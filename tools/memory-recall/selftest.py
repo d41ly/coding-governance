@@ -108,7 +108,7 @@ def resolve_memory_root() -> str:
 # `main()` already asserts `len(order) == len(_checks)`, which is DECLARED versus RAN: delete an arm
 # from both the order list and the definitions and it passes silently. This is the external number
 # that cannot be satisfied by deleting both halves.
-SELFTEST_ARMS = 71
+SELFTEST_ARMS = 73
 # 34 -> 58 on 2026-08-24 (adopter ic's recall contrib branch): twenty-four arms — twenty-three ported from
 #   adopter ic's scripts/recall/selftest.py plus one written here. NINE over `bench.py`/`union.py`,
 #   which `verbatim.json` pinned by digest and nothing exercised; ELEVEN over the half of
@@ -127,6 +127,9 @@ SELFTEST_ARMS = 71
 #   into the conf, each observed red against the kit before the unit - the archive segment after
 #   `archive/`, `RECALL_NODE_TAG_CLASS`, `RECALL_CITED_FAMILIES`, `RECALL_BUILD_QID_CUTOFF`,
 #   `RECALL_EXPORT_DIR`, and the digest moving with the two grammar keys and only those.
+# 71 -> 73 on 2026-09-28 (TOOL-aRepatriatedFork-40): TWO arms, both red against the d486ea50
+#   extractor - a spec's defining H1 anchors its id by the index generator's own predicate, and a
+#   query for that id returns the defining spec's record first.
 
 
 def check_provenance_chain(src: str | None = None, pinned: int | None = None) -> str:
@@ -189,6 +192,13 @@ def make_repo(kitname: str = "memory-recall", conf: str = CONF, gitignore: str |
     kitdir.mkdir(parents=True)
     for f in SHIPPED:
         shutil.copyfile(KIT / f, kitdir / f)
+    # The two memory-tree files this kit reaches, where the resolver's probe finds them: this kit
+    # `requires` that one, `extract_records` imports `parse_spec_h1` from `tree_lib.py` on first use,
+    # and the spec-H1 arm compares against `gen_build_index.spec_ids` (TOOL-aRepatriatedFork-40).
+    import extract as E
+    (root / "memory-tree").mkdir()
+    for f in ("tree_lib.py", "gen_build_index.py"):
+        shutil.copyfile(E.resolve_kit_dir("memory-tree", f, KIT) / f, root / "memory-tree" / f)
     (root / ".memory-tree.conf").write_text(conf, encoding="utf-8", newline="\n")
     # `flat` writes <root>/DECISIONS.md, which is the layout the memory-tree kit's own adopter
     # creates; the default writes <root>/<discipline>/DECISIONS.md, which is upstream's. `DURABLE`
@@ -1578,6 +1588,12 @@ def test_one_walk_two_callers():
         return f"query sees {len(live)} file(s), measurement sees {len(tracked)}"
     finally:
         os.chdir(cwd)
+        # `reload` re-executes the ONE module object `query` also holds, from the fixture's copy;
+        # left there, every later in-process arm ran a kit whose directory `cleanup` deletes, and
+        # anything resolving a sibling from `extract.__file__` looked beside nothing
+        # (TOOL-aRepatriatedFork-40). Put the kit's own source back.
+        sys.path.remove(str(kitdir))
+        importlib.reload(E)
         cleanup(root)
 
 
@@ -2637,6 +2653,88 @@ def test_digest_follows_grammar_keys_only():
     return f"base {dig['base']}; tag and cited move it, cutoff and export do not"
 
 
+# --- TOOL-aRepatriatedFork-40: a spec's defining H1 anchors its id, by the index generator's predicate
+SPEC_H1_REL = "builds/bQuill/spec/2026-09-28-spec-TOOL-aQuill-9.md"
+SPEC_H1_CORPUS = {
+    # The ONLY defining line TOOL-aQuill-9 has: a spec H1. The section under it must stay out of
+    # its record.
+    SPEC_H1_REL: "# TOOL-aQuill-9 — the quibbler rotation\n\n**Status:** SPECCED\n\n"
+                 "## 1. Goal\n\nThe zanzibar gasket rotates every flush.\n",
+    # A sub-spec, any depth under spec/ — the index generator reads it too. It carries a status
+    # line as every real spec does: a ONE-LINE file's record and chunk share the fusion key, so
+    # they sum in `rrf` and that file outranks every other hit whatever the query named.
+    "builds/bQuill/spec/subspecs/sub.md": "# TOOL-aQuill-6 — the sub-spec\n\n**Status:** SPECCED\n",
+    # Citation only, in prose: never a definition.
+    "tooling/cite.md": "Notes. The quibbler rotation from TOOL-aQuill-9 is discussed here at length, "
+                       "with the quibbler and its rotation, again and again, quibbler rotation.\n",
+    # An H1 outside spec/ and a FENCED H1 inside one: neither defines anything.
+    "builds/bQuill/build/journal.md": "# TOOL-aQuill-8 — a journal titled with an id\n",
+    "builds/bOther/spec/fenced.md": "Intro.\n\n```\n# TOOL-aQuill-7 — fenced\n```\n",
+}
+
+
+def seed_spec_h1(root: pathlib.Path) -> str:
+    m = resolve_memory_root()
+    for rel, text in SPEC_H1_CORPUS.items():
+        p = root / m / rel
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text(text, encoding="utf-8", newline="\n")
+    subprocess.run(["git", "-C", str(root), "add", "-A"], check=True, capture_output=True)
+    return m
+
+
+@check("a spec H1 anchors the id it defines, by the index generator's own predicate")
+def test_spec_h1_anchors_the_id_it_defines():
+    """AC1-AC3. Before this, `A_HEADING` was `#{2,6}` and nothing else looked at an H1, so an id
+    whose only defining line is its spec's H1 had no record and resolved to nothing."""
+    import extract as E
+    root, kitdir = make_repo()
+    out = root / ".x"
+    try:
+        m = seed_spec_h1(root)
+        p = run(root, kitdir, str(root), str(out), script="extract.py")
+        assert p.returncode == 0, f"extract exited {p.returncode}: {p.stderr[-400:]}"
+        anchors = json.loads((out / "anchors.json").read_text(encoding="utf-8"))
+        recs = [json.loads(x) for x in (out / "records.jsonl").read_text(encoding="utf-8").splitlines()]
+        tree_kit = E.resolve_kit_dir("memory-tree", "gen_build_index.py", kitdir)
+        if str(tree_kit) not in sys.path:
+            sys.path.insert(0, str(tree_kit))
+        import gen_build_index as G
+        tracked = subprocess.run(["git", "-C", str(root), "ls-files"], capture_output=True,
+                                 text=True, encoding="utf-8", check=True).stdout.split()
+        want = G.spec_ids(str(root), tracked, {"MEMORY_ROOT": m, "FAMILIES": "tooling:TOOL"})
+    finally:
+        cleanup(root)
+    spec = f"{m}/{SPEC_H1_REL}"
+    assert anchors.get("TOOL-aQuill-9") == [spec], f"the spec H1 did not anchor: {anchors}"
+    rec = next(r for r in recs if r["id"] == "TOOL-aQuill-9")
+    assert rec["text"] == "# TOOL-aQuill-9 — the quibbler rotation", f"the record ran on: {rec['text']!r}"
+    assert not any(r["path"] == f"{m}/tooling/cite.md" for r in recs), "a citation wrote a record"
+    assert "TOOL-aQuill-8" not in anchors, "an H1 outside spec/ anchored"
+    assert "TOOL-aQuill-7" not in anchors, "a fenced H1 anchored"
+    h1 = {r["id"] for r in recs if r["text"].startswith("# ")}
+    assert h1 == want == {"TOOL-aQuill-9", "TOOL-aQuill-6"}, f"extract {h1} vs spec_ids {want}"
+    return f"H1-anchored {sorted(h1)} == spec_ids; the journal H1, the fenced H1 and the citation do not"
+
+
+@check("a query for a spec-defined id returns the defining spec's record first")
+def test_spec_h1_record_outranks_a_citation():
+    """AC4. The citing file repeats the words; the defining spec must still come back as hit 1."""
+    root, kitdir = make_repo()
+    try:
+        m = seed_spec_h1(root)
+        p = run(root, kitdir, "what is TOOL-aQuill-9", "--terms",
+                "TOOL-aQuill-9 quibbler rotation zanzibar gasket flush")
+    finally:
+        cleanup(root)
+    hits = [ln for ln in p.stdout.splitlines() if re.match(r"^\[\d+\] ", ln)]
+    want = f"[1] TOOL-aQuill-9 · {m}/{SPEC_H1_REL}:1"
+    assert hits and hits[0] == want, f"hit 1 is {hits[:1]}, wanted {want!r}\n{p.stdout[-600:]}{p.stderr[-300:]}"
+    cite = next((ln for ln in hits if f"{m}/tooling/cite.md" in ln), None)
+    assert cite, f"the citing file never surfaced, so nothing was outranked: {hits}"
+    return f"{hits[0]}; the citation comes back as {cite.split(' ', 1)[0]}"
+
+
 def main() -> int:
     # The live log of the repo this kit sits in, hashed before and after: a gate that writes to the
     # instrument it measures is how upstream's log came to be 96% self-inflicted refusals.
@@ -2684,6 +2782,8 @@ def main() -> int:
         test_archive_segment_after_archive_is_durable, test_node_tag_class_is_declared,
         test_cited_families_are_ids_not_homes, test_build_qid_cutoff_is_read_from_conf,
         test_export_dir_is_declared_and_bounded, test_digest_follows_grammar_keys_only,
+        # TOOL-aRepatriatedFork-40: the spec H1 anchor
+        test_spec_h1_anchors_the_id_it_defines, test_spec_h1_record_outranks_a_citation,
     ]
     assert len(order) == len(_checks), f"{len(order)} arms declared, {len(_checks)} ran"
     # DECLARED-versus-RAN above is satisfied by deleting an arm from both halves; this is the

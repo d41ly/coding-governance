@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.4 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-09-26T13:29:28+03:00 @ 2ab8887944cf89dad8c33757fafe7101184884a0
+last-audit: 2026-09-28T18:44:02+03:00 @ ca4bff2449101b575fe67534b2880a1d2e254130
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/run-gates/run-selftests.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 6ee9be2e0905d6d6717e3a6f913e2fe119a96132
+last-body-change: 0b41c62f2c331f49c1de305e53d9ef449095d892
 check-script: skills/session-kickoff/manifest-check.sh
 registry: AGENTS.md
 -->
@@ -212,7 +212,9 @@ same primary tree, so the path cannot tell them apart) + CamelCase adjective-nou
 READ from the GENERATED `memory/LIVE.md` + `memory/ledger/<month>.md` (`gen_build_index.py --write`
 re-renders them from build front matter); there is no authored ledger to update. Build folders are
 `memory/builds/<slug>/`; the discipline is the spec header's `streams` value (`STREAMS_CUTOFF` in
-`.memory-tree.conf` arms it).
+`.memory-tree.conf` arms it). A unit id is DEFINED by its spec's H1 under `builds/<slug>/spec/`: the
+index generator and recall read that line through one predicate, `tree_lib.parse_spec_h1`, and
+check 14 counts only present-tense citations against it. `TOOL-aRepatriatedFork-39`, `-40`.
 
 ### Current posture — dated corrections
 

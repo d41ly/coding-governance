@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.99 -->
+<!-- gov:kit memory-tree@2.101 -->
 # memory/ retention & hygiene
 
 `memory/` is the project's AI-first memory: version-controlled, travelling to every node on clone.
@@ -119,8 +119,9 @@ set membership rather than a `grep -qxF` per call, because that fork ran once pe
   and — since `TOOL-cGradedDebt-1` — if a listed path would PASS all three unwaived, because a row
   that hides nothing has stopped shrinking. The same run prints which of the three each row earns,
   so a waiver wider than its fault is visible without being failed. Held under `--staged`.
-- **`id-orphan-waiver.txt`** — ids cited but never defined, deliberately (check 14). Shrink-only
-  against `ORPHAN_ID_PIN`, with a stale-entry guard: a waived id that now resolves reds.
+- **`id-orphan-waiver.txt`** — ids cited in the present tense but never defined, deliberately
+  (check 14). Shrink-only against `ORPHAN_ID_PIN`, with a stale-entry guard: a waived id that
+  now resolves, or that no present-tense file cites, reds.
 - **`corpus-path-unresolved.txt`** — rooted repo-path citations that resolve to nothing (check 15),
   one TAB-separated row per `(citing-file, cited-path)`. Shrink-only against `DEAD_PATH_PIN`.
 - **`unarmed-branches.txt`** — `fail` branches no assertion reaches (the harness meta-gate below).
@@ -242,9 +243,11 @@ to every consumer, so a registry a gate names and nothing creates is invisible u
 13. **id-definition collision** — one id claimed by two different build folders. A decision-log row
     and its spec's H1 both anchor the same id BY DESIGN (the index points at the record), so
     "defined twice" is not the test; "claimed by two builds" is.
-14. **orphan ids** — an id cited but never defined fails unless listed in
-    `project/id-orphan-waiver.txt`, which carries a shrink-only pin (`ORPHAN_ID_PIN`) and a
-    stale-entry guard: a waived id that now resolves is a stale row and reds.
+14. **orphan ids** — an id cited in the PRESENT-tense corpus but never defined fails unless listed
+    in `project/id-orphan-waiver.txt`. The population is check 15's, decided by one test for both:
+    a record of a moment or an append-only file is not a claim about now. The waiver is not a
+    citation. It carries a shrink-only pin (`ORPHAN_ID_PIN`) and a stale-entry guard: a waived
+    id that now resolves, or that no present-tense file cites, is a stale row and reds.
 15. **dead repo-path citations** — a rooted repo-path citation in the PRESENT-tense corpus that
     resolves to nothing must be registered in `project/corpus-path-unresolved.txt`. A DIRECTORY
     citation counts: it is exactly as broken when it does not resolve, and the flatten left four of

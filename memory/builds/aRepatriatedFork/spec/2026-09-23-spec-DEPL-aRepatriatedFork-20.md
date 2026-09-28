@@ -1,6 +1,6 @@
 # DEPL-aRepatriatedFork-20 — inCMS converges onto gov's memory-tree programs
 
-**Status:** INPROGRESS · rev-7 · 2026-09-25 · node a · Tier-2 · base f8fdd873 · streams deployer · order 20
+**Status:** INPROGRESS · rev-9 · 2026-09-28 · node a · Tier-2 · base f8fdd873 · streams deployer · order 20
 
 <!-- gen:spec-records -->
 
@@ -112,6 +112,10 @@ bridge rows go.
   where its generator sits.
 - **consumes-from** `TOOL-aRepatriatedFork-38` — gov's conf readers agreeing with bash on a trailing
   comment. Without it inCMS's `ratified="2026-09-10 node a"   # …` reads as junk in the lexicon kit.
+- **consumes-from** `TOOL-aRepatriatedFork-39` — check 14 grading present-tense citations only, as
+  check 15 does. Without it gov's engine counts 330 inCMS orphans where 4 sit in a present-tense file.
+- **consumes-from** `TOOL-aRepatriatedFork-40` — recall anchoring an id on the spec H1 that defines
+  it. Without it the recall-regression leg loses two graded targets and reads 1610/1613 alias ids.
 
 ## 4. Design
 
@@ -319,6 +323,10 @@ New arm: none. The witnesses are inCMS's own legs, run at inCMS; gov's bar gains
   of the carried inCMS sites, `TOOL-aRepatriatedFork-36`, the recall kit's convergence, `TOOL-aRepatriatedFork-37`, the
   suite's derived repair pointer, and `TOOL-aRepatriatedFork-38`, the conf readers. The order moves
   7 -> 20, one past the highest order it consumes from, as the build rule states.
+- rev-8 · 2026-09-28 · §3 gains the **consumes-from** edge to `TOOL-aRepatriatedFork-39`, check 14's
+  present-tense population. It sits at order 19, so this unit's order stays 20.
+- rev-9 · 2026-09-28 · §3 gains the **consumes-from** edge to `TOOL-aRepatriatedFork-40`, recall's
+  spec-H1 anchor. It sits at order 19, so this unit's order stays 20.
 
 ## 10. Reuse audit
 

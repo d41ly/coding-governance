@@ -983,6 +983,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "build_spec_path_re",
+      "kind": "function",
+      "file": "tools/memory-tree/tree_lib.py"
+    },
+    {
       "id": "build_spec_record_index",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -3263,6 +3268,11 @@
       "file": "tools/codebase-map/map_lib.py"
     },
     {
+      "id": "load_parse_spec_h1",
+      "kind": "function",
+      "file": "tools/memory-recall/extract.py"
+    },
+    {
       "id": "load_project_layer",
       "kind": "function",
       "file": "tools/drift-audit/drift_report.py"
@@ -4036,6 +4046,11 @@
       "id": "parse_spec",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "parse_spec_h1",
+      "kind": "function",
+      "file": "tools/memory-tree/tree_lib.py"
     },
     {
       "id": "parse_time",
@@ -5675,6 +5690,11 @@
     {
       "id": "resolve_kit_dir",
       "kind": "function",
+      "file": "tools/memory-recall/extract.py"
+    },
+    {
+      "id": "resolve_kit_dir",
+      "kind": "function",
       "file": "tools/memory-tree/corpus_ids.py"
     },
     {
@@ -6484,6 +6504,11 @@
     },
     {
       "id": "seed_records",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "seed_spec_h1",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
     },
@@ -8266,6 +8291,16 @@
       "id": "test_source_cited_ids",
       "kind": "function",
       "file": "tools/drift-audit/selftest.py"
+    },
+    {
+      "id": "test_spec_h1_anchors_the_id_it_defines",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_spec_h1_record_outranks_a_citation",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
     },
     {
       "id": "test_spine_flat_layout",

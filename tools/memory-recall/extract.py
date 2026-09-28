@@ -58,6 +58,62 @@ import recall_conf  # noqa: E402
 
 CONF = recall_conf.resolve()
 
+
+# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
+def resolve_kit_dir(home, anchor, here):
+    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
+
+    1. receipt — the `.governance/install.json` row whose `source` ends in <home>/<anchor> and
+       whose `path` exists inside this tree. The only record of a RENAMED kit dir: no probe finds
+       a memory-recall kit an adopter homed at `scripts/recall/`.
+    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
+    3. refuse — LookupError naming the three places looked; never a guessed prefix.
+    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
+    """
+    import json
+    import pathlib
+    here = pathlib.Path(here).resolve()
+    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
+    receipt = root / ".governance" / "install.json"
+    try:
+        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("path"):
+            continue
+        if str(row.get("source") or "").split("/")[-2:] != [home, anchor]:
+            continue
+        hit = (root / str(row["path"])).resolve()
+        if hit.is_file() and root in hit.parents:
+            return hit.parent
+    probes = (here / home, here.parent / home)
+    for cand in probes:
+        if (cand / anchor).is_file():
+            return cand
+    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
+        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
+# <<< resolve_kit_dir
+
+
+# The spec-H1 predicate is the memory-tree kit's, found by `resolve_kit_dir` and imported on FIRST
+# USE (TOOL-aRepatriatedFork-40). This kit `requires` that one, so a miss is a refusal naming where
+# the resolver looked, never a silent "no spec defines anything". Deferred rather than at import:
+# the merge driver and check-wiring load this module for the GRAMMAR alone, and their fixtures carry
+# no memory-tree kit beside it.
+_PARSE_SPEC_H1 = None
+
+
+def load_parse_spec_h1():
+    global _PARSE_SPEC_H1
+    if _PARSE_SPEC_H1 is None:
+        kit = resolve_kit_dir("memory-tree", "tree_lib.py", pathlib.Path(__file__).resolve().parent)
+        if str(kit) not in sys.path:
+            sys.path.insert(0, str(kit))
+        from tree_lib import parse_spec_h1
+        _PARSE_SPEC_H1 = parse_spec_h1
+    return _PARSE_SPEC_H1
+
 # The three id eras of the memory-tree kit's id grammar, in one pattern:
 #   flat          ARCH-001              (family, "001",            None)
 #   node-scoped   ABL-d119              (family, "d119",           None)
@@ -111,10 +167,13 @@ ID_RE = re.compile(r"\b" + ID + r"\b")
 # An anchor is a line that DEFINES a record, as opposed to one that merely cites it. Four shapes
 # exist in this corpus and all four are load-bearing -- U4 of the unified build spec counts 759
 # pipe-table rows against 407 charter-form dash rows across 7 table schemas.
-# H1 is deliberately NOT an anchor. A build spec titles itself `# ARCH-aBoundGazetteer-1 — ...`, and
-# an H1 anchor then owns the whole file down to the next H1 -- one 40 KB "record". Measured: records
-# went 3 164 394 -> 8 507 443 indexed chars (mean 1 041 -> 2 572) against the published mean of
-# 1 086. The H2-H6 rule reproduces the published byte profile; H1 destroys it.
+# H1 is NOT one of the four LINE shapes. A build spec titles itself `# ARCH-aBoundGazetteer-1 — ...`,
+# and an H1 anchor that owned its section would own the whole file down to the next H1 -- one 40 KB
+# "record". Measured: records went 3 164 394 -> 8 507 443 indexed chars (mean 1 041 -> 2 572)
+# against the published mean of 1 086. The H2-H6 rule reproduces the published byte profile.
+# A SPEC's defining H1 does anchor, in `extract_records` (TOOL-aRepatriatedFork-40): it is decided by
+# PATH as well as line, through the memory-tree kit's `parse_spec_h1`, and its record is shaped as a
+# ROW -- the title line and its continuations -- so the byte profile holds.
 A_HEADING = re.compile(r"^#{2,6}\s+[`*]*(" + ID + r")\b")
 A_BOLD_LI = re.compile(r"^\s*[-*]\s+[`*]*(" + ID + r")\b[`*]*\s*[-—:·]")
 # The first cell may carry trailing text -- `| **ABL-a085** (AC2 sweep) | ... |` is one of the 7
@@ -525,15 +584,34 @@ def extract_records(path: str, text: str) -> list[dict]:
     A heading anchor owns its section, down to the next heading of the same or higher level. A row
     anchor (list entry or table row) owns its own line plus indented continuations -- those rows run
     to 1-2 KB in this corpus, so the row IS the record.
+
+    A spec's DEFINING H1 -- `parse_spec_h1`, the predicate the index generator's `spec_ids` reads --
+    anchors too, and owns what a row anchor owns: its own line and the non-blank lines under it,
+    which is the spec's title (TOOL-aRepatriatedFork-40).
     """
     lines = text.splitlines()
+    h1 = load_parse_spec_h1()(path, text, CONF.memory_root, CONF.families)
+    h1_at = None
+    if h1:
+        # The predicate numbers `split("\n")` lines and this loop walks `splitlines()`, which also
+        # breaks on form feeds and U+2028; re-find the line by content when the two disagree.
+        want = text.split("\n")[h1[0] - 1].rstrip("\r")
+        h1_at = h1[0] - 1
+        if h1_at >= len(lines) or lines[h1_at] != want:
+            h1_at = next((k for k, ln in enumerate(lines) if ln == want), None)
     docs, i = [], 0
     while i < len(lines):
         rid = anchor_at(lines[i])
+        lvl = heading_level(lines[i])
+        if not rid and i == h1_at:
+            # A ROW, not a section: the H1 line and the non-blank lines under it, i.e. the title.
+            # As a section to the next heading it carried the generated records table too, and
+            # measured on this corpus that took records 734 844 -> 2 000 616 indexed chars and the
+            # graded floor 0.8333 -> 0.7500 by moving every BM25 statistic. As a row: 805 928, 0.8333.
+            rid, lvl = h1[1], None
         if not rid:
             i += 1
             continue
-        lvl = heading_level(lines[i])
         start, j = i, i + 1
         if lvl is not None:
             while j < len(lines):

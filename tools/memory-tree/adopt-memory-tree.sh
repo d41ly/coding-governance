@@ -382,8 +382,9 @@ printf '# legacy-files.txt — recording files kept under historical names (perm
 ' > "$M/project/legacy-files.txt"
 printf '# curation-debt.txt — index files pending slimming (exempt from checks 6/7/8 while listed). Empty = fully strict.
 ' > "$M/project/curation-debt.txt"
-printf '# id-orphan-waiver.txt — ids cited but never defined, deliberately (check 14). One id per line.
-# Shrink-only against ORPHAN_ID_PIN; a waived id that now resolves is a stale row and reds.
+printf '# id-orphan-waiver.txt — ids cited in the present tense but never defined, deliberately (check 14).
+# Shrink-only against ORPHAN_ID_PIN; a waived id that now resolves, or that no present-tense file
+# cites, is a stale row and reds.
 ' > "$M/project/id-orphan-waiver.txt"
 printf '# corpus-path-unresolved.txt — rooted repo-path citations in the present-tense corpus that
 # resolve to nothing (check 15). One row per (citing-file, cited-path), TAB-separated:
