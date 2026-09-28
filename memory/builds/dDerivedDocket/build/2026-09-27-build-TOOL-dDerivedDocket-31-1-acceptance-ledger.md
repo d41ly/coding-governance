@@ -69,6 +69,17 @@ the new hygiene-suite arm, the driver-suite arm, and the ratchet half of AC12.
 - AC13 — amended rev-6 — only `--plan` can report FORKED; `--dispatch`, the build-complete term and
   the pass-order leg act on MISSING and THIN alone, so their half is the call-site count. In a
   scratch build `--plan` printed `next: ARCH-tP-1 (FORKED)` for an unmarked F2 below a marked F1
+- AC14 — `tools/memory-tree/marker-contract.test.sh` — its four spelling rows and its
+  bullets-and-no-F-item row, byte for byte with its fixture conf and spec shape at 2026-09-20,
+  run directly through bed37c25's hygiene engine and a `plan_state` sliced as the harness slices
+  it, because the harness's own match admits either finding and cannot tell them apart. Each
+  spelling, unmarked, drew only the per-item finding
+  `F-items carrying no conforming resolution mark in their own span`, naming F1, and FORKED, and
+  no shape finding. The same four with a conforming mark inside their own span read silent and
+  READY, which a spelling that opened no F-item cannot do: a marked `- **Fx — …**` control still
+  drew the shape finding and FORKED. The bullets-and-no-F-item row drew
+  `§8 is not F-item shaped … it carries items and no F-item` and FORKED, and its twin dated
+  2026-08-09 read silent and READY. This is not the harness run the entries around it cite.
 - AC15 — `marker contracts` — the same run held every reader pair: the trailing-comment, single-quoted,
   repeated and bare spellings, and the matched `FORK_ITEM_CUTOFF=`, each agreeing with a subshell `.`
   of the same file; `2026-09-15x` refused rc 2 as neither blank nor an ISO date; and the `export`,

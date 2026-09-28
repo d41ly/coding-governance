@@ -18,6 +18,17 @@ carry a `permission:` line deferring their observation and get no line here: AC3
   numbered message naming that verb and the run-state blob is unchanged; with it exiting 3 the
   refusal names the observation, the output carries no `--prepare` at all, and the blob is again
   unchanged. The exit-2 arm refuses naming `LANDER_MODE`.
+- AC3 — `--land` — observed by hand in a scratch fixture built from bed37c25's own driver, lander,
+  pre-push hook and gate runner: a bare remote, a primary tree, the run's linked worktree on
+  `unit`, and a two-leg `tools/gate-legs.json`. After a second clone moved the remote,
+  `push-main.sh --prepare` made merge 7c692630 onto the advertised tip, and `--close` under
+  `in-place` ran the runner with `GATE_FULL=1` over both legs, which stamped `gate-full-green` at
+  7c692630 in the worktree's git dir and left none in the common dir, then committed
+  `records(tRun): close — LANDING` as a9cda5e3. `push-main.sh --land` printed
+  `pre-push: scoped gate on main push (a9cda5e3) — full green 7c692630 is 1 commit(s) back`,
+  ran both legs green and moved the remote's main to a9cda5e3. Staged break: with that stamp moved
+  into the common dir, the hook run directly on the same push line printed
+  `FULL gate on main push (a9cda5e3) — no recorded full green`.
 - AC4 — `--land` — the kit gate run over a fixture copy reds on four staged breaks of the Land
   section: `--prepare` renamed, `--land` renamed, a sentence directing a merge into the node's own
   default branch, and an emptied section. The shipped template passes the same run. The shipped

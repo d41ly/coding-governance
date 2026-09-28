@@ -98,6 +98,20 @@ list names.
   shape predicate (a TAB on every line, no `:<digits>:` locator, no bare count, colon-ended header
   or `… and` line) with no red, and ran a declared signature's own `--list` sibling there, whose
   real output the same predicate reded.
+- AC13 — `lexicon.py --offenders` — read at 53a7a067 against its parent 37ef8940, from scratch
+  copies of each commit's checker, over the fixtures each checker's own suite builds: lexicon's
+  `OFF_FILES` under `BASE_CONF`, and install-prefix's README line carrying two root spellings plus
+  its ROSE carried-prefix repo. At 53a7a067 `--offenders` printed exactly the known sets, four
+  lexicon keys, `frobnicate_a#2` among them, and two install-prefix keys, one ending `#2`, and
+  printed them unchanged after an unrelated function or line and an unrelated tracked file landed
+  above. Each checker's default run over the same fixtures gave stdout, stderr and exit
+  byte-identical by `cmp` at the build commit and its parent: lexicon 1525 and 1526 bytes,
+  install-prefix 606, 606 and 1210, every exit 1. The parent's lexicon.py answers `--offenders`
+  with its usage and exit 2, so it is the pre-change checker. Lexicon's default output also matched
+  BASE fb07ca25's, and `check-install-prefix.sh` is one blob at BASE and the parent. The runner
+  half is the `run-gates canary` leg record of bar run 20260928T034330Z at 364278a8: exit 0,
+  `PASS (266 assertions)`, no `canary:` failure line, so its `siginh` arm held, which wants
+  `INHERITED · offenders 1` after an unrelated line and an unrelated tracked file.
 - AC14 — `GATE_ATTRIBUTE` — at 364278a8 `run-gates canary` exited 0 with `PASS (266 assertions)`
   and no SKIP line, so its `timeout -k` arms ran. Section 7 asserts `timed` (rc 124, bound 2)
   reads `CONTENDED · timed out after 2s; not re-run at R`, `stubborn` (rc 137 under bound 1 after

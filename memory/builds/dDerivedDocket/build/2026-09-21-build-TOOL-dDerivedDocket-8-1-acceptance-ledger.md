@@ -53,6 +53,15 @@ break.
   absent key, a blank one and `shards`, and `builds` for `builds`, read through the engine's
   `--print-backlog-mode`; `buildz`, `Builds` and a leading-space `builds` each exit 2 naming the key
   and its legal values.
+- AC10 — `bash tools/memory-tree/check-memory-hygiene.sh` — in ONE scratch clone checked out at
+  e7d3f70a, this unit's parent, the engine exited 1 with 2221 bytes of stdout, whose first line is
+  `memory-hygiene: check 8 graded 590 backlog row(s) across 4 shard(s)`, and 200 of stderr. Only
+  `check-memory-hygiene.sh`, `corpus_ids.py` and `row_grammar.py` were then overlaid in that same
+  checkout from 09c5c56c with `git restore --source=09c5c56c --worktree`, each blob matching the
+  build commit's, and the second run exited 1 with stdout and stderr byte-identical to the first
+  by `cmp`. The fold's two files from e8e8f4b5 gave the same result. Control: with
+  `BACKLOG_MODE="builds"` appended to that checkout's conf, the overlaid engine's first line became
+  `memory-hygiene: check 8: backlog layout builds — graded by check 9`, so the comparison could move.
 - AC11 — `curation-debt.txt` — with the family view listed in it, the builds run reds check 6 with
   the stale-entry guard naming `memory/backlog/BRAND.md`; under `shards` the same row earns check 6
   and the guard is silent.

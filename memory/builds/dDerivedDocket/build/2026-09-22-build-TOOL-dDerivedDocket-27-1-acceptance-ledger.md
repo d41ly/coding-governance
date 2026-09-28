@@ -64,6 +64,16 @@ runs above; their lines are the orchestrator's.
   run-state file is unchanged, and left the record byte-identical and the tree clean; at a wall of 30
   it pinned the backstop. The leg over the same declaration red check 42 naming both numbers, and
   reported the equal wall clear on its report channel.
+- AC5 — `GATE_WALL` — the leg's command, `bash tools/unattended/check-unattended.sh` under
+  `GOV_UNATTENDED_REPORT=1`, run in two scratch clones at bed37c25 and never in this checkout.
+  Over the real tree it exited 0, reporting that check 42 graded the unattended bar's wall:
+  `the declared GATE_WALL, is 21600s and clears the largest declared leg ceiling of 16040s`.
+  With `GATE_WALL="10800"` staged in the second clone's `.unattended.conf` it exited 1 with
+  check 42 its only failure, whose line ends
+  `the declared GATE_WALL, is 10800s, below the largest declared leg ceiling of 16040s`,
+  every other line of the two outputs matching. 16040 was derived at
+  observation from `tools/gate-legs.json` at bed37c25, the `unattended kit gate` row, and the
+  check read it through the declared `GATE_PROFILE_CMD`, the runner's `--print-profile`.
 - AC6 — `run-gates canary` — the held leg ran at the post-build bar at 364278a8 and exited 0 on
   `PASS (266 assertions)` with no failure line, so its S3 profile-key arms held: with the TTL pinned
   at 25 s, `--print-profile` printed `queue` as the TTL times the runner's declared multiple, which
