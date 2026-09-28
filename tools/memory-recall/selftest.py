@@ -108,7 +108,7 @@ def resolve_memory_root() -> str:
 # `main()` already asserts `len(order) == len(_checks)`, which is DECLARED versus RAN: delete an arm
 # from both the order list and the definitions and it passes silently. This is the external number
 # that cannot be satisfied by deleting both halves.
-SELFTEST_ARMS = 71
+SELFTEST_ARMS = 73
 # 34 -> 58 on 2026-08-24 (contrib/incms-memory-recall): twenty-four arms — twenty-three ported from
 #   inCMS's scripts/recall/selftest.py plus one written here. NINE over `bench.py`/`union.py`,
 #   which `verbatim.json` pinned by digest and nothing exercised; ELEVEN over the half of
@@ -127,6 +127,11 @@ SELFTEST_ARMS = 71
 #   into the conf, each observed red against the kit before the unit - the archive segment after
 #   `archive/`, `RECALL_NODE_TAG_CLASS`, `RECALL_CITED_FAMILIES`, `RECALL_BUILD_QID_CUTOFF`,
 #   `RECALL_EXPORT_DIR`, and the digest moving with the two grammar keys and only those.
+# 71 -> 73 on 2026-09-28 (TOOL-dHashedPrelude-2): TWO arms over the live-log guard that
+#   brackets this suite, which until now could not fail — `main()` took its baseline after
+#   every arm had already run. One asserts from source that the baseline precedes the first
+#   decorated arm and that `main()` appends the row unconditionally; one drives
+#   `_live_log_row` over all four of its states, two of which no run in this repo produces.
 
 
 def check_provenance_chain(src: str | None = None, pinned: int | None = None) -> str:
@@ -2673,6 +2678,93 @@ def test_export_dir_is_declared_and_bounded():
     return "declared dir honoured with an honest header, `../out` exits 2 writing nothing, absent = git dir"
 
 
+# The anchors the ordering arm below compares. Each carries a LEADING NEWLINE, making it a
+# column-0 anchor, and that is load-bearing rather than tidy: a literal written inside this file's
+# own source with a backslash-n escape is the two characters backslash and n, NOT a newline, so a
+# real-newline search never matches one. Counted on the blob at BASE 3cf05f29 — bare `@check(`
+# occurs 72 times and first resolves to LINE 145, inside `check_provenance_chain()`'s docstring,
+# while the anchored form occurs 71 times and first resolves to line 287; bare `def main() -> int:`
+# occurs twice, first at line 2379 inside a `src.partition` literal, while the anchored form occurs
+# once. An arm anchored on the BARE forms would compare an offset inside a docstring against the
+# baseline's and red against a CORRECT file. Line numbers are quoted here and byte offsets are not:
+# an offset differs by one per preceding line between this CRLF working copy and the LF blob, and a
+# rev-2 draft of the spec pinned the worktree pair by mistake. TOOL-dHashedPrelude-2.
+_ANCHOR_ARM = "\n@check("
+_ANCHOR_BASELINE = "\n_LIVE_LOG_BEFORE = "
+_ANCHOR_MAIN = "\ndef main() -> int:"
+
+
+@check("the live-log baseline precedes every arm, and main() appends its row unconditionally")
+def test_the_live_log_baseline_is_taken_before_any_arm_runs(src: str | None = None):
+    """The guard is only a guard if its baseline precedes the arms it brackets.
+
+    READ FROM SOURCE, not from behaviour. The behavioural test would write a row to the REAL QUERY
+    LOG, run the suite and expect FAIL. That is not available: the only log the guard watches is
+    this repository's own, because `repo_root()` anchors on this kit's file and no arm can point it
+    at a fixture, so an arm that writes there IS the defect the guard exists to catch. Reading text
+    is what is left.
+
+    `src` is a parameter for the reason `check_provenance_chain` takes one: every failure direction
+    has to be reachable from a synthetic string, the absent-anchor one included.
+    """
+    if src is None:
+        src = pathlib.Path(__file__).read_text(encoding="utf-8", errors="replace")
+
+    # COUNTS FIRST. A second column-0 spelling of either unique anchor would silently re-point the
+    # offset compare below, so it reds here instead, naming the anchor that moved.
+    for anchor in (_ANCHOR_BASELINE, _ANCHOR_MAIN):
+        n = src.count(anchor)
+        assert n == 1, f"{anchor!r} occurs {n} time(s) at column 0, expected exactly 1"
+    arms = src.count(_ANCHOR_ARM)
+    assert arms >= 1, f"{_ANCHOR_ARM!r} occurs {arms} time(s) at column 0, expected at least 1"
+
+    base = src.find(_ANCHOR_BASELINE)
+    first = src.find(_ANCHOR_ARM)
+    mn = src.find(_ANCHOR_MAIN)
+    assert base < first, (
+        f"the baseline is assigned at offset {base}, after the first decorated arm at {first} — "
+        "every arm runs at decoration time, so a baseline below them brackets nothing")
+
+    body = src[mn:]
+    assert "_LIVE_LOG_BEFORE" in body, "main() does not read the module-scope baseline"
+    assert "_checks.append(_live_log_row(" in body, "main() does not append the guard's row"
+    for dead in ("if live is not None", "if _LIVE_LOG is not None"):
+        assert dead not in body, (
+            f"main() still guards the append with `{dead}`; with the module-scope baseline in "
+            "place that emits the row twice and both copies are green")
+    return f"baseline {base} < first arm {first}, {arms} arm(s), main() at {mn}"
+
+
+@check("the live-log row is total over its four states")
+def test_the_live_log_row_is_total_over_its_four_states():
+    """`_live_log_row` answers for every state, including two no run in this repo can produce.
+
+    DRIVEN DIRECTLY rather than by running the suite: an unresolvable repository and a missing log
+    cannot be produced inside a repository that has one, and the behavioural alternative — making
+    the guard witness a real write — means writing to the live query log, which this suite may not
+    do. The fourth state is the one that used to emit NO ROW, which reads exactly like a clean run.
+    """
+    state, name, detail = _live_log_row(None, "(absent)")
+    assert state == "skip", f"an unresolvable repository reported {state!r}, not a skip"
+    assert name == _LIVE_LOG_ROW and "resolve" in detail, f"the skip does not say why: {detail!r}"
+
+    root = pathlib.Path(tempfile.mkdtemp(prefix="recall-row-"))
+    try:
+        log = root / "queries.jsonl"
+        assert _live_log_row(log, "(absent)")[0] == "ok", "a log absent at both readings is not ok"
+        log.write_bytes(b'{"qid": 1}\n')
+        before = _live_log_digest(log)
+        assert _live_log_row(log, before)[0] == "ok", "an unchanged log did not report ok"
+        log.write_bytes(b'{"qid": 1}\n{"qid": 2}\n')
+        state, _, detail = _live_log_row(log, before)
+        assert state == "FAIL", f"an appended-to log reported {state!r}"
+        assert before[:12] in detail and _live_log_digest(log)[:12] in detail, (
+            f"the FAIL detail names only one digest, so it says nothing about what changed: {detail!r}")
+    finally:
+        cleanup(root)
+    return "skip / ok / ok / FAIL, and the FAIL names both digests"
+
+
 @check("CONF_DIGEST moves with the two grammar keys and ONLY with them")
 def test_digest_follows_grammar_keys_only():
     """A grammar key must invalidate a warm cache; a non-corpus key must not force a rebuild (AC6)."""
@@ -2737,6 +2829,9 @@ def main() -> int:
         test_archive_segment_after_archive_is_durable, test_node_tag_class_is_declared,
         test_cited_families_are_ids_not_homes, test_build_qid_cutoff_is_read_from_conf,
         test_export_dir_is_declared_and_bounded, test_digest_follows_grammar_keys_only,
+        # TOOL-dHashedPrelude-2: the guard that brackets this suite, gated
+        test_the_live_log_baseline_is_taken_before_any_arm_runs,
+        test_the_live_log_row_is_total_over_its_four_states,
     ]
     assert len(order) == len(_checks), f"{len(order)} arms declared, {len(_checks)} ran"
     # DECLARED-versus-RAN above is satisfied by deleting an arm from both halves; this is the
