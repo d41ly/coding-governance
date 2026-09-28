@@ -50,3 +50,11 @@ form.
 - AC4 — amended rev-6 — `CLAUDE_CODE_SESSION_ID=sOther` was on four arms at the parent, from unit
   61's build pass. The criterion now counts it, 5 at the parent and 1 after, and names the one
   lease-fact line rewritten, AC20's, which reads `lease-utc` re-stamped. Section 9, rev-6.
+- AC5 — `unattended skill wiring` — at 364278a8 the leg exits 0 printing `in sync`, which it reaches
+  only past its refusals on a stop contract that is missing or has drifted from
+  `tools/unattended/STOPS.template.md`. The `unattended kit gate` leg exits 0 with no check 10
+  finding. The greps, the `cmp` and the size reads are the in-pass reads above.
+- AC6 — `harness arms (fail branches armed or pinned)` — at 364278a8 the leg exits 0 with no
+  finding, and the `kit version markers` and `install-prefix (shipped surface)` legs each exit 0
+  clean. The function list, the `fail 58` and `fail 59` counts, the pin-file diff, the version
+  greps and the added-line reads are the in-pass reads above.

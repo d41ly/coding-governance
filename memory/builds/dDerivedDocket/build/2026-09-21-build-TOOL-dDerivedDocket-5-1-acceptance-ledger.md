@@ -48,6 +48,17 @@ AC14, the attributed unattended run the main loop makes at VERIFYING.
   exits 1 naming the same placeholder in the render it just made; with `RESUME_SCHEDULE="off"` the
   render carries the fixed literal `not scheduled: RESUME_SCHEDULE is off` in place of both tool
   names and `--check` exits 0.
+- AC10 — `bash tools/unattended/check-unattended.sh` — at 364278a8 the `unattended kit gate` leg
+  exited 0, and the `unattended skill wiring` leg
+  (`bash tools/unattended/adopt-unattended.sh --check`, which exits 1 when
+  `memory/guides/UNATTENDED-STOPS.md` drifts from `tools/unattended/STOPS.template.md`) printed
+  `in sync (skill rendered from template + .unattended.conf)`, exit 0. At that commit
+  `memory/guides/UNATTENDED-VERBS.md` carries `--scheduled`; the rendered
+  `.claude/skills/unattended/SKILL.md` hold step issues `delete_scheduled_task` against the printed
+  name and then `create_scheduled_task` under it; its Resume section deletes the restart only after
+  a take-over's `--resume` has succeeded and been pushed, never on a refusal or the `still held`
+  branch; and that branch, scheduled or manual, leaves the named task, reaps the keepalive just
+  scheduled and reads the scheduler's listing back before it stops.
 - AC11 — `--close` — on a fixture whose history holds one hold row that owed a schedule, it prints the
   reap list beside the keepalive id: `keepalive kC · durable schedule unattended-resume-trun`.
   `--abort` prints the same line before it asks for the attestation, and a fixture whose holds owed
@@ -55,6 +66,11 @@ AC14, the attributed unattended run the main loop makes at VERIFYING.
 - AC12 — `memory/DECISIONS.md` — its TOOL heading carries one row keyed `TOOL-dDerivedDocket-5`
   recording the owner's on-everywhere ruling and the charter §9 override, 292 characters against the
   300-character entry budget.
+- AC13 — `bash tools/unattended/check-unattended.sh` — at 364278a8 the `unattended kit gate` leg
+  exited 0 printing `RESUME_SCHEDULE on (declared)` against the driver's set `on off`, with no check
+  46 refusal. `.unattended.conf` there declares `RESUME_SCHEDULE_CREATE="create_scheduled_task"` and
+  `RESUME_SCHEDULE_DELETE="delete_scheduled_task"`, while `KEEPALIVE_CREATE` is `CronCreate`, a
+  different tool.
 - AC15 — `tools/unattended/kit.toml` — the conf-placeholder hole's discharge command, read out of
   the descriptor, exits 1 over a fixture holding the shipped example with its three `KEEPALIVE_`
   lines filled and its two resume placeholder lines verbatim, and exits 0 once those two are filled

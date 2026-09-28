@@ -49,6 +49,11 @@ carry a `permission:` line deferring their observation and get no line here: AC3
 - AC12 — `gates-green` — with one untracked file in an otherwise prepared tree the close refuses by
   number naming the stamp precondition, and the fixture bar's environment dump is never written, so
   no bar ran.
+- AC13 — `bash tools/unattended/check-unattended.sh` — at 364278a8 the `unattended kit gate` leg
+  exited 0 printing `LANDER_MODE in-place (declared)` and
+  `SELFTESTS_OWED_PATHS entry tools/ — resolves to tracked paths`. At that commit all 15 directories
+  holding a `tools/*/kit.toml` and all 5 paths named by a `sentinel = ` line in
+  `tools/govkit/entries/*.kit.toml` start with `tools/`.
 - AC14 — amended rev-6 — the `memory/DECISIONS.md` half was removed because a unit pass structurally
   cannot write that file: `--dispatch` refuses a declared write overlapping a `SHARED_RECORDS` entry
   and the kit gate's subset test reds an undeclared one. The surviving half was observed:

@@ -16,6 +16,23 @@ deleted, and the exemption's second direction deleted. No merge bar, no gate leg
 suite was run.
 
 **Evidences:** TOOL-dDerivedDocket-50
+- AC1 — `corpus-ids selftest` — at 364278a8 the leg,
+  `python3 tools/memory-tree/corpus_ids.py --selftest`, prints `PASS — corpus_ids: all arms held`,
+  exit 0, and its arm answering the GIVEN root's own id on a heading and a table row, and `None` on
+  a citation, through `resolve_anchor` reads ok.
+- AC2 — `corpus_ids.py --selftest` — as the `corpus-ids selftest` leg at 364278a8 its call-graph
+  arm reads ok: `anchor_at` named once, `_anchor`'s only caller the route, and `walk()` resolving
+  one bundle and handing it over. Its expected answer, in the module's source at that commit, is
+  `anchor_at=1 _anchor callers=['resolve_anchor'] grammar( in walk=1 route args in walk=[2]`,
+  counting `anchor_at` reached through any expression.
+- AC3 — `GRAMMAR_DIR` — as the `corpus-ids selftest` leg at 364278a8 all six refusal arms read ok,
+  over a `GRAMMAR_DIR` holding no `extract.py` and over one whose `extract.py` has no `grammar_for`:
+  in each the anchor route's refusal states its own cause and its install or update cure and names
+  neither pin, and `grammar()`'s own refusal keeps the pin cause and the parent's cure verbatim.
+- AC4 — `memory-hygiene self-test` — at 364278a8 the leg prints `PASS (521 assertions)` against
+  that commit's floor of 516, exit 0, with no `FAIL` line. At that commit the python example-conf
+  block prints a `FAIL` line on each miss: a derivation naming no key, one missing `MEMORY_ROOT` or
+  `ROTATION_MODE`, a fixture read through `conf` not redding, and `ucfg["RECALL_CLI"]` not redding.
 - AC5 — amended rev-2 — `FLOOR_ASSERTIONS` — the criterion's exemption clause named only the
   `os.environ` reads; re-measured on this tree the unconstrained receiver also pulls in two module
   constants reached through `globals()` and one fixture view key, so the clause is widened and §9's
@@ -41,3 +58,8 @@ suite was run.
   and the artifact carries no leading-underscore Python function at all, re-measured here. The
   dossier `memory/map/features/memory-tree-hygiene.md` now describes the project-key block as three
   example-conf parity arms and states what the unconstrained receiver buys.
+- AC9 — `resolve_anchor` — as the `corpus-ids selftest` leg at 364278a8 all six target-root arms
+  read ok: over a root with no `.memory-tree.conf`, one declaring no `MEMORY_ROOT` and one declaring
+  no usable `FAMILIES`, each call raises this kit's `Problem` naming the root, and each refusal
+  names which declaration was missing. A `ConfError` reaching the caller fails those arms by
+  construction.

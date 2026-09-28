@@ -40,3 +40,74 @@ self-test`, `drift-audit selftest` and `memory-hygiene self-test`, plus the plai
 list names.
 
 **Evidences:** TOOL-dDerivedDocket-23
+- AC1 — `GATE_ATTRIBUTE` — at 364278a8 `run-gates canary` exited 0 with `PASS (266 assertions)`
+  and no SKIP line. Its section 7 drives the real runner under `GATE_ATTRIBUTE=HEAD` over a
+  two-commit fixture and asserts leg `sig off` reads `MIXED · inherited 1 · own 1`, then
+  `MIXED · inherited 0 · own 2` once L fixed R's offender and added two others.
+- AC2 — `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` — at 364278a8 its
+  `run-gates canary` leg exited 0 with `PASS (266 assertions)` and no SKIP line. Section 7 asserts
+  leg `cmpself`, red at R as at L and with its checker `fx14/c.sh` edited on the branch, reads
+  `OWN · the diff against R touches its comparator: fx14/c.sh`.
+- AC3 — `<git-dir>/gate-run/<id>/attribution` — at 364278a8 `run-gates canary` exited 0 with
+  `PASS (266 assertions)` and no SKIP line. Section 7 asserts leg `absent` reads
+  `DEAD PROBE · R's argv file`, leg `empty`, empty at L with exit 1, reads `DEAD PROBE`, a one-leg
+  manifest whose argv file R lacks prints `attributed 0 of 1 red legs`, and the `attribution` file
+  holds one nine-column TAB row per red leg, each with a known verdict and the full R sha in
+  column five.
+- AC4 — `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` — at 364278a8 its
+  `run-gates canary` leg exited 0 with `PASS (266 assertions)` and no SKIP line. Section 7 asserts
+  signature-less leg `same`, byte-identical at R and L, reads `INHERITED · offenders 1`, and leg
+  `gained`, whose L output adds one line under an unchanged `FAIL x`, reads `MIXED`.
+- AC5 — `tools/run-gates/run-gates.sh` — at 364278a8 `run-gates canary` exited 0 with
+  `PASS (266 assertions)` and no SKIP line. Section 7 appends a comment to the fixture's copy of
+  the runner and asserts leg `same`, identical at both ends, then reads `OWN · KF3`.
+- AC6 — `tools/gate-legs.json` — at 364278a8 it declares `signature` on 4 of its 122 rows, the
+  four S3 legs: `drift-audit records`, `install-prefix (shipped surface)`,
+  `lexicon naming predicates` and `memory hygiene`. `run-gates canary` (exit 0,
+  `PASS (266 assertions)`) holds the key-set control that passes a `signature` row and reds a
+  `signatur` near-miss, and `run-gates gov canary` (exit 0, `PASS (17 assertions)`) holds G1b,
+  the four-leg pin.
+- AC7 — `pre-push self-test` — at 364278a8 the leg exited 0, `pre-push.test: all cases ok`, with
+  `9 the runner is handed GATE_ATTRIBUTE = the remote sha fed on stdin`,
+  `9 the hook's exit is the runner's (3)` and
+  `9b an all-zero remote sha exports no GATE_ATTRIBUTE` each `ok`.
+- AC8 — `run-selftests self-test` — at 364278a8 the leg exited 0 with `PASS (139 arms, width 1)`,
+  every arm `ok`, the 27 of its `--attribute` block among them. `git show 53a7a067` shows this
+  unit's one change to `tools/run-gates/run-selftests.test.sh` is four lines in `build_repo`
+  copying `lib-attribute.sh`, no arm edited. At 364278a8 `run-selftests.sh` defines no
+  normaliser: it makes one `write_normaliser` call, and that function is defined in
+  `lib-attribute.sh`.
+- AC9 — `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` — at 364278a8 its
+  `run-gates canary` leg exited 0 with `PASS (266 assertions)` and no SKIP line. Section 7 replays
+  a `lexicon naming predicates` leg from measured pairs: `TOOL-aStagedLane-6`'s landing pair, R at
+  461/1045 and green, L at 467/1059, reads `OWN · green at R`; the branch point, 463 at both ends,
+  reads `INHERITED`; dCarriedReceipt's R at 382 under a pin of 384 and green, L at 429, reads
+  `OWN · green at R`.
+- AC10 — `signature` — at 364278a8 `run-gates canary` exited 0 with `PASS (266 assertions)` and
+  no SKIP line. Section 7 asserts legs `sig c` and `sig f`, whose L manifest points `signature` at
+  a constant line and at a filtering wrapper, both read `MIXED · inherited 1 · own 1`; leg
+  `lonelysig`, whose `signature` only L declares, reads `INHERITED · offenders 2` by the byte
+  rule; and leg `argvd` reads `OWN · its argv differs`.
+- AC11 — `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` — at 364278a8 its
+  `run-gates canary` leg exited 0 with `PASS (266 assertions)` and no SKIP line. Section 7 asserts
+  leg `cmp`, whose helper `fx8/helper.txt` the branch edited, and leg `rootconf`, whose root conf
+  `rootconf.txt` its checker names, each read
+  `OWN · the diff against R touches its comparator:` naming that file.
+- AC12 — `signature` — at 364278a8 `run-gates canary` exited 0 with `PASS (266 assertions)` and
+  no SKIP line. Section 7 ran each of the 4 declared `signature` argvs on that tree through its
+  shape predicate (a TAB on every line, no `:<digits>:` locator, no bare count, colon-ended header
+  or `… and` line) with no red, and ran a declared signature's own `--list` sibling there, whose
+  real output the same predicate reded.
+- AC14 — `GATE_ATTRIBUTE` — at 364278a8 `run-gates canary` exited 0 with `PASS (266 assertions)`
+  and no SKIP line, so its `timeout -k` arms ran. Section 7 asserts `timed` (rc 124, bound 2)
+  reads `CONTENDED · timed out after 2s; not re-run at R`, `stubborn` (rc 137 under bound 1 after
+  an ignored TERM) `CONTENDED · killed after`, `kill0` (rc 137, bound 0) `INHERITED`, `argvd`
+  `OWN · its argv differs`, `newrow` `OWN · no row in R's manifest`, `greenr` `OWN · green at R`,
+  `rslow` `DEAD PROBE · R's run hit its 3s ceiling` and `siginh` `INHERITED · offenders 1`. Under
+  `GATE_ATTRIBUTE=no-such-rev`, leg `same` reads `DEAD PROBE · R 'no-such-rev' does not resolve`
+  and the summary names that R.
+- AC15 — `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` — at 364278a8 its
+  `run-gates canary` leg exited 0 with `PASS (266 assertions)` and no SKIP line. Section 7 runs an
+  R copy that sleeps 120 s under `GATE_WALL=8` and asserts leg `walled` reads
+  `DEAD PROBE · cut by the wall`, the summary reads `attributed 0 of 1 red legs` with
+  `DEAD PROBE 1`, and the runner exits 1 in under 100 s, the margin it grades against the sleep.

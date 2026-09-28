@@ -51,8 +51,21 @@ owed.
   `stat -c %Y on .git/gate-queue-heartbeat`, with no `verdict:` line. The term-less copy read
   `commit` and `stale: yes` with the fresh file, and `verdict: STALE` rather than a refusal under
   the stub.
+- AC4 — `run-gates turnstile` — at 364278a8 the leg prints `PASS (74 assertions)`, exit 0, and its
+  position fixture's arms read ok: a waiter writes `gate-queue-heartbeat` under its own git dir,
+  its mtime advances while the waiter waits at one position (1790567195 -> 1790567196), the
+  queue-status file is gone once the waiter stops waiting, and the heartbeat outlives the wait.
 - AC5 — `tools/unattended/unattended.sh` — `grep -cE '^[^#]*gate-queue-heartbeat'` printed 1 over it
   and 1 over the gate runner; the loop-scoped `awk` count printed 1; and the `-nE` grep printed the
   heartbeat at line 1038, above the `TS_MAXWAIT` test at 1039.
+- AC6 — `unattended skill wiring` — at 364278a8 the leg exits 0 printing `in sync`, the Skill
+  rendered from its template, past its drift refusals on the installed guides. The
+  `unattended kit gate` leg exits 0 with no check 10 finding, and its report channel, re-run over
+  that tree, reads `check 10 byte-compared 3 of its 3 pairs: protocol verbs asks`. The greps are
+  the in-pass reads above.
 - AC7 — `git cat-file -s` — the protocol template and its render each read 64424 bytes in 703 lines
   at the parent and 64357 in 703 at the build commit, −67 bytes and 0 lines each.
+- AC9 — `install-prefix (shipped surface)` — at 364278a8 the leg exits 0 printing `clean` over 322
+  shipped files with no undeclared root-install spelling, its runtime-literal and carried-prefix
+  passes clean too. The `harness arms (fail branches armed or pinned)` leg exits 0 with no finding.
+  The version, function and `fail` counts and the added-line reads are the in-pass reads above.

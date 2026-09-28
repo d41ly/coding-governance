@@ -54,6 +54,11 @@ AC1, AC4, AC6, AC8 and AC9 carry `permission:` lines and get no line here; the o
 them after the post-build bar.
 
 **Evidences:** TOOL-dDerivedDocket-21
+- AC1 — `tools/drift-audit/selftest.py` — as the `drift-audit selftest` leg at 364278a8 it prints
+  `all checks passed (315 executed, floor 277)`, exit 0. Its remote-tracking block reads ok on every
+  arm: local main behind the raise and ahead by an unrelated commit each report the same signal
+  values as equal, none of the three states reads the landed raise as a weakened ratchet, and the
+  control against the stale local main reds as one.
 - AC2 — `git fetch origin` — over the fixture with `origin` configured and its tracking ref deleted,
   the report exited 2 with empty stdout and a refusal naming `git fetch origin main`; with `origin`
   removed it printed `no origin remote, so the base is local main @` and eight hex digits on stderr
@@ -64,13 +69,31 @@ them after the post-build bar.
   files and 50 lines. Each file is a row of the spec's inventory at rev-6 and each count equals the
   row's build count: two files landed after BASE and gained rows, `tools/push-main.sh` reads 5, and
   the converted report reads 4, which its CONVERT disposition names.
+- AC4 — `tools/govkit/selftest.py` — as the `govkit selftest` leg at 364278a8 it prints
+  `all arms held`, exit 0. Its AC4 arms read ok: a fixture guard naming `.lexicon.conf` falls into
+  exactly one class, and the same guard with `.nosuch.conf` beside it reds 7c naming `.nosuch.conf`
+  and not the declared conf.
 - AC5 — `python tools/govkit/govkit.py selfcheck` — over a scratch gov tree whose guarded,
   repo-subject leg's argv file names `.lexicon.conf` and whose guard lacks it, selfcheck exited 1
   naming `leg 'demo' reads root conf .lexicon.conf` and printed a graded count of 1. With the conf
   in the guard it exited 0, and with the leg moved to chunk `selftests` it graded only the other
   leg. A staged break in which the check read the guard alone, never the argv bytes, passed the
   first tree, and the arm caught it.
+- AC6 — `python tools/govkit/govkit.py selfcheck` — as the `govkit selfcheck` leg at 364278a8 it
+  exits 0 printing `guarded bar legs graded 8 · root-conf readers 6`. Re-derived from that commit's
+  `tools/gate-legs.json`, the six readers are the five S6 legs whose argv bytes name a root conf and
+  `govkit acceptance matrix`, whose argv file began naming `.lexicon.conf` in `8d5d16f2` and whose
+  guard already carried it; `recall floor` is graded and is not a reader. The reverted-guard reds
+  are the scratch-clone reads above.
 - AC7 — `tools/lexicon/kit.toml` — it and `tools/lexicon/adopt-lexicon.sh` now say the conf IS a
   guard pathspec under the `root-conf` class, in the past tense for the old ruling, and say that
   `lexicon wiring` still grades the declaration unguarded; that leg's empty guard and argv are
   unchanged. The same stale sentence in the kit README and a suite comment was rewritten too.
+- AC8 — `bash tools/check-kit-versions.sh` — as the `kit version markers` leg at 364278a8 it exits
+  0 with no finding. The reads against `fb07ca25` and `origin/main`, and the three diffs of the
+  build commit, are the in-pass reads above.
+- AC9 — `recall floor` — at 364278a8 the leg's guard in `tools/gate-legs.json` names
+  `.memory-tree.conf`, and the `govkit selfcheck` leg, `python tools/govkit/govkit.py selfcheck`,
+  exits 0 with three near-miss lines, two for `lexicon naming predicates` and one for
+  `govkit acceptance matrix`, none naming `recall floor`. The reverted-entry half is the
+  scratch-clone read above.

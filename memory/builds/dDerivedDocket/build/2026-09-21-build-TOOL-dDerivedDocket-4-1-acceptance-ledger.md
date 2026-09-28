@@ -39,6 +39,17 @@ carry a `permission:` line deferring their observation and get no line here.
   unchanged; with a different one it refuses naming `--resume`, the fact is unchanged and the lease
   file's blob hash is identical although the fixture's `WIRING_CHECK` stub ran through `run_bounded`;
   over a HELD record it refuses naming `--resume` and the lease is byte-unchanged.
+- AC11 — `bash tools/unattended/check-unattended.sh` — at 364278a8 the `unattended kit gate` leg
+  exited 0, and `unattended skill wiring` printed
+  `in sync (skill rendered from template + .unattended.conf)`, exit 0. There the driver declares
+  `--hold`, the rendered `.claude/skills/unattended/SKILL.md` invokes it, and
+  `memory/guides/UNATTENDED-VERBS.md` carries its entry, which lists `--reaped <id>` and
+  `--keepalive-unreachable <node>`. Every `--resume` command the Skill spells carries
+  `--keepalive-id`; its take-over branch reaps only the recorded job before that `--resume` and,
+  when it refuses or prints `still held`, reaps only the job it scheduled and reads the listing
+  back; its `/session-kickoff` step comes after that `--resume`; and its keepalive section runs
+  `--resume <slug> --keepalive-id` first and `--audit <slug>` only when that first act neither
+  refuses nor prints `still held`.
 - AC13 — `verb_phase` — `--phase <slug> HELD --witness <sha>` on a working-phase fixture refuses with
   a numbered message and writes nothing; and over a fixture driver copy whose `verb_phase` no longer
   guards HELD, the kit gate's check 33 reds naming HELD.

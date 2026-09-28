@@ -37,6 +37,36 @@ AC2 moved-tree bar and its exit-table row), `template size gate selftest`, `kit 
 `kickoff-manifest ratchet` and `memory hygiene`.
 
 **Evidences:** TOOL-dDerivedDocket-25
+- AC1 — `tools/run-gates/run-gates.test.sh` — the `run-gates canary` leg ran it at the post-build bar
+  at 364278a8 and exited 0 on `PASS (266 assertions)` with no failure line, so arm 8a held: after an
+  idle-mover control that exits 0 and stamps, a bar whose leg edits a tracked file mid-run exits 3,
+  prints `gates TREE MOVED — `, records `verdict TREE MOVED` and writes no full-green stamp.
+- AC2 — `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` — at 364278a8 its canary
+  arm 8d held: two fixture bars killed by signal 9 while a leg held `mktemp -d` scratch, under a
+  private ambient `TMPDIR`, left a third bar printing the same `TMPDIR entries <n>` as the first and
+  announcing that it swept a dead bar's scratch.
+- AC3 — `tools/run-gates/run-gates.turnstile.test.sh` — the `run-gates turnstile` leg ran it at the
+  same bar and exited 0 on `PASS (74 assertions)`; its arm 22, bars run with `GATE_TURNSTILE=0`,
+  printed that a LIVE bar's scratch survived a second bar's sweep, that a dead bar's scratch whose
+  owner names another repository survived, and that the first bar's verdict stayed rc 0, GREEN.
+- AC4 — `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` — at 364278a8 its canary
+  arm 8c held: a fixture leg's `mktemp -d` landed under the run's own `gate-work.*/tmp`, was gone
+  once the bar exited 0, and the private ambient `TMPDIR` held nothing afterwards.
+- AC5 — `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` — at 364278a8 its canary
+  arm 8e held and printed no SKIP line: the `/proc/<pid>/cmdline` of a relatively started runner,
+  its pid read from the beacon's `pid` file, carries an absolute path ending in
+  `tools/run-gates/run-gates.sh`.
+- AC6 — `template size gate selftest` — the leg exited 0 at the post-build bar at 364278a8, a bar run
+  with `GATE_FULL=1 GATE_SELFTESTS=1` whose selftests chunk ran 58 legs and held none, printing that
+  every arm of `check-template-size.test.sh` held; that bar printed `TMPDIR entries 26270`, the
+  line the runner prints just before it exports `TMPDIR` as its own `$WORK/tmp` for every leg.
+- AC7 — `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` — at 364278a8 its canary
+  arm 8b held: with one fixture leg failing and another editing a tracked file mid-bar, the bar exits
+  1, its RED line reads 1/2 legs failed and names the moved tree, and the run record says RED over a
+  moved tree rather than `verdict TREE MOVED`.
+- AC8 — `kickoff-manifest ratchet` — at 364278a8 the leg exited 0 with no output, so check 5 passes
+  against the re-stamped `last-audit`; the §B trap there says every leg's `TMPDIR` is the runner's
+  own `gate-work.*/tmp`, gone on exit, and names this unit.
 - AC9 — `wc -c < memory/guides/SESSION-KICKOFF.md` — 24172 at this unit's commit against 24184 at
   its parent 5c33fd5a, the four-line trap bullet replaced by one of 353 bytes against 365; and
   `grep -c 'at an empty dir' tools/run-gates/README.md` prints 1, in the README's new scratch section.

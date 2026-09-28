@@ -293,6 +293,11 @@ each a KEEP row. Each ask with its status and deciding row, as `status · decidi
 17. TOOL-dDerivedDocket-66 — OPEN · unit 34's KEEP, awaiting the owner's triage of five legacy holds
 
 **Evidences:** TOOL-dDerivedDocket-35
+- AC1 — `bash tools/unattended/check-unattended.sh` — at 364278a8 the `unattended kit gate` leg
+  exited 0, where `.unattended.conf` sets
+  `ASKS_CMD="python tools/memory-tree/gen_build_index.py --asks"` and
+  `memory/guides/UNATTENDED-PROTOCOL.md` carries the `ASKS_CMD` row in its key table. The check 15
+  red this ledger foresaw for that leg did not occur at 364278a8.
 - AC2 — amended rev-10 — `unattended.sh --preflight` on the landed `dUnfiledMandate` README refused
   at check 72, P5's statement, naming EXMP-dUnfiledMandate-1, after authorization passed. It was no
   parse refusal and no DEAD PROBE. The criterion asked for the label `P5` by name, which the driver
@@ -324,12 +329,22 @@ each a KEEP row. Each ask with its status and deciding row, as `status · decidi
   `UNACCOUNTED` naming merge `2ee66b9c`, TOOL-aHonedRuleset-7 and change commit `f150d8fb`. Other
   scratch-content findings shared that exit, and `transition_audit.py` alone read 0 at `4c6bd140`
   and 1 at the merge.
+- AC7 — `memory hygiene` — at 364278a8, which carries 8231ecfd, the commit holding this ledger's
+  last copied RED, the leg (`bash tools/memory-tree/check-memory-hygiene.sh`) exited 1 on check 23
+  alone, the criteria this back-fill answers, and printed no check 14 line, so it names no orphan id
+  in this ledger; `git ls-tree` lists this ledger at 364278a8. The pass's `git status --porcelain`
+  read and the clone's `test -e` absence are recorded above.
 - AC8 — `python tools/memory-tree/gen_build_index.py --asks --all --json` — at `79485291` every ask
   homed in this build's `BACKLOG.md` derives OPEN with a KEEP row there. That is `<triage-id>`,
   TOOL-dDerivedDocket-66, with unit 34's KEEP, and the sixteen section 11 declines, 38 to 47 and 55
   to 60, with S9's. `git diff HEAD^ HEAD` at `79485291` over the file adds sixteen KEEP rows and
   removes none. Each names an ask whose text records the decline, and the journal lists all seventeen
   with status and deciding row.
+- AC9 — `kickoff-manifest ratchet` — at 364278a8 the leg
+  (`bash skills/session-kickoff/manifest-check.sh`) exited 0 with no `MANIFEST check` failure line.
+  `git show` reads the `last-audit` stamp as `2026-09-28T02:21:57+03:00` at the unit's commit
+  79485291 against `02:02:14` at its parent c2fd68d6, both at sha 869209ed, and that commit's
+  message carries the delta line; its staged pre-commit leg is recorded above.
 - AC10 — `core.hooksPath` — was unset in the clone when `4c6bd140`, carrying both scratch READMEs,
   reached the scratch remote's `main`. It was set by `check-wiring.sh --fix` only afterwards. The
   in-pass procedure used no `--no-verify` and no `GOV_GATE_CMD`, and pushed nothing after the hooks

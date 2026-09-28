@@ -77,6 +77,13 @@ and so does AC9's one reading over the real tree.
   `--follow` and without the floor. The `memory/builds/dCarriedReceipt/RUN.md` reading is deferred.
 - AC10 — amended rev-7 — the ban's token follows S1's rename to `read_landing_commit` (section 9,
   rev-7); the grep over `tools/memory-tree/gen_build_index.py` prints 0 at the build commit.
+- AC11 — `bash tools/unattended/check-unattended.sh` — as the `unattended kit gate` leg at 364278a8
+  it exits 0 with no check 10 finding over the protocol pair, and the `unattended skill wiring` leg
+  exits 0 printing `in sync (skill rendered from template + .unattended.conf)`. Over that tree
+  line 426 of both protocol copies reads that `LANDED` is also DERIVED (D12-i2) from a pushed
+  `LANDING` commit, the next line hands the rest to `UNATTENDED-STOPS.md`, where a section citing
+  D12-i2 calls itself the rest, and the rendered Skill's Land section says `--landed` under
+  `in-place` is an OBSERVATION and writes nothing to the tree.
 - AC12 — `LANDED_FACTS_CUTOFF` — under primary, a derived-LANDED record first committed after a
   2000-01-01 cutoff and lacking `units-at-landing` is refused under code 81 naming `--landed tRun`,
   with the record, the tree and the archive set unchanged; with a 2999-01-01 cutoff it rotates.

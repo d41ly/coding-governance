@@ -113,8 +113,35 @@ hand-edited one could. The break was restaged on a row with no pointer and went 
   are declared blank.
 - AC5 — `git check-attr merge memory/backlog/TOOL.md` — reads `rows`, and so does
   `memory/builds/dDerivedDocket/BACKLOG.md` through the added line.
+- AC6 — `dead-path carriers (deleted files still named)` — at the post-build bar at 364278a8 the leg
+  exited 0 printing `dead-paths: clean` over 30 derived needles and 14 declared waivers with no
+  undeclared carrier; `git ls-tree -r --name-only 364278a8 memory/archive` lists 15 files, the
+  decision-log rotation, the template snapshots and the retired ledger shards, and no backlog archive.
+- AC7 — `memory hygiene` — at 364278a8 the leg exited 1 on check 23 alone, the owed ledger lines these
+  answer, and named no stale debt row: no check 6 finding, and its per-row report shows each of the
+  three rows `memory/project/curation-debt.txt` carries there earning a check it is waived from. The
+  three are build READMEs; none is the TOOL view.
+- AC8 — `unattended kit gate` — at 364278a8 the leg exited 0 with no check 38 finding. There
+  `.unattended.conf` declares `SHARED_RECORDS` as the decision log and the README contract alone, and
+  `GENERATED_INDEXES` pairs `memory/backlog` with `tools/memory-tree/gen_build_index.py` and with
+  `tools/memory-tree/backlog.py`. The same check run with `GOV_UNATTENDED_REPORT=1` in the frozen
+  verify worktree at 364278a8 reported comparing 2 shared records against 4 index halves, so the
+  probe had populations to compare.
+- AC9 — `recall floor` — at 364278a8 the leg exited 0, per-id 12/12 and `records:fts5:r@5` raw
+  0.8333, normalised 0.8333 against the 0.81 floor: equal to the 0.8333 and 12/12 the pass read
+  before the switch.
+- AC10 — `drift-audit records` — at 364278a8 `drift_report.py --check` exited 0 and printed no
+  `backlog_rows_outliving_closed_specs` line; `backlog_asks_contested` read 0 of 732 examined,
+  `backlog_evidence_sha` 0 of 67 and `backlog_asks_unlabelled` 455 of 455. `live_backlog_rows_per_shard`
+  read 455, the length of the `asks` list `gen_build_index.py --asks --json` printed in the frozen
+  verify worktree at 364278a8. There the criterion's table grep over
+  `tools/drift-audit/README.md` counts 1 for each of the three new signals and 0 for the retired one.
 - AC11 — `python tools/memory-tree/gen_build_index.py --asks TOOL-aWeighedCompass-3` — prints WONTDO,
   decided by and declined by `dDerivedDocket`, the disposition sitting in this build's own file.
+- AC12 — `kickoff-manifest ratchet` — at 364278a8 the leg exited 0 with no output, so check 5 passes
+  there. At that commit both gotchas carry their `BACKLOG_MODE="shards"`-only sentence, and the
+  manifest reads 25326 bytes and 302 lines, below 98304 and 1200. The two BASE-string greps and the
+  25591-against-25595 byte reading at the switch-over commit are the pass's, recorded above.
 - AC13 — `gen_build_index.py --check` — over the committed switch-over: the moved ask row red V1
   naming the id's slug and the folder it sat in; the authored row appended to the TOOL view made
   `--write` exit 1 leaving the view byte-identical and naming the line and the `--ingest` remedy; the
@@ -165,6 +192,11 @@ hand-edited one could. The break was restaged on a row with no pointer and went 
   form with `--dry-run` exited 2 naming the contained tip; the worktree was removed and the run
   tree's porcelain was unchanged. The classified count is owed at the landing reconcile only if the
   tip moves, as the section 9 rev-13 line logs.
+- AC21 — `drift-audit selftest` — the held leg ran at the post-build bar at 364278a8, all checks
+  passing at 315 executed against a floor of 277, and its dDD-34 lines held: in shards mode the
+  three new signals are NOT ASKED, never DEAD, and the live-row count still reads the shards; in
+  builds mode with no `BACKLOG.md` the three are NOT ASKED, never DEAD; and a projection lacking
+  `declining`, `closing` or `sev` makes that field's signal a DEAD PROBE, not a 0.
 - AC22 — `memory/DECISIONS.md` — carries one TOOL row keyed by this unit, naming the stance of
   DEPL-dGaugedVintage-13 as superseded and citing design §4.4, in 258 characters.
 - AC23 — `(durable home: <n>)` — read 915 before and 917 after; the spine holds 731 documents under
@@ -198,6 +230,10 @@ hand-edited one could. The break was restaged on a row with no pointer and went 
   switch-over's parent, over 91 ids, every id whose only copy was archived, the one wrapped row and
   twelve others, gives each written `filed`; 0 differing. The two rows born in merge resolutions are
   dated by their merges, which a `-G` log with no `-m` does not list.
+- AC27 — `kit version markers` — at 364278a8 the leg exited 0. At the switch-over commit c4568fe0 the
+  criterion's `git grep -o` over `tools/memory-recall/` prints `gov:kit memory-recall@1.18` from
+  `README.md` and from `recall_conf.py` and no other value. The diff readings are the pass's,
+  recorded above; by 364278a8 the recall carriers read 1.19, moved again by `2d54cc08`.
 - AC28 — `migrate_backlog.py --plan` — in a scratch repository: the step-5 probe with the three
   recorded ids exited 1 naming the first flipped id with the porcelain unchanged, the probe with the
   other two and the recorded run exited 0, whose header and design-named rows name those two, and the

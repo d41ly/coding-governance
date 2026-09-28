@@ -21,6 +21,13 @@ its carrier; `memory/guides/UNATTENDED-VERBS.md` reads 15127 B and 165 lines; an
 protocol copy here, with exactly the reverse at the parent.
 
 **Evidences:** TOOL-dDerivedDocket-17
+- AC1 — `bash tools/unattended/check-unattended.sh` — at 364278a8 the `unattended kit gate` leg
+  exited 0, so check 16's two joins and check 10's pair comparisons held, with
+  `memory/guides/UNATTENDED-PROTOCOL.md` stating "Thirteen kit-owned core items". At the build
+  commit 936bdebe both protocol copies read 59779 bytes and 672 lines against `git cat-file -s`
+  59827 at the parent 0614e3b9, and both verbs copies 15127 bytes and 165 lines, all under 61440 and
+  750; `git grep -c 'the only way to write one'` counts 1 in each verbs copy and 0 in each protocol
+  copy at 936bdebe, and the reverse at 0614e3b9.
 - AC2 — `skipped — asks-disposed` — `--close` on a fixture build with no `asks:` mandate and a blank
   `ASKS_CMD` reports the item MET and prints the NOT ADOPTED announcement. The second half of term
   zero is AC18's.

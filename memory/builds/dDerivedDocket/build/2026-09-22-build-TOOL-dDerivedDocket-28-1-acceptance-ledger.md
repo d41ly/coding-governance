@@ -61,6 +61,11 @@ here. AC1 was nonetheless exercised by the block above; its line is the orchestr
 - AC6 — `--hold` — with a recorded `sleep 63` alive under a live driver, `--hold` refused as check 84
   naming `<pid> (sleep 63)`, left the run-state file byte-unchanged and reached no reaper; after the
   sleeper exited, the same `--hold` printed `phase HELD · code platform-limit`.
+- AC7 — `bash tools/unattended/check-unattended.sh` — at 364278a8 the `unattended kit gate` leg
+  exited 0 and `unattended skill wiring` printed
+  `in sync (skill rendered from template + .unattended.conf)`, exit 0; there
+  `memory/guides/UNATTENDED-STOPS.md` line 477 and the rendered `.claude/skills/unattended/SKILL.md`
+  line 579 each state that a process not in the ledger is never killed.
 - AC8 — `--resume` — with the procfs seam pointed at a directory that does not exist, the killed
   driver's record carried `-` in both token fields; the holder's `--resume` printed
   `NOT reaped <pid> — no procfs token` and `orphans 1`, the orphan was alive after, and the stub

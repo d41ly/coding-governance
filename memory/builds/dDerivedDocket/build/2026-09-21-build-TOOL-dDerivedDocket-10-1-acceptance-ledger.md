@@ -45,6 +45,10 @@ own break and green with the fix restored, which is AC9's in-pass obligation.
   `builds/<slug>/BACKLOG.md`, `census generic` when `%P` is omitted, and `census generic` when `%P`
   names an ordinary governed index. Staged RED (B4): `check_build_backlog` forced to answer True
   reds the two generic arms.
+- AC6 — `python3 tools/memory-tree/merge-rows.py --check` — at 364278a8 the
+  `row-driver view refusal` leg ran it and printed
+  `merge-rows: check · 109 governed path(s) resolve merge=rows · mode builds · view refusal armed`,
+  exit 0.
 - AC7 — `--check` — four scratch repositories, each a real `git` tree. Removing
   `memory/backlog/*.md merge=rows` from a shards-mode fixture makes it exit 1 naming
   `memory/backlog/TOOL.md`, and the same fixture passes before the removal. A copy of the driver
@@ -54,6 +58,18 @@ own break and green with the fix restored, which is AC9's in-pass obligation.
   declaration. Staged RED (B5): the attribute comparison replaced by an empty list reds both the
   removal and the nested override; (B7): the probe's failure branch no longer returning 1 reds the
   disabled-refusal arm.
+- AC8 — `govkit selfcheck` — at 364278a8 the leg exited 0 with
+  `legs: 122 in the manifest · 57 claimed · 65 exempt`. There `tools/gate-legs.json` carries
+  `row-driver view refusal` with `subject` `repo`, `chunk` `declarations`, no `guard` and `ceiling`
+  300; `tools/govkit/registry.toml` carries its `[[exempt_leg]]` row with a reason; and
+  `memory/map/features/memory-tree-merge-driver.md` claims it in `gate-legs`. The
+  `codebase-map coverage + freshness` leg printed six `ok` tests,
+  `test_every_inventory_key_is_claimed_or_baselined` among them, exit 0.
+- AC9 — `tools/memory-tree/merge-rows.test.sh` — at 364278a8, in the `GATE_FULL=1 GATE_SELFTESTS=1`
+  bar, the `row-keyed merge driver replay` leg (`bash tools/memory-tree/merge-rows.test.sh`) printed
+  `PASS — merge-rows: 55 groups / 42 run cases held, 16 under the arithmetic never-worse bar, 2 conservative (cap 2)`,
+  exit 0, and the `row-driver view refusal` leg printed `view refusal armed`, exit 0. Each arm's RED
+  with its fix unstaged is the pass's nine staged breaks, B1 to B9, recorded above.
 - AC10 — amended rev-6 — the criterion's middle clause, requiring `gen_build_index.py --write` to
   exit 0 over the merged view with the result byte-equal to a fresh render, was removed; §9's
   rev-6 item (2) records why, that it grades the view unit's data-loss guard which §3 puts OUT of

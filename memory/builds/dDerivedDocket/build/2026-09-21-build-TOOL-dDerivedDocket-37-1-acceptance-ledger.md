@@ -3,6 +3,29 @@
 **Serves:** journal TOOL-dDerivedDocket-37
 
 **Evidences:** TOOL-dDerivedDocket-37
+- AC1 — `tools/check-spec-tokens.test.sh` — the `spec-tokens self-test` leg exited 0 at 364278a8
+  with `PASS (112 assertions)`. Its two AC1 arms printed ok: the missing token exits 1 printing
+  `spec-EXMP-tOne-1.md`, `[handoff]` and the key `EXMP-tOne-1>EXMP-tOne-2:--frob`; and once
+  the target names `--frob` it exits 0 printing
+  `1 bullet(s) graded in live spec(s) · 1 payload token(s)`.
+- AC2 — `python tools/check-spec-tokens.py` — the `spec-tokens self-test` leg exited 0 at
+  364278a8 with `PASS (112 assertions)`. Both AC2 arms printed ok, each exiting 1 with
+  `[handoff]` and the key `EXMP-tOne-1>EXMP-tOne-2:--frob`: the payload on the bullet's
+  continuation line, and a `*` marker with a tab naming the target uid unbackticked.
+- AC3 — `1 silent` — the `spec-tokens self-test` leg exited 0 at 364278a8 with
+  `PASS (112 assertions)`. Its AC3 arms printed ok: a hands-off to a CLOSED sibling exits 0 with
+  `0 payload token(s) · 1 silent`, and an unspecced target uid beside a source with no H1 uid
+  exits 0 with `0 payload token(s) · 2 silent`.
+- AC4 — `SPEC_HANDOFF_CUTOFF` — the `spec-tokens self-test` leg exited 0 at 364278a8 with
+  `PASS (112 assertions)`. Its three AC4 arms printed ok: a blank key exits 0 printing
+  `SPEC_HANDOFF_CUTOFF blank (arm off)`, a source dated before a set key exits 0 with
+  `0 bullet(s) graded in live spec(s)`, and the key `2026-9-14` exits 1 printing
+  `REFUSING — SPEC_HANDOFF_CUTOFF 2026-9-14 is not an ISO date`.
+- AC5 — `STALE WAIVER` — the `spec-tokens self-test` leg exited 0 at 364278a8 with
+  `PASS (112 assertions)`. Its three AC5 arms printed ok: the edge-keyed waiver row exits 0 with
+  `1 waiver(s)`; the same row exits 1 printing `STALE WAIVER` once the target names `--frob`; and,
+  that naming reverted, a third spec's edge exits 1 printing `EXMP-tOne-3>EXMP-tOne-2:--frob`
+  with `STALE WAIVER` forbidden in its output.
 - AC7 — `grep -c '^arm "' tools/check-spec-tokens.test.sh` — prints 51 at the build commit, and
   `grep -m1 '^FLOOR_ASSERTIONS=' tools/check-spec-tokens.test.sh` prints `FLOOR_ASSERTIONS=55`.
   Both are the criterion's figures: 38 `arm` calls at `fb07ca25` plus the 13 this unit adds over
@@ -12,6 +35,17 @@
   untouched, at `tools/check-spec-tokens.test.sh:275`, `:453`, `:455` and `:457` after this diff
   moved them down from the `:265`, `:443`, `:445` and `:447` AC7 read at `fb07ca25`, so 51 + 4 = 55 is
   the count AC10 will read from the suite's own print
+- AC8 — `bash skills/session-kickoff/manifest-check.sh` — the `kickoff-manifest ratchet` leg
+  exited 0 at 364278a8, printing no finding, over the `last-audit` stamped there at 7fc42f2c; no
+  run was made at this unit's commit 434cad14 itself. At 434cad14 `git show` reads
+  `memory/map/features/spec-tokens.md` titled "Five joins", and the docstring of
+  `tools/check-spec-tokens.py` carrying a `handoff` row after `legs`, `paths`, `cites` and `bar`
+  that names its population, a LIVE spec's hands-off payload at or after `SPEC_HANDOFF_CUTOFF`,
+  and both limits: `**consumes-from**` bullets are not graded, and naming is not doing the work.
+- AC9 — `EXMP-tOne-1>EXMP-tOne-2:--frob` — the `spec-tokens self-test` leg exited 0 at 364278a8
+  with `PASS (112 assertions)`. Its AC9 arm printed ok: a family-less source and a tailed target
+  in a `units` sub-folder of `spec`, both dated at the scratch repo's own key, exit 1 printing
+  `[handoff]` and that key, the target joined by its H1 rather than its filename.
 - AC11 — `wc -c < memory/guides/SESSION-KICKOFF.md` — reads 20057 at this unit's commit and 20057
   at its parent, so the carrier is no larger; and `git diff --numstat` over that path between the
   same two commits reports `1	1`, one line added and one removed. The whole edit to that file is

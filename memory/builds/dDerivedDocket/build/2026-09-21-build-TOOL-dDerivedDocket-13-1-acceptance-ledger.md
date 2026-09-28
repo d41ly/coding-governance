@@ -67,6 +67,17 @@ would have made AC12's grep pass over a run where nothing was marked; and the ex
   `gateable` false, `live` true, and its detail names both `refs/heads/strag` and
   `refs/remotes/origin/elsewhere`. With every branch deleted and HEAD detached it reads value 0,
   `live` false, and carries the inventory's own DEAD PROBE sentence as its detail.
+- AC9 — `python tools/govkit/govkit.py selfcheck` — the `govkit selfcheck` leg exited 0 at
+  364278a8, its surface line reading `0 unclaimed`. At 364278a8 too: the
+  `codebase-map coverage + freshness` leg, whose argv is
+  `python3 tools/codebase-map/test_codebase_map.py`, exited 0 with its six tests ok; the
+  `install-prefix (shipped surface)` leg exited 0 reading `8 declared waiver(s)`;
+  `grep -c 'githooks/pre-commit' tools/install-prefix-waivers.txt` over the `git show` blob
+  prints 0, this unit's commit ae64dfd7 having removed that row and added none; the `gate_at`
+  probe at `.githooks/pre-commit:88` carries `gov:root-fixture` with its reason;
+  `transition-audit arms` exited 0 with `PASS (58 assertions)`, its AC16 both-ways hook-list arm
+  running over a tree that tracks `.githooks/pre-rebase` beside a `GOV_WIRING_HOOKS` naming it;
+  and the `backlog_stragglers` row grep over `tools/drift-audit/README.md` prints 1.
 - AC10 — `migrate_backlog.py --recipe` — inside a fixture the engine's recipe and the library's
   `print_recipe` rendering are byte-identical after CR normalisation, both at the fixture's derived
   prefix. A copy of the library with one character changed in the merge-never-rebase line no longer
@@ -85,6 +96,11 @@ would have made AC12's grep pass over a run where nothing was marked; and the ex
   suite and the gotcha tree prints nothing, and `git grep -c` for the pinned sentence's
   config.worktree phrase prints exactly one hit in each of the four carriers. The gotcha's
   description no longer states the retired premise and its index row was regenerated from it.
+- AC14 — `straggler-guard.test.sh` — the `straggler-guard arms` leg exited 0 at 364278a8 with
+  `PASS (57 assertions)`, its AC14 block running `--topology` over a fixture on branch `side`:
+  exit 0, one printed line that `worktree list` names on `refs/heads/side`, no `PASS` line, and
+  `core.hooksPath` unchanged. `grep -n add_topology_worktree` over the suite at 364278a8 shows
+  the definition at line 55, the mode's dispatch at 67 and AC12's calls at 334 and 359.
 - AC15 — `KIT_DRIFT_AUDIT_VERSION` — the constant reads 1.12, strictly above the 1.10 every carrier
   holds at `fb07ca25` and above the 1.11 `git show origin/main:<carrier>` prints after this pass's
   fetch, for the constant, the README marker and both harnesses' `version:` fields. Every file the

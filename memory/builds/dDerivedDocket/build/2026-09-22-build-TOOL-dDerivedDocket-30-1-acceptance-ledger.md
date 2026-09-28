@@ -39,10 +39,25 @@ or the `kickoff-manifest ratchet` leg carries a `permission:` line deferring it 
 none of them gets a line here: AC1, AC2, AC4 to AC9, AC11, AC12 and AC13, and AC3's real-tree half.
 
 **Evidences:** TOOL-dDerivedDocket-30
+- AC2 — `unattended kit gate` — at 364278a8 the leg ran
+  `bash tools/unattended/check-unattended.sh` over the real tree, the whole leg rather than
+  `--skip 28`, and exited 0. Its one check 23 line is a dodged-join line for aClosedDocket's write
+  of `tools/unattended/unattended.test.sh`; no check 23 line names a brief under any `prompts/`.
 - AC3 — `# ---- check 97` — the fixture half, over the replica fixture: `--only 28` exited 0,
   named checks 30, 31, 32, 33, 39, 40 and 15 on the report channel, and named 97 once that header
   was staged after the region. The real-tree half is owed at VERIFYING.
+- AC7 — `unattended kit gate` — at 364278a8 the leg ran
+  `bash tools/unattended/check-unattended.sh` over the real tree, where both sibling suites exist,
+  and exited 0 with no `UNATTENDED check 26 FAILED` line. Its flag arm joins the parsed flags plus
+  `VERBS_SLUG` and `VERBS_INLINE` to the `#   unattended.sh` header lines in both directions, and
+  by its own header does not check which verb's line a flag sits on. Read at 364278a8, the seven
+  S5 names sit on the `--preflight`, `--plan`, `--resume`, `--record-piece` and `--record-set`
+  lines, `--framed` beside `[--paths]` and `--replaces` on `--resume` as S5 places them.
 - AC10 — `grep -n 'belt and braces' tools/unattended/check-unattended.sh` — one hit, in check 31's
   comment, which gives the hoist and the announced skip as the reason and no longer the crash.
+- AC11 — `kickoff-manifest ratchet` — at 364278a8 the leg ran
+  `bash skills/session-kickoff/manifest-check.sh` and exited 0 with no `MANIFEST check` line and
+  no WARN, so check 5 ran and passed. The `last-audit` it passed with is the build's latest stamp,
+  at 7fc42f2c, not this unit's own: the bar ran after the last unit.
 - AC14 — `wc -c < memory/guides/SESSION-KICKOFF.md` — the carrier is the same size at the parent
   and in the staged tree, and `git diff --numstat` reads one line added and one removed.

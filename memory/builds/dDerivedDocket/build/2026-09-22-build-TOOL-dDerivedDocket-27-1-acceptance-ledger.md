@@ -64,8 +64,17 @@ runs above; their lines are the orchestrator's.
   run-state file is unchanged, and left the record byte-identical and the tree clean; at a wall of 30
   it pinned the backstop. The leg over the same declaration red check 42 naming both numbers, and
   reported the equal wall clear on its report channel.
+- AC6 — `run-gates canary` — the held leg ran at the post-build bar at 364278a8 and exited 0 on
+  `PASS (266 assertions)` with no failure line, so its S3 profile-key arms held: with the TTL pinned
+  at 25 s, `--print-profile` printed `queue` as the TTL times the runner's declared multiple, which
+  is 4 there, and never 0, and `ceiling_max` 30 over a manifest whose largest integer ceiling is 30.
 - AC7 — `probe host` — a stub bar exiting 4 left `gates-green` UNMET printing
   `hold · host-degraded · until probe host · the runner exited HOST` and the `--hold` it names.
+- AC8 — `bash tools/unattended/check-unattended.sh` — as the `unattended kit gate` leg at 364278a8 it
+  exited 0 with no check 43 finding, and the hold paragraph of the Skill template's Close section
+  there names the staged-records commit, the branch push, the keepalive reap and `--hold` in that
+  order, names `platform-unavailable` for a push the remote does not answer, and no `--override`;
+  the `unattended skill wiring` leg printed `in sync` for the Skill rendered from that template.
 - AC9 — amended rev-8 — withdrawn with S11, as `TOOL-dDerivedDocket-61` deletes the lease bound
   it graded; rev-9 names what that unit carries of the property and what it does not.
 - AC11 — `gate queue: acquired` — a stub bar that printed the acquire line and then hung past the

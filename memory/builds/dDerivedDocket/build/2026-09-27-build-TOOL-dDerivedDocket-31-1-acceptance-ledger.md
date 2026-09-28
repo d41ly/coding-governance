@@ -30,10 +30,30 @@ AC2, AC3, AC4, AC5, AC7, AC13's count, AC14, AC15) are owed to the post-build ba
 the new hygiene-suite arm, the driver-suite arm, and the ratchet half of AC12.
 
 **Evidences:** TOOL-dDerivedDocket-31
+- AC1 — `marker contracts` — at the post-build bar at 364278a8 the leg exited 0 with its PASS line
+  over 90 cases and no FAIL line; its table there holds the post-cutoff row
+  `item: F2 unmarked below a marked F1`, wanting the hygiene side red and `plan_state` FORKED, and the
+  `item/names-F2` assertion that the hygiene finding on it ends `: F2`, so both held
+- AC2 — `marker contracts` — the same run: every row dated 2026-08-09, before the fixture cutoff, held
+  its section-wide verdict, `none line, later open` among them, silent and READY over an unmarked F2
+  below a marked F1; and the `item/blank` and `item/absent` arms re-graded the post-cutoff F2 row with
+  the key blank and then absent, the text reader returning rc 0 and an empty value, the engine
+  silent on that row and `plan_state` READY
+- AC3 — `marker contracts` — the same run held the post-cutoff rows `item: mark only in backticks`
+  and `item: mark only in dquotes`, each wanting red and FORKED, so both readers called a quoted mark
+  unresolved
+- AC4 — `marker contracts` — the same run held the post-cutoff row `item: mark wrapped at the paren`,
+  its mark split inside the parenthesis across two lines, wanting silent and READY from both readers
+- AC5 — `marker contracts` — the same run held the post-cutoff row `item: three options, one mark`,
+  three option bullets under F1 and one mark, wanting silent and READY from both readers
 - AC6 — `plan_state` — in a scratch fixture repo, the engine's `--staged` run named a live Tier-2 spec
   dated 2026-09-20 whose §8 opens with a bullet before F1 (`§8 is not F-item shaped`), and the
   sliced `plan_state` printed FORKED for the same bytes; dated 2026-09-01, or with the key blank,
   the engine stayed silent
+- AC7 — `marker contracts` — the same run held `item: none line, later open` red and FORKED at
+  2026-09-20 and its twin `none line, later open` silent and READY at 2026-08-09; every planning row
+  there is handed the cutoff the sliced `read_fork_cutoff` returns for the fixture conf, and the
+  `item/cutoff` assertion that it reads 2026-09-15 held
 - AC9 — `bash tools/memory-tree/kit-dogfood-parity.test.sh --check` — exit 0, 4 pairs agree after
   `--render`; the F-item grammar and the section-reading sentence sit in `memory/TEMPLATE-SPEC.md`
   where the fork-format unit moved M3's paragraph, check 12 in `memory/HYGIENE.md` carries the
@@ -49,3 +69,7 @@ the new hygiene-suite arm, the driver-suite arm, and the ratchet half of AC12.
 - AC13 — amended rev-6 — only `--plan` can report FORKED; `--dispatch`, the build-complete term and
   the pass-order leg act on MISSING and THIN alone, so their half is the call-site count. In a
   scratch build `--plan` printed `next: ARCH-tP-1 (FORKED)` for an unmarked F2 below a marked F1
+- AC15 — `marker contracts` — the same run held every reader pair: the trailing-comment, single-quoted,
+  repeated and bare spellings, and the matched `FORK_ITEM_CUTOFF=`, each agreeing with a subshell `.`
+  of the same file; `2026-09-15x` refused rc 2 as neither blank nor an ISO date; and the `export`,
+  indented and conditional spellings each refused rc 2 naming the line it could not resolve

@@ -39,6 +39,22 @@ over the real tree, carries a `permission:` line deferring it to VERIFYING, so n
 line here: AC1 to AC7, AC9, AC11 to AC19, and AC21 to AC23. The same goes for AC10's leg half.
 
 **Evidences:** TOOL-dDerivedDocket-24
+- AC2 — `pre-push self-test` — at 364278a8 the leg exited 0, `pre-push.test: all cases ok`, with
+  `IR AC2 an inherited-only red within its age lands under land`, whose arm matches exit 0 and
+  `red on inherited legs only — landing under INHERITED_RED=land: x` naming leg `x`;
+  `IR AC2 the runner is handed land, the bound 10 and R`; and
+  `IR AC2 a MIXED leg is blocked under land`, whose arm matches exit 1.
+- AC3 — `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh` — at 364278a8 its
+  `run-gates canary` leg exited 0 with `PASS (266 assertions)` and no SKIP line. Its age arms, over
+  a twelve-landing fixture under `GATE_INHERITED_RED_MAX_AGE=10`, assert a red arriving at landing
+  4 reads `INHERITED` at `age 8` naming that landing's owner sha and id, in the record's columns
+  too, and a red already present at landing 1 reads `aged at R~10` and writes no
+  `gate-inherited-green`.
+- AC4 — `gate-inherited-green` — at 364278a8 `run-gates canary` (exit 0, `PASS (266 assertions)`)
+  asserts an inherited-only bar under `land` writes `gate-inherited-green` naming R, the bound 10
+  and the leg, and writes no `gate-full-green` into a git dir that held none. `pre-push self-test`
+  (exit 0, all cases ok) logged `IR AC4 an inherited green at the remote sha scopes the gate` and
+  `IR AC4 a moved remote sha forces FULL past the inherited green`.
 - AC8 — `ABSORB` — over the leg suite's fixture: a pass that declared `work/one.txt` and an
   `absorb(tRun): memory hygiene inherited at 0123abcd` commit writing `fix/leg.txt` printed
   `check 23 ABSORB` naming that path, with no FAILED and no dodged-join line. The same commit moving
@@ -48,9 +64,21 @@ line here: AC1 to AC7, AC9, AC11 to AC19, and AC21 to AC23. The same goes for AC
   rendered Skill's Close section names the hold for an inherited red under `park` once. Its steps run
   commit, push, reap, then `--hold`, and the rendered stops guide states ABSORB's four conditions and
   the absorb subject. The leg half over the rendered tree is owed at VERIFYING.
+- AC14 — `pre-push self-test` — at 364278a8 the leg exited 0, `pre-push.test: all cases ok`, with
+  `IR AC14 a stamp's wider window is not trusted`, whose arm matches `FULL gate on main push` and
+  a reason naming the stamp's `max_age 50` and the bound 10 at the remote sha.
+- AC16 — `pre-push self-test` — at 364278a8 the leg exited 0, `pre-push.test: all cases ok`, with
+  `IR AC16 a stale full green still reaches the inherited green`, whose arm matches
+  `scoped gate on main push` naming the inherited green, over a full green that
+  `is not an ancestor of the pushed tip`.
 - AC20 — `memory/DECISIONS.md` — the TOOL heading carries one `TOOL-dDerivedDocket-24` row naming
   D12-i4, the charter's 'blocks a red one' and 'green at the push boundary', and the protocol's
   `gates-green`, at 287 bytes against the 300 budget.
+- AC22 — `govkit selftest` — at 364278a8 the leg exited 0, `govkit-selftest: all arms held`, with
+  `AC22: a bare INHERITED_RED assignment inside a kit's payload REDS, naming the file` and the same
+  arm for `INHERITED_RED_MAX_AGE` both `ok`. Each runs `govkit.py selfcheck` over a scratch kit
+  whose `tools/demo/policy.sh` carries `INHERITED_RED=land`, then
+  `export INHERITED_RED_MAX_AGE=10  # gov only`, and matches exit 1 naming that file.
 - AC24 — `wc -c < memory/guides/UNATTENDED-PROTOCOL.md` — 64744 bytes and 706 lines at the parent,
   64719 and 704 here, the `GATE_POLICY_FILE` row being one line of 170 bytes against the 195-byte
   paragraph it replaced. `grep -c 'contend on the bar' tools/unattended/README.md` prints 1.

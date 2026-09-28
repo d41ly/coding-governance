@@ -59,6 +59,13 @@ one declaring nothing.
   nothing for the grant, which is the label admitted.
 - AC8 — `may:` — `cmd_new_build` over a fixture ask carrying ``may `tools/push-main.sh` `` wrote its
   README, exit 0, with no `may:` line in the front matter or anywhere else.
+- AC9 — `kit/dogfood doc parity` — at 364278a8 the leg exits 0 printing that shipped and installed
+  docs agree over 4 pairs, the BUILD-METHOD pair among them. The `unattended kit gate` leg,
+  `bash tools/unattended/check-unattended.sh`, exits 0 with no check 10 finding, and its report
+  channel, re-run over that tree, reads
+  `check 10 byte-compared 3 of its 3 pairs: protocol verbs asks`. The `build-method size` leg
+  exits 0 with `BUILD-METHOD.md: 27560 / 30720 bytes` and an advisory high-water WARN,
+  26941 -> 27560.
 - AC10 — `git grep -n "TOOL-dDerivedDocket-19" memory/DECISIONS.md` — one row: a grant is honoured
   only from an owner-committed `slug` build README and lifts veto 2 only.
 - AC11 — `git cat-file -s` — at the parent and at the working tree: the protocol pair 59779 to

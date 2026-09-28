@@ -53,3 +53,13 @@ suites. The unit names no function, so no lexicon answer is owed.
 - AC4 — `grep -cF '/**/agent-*.jsonl'` — printed 1 over the driver, and
   `grep -cE '^[^#]*subagents'` printed 1, the one line deriving the directory from the transcript
   path. The count of `grep -cF "'----'"` read 1 at the parent and 1 at the build.
+- AC6 — `grep -c 'KIT_UNATTENDED_VERSION=1.29' tools/unattended/unattended.sh` — printed 1 at the
+  build commit 5491f7bc, as at its parent e0643748. Over the driver, `git diff -U0` adds no line
+  spelling a `tools/<kit>/` literal; the function-definition and `fail` counts read 199 and 289 at
+  both commits; `grep -cE '^ *#.*sub-agent transcript'` reads 4; `git diff --name-only` names the
+  driver, its two suites, the unattended dossier and build records only; and `scan_file` of
+  `tools/gate-lint/sh_hygiene.py` reports 3 gated `<<<` sites at both commits. At 364278a8 the
+  `install-prefix (shipped surface)` leg printed `install-prefix: clean — 322 shipped files`,
+  `harness arms (fail branches armed or pinned)` exited 0, silent, and
+  `shell hygiene (a loop fed by a command substitution)` printed
+  `sh-hygiene: OK — 61 declared site(s) in 46 row(s)`.

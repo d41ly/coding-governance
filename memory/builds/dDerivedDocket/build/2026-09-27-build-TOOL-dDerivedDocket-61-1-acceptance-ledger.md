@@ -52,6 +52,10 @@ line spells a kit path, every new name answered `OK` to `lexicon.py --suggest`, 
 - AC1 — `find "$(git rev-parse --git-common-dir)" -name '*.lease'` — printed nothing inside every
   fixture after the AC3 to AC11 and AC21 to AC24 runs, and the code-line grep over the driver for the
   eight retired names and `RB_LEASE_` printed 0.
+- AC2 — `grep -c 'LEASE_STALE_AFTER'` — over the `git show` blobs of all ten files the criterion
+  names it prints 0 at the build commit c9c1927a, against 5, 2, 1, 2, 2, 1, 1, 1, 1 and 6 in the
+  criterion's order at its first parent cd4127f4, and 0 in each at 364278a8. Check 22's join is
+  the `unattended kit gate` leg, which exited 0 at 364278a8 with no check-22 finding.
 - AC3 — `verdict: LIVE` — with the recorded session's transcript touched and the commit aged,
   `--liveness` read LIVE and the same session's `--resume --keepalive-id k2` printed
   `lease replaced · keepalive k1 -> k2` with no check 58; a recorded pid alive and not `CLAUDE_PID`
@@ -90,6 +94,16 @@ line spells a kit path, every new name answered `OK` to `lexicon.py --suggest`, 
   clock it refused at 58 and wrote nothing; over a leftover `<slug>.lease` naming `k9`,
   `--hold --reaped k9` refused at 56 naming `k1`, the holder's resume wrote nothing, and the leftover
   file was byte-unchanged.
+- AC13 — `tools/unattended/STOPS.template.md` — `git show` at the build commit c9c1927a and its
+  first parent cd4127f4: every zero-count string the criterion lists, 25 readings over the files
+  it names, prints 0 at c9c1927a and at least 1 at cd4127f4, and still 0 at 364278a8; the six row
+  texts units 62 and 63 key on each print exactly 1 at c9c1927a; `non-terminal and not` prints 1
+  in both the Skill and the protocol template. At c9c1927a the Skill's tick paragraph names checks
+  10, 26 and 51, the Skill names no `LEASE` line where cd4127f4's line 840 did, placements 2 and
+  3 of Record the run name `primary` beside an in-place placement naming `--prepare`, and the
+  `--liveness` entry of `tools/unattended/VERBS.template.md` lists `HELD`. At 364278a8 the
+  `unattended skill wiring` leg exited 0 printing
+  `in sync (skill rendered from template + .unattended.conf)`, and `unattended kit gate` exited 0.
 - AC14 — `wc -l` — against the parent's `git cat-file -s` and line counts: protocol template and
   render -133 bytes and -1 line, stop contract and render -9 and -12, verb carrier and render -85 and
   -1, the `unattended` dossier -49 and 0, the `unattended-stops` dossier -1 and 0, the kickoff
@@ -97,3 +111,17 @@ line spells a kit path, every new name answered `OK` to `lexicon.py --suggest`, 
 - AC16 — `TOOL-dDerivedDocket-61` — `memory/DECISIONS.md`'s TOOL heading carries one row keyed by it,
   294 characters, naming the one lease record, the one bound and the HELD carve-outs.
 - AC17 — `grep -c 'one lease and one restart path' memory/guides/SESSION-KICKOFF.md` — prints 0.
+- AC18 — `KIT_UNATTENDED_VERSION=1.29` — `grep -c` prints 1 over `tools/unattended/unattended.sh`
+  and over `tools/unattended/check-unattended.sh` at the build commit c9c1927a and at da80b2e5,
+  as at the parent, so the unit moved no version; 364278a8 carries 1.42 from later units.
+  `unattended@1.29` counts 1 in each of the nine kit templates at both c9c1927a and cd4127f4. No
+  added line of the unit's diff, cd4127f4 to da80b2e5, spells a `tools/<kit>/` literal, and the
+  `install-prefix (shipped surface)` leg exited 0 at 364278a8 with no undeclared spelling.
+- AC19 — `python tools/lexicon/lexicon.py --suggest` — run in the frozen worktree at 364278a8
+  with `--as sh.function`, it printed `OK` for each of the six names §4's Inventory mints and for
+  `check_lease_fresh`, and the `lexicon naming predicates` leg exited 0 there. The new check-58
+  branch's text is asserted by a `hit` line in `tools/unattended/unattended.test.sh` and has no
+  row in `memory/project/unarmed-branches.txt`, and the
+  `harness arms (fail branches armed or pinned)` leg exited 0. That registry is byte-unchanged
+  from cd4127f4 to da80b2e5, and that diff adds or removes no `fail 9`, `fail 27`, `fail 29`,
+  `fail 49` or `fail 56` line in the driver.

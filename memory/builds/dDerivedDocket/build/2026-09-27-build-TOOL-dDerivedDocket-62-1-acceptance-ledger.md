@@ -79,6 +79,19 @@ with digits folded and `git status --porcelain` alike.
   `--dry-run` printed two `skip · NO RUN BRANCH` decisions and no `resumed ·`; on the driver
   fixture with both branch facts removed, `--resume tRun --keepalive-id k1` printed the no-run-branch
   announcement and then the holder row's orientation.
+- AC9 — `unattended skill wiring` — at 364278a8 the leg exits 0 printing `in sync`, which it reaches
+  only past its drift refusals on the installed stop contract, with the Skill rendered from its
+  template. The `unattended kit gate` leg exits 0 with no check 10 finding, and its report channel,
+  re-run over that tree, reads `check 10 byte-compared 3 of its 3 pairs: protocol verbs asks`. The
+  greps are the in-pass reads above.
 - AC10 — `git cat-file -s` — against the first parent's figures: protocol template and render 64456
   -> 64424 bytes and 703 -> 703 lines, stop contract and render 35321 -> 35303 and 518 -> 517, verb
   carrier and render 19142 -> 19136 and 209 -> 208; none grew.
+- AC12 — `lexicon naming predicates` — at 364278a8 the leg exits 0 ending `lexicon OK`, and there
+  `lexicon.py --suggest <name> --as sh.function` answers `OK` for `resolve_holder_worktree`,
+  `check_holder_worktree` and `add_sibling_worktree`. The
+  `harness arms (fail branches armed or pinned)` leg exits 0 with no finding, and
+  `check-arms.py --report` there lists check 58 branch 1, the text
+  `this worktree is not on the run's branch`, as ARMED. The `kit version markers` and
+  `install-prefix (shipped surface)` legs each exit 0 clean. The version pin, the pin file and the
+  added-line reads are the in-pass reads above.

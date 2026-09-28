@@ -9,6 +9,11 @@ writes them after that run. Everything below was observed in this pass, against 
 break.
 
 **Evidences:** TOOL-dDerivedDocket-8
+- AC1 — `bash tools/memory-tree/check-memory-hygiene.test.sh` — at 364278a8 the
+  `memory-hygiene self-test` leg ran it in the `GATE_FULL=1 GATE_SELFTESTS=1` bar and printed
+  `PASS (521 assertions)`, exit 0. Its declared-backlog-layout block runs one fixture under both
+  modes: under `builds` it asserts no check 4 finding for a `BACKLOG.md` beside a build README nor
+  for a folder holding only `BACKLOG.md`, and under `shards` it asserts check 4 names both.
 - AC2 — `BACKLOG.md` — in the builds-mode fixture the one over the row cap is named on the branch
   carrying the never-rotate remedy, and the family view over the same cap is not named at all; over
   the same tree under `shards` the oversized shard is named with today's rotate message. Staged RED:
@@ -39,6 +44,11 @@ break.
   own duplicate still fails check 20, the view's duplicate is not named, and check 24 grades exactly
   one archive. Staged RED in a scratch copy, two breaks: the stem set returning every family, and the
   `backlog/` prefix admitted unconditionally.
+- AC8 — `bash tools/memory-tree/check-memory-hygiene.test.sh` — the same `memory-hygiene self-test`
+  run at 364278a8, `PASS (521 assertions)`: under `builds` its fixture asserts
+  `memory-hygiene: check 10: 1 family archive(s) left to check 9's archive guard` and no check 10
+  finding for its unreferenced family archive, and under `shards` it asserts check 10 names that
+  same archive.
 - AC9 — `BACKLOG_MODE` — over one fixture the shell and the Python reader both report `shards` for an
   absent key, a blank one and `shards`, and `builds` for `builds`, read through the engine's
   `--print-backlog-mode`; `buildz`, `Builds` and a leading-space `builds` each exit 2 naming the key
@@ -46,6 +56,14 @@ break.
 - AC11 — `curation-debt.txt` — with the family view listed in it, the builds run reds check 6 with
   the stale-entry guard naming `memory/backlog/BRAND.md`; under `shards` the same row earns check 6
   and the guard is silent.
+- AC12 — `bash tools/memory-tree/kit-dogfood-parity.test.sh` — at 364278a8 the
+  `kit/dogfood doc parity` leg ran it and printed
+  `kit-parity: shipped and installed docs agree (4 pairs, rendered for 'tools/memory-tree')`, exit
+  0. At that commit `memory/HYGIENE.md`'s backlog-layout section names checks 4, 6, 7, 8, 10, 13,
+  15, 20 and 24 as the ones the key moves and says each behaves as before under `shards`, and each
+  of those nine catalog entries carries its `builds` clause; `memory/TEMPLATE-SPEC.md` names
+  `closes <id>` and `advances <id>` as the two BACKLOG verbs, legal only where `BACKLOG_MODE` is
+  `builds`.
 - AC13 — `ARMS_FLOORS` — asked through `check-arms`'s own `branches()` and `armed_signatures()` over
   the real files, because the leg's argv is a gate command this pass does not run. The engine carries
   32 fail branches, all armed, the new check 6 branch among them; with that arm's assertion line

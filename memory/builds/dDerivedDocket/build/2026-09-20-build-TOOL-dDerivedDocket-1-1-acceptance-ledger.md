@@ -3,6 +3,29 @@
 **Serves:** journal TOOL-dDerivedDocket-1
 
 **Evidences:** TOOL-dDerivedDocket-1
+- AC1 — `bash tools/run-gates/run-selftests.sh --attribute <R>` — run by the
+  `run-selftests self-test` leg over its two-commit fixture at 364278a8, exit 0 and
+  `PASS (139 arms, width 1)`. Over `tools/attr/inherit.sh`, failing arm A at R and arms A and B
+  at L, the attributed run exited 1 with `NEW 1 · INHERITED 1 · FIXED 0`, an
+  `INHERITED  FAIL arm A` member line and a `NEW        FAIL arm B` one.
+- AC2 — `DEAD PROBE at L` — the `run-selftests self-test` leg exited 0 at 364278a8 with
+  `PASS (139 arms, width 1)`. Over `tools/attr/deadl.sh`, which exits 3 at L before any count or
+  FAIL line, the attributed run exited 1 printing `DEAD PROBE at L`,
+  `attributed 0 of 1 suite(s)` and `DEAD L 1 · DEAD R 0 · OVER 0 · verdict red`.
+- AC3 — `verdict clean` — the `run-selftests self-test` leg exited 0 at 364278a8 with
+  `PASS (139 arms, width 1)`. Over `tools/attr/both.sh`, failing arm A at both R and L, the
+  attributed run exited 0 printing `verdict clean` and `NEW 0 · INHERITED 1 · FIXED 0`.
+- AC4 — `git worktree list` — the `run-selftests self-test` leg exited 0 at 364278a8 with
+  `PASS (139 arms, width 1)`. After an R run killed by `timeout -k 1 2` the next attributed run
+  read `fresh`; after a completed R run the next read `cached`; and a cached run left the
+  `git worktree list` count unchanged.
+- AC5 — `--attribute` — the `run-selftests self-test` leg exited 0 at 364278a8 with
+  `PASS (139 arms, width 1)`. Over `tools/attr/fixed.sh`, failing arm F at R and passing at L,
+  the attributed run exited 0 and printed `FIXED      FAIL arm F`.
+- AC6 — `run-unattended-gates.sh` — the `run-selftests self-test` leg exited 0 at 364278a8 with
+  `PASS (139 arms, width 1)`. Inside its fixture, over the fixture's own `attr unattended` row
+  and never the kit's real suites, the wrapper's `--serial --attribute HEAD~1` exited 0 printing
+  `attributed 1 of 1 suite(s)` and `the --checks half is NOT attributed`.
 - AC7 — `git grep -n -e 'GREEN verdict' -e 'prints GREEN' -- tools .githooks` — prints nothing and
   exits 1 at the build commit. Re-run at HEAD before the edit, it printed the same four lines the
   criterion names: `.githooks/gate-env.sh:26`, `tools/run-gates/run-selftests.sh:15`,
@@ -10,6 +33,18 @@
   files now carries `verdict clean` at least once, and each names `--attribute`, `DEAD PROBE` and
   `OVER BUDGET` beside it — counted per file at the build commit: kit.toml 1/2/2/1,
   run-selftests.sh 2/12/7/4, run-unattended-gates.sh 2/11/3/4, gate-env.sh 1/3/2/1
+- AC8 — `run-selftests.sh --kit` — the `run-selftests self-test` leg exited 0 at 364278a8 with
+  `PASS (139 arms, width 1)`. Its parity arm ran `--serial --kit tools/suite-ok.sh`, with no
+  `--attribute`, and the runner as of `fb07ca25` with a bare `--kit tools/suite-ok.sh` over the
+  same fixture, and printed `default mode matches the BASE runner`: equal exit status and equal
+  stdout, durations normalised. The no-flag mode is spelled `--serial` in the runner at 364278a8.
+- AC9 — `DEAD PROBE at L` — the `run-selftests self-test` leg exited 0 at 364278a8 with
+  `PASS (139 arms, width 1)`. Over `tools/attr/deadl9.sh`, which prints its count line and then
+  exits 3 at L with no FAIL line, the attributed run exited 1 printing `DEAD PROBE at L`.
+- AC10 — `OVER BUDGET` — the `run-selftests self-test` leg exited 0 at 364278a8 with
+  `PASS (139 arms, width 1)`. Over `tools/attr/over.sh`, whose 1 s budget row sits below its 3 s
+  run at L, the attributed run exited 1 printing `OVER BUDGET at L` and
+  `NEW 0 · INHERITED 0 · FIXED 0 · DEAD L 0 · DEAD R 0 · OVER 1 · verdict red`.
 - AC11 — `git show fb07ca25:tools/run-gates/run-gates.sh` and `git show origin/main:...`, after a
   `git fetch` in this pass — `KIT_RUN_GATES_VERSION` reads `1.7` at BASE and `1.7` at the
   `origin/main` tip `d46d3ccb`, and `1.8` at the build commit; `KIT_UNATTENDED_VERSION` reads `1.24`
@@ -19,6 +54,12 @@
   and the rendered artifacts under `memory/guides/` and `.claude/skills/unattended/`, so no tracked
   file still spells either old value. The criterion's other half is its `permission:` line's: the
   `kit version markers` leg over the real tree is owed to the build's one post-build bar
+- AC12 — `DEAD PROBE at R` — the `run-selftests self-test` leg exited 0 at 364278a8 with
+  `PASS (139 arms, width 1)`. State 1, `tools/attr/deadr.sh` exiting 3 at R and clean at L:
+  exit 0, `DEAD R 1 · OVER 0 · verdict clean` and `DEAD PROBE at R`. State 2, that suite failing
+  arm A at L: exit 1 and `NEW        FAIL arm A`. State 3, `tools/attr/deadboth.sh` exiting 3 on
+  both sides: exit 1 and `DEAD L 1 · DEAD R 1`. That arm's asserted text stops there, so state
+  3's `verdict red` and its `DEAD PROBE at L` block line are not themselves observed.
 
 ## What this ledger does NOT evidence, and why
 

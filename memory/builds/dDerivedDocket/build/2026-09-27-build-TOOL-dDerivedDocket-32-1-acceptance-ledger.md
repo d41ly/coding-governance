@@ -77,13 +77,43 @@ does not touch.
   identical dormant line. A shallow clone of a builds-mode commit printed
   `check 25 DEAD PROBE — this is a SHALLOW repository`. The liveness step exited 1 with every
   check 25 line removed, and exited 1 again when the word `check` was the only match.
+- AC4 — `GATE_FULL=1 bash tools/run-gates/run-gates.sh --print-profile` — printed
+  `ceiling_max 16040`, the `unattended kit gate` leg's ceiling. It ran in the frozen verify worktree
+  at a6cccc03, whose runner and `tools/gate-legs.json` are unchanged from 364278a8, where the
+  manifest's largest `ceiling` is also 16040. At 364278a8 the `bar` job runs
+  `GATE_FULL=1 GATE_WALL=20400` under `timeout-minutes: 360`, so 16040 is at most 20400 and 20400 is
+  below 21600, the timeout sits at the 360 cap, and `permissions` appears once, at workflow level,
+  as `contents: read`. The four scratch-copy breaks are the pass's readings, recorded above.
 - AC5 — `held-plan` — 72 entries, whose union by name equals `--list`'s 72 rows, no name twice, every
   argv equal to its row. All 72 `--kit "<argv>" --list` checks selected exactly their own row. Four
   staged arms each exited 1 and emitted no matrix: one entry dropped (the union check named it), a
   key cut to `tools/unattended` (twelve rows selected), an unparseable row (named, plus the count
   mismatch), and a 257-row fixture (named the 256-entry limit).
+- AC6 — `lexicon naming predicates` — at 364278a8 the leg (`python tools/lexicon/lexicon.py`)
+  printed `lexicon OK — 2916 tracked file(s)` with `.yml=dark` in its coverage, exit 0, and the
+  `govkit selfcheck` leg (`python tools/govkit/govkit.py selfcheck`) exited 0 with
+  `surface 75 tracked path(s) · 27 entr(y|ies) · 26 exemption(s) · 0 unclaimed`;
+  `.github/workflows/remote-ci.yml` is tracked at that commit.
 - AC7 — `git check-attr eol` — reads `eol: lf`, and `git ls-files --eol` reads
   `i/lf w/lf attr/text eol=lf` for the staged file.
+- AC8 — `playbook render wiring` — at 364278a8 the leg
+  (`bash tools/playbook/adopt-playbook.sh --target . --check`) printed
+  `render-playbook OK — region matches a fresh render, no placeholder survived`, exit 0. There
+  `AGENTS.md` names `.github/workflows/remote-ci.yml` in the rendered region at line 251 and in the
+  merge-bar section at line 545, names `tools/unattended/README.md` at line 505, and calls remote CI
+  a follow-up nowhere; `grep -c '^ci_file' .governance/deploy.toml` prints 0; the absence grep
+  prints 0 over the headers of `tools/run-gates/run-selftests.sh` and
+  `tools/unattended/run-unattended-gates.sh`, and each header names `remote-ci.yml` and
+  `no NEW FAIL`; `stop receiving them too` counts 0 in `AGENTS.md`, and `tools/unattended/README.md`
+  counts 1 `adopters stop receiving` and 0 `tools/`. The CR-stripped `wc -c` of `AGENTS.md` reads
+  63562 at the unit commits 8d63a0e0 and f9e7d229 against 63691 at the parent 17841e72, under 64329,
+  and the `charter size` leg printed `template-size OK — AGENTS.md: 64210 / 64512 bytes`. The
+  `CI_FILE` refusal is the pass's scratch render, recorded above.
+- AC9 — `drift-audit records` — at 364278a8 the leg
+  (`python tools/drift-audit/drift_report.py --check`) exited 0 with
+  `lexicon_ratified_older_than_language_surface` at 0 of 1, `ok (pin 0)`, the signal
+  `signal_lexicon_ratified_stale` computes. The RED with the `ratified=` line reverted is the pass's
+  scratch clone, recorded above.
 - AC10 — `if: always()` — the two uploads carry `if: always()` twice and `if-no-files-found: error`
   twice. The copy step names `gate-logs` under `if: always()`, and `held` tees into
   `../held-<safe>.log`, the workspace path its upload names. Three breaks each reddened their own

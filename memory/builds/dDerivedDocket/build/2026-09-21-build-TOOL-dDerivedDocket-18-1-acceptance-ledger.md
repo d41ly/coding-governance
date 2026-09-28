@@ -61,6 +61,10 @@ mandated record, printed the vacuity line with the count 0.
   check 19; a `slug` record under a blank `ASKS_CMD` reds on the conf half alone. Staged RED three
   ways: the mode refusal disarmed, the refusal keyed on `prompt` alone (the `recipe` arm misses), and
   the conf refusal disarmed.
+- AC9 — `GOV_UNATTENDED_REPORT=1` — set for the leg's own command,
+  `bash tools/unattended/check-unattended.sh`, over the real tree in the frozen verify worktree at
+  364278a8: it exited 0 and printed exactly one report-channel line on the ask mandate, calling
+  checks 19, 15 and 37 VACUOUS because 0 run-state records pin an `asks:` fact.
 - AC11 — `asks-ready:` — on an unpublished record, `EXMP-aFoo-3=no` against the stub's `yes` at the
   pinned tree reds check 19 naming both pairs; pushed to the advertised tip it is counted as
   `published, not re-derived`; a stub sleeping past a 2 s bound is reported UNANSWERED and does not
