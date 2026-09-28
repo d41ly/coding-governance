@@ -135,9 +135,11 @@ barfile="$gd/pre-push-bar"
 # worktree would feel. Their claim to write nothing is kept true here rather than asserted.
 case "$MODE" in
   carry|prepared) ;;
-  # A signal EXITS, so the EXIT trap removes the marker and the lander stops; a handler that only
-  # cleans up would resume the landing after the interrupt (the closing review's F5 class).
-  *) trap 'rm -f "$marker"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM ;;
+  # A signal RESUMES here, deliberately, unlike the F5 fix in run-selftests. bash defers a trap until
+  # the foreground `git push` returns, so an exiting handler would publish the push and then exit
+  # before write_lander_marker: a landed push with no marker, which `--landed` refuses. Resuming lets
+  # the push and its record finish together (closing review round 2, F1).
+  *) trap 'rm -f "$marker"' EXIT INT TERM ;;
 esac
 
 # KEEP THE CONNECTION ALIVE ACROSS THE GATE. The gate runs INSIDE the push: git connects and
