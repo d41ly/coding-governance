@@ -50,14 +50,11 @@ queries reached the real log as qids 592-595 and the row still reported ok.
 ## Parked decisions
 
 - **The kit version bump is the owner's call, taken against the recommendation.** `selftest.py` is
-  declared `role = "project-owned"` in `tools/memory-recall/kit.toml`, so it ships to no adopter
-  and `govkit epoch` (which grades `engine`, `seed`, `rendered` and `merged`) never asks for a bump
-  on its account. The bump also enters `Conf.digest()` and invalidates every node's warm recall
-  cache. The owner ruled 1.12 to 1.13 anyway on 2026-09-28, on the ground that an edit inside the
-  kit directory is a kit edit. Unit 3 carries both sides and `epoch --base 3cf05f29` is run as an
-  observation either way. The landing reconcile then carried it to 1.19: `aRepatriatedFork` had
-  taken the same kit to 1.18 on `main` while this build ran, so the contested bump cost a merge
-  rather than a cache rebuild.
+  `role = "project-owned"` in `tools/memory-recall/kit.toml`, so `govkit epoch` never asks for a
+  bump on its account, and the value enters `Conf.digest()`. The owner ruled 1.12 to 1.13 anyway
+  on 2026-09-28: an edit inside the kit directory is a kit edit. Unit 3 §4 carries both sides.
+  The landing reconcile carried it to 1.19, `aRepatriatedFork` having taken the same kit to 1.18
+  in parallel, so the bump cost a merge rather than a cache rebuild.
 - **`tools/lexicon/README`'s half of `TOOL-aProbedToolkit-14` stays open.** Unit 3 closes only the
   memory-recall half, because that is the file this build already edits. The row is updated to say
   which half drained.
