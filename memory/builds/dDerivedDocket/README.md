@@ -170,7 +170,7 @@ ids TOOL-dDerivedDocket-60 TOOL-dDerivedDocket-61 TOOL-dDerivedDocket-62 TOOL-dD
 | [TOOL-dDerivedDocket-35 — arming and the real-tree staged reds](spec/2026-09-14-spec-TOOL-dDerivedDocket-35.md) | 37 | 2 | CLOSED | rev-10 | 2026-09-28 |
 | [PLAY-dDerivedDocket-1 — charter backlog wording and unattended landing exception](spec/2026-09-14-spec-PLAY-dDerivedDocket-1.md) | 38 | 2 | CLOSED | rev-9 | 2026-09-28 |
 | [TOOL-dDerivedDocket-36 — memory-tree docs, carriers and dossier](spec/2026-09-14-spec-TOOL-dDerivedDocket-36.md) | 39 | 2 | CLOSED | rev-8 | 2026-09-28 |
-| [DEPL-dDerivedDocket-1 — adopter runbook: backlog switch and merge attribute](spec/2026-09-14-spec-DEPL-dDerivedDocket-1.md) | 40 | 1 | CLOSED | rev-10 | 2026-09-28 |
+| [DEPL-dDerivedDocket-1 — adopter runbook: backlog switch and merge attribute](spec/2026-09-14-spec-DEPL-dDerivedDocket-1.md) | 40 | 1 | CLOSED | rev-11 | 2026-09-28 |
 <!-- /gen:build-units -->
 
 Records: 87 bound to this build, across 4 record folder(s).

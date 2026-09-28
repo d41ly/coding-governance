@@ -1,6 +1,6 @@
 # DEPL-dDerivedDocket-1 — adopter runbook: backlog switch and merge attribute
 
-**Status:** CLOSED · rev-10 · 2026-09-28 · node d · Tier-1 · base fb07ca25 · streams deployer+tooling · order 40
+**Status:** CLOSED · rev-11 · 2026-09-28 · node d · Tier-1 · base fb07ca25 · streams deployer+tooling · order 40
 
 <!-- gen:spec-records -->
 
@@ -122,7 +122,7 @@ status token" wording is where one adopter's status-first rows came from.
 
 The build may reword it. It may not name a flag or path the tree does not hold at the pass (AC3),
 and it keeps the switch out of §3's first-adoption steps (AC4). The text below is what the runbook
-carries at rev-10: every command is spelled through the `<kit>` token (S7), and every `--signed`
+carries at rev-11: every command is spelled through the `<kit>` token (S7), and every `--signed`
 takes the `<kind>=<path>` form the planner's usage and unit 34's S1 name.
 
 ```markdown
@@ -169,9 +169,14 @@ migrates your corpus, so it takes a spec, a signed record and one switch-over co
    `python <kit>/gen_build_index.py --check` refuses one, and reword any file outside `<MEMORY_ROOT>`
    that names a deleted archive, which a dead-path gate reads from git history. Then set
    `BACKLOG_MODE="builds"` and the `ASK_CUTOFF` the writer prints, add the `BACKLOG.md` attribute
-   from §3 step 4, and run `python <kit>/gen_build_index.py --write`. Add a gate leg of your own
-   running `python <kit>/merge-rows.py --check`; this repo calls it `row-driver view refusal`, and no
-   kit ships it. Commit when both `--check` runs exit 0.
+   from §3 step 4, and run `python <kit>/gen_build_index.py --write`. Two conf values measured on the
+   shards go stale in the same commit, and the hygiene gate reds on each: re-derive
+   `SEVERITY_UNLABELLED_PIN` and `LIVE_ROW_PIN`, if you declared them, with
+   `python <kit>/row_grammar.py --emit-pin` over the rendered views, which count 0; and delete any
+   `curation-debt.txt` row naming a backlog shard, because the view leaves the size checks and the
+   row then hides nothing. Add a gate leg of your own running `python <kit>/merge-rows.py --check`;
+   this repo calls it `row-driver view refusal`, and no kit ships it. Commit when both `--check` runs
+   and the hygiene gate exit 0.
 5. **Tell stragglers what to do.** The recipe a pre-switch branch follows is what
    `python <kit>/migrate_backlog.py --recipe` prints, the same text the generated views carry. The
    hooks that tell a branch before it lands are yours to wire: this repo's
@@ -200,6 +205,7 @@ A census over a FORKED engine decides more before step 4: a status your tree rea
 the kit does not, ids from an era with no slug to route by, relative links that change depth. This
 repo measured those for its three known adopters in section 10 of
 `memory/builds/dDerivedDocket/build/2026-09-14-build-TOOL-dDerivedDocket-1-design.md`.
+
 ```
 
 The version in the heading is the `KIT_MEMORY_TREE_VERSION` the tree declared at this unit's pass,
@@ -513,6 +519,15 @@ is kit work; `GATE_FULL=1` alone would still hold it. Every other leg in the lis
   `shards` as the shipped example conf leaves it, says `--stragglers` needs `origin/HEAD`, says the
   triage ask is filed only when a hold names no id, and has step 6's re-plan write its records into
   the switch tree. No other criterion moved.
+- rev-11 · 2026-09-28 · §4 · the same pass, after its commit, acting on the checklist's
+  fixture-lacks-a-gate-the-consumer-has class. AC3's fixture had declared no check-20 pin, so step 4
+  as rev-10 spelled it passed there and would red an adopter who had: with `SEVERITY_UNLABELLED_PIN`
+  and `LIVE_ROW_PIN` measured on the shards, the full hygiene run after the switch printed "lower it
+  to 0" for each and `row_grammar.py --check` exited 1, and a `curation-debt.txt` row naming a shard
+  redded check 6 as a row that hides nothing, the two stale values unit 34 S4 and S7 cleared for
+  this repo. Step 4 now re-derives both pins with `--emit-pin` and deletes such a row before the
+  commit, and the fixture's switch commit, given a spec for its ids and a declared
+  `RECORD_UNBOUND_PIN`, passed the full hygiene run at exit 0. No criterion moved.
 
 ## 10. Reuse audit
 

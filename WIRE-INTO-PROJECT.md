@@ -289,9 +289,14 @@ migrates your corpus, so it takes a spec, a signed record and one switch-over co
    `python <kit>/gen_build_index.py --check` refuses one, and reword any file outside `<MEMORY_ROOT>`
    that names a deleted archive, which a dead-path gate reads from git history. Then set
    `BACKLOG_MODE="builds"` and the `ASK_CUTOFF` the writer prints, add the `BACKLOG.md` attribute
-   from §3 step 4, and run `python <kit>/gen_build_index.py --write`. Add a gate leg of your own
-   running `python <kit>/merge-rows.py --check`; this repo calls it `row-driver view refusal`, and no
-   kit ships it. Commit when both `--check` runs exit 0.
+   from §3 step 4, and run `python <kit>/gen_build_index.py --write`. Two conf values measured on the
+   shards go stale in the same commit, and the hygiene gate reds on each: re-derive
+   `SEVERITY_UNLABELLED_PIN` and `LIVE_ROW_PIN`, if you declared them, with
+   `python <kit>/row_grammar.py --emit-pin` over the rendered views, which count 0; and delete any
+   `curation-debt.txt` row naming a backlog shard, because the view leaves the size checks and the
+   row then hides nothing. Add a gate leg of your own running `python <kit>/merge-rows.py --check`;
+   this repo calls it `row-driver view refusal`, and no kit ships it. Commit when both `--check` runs
+   and the hygiene gate exit 0.
 5. **Tell stragglers what to do.** The recipe a pre-switch branch follows is what
    `python <kit>/migrate_backlog.py --recipe` prints, the same text the generated views carry. The
    hooks that tell a branch before it lands are yours to wire: this repo's
