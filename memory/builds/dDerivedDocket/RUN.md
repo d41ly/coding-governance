@@ -15,15 +15,15 @@ host: compeeto
 pid: 37484
 session: 2588f719-5358-4984-93bc-1f908a71e0ab
 hold-run: 
-hold-streak: 1 · at 4c842945
+hold-streak: 1 · at b052863c
 resume-owed: none · owner
-held-at: 2026-09-22T09:24:20Z
-hold-reason: Paused at the owner's instruction near the weekly usage limit, after wave 6 merged at 4c842945; 38 of 50 units built. The recorded keepalive 00c7d786 belonged to a session that ended long ago and its store is unreachable; the live job b5b0b444 was reaped with CronDelete before this hold. Next: fold unit 27's AC9 and section 3 wording, review the G9 fold text in 61 to 64, then wave 7 (31), wave 8 (32), then 61 to 65 serially, then 34, 35, PLAY-1, 36 and DEPL-1, then VERIFYING.
+held-at: 2026-09-28T15:28:31Z
+hold-reason: VERIFYING is done except what only the owner may authorize: the unattended kit's own self-test suites (run-unattended-gates.sh --serial --attribute fb07ca25, or --pooled), which the standing instruction says are not run on the owner's behalf. 61 acceptance criteria and hygiene check 23's two green-run criteria wait on that run (parked rows 73 and 75); the final bar at bed37c25 is 121 of 122 green, the one red being check 23. Resume with --resume after that run or a permission to make it.
 hold-until: owner
-hold-code: platform-limit
-held-from: BUILDING
-witness: 25026497d1f6ce9aebed76210d64ad6f29d4228a
-phase: VERIFYING
+hold-code: host-owner-action
+held-from: VERIFYING
+witness: b052863cafb0ab0aa97a31a3f80515446b80eeca
+phase: HELD
 branch-sha: abac6d59cae3baf711fac4d275bf13a401e01901
 branch-ref: refs/heads/branch/backlog-maintenance-mechanics-10588f
 mode: prompt
@@ -359,3 +359,5 @@ base: abac6d59cae3baf711fac4d275bf13a401e01901
 2026-09-28T00:39:00Z brief · item DEPL-dDerivedDocket-1 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
 
 2026-09-28T04:16:13Z review · item dDerivedDocket · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED
+
+2026-09-28T15:28:33Z hold · item host-owner-action · reason until owner · reaped 6ed4075c · resume none(owner)
