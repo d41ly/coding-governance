@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """selftest.py — the process-monitor engine's arms.
 
-gov:kit process-monitor@0.5
+gov:kit process-monitor@0.7
 
 Two kinds of arm and the split is deliberate. PARSING arms run over captured fixtures, so they grade
 column contracts without a live table. LIVENESS arms run over a live read, because a property like
@@ -779,6 +779,17 @@ def test_read_roots_is_last_wins():
     check("test_read_roots_is_last_wins",
           scope.read_roots('# a comment\nPROCMON_ROOTS="/c/only/onexxxx"\n'),
           ["/c/only/onexxxx"])
+
+
+def test_read_roots_drops_a_trailing_comment():
+    """TOOL-aRepatriatedFork-38: a quoted value ends at its quote, an unquoted one at a `#` word."""
+    check("test_read_roots_drops_a_trailing_comment",
+          (scope.read_roots('PROCMON_ROOTS="/c/a/one /c/b/two"   # note\n'),
+           scope.read_roots("PROCMON_ROOTS=/c/a/one   # note\n"),
+           # rev-3 (C4): a `#` opening the word is data; whitespace after `=` declares nothing.
+           scope.read_roots("PROCMON_ROOTS=#x\n"),
+           scope.read_roots("PROCMON_ROOTS=   # note\n")),
+          (["/c/a/one", "/c/b/two"], ["/c/a/one"], ["#x"], []))
 
 
 def test_exotic_line_terminators_cannot_forge_a_row():

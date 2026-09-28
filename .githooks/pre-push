@@ -308,7 +308,7 @@ write_push_end() { # the status the EXIT trap saw -> the END line
 
 resolve_push_dirs "$top" || { RUNLOG_GITDIR=""; RUNLOG_DIR=""; }
 
-# ---- THE REFUSAL CHANNEL — TOOL-aRepatriatedFork-8 S2, from inCMS's `fail_push` ------------------
+# ---- THE REFUSAL CHANNEL — TOOL-aRepatriatedFork-8 S2, from adopter ic's `fail_push` ------------------
 # `pre-push-refusal` in this tree's git dir holds `<token><TAB><message>` for the refusal this run
 # made, and nothing when it made none: it is cleared here, on every run, before anything can refuse.
 # push-main.sh reads it after a failed push. It used to grep its own tee of the push output instead,
@@ -316,7 +316,7 @@ resolve_push_dirs "$top" || { RUNLOG_GITDIR=""; RUNLOG_DIR=""; }
 # "unreachable remote" (TOOL-aHonedRuleset-10). A token is written by this hook and read by the
 # lander; no wording anywhere can select a verdict.
 #
-# The tokens are inCMS's spellings, so its reader and this one read one vocabulary. The function
+# The tokens are adopter ic's spellings, so its reader and this one read one vocabulary. The function
 # below is the one place a token is paired with its run-log decision. `gate-red` and `head-moved`
 # pair with none: the bar RAN, and the decision it ran under stands. Before the ref loop no START
 # exists, so the decision goes to one `ev=once` line instead. The two refusals above the journal
@@ -352,7 +352,7 @@ write_refusal() { # token · one-line message -> the refusal file, and the run-l
 # the leg-manifest diff resolved to NOTHING and the bar command named a script that does not exist.
 # Forcing predicates 6 and 7 then matched nothing and did not fire, so a manifest-wide change landed
 # scoped against a green earned on a DIFFERENT leg set — green-by-absence, in the hook that decides
-# whether the authoritative bar is owed at all. TOOL-aBoundedCeiling-7; NicoCares carries the fix by
+# whether the authoritative bar is owed at all. TOOL-aBoundedCeiling-7; adopter nc carries the fix by
 # hand as its carve-out 14/20.
 #
 # PROBED ON THE LEG MANIFEST, not on the run-gates directory. The manifest is what predicates 6 and 7
@@ -361,7 +361,7 @@ write_refusal() { # token · one-line message -> the refusal file, and the run-l
 # directory falls through and takes twenty arms with it. Measured, on the first cut of this change.
 #
 # `tools` FIRST, because it is this kit's default and gov's tree must resolve unchanged; the fallback
-# is only consulted when this tree shows no sign of `tools` at all. NicoCares probes `scripts` first
+# is only consulted when this tree shows no sign of `tools` at all. Adopter nc probes `scripts` first
 # for the mirror-image reason — the order is a default, never a rule.
 GOV_KITROOT=tools
 if [ ! -f "$top/tools/gate-legs.json" ] && [ ! -d "$top/tools/run-gates" ]; then  # gov:prefix-literal — probes gov's own layout first and falls back to the derived prefix below
@@ -389,7 +389,7 @@ GATE_RUNNER=$GOV_KITROOT/run-gates/run-gates.sh
 #
 # OBSERVED ON THE REMOTE THIS PUSH GOES TO — TOOL-aRepatriatedFork-8 S1. Git hands a pre-push hook the
 # remote's NAME as $1, and this read `origin/HEAD` for every push regardless. On a node whose remote
-# is named anything else (inCMS's node `d` names it `incms`) nothing was observed, and every
+# is named anything else (adopter ic's node `d` names it after the project) nothing was observed, and every
 # default-branch push was refused unless each node exported GOV_DEFAULT_BRANCH. A push to a URL names
 # no remote, so nothing is observable and the environment is the only source, the rule a fresh
 # `git init` already lives by. WHAT IS A NAME is decided once, by `resolve_remote_name`, which
@@ -481,7 +481,7 @@ fi
 # was refused at rc 1 and the remote stayed put; with GOV_GATE_CMD=true the SAME commit landed at rc 0
 # under a BYTE-IDENTICAL "FULL gate … no recorded full green" line, a run-log END reading
 # `decision=full rc=0`, and push-main's lander marker. The evidence an unattended run is read for
-# could not tell a whole bar from `true`. NicoCares found and fixed it first (PKG-dCandidLodestar-5);
+# could not tell a whole bar from `true`. Adopter nc found and fixed it first (PKG-dCandidLodestar-5);
 # this is its rev-3 guard, taken without change but for the run-log decision it writes. Since
 # TOOL-aRepatriatedFork-8 it is a function, because the branch bar is vetted by the same rule.
 #
@@ -515,7 +515,7 @@ check_bar_command() { # knob name · command · sha its scripts must be tracked 
   # `bash /tmp/evil.sh <tracked>`, because the tracked name trails the one that actually runs.
   #
   # AND THE EVERY-TOKEN RULE STILL DOES NOT CONSTRAIN WHAT RUNS. `gatepayload <tracked>` and
-  # `bash -c gatepayload <tracked>` both landed over a RED bar at NicoCares: `gatepayload` is a PATH
+  # `bash -c gatepayload <tracked>` both landed over a RED bar at adopter nc: `gatepayload` is a PATH
   # command, it holds no `/` and does not end `.sh`, so no arm looked at it while the shell ran it.
   # So the word that EXECUTES is constrained by its POSITION: word 1, or word 2 when word 1 is one
   # of the two interpreters, and it has to be path-shaped, which routes it through the tracked and
@@ -635,7 +635,7 @@ check_bar_command() { # knob name · command · sha its scripts must be tracked 
 # ---- THE BRANCH BAR — TOOL-aRepatriatedFork-8 S5 ------------------------------------------------
 # A push that does not touch the default branch is ungated UNLESS the repository declares a branch
 # bar, `GOV_BRANCH_GATE_CMD`, in its `.githooks/gate-env.sh`. It is the seam for an adopter policy that
-# is not generic (inCMS runs its docs hygiene on a branch push that moved `memory/`). Unset, nothing
+# is not generic (adopter ic runs its docs hygiene on a branch push that moved `memory/`). Unset, nothing
 # changes. Set, it is vetted by the rule above, at HEAD, and run with git's own ref lines on its
 # stdin, since a branch push can carry several refs and one base sha cannot describe them; so
 # `GATE_PUSH_BASE` is unset for it rather than inherited. A branch bar can only ADD a refusal to a
@@ -716,7 +716,7 @@ if [ "$main_local" != "$head" ]; then
   write_refusal head-mismatch "$why"; RUNLOG_CLEAN=1; exit 1
 fi
 
-# ---- THE TREE THE BAR CERTIFIES — TOOL-aRepatriatedFork-8 S3, from inCMS's ARCH-dWaryGatepost-1 ----
+# ---- THE TREE THE BAR CERTIFIES — TOOL-aRepatriatedFork-8 S3, from adopter ic's ARCH-dWaryGatepost-1 ----
 # The bar reads the WORKING TREE and the push carries the COMMIT, so a dirty tree is a tree the green
 # does not describe. ONE definition of dirty, spelled identically in push-main.sh:
 # `--ignore-submodules=untracked` refuses an untracked superproject file, a moved submodule pointer

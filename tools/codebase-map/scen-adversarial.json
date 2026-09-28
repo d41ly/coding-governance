@@ -816,7 +816,7 @@
     "tools/gate-lint/ps-hygiene.py",
     "tools/govkit/census.py",
     "tools/govkit/check_runbook_parity.py",
-    "tools/govkit/fixtures/make_incms_receipt.py",
+    "tools/govkit/fixtures/make_adopter_receipt.py",
     "tools/govkit/govkit.py",
     "tools/govkit/matrix.py",
     "tools/govkit/refusal_join.py",

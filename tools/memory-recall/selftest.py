@@ -37,7 +37,7 @@ import tempfile
 sys.dont_write_bytecode = True
 
 # ALSO above it, and process-level rather than per-subprocess. TOOL-dRetiredFork-2, absorbed from
-# NicoCares `nc carve-out 17/20`; the sibling half lives in gen_build_index.py and the list is gov's
+# adopter nc `nc carve-out 17/20`; the sibling half lives in gen_build_index.py and the list is gov's
 # own from `.githooks/pre-push`. Every arm here builds a throwaway git repo, and `git init` under an
 # inherited GIT_DIR does not make a repo at the cwd — it RE-INITIALISES the repo GIT_DIR names. Run
 # from a hook, this suite would rewrite the caller's repository instead of its own fixture.
@@ -109,16 +109,16 @@ def resolve_memory_root() -> str:
 # `main()` already asserts `len(order) == len(_checks)`, which is DECLARED versus RAN: delete an arm
 # from both the order list and the definitions and it passes silently. This is the external number
 # that cannot be satisfied by deleting both halves.
-SELFTEST_ARMS = 73
-# 34 -> 58 on 2026-08-24 (contrib/incms-memory-recall): twenty-four arms — twenty-three ported from
-#   inCMS's scripts/recall/selftest.py plus one written here. NINE over `bench.py`/`union.py`,
+SELFTEST_ARMS = 75
+# 34 -> 58 on 2026-08-24 (adopter ic's recall contrib branch): twenty-four arms — twenty-three ported from
+#   adopter ic's scripts/recall/selftest.py plus one written here. NINE over `bench.py`/`union.py`,
 #   which `verbatim.json` pinned by digest and nothing exercised; ELEVEN over the half of
-#   `query.py` that diffs to zero changed lines against inCMS's copy; THREE over the alias join,
+#   `query.py` that diffs to zero changed lines against adopter ic's copy; THREE over the alias join,
 #   one of which covers the query-side call site a recall floor structurally cannot see; and ONE
 #   that is this pin's own arm, `test_the_selftest_pin_carries_an_unbroken_provenance_chain`.
 #   The first draft of this line read "ten / eleven / three" and omitted the fourth term — which
 #   is the exact defect this comment exists to prevent, found by review before it landed.
-# 58 -> 65 on 2026-09-22 (merge of main 955d348e into contrib/incms-memory-recall): SEVEN arms
+# 58 -> 65 on 2026-09-22 (merge of main 955d348e into adopter ic's recall contrib branch): SEVEN arms
 #   main gained after this branch's base, none of them new here. FIVE from aTunedCompass —
 #   `test_spine_flat_layout`, `test_spine_nested_layout`, `test_durable_derives_families`,
 #   `test_chunk_arm_rolls_up`, `test_empty_spine_is_loud`; ONE from the flag-in-path guard,
@@ -128,17 +128,23 @@ SELFTEST_ARMS = 73
 #   into the conf, each observed red against the kit before the unit - the archive segment after
 #   `archive/`, `RECALL_NODE_TAG_CLASS`, `RECALL_CITED_FAMILIES`, `RECALL_BUILD_QID_CUTOFF`,
 #   `RECALL_EXPORT_DIR`, and the digest moving with the two grammar keys and only those.
-# 71 -> 73 on 2026-09-28 (TOOL-dHashedPrelude-2): TWO arms over the live-log guard that
-#   brackets this suite, which until now could not fail — `main()` took its baseline after
-#   every arm had already run. One asserts from source that the baseline precedes the first
-#   decorated arm and that `main()` appends the row unconditionally; one drives
-#   `_build_live_log_row` over all four of its states, two of which no run in this repo produces.
+# 71 -> 73 on 2026-09-28 (TOOL-aRepatriatedFork-40): TWO arms, both red against the d486ea50
+#   extractor - a spec's defining H1 anchors its id by the index generator's own predicate, and a
+#   query for that id returns the defining spec's record first.
+# 73 -> 75 on 2026-09-28 (TOOL-dHashedPrelude-2): TWO arms over the live-log guard that
+#   brackets this suite, which until now could not fail - `main()` took its baseline after every
+#   arm had already run, so the row it feeds compared post-arm state against itself. One asserts
+#   from source that the baseline precedes the first decorated arm and that `main()` appends the
+#   row exactly once, unconditionally and argument-free; one drives the verdict over all FIVE of
+#   its states, three of which no run in a repo with a readable log produces. Both this line and
+#   the one above it were written as `71 -> 73` on two branches that did not know about each
+#   other; the merge renumbered this one, which is the whole reason the chain is checked.
 
 
 def check_provenance_chain(src: str | None = None, pinned: int | None = None) -> str:
     """`SELFTEST_ARMS` must be the END of an unbroken `N -> M` chain of comment lines.
 
-    Ported from inCMS `scripts/check_recall.py`. Upstream's pin had been bumped six times over
+    Ported from adopter ic `scripts/check_recall.py`. Upstream's pin had been bumped six times over
     35 -> 62, and once more over 83 -> 92, with no line recorded. A session that has to re-derive
     the pin then cannot tell which arms the missing ones were — which is exactly the state where a
     quiet DELETION reads as a legitimate re-pin. Writing the lines is the fix; this is what keeps
@@ -195,6 +201,13 @@ def make_repo(kitname: str = "memory-recall", conf: str = CONF, gitignore: str |
     kitdir.mkdir(parents=True)
     for f in SHIPPED:
         shutil.copyfile(KIT / f, kitdir / f)
+    # The two memory-tree files this kit reaches, where the resolver's probe finds them: this kit
+    # `requires` that one, `extract_records` imports `parse_spec_h1` from `tree_lib.py` on first use,
+    # and the spec-H1 arm compares against `gen_build_index.spec_ids` (TOOL-aRepatriatedFork-40).
+    import extract as E
+    (root / "memory-tree").mkdir()
+    for f in ("tree_lib.py", "gen_build_index.py"):
+        shutil.copyfile(E.resolve_kit_dir("memory-tree", f, KIT) / f, root / "memory-tree" / f)
     (root / ".memory-tree.conf").write_text(conf, encoding="utf-8", newline="\n")
     # `flat` writes <root>/DECISIONS.md, which is the layout the memory-tree kit's own adopter
     # creates; the default writes <root>/<discipline>/DECISIONS.md, which is upstream's. `DURABLE`
@@ -408,10 +421,16 @@ def test_parser_vs_bash():
             "MEMORY_ROOT=memory   # trailing comment on an unquoted value\n"
             'export FAMILIES="tooling:TOOL playbook:PLAY"\n'
             'SPACED="a value with spaces"\n'
-            "PLAIN=plain\n",
+            "PLAIN=plain\n"
+            # TOOL-aRepatriatedFork-38: a quoted value with a trailing comment read as `"a`.
+            'NOTED="a quoted value"   # trailing comment on a quoted value\n'
+            # rev-3 (C4): a `#` opening the word is data; whitespace after `=` ends the assignment.
+            "HASHED=#x\n"
+            "BLANKED=   # blank on purpose\n",
             encoding="utf-8", newline="\n",
         )
-        keys = ["MEMORY_ROOT", "FAMILIES", "SPACED", "PLAIN"]
+        # An empty value is never LAST: the `rstrip` of the reply below would drop it.
+        keys = ["MEMORY_ROOT", "FAMILIES", "SPACED", "BLANKED", "PLAIN", "NOTED", "HASHED"]
         script = ". '%s'; printf '%%s\\n' %s" % (
             (root / ".memory-tree.conf").as_posix(),
             " ".join(f'"${k}"' for k in keys),
@@ -1676,36 +1695,42 @@ def test_one_walk_two_callers():
         return f"query sees {len(live)} file(s), measurement sees {len(tracked)}"
     finally:
         os.chdir(cwd)
+        # `reload` re-executes the ONE module object `query` also holds, from the fixture's copy;
+        # left there, every later in-process arm ran a kit whose directory `cleanup` deletes, and
+        # anything resolving a sibling from `extract.__file__` looked beside nothing
+        # (TOOL-aRepatriatedFork-40). Put the kit's own source back.
+        sys.path.remove(str(kitdir))
+        importlib.reload(E)
         cleanup(root)
 
 
 
 # ==================================================================================================
-# THE INSTRUMENT'S OWN BEHAVIOUR — ported from inCMS `scripts/recall/selftest.py` (2026-08-24).
+# THE INSTRUMENT'S OWN BEHAVIOUR — ported from adopter ic `scripts/recall/selftest.py` (2026-08-24).
 #
 # WHY THIS BLOCK EXISTS. `bench.py` and `union.py` are byte-identical between the two trees and
 # `verbatim.json` pins both by digest, so `t_verbatim_files` proves the bytes have not moved and
 # NOTHING here proved they still behave. Same for the half of `query.py` that has not forked:
-# `emit`, `parse`, `query_expr`, `rrf` and `render` diff to ZERO changed lines against inCMS's copy.
+# `emit`, `parse`, `query_expr`, `rrf` and `render` diff to ZERO changed lines against adopter ic's copy.
 # A digest is not a check of behaviour; these are. Every arm below either drives a verbatim file or
 # drives a query.py function that is byte-identical to the one it was written against.
 #
-# WHAT WAS REPATHED, and it is only ever one of three things: inCMS's `_throwaway_repo()` becomes
+# WHAT WAS REPATHED, and it is only ever one of three things: adopter ic's `_throwaway_repo()` becomes
 # gov's `make_repo()` plus `run()` over the fixture's own copy of the kit, for every arm that drives
 # `query.main` (the note where `run_in_repo()` used to be says why it is not a chdir any more); an
 # `ARCH-` id becomes a `TOOL-` id from this repo's conf;
 # and a `memory/architecture/...` path becomes a `<MEMORY_ROOT>/tooling/...` one. No assertion was
 # weakened and no measurement re-derived — the figures quoted in these docstrings were measured on
-# inCMS's corpus and are cited as PROVENANCE for why an arm exists, never asserted here.
+# adopter ic's corpus and are cited as PROVENANCE for why an arm exists, never asserted here.
 #
 # ONE EDIT THAT IS NOT A REPATH, disclosed because the sentence above would otherwise hide it:
-# `test_rrf_is_rank_based_not_score_based`'s docstring is REWRITTEN, not repathed. inCMS's reads
+# `test_rrf_is_rank_based_not_score_based`'s docstring is REWRITTEN, not repathed. adopter ic's reads
 # "a document ranked 1 by the small set and absent from the large one must beat one ranked 3 by
 # both", which is the opposite of what its own assertions check. Gov's wording matches the arm.
 # The upstream copy is the one to fix; this is noted rather than silently carried.
 #
 # AND ONE PRECISION ON "BYTE-IDENTICAL": `bench.py` and `union.py` are identical after CRLF
-# normalisation, not raw. Gov's worktree copies are CRLF and inCMS's are LF, so their raw sha256
+# normalisation, not raw. Gov's worktree copies are CRLF and adopter ic's are LF, so their raw sha256
 # differs; `diff --strip-trailing-cr` reports zero in both directions, and `t_verbatim_files`
 # strips CRLF before hashing, so the kit's own arm and this claim agree. A reader who checks with
 # `sha256sum` alone will not reproduce it, which is why the qualifier is here.
@@ -1716,12 +1741,12 @@ def test_one_walk_two_callers():
 #
 # WHAT WAS DELIBERATELY LEFT UPSTREAM: the id-grammar and anchor-shape arms. Those are precisely the
 # arms this kit's four anchor regexes and its H1-is-not-an-anchor rule still lack — but every one of
-# their fixtures is an inCMS id embedded in an inCMS row shape, and rewriting them in this
+# their fixtures is an adopter ic id embedded in its row shape, and rewriting them in this
 # conf's vocabulary is authoring a new arm rather than moving one. They are worth purpose-writing
 # here as separate work.
 #
 # One more piece of this contribution does not live in this block: `SELFTEST_ARMS` and
-# `check_provenance_chain`, up beside the harness, ported from inCMS's `scripts/check_recall.py`.
+# `check_provenance_chain`, up beside the harness, ported from adopter ic's `scripts/check_recall.py`.
 # ==================================================================================================
 
 
@@ -2595,7 +2620,7 @@ def read_grammar(conf: str, ids: str, *paths: str) -> dict:
 
 @check("DURABLE admits one segment AFTER archive/, and still refuses a non-index file there")
 def test_archive_segment_after_archive_is_durable():
-    """inCMS rotates to `<root>/archive/<discipline>/DECISIONS.<date>.md`; the pattern took a segment
+    """Adopter ic rotates to `<root>/archive/<discipline>/DECISIONS.<date>.md`; the pattern took a segment
     only BEFORE `archive/`, so all fifteen of those files had no durable home (spec AC1)."""
     after = "memory/archive/architecture/DECISIONS.2026-07-27.md"
     before = "memory/tooling/archive/DECISIONS.2026-07-27.md"
@@ -2610,7 +2635,7 @@ def test_archive_segment_after_archive_is_durable():
 
 @check("RECALL_NODE_TAG_CLASS narrows the id grammar, prints, defaults to a-z, and refuses a bad class")
 def test_node_tag_class_is_declared():
-    """The class was a code constant, so inCMS (`a-f`) could not run the kit verbatim (spec AC2)."""
+    """The class was a code constant, so adopter ic (`a-f`) could not run the kit verbatim (spec AC2)."""
     narrow = CONF + 'RECALL_NODE_TAG_CLASS="a-f"\n'
     g = read_grammar(narrow, "ARCH-xFoo-3 TOOL-xFoo-3 TOOL-aFoo-3")
     assert not g["id"]["TOOL-xFoo-3"] and not g["grammar_for"]["TOOL-xFoo-3"], (
@@ -2881,6 +2906,88 @@ def test_digest_follows_grammar_keys_only():
     return f"base {dig['base']}; tag and cited move it, cutoff and export do not"
 
 
+# --- TOOL-aRepatriatedFork-40: a spec's defining H1 anchors its id, by the index generator's predicate
+SPEC_H1_REL = "builds/bQuill/spec/2026-09-28-spec-TOOL-aQuill-9.md"
+SPEC_H1_CORPUS = {
+    # The ONLY defining line TOOL-aQuill-9 has: a spec H1. The section under it must stay out of
+    # its record.
+    SPEC_H1_REL: "# TOOL-aQuill-9 — the quibbler rotation\n\n**Status:** SPECCED\n\n"
+                 "## 1. Goal\n\nThe zanzibar gasket rotates every flush.\n",
+    # A sub-spec, any depth under spec/ — the index generator reads it too. It carries a status
+    # line as every real spec does: a ONE-LINE file's record and chunk share the fusion key, so
+    # they sum in `rrf` and that file outranks every other hit whatever the query named.
+    "builds/bQuill/spec/subspecs/sub.md": "# TOOL-aQuill-6 — the sub-spec\n\n**Status:** SPECCED\n",
+    # Citation only, in prose: never a definition.
+    "tooling/cite.md": "Notes. The quibbler rotation from TOOL-aQuill-9 is discussed here at length, "
+                       "with the quibbler and its rotation, again and again, quibbler rotation.\n",
+    # An H1 outside spec/ and a FENCED H1 inside one: neither defines anything.
+    "builds/bQuill/build/journal.md": "# TOOL-aQuill-8 — a journal titled with an id\n",
+    "builds/bOther/spec/fenced.md": "Intro.\n\n```\n# TOOL-aQuill-7 — fenced\n```\n",
+}
+
+
+def seed_spec_h1(root: pathlib.Path) -> str:
+    m = resolve_memory_root()
+    for rel, text in SPEC_H1_CORPUS.items():
+        p = root / m / rel
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text(text, encoding="utf-8", newline="\n")
+    subprocess.run(["git", "-C", str(root), "add", "-A"], check=True, capture_output=True)
+    return m
+
+
+@check("a spec H1 anchors the id it defines, by the index generator's own predicate")
+def test_spec_h1_anchors_the_id_it_defines():
+    """AC1-AC3. Before this, `A_HEADING` was `#{2,6}` and nothing else looked at an H1, so an id
+    whose only defining line is its spec's H1 had no record and resolved to nothing."""
+    import extract as E
+    root, kitdir = make_repo()
+    out = root / ".x"
+    try:
+        m = seed_spec_h1(root)
+        p = run(root, kitdir, str(root), str(out), script="extract.py")
+        assert p.returncode == 0, f"extract exited {p.returncode}: {p.stderr[-400:]}"
+        anchors = json.loads((out / "anchors.json").read_text(encoding="utf-8"))
+        recs = [json.loads(x) for x in (out / "records.jsonl").read_text(encoding="utf-8").splitlines()]
+        tree_kit = E.resolve_kit_dir("memory-tree", "gen_build_index.py", kitdir)
+        if str(tree_kit) not in sys.path:
+            sys.path.insert(0, str(tree_kit))
+        import gen_build_index as G
+        tracked = subprocess.run(["git", "-C", str(root), "ls-files"], capture_output=True,
+                                 text=True, encoding="utf-8", check=True).stdout.split()
+        want = G.spec_ids(str(root), tracked, {"MEMORY_ROOT": m, "FAMILIES": "tooling:TOOL"})
+    finally:
+        cleanup(root)
+    spec = f"{m}/{SPEC_H1_REL}"
+    assert anchors.get("TOOL-aQuill-9") == [spec], f"the spec H1 did not anchor: {anchors}"
+    rec = next(r for r in recs if r["id"] == "TOOL-aQuill-9")
+    assert rec["text"] == "# TOOL-aQuill-9 — the quibbler rotation", f"the record ran on: {rec['text']!r}"
+    assert not any(r["path"] == f"{m}/tooling/cite.md" for r in recs), "a citation wrote a record"
+    assert "TOOL-aQuill-8" not in anchors, "an H1 outside spec/ anchored"
+    assert "TOOL-aQuill-7" not in anchors, "a fenced H1 anchored"
+    h1 = {r["id"] for r in recs if r["text"].startswith("# ")}
+    assert h1 == want == {"TOOL-aQuill-9", "TOOL-aQuill-6"}, f"extract {h1} vs spec_ids {want}"
+    return f"H1-anchored {sorted(h1)} == spec_ids; the journal H1, the fenced H1 and the citation do not"
+
+
+@check("a query for a spec-defined id returns the defining spec's record first")
+def test_spec_h1_record_outranks_a_citation():
+    """AC4. The citing file repeats the words; the defining spec must still come back as hit 1."""
+    root, kitdir = make_repo()
+    try:
+        m = seed_spec_h1(root)
+        p = run(root, kitdir, "what is TOOL-aQuill-9", "--terms",
+                "TOOL-aQuill-9 quibbler rotation zanzibar gasket flush")
+    finally:
+        cleanup(root)
+    hits = [ln for ln in p.stdout.splitlines() if re.match(r"^\[\d+\] ", ln)]
+    want = f"[1] TOOL-aQuill-9 · {m}/{SPEC_H1_REL}:1"
+    assert hits and hits[0] == want, f"hit 1 is {hits[:1]}, wanted {want!r}\n{p.stdout[-600:]}{p.stderr[-300:]}"
+    cite = next((ln for ln in hits if f"{m}/tooling/cite.md" in ln), None)
+    assert cite, f"the citing file never surfaced, so nothing was outranked: {hits}"
+    return f"{hits[0]}; the citation comes back as {cite.split(' ', 1)[0]}"
+
+
 def main() -> int:
     # The live-log baseline is NOT taken here. It is taken at module scope, above the first `@check`,
     # because every arm runs at decoration time and a baseline taken in this function brackets
@@ -2901,7 +3008,7 @@ def main() -> int:
         test_version_marker, test_verbatim_files, test_adopter_layout,
         test_declared_sources_reach_the_corpus, test_declared_source_absent_is_skipped,
         test_undeclared_file_stays_out, test_one_walk_two_callers,
-        # ported from inCMS scripts/recall/selftest.py — the two verbatim files, the unforked half
+        # ported from adopter ic scripts/recall/selftest.py — the two verbatim files, the unforked half
         # of query.py, and the alias join
         test_chunk_matching, test_scoring, test_full_at_k_counts_targets_not_documents,
         test_fts_query_safety, test_alias_column_is_separate_and_downweighted,
@@ -2923,6 +3030,8 @@ def main() -> int:
         test_archive_segment_after_archive_is_durable, test_node_tag_class_is_declared,
         test_cited_families_are_ids_not_homes, test_build_qid_cutoff_is_read_from_conf,
         test_export_dir_is_declared_and_bounded, test_digest_follows_grammar_keys_only,
+        # TOOL-aRepatriatedFork-40: the spec H1 anchor
+        test_spec_h1_anchors_the_id_it_defines, test_spec_h1_record_outranks_a_citation,
         # TOOL-dHashedPrelude-2: the guard that brackets this suite, gated
         test_the_live_log_baseline_is_taken_before_any_arm_runs,
         test_the_live_log_verdict_is_total_over_its_states,

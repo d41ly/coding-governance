@@ -18,7 +18,7 @@
 #
 # Exit 0 + no output = clean. Anything printed is a hygiene regression.
 set -u
-KIT_MEMORY_TREE_VERSION=2.95   # gov:kit memory-tree@2.95 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
+KIT_MEMORY_TREE_VERSION=2.101   # gov:kit memory-tree@2.101 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 MEMORY_ROOT=memory
@@ -105,7 +105,7 @@ DOSSIER_CAP_BYTES=20480       ; DOSSIER_CAP_LINES=0
 ENTRY_CAP_CHARS=300           ; BUILD_README_ENTRY_CAP_CHARS=350
 
 # ---- THE VALUES A PROJECT OWNS — TOOL-dRetiredFork-15, TOOL-aRepatriatedFork-10 -----------------
-# Each was a literal in a check below, which is why NicoCares carries four carve-outs against this
+# Each was a literal in a check below, which is why adopter nc carries four carve-outs against this
 # one file. BLANK MEANS GOV'S CURRENT BEHAVIOUR for every one, so an adopter who never edits
 # .memory-tree.conf sees a byte-identical run.
 #
@@ -295,7 +295,7 @@ DEBT=$(grep -vE '^\s*(#|$)' "$M/project/curation-debt.txt" 2>/dev/null || true)
 # Membership via associative arrays, NOT `grep -qxF <<<"$LIST"` — the here-string forks a grep per
 # call, and these run once per scanned file (minutes on a large adopter tree; a fork is ~50-100ms
 # under MSYS/Windows). Exact-key lookup is semantically identical (fixed string, whole line) and
-# costs zero processes. (Upstream: inCMS ARCH-aFencedNamespace-3.)
+# costs zero processes. (Upstream: adopter ic ARCH-aFencedNamespace-3.)
 declare -A LEGACY_SET DEBT_SET
 while IFS= read -r _l; do [ -n "$_l" ] && LEGACY_SET["$_l"]=1; done <<<"$LEGACY"
 while IFS= read -r _l; do [ -n "$_l" ] && DEBT_SET["$_l"]=1; done <<<"$DEBT"
@@ -460,7 +460,7 @@ scan2=$(printf '%s\n' "$FILES" | grep -E '\.md$' | grep -vE '/(DECISIONS\.md$|de
 [ "$STAGED" = 1 ] && scan2=$(printf '%s\n' "$scan2" | { grep -xF -f <(printf '%s\n' "$STAGED_MD") || true; })
 # Drop grandfathered files first (fork-free), then extract every candidate link in ONE awk pass over
 # all remaining files — was `_unfenced | grep -oE | sed -E` PER FILE (3 forks × N files; the single
-# biggest cost on a large adopter tree — upstream inCMS ARCH-aFencedNamespace-3). The awk inlines
+# biggest cost on a large adopter tree — upstream adopter ic ARCH-aFencedNamespace-3). The awk inlines
 # _unfenced's exact semantics (CR strip + marker-matched fences, state reset per file) and the
 # grep+sed link shape INCLUDING the sed fall-through (an anchor-only `](#x.md)` stays as-is).
 scan2f=""
@@ -552,7 +552,7 @@ bp=$(printf '%s\n' "$p1" | grep . | while IFS= read -r e; do case "$e" in
   # PROJECT_REGISTRY_EXTRA. TOOL-aRepatriatedFork-10 S4.
   F:pass-order-waiver.txt) ;;
   # S2 — PROJECT_REGISTRY_EXTRA. A project may ADD registries under <M>/project/ without
-  # forking this whitelist, which is what NicoCares carved this file out to do.
+  # forking this whitelist, which is what adopter nc carved this file out to do.
   #
   # PLACED LAST ON PURPOSE. The first cut put this case ABOVE the named ones, where `F:*`
   # matched every one of them and accepted it — check 3 stopped grading anything under
@@ -784,7 +784,7 @@ fi
 derive_waived 6 "$bad6"; bad6="$_UNWAIVED"
 [ -n "$bad6" ] && fail 6 "index files over cap (rotate to archive/<INDEX>.<YYYY-MM-DD>.md; a codebase-map dossier over cap is SPLIT into two dossiers instead — never rotate FOUNDATION.md, the map gate requires it):
 $bad6"
-# TOOL-dRetiredFork-1, absorbed from NicoCares `nc carve-out 5/20`. Eight sibling checks already
+# TOOL-dRetiredFork-1, absorbed from adopter nc `nc carve-out 5/20`. Eight sibling checks already
 # carry this; check 6 reported a clean zero over an empty population instead of refusing.
 pop_guard 6 "no index file under $M/ (guides, ledger, backlog, build READMEs, map dossiers)" \
   "$(printf '%s\n' "$sel6" | grep -c . || true)" "$PRE_INDEXY"
@@ -873,7 +873,7 @@ $bad7"
 # `^[[:space:]]*-` slot can only anchor once (caret pattern on the first match, no-caret thereafter),
 # and the trailing `\b` is checked ZERO-WIDTH (next char is end/non-word) so it never consumes a
 # following delimiter. uln counts the UNFENCED stream (== the old grep -n numbering). The two `·` in
-# the patterns are the LITERAL middot byte. Validated per-row against grep over the upstream inCMS
+# the patterns are the LITERAL middot byte. Validated per-row against grep over the upstream adopter ic
 # tree's 589 real rows — 0 mismatches (PERF-eThriftyBellows-1).
 pop8=$( { printf '%s\n' "$FILES" | grep -E "^$M/backlog/[^/]+\.md$"; printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/STATUS\.md$"; } | grep -c . || true)
 pop_guard 8 "no backlog shard under $M/backlog/" "$pop8" "$PRE_STATUSY"
@@ -1007,25 +1007,27 @@ if [ "$STAGED" = 0 ] && printf '%s\n' "$c21_sel" | grep -q .; then
 $(printf '%s\n' "$b21" | tail -n 5 | sed 's/^/  /')"
     b21=""
   fi
-  miss21=$(printf '%s\n' "$b21" | sed -n 's/^A\t\([^\t]*\)\t\(.*\)$/  \1 — \2/p')
-  # The grandfather registry reaches this population as it reaches check 5: a record legacy-files.txt
-  # lists was exempt from the filename grammar and still redded here, so one registry answered two
-  # ways. Builtins only -- `in_legacy` is an array lookup, so this costs no process per row.
-  # TOOL-aRepatriatedFork-10 S2.
-  miss21=$(printf '%s\n' "$miss21" | while IFS= read -r _r21; do
-    [ -n "$_r21" ] || continue
-    _p21=${_r21#"  "}; _p21=${_p21%% *}
-    in_legacy "$_p21" || printf '%s\n' "$_r21"
-  done)
-  # S3 — RECORD_SERVES_CUTOFF. A project adopting this kit mid-life has landed records that
-  # predate the Serves grammar; NicoCares measured 549 of them. A cutoff is one value where a
-  # grandfather list would be 549 rows, and it matches the five cutoffs already in the conf.
+  # ONE POPULATION FILTER FOR EVERY BRANCH (TOOL-aRepatriatedFork-32). A record the grandfather
+  # registry lists, or one dated before RECORD_SERVES_CUTOFF, is exempt from all four branches of
+  # this check, not only the missing-Serves one: an adopter declaring the cutoff still redded 55
+  # legacy names in branch 4 and two reviews in the id branch. Rows are `  <path> — <detail>`.
   #
-  # THIS NARROWS A POPULATION, which is why the preset block refuses a cutoff dated after
-  # today: a future date exempts every record and the check reports clean over nothing.
-  # Blank grades everything, which is what gov does.
-  if [ -n "$RECORD_SERVES_CUTOFF" ]; then
-    miss21=$(printf '%s\n' "$miss21" | awk -v cut="$RECORD_SERVES_CUTOFF" '
+  # The legacy half: the registry reaches this population as it reaches check 5, and costs no
+  # process per row -- `in_legacy` is an array lookup. TOOL-aRepatriatedFork-10 S2.
+  #
+  # The cutoff half, S3 of that unit. A project adopting this kit mid-life has landed records that
+  # predate the Serves grammar; adopter nc measured 549 of them. A cutoff is one value where a
+  # grandfather list would be 549 rows. THIS NARROWS A POPULATION, which is why the preset block
+  # refuses a cutoff dated after today: a future date exempts every record and the check reports
+  # clean over nothing. Blank grades everything, which is what gov does.
+  extract_graded_rows() {
+    local _r21 _p21
+    while IFS= read -r _r21; do
+      [ -n "$_r21" ] || continue
+      _p21=${_r21#"  "}; _p21=${_p21%% *}
+      in_legacy "$_p21" || printf '%s\n' "$_r21"
+    done | if [ -n "$RECORD_SERVES_CUTOFF" ]; then
+      awk -v cut="$RECORD_SERVES_CUTOFF" '
       # the record date is the basename prefix the naming grammar already pins. A row whose
       # name carries no date is KEPT: unparseable is not the same answer as old, and only one
       # of them is an exemption.
@@ -1040,8 +1042,12 @@ $(printf '%s\n' "$b21" | tail -n 5 | sed 's/^/  /')"
           if (d < cut) next
         }
         print
-      }' | grep . || true)
-  fi
+      }'
+    else
+      cat
+    fi
+  }
+  miss21=$(printf '%s\n' "$b21" | sed -n 's/^A\t\([^\t]*\)\t\(.*\)$/  \1 — \2/p' | extract_graded_rows)
   # RECORD_UNDATED_ARTIFACTS=exempt — a JSON result or an HTML report cannot carry a Serves line at
   # any date, so a DATE is not what decides it (the owner ruled this independent of the cutoff). The
   # class is STRUCTURAL: no leading ISO date AND no .md suffix. A suffix list was rejected because an
@@ -1062,19 +1068,36 @@ $(printf '%s\n' "$b21" | tail -n 5 | sed 's/^/  /')"
   fi
   [ -n "$miss21" ] && fail 21 "records under build/, prompts/ or reviews/ whose head carries no conformant Serves line:
 $miss21"
-  bad21=$(printf '%s\n' "$b21" | sed -n 's/^B\t\([^\t]*\)\t\(.*\)$/  \1 — \2/p')
+  bad21=$(printf '%s\n' "$b21" | sed -n 's/^B\t\([^\t]*\)\t\(.*\)$/  \1 — \2/p' | extract_graded_rows)
   [ -n "$bad21" ] && fail 21 "Serves or Commissions lines naming an id that no spec in this tree defines:
 $bad21"
   # The unbound escape. An UNDECLARED pin is a refusal, not a disabled check: `none` is a deliberate
   # declaration and the number of them is the thing a reader is entitled to see bounded. `n21` was
   # read above, where its absence is the parse's liveness test.
+  # The pin counts the U rows the population filter keeps, so an exempt record no longer spends it;
+  # `n21` stays the liveness total. TOOL-aRepatriatedFork-32.
   pin21=${RECORD_UNBOUND_PIN-}
+  u21=$(printf '%s\n' "$b21" | sed -n 's/^U\t\(.*\)$/  \1 — unbound/p')
+  g21=$(printf '%s\n' "$u21" | extract_graded_rows | grep -c . || true)
+  # A generator predating the U row prints N and no U, which would make the pin unreachable.
+  if [ -n "$b21" ] && [ "$(printf '%s\n' "$u21" | grep -c . || true)" != "${n21:-0}" ]; then
+    fail 21 "the bindings parse printed N ${n21:-0} but $(printf '%s\n' "$u21" | grep -c . || true) U row(s) — a generator without the U row leaves RECORD_UNBOUND_PIN ungraded"
+  fi
+  # THE MEASUREMENT PRINTS ON EVERY RUN, and SLACK REDS (TOOL-aRepatriatedFork-32 rev-3, the closing
+  # review's C1). Since the pin began counting the graded rows, an adopter who set it to `N` as the
+  # runbook said held slack equal to its exempt records, and that many new unbound records then
+  # landed green: a shrink-only pin satisfied vacuously. The line names all three numbers, because
+  # the one to set the pin to is the graded count, and a reader shown only `N` sets the wrong one.
+  [ -n "$b21" ] && echo "memory-hygiene: check 21: the unbound pin grades ${g21:-0} of N ${n21:-0} unbound record(s), $(( ${n21:-0} - ${g21:-0} )) exempt by RECORD_SERVES_CUTOFF or legacy-files.txt, against RECORD_UNBOUND_PIN=${pin21:-<undeclared>}" >&2
   if [ -z "$pin21" ]; then
     fail 21 "RECORD_UNBOUND_PIN is undeclared, so the count of records that serve no spec is unbounded — declare it in .memory-tree.conf, measured against this corpus"
-  elif [ "${n21:-0}" -gt "$pin21" ]; then
-    over21="  measured ${n21:-0} against the pin $pin21"
+  elif [ "${g21:-0}" -gt "$pin21" ]; then
+    over21="  measured ${g21:-0} against the pin $pin21"
     fail 21 "records carrying the unbound Serves form outnumber their pin — bind them, or move the pin in the same commit recording the old and new values beside it:
 $over21"
+  elif [ -n "$b21" ] && [ "$pin21" -gt "${g21:-0}" ]; then
+    fail 21 "RECORD_UNBOUND_PIN carries slack — the pin is shrink-only, and this much headroom lets as many new unbound records land green:
+  the pin $pin21 against a graded count of ${g21:-0} — lower it to ${g21:-0} in .memory-tree.conf"
   fi
   # Branch 4 — the filename PROJECTS the header. Its input is the S row, because a conformant record
   # is not a finding and nothing else in the mode's output describes one. The projection is a WHOLE
@@ -1108,7 +1131,7 @@ $over21"
       n = split(ids, a, " ")
       for (i = 1; i <= n; i++) if (a[i] == claimed) next
       print "  " p " — the name claims " claimed
-    }')
+    }' | extract_graded_rows)
   [ -n "$proj21" ] && fail 21 "record filenames whose family, slug and ordinal name an id their own Serves line does not list:
 $proj21"
 fi
@@ -1220,7 +1243,7 @@ SPEC_CANON='## 1. Goal
 SPEC_CANON10="$SPEC_CANON
 ## 10. Reuse audit"
 # ONE awk over the whole population, replacing ~13 forks PER SPEC (measured 42.88s of an 81.77s run
-# here; upstream inCMS measured the same shape at 257.8s of 311s over 356 specs —
+# here; upstream adopter ic measured the same shape at 257.8s of 311s over 356 specs —
 # TOOL-aBatchedLintel-1 ports PERF-aSlothfulCapstan-1). The driver is a tagged path stream built in
 # the SHELL rather than an `ARGIND` switch: ARGIND is gawk-only, and upstream had a byte cap silently
 # not exist under mawk because of it. `M` = tracked and in scope but absent from the worktree,
@@ -2217,7 +2240,7 @@ fi
 
 # grandfather stale-line guards (a listed path that no longer exists fails).
 # One `git ls-files` + set lookups, NOT `git ls-files --error-unmatch` per path — git is a heavyweight
-# fork, so a long grandfather list was one spawn per line (~80s at inCMS's 522 lines). Entries are
+# fork, so a long grandfather list was one spawn per line (~80s at adopter ic's 522 lines). Entries are
 # literal paths, never globs, so exact membership in the tracked set is equivalent.
 if [ -n "$LEGACY$DEBT" ]; then
   declare -A TRACKED_SET

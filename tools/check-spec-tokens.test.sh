@@ -143,6 +143,23 @@ sed -i 's|^`real leg`\.|The bar and whatever it drags in.|' "$d/memory/builds/tO
 git -C "$d" add -A >/dev/null
 arm "a post-cutoff section 7 naming no leg REDS" 1 "$d" "contributes no leg name"
 
+# TOOL-aRepatriatedFork-38 — the SAME cutoff with a trailing comment, quoted and then unquoted. The
+# old reader demanded nothing after the closing quote, so the quoted one read as BLANK (arm off).
+d=$base/leglinenote; scratch "$d"
+printf 'SPEC_LEGLINE_CUTOFF="2026-09-01"   # a trailing note\n' > "$d/.memory-tree.conf"
+sed -i 's|^`real leg`\.|The bar and whatever it drags in.|' "$d/memory/builds/tOne/spec/2026-09-02-spec-TOOL-tOne-1.md"
+git -C "$d" add -A >/dev/null
+arm "a quoted cutoff with a trailing comment still arms the join" 1 "$d" "contributes no leg name"
+printf 'SPEC_LEGLINE_CUTOFF=2026-09-01   # a trailing note\n' > "$d/.memory-tree.conf"
+git -C "$d" add -A >/dev/null
+arm "an unquoted cutoff with a trailing comment still arms the join" 1 "$d" "contributes no leg name"
+# rev-3 (the closing review's C4): a `#` OPENING the value is part of the word, as bash reads it, so
+# this cutoff is the non-date `#2026-09-01` and is REFUSED by name. The old reader read it as BLANK,
+# which switched the join off without a word.
+printf 'SPEC_LEGLINE_CUTOFF=#2026-09-01\n' > "$d/.memory-tree.conf"
+git -C "$d" add -A >/dev/null
+arm "a cutoff whose word opens with # is refused as a non-date, never read as off" 1 "$d" "is not an ISO date"
+
 # ...and its PRE-cutoff twin is green, so nothing landed goes retroactively red.
 d=$base/leglinepre; scratch "$d"
 printf 'SPEC_LEGLINE_CUTOFF="2026-09-30"

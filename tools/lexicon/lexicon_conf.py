@@ -158,9 +158,22 @@ def load_conf(path: str | Path) -> dict:
 
         ms = _SCALAR_RE.match(line)
         if ms:
-            val = ms.group(2).strip()
-            if len(val) >= 2 and val[0] == val[-1] and val[0] in "\"'":
-                val = val[1:-1]
+            # TOOL-aRepatriatedFork-38. A QUOTED value ends at its matching quote, whatever follows
+            # it, and an UNQUOTED one at a `#` that begins a word, which is bash's rule and the
+            # memory-tree kit's `parse_conf_line`. Testing the value's first and last characters
+            # kept `ratified="2026-09-10 node a"   # note` whole, comment and quotes included.
+            raw = ms.group(2)
+            # TOOL-aRepatriatedFork-38 rev-3 (the closing review's C4): the WORD rule, decided on the
+            # text right after `=`. Whitespace there ends the assignment, so `K= x` and `K= # n` are
+            # empty; a `#` begins a comment only after whitespace, so `K=#x` keeps `#x`. Bash's rule.
+            val = raw.strip()
+            close = val.find(val[0], 1) if val[:1] in ("'", '"') else -1
+            if raw[:1].isspace():
+                val = ""
+            elif close >= 0:
+                val = val[1:close]
+            else:
+                val = re.split(r"\s#", val, maxsplit=1)[0].strip()
             out[ms.group(1)] = val
             i += 1
             continue

@@ -232,7 +232,7 @@ case "$out" in *ban-table.js*) fails=$((fails+1)); printf 'arm FAIL  a file unde
   *) printf 'arm ok    a file under .claude/hooks/ is not judged\n' ;; esac
 
 # ---- ARM 2: the agent wave that silently drops itself (TOOL-dRetiredFork-7) ----------------------
-# Absorbed from inCMS, REDUCED: its arms keyed on that repo's own record ids are left behind, because
+# Absorbed from adopter ic, REDUCED: its arms keyed on that repo's own record ids are left behind, because
 # an arm keyed on a foreign corpus reds on absence rather than on behaviour.
 #
 # Each fixture is a whole scratch TREE, not a lone file, because arm 2's population and its liveness

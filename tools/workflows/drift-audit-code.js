@@ -1,6 +1,6 @@
 export const meta = {
   name: 'drift-audit-code',
-  version: '1.13',
+  version: '1.15',
   description:
     'Drift audit Tier 2, wave 1: dead / inefficient / unwired / duplicated code + instrument integrity. Project-agnostic; all repo facts arrive via args.',
   whenToUse:
@@ -12,7 +12,7 @@ export const meta = {
   ],
 }
 
-// gov:kit drift-audit@1.13
+// gov:kit drift-audit@1.15
 // --- bounded fan-out (inlined; workflow scripts cannot import) ------------
 // The cap is on CONCURRENCY *and*, for the verify stage, on TOTAL agents. Concurrency is not a
 // budget: N findings fanned one-skeptic-each still spawn N agents, five at a time.
@@ -22,7 +22,7 @@ export const meta = {
 // now RESOLVES the bound and refuses that binder form outright. (The spelling itself is paraphrased
 // here on purpose: the acceptance grep for it is repo-wide and would match the comment explaining it.)
 const CAP = 5
-// TOOL-dRetiredFork-6, taken from inCMS's KIT_DRIFT_AUDIT_HARNESS_DELTA. The note used to be a
+// TOOL-dRetiredFork-6, taken from adopter ic's KIT_DRIFT_AUDIT_HARNESS_DELTA. The note used to be a
 // hand-written ternary with THREE outcomes that conflated TWO of them: `!synth` gave UNVERIFIED,
 // anything non-zero gave PARTIAL, and everything else gave the bare string `complete` — so "nothing
 // moved" and "the probe could not run" were the same sentence, and `complete` is a reassuring word

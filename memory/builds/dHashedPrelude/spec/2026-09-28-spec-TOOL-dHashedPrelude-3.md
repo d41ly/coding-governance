@@ -1,6 +1,6 @@
 # TOOL-dHashedPrelude-3 — the kit's published facts stop being a typed count, and its version moves
 
-**Status:** CLOSED · rev-3 · 2026-09-28 · node d · Tier-1 · base 3cf05f29 · streams tooling · order 3
+**Status:** CLOSED · rev-4 · 2026-09-28 · node d · Tier-1 · base 3cf05f29 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -26,10 +26,12 @@ commit than the last change to the kit's shipped bytes.
 - **S1** — `tools/memory-recall/README.md` line 26 describes `selftest.py` by its role and by where
   a reader finds the number of checks, which is the summary line the run itself prints. No figure is
   typed into that table. Observed by AC1.
-- **S2** — `KIT_MEMORY_RECALL_VERSION` in `tools/memory-recall/recall_conf.py` moves from 1.12 to
-  1.13, and so do the two `gov:kit memory-recall@` markers, one in that file's docstring at line 4
-  and one in the README's HTML comment at line 3. Those three lines are the whole population that
-  carries a version literal. Observed by AC2.
+- **S2** — `KIT_MEMORY_RECALL_VERSION` in `tools/memory-recall/recall_conf.py` moves, and so do the
+  two `gov:kit memory-recall@` markers, one in that file's docstring at line 4 and one in the
+  README's HTML comment at line 3. Those three lines are the whole population that carries a
+  version literal. The unit built 1.12 to 1.13; the landing reconcile carried it to 1.19, because
+  `aRepatriatedFork` had taken the same kit 1.12 to 1.18 on `main` in parallel and a merge that
+  moves shipped bytes cannot sit at either parent's number. Observed by AC2.
 - **S3** — The backlog row `TOOL-aProbedToolkit-14` records that its memory-recall half is answered
   here and that its `tools/lexicon/README.md` half is still open. Observed by AC3.
 - **S4** — The two deferrals units 2 and 3 name are PARKED in the build README, because a non-goal
@@ -78,15 +80,17 @@ section carries the reasoning so the next reader does not re-derive it.
   answering it.
 - **AC2** — When `grep -rn 'gov:kit memory-recall@[0-9]\|^KIT_MEMORY_RECALL_VERSION = '
   tools/memory-recall/README.md tools/memory-recall/recall_conf.py` runs, it prints exactly three
-  lines and every one carries 1.13. `bash tools/check-kit-versions.sh` exits 0, and
+  lines and every one carries the same value — 1.13 as the unit built it, 1.19 after the landing
+  reconcile. `bash tools/check-kit-versions.sh` exits 0, and
   `python tools/govkit/govkit.py epoch --base 3cf05f29` prints a `clean` row for `memory-recall`
   with no `FAILED` line for it.
   figure: the three lines are DERIVED by that command, which was run as written at BASE and printed
   exactly those three, all carrying 1.12; 1.13 is PINNED. The count is the carrier list of S2, not a
   count over an unanchored pattern — the rev-1 form of this criterion asserted three lines from a
   pattern that prints twelve.
-  Red when: one of the three is left at 1.12, or the bump rides unit 1's or unit 2's commit and so
-  precedes the README edit that moves engine bytes.
+  Red when: the three disagree, or the bump rides unit 1's or unit 2's commit and so precedes the
+  README edit that moves engine bytes, or the reconcile leaves the merged kit at a number either
+  parent already shipped.
 - **AC3** — When `TOOL-aProbedToolkit-14` is read in `memory/backlog/TOOL.md`, it names which half
   this build answered and which half is still open, and its status token still reflects that one
   half remains.
@@ -125,3 +129,8 @@ the build README's parked section.
   the build README's parked section. A backlog row was written first and reverted: hygiene check
   20 holds `memory/backlog/TOOL.md` at a shrink-only pin of 417 live rows and the shard is AT it,
   so a row cannot be added without draining two, which is not this build's to do.
+
+- rev-4 · 2026-09-28 · §2 S2 · AC2 · the landing reconcile. `origin/main` had moved 33 commits
+  while this build ran, and `aRepatriatedFork` took the same kit 1.12 to 1.18 over six units,
+  touching all three files this unit edits. The merged kit is 1.19: a merge that moves shipped
+  bytes cannot sit at either parent's number, and 1.13 is now behind main.

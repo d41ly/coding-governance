@@ -138,7 +138,8 @@ SPEC_RECORDS_CLOSE = "<!-- /gen:spec-records -->"
 # longer imports a sibling ENGINE: an adopter's own `corpus_ids.py` stops being able to kill it.
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from tree_lib import (  # noqa: E402  the kit's shared helpers
-    STATUS_TOKENS, TERMINAL, kit_rel, parse_conf, unfenced_lines,
+    STATUS_TOKENS, TERMINAL, build_spec_path_re, kit_rel, parse_conf, parse_spec_h1,
+    unfenced_lines,
 )
 
 
@@ -178,7 +179,7 @@ class Problem(Exception):
 class StaleHeader(Problem):
     """A build README header that is PRESENT and does not conform — NOT one that is absent.
 
-    TOOL-dRetiredFork-3, absorbed from NicoCares `nc carve-out 9/20`. Those two states were one
+    TOOL-dRetiredFork-3, absorbed from adopter nc `nc carve-out 9/20`. Those two states were one
     `Problem` here, so a CORRUPTED header read as a MISSING one and the index regenerated around it.
     They are different animals: an absent header is a build nobody wrote front matter for, and a
     corrupt one is front matter that rotted after someone did.
@@ -197,7 +198,7 @@ class StaleHeader(Problem):
 
 # --------------------------------------------------------------------------------------- plumbing
 #: The variables git EXPORTS to a hook, which then reach any subprocess that hook starts.
-#: TOOL-dRetiredFork-2, absorbed from NicoCares `nc carve-out 16/20`. Taken VERBATIM from gov's own
+#: TOOL-dRetiredFork-2, absorbed from adopter nc `nc carve-out 16/20`. Taken VERBATIM from gov's own
 #: hook-side scrub at `.githooks/pre-push` rather than re-derived, because these are two halves of
 #: ONE defect and a second list would be the place they drift apart.
 _GIT_ENV_LEAKS = (
@@ -430,10 +431,13 @@ def spec_ids(root: str, tracked: list, conf: dict) -> set:
     citations anywhere, and it admits backlog and decision rows as if they were units — measured on
     this corpus, two thirds of its ids had no spec at all. Resolving a record against it would let a
     binding name something no spec ever defined.
+
+    The predicate itself is `tree_lib.parse_spec_h1`, shared with the memory-recall kit's extractor
+    so the two readers cannot disagree about which line defines an id (TOOL-aRepatriatedFork-40).
     """
     m = conf["MEMORY_ROOT"]
-    pat = re.compile(r"^#\s+[`*]*(?P<id>(?:" + _id_alternation(conf) + r")-[A-Za-z0-9]+-\d+)\b")
-    sel = re.compile(r"^" + re.escape(m) + r"/builds/[^/]+/spec/")
+    fams = [p.split(":", 1)[1] for p in conf.get("FAMILIES", "").split() if ":" in p]
+    sel = build_spec_path_re(m)
     out = set()
     for rel in tracked:
         if not sel.match(rel):
@@ -441,11 +445,9 @@ def spec_ids(root: str, tracked: list, conf: dict) -> set:
         text, _why = read_text_or_none(os.path.join(root, rel))
         if text is None:
             continue
-        for line in unfenced(text):
-            mm = pat.match(line)
-            if mm:
-                out.add(mm.group("id"))
-                break
+        hit = parse_spec_h1(rel, text, m, fams)
+        if hit:
+            out.add(hit[1])
     return out
 
 
@@ -575,6 +577,10 @@ def cmd_print_bindings(root: str, conf: dict) -> int:
             continue
         if rec["state"] == "unbound":
             unbound += 1
+            # One U row per unbound record, so check 21's pin branch can drop a record its
+            # population filter exempts before it counts. N stays the liveness row and the total.
+            # TOOL-aRepatriatedFork-32.
+            print(f"U\t{rel}")
         # One S row per BOUND record, carrying the resolved SET. A conformant record is not a
         # finding, so the A/B/N rows say nothing about it — and check 21's filename-vs-header
         # branch needs exactly this set to test membership against. Without it that branch would
@@ -1720,7 +1726,7 @@ def extract_build_readmes(paths: list, memory_root: str) -> list:
 
     The slot contract and the survey used to keep every tracked path ending in `/README.md`, at any
     depth, while the render keys on `builds/<slug>/`. An adopter whose legacy records are folders
-    with a README inside (inCMS carried 41) was then graded as 41 malformed builds the render never
+    with a README inside (adopter ic carried 41) was then graded as 41 malformed builds the render never
     saw. ONE predicate for both verbs, because two copies of it are two answers to one question.
     """
     prefix = memory_root.rstrip("/") + "/builds/"

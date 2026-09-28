@@ -92,7 +92,8 @@ def main() -> int:' occurs 2 time(s) at column 0, expected exactly 1`
   the run's own summary line and types no figure
 - AC2 — `bash tools/check-kit-versions.sh` — exits 0. The anchored grep over `README.md` and
   `recall_conf.py` prints exactly three lines, all carrying 1.13:
-  `README.md:3`, `recall_conf.py:4` and `recall_conf.py:50`.
+  `README.md:3`, `recall_conf.py:4` and `recall_conf.py:50`. After the landing reconcile the same
+  three carry 1.19, because `aRepatriatedFork` had moved the kit to 1.18 on `main` in parallel.
   `python tools/govkit/govkit.py epoch --base 3cf05f29` prints
   `epoch: memory-recall · clean · 1.13` with no FAILED line. Run at HEAD BEFORE this unit's commit,
   after two commits of `selftest.py` edits, the same command printed `clean · 1.12` — which is the

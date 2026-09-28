@@ -3,7 +3,7 @@
 
 TOOL-aRepatriatedFork-9. `check-arms.py`, `row_grammar.py` and `gotchas.py` used to import these from
 `corpus_ids.py` and `gen_build_index.py`, which made those two files a hard prerequisite of every
-engine beside them. At an adopter whose copies of those two are its own programs — inCMS, measured —
+engine beside them. At an adopter whose copies of those two are its own programs — adopter ic, measured —
 both gov engines died on import with an `ImportError`, so a fork of one file forced a fork of three.
 The helpers live here now, and the two modules that defined them re-import them, so every caller
 that reaches them through the old name keeps working.
@@ -17,6 +17,7 @@ The module name follows the codebase-map kit's `map_lib.py` and the runlog kit's
 from __future__ import annotations
 
 import pathlib
+import re
 
 # The lifecycle vocabulary, one declaration for the index generator's front-matter check, check 24's
 # rotation grading and the backlog-row census.
@@ -86,6 +87,11 @@ def parse_conf_line(line: str):
         k = k[len("export"):].strip()
     if not k:
         return None
+    # TOOL-aRepatriatedFork-38 rev-3 (the closing review's C4): the WORD rule, decided on the text
+    # right after `=`. Whitespace there ends the assignment, so `K= x` and `K=   # note` are empty in
+    # bash; a `#` begins a comment only AFTER whitespace, so `K=#x` keeps `#x`.
+    if v[:1].isspace():
+        return k, ""
     v = v.strip()
     # A QUOTED VALUE AND AN UNQUOTED ONE NEED DIFFERENT SCANS, and the first cut of this function
     # had only the second — so `KEY="v"  # note` kept both the comment AND a stray quote, which is
@@ -103,11 +109,11 @@ def parse_conf_line(line: str):
         # An UNTERMINATED quote is not something to guess at. Fall through to the unquoted scan,
         # which is what the old body did for every value, so this is no worse than before for a
         # spelling bash itself would reject.
-    # UNQUOTED: a `#` that begins a word starts a comment, including at position 0 — `X=   # note`
-    # is an empty value in bash, not the literal `# note`.
+    # UNQUOTED: a `#` that FOLLOWS whitespace starts a comment. Position 0 is not one: the
+    # leading-whitespace case returned above, so a `#` there is the first character of the word.
     cut = -1
     for i, ch in enumerate(v):
-        if ch == "#" and (i == 0 or v[i - 1].isspace()):
+        if ch == "#" and i > 0 and v[i - 1].isspace():
             cut = i
             break
     if cut >= 0:
@@ -157,3 +163,35 @@ def unfenced_lines(text: str):
             yield n, line
     if fence:
         yield opened_at, None
+
+
+def build_spec_path_re(memory_root: str):
+    """The path half of `parse_spec_h1`: a build's `spec/` folder, at any depth. Exposed so a caller
+    walking a whole tree can skip reading a file the predicate would refuse on its path alone."""
+    return re.compile(r"^" + re.escape(memory_root) + r"/builds/[^/]+/spec/")
+
+
+def parse_spec_h1(rel: str, text: str, memory_root: str, families) -> tuple[int, str] | None:
+    """`(lineno, id)` of the H1 that DEFINES a unit id in a spec file, or None.
+
+    THE one predicate for "which id does this spec define" (TOOL-aRepatriatedFork-40). Two kits read
+    it: `gen_build_index.spec_ids`, the index generator's resolution set, and the memory-recall
+    kit's `extract_records`, which anchors a record on the same line. The recall kit reaches it
+    through the sibling-kit resolver because it `requires` this kit; a copy of the regex there is
+    the two-answers-to-one-question class.
+
+    `rel` is repo-relative and must sit under `<memory_root>/builds/<slug>/spec/`, at any depth. The
+    first UNFENCED H1 whose first token is `<FAMILY>-<slug>-<seq>` wins, one per file. `families`
+    is the prefixes alone (`TOOL`, not `tooling:TOOL`).
+    """
+    if not build_spec_path_re(memory_root).match(rel):
+        return None
+    alt = "|".join(sorted(set(families))) or "(?!)"
+    pat = re.compile(r"^#\s+[`*]*(?P<id>(?:" + alt + r")-[A-Za-z0-9]+-\d+)\b")
+    for n, line in unfenced_lines(text):
+        if line is None:
+            continue
+        m = pat.match(line)
+        if m:
+            return n, m.group("id")
+    return None

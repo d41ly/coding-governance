@@ -37,7 +37,7 @@
 # THE CORE SETS ARE READ FROM THE DRIVER, never restated here. A second spelling of `PHASES_CORE` one
 # file away from the thing that enforces it is the drift this leg exists to catch.
 set -u
-KIT_UNATTENDED_VERSION=1.37   # gov:kit unattended@1.37 — must match unattended.sh; check-kit-versions.sh pairs them
+KIT_UNATTENDED_VERSION=1.40   # gov:kit unattended@1.40 — must match unattended.sh; check-kit-versions.sh pairs them
 
 # ------------------------------------------------------------------------------ the dereference pin
 # Identical to the driver's, and for the identical reason: `git replace` rewrites what a sha MEANS for
@@ -2586,7 +2586,7 @@ fi
 # ---- The generator CREATES a missing pair on --write, so the repair is one render and the refusal
 # ---- names it: the SCRIPT and its mode, never a launcher, because this repo cannot assume a bare
 # ---- `python` exists and the driver's own resolver ban refuses one in source.
-# BATCHED: two greps over the whole population, not two per file. Absorbed from inCMS, which
+# BATCHED: two greps over the whole population, not two per file. Absorbed from adopter ic, which
 # measured 132.2 s -> 2.795 s on its own corpus with the verdict asserted IDENTICAL. The verdict is
 # what matters and the equality is fixtured, because a speed-up that changes a verdict is not an
 # optimisation.
@@ -2876,8 +2876,8 @@ fi
 
 # ---- 35: a pathspec naming a file AT A BUILD ROOT carries the `:(glob)` magic. TOOL-aRepatriatedFork-11
 # ---- S2. A plain git pathspec's `*` crosses `/`, so the build-root README spelling also matched
-# ---- every README nested inside a build: 41 extra at inCMS, graded by check 21 as build READMEs,
-# ---- which is why inCMS forked this file. The class is every script in THIS kit's directory, test
+# ---- every README nested inside a build: 41 extra at adopter ic, graded by check 21 as build READMEs,
+# ---- which is why adopter ic forked this file. The class is every script in THIS kit's directory, test
 # ---- suites excepted because their fixtures spell the defect on purpose.
 # ----
 # ---- A tail that DESCENDS (a `spec/` segment after the wildcard) is not graded: sub-spec depth is

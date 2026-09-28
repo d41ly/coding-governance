@@ -1,6 +1,6 @@
 export const meta = {
   name: 'drift-audit-state',
-  version: '1.13',
+  version: '1.15',
   description:
     "Drift audit Tier 1/2: are this repo's own records still true? Stale maps, stale memory, charter drift, work-state uncertainty, record-gate integrity. Project-agnostic; all repo facts arrive via args.",
   whenToUse:
@@ -12,7 +12,7 @@ export const meta = {
   ],
 }
 
-// gov:kit drift-audit@1.13
+// gov:kit drift-audit@1.15
 // --- bounded fan-out (inlined; workflow scripts cannot import) ------------
 // BOTH THE CONCURRENCY CAP AND THE VERIFIER TOTAL ARE BARE LITERALS, and neither is caller-settable.
 // The retired form bound each of them from an `<expr> || 5` fallback, which read as a constant to the
@@ -21,7 +21,7 @@ export const meta = {
 // (The spelling itself is paraphrased here on purpose: the acceptance grep for it is repo-wide and
 // would match the comment explaining it.)
 const CAP = 5
-// TOOL-dRetiredFork-6, taken from inCMS's KIT_DRIFT_AUDIT_HARNESS_DELTA. The note used to be a
+// TOOL-dRetiredFork-6, taken from adopter ic's KIT_DRIFT_AUDIT_HARNESS_DELTA. The note used to be a
 // hand-written ternary with THREE outcomes that conflated TWO of them: `!synth` gave UNVERIFIED,
 // anything non-zero gave PARTIAL, and everything else gave the bare string `complete` — so "nothing
 // moved" and "the probe could not run" were the same sentence, and `complete` is a reassuring word

@@ -101,7 +101,7 @@ arm 'a missing predicate is a named failure' 'has no predicate to delegate to' \
 # a missing predicate — and every one of them carried a hand-maintained carve-out to fix it.
 #
 # The fixtures are built here rather than borrowed, because the two real adopters are foreign trees
-# this suite must not depend on: a fixture keyed to inCMS's current bytes grades a moving target.
+# this suite must not depend on: a fixture keyed to adopter ic's current bytes grades a moving target.
 mkfix() { # $1 = fixture root · $2 = where the hook goes, relative to the root ("" = no hook at all)
   local fix=$1 hookrel=$2
   mkdir -p "$fix/scripts/workflows"
@@ -120,7 +120,7 @@ JS
       && git add -A && git commit -q -m fixture --no-verify ) >/dev/null 2>&1
 }
 
-# AC2 — the NicoCares shape: kit at `scripts/`, hook a directory up from the harnesses. Rung 2.
+# AC2 — the adopter nc shape: kit at `scripts/`, hook a directory up from the harnesses. Rung 2.
 FIX_A=$(mktemp -d); mkfix "$FIX_A" "scripts/hooks/agent-cap.js"
 out=$(cd "$FIX_A" && bash scripts/workflows/check-verifier-fanout.sh 2>&1); rc=$?
 if [ "$rc" = 0 ]; then printf 'arm ok    AC2: resolves at a scripts/ install and exits 0\n'
@@ -128,7 +128,7 @@ else fails=$((fails+1)); printf 'arm FAIL  AC2: a scripts/ install did not pass 
 case "$out" in *"1 workflow script"*) printf 'arm ok    AC2: and the population is non-empty there\n' ;;
   *) fails=$((fails+1)); printf 'arm FAIL  AC2: population wrong at a foreign prefix: %s\n' "$out" ;; esac
 
-# AC3 — the inCMS shape: NO scripts/hooks/ at all, the only copy at .claude/hooks/. Rung 3, which a
+# AC3 — the adopter ic shape: NO scripts/hooks/ at all, the only copy at .claude/hooks/. Rung 3, which a
 # two-rung chain strands. This arm is the one that would have caught that.
 FIX_B=$(mktemp -d); mkfix "$FIX_B" ".claude/hooks/agent-cap.js"
 out=$(cd "$FIX_B" && bash scripts/workflows/check-verifier-fanout.sh 2>&1); rc=$?

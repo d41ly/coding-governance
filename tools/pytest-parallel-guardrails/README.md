@@ -1,6 +1,6 @@
 # pytest-parallel-guardrails — bounded, attributable parallel test runs
 
-<!-- gov:kit pytest-parallel-guardrails@1.1 -->
+<!-- gov:kit pytest-parallel-guardrails@1.2 -->
 
 Any pytest-xdist suite can wedge forever when a worker dies, and the death leaves no evidence:
 execnet redirects a worker's fd 0/1 to devnull on every platform — on Windows fd 2 as well — so
@@ -11,7 +11,7 @@ records its victim test and death mode), and **resilient** against one fully-dia
 
 Provenance: diagnosed and proven on a real 4300-test suite (2026-07-16) — a parallel run that hung
 three-for-three under load completed clean twice in a row once the seam fix landed. Upstream
-records: inCMS `ARCH-eGuidingConcierge-12/-19`, `ARCH-eVigilantCanary-1/-2`.
+records: adopter ic `ARCH-eGuidingConcierge-12/-19`, `ARCH-eVigilantCanary-1/-2`.
 
 ## What's in the kit
 
@@ -87,6 +87,6 @@ multi-loop pattern entirely at the cost of a suite-wide loop-semantics migration
 ## Version
 
 Kit version: `KIT_PYTEST_GUARDRAILS_VERSION = "1.1"` in `crashprobe.py`; the same version rides
-the `gov:kit pytest-parallel-guardrails@1.1` markers in the artifacts adopters keep (this README,
+the `gov:kit pytest-parallel-guardrails@1.2` markers in the artifacts adopters keep (this README,
 the snippet, the seam patch, the test template), because the probe itself is expected to be
 removed after a hunt.

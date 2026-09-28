@@ -44,9 +44,9 @@ from dataclasses import dataclass, field
 from fnmatch import fnmatchcase
 from pathlib import Path
 
-#: gov:kit codebase-map@1.9 — engine identity. Bump on any engine/render change; mirrored into the
+#: gov:kit codebase-map@1.12 — engine identity. Bump on any engine/render change; mirrored into the
 #: generated artifacts as `codebase-map@<v>` so the deployer can grep the installed version.
-KIT_CODEBASE_MAP_VERSION = "1.9"
+KIT_CODEBASE_MAP_VERSION = "1.12"
 
 #: The per-repo conf, at the adopting repo's ROOT. Also the MARKER resolve_root walks up for: a
 #: repo that has adopted the kit has this file, and the kit needs no other declaration of where
@@ -191,12 +191,20 @@ def load_conf(root: Path | None = None) -> dict[str, str]:
             continue
         key, value = line.split("=", 1)
         key = key.strip().removeprefix("export ").strip()
+        # TOOL-aRepatriatedFork-38 rev-3 (the closing review's C4): whitespace right after `=`
+        # ends the assignment, so `K=   # note` is empty in bash, not the word `#`.
+        if value[:1].isspace():
+            conf[key] = ""
+            continue
         value = value.strip()
         # match bash sourcing semantics for the restricted grammar the conf documents:
         # quoted values keep everything inside the quotes; unquoted values end at whitespace
         # (so an inline " # comment" can't leak into the value and diverge from bash)
-        if value[:1] in {'"', "'"} and value[-1:] == value[:1] and len(value) >= 2:
-            value = value[1:-1]
+        # TOOL-aRepatriatedFork-38: a quoted value ends at its MATCHING quote, whatever follows it.
+        # Testing the first and last characters read `K="a b"  # note` as `"a`.
+        close = value.find(value[0], 1) if value[:1] in {'"', "'"} else -1
+        if close >= 0:
+            value = value[1:close]
         else:
             value = value.split()[0] if value.split() else ""
         conf[key] = value

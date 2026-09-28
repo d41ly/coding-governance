@@ -55,7 +55,9 @@ queries reached the real log as qids 592-595 and the row still reported ok.
   on its account. The bump also enters `Conf.digest()` and invalidates every node's warm recall
   cache. The owner ruled 1.12 to 1.13 anyway on 2026-09-28, on the ground that an edit inside the
   kit directory is a kit edit. Unit 3 carries both sides and `epoch --base 3cf05f29` is run as an
-  observation either way.
+  observation either way. The landing reconcile then carried it to 1.19: `aRepatriatedFork` had
+  taken the same kit to 1.18 on `main` while this build ran, so the contested bump cost a merge
+  rather than a cache rebuild.
 - **`tools/lexicon/README`'s half of `TOOL-aProbedToolkit-14` stays open.** Unit 3 closes only the
   memory-recall half, because that is the file this build already edits. The row is updated to say
   which half drained.
@@ -88,7 +90,7 @@ ids TOOL-dHashedPrelude-1 TOOL-dHashedPrelude-2 TOOL-dHashedPrelude-3
 |---|---|---|---|---|---|
 | [TOOL-dHashedPrelude-1 — the live-log baseline is captured above the first decorated arm](spec/2026-09-28-spec-TOOL-dHashedPrelude-1.md) | 1 | 2 | CLOSED | rev-6 | 2026-09-28 |
 | [TOOL-dHashedPrelude-2 — two arms red when the live-log guard stops bracketing the arms](spec/2026-09-28-spec-TOOL-dHashedPrelude-2.md) | 2 | 2 | CLOSED | rev-6 | 2026-09-28 |
-| [TOOL-dHashedPrelude-3 — the kit's published facts stop being a typed count, and its version moves](spec/2026-09-28-spec-TOOL-dHashedPrelude-3.md) | 3 | 1 | CLOSED | rev-3 | 2026-09-28 |
+| [TOOL-dHashedPrelude-3 — the kit's published facts stop being a typed count, and its version moves](spec/2026-09-28-spec-TOOL-dHashedPrelude-3.md) | 3 | 1 | CLOSED | rev-4 | 2026-09-28 |
 <!-- /gen:build-units -->
 
 Records: 5 bound to this build, across 3 record folder(s).

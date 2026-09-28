@@ -101,7 +101,7 @@ def _symbols_at_ref(root: Path, ref: str, rel: str) -> list[dict] | None:
     """symbols.json rows at a git ref (POSIX rel path), or ``None`` when that ref carries no such
     file at all.
 
-    THE None IS THE POINT (ABL-bCandidLoupe-2, ported from inCMS). This used to fail open to ``[]``
+    THE None IS THE POINT (ABL-bCandidLoupe-2, ported from adopter ic). This used to fail open to ``[]``
     for both the absent file and a present-but-empty one, and ``_converge`` cannot tell those apart
     from a list: with no baseline no seam reaches the fan-in threshold, so ``collision_flags``
     printed ``0`` on every range whose base predates the SYMBOL tier. Measured on the adopting repo:

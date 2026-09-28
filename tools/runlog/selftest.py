@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""selftest.py — the runlog kit's arms. gov:kit runlog@1.1
+"""selftest.py — the runlog kit's arms. gov:kit runlog@1.2
 
     python <this kit>/selftest.py
 
@@ -793,6 +793,8 @@ CONF_SPELLINGS = (
     ("a # inside quotes", 'MEMORY_ROOT="docs/a # b"\n'),
     ("a # inside a word", "MEMORY_ROOT=docs/p#10\n"),
     ("a comment where the value would be", "MEMORY_ROOT=   # only a note\n"),
+    # TOOL-aRepatriatedFork-38 rev-3 (C4): a `#` opening the word is data, not a comment.
+    ("a # opening the word", "MEMORY_ROOT=#p15\n"),
     ("an empty quote, then a comment", 'MEMORY_ROOT=""  # a note\n'),
     ("set twice", 'MEMORY_ROOT=first\nMEMORY_ROOT="second"  # a note\n'),
     ("indented, under a commented-out one", "# MEMORY_ROOT=nope\n  MEMORY_ROOT='yes'\n"),
