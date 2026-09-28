@@ -1,10 +1,12 @@
 # TOOL-aRepatriatedFork-40 — recall anchors an id on the spec H1 that defines it
 
-**Status:** SPECCED · rev-1 · 2026-09-28 · node a · Tier-1 · base d486ea50 · streams tooling · order 19
+**Status:** CLOSED · rev-2 · 2026-09-28 · node a · Tier-1 · base d486ea50 · streams tooling · order 19
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-28-build-TOOL-aRepatriatedFork-40-1-acceptance-ledger.md](../build/2026-09-28-build-TOOL-aRepatriatedFork-40-1-acceptance-ledger.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
@@ -30,12 +32,12 @@ with the predicate `spec_ids` uses, not a copy of it.
   block. The import happens on the first call, so a program that reads only the grammar never needs
   the sibling kit. When the resolver finds no memory-tree kit, the call raises and names where it
   looked. Observed by AC1 and AC2.
-- **S3** — The H1 record owns its own line down to the next heading of any level. That is the title,
-  the status header and the preamble, never the whole file. Observed by AC1.
+- **S3** — The H1 record is shaped as a row: its own line and the non-blank lines under it, which
+  is the spec's title. Observed by AC1.
 - **S4** — A query naming such an id returns the defining spec's record first, ahead of a file that
   only cites the id. Observed by AC4.
-- **S5** — The recall selftest's fixture repo lays the memory-tree kit's `tree_lib.py` beside the
-  recall kit, which is the layout `requires = ["memory-tree"]` already declares. memory-recall and
+- **S5** — The recall selftest's fixture repo lays the memory-tree kit's `tree_lib.py` and
+  `gen_build_index.py` beside the recall kit, which is the layout `requires = ["memory-tree"]` already declares. memory-recall and
   memory-tree take a version bump in every carrier. Observed by AC5.
 
 ## 3. Non-goals (OUT)
@@ -64,7 +66,12 @@ table row or heading carried the id in its first cell, and the extractor anchore
 
 The extractor rejected H1 anchors on purpose. An H1 anchor owns the whole file down to the next H1,
 and the comment at `A_HEADING` measured that as a jump in indexed characters. S3 keeps the record to
-the preamble, so that cost does not come back.
+the title, so that cost does not come back.
+
+Measured on gov while building. With the record running to the next heading, it carried each spec's
+generated records table. The `records` set went from 734 844 to 2 000 616 indexed characters, and
+the graded floor fell from 0.8333 to 0.7500, because the new documents moved every BM25 statistic.
+Shaped as a row, the set is 805 928 characters, and all twelve graded questions score as they did.
 
 ### The kit boundary
 
@@ -96,14 +103,16 @@ carriers and any map dossier that claims the new key.
   memory-tree does not require.
 - Letting the H1 own its section to the next H1. That is the whole file, the cost the extractor's
   own comment measured.
+- Letting the H1 own the preamble, down to the next heading of any level. rev-1 specified that. It
+  failed gov's recall floor, as the evidence above records.
 
 ## 6. Acceptance criteria
 
-- **AC1** — In the recall selftest, a fixture holds a spec whose H1 is the only defining line for its
-  id, and another file that only cites the id. The built extractor writes a record for the id at the
-  spec's path, and that record stops before the spec's first `##`. The citing file writes no record.
+- **AC1** — In the recall `selftest.py`, a fixture holds a spec whose H1 is the only defining line
+  for its id, and another file that only cites the id. The built extractor writes a record for the id
+  at the spec's path, and that record is the H1 line alone. The citing file writes no record.
   The d486ea50 extractor writes no record for the id.
-  Red when: the spec H1 does not anchor, or the record runs past the preamble.
+  Red when: the spec H1 does not anchor, or the record runs past the title.
 - **AC2** — In the same selftest, an H1 carrying an id under a build's `build/` folder writes no
   record, and neither does an H1 inside a fenced block of a spec.
   Red when: an H1 outside a spec's defining position anchors.
@@ -133,6 +142,10 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-09-28 · initial draft, from the owner's ruling.
+- rev-2 · 2026-09-28 · S1 · S2 · S3 · S4 · S5 · AC1 · AC2 · AC3 · AC4 · AC5 · built. S3 and AC1
+  narrow the H1 record from the preamble to the title, since the preamble form failed gov's recall
+  floor. Both new arms red on the d486ea50 extractor. At inCMS the leg goes from exit 1 to exit 0,
+  1613/1613.
 
 ## 10. Reuse audit
 

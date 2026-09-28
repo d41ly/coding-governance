@@ -167,13 +167,13 @@ ids TOOL-aRepatriatedFork-32 TOOL-aRepatriatedFork-33 TOOL-aRepatriatedFork-34 T
 | [TOOL-aRepatriatedFork-37 — the unattended suite derives the repair pointer it asserts](spec/2026-09-25-spec-TOOL-aRepatriatedFork-37.md) | 19 | 1 | CLOSED | rev-2 | 2026-09-25 |
 | [TOOL-aRepatriatedFork-38 — every conf reader drops a trailing comment the way bash does](spec/2026-09-25-spec-TOOL-aRepatriatedFork-38.md) | 19 | 1 | CLOSED | rev-3 | 2026-09-26 |
 | [TOOL-aRepatriatedFork-39 — hygiene check 14 counts present-tense citations only, as check 15 does](spec/2026-09-28-spec-TOOL-aRepatriatedFork-39.md) | 19 | 1 | CLOSED | rev-2 | 2026-09-28 |
-| [TOOL-aRepatriatedFork-40 — recall anchors an id on the spec H1 that defines it](spec/2026-09-28-spec-TOOL-aRepatriatedFork-40.md) | 19 | 1 | SPECCED | rev-1 | 2026-09-28 |
+| [TOOL-aRepatriatedFork-40 — recall anchors an id on the spec H1 that defines it](spec/2026-09-28-spec-TOOL-aRepatriatedFork-40.md) | 19 | 1 | CLOSED | rev-2 | 2026-09-28 |
 | [DEPL-aRepatriatedFork-20 — inCMS converges onto gov's memory-tree programs](spec/2026-09-23-spec-DEPL-aRepatriatedFork-20.md) | 20 | 2 | INPROGRESS | rev-9 | 2026-09-28 |
 <!-- /gen:build-units -->
 
-Records: 72 bound to this build, across 4 record folder(s).
+Records: 73 bound to this build, across 4 record folder(s).
 
-Ids no record names: TOOL-aRepatriatedFork-40.
+Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: DEPL-aRepatriatedFork-1 DEPL-aRepatriatedFork-13 DEPL-aRepatriatedFork-14 DEPL-aRepatriatedFork-17 DEPL-aRepatriatedFork-20 TOOL-aRepatriatedFork-10 TOOL-aRepatriatedFork-11 TOOL-aRepatriatedFork-12 TOOL-aRepatriatedFork-15 TOOL-aRepatriatedFork-16
 TOOL-aRepatriatedFork-18 TOOL-aRepatriatedFork-19 TOOL-aRepatriatedFork-2 TOOL-aRepatriatedFork-3 TOOL-aRepatriatedFork-4 TOOL-aRepatriatedFork-5 TOOL-aRepatriatedFork-6 TOOL-aRepatriatedFork-7 TOOL-aRepatriatedFork-8 TOOL-aRepatriatedFork-9 DEPL-aRepatriatedFork-21 TOOL-aRepatriatedFork-21
