@@ -4,7 +4,7 @@ node: a
 opened: 2026-09-23
 streams: tooling+deployer+playbook
 roster: TOOL+DEPL
-ids: DEPL-aRepatriatedFork-1 DEPL-aRepatriatedFork-13 DEPL-aRepatriatedFork-14 DEPL-aRepatriatedFork-17 DEPL-aRepatriatedFork-20 DEPL-aRepatriatedFork-21 DEPL-aRepatriatedFork-22 DEPL-aRepatriatedFork-23 TOOL-aRepatriatedFork-2 TOOL-aRepatriatedFork-3 TOOL-aRepatriatedFork-4 TOOL-aRepatriatedFork-5 TOOL-aRepatriatedFork-6 TOOL-aRepatriatedFork-7 TOOL-aRepatriatedFork-8 TOOL-aRepatriatedFork-9 TOOL-aRepatriatedFork-10 TOOL-aRepatriatedFork-11 TOOL-aRepatriatedFork-12 TOOL-aRepatriatedFork-15 TOOL-aRepatriatedFork-16 TOOL-aRepatriatedFork-18 TOOL-aRepatriatedFork-19 TOOL-aRepatriatedFork-20 TOOL-aRepatriatedFork-21 TOOL-aRepatriatedFork-22 TOOL-aRepatriatedFork-23 TOOL-aRepatriatedFork-24 TOOL-aRepatriatedFork-25 TOOL-aRepatriatedFork-26 TOOL-aRepatriatedFork-27 TOOL-aRepatriatedFork-28 TOOL-aRepatriatedFork-29 TOOL-aRepatriatedFork-30 TOOL-aRepatriatedFork-31 TOOL-aRepatriatedFork-32 TOOL-aRepatriatedFork-33 TOOL-aRepatriatedFork-34 TOOL-aRepatriatedFork-35 TOOL-aRepatriatedFork-36 TOOL-aRepatriatedFork-37 TOOL-aRepatriatedFork-38 TOOL-aRepatriatedFork-39
+ids: DEPL-aRepatriatedFork-1 DEPL-aRepatriatedFork-13 DEPL-aRepatriatedFork-14 DEPL-aRepatriatedFork-17 DEPL-aRepatriatedFork-20 DEPL-aRepatriatedFork-21 DEPL-aRepatriatedFork-22 DEPL-aRepatriatedFork-23 TOOL-aRepatriatedFork-2 TOOL-aRepatriatedFork-3 TOOL-aRepatriatedFork-4 TOOL-aRepatriatedFork-5 TOOL-aRepatriatedFork-6 TOOL-aRepatriatedFork-7 TOOL-aRepatriatedFork-8 TOOL-aRepatriatedFork-9 TOOL-aRepatriatedFork-10 TOOL-aRepatriatedFork-11 TOOL-aRepatriatedFork-12 TOOL-aRepatriatedFork-15 TOOL-aRepatriatedFork-16 TOOL-aRepatriatedFork-18 TOOL-aRepatriatedFork-19 TOOL-aRepatriatedFork-20 TOOL-aRepatriatedFork-21 TOOL-aRepatriatedFork-22 TOOL-aRepatriatedFork-23 TOOL-aRepatriatedFork-24 TOOL-aRepatriatedFork-25 TOOL-aRepatriatedFork-26 TOOL-aRepatriatedFork-27 TOOL-aRepatriatedFork-28 TOOL-aRepatriatedFork-29 TOOL-aRepatriatedFork-30 TOOL-aRepatriatedFork-31 TOOL-aRepatriatedFork-32 TOOL-aRepatriatedFork-33 TOOL-aRepatriatedFork-34 TOOL-aRepatriatedFork-35 TOOL-aRepatriatedFork-36 TOOL-aRepatriatedFork-37 TOOL-aRepatriatedFork-38 TOOL-aRepatriatedFork-39 TOOL-aRepatriatedFork-40
 ---
 
 # aRepatriatedFork — what the a7c78ad2 pull proved gov still does not carry, specced as gov's to fix
@@ -108,6 +108,7 @@ The ones that set build policy:
 | 19 | `TOOL-aRepatriatedFork-37` | 1 | the unattended suite derives the repair pointer it asserts |
 | 19 | `TOOL-aRepatriatedFork-38` | 1 | every conf reader drops a trailing comment the way bash does |
 | 19 | `TOOL-aRepatriatedFork-39` | 1 | hygiene check 14 counts present-tense citations only, as check 15 does |
+| 19 | `TOOL-aRepatriatedFork-40` | 1 | recall anchors an id on the spec H1 that defines it |
 | 20 | `DEPL-aRepatriatedFork-20` | 2 | inCMS converges onto gov's memory-tree programs |
 
 The `#` column is the `order` each spec declares, derived from its `### Edges`: a unit's order is one
@@ -121,11 +122,11 @@ with no hand edit between the update and the bar.** One observation at each adop
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 37 unit(s) · node a · opened 2026-09-23 · streams tooling+deployer+playbook
+**Build status:** INPROGRESS · 38 unit(s) · node a · opened 2026-09-23 · streams tooling+deployer+playbook
 ids DEPL-aRepatriatedFork-1 DEPL-aRepatriatedFork-13 DEPL-aRepatriatedFork-14 DEPL-aRepatriatedFork-17 DEPL-aRepatriatedFork-20 DEPL-aRepatriatedFork-21 DEPL-aRepatriatedFork-22 DEPL-aRepatriatedFork-23 TOOL-aRepatriatedFork-2 TOOL-aRepatriatedFork-3 TOOL-aRepatriatedFork-4 TOOL-aRepatriatedFork-5
 ids TOOL-aRepatriatedFork-6 TOOL-aRepatriatedFork-7 TOOL-aRepatriatedFork-8 TOOL-aRepatriatedFork-9 TOOL-aRepatriatedFork-10 TOOL-aRepatriatedFork-11 TOOL-aRepatriatedFork-12 TOOL-aRepatriatedFork-15 TOOL-aRepatriatedFork-16 TOOL-aRepatriatedFork-18 TOOL-aRepatriatedFork-19 TOOL-aRepatriatedFork-20
 ids TOOL-aRepatriatedFork-21 TOOL-aRepatriatedFork-22 TOOL-aRepatriatedFork-23 TOOL-aRepatriatedFork-24 TOOL-aRepatriatedFork-25 TOOL-aRepatriatedFork-26 TOOL-aRepatriatedFork-27 TOOL-aRepatriatedFork-28 TOOL-aRepatriatedFork-29 TOOL-aRepatriatedFork-30 TOOL-aRepatriatedFork-31
-ids TOOL-aRepatriatedFork-32 TOOL-aRepatriatedFork-33 TOOL-aRepatriatedFork-34 TOOL-aRepatriatedFork-35 TOOL-aRepatriatedFork-36 TOOL-aRepatriatedFork-37 TOOL-aRepatriatedFork-38 TOOL-aRepatriatedFork-39
+ids TOOL-aRepatriatedFork-32 TOOL-aRepatriatedFork-33 TOOL-aRepatriatedFork-34 TOOL-aRepatriatedFork-35 TOOL-aRepatriatedFork-36 TOOL-aRepatriatedFork-37 TOOL-aRepatriatedFork-38 TOOL-aRepatriatedFork-39 TOOL-aRepatriatedFork-40
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -166,17 +167,18 @@ ids TOOL-aRepatriatedFork-32 TOOL-aRepatriatedFork-33 TOOL-aRepatriatedFork-34 T
 | [TOOL-aRepatriatedFork-37 — the unattended suite derives the repair pointer it asserts](spec/2026-09-25-spec-TOOL-aRepatriatedFork-37.md) | 19 | 1 | CLOSED | rev-2 | 2026-09-25 |
 | [TOOL-aRepatriatedFork-38 — every conf reader drops a trailing comment the way bash does](spec/2026-09-25-spec-TOOL-aRepatriatedFork-38.md) | 19 | 1 | CLOSED | rev-3 | 2026-09-26 |
 | [TOOL-aRepatriatedFork-39 — hygiene check 14 counts present-tense citations only, as check 15 does](spec/2026-09-28-spec-TOOL-aRepatriatedFork-39.md) | 19 | 1 | CLOSED | rev-2 | 2026-09-28 |
-| [DEPL-aRepatriatedFork-20 — inCMS converges onto gov's memory-tree programs](spec/2026-09-23-spec-DEPL-aRepatriatedFork-20.md) | 20 | 2 | INPROGRESS | rev-8 | 2026-09-28 |
+| [TOOL-aRepatriatedFork-40 — recall anchors an id on the spec H1 that defines it](spec/2026-09-28-spec-TOOL-aRepatriatedFork-40.md) | 19 | 1 | SPECCED | rev-1 | 2026-09-28 |
+| [DEPL-aRepatriatedFork-20 — inCMS converges onto gov's memory-tree programs](spec/2026-09-23-spec-DEPL-aRepatriatedFork-20.md) | 20 | 2 | INPROGRESS | rev-9 | 2026-09-28 |
 <!-- /gen:build-units -->
 
 Records: 72 bound to this build, across 4 record folder(s).
 
-Ids no record names: none — every unit id is named by a record.
+Ids no record names: TOOL-aRepatriatedFork-40.
 
 Ids no `spec-audit` record has ever named: DEPL-aRepatriatedFork-1 DEPL-aRepatriatedFork-13 DEPL-aRepatriatedFork-14 DEPL-aRepatriatedFork-17 DEPL-aRepatriatedFork-20 TOOL-aRepatriatedFork-10 TOOL-aRepatriatedFork-11 TOOL-aRepatriatedFork-12 TOOL-aRepatriatedFork-15 TOOL-aRepatriatedFork-16
 TOOL-aRepatriatedFork-18 TOOL-aRepatriatedFork-19 TOOL-aRepatriatedFork-2 TOOL-aRepatriatedFork-3 TOOL-aRepatriatedFork-4 TOOL-aRepatriatedFork-5 TOOL-aRepatriatedFork-6 TOOL-aRepatriatedFork-7 TOOL-aRepatriatedFork-8 TOOL-aRepatriatedFork-9 DEPL-aRepatriatedFork-21 TOOL-aRepatriatedFork-21
 TOOL-aRepatriatedFork-23 TOOL-aRepatriatedFork-24 TOOL-aRepatriatedFork-25 TOOL-aRepatriatedFork-26 TOOL-aRepatriatedFork-27 TOOL-aRepatriatedFork-28 TOOL-aRepatriatedFork-29 TOOL-aRepatriatedFork-30 TOOL-aRepatriatedFork-31 TOOL-aRepatriatedFork-32 TOOL-aRepatriatedFork-35 TOOL-aRepatriatedFork-36
-TOOL-aRepatriatedFork-37 TOOL-aRepatriatedFork-38 TOOL-aRepatriatedFork-39.
+TOOL-aRepatriatedFork-37 TOOL-aRepatriatedFork-38 TOOL-aRepatriatedFork-39 TOOL-aRepatriatedFork-40.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -200,7 +202,7 @@ TOOL-aRepatriatedFork-37 TOOL-aRepatriatedFork-38 TOOL-aRepatriatedFork-39.
 | 16 | `TOOL-aRepatriatedFork-31` | no |
 | 17 | `TOOL-aRepatriatedFork-32` | no |
 | 18 | `TOOL-aRepatriatedFork-35` | no |
-| 19 | `TOOL-aRepatriatedFork-36`, `TOOL-aRepatriatedFork-37`, `TOOL-aRepatriatedFork-38`, `TOOL-aRepatriatedFork-39` | yes |
+| 19 | `TOOL-aRepatriatedFork-36`, `TOOL-aRepatriatedFork-37`, `TOOL-aRepatriatedFork-38`, `TOOL-aRepatriatedFork-39`, `TOOL-aRepatriatedFork-40` | yes |
 | 20 | `DEPL-aRepatriatedFork-20` | no |
 <!-- /gen:build-order -->
 
