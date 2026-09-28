@@ -311,10 +311,10 @@ Inventories: gate-legs: 122 · kits: 17 · git-hooks: 7 · workflow-scripts: 11 
 
 | key | claimant |
 |---|---|
-| `DEPL.md` | govkit |
-| `KICK.md` | baseline |
-| `PLAY.md` | baseline |
-| `TOOL.md` | baseline |
+| `DEPL.md` | memory-tree-backlog |
+| `KICK.md` | memory-tree-backlog |
+| `PLAY.md` | memory-tree-backlog |
+| `TOOL.md` | memory-tree-backlog |
 
 ## lexicon-verbs
 

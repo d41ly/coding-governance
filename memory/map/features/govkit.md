@@ -18,7 +18,7 @@ rendered-skills = []
 gotcha-classes = ["fixture-lacks-a-gate-the-consumer-has.md",
   "guard-above-a-fold-makes-its-fallback-dead.md"]
 guides = []
-backlog-shards = ["DEPL.md"]
+backlog-shards = []
 lexicon-verbs = []
 [paths]
 globs = [

@@ -3383,6 +3383,11 @@
       "file": "tools/check-spec-tokens.py"
     },
     {
+      "id": "extract_ask_vocabulary",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "extract_bound_names",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
@@ -3451,6 +3456,11 @@
       "id": "extract_jsx_defs",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
+    },
+    {
+      "id": "extract_modes_section",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
     },
     {
       "id": "extract_narration",
@@ -7726,6 +7736,11 @@
       "id": "scan_model_edits",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "scan_modes_doc_drift",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
     },
     {
       "id": "scan_module_constants",

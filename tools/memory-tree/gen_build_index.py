@@ -46,6 +46,7 @@ THE THREE BLIND SPOTS THIS CLOSES (each armed in --selftest)
 """
 from __future__ import annotations
 
+import ast
 import contextlib
 import datetime
 import io
@@ -3202,6 +3203,123 @@ def cmd_new_build(root: str, conf: dict, args: dict) -> int:
     return cmd_write(root, conf)
 
 
+# ------------------------------------------------------------- the backlog-modes docs drift arm
+# TOOL-dDerivedDocket-36 S2. The kit README's backlog-modes section is where an author writing a row
+# by hand learns the grammar, and the adopter runbook points there rather than restating it. A
+# document beside the code it describes rots on the next change, so `--selftest` compares the two:
+# every verdict code and disposition kind the ask module's SOURCE declares must have a line in that
+# section defining it. The comparison reads nothing outside this kit, which is where both files are.
+#
+# WHAT IT DOES NOT CHECK. It asks whether each code and kind is DEFINED, never whether the definition
+# is true: a line that says the wrong thing about V7 passes, exactly as a stale sentence does.
+#: The section's heading, whole. The runbook names the section, so renaming it strands that pointer.
+MODES_HEADING = "## Backlog modes — authored shards and per-build asks"
+#: A DEFINING line, not a mention. V15's own line names V9, and a kind appears in every rule that
+#: uses it, so a word search stays green after a definition is deleted as long as any other sentence
+#: still names the token. The closing backtick is also what keeps `V1` from matching `V10`.
+MODES_DEFINES = "- `{}`"
+_MODES_HEAD_RE = re.compile(r"^- `[^`]+`")
+#: The module constants that declare a disposition kind: every upper-case `*_VERB` or `*_VERBS`
+#: assignment EXCEPT `NON_VERBS`, whose members are the derived tokens a row may NOT lead with.
+_KIND_CONSTANT_RE = re.compile(r"^(?!NON_)[A-Z][A-Z_]*_VERBS?$")
+
+
+def extract_ask_vocabulary(source: str) -> tuple:
+    """-> (verdict codes, disposition kinds) the ask module's source declares, each sorted.
+
+    FROM THE SOURCE AND NEVER FROM THE README, which is the whole arm: an extractor reading the
+    document it grades can only ever agree with it. Parsed with `ast`, not imported, so a fixture can
+    hand in a module text this must find empty. The codes are `VERDICT_CODES` united with every
+    literal a `Verdict(<n>, …)` call or a `code=<n>` keyword spells, so a code raised without being
+    declared is still owed a line.
+    """
+    try:
+        tree = ast.parse(source)
+    except SyntaxError:
+        return (), ()
+    codes: set = set()
+    kinds: set = set()
+    for node in tree.body:
+        if not isinstance(node, ast.Assign):
+            continue
+        for target in node.targets:
+            if not isinstance(target, ast.Name):
+                continue
+            try:
+                value = ast.literal_eval(node.value)
+            except (ValueError, TypeError, SyntaxError):
+                continue
+            if target.id == "VERDICT_CODES" and isinstance(value, tuple):
+                codes.update(v for v in value if type(v) is int)
+            elif _KIND_CONSTANT_RE.match(target.id):
+                values = (value,) if isinstance(value, str) else value
+                if isinstance(values, tuple):
+                    kinds.update(v for v in values if isinstance(v, str))
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Call):
+            continue
+        first = node.args[0] if node.args else None
+        if (isinstance(node.func, ast.Name) and node.func.id == "Verdict"
+                and isinstance(first, ast.Constant) and type(first.value) is int):
+            codes.add(first.value)
+        for kw in node.keywords:
+            if (kw.arg == "code" and isinstance(kw.value, ast.Constant)
+                    and type(kw.value.value) is int and kw.value.value):
+                codes.add(kw.value.value)
+    return tuple(sorted(codes)), tuple(sorted(kinds))
+
+
+def extract_modes_section(readme: str) -> str:
+    """The lines after the backlog-modes heading, up to the next `## `; "" when there is no heading.
+
+    An absent heading is returned as "" and REPORTED by the caller, never read as a section that
+    happens to define nothing.
+    """
+    lines = readme.replace("\r\n", "\n").split("\n")
+    starts = [n for n, line in enumerate(lines) if line.rstrip() == MODES_HEADING]
+    if not starts:
+        return ""
+    out = []
+    for line in lines[starts[0] + 1:]:
+        if line.startswith("## "):
+            break
+        out.append(line)
+    return "\n".join(out)
+
+
+def scan_modes_doc_drift(source: str, readme: str, extra_codes=()) -> tuple:
+    """-> (findings, verdicts compared, kinds compared). Every finding NAMES its code or kind.
+
+    `extra_codes` are the codes a CALLER adds to the module's one sequence: this generator's own
+    population verdicts, which continue it past the module's last code. They join AFTER the dead-probe
+    test, so they cannot stand in for a module extraction that found nothing — zero codes or zero
+    kinds from the module is a DEAD PROBE, because an extractor that finds nothing agrees with every
+    document.
+    """
+    codes, kinds = extract_ask_vocabulary(source)
+    if not codes or not kinds:
+        return ([f"DEAD PROBE — the ask module's source yielded {len(codes)} verdict code(s) and "
+                 f"{len(kinds)} disposition kind(s), and a comparison over an empty side agrees "
+                 f"with any README"], len(codes), len(kinds))
+    codes = tuple(sorted(set(codes) | set(extra_codes)))
+    section = extract_modes_section(readme)
+    if not section.strip():
+        return ([f"the kit README carries no `{MODES_HEADING}` section, so none of the "
+                 f"{len(codes)} verdict(s) and {len(kinds)} kind(s) is defined anywhere an author "
+                 f"reads"], len(codes), len(kinds))
+    heads = {m.group(0) for m in (_MODES_HEAD_RE.match(line) for line in section.split("\n")) if m}
+    findings = []
+    for code in codes:
+        if MODES_DEFINES.format(f"V{code}") not in heads:
+            findings.append(f"V{code} is a verdict code the module raises, and no line of the "
+                            f"backlog-modes section defines it")
+    for kind in kinds:
+        if MODES_DEFINES.format(kind) not in heads:
+            findings.append(f"{kind} is a disposition kind the row grammar admits, and no line of "
+                            f"the backlog-modes section defines it")
+    return findings, len(codes), len(kinds)
+
+
 # --------------------------------------------------------------- the backlog fixture helpers
 #: The fixture corpus declares FOUR families and fills TWO, so "a family with no live ask renders a
 #: file" is observable at all. A declaration nothing exercises is a rule with no population.
@@ -5438,6 +5556,58 @@ def cmd_selftest() -> int:
                     f"missing={sorted(set(_c_defaults) - set(_c_pinned_new))} "
                     f"undeclared-agree="
                     f"{all(_c_pinned_new[k] == _c_defaults[k] for k in _c_undeclared)}")
+
+    # TOOL-dDerivedDocket-36 S2 — THE BACKLOG-MODES DOCS DRIFT ARM. The module's source is read at
+    # the path this file imports it by, and the README from this file's own directory, so the arm
+    # names no path at all. The positive arm is the real pair; every negative arm below mutates ONE
+    # side of a copy and asserts the finding names what was removed.
+    _d_source = read_text(backlog.__file__)
+    _d_readme = read_text(os.path.join(os.path.dirname(os.path.abspath(__file__)), "README.md"))
+    _d_found, _d_v, _d_k = scan_modes_doc_drift(_d_source, _d_readme, GUARD_CODES)
+    print(f"arm info  backlog-modes docs: compared {_d_v} verdicts and {_d_k} kinds")
+    arm("the README's backlog-modes section defines every verdict and kind the module declares",
+        "live=True findings=[]",
+        lambda: f"live={_d_v > 0 and _d_k > 0} findings={_d_found}")
+
+    def _remove_readme_lines(prefix):
+        """The real README with every line opening `prefix` removed — one side mutated, one only."""
+        return "\n".join(x for x in _d_readme.split("\n") if not x.startswith(prefix))
+
+    arm("a README missing one verdict's line fails naming THAT verdict, and only it",
+        "n=1 V7 is a verdict code",
+        lambda: (lambda f: f"n={len(f)} {f[0] if f else ''}")(
+            scan_modes_doc_drift(_d_source, _remove_readme_lines("- `V7`"), GUARD_CODES)[0]))
+    arm("V1's line is not satisfied by V10's — the closing backtick bounds the code",
+        "n=1 V1 is a verdict code",
+        lambda: (lambda f: f"n={len(f)} {f[0] if f else ''}")(
+            scan_modes_doc_drift(_d_source, _remove_readme_lines("- `V1`"), GUARD_CODES)[0]))
+    arm("a README missing one kind's line fails naming that kind",
+        "n=1 KEEP is a disposition kind",
+        lambda: (lambda f: f"n={len(f)} {f[0] if f else ''}")(
+            scan_modes_doc_drift(_d_source, _remove_readme_lines("- `KEEP`"), GUARD_CODES)[0]))
+    arm("a generator population code missing from the README is named too",
+        "V19 is a verdict code",
+        lambda: scan_modes_doc_drift(_d_source, _remove_readme_lines("- `V19`"), GUARD_CODES)[0])
+    # THE CODES COME FROM THE MODULE. A code the module raises and the README never mentions must be
+    # named against the unchanged README — an extractor reading the README could not see it.
+    arm("a code raised in the module and absent from the README is named against the real README",
+        "V99 is a verdict code",
+        lambda: scan_modes_doc_drift(_d_source + "\n_X = Verdict(99, 'x', ())\n",
+                                     _d_readme, GUARD_CODES)[0])
+    arm("a module whose extraction yields nothing is a DEAD PROBE, not agreement", "DEAD PROBE",
+        lambda: scan_modes_doc_drift("", _d_readme, GUARD_CODES)[0])
+    arm("codes with no kinds is a DEAD PROBE too — each side is asserted live on its own",
+        "DEAD PROBE — the ask module's source yielded 2 verdict code(s) and 0",
+        lambda: scan_modes_doc_drift("VERDICT_CODES = (1, 2)\n", _d_readme, GUARD_CODES)[0])
+    arm("the generator's extra codes cannot stand in for a dead module extraction", "DEAD PROBE",
+        lambda: scan_modes_doc_drift("STATUS_VERBS = ('CLOSED',)\n", _d_readme, GUARD_CODES)[0])
+    _d_non = "VERDICT_CODES = (1,)\nSTATUS_VERBS = ('CLOSED',)\nNON_VERBS = ('OPEN',)\n"
+    arm("NON_VERBS declares no kind: a derived token is not a disposition", "kinds=('CLOSED',)",
+        lambda: f"kinds={extract_ask_vocabulary(_d_non)[1]}")
+    arm("a README with no backlog-modes heading is named, not read as an empty agreement",
+        "carries no `## Backlog modes",
+        lambda: scan_modes_doc_drift(_d_source, _d_readme.replace(MODES_HEADING, "## Elsewhere"),
+                                     GUARD_CODES)[0])
 
     # THE SIBLING MODULE'S OWN ARMS RUN HERE, inside this leg, rather than as a leg of their own.
     # `backlog.py` is a LIBRARY with no bar leg and no adopter-visible verb; a second leg for it

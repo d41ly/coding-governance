@@ -117,7 +117,10 @@ EXTRACTORS: dict[str, object] = {
     ),
     # Charter-cited binding documents — each one spends from the read-path budget (hygiene 16).
     "guides": lambda: m.glob_inventory(ROOT / "memory" / "guides", "*.md", "guides"),
-    # One mutable shard per id family, per .memory-tree.conf FAMILIES.
+    # One file per id family, per .memory-tree.conf FAMILIES, whose ROLE depends on BACKLOG_MODE:
+    # under `shards` each is the family's authored backlog, and under `builds` each is a GENERATED
+    # view of the live asks filed in the per-build BACKLOG.md files. The key keeps its name in both
+    # modes, because every dossier carries it and a rename would churn all of them to say this.
     "backlog-shards": lambda: m.glob_inventory(
         ROOT / "memory" / "backlog", "*.md", "backlog-shards"
     ),

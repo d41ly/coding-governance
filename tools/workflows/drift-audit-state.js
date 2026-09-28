@@ -195,10 +195,11 @@ note. Audit it:
     brief: `LENS — IS THE MEMORY TREE STILL TRUE, AND IS IT AFFORDABLE?
  - THE SPEC STATUS QUESTION (highest value). For each non-terminal spec (OPEN/SPECCED/BLOCKED/
    INPROGRESS), determine whether its unit actually landed — cross-reference the generated build
-   index, the decision indexes, the backlog rows, and git (\`git log --grep=<id>\`, and whether a
-   named merge sha is an ancestor of ${BASE}). Report the REAL count whose header contradicts
-   reality, with the list. A spec frozen mid-build is a named rot class; a spec that shipped and
-   still says SPECCED is the same class.
+   index, the decision indexes, the backlog rows (the asks \`gen_build_index.py --asks --json --all\`
+   prints, or the backlog shards when its \`mode\` field says \`shards\`), and git
+   (\`git log --grep=<id>\`, and whether a named merge sha is an ancestor of ${BASE}). Report the
+   REAL count whose header contradicts reality, with the list. A spec frozen mid-build is a named
+   rot class; a spec that shipped and still says SPECCED is the same class.
  - Which memory documents make claims now FALSE about the code at ${BASE}? Sample the
    highest-traffic notes and verify their concrete claims — paths, flags, commands, ports.
  - Does any CURRENT (non-archive) doc still instruct a session to use a RETIRED mechanism? That

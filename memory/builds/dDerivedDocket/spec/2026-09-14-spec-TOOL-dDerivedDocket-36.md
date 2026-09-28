@@ -1,12 +1,13 @@
 # TOOL-dDerivedDocket-36 — memory-tree docs, carriers and dossier
 
-**Status:** SPECCED · rev-7 · 2026-09-28 · node d · Tier-2 · base fb07ca25 · streams tooling · order 39
+**Status:** CLOSED · rev-8 · 2026-09-28 · node d · Tier-2 · base fb07ca25 · streams tooling · order 39
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-14-build-TOOL-dDerivedDocket-1-design.md](../build/2026-09-14-build-TOOL-dDerivedDocket-1-design.md) | research | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
+| [2026-09-28-build-TOOL-dDerivedDocket-36-1-acceptance-ledger.md](../build/2026-09-28-build-TOOL-dDerivedDocket-36-1-acceptance-ledger.md) | journal | — |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-37 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
 | [2026-09-14-review-TOOL-dDerivedDocket-32-spec-audit-g5-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-32-spec-audit-g5-round1.md) | spec-audit | TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 PLAY-dDerivedDocket-1 DEPL-dDerivedDocket-1 |
@@ -35,8 +36,9 @@ one section the adopter runbook points at, and gate the part of it that can drif
   header names — and the transition audit with a pointer to the recipe
   `migrate_backlog.py --recipe` prints rather than a copy of it. Observed by AC1 and AC2.
 - **S2** A drift arm in `gen_build_index.py --selftest`: every verdict id and every disposition kind
-  the ask module's source declares must appear in that README section, and the arm prints the counts
-  it compared, refusing when either count is zero. Observed by AC2.
+  the ask module's source declares, and the three population verdicts the generator itself continues
+  that sequence with, must each have a line in that README section DEFINING it, and the arm prints
+  the counts it compared, refusing when either count the module yields is zero. Observed by AC2.
 - **S3** The rest of the kit README. Its "What's here" table carries a row for every tracked file
   under the kit directory that has none. Its merge-driver section carries the
   `memory/builds/*/BACKLOG.md merge=rows` line beside the two it shows, and says why the backlog line
@@ -161,9 +163,10 @@ own source, not a promise.
 ### The drift arm
 
 `gen_build_index.py --selftest` gains one arm. It reads the ask module's source through the same
-path the generator imports it by, collects every `V<digits>` verdict id it raises and every
-disposition kind its row grammar admits, and reads the README section between its heading and the
-next `## `. Each id or kind the module has and the section lacks is a failure naming it. The arm
+path the generator imports it by, collects every `V<digits>` verdict id it declares or raises and
+every disposition kind its row grammar admits, adds the generator's own population codes, and reads
+the README section between its heading and the next `## `. Each id or kind without a defining line
+there, a list item opening with it in backticks, is a failure naming it. The arm
 prints `compared <v> verdicts and <k> kinds`, and zero on either side is a DEAD PROBE, because an
 extractor that finds nothing agrees with every document. A kit README is a kit file, so the arm
 reads within its own kit and names nothing outside it.
@@ -528,6 +531,24 @@ is `subject = repo` and runs on any bar.
   Files touched, AC4 and AC5 name the two templates beside their renders, and AC4's phrase
   citations read at `313cc478`. The constant's citation moves from `:20` to `:33`. §10 records the
   reading.
+- rev-8 · 2026-09-28 · §2 §4 · S2 S4 · the build pass. THREE READINGS THE SOURCE FORCED. First,
+  the generator declares three verdicts of its own, V17 to V19 for the population it walks, and
+  its comment says they continue the module's one sequence because this arm reads the codes as one
+  list; `--check` prints them beside V1 to V16, so the arm compares them too, and they join after
+  the dead-probe test so they cannot stand in for an empty module extraction. Second, a mention
+  cannot be the test: V15's own line names V9, and every kind recurs in the fold, so a README with
+  a definition deleted stayed green under a word search. The arm requires a list item opening with
+  the backticked code or kind, which is also what bounds `V1` against `V10`, and AC2's deleted-line
+  RED names the verdict for any code. The module side reads `VERDICT_CODES`, every literal
+  `Verdict(<n>, …)` and `code=<n>`, and every upper-case `*_VERB` or `*_VERBS` constant except
+  `NON_VERBS`, parsed with `ast` rather than imported. Third, `--asks --json` lists LIVE asks only,
+  exactly as the family view does, so §4's reason for S4 holds only where the question is about
+  open asks. The three carriers whose question includes decided asks — the prior-art lens, the
+  memory-rot lens and the recall Skill's fallback — name `--asks --json --all`, which AC4's grep
+  still finds; the review protocol and the drift-audit Skill, which ask for the OPEN backlog, keep
+  `--asks --json`. Also recorded, not a divergence: the first `--dispatch` declaration named
+  `memory/LIVE.md` and `memory/ledger` beside the generator and was refused by the condition-3
+  pairing check; the pass re-declared without the two indexes, as units 6, 7, 15, 51 and 53 did.
 
 ## 10. Reuse audit
 

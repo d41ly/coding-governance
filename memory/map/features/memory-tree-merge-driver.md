@@ -1,8 +1,8 @@
-# memory-tree merge driver — the row-keyed three-way merge for the authored indexes
+# memory-tree merge driver — the row-keyed three-way merge for the authored indexes and each build's `BACKLOG.md`
 
 ```toml
 feature = "memory-tree-merge-driver"
-title = "Row-keyed merge driver for the authored indexes, and its view-against-shard refusal"
+title = "Row-keyed merge driver for the authored indexes and each build's BACKLOG.md, and its view-against-shard refusal"
 status = "shipped"
 streams = ["tooling"]
 decisions = []

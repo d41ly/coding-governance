@@ -185,8 +185,9 @@ which is the defeatable class this rule exists to stay out of.
 
 Dimension finders (security / correctness / data-integrity / dead-code / integration-seams) emit
 `file:line` findings **scoped to an immutable base SHA**, then skeptics try to REFUTE each before it
-is recorded. Feed the finders the security model, the open backlog and what is by-design, so they
-hunt NEW issues instead of re-reporting known ones.
+is recorded. Feed the finders the security model, the open backlog — the asks
+`gen_build_index.py --asks --json` prints, or the backlog shards when its `mode` field says
+`shards` — and what is by-design, so they hunt NEW issues instead of re-reporting known ones.
 
 Default configuration: **3–6 primed finder lenses → batched default-refute skeptics within the
 hook's declared bound → one
