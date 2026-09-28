@@ -1,12 +1,13 @@
 # TOOL-dHashedPrelude-3 — the kit's published facts stop being a typed count, and its version moves
 
-**Status:** SPECCED · rev-2 · 2026-09-28 · node d · Tier-1 · base 3cf05f29 · streams tooling · order 3
+**Status:** SPECCED · rev-3 · 2026-09-28 · node d · Tier-1 · base 3cf05f29 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-28-review-TOOL-dHashedPrelude-1-2-3-spec-audit-round1.md](../reviews/2026-09-28-review-TOOL-dHashedPrelude-1-2-3-spec-audit-round1.md) | spec-audit | TOOL-dHashedPrelude-1 TOOL-dHashedPrelude-2 |
+| [2026-09-28-review-TOOL-dHashedPrelude-1-2-3-spec-audit-round2.md](../reviews/2026-09-28-review-TOOL-dHashedPrelude-1-2-3-spec-audit-round2.md) | spec-audit | TOOL-dHashedPrelude-1 TOOL-dHashedPrelude-2 |
 
 <!-- /gen:spec-records -->
 
@@ -28,14 +29,20 @@ commit than the last change to the kit's shipped bytes.
   carries a version literal. Observed by AC2.
 - **S3** — The backlog row `TOOL-aProbedToolkit-14` records that its memory-recall half is answered
   here and that its `tools/lexicon/README.md` half is still open. Observed by AC3.
+- **S4** — The two deferrals units 2 and 3 name are PARKED in the build README, because a non-goal
+  pointing at a record nobody writes defers the work to nobody. They are the selftest summary line
+  carrying both figures, and an `eol=lf` pin over `tools/**/*.py`, whose absence let a CRLF working
+  copy put wrong byte offsets into a spec at rev-2. Each entry carries its question, the option
+  seen and the reason it was refused, which is where the owner gets the turn this build did not
+  take. Observed by AC4.
 
 ## 3. Non-goals (OUT)
 
 The lexicon half of `TOOL-aProbedToolkit-14` is not touched: it is a different kit, a different
 sample paste, and this build edits neither. No other figure in this README is audited — the row is
 specific about which claims it measured, and the ones it checked and found correct stay as they are.
-No change to how the version enters `Conf.digest()`, and no change to the selftest's summary line,
-which is recorded as a backlog row rather than built here.
+No change to how the version enters `Conf.digest()`, and no change to the selftest's summary line
+or to any `eol` pin: S4 parks both, and neither is built in this build.
 
 ## 4. Design
 
@@ -81,6 +88,12 @@ section carries the reasoning so the next reader does not re-derive it.
   this build answered and which half is still open, and its status token still reflects that one
   half remains.
   Red when: the row is closed outright, which would claim the lexicon README was fixed here.
+- **AC4** — When the `## Parked decisions` section of `memory/builds/dHashedPrelude/README.md` is
+  read, it carries an entry for each of the two deferrals, and each names the spec section that
+  deferred it, the option seen and the reason it was refused.
+  Red when: a spec's non-goal defers to a record nobody writes, which is a deferral to nobody
+  wearing the shape of a tracked one. Also red when an entry names only the deferral: a parked
+  item without its reason is indistinguishable from a forgotten one.
 
 ## 7. Gates
 
@@ -104,3 +117,8 @@ the build README's parked section.
   check count while unit 1's own edges and AC4 say unit 1 changes nothing — unit 2 alone moves it
   (D-6). §4 records that `test_version_marker` binds all three markers, which `check-kit-versions.sh`
   alone does not. Sections 5 and 10 are absent by the Tier-1 light profile, not by omission.
+- rev-3 · 2026-09-28 · §2 S4 · §3 · AC4 · folded the round-2 spec audit. Two specs deferred work
+  to "a backlog row" that no unit wrote and no id named; S4 and AC4 give both deferrals a home in
+  the build README's parked section. A backlog row was written first and reverted: hygiene check
+  20 holds `memory/backlog/TOOL.md` at a shrink-only pin of 417 live rows and the shard is AT it,
+  so a row cannot be added without draining two, which is not this build's to do.

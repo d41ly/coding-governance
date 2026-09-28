@@ -1,12 +1,13 @@
 # TOOL-dHashedPrelude-1 — the live-log baseline is captured above the first decorated arm
 
-**Status:** SPECCED · rev-2 · 2026-09-28 · node d · Tier-2 · base 3cf05f29 · streams tooling · order 1
+**Status:** SPECCED · rev-3 · 2026-09-28 · node d · Tier-2 · base 3cf05f29 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-28-review-TOOL-dHashedPrelude-1-2-3-spec-audit-round1.md](../reviews/2026-09-28-review-TOOL-dHashedPrelude-1-2-3-spec-audit-round1.md) | spec-audit | TOOL-dHashedPrelude-2 TOOL-dHashedPrelude-3 |
+| [2026-09-28-review-TOOL-dHashedPrelude-1-2-3-spec-audit-round2.md](../reviews/2026-09-28-review-TOOL-dHashedPrelude-1-2-3-spec-audit-round2.md) | spec-audit | TOOL-dHashedPrelude-2 TOOL-dHashedPrelude-3 |
 
 <!-- /gen:spec-records -->
 
@@ -43,7 +44,7 @@ ok whatever the arms did to the log.
   the pin are untouched; `SELFTEST_ARMS` does not change, because no arm is added here. In every
   reachable-repository state the count of appended run-property rows is unchanged at five, and in
   the unresolvable state it rises from four to five, which is S2's ruling and nothing else.
-  Observed by AC4.
+  Observed by AC6.
 
 ## 3. Non-goals (OUT)
 
@@ -55,8 +56,9 @@ the comment names that gap, it does not close it. No change to how `repo_root()`
 
 ### Edges
 
-- **hands-off** `TOOL-dHashedPrelude-2` — this unit creates the module-scope assignment and the
-  `_live_log_row` function that unit 2's two arms read and drive. Both arms red until this lands.
+- **hands-off** `TOOL-dHashedPrelude-2` — this unit creates the module-scope assignment, the
+  unconditional append in `main()`, and the `_live_log_row` function that unit 2's two arms read
+  and drive. Both arms red until this lands.
 - **hands-off** `TOOL-dHashedPrelude-3` — this unit changes no count, so nothing in unit 3 depends
   on it.
 - **consumes-from** external — `git_common_dir()` and `recall_conf.repo_root()` as they stand.
@@ -165,11 +167,19 @@ wrong state gets preserved, and the charter already rules that a skip must annou
   597 arrived during this build's own kickoff from a query it did not issue, so equal digests cannot
   be assumed and unequal ones do not by themselves convict the suite.
 - **AC5** — When `_live_log_row` is called with the path argument set to the none-value, it returns
-  a triple whose state is `skip` and whose detail names the unresolvable repository, and when it is
-  called with a path that does not exist and the absent-sentinel as the baseline, it returns an `ok`
-  triple.
-  Red when: the unresolvable case returns no triple, or `main()` keeps a conditional append, either
-  of which restores a row that is absent rather than a skip that announces itself.
+  a triple whose state is `skip` and whose detail names the unresolvable repository; called with a
+  path that does not exist and the absent-sentinel as the baseline, it returns an `ok` triple; and
+  called with two differing digests, it returns a `FAIL` triple whose detail contains both digest
+  prefixes rather than only the baseline.
+  Red when: the unresolvable case returns no triple, which restores a row that is absent rather
+  than a skip that announces itself; or the failing case reports only what the digest was, which
+  is the detail the pre-unit code carried and which names nothing about what it became.
+- **AC6** — When the body of `main()` is read after this unit, the guard's row is appended by a
+  single unconditional `_checks.append(_live_log_row(...))` and no conditional on the log path
+  being set survives anywhere in it.
+  Red when: the module-scope assignment lands but the old conditional append is left in place, in
+  which case the row is emitted twice, the summary prints one row more than the suite has, and
+  both copies are green. Unit 2's ordering arm is what keeps this true afterwards.
 
 ## 7. Gates
 
@@ -193,6 +203,12 @@ none
   against a live log of 1,545,472 bytes (D-8). AC3 gains the fourth NOT-CHECKED item, AC4 gains the
   row-count and delta-quoting requirement after rows from another session appeared in the log during
   this build, and AC5 is new.
+- rev-3 · 2026-09-28 · §2 S4 · §3 · AC5 · AC6 · folded the round-2 spec audit. S4's row-count
+  clause named AC4 as its observer, which counts rows in the query log rather than rows in the
+  suite's output; it now names AC6. AC6 is new: nothing in the three-spec set observed that
+  `main()` appends the guard's row unconditionally, so a build that kept the old conditional
+  beside the new append would emit the row twice and print a longer green summary. AC5 gains the
+  differing-digest clause, which S2 had specified and no criterion reached.
 
 ## 10. Reuse audit
 
