@@ -1,12 +1,13 @@
 # DEPL-dDerivedDocket-1 — adopter runbook: backlog switch and merge attribute
 
-**Status:** SPECCED · rev-9 · 2026-09-28 · node d · Tier-1 · base fb07ca25 · streams deployer+tooling · order 40
+**Status:** CLOSED · rev-10 · 2026-09-28 · node d · Tier-1 · base fb07ca25 · streams deployer+tooling · order 40
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-14-build-TOOL-dDerivedDocket-1-design.md](../build/2026-09-14-build-TOOL-dDerivedDocket-1-design.md) | research | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 |
+| [2026-09-28-build-DEPL-dDerivedDocket-1-1-acceptance-ledger.md](../build/2026-09-28-build-DEPL-dDerivedDocket-1-1-acceptance-ledger.md) | journal | — |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 TOOL-dDerivedDocket-37 PLAY-dDerivedDocket-1 |
 | [2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md](../prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-spec-brief.md) | journal | TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 |
 | [2026-09-14-review-TOOL-dDerivedDocket-32-spec-audit-g5-round1.md](../reviews/2026-09-14-review-TOOL-dDerivedDocket-32-spec-audit-g5-round1.md) | spec-audit | TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 TOOL-dDerivedDocket-36 PLAY-dDerivedDocket-1 |
@@ -50,13 +51,12 @@ status token" wording is where one adopter's status-first rows came from.
 - **S6** §2's kit list gains a bullet for the kickoff manifest, the `kickoff-manifest` kit: keeping
   it selected keeps the `kit:kickoff-manifest` block in `§1`, the manifest's merge exception, and
   dropping it removes that exception with the manifest it governs. Observed by AC5.
-- **S7** The carried-prefix list. §3a-asks spells commands an operator types, each carrying a
-  `tools/<kit>/` literal, so the `WIRE-INTO-PROJECT.md` row of `tools/install-prefix-carried.txt` is
-  raised by hand in this pass to exactly the count the file holds once the section lands, counted as
-  `check-install-prefix.sh` counts it, with the kits column that count measures, and its reason
-  column gains a sentence dated at this pass
-  saying the new literals are the switch's commands, which a runbook carries as content rather than
-  as a path to derive, as the 2026-09-08 raise recorded (§8 F7). Observed by AC7.
+- **S7** The carried-prefix list stays as it is. §3a-asks spells every command an operator types
+  through the `<kit>` token the runbook's §3a-bind and §3b already use for a kit's install directory,
+  never at gov's own `tools/` prefix, and names §3 step 4's wiring check rather than spelling its
+  path again, so the section adds no literal `check-install-prefix.sh` counts and the
+  `WIRE-INTO-PROJECT.md` row of `tools/install-prefix-carried.txt` is not edited (§8 F7, rev-10).
+  Observed by AC7.
 
 ## 3. Non-goals (OUT)
 
@@ -116,74 +116,84 @@ status token" wording is where one adopter's status-first rows came from.
 | `WIRE-INTO-PROJECT.md:231`-`:234` | two attribute lines | three, and one sentence on keeping the backlog line |
 | after `WIRE-INTO-PROJECT.md:238` | the drift-audit anchor follows | `### 3a-asks`, then the anchor |
 | `tools/memory-tree/adopt-memory-tree.sh:503` | "> Mutable. Each row leads with one status token (OPEN…WONTDO)." | the id-first shape |
-| `tools/install-prefix-carried.txt:11`, the `WIRE-INTO-PROJECT.md` row | pinned at 53 | raised by hand to the count once §3a-asks lands, with a dated reason (S7) |
+| `tools/install-prefix-carried.txt:11`, the `WIRE-INTO-PROJECT.md` row | pinned at 53 | unchanged at 53: §3a-asks carries no `tools/` literal (S7, rev-10) |
 
 ### Proposed text for §3a-asks
 
 The build may reword it. It may not name a flag or path the tree does not hold at the pass (AC3),
-and it keeps the switch out of §3's first-adoption steps (AC4).
+and it keeps the switch out of §3's first-adoption steps (AC4). The text below is what the runbook
+carries at rev-10: every command is spelled through the `<kit>` token (S7), and every `--signed`
+takes the `<kind>=<path>` form the planner's usage and unit 34's S1 name.
 
 ```markdown
-### 3a-asks — Per-build asks and a generated backlog view (opt-in; memory-tree kit ≥ <version>)
+### 3a-asks — Per-build asks and a generated backlog view (opt-in; memory-tree kit ≥ 2.100)
 
-**An upgrade changes nothing until you switch.** With `BACKLOG_MODE` absent from
-`.memory-tree.conf` the tree runs in `shards` mode: the authored `backlog/<FAMILY>.md` files §3
+**An upgrade changes nothing until you switch.** With `BACKLOG_MODE` absent or blank in
+`.memory-tree.conf`, the tree runs in `shards` mode: the authored `backlog/<FAMILY>.md` files §3
 scaffolds, one status slot per row. In `builds` mode each ask is filed once, as a row of
 `<MEMORY_ROOT>/builds/<slug>/BACKLOG.md` in the folder of its own id's slug; its status is derived
 from specs and disposition rows; and `backlog/<FAMILY>.md` becomes a GENERATED view nobody edits.
-The grammar, the verdicts and the status fold are `tools/memory-tree/README.md`'s. This is the order.
+The grammar, the verdicts and the status fold are the memory-tree kit README's "Backlog modes"
+section, and are not repeated here. Below, `<kit>` is where you installed the memory-tree kit.
 
 **The switch is its own deployer build in your repo, never a step of a first adoption.** It
-migrates your corpus, so it takes a spec, a signed record and one switch-over commit:
+migrates your corpus, so it takes a spec, a signed record and one switch-over commit. In order:
 
-1. **Census, read-only.** `python tools/memory-tree/migrate_backlog.py --plan --record <MEMORY_ROOT>/builds/<your-slug>/build --record-as <your-unit-id>`
-   files the id census, the same-id worksheet and the triage worksheet as records of your build, and
-   names every row it cannot parse. Without `--record` the planner prints and writes nothing. Fix the
-   unparseable rows first: the writer never drops a row.
-2. **Stragglers.** `python tools/memory-tree/migrate_backlog.py --stragglers` walks every local and
-   remote-tracking ref for a branch still editing a shard. Merge the ones you know before the switch.
+1. **Census, read-only.** Run
+   `python <kit>/migrate_backlog.py --plan --record <MEMORY_ROOT>/builds/<your-slug>/build --record-as <your-unit-id>`.
+   It files the id census, the same-id worksheet and the triage worksheet as records of your build,
+   with a status worksheet beside them, and names every row it cannot parse. Without `--record` the
+   planner prints and writes nothing. Fix the unparseable rows first: the writer never drops a row.
+2. **Stragglers.** `python <kit>/migrate_backlog.py --stragglers` walks every local and
+   remote-tracking ref for a branch still editing a shard. It refuses to guess your default branch,
+   so set `origin/HEAD` first with `git remote set-head origin -a`. Merge the branches you know
+   before the switch.
 3. **Sign both worksheets.** Your owner decides which same-id pairs are one subject and gives every
-   open ask on a finished build one disposition, as the two signed records the kit README's
-   signed-records row describes — the header cells `Ask`, `Verdict` and, on the triage record,
-   `Field`. Preview the result with
-   `python tools/memory-tree/migrate_backlog.py --plan --signed <same-id record> <triage record>`;
+   open ask on a finished build one disposition, as the two signed records the kit README's "Signed
+   records" row describes: header cells `Ask` and `Verdict`, and `Field` too on the triage record.
+   Commit the worksheets before signing, because each record names its worksheet by blob sha.
+   Preview the result with
+   `python <kit>/migrate_backlog.py --plan --signed same-id=<same-id record> --signed triage=<triage record>`;
    the writer applies exactly what is signed. This repo's own signing, under rules its owner
    delegated, is in `memory/builds/dDerivedDocket/`.
-4. **Switch in ONE commit.** Install the memory-recall kit beside memory-tree first if you have not:
-   the transition audit keys every row through its anchor grammar and refuses by name without it, and
-   no kit descriptor installs it for you. Mint one ask id under your build's slug for the legacy holds
-   that name no id, then run
-   `python tools/memory-tree/migrate_backlog.py --write --as <your-slug> --signed <same-id record> <triage record> --triage-ask <that id>`.
-   It files that ask with a KEEP in your build's `BACKLOG.md`, holds each such row on it, migrates
-   the rows of your rotated backlog archives with the live ones, and removes the authored shards once
-   its conservation proof passes. It does not remove the archives: delete every tracked backlog
-   archive whose name starts with one of your families, because builds mode keeps no backlog archive
-   and `gen_build_index.py --check` refuses one, and reword any file outside `<MEMORY_ROOT>` that
-   names a deleted archive, which a dead-path gate reads from git history. Then set
-   `BACKLOG_MODE="builds"` and the `ASK_CUTOFF` it prints, add the `BACKLOG.md` attribute from §3
-   step 4, and run `python tools/memory-tree/gen_build_index.py --write`. Add a gate leg of your own
-   running `python tools/memory-tree/merge-rows.py --check`; this repo calls it
-   `row-driver view refusal`, and no kit ships it. Commit when `--check` exits 0.
+4. **Switch in ONE commit.** Install the `memory-recall` kit beside memory-tree first if you have
+   not: the transition audit keys every row through its anchor grammar and refuses by name without
+   it, and no kit descriptor installs it for you. If the census found legacy holds that name no id,
+   mint one ask id under your build's slug to hold them on. Then run
+   `python <kit>/migrate_backlog.py --write --as <your-slug> --signed same-id=<same-id record> --signed triage=<triage record> --triage-ask <that id>`.
+   It files that ask with a KEEP in your build's `BACKLOG.md` and holds each such row on it (with no
+   such hold it files nothing, and `--triage-ask` may be left out), migrates the rows of your rotated
+   backlog archives with the live ones, and removes the authored shards once its conservation proof
+   passes. It does not remove the archives: delete every tracked backlog archive whose name starts
+   with one of your families, because builds mode keeps no backlog archive and
+   `python <kit>/gen_build_index.py --check` refuses one, and reword any file outside `<MEMORY_ROOT>`
+   that names a deleted archive, which a dead-path gate reads from git history. Then set
+   `BACKLOG_MODE="builds"` and the `ASK_CUTOFF` the writer prints, add the `BACKLOG.md` attribute
+   from §3 step 4, and run `python <kit>/gen_build_index.py --write`. Add a gate leg of your own
+   running `python <kit>/merge-rows.py --check`; this repo calls it `row-driver view refusal`, and no
+   kit ships it. Commit when both `--check` runs exit 0.
 5. **Tell stragglers what to do.** The recipe a pre-switch branch follows is what
-   `python tools/memory-tree/migrate_backlog.py --recipe` prints, the same text the generated views
-   carry. The hooks that tell a branch before it lands are yours to wire: this repo's
+   `python <kit>/migrate_backlog.py --recipe` prints, the same text the generated views carry. The
+   hooks that tell a branch before it lands are yours to wire: this repo's
    `.githooks/straggler-guard.sh`, `.githooks/pre-rebase` and `.githooks/commit-msg` are the
-   reference, and they are not shipped by any kit.
-6. **Land it when your default branch moved.** If your default branch gained backlog rows while your
-   switch build ran, the row driver's refusal prints the `--relocate` recipe, which is for a
+   reference, and no kit ships them.
+6. **Land it when your default branch moved.** If your default branch gained backlog rows while
+   your switch build ran, the row driver's refusal prints the `--relocate` recipe, which is for a
    pre-switch branch merged into a switched default branch and exits 2 in this direction. Instead,
-   first confirm `merge.rows.driver` resolves in the tree you are about to merge —
-   `bash tools/check-wiring.sh --check` reporting no `UNWIRED` row for `merge`, or `--fix` to set it
-   — because `merge=rows` in `.gitattributes` is per-clone config and without it git falls back,
-   with a warning but with no refusal, to a line merge that completes instead of conflicting; then,
-   on your switch branch, run `git merge --no-ff --no-commit <default tip>` and take your branch's
-   side of every generated view and deleted archive; run step 1's `--plan` inside a worktree of the
-   tip; sign the rows it adds as step 3 did; then run
-   `python tools/memory-tree/migrate_backlog.py --ingest <default tip> --as <your-slug> --signed <same-id record> <triage record> --triage-ask <that id> --dry-run`,
-   pass `--confirm <id>` only for an id your branch never acted on since it forked, re-run without
-   `--dry-run`, write the `ASK_CUTOFF` it prints, run
-   `python tools/memory-tree/gen_build_index.py --write`, and conclude the merge. This repo's own
-   landing, with its confirmation rule and its manifest re-stamp, is §4 "The landing reconcile" of
+   first confirm `merge.rows.driver` resolves in the tree you are about to merge: §3 step 4's wiring
+   check reports no `UNWIRED` row for `merge`, or its `--fix` sets it. The driver is per-clone git
+   config, `merge=rows` in `.gitattributes` does nothing without it, and git then falls back, with a
+   warning but no refusal, to a line merge that completes instead of conflicting. Then, on your
+   switch branch, run `git merge --no-ff --no-commit <default tip>` and take your branch's side of
+   every generated view and deleted archive; run step 1's `--plan` inside a worktree of the tip, its
+   `--record` naming the build folder of your switch tree; sign the rows it adds as step 3 did, as a
+   new pair of records; then run
+   `python <kit>/migrate_backlog.py --ingest <default tip> --as <your-slug> --signed same-id=<landing same-id record> --signed triage=<landing triage record> --triage-ask <that id> --dry-run`.
+   It exits 1 while a CONFIRM or NEEDS-HUMAN entry stands: pass `--confirm <id>` only for an id your
+   branch never acted on since it forked, and stop the landing on anything else. Re-run without
+   `--dry-run` once the dry run exits 0, write the `ASK_CUTOFF` it prints, run
+   `python <kit>/gen_build_index.py --write`, and conclude the merge. This repo's own landing, with
+   its confirmation rule and its manifest re-stamp, is §4 "The landing reconcile" of
    `memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-34.md`.
 
 A census over a FORKED engine decides more before step 4: a status your tree reads as terminal that
@@ -192,8 +202,8 @@ repo measured those for its three known adopters in section 10 of
 `memory/builds/dDerivedDocket/build/2026-09-14-build-TOOL-dDerivedDocket-1-design.md`.
 ```
 
-`<version>` is the `KIT_MEMORY_TREE_VERSION` the tree declares at this unit's pass, read then and
-not assumed here.
+The version in the heading is the `KIT_MEMORY_TREE_VERSION` the tree declared at this unit's pass,
+2.100, read then and not assumed.
 
 ### Proposed text for the smaller edits
 
@@ -222,8 +232,8 @@ The scaffold header, inside the existing `printf` format string:
 
 ### Files touched (estimate)
 
-`WIRE-INTO-PROJECT.md` · `tools/memory-tree/adopt-memory-tree.sh` · `tools/install-prefix-carried.txt`
-(one row raised by hand, with its reason)
+`WIRE-INTO-PROJECT.md` · `tools/memory-tree/adopt-memory-tree.sh`. Not
+`tools/install-prefix-carried.txt`, which rev-10 leaves unedited (S7).
 
 ### Alternatives rejected
 
@@ -321,15 +331,14 @@ The scaffold header, inside the existing `printf` format string:
   cost: under a minute.
 - **AC7** — When `bash tools/check-install-prefix.sh` runs at this unit's commit, it prints no `ROSE`,
   `SLACK` or `SWAPPED` line for `WIRE-INTO-PROJECT.md`, and that file's row in
-  `tools/install-prefix-carried.txt` carries a reason sentence dated at this pass naming §3a-asks.
-  Red when: the section lands with the row unraised, so the `install-prefix (shipped surface)` leg
-  DEPL's own §7 lists reds with ROSE at the post-build bar, where no pass is left to fix it; or the
-  row is raised past the count the section carries, or its kits column is left behind the literals,
-  which the same leg reds as SLACK or SWAPPED; or the row is raised with no reason, which the list's
-  header reserves to a person writing one in the pass that needs it.
+  `tools/install-prefix-carried.txt` is the row it was before this unit, unedited.
+  Red when: §3a-asks spells a command at gov's own `tools/` prefix, so the file's count rises past its
+  row and the `install-prefix (shipped surface)` leg DEPL's own §7 lists reds with ROSE at the
+  post-build bar, where no pass is left to fix it; or the row is edited upward by hand to absorb the
+  rise, which the list's header and this build's tail rule both forbid.
   permission: the script is the `install-prefix (shipped surface)` leg and binds at the one
-  post-build bar; in the pass the raise is observed by reading the row and counting the section's
-  literals.
+  post-build bar; in the pass the count is observed by running the leg's own carried-literal
+  predicate over the file before and after the edit, and by reading the row.
 
 ## 7. Gates
 
@@ -374,8 +383,12 @@ is kit work; `GATE_FULL=1` alone would still hold it. Every other leg in the lis
   row by hand in this pass with a dated reason. (b) Spell the commands relative to the kit directory,
   without the `tools/` prefix. (c) Leave the pin. (b) hands an operator a variable to expand, the
   reason the 2026-09-08 raise gave, and AC3 resolves commands against tracked paths; (c) reds the
-  post-build bar with no pass left to fix it. RESOLVED (agent, 2026-09-16, delegated): (a), the route
-  the checker's own refusal names, as the prompt-authorized `aReapedSpinner` run took it.
+  post-build bar with no pass left to fix it. RESOLVED (agent, 2026-09-28, delegated), decided by
+  the orchestrator's rule for this build's tail passes, that the list is a BAN no pass raises by hand
+  or otherwise: (b), the `<kit>` token the runbook's §3a-bind and §3b already spell, so the pin is
+  left, as (c) wanted, with nothing rising past it. The runbook already hands an operator that token
+  in both sections, and AC3 reads it as the kit directory the way it reads `<your-slug>`. The
+  2026-09-16 resolution, (a), is superseded at rev-10.
 - The ruling this unit carries out and does not revisit: D1, adopt per-build asks with a generated
   view while adopters keep the shards default, RESOLVED (owner, 2026-09-13).
 
@@ -487,6 +500,19 @@ is kit work; `GATE_FULL=1` alone would still hold it. Every other leg in the lis
   `tools/memory-tree/merge-rows.py` is being edited in the same reconcile, and its Red when names
   the transition audit as check 26, the number it carries since main's `TOOL-dGatedProse-1` took 25.
   §10 records the reading.
+- rev-10 · 2026-09-28 · §2 §4 §6 §8 · S7 · AC7 · F7 · the build pass, which diverged in two places
+  before writing the runbook. First, the orchestrator's rule for this build's tail passes makes
+  `tools/install-prefix-carried.txt` a BAN no pass raises, by hand or otherwise, so S7's hand raise
+  was not buildable: F7 now resolves to (b), S7 keeps the row unedited and spells every command
+  through the `<kit>` token, the §4 edits table and Files touched drop the list, and AC7 grades an
+  unchanged row and an unchanged count. Second, the planner's usage and unit 34's S1 at rev-11 take
+  each signed record as `--signed <kind>=<path>`, so §4's proposed spelling
+  `--signed <same-id record> <triage record>` refuses with "--signed takes <kind>=<path>", measured
+  in this pass's fixture; the proposed block is now the text the runbook carries, which also names
+  the status worksheet step 1 files beside the three AC3 counts, says a blank `BACKLOG_MODE` reads as
+  `shards` as the shipped example conf leaves it, says `--stragglers` needs `origin/HEAD`, says the
+  triage ask is filed only when a hold names no id, and has step 6's re-plan write its records into
+  the switch tree. No other criterion moved.
 
 ## 10. Reuse audit
 
@@ -532,5 +558,13 @@ lines S1 extends. The `WIRE-INTO-PROJECT.md` row of `tools/install-prefix-carrie
 text unchanged, and the three fixture replicas §3 keeps are still three. The three reference hooks
 step 5 names, `.githooks/straggler-guard.sh`, `.githooks/pre-rebase` and `.githooks/commit-msg`, are
 tracked now, which AC3's `git ls-files` read needs.
+
+READ AT THE BUILD PASS, 2026-09-28 at `66f99c96`. Every runbook line rev-9 cites held: the lexicon
+bullet ends at `:123`, the unattended bullet is `:124`-`:126`, the scaffold sentence `:197`-`:200`,
+the append sentence `:223`-`:226`, the attribute lines `:231`-`:234`, and the drift-audit anchor
+`:240`. The scaffold header still sat at `tools/memory-tree/adopt-memory-tree.sh:503` and the
+carried row still read 53 at line 11; the leg's own carried-literal predicate, run over the runbook
+at `66f99c96`, reproduced that 53, which is what makes the same count after the edit a reading
+rather than an assumption. `KIT_MEMORY_TREE_VERSION` read 2.100.
 
 Recall terms used: `WIRE-INTO-PROJECT runbook migrate adopter shards scaffold header merge=rows attribute ledger retired status-first`
