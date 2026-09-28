@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.4 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-09-29T01:10:18+03:00 @ c5b6b0142e55051798324418a423ae388fa60857
+last-audit: 2026-09-29T02:34:21+03:00 @ c3098a92bde3b183b0f877cb36ca4e5c05dfc2b7
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/run-gates/run-selftests.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: c5b6b0142e55051798324418a423ae388fa60857
+last-body-change: c3098a92bde3b183b0f877cb36ca4e5c05dfc2b7
 check-script: skills/session-kickoff/manifest-check.sh
 registry: AGENTS.md
 -->
@@ -284,8 +284,8 @@ does — hit three times in one file in one session; also the whole-signature an
 - A kit path a tool WRITES, RENDERS or PRINTS is DERIVED from that tool's own location, never spelled.
   A hardcoded prefix in a RENDERED artifact is the worst case: it lands a dead path in the adopter's
   committed tree and the byte-compare guarding that file agrees with it.
-- A path the ADOPTER declares (its merge bar, manifest, skill, protocols) renders from its
-  deploy.toml through the playbook engine's `--answers`, never in gov's layout. `TOOL-aRepatriatedFork-42`.
+- An ADOPTER-declared path renders from deploy.toml via the playbook engine's `--answers` (1.11+,
+  else a phrase), a protocol from its receipt row; never gov's layout. `TOOL-aRepatriatedFork-42`.
 - A gate that returns a VALUE on stdout cannot also report on stdout — `fail` echoes, so `x=$(check …)`
   captures the diagnostics and the operator sees only the downstream symptom. Use a separate channel.
 - A NEW record under `memory/gotchas/` needs `gotchas.py --write` AND a dossier claim, and the

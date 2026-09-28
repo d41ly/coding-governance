@@ -81,8 +81,14 @@ render_doc() {
 # deploy.toml. A kit the tree did not select, a tree with no deploy.toml and an install with no
 # engine each render the placeholder's stated phrase, which names no path; a selected kickoff kit
 # with no answer, and every refusal of the engine's, is a named refusal.
+# rev-3, the closing review. Every printed value is ONE line or a named refusal (C1). An engine
+# below 1.11, whose `--answers` cannot speak the keys asked here, counts as no engine (C2, I1). Both
+# pipes are UTF-8 whatever the code page (C3, I2). The kickoff answers take govkit's per-entry
+# overlay, and a memory root declared apart from the conf must equal it (C4). A repo-relative skill
+# renders only where git tracks it (I3). The two protocols render the path of their kit's
+# `rendered` receipt row, the destination govkit wrote, or a phrase (C5, I4).
 derive_kit_paths() {
-  "$1" -c "$(cat <<'RKD'
+  MT_MEMORY_ROOT="${MEMORY_ROOT:-}" "$1" -c "$(cat <<'RKD'
 # >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
 def resolve_kit_dir(home, anchor, here):
     """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
@@ -121,9 +127,23 @@ def resolve_kit_dir(home, anchor, here):
 RKD
 )"'
 import json
+import os
 import pathlib
 import re
+import subprocess
 import sys
+sys.stdout.reconfigure(encoding="utf-8")
+sys.stderr.reconfigure(encoding="utf-8", errors="backslashreplace")
+
+
+def emit(p, v):
+    if re.search(r"[\t\r\n]", v):
+        sys.exit("memory-tree render: REFUSED, the value for %s carries a tab, CR or newline (%r), "
+                 "and a render line holds one line, so it would cut every doc it reaches. Answer "
+                 "it on one line" % (p, v))
+    print("%s\t%s" % (p, v))
+
+
 kit = pathlib.Path(sys.argv[1]).resolve()
 root = next((p for p in (kit, *kit.parents) if (p / ".git").exists()), kit)
 cites = []
@@ -143,17 +163,40 @@ for cite in cites:
         path = (resolve_kit_dir(home, anchor, kit) / anchor).relative_to(root)
     except (LookupError, ValueError):
         continue
-    print("%s\t%s" % (cite, path.as_posix()))
+    emit(cite, path.as_posix())
+try:
+    receipt = json.loads((root / ".governance" / "install.json").read_text(encoding="utf-8"))
+    rows, pfx = list(receipt.get("files") or []), receipt.get("prefix")
+except (OSError, ValueError, AttributeError, TypeError):
+    rows, pfx = [], None
+
+
+def rendered_at(eid, template):
+    for row in rows:
+        if not isinstance(row, dict) or row.get("kit") != eid or row.get("role") != "rendered":
+            continue
+        if str(row.get("source") or "").split("/")[-1] != template:
+            continue
+        dest = pathlib.PurePosixPath(str(row.get("path") or ""))
+        if dest.parts and not dest.is_absolute() and ".." not in dest.parts and ":" not in str(dest):
+            return dest.as_posix()
+    return None
+
+
 said = {
     "{{GATE_RUNNER}}": "the merge bar of this repo",
     "{{MANIFEST_PATH}}": "the kickoff manifest of this repo",
     "{{KICKOFF_SKILL}}": "the session-kickoff skill",
     "{{REVIEW_PROTOCOL}}": "the review protocol of this repo",
-    "{{UNATTENDED_PROTOCOL}}": "the unattended-run protocol (not installed here)",
+    "{{UNATTENDED_PROTOCOL}}": "the unattended-run protocol of this repo",
     "{{SPEC_TOKEN_CHECKER}}": "The spec-token checker of the shipping repo, not installed here,",
 }
+floor = (1, 11)
 need = [p for p in said if p in seen]
-got = {}
+got = {
+    "{{REVIEW_PROTOCOL}}": rendered_at("review-harness", "REVIEW-PROTOCOL.template.md"),
+    "{{UNATTENDED_PROTOCOL}}": rendered_at("unattended", "PROTOCOL.template.md"),
+}
 eng = None
 if need and (root / ".governance" / "deploy.toml").is_file():
     try:
@@ -161,37 +204,59 @@ if need and (root / ".governance" / "deploy.toml").is_file():
     except LookupError as e:
         sys.stderr.write("memory-tree render: %s, so each adopter path states its phrase\n" % e)
 if eng is not None:
-    import subprocess
+    m = re.search(r"^KIT_PLAYBOOK_RENDER_VERSION = \"([0-9.]+)\"",
+                  eng.read_text(encoding="utf-8", errors="replace"), re.M)
+    if not m or tuple(int(x) for x in m.group(1).split(".") if x) < floor:
+        sys.stderr.write("memory-tree render: the playbook-render engine at %s is %s, below the %s "
+                         "whose --answers this render asks, so each adopter path states its phrase. "
+                         "Update it: govkit update --kits playbook-render\n"
+                         % (eng.as_posix(), m.group(1) if m else "unversioned",
+                            ".".join(str(x) for x in floor)))
+        eng = None
+if eng is not None:
+    ek = "kit.kickoff-manifest."
     r = subprocess.run([sys.executable, str(eng), "--target", str(root), "--answers", "GATE_RUNNER",
-                        "kits", "gov_source", "manifest_path", "user_skills"],
-                       capture_output=True, text=True, encoding="utf-8")
+                        "MEMORY_ROOT", "kit.memory-tree.memory_root", "kits", "gov_source",
+                        ek + "manifest_path", ek + "user_skills"],
+                       capture_output=True, text=True, encoding="utf-8", errors="replace",
+                       env=dict(os.environ, PYTHONUTF8="1", PYTHONIOENCODING="utf-8"))
     if r.returncode:
         sys.exit("memory-tree render: REFUSED, the playbook-render engine gave no answers: %s"
-                 % (r.stderr.strip() or r.stdout.strip()))
+                 % ((r.stderr or "").strip() or (r.stdout or "").strip() or "exit %d" % r.returncode))
     ans = json.loads(r.stdout)
     kits = set(ans["kits"])
+    conf = os.environ.get("MT_MEMORY_ROOT", "")
+    for key in ("MEMORY_ROOT", "kit.memory-tree.memory_root"):
+        if conf and ans[key] and ans[key] != conf:
+            sys.exit("memory-tree render: REFUSED, the memory root has two values: .memory-tree.conf "
+                     "says MEMORY_ROOT=%s and the playbook engine answers %s = %s from "
+                     ".governance/deploy.toml. These docs land under the conf root, so make the two "
+                     "one value" % (conf, key, ans[key]))
     if "kickoff-manifest" in kits:
-        for key, p in (("manifest_path", "{{MANIFEST_PATH}}"), ("user_skills", "{{KICKOFF_SKILL}}")):
+        for key, p in ((ek + "manifest_path", "{{MANIFEST_PATH}}"), (ek + "user_skills", "{{KICKOFF_SKILL}}")):
             if p in need and not ans[key]:
                 sys.exit("memory-tree render: REFUSED, kickoff-manifest is selected and "
-                         ".governance/deploy.toml answers no %s, so %s has no declared path. "
-                         "Answer it there; this render does not guess one" % (key, p))
-    got = {
+                         ".governance/deploy.toml answers no %s, under [answers] or "
+                         "[kit.kickoff-manifest], so %s has no declared path. Answer it there; this "
+                         "render does not guess one" % (key[len(ek):], p))
+    skill = None
+    if "kickoff-manifest" in kits and ans[ek + "user_skills"]:
+        skill = "%s/session-kickoff/SKILL.md" % ans[ek + "user_skills"]
+        if not re.match(r"~|/|[A-Za-z]:[/\\]", skill):
+            tracked = subprocess.run(["git", "-C", str(root), "ls-files", "--", skill],
+                                     capture_output=True, text=True, encoding="utf-8", errors="replace")
+            skill = skill if (tracked.stdout or "").strip() else None
+    got.update({
         "{{GATE_RUNNER}}": ans["GATE_RUNNER"],
-        "{{MANIFEST_PATH}}": "kickoff-manifest" in kits and ans["manifest_path"],
-        "{{KICKOFF_SKILL}}": "kickoff-manifest" in kits and "%s/session-kickoff/SKILL.md" % ans["user_skills"],
-        "{{REVIEW_PROTOCOL}}": "review-harness" in kits and "{{MEMORY_ROOT}}/guides/REVIEW-PROTOCOL.md",
-        "{{UNATTENDED_PROTOCOL}}": "unattended" in kits and "{{MEMORY_ROOT}}/guides/UNATTENDED-PROTOCOL.md",
+        "{{MANIFEST_PATH}}": "kickoff-manifest" in kits and ans[ek + "manifest_path"],
+        "{{KICKOFF_SKILL}}": skill,
         "{{SPEC_TOKEN_CHECKER}}": ans["gov_source"] == "." and "{{TOOL_ROOT}}check-spec-tokens.py",
-    }
+    })
 for p in need:
-    print("%s\t%s" % (p, "`%s`" % got[p] if got.get(p) else said[p]))
-try:
-    pfx = json.loads((root / ".governance" / "install.json").read_text(encoding="utf-8")).get("prefix")
-except (OSError, ValueError, AttributeError):
-    pfx = None
+    emit(p, "`%s`" % got[p] if got.get(p) else said[p])
 pfx = str(pfx or "").strip("/")
 if pfx and pfx != ".":
-    print("{{TOOL_ROOT}}\t%s/" % pfx)' "$2" "${@:3}"
+    emit("{{TOOL_ROOT}}", "%s/" % pfx)
+' "$2" "${@:3}"
 }
 # <<< derive_kit_paths

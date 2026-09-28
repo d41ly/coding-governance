@@ -553,23 +553,41 @@ def resolve_answers(engine_dir: Path, gov_root: Path, target: Path,
 
     A key the descriptor declares as a placeholder resolves exactly as `render` resolves it: the
     same precedence, the same probe, the same refusal. `kits` is the selection `render` grades.
+    `kit.<entry>.<key>` is the value govkit's `target_context` interpolates for that entry's
+    `{<key>}` token: the `[kit.<entry>]` value over the `[answers]` value, or None when neither
+    table answers it, where govkit falls back to its own default (`memory` for `memory_root`).
     Any other key is the `[answers]` value, then the file's top-level value, or None when it has
     neither — the caller owns what an absent answer means, because only it knows whether it needs one.
+
+    rev-3 (the closing review's C6): every key compares case-insensitively, as `[answers]` and
+    `[charter]` already do here, so one question never has two answers selected by spelling.
     """
     desc, _blocks, entries = load_declarations(*resolve_declaration_paths(engine_dir, gov_root))
     dep, cfg, answers = read_deploy(target)
     rows = desc.get('placeholder', [])
-    by_key = {r['key']: r for r in rows}
+    by_key = {r['key'].upper(): r for r in rows}
     charter = read_charter_table(cfg, rows, read_argv_tokens(desc))
+    top = {str(k).lower(): v for k, v in cfg.items()}
+    per_entry = cfg.get('kit') if isinstance(cfg.get('kit'), dict) else {}
     out: dict = {}
     for key in keys:
-        if key in by_key:
-            out[key] = resolve_placeholder_value(by_key[key], charter, answers, target)[0]
-        elif key == 'kits':
+        low = key.lower()
+        if key.upper() in by_key:
+            out[key] = resolve_placeholder_value(by_key[key.upper()], charter, answers, target)[0]
+            continue
+        if low == 'kits':
             out[key] = sorted(read_kits(dep, cfg, entries))
+            continue
+        if low.startswith('kit.') and low.count('.') >= 2:
+            eid, sub = low[len('kit.'):].rsplit('.', 1)
+            table = per_entry.get(eid)
+            val = ({str(k).lower(): v for k, v in table.items()}.get(sub)
+                   if isinstance(table, dict) else None)
+            if not isinstance(val, str):
+                val = answers.get(sub)
         else:
-            val = answers.get(key.lower(), cfg.get(key))
-            out[key] = val if isinstance(val, str) and val else None
+            val = answers.get(low, top.get(low))
+        out[key] = val if isinstance(val, str) and val else None
     return out
 
 
@@ -840,6 +858,31 @@ def run_selftest() -> int:
         failed += 1
         print(f'  arm FAIL --answers agrees with render — got {got!r}, kits graded {graded}')
 
+    # TOOL-aRepatriatedFork-42 rev-3 (C4, C6) — one answer whatever the spelling, and govkit's
+    # per-entry overlay: `[kit.<entry>]` over `[answers]`, falling back to it, null when neither says.
+    with tempfile.TemporaryDirectory() as td:
+        eng, tgt = _write_fixture(Path(td), ok_kits, ok_var)
+        (eng / 'playbook.kit.toml').write_text(
+            DESC_FIXTURE + '\n[[placeholder]]\nkey = "GATE_RUNNER"\nclass = "derived"\n'
+            'probe = "gate_runner"\n', encoding='utf-8')
+        (tgt / '.governance' / 'deploy.toml').write_text(
+            'gov_source = "../gov"\nkits = ["codebase-map", "lexicon"]\n\n[answers]\n'
+            'playbook_path = "CHARTER.md"\nvariances_a = "plain"\nGate_Runner = "bash g.sh"\n'
+            'manifest_path = "m.md"\n\n[kit.kickoff-manifest]\nManifest_Path = "x.md"\n',
+            encoding='utf-8')
+        keys = ['gate_runner', 'GATE_RUNNER', 'KITS', 'Manifest_Path', 'GOV_SOURCE',
+                'kit.kickoff-manifest.manifest_path', 'KIT.Kickoff-Manifest.MANIFEST_PATH',
+                'kit.memory-tree.manifest_path', 'kit.kickoff-manifest.nope']
+        got = resolve_answers(eng, Path(td), tgt, keys)
+    want = dict(zip(keys, ['bash g.sh', 'bash g.sh', ['codebase-map', 'lexicon'], 'm.md', '../gov',
+                           'x.md', 'x.md', 'm.md', None]))
+    if got == want:
+        passed += 1
+    else:
+        failed += 1
+        print(f'  arm FAIL --answers is case-insensitive and applies the per-entry overlay — '
+              f'got {got!r}')
+
     # TOOL-aRepatriatedFork-38 — a conf value keeps no trailing comment, quoted or not.
     with tempfile.TemporaryDirectory() as td:
         (Path(td) / '.memory-tree.conf').write_text(
@@ -949,4 +992,4 @@ def main(argv: list[str]) -> int:
 if __name__ == '__main__':
     raise SystemExit(main(sys.argv[1:]))
 
-KIT_PLAYBOOK_RENDER_VERSION = "1.10"  # gov:kit playbook-render@1.10
+KIT_PLAYBOOK_RENDER_VERSION = "1.11"  # gov:kit playbook-render@1.11

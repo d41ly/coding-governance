@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.102 -->
+<!-- gov:kit memory-tree@2.103 -->
 # The build method — how a multi-pass build runs
 
 ## M1 — What this is
@@ -126,7 +126,7 @@ reviewed by that run is false.
 **Run it as a `Workflow` script, not as direct `Agent` spawns.** The direct-spawn budget is keyed per PROMPT TURN
 and an unattended run has no next prompt to reset it: three specs audited directly exhaust it mid-set and the rest
 are refused with nobody reading. Agents inside a `Workflow` sidechain are not counted. Shape and caps:
-`memory/guides/REVIEW-PROTOCOL.md`, **read there.**
+the review protocol of this repo, **read there.**
 
 **Lenses: 3–5, primed with the mandate, the overview and the spec format.** The catalogue —
 underspecification, contradiction, unstated assumption, prior art — with what each hunts, is in
@@ -272,7 +272,7 @@ park, not a waiver, and its unit does not close. Left-shift every confirmed find
 **Landing** — `land-once-done` and `conflicts-reconciled` between them: merge and push
 authorization, the lander, the bypass ban, additive reconciliation of a shared record, and when a
 build may land at all. Both are template §1 Landing and
-`memory/guides/UNATTENDED-PROTOCOL.md`; neither is restated here.
+the unattended-run protocol of this repo; neither is restated here.
 
 ## M9 — The wrap-up — a derivation, not a recollection
 
@@ -297,7 +297,7 @@ apply: §16 budgets a completion message, and this is the only turn the owner ge
 ## M10 — If the run is unattended
 
 Three deltas, and no others. The contract — mandate, run state, phases, witnesses, DoD, keepalive, landing — is
-`memory/guides/UNATTENDED-PROTOCOL.md`, deliberately not paraphrased here.
+the unattended-run protocol of this repo, deliberately not paraphrased here.
 
 - **Nobody reads the transcript**, which is `minimal-prose`. Speak only when it changes what happens
   next: a refusal, an abort, a park, the
@@ -316,8 +316,8 @@ Three deltas, and no others. The contract — mandate, run state, phases, witnes
 
 The carriers, what each owns, and when to load it: **`tools/memory-tree/README.md`, section "The method's
 pointer table"**. The six are `~/.claude/skills/session-kickoff/SKILL.md`, `memory/TEMPLATE-SPEC.md`,
-`memory/guides/REVIEW-PROTOCOL.md`, `memory/HYGIENE.md`, the governance template with its companion, and
-`memory/guides/UNATTENDED-PROTOCOL.md`. Names here, scopes there — one hop, and this file stays re-readable.
+the review protocol of this repo, `memory/HYGIENE.md`, the governance template with its companion, and
+the unattended-run protocol of this repo. Names here, scopes there — one hop, and this file stays re-readable.
 
 ## M12 — Research, test, choose — when the solution is not given
 

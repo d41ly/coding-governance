@@ -660,6 +660,33 @@ def check_playbook_hole_modes(tmp: pathlib.Path) -> None:
           p.stdout + p.stderr)
 
 
+def check_answers_parity(tmp: pathlib.Path) -> None:
+    """TOOL-aRepatriatedFork-42 rev-3 (review C4). The playbook engine's `--answers` states, for
+    `kit.<entry>.<key>`, the value `target_context` interpolates for that entry's `{<key>}` token.
+    The engine ships without govkit and cannot import it, so the one copy of the overlay it carries
+    is pinned HERE against the original, over a target answering each key in both tables."""
+    spec = importlib.util.spec_from_file_location(
+        "render_playbook_parity", HERE.parent / "playbook" / "render_playbook.py")
+    rp = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(rp)
+    t = make_target(tmp / "answers-parity", (
+        'gov_source = "local"\nprefix = "tools"\nkits = ["memory-tree", "kickoff-manifest"]\n\n'
+        '[answers]\nmemory_root = "docs/mem"\nmanifest_path = "docs/SESSION-KICKOFF.md"\n'
+        'user_skills = "~/.claude/skills"\n\n[kit.kickoff-manifest]\nmanifest_path = "x.md"\n\n'
+        '[kit.memory-tree]\nmemory_root = "notes"\n'))
+    G = govkit_module()
+    deploy = G.load_deploy(t)
+    pairs = [("kickoff-manifest", "manifest_path"), ("kickoff-manifest", "user_skills"),
+             ("memory-tree", "memory_root"), ("review-harness", "memory_root"),
+             ("memory-tree", "manifest_path")]
+    got = rp.resolve_answers(HERE.parent / "playbook", HERE.parent.parent, t,
+                             [f"kit.{e}.{k}" for e, k in pairs])
+    want = {f"kit.{e}.{k}": G.target_context(t, deploy, e, {}).get(k) for e, k in pairs}
+    check("[aRF-42 rev-3 AC9] --answers kit.<entry>.<key> agrees with target_context on every "
+          "overlay and fallback", got == want and want["kit.kickoff-manifest.manifest_path"] == "x.md"
+          and want["kit.review-harness.memory_root"] == "docs/mem", f"engine {got!r} govkit {want!r}")
+
+
 def check_pytest_ini_probe(tmp: pathlib.Path) -> None:
     """DEPL-aRepatriatedFork-14 AC2, AC1's class — the `pytest-ini-knobs` hole through `check`.
 
@@ -1245,6 +1272,27 @@ def check_update_safety(tmp: pathlib.Path) -> None:
           and "still differs after the rollback: docs/stray.txt" in p.stdout
           and "still differs docs/stray.txt" in order, p.stdout[-1500:] + order)
 
+    # ---- TOOL-aRepatriatedFork-42 rev-3 (review I1) — AC11. A refused regenerate argv's REASON is
+    # ---- in update's failure line. Its stderr used to be captured and dropped, so an adopter render
+    # ---- refusing on an old sibling engine read as "exited 2 ... repaired by hand" and nothing else.
+    kit_rf = (SAFE_HEAD + 'version_from = { none = "fixture" }\n\n[check]\nnone = "fixture"\n\n'
+              '[[files]]\ninclude = "**"\nrole = "engine"\n\n'
+              '[[files]]\ninclude = ["tpl.md"]\nrole = "rendered"\nto = "docs/out.md"\n\n'
+              '[[regenerate]]\nargv = ["bash", "{kit}/gen.sh"]\n\n'
+              '[adopt]\nargv = ["bash", "{kit}/gen.sh"]\nmutates_index = false\n')
+    gen_rf = ('d="$(dirname "$0")"\nmkdir -p docs\ncat "$d/eng.txt" > docs/out.md\n'
+              'if grep -q v2 "$d/eng.txt"; then echo "gen: REFUSED, the sibling it asks is too old" >&2; '
+              'exit 5; fi\n')
+    g, _a = build_gov17("rf", kit_rf, {"eng.txt": "v1\n", "gen.sh": gen_rf, "tpl.md": "tpl\n"})
+    t = build_target17(g, "rf")
+    write_gov17(g, kit_rf, {"eng.txt": "v2\n"}, "B")
+    p = run_gov17(g, "update", "--target", str(t), "--write")
+    line = next((ln for ln in (p.stdout + p.stderr).splitlines()
+                 if "re-render/regenerate argv exited 5" in ln), "")
+    check("[aRF-42 rev-3 AC11] a refused regenerate argv's stderr reason is in update's failure line",
+          p.returncode != 0 and "gen: REFUSED, the sibling it asks is too old" in line,
+          (p.stdout + p.stderr)[-1500:])
+
     # ---- S3, S4 — AC5, AC6, AC7. One conflicting engine file carrying a lone CR inside an awk
     # ---- program on its first line, and one engine file whose four lone CRs a target lost.
     conf_a = b"awk '{ gsub(\"\r\", \"\") }' \"$1\"\nmode=one\ntail\n"
@@ -1582,6 +1630,7 @@ def main() -> int:
         check("that message names the kit", "claims kit 'ghost-kit'" in p.stdout, p.stdout)
 
         check_playbook_hole_modes(tmp / "pb")
+        check_answers_parity(tmp / "ap")
         check_shipped_verb(tmp)
         check_epoch_verb(tmp)
         check_adopter_owned(tmp / "own")
