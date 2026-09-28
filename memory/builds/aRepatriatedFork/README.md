@@ -169,11 +169,11 @@ ids TOOL-aRepatriatedFork-32 TOOL-aRepatriatedFork-33 TOOL-aRepatriatedFork-34 T
 | [TOOL-aRepatriatedFork-38 — every conf reader drops a trailing comment the way bash does](spec/2026-09-25-spec-TOOL-aRepatriatedFork-38.md) | 19 | 1 | CLOSED | rev-3 | 2026-09-26 |
 | [TOOL-aRepatriatedFork-39 — hygiene check 14 counts present-tense citations only, as check 15 does](spec/2026-09-28-spec-TOOL-aRepatriatedFork-39.md) | 19 | 1 | CLOSED | rev-2 | 2026-09-28 |
 | [TOOL-aRepatriatedFork-40 — recall anchors an id on the spec H1 that defines it](spec/2026-09-28-spec-TOOL-aRepatriatedFork-40.md) | 19 | 1 | CLOSED | rev-2 | 2026-09-28 |
-| [TOOL-aRepatriatedFork-42 — the memory-tree renders take every adopter path from the adopter's own declarations](spec/2026-09-29-spec-TOOL-aRepatriatedFork-42.md) | 19 | 1 | CLOSED | rev-2 | 2026-09-29 |
+| [TOOL-aRepatriatedFork-42 — the memory-tree renders take every adopter path from the adopter's own declarations](spec/2026-09-29-spec-TOOL-aRepatriatedFork-42.md) | 19 | 1 | CLOSED | rev-3 | 2026-09-29 |
 | [DEPL-aRepatriatedFork-20 — inCMS converges onto gov's memory-tree programs](spec/2026-09-23-spec-DEPL-aRepatriatedFork-20.md) | 20 | 2 | INPROGRESS | rev-10 | 2026-09-29 |
 <!-- /gen:build-units -->
 
-Records: 74 bound to this build, across 4 record folder(s).
+Records: 75 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
