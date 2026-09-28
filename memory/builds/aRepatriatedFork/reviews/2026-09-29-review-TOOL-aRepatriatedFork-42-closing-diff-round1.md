@@ -18,7 +18,7 @@ excluded).
 Two HIGH findings reproduced: an answer carrying a newline silently deletes text from all four
 renders, and a memory-tree kit landed beside a playbook engine older than the one it calls cannot
 render at all. The rest are MEDIUM and LOW contract gaps in the same derivation block. Every one
-reproduced red on the `f02a3a56` bytes and is FOLDED into the unit's spec as a rev-3 bump.
+reproduced red on the `f02a3a56` bytes and is FIXED under the unit's spec at rev-3.
 
 ## Review shape and run integrity
 
@@ -65,17 +65,17 @@ engine beside it with a two-row descriptor. Rendered by that commit's own adopte
 
 | id | finder severity | red-first | final | disposition |
 |---|---|---|---|---|
-| C1 | HIGH | reproduced | HIGH | FOLDED S7 — a value carrying a tab, CR or newline is a named refusal before any file is written |
-| C2 | HIGH | reproduced | HIGH | FOLDED S8 — the render reads the engine's version first; below the floor it states the phrases with one stderr line |
-| I1 | HIGH | reproduced | HIGH | FOLDED S8 — same defect as C2; the edge is declared, and update prints a refused argv's stderr |
-| C3 | MEDIUM | reproduced | MEDIUM | FOLDED S9 — UTF-8 in both directions |
-| I2 | MEDIUM | reproduced | MEDIUM | FOLDED S9 — same defect as C3, from the refusal side |
-| C4 | MEDIUM | reproduced | MEDIUM | FOLDED S10 — `--answers` takes govkit's per-entry overlay; a memory root declared twice must agree |
-| C5 | MEDIUM | reproduced | LOW | FOLDED S11 — a neutral phrase, like the other four |
-| C6 | LOW | reproduced | LOW | FOLDED S10 — keys compare case-insensitively, as `[answers]` and `[charter]` already do |
-| C7 | LOW | reproduced | LOW | FOLDED S11 — the sentence names no gate-leg path |
-| I3 | MEDIUM | reproduced | MEDIUM | FOLDED S11 — a repo-relative skill path renders only when git tracks it |
-| I4 | LOW | reproduced | LOW | FOLDED S11 — the protocol paths come from the kit's rendered receipt row |
+| C1 | HIGH | reproduced | HIGH | FIXED S7 — a value carrying a tab, CR or newline is a named refusal before any file is written |
+| C2 | HIGH | reproduced | HIGH | FIXED S8 — the render reads the engine's version first; below the floor it states the phrases with one stderr line |
+| I1 | HIGH | reproduced | HIGH | FIXED S8 — same defect as C2; the edge is declared, and update prints a refused argv's stderr |
+| C3 | MEDIUM | reproduced | MEDIUM | FIXED S9 — UTF-8 in both directions |
+| I2 | MEDIUM | reproduced | MEDIUM | FIXED S9 — same defect as C3, from the refusal side |
+| C4 | MEDIUM | reproduced | MEDIUM | FIXED S10 — `--answers` takes govkit's per-entry overlay; a memory root declared twice must agree |
+| C5 | MEDIUM | reproduced | LOW | FIXED S11 — a neutral phrase, like the other four |
+| C6 | LOW | reproduced | LOW | FIXED S10 — keys compare case-insensitively, as `[answers]` and `[charter]` already do |
+| C7 | LOW | reproduced | LOW | FIXED S11 — the sentence names no gate-leg path |
+| I3 | MEDIUM | reproduced | MEDIUM | FIXED S11 — a repo-relative skill path renders only when git tracks it |
+| I4 | LOW | reproduced | LOW | FIXED S11 — the protocol paths come from the kit's rendered receipt row |
 
 C5 grades LOW rather than MEDIUM: the phrase is false only where the protocol exists and the render
 could not ask, and it names no path, so nothing resolves to a dead one.
@@ -90,3 +90,21 @@ playbook-render (`derive_unsatisfied_requires`, called by `_cmd_apply`). And no 
 Below the floor the render states the phrases rather than refusing. A tree whose engine was rolled
 back after its docs were rendered then shows a named parity drift, and that stderr line says which
 update repairs it.
+
+## After the fold, at the two adopters
+
+Scratch clones, each taken through `govkit update --write` from the fold's HEAD.
+
+- **inCMS** at `f1d1c75a3`: exit 0, both `--render` argv exit 0. The build method names `bash
+  scripts/gate.sh`, `.claude/SESSION-KICKOFF.md` and `~/.claude/skills/session-kickoff/SKILL.md`,
+  states the review-protocol phrase since its receipt holds no rendered row for it, and names the
+  unattended protocol at its rendered row. The parity leg is green. Hygiene check 15 asks for four
+  dead-path rows to be deleted, the review protocol's among them, which is the hands-off to
+  DEPL-aRepatriatedFork-20.
+- **nc** at `1e308c9b`: both `--render` argv exit 0 and no unwaived dead path appears; the kickoff
+  skill states its phrase, since nc tracks it as a single file. The update exits 1 for reasons this
+  unit does not touch, among them playbook-render rolled back to 1.0 on a conflict in nc's own
+  playbook descriptor. That is the state this review's C2 described: the docs were rendered with the
+  1.11 engine's answers, the rolled-back engine answers nothing, and the parity leg reports the drift
+  with the floor line naming `govkit update --kits playbook-render`. With the 1.11 engine in place
+  the parity leg is green.

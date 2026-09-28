@@ -260,6 +260,8 @@ none
   asks the kickoff answers through govkit's per-entry overlay, holds one memory root, and takes the
   protocol destinations from the receipt; `govkit update` prints a refused argv's reason.
   memory-tree and playbook-render bump again in every carrier.
+  Built: every new arm green, each red on the `f02a3a56` bytes. inCMS renders its own bar,
+  manifest and the review-protocol phrase; nc renders with no new dead path.
 
 ## 10. Reuse audit
 
