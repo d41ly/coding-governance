@@ -281,6 +281,70 @@ def cleanup(root: pathlib.Path) -> None:
         pass          # survivors are the final arm's business, not an exception here
 
 
+# ---- the live-log baseline, taken HERE and not in main() ----------------------------------------
+# `check()` above runs each arm INSIDE the decorator, so every arm has already executed by the time
+# `main()` is entered. A baseline taken there brackets nothing, and the row it feeds reported `ok`
+# while four fixture queries (qids 592-595) sat in this repository's real log — observed 2026-09-22
+# on node `d`. Module scope, above the first `@check`, is what brackets the arms. TOOL-dHashedPrelude-1.
+#
+# WHAT THIS DOES NOT CHECK, stated so the row is never read as more than it is:
+#   * A CONCURRENT WRITER. This is a whole-file digest and the log is shared by every session in
+#     this repository, so a row another session appends while this suite runs is indistinguishable
+#     from a row an arm wrote. That cuts both ways: it can red an innocent run and it can mask a
+#     guilty one. Measured: rows arrived here mid-run during this unit's own build.
+#   * THE CACHE. Only `recall/queries.jsonl` is bracketed. The `recall/cache/` tree beside it is
+#     written by ordinary queries and by eviction, and nothing here looks at it.
+#   * A LOG ABSENT AT BOTH ENDS. Two absent readings compare equal, so a tree with no log at all
+#     reports exactly like a tree whose log was protected.
+#   * A WRITE THAT IS REVERTED. Only the endpoints are read. An arm that appends a row and removes
+#     it again before `main()` reaches the compare leaves nothing for this to see.
+
+
+def _live_log_path():
+    """The path this suite brackets, or None when no repository resolves.
+
+    `repo_root()` anchors on this kit's own file rather than the cwd (TOOL-aCollapsedScan-7), so
+    this is the REAL repository even for an arm that has chdir'd into a throwaway fixture. That is
+    exactly why the bracket is worth taking.
+    """
+    try:
+        return git_common_dir(recall_conf.repo_root()) / "recall" / "queries.jsonl"
+    except Exception:  # noqa: BLE001 — no repo, no log to protect
+        return None
+
+
+def _live_log_digest(live):
+    """The digest of `live`, or the absent-sentinel. Raises for neither a missing repo nor a
+    missing file, because both are states the guard reports rather than crashes on."""
+    if live is None:
+        return "(absent)"
+    return hashlib.sha256(live.read_bytes()).hexdigest() if live.exists() else "(absent)"
+
+
+_LIVE_LOG = _live_log_path()
+_LIVE_LOG_BEFORE = _live_log_digest(_LIVE_LOG)
+_LIVE_LOG_ROW = "the live query log is byte-identical after this run"
+
+
+def _live_log_row(live, before) -> tuple[str, str, str]:
+    """The guard's verdict, as the `(state, name, detail)` triple `_checks` holds.
+
+    A FUNCTION rather than a branch inside `main()`, so an arm can drive all four states. Two of
+    them cannot be produced by running this suite in a real repository at all: an unresolvable
+    repository, and a log that does not exist.
+
+    The unresolvable case returns a `skip`. It used to emit NO ROW — `main()` guarded the append on
+    the path being set — and a row that is absent is indistinguishable from a clean run, which is
+    the same green-by-absence this guard exists to catch, on the guard's own row.
+    """
+    if live is None:
+        return ("skip", _LIVE_LOG_ROW, "the repository did not resolve, so nothing was bracketed")
+    after = _live_log_digest(live)
+    if after == before:
+        return ("ok", _LIVE_LOG_ROW, before[:12])
+    return ("FAIL", _LIVE_LOG_ROW, f"the gate wrote to it: {before[:12]} -> {after[:12]}")
+
+
 # ------------------------------------------------------------------------------------ the arms
 
 
@@ -2632,14 +2696,9 @@ def test_digest_follows_grammar_keys_only():
 
 
 def main() -> int:
-    # The live log of the repo this kit sits in, hashed before and after: a gate that writes to the
-    # instrument it measures is how upstream's log came to be 96% self-inflicted refusals.
-    try:
-        live = git_common_dir(recall_conf.repo_root()) / "recall" / "queries.jsonl"
-        before = hashlib.sha256(live.read_bytes()).hexdigest() if live.exists() else "(absent)"
-    except Exception:  # noqa: BLE001 — no repo, no log to protect
-        live, before = None, "(absent)"
-
+    # The live-log baseline is NOT taken here. It is taken at module scope, above the first `@check`,
+    # because every arm runs at decoration time and a baseline taken in this function brackets
+    # nothing. The block above the arms says what the bracket does and does not cover.
     order = [
         test_parser_vs_bash, test_no_conf_query, test_no_conf_adopt, test_empty_alias,
         test_spine_flat_layout, test_spine_nested_layout, test_durable_derives_families, test_chunk_arm_rolls_up,
@@ -2697,13 +2756,9 @@ def main() -> int:
         else ("FAIL", "the arm-count pin ends an unbroken provenance chain", _chain)
     )
 
-    if live is not None:
-        after = hashlib.sha256(live.read_bytes()).hexdigest() if live.exists() else "(absent)"
-        _checks.append(
-            ("ok", "the live query log is byte-identical after this run", f"{before[:12]}")
-            if after == before
-            else ("FAIL", "the live query log is byte-identical after this run", "the gate wrote to it")
-        )
+    # UNCONDITIONAL. A row that is absent reads as a clean run, so every state gets a row and the
+    # count of appended run-property rows stops depending on the environment.
+    _checks.append(_live_log_row(_LIVE_LOG, _LIVE_LOG_BEFORE))
 
     # TOOL-dRetiredFork-2 — the git-environment scrub at the top of this file, asserted rather than
     # trusted. Appended here for the same reason the sweep below is: it is a property of the RUN.
