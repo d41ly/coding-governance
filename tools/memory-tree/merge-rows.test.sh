@@ -50,6 +50,22 @@ PY=$(resolve_python) || { echo "FAIL no usable python on this host — every arm
 DRV="bash $KIT_REL/lib/pyrun.sh $KIT_REL/memory-tree/merge-rows.py"
 bad() { echo "FAIL $1"; st=1; }
 
+# THE DRIVER'S OWN KIT, laid WHOLE into every scratch install below, and the set is DERIVED from the
+# kit directory rather than typed. `merge-rows.py` loads siblings of its own at run time: `backlog.py`
+# for the view/shard refusal that opens EVERY merge, `tree_lib.py` for the conf read, and
+# `gen_build_index.py` by path for `--check`. A fixture carrying a hand-typed subset holds a driver
+# that cannot start, and that is how the end-to-end and linked-worktree arms went red when
+# TOOL-dDerivedDocket-10 gave the driver its view predicate: their lists predated `backlog.py`, the
+# driver failed closed on `ModuleNotFoundError`, and git reported a conflict nobody could trace to a
+# fixture. It also left the fail-closed arms green for the WRONG reason, since each died on that
+# import before reaching the failure it stages. A glob of the kit is what an adopter's copy-install
+# lays, so a sibling the driver gains later arrives in every fixture with no edit here. The source is
+# `$HERE`, this suite's own directory, which IS the kit: derived, so it names no install prefix.
+seed_driver_kit() {  # $1 = the scratch kit directory -> every module of this kit plus its launcher
+  mkdir -p "$1"
+  cp "$HERE/"*.py "$HERE/merge-rows.sh" "$1/"
+}
+
 # THE ORACLE — a family-agnostic id shape, deliberately NOT the driver's grammar. Keying the
 # assertion on the same regex the driver keys the merge on would make every arm self-consistent and
 # blind: a grammar that stopped recognising a row would remove it from BOTH sides of the comparison.
@@ -280,28 +296,35 @@ printf '%s\n' "$copies" | grep -qx 'tools/memory-tree/merge-rows.sh' \
 # failures land in main()'s fail-closed handler. Simulated on scratch trees rather than by breaking
 # the real kit under a concurrently-running gate. This is corpus case C18, the worst class in it, and
 # the redesign does not touch the property — so it is re-proven here rather than assumed (AC17).
-failclosed() {  # $1 label · $2 scratch tree holding $KIT_REL/memory-tree/merge-rows.py
+#
+# AND EACH ARM NAMES ITS CAUSE ($3). Failing closed is not enough, because EVERY broken scratch tree
+# fails closed: when the driver gained `backlog.py` and these trees did not, all three died on that
+# import before reaching the failure each stages, and stayed green. The driver's FAILED line carries
+# the exception, so each arm requires the one it staged.
+failclosed() {  # $1 label · $2 scratch tree holding $KIT_REL/memory-tree/merge-rows.py · $3 cause
   { pre; row TOOL-zFixture-1 base; } > "$TMP/o"
   { pre; row TOOL-zFixture-1 base; } > "$TMP/a"
   { pre; row TOOL-zFixture-1 base; row TOOL-zFixture-2 INCOMING; } > "$TMP/b"
-  if "$PY" "$2/tools/memory-tree/merge-rows.py" "$TMP/o" "$TMP/a" "$TMP/b" x >/dev/null 2>&1; then
+  if "$PY" "$2/tools/memory-tree/merge-rows.py" "$TMP/o" "$TMP/a" "$TMP/b" x >/dev/null 2>"$TMP/fcerr"; then
     bad "$1: the driver reported SUCCESS with no resolvable anchor grammar"
   fi
   grep -q 'INCOMING' "$TMP/a" || bad "$1: the incoming row vanished — this is the silent-take-ours shape"
   grep -q '^<<<<<<< ours$' "$TMP/a" || bad "$1: no conflict markers written"
+  grep -qF "FAILED ($3" "$TMP/fcerr" \
+    || bad "$1: the driver failed closed for a reason other than the staged one ($3): $(head -1 "$TMP/fcerr" | cut -c1-160)"
 }
 mkscratch() { local d; d=$(mktemp -d); SCRATCH="$SCRATCH $d"
   mkdir -p "$d/tools/memory-tree" "$d/tools/memory-recall"
-  cp $KIT_REL/memory-tree/merge-rows.py "$d/tools/memory-tree/"
+  seed_driver_kit "$d/tools/memory-tree"
   printf '%s' "$d"; }
 S=$(mkscratch); cp .memory-tree.conf "$S/"
 printf 'this is not valid syntax(\n' > "$S/tools/memory-recall/extract.py"
-failclosed "broken grammar" "$S"
+failclosed "broken grammar" "$S" "SyntaxError: "
 S=$(mkscratch); cp .memory-tree.conf "$S/"          # kit dir present, extract.py absent
-failclosed "missing grammar module" "$S"
+failclosed "missing grammar module" "$S" "LookupError: no memory-recall kit"
 S=$(mkscratch)                                       # no .memory-tree.conf above the driver
 cp $KIT_REL/memory-recall/extract.py $KIT_REL/memory-recall/recall_conf.py "$S/tools/memory-recall/"
-failclosed "missing .memory-tree.conf" "$S"
+failclosed "missing .memory-tree.conf" "$S" "RuntimeError: no .memory-tree.conf"
 
 # --- 0d. the oracle sees a row the driver's grammar does NOT, and `dups` fires ---------------------
 # The oracle earns its keep only if it can see something the subject cannot; otherwise "independent"
@@ -593,7 +616,7 @@ audit "a structure conflict at rc 1" 1 0 0 1
 E=$(mktemp -d); SCRATCH="$SCRATCH $E"
 mkdir -p "$E/tools/memory-tree" "$E/tools/memory-recall" "$E/tools/lib" "$E/memory/backlog"
 cp .memory-tree.conf "$E/"
-cp $KIT_REL/memory-tree/merge-rows.py "$E/tools/memory-tree/"
+seed_driver_kit "$E/tools/memory-tree"
 cp $KIT_REL/memory-recall/extract.py $KIT_REL/memory-recall/recall_conf.py "$E/tools/memory-recall/"
 cp $KIT_REL/lib/pyrun.sh $KIT_REL/lib/resolve-python.sh "$E/tools/lib/"
 (
@@ -1585,8 +1608,7 @@ done < "$TMP/recipe"
 # it — the incoming rows simply absent, nothing saying so.
 S=$(mkscratch); cp .memory-tree.conf "$S/"
 cp $KIT_REL/memory-recall/extract.py $KIT_REL/memory-recall/recall_conf.py "$S/tools/memory-recall/"
-cp $KIT_REL/memory-tree/backlog.py $KIT_REL/memory-tree/corpus_ids.py $KIT_REL/memory-tree/tree_lib.py \
-   "$S/tools/memory-tree/"
+# `backlog.py` and its siblings are already here, because `mkscratch` lays the whole kit.
 # `git init` AND NOT A TIDY-UP: `recall_conf.resolve` refuses a root that is not inside a git
 # repository, so without this the liveness control below fails for that reason and the broken-import
 # arm after it would be graded against a tree that never worked.
@@ -1649,7 +1671,7 @@ MR=tools/memory-recall
 LIB=tools/lib
 mkdir -p "$W/$MT" "$W/$MR" "$W/$LIB" "$W/memory/backlog"
 cp "$ROOT/.memory-tree.conf" "$W/"
-cp "$ROOT/$MT/merge-rows.py" "$ROOT/$MT/merge-rows.sh" "$W/$MT/"
+seed_driver_kit "$W/$MT"
 cp "$ROOT/$MR/extract.py" "$ROOT/$MR/recall_conf.py" "$W/$MR/"
 cp "$ROOT/$LIB/pyrun.sh" "$ROOT/$LIB/resolve-python.sh" "$W/$LIB/"
 WT="$W-wt"; SCRATCH="$SCRATCH $WT"
@@ -1698,17 +1720,17 @@ WT="$W-wt"; SCRATCH="$SCRATCH $WT"
 
 # ONE FIXTURE REPOSITORY BUILDER for every group below, wired exactly the way a node is: the
 # SHIPPED `merge-rows.sh` wrapper through `git config merge.rows.driver`, never `pyrun.sh` and never
-# a direct python call. The five sibling modules travel with it because the refusal reads the view
-# layer and the `--check` probe reads the generated header, and a fixture missing one of them would
-# fail closed for a reason that has nothing to do with the arm. `tree_lib.py` is the fifth: the
-# driver's conf read, `corpus_ids` and the generator all import the kit's one conf parser from it,
-# and without it `--check` died on ModuleNotFoundError in every fixture this builder made.
+# a direct python call. The whole kit travels with it, through `seed_driver_kit`, because the
+# refusal reads the view layer and the `--check` probe reads the generated header, and a fixture
+# missing one of their modules would fail closed for a reason that has nothing to do with the arm.
+# `tree_lib.py` was the one a typed list here once missed: the driver's conf read, `corpus_ids` and
+# the generator all import the kit's one conf parser from it, and without it `--check` died on
+# ModuleNotFoundError in every fixture this builder made.
 mkfixrepo() {  # $1 = a directory -> a git repo on `main` with this kit wired as the row driver
   local d=$1 mt=tools/memory-tree mr=tools/memory-recall lb=tools/lib
   mkdir -p "$d/$mt" "$d/$mr" "$d/$lb" "$d/memory/backlog"
   cp "$ROOT/.memory-tree.conf" "$d/"
-  cp "$ROOT/$mt/merge-rows.py" "$ROOT/$mt/merge-rows.sh" "$ROOT/$mt/backlog.py" \
-     "$ROOT/$mt/corpus_ids.py" "$ROOT/$mt/gen_build_index.py" "$ROOT/$mt/tree_lib.py" "$d/$mt/"
+  seed_driver_kit "$d/$mt"
   cp "$ROOT/$mr/extract.py" "$ROOT/$mr/recall_conf.py" "$d/$mr/"
   cp "$ROOT/$lb/pyrun.sh" "$ROOT/$lb/resolve-python.sh" "$d/$lb/"
   git -C "$d" init -q -b main

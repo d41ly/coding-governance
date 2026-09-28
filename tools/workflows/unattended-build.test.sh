@@ -495,11 +495,14 @@ has "fallback: the unit with no brief is named" "$o" "A-tB-1 has no specBriefPat
 # ---- a per-writer one. The control is the SAME args with no `closes` anywhere: the writer of the unit
 # ---- that carries none must be handed a byte-identical prompt, or the new clause leaked into a group
 # ---- that asked for nothing.
+# ---- `specAudit` IS DECLARED in all three fixtures (VERIFYING, dDerivedDocket): they carry `subjects`,
+# ---- and TOOL-aBlindedTrial-3 refuses `subjects` beside no `specAudit` before any stage runs, so
+# ---- without it both controls threw and the byte comparison compared two empty prompts.
 CL_RET='{"spec":{"authored":["x"],"alreadyPresent":[],"refused":[],"summary":"s"},"workflow":{"blockers":0,"confirmed":0,"highs":0,"unverified":0,"report":"r.md"},"audit:record":{"token":"CONVERGED"}}'
-CL_WITH='{"repo":"/tmp/r","slug":"tB","scratch":"/tmp/s","subjects":[{"path":"s1","blob":"abc1234"}],"units":[
+CL_WITH='{"repo":"/tmp/r","slug":"tB","scratch":"/tmp/s","specAudit":"2026-09-20","subjects":[{"path":"s1","blob":"abc1234"}],"units":[
   {"id":"A-tB-1","order":1,"specPath":"s1","closes":["EXMP-aFoo-3","EXMP-aFoo-4"]},
   {"id":"A-tB-2","order":2,"specPath":"s2"}]}'
-CL_NONE='{"repo":"/tmp/r","slug":"tB","scratch":"/tmp/s","subjects":[{"path":"s1","blob":"abc1234"}],"units":[
+CL_NONE='{"repo":"/tmp/r","slug":"tB","scratch":"/tmp/s","specAudit":"2026-09-20","subjects":[{"path":"s1","blob":"abc1234"}],"units":[
   {"id":"A-tB-1","order":1,"specPath":"s1"},
   {"id":"A-tB-2","order":2,"specPath":"s2"}]}'
 o=$(run_wf "$CL_WITH" "$CL_RET")
@@ -513,7 +516,7 @@ hasnt_ "closes: the other unit's writer is not handed them" "$cw1" "EXMP-aFoo-3"
 same   "closes: a unit with no closes gets its prompt unchanged" "$cw1" "$cn1"
 hasnt_ "closes: with no closes anywhere, no writer is told of any" "$cn0" "this unit closes"
 n=$((n+1)); if [ -n "$cw1" ] && [ -n "$cn1" ]; then echo "ok   closes: both controls captured a prompt"; else echo "FAIL closes: a control captured no prompt, so the byte comparison above compared two empty strings"; st=1; fi
-o=$(run_wf '{"repo":"/tmp/r","slug":"tB","scratch":"/tmp/s","subjects":[{"path":"s1","blob":"abc1234"}],"units":[{"id":"A-tB-1","order":1,"specPath":"s1","closes":"EXMP-aFoo-3"}]}' "$CL_RET")
+o=$(run_wf '{"repo":"/tmp/r","slug":"tB","scratch":"/tmp/s","specAudit":"2026-09-20","subjects":[{"path":"s1","blob":"abc1234"}],"units":[{"id":"A-tB-1","order":1,"specPath":"s1","closes":"EXMP-aFoo-3"}]}' "$CL_RET")
 has "closes: a string in place of a list THROWS by name" "$o" "carries a \`closes\` that is not a non-empty array of ask ids"
 
 # ---- AC4: one dead writer is REFUSED, not dropped, and its siblings still return.
@@ -629,6 +632,9 @@ MT_ARGS='{"repo":"/tmp/r","kind":"spec-audit","subjects":[{"path":"s1","blob":"a
 # matches them, `typed` as the blockers and highs that audit's synthesis typed, and its `summary`.
 # `run_merged_review <returns>` runs the callee with its doubles answering as their SCHEMAS allow, so
 # a synthesis schema that stopped requiring `items` drops the key and reds the counting arms.
+# The lens and verdict doubles carry `path` because TOOL-dDerivedDocket-29 S1 made it REQUIRED on
+# both finding schemas and the verdict schema: under the strict runner a double without it comes back
+# null, every lens reads as dead, and the callee DEFERS before a single count is derived.
 build_merged_returns() {
   node -e '
     const shape = process.argv[3] ? JSON.parse(process.argv[3]) : {
@@ -640,8 +646,8 @@ build_merged_returns() {
       ({ id: i + 1, verdict: confirmed.has(i + 1) ? "confirmed" : "refuted", reason: "r" }))
     const out = {}
     for (const [prefix, count] of Object.entries(shape.lenses))
-      out[prefix] = { lens: "l", findings: Array.from({ length: count }, () => finding) }
-    out["verify:"] = { verdicts }
+      out[prefix] = { lens: "l", path: "/cd/find.json", findings: Array.from({ length: count }, () => finding) }
+    out["verify:"] = { path: "/cd/verify.json", verdicts }
     out.synth = { path: "r/merged.md", summary: shape.summary, blockers: shape.typed[0], highs: shape.typed[1],
       items: process.argv[1] === "absent" ? undefined : JSON.parse(process.argv[1]) }
     console.log(JSON.stringify(out))
@@ -1624,7 +1630,11 @@ if [ -f "$UK/adopt-unattended.sh" ]; then
     build_layout "$X" scripts/workflows scripts/unattended "$gp"
     cp "$UK/adopt-unattended.sh" "$UK/unattended.sh" "$UK/lib-unattended.sh" "$UK/check-unattended.sh" \
        "$UK"/*.template.md "$X/scripts/unattended/"
-    printf 'MEMORY_ROOT=memory\nLANDER="true"\nKEEPALIVE_CREATE="c"\nKEEPALIVE_DELETE="d"\nKEEPALIVE_INTERVAL="i"\n' \
+    # The durable-restart carrier pair is DECLARED (TOOL-dDerivedDocket-5 S1): with the switch at its
+    # default `on` the adopter keeps both placeholders standing and refuses to install the Skill, so a
+    # conf without them compared the harness's command against an empty string. Distinct from the
+    # keepalive pair, which S2 refuses as a carrier.
+    printf 'MEMORY_ROOT=memory\nLANDER="true"\nKEEPALIVE_CREATE="c"\nKEEPALIVE_DELETE="d"\nKEEPALIVE_INTERVAL="i"\nRESUME_SCHEDULE_CREATE="rc"\nRESUME_SCHEDULE_DELETE="rd"\n' \
       > "$X/.unattended.conf"
     ( cd "$X" && git add -A )
     run_layout "$X" scripts/workflows --render >/dev/null

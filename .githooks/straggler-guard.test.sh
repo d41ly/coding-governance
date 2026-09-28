@@ -238,6 +238,11 @@ out=$(run_in "$WT2" git rebase --no-verify main); rc=$?
 # nothing to relocate, so it must draw the merge-first notice and never the recipe, and it rebases.
 git -C "$F1" branch -q rot "$F1_BASE"
 WT3=$(add_topology_worktree "$F1" rot)
+# CREATED HERE, because git tracks no empty directory: `init_repo` makes `memory/archive/` in the
+# primary tree, but the base commit carries nothing under it, so a worktree checked out from that
+# commit has no such directory. Measured at the build's first bar: the write failed, nothing was
+# staged, and `git commit` exited 1 on "nothing to commit" — which this arm read as a refusal.
+mkdir -p "$WT3/memory/archive"
 printf '# rotated decisions\n\n- TOOL-aSeed-9 - a decision\n' > "$WT3/memory/archive/DECISIONS.2026-05-01.md"
 git -C "$WT3" add memory/archive >/dev/null 2>&1
 out=$(run_in "$WT3" git commit -m "rotate the decision log"); rc=$?
@@ -441,7 +446,16 @@ tout=$(bash "$SELF" --topology "$T" side); trc=$?
 after=$(git -C "$T" config --get core.hooksPath || true)
 [ "$trc" = 0 ] || print_failure "AC14: --topology exited $trc"; add_arm
 [ "$(printf '%s\n' "$tout" | grep -c .)" = 1 ] || print_failure "AC14: --topology printed more or fewer than one line: $tout"; add_arm
-git -C "$T" worktree list | grep -qF "$tout" || print_failure "AC14: the path --topology printed is not a worktree of the fixture: $tout"; add_arm
+# COMPARED IN GIT'S OWN SPELLING ON BOTH SIDES. The mode prints the path as the shell gave it, and
+# `worktree list` prints git's: under a POSIX-emulation shell on Windows those are `/tmp/…` and
+# `C:/Users/…/Temp/…` for one directory, so a text match of the one against the other redded a
+# correct helper at the build's first bar. Git names the printed path's top level itself, the
+# printed path must BE that top level, and the listing must carry it on `side` (the spec's AC14).
+tl=$(git -C "$tout" rev-parse --show-toplevel 2>/dev/null || true)
+tp=$(git -C "$tout" rev-parse --show-prefix 2>/dev/null || echo not-a-tree)
+{ [ -n "$tl" ] && [ -z "$tp" ] && git -C "$T" worktree list --porcelain | tr -d '\r' |
+    awk -v p="$tl" '/^worktree / { w = substr($0, 10) } $1 == "branch" && w == p && $2 == "refs/heads/side" { f = 1 } END { exit !f }'; } \
+  || print_failure "AC14: the path --topology printed is not a worktree of the fixture on 'side': $tout (git names it '$tl')"; add_arm
 printf '%s' "$tout" | grep -q PASS && print_failure "AC14: --topology printed a PASS line, so the mode reads as a suite run"; add_arm
 [ "$before" = "$after" ] || print_failure "AC14: --topology changed core.hooksPath from '$before' to '$after'"; add_arm
 hits=$(grep -c 'add_topology_worktree' "$SELF")

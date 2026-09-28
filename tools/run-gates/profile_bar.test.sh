@@ -19,7 +19,8 @@
 KIT_REL="${KIT_REL:-tools/run-gates}"
 set -u
 
-FLOOR_ASSERTIONS=39
+# 40: the interim-verdict arm added one executed assertion (TOOL-dDerivedDocket-26 and -23's verbs).
+FLOOR_ASSERTIONS=40
 
 HERE=$(cd "$(dirname "$0")" && pwd)
 export HERE_DIR="$HERE"   # the inline python arms import profile_bar from it
@@ -370,6 +371,30 @@ print("OK" if not bad else "UNMATCHED:%s" % bad)
 PYEOF
 )
 chk $([ "$RX" = OK ] && echo 0 || echo 1) "verb-regex arm: PINNED_VERBS vs VERDICT returned $RX"
+
+# ...and the two verbs that are NOT a leg's final verdict leave exactly one verdict per leg.
+# TOOL-dDerivedDocket-26 prints `GATE retry` in a deferred leg's manifest position and its `ok` or
+# `FAIL` after the serial retry; TOOL-dDerivedDocket-23 prints `GATE attr` beside a leg already
+# reported `FAIL`. Carrying the verbs without this collapse would count a retried leg twice and an
+# attributed red leg twice, which over-counts the work exactly as the dropped verb under-counted it.
+# The unresolved `cut leg` is a retry the wall cut, so it keeps its interim verdict.
+IV=$("$PY" - <<'PYEOF'
+import sys, os
+sys.path.insert(0, os.environ["HERE_DIR"])
+import profile_bar as p
+
+text = ("GATE retry  slow leg  (timed out after 9s beside 3 neighbours; one serial retry after the pool drains)\n"
+        "GATE ok    other leg\n"
+        "GATE FAIL  red leg  (exit 1)\n"
+        "GATE retry  cut leg  (timed out after 9s beside 3 neighbours; one serial retry after the pool drains)\n"
+        "GATE ok    slow leg  (retried after timeout)\n"
+        "GATE attr  red leg  OWN - a reason\n")
+got = p.parse_verdicts(text)
+want = [("slow leg", "ok"), ("other leg", "ok"), ("red leg", "FAIL"), ("cut leg", "retry")]
+print("OK" if got == want else "GOT:%s" % got)
+PYEOF
+)
+chk $([ "$IV" = OK ] && echo 0 || echo 1) "interim-verdict arm: parse_verdicts returned $IV"
 
 # ---------------------------------------------------------------------------------------- verdict
 if [ "$bad" -ne 0 ]; then

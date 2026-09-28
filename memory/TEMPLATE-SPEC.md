@@ -75,7 +75,7 @@ an absent region cannot be told from a spec nobody has recorded against.
 - The tail holds POINTERS and DECLARED VERBS only — a review workflow id, `ratified <date>`,
   `order <n>` — never prose.
 - `closes <id>` and `advances <id>` are the two BACKLOG verbs, legal ONLY where
-  `.memory-tree.conf` declares `BACKLOG_MODE=builds`. They join a spec to an ask in a
+  `.memory-tree.conf` sets `BACKLOG_MODE` to `builds`. They join a spec to an ask in a
   `builds/<slug>/BACKLOG.md`: `closes` says this unit resolves that ask, `advances` says it moves it
   without finishing it. Under `shards` an ask carries its own status token and neither verb has
   anything to say, so writing one there is a refusal rather than a no-op.

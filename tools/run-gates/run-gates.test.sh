@@ -68,6 +68,13 @@ KITDIR=$(cd "$(dirname "$0")" && pwd)
 ROOTN=$(cd "$ROOT" && pwd)
 KITREL=${KITDIR#"$ROOTN"/}
 LEGS_FILE="${GATE_LEGS:-$(dirname "$KITREL")/gate-legs.json}"
+# ...and then DROPPED, because every scratch bar below inherits this shell's environment and several
+# of them clear only the knobs they vary. A bar run over a hand-picked subset of legs exports its
+# GATE_LEGS to this leg, and each scratch bar then read that subset, relative to a repository that
+# holds none of its scripts: every subset leg exited 127 in place of the four-leg fixture, and the
+# arms reading those bars red on a runner that was fine. LEGS_FILE keeps the inherited manifest for
+# the arms that grade it; no scratch bar reads it, and one that needs a manifest names its own.
+unset GATE_LEGS
 
 # 1. manifest well-formed: non-empty list; every leg has a non-empty name, an argv with a launcher
 #    AND a script (len >= 2), and argv[0] in the allowed set. An empty name is the runner's
@@ -2520,7 +2527,10 @@ if [ "$HAVE_TIMEOUT" = 1 ]; then
   run_hv_bar "$H10" "$HV/moved-red.json" GATE_SPAWN_FLOOR="$HV/one-ms" GATE_SPAWN_CMD="bash $HV/slow50.sh"
   git -C "$H10" checkout -q -- fx/target.txt
   check_hv_value "AC10 one assertion failure beside it makes the bar exit 1" "$HV_RC" 1
-  check_hv_line "AC10 the RED line names the move and the HOST leg" '^gates RED — 2/3 legs failed \(the tree moved while the bar ran\) \(1 HOST: lone\)$'
+  # `lone` reaches HOST only through its serial retry, so this total always carries the retried
+  # clause TOOL-dDerivedDocket-26 S2 names in every summary line, ahead of the move and HOST clauses
+  # S5 adds. Pinned whole: the arm first shipped without that clause and could never match.
+  check_hv_line "AC10 the RED line names the move and the HOST leg" '^gates RED — 2/3 legs failed \(1 retried after timeout\) \(the tree moved while the bar ran\) \(1 HOST: lone\)$'
 
   # 9j. AC11's first and third arms — THE ATTEMPT'S RESIDUE IS GONE BEFORE ITS RETRY, AND THE WORKER
   #     SURVIVED THE REAP. The leg's first attempt leaves a TERM-ignoring grandchild that keeps

@@ -258,7 +258,7 @@ print_recipe() { # $1 = optional line prefix
     return 0
   fi
   echo "${pre}  git merge <default>       # MERGE, never rebase or squash: those leave no merge to audit"
-  echo "${pre}  python $kit/migrate_backlog.py --relocate --as <your-slug>"
+  echo "${pre}  python $kit/migrate_backlog.py --relocate --as <your-slug>"   # gov:literal-python — a remedy line printed for the operator, never run; its bytes are the engine's --recipe constant
   echo "${pre}  git add $m/ && git commit"
   echo "${pre}Already landed without this? Any node:  python $kit/migrate_backlog.py --repair <merge-sha>"
   echo "${pre}A branch nobody will revisit? From the default branch:  python $kit/migrate_backlog.py --ingest <ref>"

@@ -1066,9 +1066,14 @@ fi
 # the run root is removed before the bar starts, because this hook READS that run's record after the
 # bar and a record the runner never wrote must not be mistaken for one it did. `$RANDOM` rides the
 # digit run, so the id keeps the `push-<digits>-<pid>` shape the run log joins on.
+# THE REMOVAL EXECS ONLY WHEN THERE IS SOMETHING TO REMOVE. The existence test is a builtin, and an
+# unconditional `rm` spent one process on every gated push, on a line the run-log line's no-exec
+# arm (`.githooks/pre-push.runlog.test.sh` AC7) owns because it carries the pin: measured, that arm
+# redded `1 rm` at the build's first bar. `-L` as well, so a dangling link of that name still goes.
 if [ -n "${EPOCHREALTIME:-}" ]; then RUNLOG_GATE_RUN="push-${EPOCHREALTIME//[!0-9]/}${RANDOM}-$$"
 else printf -v RUNLOG_GATE_RUN 'push-%(%s)T%s-%s' -1 "$RANDOM" "$$"; fi
-[ -n "$gd" ] && rm -rf "$gd/gate-run/$RUNLOG_GATE_RUN" 2>/dev/null
+[ -n "$gd" ] && { [ -e "$gd/gate-run/$RUNLOG_GATE_RUN" ] || [ -L "$gd/gate-run/$RUNLOG_GATE_RUN" ]; } \
+  && rm -rf "$gd/gate-run/$RUNLOG_GATE_RUN" 2>/dev/null
 export GATE_RUN_ID="$RUNLOG_GATE_RUN"
 # A RED AT THE PUSH BOUNDARY IS ATTRIBUTED against the sha the REMOTE holds for the default branch —
 # the one git fed this hook on stdin, which is the landing base and never this clone's own tip, so a

@@ -86,12 +86,26 @@ py=$(resolve_python "${PYBIN:-}") || { echo "check-wiring.test: no usable python
 # third rung for `scripts/`.
 src_of() { for c in "$HERE/$1" "$REPO/$1"; do [ -e "$c" ] && { echo "$c"; return; }; done; }
 
+# THE MEMORY-TREE KIT'S OWN MODULES, laid WHOLE into $1 and DERIVED from the directory the shipped
+# driver sits in rather than typed. `merge-rows.py` loads siblings at run time: `backlog.py` for the
+# view/shard refusal that opens EVERY merge, and `tree_lib.py` for its conf read. A fixture carrying a
+# typed subset holds a driver that cannot start, so every arm that RUNS it reads UNWIRED for the
+# fixture's reasons. That is how AC10, AC12 and U19 AC1 went red when TOOL-dDerivedDocket-10 gave the
+# driver its view predicate: the lists here predated `backlog.py`. A glob of the kit is what a
+# copy-install lays, so a sibling the driver gains later reaches these fixtures with no edit here.
+seed_driver_kit() {  # $1 = destination directory -> every python module of the memory-tree kit
+  local drv
+  drv=$(src_of memory-tree/merge-rows.py)  # gov:root-fixture — src_of keys under the tool root; the kit dir is the driver's own
+  [ -n "$drv" ] || { ck "seed_driver_kit: the memory-tree kit is not installed in $REPO (the driver cannot run without it)" 0; return 1; }
+  cp "${drv%/*}/"*.py "$1/"
+}
+
 # Lay a COMPLETE, RUNNABLE merge-driver install into the cwd under prefix $1 ("tools/" here, "" for
 # the copy-installed adopter layout). Complete is the point: the driver sources a resolver through
-# its shim, imports its anchor grammar from the sibling memory-recall kit, and walks up for
-# `.memory-tree.conf`. A fixture missing any of those holds a driver that CANNOT START — which is
-# exactly the state the arm under test has to report, so it must be reachable on purpose and never
-# by accident.
+# its shim, imports its anchor grammar from the sibling memory-recall kit and its view layer from its
+# own kit (`seed_driver_kit`), and walks up for `.memory-tree.conf`. A fixture missing any of those
+# holds a driver that CANNOT START — which is exactly the state the arm under test has to report, so
+# it must be reachable on purpose and never by accident.
 install_driver() {
   local p="$1" rel src
   mkdir -p "${p}memory-tree" "${p}lib" "${p}memory-recall" memory/backlog
@@ -108,6 +122,7 @@ install_driver() {
     [ -n "$src" ] || { ck "install_driver: $rel is not installed in $REPO (the driver cannot run without it)" 0; return 1; }
     cp "$src" "${p}${rel}"
   done
+  seed_driver_kit "${p}memory-tree" || return 1
   printf 'MEMORY_ROOT=memory\nFAMILIES="tooling:TOOL"\n' > .memory-tree.conf
   # A REAL ANCHORED ROW, not an empty index. The merge arm harvests the family prefix each row LEADS
   # with and requires the conf to declare it — over an index with no rows that harvest is empty and
@@ -1072,17 +1087,16 @@ ck "hooks: two divergences still exit 0" "$([ "$rc" = 0 ] && echo 1 || echo 0)"
 # `GOV_WIRING_HOOKS` it could never report one. A FIXTURE arm, because an adopter's hook
 # population is theirs; the both-ways comparison against THIS repo's tracked hooks lives in
 # the memory-tree kit's transition-audit suite, which is gov-only.
-printf '#!/bin/sh
-exit 0
-' > .githooks/commit-msg; chmod +x .githooks/commit-msg
+printf '#!/bin/sh\nexit 0\n' > .githooks/commit-msg; chmod +x .githooks/commit-msg
 git add -A; git commit -q -m "track the commit-msg hook"
 cp .githooks/commit-msg "$OOT/"
 out=$(bash "$SCRIPT" --check 2>&1)
-ck "hooks: an identical commit-msg reports no divergence" \n   "$(printf '%s' "$out" | grep -q 'commit-msg DIVERGES' && echo 0 || echo 1)"
-printf '# planted
-' >> "$OOT/commit-msg"
+ck "hooks: an identical commit-msg reports no divergence" \
+   "$(printf '%s' "$out" | grep -q 'commit-msg DIVERGES' && echo 0 || echo 1)"
+printf '# planted\n' >> "$OOT/commit-msg"
 out=$(bash "$SCRIPT" --check 2>&1); rc=$?
-ck "hooks: a diverging commit-msg is REPORTED" \n   "$(printf '%s' "$out" | grep -q 'commit-msg DIVERGES' && echo 1 || echo 0)"
+ck "hooks: a diverging commit-msg is REPORTED" \
+   "$(printf '%s' "$out" | grep -q 'commit-msg DIVERGES' && echo 1 || echo 0)"
 ck "hooks: the commit-msg divergence does not gate either" "$([ "$rc" = 0 ] && echo 1 || echo 0)"
 rm -f "$OOT/pre-push"
 out=$(bash "$SCRIPT" --check 2>&1)
@@ -1232,6 +1246,7 @@ if [ -f "$SMERGE" ] && [ -f "$SGFRAG" ] && [ -n "$FRAG" ]; then
   _flat="memory-tree/merge-rows.py memory-tree/merge-rows.sh"  # gov:root-fixture — src_of keys under the tool root; the scratch repo lays them FLAT under scripts/, where no probe looks
   _grammar="memory-recall/extract.py memory-recall/recall_conf.py"  # gov:root-fixture — src_of keys under the tool root; the grammar kit the flat driver finds beside itself
   for rel in $_flat; do cp "$(src_of "$rel")" "scripts/${rel#*/}"; done
+  seed_driver_kit scripts   # FLAT as well: the driver imports its siblings from its own directory
   for rel in $_grammar; do cp "$(src_of "$rel")" "scripts/$rel"; done
   printf 'MEMORY_ROOT=memory\nFAMILIES="tooling:TOOL"\n' > .memory-tree.conf
   printf '# tooling backlog\n\n- TOOL-001 | a landed row, so the family harvest has a population\n' > memory/backlog/TOOL.md

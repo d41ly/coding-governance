@@ -890,7 +890,10 @@ if (specAudit && (!auRaw || typeof auRaw !== 'object' ||
 // wait out a limit. The caller re-runs this workflow ONCE with identical args, and holds on a second
 // deferral. No review round is recorded: nothing was adjudicated. `roster: []`, as on every other
 // non-throwing exit, so `roster.length === 0` stays the caller's whole stop condition.
-if (auRaw.exit === 'deferred-platform') {
+// GUARDED ON `specAudit` like every other read of `auRaw` (VERIFYING, dDerivedDocket): with the
+// audit OFF by declaration `auRaw` is null, and an unguarded `.exit` threw a TypeError on every
+// OFF run before its Disposal stage and its NOT-OWED exit could be reached.
+if (specAudit && auRaw.exit === 'deferred-platform') {
   const pending = Array.isArray(auRaw.pending) ? auRaw.pending : []
   log('audit round ' + roundNo + ': DEFERRED by the platform — ' + (pending.length ? pending.join(', ') : 'no label named') +
     ' did not return; no round recorded, no unit built')

@@ -320,8 +320,12 @@ esac
 # So this arm skips the gate and feeds the awk PROGRAM ITSELF the one input the roles disagree on.
 # The program text is EXTRACTED from the gate rather than copied here: a copy would be two answers to
 # one question, and an edit to the real awk has to reach this arm or the arm grades a fossil.
+# ANCHORED ON `-v pinf="$CARRIED"`, the one line that opens this program and no other, and never on
+# how the call is wrapped: TOOL-dDerivedDocket-23 S3 captured the call as `_cv=$(awk …` for
+# --offenders, and an anchor on a bare `awk -F` at the line start then matched nothing, so this arm
+# extracted an empty file.
 _awkprog="$TMP/role.awk"
-awk '/^  awk -F/ {grab=1; next} grab && /^    \}.*CARRIED/ {print "}"; exit} grab {print}' \
+awk '/-v pinf="\$CARRIED"/ {grab=1; next} grab && /^    \}.*CARRIED/ {print "}"; exit} grab {print}' \
   tools/check-install-prefix.sh > "$_awkprog"
 if [ ! -s "$_awkprog" ] || ! grep -q 'UNRECORDED' "$_awkprog"; then
   bad "L5: could not EXTRACT the awk program from the gate — this arm is grading nothing, which is the exact class it exists to close"

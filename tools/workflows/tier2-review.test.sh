@@ -234,8 +234,15 @@ async function runWholeScriptArms() {
   const rs = await runReview(SPEC, ALL_OK)
   if (checkNoThrow(rs, 'spec-audit complete run')) {
     const sf = rs.trace.filter((t) => t.label.indexOf('find:') === 0)
-    ck(sf.length === 4 && sf.every((t) => t.schema && t.schema.required.indexOf('path') !== -1 && t.schema.required.indexOf('where') !== -1 &&
-      t.prompt.indexOf('/review-lenses/' + rs.result.key + '/find-') !== -1),
+    // `where` is read off the ITEM schema, which is where the spec kind requires it (TOOL-dTieredTribunal-11
+    // S3); it is what tells this schema from the diff one. The first cut read it off the top-level
+    // `required`, which holds lens, path and findings on both kinds, so this arm could never pass.
+    const extractItemRequired = (t) => {
+      const items = t.schema && t.schema.properties && t.schema.properties.findings && t.schema.properties.findings.items
+      return (items && items.required) || []
+    }
+    ck(sf.length === 4 && sf.every((t) => t.schema && t.schema.required.indexOf('path') !== -1 && extractItemRequired(t).indexOf('where') !== -1 &&
+      t.prompt.indexOf('/review-lenses/' + rs.result.key + '/find-' + t.label.slice(5) + '.json') !== -1),
       'AC1 the spec finding schema lists path in required, and every spec lens prompt names its file')
   }
 

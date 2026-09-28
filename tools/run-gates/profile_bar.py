@@ -67,11 +67,22 @@ RUNNER = os.path.join(KITDIR, "run-gates.sh").replace("\\", "/")
 # records for `reuse` — an unlisted verb is dropped SILENTLY, so 42 of gov's 85 legs vanished from
 # every profile with nothing reporting a gap. `derive_runner_verbs()` below now derives the
 # runner's own set and refuses on any verb this pin does not carry, so the sixth verb reds instead.
-VERDICT = re.compile(r"^GATE (ok|skip|FAIL|reuse|held)\s+(.*)$")
-PINNED_VERBS = ("ok", "skip", "FAIL", "reuse", "held")
+# It did: `retry` (TOOL-dDerivedDocket-26) and `attr` (TOOL-dDerivedDocket-23) landed in the runner
+# and not here, and this reader refused every bar until they were carried. Neither is a leg's final
+# verdict, which is why each has its own set below rather than a place in NOT_RUN.
+VERDICT = re.compile(r"^GATE (ok|skip|FAIL|reuse|held|retry|attr)\s+(.*)$")
+PINNED_VERBS = ("ok", "skip", "FAIL", "reuse", "held", "retry", "attr")
 # Verbs whose leg did NOT execute. `skip` is a guard decision and `held` is a subject decision; the
 # two have different remedies and are counted separately, but neither contributes work.
 NOT_RUN = ("skip", "held")
+# An INTERIM verdict, superseded by a later line for the same leg. `retry` is a leg whose own
+# ceiling fired inside the pool; the runner prints it in manifest position and then exactly one
+# `ok` or `FAIL` for that leg after its serial retry, and that later line is the leg's verdict. A
+# `retry` nothing supersedes is a retry the wall cut: the leg ran and did not pass.
+INTERIM = ("retry",)
+# An ANNOTATION of a verdict already printed. `attr` classifies a red leg against a base commit
+# after the bar has reported it `FAIL`, so it names no new leg and changes no verdict.
+ANNOTATION = ("attr",)
 
 
 def derive_runner_verbs(runner_path):
@@ -94,8 +105,11 @@ def parse_verdicts(stdout):
 
     Splits on LF ONLY. `str.splitlines()` also breaks on \\v \\f \\x1c \\x1d \\x1e, none of which the
     runner treats as a line break, so using it lets leg output inject a verdict row.
+
+    ONE verdict per leg. An ANNOTATION line is dropped, and an INTERIM line is replaced IN PLACE by
+    the leg's later verdict, so a retried leg keeps its manifest position and is counted once.
     """
-    out = []
+    out, at = [], {}
     for line in stdout.split("\n"):
         line = line.rstrip("\r")
         m = VERDICT.match(line)
@@ -103,8 +117,13 @@ def parse_verdicts(stdout):
             continue
         verdict, rest = m.group(1), m.group(2)
         name = rest.split("  ")[0].strip()   # the tail contract: two spaces before any tail
-        if name:
-            out.append((name, verdict))
+        if not name or verdict in ANNOTATION:
+            continue
+        if name in at and out[at[name]][1] in INTERIM:
+            out[at[name]] = (name, verdict)
+            continue
+        at[name] = len(out)
+        out.append((name, verdict))
     return out
 
 
@@ -351,7 +370,8 @@ def main():
         print("profile-bar: the runner emits verb(s) %s that this reader does not know. Every line "
               "carrying one would be dropped silently and the profile would under-count the bar "
               "while looking complete. Add them to PINNED_VERBS and to VERDICT, and decide for each "
-              "whether it belongs in NOT_RUN." % ", ".join(_unknown), file=sys.stderr)
+              "whether it belongs in NOT_RUN, INTERIM or ANNOTATION." % ", ".join(_unknown),
+              file=sys.stderr)
         return 2
 
     bash, bash_tried = resolve_bash(RUNNER)
@@ -443,7 +463,8 @@ def main():
         return 2
     regime["packing"] = packing
 
-    failed = [l["name"] for l in legs if l["verdict"] == "FAIL"]
+    # An INTERIM verdict left standing is a leg whose serial retry the wall cut: it did not pass.
+    failed = [l["name"] for l in legs if l["verdict"] == "FAIL" or l["verdict"] in INTERIM]
     rec = {
         "run": "%s-%s-w%d" % (run_git(["rev-parse", "--short=8", "HEAD"]) or "unknown",
                               datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ"), width),

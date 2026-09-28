@@ -38,7 +38,7 @@ memory/
 named for its SLUG alone — no date, no family. A recording filename MAY carry the family as an
 optional qualifier, which is how one slug shared by two families survives in a single folder.
 Ceremony is conditional: subfolders exist only when non-empty; a single-file build is one spec file
-plus its backlog row — no README. Under `BACKLOG_MODE=builds` the smallest build is smaller still: a
+plus its backlog row — no README. With `BACKLOG_MODE` set to `builds` the smallest build is smaller still: a
 folder holding nothing but `BACKLOG.md`, which is a FILING HOME for asks nobody has specced yet. Non-markdown artifacts (scripts, data) are legal only inside
 `builds/*/build/`, `guides/`, and `archive/`.
 
@@ -180,8 +180,8 @@ to every consumer, so a registry a gate names and nothing creates is invisible u
    generated region plus an authored one, present only while a run is or was live. It is in NO size
    check — see rule 6 — and deliberately OUTSIDE rule 8, because a run phase is not a slot status
    and no token in that vocabulary means "built and reviewed, not yet landed". The RETIRED form
-   `RUN.<PHASE>.<8 hex>.md` is admitted here by grammar and IS capped by rule 6. Under
-   `BACKLOG_MODE=builds` a `BACKLOG.md` is admitted at a build root too, including in a folder that
+   `RUN.<PHASE>.<8 hex>.md` is admitted here by grammar and IS capped by rule 6. With
+   `BACKLOG_MODE` set to `builds` a `BACKLOG.md` is admitted at a build root too, including in a folder that
    holds nothing else; under `shards` it is a stray file and is named.
 5. **recording-file naming** — files under the four subfolders, AT ANY DEPTH, match
    `<date>-<kind>[-<FAMILY>]-<slug>-<seq>[-<unit-tail>].md`. The kind comes from the SUBFOLDER, not
@@ -217,19 +217,19 @@ to every consumer, so a registry a gate names and nothing creates is invisible u
    bound, which is why a codebase-map dossier is its own class rather than inheriting a relaxed index
    cap.
 
-   **Under `BACKLOG_MODE=builds` the population swaps one member for another.** Each
+   **With `BACKLOG_MODE` set to `builds` the population swaps one member for another.** Each
    `builds/*/BACKLOG.md` joins the row class, and the family VIEWS leave it: a view is generated, so
    a cap on it would be a hard ceiling on how many live asks a family may hold, which owner ruling
    D3 refused. A `BACKLOG.md` over cap fails on its OWN branch, whose remedy is to move detail into
    a `build/` recording and NEVER to rotate — an ask is filed exactly once, in its own build's
    folder, and a rotation would move it where the view cannot link to it.
 7. **entry budget** — index entry lines ≤ `ENTRY_CAP_CHARS` (300 by default), a build `README.md`
-   ≤ `BUILD_README_ENTRY_CAP_CHARS` (350) (grandfather: `curation-debt.txt`). Under
-   `BACKLOG_MODE=builds` the population is check 6's set PLUS the family views, MINUS the
+   ≤ `BUILD_README_ENTRY_CAP_CHARS` (350) (grandfather: `curation-debt.txt`). With
+   `BACKLOG_MODE` set to `builds` the population is check 6's set PLUS the family views, MINUS the
    exemptions — the views are graded, because their rows are short by construction and this budget
    is what keeps them so, and `builds/*/BACKLOG.md` is EXEMPT, because the ask is the record and its
    text is free prose on one line.
-8. **status vocabulary** — under `BACKLOG_MODE=shards` only. `backlog/<FAMILY>.md` rows carry exactly
+8. **status vocabulary** — only where `BACKLOG_MODE` reads `shards`. `backlog/<FAMILY>.md` rows carry exactly
    one slot status token (grandfather: `curation-debt.txt`).
    Under `builds` this check is RETIRED and says so on every run, in place of the line below: an ask
    carries no status token at all there, its status being folded from records that check 9 grades by
@@ -246,7 +246,7 @@ to every consumer, so a registry a gate names and nothing creates is invisible u
     a fixed path; a stem resolving to zero or several live indexes is a NAMED finding, never a
     skip. The reference is read from everything above the index's first row, and never fewer
     than its first three lines. It grades ANNOUNCEMENT, never the archive's CONTENTS.
-    Under `BACKLOG_MODE=builds` an archive whose stem is a FAMILY is left to check 9's archive
+    With `BACKLOG_MODE` set to `builds` an archive whose stem is a FAMILY is left to check 9's archive
     guard and COUNTED in one line, because the live file at that stem is a generated view that could
     never reference it — a finding here would have no remedy but to hand-edit the next render away.
 11. **old-tree tombstone** — if `.memory-tree.conf` sets `TOMBSTONE_ROOTS` (the tree you migrated FROM),
@@ -290,7 +290,7 @@ to every consumer, so a registry a gate names and nothing creates is invisible u
 13. **id-definition collision** — one id claimed by two different build folders. A decision-log row
     and its spec's H1 both anchor the same id BY DESIGN (the index points at the record), so
     "defined twice" is not the test; "claimed by two builds" is.
-    Under `BACKLOG_MODE=builds` an ask row in a `BACKLOG.md` filed BEFORE `ASK_CUTOFF` is not its
+    With `BACKLOG_MODE` set to `builds` an ask row in a `BACKLOG.md` filed BEFORE `ASK_CUTOFF` is not its
     folder's claim: those ids were migrated and their records already live elsewhere. An ask filed on
     or after the cutoff DOES claim, so a new foreign anchor is still a collision. The row still
     DEFINES the id, so nothing this silences becomes an orphan under check 14. A cutoff that is blank
@@ -310,7 +310,7 @@ to every consumer, so a registry a gate names and nothing creates is invisible u
     with an occurrence count and NEVER on a line number — a line number moves on unrelated edits and
     a gate whose steady state is red gets bypassed; (2) a shrink-only pin (`DEAD_PATH_PIN`);
     (3) no duplicate rows; (4) a `moved:<dest>` row needs `<dest>` to be a tracked FILE.
-    Under `BACKLOG_MODE=builds` the PRESENT-tense corpus swaps `backlog/` for
+    With `BACKLOG_MODE` set to `builds` the PRESENT-tense corpus swaps `backlog/` for
     `builds/<slug>/BACKLOG.md`: the ask keeps its path grading and the view's derived text does not.
     The member is replaced rather than dropped, because dropping it alone would take every graded
     ask path token out of this check and report green.
@@ -366,7 +366,7 @@ imported, and with a pin set and the kit absent the failure is NAMED, not a trac
     prescribes covers that. Keyability is asserted alongside it, but only as the precondition that
     makes the uniqueness census meaningful: on its own it is a check the corpus cannot fail, over a
     property the merge driver already enforces where it can be violated.
-    Under `BACKLOG_MODE=builds` the row documents are the decision index and ITS archives alone: a
+    With `BACKLOG_MODE` set to `builds` the row documents are the decision index and ITS archives alone: a
     family view's rows are link-wrapped renderings of asks filed elsewhere, so reading one as a row
     document would report a mis-segmented grammar against text no author wrote, and ask uniqueness
     is the fold's corpus-wide verdict rather than a per-file one.
@@ -381,7 +381,7 @@ imported, and with a pin set and the kit absent the failure is NAMED, not a trac
     here; an UNDECLARED mode; a DECISIONS archive's terminal half, since a decision row carries no
     lifecycle token; and the CONTENT of any archive, ever. A `cut` tree with no rotated archive says
     it graded nothing rather than reporting clean.
-    Under `BACKLOG_MODE=builds` it follows check 20's population out: a family archive is check 9's
+    With `BACKLOG_MODE` set to `builds` it follows check 20's population out: a family archive is check 9's
     archive guard's, and this check grades the decision-log archive alone.
 
 21. **every record names the spec it is evidence about** — a build folder holds one spec per unit,
@@ -453,7 +453,7 @@ imported, and with a pin set and the kit absent the failure is NAMED, not a trac
     new conf early has a builds-mode tip and shards-mode content — and each row it changed owes
     exactly ONE `RELOCATED` provenance row naming the id and the change commit. Delegated to
     `transition_audit.py`, which owns the walk, and keyed through the memory-recall kit's anchor
-    grammar, so no second row grammar is spelled here. LIVE ONLY UNDER `BACKLOG_MODE=builds`: on a
+    grammar, so no second row grammar is spelled here. LIVE ONLY WHEN `BACKLOG_MODE` IS `builds`: on a
     shards-mode tree it prints that it is DORMANT and why, because a silent zero there reads exactly
     like a clean audit. Three DEAD PROBE refusals guard it — a shallow repository, a history whose
     shards-mode commits yield no mode boundary, and a walk that finds no builds-mode commit at all

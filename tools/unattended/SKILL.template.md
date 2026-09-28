@@ -573,7 +573,7 @@ definition, so the absence is a decision and not an oversight.
   it, and gate-guard.js refuses it at the tool call: a `GATE_FULL=`/`GATE_SELFTESTS=` prefix, a
   self-test runner or any `*.test.sh` is denied on this branch until the record reaches
   `VERIFYING`, sidechain agents included, with the record and the phase named in the refusal. Under
-  `LANDER_MODE=in-place` the close ANNOUNCES when that flagged run is owed — when the landing range
+  `LANDER_MODE` set to `in-place` the close ANNOUNCES when that flagged run is owed — when the landing range
   touches a path `SELFTESTS_OWED_PATHS` declares — so you are told rather than left to remember; it
   still does not run it and does not set the flag, and you name the command you ran in the record.
 - **A process not in the ledger is never killed**, whatever its command line says. The driver records
@@ -907,7 +907,7 @@ sentence here. Skip it silently if the project has no such skill, as the start p
 bash {{KIT_DIR}}/unattended.sh --close <slug>
 ```
 
-**Under `LANDER_MODE=in-place`, one step comes FIRST.** The close's bar grades what HEAD carries, so
+**Under `LANDER_MODE` set to `in-place`, one step comes FIRST.** The close's bar grades what HEAD carries, so
 the landing merge has to exist before it runs. Without it the bar grades this branch and never the
 merge the push publishes, and a branch that is green alone can still land red onto a tip the remote
 moved:
@@ -1068,13 +1068,13 @@ cannot see one that was never written. A skipped render is caught by nothing, so
 
 ## Land
 
-Under `LANDER_MODE=primary`, from the primary tree:
+Under `LANDER_MODE` set to `primary`, from the primary tree:
 
 ```bash
 {{LANDER}}
 ```
 
-Under `LANDER_MODE=in-place`, the graded merge is already HEAD and the landing is one push of it,
+Under `LANDER_MODE` set to `in-place`, the graded merge is already HEAD and the landing is one push of it,
 made from this worktree:
 
 ```bash

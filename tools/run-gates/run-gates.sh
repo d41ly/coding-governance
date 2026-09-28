@@ -1207,7 +1207,7 @@ echo "gate queue: acquired $ACQUIRED from $QUEUED_FROM"
 #             `mktemp -d` and every Python `tempfile` lands inside the scratch the `cleanup` trap
 #             already removes. The spelling is the one `mktemp -d` returned and never a drive-letter
 #             rewrite, which is what broke four arms of the template-size self-test when an external
-#             root was tried (TOOL-aTetheredScratch-2).
+#             root was tried (measured by the aTetheredScratch build).
 #
 # It runs HERE, after the turnstile, so a bar still queued never sweeps. Every refusal in this block
 # sits ABOVE the `cleanup` trap, the same class as the `mktemp -d` beside it, so each removes what it

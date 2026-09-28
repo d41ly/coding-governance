@@ -4081,6 +4081,7 @@ user_skills = "/tmp/gk-fake-skills"
             (g / "tools" / "govkit").mkdir(parents=True)
             (g / "tools" / "demo").mkdir(parents=True)
             shutil.copy2(GOVKIT, g / "tools" / "govkit" / "govkit.py")
+            shutil.copy2(GOVKIT.parent / "adopters.toml", g / "tools" / "govkit" / "adopters.toml")  # arm 10 refuses a gov without it
             (g / "tools" / "govkit" / "registry.toml").write_text(
                 '[surface]\nglobs = ["tools/*"]\n\n'
                 '[selection]\ndefault = ["demo"]\n\n'
@@ -4133,8 +4134,11 @@ user_skills = "/tmp/gk-fake-skills"
         check("root-conf: a root file NO descriptor declares still reds 7c",
               _c2.returncode == 1 and "'.nosuch.conf'" in _c2.stdout
               and "declared classes" in _c2.stdout, _c2.stdout)
+        # The rc conjunct is load-bearing: a fixture govkit REFUSED (exit 2, empty stdout) passed
+        # this arm alone when the fixture lacked adopters.toml, an absence-shaped green.
         check("root-conf: ...and the declared conf beside it is not the one named",
-              "'.lexicon.conf'" not in _c2.stdout, _c2.stdout)
+              _c2.returncode == 1 and "'.lexicon.conf'" not in _c2.stdout,
+              _c2.stdout + _c2.stderr)
 
         # AC5 — a guarded bar leg whose argv file names the conf, with the conf missing from its guard.
         _c3 = run_in(build_scratch_gov_conf(
@@ -4660,9 +4664,11 @@ user_skills = "/tmp/gk-fake-skills"
             # mechanism, the only row that build added to the default selection.
             # 28 -> 27, TOOL-aRepatriatedFork-18 S1: check-line-length's self-test ships as `engine`,
             # the check-arms sibling of its gate, so it left the project-owned ORDER rows.
+            # 27 -> 28, TOOL-dDerivedDocket-9: memory-tree withholds `transition-audit.test.sh`
+            # by the same `project-owned` include (its spec's S12: the suite grades gov's hooks).
             check("...and the playbook file previews as a seed WRITE, not as an order",
                   marks.get("write|seed", 0) + marks.get("KEEP|seed", 0) == 3
-                  and marks.get("ORDER|project-owned") == 27,
+                  and marks.get("ORDER|project-owned") == 28,
                   str(marks))
             check("...and 1 COVER|project-owned row, for the path a sibling seed writes",
                   marks.get("COVER|project-owned") == 1, str(marks))
