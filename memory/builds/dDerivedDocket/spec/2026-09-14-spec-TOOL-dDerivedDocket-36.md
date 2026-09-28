@@ -48,8 +48,9 @@ one section the adopter runbook points at, and gate the part of it that can drif
   `tools/workflows/tier2-review.template.js`, the memory-rot lens in
   `tools/workflows/drift-audit-state.template.js`, `tools/drift-audit/SKILL.template.md`,
   `tools/workflows/REVIEW-PROTOCOL.template.md` and `tools/memory-recall/SKILL.template.md` each tell
-  an agent to read the open asks through the build index generator's `--asks --json` and, when its
-  `mode` field says `shards`, the backlog shards. The two harness lenses are written in their
+  an agent to read the asks through the build index generator's `--asks --json`, adding `--all`
+  where the carrier's question includes decided asks, and, when its `mode` field says `shards`, the
+  backlog shards. The two harness lenses are written in their
   templates because main's `TOOL-aRepatriatedFork-7` made `tools/workflows/tier2-review.js` and
   `tools/workflows/drift-audit-state.js` renders of them. None names a sibling kit's path by
   literal. Each rendered copy is regenerated, the two harness renders among them. Observed by AC4
@@ -154,7 +155,7 @@ own source, not a promise.
 | default | absent `BACKLOG_MODE` reads `shards`, byte-identical to today | the conf reader; stated once |
 | row kinds | ask, CLOSED, WONTDO, BLOCKED, DEFERRED, KEEP, REOPEN, SEV, RELOCATED, and who writes each | S2's arm, over the kinds the module declares |
 | the fold | its rules in order, order-free over sets, REOPEN cancelling a named record | prose, citing the fold function by name |
-| verdicts | each V-number with its one-line meaning | S2's arm, over the ids the module raises |
+| verdicts | each V-number with its one-line meaning | S2's arm, over the ids the module declares or raises and the generator's population codes |
 | ask clauses | `seen`, `accept`, `may`, `out`, `verify`, READY, and `PROBE_ALLOW` | prose, citing the envelope unit's parser |
 | print modes | `--asks` with `--all`, `--json`, `--build`, `--ready`, `--tsv`, `--at` and `--probe`, and the `--new-build` scaffold | prose, stating the argument each mode takes, that `--build`, `--ready` and `--at` qualify `--asks`, and that `--probe` refuses while `PROBE_ALLOW` is blank; every flag is resolved by AC1 |
 | stragglers | the transition audit, `--stragglers`, `--relocate`, `--ingest`, `--repair` | a pointer to `--recipe`, which is single-sourced |
@@ -188,7 +189,8 @@ Under `builds` the family file an agent would open is a view of live asks only, 
 backlog" there silently omits every terminal ask and its reason. Under `shards`, which every adopter
 runs until its own switch, `--asks --json` prints the mode notice and an empty set. So each carrier
 names the generator's `--asks --json` and tells the agent to read the shards when the output's
-`mode` field says `shards`. The two workflow scripts were deployed verbatim when this was written;
+`mode` field says `shards`. That mode lists live asks only, as the view does, so a carrier whose
+question includes decided asks adds `--all`. The two workflow scripts were deployed verbatim when this was written;
 since main's `TOOL-aRepatriatedFork-7` each is rendered from a template carrying render tokens, and
 the lens sentence still names the generator by its file name and never by a path with an install
 prefix, which the install-prefix gate would refuse.

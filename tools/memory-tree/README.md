@@ -323,10 +323,13 @@ constant, rendered by every view banner, the row driver's refusal and V17's reme
 ### Signed records
 
 The switch applies an owner's answer to two questions the planner cannot decide: which same-id pairs
-are one subject, and what becomes of each open ask on a finished build. `migrate_backlog.py --plan
---record <dir> --record-as <unit-id>` files the worksheets; the owner signs two markdown records;
-`--plan --signed <kind>=<path>` previews the result; and `--write --as <slug> --signed
-same-id=<path> --signed triage=<path> [--triage-ask <id>]` applies exactly what is signed.
+are one subject, and what becomes of each open ask on a finished build. In order:
+
+1. `migrate_backlog.py --plan --record <dir> --record-as <unit-id>` files the worksheets.
+2. The owner signs two markdown records, one per worksheet.
+3. `migrate_backlog.py --plan --signed same-id=<path> --signed triage=<path>` previews the result.
+4. `migrate_backlog.py --write --as <slug> --signed same-id=<path> --signed triage=<path>` applies
+   exactly what is signed; `--triage-ask <id>` names the ask the legacy holds naming no id are held on.
 
 - Each record's header carries one line per worksheet it signs, naming the worksheet's path and
   its git blob sha: ``the same-id worksheet: `<path>` · blob `<40-hex sha>` ``, and the same with
