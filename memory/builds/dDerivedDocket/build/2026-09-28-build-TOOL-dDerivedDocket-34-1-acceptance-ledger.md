@@ -159,6 +159,12 @@ hand-edited one could. The break was restaged on a row with no pointer and went 
   per-build file carries a disposition naming a triage-record id.
 - AC19 — `git ls-files memory/backlog` — listed nothing between the write and the render, and the
   render's `gen_build_index.py --write` exited 0 writing all four views.
+- AC20 — amended rev-13 — the criterion assumed the remote tip had moved past the fork, and at
+  VERIFYING it had not: `869209ed` is an ancestor of HEAD. In a scratch worktree of the run branch,
+  step 2's `--plan` exited 0, the signer's `--check` read 2 of 2 re-derived, and step 4's landing
+  form with `--dry-run` exited 2 naming the contained tip; the worktree was removed and the run
+  tree's porcelain was unchanged. The classified count is owed at the landing reconcile only if the
+  tip moves, as the section 9 rev-13 line logs.
 - AC22 — `memory/DECISIONS.md` — carries one TOOL row keyed by this unit, naming the stance of
   DEPL-dGaugedVintage-13 as superseded and citing design §4.4, in 258 characters.
 - AC23 — `(durable home: <n>)` — read 915 before and 917 after; the spine holds 731 documents under

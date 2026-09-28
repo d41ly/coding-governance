@@ -95,7 +95,7 @@ LEDGER_SOURCES = ("decision", "abort", "override", "waiver", "rescope-retire", "
 # value is held to the file that owns it: the withheld self-test extracts these from the driver's
 # source where that file is present, compares both directions, and announces its skip where it is not.
 PARK_KINDS = ("decision", "abort", "override", "waiver", "proposal", "rescope", "dispatch", "review",
-              "brief")
+              "brief", "hold", "resume")
 PARK_KINDS_OWED = ("decision", "abort", "override", "waiver")
 PARK_ACTS_OWED = ("retire", "supersede")
 PHASES_TERMINAL = ("LANDED", "ABORTED")

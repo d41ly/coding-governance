@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-34 — the switch-over: migration applied and the views rendered
 
-**Status:** CLOSED · rev-12 · 2026-09-28 · node d · Tier-2 · base fb07ca25 · streams tooling+kickoff · order 36
+**Status:** CLOSED · rev-13 · 2026-09-28 · node d · Tier-2 · base fb07ca25 · streams tooling+kickoff · order 36
 
 <!-- gen:spec-records -->
 
@@ -807,7 +807,10 @@ confirms an id the receiving side acted on (§8 F7).
   prints a non-zero classified count, each entry as new, flipped, CONFIRM, already present or
   NEEDS-HUMAN, the size of the landing triage population steps 2 and 3 compute, and the
   `ASK_CUTOFF` it would write; after the scratch worktree is removed, `git status --porcelain` in the
-  run tree is unchanged, and the journal records the counts and the cutoff and no id.
+  run tree is unchanged, and the journal records the counts and the cutoff and no id. When the
+  advertised tip is an ancestor of HEAD there is nothing to ingest, and the reading is instead
+  that step 4's landing form refuses by design, exit 2 naming the contained tip, with the run
+  tree unchanged; the classified count is then owed at the landing reconcile, if the tip moves.
   Red when: a text amendment is classified as a flip, which writes a disposition over another
   session's wording at the landing; or the rehearsal writes its six records into the run tree, where
   untracked they dirty the tree unit 35 AC7 and the landing's `gates-green` read, and committed they
@@ -1365,6 +1368,10 @@ its guard names the four renders step 6 re-renders, so the merge commit triggers
   landing-reconcile rehearsal met the same refusal from `--ingest`. S1, reconcile step 4, rollout
   step 5 and AC3 now spell `--signed same-id=<path> --signed triage=<path>`; what AC3 observes is
   unchanged, and the older §9 entries keep the spelling they recorded.
+- rev-13 · 2026-09-28 · §6 · AC20 · AC20 assumed the remote tip had moved past the fork. At
+  VERIFYING it had not: `869209ed` is an ancestor of HEAD, and step 4's landing form refuses by
+  design. AC20 now names that reading for the unmoved tip and owes the classified count to the
+  landing reconcile only if the tip moves. The unit stays CLOSED and nothing it built moved.
 
 ## 10. Reuse audit
 

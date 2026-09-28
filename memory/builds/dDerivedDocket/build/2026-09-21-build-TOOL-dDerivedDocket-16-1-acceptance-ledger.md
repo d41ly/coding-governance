@@ -84,6 +84,16 @@ strictly below the parent.
   all four fixtures, and labels the build terminal in exactly one: record absent, record tracked and
   LANDED, record tracked and HELD, record present only on a branch this tree does not carry. The
   stub's recorded argv carries no `--live-builds`.
+- AC15 — `ASKS_CMD` — at VERIFYING, the AC15 block of `tools/unattended/unattended.test.sh`, cut
+  verbatim with the suite's `hit`, `miss`, `same` and `slice_fn` into a scratch replay and run
+  alone against the shipped driver, ran this repository's declared producer from a builds-mode
+  fixture holding an unlabelled OPEN ask, an ask closed by two records and a header tolerated by
+  waiver. Call shape 1 at `m-base` and call shape 2 at the later rev each went through the
+  driver's sliced `run_ask_witness`, which accepted every row with `examined` 2 and 3 equal to the
+  scope, and the replay printed `(14 assertions executed) st=0`. The same producer with its notices
+  merged onto stdout was refused by that parse, and the arm went red under a driver copy parsing
+  both streams, a lax parse, a merged producer and a ten-field projection. The waiver header has no
+  effect under either shape, since both carry `--at` and the at-rev read opens no README.
 - AC16 — `git status --porcelain` — a `prompt`-mode README carrying `asks:` and a `recipe`-mode one
   each refuse under check 71, pin no fact, and leave the porcelain count at zero.
 - AC17 — `UNDECIDED` — a build carrying an empty roster pair, no spec and an `asks:` line naming two

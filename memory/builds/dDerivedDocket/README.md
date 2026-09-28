@@ -165,7 +165,7 @@ ids TOOL-dDerivedDocket-60 TOOL-dDerivedDocket-61 TOOL-dDerivedDocket-62 TOOL-dD
 | [TOOL-dDerivedDocket-63 — the holder keeps its own `--replaces`: row precedence in the re-keyed resume matrix](spec/2026-09-22-spec-TOOL-dDerivedDocket-63.md) | 33 | 2 | CLOSED | rev-6 | 2026-09-27 |
 | [TOOL-dDerivedDocket-64 — the turnstile queue's heartbeat, a move the liveness clock sees](spec/2026-09-22-spec-TOOL-dDerivedDocket-64.md) | 34 | 2 | CLOSED | rev-5 | 2026-09-27 |
 | [TOOL-dDerivedDocket-65 — a session waiting on its own sub-agents, a move the liveness clock sees](spec/2026-09-22-spec-TOOL-dDerivedDocket-65.md) | 35 | 2 | CLOSED | rev-2 | 2026-09-27 |
-| [TOOL-dDerivedDocket-34 — the switch-over: migration applied and the views rendered](spec/2026-09-14-spec-TOOL-dDerivedDocket-34.md) | 36 | 2 | CLOSED | rev-12 | 2026-09-28 |
+| [TOOL-dDerivedDocket-34 — the switch-over: migration applied and the views rendered](spec/2026-09-14-spec-TOOL-dDerivedDocket-34.md) | 36 | 2 | CLOSED | rev-13 | 2026-09-28 |
 | [TOOL-dDerivedDocket-35 — arming and the real-tree staged reds](spec/2026-09-14-spec-TOOL-dDerivedDocket-35.md) | 37 | 2 | CLOSED | rev-10 | 2026-09-28 |
 | [PLAY-dDerivedDocket-1 — charter backlog wording and unattended landing exception](spec/2026-09-14-spec-PLAY-dDerivedDocket-1.md) | 38 | 2 | CLOSED | rev-9 | 2026-09-28 |
 | [TOOL-dDerivedDocket-36 — memory-tree docs, carriers and dossier](spec/2026-09-14-spec-TOOL-dDerivedDocket-36.md) | 39 | 2 | CLOSED | rev-8 | 2026-09-28 |
