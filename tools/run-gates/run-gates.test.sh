@@ -45,7 +45,7 @@ fail=0
 # than written as a literal. A hardcoded count is the recorded failure this leg exists for.
 # 132, not 134: arms 1c/1d/1e SKIP on a host with no runnable `timeout -k`, so the floor is the
 # skipped-host count. A floor set to the lucky-host figure reds every box without coreutils.
-FLOOR_ASSERTIONS=264
+FLOOR_ASSERTIONS=272
 # RAISED 149 -> 188 by TOOL-dDerivedDocket-23: the `signature` key-set control and section 7's
 # thirty-eight red-attribution assertions, every one counted on a host with no `timeout` as well.
 # RAISED 188 -> 205 by TOOL-dDerivedDocket-25: arm 3a's `TMPDIR entries` presence check and the
@@ -58,6 +58,12 @@ FLOOR_ASSERTIONS=264
 # `timeout` gate and counted on a host without one as well.
 # RAISED 258 -> 264 by TOOL-dDerivedDocket-27: section 10's six profile-key assertions, none of them
 # host-conditional. COUNTED off the section's own calls; this pass runs no suite.
+# RAISED 264 -> 269 by the dDerivedDocket closing diff review's F1: section 7's five assertions over
+# three no-signature legs whose text moved inside the age window (three attr lines, one record row,
+# one absent stamp), none of them host-conditional.
+# RAISED 269 -> 272 by the same review's F5: section 7's two assertions over a TERM placed inside the
+# attribution (exit 143 before any summary with the worktree gone; no orphan line), both counted on
+# either branch of their liveness check, and the one source scan of this kit's signal traps.
 n=0
 # The manifest, derived exactly as run-gates.sh derives it: this kit's dir SIBLING. Hardcoding
 # `tools/gate-legs.json` here would be a gov spelling in a harness that now ships (S1/S3).
@@ -2075,6 +2081,129 @@ check_attr_line "$ahout" "aged leg" "INHERITED · offenders 1 · at ${AGE_R:0:8}
 n=$((n+1))
 [ ! -f "$AH/.git/gate-inherited-green" ] \
   || { echo "canary: attribution — AC17 an aged leg still wrote gate-inherited-green, so a red past the bound would land"; fail=1; }
+# THE CLOSING DIFF REVIEW'S F1 — NO-SIGNATURE LEGS WHOSE TEXT MOVED INSIDE THE WINDOW. The age probe
+# used to answer rc 1, the green code, for any probe red with output not byte-identical to L's, so
+# the bisection walked toward R and named the landing that CHANGED the text as the owner: an old red
+# read young, and landed under `land`. One line, three legs, one bar: (1) `moved superset`, red since
+# landing 1 and shrunk at 6, so R~10 prints a superset of L — aged, every line of L's already there;
+# (2) `moved count`, red since 1 with its count line moved at 6 — text cannot tell that from a missing
+# offender, so the age is unproven, never a number; (3) `moved inside`, red since 4 and shrunk at 8 —
+# owned by the landing it arrived in, not the one that shrank it. Before the fix all three read a
+# number and the bar wrote the inherited-green stamp.
+build_moved_age_fixture() { # dir -> sets AGE_R
+  local d=$1 i k
+  mkdir -p "$d/$KIT_REL" "$d/fx" "$d/data"
+  cp "$KITDIR/run-gates.sh" "$KITDIR/lib-attribute.sh" "$KITDIR/gate-profiles.txt" "$d/$KIT_REL/" 2>/dev/null
+  cp "$KITDIR/gate-fingerprint.sh" "$d/$KIT_REL/" 2>/dev/null || true
+  ( cd "$d" && git init -q -b main . && git config user.email a@t.invalid && git config user.name a \
+      && git config core.autocrlf false ) >/dev/null 2>&1
+  for k in sup cnt ins; do
+    printf '#!/usr/bin/env bash\nif [ -s data/%s.txt ]; then cat data/%s.txt; exit 1; fi\nexit 0\n' "$k" "$k" > "$d/fx/$k.sh"
+    : > "$d/data/$k.txt"
+  done
+  printf '[\n  {"name": "moved superset", "argv": ["bash", "fx/sup.sh"]},\n  {"name": "moved count", "argv": ["bash", "fx/cnt.sh"]},\n  {"name": "moved inside", "argv": ["bash", "fx/ins.sh"]}\n]\n' > "$d/tools/gate-legs.json"
+  ( cd "$d" && git add -A && git commit -qm "landing 0" ) >/dev/null 2>&1
+  for i in 1 2 3 4 5 6 7 8 9 10 11 12; do
+    case "$i" in
+      1) printf 'FAIL a\nFAIL b\nFAIL c\n' > "$d/data/sup.txt"; printf 'FAIL a\n3 offenders\n' > "$d/data/cnt.txt" ;;
+      4) printf 'FAIL a\nFAIL b\nFAIL c\n' > "$d/data/ins.txt" ;;
+      6) printf 'FAIL a\nFAIL b\n' > "$d/data/sup.txt"; printf 'FAIL a\n2 offenders\n' > "$d/data/cnt.txt" ;;
+      8) printf 'FAIL a\nFAIL b\n' > "$d/data/ins.txt" ;;
+    esac
+    printf '%s\n' "$i" > "$d/data/n.txt"
+    ( cd "$d" && git add -A && git commit -qm "merge: AGE-tFix-$i lands" ) >/dev/null 2>&1
+  done
+  AGE_R=$(git -C "$d" rev-parse HEAD)
+  printf 'L\n' > "$d/data/l.txt"
+  ( cd "$d" && git add -A && git commit -qm "L, past R" ) >/dev/null 2>&1
+}
+AM="$AT/am"; build_moved_age_fixture "$AM"
+_am_own=$(git -C "$AM" log --format='%H %s' | awk '/AGE-tFix-4 lands/ { print substr($1, 1, 8); exit }')
+amout=$(run_attr_bar "$AM" GATE_ATTRIBUTE="$AGE_R" GATE_INHERITED_RED=land GATE_INHERITED_RED_MAX_AGE=10)
+check_attr_line "$amout" "moved superset" "INHERITED · offenders 2 · at ${AGE_R:0:8} · aged at R~10" \
+  "F1 an old red a later landing shrank reads aged, not owned by the landing that shrank it"
+check_attr_line "$amout" "moved count" "INHERITED · offenders 2 · at ${AGE_R:0:8} · age unproven" \
+  "F1 an old red whose count line moved reads age unproven, never a number"
+check_attr_line "$amout" "moved inside" "INHERITED · offenders 2 · at ${AGE_R:0:8} · age 8 · owner $_am_own AGE-tFix-4" \
+  "F1 a red that arrived inside the window and shrank later is owned by the landing it arrived in"
+n=$((n+1))
+_amrec=$(ls -1d "$AM"/.git/gate-run/*/ 2>/dev/null | tail -1)
+awk -F'\t' '$1 == "moved count" { seen = 1; if ($6 != "-" || $9 !~ /declares no signature/) bad = 1 }
+    END { exit (bad || !seen) }' "${_amrec}attribution" 2>/dev/null \
+  || { echo "canary: attribution — F1 the row for a moved count line carries an age, or a reason not naming the missing signature"; grep '^moved count' "${_amrec}attribution" 2>/dev/null | sed 's/^/    /'; fail=1; }
+n=$((n+1))
+[ ! -f "$AM/.git/gate-inherited-green" ] \
+  || { echo "canary: attribution — F1 a bar whose moved-text legs cannot all be aged wrote gate-inherited-green, so an old red would land"; fail=1; }
+# THE SAME REVIEW'S F5, THIS RUNNER'S INSTANCE OF ITS CLASS. A signal arm runs `cleanup` and exits,
+# and that exit runs `cleanup` again from the EXIT trap: the worktree the first entry removed failed
+# to remove on the second, and the bar printed an orphan line naming a path already gone. The leg's
+# R copy ANNOUNCES itself and HOLDS until released, so the TERM lands inside the attribution by
+# construction rather than by a sleep (`fixed-sleep-does-not-place-a-signal`); at L it just fails.
+AX="$AT/ax"; mkdir -p "$AX/$KIT_REL" "$AX/fx" "$AX/data"
+cp "$KITDIR/run-gates.sh" "$KITDIR/lib-attribute.sh" "$KITDIR/gate-profiles.txt" "$AX/$KIT_REL/" 2>/dev/null
+cp "$KITDIR/gate-fingerprint.sh" "$AX/$KIT_REL/" 2>/dev/null || true
+( cd "$AX" && git init -q -b main . && git config user.email a@t.invalid && git config user.name a \
+    && git config core.autocrlf false ) >/dev/null 2>&1
+{ printf '#!/usr/bin/env bash\n'
+  printf 'if [ -n "${ATTR_TERM_READY:-}" ] && [ "$(cat data/side.txt)" = r ]; then\n'
+  printf '  printf "%%s\\n" "$$" > "$ATTR_TERM_READY"\n'
+  printf '  i=0; while [ ! -e "$ATTR_TERM_READY.go" ] && [ "$i" -lt 300 ]; do sleep 0.1; i=$((i + 1)); done\n'
+  printf 'fi\necho "FAIL held"\nexit 1\n'
+} > "$AX/fx/h.sh"
+printf '[\n  {"name": "held", "argv": ["bash", "fx/h.sh"]}\n]\n' > "$AX/tools/gate-legs.json"
+printf 'r\n' > "$AX/data/side.txt"
+( cd "$AX" && git add -A && git commit -qm R ) >/dev/null 2>&1
+printf 'l\n' > "$AX/data/side.txt"
+_axr="$AT/ax.ready"; _axo="$AT/ax.out"
+( cd "$AX" && exec env GATE_FULL= GATE_BASE= GATE_LEGS= GATE_REUSE= GATE_WALL= GATE_JOBS=2 GATE_ATTRIBUTE=HEAD \
+    ATTR_TERM_READY="$_axr" bash $KIT_REL/run-gates.sh > "$_axo" 2>&1 ) &
+_axp=$!; _axi=0
+while [ ! -s "$_axr" ] && [ "$_axi" -lt 600 ]; do sleep 0.1; _axi=$((_axi + 1)); done
+n=$((n+1)); n=$((n+1))
+if [ -s "$_axr" ] && kill -0 "$(cat "$_axr")" 2>/dev/null; then
+  kill -TERM "$_axp"; : > "$_axr.go"; wait "$_axp"; _axrc=$?
+  { [ "$_axrc" = 143 ] && ! grep -q '^attributed ' "$_axo" && [ "$(git -C "$AX" worktree list | grep -c .)" = 1 ]; } \
+    || { echo "canary: attribution — F5 a TERM mid-attribution did not end the bar at 143, before its summary, with the R worktree removed (exit $_axrc)"; sed 's/^/    /' "$_axo"; fail=1; }
+  ! grep -q 'could not be removed' "$_axo" \
+    || { echo "canary: attribution — F5 a TERM mid-attribution ran cleanup twice and named the removed R worktree an orphan"; grep 'could not be removed' "$_axo" | sed 's/^/    /'; fail=1; }
+else
+  : > "$_axr.go"; wait "$_axp"
+  echo "canary: attribution — F5 the R run never announced itself alive, so no TERM could be placed inside the attribution"; fail=1
+fi
+# F5'S CLASS, BY SOURCE. A `trap` naming INT, TERM or HUP whose handler does not `exit` RESUMES the
+# script once the handler has run, which is the defect F5 found; the arm above and the signalled
+# `--attribute` arm of the self-test runner's suite catch the two instances this kit had, and this
+# catches the next one before it ships. Every shell file of this kit is read: a signal handler is a
+# quoted string that exits, or the empty string that ignores the signal. A bare function name reds
+# too, because whether it exits cannot be read off the trap line.
+# WHAT IT DOES NOT CHECK: a trap assembled at run time, a handler that exits only inside a function it
+# calls, or a double-quoted handler carrying escaped quotes, which it may mis-split. It reads this
+# kit's files and no others. LIVENESS: it must see at least one signal trap, or it says so.
+n=$((n+1))
+_traps=$(awk '
+  /^[[:space:]]*#/ { next }
+  {
+    s = $0
+    while (match(s, /(^|[;&|(){}]|then|do|else)[[:space:]]*trap[[:space:]]+/)) {
+      s = substr(s, RSTART + RLENGTH); q = substr(s, 1, 1)
+      if (q == "\047" || q == "\"") {
+        r = substr(s, 2); k = index(r, q); if (!k) break
+        h = substr(r, 1, k - 1); t = substr(r, k + 1)
+      } else {
+        match(s, /^[^[:space:];]+/); h = substr(s, 1, RLENGTH); t = substr(s, RLENGTH + 1); q = ""
+      }
+      u = t; sub(/[;)].*/, "", u); s = t
+      if (u !~ /(^|[[:space:]])(SIG)?(INT|TERM|HUP)([[:space:]]|$)/) continue
+      if (q != "" && (h == "" || h ~ /(^|[;[:space:]])exit([[:space:]]|;|$)/)) print "ok\t" FILENAME ":" FNR
+      else print "HIT\t" FILENAME ":" FNR "\t" $0
+    }
+  }' "$KITDIR"/*.sh 2>/dev/null)
+if ! printf '%s\n' "$_traps" | grep -q '^ok'; then
+  echo "canary: signal traps — DEAD PROBE: the scan read no INT, TERM or HUP trap under $KITDIR, so a clean result would mean nothing"; fail=1
+elif printf '%s\n' "$_traps" | grep -q '^HIT'; then
+  echo "canary: signal traps — a trap naming INT, TERM or HUP whose handler does not exit, so the signal RESUMES the script:"
+  printf '%s\n' "$_traps" | grep '^HIT' | cut -f2- | sed 's/^/    /'; fail=1
+fi
 rm -rf "$AT" 2>/dev/null || true
 
 # AC12 — EVERY DECLARED SIGNATURE, RUN ON THE TREE THIS CANARY GRADES, PRINTS KEYS AND NOTHING ELSE:

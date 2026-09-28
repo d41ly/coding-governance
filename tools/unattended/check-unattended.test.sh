@@ -4549,6 +4549,17 @@ set_ak_pristine; sed -i 's/^asks: EXMP-aFoo-3$/asks: EXMP-aFoo-3 EXMP-aFoo-4/' "
 hit "$out" "a run-state file pins an asks: mandate the build README at its own recorded BASE does not declare, so the set the run says authorized it is not the set its authorization asked for - pinned against declared follow: ["
 hit "$out" "pinned against declared follow: [EXMP-aFoo-3 EXMP-aFoo-4] against [EXMP-aFoo-3]"
 
+# CLOSING REVIEW F2: the pinned value reads through the driver's own IDLIST reader, ALL OR NOTHING.
+# A comma-suffixed token reds BY NAME rather than dropping out of every arm keyed on the ids; a `-N`
+# continuation is an id, so P5 looks for the row it names. RED under the binding-line expander this
+# replaced, which read the first record as no id at all and the second as `-3` alone.
+set_ak_pristine; sed -i 's/^asks: EXMP-aFoo-3$/asks: EXMP-aFoo-3,/' "$ak/$ak_R"; out=$(run_ak_leg)
+hit "$out" "a run-state file pins an asks: mandate that does not read whole as an id list, so every arm below would grade the ids that did parse and the owner's own list would narrow with the leg green: "
+hit "$out" "\`EXMP-aFoo-3,\` (neither an id, an id range, nor a -N continuation)"
+set_ak_pristine; sed -i 's/^asks: EXMP-aFoo-3$/asks: EXMP-aFoo-3 -4/' "$ak/$ak_R"; out=$(run_ak_leg)
+hit  "$out" "EXMP-aFoo-4, wanted in memory/builds/aFoo/BACKLOG.md"
+miss "$out" "does not read whole as an id list"
+
 # AC2: a LIVE record's README edited at HEAD reds; the same edit under a record past its close does not
 set_ak_pristine; sed -i 's/^asks: EXMP-aFoo-3$/asks: EXMP-aFoo-3 EXMP-aFoo-4/' "$ak/$ak_B"; add_ak_commit "head edit"; out=$(run_ak_leg)
 hit "$out" "a LIVE run's build README carries an asks: line at HEAD that is not the one the run pinned, so the mandate this run will be measured against was edited underneath it - pinned against HEAD follow: ["
@@ -5570,7 +5581,12 @@ fi   # ---- end REGION 8 -------------------------------------------------------
 # ---- each arm landed, not measured: the merge runs no suite, and all nine are owed a re-read at the
 # ---- build's next gate pass. The `check 36` of the TOOL-dDerivedDocket-5 raise line above is check 46
 # ---- in the merged leg: main took 34 to 36 first, so this build's three moved to 44 to 46.
-FLOOR_ASSERTIONS=919
+# ---- RAISED 919 -> 923 by exactly the arm, the fold of dDerivedDocket's closing diff review, round
+# ---- 1, F2: the IDLIST arms after the ask block's AC1, three `hit` and one `miss`, all at the END of
+# ---- region 8, so FLOOR_SHARD_8 carries the same +4 and the other seven are untouched. MEASURED by
+# ---- running that block alone behind a replica of this prologue by hand, n 64 -> 68, green on the
+# ---- fold and red on HEAD's kit for all but the `miss`, which is the control; this pass runs no suite.
+FLOOR_ASSERTIONS=923
 # THE FLOOR IS MODE-SELECTED, or every shard leg reds forever against the unsharded floor. The
 # per-shard floors carry the SAME proportional discount the unsharded pin does rather than pinning
 # at 100 % of observation, which would red on the first arm anyone legitimately removes. The
@@ -5582,7 +5598,7 @@ FLOOR_SHARD_4=98
 FLOOR_SHARD_5=67
 FLOOR_SHARD_6=75
 FLOOR_SHARD_7=92
-FLOOR_SHARD_8=377
+FLOOR_SHARD_8=381
 case "$SH_I" in
   0) FLOOR=$FLOOR_ASSERTIONS; MODE="unsharded" ;;
   *) _fv="FLOOR_SHARD_$SH_I"; FLOOR=${!_fv}; MODE="shard $SH_I/$SHARD_ARITY" ;;

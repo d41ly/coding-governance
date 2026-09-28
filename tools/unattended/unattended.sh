@@ -3164,12 +3164,18 @@ read_asks_key() { # README blob text -> the asks: value, or nothing
     /^asks:/ { v = $0; sub(/^asks:[[:space:]]*/, "", v); sub(/[[:space:]]*\r?$/, "", v); print v; exit }'
 }
 # The mandated ids, ranges expanded, IN THE OWNER'S OWN LISTING ORDER — which is rank step 3, so the
-# order is data and not an artefact of a sort. `expand_id_runs` is the kit's one expander and is
-# already what the record-binding join reads, so `EXMP-aFoo-3..4` means here exactly what it means
-# there. Nothing is sorted and nothing is deduplicated: a duplicate in a mandate is the owner's own
-# line, and collapsing it silently would make the pinned fact disagree with the README it came from.
-asks_ids_of() { # asks: value -> the mandated ids, one per line
-  printf '%s\n' "$1" | expand_id_runs
+# order is data and not an artefact of a sort. Nothing is sorted and nothing is deduplicated: a
+# duplicate in a mandate is the owner's own line, and collapsing it silently would make the pinned
+# fact disagree with the README it came from.
+#
+# READ ALL OR NOTHING, through the library's IDLIST reader and NOT the binding-line expander this
+# used to call (closing diff review of dDerivedDocket, F2). That expander drops every token it does
+# not know, so `<id>-3 -5..6` pinned `-3` alone and `<id>-1, <id>-2` pinned `-2`, and preflight, the
+# witness, the plan, `asks-disposed` and the freeze all read the narrowed set with every check green.
+# RC 1 AND NOTHING PRINTED on a refused token: every caller either refuses by name through
+# `read_id_list_refusals` or reads a value an earlier refusal has already proven whole.
+asks_ids_of() { # asks: value -> the mandated ids, one per line; rc 1 and nothing when it does not read whole
+  read_id_list "$1"
 }
 # `ask_home_of` USED TO BE DEFINED HERE, and moved to `lib-unattended.sh` with the expander above,
 # for the same reason: the leg reads one BACKLOG blob per home when it re-derives P5, and two
@@ -3195,13 +3201,15 @@ spec_ask_verbs() { # spec file · closes|advances -> the ids that verb names, on
 # A disposition row's VERB for one ask, out of a build's own `BACKLOG.md`. The row shape is
 # `- <VERB> · <id> · <slot> <value> · <why>`, so the verb is the first field and the id the second;
 # nothing here decides whether the disposition is HONEST, which is the fold's job and not this one's.
-ask_disposition_of() { # BACKLOG.md text · ask id -> the first disposition verb naming it, or nothing
-  printf '%s\n' "$1" | ADO_ID="$2" awk '
-    BEGIN { id = ENVIRON["ADO_ID"] }
-    /^- [A-Z][A-Z]* · / {
-      n = split($0, f, " · ")
-      if (n >= 2 && f[2] == id) { v = substr(f[1], 3); print v; exit }
-    }'
+#
+# A STATUS ROW'S VERB AND NO OTHER, read through `ask_disposition_row_of` below rather than beside it
+# (closing diff review of dDerivedDocket, F3). This used to answer with the verb of ANY row of that
+# shape, so a `SEV`, `SCOPE` or `RELOCATED` row - which label, widen or move an ask and dispose of
+# nothing - read as its disposition, and `--plan` took the ask as covered and never offered it on the
+# `next:` ladder. The DoD reader one function down already refused that misread; two readers of one
+# question gave two answers, and now there is one.
+ask_disposition_of() { # BACKLOG.md text · ask id -> the verb of the first STATUS row naming it, or nothing
+  ask_disposition_row_of "$1" "$2" | awk -F' · ' '{ v = $1; sub(/^- /, "", v); print v; exit }'
 }
 
 # ---------------------------------------------------------------------------- the bounded witness
@@ -3433,11 +3441,20 @@ ask_disposition_slot_of() { # disposition row -> the slot value, or nothing
 #
 # ORDER IS THE MANDATE'S, then this build's own filings. Nothing is sorted here: the mandate's order
 # is the owner's own listing order and is rank step 3.
+# A MANDATE THAT DOES NOT READ WHOLE IS A REFUSAL, not an empty M (closing review F2). Read as
+# nothing, the scope would be this build's own filings alone, and `asks-disposed` would grade the run
+# GREEN without ever looking at an ask the owner named. The reason rides `AW_WHY`, which both callers
+# already print when this function's sibling, the witness, declines to answer.
 AD_SCOPE=""
-read_ask_scope() { # slug · rev -> AD_SCOPE, the mandate then this build's own filings
-  local _id
+read_ask_scope() { # slug · rev -> 0 and AD_SCOPE, the mandate then this build's own filings; 1 and AW_WHY
+  local _id _m _mids=""
   AD_SCOPE=""
-  for _id in $(asks_ids_of "$(mandate_of "$1")") \
+  _m=$(mandate_of "$1")
+  if [ -n "$_m" ] && ! _mids=$(asks_ids_of "$_m"); then
+    AW_WHY="the asks: mandate this run is under does not read whole as an id list, so its scope cannot be enumerated and a scope taken from the ids that did parse would be the owner's list silently narrowed: $(read_id_list_refusals "$_m")"
+    return 1
+  fi
+  for _id in $_mids \
              $(asks_filed_by "$(backlog_blob_of "$1" "$2")" "$1"); do
     case " $AD_SCOPE " in *" $_id "*) continue ;; esac
     AD_SCOPE="$AD_SCOPE $_id"
@@ -3464,7 +3481,7 @@ derive_ask_freeze() { # slug · rev -> 0 and AD_FREEZE, or 1 and AW_WHY
   local _id _st
   AD_FREEZE=""
   [ -n "${ASKS_CMD:-}" ] || return 0
-  read_ask_scope "$1" "$2"
+  read_ask_scope "$1" "$2" || return 1
   [ -n "$AD_SCOPE" ] || return 0
   run_ask_witness "$1" "$2" $AD_SCOPE || return 1
   for _id in $(printf '%s\n' $AD_SCOPE | sort -t- -k2,2 -k3,3n); do
@@ -3555,9 +3572,20 @@ check_asks_pinned() { # slug · run-state file -> 1 with its own refusal printed
 }
 PF_MBASE=""; PF_ASKS_READY=""
 check_ask_mandate() { # slug · run-state file -> 1 with its own refusal printed
-  local slug="$1" rel="$2" _mb _ids _id _home _blob _pin _now _g _grades="" _allno=1 _sp _sslug
+  local slug="$1" rel="$2" _mb _ids _id _home _blob _pin _now _g _grades="" _allno=1 _sp _sslug _bad
   PF_MBASE=""; PF_ASKS_READY=""
   [ -n "${AUTH_ASKS:-}" ] || return 0
+  # THE LINE READS WHOLE OR THE MANDATE IS REFUSED, FIRST (closing diff review of dDerivedDocket,
+  # F2). Every property below iterates the ids, so a token the reader cannot take would leave them
+  # all passing over a set the owner never wrote - P5 over fewer rows, the witness over fewer ids, and
+  # its "fewer rows than asked" DEAD PROBE counting against the narrowed list. At preflight AND at
+  # every resume, which both run this function: a record pinned before this refusal existed is
+  # refused at its next resume rather than carried to a close.
+  if ! _ids=$(asks_ids_of "$AUTH_ASKS"); then
+    _bad=$(read_id_list_refusals "$AUTH_ASKS")
+    fail 87 "the build README's asks: line does not read whole as an id list, and a mandate taken from the ids that did parse is the owner's own list silently narrowed - write each id, an id range or a -N continuation, and nothing else: $_bad"
+    return 1
+  fi
   # PINNED ONCE, READ BACK. A re-preflight must grade the SAME tree the first one graded, or the
   # facts beside `m-base:` describe a merge base that has moved underneath them — the drift the
   # anchor triple was frozen to stop, one key over.
@@ -3574,7 +3602,6 @@ check_ask_mandate() { # slug · run-state file -> 1 with its own refusal printed
     fail 72 "this build README carries an asks: mandate and the tree the mandate is asserted against is not a commit this clone can read, so every property below would pass over an empty blob or, worse, over the index this run itself staged: m-base [${_mb:-(none)}], anchor ${ASHA:-(none)}"
     return 1
   fi
-  _ids=$(asks_ids_of "$AUTH_ASKS")
   check_asks_pinned "$slug" "$rel" || return 1
   # P5 — EVERY MANDATED ASK IS A RECORD THE RUN DID NOT CREATE. One `git show` per HOME folder, and
   # the line match is the kit library's, shared with the leg that re-derives this. Reading the
@@ -3715,7 +3742,13 @@ build_ask_plan() { # slug · spec paths… -> sets ASK_PLAN_ROWS, ASK_PLAN_NEXT,
   local _n=0 _sum _rdy _dup
   ASK_PLAN_ROWS=""; ASK_PLAN_NEXT=""; ASK_PLAN_WHY=""; ASK_POSITIONS=""; AW_ROWS=""
   _m=$(mandate_of "$slug")
-  _mids=$(asks_ids_of "$_m")
+  # A MANDATE THAT DOES NOT READ WHOLE IS NAMED, not planned from (closing review F2). This verb
+  # reports and refuses nothing, so it plans the folder's own asks and says, on a line of its own
+  # whatever the output mode, that no mandated ask is among them and why. Planning from the ids that
+  # did parse would hand a run the narrowed set `--preflight` now refuses.
+  if ! _mids=$(asks_ids_of "$_m"); then
+    echo "unattended: --plan — the build README's asks: line does not read whole as an id list, so no mandated ask is planned below and --preflight refuses the mandate: $(read_id_list_refusals "$_m")"
+  fi
   _bl=$(backlog_text_of "$slug")
   _fids=$(asks_filed_in "$_bl")
   for _id in $_mids; do
@@ -6793,7 +6826,7 @@ read_ask_back() { # ask id · slug -> 0 when ASKS_CMD reads it back as ONE OPEN 
 }
 
 write_inherited_asks() { # slug · R · run dir
-  local slug=$1 r=$2 d=$3 bl leg ver age own8 ownid cand reused fam seq id argv file tok a s k prior had
+  local slug=$1 r=$2 d=$3 bl leg ver age own8 ownid cand reused fam seq id argv file tok a s k prior had restored
   local r8=${2:0:8} today
   bl="$M/builds/$slug/BACKLOG.md"
   today=$(date -u +%Y-%m-%d)
@@ -6845,17 +6878,41 @@ write_inherited_asks() { # slug · R · run dir
       printf '    %s\n' "$a" "$s" "$k"
       continue
     fi
+    # THE BACKUP IS THE ROLLBACK'S PRECONDITION, so it is PROVEN before the file is touched, and a
+    # file that cannot be backed up is not written at all (closing diff review of dDerivedDocket,
+    # F4). This used to set `had=1` before the backup existed and never look again: under a temp store
+    # that failed after the bar ran, `mktemp` left `prior` empty, the restore guard read false, and
+    # the rollback's other arm DELETED a BACKLOG.md that existed before the write and staged the
+    # deletion into the close's records commit. A `cp` that failed or stopped short left a backup the
+    # restore then copied over the file. `cmp` is the proof: a backup that is not byte for byte the
+    # file is not a backup.
     had=0; prior=""
-    if [ -f "$bl" ]; then had=1; prior=$(mktemp) && cp -- "$bl" "$prior"; fi
+    if [ -f "$bl" ]; then
+      had=1
+      if ! prior=$(mktemp) || ! cp -- "$bl" "$prior" || ! cmp -s "$bl" "$prior"; then
+        [ -z "$prior" ] || rm -f -- "$prior"
+        echo "gates-green: no ask filed for leg $leg — $bl could not be backed up before the write, so a rollback could not put it back, and it is left exactly as it was"
+        continue
+      fi
+    fi
     mkdir -p "${bl%/*}" && write_backlog_rows "$bl" "$slug" "$a" "$s" "$k" && GIT add -- "$bl" 2>/dev/null
     if read_ask_back "$id" "$slug"; then
       echo "gates-green: filed ask $id for leg $leg red at $r8, staged in $bl"
     else
       # REMOVED, and the file put back exactly as it was: a row the parser cannot read back is a row
-      # every later reader would read differently from this writer.
-      if [ "$had" = 1 ] && [ -n "$prior" ]; then cp -- "$prior" "$bl"; GIT add -- "$bl" 2>/dev/null
+      # every later reader would read differently from this writer. A path that EXISTED before the
+      # write is only ever restored from its proven backup and never removed; a restore that fails
+      # KEEPS the backup and names it, because deleting the one good copy is the step to refuse.
+      restored=1
+      if [ "$had" = 1 ]; then
+        if cp -- "$prior" "$bl"; then GIT add -- "$bl" 2>/dev/null; else restored=0; fi
       else GIT rm -q --cached -f -- "$bl" >/dev/null 2>&1; rm -f -- "$bl"; fi
-      echo "gates-green: the rows for leg $leg were REMOVED — the declared ask generator did not read $id back as one OPEN HIGH ask homed at $slug: $AB_WHY"
+      if [ "$restored" = 1 ]; then
+        echo "gates-green: the rows for leg $leg were REMOVED — the declared ask generator did not read $id back as one OPEN HIGH ask homed at $slug: $AB_WHY"
+      else
+        echo "gates-green: the rows for leg $leg could NOT be removed — $bl was not put back from its backup, which is KEPT at $prior; restore it by hand before committing. The declared ask generator did not read $id back as one OPEN HIGH ask homed at $slug: $AB_WHY"
+        prior=""
+      fi
       [ -z "${RB_OUT:-}" ] || printf '%s\n' "$RB_OUT" | sed 's/^/    /'
     fi
     [ -z "$prior" ] || rm -f -- "$prior"
@@ -8157,8 +8214,13 @@ $_bcnon"
         DOD_OUT="this build README carries an asks: mandate and this project declares no ASKS_CMD, which --preflight refuses outright, so this run was authorized by a mandate nothing in the project can grade: $_ad_m"
         return 1
       fi
-      # ---- TERM 2: the witness, against the scope READ FROM THE TREE.
-      read_ask_scope "$slug" "$_ad_rev"
+      # ---- TERM 2: the witness, against the scope READ FROM THE TREE. A mandate that does not read
+      # ---- whole refuses first (closing review F2): read as nothing, M would leave the scope and
+      # ---- this item would grade the run's own filings alone.
+      if ! read_ask_scope "$slug" "$_ad_rev"; then
+        DOD_OUT="$AW_WHY"
+        return 1
+      fi
       _ad_n=$(printf '%s\n' $AD_SCOPE | grep -c . || true)
       if ! run_ask_witness "$slug" "$_ad_rev" $AD_SCOPE; then
         DOD_OUT="the ask witness did not answer for this build's scope, so no ask below is graded and any verdict here would be invented: $AW_WHY"
@@ -9532,6 +9594,9 @@ verb_dispatch() { # slug · unit · writes...
   local _dh_mandate _dh_ids _dh_a _dh_b _dh_block="" _dh_st
   _dh_mandate=$(fact "$rel" asks)
   if [ -n "$_dh_mandate" ]; then
+    # The PINNED line, which preflight and every resume refuse unless it reads whole (closing review
+    # F2). Its rc 1 here needs a record pinned before that refusal existed and never resumed since;
+    # it then holds nothing back at this gate, and `asks-disposed` refuses the same line at the close.
     _dh_ids=$(asks_ids_of "$_dh_mandate")
     _dh_a=$(spec_ask_verbs "$_d_spec" closes)
     if [ -n "$_dh_a" ] && run_ask_witness "$slug" "$(fact "$rel" m-base)" $_dh_ids; then

@@ -362,7 +362,8 @@ attributed <N> of <M> red legs against <R8>[ · DEAD PROBE <k>]
 ```
 
 The same rows land in the run record as `attribution`, TAB-separated: leg, verdict, inherited, own,
-the full `R` sha, reason — the reason LAST. **It changes no exit code**: a bar that was red is red.
+the full `R` sha, age, owner sha8, owner id, reason — the reason LAST, the three age columns `-`
+where no age was asked. **It changes no exit code**: a bar that was red is red.
 What to DO with a verdict is a policy, and the policy is not this runner's.
 
 The classifier, first match wins. **OWN, forced** when the diff between `R` and the working tree
@@ -393,6 +394,18 @@ bytes name, so a module imported from ANOTHER directory, or a conf named only at
 it; an edit there that hides the run's own offender can read INHERITED. An untracked file is
 invisible to the diff. A repository at a very deep path on Windows may fail to make the worktree,
 which reads every red DEAD PROBE rather than guessing.
+
+### The age of an INHERITED red — `GATE_INHERITED_RED_MAX_AGE=<n>`
+
+With the bound set, each INHERITED leg runs once more at `R~n`, `R`'s n-th first-parent ancestor,
+from `R`'s row in the same scratch worktree. Red there carrying every offender L carries appends
+`aged at R~<n>`; otherwise a bisection of the window names the landing that introduced the red,
+`age <k> · owner <sha8> <id>`. A probe that cannot answer appends `age unproven`, and only a number
+counts toward the inherited-green stamp. Without a `signature` the offenders are the output's
+non-blank lines: red with every line of L's is red there, and red with ANY other output cannot be
+answered, because text cannot tell a fixed offender from a moved count line. Such a leg is aged
+only while its text holds still or shrinks toward L's; one whose red prints a changing count
+declares a `signature` to be aged across it.
 
 ## The report tail contract
 

@@ -1374,6 +1374,9 @@ asks_unit_in() { # BACKLOG.md text -> every filed `unit` ask id, one per line, i
 # under" with the SAME bytes the driver answered it with. Two expanders disagree silently on the
 # one input that matters - a range - and the leg would then red an honest record for a row it never
 # looked for. The leg can source no driver, so a shared answer has to live in the shared file.
+# THE MANDATE NO LONGER READS THROUGH IT: an `asks:` value is an IDLIST, and `read_id_list` below
+# is its reader on both sides (closing diff review of dDerivedDocket, F2). This one stays the
+# reader of BINDING LINES - spec-audit lines and status-header verbs - whose words it must skip.
 #
 # The RECORD-BINDING id grammar is WIDER than `_ids_of`'s, and reading it with the narrow one is
 # wrong in both directions. `memory/HYGIENE.md` admits a trailing `@rev-N` and a contiguous run
@@ -1397,6 +1400,77 @@ expand_id_runs() { # stdin: binding-line text -> stdout: ids, ranges expanded, o
       } else if (t ~ /^[A-Z]+-[A-Za-z0-9]+-[0-9]+$/) print t
     }
   }'
+}
+# ------------------------------------------------------- the IDLIST reader, ALL OR NOTHING
+# THE `asks:` VALUE IS AN IDLIST, NOT A BINDING LINE, and the expander above is the wrong reader for
+# it (closing diff review of dDerivedDocket, round 1, F2). A binding line carries words, so that
+# expander takes the ids out of it and DROPS everything else without a word - which over a mandate
+# dropped every form the IDLIST grammar admits and it did not know (`-5`, `-5..6`) and every form
+# that grammar refuses (`<id>,`, an elision). The producer's own `read_idlist` reads the same value
+# all or nothing and refuses those by name, so the set a run pinned was silently narrower than the
+# one the owner wrote, and every check keyed on it passed over the narrowed set.
+#
+# THIS IS THAT GRAMMAR, token for token, and a parity arm runs both readers over one table:
+#   an id `<FAMILY>-<slug>-<n>`, a trailing `@rev-<n>` dropped · a run `<FAMILY>-<slug>-<lo>..<hi>`
+#   with lo <= hi, expanded · a continuation `-<n>` or `-<lo>..<hi>` taking the family and slug of
+#   the id before it · and NOTHING ELSE. An elision (`...` or `…` anywhere in a token), a trailing
+#   comma, a run counting backwards, a continuation with no id before it and any other word refuse
+#   the WHOLE list.
+# WHAT IT DOES NOT CHECK: that a family is DECLARED. The producer reads the family set out of its own
+# conf, which this kit copy-installs without, so an undeclared family reads here and is refused by the
+# witness every caller runs next.
+#
+# DUPLICATES ARE KEPT, where the producer collapses them: the producer returns a set to iterate, this
+# returns the owner's own listing, and a caller that needs a set collapses it (`read_ask_scope` does).
+# The parity arm compares the two after that collapse.
+read_id_tokens() { # stdin: an IDLIST value -> `id<TAB><id>` and `bad<TAB><token><TAB><why>` lines, in token order
+  awk '
+    function refuse(t, why) { printf "bad\t%s\t%s\n", t, why }
+    {
+      n = split($0, w, /[ \t\r]+/)
+      for (i = 1; i <= n; i++) {
+        t = w[i]
+        if (t == "") continue
+        if (index(t, "...") || index(t, "\342\200\246")) {
+          refuse(t, "carries an elision, which names no id; write every one, or a lo..hi range"); continue
+        }
+        if (t ~ /^-[0-9]+(\.\.[0-9]+)?$/) {
+          if (stem == "") { refuse(t, "a continuation with no id before it to continue"); continue }
+          lo = substr(t, 2); hi = lo; p = index(lo, "..")
+          if (p) { hi = substr(lo, p + 2); lo = substr(lo, 1, p - 1) }
+          if (hi + 0 < lo + 0) { refuse(t, "a range that counts backwards"); continue }
+          for (k = lo + 0; k <= hi + 0; k++) printf "id\t%s-%d\n", stem, k
+          continue
+        }
+        if (t ~ /^[A-Z]+-[A-Za-z0-9]+-[0-9]+(@rev-[0-9]+)?$/) {
+          sub(/@rev-[0-9]+$/, "", t)
+          printf "id\t%s\n", t
+          stem = t; sub(/-[0-9]+$/, "", stem)
+          continue
+        }
+        if (t ~ /^[A-Z]+-[A-Za-z0-9]+-[0-9]+\.\.[0-9]+$/) {
+          p = index(t, ".."); head = substr(t, 1, p - 1); hi = substr(t, p + 2) + 0
+          match(head, /[0-9]+$/); lo = substr(head, RSTART) + 0; s = substr(head, 1, RSTART - 2)
+          if (hi < lo) { refuse(t, "a range that counts backwards"); continue }
+          for (k = lo; k <= hi; k++) printf "id\t%s-%d\n", s, k
+          stem = s
+          continue
+        }
+        refuse(t, "neither an id, an id range, nor a -N continuation")
+      }
+    }'
+}
+# The ids, or NOTHING and rc 1. A caller holding rc 1 names the refusal through the reader below;
+# one that prints what did parse is the narrowing this reader exists to refuse.
+read_id_list() { # IDLIST value -> its ids, one per line, in listing order; rc 1 and nothing printed when any token is refused
+  local _rows
+  _rows=$(printf '%s\n' "$1" | read_id_tokens)
+  case $'\n'"$_rows" in *$'\n'bad$'\t'*) return 1 ;; esac
+  [ -z "$_rows" ] || printf '%s\n' "$_rows" | awk -F'\t' '{ print $2 }'
+}
+read_id_list_refusals() { # IDLIST value -> every refused token and why, on ONE line; nothing when the list reads whole
+  printf '%s\n' "$1" | read_id_tokens \
+    | awk -F'\t' '$1 == "bad" { printf "%s`%s` (%s)", (k++ ? "; " : ""), $2, $3 } END { if (k) print "" }'
 }
 # The build folder an ask is FILED in: the slug segment of its own id. An id nobody filed still
 # names its home this way, which is what lets the P5 refusal say WHERE to go and look. MOVED HERE

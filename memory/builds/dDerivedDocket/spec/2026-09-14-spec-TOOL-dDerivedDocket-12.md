@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-12 — relocation tools for pre-flip branches
 
-**Status:** CLOSED · rev-6 · 2026-09-21 · node d · Tier-2 · base fb07ca25 · streams tooling · order 12
+**Status:** CLOSED · rev-7 · 2026-09-28 · node d · Tier-2 · base fb07ca25 · streams tooling · order 12
 
 <!-- gen:spec-records -->
 
@@ -62,8 +62,9 @@ audit can count, and refuses to finish while any change is unaccounted.
   containment, and every containment under the straggler form, exits 2 naming the condition and
   `--repair` (§8 F9). Observed by AC5, AC14 and AC16.
 - **S7** `--repair <merge-sha> --as <slug>`, run from any builds-mode checkout for a transition that
-  hygiene check 25 reports. It plans only the entries not already accounted at `HEAD`, so a second
-  run plans nothing. Observed by AC4.
+  hygiene check 26 reports. It plans only the entries not already accounted in the tree it writes,
+  the index, so a second run plans nothing; on a clean tree that is `HEAD`, and inside an open
+  merge it is not. Observed by AC4.
 - **S8** `--stragglers [--local] [--tsv]`, a print mode over every local and remote-tracking ref,
   `--local` narrowing to `refs/heads`. A ref is listed while its delta against the default branch
   holds an entry that the default tip neither holds in history nor accounts. It prints a liveness
@@ -716,6 +717,10 @@ New arm: `python3 tools/memory-tree/migrate_backlog.py --selftest` · one fixtur
   drop this machine's own `GOV_DEFAULT_BRANCH` for the whole block and put it back, because every
   fixture that resolves a default branch cross-checks the observed one against it. §7's arm line
   said three DEAD PROBE cases where S8 and AC6 both name two.
+- rev-7 · 2026-09-28 · §2 · S7 · the closing diff review's F9: `--relocate` re-planned inside an
+  open merge because the accounted filter read `HEAD`, the straggler's pre-merge commit, rather
+  than the index the verb stages. S7 now names the index; the check number reads 26, the
+  transition audit's since the second merge of main. The fold is the code change.
 
 ## 10. Reuse audit
 

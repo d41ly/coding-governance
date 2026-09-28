@@ -9076,6 +9076,15 @@ asksetup() {
   mutate memory/builds/tAskP/README.md '/^slug: tAskP$/a authorized-by: prompt\nasks: EXMP-aFoo-3'
   readme tAskR
   mutate memory/builds/tAskR/README.md '/^slug: tAskR$/a authorized-by: recipe\nasks: EXMP-aFoo-3'
+  # CLOSING REVIEW F2 - three spellings of one two-ask mandate: the `-N` continuation the IDLIST
+  # grammar admits, and the two comma forms it refuses. The binding-line expander read the first as
+  # `-3` alone and the second as `-4` alone, and read the third as nothing at all.
+  readme tAskC
+  mutate memory/builds/tAskC/README.md '/^slug: tAskC$/a asks: EXMP-aFoo-3 -4'
+  readme tAskK
+  mutate memory/builds/tAskK/README.md '/^slug: tAskK$/a asks: EXMP-aFoo-3, EXMP-aFoo-4'
+  readme tAskN
+  mutate memory/builds/tAskN/README.md '/^slug: tAskN$/a asks: EXMP-aFoo-3,EXMP-aFoo-4'
   # A mandate naming one ask this tree files and one it does not, for property P5.
   readme tAskLate
   mutate memory/builds/tAskLate/README.md '/^slug: tAskLate$/a asks: EXMP-aFoo-3 EXMP-aFoo-9'
@@ -9184,6 +9193,31 @@ out=$(run --resume tAskA --keepalive-id KA-1)
 hit "$out" "the build README's asks: line at HEAD is not the one this run pinned, and a run that re-read its own mandate could grow the set it is authorized for: pinned ["
 hit "$out" "EXMP-aFoo-3..4"
 
+# ---- CLOSING REVIEW F2: the mandate reads ALL OR NOTHING, in the producer's own IDLIST grammar. A
+# ---- `-N` continuation is an id and is pinned and graded as one; a comma-suffixed token refuses the
+# ---- whole line BY NAME before anything is pinned. RED under the binding-line expander this reader
+# ---- replaced, which graded `-3` alone for the first, `-4` alone for the second, and nothing for the
+# ---- third - where it then refused with the misleading every-ask-grades-not-ready line.
+askreset
+out=$(run --preflight tAskC --keepalive-id KA-1)
+hit "$out" "mandate pinned at m-base"
+same "F2 a -N continuation is graded as the id it names" "$(sed -n 's/^asks-ready: //p' memory/builds/tAskC/RUN.md)" "EXMP-aFoo-3=yes EXMP-aFoo-4=yes"
+same "F2 ...and the witness was asked about both" "$(sed -n 's/.*--ready \(.*\) --target.*/\1/p' "$TMP/argv.txt")" "EXMP-aFoo-3 EXMP-aFoo-4"
+askreset
+out=$(run --preflight tAskK --keepalive-id KA-1)
+hit "$out" "the build README's asks: line does not read whole as an id list, and a mandate taken from the ids that did parse is the owner's own list silently narrowed - write each id, an id range or a -N continuation, and nothing else: "
+hit "$out" "\`EXMP-aFoo-3,\` (neither an id, an id range, nor a -N continuation)"
+same "F2 a refused mandate pins nothing" "$(git status --porcelain | grep -c . || true)" "0"
+askreset
+out=$(run --preflight tAskN --keepalive-id KA-1)
+hit  "$out" "\`EXMP-aFoo-3,EXMP-aFoo-4\` (neither an id, an id range, nor a -N continuation)"
+miss "$out" "every mandated ask in this build README grades not-ready"
+# ...and `--plan`, which refuses nothing, NAMES the line rather than planning the ids that parsed.
+askreset
+out=$(run --plan tAskK --asks)
+hit  "$out" "unattended: --plan — the build README's asks: line does not read whole as an id list, so no mandated ask is planned below and --preflight refuses the mandate: \`EXMP-aFoo-3,\`"
+miss "$out" "EXMP-aFoo-4"
+
 # ---- AC6: the witness's five failure shapes, and the mandate that grades all-no.
 askreset; askmode tenfield
 out=$(run --preflight tAskA --keepalive-id KA-1)
@@ -9289,6 +9323,27 @@ hit "$out" "EXMP-aFoo-4"
 hit "$out" "UNDECIDED - plan a unit that closes it, or dispose it"
 miss "$out" "no tracked spec under this build, and neither its roster"
 
+# ---- CLOSING REVIEW F3: a SEV or RELOCATED row NAMES an ask and disposes of nothing, so the ask stays
+# ---- `cover=-` and is the one the UNDECIDED rung offers. RED under the any-verb reader this replaced,
+# ---- which printed `cover=SEV` and sent the ladder to the next ask - and from ASK_CUTOFF every new
+# ---- ask carries a SEV row beside it, so that reader hid nearly all of them from the planner. The
+# ---- KEEP arm is the control: a STATUS row still covers, or these arms pass over a reader that
+# ---- covers nothing at all.
+askrows ''
+printf '# tMandate — asks\n\n## Asks\n\n## Dispositions\n- SEV · EXMP-aFoo-3 · HIGH · triaged, and decided nothing\n' > memory/builds/tMandate/BACKLOG.md
+out=$(run --plan tMandate --asks --paths)
+hit "$out" "ASK	EXMP-aFoo-3	status=OPEN;ready=yes;cover=-;rank=1"
+hit "$out" "next: EXMP-aFoo-3 (UNDECIDED - plan a unit that closes it, or dispose it)"
+printf '# tMandate — asks\n\n## Asks\n\n## Dispositions\n- RELOCATED · EXMP-aFoo-3 · by 0123abcd · kept: moved here and decided nothing\n' > memory/builds/tMandate/BACKLOG.md
+out=$(run --plan tMandate --asks --paths)
+hit "$out" "ASK	EXMP-aFoo-3	status=OPEN;ready=yes;cover=-;rank=1"
+hit "$out" "next: EXMP-aFoo-3 (UNDECIDED - plan a unit that closes it, or dispose it)"
+printf '# tMandate — asks\n\n## Asks\n\n## Dispositions\n- SEV · EXMP-aFoo-3 · HIGH · triaged\n- KEEP · EXMP-aFoo-3 · kept live on purpose\n' > memory/builds/tMandate/BACKLOG.md
+out=$(run --plan tMandate --asks --paths)
+hit "$out" "ASK	EXMP-aFoo-3	status=OPEN;ready=yes;cover=KEEP;rank=1"
+hit "$out" "next: EXMP-aFoo-4 (UNDECIDED - plan a unit that closes it, or dispose it)"
+rm -f memory/builds/tMandate/BACKLOG.md
+
 # ---- AC10: a unit closing an ask HELD ON a mandated ask that is not terminal.
 askreset
 askrows 'EXMP-aFoo-3\tOPEN\t-\taFoo\tHIGH\tyes\t-\tEXMP-aFoo-4\t-\t-\nEXMP-aFoo-4\tOPEN\t-\taFoo\tHIGH\tyes\t-\t-\t-\t-\n'
@@ -9350,8 +9405,8 @@ hit "$(run --rescope tUnitAsk --act retire --item EXMP-tUnitAsk-77 --reason gone
 ASKS_ROOT=$(cd "$HERE" && git rev-parse --show-toplevel 2>/dev/null)
 ASKS_REAL=$(sed -n 's/^ASKS_CMD="\(.*\)"$/\1/p' "$ASKS_ROOT/.unattended.conf" 2>/dev/null | head -1)
 if [ -z "$ASKS_REAL" ]; then
-  n=$((n+14))
-  echo "  SKIP AC15 — this repository's .unattended.conf declares no ASKS_CMD, so the two call shapes have no declared producer to run against; the stubbed arms above are the only coverage until it is armed, and the arm's 14 assertions are counted, not run"
+  n=$((n+36))
+  echo "  SKIP AC15 — this repository's .unattended.conf declares no ASKS_CMD, so the two call shapes and closing review F2's IDLIST parity table have no declared producer to run against; the stubbed arms above are the only coverage until it is armed, and the arm's 36 assertions are counted, not run"
 else
   echo "  AC15 runs the declared producer: $ASKS_REAL"
   slice_fn run_bounded; slice_fn read_stderr_tail; slice_fn derive_stream_verdict
@@ -9426,6 +9481,43 @@ else
   run_ac15_witness "bash $ac15_dir/.git/merge-streams.sh $ASKS_REAL" tRun "$ac15_mbase" EXMP-aFoo-30 EXMP-aFoo-31; _rc=$?
   same "AC15 control: the same producer with its notices merged onto stdout is refused by the same parse" "$_rc" "1"
   hit  "$AW_WHY" "the declared ask generator printed a line that is not the"
+  # ---- CLOSING REVIEW F2: THE TWO IDLIST READERS, ONE TABLE. The driver's mandate reader (the kit
+  # ---- library's, sourced at the head of this suite) and the declared producer's `--ready` parse
+  # ---- read one grammar in two languages, and a spelling one takes and the other drops is a mandate
+  # ---- pinned narrower than the owner wrote. Each row states the answer both must give; the
+  # ---- producer's REFUSED must be its own all-or-nothing refusal, never some other failure, and its
+  # ---- rows are read after its collapse of duplicates, which this reader leaves to its callers.
+  while IFS='|' read -r ac15_want ac15_v; do
+    [ -n "$ac15_v" ] || continue
+    if ac15_ids=$(read_id_list "$ac15_v"); then
+      ac15_sh=$(printf '%s\n' "$ac15_ids" | awk 'NF && !seen[$0]++' | paste -sd' ' -)
+    else
+      ac15_sh=REFUSED
+    fi
+    # shellcheck disable=SC2086 # the declared value is a launcher and a script, split on purpose
+    ac15_py=$($ASKS_REAL --tsv --ready $ac15_v --at "$ac15_head" 2>"$TMP/ac15-idl.err"); _rc=$?
+    if [ "$_rc" = 0 ]; then
+      ac15_py=$(printf '%s\n' "$ac15_py" | awk -F'\t' '$1 == "ask" { print $2 }' | paste -sd' ' -)
+    elif grep -qF "the id list is read ALL or NOTHING" "$TMP/ac15-idl.err"; then
+      ac15_py=REFUSED
+    else
+      ac15_py="UNANSWERED rc $_rc: $(head -c 200 "$TMP/ac15-idl.err")"
+    fi
+    same "F2 the driver's IDLIST reader over [$ac15_v]" "$ac15_sh" "$ac15_want"
+    same "F2 the declared producer's IDLIST reader over [$ac15_v]" "$ac15_py" "$ac15_want"
+  done <<'AC15IDL'
+EXMP-aFoo-30 EXMP-aFoo-31|EXMP-aFoo-30 EXMP-aFoo-31
+EXMP-aFoo-30 EXMP-aFoo-31|EXMP-aFoo-30..31
+EXMP-aFoo-30 EXMP-aFoo-31|EXMP-aFoo-30 -31
+EXMP-aFoo-31 EXMP-aFoo-30|EXMP-aFoo-31 -30..31
+EXMP-aFoo-30|EXMP-aFoo-30@rev-1
+REFUSED|EXMP-aFoo-30, EXMP-aFoo-31
+REFUSED|EXMP-aFoo-30,EXMP-aFoo-31
+REFUSED|EXMP-aFoo-30 … EXMP-aFoo-31
+REFUSED|EXMP-aFoo-30...31
+REFUSED|EXMP-aFoo-31..30
+REFUSED|-30 EXMP-aFoo-31
+AC15IDL
   cd "$TMP" || exit 2
   rm -rf "$ac15_dir"
 fi
@@ -9521,6 +9613,16 @@ out=$(run --close tDisp)
 hit "$out" "so this is unanswered because the command never returned rather than because it said no"
 miss "$out" "DEAD PROBE - the declared ask generator disagrees"
 askmode ok
+# ---- CLOSING REVIEW F2, term 2's precondition: a PINNED mandate that does not read whole is a
+# ---- refusal, never an empty M. Preflight and every resume refuse such a line before it is pinned,
+# ---- so this record is one a driver without that refusal pinned, written here by hand. RED under the
+# ---- reader this replaced: the scope read `-4` alone and this item graded the one ask it could see.
+dispreset
+run --preflight tDisp --keepalive-id KD-1 >/dev/null
+mutate memory/builds/tDisp/RUN.md 's/^asks: EXMP-aFoo-3$/asks: EXMP-aFoo-3, EXMP-aFoo-4/'
+git add -A >/dev/null; git commit -q -m pinnedbad --no-verify
+out=$(run --close tDisp)
+hit "$out" "the asks: mandate this run is under does not read whole as an id list, so its scope cannot be enumerated and a scope taken from the ids that did parse would be the owner's list silently narrowed: \`EXMP-aFoo-3,\`"
 
 # ---- AC13: this build filed an ask and left it neither disposed nor terminal. Graded off the
 # ---- SCOPE's membership, never off the witness's `home` field.
@@ -10585,6 +10687,81 @@ out=$(IH_ASK_EMPTY=1 run_ih --close tRun $IHOVR)
 hit  "$out" "gates-green: the rows for leg x leg were REMOVED — the declared ask generator did not read ARCH-tRun-2 back as one OPEN HIGH ask homed at tRun"
 n=$((n+1)); [ ! -f "$ih_dir/memory/builds/tRun/BACKLOG.md" ] || { echo "FAIL AC9 the rows the witness did not read back were kept"; st=1; }
 
+# CLOSING REVIEW F4: the rollback's precondition is its BACKUP, and a BACKLOG.md that existed before
+# the write is never deleted by it. SLICED out of the shipped driver, because the failure needs the
+# temp store to fail AFTER the bar has run and written its record, which no whole-verb fixture can
+# arrange: the bar's own capture lives in that same store. The filer and the row writer are the
+# shipped bytes; the attribution row is the one a bar writes; the three neighbours the filer calls
+# are doubles. RED under the filer this replaced: a store that could not hold the backup DELETED the
+# authored file and staged the deletion, and a backup copy that failed TRUNCATED it to the empty
+# backup on restore. The last two arms are the controls: a proven backup still restores the file
+# byte for byte, and a read-back that answers still files beside the authored rows.
+f4_dir=$(mktemp -d)
+( cd "$f4_dir" && git init -q -b main . && git config user.email t@t.test && git config user.name t \
+    && git config core.autocrlf false && mkdir -p memory/builds/tRun .git/f4-run \
+    && printf '# tRun — asks\n\n## Asks\n- ARCH-tRun-1 · filed 2026-09-01 · an authored ask · seen `x.sh`@abc1234 · accept done\n\n## Dispositions\n- KEEP · ARCH-tRun-1 · authored, and kept live on purpose\n' \
+         > memory/builds/tRun/BACKLOG.md \
+    && git add -A && git commit -q -m authored --no-verify ) >/dev/null 2>&1
+cp "$f4_dir/memory/builds/tRun/BACKLOG.md" "$TMP/f4-authored.md"
+printf 'x leg\tINHERITED\t1\t0\t%s\t3\t0badc0de\tARCH-tRun-1\tstub\n' "$(git -C "$f4_dir" rev-parse HEAD)" \
+  > "$f4_dir/.git/f4-run/attribution"
+: > "$TMP/f4-not-a-dir"
+# A `cp` that fails ONE of the filer's two copies, first on PATH: a script and not a shell function,
+# so the lexicon's verb table is not asked to name a builtin's shadow. Its directory is taken through
+# `pwd`, which spells it the way PATH splits; a drive-letter `TMP` would cut the entry at its colon.
+mkdir -p "$TMP/f4-shim"
+printf '#!/usr/bin/env bash\ncase "${F4_CP_FAILS:-}" in\n  backup)  [ "$2" = "$F4_BL" ] && exit 1 ;;\n  restore) [ "$3" = "$F4_BL" ] && exit 1 ;;\nesac\nexec "$F4_REAL_CP" "$@"\n' \
+  > "$TMP/f4-shim/cp"
+chmod +x "$TMP/f4-shim/cp"
+f4_shim=$(cd "$TMP/f4-shim" && pwd)
+slice_fn write_inherited_asks; slice_fn write_backlog_rows
+read_leg_argv() { printf 'bash x.sh'; }
+derive_ask_seq() { printf '2'; }
+read_ask_back() { AB_WHY="the double reads nothing back"; [ "${F4_READBACK:-no}" = yes ]; }
+run_f4_filer() { # temp store -> the sliced filer's output over the arm's repository; F4_CP_FAILS=backup|restore fails that copy
+  local M=memory ASKS_CMD="bash asks.sh" RB_OUT=""
+  local -x TMPDIR="$1" F4_BL="memory/builds/tRun/BACKLOG.md" F4_CP_FAILS="${F4_CP_FAILS:-}" F4_REAL_CP
+  F4_REAL_CP=$(command -v cp)
+  ( cd "$f4_dir" || exit 2
+    [ -z "$F4_CP_FAILS" ] || PATH="$f4_shim:$PATH"
+    write_inherited_asks tRun "$(git rev-parse HEAD)" "$f4_dir/.git/f4-run" ) 2>&1
+}
+seed_f4_tree() { git -C "$f4_dir" reset -q --hard; git -C "$f4_dir" clean -qfd; }
+out=$(run_f4_filer "$TMP/f4-not-a-dir")
+hit  "$out" "gates-green: no ask filed for leg x leg — memory/builds/tRun/BACKLOG.md could not be backed up before the write, so a rollback could not put it back, and it is left exactly as it was"
+n=$((n+1)); cmp -s "$f4_dir/memory/builds/tRun/BACKLOG.md" "$TMP/f4-authored.md" \
+  || { echo "FAIL F4 a temp store that could not hold the backup left the authored BACKLOG.md altered or gone"; st=1; }
+same "F4 ...and staged nothing" "$(git -C "$f4_dir" status --porcelain)" ""
+seed_f4_tree
+out=$(F4_CP_FAILS=backup run_f4_filer "$TMP")
+hit  "$out" "memory/builds/tRun/BACKLOG.md could not be backed up before the write"
+n=$((n+1)); cmp -s "$f4_dir/memory/builds/tRun/BACKLOG.md" "$TMP/f4-authored.md" \
+  || { echo "FAIL F4 a backup copy that failed let the restore overwrite the authored BACKLOG.md"; st=1; }
+same "F4 ...and staged nothing" "$(git -C "$f4_dir" status --porcelain)" ""
+seed_f4_tree
+out=$(run_f4_filer "$TMP")
+hit  "$out" "gates-green: the rows for leg x leg were REMOVED — the declared ask generator did not read ARCH-tRun-2 back"
+n=$((n+1)); cmp -s "$f4_dir/memory/builds/tRun/BACKLOG.md" "$TMP/f4-authored.md" \
+  || { echo "FAIL F4 control: a proven backup did not restore the authored BACKLOG.md byte for byte"; st=1; }
+same "F4 control: the restored file stages back to HEAD" "$(git -C "$f4_dir" status --porcelain)" ""
+# ...and a RESTORE that fails keeps the one good copy and says where, rather than deleting it and
+# reporting the rows removed.
+seed_f4_tree
+out=$(F4_CP_FAILS=restore run_f4_filer "$TMP")
+hit  "$out" "gates-green: the rows for leg x leg could NOT be removed — memory/builds/tRun/BACKLOG.md was not put back from its backup, which is KEPT at "
+miss "$out" "were REMOVED"
+f4_kept=$(printf '%s\n' "$out" | sed -n 's/.*which is KEPT at \(.*\); restore it by hand.*/\1/p')
+n=$((n+1)); { [ -n "$f4_kept" ] && cmp -s "$f4_kept" "$TMP/f4-authored.md"; } \
+  || { echo "FAIL F4 a restore that failed kept no backup byte-identical to the authored BACKLOG.md: [$f4_kept]"; st=1; }
+[ -z "$f4_kept" ] || rm -f -- "$f4_kept"
+seed_f4_tree
+out=$(F4_READBACK=yes run_f4_filer "$TMP")
+hit  "$out" "gates-green: filed ask ARCH-tRun-2 for leg x leg red at"
+hit  "$(cat "$f4_dir/memory/builds/tRun/BACKLOG.md")" "- KEEP · ARCH-tRun-1 · authored, and kept live on purpose"
+hit  "$(cat "$f4_dir/memory/builds/tRun/BACKLOG.md")" "- SEV · ARCH-tRun-2 · HIGH · a merge-bar leg is red on the default branch"
+unset -f write_inherited_asks write_backlog_rows read_leg_argv derive_ask_seq read_ask_back run_f4_filer seed_f4_tree
+rm -rf "$f4_dir" "$TMP/f4-authored.md" "$TMP/f4-not-a-dir" "$TMP/f4-shim"
+
 # AC21 and AC23: under park with the witness set, the rows are staged beside the hold line; commit,
 # push, reap and hold as the line says, and the hold is accepted. Resumed and closed again over the
 # same leg at the same R, the second close REUSES the OPEN ask and stages nothing, and the second
@@ -11315,7 +11492,20 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # +14 and FLOOR_SHARD_1 is untouched. COUNTED EITHER WAY: the blank-key SKIP adds the same 14. The
 # block was run alone behind a replica of this prologue by hand, n 0 -> 14 and green, and red under a
 # driver copy parsing both streams, a lax parse, a merged producer and a ten-field one; no suite ran.
-FLOOR_ASSERTIONS=1778
+# RAISED 1778 -> 1836 by the fold of dDerivedDocket's closing diff review, round 1, findings F2, F3
+# and F4: 58 executed assertions, all in region two, so FLOOR_SHARD_2 carries the same +58 and
+# FLOOR_SHARD_1 is untouched. F2 is 37: the three mandate-spelling fixtures' `mutate` lines in
+# `asksetup`, ten preflight and `--plan` arms after AC4, the IDLIST parity table inside AC15 (eleven
+# rows, two `same` each, COUNTED EITHER WAY, so its SKIP branch now adds 36 where it added 14), and
+# the `asks-disposed` arm's `mutate` and `hit`. F3 is six `--plan` arms after AC17; F4 is fifteen
+# sliced-filer arms after AC9's armed halves. MEASURED, not typed: two cuts run behind a replica of
+# this prologue by hand, HEAD's suite against HEAD's kit and then this suite against the fold - the
+# ask block and the F4 arm, n 115 -> 171, and the ask and asks-disposed blocks, n 168 -> 211 - with
+# every new arm green on the fold. On HEAD's kit each arm grading a changed path reds; the controls,
+# the producer's half of the parity table and its REFUSED rows do not, as they should. Thirteen
+# OLDER arms of those two blocks red in the replica, identically at HEAD and on the fold, and this
+# raise neither counts on nor moves them. No suite ran.
+FLOOR_ASSERTIONS=1836
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -11440,7 +11630,8 @@ FLOOR_SHARD_1=208
 # +6 for the run_bounded and verb arms, which sit above the REGION TWO terminator and are therefore
 # paid by shard 2 as well as by an unsharded run.
 # +61 for the TOOL-dDerivedDocket-28 process-ledger arms, all in region two - see FLOOR_ASSERTIONS.
-FLOOR_SHARD_2=1582
+FLOOR_SHARD_2=1640
+# +58 for the fold of dDerivedDocket's closing diff review, round 1 (F2, F3, F4), all in region two - see FLOOR_ASSERTIONS.
 # +14 for TOOL-dDerivedDocket-16's AC15 arm at the VERIFYING pass, all in region two - see FLOOR_ASSERTIONS.
 # +5 for the --hold line-end refusal arms at the second origin/main reconcile, region two - see FLOOR_ASSERTIONS.
 # +23 for the TOOL-dDerivedDocket-65 sub-agent arms, all in region two - see FLOOR_ASSERTIONS.

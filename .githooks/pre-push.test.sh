@@ -711,10 +711,11 @@ esac
 cd "$pfx_home" || exit 2
 
 # ---- TOOL-dDerivedDocket-26: AN EXIT 0 IS NOT A VERDICT UNTIL THE RUN RECORD SAYS SO ------------------
-# A STUB RUNNER at the hook's DEFAULT command, with GOV_GATE_CMD unset, because an override command is
-# announced and not checked. It exits 0 in every mode; the variable is what it writes into the run
-# record of the id the hook pinned. The GREEN mode is the control: without it a hook that blocked
-# every push would pass the two arms that expect a block.
+# A STUB RUNNER at the hook's DEFAULT command, TRACKED at the runner's own path, so the hook takes it
+# for the runner whether GOV_GATE_CMD is unset or names it (F8, below); only the declared STUB and a
+# declared GATE_CMD naming another script go unchecked. It exits 0 in every mode; the variable is
+# what it writes into the run record of the id the hook pinned. The GREEN mode is the control:
+# without it a hook that blocked every push would pass the two arms that expect a block.
 build_vr_fixture() { # tag -> a pushed main whose tree carries the stub runner; cwd moves into its work tree
   local d="$tmp/vr-$1"
   mkdir -p "$d/hooks"; cp "$SRC/.githooks/pre-push" "$d/hooks/pre-push"
@@ -775,12 +776,37 @@ case "$(sort -u "$tmp/vr-ids" | grep -c .)|$(grep -c '^planted$' "$tmp/vr-ids")"
   "2|0") ok "VR AC15 two pushes pin two different ids, neither the inherited one" ;;
   *) bad "VR AC15 the stub runner saw these ids: $(tr '\n' ' ' < "$tmp/vr-ids")" ;;
 esac
-# S6's announcement: an override command is not the runner and writes no record, so it is not checked.
+# S6's announcement: the declared STUB is not the runner and writes no record, so it is not checked.
 git commit -q --allow-empty -m "vr override" >/dev/null 2>&1
 _o=$( GATE_SELFTESTS= GOV_GATE_CMD="bash $green" git push origin main 2>&1 ); _r=$?
 case "$_r|$_o" in
-  0*"its run record is not checked for an override command"*) ok "VR an override command lands and the skipped record check is announced" ;;
-  *) bad "VR an override command must land with the skip announced, got rc $_r: $_o" ;;
+  0*"STUB"*"its run record is not checked for an override command"*) ok "VR a STUB override lands and the skipped record check is announced" ;;
+  *) bad "VR a STUB override must land with the skip announced, got rc $_r: $_o" ;;
+esac
+# F8 (closing diff review round 1): THE KNOB DOES NOT SWITCH S6 OFF. GOV_GATE_CMD naming the runner
+# itself, with no test escape, vets as `tracked` and earns the lander marker, so the record check has
+# to run for it exactly as for the default command. The stub runner above exits 0 and writes no record.
+git reset -q --hard origin/main
+run_vr_push VR_MODE=none GOV_GATE_CMD_TEST= GOV_GATE_CMD="bash $KIT_REL/run-gates/run-gates.sh"
+case "$VR_RC|$VR_OUT" in
+  1*"left no verdict in its run record"*) ok "VR F8 GOV_GATE_CMD naming the runner is still held to its run record: an exit 0 with none is blocked" ;;
+  *) bad "VR F8 GOV_GATE_CMD naming the runner switched the record check off, got rc $VR_RC: $VR_OUT" ;;
+esac
+# ITS CONTROL: the same override over the runner's own GREEN record lands, so the arm above is the
+# record check and not a refusal of the override itself.
+git reset -q --hard origin/main
+run_vr_push VR_MODE=green GOV_GATE_CMD_TEST= GOV_GATE_CMD="bash $KIT_REL/run-gates/run-gates.sh"
+[ "$VR_RC" = 0 ] && ok "VR F8 control: GOV_GATE_CMD naming the runner lands over the runner's own GREEN record" \
+  || bad "VR F8 control: GOV_GATE_CMD naming the runner must land over a GREEN record, got rc $VR_RC: $VR_OUT"
+# AND THE ONE SANCTIONED SKIP: a declared GATE_CMD naming ANOTHER tracked script writes no record this
+# hook can read, so the check is skipped for it and the skip is announced, naming the script.
+printf '#!/usr/bin/env bash\nexit 0\n' > other-bar.sh
+printf 'GATE_CMD="bash other-bar.sh"\n' > .unattended.conf
+git add other-bar.sh .unattended.conf >/dev/null 2>&1; git commit -q -m "declare another bar" >/dev/null 2>&1
+_o=$( env -u GATE_RUN_ID GATE_SELFTESTS= GOV_GATE_CMD_TEST= GOV_GATE_CMD="bash other-bar.sh" git push origin main 2>&1 ); _r=$?
+case "$_r|$_o" in
+  0*"runs the declared GATE_CMD 'other-bar.sh', not this kit's runner"*"not checked"*) ok "VR F8 a declared GATE_CMD naming another script lands, its record skip announced by name" ;;
+  *) bad "VR F8 a declared GATE_CMD naming another script must land with its skip announced, got rc $_r: $_o" ;;
 esac
 cd "$pfx_home" || exit 2
 

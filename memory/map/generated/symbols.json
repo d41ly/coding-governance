@@ -2738,6 +2738,11 @@
       "file": "tools/memory-tree/transition_audit.py"
     },
     {
+      "id": "derive_cache_key",
+      "kind": "function",
+      "file": "tools/memory-tree/transition_audit.py"
+    },
+    {
       "id": "derive_candidates",
       "kind": "function",
       "file": "tools/lexicon/scaffold_lexicon.py"
@@ -5749,6 +5754,11 @@
     },
     {
       "id": "read_signed_record",
+      "kind": "function",
+      "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "read_signed_text",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
     },

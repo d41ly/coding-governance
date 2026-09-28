@@ -1134,8 +1134,14 @@ check_backlog_stragglers() {
     echo "skip     straggler — no .memory-tree.conf here, so this repo declares no backlog mode"
     return
   fi
-  mode=$(sed -n 's/^[[:space:]]*BACKLOG_MODE[[:space:]]*=[[:space:]]*//p' "$conf" | tail -n 1 |
-         tr -d "\"'\r" | sed 's/[[:space:]]*$//')
+  # READ IN THE FILE'S OWN LANGUAGE, as check M above reads FAMILIES: the conf is a shell file the
+  # hygiene gate SOURCES, so a subshell source is the kit's reader and not a second one. The pipeline
+  # this replaces kept `BACKLOG_MODE=builds   # note` as `builds   # note` and read
+  # `export BACKLOG_MODE=builds` as nothing, and skipped a flipped tree as not flipped
+  # (closing diff review round 1, F6). A trailing CR is dropped as the kit's python parser drops it;
+  # the conf is pinned LF, so that only matters in a working copy that smudged it anyway.
+  mode=$( . "./$conf" >/dev/null 2>&1; printf '%s' "${BACKLOG_MODE:-}" )
+  mode=${mode%$'\r'}
   if [ "$mode" != builds ]; then
     echo "skip     straggler — BACKLOG_MODE is not 'builds' here, so no branch can be a straggler yet"
     return

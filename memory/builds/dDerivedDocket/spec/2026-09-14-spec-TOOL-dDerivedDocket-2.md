@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-2 — in-place landing merge
 
-**Status:** CLOSED · rev-5 · 2026-09-20 · node d · Tier-2 · base fb07ca25 · streams tooling · order 2
+**Status:** CLOSED · rev-6 · 2026-09-28 · node d · Tier-2 · base fb07ca25 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -146,8 +146,10 @@ Neither flag reads or writes local `<def>`, except that `--land` READS it for th
    `--carry` runs exactly this step and stops, printing the members and exiting 1 on a foreign one.
 
    These are the commits that entered B through a merge of local `<def>` and that the push would
-   publish. Each is attributed to a build by the first unit id in its subject, else by the
-   `<memory-root>/builds/<slug>/` folders it touches, else `unknown`. A member whose build is not
+   publish. Each is attributed first by the `<memory-root>/builds/<slug>/` folders it touches, then
+   by a claim at the HEAD of its subject only (a `<verb>(<slug>):` prefix, a unit id and a colon,
+   or `merge: <unit id>`), else `unknown`; an id elsewhere in the subject is a citation, and a head
+   claim naming another build, or naming none, is foreign. A member whose build is not
    `<slug>` refuses the landing, naming the sha, the subject and the build; `unknown` counts as
    foreign. A commit of this build that reached local `<def>` by some attended act is not foreign.
 3. `touch "$(git rev-parse --git-dir)/push-main-active"`. In a linked worktree that is the
@@ -370,6 +372,10 @@ New arm: `tools/push-main.test.sh` · a scratch repository with a bare remote, a
   entry carried an earlier date takes a new `- rev-<N>` line with a single bump. This entry was
   briefly folded the second way and is restored to the first; the bump the other specs of the set
   took was correct for them, because none of them had a same-day entry to extend.
+- rev-6 · 2026-09-28 · §4 · the closing diff review's F7: the carry-set step read the first unit
+  id ANYWHERE in a subject before the folders, so another build's records commit citing this
+  build's id landed unflagged. The step now reads the folders first and a claim only at the
+  subject's head. Wording only here; the fold is the code change, graded by push-main's suite.
 
 ## 10. Reuse audit
 

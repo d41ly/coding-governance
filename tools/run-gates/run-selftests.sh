@@ -1556,19 +1556,33 @@ if [ -n "$ATTRIBUTE" ]; then
   fi
 
   ATTR_TMP=$(mktemp -d) || { echo "run-selftests: cannot create a scratch root" >&2; exit 2; }
+  # IDEMPOTENT: a removed worktree is forgotten, so a second entry has nothing left to fail on and
+  # cannot print an orphan line for a worktree that is already gone.
   attr_cleanup() {
     if [ -n "$ATTR_WT" ]; then
-      remove_scratch_worktree "$ATTR_WT" \
-        || echo "run-selftests: the R worktree at $ATTR_WT could not be removed — remove it by hand" >&2
+      if remove_scratch_worktree "$ATTR_WT"; then ATTR_WT=""
+      else echo "run-selftests: the R worktree at $ATTR_WT could not be removed — remove it by hand" >&2; fi
     fi
     rm -rf "$ATTR_TMP" 2>/dev/null
     # THE POPULATION SCRATCH TOO: this trap REPLACES the one that removed it at startup.
     rm -rf "$RS_SCRATCH" 2>/dev/null
   }
-  # EVERY EXIT PATH, and the three signals are not decoration: bash runs an EXIT trap on a SIGTERM
-  # only when TERM is trapped too, and a run killed by an outer bound is exactly the case that
-  # would otherwise leave a registered worktree behind.
-  trap attr_cleanup EXIT INT TERM HUP
+  # EVERY EXIT PATH CLEANS UP ONCE, in the EXIT trap. EACH SIGNAL ARM ONLY RE-EXITS with its
+  # conventional status, and that exit is what fires the EXIT trap. The arms are required, not
+  # symmetry: a handler that cleans up and returns RESUMES the suite loop over a deleted scratch root,
+  # so the run printed a false verdict, red or clean, exited 1 or 0 rather than 143, and then cleaned
+  # up a second time and reported the removed worktree as an orphan (the dDerivedDocket closing diff
+  # review's F5). The sibling runner's traps carry the same rule.
+  # WHY TRAP THE SIGNALS AT ALL, when bash runs an EXIT trap on an untrapped TERM too (measured on
+  # node d, 2026-09-28: exit 143 and the EXIT trap one second into a 6 s foreground sleep)? It runs
+  # it AT ONCE, while the R run still stands in the worktree it removes. A TRAPPED signal is handled
+  # when the foreground suite returns (the gotcha `trapped-signal-waits-for-the-foreground-child`),
+  # so the removal never races it. A bound that cannot wait that long escalates to KILL, which runs
+  # no trap; the orphan it leaves is named by the line printed when the worktree was made.
+  trap attr_cleanup EXIT
+  trap 'exit 130' INT
+  trap 'exit 143' TERM
+  trap 'exit 129' HUP
 
   attr_worktree() {
     [ -z "$ATTR_WT" ] || return 0

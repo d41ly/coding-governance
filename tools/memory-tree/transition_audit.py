@@ -33,6 +33,7 @@ The unattended kit's history leg holds the identical pin for the identical reaso
 """
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import pathlib
@@ -50,7 +51,8 @@ KIT = pathlib.Path(__file__).resolve().parent
 # The cache's generation. BUMP IT whenever the delta's SHAPE or the rule computing it changes: an
 # entry written by an older rule is not a faster answer, it is a different one. The epoch is stored
 # INSIDE each file rather than only in its path, so a foreign entry is DETECTED and reported instead
-# of being quietly skipped by a path that never matched.
+# of being quietly skipped by a path that never matched. The epoch covers this module's CODE; what
+# the delta reads from CONFIGURATION is the per-entry key `derive_cache_key` writes beside it.
 CACHE_EPOCH = 1
 
 # ONE PREFIX ON EVERY LINE THIS CHECK PRINTS — the liveness line, the dormant announcement and each
@@ -693,13 +695,41 @@ def resolve_cache_dir(root: pathlib.Path) -> pathlib.Path:
     return common / "transition-audit-cache"
 
 
-def read_cache(cache_dir: pathlib.Path, merge: str) -> tuple:
-    """`(entries, reason)` — the cached delta, or `(None, 'unreadable'|'foreign epoch')`.
+def derive_cache_key(walk: Walk) -> str:
+    """The digest of every CONFIGURED input a merge's delta depends on besides its two lineages.
 
-    ONLY THE DELTA IS CACHED, because only the delta is immutable: it is a fact about two lineages
-    that cannot change while the merge exists. The VERDICT is not — a RELOCATED row written today
-    accounts for a delta computed last week — so caching it would pin an answer to the tree that
-    happened to be checked out when the cache was warmed.
+    The delta is a function of the lineages AND of what this tree declares: the watched paths
+    (memory root, backlog prefix, the family archive pattern), the conf path the mode reader reads
+    each commit's blob at, and the id grammar that keys every row. The cache sits in the git COMMON
+    dir, which every worktree shares, so a key narrower than those inputs hands one tree's delta to
+    another tree's grammar. Measured in the closing review (F10): retire a family and a warm node
+    reports the cached entries UNACCOUNTED while remote CI's cold run never produces them.
+
+    RESOLVED VALUES, never the conf's bytes, so a comment edit keeps the cache warm. The grammar
+    enters as its compiled PATTERNS, which carry the families, the cited families and the node-tag
+    eras exactly. The memory-recall conf's own `digest()` rides beside them because it folds that
+    kit's version, and `anchor_at`'s code lives there, where this module's `CACHE_EPOCH` cannot
+    see it move. Two worktrees that declare differently now recompute in turn over one shared
+    entry instead of reading each other's delta: that costs wall clock and never a verdict.
+    """
+    _anchor, grammar = walk.resolve_grammar()
+    import recall_conf    # noqa: PLC0415 — the sibling kit's dir is on the path once the grammar is
+
+    parts = [walk.memory_root, walk.prefix, walk.archive_re.pattern, walk.conf_rel, grammar.ID,
+             *(pat.pattern for pat in grammar.anchors), recall_conf.resolve(walk.root).digest()]
+    return hashlib.sha1("\0".join(parts).encode("utf-8")).hexdigest()[:16]
+
+
+def read_cache(cache_dir: pathlib.Path, merge: str, key: str) -> tuple:
+    """`(entries, reason)` — the cached delta, or `(None, 'unreadable'|'foreign epoch'|'foreign
+    inputs')`.
+
+    ONLY THE DELTA IS CACHED, because only the delta is fixed once its inputs are: two lineages that
+    cannot change while the merge exists, and the declared inputs `key` digests, which can. An entry
+    whose key differs was computed under another tree's declarations and is recomputed, reported
+    like a foreign epoch. The VERDICT is never cached — a RELOCATED row written today accounts for
+    a delta computed last week — so caching it would pin an answer to the tree that happened to be
+    checked out when the cache was warmed.
     """
     path = cache_dir / f"{merge}.json"
     if not path.is_file():
@@ -712,18 +742,20 @@ def read_cache(cache_dir: pathlib.Path, merge: str) -> tuple:
         return None, "unreadable"
     if blob.get("epoch") != CACHE_EPOCH:
         return None, "foreign epoch"
+    if blob.get("key") != key:
+        return None, "foreign inputs"
     entries = blob.get("entries")
     if not isinstance(entries, list):
         return None, "unreadable"
     return entries, ""
 
 
-def write_cache(cache_dir: pathlib.Path, merge: str, entries: list) -> None:
+def write_cache(cache_dir: pathlib.Path, merge: str, entries: list, key: str) -> None:
     """Best effort. The cache is ADVISORY: an unwritable git dir costs wall clock and nothing else."""
     try:
         cache_dir.mkdir(parents=True, exist_ok=True)
         (cache_dir / f"{merge}.json").write_text(
-            json.dumps({"epoch": CACHE_EPOCH, "entries": entries}), encoding="utf-8")
+            json.dumps({"epoch": CACHE_EPOCH, "key": key, "entries": entries}), encoding="utf-8")
     except OSError:
         pass
 
@@ -791,6 +823,7 @@ def scan_history(root: pathlib.Path, tips: list, expect_builds: bool, account_ti
                         "the boundary detector is not answering")
 
     cache_dir = resolve_cache_dir(root)
+    cache_key = derive_cache_key(walk)
     report = {"dormant": False, "merges": 0, "transitions": [], "entries": [], "hits": 0,
               "recomputed": {}, "conf": conf}
     for merge in walk.order:
@@ -803,12 +836,12 @@ def scan_history(root: pathlib.Path, tips: list, expect_builds: bool, account_ti
         if found is None:
             continue
         report["transitions"].append(merge)
-        cached, reason = read_cache(cache_dir, merge)
+        cached, reason = read_cache(cache_dir, merge, cache_key)
         if cached is None:
             if reason:
                 report["recomputed"][reason] = report["recomputed"].get(reason, 0) + 1
             entries = derive_entries(walk, found[0], found[1], merge)
-            write_cache(cache_dir, merge, entries)
+            write_cache(cache_dir, merge, entries, cache_key)
         else:
             report["hits"] += 1
             entries = cached

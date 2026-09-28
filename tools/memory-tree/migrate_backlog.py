@@ -137,7 +137,10 @@ RECORD_KINDS = {"prompts": "prompt", "spec": "spec", "build": "build", "reviews"
 #: RAISED 205 -> 206 with the one arm that sees `load_generator` refuse a generator it cannot load.
 #: RAISED 206 -> 250 with the switch-over writer's 44 arms (TOOL-dDerivedDocket-34 AC17): eight
 #: refusals graded three ways each, the named holds, the zero-holds filing, the dry run, the write.
-FLOOR_ASSERTIONS = 250
+#: RAISED 250 -> 261 with the closing review's fold (TOOL-dDerivedDocket-1 round 1): six arms for
+#: `--relocate` re-run inside one open merge (F9), and five for an unreadable `--signed` path
+#: refused by name with exit 2 under `--ingest`, `--plan` and `--write`.
+FLOOR_ASSERTIONS = 261
 
 NEWLINE = chr(10)
 
@@ -781,6 +784,24 @@ def check_conservation(chosen: dict, texts_by_id: dict, units: set, grammar) -> 
 
 
 # ------------------------------------------------------------------------------ the signed records
+def read_signed_text(kind: str, path: str) -> str:
+    """The bytes of one `--signed <kind>=<path>` record, or a Refusal naming the kind and the path.
+
+    THE ONE READ OF AN OPERATOR-SUPPLIED RECORD PATH, shared by the table reader and the worksheet
+    reader, so every verb that takes `--signed` refuses an unreadable one the same way. A path
+    nobody can open is a MISSING CONDITION, which is exit 2 by this module's contract, and never a
+    traceback: an uncaught `FileNotFoundError` exits 1, which the landing reconcile and the adopter
+    runbook read as "the plan refuses", and they then stop re-running on a typo. Found by the
+    switch-over's landing-reconcile rehearsal (unit 34), where `--ingest` died exactly that way.
+    """
+    try:
+        return read_text(path)
+    except OSError as exc:
+        raise Refusal(f"migrate-backlog: the signed {kind} record {path} cannot be read "
+                      f"({exc.strerror or type(exc).__name__}), so there is no signature to apply. "
+                      f"Check the --signed {kind}=<path> value; nothing was written") from exc
+
+
 def read_signed_record(kind: str, path: str) -> dict:
     """One signer's markdown table, located by the header cells `Ask`, `Verdict` and `Field`.
 
@@ -790,7 +811,7 @@ def read_signed_record(kind: str, path: str) -> dict:
     the cell, because a record read as all `not-unit` is a plan that quietly ignores a signature.
     """
     want = SIGNED_CELLS[kind]
-    text = read_text(path)
+    text = read_signed_text(kind, path)
     header, cells = None, []
     for line in text.split("\n"):
         if not line.strip().startswith("|"):
@@ -1732,12 +1753,18 @@ def build_relocation(root: str, form: Form, ours: str, theirs: list, args: dict,
     memory_root = conf["MEMORY_ROOT"]
     grammar = backlog.build_grammar(derive_families(conf))
     entries = audit.delta(ours, theirs, root) if args.get("entries") is None else args["entries"]
-    # S7 — AN ENTRY ALREADY ACCOUNTED AT `HEAD` PLANS NOTHING, which is what makes every verb
-    # idempotent: a second `--repair` over a tree whose records landed plans zero records rather
-    # than a second set of them, which unit 9 would then red as a DUPLICATE. The predicate is that
-    # unit's, bound to HEAD as S7 words it, and `plan.entries` keeps the FULL delta so the
-    # post-write re-read still grades every entry.
-    open_now = audit.accounted(entries, "HEAD", pathlib.Path(root))
+    # S7 — AN ENTRY ALREADY ACCOUNTED IN THE TREE THIS VERB WRITES PLANS NOTHING, which is what
+    # makes every verb idempotent: a second run plans zero records rather than a second set of
+    # them, which unit 9 would then red as a DUPLICATE. The predicate is that unit's, and
+    # `plan.entries` keeps the FULL delta so the post-write re-read still grades every entry.
+    #
+    # BOUND TO THE INDEX, NOT HEAD, because the index is what `write_relocation` stages, what
+    # `check_accounted` re-reads and what the commit takes. S7 words it as HEAD, and on a clean tree
+    # the two are one. Inside an open merge they are not: HEAD is the straggler's pre-merge commit,
+    # so the rows a first `--relocate` staged read as unaccounted and a re-run, which that verb's
+    # own exit-1-after-write path invites, appended every ask and RELOCATED row a second time.
+    # Measured in the closing review (F9); the selftest's open-merge re-run arm pins it.
+    open_now = audit.accounted(entries, audit.INDEX, pathlib.Path(root))
     planned = [e for i, e in enumerate(entries) if open_now.get(i) != "ok"]
 
     texts = read_target_texts(root, conf)
@@ -2148,10 +2175,10 @@ WORKSHEET_DESIGN_RE = re.compile(r"^# (same-id|triage) worksheet · .* · design
 SIGNED_SHEETS = (("same-id", SAME_ID_COLUMNS), ("triage", TRIAGE_COLUMNS))
 
 
-def read_signed_worksheets(path: str) -> dict:
+def read_signed_worksheets(kind: str, path: str) -> dict:
     """`{worksheet kind: (repo-relative path, blob sha)}` for every worksheet a record names."""
     return {hit.group(1): (hit.group(2), hit.group(3))
-            for hit in SIGNED_WORKSHEET_RE.finditer(read_text(path))}
+            for hit in SIGNED_WORKSHEET_RE.finditer(read_signed_text(kind, path))}
 
 
 def check_worksheets_signed(root: str, signed_paths: dict) -> dict:
@@ -2163,7 +2190,7 @@ def check_worksheets_signed(root: str, signed_paths: dict) -> dict:
     """
     named: dict = {}
     for kind, path in sorted(signed_paths.items()):
-        sheets = read_signed_worksheets(path)
+        sheets = read_signed_worksheets(kind, path)
         if kind not in sheets:
             raise Problem(f"migrate-backlog: the signed {kind} record {path} names no {kind} "
                           f"worksheet by blob, so nothing says which worksheet bytes it signed — "
@@ -3397,6 +3424,11 @@ def cmd_selftest() -> int:  # noqa: C901 — one arm list, deliberately flat and
             True, lambda: read_backlogs(fd) == books_before)
         arm("and the tree is exactly as the merge left it",
             True, lambda: run("git", "status", "--porcelain", cwd=fd) == before_status)
+        # A COPY THAT STILL HOLDS THE NEEDS-HUMAN ENTRY, for AC7's dry-run arm below. It used to
+        # re-run over `fd` after the `--drop` write, and read NEEDS-HUMAN there only because the
+        # filter graded HEAD and so re-planned an entry the index already accounted (review F9).
+        fd_human = os.path.join(base, "rel_amended_human")
+        shutil.copytree(fd, fd_human)
         rc_d2, _out_d2 = run_engine(fd, ["--relocate", "--as", "aWho",
                                            "--drop", "EXMP-aFoo-4=a human read it and let it go"])
         arm("re-run with --drop it exits 0", 0, lambda: rc_d2)
@@ -3458,6 +3490,30 @@ def cmd_selftest() -> int:  # noqa: C901 — one arm list, deliberately flat and
         arm("a second --repair plans ZERO records, because every entry is accounted",
             "the plan is EMPTY", lambda: out_g2)
         arm("and says so with exit 2 rather than 1 (AC7)", 2, lambda: rc_g2)
+
+        # ---- S7 inside an OPEN merge: the re-run the exit-1-after-write path invites (review F9).
+        # The arm above re-runs after a COMMIT, where HEAD and the index agree; only an uncommitted
+        # merge tells a filter bound to HEAD from one bound to the tree the verb writes. A straggler
+        # that files one new ask and moves no status, so no status-row collision refuses the re-run
+        # before it writes, which is what hid the duplicate from every earlier arm.
+        fn_rows = list(FX_SEED_ROWS) + ["- EXMP-aFoo-3 · OPEN · a brand new ask the straggler filed"]
+        fn, _fn0, _fn1, _fn2 = seed_transition(base, "rel_rerun_open", strag_rows=fn_rows)
+        run("git", "checkout", "-q", "strag", cwd=fn)
+        run_unchecked("git", "merge", "--no-commit", "--no-ff", "main", cwd=fn)
+        rc_n1, _out_n1 = run_engine(fn, ["--relocate", "--as", "aWho"])
+        books_n1 = read_backlogs(fn)
+        rc_n2, out_n2 = run_engine(fn, ["--relocate", "--as", "aWho"])
+        arm("F9: the first --relocate inside an open merge writes its records", 0, lambda: rc_n1)
+        # LIVENESS: every arm below also passes over a first run that wrote nothing at all.
+        arm("F9: including exactly one RELOCATED row, so the re-run has something to duplicate",
+            1, lambda: books_n1.get("aWho", "").count("- RELOCATED · EXMP-aFoo-3 · by "))
+        arm("F9: a second --relocate in the SAME open merge exits 0", 0, lambda: rc_n2)
+        arm("F9: and plans nothing, because the index already accounts every entry",
+            "wrote 0 record(s)", lambda: out_n2)
+        arm("F9: so every per-build file is byte-identical to the first run's",
+            True, lambda: read_backlogs(fn) == books_n1)
+        arm("F9: and the pending merge accounts each entry exactly once, never as a DUPLICATE",
+            0, lambda: run_audit(fn, staged=True))
 
         # ---- AC5: an ingested ref stops being listed while it is still unmerged.
         fh, _fh0, _fh1, _fh2 = seed_transition(base, "rel_ingest")
@@ -3554,7 +3610,7 @@ def cmd_selftest() -> int:  # noqa: C901 — one arm list, deliberately flat and
             True, lambda: run("git", "status", "--porcelain", cwd=fm) == dry_before)
         arm("not even by creating the file it would have written into",
             False, lambda: os.path.isfile(os.path.join(fm, "memory/builds/aWho/BACKLOG.md")))
-        rc_m2, _out_m2 = run_engine(fd, ["--relocate", "--as", "aWho", "--dry-run"])
+        rc_m2, _out_m2 = run_engine(fd_human, ["--relocate", "--as", "aWho", "--dry-run"])
         arm("a dry run over a plan holding a NEEDS-HUMAN entry exits 1", 1, lambda: rc_m2)
 
         # ---- S2: the classification rows AC1 and AC2 do not reach — a removal on either side of
@@ -3810,6 +3866,34 @@ def cmd_selftest() -> int:  # noqa: C901 — one arm list, deliberately flat and
         arm("so --signed exits 2 naming the form it was given",
             "belong to the migration policy set", lambda: out_v)
 
+        # An UNREADABLE --signed path is a missing condition: exit 2 by name, never the uncaught
+        # FileNotFoundError (exit 1) the landing-reconcile rehearsal hit. The landing form reaches
+        # the read only after its sides resolve, so the arm runs over the admitted `fs` tree.
+        def read_exit_code(fn):
+            """A verb's exit code, its Problem's code, or `UNEXPECTED <type>` for a traceback."""
+            try:
+                with redirect_stdout(io.StringIO()):
+                    return fn()
+            except Problem as exc:
+                return getattr(exc, "code", 1)
+            except Exception as exc:                  # noqa: BLE001 — the traceback IS the finding
+                return f"UNEXPECTED {type(exc).__name__}"
+
+        absent = os.path.join(base, "absent", "signed-same-id.md")
+        try:
+            rc_sa, out_sa = run_engine(fs, ["--ingest", "main", "--as", "aWho",
+                                              "--signed", "same-id=" + absent, "--dry-run"])
+        except Exception as exc:                      # noqa: BLE001 — the traceback IS the finding
+            rc_sa, out_sa = f"UNEXPECTED {type(exc).__name__}", str(exc)
+        arm("--ingest refuses an unreadable --signed path with exit 2, not a traceback",
+            2, lambda: rc_sa)
+        arm("naming the record's kind and the path it could not read",
+            f"the signed same-id record {absent} cannot be read", lambda: out_sa)
+        arm("and writing nothing", True, lambda: read_backlogs(fs) == books_fs)
+        arm("--plan refuses the same unreadable record through the same reader, exit 2",
+            2, lambda: read_exit_code(lambda: cmd_plan(fs, read_args(
+                ["--plan", "--signed", "same-id=" + absent]))))
+
         # AC16 — the in-progress merge and the concluded merge write the same bytes.
         fw, _fw_flip, _fw_tip = seed_landing(base, "land_inprogress", land_tip_rows,
                                              slugs=("aFoo", "aBar", "aWho"))
@@ -3952,6 +4036,11 @@ def cmd_selftest() -> int:  # noqa: C901 — one arm list, deliberately flat and
         arm("and it names each such hold", "EXMP-aFoo-3", lambda: out_nt.split("pass it:")[-1])
         run_refusal("a --triage-ask minted under another slug than --as", wbase,
                     ["--triage-ask", "EXMP-aBar-9"], "not --as `aWho`")
+        arm("--write refuses an unreadable --signed path through the same reader, exit 2",
+            2, lambda: read_exit_code(lambda: cmd_write(wbase, read_args(
+                ["--write", "--as", "aWho", "--signed", "same-id=" + absent,
+                 "--signed", "triage=" + WRITE_SIGNED + "triage.md",
+                 "--triage-ask", "EXMP-aWho-9"]))))
 
         wspec = os.path.join(base, "write_spec")
         shutil.copytree(wbase, wspec)

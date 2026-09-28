@@ -135,7 +135,9 @@ barfile="$gd/pre-push-bar"
 # worktree would feel. Their claim to write nothing is kept true here rather than asserted.
 case "$MODE" in
   carry|prepared) ;;
-  *) trap 'rm -f "$marker"' EXIT INT TERM ;;
+  # A signal EXITS, so the EXIT trap removes the marker and the lander stops; a handler that only
+  # cleans up would resume the landing after the interrupt (the closing review's F5 class).
+  *) trap 'rm -f "$marker"' EXIT; trap 'exit 130' INT; trap 'exit 143' TERM ;;
 esac
 
 # KEEP THE CONNECTION ALIVE ACROSS THE GATE. The gate runs INSIDE the push: git connects and
@@ -356,30 +358,41 @@ derive_carry_set() {  # R · output-file
   return 0
 }
 
-# WHICH BUILD A COMMIT BELONGS TO: the first unit id in its subject, else the build folders it
-# touches, else `unknown`. An `unknown` counts as FOREIGN — a landing may publish what it can
-# account for, and failing open here would give back the hazard this refusal exists to close.
+# WHICH BUILD A COMMIT BELONGS TO. A commit is this build's only when every signal it carries says
+# so; `unknown` counts as FOREIGN, because a landing may publish what it can account for and failing
+# open here would give back the hazard this refusal exists to close.
+#
+# THE BUILD FOLDERS IT TOUCHES DECIDE FIRST. Any `<memory-root>/builds/<slug>/` other than this
+# build's makes it that build's.
+#
+# A SUBJECT CLAIMS OWNERSHIP ONLY AT ITS HEAD: a `<verb>(<slug>):` prefix, a unit id followed by a
+# colon, or `merge: <unit id>`. An id anywhere else is a CITATION and never ownership. This used to
+# take the first id ANYWHERE in the subject, before the folders, so another build's records commit
+# leading with this build's id — `records(<other>): <this build's id> closes …`, an ordinary shape
+# once one build disposes another's ask — read as this build's and was published unflagged (closing
+# diff review round 1, F7). A claim naming another build is FOREIGN even when every folder it
+# touches is this build's; a claim naming no build (`fix(unattended):`) is FOREIGN by the same
+# comparison.
 resolve_commit_build() {  # sha · memory-root -> a build slug, or `unknown`
-  local subj id rest folders one
+  local subj claim folders one
   subj=$(git log -1 --format=%s "$1" 2>/dev/null || true)
-  id=$(printf '%s' "$subj" | grep -oE '[A-Z][A-Z]+-[A-Za-z]+-[0-9]+' | head -1)
-  if [ -n "$id" ]; then
-    rest=${id#*-}
-    printf '%s\n' "${rest%-*}"
-    return 0
-  fi
+  claim=$(printf '%s\n' "$subj" | sed -nE \
+    -e 's/^[a-z][a-z-]*\(([A-Za-z0-9_.-]+)\):.*/\1/p' -e 't' \
+    -e 's/^[A-Z][A-Z]+-([A-Za-z]+)-[0-9]+:.*/\1/p' -e 't' \
+    -e 's/^merge: [A-Z][A-Z]+-([A-Za-z]+)-[0-9]+( .*)?$/\1/p' | head -n 1)
   folders=$(git show --pretty=format: --name-only "$1" 2>/dev/null \
     | awk -v p="$2/builds/" 'index($0,p)==1 { r=substr($0,length(p)+1); i=index(r,"/"); if (i>1) print substr(r,1,i-1) }' \
     | sort -u)
   if [ -n "$folders" ]; then
-    # This build's own folder is not foreign, so a set that is entirely this build's reads as this
-    # build's; anything else is named by the first member that is not.
     for one in $folders; do
       [ "$one" = "$SLUG" ] || { printf '%s\n' "$one"; return 0; }
     done
+    # Every folder is this build's, and a head claim naming another build still contradicts them.
+    if [ -n "$claim" ] && [ "$claim" != "$SLUG" ]; then printf '%s\n' "$claim"; return 0; fi
     printf '%s\n' "$SLUG"
     return 0
   fi
+  if [ -n "$claim" ]; then printf '%s\n' "$claim"; return 0; fi
   printf 'unknown\n'
 }
 

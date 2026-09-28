@@ -71,13 +71,54 @@ read_blob_at() { # $1 = a `<rev>:<path>` spec -> the blob's text · rc 1 when it
   printf '%s' "$raw" | tail -n +2
 }
 
-read_conf_value() { # $1 = conf blob text · $2 = key -> its value, quotes and edge blanks stripped
-  local line
-  line=$(printf '%s\n' "$1" | grep -E "^[[:space:]]*$2[[:space:]]*=" | tail -n 1)
-  [ -n "$line" ] || return 1
-  line=${line#*=}
-  line=$(printf '%s' "$line" | tr -d "\"'\r")
-  printf '%s' "$line" | sed 's/^[[:space:]]*//; s/[[:space:]]*$//'
+read_conf_value() { # $1 = conf blob text · $2 = key -> its value as the kit's parser reads it · rc 1 when no line declares it
+  # THE KIT'S ONE LINE PARSER, PORTED RULE FOR RULE — `parse_conf_line` in the memory-tree kit's
+  # `tree_lib.py`, applied the way its `parse_conf` applies it: every line, the LAST declaration
+  # wins. The pipeline this replaces (grep, tr, sed) was a second reader of one file, and it kept
+  # `BACKLOG_MODE=builds   # flipped` as `builds   # flipped` and read `export BACKLOG_MODE=builds`
+  # as no declaration at all. Both spellings are legal — the hygiene gate SOURCES this file — so a
+  # flipped repository spelling either read as unflipped here and every straggler layer went dormant
+  # in silence (closing diff review round 1, F6).
+  #
+  # WHY A PORT AND NOT A CALL. The subjects are git OBJECTS — the default branch's conf, a merge
+  # base's, a straggler's own commits' — and this file neither executes one (sourcing a blob would
+  # run whatever a fetched commit wrote) nor starts python on every commit (unit 13's spec rules the
+  # library python-free). A deliberate re-parse is only safe beside something asserting it agrees,
+  # so `straggler-guard.test.sh` runs THIS function and the kit's `parse_conf` over one table of
+  # spellings and reds on any difference.
+  #
+  # NOT MODELLED, as the kit's own docstring says of itself: command substitution, expansion, line
+  # continuations. Whitespace here is the ASCII set; python's `strip` also takes Unicode spaces.
+  printf '%s\n' "$1" | awk -v want="$2" -v sq="'" '
+    function trim(s) { sub(/^[ \t\r\v\f]+/, "", s); sub(/[ \t\r\v\f]+$/, "", s); return s }
+    function peel(s, c) {
+      while (length(s) > 0 && substr(s, 1, 1) == c) s = substr(s, 2)
+      while (length(s) > 0 && substr(s, length(s), 1) == c) s = substr(s, 1, length(s) - 1)
+      return s
+    }
+    {
+      line = trim($0)
+      if (line == "" || substr(line, 1, 1) == "#") next
+      eq = index(line, "="); if (eq == 0) next
+      k = trim(substr(line, 1, eq - 1)); v = substr(line, eq + 1)
+      if (k ~ /^export[ \t]/) k = trim(substr(k, 7))
+      if (k == "" || k != want) next
+      found = 1
+      # The WORD rule: whitespace right after `=` ends the assignment, so the value is empty.
+      if (v ~ /^[ \t\r\v\f]/) { val = ""; next }
+      v = trim(v)
+      q = substr(v, 1, 1)
+      if (q == "\"" || q == sq) {
+        e = index(substr(v, 2), q)
+        if (e > 0) { val = substr(v, 2, e - 1); next }
+        # An unterminated quote falls through to the unquoted scan, as the kit parser does.
+      }
+      # Unquoted: a `#` that FOLLOWS whitespace begins a comment; one glued to a word is data.
+      for (i = 2; i <= length(v); i++)
+        if (substr(v, i, 1) == "#" && substr(v, i - 1, 1) ~ /[ \t\r\v\f]/) { v = trim(substr(v, 1, i - 1)); break }
+      val = peel(peel(v, "\""), sq)
+    }
+    END { if (!found) exit 1; printf "%s", val }'
 }
 
 read_conf_modes() { # $@ = commits -> one mode token per DISTINCT conf blob among them

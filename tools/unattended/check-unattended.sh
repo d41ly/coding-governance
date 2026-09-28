@@ -2361,7 +2361,15 @@ WAIVERS
     asks_n=$((asks_n + 1))
     askslug=${f#"$M/builds/"}; askslug=${askslug%%/*}
     asksre="$M/builds/$askslug/README.md"
-    askids=$(printf '%s\n' "$recasks" | expand_id_runs)
+    # ---- THE MANDATE READS WHOLE OR THIS RECORD REDS, before any arm below iterates it (closing
+    # ---- diff review of dDerivedDocket, F2). This used to read the value through the binding-line
+    # ---- expander, which drops every token it does not know, so a record pinning `<id>-1, <id>-2`
+    # ---- was graded here over `-2` alone and every arm keyed on the ids passed over the narrowed
+    # ---- set. The library's IDLIST reader is the driver's own, and a list it refuses is named.
+    if ! askids=$(read_id_list "$recasks"); then
+      askbad=$(read_id_list_refusals "$recasks")
+      fail 19 "a run-state file pins an asks: mandate that does not read whole as an id list, so every arm below would grade the ids that did parse and the owner's own list would narrow with the leg green: $askbad in $f"
+    fi
 
     # ---- S5: ONE AUTHORIZATION PATH (owner ruling D12-a). A mandate is admissible on the FIRST
     # ---- anchor's discipline alone — mode `slug`, where the owner landed the folder before the run

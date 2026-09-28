@@ -6,9 +6,11 @@
 #
 # WHAT IT GRADES. `straggler-guard.sh` and the three hook bodies that source it: the commit refusal
 # and its two notices, the rebase refusal, the per-ref push layer, the recipe's parity with the one
-# constant that owns it, and the session step's `hooks own-tree` mark. Every arm builds a throwaway
-# git repository, installs the real hooks and the real kits into it, writes a history whose SHAPE is
-# the question, and runs the real hook. Nothing here re-implements the subject.
+# constant that owns it, the library's conf reader's agreement with the kit's own parser, and the
+# session step's `hooks own-tree` mark. Every hook arm builds a throwaway git repository, installs
+# the real hooks and the real kits into it, writes a history whose SHAPE is the question, and runs
+# the real hook; the conf arm runs the real reader and the real parser side by side. Nothing here
+# re-implements the subject.
 #
 # WHY IT IS A REPO-SUBJECT LEG AND NOT A HELD SELF-TEST. The recipe-parity arm grades two tracked
 # TEXTS — the library's rendering and the relocation engine's `--recipe` — which drift with nobody
@@ -82,7 +84,9 @@ WIRING="$TOOL_ROOT/check-wiring.sh"
 . "$KIT_LIB/resolve-python.sh"
 PY=$(resolve_python) || { echo "FAIL no usable python launcher"; exit 2; }
 
-FLOOR_ASSERTIONS=57
+# 57, then 83: the F6 fold of the closing diff review round 1 added exactly 26 executed assertions —
+# 21 conf-table agreement rows, the finding's two spellings read as builds, and 2 x 2 end to end.
+FLOOR_ASSERTIONS=83
 
 TMP=$(mktemp -d) || exit 2
 trap 'rm -rf "$TMP"' EXIT
@@ -461,6 +465,95 @@ printf '%s' "$tout" | grep -q PASS && print_failure "AC14: --topology printed a 
 hits=$(grep -c 'add_topology_worktree' "$SELF")
 [ "$hits" -ge 3 ] || print_failure "AC14: the topology helper is named $hits times in this suite, so its definition, the mode's dispatch and AC12's call are not all routed through it"; add_arm
 grep -qE '^add_topology_worktree\(\) \{' "$SELF" || print_failure "AC14: the topology helper has no definition line in this suite"; add_arm
+
+# ============================================ F6 — ONE conf grammar, the library's and the kit's ---
+# Closing diff review round 1, F6 (its ids 6 and 14). The library re-parses `.memory-tree.conf`
+# because its subjects are git objects it must not execute, and its reader kept an unquoted trailing
+# comment and missed an `export` prefix, so a flipped tree spelling either read as unflipped and
+# every straggler layer went dormant with nothing printed. A deliberate re-parse is safe only beside
+# an assertion that it agrees with the authoritative reader, so BOTH run over one table of legal
+# spellings here: the kit's `tree_lib.parse_conf` imported from this tree, and the library's
+# `read_conf_value` sourced from beside this suite. Each side prints `<value> rc=<0|1>`, so an
+# absent key and a blank one are two answers, and a side that did not run prints no `rc=` at all.
+TL_DIR="$ROOT/$KIT_MT"
+[ -f "$TL_DIR/tree_lib.py" ] || { echo "FAIL the kit's conf parser is not at $TL_DIR/tree_lib.py, so the agreement arm has no authority to compare against"; exit 2; }
+cat > "$TMP/parse_conf.py" <<'PYEOF'
+import sys
+
+sys.path.insert(0, sys.argv[1])
+import tree_lib  # noqa: E402  the kit's ONE conf parser, the authority this arm compares against
+
+with open(sys.argv[2], encoding="utf-8", newline="") as fh:
+    conf = tree_lib.parse_conf(fh.read(), {})
+key = sys.argv[3]
+sys.stdout.write((conf[key] + " rc=0") if key in conf else " rc=1")
+PYEOF
+CF="$TMP/conf-cases"; mkdir -p "$CF"
+cfk=()
+printf 'MEMORY_ROOT=memory\n' > "$CF/1";                                         cfk+=(BACKLOG_MODE)  # absent
+printf 'BACKLOG_MODE=""\n' > "$CF/2";                                            cfk+=(BACKLOG_MODE)  # blank
+printf 'BACKLOG_MODE="builds"\n' > "$CF/3";                                      cfk+=(BACKLOG_MODE)  # quoted
+printf "BACKLOG_MODE='builds'\n" > "$CF/4";                                      cfk+=(BACKLOG_MODE)  # single-quoted
+printf 'BACKLOG_MODE=builds\n' > "$CF/5";                                        cfk+=(BACKLOG_MODE)  # bare
+printf 'BACKLOG_MODE=builds   # flipped by the switch-over\n' > "$CF/6";         cfk+=(BACKLOG_MODE)  # commented (F6)
+printf 'BACKLOG_MODE="builds"  # flipped\n' > "$CF/7";                           cfk+=(BACKLOG_MODE)  # quoted, commented
+printf 'export BACKLOG_MODE=builds\n' > "$CF/8";                                 cfk+=(BACKLOG_MODE)  # exported (F6)
+printf 'export\tBACKLOG_MODE="builds"\n' > "$CF/9";                              cfk+=(BACKLOG_MODE)  # exported after a tab
+printf 'BACKLOG_MODE="a # b"\n' > "$CF/10";                                      cfk+=(BACKLOG_MODE)  # a # inside quotes is data
+printf 'BACKLOG_MODE=a#b\n' > "$CF/11";                                          cfk+=(BACKLOG_MODE)  # a glued # is data
+printf 'BACKLOG_MODE= builds\n' > "$CF/12";                                      cfk+=(BACKLOG_MODE)  # blank after = ends it
+printf 'BACKLOG_MODE=shards\nBACKLOG_MODE=builds\n' > "$CF/13";                  cfk+=(BACKLOG_MODE)  # the last one wins
+printf 'BACKLOG_MODE="builds"\r\n' > "$CF/14";                                   cfk+=(BACKLOG_MODE)  # CRLF
+printf '# BACKLOG_MODE=builds\n' > "$CF/15";                                     cfk+=(BACKLOG_MODE)  # a comment line
+printf 'BACKLOG_MODE="builds\n' > "$CF/16";                                      cfk+=(BACKLOG_MODE)  # unterminated quote
+printf 'MEMORY_ROOT=mem   # the root\n' > "$CF/17";                              cfk+=(MEMORY_ROOT)   # the watched root
+printf 'export FAMILIES="tooling:TOOL deploy:DEPL"\n' > "$CF/18";                cfk+=(FAMILIES)      # the archive families
+printf '  BACKLOG_MODE = builds\n' > "$CF/19";                                   cfk+=(BACKLOG_MODE)  # spaced around =
+printf 'BACKLOG_MODE=builds#x # c\n' > "$CF/20";                                 cfk+=(BACKLOG_MODE)  # glued, then a comment
+printf 'BACKLOG_MODE_OLD=builds\n' > "$CF/21";                                   cfk+=(BACKLOG_MODE)  # a longer key is not this one
+for i in "${!cfk[@]}"; do
+  cf="$CF/$((i + 1))"; key=${cfk[$i]}
+  lib=$(bash -c '. "$1" && { read_conf_value "$(cat "$2")" "$3"; echo " rc=$?"; }' _ "$HOOKDIR/straggler-guard.sh" "$cf" "$key" 2>&1)
+  kit=$("$PY" "$TMP/parse_conf.py" "$TL_DIR" "$cf" "$key" 2>&1)
+  { check_contains "$kit" " rc=" && [ "$lib" = "$kit" ]; } \
+    || print_failure "F6 conf case $((i + 1)) ($key): the library read '$lib' and the kit's parser read '$kit'"; add_arm
+done
+# THE FINDING'S OWN TWO SPELLINGS, read as `builds` — agreement alone would pass a kit that had the
+# same defect, and these are the lines the review reproduced.
+c6=$(bash -c '. "$1" && read_conf_value "$(cat "$2")" BACKLOG_MODE' _ "$HOOKDIR/straggler-guard.sh" "$CF/6" 2>&1)
+c8=$(bash -c '. "$1" && read_conf_value "$(cat "$2")" BACKLOG_MODE' _ "$HOOKDIR/straggler-guard.sh" "$CF/8" 2>&1)
+[ "$c6|$c8" = "builds|builds" ] || print_failure "F6: the commented and the exported flip read '$c6' and '$c8', not builds"; add_arm
+
+# END TO END: a default branch that flipped with the commented spelling, then with the exported one,
+# and a straggler staging a shard edit under each. The old reader left the layer dormant on both.
+E="$TMP/spell"
+mkdir -p "$E/memory/backlog"
+write_hooks "$E"
+printf 'MEMORY_ROOT=memory\nFAMILIES="tooling:TOOL"\nBACKLOG_MODE="shards"\n' > "$E/.memory-tree.conf"
+printf '# TOOL backlog\n\n- TOOL-x-1 - a row\n' > "$E/memory/backlog/TOOL.md"
+git init -q -b main "$E"
+git -C "$E" config user.email arms@example.invalid; git -C "$E" config user.name arms
+git -C "$E" config core.autocrlf false; git -C "$E" config commit.gpgsign false
+git -C "$E" config core.hooksPath "$E/hk"
+git -C "$E" add -A >/dev/null 2>&1; git -C "$E" commit -q --no-verify -m base
+git -C "$E" branch -q spellstrag
+printf 'MEMORY_ROOT=memory   # the root\nFAMILIES="tooling:TOOL"\nBACKLOG_MODE=builds   # flipped by the switch-over\n' > "$E/.memory-tree.conf"
+git -C "$E" commit -q --no-verify -am "the flip, spelled with trailing comments"
+EW=$(add_topology_worktree "$E" spellstrag)
+printf -- '- TOOL-x-2 - a late row\n' >> "$EW/memory/backlog/TOOL.md"
+git -C "$EW" add memory/backlog/TOOL.md
+out=$(run_in "$EW" git commit -m "a shard edit under a commented flip"); rc=$?
+[ "$rc" != 0 ] || print_failure "F6: a default branch flipped as 'BACKLOG_MODE=builds   # …' left the straggler layer dormant — the shard edit was COMMITTED"; add_arm
+check_contains "$out" "REFUSING" || print_failure "F6: the commented flip drew no refusal: $out"; add_arm
+printf 'MEMORY_ROOT=memory\nexport FAMILIES="tooling:TOOL"\nexport BACKLOG_MODE=builds\n' > "$E/.memory-tree.conf"
+git -C "$E" commit -q --no-verify -am "the flip, respelled with export"
+# A FRESH EDIT, staged whatever the arm above did: had the commented flip been committed, a bare retry
+# would exit 1 on "nothing to commit" and read as a refusal. Measured, with the old reader staged.
+printf -- '- TOOL-x-3 - another late row\n' >> "$EW/memory/backlog/TOOL.md"
+git -C "$EW" add memory/backlog/TOOL.md
+out=$(run_in "$EW" git commit -m "a shard edit under an exported flip"); rc=$?
+[ "$rc" != 0 ] || print_failure "F6: a default branch flipped as 'export BACKLOG_MODE=builds' left the straggler layer dormant — the shard edit was COMMITTED"; add_arm
+check_contains "$out" "REFUSING" || print_failure "F6: the exported flip drew no refusal: $out"; add_arm
 
 # ---------------------------------------------------------------------------------------- verdict
 if [ "$n" -lt "$FLOOR_ASSERTIONS" ]; then

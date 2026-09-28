@@ -76,7 +76,8 @@ ATTR_BASE=fb07ca25
 # closing-fix ledger carries both counts.
 # MERGED with TOOL-dDerivedDocket-1/-23's floor: base 43, +26 from that build (69), +69 from
 # TOOL-aBatchedArm (112), so 43 + 26 + 69.
-SELFTEST_FLOOR=138
+SELFTEST_FLOOR=139
+# RAISED 138 -> 139 by the dDerivedDocket closing diff review's F5: the signalled --attribute arm.
 
 # The fixture is a MINIMAL repo the runner can root itself in: two suites it can execute, a manifest
 # with one held leg, and a declaration that covers it. Every arm below starts from this green state
@@ -274,6 +275,16 @@ build_repo() {
   # the only way to observe that a killed run caches nothing.
   attr_suite cache.sh     'sleep 4' 'exit 0'
   attr_suite variant-deadr-fail.sh 'echo "FAIL arm A"' 'exit 1'
+  # THE SIGNALLED SUITE (the closing diff review's F5). At R it ANNOUNCES itself and then HOLDS until
+  # released, so the TERM lands inside the R run by construction and not by a sleep (the gotcha
+  # `fixed-sleep-does-not-place-a-signal`); unannounced, as in any run not driven by `termrun.sh`,
+  # it just fails. At L it fails at once.
+  attr_suite term.sh \
+    'if [ -n "${ATTR_TERM_READY:-}" ]; then' \
+    '  printf "%s\n" "$$" > "$ATTR_TERM_READY"' \
+    '  i=0; while [ ! -e "$ATTR_TERM_READY.go" ] && [ "$i" -lt 300 ]; do sleep 0.1; i=$((i + 1)); done' \
+    'fi' \
+    'echo "FAIL arm T"' 'exit 1'
   printf '#!/usr/bin/env bash\necho "the delegated suite ran"\nexit 0\n' > "$UDIR/attr-u.sh"
 
   {
@@ -286,6 +297,7 @@ build_repo() {
     printf 'attr deadr\t60\tbash tools/attr/deadr.sh\tmeasured 2s on node t 2026-09-20, x1.5\n'
     printf 'attr deadboth\t60\tbash tools/attr/deadboth.sh\tmeasured 2s on node t 2026-09-20, x1.5\n'
     printf 'attr cache\t60\tbash tools/attr/cache.sh\tmeasured 2s on node t 2026-09-20, x1.5\n'
+    printf 'attr term\t60\tbash tools/attr/term.sh\tmeasured 2s on node t 2026-09-20, x1.5\n'
     printf 'attr unattended\t60\tbash %s/attr-u.sh\tmeasured 2s on node t 2026-09-20, x1.5\n' "$UDIR"
     # LAST, and deliberately excluded from R's declaration below: this is the row that tests the
     # `absent` path, where the baseline declares no such suite at all.
@@ -334,6 +346,28 @@ build_repo() {
     printf '[ "$b" = "$a" ] && echo "worktree count unchanged $a" || { echo "nope: $b -> $a"; exit 1; }\n'
   } > tools/attr/wtcount.sh
 
+  # THE SIGNAL DRIVER. It runs `--attribute` in the background, waits for the R run to announce
+  # itself alive, TERMs the RUNNER, releases the suite, and grades what the signalled run left.
+  {
+    printf '#!/usr/bin/env bash\n'
+    printf 'set -u\n'
+    printf 'rdy="$PWD/term.ready"; out="$PWD/term.out"; rm -f "$rdy" "$rdy.go"\n'
+    printf 'ATTR_TERM_READY="$rdy" %s --serial --attribute HEAD~1 --kit tools/attr/term.sh > "$out" 2>&1 &\n' "$R"
+    printf 'pid=$!; i=0\n'
+    printf 'while [ ! -s "$rdy" ] && [ "$i" -lt 600 ]; do sleep 0.1; i=$((i + 1)); done\n'
+    printf 'if ! [ -s "$rdy" ] || ! kill -0 "$(cat "$rdy")" 2>/dev/null; then\n'
+    printf '  echo "nope: the R run never announced itself alive, so no signal could be placed inside it"\n'
+    printf '  : > "$rdy.go"; kill "$pid" 2>/dev/null; wait "$pid"; sed "s/^/    /" "$out"; exit 1\n'
+    printf 'fi\n'
+    printf 'kill -TERM "$pid"; : > "$rdy.go"; wait "$pid"; rc=$?; bad=0\n'
+    printf '[ "$rc" = 143 ] || { echo "nope: a TERM ended the run with exit $rc, not 143"; bad=1; }\n'
+    printf '! grep -qE "^attributed |verdict (red|clean)" "$out" || { echo "nope: a signalled run printed a verdict"; bad=1; }\n'
+    printf '! grep -q "could not be removed" "$out" || { echo "nope: cleanup ran twice and named a removed worktree as an orphan"; bad=1; }\n'
+    printf '[ "$(git worktree list | wc -l)" = 1 ] || { echo "nope: the R worktree outlived the run"; bad=1; }\n'
+    printf '[ "$bad" = 0 ] || { sed "s/^/    /" "$out"; exit 1; }\n'
+    printf 'echo "signalled run ended 143: no verdict, one cleanup, no worktree left"\n'
+  } > tools/attr/termrun.sh
+
   # ---- COMMIT ONE: R. Its declaration carries every attribution row EXCEPT `attr absent`.
   grep -v '^attr absent' tools/attr/rows.txt >> "$B" || return 2
   git add -A >/dev/null 2>&1 || return 2
@@ -350,6 +384,7 @@ build_repo() {
   attr_suite deadr.sh    'echo "arm ran"' 'exit 0'
   attr_suite absent.sh   'echo "FAIL arm Z"' 'exit 1'
   attr_suite cache.sh    'exit 0'
+  attr_suite term.sh     'echo "FAIL arm T"' 'exit 1'
   git add -A >/dev/null 2>&1 || return 2
   git commit -q -m 'the working tree L' >/dev/null 2>&1 || return 2
 }
@@ -855,6 +890,16 @@ arm "a cached run adds NO worktree entry at all, so the cache is a real saving a
     "worktree count unchanged" \
     "$ATTR_ROWS && $R --serial --attribute HEAD~1 --kit tools/attr/cache.sh >/dev/null 2>&1; true" \
     'bash tools/attr/wtcount.sh'
+
+# THE CLOSING DIFF REVIEW'S F5. The attribution trap named INT, TERM and HUP beside EXIT and never
+# exited, so a signal cleaned up and then RESUMED the suite loop over a deleted scratch root: a false
+# verdict, exit 0 or 1 rather than 143, and a second cleanup that reported the removed worktree as
+# an orphan. The TERM is placed inside the R run, where the worktree exists, because that is the only
+# moment the orphan line can be seen; the worktree must still be gone afterwards.
+arm "a TERM mid-suite under --attribute EXITS 143 — no verdict, one cleanup, and no worktree left" 0 \
+    "signalled run ended 143" \
+    "$ATTR_ROWS" \
+    'bash tools/attr/termrun.sh'
 
 # AC8. The flag is additive or it is nothing: every consumer of the no-flag mode predates it. That
 # mode is `--serial` since TOOL-aBatchedArm-4 S2, and parity.sh compares it with the BASE bare form.

@@ -51,6 +51,11 @@ at **`m-base:`**, the merge-base of the observed anchor and `HEAD` that prefligh
   and every later verb refuses a README whose line at `HEAD` differs. Units still grow through
   `--rescope --act add`; the ASK set does not grow at all.
 
+The `asks:` value reads WHOLE or not at all, by the ask generator's own id-list grammar: an id, an id
+range, or a `-N` continuation, each token or none. A token it cannot read refuses the list at
+preflight and at every resume (check 87), rather than mandating the ids that did parse, because a
+narrowed list is the owner's own list silently cut.
+
 Preflight also pins `asks-ready:`, one READY grade per mandated id, and refuses a mandate in which
 every id grades `no`. What the owner's act grants is the mandated asks' texts and their `out` clauses
 as scope, inside the goal the README states. It grants no authority: an ask's `may` clause honours

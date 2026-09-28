@@ -295,7 +295,8 @@ cd "$tmp" || exit 2
 # FOUR CASES PIN MESSAGE TEXT, and an edit to any of these strands its case silently — the case goes
 # on passing for the wrong reason or fails for a reason that is not a defect. They are `--prepare`
 # in case 18, `git merge origin/main` in case 19, `landed main on origin` in case 21b, and the whole
-# merge subject in case 9. Change one of those strings and change its case in the same commit.
+# merge subject in case 9. Change one of those strings and change its case in the same commit. The
+# F7 arms pin a SHAPE as well: the carry line's `<sha8> · <build> ·` and its trailing `FOREIGN`.
 git init -q --bare "$tmp/remote2.git"
 setup_repo "$tmp/work2" origin "$tmp/remote2.git"
 echo seed > src-seed.txt; git add src-seed.txt; git commit -q -m seed
@@ -423,6 +424,51 @@ run_wt --prepare --slug tFix >/dev/null 2>&1
 out15=$(run_wt --carry --slug tFix 2>&1); rc15=$?
 [ "$rc15" = 1 ] && case "$out15" in *"${unkn:0:8}"*unknown*) true ;; *) false ;; esac \
   && ok "15 an unattributable carry is named unknown and refuses" || bad "15 rc=$rc15 $out15"
+
+# F7 — OWNERSHIP IS CLAIMED ONLY AT A SUBJECT'S HEAD, AND THE BUILD FOLDERS DECIDE FIRST (closing diff
+#      review round 1, F7). The rule these arms replace took the first unit id ANYWHERE in the subject
+#      as the owner, before the folders. Each arm puts one commit on local main and merges it in.
+build_carry() {  # subject · build folder to touch, or "" -> the carry's sha; B merged local main and is prepared
+  build_main
+  if [ -n "$2" ]; then
+    mkdir -p "$tmp/work2/memory/builds/$2"
+    echo "row $RANDOM" >> "$tmp/work2/memory/builds/$2/BACKLOG.md"
+    git -C "$tmp/work2" add "memory/builds/$2/BACKLOG.md"
+  fi
+  git -C "$tmp/work2" commit -q --allow-empty -m "$1"
+  git -C "$tmp/work2" rev-parse HEAD
+  build_feat >/dev/null 2>&1
+  git -C "$tmp/wt" merge -q --no-ff -m "merge local main" main >/dev/null 2>&1
+  run_wt --prepare --slug tFix >/dev/null 2>&1
+}
+# F7a — the finding's own shape: another build's records commit, touching ONLY its own folder, whose
+#       subject cites this build's unit id first. Before the fix `--land` published it unflagged.
+f7a=$(build_carry "records(zOther): TOOL-tFix-1 closes behind TOOL-zOther-2" zOther)
+remf7=$(git ls-remote "$tmp/remote2.git" refs/heads/main | awk '{print $1}')
+outf7a=$(run_wt --land --slug tFix 2>&1); rcf7a=$?
+[ "$rcf7a" = 1 ] && [ "$(git ls-remote "$tmp/remote2.git" refs/heads/main | awk '{print $1}')" = "$remf7" ] \
+  && case "$outf7a" in *"${f7a:0:8} · zOther ·"*FOREIGN*) true ;; *) false ;; esac \
+  && ok "F7a another build's commit citing this build's id first is FOREIGN, and --land refuses it with the remote unchanged" \
+  || bad "F7a rc=$rcf7a $outf7a"
+# F7b — a CITATION alone is no claim: no build folder, and this build's id cited after the head.
+f7b=$(build_carry "records: TOOL-tFix-1 cited by a commit that claims nothing" "")
+outf7b=$(run_wt --carry --slug tFix 2>&1); rcf7b=$?
+[ "$rcf7b" = 1 ] && case "$outf7b" in *"${f7b:0:8} · unknown ·"*FOREIGN*) true ;; *) false ;; esac \
+  && ok "F7b an id cited after the subject's head claims nothing, so the carry is unknown and refuses" \
+  || bad "F7b rc=$rcf7b $outf7b"
+# F7c — the reverse: every folder is this build's, and the head claims another build.
+f7c=$(build_carry "records(zOther): disposes TOOL-tFix-1 in its home build" tFix)
+outf7c=$(run_wt --carry --slug tFix 2>&1); rcf7c=$?
+[ "$rcf7c" = 1 ] && case "$outf7c" in *"${f7c:0:8} · zOther ·"*FOREIGN*) true ;; *) false ;; esac \
+  && ok "F7c a head claiming another build is FOREIGN even when every folder it touches is this build's" \
+  || bad "F7c rc=$rcf7c $outf7c"
+# F7d — ITS CONTROL: this build's head claim citing a foreign id, touching no folder, is this build's.
+#       Without it, the three arms above pass on a rule that refuses every subject carrying an id.
+f7d=$(build_carry "records(tFix): TOOL-zOther-3 is cited here, not owned" "")
+outf7d=$(run_wt --carry --slug tFix 2>&1); rcf7d=$?
+[ "$rcf7d" = 0 ] && case "$outf7d" in *"${f7d:0:8} · tFix ·"*) true ;; *) false ;; esac \
+  && ok "F7d control — this build's head claim citing another build's id is this build's and does not refuse" \
+  || bad "F7d rc=$rcf7d $outf7d"
 
 # 16 — a single-parent records commit on top of T is accepted, and HEAD is what gets pushed
 build_main; build_feat

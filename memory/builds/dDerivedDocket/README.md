@@ -120,7 +120,7 @@ ids TOOL-dDerivedDocket-60 TOOL-dDerivedDocket-61 TOOL-dDerivedDocket-62 TOOL-dD
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-dDerivedDocket-1 — held-suite failure baseline](spec/2026-09-14-spec-TOOL-dDerivedDocket-1.md) | 1 | 2 | CLOSED | rev-7 | 2026-09-22 |
-| [TOOL-dDerivedDocket-2 — in-place landing merge](spec/2026-09-14-spec-TOOL-dDerivedDocket-2.md) | 2 | 2 | CLOSED | rev-5 | 2026-09-20 |
+| [TOOL-dDerivedDocket-2 — in-place landing merge](spec/2026-09-14-spec-TOOL-dDerivedDocket-2.md) | 2 | 2 | CLOSED | rev-6 | 2026-09-28 |
 | [TOOL-dDerivedDocket-4 — HELD phase, lease and derived phase](spec/2026-09-14-spec-TOOL-dDerivedDocket-4.md) | 3 | 2 | CLOSED | rev-9 | 2026-09-22 |
 | [TOOL-dDerivedDocket-3 — the run's landing path](spec/2026-09-14-spec-TOOL-dDerivedDocket-3.md) | 4 | 2 | CLOSED | rev-7 | 2026-09-22 |
 | [TOOL-dDerivedDocket-5 — auto-resume from HELD](spec/2026-09-14-spec-TOOL-dDerivedDocket-5.md) | 5 | 2 | CLOSED | rev-8 | 2026-09-22 |
@@ -131,7 +131,7 @@ ids TOOL-dDerivedDocket-60 TOOL-dDerivedDocket-61 TOOL-dDerivedDocket-62 TOOL-dD
 | [TOOL-dDerivedDocket-9 — transition-merge audit over history and at commit time](spec/2026-09-14-spec-TOOL-dDerivedDocket-9.md) | 9 | 2 | CLOSED | rev-7 | 2026-09-21 |
 | [TOOL-dDerivedDocket-10 — driver refuses shard-into-view](spec/2026-09-14-spec-TOOL-dDerivedDocket-10.md) | 10 | 2 | CLOSED | rev-6 | 2026-09-21 |
 | [TOOL-dDerivedDocket-11 — migration planner](spec/2026-09-14-spec-TOOL-dDerivedDocket-11.md) | 11 | 2 | CLOSED | rev-6 | 2026-09-21 |
-| [TOOL-dDerivedDocket-12 — relocation tools for pre-flip branches](spec/2026-09-14-spec-TOOL-dDerivedDocket-12.md) | 12 | 2 | CLOSED | rev-6 | 2026-09-21 |
+| [TOOL-dDerivedDocket-12 — relocation tools for pre-flip branches](spec/2026-09-14-spec-TOOL-dDerivedDocket-12.md) | 12 | 2 | CLOSED | rev-7 | 2026-09-28 |
 | [TOOL-dDerivedDocket-13 — straggler hook bodies and the fleet inventory](spec/2026-09-14-spec-TOOL-dDerivedDocket-13.md) | 13 | 2 | CLOSED | rev-7 | 2026-09-21 |
 | [TOOL-dDerivedDocket-50 — the kit's own route to the anchor grammar](spec/2026-09-20-spec-TOOL-dDerivedDocket-50.md) | 13 | 2 | CLOSED | rev-2 | 2026-09-21 |
 | [TOOL-dDerivedDocket-14 — rotation-note check for shards-mode archives](spec/2026-09-14-spec-TOOL-dDerivedDocket-14.md) | 14 | 1 | WONTDO | rev-1 | 2026-09-14 |

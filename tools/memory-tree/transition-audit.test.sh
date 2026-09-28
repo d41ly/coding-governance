@@ -43,7 +43,8 @@ KIT_LIB="$TOOL_ROOT/lib"
 . "$KIT_LIB/resolve-python.sh"
 PY=$(resolve_python) || { echo "FAIL no usable python launcher"; exit 2; }
 
-FLOOR_ASSERTIONS=58
+# RAISED 58 -> 62 with AC9b's four arms: the delta cache keyed by the declared inputs (review F10).
+FLOOR_ASSERTIONS=62
 
 TMP=$(mktemp -d) || exit 2
 trap 'rm -rf "$TMP"' EXIT
@@ -70,11 +71,11 @@ ENGINE="$KIT_MT/check-memory-hygiene.sh"
 printf '# the seed build\n' > "$SEED/memory/builds/aSeed/README.md"
 printf '# decisions\n\n- TOOL-aSeed-9 - a decision\n' > "$SEED/memory/DECISIONS.md"
 
-write_conf() { # $1 = repo dir, $2 = mode
+write_conf() { # $1 = repo dir, $2 = mode, [$3 = FAMILIES, $4 = DISCIPLINES] — default one family
   {
     printf 'MEMORY_ROOT=memory\n'
-    printf 'DISCIPLINES="tooling"\n'
-    printf 'FAMILIES="tooling:TOOL"\n'
+    printf 'DISCIPLINES="%s"\n' "${4:-tooling}"
+    printf 'FAMILIES="%s"\n' "${3:-tooling:TOOL}"
     printf 'ROTATION_MODE="cut"\n'
     printf 'BACKLOG_MODE="%s"\n' "$2"
   } > "$1/.memory-tree.conf"
@@ -195,6 +196,41 @@ if [ -n "$cf" ]; then
   has "$c3" "cache recomputed 1 (foreign epoch)" || bad "AC9: a foreign-epoch cache entry was not reported as recomputed"; ok
   has "$c3" "cache hits 0" || bad "AC9: a foreign-epoch cache entry was still counted as a hit"; ok
 fi
+
+# --- AC9b — the cache KEY carries the declared inputs that shape the delta (review F10) -----------
+# The cache sits in the git COMMON dir every worktree shares, so an entry keyed on the merge alone
+# hands one tree's delta to another tree's grammar. Retiring a family is the measured case: a warm
+# node graded the cached entry UNACCOUNTED, while a cold run — remote CI's — never produced it.
+FK="$TMP/fkey"
+new_repo "$FK"
+write_conf "$FK" shards "tooling:TOOL playbook:PLAY" "tooling playbook"
+printf '# PLAY backlog\n\n- PLAY-aSeed-1 \xc2\xb7 filed 2026-01-01 \xc2\xb7 a playbook ask\n' > "$FK/memory/backlog/PLAY.md"
+git -C "$FK" add -A >/dev/null 2>&1; git -C "$FK" commit -qm "a second family"
+git -C "$FK" checkout -q -b strag
+printf '# PLAY backlog\n\n- PLAY-aSeed-1 \xc2\xb7 filed 2026-01-01 \xc2\xb7 a playbook ask, REWORDED by the straggler\n' > "$FK/memory/backlog/PLAY.md"
+git -C "$FK" commit -qam "the straggler edits the playbook row"
+git -C "$FK" checkout -q main
+write_conf "$FK" builds "tooling:TOOL playbook:PLAY" "tooling playbook"
+mkdir -p "$FK/memory/builds/aFlip"
+printf '# aFlip\n\n## Asks\n\n## Dispositions\n' > "$FK/memory/builds/aFlip/BACKLOG.md"
+git -C "$FK" add -A >/dev/null 2>&1; git -C "$FK" commit -qm "flip to builds"
+git -C "$FK" merge -q --no-ff -m "merge the straggler" strag
+rm -rf "$FK/.git/transition-audit-cache"
+kcold=$(audit "$FK" --expect-builds)
+has "$kcold" "PLAY-aSeed-1" \
+  || bad "AC9b: the fixture's delta does not carry the playbook row, so retiring its family below moves nothing"; ok
+# RETIRE THE FAMILY in the working tree's conf, which every reader of the delta resolves. The
+# committed conf blobs still read builds, so the mode walk the audit rests on does not move.
+write_conf "$FK" builds "tooling:TOOL" "tooling"
+kwarm=$(audit "$FK" --expect-builds); kwarm_rc=$(audit_rc "$FK" --expect-builds)
+has "$kwarm" "cache recomputed 1 (foreign inputs)" \
+  || bad "AC9b: a cache entry computed under another FAMILIES was not reported as recomputed"; ok
+has "$kwarm" "PLAY-aSeed-1" \
+  && bad "AC9b: a warm run graded a retired family's cached entry, which a cold run never produces"; ok
+rm -rf "$FK/.git/transition-audit-cache"
+kcold_rc=$(audit_rc "$FK" --expect-builds)
+[ "$kwarm_rc" = "$kcold_rc" ] \
+  || bad "AC9b: the warm verdict ($kwarm_rc) differs from a cold run's ($kcold_rc) over one tree"; ok
 
 # --- AC7 — the pinned registry -------------------------------------------------------------------
 pinout=$(audit "$F1" --pin --expect-builds)

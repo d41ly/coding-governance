@@ -1536,8 +1536,12 @@ write_runlog_verdict() { # the status the EXIT trap saw -> one ev=once line appe
 
 # THE ATTRIBUTION WORKTREE goes on every exit path too, AFTER the reap (its R run may be what is
 # being reaped) and before the scratch dir. ATTR_WT is set only once lib-attribute.sh is sourced.
+# FORGOTTEN ONCE REMOVED, because `cleanup` runs twice on every caught signal (the arm below, then
+# the EXIT trap its `exit` fires): the second removal of a worktree already gone fails, and printed
+# an orphan line naming a path that no longer exists (the dDerivedDocket closing diff review's F5,
+# the sibling runner's instance of the same class).
 ATTR_WT=""
-cleanup() { write_runlog_verdict "$?"; run_outstanding_reap; [ -z "${ATTR_WT:-}" ] || remove_scratch_worktree "$ATTR_WT" || echo "run-gates: the R worktree at $ATTR_WT could not be removed — remove it by hand" >&2; rm -rf "$WORK" 2>/dev/null || true; ts_release; ts_drop_ticket; }
+cleanup() { write_runlog_verdict "$?"; run_outstanding_reap; if [ -n "${ATTR_WT:-}" ]; then if remove_scratch_worktree "$ATTR_WT"; then ATTR_WT=""; else echo "run-gates: the R worktree at $ATTR_WT could not be removed — remove it by hand" >&2; fi; fi; rm -rf "$WORK" 2>/dev/null || true; ts_release; ts_drop_ticket; }
 trap cleanup EXIT
 trap 'RUNLOG_RC=130; cleanup; exit 130' INT
 trap 'RUNLOG_RC=143; cleanup; exit 143' TERM
@@ -2760,15 +2764,23 @@ derive_attribution() {
 # cannot answer — the wall, a ceiling, a checkout that fails, an output that normalises to nothing —
 # leaves the age UNPROVEN (`-`), which reads as not landable: the safe direction.
 #
+# WITHOUT A SIGNATURE the probe reads red there only when every non-blank line of L's output is in
+# the probe's, and red with any other output is one more probe that cannot answer: text is not an
+# offender set, so a fixed offender and a moved count line look alike. Such a leg's age is therefore
+# proven only while its text holds still or shrinks toward L's; a row that wants its red aged across
+# a changing count declares a `signature`. Green is the only rc-1 answer, because rc 1 moves the
+# bisection toward R and so makes an old red read young (closing diff review F1).
+#
 # WHAT IT DOES NOT CHECK. The bisection assumes the red, once present, stayed on the line: a leg that
 # went red, green and red again inside the window is owned by whichever landing the search meets,
 # which may be the later one. A flaky leg can bisect to the wrong owner too. The ask the driver files
 # names the leg's argv so a reader can re-run it, which is the only defence this block claims.
 ATTR_FPL=(); ATTR_WT_MOVED=0
 # check_red_at <leg index> <sha> <probe tag> — rc 0 when the leg, run from R's row with the R worktree
-# checked out at <sha>, is red there carrying every offender L carries; rc 1 when it is green there,
-# its argv file is absent there, or an offender of L's is missing; rc 2 when that tree could not
-# answer, with the reason in A_AGE_WHY.
+# checked out at <sha>, is red there carrying every offender L carries (every line of L's, for a row
+# with no signature); rc 1 when it is green there, its argv file is absent there, or a signature
+# offender of L's is missing; rc 2 when that tree could not answer, or a row with no signature is red
+# there with output that is not L's, with the reason in A_AGE_WHY.
 check_red_at() {
   local i=$1 sha=$2 tag=$3 rc_x t0 t1 xsecs raw xset f rb=${A_RBOUND:-0}
   local -a xav xsv
@@ -2808,8 +2820,17 @@ check_red_at() {
     [ -z "$(LC_ALL=C comm -23 "$A_LSET" "$xset")" ] && return 0
     return 1
   fi
+  # NO SIGNATURE: THE TEXT IS NOT AN OFFENDER SET, so a line of L's missing here cannot be read as an
+  # offender of L's missing here — a count line that moved reads exactly the same. Red with every
+  # line L prints is red there; red with any other output is a probe that cannot answer, never the
+  # rc 1 that means green, which is what it returned until the closing diff review's F1: an old red
+  # whose text a later landing changed then bisected to that landing and landed as young.
   cmp -s "$A_LSET" "$xset" && return 0
-  return 1
+  grep -v '^[[:space:]]*$' "$A_LSET" | LC_ALL=C sort -u > "$ATMP/$i.$tag.lu"
+  grep -v '^[[:space:]]*$' "$xset" | LC_ALL=C sort -u > "$ATMP/$i.$tag.xu"
+  [ -z "$(LC_ALL=C comm -23 "$ATMP/$i.$tag.lu" "$ATMP/$i.$tag.xu")" ] && return 0
+  A_AGE_WHY="red at ${sha:0:8} with output that is not L's, and R's row declares no signature to compare offenders by"
+  return 2
 }
 
 # derive_age <leg index> — after an INHERITED verdict, sets A_AGE (the owner's first-parent distance

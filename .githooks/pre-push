@@ -1021,12 +1021,26 @@ fi
 # ---- WHICH BAR RUNS: GOV_GATE_CMD, vetted by `check_bar_command` above, at the pushed tip -----
 gate=${GOV_GATE_CMD:-bash $GATE_RUNNER}
 bar_label="$gate"
+# WHETHER THE BAR THAT RUNS WRITES A RUN RECORD, decided from WHAT RUNS and never from which knob named
+# it (closing diff review round 1, F8). S6 below reads that record, and it used to be skipped whenever
+# GOV_GATE_CMD was set. But the declared rule admits only this kit's runner or the committed GATE_CMD,
+# and in this repository those are one script, so every admissible override IS the runner: exporting
+# the very value the refusals above recommend switched the envelope off, which is the environment
+# SELECTING. `runner` when the program is this kit's runner by path or by blob at the pushed sha;
+# `other` for a declared GATE_CMD that names a different script; `stub` under the declared escape.
+bar_record=runner
 if [ -n "${GOV_GATE_CMD:-}" ]; then
   if ! check_bar_command GOV_GATE_CMD "$gate" "$main_local" declared; then
     write_refusal bar-refused "$why"; RUNLOG_CLEAN=1; exit 1
   fi
   RUNLOG_BAR=$bar_class
   [ "$bar_class" = stub ] && bar_label="STUB $gate"
+  if [ "$bar_class" = stub ]; then
+    bar_record=stub
+  elif [ "${bar_path#./}" != "$GATE_RUNNER" ] &&
+       [ "$bar_blob" != "$(git rev-parse -q --verify "$main_local:$GATE_RUNNER" 2>/dev/null || true)" ]; then
+    bar_record=other
+  fi
 else
   bar_path=$GATE_RUNNER
   bar_blob=$(git rev-parse -q --verify "$main_local:$bar_path" 2>/dev/null || true)
@@ -1162,15 +1176,22 @@ rc=$?
 # (TOOL-aSurfacedLexicon-25), and the path that exited 0 was never found. Whatever it was, a runner
 # that exits 0 without writing `verdict GREEN` into the record of the id pinned above is now RED here.
 # The record is read, never stdout: a pipe waits for the last inherited write end, and the runner's
-# wall watcher can outlive it holding one. An override command is not the runner and writes no
-# record, so it is announced and not checked -- which is also what every arm that stubs the bar uses.
+# wall watcher can outlive it holding one. It is checked whenever the RUNNER ran, whichever knob named
+# it (`bar_record`, set where the bar was vetted). Only a bar that is not the runner goes unchecked,
+# and it is announced: a declared GATE_CMD naming another script writes no record this hook can
+# read, and the declared STUB is what every arm that stubs the bar uses.
 if [ "$rc" -eq 0 ]; then
-  if [ -n "${GOV_GATE_CMD:-}" ]; then
-    echo "pre-push: GOV_GATE_CMD overrides the bar, so its run record is not checked for an override command"
-  elif ! check_verdict_record "$gd/gate-run/$RUNLOG_GATE_RUN"; then
-    echo "pre-push: $PP_NOT — treating it as RED"
-    rc=1
-  fi
+  case "$bar_record" in
+    stub)
+      echo "pre-push: the bar is the declared STUB (GOV_GATE_CMD_TEST), not this kit's runner, so its run record is not checked for an override command" ;;
+    other)
+      echo "pre-push: GOV_GATE_CMD runs the declared GATE_CMD '$bar_path', not this kit's runner, so its run record is not checked for an override command" ;;
+    *)
+      if ! check_verdict_record "$gd/gate-run/$RUNLOG_GATE_RUN"; then
+        echo "pre-push: $PP_NOT — treating it as RED"
+        rc=1
+      fi ;;
+  esac
 fi
 # A RED ON INHERITED LEGS ONLY LANDS UNDER `land`, and nowhere else (D12-i4). The exit that follows is
 # still this hook's one exit, so the run log's decision stays the gate decision above; the landing is

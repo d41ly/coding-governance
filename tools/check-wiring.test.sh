@@ -1224,6 +1224,35 @@ ck "straggler: --check still names it" \
    "$(printf '%s' "$out" | grep -q '^note     straggler' && echo 1 || echo 0)"
 ck "straggler: and the straggler alone does not decide the exit" \
    "$([ "$rc" = 0 ] && echo 1 || echo 0)"
+# ONE CONF GRAMMAR (closing diff review round 1, F6): the step's mode read and the kit's own
+# `tree_lib.parse_conf` agree over every legal spelling of the flip. The step's answer is read off its
+# own line, and an answer that is neither the mode skip nor a straggler line is its own value, so a
+# step that printed nothing cannot agree. The pipeline this step used read the commented and the
+# exported spellings as not flipped and skipped a flipped tree.
+cat > "$D/.git/mode-kit.py" <<'PYEOF'
+import sys
+
+sys.path.insert(0, sys.argv[1])
+import tree_lib  # noqa: E402  the kit's ONE conf parser
+
+with open(".memory-tree.conf", encoding="utf-8", newline="") as fh:
+    conf = tree_lib.parse_conf(fh.read(), {})
+sys.stdout.write("builds" if conf.get("BACKLOG_MODE") == "builds" else "not-builds")
+PYEOF
+for spell in 'absent|' 'blank|BACKLOG_MODE=""' 'quoted|BACKLOG_MODE="builds"' \
+             'commented|BACKLOG_MODE=builds   # flipped by the switch-over' \
+             'exported|export BACKLOG_MODE=builds' "single|BACKLOG_MODE='builds'" \
+             'quoted-commented|BACKLOG_MODE="builds"  # flipped'; do
+  printf 'MEMORY_ROOT=memory\nDISCIPLINES="tooling"\nFAMILIES="tooling:TOOL"\nROTATION_MODE="cut"\n%s\n' "${spell#*|}" > .memory-tree.conf
+  kitmode=$("$py" "$D/.git/mode-kit.py" "$D/memory-tree" 2>&1)
+  out=$(chke --session)
+  if printf '%s' "$out" | grep -q "^skip     straggler — BACKLOG_MODE is not 'builds'"; then shmode=not-builds
+  elif printf '%s' "$out" | grep -qE '^(note|ok) +straggler '; then shmode=builds
+  else shmode="no straggler line"; fi
+  ck "straggler F6: the '${spell%%|*}' spelling reads '$kitmode' to the kit's parser and '$shmode' to the step" \
+     "$([ "$shmode" = "$kitmode" ] && echo 1 || echo 0)"
+done
+rm -f "$D/.git/mode-kit.py"
 cleanup
 
 # ---- TOOL-aRepatriatedFork-19: the install RECEIPT is the first rung -----------------------------

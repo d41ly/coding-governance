@@ -434,7 +434,10 @@ rotation does not re-date it. Blank turns the arm off, announced.
 **The bar says whose a red is, and a policy says what happens next.** `gates-green` attributes a
 red against R, the tip `observe_anchor` saw the remote advertise, and ages each INHERITED leg against
 R's last `INHERITED_RED_MAX_AGE` first-parent landings: red with the same offenders at the far end
-is `aged`, and otherwise a bisection names the landing that introduced it. The policy is the pair of
+is `aged`, and otherwise a bisection names the landing that introduced it. A probe that cannot
+answer reads `age unproven` and never counts toward the bound: a leg with no `signature` whose far
+end is red with different output is one, since text cannot tell a fixed offender from a moved
+count line. The policy is the pair of
 keys in the file `GATE_POLICY_FILE` names, both read at R and parsed, never sourced. Blank or
 malformed reads `park`, and so does `land` with no positive bound; the item announces which.
 
