@@ -345,3 +345,7 @@ base: abac6d59cae3baf711fac4d275bf13a401e01901
 2026-09-27T23:17:53Z dispatch · item c2fd68d6 TOOL-dDerivedDocket-35 · reason .unattended.conf memory/guides/SESSION-KICKOFF.md memory/builds/dDerivedDocket/BACKLOG.md memory/builds/dDerivedDocket/build memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-35.md memory/builds/dDerivedDocket/README.md memory/LIVE.md memory/ledger memory/backlog memory/map/features/unattended-mandate.md memory/map/generated
 
 2026-09-27T23:17:58Z brief · item TOOL-dDerivedDocket-35 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
+
+2026-09-28T00:02:05Z dispatch · item 3215c6cb PLAY-dDerivedDocket-1 · reason coding-governance-agents.template.md AGENTS.md memory/guides/SESSION-KICKOFF.md memory/builds/dDerivedDocket/spec/2026-09-14-spec-PLAY-dDerivedDocket-1.md memory/builds/dDerivedDocket/build/2026-09-28-build-PLAY-dDerivedDocket-1-1-acceptance-ledger.md memory/builds/dDerivedDocket/README.md memory/LIVE.md memory/ledger memory/map/features/unattended.md memory/map/generated
+
+2026-09-28T00:02:10Z brief · item PLAY-dDerivedDocket-1 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md

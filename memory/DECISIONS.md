@@ -8,6 +8,7 @@
 ## PLAY — playbook
 
 - PLAY-aCandidStub-1 · the §10-into-`gotchas/` retirement is REFUTED, not deferred: the kit is Optional so no universal rule may route to its dir, `aFoldedQuarry` U4 §2 S8/§3 charter the corpora disjoint, and DERIVED anchors make a generic record inert. The drift is one level up
+- **PLAY-dDerivedDocket-1** — **attended landings keep local-main-first; an unattended run lands by its protocol's rule** (owner, D12-i3). §6's backlog bullet points at the memory tree's status rule, true in both modes. Detail `builds/dDerivedDocket/`. — _2026-09-28, `d`_
 
 ## KICK — kickoff
 

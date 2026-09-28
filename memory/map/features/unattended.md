@@ -123,7 +123,7 @@ counts of them at once.
 
 **The template is byte-gated and this feature is kit-conditional.** The unattended rules first landed
 in the domain-rules companion (§1) to stay inside the byte ceiling; v3.0 converged that companion into
-the charter, so they now live in the charter's `kit:unattended` conditional block in §1 — dropped by
+the charter, so they now live in the charter's two `kit:unattended` conditional blocks in §1 — dropped by
 the renderer for a target that did not select the kit. Two amended clauses sit in the unconditional
 body, both written to stay true for a non-adopting re-puller. The Skill's `## Resume` section invokes `/session-kickoff`
 after the reap and the re-schedule (`TOOL-aReplayedCard-3`), so a session resumed after process
