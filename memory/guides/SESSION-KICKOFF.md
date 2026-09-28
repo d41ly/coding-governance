@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.4 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-09-28T03:32:00+03:00 @ 869209edc6f8056706989e05e45558607b0eb709
+last-audit: 2026-09-28T04:52:04+03:00 @ 8d46bc3ef670986b820158e2dc52f35ae6bd4c6c
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/run-gates/run-selftests.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 6ee9be2e0905d6d6717e3a6f913e2fe119a96132
+last-body-change: 8d46bc3ef670986b820158e2dc52f35ae6bd4c6c
 check-script: skills/session-kickoff/manifest-check.sh
 registry: AGENTS.md
 -->
@@ -222,9 +222,6 @@ re-renders them from build front matter); there is no authored ledger to update.
 *Correction OVERRIDES a stale doc/memory claim until fixed; entry: `<date> · <stale where> · <the
 correction> · prune when <condition>`. Starts empty; prune per-entry, never delete the section.*
 
-- 2026-09-22 · the unattended kit's self-tests · they are GREEN WHOLE at last: 76 failing
-  assertions in the gate, driver and cross-component suites were fixtures pinned to moved texts,
-  fixed at the aBatchedArm landing · prune when a run finds one red again.
 - 2026-08-23 · the owner's standing instruction on the kit self-test suites · `--checks` yes,
   `--selftests --serial` only when they ask. The cost is process creation, not logic:
   `memory/gotchas/process-creation-is-the-suite-cost.md` · prune when a bar runs them automatically.

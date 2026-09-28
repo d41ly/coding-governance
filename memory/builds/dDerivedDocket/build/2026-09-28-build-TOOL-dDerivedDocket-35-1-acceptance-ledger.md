@@ -7,16 +7,19 @@ end of the pass while the scratch clone still stands. `79485291` is the arming c
 `ASKS_CMD` to `python tools/memory-tree/gen_build_index.py --asks`, writes S9's sixteen KEEP rows in
 this build's `BACKLOG.md`, refreshes the mandate dossier's gap entry and re-stamps the kickoff
 manifest. The scratch clone was cloned from that commit. This commit carries the three in-pass REDs,
-the spec's rev-10 and its CLOSED header.
+the spec's rev-10 and its CLOSED header. Rollout step 6's SECOND commit, made at VERIFYING, adds
+the two deferred REDs, AC5's and AC6's lines, and the clone's removal. That is the section
+"The two deferred REDs, staged at VERIFYING" below.
 
 NO MERGE BAR, NO GATE LEG AND NO SUITE FILE RAN IN THIS PASS. The direct checks were the driver
 (`unattended.sh --preflight`, `--close`) and the leg's own checker (`check-unattended.sh`), both run
 INSIDE the scratch clone over its fixtures, the declared producer run by hand in call shape 2, and
-`gen_build_index.py --asks --all --json` over this tree. Five criteria have NO line below, because
-their `permission:` lines defer them. AC1, AC7 and AC9 are leg verdicts over the real tree, owed to
-the one post-build bar. AC5 and AC6 need the linked-worktree topology that
-`straggler-guard.test.sh --topology` builds, which gate-guard denies in a pass, so they are staged
-at VERIFYING (§8 F7). Their direct in-pass reads are recorded in prose below.
+`gen_build_index.py --asks --all --json` over this tree. At the first commit five criteria had NO
+line below, because their `permission:` lines defer them. AC1, AC7 and AC9 are leg verdicts over the
+real tree, owed to the one post-build bar, and still have none. AC5 and AC6 need the linked-worktree
+topology that `straggler-guard.test.sh --topology` builds, which gate-guard denies in a pass, so
+they were staged at VERIFYING (§8 F7) and their lines came with the second commit. The direct
+in-pass reads behind AC1, AC7 and AC9 are recorded in prose below.
 
 ## The scratch clone, left standing for VERIFYING
 
@@ -101,6 +104,137 @@ UNATTENDED check 37 FAILED — a mandated run's own build folder ANCHORS a recor
 
 The table was then unstaged and deleted.
 
+## The two deferred REDs, staged at VERIFYING
+
+This is Rollout step 6's second commit, and the orchestrator makes it at VERIFYING, after the last
+unit closed (§8 F7). The clone read as the pass handed it over: `git status --short` printed nothing,
+`main` stood at `4c6bd140`, `git worktree list` held the primary tree alone, and
+`git config --get core.hooksPath` printed `.githooks`. Every command ran under the in-pass fixture
+session environment, plus `PYTHONDONTWRITEBYTECODE=1`, which the straggler suite also sets.
+
+**The topology.** `git branch straggler abac6d59` cut the pre-switch branch. Then
+`bash .githooks/straggler-guard.test.sh --topology <clone> straggler`, run in the clone, exited 0 and
+printed one path, the linked worktree `c-wt-straggler` beside the clone. The helper checks out an
+existing branch, so this pair stands in for the `git worktree add <dir> -b <branch> abac6d59` that
+S6 spells. `git worktree list` then read the primary tree at `4c6bd140 [main]` and the linked one at
+`abac6d59 [straggler]`, and `core.hooksPath` still read `.githooks`, the relative value the pass's
+`check-wiring.sh --fix` wrote. Every edit below rewords the same row of `memory/backlog/TOOL.md`,
+the row of TOOL-aHonedRuleset-7, which is OPEN at `abac6d59` and whose id this tree defines in
+`memory/builds/aHonedRuleset/BACKLOG.md`.
+
+**S6, the relative arm, ran first.** That order makes the edit the absolute arm refuses the same
+edit S7 commits with `--no-verify`, so the change commit the audit names is S7's. AC5 orders neither
+arm. With `core.hooksPath` read from the clone's shared config alone, a plain `git commit` of the
+staged reword in the linked worktree exited 0. The worktree's own pre-switch `pre-commit` ran, and
+no line refused or printed the recipe:
+
+```
+memory-hygiene: project key PROJECT_REGISTRY_EXTRA='pass-order-waiver.txt substitution-fed-loops.txt' (gov's default is blank)
+memory-hygiene: project key ROTATION_MODE='cut' (gov's default is blank)
+memory-hygiene: the §3 edge JOINS are held under --staged — the selection is the staged set, so one end of a correctly declared pair would report the other as missing. The shape arm still ran; the push-boundary run is where the joins bind.
+memory-hygiene: the curation-debt stale-ENTRY guard and its per-row report are HELD under --staged — the selection is the staged set, so a listed file nobody staged would record nothing and read as stale
+memory-hygiene: check 23 HELD under --staged — a corpus-wide join over every closed Tier-2 unit; the push-boundary run is where they bind
+[straggler 46dfdc2e] scratch straggler: a shard row edit under the relative hooks path
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+```
+
+`bash tools/check-wiring.sh --session` in the primary scratch tree then exited 0, and the last of
+its ten lines was:
+
+```
+note     straggler — refs/heads/straggler (hooks own-tree) still edit the authored backlog shards and owe a relocation before they merge; a marked branch runs its own pre-flip hook files, so only this note, the drift signal and the merge bar reach it. Detail: python3 tools/memory-tree/migrate_backlog.py --stragglers
+```
+
+**S6, the absolute arm.** This is a FIXTURE SETTING and proves nothing about gov's own wiring:
+`git config extensions.worktreeConfig true` in the clone, then
+`git config --worktree core.hooksPath <clone>/.githooks` in the linked worktree.
+`git config --show-origin --get-all core.hooksPath` there then read the shared `.githooks` and the
+absolute value from that worktree's `config.worktree`. A second reword of the same row was staged,
+and a plain `git commit` exited 1:
+
+```
+pre-commit: REFUSING — this branch predates the per-build backlog and this commit stages an
+  authored backlog shard or a family-named backlog archive. Merged later, that edit can drop
+  a row with nothing able to say which one. Relocate it instead:
+  This branch predates the per-build backlog. Its edits to memory/backlog/<F>.md must be relocated, not merged.
+    git merge <default>       # MERGE, never rebase or squash: those leave no merge to audit
+    python tools/memory-tree/migrate_backlog.py --relocate --as <your-slug>
+    git add memory/ && git commit
+  Already landed without this? Any node:  python tools/memory-tree/migrate_backlog.py --repair <merge-sha>
+  A branch nobody will revisit? From the default branch:  python tools/memory-tree/migrate_backlog.py --ingest <ref>
+  Deliberate override, as always: git commit --no-verify
+memory-hygiene: project key PROJECT_REGISTRY_EXTRA='pass-order-waiver.txt substitution-fed-loops.txt' (gov's default is blank)
+memory-hygiene: project key ROTATION_MODE='cut' (gov's default is blank)
+memory-hygiene: the §3 edge JOINS are held under --staged — the selection is the staged set, so one end of a correctly declared pair would report the other as missing. The shape arm still ran; the push-boundary run is where the joins bind.
+memory-hygiene: the curation-debt stale-ENTRY guard and its per-row report are HELD under --staged — the selection is the staged set, so a listed file nobody staged would record nothing and read as stale
+memory-hygiene: check 23 HELD under --staged — a corpus-wide join over every closed Tier-2 unit; the push-boundary run is where they bind
+pre-commit: a gate failed — fix or 'git commit --no-verify' to override deliberately.
+```
+
+**S7, the transition audit.** The refused edit was committed in the linked worktree with
+`git commit --no-verify`, the first of S7's two bypasses, as `f150d8fb`. In the primary scratch tree
+`git merge --no-ff straggler` then exited 1, stopped by the row driver:
+
+```
+merge-rows: REFUSED — %A is a GENERATED family view and %B is an AUTHORED backlog shard, so one branch predates the per-build backlog; those rows are RELOCATED, never line-merged
+This branch predates the per-build backlog. Its edits to memory/backlog/<F>.md must be relocated, not merged.
+  git merge <default>       # MERGE, never rebase or squash: those leave no merge to audit
+  python tools/memory-tree/migrate_backlog.py --relocate --as <your-slug>
+  git add memory/ && git commit
+Already landed without this? Any node:  python tools/memory-tree/migrate_backlog.py --repair <merge-sha>
+A branch nobody will revisit? From the default branch:  python tools/memory-tree/migrate_backlog.py --ingest <ref>
+Auto-merging memory/backlog/TOOL.md
+CONFLICT (content): Merge conflict in memory/backlog/TOOL.md
+Automatic merge failed; fix conflicts and then commit the result.
+```
+
+The resolution took the default branch's view, `git checkout --ours memory/backlog/TOOL.md` and then
+`git add`, which left the index equal to `HEAD`. A plain `git commit --no-edit` exited 1 with one
+line:
+
+```
+memory-hygiene: check 26 refuses this merge — TOOL-aHonedRuleset-7 (changed), changed by f150d8fb77472e03bf7841c0ae72ac98ab31fd49, crosses a mode boundary with no RELOCATED row in the index. Write the row and conclude the merge, or `--repair` it afterwards.
+```
+
+That line comes from `transition_audit.py --staged`, which `.githooks/commit-msg` calls and
+`pre-commit` does not. A direct replay of both hooks over the same pending merge confirmed it:
+`bash .githooks/commit-msg .git/MERGE_MSG` exited 1 printing the same line, and
+`bash .githooks/pre-commit` exited 0. Then `git commit --no-verify --no-edit`, S7's second bypass,
+concluded the merge as `2ee66b9c`. Its parents are `4c6bd140` and `f150d8fb`, so it is a real merge
+and not a squash. `bash tools/memory-tree/check-memory-hygiene.sh` in the primary scratch tree then
+exited 1 after 44 s, and its check 26 printed:
+
+```
+memory-hygiene: check 26 transitions examined 1 · merges walked 391 · pinned 0 · unpinned 1 · cache hits 0
+memory-hygiene: check 26 UNACCOUNTED — merge 2ee66b9c09543792ab055530ce668fa79b33856e carries a lost row: TOOL-aHonedRuleset-7 (changed), changed by f150d8fb77472e03bf7841c0ae72ac98ab31fd49. Remedy: repair it forward with `--repair 2ee66b9c09543792ab055530ce668fa79b33856e`, which writes the RELOCATED row this check reads.
+```
+
+**That exit 1 is not check 26's alone.** The same run reported findings that belong to the scratch
+content, not to the break:
+
+- Check 14 named 23 `EXMP` ids as cited and never defined. The clone's conf declares that family,
+  and this corpus already cites ids in it.
+- Check 23 failed on closed units the clone's content at `79485291` evidences in no journal.
+- Check 17 reported the gotchas index stale, and check 16 reported one ungated finding.
+- It printed `line 2534: files8: unbound variable` three times, once per curation-debt row it found
+  earning a waived check. `files8` is assigned only on check 8's shards-mode branch, so under
+  `BACKLOG_MODE="builds"` the report's check-8 applicability test reads an unset name under
+  `set -u`. It moved no verdict here, and this unit touched neither that line nor the report. The
+  same script run over this worktree while this section was written printed the same three lines,
+  so this one is not scratch content.
+
+The audit's own module isolates the RED. `python tools/memory-tree/transition_audit.py --at 4c6bd140`
+exited 0 with `transitions examined 0`, and the same module at the merge exited 1 with the
+`UNACCOUNTED` line above.
+
+**Bypasses, and the clone's removal.** This procedure used `--no-verify` exactly twice, both of them
+S7's. It set no `GOV_GATE_CMD` and pushed nothing. Afterwards, `chmod -R u+w` over the clone, the
+linked worktree beside it and `o.git` cleared their read-only object files, 73 of them, and
+`rm -rf` removed all three. `test -e` then read each one absent. The rest of the `build-scratch`
+directory holds other units' files and was left in place. AC7's `memory hygiene` reading binds only
+on a run that includes the commit carrying this section; a bar started before that commit reads the
+first commit's ledger (Rollout step 6).
+
 ## A red that is not this unit's, and that the owed bar will meet
 
 Both leg runs in the clone also failed check 15, independent of the break:
@@ -173,6 +307,23 @@ each a KEEP row. Each ask with its status and deciding row, as `status · decidi
   staged, failed check 37 naming the anchor ban and TOOL-dDerivedDocket-38 at line 7 of the table.
   The baseline run before the break reported no foreign anchor under the same folder, and the first
   cell was backticked, not link-wrapped.
+- AC5 — `git commit` — ran in the scratch clone's linked worktree on `straggler`, cut from `abac6d59`,
+  built by `straggler-guard.test.sh --topology`, with the primary scratch tree on `main` and a reword
+  of TOOL-aHonedRuleset-7's row in `memory/backlog/TOOL.md` staged. Under the absolute
+  `config.worktree` override naming the primary tree's `.githooks`, a fixture setting, it exited 1
+  printing `REFUSING` and the recipe's `migrate_backlog.py --relocate --as <your-slug>` line. Under
+  the relative `.githooks` the pass's `check-wiring.sh --fix` wrote, it landed as `46dfdc2e` with no
+  recipe, and `bash tools/check-wiring.sh --session` in the primary scratch tree then printed one
+  `note` line naming `refs/heads/straggler` with `hooks own-tree`. The relative arm ran first.
+- AC6 — `git merge --no-ff` — of `straggler` into the scratch `main`, in the primary scratch tree,
+  stopped on the row driver's shard-into-view refusal in `memory/backlog/TOOL.md`. Resolved to
+  `main`'s view, a plain `git commit` exited 1 on `.githooks/commit-msg`: replayed directly, that
+  hook exited 1 printing check 26's refusal of TOOL-aHonedRuleset-7, changed by `f150d8fb`, while
+  `pre-commit` exited 0. Concluded with `--no-verify` as the two-parent merge `2ee66b9c`,
+  `bash tools/memory-tree/check-memory-hygiene.sh` there exited 1, and check 26 printed
+  `UNACCOUNTED` naming merge `2ee66b9c`, TOOL-aHonedRuleset-7 and change commit `f150d8fb`. Other
+  scratch-content findings shared that exit, and `transition_audit.py` alone read 0 at `4c6bd140`
+  and 1 at the merge.
 - AC8 — `python tools/memory-tree/gen_build_index.py --asks --all --json` — at `79485291` every ask
   homed in this build's `BACKLOG.md` derives OPEN with a KEEP row there. That is `<triage-id>`,
   TOOL-dDerivedDocket-66, with unit 34's KEEP, and the sixteen section 11 declines, 38 to 47 and 55
@@ -182,4 +333,5 @@ each a KEEP row. Each ask with its status and deciding row, as `status · decidi
 - AC10 — `core.hooksPath` — was unset in the clone when `4c6bd140`, carrying both scratch READMEs,
   reached the scratch remote's `main`. It was set by `check-wiring.sh --fix` only afterwards. The
   in-pass procedure used no `--no-verify` and no `GOV_GATE_CMD`, and pushed nothing after the hooks
-  path was set, so no landing met `push-main-active`. S7's two documented uses are VERIFYING's.
+  path was set, so no landing met `push-main-active`. S7's two documented uses are VERIFYING's, and
+  the VERIFYING procedure used exactly those two, set no `GOV_GATE_CMD` and pushed nothing.

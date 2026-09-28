@@ -985,6 +985,8 @@ $bad7"
 # would otherwise fire: the guard`s precondition already counts BACKLOG.md files, so under
 # `builds` it would see a non-empty precondition over an empty population and red.
 if [ "$BMODE" = builds ]; then
+  # Empty, not unset: the curation-debt report below reads it under `set -u` in either mode.
+  files8=""
   [ "$STAGED" = 1 ] || printf 'memory-hygiene: check 8: backlog layout builds — graded by check 9\n'
 else
   pop8=$( { printf '%s\n' "$FILES" | grep -E "^$M/backlog/[^/]+\.md$"; printf '%s\n' "$FILES" | grep -E "^$M/builds/[^/]+/STATUS\.md$"; } | grep -c . || true)

@@ -9027,7 +9027,7 @@ rm -rf "$RS_FIX"
 #
 # THE DECLARED GENERATOR IS A STUB, and it is the only thing here that is. Its rows are what the
 # real producer's eleven-field projection looks like, and AC15's arm — which runs the REAL declared
-# producer — is the one that holds this stub honest; it skips in this repo until the key is armed.
+# producer — is the one that holds this stub honest; it skips only where the key is blank.
 #
 # THE STUB LIVES OUTSIDE THE WORK TREE, under $TMP. Written inside it, it is an untracked file, and
 # `check_clean` counts untracked paths — so every preflight below would refuse on a DIRTY TREE and
@@ -9318,12 +9318,116 @@ hit "$(run --rescope tUnitAsk --act retire --item EXMP-tUnitAsk-77 --reason gone
 # ---- AC15: the TWO CALL SHAPES against the producer THIS REPOSITORY declares, never a stub. In a
 # ---- repo whose ASKS_CMD is blank the arm prints a NAMED skip: a silent pass here would let the
 # ---- stub above stand in for a producer nobody has ever run this parse against.
+# ----
+# ---- THIS ARM USED TO ASSERT NOTHING. Once TOOL-dDerivedDocket-35 armed the key it printed which
+# ---- producer it "runs" and ran none, so it passed over exactly the seam it is named for.
+# ----
+# ---- THE FIXTURE IS ITS OWN builds-mode TREE holding what the criterion names: an unlabelled OPEN
+# ---- ask, an ask closed by two records (a CLOSED spec that closes it and a CLOSED disposition naming
+# ---- a sha), and a README header tolerated by waiver. Its own repository, because the shared
+# ---- fixture's tree is what every ask arm above reads, and a second memory tree in it would change
+# ---- their subject.
+# ---- THAT HEADER IS INERT UNDER BOTH SHAPES, and no assertion pretends otherwise. Both carry `--at`,
+# ---- and the pinned read that selects opens BACKLOG files and spec headers only, never a README, so
+# ---- the waiver's notice is not printed here at all (observed). The notices a merged capture would
+# ---- hand the parse are that read's own lines, `conf pinned at` and `backlog at`, and the arm reads
+# ---- the first of them back to see the rev each shape appended.
+# ---- THE PRODUCER IS INSTALLED, NEVER RESPELLED: the declared value's word that names a file in this
+# ---- repository is copied to the same relative path in the fixture, with the files beside it, so
+# ---- the declared value runs VERBATIM from the fixture's root and no kit path is spelled here. That
+# ---- is the AC19 real-runner arm's idiom. A value naming no file here runs as declared, off PATH.
+# ---- THE PARSE IS THE DRIVER'S OWN: the witness, the field reader and the capture helpers they call,
+# ---- sliced out of the shipped bytes by `slice_fn`, and the pins they read, lifted out of the same
+# ---- bytes. The witness appends the shape's arguments itself, so each call below is one shape: shape
+# ---- 1 is the mandate at `m-base`, shape 2 the mandate plus the ask the build filed for itself, at
+# ---- the later rev a close examines.
+# ---- THE CONTROL is the same producer with its notice stream merged onto stdout, the capture
+# ---- TOOL-dDerivedDocket-48 split. The parse must REFUSE that, or an accept above could come from a
+# ---- parse that accepts anything. UNBOUNDED, for the capture-helper arms' reason: a bound is not
+# ---- what this arm grades, and one that fired would red as unanswered, which is another fault.
+# ---- COUNTED EITHER WAY, like the backstop kill arms, so the floor grades this suite and not the conf
+# ---- beside it; the SKIP line says the arms went unexercised.
 ASKS_ROOT=$(cd "$HERE" && git rev-parse --show-toplevel 2>/dev/null)
 ASKS_REAL=$(sed -n 's/^ASKS_CMD="\(.*\)"$/\1/p' "$ASKS_ROOT/.unattended.conf" 2>/dev/null | head -1)
 if [ -z "$ASKS_REAL" ]; then
-  echo "  SKIP AC15 — this repository's .unattended.conf declares no ASKS_CMD, so the two call shapes have no declared producer to run against; the stubbed arms above are the only coverage until it is armed"
+  n=$((n+14))
+  echo "  SKIP AC15 — this repository's .unattended.conf declares no ASKS_CMD, so the two call shapes have no declared producer to run against; the stubbed arms above are the only coverage until it is armed, and the arm's 14 assertions are counted, not run"
 else
   echo "  AC15 runs the declared producer: $ASKS_REAL"
+  slice_fn run_bounded; slice_fn read_stderr_tail; slice_fn derive_stream_verdict
+  slice_fn run_ask_witness; slice_fn ask_field
+  eval "$(sed -n '/^ASK_TSV_HEAD=/p;/^ASK_TSV_FIELDS=/p;/^ASK_TSV_EXAMINED=/p;/^RB_TAIL_LINES=/p;/^RB_TAIL_BYTES=/p;/^RB_TAIL_NOTE_ROOM=/p' "$SCRIPT")"
+  # The process ledger's recorder, a no-op for the capture-helper arms' reason: it is graded by its
+  # own unit's arms, and the witness reaches it through the capture.
+  write_proc_record() { :; }
+  AW_ROWS=""; AW_WHY=""; AW_EXAMINED=""; RB_STDOUT=""; RB_ERR=""
+  ac15_dir=$(mktemp -d)
+  (
+    cd "$ac15_dir" || exit 2
+    git init -q -b main . && git config user.email t@t.test && git config user.name t \
+      && git config core.autocrlf false
+    printf 'MEMORY_ROOT=memory\nDISCIPLINES="tool"\nFAMILIES="tool:EXMP"\nBACKLOG_MODE="builds"\nASK_CUTOFF="2026-06-01"\n' \
+      > .memory-tree.conf
+    mkdir -p memory/project memory/builds/aFoo/spec memory/builds/aBar memory/builds/tRun
+    printf 'memory/builds/aBar/README.md  a corrupt header, tolerated for this arm\n' \
+      > memory/project/stale-header-waiver.txt
+    printf -- '---\nslug: aBar\nthis line has no colon\n---\n' > memory/builds/aBar/README.md
+    for _s in aFoo tRun; do
+      printf -- '---\nslug: %s\nnode: a\nopened: 2026-09-01\nstreams: tool\nroster: EXMP\nids: EXMP-%s-1\n---\n\n# %s\n\n<!-- roster:units -->\n<!-- /roster:units -->\n\n<!-- gen:build-index -->\n<!-- /gen:build-index -->\n' \
+        "$_s" "$_s" "$_s" > "memory/builds/$_s/README.md"
+    done
+    printf '# EXMP-aFoo-70 — a unit\n\n**Status:** CLOSED · rev-1 · 2026-09-01 · node a · Tier-2 · base 0123abcd · closes EXMP-aFoo-31\n' \
+      > memory/builds/aFoo/spec/2026-09-01-spec-aFoo-70.md
+    printf '# aFoo — asks\n\n## Asks\n- EXMP-aFoo-30 · filed 2026-09-01 · unlabelled and open\n- EXMP-aFoo-31 · filed 2026-09-01 · answered twice over · seen `memory/builds/aFoo/README.md`@abc1234 · accept the row says what done looks like\n\n## Dispositions\n- CLOSED · EXMP-aFoo-31 · by abc1234 · done\n- SEV · EXMP-aFoo-31 · HIGH · graded\n' \
+      > memory/builds/aFoo/BACKLOG.md
+    git add -A && git commit -q -m m-base --no-verify
+    printf '# tRun — asks\n\n## Asks\n- EXMP-tRun-5 · filed 2026-09-02 · this build raised it itself\n\n## Dispositions\n' \
+      > memory/builds/tRun/BACKLOG.md
+    git add -A && git commit -q -m filed --no-verify
+  ) >/dev/null 2>&1
+  ac15_word=""
+  for _w in $ASKS_REAL; do [ -f "$ASKS_ROOT/$_w" ] && { ac15_word=$_w; break; }; done
+  if [ -n "$ac15_word" ]; then
+    ac15_kit=$(dirname -- "$ac15_word"); ac15_src=()
+    for _f in "$ASKS_ROOT/$ac15_kit"/*; do [ -f "$_f" ] && ac15_src+=("$_f"); done
+    mkdir -p "$ac15_dir/$ac15_kit" && cp -- "${ac15_src[@]}" "$ac15_dir/$ac15_kit/"
+  fi
+  # Under `.git`, so the wrapper is never a file of the tree the producer reads.
+  printf '#!/usr/bin/env bash\n"$@" 2>&1\n' > "$ac15_dir/.git/merge-streams.sh"
+  ac15_mbase=$(git -C "$ac15_dir" rev-parse HEAD~1)
+  ac15_head=$(git -C "$ac15_dir" rev-parse HEAD)
+  run_ac15_witness() { # asks command · target slug · rev · ids… -> the witness's status, AW_ and RB_ set
+    local ASKS_CMD="$1" ROOT="$ac15_dir" GATE_BOUND_LIVE=0 GATE_BOUND=0 _v
+    shift
+    AW_ROWS=""; AW_WHY=""; AW_EXAMINED=""
+    for _v in ASK_TSV_HEAD ASK_TSV_FIELDS ASK_TSV_EXAMINED RB_TAIL_LINES RB_TAIL_BYTES RB_TAIL_NOTE_ROOM; do
+      [ -n "${!_v:-}" ] || { AW_WHY="the driver pin $_v was not lifted out of the shipped bytes, so there is no parse to feed"; return 2; }
+    done
+    run_ask_witness "$@"
+  }
+  cd "$ac15_dir" || exit 2
+  run_ac15_witness "$ASKS_REAL" tRun "$ac15_mbase" EXMP-aFoo-30 EXMP-aFoo-31; _rc=$?
+  same "AC15 call shape 1: the driver's own parse accepts every row the declared producer printed${AW_WHY:+ ($AW_WHY)}" "$_rc" "0"
+  same "AC15 call shape 1: the producer's examined count equals the scope" "$AW_EXAMINED" "2"
+  same "AC15 call shape 1: one parsed row per id in the scope" "$(printf '%s' "$AW_ROWS" | grep -c '')" "2"
+  same "AC15 the unlabelled OPEN ask parses as OPEN with no severity" \
+    "$(ask_field EXMP-aFoo-30 status) $(ask_field EXMP-aFoo-30 sev)" "OPEN -"
+  same "AC15 the ask closed by two records parses as CLOSED, naming both" \
+    "$(ask_field EXMP-aFoo-31 status) $(ask_field EXMP-aFoo-31 decided)" "CLOSED EXMP-aFoo-70,abc1234"
+  # The producer read the tree the witness appended, and said so on the stream the parse never takes.
+  hit  "$RB_ERR" "conf pinned at $ac15_mbase"
+  miss "$RB_STDOUT" "build-index:"
+  run_ac15_witness "$ASKS_REAL" tRun "$ac15_head" EXMP-aFoo-30 EXMP-aFoo-31 EXMP-tRun-5; _rc=$?
+  same "AC15 call shape 2: the driver's own parse accepts every row the declared producer printed${AW_WHY:+ ($AW_WHY)}" "$_rc" "0"
+  same "AC15 call shape 2: the producer's examined count equals the scope" "$AW_EXAMINED" "3"
+  same "AC15 call shape 2: one parsed row per id in the scope" "$(printf '%s' "$AW_ROWS" | grep -c '')" "3"
+  same "AC15 call shape 2 grades the ask the build filed for itself after m-base" "$(ask_field EXMP-tRun-5 status)" "OPEN"
+  hit  "$RB_ERR" "conf pinned at $ac15_head"
+  run_ac15_witness "bash $ac15_dir/.git/merge-streams.sh $ASKS_REAL" tRun "$ac15_mbase" EXMP-aFoo-30 EXMP-aFoo-31; _rc=$?
+  same "AC15 control: the same producer with its notices merged onto stdout is refused by the same parse" "$_rc" "1"
+  hit  "$AW_WHY" "the declared ask generator printed a line that is not the"
+  cd "$TMP" || exit 2
+  rm -rf "$ac15_dir"
 fi
 askreset
 
@@ -11205,7 +11309,13 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # all in region two, so FLOOR_SHARD_2 carries the same +5 and FLOOR_SHARD_1 is untouched. COUNTED
 # off the block's own `hit`/`same` lines; each refusal was observed over a replica of this prologue,
 # and the phase moving to HELD under a driver copy without the refusal; no suite ran.
-FLOOR_ASSERTIONS=1764
+# RAISED 1764 -> 1778 at dDerivedDocket's VERIFYING pass, for TOOL-dDerivedDocket-16's AC15: the arm
+# that only echoed once ASKS_CMD was armed now runs call shapes 1 and 2 through the declared producer
+# and the driver's own sliced parse, 14 assertions in region two, so FLOOR_SHARD_2 carries the same
+# +14 and FLOOR_SHARD_1 is untouched. COUNTED EITHER WAY: the blank-key SKIP adds the same 14. The
+# block was run alone behind a replica of this prologue by hand, n 0 -> 14 and green, and red under a
+# driver copy parsing both streams, a lax parse, a merged producer and a ten-field one; no suite ran.
+FLOOR_ASSERTIONS=1778
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -11330,7 +11440,8 @@ FLOOR_SHARD_1=208
 # +6 for the run_bounded and verb arms, which sit above the REGION TWO terminator and are therefore
 # paid by shard 2 as well as by an unsharded run.
 # +61 for the TOOL-dDerivedDocket-28 process-ledger arms, all in region two - see FLOOR_ASSERTIONS.
-FLOOR_SHARD_2=1568
+FLOOR_SHARD_2=1582
+# +14 for TOOL-dDerivedDocket-16's AC15 arm at the VERIFYING pass, all in region two - see FLOOR_ASSERTIONS.
 # +5 for the --hold line-end refusal arms at the second origin/main reconcile, region two - see FLOOR_ASSERTIONS.
 # +23 for the TOOL-dDerivedDocket-65 sub-agent arms, all in region two - see FLOOR_ASSERTIONS.
 # +19 for the TOOL-dDerivedDocket-64 queue-heartbeat arms, all in region two - see FLOOR_ASSERTIONS.

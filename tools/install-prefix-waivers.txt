@@ -9,7 +9,7 @@
 tools/codebase-map/map_lib.py:1501      REGEN_CMD legacy, deliberate: a pre-1.1 GATE_FILE is project-owned and never overwritten
 tools/codebase-map/gen_map.py:47        prose quoting that legacy literal
 tools/codebase-map/adopt-codebase-map.sh:155  prose quoting that legacy literal
-tools/memory-tree/README.md:125         the PUBLISHED root-prefix driver command; check-wiring.test.sh AC12 derives and requires it
+tools/memory-tree/README.md:152         the PUBLISHED root-prefix driver command; check-wiring.test.sh AC12 derives and requires it
 tools/check-wiring.sh:561	dual-spelling probe: scratch-guard fragment, both layouts
 tools/check-wiring.sh:622	dual-spelling probe: memory-recall fragment, both layouts
 tools/check-wiring.sh:865	dual-spelling probe: the merge driver, both layouts

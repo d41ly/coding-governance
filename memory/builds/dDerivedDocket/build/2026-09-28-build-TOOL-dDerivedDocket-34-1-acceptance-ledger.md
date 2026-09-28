@@ -52,8 +52,43 @@ what `origin/main` advertised after a fetch at this pass and 1.8 the base's, and
 its own admission rule (exit 2, naming `--repair`), which a dry run in a scratch worktree of the run
 branch confirmed with the run tree's porcelain unchanged. AC15, AC24, AC25 and AC29, the scratch
 rehearsal of the landing reconcile with a bare remote, were not built in this pass. The reconcile is
-a procedure over verbs other units shipped, and it runs at the landing; those four criteria have no
-line below.
+a procedure over verbs other units shipped, and it runs at the landing; the orchestrator's VERIFYING
+phase built that rehearsal after the unit closed, and its lines below are the only ones in this
+ledger not observed by the pass.
+
+**The landing-reconcile rehearsal, at VERIFYING on 2026-09-28.** One fixture, built under the run's
+scratch root and never in this tree: a fresh `git init` holding the tracked `tools/`, `skills/` and
+`.githooks/` of `8d46bc3e`, a `.memory-tree.conf` from the kit's example declaring two families, a
+scaffolded memory tree that passed the hygiene engine, two finished builds, one live build and a run
+build carrying this build's copy of unit 33's signer. Its run branch edits one legacy row's wording,
+then makes its own switch-over by rollout step 5 as written: the probe `--plan`, the recorded
+`--plan`, the signer's `--tail switch` and its `--check`, then `--write`, builds mode with the two
+check-20 pins `row_grammar.py --emit-pin` printed, memory-recall moved from 1.17 to 1.18 and
+memory-tree from 2.99 to 2.100. After it, the branch REOPENs one closed ask in its own file. Each
+variant copies that repository, commits a tip on its `main`, bare-clones it as the remote and clones
+the remote, with `merge.rows.driver` set to this node's value, `core.hooksPath` set to `.githooks`
+and the run branch in a linked worktree. A scratch driver ran section 4's eight steps by their real
+command lines and computed the two confirmation conditions itself, with the kit's legacy reader and
+row classifier over `git show` and over the added lines of `git diff <switch> HEAD`, each added row
+attributed to its commit by `git blame`. Every reconcile commit ran the fixture's own `pre-commit`
+and `commit-msg` hooks. No gate leg ran on this tree for these lines. Over the fixtures only, step 6
+ran the parity test's `--render` as the step prescribes, and the checks each line names ran there.
+
+**AC20 at VERIFYING, still owed.** `git ls-remote origin refs/heads/main` advertised `869209ed`,
+the same sha as `origin/main` and still an ancestor of HEAD, so there is no delta to classify. The
+rehearsal ran anyway in a scratch worktree of the run branch made by
+`git worktree add --detach <scratch> HEAD`, the tip planned in a second one. Step 2's plan exited
+0 with 714 prospective ask rows, 156 same-id pairs, 372 triage asks and 714 status rows, its census
+and three worksheets landing in the scratch worktree. Step 3's signer signed 66 unit and 90
+not-unit pairs and 366 KEEP, 5 CLOSED and 1 exclusion, its `--check` re-deriving both landing
+records byte-identical. Step 4's
+`--dry-run` exited 2 naming `--repair`, printing no classified count and no cutoff. Both scratch
+worktrees were removed; no path the rehearsal wrote appears in the run tree's porcelain, whose only
+differences were this ledger, the spec's rev-12 and three paths other agents staged meanwhile. The
+local `main` read `3cf05f29`, an ancestor of the advertised tip; the landing form resolves the
+default tip through the local branch first, and the fixture's second tip showed `--ingest` exiting
+2 as the straggler form until the local `main` was moved to the advertised tip. AC20 needs a remote
+tip past the fork, and has no line below.
 
 **One observation for the record.** The first V13 break was staged on an ask row carrying a pointer
 tail and `--check` stayed green: a clause appended after ` → <pointer>` reads as pointer text and is
@@ -87,6 +122,31 @@ hand-edited one could. The break was restaged on a row with no pointer and went 
   naming the row. Each removal by checkout was followed by `--check` exiting 0 on a clean tree.
 - AC14 — `migrate_backlog.py --stragglers --tsv` — examined 11 refs where `--stragglers --local --tsv`
   examined 7, with five remote-tracking refs listed by `git for-each-ref refs/remotes`.
+- AC15 — `push-main.sh --prepare` — in the VERIFYING fixture, run first as
+  `bash tools/push-main.sh --prepare --slug dDerivedDocket`, it exited 1, left the run branch at its
+  sha and named `git merge origin/main`. Over the tip carrying all eight shapes, step 1's merge
+  stopped conflicted on the family view under the row driver's REFUSED banner, step 3's `--check`
+  re-derived both landing records byte-identical, and step 4's `--dry-run` exited 1 with four
+  CONFIRM entries, the amendment as NEEDS-HUMAN and `ASK_CUTOFF=2026-10-03`. The rule failed the
+  pre-switch-edited id on condition 1 only and the REOPENed id on condition 2 only, so steps 1 to 4
+  parked naming those two and the amendment, `--recipe` printed the recipe, and every per-build
+  file stayed byte-identical. With those three removed from the tip, steps 1 to 8 completed:
+  `gen_build_index.py --check` exited 0 printing `0 verdict(s)`; the untouched flip is a CLOSED row
+  in its owner's file; the hold-origin flip has one status row there, the CLOSED that replaced the
+  migration's hold on the triage ask; the held second ask's BLOCKED row names the first new ask
+  verbatim in its owner's file; the signer signed the withdrawal ask WONTDO under T4 from its row at
+  the tip, whose `source` line the branch's view fills with another ask's row; the `--as` file
+  carries a signed KEEP for the first new ask and nothing for the held one; `ASK_CUTOFF` is
+  2026-10-03, the day after the new asks' `filed`; `transition_audit.py --report` printed the
+  merge's five entries `ok`; and step 8's `--prepare` exited 0 printing the tip as first parent.
+  Staged reds, one fixture each: `--relocate` exited 2 naming the shards-mode tip; with step 2
+  skipped the signer exited 2 on the absent worksheet, with step 3 skipped `--ingest` crashed on the
+  absent signed record, and with either, or step 4, skipped `git commit` was refused by check 26 on
+  all five entries; step 5 skipped redded `--check` with V12 and V14 on the three new asks; step 7
+  skipped left `--prepare` refusing the uncommitted tree; step 8 skipped left `--prepared` exiting 1.
+  The driverless clone printed `UNWIRED  merge` from `check-wiring.sh --check`, but its merge still
+  stopped conflicted on the view, a text conflict with no banner: this fixture did not reproduce the
+  clean driverless merge the criterion's last red names.
 - AC16 — `grep -c TRIAGE-ASK memory/builds/*/BACKLOG.md` — prints 0 for all 104 files; `--asks` prints
   the triage ask OPEN in this build's file beside its KEEP, and `--asks --all --json` shows five asks
   held on it, the five legacy holds that named no id.
@@ -103,6 +163,31 @@ hand-edited one could. The break was restaged on a row with no pointer and went 
   DEPL-dGaugedVintage-13 as superseded and citing design §4.4, in 258 characters.
 - AC23 — `(durable home: <n>)` — read 915 before and 917 after; the spine holds 731 documents under
   `memory/builds/*/BACKLOG.md`, and the ten fixture ids that were backlog rows each anchor there.
+- AC24 — `git merge-base <switch> <tip>` — in the VERIFYING fixture, its run branch extended after
+  the switch-over by an acceptance ledger quoting verbatim the V12 line `gen_build_index.py --check`
+  printed naming the untouched flip's id under a staged cutoff, and a rehearsal journal naming all
+  14 census ids: the dry run listed that flip as CONFIRM, the rule qualified it and nothing parked,
+  though 11 added lines of `git diff <switch> HEAD` name the id. After steps 1 to 8, a second tip
+  flipped a further untouched id, the first tip's first new ask and the REOPENed id. With the
+  clone's local `main` still at the first tip, `--ingest <tip2> --dry-run` exited 2 as the straggler
+  form; with `main` moved to the second tip, the re-run from step 1 listed all three as CONFIRM,
+  resolved `<switch>` to the switch-over commit and `<fork>` to its merge base with the second tip,
+  the seed and not the first tip, qualified the first two and parked the REOPENed id on condition 2.
+  The three wrong readings, computed over the same state, each differ: `<switch>` off HEAD's
+  first-parent chain is the prepared merge and confirms the REOPENed id, `<fork>` as the first tip
+  fails condition 1 for the first new ask, and counting the first reconcile's transferred rows gives
+  that ask two acts. With the REOPENed flip removed from the second tip, the re-run completed,
+  `gen_build_index.py --check` exited 0, the commit was accepted and `--prepare` exited 0.
+- AC25 — `.githooks/pre-commit` — in the VERIFYING fixture, whose clone carries
+  `memory/guides/SESSION-KICKOFF.md` watching `.memory-tree.conf` and a fixture Makefile, with
+  `core.hooksPath` set. Over a tip that moves the cutoff and edits the Makefile, with step 6 skipped,
+  step 7's `git commit` exited 1 on `MANIFEST check 5 FAILED — staged changes touch watched files:`
+  naming both, HEAD unmoved and MERGE_HEAD kept; with step 6's re-stamp staged, the same commit
+  exited 0 carrying a `manifest delta:` line. Over the completing tip, which moves the cutoff and
+  edits no watched file, `git diff --name-only HEAD` named `.memory-tree.conf` from step 5's
+  unstaged write, step 6 re-stamped and the commit exited 0. Over a tip holding one flip and no new
+  ask, the dry run printed the unchanged cutoff, no watched path moved, the manifest stayed
+  byte-identical and the commit exited 0.
 - AC26 — `git log --format=%ad --date=short -G '^- <id> · ' -- memory/backlog memory/archive` — at the
   switch-over's parent, over 91 ids, every id whose only copy was archived, the one wrapped row and
   twelve others, gives each written `filed`; 0 differing. The two rows born in merge resolutions are
@@ -113,3 +198,15 @@ hand-edited one could. The break was restaged on a row with no pointer and went 
   journal file gained one line naming the dropped id, not leading with it; step 2 in a worktree of the
   second flip exited 1 naming the second id, its recorded run with the third exited 0 naming only that
   id, and the journal gained no line.
+- AC29 — `bash tools/check-kit-versions.sh` — over the VERIFYING fixture's merged tree it exited 0
+  three times. A tip declaring `KIT_MEMORY_RECALL_VERSION` 1.18, the value the branch's switch-over
+  wrote, and memory-tree 2.100, the branch's too, had step 6 raise the recall constant and both
+  `gov:kit memory-recall@` markers to 1.19, and `KIT_MEMORY_TREE_VERSION` with its four template
+  markers to 2.101, re-rendering the four live renders with `kit-dogfood-parity.test.sh --render`,
+  all inside the merge commit; the criterion's pathspec `git grep` printed `gov:kit memory-tree@2.101`
+  eight times and nothing else, and the parity test printed its four pairs agreeing. The completing
+  tip, declaring 1.17 and 2.99, values the branch passed, left every carrier as the branch wrote it.
+  A branch at 1.9 against a tip at 1.10 conflicted on both recall carriers, which step 1 resolved to
+  the branch's side, and step 6, comparing component by component, raised all three bytes to 1.11,
+  where a decimal read gives 1.1 below 1.9 and raises nothing. The check over this tree still binds
+  at the post-build bar, as the criterion's `permission:` line says.

@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-34 — the switch-over: migration applied and the views rendered
 
-**Status:** CLOSED · rev-11 · 2026-09-28 · node d · Tier-2 · base fb07ca25 · streams tooling+kickoff · order 36
+**Status:** CLOSED · rev-12 · 2026-09-28 · node d · Tier-2 · base fb07ca25 · streams tooling+kickoff · order 36
 
 <!-- gen:spec-records -->
 
@@ -31,7 +31,7 @@ necessary, so no gate reads a half-switched tree.
 ## 2. Scope (IN)
 
 - **S1** A `--write` mode of `tools/memory-tree/migrate_backlog.py`,
-  `--write --as <slug> --signed <same-id record> <triage record> [--triage-ask <id>]`, built as a
+  `--write --as <slug> --signed same-id=<same-id record> --signed triage=<triage record> [--triage-ask <id>]`, built as a
   thin driver over `TOOL-dDerivedDocket-12`'s engine in its migration set (unit 12 §4). The whole
   legacy corpus, live shards and backlog archives together, is the delta from an empty base, and the
   two signed records are the adjudication input. It writes each ask row in its id's slug folder, with
@@ -403,7 +403,7 @@ P3), which is also what unit 11's plan over the tip predicts. The reconcile is t
    It reads each row's text at the tree sha the worksheet records, never in this tree, where step 1
    replaced the shards with views. Its `--check` exits 0.
 4. Ingest. Run
-   `migrate_backlog.py --ingest <tip> --as dDerivedDocket --signed <landing same-id record> <landing triage record> --triage-ask <triage-id>`
+   `migrate_backlog.py --ingest <tip> --as dDerivedDocket --signed same-id=<landing same-id record> --signed triage=<landing triage record> --triage-ask <triage-id>`
    with `--dry-run`, which exits 1 while any CONFIRM or NEEDS-HUMAN entry stands and prints the
    cutoff line, and confirm per the rule below. Any park condition stops the landing with the
    recipe; otherwise re-run without `--dry-run`, passing `--confirm` for each qualifying id.
@@ -514,7 +514,7 @@ confirms an id the receiving side acted on (§8 F7).
    until a pass records one. Run the signer over that pair,
    `--worksheets <same-id worksheet> <triage worksheet> --tail switch`
    (unit 33 S11), and its `--check`, gov's operator step. Then run
-   `migrate_backlog.py --write --as dDerivedDocket --signed <switch same-id record> <switch triage record> --triage-ask <triage-id>`.
+   `migrate_backlog.py --write --as dDerivedDocket --signed same-id=<switch same-id record> --signed triage=<switch triage record> --triage-ask <triage-id>`.
    Every pass between unit 11's and this one can move the planner's output: a shard line shifts
    the triage `source` column, a filed row joins the census, and a pass commit naming an ask moves
    the `commit-names-ask` basis. `--write` refuses a stale worksheet (§5), so the records it applies
@@ -630,7 +630,7 @@ confirms an id the receiving side acted on (§8 F7).
   not pinned here.
 - **AC3** — When `python tools/memory-tree/gen_build_index.py --asks --all --json` runs after the
   switch, every id's derived status and hold target equal the prediction
-  `migrate_backlog.py --plan --signed <switch same-id record> <switch triage record>` prints at the
+  `migrate_backlog.py --plan --signed same-id=<switch same-id record> --signed triage=<switch triage record>` prints at the
   switch-over's parent, with `<triage-id>` substituted for `TRIAGE-ASK`, and the comparison prints
   zero differing ids outside two named exceptions, each a write this commit makes outside the
   predicted set, each printed on its own line: `TOOL-aWeighedCompass-3` compares against WONTDO
@@ -1359,6 +1359,12 @@ its guard names the four renders step 6 re-renders, so the merge commit triggers
   holds the manifest itself to 25600 bytes, 5 above its parent, so the four claims and the
   re-stamp land at net minus 4 bytes, the drift-report command line losing its copy of the
   charter's before-theorizing instruction. AC12's reads all still hold.
+- rev-12 · 2026-09-28 · §2 §4 §6 · S1 · AC3 · the `--signed` spelling, written out. Rev-11 called
+  `--signed <same-id record> <triage record>` shorthand for the `<kind>=<path>` pair, but the
+  planner refuses it: DEPL-dDerivedDocket-1 measured `--signed takes <kind>=<path>`, and the
+  landing-reconcile rehearsal met the same refusal from `--ingest`. S1, reconcile step 4, rollout
+  step 5 and AC3 now spell `--signed same-id=<path> --signed triage=<path>`; what AC3 observes is
+  unchanged, and the older §9 entries keep the spelling they recorded.
 
 ## 10. Reuse audit
 

@@ -32,8 +32,7 @@ recorded stop causes.
 ## Build-level rules
 - **The design record is the spec source**: `build/2026-09-14-build-TOOL-dDerivedDocket-1-design.md`,
   rulings in its sections 17, 20 and 22. A spec that diverges takes a rev and a section-9 line.
-- **Re-ground on each spec's base.** origin/main passed `abac6d59` by 210 commits before any unit
-  was built, so every spec re-verified its claims at `fb07ca25`; a pass re-verifies them on the tree.
+- **Re-ground on each spec's base**, `fb07ca25`; a pass re-verifies its claims on the tree.
 - **Self-protection first** (D12-i11): units 1 to 5 land before the rest so this run lands through them.
 - **Dark until the flip.** Every unit before 34 keeps the shards mode byte-identical; 34 is the one
   switch-over commit.
@@ -44,8 +43,8 @@ recorded stop causes.
 - **A pass runs no gate, suite or bar**, which `tools/unattended/gate-guard.js` enforces. Attributed
   suite runs moved to the one VERIFYING run; a fixture run stays in the pass. D12-h and D12-i8 say
   otherwise and are parked for the owner.
-- **Spec audits run per topic group**, five sequential spec-audit reviews each recording its own
-  round subject: 827 KB of specs is past what one lens reads whole, and the harness audits one set.
+- **Spec audits run per topic group**, each recording its own round subject: 827 KB of specs is
+  past what one lens reads whole.
 - **A declined discovery filed as a shard row says so.** Its text carries `Declined under the
   unattended protocol's section 11`, which unit 35 S9 keys its KEEP on; any other row filed under
   this slug names its disposing unit in the filing commit.
@@ -166,7 +165,7 @@ ids TOOL-dDerivedDocket-60 TOOL-dDerivedDocket-61 TOOL-dDerivedDocket-62 TOOL-dD
 | [TOOL-dDerivedDocket-63 — the holder keeps its own `--replaces`: row precedence in the re-keyed resume matrix](spec/2026-09-22-spec-TOOL-dDerivedDocket-63.md) | 33 | 2 | CLOSED | rev-6 | 2026-09-27 |
 | [TOOL-dDerivedDocket-64 — the turnstile queue's heartbeat, a move the liveness clock sees](spec/2026-09-22-spec-TOOL-dDerivedDocket-64.md) | 34 | 2 | CLOSED | rev-5 | 2026-09-27 |
 | [TOOL-dDerivedDocket-65 — a session waiting on its own sub-agents, a move the liveness clock sees](spec/2026-09-22-spec-TOOL-dDerivedDocket-65.md) | 35 | 2 | CLOSED | rev-2 | 2026-09-27 |
-| [TOOL-dDerivedDocket-34 — the switch-over: migration applied and the views rendered](spec/2026-09-14-spec-TOOL-dDerivedDocket-34.md) | 36 | 2 | CLOSED | rev-11 | 2026-09-28 |
+| [TOOL-dDerivedDocket-34 — the switch-over: migration applied and the views rendered](spec/2026-09-14-spec-TOOL-dDerivedDocket-34.md) | 36 | 2 | CLOSED | rev-12 | 2026-09-28 |
 | [TOOL-dDerivedDocket-35 — arming and the real-tree staged reds](spec/2026-09-14-spec-TOOL-dDerivedDocket-35.md) | 37 | 2 | CLOSED | rev-10 | 2026-09-28 |
 | [PLAY-dDerivedDocket-1 — charter backlog wording and unattended landing exception](spec/2026-09-14-spec-PLAY-dDerivedDocket-1.md) | 38 | 2 | CLOSED | rev-9 | 2026-09-28 |
 | [TOOL-dDerivedDocket-36 — memory-tree docs, carriers and dossier](spec/2026-09-14-spec-TOOL-dDerivedDocket-36.md) | 39 | 2 | CLOSED | rev-8 | 2026-09-28 |
