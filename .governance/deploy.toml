@@ -52,3 +52,8 @@ worktree_script = "none yet — worktrees are created by hand under .claude/work
 kind_factory_map = "kits are the kind: each is a directory under tools/ with a kit.toml descriptor and its own adopter"
 shared_primitives_location = "tools/lib/ — gov-internal, and every copy-installed kit carries its contents inline instead"
 toolchain_notes = "bash + python3 resolved by tools/lib/resolve-python.sh, which RUNS each candidate because the MS-Store python3 stub answers `command -v` and exits 9009"
+# TOOL-aRepatriatedFork-42: the memory-tree renders read these two through the playbook engine, so
+# gov states its own rather than the render guessing gov's layout for every tree. The manifest is
+# where manifest-check.sh finds gov's; the skill installs per machine as a junction to skills/.
+manifest_path = "memory/guides/SESSION-KICKOFF.md"
+user_skills = "~/.claude/skills"

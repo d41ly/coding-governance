@@ -1,7 +1,7 @@
-<!-- gov:kit memory-tree@2.101 -->
-# memory/ retention & hygiene
+<!-- gov:kit memory-tree@2.102 -->
+# {{MEMORY_ROOT}}/ retention & hygiene
 
-`memory/` is the project's AI-first memory: version-controlled, travelling to every node on clone.
+`{{MEMORY_ROOT}}/` is the project's AI-first memory: version-controlled, travelling to every node on clone.
 It holds one append-only decision log, per-build folders, the gate's own waiver registries, and
 long-lived guides.
 The tree is FLAT: the discipline is a SIGNAL, not a directory. Which discipline a build served is
@@ -10,12 +10,12 @@ repo-root `.memory-tree.conf` declares as `DISCIPLINES`. A build spanning two di
 build, in one folder.
 This file is the rule set; the single mechanical enforcement is `{{KIT_DIR}}/check-memory-hygiene.sh`
 (run by CI, the pre-commit hook, and the local gate runner). Prose rules with no wiring rot — the
-script is the law, this doc explains it. (Replace `memory/` throughout with your `MEMORY_ROOT` if you renamed it.)
+script is the law, this doc explains it.
 
 ## Structure
 
 ```
-memory/
+{{MEMORY_ROOT}}/
 ├── README.md              root index (one-liners)
 ├── LIVE.md                GENERATED — builds with a non-terminal unit ({{KIT_DIR}}/gen_build_index.py)
 ├── ledger/<YYYY-MM>.md    GENERATED — one row per build opened that month; freezes when the month passes
@@ -86,7 +86,7 @@ plus its backlog row — no README. Non-markdown artifacts (scripts, data) are l
   under a header promising terminal ones only, with 49 of its ids also live in the shard and 7 of
   those disagreeing about status.
 - **Either mode:** the fresh or surviving index notes the rotation in its PREAMBLE, naming the archive
-  file (check 10, which greps for that basename and reads nothing else) and what moved; rotated archives stay inside `memory/` so the all-time id-collision
+  file (check 10, which greps for that basename and reads nothing else) and what moved; rotated archives stay inside `{{MEMORY_ROOT}}/` so the all-time id-collision
   grep still reaches them; and rotation never rewrites or renumbers a ratified record.
 - **The live-row floor.** Non-terminal rows survive the rotation under either mode, so a shard's floor
   is its LIVE ROW COUNT: when nothing terminal is left, rotating is a no-op and the next row breaches
@@ -108,7 +108,7 @@ Spec status headers (check 12) reuse the same seven tokens with spec-lifecycle m
 
 ## The grandfather ratchet
 
-The plain lists in `memory/project/` — the whole of what that directory holds — read as exact-key
+The plain lists in `{{MEMORY_ROOT}}/project/` — the whole of what that directory holds — read as exact-key
 set membership rather than a `grep -qxF` per call, because that fork ran once per scanned file:
 - **`legacy-files.txt`** — recording files kept under historical names (e.g. from a migration), permanently
   exempt from the recording-file naming check, from check 4's build-folder shape (a listed folder
@@ -147,7 +147,7 @@ to every consumer, so a registry a gate names and nothing creates is invisible u
 1. **prompt placement** — prompt-kind files only under `builds/*/prompts/` or `archive/`.
 2. **link integrity** — every relative md link resolves (exempt: DECISIONS.md, `decisions/`, `archive/`,
    and `legacy-files.txt`-listed recordings). The generated index files are NOT exempt.
-3. **structure lint** — the `memory/` root holds only the sanctioned set; `backlog/` holds only
+3. **structure lint** — the `{{MEMORY_ROOT}}/` root holds only the sanctioned set; `backlog/` holds only
    `<FAMILY>.md`; `builds/` holds only folders; `decisions/ guides/ archive/` contents are
    unconstrained; `project/` holds ONLY the waiver registries — no catch-all — and its selector
    carries rule 5's guard, so a mis-segmented `project/` path reds instead of admitting everything;

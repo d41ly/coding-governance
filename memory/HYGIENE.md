@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.101 -->
+<!-- gov:kit memory-tree@2.102 -->
 # memory/ retention & hygiene
 
 `memory/` is the project's AI-first memory: version-controlled, travelling to every node on clone.
@@ -10,7 +10,7 @@ repo-root `.memory-tree.conf` declares as `DISCIPLINES`. A build spanning two di
 build, in one folder.
 This file is the rule set; the single mechanical enforcement is `tools/memory-tree/check-memory-hygiene.sh`
 (run by CI, the pre-commit hook, and the local gate runner). Prose rules with no wiring rot — the
-script is the law, this doc explains it. (Replace `memory/` throughout with your `MEMORY_ROOT` if you renamed it.)
+script is the law, this doc explains it.
 
 ## Structure
 

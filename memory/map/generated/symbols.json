@@ -4468,6 +4468,11 @@
       "file": "tools/memory-tree/corpus_ids.py"
     },
     {
+      "id": "read_deploy",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
+    },
+    {
       "id": "read_descriptors",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -4596,6 +4601,11 @@
       "id": "read_kinds",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "read_kits",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
     },
     {
       "id": "read_kits_json",
@@ -5546,6 +5556,11 @@
       "id": "resolve_adopter",
       "kind": "function",
       "file": "tools/check-kit-placeholders.py"
+    },
+    {
+      "id": "resolve_answers",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
     },
     {
       "id": "resolve_backend",

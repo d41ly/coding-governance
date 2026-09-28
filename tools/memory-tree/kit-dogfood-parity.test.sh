@@ -115,6 +115,12 @@ PY=$(resolve_python) || exit 2
 # the receipt carries a top-level `prefix`, read as JSON and never grepped, because a FLAT install's
 # kit directory has an empty parent (TOOL-aRepatriatedFork-10 S6). A citation nothing resolves gets
 # no line and falls through to that prefix, or to the caller's parent-derived `TOOL_ROOT`.
+# TOOL-aRepatriatedFork-42: between the two, one line per ADOPTER-DECLARED placeholder the templates
+# cite. Its value is the answer the playbook-render engine gives through `--answers`, reached through
+# `resolve_kit_dir`, so the render and the charter state one answer and nothing here re-reads
+# deploy.toml. A kit the tree did not select, a tree with no deploy.toml and an install with no
+# engine each render the placeholder's stated phrase, which names no path; a selected kickoff kit
+# with no answer, and every refusal of the engine's, is a named refusal.
 derive_kit_paths() {
   "$1" -c "$(cat <<'RKD'
 # >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
@@ -161,11 +167,13 @@ import sys
 kit = pathlib.Path(sys.argv[1]).resolve()
 root = next((p for p in (kit, *kit.parents) if (p / ".git").exists()), kit)
 cites = []
+seen = ""
 for t in sys.argv[2:]:
     try:
         text = pathlib.Path(t).read_text(encoding="utf-8")
     except OSError:
         continue
+    seen += text
     for m in re.finditer(r"\{\{TOOL_ROOT\}\}([\w.-]+)/([\w.-]+)", text):
         if m.group(0) not in cites:
             cites.append(m.group(0))
@@ -176,6 +184,48 @@ for cite in cites:
     except (LookupError, ValueError):
         continue
     print("%s\t%s" % (cite, path.as_posix()))
+said = {
+    "{{GATE_RUNNER}}": "the merge bar of this repo",
+    "{{MANIFEST_PATH}}": "the kickoff manifest of this repo",
+    "{{KICKOFF_SKILL}}": "the session-kickoff skill",
+    "{{REVIEW_PROTOCOL}}": "the review protocol of this repo",
+    "{{UNATTENDED_PROTOCOL}}": "the unattended-run protocol (not installed here)",
+    "{{SPEC_TOKEN_CHECKER}}": "The spec-token checker of the shipping repo, not installed here,",
+}
+need = [p for p in said if p in seen]
+got = {}
+eng = None
+if need and (root / ".governance" / "deploy.toml").is_file():
+    try:
+        eng = resolve_kit_dir("playbook", "render_playbook.py", kit) / "render_playbook.py"
+    except LookupError as e:
+        sys.stderr.write("memory-tree render: %s, so each adopter path states its phrase\n" % e)
+if eng is not None:
+    import subprocess
+    r = subprocess.run([sys.executable, str(eng), "--target", str(root), "--answers", "GATE_RUNNER",
+                        "kits", "gov_source", "manifest_path", "user_skills"],
+                       capture_output=True, text=True, encoding="utf-8")
+    if r.returncode:
+        sys.exit("memory-tree render: REFUSED, the playbook-render engine gave no answers: %s"
+                 % (r.stderr.strip() or r.stdout.strip()))
+    ans = json.loads(r.stdout)
+    kits = set(ans["kits"])
+    if "kickoff-manifest" in kits:
+        for key, p in (("manifest_path", "{{MANIFEST_PATH}}"), ("user_skills", "{{KICKOFF_SKILL}}")):
+            if p in need and not ans[key]:
+                sys.exit("memory-tree render: REFUSED, kickoff-manifest is selected and "
+                         ".governance/deploy.toml answers no %s, so %s has no declared path. "
+                         "Answer it there; this render does not guess one" % (key, p))
+    got = {
+        "{{GATE_RUNNER}}": ans["GATE_RUNNER"],
+        "{{MANIFEST_PATH}}": "kickoff-manifest" in kits and ans["manifest_path"],
+        "{{KICKOFF_SKILL}}": "kickoff-manifest" in kits and "%s/session-kickoff/SKILL.md" % ans["user_skills"],
+        "{{REVIEW_PROTOCOL}}": "review-harness" in kits and "{{MEMORY_ROOT}}/guides/REVIEW-PROTOCOL.md",
+        "{{UNATTENDED_PROTOCOL}}": "unattended" in kits and "{{MEMORY_ROOT}}/guides/UNATTENDED-PROTOCOL.md",
+        "{{SPEC_TOKEN_CHECKER}}": ans["gov_source"] == "." and "{{TOOL_ROOT}}check-spec-tokens.py",
+    }
+for p in need:
+    print("%s\t%s" % (p, "`%s`" % got[p] if got.get(p) else said[p]))
 try:
     pfx = json.loads((root / ".governance" / "install.json").read_text(encoding="utf-8")).get("prefix")
 except (OSError, ValueError, AttributeError):
@@ -208,6 +258,9 @@ render_doc() {
   while IFS=$'\t' read -r kp kv; do
     [ -z "$kp" ] || out=${out//"$kp"/"$kv"}
   done <<<"${kpaths//$'\r'/}"
+  # TOOL-aRepatriatedFork-42: the memory root is the conf's, the key the playbook engine's own
+  # MEMORY_ROOT probe reads. It runs AFTER the pass above because a resolved line may carry it.
+  out=${out//\{\{MEMORY_ROOT\}\}/"$MEMORY_ROOT"}
   out=${out//\{\{TOOL_ROOT\}\}/"$TOOL_ROOT"}
   # TOOL-aJoinedCanon-9: the §5 row set is DECLARED, not written into the skeleton. The transform
   # sits INSIDE the marked block rather than in the callers, so the parity table already gating this

@@ -1,10 +1,12 @@
 # TOOL-aRepatriatedFork-42 — the memory-tree renders take every adopter path from the adopter's own declarations
 
-**Status:** SPECCED · rev-1 · 2026-09-29 · node a · Tier-1 · base 012d9dd5 · streams tooling · order 19
+**Status:** CLOSED · rev-2 · 2026-09-29 · node a · Tier-1 · base 012d9dd5 · streams tooling · order 19
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-29-build-TOOL-aRepatriatedFork-42-1-acceptance-ledger.md](../build/2026-09-29-build-TOOL-aRepatriatedFork-42-1-acceptance-ledger.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
@@ -164,6 +166,10 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-09-29 · initial draft, from the owner's ruling.
+- rev-2 · 2026-09-29 · S1 · S2 · S3 · S4 · S5 · S6 · AC1 · AC2 · AC3 · AC4 · AC5 · built. The three
+  new hygiene-suite arms red on the 012d9dd5 kit, and the new playbook arm reds on an ungraded
+  `kits`. At an inCMS clone of 71180c796 the render names inCMS's own bar, manifest and skill, and
+  `DEAD_PATH_PIN` measures 3 against 6.
 
 ## 10. Reuse audit
 

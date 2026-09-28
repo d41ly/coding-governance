@@ -56,19 +56,19 @@ role = "project-owned"
 include = ["HYGIENE.template.md"]
 role = "rendered"
 to = "{memory_root}/HYGIENE.md"
-placeholders = ["KIT_DIR", "TOOL_ROOT", "INDEX_CAP_LINES", "ENTRY_CAP_UNIT"]
+placeholders = ["KIT_DIR", "TOOL_ROOT", "MEMORY_ROOT", "INDEX_CAP_LINES", "ENTRY_CAP_UNIT"]
 
 [[files]]
 include = ["SPEC-TEMPLATE.template.md"]
 role = "rendered"
 to = "{memory_root}/TEMPLATE-SPEC.md"
-placeholders = ["KIT_DIR", "TOOL_ROOT", "READINESS_ROWS"]
+placeholders = ["KIT_DIR", "TOOL_ROOT", "READINESS_ROWS", "SPEC_TOKEN_CHECKER"]
 
 [[files]]
 include = ["BUILD-METHOD.template.md"]
 role = "rendered"
 to = "{memory_root}/guides/BUILD-METHOD.md"
-placeholders = ["KIT_DIR", "TOOL_ROOT"]
+placeholders = ["KIT_DIR", "TOOL_ROOT", "MEMORY_ROOT", "GATE_RUNNER", "MANIFEST_PATH", "KICKOFF_SKILL", "REVIEW_PROTOCOL", "UNATTENDED_PROTOCOL"]
 
 [[files]]
 include = ["ANNOTATION-STYLE.template.md"]
