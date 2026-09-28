@@ -1,6 +1,6 @@
 # DEPL-aRepatriatedFork-20 — inCMS converges onto gov's memory-tree programs
 
-**Status:** INPROGRESS · rev-9 · 2026-09-28 · node a · Tier-2 · base f8fdd873 · streams deployer · order 20
+**Status:** INPROGRESS · rev-10 · 2026-09-29 · node a · Tier-2 · base f8fdd873 · streams deployer · order 20
 
 <!-- gen:spec-records -->
 
@@ -116,6 +116,9 @@ bridge rows go.
   check 15 does. Without it gov's engine counts 330 inCMS orphans where 4 sit in a present-tense file.
 - **consumes-from** `TOOL-aRepatriatedFork-40` — recall anchoring an id on the spec H1 that defines
   it. Without it the recall-regression leg loses two graded targets and reads 1610/1613 alias ids.
+- **consumes-from** `TOOL-aRepatriatedFork-42` — the memory-tree renders taking every adopter path
+  from inCMS's own declarations. Without it the rendered docs name gov's merge bar and four gov
+  paths, and `DEAD_PATH_PIN` stays 6.
 
 ## 4. Design
 
@@ -327,6 +330,8 @@ New arm: none. The witnesses are inCMS's own legs, run at inCMS; gov's bar gains
   present-tense population. It sits at order 19, so this unit's order stays 20.
 - rev-9 · 2026-09-28 · §3 gains the **consumes-from** edge to `TOOL-aRepatriatedFork-40`, recall's
   spec-H1 anchor. It sits at order 19, so this unit's order stays 20.
+- rev-10 · 2026-09-29 · §3 gains the **consumes-from** edge to `TOOL-aRepatriatedFork-42`, the
+  memory-tree renders' adopter-declared paths. It sits at order 19, so this unit's order stays 20.
 
 ## 10. Reuse audit
 
