@@ -9,7 +9,7 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-lease-utc: 2026-09-27T22:11:55Z
+lease-utc: 2026-09-28T17:10:32Z
 pid-image: claude.exe
 host: compeeto
 pid: 37484
@@ -22,13 +22,13 @@ hold-reason: VERIFYING is done except what only the owner may authorize: the una
 hold-until: owner
 hold-code: host-owner-action
 held-from: VERIFYING
-witness: b052863cafb0ab0aa97a31a3f80515446b80eeca
-phase: HELD
+witness: ef34d15c537c1b990ed3f6608c20296e7db46d81
+phase: VERIFYING
 branch-sha: abac6d59cae3baf711fac4d275bf13a401e01901
 branch-ref: refs/heads/branch/backlog-maintenance-mechanics-10588f
 mode: prompt
 anchor-kind: run-branch
-keepalive: 6ed4075c
+keepalive: c6325dfb
 anchor-url: https://github.com/d41ly/coding-governance
 anchor-sha: 7484d8d7b107c0357943345e11d9b1d9bc337bea
 anchor-ref: refs/heads/main
@@ -361,3 +361,5 @@ base: abac6d59cae3baf711fac4d275bf13a401e01901
 2026-09-28T04:16:13Z review · item dDerivedDocket · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED
 
 2026-09-28T15:28:33Z hold · item host-owner-action · reason until owner · reaped 6ed4075c · resume none(owner)
+
+2026-09-28T17:10:33Z resume · item dDerivedDocket · reason held · keepalive c6325dfb · manual
