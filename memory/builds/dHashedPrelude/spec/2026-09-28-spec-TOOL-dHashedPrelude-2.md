@@ -1,6 +1,6 @@
 # TOOL-dHashedPrelude-2 — two arms red when the live-log guard stops bracketing the arms
 
-**Status:** SPECCED · rev-3 · 2026-09-28 · node d · Tier-2 · base 3cf05f29 · streams tooling · order 2
+**Status:** SPECCED · rev-4 · 2026-09-28 · node d · Tier-2 · base 3cf05f29 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -31,8 +31,8 @@ signal saying so.
   source it was given: the baseline anchor exactly once, the `main()` anchor exactly once, the
   decorator anchor at least once. A count outside that reds naming the anchor, so a later duplicate
   at column 0 is caught here instead of silently re-pointing a comparison. Observed by AC6.
-- **S4** — A state arm, `test_the_live_log_row_is_total_over_its_four_states`, drives
-  `_live_log_row` over all four states of unit 1's S2 table, asserts the state token of each, and
+- **S4** — A state arm, `test_the_build_live_log_row_is_total_over_its_four_states`, drives
+  `_build_live_log_row` over all four states of unit 1's S2 table, asserts the state token of each, and
   asserts the differing-digest row's detail carries both digests. Observed by AC4.
 - **S5** — Both arms are registered in `main()`'s `order` list so the declared-versus-ran assertion
   counts them, and `SELFTEST_ARMS` moves from 71 to 73 with the one provenance line its chain
@@ -55,7 +55,7 @@ row pin and a row cannot be added to it without draining two.
 ### Edges
 
 - **consumes-from** `TOOL-dHashedPrelude-1` — the module-scope assignment this unit's ordering arm
-  reads by name, the unconditional append it asserts, and the `_live_log_row` function its state arm
+  reads by name, the unconditional append it asserts, and the `_build_live_log_row` function its state arm
   calls. Without them both arms red, which is the correct verdict on a tree that has not landed
   unit 1.
 - **hands-off** `TOOL-dHashedPrelude-3` — this unit changes the number of arms and therefore the
@@ -72,7 +72,7 @@ can see what was compared.
 
 Two new module-level functions in this file's `test_*` cell:
 `test_the_live_log_baseline_is_taken_before_any_arm_runs` and
-`test_the_live_log_row_is_total_over_its_four_states`. Both follow the convention of
+`test_the_build_live_log_row_is_total_over_its_four_states`. Both follow the convention of
 `test_the_selftest_pin_carries_an_unbroken_provenance_chain`, the file's existing self-referential
 arm. Three module-level anchor constants are minted beside them. One pinned constant moves rather
 than being minted: `SELFTEST_ARMS`, 71 to 73.
@@ -126,7 +126,7 @@ that keeps unit 1's module-scope assignment AND the old conditional append emits
 twice, prints a green summary one row longer than it should be, and no other criterion in this set
 reaches that.
 
-The state arm calls `_live_log_row` directly with each of the four inputs. Two of the four states
+The state arm calls `_build_live_log_row` directly with each of the four inputs. Two of the four states
 cannot be produced by running the suite in this repository at all, which is why unit 1 makes the
 verdict a function rather than an inline branch.
 
@@ -186,7 +186,7 @@ criterion resting on one couples a merge-bar leg to the current wording of an un
   under a conditional on the log path being set, it reports FAIL naming the surviving conditional.
   Red when: the arm checks only that the append exists, which both the correct build and the
   double-append build satisfy.
-- **AC4** — When the state arm runs, it asserts `_live_log_row` returns state `skip` for an
+- **AC4** — When the state arm runs, it asserts `_build_live_log_row` returns state `skip` for an
   unresolvable repository, `ok` for equal digests, `ok` for a log absent at both readings, and
   `FAIL` for differing digests, and that the differing-digest detail contains both digest prefixes.
   The arm reports ok.
@@ -213,9 +213,9 @@ criterion resting on one couples a merge-bar leg to the current wording of an un
   Red when: an arm is defined but not added to `order`, which the arity assertion catches, or
   `SELFTEST_ARMS` is bumped without its provenance line, which `check_provenance_chain()` catches.
 - **AC8** — When the docstrings of `test_the_live_log_baseline_is_taken_before_any_arm_runs` and
-  `test_the_live_log_row_is_total_over_its_four_states` are read, each states that a behavioural
+  `test_the_build_live_log_row_is_total_over_its_four_states` are read, each states that a behavioural
   test of its property would write to the real query log, and that this is why it reads source or
-  calls `_live_log_row` directly.
+  calls `_build_live_log_row` directly.
   Red when: a docstring describes only what its arm does, leaving the next reader to re-derive why
   the obvious stronger test is absent and to write it.
 
@@ -225,7 +225,7 @@ criterion resting on one couples a merge-bar leg to the current wording of an un
 
 New arm: `tools/memory-recall/selftest.py` · the ordering arm's failing cases are four synthetic
 sources — baseline indented inside `main()`, baseline unread by `main()`, a surviving conditional
-append, and no anchor present — and the state arm's is a `_live_log_row` return whose state token or
+append, and no anchor present — and the state arm's is a `_build_live_log_row` return whose state token or
 detail is wrong for its input · the `SELFTEST_ARMS` pin moves 71 to 73 with its provenance line.
 
 ## 8. Open questions
@@ -239,7 +239,7 @@ none
   folded the round-1 spec audit. §4 named the anchor bytes, which the draft left to the implementer:
   the bare `@check(` resolves to a docstring at line 145 and would have made the arm red against a
   correct file, the round's blocker. S2 made the source a parameter. A second arm and S4 came from
-  unit 1's new `_live_log_row`, so the pin moves 71 to 73. AC6 read the count off the pin row
+  unit 1's new `_build_live_log_row`, so the pin moves 71 to 73. AC6 read the count off the pin row
   instead of the summary line.
 - rev-3 · 2026-09-28 · §2 S1 · §2 S3 · §3 · §4 · §5 · AC1 · AC3 · AC5 · AC6 · folded the round-2
   spec audit, whose subject was rev-2's own fold. S3 and rev-2's AC5 demanded opposite verdicts on
@@ -253,6 +253,9 @@ none
   the bare form, which occurs twice. AC3 is new: nothing in the set observed that `main()` appends
   the row unconditionally, and a build keeping the old conditional emits it twice and prints green.
   AC4 gains the both-digests clause. §3's two deferrals now name the backlog ids unit 3 writes.
+- rev-4 · 2026-09-28 · §2 S4 · §4 · AC4 · the helper rename of unit 1 carried through here:
+  the state arm drives `_build_live_log_row` and the ordering arm's source literal moves
+  with it. Behaviour is unchanged.
 
 ## 10. Reuse audit
 

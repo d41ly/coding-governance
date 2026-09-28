@@ -8313,6 +8313,11 @@
       "file": "tools/memory-recall/test_recall_floor.py"
     },
     {
+      "id": "test_the_build_live_log_row_is_total_over_its_four_states",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
       "id": "test_the_control_and_the_measurement_share_a_denominator",
       "kind": "function",
       "file": "tools/codebase-map/selftest.py"
@@ -8324,11 +8329,6 @@
     },
     {
       "id": "test_the_live_log_baseline_is_taken_before_any_arm_runs",
-      "kind": "function",
-      "file": "tools/memory-recall/selftest.py"
-    },
-    {
-      "id": "test_the_live_log_row_is_total_over_its_four_states",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
     },

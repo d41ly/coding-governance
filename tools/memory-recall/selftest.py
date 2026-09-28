@@ -131,7 +131,7 @@ SELFTEST_ARMS = 73
 #   brackets this suite, which until now could not fail — `main()` took its baseline after
 #   every arm had already run. One asserts from source that the baseline precedes the first
 #   decorated arm and that `main()` appends the row unconditionally; one drives
-#   `_live_log_row` over all four of its states, two of which no run in this repo produces.
+#   `_build_live_log_row` over all four of its states, two of which no run in this repo produces.
 
 
 def check_provenance_chain(src: str | None = None, pinned: int | None = None) -> str:
@@ -305,7 +305,7 @@ def cleanup(root: pathlib.Path) -> None:
 #     it again before `main()` reaches the compare leaves nothing for this to see.
 
 
-def _live_log_path():
+def _resolve_live_log():
     """The path this suite brackets, or None when no repository resolves.
 
     `repo_root()` anchors on this kit's own file rather than the cwd (TOOL-aCollapsedScan-7), so
@@ -318,7 +318,7 @@ def _live_log_path():
         return None
 
 
-def _live_log_digest(live):
+def _derive_live_log_digest(live):
     """The digest of `live`, or the absent-sentinel. Raises for neither a missing repo nor a
     missing file, because both are states the guard reports rather than crashes on."""
     if live is None:
@@ -326,12 +326,12 @@ def _live_log_digest(live):
     return hashlib.sha256(live.read_bytes()).hexdigest() if live.exists() else "(absent)"
 
 
-_LIVE_LOG = _live_log_path()
-_LIVE_LOG_BEFORE = _live_log_digest(_LIVE_LOG)
+_LIVE_LOG = _resolve_live_log()
+_LIVE_LOG_BEFORE = _derive_live_log_digest(_LIVE_LOG)
 _LIVE_LOG_ROW = "the live query log is byte-identical after this run"
 
 
-def _live_log_row(live, before) -> tuple[str, str, str]:
+def _build_live_log_row(live, before) -> tuple[str, str, str]:
     """The guard's verdict, as the `(state, name, detail)` triple `_checks` holds.
 
     A FUNCTION rather than a branch inside `main()`, so an arm can drive all four states. Two of
@@ -344,7 +344,7 @@ def _live_log_row(live, before) -> tuple[str, str, str]:
     """
     if live is None:
         return ("skip", _LIVE_LOG_ROW, "the repository did not resolve, so nothing was bracketed")
-    after = _live_log_digest(live)
+    after = _derive_live_log_digest(live)
     if after == before:
         return ("ok", _LIVE_LOG_ROW, before[:12])
     return ("FAIL", _LIVE_LOG_ROW, f"the gate wrote to it: {before[:12]} -> {after[:12]}")
@@ -2727,7 +2727,7 @@ def test_the_live_log_baseline_is_taken_before_any_arm_runs(src: str | None = No
 
     body = src[mn:]
     assert "_LIVE_LOG_BEFORE" in body, "main() does not read the module-scope baseline"
-    assert "_checks.append(_live_log_row(" in body, "main() does not append the guard's row"
+    assert "_checks.append(_build_live_log_row(" in body, "main() does not append the guard's row"
     for dead in ("if live is not None", "if _LIVE_LOG is not None"):
         assert dead not in body, (
             f"main() still guards the append with `{dead}`; with the module-scope baseline in "
@@ -2736,29 +2736,29 @@ def test_the_live_log_baseline_is_taken_before_any_arm_runs(src: str | None = No
 
 
 @check("the live-log row is total over its four states")
-def test_the_live_log_row_is_total_over_its_four_states():
-    """`_live_log_row` answers for every state, including two no run in this repo can produce.
+def test_the_build_live_log_row_is_total_over_its_four_states():
+    """`_build_live_log_row` answers for every state, including two no run in this repo can produce.
 
     DRIVEN DIRECTLY rather than by running the suite: an unresolvable repository and a missing log
     cannot be produced inside a repository that has one, and the behavioural alternative — making
     the guard witness a real write — means writing to the live query log, which this suite may not
     do. The fourth state is the one that used to emit NO ROW, which reads exactly like a clean run.
     """
-    state, name, detail = _live_log_row(None, "(absent)")
+    state, name, detail = _build_live_log_row(None, "(absent)")
     assert state == "skip", f"an unresolvable repository reported {state!r}, not a skip"
     assert name == _LIVE_LOG_ROW and "resolve" in detail, f"the skip does not say why: {detail!r}"
 
     root = pathlib.Path(tempfile.mkdtemp(prefix="recall-row-"))
     try:
         log = root / "queries.jsonl"
-        assert _live_log_row(log, "(absent)")[0] == "ok", "a log absent at both readings is not ok"
+        assert _build_live_log_row(log, "(absent)")[0] == "ok", "a log absent at both readings is not ok"
         log.write_bytes(b'{"qid": 1}\n')
-        before = _live_log_digest(log)
-        assert _live_log_row(log, before)[0] == "ok", "an unchanged log did not report ok"
+        before = _derive_live_log_digest(log)
+        assert _build_live_log_row(log, before)[0] == "ok", "an unchanged log did not report ok"
         log.write_bytes(b'{"qid": 1}\n{"qid": 2}\n')
-        state, _, detail = _live_log_row(log, before)
+        state, _, detail = _build_live_log_row(log, before)
         assert state == "FAIL", f"an appended-to log reported {state!r}"
-        assert before[:12] in detail and _live_log_digest(log)[:12] in detail, (
+        assert before[:12] in detail and _derive_live_log_digest(log)[:12] in detail, (
             f"the FAIL detail names only one digest, so it says nothing about what changed: {detail!r}")
     finally:
         cleanup(root)
@@ -2831,7 +2831,7 @@ def main() -> int:
         test_export_dir_is_declared_and_bounded, test_digest_follows_grammar_keys_only,
         # TOOL-dHashedPrelude-2: the guard that brackets this suite, gated
         test_the_live_log_baseline_is_taken_before_any_arm_runs,
-        test_the_live_log_row_is_total_over_its_four_states,
+        test_the_build_live_log_row_is_total_over_its_four_states,
     ]
     assert len(order) == len(_checks), f"{len(order)} arms declared, {len(_checks)} ran"
     # DECLARED-versus-RAN above is satisfied by deleting an arm from both halves; this is the
@@ -2853,7 +2853,7 @@ def main() -> int:
 
     # UNCONDITIONAL. A row that is absent reads as a clean run, so every state gets a row and the
     # count of appended run-property rows stops depending on the environment.
-    _checks.append(_live_log_row(_LIVE_LOG, _LIVE_LOG_BEFORE))
+    _checks.append(_build_live_log_row(_LIVE_LOG, _LIVE_LOG_BEFORE))
 
     # TOOL-dRetiredFork-2 — the git-environment scrub at the top of this file, asserted rather than
     # trusted. Appended here for the same reason the sweep below is: it is a property of the RUN.

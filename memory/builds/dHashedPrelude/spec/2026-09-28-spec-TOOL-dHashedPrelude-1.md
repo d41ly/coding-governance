@@ -1,6 +1,6 @@
 # TOOL-dHashedPrelude-1 — the live-log baseline is captured above the first decorated arm
 
-**Status:** SPECCED · rev-3 · 2026-09-28 · node d · Tier-2 · base 3cf05f29 · streams tooling · order 1
+**Status:** SPECCED · rev-4 · 2026-09-28 · node d · Tier-2 · base 3cf05f29 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -21,7 +21,7 @@ ok whatever the arms did to the log.
 
 - **S1** — The live-log path and its `before` digest are assigned at MODULE scope, textually above
   the first decorated arm. Observed by AC1.
-- **S2** — The guard's verdict becomes a function, `_live_log_row(live, before)`, returning the
+- **S2** — The guard's verdict becomes a function, `_build_live_log_row(live, before)`, returning the
   `(state, name, detail)` triple `_checks` holds. It is TOTAL over the four states the code can
   actually be in, which the rev-1 draft of this item got wrong:
 
@@ -49,7 +49,7 @@ ok whatever the arms did to the log.
 ## 3. Non-goals (OUT)
 
 No permanent arm that writes to the real query log: the break that proves this works is staged into
-the working tree, observed, and reverted. This unit adds no arm at all — `_live_log_row` is built
+the working tree, observed, and reverted. This unit adds no arm at all — `_build_live_log_row` is built
 here so that unit 2's arms can reach the branches, and those arms are unit 2's. No change to
 `query.py`, `extract.py` or any existing arm's behaviour. No second guard over the cache directory —
 the comment names that gap, it does not close it. No change to how `repo_root()` resolves.
@@ -57,7 +57,7 @@ the comment names that gap, it does not close it. No change to how `repo_root()`
 ### Edges
 
 - **hands-off** `TOOL-dHashedPrelude-2` — this unit creates the module-scope assignment, the
-  unconditional append in `main()`, and the `_live_log_row` function that unit 2's two arms read
+  unconditional append in `main()`, and the `_build_live_log_row` function that unit 2's two arms read
   and drive. Both arms red until this lands.
 - **hands-off** `TOOL-dHashedPrelude-3` — this unit changes no count, so nothing in unit 3 depends
   on it.
@@ -77,7 +77,7 @@ reads as a preamble to the arms it brackets. The rev-1 draft called that site "t
 where `git_common_dir()` and `recall_conf` are both defined", which was the opposite of true — it is
 the latest such point.
 
-`main()` then appends `_live_log_row(_LIVE_LOG, _LIVE_LOG_BEFORE)` unconditionally, in place of the
+`main()` then appends `_build_live_log_row(_LIVE_LOG, _LIVE_LOG_BEFORE)` unconditionally, in place of the
 guarded branch that decides whether a row exists. One consequence worth naming: the number of
 appended run-property rows stops depending on the environment, so the suite's summary denominator
 becomes deterministic.
@@ -129,7 +129,7 @@ wrong state gets preserved, and the charter already rules that a skip must annou
 - risks — the digest runs at import, so anything importing this module pays it, including the nested
   adopter-layout run. Nothing else imports it.
 - testing — AC1 through AC5. AC1's staged break is the liveness proof; AC5's state is reachable only
-  through `_live_log_row`, which is why S2 makes it a function.
+  through `_build_live_log_row`, which is why S2 makes it a function.
 - migration — N/A. No stored state and no adopter copy: `selftest.py` is `project-owned` in
   `tools/memory-recall/kit.toml`.
 - user docs — N/A here. The kit README is unit 3.
@@ -166,7 +166,7 @@ wrong state gets preserved, and the charter already rules that a skip must annou
   quoting requirement exists because this log is shared by every session on this node: rows 596 and
   597 arrived during this build's own kickoff from a query it did not issue, so equal digests cannot
   be assumed and unequal ones do not by themselves convict the suite.
-- **AC5** — When `_live_log_row` is called with the path argument set to the none-value, it returns
+- **AC5** — When `_build_live_log_row` is called with the path argument set to the none-value, it returns
   a triple whose state is `skip` and whose detail names the unresolvable repository; called with a
   path that does not exist and the absent-sentinel as the baseline, it returns an `ok` triple; and
   called with two differing digests, it returns a `FAIL` triple whose detail contains both digest
@@ -175,7 +175,7 @@ wrong state gets preserved, and the charter already rules that a skip must annou
   than a skip that announces itself; or the failing case reports only what the digest was, which
   is the detail the pre-unit code carried and which names nothing about what it became.
 - **AC6** — When the body of `main()` is read after this unit, the guard's row is appended by a
-  single unconditional `_checks.append(_live_log_row(...))` and no conditional on the log path
+  single unconditional `_checks.append(_build_live_log_row(...))` and no conditional on the log path
   being set survives anywhere in it.
   Red when: the module-scope assignment lands but the old conditional append is left in place, in
   which case the row is emitted twice, the summary prints one row more than the suite has, and
@@ -197,7 +197,7 @@ none
 - rev-1 · 2026-09-28 · initial draft.
 - rev-2 · 2026-09-28 · §2 S2 · §2 S3 · §2 S4 · §3 · §4 · §5 · AC3 · AC4 · AC5 · folded the round-1
   spec audit. S2 replaced a three-state claim the code does not have with the four real states and
-  rules on the unresolvable one (D-2); the guard's verdict becomes `_live_log_row` so unit 2 can
+  rules on the unresolvable one (D-2); the guard's verdict becomes `_build_live_log_row` so unit 2 can
   drive branches a suite run cannot reach. §4 corrects "earliest point", which named the latest such
   point (D-7), and adds the nested adopter-layout import path. §5's perf row priced a 120 KB file
   against a live log of 1,545,472 bytes (D-8). AC3 gains the fourth NOT-CHECKED item, AC4 gains the
@@ -209,6 +209,11 @@ none
   `main()` appends the guard's row unconditionally, so a build that kept the old conditional
   beside the new append would emit the row twice and print a longer green summary. AC5 gains the
   differing-digest clause, which S2 had specified and no criterion reached.
+- rev-4 · 2026-09-28 · §2 S2 · §4 · AC5 · the three helpers are renamed to lead with a verb
+  the lexicon declares: `_resolve_live_log`, `_derive_live_log_digest` and
+  `_build_live_log_row`. The originals led with `live`, which is not in the VERBS table, and
+  `tools/lexicon/lexicon.py` reds on a shrink-only offender pin the three of them moved 982
+  to 985. Names chosen with `--suggest`, not by guess. Behaviour is unchanged.
 
 ## 10. Reuse audit
 
@@ -220,7 +225,7 @@ the name is common. The mechanism this unit moves is two statements already in t
 reuse question here is where they belong rather than what to call them. The one seam it does extend
 is local and was found by reading the file rather than by the probe: `check_provenance_chain(src,
 pinned)` is this file's own shape for a verdict computed by a function so an arm can drive it, and
-`_live_log_row` takes it.
+`_build_live_log_row` takes it.
 
 Recall terms used: selftest live query log byte-identical guard arm count pin provenance chain
 memory-recall kit version staged break
