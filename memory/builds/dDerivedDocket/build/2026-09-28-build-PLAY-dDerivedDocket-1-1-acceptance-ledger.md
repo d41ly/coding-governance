@@ -15,8 +15,8 @@ run's scratch root, and plain `grep`, `tr` and `wc` reads over the tree. The wri
 ## What this ledger does NOT evidence, and why
 
 AC1, AC3, AC4, AC8 and AC9 carry `permission:` lines and get no line here; the orchestrator writes
-them after the post-build bar, whose `template size <=48KiB`, `playbook render wiring`, `charter
-size`, `kickoff-manifest ratchet` and `line length` legs make the observations. The in-pass halves
+them after the post-build bar, whose `template size <=48KiB`, `playbook render wiring`,
+`charter size`, `kickoff-manifest ratchet` and `line length` legs make the observations. The in-pass halves
 those permission lines give the pass were read, and are recorded here as prose, not as answers:
 
 - **AC1's two counts.** `tr -d '\r' | wc -c` over the template reads 48,229 at the parent,
