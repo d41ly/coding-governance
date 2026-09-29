@@ -6699,7 +6699,7 @@ user_skills = "/tmp/gk-fake-skills"
         # ---- TARGET's recorded oid. `eol` cannot be: the rung normalises BOTH sides, and an oid
         # ---- cannot be un-hashed, so the fixture carries `lf_oid` -- one measurement of the target
         # ---- taken where inCMS was reachable -- and the arm reproduces it from gov's side.
-        _fx9 = json.loads((GOVKIT.parent / "fixtures" / "incms-2cff5855.receipt.json")
+        _fx9 = json.loads((GOVKIT.parent / "fixtures" / "adopter-ic-2cff5855.receipt.json")
                           .read_text(encoding="utf-8"))
         _fx9rows = _fx9["files"]
         check("[-9] S13 LIVENESS the committed inCMS fixture carries the 52-row population",

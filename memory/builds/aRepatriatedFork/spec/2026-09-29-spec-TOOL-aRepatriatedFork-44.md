@@ -1,10 +1,12 @@
 # TOOL-aRepatriatedFork-44 — the adopter-ic receipt fixture carries no adopter name
 
-**Status:** SPECCED · rev-1 · 2026-09-29 · node a · Tier-1 · base d6e1749c · streams tooling · order 7
+**Status:** CLOSED · rev-1 · 2026-09-29 · node a · Tier-1 · base d6e1749c · streams tooling · order 7
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-09-29-build-TOOL-aRepatriatedFork-44-1-acceptance-ledger.md](../build/2026-09-29-build-TOOL-aRepatriatedFork-44-1-acceptance-ledger.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
@@ -98,7 +100,7 @@ New arm: none · the old basename becomes a dead-path needle by git's own deriva
 
 ## 8. Open questions
 
-- none
+none
 
 ## 9. Revision log
 

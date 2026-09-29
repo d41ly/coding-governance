@@ -245,7 +245,7 @@ def main(argv: list[str]) -> int:
     ap.add_argument("--incms", required=True)
     ap.add_argument("--incms-rev", default="2cff5855")
     ap.add_argument("--gov-rev", default="ce5dca99")
-    ap.add_argument("--out", default=str(HERE / "incms-2cff5855.receipt.json"))
+    ap.add_argument("--out", default=str(HERE / "adopter-ic-2cff5855.receipt.json"))
     a = ap.parse_args(argv)
 
     doc = build(pathlib.Path(a.incms), a.incms_rev, a.gov_rev)
