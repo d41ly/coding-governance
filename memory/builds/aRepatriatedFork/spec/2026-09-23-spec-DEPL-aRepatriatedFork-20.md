@@ -1,6 +1,6 @@
 # DEPL-aRepatriatedFork-20 — inCMS converges onto gov's memory-tree programs
 
-**Status:** INPROGRESS · rev-10 · 2026-09-29 · node a · Tier-2 · base f8fdd873 · streams deployer · order 20
+**Status:** CLOSED · rev-11 · 2026-09-29 · node a · Tier-2 · base f8fdd873 · streams deployer · order 20
 
 <!-- gen:spec-records -->
 
@@ -10,6 +10,7 @@
 | [2026-09-24-build-DEPL-aRepatriatedFork-1-runlog-0e284ca8.md](../build/2026-09-24-build-DEPL-aRepatriatedFork-1-runlog-0e284ca8.md) | journal | DEPL-aRepatriatedFork-1 DEPL-aRepatriatedFork-13 DEPL-aRepatriatedFork-14 DEPL-aRepatriatedFork-17 DEPL-aRepatriatedFork-21 TOOL-aRepatriatedFork-2 TOOL-aRepatriatedFork-3 TOOL-aRepatriatedFork-4 TOOL-aRepatriatedFork-5 TOOL-aRepatriatedFork-6 TOOL-aRepatriatedFork-7 TOOL-aRepatriatedFork-8 TOOL-aRepatriatedFork-9 TOOL-aRepatriatedFork-10 TOOL-aRepatriatedFork-11 TOOL-aRepatriatedFork-12 TOOL-aRepatriatedFork-15 TOOL-aRepatriatedFork-16 TOOL-aRepatriatedFork-18 TOOL-aRepatriatedFork-19 TOOL-aRepatriatedFork-21 |
 | [2026-09-24-build-DEPL-aRepatriatedFork-20-1-acceptance-ledger.md](../build/2026-09-24-build-DEPL-aRepatriatedFork-20-1-acceptance-ledger.md) | journal | — |
 | [2026-09-24-build-DEPL-aRepatriatedFork-20-convergence-journal.md](../build/2026-09-24-build-DEPL-aRepatriatedFork-20-convergence-journal.md) | journal | — |
+| [2026-09-29-build-DEPL-aRepatriatedFork-20-2-acceptance-ledger.md](../build/2026-09-29-build-DEPL-aRepatriatedFork-20-2-acceptance-ledger.md) | journal | — |
 | [2026-09-24-prompt-DEPL-aRepatriatedFork-20-build-brief.md](../prompts/2026-09-24-prompt-DEPL-aRepatriatedFork-20-build-brief.md) | journal | — |
 | [2026-09-24-review-TOOL-aRepatriatedFork-2-closing-diff-round1.md](../reviews/2026-09-24-review-TOOL-aRepatriatedFork-2-closing-diff-round1.md) | diff-review | DEPL-aRepatriatedFork-1 TOOL-aRepatriatedFork-2 TOOL-aRepatriatedFork-3 TOOL-aRepatriatedFork-4 TOOL-aRepatriatedFork-5 TOOL-aRepatriatedFork-6 TOOL-aRepatriatedFork-7 TOOL-aRepatriatedFork-8 TOOL-aRepatriatedFork-9 TOOL-aRepatriatedFork-10 TOOL-aRepatriatedFork-11 TOOL-aRepatriatedFork-12 DEPL-aRepatriatedFork-13 DEPL-aRepatriatedFork-14 TOOL-aRepatriatedFork-15 TOOL-aRepatriatedFork-16 DEPL-aRepatriatedFork-17 TOOL-aRepatriatedFork-18 TOOL-aRepatriatedFork-19 DEPL-aRepatriatedFork-21 TOOL-aRepatriatedFork-21 |
 
@@ -332,6 +333,15 @@ New arm: none. The witnesses are inCMS's own legs, run at inCMS; gov's bar gains
   spec-H1 anchor. It sits at order 19, so this unit's order stays 20.
 - rev-10 · 2026-09-29 · §3 gains the **consumes-from** edge to `TOOL-aRepatriatedFork-42`, the
   memory-tree renders' adopter-declared paths. It sits at order 19, so this unit's order stays 20.
+- rev-11 · 2026-09-29 · LANDED at inCMS: origin/main `6e19a07b9`, pushed by inCMS's lander with its pre-push
+  bar GATE PASSED, together with BLOCK-aLanternedFoyer-7 per the owner's ruling. AC7: `update --write`
+  from gov `41a874cf` wrote 0 files and the full bar passed with no edit between (1157 s, 49 legs).
+  AC1: memory-tree rows all attributed and `gov_commit` = `41a874cf`; 33 of 34 unattributed rows
+  pinned by role or declared `[[own]]`; `.githooks/pre-push` stays unattributed because `[[own]]`
+  cannot name a root-relative source (`TOOL-aRepatriatedFork-43`), so later updates withhold the
+  re-stamp over that one row. The landing fast-forwarded inCMS main, since the stale installed hooks
+  would refuse a merge commit; hooks were then reinstalled. nc's main tree was fast-forwarded to the
+  submodule commit inCMS records (`411e5c53`), owner-approved.
 
 ## 10. Reuse audit
 
