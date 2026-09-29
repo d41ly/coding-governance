@@ -4,7 +4,7 @@
 #   1) a commit ON the default branch is allowed
 #   2) a commit parked OFF the default branch in the primary tree is refused
 #   3) --no-verify overrides the refusal
-# The throwaway repo has none of the gate-leg scripts (tools/…, skills/…), so those legs
+# The throwaway repo has none of the gate-leg scripts (<prefix>/…, skills/…), so those legs
 # self-skip and only the guard is exercised — except the codebase-map leg, whose arms follow the
 # guard's and plant a stand-in gate. Run: bash .githooks/pre-commit.test.sh  (exit 0 = pass)
 set -u

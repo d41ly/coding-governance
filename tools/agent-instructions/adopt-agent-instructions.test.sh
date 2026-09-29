@@ -2,7 +2,8 @@
 # Regression suite for adopt-agent-instructions.sh — one scenario per part-d review finding.
 set -u
 export GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_SYSTEM=/dev/null
-TOOL=/c/projects/coding-governance/tools/agent-instructions/adopt-agent-instructions.sh
+HERE="$(cd "$(dirname "$0")" && pwd)"
+TOOL="$HERE/adopt-agent-instructions.sh"
 TMP=$(mktemp -d); trap 'rm -rf "$TMP"' EXIT
 pass=0; fail=0
 ok(){ echo "PASS $1"; pass=$((pass+1)); }

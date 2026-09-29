@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# lib-selftest.test.sh — the arms for tools/lib/lib-selftest.sh. TOOL-aQuenchedHarness-5 S7.
+# lib-selftest.test.sh — the arms for <prefix>/lib/lib-selftest.sh. TOOL-aQuenchedHarness-5 S7.
 #
 # IT DOES NOT USE THE HARNESS TO TEST ITSELF, and that is not squeamishness: half of what must be
 # graded here is the harness FAILING correctly, and an arm that fails inside the harness fails the

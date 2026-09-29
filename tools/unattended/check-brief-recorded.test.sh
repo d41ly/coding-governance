@@ -16,12 +16,30 @@
 # before the leg landed; they are what stands in for a population.
 #
 # NO KIT_REL SWEEP IN THIS FILE, DELIBERATELY, and the sibling suite's header says why at length:
-# every path below is INSIDE the fixture tree this suite builds with `mkdir -p tools/unattended`, so
-# `tools/` here is the FIXTURE's own layout and not gov's install prefix. Sweeping it to a derived
+# every path below is INSIDE the fixture tree this suite builds with `mkdir -p <prefix>/unattended`, so
+# `<prefix>/` here is the FIXTURE's own layout and not gov's install prefix. Sweeping it to a derived
 # prefix broke 14 of 19 arms in the sibling, because the `.unattended.conf` heredoc is QUOTED.
 set -u
+HERE="$(cd "$(dirname "$0")" && pwd)"
+# >>> derive_self_rel — canonical copy: kit-rel.sh in gov's lib dir (byte-identical; gated)
+derive_self_rel() {
+  local _dsr_p _dsr_rel=""
+  _dsr_p=$(cd "$1" 2>/dev/null && pwd) || return 1
+  while [ ! -e "$_dsr_p/.git" ]; do
+    [ "$(dirname "$_dsr_p")" = "$_dsr_p" ] && return 1
+    _dsr_rel="$(basename "$_dsr_p")${_dsr_rel:+/$_dsr_rel}"
+    _dsr_p=$(dirname "$_dsr_p")
+  done
+  printf '%s\n' "$_dsr_rel"
+}
+# <<< derive_self_rel
+KIT_REL=$(derive_self_rel "$HERE") || { echo "check-brief-recorded.test: not inside a git repository"; exit 2; }
+# PFX is the install prefix WITH its trailing slash, derived from where this file sits and empty
+# at a root install: every fixture and host path below is spelled through it, never through a
+# literal prefix (TOOL-aRepatriatedFork-28).
+case "$KIT_REL" in */*) PFX="${KIT_REL%/*}/" ;; *) PFX="" ;; esac
 st=0; n=0
-LEG="tools/unattended/check-brief-recorded.sh"
+LEG="${PFX}unattended/check-brief-recorded.sh"
 # The fixture's own driver, beside the fixture's own leg. Derived from LEG rather than spelled, so the
 # fixture layout is written in one place.
 DRV="${LEG%/*}/unattended.sh"
@@ -36,23 +54,24 @@ hasnt(){ n=$((n+1)); case "$2" in *"$3"*) echo "FAIL $1 -- output carried '$3' a
 # THE FIXTURE. One build, one CLOSED unit, one build commit. What varies is the brief row that
 # commit carries. The build commit must touch a path OUTSIDE the build folder, the generated indexes
 # and the shared records, or `build_commit` correctly declines to call it a build commit at all --
-# `tools/product.sh` is that path, and dropping it would make every arm below pass vacuously.
+# `<prefix>/product.sh` is that path, and dropping it would make every arm below pass vacuously.
 mkfixture() { # mode -> prints the fixture root
   local mode="$1" T
   T=$(mktemp -d) || exit 2
   ( cd "$T" || exit 2
     git init -q .
     git config user.email t@t; git config user.name t; git config commit.gpgsign false
-    mkdir -p tools/unattended memory/builds/tBrief/spec memory/builds/tBrief/prompts
-    cp "$KIT/lib-unattended.sh" tools/unattended/
-    cp "$KIT/unattended.sh"     tools/unattended/
-    cp "$KIT/check-brief-recorded.sh" tools/unattended/
+    mkdir -p ${PFX}unattended memory/builds/tBrief/spec memory/builds/tBrief/prompts
+    cp "$KIT/lib-unattended.sh" ${PFX}unattended/
+    cp "$KIT/unattended.sh"     ${PFX}unattended/
+    cp "$KIT/check-brief-recorded.sh" ${PFX}unattended/
     cat > .unattended.conf <<'CONF'
 MEMORY_ROOT=memory
 BRIEF_RECORDED_CUTOFF="2026-01-01"
-GENERATED_INDEXES="memory/LIVE.md:tools/memory-tree/gen_build_index.py"
+GENERATED_INDEXES="memory/LIVE.md:{PFX}memory-tree/gen_build_index.py"
 SHARED_RECORDS="memory/DECISIONS.md memory/backlog"
 CONF
+    sed -i "s#{PFX}#${PFX}#" .unattended.conf   # the quoted heredoc cannot expand the prefix
     cat > memory/builds/tBrief/README.md <<'RM'
 ---
 slug: tBrief
@@ -170,7 +189,7 @@ RM
       *)
         printf '\n2026-06-02T00:00:00Z brief · item ARCH-tBrief-1 · reason %s memory/builds/tBrief/prompts/brief.md\n' "$H" >> memory/builds/tBrief/RUN.md ;;
     esac
-    printf 'the product\n' > tools/product.sh
+    printf 'the product\n' > ${PFX}product.sh
     printf 'regenerated index\n' > memory/LIVE.md
     git add -A >/dev/null; git commit -q -m "ARCH-tBrief-1: build the thing" --no-verify
 
@@ -286,7 +305,7 @@ rm -rf "$T"
 # ---- clothes, and the leg must refuse INSTEAD of reporting any of them. Staged on the conforming
 # ---- fixture, so the only thing that changed is the grammar.
 T=$(mkfixture ok)
-( cd "$T" && sed -i 's/brief · item/brief-item/g' tools/unattended/unattended.sh )
+( cd "$T" && sed -i 's/brief · item/brief-item/g' ${PFX}unattended/unattended.sh )
 o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
 same "driver grammar gone: exits 2 rather than accusing every unit" "$rc" "2"
 has  "driver grammar gone: it says DEAD PROBE" "$o" "DEAD PROBE"
@@ -326,7 +345,7 @@ o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
 n=$((n+1)); [ "$rc" != 0 ] && echo "ok   hostile conf: an appended EXIT trap cannot force rc 0" || { echo "FAIL an appended EXIT trap forced rc 0 -- the worse shape, where the leg prints FAILED and exits green"; st=1; }
 # THE VECTOR THE SPLICE MISSED. This leg sets DRIVER above its import, exactly as the sibling does,
 # and the sibling's blanket uppercase assignment let one tracked conf line redirect that path.
-( cd "$T" && printf '\nDRIVER="tools/unattended/evil.sh"\n' >> .unattended.conf )
+( cd "$T" && printf '\nDRIVER="'"${PFX}unattended/evil.sh"'"\n' >> .unattended.conf )
 o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
 hasnt "hostile conf: DRIVER is not assignable from the conf" "$o" "evil.sh"
 rm -rf "$T"

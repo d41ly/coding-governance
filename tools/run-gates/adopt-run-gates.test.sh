@@ -12,6 +12,24 @@
 # distinguishes them: it edits the runner's printf out from under a real declaration and asserts the
 # red. Without it the criterion is satisfied by a no-op.
 set -u
+HERE="$(cd "$(dirname "$0")" && pwd)"
+# >>> derive_self_rel — canonical copy: kit-rel.sh in gov's lib dir (byte-identical; gated)
+derive_self_rel() {
+  local _dsr_p _dsr_rel=""
+  _dsr_p=$(cd "$1" 2>/dev/null && pwd) || return 1
+  while [ ! -e "$_dsr_p/.git" ]; do
+    [ "$(dirname "$_dsr_p")" = "$_dsr_p" ] && return 1
+    _dsr_rel="$(basename "$_dsr_p")${_dsr_rel:+/$_dsr_rel}"
+    _dsr_p=$(dirname "$_dsr_p")
+  done
+  printf '%s\n' "$_dsr_rel"
+}
+# <<< derive_self_rel
+KIT_REL=$(derive_self_rel "$HERE") || { echo "adopt-e2e: not inside a git repository"; exit 2; }
+# PFX is the install prefix WITH its trailing slash, derived from where this file sits and empty
+# at a root install: every fixture and host path below is spelled through it, never through a
+# literal prefix (TOOL-aRepatriatedFork-28).
+case "$KIT_REL" in */*) PFX="${KIT_REL%/*}/" ;; *) PFX="" ;; esac
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "adopt-e2e: not a git repo"; exit 2; }
 cd "$ROOT" || exit 2
 KITDIR=$(cd "$(dirname "$0")" && pwd)
@@ -159,7 +177,7 @@ echo "== 7. the adopter derives its own prefix — no gov path is spelled in it 
 grep -qE '^\s*KITDIR=\$\(cd "\$\(dirname "\$0"\)" && pwd\)' "$ADOPT" \
   && ok "the kit dir is derived from the script's own location" \
   || nope "the adopter does not derive its kit dir"
-grep -q 'tools/run-gates' "$ADOPT" \
+grep -q ''"${PFX}run-gates"'' "$ADOPT" \
   && nope "the adopter SPELLS a gov install prefix, which lands a dead path in an adopter's tree" \
   || ok "the adopter spells no install prefix"
 

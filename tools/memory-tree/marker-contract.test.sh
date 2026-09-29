@@ -8,7 +8,7 @@
 #      Added when both were tightened from a first-line substring to a per-item shaped mark; they
 #      cannot share code across a kit boundary, so AGREEMENT is proven instead.
 #
-#   bash tools/memory-tree/marker-contract.test.sh    # "PASS (…cases × …readers)" + exit 0 = good
+#   bash <prefix>/memory-tree/marker-contract.test.sh    # "PASS (…cases × …readers)" + exit 0 = good
 #
 # WHY A CONFORMANCE TEST AND NOT A SHARED FUNCTION. Three readers are awk inside the unattended kit
 # and one is Python here; no single implementation serves both languages. A three-way lift INSIDE the
@@ -27,7 +27,7 @@
 # that covers three readers and skips it covers the wrong three.
 #
 # THE UNATTENDED KIT IS OPTIONAL, AND THIS LEG LIVES IN memory-tree. Both kit dirs are DERIVED from
-# this script's own location, never spelled: a hardcoded `tools/unattended` is wrong at every install
+# this script's own location, never spelled: a hardcoded `<prefix>/unattended` is wrong at every install
 # prefix but the one it assumed, which is the class this repo gates repo-wide. When the sibling kit is
 # absent the leg SKIPS LOUDLY and exits 0 — an adopter who installed memory-tree alone must not get a
 # red bar for a kit they chose not to take, and a silent pass would claim coverage that never ran.

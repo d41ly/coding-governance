@@ -2,9 +2,12 @@
 # pre-push.test.sh — drives a REAL git push through .githooks/pre-push in a throwaway scratch repo,
 # with the gate stubbed via GOV_GATE_CMD so the bar never actually runs. Proves the hook FIRES and
 # classifies correctly. Exit 0 = all cases ok.
-KIT_REL="${KIT_REL:-tools}"
 set -u
 SRC=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "pre-push.test: not a git repo"; exit 2; }
+# The kit root is the one the hook itself reads: GOV_KITROOT as `.githooks/gate-env.sh` declares it
+# (TOOL-aRepatriatedFork-28), never a literal prefix typed here.
+KIT_REL=$( . "$SRC/.githooks/gate-env.sh" >/dev/null 2>&1; printf '%s' "${GOV_KITROOT:-}" )
+[ -n "$KIT_REL" ] || { echo "pre-push.test: .githooks/gate-env.sh declares no GOV_KITROOT"; exit 2; }
 [ -f "$SRC/.githooks/pre-push" ] || { echo "pre-push.test: .githooks/pre-push missing"; exit 1; }
 
 tmp=$(mktemp -d) || exit 2
@@ -475,7 +478,7 @@ pfx_fixture() {
   GOV_GATE_CMD="bash $green" git push -q origin main >/dev/null 2>&1
 }
 # A full-green record for a fixture at $1, naming sha $2. Deliberately NOT the `stamp` above: that
-# one spells `tools/` itself, which is the very assumption under test here.
+# one spells `<prefix>/` itself, which is the very assumption under test here.
 pfx_stamp() {
   local pfx=$1 sha=$2 blob=${3-} gd; gd=$(git rev-parse --git-dir)
   [ -n "$blob" ] || blob=$(git hash-object -- "$pfx/gate-legs.json" 2>/dev/null)

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Runnable check for scratch-guard.js — the PreToolUse guard that keeps agent scratch out of the
-# home directory. Run: bash tools/hooks/scratch-guard.test.sh   (exit 0 = all pass)
+# home directory. Run: bash <prefix>/hooks/scratch-guard.test.sh   (exit 0 = all pass)
 #
 # WHAT THIS FILE DOES NOT CHECK, stated up front because a structural check reads as a semantic one
 # to everybody who did not write it: it does not prove the hook is WIRED. That is check-wiring.sh's
@@ -12,9 +12,25 @@
 # where it stopped matching. `memory/gotchas/fixture-inherits-ambient-machine-state.md` names exactly
 # this. The fixture home is deliberately a name no machine has, in two spellings, so the 8.3
 # cross-substitution is exercised rather than assumed.
-KIT_REL="${KIT_REL:-tools/hooks}"
 set -u
 HERE="$(cd "$(dirname "$0")" && pwd)"
+# >>> derive_self_rel — canonical copy: kit-rel.sh in gov's lib dir (byte-identical; gated)
+derive_self_rel() {
+  local _dsr_p _dsr_rel=""
+  _dsr_p=$(cd "$1" 2>/dev/null && pwd) || return 1
+  while [ ! -e "$_dsr_p/.git" ]; do
+    [ "$(dirname "$_dsr_p")" = "$_dsr_p" ] && return 1
+    _dsr_rel="$(basename "$_dsr_p")${_dsr_rel:+/$_dsr_rel}"
+    _dsr_p=$(dirname "$_dsr_p")
+  done
+  printf '%s\n' "$_dsr_rel"
+}
+# <<< derive_self_rel
+KIT_REL=$(derive_self_rel "$HERE") || { echo "scratch-guard.test: not inside a git repository"; exit 2; }
+# PFX is the install prefix WITH its trailing slash, derived from where this file sits and empty
+# at a root install: every fixture and host path below is spelled through it, never through a
+# literal prefix (TOOL-aRepatriatedFork-28).
+case "$KIT_REL" in */*) PFX="${KIT_REL%/*}/" ;; *) PFX="" ;; esac
 HOOK="$HERE/scratch-guard.js"
 TMP=$(mktemp -d); trap 'rm -rf "$TMP"' EXIT
 pass=0; fail=0
@@ -96,7 +112,7 @@ run "redirect > -> deny"                          2 'echo x > ~/.a'
 run "append >> -> deny"                           2 'echo x >> ~/.a'
 run "stderr 2> -> deny"                           2 'cmd 2> ~/.a'
 run "both &> -> deny"                             2 'cmd &> ~/.a'
-run "the observed litter shape -> deny"           2 'bash tools/run-gates/run-gates.sh > ~/.merge-bar.log 2>&1'
+run "the observed litter shape -> deny"           2 'bash '"${PFX}run-gates/run-gates.sh"' > ~/.merge-bar.log 2>&1'
 run "  near-miss: redirect to /dev/null -> allow" 0 'cmd > /dev/null 2>&1'
 run "tee -> deny"                                 2 'echo x | tee ~/.a'
 run "touch -> deny"                               2 'touch ~/.a'
@@ -293,7 +309,7 @@ esac
 
 # ---- kit-versus-wired parity ---------------------------------------------------------------------
 # `.claude/**` is outside the govkit surface, outside the codebase-map inventories and outside both
-# tools/-scoped JS gates, so nothing else in the bar notices the EXECUTED copy drifting from the
+# <prefix>/-scoped JS gates, so nothing else in the bar notices the EXECUTED copy drifting from the
 # graded one. Absence must not satisfy it.
 ROOT=$(git -C "$HERE" rev-parse --show-toplevel 2>/dev/null || echo "")
 # SELF-ARMING ON THE RESOLVED COPY COUNT — TOOL-dRetiredFork-14.

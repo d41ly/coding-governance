@@ -7,7 +7,7 @@
 # Nothing is asserted about the shipped tree except by the two arms that say so, because a suite
 # that only ever runs against a green tree is an assertion about nothing.
 #
-#   bash tools/process-monitor/adopt-process-monitor.test.sh
+#   bash <prefix>/process-monitor/adopt-process-monitor.test.sh
 #
 # Exit 0 = all arms passed · 1 = an arm failed.
 set -u
@@ -18,6 +18,10 @@ ROOT="$(cd "$KIT_DIR" && git rev-parse --show-toplevel)"
 # The kit's own prefix, DERIVED — a scratch adopter tree is built at it, and spelling it out
 # is exactly the literal the install-prefix ban refuses.
 KIT_REL="$(cd "$KIT_DIR" && git rev-parse --show-prefix)"; KIT_REL="${KIT_REL%/}"
+# PFX is the install prefix WITH its trailing slash, derived from where this file sits and empty
+# at a root install: every fixture and host path below is spelled through it, never through a
+# literal prefix (TOOL-aRepatriatedFork-28).
+case "$KIT_REL" in */*) PFX="${KIT_REL%/*}/" ;; *) PFX="" ;; esac
 # The python the hook is pointed at, RESOLVED by running it when the shared resolver is present.
 if [ -f "$KIT_DIR/../lib/resolve-python.sh" ]; then
   . "$KIT_DIR/../lib/resolve-python.sh"
@@ -58,9 +62,9 @@ CONF
 # The scratch repo is a real git repo because the adopter derives its own path through git.
 run_against() {
   local conf_body="$1" repo="$WORK/r$RANDOM$RANDOM"
-  mkdir -p "$repo/tools/process-monitor" "$REALROOT"
+  mkdir -p "$repo/${PFX}process-monitor" "$REALROOT"
   git -C "$repo" init -q 2>/dev/null
-  cp "$ADOPT" "$repo/tools/process-monitor/"
+  cp "$ADOPT" "$repo/${PFX}process-monitor/"
   # THE ENGINE, and only where an arm asks for it. The line above copies the adopter ALONE, so the
   # delegation to the engine's own reader is never reached and an arm over that branch would pass
   # by finding nothing. `$KIT_REL` is derived, so no install prefix is spelled here.
@@ -138,8 +142,8 @@ check_equal "test_non_numeric_throttle_refuses" \
 
 # --- AC3: an absent conf refuses, and --check REPAIRS NOTHING
 check_equal "test_absent_conf_refuses" "$(run_against "__ABSENT__")" 1
-_repo="$WORK/norepair"; mkdir -p "$_repo/tools/process-monitor"; git -C "$_repo" init -q 2>/dev/null
-cp "$ADOPT" "$_repo/tools/process-monitor/"
+_repo="$WORK/norepair"; mkdir -p "$_repo/${PFX}process-monitor"; git -C "$_repo" init -q 2>/dev/null
+cp "$ADOPT" "$_repo/${PFX}process-monitor/"
 ( cd "$_repo" && bash "$KIT_REL/adopt-process-monitor.sh" --check ) >/dev/null 2>&1 || true
 [ -f "$_repo/.process-monitor.conf" ] \
   && add_fail "test_check_refuses_without_repairing (a conf was created)" \

@@ -2,12 +2,12 @@
 # check-protocol-parity.test.sh — every artifact this kit RENDERS must equal its template rendered
 # for this install. Exit 0 = in parity · 1 = drift · 2 = misconfigured.
 #
-#   bash tools/workflows/check-protocol-parity.test.sh            # assert parity
-#   bash tools/workflows/check-protocol-parity.test.sh --render    # (re)write every rendered copy
+#   bash <prefix>/workflows/check-protocol-parity.test.sh            # assert parity
+#   bash <prefix>/workflows/check-protocol-parity.test.sh --render    # (re)write every rendered copy
 #   ... --tracked-only    with either mode: SKIP, by name, a pair whose live copy is absent AND
 #                         untracked, so the run refreshes what this install holds and creates nothing
 #
-# WHY THIS KIT OWNS IT. `tools/memory-tree/kit-dogfood-parity.test.sh` does exactly this job for the
+# WHY THIS KIT OWNS IT. `<prefix>/memory-tree/kit-dogfood-parity.test.sh` does exactly this job for the
 # memory-tree kit's two documents, and the obvious move was to add a third pair to its list. That
 # would hardcode a WORKFLOWS-kit path into the MEMORY-TREE kit's shipped gate: an adopter who installs
 # memory-tree alone would get a gate demanding a file their tree has no reason to contain, and the
@@ -84,7 +84,7 @@ MEMORY_ROOT=memory
 [ -f .memory-tree.conf ] && . ./.memory-tree.conf
 M="$MEMORY_ROOT"
 TOOLROOT=${KITREL%/*}; [ "$TOOLROOT" = "$KITREL" ] && TOOLROOT=""
-[ -z "$TOOLROOT" ] || TOOLROOT="$TOOLROOT/"   # "tools/" at a prefix, "" at a root install
+[ -z "$TOOLROOT" ] || TOOLROOT="$TOOLROOT/"   # "<prefix>/" at a prefix, "" at a root install
 
 # The pairs: `<live copy>|<template>`, both repo-relative. The render of each template is the live
 # copy's ENTIRE expected content.

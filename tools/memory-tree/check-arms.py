@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """check-arms.py — the harness meta-gate: every `fail` BRANCH is armed, or explicitly pinned.
 
-    python tools/memory-tree/check-arms.py --check        # the gate
-    python tools/memory-tree/check-arms.py --report       # what is armed, what is pinned, per gate
-    python tools/memory-tree/check-arms.py --emit-pin     # the pin file for the CURRENT unarmed set
+    python <prefix>/memory-tree/check-arms.py --check        # the gate
+    python <prefix>/memory-tree/check-arms.py --report       # what is armed, what is pinned, per gate
+    python <prefix>/memory-tree/check-arms.py --emit-pin     # the pin file for the CURRENT unarmed set
     python <kit>/check-arms.py --emit-floors              # the ARMS_FLOORS line for the CURRENT census
-    python tools/memory-tree/check-arms.py --selftest
+    python <prefix>/memory-tree/check-arms.py --selftest
 
 THE POPULATION IS DISCOVERED, never named. A gate is a tracked `*.sh` that DEFINES the helper
 (`fail() {`) and has `fail <n> "` call sites; its test is the sibling `<stem>.test.sh`. A named pair
@@ -228,7 +228,7 @@ def parse_pin(root: str, m: str) -> list:
     TOOL-aRepatriatedFork-18 S5. A pin for a SHIPPED gate is a fact about gov's bytes, so it travels
     with them: a tracked `unarmed-branches.txt` in any directory other than the central one pins the
     gates of THAT directory, and its gate column is relative to it. So `unattended.sh<TAB>9<TAB>1…`
-    means the same branch at `tools/unattended/` and at `scripts/unattended/`, and no adopter re-keys
+    means the same branch at `<prefix>/unattended/` and at `scripts/unattended/`, and no adopter re-keys
     gov's rows by hand. The sidecar set is every tracked file of that name, not the discovered gates'
     directories, so a sidecar whose gate vanished is still read and still reds as stale.
     """
@@ -467,7 +467,22 @@ def _w(path, text):
         fh.write(text.encode("utf-8"))
 
 
+def derive_install_prefix() -> str:
+    """The install prefix WITH its trailing slash, derived from where this file sits and empty at a
+    root install. Every fixture and host path the self-test builds is spelled through it, never
+    through a literal prefix (TOOL-aRepatriatedFork-28)."""
+    import pathlib
+    here = pathlib.Path(__file__).resolve().parent
+    for anc in here.parents:
+        if (anc / ".git").exists():
+            rel = here.parent.relative_to(anc).as_posix()
+            return "" if rel == "." else rel + "/"
+    raise SystemExit(f"{pathlib.Path(__file__).name}: not inside a git repository, so there is no "
+                     "install prefix to derive")
+
+
 def cmd_selftest() -> int:
+    PFX = derive_install_prefix()   # TOOL-aRepatriatedFork-28
     fails = []
 
     def arm(label, want, fn):
@@ -505,14 +520,14 @@ def cmd_selftest() -> int:
         run("git", "config", "user.email", "t@t.test", cwd=root)
         run("git", "config", "user.name", "t", cwd=root)
         _w(os.path.join(root, ".memory-tree.conf"),
-           'MEMORY_ROOT=memory\nARMS_FLOORS="tools/gate-a.sh:3:1"\n')
-        _w(os.path.join(root, "tools", "gate-a.sh"), GATE_A)
-        _w(os.path.join(root, "tools", "gate-a.test.sh"), "hit 'alpha branch message here'\n")
-        _w(os.path.join(root, "tools", "gate-b.sh"), GATE_B)
-        _w(os.path.join(root, "tools", "gate-b.test.sh"), "hit 'delta branch message here'\n")
+           f'MEMORY_ROOT=memory\nARMS_FLOORS="{PFX}gate-a.sh:3:1"\n')
+        _w(os.path.join(root, PFX, "gate-a.sh"), GATE_A)
+        _w(os.path.join(root, PFX, "gate-a.test.sh"), "hit 'alpha branch message here'\n")
+        _w(os.path.join(root, PFX, "gate-b.sh"), GATE_B)
+        _w(os.path.join(root, PFX, "gate-b.test.sh"), "hit 'delta branch message here'\n")
         # A *.test.sh that QUOTES a fail line AND defines the helper — the shape that would make the
         # whole suite permanently red by demanding a <stem>.test.test.sh.
-        _w(os.path.join(root, "tools", "decoy.test.sh"), HELPER + 'fail 1 "decoy message here"\n')
+        _w(os.path.join(root, PFX, "decoy.test.sh"), HELPER + 'fail 1 "decoy message here"\n')
         _w(os.path.join(root, "memory", "project", ".keep"), "")
         run("git", "add", "-A", cwd=root)
         run("git", "commit", "-q", "-m", "f", "--no-verify", cwd=root)
@@ -531,41 +546,41 @@ def cmd_selftest() -> int:
 
         arm("two gates are discovered, the decoy test is not",
             "[rc=0]",
-            lambda: 0 if [g for g, _ in discover(root)] == ["tools/gate-a.sh", "tools/gate-b.sh"] else 1)
+            lambda: 0 if [g for g, _ in discover(root)] == [f"{PFX}gate-a.sh", f"{PFX}gate-b.sh"] else 1)
         arm("branches are keyed on the call site, not the check number", "[rc=0]",
-            lambda: 0 if [(b["num"], b["ord"]) for b in branches(root, "tools/gate-a.sh")]
+            lambda: 0 if [(b["num"], b["ord"]) for b in branches(root, f"{PFX}gate-a.sh")]
             == [(1, 1), (1, 2), (2, 1)] else 1)
         arm("a command substitution is dropped from the signature like a variable", "[rc=0]",
             lambda: 0 if signature(message_of('substituted message here; repair with $(derive_x)"'))
             == "substituted message here; repair with" else 1)
         arm("the capture stops at the closing quote, not end of line", "[rc=0]",
-            lambda: 0 if branches(root, "tools/gate-b.sh")[0]["sig"] == "delta branch message here" else 1)
+            lambda: 0 if branches(root, f"{PFX}gate-b.sh")[0]["sig"] == "delta branch message here" else 1)
 
         # the PIN key carries the gate: both gates have a (1,1)
-        _w(pin, "tools/gate-a.sh\t1\t2\tbeta branch message here\n"
-                "tools/gate-a.sh\t2\t1\tgamma branch message here\n")
+        _w(pin, f"{PFX}gate-a.sh\t1\t2\tbeta branch message here\n"
+                f"{PFX}gate-a.sh\t2\t1\tgamma branch message here\n")
         run("git", "add", "-A", cwd=root); run("git", "commit", "-q", "-m", "p", "--no-verify", cwd=root)
         arm("a fully pinned + armed population passes", None, lambda: cmd_check(root, conf))
         # gate A's (1,1) pinned must NOT exempt gate B's (1,1)
-        _w(os.path.join(root, "tools", "gate-b.test.sh"), "# no arm here\n")
-        _w(pin, "tools/gate-a.sh\t1\t1\talpha branch message here\n"
-                "tools/gate-a.sh\t1\t2\tbeta branch message here\n"
-                "tools/gate-a.sh\t2\t1\tgamma branch message here\n")
+        _w(os.path.join(root, PFX, "gate-b.test.sh"), "# no arm here\n")
+        _w(pin, f"{PFX}gate-a.sh\t1\t1\talpha branch message here\n"
+                f"{PFX}gate-a.sh\t1\t2\tbeta branch message here\n"
+                f"{PFX}gate-a.sh\t2\t1\tgamma branch message here\n")
         run("git", "add", "-A", cwd=root); run("git", "commit", "-q", "-m", "p2", "--no-verify", cwd=root)
         out = []
         arm("a pin for gate A does not exempt gate B's same key",
-            "tools/gate-b.sh:2 check 1 branch 1 has no POSITIVE",
+            f"{PFX}gate-b.sh:2 check 1 branch 1 has no POSITIVE",
             lambda: _capture(cmd_check, root, conf, out))
         arm("...and raises no stale-signature line against gate B", "[rc=0]",
             lambda: 0 if not any("gate-b" in l and "stale signature" in l for l in out) else 1)
         arm("...and gate A's own armed branch is reported as wrongly pinned",
-            "pins tools/gate-a.sh check 1 branch 1, which IS armed now",
+            f"pins {PFX}gate-a.sh check 1 branch 1, which IS armed now",
             lambda: _capture(cmd_check, root, conf, []))
 
         # a missing sibling test is a NAMED failure, and it does not abort the other gate
-        _w(pin, "tools/gate-a.sh\t1\t2\tbeta branch message here\n"
-                "tools/gate-a.sh\t2\t1\tgamma branch message here\n")
-        os.remove(os.path.join(root, "tools", "gate-b.test.sh"))
+        _w(pin, f"{PFX}gate-a.sh\t1\t2\tbeta branch message here\n"
+                f"{PFX}gate-a.sh\t2\t1\tgamma branch message here\n")
+        os.remove(os.path.join(root, PFX, "gate-b.test.sh"))
         run("git", "add", "-A", cwd=root); run("git", "commit", "-q", "-m", "rm", "--no-verify", cwd=root)
         arm("a gate with no sibling test is named", "gate-b.test.sh is missing, but its gate has",
             lambda: cmd_check(root, conf))
@@ -575,40 +590,40 @@ def cmd_selftest() -> int:
         # line-agnostic on purpose: the assertion is about WHICH gate still gets scanned, not about
         # where in that gate the branch happens to sit.
         arm("one gate's error does not hide the other gate's branches",
-            "tools/gate-a.sh:4 check 1 branch 2 has no POSITIVE",
+            f"{PFX}gate-a.sh:4 check 1 branch 2 has no POSITIVE",
             lambda: _capture(cmd_check, root, conf, out2))
 
         # restore gate B, then the per-gate floors
-        _w(os.path.join(root, "tools", "gate-b.test.sh"), "hit 'delta branch message here'\n")
-        _w(pin, "tools/gate-a.sh\t1\t2\tbeta branch message here\n"
-                "tools/gate-a.sh\t2\t1\tgamma branch message here\n")
+        _w(os.path.join(root, PFX, "gate-b.test.sh"), "hit 'delta branch message here'\n")
+        _w(pin, f"{PFX}gate-a.sh\t1\t2\tbeta branch message here\n"
+                f"{PFX}gate-a.sh\t2\t1\tgamma branch message here\n")
         run("git", "add", "-A", cwd=root); run("git", "commit", "-q", "-m", "r", "--no-verify", cwd=root)
         arm("restored population passes", None, lambda: cmd_check(root, conf))
-        confh = dict(conf, ARMS_FLOORS="tools/gate-a.sh:4:1")
+        confh = dict(conf, ARMS_FLOORS=f"{PFX}gate-a.sh:4:1")
         arm("a per-gate branch floor catches a deleted guard",
-            "tools/gate-a.sh has 3 fail branch(es) against a floor of 4",
+            f"{PFX}gate-a.sh has 3 fail branch(es) against a floor of 4",
             lambda: cmd_check(root, confh))
-        confa = dict(conf, ARMS_FLOORS="tools/gate-a.sh:3:2")
+        confa = dict(conf, ARMS_FLOORS=f"{PFX}gate-a.sh:3:2")
         arm("a per-gate armed floor catches a dropped assertion",
-            "tools/gate-a.sh has 1 armed branch(es) against a floor of 2",
+            f"{PFX}gate-a.sh has 1 armed branch(es) against a floor of 2",
             lambda: cmd_check(root, confa))
         # CROSS-GATE COMPENSATION: an aggregate floor would be satisfied here; a per-gate one is not.
-        confc = dict(conf, ARMS_FLOORS="tools/gate-a.sh:4:1 tools/gate-b.sh:0:0")
+        confc = dict(conf, ARMS_FLOORS=f"{PFX}gate-a.sh:4:1 {PFX}gate-b.sh:0:0")
         arm("a per-gate floor is not satisfied by another gate's growth",
-            "tools/gate-a.sh has 3 fail branch(es)",
+            f"{PFX}gate-a.sh has 3 fail branch(es)",
             lambda: cmd_check(root, confc))
 
         # A FLOOR whose gate is gone. The floors loop walks the DISCOVERED gates and looks each floor
         # up by key, so before this guard a floor for a vanished gate was never consulted at all:
         # rc=0, no output, and a whole gate's branches and arms silently uncounted. The escape is not
         # hypothetical — reformatting `fail() {` to `fail () {` drops a gate out of discovery.
-        confz = dict(conf, ARMS_FLOORS="tools/gate-a.sh:3:1 tools/gate-gone.sh:9:9")
+        confz = dict(conf, ARMS_FLOORS=f"{PFX}gate-a.sh:3:1 {PFX}gate-gone.sh:9:9")
         arm("a floor naming a gate outside the population is a failure",
             "which is NOT in the discovered population", lambda: cmd_check(root, confz))
         # ...and the same floor set with the gate PRESENT is silent, so the arm above is not passing
         # because cmd_check reds on everything.
         arm("...and a floor whose gate IS discovered stays silent", "[rc=0]",
-            lambda: cmd_check(root, dict(conf, ARMS_FLOORS="tools/gate-a.sh:3:1")))
+            lambda: cmd_check(root, dict(conf, ARMS_FLOORS=f"{PFX}gate-a.sh:3:1")))
 
         # A GATE THAT LEAVES THE POPULATION — the measured escape itself, not a floor naming a gate
         # that never existed. Reformatting the helper from `fail() {` to `fail () {` drops a REAL
@@ -617,13 +632,13 @@ def cmd_selftest() -> int:
         # this escape actually threatens are the ones no pin row names, where the floor is the only
         # thing left watching.
         _w(pin, "")
-        _w(os.path.join(root, "tools", "gate-a.sh"), GATE_A.replace("fail() {", "fail () {", 1))
+        _w(os.path.join(root, PFX, "gate-a.sh"), GATE_A.replace("fail() {", "fail () {", 1))
         run("git", "add", "-A", cwd=root); run("git", "commit", "-q", "-m", "s5", "--no-verify", cwd=root)
         arm("a gate whose helper is reformatted leaves the discovered population", "[rc=0]",
-            lambda: 0 if [g for g, _ in discover(root)] == ["tools/gate-b.sh"] else 1)
+            lambda: 0 if [g for g, _ in discover(root)] == [f"{PFX}gate-b.sh"] else 1)
         arm("...and its floor is what catches that, with no pin row to help",
-            "ARMS_FLOORS names tools/gate-a.sh, which is NOT in the discovered population",
-            lambda: cmd_check(root, dict(conf, ARMS_FLOORS="tools/gate-a.sh:3:1 tools/gate-b.sh:1:1")))
+            f"ARMS_FLOORS names {PFX}gate-a.sh, which is NOT in the discovered population",
+            lambda: cmd_check(root, dict(conf, ARMS_FLOORS=f"{PFX}gate-a.sh:3:1 {PFX}gate-b.sh:1:1")))
         # AC6: ONE discovered gate and an empty declaration. The refusal names the module by the
         # path DERIVED for this install, so the arm asserts the derivation rather than a literal.
         arm("...and an empty ARMS_FLOORS is refused while a gate is discovered",
@@ -633,24 +648,24 @@ def cmd_selftest() -> int:
             f"`python {kit_rel()}/check-arms.py --emit-floors`",
             lambda: cmd_check(root, dict(conf, ARMS_FLOORS="")))
         arm("--emit-floors prints one token per discovered gate, measured",
-            'ARMS_FLOORS="tools/gate-b.sh:1:1"\n[rc=0]',
+            f'ARMS_FLOORS="{PFX}gate-b.sh:1:1"\n[rc=0]',
             lambda: cmd_emit_floors(root, dict(conf, ARMS_FLOORS="")))
         # ...and the SAME floor set over the restored gate is silent, so the arms above are not
         # passing because cmd_check reds on everything.
-        _w(os.path.join(root, "tools", "gate-a.sh"), GATE_A)
-        _w(pin, "tools/gate-a.sh\t1\t2\tbeta branch message here\n"
-                "tools/gate-a.sh\t2\t1\tgamma branch message here\n")
+        _w(os.path.join(root, PFX, "gate-a.sh"), GATE_A)
+        _w(pin, f"{PFX}gate-a.sh\t1\t2\tbeta branch message here\n"
+                f"{PFX}gate-a.sh\t2\t1\tgamma branch message here\n")
         run("git", "add", "-A", cwd=root); run("git", "commit", "-q", "-m", "s5r", "--no-verify", cwd=root)
         arm("...and the restored gate passes the same floor set", "[rc=0]",
-            lambda: cmd_check(root, dict(conf, ARMS_FLOORS="tools/gate-a.sh:3:1 tools/gate-b.sh:1:1")))
+            lambda: cmd_check(root, dict(conf, ARMS_FLOORS=f"{PFX}gate-a.sh:3:1 {PFX}gate-b.sh:1:1")))
         # An EMPTY population is not refused.
         arm("an empty ARMS_FLOORS over a tree with no discovered gate is not refused", "[rc=0]",
             lambda: cmd_check(empty, dict(conf, ARMS_FLOORS="")))
 
         # a pin whose GATE is gone names that, not "the guard was deleted"
-        _w(pin, "tools/gate-z.sh\t1\t1\tvanished gate message here\n"
-                "tools/gate-a.sh\t1\t2\tbeta branch message here\n"
-                "tools/gate-a.sh\t2\t1\tgamma branch message here\n")
+        _w(pin, f"{PFX}gate-z.sh\t1\t1\tvanished gate message here\n"
+                f"{PFX}gate-a.sh\t1\t2\tbeta branch message here\n"
+                f"{PFX}gate-a.sh\t2\t1\tgamma branch message here\n")
         run("git", "add", "-A", cwd=root); run("git", "commit", "-q", "-m", "z", "--no-verify", cwd=root)
         arm("a pin for a gate outside the population says so",
             "the gate is no longer in the population", lambda: cmd_check(root, conf))
@@ -661,7 +676,7 @@ def cmd_selftest() -> int:
                               if (b["num"], b["ord"]) == (1, 2) and b["armed"]] else 1)
 
         # a comment and an absence assertion do not arm
-        _w(os.path.join(root, "tools", "gate-a.test.sh"),
+        _w(os.path.join(root, PFX, "gate-a.test.sh"),
            "hit 'alpha branch message here'\n"
            "# this arm would cover: gamma branch message here\n"
            "miss 'beta branch message here'\n")
@@ -675,7 +690,7 @@ def cmd_selftest() -> int:
             lambda: 0 if any("check 1 branch 2 has no POSITIVE" in l for l in outc) else 1)
 
         # a message with no assertable literal run is a named error, not a silent skip
-        _w(os.path.join(root, "tools", "gate-a.sh"), HELPER + '[ -n "$a" ] && fail 1 "$X:\n"\n')
+        _w(os.path.join(root, PFX, "gate-a.sh"), HELPER + '[ -n "$a" ] && fail 1 "$X:\n"\n')
         run("git", "add", "-A", cwd=root); run("git", "commit", "-q", "-m", "x", "--no-verify", cwd=root)
         arm("a message with no literal run is named", "no literal run long enough",
             lambda: cmd_check(root, conf))
@@ -689,25 +704,25 @@ def cmd_selftest() -> int:
                 "strands its arms")
         # The second branch opens with the first's 40 characters: once the test arms branch 1 with
         # the whole signature, that line holds branch 2's opening run and is NOT its stranded prefix.
-        _w(os.path.join(root, "tools", "gate-c.sh"),
+        _w(os.path.join(root, PFX, "gate-c.sh"),
            HELPER + f'[ -n "$e" ] && fail 1 "{LONG}: $x"\n'
            f'[ -n "$f" ] && fail 2 "{LONG[:40]} but this sibling ends another way: $y"\n')
-        _w(os.path.join(root, "tools", "gate-c.test.sh"), f"hit '{LONG[:40]}'\n")
+        _w(os.path.join(root, PFX, "gate-c.test.sh"), f"hit '{LONG[:40]}'\n")
         run("git", "add", "-A", cwd=root); run("git", "commit", "-q", "-m", "s", "--no-verify", cwd=root)
         arm("a test quoting a prefix of a long message is named STRANDED at its line",
-            "STRANDED prefix at tools/gate-c.test.sh:1 stops short of the signature; copy the whole row",
+            f"STRANDED prefix at {PFX}gate-c.test.sh:1 stops short of the signature; copy the whole row",
             lambda: cmd_check(root, conf))
         arm("...and --report prints that row's signature whole, with the STRANDED line",
-            f"{LONG}  STRANDED tools/gate-c.test.sh:1",
+            f"{LONG}  STRANDED {PFX}gate-c.test.sh:1",
             lambda: cmd_report(root, conf))
         # the CONTROL: the same test quoting the whole signature arms it, and nothing says STRANDED
-        _w(os.path.join(root, "tools", "gate-c.test.sh"), f"hit '{LONG}'\n")
+        _w(os.path.join(root, PFX, "gate-c.test.sh"), f"hit '{LONG}'\n")
         run("git", "add", "-A", cwd=root); run("git", "commit", "-q", "-m", "w", "--no-verify", cwd=root)
         outs = []
         _capture(cmd_report, root, conf, outs)
         arm("...and the same test quoting the whole signature reads ARMED with no STRANDED token",
             "[rc=0]",
-            lambda: 0 if any("ARMED " in l and f"{LONG}  by tools/gate-c.test.sh" in l for l in outs)
+            lambda: 0 if any("ARMED " in l and f"{LONG}  by {PFX}gate-c.test.sh" in l for l in outs)
             and not any("STRANDED" in l and "gate-c" in l for l in outs) else 1)
 
         # TOOL-aRepatriatedFork-18 S5 + S6, in a tree of their own: a SIDECAR pin beside the gate,
@@ -719,13 +734,13 @@ def cmd_selftest() -> int:
         run("git", "config", "user.email", "t@t.test", cwd=side)
         run("git", "config", "user.name", "t", cwd=side)
         _w(os.path.join(side, ".memory-tree.conf"),
-           'MEMORY_ROOT=memory\nARMS_FLOORS="tools/kit/g.sh:2:1"\n')
-        _w(os.path.join(side, "tools", "kit", "g.sh"),
+           f'MEMORY_ROOT=memory\nARMS_FLOORS="{PFX}kit/g.sh:2:1"\n')
+        _w(os.path.join(side, PFX, "kit", "g.sh"),
            HELPER + '[ -n "$a" ] && fail 1 "sidecar pinned branch here"\n'
                     '[ -n "$b" ] && fail 2 "local arm branch message here"\n')
-        _w(os.path.join(side, "tools", "kit", "g.test.sh"), "# the shipped suite arms neither\n")
-        _w(os.path.join(side, "tools", "kit", "g.local.test.sh"), "hit 'local arm branch message here'\n")
-        _w(os.path.join(side, "tools", "kit", "unarmed-branches.txt"),
+        _w(os.path.join(side, PFX, "kit", "g.test.sh"), "# the shipped suite arms neither\n")
+        _w(os.path.join(side, PFX, "kit", "g.local.test.sh"), "hit 'local arm branch message here'\n")
+        _w(os.path.join(side, PFX, "kit", "unarmed-branches.txt"),
            "g.sh\t1\t1\tsidecar pinned branch here\n")
         _w(os.path.join(side, "memory", "project", ".keep"), "")
         run("git", "add", "-A", cwd=side)
@@ -735,31 +750,31 @@ def cmd_selftest() -> int:
         arm("S5+S6: a sidecar pin and a local-suite arm leave the gate green", None,
             lambda: cmd_check(side, sconf))
         arm("...and --report names the sidecar that pinned the branch",
-            "PINNED sidecar pinned branch here  in tools/kit/unarmed-branches.txt",
+            f"PINNED sidecar pinned branch here  in {PFX}kit/unarmed-branches.txt",
             lambda: cmd_report(side, sconf))
         arm("...and --report names the local suite that armed the other",
-            "ARMED  local arm branch message here  by tools/kit/g.local.test.sh",
+            f"ARMED  local arm branch message here  by {PFX}kit/g.local.test.sh",
             lambda: cmd_report(side, sconf))
-        _w(spin, "tools/kit/g.sh\t1\t1\tsidecar pinned branch here\n")
+        _w(spin, f"{PFX}kit/g.sh\t1\t1\tsidecar pinned branch here\n")
         run("git", "add", "-A", cwd=side); run("git", "commit", "-q", "-m", "d", "--no-verify", cwd=side)
         arm("S5: a branch pinned in the central file AND a sidecar is refused, naming both",
-            "tools/kit/unarmed-branches.txt:1 pins tools/kit/g.sh check 1 branch 1, which "
+            f"{PFX}kit/unarmed-branches.txt:1 pins {PFX}kit/g.sh check 1 branch 1, which "
             "memory/project/unarmed-branches.txt:1 already pins",
             lambda: cmd_check(side, sconf))
         _w(spin, "")
-        _w(os.path.join(side, "tools", "kit", "unarmed-branches.txt"),
+        _w(os.path.join(side, PFX, "kit", "unarmed-branches.txt"),
            "g.sh\t1\t1\tsidecar pinned branch here\ngone.sh\t1\t1\tvanished sidecar gate here\n")
         run("git", "add", "-A", cwd=side); run("git", "commit", "-q", "-m", "g", "--no-verify", cwd=side)
         arm("S5: a sidecar row whose gate left its directory is stale, named at the sidecar",
-            "tools/kit/unarmed-branches.txt:2 pins tools/kit/gone.sh check 1 branch 1, which no longer "
+            f"{PFX}kit/unarmed-branches.txt:2 pins {PFX}kit/gone.sh check 1 branch 1, which no longer "
             "exists — the gate is no longer in the population",
             lambda: cmd_check(side, sconf))
-        _w(os.path.join(side, "tools", "kit", "unarmed-branches.txt"),
+        _w(os.path.join(side, PFX, "kit", "unarmed-branches.txt"),
            "g.sh\t1\t1\tsidecar pinned branch here\n")
-        os.remove(os.path.join(side, "tools", "kit", "g.local.test.sh"))
+        os.remove(os.path.join(side, PFX, "kit", "g.local.test.sh"))
         run("git", "add", "-A", cwd=side); run("git", "commit", "-q", "-m", "l", "--no-verify", cwd=side)
         arm("S6: without the local suite the same branch is named unarmed",
-            "tools/kit/g.sh:3 check 2 branch 1 has no POSITIVE",
+            f"{PFX}kit/g.sh:3 check 2 branch 1 has no POSITIVE",
             lambda: cmd_check(side, sconf))
 
     if fails:

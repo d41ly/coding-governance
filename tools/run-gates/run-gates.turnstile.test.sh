@@ -15,8 +15,25 @@
 # Intersecting recorded start and end times was tried in a sibling build and retired by name: it
 # graded the node's clock rather than the runner, and red three consecutive pushes on a tree it had
 # already passed.
-KIT_REL="${KIT_REL:-tools/run-gates}"
 set -u
+HERE="$(cd "$(dirname "$0")" && pwd)"
+# >>> derive_self_rel — canonical copy: kit-rel.sh in gov's lib dir (byte-identical; gated)
+derive_self_rel() {
+  local _dsr_p _dsr_rel=""
+  _dsr_p=$(cd "$1" 2>/dev/null && pwd) || return 1
+  while [ ! -e "$_dsr_p/.git" ]; do
+    [ "$(dirname "$_dsr_p")" = "$_dsr_p" ] && return 1
+    _dsr_rel="$(basename "$_dsr_p")${_dsr_rel:+/$_dsr_rel}"
+    _dsr_p=$(dirname "$_dsr_p")
+  done
+  printf '%s\n' "$_dsr_rel"
+}
+# <<< derive_self_rel
+KIT_REL=$(derive_self_rel "$HERE") || { echo "turnstile-test: not inside a git repository"; exit 2; }
+# PFX is the install prefix WITH its trailing slash, derived from where this file sits and empty
+# at a root install: every fixture and host path below is spelled through it, never through a
+# literal prefix (TOOL-aRepatriatedFork-28).
+case "$KIT_REL" in */*) PFX="${KIT_REL%/*}/" ;; *) PFX="" ;; esac
 
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "turnstile-test: not a git repo"; exit 2; }
 HERE=$(cd "$(dirname "$0")" && pwd)
@@ -56,10 +73,10 @@ hdrkey() {
 # mk_repo <dir> — a scratch repository carrying the runner and its table.
 mk_repo() {
   local d=$1
-  mkdir -p "$d/tools/run-gates" "$d/tools/lib" "$d/fx"
-  cp "$HERE/run-gates.sh" "$HERE/gate-profiles.txt" "$d/tools/run-gates/" || return 1
-  cp "$HERE/gate-fingerprint.sh" "$d/tools/run-gates/" 2>/dev/null || true
-  cp "$ROOT/tools/lib/resolve-python.sh" "$d/tools/lib/" 2>/dev/null || true
+  mkdir -p "$d/${PFX}run-gates" "$d/${PFX}lib" "$d/fx"
+  cp "$HERE/run-gates.sh" "$HERE/gate-profiles.txt" "$d/${PFX}run-gates/" || return 1
+  cp "$HERE/gate-fingerprint.sh" "$d/${PFX}run-gates/" 2>/dev/null || true
+  cp "$ROOT/${PFX}lib/resolve-python.sh" "$d/${PFX}lib/" 2>/dev/null || true
   ( cd "$d" && git init -q -b main . && git config user.email ts@test.invalid \
       && git config user.name ts-test ) >/dev/null 2>&1 || return 1
   # The occupancy leg: register, count everyone registered, record the count, dwell, deregister.
@@ -80,10 +97,10 @@ OCC
   printf '#!/usr/bin/env bash\nsleep "${TS_LONG:-12}"\nexit 0\n' > "$d/fx/long.sh"
   # several quick legs, so a holder's heartbeat refreshes repeatedly across a run
   printf '#!/usr/bin/env bash\nsleep 1\nexit 0\n' > "$d/fx/tick.sh"
-  printf '%s\n' '[ {"name": "occupy", "argv": ["bash", "fx/occupy.sh"]} ]' > "$d/tools/gate-legs.json"
+  printf '%s\n' '[ {"name": "occupy", "argv": ["bash", "fx/occupy.sh"]} ]' > "$d/${PFX}gate-legs.json"
   ( cd "$d" && git add -A && git commit -qm seed ) >/dev/null 2>&1 || return 1
 }
-legs()  { printf '%s\n' "$2" > "$1/tools/gate-legs.json"; }
+legs()  { printf '%s\n' "$2" > "$1/${PFX}gate-legs.json"; }
 runbg() { ( cd "$1" && shift; env "$@" bash $KIT_REL/run-gates.sh; ) >>"$tmp/out.$RANDOM" 2>&1 & }
 peak()  { awk 'BEGIN{m=0} {if ($1+0>m) m=$1+0} END{print m+0}' "$1/peaks" 2>/dev/null; }
 # RESOLVED ABSOLUTELY, the way the runner resolves it. `git rev-parse --git-common-dir` answers a
@@ -461,11 +478,11 @@ done
 # The launcher, RESOLVED by running it where the shared resolver is present; this suite SHIPS, so
 # the fallback is the bare name, marked as the guess it is. `PYBIN=` overrides.
 TS_PY="${PYBIN:-}"
-if [ -z "$TS_PY" ] && [ -f "$ROOT/tools/lib/resolve-python.sh" ]; then . "$ROOT/tools/lib/resolve-python.sh"; TS_PY=$(resolve_python 2>/dev/null); fi
+if [ -z "$TS_PY" ] && [ -f "$ROOT/${PFX}lib/resolve-python.sh" ]; then . "$ROOT/${PFX}lib/resolve-python.sh"; TS_PY=$(resolve_python 2>/dev/null); fi
 [ -n "$TS_PY" ] || TS_PY=python   # gov:literal-python — last-resort fallback when ../lib/ is absent (adopter layout)
 nested=$( "$TS_PY" -c '
 import json, os, sys
-p = os.environ.get("GATE_LEGS") or "tools/gate-legs.json"
+p = os.environ.get("GATE_LEGS") or "'"${PFX}gate-legs.json"'"
 try: legs = json.load(open(p))
 except Exception: sys.exit(0)
 print("\n".join(l["name"] for l in legs if any("run-gates.sh" in str(a) for a in l.get("argv", []))))
@@ -757,7 +774,7 @@ fi
 # fix. `TOOL-aBoundedCeiling-8` records arm 4c grading a source COMMENT and thereby asserting
 # nothing; this asserts that three real statements appear in the required order, so an edit that
 # moves the trap back inside the winning branch reds here rather than shipping the wedge again.
-rgs=$ROOT/tools/run-gates/run-gates.sh
+rgs=$ROOT/${PFX}run-gates/run-gates.sh
 tl=$(grep -n 'TS_TICKET="\$TS_Q/' "$rgs" | head -1 | cut -d: -f1)
 pl=$(grep -n "^  trap 'ts_drop_ticket' EXIT" "$rgs" | head -1 | cut -d: -f1)
 wl=$(grep -n '^  while \[ -n "\$TS_TICKET" \]' "$rgs" | head -1 | cut -d: -f1)

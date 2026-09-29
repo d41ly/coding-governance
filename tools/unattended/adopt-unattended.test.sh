@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # End-to-end for adopt-unattended.sh — GATED ON EFFECTS, not on exit codes.
 #
-#   bash tools/unattended/adopt-unattended.test.sh    # "PASS (…assertions)" + exit 0 = good
+#   bash <prefix>/unattended/adopt-unattended.test.sh    # "PASS (…assertions)" + exit 0 = good
 #
 # WHY EFFECTS. The adopter WRITES. An exit-code test passes on a script that refused correctly and
 # on one that wrote into the wrong tree and then exited 2 for an unrelated reason. The charter
@@ -21,8 +21,23 @@ set -u
 # changed and passes. Measured three times -- ARCH-dReadoptedConvoy-6, ARCH-aThriftySentry-1 and
 # ARCH-aBridledVintage-5 each cleared the same class by hand, and the last found NINE fresh sites
 # arriving in one kit pull. The default keeps gov identical; an adopter sets it once.
-KIT_REL="${KIT_REL:-tools/unattended}"
 HERE="$(cd "$(dirname "$0")" && pwd)"
+# >>> derive_self_rel — canonical copy: kit-rel.sh in gov's lib dir (byte-identical; gated)
+derive_self_rel() {
+  local _dsr_p _dsr_rel=""
+  _dsr_p=$(cd "$1" 2>/dev/null && pwd) || return 1
+  while [ ! -e "$_dsr_p/.git" ]; do
+    [ "$(dirname "$_dsr_p")" = "$_dsr_p" ] && return 1
+    _dsr_rel="$(basename "$_dsr_p")${_dsr_rel:+/$_dsr_rel}"
+    _dsr_p=$(dirname "$_dsr_p")
+  done
+  printf '%s\n' "$_dsr_rel"
+}
+# <<< derive_self_rel
+KIT_REL=$(derive_self_rel "$HERE") || { echo "adopt-unattended.test: not inside a git repository"; exit 2; }
+# ROOTPFX is a ROOT install's prefix, empty by definition: a fixture that models a root install,
+# or a key relative to the tool root, is spelled through it rather than bare (TOOL-aRepatriatedFork-28 S2).
+ROOTPFX=""
 if [ -f "$HERE/../lib/resolve-python.sh" ]; then
   . "$HERE/../lib/resolve-python.sh"
   TESTPY=$(resolve_python) || { echo "adopt-unattended.test: no usable python"; exit 2; }
@@ -85,7 +100,7 @@ seed() { # dir  -> a git repo carrying the kit, a conf, and a TRACKED memory-tre
   printf '}}\n' >> "$1/.claude/settings.json"
   cat > "$1/.unattended.conf" <<'EOF'
 MEMORY_ROOT=memory
-LANDER="bash tools/land.sh"
+LANDER="bash bin/land.sh"
 BYPASS_BAN="--no-verify"
 GATE_CMD="true"
 WIRING_CHECK="true"
@@ -134,7 +149,7 @@ hit "$(cat "$A/memory/guides/UNATTENDED-PROTOCOL.md")" "The run is authorized by
 present "$A/memory/guides/PLAYBOOK-TEMPLATE.md" "arm 1 installed the playbook template"
 hit "$(cat "$A/memory/guides/PLAYBOOK-TEMPLATE.md")" "PROHIBITED OUTPUT unless it is a tracked"
 hit "$(cat "$A/.claude/skills/unattended/SKILL.md")" "TheCreateCall"
-hit "$(cat "$A/.claude/skills/unattended/SKILL.md")" "bash tools/land.sh"
+hit "$(cat "$A/.claude/skills/unattended/SKILL.md")" "bash bin/land.sh"
 hit "$(cat "$A/.claude/skills/unattended/SKILL.md")" "bash "$KIT_REL"/unattended.sh --preflight"
 hit "$(cat "$A/.claude/skills/unattended/SKILL.md")" "python ${TR_T}memory-tree/gotchas.py --for-diff HEAD~1..HEAD"
 same "arm 1 left no placeholder" \
@@ -261,7 +276,7 @@ H="$TMP/hostile"; seed "$H"
 # exists to catch. It did, on the first attempt at writing this arm.
 grep -v -e '^LANDER=' -e '^KEEPALIVE_INTERVAL=' "$H/.unattended.conf" > "$H/.conf.tmp"
 cat >> "$H/.conf.tmp" <<'HOSTILEEOF'
-LANDER="bash tools/land.sh | tee log & echo done \\ok"
+LANDER="bash bin/land.sh | tee log & echo done \\ok"
 KEEPALIVE_INTERVAL="every 10 min | offset 3 & then \\wait"
 HOSTILEEOF
 mv "$H/.conf.tmp" "$H/.unattended.conf"
@@ -269,7 +284,7 @@ out=$(cd "$H" && bash "$KIT_REL"/adopt-unattended.sh 2>&1); rc=$?
 same "a hostile conf still adopts" "$rc" "0"
 SK="$H/.claude/skills/unattended/SKILL.md"
 present "$SK" "the Skill is written for a hostile conf"
-hit "$(cat "$SK")" 'bash tools/land.sh | tee log & echo done \ok'
+hit "$(cat "$SK")" 'bash bin/land.sh | tee log & echo done \ok'
 hit "$(cat "$SK")" 'every 10 min | offset 3 & then \wait'
 # NEGATIVE control: a render that silently drops a substitution leaves the token standing, and would
 # otherwise satisfy every assertion above by writing nothing useful.
@@ -368,8 +383,8 @@ absent "$A/.claude/skills/unattended/SKILL.md" "arm 2 wrote into the KIT OWNER's
 # ---- commands in the rendered Skill, so this is not cosmetic: the render would emit a command that
 # ---- word-splits. Refusing beats emitting a Skill that misfires at the first verb.
 C="$TMP/spaced"; seed "$C"
-mkdir -p "$C/my tools" && cp -r "$C/$KIT_REL" "$C/my tools/unattended"
-out=$( cd "$C" && bash "$C/my tools/unattended/adopt-unattended.sh" 2>&1 ); rc=$?
+mkdir -p "$C/my kits" && cp -r "$C/$KIT_REL" "$C/my kits/unattended"
+out=$( cd "$C" && bash "$C/my kits/unattended/adopt-unattended.sh" 2>&1 ); rc=$?
 hit "$out" "the kit path contains whitespace and is interpolated into shell commands"
 same "arm 3 refuses" "$rc" "2"
 absent "$C/.claude/skills/unattended/SKILL.md" "arm 3 wrote despite refusing"
@@ -470,7 +485,7 @@ out=$( cd "$H7" && bash "$KIT_REL"/adopt-unattended.sh 2>&1 ); rc=$?
 same "arm 7 a flat memory-tree adopts" "$rc" "0"
 hit "$(cat "$H7/.claude/skills/unattended/SKILL.md")" "python ${TR_T}gotchas.py --for-diff HEAD~1..HEAD"
 same "arm 7 the flat Skill names no nested checklist path" \
-  "$(grep -c "memory-tree/gotchas.py" "$H7/.claude/skills/unattended/SKILL.md" || true)" "0"  # gov:root-fixture — the nested spelling this arm asserts the flat render does NOT contain
+  "$(grep -c "${ROOTPFX}memory-tree/gotchas.py" "$H7/.claude/skills/unattended/SKILL.md" || true)" "0"   # the nested spelling the flat render must NOT contain
 ( cd "$H7" && bash "$KIT_REL"/adopt-unattended.sh --check >/dev/null 2>&1 )
 same "arm 7 --check agrees with the flat render" "$?" "0"
 

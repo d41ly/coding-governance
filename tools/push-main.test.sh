@@ -4,8 +4,8 @@
 set -u
 # THE SUBJECT IS FOUND FROM THIS FILE'S OWN LOCATION (TOOL-aRepatriatedFork-8 S6). This suite ships
 # beside its lander to whatever prefix an adopter installs the kit at (`scripts/` at adopter ic), and it
-# used to spell `tools/` for both, so an adopter had to fork it to run it. KIT_REL is where the pair
-# sits relative to the root, as git reports it: `tools/` here, empty at a root install.
+# used to spell `<prefix>/` for both, so an adopter had to fork it to run it. KIT_REL is where the pair
+# sits relative to the root, as git reports it: `<prefix>/` here, empty at a root install.
 HERE=$(cd "$(dirname "$0")" && pwd)
 SRC=$(git -C "$HERE" rev-parse --show-toplevel 2>/dev/null) || { echo "not a git repo"; exit 2; }
 KIT_REL=$(git -C "$HERE" rev-parse --show-prefix 2>/dev/null)

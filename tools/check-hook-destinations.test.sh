@@ -1,15 +1,27 @@
 #!/usr/bin/env bash
-# Arms for tools/check-hook-destinations.sh — TOOL-dRetiredFork-21.
+# Arms for <prefix>/check-hook-destinations.sh — TOOL-dRetiredFork-21.
 #
-#   bash tools/check-hook-destinations.test.sh
+#   bash <prefix>/check-hook-destinations.test.sh
 #
 # Every arm here was observed RED before the gate was wired, which is the rule: a gate whose failing
 # case nobody has watched fire is an assertion about nothing. The two positive breaks are staged
 # into COPIES of the real tree rather than the tree itself, so a killed run cannot leave gov with a
 # reverted fragment.
 set -u
-KIT_REL="${KIT_REL:-tools}"
 HERE="$(cd "$(dirname "$0")" && pwd)"
+# >>> derive_self_rel — canonical copy: kit-rel.sh in gov's lib dir (byte-identical; gated)
+derive_self_rel() {
+  local _dsr_p _dsr_rel=""
+  _dsr_p=$(cd "$1" 2>/dev/null && pwd) || return 1
+  while [ ! -e "$_dsr_p/.git" ]; do
+    [ "$(dirname "$_dsr_p")" = "$_dsr_p" ] && return 1
+    _dsr_rel="$(basename "$_dsr_p")${_dsr_rel:+/$_dsr_rel}"
+    _dsr_p=$(dirname "$_dsr_p")
+  done
+  printf '%s\n' "$_dsr_rel"
+}
+# <<< derive_self_rel
+KIT_REL=$(derive_self_rel "$HERE") || { echo "check-hook-destinations.test: not inside a git repository"; exit 2; }
 ROOT="$(git -C "$HERE" rev-parse --show-toplevel)" || exit 2
 GATE="$ROOT/$KIT_REL/check-hook-destinations.sh"
 n=0; st=0
@@ -115,7 +127,7 @@ out=$(cd "$d" && bash "$KIT_REL/check-hook-destinations.sh" 2>&1); rc=$?
 rm -rf "$d"
 
 # ---- ARM 7: a {here} fragment under a SHARED flat home is judged at its adopter path (AC6) --------
-# `tools/` is the home of several flat descriptors at once. That is not undecidable: the rule is "at
+# `<prefix>/` is the home of several flat descriptors at once. That is not undecidable: the rule is "at
 # least one flat descriptor homes the directory", and `{prefix}/<file>` is then compared against the
 # WHOLE declared set. The fixture names a file a flat kit ships beside the fragment.
 d=$(scratch)

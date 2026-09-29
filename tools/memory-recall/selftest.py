@@ -32,6 +32,24 @@ import subprocess
 import sys
 import tempfile
 
+
+def derive_install_prefix() -> str:
+    """The install prefix WITH its trailing slash, derived from where this file sits and empty at a
+    root install. Every fixture and host path the self-test builds is spelled through it, never
+    through a literal prefix (TOOL-aRepatriatedFork-28)."""
+    import pathlib
+    here = pathlib.Path(__file__).resolve().parent
+    for anc in here.parents:
+        if (anc / ".git").exists():
+            rel = here.parent.relative_to(anc).as_posix()
+            return "" if rel == "." else rel + "/"
+    raise SystemExit(f"{pathlib.Path(__file__).name}: not inside a git repository, so there is no "
+                     "install prefix to derive")
+
+
+PFX = derive_install_prefix()
+
+
 # ABOVE the sys.path insert: this file imports the same siblings query.py does, so without it the
 # gate leg itself drops __pycache__ into the adopter's worktree (spec F5/S12).
 sys.dont_write_bytecode = True
@@ -1212,8 +1230,8 @@ SURFACE = ("adopt-memory-recall.sh", "SKILL.template.md", "recall-opened.js",
 
 
 def settings_merge_src() -> pathlib.Path | None:
-    """The wiring tool, wherever THIS repo keeps it: beside the kit here, under tools/ in an adopter."""
-    for c in (KIT.parent / "settings-merge.py", recall_conf.repo_root() / "tools" / "settings-merge.py"):
+    """The wiring tool, wherever THIS repo keeps it: beside the kit here, under <prefix>/ in an adopter."""
+    for c in (KIT.parent / "settings-merge.py", recall_conf.repo_root() / PFX / "settings-merge.py"):
         if c.is_file():
             return c
     return None
@@ -1242,10 +1260,10 @@ def test_printed_invocations_resolve():
         assert refused.returncode == 2 and "--terms" in refused.stderr
         # The hook opt-in's remedy is the kit's OTHER printed invocation, and it was the one naming
         # a path no runbook step created (errno 2 when run verbatim). THE MERGER GOES BESIDE THE KIT,
-        # not under a `tools/` this fixture has no kit in: `make_repo` installs the fixture kit at the
+        # not under a `<prefix>/` this fixture has no kit in: `make_repo` installs the fixture kit at the
         # ROOT, so the adopter derives an EMPTY tool root and `settings_merge_src` looks at the kit's
-        # own parent. A `tools/`-prefixed copy models neither layout WIRE §3c supports — it was
-        # reachable only while the adopter hardcoded `tools/` too, and two agreeing hardcodes are not
+        # own parent. A `<prefix>/`-prefixed copy models neither layout WIRE §3c supports — it was
+        # reachable only while the adopter hardcoded `<prefix>/` too, and two agreeing hardcodes are not
         # a passing test. TOOL-cMendedVintage-4 removed one and this fixture was the other.
         copy_extra(kitdir, *SURFACE)
         shutil.copyfile(smerge, root / "settings-merge.py")

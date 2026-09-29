@@ -267,7 +267,7 @@ def resolve_bash() -> str:
     A candidate is accepted only if it RUNS. Existing on disk is not evidence — that is the same
     mistake one interpreter over that the python side made with the Microsoft Store `python3` stub,
     which answers `command -v` and exits 9009 without executing anything (see
-    tools/lib/resolve-python.sh). An override that is SET and unusable is a named failure here too,
+    <prefix>/lib/resolve-python.sh). An override that is SET and unusable is a named failure here too,
     never a silent fall-through to something else.
     """
     def runs(cand: str) -> bool:
@@ -385,10 +385,10 @@ def walk(root: str, conf: dict) -> dict:
                 # top-level directory — the ordinary case. (2) It is not, but the token is the TAIL of
                 # a tracked path, which means it names a real file of this repo written at the WRONG
                 # PREFIX. Case 2 exists because case 1 alone made this check structurally blind to
-                # the failure it is most needed for: a kit installed at `tools/<kit>/` scaffolds
+                # the failure it is most needed for: a kit installed at `<prefix>/<kit>/` scaffolds
                 # documents citing `<kit>/…`, whose first segment is not a top-level directory, so
                 # every one of those citations was skipped before it could be judged. Measured on a
-                # `tools/` install: seven dead kit paths in a scaffolded `HYGIENE.md` and the gate
+                # `<prefix>/` install: seven dead kit paths in a scaffolded `HYGIENE.md` and the gate
                 # exited 0. A tail match is deliberately narrow — an unresolvable token that matches
                 # nothing tracked is still prose, not a finding.
                 if cited.split("/", 1)[0] + "/" not in _roots(tracked_set):
@@ -791,7 +791,22 @@ def _walk_continues() -> set:
     return {n.lineno + off for n in ast.walk(tree) if isinstance(n, ast.Continue)}
 
 
+def derive_install_prefix() -> str:
+    """The install prefix WITH its trailing slash, derived from where this file sits and empty at a
+    root install. Every fixture and host path the self-test builds is spelled through it, never
+    through a literal prefix (TOOL-aRepatriatedFork-28)."""
+    import pathlib
+    here = pathlib.Path(__file__).resolve().parent
+    for anc in here.parents:
+        if (anc / ".git").exists():
+            rel = here.parent.relative_to(anc).as_posix()
+            return "" if rel == "." else rel + "/"
+    raise SystemExit(f"{pathlib.Path(__file__).name}: not inside a git repository, so there is no "
+                     "install prefix to derive")
+
+
 def cmd_selftest() -> int:
+    PFX = derive_install_prefix()   # TOOL-aRepatriatedFork-28
     fails = []
     # EVERY `continue` IN walk() MUST BE REACHED BY A FIXTURE. This is the one arm that could catch
     # the tautological shape filter deleted in TOOL-aBatchedTribunal-4: that branch was
@@ -1000,27 +1015,29 @@ def cmd_selftest() -> int:
         arm("...and is silent about a directory that resolves", "[nope]" if False else "",
             lambda: "" if not [l for l in checks(walk(tD, cD)) if "memory/builds/tOne" in l] else "FOUND")
 
-        # THE WRONG-PREFIX CASE, both halves. A kit installed at `tools/<kit>/` scaffolds documents
+        # THE WRONG-PREFIX CASE, both halves. A kit installed at `<prefix>/<kit>/` scaffolds documents
         # that cite `<kit>/…`, whose first segment is not a top-level directory. Before the tail rule
-        # those citations were skipped unjudged: measured on a real `tools/` install, seven dead kit
+        # those citations were skipped unjudged: measured on a real `<prefix>/` install, seven dead kit
         # paths in a scaffolded HYGIENE.md and the gate exited 0. `_scratch` puts nothing under
-        # `tools/`, so the fixture supplies the whole shape — a real file at a prefix, and a citation
+        # `<prefix>/`, so the fixture supplies the whole shape — a real file at a prefix, and a citation
         # of it written WITHOUT that prefix.
+        # The wrong citation is the ROOT-install spelling, built through a prefix variable set EMPTY.
+        root_pfx = ""
         tP = os.path.join(base, "prefix"); os.makedirs(tP)
         cP = _scratch(tP, extra={
-            "tools/memory-tree/check-memory-hygiene.sh": "#!/usr/bin/env bash\n",  # gov:prefix-literal — fixture-internal: the selftest builds this layout in its own scratch tree
-            "memory/HYGIENE.md": "sentinel\n\nRun `memory-tree/check-memory-hygiene.sh` to lint.\n",
+            f"{PFX}memory-tree/check-memory-hygiene.sh": "#!/usr/bin/env bash\n",  # gov:prefix-literal — fixture-internal: the selftest builds this layout in its own scratch tree
+            "memory/HYGIENE.md": f"sentinel\n\nRun `{root_pfx}memory-tree/check-memory-hygiene.sh` to lint.\n",
         })
         cP["DEAD_PATH_PIN"] = "0"
         arm("check 15 catches a kit path written at the WRONG PREFIX",
-            "memory-tree/check-memory-hygiene.sh",
+            f"{root_pfx}memory-tree/check-memory-hygiene.sh",
             lambda: "\n".join(checks(walk(tP, cP))))
         # ...and the same citation spelled correctly is silent. Without this half the arm above would
         # also pass on a rule that reds every token whose first segment is not a top-level directory.
         tQ = os.path.join(base, "prefix-ok"); os.makedirs(tQ)
         cQ = _scratch(tQ, extra={
-            "tools/memory-tree/check-memory-hygiene.sh": "#!/usr/bin/env bash\n",  # gov:prefix-literal — fixture-internal: the selftest builds this layout in its own scratch tree
-            "memory/HYGIENE.md": "sentinel\n\nRun `tools/memory-tree/check-memory-hygiene.sh` to lint.\n",  # gov:prefix-literal — fixture-internal: the selftest builds this layout in its own scratch tree
+            f"{PFX}memory-tree/check-memory-hygiene.sh": "#!/usr/bin/env bash\n",  # gov:prefix-literal — fixture-internal: the selftest builds this layout in its own scratch tree
+            "memory/HYGIENE.md": f"sentinel\n\nRun `{PFX}memory-tree/check-memory-hygiene.sh` to lint.\n",  # gov:prefix-literal — fixture-internal: the selftest builds this layout in its own scratch tree
         })
         cQ["DEAD_PATH_PIN"] = "0"
         arm("...and the correctly-prefixed spelling of it is silent", None,

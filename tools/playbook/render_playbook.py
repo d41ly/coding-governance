@@ -725,13 +725,17 @@ def run_selftest() -> int:
         else:
             failed += 1
             print(f'  arm FAIL {name} — {detail}')
-    ok_kits, ok_var = '["codebase-map", "lexicon"]', '"plain"'
+    # One kit id per line: a comma-joined run of quoted kit names reads to the carried-prefix ban as
+    # a path assembled from quoted segments, the registry's own rule (TOOL-aRepatriatedFork-28).
+    two_kits = ["codebase-map",
+                "lexicon"]
+    ok_kits, ok_var = json.dumps(two_kits), '"plain"'
 
     # H2 — the `kits` array is graded against the registry, in both failing directions.
     arm('a green render survives its own fixture', ok_kits, ok_var, None,
         in_body='the codebase-map ruleset')
     arm('a misspelled kit id is a refusal, not a silently dropped section',
-        '["codebasemap", "lexicon"]', ok_var, 'not a registry entry id')
+        json.dumps(["codebasemap", two_kits[1]]), ok_var, 'not a registry entry id')
     arm('the misspelling does NOT reach the render', '["codebasemap"]', ok_var, 'codebasemap')
     arm('an empty kits array is a refusal, not a charter with every block dropped',
         '[]', ok_var, 'declares no `kits`')
@@ -867,7 +871,7 @@ def run_selftest() -> int:
                        encoding='utf-8')
         got = resolve_answers(eng, Path(td), tgt, ['GATE_RUNNER', 'kits', 'manifest_path',
                                                    'gov_source', 'nope'])
-        want = {'GATE_RUNNER': 'bash scripts/gate.sh', 'kits': ['codebase-map', 'lexicon'],
+        want = {'GATE_RUNNER': 'bash scripts/gate.sh', 'kits': two_kits,
                 'manifest_path': 'm.md', 'gov_source': '../gov', 'nope': None}
         dep.write_text(dep.read_text(encoding='utf-8').replace('"lexicon"', '"lexcon"'),
                        encoding='utf-8')
@@ -890,7 +894,7 @@ def run_selftest() -> int:
             DESC_FIXTURE + '\n[[placeholder]]\nkey = "GATE_RUNNER"\nclass = "derived"\n'
             'probe = "gate_runner"\n', encoding='utf-8')
         (tgt / '.governance' / 'deploy.toml').write_text(
-            'gov_source = "../gov"\nkits = ["codebase-map", "lexicon"]\n\n[answers]\n'
+            'gov_source = "../gov"\nkits = ' + ok_kits + '\n\n[answers]\n'
             'playbook_path = "CHARTER.md"\nvariances_a = "plain"\nGate_Runner = "bash g.sh"\n'
             'manifest_path = "m.md"\n\n[kit.kickoff-manifest]\nManifest_Path = "x.md"\n',
             encoding='utf-8')
@@ -898,7 +902,7 @@ def run_selftest() -> int:
                 'kit.kickoff-manifest.manifest_path', 'KIT.Kickoff-Manifest.MANIFEST_PATH',
                 'kit.memory-tree.manifest_path', 'kit.kickoff-manifest.nope']
         got = resolve_answers(eng, Path(td), tgt, keys)
-    want = dict(zip(keys, ['bash g.sh', 'bash g.sh', ['codebase-map', 'lexicon'], 'm.md', '../gov',
+    want = dict(zip(keys, ['bash g.sh', 'bash g.sh', two_kits, 'm.md', '../gov',
                            'x.md', 'x.md', 'm.md', None]))
     if got == want:
         passed += 1
@@ -1035,4 +1039,4 @@ def main(argv: list[str]) -> int:
 if __name__ == '__main__':
     raise SystemExit(main(sys.argv[1:]))
 
-KIT_PLAYBOOK_RENDER_VERSION = "1.14"  # gov:kit playbook-render@1.14
+KIT_PLAYBOOK_RENDER_VERSION = "1.15"  # gov:kit playbook-render@1.15

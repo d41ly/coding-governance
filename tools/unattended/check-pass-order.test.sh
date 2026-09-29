@@ -7,19 +7,37 @@
 # build commit and once after. An arm for the refusal alone would not distinguish a leg that reds
 # correctly from one that reds on everything.
 # NO KIT_REL SWEEP IN THIS FILE, DELIBERATELY. Every path below is INSIDE the fixture tree this
-# suite builds with `mkdir -p tools/unattended`, so `tools/` here is the FIXTURE's own layout
+# suite builds with `mkdir -p <prefix>/unattended`, so `<prefix>/` here is the FIXTURE's own layout
 # and not gov's install prefix -- a fixture value, not a path to derive. Sweeping it broke 14
 # of 19 arms: the `.unattended.conf` heredoc is `<<'CONF'`, which is QUOTED, so the config got
 # the four literal bytes `$KIT_REL` and the generated-index claim pointed at nothing. This
 # suite is not on the bar, so nothing would have reported it.
 set -u
+HERE="$(cd "$(dirname "$0")" && pwd)"
+# >>> derive_self_rel — canonical copy: kit-rel.sh in gov's lib dir (byte-identical; gated)
+derive_self_rel() {
+  local _dsr_p _dsr_rel=""
+  _dsr_p=$(cd "$1" 2>/dev/null && pwd) || return 1
+  while [ ! -e "$_dsr_p/.git" ]; do
+    [ "$(dirname "$_dsr_p")" = "$_dsr_p" ] && return 1
+    _dsr_rel="$(basename "$_dsr_p")${_dsr_rel:+/$_dsr_rel}"
+    _dsr_p=$(dirname "$_dsr_p")
+  done
+  printf '%s\n' "$_dsr_rel"
+}
+# <<< derive_self_rel
+KIT_REL=$(derive_self_rel "$HERE") || { echo "check-pass-order.test: not inside a git repository"; exit 2; }
+# PFX is the install prefix WITH its trailing slash, derived from where this file sits and empty
+# at a root install: every fixture and host path below is spelled through it, never through a
+# literal prefix (TOOL-aRepatriatedFork-28).
+case "$KIT_REL" in */*) PFX="${KIT_REL%/*}/" ;; *) PFX="" ;; esac
 st=0; n=0
 # THE LEG'S FIXTURE-RELATIVE PATH, written ONCE. Every arm below runs it from inside the fixture
-# tree this suite builds, so `tools/` here is the FIXTURE's own layout and is correct at any
+# tree this suite builds, so `<prefix>/` here is the FIXTURE's own layout and is correct at any
 # install prefix -- the file header says why sweeping it to a derived prefix broke 14 of 19 arms.
 # What this variable changes is only that the path is spelled once rather than in every arm: the
 # carried-prefix BAN counts literals, and thirty copies of a correct literal are still thirty.
-LEG="tools/unattended/check-pass-order.sh"
+LEG="${PFX}unattended/check-pass-order.sh"
 SCRIPT="$(cd "$(dirname "$0")" && pwd)/check-pass-order.sh"
 KIT="$(cd "$(dirname "$0")" && pwd)"
 [ -f "$SCRIPT" ] || { echo "FAIL cannot find check-pass-order.sh beside this test"; exit 2; }
@@ -37,16 +55,17 @@ mkfixture() { # run-state-mode · staging-order -> prints the fixture root
   ( cd "$T" || exit 2
     git init -q .
     git config user.email t@t; git config user.name t; git config commit.gpgsign false
-    mkdir -p tools/unattended memory/builds/tOrder/spec
-    cp "$KIT/lib-unattended.sh" tools/unattended/ 2>/dev/null || true
-    cp "$KIT/unattended.sh"     tools/unattended/
-    cp "$KIT/check-pass-order.sh" tools/unattended/
+    mkdir -p ${PFX}unattended memory/builds/tOrder/spec
+    cp "$KIT/lib-unattended.sh" ${PFX}unattended/ 2>/dev/null || true
+    cp "$KIT/unattended.sh"     ${PFX}unattended/
+    cp "$KIT/check-pass-order.sh" ${PFX}unattended/
     cat > .unattended.conf <<'CONF'
 MEMORY_ROOT=memory
 PASS_ORDER_CUTOFF="2026-01-01"
-GENERATED_INDEXES="memory/LIVE.md:tools/memory-tree/gen_build_index.py"
+GENERATED_INDEXES="memory/LIVE.md:{PFX}memory-tree/gen_build_index.py"
 SHARED_RECORDS="memory/DECISIONS.md memory/backlog"
 CONF
+    sed -i "s#{PFX}#${PFX}#" .unattended.conf   # the quoted heredoc cannot expand the prefix
     cat > memory/builds/tOrder/README.md <<'RM'
 ---
 slug: tOrder
@@ -132,14 +151,14 @@ SPEC
       git add -A >/dev/null; git commit -q -m "drop the build folder" --no-verify
       git checkout -q --orphan clean-base
       git rm -r -q --cached . >/dev/null 2>&1 || true
-      git add tools .unattended.conf >/dev/null 2>&1
+      git add "./${PFX}" .unattended.conf >/dev/null 2>&1
       git commit -q -m "fixture base without the build folder" --no-verify
       git branch -q -D master main 2>/dev/null || true
       if [ "$ord" = "preanchor-record" ]; then
         mkdir -p memory/backlog; printf 'a row\n' > memory/backlog/ARCH.md; git add -A >/dev/null
         git commit -q -m "backlog(ARCH-tOrder-1): open the row" --no-verify
       else
-        printf 'the product\n' > tools/product.sh; git add -A >/dev/null
+        printf 'the product\n' > ${PFX}product.sh; git add -A >/dev/null
         git commit -q -m "ARCH-tOrder-1: build the thing" --no-verify
       fi
       # `preanchor` puts FILLER between the product commit and the folder, so the violation sits
@@ -147,7 +166,7 @@ SPEC
       # positions, two arms — otherwise both would test the same commit and one would prove nothing.
       if [ "$ord" = "preanchor" ]; then
         printf 'filler
-' > tools/filler.sh; git add -A >/dev/null
+' > ${PFX}filler.sh; git add -A >/dev/null
         git commit -q -m "unrelated filler" --no-verify
       fi
       mkdir -p memory/builds/tOrder/spec
@@ -196,7 +215,7 @@ ids: ARCH-tOrder-1
 <!-- /gen:build-units -->
 <!-- /gen:build-index -->
 RM3
-      printf 'the product\n' > tools/product.sh; git add -A >/dev/null
+      printf 'the product\n' > ${PFX}product.sh; git add -A >/dev/null
       git commit -q -m "ARCH-tOrder-1: build the thing" --no-verify
       write_spec
       git add -A >/dev/null; git commit -q -m "spec ARCH-tOrder-1 written afterwards" --no-verify
@@ -211,10 +230,10 @@ RM3
       printf 'regenerated index
 ' > memory/LIVE.md
       git add -A >/dev/null; git commit -q -m "spec ARCH-tOrder-1 authored" --no-verify
-      printf 'the product\n' > tools/product.sh; git add -A >/dev/null
+      printf 'the product\n' > ${PFX}product.sh; git add -A >/dev/null
       git commit -q -m "ARCH-tOrder-1: build the thing" --no-verify
     else
-      printf 'the product\n' > tools/product.sh; git add -A >/dev/null
+      printf 'the product\n' > ${PFX}product.sh; git add -A >/dev/null
       git commit -q -m "ARCH-tOrder-1: build the thing" --no-verify
       write_spec
       printf 'regenerated index
@@ -280,8 +299,8 @@ rm -rf "$T"
 # ---- block copied verbatim between two scripts is not the same block.
 T=$(mkfixture run build-first)
 ( cd "$T" && printf 'echo OWNED; plan_state() { echo READY; }
-' > tools/unattended/evil.sh    && printf '
-DRIVER="tools/unattended/evil.sh"
+' > ${PFX}unattended/evil.sh    && printf '
+DRIVER="'"${PFX}unattended/evil.sh"'"
 ' >> .unattended.conf )
 o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
 n=$((n+1)); case "$o" in *OWNED*) echo "FAIL a conf line redirected DRIVER, so the leg eval'd a file the graded run chose"; st=1 ;; *) echo "ok   hostile conf: DRIVER is not assignable from the conf" ;; esac
@@ -299,7 +318,7 @@ rm -rf "$T"
 # ---- THE LIVENESS PROBE. A leg whose classifier cannot be sliced must SAY so and exit 2, never
 # ---- report a clean bill. Staged by breaking the driver's function header in a copy.
 T=$(mkfixture run spec-first)
-( cd "$T" && sed -i 's/^plan_state()/plan_state_renamed()/' tools/unattended/unattended.sh )
+( cd "$T" && sed -i 's/^plan_state()/plan_state_renamed()/' ${PFX}unattended/unattended.sh )
 o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
 same "unsliceable classifier: exits 2 rather than reporting clean" "$rc" "2"
 has  "unsliceable classifier: it says which predicate it lost" "$o" "plan_state"
@@ -309,7 +328,7 @@ rm -rf "$T"
 # ---- Every id ending in a 1-up sequence is a prefix of nine others, and an unanchored match would
 # ---- attribute the wrong commit -- which on this leg means grading the wrong parent.
 T=$(mkfixture run spec-first)
-( cd "$T" && printf 'x\n' > tools/other.sh && git add -A >/dev/null \
+( cd "$T" && printf 'x\n' > ${PFX}other.sh && git add -A >/dev/null \
     && git commit -q -m "ARCH-tOrder-11: a different unit entirely" --no-verify )
 o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
 same "id join is whole-token: a -11 commit does not disturb -1's verdict" "$rc" "0"

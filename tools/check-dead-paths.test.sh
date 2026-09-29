@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# check-dead-paths.test.sh — self-test for tools/check-dead-paths.sh.
+# check-dead-paths.test.sh — self-test for <prefix>/check-dead-paths.sh.
 #
-#   bash tools/check-dead-paths.test.sh
+#   bash <prefix>/check-dead-paths.test.sh
 #
 # Exit 0 = every arm held · 1 = an arm failed · 2 = the harness could not set up.
 #
@@ -22,9 +22,27 @@
 # NOTHING HERE TOUCHES THE REAL TREE. The gate `cd`s to its own git toplevel, so every arm runs it
 # from inside the scratch repo it was built for.
 set -u
+HERE="$(cd "$(dirname "$0")" && pwd)"
+# >>> derive_self_rel — canonical copy: kit-rel.sh in gov's lib dir (byte-identical; gated)
+derive_self_rel() {
+  local _dsr_p _dsr_rel=""
+  _dsr_p=$(cd "$1" 2>/dev/null && pwd) || return 1
+  while [ ! -e "$_dsr_p/.git" ]; do
+    [ "$(dirname "$_dsr_p")" = "$_dsr_p" ] && return 1
+    _dsr_rel="$(basename "$_dsr_p")${_dsr_rel:+/$_dsr_rel}"
+    _dsr_p=$(dirname "$_dsr_p")
+  done
+  printf '%s\n' "$_dsr_rel"
+}
+# <<< derive_self_rel
+KIT_REL=$(derive_self_rel "$HERE") || { echo "dead-paths.test: not inside a git repository"; exit 2; }
+# PFX is the install prefix WITH its trailing slash, derived from where this file sits and empty
+# at a root install: every fixture and host path below is spelled through it, never through a
+# literal prefix (TOOL-aRepatriatedFork-28).
+PFX="${KIT_REL:+$KIT_REL/}"
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
-GATE_SRC="$ROOT/tools/check-dead-paths.sh"
+GATE_SRC="$ROOT/${PFX}check-dead-paths.sh"
 [ -f "$GATE_SRC" ] || { echo "dead-paths.test: no gate at $GATE_SRC"; exit 2; }
 
 FLOOR_ASSERTIONS=19
@@ -53,17 +71,17 @@ arm() {
 # precisely because they must NOT satisfy the sentinel.
 mkrepo() {
   local d="$1"; shift
-  mkdir -p "$d/tools"
+  mkdir -p "$d/${PFX}"
   ( cd "$d" && git init -q && git config core.autocrlf false \
       && git config user.email t@t && git config user.name t ) || return 1
-  cp "$GATE_SRC" "$d/tools/check-dead-paths.sh"
+  cp "$GATE_SRC" "$d/${PFX}check-dead-paths.sh"
   printf 'placeholder catalogue\n' > "$d/parallel-coding-governance.domain-rules.md"
   printf 'a live file\n' > "$d/README.md"
   ( cd "$d" && git add -A && git commit -qm seed )
   ( cd "$d" && git rm -q parallel-coding-governance.domain-rules.md && git commit -qm delete )
 }
 
-run() { ( cd "$1" && bash tools/check-dead-paths.sh "${2:---check}" ); }
+run() { ( cd "$1" && bash ${PFX}check-dead-paths.sh "${2:---check}" ); }
 
 # ONE repo carries every arm that needs the same HISTORY. `git init` costs seconds on Windows and
 # eleven of them made this suite the slowest leg on the bar; the arms below differ in WORKING TREE,
@@ -75,7 +93,7 @@ mkrepo "$BASE" || exit 2
 # body. Clears the waiver registry too, so no arm inherits the previous one's.
 reset_base() {
   printf 'a live file\n' > "$BASE/README.md"
-  rm -f "$BASE/tools/dead-path-waivers.txt"
+  rm -f "$BASE/${PFX}dead-path-waivers.txt"
   rm -rf "$BASE/memory"
   [ $# -gt 0 ] && printf '%s\n' "$@" >> "$BASE/README.md"
   ( cd "$BASE" && git add -A )
@@ -113,20 +131,20 @@ wrow() { printf '%s\t%s\t%s\t%s\n' "$1" "$2" "$3" "$4"; }
 CARRIER='see parallel-coding-governance.domain-rules.md for the checklists'
 
 reset_base "$CARRIER"
-{ printf '# waivers\n'; wrow README.md 1 "$CARRIER" 'deliberate, migration prose'; } > "$BASE/tools/dead-path-waivers.txt"
+{ printf '# waivers\n'; wrow README.md 1 "$CARRIER" 'deliberate, migration prose'; } > "$BASE/${PFX}dead-path-waivers.txt"
 ( cd "$BASE" && git add -A )
 arm "green: a declared waiver silences its own hit" 0 "1 declared waiver(s)" -- run "$BASE"
 
 # THE ARM THE WHOLE RE-KEY EXISTS FOR. Under line keying this redded, twice in one build, for a
 # change that had nothing to do with the waiver.
 reset_base 'an unrelated line inserted above the carrier' "$CARRIER"
-{ printf '# waivers\n'; wrow README.md 1 "$CARRIER" 'deliberate, migration prose'; } > "$BASE/tools/dead-path-waivers.txt"
+{ printf '# waivers\n'; wrow README.md 1 "$CARRIER" 'deliberate, migration prose'; } > "$BASE/${PFX}dead-path-waivers.txt"
 ( cd "$BASE" && git add -A )
 arm "green: a DIFFERENT line above the carrier does not unpin the waiver" 0 "1 declared waiver(s)" -- run "$BASE"
 
 # A waiver whose carrier is gone must red, or the list stops shrinking.
 reset_base
-{ printf '# waivers\n'; wrow README.md 1 "$CARRIER" 'the carrier this excuses was already removed'; } > "$BASE/tools/dead-path-waivers.txt"
+{ printf '# waivers\n'; wrow README.md 1 "$CARRIER" 'the carrier this excuses was already removed'; } > "$BASE/${PFX}dead-path-waivers.txt"
 ( cd "$BASE" && git add -A )
 arm "red: a waiver whose carrier is gone is stale" 1 "stale waiver(s)" -- run "$BASE"
 
@@ -134,13 +152,13 @@ arm "red: a waiver whose carrier is gone is stale" 1 "stale waiver(s)" -- run "$
 # a line whose waiver should be re-read. The message is the UNWAIVED one, not the stale one, because
 # the unwaived report comes first and exits — asserted as it behaves rather than as it reads better.
 reset_base 'see parallel-coding-governance.domain-rules.md for the checklist'
-{ printf '# waivers\n'; wrow README.md 1 "$CARRIER" 'deliberate, migration prose'; } > "$BASE/tools/dead-path-waivers.txt"
+{ printf '# waivers\n'; wrow README.md 1 "$CARRIER" 'deliberate, migration prose'; } > "$BASE/${PFX}dead-path-waivers.txt"
 ( cd "$BASE" && git add -A )
 arm "red: a REWORDED carrier is no longer waived" 1 "names a path this repo DELETED" -- run "$BASE"
 
 # A waiver must not silence a DIFFERENT line in the same file.
 reset_base 'filler' 'see parallel-coding-governance.domain-rules.md here'
-{ printf '# waivers\n'; wrow README.md 1 "$CARRIER" 'waives text that is not here'; } > "$BASE/tools/dead-path-waivers.txt"
+{ printf '# waivers\n'; wrow README.md 1 "$CARRIER" 'waives text that is not here'; } > "$BASE/${PFX}dead-path-waivers.txt"
 ( cd "$BASE" && git add -A )
 arm "red: a waiver whose text names no line does not cover this hit" 1 "names a path this repo DELETED" -- run "$BASE"
 
@@ -148,19 +166,19 @@ arm "red: a waiver whose text names no line does not cover this hit" 1 "names a 
 # unwaived hit reds. This is the case the ordinal exists for and the case rev-2 of the spec got
 # wrong, asserting that one ordinal-bearing row could clear it.
 reset_base "$CARRIER" "$CARRIER"
-{ printf '# waivers\n'; wrow README.md 1 "$CARRIER" 'first occurrence only'; } > "$BASE/tools/dead-path-waivers.txt"
+{ printf '# waivers\n'; wrow README.md 1 "$CARRIER" 'first occurrence only'; } > "$BASE/${PFX}dead-path-waivers.txt"
 ( cd "$BASE" && git add -A )
 arm "red: two identical carriers, one row — the second is unwaived" 1 "names a path this repo DELETED" -- run "$BASE"
 
 reset_base "$CARRIER" "$CARRIER"
-{ printf '# waivers\n'; wrow README.md 1 "$CARRIER" 'first occurrence'; wrow README.md 2 "$CARRIER" 'second occurrence, its own reason'; } > "$BASE/tools/dead-path-waivers.txt"
+{ printf '# waivers\n'; wrow README.md 1 "$CARRIER" 'first occurrence'; wrow README.md 2 "$CARRIER" 'second occurrence, its own reason'; } > "$BASE/${PFX}dead-path-waivers.txt"
 ( cd "$BASE" && git add -A )
 arm "green: two identical carriers, two rows at ordinals 1 and 2" 0 "2 declared waiver(s)" -- run "$BASE"
 
 # THE RESIDUAL, armed rather than argued away. An IDENTICAL line above a waived carrier DOES move the
 # ordinal — the one drift the new key keeps, named in the registry header as the case it exists for.
 reset_base "$CARRIER" "$CARRIER"
-{ printf '# waivers\n'; wrow README.md 2 "$CARRIER" 'pinned to the second occurrence'; } > "$BASE/tools/dead-path-waivers.txt"
+{ printf '# waivers\n'; wrow README.md 2 "$CARRIER" 'pinned to the second occurrence'; } > "$BASE/${PFX}dead-path-waivers.txt"
 ( cd "$BASE" && git add -A )
 arm "red: an IDENTICAL line above a waived carrier renumbers it" 1 "names a path this repo DELETED" -- run "$BASE"
 
@@ -169,7 +187,7 @@ arm "red: an IDENTICAL line above a waived carrier renumbers it" 1 "names a path
 # inherited.
 for bad in 0 zero '' -1; do
   reset_base "$CARRIER"
-  { printf '# waivers\n'; wrow README.md "$bad" "$CARRIER" 'ordinal is not a positive integer'; } > "$BASE/tools/dead-path-waivers.txt"
+  { printf '# waivers\n'; wrow README.md "$bad" "$CARRIER" 'ordinal is not a positive integer'; } > "$BASE/${PFX}dead-path-waivers.txt"
   ( cd "$BASE" && git add -A )
   arm "red: ordinal [$bad] is MALFORMED, not stale" 1 "MALFORMED waiver row" -- run "$BASE"
 done
@@ -178,7 +196,7 @@ done
 # the branch is unreachable in the ordinary case, because a gone file usually leaves its carrier
 # behind as an unwaived hit and that report exits first.
 reset_base
-{ printf '# waivers\n'; wrow NO-SUCH-FILE.md 1 'text that is not a carrier anywhere' 'names a file that is gone'; } > "$BASE/tools/dead-path-waivers.txt"
+{ printf '# waivers\n'; wrow NO-SUCH-FILE.md 1 'text that is not a carrier anywhere' 'names a file that is gone'; } > "$BASE/${PFX}dead-path-waivers.txt"
 ( cd "$BASE" && git add -A )
 arm "red: a row naming an absent file is stale, with its own reason" 1 "file is gone" -- run "$BASE"
 
@@ -187,7 +205,7 @@ arm "red: a row naming an absent file is stale, with its own reason" 1 "file is 
 # a reason nobody can see. ENVIRON does not expand, and this arm is what proves it.
 BSLASH='printf "# ARCH \\n" and parallel-coding-governance.domain-rules.md'
 reset_base "$BSLASH"
-{ printf '# waivers\n'; wrow README.md 1 "$BSLASH" 'carrier text holds a literal backslash-n'; } > "$BASE/tools/dead-path-waivers.txt"
+{ printf '# waivers\n'; wrow README.md 1 "$BSLASH" 'carrier text holds a literal backslash-n'; } > "$BASE/${PFX}dead-path-waivers.txt"
 ( cd "$BASE" && git add -A )
 arm "green: a carrier holding a literal backslash-n still resolves" 0 "1 declared waiver(s)" -- run "$BASE"
 
@@ -196,10 +214,10 @@ arm "green: a carrier holding a literal backslash-n still resolves" 0 "1 declare
 # exists to avoid being: a selector matching nothing prints nothing, and nothing is what a pass
 # prints (memory/gotchas/vacuous-selector-empty-population.md).
 NODEL="$TMPROOT/nodel"
-mkdir -p "$NODEL/tools"
+mkdir -p "$NODEL/${PFX}"
 ( cd "$NODEL" && git init -q && git config core.autocrlf false \
     && git config user.email t@t && git config user.name t )
-cp "$GATE_SRC" "$NODEL/tools/check-dead-paths.sh"
+cp "$GATE_SRC" "$NODEL/${PFX}check-dead-paths.sh"
 printf 'nothing was ever deleted here\n' > "$NODEL/README.md"
 ( cd "$NODEL" && git add -A && git commit -qm seed )
 arm "refuse: a repo with no deletion history is not a clean verdict" 2 "the derivation is broken, not the tree clean" -- run "$NODEL"
@@ -207,10 +225,10 @@ arm "refuse: a repo with no deletion history is not a clean verdict" 2 "the deri
 # A repo that HAS deleted things, but not the frozen sentinel, must red on the sentinel — this is the
 # arm that catches a derivation which silently stops finding gov's own deleted companions.
 SENT="$TMPROOT/sentinel"
-mkdir -p "$SENT/tools"
+mkdir -p "$SENT/${PFX}"
 ( cd "$SENT" && git init -q && git config core.autocrlf false \
     && git config user.email t@t && git config user.name t )
-cp "$GATE_SRC" "$SENT/tools/check-dead-paths.sh"
+cp "$GATE_SRC" "$SENT/${PFX}check-dead-paths.sh"
 printf 'x\n' > "$SENT/unrelated.md"; printf 'y\n' > "$SENT/README.md"
 ( cd "$SENT" && git add -A && git commit -qm seed )
 ( cd "$SENT" && git rm -q unrelated.md && git commit -qm del )
@@ -222,14 +240,14 @@ arm "red: and it says the derivation broke, not that the tree is clean" 1 "DERIV
 # accident while this suite was being written and nothing pinned it, which is how a branch goes quiet.
 # Exit 1 (the gate ran and found its own inputs wrong), not 2 (this repo cannot be graded at all).
 EMPTY="$TMPROOT/emptyneedles"
-mkdir -p "$EMPTY/tools/sub"
+mkdir -p "$EMPTY/${PFX}sub"
 ( cd "$EMPTY" && git init -q && git config core.autocrlf false \
     && git config user.email t@t && git config user.name t )
-cp "$GATE_SRC" "$EMPTY/tools/check-dead-paths.sh"
+cp "$GATE_SRC" "$EMPTY/${PFX}check-dead-paths.sh"
 printf 'x\n' > "$EMPTY/moved.md"; printf 'y\n' > "$EMPTY/README.md"
 ( cd "$EMPTY" && git add -A && git commit -qm seed )
 ( cd "$EMPTY" && git rm -q moved.md && git commit -qm remove )
-printf 'x\n' > "$EMPTY/tools/sub/moved.md"
+printf 'x\n' > "$EMPTY/${PFX}sub/moved.md"
 ( cd "$EMPTY" && git add -A && git commit -qm readd )
 arm "red: every deleted basename re-added leaves an EMPTY needle set" 1 "needle set is EMPTY" -- run "$EMPTY"
 
@@ -266,8 +284,8 @@ arm "and the sentinel still anchors that repo's derivation" 0 "parallel-coding-g
 # mentions becomes a violation and the gate is unusable. Verified by disabling the pass: this arm is
 # the one that reds, and the re-add arm above stays green either way.
 mkrepo "$TMPROOT/gentail" || exit 2
-mkdir -p "$TMPROOT/gentail/tools/live"
-printf 'a live descriptor\n' > "$TMPROOT/gentail/tools/live/kit.toml"
+mkdir -p "$TMPROOT/gentail/${PFX}live"
+printf 'a live descriptor\n' > "$TMPROOT/gentail/${PFX}live/kit.toml"
 printf 'a legacy descriptor\n' > "$TMPROOT/gentail/legacy.kit.toml"
 ( cd "$TMPROOT/gentail" && git add -A && git commit -qm seedtail )
 ( cd "$TMPROOT/gentail" && git rm -q legacy.kit.toml && git commit -qm droplegacy )

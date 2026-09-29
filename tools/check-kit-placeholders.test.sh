@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# check-kit-placeholders.test.sh — red/green arms for tools/check-kit-placeholders.py
+# check-kit-placeholders.test.sh — red/green arms for <prefix>/check-kit-placeholders.py
 # (TOOL-dRetiredFork-19).
 #
 # HERMETIC: every arm builds its own scratch tree under mktemp -d and never touches the real one, so
@@ -11,13 +11,31 @@
 # the braces backslash-escaped for the shell, and a predicate matching only the bare `{{KIT_DIR}}`
 # finds NOTHING in the one file it exists to read. That arm is what stops the fix regressing.
 set -u
+HERE="$(cd "$(dirname "$0")" && pwd)"
+# >>> derive_self_rel — canonical copy: kit-rel.sh in gov's lib dir (byte-identical; gated)
+derive_self_rel() {
+  local _dsr_p _dsr_rel=""
+  _dsr_p=$(cd "$1" 2>/dev/null && pwd) || return 1
+  while [ ! -e "$_dsr_p/.git" ]; do
+    [ "$(dirname "$_dsr_p")" = "$_dsr_p" ] && return 1
+    _dsr_rel="$(basename "$_dsr_p")${_dsr_rel:+/$_dsr_rel}"
+    _dsr_p=$(dirname "$_dsr_p")
+  done
+  printf '%s\n' "$_dsr_rel"
+}
+# <<< derive_self_rel
+KIT_REL=$(derive_self_rel "$HERE") || { echo "check-kit-placeholders.test: not inside a git repository"; exit 2; }
+# PFX is the install prefix WITH its trailing slash, derived from where this file sits and empty
+# at a root install: every fixture and host path below is spelled through it, never through a
+# literal prefix (TOOL-aRepatriatedFork-28).
+PFX="${KIT_REL:+$KIT_REL/}"
 
 # The shrink-only assertion floor. A suite that stops running arms must RED rather than report a
 # smaller success: `check-testsuite-counts.sh` reads this pin, the printed count, and the comparison
 # between them, because a pin nothing reads is the same nothing as no pin.
 FLOOR_ASSERTIONS=12
 GATE="$(cd "$(dirname "$0")" && pwd)/check-kit-placeholders.py"
-# The launcher is RESOLVED by running it (tools/lib/resolve-python.sh); `PY=` overrides. A bare
+# The launcher is RESOLVED by running it (<prefix>/lib/resolve-python.sh); `PY=` overrides. A bare
 # default here was the parameter-default shape the resolver ban now catches.
 if [ -z "${PY:-}" ] && [ -f "${GATE%/*}/lib/resolve-python.sh" ]; then . "${GATE%/*}/lib/resolve-python.sh"; PY=$(resolve_python) || exit 2; fi
 PY=${PY:-python}   # gov:literal-python — last-resort fallback when lib/ is absent (adopter layout)
@@ -47,8 +65,8 @@ spell() {
   esac
 }
 scratch() {
-  mkdir -p "$1/tools/demo"
-  cat > "$1/tools/demo/kit.toml" <<TOML
+  mkdir -p "$1/${PFX}demo"
+  cat > "$1/${PFX}demo/kit.toml" <<TOML
 [[files]]
 include = ["t.md"]
 role = "rendered"
@@ -57,7 +75,7 @@ placeholders = [$2]
 [adopt]
 $4
 TOML
-  { printf '#!/usr/bin/env bash\n# demo adopter\n'; spell "$3"; } > "$1/tools/demo/adopt-demo.sh"
+  { printf '#!/usr/bin/env bash\n# demo adopter\n'; spell "$3"; } > "$1/${PFX}demo/adopt-demo.sh"
 }
 
 run() { "$PY" "$GATE" --root "$1" ${2:-} 2>&1; }
@@ -85,8 +103,8 @@ arm "...and the refusal names the adopter that omits it" 1 "$rc3" "$o3" "adopt-d
 
 # ---- AC4: an EMPTY population REFUSES. A gate that scanned nothing reports the same zero as a
 # ---- clean tree, which is the vacuous-selector shape this repo refuses.
-T4=$(mktemp -d); mkdir -p "$T4/tools/demo"
-printf '[[files]]\ninclude = ["t.md"]\nrole = "engine"\n\n[adopt]\nargv = []\n' > "$T4/tools/demo/kit.toml"
+T4=$(mktemp -d); mkdir -p "$T4/${PFX}demo"
+printf '[[files]]\ninclude = ["t.md"]\nrole = "engine"\n\n[adopt]\nargv = []\n' > "$T4/${PFX}demo/kit.toml"
 o4=$(run "$T4"); rc4=$?
 arm "an EMPTY declaring population REFUSES rather than passing" 2 "$rc4" "$o4" "REFUSED"
 
@@ -107,19 +125,19 @@ arm "an adopter-less kit with NO stated reason REDS" 1 "$rc6" "$o6" "no resolvab
 # ---- adopter's. The key is in NO `[config]` list on purpose: the caps a template cites live in the
 # ---- example alone, so an arm reading the lists only would pass this fixture by scanning nothing.
 T7=$(mktemp -d); scratch "$T7" '"KIT_DIR"' escaped 'argv = ["bash", "{kit}/adopt-demo.sh"]'
-printf '\n[config]\nfile = ".demo.conf"\noptional_keys = ["OTHER_KEY"]\n' >> "$T7/tools/demo/kit.toml"
-printf 'INDEX_CAP_LINES="250"\n' > "$T7/tools/demo/.demo.conf.example"
-printf 'This repo declares `INDEX_CAP_LINES=0`.\n' > "$T7/tools/demo/t.md"
+printf '\n[config]\nfile = ".demo.conf"\noptional_keys = ["OTHER_KEY"]\n' >> "$T7/${PFX}demo/kit.toml"
+printf 'INDEX_CAP_LINES="250"\n' > "$T7/${PFX}demo/.demo.conf.example"
+printf 'This repo declares `INDEX_CAP_LINES=0`.\n' > "$T7/${PFX}demo/t.md"
 o7=$(run "$T7"); rc7=$?
 arm "a rendered template spelling its own kit's conf value REDS" 1 "$rc7" "$o7" "INDEX_CAP_LINES"
 # ...and the render form passes: the same key through a placeholder is what the arm asks for.
-printf 'This tree declares `INDEX_CAP_LINES={{KIT_DIR}}`.\n' > "$T7/tools/demo/t.md"
+printf 'This tree declares `INDEX_CAP_LINES={{KIT_DIR}}`.\n' > "$T7/${PFX}demo/t.md"
 o8=$(run "$T7"); rc8=$?
 arm "the same key rendered through a placeholder passes" 0 "$rc8" "$o8" "spell no conf value"
 
 # ...and a FORMAT description of the value is not a value: a quoted `<placeholder>` states no
 # ---- value of gov's, so it passes (gate repair at VERIFYING, TOOL-aRepatriatedFork-10).
-printf 'Pinned per gate, `INDEX_CAP_LINES="<gate>:<n>"`.\n' > "$T7/tools/demo/t.md"
+printf 'Pinned per gate, `INDEX_CAP_LINES="<gate>:<n>"`.\n' > "$T7/${PFX}demo/t.md"
 o9=$(run "$T7"); rc9=$?
 arm "a quoted <placeholder> format description is not a conf value" 0 "$rc9" "$o9" "spell no conf value"
 

@@ -31,11 +31,15 @@ derive_self_rel() {
 }
 # <<< derive_self_rel
 KIT_REL=$(derive_self_rel "$HERE") || { echo "FAIL this suite is not inside a git repository"; exit 2; }
+# PFX is the install prefix WITH its trailing slash, derived from where this file sits and empty
+# at a root install: every fixture and host path below is spelled through it, never through a
+# literal prefix (TOOL-aRepatriatedFork-28).
+case "$KIT_REL" in */*) PFX="${KIT_REL%/*}/" ;; *) PFX="" ;; esac
 TMP=$(mktemp -d)
 trap 'rm -rf "$TMP"' EXIT
 # The resolver, INLINE. This kit is copy-installed as a standalone directory, so `../lib/` does not
-# exist in an adopting repo. The block below is byte-identical to tools/lib/resolve-python.sh and
-# tools/lib/resolve-python.test.sh reds if any copy drifts.
+# exist in an adopting repo. The block below is byte-identical to <prefix>/lib/resolve-python.sh and
+# <prefix>/lib/resolve-python.test.sh reds if any copy drifts.
 #
 # This file invoked `python3` BARE — the shape a ban keyed on `command -v` cannot see, which is how
 # it survived the V5 migration. On a python3-only host it happened to work; on a host where the
@@ -461,7 +465,7 @@ no open-questions section at all
   > "$D/spec/2026-08-10-spec-tFixture-64.md"                                   # no such section -> must SAY SO, not pass
 # The witness sits on a CONTINUATION line. The accumulator that folds continuations into their
 # bullet had no fixture: deleting it left this harness unchanged while the real gate went red.
-wit | sed 's|- AC1 When run, `check-memory-hygiene.sh` passes.|- **AC1** When run, the gate named below passes:\n  `bash tools/memory-tree/check-memory-hygiene.sh`|' \
+wit | sed 's|- AC1 When run, `check-memory-hygiene.sh` passes.|- **AC1** When run, the gate named below passes:\n  `bash '"${PFX}memory-tree/check-memory-hygiene.sh"'`|' \
   > "$D/spec/2026-08-10-spec-tFixture-55.md"   # witness on a continuation -> silent
 # A hard-wrapped continuation that OPENS with a cross-reference to other ACs. The first selector
 # read this as a new bullet head: it closed the real bullet early and invented a phantom label, so

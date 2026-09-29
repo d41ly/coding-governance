@@ -10,9 +10,25 @@
 # WHY A SEPARATE LEG rather than arms in the driver suite: that suite pins a single unit-branch
 # commit and never pushes. The arms here deliberately MOVE the advertised branch tip, and
 # retrofitting that into a shared fixture would perturb every existing arm in a 1600-line file.
-KIT_REL="${KIT_REL:-tools/unattended}"
 set -u
 HERE="$(cd "$(dirname "$0")" && pwd)"
+# >>> derive_self_rel — canonical copy: kit-rel.sh in gov's lib dir (byte-identical; gated)
+derive_self_rel() {
+  local _dsr_p _dsr_rel=""
+  _dsr_p=$(cd "$1" 2>/dev/null && pwd) || return 1
+  while [ ! -e "$_dsr_p/.git" ]; do
+    [ "$(dirname "$_dsr_p")" = "$_dsr_p" ] && return 1
+    _dsr_rel="$(basename "$_dsr_p")${_dsr_rel:+/$_dsr_rel}"
+    _dsr_p=$(dirname "$_dsr_p")
+  done
+  printf '%s\n' "$_dsr_rel"
+}
+# <<< derive_self_rel
+KIT_REL=$(derive_self_rel "$HERE") || { echo "cross-component.test: not inside a git repository"; exit 2; }
+# PFX is the install prefix WITH its trailing slash, derived from where this file sits and empty
+# at a root install: every fixture and host path below is spelled through it, never through a
+# literal prefix (TOOL-aRepatriatedFork-28).
+case "$KIT_REL" in */*) PFX="${KIT_REL%/*}/" ;; *) PFX="" ;; esac
 st=0; n=0
 hit()  { n=$((n+1)); grep -qF -- "$2" <<<"$1" || { echo "FAIL missing: $2"; st=1; }; }
 miss() { n=$((n+1)); if grep -qF -- "$2" <<<"$1"; then echo "FAIL unexpected: $2"; st=1; fi; }
@@ -43,7 +59,7 @@ git init -q repo && cd repo
 git config user.email t@t; git config user.name t; git config commit.gpgsign false
 git checkout -q -b main
 
-mkdir -p memory/guides tools/unattended .claude/skills/unattended
+mkdir -p memory/guides ${PFX}unattended .claude/skills/unattended
 # The REAL files, not stubs. Measured during this build: an incomplete fixture makes the leg fail on
 # checks that have nothing to do with the subject, and a naive arm reading "the leg failed" scores
 # that as a correct refusal. This is `fixture-passes-by-finding-nothing` inverted — the fixture fails
@@ -57,14 +73,14 @@ mkdir -p memory/guides tools/unattended .claude/skills/unattended
 # that leaves both checks reading what they were written to read.
 cp "$HERE/unattended.sh" "$HERE/check-unattended.sh" "$HERE/lib-unattended.sh" "$HERE/PROTOCOL.template.md" \
    "$HERE/SKILL.template.md" "$HERE/check-playbook.sh" "$HERE/PLAYBOOK-TEMPLATE.template.md" \
-   "$HERE/.unattended.conf.example" "$HERE/VERBS.template.md" tools/unattended/
+   "$HERE/.unattended.conf.example" "$HERE/VERBS.template.md" ${PFX}unattended/
 cp "$HERE/../../memory/guides/BUILD-METHOD.md" memory/guides/
 cp "$HERE/../../memory/guides/UNATTENDED-PROTOCOL.md" memory/guides/
 cp "$HERE/VERBS.template.md" memory/guides/UNATTENDED-VERBS.md
-sed -e 's|{{MEMORY_ROOT}}|memory|g' -e 's|{{KIT_DIR}}|tools/unattended|g' \
+sed -e 's|{{MEMORY_ROOT}}|memory|g' -e 's|{{KIT_DIR}}|'"${PFX}unattended"'|g' \
     -e 's|{{KEEPALIVE_CREATE}}|CronCreate|g' -e 's|{{KEEPALIVE_DELETE}}|CronDelete|g' \
-    -e 's|{{KEEPALIVE_INTERVAL}}|every 10 minutes|g' -e 's|{{LANDER}}|bash tools/push-main.sh|g' \
-    -e 's|{{ANCHOR_SCOPE}}|published|g' -e 's|{{TOOL_ROOT}}|tools/|g' -e 's|{{MEMORY_TREE_DIR}}|tools/memory-tree|g' -e 's|{{AUTH_PARAM}}|--prompt|g'     "$HERE/SKILL.template.md" > .claude/skills/unattended/SKILL.md
+    -e 's|{{KEEPALIVE_INTERVAL}}|every 10 minutes|g' -e 's|{{LANDER}}|bash '"${PFX}push-main.sh"'|g' \
+    -e 's|{{ANCHOR_SCOPE}}|published|g' -e 's|{{TOOL_ROOT}}|'"${PFX}"'|g' -e 's|{{MEMORY_TREE_DIR}}|'"${PFX}memory-tree"'|g' -e 's|{{AUTH_PARAM}}|--prompt|g'     "$HERE/SKILL.template.md" > .claude/skills/unattended/SKILL.md
 # TOOL-aNamedGesture-1 - this chain is a SECOND hand-kept renderer, and nothing downstream reads the
 # file it writes closely enough to notice a placeholder nobody added an entry for. So the fixture
 # asserts its own render, which is what turns an omission here into a failure instead of a silent

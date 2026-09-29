@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# extract-arms.test.sh — the four states `tools/lib/extract-arms.sh` can report, each armed.
+# extract-arms.test.sh — the four states `<prefix>/lib/extract-arms.sh` can report, each armed.
 #
 # THE SUBJECT IS A SAFETY PROPERTY, WHICH IS WHY IT GETS ARMS AT ALL. `extract-arms.sh` is not a gate
 # leg; it is the thing that decides whether a rebuilt suite still grades what it used to. A wrong
@@ -10,16 +10,33 @@
 # AND IT HAD A WRONG ANSWER. The extractor guarded the empty inventory and nothing else, so a suite
 # printing 14 readable lines against 289 executed assertions came back as a confident 14-arm
 # inventory at exit 0 — 4.8% coverage, and a port dropping the other 275 would have diffed empty.
-# `tools/memory-tree/check-memory-hygiene.test.sh` is that suite; it costs 918 s to run, so the arm
+# `<prefix>/memory-tree/check-memory-hygiene.test.sh` is that suite; it costs 918 s to run, so the arm
 # below reproduces the SHAPE in a three-line fixture rather than paying for the instance.
 set -u
 HERE=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+# >>> derive_self_rel — canonical copy: kit-rel.sh in gov's lib dir (byte-identical; gated)
+derive_self_rel() {
+  local _dsr_p _dsr_rel=""
+  _dsr_p=$(cd "$1" 2>/dev/null && pwd) || return 1
+  while [ ! -e "$_dsr_p/.git" ]; do
+    [ "$(dirname "$_dsr_p")" = "$_dsr_p" ] && return 1
+    _dsr_rel="$(basename "$_dsr_p")${_dsr_rel:+/$_dsr_rel}"
+    _dsr_p=$(dirname "$_dsr_p")
+  done
+  printf '%s\n' "$_dsr_rel"
+}
+# <<< derive_self_rel
+KIT_REL=$(derive_self_rel "$HERE") || { echo "extract-arms.test: not inside a git repository"; exit 2; }
+# PFX is the install prefix WITH its trailing slash, derived from where this file sits and empty
+# at a root install: every fixture and host path below is spelled through it, never through a
+# literal prefix (TOOL-aRepatriatedFork-28).
+case "$KIT_REL" in */*) PFX="${KIT_REL%/*}/" ;; *) PFX="" ;; esac
 ROOT=$(git -C "$HERE" rev-parse --show-toplevel 2>/dev/null) || {
   echo "extract-arms.test: not a git work tree"; exit 2; }
 cd "$ROOT" || exit 2
-. "$ROOT/tools/lib/lib-selftest.sh"
+. "$ROOT/${PFX}lib/lib-selftest.sh"
 
-TOOL="$ROOT/tools/lib/extract-arms.sh"
+TOOL="$ROOT/${PFX}lib/extract-arms.sh"
 [ -f "$TOOL" ] || { echo "extract-arms.test: no extractor at $TOOL"; exit 2; }
 
 SELFTEST_FLOOR=9

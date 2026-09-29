@@ -3,7 +3,7 @@
 # own failure text, and every RED arm paired with a GREEN control. Silence proves nothing on its
 # own: a check that was never reached is silent for the same reason a passing one is.
 #
-#   bash tools/unattended/check-unattended.test.sh    # "PASS (…assertions)" + exit 0 = good
+#   bash <prefix>/unattended/check-unattended.test.sh    # "PASS (…assertions)" + exit 0 = good
 #
 # ONE scratch repo, rebuilt to a pristine state between arms. The kit is COPIED in rather than run
 # from the source tree, because the leg resolves its own install prefix and the parity arm depends
@@ -36,7 +36,7 @@ KIT_REL=$(derive_self_rel "$HERE") || { echo "FAIL this suite is not inside a gi
 
 # ---- THE SHARD CONTRACT — ADOPTED, not reinvented (TOOL-aShardedFloor-3) -------------------------
 # The contract is TOOL-aShardedFloor-2's and its reasoning lives in the head of
-# tools/unattended/unattended.test.sh: one file and guarded contiguous regions rather than a
+# <prefix>/unattended/unattended.test.sh: one file and guarded contiguous regions rather than a
 # physical split (which `check-arms.py`'s one-gate-one-sibling map and the armed-branch pin refuse),
 # the flag PARSED rather than position-read, and the refusal before any scratch dir exists.
 #

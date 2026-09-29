@@ -45,9 +45,10 @@
 set -u
 HERE="$(cd "$(dirname "$0")" && pwd)"
 SRC="$(cd "$HERE/.." && pwd)"
-# Where this repository keeps its kits, the hook's own default. The suite never ships, so only gov's
-# layout and a caller's override are ever asked for.
-KIT_REL="${KIT_REL:-tools}"
+# The kit root is the one the hook itself reads: GOV_KITROOT as `.githooks/gate-env.sh` declares it
+# (TOOL-aRepatriatedFork-28), never a literal prefix typed here.
+KIT_REL=$( . "$SRC/.githooks/gate-env.sh" >/dev/null 2>&1; printf '%s' "${GOV_KITROOT:-}" )
+[ -n "$KIT_REL" ] || { echo "pre-push.runlog.test: .githooks/gate-env.sh declares no GOV_KITROOT"; exit 2; }
 FLOOR_ASSERTIONS=246
 n=0; st=0
 SEEN=" "; WRITER_FNS=""

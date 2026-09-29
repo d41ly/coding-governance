@@ -30,6 +30,24 @@ import tempfile
 import time
 import types
 
+
+def derive_install_prefix() -> str:
+    """The install prefix WITH its trailing slash, derived from where this file sits and empty at a
+    root install. Every fixture and host path the self-test builds is spelled through it, never
+    through a literal prefix (TOOL-aRepatriatedFork-28)."""
+    import pathlib
+    here = pathlib.Path(__file__).resolve().parent
+    for anc in here.parents:
+        if (anc / ".git").exists():
+            rel = here.parent.relative_to(anc).as_posix()
+            return "" if rel == "." else rel + "/"
+    raise SystemExit(f"{pathlib.Path(__file__).name}: not inside a git repository, so there is no "
+                     "install prefix to derive")
+
+
+PFX = derive_install_prefix()
+
+
 HERE = pathlib.Path(__file__).resolve().parent
 
 
@@ -599,8 +617,8 @@ def make_target(tmp: pathlib.Path, deploy: str | None) -> pathlib.Path:
     return t
 
 
-DEPLOY_FULL = """gov_source = "local"
-prefix = "tools"
+DEPLOY_FULL = f"""gov_source = "local"
+prefix = "{PFX[:-1]}"
 kits = ["memory-tree"]
 
 [answers]
@@ -621,8 +639,8 @@ DEPLOY_REGISTRY_DEFAULT = "".join(
     ln for ln in DEPLOY_FULL.splitlines(keepends=True) if not ln.startswith("kits = "))
 assert "kits = " not in DEPLOY_REGISTRY_DEFAULT, "the kits line must be gone, or the fixture lies"
 
-DEPLOY_NO_ANSWERS = """gov_source = "local"
-prefix = "tools"
+DEPLOY_NO_ANSWERS = f"""gov_source = "local"
+prefix = "{PFX[:-1]}"
 kits = ["playbook"]
 """
 
@@ -630,7 +648,7 @@ kits = ["playbook"]
 def check_playbook_hole_modes(tmp: pathlib.Path) -> None:
     """DEPL-aRepatriatedFork-1 AC6, AC7, AC9, S5 — the placeholder hole in both modes, and the
     `[charter]` table's two govkit halves. Fixture-driven through `check`, asserted on its lines."""
-    base = ('gov_source = "local"\nprefix = "tools"\nkits = ["playbook"]\n\n'
+    base = (f'gov_source = "local"\nprefix = "{PFX[:-1]}"\nkits = ["playbook"]\n\n'
             '[answers]\nplaybook_path = "CHARTER.md"\n')
 
     def run_fixture(name: str, kits: list[str], deploy: str) -> subprocess.CompletedProcess:
@@ -670,7 +688,7 @@ def check_answers_parity(tmp: pathlib.Path) -> None:
     rp = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(rp)
     t = make_target(tmp / "answers-parity", (
-        'gov_source = "local"\nprefix = "tools"\nkits = ["memory-tree", "kickoff-manifest"]\n\n'
+        f'gov_source = "local"\nprefix = "{PFX[:-1]}"\nkits = ["memory-tree", "kickoff-manifest"]\n\n'
         '[answers]\nmemory_root = "docs/mem"\nmanifest_path = "docs/SESSION-KICKOFF.md"\n'
         'user_skills = "~/.claude/skills"\n\n[kit.kickoff-manifest]\nmanifest_path = "x.md"\n\n'
         '[kit.memory-tree]\nmemory_root = "notes"\n'))
@@ -696,7 +714,7 @@ def check_pytest_ini_probe(tmp: pathlib.Path) -> None:
              'timeout_method = "thread"\nsession_timeout = 1800\nfaulthandler_timeout = 240\n')
     unsized = sized.replace("faulthandler_timeout = 240\n", "")
     bare = '[project]\nname = "x"\n'
-    deploy = 'gov_source = "local"\nprefix = "tools"\nkits = ["pytest-parallel-guardrails"]\n'
+    deploy = f'gov_source = "local"\nprefix = "{PFX[:-1]}"\nkits = ["pytest-parallel-guardrails"]\n'
     line = "hole 'pytest-ini-knobs' is UNDISCHARGED"
 
     def run_fixture(name: str, files: dict[str, str]) -> tuple[pathlib.Path, subprocess.CompletedProcess]:
@@ -706,7 +724,7 @@ def check_pytest_ini_probe(tmp: pathlib.Path) -> None:
             (t / rel).write_text(body, encoding="utf-8", newline="\n")
         (t / ".governance" / "install.json").write_text(
             json.dumps({"schema": 2, "gov_source": "local", "kits": ["pytest-parallel-guardrails"],
-                        "files": [{"path": "tools/pytest-parallel-guardrails/crashprobe.py",
+                        "files": [{"path": f"{PFX}pytest-parallel-guardrails/crashprobe.py",
                                    "role": "engine", "kit": "pytest-parallel-guardrails",
                                    "written": True}]}, indent=2), encoding="utf-8", newline="\n")
         settle(t)
@@ -720,7 +738,7 @@ def check_pytest_ini_probe(tmp: pathlib.Path) -> None:
     t, p = run_fixture("pi-none", {"pyproject.toml": bare})
     check("[aRF-14 AC2] no pytest table anywhere is undischarged", line in p.stdout, p.stdout)
     import tomllib  # noqa: PLC0415
-    cmd = next(h for h in tomllib.loads((HERE.parents[1] / "tools" / "pytest-parallel-guardrails" /
+    cmd = next(h for h in tomllib.loads((HERE.parents[1] / PFX / "pytest-parallel-guardrails" /
                                           "kit.toml").read_text(encoding="utf-8"))["hole"]
                if h["id"] == "pytest-ini-knobs")["discharge"]["command"]
     q = subprocess.run([sys.executable, *cmd[1:]], cwd=str(t), capture_output=True, text=True, encoding="utf-8")
@@ -735,28 +753,28 @@ def check_shipped_verb(tmp: pathlib.Path) -> None:
     so the arm is observed REJECTING a verb that drops the role — not only accepting a good one.
     """
     fx = tmp / "shipped-fx"
-    (fx / "tools" / "govkit" / "entries").mkdir(parents=True, exist_ok=True)
-    (fx / "tools" / "demo").mkdir(parents=True, exist_ok=True)
-    shutil.copy(GOVKIT, fx / "tools" / "govkit" / "govkit.py")
-    shutil.copy2(GOVKIT.parent / "adopters.toml", fx / "tools" / "govkit" / "adopters.toml")  # arm 10 refuses a gov without it
-    (fx / "tools" / "govkit" / "registry.toml").write_text(
-        '[[entry]]\nid = "demo"\ndescriptor = "tools/govkit/entries/demo.kit.toml"\n',
+    (fx / PFX / "govkit" / "entries").mkdir(parents=True, exist_ok=True)
+    (fx / PFX / "demo").mkdir(parents=True, exist_ok=True)
+    shutil.copy(GOVKIT, fx / PFX / "govkit" / "govkit.py")
+    shutil.copy2(GOVKIT.parent / "adopters.toml", fx / PFX / "govkit" / "adopters.toml")  # arm 10 refuses a gov without it
+    (fx / PFX / "govkit" / "registry.toml").write_text(
+        '[[entry]]\nid = "demo"\ndescriptor = "{prefix}/govkit/entries/demo.kit.toml"\n',
         encoding="utf-8", newline="\n")
-    (fx / "tools" / "govkit" / "entries" / "demo.kit.toml").write_text(
-        'id = "demo"\nhome = "tools/demo"\n\n'
+    (fx / PFX / "govkit" / "entries" / "demo.kit.toml").write_text(
+        'id = "demo"\nhome = "demo"\n\n'
         '[[files]]\ninclude = ["run.sh"]\nrole = "engine"\nto = "{prefix}/{relpath}"\n\n'
         '[[files]]\ninclude = ["seed.txt"]\nrole = "generated"\nto = "{prefix}/seed.txt"\n',
         encoding="utf-8", newline="\n")
-    p = subprocess.run([sys.executable, str(fx / "tools" / "govkit" / "govkit.py"), "shipped"],
+    p = subprocess.run([sys.executable, str(fx / PFX / "govkit" / "govkit.py"), "shipped"],
                        capture_output=True, text=True, encoding="utf-8")
-    want = ["demo\tengine\ttools/demo/run.sh", "demo\tgenerated\ttools/demo/seed.txt"]
+    want = [f"demo\tengine\t{PFX}demo/run.sh", f"demo\tgenerated\t{PFX}demo/seed.txt"]
     cut = "\n".join(ln.split("\t", 1)[0] + "\t" + ln.split("\t")[-1]
                     for ln in p.stdout.splitlines() if "\t" in ln)
     check("[aRF-16 S1] `shipped` prints one row per survivor, with its entry and its role",
           p.returncode == 0 and p.stdout.splitlines() == want, p.stdout + p.stderr)
     check("[aRF-16 S1] ...and the same predicate REJECTS a copy with the role column deleted",
           cut.splitlines() != want and len(cut.splitlines()) == len(want), cut)
-    pr = subprocess.run([sys.executable, str(fx / "tools" / "govkit" / "govkit.py"),
+    pr = subprocess.run([sys.executable, str(fx / PFX / "govkit" / "govkit.py"),
                          "shipped", "--all"], capture_output=True, text=True, encoding="utf-8")
     check("[aRF-16 S1] `shipped` refuses an argument", pr.returncode == 2
           and "shipped takes no arguments" in pr.stderr, pr.stderr)
@@ -770,24 +788,24 @@ def check_epoch_verb(tmp: pathlib.Path) -> None:
     Each arm reads a different line, so a verb that printed one verdict for every state fails three.
     """
     fx = tmp / "epoch-fx"
-    for d in ("tools/govkit/entries", "tools/vk", "tools/nk"):
+    for d in (f"{PFX}govkit/entries", f"{PFX}vk", f"{PFX}nk"):
         (fx / d).mkdir(parents=True, exist_ok=True)
-    shutil.copy(GOVKIT, fx / "tools" / "govkit" / "govkit.py")
-    shutil.copy2(GOVKIT.parent / "adopters.toml", fx / "tools" / "govkit" / "adopters.toml")  # arm 10 refuses a gov without it
+    shutil.copy(GOVKIT, fx / PFX / "govkit" / "govkit.py")
+    shutil.copy2(GOVKIT.parent / "adopters.toml", fx / PFX / "govkit" / "adopters.toml")  # arm 10 refuses a gov without it
     files = {
-        "tools/govkit/registry.toml":
-            '[[entry]]\nid = "vk"\ndescriptor = "tools/govkit/entries/vk.kit.toml"\n\n'
-            '[[entry]]\nid = "nk"\ndescriptor = "tools/govkit/entries/nk.kit.toml"\n',
-        "tools/govkit/entries/vk.kit.toml":
-            'id = "vk"\nhome = "tools/vk"\n'
+        f"{PFX}govkit/registry.toml":
+            '[[entry]]\nid = "vk"\ndescriptor = "{prefix}/govkit/entries/vk.kit.toml"\n\n'
+            '[[entry]]\nid = "nk"\ndescriptor = "{prefix}/govkit/entries/nk.kit.toml"\n',
+        f"{PFX}govkit/entries/vk.kit.toml":
+            'id = "vk"\nhome = "vk"\n'
             'version_from = { file = "vk.sh", pattern = "^KIT_VK_VERSION=" }\n\n'
             '[[files]]\ninclude = ["vk.sh", "lib.sh"]\nrole = "engine"\nto = "{prefix}/{relpath}"\n',
-        "tools/govkit/entries/nk.kit.toml":
-            'id = "nk"\nhome = "tools/nk"\nversion_from = { none = "a fixture kit" }\n\n'
+        f"{PFX}govkit/entries/nk.kit.toml":
+            'id = "nk"\nhome = "nk"\nversion_from = { none = "a fixture kit" }\n\n'
             '[[files]]\ninclude = ["nk.sh"]\nrole = "engine"\nto = "{prefix}/{relpath}"\n',
-        "tools/vk/vk.sh": "KIT_VK_VERSION=1.0   # gov:kit vk@1.0\n",
-        "tools/vk/lib.sh": "echo one\n",
-        "tools/nk/nk.sh": "echo nk\n",
+        f"{PFX}vk/vk.sh": "KIT_VK_VERSION=1.0   # gov:kit vk@1.0\n",
+        f"{PFX}vk/lib.sh": "echo one\n",
+        f"{PFX}nk/nk.sh": "echo nk\n",
     }
     for rel, text in files.items():
         (fx / rel).write_text(text, encoding="utf-8", newline="\n")
@@ -799,21 +817,21 @@ def check_epoch_verb(tmp: pathlib.Path) -> None:
                           capture_output=True, text=True, encoding="utf-8").stdout.strip()
 
     def run_epoch(*args: str) -> subprocess.CompletedProcess:
-        return subprocess.run([sys.executable, str(fx / "tools" / "govkit" / "govkit.py"), "epoch",
+        return subprocess.run([sys.executable, str(fx / PFX / "govkit" / "govkit.py"), "epoch",
                                *args], capture_output=True, text=True, encoding="utf-8",
                               env={**os.environ, "GOV_DEFAULT_BRANCH": "no-such-branch"})
 
-    (fx / "tools" / "vk" / "lib.sh").write_text("echo two\n", encoding="utf-8", newline="\n")
-    (fx / "tools" / "nk" / "nk.sh").write_text("echo nk2\n", encoding="utf-8", newline="\n")
+    (fx / PFX / "vk" / "lib.sh").write_text("echo two\n", encoding="utf-8", newline="\n")
+    (fx / PFX / "nk" / "nk.sh").write_text("echo nk2\n", encoding="utf-8", newline="\n")
     settle(fx, "edit, no bump")
     p = run_epoch("--base", base)
     check("[aRF-15 AC1] an edit of a shipped engine with no bump is a FAILED naming the entry, exit 1",
           p.returncode == 1 and "epoch: vk · FAILED · moved in" in p.stdout
           and "no value change" in p.stdout and "(still 1.0)" in p.stdout, p.stdout + p.stderr)
     check("[aRF-15 AC6] an unversioned kit that moved prints an announced skip naming its file",
-          "epoch: nk · skip · no declared version · moved: tools/nk/nk.sh" in p.stdout, p.stdout)
+          f"epoch: nk · skip · no declared version · moved: {PFX}nk/nk.sh" in p.stdout, p.stdout)
 
-    (fx / "tools" / "vk" / "vk.sh").write_text("KIT_VK_VERSION=1.1   # gov:kit vk@1.1\n",
+    (fx / PFX / "vk" / "vk.sh").write_text("KIT_VK_VERSION=1.1   # gov:kit vk@1.1\n",
                                               encoding="utf-8", newline="\n")
     settle(fx, "bump")
     bump = subprocess.run(["git", "-C", str(fx), "rev-parse", "HEAD"],
@@ -822,16 +840,16 @@ def check_epoch_verb(tmp: pathlib.Path) -> None:
     check("[aRF-15 AC1] ...and the bump in a later commit makes it clean, exit 0",
           p.returncode == 0 and "epoch: vk · clean · 1.1" in p.stdout, p.stdout + p.stderr)
     check("[aRF-15 AC6] ...with the unversioned kit's skip still printed on the exit-0 run",
-          "epoch: nk · skip · no declared version · moved: tools/nk/nk.sh" in p.stdout, p.stdout)
+          f"epoch: nk · skip · no declared version · moved: {PFX}nk/nk.sh" in p.stdout, p.stdout)
 
-    (fx / "tools" / "vk" / "lib.sh").write_text("echo three\n", encoding="utf-8", newline="\n")
+    (fx / PFX / "vk" / "lib.sh").write_text("echo three\n", encoding="utf-8", newline="\n")
     settle(fx, "edit after the bump")
     p = run_epoch("--base", base)
     check("[aRF-15 AC3] a bump BEFORE a later edit does not excuse it: 'last bump precedes last move'",
           p.returncode == 1 and f"epoch: vk · FAILED · last bump {bump[:10]} precedes last move"
           in p.stdout, p.stdout + p.stderr)
 
-    (fx / "tools" / "vk" / "vk.sh").write_text("KIT_VK_VERSION=1.1   # gov:kit vk@1.1, reflowed\n",
+    (fx / PFX / "vk" / "vk.sh").write_text("KIT_VK_VERSION=1.1   # gov:kit vk@1.1, reflowed\n",
                                               encoding="utf-8", newline="\n")
     settle(fx, "decoy: the version line moves, the value does not")
     p = run_epoch("--base", base)
@@ -847,7 +865,7 @@ def check_epoch_verb(tmp: pathlib.Path) -> None:
 
 
 OWN_KIT = """id = "demo"
-home = "tools/demo"
+home = "demo"
 version_from = { none = "fixture" }
 
 [check]
@@ -888,7 +906,7 @@ expect = "(?m)^hello$"
 consumer = "use.py"
 """.replace("PYTHON", json.dumps(sys.executable))  # this interpreter, not whatever PATH calls python3
 OWN_RUN = "alpha = 1\n\n\ndef beta():\n    return 2\n\n\nif __name__ == '__main__':\n    print('hello')\n"
-OWN_DEPLOY = ('gov_source = "local"\nprefix = "tools"\nkits = ["demo"]\n\n'
+OWN_DEPLOY = (f'gov_source = "local"\nprefix = "{PFX[:-1]}"\nkits = ["demo"]\n\n'
               '[[own]]\npath = "{path}"\nimplements = "{impl}"\nwhy = "the target wrote its own"\n')
 
 
@@ -897,42 +915,42 @@ def check_adopter_owned(tmp: pathlib.Path) -> None:
     `demo` entry with a contract and a `when_owned` hole. Asserted on lines and receipt fields."""
     env = dict(os.environ, GOVKIT_NO_REMOTE_PROBE="1")
     g = tmp / "own-gov"
-    (g / "tools" / "govkit").mkdir(parents=True)
-    (g / "tools" / "demo").mkdir(parents=True)
-    shutil.copy2(GOVKIT, g / "tools" / "govkit" / "govkit.py")
-    shutil.copy2(GOVKIT.parent / "adopters.toml", g / "tools" / "govkit" / "adopters.toml")  # arm 10 refuses a gov without it
-    (g / "tools" / "govkit" / "registry.toml").write_text(
-        '[surface]\nglobs = ["tools/*"]\n\n[selection]\ndefault = ["demo"]\n\n'
-        '[[entry]]\nid = "demo"\ndescriptor = "tools/demo/kit.toml"\n\n'
-        '[[exempt]]\npath = "tools/govkit"\nwhy = "the deployer itself"\n',
+    (g / PFX / "govkit").mkdir(parents=True)
+    (g / PFX / "demo").mkdir(parents=True)
+    shutil.copy2(GOVKIT, g / PFX / "govkit" / "govkit.py")
+    shutil.copy2(GOVKIT.parent / "adopters.toml", g / PFX / "govkit" / "adopters.toml")  # arm 10 refuses a gov without it
+    (g / PFX / "govkit" / "registry.toml").write_text(
+        '[surface]\nglobs = ["{prefix}/*"]\n\n[selection]\ndefault = ["demo"]\n\n'
+        '[[entry]]\nid = "demo"\ndescriptor = "{prefix}/demo/kit.toml"\n\n'
+        '[[exempt]]\npath = "{prefix}/govkit"\nwhy = "the deployer itself"\n',
         encoding="utf-8", newline="\n")
-    (g / "tools" / "demo" / "kit.toml").write_text(OWN_KIT + OWN_CONTRACT, encoding="utf-8",
+    (g / PFX / "demo" / "kit.toml").write_text(OWN_KIT + OWN_CONTRACT, encoding="utf-8",
                                                    newline="\n")
-    (g / "tools" / "demo" / "run.py").write_text(OWN_RUN, encoding="utf-8", newline="\n")
-    (g / "tools" / "demo" / "use.py").write_text("from run import alpha, beta\n",
+    (g / PFX / "demo" / "run.py").write_text(OWN_RUN, encoding="utf-8", newline="\n")
+    (g / PFX / "demo" / "use.py").write_text("from run import alpha, beta\n",
                                                  encoding="utf-8", newline="\n")
-    (g / "tools" / "demo" / "seed.txt").write_text("seed\n", encoding="utf-8", newline="\n")
-    (g / "tools" / "demo" / "tpl.md").write_text("tpl\n", encoding="utf-8", newline="\n")
+    (g / PFX / "demo" / "seed.txt").write_text("seed\n", encoding="utf-8", newline="\n")
+    (g / PFX / "demo" / "tpl.md").write_text("tpl\n", encoding="utf-8", newline="\n")
     for a in (("init", "-q", "-b", "main"), ("config", "user.email", "t@e"),
               ("config", "user.name", "t"), ("add", "-A"), ("commit", "-qm", "base")):
         git(g, *a)
 
     def run_govkit(*args: str) -> subprocess.CompletedProcess:
-        return subprocess.run([sys.executable, str(g / "tools" / "govkit" / "govkit.py"), *args],
+        return subprocess.run([sys.executable, str(g / PFX / "govkit" / "govkit.py"), *args],
                               capture_output=True, text=True, encoding="utf-8", env=env)
 
     def build_target(name: str, path: str, impl: str, run_src: str) -> pathlib.Path:
         t = make_target(tmp / name, OWN_DEPLOY.format(path=path, impl=impl))
-        (t / "tools" / "demo").mkdir(parents=True)
+        (t / PFX / "demo").mkdir(parents=True)
         for f in ("use.py", "seed.txt", "tpl.md"):
-            shutil.copy2(g / "tools" / "demo" / f, t / "tools" / "demo" / f)
-        (t / "tools" / "demo" / "run.py").write_text(run_src, encoding="utf-8", newline="\n")
+            shutil.copy2(g / PFX / "demo" / f, t / PFX / "demo" / f)
+        (t / PFX / "demo" / "run.py").write_text(run_src, encoding="utf-8", newline="\n")
         settle(t)
         return t
 
     # AC1 — a hostile `path` refuses at exit 1 and names the row, before anything is measured. The
     # file each names EXISTS, so the refusal is the path grade's and not the missing-file one's.
-    for tag, bad, said in (("space", "tools/demo/run x.py", "'own.path'"),
+    for tag, bad, said in (("space", f"{PFX}demo/run x.py", "'own.path'"),
                            ("dotdot", "../run.py", "leaves the target repository")):
         t = build_target(f"own-ac1-{tag}", bad, "demo:run.py", OWN_RUN)
         (t / bad).write_text(OWN_RUN, encoding="utf-8", newline="\n")
@@ -941,21 +959,21 @@ def check_adopter_owned(tmp: pathlib.Path) -> None:
               p.returncode == 1 and "[[own]] row 1" in p.stdout and said in p.stdout
               and not (t / ".governance" / "install.json").exists(), p.stdout + p.stderr)
     # AC2 — `implements` naming a seed source refuses, naming the role that owns those bytes.
-    t = build_target("own-ac2", "tools/demo/seed.txt", "demo:seed.txt", OWN_RUN)
+    t = build_target("own-ac2", f"{PFX}demo/seed.txt", "demo:seed.txt", OWN_RUN)
     p = run_govkit("adopt", "--target", str(t), "--write")
     check("[aRF-13 AC2] an [[own]] row implementing a seed source is refused, naming `seed`",
           p.returncode == 1 and "ships as seed" in p.stdout, p.stdout + p.stderr)
-    t = build_target("own-ac2r", "tools/demo/tpl.md", "demo:tpl.md", OWN_RUN)
+    t = build_target("own-ac2r", f"{PFX}demo/tpl.md", "demo:tpl.md", OWN_RUN)
     p = run_govkit("adopt", "--target", str(t), "--write")
     check("[aRF-13 AC2] ...and one whose source a rendered rule reaches beside an engine one",
           p.returncode == 1 and "ships as rendered" in p.stdout, p.stdout + p.stderr)
 
     # The owned program keeps `alpha` and the probe, and LACKS `beta`: one clause of two fails.
     lacking = "alpha = 1\n\nif __name__ == '__main__':\n    print('hello')\n"
-    t = build_target("own-main", "tools/demo/run.py", "demo:run.py", lacking)
+    t = build_target("own-main", f"{PFX}demo/run.py", "demo:run.py", lacking)
     p = run_govkit("adopt", "--target", str(t), "--write")
     rec = json.loads((t / ".governance" / "install.json").read_text(encoding="utf-8"))
-    row = next((f for f in rec["files"] if f["path"] == "tools/demo/run.py"), {})
+    row = next((f for f in rec["files"] if f["path"] == f"{PFX}demo/run.py"), {})
     check("[aRF-13 S2] adopt records the row adopter-owned, evidence declared, no commit or gov_oid",
           p.returncode == 0 and row.get("role") == "adopter-owned"
           and row.get("evidence") == "declared" and row.get("implements") == "demo:run.py"
@@ -966,10 +984,10 @@ def check_adopter_owned(tmp: pathlib.Path) -> None:
     # AC6 + AC7 + AC8 — `check`: the parity line, the installed-consumer mark, the stood-down hole.
     p = run_govkit("check", "--target", str(t))
     check("[aRF-13 AC6] check prints 1/2 for the owned file lacking one declared import",
-          "contract demo/run <- tools/demo/run.py: 1/2 clauses hold" in p.stdout
-          and "FAILS imports beta — needed by tools/demo/use.py" in p.stdout, p.stdout)
+          f"contract demo/run <- {PFX}demo/run.py: 1/2 clauses hold" in p.stdout
+          and f"FAILS imports beta — needed by {PFX}demo/use.py" in p.stdout, p.stdout)
     check("[aRF-13 AC7] ...marks the installed consumer, and the exit code does not move for it",
-          "INSTALLED CONSUMER CANNOT RUN: tools/demo/use.py against tools/demo/run.py" in p.stdout
+          f"INSTALLED CONSUMER CANNOT RUN: {PFX}demo/use.py against {PFX}demo/run.py" in p.stdout
           and p.returncode == 0, p.stdout + p.stderr)
     check("[aRF-13 AC8] the when_owned hole stands down at a target owning run.py",
           "hole 'pins' stood down — run.py adopter-owned here" in p.stdout
@@ -977,14 +995,14 @@ def check_adopter_owned(tmp: pathlib.Path) -> None:
     # §8 F3 — the same failure reds ONLY once the consumer sits on a leg the receipt emitted.
     rp = t / ".governance" / "install.json"
     wired = dict(rec, gate_runner={"kind": "manifest", "emitted": [
-        {"name": "use", "kit": "demo", "argv": ["python3", "tools/demo/use.py"]}]})
+        {"name": "use", "kit": "demo", "argv": ["python3", f"{PFX}demo/use.py"]}]})
     rp.write_text(json.dumps(wired, indent=2), encoding="utf-8", newline="\n")
     p = run_govkit("check", "--target", str(t))
     check("[aRF-13 F3] an installed consumer on an emitted leg that cannot run reds `check`",
-          p.returncode == 1 and "tools/demo/use.py is on a leg this receipt emitted" in p.stdout,
+          p.returncode == 1 and f"{PFX}demo/use.py is on a leg this receipt emitted" in p.stdout,
           p.stdout + p.stderr)
     # AC6's second red-when: a consumer that is NOT installed is reported without the mark.
-    bare = dict(rec, files=[f for f in rec["files"] if f["path"] != "tools/demo/use.py"])
+    bare = dict(rec, files=[f for f in rec["files"] if f["path"] != f"{PFX}demo/use.py"])
     rp.write_text(json.dumps(bare, indent=2), encoding="utf-8", newline="\n")
     (t / ".governance" / "install.sums").write_text(
         "".join(f"{f['sha256']}  {f['path']}\n" for f in bare["files"] if "sha256" in f),
@@ -994,7 +1012,7 @@ def check_adopter_owned(tmp: pathlib.Path) -> None:
           "FAILS imports beta" in p.stdout and "INSTALLED CONSUMER" not in p.stdout
           and p.returncode == 0, p.stdout + p.stderr)
     # AC8's control: the same row recorded `engine` runs the hole's probe, as before.
-    eng = dict(rec, files=[dict(f, role="engine") if f["path"] == "tools/demo/run.py" else f
+    eng = dict(rec, files=[dict(f, role="engine") if f["path"] == f"{PFX}demo/run.py" else f
                            for f in rec["files"]])
     rp.write_text(json.dumps(eng, indent=2), encoding="utf-8", newline="\n")
     p = run_govkit("check", "--target", str(t))
@@ -1008,13 +1026,13 @@ def check_adopter_owned(tmp: pathlib.Path) -> None:
 
     # AC3 + AC4 — gov moves one commit that touches no claimed file; `update --write` then counts
     # the owned row under its role and re-stamps. The control records the row `unattributed`.
-    (g / "tools" / "govkit" / "registry.toml").write_text(
-        (g / "tools" / "govkit" / "registry.toml").read_text(encoding="utf-8") + "# moved\n",
+    (g / PFX / "govkit" / "registry.toml").write_text(
+        (g / PFX / "govkit" / "registry.toml").read_text(encoding="utf-8") + "# moved\n",
         encoding="utf-8", newline="\n")
     git(g, "commit", "-qam", "gov moves")
     head = subprocess.run(["git", "-C", str(g), "rev-parse", "HEAD"], capture_output=True,
                           text=True, encoding="utf-8").stdout.strip()
-    ctl = build_target("own-ac4", "tools/demo/run.py", "demo:run.py", lacking)
+    ctl = build_target("own-ac4", f"{PFX}demo/run.py", "demo:run.py", lacking)
     shutil.copy2(rp, ctl / ".governance" / "install.json")
     shutil.copy2(t / ".governance" / "install.sums", ctl / ".governance" / "install.sums")
     p = run_govkit("update", "--target", str(t), "--write")
@@ -1023,11 +1041,11 @@ def check_adopter_owned(tmp: pathlib.Path) -> None:
           "adopter-owned 1" in p.stdout and "unattributed" not in p.stdout
           and now.get("gov_commit") == head and p.returncode == 0, p.stdout + p.stderr)
     check("[aRF-13 S4] ...and prints the contract parity line on update too",
-          "govkit update — contract demo/run <- tools/demo/run.py: 1/2 clauses hold" in p.stdout,
+          f"govkit update — contract demo/run <- {PFX}demo/run.py: 1/2 clauses hold" in p.stdout,
           p.stdout)
     crec = json.loads((ctl / ".governance" / "install.json").read_text(encoding="utf-8"))
     for f in crec["files"]:
-        if f["path"] == "tools/demo/run.py":
+        if f["path"] == f"{PFX}demo/run.py":
             f.update(role="engine", evidence="unattributed")
             f.pop("implements", None)
     (ctl / ".governance" / "install.json").write_text(json.dumps(crec, indent=2),
@@ -1047,13 +1065,13 @@ def check_adopter_owned(tmp: pathlib.Path) -> None:
     p = run_govkit("selfcheck")
     check("[aRF-13 AC5] selfcheck names every [[contract]] a descriptor declares",
           "contract demo/run (demo:run.py): 2 clause(s)" in p.stdout, p.stdout)
-    (g / "tools" / "demo" / "kit.toml").write_text(
+    (g / PFX / "demo" / "kit.toml").write_text(
         OWN_KIT + OWN_CONTRACT.replace('"use.py"\n[[contract.clause]]',
                                        '"nope.py"\n[[contract.clause]]')
         + '\n[[contract]]\nsource = "use.py"\nid = "demo/empty"\n', encoding="utf-8", newline="\n")
     p = run_govkit("selfcheck")
     check("[aRF-13 AC5] ...and refuses a clause citing an untracked consumer",
-          "contract 'demo/run'" in p.stdout and "consumer tools/demo/nope.py is not a tracked gov file"
+          "contract 'demo/run'" in p.stdout and f"consumer {PFX}demo/nope.py is not a tracked gov file"
           in p.stdout and p.returncode == 1, p.stdout)
     check("[aRF-13 AC5] ...and a contract with zero clauses",
           "contract 'demo/empty': it has zero clauses" in p.stdout, p.stdout)
@@ -1066,44 +1084,44 @@ def check_apply_owned(tmp: pathlib.Path) -> None:
     an old sha's output reds on every later legitimate change to `apply`."""
     env = dict(os.environ, GOVKIT_NO_REMOTE_PROBE="1")
     g = tmp / "gov"
-    (g / "tools" / "govkit").mkdir(parents=True)
-    (g / "tools" / "demo").mkdir(parents=True)
-    shutil.copy2(GOVKIT, g / "tools" / "govkit" / "govkit.py")
-    shutil.copy2(GOVKIT.parent / "adopters.toml", g / "tools" / "govkit" / "adopters.toml")  # arm 10 refuses a gov without it
-    (g / "tools" / "govkit" / "registry.toml").write_text(SAFE_REG, encoding="utf-8", newline="\n")
+    (g / PFX / "govkit").mkdir(parents=True)
+    (g / PFX / "demo").mkdir(parents=True)
+    shutil.copy2(GOVKIT, g / PFX / "govkit" / "govkit.py")
+    shutil.copy2(GOVKIT.parent / "adopters.toml", g / PFX / "govkit" / "adopters.toml")  # arm 10 refuses a gov without it
+    (g / PFX / "govkit" / "registry.toml").write_text(SAFE_REG, encoding="utf-8", newline="\n")
     for name, body in (("kit.toml", OWN_KIT), ("run.py", OWN_RUN), ("seed.txt", "seed\n"),
                        ("use.py", "from run import alpha, beta\n"), ("tpl.md", "tpl\n")):
-        (g / "tools" / "demo" / name).write_text(body, encoding="utf-8", newline="\n")
+        (g / PFX / "demo" / name).write_text(body, encoding="utf-8", newline="\n")
     for a in (("init", "-q", "-b", "main"), ("config", "user.email", "t@e"),
               ("config", "user.name", "t"), ("add", "-A"), ("commit", "-qm", "base")):
         git(g, *a)
 
     def run_govkit(*args: str) -> subprocess.CompletedProcess:
-        return subprocess.run([sys.executable, str(g / "tools" / "govkit" / "govkit.py"), *args],
+        return subprocess.run([sys.executable, str(g / PFX / "govkit" / "govkit.py"), *args],
                               capture_output=True, text=True, encoding="utf-8", env=env)
 
     # AC1 — adopt records the owned row, then `apply --resume` must leave its bytes and role alone.
     lacking = "alpha = 1\n\nif __name__ == '__main__':\n    print('hello')\n"
-    t = make_target(tmp / "own", OWN_DEPLOY.format(path="tools/demo/run.py", impl="demo:run.py"))
-    (t / "tools" / "demo").mkdir(parents=True)
+    t = make_target(tmp / "own", OWN_DEPLOY.format(path=f"{PFX}demo/run.py", impl="demo:run.py"))
+    (t / PFX / "demo").mkdir(parents=True)
     (t / "docs").mkdir()
     for f in ("use.py", "seed.txt", "tpl.md"):
-        shutil.copy2(g / "tools" / "demo" / f, t / "tools" / "demo" / f)
+        shutil.copy2(g / PFX / "demo" / f, t / PFX / "demo" / f)
     (t / "docs" / "tpl.md").write_text("tpl\n", encoding="utf-8", newline="\n")
-    (t / "tools" / "demo" / "run.py").write_text(lacking, encoding="utf-8", newline="\n")
+    (t / PFX / "demo" / "run.py").write_text(lacking, encoding="utf-8", newline="\n")
     settle(t)
     p = run_govkit("adopt", "--target", str(t), "--write")
     settle(t, "adopted")
     rp = t / ".governance" / "install.json"
     adopted = next((f for f in json.loads(rp.read_text(encoding="utf-8"))["files"]
-                    if f["path"] == "tools/demo/run.py"), None)
+                    if f["path"] == f"{PFX}demo/run.py"), None)
     p = run_govkit("apply", "--target", str(t), "--resume", "--write")
     row = next((f for f in json.loads(rp.read_text(encoding="utf-8"))["files"]
-                if f["path"] == "tools/demo/run.py"), {})
+                if f["path"] == f"{PFX}demo/run.py"), {})
     check("[aRF-21 AC1] apply --resume leaves the owned file's bytes and names it skipped",
           p.returncode == 0
-          and (t / "tools" / "demo" / "run.py").read_text(encoding="utf-8") == lacking
-          and "SKIPPED [adopter-owned] tools/demo/run.py <- demo" in p.stdout, p.stdout + p.stderr)
+          and (t / PFX / "demo" / "run.py").read_text(encoding="utf-8") == lacking
+          and f"SKIPPED [adopter-owned] {PFX}demo/run.py <- demo" in p.stdout, p.stdout + p.stderr)
     check("[aRF-21 AC1] ...and its receipt row stays adopter-owned, exactly as adopt wrote it",
           row.get("role") == "adopter-owned" and row == adopted, json.dumps(row))
 
@@ -1124,7 +1142,7 @@ def check_apply_owned(tmp: pathlib.Path) -> None:
     # DEPL-aRepatriatedFork-13 S1, closing review round 1 M3. Every reader joins the owned path on
     # its exact string, so a second spelling of the same file matched no destination, and apply
     # wrote gov's bytes over the program the target declared its own. Each spelling is refused.
-    for spelt in ("./tools/demo/run.py", "tools//demo/run.py", "tools/demo/./run.py"):
+    for spelt in (f"./{PFX}demo/run.py", f"{PFX}/demo/run.py", f"{PFX}demo/./run.py"):
         (t / ".governance" / "deploy.toml").write_text(
             OWN_DEPLOY.format(path=spelt, impl="demo:run.py"), encoding="utf-8", newline="\n")
         settle(t, "a non-canonical spelling")
@@ -1132,18 +1150,18 @@ def check_apply_owned(tmp: pathlib.Path) -> None:
         check(f"[aRF-13 M3] the non-canonical [[own]] path {spelt!r} refuses apply, naming the row, "
               f"and the owned bytes stand",
               p.returncode == 1 and "[[own]] row 1" in p.stdout and "is not canonical" in p.stdout
-              and (t / "tools" / "demo" / "run.py").read_text(encoding="utf-8") == lacking,
+              and (t / PFX / "demo" / "run.py").read_text(encoding="utf-8") == lacking,
               p.stdout[-1200:] + p.stderr)
 
     # DEPL-aRepatriatedFork-21 S2, closing review round 1 residual (e). A FIRST apply over an owning
     # target has no receipt row to carry, so it builds one; the row carries every key adopt's does.
-    f1 = make_target(tmp / "first", OWN_DEPLOY.format(path="tools/demo/run.py", impl="demo:run.py"))
-    (f1 / "tools" / "demo").mkdir(parents=True)
-    (f1 / "tools" / "demo" / "run.py").write_text(lacking, encoding="utf-8", newline="\n")
+    f1 = make_target(tmp / "first", OWN_DEPLOY.format(path=f"{PFX}demo/run.py", impl="demo:run.py"))
+    (f1 / PFX / "demo").mkdir(parents=True)
+    (f1 / PFX / "demo" / "run.py").write_text(lacking, encoding="utf-8", newline="\n")
     settle(f1, "the target's own program")
     p = run_govkit("apply", "--target", str(f1))
     frow = next((f for f in json.loads((f1 / ".governance" / "install.json").read_text(
-        encoding="utf-8"))["files"] if f["path"] == "tools/demo/run.py"), {})
+        encoding="utf-8"))["files"] if f["path"] == f"{PFX}demo/run.py"), {})
     check("[aRF-21 residual e] a first apply builds the owned row with adopt's keys, oid included",
           frow.get("role") == "adopter-owned" and sorted(frow) == sorted(adopted or {})
           and frow.get("oid") == (adopted or {}).get("oid"), json.dumps(frow) + p.stdout[-600:])
@@ -1156,38 +1174,38 @@ def check_apply_owned(tmp: pathlib.Path) -> None:
     settle(n, "applied")
     p = run_govkit("apply", "--target", str(n), "--resume", "--write")
     nrow = next((f for f in json.loads((n / ".governance" / "install.json").read_text(
-        encoding="utf-8"))["files"] if f["path"] == "tools/demo/run.py"), {})
+        encoding="utf-8"))["files"] if f["path"] == f"{PFX}demo/run.py"), {})
     check("[aRF-21 AC4] a target with no [[own]] rows lands run.py as engine, no owned skip",
           p.returncode == 0 and "adopter-owned" not in p.stdout and nrow.get("role") == "engine"
-          and (n / "tools" / "demo" / "run.py").read_text(encoding="utf-8") == OWN_RUN,
+          and (n / PFX / "demo" / "run.py").read_text(encoding="utf-8") == OWN_RUN,
           p.stdout + p.stderr + json.dumps(nrow))
 
     # DEPL-aRepatriatedFork-13 S2, closing review round 1 M4. The operator declares the file their
     # own AFTER it landed as `engine`, and gov moves it. `update` and `check` read the declaration
     # too, so the write is refused naming `adopt --re-adopt`, rather than merged into their program.
     (n / ".governance" / "deploy.toml").write_text(
-        OWN_DEPLOY.format(path="tools/demo/run.py", impl="demo:run.py"), encoding="utf-8",
+        OWN_DEPLOY.format(path=f"{PFX}demo/run.py", impl="demo:run.py"), encoding="utf-8",
         newline="\n")
     settle(n, "the operator declares run.py their own")
-    (g / "tools" / "demo" / "run.py").write_text(OWN_RUN + "# v2\n", encoding="utf-8", newline="\n")
+    (g / PFX / "demo" / "run.py").write_text(OWN_RUN + "# v2\n", encoding="utf-8", newline="\n")
     git(g, "commit", "-qam", "gov moves run.py")
     p = run_govkit("update", "--target", str(n), "--write")
     check("[aRF-13 M4] update --write refuses an engine row the target declares owned, naming "
           "adopt --re-adopt, and writes nothing into it",
-          p.returncode == 1 and "tools/demo/run.py" in p.stdout and "adopt --re-adopt" in p.stdout
-          and (n / "tools" / "demo" / "run.py").read_text(encoding="utf-8") == OWN_RUN,
+          p.returncode == 1 and f"{PFX}demo/run.py" in p.stdout and "adopt --re-adopt" in p.stdout
+          and (n / PFX / "demo" / "run.py").read_text(encoding="utf-8") == OWN_RUN,
           p.stdout[-1500:] + p.stderr)
     p = run_govkit("check", "--target", str(n))
     check("[aRF-13 M4] ...and check names the same row instead of saying nothing",
-          p.returncode == 1 and "declares 'tools/demo/run.py' adopter-owned" in p.stdout
+          p.returncode == 1 and f"declares '{PFX}demo/run.py' adopter-owned" in p.stdout
           and "adopt --re-adopt" in p.stdout, p.stdout[-1500:])
 
 
-SAFE_REG = ('[surface]\nglobs = ["tools/*"]\n\n[selection]\ndefault = ["demo"]\n\n'
-            '[[entry]]\nid = "demo"\ndescriptor = "tools/demo/kit.toml"\n\n'
-            '[[exempt]]\npath = "tools/govkit"\nwhy = "the deployer itself"\n')
-SAFE_DEPLOY = 'gov_source = "local"\nprefix = "tools"\nkits = ["demo"]\n'
-SAFE_HEAD = 'id = "demo"\nhome = "tools/demo"\n'
+SAFE_REG = ('[surface]\nglobs = ["{prefix}/*"]\n\n[selection]\ndefault = ["demo"]\n\n'
+            '[[entry]]\nid = "demo"\ndescriptor = "{prefix}/demo/kit.toml"\n\n'
+            '[[exempt]]\npath = "{prefix}/govkit"\nwhy = "the deployer itself"\n')
+SAFE_DEPLOY = f'gov_source = "local"\nprefix = "{PFX[:-1]}"\nkits = ["demo"]\n'
+SAFE_HEAD = 'id = "demo"\nhome = "demo"\n'
 SAFE_TAIL = ('[[files]]\ninclude = "**"\nrole = "engine"\n\n'
              '[adopt]\nargv = []\nmutates_index = false\n')
 
@@ -1200,10 +1218,10 @@ def check_update_safety(tmp: pathlib.Path) -> None:
     env = dict(os.environ, GOVKIT_NO_REMOTE_PROBE="1")
 
     def write_gov17(g: pathlib.Path, kit: str, files: dict, msg: str) -> str:
-        (g / "tools" / "demo").mkdir(parents=True, exist_ok=True)
-        (g / "tools" / "demo" / "kit.toml").write_bytes(kit.encode("utf-8"))
+        (g / PFX / "demo").mkdir(parents=True, exist_ok=True)
+        (g / PFX / "demo" / "kit.toml").write_bytes(kit.encode("utf-8"))
         for rel, body in files.items():
-            (g / "tools" / "demo" / rel).write_bytes(
+            (g / PFX / "demo" / rel).write_bytes(
                 body if isinstance(body, bytes) else body.encode("utf-8"))
         git(g, "add", "-A")
         git(g, "commit", "-qm", msg)
@@ -1211,17 +1229,17 @@ def check_update_safety(tmp: pathlib.Path) -> None:
 
     def build_gov17(tag: str, kit: str, files: dict) -> tuple[pathlib.Path, str]:
         g = tmp / f"{tag}-gov"
-        (g / "tools" / "govkit").mkdir(parents=True)
-        shutil.copy2(GOVKIT, g / "tools" / "govkit" / "govkit.py")
-        shutil.copy2(GOVKIT.parent / "adopters.toml", g / "tools" / "govkit" / "adopters.toml")  # arm 10 refuses a gov without it
-        (g / "tools" / "govkit" / "registry.toml").write_bytes(SAFE_REG.encode("utf-8"))
+        (g / PFX / "govkit").mkdir(parents=True)
+        shutil.copy2(GOVKIT, g / PFX / "govkit" / "govkit.py")
+        shutil.copy2(GOVKIT.parent / "adopters.toml", g / PFX / "govkit" / "adopters.toml")  # arm 10 refuses a gov without it
+        (g / PFX / "govkit" / "registry.toml").write_bytes(SAFE_REG.encode("utf-8"))
         for a in (("init", "-q", "-b", "main"), ("config", "user.email", "t@e"),
                   ("config", "user.name", "t"), ("config", "core.autocrlf", "false")):
             git(g, *a)
         return g, write_gov17(g, kit, files, "A")
 
     def run_gov17(g: pathlib.Path, *args: str) -> subprocess.CompletedProcess:
-        return subprocess.run([sys.executable, str(g / "tools" / "govkit" / "govkit.py"), *args],
+        return subprocess.run([sys.executable, str(g / PFX / "govkit" / "govkit.py"), *args],
                               capture_output=True, text=True, encoding="utf-8", env=env)
 
     def build_target17(g: pathlib.Path, tag: str) -> pathlib.Path:
@@ -1259,7 +1277,7 @@ def check_update_safety(tmp: pathlib.Path) -> None:
     p = run_gov17(g, "update", "--target", str(t), "--write")
     order = read_bytes17(t / ".governance" / "outbox" / "update-rollback-demo.md").decode("utf-8")
     check("[aRF-17 AC1] LIVENESS the run really rolled the kit back",
-          "ROLLED BACK" in p.stdout and read_bytes17(t / "tools" / "demo" / "eng.txt") == b"v1\n",
+          "ROLLED BACK" in p.stdout and read_bytes17(t / PFX / "demo" / "eng.txt") == b"v1\n",
           p.stdout[-1500:])
     check("[aRF-17 AC1] the re-rendered row is restored, and the rollback order lists it",
           read_bytes17(t / "docs" / "out.md") == b"v1\n" and "restored  docs/out.md" in order,
@@ -1301,14 +1319,14 @@ def check_update_safety(tmp: pathlib.Path) -> None:
     g, _a = build_gov17("cf", kit_cf, {"conf.sh": conf_a, "lone.sh": lone, "plain.txt": "a\nb\n"})
     t = build_target17(g, "cf")
     tl = build_target17(g, "lc")
-    (t / "tools" / "demo" / "conf.sh").write_bytes(conf_a.replace(b"mode=one", b"mode=target"))
+    (t / PFX / "demo" / "conf.sh").write_bytes(conf_a.replace(b"mode=one", b"mode=target"))
     settle(t, "the adopter edits the mode line")
-    (tl / "tools" / "demo" / "lone.sh").write_bytes(b"abcde\n")
+    (tl / PFX / "demo" / "lone.sh").write_bytes(b"abcde\n")
     settle(tl, "a CR-normalising reconstruction")
     write_gov17(g, kit_cf, {"conf.sh": conf_a.replace(b"mode=one", b"mode=gov")}, "B")
-    before = read_bytes17(t / "tools" / "demo" / "conf.sh")
+    before = read_bytes17(t / PFX / "demo" / "conf.sh")
     p = run_gov17(g, "update", "--target", str(t), "--write")
-    slug = govkit_module().render_order_slug("tools/demo/conf.sh")
+    slug = govkit_module().render_order_slug(f"{PFX}demo/conf.sh")
     cdir = t / ".governance" / "outbox" / f"update-conflict-{slug}"
     corder = read_bytes17(cdir.with_name(cdir.name + ".md")).decode("utf-8")
     cand = read_bytes17(cdir / "candidate")
@@ -1318,7 +1336,7 @@ def check_update_safety(tmp: pathlib.Path) -> None:
     check("[aRF-17 AC5] LIVENESS the three-way really conflicts",
           "diverged and the three-way conflicts" in p.stdout, p.stdout[-1200:])
     check("[aRF-17 AC5] the target file stays byte-identical and the four candidate files exist",
-          read_bytes17(t / "tools" / "demo" / "conf.sh") == before
+          read_bytes17(t / PFX / "demo" / "conf.sh") == before
           and all((cdir / n).is_file() for n in ("base", "ours", "theirs", "candidate")),
           str(sorted(q.name for q in cdir.glob("*"))) if cdir.is_dir() else "no candidate dir")
     check("[aRF-17 AC5] git merge-file -p --diff3 over the written three reproduces candidate",
@@ -1331,7 +1349,7 @@ def check_update_safety(tmp: pathlib.Path) -> None:
           repr(cand[:80]))
     p = run_gov17(g, "update", "--target", str(tl))
     check("[aRF-17 AC7] a lost lone CR prints a lone-CR row naming 4 and 0",
-          "lone-CR tools/demo/lone.sh" in p.stdout and "gov 4 · target 0" in p.stdout, p.stdout[-1500:])
+          f"lone-CR {PFX}demo/lone.sh" in p.stdout and "gov 4 · target 0" in p.stdout, p.stdout[-1500:])
     p = run_gov17(g, "update", "--target", str(tl), "--write")
     check("[aRF-17 S4] ...and on a --write run it is a finding, which withholds the re-stamp (§8 F3)",
           p.returncode == 1 and "makes the loss permanent" in p.stdout
@@ -1343,45 +1361,45 @@ def check_update_safety(tmp: pathlib.Path) -> None:
     subprocess.run(["git", "clone", "-q", "-c", "core.autocrlf=true", str(te), str(c)],
                    capture_output=True)
     check("[aRF-17 AC3] LIVENESS the clone's worktree copy is CRLF",
-          read_bytes17(c / "tools" / "demo" / "plain.txt") == b"a\r\nb\r\n",
-          repr(read_bytes17(c / "tools" / "demo" / "plain.txt")))
+          read_bytes17(c / PFX / "demo" / "plain.txt") == b"a\r\nb\r\n",
+          repr(read_bytes17(c / PFX / "demo" / "plain.txt")))
     p = run_gov17(g, "check", "--target", str(c))
     m = _re.search(r"eol-only (\d+)", p.stdout)
     check("[aRF-17 AC3] check counts the CRLF copy eol-only and reports no mismatch",
           m is not None and int(m.group(1)) >= 1 and "does not match the receipt" not in p.stdout,
           p.stdout[-1500:])
-    (c / "tools" / "demo" / "plain.txt").write_bytes(b"a\r\nX\r\n")
+    (c / PFX / "demo" / "plain.txt").write_bytes(b"a\r\nX\r\n")
     p = run_gov17(g, "check", "--target", str(c))
     check("[aRF-17 AC4] a real byte change still reports the mismatch",
-          "'tools/demo/plain.txt' does not match the receipt" in p.stdout, p.stdout[-1500:])
+          f"'{PFX}demo/plain.txt' does not match the receipt" in p.stdout, p.stdout[-1500:])
     rec = json.loads((te / ".governance" / "install.json").read_text(encoding="utf-8"))
     for f in rec["files"]:
-        if f.get("path") == "tools/demo/plain.txt":
+        if f.get("path") == f"{PFX}demo/plain.txt":
             f["sha256"] = "0" * 64
     (te / ".governance" / "install.json").write_bytes((json.dumps(rec, indent=2) + "\n").encode())
     p = run_gov17(g, "check", "--target", str(te))
     check("[aRF-17 S2] a tampered sha256 over untouched LF bytes is still a mismatch, not eol-only",
-          "'tools/demo/plain.txt' does not match the receipt" in p.stdout, p.stdout[-1500:])
+          f"'{PFX}demo/plain.txt' does not match the receipt" in p.stdout, p.stdout[-1500:])
 
     # ---- S5 — AC8, AC9. A staged edit, then an unstaged one, at a planned destination.
     ts = build_target17(g, "st")
-    (ts / "tools" / "demo" / "plain.txt").write_bytes(b"a\nb\nc\n")
-    git(ts, "add", "--", "tools/demo/plain.txt")
+    (ts / PFX / "demo" / "plain.txt").write_bytes(b"a\nb\nc\n")
+    git(ts, "add", "--", f"{PFX}demo/plain.txt")
     p = run_gov17(g, "adopt", "--target", str(ts), "--re-adopt", "--write")
     check("[aRF-17 AC8] LIVENESS without --staged the staged tree is refused",
           p.returncode == 2 and "differ from HEAD" in p.stderr, p.stderr)
     p = run_gov17(g, "adopt", "--target", str(ts), "--re-adopt", "--staged", "--write")
-    staged_oid = run_gov_git(ts, "rev-parse", ":tools/demo/plain.txt")
+    staged_oid = run_gov_git(ts, "rev-parse", f":{PFX}demo/plain.txt")
     check("[aRF-17 AC8] --staged exits 0 and the row's oid is the staged blob",
-          p.returncode == 0 and read_row17(ts, "tools/demo/plain.txt").get("oid") == staged_oid,
+          p.returncode == 0 and read_row17(ts, f"{PFX}demo/plain.txt").get("oid") == staged_oid,
           p.stdout[-900:] + p.stderr)
     check("[aRF-17 S5] ...and the receipt is staged beside it",
           ".governance/install.json" in run_gov_git(ts, "diff", "--cached", "--name-only"),
           run_gov_git(ts, "diff", "--cached", "--name-only"))
-    (ts / "tools" / "demo" / "plain.txt").write_bytes(b"a\nb\nc\nd\n")
+    (ts / PFX / "demo" / "plain.txt").write_bytes(b"a\nb\nc\nd\n")
     p = run_gov17(g, "adopt", "--target", str(ts), "--re-adopt", "--staged", "--write")
     check("[aRF-17 AC9] an unstaged edit at a planned destination refuses --staged, naming it",
-          p.returncode == 2 and "--staged:" in p.stderr and "tools/demo/plain.txt" in p.stderr,
+          p.returncode == 2 and "--staged:" in p.stderr and f"{PFX}demo/plain.txt" in p.stderr,
           p.stderr)
 
     # ---- S6, S7 — AC10, AC11, AC15. `s.txt` moves engine -> seed and `p.txt` project-owned ->
@@ -1396,28 +1414,28 @@ def check_update_safety(tmp: pathlib.Path) -> None:
     g, a_sha = build_gov17("rm", kit_a, {"ver.sh": "DEMO_VERSION=1.0\n", "s.txt": "seed me\n",
                                          "p.txt": "p v1\n"})
     t = build_target17(g, "rm")
-    (t / "tools" / "demo" / "p.txt").write_bytes(b"p v1\n")
+    (t / PFX / "demo" / "p.txt").write_bytes(b"p v1\n")
     rp = t / ".governance" / "install.json"
     rec = json.loads(rp.read_text(encoding="utf-8"))
     for f in rec["files"]:
-        if f.get("path") == "tools/demo/s.txt":
+        if f.get("path") == f"{PFX}demo/s.txt":
             f["version"] = "DEMO_VERSION=0.9"
     rp.write_bytes((json.dumps(rec, indent=2) + "\n").encode("utf-8"))
     settle(t, "the target writes its own p.txt; one row's version set apart")
     write_gov17(g, kit_b, {"p.txt": "p v2\n", "ver.sh": "DEMO_VERSION=1.1\n"}, "B")
     p = run_gov17(g, "update", "--target", str(t))
     check("[aRF-17 AC10] LIVENESS both rows read role-moved before the flag",
-          "role-moved         [engine       ] -> seed          tools/demo/s.txt" in p.stdout
-          and "-> engine        tools/demo/p.txt" in p.stdout, p.stdout[-1500:])
+          f"role-moved         [engine       ] -> seed          {PFX}demo/s.txt" in p.stdout
+          and f"-> engine        {PFX}demo/p.txt" in p.stdout, p.stdout[-1500:])
     dl = next((ln for ln in p.stdout.splitlines() if ln.strip().startswith("demo ")), "")
     check("[aRF-17 S7] the delta line reads the target's own constant, never MIXED",
           "MIXED" not in dl and "target has 1.0, gov has 1.1" in dl and "row base versions" in dl, dl)
     pl = run_gov17(g, "plan", "--target", str(t))
     check("[aRF-17 AC11] plan prints KEEP for a seed destination that exists",
-          any(ln.startswith("  KEEP") and ln.rstrip().endswith("tools/demo/s.txt   <- demo")
+          any(ln.startswith("  KEEP") and ln.rstrip().endswith(f"{PFX}demo/s.txt   <- demo")
               for ln in pl.stdout.splitlines()), pl.stdout[-1200:])
     snap = {q: (read_bytes17(t / q), run_gov_git(t, "rev-parse", f":{q}"))
-            for q in ("tools/demo/s.txt", "tools/demo/p.txt")}
+            for q in (f"{PFX}demo/s.txt", f"{PFX}demo/p.txt")}
     p = run_gov17(g, "update", "--target", str(t), "--write", "--accept-role-moves")
     check("[aRF-17 AC10] --accept-role-moves prints role-recorded for both rows",
           p.stdout.count("role-recorded") >= 2 and "role-moved         [" not in p.stdout,
@@ -1425,9 +1443,9 @@ def check_update_safety(tmp: pathlib.Path) -> None:
     check("[aRF-17 AC10] ...and neither file's bytes nor index entry moved",
           all(snap[q] == (read_bytes17(t / q), run_gov_git(t, "rev-parse", f":{q}")) for q in snap),
           str(snap))
-    prow = read_row17(t, "tools/demo/p.txt")
+    prow = read_row17(t, f"{PFX}demo/p.txt")
     check("[aRF-17 AC15] the move into engine is recorded vintage-match at A",
-          read_row17(t, "tools/demo/s.txt").get("role") == "seed" and prow.get("role") == "engine"
+          read_row17(t, f"{PFX}demo/s.txt").get("role") == "seed" and prow.get("role") == "engine"
           and prow.get("evidence") == "vintage-match" and prow.get("commit") == a_sha, str(prow))
     settle(t, "the role move")
     p = run_gov17(g, "update", "--target", str(t))
@@ -1435,26 +1453,26 @@ def check_update_safety(tmp: pathlib.Path) -> None:
           "role-moved" not in p.stdout, p.stdout[-1200:])
     p = run_gov17(g, "update", "--target", str(t), "--write")
     check("[aRF-17 AC15] the next update --write lands gov's newer bytes through the verdict table",
-          read_bytes17(t / "tools" / "demo" / "p.txt") == b"p v2\n"
+          read_bytes17(t / PFX / "demo" / "p.txt") == b"p v2\n"
           and "stale" in next((ln for ln in p.stdout.splitlines()
-                               if ln.rstrip().endswith(" tools/demo/p.txt")), ""), p.stdout[-1500:])
+                               if ln.rstrip().endswith(f" {PFX}demo/p.txt")), ""), p.stdout[-1500:])
 
     # ---- S9 — AC14. One row drifted one line from an OLD vintage, one unrelated program.
     old = "".join(f"line {i}\n" for i in range(20))
     g, a1 = build_gov17("sp", kit_cf, {"prog.py": old, "other.py": old})
     write_gov17(g, kit_cf, {"prog.py": "".join(f"mid {i}\n" for i in range(20))}, "A2")
     t = make_target(tmp / "sp-t", SAFE_DEPLOY)
-    (t / "tools" / "demo").mkdir(parents=True)
-    (t / "tools" / "demo" / "prog.py").write_bytes(old.replace("line 7\n", "line seven\n").encode())
-    (t / "tools" / "demo" / "other.py").write_bytes(
+    (t / PFX / "demo").mkdir(parents=True)
+    (t / PFX / "demo" / "prog.py").write_bytes(old.replace("line 7\n", "line seven\n").encode())
+    (t / PFX / "demo" / "other.py").write_bytes(
         "".join(f"unrelated {i}\n" for i in range(10)).encode())
     settle(t, "a hand-vendored tree")
     p = run_gov17(g, "adopt", "--target", str(t), "--suggest-pins")
     check("[aRF-17 AC14] a slightly drifted row gets a --pin at its old vintage",
-          f"--pin tools/demo/prog.py={a1}" in p.stdout, p.stdout[-1500:] + p.stderr)
+          f"--pin {PFX}demo/prog.py={a1}" in p.stdout, p.stdout[-1500:] + p.stderr)
     check("[aRF-17 AC14] ...and an unrelated program is offered no pin and named adopter-owned",
-          "no-pin tools/demo/other.py" in p.stdout and "adopter-owned" in p.stdout
-          and "--pin tools/demo/other.py" not in p.stdout, p.stdout[-1500:])
+          f"no-pin {PFX}demo/other.py" in p.stdout and "adopter-owned" in p.stdout
+          and f"--pin {PFX}demo/other.py" not in p.stdout, p.stdout[-1500:])
 
 
 def check_fragment_wiring(tmp: pathlib.Path) -> None:
@@ -1464,28 +1482,28 @@ def check_fragment_wiring(tmp: pathlib.Path) -> None:
     stale entry the step REWRITES is never claimed as one it added."""
     gk = govkit_module()
     t = tmp / "frag"
-    (t / "tools" / "unattended").mkdir(parents=True)
-    shutil.copy(HERE.parent / "settings-merge.py", t / "tools" / "settings-merge.py")
+    (t / PFX / "unattended").mkdir(parents=True)
+    shutil.copy(HERE.parent / "settings-merge.py", t / PFX / "settings-merge.py")
     names = ["gate-guard", "stall-recorder", "stop-guard"]
     for n in names:
         for ext in (".js", ".fragment.json"):
-            shutil.copy(HERE.parent / "unattended" / f"{n}{ext}", t / "tools" / "unattended" / f"{n}{ext}")
-    rows = [{"path": "tools/settings-merge.py", "kit": "settings-merge"}] + \
-           [{"path": f"tools/unattended/{n}.fragment.json", "kit": "unattended"} for n in names]
+            shutil.copy(HERE.parent / "unattended" / f"{n}{ext}", t / PFX / "unattended" / f"{n}{ext}")
+    rows = [{"path": f"{PFX}settings-merge.py", "kit": "settings-merge"}] + \
+           [{"path": f"{PFX}unattended/{n}.fragment.json", "kit": "unattended"} for n in names]
     landed = {r["path"] for r in rows}
 
     def test_wired(n: str) -> bool:
-        return subprocess.run([sys.executable, "tools/settings-merge.py", "--check", "--fragment",
-                               f"tools/unattended/{n}.fragment.json"], cwd=t,
+        return subprocess.run([sys.executable, f"{PFX}settings-merge.py", "--check", "--fragment",
+                               f"{PFX}unattended/{n}.fragment.json"], cwd=t,
                               capture_output=True, text=True, encoding="utf-8").returncode == 0
-    subprocess.run([sys.executable, "tools/settings-merge.py", "--fragment",
-                    "tools/unattended/gate-guard.fragment.json"], cwd=t, capture_output=True, text=True, encoding="utf-8")
+    subprocess.run([sys.executable, f"{PFX}settings-merge.py", "--fragment",
+                    f"{PFX}unattended/gate-guard.fragment.json"], cwd=t, capture_output=True, text=True, encoding="utf-8")
     check("fragment wiring: the fixture starts with gate-guard alone wired",
           test_wired("gate-guard") and not test_wired("stop-guard"))
     added = gk.run_fragment_merges(t, rows, landed, set(), "update")
     check("fragment wiring: the step returns exactly the two entries it added",
-          added == {"unattended": ["tools/unattended/stall-recorder.fragment.json",
-                                   "tools/unattended/stop-guard.fragment.json"]}, str(added))
+          added == {"unattended": [f"{PFX}unattended/stall-recorder.fragment.json",
+                                   f"{PFX}unattended/stop-guard.fragment.json"]}, str(added))
     check("fragment wiring: every landed fragment is wired after the step", all(test_wired(n) for n in names))
     gk.remove_wired_fragments(t, rows, added.get("unattended", []), "update")
     check("fragment wiring: a rollback unwires what the run added",
@@ -1597,7 +1615,7 @@ def main() -> int:
         # receipt shape no apply can produce.
         (full / ".governance" / "install.json").write_text(
             json.dumps({"schema": 2, "gov_source": "local", "kits": ["memory-tree"],
-                        "files": [{"path": "tools/memory-tree/check-memory-hygiene.sh",
+                        "files": [{"path": f"{PFX}memory-tree/check-memory-hygiene.sh",
                                    "role": "engine", "kit": "memory-tree", "written": True}]},
                        indent=2),
             encoding="utf-8", newline="\n")
@@ -1645,13 +1663,13 @@ def main() -> int:
         p = run("apply", "--target", str(ap), "--kits", "check-wiring")
         check("apply exits 0 over a clean target", p.returncode == 0, p.stdout + p.stderr)
         check("apply landed the flat destination its descriptor DECLARES, not a kit-relative default",
-              (ap / "tools" / "check-wiring.sh").is_file(),
-              str(sorted(q.as_posix() for q in (ap / "tools").rglob("*"))))
+              (ap / PFX / "check-wiring.sh").is_file(),
+              str(sorted(q.as_posix() for q in (ap / PFX).rglob("*"))))
         check("apply wrote a receipt", (ap / ".governance" / "install.json").is_file())
         check("apply wrote the flat sums sidecar a target verifies with bash alone",
               (ap / ".governance" / "install.sums").is_file())
         check("apply STAGED what it wrote — every gate here reads the index",
-              "tools/check-wiring.sh" in subprocess.run(
+              f"{PFX}check-wiring.sh" in subprocess.run(
                   ["git", "-C", str(ap), "diff", "--cached", "--name-only"],
                   capture_output=True, text=True).stdout, "")
         check("apply names its gate-leg outcome rather than printing a fixed SKIPPED line",
@@ -1712,33 +1730,33 @@ def main() -> int:
         idx_of = lambda q: subprocess.run(
             ["git", "-C", str(govroot), "show", f"{GOV_PIN}:{q}"],
                                           capture_output=True).stdout
-        landed = (cm / "tools" / "codebase-map" / "map_extractors.py").read_bytes()
+        landed = (cm / PFX / "codebase-map" / "map_extractors.py").read_bytes()
         check("the carved destination carries the TEMPLATE's bytes",
-              landed == idx_of("tools/codebase-map/map_extractors.template.py"), "")
+              landed == idx_of(f"{PFX}codebase-map/map_extractors.template.py"), "")
         check("and NOT gov's own filled module — the measured data-loss path",
-              landed != idx_of("tools/codebase-map/map_extractors.py"), "")
+              landed != idx_of(f"{PFX}codebase-map/map_extractors.py"), "")
         rows = {f["path"]: f for f in rec["files"]}
         check("its winning row is the seed, sourced from the template",
-              rows["tools/codebase-map/map_extractors.py"]["role"] == "seed" and
-              rows["tools/codebase-map/map_extractors.py"]["source"].endswith("template.py"),
-              str(rows.get("tools/codebase-map/map_extractors.py")))
+              rows[f"{PFX}codebase-map/map_extractors.py"]["role"] == "seed" and
+              rows[f"{PFX}codebase-map/map_extractors.py"]["source"].endswith("template.py"),
+              str(rows.get(f"{PFX}codebase-map/map_extractors.py")))
         check("gov's filled module is recorded as project-owned and NOT written",
               any(f["role"] == "project-owned" and f.get("written") is False
-                  and f["source"] == "tools/codebase-map/map_extractors.py"
+                  and f["source"] == f"{PFX}codebase-map/map_extractors.py"
                   for f in rec["files"]), "")
 
         # AC1b — a `seed` the target has since edited survives a re-apply, and the receipt row for it
         # is still there. The row surviving is the half that used to fail: serializing the receipt
         # from the write log dropped every seed row on the second run.
         settle(cm, "the first apply")
-        (cm / "tools" / "codebase-map" / "map_extractors.py").write_bytes(b"# TARGET EDITED\n")
+        (cm / PFX / "codebase-map" / "map_extractors.py").write_bytes(b"# TARGET EDITED\n")
         # COMMITTED, not merely written. -12 S4 refuses a writing verb over an uncommitted edit
         # to a claimed path, so an uncommitted edit here would make the re-apply refuse — and
         # both arms below would then pass on an apply that never ran.
         settle(cm, "the target edits its seed")
         p = run("apply", "--target", str(cm), "--kits", "codebase-map,memory-tree")
         check("a re-apply leaves an edited seed byte-identical",
-              (cm / "tools" / "codebase-map" / "map_extractors.py").read_bytes()
+              (cm / PFX / "codebase-map" / "map_extractors.py").read_bytes()
               == b"# TARGET EDITED\n", "")
         rec2b = json.loads((cm / ".governance" / "install.json").read_text(encoding="utf-8"))
         check("and its receipt row SURVIVES the re-apply",
@@ -1756,14 +1774,14 @@ def main() -> int:
         sys.path.insert(0, str(HERE))
         import govkit as _G
         _root = _G.repo_root()
-        CARVED = {"id": "scratch", "home": "tools/memory-tree", "files": [
+        CARVED = {"id": "scratch", "home": f"{PFX}memory-tree", "files": [
             {"include": "**", "role": "engine"},
             {"include": ["corpus_ids.py"], "role": "project-owned"},
         ]}
         with_co = _G.resolve_entry(_root, CARVED, _G.canonical_ctx("scratch"))
         bare = dict(CARVED, files=[CARVED["files"][0]])
         without = _G.resolve_entry(_root, bare, _G.canonical_ctx("scratch"))
-        dest = "tools/scratch/corpus_ids.py"
+        dest = f"{PFX}scratch/corpus_ids.py"
         check("a carved source whose destination no later rule reaches is NOT written",
               dest not in with_co["writes"], str(sorted(with_co["writes"])[:3]))
         check("LIVENESS: without the carve-out the same destination IS written",
@@ -1787,7 +1805,7 @@ def main() -> int:
         # facts the removed `not landed` print did — role, destination, kit and reason — and the
         # two together were the duplicate this reconcile removed.
         check("an unlanded rule prints its role, its destination and who does produce it",
-              "SKIPPED [project-owned] tools/codebase-map/map_extractors.py" in p.stdout and
+              f"SKIPPED [project-owned] {PFX}codebase-map/map_extractors.py" in p.stdout and
               "writes that same path in this run" in p.stdout, p.stdout)
 
         # AC4 — plan promises exactly the file set gov owns. NOT keyed on `written`: that flag is a
@@ -1863,7 +1881,7 @@ def main() -> int:
         # is then measured rather than simulated.
         OLD = subprocess.run(
             ["git", "-C", str(govroot), "rev-list", "-1",
-             "24f39915b3de86010a30d8698d0d4b317db015de", "--", "tools/check-wiring.sh"],
+             "24f39915b3de86010a30d8698d0d4b317db015de", "--", f"{PFX}check-wiring.sh"],
             capture_output=True, text=True).stdout.strip()
 
         def stale_target(name: str, deploy: str = DEPLOY_FULL) -> pathlib.Path:
@@ -1889,7 +1907,7 @@ def main() -> int:
         bf = stale_target("bf")
         _gbf = govkit_module()
         _bf_writes = _gbf.resolve_entry(
-            govroot, _gbf.load_toml(govroot / "tools" / "govkit" / "entries" / "check-wiring.kit.toml"),
+            govroot, _gbf.load_toml(govroot / PFX / "govkit" / "entries" / "check-wiring.kit.toml"),
             _gbf.canonical_ctx("check-wiring"))["writes"]
         _bf_old = set(run_gov_git(govroot, "ls-tree", "-r", "--name-only", OLD).splitlines())
         _bf_drop = {d for d, w in _bf_writes.items() if w["src"] and w["src"] not in _bf_old}
@@ -1921,19 +1939,19 @@ def main() -> int:
               "stale " in p.stdout and "check-wiring.sh" in p.stdout, p.stdout)
         check("update is READ-ONLY by default and says so",
               "NOTHING was written" in p.stdout, p.stdout)
-        before = (up / "tools" / "check-wiring.sh").read_bytes()
+        before = (up / PFX / "check-wiring.sh").read_bytes()
         p = run("update", "--target", str(up))
         check("and it really wrote nothing — the bytes are unchanged",
-              (up / "tools" / "check-wiring.sh").read_bytes() == before, "")
+              (up / PFX / "check-wiring.sh").read_bytes() == before, "")
 
         # AC2 — --write takes gov's new bytes, and they are the INDEX's at the new commit.
         p = run("update", "--target", str(up), "--write")
         # S5. AT THE PIN, for the reason `idx_of` above carries.
         head_bytes = subprocess.run(["git", "-C", str(govroot), "show",
-                                     f"{GOV_PIN}:tools/check-wiring.sh"],
+                                     f"{GOV_PIN}:{PFX}check-wiring.sh"],
                                     capture_output=True).stdout
         check("update --write brings a stale engine file to the new commit's bytes",
-              (up / "tools" / "check-wiring.sh").read_bytes() == head_bytes, "")
+              (up / PFX / "check-wiring.sh").read_bytes() == head_bytes, "")
         rec = json.loads((up / ".governance" / "install.json").read_text(encoding="utf-8"))
         check("and re-stamps the receipt at the new commit",
               rec["gov_commit"] == subprocess.run(
@@ -1952,7 +1970,7 @@ def main() -> int:
         # --- (3e11f259 -> b263d5b9 on a scratch fixture) and printed the ordinary re-stamp line.
         # THE TARGET DECLARES THE KIT THE REMEDY IS RUN OVER. `adopt` plans the target's own
         # `kits` list (TOOL-aScouredKit-13), and DEPLOY_FULL declares memory-tree alone, so the
-        # printed remedy could never see `tools/check-wiring.sh` here and refused the pin as
+        # printed remedy could never see `<prefix>/check-wiring.sh` here and refused the pin as
         # matching no planned destination — a fixture that installs a kit its descriptor does not
         # declare, which no real target is. The arm below was written while this suite was already
         # red on the vintage fixture, so it had never been seen green.
@@ -2076,31 +2094,31 @@ def main() -> int:
         # --- dropped from the needle map — which is every kit that ships a Skill. The global map
         # --- still drops it (it cannot hold two), but rows now rewrite through their OWN pair.
         _n_global, _pairs_g, _drop_g = _gk.derive_carry_map(
-            [("tools/k/engine.py", "scripts/k/engine.py"),
-             ("tools/k/SKILL.template.md", ".claude/skills/k/SKILL.md")])
+            [(f"{PFX}k/engine.py", "scripts/k/engine.py"),
+             (f"{PFX}k/SKILL.template.md", ".claude/skills/k/SKILL.md")])
         check("[dGV-11] a gov directory that fans out is still absent from the GLOBAL needle map",
-              "tools/k" not in _n_global and any(g == "tools/k" for g, _ in _drop_g),
+              f"{PFX}k" not in _n_global and any(g == f"{PFX}k" for g, _ in _drop_g),
               f"{_n_global} | {_drop_g}")
-        _row = {"source": "tools/k/engine.py", "path": "scripts/k/engine.py"}
+        _row = {"source": f"{PFX}k/engine.py", "path": "scripts/k/engine.py"}
         _n_row = _gk.resolve_row_needles(_n_global, _row)
         check("[dGV-11] but the ROW resolves against its own destination, rooted on its own pair",
-              _n_row.get("tools/k") == "scripts/k", f"{_n_row}")
-        _row2 = {"source": "tools/k/SKILL.template.md", "path": ".claude/skills/k/SKILL.md"}
+              _n_row.get(f"{PFX}k") == "scripts/k", f"{_n_row}")
+        _row2 = {"source": f"{PFX}k/SKILL.template.md", "path": ".claude/skills/k/SKILL.md"}
         _n_row2 = _gk.resolve_row_needles(_n_global, _row2)
         check("[dGV-11] and a second row under the same gov directory gets ITS destination, "
               "not the first row's",
-              _n_row2.get("tools/k") == ".claude/skills/k", f"{_n_row2}")
+              _n_row2.get(f"{PFX}k") == ".claude/skills/k", f"{_n_row2}")
         check("[dGV-11] gov's bytes really are rewritten through the row's needle",
-              _gk.derive_carried(b"see tools/k/engine.py here", _n_row) ==
+              _gk.derive_carried(f"see {PFX}k/engine.py here".encode(), _n_row) ==
               b"see scripts/k/engine.py here",
-              _gk.derive_carried(b"see tools/k/engine.py here", _n_row).decode())
+              _gk.derive_carried(f"see {PFX}k/engine.py here".encode(), _n_row).decode())
         _row3 = {"source": None, "path": None}
         check("[dGV-11] a row with no pair falls back to the global map rather than emptying it",
               _gk.resolve_row_needles(_n_global, _row3) == _n_global, "")
 
         # AC3 — THE NO-CLOBBER GUARANTEE. Nothing else observes it.
         up2 = stale_target("u2b")
-        (up2 / "tools" / "check-wiring.sh").write_bytes(b"#!/usr/bin/env bash\n# OPERATOR EDIT\n")
+        (up2 / PFX / "check-wiring.sh").write_bytes(b"#!/usr/bin/env bash\n# OPERATOR EDIT\n")
         # COMMITTED. -12 S4 refuses over an UNCOMMITTED edit to a claimed path — a stronger
         # protection than this arm asserts, and one that would stop the classifier ever being
         # reached. The guarantee under test is the one that survives a commit: a local edit gov
@@ -2108,7 +2126,7 @@ def main() -> int:
         settle(up2, "the operator edits a gov-owned file")
         p = run("update", "--target", str(up2), "--write")
         check("a locally edited file whose gov copy also moved is reported, never overwritten",
-              (up2 / "tools" / "check-wiring.sh").read_bytes()
+              (up2 / PFX / "check-wiring.sh").read_bytes()
               == b"#!/usr/bin/env bash\n# OPERATOR EDIT\n", "")
         check("and the verdict names it rather than acting",
               "diverged" in p.stdout or "patched" in p.stdout, p.stdout)
@@ -2127,8 +2145,8 @@ def main() -> int:
         check("and says it will not fall back to a fresh install",
               "fresh install" in p.stderr, p.stderr)
         check("nothing was written on that refusal",
-              (up3 / "tools" / "check-wiring.sh").read_bytes()
-              == subprocess.run(["git", "-C", str(govroot), "show", f"{OLD}:tools/check-wiring.sh"],
+              (up3 / PFX / "check-wiring.sh").read_bytes()
+              == subprocess.run(["git", "-C", str(govroot), "show", f"{OLD}:{PFX}check-wiring.sh"],
                                 capture_output=True).stdout, "")
         # NEGATIVE half: the same fixture with a resolvable commit does not refuse.
         rec["gov_commit"] = OLD
@@ -2160,37 +2178,37 @@ def main() -> int:
         def scratch_gov(kit_toml: str) -> subprocess.CompletedProcess:
             g = tmp / ("sg%d" % scratch_gov.n)
             scratch_gov.n += 1
-            shutil.copytree(HERE, g / "tools" / "govkit")
-            mt = g / "tools" / "memory-tree"
+            shutil.copytree(HERE, g / PFX / "govkit")
+            mt = g / PFX / "memory-tree"
             mt.mkdir(parents=True, exist_ok=True)
             (mt / "engine.sh").write_text("#!/bin/sh" + NL, encoding="utf-8", newline=NL)
             (mt / "extra.sh").write_text("#!/bin/sh" + NL, encoding="utf-8", newline=NL)
-            (g / "tools" / "gate-legs.json").write_text(
+            (g / PFX / "gate-legs.json").write_text(
                 json.dumps([{"name": "demo leg",
-                             "argv": ["bash", "tools/memory-tree/engine.sh"],
+                             "argv": ["bash", f"{PFX}memory-tree/engine.sh"],
                              "guard": [], "subject": "repo"}], indent=2) + NL,
                 encoding="utf-8", newline=NL)
             # `shutil.copytree(HERE, ...)` above brings gov's own subject pin with it, and this
             # tree has one leg rather than gov's whole manifest. Overwritten with a pin for THIS
             # fixture, because a pin naming legs the tree does not have is exactly the stale-pin
             # refusal the ratchet exists to raise. TOOL-dUnstalledConvoy-29.
-            (g / "tools" / "govkit" / "subject-pins.tsv").write_text(
+            (g / PFX / "govkit" / "subject-pins.tsv").write_text(
                 "# fixture pin" + NL + "demo leg\trepo" + NL, encoding="utf-8", newline=NL)
             (mt / "kit.toml").write_text(kit_toml, encoding="utf-8", newline=NL)
-            (g / "tools" / "govkit" / "registry.toml").write_text(NL.join([
+            (g / PFX / "govkit" / "registry.toml").write_text(NL.join([
                 "version = 1",
                 "[surface]",
-                'globs = ["tools/*"]',
+                'globs = ["{prefix}/*"]',
                 "[selection]",
                 'default = ["memory-tree"]',
                 "[[entry]]",
                 'id = "memory-tree"',
-                'descriptor = "tools/memory-tree/kit.toml"',
+                'descriptor = "{prefix}/memory-tree/kit.toml"',
                 "[[exempt]]",
-                'path = "tools/govkit"',
+                f'path = "{PFX}govkit"',
                 'why = "the deployer itself"',
                 "[[exempt]]",
-                'path = "tools/gate-legs.json"',
+                f'path = "{PFX}gate-legs.json"',
                 'why = "gov\'s own manifest"',
                 "",
             ]), encoding="utf-8", newline=NL)
@@ -2200,13 +2218,13 @@ def main() -> int:
             git(g, "add", "-A")
             git(g, "commit", "-qm", "s")
             return subprocess.run(
-                [sys.executable, str(g / "tools" / "govkit" / "govkit.py"), "selfcheck"],
+                [sys.executable, str(g / PFX / "govkit" / "govkit.py"), "selfcheck"],
                 capture_output=True, text=True)
 
         scratch_gov.n = 0
 
         def kit(leg_name=None, include_all=True):
-            lines = ['id = "memory-tree"', 'home = "tools/memory-tree"', 'scope = "repo"',
+            lines = ['id = "memory-tree"', 'home = "memory-tree"', 'scope = "repo"',
                      'version_from = { none = "demo" }', "[check]", 'none = "demo"',
                      "[[files]]"]
             lines.append('include = "**"' if include_all
@@ -2226,7 +2244,7 @@ def main() -> int:
 
         r1 = scratch_gov(kit("typo leg"))
         check("a descriptor leg absent from the manifest REDS",
-              "is in no leg of tools/gate-legs.json" in r1.stdout, r1.stdout)
+              f"is in no leg of {PFX}gate-legs.json" in r1.stdout, r1.stdout)
         check("and the manifest leg it left unclaimed reds too — both directions, one fixture",
               "claimed by no descriptor and carried by no [[exempt_leg]]" in r1.stdout, r1.stdout)
 
@@ -2247,7 +2265,7 @@ def main() -> int:
         check("over gov, every manifest leg is claimed or exempted",
               "claimed by no descriptor" not in ps.stdout, ps.stdout)
         check("over gov, no descriptor leg is missing from the manifest",
-              "is in no leg of tools/gate-legs.json" not in ps.stdout, ps.stdout)
+              f"is in no leg of {PFX}gate-legs.json" not in ps.stdout, ps.stdout)
         check("the leg note reports all three figures, derived",
               "in the manifest" in ps.stdout and "claimed" in ps.stdout
               and "exempt" in ps.stdout, ps.stdout)
@@ -2269,7 +2287,7 @@ def main() -> int:
         # TOOL-aReplayedCard-2 gave the kit a third file, which is the literal going stale in place.
         _g5 = govkit_module()
         _w5 = _g5.resolve_entry(
-            govroot, _g5.load_toml(govroot / "tools" / "govkit" / "entries" / "check-wiring.kit.toml"),
+            govroot, _g5.load_toml(govroot / PFX / "govkit" / "entries" / "check-wiring.kit.toml"),
             _g5.canonical_ctx("check-wiring"))["writes"].values()
         _n5 = sum(1 for w in _w5 if w["role"] == "engine")
         _p5 = sum(1 for w in _w5 if w["role"] == "engine" and w["src"])
@@ -2287,7 +2305,7 @@ def main() -> int:
         # AC2 — one modified engine file is a finding naming the path and BOTH hashes.
         ev2 = make_target(tmp / "u5b", DEPLOY_FULL)
         run("apply", "--target", str(ev2), "--kits", "check-wiring")
-        tgt = ev2 / "tools" / "check-wiring.sh"
+        tgt = ev2 / PFX / "check-wiring.sh"
         tgt.write_bytes(tgt.read_bytes() + b"\n# drift\n")
         pc = run("check", "--target", str(ev2))
         check("a modified engine file reds naming the path", pc.returncode == 1
@@ -2348,8 +2366,8 @@ def main() -> int:
         # These paths had NO arms at all, and it showed: a NameError in the machine-order writer
         # reached runtime, because nothing here had ever executed that branch. The review's finding
         # that the write block is the least-armed block is the reason these exist.
-        MACH = """gov_source = "local"
-prefix = "tools"
+        MACH = f"""gov_source = "local"
+prefix = "{PFX[:-1]}"
 kits = ["kickoff-manifest"]
 
 [answers]
@@ -2368,7 +2386,7 @@ user_skills = "/tmp/gk-fake-skills"
         check("the order carries the destination and BOTH platforms' link commands",
               "session-kickoff" in body and "mklink /J" in body and "ln -s" in body, body[:300])
         check("and apply wrote nothing at that destination — it is outside the repository",
-              not (mt / "tools" / "session-kickoff").exists(), "")
+              not (mt / PFX / "session-kickoff").exists(), "")
 
         pc = run("check", "--target", str(mt))
         check("check reports the machine destination undischargeable, not missing",
@@ -2458,7 +2476,7 @@ user_skills = "/tmp/gk-fake-skills"
 
         def _run_selfcheck(root):
             return subprocess.run(
-                [sys.executable, str(root / "tools" / "govkit" / "govkit.py"), "selfcheck"],
+                [sys.executable, str(root / PFX / "govkit" / "govkit.py"), "selfcheck"],
                 capture_output=True, text=True)
 
         base = _run_selfcheck(gcopy)
@@ -2466,7 +2484,7 @@ user_skills = "/tmp/gk-fake-skills"
               base.stdout + base.stderr)
 
         # --- 7d: a conditional entry whose why_conditional is removed.
-        d = gcopy / "tools" / "govkit" / "entries" / "check-placeholders.kit.toml"
+        d = gcopy / PFX / "govkit" / "entries" / "check-placeholders.kit.toml"
         keep = d.read_text(encoding="utf-8")
         d.write_text("\n".join(l for l in keep.split("\n")
                                 if not l.startswith("why_conditional")), encoding="utf-8")
@@ -2480,11 +2498,11 @@ user_skills = "/tmp/gk-fake-skills"
 
         # --- 7e: an entry requiring a default-set member, reachable by no declared selection. This
         #     is check-microformats' own state before TOOL-aHonedRuleset-8 moved it.
-        reg = gcopy / "tools" / "govkit" / "registry.toml"
+        reg = gcopy / PFX / "govkit" / "registry.toml"
         rkeep = reg.read_text(encoding="utf-8")
         reg.write_text(rkeep.replace('"run-gates",\n           "check-microformats"]',
                                      '"run-gates"]', 1), encoding="utf-8")
-        cm = gcopy / "tools" / "govkit" / "entries" / "check-microformats.kit.toml"
+        cm = gcopy / PFX / "govkit" / "entries" / "check-microformats.kit.toml"
         ckeep = cm.read_text(encoding="utf-8")
         cl = ckeep.split("\n")
         ci = next(i for i, l in enumerate(cl) if l.startswith('requires = ["playbook"]'))
@@ -2503,22 +2521,22 @@ user_skills = "/tmp/gk-fake-skills"
 
         # --- TOOL-aRepatriatedFork-18 S8 (AC1): a shipped gate whose sibling suite is withheld
         #     again, the state all four arm-bearing kits were in before that unit.
-        uk = gcopy / "tools" / "unattended" / "kit.toml"
+        uk = gcopy / PFX / "unattended" / "kit.toml"
         ukeep = uk.read_text(encoding="utf-8")
         uk.write_text(ukeep.replace('"stop-guard.test.sh"]', '"stop-guard.test.sh", "unattended.test.sh"]', 1),
                       encoding="utf-8")
         r18 = _run_selfcheck(gcopy)
         check("[aRF-18 AC1] selfcheck reds a shipped gate whose check-arms sibling is project-owned",
               r18.returncode != 0
-              and "'tools/unattended/unattended.sh' ships and check-arms reads it as a gate, but its "
-                  "sibling suite 'tools/unattended/unattended.test.sh' does not ship"
+              and f"'{PFX}unattended/unattended.sh' ships and check-arms reads it as a gate, but its "
+                  f"sibling suite '{PFX}unattended/unattended.test.sh' does not ship"
               in (r18.stdout + r18.stderr), r18.stdout + r18.stderr)
         uk.write_text(ukeep, encoding="utf-8")
         check("[aRF-18 AC1] and is green again once the suite ships",
               _run_selfcheck(gcopy).returncode == 0, "")
 
         # --- DEPL-aRepatriatedFork-1 AC7: a `stands_down.when_selected` member naming no entry.
-        pk = gcopy / "tools" / "govkit" / "entries" / "playbook.kit.toml"
+        pk = gcopy / PFX / "govkit" / "entries" / "playbook.kit.toml"
         pkeep = pk.read_text(encoding="utf-8")
         pk.write_text(pkeep.replace('when_selected = ["playbook-render"]',
                                     'when_selected = ["playbook-rendr"]', 1), encoding="utf-8")
@@ -2529,7 +2547,7 @@ user_skills = "/tmp/gk-fake-skills"
         pk.write_text(pkeep, encoding="utf-8")
 
         # --- DEPL-aRepatriatedFork-14 AC4: arm 7j2, an entry declaring no `[check]` table at all.
-        tc = gcopy / "tools" / "govkit" / "entries" / "check-testsuite-counts.kit.toml"
+        tc = gcopy / PFX / "govkit" / "entries" / "check-testsuite-counts.kit.toml"
         tkeep = tc.read_text(encoding="utf-8")
         tc.write_text(tkeep.split("\n[check]\n", 1)[0] + "\n", encoding="utf-8")
         r14 = _run_selfcheck(gcopy)
@@ -2539,13 +2557,13 @@ user_skills = "/tmp/gk-fake-skills"
         tc.write_text(tkeep, encoding="utf-8")
 
         # --- DEPL-aRepatriatedFork-14 AC7: arm 7j3, a descriptor leg running its own withheld file.
-        pmk = gcopy / "tools" / "process-monitor" / "kit.toml"
+        pmk = gcopy / PFX / "process-monitor" / "kit.toml"
         pmkeep = pmk.read_text(encoding="utf-8")
         pmk.write_text(pmkeep + '\n[[gate_leg]]\nname = "pm fixture leg"\nsubject = "kit"\n'
                        'argv = ["python", "{kit}/selftest.py"]\nguard = []\n', encoding="utf-8")
         r14 = _run_selfcheck(gcopy)
         check("[aRF-14 AC7] selfcheck refuses a gate leg naming its own project-owned path",
-              r14.returncode != 0 and "gate leg 'pm fixture leg' runs tools/process-monitor/selftest.py, "
+              r14.returncode != 0 and f"gate leg 'pm fixture leg' runs {PFX}process-monitor/selftest.py, "
               "which its own `project-owned` rule withholds" in r14.stdout, r14.stdout + r14.stderr)
         pmk.write_text(pmkeep, encoding="utf-8")
         check("[aRF-14] and the gov copy is green again with both descriptors restored",
@@ -2560,7 +2578,7 @@ user_skills = "/tmp/gk-fake-skills"
             "#!/usr/bin/env bash\n"
             "'" + sys.executable.replace("\\", "/") + "' - \"$@\" <<'PY'\n"
             "import json, subprocess\n"
-            "legs = json.load(open('tools/legs.json'))\n"
+            f"legs = json.load(open('{PFX}legs.json'))\n"
             "rc = 0\n"
             "for l in legs:\n"
             "    try:\n"
@@ -2580,28 +2598,28 @@ user_skills = "/tmp/gk-fake-skills"
 
         def runner_target(name: str, kind: str = "manifest", extra: str = "") -> pathlib.Path:
             g = tmp / name
-            (g / "tools").mkdir(parents=True, exist_ok=True)
+            (g / PFX).mkdir(parents=True, exist_ok=True)
             # NO SHELL in the loop. The declaration takes an argv ARRAY — that is its own rule, and
             # it is why a shell string is refused — so the fixture's runner is a python file the
             # interpreter running this harness invokes directly. A bare `python` does not resolve
             # inside the fixture's bash on this host, and handing that bash a Windows path is the
             # two-spellings trap this repo already records; taking the shell out avoids both.
-            (g / "tools" / "runner.py").write_text(
+            (g / PFX / "runner.py").write_text(
                 RUNNER.split("<<'PY'\n", 1)[1].rsplit('PY\n', 1)[0],
                 encoding="utf-8", newline="\n")
-            (g / "tools" / "legs.json").write_text(
+            (g / PFX / "legs.json").write_text(
                 json.dumps([{"name": "control", "argv": ["true"]}], indent=2) + "\n",
                 encoding="utf-8", newline="\n")
             (g / ".governance").mkdir(exist_ok=True)
-            decl = ('\n[gate_runner]\nkind = "manifest"\nfile = "tools/legs.json"\n'
+            decl = (f'\n[gate_runner]\nkind = "manifest"\nfile = "{PFX}legs.json"\n'
                     'grammar = "json-array"\ndedupe_key = "name"\n'
-                    'command = ["bash", "tools/runner.sh"]\n'
+                    f'command = ["bash", "{PFX}runner.sh"]\n'
                     'run_all_env = { GATE_FULL = "1" }\n'
                     'observed_ran = ["GATE ok    {name}"]\n'
                     'observed_failed = ["GATE FAIL  {name}"]\n') if kind == "manifest" else (
                     '\n[gate_runner]\nkind = "none"\n')
             (g / ".governance" / "deploy.toml").write_text(
-                'gov_source = "local"\nprefix = "tools"\nkits = ["check-wiring"]\n\n'
+                f'gov_source = "local"\nprefix = "{PFX[:-1]}"\nkits = ["check-wiring"]\n\n'
                 '[answers]\nmemory_root = "memory"\n' + decl + extra,
                 encoding="utf-8", newline="\n")
             git(g, "init", "-q", "-b", "main"); git(g, "config", "user.email", "t@e")
@@ -2613,7 +2631,7 @@ user_skills = "/tmp/gk-fake-skills"
             # self-test takes minutes, and a runner that never returned would make every assertion
             # about its output vacuous rather than failing loudly.
             try:
-                q = subprocess.run([sys.executable, "tools/runner.py"], cwd=str(g),
+                q = subprocess.run([sys.executable, f"{PFX}runner.py"], cwd=str(g),
                                    capture_output=True, text=True, timeout=180)
                 return q.stdout + q.stderr
             except subprocess.TimeoutExpired:
@@ -2636,7 +2654,7 @@ user_skills = "/tmp/gk-fake-skills"
         # ---- exists — the removal would read to them as the kit shipping no tests at all.
         # ---- The check-wiring entry emits exactly one leg and it is subject = "kit", so this
         # ---- fixture is the right shape for the arm rather than an accident of it.
-        _kits_in = [r for r in json.loads((gt / "tools" / "legs.json").read_text(encoding="utf-8"))
+        _kits_in = [r for r in json.loads((gt / PFX / "legs.json").read_text(encoding="utf-8"))
                     if (r.get("subject") or "repo") == "kit"]
         check("LIVENESS: the fixture actually emitted a kit-subject leg, or the AC11 arms below "
               "would be asserting about a summary with nothing to summarise",
@@ -2654,7 +2672,7 @@ user_skills = "/tmp/gk-fake-skills"
         # The invocation is the TARGET's declared runner command, not this repo's path — an adopter
         # pointed at a script absent from their tree has been told nothing.
         check("AC11: and names the once-and-on-demand invocation against the target's own runner",
-              "govkit apply —   GATE_SELFTESTS=1 bash tools/runner.sh" in pa.stdout, pa.stdout)
+              f"govkit apply —   GATE_SELFTESTS=1 bash {PFX}runner.sh" in pa.stdout, pa.stdout)
         # The GATE_FULL sentence is not decoration: `guard = ["{kit}/"]` was the mechanism this
         # replaced, and it failed precisely because GATE_FULL ignores guards. An adopter who reads
         # `GATE_FULL=1` as "everything" will believe a green bar covered the kits.
@@ -2672,11 +2690,11 @@ user_skills = "/tmp/gk-fake-skills"
 
         # Idempotency by the declared dedupe key, and the row count must have GROWN first —
         # 'byte-identical' alone is satisfied by an emitter that does nothing.
-        legs1 = json.loads((gt / "tools" / "legs.json").read_text(encoding="utf-8"))
+        legs1 = json.loads((gt / PFX / "legs.json").read_text(encoding="utf-8"))
         check("the first apply strictly increased the runner's row count", len(legs1) == 2,
               str(legs1))
         run("apply", "--target", str(gt), "--kits", "check-wiring")
-        legs2 = json.loads((gt / "tools" / "legs.json").read_text(encoding="utf-8"))
+        legs2 = json.loads((gt / PFX / "legs.json").read_text(encoding="utf-8"))
         check("a second apply leaves the runner file byte-identical", legs1 == legs2, str(legs2))
 
         # A guard that renders to a path matching nothing TRACKED is dropped, and the leg is emitted
@@ -2684,7 +2702,7 @@ user_skills = "/tmp/gk-fake-skills"
         # pathspec matching nothing diffs clean, so an existence test would keep it and skip forever.
         emitted_leg = next(l for l in legs2 if l["name"] == "check-wiring self-test")
         check("a guard rendering to a path this apply STAGED is kept, not dropped",
-              emitted_leg.get("guard") == ["tools/check-wiring.sh", "tools/check-wiring.test.sh"],
+              emitted_leg.get("guard") == [f"{PFX}check-wiring.sh", f"{PFX}check-wiring.test.sh"],
               str(emitted_leg))
         vals = [v for l in legs2 for v in ([l["name"]] + l["argv"] + l.get("guard", []))]
         check("and no emitted VALUE still carries a brace", not any("{" in v for v in vals),
@@ -2714,14 +2732,14 @@ user_skills = "/tmp/gk-fake-skills"
         # receipt's `emitted` KEEPS the previous run's rows instead of being blanked. `owned`
         # derives from that field, so a blank makes the next apply refuse the legs this deployer
         # itself wrote — permanently, with --re-adopt carrying the blank forward.
-        _pre_legs = (gt / "tools" / "legs.json").read_text(encoding="utf-8")
+        _pre_legs = (gt / PFX / "legs.json").read_text(encoding="utf-8")
         _pre_rcpt = json.loads((gt / ".governance" / "install.json").read_text(encoding="utf-8"))
         _pre_owned = [e["name"] for e in (_pre_rcpt.get("gate_runner") or {}).get("emitted", [])]
         check("PRECONDITION: the target owns at least one emitted leg before the withheld run — "
               "without this the two arms below pass over an empty set",
               len(_pre_owned) >= 1, str(_pre_owned))
         # THE BREAK IS IN THE TARGET'S OWN RUNNER, and the first attempt got this wrong in a way
-        # worth recording: it edited `<target>/tools/check-wiring/kit.toml`, which does not exist.
+        # worth recording: it edited `<target>/<prefix>/check-wiring/kit.toml`, which does not exist.
         # `check-wiring` is a FLAT registry entry — no kit directory, and the descriptor is gov's,
         # never copied into the target — so the fixture asserted against a path no install creates
         # and the loud else-branch below is what said so.
@@ -2753,8 +2771,8 @@ user_skills = "/tmp/gk-fake-skills"
                   "the guard reacts to",
                   "gate legs: WITHHELD" in _wr.stdout, _wr.stdout + _wr.stderr)
             check("AC-withheld: and the runner file is byte-identical — nothing was rewritten",
-                  (gt / "tools" / "legs.json").read_text(encoding="utf-8") == _pre_legs,
-                  (gt / "tools" / "legs.json").read_text(encoding="utf-8"))
+                  (gt / PFX / "legs.json").read_text(encoding="utf-8") == _pre_legs,
+                  (gt / PFX / "legs.json").read_text(encoding="utf-8"))
             _post = json.loads((gt / ".governance" / "install.json").read_text(encoding="utf-8"))
             _post_owned = [e["name"] for e in (_post.get("gate_runner") or {}).get("emitted", [])]
             check("AC-withheld: and the receipt KEEPS the previous ownership rather than blanking "
@@ -2821,7 +2839,7 @@ user_skills = "/tmp/gk-fake-skills"
 
         # Ownership: a name the target already owns is refused, not overwritten.
         own = runner_target("u4b")
-        lj = own / "tools" / "legs.json"
+        lj = own / PFX / "legs.json"
         lj.write_text(json.dumps([{"name": "control", "argv": ["true"]},
                                   {"name": "check-wiring self-test", "argv": ["echo", "theirs"]}],
                                  indent=2) + "\n", encoding="utf-8", newline="\n")
@@ -2854,7 +2872,7 @@ user_skills = "/tmp/gk-fake-skills"
             bt = make_target(tmp / ("u4r%d" % (abs(hash(bad)) % 9999)), None)
             (bt / ".governance").mkdir(exist_ok=True)
             (bt / ".governance" / "deploy.toml").write_text(
-                'gov_source = "local"\nprefix = "tools"\nkits = ["check-wiring"]\n'
+                f'gov_source = "local"\nprefix = "{PFX[:-1]}"\nkits = ["check-wiring"]\n'
                 '[answers]\nmemory_root = "memory"\n[gate_runner]\n' + bad + "\n",
                 encoding="utf-8", newline="\n")
             pa = run("apply", "--target", str(bt), "--kits", "check-wiring")
@@ -2872,7 +2890,7 @@ user_skills = "/tmp/gk-fake-skills"
             (g / ".githooks" / "pre-commit").write_text(hook, encoding="utf-8", newline=NLc)
             (g / ".governance").mkdir(exist_ok=True)
             (g / ".governance" / "deploy.toml").write_text(
-                'gov_source = "l"' + NLc + 'prefix = "tools"' + NLc +
+                'gov_source = "l"' + NLc + f'prefix = "{PFX[:-1]}"' + NLc +
                 'kits = ["push-main"]' + NLc + "[answers]" + NLc + 'memory_root = "memory"' + NLc,
                 encoding="utf-8", newline=NLc)
             git(g, "init", "-q", "-b", "main"); git(g, "config", "user.email", "t@e")
@@ -2935,7 +2953,7 @@ user_skills = "/tmp/gk-fake-skills"
         (pj / ".governance").mkdir(parents=True, exist_ok=True)
         (pj / "pyproject.toml").write_bytes(b"[tool.other]\nkey = 1")      # NO trailing newline
         (pj / ".governance" / "deploy.toml").write_text(
-            'gov_source = "l"' + NLc + 'prefix = "tools"' + NLc +
+            'gov_source = "l"' + NLc + f'prefix = "{PFX[:-1]}"' + NLc +
             'kits = ["pytest-parallel-guardrails"]' + NLc + "[answers]" + NLc +
             'memory_root = "memory"' + NLc, encoding="utf-8", newline=NLc)
         git(pj, "init", "-q", "-b", "main"); git(pj, "config", "user.email", "t@e")
@@ -2959,7 +2977,7 @@ user_skills = "/tmp/gk-fake-skills"
             g = tmp / name
             (g / ".governance").mkdir(parents=True, exist_ok=True)
             (g / ".governance" / "deploy.toml").write_text(
-                'gov_source = "l"' + NLp + 'prefix = "tools"' + NLp +
+                'gov_source = "l"' + NLp + f'prefix = "{PFX[:-1]}"' + NLp +
                 'kits = ["memory-recall"]' + NLp + "[answers]" + NLp +
                 'memory_root = "memory"' + NLp, encoding="utf-8", newline=NLp)
             (g / "README.md").write_text("t" + NLp, encoding="utf-8", newline=NLp)
@@ -2982,7 +3000,7 @@ user_skills = "/tmp/gk-fake-skills"
         inc = make_target(tmp / "incomplete", DEPLOY_FULL)
         p = run("apply", "--target", str(inc), "--kits", "memory-recall,memory-tree")
         out = p.stdout + p.stderr
-        _mr = inc / "tools" / "memory-recall"
+        _mr = inc / PFX / "memory-recall"
         check("[aRF-36] apply lands memory-recall's CLI and extractor on a fresh target",
               all((_mr / f).is_file() for f in ("query.py", "extract.py")), out[-900:])
         check("[aRF-36] ...and reports no entry INCOMPLETE", "INCOMPLETE" not in out, out[-900:])
@@ -2991,18 +3009,18 @@ user_skills = "/tmp/gk-fake-skills"
         check("[aRF-36] rev-3 ...but NOT the recall hook, whose opt-in this target never took",
               not (_mr / "recall-opened.js").exists(), out[-900:])
         check("[aRF-36] rev-3 ...and the skip names the key that takes it",
-              "SKIPPED [opt-in       ] tools/memory-recall/recall-opened.js" in out
+              f"SKIPPED [opt-in       ] {PFX}memory-recall/recall-opened.js" in out
               and "with_hook" in out, out[-900:])
         _optin = make_target(tmp / "optin36", DEPLOY_FULL + "\n[kit.memory-recall]\nwith_hook = \"yes\"\n")
         _po = run("apply", "--target", str(_optin), "--kits", "memory-recall,memory-tree")
         check("[aRF-36] rev-3 a target declaring [kit.memory-recall] with_hook = \"yes\" gets the hook",
-              (_optin / "tools" / "memory-recall" / "recall-opened.js").is_file(),
+              (_optin / PFX / "memory-recall" / "recall-opened.js").is_file(),
               (_po.stdout + _po.stderr)[-900:])
         _all = make_target(tmp / "optall36", DEPLOY_FULL + "\n[kit.memory-recall]\nopt_in_all = \"yes\"\n")
         _pa = run("apply", "--target", str(_all), "--kits", "memory-recall,memory-tree")
         check("[aRF-36] rev-3 a target spelling the canonical ctx's reserved key is refused by name",
               _pa.returncode != 0 and "reserved" in (_pa.stdout + _pa.stderr)
-              and not (_all / "tools" / "memory-recall" / "recall-opened.js").exists(),
+              and not (_all / PFX / "memory-recall" / "recall-opened.js").exists(),
               (_pa.stdout + _pa.stderr)[-900:])
         _pr = run("plan", "--target", str(inc), "--kits", "memory-recall")
         check("[aRF-36] rev-3 ...and plan, the preview the operator approves, agrees with apply",
@@ -3042,7 +3060,7 @@ user_skills = "/tmp/gk-fake-skills"
         # deployer into a target that receives neither.
         blk = (pg / ".gitattributes").read_text(encoding="utf-8")
         check("gov-only pins are NOT emitted into a target",
-              "tools/govkit/*" not in blk and "tools/gate-legs.json" not in blk, blk)
+              f"{PFX}govkit/*" not in blk and f"{PFX}gate-legs.json" not in blk, blk)
         check("but the selected kit's own pin IS",
               ".claude/skills/memory-recall/SKILL.md text eol=lf" in blk, blk)
 
@@ -3586,20 +3604,20 @@ user_skills = "/tmp/gk-fake-skills"
 
         # --- AC8 the POSITIVE half: a FOREIGN kit, one no receipt claims, refuses before writing.
         for_ = make_target(tmp / "e", DEPLOY_FULL)
-        (for_ / "tools").mkdir(parents=True, exist_ok=True)
-        (for_ / "tools" / "check-wiring.sh").write_text("KIT_CHECK_WIRING_VERSION=9.9\n",
+        (for_ / PFX).mkdir(parents=True, exist_ok=True)
+        (for_ / PFX / "check-wiring.sh").write_text("KIT_CHECK_WIRING_VERSION=9.9\n",
                                                         encoding="utf-8")
         p = run("apply", "--target", str(for_), "--kits", "memory-tree")
         check("apply refuses a target already carrying a kit no receipt claims", p.returncode == 2)
         check("that refusal NAMES the kit and where it resolved",
-              "check-wiring (at tools/check-wiring.sh)" in p.stderr, p.stderr)
+              f"check-wiring (at {PFX}check-wiring.sh)" in p.stderr, p.stderr)
         check("the refusal happened BEFORE any write",
               not (for_ / ".governance" / "install.json").exists(), "")
 
         # --- TOOL-aRepatriatedFork-24 AC8: a foreign kit at the INTAKE'S OWN prefix. The probe asked
         # --- only at gov's prefix and the root, so a `scripts/` intake over a `scripts/` install read
         # --- as a clean target and the apply went ahead. Red against `2143b6d6`'s probe.
-        for_s = make_target(tmp / "e24", DEPLOY_FULL.replace('prefix = "tools"', 'prefix = "scripts"', 1))
+        for_s = make_target(tmp / "e24", DEPLOY_FULL.replace(f'prefix = "{PFX[:-1]}"', 'prefix = "scripts"', 1))
         (for_s / "scripts").mkdir(parents=True, exist_ok=True)
         (for_s / "scripts" / "check-wiring.sh").write_text("KIT_CHECK_WIRING_VERSION=9.9\n",
                                                           encoding="utf-8")
@@ -3717,8 +3735,8 @@ user_skills = "/tmp/gk-fake-skills"
               'file = "scripts/gate-legs.json"' in _d6, _d6)
         check("the [gate_runner] command follows it too",
               '"scripts/run-gates/run-gates.sh"' in _d6, _d6)
-        check("no tools/ path survives in the descriptor's runner block",
-              "tools/gate-legs.json" not in _d6, _d6)
+        check(f"no {PFX} path survives in the descriptor's runner block",
+              f"{PFX}gate-legs.json" not in _d6, _d6)
 
         # ================= DEPL-dCarriedReceipt-2: attributes, gate-leg and ci =================
         # The defect: `UPDATE_ROLE` sent all three to `refuse`, which runs BEFORE `classify_row`
@@ -4000,7 +4018,7 @@ user_skills = "/tmp/gk-fake-skills"
                 _pm, _eng[0], "push-main.sh", _gk.canonical_ctx("push-main"),
                 (_pm.get("home") or "").rstrip("/"))]
             check("[-1] a source under `home` still resolves to its basename",
-                  _got2 == ["tools/push-main.sh"], str(_got2))
+                  _got2 == [f"{PFX}push-main.sh"], str(_got2))
 
         # ================= liveness of the two derived assertions =================
         # An assertion that finds nothing on a clean tree is indistinguishable from one that CANNOT
@@ -4012,22 +4030,22 @@ user_skills = "/tmp/gk-fake-skills"
             # the arguments alone, so a second call with identical ones met a directory that already
             # existed and died with FileExistsError rather than reusing or refusing.
             g = tmp / f"gov{abs(hash((mutates, guard))) % 9999}{tag}"
-            (g / "tools" / "govkit").mkdir(parents=True)
-            (g / "tools" / "demo").mkdir(parents=True)
-            shutil.copy2(GOVKIT, g / "tools" / "govkit" / "govkit.py")
-            shutil.copy2(GOVKIT.parent / "adopters.toml", g / "tools" / "govkit" / "adopters.toml")  # arm 10 refuses a gov without it
-            (g / "tools" / "govkit" / "registry.toml").write_text(
-                '[surface]\nglobs = ["tools/*"]\n\n'
+            (g / PFX / "govkit").mkdir(parents=True)
+            (g / PFX / "demo").mkdir(parents=True)
+            shutil.copy2(GOVKIT, g / PFX / "govkit" / "govkit.py")
+            shutil.copy2(GOVKIT.parent / "adopters.toml", g / PFX / "govkit" / "adopters.toml")  # arm 10 refuses a gov without it
+            (g / PFX / "govkit" / "registry.toml").write_text(
+                '[surface]\nglobs = ["{prefix}/*"]\n\n'
                 '[selection]\ndefault = ["demo"]\n\n'
-                '[[entry]]\nid = "demo"\ndescriptor = "tools/demo/kit.toml"\n\n'
-                '[[exempt]]\npath = "tools/govkit"\nwhy = "the deployer itself"\n\n'
-                '[[exempt]]\npath = "tools/gate-legs.json"\nwhy = "a gov-specific leg manifest"\n',
+                '[[entry]]\nid = "demo"\ndescriptor = "{prefix}/demo/kit.toml"\n\n'
+                '[[exempt]]\npath = "{prefix}/govkit"\nwhy = "the deployer itself"\n\n'
+                '[[exempt]]\npath = "{prefix}/gate-legs.json"\nwhy = "a gov-specific leg manifest"\n',
                 encoding="utf-8", newline="\n")
             # The descriptor DECLARES the manifest's leg. Without it the fixture is a gov tree whose
             # leg is claimed by nobody, which the leg correspondence reds on — correctly, and the
             # fixture's own premise is that both facts agree.
-            (g / "tools" / "demo" / "kit.toml").write_text(
-                'id = "demo"\nhome = "tools/demo"\n'
+            (g / PFX / "demo" / "kit.toml").write_text(
+                'id = "demo"\nhome = "demo"\n'
                 'version_from = { none = "fixture" }\n\n'
                 '[check]\nnone = "a fixture kit"\n\n'
                 '[[files]]\ninclude = "**"\nrole = "engine"\n\n'
@@ -4036,10 +4054,10 @@ user_skills = "/tmp/gk-fake-skills"
                 encoding="utf-8", newline="\n")
             # The adopter EXECUTES `git add`. A `git add` inside an echo would not count, which is
             # the distinction that made this assertion necessary in the first place.
-            (g / "tools" / "demo" / "adopt-demo.sh").write_text(
+            (g / PFX / "demo" / "adopt-demo.sh").write_text(
                 '#!/usr/bin/env bash\necho "  1. git add something && commit."\ngit add .\n',
                 encoding="utf-8", newline="\n")
-            (g / "tools" / "gate-legs.json").write_text(
+            (g / PFX / "gate-legs.json").write_text(
                 # THE MANIFEST DECLARES ITS SUBJECT, like the descriptor beside it. An
                 # omission here is the M1 case: the descriptor says one thing and the
                 # manifest says nothing, which every reader defaults to `repo` — a silent
@@ -4050,7 +4068,7 @@ user_skills = "/tmp/gk-fake-skills"
             # Only govkit.py was copied, so this tree arrives with no subject pin and the ratchet
             # reds on its absence — correctly, and this fixture's premise is a tree where every
             # declared fact agrees. The manifest leg declares no subject, so it derives to `repo`.
-            (g / "tools" / "govkit" / "subject-pins.tsv").write_text(
+            (g / PFX / "govkit" / "subject-pins.tsv").write_text(
                 "# fixture pin\ndemo\trepo\n", encoding="utf-8", newline="\n")
             git(g, "init", "-q", "-b", "main")
             git(g, "config", "user.email", "t@e")
@@ -4060,11 +4078,11 @@ user_skills = "/tmp/gk-fake-skills"
             return g
 
         def run_in(g: pathlib.Path) -> subprocess.CompletedProcess:
-            return subprocess.run([sys.executable, str(g / "tools" / "govkit" / "govkit.py"),
+            return subprocess.run([sys.executable, str(g / PFX / "govkit" / "govkit.py"),
                                    "selfcheck"], capture_output=True, text=True)
 
         def run_in_gov(g: pathlib.Path, *args: str) -> subprocess.CompletedProcess:
-            return subprocess.run([sys.executable, str(g / "tools" / "govkit" / "govkit.py"), *args],
+            return subprocess.run([sys.executable, str(g / PFX / "govkit" / "govkit.py"), *args],
                                   capture_output=True, text=True)
 
         def build_scratch_gov_kit(tag: str, kit_toml: str) -> pathlib.Path:
@@ -4075,20 +4093,20 @@ user_skills = "/tmp/gk-fake-skills"
             asserted by nothing. A fixture is the difference between a guard and a claim.
             """
             g = tmp / f"govkit-{tag}"
-            (g / "tools" / "govkit").mkdir(parents=True)
-            (g / "tools" / "demo").mkdir(parents=True)
-            shutil.copy2(GOVKIT, g / "tools" / "govkit" / "govkit.py")
-            shutil.copy2(GOVKIT.parent / "adopters.toml", g / "tools" / "govkit" / "adopters.toml")  # arm 10 refuses a gov without it
-            (g / "tools" / "govkit" / "registry.toml").write_text(
-                '[surface]\nglobs = ["tools/*"]\n\n'
+            (g / PFX / "govkit").mkdir(parents=True)
+            (g / PFX / "demo").mkdir(parents=True)
+            shutil.copy2(GOVKIT, g / PFX / "govkit" / "govkit.py")
+            shutil.copy2(GOVKIT.parent / "adopters.toml", g / PFX / "govkit" / "adopters.toml")  # arm 10 refuses a gov without it
+            (g / PFX / "govkit" / "registry.toml").write_text(
+                '[surface]\nglobs = ["{prefix}/*"]\n\n'
                 '[selection]\ndefault = ["demo"]\n\n'
-                '[[entry]]\nid = "demo"\ndescriptor = "tools/demo/kit.toml"\n\n'
-                '[[exempt]]\npath = "tools/govkit"\nwhy = "the deployer itself"\n',
+                '[[entry]]\nid = "demo"\ndescriptor = "{prefix}/demo/kit.toml"\n\n'
+                '[[exempt]]\npath = "{prefix}/govkit"\nwhy = "the deployer itself"\n',
                 encoding="utf-8", newline="\n")
-            (g / "tools" / "demo" / "kit.toml").write_text(kit_toml, encoding="utf-8", newline="\n")
-            (g / "tools" / "demo" / "demo-rendered.md").write_text("x\n", encoding="utf-8",
+            (g / PFX / "demo" / "kit.toml").write_text(kit_toml, encoding="utf-8", newline="\n")
+            (g / PFX / "demo" / "demo-rendered.md").write_text("x\n", encoding="utf-8",
                                                                    newline="\n")
-            (g / "tools" / "demo" / "adopt-demo.sh").write_text(
+            (g / PFX / "demo" / "adopt-demo.sh").write_text(
                 '#!/usr/bin/env bash\ntrue\n', encoding="utf-8", newline="\n")
             git(g, "init", "-q", "-b", "main")
             git(g, "config", "user.email", "t@e")
@@ -4099,7 +4117,7 @@ user_skills = "/tmp/gk-fake-skills"
 
         def build_scratch_gov_role(role: str) -> pathlib.Path:
             return build_scratch_gov_kit(f"role-{role}",
-                                   'id = "demo"\nhome = "tools/demo"\n'
+                                   'id = "demo"\nhome = "demo"\n'
                                    'version_from = { none = "fixture" }\n\n'
                                    '[[files]]\ninclude = ["demo-rendered.md"]\n'
                                    f'role = "{role}"\n\n[adopt]\nargv = []\nmutates_index = false\n')
@@ -4107,7 +4125,7 @@ user_skills = "/tmp/gk-fake-skills"
         def build_scratch_gov_hole() -> pathlib.Path:
             return build_scratch_gov_kit(
                 "blocked-hole",
-                'id = "demo"\nhome = "tools/demo"\n'
+                'id = "demo"\nhome = "demo"\n'
                 'version_from = { none = "fixture" }\n\n'
                 '[[files]]\ninclude = ["demo-rendered.md"]\nrole = "rendered"\n\n'
                 '[adopt]\nargv = ["bash", "{kit}/adopt-demo.sh"]\nmutates_index = false\n\n'
@@ -4115,11 +4133,11 @@ user_skills = "/tmp/gk-fake-skills"
                 'blocks_gate = false\nwhy = "the fixture that arms the blocks_adopt branch"\n'
                 'discharge = { command = ["true"] }\n')
 
-        good = run_in(scratch_gov("true", "tools/demo/"))
+        good = run_in(scratch_gov("true", f"{PFX}demo/"))
         check("the scratch gov fixture is GREEN when both facts agree", good.returncode == 0,
               good.stdout + good.stderr)
 
-        bad_m = run_in(scratch_gov("false", "tools/demo/"))
+        bad_m = run_in(scratch_gov("false", f"{PFX}demo/"))
         check("mutates_index reds when the declared value is not the measured one",
               bad_m.returncode == 1 and "mutates_index" in bad_m.stdout, bad_m.stdout)
         check("that message says the declared value is not the measured one",
@@ -4137,11 +4155,11 @@ user_skills = "/tmp/gk-fake-skills"
         # exactly the repositories TOOL-dUnstalledConvoy-26 exists to spare. The mechanism that
         # READS the choice may travel; the file that MAKES it may not. Armed on a fixture rather
         # than on this tree alone, because gating the instance certifies coverage nobody has.
-        pg = scratch_gov("true", "tools/demo/", tag="-policy")
-        # `tools/demo/` is claimed by an `include = "**"` engine rule, so anything dropped in it is
+        pg = scratch_gov("true", f"{PFX}demo/", tag="-policy")
+        # `<prefix>/demo/` is claimed by an `include = "**"` engine rule, so anything dropped in it is
         # payload. That is the case a claims-only derivation missed: 13 of 58 file rules in gov's
         # own tree declare `claims` at all.
-        (pg / "tools" / "demo" / "policy.sh").write_text(
+        (pg / PFX / "demo" / "policy.sh").write_text(
             "#!/usr/bin/env sh\nexport GATE_SELFTESTS=1\n", encoding="utf-8", newline="\n")
         git(pg, "add", "-A")
         git(pg, "commit", "-qm", "policy in the payload")
@@ -4150,12 +4168,12 @@ user_skills = "/tmp/gk-fake-skills"
               _pol.returncode == 1 and "carries a bare GATE_SELFTESTS assignment AND is shipped"
               in _pol.stdout, _pol.stdout + _pol.stderr)
         check("AC2: and the refusal names the file and the kit that would ship it",
-              "'tools/demo/policy.sh'" in _pol.stdout and "kit 'demo'" in _pol.stdout, _pol.stdout)
+              f"'{PFX}demo/policy.sh'" in _pol.stdout and "kit 'demo'" in _pol.stdout, _pol.stdout)
 
         # ITS CONTROL, and it is the arm that stops this being a ban on the variable. The same line
         # in a path no kit claims is the SANCTIONED shape — that is where gov keeps its own — and a
         # check that redded on it would have no place left to put the policy.
-        (pg / "tools" / "demo" / "policy.sh").unlink()
+        (pg / PFX / "demo" / "policy.sh").unlink()
         (pg / ".githooks").mkdir(parents=True, exist_ok=True)
         (pg / ".githooks" / "gate-env.sh").write_text(
             "#!/usr/bin/env sh\nexport GATE_SELFTESTS=1\n", encoding="utf-8", newline="\n")
@@ -4168,7 +4186,7 @@ user_skills = "/tmp/gk-fake-skills"
         # An INVOCATION is not a policy. `GATE_SELFTESTS=1 bash ...` appears in docs, arms and
         # refusal strings all over gov's tree — 54 such lines when the predicate was run over it —
         # and a check that called those policies would be permanently red on its own source.
-        (pg / "tools" / "demo" / "invoke.sh").write_text(
+        (pg / PFX / "demo" / "invoke.sh").write_text(
             "#!/usr/bin/env sh\nGATE_SELFTESTS=1 bash run-gates.sh\n",
             encoding="utf-8", newline="\n")
         git(pg, "add", "-A")
@@ -4182,20 +4200,20 @@ user_skills = "/tmp/gk-fake-skills"
         # predicate over a descriptor can decide whether a given value is RIGHT — that needs to know
         # what the leg's failure MEANS. So the value is ratcheted instead: it cannot move without the
         # move appearing in a diff. These arms grade the ratchet, and none of them grades correctness.
-        rg = scratch_gov("true", "tools/demo/", tag="-ratchet")
-        pinf = rg / "tools" / "govkit" / "subject-pins.tsv"
-        legsf = rg / "tools" / "gate-legs.json"
-        kitf = rg / "tools" / "demo" / "kit.toml"
+        rg = scratch_gov("true", f"{PFX}demo/", tag="-ratchet")
+        pinf = rg / PFX / "govkit" / "subject-pins.tsv"
+        legsf = rg / PFX / "gate-legs.json"
+        kitf = rg / PFX / "demo" / "kit.toml"
 
         def _write_legs(subject: str, extra: bool = False) -> None:
-            rows = [{"name": "demo", "argv": ["true"], "guard": ["tools/demo/"],
+            rows = [{"name": "demo", "argv": ["true"], "guard": [f"{PFX}demo/"],
                      "subject": subject}]
             if extra:
                 rows.append({"name": "demo two", "argv": ["true"], "guard": [], "subject": "repo"})
             legsf.write_text(json.dumps(rows, indent=2) + "\n", encoding="utf-8", newline="\n")
             # The DESCRIPTOR moves with it. Leaving it behind reds on the 7h agreement check, and
             # the arm would then be green for a reason that has nothing to do with the ratchet.
-            body = ('id = "demo"\nhome = "tools/demo"\n'
+            body = ('id = "demo"\nhome = "demo"\n'
                     'version_from = { none = "fixture" }\n\n'
                     '[check]\nnone = "a fixture kit"\n\n'
                     '[[files]]\ninclude = "**"\nrole = "engine"\n\n'
@@ -4316,7 +4334,7 @@ user_skills = "/tmp/gk-fake-skills"
         # catch this and its JOIN half has never executed, so these are hand-written.
         def _write_desc(subject_line: str, extra: str = "") -> None:
             kitf.write_text(
-                'id = "demo"\nhome = "tools/demo"\n'
+                'id = "demo"\nhome = "demo"\n'
                 'version_from = { none = "fixture" }\n\n'
                 '[check]\nnone = "a fixture kit"\n\n'
                 '[[files]]\ninclude = "**"\nrole = "engine"\n\n'
@@ -4351,7 +4369,7 @@ user_skills = "/tmp/gk-fake-skills"
         run_in_gov(rg, "selfcheck", "--write")
         check("L1 control: the fixture is GREEN again before the pin arms below",
               run_in(rg).returncode == 0, "")
-        _pinf = rg / "tools" / "govkit" / "subject-pins.tsv"
+        _pinf = rg / PFX / "govkit" / "subject-pins.tsv"
         _pinf.write_text("# fixture pin\ndemo repo\n", encoding="utf-8", newline="\n")
         _r = run_in(rg)
         check("L1: a pin row with no TAB REDS rather than being skipped as unparseable",
@@ -4402,7 +4420,7 @@ user_skills = "/tmp/gk-fake-skills"
         for _s in ("export GATE_SELFTESTS=1", "GATE_SELFTESTS=1",
                    "export GATE_SELFTESTS=1  # gov only", ": ${GATE_SELFTESTS:=1}"):
             check(f"M5: a policy line is caught — {_s!r}", bool(_pol_re.match(_s)), _s)
-        for _s in ("GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh",
+        for _s in (f"GATE_SELFTESTS=1 bash {PFX}run-gates/run-gates.sh",
                    'if [ -n "${GATE_SELFTESTS:-}" ]; then',
                    'echo "set GATE_SELFTESTS=1 to run"'):
             check(f"M5 control: an invocation is NOT a policy — {_s[:38]!r}",
@@ -4416,22 +4434,22 @@ user_skills = "/tmp/gk-fake-skills"
             _vp = pathlib.Path(_vd)
             check("M6: a target with no run-gates at all still gets the key — there is no canary "
                   "to red, and withholding it would deny the feature silently",
-                  govkit.check_target_reads_subject(_vp, {"prefix": "tools"}), "")
-            (_vp / "tools" / "run-gates").mkdir(parents=True)
-            _rgs = _vp / "tools" / "run-gates" / "run-gates.sh"
+                  govkit.check_target_reads_subject(_vp, {"prefix": PFX[:-1]}), "")
+            (_vp / PFX / "run-gates").mkdir(parents=True)
+            _rgs = _vp / PFX / "run-gates" / "run-gates.sh"
             _rgs.write_text("#!/usr/bin/env bash\nKIT_RUN_GATES_VERSION=1.0\n",
                             encoding="utf-8", newline="\n")
             check("M6: a target BELOW the floor does not get the key",
-                  not govkit.check_target_reads_subject(_vp, {"prefix": "tools"}), "1.0 accepted")
+                  not govkit.check_target_reads_subject(_vp, {"prefix": PFX[:-1]}), "1.0 accepted")
             _rgs.write_text("#!/usr/bin/env bash\nKIT_RUN_GATES_VERSION=1.1\n",
                             encoding="utf-8", newline="\n")
             check("M6: a target AT the floor does",
-                  govkit.check_target_reads_subject(_vp, {"prefix": "tools"}), "1.1 refused")
+                  govkit.check_target_reads_subject(_vp, {"prefix": PFX[:-1]}), "1.1 refused")
             _rgs.write_text("#!/usr/bin/env bash\n# no version constant here\n",
                             encoding="utf-8", newline="\n")
             check("M6: an UNREADABLE version is treated as below the floor — the direction that "
                   "costs a feature is recoverable, the one that reds somebody else's bar is not",
-                  not govkit.check_target_reads_subject(_vp, {"prefix": "tools"}), "unreadable accepted")
+                  not govkit.check_target_reads_subject(_vp, {"prefix": PFX[:-1]}), "unreadable accepted")
             check("M6: the floor is the version the canary's key set moved in",
                   govkit.SUBJECT_FLOOR_RUN_GATES == (1, 1),
                   str(govkit.SUBJECT_FLOOR_RUN_GATES))
@@ -4454,14 +4472,14 @@ user_skills = "/tmp/gk-fake-skills"
             t = make_target(tmp3, None)
             run("intake", "--target", str(t), "--kits", "drift-audit")
             first = run("apply", "--target", str(t), "--kits", "drift-audit,memory-tree")
-            owned = t / "tools" / "drift-audit" / "drift_signals.py"
+            owned = t / PFX / "drift-audit" / "drift_signals.py"
             check("apply lands the kit at all",
                   owned.is_file() and "landed" in first.stdout, first.stdout + first.stderr)
 
             # AC3 FIRST, and it is not ceremony: the cheapest way to pass the two arms below is to
             # stop landing files, so the coverage claim has to be pinned BEFORE the protection ones.
             first_receipt = json.loads((t / ".governance" / "install.json").read_text(encoding="utf-8"))
-            landed_before = sorted(p.name for p in (t / "tools" / "drift-audit").iterdir() if p.is_file())
+            landed_before = sorted(p.name for p in (t / PFX / "drift-audit").iterdir() if p.is_file())
             check("a ** rule still lands what nothing else claims — the template included",
                   "drift_signals.template.py" in landed_before and "drift_report.py" in landed_before,
                   str(landed_before))
@@ -4472,7 +4490,7 @@ user_skills = "/tmp/gk-fake-skills"
             # makes the re-apply REFUSE, and "the edit survived" is then true because nothing
             # ran — which is the exact vacuity the arm below was written to close.
             settle(t, "the adopter edits a seeded file")
-            seeded = t / "tools" / "drift-audit" / "drift_signals.py"
+            seeded = t / PFX / "drift-audit" / "drift_signals.py"
             second = run("apply", "--target", str(t), "--kits", "drift-audit,memory-tree")
             # THE RE-APPLY MUST HAVE SUCCEEDED. Both protection arms are satisfied by an apply that
             # REFUSED and wrote nothing — "the edit survived" is trivially true when nothing ran —
@@ -4491,7 +4509,7 @@ user_skills = "/tmp/gk-fake-skills"
                   "ADOPTER EDIT" in seeded.read_text(encoding="utf-8"),
                   "the wildcard rule clobbered a path another rule owns")
 
-            landed_after = sorted(p.name for p in (t / "tools" / "drift-audit").iterdir() if p.is_file())
+            landed_after = sorted(p.name for p in (t / PFX / "drift-audit").iterdir() if p.is_file())
             check("...and the re-apply still lands the same file set",
                   landed_after == landed_before, f"{landed_before} -> {landed_after}")
 
@@ -4690,7 +4708,7 @@ user_skills = "/tmp/gk-fake-skills"
             # seeds an empty file. Neither declares an adopter, so `apply`'s CONFIGURE step runs
             # nothing for them and a SIDE mark would promise a producer that does not exist.
             for kit, dest in (("review-harness", "memory/guides/REVIEW-PROTOCOL.md"),
-                              ("check-install-prefix", "tools/install-prefix-waivers.txt")):
+                              ("check-install-prefix", f"{PFX}install-prefix-waivers.txt")):
                 out = run("plan", "--target", str(t2), "--kits", kit).stdout
                 row = next((l for l in out.splitlines() if dest in l), "")
                 check(f"{kit}: a rendered/generated rule with NO adopter is an ORDER",
@@ -4724,12 +4742,12 @@ user_skills = "/tmp/gk-fake-skills"
             t3 = make_target(tmp3 / "skips", DEPLOY_FULL)
             sk = run("apply", "--target", str(t3), "--kits", "codebase-map,memory-tree")
             check("apply names each skipped rule, its role and its destination",
-                  "SKIPPED [project-owned] tools/codebase-map/map_extractors.py" in sk.stdout,
+                  f"SKIPPED [project-owned] {PFX}codebase-map/map_extractors.py" in sk.stdout,
                   sk.stdout)
             check("...and says why, in the same terms the preview used",
                   "writes that same path in this run" in sk.stdout, sk.stdout)
             check("...and names it ONCE, not once per classifier",
-                  sk.stdout.count("tools/codebase-map/map_extractors.py <- codebase-map") == 1,
+                  sk.stdout.count(f"{PFX}codebase-map/map_extractors.py <- codebase-map") == 1,
                   sk.stdout)
 
             # LANDABLE_ROLES IS DERIVED, and pinned against a literal so a table edit that changes
@@ -4772,7 +4790,7 @@ user_skills = "/tmp/gk-fake-skills"
             # green-by-absence of a passing tree rather than by the block being declared.
             # `[check]` declared absent, because DEPL-aRepatriatedFork-14 reds a descriptor that
             # declares neither an argv nor a reason, and this control must be green on its own arm.
-            _rr_desc = ('id = "demo"\nhome = "tools/demo"\n'
+            _rr_desc = ('id = "demo"\nhome = "demo"\n'
                         'version_from = { none = "fixture" }\n\n'
                         '[check]\nnone = "a fixture kit: nothing can measure its writes"\n\n'
                         '[[files]]\ninclude = ["demo-rendered.md"]\nrole = "rendered"\n'
@@ -4829,7 +4847,7 @@ user_skills = "/tmp/gk-fake-skills"
             # second rule claims the fixture's own non-rendered files on purpose — without it the
             # tree reds on the per-file claim arm instead, and the control below would be green by a
             # failure that never reached this predicate.
-            _mv_desc = ('id = "demo"\nhome = "tools/demo"\n'
+            _mv_desc = ('id = "demo"\nhome = "demo"\n'
                         'version_from = { none = "fixture" }\n\n'
                         '[check]\nnone = "a fixture kit: nothing can measure its writes"\n\n'
                         '[[files]]\ninclude = ["demo-rendered.md"]\nrole = "seed"\n'
@@ -4979,7 +4997,7 @@ user_skills = "/tmp/gk-fake-skills"
         # ---- instead of S3. The stages are injected directly, so the tree carries exactly the one
         # ---- condition under test — asserted on the next two lines rather than assumed.
         u3 = stale_target("ac3")
-        CW = "tools/check-wiring.sh"
+        CW = f"{PFX}check-wiring.sh"
         _blob = gout(u3, "rev-parse", f"HEAD:{CW}").strip()
         # BYTES, never `text=True`. Text mode wraps stdin in a TextIOWrapper whose default newline
         # handling rewrites every "\n" as os.linesep, so on Windows git read a path with a trailing
@@ -5082,24 +5100,24 @@ user_skills = "/tmp/gk-fake-skills"
         # and manufacturing one would mean writing to the repository under test.
         def vintage_gov() -> pathlib.Path:
             g = tmp / "gov-vintage"
-            (g / "tools" / "govkit").mkdir(parents=True)
-            (g / "tools" / "demo").mkdir(parents=True)
-            shutil.copy2(GOVKIT, g / "tools" / "govkit" / "govkit.py")
-            shutil.copy2(GOVKIT.parent / "adopters.toml", g / "tools" / "govkit" / "adopters.toml")  # arm 10 refuses a gov without it
-            (g / "tools" / "govkit" / "registry.toml").write_text(
-                '[surface]\nglobs = ["tools/*"]\n\n'
+            (g / PFX / "govkit").mkdir(parents=True)
+            (g / PFX / "demo").mkdir(parents=True)
+            shutil.copy2(GOVKIT, g / PFX / "govkit" / "govkit.py")
+            shutil.copy2(GOVKIT.parent / "adopters.toml", g / PFX / "govkit" / "adopters.toml")  # arm 10 refuses a gov without it
+            (g / PFX / "govkit" / "registry.toml").write_text(
+                '[surface]\nglobs = ["{prefix}/*"]\n\n'
                 '[selection]\ndefault = ["demo"]\n\n'
-                '[[entry]]\nid = "demo"\ndescriptor = "tools/demo/kit.toml"\n\n'
-                '[[exempt]]\npath = "tools/govkit"\nwhy = "the deployer itself"\n',
+                '[[entry]]\nid = "demo"\ndescriptor = "{prefix}/demo/kit.toml"\n\n'
+                '[[exempt]]\npath = "{prefix}/govkit"\nwhy = "the deployer itself"\n',
                 encoding="utf-8", newline="\n")
-            (g / "tools" / "demo" / "kit.toml").write_text(
-                'id = "demo"\nhome = "tools/demo"\n'
+            (g / PFX / "demo" / "kit.toml").write_text(
+                'id = "demo"\nhome = "demo"\n'
                 'version_from = { none = "fixture" }\n\n'
                 '[check]\nnone = "a fixture kit"\n\n'
                 '[[files]]\ninclude = ["demo.txt"]\nrole = "engine"\n\n'
                 '[adopt]\nargv = []\nmutates_index = false\n',
                 encoding="utf-8", newline="\n")
-            (g / "tools" / "demo" / "demo.txt").write_text("v1\n", encoding="utf-8", newline="\n")
+            (g / PFX / "demo" / "demo.txt").write_text("v1\n", encoding="utf-8", newline="\n")
             git(g, "init", "-q", "-b", "main")
             git(g, "config", "user.email", "t@e")
             git(g, "config", "user.name", "t")
@@ -5108,12 +5126,12 @@ user_skills = "/tmp/gk-fake-skills"
             return g
 
         def gov_run(g: pathlib.Path, *args: str) -> subprocess.CompletedProcess:
-            return subprocess.run([sys.executable, str(g / "tools" / "govkit" / "govkit.py"), *args],
+            return subprocess.run([sys.executable, str(g / PFX / "govkit" / "govkit.py"), *args],
                                   capture_output=True, text=True)
 
         gv = vintage_gov()
         VA = gout(gv, "rev-parse", "HEAD").strip()
-        (gv / "tools" / "demo" / "demo.txt").write_text("v2\n", encoding="utf-8", newline="\n")
+        (gv / PFX / "demo" / "demo.txt").write_text("v2\n", encoding="utf-8", newline="\n")
         git(gv, "add", "-A")
         git(gv, "commit", "-qm", "B")
         VB = gout(gv, "rev-parse", "HEAD").strip()
@@ -5125,19 +5143,19 @@ user_skills = "/tmp/gk-fake-skills"
         gov_run(gv, "apply", "--target", str(t7), "--kits", "demo")
         settle(t7, "the demo install")
 
-        (gv / "tools" / "demo" / "demo.txt").write_text("v3\n", encoding="utf-8", newline="\n")
+        (gv / PFX / "demo" / "demo.txt").write_text("v3\n", encoding="utf-8", newline="\n")
         git(gv, "add", "-A")
         git(gv, "commit", "-qm", "D")
         VD = gout(gv, "rev-parse", "HEAD").strip()
         git(gv, "checkout", "-q", "-b", "gone")
-        (gv / "tools" / "demo" / "demo.txt").write_text("v9\n", encoding="utf-8", newline="\n")
+        (gv / PFX / "demo" / "demo.txt").write_text("v9\n", encoding="utf-8", newline="\n")
         git(gv, "add", "-A")
         git(gv, "commit", "-qm", "C on a branch nobody keeps")
         VC = gout(gv, "rev-parse", "HEAD").strip()
         git(gv, "checkout", "-q", "main")
         git(gv, "branch", "-q", "-D", "gone")
 
-        DEMO = "tools/demo/demo.txt"
+        DEMO = f"{PFX}demo/demo.txt"
         check("[-12] AC7 the fixture's receipt records the MIDDLE vintage",
               json.loads((t7 / ".governance" / "install.json").read_text(
                   encoding="utf-8"))["gov_commit"] == VB, VB)
@@ -5398,7 +5416,7 @@ user_skills = "/tmp/gk-fake-skills"
         _dvt = make_target(tmp / "drive-win", None)
         (_dvt / ".governance").mkdir(parents=True, exist_ok=True)
         (_dvt / ".governance" / "deploy.toml").write_text(
-            'prefix = "tools"\n\n[answers]\nmanifest_path = "docs/MANIFEST.md"\n'
+            f'prefix = "{PFX[:-1]}"\n\n[answers]\nmanifest_path = "docs/MANIFEST.md"\n'
             'user_skills = "C:/Users/x/.claude/skills"\n', encoding="utf-8", newline="\n")
         settle(_dvt, "a Windows machine-path answer")
         _dvp = run("plan", "--target", str(_dvt), "--kits", "kickoff-manifest")
@@ -5444,7 +5462,7 @@ user_skills = "/tmp/gk-fake-skills"
             _t = make_target(tmp / f"gr-{tag}", None)
             (_t / ".governance").mkdir(parents=True, exist_ok=True)
             (_t / ".governance" / "deploy.toml").write_text(
-                'prefix = "tools"\n\n[gate_runner]\nkind = "manifest"\n'
+                f'prefix = "{PFX[:-1]}"\n\n[gate_runner]\nkind = "manifest"\n'
                 f'file = "{runner_file}"\n'
                 'grammar = "json-array"\ndedupe_key = "name"\n'
                 'command = ["bash", "run.sh"]\nrun_all_env = "GATE_ALL"\n'
@@ -5506,7 +5524,7 @@ user_skills = "/tmp/gk-fake-skills"
                 ("tools",                              True,  True,  "the default prefix"),
                 ("C:/Users/x/.claude/skills",          True,  True,  "a Windows machine path"),
                 ("stated for the scratch install",     False, True,  "the matrix fixture's stub"),
-                ("bash tools/run-gates/run-gates.sh",  False, True,  "a gate_runner override"),
+                (f"bash {PFX}run-gates/run-gates.sh",  False, True,  "a gate_runner override"),
                 ("PLAY KICK TOOL DEPL",                False, True,  "an id_families override"),
                 ("tools; touch PWNED ;",               False, False, "round 2's reproduction"),
                 ("$(id)",                              False, False, "command substitution"),
@@ -5542,7 +5560,7 @@ user_skills = "/tmp/gk-fake-skills"
               not _check_token("a b", False), "")
 
         # ---- THE STRUCTURAL ARM, and it gates the CLASS rather than any instance. Round 4's
-        # ---- blocker rode a SHIPPED descriptor template: `tools/drift-audit/kit.toml` spells
+        # ---- blocker rode a SHIPPED descriptor template: `<prefix>/drift-audit/kit.toml` spells
         # ---- `command = ["bash", "-c", "python {kit}/drift_report.py --check"]`, and five more
         # ---- descriptors interpolate a token inside a `-c` STRING. Inside such a string a token is
         # ---- not an argv element -- it is source the shell or python parses -- so whether it is
@@ -5565,8 +5583,8 @@ user_skills = "/tmp/gk-fake-skills"
         _dangerous = []
         _scanned = 0
         _templates = 0
-        for _kt in sorted(pathlib.Path(HERE.parents[1]).glob("tools/*/kit.toml")) + sorted(
-                pathlib.Path(HERE.parents[1]).glob("tools/govkit/entries/*.kit.toml")):
+        for _kt in sorted(pathlib.Path(HERE.parents[1]).glob(f"{PFX}*/kit.toml")) + sorted(
+                pathlib.Path(HERE.parents[1]).glob(f"{PFX}govkit/entries/*.kit.toml")):
             try:
                 _d2 = govkit_module().load_toml(_kt)
             except Exception:
@@ -5725,7 +5743,7 @@ user_skills = "/tmp/gk-fake-skills"
                     return ln[2:].split("[", 1)[0].strip()
             return "(no row)"
 
-        MTR = "tools/memory-tree/README.md"
+        MTR = f"{PFX}memory-tree/README.md"
         i7 = make_target(tmp / "id7", DEPLOY_FULL)
         run("apply", "--target", str(i7), "--kits", "memory-tree")
         settle(i7, "the install")
@@ -5871,25 +5889,25 @@ user_skills = "/tmp/gk-fake-skills"
         # ---- independently. A scratch gov with three files, built rather than borrowed.
         def identity_gov(name: str) -> pathlib.Path:
             g = tmp / f"{name}-gov"
-            (g / "tools" / "govkit").mkdir(parents=True)
-            (g / "tools" / "demo").mkdir(parents=True)
-            shutil.copy2(GOVKIT, g / "tools" / "govkit" / "govkit.py")
-            shutil.copy2(GOVKIT.parent / "adopters.toml", g / "tools" / "govkit" / "adopters.toml")  # arm 10 refuses a gov without it
-            (g / "tools" / "govkit" / "registry.toml").write_text(
-                '[surface]\nglobs = ["tools/*"]\n\n'
+            (g / PFX / "govkit").mkdir(parents=True)
+            (g / PFX / "demo").mkdir(parents=True)
+            shutil.copy2(GOVKIT, g / PFX / "govkit" / "govkit.py")
+            shutil.copy2(GOVKIT.parent / "adopters.toml", g / PFX / "govkit" / "adopters.toml")  # arm 10 refuses a gov without it
+            (g / PFX / "govkit" / "registry.toml").write_text(
+                '[surface]\nglobs = ["{prefix}/*"]\n\n'
                 '[selection]\ndefault = ["demo"]\n\n'
-                '[[entry]]\nid = "demo"\ndescriptor = "tools/demo/kit.toml"\n\n'
-                '[[exempt]]\npath = "tools/govkit"\nwhy = "the deployer itself"\n',
+                '[[entry]]\nid = "demo"\ndescriptor = "{prefix}/demo/kit.toml"\n\n'
+                '[[exempt]]\npath = "{prefix}/govkit"\nwhy = "the deployer itself"\n',
                 encoding="utf-8", newline="\n")
-            (g / "tools" / "demo" / "kit.toml").write_text(
-                'id = "demo"\nhome = "tools/demo"\n'
+            (g / PFX / "demo" / "kit.toml").write_text(
+                'id = "demo"\nhome = "demo"\n'
                 'version_from = { none = "fixture" }\n\n'
                 '[check]\nnone = "a fixture kit"\n\n'
                 '[[files]]\ninclude = ["demo.txt", "extra.txt", "spare.txt"]\nrole = "engine"\n\n'
                 '[adopt]\nargv = []\nmutates_index = false\n', encoding="utf-8", newline="\n")
             for _n, _c in (("demo.txt", "alpha\nbeta\ngamma\n"), ("extra.txt", "x1\n"),
                            ("spare.txt", "s1\n")):
-                (g / "tools" / "demo" / _n).write_text(_c, encoding="utf-8", newline="\n")
+                (g / PFX / "demo" / _n).write_text(_c, encoding="utf-8", newline="\n")
             git(g, "init", "-q", "-b", "main")
             git(g, "config", "user.email", "t@e")
             git(g, "config", "user.name", "t")
@@ -5906,13 +5924,13 @@ user_skills = "/tmp/gk-fake-skills"
             """
             t = make_target(tmp / name, None)
             for verb in ("intake", "apply"):
-                subprocess.run([sys.executable, str(g / "tools" / "govkit" / "govkit.py"), verb,
+                subprocess.run([sys.executable, str(g / PFX / "govkit" / "govkit.py"), verb,
                                 "--target", str(t), "--kits", "demo"], capture_output=True)
             settle(t, "the demo install")
             return t
 
         def gov_update(g: pathlib.Path, t: pathlib.Path, *extra: str):
-            return subprocess.run([sys.executable, str(g / "tools" / "govkit" / "govkit.py"),
+            return subprocess.run([sys.executable, str(g / PFX / "govkit" / "govkit.py"),
                                    "update", "--target", str(t), *extra],
                                   capture_output=True, text=True)
 
@@ -5933,7 +5951,7 @@ user_skills = "/tmp/gk-fake-skills"
             return hit
 
         ig = identity_gov("id4")
-        DMO = "tools/demo/demo.txt"
+        DMO = f"{PFX}demo/demo.txt"
         # EVERY target is installed at vintage A and gov moves to B AFTERWARDS, once, below. Built
         # in this order deliberately: a target installed after the move records B, and then "the
         # stale row's bytes moved" is trivially true because they were never anywhere else. That is
@@ -5943,11 +5961,11 @@ user_skills = "/tmp/gk-fake-skills"
         it8 = identity_target(ig, "id8-t")
         it9 = identity_target(ig, "id9-t")
         it10s = {d: identity_target(ig, f"id10-{d}") for d in ("gov_oid", "commit")}
-        (ig / "tools" / "demo" / "demo.txt").write_text("alpha\nbeta CHANGED\ngamma\n",
+        (ig / PFX / "demo" / "demo.txt").write_text("alpha\nbeta CHANGED\ngamma\n",
                                                         encoding="utf-8", newline="\n")
         git(ig, "add", "-A")
         git(ig, "commit", "-qm", "B")
-        _govblob = gout(ig, "rev-parse", "HEAD:tools/demo/demo.txt").strip()
+        _govblob = gout(ig, "rev-parse", f"HEAD:{PFX}demo/demo.txt").strip()
 
         # ---- AC4: what lands in the INDEX is gov's blob, and what lands in the WORKTREE is
         # ---- whatever THAT target's own filters make of it. Staged red, twice over: the replaced
@@ -6004,7 +6022,7 @@ user_skills = "/tmp/gk-fake-skills"
         # `diverged` and is merged against an empty base. That population is `-13` S7's in-loop
         # skip, keyed on `evidence: "unattributed"` and running after `how` resolves — step 6 of the
         # build's preamble order, where S9 is step 4. This unit does not own it and does not pin it.
-        _r9 = poison(it9, "tools/demo/extra.txt", drop=("commit", "gov_oid", "source"),
+        _r9 = poison(it9, f"{PFX}demo/extra.txt", drop=("commit", "gov_oid", "source"),
                      evidence="unattributed")
         check("[-7] AC9 the fixture's field-less row really carries neither identity",
               not _r9.get("commit") and not _r9.get("gov_oid")
@@ -6012,22 +6030,22 @@ user_skills = "/tmp/gk-fake-skills"
         check("[-7] AC9 ...and its receipt is at the CURRENT schema, so no migration fills them in",
               json.loads((it9 / ".governance" / "install.json").read_text(
                   encoding="utf-8")).get("schema") == govkit_module().RECEIPT_SCHEMA, "")
-        _x9 = (it9 / "tools" / "demo" / "extra.txt").read_bytes()
+        _x9 = (it9 / PFX / "demo" / "extra.txt").read_bytes()
         _a9 = gov_update(ig, it9, "--write")
         check("[-7] AC9 the run completes over the field-less row and exits 0",
               _a9.returncode == 0, _a9.stdout + _a9.stderr)
         check("[-7] AC9 the genuinely stale row's bytes MOVED",
               b"CHANGED" in (it9 / DMO).read_bytes(), repr((it9 / DMO).read_bytes()))
         check("[-7] AC9 the field-less row was printed BY NAME",
-              verdict_of(_a9.stdout, "tools/demo/extra.txt") != "(no row)", _a9.stdout)
+              verdict_of(_a9.stdout, f"{PFX}demo/extra.txt") != "(no row)", _a9.stdout)
         check("[-7] AC9 ...and written in NEITHER direction",
-              (it9 / "tools" / "demo" / "extra.txt").read_bytes() == _x9, "")
+              (it9 / PFX / "demo" / "extra.txt").read_bytes() == _x9, "")
 
         for _drop, _why in (("gov_oid", "commit and no gov_oid"), ("commit", "gov_oid and no commit")):
             it10 = it10s[_drop]
-            poison(it10, "tools/demo/extra.txt", drop=("commit", "gov_oid", "source"),
+            poison(it10, f"{PFX}demo/extra.txt", drop=("commit", "gov_oid", "source"),
                    evidence="unattributed")
-            _r10 = poison(it10, "tools/demo/spare.txt", drop=(_drop,))
+            _r10 = poison(it10, f"{PFX}demo/spare.txt", drop=(_drop,))
             _sum10 = (it10 / ".governance" / "install.json").read_bytes()
             _b10 = (it10 / DMO).read_bytes()
             check(f"[-7] AC10 the fixture's `engine` row really carries {_why}",
@@ -6036,7 +6054,7 @@ user_skills = "/tmp/gk-fake-skills"
             _a10 = gov_update(ig, it10, "--write")
             check(f"[-7] AC10 a half-populated pair ({_why}) refuses by name",
                   _a10.returncode == 2 and "meaningless apart" in _a10.stderr
-                  and "tools/demo/spare.txt" in _a10.stderr, _a10.stderr)
+                  and f"{PFX}demo/spare.txt" in _a10.stderr, _a10.stderr)
             check(f"[-7] AC10 ...writes nothing ({_why})", (it10 / DMO).read_bytes() == _b10, "")
             check(f"[-7] AC10 ...and leaves the receipt byte-identical ({_why})",
                   (it10 / ".governance" / "install.json").read_bytes() == _sum10, "")
@@ -6085,7 +6103,7 @@ user_skills = "/tmp/gk-fake-skills"
               "0f4d30843f2693dae9e9a69a348bf3390ad0ad3c",
               "372e6b2a9a7d5b06001167b206c869f604c8a8af",
               "9ddcc5c944bdb92456ef031ee5f038842d016587")
-        CWS, CWT = "tools/check-wiring.sh", "tools/check-wiring.test.sh"
+        CWS, CWT = f"{PFX}check-wiring.sh", f"{PFX}check-wiring.test.sh"
         MINE8 = b"# DEPL-dCarriedReceipt-8 OPERATOR LINE\n"
         GK8 = govkit_module()
 
@@ -6165,7 +6183,7 @@ user_skills = "/tmp/gk-fake-skills"
         import tomllib as _cw8toml  # noqa: PLC0415
         _n8 = sum(1 for _f in _cw8toml.loads(
             (HERE / "entries" / "check-wiring.kit.toml").read_text(encoding="utf-8"))
-            ["files"][0]["include"] if gblob(V8[2], "tools/" + _f))
+            ["files"][0]["include"] if gblob(V8[2], f"{PFX}" + _f))
         check("[-8] AC3 PRECONDITION more than one kit file exists at V8[2], so the count below "
               "is not a 1/1 any single-row loop would print", _n8 > 1, str(_n8))
         check("[-8] AC3 ...and its provenance loop RESOLVED the merged row rather than skipping it",
@@ -6248,12 +6266,12 @@ user_skills = "/tmp/gk-fake-skills"
         # moved did NOT reconcile: the three-way was handed a `base` spelling gov's prefix where the
         # target's own copy did not, every line naming a path read as an operator edit, the merge
         # CONFLICTED, the run exited 1 and a conflict order was written. The row the target had
-        # DELETED was restored as `gone refers to tools/demo/gone.txt` — gov's prefix, into a target
+        # DELETED was restored as `gone refers to <prefix>/demo/gone.txt` — gov's prefix, into a target
         # that does not use it — and the stamp it left recorded `oid == gov_oid` over bytes gov never
         # shipped, which is the pairing the next run reads as a clean gov-owned row.
         #
         # ONE OF THOSE IS A CORRECTION TO THE SPEC RATHER THAN A DETAIL. AC8 predicted its red as
-        # "takes the raw arm, lands gov's `tools/` spelling verbatim, and exits 0". That is the
+        # "takes the raw arm, lands gov's `<prefix>/` spelling verbatim, and exits 0". That is the
         # behaviour at 9ddcc5c9, which the spec cites; it is NOT reachable on `-8`'s tip, because a
         # receipt claiming gov's blob IS the carried blob is exactly what `-7` S9's preamble refuses.
         # The red that IS reachable there is the whole-file conflict above, and that is the one
@@ -6274,12 +6292,12 @@ user_skills = "/tmp/gk-fake-skills"
         # ---- run with no fixture copy in between. The end-to-end arms further down run a scratch
         # ---- gov's COPY of the engine — fine when the whole file is re-run after a break is staged,
         # ---- and a trap if it is not.
-        _pairs9 = [("tools/demo/a.txt", "scripts/demo/a.txt"),
-                   ("tools/demo/b.txt", "scripts/demo/b.txt"),
-                   ("tools/hooks/h.js", ".claude/hooks/h.js"),
-                   ("tools/top.txt", "data/top.txt"),
-                   ("tools/amb/x.txt", "one/x.txt"),
-                   ("tools/amb/y.txt", "two/y.txt"),
+        _pairs9 = [(f"{PFX}demo/a.txt", "scripts/demo/a.txt"),
+                   (f"{PFX}demo/b.txt", "scripts/demo/b.txt"),
+                   (f"{PFX}hooks/h.js", ".claude/hooks/h.js"),
+                   (f"{PFX}top.txt", "data/top.txt"),
+                   (f"{PFX}amb/x.txt", "one/x.txt"),
+                   (f"{PFX}amb/y.txt", "two/y.txt"),
                    ("README.md", "README.md"),
                    (None, "scripts/demo/nope.txt")]
         _n9, _p9, _d9 = GK9.derive_carry_map(_pairs9)
@@ -6288,10 +6306,10 @@ user_skills = "/tmp/gk-fake-skills"
         # ---- pair set is asserted WHOLE, not counted: a count agrees with the wrong map as readily
         # ---- as with the right one.
         check("[-9] S3 the dirname lift gives one pair per gov directory, the ambiguous one dropped",
-              _p9 == {"tools/demo": "scripts/demo", "tools/hooks": ".claude/hooks",
+              _p9 == {f"{PFX}demo": "scripts/demo", f"{PFX}hooks": ".claude/hooks",
                       "tools": "data"}, str(_p9))
         check("[-9] S3 an ambiguous gov directory is DROPPED and returned BY NAME, both destinations",
-              _d9 == [("tools/amb", ["one", "two"])], str(_d9))
+              _d9 == [(f"{PFX}amb", ["one", "two"])], str(_d9))
         check("[-9] S3 a root-level row lifts to the EMPTY needle and is skipped, never emitted",
               "" not in _n9, str(sorted(_n9)))
         check("[-9] S3 a row with no `source` contributes no pair and is not a reason to refuse",
@@ -6307,28 +6325,28 @@ user_skills = "/tmp/gk-fake-skills"
               all(_n9.get(gd) == td and _n9.get(gd.replace("/", "~")) == td.replace("/", "~")
                   for gd, td in _p9.items()), str(_n9))
 
-        # ---- S4: LONGEST NEEDLE FIRST. `tools` and `tools/demo` are both needles here and they map
+        # ---- S4: LONGEST NEEDLE FIRST. `tools` and `<prefix>/demo` are both needles here and they map
         # ---- to DIFFERENT roots, so the order is observable rather than inferred.
-        check("[-9] S4 the longest needle wins at a position — `tools/demo` beats the bare `tools`",
-              GK9.derive_carried(b"tools/demo/x", _n9) == b"scripts/demo/x",
-              repr(GK9.derive_carried(b"tools/demo/x", _n9)))
+        check(f"[-9] S4 the longest needle wins at a position — `{PFX}demo` beats the bare `tools`",
+              GK9.derive_carried(f"{PFX}demo/x".encode(), _n9) == b"scripts/demo/x",
+              repr(GK9.derive_carried(f"{PFX}demo/x".encode(), _n9)))
         check("[-9] S4 ...and the bare `tools` needle is genuinely live, so that arm CAN fail",
-              GK9.derive_carried(b"tools/other/x", _n9) == b"data/other/x",
-              repr(GK9.derive_carried(b"tools/other/x", _n9)))
+              GK9.derive_carried(f"{PFX}other/x".encode(), _n9) == b"data/other/x",
+              repr(GK9.derive_carried(f"{PFX}other/x".encode(), _n9)))
 
         # ---- AC4: the `~` form, load-bearing because gov FLATTENS paths into fixture filenames —
-        # ---- `tools/unattended/check-playbook.test.sh` spells `tools~` at lines 365, 479, 523, 570
+        # ---- `<prefix>/unattended/check-playbook.test.sh` spells `tools~` at lines 365, 479, 523, 570
         # ---- and 582 while an adopter's own fixture records are named `scripts~unattended~…`. Its
         # ---- own map, so the criterion's literal strings are the ones asserted.
         _n4, _p4, _d4 = GK9.derive_carry_map(
-            [("tools/unattended/adopt.sh", "scripts/unattended/adopt.sh"),
-             ("tools/top.txt", "scripts/top.txt")])
-        check("[-9] AC4 the fixture map really carries BOTH `tools/unattended` and `tools`",
-              _p4 == {"tools/unattended": "scripts/unattended", "tools": "scripts"}, str(_p4))
+            [(f"{PFX}unattended/adopt.sh", "scripts/unattended/adopt.sh"),
+             (f"{PFX}top.txt", "scripts/top.txt")])
+        check(f"[-9] AC4 the fixture map really carries BOTH `{PFX}unattended` and `tools`",
+              _p4 == {f"{PFX}unattended": "scripts/unattended", "tools": "scripts"}, str(_p4))
         check("[-9] AC4 ONE pass rewrites the `/` form and the `~` form of the same string",
-              GK9.derive_carried(b"tools/unattended/fixture-records/tools~a~b.md", _n4)
+              GK9.derive_carried(f"{PFX}unattended/fixture-records/tools~a~b.md".encode(), _n4)
               == b"scripts/unattended/fixture-records/scripts~a~b.md",
-              repr(GK9.derive_carried(b"tools/unattended/fixture-records/tools~a~b.md", _n4)))
+              repr(GK9.derive_carried(f"{PFX}unattended/fixture-records/tools~a~b.md".encode(), _n4)))
         check("[-9] AC4 ...and a string already reading `scripts/unattended` is rewritten not at all",
               GK9.derive_carried(b"scripts/unattended/x", _n4) == b"scripts/unattended/x",
               repr(GK9.derive_carried(b"scripts/unattended/x", _n4)))
@@ -6352,17 +6370,17 @@ user_skills = "/tmp/gk-fake-skills"
         #
         # The three arms below are one fixture read three ways, so the difference between them is the
         # only thing that can move: same base, same content, different needle source.
-        _f1 = [("tools/hooks/agent-cap.js", "scripts/hooks/agent-cap.js"),
-               ("tools/hooks/scratch-guard.js", ".claude/hooks/scratch-guard.js")]
+        _f1 = [(f"{PFX}hooks/agent-cap.js", "scripts/hooks/agent-cap.js"),
+               (f"{PFX}hooks/scratch-guard.js", ".claude/hooks/scratch-guard.js")]
         _nf, _pf, _df = GK9.derive_carry_map(_f1)
         check("[-1] S1 a fanned gov directory is still DROPPED from the global map",
-              [d[0] for d in _df] == ["tools/hooks"] and not _nf,
+              [d[0] for d in _df] == [f"{PFX}hooks"] and not _nf,
               f"dropped={_df} needles={_nf}")
-        _rowf = {"source": "tools/hooks/agent-cap.js", "path": "scripts/hooks/agent-cap.js"}
+        _rowf = {"source": f"{PFX}hooks/agent-cap.js", "path": "scripts/hooks/agent-cap.js"}
         _pf2 = GK9.resolve_row_needles(_nf, _rowf)
         check("[-1] S1 ...but the row's own overlay supplies the needle the map could not hold",
-              _pf2.get("tools/hooks") == "scripts/hooks", repr(_pf2))
-        _base1 = b"# see tools/hooks/agent-cap.js for the rule" + bytes([10])
+              _pf2.get(f"{PFX}hooks") == "scripts/hooks", repr(_pf2))
+        _base1 = f"# see {PFX}hooks/agent-cap.js for the rule".encode() + bytes([10])
         _ours1 = GK9.derive_carried(_base1, _pf2)
         check("[-1] S1 the rung is RELOCATE with the row's needles, where the map gave nothing",
               GK9.derive_carry_rung(_base1, _pf2, lambda: _ours1, known_equal=False) == "relocate"
@@ -6392,28 +6410,28 @@ user_skills = "/tmp/gk-fake-skills"
         check("[-1] S3b an EMPTY/whitespace needle is REFUSED rather than substituted",
               _degen == "Refusal", f"got {_degen}")
         check("[-1] S3b ...and a normal two-segment pair still derives",
-              GK9.derive_carry_map([("tools/x.txt", "scripts/x.txt")])[0].get("tools") == "scripts")
+              GK9.derive_carry_map([(f"{PFX}x.txt", "scripts/x.txt")])[0].get("tools") == "scripts")
         check("[-1] S3b ...and a single-letter directory is PERMITTED, which is the stated residual",
               GK9.derive_carry_map([("a/x.txt", "b/x.txt")])[0].get("a") == "b")
 
         # ---- S4: THE OUTPUT IS NEVER RESCANNED. The fixture is built so a rescan WOULD visibly
         # ---- change the answer — `tools` rewrites to `demo` and `demo` rewrites to `final` — and
         # ---- that second step is asserted live FIRST, so this cannot pass by finding nothing.
-        _nr, _pr, _dr = GK9.derive_carry_map([("tools/a.txt", "demo/a.txt"),
+        _nr, _pr, _dr = GK9.derive_carry_map([(f"{PFX}a.txt", "demo/a.txt"),
                                               ("demo/b.txt", "final/b.txt")])
         check("[-9] S4 the no-rescan fixture really chains — `demo` on its own becomes `final`",
               GK9.derive_carried(b"demo/x", _nr) == b"final/x",
               repr(GK9.derive_carried(b"demo/x", _nr)))
-        check("[-9] S4 ...so one substitution never feeds another: `tools/x` stops at `demo/x`",
-              GK9.derive_carried(b"tools/x", _nr) == b"demo/x",
-              repr(GK9.derive_carried(b"tools/x", _nr)))
+        check(f"[-9] S4 ...so one substitution never feeds another: `{PFX}x` stops at `demo/x`",
+              GK9.derive_carried(f"{PFX}x".encode(), _nr) == b"demo/x",
+              repr(GK9.derive_carried(f"{PFX}x".encode(), _nr)))
 
         # ---- AC6: a blob that is not valid UTF-8 comes back UNCHANGED rather than being mangled
         # ---- into a false rung. The precondition asserts the same needle DOES fire on decodable
         # ---- bytes, so this grades the decode guard and not an empty map.
-        _bin9 = b"\xff\xfe\x00 tools/demo \x00"
+        _bin9 = b"\xff\xfe\x00 " + PFX.encode() + b"demo \x00"
         check("[-9] AC6 the same needle fires on the decodable form, so the guard is what stops it",
-              GK9.derive_carried(b" tools/demo ", _n9) == b" scripts/demo ", "")
+              GK9.derive_carried(f" {PFX}demo ".encode(), _n9) == b" scripts/demo ", "")
         check("[-9] AC6 a non-UTF-8 blob returns byte-identical from the substituter",
               GK9.derive_carried(_bin9, _n9) == _bin9, repr(GK9.derive_carried(_bin9, _n9)))
 
@@ -6422,7 +6440,7 @@ user_skills = "/tmp/gk-fake-skills"
         check("[-9] S3 a receipt yielding no pair produces an EMPTY map, not a raise",
               GK9.derive_carry_map([]) == ({}, {}, []), str(GK9.derive_carry_map([])))
         check("[-9] S3 ...and an empty map leaves bytes alone",
-              GK9.derive_carried(b"tools/demo/x", {}) == b"tools/demo/x", "")
+              GK9.derive_carried(f"{PFX}demo/x".encode(), {}) == f"{PFX}demo/x".encode(), "")
 
         # ---- S1 + S5: THE LADDER ITSELF, one arm per rung plus the rules that bound it.
         check("[-9] S1 rung `verbatim` — ours and base are the same bytes",
@@ -6430,13 +6448,13 @@ user_skills = "/tmp/gk-fake-skills"
         check("[-9] S1 rung `eol` — equal after CRLF-to-LF on BOTH sides",
               GK9.derive_carry_rung(b"x\ny\n", _n9, lambda: b"x\r\ny\r\n") == "eol", "")
         check("[-9] S1 rung `relocate` — ours is base rewritten through the map",
-              GK9.derive_carry_rung(b"see tools/demo/x\n", _n9,
+              GK9.derive_carry_rung(f"see {PFX}demo/x\n".encode(), _n9,
                                     lambda: b"see scripts/demo/x\n") == "relocate", "")
         check("[-9] S5 WHOLE-FILE equality decides: one residual byte and NO rung matches",
-              GK9.derive_carry_rung(b"see tools/demo/x\n", _n9,
+              GK9.derive_carry_rung(f"see {PFX}demo/x\n".encode(), _n9,
                                     lambda: b"see scripts/demo/x\nMINE\n") is None, "")
         check("[-9] F2 a ladder and not a lattice: `relocate` AND `eol` together prove nothing",
-              GK9.derive_carry_rung(b"see tools/demo/x\n", _n9,
+              GK9.derive_carry_rung(f"see {PFX}demo/x\n".encode(), _n9,
                                     lambda: b"see scripts/demo/x\r\n") is None, "")
         check("[-9] S1 an unreadable `ours` yields no rung rather than a guessed one",
               GK9.derive_carry_rung(b"x\n", _n9, lambda: None) is None, "")
@@ -6455,14 +6473,14 @@ user_skills = "/tmp/gk-fake-skills"
         # ---- S6's transformation, per rung. Two of the three are no-ops, which the engine says at
         # ---- the site rather than leaving a reader to infer; these arms pin which is which.
         check("[-9] S6 `relocate` applied to gov's bytes lands them in the target's spelling",
-              GK9.derive_carried_by_rung("relocate", b"see tools/demo/x\n", _n9)
+              GK9.derive_carried_by_rung("relocate", f"see {PFX}demo/x\n".encode(), _n9)
               == b"see scripts/demo/x\n", "")
         check("[-9] S6 `eol` normalises gov's own bytes, a no-op wherever gov ships LF",
               GK9.derive_carried_by_rung("eol", b"a\r\nb\n", _n9) == b"a\nb\n"
               and GK9.derive_carried_by_rung("eol", b"a\nb\n", _n9) == b"a\nb\n", "")
         check("[-9] S6 no rung leaves the bytes exactly as gov shipped them",
-              GK9.derive_carried_by_rung(None, b"see tools/demo/x\n", _n9)
-              == b"see tools/demo/x\n", "")
+              GK9.derive_carried_by_rung(None, f"see {PFX}demo/x\n".encode(), _n9)
+              == f"see {PFX}demo/x\n".encode(), "")
 
         # ---- S2, AS A GATE RATHER THAN A DISCIPLINE. "No branch in either verb may read a stored
         # ---- `carry`" is a claim about SOURCE, and a behavioural arm can only ever show that ONE
@@ -6504,51 +6522,51 @@ user_skills = "/tmp/gk-fake-skills"
         # ---- over a real index. Both sides of every rung are AUTHORED literals: deriving the
         # ---- target's bytes by calling the substituter would make `ours == derive_carried(base)` a
         # ---- tautology and every relocate arm would pass against a broken map.
-        _MOVED_A = ("tools/demo/moved.txt line 1\ntools/demo/moved.txt line 2\n"
-                    "tools/demo/moved.txt line 3\ntools/demo/moved.txt line 4\n"
-                    "tools/demo/moved.txt line 5\n")
-        _MOVED_B = ("tools/demo/moved.txt line 1\ntools/demo/moved.txt line 2\n"
-                    "GOV SEMANTIC CHANGE at tools/demo/moved.txt\ntools/demo/moved.txt line 4\n"
-                    "tools/demo/moved.txt line 5\n")
+        _MOVED_A = (f"{PFX}demo/moved.txt line 1\n{PFX}demo/moved.txt line 2\n"
+                    f"{PFX}demo/moved.txt line 3\n{PFX}demo/moved.txt line 4\n"
+                    f"{PFX}demo/moved.txt line 5\n")
+        _MOVED_B = (f"{PFX}demo/moved.txt line 1\n{PFX}demo/moved.txt line 2\n"
+                    f"GOV SEMANTIC CHANGE at {PFX}demo/moved.txt\n{PFX}demo/moved.txt line 4\n"
+                    f"{PFX}demo/moved.txt line 5\n")
         _MOVED_T = ("scripts/demo/moved.txt line 1\nscripts/demo/moved.txt line 2\n"
                     "scripts/demo/moved.txt line 3\nscripts/demo/moved.txt line 4\n"
                     "scripts/demo/moved.txt line 5\n")
         # AC3's row, and the reason the whole design is a PROOF gate rather than a rewrite. `bash
-        # tools/land.sh` names no prefix at all, and `my tools/demo` is a directory the fixture
+        # <prefix>/land.sh` names no prefix at all, and `my <prefix>/demo` is a directory the fixture
         # BUILDS — the write-time alternative corrupts both. Re-opened at ce5dca99 in this tree's own
-        # `tools/unattended/adopt-unattended.test.sh`: four `bash tools/land.sh` lines at 34, 63, 83
-        # and 91, and the `my tools/unattended` construction at 132-133.
-        _HAZ_G = ("run bash tools/land.sh\nrun bash tools/land.sh\n"
-                  "mkdir 'my tools/demo'\nsee tools/demo/hazard.txt\n")
-        _HAZ_T = ("run bash tools/land.sh\nrun bash tools/land.sh\n"
-                  "mkdir 'my tools/demo'\nsee scripts/demo/hazard.txt\n")
+        # `<prefix>/unattended/adopt-unattended.test.sh`: four `bash <prefix>/land.sh` lines at 34, 63, 83
+        # and 91, and the `my <prefix>/unattended` construction at 132-133.
+        _HAZ_G = (f"run bash {PFX}land.sh\nrun bash {PFX}land.sh\n"
+                  f"mkdir 'my {PFX}demo'\nsee {PFX}demo/hazard.txt\n")
+        _HAZ_T = (f"run bash {PFX}land.sh\nrun bash {PFX}land.sh\n"
+                  f"mkdir 'my {PFX}demo'\nsee scripts/demo/hazard.txt\n")
         _GOV9 = {
-            "tools/demo/plain.txt": b"plain one\nplain two\n",
-            "tools/demo/crlf.txt": b"c one\nc two\n",
-            "tools/demo/pathy.txt": b"see tools/demo/pathy.txt\nand tools/demo/other\n",
-            "tools/demo/moved.txt": _MOVED_A.encode(),
-            "tools/demo/gone.txt": b"gone refers to tools/demo/gone.txt\n",
-            "tools/demo/hazard.txt": _HAZ_G.encode(),
-            "tools/demo/binary.bin": b"\xff\xfe\x00tools/demo\x00",
-            "tools/top.txt": b"top level\n",
-            "tools/amb/a.txt": b"a\n",
-            "tools/amb/b.txt": b"b\n",
+            f"{PFX}demo/plain.txt": b"plain one\nplain two\n",
+            f"{PFX}demo/crlf.txt": b"c one\nc two\n",
+            f"{PFX}demo/pathy.txt": f"see {PFX}demo/pathy.txt\nand {PFX}demo/other\n".encode(),
+            f"{PFX}demo/moved.txt": _MOVED_A.encode(),
+            f"{PFX}demo/gone.txt": f"gone refers to {PFX}demo/gone.txt\n".encode(),
+            f"{PFX}demo/hazard.txt": _HAZ_G.encode(),
+            f"{PFX}demo/binary.bin": b"\xff\xfe\x00tools/demo\x00",
+            f"{PFX}top.txt": b"top level\n",
+            f"{PFX}amb/a.txt": b"a\n",
+            f"{PFX}amb/b.txt": b"b\n",
         }
         # (target path, gov source, the target's OWN bytes, the rung those two must prove)
         _ROWS9 = [
-            ("scripts/demo/plain.txt", "tools/demo/plain.txt", b"plain one\nplain two\n",
+            ("scripts/demo/plain.txt", f"{PFX}demo/plain.txt", b"plain one\nplain two\n",
              "verbatim"),
-            ("scripts/demo/crlf.txt", "tools/demo/crlf.txt", b"c one\r\nc two\r\n", "eol"),
-            ("scripts/demo/pathy.txt", "tools/demo/pathy.txt",
+            ("scripts/demo/crlf.txt", f"{PFX}demo/crlf.txt", b"c one\r\nc two\r\n", "eol"),
+            ("scripts/demo/pathy.txt", f"{PFX}demo/pathy.txt",
              b"see scripts/demo/pathy.txt\nand scripts/demo/other\n", "relocate"),
-            ("scripts/demo/moved.txt", "tools/demo/moved.txt", _MOVED_T.encode(), "relocate"),
-            ("scripts/demo/gone.txt", "tools/demo/gone.txt",
+            ("scripts/demo/moved.txt", f"{PFX}demo/moved.txt", _MOVED_T.encode(), "relocate"),
+            ("scripts/demo/gone.txt", f"{PFX}demo/gone.txt",
              b"gone refers to scripts/demo/gone.txt\n", None),
-            ("scripts/demo/hazard.txt", "tools/demo/hazard.txt", _HAZ_T.encode(), None),
-            ("scripts/demo/binary.bin", "tools/demo/binary.bin", b"\xff\xfe\x00LOCAL\x00", None),
-            ("data/top.txt", "tools/top.txt", b"top level\n", "verbatim"),
-            ("one/a.txt", "tools/amb/a.txt", b"a\n", "verbatim"),
-            ("two/b.txt", "tools/amb/b.txt", b"b\n", "verbatim"),
+            ("scripts/demo/hazard.txt", f"{PFX}demo/hazard.txt", _HAZ_T.encode(), None),
+            ("scripts/demo/binary.bin", f"{PFX}demo/binary.bin", b"\xff\xfe\x00LOCAL\x00", None),
+            ("data/top.txt", f"{PFX}top.txt", b"top level\n", "verbatim"),
+            ("one/a.txt", f"{PFX}amb/a.txt", b"a\n", "verbatim"),
+            ("two/b.txt", f"{PFX}amb/b.txt", b"b\n", "verbatim"),
         ]
         GONE9 = "scripts/demo/gone.txt"
         HAZ9 = "scripts/demo/hazard.txt"
@@ -6556,20 +6574,20 @@ user_skills = "/tmp/gk-fake-skills"
         PATH9 = "scripts/demo/pathy.txt"
 
         def carry_gov(name: str) -> pathlib.Path:
-            """A scratch gov holding the kit under `tools/`, plus a copy of the engine to run it."""
+            """A scratch gov holding the kit under `<prefix>/`, plus a copy of the engine to run it."""
             g = tmp / f"{name}-gov"
-            (g / "tools" / "govkit").mkdir(parents=True)
-            shutil.copy2(GOVKIT, g / "tools" / "govkit" / "govkit.py")
-            shutil.copy2(GOVKIT.parent / "adopters.toml", g / "tools" / "govkit" / "adopters.toml")  # arm 10 refuses a gov without it
-            (g / "tools" / "govkit" / "registry.toml").write_text(
-                '[surface]\nglobs = ["tools/*"]\n\n'
+            (g / PFX / "govkit").mkdir(parents=True)
+            shutil.copy2(GOVKIT, g / PFX / "govkit" / "govkit.py")
+            shutil.copy2(GOVKIT.parent / "adopters.toml", g / PFX / "govkit" / "adopters.toml")  # arm 10 refuses a gov without it
+            (g / PFX / "govkit" / "registry.toml").write_text(
+                '[surface]\nglobs = ["{prefix}/*"]\n\n'
                 '[selection]\ndefault = ["demo"]\n\n'
-                '[[entry]]\nid = "demo"\ndescriptor = "tools/demo/kit.toml"\n\n'
-                '[[exempt]]\npath = "tools/govkit"\nwhy = "the deployer itself"\n',
+                '[[entry]]\nid = "demo"\ndescriptor = "{prefix}/demo/kit.toml"\n\n'
+                '[[exempt]]\npath = "{prefix}/govkit"\nwhy = "the deployer itself"\n',
                 encoding="utf-8", newline="\n")
-            (g / "tools" / "demo").mkdir(parents=True, exist_ok=True)
-            (g / "tools" / "demo" / "kit.toml").write_text(
-                'id = "demo"\nhome = "tools/demo"\nversion_from = { none = "fixture" }\n\n'
+            (g / PFX / "demo").mkdir(parents=True, exist_ok=True)
+            (g / PFX / "demo" / "kit.toml").write_text(
+                'id = "demo"\nhome = "demo"\nversion_from = { none = "fixture" }\n\n'
                 '[check]\nnone = "a fixture kit"\n\n'
                 '[[files]]\ninclude = ["*.txt"]\nrole = "engine"\n\n'
                 '[adopt]\nargv = []\nmutates_index = false\n', encoding="utf-8", newline="\n")
@@ -6636,13 +6654,13 @@ user_skills = "/tmp/gk-fake-skills"
 
         def carry_advance(g: pathlib.Path) -> str:
             """Gov moves ONE file, semantically, under a target that is holding the relocation."""
-            (g / "tools" / "demo" / "moved.txt").write_bytes(_MOVED_B.encode())
+            (g / PFX / "demo" / "moved.txt").write_bytes(_MOVED_B.encode())
             git(g, "add", "-A")
             git(g, "commit", "-qm", "B")
             return gout(g, "rev-parse", "HEAD").strip()
 
         def carry_update(g: pathlib.Path, t: pathlib.Path, *extra):
-            return subprocess.run([sys.executable, str(g / "tools" / "govkit" / "govkit.py"),
+            return subprocess.run([sys.executable, str(g / PFX / "govkit" / "govkit.py"),
                                    "update", "--target", str(t), *extra],
                                   capture_output=True, text=True)
 
@@ -6655,14 +6673,14 @@ user_skills = "/tmp/gk-fake-skills"
         # ---- does not trigger the rule proves nothing, and two of these rules are triggered by
         # ---- state rather than by an edit.
         check("[-9] the fixture's gov copy really MOVED between the two vintages",
-              gout(g9, "rev-parse", f"{A9}:tools/demo/moved.txt").strip()
-              != gout(g9, "rev-parse", f"{B9}:tools/demo/moved.txt").strip(),
-              gout(g9, "rev-parse", f"{A9}:tools/demo/moved.txt"))
+              gout(g9, "rev-parse", f"{A9}:{PFX}demo/moved.txt").strip()
+              != gout(g9, "rev-parse", f"{B9}:{PFX}demo/moved.txt").strip(),
+              gout(g9, "rev-parse", f"{A9}:{PFX}demo/moved.txt"))
         check("[-9] the deleted row is absent from the target's index, worktree AND HEAD",
               GONE9 not in gout(t9, "ls-files").split() and not (t9 / GONE9).exists()
               and GONE9 not in gout(t9, "ls-tree", "-r", "--name-only", "HEAD").split(), "")
         check("[-9] the target really installed at a prefix gov does not use",
-              all(not p.startswith("tools/") for p, _s, _d, _r in _ROWS9), "")
+              all(not p.startswith(f"{PFX}") for p, _s, _d, _r in _ROWS9), "")
 
         # ---- AC1, restated over the fixture this file BUILDS rather than over inCMS's 52 rows.
         # ---- `classify_row` is driven directly, through the derivation's own output, and the rung
@@ -6695,7 +6713,7 @@ user_skills = "/tmp/gk-fake-skills"
         # ---- nothing, and that is the failure mode that would waste the most time.
         _ro9 = carry_update(g9, t9)
         check("[-9] AC2 the run names the dropped ambiguous gov directory and both destinations",
-              "DROPPED the ambiguous gov directory 'tools/amb'" in _ro9.stdout
+              f"DROPPED the ambiguous gov directory '{PFX}amb'" in _ro9.stdout
               and "one, two" in _ro9.stdout, _ro9.stdout[:1200])
         check("[-9] S7 ...and prints the pair count and the needle count it derived on this run",
               "carry map: 2 directory pair(s), 3 needle(s)" in _ro9.stdout, _ro9.stdout[:1200])
@@ -6705,7 +6723,7 @@ user_skills = "/tmp/gk-fake-skills"
         # ---- DEPL-dCarriedReceipt-9 S13 -- THE COMMITTED INCMS FIXTURE, BUILT AT LAST.
         # ---- Deferred when this unit was built on node `d`, where the inCMS checkout is not
         # ---- reachable; reopened by owner ruling 2026-08-26 on node `a`, where it is. Generated
-        # ---- once by `tools/govkit/fixtures/make_adopter_receipt.py` from inCMS's own
+        # ---- once by `<prefix>/govkit/fixtures/make_adopter_receipt.py` from inCMS's own
         # ---- `.governance/install.index` at `2cff5855` against gov `ce5dca99`, and committed, so
         # ---- everything below runs with NEITHER live repository present.
         # ----
@@ -6715,8 +6733,10 @@ user_skills = "/tmp/gk-fake-skills"
         # ---- TARGET's recorded oid. `eol` cannot be: the rung normalises BOTH sides, and an oid
         # ---- cannot be un-hashed, so the fixture carries `lf_oid` -- one measurement of the target
         # ---- taken where inCMS was reachable -- and the arm reproduces it from gov's side.
+        # TOOL-aRepatriatedFork-28 F1: the fixture spells gov's prefix as the `{prefix}` token, so
+        # it carries no literal and the arms read it at whatever prefix this checkout sits at.
         _fx9 = json.loads((GOVKIT.parent / "fixtures" / "adopter-ic-2cff5855.receipt.json")
-                          .read_text(encoding="utf-8"))
+                          .read_text(encoding="utf-8").replace("{prefix}/", PFX))
         _fx9rows = _fx9["files"]
         check("[-9] S13 LIVENESS the committed inCMS fixture carries the 52-row population",
               len(_fx9rows) == 52, f"{len(_fx9rows)} row(s)")
@@ -6763,18 +6783,18 @@ user_skills = "/tmp/gk-fake-skills"
         _n86, _p86, _d86 = _gk9.derive_carry_map(_fx9pairs)
         check("[-9] AC2 the 86-row population yields 13 directory pairs",
               len(_p86) == 13, f"{len(_p86)}: {sorted(_p86)}")
-        check("[-9] AC2 ...and DROPS `tools/memory-recall` and `tools/workflows` BY NAME",
-              sorted(g for g, _ in _d86) == ["tools/memory-recall", "tools/workflows"],
+        check(f"[-9] AC2 ...and DROPS `{PFX}memory-recall` and `{PFX}workflows` BY NAME",
+              sorted(g for g, _ in _d86) == [f"{PFX}memory-recall", f"{PFX}workflows"],
               str([g for g, _ in _d86]))
         # THE NEEDLE COUNT IS 25 AND THE SPEC SAYS 26. The spec's figure is wrong by exactly one and
         # this build DERIVED why before measuring it: needles emit in a `/` form and a `~` form, and
         # for a gov directory carrying NO slash those two strings are the SAME, so such a pair
-        # contributes one needle rather than two. Exactly one of the 13 -- `tools` -- has no slash.
+        # contributes one needle rather than two. Exactly one of the 13 -- the prefix dir itself -- has no slash.
         # 2*13 - 1 = 25. Asserted as the RELATION and not as a literal, because a literal here is
         # the class this whole build keeps finding.
         _noslash = [g for g in _p86 if "/" not in g]
-        check("[-9] AC2 exactly one surviving gov directory carries no slash, and it is `tools`",
-              _noslash == ["tools"], str(_noslash))
+        check(f"[-9] AC2 exactly one surviving gov directory carries no slash, and it is `{PFX[:-1]}`",
+              _noslash == [PFX[:-1]], str(_noslash))
         check("[-9] AC2 the needle count is the RELATION 2*pairs - (pairs with no slash) = 25",
               len(_n86) == 2 * len(_p86) - len(_noslash) == 25,
               f"{len(_n86)} needle(s) over {len(_p86)} pair(s), {len(_noslash)} slashless")
@@ -6810,12 +6830,12 @@ user_skills = "/tmp/gk-fake-skills"
         _mb9 = subprocess.run(["git", "-C", str(t9), "cat-file", "blob", _mi9],
                               capture_output=True).stdout
         check("[-9] AC8 the TARGET's index blob for that row spells its own `scripts/` prefix",
-              b"scripts/demo/moved.txt" in _mb9 and b"tools/demo/moved.txt" not in _mb9,
+              b"scripts/demo/moved.txt" in _mb9 and f"{PFX}demo/moved.txt".encode() not in _mb9,
               repr(_mb9))
         check("[-9] AC5 ...and carries gov's semantic change — asserted on CONTENT, never on rc",
               b"GOV SEMANTIC CHANGE at scripts/demo/moved.txt" in _mb9, repr(_mb9))
         check("[-9] AC5 ...and every untouched line came through at the target's spelling",
-              _mb9 == _MOVED_B.encode().replace(b"tools/demo", b"scripts/demo"), repr(_mb9))
+              _mb9 == _MOVED_B.encode().replace(f"{PFX}demo".encode(), b"scripts/demo"), repr(_mb9))
         _rec9 = json.loads((t9 / ".governance" / "install.json").read_text(encoding="utf-8"))
         _rowm = [f for f in _rec9["files"] if f["path"] == MOV9][0]
         check("[-9] S12 the reconciled row's `oid` is the blob the target now holds",
@@ -6825,26 +6845,26 @@ user_skills = "/tmp/gk-fake-skills"
               and _rowm.get("commit") == B9, str(_rowm)[:300])
 
         # ---- AC9: the DELETED carried row, restored. Red observed: the file came back as
-        # ---- `gone refers to tools/demo/gone.txt`, gov's prefix in a target that does not use it.
+        # ---- `gone refers to <prefix>/demo/gone.txt`, gov's prefix in a target that does not use it.
         _gb9 = (t9 / GONE9).read_bytes()
         check("[-9] AC9 a `missing` carried row is restored in the CARRIED form",
               _gb9 == b"gone refers to scripts/demo/gone.txt\n", repr(_gb9))
-        check("[-9] AC9 ...and spells gov's own prefix nowhere", b"tools/" not in _gb9, repr(_gb9))
+        check("[-9] AC9 ...and spells gov's own prefix nowhere", f"{PFX}".encode() not in _gb9, repr(_gb9))
         _gi9 = gout(t9, "ls-files", "-s", "--", GONE9).split()[1]
         check("[-9] AC9 ...and its index blob is NOT gov's blob for that source",
-              _gi9 != GK9.blob_oid(_GOV9["tools/demo/gone.txt"]), _gi9)
+              _gi9 != GK9.blob_oid(_GOV9[f"{PFX}demo/gone.txt"]), _gi9)
 
         # ---- AC10: THE STAMP the restore leaves, both halves together. This is the arm that fails
         # ---- against a draft writing the carried bytes and then taking `-8`'s raw-arm stamp: the
         # ---- two identities come back EQUAL over bytes gov never shipped, and the NEXT run reads
-        # ---- that row as clean and raw-overwrites it straight back to `tools/`.
+        # ---- that row as clean and raw-overwrites it straight back to `<prefix>/`.
         _rowg = [f for f in _rec9["files"] if f["path"] == GONE9][0]
         check("[-9] AC10 the restored row records `carry: relocate`",
               _rowg.get("carry") == "relocate", str(_rowg)[:300])
         check("[-9] AC10 ...`oid` is the blob the target's index actually holds",
               _rowg.get("oid") == _gi9, str(_rowg)[:300])
         check("[-9] AC10 ...`gov_oid` is gov's blob at the row's own commit",
-              _rowg.get("gov_oid") == GK9.blob_oid(_GOV9["tools/demo/gone.txt"])
+              _rowg.get("gov_oid") == GK9.blob_oid(_GOV9[f"{PFX}demo/gone.txt"])
               and _rowg.get("commit") == B9, str(_rowg)[:300])
         check("[-9] AC10 ...so the two identities DIFFER, which reads `this row carries a rung`",
               _rowg.get("oid") != _rowg.get("gov_oid"), str(_rowg)[:300])
@@ -6913,7 +6933,7 @@ user_skills = "/tmp/gk-fake-skills"
         # from that rule on every run and NEVER inferred from what an attribution walk found. A
         # forked row is report-only: written in NEITHER direction.
         #
-        # THE LANDMINE THESE ARMS GATE AS A CLASS. gov's `tools/memory-recall/extract.py` is a fork
+        # THE LANDMINE THESE ARMS GATE AS A CLASS. gov's `<prefix>/memory-recall/extract.py` is a fork
         # of inCMS's `scripts/recall/extract.py`; it carries `import recall_conf` at its line 55 and
         # inCMS's `scripts/` tree holds no `recall_conf` anywhere. inCMS's own `.governance/
         # install.index` declares that file `engine`, so one automatic update writes gov's blob over
@@ -6940,7 +6960,7 @@ user_skills = "/tmp/gk-fake-skills"
                 rule += f'direction = "{direction}"\n'
             if record is not None:
                 rule += f'record = "{record}"\n'
-            return ('id = "demo"\nhome = "tools/demo"\nversion_from = { none = "fixture" }\n\n'
+            return ('id = "demo"\nhome = "demo"\nversion_from = { none = "fixture" }\n\n'
                     '[check]\nnone = "a fixture kit"\n\n'
                     '[[files]]\ninclude = "**"\nrole = "engine"\n\n'
                     + rule + '\n[adopt]\nargv = []\nmutates_index = false\n')
@@ -6954,20 +6974,20 @@ user_skills = "/tmp/gk-fake-skills"
             rather than remembered.
             """
             g = tmp / f"fork-{tag}"
-            (g / "tools" / "govkit").mkdir(parents=True)
-            (g / "tools" / "demo").mkdir(parents=True)
-            shutil.copy2(GOVKIT, g / "tools" / "govkit" / "govkit.py")
-            shutil.copy2(GOVKIT.parent / "adopters.toml", g / "tools" / "govkit" / "adopters.toml")  # arm 10 refuses a gov without it
-            (g / "tools" / "govkit" / "registry.toml").write_text(
-                '[surface]\nglobs = ["tools/*"]\n\n'
+            (g / PFX / "govkit").mkdir(parents=True)
+            (g / PFX / "demo").mkdir(parents=True)
+            shutil.copy2(GOVKIT, g / PFX / "govkit" / "govkit.py")
+            shutil.copy2(GOVKIT.parent / "adopters.toml", g / PFX / "govkit" / "adopters.toml")  # arm 10 refuses a gov without it
+            (g / PFX / "govkit" / "registry.toml").write_text(
+                '[surface]\nglobs = ["{prefix}/*"]\n\n'
                 '[selection]\ndefault = ["demo"]\n\n'
-                '[[entry]]\nid = "demo"\ndescriptor = "tools/demo/kit.toml"\n\n'
-                '[[exempt]]\npath = "tools/govkit"\nwhy = "the deployer itself"\n',
+                '[[entry]]\nid = "demo"\ndescriptor = "{prefix}/demo/kit.toml"\n\n'
+                '[[exempt]]\npath = "{prefix}/govkit"\nwhy = "the deployer itself"\n',
                 encoding="utf-8", newline="\n")
-            (g / "tools" / "demo" / "kit.toml").write_text(kit_toml, encoding="utf-8",
+            (g / PFX / "demo" / "kit.toml").write_text(kit_toml, encoding="utf-8",
                                                            newline="\n")
             for rel, body in FORK_SRC.items():
-                (g / "tools" / "demo" / rel).write_text(body, encoding="utf-8", newline="\n")
+                (g / PFX / "demo" / rel).write_text(body, encoding="utf-8", newline="\n")
             git(g, "init", "-q", "-b", "main")
             git(g, "config", "user.email", "t@e")
             git(g, "config", "user.name", "t")
@@ -7030,15 +7050,15 @@ user_skills = "/tmp/gk-fake-skills"
         # ---- printed. The summary clause is derived from the same table now.
         _gp = fork_gov("plan", fork_kit())
         _tp = make_target(tmp / "fork-plan-t",
-                          'gov_source = "local"\nprefix = "tools"\nkits = ["demo"]\n')
+                          f'gov_source = "local"\nprefix = "{PFX[:-1]}"\nkits = ["demo"]\n')
         _pp = run_in_gov(_gp, "plan", "--target", str(_tp), "--kits", "demo")
         _prows = _extract_plan_rows(_pp.stdout)
         check("[-10] AC5 plan exits 0 over a descriptor carrying a forked rule",
               _pp.returncode == 0, _pp.stdout + _pp.stderr)
         check("[-10] AC5 the forked source is marked FORK, not `write`",
-              ("FORK", "tools/demo/forked-one.py") in _prows, str(_prows))
+              ("FORK", f"{PFX}demo/forked-one.py") in _prows, str(_prows))
         check("[-10] AC5 ...and no forked destination is previewed as a write",
-              "tools/demo/forked-one.py" not in extract_plan_writes(_pp.stdout),
+              f"{PFX}demo/forked-one.py" not in extract_plan_writes(_pp.stdout),
               str(extract_plan_writes(_pp.stdout)))
         # `detail` IS STRINGIFIED HERE, and that is not tidiness. `check()` concatenates it onto
         # its FAIL line, so a list argument raises `TypeError` on the failing path and takes the
@@ -7050,7 +7070,7 @@ user_skills = "/tmp/gk-fake-skills"
         check("[-10] AC5 ...with the legend naming the mark it just printed",
               "FORK = " in _pp.stdout, _pp.stdout)
         check("[-10] S2 the `**` engine pool still ships everything the forked rule did not claim",
-              "tools/demo/engine.txt" in extract_plan_writes(_pp.stdout),
+              f"{PFX}demo/engine.txt" in extract_plan_writes(_pp.stdout),
               str(extract_plan_writes(_pp.stdout)))
 
         # ---- AC2: `apply` then `update --write`, end to end, over a target holding its OWN copy of
@@ -7060,8 +7080,8 @@ user_skills = "/tmp/gk-fake-skills"
 
         def fork_target(g: pathlib.Path, name: str) -> pathlib.Path:
             t = make_target(tmp / name,
-                            'gov_source = "local"\nprefix = "tools"\nkits = ["demo"]\n')
-            p = t / "tools" / "demo" / "forked-one.py"
+                            f'gov_source = "local"\nprefix = "{PFX[:-1]}"\nkits = ["demo"]\n')
+            p = t / PFX / "demo" / "forked-one.py"
             p.parent.mkdir(parents=True, exist_ok=True)
             p.write_text(FORK_TARGET_BYTES, encoding="utf-8", newline="\n")
             git(t, "add", "-A")
@@ -7071,7 +7091,7 @@ user_skills = "/tmp/gk-fake-skills"
         _ga = fork_gov("apply", fork_kit())
         _ta = fork_target(_ga, "fork-apply-t")
         check("[-10] the fixture triggers the rule: gov's bytes and the target's DIFFER",
-              (_ta / "tools" / "demo" / "forked-one.py").read_text(encoding="utf-8")
+              (_ta / PFX / "demo" / "forked-one.py").read_text(encoding="utf-8")
               != FORK_SRC["forked-one.py"], "")
 
         _ap = run_in_gov(_ga, "apply", "--target", str(_ta), "--kits", "demo")
@@ -7080,9 +7100,9 @@ user_skills = "/tmp/gk-fake-skills"
         check("[-10] apply SKIPPED the forked rule and said why, rather than skipping silently",
               "SKIPPED [forked" in _ap.stdout and "derivative" in _ap.stdout, _ap.stdout)
         check("[-10] apply left the target's own copy BYTE-IDENTICAL",
-              (_ta / "tools" / "demo" / "forked-one.py").read_text(encoding="utf-8")
+              (_ta / PFX / "demo" / "forked-one.py").read_text(encoding="utf-8")
               == FORK_TARGET_BYTES,
-              repr((_ta / "tools" / "demo" / "forked-one.py").read_text(encoding="utf-8")))
+              repr((_ta / PFX / "demo" / "forked-one.py").read_text(encoding="utf-8")))
         _reca = json.loads((_ta / ".governance" / "install.json").read_text(encoding="utf-8"))
         _fr = [f for f in _reca["files"] if f.get("role") == "forked"]
         check("[-10] apply wrote ONE forked receipt row, marked unwritten",
@@ -7104,27 +7124,27 @@ user_skills = "/tmp/gk-fake-skills"
         # ---- never on the kit id, so this fixture grades the same branch.
         _gi = fork_gov("incomplete", fork_kit())
         _ti = make_target(tmp / "fork-incomplete-t",
-                          'gov_source = "local"\nprefix = "tools"\nkits = ["demo"]\n')
+                          f'gov_source = "local"\nprefix = "{PFX[:-1]}"\nkits = ["demo"]\n')
         _ip = run_in_gov(_gi, "apply", "--target", str(_ti), "--kits", "demo")
         _io = _ip.stdout + _ip.stderr
         check("[dGV-3] apply reports an entry INCOMPLETE when its forked files are absent",
               "INCOMPLETE demo" in _io, _io[-900:])
         check("[dGV-3] and it names the absent file with the role that withheld it",
-              "absent [forked" in _io and "tools/demo/forked-one.py" in _io, _io[-900:])
+              "absent [forked" in _io and f"{PFX}demo/forked-one.py" in _io, _io[-900:])
         check("[dGV-3] and it gives UNLANDED_REASON's sentence rather than a bare skip",
               "derivative of the target's" in _io, _io[-900:])
         check("[dGV-3] and it tells the operator gov will not send them",
               "gov will not send them" in _io, _io[-900:])
         check("[dGV-3] the forked file really is absent, so the report is not describing a landed one",
-              not (_ti / "tools" / "demo" / "forked-one.py").exists())
+              not (_ti / PFX / "demo" / "forked-one.py").exists())
 
         # Gov moves BOTH files. The engine row must still move — an arm where nothing updates
         # cannot tell "the forked row was skipped" from "the whole run did nothing".
         settle(_ta, "after apply")
-        (_ga / "tools" / "demo" / "forked-one.py").write_text(
+        (_ga / PFX / "demo" / "forked-one.py").write_text(
             "# gov's own copy, moved\nimport gov_only\nimport more_gov_only\n",
             encoding="utf-8", newline="\n")
-        (_ga / "tools" / "demo" / "engine.txt").write_text("gov B\n", encoding="utf-8",
+        (_ga / PFX / "demo" / "engine.txt").write_text("gov B\n", encoding="utf-8",
                                                            newline="\n")
         git(_ga, "add", "-A")
         git(_ga, "commit", "-qm", "B")
@@ -7140,16 +7160,16 @@ user_skills = "/tmp/gk-fake-skills"
         check("[-10] AC2 ...counted in the tally rather than dropped from it",
               "forked:reported 1" in _up.stdout, _up.stdout)
         check("[-10] AC2 ...writing NEITHER direction: the target's bytes are untouched",
-              (_ta / "tools" / "demo" / "forked-one.py").read_text(encoding="utf-8")
+              (_ta / PFX / "demo" / "forked-one.py").read_text(encoding="utf-8")
               == FORK_TARGET_BYTES,
-              repr((_ta / "tools" / "demo" / "forked-one.py").read_text(encoding="utf-8")))
+              repr((_ta / PFX / "demo" / "forked-one.py").read_text(encoding="utf-8")))
         check("[-10] AC2 ...and gov's own copy is untouched too — no reverse transform exists",
-              (_ga / "tools" / "demo" / "forked-one.py").read_text(encoding="utf-8")
+              (_ga / PFX / "demo" / "forked-one.py").read_text(encoding="utf-8")
               != FORK_TARGET_BYTES, "")
         check("[-10] AC2 LIVENESS the same run DID move the engine row, so nothing passed by "
               "doing nothing",
-              (_ta / "tools" / "demo" / "engine.txt").read_text(encoding="utf-8") == "gov B\n",
-              repr((_ta / "tools" / "demo" / "engine.txt").read_text(encoding="utf-8")))
+              (_ta / PFX / "demo" / "engine.txt").read_text(encoding="utf-8") == "gov B\n",
+              repr((_ta / PFX / "demo" / "engine.txt").read_text(encoding="utf-8")))
         _recb = json.loads((_ta / ".governance" / "install.json").read_text(encoding="utf-8"))
         check("[-10] AC2 ...and the receipt is RE-STAMPED rather than frozen by the forked row",
               _recb.get("gov_commit") == _B, str(_recb.get("gov_commit")) + " want " + _B)
@@ -7175,7 +7195,7 @@ user_skills = "/tmp/gk-fake-skills"
         check("[-10] AC7 the fixture really carries a forked row with NO `direction` key",
               [f for f in json.loads(_r7p.read_text(encoding="utf-8"))["files"]
                if f.get("role") == "forked" and "direction" not in f], _r7p.read_text())
-        (_g7 / "tools" / "demo" / "engine.txt").write_text("gov B\n", encoding="utf-8",
+        (_g7 / PFX / "demo" / "engine.txt").write_text("gov B\n", encoding="utf-8",
                                                            newline="\n")
         git(_g7, "add", "-A")
         git(_g7, "commit", "-qm", "B")
@@ -7192,7 +7212,7 @@ user_skills = "/tmp/gk-fake-skills"
         check("[-10] AC7 ...and COUNTED, so a tolerated row is not a silent one",
               "forked:reported 1" in _u7.stdout, _u7.stdout)
         check("[-10] AC7 ...and still writes no bytes at that path",
-              (_t7 / "tools" / "demo" / "forked-one.py").read_text(encoding="utf-8")
+              (_t7 / PFX / "demo" / "forked-one.py").read_text(encoding="utf-8")
               == FORK_TARGET_BYTES, "")
 
         # ============ DEPL-dCarriedReceipt-11 — rename detection, and `withdrawn` stops deleting =========
@@ -7235,7 +7255,7 @@ user_skills = "/tmp/gk-fake-skills"
         # The descriptor, in its two vintages. Gov renaming a file inside its own kit and updating its own
         # includes in the same commit is the whole motivating scenario, so the fixture does exactly that —
         # and it is what makes `resolve_entry` the only thing that can answer where the new source lands.
-        _11_KIT_A = ('id = "demo"\nhome = "tools/demo"\nversion_from = { none = "fixture" }\n\n'
+        _11_KIT_A = ('id = "demo"\nhome = "demo"\nversion_from = { none = "fixture" }\n\n'
                      '[check]\nnone = "a fixture kit"\n\n'
                      '[[files]]\ninclude = "**"\nrole = "engine"\n\n'
                      '[[files]]\ninclude = ["twin.txt"]\n'
@@ -7269,16 +7289,16 @@ user_skills = "/tmp/gk-fake-skills"
             AFTER the copy runs the UNPATCHED engine and the arm reports on nothing.
             """
             g = tmp / f"rn-{tag}-gov"
-            (g / "tools" / "govkit").mkdir(parents=True)
-            shutil.copy2(GOVKIT, g / "tools" / "govkit" / "govkit.py")
-            shutil.copy2(GOVKIT.parent / "adopters.toml", g / "tools" / "govkit" / "adopters.toml")  # arm 10 refuses a gov without it
-            (g / "tools" / "govkit" / "registry.toml").write_text(
-                '[surface]\nglobs = ["tools/*"]\n\n'
+            (g / PFX / "govkit").mkdir(parents=True)
+            shutil.copy2(GOVKIT, g / PFX / "govkit" / "govkit.py")
+            shutil.copy2(GOVKIT.parent / "adopters.toml", g / PFX / "govkit" / "adopters.toml")  # arm 10 refuses a gov without it
+            (g / PFX / "govkit" / "registry.toml").write_text(
+                '[surface]\nglobs = ["{prefix}/*"]\n\n'
                 '[selection]\ndefault = ["demo"]\n\n'
-                '[[entry]]\nid = "demo"\ndescriptor = "tools/demo/kit.toml"\n\n'
-                '[[exempt]]\npath = "tools/govkit"\nwhy = "the deployer itself"\n',
+                '[[entry]]\nid = "demo"\ndescriptor = "{prefix}/demo/kit.toml"\n\n'
+                '[[exempt]]\npath = "{prefix}/govkit"\nwhy = "the deployer itself"\n',
                 encoding="utf-8", newline="\n")
-            d = g / "tools" / "demo"
+            d = g / PFX / "demo"
             d.mkdir(parents=True, exist_ok=True)
             (d / "kit.toml").write_text(kit_a, encoding="utf-8", newline="\n")
             for rel, body in _11_SRC.items():
@@ -7294,22 +7314,22 @@ user_skills = "/tmp/gk-fake-skills"
 
         def write_rename_vintage(g: pathlib.Path) -> str:
             """Gov's second vintage: nine renames, one deletion-and-addition, two edits."""
-            d = g / "tools" / "demo"
-            git(g, "mv", "tools/demo/moved.txt", "tools/demo/renamed.txt")
-            git(g, "mv", "tools/demo/content.txt", "tools/demo/content2.txt")
+            d = g / PFX / "demo"
+            git(g, "mv", f"{PFX}demo/moved.txt", f"{PFX}demo/renamed.txt")
+            git(g, "mv", f"{PFX}demo/content.txt", f"{PFX}demo/content2.txt")
             (d / "content2.txt").write_text(_11_CONTENT_B, encoding="utf-8", newline="\n")
-            git(g, "mv", "tools/demo/delta.txt", "tools/demo/delta2.txt")
+            git(g, "mv", f"{PFX}demo/delta.txt", f"{PFX}demo/delta2.txt")
             (d / "delta2.txt").write_text(_11_DELTA_B, encoding="utf-8", newline="\n")
             (d / "low.txt").unlink()                       # rewritten far enough that git pairs nothing
             (d / "newlow.txt").write_text(_11_LOW_B, encoding="utf-8", newline="\n")
             (g / "docs").mkdir(parents=True, exist_ok=True)
-            git(g, "mv", "tools/demo/gone.txt", "docs/gone.txt")     # OUT of the kit's home entirely
-            git(g, "mv", "tools/demo/twin.txt", "tools/demo/twin2.txt")
-            git(g, "mv", "tools/demo/seed.txt", "tools/demo/seed2.txt")
-            git(g, "mv", "tools/demo/rendered.txt", "tools/demo/rendered2.txt")
+            git(g, "mv", f"{PFX}demo/gone.txt", "docs/gone.txt")     # OUT of the kit's home entirely
+            git(g, "mv", f"{PFX}demo/twin.txt", f"{PFX}demo/twin2.txt")
+            git(g, "mv", f"{PFX}demo/seed.txt", f"{PFX}demo/seed2.txt")
+            git(g, "mv", f"{PFX}demo/rendered.txt", f"{PFX}demo/rendered2.txt")
             (d / "sub").mkdir(parents=True, exist_ok=True)
-            git(g, "mv", "tools/demo/sub.txt", "tools/demo/sub/sub.txt")     # into a NEW subdirectory
-            git(g, "mv", "tools/demo/dropped.txt", "tools/demo/dropped2.txt")
+            git(g, "mv", f"{PFX}demo/sub.txt", f"{PFX}demo/sub/sub.txt")     # into a NEW subdirectory
+            git(g, "mv", f"{PFX}demo/dropped.txt", f"{PFX}demo/dropped2.txt")
             (d / "keep.txt").write_text("keep B\n", encoding="utf-8", newline="\n")
             (d / "kit.toml").write_text(_11_KIT_B, encoding="utf-8", newline="\n")
             git(g, "add", "-A")
@@ -7325,19 +7345,19 @@ user_skills = "/tmp/gk-fake-skills"
             later arms are grading a broken install. The local delta is an EDIT AFTER the install, which is
             the state the three-way exists for.
             """
-            t = make_target(tmp / name, 'gov_source = "local"\nprefix = "tools"\nkits = ["demo"]\n')
-            (t / "tools" / "demo").mkdir(parents=True, exist_ok=True)
-            (t / "tools" / "demo" / "rendered.txt").write_text(
+            t = make_target(tmp / name, f'gov_source = "local"\nprefix = "{PFX[:-1]}"\nkits = ["demo"]\n')
+            (t / PFX / "demo").mkdir(parents=True, exist_ok=True)
+            (t / PFX / "demo" / "rendered.txt").write_text(
                 "the adopter rendered this\n", encoding="utf-8", newline="\n")
             settle(t, "the adopter's own rendered file")
             _ap = run_in_gov(g, "apply", "--target", str(t), "--kits", "demo")
             check(f"[-11] the {name} fixture's install applies GREEN, or every arm over it grades a "
                   f"broken target", _ap.returncode == 0, _ap.stdout[-900:] + _ap.stderr[-600:])
-            (t / "tools" / "demo" / "delta.txt").write_text(_11_DELTA_T, encoding="utf-8", newline="\n")
+            (t / PFX / "demo" / "delta.txt").write_text(_11_DELTA_T, encoding="utf-8", newline="\n")
             # AND ONE ROW THE TARGET DELETED, committed rather than staged: `-12` S4 calls a STAGED
             # deletion dirty and would refuse the run before any verdict, so a path absent from the
             # index, the worktree AND HEAD is the only way to reach this state at all.
-            (t / "tools" / "demo" / "dropped.txt").unlink()
+            (t / PFX / "demo" / "dropped.txt").unlink()
             settle(t, "the install, one adopter edit and one adopter deletion")
             return t
 
@@ -7355,14 +7375,14 @@ user_skills = "/tmp/gk-fake-skills"
         _pairs50 = {ln.split("\t")[1]: ln.split("\t")[2] for ln in _rn50.splitlines()
                     if ln.startswith("R") and len(ln.split("\t")) == 3}
         check("[-11] the fixture really renames: git pairs nine sources at the declared threshold",
-              len(_pairs50) == 9 and _pairs50.get("tools/demo/moved.txt") == "tools/demo/renamed.txt",
+              len(_pairs50) == 9 and _pairs50.get(f"{PFX}demo/moved.txt") == f"{PFX}demo/renamed.txt",
               _rn50)
         check("[-11] ...including one that leaves the kit's home, which only an UNSCOPED diff can see",
-              _pairs50.get("tools/demo/gone.txt") == "docs/gone.txt", _rn50)
+              _pairs50.get(f"{PFX}demo/gone.txt") == "docs/gone.txt", _rn50)
         check("[-11] S7 the low-similarity pair is NOT paired at the declared threshold",
-              "tools/demo/low.txt" not in _pairs50, _rn50)
+              f"{PFX}demo/low.txt" not in _pairs50, _rn50)
         check("[-11] S7 LIVENESS ...and IS paired below it, so the constant is what decides, not the bytes",
-              "R" in _rn10 and "tools/demo/low.txt\ttools/demo/newlow.txt" in _rn10, _rn10)
+              "R" in _rn10 and f"{PFX}demo/low.txt\t{PFX}demo/newlow.txt" in _rn10, _rn10)
         check("[-11] S7 the threshold is a NAMED constant rather than git's implicit default",
               GK11.RENAME_SIMILARITY_PERCENT == 50, str(GK11.RENAME_SIMILARITY_PERCENT))
         _map11 = GK11.derive_rename_map(_g11, _A11, _B11)
@@ -7373,14 +7393,14 @@ user_skills = "/tmp/gk-fake-skills"
         _rec11a = json.loads((_t11 / ".governance" / "install.json").read_text(encoding="utf-8"))
         _row11 = {f["path"]: f for f in _rec11a["files"]}
         check("[-11] the fixture's delta row really carries an adopter edit gov's blob does not have",
-              (_t11 / "tools" / "demo" / "delta.txt").read_bytes() != _11_SRC["delta.txt"].encode(), "")
+              (_t11 / PFX / "demo" / "delta.txt").read_bytes() != _11_SRC["delta.txt"].encode(), "")
         check("[-11] ...and its clean row does NOT, or AC8 would grade the merge arm by accident",
-              (_t11 / "tools" / "demo" / "content.txt").read_bytes() == _11_SRC["content.txt"].encode(), "")
+              (_t11 / PFX / "demo" / "content.txt").read_bytes() == _11_SRC["content.txt"].encode(), "")
         check("[-11] the fixture's rendered row is in the receipt AND in the target's index",
-              _row11.get("tools/demo/rendered.txt", {}).get("role") == "rendered"
-              and "tools/demo/rendered.txt" in gout(_t11, "ls-files").split(), str(sorted(_row11)))
+              _row11.get(f"{PFX}demo/rendered.txt", {}).get("role") == "rendered"
+              and f"{PFX}demo/rendered.txt" in gout(_t11, "ls-files").split(), str(sorted(_row11)))
         check("[-11] the fixture's seed row is in the receipt as `seed`",
-              _row11.get("tools/demo/seed.txt", {}).get("role") == "seed", str(sorted(_row11)))
+              _row11.get(f"{PFX}demo/seed.txt", {}).get("role") == "seed", str(sorted(_row11)))
 
         # ---- THE READ-ONLY RUN. AC10 lives here: it asserts a string is ABSENT from the whole output, so
         # ---- it has to run over a fixture where no row can legitimately print it.
@@ -7390,28 +7410,28 @@ user_skills = "/tmp/gk-fake-skills"
         check("[-11] S1 the run PRINTS the map it derived rather than finding renames silently",
               "rename map: 9 gov source(s) moved" in _ro11.stdout, _ro11.stdout[:1400])
         check("[-11] S2 a clean renamed row takes the new verdict rather than `withdrawn`",
-              verdict_of(_ro11.stdout, "tools/demo/moved.txt") == "renamed", _ro11.stdout)
+              verdict_of(_ro11.stdout, f"{PFX}demo/moved.txt") == "renamed", _ro11.stdout)
         check("[-11] AC3 a rename git scored below the threshold stays `withdrawn` — nothing is invented",
-              verdict_of(_ro11.stdout, "tools/demo/low.txt") == "withdrawn", _ro11.stdout)
+              verdict_of(_ro11.stdout, f"{PFX}demo/low.txt") == "withdrawn", _ro11.stdout)
         check("[-11] S3 a source renamed OUT of the kit's surface is a withdrawal, not a move",
-              verdict_of(_ro11.stdout, "tools/demo/gone.txt") == "withdrawn"
+              verdict_of(_ro11.stdout, f"{PFX}demo/gone.txt") == "withdrawn"
               and "it has left this kit's claimed surface" in _ro11.stdout, _ro11.stdout)
         check("[-11] S3 ...and a new source the kit resolves to SEVERAL destinations is dropped LOUDLY",
-              verdict_of(_ro11.stdout, "tools/demo/twin-a.txt") == "withdrawn"
+              verdict_of(_ro11.stdout, f"{PFX}demo/twin-a.txt") == "withdrawn"
               and "3 destinations" in _ro11.stdout and "picking one would be a guess" in _ro11.stdout,
               _ro11.stdout)
         check("[-11] the control row gov EDITED is still `stale`, so the map moved nothing it should not",
-              verdict_of(_ro11.stdout, "tools/demo/keep.txt") == "stale", _ro11.stdout)
+              verdict_of(_ro11.stdout, f"{PFX}demo/keep.txt") == "stale", _ro11.stdout)
         check("[-11] the fixture's deleted row is absent from the target's index, worktree AND HEAD",
-              "tools/demo/dropped.txt" not in gout(_t11, "ls-files").split()
-              and not (_t11 / "tools" / "demo" / "dropped.txt").exists()
-              and "tools/demo/dropped.txt" not in gout(
+              f"{PFX}demo/dropped.txt" not in gout(_t11, "ls-files").split()
+              and not (_t11 / PFX / "demo" / "dropped.txt").exists()
+              and f"{PFX}demo/dropped.txt" not in gout(
                   _t11, "ls-tree", "-r", "--name-only", "HEAD").split(), "")
         check("[-11] S2 a row the TARGET deleted is not a rename however the map reads: there is nothing "
               "to move, and the grid already answers `converged` for a file gone on both sides",
-              verdict_of(_ro11.stdout, "tools/demo/dropped.txt") == "converged", _ro11.stdout)
+              verdict_of(_ro11.stdout, f"{PFX}demo/dropped.txt") == "converged", _ro11.stdout)
         check("[-11] AC10 S0c a `seed` row whose gov source MOVED prints `renamed`",
-              verdict_of(_ro11.stdout, "tools/demo/seed.txt") == "renamed", _ro11.stdout)
+              verdict_of(_ro11.stdout, f"{PFX}demo/seed.txt") == "renamed", _ro11.stdout)
         check("[-11] AC10 S0c ...and the string `current` appears NOWHERE in that run's output — the seed "
               "override may not rewrite this verdict over a source that no longer exists",
               "current" not in _ro11.stdout, _ro11.stdout)
@@ -7602,15 +7622,15 @@ user_skills = "/tmp/gk-fake-skills"
               len({_w for _x, _y, _w, _z in _S4_TABLE}) == 2,
               f"the table lost a direction: {sorted({_w for _x, _y, _w, _z in _S4_TABLE})}")
         check("[-11] AC3 ...so the below-threshold row's file is still on disk",
-              (_t11 / "tools" / "demo" / "low.txt").is_file(), "")
+              (_t11 / PFX / "demo" / "low.txt").is_file(), "")
         check("[-11] AC3 ...and still tracked, and still a row in install.json",
-              "tools/demo/low.txt" in _files_after
-              and any(f["path"] == "tools/demo/low.txt" for f in json.loads(
+              f"{PFX}demo/low.txt" in _files_after
+              and any(f["path"] == f"{PFX}demo/low.txt" for f in json.loads(
                   (_t11 / ".governance" / "install.json").read_text(encoding="utf-8"))["files"]), "")
         # DEPL-cMendedVintage-14 re-keyed every outbox order on the FULL path plus a digest, so a
         # literal filename here would be a second copy of that rule and would strand on the next
         # change to it. Derive it from the engine's own renderer, which is what the writer calls.
-        _wdname11 = f"update-withdrawn-{GK9.render_order_slug('tools/demo/low.txt')}.md"
+        _wdname11 = f"update-withdrawn-{GK9.render_order_slug(f'{PFX}demo/low.txt')}.md"
         check("[-11] S8 ...with an ORDER naming the file, its last gov commit and why nothing was deleted",
               (_t11 / ".governance" / "outbox" / _wdname11).is_file()
               and "NOTHING was deleted" in (_t11 / ".governance" / "outbox"
@@ -7622,20 +7642,20 @@ user_skills = "/tmp/gk-fake-skills"
 
         _status11 = gout(_t11, "status", "--porcelain")
         check("[-11] AC2 the target's own git sees an R entry for the clean rename",
-              any(ln.startswith("R") and "tools/demo/moved.txt" in ln and "tools/demo/renamed.txt" in ln
+              any(ln.startswith("R") and f"{PFX}demo/moved.txt" in ln and f"{PFX}demo/renamed.txt" in ln
                   for ln in _status11.splitlines()), _status11)
         check("[-11] AC2 ...the old path is gone from the worktree and the new one is there",
-              not (_t11 / "tools" / "demo" / "moved.txt").exists()
-              and (_t11 / "tools" / "demo" / "renamed.txt").is_file(), "")
+              not (_t11 / PFX / "demo" / "moved.txt").exists()
+              and (_t11 / PFX / "demo" / "renamed.txt").is_file(), "")
         check("[-11] S4 ...and the rename into a NEW subdirectory worked, parent and all",
-              (_t11 / "tools" / "demo" / "sub" / "sub.txt").is_file(), "")
+              (_t11 / PFX / "demo" / "sub" / "sub.txt").is_file(), "")
         _rec11b = json.loads((_t11 / ".governance" / "install.json").read_text(encoding="utf-8"))
         _row11b = {f["path"]: f for f in _rec11b["files"]}
         check("[-11] AC2 the receipt row's `path` AND `source` both carry the new spelling",
-              _row11b.get("tools/demo/renamed.txt", {}).get("source") == "tools/demo/renamed.txt",
+              _row11b.get(f"{PFX}demo/renamed.txt", {}).get("source") == f"{PFX}demo/renamed.txt",
               str(sorted(_row11b)))
         check("[-11] S4 ...and the old spelling is a row no more",
-              "tools/demo/moved.txt" not in _row11b, str(sorted(_row11b)))
+              f"{PFX}demo/moved.txt" not in _row11b, str(sorted(_row11b)))
         check("[-11] S2 ...and the run stayed HEALTHY over it — no `git mv` of a file that is not "
               "there, and no traceback either: asserting only the absence of a message would let a "
               "crash pass for a guard",
@@ -7649,22 +7669,22 @@ user_skills = "/tmp/gk-fake-skills"
         # ---- draft which moves the file and stamps the row forward without writing gov's new bytes — and
         # ---- against one that defers the byte question to a post-move comparison, which freezes the file
         # ---- at pre-rename content and prints `patched` for an adopter edit that never happened.
-        _c2 = "tools/demo/content2.txt"
+        _c2 = f"{PFX}demo/content2.txt"
         _idx_c2 = gout(_t11, "ls-files", "-s", "--", _c2).split()
         check("[-11] AC8 the renamed-and-edited row is in the index at its NEW path",
               len(_idx_c2) >= 2, gout(_t11, "ls-files", "-s", "--", _c2))
         check("[-11] AC8 ...holding gov's blob at the requested vintage for the NEW source, byte for byte",
               len(_idx_c2) >= 2
-              and _idx_c2[1] == GK11.blob_oid(GK11.blob_at(_g11, _B11, "tools/demo/content2.txt")),
+              and _idx_c2[1] == GK11.blob_oid(GK11.blob_at(_g11, _B11, f"{PFX}demo/content2.txt")),
               str(_idx_c2))
         check("[-11] AC8 ...and NOT the pre-rename content, which is what a deferred byte decision leaves",
               read_bytes11(_t11 / _c2) == _11_CONTENT_B.encode(), repr(read_bytes11(_t11 / _c2)))
         check("[-11] AC8 the row's `commit` and `gov_oid` BOTH carry the --to vintage, never one without "
               "the other", _row11b.get(_c2, {}).get("commit") == _B11
               and _row11b.get(_c2, {}).get("gov_oid") == GK11.blob_oid(
-                  GK11.blob_at(_g11, _B11, "tools/demo/content2.txt")), str(_row11b.get(_c2))[:300])
+                  GK11.blob_at(_g11, _B11, f"{PFX}demo/content2.txt")), str(_row11b.get(_c2))[:300])
         check("[-11] AC9 that row's verdict was `renamed`, and the string `patched` appears NOWHERE in the "
-              "write run's output", verdict_of(_w11.stdout, "tools/demo/content.txt") == "renamed"
+              "write run's output", verdict_of(_w11.stdout, f"{PFX}demo/content.txt") == "renamed"
               and "patched" not in _w11.stdout, _w11.stdout)
         check("[-11] AC9 ...and its stored sha256 is gov's blob at --to, not the pre-rename content",
               _row11b.get(_c2, {}).get("sha256") == GK11._sha(_11_CONTENT_B.encode()),
@@ -7673,12 +7693,12 @@ user_skills = "/tmp/gk-fake-skills"
         # ---- AC5: THE RENAMED ROW CARRYING A LOCAL DELTA. Moved, then three-way merged — asserted on
         # ---- CONTENT and never on an exit code, because a wrong argument order to `git merge-file` emits
         # ---- a plausible file with one side silently dropped and exits 0.
-        _d2 = "tools/demo/delta2.txt"
+        _d2 = f"{PFX}demo/delta2.txt"
         _idx_d2 = gout(_t11, "ls-files", "-s", "--", _d2).split()
         check("[-11] AC5 the delta row moved to its new path", len(_idx_d2) >= 2, str(_idx_d2))
         check("[-11] AC5 ...and what it holds is NOT gov's blob there, which is what proves no raw write",
               len(_idx_d2) >= 2
-              and _idx_d2[1] != GK11.blob_oid(GK11.blob_at(_g11, _B11, "tools/demo/delta2.txt")),
+              and _idx_d2[1] != GK11.blob_oid(GK11.blob_at(_g11, _B11, f"{PFX}demo/delta2.txt")),
               str(_idx_d2))
         check("[-11] AC5 ...it is the MERGE: gov's change landed and the adopter's edit survived",
               read_bytes11(_t11 / _d2) == _11_DELTA_M.encode(), repr(read_bytes11(_t11 / _d2)))
@@ -7686,23 +7706,23 @@ user_skills = "/tmp/gk-fake-skills"
               "is gov's own blob at the new source",
               len(_idx_d2) >= 2 and _row11b.get(_d2, {}).get("oid") == _idx_d2[1]
               and _row11b.get(_d2, {}).get("gov_oid") == GK11.blob_oid(
-                  GK11.blob_at(_g11, _B11, "tools/demo/delta2.txt")), str(_row11b.get(_d2))[:300])
+                  GK11.blob_at(_g11, _B11, f"{PFX}demo/delta2.txt")), str(_row11b.get(_d2))[:300])
 
         # ---- AC11: S0b's reported-only line. A verdict word missing from that tuple falls through to a
         # ---- bare `continue`, so the row's disposition — reported, never moved — is never stated.
         check("[-11] AC11 S0b a `rendered` row whose gov source moved gets the reported-only line, naming "
               "the new verdict", any(ln.startswith("  reported only") and "[rendered]" in ln
-                                     and "renamed" in ln and "tools/demo/rendered.txt" in ln
+                                     and "renamed" in ln and f"{PFX}demo/rendered.txt" in ln
                                      for ln in _w11.stdout.splitlines()), _w11.stdout)
         check("[-11] AC11 ...in ADDITION to its verdict line, which is where the row is first named",
-              verdict_of(_w11.stdout, "tools/demo/rendered.txt") == "renamed", _w11.stdout)
+              verdict_of(_w11.stdout, f"{PFX}demo/rendered.txt") == "renamed", _w11.stdout)
         check("[-11] AC11 ...and the adopter's own bytes are untouched: this role is never written",
-              read_bytes11(_t11 / "tools" / "demo" / "rendered.txt") == b"the adopter rendered this\n",
-              repr(read_bytes11(_t11 / "tools" / "demo" / "rendered.txt")))
+              read_bytes11(_t11 / PFX / "demo" / "rendered.txt") == b"the adopter rendered this\n",
+              repr(read_bytes11(_t11 / PFX / "demo" / "rendered.txt")))
         check("[-11] AC10 S0c ...and the `seed` row is reported the same way, never written",
               any(ln.startswith("  reported only") and "[seed]" in ln and "renamed" in ln
                   for ln in _w11.stdout.splitlines())
-              and (_t11 / "tools" / "demo" / "seed.txt").is_file(), _w11.stdout)
+              and (_t11 / PFX / "demo" / "seed.txt").is_file(), _w11.stdout)
 
         # ---- THE NEXT RUN is what the four-fields-together stamp is FOR, so it is exercised rather than
         # ---- argued. If `commit` and `gov_oid` disagreed after the move, `-7` S9's preamble would refuse
@@ -7713,7 +7733,7 @@ user_skills = "/tmp/gk-fake-skills"
               _w11b.returncode == 0 and "REFUSING" not in _w11b.stderr,
               _w11b.stdout[-1200:] + _w11b.stderr[-800:])
         check("[-11] S4 ...and every moved row now reads `current` at its new spelling",
-              verdict_of(_w11b.stdout, "tools/demo/renamed.txt") == "current"
+              verdict_of(_w11b.stdout, f"{PFX}demo/renamed.txt") == "current"
               and verdict_of(_w11b.stdout, _c2) == "current", _w11b.stdout)
         check("[-11] S4 ...while the merged row reads `patched`, which is what a surviving edit IS",
               verdict_of(_w11b.stdout, _d2) == "patched", _w11b.stdout)
@@ -7728,7 +7748,7 @@ user_skills = "/tmp/gk-fake-skills"
         # The scenario is the real one: gov gains a file inside a kit whose descriptor already says
         # `include = "**"`, so the descriptor DECLARES it and the receipt has never named it. That
         # is precisely what an adopter meets when gov ships a new file into a kit they installed.
-        (_g11 / "tools" / "demo" / "arrival.txt").write_text(
+        (_g11 / PFX / "demo" / "arrival.txt").write_text(
             "a file gov added after this target installed\n", encoding="utf-8", newline="\n")
         settle(_g11, "gov gains a file the receipt has never named")
         settle(_t11, "before the unclaimed-source run")
@@ -7741,18 +7761,18 @@ user_skills = "/tmp/gk-fake-skills"
               _wn.returncode == 0 and "unclaimed sources: 1 landed" in _wn.stdout,
               _wn.stdout[-1400:] + _wn.stderr[-600:])
         check("[-RS1] AC4 ...and the file is really in the target's worktree",
-              (_t11 / "tools" / "demo" / "arrival.txt").is_file(), "")
+              (_t11 / PFX / "demo" / "arrival.txt").is_file(), "")
         check("[-RS1] AC4 ...and it is TRACKED, not merely written",
-              "tools/demo/arrival.txt" in _files_post_new,
+              f"{PFX}demo/arrival.txt" in _files_post_new,
               f"{len(_files_pre_new)} -> {len(_files_post_new)}")
         check("[-RS1] AC4 ...and the receipt now carries a row for it",
-              any(f.get("path") == "tools/demo/arrival.txt" for f in _rc_new.get("files", [])),
+              any(f.get("path") == f"{PFX}demo/arrival.txt" for f in _rc_new.get("files", [])),
               str(sorted(f.get("path") for f in _rc_new.get("files", []))[-4:]))
         # THE ROW MUST BE ATTRIBUTABLE, which is what the five-field version of it was not: a row
         # with no `commit`/`gov_oid` cannot be traced to a gov vintage, and `-7`'s integrity
         # preamble refuses the NEXT run over it.
         _row_new = next((f for f in _rc_new.get("files", [])
-                         if f.get("path") == "tools/demo/arrival.txt"), {})
+                         if f.get("path") == f"{PFX}demo/arrival.txt"), {})
         check("[-RS1] AC4 ...carrying the four fields that make a row attributable to a vintage",
               all(_row_new.get(k) for k in ("commit", "gov_oid", "source", "sha256")),
               str(sorted(_row_new.keys())))
@@ -7764,24 +7784,24 @@ user_skills = "/tmp/gk-fake-skills"
         # so gov never put those bytes there and has no basis for calling them stale. Overwriting
         # would be the silent data loss in somebody else's repository that this verb's read-only
         # default exists to prevent.
-        (_g11 / "tools" / "demo" / "occupied.txt").write_text(
+        (_g11 / PFX / "demo" / "occupied.txt").write_text(
             "gov's version\n", encoding="utf-8", newline="\n")
         settle(_g11, "gov declares a second new file")
-        (_t11 / "tools" / "demo" / "occupied.txt").write_text(
+        (_t11 / PFX / "demo" / "occupied.txt").write_text(
             "the adopter got here first\n", encoding="utf-8", newline="\n")
         _wo = run_in_gov(_g11, "update", "--target", str(_t11), "--write")
         check("[-RS1] AC5 a destination the target already holds is REFUSED, not overwritten",
-              "REFUSED tools/demo/occupied.txt" in _wo.stdout,
+              f"REFUSED {PFX}demo/occupied.txt" in _wo.stdout,
               _wo.stdout[-1400:] + _wo.stderr[-600:])
         check("[-RS1] AC5 ...and the adopter's bytes are untouched",
-              (_t11 / "tools" / "demo" / "occupied.txt").read_text(encoding="utf-8")
+              (_t11 / PFX / "demo" / "occupied.txt").read_text(encoding="utf-8")
               == "the adopter got here first\n",
-              (_t11 / "tools" / "demo" / "occupied.txt").read_text(encoding="utf-8"))
+              (_t11 / PFX / "demo" / "occupied.txt").read_text(encoding="utf-8"))
         check("[-RS1] AC5 ...and no receipt row was minted for it",
-              not any(f.get("path") == "tools/demo/occupied.txt" for f in json.loads(
+              not any(f.get("path") == f"{PFX}demo/occupied.txt" for f in json.loads(
                   (_t11 / ".governance" / "install.json").read_text(encoding="utf-8")).get("files", [])),
               "a refused landing minted a row anyway")
-        (_t11 / "tools" / "demo" / "occupied.txt").unlink()
+        (_t11 / PFX / "demo" / "occupied.txt").unlink()
         settle(_t11, "clear the AC5 collision before the withdrawal arms")
 
         # ---- DEPL-dSealedTally-2. THE EAGER FILL AND THE NARROWED `_decided`, END TO END ----
@@ -7796,19 +7816,19 @@ user_skills = "/tmp/gk-fake-skills"
         # `apply` writes it at 7594 for a row it cannot attribute to a vintage -- and it is the
         # cheapest of the seven to construct, because it is a receipt field rather than a role.
         _gs2 = tmp / "st2-gov"
-        (_gs2 / "tools" / "govkit").mkdir(parents=True)
-        shutil.copy2(GOVKIT, _gs2 / "tools" / "govkit" / "govkit.py")
-        shutil.copy2(GOVKIT.parent / "adopters.toml", _gs2 / "tools" / "govkit" / "adopters.toml")  # arm 10 refuses a gov without it
-        (_gs2 / "tools" / "govkit" / "registry.toml").write_text(
-            '[surface]\nglobs = ["tools/*"]\n\n'
+        (_gs2 / PFX / "govkit").mkdir(parents=True)
+        shutil.copy2(GOVKIT, _gs2 / PFX / "govkit" / "govkit.py")
+        shutil.copy2(GOVKIT.parent / "adopters.toml", _gs2 / PFX / "govkit" / "adopters.toml")  # arm 10 refuses a gov without it
+        (_gs2 / PFX / "govkit" / "registry.toml").write_text(
+            '[surface]\nglobs = ["{prefix}/*"]\n\n'
             '[selection]\ndefault = ["mvkit"]\n\n'
-            '[[entry]]\nid = "mvkit"\ndescriptor = "tools/mvkit/kit.toml"\n\n'
-            '[[exempt]]\npath = "tools/govkit"\nwhy = "the deployer itself"\n',
+            '[[entry]]\nid = "mvkit"\ndescriptor = "{prefix}/mvkit/kit.toml"\n\n'
+            '[[exempt]]\npath = "{prefix}/govkit"\nwhy = "the deployer itself"\n',
             encoding="utf-8", newline="\n")
-        _ds2 = _gs2 / "tools" / "mvkit"
+        _ds2 = _gs2 / PFX / "mvkit"
         _ds2.mkdir(parents=True, exist_ok=True)
         (_ds2 / "kit.toml").write_text(
-            'id = "mvkit"\nhome = "tools/mvkit"\nversion_from = { none = "fixture" }\n\n'
+            'id = "mvkit"\nhome = "mvkit"\nversion_from = { none = "fixture" }\n\n'
             '[check]\nnone = "a fixture kit"\n\n'
             '[[files]]\ninclude = "**"\nrole = "engine"\n\n'
             '[adopt]\nargv = []\nmutates_index = false\n',
@@ -7825,7 +7845,7 @@ user_skills = "/tmp/gk-fake-skills"
         git(_gs2, "commit", "-qm", "mvkit A")
 
         _ts2 = make_target(tmp / "st2-t",
-                           'gov_source = "local"\nprefix = "tools"\nkits = ["mvkit"]\n')
+                           f'gov_source = "local"\nprefix = "{PFX[:-1]}"\nkits = ["mvkit"]\n')
         _ap2 = run_in_gov(_gs2, "apply", "--target", str(_ts2), "--kits", "mvkit")
         check("[-ST2] the mvkit fixture installs GREEN, or every arm below grades a broken "
               "target", _ap2.returncode == 0, _ap2.stdout[-900:] + _ap2.stderr[-600:])
@@ -7836,13 +7856,13 @@ user_skills = "/tmp/gk-fake-skills"
         _rp2 = _ts2 / ".governance" / "install.json"
         _rj2 = json.loads(_rp2.read_text(encoding="utf-8"))
         for _r2 in _rj2.get("files", []):
-            if _r2.get("path") == "tools/mvkit/mover.txt":
+            if _r2.get("path") == f"{PFX}mvkit/mover.txt":
                 _r2["evidence"] = "unattributed"
         _rp2.write_text(json.dumps(_rj2, indent=2) + "\n", encoding="utf-8",
                         newline="\n")
         settle(_ts2, "the mvkit install, with one row made unattributed")
 
-        git(_gs2, "mv", "tools/mvkit/mover.txt", "tools/mvkit/moved2.txt")
+        git(_gs2, "mv", f"{PFX}mvkit/mover.txt", f"{PFX}mvkit/moved2.txt")
         git(_gs2, "add", "-A")
         git(_gs2, "commit", "-qm", "mvkit B: gov renames the unattributed source")
 
@@ -7856,11 +7876,11 @@ user_skills = "/tmp/gk-fake-skills"
               "fill was skipped", any("unattributed" in ln and "mover.txt" in ln
                                       for ln in _w2.stdout.splitlines()), _w2.stdout[-1400:])
         check("[-ST2] AC1 the rename DESTINATION is not landed as a new source",
-              "tools/mvkit/moved2.txt" not in _files2, repr(_files2))
+              f"{PFX}mvkit/moved2.txt" not in _files2, repr(_files2))
         check("[-ST2] AC1 ...and the run says it landed no unclaimed source",
               "unclaimed sources: 0 landed" in _w2.stdout, _w2.stdout[-1400:])
         check("[-ST2] AC1 ...while the kit's other file is untouched, so the run did act",
-              "tools/mvkit/stay.txt" in _files2, repr(_files2))
+              f"{PFX}mvkit/stay.txt" in _files2, repr(_files2))
         check("[-ST2] AC1 ...and the run exits 0 rather than refusing the kit",
               _w2.returncode == 0, _w2.stdout[-900:] + _w2.stderr[-600:])
 
@@ -7872,7 +7892,7 @@ user_skills = "/tmp/gk-fake-skills"
         # `.gitignore` in the target manufactures the one refusal site a fixture can reach: the
         # file is written, `git add` exits non-zero, the bytes are removed, the destination stays
         # untracked -- and it is therefore still an open gap when the coverage block runs.
-        (_ts2 / ".gitignore").write_text("tools/mvkit/ignored.txt\n", encoding="utf-8",
+        (_ts2 / ".gitignore").write_text(f"{PFX}mvkit/ignored.txt\n", encoding="utf-8",
                                          newline="\n")
         settle(_ts2, "the target ignores a destination gov is about to ship")
         (_ds2 / "ignored.txt").write_text("gov ships this and the target ignores it\n",
@@ -7889,19 +7909,19 @@ user_skills = "/tmp/gk-fake-skills"
         # anything asks what it says. Without both, every arm below could pass over an absent line.
         check("[-MV3] LIVENESS the ignored destination really took the STAGING refusal, and not "
               "one of the seven other refusal sites",
-              any("REFUSED tools/mvkit/ignored.txt" in ln and "git refused to stage it" in ln
+              any(f"REFUSED {PFX}mvkit/ignored.txt" in ln and "git refused to stage it" in ln
                   for ln in _w3.stdout.splitlines()), _w3.stdout[-1600:])
         check("[-MV3] LIVENESS ...and it is still an OPEN GAP, so the join has a row to annotate",
-              "tools/mvkit/ignored.txt" in _gap3, str(sorted(_gap3)))
+              f"{PFX}mvkit/ignored.txt" in _gap3, str(sorted(_gap3)))
         check("[-MV3] AC1 the open gap carries the refusal reason this run already recorded for "
               "that destination",
-              "refused: git refused to stage it" in _gap3.get("tools/mvkit/ignored.txt", ""),
-              _gap3.get("tools/mvkit/ignored.txt", "there is no GAP line for it at all"))
+              "refused: git refused to stage it" in _gap3.get(f"{PFX}mvkit/ignored.txt", ""),
+              _gap3.get(f"{PFX}mvkit/ignored.txt", "there is no GAP line for it at all"))
         check("[-MV3] AC2 a gap the rename machinery decided about says NO reason was recorded — "
               "never that it was resolved, and never the refused wording with an empty reason",
-              "no refusal reason was recorded" in _gap3.get("tools/mvkit/moved2.txt", "")
-              and "refused:" not in _gap3.get("tools/mvkit/moved2.txt", ""),
-              _gap3.get("tools/mvkit/moved2.txt", "there is no GAP line for it at all"))
+              "no refusal reason was recorded" in _gap3.get(f"{PFX}mvkit/moved2.txt", "")
+              and "refused:" not in _gap3.get(f"{PFX}mvkit/moved2.txt", ""),
+              _gap3.get(f"{PFX}mvkit/moved2.txt", "there is no GAP line for it at all"))
         check("[-MV3] AC5 the join ANNOTATES the gap set rather than filtering it: both rows still "
               "print and the tally still counts them both",
               len(_gap3) == 2 and "coverage: 2 undeclined gap(s) of 2" in _w3.stdout,
@@ -7983,19 +8003,19 @@ user_skills = "/tmp/gk-fake-skills"
         # is the realistic case rather than a contrived one: gov ships a file the adopter's own
         # guard rejects, which is exactly when a rollback has to work.
         _gl = tmp / "st1-gov"
-        (_gl / "tools" / "govkit").mkdir(parents=True)
-        shutil.copy2(GOVKIT, _gl / "tools" / "govkit" / "govkit.py")
-        shutil.copy2(GOVKIT.parent / "adopters.toml", _gl / "tools" / "govkit" / "adopters.toml")  # arm 10 refuses a gov without it
-        (_gl / "tools" / "govkit" / "registry.toml").write_text(
-            '[surface]\nglobs = ["tools/*"]\n\n'
+        (_gl / PFX / "govkit").mkdir(parents=True)
+        shutil.copy2(GOVKIT, _gl / PFX / "govkit" / "govkit.py")
+        shutil.copy2(GOVKIT.parent / "adopters.toml", _gl / PFX / "govkit" / "adopters.toml")  # arm 10 refuses a gov without it
+        (_gl / PFX / "govkit" / "registry.toml").write_text(
+            '[surface]\nglobs = ["{prefix}/*"]\n\n'
             '[selection]\ndefault = ["landkit"]\n\n'
-            '[[entry]]\nid = "landkit"\ndescriptor = "tools/landkit/kit.toml"\n\n'
-            '[[exempt]]\npath = "tools/govkit"\nwhy = "the deployer itself"\n',
+            '[[entry]]\nid = "landkit"\ndescriptor = "{prefix}/landkit/kit.toml"\n\n'
+            '[[exempt]]\npath = "{prefix}/govkit"\nwhy = "the deployer itself"\n',
             encoding="utf-8", newline="\n")
-        _dl = _gl / "tools" / "landkit"
+        _dl = _gl / PFX / "landkit"
         _dl.mkdir(parents=True, exist_ok=True)
         (_dl / "kit.toml").write_text(
-            'id = "landkit"\nhome = "tools/landkit"\nversion_from = { none = "fixture" }\n\n'
+            'id = "landkit"\nhome = "landkit"\nversion_from = { none = "fixture" }\n\n'
             '[check]\nargv = ["bash", "{kit}/check.sh", "{kit}"]\n\n'
             '[[files]]\ninclude = "**"\nrole = "engine"\n\n'
             '[adopt]\nargv = []\nmutates_index = false\n',
@@ -8015,7 +8035,7 @@ user_skills = "/tmp/gk-fake-skills"
         git(_gl, "commit", "-qm", "landkit A")
 
         _tl = make_target(tmp / "st1-t",
-                          'gov_source = "local"\nprefix = "tools"\nkits = ["landkit"]\n')
+                          f'gov_source = "local"\nprefix = "{PFX[:-1]}"\nkits = ["landkit"]\n')
         _apl = run_in_gov(_gl, "apply", "--target", str(_tl), "--kits", "landkit")
         check("[-ST1] the landkit fixture installs GREEN, or every arm below grades a broken "
               "target", _apl.returncode == 0, _apl.stdout[-900:] + _apl.stderr[-600:])
@@ -8039,9 +8059,9 @@ user_skills = "/tmp/gk-fake-skills"
         check("[-ST1] AC9 the read-only preview names the source the write run will land",
               "unclaimed sources: 1 would land" in _pl.stdout, _pl.stdout[-1400:])
         check("[-ST1] AC9 ...and names it by path, not merely by count",
-              "would land tools/landkit/arrival.txt" in _pl.stdout, _pl.stdout[-1400:])
+              f"would land {PFX}landkit/arrival.txt" in _pl.stdout, _pl.stdout[-1400:])
         check("[-ST1] AC9 ...and the preview wrote NOTHING, which is what read-only means",
-              not (_tl / "tools" / "landkit" / "arrival.txt").exists(),
+              not (_tl / PFX / "landkit" / "arrival.txt").exists(),
               "the read-only run created the file")
 
         _wl = run_in_gov(_gl, "update", "--target", str(_tl), "--write")
@@ -8059,27 +8079,27 @@ user_skills = "/tmp/gk-fake-skills"
         _ord_l = (_tl / ".governance" / "outbox" / "update-rollback-landkit.md").read_text(
             encoding="utf-8")
         check("[-ST1] LIVENESS the landing really happened, and the order says it was REMOVED",
-              "removed   tools/landkit/arrival.txt" in _ord_l, _ord_l[-900:])
+              f"removed   {PFX}landkit/arrival.txt" in _ord_l, _ord_l[-900:])
         check("[-ST1] AC8 ...under its own verb, never `restored`, which it never was",
-              "restored  tools/landkit/arrival.txt" not in _ord_l, _ord_l[-900:])
+              f"restored  {PFX}landkit/arrival.txt" not in _ord_l, _ord_l[-900:])
         # THIS ARM WAS VACUOUS AND SHIPPED GREEN OVER A RUN THAT ROLLED BACK NOTHING: it matched
         # the word "rolled back" in the summary line `rolled back 0`. It now asserts the COUNT.
         check("[-ST1] LIVENESS ...and the kit check really went red, so a rollback really ran",
               "rolled back 1" in _wl.stdout, _wl.stdout[-1600:])
 
         check("[-ST1] AC1 the landed file is GONE from the worktree after the rollback",
-              not (_tl / "tools" / "landkit" / "arrival.txt").exists(),
+              not (_tl / PFX / "landkit" / "arrival.txt").exists(),
               "the landed file survived a failed verification")
         check("[-ST1] AC3 ...and gone from the INDEX, which is the half a bare unlink misses",
-              "tools/landkit/arrival.txt" not in _files_post_l, repr(_files_post_l))
+              f"{PFX}landkit/arrival.txt" not in _files_post_l, repr(_files_post_l))
         check("[-ST1] AC1 ...and the target is back to exactly the file set it had",
               _files_post_l == _files_pre_l,
               f"before={_files_pre_l} after={_files_post_l}")
         check("[-ST1] AC4 ...and the receipt names no landed path, so the minted row went too",
-              not any(f.get("path") == "tools/landkit/arrival.txt"
+              not any(f.get("path") == f"{PFX}landkit/arrival.txt"
                       for f in _rcl.get("files", [])), "a rolled-back landing kept its row")
         check("[-ST1] AC7 ...and the closing summary does not report a landing that was undone",
-              "landed tools/landkit/arrival.txt" not in _wl.stdout, _wl.stdout[-1600:])
+              f"landed {PFX}landkit/arrival.txt" not in _wl.stdout, _wl.stdout[-1600:])
         check("[-ST1] AC1 ...and the run reached its own rollback report, not a traceback",
               "Traceback" not in _wl.stderr, _wl.stderr[-900:])
 
@@ -8093,10 +8113,10 @@ user_skills = "/tmp/gk-fake-skills"
         check("[-11] AC4 `--write-withdrawals` is accepted by the parser and the run exits 0",
               _wd11.returncode == 0, _wd11.stdout[-1200:] + _wd11.stderr[-800:])
         check("[-11] AC4 ...and THAT is when the withdrawn row is deleted: `ls-files` no longer names it",
-              "tools/demo/low.txt" not in _files_post_wd and not (_t11 / "tools/demo/low.txt").exists(),
+              f"{PFX}demo/low.txt" not in _files_post_wd and not (_t11 / f"{PFX}demo/low.txt").exists(),
               str(sorted(set(_files_pre_wd) - set(_files_post_wd))))
         check("[-11] AC4 ...its row is dropped from the receipt rather than left claiming a deleted file",
-              not any(f["path"] == "tools/demo/low.txt" for f in json.loads(
+              not any(f["path"] == f"{PFX}demo/low.txt" for f in json.loads(
                   (_t11 / ".governance" / "install.json").read_text(encoding="utf-8"))["files"]), "")
         check("[-11] AC4 ...and an order is written under .governance/outbox/ either way",
               (_t11 / ".governance" / "outbox" / _wdname11).is_file()
@@ -8108,50 +8128,50 @@ user_skills = "/tmp/gk-fake-skills"
               len(_files_post_wd) < len(_files_pre_wd),
               f"{len(_files_pre_wd)} -> {len(_files_post_wd)}")
         check("[-11] S9 the flag is a SCOPE flag: nothing gov still ships was touched by it",
-              (_t11 / "tools" / "demo" / "renamed.txt").is_file()
-              and (_t11 / "tools" / "demo" / "keep.txt").is_file(), "")
+              (_t11 / PFX / "demo" / "renamed.txt").is_file()
+              and (_t11 / PFX / "demo" / "keep.txt").is_file(), "")
 
         # ---- THE TWO WRITE REFUSALS. Both are reachable only with something IN THE WAY, so each gets a
         # ---- target that has it. Neither is a `--force`-able state: the row is left exactly as it was.
         _g11b = build_rename_gov("occupied")
         _t11b = build_rename_target(_g11b, "rn-occupied-t")
-        (_t11b / "tools" / "demo" / "renamed.txt").write_text(
+        (_t11b / PFX / "demo" / "renamed.txt").write_text(
             "the operator's own file, at the path gov is about to move something to\n",
             encoding="utf-8", newline="\n")
         settle(_t11b, "a file already sitting at the rename destination")
         write_rename_vintage(_g11b)
         check("[-11] the occupied fixture really holds a file at the destination gov renames into",
-              (_t11b / "tools" / "demo" / "renamed.txt").is_file()
-              and "tools/demo/renamed.txt" in gout(_t11b, "ls-files").split(), "")
+              (_t11b / PFX / "demo" / "renamed.txt").is_file()
+              and f"{PFX}demo/renamed.txt" in gout(_t11b, "ls-files").split(), "")
         _occ = run_in_gov(_g11b, "update", "--target", str(_t11b), "--write")
         check("[-11] a rename whose destination the target ALREADY holds is a refusal by name",
               _occ.returncode == 1 and "ALREADY holds a file there" in _occ.stdout, _occ.stdout[-1500:])
         check("[-11] ...and it is a REFUSAL rather than an overwrite: those bytes are untouched",
-              read_bytes11(_t11b / "tools" / "demo" / "renamed.txt").startswith(b"the operator's own file"),
-              repr(read_bytes11(_t11b / "tools" / "demo" / "renamed.txt")))
+              read_bytes11(_t11b / PFX / "demo" / "renamed.txt").startswith(b"the operator's own file"),
+              repr(read_bytes11(_t11b / PFX / "demo" / "renamed.txt")))
         check("[-11] ...and the row it refused is still at its old path, at its old vintage",
-              (_t11b / "tools" / "demo" / "moved.txt").is_file()
+              (_t11b / PFX / "demo" / "moved.txt").is_file()
               and [f for f in json.loads((_t11b / ".governance" / "install.json").read_text(
-                  encoding="utf-8"))["files"] if f["path"] == "tools/demo/moved.txt"], "")
+                  encoding="utf-8"))["files"] if f["path"] == f"{PFX}demo/moved.txt"], "")
 
         _g11c = build_rename_gov("mvfail")
         _t11c = build_rename_target(_g11c, "rn-mvfail-t")
-        (_t11c / "tools" / "demo" / "sub").write_text(
+        (_t11c / PFX / "demo" / "sub").write_text(
             "a FILE where gov is about to want a directory\n", encoding="utf-8", newline="\n")
         settle(_t11c, "a file where the rename needs a parent directory")
         write_rename_vintage(_g11c)
         check("[-11] the mv-failure fixture really holds a FILE at the new parent's path",
-              (_t11c / "tools" / "demo" / "sub").is_file(), "")
+              (_t11c / PFX / "demo" / "sub").is_file(), "")
         _mvf = run_in_gov(_g11c, "update", "--target", str(_t11c), "--write")
         check("[-11] a move that cannot be performed is REPORTED, never half-applied",
               _mvf.returncode == 1 and "could not be moved to" in _mvf.stdout, _mvf.stdout[-1500:])
         check("[-11] ...with the row left exactly as it was, at its old path",
-              (_t11c / "tools" / "demo" / "sub.txt").is_file(), "")
+              (_t11c / PFX / "demo" / "sub.txt").is_file(), "")
         check("[-11] ...and the receipt NOT re-stamped, so the next run re-attempts rather than forgetting",
               json.loads((_t11c / ".governance" / "install.json").read_text(
                   encoding="utf-8")).get("gov_commit") != gout(_g11c, "rev-parse", "HEAD").strip(), "")
         check("[-11] LIVENESS the same run still moved the rows it COULD, so one bad row strands nothing",
-              (_t11c / "tools" / "demo" / "renamed.txt").is_file(), _mvf.stdout[-1200:])
+              (_t11c / PFX / "demo" / "renamed.txt").is_file(), _mvf.stdout[-1200:])
 
         # ---- THE ESCAPING DESTINATION. The destination is composed from the TARGET's own answers, so a
         # ---- `prefix` that climbs out of the tree is target-supplied data reaching a write path — the
@@ -8160,8 +8180,8 @@ user_skills = "/tmp/gk-fake-skills"
         _A11d = gout(_g11d, "rev-parse", "HEAD").strip()
         _t11d = make_target(tmp / "rn-escape-t",
                             'gov_source = "local"\nprefix = "../escape"\nkits = ["demo"]\n')
-        (_t11d / "tools" / "demo").mkdir(parents=True, exist_ok=True)
-        (_t11d / "tools" / "demo" / "moved.txt").write_text(
+        (_t11d / PFX / "demo").mkdir(parents=True, exist_ok=True)
+        (_t11d / PFX / "demo" / "moved.txt").write_text(
             _11_SRC["moved.txt"], encoding="utf-8", newline="\n")
         settle(_t11d, "one installed file, at a sane path")
         _idx11d = {}
@@ -8170,10 +8190,10 @@ user_skills = "/tmp/gk-fake-skills"
             _idx11d[_p] = _meta.split()[1]
         (_t11d / ".governance" / "install.json").write_text(json.dumps({
             "schema": 3, "gov_source": "local", "gov_commit": _A11d, "kits": ["demo"],
-            "files": [{"path": "tools/demo/moved.txt", "source": "tools/demo/moved.txt", "role": "engine",
+            "files": [{"path": f"{PFX}demo/moved.txt", "source": f"{PFX}demo/moved.txt", "role": "engine",
                        "kit": "demo", "written": True, "commit": _A11d,
                        "gov_oid": GK11.blob_oid(_11_SRC["moved.txt"].encode()),
-                       "oid": _idx11d.get("tools/demo/moved.txt"),
+                       "oid": _idx11d.get(f"{PFX}demo/moved.txt"),
                        "sha256": GK11._sha(_11_SRC["moved.txt"].encode())}]}, indent=2) + "\n",
             encoding="utf-8", newline="\n")
         settle(_t11d, "the receipt")
@@ -8185,7 +8205,7 @@ user_skills = "/tmp/gk-fake-skills"
               _esc.returncode == 1 and "OUTSIDE the repository the operator named" in _esc.stdout,
               _esc.stdout[-1500:])
         check("[-11] ...and nothing was written anywhere: the row is untouched at its old path",
-              (_t11d / "tools" / "demo" / "moved.txt").is_file()
+              (_t11d / PFX / "demo" / "moved.txt").is_file()
               and not (_t11d.parent / "escape").exists(), "")
 
         # ---- S11: THE CARRIED RENAME. A row DEPL-dCarriedReceipt-9 proves a rung for ALWAYS differs from
@@ -8193,28 +8213,28 @@ user_skills = "/tmp/gk-fake-skills"
         # ---- with an UN-carried base, which is the one input a rung exists to correct. RED observed on
         # ---- this fixture with the rung dropped from this unit's own merge call: every line naming a path
         # ---- read as an operator edit, the merge conflicted, the run exited 1 and nothing moved.
-        _C11_A = "".join(f"tools/demo/pathy.txt line {i}\n" for i in range(1, 6))
-        _C11_T = _C11_A.replace("tools/demo", "scripts/demo")
-        _C11_B = _C11_A.replace("tools/demo/pathy.txt line 3",
-                                "GOV SEMANTIC CHANGE at tools/demo/pathy.txt")
-        _C11_WANT = _C11_B.replace("tools/demo", "scripts/demo")
+        _C11_A = "".join(f"{PFX}demo/pathy.txt line {i}\n" for i in range(1, 6))
+        _C11_T = _C11_A.replace(f"{PFX}demo", "scripts/demo")
+        _C11_B = _C11_A.replace(f"{PFX}demo/pathy.txt line 3",
+                                f"GOV SEMANTIC CHANGE at {PFX}demo/pathy.txt")
+        _C11_WANT = _C11_B.replace(f"{PFX}demo", "scripts/demo")
 
 
         def build_carry_rename_gov() -> pathlib.Path:
             g = tmp / "rn-carry-gov"
-            (g / "tools" / "govkit").mkdir(parents=True)
-            shutil.copy2(GOVKIT, g / "tools" / "govkit" / "govkit.py")
-            shutil.copy2(GOVKIT.parent / "adopters.toml", g / "tools" / "govkit" / "adopters.toml")  # arm 10 refuses a gov without it
-            (g / "tools" / "govkit" / "registry.toml").write_text(
-                '[surface]\nglobs = ["tools/*"]\n\n'
+            (g / PFX / "govkit").mkdir(parents=True)
+            shutil.copy2(GOVKIT, g / PFX / "govkit" / "govkit.py")
+            shutil.copy2(GOVKIT.parent / "adopters.toml", g / PFX / "govkit" / "adopters.toml")  # arm 10 refuses a gov without it
+            (g / PFX / "govkit" / "registry.toml").write_text(
+                '[surface]\nglobs = ["{prefix}/*"]\n\n'
                 '[selection]\ndefault = ["demo"]\n\n'
-                '[[entry]]\nid = "demo"\ndescriptor = "tools/demo/kit.toml"\n\n'
-                '[[exempt]]\npath = "tools/govkit"\nwhy = "the deployer itself"\n',
+                '[[entry]]\nid = "demo"\ndescriptor = "{prefix}/demo/kit.toml"\n\n'
+                '[[exempt]]\npath = "{prefix}/govkit"\nwhy = "the deployer itself"\n',
                 encoding="utf-8", newline="\n")
-            d = g / "tools" / "demo"
+            d = g / PFX / "demo"
             d.mkdir(parents=True, exist_ok=True)
             (d / "kit.toml").write_text(
-                'id = "demo"\nhome = "tools/demo"\nversion_from = { none = "fixture" }\n\n'
+                'id = "demo"\nhome = "demo"\nversion_from = { none = "fixture" }\n\n'
                 '[check]\nnone = "a fixture kit"\n\n'
                 '[[files]]\ninclude = "**"\nrole = "engine"\n\n'
                 '[adopt]\nargv = []\nmutates_index = false\n', encoding="utf-8", newline="\n")
@@ -8251,7 +8271,7 @@ user_skills = "/tmp/gk-fake-skills"
             _ic11[_p] = _meta.split()[1]
         (_tc11 / ".governance" / "install.json").write_text(json.dumps({
             "schema": 3, "gov_source": "local", "gov_commit": _Ac11, "kits": ["demo"],
-            "files": [{"path": "scripts/demo/pathy.txt", "source": "tools/demo/pathy.txt",
+            "files": [{"path": "scripts/demo/pathy.txt", "source": f"{PFX}demo/pathy.txt",
                        "role": "engine", "kit": "demo", "written": True, "commit": _Ac11,
                        "gov_oid": GK11.blob_oid(_C11_A.encode()),
                        "oid": _ic11.get("scripts/demo/pathy.txt"),
@@ -8259,8 +8279,8 @@ user_skills = "/tmp/gk-fake-skills"
             encoding="utf-8", newline="\n")
         git(_tc11, "add", "-A")
         git(_tc11, "commit", "-qm", "the receipt")
-        git(_gc11, "mv", "tools/demo/pathy.txt", "tools/demo/pathy2.txt")
-        (_gc11 / "tools" / "demo" / "pathy2.txt").write_text(_C11_B, encoding="utf-8", newline="\n")
+        git(_gc11, "mv", f"{PFX}demo/pathy.txt", f"{PFX}demo/pathy2.txt")
+        (_gc11 / PFX / "demo" / "pathy2.txt").write_text(_C11_B, encoding="utf-8", newline="\n")
         git(_gc11, "add", "-A")
         git(_gc11, "commit", "-qm", "B")
         _Bc11 = gout(_gc11, "rev-parse", "HEAD").strip()
@@ -8277,12 +8297,12 @@ user_skills = "/tmp/gk-fake-skills"
         check("[-11] S11 ...and therefore differs from gov's blob at the OLD source, which is why every "
               "carried row in a renamed kit lands on the three-way",
               read_bytes11(_tc11 / "scripts" / "demo" / "pathy.txt")
-              != GK11.blob_at(_gc11, _Ac11, "tools/demo/pathy.txt"),
+              != GK11.blob_at(_gc11, _Ac11, f"{PFX}demo/pathy.txt"),
               repr(read_bytes11(_tc11 / "scripts" / "demo" / "pathy.txt")))
         check("[-11] S11 the fixture's gov copy really moved AND changed between the two vintages",
-              GK11.blob_at(_gc11, _Bc11, "tools/demo/pathy.txt") is None
-              and GK11.blob_at(_gc11, _Bc11, "tools/demo/pathy2.txt") == _C11_B.encode(), "")
-        _wc11 = subprocess.run([sys.executable, str(_gc11 / "tools" / "govkit" / "govkit.py"),
+              GK11.blob_at(_gc11, _Bc11, f"{PFX}demo/pathy.txt") is None
+              and GK11.blob_at(_gc11, _Bc11, f"{PFX}demo/pathy2.txt") == _C11_B.encode(), "")
+        _wc11 = subprocess.run([sys.executable, str(_gc11 / PFX / "govkit" / "govkit.py"),
                                 "update", "--target", str(_tc11), "--write"],
                                capture_output=True, text=True)
         check("[-11] S11 the carried rename RECONCILES rather than conflicting",
@@ -8294,7 +8314,7 @@ user_skills = "/tmp/gk-fake-skills"
         check("[-11] S11 ...carrying gov's semantic change at the target's spelling, on every line",
               _bc11 == _C11_WANT.encode(), repr(_bc11))
         check("[-11] S11 ...and spelling gov's own prefix NOWHERE",
-              b"tools/demo" not in _bc11, repr(_bc11))
+              f"{PFX}demo".encode() not in _bc11, repr(_bc11))
         _rowc11 = (json.loads(
             (_tc11 / ".governance" / "install.json").read_text(encoding="utf-8"))["files"] or [{}])[0]
         check("[-11] S11 the row is stamped per `-9` S12: `gov_oid` is gov's UN-carried blob at the new "
@@ -8304,13 +8324,13 @@ user_skills = "/tmp/gk-fake-skills"
               and _rowc11.get("commit") == _Bc11, str(_rowc11)[:400])
         check("[-11] S11 ...and `path` and `source` moved with them",
               _rowc11.get("path") == "scripts/demo/pathy2.txt"
-              and _rowc11.get("source") == "tools/demo/pathy2.txt", str(_rowc11)[:400])
+              and _rowc11.get("source") == f"{PFX}demo/pathy2.txt", str(_rowc11)[:400])
 
         # ========= DEPL-dCarriedReceipt-14 — post-write verification, with index rollback ========
         #
         # THE MEASURED RED, on this block's own fixture, against the engine with `-1`..`-13` landed
         # and this unit not: `update --write` exited **0**, printed `0 conflict(s)`, left a
-        # plausible and WRONG three-way merge staged at `tools/demo/conf.txt`, and re-stamped the
+        # plausible and WRONG three-way merge staged at `<prefix>/demo/conf.txt`, and re-stamped the
         # receipt at the new vintage. ZERO check subprocesses ran. The kit's own `[check].argv` —
         # the declaration `check` has always run — reported `landed-but-inert` on the very next
         # command, over a file `update` had just written and nothing had observed. Every arm below
@@ -8359,7 +8379,7 @@ user_skills = "/tmp/gk-fake-skills"
                 "token": '[check]\nargv = ["bash", "{kit}/check.sh", "{needs_an_answer}"]\n',
                 "no-binary": '[check]\nargv = ["{kit}/no-such-binary-xyzzy"]\n',
             }[arm]
-            return (f'id = "{eid}"\nhome = "tools/{eid}"\n'
+            return (f'id = "{eid}"\nhome = "{eid}"\n'
                     'version_from = { none = "fixture" }\n\n'
                     + chk +
                     '\n[[files]]\ninclude = "**"\nrole = "engine"\n\n'
@@ -8379,18 +8399,18 @@ user_skills = "/tmp/gk-fake-skills"
             """
             g = tmp / f"v14-{tag}-gov"
             log = tmp / f"v14-{tag}-runs.txt"
-            (g / "tools" / "govkit").mkdir(parents=True)
-            shutil.copy2(GOVKIT, g / "tools" / "govkit" / "govkit.py")
-            shutil.copy2(GOVKIT.parent / "adopters.toml", g / "tools" / "govkit" / "adopters.toml")  # arm 10 refuses a gov without it
-            (g / "tools" / "govkit" / "registry.toml").write_text(
-                '[surface]\nglobs = ["tools/*"]\n\n'
+            (g / PFX / "govkit").mkdir(parents=True)
+            shutil.copy2(GOVKIT, g / PFX / "govkit" / "govkit.py")
+            shutil.copy2(GOVKIT.parent / "adopters.toml", g / PFX / "govkit" / "adopters.toml")  # arm 10 refuses a gov without it
+            (g / PFX / "govkit" / "registry.toml").write_text(
+                '[surface]\nglobs = ["{prefix}/*"]\n\n'
                 "[selection]\ndefault = [" + ", ".join(f'"{e}"' for e in kits) + "]\n\n"
-                + "".join(f'[[entry]]\nid = "{e}"\ndescriptor = "tools/{e}/kit.toml"\n\n'
+                + "".join(f'[[entry]]\nid = "{e}"\ndescriptor = "{{prefix}}/{e}/kit.toml"\n\n'
                           for e in kits)
-                + '[[exempt]]\npath = "tools/govkit"\nwhy = "the deployer itself"\n',
+                + '[[exempt]]\npath = "{prefix}/govkit"\nwhy = "the deployer itself"\n',
                 encoding="utf-8", newline="\n")
             for eid, spec in kits.items():
-                d = g / "tools" / eid
+                d = g / PFX / eid
                 d.mkdir(parents=True, exist_ok=True)
                 (d / "kit.toml").write_text(
                     build_kit14(eid, spec.get("arm", "argv"), spec.get("extra", ""),
@@ -8421,7 +8441,7 @@ user_skills = "/tmp/gk-fake-skills"
             """An installed target, built by running the real `apply` rather than by authoring a
             receipt — so every arm below grades an install this engine can actually produce."""
             t = make_target(tmp / f"v14-{name}",
-                            'gov_source = "local"\nprefix = "tools"\nkits = ['
+                            f'gov_source = "local"\nprefix = "{PFX[:-1]}"\nkits = ['
                             + ", ".join(f'"{e}"' for e in kits) + "]\n")
             _ap = run_in_gov(g, "apply", "--target", str(t), "--kits", ",".join(kits))
             check(f"[-14] the {name} fixture installs GREEN, or every arm over it grades a broken "
@@ -8464,13 +8484,13 @@ user_skills = "/tmp/gk-fake-skills"
         # THE ADOPTER'S EDIT, committed rather than staged: `-12` S4 refuses a writing verb over a
         # dirty claimed path, so an uncommitted edit would make the update refuse and every arm
         # below would grade a run that never happened.
-        (_t14 / "tools" / "demo" / "conf.txt").write_text(_14_CONF_T, encoding="utf-8", newline="\n")
+        (_t14 / PFX / "demo" / "conf.txt").write_text(_14_CONF_T, encoding="utf-8", newline="\n")
         settle(_t14, "the adopter edits LEGACY in demo's conf")
 
         # gov's second vintage: one hunk in each kit's conf, and one pure rename inside `demo`.
-        (_g14 / "tools" / "demo" / "conf.txt").write_text(_14_CONF_B, encoding="utf-8", newline="\n")
-        (_g14 / "tools" / "sib" / "conf.txt").write_text(_14_CONF_B, encoding="utf-8", newline="\n")
-        git(_g14, "mv", "tools/demo/moved.txt", "tools/demo/renamed.txt")
+        (_g14 / PFX / "demo" / "conf.txt").write_text(_14_CONF_B, encoding="utf-8", newline="\n")
+        (_g14 / PFX / "sib" / "conf.txt").write_text(_14_CONF_B, encoding="utf-8", newline="\n")
+        git(_g14, "mv", f"{PFX}demo/moved.txt", f"{PFX}demo/renamed.txt")
         git(_g14, "add", "-A")
         git(_g14, "commit", "-qm", "B")
         _B14 = gout(_g14, "rev-parse", "HEAD").strip()
@@ -8485,24 +8505,24 @@ user_skills = "/tmp/gk-fake-skills"
         check("[-14] ...and so is the sibling's, or AC5 grades a kit that was already red",
               "govkit check — sib: adopted" in _pre14.stdout, _pre14.stdout)
         _snap14 = {p: read_index_oid14(_t14, p) for p in
-                   ("tools/demo/conf.txt", "tools/demo/moved.txt", "tools/sib/conf.txt")}
+                   (f"{PFX}demo/conf.txt", f"{PFX}demo/moved.txt", f"{PFX}sib/conf.txt")}
         check("[-14] the fixture's three touched paths all have index entries before the write",
               all(_snap14.values()), str(_snap14))
         check("[-14] ...and the rename destination has NONE, which is the `absent` marker S2 exists "
               "for: keyed on the old path alone the new spelling sits behind a key nothing reaches",
-              read_index_oid14(_t14, "tools/demo/renamed.txt") == "", "")
+              read_index_oid14(_t14, f"{PFX}demo/renamed.txt") == "", "")
         _rec14a = json.loads((_t14 / ".governance" / "install.json").read_text(encoding="utf-8"))
         _row14a = {f["path"]: dict(f) for f in _rec14a["files"]}
         # AGAINST GOV'S OWN BLOB, not against the constant the fixture just wrote. The first cut of
         # this arm compared the file to `_14_CONF_T` — which is what put it there — so it held even
         # with the adopter's edit removed from the fixture entirely. An arm that cannot fail.
         check("[-14] the fixture's demo conf really carries an adopter edit gov's blob does not have",
-              read_bytes14(_t14 / "tools" / "demo" / "conf.txt")
-              != GK14.blob_at(_g14, _A14, "tools/demo/conf.txt")
-              and read_bytes14(_t14 / "tools" / "demo" / "conf.txt") == _14_CONF_T.encode(),
-              repr(read_bytes14(_t14 / "tools" / "demo" / "conf.txt")))
+              read_bytes14(_t14 / PFX / "demo" / "conf.txt")
+              != GK14.blob_at(_g14, _A14, f"{PFX}demo/conf.txt")
+              and read_bytes14(_t14 / PFX / "demo" / "conf.txt") == _14_CONF_T.encode(),
+              repr(read_bytes14(_t14 / PFX / "demo" / "conf.txt")))
         check("[-14] ...and the sibling's does NOT, so its row takes the raw arm and stays green",
-              read_bytes14(_t14 / "tools" / "sib" / "conf.txt") == _14_CONF_A.encode(), "")
+              read_bytes14(_t14 / PFX / "sib" / "conf.txt") == _14_CONF_A.encode(), "")
         check("[-14] LIVENESS the three-way this fixture is built around really merges CLEAN and "
               "really produces the file the kit's check rejects",
               GK14.three_way(_14_CONF_T.encode(), _14_CONF_A.encode(), _14_CONF_B.encode())
@@ -8523,46 +8543,46 @@ user_skills = "/tmp/gk-fake-skills"
         check("[-14] AC2 ...naming BOTH exit codes, because one of them is the whole verdict",
               "exit 0 -> 1" in _w14.stdout, _w14.stdout)
         check("[-14] AC2 ...and the verdict that got it there was the CLEAN merge, not a conflict",
-              verdict_of(_w14.stdout, "tools/demo/conf.txt") == "diverged"
+              verdict_of(_w14.stdout, f"{PFX}demo/conf.txt") == "diverged"
               and "0 conflict(s)" in _w14.stdout, _w14.stdout)
 
         # ---- AC3: the index is back where it was, byte for byte, and the rename is undone under
         # ---- BOTH spellings. This is S2's row-keyed snapshot observed directly.
         check("[-14] AC3 the rolled-back path's index entry EQUALS its pre-write oid",
-              read_index_oid14(_t14, "tools/demo/conf.txt") == _snap14["tools/demo/conf.txt"],
-              f"{read_index_oid14(_t14, 'tools/demo/conf.txt')} vs {_snap14['tools/demo/conf.txt']}")
+              read_index_oid14(_t14, f"{PFX}demo/conf.txt") == _snap14[f"{PFX}demo/conf.txt"],
+              f"{read_index_oid14(_t14, f'{PFX}demo/conf.txt')} vs {_snap14[f'{PFX}demo/conf.txt']}")
         check("[-14] AC3 ...and its worktree bytes are the adopter's own, not the merge",
-              read_bytes14(_t14 / "tools" / "demo" / "conf.txt") == _14_CONF_T.encode(),
-              repr(read_bytes14(_t14 / "tools" / "demo" / "conf.txt")))
+              read_bytes14(_t14 / PFX / "demo" / "conf.txt") == _14_CONF_T.encode(),
+              repr(read_bytes14(_t14 / PFX / "demo" / "conf.txt")))
         check("[-14] AC3 ...so the target's own git reports NOTHING for it: not staged, not dirty",
-              gout(_t14, "status", "--porcelain", "--", "tools/demo/conf.txt").strip() == "",
-              gout(_t14, "status", "--porcelain", "--", "tools/demo/conf.txt"))
+              gout(_t14, "status", "--porcelain", "--", f"{PFX}demo/conf.txt").strip() == "",
+              gout(_t14, "status", "--porcelain", "--", f"{PFX}demo/conf.txt"))
         check("[-14] AC3 the RENAMED row is restored under its OLD spelling, from its snapshot entry",
-              read_index_oid14(_t14, "tools/demo/moved.txt") == _snap14["tools/demo/moved.txt"]
-              and (_t14 / "tools" / "demo" / "moved.txt").is_file(),
-              read_index_oid14(_t14, "tools/demo/moved.txt"))
+              read_index_oid14(_t14, f"{PFX}demo/moved.txt") == _snap14[f"{PFX}demo/moved.txt"]
+              and (_t14 / PFX / "demo" / "moved.txt").is_file(),
+              read_index_oid14(_t14, f"{PFX}demo/moved.txt"))
         check("[-14] AC3 ...and the NEW spelling is gone from the index AND from the worktree — the "
               "half a path-keyed snapshot cannot reach",
-              read_index_oid14(_t14, "tools/demo/renamed.txt") == ""
-              and not (_t14 / "tools" / "demo" / "renamed.txt").exists(),
+              read_index_oid14(_t14, f"{PFX}demo/renamed.txt") == ""
+              and not (_t14 / PFX / "demo" / "renamed.txt").exists(),
               gout(_t14, "ls-files"))
         check("[-14] AC3 ...and the whole kit is clean in the target's own git, both paths at once",
-              gout(_t14, "status", "--porcelain", "--", "tools/demo").strip() == "",
-              gout(_t14, "status", "--porcelain", "--", "tools/demo"))
+              gout(_t14, "status", "--porcelain", "--", f"{PFX}demo").strip() == "",
+              gout(_t14, "status", "--porcelain", "--", f"{PFX}demo"))
 
         # ---- AC4: the ROW, and all six fields of it. Restoring bytes and leaving the row stamped
         # ---- forward re-creates `-8`; restoring some of the six is the split `-7` S9 refuses on.
         _rec14b = json.loads((_t14 / ".governance" / "install.json").read_text(encoding="utf-8"))
         _row14b = {f["path"]: dict(f) for f in _rec14b["files"]}
         check("[-14] AC4 the rolled-back row carries all six pre-run fields, together",
-              all(_row14b.get("tools/demo/conf.txt", {}).get(k)
-                  == _row14a["tools/demo/conf.txt"].get(k) for k in GK14.ROLLBACK_FIELDS),
-              str(_row14b.get("tools/demo/conf.txt"))[:400])
+              all(_row14b.get(f"{PFX}demo/conf.txt", {}).get(k)
+                  == _row14a[f"{PFX}demo/conf.txt"].get(k) for k in GK14.ROLLBACK_FIELDS),
+              str(_row14b.get(f"{PFX}demo/conf.txt"))[:400])
         check("[-14] AC4 ...and the RENAMED row's `path` and `source` both carry the OLD spelling, "
               "beside the old `commit` and `gov_oid` — so `-7` S9's preamble holds on the next run",
-              _row14b.get("tools/demo/moved.txt", {}).get("source") == "tools/demo/moved.txt"
-              and _row14b.get("tools/demo/moved.txt", {}).get("commit") == _A14
-              and "tools/demo/renamed.txt" not in _row14b, str(sorted(_row14b)))
+              _row14b.get(f"{PFX}demo/moved.txt", {}).get("source") == f"{PFX}demo/moved.txt"
+              and _row14b.get(f"{PFX}demo/moved.txt", {}).get("commit") == _A14
+              and f"{PFX}demo/renamed.txt" not in _row14b, str(sorted(_row14b)))
         check("[-14] AC4 install.json's gov_commit is UNCHANGED — the `if r.problems` arm declining "
               "to re-stamp", _rec14b.get("gov_commit") == _A14 and _A14 != _B14,
               str(_rec14b.get("gov_commit")))
@@ -8573,15 +8593,15 @@ user_skills = "/tmp/gk-fake-skills"
               any(ln.startswith("govkit update — verify sib:") and "verified" in ln
                   for ln in _w14.stdout.splitlines()), _w14.stdout)
         check("[-14] AC5 ...its path is staged at gov's NEW bytes",
-              read_index_oid14(_t14, "tools/sib/conf.txt")
-              == GK14.blob_oid(GK14.blob_at(_g14, _B14, "tools/sib/conf.txt")),
-              read_index_oid14(_t14, "tools/sib/conf.txt"))
-        check("[-14] AC5 ...on disk too", read_bytes14(_t14 / "tools" / "sib" / "conf.txt")
-              == _14_CONF_B.encode(), repr(read_bytes14(_t14 / "tools" / "sib" / "conf.txt")))
+              read_index_oid14(_t14, f"{PFX}sib/conf.txt")
+              == GK14.blob_oid(GK14.blob_at(_g14, _B14, f"{PFX}sib/conf.txt")),
+              read_index_oid14(_t14, f"{PFX}sib/conf.txt"))
+        check("[-14] AC5 ...on disk too", read_bytes14(_t14 / PFX / "sib" / "conf.txt")
+              == _14_CONF_B.encode(), repr(read_bytes14(_t14 / PFX / "sib" / "conf.txt")))
         check("[-14] AC5 ...and its row carries the --to commit while the rolled-back one does not",
-              _row14b.get("tools/sib/conf.txt", {}).get("commit") == _B14
-              and _row14b.get("tools/demo/conf.txt", {}).get("commit") == _A14,
-              str(_row14b.get("tools/sib/conf.txt"))[:300])
+              _row14b.get(f"{PFX}sib/conf.txt", {}).get("commit") == _B14
+              and _row14b.get(f"{PFX}demo/conf.txt", {}).get("commit") == _A14,
+              str(_row14b.get(f"{PFX}sib/conf.txt"))[:300])
 
         # ---- S7's ORDER. A rollback that left no readable record is a revert the operator finds by
         # ---- accident, days later, in a diff.
@@ -8592,9 +8612,9 @@ user_skills = "/tmp/gk-fake-skills"
         _ordt14 = read_text14(_ord14)
         check("[-14] S7 ...naming the kit's check argv, BOTH exit codes and every path restored",
               "check.sh" in _ordt14 and "exit 0 -> 1" in _ordt14
-              and "restored  tools/demo/conf.txt" in _ordt14
-              and "restored  tools/demo/moved.txt" in _ordt14
-              and "restored  tools/demo/renamed.txt" in _ordt14, _ordt14)
+              and f"restored  {PFX}demo/conf.txt" in _ordt14
+              and f"restored  {PFX}demo/moved.txt" in _ordt14
+              and f"restored  {PFX}demo/renamed.txt" in _ordt14, _ordt14)
         check("[-14] S7 ...and NO order was written for the sibling this run did not roll back",
               not (_t14 / ".governance" / "outbox" / "update-rollback-sib.md").exists(), "")
         check("[-14] §5 the closing counts DROP the rolled-back work: `wrote` names the writes that "
@@ -8615,8 +8635,8 @@ user_skills = "/tmp/gk-fake-skills"
         check("[-14] AC4 the run AFTER a rollback is accepted by `-7`'s receipt-integrity preamble",
               "REFUSING" not in _n14.stderr, _n14.stdout[-900:] + _n14.stderr[-900:])
         check("[-14] AC4 ...and it re-offers exactly the work that was rolled back",
-              verdict_of(_n14.stdout, "tools/demo/conf.txt") == "diverged"
-              and verdict_of(_n14.stdout, "tools/demo/moved.txt") == "renamed", _n14.stdout)
+              verdict_of(_n14.stdout, f"{PFX}demo/conf.txt") == "diverged"
+              and verdict_of(_n14.stdout, f"{PFX}demo/moved.txt") == "renamed", _n14.stdout)
 
         # ---- THE PATH THIS RUN NEVER WROTE. A rename destination the target already holds is
         # ---- REFUSED by `-11`, so nothing lands there — and if the same kit then rolls back, the
@@ -8628,23 +8648,23 @@ user_skills = "/tmp/gk-fake-skills"
                      "files": {"conf.txt": _14_CONF_A, "moved.txt": _14_MOVED}},
         })
         _to14 = build_verify_target(_go14, "occupied-t", ["demo"])
-        (_to14 / "tools" / "demo" / "conf.txt").write_text(_14_CONF_T, encoding="utf-8",
+        (_to14 / PFX / "demo" / "conf.txt").write_text(_14_CONF_T, encoding="utf-8",
                                                            newline="\n")
         settle(_to14, "the adopter edits LEGACY")
         # WRITTEN AFTER THE SETTLE, deliberately: tracked, it would restore from its own index entry
         # and this arm would pass over the safe half of the branch it exists to grade.
-        (_to14 / "tools" / "demo" / "renamed.txt").write_text(
+        (_to14 / PFX / "demo" / "renamed.txt").write_text(
             "the operator's own untracked file, at the path gov is about to move something to\n",
             encoding="utf-8", newline="\n")
-        (_go14 / "tools" / "demo" / "conf.txt").write_text(_14_CONF_B, encoding="utf-8",
+        (_go14 / PFX / "demo" / "conf.txt").write_text(_14_CONF_B, encoding="utf-8",
                                                            newline="\n")
-        git(_go14, "mv", "tools/demo/moved.txt", "tools/demo/renamed.txt")
+        git(_go14, "mv", f"{PFX}demo/moved.txt", f"{PFX}demo/renamed.txt")
         git(_go14, "add", "-A")
         git(_go14, "commit", "-qm", "B")
         check("[-14] the occupied fixture really holds an UNTRACKED file at the rename destination — "
               "tracked, it would restore from its own index entry and this arm would be vacuous",
-              (_to14 / "tools" / "demo" / "renamed.txt").is_file()
-              and "tools/demo/renamed.txt" not in gout(_to14, "ls-files").split(),
+              (_to14 / PFX / "demo" / "renamed.txt").is_file()
+              and f"{PFX}demo/renamed.txt" not in gout(_to14, "ls-files").split(),
               gout(_to14, "ls-files"))
         _wo14 = run_in_gov(_go14, "update", "--target", str(_to14), "--write")
         check("[-14] the rename is refused by `-11` AND the same kit still rolls back its conf, so "
@@ -8653,11 +8673,11 @@ user_skills = "/tmp/gk-fake-skills"
               _wo14.stdout[-1500:])
         check("[-14] ...and the operator's untracked bytes SURVIVE it: a path this run never wrote "
               "is not a path it may undo",
-              read_bytes14(_to14 / "tools" / "demo" / "renamed.txt").startswith(
+              read_bytes14(_to14 / PFX / "demo" / "renamed.txt").startswith(
                   b"the operator's own untracked file"),
-              repr(read_bytes14(_to14 / "tools" / "demo" / "renamed.txt")[:80]))
+              repr(read_bytes14(_to14 / PFX / "demo" / "renamed.txt")[:80]))
         check("[-14] ...the order SAYS so rather than listing it as restored",
-              "left alone tools/demo/renamed.txt" in read_text14(
+              f"left alone {PFX}demo/renamed.txt" in read_text14(
                   _to14 / ".governance" / "outbox" / "update-rollback-demo.md"),
               read_text14(_to14 / ".governance" / "outbox" / "update-rollback-demo.md"))
 
@@ -8687,10 +8707,10 @@ user_skills = "/tmp/gk-fake-skills"
                      "files": {"conf.txt": _14_CONF_A, "victim.txt": _2_VICTIM_A}},
         })
         _t2 = build_verify_target(_g2, "refused-t", ["demo"])
-        (_t2 / "tools" / "demo" / "conf.txt").write_text(_14_CONF_T, encoding="utf-8", newline="\n")
+        (_t2 / PFX / "demo" / "conf.txt").write_text(_14_CONF_T, encoding="utf-8", newline="\n")
         settle(_t2, "the adopter edits LEGACY")
-        (_g2 / "tools" / "demo" / "conf.txt").write_text(_14_CONF_B, encoding="utf-8", newline="\n")
-        (_g2 / "tools" / "demo" / "victim.txt").write_text(_2_VICTIM_B, encoding="utf-8",
+        (_g2 / PFX / "demo" / "conf.txt").write_text(_14_CONF_B, encoding="utf-8", newline="\n")
+        (_g2 / PFX / "demo" / "victim.txt").write_text(_2_VICTIM_B, encoding="utf-8",
                                                            newline="\n")
         git(_g2, "add", "-A")
         git(_g2, "commit", "-qm", "B")
@@ -8707,26 +8727,26 @@ user_skills = "/tmp/gk-fake-skills"
         _ord2 = read_text14(_t2 / ".governance" / "outbox" / "update-rollback-demo.md")
         _sha2_run = hashlib.sha256(_2_VICTIM_B.encode()).hexdigest()
         check("[-2] AC1 the order names the path it could not restore, under its own verb",
-              "NOT restored tools/demo/victim.txt" in _ord2, _ord2)
+              f"NOT restored {PFX}demo/victim.txt" in _ord2, _ord2)
         check("[-2] AC1 ...and under NO other verb — before this unit a failed path was in none of "
               "the three lists, which reads as a file the rollback never touched",
-              "restored  tools/demo/victim.txt" not in _ord2
-              and "removed   tools/demo/victim.txt" not in _ord2
-              and "left alone tools/demo/victim.txt" not in _ord2, _ord2)
+              f"restored  {PFX}demo/victim.txt" not in _ord2
+              and f"removed   {PFX}demo/victim.txt" not in _ord2
+              and f"left alone {PFX}demo/victim.txt" not in _ord2, _ord2)
         check("[-2] AC2 the receipt row for the failed path is LEFT at this run's sha256 rather "
               "than reverted to the pre-run one it does not have on disk",
-              _row2b.get("tools/demo/victim.txt", {}).get("sha256") == _sha2_run
-              and _row2a["tools/demo/victim.txt"].get("sha256") != _sha2_run,
-              str(_row2b.get("tools/demo/victim.txt"))[:400])
+              _row2b.get(f"{PFX}demo/victim.txt", {}).get("sha256") == _sha2_run
+              and _row2a[f"{PFX}demo/victim.txt"].get("sha256") != _sha2_run,
+              str(_row2b.get(f"{PFX}demo/victim.txt"))[:400])
         check("[-2] AC2 ...and its `commit` stayed forward with it, because the gate is ONE decision "
               "per entry and a split row is what `-7` S9 refuses the next run on",
-              _row2b.get("tools/demo/victim.txt", {}).get("commit") == _B2
-              and _row2a["tools/demo/victim.txt"].get("commit") != _B2,
-              str(_row2b.get("tools/demo/victim.txt"))[:400])
+              _row2b.get(f"{PFX}demo/victim.txt", {}).get("commit") == _B2
+              and _row2a[f"{PFX}demo/victim.txt"].get("commit") != _B2,
+              str(_row2b.get(f"{PFX}demo/victim.txt"))[:400])
         check("[-2] AC2 the worktree does not hold the pre-run bytes either, so nothing anywhere "
               "claims a restore that did not happen",
-              read_bytes14(_t2 / "tools" / "demo" / "victim.txt") != _2_VICTIM_A.encode(),
-              repr(read_bytes14(_t2 / "tools" / "demo" / "victim.txt")[:80]))
+              read_bytes14(_t2 / PFX / "demo" / "victim.txt") != _2_VICTIM_A.encode(),
+              repr(read_bytes14(_t2 / PFX / "demo" / "victim.txt")[:80]))
         check("[-2] AC4 the order's lead paragraph stops claiming every path below was put back, "
               "and introduces the block that contradicts it",
               "and ONLY those" in _ord2 and "could not return at all" in _ord2, _ord2[:1400])
@@ -8736,10 +8756,10 @@ user_skills = "/tmp/gk-fake-skills"
               and "the index and the worktree now disagree" in _ord2, _ord2)
         check("[-2] AC5 the SAME run still reverts the path it DID restore, bytes and row together "
               "— the gate fires on the failed entry and on nothing else",
-              "restored  tools/demo/conf.txt" in _ord2
-              and _row2b.get("tools/demo/conf.txt", {}).get("sha256")
-              == _row2a["tools/demo/conf.txt"].get("sha256"),
-              str(_row2b.get("tools/demo/conf.txt"))[:400])
+              f"restored  {PFX}demo/conf.txt" in _ord2
+              and _row2b.get(f"{PFX}demo/conf.txt", {}).get("sha256")
+              == _row2a[f"{PFX}demo/conf.txt"].get("sha256"),
+              str(_row2b.get(f"{PFX}demo/conf.txt"))[:400])
 
         # ---- DEPL-cMendedVintage-18. A WITHDRAWAL THE ROLLBACK COULD NOT UNDO. `-2` gated the
         # ---- `withdrawn_rows` removal together with the `ROLLBACK_FIELDS` revert, on the
@@ -8749,7 +8769,7 @@ user_skills = "/tmp/gk-fake-skills"
         # ---- not return.
         # ----
         # ---- THE MEASURED RED, on this fixture against the engine with this unit not landed: the
-        # ---- post-run receipt carried NO row for `tools/demo/gone.txt` while `git ls-files` still
+        # ---- post-run receipt carried NO row for `<prefix>/demo/gone.txt` while `git ls-files` still
         # ---- named it, because the rollback's `update-index` had already re-staged the pre-run
         # ---- blob before `checkout-index` refused. Gov's bytes, staged in the target, claimed by
         # ---- nothing — `-15`'s shape one layer down.
@@ -8767,12 +8787,12 @@ user_skills = "/tmp/gk-fake-skills"
                      "files": {"conf.txt": _14_CONF_A, "gone.txt": "gov ships this, for now\n"}},
         })
         _t18 = build_verify_target(_g18, "withdrawn-t", ["demo"])
-        (_t18 / "tools" / "demo" / "conf.txt").write_text(_14_CONF_T, encoding="utf-8",
+        (_t18 / PFX / "demo" / "conf.txt").write_text(_14_CONF_T, encoding="utf-8",
                                                           newline="\n")
         settle(_t18, "the adopter edits LEGACY")
-        (_g18 / "tools" / "demo" / "conf.txt").write_text(_14_CONF_B, encoding="utf-8",
+        (_g18 / PFX / "demo" / "conf.txt").write_text(_14_CONF_B, encoding="utf-8",
                                                           newline="\n")
-        (_g18 / "tools" / "demo" / "gone.txt").unlink()
+        (_g18 / PFX / "demo" / "gone.txt").unlink()
         git(_g18, "add", "-A")
         git(_g18, "commit", "-qm", "B")
         _row18a = {f["path"]: dict(f) for f in json.loads(
@@ -8791,20 +8811,20 @@ user_skills = "/tmp/gk-fake-skills"
         check("[-18] AC1 the row for the withdrawn path the rollback could not return is STILL in "
               "the receipt — the removal from the delete list is not the revert and no longer "
               "shares its gate",
-              "tools/demo/gone.txt" in _row18b, str(sorted(_row18b)))
+              f"{PFX}demo/gone.txt" in _row18b, str(sorted(_row18b)))
         check("[-18] AC1 ...and the pre-run blob really is staged at that path, which is what the "
               "kept row names: dropping the row left gov's bytes in the target claimed by nothing",
-              "tools/demo/gone.txt" in gout(_t18, "ls-files").split(), gout(_t18, "ls-files"))
+              f"{PFX}demo/gone.txt" in gout(_t18, "ls-files").split(), gout(_t18, "ls-files"))
         check("[-18] AC2 the kept row carries this run's values over every ROLLBACK_FIELDS key, "
               "and for a withdrawal those ARE the pre-run ones: the run writes none of the six, so "
               "the revert is a no-op here and its placement cannot be read off the receipt at all "
               "(measured; spec rev-2 amends AC2 to say so)",
-              all(_row18b.get("tools/demo/gone.txt", {}).get(_k)
-                  == _row18a["tools/demo/gone.txt"].get(_k) for _k in GK14.ROLLBACK_FIELDS),
-              str(_row18b.get("tools/demo/gone.txt"))[:400])
+              all(_row18b.get(f"{PFX}demo/gone.txt", {}).get(_k)
+                  == _row18a[f"{PFX}demo/gone.txt"].get(_k) for _k in GK14.ROLLBACK_FIELDS),
+              str(_row18b.get(f"{PFX}demo/gone.txt"))[:400])
         check("[-18] AC3 the order says the withdrawal did not complete and the row was KEPT, "
               "rather than the rewrite branch's sentence about bytes that were never rewritten",
-              "NOT restored tools/demo/gone.txt" in _ord18 and "this run WITHDREW it" in _ord18
+              f"NOT restored {PFX}demo/gone.txt" in _ord18 and "this run WITHDREW it" in _ord18
               and "receipt row was KEPT rather than dropped" in _ord18, _ord18)
         check("[-18] AC3 ...and the rewrite sentence appears nowhere in this order, because the "
               "only path it could describe is the one the third branch just took",
@@ -8820,7 +8840,7 @@ user_skills = "/tmp/gk-fake-skills"
             "idle2": {"guard": _14_GUARD_CONFLICT, "files": {"conf.txt": _14_CONF_A}},
         })
         _t6 = build_verify_target(_g6, "three-t", ["demo", "idle1", "idle2"])
-        (_g6 / "tools" / "demo" / "conf.txt").write_text(_14_CONF_B, encoding="utf-8", newline="\n")
+        (_g6 / PFX / "demo" / "conf.txt").write_text(_14_CONF_B, encoding="utf-8", newline="\n")
         git(_g6, "add", "-A")
         git(_g6, "commit", "-qm", "B")
         _B6 = gout(_g6, "rev-parse", "HEAD").strip()
@@ -8865,7 +8885,7 @@ user_skills = "/tmp/gk-fake-skills"
         })
         _t7v = build_verify_target(_g7v, "unmeasured-t", ["mute", "tokened"])
         for _e in ("mute", "tokened"):
-            (_g7v / "tools" / _e / "conf.txt").write_text(_14_CONF_B, encoding="utf-8", newline="\n")
+            (_g7v / PFX / _e / "conf.txt").write_text(_14_CONF_B, encoding="utf-8", newline="\n")
         git(_g7v, "add", "-A")
         git(_g7v, "commit", "-qm", "B")
         remove_runs14(_log7v)
@@ -8901,8 +8921,8 @@ user_skills = "/tmp/gk-fake-skills"
         check("[-14] AC9 the fixture's kit really is RED before anything is written — without that "
               "precondition this arm grades the verified path and proves nothing",
               "govkit check — demo: landed-but-inert" in _pre9.stdout, _pre9.stdout)
-        _snap9 = read_index_oid14(_t9v, "tools/demo/conf.txt")
-        (_g9v / "tools" / "demo" / "conf.txt").write_text(_14_CONF_B, encoding="utf-8", newline="\n")
+        _snap9 = read_index_oid14(_t9v, f"{PFX}demo/conf.txt")
+        (_g9v / PFX / "demo" / "conf.txt").write_text(_14_CONF_B, encoding="utf-8", newline="\n")
         git(_g9v, "add", "-A")
         git(_g9v, "commit", "-qm", "B")
         _B9 = gout(_g9v, "rev-parse", "HEAD").strip()
@@ -8915,11 +8935,11 @@ user_skills = "/tmp/gk-fake-skills"
         check("[-14] AC9 ...and counted under its own tally rather than folded into another",
               "pre-existing red 1" in _w9v.stdout and "rolled back 0" in _w9v.stdout, _w9v.stdout)
         check("[-14] AC9 NO ROLLBACK: the index does NOT match the pre-write snapshot",
-              read_index_oid14(_t9v, "tools/demo/conf.txt") != _snap9,
-              f"{read_index_oid14(_t9v, 'tools/demo/conf.txt')} vs {_snap9}")
+              read_index_oid14(_t9v, f"{PFX}demo/conf.txt") != _snap9,
+              f"{read_index_oid14(_t9v, f'{PFX}demo/conf.txt')} vs {_snap9}")
         check("[-14] AC9 ...and gov's new bytes stand on disk",
-              read_bytes14(_t9v / "tools" / "demo" / "conf.txt") == _14_CONF_B.encode(),
-              repr(read_bytes14(_t9v / "tools" / "demo" / "conf.txt")))
+              read_bytes14(_t9v / PFX / "demo" / "conf.txt") == _14_CONF_B.encode(),
+              repr(read_bytes14(_t9v / PFX / "demo" / "conf.txt")))
         check("[-14] AC9 no r.fail was raised for it: the run exits 0 and gov_commit ADVANCES to "
               "--to, which is the only thing that stops the wedge",
               _w9v.returncode == 0
@@ -8938,7 +8958,7 @@ user_skills = "/tmp/gk-fake-skills"
         # ======== DEPL-cMendedVintage-1 — NO ROLLBACK OVER A RENDER STEP THIS RUN DECLINED ========
         #
         # THE MEASURED RED, on this fixture, against the engine with `-1` not landed: `update
-        # --write` printed `ROLLED BACK`, reverted `tools/stale/conf.txt` to its pre-run blob, wrote
+        # --write` printed `ROLLED BACK`, reverted `<prefix>/stale/conf.txt` to its pre-run blob, wrote
         # `update-rollback-stale.md`, and printed NO decline line at all. The next run classifies
         # the reverted rows identically and decides identically, because a rolled-back run takes the
         # `if r.problems` arm and withholds the `gov_commit` re-stamp. Observed at two adopters as
@@ -8972,18 +8992,18 @@ user_skills = "/tmp/gk-fake-skills"
         })
         _tdr = build_verify_target(_gdr, "declined-t", ["stale"])
         check("[-1] PRECONDITION the adopter really rendered the destination the rendered row names",
-              read_text14(_tdr / "tools" / "stale" / "out.txt") == "V=1\n",
-              repr(read_text14(_tdr / "tools" / "stale" / "out.txt")))
+              read_text14(_tdr / PFX / "stale" / "out.txt") == "V=1\n",
+              repr(read_text14(_tdr / PFX / "stale" / "out.txt")))
         _predr = run_in_gov(_gdr, "check", "--target", str(_tdr))
         check("[-1] PRECONDITION the kit's own check is GREEN before the write — without it the "
               "green-to-red transition this branch diverts cannot exist",
               "govkit check — stale: adopted" in _predr.stdout, _predr.stdout[-900:])
-        _snapdr = read_index_oid14(_tdr, "tools/stale/conf.txt")
+        _snapdr = read_index_oid14(_tdr, f"{PFX}stale/conf.txt")
         # Gov's second vintage: the engine file and the render's TEMPLATE both move. The target's
         # rendered destination does not, because nothing in `update` writes one.
-        (_gdr / "tools" / "stale" / "conf.txt").write_text("V=2\n", encoding="utf-8", newline="\n")
-        (_gdr / "tools" / "stale" / "out.tmpl").write_text("V=2\n", encoding="utf-8", newline="\n")
-        (_gdr / "tools" / "stale" / "render.sh").write_text(render_script(2), encoding="utf-8",
+        (_gdr / PFX / "stale" / "conf.txt").write_text("V=2\n", encoding="utf-8", newline="\n")
+        (_gdr / PFX / "stale" / "out.tmpl").write_text("V=2\n", encoding="utf-8", newline="\n")
+        (_gdr / PFX / "stale" / "render.sh").write_text(render_script(2), encoding="utf-8",
                                                             newline="\n")
         git(_gdr, "add", "-A")
         git(_gdr, "commit", "-qm", "B")
@@ -8995,7 +9015,7 @@ user_skills = "/tmp/gk-fake-skills"
         # other path — so the strip that used to make this a claim about something would make it a
         # claim about nothing. `0` is the operator's own revert, spelled here for the same reason.
         _wdr = subprocess.run(
-            [sys.executable, str(_gdr / "tools" / "govkit" / "govkit.py"),
+            [sys.executable, str(_gdr / PFX / "govkit" / "govkit.py"),
              "update", "--target", str(_tdr), "--write"], capture_output=True, text=True,
             env=dict(os.environ, GOVKIT_RERENDER="0"))
         _obdr = _tdr / ".governance" / "outbox"
@@ -9005,17 +9025,17 @@ user_skills = "/tmp/gk-fake-skills"
                   and "adopted -> landed-but-inert" in ln and "exit 0 -> 1" in ln
                   for ln in _wdr.stdout.splitlines()), _wdr.stdout[-1600:])
         check("[-1] AC1 NO ROLLBACK: the index does NOT match the pre-write snapshot",
-              read_index_oid14(_tdr, "tools/stale/conf.txt") != _snapdr,
-              f"{read_index_oid14(_tdr, 'tools/stale/conf.txt')} vs {_snapdr}")
+              read_index_oid14(_tdr, f"{PFX}stale/conf.txt") != _snapdr,
+              f"{read_index_oid14(_tdr, f'{PFX}stale/conf.txt')} vs {_snapdr}")
         check("[-1] AC1 ...and gov's new bytes stand on disk",
-              read_bytes14(_tdr / "tools" / "stale" / "conf.txt") == b"V=2\n",
-              repr(read_bytes14(_tdr / "tools" / "stale" / "conf.txt")))
+              read_bytes14(_tdr / PFX / "stale" / "conf.txt") == b"V=2\n",
+              repr(read_bytes14(_tdr / PFX / "stale" / "conf.txt")))
         _rowdr = {f["path"]: dict(f) for f in json.loads(
             (_tdr / ".governance" / "install.json").read_text(encoding="utf-8"))["files"]}
         check("[-1] AC1 ...and its receipt row keeps THIS run's values — the `for k in "
               "ROLLBACK_FIELDS` revert sits inside the loop this exit skips",
-              _rowdr.get("tools/stale/conf.txt", {}).get("commit") == _Bdr,
-              str(_rowdr.get("tools/stale/conf.txt"))[:400])
+              _rowdr.get(f"{PFX}stale/conf.txt", {}).get("commit") == _Bdr,
+              str(_rowdr.get(f"{PFX}stale/conf.txt"))[:400])
         check("[-1] AC1 an `update-declined-red-<kit>.md` order is written, and NO rollback order",
               (_obdr / "update-declined-red-stale.md").is_file()
               and not (_obdr / "update-rollback-stale.md").exists(),
@@ -9084,7 +9104,7 @@ user_skills = "/tmp/gk-fake-skills"
             json.dumps(_recor, indent=2) + "\n", encoding="utf-8", newline="\n")
         settle(_tor, "a receipt whose kit list has lost one of its rows' kits")
         for _e in ("demo", "sib"):
-            (_gor / "tools" / _e / "conf.txt").write_text(_14_CONF_B, encoding="utf-8", newline="\n")
+            (_gor / PFX / _e / "conf.txt").write_text(_14_CONF_B, encoding="utf-8", newline="\n")
         git(_gor, "add", "-A")
         git(_gor, "commit", "-qm", "B")
         check("[-14] the orphan fixture really carries a row whose kit the receipt does not claim",
@@ -9113,7 +9133,7 @@ user_skills = "/tmp/gk-fake-skills"
         # commit whose engine predates the extraction.
         _PRE_EXTRACTION_SHA = "af9421d736d6cbd942e953c0159148b91cb425f8"
         _pe_src = subprocess.run(["git", "-C", str(HERE.parents[1]), "show",
-                                  f"{_PRE_EXTRACTION_SHA}:tools/govkit/govkit.py"],
+                                  f"{_PRE_EXTRACTION_SHA}:{PFX}govkit/govkit.py"],
                                  capture_output=True).stdout
         check("[-14] AC8 the pre-extraction engine really came out of git, and it is the engine "
               "BEFORE the helper existed",
@@ -9124,7 +9144,7 @@ user_skills = "/tmp/gk-fake-skills"
         # the two runs would differ for a reason that has nothing to do with the extraction.
         _pre_gov = tmp / "v14-pre-gov"
         shutil.copytree(_g14, _pre_gov)
-        (_pre_gov / "tools" / "govkit" / "govkit.py").write_bytes(_pe_src)
+        (_pre_gov / PFX / "govkit" / "govkit.py").write_bytes(_pe_src)
         _ac8_now = run_in_gov(_g14, "check", "--target", str(_t14))
         _ac8_was = run_in_gov(_pre_gov, "check", "--target", str(_t14))
         # DEPL-aRepatriatedFork-17 added ONE field to the integrity line, ` · eol-only <n>`, which
@@ -9157,7 +9177,7 @@ user_skills = "/tmp/gk-fake-skills"
         # while gov's block stays staged in a repository gov does not own.
         _g15, _ = build_verify_gov("pinroll", {
             "demo": {"guard": _14_GUARD_CONFLICT,
-                     "extra": '[[lf_pin]]\npattern = "tools/demo/*.txt"\n'
+                     "extra": f'[[lf_pin]]\npattern = "{PFX}demo/*.txt"\n'
                               'why = "the fixture pin, so this target has a block to lose"\n\n',
                      "files": {"conf.txt": _14_CONF_A}},
             "sib": {"guard": _14_GUARD_CONFLICT, "files": {"conf.txt": _14_CONF_A}},
@@ -9181,7 +9201,7 @@ user_skills = "/tmp/gk-fake-skills"
         # AND THE ADOPTER'S EDIT, committed rather than staged, for `-12` S4's reason: a writing
         # verb refuses over a dirty claimed path, so an uncommitted edit makes the update refuse and
         # every arm below grades a run that never happened.
-        (_t15 / "tools" / "demo" / "conf.txt").write_text(_14_CONF_T, encoding="utf-8",
+        (_t15 / PFX / "demo" / "conf.txt").write_text(_14_CONF_T, encoding="utf-8",
                                                           newline="\n")
         settle(_t15, "the adopter edits demo's conf and the block moves")
         _before15 = read_bytes14(_ga15)
@@ -9189,9 +9209,9 @@ user_skills = "/tmp/gk-fake-skills"
         # gov's second vintage: one hunk in each kit's conf. `demo`'s merges CLEAN against the
         # adopter's own hunk and the merged file then breaks `demo`'s own rule, which is the whole
         # green-to-red transition the rollback keys on.
-        (_g15 / "tools" / "demo" / "conf.txt").write_text(_14_CONF_B, encoding="utf-8",
+        (_g15 / PFX / "demo" / "conf.txt").write_text(_14_CONF_B, encoding="utf-8",
                                                           newline="\n")
-        (_g15 / "tools" / "sib" / "conf.txt").write_text(_14_CONF_B, encoding="utf-8",
+        (_g15 / PFX / "sib" / "conf.txt").write_text(_14_CONF_B, encoding="utf-8",
                                                          newline="\n")
         git(_g15, "add", "-A")
         git(_g15, "commit", "-qm", "B")
@@ -9241,7 +9261,7 @@ user_skills = "/tmp/gk-fake-skills"
         # marker-pair Refusal. So `plain` is AC5's fixture and `roomy` is AC2's, and an exit code
         # alone distinguishes neither from a clean run.
         _g17, _ = build_verify_gov("pinout", {
-            "demo": {"extra": '[[lf_pin]]\npattern = "tools/demo/*.txt"\n'
+            "demo": {"extra": f'[[lf_pin]]\npattern = "{PFX}demo/*.txt"\n'
                               'why = "the fixture pin, so this target has a block to withdraw"\n\n',
                      "files": {"conf.txt": _14_CONF_A}},
         })
@@ -9263,7 +9283,7 @@ user_skills = "/tmp/gk-fake-skills"
         # reachable population — a descriptor that drops its own pin, or a kit dropped from the
         # receipt's `kits` — and it is one line of a real descriptor rather than a hand-built
         # receipt state no install could produce.
-        (_g17 / "tools" / "demo" / "kit.toml").write_text(
+        (_g17 / PFX / "demo" / "kit.toml").write_text(
             build_kit14("demo", "argv", "", "[]"), encoding="utf-8", newline="\n")
         git(_g17, "add", "-A")
         git(_g17, "commit", "-qm", "B — demo retires its lf_pin")
@@ -9305,7 +9325,7 @@ user_skills = "/tmp/gk-fake-skills"
         check("[-17] AC4 LIVENESS a never-pinned install writes no .gitattributes at all, or the "
               "arm below grades an absence this run did not cause",
               not (_t17n / ".gitattributes").is_file(), read_text14(_t17n / ".gitattributes"))
-        (_g17n / "tools" / "demo" / "conf.txt").write_text(_14_CONF_B, encoding="utf-8",
+        (_g17n / PFX / "demo" / "conf.txt").write_text(_14_CONF_B, encoding="utf-8",
                                                            newline="\n")
         git(_g17n, "add", "-A")
         git(_g17n, "commit", "-qm", "B")
@@ -9346,7 +9366,7 @@ user_skills = "/tmp/gk-fake-skills"
         # its rollback steps over the path, and the arm would have passed over an absence.
         _PRE_DIRTY_SHA = "a2f840b2e648850ef4b33d91148bc6054daf9866"
         _pd_src = subprocess.run(["git", "-C", str(HERE.parents[1]), "show",
-                                  f"{_PRE_DIRTY_SHA}:tools/govkit/govkit.py"],
+                                  f"{_PRE_DIRTY_SHA}:{PFX}govkit/govkit.py"],
                                  capture_output=True).stdout
         check("[-24] LIVENESS the pre-fix engine really came out of git, and it is the engine that "
               "WRITES the pin block and does NOT grade its row",
@@ -9356,7 +9376,7 @@ user_skills = "/tmp/gk-fake-skills"
         # ---- AC1 + AC5. One gov, two identical targets, one engine each.
         _g24, _ = build_verify_gov("dirtypin", {
             "demo": {"guard": _14_GUARD_CONFLICT,
-                     "extra": '[[lf_pin]]\npattern = "tools/demo/*.txt"\n'
+                     "extra": f'[[lf_pin]]\npattern = "{PFX}demo/*.txt"\n'
                               'why = "the fixture pin, so this target has a block to lose"\n\n',
                      "files": {"conf.txt": _14_CONF_A}},
             "sib": {"guard": _14_GUARD_CONFLICT, "files": {"conf.txt": _14_CONF_A}},
@@ -9377,7 +9397,7 @@ user_skills = "/tmp/gk-fake-skills"
                 _ln = _tx.split("\n")
                 _ln[_sp[1] - 1] = "# tampered by the fixture"
                 _gg.write_text("\n".join(_ln), encoding="utf-8", newline="\n")
-            (_tt / "tools" / "demo" / "conf.txt").write_text(_14_CONF_T, encoding="utf-8",
+            (_tt / PFX / "demo" / "conf.txt").write_text(_14_CONF_T, encoding="utf-8",
                                                              newline="\n")
             settle(_tt, "the adopter edits demo's conf and the block moves")
             # AND NOW THE UNCOMMITTED BYTES, after the commit, so they are the only thing in this
@@ -9397,8 +9417,8 @@ user_skills = "/tmp/gk-fake-skills"
         # gov's second vintage: one hunk in each kit's conf. `demo`'s merges CLEAN against the
         # adopter's own hunk and the merged file then breaks `demo`'s own rule, which is the
         # green-to-red transition the rollback keys on.
-        (_g24 / "tools" / "demo" / "conf.txt").write_text(_14_CONF_B, encoding="utf-8", newline="\n")
-        (_g24 / "tools" / "sib" / "conf.txt").write_text(_14_CONF_B, encoding="utf-8", newline="\n")
+        (_g24 / PFX / "demo" / "conf.txt").write_text(_14_CONF_B, encoding="utf-8", newline="\n")
+        (_g24 / PFX / "sib" / "conf.txt").write_text(_14_CONF_B, encoding="utf-8", newline="\n")
         git(_g24, "add", "-A")
         git(_g24, "commit", "-qm", "B")
         _to24 = gout(_g24, "rev-parse", "HEAD").strip()
@@ -9406,7 +9426,7 @@ user_skills = "/tmp/gk-fake-skills"
         # engine is the only difference between the two runs, and the fixture is the same recipe.
         _g24pre = tmp / "v24-dirtypin-gov-pre"
         shutil.copytree(_g24, _g24pre)
-        (_g24pre / "tools" / "govkit" / "govkit.py").write_bytes(_pd_src)
+        (_g24pre / PFX / "govkit" / "govkit.py").write_bytes(_pd_src)
 
         _tp24, _gp24, _bp24 = _t24["pre"]
         _up24 = run_in_gov(_g24pre, "update", "--target", str(_tp24), "--to", _to24, "--write")
@@ -9438,7 +9458,7 @@ user_skills = "/tmp/gk-fake-skills"
 
         # ---- AC2, AC3, AC4. One gov with a pin and a guard that cannot red, four targets.
         _gp, _ = build_verify_gov("pinguard", {
-            "demo": {"extra": '[[lf_pin]]\npattern = "tools/demo/*.txt"\n'
+            "demo": {"extra": f'[[lf_pin]]\npattern = "{PFX}demo/*.txt"\n'
                               'why = "the fixture pin"\n\n',
                      "files": {"conf.txt": _14_CONF_A}},
         })
@@ -9447,7 +9467,7 @@ user_skills = "/tmp/gk-fake-skills"
         # this unit's widening and no arm would have noticed. `make_target` + the real `apply`, with
         # no `settle` behind it, is that state exactly: gov's block staged, nothing committed.
         _t24p = make_target(tmp / "v24-postapply",
-                            'gov_source = "local"\nprefix = "tools"\nkits = ["demo"]\n')
+                            f'gov_source = "local"\nprefix = "{PFX[:-1]}"\nkits = ["demo"]\n')
         _a24p = run_in_gov(_gp, "apply", "--target", str(_t24p), "--kits", "demo")
         check("[-24] AC2 LIVENESS the post-apply fixture installed green and left gov's block "
               "STAGED rather than committed",
@@ -9476,7 +9496,7 @@ user_skills = "/tmp/gk-fake-skills"
         # THE ASSERTION IS ON THE PRECONDITION'S OWN REFUSAL AND ON THE WRITE, NEVER ON THE EXIT
         # CODE, and that is this file's own rule rather than a concession. MEASURED: a target
         # straight out of `apply` also carries every ENGINE row staged, so the renormalize guard
-        # refuses over `tools/demo/conf.txt` being unclean relative to HEAD and the run exits 1 with
+        # refuses over `<prefix>/demo/conf.txt` being unclean relative to HEAD and the run exits 1 with
         # a finding that has nothing to do with this unit. Reading rc here would make the arm
         # hostage to every other guard in the verb and would red on a run that proved the point.
         check("[-24] AC2 a target straight out of `apply` still PROCEEDS past the dirty-path "
@@ -9536,7 +9556,7 @@ user_skills = "/tmp/gk-fake-skills"
               and "never graded" not in _o24r, f"rc={_u24r.returncode} " + _o24r[-1200:])
         _g24x = tmp / "v24-tally-gov-broken"
         shutil.copytree(_gp, _g24x)
-        _eng24x = _g24x / "tools" / "govkit" / "govkit.py"
+        _eng24x = _g24x / PFX / "govkit" / "govkit.py"
         _src24x = _eng24x.read_text(encoding="utf-8")
         check("[-24] AC4 LIVENESS the declared writing set is where the break expects it, or the "
               "staged break below patches nothing and the arm grades an unbroken engine",
@@ -9601,7 +9621,7 @@ user_skills = "/tmp/gk-fake-skills"
         # on a fixture the real run never touched.
         _g24d = tmp / "v24-delattrs-gov-broken"
         shutil.copytree(_gp, _g24d)
-        _eng24d = _g24d / "tools" / "govkit" / "govkit.py"
+        _eng24d = _g24d / PFX / "govkit" / "govkit.py"
         _src24d = _eng24d.read_text(encoding="utf-8")
         _mark24d = ("        if not (target / path).is_file():" + NLp
                     + "            return False" + NLp)
@@ -9648,7 +9668,7 @@ user_skills = "/tmp/gk-fake-skills"
         # neither — the second half is what stops this pair passing over an unchanged file.
         _PRE26_SHA = "60bd6a4d12669a844b436cefc11f99ed5d2754d4"
         _p26 = subprocess.run(["git", "-C", str(HERE.parents[1]), "show",
-                               f"{_PRE26_SHA}:tools/govkit/govkit.py"], capture_output=True).stdout
+                               f"{_PRE26_SHA}:{PFX}govkit/govkit.py"], capture_output=True).stdout
         _now26 = GOVKIT.read_bytes()
         # THE TALLY HALF IS A POSITION, not a string: the defect is WHERE the derivation sits
         # relative to the write loop, so the liveness test is an ordering over the two anchors and
@@ -9668,20 +9688,20 @@ user_skills = "/tmp/gk-fake-skills"
         # ---- AC1, AC2, AC3. ONE TWO-KIT RECIPE. The second kit is the whole fixture: with one kit
         # ---- in the receipt a `--kits` run scopes to everything and the defect cannot appear.
         _g26, _ = build_verify_gov("scope26", {
-            "demo": {"extra": '[[lf_pin]]\npattern = "tools/demo/*.txt"\n'
+            "demo": {"extra": f'[[lf_pin]]\npattern = "{PFX}demo/*.txt"\n'
                               'why = "the fixture pin, so the receipt carries an attributes row"\n\n',
                      "files": {"conf.txt": _14_CONF_A}},
             "sib": {"files": {"conf.txt": _14_CONF_A}},
         })
-        (_g26 / "tools" / "demo" / "conf.txt").write_text(_14_CONF_B, encoding="utf-8",
+        (_g26 / PFX / "demo" / "conf.txt").write_text(_14_CONF_B, encoding="utf-8",
                                                           newline="\n")
-        (_g26 / "tools" / "sib" / "conf.txt").write_text(_14_CONF_B, encoding="utf-8", newline="\n")
+        (_g26 / PFX / "sib" / "conf.txt").write_text(_14_CONF_B, encoding="utf-8", newline="\n")
         git(_g26, "add", "-A")
         git(_g26, "commit", "-qm", "B")
         _to26 = gout(_g26, "rev-parse", "HEAD").strip()
         _g26pre = tmp / "v26-scope-gov-pre"
         shutil.copytree(_g26, _g26pre)
-        (_g26pre / "tools" / "govkit" / "govkit.py").write_bytes(_p26)
+        (_g26pre / PFX / "govkit" / "govkit.py").write_bytes(_p26)
 
         _t26p = build_verify_target(_g26, "scope26-pre", ["demo", "sib"])
         _t26n = build_verify_target(_g26, "scope26-now", ["demo", "sib"])
@@ -9711,7 +9731,7 @@ user_skills = "/tmp/gk-fake-skills"
               _o26n[:1500])
         check("[-26] AC1 this engine reaches its per-row verdicts and does NOT refuse",
               _u26n.returncode == 0 and "present in the target's WORKTREE" not in _o26n
-              and "tools/demo/conf.txt" in _o26n, f"rc={_u26n.returncode} " + _o26n[-2000:])
+              and f"{PFX}demo/conf.txt" in _o26n, f"rc={_u26n.returncode} " + _o26n[-2000:])
 
         # AC2 — THE ROLE WIDENING STAYS, and the narrowing's give-up is PAIRED with the write arm.
         # The `attributes` row carries the `(govkit)` attribution, so it is in no `--kits` scope:
@@ -9779,13 +9799,13 @@ user_skills = "/tmp/gk-fake-skills"
         })
         _t26rn = build_verify_target(_g26r, "rename26-now", ["demo"])
         _t26rp = build_verify_target(_g26r, "rename26-pre", ["demo"])
-        git(_g26r, "mv", "tools/demo/moved.txt", "tools/demo/renamed.txt")
+        git(_g26r, "mv", f"{PFX}demo/moved.txt", f"{PFX}demo/renamed.txt")
         git(_g26r, "add", "-A")
         git(_g26r, "commit", "-qm", "B")
         _to26r = gout(_g26r, "rev-parse", "HEAD").strip()
         _g26rp = tmp / "v26-rename-gov-pre"
         shutil.copytree(_g26r, _g26rp)
-        (_g26rp / "tools" / "govkit" / "govkit.py").write_bytes(_p26)
+        (_g26rp / PFX / "govkit" / "govkit.py").write_bytes(_p26)
         _u26rp = run_in_gov(_g26rp, "update", "--target", str(_t26rp), "--to", _to26r, "--write")
         _o26rp = _u26rp.stdout + _u26rp.stderr
         check("[-26] AC4 the PRE-FIX engine exits non-zero over a renaming vintage on the tally's "
@@ -9813,15 +9833,15 @@ user_skills = "/tmp/gk-fake-skills"
         # THE ENGINE COPY IS TAKEN AT FIXTURE-BUILD TIME, as everywhere else in this file. A break
         # staged into this repo's `govkit.py` after the copy runs the UNPATCHED engine and the arm
         # reports on nothing.
-        A13_REG = ('[surface]\nglobs = ["tools/*"]\n\n'
+        A13_REG = ('[surface]\nglobs = ["{prefix}/*"]\n\n'
                    '[selection]\ndefault = ["demo"]\n\n'
-                   '[[entry]]\nid = "demo"\ndescriptor = "tools/demo/kit.toml"\n\n'
-                   '[[exempt]]\npath = "tools/govkit"\nwhy = "the deployer itself"\n')
+                   '[[entry]]\nid = "demo"\ndescriptor = "{prefix}/demo/kit.toml"\n\n'
+                   '[[exempt]]\npath = "{prefix}/govkit"\nwhy = "the deployer itself"\n')
 
         def a13_kit(extra: str = "") -> str:
             """The fixture descriptor: a `**` engine rule, a `forked` rule, and whatever else the
             caller adds. The forked rule is LAST so precedence elects it for its own source."""
-            return ('id = "demo"\nhome = "tools/demo"\n'
+            return ('id = "demo"\nhome = "demo"\n'
                     'version_from = { none = "fixture" }\n\n'
                     '[check]\nnone = "a fixture kit"\n\n'
                     '[[files]]\ninclude = "**"\nrole = "engine"\n\n'
@@ -9838,13 +9858,13 @@ user_skills = "/tmp/gk-fake-skills"
             rewrite-everything fixture would destroy.
             """
             g = tmp / f"a13-{tag}"
-            (g / "tools" / "govkit").mkdir(parents=True)
-            (g / "tools" / "demo").mkdir(parents=True)
-            shutil.copy2(HERE / "govkit.py", g / "tools" / "govkit" / "govkit.py")
-            shutil.copy2(HERE / "adopters.toml", g / "tools" / "govkit" / "adopters.toml")  # arm 10 refuses a gov without it
-            (g / "tools" / "govkit" / "registry.toml").write_text(A13_REG, encoding="utf-8",
+            (g / PFX / "govkit").mkdir(parents=True)
+            (g / PFX / "demo").mkdir(parents=True)
+            shutil.copy2(HERE / "govkit.py", g / PFX / "govkit" / "govkit.py")
+            shutil.copy2(HERE / "adopters.toml", g / PFX / "govkit" / "adopters.toml")  # arm 10 refuses a gov without it
+            (g / PFX / "govkit" / "registry.toml").write_text(A13_REG, encoding="utf-8",
                                                                   newline="\n")
-            (g / "tools" / "demo" / "kit.toml").write_text(kit_toml, encoding="utf-8", newline="\n")
+            (g / PFX / "demo" / "kit.toml").write_text(kit_toml, encoding="utf-8", newline="\n")
             git(g, "init", "-q", "-b", "main")
             git(g, "config", "user.email", "t@e")
             git(g, "config", "user.name", "t")
@@ -9857,7 +9877,7 @@ user_skills = "/tmp/gk-fake-skills"
             shas: list[str] = []
             for i, wave in enumerate(waves):
                 for rel, body in wave.items():
-                    p = g / "tools" / "demo" / rel
+                    p = g / PFX / "demo" / rel
                     p.parent.mkdir(parents=True, exist_ok=True)
                     p.write_text(body, encoding="utf-8", newline="\n")
                 git(g, "add", "-A")
@@ -9918,7 +9938,7 @@ user_skills = "/tmp/gk-fake-skills"
         # ---- moves on in wave 2, so the target's copies attribute to wave 1 and the two vintages
         # ---- are genuinely different. `ladder.py` is the AC5 discriminator, built below.
         _W1 = {"verbatim-one.py": "v1\n", "eol-one.py": "e1\n",
-               "moved-one.py": "row: tools/demo/thing\n", "stranger.py": "s1\n",
+               "moved-one.py": f"row: {PFX}demo/thing\n", "stranger.py": "s1\n",
                "forked-one.py": "f1\n",
                # AC5: at wave 1 this is BYTE-IDENTICAL to what the target holds (verbatim), and at
                # wave 2 it is the same text spelling GOV's own directory, which the needle map
@@ -9926,7 +9946,7 @@ user_skills = "/tmp/gk-fake-skills"
                # `relocate`; rung-major must pick wave 1 at `verbatim`.
                "ladder.py": "row: scripts/demo/thing\n"}
         _W2 = {"verbatim-one.py": "v2\n", "eol-one.py": "e2\n", "stranger.py": "s2\n",
-               "forked-one.py": "f2\n", "ladder.py": "row: tools/demo/thing\n"}
+               "forked-one.py": "f2\n", "ladder.py": f"row: {PFX}demo/thing\n"}
         _g13, _sh13 = a13_gov("ladder", [_W1, _W2], a13_kit())
         _t13 = a13_target("ladder", "scripts", {
             "scripts/demo/verbatim-one.py": b"v1\n",
@@ -9996,7 +10016,7 @@ user_skills = "/tmp/gk-fake-skills"
         # ---- first `update --write` raw-overwrites every carried edit at exit 0.
         _rel = a13_row(_rec13, "scripts/demo/moved-one.py")
         _gov_blob = subprocess.run(
-            ["git", "-C", str(_g13), "rev-parse", f"{_rel.get('commit')}:tools/demo/moved-one.py"],
+            ["git", "-C", str(_g13), "rev-parse", f"{_rel.get('commit')}:{PFX}demo/moved-one.py"],
             capture_output=True, text=True).stdout.strip()
         _tgt_blob = subprocess.run(
             ["git", "-C", str(_t13), "rev-parse", ":scripts/demo/moved-one.py"],
@@ -10180,22 +10200,22 @@ user_skills = "/tmp/gk-fake-skills"
         # and an arm that pretended to measure one would be asserting nothing. What IS gateable is
         # the shape of the join: which rows are eligible, what answers "does the target have it",
         # and that a clean run says `gap 0` out loud.
-        A4_REG = ('[surface]\nglobs = ["tools/*"]\n\n'
+        A4_REG = ('[surface]\nglobs = ["{prefix}/*"]\n\n'
                   '[selection]\ndefault = ["demo"]\n\n'
-                  '[[entry]]\nid = "demo"\ndescriptor = "tools/demo/kit.toml"\n\n'
-                  '[[exempt]]\npath = "tools/govkit"\nwhy = "the deployer itself"\n')
+                  '[[entry]]\nid = "demo"\ndescriptor = "{prefix}/demo/kit.toml"\n\n'
+                  '[[exempt]]\npath = "{prefix}/govkit"\nwhy = "the deployer itself"\n')
 
         def a4_gov(tag: str, kit_toml: str, srcs: dict[str, str]) -> pathlib.Path:
             g = tmp / f"a4-{tag}"
-            (g / "tools" / "govkit").mkdir(parents=True)
-            (g / "tools" / "demo").mkdir(parents=True)
-            shutil.copy2(HERE / "govkit.py", g / "tools" / "govkit" / "govkit.py")
-            shutil.copy2(HERE / "adopters.toml", g / "tools" / "govkit" / "adopters.toml")  # arm 10 refuses a gov without it
-            (g / "tools" / "govkit" / "registry.toml").write_text(A4_REG, encoding="utf-8",
+            (g / PFX / "govkit").mkdir(parents=True)
+            (g / PFX / "demo").mkdir(parents=True)
+            shutil.copy2(HERE / "govkit.py", g / PFX / "govkit" / "govkit.py")
+            shutil.copy2(HERE / "adopters.toml", g / PFX / "govkit" / "adopters.toml")  # arm 10 refuses a gov without it
+            (g / PFX / "govkit" / "registry.toml").write_text(A4_REG, encoding="utf-8",
                                                                   newline="\n")
-            (g / "tools" / "demo" / "kit.toml").write_text(kit_toml, encoding="utf-8", newline="\n")
+            (g / PFX / "demo" / "kit.toml").write_text(kit_toml, encoding="utf-8", newline="\n")
             for rel, body in srcs.items():
-                pth = g / "tools" / "demo" / rel
+                pth = g / PFX / "demo" / rel
                 pth.parent.mkdir(parents=True, exist_ok=True)
                 pth.write_text(body, encoding="utf-8", newline="\n")
             git(g, "init", "-q", "-b", "main")
@@ -10217,7 +10237,7 @@ user_skills = "/tmp/gk-fake-skills"
             m = _re.search(r"coverage: gap (\d+) of (\d+) write row\(s\)", out)
             return int(m.group(1)) if m else None
 
-        _A4_KIT = ('id = "demo"\nhome = "tools/demo"\n'
+        _A4_KIT = ('id = "demo"\nhome = "demo"\n'
                    'version_from = { none = "fixture" }\n\n'
                    '[check]\nnone = "a fixture kit"\n\n'
                    '[[files]]\ninclude = "**"\nrole = "engine"\n\n'
@@ -10262,7 +10282,7 @@ user_skills = "/tmp/gk-fake-skills"
               _p4g.returncode == 0, f"rc {_p4g.returncode}")
         check("[-4] S1 ...and the row names the gov source it came from, so a rename reads apart "
               "from an absence",
-              "<- tools/demo/two.py" in _p4g.stdout, _p4g.stdout)
+              f"<- {PFX}demo/two.py" in _p4g.stdout, _p4g.stdout)
         # THE INDEX, NOT THE WORKTREE. An untracked file sitting at the destination is not a file
         # the target holds, and this is the arm that says which of the two answers.
         (_t4gap / "scripts" / "demo" / "two.py").write_bytes(b"2\n")
@@ -10279,7 +10299,7 @@ user_skills = "/tmp/gk-fake-skills"
         # ---- counted as a gap", gated over the WHOLE `ROLE_KINDS` table rather than over the one
         # ---- role that exposed it: a role added tomorrow takes its kind from that table and this
         # ---- assertion inherits the answer.
-        _A4_KIND_KIT = ('id = "demo"\nhome = "tools/demo"\n'
+        _A4_KIND_KIT = ('id = "demo"\nhome = "demo"\n'
                         'version_from = { none = "fixture" }\n\n'
                         '[check]\nnone = "a fixture kit"\n\n'
                         '[[files]]\ninclude = "**"\nrole = "engine"\n\n'
@@ -10359,7 +10379,7 @@ user_skills = "/tmp/gk-fake-skills"
         # ---- S4: ROWS, never unique destinations. Two rules resolving to ONE dest are two triage
         # ---- items, and a destination-keyed tally is what hid the single collision measured at
         # ---- the live target this unit was built for.
-        _A4_DUP_KIT = ('id = "demo"\nhome = "tools/demo"\n'
+        _A4_DUP_KIT = ('id = "demo"\nhome = "demo"\n'
                        'version_from = { none = "fixture" }\n\n'
                        '[check]\nnone = "a fixture kit"\n\n'
                        '[[files]]\ninclude = "one.py"\nrole = "engine"\nto = "shared/collide.py"\n\n'
@@ -10743,7 +10763,7 @@ user_skills = "/tmp/gk-fake-skills"
         _h3t = make_target(tmp / 'h3-order', None)
         (_h3t / '.governance').mkdir(parents=True, exist_ok=True)
         (_h3t / '.governance' / 'deploy.toml').write_text(
-            'gov_source = "local"\nprefix = "tools"\n'
+            f'gov_source = "local"\nprefix = "{PFX[:-1]}"\n'
             'kits = ["check-wiring", "memory-tree"]\n\n[answers]\n'
             'memory_root = "../../ESCAPED"\n', encoding='utf-8', newline='\n')
         settle(_h3t, 'a two-kit selection escaping on the SECOND entry')
@@ -10867,7 +10887,7 @@ user_skills = "/tmp/gk-fake-skills"
         #
         # THE ARM THAT MISSED IT declared `"ok": True` on its synthetic descriptor — the one shape
         # no shipped kit has. So this fixture is built to match the CORPUS instead: `code = 0`, a
-        # probe, and no `ok`. Measured against tools/lexicon/kit.toml, which is exactly this shape.
+        # probe, and no `ok`. Measured against <prefix>/lexicon/kit.toml, which is exactly this shape.
         _k5d = {"outcome": [{"code": 0, "means": "adopted",
                              "probe": {"must_exist": ["{kit}/marker.txt"]}}]}
         _k5r = pathlib.Path(__import__("tempfile").mkdtemp())
@@ -10918,7 +10938,7 @@ user_skills = "/tmp/gk-fake-skills"
         # of 31 real NicoCares candidates as layout carriage.
         _k6GKC = govkit_module()
         # Class 4: the same line with a path rewritten, and nothing else.
-        _k6g4 = "load('tools/hooks/agent-cap.js')" + chr(10) + "x = 1" + chr(10)
+        _k6g4 = f"load('{PFX}hooks/agent-cap.js')" + chr(10) + "x = 1" + chr(10)
         _k6a4 = "load('scripts/hooks/agent-cap.js')" + chr(10) + "x = 1" + chr(10)
         _k6c4, _k6w4 = _k6GKC.contrib_propose_class({"path": "a.js", "gov_path": "a.js"}, _k6g4, _k6a4, "nc")
         check("[-6] a change that is only a repath proposes class 4", _k6c4 == 4, f"{_k6c4}: {_k6w4}")
@@ -10928,7 +10948,7 @@ user_skills = "/tmp/gk-fake-skills"
         _k6g4b = "x = 1" + chr(10)
         _k6a4b = "x = 2" + chr(10)
         _k6c4b, _k6w4b = _k6GKC.contrib_propose_class(
-            {"path": "scripts/a.js", "gov_path": "tools/a.js"}, _k6g4b, _k6a4b, "nc")
+            {"path": "scripts/a.js", "gov_path": f"{PFX}a.js"}, _k6g4b, _k6a4b, "nc")
         check("[-6] a real change at a repathed DESTINATION is not class 4",
               _k6c4b != 4, f"{_k6c4b}: {_k6w4b}")
         # Class 3: an added line naming the tree itself.
@@ -11280,23 +11300,23 @@ user_skills = "/tmp/gk-fake-skills"
         # only kit there was, the branch never ran, and the arm passed on the exit code alone. That
         # is `fixture-passes-by-finding-nothing`, in an arm written for a review finding.
         _g5sib = tmp / "a5-sibling"
-        (_g5sib / "tools" / "govkit").mkdir(parents=True)
-        (_g5sib / "tools" / "demo").mkdir(parents=True)
-        (_g5sib / "tools" / "sib").mkdir(parents=True)
-        shutil.copy2(HERE / "govkit.py", _g5sib / "tools" / "govkit" / "govkit.py")
-        shutil.copy2(HERE / "adopters.toml", _g5sib / "tools" / "govkit" / "adopters.toml")  # arm 10 refuses a gov without it
-        (_g5sib / "tools" / "govkit" / "registry.toml").write_text(
-            '[surface]\nglobs = ["tools/*"]\n\n[selection]\ndefault = ["demo", "sib"]\n\n'
-            '[[entry]]\nid = "demo"\ndescriptor = "tools/demo/kit.toml"\n\n'
-            '[[entry]]\nid = "sib"\ndescriptor = "tools/sib/kit.toml"\n\n'
-            '[[exempt]]\npath = "tools/govkit"\nwhy = "the deployer itself"\n',
+        (_g5sib / PFX / "govkit").mkdir(parents=True)
+        (_g5sib / PFX / "demo").mkdir(parents=True)
+        (_g5sib / PFX / "sib").mkdir(parents=True)
+        shutil.copy2(HERE / "govkit.py", _g5sib / PFX / "govkit" / "govkit.py")
+        shutil.copy2(HERE / "adopters.toml", _g5sib / PFX / "govkit" / "adopters.toml")  # arm 10 refuses a gov without it
+        (_g5sib / PFX / "govkit" / "registry.toml").write_text(
+            '[surface]\nglobs = ["{prefix}/*"]\n\n[selection]\ndefault = ["demo", "sib"]\n\n'
+            '[[entry]]\nid = "demo"\ndescriptor = "{prefix}/demo/kit.toml"\n\n'
+            '[[entry]]\nid = "sib"\ndescriptor = "{prefix}/sib/kit.toml"\n\n'
+            '[[exempt]]\npath = "{prefix}/govkit"\nwhy = "the deployer itself"\n',
             encoding="utf-8", newline="\n")
         for _e in ("demo", "sib"):
-            (_g5sib / "tools" / _e / "kit.toml").write_text(
+            (_g5sib / PFX / _e / "kit.toml").write_text(
                 _A4_KIT.replace('id = "demo"', f'id = "{_e}"').replace(
-                    'home = "tools/demo"', f'home = "tools/{_e}"'),
+                    'home = "demo"', f'home = "{_e}"'),
                 encoding="utf-8", newline="\n")
-            (_g5sib / "tools" / _e / "one.py").write_text("1\n", encoding="utf-8", newline="\n")
+            (_g5sib / PFX / _e / "one.py").write_text("1\n", encoding="utf-8", newline="\n")
         git(_g5sib, "init", "-q", "-b", "main")
         git(_g5sib, "config", "user.email", "t@e")
         git(_g5sib, "config", "user.name", "t")
@@ -11650,15 +11670,15 @@ user_skills = "/tmp/gk-fake-skills"
         # GUARDS, whether they matched a tracked path — while never asking the same question of the
         # thing the leg actually EXECUTES. So gov could hand an adopter a leg row naming a file gov
         # never ships, record it in the receipt as emitted coverage, and nothing would say so.
-        A6_REG = ('[surface]\nglobs = ["tools/*"]\n\n'
+        A6_REG = ('[surface]\nglobs = ["{prefix}/*"]\n\n'
                   '[selection]\ndefault = ["demo"]\n\n'
-                  '[[entry]]\nid = "demo"\ndescriptor = "tools/demo/kit.toml"\n\n'
-                  '[[exempt]]\npath = "tools/govkit"\nwhy = "the deployer itself"\n')
+                  '[[entry]]\nid = "demo"\ndescriptor = "{prefix}/demo/kit.toml"\n\n'
+                  '[[exempt]]\npath = "{prefix}/govkit"\nwhy = "the deployer itself"\n')
 
         def a6_kit(leg_argv: str) -> str:
             """The fixture kit: one engine rule, a `[gate_runner]` seed so the target gets a
             manifest to emit into, and ONE gate leg whose argv the caller writes."""
-            return ('id = "demo"\nhome = "tools/demo"\n'
+            return ('id = "demo"\nhome = "demo"\n'
                     'version_from = { none = "fixture" }\n\n'
                     '[check]\nnone = "a fixture kit"\n\n'
                     '[[files]]\ninclude = "**"\nrole = "engine"\n\n'
@@ -11670,15 +11690,15 @@ user_skills = "/tmp/gk-fake-skills"
 
         def a6_gov(tag: str, leg_argv: str) -> pathlib.Path:
             g = tmp / f"a6-{tag}"
-            (g / "tools" / "govkit").mkdir(parents=True)
-            (g / "tools" / "demo").mkdir(parents=True)
-            shutil.copy2(HERE / "govkit.py", g / "tools" / "govkit" / "govkit.py")
-            shutil.copy2(HERE / "adopters.toml", g / "tools" / "govkit" / "adopters.toml")  # arm 10 refuses a gov without it
-            (g / "tools" / "govkit" / "registry.toml").write_text(A6_REG, encoding="utf-8",
+            (g / PFX / "govkit").mkdir(parents=True)
+            (g / PFX / "demo").mkdir(parents=True)
+            shutil.copy2(HERE / "govkit.py", g / PFX / "govkit" / "govkit.py")
+            shutil.copy2(HERE / "adopters.toml", g / PFX / "govkit" / "adopters.toml")  # arm 10 refuses a gov without it
+            (g / PFX / "govkit" / "registry.toml").write_text(A6_REG, encoding="utf-8",
                                                                   newline="\n")
-            (g / "tools" / "demo" / "kit.toml").write_text(a6_kit(leg_argv), encoding="utf-8",
+            (g / PFX / "demo" / "kit.toml").write_text(a6_kit(leg_argv), encoding="utf-8",
                                                            newline="\n")
-            (g / "tools" / "demo" / "present-engine.sh").write_text("exit 0\n", encoding="utf-8",
+            (g / PFX / "demo" / "present-engine.sh").write_text("exit 0\n", encoding="utf-8",
                                                                     newline="\n")
             git(g, "init", "-q", "-b", "main")
             git(g, "config", "user.email", "t@e")
@@ -11924,7 +11944,7 @@ user_skills = "/tmp/gk-fake-skills"
         settle(_t22, "applied at vintage one")
         # GOV SHIPS THE NEW VINTAGE: the third element leaves the descriptor. That is the shape this
         # build itself shipped, and it is what wedged every adopter who had applied the older one.
-        (_g22 / "tools" / "demo" / "kit.toml").write_text(
+        (_g22 / PFX / "demo" / "kit.toml").write_text(
             a6_kit('["bash", "{prefix}/demo/present-engine.sh"]'), encoding="utf-8", newline="\n")
         settle(_g22, "gov drops the third element from the leg's argv")
         _u22 = run_in_gov(_g22, "update", "--target", str(_t22), "--write")
@@ -12056,7 +12076,7 @@ user_skills = "/tmp/gk-fake-skills"
         import tomllib as _pvtoml  # noqa: PLC0415
 
         def run_pv_govkit(g: pathlib.Path, *args: str, env: dict | None = None) -> subprocess.CompletedProcess:
-            return subprocess.run([sys.executable, str(g / "tools" / "govkit" / "govkit.py"), *args],
+            return subprocess.run([sys.executable, str(g / PFX / "govkit" / "govkit.py"), *args],
                                   capture_output=True, text=True, env=env)
 
         # THE REAL RENDERER AND THE ARGV THE REAL DESCRIPTOR DECLARES FOR IT. Read, never restated: a
@@ -12067,7 +12087,7 @@ user_skills = "/tmp/gk-fake-skills"
         check("[-PV] LIVENESS the real review-harness descriptor declares a regenerate argv to copy",
               bool(_pvREGEN) and "check-protocol-parity.test.sh" in " ".join(_pvREGEN), str(_pvREGEN))
 
-        _pvKIT_A = ('id = "review-harness"\nhome = "tools/workflows"\nversion_from = { none = "fixture" }\n\n'
+        _pvKIT_A = ('id = "review-harness"\nhome = "workflows"\nversion_from = { none = "fixture" }\n\n'
                     '[check]\nnone = "a fixture kit: nothing can measure its writes"\n\n'
                     '[[files]]\ninclude = "**"\nrole = "engine"\n\n'
                     '[[files]]\ninclude = ["unattended-build.test.sh", "review-local.txt"]\n'
@@ -12089,7 +12109,7 @@ user_skills = "/tmp/gk-fake-skills"
         # also carries a FORK, as core's recall kit does, which `adopt` prints `forked` whatever it
         # measured, and a target copy of it that matches no gov vintage (R3-8).
         # ROUND 4: notes' version marker rides in a churn file, so notes moves with churn (W2).
-        _pvNOTES_KIT = ('id = "notes"\nhome = "tools/notes"\nversion_from = { none = "fixture" }\n'
+        _pvNOTES_KIT = ('id = "notes"\nhome = "notes"\nversion_from = { none = "fixture" }\n'
                         'marker_carriers = ["{prefix}/churn/notes-mark.txt"]\n\n'
                         '[check]\nnone = "a fixture kit: nothing can measure its writes"\n\n'
                         '[[files]]\ninclude = "**"\nrole = "engine"\n\n'
@@ -12103,7 +12123,7 @@ user_skills = "/tmp/gk-fake-skills"
         # render, so neither may reach the commit block 3 makes for the renders.
         # ROUND 4: its version marker rides in a review-harness file, as drift-audit's two workflow
         # harnesses do at both consumers, so a pull scoped to review-harness must carry it (W2).
-        _pvCHURN_KIT = ('id = "churn"\nhome = "tools/churn"\nversion_from = { none = "fixture" }\n'
+        _pvCHURN_KIT = ('id = "churn"\nhome = "churn"\nversion_from = { none = "fixture" }\n'
                         'marker_carriers = ["{prefix}/workflows/churn-mark.txt"]\n\n'
                         '[check]\nnone = "a fixture kit: nothing can measure its writes"\n\n'
                         '[[files]]\ninclude = "**"\nrole = "engine"\n\n'
@@ -12113,7 +12133,7 @@ user_skills = "/tmp/gk-fake-skills"
         # (W1, W3). It ships a SEED under the memory root that the consumer never kept, so every
         # unscoped update lands it, and core's hygiene refuses a commit that adds it. Its version
         # moves between A and B, so a re-adopt pinning its rows at A must not report B's version.
-        _pvSEEDY_KIT = ('id = "seedy"\nhome = "tools/seedy"\n'
+        _pvSEEDY_KIT = ('id = "seedy"\nhome = "seedy"\n'
                         'version_from = { file = "seedy.sh", pattern = "^SEEDY_VERSION=" }\n\n'
                         '[check]\nnone = "a fixture kit: nothing can measure its writes"\n\n'
                         '[[files]]\ninclude = "**"\nrole = "engine"\n\n'
@@ -12122,9 +12142,9 @@ user_skills = "/tmp/gk-fake-skills"
                         '[adopt]\nargv = []\nmutates_index = false\n')
         _pvCHURN_SH = ('d=$(dirname "$0")\nrm -f "$d/gone.txt"\n'
                        'printf \'a line a regenerate appended\\n\' >> "$d/edit.txt"\n')
-        _pvH_A = ("// harness v1\nconst DRIVER = 'bash tools/unattended/unattended.sh'\n"
-                  "const CHECKLIST = 'python tools/memory-tree/gotchas.py --for-diff HEAD~1..HEAD'\n"
-                  "const REVIEW = 'tools/workflows/tier2-review.js'\n")
+        _pvH_A = (f"// harness v1\nconst DRIVER = 'bash {PFX}unattended/unattended.sh'\n"
+                  f"const CHECKLIST = 'python {PFX}memory-tree/gotchas.py --for-diff HEAD~1..HEAD'\n"
+                  f"const REVIEW = '{PFX}workflows/tier2-review.js'\n")
         _pvH_B = _pvH_A.replace("harness v1", "harness v2")
         _pvT_B = ("// harness v2\nconst DRIVER = 'bash {{TOOL_ROOT}}unattended/unattended.sh'\n"
                   "const CHECKLIST = 'python {{MEMORY_TREE_DIR}}/gotchas.py --for-diff HEAD~1..HEAD'\n"
@@ -12155,16 +12175,16 @@ user_skills = "/tmp/gk-fake-skills"
 
         def build_pv_gov():
             g = tmp / "pv-gov"
-            (g / "tools" / "govkit").mkdir(parents=True)
-            shutil.copy2(GOVKIT, g / "tools" / "govkit" / "govkit.py")
-            shutil.copy2(GOVKIT.parent / "adopters.toml", g / "tools" / "govkit" / "adopters.toml")  # arm 10 refuses a gov without it
-            (g / "tools" / "govkit" / "registry.toml").write_text(
-                '[surface]\nglobs = ["tools/*"]\n\n[selection]\ndefault = ["review-harness"]\n\n'
-                '[[entry]]\nid = "review-harness"\ndescriptor = "tools/workflows/kit.toml"\n\n'
-                '[[entry]]\nid = "notes"\ndescriptor = "tools/notes/kit.toml"\n\n'
-                '[[entry]]\nid = "churn"\ndescriptor = "tools/churn/kit.toml"\n\n'
-                '[[entry]]\nid = "seedy"\ndescriptor = "tools/seedy/kit.toml"\n\n'
-                '[[exempt]]\npath = "tools/govkit"\nwhy = "the deployer itself"\n',
+            (g / PFX / "govkit").mkdir(parents=True)
+            shutil.copy2(GOVKIT, g / PFX / "govkit" / "govkit.py")
+            shutil.copy2(GOVKIT.parent / "adopters.toml", g / PFX / "govkit" / "adopters.toml")  # arm 10 refuses a gov without it
+            (g / PFX / "govkit" / "registry.toml").write_text(
+                '[surface]\nglobs = ["{prefix}/*"]\n\n[selection]\ndefault = ["review-harness"]\n\n'
+                '[[entry]]\nid = "review-harness"\ndescriptor = "{prefix}/workflows/kit.toml"\n\n'
+                '[[entry]]\nid = "notes"\ndescriptor = "{prefix}/notes/kit.toml"\n\n'
+                '[[entry]]\nid = "churn"\ndescriptor = "{prefix}/churn/kit.toml"\n\n'
+                '[[entry]]\nid = "seedy"\ndescriptor = "{prefix}/seedy/kit.toml"\n\n'
+                '[[exempt]]\npath = "{prefix}/govkit"\nwhy = "the deployer itself"\n',
                 encoding="utf-8", newline="\n")
             for _kd, _files in (("workflows", (("kit.toml", _pvKIT_A), ("unattended-build.js", _pvH_A),
                                                ("REVIEW-PROTOCOL.template.md", _pvPROTO_T),
@@ -12184,17 +12204,17 @@ user_skills = "/tmp/gk-fake-skills"
                                            ("edit.txt", "edit\n"))),
                                 ("seedy", (("kit.toml", _pvSEEDY_KIT), ("seedy.sh", "SEEDY_VERSION=1.0\n"),
                                            ("loops.seed.txt", "a site gov's own tree carries\n")))):
-                (g / "tools" / _kd).mkdir(parents=True, exist_ok=True)
+                (g / PFX / _kd).mkdir(parents=True, exist_ok=True)
                 for _name, _body in _files:
-                    (g / "tools" / _kd / _name).write_text(_body, encoding="utf-8", newline="\n")
+                    (g / PFX / _kd / _name).write_text(_body, encoding="utf-8", newline="\n")
             shutil.copy2(_pvREAL / "check-protocol-parity.test.sh",
-                         g / "tools" / "workflows" / "check-protocol-parity.test.sh")
+                         g / PFX / "workflows" / "check-protocol-parity.test.sh")
             # TOOL-aRepatriatedFork-7 residual b: the renderer asks its sibling gate's `--print-cap`
             # for FANOUT_CAP, and that gate asks the agent-cap hook, so the real kit's renderer
             # cannot run without both. The sibling ships in the kit as it does in the real one; the
             # hook is the target's own, see `seed_pv_hook`.
             shutil.copy2(_pvREAL / "check-verifier-fanout.sh",
-                         g / "tools" / "workflows" / "check-verifier-fanout.sh")
+                         g / PFX / "workflows" / "check-verifier-fanout.sh")
             git(g, "init", "-q", "-b", "main")
             git(g, "config", "user.email", "t@e")
             git(g, "config", "user.name", "t")
@@ -12250,8 +12270,8 @@ user_skills = "/tmp/gk-fake-skills"
             settle(t, "the install at A, and a local edit")
             return t
 
-        _pvKITDIRS = {"review-harness": ("tools/workflows", _pvW), "notes": ("tools/notes", "scripts/notes"),
-                      "churn": ("tools/churn", "scripts/churn"), "seedy": ("tools/seedy", "scripts/seedy")}
+        _pvKITDIRS = {"review-harness": (f"{PFX}workflows", _pvW), "notes": (f"{PFX}notes", "scripts/notes"),
+                      "churn": (f"{PFX}churn", "scripts/churn"), "seedy": (f"{PFX}seedy", "scripts/seedy")}
 
         def build_pv_bootstrap(g, name, kits=("review-harness", "notes", "churn", "seedy"), harness_edit=None,
                                template_fork=None):
@@ -12469,7 +12489,7 @@ user_skills = "/tmp/gk-fake-skills"
         _pvtf = build_pv_target(_pvg, "pv-tf")
         _pvtc = build_pv_target(_pvg, "pv-tc")
         # THE CONFLICT: this tree's harness edit sits on the line beside the one gov changes at B.
-        _pvXEDIT = _pvH_A.replace("'bash tools/unattended/unattended.sh'",
+        _pvXEDIT = _pvH_A.replace(f"'bash {PFX}unattended/unattended.sh'",
                                   "'bash vendor/driver.sh' // this tree's own")
         _pvtx = build_pv_target(_pvg, "pv-tx", harness_edit=_pvXEDIT)
         _pvtm = build_pv_target(_pvg, "pv-tm")
@@ -12558,24 +12578,24 @@ user_skills = "/tmp/gk-fake-skills"
         # VINTAGE B: gov keeps tracking its own render at the old path and edits it, adds the template,
         # claims the destination `rendered`, and declares the regenerate. The notes template moves, and
         # so does a churn file, so that kit is touched and its regenerate runs.
-        _pvd = _pvg / "tools" / "workflows"
+        _pvd = _pvg / PFX / "workflows"
         (_pvd / "kit.toml").write_text(_pvKIT_B, encoding="utf-8", newline="\n")
         (_pvd / "unattended-build.template.js").write_text(_pvT_B, encoding="utf-8", newline="\n")
         (_pvd / "unattended-build.js").write_text(_pvH_B, encoding="utf-8", newline="\n")
-        (_pvg / "tools" / "notes" / "notes.template.md").write_text(
+        (_pvg / PFX / "notes" / "notes.template.md").write_text(
             "notes v2 for {{KIT_DIR}}\n", encoding="utf-8", newline="\n")
-        (_pvg / "tools" / "churn" / "keep.txt").write_text("keep v2\n", encoding="utf-8", newline="\n")
+        (_pvg / PFX / "churn" / "keep.txt").write_text("keep v2\n", encoding="utf-8", newline="\n")
         # ROUND 4: the protocol template, a file one consumer edits, and the out-of-release kit move.
         (_pvd / "REVIEW-PROTOCOL.template.md").write_text(_pvPROTO_TB, encoding="utf-8", newline="\n")
         (_pvd / "check-local.sh").write_text(_pvLOCAL_B, encoding="utf-8", newline="\n")
-        (_pvg / "tools" / "seedy" / "seedy.sh").write_text("SEEDY_VERSION=1.1\n", encoding="utf-8",
+        (_pvg / PFX / "seedy" / "seedy.sh").write_text("SEEDY_VERSION=1.1\n", encoding="utf-8",
                                                            newline="\n")
         settle(_pvg, "B: the harness is rendered, and gov keeps its own render tracked")
         _pvB = gout(_pvg, "rev-parse", "HEAD").strip()
-        _pvGOV_H_B = gout(_pvg, "rev-parse", "HEAD:tools/workflows/unattended-build.js").strip()
+        _pvGOV_H_B = gout(_pvg, "rev-parse", f"HEAD:{PFX}workflows/unattended-build.js").strip()
         _pvdiff = gout(_pvg, "diff", "--name-status", "--find-renames", "HEAD~1", "HEAD")
         check("[-PV] PRECONDITION the template is an ADD in gov's diff, not a rename",
-              "\nR" not in "\n" + _pvdiff and "A\ttools/workflows/unattended-build.template.js" in _pvdiff,
+              "\nR" not in "\n" + _pvdiff and f"A\t{PFX}workflows/unattended-build.template.js" in _pvdiff,
               _pvdiff)
 
         # ---- R3-3's STARTING STATE. The consumer took its routine pull first: a flag-off `update
@@ -12641,7 +12661,7 @@ user_skills = "/tmp/gk-fake-skills"
         _pvrow1 = read_pv_row(_pvt, _pvH)
         check("[-PV] F1 PRECONDITION after `update` alone the row is still `engine`, naming gov's "
               "tracked render as its source", _pvrow1.get("role") == "engine"
-              and _pvrow1.get("source") == "tools/workflows/unattended-build.js", str(_pvrow1))
+              and _pvrow1.get("source") == f"{PFX}workflows/unattended-build.js", str(_pvrow1))
         check("[-PV] F1 PRECONDITION ...and the INDEX holds gov's own render, not this target's",
               gout(_pvt, "ls-files", "-s", "--", _pvH).split()[1:2] == [_pvGOV_H_B],
               gout(_pvt, "ls-files", "-s", "--", _pvH))
@@ -12674,7 +12694,7 @@ user_skills = "/tmp/gk-fake-skills"
         _pvrow2 = read_pv_row(_pvt, _pvH)
         check("[-PV] F1 after the migration the row is `rendered`, sourced from the template",
               _pvrow2.get("role") == "rendered" and _pvrow2.get("evidence") == "pinned"
-              and _pvrow2.get("source") == "tools/workflows/unattended-build.template.js", str(_pvrow2))
+              and _pvrow2.get("source") == f"{PFX}workflows/unattended-build.template.js", str(_pvrow2))
         check("[-PV] F1 ...and the index holds THIS target's render, which the receipt records",
               gout(_pvt, "ls-files", "-s", "--", _pvH).split()[1:2]
               == [gout(_pvt, "hash-object", "--", _pvH).strip()] == [_pvrow2.get("oid")]
@@ -13145,7 +13165,7 @@ user_skills = "/tmp/gk-fake-skills"
             return seed_toml.load(fh)
 
     def run_govkit(*args: str) -> subprocess.CompletedProcess:
-        return subprocess.run([sys.executable, str(_gov / "tools" / "govkit" / "govkit.py"), *args],
+        return subprocess.run([sys.executable, str(_gov / PFX / "govkit" / "govkit.py"), *args],
                               capture_output=True, text=True)
 
     # ---- THE OBSERVED-STATE TABLE IS THE ONE SPELLING OF IT ---------------------------------
@@ -13197,7 +13217,7 @@ user_skills = "/tmp/gk-fake-skills"
         check("LIVENESS: without the held template that leg holds no state at all",
               "a kit self-test" not in _got2, str(_got2))
 
-    reg = load_seed_toml(_gov / "tools" / "govkit" / "registry.toml")
+    reg = load_seed_toml(_gov / PFX / "govkit" / "registry.toml")
     seeded = []
     for e in reg.get("entry", []):
         d = load_seed_toml(_gov / e["descriptor"])
@@ -13348,20 +13368,20 @@ user_skills = "/tmp/gk-fake-skills"
     with tempfile.TemporaryDirectory() as _qh:
         _qt = pathlib.Path(_qh)
         _qg = _qt / "adopter"
-        (_qg / "tools").mkdir(parents=True, exist_ok=True)
-        (_qg / "tools" / "legs.json").write_text(
+        (_qg / PFX).mkdir(parents=True, exist_ok=True)
+        (_qg / PFX / "legs.json").write_text(
             json.dumps([{"name": "control", "argv": ["true"]}], indent=2) + "\n",
             encoding="utf-8", newline="\n")
         (_qg / ".governance").mkdir(exist_ok=True)
         (_qg / ".governance" / "deploy.toml").write_text(
-            'gov_source = "local"\nprefix = "tools"\n'
+            f'gov_source = "local"\nprefix = "{PFX[:-1]}"\n'
             # settings-merge is DECLARED by agent-cap as a dependency, and govkit refuses a
             # selection that omits it rather than widening one on the caller's behalf.
             'kits = ["agent-cap", "settings-merge"]\n\n'
             '[answers]\nmemory_root = "memory"\n\n'
-            '[gate_runner]\nkind = "manifest"\nfile = "tools/legs.json"\n'
+            f'[gate_runner]\nkind = "manifest"\nfile = "{PFX}legs.json"\n'
             'grammar = "json-array"\ndedupe_key = "name"\n'
-            'command = ["bash", "tools/runner.sh"]\n'
+            f'command = ["bash", "{PFX}runner.sh"]\n'
             'run_all_env = { GATE_FULL = "1" }\n'
             'observed_ran = ["GATE ok    {name}"]\n'
             'observed_failed = ["GATE FAIL  {name}"]\n',
@@ -13377,20 +13397,20 @@ user_skills = "/tmp/gk-fake-skills"
         # LIVENESS FIRST, because every assertion below is about ABSENCE and absence is what a
         # broken apply also produces. If the kit's engine did not land either, the withholding
         # arms are grading a target that received nothing at all.
-        _qeng = _qg / "tools" / "hooks" / "agent-cap.js"
+        _qeng = _qg / PFX / "hooks" / "agent-cap.js"
         check("aQuenchedHarness-3 LIVENESS: the kit's ENGINE landed, so the absence arms below "
               "are about withholding and not about an apply that did nothing",
-              _qeng.is_file(), str(sorted(p.name for p in (_qg / "tools").rglob("*"))))
+              _qeng.is_file(), str(sorted(p.name for p in (_qg / PFX).rglob("*"))))
 
         # AC1 — the self-test FILES are withheld.
         for _qf in ("agent-cap.test.sh", "scratch-guard.test.sh"):
             check(f"aQuenchedHarness-3 AC1: {_qf} is NOT in the adopter's tree",
-                  not (_qg / "tools" / "hooks" / _qf).is_file(),
-                  str(sorted(p.name for p in (_qg / "tools" / "hooks").glob("*"))))
+                  not (_qg / PFX / "hooks" / _qf).is_file(),
+                  str(sorted(p.name for p in (_qg / PFX / "hooks").glob("*"))))
 
         # AC2 — and no emitted leg NAMES one of those paths. This is the join: a manifest row
         # pointing at a file the target never received is a leg that can only ever red.
-        _qlegs = json.loads((_qg / "tools" / "legs.json").read_text(encoding="utf-8"))
+        _qlegs = json.loads((_qg / PFX / "legs.json").read_text(encoding="utf-8"))
         _qbad = [r for r in _qlegs
                  if any(".test.sh" in str(a) or "selftest.py" in str(a) for a in r.get("argv", []))]
         check("aQuenchedHarness-3 AC2: no emitted leg's argv names a withheld self-test path",
@@ -13417,10 +13437,10 @@ user_skills = "/tmp/gk-fake-skills"
         # ADOPTER's own tree and must keep shipping; a rule that claimed them would silence legs
         # an adopter needs, and every arm above would still pass.
         _qmt = _qt / "adopter2"
-        (_qmt / "tools").mkdir(parents=True, exist_ok=True)
+        (_qmt / PFX).mkdir(parents=True, exist_ok=True)
         (_qmt / ".governance").mkdir(exist_ok=True)
         (_qmt / ".governance" / "deploy.toml").write_text(
-            'gov_source = "local"\nprefix = "tools"\nkits = ["memory-tree"]\n\n'
+            f'gov_source = "local"\nprefix = "{PFX[:-1]}"\nkits = ["memory-tree"]\n\n'
             '[answers]\nmemory_root = "memory"\n',
             encoding="utf-8", newline="\n")
         git(_qmt, "init", "-q", "-b", "main"); git(_qmt, "config", "user.email", "t@e")
@@ -13428,18 +13448,18 @@ user_skills = "/tmp/gk-fake-skills"
         git(_qmt, "add", "-A"); git(_qmt, "commit", "-qm", "base")
         _qm = run("apply", "--target", str(_qmt), "--kits", "memory-tree")
         if _qm.returncode == 0:
-            _qkeep = _qmt / "tools" / "memory-tree" / "kit-dogfood-parity.test.sh"
+            _qkeep = _qmt / PFX / "memory-tree" / "kit-dogfood-parity.test.sh"
             # check-verdict-epoch.test.sh, not check-memory-hygiene.test.sh: TOOL-aRepatriatedFork-18
             # S1 ships every self-test that is a shipped gate's check-arms sibling, and the hygiene
             # gate's is one. This suite arms no shipped gate, so the withholding rule still takes it.
-            _qdrop = _qmt / "tools" / "memory-tree" / "check-verdict-epoch.test.sh"
+            _qdrop = _qmt / PFX / "memory-tree" / "check-verdict-epoch.test.sh"
             check("aQuenchedHarness-3 AC4: kit-dogfood-parity.test.sh STILL SHIPS — its leg is "
                   "subject = repo and is graded on the adopter's own tree",
                   _qkeep.is_file(),
-                  str(sorted(p.name for p in (_qmt / "tools" / "memory-tree").glob("*.test.sh"))))
+                  str(sorted(p.name for p in (_qmt / PFX / "memory-tree").glob("*.test.sh"))))
             check("aQuenchedHarness-3 AC4b: while the kit's own self-test beside it does not",
                   not _qdrop.is_file(),
-                  str(sorted(p.name for p in (_qmt / "tools" / "memory-tree").glob("*.test.sh"))))
+                  str(sorted(p.name for p in (_qmt / PFX / "memory-tree").glob("*.test.sh"))))
         else:
             # ANNOUNCED, not skipped into silence: a memory-tree apply needs answers this fixture
             # does not supply on every gov revision, and a green here would be a green over an
@@ -13461,11 +13481,11 @@ user_skills = "/tmp/gk-fake-skills"
         # withheld path and the non-manifest order path — and the diffs were empty; the ledger
         # records it. What IS gradeable here is the idempotence arm below, which reds on the same
         # class: an extraction that changed row order or dropped a field.
-        M13_REG = ('[surface]\nglobs = ["tools/*"]\n\n'
+        M13_REG = ('[surface]\nglobs = ["{prefix}/*"]\n\n'
                    '[selection]\ndefault = ["demo", "demo2"]\n\n'
-                   '[[entry]]\nid = "demo"\ndescriptor = "tools/demo/kit.toml"\n\n'
-                   '[[entry]]\nid = "demo2"\ndescriptor = "tools/demo2/kit.toml"\n\n'
-                   '[[exempt]]\npath = "tools/govkit"\nwhy = "the deployer itself"\n')
+                   '[[entry]]\nid = "demo"\ndescriptor = "{prefix}/demo/kit.toml"\n\n'
+                   '[[entry]]\nid = "demo2"\ndescriptor = "{prefix}/demo2/kit.toml"\n\n'
+                   '[[exempt]]\npath = "{prefix}/govkit"\nwhy = "the deployer itself"\n')
         # The runner lives under the target's OWN prefix, which is not this repo's — the same
         # choice the `-6` fixtures above make, and for the same reason: a fixture that spells gov's
         # layout grades gov's layout.
@@ -13485,7 +13505,7 @@ user_skills = "/tmp/gk-fake-skills"
             """One fixture kit: an engine pool, one gate leg, and optionally its own `[check]`."""
             chk = ('[check]\nargv = ["bash", "{prefix}/' + eid + '/check.sh"]\n\n') if with_check \
                   else '[check]\nnone = "a fixture kit"\n\n'
-            return ('id = "%s"\nhome = "tools/%s"\n' % (eid, eid)
+            return ('id = "%s"\nhome = "%s"\n' % (eid, eid)
                     + 'version_from = { none = "fixture" }\n\n' + chk
                     + '[[files]]\ninclude = "**"\nrole = "engine"\n\n'
                     + '[[gate_leg]]\nname = "%s"\nsubject = "repo"\n' % leg
@@ -13502,20 +13522,20 @@ user_skills = "/tmp/gk-fake-skills"
             one and the arm reports on nothing.
             """
             g = tmp / ("m13-gov-" + tag)
-            (g / "tools" / "govkit").mkdir(parents=True)
-            shutil.copy2(GOVKIT, g / "tools" / "govkit" / "govkit.py")
-            shutil.copy2(GOVKIT.parent / "adopters.toml", g / "tools" / "govkit" / "adopters.toml")  # arm 10 refuses a gov without it
-            (g / "tools" / "govkit" / "registry.toml").write_text(M13_REG, encoding="utf-8",
+            (g / PFX / "govkit").mkdir(parents=True)
+            shutil.copy2(GOVKIT, g / PFX / "govkit" / "govkit.py")
+            shutil.copy2(GOVKIT.parent / "adopters.toml", g / PFX / "govkit" / "adopters.toml")  # arm 10 refuses a gov without it
+            (g / PFX / "govkit" / "registry.toml").write_text(M13_REG, encoding="utf-8",
                                                                   newline="\n")
             for eid, leg, eng, chk in (("demo", leg_name, leg_engine, with_check),
                                        ("demo2", "demo2 leg", "demo2/engine.sh", False)):
-                (g / "tools" / eid).mkdir(parents=True, exist_ok=True)
-                (g / "tools" / eid / "kit.toml").write_text(build_kit13(eid, leg, eng, chk),
+                (g / PFX / eid).mkdir(parents=True, exist_ok=True)
+                (g / PFX / eid / "kit.toml").write_text(build_kit13(eid, leg, eng, chk),
                                                             encoding="utf-8", newline="\n")
-                (g / "tools" / eid / "engine.sh").write_text("exit 0\n", encoding="utf-8",
+                (g / PFX / eid / "engine.sh").write_text("exit 0\n", encoding="utf-8",
                                                              newline="\n")
             if with_check:
-                (g / "tools" / "demo" / "check.sh").write_text("exit %d\n" % check_rc,
+                (g / PFX / "demo" / "check.sh").write_text("exit %d\n" % check_rc,
                                                                encoding="utf-8", newline="\n")
             git(g, "init", "-q", "-b", "main")
             git(g, "config", "user.email", "t@e")
@@ -13547,13 +13567,13 @@ user_skills = "/tmp/gk-fake-skills"
             """gov's NEXT vintage. `update` refuses a run that is not moving forward, so every arm
             below needs one byte to have moved — and it is deliberately the OTHER kit's byte, so
             the kit whose leg is under test moves nothing at all."""
-            (g / "tools" / "demo2" / "engine.sh").write_text("exit 0\n# moved\n",
+            (g / PFX / "demo2" / "engine.sh").write_text("exit 0\n# moved\n",
                                                              encoding="utf-8", newline="\n")
             git(g, "add", "-A")
             git(g, "commit", "-qm", msg)
 
         def run_gov13(g: pathlib.Path, *args: str) -> subprocess.CompletedProcess:
-            return subprocess.run([sys.executable, str(g / "tools" / "govkit" / "govkit.py"),
+            return subprocess.run([sys.executable, str(g / PFX / "govkit" / "govkit.py"),
                                    *args], capture_output=True, text=True)
 
         def read_legs13(t: pathlib.Path) -> list[str]:
@@ -13680,7 +13700,7 @@ user_skills = "/tmp/gk-fake-skills"
         settle(_t13e, "after apply")
         remove_leg13(_t13e, "demo leg")
         settle(_t13e, "the demo leg row deleted by hand")
-        (_g13e / "tools" / "demo" / "check.sh").write_text("exit 1\n", encoding="utf-8",
+        (_g13e / PFX / "demo" / "check.sh").write_text("exit 1\n", encoding="utf-8",
                                                             newline="\n")
         git(_g13e, "add", "-A")
         git(_g13e, "commit", "-qm", "B: the demo kit's own check goes red")
@@ -13719,12 +13739,12 @@ user_skills = "/tmp/gk-fake-skills"
         check("[-13] AC7 LIVENESS the apply left an order naming the vintage-A engine",
               "demo/engine.sh" in _order13.read_text(encoding="utf-8"),
               _order13.read_text(encoding="utf-8"))
-        (_g13g / "tools" / "demo" / "kit.toml").write_text(
+        (_g13g / PFX / "demo" / "kit.toml").write_text(
             build_kit13("demo", "demo leg", "demo/engine-v2.sh", False),
             encoding="utf-8", newline="\n")
-        (_g13g / "tools" / "demo" / "engine-v2.sh").write_text("exit 0\n", encoding="utf-8",
+        (_g13g / PFX / "demo" / "engine-v2.sh").write_text("exit 0\n", encoding="utf-8",
                                                                 newline="\n")
-        (_g13g / "tools" / "demo" / "engine.sh").unlink()
+        (_g13g / PFX / "demo" / "engine.sh").unlink()
         git(_g13g, "add", "-A")
         git(_g13g, "commit", "-qm", "B: the demo leg's engine is renamed")
         _u13g = run_gov13(_g13g, "update", "--target", str(_t13g), "--write")
@@ -13879,7 +13899,7 @@ user_skills = "/tmp/gk-fake-skills"
         check("[-21] AC1 LIVENESS the staged break matched the line it names, so a renamed or "
               "reindented replace call reds here rather than staging nothing",
               _broken21 != _gsrc21, "the engine does not spell " + _SWAP21.strip())
-        (_g21 / "tools" / "govkit" / "govkit.py").write_text(_broken21, encoding="utf-8",
+        (_g21 / PFX / "govkit" / "govkit.py").write_text(_broken21, encoding="utf-8",
                                                              newline="")
         git(_g21, "add", "-A")
         git(_g21, "commit", "-qm", "a raise staged between the temp write and the replace")
@@ -13989,8 +14009,8 @@ user_skills = "/tmp/gk-fake-skills"
         # ===== DEPL-cMendedVintage-14 — stale conflict orders are reaped, and keyed on the path ====
         #
         # THE MEASURED RED, on this block's own fixture against the engine at the parent commit:
-        # THREE rows conflicted — `tools/demo/one/conf.txt`, `tools/demo/two/conf.txt` and
-        # `tools/sib/conf.txt` — and the outbox held ONE file, `update-conflict-conf.txt.md`. The
+        # THREE rows conflicted — `<prefix>/demo/one/conf.txt`, `<prefix>/demo/two/conf.txt` and
+        # `<prefix>/sib/conf.txt` — and the outbox held ONE file, `update-conflict-conf.txt.md`. The
         # run exited 1 and named all three conflicts on stderr, so the LOSS is invisible to an exit
         # code: two of the three orders were overwritten by the third, and the only symptom is the
         # missing CONTENT. Every arm below is written against that observation.
@@ -14018,7 +14038,7 @@ user_skills = "/tmp/gk-fake-skills"
             "sib": {"files": {"conf.txt": _14R_A}},
         })
         _t14r = build_verify_target(_g14r, "reap-t", ["demo", "sib"])
-        _14R_ROWS = ("tools/demo/one/conf.txt", "tools/demo/two/conf.txt", "tools/sib/conf.txt")
+        _14R_ROWS = (f"{PFX}demo/one/conf.txt", f"{PFX}demo/two/conf.txt", f"{PFX}sib/conf.txt")
         for _rel in _14R_ROWS:
             (_t14r / _rel).write_text(_14R_T, encoding="utf-8", newline="\n")
         settle(_t14r, "the adopter edits all three rows on the line gov is about to move")
@@ -14085,7 +14105,7 @@ user_skills = "/tmp/gk-fake-skills"
 
         # ---- AC1: resolve ONE row, re-run unscoped. Its order is gone and the run says so; the
         # ---- other two are REWRITTEN by the same run, which is the migration in miniature.
-        (_t14r / "tools" / "demo" / "one" / "conf.txt").write_text(_14R_B, encoding="utf-8",
+        (_t14r / PFX / "demo" / "one" / "conf.txt").write_text(_14R_B, encoding="utf-8",
                                                                    newline="\n")
         settle(_t14r, "the operator resolves demo/one")
         _w14r2 = run_in_gov(_g14r, "update", "--target", str(_t14r), "--write")
@@ -14134,9 +14154,9 @@ user_skills = "/tmp/gk-fake-skills"
                                "keep.txt": "keep\n"}},
         })
         _t14w = build_verify_target(_g14w, "reapw-t", ["demo"])
-        for _rel in ("tools/demo/one/gone.txt", "tools/demo/two/gone.txt"):
+        for _rel in (f"{PFX}demo/one/gone.txt", f"{PFX}demo/two/gone.txt"):
             (_g14w / _rel).unlink()
-        (_g14w / "tools" / "demo" / "keep.txt").write_text("keep\nmore\n", encoding="utf-8",
+        (_g14w / PFX / "demo" / "keep.txt").write_text("keep\nmore\n", encoding="utf-8",
                                                            newline="\n")
         git(_g14w, "add", "-A")
         git(_g14w, "commit", "-qm", "B")
@@ -14148,7 +14168,7 @@ user_skills = "/tmp/gk-fake-skills"
               len(_o14w) == 2, str(_o14w))
         check("[-14R] AC3 ...each naming its own full path",
               all(p in read_order_bodies14r(_t14w, "update-withdrawn-*.md")
-                  for p in ("tools/demo/one/gone.txt", "tools/demo/two/gone.txt")), str(_o14w))
+                  for p in (f"{PFX}demo/one/gone.txt", f"{PFX}demo/two/gone.txt")), str(_o14w))
         check("[-14R] S5 ...and the reap did NOT take them with it",
               any("removed 0 stale conflict order(s)" in ln
                   for ln in read_reap_lines14r(_w14w.stdout)) and len(_o14w) == 2,

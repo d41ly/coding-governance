@@ -2,7 +2,7 @@
 # check-review-join.test.sh — self-test for BOTH U6 gates: the ref-keyed-join ban and the workflow
 # syntax parser. Exit 0 = every arm held · 1 = an arm failed.
 #
-#   bash tools/workflows/check-review-join.test.sh
+#   bash <prefix>/workflows/check-review-join.test.sh
 #
 # DISCIPLINES THIS FILE OBEYS (ported with the build, TOOL-aFoldedQuarry-7):
 #  * Every arm asserts the SPECIFIC MESSAGE the branch emits, never the process exit code alone. A
@@ -11,8 +11,25 @@
 #    repo per assertion.
 #  * `PASS` prints after the LAST arm. Upstream printed it ~150 lines early and landed a red bar
 #    because the head of the output said success.
-KIT_REL="${KIT_REL:-tools/workflows}"
 set -u
+HERE="$(cd "$(dirname "$0")" && pwd)"
+# >>> derive_self_rel — canonical copy: kit-rel.sh in gov's lib dir (byte-identical; gated)
+derive_self_rel() {
+  local _dsr_p _dsr_rel=""
+  _dsr_p=$(cd "$1" 2>/dev/null && pwd) || return 1
+  while [ ! -e "$_dsr_p/.git" ]; do
+    [ "$(dirname "$_dsr_p")" = "$_dsr_p" ] && return 1
+    _dsr_rel="$(basename "$_dsr_p")${_dsr_rel:+/$_dsr_rel}"
+    _dsr_p=$(dirname "$_dsr_p")
+  done
+  printf '%s\n' "$_dsr_rel"
+}
+# <<< derive_self_rel
+KIT_REL=$(derive_self_rel "$HERE") || { echo "check-review-join.test: not inside a git repository"; exit 2; }
+# PFX is the install prefix WITH its trailing slash, derived from where this file sits and empty
+# at a root install: every fixture and host path below is spelled through it, never through a
+# literal prefix (TOOL-aRepatriatedFork-28).
+case "$KIT_REL" in */*) PFX="${KIT_REL%/*}/" ;; *) PFX="" ;; esac
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 GATE="$KIT_REL/check-review-join.sh"
@@ -98,21 +115,21 @@ arm 'a predicate refusing its ENVIRONMENT is not a join report' 'is its own refu
 # status was read, so a builder that threw fed empty stdin to a JSON.parse whose catch exits 0 and
 # the file was recorded clean. A stub predicate returning an unclassifiable status stands in for
 # every such shape. The gate's own header preaches that a probe which cannot move must say so.
-BS="$TMP/badstatus"; mkdir -p "$BS/tools/workflows" "$BS/tools/hooks"
+BS="$TMP/badstatus"; mkdir -p "$BS/${PFX}workflows" "$BS/${PFX}hooks"
 ( cd "$BS" && git init -q . && git config user.email t@t.test && git config user.name t
   printf "export const meta = { name: 'x' }
 await log('hi')
 " > $KIT_REL/w.js
   printf 'process.exit(3)
-' > tools/hooks/agent-cap.js
+' > ${PFX}hooks/agent-cap.js
   git add -A && git commit -qm badstatus --no-verify )
 # TOOL-dRetiredFork-10: the gate resolves its predicate RELATIVE TO ITSELF now, so these
 # fixtures place it where an install actually puts it. They previously dropped it at the
-# fixture ROOT and worked only because the gate hard-coded `$ROOT/tools/hooks/` -- the very
+# fixture ROOT and worked only because the gate hard-coded `$ROOT/<prefix>/hooks/` -- the very
 # literal this unit removes. No kit installs a workflow gate at a repository root, so the old
 # shape described a layout that has never existed in any adopter.
-cp "$GATE" "$BS/tools/workflows/gate.sh"
-arm 'a status the gate cannot classify is a refusal, not a pass' 'neither clean nor a rule hit'   bash -c 'cd "$1" && bash ./tools/workflows/gate.sh' _ "$BS"
+cp "$GATE" "$BS/${PFX}workflows/gate.sh"
+arm 'a status the gate cannot classify is a refusal, not a pass' 'neither clean nor a rule hit'   bash -c 'cd "$1" && bash ./'"${PFX}workflows/gate.sh"'' _ "$BS"
 
 # ---- the gate cannot pass by looking at nothing --------------------------------------------------
 arm 'an empty scan is not a pass' 'nothing was scanned, which is not a pass' \
@@ -129,7 +146,7 @@ arm 'syntax: the shipped harness parses' 'workflow script(s) parsed clean' \
 # ---- the harness itself carries the indexed join --------------------------------------------------
 # Positive assertions on the SHIPPED file: a source-level absence ban proves the old join is gone,
 # and these prove the new one is present. Only both together mean "index-keyed".
-H='tools/workflows/tier2-review.js'
+H=''"${PFX}workflows/tier2-review.js"''
 arm 'harness: orchestrator assigns the id' 'id: i + 1' grep -F 'id: i + 1' "$H"
 arm 'harness: the verdict map is keyed on the integer' 'verdictById = new Map()' grep -F 'verdictById = new Map()' "$H"
 arm 'harness: the schema demands an integer id' "id: { type: 'integer' }" grep -F "id: { type: 'integer' }" "$H"
@@ -148,30 +165,30 @@ arm 'harness: the bounded split carries the marker' 'gov:fixed-verifiers' grep -
 # throwaway repo where the offending file is UNTRACKED — which is exactly the state the widening is
 # about, and the state both gates were blind to.
 D="$TMP/discover"
-mkdir -p "$D/tools/workflows"
+mkdir -p "$D/${PFX}workflows"
 ( cd "$D" && git init -q . && git config user.email t@t.test && git config user.name t \
   && git config core.autocrlf false && git config commit.gpgsign false
   # Two seeds, because the two gates have DIFFERENT populations: review-join scans every .js under
-  # tools/, while the syntax gate scans only files carrying the `export const meta` marker. With one
+  # <prefix>/, while the syntax gate scans only files carrying the `export const meta` marker. With one
   # plain seed the ignored-file arm below would empty the syntax gate's population and red for the
   # opposite reason to the one it is testing — measured, not guessed.
   printf 'const x = 1\n' > $KIT_REL/seed.js
   printf "export const meta = { name: 'seed', description: 'a tracked workflow' }\nawait log('hi')\n" \
     > $KIT_REL/seed-workflow.js
   git add -A && git commit -qm seed --no-verify )
-mkdir -p "$D/tools/workflows" && cp "$GATE" "$D/tools/workflows/gate.sh"; cp "$SYNTAX" "$D/syntax.js"
+mkdir -p "$D/${PFX}workflows" && cp "$GATE" "$D/${PFX}workflows/gate.sh"; cp "$SYNTAX" "$D/syntax.js"
 # TOOL-dTieredTribunal-14 S8 - the gate DELEGATES its predicate to the hook now, so a scratch repo
 # without one meets the missing-predicate refusal instead of the verdict this arm asserts.
-mkdir -p "$D/tools/hooks" && cp "$ROOT/tools/hooks/agent-cap.js" "$D/tools/hooks/agent-cap.js"
+mkdir -p "$D/${PFX}hooks" && cp "$ROOT/${PFX}hooks/agent-cap.js" "$D/${PFX}hooks/agent-cap.js"
 
 # never staged, never committed — visible to `git ls-files --others`, invisible to `git ls-files`
-cat >"$D/tools/workflows/scratch-join.js" <<'EOF'
+cat >"$D/${PFX}workflows/scratch-join.js" <<'EOF'
 const verdicts = {}
 for (const v of all) verdicts[v.ref] = v
 EOF
 arm 'discovery: an UNTRACKED banned join is caught' 'scratch-join.js' \
-  bash -c 'cd "$1" && bash ./tools/workflows/gate.sh' _ "$D"
-cat >"$D/tools/workflows/scratch-workflow.js" <<'EOF'
+  bash -c 'cd "$1" && bash ./'"${PFX}workflows/gate.sh"'' _ "$D"
+cat >"$D/${PFX}workflows/scratch-workflow.js" <<'EOF'
 export const meta = { name: 'x', description: 'y' }
 const a = (
 EOF
@@ -180,9 +197,9 @@ arm 'discovery: an UNTRACKED workflow script is parsed' 'SyntaxError' \
 
 # ...and IGNORED stays ignored, which is the escape hatch the widening leans on. Same two files, one
 # .gitignore line: both gates must go quiet, or "untracked" would mean "unignorable".
-printf 'tools/workflows/scratch-*.js\n' > "$D/.gitignore"
+printf ''"${PFX}workflows/scratch-"'*.js\n' > "$D/.gitignore"
 arm 'discovery: a git-ignored file is not judged (review-join)' 'clean — no ref-keyed verdict join' \
-  bash -c 'cd "$1" && bash ./tools/workflows/gate.sh' _ "$D"
+  bash -c 'cd "$1" && bash ./'"${PFX}workflows/gate.sh"'' _ "$D"
 arm 'discovery: a git-ignored file is not judged (syntax)' 'parsed clean' \
   bash -c 'cd "$1" && node ./syntax.js' _ "$D"
 
@@ -192,23 +209,23 @@ arm 'discovery: a git-ignored file is not judged (syntax)' 'parsed clean' \
 E="$TMP/emptyrepo"; mkdir -p "$E"
 ( cd "$E" && git init -q . && git config user.email t@t.test && git config user.name t
   printf 'x\n' > README.md && git add -A && git commit -qm empty --no-verify )
-mkdir -p "$E/tools/workflows" && cp "$GATE" "$E/tools/workflows/gate.sh"
+mkdir -p "$E/${PFX}workflows" && cp "$GATE" "$E/${PFX}workflows/gate.sh"
 # S8 - same reason as the $D site. `$E` and not `$D`: the scratch variable is per SITE, and `E` is
 # not bound until this block, so a `$D` spelling here would judge the wrong repo.
-mkdir -p "$E/tools/hooks" && cp "$ROOT/tools/hooks/agent-cap.js" "$E/tools/hooks/agent-cap.js"
+mkdir -p "$E/${PFX}hooks" && cp "$ROOT/${PFX}hooks/agent-cap.js" "$E/${PFX}hooks/agent-cap.js"
 arm 'discovery: an empty population is still not a pass' 'the population is empty, which is not a pass' \
-  bash -c 'cd "$1" && bash ./tools/workflows/gate.sh' _ "$E"
+  bash -c 'cd "$1" && bash ./'"${PFX}workflows/gate.sh"'' _ "$E"
 
 # TOOL-dTieredTribunal-14 S8 - the missing-predicate refusal's own failing case, OBSERVED. A gate whose
 # predicate is absent must SAY SO rather than pass, and a refusal nobody has watched fire is an
 # assertion about nothing. Named `N` and not `D`, which is already bound to the discovery repo.
-N="$TMP/nohook"; mkdir -p "$N/tools/workflows"
+N="$TMP/nohook"; mkdir -p "$N/${PFX}workflows"
 ( cd "$N" && git init -q . && git config user.email t@t.test && git config user.name t
   printf "export const meta = { name: 'x' }\nawait log('hi')\n" > $KIT_REL/w.js
   git add -A && git commit -qm nohook --no-verify )
-cp "$GATE" "$N/tools/workflows/gate.sh"
+cp "$GATE" "$N/${PFX}workflows/gate.sh"
 arm 'the predicate being absent is a refusal, not a pass' 'a gate whose predicate is absent must say so' \
-  bash -c 'cd "$1" && bash ./tools/workflows/gate.sh' _ "$N"
+  bash -c 'cd "$1" && bash ./'"${PFX}workflows/gate.sh"'' _ "$N"
 
 # ---- TOOL-aRepatriatedFork-4: the population reaches .claude/workflows/, and only that ------------
 # A kit at a `scripts/` prefix, as both adopters install it, with the adopter's harness under
@@ -217,7 +234,7 @@ arm 'the predicate being absent is a refusal, not a pass' 'a gate whose predicat
 # stay OUT: `.claude/` wholesale admits the hook ban tables.
 H4="$TMP/harnessdir"; mkdir -p "$H4/scripts/workflows" "$H4/scripts/hooks" "$H4/.claude/workflows" "$H4/.claude/hooks"
 cp "$GATE" "$H4/scripts/workflows/check-review-join.sh"
-cp "$ROOT/tools/hooks/agent-cap.js" "$H4/scripts/hooks/agent-cap.js"
+cp "$ROOT/${PFX}hooks/agent-cap.js" "$H4/scripts/hooks/agent-cap.js"
 ( cd "$H4" && git init -q . && git config user.email t@t.test && git config user.name t \
   && git add -A && git commit -qm h4 --no-verify ) >/dev/null 2>&1
 out=$(cd "$H4" && bash scripts/workflows/check-review-join.sh 2>&1); rc=$?
@@ -238,9 +255,9 @@ case "$out" in *ban-table.js*) fails=$((fails+1)); printf 'arm FAIL  a file unde
 # Each fixture is a whole scratch TREE, not a lone file, because arm 2's population and its liveness
 # refusal are both properties of the scan, and an explicit file list bypasses the refusal by design.
 a2tree() {  # $1 = dir · $2 = harness body
-  mkdir -p "$1/tools/workflows" "$1/tools/hooks"
-  cp "$ROOT/tools/hooks/agent-cap.js" "$1/tools/hooks/agent-cap.js"
-  printf '%s\n' "$2" > "$1/tools/workflows/h.js"
+  mkdir -p "$1/${PFX}workflows" "$1/${PFX}hooks"
+  cp "$ROOT/${PFX}hooks/agent-cap.js" "$1/${PFX}hooks/agent-cap.js"
+  printf '%s\n' "$2" > "$1/${PFX}workflows/h.js"
   ( cd "$1" && git init -q . && git config user.email t@t.test && git config user.name t \
     && git add -A && git commit -q -m f --no-verify ) >/dev/null 2>&1
 }

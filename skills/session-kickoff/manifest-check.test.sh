@@ -239,12 +239,12 @@ run "no-remote squash landing → 0 (C3+C5 hold)" "$R" 0 -
 
 # ---- 16 merged orphan-root watch history → clean fail, no raw fatal -----
 mkrepo orphan
-write_manifest "$R" "$(head_sha "$R")" "Makefile; tools/" "docs/GOV.md"
-mkdir -p "$R/tools"; echo t > "$R/tools/seed.txt"   # keeps the tools/ watch pathspec alive (C6)
+write_manifest "$R" "$(head_sha "$R")" "Makefile; vendor/" "docs/GOV.md"
+mkdir -p "$R/vendor"; echo t > "$R/vendor/seed.txt"   # keeps the vendor/ watch pathspec alive (C6)
 commit_all "$R" manifest
 git -C "$R" checkout -q --orphan lonely
 git -C "$R" rm -qrf . >/dev/null 2>&1
-mkdir -p "$R/tools"; echo o > "$R/tools/orphan.txt"   # watched path, no overlap with main
+mkdir -p "$R/vendor"; echo o > "$R/vendor/orphan.txt"   # watched path, no overlap with main
 git -C "$R" add -A; git -C "$R" commit -qm "orphan root touching watch"
 git -C "$R" checkout -q main
 git -C "$R" merge -q --no-edit --allow-unrelated-histories lonely
@@ -350,8 +350,8 @@ write_manifest "$R" "$(head_sha "$R")" "Makefile" "docs/GOV.md"
 commit_all "$R" manifest
 printf 'all:\n\ttrue\nro:\n\ttrue\n' > "$R/Makefile"; commit_all "$R" "unaudited drift"
 # The resolver, INLINE. This kit is copy-installed as a standalone directory, so `../lib/` does
-# not exist in an adopting repo. The block below is byte-identical to tools/lib/resolve-python.sh
-# and tools/lib/resolve-python.test.sh reds if any copy drifts.
+# not exist in an adopting repo. The block below is byte-identical to <prefix>/lib/resolve-python.sh
+# and <prefix>/lib/resolve-python.test.sh reds if any copy drifts.
 # >>> resolve_python — canonical copy: resolve-python.sh in gov's lib dir (byte-identical; gated)
 resolve_python() {
   # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
@@ -1134,10 +1134,10 @@ printf '## task\n- `skills/session-kickoff/SKILL.md` and ../../outside.md\n%s\n'
 # F9 — `--card --check` grades what the SESSION wrote: a commit subject in the writer's `recent —`
 # block naming an untracked path is git's text, blanked before the check, never an UNVERIFIED.
 K2F="$NONCE-k2f"
-git -C "$CWT2" commit -q --no-verify --allow-empty -m "drop tools/gone.sh from the bar" \
+git -C "$CWT2" commit -q --no-verify --allow-empty -m "drop vendor/gone.sh from the bar" \
   || { echo "FAIL F9 setup: the fixture commit in worktree B failed"; fail=$((fail+1)); }
 f9_head=$(git -C "$CWT2" rev-parse HEAD)
-run_card "F9 setup: a card whose recent block names tools/gone.sh" "$CWT2" 0 "drop tools/gone.sh from the bar" --card --write --session "$K2F"
+run_card "F9 setup: a card whose recent block names vendor/gone.sh" "$CWT2" 0 "drop vendor/gone.sh from the bar" --card --write --session "$K2F"
 printf '## task\n- `AGENTS.md:1`\nREADY — aTest · node a · card-wt2 · base %s · Tier-2 · gates x\n' "$f9_head" | (cd "$CWT2" && bash "$CHECK" --card --append --session "$K2F" > "$CARD_OUT" 2>&1); got=$?
 check_eq "F9 setup: the body over that card appends" "0" "$got"
 run_card "F9 --card --check over a card whose only miss is a commit subject exits 0" "$CWT2" 0 - --card --check --session "$K2F"

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Runnable check for stall-recorder.js — the `StopFailure` hook that appends one line per API-error
 # stall of a bound session to `<git-dir>/unattended/stall.<slug>.log`, and cannot block.
-# Run: bash tools/unattended/stall-recorder.test.sh   (exit 0 = all pass)
+# Run: bash <prefix>/unattended/stall-recorder.test.sh   (exit 0 = all pass)
 #
 # WITHHELD FROM THE BAR AND FROM ADOPTERS, like every suite in this kit (kit.toml `project-owned`):
 # its subject is the hook's key and its line shape, which move only when this file's siblings move.
@@ -22,6 +22,19 @@
 # scratch kit dir beside its module; no driver stub, because this hook never spawns one.
 set -u
 HERE="$(cd "$(dirname "$0")" && pwd)"
+# >>> derive_self_rel — canonical copy: kit-rel.sh in gov's lib dir (byte-identical; gated)
+derive_self_rel() {
+  local _dsr_p _dsr_rel=""
+  _dsr_p=$(cd "$1" 2>/dev/null && pwd) || return 1
+  while [ ! -e "$_dsr_p/.git" ]; do
+    [ "$(dirname "$_dsr_p")" = "$_dsr_p" ] && return 1
+    _dsr_rel="$(basename "$_dsr_p")${_dsr_rel:+/$_dsr_rel}"
+    _dsr_p=$(dirname "$_dsr_p")
+  done
+  printf '%s\n' "$_dsr_rel"
+}
+# <<< derive_self_rel
+KIT_REL=$(derive_self_rel "$HERE") || { echo "stall-recorder.test: not inside a git repository"; exit 2; }
 # STALL_RECORDER_TEST_TMP is the pass's seam: a unit pass runs one arm at a time from a sourced
 # copy of this prologue and must put its scratch under the session scratchpad, not /tmp.
 # STALL_RECORDER_TEST_GITTMP is the real-driver arm's: its `git init` fixture wants a SHORT path on
@@ -180,7 +193,6 @@ check_same "AC13 the suite is withheld by the descriptor" "$(grep -c 'stall-reco
 # ---- own seed() — extracted as one function, never the suite — which commits once so HEAD is
 # ---- born and the driver's clock probe is live. Before the payload `last-stall: none`; after it,
 # ---- the `last-stall:` line equals the sidecar's last line, both read from the fixture.
-KIT_REL="${KIT_REL:-tools/unattended}"
 TR_T=${KIT_REL%/*}; [ "$TR_T" = "$KIT_REL" ] && TR_T=""; [ -z "$TR_T" ] || TR_T="$TR_T/"
 eval "$(sed -n '/^seed() {/,/^}/p' "$HERE/adopt-unattended.test.sh")"
 FR="$GITTMP/real"; rm -rf "$FR"; mkdir -p "$GITTMP"; seed "$FR" >/dev/null 2>&1

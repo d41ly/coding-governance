@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # check-method-carriers.test.sh — the self-test for the method-carrier gate.
 #
-#   bash tools/memory-tree/check-method-carriers.test.sh   # "PASS (…assertions)" + exit 0 = good
+#   bash <prefix>/memory-tree/check-method-carriers.test.sh   # "PASS (…assertions)" + exit 0 = good
 #
 # Every arm runs against a SCRATCH repo, never this tree: the leg reads `git ls-files`, so a fixture
 # built in place would either see gov's real population or need this repo mutated to fail. The green

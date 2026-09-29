@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Runnable check for tools/check-wiring.sh. Spins throwaway repos and asserts the wired/unwired
-# detection, the never-clobber auto-fix, and the always-exit-0 --session mode. Run: bash tools/check-wiring.test.sh
+# Runnable check for <prefix>/check-wiring.sh. Spins throwaway repos and asserts the wired/unwired
+# detection, the never-clobber auto-fix, and the always-exit-0 --session mode. Run: bash <prefix>/check-wiring.test.sh
 set -u
 HERE="$(cd "$(dirname "$0")" && pwd)"
 REPO="$(cd "$HERE/.." && pwd)"      # safe dir to return to before any rm -rf
@@ -22,6 +22,9 @@ derive_self_rel() {
 # <<< derive_self_rel
 KIT_REL=$(derive_self_rel "$HERE") || { echo "check-wiring.test: not inside a git repository"; exit 2; }
 KP=${KIT_REL:+$KIT_REL/}   # the prefix as a path head: empty at a root install, never a bare '/'
+# ROOTPFX is a ROOT install's prefix, empty by definition: a fixture that models a root install,
+# or a key relative to the tool root, is spelled through it rather than bare (TOOL-aRepatriatedFork-28 S2).
+ROOTPFX=""
 SCRIPT="$HERE/check-wiring.sh"
 SMERGE="$HERE/settings-merge.py"
 pass=0; fail=0
@@ -80,13 +83,13 @@ resolve_python() {
 py=$(resolve_python "${PYBIN:-}") || { echo "check-wiring.test: no usable python"; exit 2; }
 
 # A kit file in THIS repo, resolved across both install layouts the way every arm resolves them:
-# beside this suite (`tools/<rel>` here, `scripts/<rel>` at an adopter that installs the kits there),
+# beside this suite (`<prefix>/<rel>` here, `scripts/<rel>` at an adopter that installs the kits there),
 # or at the root in a copy-installed adopter. The prefix is this file's own directory, DERIVED
-# (TOOL-aRepatriatedFork-8 S6); it used to be the literal `tools/`, which adopter nc patched with a
+# (TOOL-aRepatriatedFork-8 S6); it used to be the literal `<prefix>/`, which adopter nc patched with a
 # third rung for `scripts/`.
 src_of() { for c in "$HERE/$1" "$REPO/$1"; do [ -e "$c" ] && { echo "$c"; return; }; done; }
 
-# Lay a COMPLETE, RUNNABLE merge-driver install into the cwd under prefix $1 ("tools/" here, "" for
+# Lay a COMPLETE, RUNNABLE merge-driver install into the cwd under prefix $1 ("<prefix>/" here, "" for
 # the copy-installed adopter layout). Complete is the point: the driver sources a resolver through
 # its shim, imports its anchor grammar from the sibling memory-recall kit, and walks up for
 # `.memory-tree.conf`. A fixture missing any of those holds a driver that CANNOT START — which is
@@ -97,8 +100,8 @@ install_driver() {
   mkdir -p "${p}memory-tree" "${p}lib" "${p}memory-recall" memory/backlog
   # A CONTINUED LINE CANNOT CARRY A COMMENT — the backslash would escape the space before it,
   # not the newline — so the list is two assignments, each of which can be marked.
-  _rels="memory-tree/merge-rows.py memory-tree/merge-rows.sh lib/pyrun.sh lib/resolve-python.sh"  # gov:root-fixture — scratch repo built at the ROOT prefix, which is the install this asserts
-  _rels="$_rels memory-recall/extract.py memory-recall/recall_conf.py"  # gov:root-fixture — scratch repo built at the ROOT prefix, which is the install this asserts
+  _rels="${ROOTPFX}memory-tree/merge-rows.py ${ROOTPFX}memory-tree/merge-rows.sh ${ROOTPFX}lib/pyrun.sh ${ROOTPFX}lib/resolve-python.sh"
+  _rels="$_rels ${ROOTPFX}memory-recall/extract.py ${ROOTPFX}memory-recall/recall_conf.py"
   for rel in $_rels; do
     src=$(src_of "$rel")
     # A NAMED cause instead of `cp: cannot stat ''`. Every file in this list is a runtime dependency
@@ -189,7 +192,7 @@ if [ -f "$SMERGE" ]; then
         "hooks": [
           {
             "type": "command",
-            "command": "node \"${CLAUDE_PROJECT_DIR}/tools/hooks/agent-cap.js\""
+            "command": "node \"${CLAUDE_PROJECT_DIR}/{KP}hooks/agent-cap.js\""
           }
         ]
       }
@@ -197,6 +200,7 @@ if [ -f "$SMERGE" ]; then
   }
 }
 JSON
+  sed -i "s#{KP}#${KP}#" .claude/settings.json   # the quoted heredoc cannot expand the prefix
   out=$(chk --check); rc=$?
   { [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'UNWIRED  agent-cap' \
       && printf '%s' "$out" | grep -q "wired under matcher 'Workflow'"; } \
@@ -279,7 +283,7 @@ if [ -f "$SGFRAG" ] && [ -f "$SMERGE" ]; then
         "hooks": [
           {
             "type": "command",
-            "command": "node \"${CLAUDE_PROJECT_DIR}/tools/hooks/scratch-guard.js\""
+            "command": "node \"${CLAUDE_PROJECT_DIR}/{KP}hooks/scratch-guard.js\""
           }
         ]
       }
@@ -287,6 +291,7 @@ if [ -f "$SGFRAG" ] && [ -f "$SMERGE" ]; then
   }
 }
 JSON
+  sed -i "s#{KP}#${KP}#" .claude/settings.json   # the quoted heredoc cannot expand the prefix
   out=$(chk --check); rc=$?
   { [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'UNWIRED  scratch' \
       && printf '%s' "$out" | grep -q "wired under matcher 'Bash'"; } \
@@ -372,7 +377,7 @@ if [ -f "$SMERGE" ] && [ -n "$FRAG" ]; then
   # `.claude/hooks/` and declared it `[[own]]`, so the receipt carries an `adopter-owned` row with the
   # source of gov's engine row at the fragment's path. The fragment resolves to the owned copy, both
   # readers agree on it, and the arm is ok. Without the seam this is state 5's false UNWIRED.
-  src6="$KIT_REL/memory-recall/recall-opened.js"  # gov:root-fixture — the receipt's gov-side source, any string both rows share
+  src6="$KIT_REL/memory-recall/recall-opened.js"   # the receipt's gov-side source, any string both rows share
   write_owned_receipt() {  # <owned path, raw JSON string body> [role] -> a pretty receipt: gov's engine row, then the owned row
     printf '{\n  "files": [\n    {\n      "path": "%s",\n      "role": "engine",\n      "source": "%s"\n    },\n    {\n      "path": "%s",\n      "role": "%s",\n      "source": "%s"\n    }\n  ]\n}\n' \
       "$rk/recall-opened.js" "$src6" "$1" "${2:-adopter-owned}" "$src6" > .governance/install.json
@@ -659,7 +664,7 @@ cleanup
 # below into a green for the fixture's reasons instead of the tool's.
 newrepo
 git config core.hooksPath .githooks        # isolate: hooks wired, so only the merge arm can be unwired
-mkdir -p tools/memory-tree tools/lib memory/backlog
+mkdir -p ${KP}memory-tree ${KP}lib memory/backlog
 WANT="bash $KIT_REL/memory-tree/merge-rows.sh %O %A %B %P"
 
 # state 1 — kit not adopted -> skip, exit 0
@@ -670,8 +675,8 @@ out=$(chk --check); rc=$?
 # state 2 — the driver is present but NO launcher is. git would exec a command that cannot start, and
 # a merge driver that cannot start exits non-zero without writing %A: git then reports CONFLICT and
 # leaves the path holding OURS-only content with no markers. The remedy has to name the launcher that
-# TRAVELS WITH THE KIT, because `tools/lib/pyrun.sh` is gov-internal and an adopter never receives it.
-cp "$(src_of memory-tree/merge-rows.py)" $KIT_REL/memory-tree/merge-rows.py  # gov:root-fixture — scratch repo built at the ROOT prefix, which is the install this asserts
+# TRAVELS WITH THE KIT, because `<prefix>/lib/pyrun.sh` is gov-internal and an adopter never receives it.
+cp "$(src_of "${ROOTPFX}memory-tree/merge-rows.py")" $KIT_REL/memory-tree/merge-rows.py
 out=$(chk --check); rc=$?
 { [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'UNWIRED  merge' && printf '%s' "$out" | grep -q 'merge-rows.sh beside it'; } \
   && ck "AC10 no launcher -> UNWIRED naming the kit-internal one, exit 1" 1 \
@@ -680,7 +685,7 @@ out=$(chk --check); rc=$?
 # state 3 — the whole kit is present, but no tracked path declares merge=rows: nothing to wire, so a
 # SKIP rather than a permanent false UNWIRED in every repo that carries the kit without the
 # attribute. `install_driver` writes the attribute, so it is stripped again for this one state.
-install_driver "tools/"
+install_driver "${KP}"
 printf '# nothing declared here\n' > .gitattributes
 git add -A; git commit -q -m nodeclare
 out=$(chk --check); rc=$?
@@ -703,7 +708,7 @@ chk --fix >/dev/null; got=$(git config merge.rows.driver); out=$(chk --check); r
 # pass — while an adopter, who receives only the kit, got a command naming a file they do not have.
 # The pattern sits in a variable so the marked line carries no line continuation — a trailing
 # backslash escapes the space before a comment, not the newline, and the break is valid shell.
-_want_launcher='memory-tree/merge-rows.sh'   # gov:root-fixture — the kit launcher's own spelling
+_want_launcher="${ROOTPFX}memory-tree/merge-rows.sh"   # the kit launcher's own spelling
 { printf '%s' "$got" | grep -q "$_want_launcher" \
   && ! printf '%s' "$got" | grep -q 'pyrun'; } \
   && ck "AC10 the kit launcher wins over the gov-internal shim" 1 \
@@ -714,13 +719,13 @@ _want_launcher='memory-tree/merge-rows.sh'   # gov:root-fixture — the kit laun
 # wired`, and the very next `git merge` printed CONFLICT and left memory/DECISIONS.md holding
 # OURS-only content with `grep -c '<<<<<<<'` = 0 and status UU — the incoming row simply absent.
 # "Wired" has to mean the command RUNS, so this state must not be green.
-# RE-AIMED: the kit-internal launcher carries the resolver INLINE, so removing `tools/lib/` no
+# RE-AIMED: the kit-internal launcher carries the resolver INLINE, so removing `<prefix>/lib/` no
 # longer breaks it — that decoupling is the whole point of shipping a launcher with the kit. What it
 # still cannot survive is a driver that will not parse. Removing the FILE would trip the
 # not-adopted probe one test earlier and never reach this arm, so the content is what breaks.
 cp $KIT_REL/memory-tree/merge-rows.py $KIT_REL/memory-tree/merge-rows.py.away
 printf 'this is not python(
-' > tools/memory-tree/merge-rows.py
+' > ${KP}memory-tree/merge-rows.py
 out=$(chk --check); rc=$?
 { [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'UNWIRED  merge' && printf '%s' "$out" | grep -q 'cannot merge'; } \
   && ck "AC10 driver cannot start (unparseable driver) -> UNWIRED, exit 1" 1 || ck "AC10 driver cannot start (unparseable driver) -> UNWIRED, exit 1" 0
@@ -747,11 +752,11 @@ out=$(TMPDIR=/nonexistent-check-wiring-tmp bash "$SCRIPT" --check 2>/dev/null); 
 # anchor grammar is gone, so the deferred import raises and the fail-closed wrapper writes a conflict
 # on every governed-index merge, forever. Loud rather than destructive, but the arm's own header
 # claims it turns "declared" into "wired"; a driver that conflicts unconditionally is not wired.
-mv tools/memory-recall tools/memory-recall.away
+mv ${KP}memory-recall ${KP}memory-recall.away
 out=$(chk --check); rc=$?
 { [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'UNWIRED  merge' && printf '%s' "$out" | grep -q 'cannot merge'; } \
   && ck "AC10 driver cannot key rows (no memory-recall) -> UNWIRED, exit 1" 1 || ck "AC10 driver cannot key rows (no memory-recall) -> UNWIRED, exit 1" 0
-mv tools/memory-recall.away tools/memory-recall
+mv ${KP}memory-recall.away ${KP}memory-recall
 out=$(chk --check); rc=$?
 { [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'ok       merge'; } \
   && ck "AC10 restoring the grammar kit goes green again" 1 || ck "AC10 restoring the grammar kit goes green again" 0
@@ -805,7 +810,7 @@ qn=0; for i in 001 002 003; do [ "$(grep -c -- "^- TOOL-$i |" "$Q/a")" = 1 ] && 
 rm -rf "$Q"
 git checkout -q -- $KIT_REL/memory-recall/extract.py 2>/dev/null || true
 if grep -q 'def anchor_at(line, g=None):' $KIT_REL/memory-recall/extract.py; then
-  cp "$(src_of memory-recall/extract.py)" $KIT_REL/memory-recall/extract.py  # gov:root-fixture — scratch repo built at the ROOT prefix, which is the install this asserts
+  cp "$(src_of "${ROOTPFX}memory-recall/extract.py")" $KIT_REL/memory-recall/extract.py
 fi
 out=$(chk --check); rc=$?
 { [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'ok       merge'; } \
@@ -883,7 +888,7 @@ fi
 # So this arm does not proof-read the README. It DERIVES both spellings by running `--fix` in a
 # complete fixture of each layout, then requires the README to publish exactly those two and no
 # third one. A future prefix change moves the derived strings and reds the doc automatically.
-newrepo; git config core.hooksPath .githooks; install_driver "tools/"
+newrepo; git config core.hooksPath .githooks; install_driver "${KP}"
 chk --fix >/dev/null; S_TOOLS=$(git config merge.rows.driver 2>/dev/null || true); cleanup
 # The ROOT layout's command comes from a checker installed AT the root. The checker finds a kit at
 # its own prefix or through the receipt and no longer guesses the root from another prefix
@@ -908,9 +913,9 @@ else
   # S9), so each layout's command is that line with the token read as the fixture's prefix or as
   # nothing. Both must come out equal to what `--fix` derived, or the doc names a third command.
   PUB=$(grep -oE 'bash <prefix>/[A-Za-z0-9_./-]*merge-rows\.sh %O %A %B %P' "$RDM" | head -1)
-  { [ -n "$PUB" ] && [ "${PUB//<prefix>\//tools/}" = "$S_TOOLS" ]; } \
-    && ck "AC12 README publishes the tools/-prefix command" 1 \
-    || ck "AC12 README publishes the tools/-prefix command" 0
+  { [ -n "$PUB" ] && [ "${PUB//<prefix>\//${KP}}" = "$S_TOOLS" ]; } \
+    && ck "AC12 README publishes the ${KP}-prefix command" 1 \
+    || ck "AC12 README publishes the ${KP}-prefix command" 0
   { [ -n "$PUB" ] && [ "${PUB//<prefix>\//}" = "$S_ROOT" ]; } \
     && ck "AC12 README publishes the root-prefix command" 1 \
     || ck "AC12 README publishes the root-prefix command" 0
@@ -1115,27 +1120,27 @@ ck "prefix: a two-segment install still carries both segments" \
 # THE SECURITY SHAPE, which the path string on its own does not show: with the hook actually THERE, a
 # root install reported the fan-out guard as not adopted. A skip that reads as a pass, over the one
 # arm in this file where a false skip has a security shape.
-mkdir -p hooks; printf '// stub\n' > hooks/agent-cap.js  # gov:root-fixture — scratch repo built at the ROOT prefix, which is the install this asserts
+mkdir -p "./${ROOTPFX}hooks"; printf '// stub\n' > "${ROOTPFX}hooks/agent-cap.js"
 git add -A; git commit -q -m "ship agent-cap.js at the root install"
 out=$(bash ./check-wiring.sh --check 2>&1)
 ck "prefix: a ROOT install FINDS a shipped agent-cap.js instead of skipping it" \
    "$(printf '%s' "$out" | grep -q 'UNWIRED  agent-cap' && echo 1 || echo 0)"
 # TOOL-cMendedVintage-4 — AND THE REMEDY IT PRINTS HAS TO BE RUNNABLE WHERE IT IS PRINTED. `SMERGE`
-# used to fall back to a hardcoded `tools/` prefix, so an install at any other prefix with no merger
+# used to fall back to a hardcoded `<prefix>/` prefix, so an install at any other prefix with no merger
 # beside it handed the operator a command naming a file their tree does not contain. The two-segment
 # install is the discriminating one: the old spelling and the new differ in both directions here, so
 # the second assertion is not a restatement of the first — it reds if the literal comes back beside
 # a derived one. No merger is installed anywhere in this fixture, which is the fallback's own case.
 # That second pattern deliberately stops before the extension: spelled whole it would be a carried
-# `tools/` literal in this file's own bytes and would RAISE the install-prefix row, which the ratchet
+# `<prefix>/` literal in this file's own bytes and would RAISE the install-prefix row, which the ratchet
 # cannot absorb. Truncated it still matches the dead spelling and nothing else. Do not "complete" it.
 mkdir -p scripts/gov/hooks; printf '// stub\n' > scripts/gov/hooks/agent-cap.js
 git add -A; git commit -q -m "ship agent-cap.js at the two-segment install"
 out=$(bash ./scripts/gov/check-wiring.sh --check 2>&1)
 ck "prefix: the agent-cap remedy names the INSTALL PREFIX's merger" \
    "$(printf '%s' "$out" | grep -q 'scripts/gov/settings-merge.py' && echo 1 || echo 0)"
-ck "prefix: no remedy in that install still names the dead tools/ merger" \
-   "$(printf '%s' "$out" | grep -q 'tools/settings-merge' && echo 0 || echo 1)"
+ck "prefix: no remedy in that install still names the dead ${KP} merger" \
+   "$(printf '%s' "$out" | grep -q ''"${KP}settings-merge"'' && echo 0 || echo 1)"
 cleanup
 
 # ---- TOOL-aRepatriatedFork-19: the install RECEIPT is the first rung -----------------------------
@@ -1155,8 +1160,8 @@ open(".governance/install.json", "w", newline="\n").write(json.dumps({"schema": 
 if [ -f "$SMERGE" ] && [ -f "$SGFRAG" ] && [ -n "$FRAG" ]; then
   newrepo; git config core.hooksPath .githooks   # isolate: hooks wired, so only the arms under test move
   mkdir -p scripts/memory-recall scripts/recall .claude/hooks memory/backlog ${KIT_REL:-.}
-  _flat="memory-tree/merge-rows.py memory-tree/merge-rows.sh"  # gov:root-fixture — src_of keys under the tool root; the scratch repo lays them FLAT under scripts/, where no probe looks
-  _grammar="memory-recall/extract.py memory-recall/recall_conf.py"  # gov:root-fixture — src_of keys under the tool root; the grammar kit the flat driver finds beside itself
+  _flat="${ROOTPFX}memory-tree/merge-rows.py ${ROOTPFX}memory-tree/merge-rows.sh"  # src_of keys under the tool root; the scratch repo lays them FLAT under scripts/, where no probe looks
+  _grammar="${ROOTPFX}memory-recall/extract.py ${ROOTPFX}memory-recall/recall_conf.py"  # src_of keys under the tool root; the grammar kit the flat driver finds beside itself
   for rel in $_flat; do cp "$(src_of "$rel")" "scripts/${rel#*/}"; done
   for rel in $_grammar; do cp "$(src_of "$rel")" "scripts/$rel"; done
   printf 'MEMORY_ROOT=memory\nFAMILIES="tooling:TOOL"\n' > .memory-tree.conf
@@ -1165,9 +1170,9 @@ if [ -f "$SMERGE" ] && [ -f "$SGFRAG" ] && [ -n "$FRAG" ]; then
   cp "$SGFRAG" .claude/hooks/scratch-guard.fragment.json; printf '// stub\n' > .claude/hooks/scratch-guard.js
   cp "$FRAG" scripts/recall/recall-opened.fragment.json; printf '// stub\n' > scripts/recall/recall-opened.js
   cp "$SMERGE" ${KP}settings-merge.py
-  _rows="scripts/merge-rows.py=memory-tree/merge-rows.py scripts/merge-rows.sh=memory-tree/merge-rows.sh"  # gov:root-fixture — receipt source suffixes, the join key, not install paths
-  _rows="$_rows .claude/hooks/scratch-guard.fragment.json=hooks/scratch-guard.fragment.json"  # gov:root-fixture — receipt source suffix, the join key, not an install path
-  _rows="$_rows scripts/recall/recall-opened.fragment.json=memory-recall/recall-opened.fragment.json"  # gov:root-fixture — receipt source suffix, the join key, not an install path
+  _rows="scripts/merge-rows.py=${ROOTPFX}memory-tree/merge-rows.py scripts/merge-rows.sh=${ROOTPFX}memory-tree/merge-rows.sh"  # receipt source suffixes, the join key, not install paths
+  _rows="$_rows .claude/hooks/scratch-guard.fragment.json=${ROOTPFX}hooks/scratch-guard.fragment.json"  # receipt source suffix, the join key, not an install path
+  _rows="$_rows scripts/recall/recall-opened.fragment.json=${ROOTPFX}memory-recall/recall-opened.fragment.json"  # receipt source suffix, the join key, not an install path
   write_receipt $_rows
   "$py" ${KP}settings-merge.py --fragment .claude/hooks/scratch-guard.fragment.json >/dev/null 2>&1
   "$py" ${KP}settings-merge.py --fragment scripts/recall/recall-opened.fragment.json >/dev/null 2>&1
@@ -1210,7 +1215,7 @@ print(m.resolve_kit_dir(sys.argv[1], sys.argv[2], ".").relative_to(pathlib.Path(
   # AC4 — the receipt names the driver and the file is gone: still a skip (a missing installed file
   # is the receipt leg's red), but one that names the row and the path instead of "not adopted".
   rm -f scripts/merge-rows.py
-  _miss_row='install.json row for memory-tree/merge-rows.py names scripts/merge-rows.py, which is absent'  # gov:root-fixture — the receipt key the checker prints, not a path
+  _miss_row="install.json row for ${ROOTPFX}memory-tree/merge-rows.py names scripts/merge-rows.py, which is absent"  # the receipt key the checker prints, not a path
   out=$(chk --check)
   line=$(printf '%s\n' "$out" | grep -E '^skip +merge ' || true)
   ck "U19 AC4 a receipted-but-missing driver skips naming the receipt and the path" \

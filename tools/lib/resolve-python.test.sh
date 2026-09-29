@@ -8,9 +8,26 @@
 #      cannot source `../lib/`, so copies exist by design; drift between them is what a gate is for.
 #   3. THE BAN — the retired `command -v python3 || python` idiom cannot come back in any tracked
 #      `*.sh`, and the population is derived by scanning, not by listing.
-#   bash tools/lib/resolve-python.test.sh    # "PASS (…)" + exit 0 = good
+#   bash <prefix>/lib/resolve-python.test.sh    # "PASS (…)" + exit 0 = good
 set -u
 HERE="$(cd "$(dirname "$0")" && pwd)"
+# >>> derive_self_rel — canonical copy: kit-rel.sh in gov's lib dir (byte-identical; gated)
+derive_self_rel() {
+  local _dsr_p _dsr_rel=""
+  _dsr_p=$(cd "$1" 2>/dev/null && pwd) || return 1
+  while [ ! -e "$_dsr_p/.git" ]; do
+    [ "$(dirname "$_dsr_p")" = "$_dsr_p" ] && return 1
+    _dsr_rel="$(basename "$_dsr_p")${_dsr_rel:+/$_dsr_rel}"
+    _dsr_p=$(dirname "$_dsr_p")
+  done
+  printf '%s\n' "$_dsr_rel"
+}
+# <<< derive_self_rel
+KIT_REL=$(derive_self_rel "$HERE") || { echo "resolve-python.test: not inside a git repository"; exit 2; }
+# PFX is the install prefix WITH its trailing slash, derived from where this file sits and empty
+# at a root install: every fixture and host path below is spelled through it, never through a
+# literal prefix (TOOL-aRepatriatedFork-28).
+case "$KIT_REL" in */*) PFX="${KIT_REL%/*}/" ;; *) PFX="" ;; esac
 ROOT=$(cd "$HERE/../.." && pwd)
 CANON="$HERE/resolve-python.sh"
 TMP=$(mktemp -d); trap 'rm -rf "$TMP"' EXIT
@@ -81,25 +98,25 @@ out=$(PATH="$C:$PATH" bash -c 'set -u; . "$1"; PY=$(resolve_python) || { echo HA
 # A TABLE of (marker, canonical source, exclude-prefix), not one hardcoded predicate. It held exactly
 # one row for a long time and read as a population; it was not one — the marker was hardcoded in both
 # the extractor and the discovery grep, so a second shared predicate had nowhere to join. The kickoff
-# kit's `region()` is that second predicate: `tools/lib/` is gov-internal and ships nothing, so a
+# kit's `region()` is that second predicate: `<prefix>/lib/` is gov-internal and ships nothing, so a
 # copy-installed kit cannot source a shared library and must carry the function inline. An inline copy
 # of a hard-won predicate with no parity gate is precisely what this arm exists to police.
 #
 # Each row is:  <marker-stem>|<canonical file>|<prefix excluded from the copy population>
 PARITY_ROWS="
-resolve_python|$CANON|tools/lib/resolve-python
-kickoff_region|$ROOT/tools/unattended/check-unattended.sh|tools/unattended/check-unattended
-render_doc|$ROOT/tools/lib/render-doc.sh|tools/lib/render-doc
-resolve_kit_dir|$ROOT/tools/lib/resolve_kit_dir.py|tools/lib/resolve_kit_dir
-derive_self_rel|$ROOT/tools/lib/kit-rel.sh|tools/lib/kit-rel
-derive_kit_paths|$ROOT/tools/lib/render-doc.sh|tools/lib/render-doc
+resolve_python|$CANON|${PFX}lib/resolve-python
+kickoff_region|$ROOT/${PFX}unattended/check-unattended.sh|${PFX}unattended/check-unattended
+render_doc|$ROOT/${PFX}lib/render-doc.sh|${PFX}lib/render-doc
+resolve_kit_dir|$ROOT/${PFX}lib/resolve_kit_dir.py|${PFX}lib/resolve_kit_dir
+derive_self_rel|$ROOT/${PFX}lib/kit-rel.sh|${PFX}lib/kit-rel
+derive_kit_paths|$ROOT/${PFX}lib/render-doc.sh|${PFX}lib/render-doc
 "
 # CRs are dropped before the compare: a Python copy may sit CRLF in a Windows working copy while git
 # stores it LF, and the parity asked is of the block, not of a checkout's line endings.
 # resolve_kit_dir (TOOL-aRepatriatedFork-2 S3) is the one row whose copies are Python as well as
 # shell, so the population grep below reads both.
 # derive_self_rel (TOOL-aRepatriatedFork-18 S2) is the shipped suites' own-directory walk: each suite
-# that ships carries it inline because `tools/lib/` travels to nobody.
+# that ships carries it inline because `<prefix>/lib/` travels to nobody.
 # derive_kit_paths (TOOL-aRepatriatedFork-10, closing review round 1 L4) is the receipt read the two
 # memory-tree renderers each used to spell as their own grep, with nothing comparing the two.
 blk() { awk -v s="$1" '$0 ~ ("^# >>> " s){f=1} f{print} $0 ~ ("^# <<< " s){if(f)exit}' "$2" | tr -d '\r'; }
@@ -125,7 +142,7 @@ done <<<"$PARITY_ROWS"
 # both EXPLAIN the idiom they replace, and a predicate that fires on the prose documenting the fix is
 # the self-inflicted red this repo has a catalogue record about.
 banned=$(cd "$ROOT" && git grep -nE 'command -v (python3|python|py)\b' -- '*.sh' \
-  | grep -v '^tools/lib/resolve-python' \
+  | grep -v '^'"${PFX}lib/resolve-python"'' \
   | awk -F: '{ line=$0; sub(/^[^:]*:[0-9]+:/, "", line); if (line !~ /^[[:space:]]*#/) print }' || true)
 [ -z "$banned" ] || { echo "FAIL the retired python-launcher idiom is back:"; printf '%s\n' "$banned" | sed 's/^/    /'; st=1; }
 ok
@@ -142,7 +159,7 @@ awk '$0 !~ /^[[:space:]]*#/' "$plant" | grep -qE 'command -v (python3|python|py)
 # ---- 3b. THE INVOCATION-SHAPE BAN ---------------------------------------------------------------
 # The §3 ban above matches the retired IDIOM (`command -v python3 …`). A launcher invoked BARE —
 # `python -c "…"`, `PYBIN=python3`, `$(python …)` — carries no idiom to match, so §3 could not see
-# it. Measured: exactly that shape shipped in tools/drift-audit/adopt-drift-audit.sh and was found by
+# it. Measured: exactly that shape shipped in <prefix>/drift-audit/adopt-drift-audit.sh and was found by
 # an adversarial review, not by this gate. This ban keys on the INVOCATION instead, so the thing it
 # catches is "a python was run without being resolved" rather than "someone wrote the old sentence".
 #
@@ -182,7 +199,7 @@ bare_scan() {  # $1=file -> "file:line:text" per bare-launcher site
   ' "$1"
 }
 
-bare=$(cd "$ROOT" && git ls-files -- '*.sh' | grep -v '^tools/lib/resolve-python' | while IFS= read -r f; do
+bare=$(cd "$ROOT" && git ls-files -- '*.sh' | grep -v '^'"${PFX}lib/resolve-python"'' | while IFS= read -r f; do
          [ -n "$f" ] && [ -f "$f" ] && bare_scan "$f"
        done)
 [ -z "$bare" ] || { echo "FAIL a python launcher is invoked without being resolved:"; printf '%s\n' "$bare" | sed 's/^/    /'; st=1; }
@@ -229,7 +246,7 @@ printf '#!/usr/bin/env bash\nout=$( "${PYBIN:-python}" x.py 2>&1 )\n' > "$plant"
 printf '#!/usr/bin/env bash\nPY=$(resolve_python "${GOV_PYTHON:-}") || exit 2\n' > "$plant"
 [ -z "$(bare_scan "$plant")" ] || bad "an EMPTY default \${GOV_PYTHON:-} fires the parameter-default ban"; ok
 # ...and the ban's own population is real, or it is a gate over nothing.
-nsh2=$(cd "$ROOT" && git ls-files -- '*.sh' | grep -cv '^tools/lib/resolve-python' || true)
+nsh2=$(cd "$ROOT" && git ls-files -- '*.sh' | grep -cv '^'"${PFX}lib/resolve-python"'' || true)
 [ "$nsh2" -gt 10 ] || bad "the invocation ban scanned $nsh2 shell files — the population collapsed"; ok
 
 [ "$st" = 0 ] && echo "PASS — resolve-python: $n assertions held"

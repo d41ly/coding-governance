@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Runnable check for stop-guard.js — the `Stop` hook that refuses the turn end of a session bound
 # to a non-terminal unattended run, bounded per session, with a sidecar line per bound stop.
-# Run: bash tools/unattended/stop-guard.test.sh   (exit 0 = all pass)
+# Run: bash <prefix>/unattended/stop-guard.test.sh   (exit 0 = all pass)
 #
 # WITHHELD FROM THE BAR AND FROM ADOPTERS, like every suite in this kit (kit.toml `project-owned`):
 # its subject is the hook's decision table and key, which move only when this file's siblings move.
@@ -23,6 +23,19 @@
 # `__dirname` and the stub is what makes the decision observable in milliseconds.
 set -u
 HERE="$(cd "$(dirname "$0")" && pwd)"
+# >>> derive_self_rel — canonical copy: kit-rel.sh in gov's lib dir (byte-identical; gated)
+derive_self_rel() {
+  local _dsr_p _dsr_rel=""
+  _dsr_p=$(cd "$1" 2>/dev/null && pwd) || return 1
+  while [ ! -e "$_dsr_p/.git" ]; do
+    [ "$(dirname "$_dsr_p")" = "$_dsr_p" ] && return 1
+    _dsr_rel="$(basename "$_dsr_p")${_dsr_rel:+/$_dsr_rel}"
+    _dsr_p=$(dirname "$_dsr_p")
+  done
+  printf '%s\n' "$_dsr_rel"
+}
+# <<< derive_self_rel
+KIT_REL=$(derive_self_rel "$HERE") || { echo "stop-guard.test: not inside a git repository"; exit 2; }
 # STOP_GUARD_TEST_TMP is the pass's seam: a unit pass runs one arm at a time from a sourced copy of
 # this prologue and must put its scratch under the session scratchpad, not /tmp.
 TMP="${STOP_GUARD_TEST_TMP:-$(mktemp -d)}"; trap 'rm -rf "$TMP"' EXIT
@@ -340,7 +353,6 @@ check_same "AC19 hung liveness line reason" "$(read_field "$(derive_sidecar "$F"
 # ---- own seed() — extracted as one function, never the suite — which commits once so HEAD is
 # ---- born and the driver's clock probe is live. The line's verdict is whatever the copied driver's
 # ---- own --liveness prints, read by the arm, never a literal.
-KIT_REL="${KIT_REL:-tools/unattended}"
 TR_T=${KIT_REL%/*}; [ "$TR_T" = "$KIT_REL" ] && TR_T=""; [ -z "$TR_T" ] || TR_T="$TR_T/"
 eval "$(sed -n '/^seed() {/,/^}/p' "$HERE/adopt-unattended.test.sh")"
 FR="$TMP/real"; seed "$FR" >/dev/null 2>&1

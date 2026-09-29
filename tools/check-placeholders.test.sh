@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# check-placeholders.test.sh — the arms for tools/check-placeholders.sh.
+# check-placeholders.test.sh — the arms for <prefix>/check-placeholders.sh.
 #
 # EVERY ARM ASSERTS A MESSAGE, never an exit code alone. These fixtures are deliberately broken in
 # several ways at once is exactly the trap: a fixture that reds for the wrong reason scores a pass

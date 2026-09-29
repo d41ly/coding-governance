@@ -33,6 +33,24 @@ import subprocess
 import sys
 import tempfile
 
+
+def derive_install_prefix() -> str:
+    """The install prefix WITH its trailing slash, derived from where this file sits and empty at a
+    root install. Every fixture and host path the self-test builds is spelled through it, never
+    through a literal prefix (TOOL-aRepatriatedFork-28)."""
+    import pathlib
+    here = pathlib.Path(__file__).resolve().parent
+    for anc in here.parents:
+        if (anc / ".git").exists():
+            rel = here.parent.relative_to(anc).as_posix()
+            return "" if rel == "." else rel + "/"
+    raise SystemExit(f"{pathlib.Path(__file__).name}: not inside a git repository, so there is no "
+                     "install prefix to derive")
+
+
+PFX = derive_install_prefix()
+
+
 sys.dont_write_bytecode = True
 
 KIT = pathlib.Path(__file__).resolve().parent
@@ -373,11 +391,11 @@ def test_kit_payload_withholds():
     """
     import tomllib  # noqa: PLC0415
 
-    sys.path.insert(0, str(ROOT / "tools" / "govkit"))
+    sys.path.insert(0, str(ROOT / PFX / "govkit"))
     import govkit as G  # noqa: PLC0415
 
     desc = tomllib.loads((KIT / "kit.toml").read_text(encoding="utf-8"))
-    home = "tools/memory-recall"
+    home = f"{PFX}memory-recall"
     ctx = {"kit": home, "relpath": "", "memory_root": "memory"}
     wild = [r for r in desc["files"] if r.get("include") == "**"][0]
     pool = {pathlib.PurePosixPath(p).name for p in G.resolve_rule_pool(ROOT, desc, wild, ctx, home)}

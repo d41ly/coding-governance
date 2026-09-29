@@ -13,335 +13,335 @@
    "scripts/manifest-check.test.sh"
   ],
   [
-   "tools/check-wiring.sh",
+   "{prefix}/check-wiring.sh",
    "scripts/check-wiring.sh"
   ],
   [
-   "tools/check-wiring.test.sh",
+   "{prefix}/check-wiring.test.sh",
    "scripts/check-wiring.test.sh"
   ],
   [
-   "tools/codebase-map/.codebase-map.conf.example",
+   "{prefix}/codebase-map/.codebase-map.conf.example",
    "scripts/codebase-map/.codebase-map.conf.example"
   ],
   [
-   "tools/codebase-map/INVENTORY-DERIVATION.md",
+   "{prefix}/codebase-map/INVENTORY-DERIVATION.md",
    "scripts/codebase-map/INVENTORY-DERIVATION.md"
   ],
   [
-   "tools/codebase-map/README.md",
+   "{prefix}/codebase-map/README.md",
    "scripts/codebase-map/README.md"
   ],
   [
-   "tools/codebase-map/adopt-codebase-map.sh",
+   "{prefix}/codebase-map/adopt-codebase-map.sh",
    "scripts/codebase-map/adopt-codebase-map.sh"
   ],
   [
-   "tools/codebase-map/adopt-codebase-map.test.sh",
+   "{prefix}/codebase-map/adopt-codebase-map.test.sh",
    "scripts/codebase-map/adopt-codebase-map.test.sh"
   ],
   [
-   "tools/codebase-map/gen_map.py",
+   "{prefix}/codebase-map/gen_map.py",
    "scripts/codebase-map/gen_map.py"
   ],
   [
-   "tools/codebase-map/map_diff.py",
+   "{prefix}/codebase-map/map_diff.py",
    "scripts/codebase-map/map_diff.py"
   ],
   [
-   "tools/codebase-map/map_extractors.py",
+   "{prefix}/codebase-map/map_extractors.py",
    "scripts/codebase-map/map_extractors.py"
   ],
   [
-   "tools/codebase-map/map_extractors.template.py",
+   "{prefix}/codebase-map/map_extractors.template.py",
    "scripts/codebase-map/map_extractors.template.py"
   ],
   [
-   "tools/codebase-map/map_lib.py",
+   "{prefix}/codebase-map/map_lib.py",
    "scripts/codebase-map/map_lib.py"
   ],
   [
-   "tools/codebase-map/reuse-lookup.agent.md",
+   "{prefix}/codebase-map/reuse-lookup.agent.md",
    "scripts/codebase-map/reuse-lookup.agent.md"
   ],
   [
-   "tools/codebase-map/reuse_lookup.py",
+   "{prefix}/codebase-map/reuse_lookup.py",
    "scripts/codebase-map/reuse_lookup.py"
   ],
   [
-   "tools/codebase-map/selftest.py",
+   "{prefix}/codebase-map/selftest.py",
    "scripts/codebase-map/selftest.py"
   ],
   [
-   "tools/codebase-map/test_codebase_map.template.py",
+   "{prefix}/codebase-map/test_codebase_map.template.py",
    "scripts/codebase-map/test_codebase_map.template.py"
   ],
   [
-   "tools/drift-audit/README.md",
+   "{prefix}/drift-audit/README.md",
    "scripts/drift-audit/README.md"
   ],
   [
-   "tools/drift-audit/drift_report.py",
+   "{prefix}/drift-audit/drift_report.py",
    "scripts/drift-audit/drift_report.py"
   ],
   [
-   "tools/drift-audit/drift_signals.py",
+   "{prefix}/drift-audit/drift_signals.py",
    "scripts/drift-audit/drift_signals.py"
   ],
   [
-   "tools/drift-audit/drift_signals.template.py",
+   "{prefix}/drift-audit/drift_signals.template.py",
    "scripts/drift-audit/drift_signals.template.py"
   ],
   [
-   "tools/drift-audit/selftest.py",
+   "{prefix}/drift-audit/selftest.py",
    "scripts/drift-audit/selftest.py"
   ],
   [
-   "tools/gate-lint/README.md",
+   "{prefix}/gate-lint/README.md",
    "scripts/gate-lint/README.md"
   ],
   [
-   "tools/gate-lint/ps-hygiene.py",
+   "{prefix}/gate-lint/ps-hygiene.py",
    "scripts/gate-lint/ps-hygiene.py"
   ],
   [
-   "tools/hooks/agent-cap.js",
+   "{prefix}/hooks/agent-cap.js",
    ".claude/hooks/agent-cap.js"
   ],
   [
-   "tools/hooks/agent-cap.test.sh",
+   "{prefix}/hooks/agent-cap.test.sh",
    ".claude/hooks/agent-cap.test.sh"
   ],
   [
-   "tools/lexicon/LEXICON.md",
+   "{prefix}/lexicon/LEXICON.md",
    "scripts/lexicon/LEXICON.md"
   ],
   [
-   "tools/lexicon/README.md",
+   "{prefix}/lexicon/README.md",
    "scripts/lexicon/README.md"
   ],
   [
-   "tools/lexicon/adopt-lexicon.sh",
+   "{prefix}/lexicon/adopt-lexicon.sh",
    "scripts/lexicon/adopt-lexicon.sh"
   ],
   [
-   "tools/lexicon/lexicon-layer-waivers.txt",
+   "{prefix}/lexicon/lexicon-layer-waivers.txt",
    "scripts/lexicon/lexicon-layer-waivers.txt"
   ],
   [
-   "tools/lexicon/lexicon-suffix-waivers.txt",
+   "{prefix}/lexicon/lexicon-suffix-waivers.txt",
    "scripts/lexicon/lexicon-suffix-waivers.txt"
   ],
   [
-   "tools/lexicon/lexicon-verb-waivers.txt",
+   "{prefix}/lexicon/lexicon-verb-waivers.txt",
    "scripts/lexicon/lexicon-verb-waivers.txt"
   ],
   [
-   "tools/lexicon/lexicon.py",
+   "{prefix}/lexicon/lexicon.py",
    "scripts/lexicon/lexicon.py"
   ],
   [
-   "tools/lexicon/lexicon_conf.py",
+   "{prefix}/lexicon/lexicon_conf.py",
    "scripts/lexicon/lexicon_conf.py"
   ],
   [
-   "tools/lexicon/scaffold_lexicon.py",
+   "{prefix}/lexicon/scaffold_lexicon.py",
    "scripts/lexicon/scaffold_lexicon.py"
   ],
   [
-   "tools/lexicon/selftest.py",
+   "{prefix}/lexicon/selftest.py",
    "scripts/lexicon/selftest.py"
   ],
   [
-   "tools/lexicon/subtokens.py",
+   "{prefix}/lexicon/subtokens.py",
    "scripts/lexicon/subtokens.py"
   ],
   [
-   "tools/memory-recall/README.md",
+   "{prefix}/memory-recall/README.md",
    "scripts/recall/README.md"
   ],
   [
-   "tools/memory-recall/bench.py",
+   "{prefix}/memory-recall/bench.py",
    "scripts/recall/bench.py"
   ],
   [
-   "tools/memory-recall/extract.py",
+   "{prefix}/memory-recall/extract.py",
    "scripts/recall/extract.py"
   ],
   [
-   "tools/memory-recall/query.py",
+   "{prefix}/memory-recall/query.py",
    "scripts/recall/query.py"
   ],
   [
-   "tools/memory-recall/recall-opened.fragment.json",
+   "{prefix}/memory-recall/recall-opened.fragment.json",
    "scripts/recall/recall-opened.fragment.json"
   ],
   [
-   "tools/memory-recall/recall-opened.js",
+   "{prefix}/memory-recall/recall-opened.js",
    ".claude/hooks/recall-opened.js"
   ],
   [
-   "tools/memory-recall/recall-opened.test.sh",
+   "{prefix}/memory-recall/recall-opened.test.sh",
    ".claude/hooks/recall-opened.test.sh"
   ],
   [
-   "tools/memory-recall/selftest.py",
+   "{prefix}/memory-recall/selftest.py",
    "scripts/recall/selftest.py"
   ],
   [
-   "tools/memory-recall/union.py",
+   "{prefix}/memory-recall/union.py",
    "scripts/recall/union.py"
   ],
   [
-   "tools/memory-tree/check-arms.py",
+   "{prefix}/memory-tree/check-arms.py",
    "scripts/check-arms.py"
   ],
   [
-   "tools/memory-tree/corpus_ids.py",
+   "{prefix}/memory-tree/corpus_ids.py",
    "scripts/corpus_ids.py"
   ],
   [
-   "tools/memory-tree/gen_build_index.py",
+   "{prefix}/memory-tree/gen_build_index.py",
    "scripts/gen_build_index.py"
   ],
   [
-   "tools/memory-tree/gotchas.py",
+   "{prefix}/memory-tree/gotchas.py",
    "scripts/gotchas.py"
   ],
   [
-   "tools/memory-tree/hygiene-parity.test.sh",
+   "{prefix}/memory-tree/hygiene-parity.test.sh",
    "scripts/hygiene-parity.test.sh"
   ],
   [
-   "tools/memory-tree/merge-rows.py",
+   "{prefix}/memory-tree/merge-rows.py",
    "scripts/merge-rows.py"
   ],
   [
-   "tools/memory-tree/merge-rows.test.sh",
+   "{prefix}/memory-tree/merge-rows.test.sh",
    "scripts/merge-rows.test.sh"
   ],
   [
-   "tools/push-main.sh",
+   "{prefix}/push-main.sh",
    "scripts/push-main.sh"
   ],
   [
-   "tools/push-main.test.sh",
+   "{prefix}/push-main.test.sh",
    "scripts/push-main.test.sh"
   ],
   [
-   "tools/pytest-parallel-guardrails/README.md",
+   "{prefix}/pytest-parallel-guardrails/README.md",
    "scripts/pytest-guardrails/README.md"
   ],
   [
-   "tools/pytest-parallel-guardrails/crashprobe.py",
+   "{prefix}/pytest-parallel-guardrails/crashprobe.py",
    "scripts/pytest-guardrails/crashprobe.py"
   ],
   [
-   "tools/settings-merge.py",
+   "{prefix}/settings-merge.py",
    "scripts/settings-merge.py"
   ],
   [
-   "tools/unattended/.unattended.conf.example",
+   "{prefix}/unattended/.unattended.conf.example",
    "scripts/unattended/.unattended.conf.example"
   ],
   [
-   "tools/unattended/PLAYBOOK-TEMPLATE.template.md",
+   "{prefix}/unattended/PLAYBOOK-TEMPLATE.template.md",
    "scripts/unattended/PLAYBOOK-TEMPLATE.template.md"
   ],
   [
-   "tools/unattended/PROTOCOL.template.md",
+   "{prefix}/unattended/PROTOCOL.template.md",
    "scripts/unattended/PROTOCOL.template.md"
   ],
   [
-   "tools/unattended/SKILL.template.md",
+   "{prefix}/unattended/SKILL.template.md",
    "scripts/unattended/SKILL.template.md"
   ],
   [
-   "tools/unattended/adopt-unattended.sh",
+   "{prefix}/unattended/adopt-unattended.sh",
    "scripts/unattended/adopt-unattended.sh"
   ],
   [
-   "tools/unattended/adopt-unattended.test.sh",
+   "{prefix}/unattended/adopt-unattended.test.sh",
    "scripts/unattended/adopt-unattended.test.sh"
   ],
   [
-   "tools/unattended/check-playbook.sh",
+   "{prefix}/unattended/check-playbook.sh",
    "scripts/unattended/check-playbook.sh"
   ],
   [
-   "tools/unattended/check-playbook.test.sh",
+   "{prefix}/unattended/check-playbook.test.sh",
    "scripts/unattended/check-playbook.test.sh"
   ],
   [
-   "tools/unattended/check-unattended.sh",
+   "{prefix}/unattended/check-unattended.sh",
    "scripts/unattended/check-unattended.sh"
   ],
   [
-   "tools/unattended/check-unattended.test.sh",
+   "{prefix}/unattended/check-unattended.test.sh",
    "scripts/unattended/check-unattended.test.sh"
   ],
   [
-   "tools/unattended/cross-component.test.sh",
+   "{prefix}/unattended/cross-component.test.sh",
    "scripts/unattended/cross-component.test.sh"
   ],
   [
-   "tools/unattended/fixture-pieces/one/piece.md",
+   "{prefix}/unattended/fixture-pieces/one/piece.md",
    "scripts/unattended/fixture-pieces/one/piece.md"
   ],
   [
-   "tools/unattended/fixture-pieces/two/piece.md",
+   "{prefix}/unattended/fixture-pieces/two/piece.md",
    "scripts/unattended/fixture-pieces/two/piece.md"
   ],
   [
-   "tools/unattended/fixture-records/set-dScriptedRepeat.md",
+   "{prefix}/unattended/fixture-records/set-dScriptedRepeat.md",
    "scripts/unattended/fixture-records/set-dScriptedRepeat.md"
   ],
   [
-   "tools/unattended/lib-unattended.sh",
+   "{prefix}/unattended/lib-unattended.sh",
    "scripts/unattended/lib-unattended.sh"
   ],
   [
-   "tools/unattended/playbook.fixture.md",
+   "{prefix}/unattended/playbook.fixture.md",
    "scripts/unattended/playbook.fixture.md"
   ],
   [
-   "tools/unattended/run-unattended-gates.sh",
+   "{prefix}/unattended/run-unattended-gates.sh",
    "scripts/unattended/run-unattended-gates.sh"
   ],
   [
-   "tools/unattended/unattended.sh",
+   "{prefix}/unattended/unattended.sh",
    "scripts/unattended/unattended.sh"
   ],
   [
-   "tools/unattended/unattended.test.sh",
+   "{prefix}/unattended/unattended.test.sh",
    "scripts/unattended/unattended.test.sh"
   ],
   [
-   "tools/workflows/check-review-join.sh",
+   "{prefix}/workflows/check-review-join.sh",
    "scripts/workflows/check-review-join.sh"
   ],
   [
-   "tools/workflows/check-review-join.test.sh",
+   "{prefix}/workflows/check-review-join.test.sh",
    "scripts/workflows/check-review-join.test.sh"
   ],
   [
-   "tools/workflows/check-verifier-fanout.sh",
+   "{prefix}/workflows/check-verifier-fanout.sh",
    "scripts/workflows/check-verifier-fanout.sh"
   ],
   [
-   "tools/workflows/check-verifier-fanout.test.sh",
+   "{prefix}/workflows/check-verifier-fanout.test.sh",
    "scripts/workflows/check-verifier-fanout.test.sh"
   ],
   [
-   "tools/workflows/check-workflow-syntax.js",
+   "{prefix}/workflows/check-workflow-syntax.js",
    "scripts/workflows/check-workflow-syntax.js"
   ],
   [
-   "tools/workflows/drift-audit-code.js",
+   "{prefix}/workflows/drift-audit-code.js",
    ".claude/workflows/drift-audit-code.js"
   ],
   [
-   "tools/workflows/drift-audit-state.js",
+   "{prefix}/workflows/drift-audit-state.js",
    ".claude/workflows/drift-audit-state.js"
   ]
  ],
@@ -355,7 +355,7 @@
    "path": ".claude/hooks/agent-cap.js",
    "role": "engine",
    "sha256": "06aa8558712b9515c952e39bc2893b14749da0b0df9097b9900a9c479195753e",
-   "source": "tools/hooks/agent-cap.js"
+   "source": "{prefix}/hooks/agent-cap.js"
   },
   {
    "commit": "ce5dca99",
@@ -366,7 +366,7 @@
    "path": ".claude/hooks/agent-cap.test.sh",
    "role": "engine",
    "sha256": "d3155eda821cbd3804223adf03a6d0b67b48f66289a65db3faeb6ee4504406e9",
-   "source": "tools/hooks/agent-cap.test.sh"
+   "source": "{prefix}/hooks/agent-cap.test.sh"
   },
   {
    "commit": "ce5dca99",
@@ -377,7 +377,7 @@
    "path": ".claude/workflows/drift-audit-code.js",
    "role": "engine",
    "sha256": "955819f618505a0a4c72c53f56bf031fb1f33c925f4445e3e30f5f17607eaf1f",
-   "source": "tools/workflows/drift-audit-code.js"
+   "source": "{prefix}/workflows/drift-audit-code.js"
   },
   {
    "commit": "ce5dca99",
@@ -388,7 +388,7 @@
    "path": ".claude/workflows/drift-audit-state.js",
    "role": "engine",
    "sha256": "c7119c6db49be5d669d148c17e3ae11082fc8935479428793a4294e06833eb93",
-   "source": "tools/workflows/drift-audit-state.js"
+   "source": "{prefix}/workflows/drift-audit-state.js"
   },
   {
    "commit": "ce5dca99",
@@ -410,7 +410,7 @@
    "path": "scripts/check-wiring.sh",
    "role": "engine",
    "sha256": "ad17c8f428f4fe8b686dd884e5880afc7e5198aeb8ddc92c93108037fdf8852f",
-   "source": "tools/check-wiring.sh"
+   "source": "{prefix}/check-wiring.sh"
   },
   {
    "commit": "ce5dca99",
@@ -421,7 +421,7 @@
    "path": "scripts/check-wiring.test.sh",
    "role": "engine",
    "sha256": "9eb30003b881f92ff2d34b1f2f6fbda11fd7010e41c21ecf949b2622470f9dc8",
-   "source": "tools/check-wiring.test.sh"
+   "source": "{prefix}/check-wiring.test.sh"
   },
   {
    "commit": "ce5dca99",
@@ -432,7 +432,7 @@
    "path": "scripts/codebase-map/map_extractors.py",
    "role": "project-owned",
    "sha256": "883c88387bfea92477088278b1fb4643c313cd9cf00fa1760d446cc764efa837",
-   "source": "tools/codebase-map/map_extractors.py"
+   "source": "{prefix}/codebase-map/map_extractors.py"
   },
   {
    "commit": "ce5dca99",
@@ -443,7 +443,7 @@
    "path": "scripts/codebase-map/map_extractors.template.py",
    "role": "engine",
    "sha256": "8ce64454204cd3c89d6f79df5601c8389691740aa40424515de7b86e31dcb5e9",
-   "source": "tools/codebase-map/map_extractors.template.py"
+   "source": "{prefix}/codebase-map/map_extractors.template.py"
   },
   {
    "commit": "ce5dca99",
@@ -454,7 +454,7 @@
    "path": "scripts/codebase-map/map_lib.py",
    "role": "engine",
    "sha256": "be028355ff493aca3c3cc6b66a1d434d8a9f363c0c0105a8ebaaf441d981a186",
-   "source": "tools/codebase-map/map_lib.py"
+   "source": "{prefix}/codebase-map/map_lib.py"
   },
   {
    "commit": "ce5dca99",
@@ -465,7 +465,7 @@
    "path": "scripts/codebase-map/selftest.py",
    "role": "engine",
    "sha256": "b78fd254458f5ce3f437dd64e4f039a631be9242b38548f06a81e1a550a55cce",
-   "source": "tools/codebase-map/selftest.py"
+   "source": "{prefix}/codebase-map/selftest.py"
   },
   {
    "commit": "ce5dca99",
@@ -476,7 +476,7 @@
    "path": "scripts/drift-audit/README.md",
    "role": "engine",
    "sha256": "43e2452bb567009ccc17a908c1a5a3ff00bc0eb60b1383713853bcd41137ad8f",
-   "source": "tools/drift-audit/README.md"
+   "source": "{prefix}/drift-audit/README.md"
   },
   {
    "commit": "ce5dca99",
@@ -487,7 +487,7 @@
    "path": "scripts/drift-audit/drift_report.py",
    "role": "engine",
    "sha256": "5d3c0e2fed0b17b160a5bcd158ac2fc235ca48ef3ada12e14c735e2cf18ca4f3",
-   "source": "tools/drift-audit/drift_report.py"
+   "source": "{prefix}/drift-audit/drift_report.py"
   },
   {
    "commit": "ce5dca99",
@@ -498,7 +498,7 @@
    "path": "scripts/drift-audit/drift_signals.py",
    "role": "project-owned",
    "sha256": "7fc9209d90f5b5e31c193d2c24ab19ae89a0ab304542ef6ceb8ef034b04504a5",
-   "source": "tools/drift-audit/drift_signals.py"
+   "source": "{prefix}/drift-audit/drift_signals.py"
   },
   {
    "commit": "ce5dca99",
@@ -509,7 +509,7 @@
    "path": "scripts/drift-audit/drift_signals.template.py",
    "role": "engine",
    "sha256": "4d980dd139ca1b11128c068b88a07a97d35308cd0bdccde584d999fc9cb8601e",
-   "source": "tools/drift-audit/drift_signals.template.py"
+   "source": "{prefix}/drift-audit/drift_signals.template.py"
   },
   {
    "commit": "ce5dca99",
@@ -520,7 +520,7 @@
    "path": "scripts/drift-audit/selftest.py",
    "role": "engine",
    "sha256": "18d86d65dc988f4bd3584ff9c99bfcc1e684104b099249e2b000c4cad9313a81",
-   "source": "tools/drift-audit/selftest.py"
+   "source": "{prefix}/drift-audit/selftest.py"
   },
   {
    "commit": "ce5dca99",
@@ -531,7 +531,7 @@
    "path": "scripts/gate-lint/README.md",
    "role": "engine",
    "sha256": "abab983491734dc1592c8344ee74300c392bf7808008e9da9cec7f5be780693a",
-   "source": "tools/gate-lint/README.md"
+   "source": "{prefix}/gate-lint/README.md"
   },
   {
    "commit": "ce5dca99",
@@ -542,7 +542,7 @@
    "path": "scripts/gate-lint/ps-hygiene.py",
    "role": "engine",
    "sha256": "97cfe54215519b4e0ea3ecde289620c598031fff036328dcd066b02670ccb2fa",
-   "source": "tools/gate-lint/ps-hygiene.py"
+   "source": "{prefix}/gate-lint/ps-hygiene.py"
   },
   {
    "commit": "ce5dca99",
@@ -553,7 +553,7 @@
    "path": "scripts/gotchas.py",
    "role": "engine",
    "sha256": "1c66aac0a7b747d0766f67f8a903e56d77331aa8227262f48cdb1e8547086473",
-   "source": "tools/memory-tree/gotchas.py"
+   "source": "{prefix}/memory-tree/gotchas.py"
   },
   {
    "commit": "ce5dca99",
@@ -564,7 +564,7 @@
    "path": "scripts/lexicon/LEXICON.md",
    "role": "engine",
    "sha256": "efd4e15115435d0e49a757e4397ec15ac5242075aa1f070c28aa5a56353a0b85",
-   "source": "tools/lexicon/LEXICON.md"
+   "source": "{prefix}/lexicon/LEXICON.md"
   },
   {
    "commit": "ce5dca99",
@@ -575,7 +575,7 @@
    "path": "scripts/lexicon/README.md",
    "role": "engine",
    "sha256": "3456612a50d05d67dc6110401751b8052b6ee965e4fa29916a5be859bd87dc5f",
-   "source": "tools/lexicon/README.md"
+   "source": "{prefix}/lexicon/README.md"
   },
   {
    "commit": "ce5dca99",
@@ -586,7 +586,7 @@
    "path": "scripts/lexicon/adopt-lexicon.sh",
    "role": "engine",
    "sha256": "8cdff7ef47ab8d9eaff3151c54bbbfa90727d816206215ae7f45ec8367946bf4",
-   "source": "tools/lexicon/adopt-lexicon.sh"
+   "source": "{prefix}/lexicon/adopt-lexicon.sh"
   },
   {
    "commit": "ce5dca99",
@@ -597,7 +597,7 @@
    "path": "scripts/lexicon/lexicon-layer-waivers.txt",
    "role": "seed",
    "sha256": "4f49424e9337a61eef40b2284cd0f6e7da55ba06b65710c9e3d6b490a788b72b",
-   "source": "tools/lexicon/lexicon-layer-waivers.txt"
+   "source": "{prefix}/lexicon/lexicon-layer-waivers.txt"
   },
   {
    "commit": "ce5dca99",
@@ -608,7 +608,7 @@
    "path": "scripts/lexicon/lexicon-suffix-waivers.txt",
    "role": "seed",
    "sha256": "68501d7e03df8039e162d264e54c02c78312c4290e2f2033a6eec464c600a381",
-   "source": "tools/lexicon/lexicon-suffix-waivers.txt"
+   "source": "{prefix}/lexicon/lexicon-suffix-waivers.txt"
   },
   {
    "commit": "ce5dca99",
@@ -619,7 +619,7 @@
    "path": "scripts/lexicon/lexicon-verb-waivers.txt",
    "role": "seed",
    "sha256": "7f3df11a5f70ae60e71d9d0e108572353935e43c2c71e3736c6bb90967543ee9",
-   "source": "tools/lexicon/lexicon-verb-waivers.txt"
+   "source": "{prefix}/lexicon/lexicon-verb-waivers.txt"
   },
   {
    "commit": "ce5dca99",
@@ -630,7 +630,7 @@
    "path": "scripts/lexicon/lexicon.py",
    "role": "engine",
    "sha256": "5cf6872dbad0a3c93e47de023bd38ec70c8f036472936177154160ae47fe1ae4",
-   "source": "tools/lexicon/lexicon.py"
+   "source": "{prefix}/lexicon/lexicon.py"
   },
   {
    "commit": "ce5dca99",
@@ -641,7 +641,7 @@
    "path": "scripts/lexicon/lexicon_conf.py",
    "role": "engine",
    "sha256": "2b417464955ea89af95c782badd0ef25118d878bfee64adecfaaf356a3d93c66",
-   "source": "tools/lexicon/lexicon_conf.py"
+   "source": "{prefix}/lexicon/lexicon_conf.py"
   },
   {
    "commit": "ce5dca99",
@@ -652,7 +652,7 @@
    "path": "scripts/lexicon/scaffold_lexicon.py",
    "role": "engine",
    "sha256": "e1d07625023eb787e91bebe89f180d1aa303275f0f26d69fe9ae8f3b826894a8",
-   "source": "tools/lexicon/scaffold_lexicon.py"
+   "source": "{prefix}/lexicon/scaffold_lexicon.py"
   },
   {
    "commit": "ce5dca99",
@@ -663,7 +663,7 @@
    "path": "scripts/lexicon/selftest.py",
    "role": "engine",
    "sha256": "2ff50395b94cb4a589a6829d6a875ef9ef4b98d946273a7b97c206f7ca0e08d1",
-   "source": "tools/lexicon/selftest.py"
+   "source": "{prefix}/lexicon/selftest.py"
   },
   {
    "commit": "ce5dca99",
@@ -674,7 +674,7 @@
    "path": "scripts/lexicon/subtokens.py",
    "role": "engine",
    "sha256": "c5424c2cbfe0106af00e456e710435c1ac945bafe8f454223fe208f466fdfba0",
-   "source": "tools/lexicon/subtokens.py"
+   "source": "{prefix}/lexicon/subtokens.py"
   },
   {
    "commit": "ce5dca99",
@@ -707,7 +707,7 @@
    "path": "scripts/recall/recall-opened.fragment.json",
    "role": "engine",
    "sha256": "77a796c89135af31a64ae675a7710c0fa0b10826d2142f1220d6b0b1043e4c53",
-   "source": "tools/memory-recall/recall-opened.fragment.json"
+   "source": "{prefix}/memory-recall/recall-opened.fragment.json"
   },
   {
    "commit": "ce5dca99",
@@ -718,7 +718,7 @@
    "path": "scripts/unattended/.unattended.conf.example",
    "role": "engine",
    "sha256": "433574c4d076c27d61e036f466d9d9295851a3da367a7f42b9c1b77295e39f19",
-   "source": "tools/unattended/.unattended.conf.example"
+   "source": "{prefix}/unattended/.unattended.conf.example"
   },
   {
    "commit": "ce5dca99",
@@ -729,7 +729,7 @@
    "path": "scripts/unattended/PLAYBOOK-TEMPLATE.template.md",
    "role": "engine",
    "sha256": "eecc9642053af47052212ea2221a1ea07465caf79d526de78796f94cd7dc1ead",
-   "source": "tools/unattended/PLAYBOOK-TEMPLATE.template.md"
+   "source": "{prefix}/unattended/PLAYBOOK-TEMPLATE.template.md"
   },
   {
    "commit": "ce5dca99",
@@ -740,7 +740,7 @@
    "path": "scripts/unattended/PROTOCOL.template.md",
    "role": "engine",
    "sha256": "f56f57cc929fb6beb3a1e4dcaeb6c233ec10dce5a931dbf7fab0d006b8a0b9d2",
-   "source": "tools/unattended/PROTOCOL.template.md"
+   "source": "{prefix}/unattended/PROTOCOL.template.md"
   },
   {
    "commit": "ce5dca99",
@@ -751,7 +751,7 @@
    "path": "scripts/unattended/SKILL.template.md",
    "role": "engine",
    "sha256": "30803d0c6f9ab8e6ce0879af73f6964bc6473cd87f5add64f1c7c7b315b65e11",
-   "source": "tools/unattended/SKILL.template.md"
+   "source": "{prefix}/unattended/SKILL.template.md"
   },
   {
    "commit": "ce5dca99",
@@ -762,7 +762,7 @@
    "path": "scripts/unattended/adopt-unattended.sh",
    "role": "engine",
    "sha256": "095d40c0b6de9fd2d32516d578d02fbd2671106ff1a6d2aceb05d2802bfb8ec3",
-   "source": "tools/unattended/adopt-unattended.sh"
+   "source": "{prefix}/unattended/adopt-unattended.sh"
   },
   {
    "commit": "ce5dca99",
@@ -773,7 +773,7 @@
    "path": "scripts/unattended/adopt-unattended.test.sh",
    "role": "engine",
    "sha256": "79db59f48c205207f1d9f37dfc5f8ba8fddb1b2dbc45f6262ec6324577254231",
-   "source": "tools/unattended/adopt-unattended.test.sh"
+   "source": "{prefix}/unattended/adopt-unattended.test.sh"
   },
   {
    "commit": "ce5dca99",
@@ -784,7 +784,7 @@
    "path": "scripts/unattended/check-playbook.sh",
    "role": "engine",
    "sha256": "345a2e2efb3de3fb3c2468951348acd4ac854bd04a5d1da415d1385541c44c76",
-   "source": "tools/unattended/check-playbook.sh"
+   "source": "{prefix}/unattended/check-playbook.sh"
   },
   {
    "commit": "ce5dca99",
@@ -795,7 +795,7 @@
    "path": "scripts/unattended/check-playbook.test.sh",
    "role": "engine",
    "sha256": "cae076d635122fca5f185f2f12e3a39d8ba746f4ef582dc2d212473404366a23",
-   "source": "tools/unattended/check-playbook.test.sh"
+   "source": "{prefix}/unattended/check-playbook.test.sh"
   },
   {
    "commit": "ce5dca99",
@@ -806,7 +806,7 @@
    "path": "scripts/unattended/check-unattended.sh",
    "role": "engine",
    "sha256": "a0b0d4487807b8a872f20de7d28f10c36d6bdd97478116be72daa6475db4e5ff",
-   "source": "tools/unattended/check-unattended.sh"
+   "source": "{prefix}/unattended/check-unattended.sh"
   },
   {
    "commit": "ce5dca99",
@@ -817,7 +817,7 @@
    "path": "scripts/unattended/check-unattended.test.sh",
    "role": "engine",
    "sha256": "43624f85be3f8c7e22b909e7b1b2d9fdc5fdbbeda25757148e8f5e5dccf024c8",
-   "source": "tools/unattended/check-unattended.test.sh"
+   "source": "{prefix}/unattended/check-unattended.test.sh"
   },
   {
    "commit": "ce5dca99",
@@ -828,7 +828,7 @@
    "path": "scripts/unattended/cross-component.test.sh",
    "role": "engine",
    "sha256": "5a4fc1d7860a31720c6c17a785a9e0f0c989ded4b6734fa5e1f54b83361c6ace",
-   "source": "tools/unattended/cross-component.test.sh"
+   "source": "{prefix}/unattended/cross-component.test.sh"
   },
   {
    "commit": "ce5dca99",
@@ -839,7 +839,7 @@
    "path": "scripts/unattended/fixture-pieces/one/piece.md",
    "role": "engine",
    "sha256": "b638f61116c7f9f53769b7a3b1bdf3c5519a3568266ae2cde5cac8d026c0a5f3",
-   "source": "tools/unattended/fixture-pieces/one/piece.md"
+   "source": "{prefix}/unattended/fixture-pieces/one/piece.md"
   },
   {
    "commit": "ce5dca99",
@@ -850,7 +850,7 @@
    "path": "scripts/unattended/fixture-pieces/two/piece.md",
    "role": "engine",
    "sha256": "84b7f6d47bd36673ba0cd035e0050f018509fd23ed33bb42d61a9fa80b8436c4",
-   "source": "tools/unattended/fixture-pieces/two/piece.md"
+   "source": "{prefix}/unattended/fixture-pieces/two/piece.md"
   },
   {
    "commit": "ce5dca99",
@@ -861,7 +861,7 @@
    "path": "scripts/unattended/fixture-records/set-dScriptedRepeat.md",
    "role": "engine",
    "sha256": "e6223c2dd87a630c8f2e8d95c90e9af15fb3f05970fdf48a833fdd75138a556f",
-   "source": "tools/unattended/fixture-records/set-dScriptedRepeat.md"
+   "source": "{prefix}/unattended/fixture-records/set-dScriptedRepeat.md"
   },
   {
    "commit": "ce5dca99",
@@ -872,7 +872,7 @@
    "path": "scripts/unattended/lib-unattended.sh",
    "role": "engine",
    "sha256": "683f3e77ed5ad8f555e72cdf9f2d25a72c3223d0800c2d7b6a3e7e67ed1f9265",
-   "source": "tools/unattended/lib-unattended.sh"
+   "source": "{prefix}/unattended/lib-unattended.sh"
   },
   {
    "commit": "ce5dca99",
@@ -883,7 +883,7 @@
    "path": "scripts/unattended/playbook.fixture.md",
    "role": "engine",
    "sha256": "3d5b572a42b00a8d14ea48e2874b8526b3c89b8f94aa920dd90255af7f20f393",
-   "source": "tools/unattended/playbook.fixture.md"
+   "source": "{prefix}/unattended/playbook.fixture.md"
   },
   {
    "commit": "ce5dca99",
@@ -894,7 +894,7 @@
    "path": "scripts/unattended/run-unattended-gates.sh",
    "role": "engine",
    "sha256": "8f6778744429242b091fe383971a15c78fff18bdbfec7110463451d92222e136",
-   "source": "tools/unattended/run-unattended-gates.sh"
+   "source": "{prefix}/unattended/run-unattended-gates.sh"
   },
   {
    "commit": "ce5dca99",
@@ -905,7 +905,7 @@
    "path": "scripts/unattended/unattended.sh",
    "role": "engine",
    "sha256": "b7edcc2f14ea02f060dec7814cb98b59e8a8805f5bcbf14731ce9505de4c8ca0",
-   "source": "tools/unattended/unattended.sh"
+   "source": "{prefix}/unattended/unattended.sh"
   },
   {
    "commit": "ce5dca99",
@@ -916,7 +916,7 @@
    "path": "scripts/unattended/unattended.test.sh",
    "role": "engine",
    "sha256": "6fcabdd1549d1dde867e342b17f621ec4178823916b4c6f04270469e68d4e56c",
-   "source": "tools/unattended/unattended.test.sh"
+   "source": "{prefix}/unattended/unattended.test.sh"
   }
  ],
  "gov_commit": "ce5dca99",
@@ -925,7 +925,7 @@
   "adopter": "inCMS",
   "adopter_record": ".governance/install.index",
   "adopter_rev": "2cff5855",
-  "generated_by": "tools/govkit/fixtures/make_adopter_receipt.py",
+  "generated_by": "{prefix}/govkit/fixtures/make_adopter_receipt.py",
   "gov_rev": "ce5dca99",
   "index_rows": 92,
   "unresolved": [

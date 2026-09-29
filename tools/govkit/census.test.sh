@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Arms for tools/govkit/census.py — DEPL-dRetiredFork-7.
+# Arms for <prefix>/govkit/census.py — DEPL-dRetiredFork-7.
 #
 # DELIBERATELY NOT A BAR LEG, and this header states the compensating check rather than leaving
 # the exemption bare (§7: an exemption is not coverage). The census reads repositories gov does
@@ -9,22 +9,40 @@
 # ON DEMAND against SYNTHETIC repositories built here, so they need no adopter present and are
 # the thing to run whenever census.py changes.
 #
-#   bash tools/govkit/census.test.sh
+#   bash <prefix>/govkit/census.test.sh
 #
 # Every arm below builds its own gov and its own adopter. None of them reads a real adopter tree:
 # a fixture that depends on inCMS's current bytes grades a moving target and reports the wrong
 # thing on the day inCMS changes.
 
 set -u
+HERE="$(cd "$(dirname "$0")" && pwd)"
+# >>> derive_self_rel — canonical copy: kit-rel.sh in gov's lib dir (byte-identical; gated)
+derive_self_rel() {
+  local _dsr_p _dsr_rel=""
+  _dsr_p=$(cd "$1" 2>/dev/null && pwd) || return 1
+  while [ ! -e "$_dsr_p/.git" ]; do
+    [ "$(dirname "$_dsr_p")" = "$_dsr_p" ] && return 1
+    _dsr_rel="$(basename "$_dsr_p")${_dsr_rel:+/$_dsr_rel}"
+    _dsr_p=$(dirname "$_dsr_p")
+  done
+  printf '%s\n' "$_dsr_rel"
+}
+# <<< derive_self_rel
+KIT_REL=$(derive_self_rel "$HERE") || { echo "census.test: not inside a git repository"; exit 2; }
+# PFX is the install prefix WITH its trailing slash, derived from where this file sits and empty
+# at a root install: every fixture and host path below is spelled through it, never through a
+# literal prefix (TOOL-aRepatriatedFork-28).
+case "$KIT_REL" in */*) PFX="${KIT_REL%/*}/" ;; *) PFX="" ;; esac
 HERE=$(cd "$(dirname "$0")/../.." && pwd)
-CENSUS="$HERE/tools/govkit/census.py"
+CENSUS="$HERE/${PFX}govkit/census.py"
 
 # THROUGH THE ONE RESOLVER, never a bare launcher name. The MS-Store `python3` stub answers
 # `command -v` and then exits 9009, so a bare name is not an answer — and the invocation ban in
-# `tools/lib/resolve-python.test.sh` refuses one repo-wide, which is how this file was caught:
+# `<prefix>/lib/resolve-python.test.sh` refuses one repo-wide, which is how this file was caught:
 # it shipped with six bare `python` calls and redded that leg on the closing bar.
 # shellcheck source=/dev/null
-. "$HERE/tools/lib/resolve-python.sh"
+. "$HERE/${PFX}lib/resolve-python.sh"
 PY="$(resolve_python)"
 n=0; st=0
 
@@ -38,11 +56,11 @@ has()  { case "$1" in *"$2"*) return 0 ;; *) return 1 ;; esac; }
 GOV=$(mktemp -d)
 (
   cd "$GOV" && git init -q . && git config user.email t@t && git config user.name t
-  mkdir -p tools/kit
-  printf 'v1 engine\n' > tools/kit/engine.sh
-  printf 'stable\n'    > tools/kit/stable.sh
+  mkdir -p ${PFX}kit
+  printf 'v1 engine\n' > ${PFX}kit/engine.sh
+  printf 'stable\n'    > ${PFX}kit/stable.sh
   git add -A && git commit -q -m v1 --no-verify
-  printf 'v2 engine\n' > tools/kit/engine.sh
+  printf 'v2 engine\n' > ${PFX}kit/engine.sh
   git add -A && git commit -q -m v2 --no-verify
 ) >/dev/null 2>&1
 
@@ -53,9 +71,9 @@ mkadopter() { # $1 = dir; builds a tree with one file of each class
   printf 'local only\n' > "$1/scripts/mine.sh"     # in no gov commit ever -> FORK
   cat > "$1/.governance/install.json" <<JSON
 {"schema":3,"gov_commit":"none","prefix":"scripts","kits":["kit"],"files":[
- {"path":"scripts/stable.sh","role":"engine","kit":"kit","source":"tools/kit/stable.sh"},
- {"path":"scripts/engine.sh","role":"engine","kit":"kit","source":"tools/kit/engine.sh"},
- {"path":"scripts/mine.sh","role":"engine","kit":"kit","source":"tools/kit/mine.sh"}]}
+ {"path":"scripts/stable.sh","role":"engine","kit":"kit","source":"${PFX}kit/stable.sh"},
+ {"path":"scripts/engine.sh","role":"engine","kit":"kit","source":"${PFX}kit/engine.sh"},
+ {"path":"scripts/mine.sh","role":"engine","kit":"kit","source":"${PFX}kit/mine.sh"}]}
 JSON
   ( cd "$1" && git init -q . && git config user.email t@t && git config user.name t \
       && git add -A && git commit -q -m a --no-verify ) >/dev/null 2>&1
@@ -125,7 +143,7 @@ after_ad=$(cd "$A1" && git status --porcelain | wc -l)
 # ---- ARM 6: a DRIFT row is not silently promoted when gov's HEAD moves --------------------------
 # The regression this guards: re-testing against HEAD only. Move gov forward again; the adopter's
 # v1 file must STILL be DRIFT, because v1 is still in the history even though HEAD has left it.
-( cd "$GOV" && printf 'v3 engine\n' > tools/kit/engine.sh && git add -A \
+( cd "$GOV" && printf 'v3 engine\n' > ${PFX}kit/engine.sh && git add -A \
     && git commit -q -m v3 --no-verify ) >/dev/null 2>&1
 out=$("$PY" "$CENSUS" --adopter "$A1" --name t --gov "$GOV" 2>&1)
 has "$out" "DRIFT: 1" && ok "a vintage stays DRIFT after gov's HEAD moves past it again" \

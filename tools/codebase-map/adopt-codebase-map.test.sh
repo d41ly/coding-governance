@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # adopt-codebase-map.test.sh — e2e self-test for the codebase-map ADOPTER. Exit 0 = every arm held.
 #
-#   bash tools/codebase-map/adopt-codebase-map.test.sh
+#   bash <prefix>/codebase-map/adopt-codebase-map.test.sh
 #
 # WHY THIS FILE EXISTS. A Tier-2 review of the install-prefix work found 4 of 7 defects — including a
 # blocker that wrote a conf, a whole map tree and a gate file into a repository the operator never
@@ -15,16 +15,33 @@
 #  * A refusal arm asserts the WRITES DID NOT HAPPEN, not just that the script exited non-zero.
 #    "It refused" and "it refused before writing" are different claims and only one is useful.
 #  * `PASS` prints after the LAST arm.
-KIT_REL="${KIT_REL:-tools/codebase-map}"
 set -u
+HERE="$(cd "$(dirname "$0")" && pwd)"
+# >>> derive_self_rel — canonical copy: kit-rel.sh in gov's lib dir (byte-identical; gated)
+derive_self_rel() {
+  local _dsr_p _dsr_rel=""
+  _dsr_p=$(cd "$1" 2>/dev/null && pwd) || return 1
+  while [ ! -e "$_dsr_p/.git" ]; do
+    [ "$(dirname "$_dsr_p")" = "$_dsr_p" ] && return 1
+    _dsr_rel="$(basename "$_dsr_p")${_dsr_rel:+/$_dsr_rel}"
+    _dsr_p=$(dirname "$_dsr_p")
+  done
+  printf '%s\n' "$_dsr_rel"
+}
+# <<< derive_self_rel
+KIT_REL=$(derive_self_rel "$HERE") || { echo "adopt-codebase-map.test: not inside a git repository"; exit 2; }
+# PFX is the install prefix WITH its trailing slash, derived from where this file sits and empty
+# at a root install: every fixture and host path below is spelled through it, never through a
+# literal prefix (TOOL-aRepatriatedFork-28).
+case "$KIT_REL" in */*) PFX="${KIT_REL%/*}/" ;; *) PFX="" ;; esac
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
-KIT="$ROOT/tools/codebase-map"
+KIT="$ROOT/${PFX}codebase-map"
 fails=0
 TMP=$(mktemp -d); trap 'rm -rf "$TMP"' EXIT
 
 # The resolver, INLINE — this file SHIPS inside the kit, so `../lib/` does not exist in an adopting
-# repo. Byte-identical to tools/lib/resolve-python.sh; resolve-python.test.sh reds if a copy drifts.
+# repo. Byte-identical to <prefix>/lib/resolve-python.sh; resolve-python.test.sh reds if a copy drifts.
 # >>> resolve_python — canonical copy: resolve-python.sh in gov's lib dir (byte-identical; gated)
 resolve_python() {
   # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
@@ -89,7 +106,7 @@ PY
 # Before the fix this adopted the KIT's repo at exit 0 while printing relative paths that read as
 # the cwd's repo, and it was a REGRESSION: the pre-1.1 `-ef` guard had refused the same invocation.
 # ---------------------------------------------------------------------------------------------
-KD=$(mkrepo "$TMP/a1-kitrepo" "tools")
+KD=$(mkrepo "$TMP/a1-kitrepo" "${PFX%/}")
 mkdir -p "$TMP/a1-target" && git -C "$TMP/a1-target" init -q
 out=$(cd "$TMP/a1-target" && bash "$KD/adopt-codebase-map.sh" --scaffold 2>&1); rc=$?
 if [ "$rc" = 0 ]; then bad "1 by-path-from-another-repo: exited 0 (must refuse)"
@@ -161,10 +178,10 @@ done
 # ---------------------------------------------------------------------------------------------
 # arm 4 (review H2) — the DOCUMENTED path: the operator copies the example conf FIRST, so the
 # adopter's create-branch stamp never fires. The digest command must still resolve, because the
-# scaffolded map README ships it. Before the fix that README named codebase-map/map_diff.py at a  # gov:root-fixture — quoting the defect that was fixed, not naming a live path
-# tools/-prefixed install, and `ls` on it said No such file.
+# scaffolded map README ships it. Before the fix that README named the kit's map_diff.py WITHOUT its
+# prefix at a <prefix>/-prefixed install, and `ls` on it said No such file.
 # ---------------------------------------------------------------------------------------------
-KD=$(mkrepo "$TMP/a4" "tools")
+KD=$(mkrepo "$TMP/a4" "${PFX%/}")
 cp "$KD/.codebase-map.conf.example" "$TMP/a4/.codebase-map.conf"
 out=$(cd "$TMP/a4" && bash "$KD/adopt-codebase-map.sh" --scaffold 2>&1); rc=$?
 if [ "$rc" != 0 ]; then bad "4 documented-path: adoption failed"; printf '%s\n' "$out" | sed 's/^/      /'
@@ -189,7 +206,7 @@ fi
 # ---------------------------------------------------------------------------------------------
 mkdir -p "$TMP/a5-src" && git -C "$TMP/a5-src" init -q
 cp -r "$KIT" "$TMP/a5-src/codebase-map"; rm -f "$TMP/a5-src/codebase-map/adopt-codebase-map.test.sh"
-mkdir -p "$TMP/a5-adopting/tools" && git -C "$TMP/a5-adopting" init -q
+mkdir -p "$TMP/a5-adopting/${PFX}" && git -C "$TMP/a5-adopting" init -q
 mkdir -p "$TMP/a5-adopting/src"; printf 'def hello():\n    return 1\n' > "$TMP/a5-adopting/src/mod.py"
 cat > "$TMP/a5-src/codebase-map/map_extractors.py" <<'PY'
 import map_lib as m
@@ -204,14 +221,14 @@ PY
 # Mode and is the exact shape the blocker was measured on (a junctioned kit dir resolving to the
 # link target's repo). `git rev-parse --show-toplevel` follows both.
 link_made=0
-if ln -s "$TMP/a5-src/codebase-map" "$TMP/a5-adopting/tools/codebase-map" 2>/dev/null &&
-   [ -L "$TMP/a5-adopting/tools/codebase-map" ]; then
+if ln -s "$TMP/a5-src/codebase-map" "$TMP/a5-adopting/${PFX}codebase-map" 2>/dev/null &&
+   [ -L "$TMP/a5-adopting/${PFX}codebase-map" ]; then
   link_made=1
 elif command -v cygpath >/dev/null 2>&1 && command -v cmd >/dev/null 2>&1; then
-  rm -rf "$TMP/a5-adopting/tools/codebase-map"
-  cmd //c mklink //J "$(cygpath -w "$TMP/a5-adopting/tools/codebase-map")" \
+  rm -rf "$TMP/a5-adopting/${PFX}codebase-map"
+  cmd //c mklink //J "$(cygpath -w "$TMP/a5-adopting/${PFX}codebase-map")" \
                      "$(cygpath -w "$TMP/a5-src/codebase-map")" >/dev/null 2>&1 || true
-  [ -f "$TMP/a5-adopting/tools/codebase-map/map_lib.py" ] && link_made=2
+  [ -f "$TMP/a5-adopting/${PFX}codebase-map/map_lib.py" ] && link_made=2
 fi
 if [ "$link_made" != 0 ]; then
   out=$(cd "$TMP/a5-adopting" && bash $KIT_REL/adopt-codebase-map.sh --scaffold 2>&1); rc=$?
@@ -231,7 +248,7 @@ fi
 # behind is LIVE: a new module reds it. A green adopter that installs a dead gate is the
 # fixture-passes-by-finding-nothing class one level up.
 # ---------------------------------------------------------------------------------------------
-KD=$(mkrepo "$TMP/a6" "tools")
+KD=$(mkrepo "$TMP/a6" "${PFX%/}")
 # Run 1 creates + stamps the conf and exits 1 BY DESIGN ("EDIT IT, then re-run"); run 2 adopts.
 (cd "$TMP/a6" && bash "$KD/adopt-codebase-map.sh" --scaffold >/dev/null 2>&1) || true
 out=$(cd "$TMP/a6" && bash "$KD/adopt-codebase-map.sh" --scaffold 2>&1); rc=$?

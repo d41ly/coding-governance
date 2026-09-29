@@ -8,12 +8,29 @@
 # sentence, which is the reason the two are not one registry.
 set -u
 HERE="$(cd "$(dirname "$0")" && pwd)"
+# >>> derive_self_rel — canonical copy: kit-rel.sh in gov's lib dir (byte-identical; gated)
+derive_self_rel() {
+  local _dsr_p _dsr_rel=""
+  _dsr_p=$(cd "$1" 2>/dev/null && pwd) || return 1
+  while [ ! -e "$_dsr_p/.git" ]; do
+    [ "$(dirname "$_dsr_p")" = "$_dsr_p" ] && return 1
+    _dsr_rel="$(basename "$_dsr_p")${_dsr_rel:+/$_dsr_rel}"
+    _dsr_p=$(dirname "$_dsr_p")
+  done
+  printf '%s\n' "$_dsr_rel"
+}
+# <<< derive_self_rel
+KIT_REL=$(derive_self_rel "$HERE") || { echo "check-agent-cap-restatement.test: not inside a git repository"; exit 2; }
+# PFX is the install prefix WITH its trailing slash, derived from where this file sits and empty
+# at a root install: every fixture and host path below is spelled through it, never through a
+# literal prefix (TOOL-aRepatriatedFork-28).
+PFX="${KIT_REL:+$KIT_REL/}"
 GATE="$HERE/check-agent-cap-restatement.sh"
 TMP=$(mktemp -d); trap 'rm -rf "$TMP"' EXIT
 st=0; n=0
 
 mk() {   # $1 = tree name; builds a repo whose markdown the gate will scan
-  R="$TMP/$1"; mkdir -p "$R/memory/builds/tOne" "$R/memory/backlog" "$R/tools"
+  R="$TMP/$1"; mkdir -p "$R/memory/builds/tOne" "$R/memory/backlog" "$R/${PFX}"
   ( cd "$R" && git init -q . && git config user.email t@t.test && git config user.name t \
       && git config core.autocrlf false )
   printf '# doc\n' > "$R/README.md"
@@ -43,7 +60,7 @@ ck "a bound with no fan-out noun stays silent"      '[ "$rc" = 0 ]'
 
 # ---- POINTER: the fixed form — no digit, names the resolver — is silent.
 mk pointed
-printf '# rules\n\nA review spawns at most the total `tools/hooks/agent-cap.js` resolves.\n' > "$R/GUIDE.md"
+printf '# rules\n\nA review spawns at most the total `'"${PFX}hooks/agent-cap.js"'` resolves.\n' > "$R/GUIDE.md"
 run
 ck "a pointer with no digit is silent"              '[ "$rc" = 0 ]'
 

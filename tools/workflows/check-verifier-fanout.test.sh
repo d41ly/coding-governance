@@ -1,10 +1,27 @@
 #!/usr/bin/env bash
-# Self-test for check-verifier-fanout.sh. The PREDICATE's own arms live in tools/hooks/agent-cap.test.sh
+# Self-test for check-verifier-fanout.sh. The PREDICATE's own arms live in <prefix>/hooks/agent-cap.test.sh
 # — this file tests the things the gate adds on top of it: the population, the self-exclusion, the
 # empty-population failure, and that the delegation actually reaches the hook rather than reporting
 # clean because nothing ran.
 set -u
 HERE="$(cd "$(dirname "$0")" && pwd)"
+# >>> derive_self_rel — canonical copy: kit-rel.sh in gov's lib dir (byte-identical; gated)
+derive_self_rel() {
+  local _dsr_p _dsr_rel=""
+  _dsr_p=$(cd "$1" 2>/dev/null && pwd) || return 1
+  while [ ! -e "$_dsr_p/.git" ]; do
+    [ "$(dirname "$_dsr_p")" = "$_dsr_p" ] && return 1
+    _dsr_rel="$(basename "$_dsr_p")${_dsr_rel:+/$_dsr_rel}"
+    _dsr_p=$(dirname "$_dsr_p")
+  done
+  printf '%s\n' "$_dsr_rel"
+}
+# <<< derive_self_rel
+KIT_REL=$(derive_self_rel "$HERE") || { echo "check-verifier-fanout.test: not inside a git repository"; exit 2; }
+# PFX is the install prefix WITH its trailing slash, derived from where this file sits and empty
+# at a root install: every fixture and host path below is spelled through it, never through a
+# literal prefix (TOOL-aRepatriatedFork-28).
+case "$KIT_REL" in */*) PFX="${KIT_REL%/*}/" ;; *) PFX="" ;; esac
 GATE="$HERE/check-verifier-fanout.sh"
 TMP=$(mktemp -d); trap 'rm -rf "$TMP"' EXIT
 fails=0
@@ -71,33 +88,33 @@ else fails=$((fails+1)); printf 'arm FAIL  the population collapsed (got %s scri
 E="$TMP/empty"; mkdir -p "$E"
 ( cd "$E" && git init -q . && git config user.email t@t.test && git config user.name t
   printf 'x\n' > README.md && git add -A && git commit -qm empty --no-verify ) >/dev/null 2>&1
-mkdir -p "$E/tools/hooks" && cp "$(cd "$HERE/../hooks" && pwd)/agent-cap.js" "$E/tools/hooks/agent-cap.js"
+mkdir -p "$E/${PFX}hooks" && cp "$(cd "$HERE/../hooks" && pwd)/agent-cap.js" "$E/${PFX}hooks/agent-cap.js"
 # TOOL-dRetiredFork-10: the gate now resolves its predicate RELATIVE TO ITSELF, so the fixture
 # has to put it where an install actually puts it. It previously sat at the bare repository
-# root and worked only because the gate hard-coded `$ROOT/tools/hooks/` -- the literal this
+# root and worked only because the gate hard-coded `$ROOT/<prefix>/hooks/` -- the literal this
 # unit removes. No kit installs a workflow gate at a repo root, so the old fixture described a
 # layout that never existed, and it would have kept passing while real adopters stayed broken.
-mkdir -p "$E/tools/workflows" && cp "$GATE" "$E/tools/workflows/gate.sh"
+mkdir -p "$E/${PFX}workflows" && cp "$GATE" "$E/${PFX}workflows/gate.sh"
 arm 'an empty population is not a pass' 'the population is empty, which is not a pass' \
-  bash -c 'cd "$1" && bash ./tools/workflows/gate.sh' _ "$E"
+  bash -c 'cd "$1" && bash ./'"${PFX}workflows/gate.sh"'' _ "$E"
 
 # The marker filter: a `.js` that is not a workflow is not judged, even carrying the banned shape.
 arm 'a non-workflow .js is not judged by the discovery path' 'verifier-fanout: clean' \
-  bash -c 'cp "$2" "$1/tools/x-helper.js" && cp "$3" "$1/tools/wf.js" && cd "$1" && bash ./tools/workflows/gate.sh' \
+  bash -c 'cp "$2" "$1/'"${PFX}x-helper.js"'" && cp "$3" "$1/'"${PFX}wf.js"'" && cd "$1" && bash ./'"${PFX}workflows/gate.sh"'' \
   _ "$E" "$TMP/not-a-workflow.js" "$TMP/bounded.js"
 
 # The gate has no predicate of its own: break the delegation and it must FAIL, not pass quietly.
 D="$TMP/nohook"; mkdir -p "$D"
 ( cd "$D" && git init -q . && git config user.email t@t.test && git config user.name t
   printf 'x\n' > README.md && git add -A && git commit -qm base --no-verify ) >/dev/null 2>&1
-mkdir -p "$D/tools/workflows" && cp "$GATE" "$D/tools/workflows/gate.sh"
+mkdir -p "$D/${PFX}workflows" && cp "$GATE" "$D/${PFX}workflows/gate.sh"
 arm 'a missing predicate is a named failure' 'has no predicate to delegate to' \
-  bash -c 'cd "$1" && bash ./tools/workflows/gate.sh' _ "$D"
+  bash -c 'cd "$1" && bash ./'"${PFX}workflows/gate.sh"'' _ "$D"
 
 
 # ---- TOOL-dRetiredFork-10: the gate resolves at a FOREIGN install prefix -------------------------
 # These three arms are the reason the unit exists. Before it, the population filter and the hook
-# path both spelled `tools/`, so an adopter who installs at `scripts/` got an EMPTY population and
+# path both spelled `<prefix>/`, so an adopter who installs at `scripts/` got an EMPTY population and
 # a missing predicate — and every one of them carried a hand-maintained carve-out to fix it.
 #
 # The fixtures are built here rather than borrowed, because the two real adopters are foreign trees

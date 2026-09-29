@@ -43,7 +43,7 @@ def _kit_dir() -> Path:
     collects, which may be inside the kit dir or nowhere near it; and the kit dir may sit at any
     PREFIX under the repo root. So each ancestor of this file is probed in order: the ancestor
     itself (gate installed inside the kit dir), `<ancestor>/codebase-map` (the root convention),
-    then `<ancestor>/*/codebase-map` (a one-segment prefix such as `tools/`). The walk stops after
+    then `<ancestor>/*/codebase-map` (a one-segment prefix such as `<prefix>/`). The walk stops after
     the ancestor holding `.codebase-map.conf` OR `.git`, so it can never leave the project.
 
     The conf is in that boundary, not just `.git`, because `.git` is absent from perfectly ordinary

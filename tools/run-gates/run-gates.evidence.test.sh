@@ -12,18 +12,35 @@
 # greps the runner) and never executes run-gates.sh. Executing the real runner in place would re-run
 # the whole bar recursively and clobber the live gate-last-summary.txt mid-run, so every case here
 # drives it through GATE_LEGS with its own scratch GIT_DIR.
-KIT_REL="${KIT_REL:-tools/run-gates}"
 set -u
+HERE="$(cd "$(dirname "$0")" && pwd)"
+# >>> derive_self_rel — canonical copy: kit-rel.sh in gov's lib dir (byte-identical; gated)
+derive_self_rel() {
+  local _dsr_p _dsr_rel=""
+  _dsr_p=$(cd "$1" 2>/dev/null && pwd) || return 1
+  while [ ! -e "$_dsr_p/.git" ]; do
+    [ "$(dirname "$_dsr_p")" = "$_dsr_p" ] && return 1
+    _dsr_rel="$(basename "$_dsr_p")${_dsr_rel:+/$_dsr_rel}"
+    _dsr_p=$(dirname "$_dsr_p")
+  done
+  printf '%s\n' "$_dsr_rel"
+}
+# <<< derive_self_rel
+KIT_REL=$(derive_self_rel "$HERE") || { echo "evidence-test: not inside a git repository"; exit 2; }
+# PFX is the install prefix WITH its trailing slash, derived from where this file sits and empty
+# at a root install: every fixture and host path below is spelled through it, never through a
+# literal prefix (TOOL-aRepatriatedFork-28).
+case "$KIT_REL" in */*) PFX="${KIT_REL%/*}/" ;; *) PFX="" ;; esac
 
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "evidence-test: not a git repo"; exit 2; }
 cd "$ROOT" || exit 2
-RUNNER="$ROOT/tools/run-gates/run-gates.sh"
+RUNNER="$ROOT/${PFX}run-gates/run-gates.sh"
 # The launcher is RESOLVED, not assumed, ONCE, for every python arm below: on Windows the bare name
 # `python` can be the Store stub that answers `command -v` and exits 9009, and an arm that dies on
 # the launcher would print FAIL and accuse the subject of a defect it never saw. `PYBIN=` overrides.
 DC_PY="${PYBIN:-}"
-if [ -z "$DC_PY" ] && [ -f "$ROOT/tools/lib/resolve-python.sh" ]; then
-  . "$ROOT/tools/lib/resolve-python.sh"
+if [ -z "$DC_PY" ] && [ -f "$ROOT/${PFX}lib/resolve-python.sh" ]; then
+  . "$ROOT/${PFX}lib/resolve-python.sh"
   DC_PY=$(resolve_python 2>/dev/null)
 fi
 # NO BARE FALLBACK. The idiom ban this repo's own bar carries reads `DC_PY=python` as a launcher
@@ -188,10 +205,10 @@ REC_OUT=$(mktemp)   # runner stdout goes OUTSIDE the repo under test: writing it
 
 rec_repo() {  # -> sets REC_T (worktree) and REC_GD (git dir)
   REC_T=$(mktemp -d)
-  mkdir -p "$REC_T/tools/run-gates" "$REC_T/tools/lib" "$REC_T/fx"
-  cp "$ROOT/tools/run-gates/run-gates.sh" "$ROOT/tools/run-gates/gate-fingerprint.sh" \
-     "$ROOT/tools/run-gates/gate-profiles.txt" "$REC_T/tools/run-gates/" || return 1
-  cp "$ROOT/tools/lib/resolve-python.sh" "$REC_T/tools/lib/" 2>/dev/null || true
+  mkdir -p "$REC_T/${PFX}run-gates" "$REC_T/${PFX}lib" "$REC_T/fx"
+  cp "$ROOT/${PFX}run-gates/run-gates.sh" "$ROOT/${PFX}run-gates/gate-fingerprint.sh" \
+     "$ROOT/${PFX}run-gates/gate-profiles.txt" "$REC_T/${PFX}run-gates/" || return 1
+  cp "$ROOT/${PFX}lib/resolve-python.sh" "$REC_T/${PFX}lib/" 2>/dev/null || true
   ( cd "$REC_T" && git init -q -b main . && git config user.email rec@test.invalid \
       && git config user.name rec-test ) >/dev/null 2>&1 || return 1
   printf '#!/usr/bin/env bash\necho hello\nexit 0\n' > "$REC_T/fx/a.sh"
@@ -201,7 +218,7 @@ rec_repo() {  # -> sets REC_T (worktree) and REC_GD (git dir)
   printf '%s\n' '[' \
     '  {"name": "one", "argv": ["bash", "fx/a.sh"]},' \
     '  {"name": "guarded", "argv": ["bash", "fx/a.sh"], "guard": ["fx/"]}' \
-    ']' > "$REC_T/tools/gate-legs.json"
+    ']' > "$REC_T/${PFX}gate-legs.json"
   ( cd "$REC_T" && git add -A && git commit -qm seed ) >/dev/null 2>&1 || return 1
   # A resolvable origin, so guards can compute a BASE and a skip is actually reachable. Without it
   # BASE is empty, changed() fails safe to "run", and every skip arm passes by finding nothing.
@@ -219,7 +236,7 @@ rec_repo() {  # -> sets REC_T (worktree) and REC_GD (git dir)
 # This is the `inputs-inside-the-subjects-reach` class: the harness measuring the subject shares an
 # input with it. Every call site's own `KEY=VALUE` still wins, because `-u` is applied first.
 rec_run()  { ( cd "$REC_T" && env -u GATE_BASE -u GATE_FULL -u GATE_REUSE -u GATE_JOBS -u GATE_PROFILES "$@" bash $KIT_REL/run-gates.sh >"$REC_OUT" 2>&1; echo $? ); }
-rec_legs() { printf '%s\n' "$1" > "$REC_T/tools/gate-legs.json"
+rec_legs() { printf '%s\n' "$1" > "$REC_T/${PFX}gate-legs.json"
              ( cd "$REC_T" && git add -A && git commit -qm legs ) >/dev/null 2>&1; }
 rec_dir()  { printf '%s/gate-run/%s' "$REC_GD" "$(cat "$REC_GD/gate-run/current" 2>/dev/null)"; }
 rec_done() { rm -rf "$REC_T"; }
@@ -320,7 +337,7 @@ rec_repo
 rc=$(rec_run GATE_FULL=1)
 if [ -f "$REC_GD/gate-full-green" ]; then
   ok "control: a clean, fully-green, nothing-skipped run DOES stamp gate-full-green"
-  blob=$( cd "$REC_T" && git hash-object -- tools/gate-legs.json )
+  blob=$( cd "$REC_T" && git hash-object -- ${PFX}gate-legs.json )
   grep -q "^manifest_blob	$blob$" "$REC_GD/gate-full-green" \
     && ok "the stamp's manifest_blob is the hash of the manifest THAT RUN READ" \
     || { nope "the stamp's manifest_blob does not match the manifest the run read"; sed 's/^/      /' "$REC_GD/gate-full-green"; }
@@ -406,7 +423,7 @@ rec_repo
 for i in 1 2 3 4 5 6 7 8; do mkdir -p "$REC_GD/gate-run/old$i"; sleep 0.05; done
 rec_run GATE_FULL=1 >/dev/null
 left=$(ls -1 "$REC_GD/gate-run" 2>/dev/null | grep -cv '^current$')
-keep=$(grep -m1 -oE 'GATE_RUN_KEEP:-[0-9]+' "$ROOT/tools/run-gates/run-gates.sh" | grep -oE '[0-9]+')
+keep=$(grep -m1 -oE 'GATE_RUN_KEEP:-[0-9]+' "$ROOT/${PFX}run-gates/run-gates.sh" | grep -oE '[0-9]+')
 # GRADED AGAINST THE CONSTANT BY NAME, read out of the runner. A bound written only into this arm is
 # satisfied by whatever a builder picked, including one above the fixture's size, which passes by
 # finding nothing.
@@ -443,7 +460,7 @@ rec_done
 
 # --- the fingerprint helper's two forms ------------------------------------------------------------
 rec_repo
-FP="$REC_T/tools/run-gates/gate-fingerprint.sh"
+FP="$REC_T/${PFX}run-gates/gate-fingerprint.sh"
 a=$( cd "$REC_T" && bash "$FP" ); b=$( cd "$REC_T" && bash "$FP" HEAD )
 [ -n "$a" ] && [ "$a" = "$b" ] \
   && ok "on a clean tree the no-argument and at-a-rev forms agree" \
@@ -499,10 +516,10 @@ rm -f "$REC_OUT"
 
 ru_repo() {   # -> RU_T, RU_GD
   RU_T=$(mktemp -d)
-  mkdir -p "$RU_T/tools/run-gates" "$RU_T/tools/lib" "$RU_T/fx" "$RU_T/ga" "$RU_T/gb"
-  cp "$ROOT/tools/run-gates/run-gates.sh" "$ROOT/tools/run-gates/gate-fingerprint.sh" \
-     "$ROOT/tools/run-gates/gate-profiles.txt" "$RU_T/tools/run-gates/" || return 1
-  cp "$ROOT/tools/lib/resolve-python.sh" "$RU_T/tools/lib/" 2>/dev/null || true
+  mkdir -p "$RU_T/${PFX}run-gates" "$RU_T/${PFX}lib" "$RU_T/fx" "$RU_T/ga" "$RU_T/gb"
+  cp "$ROOT/${PFX}run-gates/run-gates.sh" "$ROOT/${PFX}run-gates/gate-fingerprint.sh" \
+     "$ROOT/${PFX}run-gates/gate-profiles.txt" "$RU_T/${PFX}run-gates/" || return 1
+  cp "$ROOT/${PFX}lib/resolve-python.sh" "$RU_T/${PFX}lib/" 2>/dev/null || true
   ( cd "$RU_T" && git init -q -b main . && git config user.email ru@test.invalid \
       && git config user.name ru-test ) >/dev/null 2>&1 || return 1
   printf '#!/usr/bin/env bash\necho a\nexit 0\n' > "$RU_T/fx/a.sh"
@@ -511,7 +528,7 @@ ru_repo() {   # -> RU_T, RU_GD
   printf '%s\n' '[' \
     '  {"name": "pa", "argv": ["bash", "fx/a.sh"], "guard": ["ga/"]},' \
     '  {"name": "pb", "argv": ["bash", "fx/b.sh"], "guard": ["gb/"]}' \
-    ']' > "$RU_T/tools/gate-legs.json"
+    ']' > "$RU_T/${PFX}gate-legs.json"
   ( cd "$RU_T" && git add -A && git commit -qm seed ) >/dev/null 2>&1 || return 1
   ( cd "$RU_T" && git update-ref refs/remotes/origin/main HEAD \
       && git symbolic-ref refs/remotes/origin/HEAD refs/remotes/origin/main ) >/dev/null 2>&1
@@ -569,7 +586,7 @@ ru_repo
 printf '%s\n' '[' \
   '  {"name": "pa", "argv": ["bash", "fx/a.sh"], "guard": ["ga/"], "impure": "reads a remote"},' \
   '  {"name": "pb", "argv": ["bash", "fx/b.sh"], "guard": ["gb/"]}' \
-  ']' > "$RU_T/tools/gate-legs.json"
+  ']' > "$RU_T/${PFX}gate-legs.json"
 ( cd "$RU_T" && git add -A && git commit -qm impure ) >/dev/null 2>&1
 ru_run GATE_FULL=1 >/dev/null
 ru_run GATE_FULL=1 GATE_REUSE=1 >/dev/null
@@ -607,9 +624,9 @@ ru_done
 # THE PROFILER STILL SEES A REUSED LEG. Without this the new verb is dropped by that tool's verdict
 # grammar and the bar is under-counted in silence — the same class as a leg that stops being
 # collected.
-if [ -f "$ROOT/tools/run-gates/profile_bar.py" ]; then
+if [ -f "$ROOT/${PFX}run-gates/profile_bar.py" ]; then
   ru_repo
-  cp "$ROOT/tools/run-gates/profile_bar.py" "$RU_T/tools/run-gates/"
+  cp "$ROOT/${PFX}run-gates/profile_bar.py" "$RU_T/${PFX}run-gates/"
   ru_run GATE_FULL=1 >/dev/null
   ru_out=$( cd "$RU_T" && "$DC_PY" $KIT_REL/profile_bar.py --width 2 2>&1 )
   # Matched on the word the tool uses for a REFUSAL, not on 'executed leg' — which appears in its
@@ -637,13 +654,13 @@ fi
 # reached the installed file would rewrite the tracked `ceiling-evidence.txt` — a self-test that
 # edits the artifact its own merge-bar leg reads.
 DC_T=$(mktemp -d)
-mkdir -p "$DC_T/tools/run-gates"
-cp "$ROOT/tools/run-gates/derive-ceilings.py" "$ROOT/tools/run-gates/ceiling-margin.txt" \
-   "$DC_T/tools/run-gates/" || { echo "evidence-test: cannot copy the ceiling kit"; exit 2; }
+mkdir -p "$DC_T/${PFX}run-gates"
+cp "$ROOT/${PFX}run-gates/derive-ceilings.py" "$ROOT/${PFX}run-gates/ceiling-margin.txt" \
+   "$DC_T/${PFX}run-gates/" || { echo "evidence-test: cannot copy the ceiling kit"; exit 2; }
 ( cd "$DC_T" && git init -q -b main . ) >/dev/null 2>&1 \
   || { echo "evidence-test: cannot init the ceiling fixture repo"; exit 2; }
-DC_SCRIPT="$DC_T/tools/run-gates/derive-ceilings.py"
-DC_EV="$DC_T/tools/run-gates/ceiling-evidence.txt"
+DC_SCRIPT="$DC_T/${PFX}run-gates/derive-ceilings.py"
+DC_EV="$DC_T/${PFX}run-gates/ceiling-evidence.txt"
 # Three legs, ONE ceiling, three failing readings: AT it, well BELOW it, and at FOUR TIMES it. The
 # third is the class the window's upper edge refuses. It is not decoration — `run-gates.sh` sets
 # `bound=0` and runs every leg UNBOUNDED when its CEILINGS_LIVE probe fails, and the `.leg` row
@@ -667,7 +684,7 @@ printf '%s\n' '[' \
   '  {"name": "below-ceiling", "argv": ["true"], "ceiling": 100},' \
   '  {"name": "way-over",      "argv": ["true"], "ceiling": 100},' \
   '  {"name": "kill-overhead", "argv": ["true"], "ceiling": 2}' \
-  ']' > "$DC_T/tools/gate-legs.json"
+  ']' > "$DC_T/${PFX}gate-legs.json"
 mkdir -p "$DC_T/.git/gate-run/r1"
 { printf 'at-ceiling\tfail\t124\t100.4\t0\t0\t-\n'
   printf 'below-ceiling\tfail\t1\t40.0\t0\t0\t-\n'

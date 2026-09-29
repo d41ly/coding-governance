@@ -5,6 +5,26 @@
 # Run from the kit directory: bash ./agent-cap.test.sh   (exit 0 = all pass)
 set -u
 HERE="$(cd "$(dirname "$0")" && pwd)"
+# >>> derive_self_rel — canonical copy: kit-rel.sh in gov's lib dir (byte-identical; gated)
+derive_self_rel() {
+  local _dsr_p _dsr_rel=""
+  _dsr_p=$(cd "$1" 2>/dev/null && pwd) || return 1
+  while [ ! -e "$_dsr_p/.git" ]; do
+    [ "$(dirname "$_dsr_p")" = "$_dsr_p" ] && return 1
+    _dsr_rel="$(basename "$_dsr_p")${_dsr_rel:+/$_dsr_rel}"
+    _dsr_p=$(dirname "$_dsr_p")
+  done
+  printf '%s\n' "$_dsr_rel"
+}
+# <<< derive_self_rel
+KIT_REL=$(derive_self_rel "$HERE") || { echo "agent-cap.test: not inside a git repository"; exit 2; }
+# PFX is the install prefix WITH its trailing slash, derived from where this file sits and empty
+# at a root install: every fixture and host path below is spelled through it, never through a
+# literal prefix (TOOL-aRepatriatedFork-28).
+case "$KIT_REL" in */*) PFX="${KIT_REL%/*}/" ;; *) PFX="" ;; esac
+# ROOTPFX is a ROOT install's prefix, empty by definition: a fixture that models a root install,
+# or a key relative to the tool root, is spelled through it rather than bare (TOOL-aRepatriatedFork-28 S2).
+ROOTPFX=""
 HOOK="$HERE/agent-cap.js"
 TMP=$(mktemp -d); trap 'rm -rf "$TMP"' EXIT
 pass=0; fail=0
@@ -235,7 +255,7 @@ const verdictByRef = new Map()
 EOF
 
 # Prose is NOT code. This is the narrowing the port deliberately took over the awk it replaced, and
-# it is load-bearing: `tools/workflows/tier2-review.js` carries a comment that necessarily spells the
+# it is load-bearing: `<prefix>/workflows/tier2-review.js` carries a comment that necessarily spells the
 # banned expression while documenting the retired join, and a whole-file-text ban reds on it.
 js "rule5: a comment documenting the join is prose" 0 <<'EOF'
 // never key the join on m[f.ref] = v again; use the integer id
@@ -651,7 +671,7 @@ js "rule2: a single synthesis agent → allow" 0 <<'EOF'
 const synth = await agent('synthesize the confirmed findings', { label: 'synth' })
 EOF
 # The synthesis stage builds its PROMPT with a .map over every finding. A proximity-based scan read
-# that as a fan-out and denied a one-agent call — measured on tools/workflows/tier2-review.js:290.
+# that as a fan-out and denied a one-agent call — measured on <prefix>/workflows/tier2-review.js:290.
 js "rule2: a synth prompt that quotes a .map → allow" 0 <<'EOF'
 const synth = await agent(
   'findings:\n' + allFindings.map((f) => f.claim).join('\n'),
@@ -672,7 +692,7 @@ check "scriptPath → clean file allowed" 0 "{\"tool_name\":\"Workflow\",\"tool_
 check "scriptPath → offending file denied" 2 "{\"tool_name\":\"Workflow\",\"tool_input\":{\"scriptPath\":\"$BAD\"}}"
 check "scriptPath → unreadable path refused, not waved through" 2 '{"tool_name":"Workflow","tool_input":{"scriptPath":"/no/such/workflow.js"}}'
 # A `name:` run supplies no source at all. It is ALLOWED here and covered by the merge-bar leg over
-# tools/workflows/ instead — declared, not papered over.
+# <prefix>/workflows/ instead — declared, not papered over.
 check "name-only run → allow (no source reaches the hook)" 0 '{"tool_name":"Workflow","tool_input":{"name":"tier2-review"}}'
 
 # ---- rule 0: a spec audit is OPT-IN, declared in the build README's front matter ----------------
@@ -1152,13 +1172,13 @@ after=$(ls "$AGROOT" 2>/dev/null | grep -c .)
   || { echo "FAIL rule4: unkeyable payload (exit $rcn, dirs $before -> $after)"; fail=$((fail+1)); }
 
 # ---- the two copies ------------------------------------------------------------------------------
-# `.claude/hooks/agent-cap.js` is the WIRED copy and `tools/hooks/agent-cap.js` is the kit's. Nothing
+# `.claude/hooks/agent-cap.js` is the WIRED copy and `<prefix>/hooks/agent-cap.js` is the kit's. Nothing
 # gated them: check-wiring.sh asserts the hook is wired, never that the wired one is this one. A
 # stale wired copy enforces yesterday's rules while the kit documents today's.
 # The arm used to sit inside `if BOTH files exist`, so a DELETED wired copy satisfied it by absence —
 # the parity assertion's own failure mode. Inside the governance repo the pair is REQUIRED; in an
-# adopting tree with no tools/hooks/ the arm skips loudly instead of vanishing.
-# The kit copy is LOCATED, never assumed at one prefix. Gating on the literal `tools/hooks/` made
+# adopting tree with no <prefix>/hooks/ the arm skips loudly instead of vanishing.
+# The kit copy is LOCATED, never assumed at one prefix. Gating on the literal `<prefix>/hooks/` made
 # this arm disarm itself in every tree that installs the kit anywhere else: measured in a scratch
 # repo with the kit at `<root>/hooks/` and NO wired copy at all, this file reported "39 passed, 0
 # failed", exit 0. A stale wired hook enforcing yesterday's fan-out rules was undetectable there.
@@ -1167,7 +1187,7 @@ after=$(ls "$AGROOT" 2>/dev/null | grep -c .)
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null || true)
 KITJS=""
 if [ -n "$ROOT" ]; then
-  for c in "$ROOT/tools/hooks/agent-cap.js" "$ROOT/hooks/agent-cap.js"; do
+  for c in "$ROOT/${PFX}hooks/agent-cap.js" "$ROOT/hooks/agent-cap.js"; do
     [ -f "$c" ] && { KITJS="$c"; break; }
   done
   # Last resort: ask git where it is, so a prefix nobody listed still arms the arm.
@@ -1176,7 +1196,7 @@ if [ -n "$ROOT" ]; then
     # backslash would escape the space before a comment rather than the newline, and the resulting
     # break is valid shell that silently drops the rest of the command.
     _g_prefixed='*/hooks/agent-cap.js'
-    _g_root='hooks/agent-cap.js'   # gov:root-fixture — a root install is half of what this searches
+    _g_root="${ROOTPFX}hooks/agent-cap.js"   # a root install is half of what this searches
     rel=$(git -C "$ROOT" ls-files -- "$_g_prefixed" "$_g_root" 2>/dev/null \
           | grep -v '^\.claude/' | head -1)
     [ -n "$rel" ] && KITJS="$ROOT/$rel"
@@ -1217,7 +1237,7 @@ if [ -n "$KITJS" ]; then
     fi
   fi
 else
-  echo "FAIL the parity arm found NO copy of agent-cap.js anywhere (looked for tools/hooks/, hooks/, then any */hooks/ outside .claude/) — an arm with no subject cannot pass"
+  echo "FAIL the parity arm found NO copy of agent-cap.js anywhere (looked for ${PFX}hooks/, hooks/, then any */hooks/ outside .claude/) — an arm with no subject cannot pass"
   fail=$((fail+1))
 fi
 
@@ -1807,7 +1827,7 @@ else echo "FAIL print-cap: a payload on stdin (exit $got, want 2 naming 'must no
 # The three renderShipped* bodies must equal their counterparts in the BASE blob. Only the name line
 # differs. A tree where that blob does not resolve -- every adopter -- gets an announced SKIP.
 GOV_BASE_SHA=${GOV_BASE_SHA:-d65da7ab}
-# DERIVED, never spelled: a `tools/hooks/` literal is gov's own install prefix and resolves to
+# DERIVED, never spelled: a `<prefix>/hooks/` literal is gov's own install prefix and resolves to
 # nothing in a target that installed this kit elsewhere, which is what the shipped-surface ratchet
 # refuses. `git ls-files --full-name` answers where THIS hook actually lives in THIS tree.
 HOOKREL=$(git -C "$HERE" ls-files --full-name -- "$HOOK" 2>/dev/null | head -1)

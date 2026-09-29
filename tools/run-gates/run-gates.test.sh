@@ -1,12 +1,29 @@
 #!/usr/bin/env bash
 # run-gates.test.sh — canary: gate-legs.json is well-formed AND run-gates.sh sources every leg from it
 # (no inlined leg command). Exit 0 = clean. Runs as a leg of run-gates.sh itself.
-KIT_REL="${KIT_REL:-tools/run-gates}"
 set -u
+HERE="$(cd "$(dirname "$0")" && pwd)"
+# >>> derive_self_rel — canonical copy: kit-rel.sh in gov's lib dir (byte-identical; gated)
+derive_self_rel() {
+  local _dsr_p _dsr_rel=""
+  _dsr_p=$(cd "$1" 2>/dev/null && pwd) || return 1
+  while [ ! -e "$_dsr_p/.git" ]; do
+    [ "$(dirname "$_dsr_p")" = "$_dsr_p" ] && return 1
+    _dsr_rel="$(basename "$_dsr_p")${_dsr_rel:+/$_dsr_rel}"
+    _dsr_p=$(dirname "$_dsr_p")
+  done
+  printf '%s\n' "$_dsr_rel"
+}
+# <<< derive_self_rel
+KIT_REL=$(derive_self_rel "$HERE") || { echo "canary: not inside a git repository"; exit 2; }
+# PFX is the install prefix WITH its trailing slash, derived from where this file sits and empty
+# at a root install: every fixture and host path below is spelled through it, never through a
+# literal prefix (TOOL-aRepatriatedFork-28).
+case "$KIT_REL" in */*) PFX="${KIT_REL%/*}/" ;; *) PFX="" ;; esac
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "canary: not a git repo"; exit 2; }
 cd "$ROOT" || exit 2
-# The resolver, INLINED byte-identically from tools/lib/resolve-python.sh -- this harness SHIPS
-# with the kit and tools/lib/ never travels. Enrols itself in the parity population, which is
+# The resolver, INLINED byte-identically from <prefix>/lib/resolve-python.sh -- this harness SHIPS
+# with the kit and <prefix>/lib/ never travels. Enrols itself in the parity population, which is
 # grep-derived from the marker below (the aPacedTurnstile build's spec set under `memory/builds/aPacedTurnstile/spec/` S2).
 # >>> resolve_python — canonical copy: resolve-python.sh in gov's lib dir (byte-identical; gated)
 resolve_python() {
@@ -48,7 +65,7 @@ fail=0
 FLOOR_ASSERTIONS=149
 n=0
 # The manifest, derived exactly as run-gates.sh derives it: this kit's dir SIBLING. Hardcoding
-# `tools/gate-legs.json` here would be a gov spelling in a harness that now ships (S1/S3).
+# `<prefix>/gate-legs.json` here would be a gov spelling in a harness that now ships (S1/S3).
 # Normalised through the SAME `cd ... && pwd` chain on both sides: under MSYS `git rev-parse
 # --show-toplevel` answers `C:/...` and `pwd` answers `/c/...`, and a strip across the two
 # flavours leaves an ABSOLUTE path that resolves to nothing.
@@ -86,7 +103,7 @@ if bad:
 #     A SCHEMA ARM, which is why it ships. It asserts a shape true of any manifest in any tree and
 #     names no leg of this repo's corpus; the gov-only harness next door holds the arms that do.
 #     It reads LEGS_FILE — the derived path — so it grades whatever manifest the tree it runs in
-#     actually has, and hardcoding `tools/gate-legs.json` in a harness that ships is the
+#     actually has, and hardcoding `<prefix>/gate-legs.json` in a harness that ships is the
 #     pin-copied-from-another-corpus class this kit refuses by name.
 #
 #     ITS CONTROL IS A MANIFEST WITH NO `impure` ANYWHERE, WHICH MUST PASS. The key is optional
@@ -309,10 +326,10 @@ done <<<"$paths"
 #    bar, which would cost minutes and couple this canary to every other kit's health.
 SCRATCH=$(mktemp -d) || { echo "canary: cannot create a scratch dir"; exit 2; }
 trap 'rm -rf "$SCRATCH"' EXIT
-mkdir -p "$SCRATCH/tools/run-gates" "$SCRATCH/fx"
+mkdir -p "$SCRATCH/${PFX}run-gates" "$SCRATCH/fx"
 # The runner is copied from THIS harness's own kit dir, not from gov's prefix. This file
-# SHIPS, and a hardcoded `tools/run-gates/` here made it red on arrival at any other prefix.
-cp "$KITDIR/run-gates.sh" "$SCRATCH/tools/run-gates/run-gates.sh"
+# SHIPS, and a hardcoded `<prefix>/run-gates/` here made it red on arrival at any other prefix.
+cp "$KITDIR/run-gates.sh" "$SCRATCH/${PFX}run-gates/run-gates.sh"
 # EVERY leg sleeps, and that is load-bearing. With only one slow leg a serial run and a concurrent
 # run both cost about that leg, so arm 3c could not tell them apart — measured: forcing width 1 left
 # the canary green. Four sleeping legs make serial (6.5s) and concurrent (2s) genuinely diverge.
@@ -348,7 +365,7 @@ printf '#!/usr/bin/env bash\n%s\nsleep 2\nexit 0\n'   "$rendezvous" > "$SCRATCH/
 printf '#!/usr/bin/env bash\n%s\nsleep 1.5\nexit 0\n' "$rendezvous" > "$SCRATCH/fx/mid.sh"
 printf '#!/usr/bin/env bash\necho "boom detail"\nexit 3\n' > "$SCRATCH/fx/bad.sh"
 printf '#!/usr/bin/env bash\nexit 0\n'                     > "$SCRATCH/fx/instant.sh"
-cat > "$SCRATCH/tools/gate-legs.json" <<'JSON'
+cat > "$SCRATCH/${PFX}gate-legs.json" <<'JSON'
 [
   {"name": "alpha slow", "argv": ["bash", "fx/slow.sh", "alpha"]},
   {"name": "beta fast",  "argv": ["bash", "fx/mid.sh", "beta"]},
@@ -493,7 +510,7 @@ clamp_target() {
 # clamp edit that this copy does not follow reds instead of silently sending the control to the
 # wrong width. The ORDER matters as much as the mapping - `nonsense` matches `?????*` too, and only
 # run-gates testing `*[!0-9]*` first makes it 1.
-_ct_src=$(sed -n 's/.*case "\$JOBS" in \(.*\) esac.*/\1/p' "$ROOT/tools/run-gates/run-gates.sh" | head -1)
+_ct_src=$(sed -n 's/.*case "\$JOBS" in \(.*\) esac.*/\1/p' "$ROOT/${PFX}run-gates/run-gates.sh" | head -1)
 case "$_ct_src" in
   *'*[!0-9]*) JOBS=1'*'?????*) JOBS=64'*) ;;
   *) echo "canary: run-gates' clamp no longer reads as the two ordered arms clamp_target mirrors, so the control width this suite computes is no longer joined to the source it copies: $_ct_src"; fail=1 ;;
@@ -597,14 +614,14 @@ esac
 #     dispatches a worker and looks for its result immediately, which is the whole window. An earlier
 #     version of this arm used the 4-leg manifest at mixed widths, reproduced at 1-in-40, and let the
 #     pre-fix reader pass. Do not "simplify" this back to the shared fixture.
-mkdir -p "$SCRATCH/many/tools/run-gates" "$SCRATCH/many/fx"
-cp "$SCRATCH/tools/run-gates/run-gates.sh" "$SCRATCH/many/tools/run-gates/run-gates.sh"
+mkdir -p "$SCRATCH/many/${PFX}run-gates" "$SCRATCH/many/fx"
+cp "$SCRATCH/${PFX}run-gates/run-gates.sh" "$SCRATCH/many/${PFX}run-gates/run-gates.sh"
 cp "$SCRATCH/fx/instant.sh" "$SCRATCH/many/fx/a.sh"
 "$PYBIN" -c '
 import json, sys
 json.dump([{"name": "l%02d" % i, "argv": ["bash", "fx/a.sh"]} for i in range(30)],
           open(sys.argv[1], "w", newline="\n"), indent=1)
-' "$SCRATCH/many/tools/gate-legs.json"
+' "$SCRATCH/many/${PFX}gate-legs.json"
 ( cd "$SCRATCH/many" && git init -q . && git config user.email t@e && git config user.name t ) >/dev/null 2>&1
 #     The ABSENCE of "(no result)" is not on its own an assertion: a fixture that never ran has none
 #     either. Two breakages were reproduced passing this arm silently — a missing manifest, and an
@@ -632,10 +649,10 @@ done
 #     skipped regardless of the diff, the canonical green-while-checking-less shape this file exists
 #     to forbid — kept the whole suite green BY CONSTRUCTION rather than by luck.
 G="$SCRATCH/guarded"
-mkdir -p "$G/tools/run-gates" "$G/fx"
-cp "$SCRATCH/tools/run-gates/run-gates.sh" "$G/tools/run-gates/run-gates.sh"
+mkdir -p "$G/${PFX}run-gates" "$G/fx"
+cp "$SCRATCH/${PFX}run-gates/run-gates.sh" "$G/${PFX}run-gates/run-gates.sh"
 cp "$SCRATCH/fx/instant.sh" "$G/fx/a.sh"
-cat > "$G/tools/gate-legs.json" <<'JSON'
+cat > "$G/${PFX}gate-legs.json" <<'JSON'
 [
   {"name": "plain one", "argv": ["bash", "fx/a.sh"]},
   {"name": "guarded",   "argv": ["bash", "fx/a.sh"], "guard": ["never/touched.txt"]},
@@ -679,14 +696,14 @@ grep -q '^guarded	' "$G/.git/gate-ledger.tsv" 2>/dev/null \
 #     .githooks/pre-push sets it whenever it decides a full run is owed, which is the one boundary an
 #     adopter actually feels. So the decision is a declared subject, not a guard.
 S="$SCRATCH/subject"
-mkdir -p "$S/tools/run-gates" "$S/fx"
-cp "$SCRATCH/tools/run-gates/run-gates.sh" "$S/tools/run-gates/run-gates.sh"
+mkdir -p "$S/${PFX}run-gates" "$S/fx"
+cp "$SCRATCH/${PFX}run-gates/run-gates.sh" "$S/${PFX}run-gates/run-gates.sh"
 # The FINGERPRINT script too: `gate-full-green` is written only when FPRINT_START is non-empty, and
 # without this file the fingerprint is the empty string, so the stamp arm below would assert against
 # a stamp no fixture can produce — passing for the wrong reason or failing for one.
-cp "$KITDIR/gate-fingerprint.sh" "$S/tools/run-gates/" 2>/dev/null || true
+cp "$KITDIR/gate-fingerprint.sh" "$S/${PFX}run-gates/" 2>/dev/null || true
 cp "$SCRATCH/fx/instant.sh" "$S/fx/a.sh"
-cat > "$S/tools/gate-legs.json" <<'JSON'
+cat > "$S/${PFX}gate-legs.json" <<'JSON'
 [
   {"name": "a repo leg",        "argv": ["bash", "fx/a.sh"], "subject": "repo"},
   {"name": "a kit self-test",   "argv": ["bash", "fx/a.sh"], "subject": "kit"},
@@ -752,14 +769,14 @@ grep -q '^selftests	1$' "$S/.git/gate-full-green" 2>/dev/null \
 #     `85/85 legs passed`, and the chunk holding nothing but kit self-tests closed GREEN. Both
 #     numbers are what a reader quotes, which is what makes this arithmetic worth an arm.
 S2="$SCRATCH/heldmath"
-mkdir -p "$S2/tools/run-gates" "$S2/fx"
-cp "$SCRATCH/tools/run-gates/run-gates.sh" "$S2/tools/run-gates/run-gates.sh"
-cp "$KITDIR/gate-fingerprint.sh" "$S2/tools/run-gates/" 2>/dev/null || true
+mkdir -p "$S2/${PFX}run-gates" "$S2/fx"
+cp "$SCRATCH/${PFX}run-gates/run-gates.sh" "$S2/${PFX}run-gates/run-gates.sh"
+cp "$KITDIR/gate-fingerprint.sh" "$S2/${PFX}run-gates/" 2>/dev/null || true
 cp "$SCRATCH/fx/instant.sh" "$S2/fx/a.sh"
 # TWO CHUNKS, ONE OF EACH SHAPE. `mixed` proves the tally is per-chunk and does not swallow the
 # chunk it appears in; `held` proves the all-held chunk changes verdict. A fixture with only the
 # second would pass on a runner that called every chunk skipped.
-cat > "$S2/tools/gate-legs.json" <<'JSON'
+cat > "$S2/${PFX}gate-legs.json" <<'JSON'
 [
   {"name": "m repo one", "argv": ["bash", "fx/a.sh"], "subject": "repo", "chunk": "mixed"},
   {"name": "m repo two", "argv": ["bash", "fx/a.sh"], "subject": "repo", "chunk": "mixed"},
@@ -817,11 +834,11 @@ printf '%s\n' "$o" | grep -q '^gates GREEN — 5/5 legs passed$' \
 #      executing not one leg, and stamp a record saying so. Measured before the fix: exit 0 and
 #      exactly that line.
 S3="$SCRATCH/allheld"
-mkdir -p "$S3/tools/run-gates" "$S3/fx"
-cp "$SCRATCH/tools/run-gates/run-gates.sh" "$S3/tools/run-gates/run-gates.sh"
-cp "$KITDIR/gate-fingerprint.sh" "$S3/tools/run-gates/" 2>/dev/null || true
+mkdir -p "$S3/${PFX}run-gates" "$S3/fx"
+cp "$SCRATCH/${PFX}run-gates/run-gates.sh" "$S3/${PFX}run-gates/run-gates.sh"
+cp "$KITDIR/gate-fingerprint.sh" "$S3/${PFX}run-gates/" 2>/dev/null || true
 cp "$SCRATCH/fx/instant.sh" "$S3/fx/a.sh"
-cat > "$S3/tools/gate-legs.json" <<'JSON'
+cat > "$S3/${PFX}gate-legs.json" <<'JSON'
 [
   {"name": "k one", "argv": ["bash", "fx/a.sh"], "subject": "kit"},
   {"name": "k two", "argv": ["bash", "fx/a.sh"], "subject": "kit"}
@@ -847,7 +864,7 @@ printf '%s\n' "$o" | grep -q '^gates GREEN' \
 # ITS CONTROL, and it is what keeps the refusal narrow. The SAME manifest with one repo-subject leg
 # added is an ordinary partial bar and must stay green — a refusal that fired here would red every
 # adopter whose kits are all held, which is every adopter.
-cat > "$S3/tools/gate-legs.json" <<'JSON'
+cat > "$S3/${PFX}gate-legs.json" <<'JSON'
 [
   {"name": "k one", "argv": ["bash", "fx/a.sh"], "subject": "kit"},
   {"name": "k two", "argv": ["bash", "fx/a.sh"], "subject": "kit"},
@@ -870,7 +887,7 @@ n=$((n+1))
 # NO verdict, so exiting between the two manufactures that signature for a deliberate refusal; and
 # the durable summary would otherwise still carry the PREVIOUS run's `gates GREEN` for anyone who
 # reads the file instead of the terminal.
-cat > "$S3/tools/gate-legs.json" <<'JSON'
+cat > "$S3/${PFX}gate-legs.json" <<'JSON'
 [
   {"name": "k one", "argv": ["bash", "fx/a.sh"], "subject": "kit"},
   {"name": "k two", "argv": ["bash", "fx/a.sh"], "subject": "kit"}
@@ -894,7 +911,7 @@ grep -q 'gates GREEN' "$S3/.git/gate-last-summary.txt" 2>/dev/null \
 # population it never ran, in the one line a reader looks at when something is broken.
 mkdir -p "$S3/fx"
 printf '#!/usr/bin/env bash\nexit 1\n' > "$S3/fx/red.sh"
-cat > "$S3/tools/gate-legs.json" <<'JSON'
+cat > "$S3/${PFX}gate-legs.json" <<'JSON'
 [
   {"name": "k one", "argv": ["bash", "fx/a.sh"], "subject": "kit"},
   {"name": "k two", "argv": ["bash", "fx/a.sh"], "subject": "kit"},
@@ -943,7 +960,7 @@ done
 #    no skip when the shipped table is edited or removed, and lets the arms name exact readings.
 #    Exactly ONE arm reads the shipped table (4e), because its subject IS that file's own content.
 P="$SCRATCH/prof"
-# EVERY WRITE BELOW LANDS IN $P, INCLUDING A `tools/gate-legs.json` and a `git config user.email`.
+# EVERY WRITE BELOW LANDS IN $P, INCLUDING A `<prefix>/gate-legs.json` and a `git config user.email`.
 # Assert first that $P is not inside the repo under test — by GIT IDENTITY, never by comparing path
 # strings, because under MSYS one directory has two spellings and mount points are not symlinks. A
 # scratch resolving into the real tree would overwrite the bar's own leg manifest with a two-leg
@@ -958,8 +975,8 @@ if [ "$( cd "$P" 2>/dev/null && git rev-parse --show-toplevel 2>/dev/null )" = "
   exit 2
 fi
 n=$((n+1))
-mkdir -p "$P/tools/run-gates" "$P/fx" "$P/shim"
-cp "$SCRATCH/tools/run-gates/run-gates.sh" "$P/tools/run-gates/run-gates.sh"
+mkdir -p "$P/${PFX}run-gates" "$P/fx" "$P/shim"
+cp "$SCRATCH/${PFX}run-gates/run-gates.sh" "$P/${PFX}run-gates/run-gates.sh"
 printf '#!/usr/bin/env bash\nexit 0\n'          > "$P/fx/a.sh"
 # An ORPHAN plus a foreground sleep, because that pair is what the blocker was made of: the
 # grandchild holds the leg's inherited write end open, and a pipe-captured leg then blocks for the
@@ -975,7 +992,7 @@ printf '#!/usr/bin/env bash\ntrap "" TERM\nsleep 25\nexit 0\n' > "$P/fx/stubborn
 # a CI cancel, staged without any of them and in about two seconds. Nothing else in this file
 # produces a 137 whose ceiling did NOT fire, which is the whole class arm 4h-kill grades.
 printf '#!/usr/bin/env bash\nsleep 2\nkill -9 $$\n' > "$P/fx/selfkill.sh"
-cat > "$P/tools/gate-legs.json" <<'JSON'
+cat > "$P/${PFX}gate-legs.json" <<'JSON'
 [
   {"name": "one", "argv": ["bash", "fx/a.sh"]},
   {"name": "two", "argv": ["bash", "fx/a.sh"]}
@@ -995,7 +1012,7 @@ profname() { profline "$1" | sed 's/^gate profile: //; s/  (.*//'; }
 # the ordinary derivation is what finds it: an arm driving GATE_PROFILES would be grading the seam
 # rather than the path every real run takes.
 printf 'big\t16\t24000\twidth=8,timeout=0\nsmall\t4\t0\twidth=4,timeout=0\nany\t0\t0\twidth=2,timeout=0\n' \
-  > "$P/tools/run-gates/gate-profiles.txt"
+  > "$P/${PFX}run-gates/gate-profiles.txt"
 
 # 4a. the most-capable row is selected when BOTH its thresholds are met. Seams, not real hardware:
 #     the node running this suite is whatever it is, and an arm that depends on that grades the box.
@@ -1101,7 +1118,7 @@ fi
 #     level up. So the budget is generous enough that only the sleeper can plausibly exceed it, and
 #     what is asserted is the SLEEPER's own row plus a RED verdict, whatever else the machine did.
 printf 'tight\t0\t0\twidth=2,timeout=3\n' > "$P/fx/tbl-tight.txt"
-cat > "$P/tools/gate-legs.json" <<'JSON'
+cat > "$P/${PFX}gate-legs.json" <<'JSON'
 [
   {"name": "one", "argv": ["bash", "fx/a.sh"]},
   {"name": "sleeper", "argv": ["bash", "fx/sleeper.sh"]}
@@ -1160,7 +1177,7 @@ if [ "$HAVE_TIMEOUT" = 1 ]; then
     || { echo "canary: the per-leg timeout bounded the VERDICT and not the CLOCK — the sleeper leg itself took ${t_timed}s under a 3s bound against ${t_ctl}s untimed over the same 20s fixture. A knob that reports 124 while the worker blocks for the whole hang leaves the bar wedged exactly as it was before the knob existed."; fail=1; }
   # THE KILL-AFTER, driven by a leg that ignores TERM. Nothing else reaches it, and the tail is
   # accepted either way: which signal wins is the host's business, that the leg is NAMED is ours.
-  cat > "$P/tools/gate-legs.json" <<'JSON'
+  cat > "$P/${PFX}gate-legs.json" <<'JSON'
 [
   {"name": "one", "argv": ["bash", "fx/a.sh"]},
   {"name": "stubborn", "argv": ["bash", "fx/stubborn.sh"]}
@@ -1182,7 +1199,7 @@ n=$((n+1))
   #     compares them against field 2 of the ledger, so any future branch that invents a number reds
   #     it too. Observed RED against the source before TOOL-aLeakedHandle-3, where the tail said the
   #     declared 600 and the ledger said 2.0xx — a factor of three hundred on one run.
-  cat > "$P/tools/gate-legs.json" <<'JSON'
+  cat > "$P/${PFX}gate-legs.json" <<'JSON'
 [
   {"name": "one", "argv": ["bash", "fx/a.sh"]},
   {"name": "selfkilled", "argv": ["bash", "fx/selfkill.sh"], "ceiling": 600}
@@ -1204,7 +1221,7 @@ JSON
     *"timed out"*) echo "canary: a leg killed at ${ks:-?}s under a declared ceiling of 600 was reported as having TIMED OUT. The ceiling never fired; rc=137 is what an operator, an OOM killer or a CI cancel produces too, and the verb may not claim a bound it cannot know about. Got: $kt"; fail=1 ;;
   esac
 
-  cat > "$P/tools/gate-legs.json" <<'JSON'
+  cat > "$P/${PFX}gate-legs.json" <<'JSON'
 [
   {"name": "one", "argv": ["bash", "fx/a.sh"]},
   {"name": "sleeper", "argv": ["bash", "fx/sleeper.sh"]}
@@ -1223,7 +1240,7 @@ fi
 #     where the tail said `(exit 137)` and the ledger said 2.424. The red case is fixture-only by
 #     class — every shipped leg declares a ceiling — which the ruling accepted with the class named:
 #     memory/gotchas/staged-break-substitutes-a-synthetic-value.md.
-cat > "$P/tools/gate-legs.json" <<'JSON'
+cat > "$P/${PFX}gate-legs.json" <<'JSON'
 [
   {"name": "one", "argv": ["bash", "fx/a.sh"]},
   {"name": "selfkilled", "argv": ["bash", "fx/selfkill.sh"]}
@@ -1243,7 +1260,7 @@ kl=$(awk -F'\t' '$1=="selfkilled" { print $2; exit }' "$P/.git/gate-ledger.tsv" 
 printf '%s\n' "$kt" | grep -qE '^GATE FAIL  selfkilled  [(]killed after [0-9][0-9.]*s[)]$' \
   || { echo "canary: a leg killed with no bound in play must read exactly (killed after Ns) — no ceiling clause for a ceiling that was never in play, no bare exit 137, no timeout it cannot have observed. Got: $kt"; fail=1; }
 # The reset below is the restore: the arms after it read the row set they expect.
-cat > "$P/tools/gate-legs.json" <<'JSON'
+cat > "$P/${PFX}gate-legs.json" <<'JSON'
 [
   {"name": "one", "argv": ["bash", "fx/a.sh"]},
   {"name": "two", "argv": ["bash", "fx/a.sh"]}
@@ -1454,16 +1471,16 @@ rm -rf "$P/cg"
 #    grade a distinction it cannot see.
 n=$((n+1))
 BB=$(mktemp -d)
-mkdir -p "$BB/tools/run-gates" "$BB/tools/lib" "$BB/fx" "$BB/ga" "$BB/gb"
-cp "$KITDIR/run-gates.sh" "$KITDIR/gate-profiles.txt" "$BB/tools/run-gates/" 2>/dev/null
-cp "$KITDIR/gate-fingerprint.sh" "$BB/tools/run-gates/" 2>/dev/null || true
-cp "$ROOT/tools/lib/resolve-python.sh" "$BB/tools/lib/" 2>/dev/null || true
+mkdir -p "$BB/${PFX}run-gates" "$BB/${PFX}lib" "$BB/fx" "$BB/ga" "$BB/gb"
+cp "$KITDIR/run-gates.sh" "$KITDIR/gate-profiles.txt" "$BB/${PFX}run-gates/" 2>/dev/null
+cp "$KITDIR/gate-fingerprint.sh" "$BB/${PFX}run-gates/" 2>/dev/null || true
+cp "$ROOT/${PFX}lib/resolve-python.sh" "$BB/${PFX}lib/" 2>/dev/null || true
 printf '#!/usr/bin/env bash\nexit 0\n' > "$BB/fx/a.sh"
 echo x > "$BB/ga/f"; echo y > "$BB/gb/f"
 printf '%s\n' '[' \
   '  {"name": "ga leg", "argv": ["bash", "fx/a.sh"], "guard": ["ga/"]},' \
   '  {"name": "gb leg", "argv": ["bash", "fx/a.sh"], "guard": ["gb/"]}' \
-  ']' > "$BB/tools/gate-legs.json"
+  ']' > "$BB/${PFX}gate-legs.json"
 ( cd "$BB" && git init -q -b main . && git config user.email c@t && git config user.name c \
    && git add -A && git commit -qm seed \
    && git update-ref refs/remotes/origin/main HEAD \
@@ -1496,10 +1513,10 @@ rm -rf "$BB"
 #    which chunk names THIS repo declares is the gov harness's, next door.
 n=$((n+1))
 CK=$(mktemp -d)
-mkdir -p "$CK/tools/run-gates" "$CK/tools/lib" "$CK/fx" "$CK/g"
-cp "$KITDIR/run-gates.sh" "$KITDIR/gate-profiles.txt" "$CK/tools/run-gates/" 2>/dev/null
-cp "$KITDIR/gate-fingerprint.sh" "$CK/tools/run-gates/" 2>/dev/null || true
-cp "$ROOT/tools/lib/resolve-python.sh" "$CK/tools/lib/" 2>/dev/null || true
+mkdir -p "$CK/${PFX}run-gates" "$CK/${PFX}lib" "$CK/fx" "$CK/g"
+cp "$KITDIR/run-gates.sh" "$KITDIR/gate-profiles.txt" "$CK/${PFX}run-gates/" 2>/dev/null
+cp "$KITDIR/gate-fingerprint.sh" "$CK/${PFX}run-gates/" 2>/dev/null || true
+cp "$ROOT/${PFX}lib/resolve-python.sh" "$CK/${PFX}lib/" 2>/dev/null || true
 printf '#!/usr/bin/env bash\nexit 0\n' > "$CK/fx/a.sh"
 echo g > "$CK/g/f"
 # INTERLEAVED ON PURPOSE. The manifest is not grouped, so the reader's walk is a real permutation
@@ -1510,7 +1527,7 @@ printf '%s\n' '[' \
   '  {"name": "beta",  "argv": ["bash", "fx/a.sh"], "chunk": "two"},' \
   '  {"name": "gamma", "argv": ["bash", "fx/a.sh"], "chunk": "one"},' \
   '  {"name": "delta", "argv": ["bash", "fx/a.sh"]}' \
-  ']' > "$CK/tools/gate-legs.json"
+  ']' > "$CK/${PFX}gate-legs.json"
 ( cd "$CK" && git init -q -b main . && git config user.email c@t && git config user.name c \
    && git add -A && git commit -qm seed ) >/dev/null 2>&1
 cout=$( cd "$CK" && env GATE_FULL=1 bash $KIT_REL/run-gates.sh 2>&1 )
@@ -1537,7 +1554,7 @@ n=$((n+1))
 printf '%s\n' '[' \
   '  {"name": "guarded", "argv": ["bash", "fx/a.sh"], "guard": ["g/"], "chunk": "gone"},' \
   '  {"name": "free", "argv": ["bash", "fx/a.sh"], "chunk": "here"}' \
-  ']' > "$CK/tools/gate-legs.json"
+  ']' > "$CK/${PFX}gate-legs.json"
 ( cd "$CK" && git add -A && git commit -qm two \
    && git update-ref refs/remotes/origin/main HEAD \
    && git symbolic-ref refs/remotes/origin/HEAD refs/remotes/origin/main ) >/dev/null 2>&1
@@ -1572,10 +1589,10 @@ rm -rf "$CK"
 #     (`memory/builds/aPacedTurnstile/reviews/2026-08-20-review-TOOL-aPacedTurnstile-2.md` B1) and a
 #     leg without one would grade a mechanism simpler than the shipped case.
 _wd=$(mktemp -d) || { echo "canary: cannot create a scratch dir for the wall arms"; exit 2; }
-mkdir -p "$_wd/tools/run-gates" "$_wd/tools/lib"
-cp "$ROOT/$KITREL/run-gates.sh" "$ROOT/$KITREL/gate-profiles.txt" "$_wd/tools/run-gates/" 2>/dev/null
-cp "$ROOT/$KITREL/gate-fingerprint.sh" "$_wd/tools/run-gates/" 2>/dev/null || true
-cp "$ROOT/tools/lib/resolve-python.sh" "$_wd/tools/lib/" 2>/dev/null || true
+mkdir -p "$_wd/${PFX}run-gates" "$_wd/${PFX}lib"
+cp "$ROOT/$KITREL/run-gates.sh" "$ROOT/$KITREL/gate-profiles.txt" "$_wd/${PFX}run-gates/" 2>/dev/null
+cp "$ROOT/$KITREL/gate-fingerprint.sh" "$_wd/${PFX}run-gates/" 2>/dev/null || true
+cp "$ROOT/${PFX}lib/resolve-python.sh" "$_wd/${PFX}lib/" 2>/dev/null || true
 ( cd "$_wd" && git init -q -b main . && git config user.email w@t.invalid && git config user.name w ) >/dev/null 2>&1
 printf 'x\n' > "$_wd/file.txt"
 printf '#!/bin/sh\n( sleep 120 ) &\nsleep 120\n' > "$_wd/slow.sh"
@@ -1593,7 +1610,7 @@ printf '[\n { "name": "slow leg", "argv": ["bash", "slow.sh"], "chunk": "product
 # DIFFERENCE survives any load this box can produce.
 _ws=$(date +%s)
 ( cd "$_wd" && GATE_LEGS="$_wd/legs.json" GATE_FULL=1 GATE_JOBS=2 GATE_WALL=8 \
-    timeout -k 5s 300 bash tools/run-gates/run-gates.sh ) > "$_wd/walled.out" 2>&1
+    timeout -k 5s 300 bash ${PFX}run-gates/run-gates.sh ) > "$_wd/walled.out" 2>&1
 _wrc=$?
 _wel=$(( $(date +%s) - _ws ))
 # THE WALLED RUN'S RECORD IS CAPTURED HERE, while it is the only one there is. Captured after
@@ -1605,7 +1622,7 @@ _wrec=$(ls -1d "$_wd"/.git/gate-run/*/ 2>/dev/null | tail -1)
 
 _cs=$(date +%s)
 ( cd "$_wd" && GATE_LEGS="$_wd/legs.json" GATE_FULL=1 GATE_JOBS=2 GATE_WALL=0 \
-    timeout -k 5s 300 bash tools/run-gates/run-gates.sh ) > "$_wd/unwalled.out" 2>&1
+    timeout -k 5s 300 bash ${PFX}run-gates/run-gates.sh ) > "$_wd/unwalled.out" 2>&1
 _cel=$(( $(date +%s) - _cs ))
 
 n=$((n+1))

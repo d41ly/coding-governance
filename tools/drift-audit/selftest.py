@@ -34,7 +34,8 @@ KIT = pathlib.Path(__file__).resolve().parent
 # prefix on purpose — that is the dual-spelling support gov keeps for its not-retrofitted adopters,
 # and a selftest that could not build one could not test it. Written ONCE here rather than twelve
 # times below: a literal repeated twelve times is twelve chances for eleven of them to be updated.
-REPORT_REL = "drift-audit/drift_report.py"  # gov:root-fixture — scratch-repo path, never gov's own
+ROOT_PFX = ""   # a root install's prefix is empty, and the scratch repos are built through it
+REPORT_REL = f"{ROOT_PFX}drift-audit/drift_report.py"
 FAILS: list[str] = []
 SKIPS: list[str] = []
 EXECUTED: list[str] = []
@@ -778,7 +779,7 @@ def test_lexicon_signals(tmp: pathlib.Path) -> None:
     # Adopt the kit INTO the fixture: the engine reaches it by `sys.path`, so the reader has to be
     # present exactly where an installed kit puts it -- BESIDE the drift-audit kit, which this fixture
     # installs at the root prefix, because the engine resolves its sibling through `resolve_kit_dir`
-    # (TOOL-aRepatriatedFork-2 S3), not at the graded root's `tools/`.
+    # (TOOL-aRepatriatedFork-2 S3), not at the graded root's `<prefix>/`.
     kit_src = pathlib.Path(__file__).resolve().parent.parent / "lexicon"
     shutil.copytree(kit_src, r / "lexicon",
                     ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))

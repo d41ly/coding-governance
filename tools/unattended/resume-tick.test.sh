@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Runnable check for resume-tick.sh — the OS-scheduled out-of-process resumer: one arm per decision
 # of its table, every one over a scratch git repo with a STUB `claude` first on PATH.
-# Run: bash tools/unattended/resume-tick.test.sh   (exit 0 = all pass)
+# Run: bash <prefix>/unattended/resume-tick.test.sh   (exit 0 = all pass)
 #
 # WITHHELD FROM THE BAR AND FROM ADOPTERS, like every suite in this kit (kit.toml `project-owned`):
 # its subject is the tick's decision table, which moves only when this file's sibling moves.
@@ -24,6 +24,23 @@
 # the driver beside the tick without touching the kit under test.
 set -u
 HERE="$(cd "$(dirname "$0")" && pwd)"
+# >>> derive_self_rel — canonical copy: kit-rel.sh in gov's lib dir (byte-identical; gated)
+derive_self_rel() {
+  local _dsr_p _dsr_rel=""
+  _dsr_p=$(cd "$1" 2>/dev/null && pwd) || return 1
+  while [ ! -e "$_dsr_p/.git" ]; do
+    [ "$(dirname "$_dsr_p")" = "$_dsr_p" ] && return 1
+    _dsr_rel="$(basename "$_dsr_p")${_dsr_rel:+/$_dsr_rel}"
+    _dsr_p=$(dirname "$_dsr_p")
+  done
+  printf '%s\n' "$_dsr_rel"
+}
+# <<< derive_self_rel
+KIT_REL=$(derive_self_rel "$HERE") || { echo "resume-tick.test: not inside a git repository"; exit 2; }
+# PFX is the install prefix WITH its trailing slash, derived from where this file sits and empty
+# at a root install: every fixture and host path below is spelled through it, never through a
+# literal prefix (TOOL-aRepatriatedFork-28).
+case "$KIT_REL" in */*) PFX="${KIT_REL%/*}/" ;; *) PFX="" ;; esac
 # RESUME_TICK_TEST_TMP is the pass's seam: a unit pass runs one arm at a time from a sourced copy of
 # this prologue and must put its scratch under the session scratchpad, not /tmp.
 # RESUME_TICK_TEST_GITTMP is every fixture's: a `git init` wants a SHORT path on Windows.
@@ -212,7 +229,7 @@ OUT=$(bash "$TICK" --repo "$TMP/notrepo" 2>&1); RC=$?
 check_same "AC8 a non-repo root exits 2" "$RC" "2"
 check_hit "$OUT" "REFUSED — $TMP/notrepo is not a git repository, so there is no worktree list to walk" "AC8 the refusal names the dir"
 check_same "AC8 the kit dir is derived from \$0" "$(grep -c 'dirname "$0"' "$HERE/resume-tick.sh")" "1"
-check_same "AC8 the tick spells no kit path by literal" "$(grep -cE 'tools/(unattended|lib|memory-tree|run-gates)' "$HERE/resume-tick.sh")" "0"
+check_same "AC8 the tick spells no kit path by literal" "$(grep -cE ''"${PFX}"'(unattended|lib|memory-tree|run-gates)' "$HERE/resume-tick.sh")" "0"
 # ...and a root with no conf is refused too, before any walk.
 build_fixture 999999999; rm -f "$FX/.unattended.conf"
 OUT=$(bash "$TICK" --repo "$FX" 2>&1); RC=$?

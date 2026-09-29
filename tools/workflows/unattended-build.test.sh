@@ -10,7 +10,29 @@
 # Asserting over text is weaker than executing and is used only where executing cannot reach: whether
 # an `agent(` sits inside a loop is a property of the source, and it is the property `agent-cap.js`
 # itself judges from the source.
-KIT_REL="${KIT_REL:-tools}"
+HERE="$(cd "$(dirname "$0")" && pwd)"
+# >>> derive_self_rel — canonical copy: kit-rel.sh in gov's lib dir (byte-identical; gated)
+derive_self_rel() {
+  local _dsr_p _dsr_rel=""
+  _dsr_p=$(cd "$1" 2>/dev/null && pwd) || return 1
+  while [ ! -e "$_dsr_p/.git" ]; do
+    [ "$(dirname "$_dsr_p")" = "$_dsr_p" ] && return 1
+    _dsr_rel="$(basename "$_dsr_p")${_dsr_rel:+/$_dsr_rel}"
+    _dsr_p=$(dirname "$_dsr_p")
+  done
+  printf '%s\n' "$_dsr_rel"
+}
+# <<< derive_self_rel
+KIT_REL=$(derive_self_rel "$HERE") || { echo "unattended-build.test: not inside a git repository"; exit 2; }
+# PFX is the install prefix WITH its trailing slash, derived from where this file sits and empty
+# at a root install: every fixture and host path below is spelled through it, never through a
+# literal prefix (TOOL-aRepatriatedFork-28).
+case "$KIT_REL" in */*) PFX="${KIT_REL%/*}/" ;; *) PFX="" ;; esac
+# In this suite KIT_REL names the TOOL ROOT, not the kit dir: the prefix without its slash.
+KIT_REL="${PFX%/}"; KIT_REL="${KIT_REL:-.}"
+# ROOTPFX is a ROOT install's prefix, empty by definition: a fixture that models a root install,
+# or a key relative to the tool root, is spelled through it rather than bare (TOOL-aRepatriatedFork-28 S2).
+ROOTPFX=""
 set -u
 st=0; n=0
 HERE="$(cd "$(dirname "$0")" && pwd)"
@@ -220,7 +242,7 @@ done
 # every arm below could pass over a harness that reached BUILD by some other path entirely.
 o=$(run_wf "$UNITS" "$(returns CONVERGED 0)")
 has "S1 the AUDIT stage invokes tier2-review as a SUB-WORKFLOW from the script" "$o" \
-    "workflow:tools/workflows/tier2-review.js"
+    "workflow:${PFX}workflows/tier2-review.js"
 
 # S3 — CONVERGING paired with 0 blockers is REFUSED BY NAME. A loop with nothing left to
 # converge on has converged, so the pairing is this repo's signature for a record no verb
@@ -296,12 +318,12 @@ n=$((n+1)); if grep -q "DISPATCH IS STRICTLY SEQUENTIAL" "$F"; then
 else
   echo "FAIL the file no longer declares per-unit dispatch sequential"; st=1
 fi
-if [ -f "$ROOT/tools/hooks/agent-cap.js" ]; then
-  o=$(printf '{"tool_name":"Workflow","tool_input":{"scriptPath":"tools/workflows/unattended-build.js"}}' \
+if [ -f "$ROOT/${PFX}hooks/agent-cap.js" ]; then
+  o=$(printf '{"tool_name":"Workflow","tool_input":{"scriptPath":"'"${PFX}workflows/unattended-build.js"'"}}' \
       | (cd "$ROOT" && node $KIT_REL/hooks/agent-cap.js 2>&1); echo "rc=$?")
   n=$((n+1)); case "$o" in *"rc=0"*) echo "ok   agent-cap ADMITS the harness" ;; *) echo "FAIL agent-cap denied the harness -- $o"; st=1 ;; esac
 else
-  echo "SKIP agent-cap admission — no hook at $ROOT/tools/hooks/agent-cap.js, so this arm was NOT exercised"
+  echo "SKIP agent-cap admission — no hook at $ROOT/${PFX}hooks/agent-cap.js, so this arm was NOT exercised"
 fi
 
 # ---- AC5: the AUDIT stage must name the spec-audit kind. `tier2-review.js` DEFAULTS an absent kind
@@ -318,7 +340,7 @@ n=$((n+1)); grep -qE "kind: ['\"]spec-audit['\"]" "$F" \
 # ---- AC2: the DEFAULT is unchanged. Every existing caller keeps the contract it had.
 o=$(run_wf "$UNITS" '{"spec":{"authored":["A-tB-1"],"alreadyPresent":[],"refused":[],"summary":"s"},"workflow":{"blockers":0,"confirmed":0,"highs":0,"unverified":0,"report":"r.md"},"audit:record":{"token":"CONVERGED"},"dispose":{"disposed":true,"standing":[],"summary":"d"}}')
 has  "default mode: the round IS recorded through the driver" "$o" "agent:audit:record"
-has  "default mode: the return names the child the caller dispatches" "$o" '"scriptPath":"tools/workflows/unattended-unit.js"'
+has  "default mode: the return names the child the caller dispatches" "$o" '"scriptPath":"'"${PFX}workflows/unattended-unit.js"'"'
 has  "default mode: hands out a roster" "$o" '"roster":[{'
 
 # ---- AC1: attended mode reaches BUILD and spawns NO recorder agent.
@@ -767,7 +789,7 @@ o=$(run_wf "$UNITS" "$(returns NON-CONVERGENT 2)")
 has "AC7 the roster is the ordered array of {id, order, specPath, briefPath}" "$o" \
   '"roster":[{"id":"A-tB-1","order":1,"specPath":"s1","briefPath":"b1"},{"id":"A-tB-2","order":1,"specPath":"s2","briefPath":"b2"},{"id":"A-tB-3","order":2,"specPath":"s3","briefPath":"b3"}]'
 has "AC7 dispatch names the child script by its repo-relative path" "$o" \
-  '"scriptPath":"tools/workflows/unattended-unit.js"'
+  '"scriptPath":"'"${PFX}workflows/unattended-unit.js"'"'
 has "AC7 dispatch names the command that resolves the rest of the paths" "$o" '--plan tB --paths'
 has "AC7 the note names the hand-out" "$o" "prologue complete"
 # `dispatch` is sliced out and asserted on its own: the child receives its own unit and never the
@@ -775,8 +797,8 @@ has "AC7 the note names the hand-out" "$o" "prologue complete"
 d=$(printf '%s\n' "$o" | grep '^RESULT ' | sed 's/.*"dispatch"://')
 has    "AC8 dispatch.args carries the repo" "$d" '"repo":"/tmp/r"'
 has    "AC8 dispatch.args carries the slug" "$d" '"slug":"tB"'
-has    "AC8 dispatch.args carries the driver" "$d" '"driver":"bash tools/unattended/unattended.sh"'
-has    "AC8 dispatch.args carries the bug-class checklist" "$d" '"checklist":"python tools/memory-tree/gotchas.py --for-diff HEAD~1..HEAD"'
+has    "AC8 dispatch.args carries the driver" "$d" '"driver":"bash '"${PFX}unattended/unattended.sh"'"'
+has    "AC8 dispatch.args carries the bug-class checklist" "$d" '"checklist":"python '"${PFX}memory-tree/gotchas.py"' --for-diff HEAD~1..HEAD"'
 has    "AC8 dispatch names the three per-unit fields and only those" "$d" '"perUnit":["unitId","specPath","briefPath"]'
 hasnt_ "AC8 the child never receives the roster list" "$d" '"roster"'
 
@@ -1072,9 +1094,9 @@ has    "D ...and the uncovered unit is named as owing a later audit" "$o" 'NOT c
 # hand-out prescribes the callee's own opening order so the file it demands is one the bar accepts.
 has    "D ...and the demanded record carries the Verdict heading check 22 reads" "$o" '## Verdict: CLEAN'
 has    "D ...and the record path at the subject round" "$o" 'memory/builds/tB/reviews/<date>-review-A-tB-1-spec-audit-round1.md'
-has    "D ...and the resume route" "$o" 'dispatch every unit `bash tools/unattended/unattended.sh --plan tB --paths` lists as READY'
+has    "D ...and the resume route" "$o" 'dispatch every unit `bash '"${PFX}unattended/unattended.sh"' --plan tB --paths` lists as READY'
 has    "D ...and the note opens HELD" "$o" '"note":"HELD AT HAND-OUT — a clean round with no tracked spec-audit record'
-has    "D ...and dispatch still travels, for the resume route" "$o" '"dispatch":{"scriptPath":"tools/workflows/unattended-unit.js"'
+has    "D ...and dispatch still travels, for the resume route" "$o" '"dispatch":{"scriptPath":"'"${PFX}workflows/unattended-unit.js"'"'
 has    "D ...and the withholding is logged" "$o" "hand-out: WITHHELD"
 o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":{"confirmed":[],"report":null,"root":"/tmp/r","blockers":null,"highs":null,"lensesRun":4,"lensesDead":0,"note":"clean: 0 findings"},"audit:record":%s,"dispose:":%s}' "$SPEC_OK" "$(rec CONVERGED)" "$DISPOSE_OK")")
 has    "F zero findings, no unverified key: a RESULT too" "$o" "RESULT"
@@ -1414,7 +1436,7 @@ has "PV-AC2 flat: ...and names the directory it probed" "$o" "MEMORY_TREE_DIR 's
 NE="$LAY/nested"; build_layout "$NE" scripts/workflows scripts/unattended scripts/memory-tree/gotchas.py
 run_layout "$NE" scripts/workflows --render >/dev/null
 check_layout "PV-AC3 nested:" "$NE" scripts/workflows scripts/ scripts/memory-tree GGGGG
-RT="$LAY/root"; build_layout "$RT" workflows unattended memory-tree/gotchas.py  # gov:root-fixture — the ROOT-install layout PV-AC3 builds on purpose
+RT="$LAY/root"; build_layout "$RT" workflows unattended "${ROOTPFX}memory-tree/gotchas.py"   # the ROOT-install layout PV-AC3 builds on purpose
 run_layout "$RT" workflows --render >/dev/null
 check_layout "PV-AC3 root:" "$RT" workflows "" memory-tree GGGGG
 RF="$LAY/rootflat"; build_layout "$RF" workflows unattended gotchas.py
@@ -1557,7 +1579,7 @@ has "PV-AC5 control: with the render and the pairs restored the leg is green aga
 VB="$LAY/verbatim"; build_layout "$VB" scripts/workflows scripts/unattended scripts/gotchas.py
 # FANOUT_CAP is not a path and the control does not grade it; it is filled so the harness PARSES,
 # because a surviving token is a syntax error and the arm would grade a throw instead of the paths.
-sed -e 's|{{KIT_DIR}}|tools/workflows|g' -e 's|{{TOOL_ROOT}}|tools/|g' -e 's|{{MEMORY_TREE_DIR}}|tools/memory-tree|g' \
+sed -e 's|{{KIT_DIR}}|'"${PFX}workflows"'|g' -e 's|{{TOOL_ROOT}}|'"${PFX}"'|g' -e 's|{{MEMORY_TREE_DIR}}|'"${PFX}memory-tree"'|g' \
     -e 's|{{FANOUT_CAP}}|5|g' "$HERE/unattended-build.template.js" > "$VB/scripts/workflows/unattended-build.js"
 check_layout "PV-AC6 the verbatim spelling:" "$VB" scripts/workflows scripts/ scripts RRRRR
 # The prefix-only half-fix: correct for this repo, and wrong for both measured adopters.
@@ -1606,7 +1628,7 @@ fi
 # static count of the `same`/`has`/`hasnt_` sites in this file — `grep -cE '^\s*(same|has|hasnt_) '`
 # over it, 326 at 1d8530e7 (TOOL-aWokenSentinel-21) — at ~10 % headroom, rounded down, because the
 # pass that wrote this line may not run the suite; the first green under GATE_SELFTESTS=1 or
-# run-selftests.sh --kit tools/workflows confirms the executed count against it. The inline
+# run-selftests.sh --kit <prefix>/workflows confirms the executed count against it. The inline
 # `n=$((n+1))` sites — the PV-AC12 branch's among them, the one region that can SKIP — are not in
 # the static count, so it is a LOWER bound on what a green run executes. Lower it in a reviewed
 # diff or not at all.

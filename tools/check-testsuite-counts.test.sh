@@ -3,9 +3,26 @@
 # naming its own failure text, each paired with a green control. A check that was never reached is
 # silent for the same reason a passing one is.
 #
-#   bash tools/check-testsuite-counts.test.sh    # "PASS (N assertions)" + exit 0 = good
+#   bash <prefix>/check-testsuite-counts.test.sh    # "PASS (N assertions)" + exit 0 = good
 set -u
 HERE="$(cd "$(dirname "$0")" && pwd)"
+# >>> derive_self_rel — canonical copy: kit-rel.sh in gov's lib dir (byte-identical; gated)
+derive_self_rel() {
+  local _dsr_p _dsr_rel=""
+  _dsr_p=$(cd "$1" 2>/dev/null && pwd) || return 1
+  while [ ! -e "$_dsr_p/.git" ]; do
+    [ "$(dirname "$_dsr_p")" = "$_dsr_p" ] && return 1
+    _dsr_rel="$(basename "$_dsr_p")${_dsr_rel:+/$_dsr_rel}"
+    _dsr_p=$(dirname "$_dsr_p")
+  done
+  printf '%s\n' "$_dsr_rel"
+}
+# <<< derive_self_rel
+KIT_REL=$(derive_self_rel "$HERE") || { echo "check-testsuite-counts.test: not inside a git repository"; exit 2; }
+# PFX is the install prefix WITH its trailing slash, derived from where this file sits and empty
+# at a root install: every fixture and host path below is spelled through it, never through a
+# literal prefix (TOOL-aRepatriatedFork-28).
+PFX="${KIT_REL:+$KIT_REL/}"
 TMP=$(mktemp -d)
 trap 'rm -rf "$TMP"' EXIT
 st=0; n=0
@@ -15,9 +32,9 @@ same() { n=$((n+1)); [ "$2" = "$3" ] || { echo "FAIL $1: expected [$3], got [$2]
 
 cd "$TMP" || exit 2
 git init -q -b main . && git config user.email t@t.test && git config user.name t
-mkdir -p tools memory/project
-cp "$HERE/check-testsuite-counts.sh" tools/
-SCRIPT="$TMP/tools/check-testsuite-counts.sh"
+mkdir -p "./${PFX}" memory/project
+cp "$HERE/check-testsuite-counts.sh" "./${PFX}"
+SCRIPT="$TMP/${PFX}check-testsuite-counts.sh"
 run() { bash "$SCRIPT" 2>&1; }
 
 # A COMPLIANT suite: the agreed count line plus a pinned floor.
@@ -39,7 +56,7 @@ build_zero() { printf 'FLOOR_ASSERTIONS=0
 echo "PASS ($n assertions)"
 ' > "$1"; }
 
-# ---- THE HARNESS SPELLING. A suite on `tools/lib/lib-selftest.sh` prints no count of its own and
+# ---- THE HARNESS SPELLING. A suite on `<prefix>/lib/lib-selftest.sh` prints no count of its own and
 # ---- compares no floor of its own: `run_arms` does both. These three fixtures are the same three
 # ---- states as the classic ones above, in that spelling.
 build_harness_ok()    { printf '. "$HERE/lib/lib-selftest.sh"
@@ -60,73 +77,73 @@ manifest() { # one argv entry per named suite
     sep=""
     for f in "$@"; do printf '%s  { "name": "%s", "argv": ["bash", "%s"] }\n' "$sep" "$f" "$f"; sep=","; done
     echo ']'
-  } > tools/gate-legs.json
+  } > ${PFX}gate-legs.json
 }
 : > memory/project/testsuite-count-waivers.txt
 
 # ---- GREEN CONTROL first. Every red arm below is worthless if a conforming tree is not silent.
-build_ok tools/a.test.sh; manifest tools/a.test.sh
+build_ok ${PFX}a.test.sh; manifest ${PFX}a.test.sh
 out=$(run); rc=$?
 same "a conforming tree exits 0" "$rc" "0"
 same "a conforming tree prints nothing" "$out" ""
 
 # ---- a suite printing NO count, and not waived.
-build_bad tools/b.test.sh; manifest tools/a.test.sh tools/b.test.sh
+build_bad ${PFX}b.test.sh; manifest ${PFX}a.test.sh ${PFX}b.test.sh
 out=$(run)
-hit "$out" "a self-test on the bar prints no executed assertion count against a floor, so a block of its arms could be stranded past an exit and the suite would still report success: tools/b.test.sh"
+hit "$out" "a self-test on the bar prints no executed assertion count against a floor, so a block of its arms could be stranded past an exit and the suite would still report success: ${PFX}b.test.sh"
 same "and it exits non-zero" "$(run >/dev/null 2>&1; echo $?)" "1"
 
 # ...WAIVED, it is silent — that is what lets the leg land green over a real tree and ratchet.
-printf 'tools/b.test.sh\n' > memory/project/testsuite-count-waivers.txt
+printf ''"${PFX}b.test.sh"'\n' > memory/project/testsuite-count-waivers.txt
 same "a waived suite is silent" "$(run)" ""
 
 # ---- a STALE waiver: the suite now complies, so the row hides nothing and must red. Without this
 # ---- the list only ever grows, which is the opposite of a ratchet.
-build_ok tools/b.test.sh
-hit "$(run)" "a testsuite-count waiver names a suite that now complies, so the list has stopped shrinking and the row hides nothing: tools/b.test.sh"
+build_ok ${PFX}b.test.sh
+hit "$(run)" "a testsuite-count waiver names a suite that now complies, so the list has stopped shrinking and the row hides nothing: ${PFX}b.test.sh"
 
 # ---- a waiver naming a suite the manifest does not run at all.
-build_bad tools/b.test.sh
-printf 'tools/b.test.sh\ntools/ghost.test.sh\n' > memory/project/testsuite-count-waivers.txt
-hit "$(run)" "a testsuite-count waiver names a suite the gate manifest does not run, so it waives nothing and outlives what it was written for: tools/ghost.test.sh"
+build_bad ${PFX}b.test.sh
+printf ''"${PFX}b.test.sh"'\n'"${PFX}ghost.test.sh"'\n' > memory/project/testsuite-count-waivers.txt
+hit "$(run)" "a testsuite-count waiver names a suite the gate manifest does not run, so it waives nothing and outlives what it was written for: ${PFX}ghost.test.sh"
 
 # ---- a floor with no count line to compare it to. Distinct message, because the fix is different.
 : > memory/project/testsuite-count-waivers.txt
-build_floor_only tools/c.test.sh; manifest tools/a.test.sh tools/c.test.sh
-hit "$(run)" "or never compares the two, so nothing reads the pin: tools/c.test.sh"
+build_floor_only ${PFX}c.test.sh; manifest ${PFX}a.test.sh ${PFX}c.test.sh
+hit "$(run)" "or never compares the two, so nothing reads the pin: ${PFX}c.test.sh"
 
 # ...a count AND a floor that never meet — a pin nothing reads is the same nothing as no pin.
-build_uncompared tools/e.test.sh; manifest tools/a.test.sh tools/e.test.sh
-hit "$(run)" "or never compares the two, so nothing reads the pin: tools/e.test.sh"
+build_uncompared ${PFX}e.test.sh; manifest ${PFX}a.test.sh ${PFX}e.test.sh
+hit "$(run)" "or never compares the two, so nothing reads the pin: ${PFX}e.test.sh"
 
 # ...a floor of ZERO, which nothing can fall below.
-build_zero tools/g.test.sh; manifest tools/a.test.sh tools/g.test.sh
+build_zero ${PFX}g.test.sh; manifest ${PFX}a.test.sh ${PFX}g.test.sh
 hit "$(run)" "a self-test pins a floor of ZERO, which nothing can fall below"
 
 # ---- THE DERIVED-POPULATION ARM. Adding a suite to the manifest reds the leg with NO edit to the
 # ---- leg itself; a hand-kept list would have stayed green and that is the defect being prevented.
-manifest tools/a.test.sh
+manifest ${PFX}a.test.sh
 same "one compliant suite, silent" "$(run)" ""
-build_bad tools/d.test.sh; manifest tools/a.test.sh tools/d.test.sh
-hit "$(run)" "tools/d.test.sh"
+build_bad ${PFX}d.test.sh; manifest ${PFX}a.test.sh ${PFX}d.test.sh
+hit "$(run)" "${PFX}d.test.sh"
 
 # ---- THE HARNESS SPELLING, all three states. Added when TOOL-aQuenchedHarness-6 ported the first
 # ---- suite onto the harness and every ported suite tripped this leg: the property is unchanged,
 # ---- the spelling is not.
-build_harness_ok tools/h.test.sh; manifest tools/h.test.sh
+build_harness_ok ${PFX}h.test.sh; manifest ${PFX}h.test.sh
 out=$(run); rc=$?
 same "a harness-form suite is compliant" "$rc" "0"
 same "and a tree holding only harness-form suites is silent" "$out" ""
 
-build_harness_zero tools/hz.test.sh; manifest tools/h.test.sh tools/hz.test.sh
-hit "$(run)" "a harness self-test pins SELFTEST_FLOOR of ZERO, which nothing can fall below — a pin that cannot bite is the decoration this leg exists to remove: tools/hz.test.sh"
+build_harness_zero ${PFX}hz.test.sh; manifest ${PFX}h.test.sh ${PFX}hz.test.sh
+hit "$(run)" "a harness self-test pins SELFTEST_FLOOR of ZERO, which nothing can fall below — a pin that cannot bite is the decoration this leg exists to remove: ${PFX}hz.test.sh"
 
-build_harness_inert tools/hi.test.sh; manifest tools/h.test.sh tools/hi.test.sh
-hit "$(run)" "a harness self-test pins SELFTEST_FLOOR but never reaches run_arms, or does not source the harness, so nothing prints its executed count and nothing reads the pin: tools/hi.test.sh"
+build_harness_inert ${PFX}hi.test.sh; manifest ${PFX}h.test.sh ${PFX}hi.test.sh
+hit "$(run)" "a harness self-test pins SELFTEST_FLOOR but never reaches run_arms, or does not source the harness, so nothing prints its executed count and nothing reads the pin: ${PFX}hi.test.sh"
 
 # ---- a manifest naming a suite that is not on disk must NOT be skipped silently.
-manifest tools/a.test.sh tools/gone.test.sh
-hit "$(run)" "the gate manifest names a self-test this leg cannot read, and skipping it silently removes it from the population: tools/gone.test.sh"
+manifest ${PFX}a.test.sh ${PFX}gone.test.sh
+hit "$(run)" "the gate manifest names a self-test this leg cannot read, and skipping it silently removes it from the population: ${PFX}gone.test.sh"
 
 # ---- an EMPTY population is a refusal, not a pass. This is the vacuous-selector shape the leg
 # ---- exists to prevent, applied to the leg itself.

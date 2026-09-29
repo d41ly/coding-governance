@@ -18,7 +18,7 @@ THE RECONSTRUCTION IS THE ENGINE'S OWN, not a heuristic. A row's gov SOURCE is r
 gov's `registry.toml` at the row's recorded commit: registry entry -> descriptor -> `home`, then the
 longest tail of the target path that resolves to a tracked gov file under that home. The first cut
 of this used a basename match and left 13 of 54 rows unresolved, because five kits do not live at
-`tools/<kit>/` — `agent-cap` is `tools/hooks`, `review-harness` is `tools/workflows`,
+`<prefix>/<kit>/` — `agent-cap` is `<prefix>/hooks`, `review-harness` is `<prefix>/workflows`,
 `kickoff-manifest` is `skills/session-kickoff`, and three single-file kits sit directly under
 `tools`. Reading the registry is not a refinement of the heuristic; it is the difference between
 guessing and asking.
@@ -37,7 +37,7 @@ exists to prove — so writing it through as `engine` is what lets those rows re
 Mapped rather than passed through, and the count is printed.
 
 RUN IT:
-    python tools/govkit/fixtures/make_adopter_receipt.py \
+    python <prefix>/govkit/fixtures/make_adopter_receipt.py \
         --incms C:/projects/incms/main --incms-rev 2cff5855 --gov-rev ce5dca99
 
 The output is committed beside this file so AC1 and AC2 re-run with NEITHER live repository
@@ -53,6 +53,24 @@ import pathlib
 import subprocess
 import sys
 import tomllib
+
+
+def derive_install_prefix() -> str:
+    """The install prefix WITH its trailing slash, derived from where this file sits and empty at a
+    root install. Every fixture and host path the self-test builds is spelled through it, never
+    through a literal prefix (TOOL-aRepatriatedFork-28)."""
+    import pathlib
+    here = pathlib.Path(__file__).resolve().parent
+    for anc in here.parents:
+        if (anc / ".git").exists():
+            rel = here.parent.relative_to(anc).as_posix()
+            return "" if rel == "." else rel + "/"
+    raise SystemExit(f"{pathlib.Path(__file__).name}: not inside a git repository, so there is no "
+                     "install prefix to derive")
+
+
+PFX = derive_install_prefix()
+
 
 HERE = pathlib.Path(__file__).resolve().parent
 GOV_ROOT = HERE.parents[2]
@@ -119,7 +137,7 @@ def load_govkit():
     global _GK
     if _GK is None:
         import importlib.util
-        spec = importlib.util.spec_from_file_location("gk", GOV_ROOT / "tools/govkit/govkit.py")
+        spec = importlib.util.spec_from_file_location("gk", GOV_ROOT / f"{PFX}govkit/govkit.py")
         _GK = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(_GK)
     return _GK
@@ -128,9 +146,27 @@ def load_govkit():
 _GK = None
 
 
+def derive_rev_prefix(gov_rev: str) -> str:
+    """The tool root gov had AT `gov_rev`, with its slash, read from that revision's own tree.
+
+    TOOL-aRepatriatedFork-28 F1. A recorded revision's layout does not move when this checkout
+    does, so it is derived from the revision rather than from where this file sits today.
+    """
+    tail = f"{HERE.parent.name}/registry.toml"   # this file sits in <deployer>/fixtures/
+    hits = sorted(t[:-len(tail)] for t in read_gov_tree(gov_rev) if t == tail or t.endswith("/" + tail))
+    if len(hits) != 1:
+        raise SystemExit(f"gov {gov_rev} carries {len(hits)} registries, so its tool root is not derivable")
+    return hits[0]
+
+
+def render_token(src: str, rev_pfx: str) -> str:
+    """A gov-side path as the fixture records it: the revision's prefix replaced by `{prefix}/`."""
+    return "{prefix}/" + src[len(rev_pfx):] if rev_pfx and src.startswith(rev_pfx) else src
+
+
 def resolve_kit_homes(gov_rev: str) -> dict[str, str]:
     """kit id -> `home`, read from gov's own registry at the recorded commit."""
-    reg = tomllib.loads(read_gov_text(gov_rev, "tools/govkit/registry.toml"))
+    reg = tomllib.loads(read_gov_text(gov_rev, f"{derive_rev_prefix(gov_rev)}govkit/registry.toml"))
     homes: dict[str, str] = {}
     for entry in reg.get("entry", []):
         txt = read_gov_text(gov_rev, entry["descriptor"])
@@ -167,6 +203,7 @@ def build(incms: pathlib.Path, incms_rev: str, gov_rev: str) -> dict:
 
     homes = resolve_kit_homes(gov_rev)
     tree = read_gov_tree(gov_rev)
+    rev_pfx = derive_rev_prefix(gov_rev)
 
     raw = []
     for line in index.stdout.splitlines():
@@ -186,7 +223,7 @@ def build(incms: pathlib.Path, incms_rev: str, gov_rev: str) -> dict:
     for r in raw:
         src = resolve_source(r["path"], homes.get(r["kit"], ""), tree)
         if src:
-            pairs_86.append([src, r["path"]])
+            pairs_86.append([render_token(src, rev_pfx), r["path"]])
     pairs_86.sort()
 
     rows, unresolved, unverified = [], [], []
@@ -206,7 +243,7 @@ def build(incms: pathlib.Path, incms_rev: str, gov_rev: str) -> dict:
         gov_oid, sha256 = blob
         role = ROLE_MAP.get(r["role"], r["role"])
         roles_seen[role] = roles_seen.get(role, 0) + 1
-        rows.append({"path": r["path"], "source": src, "role": role,
+        rows.append({"path": r["path"], "source": render_token(src, rev_pfx), "role": role,
                      "commit": r["commit"], "gov_oid": gov_oid, "oid": r["oid"],
                      "sha256": sha256, "kit": r["kit"],
                      "lf_oid": derive_lf_oid(incms, r["oid"])})
@@ -228,7 +265,7 @@ def build(incms: pathlib.Path, incms_rev: str, gov_rev: str) -> dict:
             "adopter_rev": incms_rev,
             "adopter_record": ".governance/install.index",
             "gov_rev": gov_rev,
-            "generated_by": "tools/govkit/fixtures/make_adopter_receipt.py",
+            "generated_by": "{prefix}/govkit/fixtures/make_adopter_receipt.py",
             "index_rows": len(raw),
             "unverified_rows": len(unverified),
             "unresolved": [f"[{k}] {p}" for k, p in unresolved],

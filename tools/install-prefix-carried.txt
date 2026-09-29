@@ -10,88 +10,54 @@
 .githooks/pre-push.test.sh	2	run-gates
 .githooks/pre_push_bar_selftest.py	2	run-gates
 WIRE-INTO-PROJECT.md	7	govkit	WRITTEN BY HAND, TOOL-aRepatriatedFork-26 rev-3. All seven sit in the harness-migration blocks, which the govkit self-test cuts out of this file and RUNS as written: six `$GOV/tools/govkit/govkit.py` invocations and the embedded program's read of gov's registry. They are executing lines joining a literal under the operator's `$GOV`, so they drain with the other executing derived-base joins, where a suite can observe the change, and not in a doc pass. Every other kit path in the runbook spells the `<prefix>/` token its Definitions line declares.
-skills/session-kickoff/manifest-check.test.sh	8	(loose),lib,memory-tree	WRITTEN BY HAND, TOOL-aRepatriatedFork-18 S1, when this suite began to SHIP beside its checker as the check-arms sibling every adopter reads. REWRITTEN by TOOL-aRepatriatedFork-27, which reworded the inline resolver block's marker to name its canonical copy in words: what is left is test prose and fixture paths, which TOOL-aRepatriatedFork-28 owns.
-tools/agent-instructions/adopt-agent-instructions.test.sh	1	agent-instructions
-tools/check-agent-cap-restatement.test.sh	1	hooks
-tools/check-dead-paths.test.sh	19	(loose)
-tools/check-hook-destinations.test.sh	9	(loose),hooks,memory-recall
-tools/check-install-prefix.test.sh	72	(loose),codebase-map,govkit,hooks,lib,memory-recall,memory-tree	FIXTURE-INTERNAL PATHS. `mkfix_source` builds a scratch gov tree containing `tools/demo/` and `tools/govkit/`, and the arms then run the gate INSIDE it -- so `tools/` in this file is the fixture's own layout and is correct at every prefix. The row rose 18 -> 25 when TOOL-dRetiredFork-17's closing review forced the BAN arms to stop re-implementing the gate's awk and invoke the real gate instead, which needs real fixture trees. Same class as the check-pass-order row below: a sweep that rewrites a fixture value is not a repath.
-tools/check-kit-placeholders.test.sh	2	(loose),lib
-tools/check-line-length.test.sh	28	(loose),lib	the suite PORTED onto the self-test harness: its fixture copies `tools/check-line-length.sh` into a scratch repo and every arm invokes it there, so the literal is fixture-internal and is the same justification `check-install-prefix.test.sh` and `check-pass-order.test.sh` already carry. Withheld from adopters by a `project-owned` rule in its own entry. TOOL-aQuenchedHarness-6. SHIPPED since TOOL-aRepatriatedFork-18 S1 as the file every adopter's check-arms reads for the gate's arms; the literals stay fixture-internal, and the suite is still no adopter's leg.
-tools/check-playbook-parity.test.sh	23	(loose),hooks,lib,memory-tree
-tools/check-spec-tokens.test.sh	92	(loose),govkit,lib,run-gates,runlog
-tools/check-template-size.test.sh	4	(loose)
-tools/check-testsuite-counts.test.sh	49	(loose),lib	its arms build fixtures that source the harness by path, which is what the new spelling requires them to grade. TOOL-aQuenchedHarness-6.
-tools/check-wiring.test.sh	59	(loose),hooks,lib,memory-recall,memory-tree
-tools/codebase-map/adopt-codebase-map.test.sh	13	codebase-map,lib
+skills/session-kickoff/manifest-check.test.sh	1	memory-tree	LOWERED 8 -> 1 by TOOL-aRepatriatedFork-28, which derives every fixture path. The one literal left is `$R/memory-tree/corpus_ids.py`, a kit segment joined under a derived base, TOOL-aRepatriatedFork-46's class (spec rev-3 §4, Returned).
+tools/check-hook-destinations.test.sh	7	hooks,memory-recall
+tools/check-install-prefix.test.sh	13	(loose),hooks,memory-recall,memory-tree	LOWERED 72 -> 13 by TOOL-aRepatriatedFork-28, which spells every fixture path through the derived prefix. What is left is this gate's own red fixtures, root-install spellings under its marker and quoted-join samples of its literal predicate, and two layouts at a foreign literal prefix: all TOOL-aRepatriatedFork-30's, which rewrites that predicate (spec rev-3 §4, Returned).
+tools/check-line-length.test.sh	1	lib	LOWERED 28 -> 1 by TOOL-aRepatriatedFork-28. The one literal left sources the harness beside this suite, a kit segment joined under a derived base, TOOL-aRepatriatedFork-46's class (spec rev-3 §4, Returned).
+tools/check-testsuite-counts.test.sh	3	lib	LOWERED 49 -> 3 by TOOL-aRepatriatedFork-28. The three left are fixture suites that source the harness beside them, a kit segment joined under a derived base, TOOL-aRepatriatedFork-46's class (spec rev-3 §4, Returned).
+tools/check-wiring.test.sh	30	hooks,lib,memory-recall,memory-tree
+tools/codebase-map/adopt-codebase-map.test.sh	3	codebase-map
 tools/codebase-map/map_extractors.py	2	lexicon,workflows
-tools/codebase-map/selftest.py	34	(loose),codebase-map,lexicon,lib
+tools/codebase-map/selftest.py	19	codebase-map,lexicon
 tools/codebase-map/test_codebase_map.py	1	codebase-map
 tools/codebase-map/test_codebase_map.template.py	1	codebase-map
-tools/dead-path-waivers.txt	4	lexicon
-tools/drift-audit/selftest.py	22	drift-audit,lexicon,memory-recall,unattended,workflows
-tools/govkit/census.test.sh	5	govkit,lib
-tools/govkit/fixtures/adopter-ic-2cff5855.receipt.json	224	(loose),codebase-map,drift-audit,gate-lint,govkit,hooks,lexicon,memory-recall,memory-tree,pytest-parallel-guardrails,unattended,workflows
-tools/govkit/fixtures/make_adopter_receipt.py	6	govkit,hooks,workflows
+tools/dead-path-waivers.txt	2	lexicon
+tools/drift-audit/selftest.py	21	drift-audit,lexicon,memory-recall,unattended,workflows
+tools/govkit/fixtures/adopter-ic-2cff5855.receipt.json	91	codebase-map,drift-audit,gate-lint,lexicon,unattended,workflows
 tools/govkit/govkit.py	1	run-gates
-tools/govkit/matrix.py	30	(loose),govkit,lib
-tools/govkit/selftest.py	596	(loose),codebase-map,drift-audit,gate-lint,govkit,hooks,lexicon,memory-recall,memory-tree,playbook,process-monitor,pytest-parallel-guardrails,run-gates,unattended,workflows
-tools/hooks/agent-cap.test.sh	15	hooks,lib,workflows
+tools/govkit/matrix.py	7	govkit
+tools/govkit/selftest.py	213	codebase-map,drift-audit,gate-lint,govkit,hooks,memory-recall,memory-tree,playbook,process-monitor,pytest-parallel-guardrails,run-gates,unattended,workflows
+tools/hooks/agent-cap.test.sh	5	hooks,lib,workflows
 tools/hooks/scratch-guard.js	2	lib
-tools/hooks/scratch-guard.test.sh	5	hooks,lib,run-gates
-tools/lexicon/selftest.py	55	lexicon	FIXTURE-INTERNAL PATHS, same class as the `check-install-prefix.test.sh` row above and justified the same way. Every literal this row counts is an argv element in a `subprocess.run(..., cwd=<scratch tree>)`: the arms build a scratch repo, copy the kit into it at `tools/lexicon/`, and run the REAL engine inside it. So `tools/` here is the FIXTURE's own layout, not the host's, and it is correct at every prefix an adopter installs at. The row rose 15 -> 21 under TOOL-aSurfacedLexicon: a build that added the convention predicate, the cell refusals, a shell parser and the canon overlay, each of which needs its own end-to-end fixture rather than an in-process call, because a refusal that only ever fires in-process is not the refusal an operator meets. The six prose mentions of SIBLING kits that this build also added were NOT justified here -- they were rewritten to drop the prefix, because a path in a comment is documentation and derives nothing. The 22nd is TOOL-aSurfacedLexicon-10's `run_expand_wrapper`, the same shape again: it runs `adopt-lexicon.sh --expand` inside the fixture repo, because the once-refusal and the stamp live in the WRAPPER and an in-process call would exercise neither. The 23rd is TOOL-aGradedDialect-4's re-scaffold arm, the same shape a third time: it runs `scaffold_lexicon.py` inside the fixture repo with `cwd=` that scratch tree, because the seeded `SEED_CONVENTIONS` rows and the emitted `CELLS` comment are what an adopter actually meets and an in-process call emits neither. Verified against source 2026-09-10: the only literal this build added to this file is that argv element. RAISED 23 -> 24, TOOL-aGradedDialect-10: one more `subprocess.run([sys.executable, "tools/lexicon/scaffold_lexicon.py", ...], cwd=<scratch tree>)`, the arm that scaffolds a helpers-only `.tsx` tree and asserts the `+returns:jsx` row is ABSENT; same fixture-internal class, same justification.
-tools/lib/extract-arms.test.sh	4	lib,memory-tree
-tools/lib/lib-selftest.test.sh	1	lib
-tools/lib/resolve-python.test.sh	18	drift-audit,lib,unattended
-tools/memory-recall/selftest.py	3	(loose),memory-tree
-tools/memory-recall/test_recall_floor.py	2	govkit,memory-recall
-tools/memory-tree/check-arms.py	69	(loose),memory-tree,unattended
-tools/memory-tree/check-memory-hygiene.test.sh	13	codebase-map,lib,memory-tree,playbook,unattended
-tools/memory-tree/check-method-carriers.test.sh	1	memory-tree
+tools/hooks/scratch-guard.test.sh	2	lib
+tools/lexicon/selftest.py	28	lexicon	LOWERED 55 -> 28 by TOOL-aRepatriatedFork-28, which derives the prefix every fixture copies the kit to. Each literal left is the kit's own segment joined under that derived prefix, a kit segment joined under a derived base, TOOL-aRepatriatedFork-46's class (spec rev-3 §4, Returned).
+tools/memory-recall/selftest.py	2	memory-tree
+tools/memory-recall/test_recall_floor.py	1	govkit
+tools/memory-tree/check-memory-hygiene.test.sh	10	codebase-map,playbook,unattended
 tools/memory-tree/check-verdict-epoch.sh	1	memory-recall
-tools/memory-tree/check-verdict-epoch.test.sh	6	memory-tree
-tools/memory-tree/corpus_ids.py	7	lib,memory-recall,memory-tree
-tools/memory-tree/gotchas.py	23	(loose),memory-tree
-tools/memory-tree/hygiene-parity.test.sh	3	memory-tree
-tools/memory-tree/kit-dogfood-parity.test.sh	5	lib,memory-tree	REWRITTEN by TOOL-aRepatriatedFork-27: the inline resolver and render_doc markers this suite carries now name their canonical copies in words, so the literals left are the suite's own fixture paths and prose, which TOOL-aRepatriatedFork-28 owns.
-tools/memory-tree/marker-contract.test.sh	4	memory-tree,unattended
-tools/memory-tree/merge-rows.test.sh	46	lib,memory-recall,memory-tree
-tools/playbook/render_playbook.py	5	lexicon
-tools/process-monitor/adopt-process-monitor.test.sh	7	lib,process-monitor	a suite that must name the files it grades. It is `project-owned` in kit.toml and is withheld from `govkit apply`, so no adopter ever receives these bytes at any prefix. LOWERED 4 -> 1, 2026-09-08: the four adopter invocations now go through KIT_REL, derived from git rev-parse --show-prefix. What is left is one usage line a human reads.
-tools/process-monitor/selftest.py	1	(loose)
-tools/pytest-parallel-guardrails/pytest-parallel-guardrails.test.sh	2	lib
-tools/run-gates/adopt-run-gates.test.sh	10	run-gates
-tools/run-gates/profile_bar.test.sh	6	(loose),run-gates
-tools/run-gates/run-gates.evidence.test.sh	37	(loose),lib,run-gates
-tools/run-gates/run-gates.gov.test.sh	10	(loose),govkit,memory-recall,run-gates
+tools/memory-tree/corpus_ids.py	1	memory-recall
+tools/memory-tree/marker-contract.test.sh	2	unattended
+tools/memory-tree/merge-rows.test.sh	19	lib,memory-recall,memory-tree
+tools/process-monitor/adopt-process-monitor.test.sh	2	lib	LOWERED 7 -> 2 by TOOL-aRepatriatedFork-28. The two left source the resolver beside this kit, a kit segment joined under a derived base, TOOL-aRepatriatedFork-46's class (spec rev-3 §4, Returned). Still `project-owned` and withheld from `govkit apply`.
+tools/run-gates/adopt-run-gates.test.sh	9	run-gates
 tools/run-gates/run-gates.runlog.test.sh	4	lib,run-gates
-tools/run-gates/run-gates.test.sh	71	(loose),lib,run-gates	the run-gates canary, withheld from adopters by a `project-owned` rule; the two new literals are the wall fixture and the profile row it reads, both gov-side. TOOL-aQuenchedHarness-1.
-tools/run-gates/run-gates.turnstile.test.sh	13	(loose),lib,run-gates
-tools/run-gates/run-selftests.test.sh	150	(loose),lib,run-gates,unattended	the arms for that runner, WITHHELD from every adopter by a `project-owned` rule in `tools/run-gates/kit.toml`, so the gov paths it spells never travel. TOOL-aQuenchedHarness-6. MERGED 2026-09-14 (aBatchedArm): 7 -> 10 read off the checker on the merged tree; the branch added the evidence-file, margin-file and pooled-kit fixture literals its unit 5 arms stage, every one inside the withheld suite.
-tools/runlog/selftest.py	62	(loose),memory-tree,runlog,unattended	ADDED at 1 by hand, TOOL-dLoggedFlight-8: the run model holds copies of the unattended driver's parked-kind, owed and terminal-phase sets, and a replicated policy value is held to the file that owns it, so this withheld arm reads the driver's source at gov's own path and compares both directions. It is a gov-side check in a file no adopter receives (kit.toml `project-owned`), it announces its skip where the driver is absent, and the path is its subject rather than a reference that would arrive at a target and resolve to nothing there. RAISED 1 -> 2 by hand, the closing diff review's round-1 fold of M7 (TOOL-dLoggedFlight-1 AC10): the kit's conf reader is a copy of the memory-tree engine's own line reader, and a replicated rule is held to the file that owns it, so this withheld arm loads that reader from gov's own path and compares the two over a table of spellings, with bash grading both. The same class as the driver literal: a gov-side check in a file no adopter receives, it announces its skip where the engine is absent, and the path is its subject.
+tools/runlog/selftest.py	4	runlog,unattended	LOWERED 62 -> 4 by TOOL-aRepatriatedFork-28. The four left name no kit path: three per-OS state directories called runlog and the Skill's keyword tuple, which the epoch-5 counter reads as kit segments. TOOL-aRepatriatedFork-30's population rule.
 tools/settings-merge.py	8	hooks,memory-recall,process-monitor
-tools/unattended/adopt-unattended.test.sh	11	(loose),lib,memory-tree,unattended
-tools/unattended/check-brief-recorded.test.sh	11	(loose),memory-tree,unattended	FIXTURE-INTERNAL PATHS, not gov's install prefix, exactly as the sibling suite's row below records at length. Every path here is inside the scratch tree the suite builds with `mkdir -p tools/unattended` and then runs the checker inside, so `tools/` is that fixture's own layout and is correct at every prefix. The sibling was swept to a derived prefix once and 14 of its 19 arms broke, because the `.unattended.conf` heredoc is QUOTED. This suite is on no bar, so nothing would report it here either.
-tools/unattended/check-pass-order.test.sh	16	(loose),memory-tree,unattended	FIXTURE-INTERNAL PATHS, not gov's install prefix. This suite builds its own tree with `mkdir -p tools/unattended` and runs the checker inside it, so `tools/` here is that fixture's own layout and is correct at every prefix. TOOL-dRetiredFork-17 swept them to a derived prefix and broke 14 of 19 arms -- the .unattended.conf heredoc is QUOTED, so the config received four literal bytes -- and reverting them is what raised this row 1 -> 14. The suite is on no bar, so nothing else would have reported it.
-tools/unattended/check-playbook.test.sh	53	unattended
-tools/unattended/check-unattended.test.sh	5	unattended,workflows
-tools/unattended/cross-component.test.sh	6	(loose),memory-tree,unattended
+tools/unattended/adopt-unattended.test.sh	3	lib,unattended
+tools/unattended/check-unattended.test.sh	3	workflows
 tools/unattended/fixture-records/tools~unattended~fixture-pieces~one~piece.md.md	2	unattended
 tools/unattended/fixture-records/tools~unattended~fixture-pieces~two~piece.md.md	2	unattended
-tools/unattended/gate-guard.test.sh	105	(loose),govkit,lib,memory-tree,run-gates,unattended	WRITTEN BY HAND, TOOL-aDeferredBar-3. FIXTURE-INTERNAL PATHS of a different kind: every literal is the COMMAND STRING an arm feeds the hook — `bash tools/unattended/check-unattended.test.sh`, `GATE_FULL=1 bash tools/run-gates/run-gates.sh` — which are the deny SHAPES under test, not paths the suite runs. The predicate keys on a basename, so a repath would change nothing it grades; withheld from adopters by the kit's `project-owned` rule like its six siblings. RE-KEYED 37 -> 39 by hand at the closing review's F1: the rev-5 `bash -n` and `bash -x` payloads spell the suite's own path as a command string, two more of the same class, and the row was written before that fold in the same commit. RE-KEYED 39 -> 42 at the closing review's F2: the selftest.py deny payload, its check_names token and the --selftest flag control, the same command-string class. RE-KEYED 42 -> 48 at its F7 and F8: four run-shape payloads and their one token check, and the two PowerShell `$env:` payloads, every one a command string fed to the hook. RE-KEYED 48 -> 56 at closing round 2 (R3 R4 R5 R6 R12 R13 R14): the five PowerShell spellings, the seven substitution shapes with the bar or a suite inside them plus the heredoc-body control, the two `timeout` long forms and the `py`/`python3.12` launchers, command strings again; eight new literals for twenty-one arms because most payloads spell the bare fixture name `tools/x.test.sh`, which is one literal each and none for the arms that spell it only in prose. RE-KEYED 56 -> 62 at closing round 3 (T1 T2 T3 T4 T5 T6 T7 T8): twenty-four arms, six new literals, counted from the diff — the three PowerShell `NAME= value` payloads spell the plain bar, and the two `py -3`/`-X utf8` payloads with one token check spell the govkit suite; every other new arm spells the bare fixture name, which the existence filter does not count. RAISED 62 -> 63 BY HAND at the origin/main merge before landing aDeferredBar: cWidenedNet widened this gate's own predicate (7484d8d7) and one fixture-internal command string it had been blind to is now counted; the file did not change.
+tools/unattended/gate-guard.test.sh	2	lib	LOWERED 105 -> 2 by TOOL-aRepatriatedFork-28, which spells every deny-shape command string through the derived prefix. The two left source the resolver beside this kit, a kit segment joined under a derived base, TOOL-aRepatriatedFork-46's class (spec rev-3 §4, Returned).
 tools/unattended/playbook.fixture.md	5	unattended
-tools/unattended/resume-tick.test.sh	1	unattended	WRITTEN BY HAND, TOOL-aWokenSentinel-5. The one literal is the usage header's `bash tools/unattended/resume-tick.test.sh`, the gov suite path every sibling suite's header spells; the suite derives its kit dir from $0, copies the tick beside a scratch driver and drives a scratch `git init`, so nothing in it runs at that prefix. FIXTURE-INTERNAL, correct at every prefix.
 tools/unattended/run-unattended-gates.sh	1	run-gates	REWRITTEN by TOOL-aRepatriatedFork-27, which reworded this file's comment prose: the one literal left is the executing `RUNNER=` join of the run-gates segment under the derived kit parent, which TOOL-aRepatriatedFork-46 owns.
-tools/unattended/runlog-writer.test.sh	4	lib,run-gates,unattended
-tools/unattended/stall-recorder.test.sh	4	lib,unattended	WRITTEN BY HAND, TOOL-aWokenSentinel-4, the stop-guard suite's row below verbatim in kind: the one literal is `KIT_REL="${KIT_REL:-tools/unattended}"`, the fixture's kit home for the real-driver arm, which borrows `adopt-unattended.test.sh`'s `seed()` and must spell the same default that suite's own row records. FIXTURE-INTERNAL, correct at every prefix.
-tools/unattended/stop-guard.test.sh	4	lib,unattended	WRITTEN BY HAND, TOOL-aWokenSentinel-3. The one literal is `KIT_REL="${KIT_REL:-tools/unattended}"`, the fixture's kit home for the real-driver arm, which borrows `adopt-unattended.test.sh`'s `seed()` and must spell the same default that suite's own row records: the seed installs the kit there and the arm runs it there, and an adopter at another prefix sets the variable once. FIXTURE-INTERNAL, correct at every prefix.
-tools/unattended/unattended.test.sh	41	(loose),govkit,memory-recall,memory-tree,unattended	RAISED 3 -> 8 BY HAND at aDeferredBar's closing review F3: the SPEC_TOKENS_CLI dispatch arms copy the real checker INTO the scratch fixture at `tools/check-spec-tokens.py`, write the fixture's own `tools/gate-legs.json`, declare that path in the fixture's conf and name a missing `tools/gone.py`. FIXTURE-INTERNAL PATHS, the class the check-pass-order and check-brief-recorded rows record: the fixture tree is built by the suite and the driver under test reads the declaration from that tree, so `tools/` is the fixture's own layout and is correct at every prefix.
-tools/workflows/check-protocol-parity.test.sh	3	memory-tree,workflows
+tools/unattended/runlog-writer.test.sh	3	lib,run-gates
+tools/unattended/stall-recorder.test.sh	2	lib	LOWERED 4 -> 2 by TOOL-aRepatriatedFork-28, which derives the fixture's kit home. The two left source the resolver beside this kit, a kit segment joined under a derived base, TOOL-aRepatriatedFork-46's class (spec rev-3 §4, Returned).
+tools/unattended/stop-guard.test.sh	2	lib	LOWERED 4 -> 2 by TOOL-aRepatriatedFork-28, which derives the fixture's kit home. The two left source the resolver beside this kit, a kit segment joined under a derived base, TOOL-aRepatriatedFork-46's class (spec rev-3 §4, Returned).
+tools/unattended/unattended.test.sh	5	govkit,memory-tree	LOWERED 41 -> 5 by TOOL-aRepatriatedFork-28, which spells the fixture tree through the derived prefix. The five left join a kit segment under a derived base, TOOL-aRepatriatedFork-46's class (spec rev-3 §4, Returned).
 tools/workflows/check-review-join.sh	2	hooks
-tools/workflows/check-review-join.test.sh	39	hooks,workflows
+tools/workflows/check-review-join.test.sh	4	hooks,workflows
 tools/workflows/check-verifier-fanout.sh	2	hooks
-tools/workflows/check-verifier-fanout.test.sh	24	(loose),hooks,workflows
+tools/workflows/check-verifier-fanout.test.sh	11	hooks,workflows
 tools/workflows/drift-audit-state.js	1	(loose)
-tools/workflows/tier2-review.test.sh	1	workflows
 tools/workflows/unattended-build.js	6	memory-tree,unattended,workflows
-tools/workflows/unattended-build.test.sh	49	hooks,memory-tree,unattended,workflows	the suite ASSERTS on the sub-workflow's path — an arm greps the trace for `workflow:tools/workflows/tier2-review.js` to prove the spawn happened in the script rather than anywhere else. The literal IS the assertion; deriving it would make the arm agree with whatever the harness did. TOOL-aHoistedPass-6 raised this 2 -> 6, DERIVED at the landing with `bash tools/check-install-prefix.sh --list` rather than predicted in the spec. Four new literals, each of them the assertion itself and not prose about one: two arms name the child workflow the return hands out, and two read `dispatch.args` back for the driver command and the bug-class checklist the caller passes each child. Deriving any of them would make the arm agree with whatever the harness did, which is the reason this row already gives for the two it had. 6 -> 8 at TOOL-aProbedUnit's closing fold (round 2, cluster D): the withheld clean-round hand-out is asserted on the driver command of its resume route and on the child workflow `dispatch.args` still carries, both read back from the return — the literal is the assertion, exactly the class above.
+tools/workflows/unattended-build.test.sh	35	hooks,memory-tree,unattended,workflows	LOWERED 49 -> 35 by TOOL-aRepatriatedFork-28: every asserted sub-workflow path spells the derived prefix. What is left is the PV layouts built at the foreign literal prefix scripts/ on purpose, TOOL-aRepatriatedFork-30's, and kit segments under the derived tool root, TOOL-aRepatriatedFork-46's (spec rev-3 §4, Returned).

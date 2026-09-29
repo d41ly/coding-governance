@@ -10,7 +10,7 @@
 # PRINTED here and never taken as this suite's: the spec's §3 forbids waiving a pre-existing
 # violation and the starting figures are the unit's acceptance ledger's to record, so a leg that
 # adopted that verdict would be red by design on its first day. What this suite grades is the LINTER.
-# NO `tools/<kit>/` LITERAL: both paths are derived from this file's own directory, because the
+# NO `<prefix>/<kit>/` LITERAL: both paths are derived from this file's own directory, because the
 # install-prefix leg bans a kit file naming its own directory and a sibling is not this kit's to spell.
 set -u
 HERE="$(cd "$(dirname "$0")" && pwd)"
