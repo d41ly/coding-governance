@@ -89,4 +89,6 @@ does write, so a hand record is never lost or double-counted.
 ## When the CLI cannot run
 
 Fall back to reading the stream's `DECISIONS.md` / `BACKLOG.md` index under `{{MEMORY_ROOT}}/`
-directly. That is the exception, not the norm.
+directly: the decision log as it stands, and the asks, decided ones included, through
+`gen_build_index.py --asks --json --all`, or the backlog shards when its `mode` field says
+`shards`. That is the exception, not the norm.

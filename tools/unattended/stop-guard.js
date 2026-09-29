@@ -3,7 +3,7 @@
  * stop-guard — a `Stop` hook that refuses the turn end of a session bound to a non-terminal
  * unattended run, and continues the conversation with the absent-owner instruction instead.
  *
- * gov:kit unattended@1.40 — a courtesy marker; the kit version gate pairs the four named `.sh`
+ * gov:kit unattended@1.45 — a courtesy marker; the kit version gate pairs the four named `.sh`
  * carriers and every `*.template.md`, and does not read this one.
  *
  * Contract: the spec for TOOL-aWokenSentinel-3 under the build folder of that slug.
@@ -24,6 +24,10 @@
  *
  * THE DECISION on a bound session, in this order (spec §4 table, amended by TOOL-aWokenSentinel-8):
  *   verdict TERMINAL              allow   `terminal`
+ *   verdict HELD                  allow   `held` — a paused run's restart is the durable schedule
+ *                                         `--hold` printed, so its session stops with nothing to do
+ *   verdict ELSEWHERE             allow   `elsewhere` — the payload's cwd is a worktree not on the
+ *                                         run's branch, whose copy cannot say whether the run is open
  *   no verdict, non-zero exit,
  *     or the liveness bound       allow   `liveness-unreadable`
  *   background_tasks non-empty    allow   `background-tasks` — the harness re-invokes the session
@@ -91,8 +95,8 @@ const BLOCKS_DEFAULT = 6
 // The driver's startup is seconds; sixty is the ceiling past which a hung liveness reads as
 // unreadable and allows. STOP_GUARD_LIVENESS_BOUND_MS overrides it — the fixture's seam.
 const LIVENESS_BOUND_MS = 60000
-const REASONS = ['terminal', 'liveness-unreadable', 'background-tasks', 'knob-malformed',
-                 'blocks-exhausted', 'landing-unstamped', 'run-open']
+const REASONS = ['terminal', 'held', 'elsewhere', 'liveness-unreadable', 'background-tasks',
+                 'knob-malformed', 'blocks-exhausted', 'landing-unstamped', 'run-open']
 
 /**
  * `bash <kitDir>/unattended.sh --liveness <slug>` with cwd at the root, because the driver sources
@@ -135,6 +139,15 @@ function measureBlocks(sidecar, sessionId) {
 function checkStop(liveness, backgroundTasks, knob, blocks) {
   if (!liveness) return { decision: 'allow', reason: 'liveness-unreadable' }
   if (liveness.verdict === 'TERMINAL') return { decision: 'allow', reason: 'terminal' }
+  // TOOL-dDerivedDocket-61 S5: a HELD run is paused on purpose and its session was told to file
+  // nothing and stop, so the stop is allowed before `background-tasks` is consulted and no block is
+  // spent on it. `--liveness` reads HELD ahead of STALE, so a silent paused run never reaches run-open.
+  if (liveness.verdict === 'HELD') return { decision: 'allow', reason: 'held' }
+  // TOOL-dDerivedDocket-62 S5: the liveness was read in the worktree the payload's cwd names, and
+  // that worktree is not on the run's branch, so its copy cannot tell a held run from a working one;
+  // blocking with `run-open` would send the session to `--plan` from a stale copy. Every other path
+  // on which this hook cannot read the run allows, and so does this one, spending no block.
+  if (liveness.verdict === 'ELSEWHERE') return { decision: 'allow', reason: 'elsewhere' }
   if (backgroundTasks > 0) return { decision: 'allow', reason: 'background-tasks' }
   if (knob.source === 'malformed') return { decision: 'allow', reason: 'knob-malformed' }
   if (blocks >= knob.value) return { decision: 'allow', reason: 'blocks-exhausted' }

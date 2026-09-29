@@ -30,7 +30,9 @@ CLAIM_CANARY is what separates that zero from a dead arm.
 THE JOINS KEEP THEIR POPULATIONS APART, the correction rev-2 folded from round 3. The fourth join,
 `bar`, reads two of the three rather than minting a fourth; the fifth, `guards`, reads the legs
 population plus one of its own, the declared write set; the sixth, `claims`, reads none of them,
-being a grammar over the spec's own prose outside its fenced blocks.
+being a grammar over the spec's own prose outside its fenced blocks; and the seventh, `handoff`,
+reads none of them either and mints a fifth population of its own, the backticked payloads of a
+spec's hands-off bullets, joined to the text of the sibling each one names.
 
   legs   backticked tokens on a `## 7. Gates` LINE THAT IS THE LIST -> a `name` in the manifest.
          A section 7 line carrying prose is not graded: measured, that predicate produced 270
@@ -89,6 +91,20 @@ being a grammar over the spec's own prose outside its fenced blocks.
          or an exact file, never as git pathspec magic. The motivating case: a unit that edited
          `tools/hooks/scratch-guard.js` and omitted `scratch-guard self-test`, found by a closing
          review and not by a gate.
+  handoff a `**hands-off**` bullet's backticked PAYLOAD, in the `### Edges` block of a LIVE spec
+         dated at or after SPEC_HANDOFF_CUTOFF (`.memory-tree.conf`, blank = off) -> the text of
+         the sibling spec the bullet names, joined by the uid each spec's own H1 carries, inside
+         the one build (TOOL-dDerivedDocket-37). The bullet promises a named sibling a flag, a key,
+         a file or a placeholder, and nothing checked that the sibling names it: three spec-audit
+         rounds over one build found the class by hand every time, and a probe run after the fold
+         found three more. TWO LIMITS, stated here because neither is guessable from a green row.
+         It proves the sibling NAMES the token, never that it DOES the work the bullet describes —
+         a sibling mentioning it in passing passes. And `**consumes-from**` bullets are NOT graded:
+         measured over that build, grading them produced twelve misses and no true one, each an
+         argument variant of a command the producer does name or a consumer naming its own file.
+         ABSENCE IS NOT DISAGREEMENT, check 12's own rule: a bullet whose target names no live spec
+         in its build is handing to a terminal or Tier-1 sibling, both legitimate, so it is SKIPPED
+         AND COUNTED like the citation arm's untracked half, and the count rides every run.
   claims every backticked OBJECT a dossier-claim SENTENCE names, in a LIVE spec, outside fenced
          blocks, with no cutoff key (owner, 2026-09-21) -> a hit when the object is a PATH (a
          `/`), a GLOB (a `*` or `?`) or a CODE SYMBOL (an underscore between two letters or
@@ -203,6 +219,32 @@ BAR = re.compile(
 BAR_WHY = ("a bar or suite is not an acceptance observation: observe the checker on a staged break, "
            "a --selftest flag or a fixture; name the suite under New arm:; the bar and the suites "
            "run once, after the build is complete")
+# TOOL-dDerivedDocket-37: the hands-off join's key, grammar and refusal. The GRAMMAR IS CHECK 12'S,
+# copied rather than called: the hygiene engine is a copy-installed kit, so an arm there would reach
+# every memory-tree adopter's bar, a shipped surface this unit did not price. Check 12's own lines,
+# cited so a reader can compare them: the uid at
+# tools/memory-tree/check-memory-hygiene.sh:1533-1534, Non-goals and Edges by heading text at :1547
+# and :1549, the marker at :1553, the verb at :1557 and the backticked-or-bare target at :1564-1565.
+HANDOFF_KEY = "SPEC_HANDOFF_CUTOFF"
+# ONE rule here is WIDER than check 12's, which reads a bullet's first line only: this reads the
+# two-space continuation lines too, the shape the acceptance-bullet loop below already uses. A
+# payload wrapped past the house width is still the bullet's promise, and reading only line one
+# would leave every wrapped token ungraded and silent.
+HANDOFF_BULLET = re.compile(r"^(?:-|\*)[ \t]+\*\*hands-off\*\*[ \t].*(?:\n  .*)*", re.M)
+# `## <n>. Non-goals` by HEADING TEXT and never by ordinal, the read GATES_HEAD and AC_HEAD already
+# have. No end anchor, because the house heading is `## 3. Non-goals (OUT)`.
+NONGOALS_HEAD = re.compile(r"^## [0-9]+[.] Non-goals[^\n]*$", re.M)
+# The uid a spec's H1 carries. BOTH halves of a handoff key are read from this and never from a
+# filename: a spec may legally be family-less, carry a record tail or sit in a sub-folder of
+# `spec/`, and its filename then says nothing about the unit it specs.
+SPEC_UID = re.compile(r"^# ([A-Z][A-Za-z0-9-]*) ", re.M)
+# A unit id is this join's SUBJECT, not its payload. The target is dropped by identity; every other
+# id in the bullet is context — a sibling unit, a prior decision — and grading one would demand that
+# every spec a bullet mentions names the unit mentioning it.
+UNIT_ID = re.compile(r"^[A-Z][A-Za-z0-9]*-[A-Za-z]+-[0-9]+$")
+HANDOFF_WHY = ("this bullet hands the token to that sibling and the sibling's own spec never names "
+               "it: name it there, or correct the bullet — the join proves the sibling NAMES the "
+               "token, never that it does the work")
 
 # TOOL-dGatedProse-2: THE CLAIMS JOIN. A codebase-map dossier claims EXACT inventory keys and nothing
 # else, so a spec sentence saying a dossier claims a path, a glob or a code symbol books a grader that
@@ -492,6 +534,93 @@ def read_cutoff_key(root, key):
     return value
 
 
+def read_spec_uids(root, specs):
+    """`(build, uid)` -> the live spec files whose H1 line carries that uid.
+
+    TOOL-dDerivedDocket-37. Both halves of a handoff key are read HERE and never from a filename: a
+    spec may legally be family-less, carry a record tail or sit in a sub-folder of `spec/`, so its
+    filename says nothing about the unit it specs. Keyed per BUILD, because a uid is unique inside
+    its build and nowhere else. One uid may map to several files; measured over 649 tracked specs no
+    build had two, and keeping the list is what makes that a measurement rather than an assumption.
+    """
+    uids = {}
+    for f in specs:
+        m = SPEC_UID.search((root / f).read_bytes().decode("utf-8", "replace"))
+        if m:
+            uids.setdefault((f.split("/")[2], m.group(1)), []).append(f)
+    return uids
+
+
+def scan_handoffs(root, specs, uids, cutoff):
+    """Every `**hands-off**` bullet's backticked payload -> the text of the sibling it names.
+
+    TOOL-dDerivedDocket-37. Returns `(hits, bullets graded, payload tokens, silent bullets)`. A
+    blank cutoff is the OFF spelling and grades nothing, which the report line says out loud.
+
+    THE SILENT COUNT IS THE HONEST HALF. A bullet whose target names no live spec in its own build
+    is handing to a terminal or a Tier-1 sibling, and a bullet in a source whose H1 carries no uid
+    has no key to report a hit under; both are legitimate, both are skipped, and a skip that does
+    not announce its size is indistinguishable from coverage. A bullet naming `external` has no
+    sibling to join at all and is not read.
+    """
+    hits, bullets, tokens, silent = [], 0, 0, 0
+    if not cutoff:
+        return hits, bullets, tokens, silent
+    # One read per file, kept flat rather than behind a nested helper: a nested `def` is a function
+    # the naming gate grades and §4 Inventory of TOOL-dDerivedDocket-37 declares exactly two.
+    cache = {}
+    for f in specs:
+        m = SPEC_DATE.search("/" + f)
+        if not m or m.group(1) < cutoff:
+            continue
+        if f not in cache:
+            cache[f] = (root / f).read_bytes().decode("utf-8", "replace")
+        text = cache[f]
+        head = NONGOALS_HEAD.search(text)
+        if not head:
+            continue
+        rest = text[head.end():]
+        nxt = re.search(r"^## ", rest, re.M)
+        nongoals = rest[:nxt.start()] if nxt else rest
+        sub = re.search(r"^### Edges[ \t]*$", nongoals, re.M)
+        if not sub:
+            continue
+        rest = nongoals[sub.end():]
+        nxt = re.search(r"^### ", rest, re.M)
+        edges = rest[:nxt.start()] if nxt else rest
+        uid = SPEC_UID.search(text)
+        source = uid.group(1) if uid else ""
+        build = f.split("/")[2]
+        for bullet in HANDOFF_BULLET.findall(edges):
+            # Check 12's target rule, on the payload past the marker and the verb: the first
+            # backticked token when the payload opens with one, else its leading word run. Stripping
+            # the MARKER here as well as the verb is what keeps a `*`-and-tab bullet readable.
+            payload = re.sub(r"^(?:-|\*)[ \t]*\*\*[^*]*\*\*[ \t]*", "", bullet.split("\n", 1)[0])
+            if payload.startswith("`"):
+                target = payload[1:].partition("`")[0]
+            else:
+                target = re.match(r"[A-Za-z0-9_-]*", payload).group(0)
+            if target == "external":
+                continue
+            if not source or (build, target) not in uids:
+                silent += 1
+                continue
+            bullets += 1
+            parts = []
+            for g in uids[(build, target)]:
+                if g not in cache:
+                    cache[g] = (root / g).read_bytes().decode("utf-8", "replace")
+                parts.append(cache[g])
+            sibling = "\n".join(parts)
+            for tok in TICK.findall(bullet):
+                if tok == target or UNIT_ID.match(tok) or NOT_A_TOKEN.match(tok):
+                    continue
+                tokens += 1
+                if tok not in sibling:
+                    hits.append((f, "handoff", f"{source}>{target}:{tok}", HANDOFF_WHY))
+    return hits, bullets, tokens, silent
+
+
 def check_path_shaped(tok, files):
     """A path this join can resolve. The pre-wiring run over the live corpus produced every one of
     these exclusions as a near-miss, and each would otherwise red an innocent spec.
@@ -651,8 +780,9 @@ def main(argv):
 
     legline_cut = read_cutoff_key(root, LEGLINE_KEY)
     direct_cut = read_cutoff_key(root, DIRECT_KEY)
+    handoff_cut = read_cutoff_key(root, HANDOFF_KEY)
     guards_cut = read_cutoff_key(root, GUARDS_KEY)
-    if legline_cut is None or direct_cut is None or guards_cut is None:
+    if legline_cut is None or direct_cut is None or handoff_cut is None or guards_cut is None:
         return 1
     relation = check_cutoff_relation(root, DIRECT_KEY, direct_cut) if direct_cut else ""
     grelation = check_cutoff_relation(root, GUARDS_KEY, guards_cut) if guards_cut else ""
@@ -813,6 +943,13 @@ def main(argv):
         near += [(f, "claims", f"claims <- {obj}", f"line {line}, arm(s) {'+'.join(arms)} — {why}")
                  for line, obj, arms, why in c_clears]
 
+    # The seventh join, over a population the six above never build: one uid map over the live specs,
+    # then one read per graded target. It is folded into `hits` before the waiver pass, so a handoff
+    # hit takes a row of the same registry and a stale row naming one reds like any other.
+    ho_uids = read_spec_uids(root, specs) if handoff_cut else {}
+    ho_hits, ho_bullets, ho_tokens, ho_silent = scan_handoffs(root, specs, ho_uids, handoff_cut)
+    hits += ho_hits
+
     live = [h for h in hits if h[2] not in waivers]
     for h in hits:
         if h[2] in waivers:
@@ -871,6 +1008,15 @@ def main(argv):
     print(f"spec-tokens: {ungraded} live spec(s) carry a Gates heading contributing NO leg name · "
           f"{noheading} carry no Gates heading to grade · "
           + (f"{LEGLINE_KEY} {legline_cut}" if legline_cut else f"{LEGLINE_KEY} blank (arm off)"))
+    # The hands-off join's line, ONE shape whether the arm is on or off, because "every run prints
+    # it" is what stops a green run over zero bullets passing for a graded one — and the OFF state
+    # is exactly when a reader most needs the zero spelled out. Its `live spec(s) ·` is deliberate:
+    # `--dispatch` drops the report lines from its refusal diagnosis by that text, so this line
+    # cannot crowd a real hit out of the three lines it prints.
+    print(f"spec-tokens: hands-off join · {ho_bullets} bullet(s) graded in live spec(s) · "
+          f"{ho_tokens} payload token(s) · {ho_silent} silent (no live target in the build, or no "
+          f"source uid) · {HANDOFF_KEY} "
+          + (handoff_cut if handoff_cut else "blank (arm off)"))
 
     if listing:
         return 0

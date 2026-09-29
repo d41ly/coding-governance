@@ -53,7 +53,9 @@ floor on the merge bar.
   FLAT `<root>/DECISIONS.md`, and a pattern requiring the segment matched nothing here. Measured
   before the fix: 0 files of 1325; after: 9 index files, and `spine` went 0 documents to 755. An
   index named for an id FAMILY is admitted beside `DECISIONS`/`BACKLOG`, and that alternation is
-  built from `CONF.families` rather than typed, so an adopter's prefixes are their own.
+  built from `CONF.families` rather than typed, so an adopter's prefixes are their own. A fourth
+  arm admits `<root>/builds/<slug>/BACKLOG.md` by exact basename (`TOOL-dDerivedDocket-34`), the one
+  authored home of an ask under `BACKLOG_MODE="builds"`, and `CACHE_VERSION` moved with it.
 - **An empty `spine` beside non-empty `records` ANNOUNCES itself** on stderr and exits 0, matching
   `zero_record_diagnosis` rather than inventing a second shape. Unlike zero records, that state has
   no honest reading: records exist, so the root and the id grammar both work, and the only remaining

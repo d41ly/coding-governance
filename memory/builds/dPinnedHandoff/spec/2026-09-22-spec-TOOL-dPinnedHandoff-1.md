@@ -1,6 +1,6 @@
 # TOOL-dPinnedHandoff-1 — an external precondition says what the builder does when it is false
 
-**Status:** SPECCED · rev-1 · 2026-09-22 · node d · Tier-2 · base 9b7e2de6 · streams tooling · order 1
+**Status:** SPECCED · rev-2 · 2026-09-28 · node d · Tier-2 · base 9b7e2de6 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -203,7 +203,7 @@ rides `TOOL-dPinnedHandoff-3`, per the build README.
 
 ## 7. Gates
 
-`memory hygiene` · `memory-hygiene self-test` · `kit/dogfood doc parity` · `recall floor` · `recall floor arms` · `testsuite counts (every bar self-test prints one)` · `spec tokens (a spec's own names resolve)`
+`memory hygiene` · `memory-hygiene self-test` · `kit/dogfood doc parity` · `recall floor` · `recall floor arms` · `testsuite counts (every bar self-test prints one)` · `spec tokens (a spec's own names resolve)` · `transition-audit arms` · `straggler-guard arms`
 
 `kit/dogfood doc parity` is the leg this unit arms: its guard names `memory/TEMPLATE-SPEC.md` and
 `memory/HYGIENE.md`, and this unit edits both templates and both rendered copies. `recall floor` and
@@ -223,6 +223,9 @@ none
 
 - rev-1 · 2026-09-22 · initial draft, from the comparison of the three NicoCares handoff briefs with
   this template; the build README states the source.
+- rev-2 · 2026-09-28 · §7 · the merge of `dDerivedDocket` brings the legs `transition-audit arms`
+  and `straggler-guard arms`, whose guards name `.memory-tree.conf`, a path §4 touches; the leg line names
+  both. Nothing else moved.
 
 ## 10. Reuse audit
 

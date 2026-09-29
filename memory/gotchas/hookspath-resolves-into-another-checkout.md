@@ -1,6 +1,6 @@
 ---
 name: hookspath-resolves-into-another-checkout
-description: core.hooksPath is repo-global and absolute, so in a multi-worktree layout every push is gated by whatever the primary tree currently has checked out
+description: an ABSOLUTE core.hooksPath makes every worktree it governs run the hook files of the one checkout it names, so a push is gated by whatever that checkout happens to have checked out
 kind: class
 universal: false
 ---
@@ -30,10 +30,19 @@ that exact commit — but the boundary itself was the old one, and nothing said 
 
 ## Why it survives review
 
-`core.hooksPath` is set once, per repository, and it is SHARED by every linked worktree — that is
-git's design, not a misconfiguration. The wiring checker asserts it is set and points at the tracked
-`.githooks/`, which it does. What no check asks is *which revision of `.githooks/` is sitting there
-right now*, because the answer depends on a different worktree's HEAD.
+The shared `core.hooksPath` applies unless a worktree's config.worktree sets its own,
+and the value in effect decides which hook files run: an ABSOLUTE value runs the hooks of the
+checkout it names, the relative `.githooks` check-wiring writes runs each worktree's own. Both are
+git's design, not a misconfiguration, and neither is visible in a diff. The wiring checker asserts
+the value is set and points at a tracked `.githooks/`, which it does. What no check asks is *which
+revision of `.githooks/` is sitting there right now*, because under the absolute value the answer
+depends on a different worktree's HEAD.
+
+**Each measurement below was taken under a particular value, and the two do not generalise to each
+other.** The landing described above ran under an absolute `core.hooksPath` naming the primary tree.
+Re-measured 2026-09-14 on node `d`: the shared config holds the relative `.githooks`, and seven of
+nine live worktrees carry an absolute `config.worktree` override naming the primary tree's copy — so
+on this fleet BOTH values are live at once and which one you are under is a per-worktree fact.
 
 It is invisible in the ordinary case, where the primary tree is on the default branch and its
 `.githooks/` is the landed one. It bites exactly when the primary tree is parked on a feature branch

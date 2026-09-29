@@ -203,8 +203,18 @@ fi
 [ "$GITTMP" = "$TMP" ] || rm -rf "$FR"
 
 # ---- the payload-builder liveness guard, its own failing case: run_hook() refuses an empty payload,
-# ---- observed once by handing it one.
-before=$fail; run_hook ""; [ "$fail" = $((before+1)) ] && { fail=$before; print_ok "run_hook refuses an empty payload"; } || print_bad "run_hook accepted an empty payload"
+# ---- observed once by handing it one. THE STAGED REFUSAL IS CAPTURED, NEVER PRINTED: its line has
+# ---- the `FAIL ` shape by design, and `run-selftests.sh` reads every `^FAIL` line on stdout as a
+# ---- failed arm whatever the exit, so printed it read as a real failure under `--attribute`
+# ---- (INHERITED on both sides at dDerivedDocket's VERIFYING) and rode the pooled baseline as
+# ---- `1 FAIL` on a green run. Graded on the counter AND the captured line, so a guard that counts
+# ---- without saying why, or says so without counting, still reds here.
+before=$fail; run_hook "" > "$TMP/guard.out"; staged=$((fail - before)); fail=$before
+if [ "$staged" = 1 ] && grep -qxF 'FAIL the payload builder produced nothing' "$TMP/guard.out"; then
+  print_ok "run_hook refuses an empty payload"
+else
+  print_bad "run_hook accepted an empty payload (counted $staged, said [$(cat "$TMP/guard.out")])"
+fi
 
 n=$((pass+fail))
 # FLOOR_ASSERTIONS — a shrink-only pin on the EXECUTED count, not on the written one. Derived from

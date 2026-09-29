@@ -69,7 +69,8 @@ fail=0
 a=0                          # executed assertions, printed at the end against the pinned floor
 # Raised from 12 by TOOL-aShardedFloor-2, which adds the shard-contract arms (forward cover and
 # reverse declaration). Stated ABSOLUTELY, never as a delta.
-FLOOR_ASSERTIONS=15
+FLOOR_ASSERTIONS=16
+# Raised 15 -> 16 by TOOL-dDerivedDocket-23, which adds G1b, the four-leg `signature` pin.
 
 # The manifest, derived the same way run-gates.sh derives it. GATE_LEGS still outranks it, which is
 # what lets the fixture arms below drive this file without touching the real bar.
@@ -115,6 +116,21 @@ bad = [l["name"] for l in json.load(open(sys.argv[1])) if "  " in l.get("name", 
 if bad:
     print("gov-canary: leg name(s) contain a DOUBLE SPACE, which makes the report tail split"
           " ambiguous: " + "; ".join(bad)); sys.exit(1)
+' "$LEGS_FILE"; then fail=1; fi
+
+# ---- G1b. `signature` sits on exactly the four legs TOOL-dDerivedDocket-23 S3 gave an `--offenders`
+# mode, and nowhere else. A fifth row would name a signature nobody built a key-only mode for, whose
+# output the attribution would grade as a set; a missing one leaves that leg on the byte-identical
+# rule, which reads MIXED on almost every branch. Gov's corpus, so the arm lives here (AC6).
+a=$((a+1))
+if ! "$PYBIN" -c '
+import json, sys
+want = {"lexicon naming predicates", "install-prefix (shipped surface)", "drift-audit records",
+        "memory hygiene"}
+got = {l["name"] for l in json.load(open(sys.argv[1])) if l.get("signature")}
+if got != want:
+    print("gov-canary: `signature` is declared on %s; the four legs with an --offenders mode are %s"
+          % (sorted(got), sorted(want))); sys.exit(1)
 ' "$LEGS_FILE"; then fail=1; fi
 
 # ---- G2. the runner and both harnesses derive the manifest identically ---------------------------

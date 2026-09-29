@@ -46,11 +46,38 @@ RC=${R#bash }
 NOBASE_RX=$(sed -n "s/^SWEEP_NOBASELINE_RX='\(.*\)'$/\1/p" "$RUNNER")
 NOBASE_OWNER="$ROOT/tools/unattended/check-unattended.test.sh"
 
+# ---- THE SECOND KIT'S PATHS ARE DERIVED, never typed. `--attribute` forwards through
+# ---- `run-unattended-gates.sh`, whose own `--kit` filter names that kit's directory, so the
+# ---- fixture needs a suite under it — and the comment above applies with full force: a second kit
+# ---- path spelled here is a NEW literal, and the install-prefix checker is a shrink-only BAN.
+# ---- `git ls-files` names the file, and the directory falls out of it.
+U=$(git -C "$ROOT" ls-files --full-name -- '*run-unattended-gates.sh' | head -1)
+[ -n "$U" ] || { echo "run-selftests.test: no tracked run-unattended-gates.sh to derive from"; exit 2; }
+UDIR=$(dirname -- "$U")
+# This script's own repo-relative path, derived the same way the runner derives its own.
+RUNNER_REL="$(git -C "$(dirname -- "$RUNNER")" rev-parse --show-prefix 2>/dev/null)$(basename -- "$RUNNER")"
+# Where the fixture parks the BASE runner for the byte-parity arm: beside the runner, derived from
+# RUNNER_REL rather than spelled, so it adds no carried literal. The build step says why it sits there.
+BASE_RUNNER="$(dirname -- "$RUNNER_REL")/base-runner.sh"
+
+# ---- THE BASE THE DEFAULT MODE IS PINNED TO, an immutable sha rather than a moving ref.
+# ---- `TOOL-dDerivedDocket-1` added `--attribute` on the promise that the no-flag mode's stdout and
+# ---- exit are UNCHANGED, and the parity arm below is that promise rather than an assertion of it.
+# ---- Since TOOL-aBatchedArm-4 S2 that mode is spelled `--serial` (a bare run refuses), so the
+# ---- arm runs `--serial` here against the BASE runner's bare form: the same loop, two spellings.
+# ---- IF YOU CHANGE THE DEFAULT MODE'S OUTPUT ON PURPOSE: re-pin this line in the same commit and
+# ---- say so in the message. A red here means the mode the flag agreed not to touch has moved, and
+# ---- the arm cannot tell a deliberate move from an accidental one — only you can.
+ATTR_BASE=fb07ca25
+
 # THE FLOOR, RE-DERIVED at TOOL-aBatchedArm-5: 55 at BASE, minus the retired factor-absent arm,
 # plus the arms that unit added — both counts are in that unit's acceptance ledger. Raised again
 # at the aBatchedArm closing fix by the arms it added, and at its round 2 by four more; the
 # closing-fix ledger carries both counts.
-SELFTEST_FLOOR=112
+# MERGED with TOOL-dDerivedDocket-1/-23's floor: base 43, +26 from that build (69), +69 from
+# TOOL-aBatchedArm (112), so 43 + 26 + 69.
+SELFTEST_FLOOR=139
+# RAISED 138 -> 139 by the dDerivedDocket closing diff review's F5: the signalled --attribute arm.
 
 # The fixture is a MINIMAL repo the runner can root itself in: two suites it can execute, a manifest
 # with one held leg, and a declaration that covers it. Every arm below starts from this green state
@@ -60,6 +87,10 @@ build_repo() {
   git init -q . >/dev/null 2>&1 || return 2
   git config user.email t@t && git config user.name t || return 2
   cp "$RUNNER" tools/run-gates/run-selftests.sh || return 2
+  # THE SHARED NORMALISER TRAVELS WITH IT. `--attribute` sources it from beside the runner since
+  # TOOL-dDerivedDocket-23 S7, and every other mode runs without it; derived from the runner's own
+  # directory rather than spelled, for the install-prefix reason the paths above give.
+  cp "$(dirname -- "$RUNNER")/lib-attribute.sh" "$(dirname -- "$RUNNER_REL")/lib-attribute.sh" || return 2
 
   # EVERY COMPLETING SUITE PRINTS THE HARNESS TRAILER `PASS (`, because under parity
   # (TOOL-aBatchedArm-5 S2/S4) a completed exit with no trailer is not a reading and does not
@@ -203,9 +234,164 @@ build_repo() {
   # The subject file the dirty suite appends to has to be TRACKED, or --untracked-files=no
   # cannot see it and the arm passes by finding nothing.
   printf 'a tracked subject\n' > subject.md
+
+  # ---------------------------------------------------------------- the attribution fixture
+  # TOOL-dDerivedDocket-1. TWO COMMITS, and that is the whole shape: commit one is R, the baseline
+  # `--attribute` measures against, and commit two is L, which is what the working tree holds. Every
+  # arm below passes `HEAD~1` as R and mutates L if it needs to.
+  #
+  # ONE SUITE PER CONDITION, each with its OWN row, because `--kit` filters on a substring of the
+  # argv — so `--kit tools/attr/<file>.sh` selects exactly that suite and no arm pays for the rest.
+  # A shared suite mutated per arm would make every arm's cost the population's cost.
+  #
+  # THE NAMES BELOW MUST STAY MUTUALLY NON-PREFIXING, because a substring filter is exactly the
+  # id-matched-as-a-substring shape: `deadl.sh` must not select `deadl9.sh`, and `both.sh` must not
+  # select `deadboth.sh` — the `.sh` and the `/` in front are what keep each one alone today. A
+  # filter that matched two suites would move the counts, and one that matched none REFUSES, so
+  # either mistake is loud; a new suite named as another's prefix is the way to make it quiet.
+  #
+  # THE ROWS ARE NOT IN L'S DECLARATION. They sit in `rows.txt` and each attribution arm appends
+  # them, which leaves the declaration the arms above this line read BYTE-IDENTICAL: the derived
+  # run-wall arm computes its number from the budgets present, so two extra rows would red an arm
+  # that has nothing to do with this flag.
+  mkdir -p tools/attr "$UDIR" || return 2
+  attr_suite() { # file · body line...
+    local f=$1; shift
+    { printf '#!/usr/bin/env bash\n'; printf '%s\n' "$@"; } > "tools/attr/$f"
+  }
+  # R's versions.
+  attr_suite inherit.sh   'echo "FAIL arm A"' 'exit 1'
+  attr_suite both.sh      'echo "FAIL arm A"' 'exit 1'
+  attr_suite fixed.sh     'echo "FAIL arm F"' 'exit 1'
+  attr_suite deadl.sh     'echo "arm ran"' 'exit 0'
+  # The count line is deliberate: KF14's DEAD PROBE is "non-zero exit and no FAIL line", WITH or
+  # WITHOUT one, and a rule that also demanded the count be absent reads this suite as clean.
+  attr_suite deadl9.sh    'echo "PASS (2 arms, width 1)"' 'exit 0'
+  attr_suite over.sh      'exit 0'
+  attr_suite deadr.sh     'exit 3'
+  attr_suite deadboth.sh  'exit 3'
+  attr_suite absent.sh    'exit 0'
+  # Slow enough on the R side that a short outer bound can kill the run mid-measurement, which is
+  # the only way to observe that a killed run caches nothing.
+  attr_suite cache.sh     'sleep 4' 'exit 0'
+  attr_suite variant-deadr-fail.sh 'echo "FAIL arm A"' 'exit 1'
+  # THE SIGNALLED SUITE (the closing diff review's F5). At R it ANNOUNCES itself and then HOLDS until
+  # released, so the TERM lands inside the R run by construction and not by a sleep (the gotcha
+  # `fixed-sleep-does-not-place-a-signal`); unannounced, as in any run not driven by `termrun.sh`,
+  # it just fails. At L it fails at once.
+  attr_suite term.sh \
+    'if [ -n "${ATTR_TERM_READY:-}" ]; then' \
+    '  printf "%s\n" "$$" > "$ATTR_TERM_READY"' \
+    '  i=0; while [ ! -e "$ATTR_TERM_READY.go" ] && [ "$i" -lt 300 ]; do sleep 0.1; i=$((i + 1)); done' \
+    'fi' \
+    'echo "FAIL arm T"' 'exit 1'
+  printf '#!/usr/bin/env bash\necho "the delegated suite ran"\nexit 0\n' > "$UDIR/attr-u.sh"
+
+  {
+    printf 'attr inherit\t60\tbash tools/attr/inherit.sh\tmeasured 2s on node t 2026-09-20, x1.5\n'
+    printf 'attr both\t60\tbash tools/attr/both.sh\tmeasured 2s on node t 2026-09-20, x1.5\n'
+    printf 'attr fixed\t60\tbash tools/attr/fixed.sh\tmeasured 2s on node t 2026-09-20, x1.5\n'
+    printf 'attr deadl\t60\tbash tools/attr/deadl.sh\tmeasured 2s on node t 2026-09-20, x1.5\n'
+    printf 'attr deadl9\t60\tbash tools/attr/deadl9.sh\tmeasured 2s on node t 2026-09-20, x1.5\n'
+    printf 'attr over\t1\tbash tools/attr/over.sh\tmeasured 2s on node t 2026-09-20, x1.5\n'
+    printf 'attr deadr\t60\tbash tools/attr/deadr.sh\tmeasured 2s on node t 2026-09-20, x1.5\n'
+    printf 'attr deadboth\t60\tbash tools/attr/deadboth.sh\tmeasured 2s on node t 2026-09-20, x1.5\n'
+    printf 'attr cache\t60\tbash tools/attr/cache.sh\tmeasured 2s on node t 2026-09-20, x1.5\n'
+    printf 'attr term\t60\tbash tools/attr/term.sh\tmeasured 2s on node t 2026-09-20, x1.5\n'
+    printf 'attr unattended\t60\tbash %s/attr-u.sh\tmeasured 2s on node t 2026-09-20, x1.5\n' "$UDIR"
+    # LAST, and deliberately excluded from R's declaration below: this is the row that tests the
+    # `absent` path, where the baseline declares no such suite at all.
+    printf 'attr absent\t60\tbash tools/attr/absent.sh\tmeasured 2s on node t 2026-09-20, x1.5\n'
+  } > tools/attr/rows.txt
+
+  # THE DELEGATING WRAPPER, copied so the forwarding arm exercises the real file rather than a
+  # description of it. Its `--checks` half is never reached under `--attribute`, which defaults the
+  # half selector to the self-tests, so none of those checkers has to exist here.
+  cp "$ROOT/$U" "$U" || return 2
+
+  # THE RUNNER AS OF BASE, for the byte-parity arm. An unreachable sha writes nothing and the arm's
+  # own liveness line refuses rather than comparing against an empty file. It is written BESIDE the
+  # runner, at `$BASE_RUNNER`, because it derives its declaration from its OWN directory: parked in
+  # `tools/attr/` it found no declaration there and exited 2 while `--serial` exited 0, so the arm
+  # compared a refusal with a run and could never pass (merge-2 skeptic F3).
+  git -C "$ROOT" show "$ATTR_BASE:$RUNNER_REL" > "$BASE_RUNNER" 2>/dev/null || : > "$BASE_RUNNER"
+
+  {
+    printf '#!/usr/bin/env bash\n'
+    printf 'set -u\n'
+    # AN ABSENT BASE RUNNER IS A REFUSAL, not a comparison against an empty file: two empty strings
+    # are equal, which would certify byte-parity while measuring nothing at all.
+    printf '[ -s %s ] || { echo "nope: no BASE runner in the fixture"; exit 1; }\n' "$BASE_RUNNER"
+    # DURATIONS NORMALISED ON BOTH SIDES. The serial mode prints each suite's seconds, so an
+    # unnormalised comparison is a coin flip on a loaded box and would red for the clock.
+    printf 'norm() { sed -E "s/[0-9]+s/Ns/g"; }\n'
+    printf 'a=$(%s --serial --kit tools/suite-ok.sh 2>&1); ra=$?\n' "$R"
+    printf 'b=$(bash %s --kit tools/suite-ok.sh 2>&1); rb=$?\n' "$BASE_RUNNER"
+    printf '[ "$ra" = "$rb" ] || { echo "nope: exit $ra against $rb"; exit 1; }\n'
+    printf 'if [ "$(printf "%%s\\n" "$a" | norm)" = "$(printf "%%s\\n" "$b" | norm)" ]; then\n'
+    printf '  echo "default mode matches the BASE runner, exit $ra"\n'
+    printf 'else\n'
+    printf '  echo "nope: the default mode diverged from the BASE runner"\n'
+    printf '  diff <(printf "%%s\\n" "$a" | norm) <(printf "%%s\\n" "$b" | norm) | head -20\n'
+    printf '  exit 1\n'
+    printf 'fi\n'
+  } > tools/attr/parity.sh
+
+  {
+    printf '#!/usr/bin/env bash\n'
+    printf 'set -u\n'
+    printf 'b=$(git worktree list | wc -l)\n'
+    printf '%s --serial --attribute HEAD~1 --kit tools/attr/cache.sh >/dev/null 2>&1\n' "$R"
+    printf 'a=$(git worktree list | wc -l)\n'
+    printf '[ "$b" = "$a" ] && echo "worktree count unchanged $a" || { echo "nope: $b -> $a"; exit 1; }\n'
+  } > tools/attr/wtcount.sh
+
+  # THE SIGNAL DRIVER. It runs `--attribute` in the background, waits for the R run to announce
+  # itself alive, TERMs the RUNNER, releases the suite, and grades what the signalled run left.
+  {
+    printf '#!/usr/bin/env bash\n'
+    printf 'set -u\n'
+    printf 'rdy="$PWD/term.ready"; out="$PWD/term.out"; rm -f "$rdy" "$rdy.go"\n'
+    printf 'ATTR_TERM_READY="$rdy" %s --serial --attribute HEAD~1 --kit tools/attr/term.sh > "$out" 2>&1 &\n' "$R"
+    printf 'pid=$!; i=0\n'
+    printf 'while [ ! -s "$rdy" ] && [ "$i" -lt 600 ]; do sleep 0.1; i=$((i + 1)); done\n'
+    printf 'if ! [ -s "$rdy" ] || ! kill -0 "$(cat "$rdy")" 2>/dev/null; then\n'
+    printf '  echo "nope: the R run never announced itself alive, so no signal could be placed inside it"\n'
+    printf '  : > "$rdy.go"; kill "$pid" 2>/dev/null; wait "$pid"; sed "s/^/    /" "$out"; exit 1\n'
+    printf 'fi\n'
+    printf 'kill -TERM "$pid"; : > "$rdy.go"; wait "$pid"; rc=$?; bad=0\n'
+    printf '[ "$rc" = 143 ] || { echo "nope: a TERM ended the run with exit $rc, not 143"; bad=1; }\n'
+    printf '! grep -qE "^attributed |verdict (red|clean)" "$out" || { echo "nope: a signalled run printed a verdict"; bad=1; }\n'
+    printf '! grep -q "could not be removed" "$out" || { echo "nope: cleanup ran twice and named a removed worktree as an orphan"; bad=1; }\n'
+    printf '[ "$(git worktree list | wc -l)" = 1 ] || { echo "nope: the R worktree outlived the run"; bad=1; }\n'
+    printf '[ "$bad" = 0 ] || { sed "s/^/    /" "$out"; exit 1; }\n'
+    printf 'echo "signalled run ended 143: no verdict, one cleanup, no worktree left"\n'
+  } > tools/attr/termrun.sh
+
+  # ---- COMMIT ONE: R. Its declaration carries every attribution row EXCEPT `attr absent`.
+  grep -v '^attr absent' tools/attr/rows.txt >> "$B" || return 2
   git add -A >/dev/null 2>&1 || return 2
+  git commit -q -m 'the baseline R' >/dev/null 2>&1 || return 2
+
+  # ---- COMMIT TWO: L. The declaration goes back to exactly what the arms above expect, and the
+  # ---- suites take their working-tree behaviour.
+  grep -v '^attr ' "$B" > tmp.b && mv tmp.b "$B" || return 2
+  attr_suite inherit.sh  'echo "FAIL arm A"' 'echo "FAIL arm B"' 'exit 1'
+  attr_suite fixed.sh    'echo "arm ran"' 'exit 0'
+  attr_suite deadl.sh    'exit 3'
+  attr_suite deadl9.sh   'echo "PASS (2 arms, width 1)"' 'exit 3'
+  attr_suite over.sh     'sleep 3' 'exit 0'
+  attr_suite deadr.sh    'echo "arm ran"' 'exit 0'
+  attr_suite absent.sh   'echo "FAIL arm Z"' 'exit 1'
+  attr_suite cache.sh    'exit 0'
+  attr_suite term.sh     'echo "FAIL arm T"' 'exit 1'
+  git add -A >/dev/null 2>&1 || return 2
+  git commit -q -m 'the working tree L' >/dev/null 2>&1 || return 2
 }
 build_fixture build_repo || exit 2
+
+# The one setup every attribution arm shares: L's declaration gains the rows R already carries.
+ATTR_ROWS="cat tools/attr/rows.txt >> $B"
 
 # ---------------------------------------------------------------- the sentinel pair, round 2 R2
 # The runner's `SWEEP_NOBASELINE_RX` is a prose pin of a phrase the unattended suite owns, and
@@ -579,6 +765,186 @@ arm "the derived run wall is the bounded work over the pool, printed so it can b
     "run wall 140s" \
     "sed -i '0,/\t60\t/{s|\t60\t|\t10\t|}' $B" \
     "SELFTEST_OUTER_WIDTH=1 $R --sweep"
+
+# ---------------------------------------------------------------- --attribute, TOOL-dDerivedDocket-1
+# THE QUESTION THIS FLAG ANSWERS is not "did the suite fail" but "did it fail BEFORE this tree
+# touched anything". Every arm below runs one fixture suite against `HEAD~1`, and each stages the
+# ONE condition it is written for. The fixture's two commits are what make that possible: the arm
+# can differ at L, at R, or on both sides, which no single-commit fixture can express.
+
+# S2/AC1. Without the normaliser, A's line carries the scratch worktree's path at R and the working
+# tree's at L, compares unequal, and the INHERITED failure reads NEW — which passes the blame for a
+# pre-existing failure to the unit that merely ran next.
+arm "--attribute separates a failure the BASELINE already had from one only this tree has" 1 \
+    "NEW 1 · INHERITED 1 · FIXED 0" \
+    "$ATTR_ROWS" \
+    "$R --serial --attribute HEAD~1 --kit tools/attr/inherit.sh"
+
+arm "the INHERITED member line NAMES the failure, so a reader can file it rather than re-diagnose it" 1 \
+    "INHERITED  FAIL arm A" \
+    "$ATTR_ROWS" \
+    "$R --serial --attribute HEAD~1 --kit tools/attr/inherit.sh"
+
+arm "the NEW member line names the failure this tree is actually answerable for" 1 \
+    "NEW        FAIL arm B" \
+    "$ATTR_ROWS" \
+    "$R --serial --attribute HEAD~1 --kit tools/attr/inherit.sh"
+
+# S5/AC3. The no-flag loop sets st=1 whenever a suite exits non-zero, and inheriting that is the
+# whole defect: it fails every unit for failures filed against other units.
+arm "a failure present on BOTH sides is INHERITED and EXITS 0 — inheriting a red is not causing one" 0 \
+    "verdict clean" \
+    "$ATTR_ROWS" \
+    "$R --serial --attribute HEAD~1 --kit tools/attr/both.sh"
+
+arm "that inherited-only suite reads NEW 0, so the token and the counts agree" 0 \
+    "NEW 0 · INHERITED 1 · FIXED 0" \
+    "$ATTR_ROWS" \
+    "$R --serial --attribute HEAD~1 --kit tools/attr/both.sh"
+
+# S3/AC2. An abort produces an EMPTY failure set, which is indistinguishable from a clean run by
+# set membership alone — green by absence, and KF14's blocker.
+arm "a suite that ABORTS at L with no FAIL line is a DEAD PROBE, never an empty failure set" 1 \
+    "DEAD PROBE at L" \
+    "$ATTR_ROWS" \
+    "$R --serial --attribute HEAD~1 --kit tools/attr/deadl.sh"
+
+arm "a DEAD PROBE at L is EXCLUDED from the attributed count and reds the verdict" 1 \
+    "attributed 0 of 1 suite(s)" \
+    "$ATTR_ROWS" \
+    "$R --serial --attribute HEAD~1 --kit tools/attr/deadl.sh"
+
+arm "the summary counts that dead side separately, so a reader can tell it from a new failure" 1 \
+    "DEAD L 1 · DEAD R 0 · OVER 0 · verdict red" \
+    "$ATTR_ROWS" \
+    "$R --serial --attribute HEAD~1 --kit tools/attr/deadl.sh"
+
+# AC9. The count line is the trap: a rule that also required it to be ABSENT would read a suite
+# that printed its count and then died as an empty set.
+arm "a suite that prints its COUNT line and then dies is still a DEAD PROBE at L" 1 \
+    "DEAD PROBE at L" \
+    "$ATTR_ROWS" \
+    "$R --serial --attribute HEAD~1 --kit tools/attr/deadl9.sh"
+
+# S1/AC5. A symmetric difference folds FIXED into NEW, which reds a unit for repairing something.
+arm "a failure present at R and GONE at L is FIXED, and the exit status is unaffected by it" 0 \
+    "FIXED      FAIL arm F" \
+    "$ATTR_ROWS" \
+    "$R --serial --attribute HEAD~1 --kit tools/attr/fixed.sh"
+
+# F4/AC10. Charter §7 says a runner REDS on a cost breach, and the mode every self-test unit
+# verifies with is the last place to quietly suspend that.
+arm "an L-side budget breach still REDS under --attribute, and names the number it broke" 1 \
+    "OVER BUDGET at L" \
+    "$ATTR_ROWS" \
+    "$R --serial --attribute HEAD~1 --kit tools/attr/over.sh"
+
+arm "that breach is reported APART from NEW, which reads 0, so the two causes never blur" 1 \
+    "NEW 0 · INHERITED 0 · FIXED 0 · DEAD L 0 · DEAD R 0 · OVER 1 · verdict red" \
+    "$ATTR_ROWS" \
+    "$R --serial --attribute HEAD~1 --kit tools/attr/over.sh"
+
+# F5/AC12. A dead R is the baseline being broken, which is exactly the state the unit that FIXES it
+# starts from — so failing the run on it leaves that unit unable ever to verify its own fix.
+arm "a DEAD PROBE at R alone never reds the run, or the unit fixing that abort could not verify it" 0 \
+    "DEAD R 1 · OVER 0 · verdict clean" \
+    "$ATTR_ROWS" \
+    "$R --serial --attribute HEAD~1 --kit tools/attr/deadr.sh"
+
+arm "that dead baseline is REPORTED rather than silently treated as a clean one" 0 \
+    "DEAD PROBE at R" \
+    "$ATTR_ROWS" \
+    "$R --serial --attribute HEAD~1 --kit tools/attr/deadr.sh"
+
+arm "an L failure over a DEAD R reads NEW and never INHERITED — a dead side has no members" 1 \
+    "NEW        FAIL arm A" \
+    "$ATTR_ROWS && cp tools/attr/variant-deadr-fail.sh tools/attr/deadr.sh" \
+    "$R --serial --attribute HEAD~1 --kit tools/attr/deadr.sh"
+
+arm "a suite dead on BOTH sides reds, or a consumer passes with its own arms never executed" 1 \
+    "DEAD L 1 · DEAD R 1" \
+    "$ATTR_ROWS" \
+    "$R --serial --attribute HEAD~1 --kit tools/attr/deadboth.sh"
+
+# S3. A suite the baseline never declared has no R-side set at all, which reads the same way a dead
+# R does: everything at L is this tree's own.
+arm "a suite the BASELINE does not declare reads 'absent' at R, and all of its L failures are NEW" 1 \
+    " absent" \
+    "$ATTR_ROWS" \
+    "$R --serial --attribute HEAD~1 --kit tools/attr/absent.sh"
+
+# S4/AC4. The cache is the only reason "each suite once per unit" is affordable across twelve
+# units, and the only dangerous way to build it is to write it before the R run returns.
+# These three arms need a `timeout` binary for the kill; without one the setup fails LOUDLY as ERR.
+arm "a KILLED R run caches nothing, so the next run measures the baseline FRESH" 0 \
+    " fresh" \
+    "$ATTR_ROWS && timeout -k 1 2 $R --serial --attribute HEAD~1 --kit tools/attr/cache.sh >/dev/null 2>&1; true" \
+    "$R --serial --attribute HEAD~1 --kit tools/attr/cache.sh"
+
+arm "a COMPLETED R run is served from the cache next time, which is what bounds the doubled cost" 0 \
+    " cached" \
+    "$ATTR_ROWS && $R --serial --attribute HEAD~1 --kit tools/attr/cache.sh >/dev/null 2>&1; true" \
+    "$R --serial --attribute HEAD~1 --kit tools/attr/cache.sh"
+
+arm "a cached run adds NO worktree entry at all, so the cache is a real saving and not a re-run" 0 \
+    "worktree count unchanged" \
+    "$ATTR_ROWS && $R --serial --attribute HEAD~1 --kit tools/attr/cache.sh >/dev/null 2>&1; true" \
+    'bash tools/attr/wtcount.sh'
+
+# THE CLOSING DIFF REVIEW'S F5. The attribution trap named INT, TERM and HUP beside EXIT and never
+# exited, so a signal cleaned up and then RESUMED the suite loop over a deleted scratch root: a false
+# verdict, exit 0 or 1 rather than 143, and a second cleanup that reported the removed worktree as
+# an orphan. The TERM is placed inside the R run, where the worktree exists, because that is the only
+# moment the orphan line can be seen; the worktree must still be gone afterwards.
+arm "a TERM mid-suite under --attribute EXITS 143 — no verdict, one cleanup, and no worktree left" 0 \
+    "signalled run ended 143" \
+    "$ATTR_ROWS" \
+    'bash tools/attr/termrun.sh'
+
+# AC8. The flag is additive or it is nothing: every consumer of the no-flag mode predates it. That
+# mode is `--serial` since TOOL-aBatchedArm-4 S2, and parity.sh compares it with the BASE bare form.
+arm "the SERIAL mode is byte-identical to the runner at BASE, so no attribution path runs without the flag" 0 \
+    "default mode matches the BASE runner" \
+    'true' \
+    'bash tools/attr/parity.sh'
+
+# S6/F2/AC6. The delegating wrapper must forward the flag AND say what it did not attribute — a
+# half that runs unattributed and says nothing is the silence this repo keeps filing.
+arm "the unattended wrapper FORWARDS --attribute to its self-test half" 0 \
+    "attributed 1 of 1 suite(s)" \
+    "$ATTR_ROWS" \
+    "bash $U --serial --attribute HEAD~1"
+
+arm "and it STATES that its checks half is not attributed, rather than leaving it to be inferred" 0 \
+    "the --checks half is NOT attributed" \
+    "$ATTR_ROWS" \
+    "bash $U --serial --attribute HEAD~1"
+
+# The refusals. An unresolvable baseline must refuse before running anything: running L and calling
+# every failure NEW is the worst of both answers.
+arm "an --attribute value naming no commit REFUSES before running a single suite" 2 \
+    "names no commit in this repository" \
+    "$ATTR_ROWS" \
+    "$R --serial --attribute deadbeefdeadbeef --kit tools/attr/both.sh"
+
+# A knob accepted and ignored leaves the operator believing a baseline they never got — the same
+# shape this file already arms for SELFTEST_WALL and SELFTEST_OUTER_WIDTH.
+arm "--attribute combined with a mode that runs nothing REFUSES rather than silently ignoring the flag" 2 \
+    "cannot be combined with" \
+    'true' \
+    "$R --attribute HEAD~1 --list"
+
+# THE MERGE WITH TOOL-aBatchedArm-4. --attribute runs on the serial clock and grades the L side's
+# budget, so --pooled, which withholds every cost verdict, is a mode it cannot attribute.
+arm "--attribute combined with --pooled REFUSES and names --serial, the clock it runs on" 2 \
+    "composes with --serial only" \
+    'true' \
+    "$R --pooled --attribute HEAD~1"
+
+arm "a bare --attribute with no value REFUSES instead of spinning on a shift that cannot happen" 2 \
+    "needs a commit-ish" \
+    'true' \
+    "$R --attribute"
 
 # ---------------------------------------------------------------- the evidence bound, TOOL-aBatchedArm-5 S1
 # Every arm from here to the floor line is that unit's. NONE has been observed RED: owner ruling

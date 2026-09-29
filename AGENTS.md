@@ -35,7 +35,7 @@ doesn't read AGENTS.md natively. Wired by `tools/agent-instructions/`.)*
   `unattended/` (the unattended-run kit: the binding protocol, the four-verb driver, and the leg that
   reads the project's `.unattended.conf` declarations rather than restating them — a run that will
   merge and push with no owner turn replaces the explicit-ask checkpoint with a committed standing
-  mandate it ASSERTS and cannot have written),
+  mandate, §1 Landing's one substitute),
   `agent-instructions/`, `pytest-parallel-guardrails/` (bounded,
   attributable pytest-xdist runs: the four-knob ini recipe, the crashprobe worker-death
   attribution plugin, the aiosqlite closed-loop seam patch + forced-race gate), the
@@ -49,7 +49,7 @@ doesn't read AGENTS.md natively. Wired by `tools/agent-instructions/`.)*
 - `tools/` — the deployable kits (copied into target repos).
 - `skills/session-kickoff/` — the kickoff skill (stays at repo root for machine-junction discovery).
 - `memory/` — this repo's dogfooded memory tree, FLAT: `README.md` · append-only `DECISIONS.md` ·
-  `HYGIENE.md` · `TEMPLATE-SPEC.md` · the GENERATED `LIVE.md` + `ledger/<month>.md` ·
+  `HYGIENE.md` · `TEMPLATE-SPEC.md` · the GENERATED `LIVE.md` + `ledger/<month>.md` +
   `backlog/<FAMILY>.md` · `builds/<slug>/` · `gotchas/` · `guides/` · `map/` · `archive/` ·
   `project/` (the gate's `*.txt` waiver registries and nothing else). Specs, reports, research
   and reviews live under a build's own folder, NOT the root. The `streams` enum is
@@ -67,9 +67,10 @@ doesn't read AGENTS.md natively. Wired by `tools/agent-instructions/`.)*
 | `d` | d41ly | `C:/projects/coding-governance` | `origin` (github `d41ly/coding-governance`) |
 
 IDs are `FAMILY-<slug>-<seq>` (`PLAY`/`KICK`/`TOOL`/`DEPL`); slug = node tag + CamelCase adjective-noun,
-minted once per session. One append-only `memory/DECISIONS.md`; backlogs shard per family at
-`memory/backlog/<FAMILY>.md`. Builds live at `memory/builds/<slug>/` — the discipline is a `streams`
-value in each spec's status header, not a directory, so a build spanning two disciplines is one build.
+minted once per session. One append-only `memory/DECISIONS.md`; asks are filed per build in
+`memory/builds/<slug>/BACKLOG.md`, and `memory/backlog/<FAMILY>.md` is their generated view. Builds
+live at `memory/builds/<slug>/` — the discipline is a `streams` value in each spec's status header,
+not a directory, so a build spanning two disciplines is one build.
 Live work state is READ from the generated `memory/LIVE.md` (plus the `ledger/<month>.md` shards),
 rendered by `gen_build_index.py` from build front matter and every spec's status header. There is no
 authored session ledger: the sharded per-node one retired at playbook v2.4 / memory-tree kit 1.8 and
@@ -78,13 +79,13 @@ its shards sit frozen under `memory/archive/`.
 <!-- gov:playbook -->
 # Coding Governance — the agent charter template
 
-*Template **v3.1** · 2026-09-24. One file. One line per directive, and a wrapped line is still one
+*Template **v3.2** · 2026-09-28. One file. One line per directive, and a wrapped line is still one
 rule. This file BECOMES a project's `AGENTS.md`: `tools/playbook/adopt-playbook.sh` fills every
 placeholder and drops the blocks a target has no kit for, so filling it is a program's job and not a
 reader's — see `WIRE-INTO-PROJECT.md` for what a program cannot decide. History lives in the
 `…-v-N-N.md` snapshots and in git.*
 
-<!-- governance-template: v3.1 -->
+<!-- governance-template: v3.2 -->
 
 > **What:** a project-agnostic charter for running Claude Code (or any agent) across several
 > machines/sessions ("nodes") on one repo. **Use:** deploy it with the renderer; the rules are
@@ -126,20 +127,18 @@ Keep units small: one stream/owner, no cross-stream contract change, reviewable 
 
 **Landing — merge protocol:**
 - Land on local `main` first, verify, then push; the merge to shared `main` and the push each need an explicit ask.
-- That explicit ask has ONE substitute: a committed build folder the run did not create, whose shape your merge bar validates. The mandate is ASSERTED, never written by the run that uses it, and must be reachable from a BASE observed on the remote rather than read from a local ref. A run with full shell access can still defeat that, and the control that actually binds lives on the remote.
+- That explicit ask has ONE substitute: a committed build folder the run did not create at the default-branch anchor (the protocol names a weaker second), whose shape your merge bar validates. It must be reachable from a BASE observed on the remote rather than read from a local ref. A run with full shell access can still defeat that, and the control that actually binds lives on the remote.
+- An unattended run lands by its protocol's landing rule, not the local-first one above.
 - After each merge run a diff-scoped gate (a conflict-free merge is not a passing merge); the push boundary DECIDES whether a full bar is owed, against a recorded green and a declared staleness bound.
 - Reconcile shared mutable files (backlogs, indexes) additively, never pick-a-side; diff the merge against BOTH parents (the "auto-took" class, §10). A GENERATED index is never reconciled — re-render it (§5).
 - Land risky behavior dark: Tier-2 ships behind a default-OFF flag or as inert defaulted data, flipped on only after in-place verification — merges without endangering other nodes, reverts cleanly.
 - Migrations are reversible — test up/down/up.
 
-*Two independent blocks. The first applies whenever the project keeps a kickoff manifest. The second
-applies only when the project adopts the unattended-run kit — drop it otherwise.*
-
 **Kickoff-manifest merge exception.**
 
 - The manifest reconciles additively EXCEPT its `last-audit` line — resolve a stamp conflict either way provisionally, complete the merge, then re-verify §B against the merged tree and re-stamp in a follow-up commit that supersedes both sides (post-merge HEAD; a commit can't embed its own sha); the same post-merge fresh audit closes any merge that brought in watch-touching commits.
 
-**Unattended runs** *(kit-conditional — drop this block if the project does not adopt the unattended-run kit).*
+**Unattended runs.**
 
 - The contract is `memory/guides/UNATTENDED-PROTOCOL.md`, installed by the kit: the committed
   build folder as the authorization and its provenance properties, the run-state file's generated and
@@ -217,7 +216,7 @@ applies only when the project adopts the unattended-run kit — drop it otherwis
   because it does not read that name natively. Make ONE file canonical and the others thin imports of
   it, so there is one text and no copy to drift, and verify the wiring with a check rather than by
   eye — an unwired pair fails silently and looks fine.
-- Two record types per stream: the decision log is append-only (never rewrite a ratified record — supersede with a new id + note); the backlog is mutable (stable ids, status updated in place; gaps fine).
+- Two record types per stream: the decision log is append-only (never rewrite a ratified record — supersede with a new id + note); the backlog keeps stable ids (gaps fine), and how an ask's status is kept is the memory tree's rule (§5).
 - Per-stream id families (`playbook:PLAY kickoff:KICK tooling:TOOL deployer:DEPL`): the family prefix routes an id to its log/backlog; allocation is slug-scoped (§2), so no shared "next free id" marker exists.
 - Record real decisions as you make them — future sessions and nodes rely on these being current.
 - Session-start reading order: ALWAYS load the master decision index first, then the stream logs for the area touched — routed by `playbook -> the charter template · kickoff -> skills/session-kickoff/ · tooling -> tools/ · deployer -> WIRE-INTO-PROJECT.md` (work-area → doc tree → id families → backlog).
@@ -249,7 +248,7 @@ applies only when the project adopts the unattended-run kit — drop it otherwis
   until a declaration claims it, and an exemption naming a path that no longer exists reds too,
   because a stale one silently widens the surface it was written to narrow.
 - Keep the automated suite green at the push boundary: `bash tools/run-gates/run-gates.sh — the legs are single-sourced from tools/gate-legs.json; read that, never a list typed elsewhere` (typecheck/compile · lint · test · generated-artifact freshness · structural invariants). Gates are the quality floor; reviews cover only what gates can't.
-- Wire the suite into remote CI as machine-required checks (`none yet — .githooks/pre-push decides at the push boundary whether a full bar is owed`) — convention is not enforcement.
+- Wire the suite into remote CI as machine-required checks (`.github/workflows/remote-ci.yml`) — convention is not enforcement.
 - Provide one command that runs the whole local bar with legs concurrent, wall ≈ longest leg: `bash tools/run-gates/run-gates.sh`.
 - A slow leg may have a sanctioned faster local variant — document the equivalence explicitly (which local run satisfies which CI leg), so local verification is fast AND unambiguous.
 - Single source of truth → generated artifacts → parity gate, for every contract duplicated across languages/layers; a new shared contract gets ONE source, generation, and a drift test — never a hand-kept second copy.
@@ -503,10 +502,8 @@ scheduled longest-first from a timing cache the runner resolves and NAMES on its
 while REPORTING is
 always manifest order, so output is byte-stable whatever the width and a corrupt cache costs wall
 clock only. **A KIT'S SELF-TESTS ARE NOT ON THIS BAR.** Owner ruling, 2026-08-23, and the first kit to take it is
-`unattended`: a suite that stages breaks into a copy of a checker has a job only when that checker's
-source changes, and none at all in an adopter's repo that copy-installs the kit and never edits it.
-Its `*.test.sh` legs left both `tools/gate-legs.json` and the kit's own `kit.toml`, so adopters
-stop receiving them too. What stayed are the legs whose subject is the REPOSITORY rather than the
+`unattended`: why, and what left its descriptor, is `tools/unattended/README.md`.
+What stayed are the legs whose subject is the REPOSITORY rather than the
 kit, because those go stale with nobody editing it; which, and how many, are its
 `tools/unattended/` rows in `tools/gate-legs.json`. On demand:
 `bash tools/unattended/run-unattended-gates.sh --serial`. The compensating check is written into that kit's
@@ -545,7 +542,9 @@ repo-GLOBAL, so the hook gating your push is the PRIMARY tree's; check H REPORTS
 branch guard, refusing a primary-tree commit off the default branch (`GOV_DEFAULT_BRANCH` pins it).
 A SessionStart hook runs `tools/check-wiring.sh --session`, which auto-sets an unset
 `core.hooksPath` and never clobbers a set one, so a fresh clone self-heals rather than running with
-dormant gates. Wiring the bar into remote CI needs a `workflow`-scoped push and is a follow-up.
+dormant gates. Remote CI is `.github/workflows/remote-ci.yml`: `history-audit` and `bar` on every
+push to main, `held-plan` and `held` running the held self-tests daily. It detects after landing,
+since landing stays a direct push, and no job is a required check.
 
 **Two protocols are BINDING, and they are rules rather than leg descriptions.**
 
@@ -558,7 +557,7 @@ dormant gates. Wiring the bar into remote CI needs a `workflow`-scoped push and 
   The marker grammar it enforces is `tools/hooks/README.md`. Ready-made harness:
   `tools/workflows/tier2-review.js`.
 - `memory/guides/UNATTENDED-PROTOCOL.md` — a run that will merge and push with no owner turn replaces
-  the explicit-ask checkpoint with a committed standing mandate it ASSERTS and cannot have written.
+  the explicit-ask checkpoint with a committed standing mandate, §1 Landing's one substitute.
   The BASE that mandate hangs on is OBSERVED from the remote's own HEAD advertisement, never read
   from a local ref and never named by the environment; both of those were reproduced bypasses. §9
   states plainly what a check running under the run's own uid can and cannot buy.
@@ -580,7 +579,7 @@ checklist for that diff.
   in a companion, not the template.
 - Follow the governance playbook (`coding-governance-agents.template.md`) for the full multi-node
   rules — this repo is its reference dogfood.
-- Commit freely; **merge to `main` and `git push` each need an explicit ask — or a committed build
-  folder the run did not create**. §1 Landing states the substitute and its properties, and
+- Commit freely; **merge to `main` and `git push` each need an explicit ask — or §1 Landing's
+  one substitute**. §1 Landing states the substitute and its properties, and
   `memory/guides/UNATTENDED-PROTOCOL.md` is the contract; this bullet is the pointer, not a third
   copy of the rule.

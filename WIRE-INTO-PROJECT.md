@@ -121,9 +121,13 @@ so these are the answers `intake` will ask for, and the kits whose blocks the ch
   suffixes, and forbidden import directions between layers. Opt-in — with no conf it reports NOT
   ADOPTED and exits 0. Keeping it selected keeps the `kit:lexicon` block in `§12`; dropping it
   removes five bullets and `{{LEXICON_CONF}}` with them.
-- **Unattended runs** (`unattended/` kit): keeping it selected keeps the `kit:unattended` block in
-  `§1`, which is the ONE substitute for the explicit ask before a merge and a push. A repo that keeps
-  that clause without the kit is carrying a rule nothing can make true.
+- **A kickoff manifest** (`kickoff-manifest` kit): the per-project manifest `/session-kickoff` reads.
+  Keeping it selected keeps the `kit:kickoff-manifest` block in `§1`, the manifest's merge exception;
+  dropping it removes that exception with the manifest it governs.
+- **Unattended runs** (`unattended/` kit): keeping it selected keeps `§1`'s `kit:unattended` blocks —
+  the ONE substitute for the explicit ask before a merge and a push, the pointer to the protocol's
+  landing rule, and the protocol contract. A repo that keeps them without the kit is carrying rules
+  nothing can make true.
 
 ### The two blocks that are not about a kit
 
@@ -195,9 +199,11 @@ here would raise this file's carried-prefix count and red `install-prefix`.
    bash tools/memory-tree/check-memory-hygiene.sh ; echo $?    # expect 0
    ```
    The scaffold writes `memory/` with `builds/`, `backlog/<FAMILY>.md`, the generated `LIVE.md`, and
-   `project/` — which holds the gate's own six waiver registries (`*.txt`) **and nothing else**. Work
-   state is not authored anywhere: `gen_build_index.py` renders it. See §3a if you already run a kit
-   older than 1.8.
+   `project/` — which holds the gate's own six waiver registries (`*.txt`) **and nothing else**. The
+   `backlog/<FAMILY>.md` files are authored shards, the default `shards` mode; per-build asks with a
+   generated view are a later, opt-in switch (§3a-asks), never part of a first adoption. Work state
+   is not authored anywhere: `gen_build_index.py` renders it. See §3a if you already run a kit older
+   than 1.8.
 3. Wire the gate in all three places:
    - **CI:** a job running `bash tools/memory-tree/check-memory-hygiene.sh` (no args = full check, incl. TREE drift).
    - **Local gate runner:** add it as a concurrent leg (cheap, parallel with test/typecheck).
@@ -222,20 +228,103 @@ here would raise this file's carried-prefix count and red `install-prefix`.
 
 4. **Wire the row-keyed merge driver** — `cp -r` delivered `merge-rows.py` and its launcher, but a
    merge driver is a per-node git config and no scaffolder can write it. Without this, two nodes
-   appending to `DECISIONS.md` or a backlog shard get git's line merge, which duplicates or drops
-   rows on an append collision.
+   appending to `DECISIONS.md`, a backlog shard or a build's `BACKLOG.md` get git's line merge, which
+   duplicates or drops rows on an append collision.
    ```bash
    git config merge.rows.driver "bash tools/memory-tree/merge-rows.sh %O %A %B %P"
    ```
    Add the attributes (adjust to your `MEMORY_ROOT`), then let the wiring checker verify it:
    ```
-   memory/DECISIONS.md   merge=rows
-   memory/backlog/*.md   merge=rows
+   memory/DECISIONS.md          merge=rows
+   memory/backlog/*.md          merge=rows
+   memory/builds/*/BACKLOG.md   merge=rows
    ```
+   Keep the `backlog/*.md` line after a switch (§3a-asks): the driver is what refuses a pre-switch
+   branch's shard merged into a generated view.
    `bash tools/check-wiring.sh --check` RUNS the configured command on a scratch three-way before it
    reports `ok`, because a driver that cannot start never writes `%A`: git prints `CONFLICT` and
    leaves the path holding OURS-ONLY content with zero conflict markers. `--fix` sets the config for
    you and refuses to declare a driver wired when it cannot run.
+
+### 3a-asks — Per-build asks and a generated backlog view (opt-in; memory-tree kit ≥ 2.100)
+
+**An upgrade changes nothing until you switch.** With `BACKLOG_MODE` absent or blank in
+`.memory-tree.conf`, the tree runs in `shards` mode: the authored `backlog/<FAMILY>.md` files §3
+scaffolds, one status slot per row. In `builds` mode each ask is filed once, as a row of
+`<MEMORY_ROOT>/builds/<slug>/BACKLOG.md` in the folder of its own id's slug; its status is derived
+from specs and disposition rows; and `backlog/<FAMILY>.md` becomes a GENERATED view nobody edits.
+The grammar, the verdicts and the status fold are the memory-tree kit README's "Backlog modes"
+section, and are not repeated here. Below, `<kit>` is where you installed the memory-tree kit.
+
+**The switch is its own deployer build in your repo, never a step of a first adoption.** It
+migrates your corpus, so it takes a spec, a signed record and one switch-over commit. In order:
+
+1. **Census, read-only.** Run
+   `python <kit>/migrate_backlog.py --plan --record <MEMORY_ROOT>/builds/<your-slug>/build --record-as <your-unit-id>`.
+   It files the id census, the same-id worksheet and the triage worksheet as records of your build,
+   with a status worksheet beside them, and names every row it cannot parse. Without `--record` the
+   planner prints and writes nothing. Fix the unparseable rows first: the writer never drops a row.
+2. **Stragglers.** `python <kit>/migrate_backlog.py --stragglers` walks every local and
+   remote-tracking ref for a branch still editing a shard. It refuses to guess your default branch,
+   so set `origin/HEAD` first with `git remote set-head origin -a`. Merge the branches you know
+   before the switch.
+3. **Sign both worksheets.** Your owner decides which same-id pairs are one subject and gives every
+   open ask on a finished build one disposition, as the two signed records the kit README's "Signed
+   records" row describes: header cells `Ask` and `Verdict`, and `Field` too on the triage record.
+   Commit the worksheets before signing, because each record names its worksheet by blob sha.
+   Preview the result with
+   `python <kit>/migrate_backlog.py --plan --signed same-id=<same-id record> --signed triage=<triage record>`;
+   the writer applies exactly what is signed. This repo's own signing, under rules its owner
+   delegated, is in `memory/builds/dDerivedDocket/`.
+4. **Switch in ONE commit.** Install the `memory-recall` kit beside memory-tree first if you have
+   not: the transition audit keys every row through its anchor grammar and refuses by name without
+   it, and no kit descriptor installs it for you. If the census found legacy holds that name no id,
+   mint one ask id under your build's slug to hold them on. Then run
+   `python <kit>/migrate_backlog.py --write --as <your-slug> --signed same-id=<same-id record> --signed triage=<triage record> --triage-ask <that id>`.
+   It files that ask with a KEEP in your build's `BACKLOG.md` and holds each such row on it (with no
+   such hold it files nothing, and `--triage-ask` may be left out), migrates the rows of your rotated
+   backlog archives with the live ones, and removes the authored shards once its conservation proof
+   passes. It does not remove the archives: delete every tracked backlog archive whose name starts
+   with one of your families, because builds mode keeps no backlog archive and
+   `python <kit>/gen_build_index.py --check` refuses one, and reword any file outside `<MEMORY_ROOT>`
+   that names a deleted archive, which a dead-path gate reads from git history. Then set
+   `BACKLOG_MODE="builds"` and the `ASK_CUTOFF` the writer prints, add the `BACKLOG.md` attribute
+   from §3 step 4, and run `python <kit>/gen_build_index.py --write`. Two conf values measured on the
+   shards go stale in the same commit, and the hygiene gate reds on each: re-derive
+   `SEVERITY_UNLABELLED_PIN` and `LIVE_ROW_PIN`, if you declared them, with
+   `python <kit>/row_grammar.py --emit-pin` over the rendered views, which count 0; and delete any
+   `curation-debt.txt` row naming a backlog shard, because the view leaves the size checks and the
+   row then hides nothing. Add a gate leg of your own running `python <kit>/merge-rows.py --check`;
+   this repo calls it `row-driver view refusal`, and no kit ships it. Commit when both `--check` runs
+   and the hygiene gate exit 0.
+5. **Tell stragglers what to do.** The recipe a pre-switch branch follows is what
+   `python <kit>/migrate_backlog.py --recipe` prints, the same text the generated views carry. The
+   hooks that tell a branch before it lands are yours to wire: this repo's
+   `.githooks/straggler-guard.sh`, `.githooks/pre-rebase` and `.githooks/commit-msg` are the
+   reference, and no kit ships them.
+6. **Land it when your default branch moved.** If your default branch gained backlog rows while
+   your switch build ran, the row driver's refusal prints the `--relocate` recipe, which is for a
+   pre-switch branch merged into a switched default branch and exits 2 in this direction. Instead,
+   first confirm `merge.rows.driver` resolves in the tree you are about to merge: §3 step 4's wiring
+   check reports no `UNWIRED` row for `merge`, or its `--fix` sets it. The driver is per-clone git
+   config, `merge=rows` in `.gitattributes` does nothing without it, and git then falls back, with a
+   warning but no refusal, to a line merge that completes instead of conflicting. Then, on your
+   switch branch, run `git merge --no-ff --no-commit <default tip>` and take your branch's side of
+   every generated view and deleted archive; run step 1's `--plan` inside a worktree of the tip, its
+   `--record` naming the build folder of your switch tree; sign the rows it adds as step 3 did, as a
+   new pair of records; then run
+   `python <kit>/migrate_backlog.py --ingest <default tip> --as <your-slug> --signed same-id=<landing same-id record> --signed triage=<landing triage record> --triage-ask <that id> --dry-run`.
+   It exits 1 while a CONFIRM or NEEDS-HUMAN entry stands: pass `--confirm <id>` only for an id your
+   branch never acted on since it forked, and stop the landing on anything else. Re-run without
+   `--dry-run` once the dry run exits 0, write the `ASK_CUTOFF` it prints, run
+   `python <kit>/gen_build_index.py --write`, and conclude the merge. This repo's own landing, with
+   its confirmation rule and its manifest re-stamp, is §4 "The landing reconcile" of
+   `memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-34.md`.
+
+A census over a FORKED engine decides more before step 4: a status your tree reads as terminal that
+the kit does not, ids from an era with no slug to route by, relative links that change depth. This
+repo measured those for its three known adopters in section 10 of
+`memory/builds/dDerivedDocket/build/2026-09-14-build-TOOL-dDerivedDocket-1-design.md`.
 
 <!-- govkit:entry drift-audit -->
 

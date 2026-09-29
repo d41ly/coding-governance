@@ -34,6 +34,46 @@ fi
 # /govkit:branch-guard
 
 
+# ---- the shards-to-builds STRAGGLER guard (TOOL-dDerivedDocket-13) -------------------------------
+# Refuse a commit that stages an authored backlog shard or a family-named backlog archive on a
+# branch that predates the per-build backlog, once the DEFAULT branch has flipped to it. Such an
+# edit is not mergeable: the builds side no longer authors the file, so a clean three-way merge
+# takes a side and neither outcome is a conflict. The recipe printed here is how it is relocated.
+#
+# SOURCED THROUGH THIS HOOK'S OWN DIRECTORY, never through the committing tree — a pre-flip branch
+# carries the old kit and no straggler rule, so a rule resolved through `$top` could never reach the
+# branch it is about. Absent, every line below is skipped: that is the state of every adopter that
+# took the hooks and not the gov-only library, and of every repository before the flip.
+#
+# IT SITS ABOVE THE LEGS deliberately. An operator who is about to be told to relocate should be
+# told before paying for three gates. Nothing here unpins an install-prefix waiver: the `gate_at`
+# probe below carries an in-line `gov:root-fixture` marker as of this unit, not a position-keyed row.
+_sg="$(cd "$(dirname "$0")" && pwd)/straggler-guard.sh"
+if [ -f "$_sg" ] && . "$_sg" && command -v init_straggler_guard >/dev/null 2>&1 &&
+   init_straggler_guard; then
+  _sg_head=$(git rev-parse --verify --quiet HEAD 2>/dev/null || true)
+  if [ -n "$_sg_head" ] && check_preflip "$_sg_head"; then
+    if check_staged_backlog; then
+      # The RELOCATION MERGE is this shape too — restored views staged on a pre-flip branch — and it
+      # carries a builds-mode MERGE_HEAD, which is what tells the two apart. Refusing it would make
+      # the recipe's own last step impossible; `commit-msg` audits that merge instead.
+      if ! check_merge_head_builds; then
+        echo "pre-commit: REFUSING — this branch predates the per-build backlog and this commit stages an"
+        echo "  authored backlog shard or a family-named backlog archive. Merged later, that edit can drop"
+        echo "  a row with nothing able to say which one. Relocate it instead:"
+        print_recipe "  "
+        echo "  Deliberate override, as always: git commit --no-verify"
+        rc=1
+      fi
+    elif check_has_delta "$_sg_head"; then
+      echo "pre-commit: note — this branch still owes a relocation of its backlog rows before it merges; the memory-tree kit's migrate_backlog.py --recipe prints the three commands."
+    else
+      echo "pre-commit: note — the default branch has moved to the per-build backlog; merge it before filing a new ask, so the ask lands in this build's own BACKLOG.md."
+    fi
+  fi
+fi
+
+
 # Locate a gate whose kit prefix is not fixed. A leg guarded on ONE literal path silently vanishes in
 # any tree that installs the kit elsewhere, and the hook still exits 0 — measured: a repo that copies
 # .githooks/ per the runbook but installs its kits at another prefix got a pre-commit where all three
@@ -45,7 +85,7 @@ gate_at() { # $1... candidate paths, most-likely first
 }
 
 # memory-tree hygiene, staged leg — only when memory/ is touched
-if g=$(gate_at tools/memory-tree/check-memory-hygiene.sh memory-tree/check-memory-hygiene.sh) &&
+if g=$(gate_at tools/memory-tree/check-memory-hygiene.sh memory-tree/check-memory-hygiene.sh) && # gov:root-fixture — dual-spelling probe: the hygiene leg locates its gate at either install prefix, and the ROOT form is the fallback an adopter this unit does not retrofit still needs
    git diff --cached --name-only --diff-filter=ACMR -- 'memory/**' | grep -q .; then
   bash "$g" --staged || rc=1
 fi

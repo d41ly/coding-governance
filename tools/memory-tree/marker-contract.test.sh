@@ -203,9 +203,13 @@ done
 #      planning verb discards its own classification for exactly those statuses. So no single fixture
 #      document can be graded by both, and each case is written TWICE — same section 8, different
 #      status — which is why the table carries a per-reader verdict and not one shared answer.
-#   3. THE CUTOFF IS ONE-SIDED. FORK_MARK_CUTOFF gates the hygiene side alone; the planning verb is
-#      tightened unconditionally, because it grades only the specs of the build currently running.
-#      A case may therefore legitimately get two different verdicts, and the table says so per row.
+#   3. ONE CUTOFF IS ONE-SIDED, THE OTHER IS SHARED. FORK_MARK_CUTOFF gates the hygiene side alone;
+#      the planning verb is tightened unconditionally, because it grades only the specs of the build
+#      currently running. A case may therefore legitimately get two different verdicts, and the
+#      table says so per row. FORK_ITEM_CUTOFF (TOOL-dDerivedDocket-31) gates BOTH: the engine sources
+#      it and the planning side reads the same line as TEXT through the unattended library, so every
+#      planning row below receives the value that reader returns for the fixture conf, and the rows
+#      dated past it are the per-F-item contract.
 #
 # THE TABLE IS THE CONTRACT. Neither reader restates it in prose.
 
@@ -219,6 +223,14 @@ _ps_start=$(grep -n '^plan_state()' "$U" | cut -d: -f1)
 _ps_end=$(awk -v s="$_ps_start" 'NR>s && /^}/ {print NR; exit}' "$U")
 [ -n "$_ps_end" ] && [ "$_ps_end" -gt "$_ps_start" ] || { echo "FAIL cannot find the closing brace of plan_state in $U, so the sliced reader below would be graded against a fragment"; exit 1; }
 mk_awk r_plan "$U" "$_ps_start" "$_ps_end"
+# The planning side's cutoff reader and the second planning caller, both DERIVED from the install
+# prefix like the driver above. The reader is sliced the same way, so the harness grades shipped bytes.
+L="$KITS_DIR/unattended/lib-unattended.sh"
+PO="$KITS_DIR/unattended/check-pass-order.sh"
+_rc_start=$(grep -n '^read_fork_cutoff()' "$L" | cut -d: -f1)
+_rc_end=$(awk -v s="${_rc_start:-0}" 'NR>s && /^}/ {print NR; exit}' "$L")
+[ -n "$_rc_start" ] && [ -n "$_rc_end" ] && [ "$_rc_end" -gt "$_rc_start" ] || { echo "FAIL cannot slice read_fork_cutoff out of $L, so every planning row below would be handed a cutoff nothing read"; exit 1; }
+mk_awk r_cutoff "$L" "$_rc_start" "$_rc_end"
 
 FT=$(mktemp -d) || exit 2
 trap 'rm -rf "$T" "$FT"' EXIT
@@ -231,8 +243,10 @@ else
   git config user.email t@t.test; git config user.name t; git config core.autocrlf false
   # The cutoff sits BELOW the fixture dates on purpose: these documents are the only place the
   # tightened hygiene reader can be exercised at all, because the real cutoff is deliberately set
-  # ahead of every landed spec so nothing ratified goes retroactively red.
-  printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\nFORK_MARK_CUTOFF="2026-08-01"\n' > .memory-tree.conf
+  # ahead of every landed spec so nothing ratified goes retroactively red. FORK_ITEM_CUTOFF sits
+  # BETWEEN the two fixture eras: the 2026-08-09 rows keep the section-wide reading, the 2026-09-20
+  # rows are graded per F-item.
+  printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\nFORK_MARK_CUTOFF="2026-08-01"\nFORK_ITEM_CUTOFF="2026-09-15"\n' > .memory-tree.conf
   printf 'sentinel\n' > memory/HYGIENE.md 2>/dev/null || { mkdir -p memory && printf 'sentinel\n' > memory/HYGIENE.md; }
 ) >/dev/null 2>&1
 
@@ -250,14 +264,17 @@ mark_case_n=0
 # as `zero`, case 3 as `items`. Grading was unaffected - the fixture index drives it - so the
 # misattribution surfaced only on the run where a row goes red, which is the one run the label has
 # to be right on. It surfaced on exactly such a run: a real failure reported itself as `[mark/on]`.
-MARK_NAMES=(); MARK_WANT_HYG=""; MARK_WANT_PLAN=""
-mark_case() { # name · want_hygiene(red|silent) · want_plan(READY|FORKED) · section-8 body
+MARK_NAMES=(); MARK_DATES=(); MARK_WANT_HYG=""; MARK_WANT_PLAN=""
+# The FILENAME DATE is the fifth argument, 2026-08-09 by default, and BOTH copies carry it: the
+# planning copy is named `<date>-plan-<n>.md` because `plan_state` reads the date from the basename,
+# exactly as the engine does, and a dateless name would grade every row under the old reading.
+mark_case() { # name · want_hygiene(red|silent) · want_plan(READY|FORKED) · section-8 body · [date]
   mark_case_n=$((mark_case_n+1))
-  local slug="tMark$mark_case_n"
+  local slug="tMark$mark_case_n" d="${5:-2026-08-09}"
   mkdir -p "$FT/memory/builds/$slug/spec"
-  spec_doc "CLOSED" "$4" > "$FT/memory/builds/$slug/spec/2026-08-09-spec-ARCH-$slug-1.md"
-  spec_doc "SPECCED" "$4" > "$T/plan-$mark_case_n.md"
-  MARK_NAMES+=("$1")
+  spec_doc "CLOSED" "$4" > "$FT/memory/builds/$slug/spec/$d-spec-ARCH-$slug-1.md"
+  spec_doc "SPECCED" "$4" > "$T/$d-plan-$mark_case_n.md"
+  MARK_NAMES+=("$1"); MARK_DATES+=("$d")
   MARK_WANT_HYG="$MARK_WANT_HYG $2"
   MARK_WANT_PLAN="$MARK_WANT_PLAN $3"
 }
@@ -275,7 +292,9 @@ mark_case "word, no attribution"    red       FORKED   '- **F1 — a question?**
 # resolved forks and genuinely open ones - so a walk over-counts on real specs (it called a RESOLVED
 # fork unresolved on a live tracked spec whose three option bullets each demanded a mark) and any
 # label-shape discriminator under-counts instead, which is worse. Closing it needs section 8 to have
-# a regular shape, which is a scope change and not a predicate change.
+# a regular shape, which is a scope change and not a predicate change. TOOL-dDerivedDocket-31 IS that
+# scope change, FORWARD-ONLY: this row stays a gap for a document dated before FORK_ITEM_CUTOFF, and
+# its post-cutoff twin below reads red and FORKED.
 mark_case "none line, later open"   silent    READY    'none - every fork below is RESOLVED in place.
 
 - **F1 — answered?** yes.
@@ -321,8 +340,56 @@ mark_case "none form in mixed case"     silent READY    'None - every fork below
   RESOLVED (owner, 2026-08-09): picked.'
 mark_case "N/A in upper case, no items" silent READY    'N/A'
 
+# ---- TOOL-dDerivedDocket-31 - THE F-ITEM ROWS, every one dated PAST the fixture FORK_ITEM_CUTOFF.
+# ---- An F-item opens on a column-0 `- **F<n>` bullet or a `### F<n>` sub-head and spans every line
+# ---- to the next one; each span needs its OWN mark. The hygiene side grades them at a terminal
+# ---- status, and a Tier-2 section of any other shape through its shape arm; the planning side
+# ---- grades the same bytes. The two defects the withdrawn per-item walk was measured on each get a
+# ---- row: a wrapped mark (line-by-line matching) and option bullets (every bullet opening an item).
+PD=2026-09-20
+mark_case "item: F2 unmarked below a marked F1" red FORKED '- **F1 — answered?** options.
+  RESOLVED (owner, 2026-08-09): picked.
+
+- **F2 — not answered?** still open, no mark.' "$PD"
+mark_case "item: both marked"              silent READY  '- **F1 — one?** RESOLVED (owner, 2026-08-09): a.
+- **F2 — two?** RESOLVED (agent, 2026-08-09, delegated): b.' "$PD"
+mark_case "item: mark only in backticks"   red    FORKED '- **F1 — one?** write `RESOLVED (owner, 2026-08-09): a` once decided.' "$PD"
+mark_case "item: mark only in dquotes"     red    FORKED '- **F1 — one?** write "RESOLVED (owner, 2026-08-09): a" once decided.' "$PD"
+mark_case "item: mark wrapped at the paren" silent READY '- **F1 — one?** options and a recommendation.
+  RESOLVED (owner,
+  2026-08-09): picked A.' "$PD"
+mark_case "item: three options, one mark"  silent READY  '- **F1 — which way?** three ways.
+- (a) the first way
+- (b) the second way
+- (c) the third way
+  RESOLVED (owner, 2026-08-09): (a).' "$PD"
+mark_case "item: none line, later open"    red    FORKED 'none - every fork below is RESOLVED in place.
+
+- **F1 — answered?** yes.
+  RESOLVED (owner, 2026-08-09): picked.
+
+- **F2 — not answered?** still open, no mark.' "$PD"
+mark_case "item: plain bullet before F1"   red    FORKED '- a note written as a bullet before any fork
+- **F1 — one?** RESOLVED (owner, 2026-08-09): a.' "$PD"
+mark_case "item: bullets and no F-item"    red    FORKED '- **Q — a question without a fork id?** RESOLVED (owner, 2026-08-09): a.' "$PD"
+# ONE ROW PER ADMITTED SPELLING, each unmarked, so an engine admitting fewer either never opens the
+# F-item (and the shape arm reds it instead of the mark arm) or opens it and still grades it.
+mark_case "spelling: F1 bold, then the question" red FORKED '- **F1** — a question, unmarked.' "$PD"
+mark_case "spelling: bold spans the question"    red FORKED '- **F1 — a question?** unmarked.' "$PD"
+mark_case "spelling: a sub-head"                 red FORKED '### F1 — a question
+
+options, unmarked.' "$PD"
+mark_case "spelling: fact-question prefix"       red FORKED '- **FACT-QUESTION · F1 — does X hold?** a probe decides it, unmarked.' "$PD"
+mark_case "item: none, zero items"          silent READY  'none - no forks here.' "$PD"
+
 ( cd "$FT" && git add -A >/dev/null 2>&1 && git -c commit.gpgsign=false commit -q -m fx --no-verify ) >/dev/null 2>&1
 hyg_out=$( cd "$FT" && bash "$HYG" 2>&1 )
+# THE PLANNING SIDE'S CUTOFF, read from the SAME fixture conf through the reader the planning callers
+# use. A row handed no cutoff would pass its post-cutoff case under the old reading, which is the
+# defect the call-site count below guards in the shipped callers.
+ITEM_CUT=$(r_cutoff "$FT/.memory-tree.conf")
+ncase=$((ncase+1))
+[ "$ITEM_CUT" = "2026-09-15" ] || { echo "FAIL [item/cutoff] the planning reader read [$ITEM_CUT] from the fixture conf, which declares 2026-09-15"; st=1; }
 
 i=0
 for want_h in $MARK_WANT_HYG; do
@@ -332,7 +399,7 @@ for want_h in $MARK_WANT_HYG; do
   # Only the section-8 verdict is read. The scratch tree reds other checks on purpose and that noise
   # is ignored, exactly as this kit's sibling test documents — but the grep is anchored on the FILE
   # plus the section-8 reason, so an unrelated fault on the same file cannot forge a hit.
-  if printf '%s\n' "$hyg_out" | grep -q "tMark$i-1.md (terminal Status.*§8\|tMark$i-1.md (terminal Status and a §8"; then got_h=red; else got_h=silent; fi
+  if printf '%s\n' "$hyg_out" | grep -q "tMark$i-1.md (terminal Status.*§8\|tMark$i-1.md (terminal Status and a §8\|tMark$i-1.md (§8 is not F-item shaped"; then got_h=red; else got_h=silent; fi
   [ "$got_h" = "$want_h" ] || { echo "FAIL [mark/$nm] hygiene said $got_h, contract says $want_h"; st=1; }
 done
 
@@ -341,8 +408,35 @@ for want_p in $MARK_WANT_PLAN; do
   i=$((i+1))
   nm=${MARK_NAMES[i-1]}
   ncase=$((ncase+1))
-  got_p=$(r_plan "$T/plan-$i.md")
+  got_p=$(r_plan "$T/${MARK_DATES[i-1]}-plan-$i.md" "$ITEM_CUT")
   [ "$got_p" = "$want_p" ] || { echo "FAIL [mark/$nm] plan_state said $got_p, contract says $want_p"; st=1; }
+done
+
+# THE FINDING NAMES THE FORK. A red row proves only that something about the section reddened; the
+# per-item reading exists to say WHICH F-item is open, and the row above has a marked F1 beside it.
+ncase=$((ncase+1))
+printf '%s\n' "$hyg_out" | grep -F 'F-items carrying no conforming resolution mark in their own span' | grep -qE ': F2$' || {
+  echo "FAIL [item/names-F2] the hygiene side did not name F2 as the open F-item below a marked F1"; st=1; }
+
+# ---- BLANK AND ABSENT ARE THE DECLARED OFF STATE, in BOTH readers. Blank is the shipped adopter
+# ---- default and the one value a date comparison gets wrong by default: every filename date sorts at
+# ---- or after the empty string. So the post-cutoff F2 row is re-graded with the key blank and then
+# ---- with it absent, and both readers must answer as they did before this cutoff existed.
+_f2=$(printf '%s\n' "${MARK_NAMES[@]}" | grep -nxF 'item: F2 unmarked below a marked F1' | cut -d: -f1)
+for _off in blank absent; do
+  if [ "$_off" = blank ]; then _kv='FORK_ITEM_CUTOFF=""\n'; else _kv=''; fi
+  printf "MEMORY_ROOT=memory\nDISCIPLINES=\"architecture\"\nFAMILIES=\"architecture:ARCH\"\nSPEC_FORMAT_CUTOFF=\"2026-07-15\"\nFORK_MARK_CUTOFF=\"2026-08-01\"\n$_kv" > "$FT/.memory-tree.conf"
+  _cut=$(r_cutoff "$FT/.memory-tree.conf"); _crc=$?
+  _ho=$( cd "$FT" && bash "$HYG" 2>&1 )
+  ncase=$((ncase+1))
+  [ "$_crc" = 0 ] && [ -z "$_cut" ] || { echo "FAIL [item/$_off] the planning reader returned rc=$_crc [$_cut] for a conf whose key is $_off"; st=1; }
+  ncase=$((ncase+1))
+  if printf '%s\n' "$_ho" | grep -q "tMark$_f2-1.md (terminal Status.*§8\|tMark$_f2-1.md (§8 is not F-item shaped"; then
+    echo "FAIL [item/$_off] with FORK_ITEM_CUTOFF $_off the hygiene side still graded the post-cutoff F2 row per item"; st=1
+  fi
+  ncase=$((ncase+1))
+  _p=$(r_plan "$T/$PD-plan-$_f2.md" "$_cut")
+  [ "$_p" = READY ] || { echo "FAIL [item/$_off] with FORK_ITEM_CUTOFF $_off plan_state said $_p for the post-cutoff F2 row, and the section-wide reading says READY"; st=1; }
 done
 
 # THE CONTROL, and without it every row above could be passing for the wrong reason. The gate must
@@ -355,6 +449,54 @@ printf '%s\n' "$hyg_out" | grep -q 'tMark' || {
   st=1
 }
 fi
+
+# ---- EVERY PLANNING CALLER PASSES THE CUTOFF. A `plan_state` call handed one argument grades the
+# ---- section as a whole, so it would plan READY on an unmarked F2 below a marked F1 while every row
+# ---- above stayed green: the table grades the classifier, and this grades who calls it. Enumerated
+# ---- by grep over the driver and the pass-order leg, comment lines dropped; the COUNT is printed and
+# ---- a zero is a dead probe, never a clean one.
+_pcs=$(grep -nE 'plan_state "' "$U" "$PO" 2>/dev/null | grep -vE '^[^:]+:[0-9]+:[[:space:]]*#')
+_pcs_n=$(printf '%s\n' "$_pcs" | grep -c . || true)
+_pcs_bad=$(printf '%s\n' "$_pcs" | grep . | grep -vE 'plan_state "[^"]+" "\$FORK_CUTOFF"' || true)
+ncase=$((ncase+1))
+if [ "${_pcs_n:-0}" -eq 0 ]; then
+  echo "FAIL [item/callers] DEAD PROBE: no plan_state call site was found in $U or $PO, so no caller was graded"; st=1
+elif [ -n "$_pcs_bad" ]; then
+  echo "FAIL [item/callers] a plan_state call site does not pass the cutoff as its second argument:"; printf '%s\n' "$_pcs_bad"; st=1
+else
+  echo "marker-contract: $_pcs_n plan_state call site(s) in the driver and the pass-order leg, each passing the cutoff"
+fi
+
+# ---- THE TWO READINGS OF ONE LINE, compared at TEST time. The engine SOURCES the conf; the planning
+# ---- side re-parses it as text, because it must not execute a second kit's conf. The sanctioned form
+# ---- of that re-parse is a compare against the authoritative read, so each spelling below goes to
+# ---- both the sliced reader and a subshell `.` of the same file. Column-0 spellings must AGREE. A
+# ---- spelling a shell accepts and the reader does not model must agree or REFUSE naming its line —
+# ---- never come back blank, which is the declared OFF state and would silence the planning side alone.
+CF="$T/cut.conf"
+check_reader_pair() { # name · conf body · want (agree|refuse|refuse-value)
+  printf '%s\n' "$2" > "$CF"
+  local _t _trc _s
+  _t=$(r_cutoff "$CF"); _trc=$?
+  _s=$( . "$CF" >/dev/null 2>&1; printf '%s' "${FORK_ITEM_CUTOFF-}" )
+  ncase=$((ncase+1))
+  case "$3:$_trc" in
+    agree:0) [ "$_t" = "$_s" ] || { echo "FAIL [reader/$1] text read [$_t], a sourced read [$_s]"; st=1; } ;;
+    refuse:2) printf '%s' "$_t" | grep -qF 'in a spelling this text reader does not resolve' || { echo "FAIL [reader/$1] refused without naming the unresolved line: $_t"; st=1; } ;;
+    refuse-value:2) printf '%s' "$_t" | grep -qF 'which is neither blank nor a zero-padded ISO date' || { echo "FAIL [reader/$1] refused a bad value without saying why: $_t"; st=1; } ;;
+    *) echo "FAIL [reader/$1] wanted $3, the text reader returned rc=$_trc [$_t] and a sourced read gave [$_s]"; st=1 ;;
+  esac
+}
+check_reader_pair "quoted, trailing comment" 'FORK_ITEM_CUTOFF="2026-09-15"  # note' agree
+check_reader_pair "single-quoted"            "FORK_ITEM_CUTOFF='2026-09-15'" agree
+check_reader_pair "repeated, last wins"      'FORK_ITEM_CUTOFF="2026-09-01"
+FORK_ITEM_CUTOFF="2026-09-15"' agree
+check_reader_pair "bare value"               'FORK_ITEM_CUTOFF=2026-09-15' agree
+check_reader_pair "matched and empty"        'FORK_ITEM_CUTOFF=' agree
+check_reader_pair "not a date"               'FORK_ITEM_CUTOFF=2026-09-15x' refuse-value
+check_reader_pair "export prefix"            'export FORK_ITEM_CUTOFF="2026-09-15"' refuse
+check_reader_pair "indented"                 '  FORK_ITEM_CUTOFF="2026-09-15"' refuse
+check_reader_pair "inside a conditional"     'if true; then FORK_ITEM_CUTOFF="2026-09-15"; fi' refuse
 
 
 # =============================================================================================
@@ -380,5 +522,5 @@ elif [ "$_cv_drv" != "$_cv_hyg" ]; then
 fi
 
 
-[ "$st" = 0 ] && echo "PASS ($ncase cases across 3 contracts, marker-region, section-8 mark and review verdicts, held)"
+[ "$st" = 0 ] && echo "PASS ($ncase cases across 3 contracts, marker-region, section-8 mark with its F-item cutoff, and review verdicts, held)"
 exit $st

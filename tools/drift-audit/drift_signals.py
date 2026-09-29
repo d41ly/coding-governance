@@ -1,6 +1,6 @@
 """drift_signals.py — coding-governance's own drift-signal declarations (dogfooding the kit).
 
-gov:kit drift-audit@1.15
+gov:kit drift-audit@1.17
 
 Copied from drift_signals.template.py and filled for THIS repo. The corpus root and disciplines are
 NOT restated here — they come from `.memory-tree.conf`, which the memory-tree kit owns.
@@ -250,14 +250,10 @@ PINS: dict[str, int] = {
     # merges whose subjects name the branch merged INTO, carrying another build's work. A 0 measured
     # that way is a number, not a measurement.
     "closed_specs_with_no_product_commit": 1,
-    # DEPL-dGaugedVintage-13. MEASURED at this base, not chosen: 27 of 376 terminal specs have a
-    # backlog row still reading OPEN or SPECCED. `DEPL-dGaugedVintage-2` swept the DEPL shard by
-    # hand; this residue is TOOL, PLAY and KICK, and it accumulated because nothing looked.
-    #
-    # A PIN rather than a refusal, deliberately. A row's ask can be legitimately WIDER than the unit
-    # that partly served it, so calling every one a defect would push an operator to close a row
-    # that should stay open. Shrink-only like the rest of this table: it only falls.
-    "backlog_rows_outliving_closed_specs": 27,
+    # `backlog_rows_outliving_closed_specs` and its pin RETIRED together at the backlog switch-over
+    # (TOOL-dDerivedDocket-34 S10): no backlog status is authored once BACKLOG_MODE is builds, so a
+    # row token compared with its spec's status has nothing left to read. The stance it counted is
+    # superseded in `memory/DECISIONS.md` under that unit's id.
     # 3 — MEASURED on the day the table was ratified, and non-zero BY CONSTRUCTION rather than as
     # tolerated rot. `--scaffold` seeds a concept only where the corpus has a live site, spells it the
     # canon's way, and a human then curates; curation ADDS verbs the corpus does not use yet: `measure`, `print`
@@ -285,7 +281,11 @@ PINS: dict[str, int] = {
     # merge: two branches' live rows united, and neither side was over its own watermark. Same shape
     # as the read-path ceiling in that same reconcile, one budget over — that ceiling has since been
     # retired (TOOL-dSpentCeiling-1) and its RATCHETS row deleted with it.
-    "live_backlog_rows_per_shard": 89,
+    # 89 -> 454. RE-MEASURED at the backlog switch-over (TOOL-dDerivedDocket-34 S10), and a change of
+    # UNIT rather than of backlog: under BACKLOG_MODE="builds" the reading is every live ask in the
+    # generator's `--asks --json` projection, 454 over 104 ask files (TOOL 425, DEPL 26, KICK 3),
+    # where the shards reading was the largest shard's own count. Nothing was filed to earn it.
+    "live_backlog_rows_per_shard": 454,
     # MEASURED at the unit that added the signal, on this corpus, and expected to be small: the
     # slug discriminator drops every fixture id with no waiver list at all, so what remains is
     # actionable rather than tolerated. A drain target from the first commit, which is why it is

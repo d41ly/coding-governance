@@ -974,7 +974,7 @@ write_base_spec 191 26 OPEN 2 "$(git rev-parse --short=8 HEAD)"
 git add -A && git commit -q -m base-green --no-verify
 rm -f "$D/spec/2026-08-01-spec-tFixture-13.md"   # tracked-but-absent only exists after the commit
 
-out=$(bash "$SCRIPT" 2>/dev/null)
+out=$(bash "$SCRIPT" 2>/dev/null); mainrc=$?
 st=0; n=0
 hit()  { n=$((n+1)); grep -qF "$1" <<<"$out" || { echo "FAIL missing: $1"; st=1; }; }
 miss() { n=$((n+1)); if grep -qF "$1" <<<"$out"; then echo "FAIL unexpected: $1"; st=1; fi; }
@@ -996,6 +996,18 @@ miss 'tFixture-2.md ('
 miss 'tFixture-5.md ('
 miss 'tFixture-11.md ('
 miss 'tFixture-12.md ('
+# ---- --offenders: the SIGNATURE the merge bar grades this leg with (TOOL-dDerivedDocket-23 S3). Over
+# this same red tree: its exit is the default mode's, and its stdout is `check <n><TAB><key>` rows and
+# nothing else — no prose, no line locator, since the bar compares two trees' key SETS and a locator
+# moves when an unrelated edit lands above an inherited offender.
+offout=$(bash "$SCRIPT" --offenders 2>/dev/null); offrc=$?
+n=$((n+1)); [ "$offrc" = "$mainrc" ] || { echo "FAIL --offenders exited $offrc where the default mode exited $mainrc"; st=1; }
+n=$((n+1)); [ -n "$offout" ] || { echo "FAIL --offenders printed no key over a red fixture"; st=1; }
+n=$((n+1)); printf '%s\n' "$offout" | awk -F'\t' 'NF != 2 || $1 !~ /^check [^ ]+$/ { bad = 1 } END { exit bad }' \
+  || { echo "FAIL --offenders printed a line that is not one check<TAB>key row"; st=1; }
+n=$((n+1)); printf '%s\n' "$offout" | grep -qE ':[0-9]+(:|[[:space:]]|$)' && { echo "FAIL --offenders keyed an offender with its line locator"; st=1; }
+n=$((n+1)); printf '%s\n' "$offout" | grep -qF 'tFixture-3.md' || { echo "FAIL --offenders did not key the known check-12 offender tFixture-3.md"; st=1; }
+n=$((n+1)); printf '%s\n' "$offout" | grep -qF 'HYGIENE check' && { echo "FAIL --offenders let the default mode's prose through"; st=1; }
 # ---- check 22: the acceptance ledger (TOOL-dUnstalledConvoy-12).
 hit  'ARCH-tFixture-70/AC2'                    # numbered, unevidenced — the defect this exists for
 miss 'ARCH-tFixture-70/AC1'                    # ...and the evidenced sibling is silent
@@ -2400,6 +2412,98 @@ for _k in $_engreads; do
     || { echo "FAIL the shipped .memory-tree.conf.example does not declare $_k, which the engine reads as an override, so an adopter cannot discover it"; st=1; }
 done
 
+# ---- ...and the kit's PYTHON modules, which the two arms above cannot see AT ALL: both derive from
+# ---- the shell engine's own text, and every key below is read by a `.py` file sitting beside it.
+# ---- THE RECEIVER IS UNCONSTRAINED, and that is the load-bearing half (TOOL-dDerivedDocket-50).
+# ---- Every module that reads an override at all binds it to a dict called `conf`, so a derivation
+# ---- anchored on that spelling reads every key this kit OWNS and cannot read the one shape this
+# ---- arm exists to catch: a module reaching for a SECOND kit's conf has the name `conf` taken by
+# ---- its own, so the line it writes is `ucfg["RECALL_CLI"]` — any receiver but that one — and a
+# ---- narrow arm stays green straight through it. Measured both ways over this directory: the
+# ---- narrow form loses nothing and gains nothing the wide form misses.
+# ---- A RECEIVER IS REQUIRED, which is what keeps a bare list literal such as `["DECISIONS"]` out:
+# ---- a list literal and a subscript are the same characters minus the receiver.
+# ---- BOTH QUOTE STYLES, because one module reads `conf.get('UNIVERSAL_BUDGET')` and a
+# ---- double-quote-only pattern would silently drop it.
+# ---- COMMENTS ARE NOT STRIPPED, unlike the two arms above. Their pattern matched bare `${NAME}`
+# ---- shapes that prose could produce by accident; this one is a whole dict read, which prose
+# ---- reaches only by spelling the form out. Over-reading reds by NAME and is fixed in one line;
+# ---- under-reading is the shape that passes by finding nothing.
+_pykeys() {  # $1 module directory. A PARAMETER, so a fixture arm grades a tree it built itself.
+  cat "$1"/*.py 2>/dev/null \
+    | grep -oE "[]A-Za-z0-9_)](\.get\(|\[)[\"'][A-Z][A-Z0-9_]{2,}[\"']" \
+    | sed "s/.*[\"']\([A-Z][A-Z0-9_]*\)[\"']\$/\1/" \
+    | sort -u
+}
+# The grading, parameterised the same way and in BOTH directions. Prints one line per finding;
+# silence is the pass. An EMPTY derivation is a finding rather than a pass — the shape both sibling
+# arms above were each written to prevent, one level up.
+_pyparity() {  # $1 module directory · $2 example conf · $3 exemption names
+  _pk=$(_pykeys "$1")
+  if [ -z "$_pk" ]; then
+    echo "the python parity derivation found NO key in $1/*.py, so this arm would pass by scanning nothing"
+    return 0
+  fi
+  for _x in $3; do
+    printf '%s\n' "$_pk" | grep -qx "$_x" \
+      || echo "the python exemption names $_x, which no module in $1 reads any more — a stale exemption widens the surface it was written to narrow"
+  done
+  for _x in $_pk; do
+    case " $3 " in *" $_x "*) continue ;; esac
+    grep -qE "^$_x=" "$2" \
+      || echo "$2 does not declare $_x, which a module in $1 reads out of a dict, so an adopter cannot discover it"
+  done
+}
+# NOT conf keys, and the list says why for each. Everything here is read out of a dict that is not a
+# conf and text alone cannot tell apart from one — `os.environ` and `globals()` are dicts like any
+# other — plus one fixture VIEW key. Same rule as `_engexempt` above, asserted in both directions.
+#   GOV_BASH GOV_DEFAULT_BRANCH PATH GIT_DIR GIT_GRAFT_FILE GIT_AUTHOR_DATE GIT_COMMITTER_DATE
+#     — environment, read or set through os.environ by the engine and by its own fixtures.
+#   GRAMMAR_DIR READ_PATH_RULES_GATE — this module's OWN module-level constants, reached through
+#     globals() by selftest arms that save and restore them.
+#   EXMP — a fixture DISCIPLINE's view key inside a migration summary, not an override.
+_pyexempt="EXMP GIT_AUTHOR_DATE GIT_COMMITTER_DATE GIT_DIR GIT_GRAFT_FILE GOV_BASH GOV_DEFAULT_BRANCH GRAMMAR_DIR PATH READ_PATH_RULES_GATE"
+_pk_real=$(_pykeys "$HERE")
+n=$((n+1))
+[ -n "$_pk_real" ] || { echo "FAIL could not derive a single conf key from $HERE/*.py; the python example-conf arms below would pass by finding nothing"; st=1; }
+n=$((n+1))
+printf '%s\n' "$_pk_real" | grep -qx MEMORY_ROOT \
+  || { echo "FAIL the python key derivation does not see MEMORY_ROOT, which five modules read — the population is not what it claims to be"; st=1; }
+n=$((n+1))
+printf '%s\n' "$_pk_real" | grep -qx ROTATION_MODE \
+  || { echo "FAIL the python key derivation does not see ROTATION_MODE, which row_grammar.py reads — the population is not what it claims to be"; st=1; }
+n=$((n+1))
+_pyout=$(_pyparity "$HERE" "$EX" "$_pyexempt")
+[ -z "$_pyout" ] || { printf '%s\n' "$_pyout" | sed 's/^/FAIL /'; st=1; }
+
+# ---- THE FIXTURE, which is what makes the unconstrained receiver a claim rather than a comment.
+# ---- Two modules: one reads an undeclared key through a dict named `conf`, the other reads a
+# ---- SECOND kit's key through a dict named anything else while keeping a `conf` of its own — the
+# ---- only spelling a cross-kit conf read can take. A `conf`-anchored derivation reds on the first
+# ---- and passes on the second, which is this unit's own defect class one level up. The third arm
+# ---- is the negative control: the fixture's DECLARED key must not be reported.
+PY=$TMP/pyparity
+mkdir -p "$PY/mod" "$PY/none"
+printf 'MEMORY_ROOT=memory\n' > "$PY/example.conf"
+printf 'def f(conf):\n    return conf.get("FIXTURE_OWN_KEY")\n' > "$PY/mod/a.py"
+printf 'def g(conf, ucfg):\n    return conf["MEMORY_ROOT"], ucfg["RECALL_CLI"]\n' > "$PY/mod/b.py"
+_fx=$(_pyparity "$PY/mod" "$PY/example.conf" "")
+n=$((n+1))
+printf '%s\n' "$_fx" | grep -q 'does not declare FIXTURE_OWN_KEY' \
+  || { echo "FAIL the python parity arm did not red on an undeclared key read through a dict named conf"; st=1; }
+n=$((n+1))
+printf '%s\n' "$_fx" | grep -q 'does not declare RECALL_CLI' \
+  || { echo "FAIL the python parity arm is anchored on the receiver spelling conf, so a module reading a SECOND kit's conf key through any other dict passes — the one shape this arm exists to catch"; st=1; }
+n=$((n+1))
+printf '%s\n' "$_fx" | grep -q 'does not declare MEMORY_ROOT' \
+  && { echo "FAIL the python parity arm reported the fixture's DECLARED key as missing"; st=1; }
+n=$((n+1))
+_pyparity "$PY/none" "$PY/example.conf" "" | grep -q 'found NO key' \
+  || { echo "FAIL the python parity derivation does not refuse an EMPTY population, so every arm above could pass by scanning nothing"; st=1; }
+n=$((n+1))
+_pyparity "$PY/mod" "$PY/example.conf" "NOBODY_READS_THIS" | grep -q 'stale exemption' \
+  || { echo "FAIL the python exemption list is not asserted in the second direction, so a name no module reads any more silently widens the surface"; st=1; }
+
 # ---- SPEC10_CUTOFF is a CONF DECLARATION, and the environment no longer reaches it
 # ---- (TOOL-aDeclaredBound-2). Four runs over ONE nine-section spec dated 2026-08-01, which is
 # ---- BEFORE the shipped 2026-08-04: absent, declared-early, declared-blank, and hostile-env.
@@ -2496,10 +2600,14 @@ n=$((n+1))
 # ---- module constants, the spelling the other two greps miss. It hid check 20 first, and then
 # ---- check 24, whose `ROTATION_CHECK` the first anchor `^CHECK =` could not see: the README said
 # ---- 23 over 24 checks and this arm agreed, until check 25 made the README true and the arm red.
+# ---- And `transition_audit.py`'s `SAY` prefix, the fourth spelling: check 26 prints through it and
+# ---- the engine calls no `fail 26`, so it was invisible here while it shared the number 25 with the
+# ---- reader inventory, and would have stayed invisible under its own number.
 n=$((n+1))
 _hy_ids=$( { grep -oE 'fail [0-9]+' "$HERE/check-memory-hygiene.sh" | grep -oE '[0-9]+'
              grep -rhoE 'check [0-9]+:' "$HERE/corpus_ids.py" "$HERE/gotchas.py" | grep -oE '[0-9]+'
-             grep -oE '^[A-Z_]*CHECK = [0-9]+' "$HERE/row_grammar.py" | grep -oE '[0-9]+'; } | sort -n -u )
+             grep -oE '^[A-Z_]*CHECK = [0-9]+' "$HERE/row_grammar.py" | grep -oE '[0-9]+'
+             grep -oE '^SAY = "memory-hygiene: check [0-9]+ ' "$HERE/transition_audit.py" | grep -oE '[0-9]+'; } | sort -n -u )
 _hy_derived=$(printf '%s\n' "$_hy_ids" | grep -c .)
 
 
@@ -3059,6 +3167,194 @@ case "$o" in
   *) echo "FAIL PROJECT_REGISTRY_EXTRA accepted a file it does not name — check 3 is disabled"; st=1 ;;
 esac
 
+# ---- TOOL-dDerivedDocket-8: THE DECLARED BACKLOG LAYOUT ------------------------------------------
+# ONE FIXTURE, TWO CONFS, TWO RUNS, in the shape the project-key arms above use (TOOL-aLeakedHandle-8
+# gave them that shape and aRatifiedRulings built it): everything graded here is in the tree for BOTH
+# runs and only the declared mode moves. A tree per mode would let an absent fixture read as a
+# correct verdict in exactly the half that matters — the `builds` half, where almost every assertion
+# is that something is NOT named.
+#
+# WHAT EACH FILE IS FOR, because a fixture nobody can read is a fixture nobody maintains:
+#   backlog/ARCH.md    over the index cap AND carrying one 320-character row. Under `shards` it is
+#                      an authored shard and check 6 names it; under `builds` it is a GENERATED view
+#                      that leaves check 6 and STAYS in check 7, which is the pair D3 decided.
+#   backlog/BRAND.md   over the index cap, every row short, and the ONLY row in curation-debt.txt.
+#                      Under `shards` the row earns check 6; under `builds` it earns nothing and the
+#                      stale-ENTRY guard reds it — the red the switch-over clears by deleting it.
+#   builds/tAsk/       a build with a README and a BACKLOG.md that is over the cap and carries one
+#                      500-character ask row: check 4's admission, check 6's never-rotate branch and
+#                      check 7's exemption, all on one file.
+#   builds/tHome/      a FILING HOME: a build folder holding nothing but BACKLOG.md.
+#   archive/ARCH...    a family archive referenced from no preamble.
+BM=$TMP/bmode
+mkdir -p "$BM"
+bm_set() {   # $1 = the BACKLOG_MODE line, or empty for a conf that never declares the key
+  printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture brand"\nFAMILIES="architecture:ARCH brand:BRAND"\n' > "$BM/.memory-tree.conf"
+  [ -n "${1:-}" ] && printf '%s\n' "$1" >> "$BM/.memory-tree.conf"
+  return 0
+}
+( cd "$BM" && git init -q . && git config user.email t@t.test && git config user.name t && git config core.autocrlf false
+  bm_set ""
+  mkdir -p memory/backlog memory/project memory/archive memory/builds/tAsk memory/builds/tHome
+  printf '# r\n' > memory/README.md
+  printf '# d\n\n- ARCH-tOne-1 · a decision\n' > memory/DECISIONS.md
+  for r in legacy-files.txt id-orphan-waiver.txt corpus-path-unresolved.txt unarmed-branches.txt method-carriers.txt stale-header-waiver.txt; do : > "memory/project/$r"; done
+  printf 'memory/backlog/BRAND.md\n' > memory/project/curation-debt.txt
+  # ONE seq, reused, for the reason the check-6 cap fixtures above give: building each line with its
+  # own command substitution costs this suite minutes.
+  BMR=$(printf 'y%.0s' $(seq 1 230))
+  BMW=$(printf 'w%.0s' $(seq 1 294))
+  BMA=$(printf 'a%.0s' $(seq 1 463))
+  { printf '# ARCH asks\n\n'
+    i=1; while [ "$i" -le 100 ]; do printf -- '- ARCH-tRow%d-1 · OPEN · %s\n' "$i" "$BMR"; i=$((i+1)); done
+    printf -- '- ARCH-tWide-1 · OPEN · %s\n' "$BMW"; } > memory/backlog/ARCH.md
+  { printf '# BRAND asks\n\n'
+    i=1; while [ "$i" -le 100 ]; do printf -- '- BRAND-tRow%d-1 · OPEN · %s\n' "$i" "$BMR"; i=$((i+1)); done
+  } > memory/backlog/BRAND.md
+  printf -- '---\nslug: tAsk\nnode: a\nopened: 2026-08-01\nstreams: architecture\nroster: ARCH\nids: ARCH-tAsk-1\n---\n\n# tAsk\n' > memory/builds/tAsk/README.md
+  { printf '# tAsk asks\n\n## Asks\n\n'
+    printf -- '- ARCH-tAsk-1 · filed 2026-08-01 · %s\n' "$BMA"
+    i=2; while [ "$i" -le 100 ]; do printf -- '- ARCH-tAsk%d-1 · filed 2026-08-01 · %s\n' "$i" "$BMR"; i=$((i+1)); done
+  } > memory/builds/tAsk/BACKLOG.md
+  printf '# tHome asks\n\n## Asks\n\n- ARCH-tHome-1 · filed 2026-08-01 · a build folder that is nothing but a filing home\n' > memory/builds/tHome/BACKLOG.md
+  printf -- '- ARCH-tGone-1 · CLOSED · a rotated ask nobody announced\n' > memory/archive/ARCH.2026-01-01.md
+  git add -A && git commit -q -m bmode --no-verify ) >/dev/null 2>&1
+
+bm_run() {   # $1 = the BACKLOG_MODE line; leaves $out set and asserts the gate actually RAN
+  bm_set "${1:-}"
+  out=$(cd "$BM" && bash "$SCRIPT" 2>/dev/null); bmrc=$?
+  n=$((n+1))
+  [ "$bmrc" != 2 ] || { echo "FAIL backlog-mode '$1' aborted the gate (status 2); every arm below would prove nothing"; st=1; }
+}
+
+# --- SHARDS. The whole point of this half is that it is byte-for-byte what the engine did before
+# --- this unit, so every `builds` assertion below has a control that is not merely "silence".
+bm_run 'BACKLOG_MODE="shards"'
+chit 4 'memory/builds/tAsk/BACKLOG.md'
+chit 4 'memory/builds/tHome/BACKLOG.md'
+chit 6 'memory/backlog/ARCH.md'
+chit 7 'memory/backlog/ARCH.md'
+cnot 7 'memory/builds/tAsk/BACKLOG.md'
+chit 10 'memory/archive/ARCH.2026-01-01.md'
+cnot 6 'curation-debt.txt lists paths that now pass checks 6, 7 and 8 unwaived'
+n=$((n+1))
+grep -qF 'memory-hygiene: check 8 graded' <<<"$out" \
+  || { echo "FAIL under shards check 8 did not print its graded-row line"; st=1; }
+n=$((n+1))
+grep -qF 'check 8: backlog layout builds' <<<"$out" \
+  && { echo "FAIL under shards check 8 printed the builds-mode retirement line"; st=1; }
+n=$((n+1))
+cblock "$out" 6 | grep -qF 'rotate to archive/' \
+  || { echo "FAIL under shards an oversized shard was not named with the ROTATE remedy"; st=1; }
+
+# --- BUILDS. Each arm's pair above is what makes it an observation rather than a silence.
+bm_run 'BACKLOG_MODE="builds"'
+cnot 4 'memory/builds/tAsk/BACKLOG.md'
+cnot 4 'memory/builds/tHome/BACKLOG.md'
+cnot 6 'memory/backlog/ARCH.md'
+chit 6 'memory/builds/tAsk/BACKLOG.md'
+n=$((n+1))
+cblock "$out" 6 | grep -qF "a build's BACKLOG.md over cap — move detail into a build/ recording; never rotate" \
+  || { echo "FAIL under builds an oversized BACKLOG.md was not named on the never-rotate branch"; st=1; }
+# ...and it is a SEPARATE branch, not the rotate message widened: a BACKLOG.md author told to rotate
+# is told to do the one thing the per-build layout forbids.
+n=$((n+1))
+cblock "$out" 6 | grep -F 'rotate to archive/' | grep -qF 'BACKLOG.md' \
+  && { echo "FAIL under builds the BACKLOG.md finding rode the ROTATE message"; st=1; }
+chit 7 'memory/backlog/ARCH.md'
+cnot 7 'memory/builds/tAsk/BACKLOG.md'
+n=$((n+1))
+grep -qF 'memory-hygiene: check 8: backlog layout builds — graded by check 9' <<<"$out" \
+  || { echo "FAIL under builds check 8 did not announce its retirement"; st=1; }
+n=$((n+1))
+grep -qF 'HYGIENE check 8 FAILED' <<<"$out" \
+  && { echo "FAIL under builds check 8 reported a finding from a check that is retired"; st=1; }
+n=$((n+1))
+grep -qF 'memory-hygiene: check 8 graded' <<<"$out" \
+  && { echo "FAIL under builds check 8 printed its graded-row line as well as the retirement line"; st=1; }
+# The POPULATION GUARD is the half that would have fired on its own: its precondition counts
+# BACKLOG.md files, which under `builds` are exactly the files check 8 no longer grades.
+n=$((n+1))
+grep -qF 'no backlog shard under memory/backlog/' <<<"$out" \
+  && { echo "FAIL under builds check 8's empty-population guard fired over a check that is retired"; st=1; }
+cnot 10 'memory/archive/ARCH.2026-01-01.md'
+n=$((n+1))
+grep -qF "memory-hygiene: check 10: 1 family archive(s) left to check 9's archive guard" <<<"$out" \
+  || { echo "FAIL under builds check 10 did not count the archive it left to check 9"; st=1; }
+chit 6 'curation-debt.txt lists paths that now pass checks 6, 7 and 8 unwaived'
+chit 6 'memory/backlog/BRAND.md'
+
+# --- AC9: the shell reader and the Python reader agree over EVERY value, and a typo ABORTS.
+# --- The shell's reading is observable only through its print mode: the project-key stderr line
+# --- prints a value that was SET, so an absent key and a blank one are both silence there.
+cat > "$TMP/readmode.py" <<'BMPY'
+import os
+import sys
+
+sys.path.insert(0, os.environ["KITDIR"])
+import backlog
+import corpus_ids
+
+print(backlog.read_conf(corpus_ids.load_conf(".")).mode)
+BMPY
+for bmpair in 'absent:' 'blank:BACKLOG_MODE=""' 'shards:BACKLOG_MODE="shards"' 'builds:BACKLOG_MODE="builds"'; do
+  bm_set "${bmpair#*:}"
+  bmsh=$(cd "$BM" && bash "$SCRIPT" --print-backlog-mode 2>/dev/null)
+  bmpy=$(cd "$BM" && KITDIR="$HERE" "$_PY" "$TMP/readmode.py" 2>&1)
+  n=$((n+1))
+  [ "$bmsh" = "$bmpy" ] || { echo "FAIL BACKLOG_MODE ${bmpair%%:*}: the shell read '$bmsh' and the python reader read '$bmpy'"; st=1; }
+  n=$((n+1))
+  [ -n "$bmsh" ] || { echo "FAIL BACKLOG_MODE ${bmpair%%:*}: the shell print mode returned nothing, so the agreement arm above compared two empty strings"; st=1; }
+done
+# Case matters, and the near-miss is the arm worth having: a value the shell read as `shards` while
+# the python reader refused it would half-migrate a tree, quietly.
+for bmbad in buildz Builds ' builds'; do
+  bm_set "BACKLOG_MODE=\"$bmbad\""
+  o=$(cd "$BM" && bash "$SCRIPT" 2>&1); r=$?
+  n=$((n+1))
+  case "$r:$o" in
+    2:*BACKLOG_MODE*) echo "ok   BACKLOG_MODE='$bmbad' ABORTS naming the key" ;;
+    *) echo "FAIL BACKLOG_MODE='$bmbad' did not abort (rc=$r)"; st=1 ;;
+  esac
+  n=$((n+1))
+  printf '%s\n' "$o" | grep -qF 'not one of: shards builds' \
+    || { echo "FAIL the BACKLOG_MODE abort did not name its legal values"; st=1; }
+done
+
+# ---- TOOL-dDerivedDocket-31 AC6 — THE F-ITEM SHAPE ARM, under --staged, in a tree of its own so no
+# ---- verdict above moves. A LIVE Tier-2 spec dated past FORK_ITEM_CUTOFF whose §8 carries a plain
+# ---- bullet before its first F-item is the finding: a shape arm that ran only at a terminal status
+# ---- would let a live spec escape per-item grading by never writing an F-item. The same bytes dated
+# ---- BEFORE the cutoff, and the same bytes with the key BLANK, are the two controls, so the silence
+# ---- they assert is an observation of the guard and not the absence of a run.
+FI=$TMP/fitem
+mkdir -p "$FI"
+write_fork_spec() { # filename date -> a live Tier-2 spec, the only one in the tree, staged
+  rm -rf "$FI/memory/builds/tFork"; mkdir -p "$FI/memory/builds/tFork/spec"
+  good10 | sed 's/^none$/- an early note written as a bullet\n- **F1 — which way?** options, and no mark yet./' \
+    > "$FI/memory/builds/tFork/spec/$1-spec-ARCH-tFork-1.md"
+  ( cd "$FI" && git add -A ) >/dev/null 2>&1
+}
+( cd "$FI" && git init -q . && git config user.email t@t.test && git config user.name t && git config core.autocrlf false
+  mkdir -p memory && printf 'sentinel\n' > memory/HYGIENE.md
+  git add -A && git commit -q -m fitem --no-verify ) >/dev/null 2>&1
+FI_CONF='MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\n'
+printf "${FI_CONF}FORK_ITEM_CUTOFF=\"2026-09-10\"\n" > "$FI/.memory-tree.conf"
+write_fork_spec 2026-09-20
+out_fi=$(cd "$FI" && bash "$SCRIPT" --staged 2>/dev/null)
+n=$((n+1))
+grep -qF '2026-09-20-spec-ARCH-tFork-1.md (§8 is not F-item shaped, required of a Tier-2 spec at/after FORK_ITEM_CUTOFF 2026-09-10: a bullet or sub-head sits before the first F-item' <<<"$out_fi" \
+  || { echo "FAIL the F-item shape arm did not name a LIVE Tier-2 spec whose §8 opens with a bullet before its first F-item, under --staged"; st=1; }
+write_fork_spec 2026-09-01
+out_fi=$(cd "$FI" && bash "$SCRIPT" --staged 2>/dev/null)
+n=$((n+1))
+grep -qF 'is not F-item shaped' <<<"$out_fi" && { echo "FAIL the F-item shape arm fired on a spec dated BEFORE FORK_ITEM_CUTOFF, which reds frozen specs"; st=1; }
+printf "${FI_CONF}FORK_ITEM_CUTOFF=\"\"\n" > "$FI/.memory-tree.conf"
+write_fork_spec 2026-09-20
+out_fi=$(cd "$FI" && bash "$SCRIPT" --staged 2>/dev/null)
+n=$((n+1))
+grep -qF 'is not F-item shaped' <<<"$out_fi" && { echo "FAIL the F-item shape arm fired with FORK_ITEM_CUTOFF BLANK, the declared off state every adopter ships with"; st=1; }
+
 # THE HIGHER OF THE TWO PINS, not the merge's arithmetic. This branch carried 224 and main carried
 # 235; the merged suite measures 251, so 235 is satisfied and 224 would be a silent LOWERING of a
 # shrink-only pin. A discount from the new measurement would give ~202, which is lower still - the
@@ -3077,13 +3373,27 @@ esac
 # each one top-level increment of `n`.
 # RAISED 448 -> 454 by TOOL-aRepatriatedFork-32: its control, four cutoff arms and the U-row arm, each top-level.
 # RAISED 454 -> 456 by its rev-3 fold: the slack arm and the measurement-line arm, both top-level.
+# RAISED 374 -> 416 by TOOL-dDerivedDocket-8, which adds 42 executed assertions: 28 outside its two
+# loops (16 chit/cnot, 10 written out, 2 inside `bm_run`) plus 4x2 and 3x2 inside them. DERIVED from
+# the block rather than read off a PASS line, because that suite run is a held leg the unit's pass
+# does not make. The figure is one-sided: this is a `-ge` floor, so an undercount still passes and
+# still catches a block stranded past an exit, which is what the pin is for.
+# RAISED 425 -> 431 by TOOL-dDerivedDocket-23, which adds six executed `--offenders` assertions
+# beside the main block's. Derived from the block, for the reason the paragraph above gives.
+# RAISED 431 -> 434 by TOOL-dDerivedDocket-31, whose F-item shape block adds three executed
+# assertions, none inside a loop. Derived from the block, for the same reason.
+# MERGED at the dDerivedDocket x origin/main reconcile: base 374 + ours' 60 (374 -> 434 above) + theirs'
+# 82 (374 -> 456 above) = 516, each side's raise counting only the arms that side added.
 # RAISED 456 -> 462 by TOOL-aRepatriatedFork-42, to the PRINTED count: its three adopter-declared-path
 # arms, each top-level, and three earlier top-level arms that landed without a raise.
 # A tree with no playbook-render engine skips them ALOUD and n_skip carries the three, so the floor
 # still catches an unreachable block without redding a kit installed without its sibling.
 # RAISED 462 -> 471 by its rev-3 fold: nine top-level arms, one per defect of the closing review,
 # skipped aloud with the three above when no engine sits beside the kit.
-FLOOR_ASSERTIONS=471
+# MERGED at the landing reconcile with d6e1749c: the fork 456 + ours' 60 (374 -> 434 above) +
+# theirs' 15 (456 -> 471 above) = 531, keeping theirs' skip-aware predicate, which counts the
+# arms skipped aloud when no playbook-render engine sits beside the kit.
+FLOOR_ASSERTIONS=531
 [ "$((n + ${n_skip:-0}))" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 
 [ "$st" = 0 ] && echo "PASS ($n assertions)"

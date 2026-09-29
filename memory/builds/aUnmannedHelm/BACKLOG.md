@@ -1,0 +1,25 @@
+# aUnmannedHelm — asks
+
+## Asks
+
+- TOOL-aUnmannedHelm-1 · filed 2026-08-10 · unit · unit 1 of the unattended-run kit: RUN.md and the hygiene contract admitting it — landed at memory-tree@2.3. The dependency on TOOL-aNumeralWarden-1 was WITHDRAWN and that fold has since landed too
+- TOOL-aUnmannedHelm-2 · filed 2026-08-10 · the `ledger_dir` in `tools/drift-audit/drift_report.py` points at an authored run-state directory under `memory/project/` that hygiene check 3 forbids, so the two kits disagree about where one may live and the probe stays DECLARED_EMPTY
+- TOOL-aUnmannedHelm-3 · filed 2026-08-10 · the `ids:` key stopped being authored rather than gaining a rule: it is DERIVED, so the two readings are moot — closed by TOOL-aMouldedFolio-2; the README's remaining authored prose is deliberately untemplated (17 of 25 carry no heading)
+- TOOL-aUnmannedHelm-4 · filed 2026-08-10 · unit · unit 2 of the unattended-run kit: the protocol document, the domain-rules companion section, and F1's amendment at all FOUR live statements of the explicit-ask rule. Owns the phase vocabulary and a kit-owned CORE DoD set the project layer may only EXTEND
+- TOOL-aUnmannedHelm-5 · filed 2026-08-10 · unit · unit 3: the driver kit. `--preflight` ASSERTS the mandate and never writes it, RECORDS the keepalive id the agent hands it, and delegates to `check-wiring.sh --check`. Per-verb acceptance for the status and resume verbs
+- TOOL-aUnmannedHelm-6 · filed 2026-08-10 · unit · unit 4: the gate legs. THREE `gate-legs.json` entries, witness PRESENCE as its own fail branch, at most one run-state file non-terminal, and a two-granularity population guard in the engine's own `pop_guard` shape
+- TOOL-aUnmannedHelm-7 · filed 2026-08-10 · unit · unit 5: the rendered skill. `.gitattributes` `eol=lf` pin only — `check-wiring.sh`'s eol population is derived — with drift and CRLF each carrying their own acceptance criterion
+- TOOL-aUnmannedHelm-8 · filed 2026-08-10 · unit · unit 6: the `/session-kickoff` hand-back. Enumerate all six interactive exits by line; mandate present hands back without halting, mandate absent still stops at Step 5 with the literal prompt string
+- TOOL-aUnmannedHelm-9 · filed 2026-08-10 · unit · unit 7: the adopter path. Refuses a foreign repo and an unsupported prefix, ADOPTS through a junction per the codebase-map precedent, and bumps `governance-template` to v2.6 with a v2.5 archive snapshot
+- TOOL-aUnmannedHelm-10 · filed 2026-08-10 · three root docs (`AGENTS.md`, `WIRE-INTO-PROJECT.md`, `.gitattributes`) come out of a linked worktree CRLF with no `eol=lf` pin; nothing byte-reads them today, so this is latent, but `check-wiring.sh`'s eol population is scoped to `.claude/` and will never see them
+
+## Dispositions
+
+- CLOSED · TOOL-aUnmannedHelm-1 · by TOOL-aNumeralWarden-1 · unit 1 of the unattended-run kit: RUN.md and the hygiene contract admitting it — landed at memory-tree@2.3. The dependency on TOOL-aNumeralWarden-1 was WITHDRAWN and that fold has since landed too
+- CLOSED · TOOL-aUnmannedHelm-3 · by TOOL-aMouldedFolio-2 · the `ids:` key stopped being authored rather than gaining a rule: it is DERIVED, so the two readings are moot — closed by TOOL-aMouldedFolio-2; the README's remaining authored prose is deliberately untemplated (17 of 25 carry no heading)
+- CLOSED · TOOL-aUnmannedHelm-4 · by 59bf8b73e7eb54ef66eb333054edaa38f6aa1de5 · unit 2 of the unattended-run kit: the protocol document, the domain-rules companion section, and F1's amendment at all FOUR live statements of the explicit-ask rule. Owns the phase vocabulary and a kit-owned CORE DoD set the project layer may only EXTEND
+- CLOSED · TOOL-aUnmannedHelm-5 · by 59bf8b73e7eb54ef66eb333054edaa38f6aa1de5 · unit 3: the driver kit. `--preflight` ASSERTS the mandate and never writes it, RECORDS the keepalive id the agent hands it, and delegates to `check-wiring.sh --check`. Per-verb acceptance for the status and resume verbs
+- CLOSED · TOOL-aUnmannedHelm-6 · by 59bf8b73e7eb54ef66eb333054edaa38f6aa1de5 · unit 4: the gate legs. THREE `gate-legs.json` entries, witness PRESENCE as its own fail branch, at most one run-state file non-terminal, and a two-granularity population guard in the engine's own `pop_guard` shape
+- CLOSED · TOOL-aUnmannedHelm-7 · by 59bf8b73e7eb54ef66eb333054edaa38f6aa1de5 · unit 5: the rendered skill. `.gitattributes` `eol=lf` pin only — `check-wiring.sh`'s eol population is derived — with drift and CRLF each carrying their own acceptance criterion
+- CLOSED · TOOL-aUnmannedHelm-8 · by 59bf8b73e7eb54ef66eb333054edaa38f6aa1de5 · unit 6: the `/session-kickoff` hand-back. Enumerate all six interactive exits by line; mandate present hands back without halting, mandate absent still stops at Step 5 with the literal prompt string
+- CLOSED · TOOL-aUnmannedHelm-9 · by 59bf8b73e7eb54ef66eb333054edaa38f6aa1de5 · unit 7: the adopter path. Refuses a foreign repo and an unsupported prefix, ADOPTS through a junction per the codebase-map precedent, and bumps `governance-template` to v2.6 with a v2.5 archive snapshot

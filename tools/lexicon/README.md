@@ -1,4 +1,4 @@
-<!-- gov:kit lexicon@1.10 -->
+<!-- gov:kit lexicon@1.11 -->
 # lexicon — a declared naming vocabulary, gated
 
 An OPT-IN kit that gates two naming predicates against a per-repo DECLARATION, and refuses an import
@@ -413,6 +413,19 @@ predicate reads it. Prose and data formats are excluded, because a fenced code b
 an example rather than a definition, and counting those made a number that moved when somebody wrote
 documentation.
 
+### `--offenders` — the key set, and nothing else
+
+`python <kit>/lexicon.py --offenders` prints one `<path><TAB><rule><TAB><identifier>` line per
+offender of every predicate the verdict reads — the unwaived P1 and P2 offenders, every graded cell's
+convention violations, and each refusal as `-<TAB>problem<TAB><text>` — and exits exactly as the
+default mode does over the same tree. It exists for the merge bar's red attribution, which asks
+whether every offender on a branch was already an offender at its base, and a SET answers that where
+`--list` cannot: `--list` keys each offender by `path:line:`, so one function added above an inherited
+offender moves it, and it cuts its re-lists at 40, which can hide a new offender behind a fixed one.
+This mode carries no line number, no count and no cut; a key repeating inside one file carries
+`#<k>`, its occurrence ordinal there in line order, so two identical offenders stay two. The default
+mode's output is unchanged.
+
 ## Vacuity is armed on BOTH sides
 
 A predicate that selects an empty population passes green forever and tells you nothing. The
@@ -588,19 +601,25 @@ kit-directory guard would leave exactly that edit unchecked.
 ### Which leg grades the declaration
 
 `lexicon wiring` does, and that is a correction rather than a description. `lexicon naming
-predicates` runs the engine over the corpus, but it is guarded on `tools/` and three sibling
+predicates` runs the engine over the corpus, but it was guarded on `tools/` and three sibling
 directories while `.lexicon.conf` sits at the repo ROOT — so a branch whose entire diff was the
 declaration skipped the only leg that would have graded it. Raising `VERB_OFFENDER_PIN`, flipping a
 cell to `dark`, or deleting a `PINS` row together with its cell all landed with no verdict computed,
 and the gate's own red text tells an author to produce exactly that commit shape.
 
-The guard could not simply be widened. `govkit` partitions every declared guard into classes —
-memory-root-relative, verbatim-repo-root, renamed, exempt, kit-relative — and a root-level conf falls
-into none of them, so declaring one reds `govkit selfcheck` instead of scoping anything; that ruling
-is written into this kit's `kit.toml` and was struck twice during the build. What was left was
-`adopt-lexicon.sh --check`, which is the argv of the leg with the empty guard and already reads the
-declaration on every bar. It now runs `lexicon.py` too and fails on a non-zero grade. The guarded leg
-stays as the fast fail on a `tools/` diff. Closing review B1.
+The guard could not simply be widened then. `govkit` partitioned every declared guard into classes —
+memory-root-relative, verbatim-repo-root, renamed, exempt, kit-relative — and a root-level conf fell
+into none of them, so declaring one redded `govkit selfcheck` instead of scoping anything; it was
+struck twice during the build. What was left was `adopt-lexicon.sh --check`, which is the argv of the
+leg with the empty guard and already read the declaration on every bar. It runs `lexicon.py` too and
+fails on a non-zero grade. Closing review B1.
+
+It can be widened now, and is. TOOL-dDerivedDocket-21 gave that partition a sixth class, `root-conf`,
+whose population is every descriptor's declared `[config] file`, and `lexicon naming predicates`
+carries `.lexicon.conf` in its guard, so a conf-only commit runs it. `govkit selfcheck` reds a guarded
+bar leg whose argv names a declared root conf its guard lacks. `lexicon wiring` keeps the grade
+anyway: unguarded, it binds on every bar however a guard is narrowed later, and the guarded leg is the
+early signal under its own name.
 
 ## Waivers
 

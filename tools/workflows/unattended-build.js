@@ -147,6 +147,7 @@ function chunk(a, n) {
 //   base: "<immutable sha>",                        // the review anchor, for the record
 //   units: [{ id, order, specPath, briefPath,      // ORDERED by the caller, from --plan
 //            specBriefPath,                        //   optional: the per-unit SPEC brief
+//            closes,                               //   optional: [<ask id>], the asks this unit answers
 //            planState }],                         //   REQUIRED in attended mode, from --plan
 //   mode: "unattended" | "attended",              // DEFAULTS to "unattended"
 //   runStateExists: <bool>,                         // caller-supplied; this script cannot detect it
@@ -260,6 +261,22 @@ for (const t of TYPED) {
     )
   }
 }
+// TOOL-dDerivedDocket-20 S8 — A UNIT'S `closes` LIST, when present, is an array of ask ids and nothing
+// else. It is the ONE carrier of which asks a unit groups (the build method's M2), so a string, an
+// empty entry or a non-array is refused by name rather than coerced: a coerced list attributes asks
+// to a unit nobody pointed at them.
+for (const u of units) {
+  if (u.closes === undefined) continue
+  const ok = Array.isArray(u.closes) && u.closes.length > 0 &&
+    u.closes.every(function (id) { return typeof id === 'string' && /^\S+$/.test(id) })
+  if (!ok) {
+    throw new Error(
+      'unattended-build: unit ' + u.id + ' carries a `closes` that is not a non-empty array of ask ids, ' +
+        'got ' + JSON.stringify(u.closes) + '. Refusing rather than coercing: this list is the only ' +
+        'record of which asks the unit answers, and a coerced one attributes them to the wrong unit.',
+    )
+  }
+}
 const roundNo = a.round === undefined ? 1 : a.round
 const subjectRound = a.subjectRound === undefined ? roundNo : a.subjectRound
 const subject = slug + '-spec-set-r' + subjectRound
@@ -359,6 +376,16 @@ function renderRoster(list, buildSlug, briefRoot) {
         ' | spec ' + (u.specPath || '(to be authored under memory/builds/' + buildSlug + '/spec/)') +
         ' | brief ' + (u.briefPath || '(to be written under ' + briefRoot + ')')
     })
+    .join('\n')
+}
+// TOOL-dDerivedDocket-20 S8 — the asks each unit of a group answers, one line per unit that carries a
+// `closes` list and none for a unit that does not, so a group with no such unit is handed exactly the
+// prompt it was handed before. Per unit and never per group: a writer holding two units must not
+// write one unit's asks into the other's header.
+function renderCloses(list) {
+  return list
+    .filter(function (u) { return Array.isArray(u.closes) && u.closes.length })
+    .map(function (u) { return '  ' + u.id + ': this unit closes ' + u.closes.join(' ') })
     .join('\n')
 }
 
@@ -596,6 +623,7 @@ const specResults = await boundedParallel(
       const briefs = gUnits
         .filter(function (u) { return u.specBriefPath })
         .map(function (u) { return u.id + ' -> ' + u.specBriefPath })
+      const closing = renderCloses(gUnits)
       return agent(
         GROUND +
           'SPEC every unit below, IN THIS ORDER. This is YOUR GROUP and it is all you are ' +
@@ -604,6 +632,10 @@ const specResults = await boundedParallel(
           (briefs.length
             ? 'Read the brief for each unit that names one, and no other brief:\n  ' +
               briefs.join('\n  ') + '\n\n'
+            : '') +
+          (closing
+            ? 'The asks each unit below answers. Write that unit\'s list into ITS spec header as the ' +
+              '`closes` verb, and into no other unit\'s:\n' + closing + '\n\n'
             : '') +
           'For each: if a conforming spec already carries that id, leave it alone and count it in ' +
           'alreadyPresent. Otherwise author it against `memory/TEMPLATE-SPEC.md` at the tier the ' +
@@ -847,6 +879,51 @@ if (specAudit && (!auRaw || typeof auRaw !== 'object' ||
       'refusal and not a convergence: an absent verdict must never read as CONVERGED, because that ' +
       'token is the only thing between this harness and building on an unreviewed spec set.',
   )
+}
+// ======================== TOOL-dDerivedDocket-29 S6 — A PLATFORM DEATH IS A DEFERRAL, NOT A DEGRADED RUN
+// `tier2-review.js` returns `exit: 'deferred-platform'` whenever a lens, a skeptic batch or its
+// synthesis came back null, with `blockers: null` and the `pending` labels a re-run will dispatch.
+// Tested HERE, ahead of the clean-round test and the non-integer refusal below: that refusal read
+// the same null as DEGRADED and THREW, so a session limit killed the run and the re-run paid for
+// every lens again. Every result that did come back is on disk under the callee's review key, so the
+// remedy is cheap and it is not this script's to take - a workflow script has no clock and cannot
+// wait out a limit. The caller re-runs this workflow ONCE with identical args, and holds on a second
+// deferral. No review round is recorded: nothing was adjudicated. `roster: []`, as on every other
+// non-throwing exit, so `roster.length === 0` stays the caller's whole stop condition.
+// GUARDED ON `specAudit` like every other read of `auRaw` (VERIFYING, dDerivedDocket): with the
+// audit OFF by declaration `auRaw` is null, and an unguarded `.exit` threw a TypeError on every
+// OFF run before its Disposal stage and its NOT-OWED exit could be reached.
+if (specAudit && auRaw.exit === 'deferred-platform') {
+  const pending = Array.isArray(auRaw.pending) ? auRaw.pending : []
+  log('audit round ' + roundNo + ': DEFERRED by the platform — ' + (pending.length ? pending.join(', ') : 'no label named') +
+    ' did not return; no round recorded, no unit built')
+  return {
+    slug: slug,
+    mode: mode,
+    base: base,
+    stage: 'Audit',
+    exit: 'deferred-platform',
+    round: roundNo,
+    pending: pending,
+    key: typeof auRaw.key === 'string' ? auRaw.key : '',
+    units: ordered.length,
+    specced: speccedCount,
+    specRefused: specRefused,
+    subjectRound: subjectRound,
+    auditIds: auditIds,
+    roster: [],
+    next:
+      'Re-run this workflow ONCE with identical args: the review reuses every lens and skeptic batch that ' +
+      'returned and dispatches only ' + (pending.length ? pending.join(', ') : 'what is missing') + '. ' +
+      (attended
+        ? 'On a second deferred-platform, stop and report it to the owner: an attended run has no driver to hold.'
+        : 'On a second deferred-platform, hold: ' + DRIVER + ' --hold ' + slug + ' --code platform-limit ' +
+          '--until "after <reset UTC>" when the Workflow result names a usage or session limit, and --code ' +
+          'platform-unavailable --until "probe api" otherwise, each with --pending-run <that Workflow runId> ' +
+          'beside the --reason and --reaped that the hold step of the unattended Skill names.'),
+    note: 'DEFERRED AT AUDIT — ' + pending.length + ' review agent(s) did not return, so the round is unrecorded and no unit was built' +
+      (attended ? ' · ATTENDED, so no driver-side check ran' : ''),
+  }
 }
 // THE CALLEE'S EARLY RETURNS CARRY `confirmed: []` AND `blockers: null`, and they are NOT all
 // degraded (closing review round 1, cluster F). `tier2-review.js` returns that pairing on four

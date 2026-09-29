@@ -320,8 +320,12 @@ esac
 # So this arm skips the gate and feeds the awk PROGRAM ITSELF the one input the roles disagree on.
 # The program text is EXTRACTED from the gate rather than copied here: a copy would be two answers to
 # one question, and an edit to the real awk has to reach this arm or the arm grades a fossil.
+# ANCHORED ON `-v pinf="$CARRIED"`, the one line that opens this program and no other, and never on
+# how the call is wrapped: TOOL-dDerivedDocket-23 S3 captured the call as `_cv=$(awk …` for
+# --offenders, and an anchor on a bare `awk -F` at the line start then matched nothing, so this arm
+# extracted an empty file.
 _awkprog="$TMP/role.awk"
-awk '/^  awk -F/ {grab=1; next} grab && /^    \}.*CARRIED/ {print "}"; exit} grab {print}' \
+awk '/-v pinf="\$CARRIED"/ {grab=1; next} grab && /^    \}.*CARRIED/ {print "}"; exit} grab {print}' \
   tools/check-install-prefix.sh > "$_awkprog"
 if [ ! -s "$_awkprog" ] || ! grep -q 'UNRECORDED' "$_awkprog"; then
   bad "L5: could not EXTRACT the awk program from the gate — this arm is grading nothing, which is the exact class it exists to close"
@@ -575,6 +579,68 @@ if [ "$BAN_ARMS" -ge 5 ]; then
 else
   bad "LIVENESS only $BAN_ARMS ban arm(s) reached the gate — the rest fell through or SKIPPED, so this section reports on arms that did not run"
 fi
+# --- --offenders: the SIGNATURE the merge bar grades this leg with (TOOL-dDerivedDocket-23 S3) ---
+# ONE KEY PER HIT AND NOTHING ELSE, because the bar's red attribution compares two trees' key SETS.
+# Graded on the three ways a set goes wrong: a key carrying its line number (it moves when an
+# unrelated line lands above it), two identical hits collapsing into one, and prose leaking into the
+# set. Its exit is `--check`'s, and the carried-prefix arm's failing files are keyed per literal.
+O="$TMP/offenders"; mkfix "$O" 'Run `bash memory-tree/check-memory-hygiene.sh` or `bash memory-tree/check-memory-hygiene.sh`.'  # gov:root-fixture — two identical root spellings on one line, for the ordinal arm
+_orm=$(git -C "$O" ls-files -- '*README.md' | head -1)
+_osp='memory-tree/check-memory-hygiene.sh'  # gov:root-fixture — the spelling the two keys above must carry
+_owant=$(printf '%s\troot\t%s\n%s\troot\t%s#2' "$_orm" "$_osp" "$_orm" "$_osp")
+oout=$(cd "$O" && bash "$GATE_REL" --offenders 2>/dev/null); orc=$?
+(cd "$O" && bash "$GATE_REL" >/dev/null 2>&1); ocrc=$?
+[ "$oout" = "$_owant" ] && good "--offenders prints exactly the two keys, the repeat carrying its ordinal" \
+  || { bad "--offenders printed a different key set"; printf '%s\n' "$oout" | sed 's/^/      /' | head -6; }
+{ [ "$orc" = "$ocrc" ] && [ "$orc" = 1 ]; } && good "--offenders exits as --check does (1)" \
+  || bad "--offenders exited $orc where --check exited $ocrc"
+{ printf 'an unrelated first line\n\n'; cat "$O/$_orm"; } > "$O/readme.tmp" && mv "$O/readme.tmp" "$O/$_orm"
+printf 'unrelated\n' > "$O/$(dirname -- "$_orm")/other.md"; git -C "$O" add -A >/dev/null 2>&1
+oout2=$(cd "$O" && bash "$GATE_REL" --offenders 2>/dev/null)
+[ "$oout2" = "$_owant" ] && good "--offenders keys do not move when an unrelated line and file land above them" \
+  || { bad "--offenders keys moved under an unrelated edit"; printf '%s\n' "$oout2" | sed 's/^/      /' | head -6; }
+rout=$(cd "$R" && bash "$GATE_REL" --offenders 2>/dev/null); rrc=$?
+_rn=$(printf '%s\n' "$rout" | awk -F'\t' 'NF == 3 && $2 == "carried" { n++ } END { print n + 0 }')
+{ [ "$rrc" = 1 ] && [ "$_rn" = 2 ] && [ "$(printf '%s\n' "$rout" | grep -c '#2$')" = 1 ]; } \
+  && good "--offenders keys a ROSE file once per carried literal, the repeat carrying its ordinal" \
+  || { bad "--offenders did not key the ROSE file per literal (rc $rrc, $_rn carried key(s))"; printf '%s\n' "$rout" | sed 's/^/      /' | head -6; }
+
+# --- --offenders over ARM 3 (merge-2 skeptic F6/F7) ---------------------------------------------
+# The runtime arm's keys come out of a python program. Compared BYTE-FOR-BYTE, because on Windows a
+# text-mode stdout ended every key but the last in CR and only an exact reader sees that; TWO keys,
+# because the last one never carried it. Observed RED against the gate before the fix.
+OK3="$TMP/offenders-runtime"; mkfix_source "$OK3" 'A demo kit.'
+printf 'bash "$ROOT/tools/demo/thing.sh" --go\nbash "$ROOT/tools/demo/thing.sh" --again\n' >> "$OK3/tools/demo/thing.sh"
+git -C "$OK3" add -A >/dev/null 2>&1
+(cd "$OK3" && bash "$GATE_REL" --write-ratchet >/dev/null 2>&1); git -C "$OK3" add -A >/dev/null 2>&1
+_k3f=$(git -C "$OK3" ls-files -- '*/thing.sh' | head -1); _k3s=$(dirname -- "$_k3f")
+_k3want=$(printf '%s\truntime\t%s\n%s\truntime\t%s#2' "$_k3f" "$_k3s" "$_k3f" "$_k3s")
+k3out=$(cd "$OK3" && bash "$GATE_REL" --offenders 2>/dev/null); k3rc=$?
+{ [ "$k3out" = "$_k3want" ] && [ "$k3rc" = 1 ]; } \
+  && good "--offenders keys arm 3's runtime literals, LF-terminated, the repeat carrying its ordinal" \
+  || { bad "--offenders printed a different arm-3 key set (rc $k3rc)"; printf '%s\n' "$k3out" | od -c | sed 's/^/      /' | head -8; }
+# A DEAD arm 3 beside an arm-1 hit. Arm 1's key has already streamed when arm 3 refuses, so a keyless
+# exit left a set that is a SUBSET of any tree carrying the same hit, and the bar read that INHERITED
+# while --check redded on the dead probe. The probe key is what makes the set say so. No code file
+# ships here, so arm 3 grades nothing. Observed RED against the gate before the fix.
+ODP="$TMP/offenders-deadprobe"; mkfix_source "$ODP" 'Run `bash demo/kit.toml` to read it.'
+rm -f "$ODP/$_k3f"; git -C "$ODP" add -A >/dev/null 2>&1
+(cd "$ODP" && bash "$GATE_REL" --write-ratchet >/dev/null 2>&1); git -C "$ODP" add -A >/dev/null 2>&1
+_dprm=$(git -C "$ODP" ls-files -- '*README.md' | head -1)
+_dp1=$(printf '%s\troot\t%s' "$_dprm" "demo/kit.toml")
+dpout=$(cd "$ODP" && bash "$GATE_REL" --offenders 2>/dev/null); dprc=$?
+{ [ "$dpout" = "$(printf '%s\n-\truntime-dead-probe\t-' "$_dp1")" ] && [ "$dprc" = 1 ]; } \
+  && good "--offenders keys a DEAD arm 3 beside arm 1's streamed key, so the set is no subset" \
+  || { bad "--offenders left a dead arm 3 keyless beside arm 1's key (rc $dprc)"; printf '%s\n' "$dpout" | sed 's/^/      /' | head -6; }
+# ...and its GREEN CONTROL over the same fixture: a shipped code file brings arm 3 back to life, so
+# the probe key goes and arm 1's key stands alone. Without this the arm above would also pass for a
+# gate that printed the probe key on every run.
+printf '#!/usr/bin/env bash\necho a demo engine\n' > "$ODP/$_k3f"; git -C "$ODP" add -A >/dev/null 2>&1
+dcout=$(cd "$ODP" && bash "$GATE_REL" --offenders 2>/dev/null); dcrc=$?
+{ [ "$dcout" = "$_dp1" ] && [ "$dcrc" = 1 ]; } \
+  && good "...and with a live arm 3 the same fixture prints arm 1's key and no probe key" \
+  || { bad "a live arm 3 still printed something beyond arm 1's key (rc $dcrc)"; printf '%s\n' "$dcout" | sed 's/^/      /' | head -6; }
+
 # --- THE LIVENESS ASSERTION ON THE SUITE ITSELF ------------------------------------------------
 # A self-test whose every fixture takes one branch is `fixture-passes-by-finding-nothing` applied to
 # the grader, and it needs the same treatment as any other probe that cannot move. This is the arm

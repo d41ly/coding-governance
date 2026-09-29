@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.103 -->
+<!-- gov:kit memory-tree@2.104 -->
 # The build method — how a multi-pass build runs
 
 ## M1 — What this is
@@ -34,6 +34,7 @@ closed forks.
 **Decompose first**, before anything is classified: **one mechanism per spec.** A separate document, gate, adopter
 or generated artifact is a separate unit with its own id and spec. Two mechanisms in one spec make a "unit built"
 pass unreviewable — the closing diff cannot tell which half a finding lands on.
+Grouping asks into one unit is written ONLY as that unit's `closes` list.
 
 **Detect.** The roster is the build README's authored Units table where one exists, else the conforming specs under
 `{{MEMORY_ROOT}}/builds/<slug>/spec/`. **`ids:` is not it either** — it is DERIVED and rewritten by the index generator, so it
@@ -78,6 +79,7 @@ resolved before it, a decision.
 **What is delegated.** A standing mandate delegates the owner's resolver authority for the named build only —
 the forks its specs state, AND that build's own scope by M2's AMEND acts. Two bounds: the README's GOAL statement is what a run may not amend (under a canon it IS the immutable description slot, folded there because two slots that must agree are one fact twice), and the delegation does not reach veto 2's governance-carrier clause,
 M1's own budget included. Vetoes 1 and 3 stand. A fork the goal cannot survive is still not yours — park it.
+A `may:` grant in an owner-committed README lifts veto 2 for what it names; protocol §1 is the rule.
 With no mandate, forks go to the owner and this is preparation.
 
 **Ratify the most FEATURE-RICH option** — most stated acceptance criteria satisfied, fewest follow-ups left open —
@@ -106,10 +108,7 @@ puts code before the fork is resolved — a rewrite, not a decision.
 vacuous-selector class, and a probe cannot tell "satisfied" from "matched nothing". A real fork here was resolved
 AGAINST the better measurement for that reason, so a testing rule without this exception gets it wrong.
 
-**Mark it in place** per `{{MEMORY_ROOT}}/TEMPLATE-SPEC.md` §8, naming resolver and authority, never `(owner, …)` for a
-decision the owner did not make. The mark must be the documented SHAPE — the word, then
-`(<owner|agent>, <date>[, delegated])` — and it may WRAP. Both readers grade the SECTION, not each item: with any
-item present ONLY a conforming mark resolves it, the first line does not vote, and §8 says what that cannot see.
+**Mark it in place**, in the shape `{{MEMORY_ROOT}}/TEMPLATE-SPEC.md` §8 states with what its readers grade.
 
 ## M4 — The spec audit — owed only where the build or its project declares it
 
@@ -180,10 +179,7 @@ checklist over what you just committed, and act on it before the next pass begin
 python {{KIT_DIR}}/gotchas.py --for-diff HEAD~1..HEAD
 ```
 
-**It takes a COMMITTED range, so it runs after the commit, not before it.** Staged-but-uncommitted work is not in
-`HEAD`, so the pre-commit spelling `<pass-base>..HEAD` resolves to an empty range and prints "touches no file" —
-which reads as a clean checklist and is not one. Its stdout IS the checklist and it always exits 0 — finish it, do
-not read its status. If a class it names is already violated, that is the next pass.
+**It takes a COMMITTED range and always exits 0**: the trap and the reading are beside its row in `{{KIT_DIR}}/README.md`.
 
 **A pass runs no merge bar and no self-test suite.** Its verification is the direct check its
 spec's acceptance names — a checker run on a staged break, a `--selftest` flag, a fixture — and a
@@ -198,12 +194,12 @@ change commits nothing and says so.
 build's authored record. A bare "parked" is indistinguishable from "forgotten", and M9 is where the owner gets the
 turn you did not take.
 
-**`parallel-when-disjoint`: parallelism is REQUIRED where disjointness is PROVEN; sequence is the
-fallback.** Two passes MUST run
-concurrently when, and may only when: (1) their WRITE sets — actual paths, written down before dispatch — do
+**`parallel-when-disjoint`: two DELEGATED passes MUST run concurrently (an inline author may
+sequence its own and says so in the unit's brief) when, and only when: (1) their WRITE sets —
+actual paths, written down before dispatch — do
 not intersect; (2) neither writes a file the other reads as a contract (conf, template, interface, generator
 input) or as an acceptance input, and neither depends on the other's output either way; (3) neither touches a
-shared mutable record — `{{MEMORY_ROOT}}/DECISIONS.md`, `{{MEMORY_ROOT}}/backlog/*.md`, the run-state file, or a generated index
+shared mutable record — `{{MEMORY_ROOT}}/DECISIONS.md`, an authored backlog shard, the run-state file, or a generated index
 TOGETHER WITH its generator. If you cannot write both path lists down, the work is not known to be disjoint —
 sequence it. Both lists are RECORDED, not merely written: the unattended kit's `--dispatch`.
 
@@ -285,6 +281,7 @@ from, the line does not go in.**
 |---|---|
 | build log and slug | `{{MEMORY_ROOT}}/builds/<slug>/` + generated `{{MEMORY_ROOT}}/LIVE.md` and `{{MEMORY_ROOT}}/ledger/<month>.md` |
 | decisions taken | every §8 `RESOLVED` mark across the spec set (M3) + the `{{MEMORY_ROOT}}/DECISIONS.md` rows this build minted + its commits' `Decided:` trailers (M10) |
+| asks filed and disposed | the index generator's `--asks --build <slug> --all` |
 | problems resolved | each review record's `## Verdict` line and its blockers/highs (M4, M8) + the bug classes the checklist selected |
 | open / parked | every `surfaced`-class parked entry in the authored record (M6) with question, options and reason, plus any recorded DoD override or directive waiver. `history`-class entries — a review round, say — are append-only sequence, carry no question, and are not the owner's to adjudicate |
 | repo state | branch · shas · gate verdict · under a mandate the phase claim and its witness |

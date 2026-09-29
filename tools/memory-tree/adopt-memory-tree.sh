@@ -630,7 +630,7 @@ for d in $DISCIPLINES; do
   fam=$(FAMILY_of "$d")
   printf '# %s backlog (%s)
 
-> Mutable. Each row leads with one status token (OPEN…WONTDO).
+> Mutable. One row per ask: `- <ID> · <STATUS> · <text>`, the id first, then exactly one status token (OPEN…WONTDO).
 ' "$fam" "$d" > "$M/backlog/$fam.md"
 done
 # builds/ starts empty; a .gitkeep would be an unsanctioned entry under check 3, so the first build

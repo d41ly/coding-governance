@@ -1,6 +1,6 @@
 # drift-audit kit
 
-`gov:kit drift-audit@1.15` — the marker a deployer greps; paired with `KIT_DRIFT_AUDIT_VERSION` in
+`gov:kit drift-audit@1.17` — the marker a deployer greps; paired with `KIT_DRIFT_AUDIT_VERSION` in
 `drift_report.py` and asserted equal by `tools/check-kit-versions.sh`, which also holds each Tier-2
 harness's own `meta.version` to the same number.
 
@@ -118,9 +118,15 @@ Tier 2 needs the two workflow scripts from `tools/workflows/drift-audit-{code,st
 | `closed_specs_with_no_product_commit` | does a CLOSED spec have a commit that names it and changed the product? | yes |
 | `lexicon_verbs_declared_but_unused` | does the verb table still describe the code it was derived from? | yes |
 | `lexicon_ratified_older_than_language_surface` | was the table curated since the languages it grades last moved? | yes |
-| `live_backlog_rows_per_shard` | is a shard’s live set approaching the floor rotation cannot clear? | no |
+| `live_backlog_rows_per_shard` | is a shard’s live set approaching the floor rotation cannot clear? Under `BACKLOG_MODE="builds"`, how many asks derive live, read from the generator’s own live projection? | no |
 | `readme_mechanism_drift` | does a build README still describe a mechanism its own spec set revised? | no |
+| `backlog_asks_contested` | does an ask carry both closing and declining evidence, or terminal evidence beside a live spec? Not asked under `shards`. | no |
+| `backlog_evidence_sha` | does every `by <sha>` closing an ask resolve to a commit in this clone? Not asked under `shards`. | no |
+| `backlog_asks_unlabelled` | how many live asks carry no severity row? Not asked under `shards`. | no |
+| `backlog_stragglers` | does a ref still carry backlog row changes unaccounted against the default branch? | no |
+| `asks_disposed_overrides` | how often did a run buy the `asks-disposed` Definition-of-Done item with an override? | no |
 | `run_records_nonterminal_but_merged` | does a run record still read live after its work reached the default branch? | no |
+| `legs_retried_after_timeout` | how many legs did the merge bar retry, once and alone, after their own ceiling fired, over the run records this git dir still holds? | no |
 
 **Every signal carries a `live` field.** A signal whose population is empty prints `DEAD PROBE`
 instead of a clean `0`. This is the kit's central rule and it is not decoration: the upstream repo's
@@ -171,6 +177,28 @@ Three states, three distinct sentences, and the split is the point:
 The retired ternary had three branches and conflated the last two into the bare word `complete`, so
 a run that measured NOTHING reported the same word as a clean one. Changing any of these sentences
 is a version bump like any other.
+
+## What "landed" is measured against — the base ladder
+
+Every ancestry answer, every `git show <base>:<path>` a ratchet reads and the trace walk are
+measured against ONE ref, and the report prints it on its header line with the commit it resolved
+to: `(base refs/remotes/origin/main @ 1a2b3c4d)`. It is resolved remote-first:
+
+1. `--base-ref <ref>`, verbatim. The escape hatch for every rung below.
+2. The default branch's NAME: `GOV_DEFAULT_BRANCH`, else the last component of
+   `refs/remotes/origin/HEAD`, else a refusal (exit 2) naming both and `git remote set-head origin -a`.
+3. `refs/remotes/origin/<name>`, whenever it resolves.
+4. A clone with **no `origin` remote** compares against `refs/heads/<name>` and says so on stderr.
+   There is no staler or fresher copy of the branch in such a clone, so local is the record.
+5. A clone that **has `origin` but no tracking ref** for the branch refuses with exit 2 and names
+   `git fetch origin <name>`. Falling back to local there is the defect this ladder removes.
+
+The base used to be the bare branch name, which git resolves to the LOCAL branch, so the same commit
+read differently on a node whose local `main` was stale: a pin raise already on origin read as a
+weakened ratchet on that node alone. The report never fetches — it is a leg that must run offline,
+and a fetch would move the ref it is grading — so a node wanting a fresher answer fetches first.
+TOOL-dDerivedDocket-21. A CI checkout that fetches branches without
+`refs/remotes/origin/HEAD` still needs `GOV_DEFAULT_BRANCH`, as before.
 
 ## Why pins rather than a perfect oracle
 

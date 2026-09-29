@@ -86,12 +86,26 @@ py=$(resolve_python "${PYBIN:-}") || { echo "check-wiring.test: no usable python
 # third rung for `scripts/`.
 src_of() { for c in "$HERE/$1" "$REPO/$1"; do [ -e "$c" ] && { echo "$c"; return; }; done; }
 
+# THE MEMORY-TREE KIT'S OWN MODULES, laid WHOLE into $1 and DERIVED from the directory the shipped
+# driver sits in rather than typed. `merge-rows.py` loads siblings at run time: `backlog.py` for the
+# view/shard refusal that opens EVERY merge, and `tree_lib.py` for its conf read. A fixture carrying a
+# typed subset holds a driver that cannot start, so every arm that RUNS it reads UNWIRED for the
+# fixture's reasons. That is how AC10, AC12 and U19 AC1 went red when TOOL-dDerivedDocket-10 gave the
+# driver its view predicate: the lists here predated `backlog.py`. A glob of the kit is what a
+# copy-install lays, so a sibling the driver gains later reaches these fixtures with no edit here.
+seed_driver_kit() {  # $1 = destination directory -> every python module of the memory-tree kit
+  local drv
+  drv=$(src_of memory-tree/merge-rows.py)  # gov:root-fixture — src_of keys under the tool root; the kit dir is the driver's own
+  [ -n "$drv" ] || { ck "seed_driver_kit: the memory-tree kit is not installed in $REPO (the driver cannot run without it)" 0; return 1; }
+  cp "${drv%/*}/"*.py "$1/"
+}
+
 # Lay a COMPLETE, RUNNABLE merge-driver install into the cwd under prefix $1 ("tools/" here, "" for
 # the copy-installed adopter layout). Complete is the point: the driver sources a resolver through
-# its shim, imports its anchor grammar from the sibling memory-recall kit, and walks up for
-# `.memory-tree.conf`. A fixture missing any of those holds a driver that CANNOT START — which is
-# exactly the state the arm under test has to report, so it must be reachable on purpose and never
-# by accident.
+# its shim, imports its anchor grammar from the sibling memory-recall kit and its view layer from its
+# own kit (`seed_driver_kit`), and walks up for `.memory-tree.conf`. A fixture missing any of those
+# holds a driver that CANNOT START — which is exactly the state the arm under test has to report, so
+# it must be reachable on purpose and never by accident.
 install_driver() {
   local p="$1" rel src
   mkdir -p "${p}memory-tree" "${p}lib" "${p}memory-recall" memory/backlog
@@ -108,6 +122,7 @@ install_driver() {
     [ -n "$src" ] || { ck "install_driver: $rel is not installed in $REPO (the driver cannot run without it)" 0; return 1; }
     cp "$src" "${p}${rel}"
   done
+  seed_driver_kit "${p}memory-tree" || return 1
   printf 'MEMORY_ROOT=memory\nFAMILIES="tooling:TOOL"\n' > .memory-tree.conf
   # A REAL ANCHORED ROW, not an empty index. The merge arm harvests the family prefix each row LEADS
   # with and requires the conf to declare it — over an index with no rows that harvest is empty and
@@ -1036,7 +1051,10 @@ ck "S4 a declared path that is absent does NOT fall back to the rung" \
 rm -rf "$OOTS"; cleanup
 
 # ---- TOOL-aWeldedTribunal-7: WHICH HOOK WILL ACTUALLY RUN --------------------------------------
-# `core.hooksPath` is repo-global and absolute, so a sibling worktree supplies the hook that gates
+# The shared `core.hooksPath` applies unless a worktree's config.worktree sets its own, and the
+# value in effect decides which hook files run: an ABSOLUTE value runs the hooks of the checkout it
+# names, the relative `.githooks` check-wiring writes runs each worktree's own — so under an
+# absolute value a sibling checkout supplies the hook that gates
 # your push. The check REPORTS that as a `note` and must never gate on it: `unwired` decides this
 # script's exit code and `.unattended.conf` makes `--check` an unattended run's precondition, so an
 # UNWIRED line would refuse every unattended run whenever another checkout moved.
@@ -1063,6 +1081,23 @@ out=$(bash "$SCRIPT" --check 2>&1); rc=$?
 ck "hooks: the pre-commit half is reported too" \
    "$(printf '%s' "$out" | grep -q 'pre-commit DIVERGES' && echo 1 || echo 0)"
 ck "hooks: two divergences still exit 0" "$([ "$rc" = 0 ] && echo 1 || echo 0)"
+# TOOL-dDerivedDocket-9 — THE THIRD HOOK. `commit-msg` carries hygiene check 26 at the moment
+# a merge is CONCLUDED, so a sibling checkout supplying somebody else's copy of it is exactly
+# the divergence this check exists to report — and until `commit-msg` joined
+# `GOV_WIRING_HOOKS` it could never report one. A FIXTURE arm, because an adopter's hook
+# population is theirs; the both-ways comparison against THIS repo's tracked hooks lives in
+# the memory-tree kit's transition-audit suite, which is gov-only.
+printf '#!/bin/sh\nexit 0\n' > .githooks/commit-msg; chmod +x .githooks/commit-msg
+git add -A; git commit -q -m "track the commit-msg hook"
+cp .githooks/commit-msg "$OOT/"
+out=$(bash "$SCRIPT" --check 2>&1)
+ck "hooks: an identical commit-msg reports no divergence" \
+   "$(printf '%s' "$out" | grep -q 'commit-msg DIVERGES' && echo 0 || echo 1)"
+printf '# planted\n' >> "$OOT/commit-msg"
+out=$(bash "$SCRIPT" --check 2>&1); rc=$?
+ck "hooks: a diverging commit-msg is REPORTED" \
+   "$(printf '%s' "$out" | grep -q 'commit-msg DIVERGES' && echo 1 || echo 0)"
+ck "hooks: the commit-msg divergence does not gate either" "$([ "$rc" = 0 ] && echo 1 || echo 0)"
 rm -f "$OOT/pre-push"
 out=$(bash "$SCRIPT" --check 2>&1)
 ck "hooks: an unreadable side is UNKNOWN, never ok" \
@@ -1124,6 +1159,102 @@ ck "prefix: no remedy in that install still names the dead tools/ merger" \
    "$(printf '%s' "$out" | grep -q 'tools/settings-merge' && echo 0 || echo 1)"
 cleanup
 
+# ---- Check T: local branches that still owe a backlog relocation (TOOL-dDerivedDocket-13) -------
+# The fixture below publishes a bare origin and observes `origin/HEAD`, so an ambient
+# GOV_DEFAULT_BRANCH is machine state that changes what it measures: the inventory's own
+# resolver REFUSES when the declared name disagrees with the observed default.
+unset GOV_DEFAULT_BRANCH
+# The step is REPORT-ONLY by construction: `unwired` decides this script's exit code and
+# `.unattended.conf` makes `--check` an unattended run's precondition, so a straggler reported as
+# UNWIRED would refuse every unattended run on this node for a branch somebody else owns. These arms
+# hold that severity, the mode gate in front of it, and the fact that it names the branch at all.
+seed_relocation_kit() { # $1 = install prefix ("" here, the copy-installed adopter layout)
+  local p="$1" rel src
+  for rel in memory-tree memory-recall lib; do
+    src=$(src_of "$rel")
+    [ -n "$src" ] || { ck "seed_relocation_kit: $rel is not installed in $REPO" 0; return 1; }
+    cp -r "$src" "${p}${rel}"
+  done
+  rm -rf "${p}memory-tree/__pycache__" "${p}memory-recall/__pycache__"
+  # The recall-opened OPT-IN pair is dropped on purpose. It is not a dependency of the straggler
+  # inventory, and leaving it here makes check R report UNWIRED over a fixture with no settings.json
+  # — which would decide this script's exit code and make the `--check` arm below assert nothing
+  # about the straggler severity it exists to hold.
+  rm -f "${p}memory-recall/recall-opened.js" "${p}memory-recall/recall-opened.fragment.json"
+}
+# A SHARDS-mode tree first: the step must be silent about stragglers where no branch can be one.
+newrepo
+seed_relocation_kit "" || true
+mkdir -p memory/backlog memory/builds/aSeed
+printf 'MEMORY_ROOT=memory\nDISCIPLINES="tooling"\nFAMILIES="tooling:TOOL"\nROTATION_MODE="cut"\nBACKLOG_MODE="shards"\n' > .memory-tree.conf
+printf '# the seed build\n' > memory/builds/aSeed/README.md
+printf '# decisions\n\n- TOOL-aSeed-9 - a decision\n' > memory/DECISIONS.md
+printf '# TOOL backlog\n\n- TOOL-aSeed-1 - the first ask\n' > memory/backlog/TOOL.md
+printf '__pycache__/\n' > .gitignore
+git add -A; git commit -q -m "a shards-mode memory tree"
+out=$(chke --session)
+ck "straggler: a shards-mode tree reports no straggler line" \
+   "$(printf '%s' "$out" | grep -q '^note     straggler' && echo 0 || echo 1)"
+ck "straggler: and says which condition held it back" \
+   "$(printf '%s' "$out" | grep -q "^skip     straggler — BACKLOG_MODE is not 'builds'" && echo 1 || echo 0)"
+# Now the flip, a bare origin so the default branch is OBSERVABLE, and one local straggler.
+git checkout -q -b strag
+printf '# TOOL backlog\n\n- TOOL-aSeed-1 - the first ask, REWORDED by the straggler\n' > memory/backlog/TOOL.md
+git commit -q -am "the straggler edits a row"
+git checkout -q main
+printf 'MEMORY_ROOT=memory\nDISCIPLINES="tooling"\nFAMILIES="tooling:TOOL"\nROTATION_MODE="cut"\nBACKLOG_MODE="builds"\n' > .memory-tree.conf
+mkdir -p memory/builds/aFlip
+printf '# aFlip\n\n## Asks\n\n## Dispositions\n' > memory/builds/aFlip/BACKLOG.md
+git add -A; git commit -q -m "flip to builds"
+OOT=$(mktemp -d); git init -q --bare -b main "$OOT/origin.git"
+git remote add origin "$OOT/origin.git"; git push -q origin main
+git remote set-head origin -a >/dev/null 2>&1
+out=$(chke --session); rc=$?
+ck "straggler: --session exits 0 over a tree holding one" "$([ "$rc" = 0 ] && echo 1 || echo 0)"
+ck "straggler: exactly one note line" \
+   "$([ "$(printf '%s\n' "$out" | grep -c '^note     straggler')" = 1 ] && echo 1 || echo 0)"
+ck "straggler: and it names the branch" \
+   "$(printf '%s' "$out" | grep -q 'refs/heads/strag' && echo 1 || echo 0)"
+# UNDER --check THE SEVERITY IS UNCHANGED AND THE EXIT IGNORES IT. This is the load-bearing arm:
+# anything reading a non-zero exit as a refusal must not learn about stragglers that way.
+out=$(chke --check); rc=$?
+ck "straggler: --check reports it at note severity, never UNWIRED" \
+   "$(printf '%s' "$out" | grep -q '^UNWIRED  straggler' && echo 0 || echo 1)"
+ck "straggler: --check still names it" \
+   "$(printf '%s' "$out" | grep -q '^note     straggler' && echo 1 || echo 0)"
+ck "straggler: and the straggler alone does not decide the exit" \
+   "$([ "$rc" = 0 ] && echo 1 || echo 0)"
+# ONE CONF GRAMMAR (closing diff review round 1, F6): the step's mode read and the kit's own
+# `tree_lib.parse_conf` agree over every legal spelling of the flip. The step's answer is read off its
+# own line, and an answer that is neither the mode skip nor a straggler line is its own value, so a
+# step that printed nothing cannot agree. The pipeline this step used read the commented and the
+# exported spellings as not flipped and skipped a flipped tree.
+cat > "$D/.git/mode-kit.py" <<'PYEOF'
+import sys
+
+sys.path.insert(0, sys.argv[1])
+import tree_lib  # noqa: E402  the kit's ONE conf parser
+
+with open(".memory-tree.conf", encoding="utf-8", newline="") as fh:
+    conf = tree_lib.parse_conf(fh.read(), {})
+sys.stdout.write("builds" if conf.get("BACKLOG_MODE") == "builds" else "not-builds")
+PYEOF
+for spell in 'absent|' 'blank|BACKLOG_MODE=""' 'quoted|BACKLOG_MODE="builds"' \
+             'commented|BACKLOG_MODE=builds   # flipped by the switch-over' \
+             'exported|export BACKLOG_MODE=builds' "single|BACKLOG_MODE='builds'" \
+             'quoted-commented|BACKLOG_MODE="builds"  # flipped'; do
+  printf 'MEMORY_ROOT=memory\nDISCIPLINES="tooling"\nFAMILIES="tooling:TOOL"\nROTATION_MODE="cut"\n%s\n' "${spell#*|}" > .memory-tree.conf
+  kitmode=$("$py" "$D/.git/mode-kit.py" "$D/memory-tree" 2>&1)
+  out=$(chke --session)
+  if printf '%s' "$out" | grep -q "^skip     straggler — BACKLOG_MODE is not 'builds'"; then shmode=not-builds
+  elif printf '%s' "$out" | grep -qE '^(note|ok) +straggler '; then shmode=builds
+  else shmode="no straggler line"; fi
+  ck "straggler F6: the '${spell%%|*}' spelling reads '$kitmode' to the kit's parser and '$shmode' to the step" \
+     "$([ "$shmode" = "$kitmode" ] && echo 1 || echo 0)"
+done
+rm -f "$D/.git/mode-kit.py"
+cleanup
+
 # ---- TOOL-aRepatriatedFork-19: the install RECEIPT is the first rung -----------------------------
 # An adopter that homes a kit somewhere no probe spells — the merge driver flat under `scripts/`, the
 # recall kit at `scripts/recall/`, the scratch guard in `.claude/hooks/` — got `skip … not adopted`
@@ -1144,6 +1275,7 @@ if [ -f "$SMERGE" ] && [ -f "$SGFRAG" ] && [ -n "$FRAG" ]; then
   _flat="memory-tree/merge-rows.py memory-tree/merge-rows.sh"  # gov:root-fixture — src_of keys under the tool root; the scratch repo lays them FLAT under scripts/, where no probe looks
   _grammar="memory-recall/extract.py memory-recall/recall_conf.py"  # gov:root-fixture — src_of keys under the tool root; the grammar kit the flat driver finds beside itself
   for rel in $_flat; do cp "$(src_of "$rel")" "scripts/${rel#*/}"; done
+  seed_driver_kit scripts   # FLAT as well: the driver imports its siblings from its own directory
   for rel in $_grammar; do cp "$(src_of "$rel")" "scripts/$rel"; done
   printf 'MEMORY_ROOT=memory\nFAMILIES="tooling:TOOL"\n' > .memory-tree.conf
   printf '# tooling backlog\n\n- TOOL-001 | a landed row, so the family harvest has a population\n' > memory/backlog/TOOL.md
@@ -1204,6 +1336,31 @@ print(m.resolve_kit_dir(sys.argv[1], sys.argv[2], ".").relative_to(pathlib.Path(
   cleanup
 else
   echo "skip receipt cases — settings-merge.py, scratch-guard.fragment.json or recall-opened.fragment.json not found"
+fi
+
+# ---- merge-2 skeptic F4: the STRAGGLER arm takes the receipt rung too ------------------------------
+# It auto-merged without it, the one arm left finding its kit file by gov's layout alone, so an engine
+# homed where no probe spells it read `not installed here` over an installed kit. The engine sits ONLY
+# where the receipt says. Whether it then RUNS in this bare fixture is not this arm's question, so the
+# first arm asserts only that the line stops calling it missing. Observed RED against the arm without
+# the rung, on a scratch copy.
+_tk=memory-tree; _te=migrate_backlog.py
+if [ -n "$(src_of "$_tk/$_te")" ]; then
+  newrepo; mkdir -p scripts
+  cp "$(src_of "$_tk/$_te")" "scripts/$_te"
+  write_receipt "scripts/$_te=$_tk/$_te"
+  printf 'MEMORY_ROOT=memory\nFAMILIES="tooling:TOOL"\nBACKLOG_MODE="builds"\n' > .memory-tree.conf
+  git add -A; git commit -q -m "a receipted straggler engine"
+  line=$(chk --check | grep -E '^[A-Za-z]+ +straggler ' || true)
+  ck "F4 a receipted straggler engine is found, not skipped as not installed" \
+     "$([ -n "$line" ] && ! printf '%s' "$line" | grep -q 'is not installed here' && echo 1 || echo 0)"
+  rm -f "scripts/$_te"
+  line=$(chk --check | grep -E '^skip +straggler ' || true)
+  ck "F4 ...and a receipted-but-missing engine skips naming the receipt row and the path" \
+     "$(printf '%s' "$line" | grep -qF "install.json row for $_tk/$_te names scripts/$_te, which is absent" && echo 1 || echo 0)"
+  cleanup
+else
+  echo "skip F4 straggler receipt cases — no $_te beside this suite"
 fi
 
 # AC5 — the eol arm's SECOND named glob: a tracked, pinned `.claude/workflows/*.js` holding CR bytes

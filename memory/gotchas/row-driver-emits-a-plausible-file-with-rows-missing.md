@@ -8,6 +8,10 @@ kind: class
 
 ## Symptom
 
+This holds under `BACKLOG_MODE="shards"` only. From the switch-over (TOOL-dDerivedDocket-34)
+the shards are generated views the driver refuses to merge into, and the authored rows are the
+per-build `BACKLOG.md` files.
+
 A backlog merge completes, the shard parses, every row it holds has one status token, and rows
 that existed on the other side are not in it. Nothing reported a conflict on those rows. Two
 distinct triggers, one output shape.

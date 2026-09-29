@@ -22,10 +22,18 @@
 #
 # WHAT THIS COSTS, said plainly rather than discovered later. Nothing exercises the kit self-tests
 # automatically any more, at any boundary. A change under a kit directory that guts a check lands
-# green. The compensating check is a person running them, and the DoD for work touching a kit is a
-# GREEN parity verdict pasted into the landing report (the pooled evidence bound, TOOL-aBatchedArm-5):
+# green. The compensating check is a person running them, and the DoD for work touching a kit is
+# this: `--serial --attribute` against the build's BASE reads `verdict clean` — no NEW FAIL, no DEAD
+# PROBE at L and no OVER BUDGET at L — and every suite reporting an INHERITED FAIL or a DEAD PROBE at
+# R is named by a filed backlog record. Beside it, for the unattended kit, a GREEN parity verdict
+# pasted into the landing report (the pooled evidence bound, TOOL-aBatchedArm-5):
+#     bash tools/run-gates/run-selftests.sh --serial --attribute <BASE>
+#     bash tools/unattended/run-unattended-gates.sh --selftests --serial --attribute <BASE>
 #     bash tools/unattended/run-unattended-gates.sh --selftests --pooled
 #     GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh
+# The wording was a bare GREEN until `TOOL-dDerivedDocket-1`, and that was unreachable: several of
+# the held suites are red at any base for causes filed against other units, so the DoD named a state
+# nobody could produce and the red it produced instead was not about the change being graded.
 # It also costs the drift detection TOOL-aBoundedCeiling-10 filed: a held leg stops reporting when it
 # breaks, and two such reds were found on main in one session. That row is the follow-up.
 #
@@ -37,7 +45,8 @@
 # The `export` line is DELETED rather than commented out. A commented assignment is a line somebody
 # uncomments without reading the paragraph above it.
 #
-# THE KEYS THIS FILE MAY DECLARE, as documentation only; gov declares none of them today.
+# THE KEYS THIS FILE MAY DECLARE, as documentation only; gov declares only the inherited-red pair
+# below.
 #   GATE_SELFTESTS=1          run the kit self-tests on every default-branch push (the switch above).
 #   GOV_GATE_CMD=<cmd>        the merge bar, when it is not `run-gates.sh`. It must run a script this
 #                             repo tracks, unmodified in the working tree, at word 1 or after bash/sh,
@@ -49,8 +58,27 @@
 #   GOV_BRANCH_GATE_CMD=<cmd> a bar for a push that does NOT touch the default branch, vetted by the
 #                             same rule at HEAD and fed git's pre-push ref lines on stdin. Unset, such
 #                             a push is ungated. It can only add a refusal, never remove one.
+#   INHERITED_RED=park|land   whether a push may land over a red its default branch already carries.
+#                             PARSED at the remote's tip by the hook and the unattended driver, never
+#                             read from the sourced value; see the policy block below.
+#   INHERITED_RED_MAX_AGE=<n> the age bound, in first-parent landings, that `land` needs beside it.
+#                             PARSED at the remote's tip by the hook and the unattended driver, never
+#                             read from the sourced value; see the policy block below.
 # THIS FILE IS VETTED BEFORE IT IS SOURCED (TOOL-aRepatriatedFork-5, closing review round 1 H1): the
 # hook sources it only when it is tracked at the pushed sha and its working copy matches, and refuses
 # the push otherwise, so an ignored or excluded copy cannot set the test escape or `exit 0`.
 # The default branch is deliberately NOT a key here: this file is sourced after the hook has decided
 # which ref is the default, so a tracked file cannot choose which branch escapes the bar.
+
+# ---- THE INHERITED-RED POLICY, by owner ruling D12-i4 (2026-09-13). TOOL-dDerivedDocket-24 -------
+# Gov LANDS over a red its default branch already carries, when every red leg reads INHERITED against
+# the remote's own tip and arrived within the last ten first-parent landings; a red older than that,
+# or one the run worsened, still blocks. The kit default is `park`, and no kit ships this path, so the
+# choice stays gov's for the reason the paragraphs above give for GATE_SELFTESTS.
+#
+# THESE TWO LINES ARE DATA, NOT SHELL, to both of their readers. `.githooks/pre-push` and the
+# unattended driver each PARSE them out of this file as committed at the remote's tip - never out of
+# the pushed tree and never by sourcing - so a branch that edits them here enables nothing until a
+# gated push has landed the edit. The source above still sets them as variables; nothing reads those.
+INHERITED_RED=land
+INHERITED_RED_MAX_AGE=10

@@ -2,13 +2,13 @@
 # unattended.sh — the driver for a run that will merge and push with no owner turn.
 # Contract: memory/guides/UNATTENDED-PROTOCOL.md (binding). Project layer: .unattended.conf.
 #
-#   unattended.sh --preflight <slug> --keepalive-id <id>   # assert, pin, record, render
-#   unattended.sh --plan <slug> [--paths]                  # per-unit state, and the next unit
+#   unattended.sh --preflight <slug> --keepalive-id <id> [--waive <item> --reason <text>]   # assert, pin, record, render
+#   unattended.sh --plan <slug> [<slug> ...] [--paths] [--asks] [--framed]   # per-unit state, and the next unit
 #   unattended.sh --phase <slug> <phase> --witness <sha>   # move the run, with its witness
 #   unattended.sh --status <slug>                          # one line: phase · witness · next unit
 #   unattended.sh --audit <slug>                           # one line per open dispatched unit: idle time, PROGRESSING|STALLED
 #   unattended.sh --liveness <slug>                        # key: value lines and ONE verdict, for an out-of-session reader
-#   unattended.sh --resume <slug> [--keepalive-id <id>]    # the same line, plus the next action; with the id, the lease is replaced
+#   unattended.sh --resume <slug> [--keepalive-id <id> [--replaces <id>]]    # the same line, plus the next action; with the id, the resume matrix decides who drives
 #   unattended.sh --close <slug> [--override <item> --reason <text>]
 #   unattended.sh --landed <slug>                          # after the push: observe, then mark LANDED
 #   unattended.sh --park <slug> --item <text> --reason <text>   # park a decision MID-RUN
@@ -18,9 +18,11 @@
 #   unattended.sh --brief <slug> --unit <id> --path <file>  # record WHAT a build pass was handed
 #   unattended.sh --review <slug> --subject <id> --verdict <v> --blockers <N> [--disposition fold|promote]
 #   unattended.sh --abort <slug> --reason <text>           # end it, with the reason on the record
+#   unattended.sh --hold <slug> --code <c> --until <cond> --reason <text> --reaped <id>|--keepalive-unreachable <node> [--pending-run <runId>]
+#   unattended.sh --resume <slug> --scheduled <held-at> --keepalive-id <id>   # the restart a durable schedule files
 #   unattended.sh --attest <slug> --item <item> [--value <text>]  # the agent-checked DoD items
-#   unattended.sh --record-piece <slug> --path <p> --leg <n> --verdict <PASS|FAIL|NA>
-#   unattended.sh --record-set <slug> --leg <n> --verdict <PASS|FAIL|NA>
+#   unattended.sh --record-piece <slug> --path <p> --leg <n> --verdict <PASS|FAIL|NA> [--records-root <dir> [--playbook-sha <sha>] [--run <id>]]
+#   unattended.sh --record-set <slug> --leg <n> --verdict <PASS|FAIL|NA> [--records-root <dir> [--run <id>] [--set <hashes>]]
 #   unattended.sh --version                                        # the kit version, then exit
 #
 # Exit 0 = the verb succeeded · 1 = a refusal, named · 2 = misconfigured (not a repo, no conf).
@@ -41,7 +43,7 @@
 # The generated region holds NO copy: the unit list is DERIVED from the build README's already-derived,
 # already-byte-compared slice. One derivation in the tree; this file is not a second one.
 set -u
-KIT_UNATTENDED_VERSION=1.40   # gov:kit unattended@1.40 — kit identity; set HERE, never from .unattended.conf
+KIT_UNATTENDED_VERSION=1.45   # gov:kit unattended@1.45 — kit identity; set HERE, never from .unattended.conf
 
 # ------------------------------------------------------------------------------ the dereference pin
 # A sha is a NAME, and turning a name into bytes or into ancestry happens in the run's own object
@@ -86,7 +88,7 @@ KIT_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
 # read wrong, it does not RUN; the usage text is rendered from the docstring above, which is the only
 # place a verb's arguments are spelled; and the two carriers in other files are joined to this one by
 # the gate leg, because no runtime derivation crosses a file boundary.
-VERBS_SLUG="--preflight --status --audit --liveness --resume --close --landed --abort --park --propose --attest --record-piece --record-set --rescope --dispatch --review --brief"
+VERBS_SLUG="--preflight --status --audit --liveness --resume --close --landed --abort --hold --park --propose --attest --record-piece --record-set --rescope --dispatch --review --brief"
 # The verbs whose argument is POSITIONAL and which exit inside the parse loop. Separate because the
 # dispatch cannot treat them alike, and merged again for every reader, who does not care.
 VERBS_INLINE="--plan --phase --version"
@@ -177,26 +179,139 @@ GATE_BOUND_LIVE=$REMOTE_BOUND_LIVE
 # 62s against the same 60s sleeper. memory/gotchas/bounded-through-a-pipe-is-unbounded.md names this
 # file as one of the two places the class has already bitten.
 #
-# Sets RB_OUT (the command output) and RB_TOOK (elapsed seconds). Returns the command status, or
-# 124/137 when the bound fired -- the caller decides what that means, because a DoD item and a
-# preflight refusal say different things about it.
-RB_OUT=""; RB_TOOK=0
+# Sets RB_OUT (both streams, stdout then stderr), RB_STDOUT (the command's stdout alone), RB_ERR
+# (its stderr alone) and RB_TOOK (elapsed seconds). Returns the command status, or 124/137 when the
+# bound fired -- the caller decides what that means, because a DoD item and a preflight refusal say
+# different things about it.
+#
+# TWO CAPTURE FILES AND NOT ONE, which is the whole of TOOL-dDerivedDocket-48. `2>&1` merged every
+# notice a producer writes into the same buffer as its rows, in front of a parse that refuses any
+# line not leading with `ask` -- so a HEALTHY producer read as a DEAD PROBE. The row stream and the
+# notice stream have to reach the caller as two values, or no consumer can tell a broken redirect
+# from a dead command. Both files sit under ONE `mktemp -d`, under the same `timeout -k 5s` wrapper
+# and the same `</dev/null`, so nothing the block above promises moves.
+#
+# RB_OUT IS ONE SUBSTITUTION OVER BOTH FILES, never a join of the two VALUES with a separator, and
+# that is not a matter of style. `cat` over an empty file contributes nothing, so a call that wrote
+# only to stderr still leaves RB_OUT opening on the producer's FIRST stderr line -- where a join
+# would open it on a blank line, and the --dispatch refusal below prints `head -1` of RB_OUT on
+# exactly that input, naming nothing. The one behaviour delta is INTERLEAVING: RB_OUT is stdout
+# then stderr rather than the two in arrival order. No byte is lost, which is why every caller that
+# prints it whole needs no edit.
+RB_OUT=""; RB_TOOK=0; RB_STDOUT=""; RB_ERR=""
+# THE BOUND THIS ONE CALL TAKES, when it is not GATE_BOUND - TOOL-dDerivedDocket-27 S4. Empty means
+# GATE_BOUND, which is every caller but one. The `gates-green` arm sets it to the bar's backstop for
+# the call that runs `$GATE_CMD` and clears it on the next line, so the wiring check, the lander
+# probes, the ask generator and the profile command itself all keep the declared bound.
+RB_BOUND=""
+# STARTED IN THE BACKGROUND, RECORDED, THEN WAITED FOR — TOOL-dDerivedDocket-28 S1. A session that
+# dies leaves the command it was waiting on running with nobody waiting (i26: an earlier bar's legs
+# still competing with the next run's), and the only thing that can later tell that orphan apart
+# from a stranger with the same command line is a record made HERE, by identity: `$!` names the
+# process this driver started and nothing else. The bound, the `</dev/null` and the two capture
+# files are unchanged, so no caller reads a different value.
+#
+# THE WRAPPER CARRIES THE REPOSITORY ROOT AS ITS `$0` (S4). process-monitor's fence admits a process
+# whose own argv names a declared root, and everything descending from one; an orphan has no living
+# ancestor, so without this token the reaper would refuse the very tree it exists for. `; exit $?`
+# keeps the wrapper a real parent: a lone `"$@"` would be exec'd in its place and the token lost.
+#
+# WHAT THE `&` COSTS, and where it costs nothing (memory/gotchas/async-job-starts-with-sigint-ignored.md).
+# A job started with `&` starts with SIGINT ignored. On the bounded path that changes nothing a
+# signal can reach: `timeout` installs its own INT handler, so the command can still trap INT, and it
+# already moved the command into its own process group, where a terminal's Ctrl-C never reached it.
+# On the UNBOUNDED path, a host with no runnable `timeout`, the command now ignores INT, so a Ctrl-C
+# ends the driver alone and leaves the command running — as a recorded orphan the next reap finds.
 run_bounded() { # argv...
-  local _s _e _rc _f
-  _f=$(mktemp) || { RB_OUT="run_bounded: cannot create a capture file"; return 1; }
+  local _s _e _rc _d _p _b=${RB_BOUND:-${GATE_BOUND:-0}}
+  # THE REFUSAL BRANCH KEEPS RB_OUT'S SENTENCE and empties only the two NEW values. That sentence
+  # is this branch's ONLY diagnostic -- it is SET here and the function returns before RB_TOOK is
+  # computed below, so it is the freshest thing a caller gets -- and check_wiring, the gates-green
+  # item and --dispatch all print it. Emptying it would make a failed capture refuse with no reason
+  # at all. RB_TOOK is the value that genuinely carries over from a previous call and --dispatch
+  # prints it beside the sentence, so it is zeroed rather than left reading a time this call never
+  # measured.
+  _d=$(mktemp -d) \
+    || { RB_OUT="run_bounded: cannot create a capture file"; RB_STDOUT=""; RB_ERR=""; RB_TOOK=0; return 1; }
   _s=$(date +%s)
   # GATE_BOUND_LIVE is REMOTE_BOUND_LIVE's sibling and is probed the same way: by RUNNING timeout,
   # never by testing for the binary. With no runnable timeout the command still RUNS, unbounded --
   # a bound may cost speed and may turn a hang into a verdict; it may never turn a check into a skip.
-  if [ "$GATE_BOUND_LIVE" = 1 ] && [ "${GATE_BOUND:-0}" -gt 0 ]; then
-    timeout -k 5s "$GATE_BOUND" "$@" </dev/null >"$_f" 2>&1; _rc=$?
+  if [ "$GATE_BOUND_LIVE" = 1 ] && [ "$_b" -gt 0 ]; then
+    "${BASH:-bash}" -c '"$@"; exit $?' "$ROOT" timeout -k 5s "$_b" "$@" </dev/null >"$_d/out" 2>"$_d/err" &
   else
-    "$@" </dev/null >"$_f" 2>&1; _rc=$?
+    "${BASH:-bash}" -c '"$@"; exit $?' "$ROOT" "$@" </dev/null >"$_d/out" 2>"$_d/err" &
   fi
+  _p=$!
+  write_proc_record "$_p" "$@"
+  wait "$_p"; _rc=$?
   _e=$(date +%s); RB_TOOK=$(( _e - _s ))
-  RB_OUT=$(cat "$_f" 2>/dev/null)
-  rm -f "$_f" 2>/dev/null
+  RB_STDOUT=$(cat "$_d/out" 2>/dev/null)
+  RB_ERR=$(cat "$_d/err" 2>/dev/null)
+  RB_OUT=$(cat "$_d/out" "$_d/err" 2>/dev/null)
+  rm -rf "$_d" 2>/dev/null
   return "$_rc"
+}
+
+# ---- THE TWO READERS OF A SPLIT CAPTURE. TOOL-dDerivedDocket-48 S4 and S5.
+#
+# Both are DARK at this order: the witness that consumes them is a later unit's, and that is why
+# each is graded by a DIRECT call over a stub rather than through a caller's output. A helper with
+# no live caller has no failing case otherwise, and a layer that stays inert while its suite reads
+# green is the shape this repository files as a defect elsewhere.
+#
+# THE TWO BOUNDS BELOW ARE PINNED LITERALS, chosen rather than measured, and a later session reading
+# them should know that. A refusal quotes a producer's stderr so a checker whose whole diagnosis is
+# on that stream is never reported with an empty reason; unbounded, one chatty producer fills a park
+# row and replaces a readable refusal with an unreadable one. They are literals and not conf keys
+# because a new key owes a protocol key-table row, and spending a capped carrier's bytes is the one
+# thing this unit set out not to do.
+RB_TAIL_LINES=20
+RB_TAIL_BYTES=2000
+# NOT A THIRD BOUND. The closing line below is part of what RB_TAIL_BYTES caps, so its own worst-case
+# width is reserved out of that figure before the body is cut -- otherwise the total overruns the cap
+# by exactly the length of the sentence that reports the cut.
+RB_TAIL_NOTE_ROOM=120
+read_stderr_tail() { # -> a bounded tail of RB_ERR on stdout; nothing at all when RB_ERR is empty
+  local _tot _kept _drop _body _room
+  [ -n "$RB_ERR" ] || return 0
+  # COUNTED WITH NO ADDED NEWLINE (check 33): `grep -c ''` reads an empty capture as 0 lines,
+  # where a newline added first reads it as one.
+  _tot=$(printf '%s' "$RB_ERR" | grep -c ''); _tot=$(( _tot + 0 ))
+  _room=$(( RB_TAIL_BYTES - RB_TAIL_NOTE_ROOM ))
+  _body=$(printf '%s\n' "$RB_ERR" | head -n "$RB_TAIL_LINES" | head -c "$_room")
+  # COUNTED AFTER THE CUT, not before it. A byte cut can end mid-line, so a drop figure derived from
+  # the line cap alone would under-report by every line the byte cap also took.
+  _kept=$(printf '%s' "$_body" | grep -c ''); _kept=$(( _kept + 0 ))
+  _drop=$(( _tot - _kept )); [ "$_drop" -gt 0 ] || _drop=0
+  printf '%s\n' "$_body"
+  # PRINTED EVEN AT ZERO. A tail that reports a drop only when there is one is indistinguishable
+  # from a whole stream, and a reader then cannot tell a short producer from a truncated one.
+  printf 'read_stderr_tail: %s of %s stderr line(s) not shown\n' "$_drop" "$_tot"
+}
+
+# THE THREE VERDICTS A STDOUT-EMPTY BOUNDED CALL CAN CARRY, written once. Today they are one fact:
+# a consumer that finds no rows reports a dead probe whether the producer was silent, talking on the
+# other stream, or never answered at all -- and a green-looking zero from a broken redirect is
+# indistinguishable from a clean run.
+#
+# ITS PRECONDITION IS THE CALLER'S: ask it only where RB_STDOUT is EMPTY. The row that says "parse
+# the rows" belongs to the consumer and this helper has no string for it, so a call made with rows
+# in hand is a question this function cannot answer -- it returns 1 and prints nothing rather than
+# returning a verdict about a stream that is not empty.
+derive_stream_verdict() { # bounded-call status -> one of three distinct strings on stdout
+  local _rc="${1:-0}"
+  [ -z "$RB_STDOUT" ] || return 1
+  if { [ "$_rc" = 124 ] || [ "$_rc" = 137 ]; } && [ "$GATE_BOUND_LIVE" = 1 ] && [ "${GATE_BOUND:-0}" -gt 0 ]; then
+    printf '%s\n' "the declared command did not answer within the declared ${GATE_BOUND}s bound and was killed after ${RB_TOOK}s, so this is unanswered because the command never returned rather than because it said no"
+    return 0
+  fi
+  if [ -n "$RB_ERR" ]; then
+    printf '%s\n' "the declared command wrote nothing to stdout and put its whole diagnosis on stderr, so it ANSWERED and the row stream is empty for a reason this run can quote:"
+    read_stderr_tail
+    return 0
+  fi
+  printf '%s\n' "DEAD PROBE - the declared command wrote nothing to either stream, so nothing here can tell a producer that is working from one that is not, and a zero read off it would report as an answer"
 }
 
 # THE PYTHON RESOLVER, INLINE (aDeferredBar closing round 2, R2 and R8). --dispatch runs the
@@ -259,6 +374,25 @@ UNIT_STALL_BOUND_DEFAULT=1800
 # 2026-09-14, TOOL-aProbedUnit-6). ONE constant, interpolated into the NOTE the reader prints, so the
 # argument and the sentence cannot say two numbers — the closing review found them typed twice.
 REVIEW_ROUNDS_DEFAULT=1
+# 1800s: a `probe` hold is a stop whose own release is a probe, and half an hour is the shortest
+# gap at which a restarted session is not simply re-asking the question the hold just answered.
+# 6 holds: the no-progress ceiling. A run that has held six times with nothing changed but its own
+# records is not waiting on anything a seventh session will find. Both are the owner's figures,
+# TOOL-dDerivedDocket-5.
+RESUME_SCHEDULE_DELAY_DEFAULT=1800
+RESUME_SCHEDULE_LIMIT_DEFAULT=6
+# TOOL-dDerivedDocket-27 S4 - THE BACKSTOP'S MARGIN, the third term of the bar's bound: what a bar may
+# still take AFTER its own wall fired - the wall watcher's poll, at most 30 s, the kill of each leg's
+# tree and the verdict render. 600 s is twenty of those polls, PINNED 2026-09-14 from that one bound,
+# and every backstop line prints it beside the other two terms, so the sum re-derives on every run.
+# A SOURCE CONSTANT with an arm seam of the same name, which the suite shrinks to reach a kill in
+# seconds; it is not a conf key, because D12-i7 ruled ONE declared number and that number is the wall.
+GATE_BACKSTOP_MARGIN=${GATE_BACKSTOP_MARGIN:-600}
+case "$GATE_BACKSTOP_MARGIN" in
+  *[!0-9]*) echo "unattended: REFUSING - the GATE_BACKSTOP_MARGIN seam is '$GATE_BACKSTOP_MARGIN', which is not a whole number of seconds, so the merge bar's backstop cannot be summed." >&2
+            RUNLOG_CLEAN=1; exit 2 ;;
+esac
+GATE_BACKSTOP_MARGIN=$((10#$GATE_BACKSTOP_MARGIN))
 
 # LIVENESS, and spec-6 S5. The sibling notice above names the REMOTE bound only, so on a host with no
 # runnable `timeout -k` an operator was told the remote observation was inert while $GATE_CMD and
@@ -334,10 +468,12 @@ CONF="$ROOT/.unattended.conf"
 # `default-branch`, because a value-set guard falling through to the wide behaviour would let a
 # misspelling grant what nobody declared. It sits ON the second line because the source-level arm
 # greps the line below with -A1, and anything inserted between them hides it.
-MEMORY_ROOT=memory; LANDER=""; BYPASS_BAN=""; GATE_CMD=""; WIRING_CHECK=""
-KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""; PHASES_EXTRA=""; DOD_EXTRA=""; DIRECTIVES_EXTRA=""; ANCHOR_SCOPE=""; UNITS_REGION_CUTOFF=""; SHARED_RECORDS="__kit-default__"; GENERATED_INDEXES=""; SPEC_THIN_CUTOFF=""
+MEMORY_ROOT=memory; LANDER=""; LANDER_MODE=""; SELFTESTS_OWED_PATHS=""; BYPASS_BAN=""; GATE_CMD=""; WIRING_CHECK=""
+KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""; PHASES_EXTRA=""; DOD_EXTRA=""; DIRECTIVES_EXTRA=""; ANCHOR_SCOPE=""; UNITS_REGION_CUTOFF=""; SHARED_RECORDS="$SHARED_RECORDS_UNDECLARED"; GENERATED_INDEXES=""; SPEC_THIN_CUTOFF=""
 HALT_CODES_EXTRA=""; HALT_FLOOR=""; LANDER_MARKER=""; RECALL_CLI=""; MAP_CLI=""; SPEC_TOKENS_CLI=""
-GATE_BOUND=""; UNIT_STALL_BOUND=""; REVIEW_ROUNDS=""; RESUME_STALE_BOUND=""; RESUME_ATTEMPTS=""; RESUME_TURNS=""
+ASKS_CMD=""; HOLD_CODES_EXTRA=""; HOLD_FLOOR=""; LANDED_FACTS_CUTOFF=""; GATE_POLICY_FILE=""; PROCMON_CMD=""
+RESUME_SCHEDULE=""; RESUME_SCHEDULE_CREATE=""; RESUME_SCHEDULE_DELETE=""; RESUME_SCHEDULE_DELAY=""; RESUME_SCHEDULE_LIMIT=""
+GATE_BOUND=""; GATE_WALL=""; GATE_PROFILE_CMD=""; UNIT_STALL_BOUND=""; REVIEW_ROUNDS=""; RESUME_STALE_BOUND=""; RESUME_ATTEMPTS=""; RESUME_TURNS=""
 DISPOSITION_CUTOFF=""; SPEC_AUDIT_DEFAULT=""; RUNLOG_SESSION_VARS=""; RUNLOG_SWITCH=${GOV_RUNLOG:-}
 # TOOL-dLoggedFlight-2 - the run log's two inputs, on the init block's LAST line so the suite's
 # contiguous-block read still covers them (a comment inside the block ends it). RUNLOG_SESSION_VARS
@@ -348,17 +484,95 @@ DISPOSITION_CUTOFF=""; SPEC_AUDIT_DEFAULT=""; RUNLOG_SESSION_VARS=""; RUNLOG_SWI
 # SPEC_AUDIT_DEFAULT (TOOL-aBlindedTrial-7) is defaulted here like its neighbours so the source-level
 # arm sees it, but the value THIS source binds decides nothing: check_authorization re-reads the key
 # from the conf blob at the pinned BASE, because a run could blank its working copy to opt out.
+# ASKS_CMD, the HOLD pair, LANDED_FACTS_CUTOFF and the RESUME_SCHEDULE keys sit on the block's own
+# lines as well, and the reason each carried on a comment beside its line is kept here instead: a
+# comment inside the block ends the suite's contiguous read, and every key under it would then read
+# as undefaulted.
+#   * ASKS_CMD (TOOL-dDerivedDocket-16) - the ASK GENERATOR, in RECALL_CLI's register: optional,
+#     blank is "not adopted" and is ANNOUNCED. A build README carrying an `asks:` key while this is
+#     blank REFUSES at preflight rather than pinning a mandate nothing in the project can grade.
+#   * HOLD_CODES_EXTRA and HOLD_FLOOR - the HOLD vocabulary's project half, and its shrink-only
+#     floor. Spelled beside the halt keys and never merged with them: a halt code ENDS a run and a
+#     hold code PAUSES one, and one list would let a pause be recorded as an ending.
+#   * RESUME_SCHEDULE and the four keys beside it (TOOL-dDerivedDocket-5) - the DURABLE RESUME
+#     SCHEDULE. A switch, a declared carrier tool pair and two numeric bounds. The pair is NAMED and
+#     never called: the driver records and prints what the agent files, exactly as it does for the
+#     keepalive, because no script reaches a harness scheduler.
+#   * LANDED_FACTS_CUTOFF (TOOL-dDerivedDocket-22 S10) - the date from which the landed fact-set
+#     arm grades a record, read here because `--preflight` refuses to retire a record that arm
+#     would red. Blank turns both halves off.
+#   * PROCMON_CMD (TOOL-dDerivedDocket-28 S5) - the REAPER a recorded orphan goes through, called
+#     `<cmd> --kill-msys <pid>`. Blank turns reaping OFF, announced, and orphans are still counted.
+#   * GATE_WALL and GATE_PROFILE_CMD (TOOL-dDerivedDocket-27 S1 and S2) - the unattended bar's
+#     whole-run wall, read below through `read_bound_key` with an empty default, and the command that
+#     prints the runner's resolved profile. Blank wall: the profile's wall stays in force. Blank
+#     profile command: the bar has no backstop and stays bounded at GATE_BOUND. Both announced.
 # shellcheck disable=SC1090
 . "$CONF"
 
+# THE LANDING SHAPE, DECLARED AND ANNOUNCED - TOOL-dDerivedDocket-3 S1. `primary` is BASE's
+# behaviour: the run leaves its own tree and lands through the primary tree's local default branch,
+# so `gates-green` grades the BRANCH and never the merge that actually lands. `in-place` prepares
+# that merge in the run's OWN worktree first, and the bar then grades exactly what the push
+# publishes.
+#
+# BLANK READS `primary` AND SAYS SO, on `read_bound_key`'s pattern: a value nobody declared must
+# never be invisible, because the difference between the two modes is which commit was graded.
+# A value OUTSIDE the closed set is a REFUSAL rather than a fallback, for ANCHOR_SCOPE's reason -
+# a misspelling falling through to the wider behaviour grants a landing shape nobody declared.
+#
+# THE SET AND THE DEFAULT ARE MARKED so the kit gate READS them off these two lines instead of
+# retyping them. A closed vocabulary spelled in two files is two answers to one question, and the
+# leg's own header already refuses that for the phase and DoD sets.
+case "$LANDER_MODE" in
+  "") LANDER_MODE=primary   # gov:lander-mode-default
+      echo "unattended: NOTE - this project declares no LANDER_MODE, so the landing runs in 'primary' mode: the run lands through the primary tree's default branch and the bar grades the branch. Declare one in $CONF to change it." >&2 ;;
+  # gov:lander-mode-set
+  primary|in-place) ;;
+  *) echo "unattended: REFUSING - LANDER_MODE is declared as '$LANDER_MODE', which is outside the closed set 'primary in-place'. A landing mode that cannot be resolved is a landing nobody declared." >&2
+     RUNLOG_CLEAN=1; exit 2 ;;
+esac
+# ...and `in-place` is expressed ENTIRELY in calls into the declared lander, so a mode declared
+# without one names a lander that does not exist. Refused at load rather than at the landing, which
+# is the whole argument for the preflight probes further down: the first refusal must not arrive
+# after the work is done.
+if [ "$LANDER_MODE" = in-place ] && [ -z "$LANDER" ]; then
+  echo "unattended: REFUSING - LANDER_MODE is 'in-place' and this project declares no LANDER, but every step of that mode is a call into one: there is nothing to prepare the merge, nothing to ask about it and nothing to push it." >&2
+  RUNLOG_CLEAN=1; exit 2
+fi
+# TOOL-dDerivedDocket-5 - THE AUTO-RESUME SWITCH, written on the marked pattern above it so the kit
+# gate READS the closed set and the default off these two lines instead of retyping them. A value
+# outside the set is a REFUSAL and never a fallback, for LANDER_MODE's reason: a misspelling falling
+# through to `off` would silently un-owe every restart in a fleet that declared one.
+#
+# BLANK IS `on` AND SAYS SO. The owner ruled this feature on in the kit and in this repo, overriding
+# charter section 9's default-off gate for it alone, and a defaulted switch nobody announced would be
+# that override happening silently - which is the one shape the ruling refused.
+case "$RESUME_SCHEDULE" in
+  "") RESUME_SCHEDULE=on   # gov:resume-schedule-default
+      echo "unattended: NOTE - this project declares no RESUME_SCHEDULE, so it takes the kit default 'on': a hold that owes a restart prints one for the agent to file. Declare one in $CONF to change it." >&2 ;;
+  # gov:resume-schedule-set
+  on|off) ;;
+  *) echo "unattended: REFUSING - RESUME_SCHEDULE is declared as '$RESUME_SCHEDULE', which is outside the closed set 'on off'. A switch that cannot be resolved is a restart policy nobody declared." >&2
+     RUNLOG_CLEAN=1; exit 2 ;;
+esac
 # `read_bound_key` — a bound key DEFAULTED, VALIDATED and ANNOUNCED — lives in `lib-unattended.sh`,
 # sourced above: TOOL-aWokenSentinel-5 hoisted it there verbatim, because the resume tick reads
 # `RESUME_ATTEMPTS` and `RESUME_TURNS` through the same function, and a bound read spelled twice is
-# two answers to one question. The four calls below stay here; the contract they rely on — the
+# two answers to one question. The calls below stay here; the contract they rely on — the
 # caller has sourced its conf into THIS shell and named it in `CONF` — is stated on the function.
+read_bound_key RESUME_SCHEDULE_DELAY "$RESUME_SCHEDULE_DELAY_DEFAULT" seconds "a probe hold fires its restart at the kit default of ${RESUME_SCHEDULE_DELAY_DEFAULT}s after it was taken"
+read_bound_key RESUME_SCHEDULE_LIMIT "$RESUME_SCHEDULE_LIMIT_DEFAULT" holds "a run that cannot move stops owing restarts after the kit default of $RESUME_SCHEDULE_LIMIT_DEFAULT consecutive holds"
 read_bound_key GATE_BOUND "$GATE_BOUND_DEFAULT" seconds "a declared command is bounded at the kit default of ${GATE_BOUND_DEFAULT}s"
+# TOOL-dDerivedDocket-27 S1 - THE UNATTENDED BAR'S WALL, the one number owner ruling D12-i7 lets a
+# project declare for it: a call, never a new `case`, and an EMPTY default, so a malformed value
+# refuses here and a blank one stays blank with the reader's NOTE. UNEXPORTED on the next line, so
+# the value reaches `$GATE_CMD` only through the environment the `gates-green` arm hands its bar:
+# the lander's push-boundary bar and every other declared command keep the runner's profile wall.
+read_bound_key GATE_WALL "" seconds "the unattended bar runs under the gate runner's own profile wall"
+export -n GATE_WALL GATE_PROFILE_CMD 2>/dev/null
 read_bound_key UNIT_STALL_BOUND "$UNIT_STALL_BOUND_DEFAULT" seconds "a dispatched unit reads STALLED after the kit default of ${UNIT_STALL_BOUND_DEFAULT}s with no write and no commit"
-# THE STALE BOUND FOR A RUN, the fourth caller (TOOL-aWokenSentinel-2). Its default is DERIVED from
+# THE STALE BOUND FOR A RUN (TOOL-aWokenSentinel-2), the one caller whose default is DERIVED from
 # the two DECLARED bounds just resolved, never from the kit defaults: a healthy bar is GATE_BOUND of
 # silence on every signal but the gate logs, so the bound at which `--liveness` reads STALE sits one
 # UNIT_STALL_BOUND above it, and an adopter who raises GATE_BOUND for a longer bar raises this with
@@ -377,14 +591,34 @@ HALT_CODE=""
 # verb to three carriers, so a new one would owe a header line, a VERBS entry and a Skill invocation
 # for a change that swaps one printf. Empty is the padded human table; `paths` is the TSV.
 PLAN_PATHS=""
+# ...and its sibling, on the same argument and for the same reason. `--asks` prints the ASK rows
+# beside the unit rows; the UNDECIDED `next:` input is derived either way, because that is an
+# input to the rung ladder rather than a property of this output mode.
+PLAN_ASKS=""
 RV_SUBJECT=""; RV_BLOCKERS=""; RV_DISPOSITION=""
 M="$MEMORY_ROOT"
 # SHARED_RECORDS's DEFAULT IS RESOLVED HERE, not in the block above, because it is expressed in terms
 # of MEMORY_ROOT and the conf is what sets that. Computed before the source it baked in this kit's own
 # `memory`, so an adopter at any other layout got a default naming a directory it does not have — a
 # refusal that can never fire, which is the same shape as no refusal at all. The sentinel is what
-# keeps a DECLARED blank meaning the empty set, as the protocol's own conf table promises.
-[ "$SHARED_RECORDS" = "__kit-default__" ] && SHARED_RECORDS="$MEMORY_ROOT/DECISIONS.md $MEMORY_ROOT/backlog"
+# keeps a DECLARED blank meaning the empty set, as the protocol's own conf table promises. The
+# resolution itself lives in the kit library since TOOL-dDerivedDocket-20, because the gate leg reads
+# the same key and a default spelled in two callers is two answers to one question.
+SHARED_RECORDS=$(resolve_shared_records "$SHARED_RECORDS" "$MEMORY_ROOT")
+# THE TWO CONDITION-3 KEYS MAY NOT NAME ONE PATH - TOOL-dDerivedDocket-20 S1. A path under both is
+# answered by whichever of condition 3's two rules `--dispatch` reaches first, and the declaration of
+# the other means nothing. Refused at LOAD, on `read_bound_key`'s pattern, because the first refusal
+# must not arrive after the work is done; the gate leg asks the same library predicate, so a conf no
+# run has read yet is refused on the bar too.
+_two_key=$(scan_shared_index_overlaps "$SHARED_RECORDS" "$GENERATED_INDEXES")
+if [ -n "$_two_key" ]; then
+  echo "unattended: REFUSING - a path is declared under both SHARED_RECORDS and GENERATED_INDEXES, so --dispatch would answer it by whichever of condition 3's two rules it reached first and the other declaration would mean nothing. Declare each path under one key in $CONF:" >&2
+  while IFS=$'\t' read -r _tk_s _tk_i; do
+    echo "  SHARED_RECORDS $_tk_s overlaps the GENERATED_INDEXES index $_tk_i" >&2
+  done < <(printf '%s
+' "$_two_key")
+  RUNLOG_CLEAN=1; exit 2
+fi
 
 status=0
 # TOOL-dLoggedFlight-2 - every refusal is also RECORDED, by number and in call order, for the run
@@ -396,7 +630,14 @@ fail() { echo "UNATTENDED check $1 FAILED — $2"; status=1; RUNLOG_CHECKS+=("$1
 # CORE, in run order. A project EXTENDS via PHASES_EXTRA and deletes nothing: the gate leg asserts
 # core membership against a shrink-only floor, because a deletable core member is a silent,
 # reason-free override of everything keyed on it.
-PHASES_CORE="PREFLIGHT RESEARCHING TESTING SPECCING REVIEWING FOLDING BUILDING RUNNING VERIFYING LANDING LANDED ABORTED"
+# HELD SITS AFTER RUNNING AND BEFORE VERIFYING, and the position is a decision rather than a
+# reading order. This kit's `gate-guard.js` RESTATES the tail of this list from VERIFYING as
+# the phases it admits the flagged bar and the self-test suites in, and its own suite pins that
+# restatement to this line. Placed after LANDING, HELD would join that tail and a run held from
+# BUILDING would regain the bar the hook exists to refuse it. Placed here, a run held from
+# VERIFYING or LANDING regains it at the resume that returns it there, which is the whole of what
+# it needs. TOOL-dDerivedDocket-4 F14.
+PHASES_CORE="PREFLIGHT RESEARCHING TESTING SPECCING REVIEWING FOLDING BUILDING RUNNING HELD VERIFYING LANDING LANDED ABORTED"
 PHASES_TERMINAL="LANDED ABORTED"
 # TOOL-aPromptedMandate-2 - the subset NAMED FOR the build method's pass kinds, published so the
 # protocol's claim about it can be JOINED rather than believed. RESEARCHING and TESTING are
@@ -407,14 +648,19 @@ PHASES_PASSKIND="SPECCING REVIEWING FOLDING BUILDING"
 # CORE DoD items, `<item>:<checker>`. `agent` items are ATTESTED, never machine-verdicted, and they
 # do not spend the --close override budget — counting attestation as a verdict is what makes an
 # override look like a check that failed.
-DOD_CORE="gates-green:machine records-current:machine authorization-reachable:machine landed-via-lander:machine build-complete:machine closing-review-recorded:machine specs-audited:machine pieces-complete:machine set-checks-recorded:machine keepalive-reaped:agent parked-decisions-surfaced:agent reuse-probed:machine"
+# TOOL-dDerivedDocket-17 - `asks-disposed` is the THIRTEENTH, and it is NOT in `DOD_NO_OVERRIDE`:
+# owner ruling D12-b made it overridable with a recorded reason, on the condition that the overrides
+# are COUNTED, which the drift-audit signal `asks_disposed_overrides` does. `CORE_FLOOR`'s DoD half
+# moves with it, in the same commit, because the leg reds BOTH ways - a floor below the kit's own
+# count is a pin guarding nothing.
+DOD_CORE="gates-green:machine records-current:machine authorization-reachable:machine landed-via-lander:machine build-complete:machine closing-review-recorded:machine specs-audited:machine pieces-complete:machine set-checks-recorded:machine keepalive-reaped:agent parked-decisions-surfaced:agent reuse-probed:machine asks-disposed:machine"
 
 # the proposal-kind unit - the PARKED KINDS, closed and kit-owned like the three sets above it, and
 # for the reason those are: a parked row whose kind is outside this set lands in a region every
 # reader parses BY kind, so it is a row nothing counts and nothing surfaces. It became a declaration
 # when a fifth kind arrived and found the alternation that recognises a row typed into `verb_status`
 # - one spelling of a vocabulary that two files read.
-PARK_KINDS="decision abort override waiver proposal rescope dispatch review brief"
+PARK_KINDS="decision abort override waiver proposal rescope dispatch review brief hold resume"
 # The BUILD-ORDER verb, in the two shapes `gen_build_index.py` declares. CONFORMING requires the
 # value to be anchored on both sides; LOOSE is anything wearing the verb's name that is not.
 ORDER_OK_RE='·[[:space:]]*order[[:space:]]+[0-9]+[[:space:]]*(·|$)'
@@ -562,6 +808,11 @@ REVIEW_DISPOSITIONS="fold|promote"
 # "strictly past the newest record any branch can still write under the old contract".
 FOLD_CUTOFF="2026-09-15"
 HALT_CODES_CORE="runaway-ceiling-unclean fork-unresolvable scope-approval-needed external-prerequisite acceptance-underivable repo-state-out-of-mandate gate-red-out-of-scope"
+# THE HOLD VOCABULARY, a SECOND closed set beside the halt one and never an extension of it. Each
+# names a stop the run cannot fix and did not cause; none of them ends the run. A project extends
+# through HOLD_CODES_EXTRA and deletes nothing, which HOLD_FLOOR pins the way HALT_FLOOR pins the
+# halt set.
+HOLD_CODES_CORE="host-degraded platform-limit platform-unavailable host-owner-action inherited-red"
 DIRECTIVES_CORE="minimal-prose:M10 sub-specced:M2 forks-resolved:M3 specs-reviewed:M4 reuse-first:M5 parallel-when-disjoint:M6 passes-committed:M6 diff-reviewed:M8 land-once-done:M8 conflicts-reconciled:M8 wrap-up-derived:M9 researched:M12:prompt solution-tested:M12:prompt pieces-recorded:M9:recipe playbook-followed:M7:recipe discoveries-adopted:M10 passes-harnessed:M6"
 
 # the AUTHORIZATION MODE set, published as a constant so it is spelled
@@ -662,6 +913,119 @@ norm_endpoint() { # <url> -> host/path, comparable
   printf '%s/%s\n' "$host" "$rest"
 }
 is_halt_code() { case " $(halt_codes) " in *" $1 "*) return 0;; esac; return 1; }
+# The EFFECTIVE hold vocabulary, the same shape as the halt one above it.
+read_hold_codes() { printf '%s %s\n' "$HOLD_CODES_CORE" "$HOLD_CODES_EXTRA"; }
+check_hold_code() { case " $(read_hold_codes) " in *" $1 "*) return 0;; esac; return 1; }
+# THE RELEASE-CONDITION GRAMMAR, closed and validated at `--hold` rather than at `--resume`. An
+# unvalidated condition is free text wearing a field name, and the auto-resume unit computes a
+# fire instant from it: a condition nothing parsed would reach that computation as prose.
+#
+#   after <utc-instant> | probe host|gate|api | owner
+#
+# The instant is ISO-8601 in UTC to the second with a trailing Z, the shape `held-at` records, so
+# the two fields are comparable without a second parser.
+check_hold_condition() { # <condition>
+  case "$1" in
+    owner) return 0 ;;
+    "probe host"|"probe gate"|"probe api") return 0 ;;
+    "after "*)
+      case "${1#after }" in
+        [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]:[0-9][0-9]:[0-9][0-9]Z) return 0 ;;
+      esac
+      return 1 ;;
+  esac
+  return 1
+}
+# IS THE CONDITION MET? Only `after` is evaluated; `probe` and `owner` are met on any resume,
+# because the resumed run's next act IS the probe and a driver cannot observe the API it runs
+# under (F2). A clock that answers nothing is a DEAD PROBE and says so through HC_DEAD rather than
+# reading as "not met", which would be a hold nothing can leave.
+HC_DEAD=""
+check_hold_condition_met() { # <condition>
+  HC_DEAD=""
+  local want now
+  case "$1" in
+    "after "*)
+      want=$(date -u -d "${1#after }" +%s 2>/dev/null) || want=""
+      now=$(date -u +%s 2>/dev/null) || now=""
+      case "$want" in ""|*[!0-9]*) HC_DEAD="date -u -d over the hold condition"; return 1 ;; esac
+      case "$now" in ""|*[!0-9]*) HC_DEAD="date -u +%s"; return 1 ;; esac
+      [ "$now" -ge "$want" ] && return 0
+      return 1 ;;
+  esac
+  return 0
+}
+# ---------------------------------------------------------- TOOL-dDerivedDocket-5: the restart
+# THE SCHEDULE NAME, DERIVED FROM THE SLUG and recorded as a carrier id nowhere. Any session holding
+# only the slug can therefore reap it, so no write on a HELD record is needed to remember one. Lower
+# case, because a carrier that sanitises names to kebab case would otherwise store a name a later
+# delete does not match — and two slugs differing only in case then map to one name, which is the
+# stated cost of that choice rather than an oversight.
+resume_schedule_name() { # slug -> the one name every hold of that slug files under
+  printf 'unattended-resume-%s\n' "$(printf '%s' "$1" | tr 'A-Z' 'a-z')"
+}
+# THE FIRE RULE, and the one place it is computed. An `after` hold fires AT ITS INSTANT, because a
+# usage limit that resets at 03:00 restarts into the same limit if the delay is applied to it
+# instead; an instant already past fires a minute after the hold, so a condition met the moment it
+# was written still produces a task rather than one in the past. A `probe` hold has no instant of
+# its own and fires DELAY seconds after it was taken. An `owner` hold owes nothing: only a human act
+# on the machine clears it, and a session restarted into it would find the same stop.
+#
+# A CLOCK THAT ANSWERS NOTHING IS A DEAD PROBE, reported through RS_DEAD, never a fire instant
+# nobody computed — the sibling condition reader above takes the same care for the same reason.
+RS_FIRE=""; RS_WHY=""; RS_DEAD=""
+resolve_resume_fire() { # release condition · held-at
+  RS_FIRE=""; RS_WHY=""; RS_DEAD=""
+  local cond="$1" at="$2" want base
+  case "$cond" in owner) RS_WHY=owner; return 0 ;; esac
+  base=$(date -u -d "$at" +%s 2>/dev/null) || base=""
+  case "$base" in ""|*[!0-9]*) RS_DEAD="date -u -d over held-at"; return 1 ;; esac
+  case "$cond" in
+    "after "*)
+      want=$(date -u -d "${cond#after }" +%s 2>/dev/null) || want=""
+      case "$want" in ""|*[!0-9]*) RS_DEAD="date -u -d over the release condition"; return 1 ;; esac
+      [ "$want" -le "$base" ] && want=$(( base + 60 )) ;;
+    *) want=$(( base + RESUME_SCHEDULE_DELAY )) ;;
+  esac
+  RS_FIRE=$(date -u -d "@$want" +%Y-%m-%dT%H:%M:%SZ 2>/dev/null) || RS_FIRE=""
+  [ -n "$RS_FIRE" ] || { RS_DEAD="date -u -d @<epoch>"; return 1; }
+  return 0
+}
+# THE NO-PROGRESS STREAK. `hold-streak` carries its OWN sha — `<n> · at <sha8>` — because `witness`
+# is rewritten by every later phase write and so cannot say where the previous hold stood. Nothing
+# but --hold writes this fact.
+#
+# PROGRESS IS ANY PATH CHANGED SINCE THAT SHA other than the run's own records: the run-state file,
+# and the build folder's BACKLOG.md where the asks, SEV rows and KEEP rows filed ABOUT a stop are
+# recorded and committed before --hold. The hold and resume writes move HEAD and the stop's own ask
+# filing changes that BACKLOG.md, and neither is progress on the build — a bare HEAD comparison
+# would therefore reset the streak on the hold's own commit and the limit would never bind.
+resolve_hold_streak() { # slug · run-state file · HEAD sha -> prints the streak
+  local slug="$1" rel="$2" head="$3" prev n at changed
+  prev=$(fact "$rel" hold-streak)
+  n=${prev%% *}; at=${prev##* }
+  case "$n" in ""|*[!0-9]*) printf '1\n'; return 0 ;; esac
+  case "$at" in ""|*[!0-9a-fA-F]*) printf '1\n'; return 0 ;; esac
+  GIT rev-parse --verify --quiet "$at^{commit}" >/dev/null 2>&1 || { printf '1\n'; return 0; }
+  changed=$(GIT diff --name-only "$at" "$head" 2>/dev/null \
+            | grep -v -x -F "$rel" \
+            | grep -v -x -F "$MEMORY_ROOT/builds/$slug/BACKLOG.md")
+  [ -n "$changed" ] && { printf '1\n'; return 0; }
+  printf '%s\n' "$(( n + 1 ))"
+}
+# THE REAP LIST the keepalive-reaped attestation is made over, DERIVED from the record's own hold
+# rows and never a second fact. An agent attests over a list it was SHOWN, because a durable task
+# outliving the run under a green attestation is the exact failure that item exists to catch.
+print_reap_targets() { # run-state file · slug
+  local rel="$1" slug="$2" ka owed
+  ka=$(fact "$rel" keepalive)
+  owed=$(grep -cE '^[0-9][0-9-]*T[0-9:]*Z hold · item .* · resume unattended-resume-' "$rel" 2>/dev/null || true)
+  if [ "${owed:-0}" -gt 0 ]; then
+    printf 'unattended: the reap list this attestation is made over — keepalive %s · durable schedule %s, owed by %s hold row(s) of this run\n' "${ka:-none}" "$(resume_schedule_name "$slug")" "$owed"
+  else
+    printf 'unattended: the reap list this attestation is made over — keepalive %s · no durable schedule: no hold of this run owed one\n' "${ka:-none}"
+  fi
+}
 checker_of()  { local p; for p in $(dod); do case "$p" in "$1:"*) printf '%s' "${p#*:}"; return;; esac; done; printf 'machine'; }
 
 # ------------------------------------------------------------------------------ the region grammar
@@ -757,6 +1121,374 @@ fact() { # run-state file · key
   return 0
 }
 
+
+# ------------------------------------------------------------------------- the two phase readers
+# S8. Every read of the `phase` fact outside the phase WRITERS goes through one of these two, and
+# `check-unattended.sh`'s structural arm grades that: a direct read anywhere else reds, whatever
+# function contains it, and a `read_recorded_phase` call reds unless the leg's allow-list names its
+# function.
+#
+# WHY TWO, and not one reader with a flag. `read_derived_phase` is the EFFECTIVE phase — what the record
+# MEANS right now — and it is where every later derivation goes; the derived-terminal unit puts its
+# LANDED-from-the-advertised-tip inside it. `read_recorded_phase` is the fact AS WRITTEN, and three call
+# sites genuinely want that: the archive namer, which must name a record by the bytes it was handed,
+# and `--landed` twice, whose own postcondition is a terminal and which also reads another worktree's
+# uncommitted copy.
+#
+# THE EXEMPTION IS A LINE, NEVER A FUNCTION. A read that shares its line with the
+# `set_fact <file> phase` it guards is a writer's own guard and is exempt; every other read in that
+# same function is graded. A function-wide exemption would let a writer read the fact directly
+# anywhere inside itself, which is five of the call-site table's ten rows.
+#
+# CALLED AS A PLAIN COMMAND, never inside `$(...)`: a substitution runs it in a SUBSHELL and the two
+# globals it sets are discarded there, which is the status-set-in-a-subshell class this file already
+# carries twice. It prints nothing, never calls `fail`, never touches the global `status`, returns 0.
+#
+# TOOL-dDerivedDocket-22 S2 - LANDED IS DERIVED HERE, by owner ruling D12-i2. A LANDING record whose
+# own commit (`read_landing_commit`, in the kit library, shared with the gate leg) is an ancestor of
+# the tip the remote ADVERTISES reads LANDED, with the evidence in DP_LANDING, DP_AREF and DP_TIP.
+# Anything short of that leaves LANDING and says why in DP_REASON. The remote is observed ONLY for a
+# LANDING record, so every other record stays offline, and only through `read_advertised_tip`,
+# which returns a code and never calls `fail` - no caller inherits the observation's refusal.
+DP_PHASE=""; DP_REASON=""; DP_LANDING=""; DP_AREF=""; DP_TIP=""
+read_derived_phase() { # run-state file -> sets DP_PHASE (the effective phase) and DP_REASON
+  DP_PHASE=""; DP_REASON=""; DP_LANDING=""; DP_AREF=""; DP_TIP=""
+  [ -n "${1:-}" ] || return 0
+  DP_PHASE=$(fact "$1" phase)
+  [ "$DP_PHASE" = LANDING ] || return 0
+  DP_LANDING=$(read_landing_commit "$1") || DP_LANDING=""
+  if [ -z "$DP_LANDING" ]; then
+    DP_REASON="the LANDING record is not committed as it stands, so no commit carries it to any remote"
+    return 0
+  fi
+  if ! read_advertised_tip; then
+    DP_REASON="$ADVQ_WHY"
+    return 0
+  fi
+  if GIT merge-base --is-ancestor "$DP_LANDING" "$ADVQ_SHA" 2>/dev/null; then
+    DP_PHASE=LANDED; DP_AREF="$ADVQ_REF"; DP_TIP="$ADVQ_SHA"
+  else
+    DP_REASON="its landing commit ${DP_LANDING:0:8} is not on $ADVQ_REF at ${ADVQ_SHA:0:8}"
+  fi
+  return 0
+}
+# THE QUIET OBSERVATION, in `branch_tip_quiet`'s shape and for its reason: `observe_anchor` refuses
+# through `fail`, which prints and sets the global `status` with no reset, so a phase READ that went
+# through it would make a correct write exit 1. This returns a code and prints nothing; the reason is
+# ADVQ_WHY. ONCE PER PROCESS, and it takes an anchor this process already observed rather than asking
+# again. An advertised tip whose object this clone lacks is an unanswered observation, not a no.
+ADVQ_DONE=0; ADVQ_RC=1; ADVQ_REF=""; ADVQ_SHA=""; ADVQ_WHY=""
+read_advertised_tip() { # -> 0 with ADVQ_REF and ADVQ_SHA, or non-zero with ADVQ_WHY
+  local _aq_rem _aq_f _aq_rc _aq_adv
+  [ "$ADVQ_DONE" = 1 ] && return "$ADVQ_RC"
+  ADVQ_DONE=1; ADVQ_RC=1; ADVQ_REF=""; ADVQ_SHA=""; ADVQ_WHY=""
+  if [ -n "${AREF:-}" ] && [ -n "${ASHA:-}" ]; then
+    ADVQ_REF="$AREF"; ADVQ_SHA="$ASHA"; ADVQ_RC=0; return 0
+  fi
+  _aq_rem=$(GIT remote 2>/dev/null | head -1)
+  if [ -z "$_aq_rem" ]; then ADVQ_WHY="this clone declares no remote to observe"; return 1; fi
+  _aq_f=$(mktemp) || { ADVQ_WHY="no scratch file could be created to capture the remote advertisement"; return 1; }
+  observe_remote "$_aq_f" ls-remote --symref --exit-code "$_aq_rem" HEAD; _aq_rc=$?
+  _aq_adv=$(cat "$_aq_f" 2>/dev/null); rm -f "$_aq_f"
+  case "$_aq_rc" in
+    0) ;;
+    124) ADVQ_WHY="the remote observation was killed by this kit's own ${REMOTE_BOUND}s bound, so the tip is unknown"; return 1 ;;
+    2) ADVQ_WHY="the remote answered and advertised no HEAD, so it names no default branch"; return 1 ;;
+    *) ADVQ_WHY="the remote did not answer: $_aq_rem"; return 1 ;;
+  esac
+  ADVQ_REF=$(printf '%s\n' "$_aq_adv" | awk -F'\t' '{ sub(/\r$/,"",$2) } $2=="HEAD" && $1 ~ /^ref: / { sub(/^ref: /,"",$1); print $1; exit }')
+  ADVQ_SHA=$(printf '%s\n' "$_aq_adv" | awk -F'\t' '{ sub(/\r$/,"",$2) } $2=="HEAD" && $1 ~ /^[0-9a-f]+$/ { print $1; exit }')
+  if [ -z "$ADVQ_REF" ] || [ -z "$ADVQ_SHA" ]; then
+    ADVQ_WHY="the remote answered and advertised no HEAD symref, so it names no default branch"; return 1
+  fi
+  if ! GIT rev-parse --verify --quiet "$ADVQ_SHA^{commit}" >/dev/null 2>&1; then
+    ADVQ_WHY="the remote advertises $ADVQ_REF at ${ADVQ_SHA:0:8}, a tip this clone does not have; fetch and read again"; return 1
+  fi
+  ADVQ_RC=0
+  return 0
+}
+read_recorded_phase() { # run-state file -> the phase fact, exactly as written
+  fact "$1" phase
+}
+
+# ------------------------------------------------------------------------------- the landed log
+# THE LEASE IS THE RUN-STATE FACTS, and there is no second record of it (TOOL-dDerivedDocket-61, the
+# owner's ruling of 2026-09-22 as the build's brief relays it). `write_lease` writes six facts
+# together, `keepalive`, `session`, `pid`, `host`, `pid-image` and `lease-utc`: a record carrying
+# `lease-utc` is leased, its holder is the `keepalive` fact, its freshness is `check_lease_fresh`
+# over `--liveness`'s own clock and bound, and HELD is its released state. The per-slug lease FILE
+# this section used to hold under the git common dir is retired and nothing reads or writes one, so
+# a leftover one is inert. NOTHING REFRESHES THE LEASE: freshness is derived from what the run moves,
+# never written, because a refresh written into the tracked record would restage it on every tick
+# and move `lease-utc`, which `--landed` grades stop lines against.
+#
+# WHAT STAYS UNDER THE COMMON DIR is the one fact the retired file carried that is not a lease: that
+# `--landed` OBSERVED an in-place landing on the remote. One append-only line per observation in
+# `landed.<slug>.log`, `<utc> landed <landing sha> on <ref> at <tip sha>`, so every worktree on this
+# node reads it, and a later reader that cannot see the remote still has it. It answers "did this
+# landing land" and never "who drives this slug", and it is matched by the LANDING COMMIT, so an
+# earlier run's line never marks a new landing finished.
+read_utc_now() { date -u +%Y-%m-%dT%H:%M:%SZ 2>/dev/null; }
+# THE ONE COMMON-DIR DERIVATION, with two consumers: the landed log and unit 28's process ledger,
+# whose `resolve_procs_path` takes its directory from here. The COMMON dir and never the
+# per-worktree `resolve_sidecar_dir`: one log and one ledger per slug on the node. A main worktree
+# cannot tell the two apart, because there both directories are one.
+resolve_landed_log() { # slug -> the landed log's path on this node, shared by every worktree
+  local _ll_cd
+  _ll_cd=$(cd "$(GIT rev-parse --git-common-dir 2>/dev/null)" 2>/dev/null && pwd) || return 1
+  [ -n "$_ll_cd" ] || return 1
+  printf '%s/unattended/landed.%s.log\n' "$_ll_cd" "$1"
+}
+# VALIDATED SHAPES ONLY, two hex shas and a ref carrying no whitespace, so no line can carry a forged
+# field. Written by one verb, the in-place `--landed`, on a derived LANDED, and never rewritten.
+write_landed_observation() { # slug · landing commit · advertised ref · advertised tip -> one line appended
+  local _lw_f
+  case "${2:-}" in ""|*[!0-9a-f]*) return 1 ;; esac
+  case "${4:-}" in ""|*[!0-9a-f]*) return 1 ;; esac
+  case "${3:-}" in ""|*[[:space:]]*) return 1 ;; esac
+  _lw_f=$(resolve_landed_log "$1") || return 1
+  mkdir -p "${_lw_f%/*}" 2>/dev/null || return 1
+  printf '%s landed %s on %s at %s\n' "$(read_utc_now)" "$2" "$3" "$4" >> "$_lw_f" 2>/dev/null || return 1
+  return 0
+}
+LO_SHA=""; LO_UTC=""
+read_landed_observation() { # slug · landing commit -> 0 with LO_SHA and LO_UTC when the log names it
+  local _lr_f _lr_l
+  LO_SHA=""; LO_UTC=""
+  [ -n "${2:-}" ] || return 1
+  _lr_f=$(resolve_landed_log "$1") || return 1
+  [ -f "$_lr_f" ] || return 1
+  _lr_l=$(awk -v s="$2" '{ sub(/\r$/, "") } $2 == "landed" && $3 == s { l = $0 } END { if (l != "") print l }' "$_lr_f" 2>/dev/null)
+  [ -n "$_lr_l" ] || return 1
+  LO_UTC=${_lr_l%% *}; LO_SHA="$2"
+  return 0
+}
+
+# ------------------------------------------------------------------------------ the process ledger
+# TOOL-dDerivedDocket-28. ONE FILE PER SLUG BESIDE THE LANDED LOG, one line per command `run_bounded`
+# started, appended:
+#
+#   <msys pid> <start token|-> <driver pid> <driver token|-> <keepalive|-> <iso-utc> <argv0> [argv1] [argv2]
+#
+# A RECORD IS AN IDENTITY, NOT A NAME. The start token is field 22 of `<procfs>/<pid>/stat`, the
+# process start time in clock ticks, read once here and again before any reap: two processes that
+# share a pid do not share it. Where procfs cannot answer the token is `-`, and such a record is
+# counted and NEVER reaped, announced — the pid alone can name a stranger.
+#
+# AN ORPHAN is a recorded process alive with its recorded token while its recorded DRIVER is not. The
+# driver waits on every command it starts, so a live driver is a live consumer. A driver pid reused by
+# another process reads as alive and withholds the reap: the error direction is a process left
+# running, never one killed. The driver's own token is recorded for the reader and decides nothing.
+#
+# NOTHING OUTSIDE THE LEDGER IS IN REACH, whatever its command line says. i1 found six abandoned
+# processes matching this kit's commands and five were another repository's, so a same-named process
+# nobody recorded is reported by the process-monitor kit and never killed here.
+#
+# `UNATTENDED_PROCFS` is the FIXTURE SEAM and nothing else: pointed away, every new record carries
+# `-` and nothing is ever reaped. A crafted directory could forge a token, and any reap it earned still
+# goes through the reaper's own fence.
+PROCFS_ROOT=${UNATTENDED_PROCFS:-/proc}
+# 120 s: one census of the reaper's is bounded at 90 s inside it and a kill costs two, so this admits
+# one slow census and still ends a hung one. A pinned literal, chosen rather than measured, on
+# REMOTE_BOUND's argument that a bound raisable from the environment leaves no diff behind.
+REAP_BOUND=120
+PT_TOKEN=""
+read_proc_token() { # pid -> sets PT_TOKEN to its procfs start token, or `-` when procfs cannot say
+  local _l="" _r
+  local -a _f
+  PT_TOKEN=-
+  case "${1:-}" in ""|*[!0-9]*) return 0 ;; esac
+  { IFS= read -r _l < "$PROCFS_ROOT/$1/stat" || [ -n "$_l" ]; } 2>/dev/null || return 0
+  # EVERY FIELD AFTER THE LAST `)` IS NUMERIC OR ONE LETTER. The command name inside the parentheses
+  # may carry spaces and parentheses of its own, so the split starts after it: field 3 is `_f[0]`.
+  _r=${_l##*) }
+  read -r -a _f <<<"$_r"
+  [ "${#_f[@]}" -ge 20 ] || return 0
+  case "${_f[19]}" in ""|*[!0-9]*) return 0 ;; esac
+  PT_TOKEN=${_f[19]}
+  return 0
+}
+resolve_procs_path() { # slug -> the process ledger's path on this node, beside the landed log
+  local _pp; _pp=$(resolve_landed_log "$1") || return 1
+  printf '%s/%s.procs\n' "${_pp%/*}" "$1"
+}
+# THE RECORDER. A verb with no slug (`--plan`, `--phase`) has no ledger to write, and a record that
+# cannot be written costs the reap and never the command: a bounded run is never refused for it.
+write_proc_record() { # pid · argv... -> one line appended to the running verb's slug ledger
+  local _pid="$1" _f _t _w _a="" _i=0 _k
+  shift
+  check_slug_shape "${SLUG:-}" || return 0
+  _f=$(resolve_procs_path "$SLUG") || return 0
+  mkdir -p "${_f%/*}" 2>/dev/null || return 0
+  read_proc_token "$_pid"; _t=$PT_TOKEN
+  # A WORD IS WHITESPACE-FREE BEFORE IT IS WRITTEN, because the line is split on whitespace when it
+  # is read back and a space inside an argv word would forge the fields after it.
+  for _w in "$@"; do
+    [ "$_i" -lt 3 ] || break
+    _w=${_w//[[:space:]]/_}; [ -n "$_w" ] || _w=-
+    _a="$_a ${_w:0:80}"; _i=$((_i + 1))
+  done
+  # THE FIFTH FIELD IS THE RECORD'S `keepalive` FACT, or `-` before the record carries one: a first
+  # `--preflight`'s probes run before the fact is written. No reader consults it (`derive_proc_state`
+  # reads the pid, the tokens, the driver pid, the time and the argv); it is for the person reading.
+  _k=$(fact "$(runmd_of "$SLUG")" keepalive 2>/dev/null) || _k=""
+  _k=${_k:--}; _k=${_k//[[:space:]]/_}
+  read_proc_token "$$"
+  printf '%s %s %s %s %s %s%s\n' "$_pid" "$_t" "$$" "$PT_TOKEN" "$_k" "$(read_utc_now)" "$_a" >> "$_f" 2>/dev/null
+  return 0
+}
+PL_FILE=""; PL_LINES=()
+read_proc_ledger() { # slug -> 0 with PL_FILE and PL_LINES filled, or 1 when this slug has no ledger
+  local _l
+  PL_FILE=""; PL_LINES=()
+  PL_FILE=$(resolve_procs_path "$1") || { PL_FILE=""; return 1; }
+  [ -f "$PL_FILE" ] || return 1
+  while IFS= read -r _l || [ -n "$_l" ]; do
+    _l=${_l%$'\r'}
+    [ -n "$_l" ] && PL_LINES+=("$_l")
+  done < "$PL_FILE"
+  return 0
+}
+# ONE CLASSIFIER, and every reader asks it: the reaper, the count `--status` prints, the precondition
+# `--hold` refuses on and the removal at a terminal. Four spellings of "is this ours and is it alive"
+# would be four answers to one question.
+PS_STATE=""; PS_PID=""; PS_TOK=""; PS_DPID=""; PS_ISO=""; PS_ARGV=""
+derive_proc_state() { # ledger line -> PS_STATE gone|reused|live|orphan|untokened|malformed, and its fields
+  local -a _f
+  read -r -a _f <<<"$1"
+  PS_PID=${_f[0]:-}; PS_TOK=${_f[1]:--}; PS_DPID=${_f[2]:-}; PS_ISO=${_f[5]:-}; PS_ARGV="${_f[*]:6}"
+  case "$PS_PID" in ""|*[!0-9]*) PS_STATE=malformed; return 0 ;; esac
+  case "$PS_DPID" in ""|*[!0-9]*) PS_STATE=malformed; return 0 ;; esac
+  if ! kill -0 "$PS_PID" 2>/dev/null; then PS_STATE=gone; return 0; fi
+  read_proc_token "$PS_PID"
+  if [ "$PS_TOK" != - ] && [ "$PT_TOKEN" != - ] && [ "$PT_TOKEN" != "$PS_TOK" ]; then PS_STATE=reused; return 0; fi
+  if kill -0 "$PS_DPID" 2>/dev/null; then PS_STATE=live; return 0; fi
+  if [ "$PS_TOK" = - ] || [ "$PT_TOKEN" = - ]; then PS_STATE=untokened; else PS_STATE=orphan; fi
+  return 0
+}
+# Is the RECORDED process still there? Dead, or its pid now carrying another start token, is gone.
+check_proc_gone() { # pid · recorded token -> 0 when that process no longer exists
+  kill -0 "$1" 2>/dev/null || return 0
+  [ "${2:--}" != - ] || return 1
+  read_proc_token "$1"
+  [ "$PT_TOKEN" != - ] && [ "$PT_TOKEN" != "$2" ] && return 0
+  return 1
+}
+measure_orphans() { # slug -> how many recorded processes are alive with their driver gone, on stdout; reads only
+  local _l _n=0
+  if read_proc_ledger "$1"; then
+    for _l in "${PL_LINES[@]}"; do
+      derive_proc_state "$_l"
+      case "$PS_STATE" in orphan|untokened) _n=$((_n + 1)) ;; esac
+    done
+  fi
+  printf '%s' "$_n"
+}
+read_procs_alive() { # slug -> one `<pid> (<argv>)` line per recorded process still alive, on stdout; reads only
+  local _l
+  read_proc_ledger "$1" || return 0
+  for _l in "${PL_LINES[@]}"; do
+    derive_proc_state "$_l"
+    case "$PS_STATE" in live|orphan|untokened) printf '%s (%s)\n' "$PS_PID" "$PS_ARGV" ;; esac
+  done
+  return 0
+}
+# THE REAPER'S CALL, bounded and captured through a FILE, never a substitution: a reaper that leaves a
+# descendant holding its stdout would hold a `$( )` open past the bound (bounded-through-a-pipe).
+# `PROCMON_ROOT` is the declared root the reaper's fence reads, set as the gate runner sets it.
+RP_WHY=""
+run_reaper() { # msys pid -> the declared reaper's exit status; RP_WHY carries what it said
+  local _o _rc
+  RP_WHY=""
+  _o=$(mktemp 2>/dev/null) || { RP_WHY="no capture file could be created for the reaper's answer"; return 1; }
+  # shellcheck disable=SC2086
+  if [ "$GATE_BOUND_LIVE" = 1 ]; then
+    PROCMON_ROOT="$ROOT" timeout -k 5s "$REAP_BOUND" $PROCMON_CMD --kill-msys "$1" </dev/null >"$_o" 2>&1; _rc=$?
+  else
+    PROCMON_ROOT="$ROOT" $PROCMON_CMD --kill-msys "$1" </dev/null >"$_o" 2>&1; _rc=$?
+  fi
+  if { [ "$_rc" = 124 ] || [ "$_rc" = 137 ]; } && [ "$GATE_BOUND_LIVE" = 1 ]; then
+    RP_WHY="the reaper did not answer within ${REAP_BOUND}s"
+  else
+    RP_WHY=$(grep -m1 'REFUSED' "$_o" 2>/dev/null)
+    [ -n "$RP_WHY" ] || RP_WHY=$(grep -v '^[[:space:]]*$' "$_o" 2>/dev/null | tail -n 1)
+    [ -n "$RP_WHY" ] || RP_WHY="the reaper exited $_rc and said nothing"
+  fi
+  RP_WHY=${RP_WHY//$'\r'/}; RP_WHY=${RP_WHY:0:200}
+  rm -f "$_o" 2>/dev/null
+  return "$_rc"
+}
+# THE REAP, one orphan at a time and in ledger order, and the PRUNE beside it: a record whose process
+# is gone, or whose pid now names a different process, leaves the ledger; every other record stays.
+# Called only by a verb that HOLDS the slug's lease when it gets here (`--preflight` after taking it,
+# `gates-green`, `--hold` before releasing it, and the `--resume` rows that hold it), so the rewrite
+# cannot race another session's append. SILENT when there is nothing to report.
+#
+# SUCCESS IS READ BACK, never taken from the reaper's exit: the recorded pid is asked again, and a
+# process still alive with its recorded token is NOT reaped, with what the reaper said. The record is
+# then kept, so a later reap can succeed and a person can read why this one did not.
+run_orphan_reap() { # slug -> every orphan of the slug reaped through PROCMON_CMD, and the ledger pruned
+  local slug="$1" _l _t _keep _off="" _noff=0 _k
+  read_proc_ledger "$slug" || return 0
+  _t=$(mktemp "$PL_FILE.XXXXXX" 2>/dev/null) || {
+    echo "unattended: NOTE - the process ledger cannot be rewritten on this node, so nothing was reaped or pruned: $PL_FILE"
+    return 0; }
+  for _l in "${PL_LINES[@]}"; do
+    derive_proc_state "$_l"; _keep=1
+    case "$PS_STATE" in
+      gone) _keep=0 ;;
+      reused) _keep=0; echo "unattended: NOT reaped $PS_PID — exited, pid reused" ;;
+      untokened) echo "unattended: NOT reaped $PS_PID — no procfs token" ;;
+      orphan)
+        if [ -z "$PROCMON_CMD" ]; then
+          _off="$_off $PS_PID"; _noff=$((_noff + 1))
+        else
+          run_reaper "$PS_PID"
+          # A KILLED PROCESS LEAVES THE TABLE A MOMENT AFTER ITS KILLER RETURNS, so it is asked a few
+          # times over two seconds before a survivor is called one.
+          _k=0
+          while ! check_proc_gone "$PS_PID" "$PS_TOK" && [ "$_k" -lt 10 ]; do sleep 0.2 2>/dev/null || sleep 1; _k=$((_k + 1)); done
+          if check_proc_gone "$PS_PID" "$PS_TOK"; then
+            _keep=0
+            echo "unattended: reaped orphan $PS_PID ($PS_ARGV), started $PS_ISO by driver $PS_DPID, now gone"
+          else
+            echo "unattended: NOT reaped $PS_PID — fence refused: $RP_WHY"
+          fi
+        fi ;;
+    esac
+    [ "$_keep" = 0 ] || printf '%s\n' "$_l" >> "$_t"
+  done
+  mv -f "$_t" "$PL_FILE" 2>/dev/null || rm -f "$_t" 2>/dev/null
+  [ "$_noff" = 0 ] \
+    || echo "unattended: reaping is OFF because PROCMON_CMD is blank, so $_noff orphan(s) of $slug are counted and left running:$_off"
+  return 0
+}
+# S11 - AT A TERMINAL THE LEDGER GOES WITH THE RUN, unless a recorded process is still alive: the
+# ledger is then the only thing a later reap can find it by, so it is KEPT and each live pid named.
+remove_procs_ledger() { # slug -> the ledger removed, or kept with a line naming each live pid
+  local _f _alive
+  _f=$(resolve_procs_path "$1") || return 0
+  [ -f "$_f" ] || return 0
+  _alive=$(read_procs_alive "$1")
+  if [ -z "$_alive" ]; then rm -f "$_f" 2>/dev/null; return 0; fi
+  echo "unattended: the process ledger is KEPT, because a recorded process is still alive and a later reap can find it only there: ${_alive//$'\n'/; } at $_f"
+  return 0
+}
+# The LEASELESS record's clock, and it is a different question from the lease's: how long ago did
+# anything commit into this build's folder. A record with no `lease-utc` predates the run-state
+# lease and names no session whose transcript could be read, and its build folder is the one thing
+# that belongs to its run rather than to whichever worktree asks (unit 4 §8 F8, kept by
+# TOOL-dDerivedDocket-61 §8 F13). It is graded against RESUME_STALE_BOUND, the one bound.
+build_folder_age() { # slug -> seconds since the newest commit touching its build folder
+  local _ct _now
+  _ct=$(GIT log -1 --format=%ct -- "$M/builds/$1" 2>/dev/null) || _ct=""
+  case "$_ct" in ""|*[!0-9]*) return 1 ;; esac
+  _now=$(date -u +%s 2>/dev/null) || _now=""
+  case "$_now" in ""|*[!0-9]*) return 1 ;; esac
+  printf '%s' "$((_now - _ct))"
+  return 0
+}
+
 # --------------------------------------------------------------------------------- the anchor
 # THE ANCHOR IS AN OBSERVATION OF THE REMOTE, not a read of any local ref and not a name from the
 # environment. Both reported routes die by CONSTRUCTION rather than by detection: no `refs/remotes/*`
@@ -791,6 +1523,19 @@ AUTH_PIECES=""
 AUTH_OUTPUTS=""
 AUTH_GRAIN=""
 AUTH_RECORDS=""
+# TOOL-dDerivedDocket-16 - the `asks:` line as the README at BASE spells it, out of the SAME scan
+# that reads the mode. It is the run's MANDATE and the one thing here the run may not write: the
+# owner commits the line, every verb below reads it, and property P6 refuses a run that re-reads a
+# changed one. Empty is the ordinary case and means today's path, unchanged.
+AUTH_ASKS=""
+# TOOL-dDerivedDocket-19 - the `may:` GRANT line, out of that same scan. It lifts the build method's
+# veto 2 for the paths and decisions it names, and ruling D12-j honours it from exactly one place: a
+# `slug`-mode README the owner committed at the default-branch anchor. PRESENCE is its own fact,
+# because a key written under a mode that admits the second anchor is refused whatever it says, and an
+# empty value is a malformed grant rather than an absent one. After the scan AUTH_MAY holds the
+# NORMALISED grants, or `none`.
+AUTH_MAY=""
+AUTH_MAY_SET=0
 # TOOL-aBlindedTrial-2 - the `spec-audit: <date>` declaration, read from the same BASE blob and for
 # the same provenance property: a run cannot opt itself in or out by editing its working copy.
 # Empty is the ordinary case and means the pre-code audit is not owed by this build. That empty is
@@ -1048,6 +1793,17 @@ TB=""
 # Set by dod_met when an unmet item has something to SAY beyond its name; verb_close prints it
 # indented under the refusal and clears it. Empty means the item had nothing to add.
 DOD_OUT=""
+# TOOL-dDerivedDocket-3 - SET WHEN AN ITEM REFUSED RATHER THAN CAME BACK UNMET, and the two are not
+# the same fact. An UNMET item invites `--override`; a numbered REFUSAL may not be bought with one,
+# because `gates-green`'s in-place preconditions are what stop an UNGRADED merge from landing and an
+# override there would land exactly that. `verb_close` reads this the moment `dod_met` returns and
+# ends the verb, so no later item can bury the refusal and no override loop can reach it.
+GG_HARD=""
+# TOOL-dDerivedDocket-24 - THE TWO FACTS A MET `gates-green` OWES, held until the close's other
+# writes: `gates-run` names the bar and the HEAD it graded, `gates-inherited` the R and the legs a
+# landing over an inherited-only red rests on. Written after the carry check, so a refusal there
+# still writes nothing; `verb_close` clears both on entry.
+GG_RUN_FACT=""; GG_INH_FACT=""
 trusted_base() { # run-state file [· allow-degenerate]  ->  sets TB
   local fresh rc rec head rec0 _tb_rd _tb_alt
   TB=""
@@ -1201,9 +1957,18 @@ scan_dirty_paths() {
   GIT ls-files --others --exclude-standard
 }
 
-check_clean() {
-  local d
-  d=$(scan_dirty_paths | grep -c . || true)
+# THE OPTIONAL ARGUMENT EXEMPTS ONE FILE, and only while it differs from HEAD in its six lease-fact
+# lines alone (`check_lease_only_diff`, TOOL-dDerivedDocket-61 S8). `--landed`'s `primary` branch is
+# its one caller: a pushed landing re-bound by `--resume --keepalive-id` stays uncommitted, because
+# committing it would move HEAD off the pushed tip. `--hold` and `--preflight` pass nothing, so both
+# still refuse the same difference.
+check_clean() { # [run-state file]
+  local d x="${1:-}"
+  if [ -n "$x" ] && check_lease_only_diff "$x"; then
+    d=$(scan_dirty_paths | grep -vxF -- "$x" | grep -c . || true)
+  else
+    d=$(scan_dirty_paths | grep -c . || true)
+  fi
   [ "$d" = 0 ] && return 0
   fail 2 "the working tree is dirty, so the pinned BASE would name a state that is not what runs: $d path(s)"
   return 1
@@ -1258,6 +2023,48 @@ check_wiring() {
   # self-test reds if this source spells one at all. Surfacing beats naming, and works for any adopter.
   [ -n "$wout" ] && printf '%s\n' "$wout" | sed 's/^/    /'
   return 1
+}
+
+# TOOL-dDerivedDocket-3 S2 - THE LANDER, ASKED A QUESTION. One spelling for every read-only call
+# into it - `--carry` and `--prepared` at preflight, both again at the close - so a liveness probe
+# and a landing precondition can never disagree about how the lander is invoked or how its answer is
+# read. $LANDER is deliberately unquoted, exactly as $GATE_CMD is: a project declares a COMMAND
+# LINE, not a path. BOUNDED, because both flags resolve the remote's advertised tip and a remote
+# that does not answer is the case this mode has to survive.
+#
+# THE EXIT CODES ARE THE LANDER'S OWN and are read the same way at every site: 0 done, 1 the
+# landing was refused or failed, 2 an ARGUMENT refusal, 3 an OBSERVATION failure. The 2/3 split is
+# the whole reason the probes exist - a 2 says the declaration names a lander that cannot land this
+# way and no retry helps, a 3 says the clone or the network is what failed and the run holds.
+run_lander() { # flag · slug -> the lander's own exit; its output in RB_OUT
+  # shellcheck disable=SC2086
+  run_bounded $LANDER "$1" --slug "$2"
+}
+
+# THE PREFLIGHT PROBE. `in-place` is a declaration about a lander this kit does not ship, and a
+# declaration nobody tests is a claim: BASE's only reader of it would have been the landing itself,
+# where a lander that never implemented the flags refuses after every unit is built. Both flags are
+# asked once, here, where the refusal costs one preflight.
+#
+# EXIT 1 IS A PASS. `--carry` exits 1 on a foreign commit and `--prepared` exits 1 on a branch tip
+# that is not a prepared merge, which is the ordinary state of every run at preflight; both answers
+# are a lander that IMPLEMENTS the mode, which is the only question this probe asks.
+check_lander_mode() { # slug
+  [ "$LANDER_MODE" = in-place ] || return 0
+  local _f _rc
+  for _f in --carry --prepared; do
+    run_lander "$_f" "$1"; _rc=$?
+    case "$_rc" in
+      0|1) ;;
+      2) fail 60 "LANDER_MODE declares 'in-place' and the declared lander refused that flag as an argument it does not implement, so the mode is declared against a lander that cannot land in it and the first refusal would otherwise arrive after every unit was built: $LANDER $_f"
+         [ -z "$RB_OUT" ] || printf '%s\n' "$RB_OUT" | sed 's/^/    /'
+         return 1 ;;
+      *) fail 61 "the declared lander could not make the observation that flag asks for, which is the remote or the clone rather than anything this project declared; re-declaring the landing shape would not move it, and the run holds on the outage instead: $LANDER $_f"
+         [ -z "$RB_OUT" ] || printf '%s\n' "$RB_OUT" | sed 's/^/    /'
+         return 1 ;;
+    esac
+  done
+  return 0
 }
 
 # TOOL-cBriefedPilot-4 - every directive this run is bound by is a POINTER into a section of the
@@ -1392,46 +2199,34 @@ check_single_live() {
   # a non-terminal phase sit there as an unseen second run — which is exactly what this check exists
   # to make impossible.
   # THE `LANDING`-ALREADY-ON-THE-REMOTE EXCLUSION, the DRIVER's half of the leg's check 7.
-  # TOOL-aPrimedKeepalive-7. A record at LANDING whose witness is an ancestor of the anchor this verb
-  # already observed is not a competing run: it is a finished one missing its stamp, and its work is
-  # on the branch every later run measures against. Without this half, fixing the leg alone still
-  # leaves the NEXT --preflight on this repo refused, which is how the wedge survived being fixed.
-  # Observed before it was written: --preflight printed check 5 at two live records, one of them a
-  # build merged and pushed days earlier.
+  # TOOL-aPrimedKeepalive-7, re-keyed by TOOL-dDerivedDocket-22 S9. A LANDING record whose OWN commit
+  # is on the tip the remote advertises derives LANDED, and a finished run is not a competing one.
+  # It reads the landing commit through `read_derived_phase`, which is the leg's reading too, so
+  # preflight and the bar agree about one record. It used to read the WITNESS, which answers
+  # whether the WORK is on the remote and not the RECORD: a run that pushed its work before
+  # committing its LANDING record was excluded here while nothing had carried its record anywhere.
   #
   # WHAT IT DOES NOT CLAIM: nothing about whether that run finished correctly or met its Definition
-  # of Done. One thing only — the commit its record names as witness is on the branch the remote
-  # calls its default. LANDING stays non-terminal; a terminal phase is a PRODUCER's to write.
+  # of Done. One thing only — the commit carrying its LANDING record is on the branch the remote
+  # calls its default.
   #
-  # FAILS CLOSED. `ASHA` is populated by observe_anchor, which verb_preflight calls BEFORE this; with
-  # no anchor, an unresolvable witness, or any phase but LANDING, the record counts as it always did.
-  local anc="${ASHA:-}" w=""
+  # FAILS CLOSED. No observation, an uncommitted record, or a landing commit off the tip leaves the
+  # record LANDING, and a LANDING record counts as it always did.
+  local anc="${ASHA:-}"
   [ -n "$anc" ] && { GIT rev-parse --verify --quiet "$anc^{commit}" >/dev/null 2>&1 || anc=""; }
   for f in $(GIT ls-files ":(glob)$M/builds/*/RUN.md" ":(glob)$M/builds/*/RUN.*.md" 2>/dev/null); do
-    p=$(fact "$f" phase); [ -n "$p" ] || continue
-    is_terminal "$p" && continue
     # THIS RUN'S OWN RECORD IS NOT A CONCURRENT RUN. It is absent at a first preflight — the file
     # does not exist yet and is certainly not tracked — but a RE-preflight after a compaction is a
     # sanctioned resume, and there the run's own committed record is tracked and non-terminal. Without
     # this skip the announcement reports the run to itself as its own competitor, which is worse than
     # saying nothing: it is a true-looking count of the wrong population.
     case "$f" in "$M/builds/${SLUG:-}/RUN.md"|"$M/builds/${SLUG:-}/RUN."*".md") continue ;; esac
-    if [ "$p" = LANDING ] && [ -n "$anc" ]; then
-      w=$(fact "$f" witness)
-      # SHA-SHAPED, for the reason the leg's copy states: `rev-parse --verify` resolves a tag or a
-      # branch name too, and the witness is authored by the run being graded. A witness reading
-      # `main` is an ancestor of the anchor by construction. This is the ADMISSION point, so the
-      # weaker predicate here is worth more to an attacker than the leg's.
-      case "$w" in
-        [0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]*) ;;
-        *) w="" ;;
-      esac
-      if [ -n "$w" ] && GIT rev-parse --verify --quiet "$w^{commit}" >/dev/null 2>&1          && GIT merge-base --is-ancestor "$w" "$anc" 2>/dev/null; then
-        printf 'unattended: EXCLUDED %s from the live-run count — LANDING, and its witness %s is an ancestor of the observed anchor %s, so its work is already on the remote and it is a finished run missing a stamp rather than a second live one
-' "$f" "$w" "$anc"
-        continue
-      fi
+    read_derived_phase "$f"; p="$DP_PHASE"; [ -n "$p" ] || continue
+    if [ "$p" = LANDED ] && [ -n "$DP_LANDING" ]; then
+      printf 'unattended: EXCLUDED %s from the live-run count — derived LANDED: its landing commit %s is on %s at %s, so it is a finished run and the next --preflight of its slug retires it\n' "$f" "${DP_LANDING:0:8}" "$DP_AREF" "${DP_TIP:0:8}"
+      continue
     fi
+    is_terminal "$p" && continue
     n=$((n + 1)); live="$live $f"
   done
   # THE THRESHOLD IS THE ANNOUNCEMENT'S, and the two must never drift apart. This guard used to read
@@ -1449,7 +2244,8 @@ check_single_live() {
   [ "$n" -lt 1 ] && return 0
   printf 'unattended: %d concurrent unattended run(s) — this run is NOT blocked by them, and none of them is blocked by this one:\n' "$n"
   for f in $live; do
-    printf '  %s · phase %s · witness %s\n' "$f" "$(fact "$f" phase)" "$(fact "$f" witness)"
+    read_derived_phase "$f"
+    printf '  %s · phase %s · witness %s\n' "$f" "$DP_PHASE" "$(fact "$f" witness)"
   done
   return 0
 }
@@ -1475,7 +2271,7 @@ check_single_live() {
 # and a run that lands a NEW build README authorizes the next run. All five are enumerated in
 # memory/guides/UNATTENDED-PROTOCOL.md; the fifth is parked as P1 in the build README.
 check_authorization() { # slug · base
-  local slug="$1" base="$2" rel blob fmslug _fm _pb _sa_shown _cf _sad
+  local slug="$1" base="$2" rel blob fmslug _fm _pb _mg _sa_shown _cf _sad
   rel=$(readme_of "$slug")
   # NO GUARD HERE FOR AN EMPTY BASE, deliberately, and the reason is unchanged from the function this
   # replaces: an empty one makes the line below read `git show ":path"` - the git INDEX, i.e. bytes
@@ -1507,6 +2303,8 @@ check_authorization() { # slug · base
     /^authorized-by:/ { v = $0; sub(/^authorized-by:[[:space:]]*/, "", v); sub(/[[:space:]]*\r?$/, "", v); print "mode=" v; next }
     /^playbook:/ { v = $0; sub(/^playbook:[[:space:]]*/, "", v); sub(/[[:space:]]*\r?$/, "", v); print "playbook=" v; next }
     /^pieces:/ { v = $0; sub(/^pieces:[[:space:]]*/, "", v); sub(/[[:space:]]*\r?$/, "", v); print "pieces=" v; next }
+    /^asks:/ { v = $0; sub(/^asks:[[:space:]]*/, "", v); sub(/[[:space:]]*\r?$/, "", v); print "asks=" v; next }
+    /^may:/ { v = $0; sub(/^may:[[:space:]]*/, "", v); sub(/[[:space:]]*\r?$/, "", v); print "may=" v; next }
     /^spec-audit:/ { v = $0; sub(/^spec-audit:[[:space:]]*/, "", v); sub(/[[:space:]]*\r?$/, "", v); print "spec-audit=" v; next }')
   fmslug=$(printf '%s\n' "$_fm" | sed -n 's/^slug=//p' | head -1)
   AUTH_MODE=$(printf '%s\n' "$_fm" | sed -n 's/^mode=//p' | head -1)
@@ -1577,6 +2375,17 @@ check_authorization() { # slug · base
   # front-matter parse and is not a rule against reading a second FILE, which S2b does.
   AUTH_PLAYBOOK=$(printf '%s\n' "$_fm" | sed -n 's/^playbook=//p' | head -1)
   AUTH_PIECES=$(printf '%s\n' "$_fm" | sed -n 's/^pieces=//p' | head -1)
+  # TOOL-dDerivedDocket-16 - the mandate, off that same scan. ASSIGNED UNCONDITIONALLY so a second
+  # call over a README with no key clears what a first call read: this is a global, and a stale
+  # mandate surviving into a build that never declared one is the shape every other value here is
+  # pinned against.
+  AUTH_ASKS=$(printf '%s\n' "$_fm" | sed -n 's/^asks=//p' | head -1)
+  # TOOL-dDerivedDocket-19 S1 - the grant, off that same scan and ASSIGNED UNCONDITIONALLY for the
+  # reason the mandate above is. The FIRST `may:` line is the one read, as for every key here, and the
+  # leg's own parse takes the first too, so a README carrying two agrees with itself on both sides.
+  AUTH_MAY=$(printf '%s\n' "$_fm" | sed -n 's/^may=//p' | head -1)
+  AUTH_MAY_SET=0
+  case $'\n'"$_fm" in *$'\n'may=*) AUTH_MAY_SET=1 ;; esac
   # ABSENT is `slug` - every build README in every adopter's tree today declares nothing, and that
   # is the ordinary case, not a defect. A value OUTSIDE the closed set is a refusal rather than a
   # default: defaulting an unrecognised mode to either member lets a typo select a discipline
@@ -1614,6 +2423,45 @@ check_authorization() { # slug · base
   # Each refusal is its own message: a single ANDed verdict would send a reader to diff a parse
   # against a path, which is the defect the Definition-of-Done evaluation already fixed once by
   # splitting its terms.
+  # TOOL-dDerivedDocket-16 S2 - THE MANDATE'S TWO PRECONDITIONS, evaluated where the mode exists
+  # and BEFORE the recipe block below, so a `recipe`-mode README carrying `asks:` is answered by the
+  # refusal that is about the mandate rather than by one about a playbook it also lacks.
+  #
+  # A NON-`slug` MODE CANNOT CARRY A MANDATE. `prompt` and `recipe` resolve at the SECOND anchor, a
+  # tip this run pushed, so a README reachable only there is one the run could have written - and
+  # choosing WHICH filed asks a run answers is exactly what ruling D12-a took away from the run.
+  if [ -n "$AUTH_ASKS" ] && [ "$AUTH_MODE" != slug ]; then
+    fail 71 "the build README declares an asks: mandate under an authorization mode that resolves at the second anchor, so the run could have written the line that says which asks it may answer - ruling D12-a puts that choice on a commit the owner landed: mode $AUTH_MODE, admissible for a mandate is slug"
+    return 1
+  fi
+  # ...and a mandate nothing can GRADE is worse than no mandate at all: every later item keyed on it
+  # would be met vacuously, by a set nobody ever read.
+  if [ -n "$AUTH_ASKS" ] && [ -z "${ASKS_CMD:-}" ]; then
+    fail 70 "the build README declares an asks: mandate and this project declares no ASKS_CMD, so nothing here can say whether any of those asks is executable and pinning the set would make every check keyed on it pass over an ungraded list: declare ASKS_CMD in .unattended.conf, or drop the asks: key"
+    return 1
+  fi
+  # TOOL-dDerivedDocket-19 S2 - A GRANT UNDER A MODE THAT ADMITS THE SECOND ANCHOR IS REFUSED, whatever
+  # it names and even when it says `none`. Such a README can resolve at a tip this run pushed, so its
+  # grant is one the run could have written - the self-grant ruling D12-j closes. Refused rather than
+  # ignored: ignoring it pins `none` and carries on, which leaves the attempt invisible in every record.
+  # The test is the MODE and not `prompt` alone, so a `recipe` README is refused by the same branch.
+  if [ "$AUTH_MAY_SET" = 1 ] && [ "$AUTH_MODE" != slug ]; then
+    fail 78 "the build README carries a may: grant under an authorization mode that resolves at the second anchor, so the run could have written the grant it would be acting under - ruling D12-j honours a grant only from a slug-mode README the owner committed at the default-branch anchor: mode $AUTH_MODE, may: [$AUTH_MAY]"
+    return 1
+  fi
+  # TOOL-dDerivedDocket-19 S3 - THE GRANT GRAMMAR, as a typo guard. One library function normalises the
+  # value, the one the leg re-runs over the same line, so a backticked grant and a bare one pin the
+  # same bytes. A token that is neither a decision id nor a repo-relative path is refused NAMING it:
+  # pinned, it would be a grant nobody can read, and the leg's comparison would agree with it.
+  if [ "$AUTH_MAY_SET" = 1 ]; then
+    if ! _mg=$(parse_grants "$AUTH_MAY"); then
+      fail 79 "the build README's may: line carries a token that is neither a decision id nor a repo-relative path with no leading slash, no .. segment and no backslash, holding a / or a file extension - a grant nobody can read is refused rather than pinned: refused token [${_mg:-the value is empty}] in may: [$AUTH_MAY]"
+      return 1
+    fi
+    AUTH_MAY=$_mg
+  else
+    AUTH_MAY=none
+  fi
   if [ "$AUTH_MODE" = recipe ]; then
     if [ -z "$AUTH_PLAYBOOK" ]; then
       fail 46 "a recipe-mode build README declares no playbook, and the mode is the discipline of FOLLOWING one, so there is nothing for this run to follow - add a playbook: key naming a repo-relative path at BASE"
@@ -1757,6 +2605,8 @@ stage_runmd() { # run-state file
 # already had, and writing it out at each call site would have made three branches of one rule - three
 # ordinals for check-arms to track, three signatures to keep in step, and two more rows for a pin file
 # whose whole purpose is to stay short. The rule is one rule, so it gets one branch.
+# It refreshes nothing: the lease is the run-state facts and its freshness is derived, never
+# written (TOOL-dDerivedDocket-61).
 stage_or_fail() { # run-state file
   # BOUND TO A NAME, not used as `$1`. check-arms reads a bare positional as LITERAL text, so it lands
   # inside the branch's signature and no assertion — and no pin — can ever match it. The repo carries
@@ -1780,10 +2630,15 @@ stage_or_fail() { # run-state file
 # phase-writer population from source and drives a terminal record through every one of them.
 # WHERE A RETIRED RECORD GOES. DERIVED from the record itself, never chosen: the terminal phase plus
 # the first 8 hex of the record's own blob hash. That makes the name TOTAL, which the obvious
-# `<witness8>` spelling is not — NO driver verb commits (`grep -c "git commit"` over this file and the
-# leg returns 0 for both), so run A aborting at commit W and run B aborting at the same W produce one
-# name for two records, and a refusal on collision would then block every later run with no operator
-# path out. Two records with the same CONTENT are the same record twice, so overwriting is lossless.
+# `<witness8>` spelling is not — two runs can honestly share a witness, so run A aborting at commit W
+# and run B aborting at the same W produce one name for two records, and a refusal on collision would
+# then block every later run with no operator path out. Two records with the same CONTENT are the
+# same record twice, so overwriting is lossless.
+#
+# THE PREMISE THIS PARAGRAPH USED TO LEAD WITH IS RETIRED, not merely softened: it said no verb in
+# this file commits, and under `LANDER_MODE=in-place` `--close` commits its own record on top of the
+# graded merge (TOOL-dDerivedDocket-3 S5). It was never the load-bearing half — the shared witness
+# is, and that holds in both modes.
 #
 # The `<phase>` half cannot carry a path separator: it comes from PHASES_TERMINAL through the same
 # `is_terminal` test that decides whether to rotate at all. The witness could — nothing constrains a
@@ -1791,18 +2646,38 @@ stage_or_fail() { # run-state file
 #
 # Stable across the fleet: .gitattributes pins `memory/**/*.md text eol=lf`, which covers RUN.*.md,
 # and `git hash-object` applies the path's clean filter, so this is the INDEX blob on every platform.
-archive_name_of() { # run-state file -> its immutable archive path
-  local rel="$1" ph blob
-  ph=$(fact "$rel" phase)
-  blob=$(GIT hash-object "$rel" 2>/dev/null) || return 1
+#
+# TOOL-dDerivedDocket-22 S4 - THE OPTIONAL SECOND ARGUMENT is the bytes to name, when they are not
+# yet the record's. A derived-LANDED record is written LANDED before it is retired, and the name has
+# to derive from the POST-write bytes or the archive would read `RUN.LANDING.` beside a LANDED body.
+# The copy is hashed with `--path=<record>` so the record path's attributes apply exactly as they
+# will when those bytes are staged in place.
+archive_name_of() { # run-state file · [the bytes to name, default the file itself] -> its immutable archive path
+  local rel="$1" src="$1" ph blob
+  # AN EXPLICIT BUT EMPTY copy is a copy that could not be built, and naming the unedited record
+  # in its place is exactly the `RUN.LANDING.` name this argument exists to prevent.
+  if [ "$#" -ge 2 ]; then src="$2"; [ -n "$src" ] || return 1; fi
+  # RECORDED, not derived (S8): this names a record by the bytes it was HANDED. The
+  # derived-terminal unit's rotation hands it a copy already carrying the terminal, before the
+  # write gate, and a derived read here would name that copy by something the file does not say.
+  ph=$(read_recorded_phase "$src")
+  blob=$(GIT hash-object --path="$rel" "$src" 2>/dev/null) || return 1
   [ -n "$ph" ] && [ -n "$blob" ] || return 1
   printf '%s/RUN.%s.%.8s.md' "${rel%/RUN.md}" "$ph" "$blob"
 }
 
-refuse_if_terminal() { # run-state file · verb
-  local rel="$1" verb="$2" cur
+refuse_if_terminal() { # run-state file · verb · [--recorded]
+  local rel="$1" verb="$2" mode="${3:-}" cur
   [ -f "$rel" ] || return 0
-  cur=$(fact "$rel" phase)
+  # S8 - DERIVED by default, because every verb guarded here is asking what the record MEANS. The
+  # `--recorded` mode has two callers. `--landed`, whose own postcondition is a terminal: it must not
+  # be refused by a derivation of the very terminal it is about to write. And `--resume` handed an
+  # id, whose derived terminal is answered by its own nothing-to-resume row, which writes nothing.
+  if [ "$mode" = --recorded ]; then
+    cur=$(read_recorded_phase "$rel")
+  else
+    read_derived_phase "$rel"; cur="$DP_PHASE"
+  fi
   [ -n "$cur" ] && is_terminal "$cur" || return 0
   fail 26 "the run is already finished and a finished record is not something to move, re-open or re-pin; every later run is measured against the counter this record left, and the verb that would rewrite it names itself here: $cur via $verb"
   return 1
@@ -1849,8 +2724,30 @@ refuse_if_terminal() { # run-state file · verb
 # this repo catalogues, one delimiter over. A single-quoted `/.../` literal has no escape level to
 # lose, and it also keeps this function SLICEABLE: the sibling kit's conformance harness lifts this
 # body out of the shipped bytes and evaluates it, so a constant defined outside it would arrive empty.
-plan_state() { # spec file -> prints the M2 state
-  awk '
+#
+# TOOL-dDerivedDocket-31 - PER F-ITEM, FORWARD-ONLY. The second argument is the memory kit's
+# FORK_ITEM_CUTOFF, and every caller passes it from `load_fork_cutoff`. For a spec whose FILENAME
+# date is at or after it, section 8 has a regular shape and each fork is graded on its own: an F-item
+# opens on a column-0 `- **F<n>` bullet or a `### F<n>` sub-head, the `FACT-QUESTION` prefix
+# admitted before the id, and spans every line up to the next one, so its option bullets are its own.
+# Each span needs its own mark, matched with code spans and double-quoted spans removed, so a mark
+# quoted as an example resolves nothing. A column-0 bullet or sub-head before the first F-item, or
+# items and no F-item at all, is FORKED: that shape is what hid an open fork under a resolved one.
+# WHAT IT STILL CANNOT SEE: a fork written as a plain bullet INSIDE another F-item span belongs to
+# that span. The shape makes a declared fork gradeable; it cannot find an undeclared one. Blank, an
+# absent key, or an earlier date keeps the section-wide reading below, byte for byte.
+# The cutoff is passed IN rather than read here, so the function stays pure and sliceable.
+plan_state() { # spec file · FORK_ITEM_CUTOFF, blank = off -> prints the M2 state
+  local _psb="${1##*/}"
+  awk -v icut="${2:-}" -v fbase="$_psb" '
+    BEGIN { fdate = ""
+            if (match(fbase, /[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]/)) fdate = substr(fbase, RSTART, RLENGTH) }
+    # THE SECTION-8 GRAMMAR, ONCE for this program: the documented mark, the F-item opener, and a
+    # span resolved by its own mark. Removing code spans and double-quoted spans only DELETES text,
+    # so a stray delimiter pairing with a later one can hide a real mark and never forge one.
+    function check_mark(s) { return (s ~ /RESOLVED \((owner|agent), [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9](, delegated)?\)/) }
+    function check_fitem_open(s) { return (s ~ /^- \*\*(FACT-QUESTION[^A-Za-z0-9]+)?F[0-9]+(\*\*| )/ || s ~ /^### (FACT-QUESTION[^A-Za-z0-9]+)?F[0-9]+([^A-Za-z0-9]|$)/) }
+    function check_span_mark(s) { gsub(/`[^`]*`/, "", s); gsub(/"[^"]*"/, "", s); gsub(/[[:space:]]+/, " ", s); return check_mark(s) }
     # TOOL-dBriefedPass-1 - KEYED ON THE HEADING TITLE, NOT ON THE ORDINAL. A TIER-1 SPEC LEGITIMATELY
     # DROPS `## 5. Production-readiness checklist`, so every section from five onward renumbers: the
     # ordinal form read a Tier-1 spec`s GATES as its acceptance criteria, its OPEN QUESTIONS as its
@@ -1882,10 +2779,10 @@ plan_state() { # spec file -> prints the M2 state
              if (sec != "") bound[sec] = 1
              cur = sec; next }
     cur == "" { next }
-    { line = $0; sub(/\r$/, "", line); gsub(/^[[:space:]]+|[[:space:]]+$/, "", line) }
+    { raw = $0; sub(/\r$/, "", raw); line = raw; gsub(/^[[:space:]]+|[[:space:]]+$/, "", line) }
     line == "" { next }
     { seen[cur] = seen[cur] 1
-      if (cur == "forks") { fl[++nf] = line; if (forkline == "") forkline = line } }
+      if (cur == "forks") { fl[++nf] = line; fr[nf] = raw; if (forkline == "") forkline = line } }
     END {
       thin = (seen["scope"] == "" || seen["acc"] == "" || seen["gates"] == "")
       # M2 orders the checks and the FIRST match wins, so THIN is decided before FORKED.
@@ -1896,7 +2793,7 @@ plan_state() { # spec file -> prints the M2 state
       blob = ""
       for (i = 1; i <= nf; i++) blob = blob " " fl[i]
       gsub(/[[:space:]]+/, " ", blob)   # the squeeze the hygiene reader does, so the two agree by construction
-      any_mark = (blob ~ /RESOLVED \((owner|agent), [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9](, delegated)?\)/)
+      any_mark = check_mark(blob)
       items = 0
       for (i = 1; i <= nf; i++)
         if (fl[i] ~ /^[-*][[:space:]]/ || fl[i] ~ /^###[[:space:]]/) items++
@@ -1915,6 +2812,23 @@ plan_state() { # spec file -> prints the M2 state
       # line; that needs section 8 to have a regular shape, and making it regular is a scope change
       # rather than a predicate change. Parked, not implied away.
       lf = tolower(forkline)
+      # TOOL-dDerivedDocket-31 - THAT SCOPE CHANGE, forward-only: at or after the cutoff the shape is
+      # regular and each F-item span is graded alone. `fr` holds the UNTRIMMED lines, because an
+      # F-item and the shape rule are both column-0 facts; `fl` feeds the span text.
+      if (icut != "" && fdate != "" && fdate >= icut) {
+        nfi = 0; plain = 0
+        for (i = 1; i <= nf; i++) {
+          if (check_fitem_open(fr[i])) { span[++nfi] = fl[i]; continue }
+          if (nfi == 0) { if (fr[i] ~ /^[-*][[:space:]]/ || fr[i] ~ /^###[[:space:]]/) plain++ }
+          else span[nfi] = span[nfi] " " fl[i]
+        }
+        # A none form is a section carrying NO item; one carrying items and no F-item is the shape
+        # finding, and so is any bullet or sub-head before the first F-item.
+        if (nfi == 0 && items == 0) { if (lf ~ /^none/ || lf ~ /^n\/a/) print "READY"; else print "FORKED"; exit }
+        if (nfi == 0 || plain > 0) { print "FORKED"; exit }
+        for (k = 1; k <= nfi; k++) if (!check_span_mark(span[k])) { print "FORKED"; exit }
+        print "READY"; exit
+      }
       # AN EMPTY SECTION IS A REFUSAL, not a pass — the ratified fork, and TEMPLATE-SPEC names both
       # readers: "A section 8 with neither an item nor a `none` form is a refusal, not a pass." The
       # hygiene reader already refused it; this one printed READY, so the two readers the spec pairs
@@ -1932,6 +2846,20 @@ plan_state() { # spec file -> prints the M2 state
         if (any_mark) print "READY"; else print "FORKED"
       }
     }' "$1"
+}
+# TOOL-dDerivedDocket-31 S5 - the planning side's ONE read of the memory kit's FORK_ITEM_CUTOFF, and
+# its one numbered refusal. The reader is the library's, shared with the pass-order leg, and it reads
+# the file as TEXT: this driver never sources a second kit's conf. Every `plan_state` caller here
+# passes FORK_CUTOFF, so a caller that forgot the load would pass blank and grade section-wide, which
+# the marker-contract harness's call-site count is there to catch.
+FORK_CUTOFF=""
+load_fork_cutoff() { # -> sets FORK_CUTOFF; rc 1 after a numbered refusal
+  local _fc
+  if ! _fc=$(read_fork_cutoff "$ROOT/.memory-tree.conf"); then
+    fail 86 "the memory tree's FORK_ITEM_CUTOFF cannot be read as text, so section 8 would be graded here under a cutoff the hygiene gate does not use: $_fc"
+    return 1
+  fi
+  FORK_CUTOFF="$_fc"
 }
 
 # TOOL-cBriefedPilot-6 - the roster join. M2 makes the README's authored Units table the roster and
@@ -1961,11 +2889,25 @@ roster_ids() { # slug -> ids the AUTHORED plan names, which may include unspecce
   # well-formed but EMPTY pair is LEGAL - it means the build plans exactly its specced units - and
   # `grep -oE` exits 1 on no match, so `set -o pipefail` would turn the legal case into a refusal.
   # The status is tested on `region` ALONE instead.
-  local slug="$1" rel _reg; rel=$(readme_of "$slug")
+  local slug="$1" rel _reg _unit; rel=$(readme_of "$slug")
   [ -f "$rel" ] || return 0
-  grep -qF -- "$ROSTER_OPEN" "$rel" || return 0
-  _reg=$(region "$rel" "$ROSTER_OPEN" "$ROSTER_CLOSE" 2>/dev/null) || return 3
-  printf '%s\n' "$_reg" | grep -oE "[A-Z]+-$slug-[0-9]+" | sort -u
+  # TOOL-dDerivedDocket-16 S7 - THE ROSTER IS THE AUTHORED TABLE TOGETHER WITH THIS FOLDER'S OWN
+  # `unit` ASKS. Design section 19.4: a `unit` ask IS a planned unit of the build whose folder files
+  # it, filed so it stays visible in the family view beyond this run. Read only here, so `--plan`'s
+  # MISSING listing and `--close`'s build-complete term take the same answer from one reader.
+  #
+  # SCOPED TO $slug ON BOTH HALVES. A folder may file an ask whose id names ANOTHER build - that is
+  # a dependency, not a unit of this one - and admitting it would put a foreign id into a roster
+  # this build can never satisfy.
+  _unit=$(asks_unit_in "$(backlog_text_of "$slug")" | grep -E "^[A-Z]+-$slug-[0-9]+$" || true)
+  # THE ABSENT PAIR NO LONGER RETURNS EARLY, because the asks half must still be read on a build that
+  # has no authored table at all - which is every build a mandate-only scaffold opens.
+  _reg=""
+  if grep -qF -- "$ROSTER_OPEN" "$rel"; then
+    _reg=$(region "$rel" "$ROSTER_OPEN" "$ROSTER_CLOSE" 2>/dev/null) || return 3
+  fi
+  { printf '%s\n' "$_reg" | grep -oE "[A-Z]+-$slug-[0-9]+" || true
+    printf '%s\n' "$_unit"; } | grep -E '.' | sort -u
 }
 # The GENERATED region's ids - what a build's units actually ARE. `build-complete`'s non-empty term
 # uses this rather than the authored plan, so the term is meetable on a build nobody hand-wrapped.
@@ -2167,29 +3109,10 @@ row_ids_of() { # stdin: unit rows -> each row's own id, one per line, sorted
     printf '%s\n' "$_ri_row" | grep -oE '[A-Z]+-[A-Za-z0-9]+-[0-9]+' | head -1
   done | sort -u
 }
-# The RECORD-BINDING id grammar is WIDER than `_ids_of`'s, and reading it with the narrow one is
-# wrong in both directions. `memory/HYGIENE.md` admits a trailing `@rev-N` and a contiguous run
-# written `<family>-<slug>-N..M`, which EXPANDS at authoring time - and only `gen_build_index.py`
-# expands it, which is the memory-tree kit's, and this kit copy-installs without it. Measured over
-# this corpus: 18 of 123 tracked `spec-audit` binding lines use the range form. A join that does not
-# expand blocks a unit that WAS audited under `TOOL-x-1..5`; a join that matches as a SUBSTRING lets
-# `TOOL-x-19` satisfy `TOOL-x-1`. This emits whole tokens, one per line, for a `grep -qxF` join.
-expand_id_runs() { # stdin: binding-line text -> stdout: ids, ranges expanded, one per line
-  awk '{
-    n = split($0, w, /[ \t]+/)
-    for (i = 1; i <= n; i++) {
-      t = w[i]
-      sub(/@rev-[0-9]+$/, "", t)
-      if (t ~ /^[A-Z]+-[A-Za-z0-9]+-[0-9]+\.\.[0-9]+$/) {
-        p = index(t, "..")
-        head = substr(t, 1, p - 1); hi = substr(t, p + 2) + 0
-        match(head, /[0-9]+$/); lo = substr(head, RSTART) + 0
-        stem = substr(head, 1, RSTART - 1)
-        for (k = lo; k <= hi; k++) print stem k
-      } else if (t ~ /^[A-Z]+-[A-Za-z0-9]+-[0-9]+$/) print t
-    }
-  }'
-}
+# `expand_id_runs` USED TO BE DEFINED HERE. TOOL-dDerivedDocket-18 moved it, unchanged, into
+# `lib-unattended.sh` beside `ask_filed_in`, because the gate leg re-derives this run's pinned
+# mandate and has to expand the same ranges into the same tokens - and the leg can source no
+# driver. Its reasoning moved with it rather than being left behind as a second explanation.
 # S3 - a malformed or absent pair is a NAMED refusal rather than a silent empty selection. `region`
 # exits 3 for ABSENT and for MALFORMED alike and this kit has already paid once for reading that one
 # status as "absent", so the message names both possibilities and the repair.
@@ -2203,6 +3126,722 @@ units_refusal() { # build README path
   printf 'the build README carries no single well-formed %s pair, so the unit list cannot be read (absent, duplicated or transposed): %s\n  repair: %s\n' "$UNITS_OPEN" "$1" "$(derive_index_repair)"
 }
 
+# ====================================================== THE ASK MANDATE — TOOL-dDerivedDocket-16
+# WHAT AN ASK MANDATE IS. A build README may carry one front-matter key, `asks:`, naming the filed
+# asks this build exists to answer. The OWNER commits that line; the run ASSERTS it and can neither
+# write it nor grow it. Every verb below reads it and none writes it, which is ruling D12-a stated
+# as code rather than as a paragraph.
+#
+# THIS SECTION GRADES NOTHING. Whether an ask is executable is the declared generator's answer, read
+# through `ASKS_CMD` in the shapes the companion guide lists. The driver pins what it was told,
+# refuses what it cannot read, and re-prints the generator's own fields. A second fold here would be
+# two answers to one question, and the one that rots is always the copy.
+#
+# BLANK `ASKS_CMD` IS "NOT ADOPTED", announced and never silent — `RECALL_CLI`'s register, which is
+# the register every optional declared command in this kit is already in.
+
+# The producer's projection, DECLARED here because the parse below REFUSES anything else rather
+# than skipping it. Eleven TAB fields led by `ask`, then an `examined` line and a count. A column
+# added or moved in the producer therefore reads as a parse refusal and never as a pass — which is
+# the whole reason a positional read is admissible at all.
+ASK_TSV_HEAD="ask"
+ASK_TSV_FIELDS=11
+ASK_TSV_EXAMINED="examined"
+
+# The `asks:` VALUE out of a build README blob's front matter.
+#
+# ITS OWN SCAN, and not `check_authorization`'s. That function's "no second GIT show" rule bounds
+# the parse of ONE blob; this reads a DIFFERENT VERSION of the same file — the one at HEAD, which
+# is the whole of property P6 — so there is no blob here read twice.
+#
+# FRONT MATTER ONLY, closing on the first `---` after line 1, for the reason that parse gives: `---`
+# is also a horizontal rule, so a scan running to the end of the file could take an `asks:` line out
+# of the body and read a sentence as a mandate.
+read_asks_key() { # README blob text -> the asks: value, or nothing
+  printf '%s\n' "$1" | awk '
+    NR == 1 { next }
+    /^---[[:space:]]*\r?$/ { exit }
+    /^asks:/ { v = $0; sub(/^asks:[[:space:]]*/, "", v); sub(/[[:space:]]*\r?$/, "", v); print v; exit }'
+}
+# The mandated ids, ranges expanded, IN THE OWNER'S OWN LISTING ORDER — which is rank step 3, so the
+# order is data and not an artefact of a sort. Nothing is sorted and nothing is deduplicated: a
+# duplicate in a mandate is the owner's own line, and collapsing it silently would make the pinned
+# fact disagree with the README it came from.
+#
+# READ ALL OR NOTHING, through the library's IDLIST reader and NOT the binding-line expander this
+# used to call (closing diff review of dDerivedDocket, F2). That expander drops every token it does
+# not know, so `<id>-3 -5..6` pinned `-3` alone and `<id>-1, <id>-2` pinned `-2`, and preflight, the
+# witness, the plan, `asks-disposed` and the freeze all read the narrowed set with every check green.
+# RC 1 AND NOTHING PRINTED on a refused token: every caller either refuses by name through
+# `read_id_list_refusals` or reads a value an earlier refusal has already proven whole.
+asks_ids_of() { # asks: value -> the mandated ids, one per line; rc 1 and nothing when it does not read whole
+  read_id_list "$1"
+}
+# `ask_home_of` USED TO BE DEFINED HERE, and moved to `lib-unattended.sh` with the expander above,
+# for the same reason: the leg reads one BACKLOG blob per home when it re-derives P5, and two
+# spellings of "which folder" would send the two readers at different files.
+# The two BACKLOG verbs off a spec's status header, read with the memory kit's own tolerant
+# separator and its anchored value. `order_verb_of` reads the third verb the same way and for the
+# same recorded reason: a bespoke reader disagreed with the generator on a doubled separator space
+# and read EMPTY, which skips the join silently while reporting nothing.
+spec_ask_verbs() { # spec file · closes|advances -> the ids that verb names, one per line
+  local hdr
+  hdr=$(grep -m1 '^\*\*Status:\*\*' "$1" 2>/dev/null) || return 0
+  printf '%s' "$hdr" | SAV_V="$2" awk '
+    BEGIN { v = ENVIRON["SAV_V"] }
+    {
+      n = split($0, f, "·")
+      for (i = 1; i <= n; i++) {
+        t = f[i]
+        gsub(/^[ \t]+|[ \t]+$/, "", t)
+        if (substr(t, 1, length(v) + 1) == v " ") print substr(t, length(v) + 2)
+      }
+    }' | expand_id_runs
+}
+# A disposition row's VERB for one ask, out of a build's own `BACKLOG.md`. The row shape is
+# `- <VERB> · <id> · <slot> <value> · <why>`, so the verb is the first field and the id the second;
+# nothing here decides whether the disposition is HONEST, which is the fold's job and not this one's.
+#
+# A STATUS ROW'S VERB AND NO OTHER, read through `ask_disposition_row_of` below rather than beside it
+# (closing diff review of dDerivedDocket, F3). This used to answer with the verb of ANY row of that
+# shape, so a `SEV`, `SCOPE` or `RELOCATED` row - which label, widen or move an ask and dispose of
+# nothing - read as its disposition, and `--plan` took the ask as covered and never offered it on the
+# `next:` ladder. The DoD reader one function down already refused that misread; two readers of one
+# question gave two answers, and now there is one.
+ask_disposition_of() { # BACKLOG.md text · ask id -> the verb of the first STATUS row naming it, or nothing
+  ask_disposition_row_of "$1" "$2" | awk -F' · ' '{ v = $1; sub(/^- /, "", v); print v; exit }'
+}
+
+# ---------------------------------------------------------------------------- the bounded witness
+# ONE call, in call shape 1 or 2: `<ASKS_CMD> --tsv --ready <ids> --target <slug> --at <rev>`.
+# `ASKS_CMD` is UNQUOTED, exactly as `$WIRING_CHECK`, `$LANDER` and `$GATE_CMD` are, so a project may
+# declare a launcher and a script rather than one word.
+#
+# NO `--live-builds`, EVER, and that is a decision rather than an omission (section 8 F2). No tree
+# this driver can read holds every run in flight — a run's record lives only on its own branch until
+# it lands — so a set derived from tracked records would admit exactly the double claim the option
+# exists to stop. Every foreign live spec is therefore a CLAIM here, and a stale one is NAMED by the
+# report-only line below rather than admitted.
+#
+# IT READS `RB_STDOUT`, NEVER `RB_OUT`. TOOL-dDerivedDocket-48 split the capture for this parse:
+# every notice the producer writes — the tolerated-header line, the liveness line, the pinned-conf
+# line — is on stderr, and a parse that refuses any line not leading with `ask` would have read a
+# HEALTHY producer as a dead probe.
+#
+# THE MANDATE IS ITERATED, NEVER THE ROWS. A loop over what came back can only confirm what came
+# back: a producer that dropped an id would be graded on the ids it did return and the missing one
+# would never be mentioned at all.
+#
+# `AW_EXAMINED` IS A SECOND ANSWER THE PRODUCER GIVES, and TOOL-dDerivedDocket-17's T2 needs it:
+# the row count says how many rows arrived, the `examined` line says how many the producer BELIEVES
+# it graded, and a producer that disagrees with itself is a dead probe however many rows it sent.
+# Kept here rather than re-parsed by the consumer, because a second parse of one stream is the
+# two-answers class this whole section refuses.
+AW_ROWS=""; AW_WHY=""; AW_EXAMINED=""
+run_ask_witness() { # target slug · rev · ids… -> 0, AW_ROWS and AW_EXAMINED, or 1 and AW_WHY
+  local _tgt="$1" _rev="$2" _rc _id _bad
+  shift 2
+  AW_ROWS=""; AW_WHY=""; AW_EXAMINED=""
+  if [ -z "${ASKS_CMD:-}" ]; then
+    AW_WHY="this project declares no ASKS_CMD, so nothing here can grade a mandated ask"
+    return 1
+  fi
+  run_bounded $ASKS_CMD --tsv --ready "$@" --target "$_tgt" --at "$_rev"; _rc=$?
+  # AN EMPTY ROW STREAM IS THREE DIFFERENT FACTS and the shared verdict helper is what tells them
+  # apart: never answered within the bound, answered entirely on the other stream, or a dead probe
+  # that wrote nothing at all. A bound breach is reported as UNANSWERED and never as a red, because
+  # "this ask is not ready" and "nobody asked" are not the same claim.
+  if [ -z "$RB_STDOUT" ]; then
+    AW_WHY=$(derive_stream_verdict "$_rc")
+    return 1
+  fi
+  if [ "$_rc" != 0 ]; then
+    AW_WHY="the declared ask generator exited $_rc after ${RB_TOOK}s, so the rows it printed are not an answer this run may pin — its first stderr line: $(printf '%s\n' "$RB_ERR" | head -1)"
+    return 1
+  fi
+  # ONE AWK over the whole stream. A row of the declared width is projected down to the eight fields
+  # every caller here reads; anything else emits a `BAD` line and stops, so the refusal can quote the
+  # line it refused rather than reporting a count nobody can act on.
+  #
+  # THE `examined` LINE IS CARRIED OUT ON ITS OWN `EX` LINE rather than skipped. It used to be
+  # dropped, which was right while preflight was the only consumer; T2 compares it, and recovering
+  # it with a second pass over the same stream would be a second parser of one projection.
+  # THE EIGHTH COLUMN IS `decided-by`, appended at the END of the projection deliberately: adding it
+  # in its source position would renumber every index in `ask_field` below, and the whole reason
+  # that function maps BY NAME is that no caller anywhere counts tabs.
+  AW_ROWS=$(printf '%s\n' "$RB_STDOUT" \
+    | ASK_HEAD="$ASK_TSV_HEAD" ASK_EX="$ASK_TSV_EXAMINED" ASK_N="$ASK_TSV_FIELDS" awk -F'\t' '
+        BEGIN { h = ENVIRON["ASK_HEAD"]; ex = ENVIRON["ASK_EX"]; want = ENVIRON["ASK_N"] + 0 }
+        $0 == "" { next }
+        $1 == ex { print "EX\t" $2; next }
+        $1 == h && NF == want { print $2 "\t" $3 "\t" $6 "\t" $7 "\t" $8 "\t" $9 "\t" $11 "\t" $4; next }
+        { print "BAD\t" $0; exit }')
+  _bad=$(printf '%s\n' "$AW_ROWS" | sed -n 's/^BAD\t//p' | head -1)
+  if [ -n "$_bad" ]; then
+    AW_ROWS=""
+    AW_WHY="the declared ask generator printed a line that is not the $ASK_TSV_FIELDS-field $ASK_TSV_HEAD projection, so a positional read of it would report fields nobody printed — the line: $_bad"
+    return 1
+  fi
+  # The `examined` value, LIFTED OFF the projection and removed from it, so every row-shaped reader
+  # below still sees rows and nothing else.
+  AW_EXAMINED=$(printf '%s\n' "$AW_ROWS" | sed -n 's/^EX\t//p' | head -1)
+  AW_ROWS=$(printf '%s\n' "$AW_ROWS" | grep -v '^EX	' || true)
+  for _id in "$@"; do
+    printf '%s\n' "$AW_ROWS" | cut -f1 | grep -qxF -- "$_id" && continue
+    AW_ROWS=""
+    AW_WHY="DEAD PROBE — the declared ask generator answered for fewer asks than it was asked about, and an id it never graded is an id nothing here can report on: $_id is missing from its rows"
+    return 1
+  done
+  return 0
+}
+# One row's field, BY NAME. The projection's own order is declared above and read once, in the awk
+# that projects it; this reads the seven columns that awk kept, so no caller anywhere counts tabs.
+ask_field() { # ask id · id|status|sev|ready|missing|holds|closers|decided -> the value, or nothing
+  local _n
+  case "$2" in
+    id) _n=1 ;; status) _n=2 ;; sev) _n=3 ;; ready) _n=4 ;;
+    missing) _n=5 ;; holds) _n=6 ;; closers) _n=7 ;; decided) _n=8 ;; *) return 0 ;;
+  esac
+  printf '%s\n' "$AW_ROWS" | awk -F'\t' -v i="$1" -v n="$_n" '$1 == i { print $n; exit }'
+}
+
+# ------------------------------------------------------------------------------------ the RANK
+# Design section 19.4's four steps, in order: hold edges first, then severity, then the owner's own
+# listing order, then numeric sequence.
+#
+# THE SEVERITY LADDER IS SPELLED AS AN ORDER rather than as a set, so a label outside it sorts LAST
+# rather than disappearing. `-` is what the projection prints for an unlabelled ask and it is the
+# bottom rung by construction, never by a branch.
+ASK_SEV_ORDER="BLOCKER HIGH MED LOW"
+ask_sev_rank() { # severity label -> its rung, lower sorts first
+  local _s _i=1
+  for _s in $ASK_SEV_ORDER; do
+    [ "$_s" = "$1" ] && { printf '%s' "$_i"; return 0; }
+    _i=$((_i + 1))
+  done
+  printf '%s' "9"
+}
+# THE LISTING POSITION OF AN ASK NOBODY MANDATED IS A TOTALITY CHOICE AND NOT A PRECEDENCE RULE.
+# Step 3 is "position in the pinned asks: fact", and an ask filed in this folder that the mandate
+# never named has no such position — so it is given one past the last mandated id, purely so the
+# sort is total. Nothing here asserts that a mandated ask outranks a filed one: where two asks must
+# be separated, severity separates them, which is step 2 and is the step that carries meaning.
+ASK_POSITIONS=""
+# Steps 2, 3 and 4 as ONE fixed-width string, so the compare below is a single string compare and
+# no caller can apply the three steps in the wrong order.
+ask_sort_key() { # ask id -> "<sev>-<pos>-<seq>", every field fixed width
+  local _pos _seq
+  _pos=$(printf '%s\n' "$ASK_POSITIONS" | awk -F'\t' -v i="$1" '$1 == i { print $2; exit }')
+  [ -n "$_pos" ] || _pos=999
+  _seq="${1##*-}"
+  case "$_seq" in *[!0-9]*|"") _seq=0 ;; esac
+  printf '%s-%04d-%06d' "$(ask_sev_rank "$(ask_field "$1" sev)")" "$_pos" "$_seq"
+}
+# THE TOPOLOGICAL PASS IS A SELECTION SORT, not a graph library, because the population is a
+# mandate and a mandate is small: emit the best-ranked ask whose live holds inside the population
+# are all already emitted, and repeat. A CYCLE cannot starve it — when nothing is emittable the
+# best-ranked remainder goes next — so the order stays total and the cycle stays the declared
+# generator's V6 to report rather than a second verdict invented here.
+ask_rank_order() { # ids… -> those ids in rank order, space separated
+  local _left="$*" _out="" _id _h _blocked _best _bestkey _key
+  while [ -n "${_left// /}" ]; do
+    _best=""; _bestkey=""
+    for _id in $_left; do
+      _blocked=0
+      for _h in $(ask_field "$_id" holds | tr ',' ' '); do
+        [ -n "$_h" ] && [ "$_h" != "-" ] || continue
+        case " $_left " in *" $_h "*) _blocked=1 ;; esac
+      done
+      [ "$_blocked" = 0 ] || continue
+      _key=$(ask_sort_key "$_id")
+      if [ -z "$_bestkey" ] || [ "$_key" \< "$_bestkey" ]; then _best="$_id"; _bestkey="$_key"; fi
+    done
+    if [ -z "$_best" ]; then
+      for _id in $_left; do
+        _key=$(ask_sort_key "$_id")
+        if [ -z "$_bestkey" ] || [ "$_key" \< "$_bestkey" ]; then _best="$_id"; _bestkey="$_key"; fi
+      done
+    fi
+    _out="$_out $_best"
+    _left=" $_left "; _left="${_left/ $_best / }"
+  done
+  printf '%s' "${_out# }"
+}
+
+# ----------------------------------------------------------------- the mandate, read and pinned
+# `asks:` as this run must treat it: the pinned fact where one exists, the README's own key
+# otherwise. Property P6 makes the two equal for the whole life of a live run, so the order is a
+# preference and not a choice between two answers — the PINNED value is what the run was authorized
+# by, and a README edited mid-run is refused by P6 rather than read here.
+mandate_of() { # slug -> the asks: value this run is under, or nothing
+  local _rel _v
+  _rel=$(runmd_of "$1")
+  if [ -f "$_rel" ]; then
+    _v=$(fact "$_rel" asks)
+    [ -z "$_v" ] || { printf '%s' "$_v"; return 0; }
+  fi
+  read_asks_key "$(cat "$(readme_of "$1")" 2>/dev/null)"
+}
+# A build's own filed asks, from its own folder's `BACKLOG.md` in the WORKING TREE. `--plan` reports
+# on the tree an agent is looking at; the PINNED half of this question is P5's, which reads the blob
+# at `m-base:` and is the only half a provenance property may rest on.
+backlog_text_of() { # slug -> that build's BACKLOG.md text, or nothing
+  cat "$M/builds/$1/BACKLOG.md" 2>/dev/null
+}
+
+# ====================================== TOOL-dDerivedDocket-17 — WAS EVERY ASK DISPOSED OF ========
+# The DoD item below asks one question the other twelve cannot: did every ask this run was mandated
+# to answer, and every ask this build filed for itself, end somewhere the owner can accept. It reads
+# STATUS only from the `ASKS_CMD` witness and re-implements no fold; what it reads from the tree is
+# FILING, disposition ROWS and spec header VERBS, each of which is a line and not a verdict.
+
+# THE BLOB AT A REV, not the working tree. `--close` and `--landed` both grade a COMMIT; the
+# working-tree reader above answers `--plan`'s different question and the two must not be confused.
+backlog_blob_of() { # slug · rev -> that build's BACKLOG.md at that rev, or nothing
+  GIT show "$2:$M/builds/$1/BACKLOG.md" 2>/dev/null
+}
+# THIS BUILD'S OWN FILINGS — the `F` half of the scope. An ask filed in this folder under ANOTHER
+# build's slug is that build's ask sitting here for reference, so the slug segment is the filter and
+# not the folder.
+asks_filed_by() { # BACKLOG.md text · slug -> every ask id this build filed under its own slug
+  local _id
+  for _id in $(asks_filed_in "$1"); do
+    [ "$(ask_home_of "$_id")" = "$2" ] || continue
+    printf '%s\n' "$_id"
+  done
+}
+# A STATUS row, whole. `ask_disposition_of` above returns the VERB alone, and three of the six verbs
+# carry a slot the verb does not say — `CLOSED · <id> · by <sha>`, `BLOCKED · <id> · on <id>`,
+# `DEFERRED · <id> · until <id>`. A caller needing the slot would otherwise re-split a line that
+# function had already split, which is one grammar in two places.
+#
+# THE SIX STATUS VERBS AND NOTHING ELSE. `- SEV · <id> · HIGH · …` and `- SCOPE · <id> · …` are the
+# same row SHAPE and carry no disposition at all, so a reader keyed on the shape alone answers
+# "this ask was disposed of" for a severity label somebody filed beside it.
+ASK_STATUS_VERBS="CLOSED WONTDO BLOCKED DEFERRED KEEP REOPEN"
+ask_disposition_row_of() { # BACKLOG.md text · ask id -> the first status row naming it
+  printf '%s\n' "$1" | ADR_ID="$2" ADR_V=" $ASK_STATUS_VERBS " awk '
+    BEGIN { id = ENVIRON["ADR_ID"]; v = ENVIRON["ADR_V"] }
+    /^- [A-Z][A-Z]* · / {
+      n = split($0, f, " · ")
+      if (n < 2 || f[2] != id) next
+      w = substr(f[1], 3)
+      if (index(v, " " w " ") == 0) next
+      print; exit
+    }'
+}
+# One disposition row's SLOT value — the text after `by `, `on ` or `until ` in the third field.
+ask_disposition_slot_of() { # disposition row -> the slot value, or nothing
+  printf '%s\n' "$1" | awk -F' · ' '{ s = $3; sub(/^(by|on|until|of) /, "", s); print s; exit }'
+}
+# ONE ENUMERATION OF THE SCOPE, two callers: the `asks-disposed` item at `--close` and the
+# `asks-at-landing` freeze at `--landed`. A second spelling of "which asks is this run answerable
+# for" is the two-answers class this kit files by name, and the freeze must cover exactly what the
+# item graded or the landed record answers a different question from the one the close asked.
+#
+# ORDER IS THE MANDATE'S, then this build's own filings. Nothing is sorted here: the mandate's order
+# is the owner's own listing order and is rank step 3.
+# A MANDATE THAT DOES NOT READ WHOLE IS A REFUSAL, not an empty M (closing review F2). Read as
+# nothing, the scope would be this build's own filings alone, and `asks-disposed` would grade the run
+# GREEN without ever looking at an ask the owner named. The reason rides `AW_WHY`, which both callers
+# already print when this function's sibling, the witness, declines to answer.
+AD_SCOPE=""
+read_ask_scope() { # slug · rev -> 0 and AD_SCOPE, the mandate then this build's own filings; 1 and AW_WHY
+  local _id _m _mids=""
+  AD_SCOPE=""
+  _m=$(mandate_of "$1")
+  if [ -n "$_m" ] && ! _mids=$(asks_ids_of "$_m"); then
+    AW_WHY="the asks: mandate this run is under does not read whole as an id list, so its scope cannot be enumerated and a scope taken from the ids that did parse would be the owner's list silently narrowed: $(read_id_list_refusals "$_m")"
+    return 1
+  fi
+  for _id in $_mids \
+             $(asks_filed_by "$(backlog_blob_of "$1" "$2")" "$1"); do
+    case " $AD_SCOPE " in *" $_id "*) continue ;; esac
+    AD_SCOPE="$AD_SCOPE $_id"
+  done
+  AD_SCOPE=${AD_SCOPE# }
+}
+# THE FREEZE LINE: `<id>=<STATUS>` pairs over the scope, at the tree the verb examines.
+#
+# SORTED BY SLUG THEN NUMERIC SEQUENCE, never as strings — `-2` before `-10`, which a string sort
+# reverses. The mandate's own order is deliberately NOT kept here: this is a terminal record read by
+# id, and a stable key is what makes two landed records comparable.
+#
+# A BLANK `ASKS_CMD` FREEZES NOTHING, and that is the same answer `asks-disposed`'s term zero gives:
+# where the ask contract is NOT ADOPTED there is no derived status to freeze, and a record in a
+# project that never declared a generator must read exactly as it did before this existed.
+#
+# IT RETURNS THROUGH A GLOBAL AND NOT ON STDOUT, which is `trusted_base`'s own lesson one more time.
+# Read as `_v=$(derive_ask_freeze …)` the whole body runs in a SUBSHELL, so the `AW_WHY` the witness
+# sets there dies with it and the caller's refusal ends in an empty reason — a message written into
+# a channel nobody reads, and one whose arm still passes because the signature stops before the
+# interpolation. `memory/gotchas/status-set-in-a-subshell.md`.
+AD_FREEZE=""
+derive_ask_freeze() { # slug · rev -> 0 and AD_FREEZE, or 1 and AW_WHY
+  local _id _st
+  AD_FREEZE=""
+  [ -n "${ASKS_CMD:-}" ] || return 0
+  read_ask_scope "$1" "$2" || return 1
+  [ -n "$AD_SCOPE" ] || return 0
+  run_ask_witness "$1" "$2" $AD_SCOPE || return 1
+  for _id in $(printf '%s\n' $AD_SCOPE | sort -t- -k2,2 -k3,3n); do
+    _st=$(ask_field "$_id" status)
+    AD_FREEZE="$AD_FREEZE$_id=${_st:--} "
+  done
+  AD_FREEZE=${AD_FREEZE% }
+}
+
+# ------------------------------------------------------- the two refusals an ids-shaped value takes
+# Ruling D12-a: an owner's id list becomes a build folder through the SCAFFOLD, which the owner then
+# lands. A run may not write the folder that authorizes it, so a verb handed ids has exactly one
+# honest answer — the recipe, printed with the owner's own tokens, and nothing written.
+#
+# THE ID SHAPE IS THE DRIVER'S OWN, `_ids_of`, and not the sibling kit's declared family enum. Two
+# reasons, and neither is convenience. The driver's grammar is a SUPERSET of any declared family, so
+# every id a project could file is caught and a family added to that conf needs no edit here; and
+# reading a sibling kit's conf from a kit file is the literal-naming ban's own subject.
+#
+# WHITESPACE ALONE IS ENOUGH TO REFUSE. A slug carries none (`check_slug`), so a value with a space
+# is either an id list or a slug MIXED with ids, and a mixed invocation has no honest reading: a run
+# cannot extend a committed mandate, so there is nothing for the second half to mean.
+is_ids_value() { # value -> 0 when it is id-shaped, or carries whitespace
+  local _v="$1" _s
+  case "$_v" in *[[:space:]]*) return 0 ;; esac
+  _s=$(printf '%s\n' "$_v" | _ids_of)
+  [ -n "$_s" ] && [ "$_s" = "$_v" ]
+}
+# The three lines the refusal prints, written once because both refusals below print them: the
+# recipe carrying the tokens EXACTLY as typed, the rule about who lands what it writes, and the
+# second legal form. `<new-slug>` is left standing on purpose — minting a slug is section 2's act
+# and belongs to the session that will own the ids, not to a refusal message. The generator is the
+# one THIS install holds, off the library's `resolve_index_generator`, never a spelled sibling-kit
+# home; a miss names what was not found in the recipe's own place.
+print_scaffold_recipe() { # the tokens, verbatim
+  local _gen
+  _gen=$(resolve_index_generator) || _gen="<the memory-tree kit's gen_build_index.py, which neither the receipt nor a probe beside this kit located>"
+  printf '  recipe: %s --new-build <new-slug> --asks %s\n' "$_gen" "$1"
+  printf '  the scaffold writes the folder and stages it; the OWNER commits and lands it, which is what makes it an authorization rather than something this run wrote for itself\n'
+  printf '  then the second legal form: --preflight <slug> naming that landed folder\n'
+}
+# The filing home. A slug whose folder at the FIRST anchor's merge-base holds a `BACKLOG.md` and
+# nothing else is not a build — it is where asks are filed — and pointing a run at it would ask this
+# run to write a README into somebody else's records, which ruling D12-f forbids.
+#
+# AGAINST `merge-base(ASHA, HEAD)` AND BEFORE `trusted_base`, deliberately. Under
+# `ANCHOR_SCOPE=published` a README absent at that merge-base widens to the second anchor, and an
+# unpushed branch is then refused with a push instruction that carries no recipe and, once followed,
+# writes to the remote.
+check_filing_home() { # slug -> 1 and a printed refusal when the slug names a filing home
+  local _mb _ls _home
+  [ -n "${ASHA:-}" ] || return 0
+  _mb=$(GIT merge-base "$ASHA" HEAD 2>/dev/null) || return 0
+  [ -n "$_mb" ] || return 0
+  _ls=$(GIT ls-tree --name-only "$_mb" "$M/builds/$1/" 2>/dev/null)
+  [ "$_ls" = "$M/builds/$1/BACKLOG.md" ] || return 0
+  _home="$1"
+  fail 6 "this slug names a FILING HOME and not a build — at the first anchor's merge-base its folder holds a BACKLOG.md and nothing else, so there is no committed README to authorize a run and writing one into another build's records is what ruling D12-f refuses: $M/builds/$_home at $_mb"
+  print_scaffold_recipe "<the ids of that folder you mean to answer>"
+  if [ -n "${ASKS_CMD:-}" ]; then
+    run_bounded $ASKS_CMD --build "$_home" --at "$_mb" || true
+    printf '%s\n' "$RB_OUT"
+  else
+    printf '  ASKS_CMD is blank in this project, so this refusal cannot list the live asks of that folder; run the generator in its --asks --build %s form by hand and pick from what it prints\n' "$_home"
+  fi
+  return 1
+}
+
+# ------------------------------------------------- the mandate's preconditions, checked at preflight
+# P5, P6 and READY, in that order, and ALL of them BEFORE the write gate. A verb that pins a fact and
+# then discovers a refusal has already changed the state the refusal was about.
+# PROPERTY P6, ON ITS OWN, because it needs NOTHING that the other two need — no anchor, no base,
+# no authorization read. `--resume` has rows that return before any of those exist, and the ask set
+# growing across a hold is the one thing about a mandate a run may never do, so the cheap half is
+# asked on every one of them.
+#
+# READ AT HEAD, which is what the property says and what a run can actually edit. A README absent at
+# HEAD reads as an EMPTY line and differs, which is this same refusal rather than a second branch.
+check_asks_pinned() { # slug · run-state file -> 1 with its own refusal printed
+  local _pin _now
+  [ -f "$2" ] || return 0
+  _pin=$(fact "$2" asks 2>/dev/null)
+  [ -n "$_pin" ] || return 0
+  _now=$(read_asks_key "$(GIT show "HEAD:$(readme_of "$1")" 2>/dev/null)")
+  [ "$_pin" != "$_now" ] || return 0
+  fail 73 "the build README's asks: line at HEAD is not the one this run pinned, and a run that re-read its own mandate could grow the set it is authorized for: pinned [$_pin] · at HEAD [$_now]"
+  return 1
+}
+PF_MBASE=""; PF_ASKS_READY=""
+check_ask_mandate() { # slug · run-state file -> 1 with its own refusal printed
+  local slug="$1" rel="$2" _mb _ids _id _home _blob _pin _now _g _grades="" _allno=1 _sp _sslug _bad
+  PF_MBASE=""; PF_ASKS_READY=""
+  [ -n "${AUTH_ASKS:-}" ] || return 0
+  # THE LINE READS WHOLE OR THE MANDATE IS REFUSED, FIRST (closing diff review of dDerivedDocket,
+  # F2). Every property below iterates the ids, so a token the reader cannot take would leave them
+  # all passing over a set the owner never wrote - P5 over fewer rows, the witness over fewer ids, and
+  # its "fewer rows than asked" DEAD PROBE counting against the narrowed list. At preflight AND at
+  # every resume, which both run this function: a record pinned before this refusal existed is
+  # refused at its next resume rather than carried to a close.
+  if ! _ids=$(asks_ids_of "$AUTH_ASKS"); then
+    _bad=$(read_id_list_refusals "$AUTH_ASKS")
+    fail 87 "the build README's asks: line does not read whole as an id list, and a mandate taken from the ids that did parse is the owner's own list silently narrowed - write each id, an id range or a -N continuation, and nothing else: $_bad"
+    return 1
+  fi
+  # PINNED ONCE, READ BACK. A re-preflight must grade the SAME tree the first one graded, or the
+  # facts beside `m-base:` describe a merge base that has moved underneath them — the drift the
+  # anchor triple was frozen to stop, one key over.
+  _mb=$(fact "$rel" m-base 2>/dev/null)
+  if [ -z "$_mb" ]; then
+    _mb=$(GIT merge-base "${ASHA:-}" HEAD 2>/dev/null) || _mb=""
+  fi
+  # IT MUST RESOLVE, not merely be non-empty. A pinned `m-base:` naming a commit this clone does not
+  # carry would make the two `git show` reads below answer EMPTY, and an empty blob files no ask -
+  # so the provenance property would refuse every mandated id while naming a tree nobody can look at.
+  # An empty value is worse still: `git show ":path"` reads the INDEX, which is bytes the run itself
+  # staged, on both sides of a test about what the run did NOT write.
+  if [ -z "$_mb" ] || ! GIT rev-parse --verify --quiet "$_mb^{commit}" >/dev/null 2>&1; then
+    fail 72 "this build README carries an asks: mandate and the tree the mandate is asserted against is not a commit this clone can read, so every property below would pass over an empty blob or, worse, over the index this run itself staged: m-base [${_mb:-(none)}], anchor ${ASHA:-(none)}"
+    return 1
+  fi
+  check_asks_pinned "$slug" "$rel" || return 1
+  # P5 — EVERY MANDATED ASK IS A RECORD THE RUN DID NOT CREATE. One `git show` per HOME folder, and
+  # the line match is the kit library's, shared with the leg that re-derives this. Reading the
+  # WORKING TREE instead would let a row filed after the run began satisfy a property about
+  # provenance, which is the whole of what it is for.
+  # THE LOOP IS OVER THE MANDATE, never over a derived home list. Deriving the homes first and
+  # iterating THOSE makes the property vacuous on any id the derivation cannot parse: no home,
+  # no iteration, and a mandate this run was never entitled to sails through a check that
+  # printed nothing. Iterating the ids keeps every one of them answerable, and an id whose home
+  # comes out empty reads a path resolving to no blob and is refused by name rather than
+  # skipped.
+  #
+  # ONE `git show` PER FOLDER STILL, through the memo below. A mandate names a handful of homes
+  # and usually one, so the read that costs anything is cached rather than repeated per id.
+  local -A _blobs=()
+  for _id in $_ids; do
+    _home=$(ask_home_of "$_id")
+    if [ -z "${_blobs[$_home]+set}" ]; then
+      _blobs[$_home]=$(GIT show "$_mb:$M/builds/$_home/BACKLOG.md" 2>/dev/null || true)
+    fi
+    ask_filed_in "${_blobs[$_home]}" "$_id" && continue
+    fail 72 "a mandated ask is not filed in the tree this run is anchored to, so the run would be choosing among records it could have written itself: $_id has no row in $M/builds/$_home/BACKLOG.md at $_mb"
+    return 1
+  done
+  # READY, at `m-base:` and through ONE bounded call. Its row count must equal the mandate's or the
+  # witness is a DEAD PROBE: a loop over the rows that came back can only ever confirm them.
+  if ! run_ask_witness "$slug" "$_mb" $_ids; then
+    fail 74 "the declared ask generator did not answer for this mandate, and a mandate nothing graded is one this run would carry without ever knowing whether any of it is executable: $AW_WHY"
+    return 1
+  fi
+  for _id in $_ids; do
+    _g=$(ask_field "$_id" ready)
+    _grades="$_grades $_id=$_g"
+    [ "$_g" = no ] || _allno=0
+  done
+  if [ "$_allno" = 1 ]; then
+    fail 75 "every mandated ask in this build README grades not-ready, so there is nothing in the mandate a run could execute without asking somebody and starting would mean deriving the acceptance nobody wrote - each id and the rules it fails follow"
+    for _id in $_ids; do
+      printf '  %s — failing rules: %s\n' "$_id" "$(ask_field "$_id" missing)"
+    done
+    return 1
+  fi
+  # THE REPORT-ONLY LINE. A foreign live spec closing a mandated ask is a CLAIM, admitted by
+  # nothing: this run passes no live-build set, so it cannot tell a live claim from a stale one and
+  # must not pretend to. What it CAN do is name the claim and say whether that build's tracked
+  # run-state record reads terminal, which is a fact an owner can act on. It pins nothing.
+  for _id in $_ids; do
+    [ "$(ask_field "$_id" ready)" = no ] || continue
+    case ",$(ask_field "$_id" missing)," in *,R2,*) ;; *) continue ;; esac
+    for _sp in $(ask_field "$_id" closers | tr ',' ' '); do
+      [ -n "$_sp" ] && [ "$_sp" != "-" ] || continue
+      _sslug=$(ask_home_of "$_sp")
+      [ "$_sslug" != "$slug" ] || continue
+      echo "unattended: preflight — $_id is claimed by $_sp of build $_sslug: $(describe_foreign_run "$_sslug"). This line pins nothing and admits nothing; the ask still grades no."
+    done
+  done
+  PF_MBASE="$_mb"
+  PF_ASKS_READY="${_grades# }"
+  return 0
+}
+# Whether a claiming build's own tracked record reads terminal, through the ONE derived-phase reader.
+# ABSENT IS NOT TERMINAL and is not a synonym for it: a run in flight keeps its record on its own
+# branch until it lands, so "no record here" is exactly the case this driver cannot see and must not
+# label. Said in those words, so a reader of the line is not invited to read absence as staleness.
+# CALLED INSIDE A SUBSTITUTION, which every other caller of the derived-phase reader is warned off.
+# It is safe HERE and nowhere else in this file: the two globals that reader sets are consumed by
+# this function, in the same subshell, and nothing outside reads them back. The warning is about a
+# CALLER that expects the globals to survive the substitution; this one returns a sentence instead.
+describe_foreign_run() { # slug -> one clause about that build's run-state record
+  local _r
+  _r=$(runmd_of "$1")
+  if ! GIT ls-files --error-unmatch -- "$_r" >/dev/null 2>&1; then
+    printf 'its run-state record is not tracked in this tree, which is also what a run still on its own branch looks like, so nothing here can say whether that claim is live'
+    return 0
+  fi
+  read_derived_phase "$_r"
+  if is_terminal "$DP_PHASE"; then
+    printf 'its tracked run-state record reads TERMINAL (%s), so that spec may be a stale claim the owner can retire' "$DP_PHASE"
+  else
+    printf 'its tracked run-state record reads %s, which is not terminal' "${DP_PHASE:-(no phase)}"
+  fi
+}
+# S11 — THE LAYOUT MODE, COMPARED ACROSS THE TWO TREES AND ANNOUNCED. Which mode the memory tree is
+# in decides whether a build folder files asks at all, so a run whose anchor predates the switch is
+# planning against asks its own BASE never filed. A NOTICE and not a refusal: the change is legal,
+# and what it costs is exactly the silence this line removes.
+read_backlog_mode() { # stdin: a .memory-tree.conf blob -> the declared value, or nothing
+  sed -n 's/^BACKLOG_MODE=[\"'"'"']\{0,1\}\([A-Za-z]*\).*/\1/p' | head -1
+}
+check_backlog_mode_shift() { # -> prints at most one line
+  local _a _h
+  [ -n "${ASHA:-}" ] || return 0
+  # READ, NOT SOURCED, and both quote spellings are admitted. That sibling conf is the memory
+  # kit's and its own readers SOURCE it; a second reader that re-parses one is how a legal
+  # spelling comes back as a value nothing matches while the guard reports itself armed. What
+  # bounds this one is that it is a NOTICE: a spelling it cannot read comes back empty, which
+  # prints as `(undeclared)` in the line itself, so a reader sees what was READ rather than a
+  # conclusion drawn from it.
+  _a=$(GIT show "$ASHA:.memory-tree.conf" 2>/dev/null | read_backlog_mode)
+  _h=$(GIT show "HEAD:.memory-tree.conf" 2>/dev/null | read_backlog_mode)
+  [ "$_a" != "$_h" ] || return 0
+  echo "unattended: preflight — the memory tree's BACKLOG_MODE differs between the anchor and HEAD: [${_a:-(undeclared)}] at the anchor, [${_h:-(undeclared)}] at HEAD. Where a build files its asks moved under this run, so an ask visible at one of those trees may be invisible at the other."
+}
+
+# A projection field, or `-` where the witness never answered. An EMPTY field and an ABSENT
+# row are two different silences and both print the same dash here, on purpose: the reason the
+# witness gave is printed once, as its own line, rather than left to be guessed from a column.
+ask_field_or_dash() { # ask id · field -> the value, or `-`
+  local _v; _v=$(ask_field "$1" "$2"); printf '%s' "${_v:--}"
+}
+# ------------------------------------------------------------------------ `--plan`'s ASK rows
+# AN OUTPUT MODE, the way `--paths` is, and not a verb: a new verb owes three carriers under the
+# sibling checker's verb join, for a change that swaps one printf.
+#
+# THREE TAB FIELDS UNDER `--paths`, never four. Every existing caller of that projection skips a
+# line with fewer than four fields, which is what stops a harness dispatching an ask as though it
+# were a unit — so the field count is the contract and the summary is one field, not three.
+ask_row() { # id · summary
+  if [ -n "$PLAN_PATHS" ]; then printf 'ASK\t%s\t%s\n' "$1" "$2"
+  else printf '%-34s %-11s %s\n' "$1" "ASK" "$2"; fi
+}
+# THE POPULATION IS THE MANDATE PLUS THIS FOLDER'S OWN FILED ASKS, and both halves are needed.
+# The mandate alone misses an ask this build filed for itself and never planned; the folder alone
+# misses every mandated ask filed somewhere else, which under an ids-mode run is all of them.
+#
+# EVERY FILED ASK GETS A ROW, terminal ones included. Which asks are terminal is the declared
+# generator's fold, and its answer arrives in each row's own `status=` field — dropping rows on it
+# would make this verb re-decide a question it deliberately does not hold.
+#
+# THE UNDECIDED PICK IS DERIVED HERE AND ON EVERY `--plan`, with or without `--asks`, because it is
+# an INPUT to the `next:` ladder rather than a property of this output mode. Where the population is
+# empty — every build in a tree that files no asks — nothing below runs, no bounded call is made,
+# and the ladder prints byte for byte what it printed before this unit.
+ASK_PLAN_ROWS=""; ASK_PLAN_NEXT=""; ASK_PLAN_WHY=""
+build_ask_plan() { # slug · spec paths… -> sets ASK_PLAN_ROWS, ASK_PLAN_NEXT, ASK_PLAN_WHY
+  local slug="$1"; shift
+  local _m _mids _bl _fids _pop="" _mset="" _id _i=0 _rev _rel _sp _spid _live _cover _disp
+  local _n=0 _sum _rdy _dup
+  ASK_PLAN_ROWS=""; ASK_PLAN_NEXT=""; ASK_PLAN_WHY=""; ASK_POSITIONS=""; AW_ROWS=""
+  _m=$(mandate_of "$slug")
+  # A MANDATE THAT DOES NOT READ WHOLE IS NAMED, not planned from (closing review F2). This verb
+  # reports and refuses nothing, so it plans the folder's own asks and says, on a line of its own
+  # whatever the output mode, that no mandated ask is among them and why. Planning from the ids that
+  # did parse would hand a run the narrowed set `--preflight` now refuses.
+  if ! _mids=$(asks_ids_of "$_m"); then
+    echo "unattended: --plan — the build README's asks: line does not read whole as an id list, so no mandated ask is planned below and --preflight refuses the mandate: $(read_id_list_refusals "$_m")"
+  fi
+  _bl=$(backlog_text_of "$slug")
+  _fids=$(asks_filed_in "$_bl")
+  for _id in $_mids; do
+    case " $_pop " in *" $_id "*) continue ;; esac
+    _pop="$_pop $_id"; _mset="$_mset $_id"; _i=$((_i + 1))
+    ASK_POSITIONS="$ASK_POSITIONS$_id	$_i
+"
+  done
+  for _id in $_fids; do
+    case " $_pop " in *" $_id "*) continue ;; esac
+    _pop="$_pop $_id"
+  done
+  _pop="${_pop# }"
+  [ -n "$_pop" ] || return 0
+  # THE REV IS THE PINNED `m-base:` WHERE ONE EXISTS, so `--plan` grades the same tree preflight
+  # pinned and its answer is a pure function of pinned inputs. With no run-state record — a build
+  # nobody has preflighted, which is what a freshly scaffolded mandate-only build IS — the rev is
+  # HEAD, and the call shape does not change.
+  _rel=$(runmd_of "$slug")
+  _rev=""
+  [ -f "$_rel" ] && _rev=$(fact "$_rel" m-base 2>/dev/null)
+  [ -n "$_rev" ] || _rev=$(GIT rev-parse HEAD 2>/dev/null)
+  if ! run_ask_witness "$slug" "$_rev" $_pop; then
+    # A WITNESS THAT DID NOT ANSWER DOES NOT SILENCE THIS VERB. `--plan` reports; it pins nothing
+    # and refuses nothing, so an ungraded population still prints its rows with `-` in the fields
+    # the generator would have filled, and the reason is named rather than left as a blank column.
+    ASK_PLAN_WHY="$AW_WHY"
+  fi
+  _pop=$(ask_rank_order $_pop)
+  for _id in $_pop; do
+    _n=$((_n + 1))
+    _live=""; _cover=""
+    # THIS BUILD'S OWN SPECS FIRST, read off their status headers, because a spec that has ALREADY
+    # closed an ask still covers it and the projection's closers field lists LIVE specs only.
+    for _sp in "$@"; do
+      spec_ask_verbs "$_sp" closes | grep -qxF -- "$_id" || {
+        spec_ask_verbs "$_sp" advances | grep -qxF -- "$_id" || continue; }
+      _spid="${SPEC_ID[$_sp]:-}"
+      [ -n "$_spid" ] || continue
+      [ -n "$_cover" ] || _cover="$_spid"
+      case "${SPEC_ST[$_sp]:-}" in CLOSED|WONTDO) continue ;; esac
+      _live="$_live${_live:+,}$_spid"
+    done
+    # TWO LIVE UNITS OF ONE BUILD CLOSING ONE ASK is a planning error and not a status: the ask has
+    # two answers and neither of them is the one. It prints as a refusal row, still three fields, so
+    # a reader and a harness both see it in the projection they already parse.
+    #
+    # READ OFF THE PROJECTION'S CLOSERS AND NOT OFF THIS BUILD'S SPECS ALONE. The closers field spans
+    # every build, and the build doing the double-claiming is usually not this one - a scan of this
+    # folder's own specs cannot see a foreign pair at all. GROUPED BY THE BUILD each closer's own id
+    # names, so two DIFFERENT builds closing it once each is a contest, which is a different thing
+    # and is what the R2 grade already reports.
+    _dup=$(ask_field "$_id" closers | tr ',' '\n' | sed 's/^stale://' \
+      | grep -E '^[A-Z]+-[A-Za-z0-9]+-[0-9]+$' \
+      | awk '{ b = $0; sub(/^[A-Z]+-/, "", b); sub(/-[0-9]+$/, "", b)
+               c[b]++; s[b] = s[b] (s[b] == "" ? "" : ",") $0 }
+             END { for (b in c) if (c[b] > 1) { print s[b]; exit } }')
+    if [ -n "$_dup" ]; then
+      ASK_PLAN_ROWS="$ASK_PLAN_ROWS$_id	refused=duplicate-closer;units=$_dup
+"
+      continue
+    fi
+    case "$_live" in
+      *,*) ASK_PLAN_ROWS="$ASK_PLAN_ROWS$_id	refused=duplicate-closer;units=$_live
+"
+           continue ;;
+    esac
+    # A LIVE CLOSER OF THIS BUILD covers the ask too, and it may have no spec here yet - a unit whose
+    # header names the ask can exist in a tree this folder's spec list has not caught up with.
+    if [ -z "$_cover" ]; then
+      _cover=$(ask_field "$_id" closers | tr ',' '\n' | sed 's/^stale://' \
+        | grep -E "^[A-Z]+-$slug-[0-9]+$" | head -1)
+    fi
+    _disp=$(ask_disposition_of "$_bl" "$_id")
+    [ -n "$_cover" ] || _cover="$_disp"
+    [ -n "$_cover" ] || _cover="-"
+    # THE GRADE IS PRINTED FOR A MANDATED ASK AND FOR NOBODY ELSE. READY is graded AGAINST a mandate
+    # - rule R3 asks whether a hold target is inside it - so a grade for an ask the mandate never
+    # named answers a question nobody asked, and section 4 gives it a dash for exactly that reason.
+    # The one call above passes the whole printed population so every row has a STATUS; the PINNED
+    # answer for the mandate is `asks-ready:` on the record, written at preflight over the mandate
+    # alone, and this column is a report beside it rather than a second pin.
+    _rdy="-"
+    case " $_mset " in *" $_id "*) _rdy=$(ask_field_or_dash "$_id" ready) ;; esac
+    _sum="status=$(ask_field_or_dash "$_id" status);ready=$_rdy;cover=$_cover;rank=$_n"
+    ASK_PLAN_ROWS="$ASK_PLAN_ROWS$_id	$_sum
+"
+    [ "$_cover" = "-" ] || continue
+    [ -n "$ASK_PLAN_NEXT" ] || ASK_PLAN_NEXT="$_id"
+  done
+  return 0
+}
+
 # ONE EMITTER FOR EVERY ROW THAT NAMES A UNIT ID, so the two modes cannot disagree about which rows
 # are units. PATHS mode swaps the shape and nothing else: four TAB-separated fields, id, status,
 # state and the spec's repo-relative path, the fourth EMPTY for a unit no tracked spec defines. A
@@ -2214,9 +3853,98 @@ plan_row() { # id · status · state · specPath
   else printf '%-34s %-11s %s\n' "$1" "$2" "$3"; fi
 }
 
+# ------------------------------------------------------------------- THE `next:` LADDER, DECLARED
+# WHAT THIS REPLACES. The line `--plan` closes with was built by three guarded assignments spread
+# across two loops of `verb_plan` - `[ -n "$next" ] || next=...` - so the PRECEDENCE between the
+# shapes was whichever loop bash reached first. It was real, it was correct, and it was stated
+# nowhere, which means a fourth shape could only be added by typing a fourth guarded assignment and
+# arguing in prose about where it went. That is how one spec of this build came to hold a design
+# sentence and a fixture that could not both be true (TOOL-dDerivedDocket-49 section 8 F1).
+#
+# ONE LINE PER RUNG, IN RUNG ORDER, AND THE ORDER OF THESE LINES IS THE RULE. The selector below
+# walks them top to bottom and returns the first rung whose input is non-empty, so moving a line
+# moves the precedence - and the sibling suite reads that order back out of THIS block. A position
+# in a declared table is gradeable by an arm; a sentence in a design section is not.
+#
+# `rung ` AT COLUMN 0 IS THE HANDLE. Nothing else in this file begins with it, so the arm counts the
+# rungs and reads their order without parsing shell and without a second copy of the table.
+#
+# THE UNDECIDED-ASK RUNG SITS THIRD, after both unit rungs and before both terminal rungs. Its input
+# is the empty string on every call until TOOL-dDerivedDocket-16 builds the predicate that fills it,
+# so the ladder prints today exactly what the three assignments printed. The position is pinned here
+# rather than in that unit because it is the half that can be graded before the predicate exists,
+# and the rule it encodes is that a run with a planned unit nobody has specced is told to spec it,
+# never to go dispose an ask.
+#
+# WHY RUNG 4 SITS BELOW RUNG 2 - today's behaviour, not a change. The MISSING loop assigned the line
+# whether or not anything graded, so a roster id with no spec already outranked the nothing-graded
+# wording, and leg check 30 reads the conjunction of a NOT A UNIT row with the LAST rung's wording.
+#
+# THE THREE SHAPE LITERALS BELOW ARE BYTE FOR BYTE THE ONES THAT STOOD IN `verb_plan`, and the two
+# terminal ones stay distinct strings. That check and the sibling suite both match on the wording,
+# so reflowing one here silently unwires both while this table reports itself correct.
+#
+# RUNGS 1 AND 3 CARRY A BARE `<id>` ON PURPOSE. The words inside those two shapes belong to whoever
+# supplies them - the state word is the caller's, and the undecided shape is unit 16's - so what the
+# table owns for those two is their POSITION, which is the whole subject of the unit that wrote it.
+#
+# `<id>` IS SUBSTITUTED, NEVER `printf`-ed. The id arrives from a build README, a `%` in one would
+# make the shape a format string, and a `printf` handed a spare argument reuses its format rather
+# than ignoring it.
+# BOTH QUOTES SIT ALONE, so every rung line is the rung and nothing else. The opening one buys the
+# fifth rung a column-0 start; the closing one keeps the last rung's wording a WHOLE line, which
+# is what an arm asserting that literal verbatim can anchor on. `read` skips both blanks the same
+# way it skips any line whose first word is not `rung`.
+NEXT_RUNGS='
+rung live-unit <id>
+rung missing-unit <id> (MISSING - spec it first)
+rung undecided-ask <id>
+rung nothing-graded none - no tracked spec grades as a unit (see the NOT A UNIT rows above)
+rung everything-terminal none - every tracked spec is terminal
+'
+
+# FOUR INPUTS AND NO STATE. Every one is derived by the caller from data it already holds, so this
+# runs once per `--plan` and performs no read of its own.
+#
+# THE TWO TERMINAL RUNGS TAKE A SENTINEL, never an id: "nothing graded" and "everything terminal"
+# are conditions rather than subjects, so their input is the word `yes` or nothing at all, and their
+# shapes carry no `<id>` for one to reach.
+#
+# FED BY A HERE-STRING OVER A VARIABLE, never by a command substitution: the loop stays in this
+# shell, and the kit's own shell-hygiene leg has nothing to declare.
+derive_next_shape() { # live-unit shape . first MISSING id . undecided-ask shape . graded flag
+  local _tag _rung _tmpl _in
+  while read -r _tag _rung _tmpl; do
+    [ "$_tag" = rung ] || continue
+    case "$_rung" in
+      live-unit)           _in="$1" ;;
+      missing-unit)        _in="$2" ;;
+      undecided-ask)       _in="$3" ;;
+      nothing-graded)      [ "$4" = 0 ] && _in=yes || _in="" ;;
+      everything-terminal) _in=yes ;;
+      *)                   _in="" ;;
+    esac
+    [ -n "$_in" ] || continue
+    printf '%s\n' "${_tmpl//<id>/$_in}"
+    return 0
+  done <<< "$NEXT_RUNGS"
+  # UNREACHABLE while the last rung's input is the constant above, and it still says something. An
+  # empty tail on a `next:` line is a verb that answered nothing while looking like it answered, and
+  # this is the one state in which the ladder itself is the thing that is broken.
+  printf 'none - the rung table named no shape, which cannot happen while its last rung is unconditional\n'
+  return 0
+}
+
 verb_plan() { # slug
-  local slug="$1" dir specs spec id st state next="" miss nmiss=0
+  local slug="$1" dir specs spec id st state miss nmiss=0 _ar_id _ar_sum
+  # THE LADDER'S INPUTS, collected by the two loops below and read ONCE at the bottom. They
+  # are not the line: `_live` and `_miss1` are first-wins captures of data each loop already
+  # has, `_ask1` is the undecided-ask rung's input and stays EMPTY here until
+  # TOOL-dDerivedDocket-16 fills it, and `_graded` is set beside the unit rows further down.
+  # No branch of this verb assigns the printed line any more.
+  local _live="" _miss1="" _ask1=""
   check_slug "$slug" || return 1
+  load_fork_cutoff || return 1
   dir="$M/builds/$slug"
   # A malformed pair is a NAMED refusal, never a silent fall-through to the no-roster path. `region`
   # exits 3 for ABSENT and for MALFORMED alike, and treating that one status as "absent" is the
@@ -2248,13 +3976,20 @@ verb_plan() { # slug
     return 1
   fi
   specs=$(git ls-files "$dir/spec/*.md" 2>/dev/null | drop_working_specs)
-  if [ -z "$specs" ]; then
-    fail 19 "no tracked spec under this build, so every planned unit is MISSING; the README roster is what this verb reads to say WHICH, and with no spec beside it there is nothing to join that roster against: $dir/spec"
+  # TOOL-dDerivedDocket-16 S7 - THREE EMPTY TERMS, not one. This refused on "no tracked spec" alone,
+  # which is design section 19.1's K4: a build whose roster names two planned units and whose specs
+  # nobody has written yet is exactly the state `--plan` exists to report, and refusing it told the
+  # agent nothing about the units it was about to spec. It fires now only where there is nothing at
+  # all to list - no roster id, no spec and no mandated ask.
+  if [ -z "$specs" ] && [ -z "$_rids" ] && [ -z "$(mandate_of "$slug")" ]; then
+    fail 19 "no tracked spec under this build, and neither its roster nor an asks: mandate names anything either, so there is no unit set to report on at all: $dir/spec"
     return 1
   fi
   # ONE read of every spec, before any per-spec question below is asked. UNQUOTED on purpose:
   # `$specs` is the newline-separated `git ls-files` output that every loop below already
   # word-splits, so this adds no assumption the surrounding code does not already make.
+  # GUARDED, because the roster may now name units over a build with no spec at all. The maps are
+  # cleared by that call and a skipped call would leave whatever a previous frame put in them.
   load_spec_facts $specs
   # S6 - THE TWO `NOT A UNIT` DIAGNOSTICS, reported FIRST and from the spec files, because the region
   # cannot carry them: `render_region` emits rows only for specs whose status header parsed, so a file
@@ -2343,7 +4078,7 @@ verb_plan() { # slug
     # the S6 pass above and cannot reach here: a row exists in the region only for a spec whose status
     # header parsed, so this branch grades a file already known to be a unit.
     st="${SPEC_ST[$spec]:-}"
-    state=$(plan_state "$spec")
+    state=$(plan_state "$spec" "$FORK_CUTOFF")
     # The grade is printed BESIDE `DONE`, never in place of it. This line USED to overwrite it, so a
     # unit closed against a spec stating no acceptance criterion read exactly like one closed against
     # a complete spec, and the one predicate that knew otherwise was discarded at the moment the
@@ -2351,18 +4086,47 @@ verb_plan() { # slug
     case "$st" in CLOSED|WONTDO) [ "$state" = "READY" ] && state="DONE" || state="DONE ($state)" ;; esac
     plan_row "$id" "${st:-?}" "$state" "$spec"
     _graded=1
+    # FIRST WINS, and what wins is an INPUT rather than the line. The guarded assignments to
+    # `next` that stood here and in the loop below settled the precedence between the shapes
+    # by whichever loop bash reached first. The order is declared at NEXT_RUNGS now, and this
+    # branch says only which id and which state word the live-unit rung takes.
     case "$state" in
-      THIN|FORKED) [ -n "$next" ] || next="$id ($state)" ;;
-      READY)       [ -n "$next" ] || next="$id (READY - build it)" ;;
+      THIN|FORKED) [ -n "$_live" ] || _live="$id ($state)" ;;
+      READY)       [ -n "$_live" ] || _live="$id (READY - build it)" ;;
     esac
   done
   # The planned units nobody has specced. These are what M2 calls MISSING, and until this
   # unit they were simply absent from the listing rather than reported.
-  for miss in $(missing_units "$slug" "$dir"); do
+  # TOOL-dDerivedDocket-16 S7 - NUMERIC SEQUENCE, never the string order `comm` hands back. `-10`
+  # sorts before `-2` as a string, so the first MISSING id - which is the one the `next:` ladder
+  # names - was whichever unit happened to sort first, and a build with ten planned units was told
+  # to spec its tenth. `missing_units` keeps its lexical contract because `comm` requires it; the
+  # ORDER a reader sees is decided here, once.
+  for miss in $(missing_units "$slug" "$dir" | sort -t- -k1,1 -k2,2 -k3,3n); do
     plan_row "$miss" "-" "MISSING" ""
     nmiss=$((nmiss + 1))
-    [ -n "$next" ] || next="$miss (MISSING - spec it first)"
+    [ -n "$_miss1" ] || _miss1="$miss"
   done
+  # TOOL-dDerivedDocket-16 S8 - THE ASK ROWS, after every unit row and before the roster line, so
+  # the unit projection is byte-identical to what it was for a build that files no asks and declares
+  # no mandate. `build_ask_plan` returns without reading anything where the population is empty,
+  # which is every build in a tree that has not adopted the ask envelope.
+  build_ask_plan "$slug" $specs
+  if [ -n "$ASK_PLAN_ROWS" ]; then
+    if [ -n "$PLAN_ASKS" ]; then
+      [ -z "$ASK_PLAN_WHY" ] || echo "unattended: --plan --asks — the ask rows below carry \`-\` where the declared generator would have graded them: $ASK_PLAN_WHY"
+      while IFS=$'\t' read -r _ar_id _ar_sum; do
+        [ -n "$_ar_id" ] || continue
+        ask_row "$_ar_id" "$_ar_sum"
+      done <<ASKROWS
+$ASK_PLAN_ROWS
+ASKROWS
+    fi
+    # THE UNDECIDED SHAPE'S WORDS ARE THIS UNIT'S and the rung's POSITION is the ladder's, which is
+    # why the table carries a bare `<id>` for it. Supplied whether or not `--asks` printed the rows:
+    # the false "every tracked spec is terminal" is a lie about the BUILD, not about an output mode.
+    [ -z "$ASK_PLAN_NEXT" ] || _ask1="$ASK_PLAN_NEXT (UNDECIDED - plan a unit that closes it, or dispose it)"
+  fi
   # The value resolved at the top of this verb, not re-derived. R2-M3: two `$( )` calls here meant two
   # discarded exit-3s, and the guard that replaced them still sat AFTER the listing.
   if [ -n "$_rids" ]; then
@@ -2373,13 +4137,13 @@ verb_plan() { # slug
   # R3-B1 — THE TERMINAL WORDING IS EARNED, not defaulted. "every tracked spec is terminal" was
   # printed at exit 0 over builds where no spec graded as a unit at all, one line below the NOT A
   # UNIT rows saying so. A reader — or an agent picking up work — is told the build is finished.
-  if [ -n "$next" ]; then
-    echo "next: $next"
-  elif [ "$_graded" = 0 ]; then
-    echo "next: none - no tracked spec grades as a unit (see the NOT A UNIT rows above)"
-  else
-    echo "next: none - every tracked spec is terminal"
-  fi
+  # It is earned by the ladder's LAST rung now, which is the same rule carrying a name and a place.
+  #
+  # ONE WRITER, ONE CALL. Three branches stood here, fed by three guarded assignments in two loops,
+  # and the order among them was an artefact of iteration: a fourth shape could be added only by
+  # arguing in prose about where to type it. `_ask1` is empty on every call until
+  # TOOL-dDerivedDocket-16 supplies it, so this prints byte for byte what the three branches did.
+  echo "next: $(derive_next_shape "$_live" "$_miss1" "$_ask1" "$_graded")"
   return 0
 }
 
@@ -2400,6 +4164,24 @@ verb_phase() { # slug · phase · witness
   # preflight. Since TOOL-aUnblockedFleet-1 neither check_single_live nor leg check 7 refuses on that
   # count, so what this guard now protects is the RECORD's own honesty rather than the fleet's.
   refuse_if_terminal "$rel" --phase || return 1
+  # S9 - HELD IS PRODUCER-ONLY, and it blocks this verb from BOTH sides.
+  #
+  # As a TARGET, because only --hold writes the hold facts. `--phase <slug> HELD` would produce a
+  # HELD record with no held-from, hold-code, hold-until or held-at — a pause nothing can evaluate
+  # and --resume cannot release, which is a wedge wearing a phase name.
+  #
+  # As a SOURCE, because --resume is the only exit: it runs the condition test, re-verifies the
+  # authorization at the pinned BASE and takes the lease, and a phase move out of HELD skips all
+  # three. A verb testing only `is_terminal` reaches both, because HELD is not terminal.
+  if [ "$want" = HELD ]; then
+    fail 53 "HELD is written by --hold alone, because the hold facts — the code, the release condition, the phase it was held from and the moment — are written with it, and a phase move into it would be that record with none of them: $want"
+    return 1
+  fi
+  read_derived_phase "$rel"
+  if [ "$DP_PHASE" = HELD ]; then
+    fail 53 "the run is HELD and a held run is left by --resume alone, which tests the release condition, re-verifies the authorization at the pinned BASE and takes the lease; a phase move out of HELD would skip all three: --resume the slug"
+    return 1
+  fi
   # A TERMINAL phase is a PRODUCER's to write, never this verb's. Vocabulary membership is not
   # permission: a run that could set LANDED here would skip the entire Definition-of-Done gate, and
   # the two agent-attested items are enforced in no other place.
@@ -2451,6 +4233,65 @@ read_stop_listing() { # slug -> utc \n phase \n session_crons, or nothing (statu
   printf '%s\n%s\n%s\n' "${_u:-(unreadable)}" "${_p:-(unreadable)}" "$_c"
 }
 
+# TOOL-aWokenSentinel-7 — THE REAP, READ BACK. `keepalive-reaped` is attested at --close; here the
+# attestation meets the one piece of evidence the agent did not write: the harness's own cron
+# listing, which the stop-guard copies into the sidecar at every stop of a bound session. A local
+# file read, so it sits before the remote round-trip as the marker does, and a refusal here leaves
+# the record at LANDING, repairable by the remedy it names, because the terminal writes sit last.
+# The line's own `phase` decides "after the close": --close is the sole writer of LANDING
+# (TOOL-cFinalBerth-1 S9) and this verb the sole writer of LANDED, so a stop recorded in LANDING is
+# by construction a stop between the two, and no clock is needed. A PRE-CLOSE newest line REFUSES
+# rather than passing unchecked: the ordinary landing runs close, lander and this verb in one turn,
+# so a pass there would check only the landings where a turn happened to end in between (spec 7
+# §8, B2); the stop-guard's landing-unstamped row (TOOL-aWokenSentinel-8) continues the session
+# after the turn the remedy asks for. That remedy works for the LEASED session alone, because the
+# stop-guard binds by the lease (run-lease.js `resolveLease`): a session the record does not name
+# appends nothing however many turns it ends, so it is refused FIRST with the step that binds it,
+# `--resume <slug> --keepalive-id <id>` (closing review ids 7 and 11 — the header used to claim an
+# unbound session is never wedged, and it was, on a false "the hook is unwired" diagnosis). A
+# lease naming no session at all reads `unchecked`: the harness exposed none, so no stop of this
+# run was ever recorded and none can be. And the newest line must be YOUNGER than the lease: the
+# hook writes a LANDING line on every stop at LANDING, blocked or allowed, so a dead incarnation's
+# line outlives its lease and would pass check 53 against the id the new lease replaced (id 15);
+# `lease-utc` is written by `write_lease`, and a line older than it is the pre-close case.
+# NOT CHECKED: whether the id named by `keepalive` was ever the run's job, whether a job under
+# another id still fires, or anything about a stop the hook did not record — one line the harness
+# populated, one id, one substring test. A record with no `lease-utc` (written before it existed)
+# takes the newest line whoever wrote it, which is the reading it always had.
+#
+# BOTH LANDING MODES CALL IT, before the remote round-trip (TOOL-dDerivedDocket-61 S9). Under
+# `in-place` the branch used to return before this block, so a session the record did not name
+# landed with no `keepalive-reaped` line at all. Moved whole: the texts and check numbers are the
+# ones the block carried, and it keeps its line order among the other branches of 53, 54 and 55.
+check_keepalive_reaped() { # slug · run-state file -> 0 read back or announced unchecked, or 1 refused
+  local slug="$1" rel="$2"
+  local _kid _sl _su _sp _sc _sid _lu _me
+  _kid=$(fact "$rel" keepalive); _sid=$(fact "$rel" session); _lu=$(fact "$rel" lease-utc); _me="${CLAUDE_CODE_SESSION_ID:-}"
+  if [ -z "$_kid" ]; then
+    echo "unattended: keepalive-reaped: attested, unchecked — the record names no keepalive id"
+  elif [ -z "$_sid" ] || [ "$_sid" = absent ]; then
+    echo "unattended: keepalive-reaped: attested, unchecked — the lease names no session (the harness exposed none), so the stop-guard never bound this run and recorded no stop of it"
+  elif [ "$_me" != "$_sid" ]; then
+    fail 55 "the stop-guard binds by the lease and this session is not the one the record names, so no stop of this session is ever recorded and ending the turn cannot help — run --resume $slug --keepalive-id <the idle-wake id you schedule now> so the lease names this session and the stop-guard records it, then re-run --landed: lease session $_sid, this session ${_me:-unset}"
+    return 1
+  elif ! _sl=$(read_stop_listing "$slug"); then
+    echo "unattended: keepalive-reaped: attested, unchecked — no stop-guard record for this run (the hook is not wired, or the session was never bound)"
+  else
+    _su=$(printf '%s\n' "$_sl" | sed -n 1p); _sp=$(printf '%s\n' "$_sl" | sed -n 2p); _sc=$(printf '%s\n' "$_sl" | sed -n '3,$p')
+    if [ -n "$_lu" ] && [ "$_lu" != absent ] && [ "$_su" \< "$_lu" ]; then _sp="$_sp, older than the lease taken at $_lu"; fi
+    if [ "$_sp" != LANDING ]; then
+      fail 54 "the stop-guard records this session and no stop after the close exists to check the reap against, so the attestation could be checked and was not — END THE TURN once (the stop-guard records the listing and continues you), then re-run --landed; if no record appears afterwards the hook is unwired and adopt-unattended.sh --check says so: newest stop-guard record $_su in phase $_sp"
+      return 1
+    fi
+    if printf '%s\n' "$_sc" | grep -qF -- "$_kid"; then
+      fail 53 "the keepalive attestation is contradicted by the harness's own listing: the stop-guard recorded the cron store after the close and it still names the recorded keepalive id, so the job was not reaped — reap it, END THE TURN so the stop-guard records the listing again, then re-run --landed: $_kid listed at $_su"
+      return 1
+    fi
+    echo "unattended: keepalive-reaped: checked — $_kid absent from the harness listing at $_su"
+  fi
+  return 0
+}
+
 # S1 - THE SOLE PRODUCER OF `LANDED`, and it is an OBSERVATION rather than a claim.
 #
 # Two preconditions, and both are load-bearing:
@@ -2482,8 +4323,15 @@ verb_landed() { # slug
   check_slug "$slug" || return 1
   rel=$(runmd_of "$slug")
   [ -f "$rel" ] || { fail 10 "no run-state file, so there is no run to mark landed: $rel"; return 1; }
-  refuse_if_terminal "$rel" --landed || return 1
-  cur=$(fact "$rel" phase)
+  refuse_if_terminal "$rel" --landed --recorded || return 1
+  cur=$(read_recorded_phase "$rel")
+  # S9 - HELD BLOCKS THIS VERB, and it is named before the LANDING test so the message sends the
+  # reader to --resume rather than to --close. A HELD record is NOT terminal, so `is_terminal`
+  # passes it; a verb that tested only that would reach its own terminal write from a paused run.
+  if [ "$cur" = HELD ]; then
+    fail 82 "the run is HELD, and a paused run is left by --resume alone; a terminal written from here would end a run that stopped for a cause it did not choose and has not re-verified: --resume the slug first"
+    return 1
+  fi
   if [ "$cur" != LANDING ]; then
     # A LANDING EVALUATED IN ANOTHER TREE DOES NOT TRAVEL. `--close` stages the phase and the RUN
     # commits it, so a run that closed in a linked worktree and then merged from the primary tree
@@ -2495,7 +4343,7 @@ verb_landed() { # slug
       case "$_wl" in "worktree "*) _wp=${_wl#worktree } ;; *) continue ;; esac
       [ "$_wp" = "$ROOT" ] && continue
       [ -f "$_wp/$rel" ] || continue
-      case "$(fact "$_wp/$rel" phase)" in
+      case "$(read_recorded_phase "$_wp/$rel")" in
         LANDING) _elsewhere="$_elsewhere $_wp" ;;
       esac
     done <<WTS
@@ -2508,56 +4356,48 @@ WTS
     fi
     return 1
   fi
-  check_clean || return 1
-  # TOOL-aWokenSentinel-7 — THE REAP, READ BACK. `keepalive-reaped` is attested at --close; here the
-  # attestation meets the one piece of evidence the agent did not write: the harness's own cron
-  # listing, which the stop-guard copies into the sidecar at every stop of a bound session. A local
-  # file read, so it sits before the remote round-trip as the marker does, and a refusal here leaves
-  # the record at LANDING, repairable by the remedy it names, because the terminal writes sit last.
-  # The line's own `phase` decides "after the close": --close is the sole writer of LANDING
-  # (TOOL-cFinalBerth-1 S9) and this verb the sole writer of LANDED, so a stop recorded in LANDING is
-  # by construction a stop between the two, and no clock is needed. A PRE-CLOSE newest line REFUSES
-  # rather than passing unchecked: the ordinary landing runs close, lander and this verb in one turn,
-  # so a pass there would check only the landings where a turn happened to end in between (spec 7
-  # §8, B2); the stop-guard's landing-unstamped row (TOOL-aWokenSentinel-8) continues the session
-  # after the turn the remedy asks for. That remedy works for the LEASED session alone, because the
-  # stop-guard binds by the lease (run-lease.js `resolveLease`): a session the record does not name
-  # appends nothing however many turns it ends, so it is refused FIRST with the step that binds it,
-  # `--resume <slug> --keepalive-id <id>` (closing review ids 7 and 11 — the header used to claim an
-  # unbound session is never wedged, and it was, on a false "the hook is unwired" diagnosis). A
-  # lease naming no session at all reads `unchecked`: the harness exposed none, so no stop of this
-  # run was ever recorded and none can be. And the newest line must be YOUNGER than the lease: the
-  # hook writes a LANDING line on every stop at LANDING, blocked or allowed, so a dead incarnation's
-  # line outlives its lease and would pass check 53 against the id the new lease replaced (id 15);
-  # `lease-utc` is written by `write_lease`, and a line older than it is the pre-close case.
-  # NOT CHECKED: whether the id named by `keepalive` was ever the run's job, whether a job under
-  # another id still fires, or anything about a stop the hook did not record — one line the harness
-  # populated, one id, one substring test. A record with no `lease-utc` (written before it existed)
-  # takes the newest line whoever wrote it, which is the reading it always had.
-  local _kid _sl _su _sp _sc _sid _lu _me
-  _kid=$(fact "$rel" keepalive); _sid=$(fact "$rel" session); _lu=$(fact "$rel" lease-utc); _me="${CLAUDE_CODE_SESSION_ID:-}"
-  if [ -z "$_kid" ]; then
-    echo "unattended: keepalive-reaped: attested, unchecked — the record names no keepalive id"
-  elif [ -z "$_sid" ] || [ "$_sid" = absent ]; then
-    echo "unattended: keepalive-reaped: attested, unchecked — the lease names no session (the harness exposed none), so the stop-guard never bound this run and recorded no stop of it"
-  elif [ "$_me" != "$_sid" ]; then
-    fail 55 "the stop-guard binds by the lease and this session is not the one the record names, so no stop of this session is ever recorded and ending the turn cannot help — run --resume $slug --keepalive-id <the idle-wake id you schedule now> so the lease names this session and the stop-guard records it, then re-run --landed: lease session $_sid, this session ${_me:-unset}"
+  # TOOL-dDerivedDocket-22 S7 - UNDER `in-place` THIS VERB IS AN OBSERVATION AND WRITES NOTHING TO
+  # THE TREE. The close committed the LANDING record on the graded merge and `--land` pushed exactly
+  # that commit, so the terminal is DERIVED from the advertised tip (D12-i2) and a LANDED commit
+  # written after the push would be the one change no bar ever grades (TOOL-aBoundedCeiling-9).
+  #
+  # The guard above reads the RECORDED phase, never the derived one: a derived guard would refuse
+  # this verb as finished after every good landing, because its own postcondition is the terminal.
+  # `observe_anchor` stays mandatory for its integrity tripwires, and the derivation then reuses that
+  # one observation. The one write is the clone-local landed log (S16, moved out of the retired lease
+  # file by TOOL-dDerivedDocket-61 S10), under the git common dir: a later reader that cannot see the
+  # remote still has this observation, every worktree on the node reads it, and none reads it as a
+  # phase or as who drives the slug.
+  if [ "$LANDER_MODE" = in-place ]; then
+    check_keepalive_reaped "$slug" "$rel" || return 1
+    observe_anchor || return 1
+    read_derived_phase "$rel"
+    if [ "$DP_PHASE" = LANDED ]; then
+      write_landed_observation "$slug" "$DP_LANDING" "$DP_AREF" "$DP_TIP" \
+        || echo "unattended: NOTE — the landed log could not be appended, so this landing reads FINISHED-UNSTAMPED to every reader until --landed is re-run: $(resolve_landed_log "$slug" 2>/dev/null)"
+      echo "unattended: phase LANDED (derived: ${DP_LANDING:0:8} on $DP_AREF at ${DP_TIP:0:8}) · observed, not written: under in-place landing the record the push carried is the terminal, and the next --preflight of $slug retires it"
+      # TOOL-dDerivedDocket-28 S11 - the in-place landing writes no terminal until a rotation that
+      # may never come, so the ledger goes HERE, beside the one write this verb makes.
+      remove_procs_ledger "$slug"
+      return 0
+    fi
+    if [ -z "$DP_LANDING" ]; then
+      fail 80 "no LANDING record is committed as it stands, so nothing a push could carry holds this run's close and there is no landing commit to observe on the remote; the in-place close commits its own record, so re-close in this tree: $rel"
+      return 1
+    fi
+    if GIT merge-base --is-ancestor "$DP_LANDING" "refs/heads/${AREF#refs/heads/}" 2>/dev/null; then
+      fail 80 "the landing commit is on the LOCAL default branch and not on the tip the remote advertises, and under in-place landing only the remote is a landing: a local arm would be the record of a merge nobody pushed. Push it with the lander, then observe again: ${DP_LANDING:0:8} against $AREF at ${ASHA:0:8}"
+      return 1
+    fi
+    fail 80 "the landing commit is not on the tip the remote advertises, so the push has not carried this record; run the lander's --land, then observe again: $DP_REASON"
     return 1
-  elif ! _sl=$(read_stop_listing "$slug"); then
-    echo "unattended: keepalive-reaped: attested, unchecked — no stop-guard record for this run (the hook is not wired, or the session was never bound)"
-  else
-    _su=$(printf '%s\n' "$_sl" | sed -n 1p); _sp=$(printf '%s\n' "$_sl" | sed -n 2p); _sc=$(printf '%s\n' "$_sl" | sed -n '3,$p')
-    if [ -n "$_lu" ] && [ "$_lu" != absent ] && [ "$_su" \< "$_lu" ]; then _sp="$_sp, older than the lease taken at $_lu"; fi
-    if [ "$_sp" != LANDING ]; then
-      fail 54 "the stop-guard records this session and no stop after the close exists to check the reap against, so the attestation could be checked and was not — END THE TURN once (the stop-guard records the listing and continues you), then re-run --landed; if no record appears afterwards the hook is unwired and adopt-unattended.sh --check says so: newest stop-guard record $_su in phase $_sp"
-      return 1
-    fi
-    if printf '%s\n' "$_sc" | grep -qF -- "$_kid"; then
-      fail 53 "the keepalive attestation is contradicted by the harness's own listing: the stop-guard recorded the cron store after the close and it still names the recorded keepalive id, so the job was not reaped — reap it, END THE TURN so the stop-guard records the listing again, then re-run --landed: $_kid listed at $_su"
-      return 1
-    fi
-    echo "unattended: keepalive-reaped: checked — $_kid absent from the harness listing at $_su"
   fi
+  # S5 - THE PRIMARY CLEAN CHECK EXEMPTS THE RUN-STATE FILE, and only when it differs from HEAD in
+  # its six lease-fact lines alone (`check_lease_only_diff`, TOOL-dDerivedDocket-61 S8): a pushed
+  # landing re-bound by `--resume --keepalive-id` carries exactly that difference, and `fail 55`
+  # names that re-bind as its remedy. No other caller of the clean check passes the file.
+  check_clean "$rel" || return 1
+  check_keepalive_reaped "$slug" "$rel" || return 1
   # THE LANDER MARKER, read BEFORE the remote observation. It is the only verb that runs after the
   # push, so this is where the evidence can exist — and it goes first because it is a local file read
   # against a remote round-trip, and because an operator who has not run the lander should be told
@@ -2676,8 +4516,8 @@ WTS
     # and under the `--no-ff` landing the charter mandates that is the merge, whose second parent is
     # this worktree's HEAD - so a string compare refused every mandated landing from the tree the
     # run lives in, and the only way through was to fast-forward the run branch onto the merge by
-    # hand. The predicate is three reads over the marker's commit: it exists here, it CONTAINS the
-    # witness, and the default branch the anchor observed REACHES it. A fast-forward landing passes
+    # hand. The predicate is three reads over the marker's commit: it exists here, the default branch
+    # the anchor observed REACHES it, and it CONTAINS the witness. A fast-forward landing passes
     # both ancestry reads reflexively; a marker naming an EARLIER landing still refuses, because an
     # earlier commit does not contain a later witness - the pass-by-finding-anything shape the
     # equality was written against. The marker's commit is EVIDENCE and never the witness: the
@@ -2690,6 +4530,11 @@ WTS
     # and a lander observed the push that carried it; the marker is written only inside the lander's
     # push-succeeded branch, so the other ordering cannot arise. -7 stays OPEN for the lander that
     # pushed and then failed to write.
+    #
+    # REACH IS READ BEFORE CONTAINMENT (TOOL-dDerivedDocket-22 S8, which fixed -38 on its own branch
+    # with the tip read first): a marker naming a commit the remote does not carry is refused as an
+    # unobserved push whatever it contains, and only a commit the advertised tip does carry is graded
+    # for containing this landing's witness. The four refusals stay distinct either way.
     _lm_line=$(tr -d '\r' < "$_lm_path" | head -1)
     msha=$(printf '%s\n' "$_lm_line" | grep -oE '[0-9a-f]{40}' | head -1)
     if [ -z "$msha" ]; then
@@ -2700,12 +4545,12 @@ WTS
       fail 34 "the lander marker names a commit this clone does not hold, so nothing here can say whether it contains this landing; fetch the remote or re-run the lander. marker: $msha"
       return 1
     fi
-    if ! GIT merge-base --is-ancestor "$wit" "$msha" 2>/dev/null; then
-      fail 34 "the lander marker names a commit that does not contain the witness, so it is evidence of an EARLIER landing standing in for this one; re-run the lander or fix what it writes. wanted $wit reachable from the marker's $msha"
-      return 1
-    fi
     if ! GIT merge-base --is-ancestor "$msha" "$ASHA" 2>/dev/null; then
       fail 34 "the lander marker names a commit the remote default branch does not reach, so the landing it records is not the one $AREF advertises; re-run the lander. marker $msha against $AREF at $ASHA"
+      return 1
+    fi
+    if ! GIT merge-base --is-ancestor "$wit" "$msha" 2>/dev/null; then
+      fail 34 "the lander marker names a commit that does not contain the witness, so it is evidence of an EARLIER landing standing in for this one; re-run the lander or fix what it writes. wanted $wit reachable from the marker's $msha"
       return 1
     fi
   fi
@@ -2733,6 +4578,26 @@ WTS
   set_fact "$rel" units-at-landing \
     "$(unit_rows "$(readme_of "$slug")" \
        | sed -e 's/^| \[//' -e 's/ —.*//' | tr '\n' ' ' | sed 's/ $//')" || return 1
+  # TOOL-dDerivedDocket-17 S3 - THE ASKS AT LANDING, frozen for the reason the roster above it is,
+  # plus one this record cannot express any other way. Owner ruling D4 makes CLOSED non-absorbing:
+  # a REOPEN on an ask this run disposed of would retroactively change what this landed record
+  # appears to have answered, so the answer is pinned at the moment of landing or it is not an
+  # answer about this run at all.
+  #
+  # AFTER `units-at-landing` AND BEFORE EVERY TERMINAL WRITE, which is `TOOL-dSealedTally-1`'s
+  # ordering and not a preference: a witness failure here leaves a record with a non-terminal phase,
+  # which `--landed` can be re-run against, where the same failure one line later would leave a
+  # terminal record no verb may repair.
+  #
+  # NO LINE FOR A RECORD WITH NO MANDATE AND NO FILING OF ITS OWN, so every record already in every
+  # tree is byte-unchanged by this.
+  if ! derive_ask_freeze "$slug" "$wit"; then
+    fail 77 "this run's asks cannot be read at the tree it is landing, so the record would go terminal carrying no answer to the question it was authorized by - and a landed record is the one thing no verb may repair: $AW_WHY"
+    return 1
+  fi
+  if [ -n "$AD_FREEZE" ]; then
+    set_fact "$rel" asks-at-landing "$AD_FREEZE" || return 1
+  fi
   # TOOL-dSealedTally-1. THE TERMINAL WRITES SIT HERE, LAST, AND THE ORDERING IS LOAD-BEARING.
   # `phase LANDED` used to be written ~70 lines above, before the lander-marker gate that can
   # refuse and before every fact write below. A refused `--landed` therefore exited 1 leaving a
@@ -2755,6 +4620,7 @@ WTS
   # later reader, silently promoting a record to the stronger claim.
   set_fact "$rel" landed-anchor "$akind" || return 1
   set_fact "$rel" phase LANDED || return 1
+  remove_procs_ledger "$slug"
   stage_or_fail "$rel" || return 1
   if [ "$akind" = remote ]; then
     echo "unattended: phase LANDED · witness $head · anchor remote · observed on $AREF at $ASHA · unpushed on local $lbranch: $unp"
@@ -2827,9 +4693,19 @@ verb_abort() { # slug · reason · code
     fail 33 "--abort names a halt code that is not in the effective vocabulary, and an unvalidated code is free text wearing a field name; declare it in HALT_CODES_EXTRA or use one of these: $legal"
     return 1
   fi
+  # TOOL-dDerivedDocket-24 S7 - "the red is outside the mandate" is the same claim an override on
+  # `gates-green` makes, and it is backed by the same record or refused: every red leg INHERITED, on
+  # a bar that ran at HEAD over a clean tree that did not move.
+  if [ "$code" = gate-red-out-of-scope ]; then
+    check_inherited_override "$rel" "--abort --code gate-red-out-of-scope" || return 1
+  fi
   # BOTH agent-attested items, read back from the record exactly as --close reads them. This is an
   # ATTESTATION and not a machine verdict, and the message says so wherever it reports - counting an
   # attestation as a verdict is what makes an override look like a check that failed.
+  # TOOL-dDerivedDocket-5 - S9. The attestation is asked for over a list the agent was SHOWN, and
+  # the durable restart schedule is on it beside the keepalive: a one-shot filed by a hold outlives
+  # the run under a green `keepalive-reaped` unless the ask names it.
+  print_reap_targets "$rel" "$slug"
   for item in keepalive-reaped parked-decisions-surfaced; do
     ck=$(checker_of "$item")
     if ! dod_met "$slug" "$rel" "$item" "$ck"; then
@@ -2844,6 +4720,7 @@ verb_abort() { # slug · reason · code
   done
   head=$(GIT rev-parse HEAD)
   set_fact "$rel" phase ABORTED || return 1
+  remove_procs_ledger "$slug"
   set_fact "$rel" witness "$head" || return 1
   # AN AUTHORED FACT, not a substring of the reason. A reader is a field read rather than a parse, and
   # three readers want it by key. It is a per-run SINGLETON written by a terminal verb, which is the
@@ -2856,8 +4733,312 @@ verb_abort() { # slug · reason · code
   return 0
 }
 
+
+# THE LAST BAR IS A PATH AND NEVER A VERDICT WORD. That is the dCarriedReceipt class: a prose field
+# on a checkpoint stated a gate verdict and a reader took it for one. `none` is the ABSENCE of a
+# record, which is not a verdict about anything.
+resolve_newest_gate_log() { # -> the newest gate-logs record's path, or `none`
+  local _gd _f
+  # The git dir comes off the sidecar root's ONE derivation in the library (check 32), never a
+  # second spelling of it here.
+  _gd=$(resolve_sidecar_dir) && _gd=$(cd "${_gd%/unattended}" 2>/dev/null && pwd) || { printf 'none'; return 0; }
+  [ -d "$_gd/gate-logs" ] || { printf 'none'; return 0; }
+  _f=$(ls -1t "$_gd/gate-logs" 2>/dev/null | head -1)
+  [ -n "$_f" ] || { printf 'none'; return 0; }
+  printf '%s/gate-logs/%s' "$_gd" "$_f"
+  return 0
+}
+
+# INTERRUPTED ACTS ARE NAMED, NEVER REPAIRED. A take-over inherits whatever the session before it
+# left behind, and the one thing worse than leaving it is a driver that "tidies" state it cannot
+# reason about: a staged index may be a half-written commit or a deliberate one, and a gate window
+# with no verdict may be a crashed bar or a bar still running under a process this node cannot see.
+# Three probes, each with its own liveness assertion, because a silent zero from any of them reads
+# as "nothing was interrupted" and that is the one sentence a take-over must not say by accident.
+print_interrupted_acts() {
+  local _idx _gd _cd _w _newest _q _tk _pid _said=0
+  _idx=$(git diff --cached --name-only 2>/dev/null | head -20)
+  if [ -n "$_idx" ]; then
+    _said=1
+    echo "unattended: INTERRUPTED — a non-empty index is staged and this take-over NAMES it rather than repairing it:"
+    printf '%s\n' "$_idx" | sed 's/^/    /'
+  fi
+  _gd=$(resolve_sidecar_dir) && _gd=$(cd "${_gd%/unattended}" 2>/dev/null && pwd) || _gd=""
+  if [ -z "$_gd" ]; then
+    echo "unattended: the git dir could not be resolved on this node, so the gate-window probe answered nothing and is reported as UNKNOWN rather than as clean"
+  elif [ -d "$_gd/gate-run" ]; then
+    _newest=$(ls -1t "$_gd/gate-run" 2>/dev/null | grep -v '^current$' | head -1)
+    if [ -n "$_newest" ] && [ -d "$_gd/gate-run/$_newest" ] && [ ! -f "$_gd/gate-run/$_newest/verdict" ]; then
+      _said=1
+      echo "unattended: INTERRUPTED — the newest gate window carries no verdict, so a bar was running when its session stopped: $_gd/gate-run/$_newest"
+    fi
+  fi
+  _cd=$(cd "$(GIT rev-parse --git-common-dir 2>/dev/null)" 2>/dev/null && pwd) || _cd=""
+  if [ -z "$_cd" ]; then
+    echo "unattended: the git common dir could not be resolved on this node, so the turnstile-ticket probe answered nothing and is reported as UNKNOWN rather than as clean"
+  else
+    _q="$_cd/gate-bar-queue"
+    if [ -d "$_q" ]; then
+      for _tk in "$_q"/*; do
+        [ -e "$_tk" ] || continue
+        _pid=${_tk##*/}; _pid=${_pid#*-}; _pid=${_pid%%-*}
+        case "$_pid" in ""|*[!0-9]*) continue ;; esac
+        if ! kill -0 "$_pid" 2>/dev/null; then
+          _said=1
+          echo "unattended: INTERRUPTED — a turnstile ticket names a pid that is not running, so a queued bar died in the queue: $_tk"
+        fi
+      done
+    fi
+  fi
+  [ "$_said" = 1 ] || echo "unattended: no interrupted act was found by the three probes — a staged index, a gate window with no verdict, a turnstile ticket with a dead pid"
+  return 0
+}
+
+# ------------------------------------------------------------------------------------- the pause
+# S2 - THE NON-TERMINAL STOP. A run that meets something it cannot fix — a usage limit, an
+# overloaded API, a degraded host, a red it inherited and may not absorb — had two endings: ABORTED,
+# which is a false sentence about a run that could continue, or a prose handoff, which is not a
+# record at all. This is the third. It is entered with a code, a release condition and a witness,
+# and it is left by --resume with no owner turn.
+#
+# EVERY REFUSAL COMES BEFORE ANY WRITE, and the ordering is the correctness rather than the tidiness:
+# a --hold that wrote the phase and then discovered a dirty tree would leave a HELD record standing
+# over uncommitted work, with a witness naming a commit that is not what the tree holds — and
+# --resume would then return that run to its working phase on a false premise.
+run_hold() { # slug · code · until · reason · reaped · unreachable · pending run
+  local slug="$1" code="$2" until="$3" reason="$4" reaped="$5" unreach="$6" pendrun="${7-}"
+  local rel cur ka head legal bt rc adv unpushed=""
+  local rsname heldat streak owed owedwhy rsrow pendrun_bad=0 inflight
+  check_slug "$slug" || return 1
+  rel=$(runmd_of "$slug")
+  [ -f "$rel" ] || { fail 10 "no run-state file, so there is no run to hold: $rel"; return 1; }
+  refuse_if_terminal "$rel" --hold || return 1
+  read_derived_phase "$rel"; cur="$DP_PHASE"
+  if [ -z "$cur" ]; then
+    fail 54 "the run-state file declares no phase, so there is no phase to hold the run FROM, and --resume reads exactly that field to decide where the run goes back to"
+    return 1
+  fi
+  if [ "$cur" = HELD ]; then
+    fail 54 "the run is already HELD, and a second hold overwrites held-from with HELD — the one field --resume reads to find the way back, so the second hold destroys the first one's only exit; read --status, or --resume it"
+    return 1
+  fi
+  # THE ARGUMENTS, validated against the effective vocabulary and the closed condition grammar. The
+  # legal set is bound to a NAME before it reaches either message: the arms gate signs a branch with
+  # the LITERAL source text of its `fail` call, so a `$(...)` inside one becomes part of the
+  # signature and no runtime arm can ever match it.
+  legal=$(read_hold_codes)
+  if [ -z "$code" ]; then
+    fail 55 "--hold requires --code, because a paused run that does not say why it paused is indistinguishable from one that stopped, and the code is the field the checkpoint and any resume scheduler both join on: $legal"
+    return 1
+  fi
+  if ! check_hold_code "$code"; then
+    fail 55 "--hold names a hold code that is not in the effective vocabulary, and the hold codes are a SECOND vocabulary beside the halt codes rather than an extension of them; declare it in HOLD_CODES_EXTRA or use one of these: $legal"
+    return 1
+  fi
+  if [ -z "$until" ]; then
+    fail 55 "--hold requires --until, because a pause with no release condition is a stop wearing a pause's name; the grammar is after <utc-instant>, probe host|gate|api, or owner"
+    return 1
+  fi
+  if ! check_hold_condition "$until"; then
+    fail 55 "--hold names a release condition outside the closed grammar, and an unvalidated condition reaches a resume scheduler's fire-instant computation as free prose; the grammar is after <YYYY-MM-DDTHH:MM:SSZ>, probe host|gate|api, or owner: $until"
+    return 1
+  fi
+  if [ -z "$reason" ]; then
+    fail 55 "--hold requires --reason, because the code is what every machine reader joins on and the reason is the only sentence the owner gets in place of the turn nobody took"
+    return 1
+  fi
+  if [ -n "$BYPASS_BAN" ] && printf '%s' "$reason" | grep -qF -- "$BYPASS_BAN"; then
+    fail 55 "the reason spells the declared bypass flag, and the gate greps this file whole for it, so recording this sentence would red the bar for as long as the hold lasts; say it without the literal flag: $BYPASS_BAN"
+    return 1
+  fi
+  # THE LINE-END REFUSAL, before anything is written: `--abort`'s rule for its reason, applied to the
+  # hold's two free-text values. `set_fact` and park() refuse a line feed or a carriage return only
+  # at write time, and this verb writes `phase: HELD` first, so a refusal there left a HELD record
+  # with no held-at, no resume-owed and no history row, which a retry then refused as already HELD.
+  # A carriage return is refused with the line feed because every reader strips it as a line end.
+  if [ "$(printf '%s' "$reason$unreach" | wc -l)" -ne 0 ] || case "$reason$unreach" in *$'\r'*) true ;; *) false ;; esac; then
+    fail 55 "the reason or the unreachable node contains a newline or a carriage return, and the hold writes each as one line every reader parses line-wise, so this would forge a second row or a fact nothing wrote; nothing was written"
+    return 1
+  fi
+  # TOOL-dDerivedDocket-29 S7 - THE PENDING RUN, optional, and validated here with the other arguments
+  # so a refusal writes nothing. It becomes the `hold-run` fact and a checkpoint line, and both are
+  # ` · `-separated rows a newline or a separator inside the value would forge a second field or row
+  # of. The platform owns the runId format (observed as `wf_` then 8 hex, a dash and 3 hex), so the
+  # grammar admits that shape without pinning it: 1 to 64 characters of letters, digits, `_` and `-`.
+  if [ -n "$pendrun" ]; then
+    case "$pendrun" in
+      *[!A-Za-z0-9_-]*) pendrun_bad=1 ;;
+      *) [ "${#pendrun}" -le 64 ] && pendrun_bad=0 || pendrun_bad=1 ;;
+    esac
+    if [ "$pendrun_bad" = 1 ]; then
+      fail 55 "--pending-run takes a workflow run id of 1 to 64 letters, digits, underscores and dashes, because the value is written as a run fact and printed on the checkpoint, and a separator or a newline inside it would forge a second fact or row; nothing was written: $pendrun"
+      return 1
+    fi
+  fi
+  if [ -n "$reaped" ] && [ -n "$unreach" ]; then
+    fail 56 "--hold takes --reaped or --keepalive-unreachable and never both: one says the job was stopped and read back, the other says this node cannot reach the session holding it, and a record claiming both says neither"
+    return 1
+  fi
+  if [ -z "$reaped" ] && [ -z "$unreach" ]; then
+    fail 56 "--hold requires --reaped <id> or --keepalive-unreachable <node>, because a keepalive still firing into a HELD run re-dispatches its units at the next tick; the driver cannot reap a job in a session store it cannot see, and can only record that somebody did"
+    return 1
+  fi
+  # THE TREE, before anything is written. A HELD record standing over uncommitted work names a
+  # witness that is not what the tree holds, and the take-over would then re-verify a mandate at a
+  # base that describes a different state from the one it is about to resume.
+  check_clean || return 1
+  # WHICH KEEPALIVE IS LIVE: the record's `keepalive` fact, the one lease record there is
+  # (TOOL-dDerivedDocket-61). A holder that replaced its own job re-recorded it there through
+  # `write_lease`, so `--reaped` naming the id it retired is refused while the live one fires; a
+  # leftover lease file from before the retirement is never read, so it cannot outrank the fact.
+  ka=$(fact "$rel" keepalive)
+  if [ -n "$reaped" ] && [ "$reaped" != "$ka" ]; then
+    fail 56 "--reaped names an id that is not the keepalive this slug currently runs under, so the job that keeps firing into this run is not the one that was stopped; the live id is: $ka"
+    return 1
+  fi
+  head=$(GIT rev-parse HEAD 2>/dev/null)
+  if [ -z "$head" ]; then
+    fail 56 "HEAD does not resolve on this node, so the hold has no witness to record and a witnessless pause is the claim an oracle skips"
+    return 1
+  fi
+  # THE PUBLISHED TIP, and its ONE exception. Design section 21.7 ends a stop HELD only with the
+  # branch pushed, and in a sustained outage that push fails too — which would leave the outage with
+  # no ending but ABORTED, the ending HELD exists to replace. So `platform-unavailable` alone may
+  # hold an unpublished tip, and only when the remote does not ANSWER. A remote that answers still
+  # requires the push, and no other code is excepted.
+  if [ "$ANCHOR_SCOPE" = published ]; then
+    bt=$(branch_tip_quiet); rc=$?
+    adv=""; [ "$rc" = 0 ] && adv=${bt##* }
+    if [ "$rc" = 0 ] && [ "$adv" = "$head" ]; then
+      :
+    elif [ "$rc" = 5 ]; then
+      if [ "$code" = platform-unavailable ]; then
+        unpushed="$head"
+      else
+        fail 57 "the remote did not answer, so whether this branch tip is published is UNKNOWN rather than yes, and only a platform-unavailable hold may park an unpublished tip — a sustained outage is the one stop whose own push fails too. This code is not that one: $code"
+        return 1
+      fi
+    elif [ "$rc" = 0 ] || [ "$rc" = 2 ] || [ "$rc" = 4 ]; then
+      fail 57 "the remote ANSWERED and does not carry this branch tip, so a hold here would park work that exists only on this node while the endpoint that could hold it is reachable; push the branch, then hold: $head"
+      return 1
+    else
+      fail 57 "this run's branch tip cannot be confirmed on its remote, so a hold would record a witness nothing off this node can reach; the run is not on a named branch, or the advertised tip is one this clone does not have"
+      return 1
+    fi
+  fi
+  # ---- TOOL-dDerivedDocket-5 - THE RESTART DECISION, computed here so it lands in the SAME write
+  # ---- as the hold facts. A hold that wrote the phase and then discovered it could not compute a
+  # ---- fire instant would leave a HELD record with no restart decision at all, which is the one
+  # ---- state --status could not report and --close could not attest over.
+  rsname=$(resume_schedule_name "$slug")
+  heldat=$(read_utc_now)
+  if [ -z "$heldat" ]; then
+    fail 56 "the clock answered nothing, so this hold has no held-at to record and every later reader — the release condition, the scheduled restart's own refusal and the fire instant — joins on exactly that field"
+    return 1
+  fi
+  streak=$(resolve_hold_streak "$slug" "$rel" "$head")
+  owed=""; owedwhy=""
+  if [ "$RESUME_SCHEDULE" != on ]; then
+    owedwhy=off
+  elif [ "$until" = owner ]; then
+    owedwhy=owner
+  elif [ -z "$RESUME_SCHEDULE_CREATE" ] || [ -z "$RESUME_SCHEDULE_DELETE" ]; then
+    # NOT A REFUSAL, and that is the whole of section 4's rollout argument: the hold is the safe
+    # state, and refusing it for a missing declaration would push the run back toward the ABORTED
+    # ending HELD exists to replace. The kit gate and the adopter check red the declaration instead.
+    owedwhy="no carrier"
+  elif [ "$streak" -ge "$RESUME_SCHEDULE_LIMIT" ]; then
+    owedwhy=limit
+  else
+    if ! resolve_resume_fire "$until" "$heldat"; then
+      fail 56 "the fire instant of this hold's restart cannot be computed on this node, because a clock probe it needs answered nothing, and a hold recorded as owing a schedule nobody can name is worse than one that owes none: $RS_DEAD"
+      return 1
+    fi
+    if [ -n "$RS_WHY" ]; then owedwhy="$RS_WHY"; else owed="$RS_FIRE"; fi
+  fi
+  # THE HISTORY ROW'S OWN FIELD, bound to a name rather than written as a `${owed:+…}${owed:-…}`
+  # pair: the second half of that pair expands to the VALUE when the variable is set, so the row
+  # would have carried the fire instant where the schedule name belongs.
+  if [ -n "$owed" ]; then rsrow="$rsname"; else rsrow="none($owedwhy)"; fi
+  # ---- TOOL-dDerivedDocket-28 S7 - A RUN CANNOT HOLD WHILE ITS OWN BAR IS STILL RUNNING. The orphans
+  # ---- are reaped first, while the phase still says this session holds the run, and anything
+  # ---- the ledger still shows alive after that is refused by name: a HELD record over work in flight
+  # ---- is a pause whose witness does not describe what the tree is about to become. LAST of the
+  # ---- refusals, because the reap is the one act above the record writes, and the prune it makes
+  # ---- touches the process ledger alone.
+  run_orphan_reap "$slug"
+  inflight=$(read_procs_alive "$slug")
+  if [ -n "$inflight" ]; then
+    inflight=${inflight//$'\n'/; }
+    fail 84 "a process this slug's driver started is still alive, and a hold now would leave a HELD record with its own work in flight; let it finish, or reap it, then hold again: $inflight"
+    return 1
+  fi
+  # ---- nothing above this line wrote anything but the process ledger's prune -----------------------
+  set_fact "$rel" phase HELD || return 1
+  set_fact "$rel" witness "$head" || return 1
+  set_fact "$rel" held-from "$cur" || return 1
+  set_fact "$rel" hold-code "$code" || return 1
+  set_fact "$rel" hold-until "$until" || return 1
+  set_fact "$rel" hold-reason "$reason" || return 1
+  set_fact "$rel" held-at "$heldat" || return 1
+  if [ -n "$owed" ]; then
+    set_fact "$rel" resume-owed "$rsname · fire $owed" || return 1
+  else
+    set_fact "$rel" resume-owed "none · $owedwhy" || return 1
+  fi
+  set_fact "$rel" hold-streak "$streak · at $(printf '%.8s' "$head")" || return 1
+  if [ -n "$unpushed" ]; then set_fact "$rel" hold-unpushed "$unpushed" || return 1; fi
+  # WRITTEN ON EVERY HOLD, empty without the flag, so no later hold inherits an earlier stop's run.
+  set_fact "$rel" hold-run "$pendrun" || return 1
+  # HISTORY-CLASS, in park()'s own row grammar so `--status` counts it as noted rather than owed and
+  # check 27 can join the kind against the declared vocabulary. The free-text reason is NOT repeated
+  # here: it has a fact of its own, which is the only place --status quotes it from.
+  if [ -n "$reaped" ]; then
+    park "$rel" hold "$code" "until $until · reaped $reaped · resume $rsrow" || return 1
+  else
+    park "$rel" hold "$code" "until $until · unreachable $unreach · resume $rsrow" || return 1
+  fi
+  # HELD IS THE RELEASED LEASE: the phase says so, and the lease facts stay as the record of who
+  # held it. The stop-guard allows this session's stop and the resume tick skips the run by the
+  # verdict `--liveness` prints for it, `HELD` (TOOL-dDerivedDocket-61 S4 to S6).
+  stage_or_fail "$rel" || return 1
+  echo "unattended: phase HELD · code $code · until $until · from $cur · witness $head"
+  if [ -n "$unpushed" ]; then
+    echo "unattended: the branch tip is UNPUBLISHED and recorded as hold-unpushed — it exists only on this node until a take-over pushes it: $unpushed"
+  fi
+  # ---- THE OWED RESTART, printed for the agent to file VERBATIM. The driver records and prints; it
+  # ---- never calls the carrier, exactly as it never schedules the keepalive, because no script
+  # ---- reaches a harness scheduler store. Every interpolated value has a validated shape — the slug
+  # ---- passed check_slug, the toplevel came from git, held-at matched the hold's own grammar — and
+  # ---- the hold REASON is free text and never reaches this prompt, because a durable prompt executes
+  # ---- later in a session nobody watches.
+  echo "unattended: hold-streak $streak · at $(printf '%.8s' "$head") — consecutive holds between which nothing but this run's own records changed"
+  if [ -z "$owed" ]; then
+    echo "unattended: resume-owed none · $owedwhy — no durable restart is owed by this hold, so nothing is filed and a manual --resume is the way out"
+    return 0
+  fi
+  echo "unattended: resume-owed $rsname · fire $owed — file this ONE-SHOT with your DURABLE scheduler, under this exact name and instant:"
+  echo "unattended:   name  $rsname"
+  echo "unattended:   fire  $owed"
+  echo "unattended:   prompt, verbatim — three lines:"
+  printf 'Resume the unattended run for build %s. Work only in the git worktree at %s.\n' "$slug" "$ROOT"
+  printf 'Load the unattended skill and follow its Resume section with: --resume %s --scheduled %s --keepalive-id <the id of the keepalive you schedule first>.\n' "$slug" "$heldat"
+  printf 'If the driver refuses or prints still held, delete the keepalive you scheduled for this resume, list your scheduler'"'"'s jobs to confirm it is gone, leave the scheduled task named %s in place because a later hold may have filed it, and stop.\n' "$rsname"
+  echo "unattended: delete $rsname with the declared delete tool FIRST and go on when no task has it, then file it — a fired one-shot can still hold the name"
+  return 0
+}
+
 verb_preflight() { # slug · keepalive-id
-  local slug="$1" kid="$2" rel base src payload tmp arch="" rotate=0
+  local slug="$1" kid="$2" rel base src payload tmp arch="" rotate=0 _pf_ka _pf_miss _pf_fix _pf_gbt=""
+  # TOOL-dDerivedDocket-16 S6 - THE IDS TEST RUNS FIRST, before `check_slug` and before any anchor
+  # work, because it needs no tree. `check_slug`'s own grammar ADMITS an id - letters, digits and
+  # dashes, opening on a letter - so an id reached the folder lookup and was refused with a message
+  # about a missing README, which tells an owner nothing about the form that would have worked.
+  if is_ids_value "$slug"; then
+    fail 6 "this verb is addressed by SLUG and was given ids, or a slug mixed with them; a run may not write the folder that authorizes it, so an id list becomes a build through the scaffold the OWNER lands, and a mixed value has no honest reading because a run cannot extend a committed mandate: $slug"
+    print_scaffold_recipe "$slug"
+    return 1
+  fi
   check_slug "$slug" || return 1
   rel=$(runmd_of "$slug")
   # ROTATION, HALF ONE: the TEST. A terminal record is not a reason to refuse a NEW run — it is a
@@ -2871,8 +5052,23 @@ verb_preflight() { # slug · keepalive-id
   # fails on any non-zero diff/cached/untracked count — so a rotation placed here would ALWAYS reach
   # the gate, print "the run-state file is unchanged" over a tree where the record had already been
   # renamed away from the path every reader globs, and return 1.
-  if [ -f "$rel" ] && is_terminal "$(fact "$rel" phase)"; then
-    arch=$(archive_name_of "$rel") || { fail 27 "cannot derive an archive name for the finished record, so there is nothing safe to retire it to and the run does not start: $rel"; return 1; }
+  read_derived_phase "$rel"
+  if [ -f "$rel" ] && is_terminal "$DP_PHASE"; then
+    # TOOL-dDerivedDocket-22 S4 - A DERIVED-LANDED RECORD IS WRITTEN LANDED BEFORE IT IS RETIRED
+    # (KF15), so the archive says what the derivation found rather than LANDING under a terminal
+    # name, and check 4 keeps reading a retired record by its own bytes. The edit is made to a
+    # SCRATCH COPY under the git dir, here in the precondition half: the archive name derives from
+    # the post-write bytes, and both collision tests below compare that copy, while the tree is still
+    # untouched. `write_landed_record`, after the gate, is what puts those bytes in place and stages
+    # them before the move.
+    PF_LCOPY=""; src="$rel"
+    if [ -n "$DP_LANDING" ]; then
+      PF_LCOPY=$(_pf_sd=$(resolve_sidecar_dir) && mktemp "${_pf_sd%/unattended}/unattended-rotation.XXXXXX" 2>/dev/null) \
+        && cp "$rel" "$PF_LCOPY" && set_fact "$PF_LCOPY" phase LANDED && set_fact "$PF_LCOPY" witness "$DP_LANDING" \
+        && set_fact "$PF_LCOPY" landed-derived "$DP_LANDING $DP_TIP" && src="$PF_LCOPY" \
+        || { [ -z "$PF_LCOPY" ] || rm -f "$PF_LCOPY"; PF_LCOPY=""; src=""; }
+    fi
+    arch=$(archive_name_of "$rel" "$src") || { fail 27 "cannot derive an archive name for the finished record, so there is nothing safe to retire it to and the run does not start: $rel"; return 1; }
     # TWO refusals, both BEFORE the write gate, because everything `GIT mv -f` will not refuse for
     # itself has to be refused here.
     #
@@ -2881,28 +5077,86 @@ verb_preflight() { # slug · keepalive-id
     # reader globs, with the verb reporting success. Letting git decide would have made a silent
     # misfiling the happy path.
     if [ -e "$arch" ] && [ ! -f "$arch" ]; then
+      [ -z "$PF_LCOPY" ] || rm -f "$PF_LCOPY"
       fail 28 "the name this record derives is occupied by something that is not a regular file, and a rename onto it would file the finished record somewhere no reader looks rather than fail: $rel -> $arch"
       return 1
     fi
-    if [ -f "$arch" ] && ! cmp -s "$rel" "$arch"; then
+    if [ -f "$arch" ] && ! cmp -s "$src" "$arch"; then
+      [ -z "$PF_LCOPY" ] || rm -f "$PF_LCOPY"
       fail 28 "an archive already exists at the name this record derives, carrying DIFFERENT bytes — that cannot happen by rotation, so something placed it by hand and overwriting it would destroy a finished record: $rel -> $arch"
       return 1
+    fi
+    # S4, S10 - A ROTATION NEVER FREEZES A RECORD THE LEG REDS. The landed fact-set arm grades the
+    # retired bytes, and nothing may edit a record once it is archived, so a copy missing a fact
+    # that arm requires is refused here with nothing moved. The predicate and the dating are the
+    # kit library's, shared with the leg, so the two cannot disagree about one record.
+    if [ -n "$PF_LCOPY" ] && check_landed_facts_due "$rel" "$LANDED_FACTS_CUTOFF"; then
+      _pf_miss=$(read_missing_landed_facts "$PF_LCOPY" derived)
+      if [ -n "$_pf_miss" ]; then
+        rm -f "$PF_LCOPY"
+        if [ "$LANDER_MODE" = in-place ]; then
+          _pf_fix="under in-place landing --close writes it beside the phase, so this LANDING was reached without the close and is repaired by the owner before any rotation"
+        else
+          _pf_fix="under primary landing --landed writes it, so run: --landed $slug"
+        fi
+        fail 81 "a derived-LANDED record would be retired missing a fact the landed fact-set arm requires of every record first committed on or after LANDED_FACTS_CUTOFF, and no verb may edit a record once it is archived, so the archive would red that arm for ever; nothing was edited or moved - missing [$_pf_miss] in $rel, and $_pf_fix"
+        return 1
+      fi
     fi
     rotate=1
   else
     refuse_if_terminal "$rel" --preflight || return 1
+  fi
+  # S9 - A HELD RECORD IS NOT RE-PREFLIGHTED. The re-preflight the protocol sanctions after a
+  # compaction is for a run that is WORKING; a paused one has a release condition to test, an
+  # authorization to re-verify and a lease to take, and the verb that does all three is --resume.
+  # This also answers TOOL-aBoundedVerdict-2's measured objection that a non-terminal phase wedges
+  # the next preflight: it does not wedge, it names the verb that moves it.
+  read_derived_phase "$rel"
+  if [ "$DP_PHASE" = HELD ]; then
+    fail 82 "the run is HELD, and a re-preflight would re-pin a run that is paused on a cause it has not re-verified; the verb that leaves HELD tests the release condition, re-checks the authorization at the pinned BASE and takes the lease: --resume"
+  fi
+  # TOOL-aBranchedMandate-8 - THE RE-PREFLIGHT KEEPS THE RECORDED KEEPALIVE. It used to rewrite it,
+  # so the verb a run is TOLD to re-run after a compaction silently re-pointed the id whose reaping
+  # the close attests. Same id: idempotent, and the lease facts are re-recorded. Different id: a refusal
+  # naming --resume, whose matrix is where "does this session hold the slug" is actually decided.
+  # A RECORD BEING RETIRED is not a re-preflight: its keepalive names the finished run's job, and
+  # comparing it with this run's id refused every rotation made under a new one (TOOL-dDerivedDocket-22).
+  _pf_ka=$(fact "$rel" keepalive)
+  if [ "$rotate" != 1 ] && [ -n "$_pf_ka" ] && [ -n "$kid" ] && [ "$_pf_ka" != "$kid" ]; then
+    fail 82 "this run already records a keepalive and a re-preflight does not re-pin one, because that id names the job whose reaping the close attests; a session taking this slug over says so through the verb whose matrix decides whether it holds it: --resume"
   fi
   [ -n "$kid" ] || fail 8 "no --keepalive-id was supplied — scheduling is the AGENT's half of the split and only the agent can do it; the driver records the id it is handed"
   # The anchor is observed BEFORE anything that consumes it, and its refusals do not cascade: a
   # failed observation leaves ASHA empty and the base block below is skipped entirely, so the
   # operator reads why the observation failed rather than a second, unrelated merge-base complaint.
   observe_anchor || true
+  # S6's second half, HERE because it needs the anchor and must still run before `trusted_base`:
+  # under `ANCHOR_SCOPE=published` a README absent at the first anchor's merge-base widens to the
+  # second anchor, and an unpushed branch is then refused with a push instruction that carries no
+  # recipe and, once followed, writes to the remote. It RETURNS, like the ids test above: S6 has both
+  # answer before any other preflight refusal can, and joining the others let the no-README refusal
+  # (and fail 32 under `published`) answer beside it.
+  check_filing_home "$slug" || return 1
   check_clean || true
   check_branch || true
   check_wiring || true
   check_method || true
   check_waivers "$rel" || true
   check_single_live || true
+  # S2 - the declared lander is PROBED, not believed, and only where the declaration says it will be
+  # used. It joins the other preconditions through `status` rather than returning, so an operator
+  # reads every unmet precondition in one pass.
+  check_lander_mode "$slug" || true
+  # TOOL-dDerivedDocket-27 S4 and S6 - THE BAR'S BACKSTOP, derived through the declared profile
+  # command, and the conf check on that same answer. A wall below the largest leg ceiling fires on a
+  # healthy bar that dispatches that leg, so it refuses HERE, while the tree is untouched. A profile
+  # that cannot answer refuses nothing, because that is where every adopter starts, and it says so.
+  derive_gate_backstop || true
+  case "$GB_CMP" in
+    1) fail 85 "the unattended bar's wall is below the largest declared leg ceiling, so a healthy bar that dispatches that leg is killed by its own wall and every close reads red over a bound nobody chose: $GW_WHY. Raise GATE_WALL in $CONF to at least that ceiling" ;;
+    2) echo "unattended: preflight — the wall is not compared with the largest leg ceiling: $GW_WHY" ;;
+  esac
   # ONE entry point for the base, shared with --close, so the two verbs cannot disagree about which
   # commit they are measuring against. `trusted_base` names its own refusals.
   #
@@ -2943,9 +5197,18 @@ verb_preflight() { # slug · keepalive-id
   # refuse a scoped waiver rather than grant it, and those two spellings differ exactly when the
   # authorization read failed - which is the moment a silent grant would matter most.
   check_waiver_scope || true
+  # TOOL-dDerivedDocket-16 S3, S4, S5 and S11 - THE MANDATE'S OWN PRECONDITIONS, evaluated here and
+  # not one line lower. Everything they pin is written AFTER the gate below; everything they refuse
+  # is refused while the tree is still untouched, which is what lets a refused preflight say the
+  # run-state file is unchanged and be telling the truth.
+  check_ask_mandate "$slug" "$rel" || true
+  check_backlog_mode_shift || true
+  # TOOL-dDerivedDocket-31 - the cutoff the spec-audit line below grades FORKED with, loaded here so
+  # an unreadable one refuses while the tree is still untouched.
+  load_fork_cutoff || true
   # NOTHING is written until every precondition above has passed. A verb that writes and then
   # discovers a refusal has already changed the state the refusal was about.
-  [ "$status" = 0 ] || { echo "unattended: --preflight refused; the run-state file is unchanged"; return 1; }
+  [ "$status" = 0 ] || { [ -z "$PF_LCOPY" ] || rm -f "$PF_LCOPY"; echo "unattended: --preflight refused; the run-state file is unchanged"; return 1; }
 
   # ROTATION, HALF TWO: the RENAME, in scaffold_runmd's position and for scaffold_runmd's reason —
   # nothing is written until every precondition above has passed.
@@ -2960,7 +5223,12 @@ verb_preflight() { # slug · keepalive-id
   # `GIT mv` and not `mv`: BOTH sides have to enter the index in one operation, because the gate leg's
   # whole per-run population is `git ls-files` and an unstaged archive is invisible to every check the
   # widened population gave it.
+  #
+  # A DERIVED-LANDED RECORD IS WRITTEN AND STAGED FIRST (S4 step 2), because `git mv` carries the
+  # STAGED blob: an edit left unstaged would ride the move as the old LANDING bytes under a LANDED
+  # name, on every other clone. The move then retires exactly the bytes the name was derived from.
   if [ "$rotate" = 1 ]; then
+    if [ -n "$PF_LCOPY" ]; then write_landed_record "$rel" "$PF_LCOPY" || return 1; fi
     if ! GIT mv -f -- "$rel" "$arch" >/dev/null 2>&1; then
       fail 29 "cannot retire the finished record, and a half-rotated build is worse than an unrotated one — the run does not start and nothing was moved: $rel -> $arch"
       return 1
@@ -3018,7 +5286,13 @@ verb_preflight() { # slug · keepalive-id
   [ -n "$(fact "$rel" anchor-ref)" ] || set_fact "$rel" anchor-ref "$AREF" || return 1
   [ -n "$(fact "$rel" anchor-sha)" ] || set_fact "$rel" anchor-sha "$ASHA" || return 1
   [ -n "$(fact "$rel" anchor-url)" ] || set_fact "$rel" anchor-url "$AURL" || return 1
-  write_lease "$rel" "$kid" || return 1
+  # PINNED ONCE, like the base and the anchor triple above it, and for the reason the block above
+  # states: a re-preflight that rewrote it re-pointed the id the close attests.
+  # The refusal above admits a re-preflight only under the id already recorded, and the RECORDED id
+  # is what goes to `write_lease` (TOOL-aWokenSentinel-1), so the keepalive is still written once;
+  # the session, pid, host, image and lease-utc beside it are the lease's own and are taken afresh.
+  _pf_ka=$(fact "$rel" keepalive); [ -n "$_pf_ka" ] || _pf_ka="$kid"
+  write_lease "$rel" "$_pf_ka" || return 1
   # S4: which anchor authorized this run, and — when it was the second one — the observation it
   # rested on. EVIDENCE, exactly like anchor-ref/sha/url: written so a party off this machine can
   # re-derive the pin, and never read back as an input by this kit. `trusted_base` deliberately does
@@ -3044,6 +5318,23 @@ verb_preflight() { # slug · keepalive-id
   # global empty, and preflight has already refused by then - the default never reaches disk on a
   # run that got here without the read.
   [ -n "$(fact "$rel" mode)" ] || set_fact "$rel" mode "${AUTH_MODE:-slug}" || return 1
+  # TOOL-dDerivedDocket-19 S1 - THE GRANT, PINNED ONCE for the reason the mode is. Only a `slug` README
+  # can reach here carrying one, because the check above refuses the key under every other mode, so
+  # every other run pins `none` - and so does a `slug` README that declares nothing, which is every
+  # README in this tree today. Printed, because the leg re-reads it and a reader should not have to.
+  [ -n "$(fact "$rel" may)" ] || set_fact "$rel" may "${AUTH_MAY:-none}" || return 1
+  echo "unattended: preflight — grant pinned as may: $(fact "$rel" may)"
+  # TOOL-dDerivedDocket-16 S3 - THE THREE ASK FACTS, pinned ONCE for the reason `base` and the anchor
+  # triple are: a re-preflight that rewrote them would re-point the mandate, the tree it was asserted
+  # against and its grades at whatever today says, while the base they are evidence beside stayed
+  # pinned - and evidence for a pinned value that moves is evidence for nothing. Written only where
+  # the README carries a mandate, because a blank key reads as configured while carrying nothing.
+  if [ -n "${AUTH_ASKS:-}" ]; then
+    [ -n "$(fact "$rel" m-base)" ]     || set_fact "$rel" m-base "$PF_MBASE"          || return 1
+    [ -n "$(fact "$rel" asks)" ]       || set_fact "$rel" asks "$AUTH_ASKS"           || return 1
+    [ -n "$(fact "$rel" asks-ready)" ] || set_fact "$rel" asks-ready "$PF_ASKS_READY" || return 1
+    echo "unattended: preflight — mandate pinned at m-base $(fact "$rel" m-base) · asks $(fact "$rel" asks) · ready $(fact "$rel" asks-ready)"
+  fi
   # the resolved binding, recorded so a later reader can tell WHICH
   # playbook bound the run without re-deriving it, and so the leg has a recorded answer to
   # SECOND-OPINION rather than a value only the driver ever saw. Recorded only in recipe mode:
@@ -3073,6 +5364,22 @@ verb_preflight() { # slug · keepalive-id
   # to re-run after a compaction.
   [ -n "$(fact "$rel" phase)" ] || set_fact "$rel" phase RUNNING || return 1
   set_fact "$rel" witness "$(GIT rev-parse HEAD)" || return 1
+  # TOOL-dDerivedDocket-27 S4 - THE BACKSTOP IS PINNED AT EVERY PREFLIGHT, the one verb that starts a
+  # run, so a changed wall takes effect at the next one and never between a close's two reads.
+  # `--resume` does not re-pin. A preflight that derives none REMOVES an earlier fact rather than
+  # leaving a bound in force that this conf no longer declares.
+  if [ -n "$GB_SUM" ]; then
+    set_fact "$rel" gate-backstop "$GB_SUM (wall $GB_WALL + queue $GB_QUEUE + margin $GB_MARGIN)" || return 1
+    print_gate_backstop "pinned as this run's gate-backstop fact"
+  else
+    # SECTION-SCOPED, the bounds `set_fact` writes with: the fact lives under `## Run facts`, so the
+    # presence test reads it through `fact` and the removal drops the key there and nowhere else.
+    if [ -n "$(fact "$rel" gate-backstop)" ]; then
+      _pf_gbt=$(mktemp) && awk '/^## /{ sec = (index($0, "## Run facts") == 1) } !(sec && /^gate-backstop: /)' "$rel" > "$_pf_gbt" && mv -f "$_pf_gbt" "$rel" \
+        && echo "unattended: preflight — the earlier gate-backstop fact is removed, because this preflight derives none"
+    fi
+    echo "unattended: preflight — no gate-backstop fact is pinned, so the merge bar stays bounded at GATE_BOUND, ${GATE_BOUND}s, and its turnstile queue is charged to that bound: $GB_WHY"
+  fi
   # TOOL-cBriefedPilot-3 - AFTER the facts and BEFORE staging. park() appends with >>, which CREATES
   # the file, so calling it before the scaffold guard makes the later splice fail naming the wrong
   # cause; and the gate leg's whole per-run population is the INDEX, so a waiver written after
@@ -3087,12 +5394,40 @@ verb_preflight() { # slug · keepalive-id
     done
   fi
   stage_or_fail "$rel" || return 1
+  # THE LEASE WAS RECORDED ABOVE, by `write_lease` into the run-state facts, and the record is staged:
+  # there is no second lease record to take (TOOL-dDerivedDocket-61).
+  # TOOL-dDerivedDocket-28 S3 - THE RUN'S OWN ORPHANS ARE REAPED HERE, after every precondition passed
+  # and the lease is held: a kill is the least reversible thing this verb does, so a refused preflight
+  # must not have done it.
+  run_orphan_reap "$slug"
   # RE-READ, like the base above and for the identical reason. Unit 5 froze the anchor triple, so on
   # a second preflight $AREF/$ASHA hold what was just OBSERVED while the record holds what is pinned.
   # Printing the observation would be the same lie in the operator's face that the unconditional
   # base write was on disk, one field over.
   print_spec_audit_line "$slug" "$rel"
   echo "unattended: preflight OK — base $base · anchor $(fact "$rel" anchor-ref) at $(fact "$rel" anchor-sha) · keepalive $kid · region copied from $src"
+  return 0
+}
+
+# TOOL-dDerivedDocket-22 S4 step 2 - THE LANDED BYTES, PUT IN PLACE AND STAGED, AND THE STAGE
+# CHECKED. The copy already carries `phase: LANDED`, the landing commit as witness and
+# `landed-derived`; the archive name was derived from it before the write gate. After the copy
+# lands on the record and is staged, the INDEX blob must be the one the name encodes, or the move
+# would retire bytes the name does not describe. On a mismatch the record is restored from HEAD -
+# which `read_landing_commit` guaranteed it equalled - so nothing is edited and nothing is moved.
+PF_LCOPY=""
+write_landed_record() { # run-state file · the LANDED copy -> 0 staged as named, or 1 restored
+  local rel="$1" copy="$2" want got
+  want=$(GIT hash-object --path="$rel" "$copy" 2>/dev/null)
+  cp "$copy" "$rel" 2>/dev/null && GIT add -- "$rel" >/dev/null 2>&1
+  got=$(GIT rev-parse --verify --quiet ":$rel" 2>/dev/null)
+  rm -f "$copy"; PF_LCOPY=""
+  if [ -z "$want" ] || [ "$got" != "$want" ]; then
+    GIT checkout HEAD -- "$rel" >/dev/null 2>&1
+    fail 29 "the LANDED record was written and staged, and the staged blob is not the one its archive name was derived from, so the move would retire bytes the name does not describe; the record was restored from HEAD and nothing was moved: staged ${got:-nothing} against ${want:-an unreadable copy} for $rel"
+    return 1
+  fi
+  echo "unattended: wrote the derived terminal — $rel reads LANDED, witness $(fact "$rel" witness), before it is retired"
   return 0
 }
 
@@ -3120,7 +5455,7 @@ print_spec_audit_line() { # slug · run-state file
   n=$(unit_rows "$(readme_of "$1")" 2>/dev/null | row_ids_of | grep -c .)
   [ "${n:-0}" -ge 2 ] && why="$n units in the generated region"
   for _sp in $(git ls-files "$M/builds/$1/spec/*.md" 2>/dev/null | drop_working_specs); do
-    [ "$(plan_state "$_sp")" = FORKED ] || continue
+    [ "$(plan_state "$_sp" "$FORK_CUTOFF")" = FORKED ] || continue
     why="${why:+$why, }a spec grading FORKED"; break
   done
   echo "unattended: spec-audit — not owed (opt-in)${why:+; recommend spec-audit: <YYYY-MM-DD> in the build README front matter before the first pass: $why}"
@@ -3170,9 +5505,10 @@ set_fact() { # file · key · value
   mv "$tmp" "$f"
 }
 
-# THE LEASE: the keepalive id and the session and pid holding the run, written by ONE function with
-# two callers — --preflight when a run starts and --resume --keepalive-id when a later session takes
-# it over (TOOL-aWokenSentinel-1). A record naming a cron job id and no session gave every
+# THE LEASE: the keepalive id and the session and pid holding the run, written by ONE function from
+# two verbs — --preflight when a run starts and --resume --keepalive-id when a later session takes
+# it over (TOOL-aWokenSentinel-1), the latter on the rows of its matrix that re-point the keepalive:
+# the take-over and the holder's --replaces. A record naming a cron job id and no session gave every
 # out-of-session actor — the stop-guard, the stall-recorder, the resume tick — nothing to bind to.
 # The values come from the harness's environment, never from argv. An unset one is recorded as the
 # LITERAL `absent`, not omitted: a missing line and a pre-lease record are the same bytes, and "never
@@ -3208,11 +5544,21 @@ write_lease() { # run-state file · keepalive-id
 
 verb_status() { # slug
   local slug="$1" rel p w unit nparked parked unowed nnoted
+  local _age _lrc _hcode _huntil _hsince _hfrom _hreason _hunp _wit8 _bar pshow _hrun
   check_slug "$slug" || return 1
   rel=$(runmd_of "$slug")
   [ -f "$rel" ] || { fail 10 "no run-state file, so there is no run to report on: $rel"; return 1; }
-  p=$(fact "$rel" phase); w=$(fact "$rel" witness)
+  read_derived_phase "$rel"; p="$DP_PHASE"; w=$(fact "$rel" witness)
   [ -n "$p" ] || { fail 10 "the run-state file declares no phase, and a run with no phase is not resumable: $rel"; return 1; }
+  # TOOL-dDerivedDocket-22 S3 - THE DERIVED PHASE CARRIES ITS EVIDENCE, and a LANDING that stays
+  # LANDING carries its reason. A bare LANDED here would be indistinguishable from one `--landed`
+  # wrote, and a bare LANDING from a record nobody has pushed.
+  pshow="$p"
+  if [ "$p" = LANDED ] && [ -n "$DP_LANDING" ]; then
+    pshow="LANDED (derived: ${DP_LANDING:0:8} on $DP_AREF at ${DP_TIP:0:8})"
+  elif [ "$p" = LANDING ] && [ -n "$DP_REASON" ]; then
+    pshow="LANDING (not on the remote: $DP_REASON)"
+  fi
   # The first non-terminal unit, DERIVED from the build README on every read. It used to be read
   # from a copy inside this file, which is exactly the staleness that design removes — main's
   # redesign, taken here over this branch's terminal-exemption workaround for the same problem.
@@ -3299,6 +5645,10 @@ BRIEFROWS
     _rtn=$(grep -c '' "$_rt"); _rtl=$(tail -n 1 -- "$_rt"); _rtl=${_rtl%$'\r'}
     parked="$parked · resume-tick $_rtn attempt(s), last ${_rtl%% *}"
   fi
+  # THE PROCESS LEDGER'S ORPHANS (TOOL-dDerivedDocket-28 S6), on the same rule: a field printed only
+  # when there is one, each identity checked, and nothing killed — this is a read verb.
+  local _orph; _orph=$(measure_orphans "$slug")
+  [ "${_orph:-0}" -gt 0 ] 2>/dev/null && parked="$parked · orphans $_orph"
   # THE STOP-GUARD'S NEWEST LISTING, on the same rule (TOOL-aWokenSentinel-9): a FIELD on this one
   # line, printed only when the record names a keepalive id AND the sidecar holds a line, so a
   # record with nothing to report prints the bytes it printed before this unit. `present` and
@@ -3324,7 +5674,68 @@ BRIEFROWS
     local _sa; _sa=$(fact "$rel" spec-audit)
     [ -n "$_sa" ] && hc="$hc · spec-audit $_sa"
   printf 'unattended: %s · phase %s · witness %s%s · next %s%s
-' "$slug" "$p" "${w:-NONE}" "$hc" "$unit" "$parked"
+' "$slug" "$pshow" "${w:-NONE}" "$hc" "$unit" "$parked"
+  # TOOL-dDerivedDocket-3 - THE LANDING SHAPE, on the status a reader actually opens, and printed
+  # only where it DIFFERS from what every other run does. `primary` is announced at conf load like
+  # any other defaulted value, so naming it again here would add a line to every adopter's status
+  # to say nothing changed; `in-place` changes which commit the bar grades and which verb commits,
+  # so a reader of this record is owed it.
+  [ "$LANDER_MODE" = in-place ] && printf 'unattended: LANDER_MODE — in-place · the landing merge is prepared in this worktree and the close grades and commits on it · %s\n' "$LANDER"
+  # ---- presumed-stopped: DERIVED here, ANNOUNCED, and never a refusal (TOOL-aUnblockedFleet-1). A
+  # ---- working-phase record whose lease reads stale on `--liveness`'s own clock and bound, or which
+  # ---- has no lease at all and whose build folder stopped moving, is one whose session is presumed
+  # ---- gone. Saying so is what makes --resume's take-over reachable by anybody reading a run rather
+  # ---- than only by its author. There is no LEASE line: the lease is the run-state facts, which this
+  # ---- record already prints to anyone who opens it (TOOL-dDerivedDocket-61).
+  # S16 - A LANDING RECORD THAT `--landed` OBSERVED ON THE REMOTE is named as such and is never
+  # presumed-stopped: the node kept the observation in its landed log because a later reader may not
+  # see the remote, and that reader must not offer a landed run for take-over. The log is not a phase
+  # source, so the phase above still reads LANDING until the advertised tip is observable again, and
+  # reads LANDED by derivation once it is, when the line is printed all the same. It is matched by the
+  # landing commit, so an earlier run's line never answers for this one.
+  if [ -n "$DP_LANDING" ] && read_landed_observation "$slug" "$DP_LANDING"; then
+    printf 'unattended: landed · observed by --landed at %s\n' "$LO_UTC"
+  elif [ "$p" != HELD ] && ! is_terminal "$p"; then
+    if [ -n "$(fact "$rel" lease-utc)" ]; then
+      check_lease_fresh "$rel"; _lrc=$?
+      case "$_lrc" in
+        1) printf 'unattended: presumed-stopped — the newest move this node can see for this run is %ss old, its %s, against the %ss bound, so the session holding the lease is presumed gone\n' "$((TC_NOW - LM_NEWEST))" "$LM_SOURCE" "$RESUME_STALE_BOUND" ;;
+        2) printf 'unattended: the lease age is UNKNOWN on this node, because a clock probe it needs answered nothing, so staleness here is unanswerable rather than no\n' ;;
+      esac
+    else
+      _age=$(build_folder_age "$slug") || _age=""
+      if [ -z "$_age" ]; then
+        printf 'unattended: this record has NO lease and its build folder age is UNKNOWN on this node, so whether its holder is gone is unanswerable rather than no\n'
+      elif [ "$_age" -gt "$RESUME_STALE_BOUND" ]; then
+        printf 'unattended: presumed-stopped — this record has NO LEASE, so its holder predates one or never took it, and the newest commit touching its build folder is %ss old against the %ss bound\n' "$_age" "$RESUME_STALE_BOUND"
+      fi
+    fi
+  fi
+  # ---- THE HELD CHECKPOINT, DERIVED from the hold facts on every read and never stored as a second
+  # ---- copy: a stored checkpoint would sit in the generated region, which `records-current` requires
+  # ---- empty, and would therefore block the close it exists to lead to. Every gate claim in it is a
+  # ---- POINTER at a run record — `last bar` is a PATH and never a verdict word, which is the
+  # ---- dCarriedReceipt class: a prose field there once stated a verdict and a reader took it for one.
+  # ---- The reason sits on its own line, quoted, and is never parsed.
+  if [ "$p" = HELD ]; then
+    _hcode=$(fact "$rel" hold-code); _huntil=$(fact "$rel" hold-until)
+    _hsince=$(fact "$rel" held-at);  _hfrom=$(fact "$rel" held-from)
+    _hreason=$(fact "$rel" hold-reason); _hunp=$(fact "$rel" hold-unpushed)
+    _howed=$(fact "$rel" resume-owed); _hstreak=$(fact "$rel" hold-streak)
+    _wit8=$(printf '%.8s' "${w:-NONE}"); _bar=$(resolve_newest_gate_log)
+    printf 'held · code %s · until %s · since %s · from %s\n' "$_hcode" "$_huntil" "$_hsince" "$_hfrom"
+    if [ -n "$_hunp" ]; then
+      printf 'checkpoint · witness %s · next %s · last bar %s · parked %s · unpushed %.8s\n' "$_wit8" "$unit" "$_bar" "${nparked:-0}" "$_hunp"
+    else
+      printf 'checkpoint · witness %s · next %s · last bar %s · parked %s\n' "$_wit8" "$unit" "$_bar" "${nparked:-0}"
+    fi
+    printf 'resume · %s · streak %s\n' "${_howed:-none · unrecorded}" "${_hstreak:-unrecorded}"
+    # TOOL-dDerivedDocket-29 S7 - the Workflow run a deferred review was holding on. Printed only
+    # while HELD, so a value left behind by an earlier stop misleads nobody after a resume.
+    _hrun=$(fact "$rel" hold-run)
+    if [ -n "$_hrun" ]; then printf 'pending run %s\n' "$_hrun"; fi
+    printf 'reason · "%s"\n' "$_hreason"
+  fi
   [ -n "$w" ] || { fail 11 "the phase carries no witness, and presence is its own refusal: an oracle that skips an unwitnessed claim makes naming no witness the cheapest way to say nothing. Phase: $p"; return 1; }
   return 0
 }
@@ -3382,7 +5793,7 @@ print_audit() { # slug
   check_slug "$slug" || return 1
   rel=$(runmd_of "$slug")
   [ -f "$rel" ] || { fail 51 "no run-state file, so there is no dispatched unit to audit for idleness: $rel"; return 1; }
-  ph=$(fact "$rel" phase)
+  read_derived_phase "$rel"; ph="$DP_PHASE"
   if [ -n "$ph" ] && is_terminal "$ph"; then
     fail 51 "the run is already finished, so no unit of it can be dispatched and open, and a keepalive still auditing it should have been reaped: $ph"; return 1
   fi
@@ -3470,6 +5881,131 @@ resolve_transcript_path() { # session -> the transcript path when it exists, or 
 # id 2; the pid half is unit 2's). The recorded pid is `claude.exe`'s Windows pid, which is the one
 # `tasklist` knows, and the recorded image is what a recycled pid fails to match.
 
+# THE ONE CLOCK OF A RUN, extracted verbatim from `print_liveness` by TOOL-dDerivedDocket-61 S3 when
+# the resume matrix became its third reader: `--liveness` grades STALE with it, `check_lease_fresh`
+# grades a lease with it, and `--status` announces presumed-stopped with it, so the tick and the
+# matrix cannot read one record two ways. The newest of its signals: the two tree clocks of
+# `read_tree_clocks`, the newest gate log under this worktree's git dir, the gate runner's queue
+# heartbeat beside those logs (TOOL-dDerivedDocket-64), the recorded session's transcript when
+# its path derives, and the newest sub-agent transcript of that session (TOOL-dDerivedDocket-65),
+# because a session waiting on its own Workflow writes under `<sid>/subagents/` and never to
+# `<sid>.jsonl`. An ABSENT gate-logs directory, heartbeat or sub-agent directory contributes nothing
+# and is not a dead probe — a repo that has never run the bar has none of them — but a file there
+# that `stat` cannot date is one. Every term is graded against the one RESUME_STALE_BOUND. A
+# Workflow's agents run inside their session's process, so once the holder dies none of its
+# sub-agents moves again, and the term keeps a dead holder fresh for at most one bound after its
+# last sub-agent turn, the window the transcript term already gives after its own. Globals, never
+# a return value, for `read_tree_clocks`'s reason: a `$( )` capture would lose the dead-probe name
+# beside the numbers. `LM_DEAD` names the probe that answered nothing, and each caller decides
+# what that costs.
+#
+# WHAT IT DOES NOT READ: another worktree's moves, and another session's sub-agents. A holder with
+# no move of its own and no sub-agent writing reads stale here — one tool call longer than the
+# bound, or a wait on a background shell task — and so does a bar running one leg past the bound:
+# once the queue is behind it only a leg's completion moves the clock.
+LM_NEWEST=""; LM_SOURCE=""; LM_DEAD=""; LM_TRANSCRIPT=""
+derive_last_move() { # session -> LM_NEWEST, LM_SOURCE, LM_TRANSCRIPT, and LM_DEAD on a dead probe
+  local sidecar gl hb f m sd fs g ms k
+  LM_NEWEST=""; LM_SOURCE=""; LM_DEAD=""; LM_TRANSCRIPT=""
+  read_tree_clocks
+  LM_DEAD="$TC_DEAD"; LM_NEWEST="$TC_LASTC"; LM_SOURCE=commit
+  if [ -z "$LM_DEAD" ] && [ -n "$TC_LASTW" ] && [ "$TC_LASTW" -gt "$LM_NEWEST" ]; then LM_NEWEST=$TC_LASTW; LM_SOURCE=write; fi
+  sidecar=$(resolve_sidecar_dir) || { sidecar=""; [ -n "$LM_DEAD" ] || LM_DEAD="resolve_sidecar_dir"; }
+  gl="${sidecar%/unattended}/gate-logs"
+  if [ -z "$LM_DEAD" ] && [ -d "$gl" ]; then
+    for f in "$gl"/*; do
+      [ -f "$f" ] || continue
+      m=$(stat -c %Y -- "$f" 2>/dev/null) || m=""
+      case "$m" in ""|*[!0-9]*) LM_DEAD="stat -c %Y on $f"; break ;; esac
+      if [ "$m" -gt "$LM_NEWEST" ]; then LM_NEWEST=$m; LM_SOURCE=gate-log; fi
+    done
+  fi
+  # THE QUEUE'S HEARTBEAT (TOOL-dDerivedDocket-64). A bar waiting in the gate runner's turnstile
+  # lands no gate log, so the runner rewrites this one file beside `gate-logs/` on every tick it
+  # waits and never removes it; its mtime is the move, its content is never read, and a leftover
+  # ages out as an old gate log does. Absent contributes nothing; present and undatable is a dead
+  # probe, named as the gate-log term names one. Source `gate-queue`, so a queued bar is told apart
+  # from a landing leg; a tie keeps the earlier source, as for every term.
+  hb="${sidecar%/unattended}/gate-queue-heartbeat"
+  if [ -z "$LM_DEAD" ] && [ -f "$hb" ]; then
+    m=$(stat -c %Y -- "$hb" 2>/dev/null) || m=""
+    case "$m" in ""|*[!0-9]*) LM_DEAD="stat -c %Y on $hb" ;; esac
+    if [ -z "$LM_DEAD" ] && [ "$m" -gt "$LM_NEWEST" ]; then LM_NEWEST=$m; LM_SOURCE=gate-queue; fi
+  fi
+  LM_TRANSCRIPT=$(resolve_transcript_path "${1:-}") || LM_TRANSCRIPT=""
+  if [ -z "$LM_DEAD" ] && [ -n "$LM_TRANSCRIPT" ]; then
+    m=$(stat -c %Y -- "$LM_TRANSCRIPT" 2>/dev/null) || m=""
+    case "$m" in ""|*[!0-9]*) LM_DEAD="stat -c %Y on $LM_TRANSCRIPT" ;; esac
+    if [ -z "$LM_DEAD" ] && [ "$m" -gt "$LM_NEWEST" ]; then LM_NEWEST=$m; LM_SOURCE=transcript; fi
+  fi
+  # THE SESSION'S SUB-AGENTS (TOOL-dDerivedDocket-65). A session waiting on its own Workflow or
+  # `Agent` spawn writes nothing to its transcript, while each sub-agent transcript it spawned is
+  # appended once per turn: every `agent-*.jsonl` at any depth under `subagents/` in the directory
+  # the transcript path names once `.jsonl` is stripped, the population the run-log kit's session
+  # reader walks. Found through the transcript term's one derivation of the encoded root, so no
+  # transcript means no sub-agent either, and a sibling worktree reads none. ONE `stat` dates the
+  # whole list, whatever its size: the glob, the tests and the loop are builtins, and the readings
+  # are split by default word splitting, never a here-string. No directory and no match contribute
+  # nothing; fewer readings than matched paths is a dead probe, so a partial reading is never a
+  # silently smaller population. Source `subagent`, graded against RESUME_STALE_BOUND like every
+  # term, and `globstar` is restored to the state it was found in.
+  if [ -z "$LM_DEAD" ] && [ -n "$LM_TRANSCRIPT" ]; then
+    sd="${LM_TRANSCRIPT%.jsonl}/subagents"; fs=(); g=""
+    shopt -q globstar && g=1; shopt -s globstar
+    for f in "$sd"/**/agent-*.jsonl; do [ -f "$f" ] && fs+=("$f"); done
+    [ -n "$g" ] || shopt -u globstar
+    if [ "${#fs[@]}" -gt 0 ]; then
+      ms=$(stat -c %Y -- "${fs[@]}" 2>/dev/null) || true; k=0
+      for m in $ms; do
+        case "$m" in *[!0-9]*) continue ;; esac
+        k=$((k+1)); if [ "$m" -gt "$LM_NEWEST" ]; then LM_NEWEST=$m; LM_SOURCE=subagent; fi
+      done
+      [ "$k" -eq "${#fs[@]}" ] || LM_DEAD="stat -c %Y over $sd"
+    fi
+  fi
+  return 0
+}
+# THE LEASE'S FRESHNESS, re-keyed onto the run-state file (TOOL-dDerivedDocket-61 S3): the clock of
+# the session the record names, against RESUME_STALE_BOUND, the one bound `--liveness` prints as
+# `stale-bound`. 0 = fresh · 1 = stale · 2 = UNKNOWN. The third code is the point: a clock that
+# answers nothing must not read as either, and every caller announces the unknown and then declines
+# the take-over. Only a record carrying `lease-utc` is asked: a record without one keeps its build
+# folder's clock (`build_folder_age`), because it names no session whose clock could be read.
+check_lease_fresh() { # run-state file -> 0 fresh, 1 stale, 2 unknown; LM_* and TC_NOW set for the caller
+  derive_last_move "$(fact "$1" session)"
+  [ -z "$LM_DEAD" ] || return 2
+  case "$TC_NOW" in ""|*[!0-9]*) return 2 ;; esac
+  case "$LM_NEWEST" in ""|*[!0-9]*) return 2 ;; esac
+  [ $((TC_NOW - LM_NEWEST)) -gt "$RESUME_STALE_BOUND" ] && return 1
+  return 0
+}
+
+# ONE WORKTREE ANSWERS FOR A SLUG (TOOL-dDerivedDocket-62 S1). The run-state file is one tracked copy
+# per worktree, and every clock above belongs to the calling one, so two worktrees carrying one
+# record would each grade their own copy and each act. The run's branch is `run-branch`, else
+# `branch-ref` for a record older than fact 13 — the key `resolveRunPhase` in the gate-guard hook
+# applies — and the worktree whose own HEAD names that ref holds the slug. Git checks a branch out
+# in one worktree at most, so on one node at most one worktree holds it, and the checkout decides
+# which, never a clock. HW_REF is the run's branch, empty when the record names neither fact;
+# HW_HEAD is this worktree's `symbolic-ref`, `detached` on that command's exit 1, `unreadable` on
+# any other failure. 0 = this worktree holds · 1 = it does not · 2 = the record names no branch.
+# Globals, so no caller runs it through a substitution; it writes nothing and prints nothing.
+HW_REF=""; HW_HEAD=""
+resolve_holder_worktree() { # run-state file -> 0 holds, 1 not here, 2 no run branch; HW_REF, HW_HEAD
+  local rc
+  HW_REF=$(fact "$1" run-branch); [ -n "$HW_REF" ] || HW_REF=$(fact "$1" branch-ref)
+  HW_HEAD=""
+  [ -n "$HW_REF" ] || return 2
+  HW_HEAD=$(GIT symbolic-ref -q HEAD 2>/dev/null); rc=$?
+  case "$rc" in
+    0) [ -n "$HW_HEAD" ] || HW_HEAD=unreadable ;;
+    1) HW_HEAD=detached ;;
+    *) HW_HEAD=unreadable ;;
+  esac
+  [ "$HW_HEAD" = "$HW_REF" ] && return 0
+  return 1
+}
+
 # --liveness: THE ONE PREDICATE EVERY OUT-OF-SESSION READER SHARES. TOOL-aWokenSentinel-2. "Is this
 # run alive" had no single answer: `--status` is prose for a human, `--audit` grades dispatched
 # UNITS and says nothing about the session holding the run, and only `--preflight` knew that a
@@ -3486,26 +6022,40 @@ resolve_transcript_path() { # session -> the transcript path when it exists, or 
 # process-monitor kit's.
 #
 #   phase · state · default-branch · session · pid · keepalive · pid-alive · last-move ·
-#   last-move-source · transcript · last-stall · stale · verdict · stale-bound
+#   last-move-source · transcript · last-stall · stale · verdict · stale-bound · holder-ref
 #
-# `state` is `terminal`, `finished-unstamped` or `live`. `last-move` is the seconds since the NEWEST
-# of four signals — the last commit, the newest dirty or untracked write, the newest gate log under
-# `<git-dir>/gate-logs/`, and the session transcript when its path derives — because during a
-# healthy 26-minute bar neither the transcript nor the commit moves and the per-leg logs do. `stale`
+# `state` is `terminal`, `finished-unstamped`, `held` or `live`, and a LANDING the node's landed log
+# names reads `terminal`. `last-move` is the seconds since the NEWEST of `derive_last_move`'s
+# signals: the last commit, the newest dirty or untracked write, the newest gate log under
+# `<git-dir>/gate-logs/`, the `gate-queue-heartbeat` a bar waiting in the gate runner's turnstile
+# rewrites beside them on every tick, the session transcript when its path derives, and the newest
+# sub-agent transcript of that session — every `agent-*.jsonl` at any depth under `subagents/` in
+# the directory the transcript path names, the population the run-log kit's session reader walks —
+# because during a healthy 26-minute bar neither the transcript nor the commit moves and the per-leg
+# logs do, before its first leg a queued bar moves only its heartbeat, and a session waiting on its
+# own Workflow moves only its agents' transcripts. `last-move-source` names the one that won:
+# `commit`, `write`, `gate-log`, `gate-queue`, `transcript` or `subagent`. `stale`
 # is `last-move` over RESUME_STALE_BOUND, and `stale-bound` is that number, printed so the tick
-# bounds its own reads by it. The verdict is the first that holds: TERMINAL,
-# FINISHED-UNSTAMPED, UNBOUND (no session to bind to), STALE, LIVE. Every key prints on every run
+# bounds its own reads by it; `holder-ref` is the branch a worktree must have checked out to hold
+# the slug (`resolve_holder_worktree`), or `absent`. The verdict is the first that holds: TERMINAL,
+# ELSEWHERE (this worktree is not on the run's branch, TOOL-dDerivedDocket-62), FINISHED-UNSTAMPED,
+# HELD, UNBOUND (no session to bind to), STALE, LIVE, so HELD is never STALE, a sibling copy never
+# acts, and the resume matrix grades a leased record's staleness with this same clock and bound
+# (`check_lease_fresh`). Every key prints on every run
 # that reaches the verdict, a terminal record included, so a reader never has to know which keys a
 # state omits. A terminal phase, an absent session and an unresolvable default branch are VALUES;
 # the two refusals are a missing record and a dead probe, and a dead probe prints no verdict line,
 # because a zero from it would read as moved-just-now — the reassuring-zero class `--audit` refuses
 # the same way.
 print_liveness() { # slug
-  local slug="$1" rel ph state d dref w sid pid kid alive newest src dead sidecar gl f m tp last stale verdict
+  local slug="$1" rel ph state d dref w sid pid kid alive newest src dead sidecar f tp last stale verdict lc hw
   check_slug "$slug" || return 1
   rel=$(runmd_of "$slug")
   [ -f "$rel" ] || { fail 52 "no run-state file, so there is no run whose liveness can be graded: $rel"; return 1; }
-  ph=$(fact "$rel" phase); [ -n "$ph" ] || ph=absent
+  # The RECORDED phase, through its reader (the gate leg's phase-reader routing check): this verb
+  # takes no network, and the derived reader asks the remote for its tip, while the OFFLINE half of
+  # that derivation is `finished-unstamped` below.
+  ph=$(read_recorded_phase "$rel"); [ -n "$ph" ] || ph=absent
   # THE REF THE ANCESTRY TEST USES, resolved whether or not the test runs, so a skipped test is
   # announced as `unresolved` rather than read as `live`. The remote-tracking ref when it exists,
   # the local branch otherwise; `default_branch` reads GOV_DEFAULT_BRANCH then origin/HEAD.
@@ -3514,8 +6064,20 @@ print_liveness() { # slug
     if GIT show-ref --verify --quiet "refs/remotes/origin/$d"; then dref="refs/remotes/origin/$d"; else dref="refs/heads/$d"; fi
   fi
   state=live
+  # TOOL-dDerivedDocket-61 S4 - A LANDING THE LANDED LOG NAMES IS TERMINAL, and HELD is its own state.
+  # The log line is matched by this record's own landing commit (`read_landing_commit`, offline), so
+  # an earlier run's observation never finishes a new landing; the log is the common dir's, so every
+  # worktree on the node reads the one `--landed` wrote. HELD is tested BEFORE finished-unstamped and
+  # reads `held`, so a paused run is never graded STALE by its silence: its restart is the durable
+  # schedule `--hold` printed, and the stop-guard and the tick key on this verdict.
+  lc=""
+  [ "$ph" = LANDING ] && lc=$(read_landing_commit "$rel" 2>/dev/null)
   if is_terminal "$ph"; then
     state=terminal
+  elif [ -n "$lc" ] && read_landed_observation "$slug" "$lc"; then
+    state=terminal
+  elif [ "$ph" = HELD ]; then
+    state=held
   elif [ "$ph" = LANDING ] && [ "$dref" != unresolved ]; then
     # SHA-SHAPED, as at the admission point: a witness reading `main` is an ancestor of `main` by
     # construction, and the witness is authored by the run being graded.
@@ -3535,29 +6097,20 @@ print_liveness() { # slug
   # number a reboot recycled reads `no` here rather than `yes` whatever image took it, and the
   # tick's kill is not aimed at the owner's next process (closing review id 2; round 2, defect E).
   alive=$(check_pid_alive "$pid" "$(fact "$rel" pid-image)" "$(fact "$rel" lease-utc)")
-  # THE FOUR SIGNALS. The two tree clocks are `read_tree_clocks`; the gate-log clock and the
-  # transcript clock are this verb's own. An ABSENT gate-logs directory contributes nothing and is
-  # not a dead probe — a repo that has never run the bar has none — but a file under it that `stat`
-  # cannot date is one.
-  read_tree_clocks
-  dead="$TC_DEAD"; newest="$TC_LASTC"; src=commit
-  if [ -z "$dead" ] && [ -n "$TC_LASTW" ] && [ "$TC_LASTW" -gt "$newest" ]; then newest=$TC_LASTW; src=write; fi
-  sidecar=$(resolve_sidecar_dir) || { sidecar=""; [ -n "$dead" ] || dead="resolve_sidecar_dir"; }
-  gl="${sidecar%/unattended}/gate-logs"
-  if [ -z "$dead" ] && [ -d "$gl" ]; then
-    for f in "$gl"/*; do
-      [ -f "$f" ] || continue
-      m=$(stat -c %Y -- "$f" 2>/dev/null) || m=""
-      case "$m" in ""|*[!0-9]*) dead="stat -c %Y on $f"; break ;; esac
-      if [ "$m" -gt "$newest" ]; then newest=$m; src=gate-log; fi
-    done
-  fi
-  tp=$(resolve_transcript_path "$sid") || tp=""
-  if [ -z "$dead" ] && [ -n "$tp" ]; then
-    m=$(stat -c %Y -- "$tp" 2>/dev/null) || m=""
-    case "$m" in ""|*[!0-9]*) dead="stat -c %Y on $tp" ;; esac
-    if [ -z "$dead" ] && [ "$m" -gt "$newest" ]; then newest=$m; src=transcript; fi
-  fi
+  # THE SIGNALS are `derive_last_move`'s — commit, write, gate log, the queue's heartbeat, the
+  # transcript and the session's sub-agent transcripts — the one clock this verb,
+  # `check_lease_fresh` and `--status` share, so a bar queued at the turnstile and a session waiting
+  # on its Workflow read LIVE here and in the matrix at once. The stall log below still needs the
+  # sidecar root, derived again here: a dead derivation is already named by the clock, so this one
+  # only has to be empty.
+  derive_last_move "$sid"
+  dead="$LM_DEAD"; newest="$LM_NEWEST"; src="$LM_SOURCE"; tp="$LM_TRANSCRIPT"
+  sidecar=$(resolve_sidecar_dir) || sidecar=""
+  # TOOL-dDerivedDocket-62 S2 - WHICH WORKTREE HOLDS THE SLUG. A HEAD this worktree cannot read is a
+  # dead probe like the clocks' own: whether this copy is the run's is then unanswerable, and a
+  # verdict printed over it would be a guess an actor that kills then acts on.
+  hw=0; resolve_holder_worktree "$rel" || hw=$?
+  if [ "$hw" = 1 ] && [ "$HW_HEAD" = unreadable ] && [ -z "$dead" ]; then dead="git symbolic-ref -q HEAD"; fi
   if [ -n "$dead" ]; then
     fail 52 "the liveness cannot be measured on this node, because a probe it needs answered nothing, so no verdict is answerable and a zero from a dead probe would read as moved-just-now: $dead"; return 1
   fi
@@ -3566,53 +6119,867 @@ print_liveness() { # slug
   last=none; f="$sidecar/stall.$slug.log"
   if [ -s "$f" ]; then last=$(tail -n 1 -- "$f"); last=${last%$'\r'}; fi
   stale=no; [ $((TC_NOW - newest)) -gt "$RESUME_STALE_BOUND" ] && stale=yes
+  # ELSEWHERE SECOND, after TERMINAL alone: a recorded or observed terminal reads the same in every
+  # copy, while a sibling copy of an acting verdict is B1's double drive, and a sibling copy holds
+  # whatever phase the record had when that worktree branched, so it cannot tell HELD from working.
   if [ "$state" = terminal ]; then verdict=TERMINAL
+  elif [ "$hw" = 1 ]; then verdict=ELSEWHERE
   elif [ "$state" = finished-unstamped ]; then verdict=FINISHED-UNSTAMPED
+  elif [ "$state" = held ]; then verdict=HELD
   elif [ "$sid" = absent ]; then verdict=UNBOUND
   elif [ "$stale" = yes ]; then verdict=STALE
   else verdict=LIVE; fi
-  # `stale-bound` LAST, after the verdict: the number `stale` was graded against, printed so the
+  # `stale-bound` after the verdict: the number `stale` was graded against, printed so the
   # resume tick bounds its in-flight skip by THIS reader's bound instead of reading the key itself
   # — a second reader would be a second copy of its default (closing review round 2, defect D).
-  printf 'phase: %s\nstate: %s\ndefault-branch: %s\nsession: %s\npid: %s\nkeepalive: %s\npid-alive: %s\nlast-move: %s\nlast-move-source: %s\ntranscript: %s\nlast-stall: %s\nstale: %s\nverdict: %s\nstale-bound: %s\n' \
-    "$ph" "$state" "$dref" "$sid" "$pid" "$kid" "$alive" "$((TC_NOW - newest))" "$src" "${tp:-absent}" "$last" "$stale" "$verdict" "$RESUME_STALE_BOUND"
+  # `holder-ref` LAST, the fifteenth key: the branch ELSEWHERE was keyed on, so the tick names it
+  # and skips a record naming none without a second spelling of the key.
+  printf 'phase: %s\nstate: %s\ndefault-branch: %s\nsession: %s\npid: %s\nkeepalive: %s\npid-alive: %s\nlast-move: %s\nlast-move-source: %s\ntranscript: %s\nlast-stall: %s\nstale: %s\nverdict: %s\nstale-bound: %s\nholder-ref: %s\n' \
+    "$ph" "$state" "$dref" "$sid" "$pid" "$kid" "$alive" "$((TC_NOW - newest))" "$src" "${tp:-absent}" "$last" "$stale" "$verdict" "$RESUME_STALE_BOUND" "${HW_REF:-absent}"
   return 0
 }
 
-verb_resume() { # slug · [keepalive-id]
-  verb_status "$1" || return 1
-  local rel p kid="${2:-}"; rel=$(runmd_of "$1"); p=$(fact "$rel" phase)
-  # THE LEASE IS REPLACED HERE AND NOT BY A RE-PREFLIGHT. `--preflight` on a live record overwrites it
-  # and re-pins the anchor (TOOL-aBranchedMandate-8), so the resumed session's only route to a record
-  # naming the session that now holds the run is this verb. Terminal first: a finished record is not
-  # re-leased, and the refusal is the whole output. Without the option the verb is byte-identical to
-  # what it always was; an empty value is the option's absence.
-  if [ -n "$kid" ]; then refuse_if_terminal "$rel" --resume || return 1; fi
+# The orientation half of --resume, unchanged in substance and extracted because the take-over half
+# ends in it too. The method path is DERIVED from MEMORY_ROOT, never recorded as a run fact: the
+# authored region carries its facts and never restates a derivable one (protocol section 2).
+print_resume_orientation() { # run-state file · phase
+  echo "unattended: resume at phase $2 — read $1, then continue the first non-terminal unit above"
+  [ -f "$M/guides/BUILD-METHOD.md" ] && echo "unattended: re-read the build method at $M/guides/BUILD-METHOD.md"
+  echo "unattended: the directives and their waivers — the table in the unattended Skill; your waivers are parked in this file"
+  return 0
+}
+
+# THE TAKE-OVER, in S5's order, and the order is the whole of it: every refusal runs BEFORE the lease
+# is taken, so a refused take-over writes nothing at all — not the lease, not the phase, not the id.
+# A take-over that half-wrote would leave the slug holding a lease for a session that then stopped.
+run_takeover() { # slug · run-state file · keepalive id · held|working · phase
+  local slug="$1" rel="$2" kid="$3" mode="$4" ph="$5" unp hf head how prun ok os op
+  if [ -z "$kid" ]; then
+    verb_status "$slug" || true
+    fail 59 "a take-over is a change of driver and the new driver has to name itself, because the lease is keyed on the keepalive id and a blank one wedges the slug until the bound expires — the holder's own later resume would then meet the different-id refusal and --replaces cannot name a blank; nothing was written: pass --keepalive-id"
+    return 1
+  fi
+  # THE BYPASS FLAG, refused beside the blank id and before any write: the lease records the id and
+  # the history row below parks it VERBATIM (TOOL-dDerivedDocket-5 rev-7), and the gate greps this
+  # file whole for the flag. Every park caller screens its text this way (TOOL-aBoundedVerdict-15 S4).
+  if [ -n "$BYPASS_BAN" ] && printf '%s' "$kid" | grep -qF -- "$BYPASS_BAN"; then
+    fail 59 "the keepalive id spells the declared bypass flag, and the take-over records it in the lease and parks it in the history row of a file the gate greps whole, so this would red the bar on a record no verb can rewrite; nothing was written, so name the keepalive job without the literal flag: $BYPASS_BAN"
+    return 1
+  fi
+  unp=$(fact "$rel" hold-unpushed)
+  if [ -n "$unp" ]; then
+    echo "unattended: PUSH THIS FIRST — this hold was taken while the remote did not answer, so the branch tip exists only on the node that held it and this take-over's first act is to push it: $unp"
+  fi
+  # THE AUTHORIZATION, RE-VERIFIED at the pinned BASE through the same pair --close uses, so the two
+  # verbs cannot disagree about which base authorizes this run. Without it a revoked mandate keeps
+  # being driven by unwatched scheduled sessions until somebody runs --close.
+  #
+  # `allow-degenerate` is passed for --preflight's reason and not --close's: a run taken over before
+  # it built anything has a merge-base equal to HEAD, which is the normal state of a run that paused
+  # early, while at --close it means a run with nothing to land.
+  observe_anchor || return 1
+  trusted_base "$rel" allow-degenerate || return 1
+  check_authorization "$slug" "$TB" || return 1
+  # TOOL-dDerivedDocket-16 S4 - PROPERTY P6 AT EVERY RESUME. The mandate was pinned at preflight and
+  # the README is a file this run can edit, so a resume that did not re-read it would let the ask set
+  # grow across a hold - which is the one thing about a mandate a run may never do. P5 and the READY
+  # witness are re-run beside it, against the PINNED `m-base:`, so the answer is the same function of
+  # the same tree that preflight evaluated.
+  check_ask_mandate "$slug" "$rel" || return 1
+  print_interrupted_acts
+  # TOOL-dDerivedDocket-28 S3 - the run's own orphaned processes are reaped HERE, after every refusal
+  # and before the lease is recorded and the phase moves: the dead session's bar is exactly what a
+  # take-over inherits.
+  run_orphan_reap "$slug"
+  # THE RUN-STATE LEASE, the one lease record (TOOL-aWokenSentinel-1, TOOL-dDerivedDocket-61): the
+  # keepalive this session holds and the session and pid the stop-guard, the stall-recorder and the
+  # resume tick bind to, written by the one function --preflight writes them with. Old values READ
+  # BEFORE the write, so the line reports what the record said rather than what was just written twice.
+  ok=$(fact "$rel" keepalive); os=$(fact "$rel" session); op=$(fact "$rel" pid)
+  write_lease "$rel" "$kid" || return 1
+  echo "unattended: lease replaced · keepalive $ok -> $(fact "$rel" keepalive) · session $os -> $(fact "$rel" session) · pid $op -> $(fact "$rel" pid)"
+  # TOOL-dDerivedDocket-5 - THE HISTORY ROW, written after every refusal and after the lease, so a
+  # refused take-over leaves none. It says which of the two restarts this was: a session the driver
+  # admitted through --scheduled passed the four refusals above the matrix, and a manual one did
+  # not, so a reader who cannot tell them apart cannot tell whether the remote was ever consulted.
+  how=manual; [ -n "$RS_SCHEDULED" ] && how=scheduled
+  park "$rel" resume "$slug" "$mode · keepalive $kid · $how" || return 1
+  head=$(GIT rev-parse HEAD 2>/dev/null)
+  if [ "$mode" = held ]; then
+    hf=$(fact "$rel" held-from); [ -n "$hf" ] || hf=RUNNING
+    set_fact "$rel" phase "$hf" || return 1
+    if [ -n "$head" ]; then set_fact "$rel" witness "$head" || return 1; fi
+    if [ -n "$unp" ]; then set_fact "$rel" hold-unpushed "" || return 1; fi
+    stage_or_fail "$rel" || return 1
+    echo "unattended: taken over — phase $hf · keepalive $kid · the hold is released and this session holds the lease"
+    # TOOL-dDerivedDocket-29 S7 - THE RELAUNCH. A hold taken on a second deferred review names the
+    # Workflow run it was waiting on, and a recorded runId nothing reads is a fact written for nobody.
+    # The lens and skeptic files that run wrote are reused either way; the runId is the bonus path.
+    prun=$(fact "$rel" hold-run)
+    if [ -n "$prun" ]; then
+      echo "unattended: relaunch the deferred review FIRST — pending run $prun: re-run that Workflow with identical args, resuming from run $prun where the platform offers it; the review reuses every lens and skeptic file the run wrote and dispatches only what did not return"
+    fi
+    print_resume_orientation "$rel" "$hf"
+  else
+    stage_or_fail "$rel" || return 1
+    echo "unattended: taken over — phase $ph · keepalive $kid · this session holds the lease"
+    print_resume_orientation "$rel" "$ph"
+  fi
+  return 0
+}
+
+# THE MATRIX ANSWERS ONLY IN THE RUN'S OWN WORKTREE (TOOL-dDerivedDocket-62 S4). A sibling worktree
+# carries a copy of the record frozen where it branched, graded on that worktree's clocks, so its
+# HELD and working rows would take a live run over, or reap the common-dir ledger, from a stale
+# copy. `verb_resume` calls this once, for a record carrying `lease-utc`, after the observed-landing
+# row and ahead of the first HELD row. The holder worktree is the one `resolve_holder_worktree`
+# names; everywhere else this refuses, numbered, before any write, and names where the run is
+# driven from: the worktree `git worktree list` shows with the run's branch checked out, else that
+# none does, else that no such branch exists here, so the remedy is one a caller can follow. A
+# record naming no branch is announced and passed: refusing it would wedge for ever the holder of a
+# run preflighted on a detached HEAD, which `check_branch` admits.
+check_holder_worktree() { # slug · run-state file -> 0 passes, 1 with its own refusal printed
+  local slug="$1" rel="$2" hw=0 wp where here
+  resolve_holder_worktree "$rel" || hw=$?
+  [ "$hw" = 0 ] && return 0
+  if [ "$hw" = 2 ]; then
+    echo "unattended: this record names no run branch (neither run-branch nor branch-ref), so which worktree drives it cannot be shown and this worktree's copy is graded on its own clocks"
+    return 0
+  fi
+  if [ -z "$KID" ]; then verb_status "$slug" || true; fi
+  wp=$(GIT worktree list --porcelain 2>/dev/null | awk -v b="branch $HW_REF" '/^worktree /{ p = substr($0, 10) } $0 == b { print p; exit }')
+  if [ -n "$wp" ]; then
+    where="$wp"
+  elif GIT rev-parse --verify -q "$HW_REF" >/dev/null 2>&1; then
+    where="no worktree on this node has it checked out, so check it out first"
+  else
+    where="no branch of that name exists on this node, so create it at a commit that carries this record and check it out"
+  fi
+  case "$HW_HEAD" in
+    detached) here="a detached HEAD" ;;
+    unreadable) here="an unreadable HEAD" ;;
+    *) here="$HW_HEAD" ;;
+  esac
+  fail 58 "this worktree is not on the run's branch, so its copy of the record is not the run's, and resuming or taking over from it would drive one slug from a stale copy; the run is driven from the worktree that has $HW_REF checked out: $where. Nothing was written. This worktree: $here"
+  return 1
+}
+
+# --resume IS TWO VERBS IN ONE — orientation and take-over — and the lease is what separates them.
+# The matrix it implements is in memory/guides/UNATTENDED-STOPS.md and is not restated here; what is
+# stated here is the property every row shares: a refusal happens before any write, and the rows that
+# refuse for want of an id print the --status block first, so a session regrounding by the build
+# method's no-id spelling still reads its phase and witness before it is told what to pass.
+#
+# THE LEASE IS THE RUN-STATE FACTS (TOOL-dDerivedDocket-61 S7). Identity is the `keepalive` fact, or
+# the `session` fact against CLAUDE_CODE_SESSION_ID for the same-session row, whose caller is under
+# a pid the `pid` fact does not name (TOOL-dDerivedDocket-63); freshness is
+# `check_lease_fresh`, `--liveness`'s own clock and bound; a record with no `lease-utc` predates the
+# run-state lease and keeps its build folder's clock against the same bound (§8 F13).
+verb_resume() { # slug
+  local slug="$1" rel p cond age bound rhc rc ka _rs_at _rs_bt _rs_rc ok os op
+  local ls_utc ls_sid ls_pid ls_hat live me rb cur restart
+  check_slug "$slug" || return 1
+  rel=$(runmd_of "$slug")
+  [ -f "$rel" ] || { fail 10 "no run-state file, so there is no run to resume: $rel"; return 1; }
+  read_derived_phase "$rel"; p="$DP_PHASE"
+  [ -n "$p" ] || { fail 10 "the run-state file declares no phase, and a run with no phase is not resumable: $rel"; return 1; }
+  # TOOL-dDerivedDocket-16 S4 - PROPERTY P6, ABOVE THE MATRIX. Several rows below return without ever
+  # reaching the authorization block — the holder resuming under its own id is the common one — so a
+  # check placed there would fire on a take-over and never on the resume an agent actually runs after
+  # a compaction. This needs only the record and HEAD, so it can sit where every row passes through.
+  check_asks_pinned "$slug" "$rel" || return 1
+  # TOOL-dDerivedDocket-5 - THE SCHEDULED RESTART'S FOUR REFUSALS, evaluated in section 4's order
+  # and BEFORE every row of the matrix below, so a restart filed by a durable task writes nothing at
+  # all unless the exact hold it was filed for is still this record's state. A schedule outlives the
+  # session that filed it by design; these are what stop it outliving the hold.
+  if [ -n "$RS_SCHEDULED" ]; then
+    if [ "$p" != HELD ]; then
+      fail 60 "--scheduled names a restart filed for a hold and this record is not HELD, so the hold it was filed for is over; a working phase belongs to the lease matrix, which refuses a session that cannot show the lease's keepalive, and falling through to it would treat an unwatched scheduled session as the holder resuming. Nothing was written. Phase: $p"
+      return 1
+    fi
+    _rs_at=$(fact "$rel" held-at)
+    if [ "$_rs_at" != "$RS_SCHEDULED" ]; then
+      fail 60 "--scheduled names a held-at this record does not carry, so the hold this task was filed for has ended and a later one began; nothing was written. The record's held-at is: ${_rs_at:-none}"
+      return 1
+    fi
+    # RULE 3, AND IT IS SKIPPED RATHER THAN FAKED under another anchor scope: --hold requires the
+    # push only under `published`, so there is no published tip to compare against and an
+    # announcement is the honest report. Reuses the bounded ls-remote the driver already runs at
+    # preflight rather than a second observation of the same endpoint.
+    if [ "$ANCHOR_SCOPE" = published ]; then
+      _rs_bt=$(branch_tip_quiet); _rs_rc=$?
+      case "$_rs_rc" in
+        0) echo "unattended: --scheduled — the remote advertises ${_rs_bt%% *} at ${_rs_bt##* }, which is HEAD or an ancestor of it, so no session has pushed work this worktree lacks" ;;
+        # 3 IS RULE 3 TOO: this driver never fetches, so work another session pushed is a tip this
+        # clone LACKS, and a commit absent here is neither HEAD nor an ancestor of it. Reading 3 as
+        # "cannot be confirmed" left the double-drive rule 3 exists for on the catch-all's message.
+        3|4) fail 60 "the remote advertises a tip for this run's branch that is neither HEAD nor an ancestor of it, so a session somewhere pushed work after this hold and a restart here would drive one slug from two places; nothing was written, and a human decides this one"
+           return 1 ;;
+        5) fail 60 "the remote did not answer, so whether another session has pushed work this worktree lacks is UNKNOWN rather than no, and a restart that might double-drive the slug is worse than one that waits for a human; nothing was written"
+           return 1 ;;
+        *) fail 60 "this run's branch tip cannot be confirmed on its remote, so the freshness this restart turns on cannot be shown: the run is not on a named branch, or the remote advertises no tip for it. Nothing was written"
+           return 1 ;;
+      esac
+    else
+      echo "unattended: --scheduled — ANCHOR_SCOPE is '$ANCHOR_SCOPE' rather than 'published', so --hold never required the push and the remote-freshness refusal is SKIPPED: this restart is not checked against work another session may have pushed"
+    fi
+  fi
+  bound="$RESUME_STALE_BOUND"
+  # THE LEASE FACTS, READ ONCE, INTO LOCALS. Every row below decides against the record as it stood
+  # before this verb printed or wrote anything.
+  ka=$(fact "$rel" keepalive); ls_utc=$(fact "$rel" lease-utc)
+  ls_sid=$(fact "$rel" session); ls_pid=$(fact "$rel" pid); ls_hat=$(fact "$rel" held-at)
+  me="${CLAUDE_CODE_SESSION_ID:-}"
+  # A FINISHED RECORD IS NOT RE-LEASED (TOOL-aWokenSentinel-1): named with an id, a RECORDED
+  # terminal is check 26 and the refusal is the whole of what this verb does. RECORDED rather than
+  # derived, which makes this the second caller of that mode: a LANDING record the advertised tip
+  # already carries reads LANDED by derivation and takes the row below.
+  if [ -n "$KID" ]; then refuse_if_terminal "$rel" --resume --recorded || return 1; fi
   if is_terminal "$p"; then
-    local rhc; rhc=$(fact "$rel" halt-code)
+    # TOOL-dDerivedDocket-61 S8 - A PUSHED LANDING `--landed` HAS NOT YET OBSERVED IS RE-BOUND. Past
+    # the recorded refusal above, a derived terminal carrying a landing commit can only be a recorded
+    # LANDING read LANDED, so no second phase read is needed. `fail 55` sends a session the record
+    # does not name here, and this row is where its remedy writes: `write_lease`, staged, never
+    # committed, because a commit would move HEAD off the pushed tip that both landing modes grade.
+    # `read_landing_commit` and the `primary` clean check read that lease-only difference as none.
+    # NO IDENTITY TEST: nothing is left to drive but the observation, and a freshness test would
+    # refuse the remedy minutes after a push, while the landing commit still keeps the clock fresh.
+    # A BRANCH SCOPE instead: the re-bind writes only where this landing's own `--landed` runs, the
+    # record's run branch, or under `primary` the default branch the remote advertises too. From any
+    # other branch — a re-run build's fresh worktree, whose keepalive tick runs before its
+    # `--preflight` — it writes nothing, or that `--preflight` would meet a staged previous record.
+    if [ -n "$KID" ] && [ -n "$DP_LANDING" ] && ! read_landed_observation "$slug" "$DP_LANDING"; then
+      # The run's branch and this worktree's HEAD through the one derivation of both
+      # (TOOL-dDerivedDocket-62), so this scope and the holder rule cannot key one record two ways.
+      resolve_holder_worktree "$rel" || true
+      rb=$HW_REF; cur=$HW_HEAD
+      case "$cur" in detached|unreadable) cur="" ;; esac
+      if [ -n "$rb" ] && [ "$cur" != "$rb" ] && { [ "$LANDER_MODE" = in-place ] || [ "$cur" != "$DP_AREF" ]; }; then
+        verb_status "$slug" || true
+        echo "unattended: nothing to resume — this landing is on the remote and --landed has not observed it, and its --landed runs on the record's run branch $rb, not on ${cur:-a detached HEAD}, so nothing was written"
+        return 0
+      fi
+      ok=$ka; os=$ls_sid; op=$ls_pid
+      write_lease "$rel" "$KID" || return 1
+      stage_or_fail "$rel" || return 1
+      echo "unattended: landing re-bound · keepalive $ok -> $(fact "$rel" keepalive) · session $os -> $(fact "$rel" session) · pid $op -> $(fact "$rel" pid) · staged, not committed, so HEAD stays the pushed tip; run --landed $slug next"
+      [ -n "$rb" ] || echo "unattended: NOTE - this record names neither a run-branch nor a branch-ref fact, so this re-bind was NOT SCOPED to a branch where its landing's --landed runs"
+      verb_status "$slug" || return 1
+      return 0
+    fi
+    verb_status "$slug" || return 1
+    rhc=$(fact "$rel" halt-code)
     if [ -n "$rhc" ]; then
       echo "unattended: nothing to resume — phase $p is terminal, and this run FINISHED rather than paused: halt-code $rhc"
     else
       echo "unattended: nothing to resume — phase $p is terminal"
     fi
-  else
-    echo "unattended: resume at phase $p — read $rel, then continue the first non-terminal unit above"
-    # The method path is DERIVED from MEMORY_ROOT, never recorded as a run fact: the authored region
-    # carries the facts protocol section 2 enumerates and never restates a derivable one.
-    [ -f "$M/guides/BUILD-METHOD.md" ] && echo "unattended: re-read the build method at $M/guides/BUILD-METHOD.md"
-    echo "unattended: the directives and their waivers — the table in the unattended Skill; your waivers are parked in this file"
-    if [ -n "$kid" ]; then
-      # Old values READ BEFORE the write, so the line reports what the record said rather than what
-      # was just written twice. Staged through the one refusal --park uses, so the new lease is in
-      # the index the gate leg reads.
-      local ok os op
-      ok=$(fact "$rel" keepalive); os=$(fact "$rel" session); op=$(fact "$rel" pid)
-      write_lease "$rel" "$kid" || return 1
-      echo "unattended: lease replaced · keepalive $ok -> $(fact "$rel" keepalive) · session $os -> $(fact "$rel" session) · pid $op -> $(fact "$rel" pid)"
+    return 0
+  fi
+  # TOOL-dDerivedDocket-22 S16 - A LANDING RECORD `--landed` OBSERVED ON THE REMOTE: nothing to resume
+  # and never the lander, whatever this clone can see of the remote today. Keyed on the node's landed
+  # log naming THIS record's landing commit (TOOL-dDerivedDocket-61 S10), never on the commit alone
+  # (F9): a run that committed its close and died before `--land` has a landing commit too, and it
+  # must stay recoverable.
+  if [ "$p" = LANDING ] && [ -n "$DP_LANDING" ] && read_landed_observation "$slug" "$DP_LANDING"; then
+    verb_status "$slug" || true
+    echo "unattended: nothing to resume — --landed observed this record on the remote at $LO_UTC, so the run is landed; the rotation waits for the advertised tip, which the next --preflight of $slug reads"
+    return 0
+  fi
+  # TOOL-dDerivedDocket-62 S4 - ONE WORKTREE DRIVES A LEASED RECORD. Every HELD and working row below
+  # grades this worktree's copy on this worktree's clocks, so they answer only where HEAD is the
+  # run's branch. Above this line every row writes nothing but unit 61's re-bind, which scopes itself
+  # to the branches where its landing's `--landed` runs. A record with no `lease-utc` passes: its
+  # rows grade the run's build folder, not this worktree's clocks (§8 F10 of this unit's spec).
+  if [ -n "$ls_utc" ]; then check_holder_worktree "$slug" "$rel" || return 1; fi
+  if [ "$p" = HELD ]; then
+    cond=$(fact "$rel" hold-until)
+    if ! check_hold_condition_met "$cond"; then
+      if [ -n "$HC_DEAD" ]; then
+        verb_status "$slug" || true
+        fail 57 "the release condition cannot be evaluated on this node, because a clock probe it needs answered nothing, so whether the hold is over is unanswerable rather than no and a zero from a dead clock would read as released: $HC_DEAD"
+        return 1
+      fi
+      verb_status "$slug" || true
+      echo "unattended: still held — the release condition is not met, so nothing was written and no lease was taken: $cond"
+      return 0
+    fi
+    # THE TAKE-OVER'S CRASH WINDOW: a take-over records its lease BEFORE it moves the phase, so a
+    # record still HELD whose `lease-utc` follows its `held-at` was resumed by a session that has not
+    # finished. On a fresh or unknown clock, a second session under another keepalive is refused.
+    if [ -n "$KID" ] && [ -n "$ls_utc" ] && [ -n "$ls_hat" ] && [[ "$ls_utc" > "$ls_hat" ]] \
+       && [ "$ls_sid" != "${me:-absent}" ] && [ "$KID" != "$ka" ]; then
+      check_lease_fresh "$rel"; rc=$?
+      [ "$rc" = 2 ] && echo "unattended: the lease age is UNKNOWN on this node, because a clock probe it needs answered nothing, so this lease is read as FRESH rather than as an invitation to take the slug over"
+      if [ "$rc" != 1 ]; then
+        fail 58 "another session already resumed this held run and recorded its lease, so a second take-over would drive one slug from two sessions; the record names that session's keepalive and when its lease was recorded: $ka at $ls_utc"
+        return 1
+      fi
+    fi
+    run_takeover "$slug" "$rel" "$KID" held "$p" || return 1
+    return 0
+  fi
+  # ---- a WORKING phase ---------------------------------------------------------------------------
+  # THE HOLDER: the keepalive the record names. It writes NOTHING unless the record carries no
+  # `lease-utc`, or names another session or pid than the harness exposes; then `write_lease`
+  # records the one lease record and stages it, `keepalive` unchanged. A tick's first act is this
+  # row, so a write on every call would restage the record every ten minutes and move `lease-utc`.
+  if [ -n "$KID" ] && [ "$KID" = "$ka" ]; then
+    if [ -z "$ls_utc" ] || [ "$ls_sid" != "${me:-absent}" ] || [ "$ls_pid" != "${CLAUDE_PID:-absent}" ]; then
+      os=$ls_sid; op=$ls_pid
+      write_lease "$rel" "$KID" || return 1
       stage_or_fail "$rel" || return 1
+      echo "unattended: lease recorded · keepalive $KID · session ${os:-none} -> $(fact "$rel" session) · pid ${op:-none} -> $(fact "$rel" pid) · this resume passes the keepalive the record names, so it is the holder"
+    fi
+    # TOOL-dDerivedDocket-28 S3 - THE HOLDER'S OWN ORPHANS: i26's harness killed the driver mid-bar
+    # while the session lived on, so the holder resuming under its own id is the one who finds them.
+    # Every row that does NOT hold the lease only counts them, through the status block.
+    run_orphan_reap "$slug"
+    verb_status "$slug" || return 1
+    print_resume_orientation "$rel" "$p"
+    return 0
+  fi
+  # THE SAME SESSION'S RESTART is the recorded session under a pid the record does NOT name: a
+  # restart is a new process, and what shares both the recorded session and the recorded pid is the
+  # holder's own process or a sub-agent inside it, which meets the clock rows below instead
+  # (TOOL-dDerivedDocket-63, G8 H1). A pid either side leaves unexposed or `absent` names nothing.
+  restart=""
+  if [ -n "$KID" ] && [ -n "$me" ] && [ -n "$ls_sid" ] && [ "$ls_sid" != absent ] && [ "$ls_sid" = "$me" ] \
+     && ! { [ -n "${CLAUDE_PID:-}" ] && [ -n "$ls_pid" ] && [ "$ls_pid" != absent ] && [ "$ls_pid" = "$CLAUDE_PID" ]; }; then
+    restart=1
+  fi
+  # THE CLOCK. A leased record reads `check_lease_fresh`; a record with no lease reads its build
+  # folder's age against the same bound (§8 F13), and an unanswerable age is its own refusal. Read
+  # for every call but the restart with no `--replaces`, which its row answers with no clock.
+  live=0
+  if [ -n "$restart" ] && [ -z "$RS_REPLACES" ]; then
+    :
+  elif [ -n "$ls_utc" ]; then
+    check_lease_fresh "$rel"; rc=$?
+    case "$rc" in
+      0) live=1 ;;
+      1) live=0 ;;
+      *) live=1
+         echo "unattended: the lease age is UNKNOWN on this node, because a clock probe it needs answered nothing, so this lease is read as FRESH rather than as an invitation to take the slug over" ;;
+    esac
+  else
+    age=$(build_folder_age "$slug") || age=""
+    if [ -z "$age" ]; then
+      verb_status "$slug" || true
+      fail 57 "this record has no lease and the age of the newest commit touching its build folder is unanswerable on this node, so whether its holder is gone cannot be decided and a take-over here would be a guess wearing a verdict's clothes"
+      return 1
+    fi
+    [ "$age" -gt "$bound" ] || live=1
+  fi
+  # THE HOLDER REPLACES ITS OWN JOB, on a live record with or without a lease: the one block both
+  # enter, ABOVE the restart below, so `--replaces` from the recorded session is the holder's own
+  # replacement and never a take-over. A holder whose scheduler lists another job than the record
+  # names retires that one by naming it, and `write_lease` records all six facts beside the new id.
+  if [ "$live" = 1 ] && [ -n "$RS_REPLACES" ]; then
+    if [ "$RS_REPLACES" != "$ka" ]; then
+      fail 58 "--replaces names an id this slug's lease does not hold, so it would record a replacement for a job that is not the one driving this run; the lease's own id is: $ka"
+      return 1
+    fi
+    if [ -z "$KID" ]; then
+      verb_status "$slug" || true
+      fail 59 "--replaces says which job is being retired and --keepalive-id says which one takes it on, so a replacement with no new id would leave the lease naming a job that has been reaped: pass --keepalive-id"
+      return 1
+    fi
+    ok=$ka; os=$ls_sid; op=$ls_pid
+    write_lease "$rel" "$KID" || return 1
+    echo "unattended: lease replaced · keepalive $ok -> $(fact "$rel" keepalive) · session ${os:-none} -> $(fact "$rel" session) · pid ${op:-none} -> $(fact "$rel" pid)"
+    stage_or_fail "$rel" || return 1
+    echo "unattended: keepalive replaced — the run-state file now names $KID in place of $RS_REPLACES"
+    verb_status "$slug" || return 1
+    print_resume_orientation "$rel" "$p"
+    return 0
+  fi
+  # THE RESTART: the holder's process restarted — the resume tick's relaunch is
+  # `claude -p --resume <session>`, whose first turn moves the very transcript this clock reads, so
+  # no freshness test is taken here. It goes through `run_takeover`, because an unwatched relaunch is
+  # where the mandate is re-verified and interrupted acts are named. Two live processes of one session
+  # are what it refuses: the tick kills the recorded pid's tree before it launches, so its relaunch
+  # passes, and a second copy started by hand while the first still runs does not. The recorded pid
+  # is not CLAUDE_PID here, which the caller test above already holds.
+  if [ -n "$restart" ]; then
+    if [ -n "$ls_pid" ] && [ "$ls_pid" != absent ] \
+       && [ "$(check_pid_alive "$ls_pid" "$(fact "$rel" pid-image)" "$ls_utc")" = yes ]; then
+      fail 58 "this session is the one the record names, and the process the record names for it is still alive and is not this one, so a take-over here would drive one slug from two processes of one session; stop that process, or resume from it: recorded pid $ls_pid, this CLAUDE_PID ${CLAUDE_PID:-unset}"
+      return 1
+    fi
+    echo "unattended: the session this record names resumes under a new keepalive, so its process restarted and this resume TAKES THE RUN OVER in its place"
+    run_takeover "$slug" "$rel" "$KID" working "$p" || return 1
+    return 0
+  fi
+  if [ "$live" = 1 ] && [ -z "$ls_utc" ]; then
+    verb_status "$slug" || true
+    fail 59 "this record has no lease and its build folder was committed to ${age}s ago, inside the staleness bound, so a session is most likely still driving it; its holder passes the keepalive the record names, a holder whose scheduler lists another job retires it with --replaces, and everyone else waits out the bound: pass --keepalive-id, and --replaces $ka"
+    return 1
+  fi
+  if [ "$live" = 1 ]; then
+    if [ -z "$KID" ]; then
+      verb_status "$slug" || true
+      fail 59 "a live session drives this slug, and a second driver is exactly what the lease exists to stop, so this refuses before any write; a session whose own scheduler lists the job id this record's keepalive fact names says so with --keepalive-id"
+      return 1
+    fi
+    fail 58 "a live session drives this slug under a different keepalive, so this resume is a second driver rather than the holder; a holder replacing its own job says so with --replaces, and the lease's id is: $ka"
+    return 1
+  fi
+  if [ -n "$ls_utc" ]; then
+    echo "unattended: presumed-stopped — the newest move this node can see for this run is $((TC_NOW - LM_NEWEST))s old, its $LM_SOURCE, longer than the ${bound}s bound, so the session holding the lease is presumed gone and this resume TAKES IT OVER"
+  else
+    echo "unattended: presumed-stopped — this record has NO lease, so its holder either predates one or never took it, and the newest commit touching its build folder is ${age}s old against the ${bound}s bound; this resume TAKES IT OVER"
+  fi
+  run_takeover "$slug" "$rel" "$KID" working "$p" || return 1
+  return 0
+}
+
+# ========================================================== THE INHERITED-RED POLICY — TOOL-dDerivedDocket-24
+# A red the landing base already carries used to leave a run two answers, both bad: override
+# `gates-green`, which spends the one check between an unattended run and its landing, or abort. This
+# section is the third, and it is a POLICY rather than a judgment the run makes about itself.
+#
+# THE POLICY IS READ AT R AND NEVER FROM THE TREE. R is the tip `observe_anchor` saw the remote
+# advertise — never local main and never any other local ref, both of which the run can write. The
+# conf key `GATE_POLICY_FILE` is read from the project conf AS COMMITTED AT R, and the two keys
+# `INHERITED_RED=park|land` and `INHERITED_RED_MAX_AGE=<n>` from the file it names, AS COMMITTED AT R.
+# Both reads PARSE and never execute: one anchored match per key, the value's trailing comment and one
+# pair of quotes stripped. A run that commits `land` into its own copy therefore enables nothing, and
+# a run that re-points the conf key moves nothing until a gated push has landed it.
+#
+# BLANK IS `park`, AND IT SAYS SO. Absent, blank or malformed reads `park`, and so does `land` with no
+# positive age bound beside it; every one of those is announced on the policy line, because the
+# difference between the two readings is whether an inherited red lands.
+#
+# WHAT THIS DOES NOT DECIDE: whether a red is inherited. That is the runner's attribution, read here
+# from the run record of a bar whose id this driver pinned, and never re-derived.
+#
+# TWO COPIES OF THIS PARSER, BYTE-IDENTICAL, and the second is the pre-push hook's. The hook ships
+# verbatim through another kit and cannot source this one, so the parse is spelled twice; the two
+# readers of one policy must never disagree about a line, which is why neither copy may be edited
+# alone.
+read_policy_key() { # file text · key -> the LAST `<key>=` line's value, cleaned; nothing when none assigns it
+  local line v="" hit=""
+  while IFS= read -r line || [ -n "$line" ]; do
+    line=${line%$'\r'}
+    case "$line" in "$2="*) v=${line#"$2="}; hit=1 ;; esac
+  done <<< "$1"
+  [ -n "$hit" ] || return 0
+  v=${v%%[[:space:]]#*}
+  while [ "${v% }" != "$v" ] || [ "${v%$'\t'}" != "$v" ]; do v=${v%?}; done
+  while [ "${v# }" != "$v" ]; do v=${v# }; done
+  case "$v" in
+    \"*\") v=${v#\"}; v=${v%\"} ;;
+    \'*\') v=${v#\'}; v=${v%\'} ;;
+  esac
+  printf '%s' "$v"
+}
+
+GP_POLICY=park; GP_MAX_AGE=""; GP_WHY=""
+read_gate_policy() { # R -> GP_POLICY (park|land), GP_MAX_AGE (a positive integer, or empty) and GP_WHY
+  local r=$1 conf path blob pol age
+  GP_POLICY=park; GP_MAX_AGE=""; GP_WHY=""
+  if [ -z "$r" ]; then
+    GP_WHY="no advertised tip was observed, so there is no R to read a gate policy at"; return 0
+  fi
+  # THE CONF'S OWN NAME, derived from the path this driver sourced, so the file is spelled once.
+  if ! conf=$(GIT show "$r:${CONF##*/}" 2>/dev/null); then
+    GP_WHY="the project conf is absent at ${r:0:8}, so no gate policy is adopted there"; return 0
+  fi
+  path=$(read_policy_key "$conf" GATE_POLICY_FILE)
+  if [ -z "$path" ]; then
+    GP_WHY="GATE_POLICY_FILE is blank or absent in the conf at ${r:0:8}, so no gate policy is adopted"; return 0
+  fi
+  case "$path" in
+    /*|[A-Za-z]:*|..|../*|*/..|*/../*)
+      GP_WHY="GATE_POLICY_FILE at ${r:0:8} is not a repo-relative path inside the tree: $path"; return 0 ;;
+  esac
+  if ! blob=$(GIT show "$r:$path" 2>/dev/null); then
+    GP_WHY="GATE_POLICY_FILE names $path, which is absent at ${r:0:8}"; return 0
+  fi
+  pol=$(read_policy_key "$blob" INHERITED_RED)
+  age=$(read_policy_key "$blob" INHERITED_RED_MAX_AGE)
+  case "$age" in ''|0*|*[!0-9]*) age="" ;; esac
+  case "$pol" in
+    land) if [ -n "$age" ]; then
+            GP_POLICY=land; GP_MAX_AGE=$age
+            GP_WHY="INHERITED_RED=land with an age bound of $age first-parent landings, read from $path at ${r:0:8}"
+          else
+            GP_WHY="INHERITED_RED=land with no positive INHERITED_RED_MAX_AGE beside it in $path at ${r:0:8}, which reads park"
+          fi ;;
+    # UNDER `park` THE BOUND STILL TRAVELS when one is declared: the runner ages and owns each
+    # INHERITED leg with it, and the auto-filed ask names that owner. Nothing lands on it.
+    park) GP_MAX_AGE=$age; GP_WHY="INHERITED_RED=park, read from $path at ${r:0:8}" ;;
+    '')   GP_WHY="$path at ${r:0:8} declares no INHERITED_RED" ;;
+    *)    GP_WHY="INHERITED_RED is '$pol' in $path at ${r:0:8}, outside 'park land'" ;;
+  esac
+}
+
+# THE RECORD OF ONE BAR, read by the decision table `gates-green` applies to a red exit. The first
+# matching row decides, in this order:
+#
+#   the verdict reads tree_moved yes                  moved   UNMET, naming the move
+#   no usable record (see below)                      none    UNMET exactly as before this unit
+#   every red INHERITED, none aged, policy land       land    MET, a gates-inherited fact
+#   every red INHERITED, policy park or any aged      hold    UNMET, the hold line
+#   any OWN, MIXED, DEAD PROBE or CONTENDED           other   UNMET, the attribution lines
+#
+# A USABLE RECORD is a RED verdict with no wall breach and `tree_moved no`, beside an attribution
+# with one row per failed leg. A wall that fired left the legs it killed out of the attribution, so a
+# partial record is not an all-INHERITED one. An UNPROVEN age reads as aged: it never lands. "Any
+# aged" is read inside the all-INHERITED rows, so a run's own red always reaches the attribution
+# lines rather than a hold that no resume can clear.
+GR_STATE=none; GR_LEGS=""; GR_WHY=""
+read_gates_record() { # run dir · policy -> GR_STATE, GR_LEGS (the red legs, comma-joined) and GR_WHY
+  local d=$1 pol=$2 v tm fl wb n=0 inh=0 aged=0 leg ver age
+  GR_STATE=none; GR_LEGS=""; GR_WHY=""
+  if [ -z "$d" ] || [ ! -f "$d/verdict" ]; then
+    GR_WHY="the bar left no run record under the id this driver pinned"; return 0
+  fi
+  v=$(awk -F'\t' '$1=="verdict"{print $2; exit}' "$d/verdict" 2>/dev/null)
+  tm=$(awk -F'\t' '$1=="tree_moved"{print $2; exit}' "$d/verdict" 2>/dev/null)
+  fl=$(awk -F'\t' '$1=="failed"{print $2; exit}' "$d/verdict" 2>/dev/null)
+  wb=$(awk -F'\t' '$1=="wall_breach"{print $2; exit}' "$d/verdict" 2>/dev/null)
+  if [ "$tm" = yes ]; then
+    GR_STATE=moved
+    GR_WHY="the bar's verdict reads tree_moved yes: the tree moved while it ran, so no verdict describes the commit being closed, whatever its attribution says"
+    return 0
+  fi
+  if [ "$v" != RED ] || [ "$tm" != no ] || [ -n "$wb" ] || [ ! -f "$d/attribution" ]; then
+    GR_WHY="the bar's record is not a RED verdict on an unmoved tree beside an attribution record"; return 0
+  fi
+  while IFS=$'\t' read -r leg ver _ _ _ age _; do
+    [ -n "$leg" ] || continue
+    n=$((n + 1)); GR_LEGS="$GR_LEGS${GR_LEGS:+,}$leg"
+    [ "$ver" = INHERITED ] || continue
+    inh=$((inh + 1))
+    case "$age" in ''|-|*[!0-9]*) aged=$((aged + 1)) ;; esac
+  done < "$d/attribution"
+  if [ "$n" = 0 ] || [ "$n" != "${fl:-}" ]; then
+    GR_WHY="the attribution names $n red leg(s) and the verdict counts ${fl:-none} failed"; return 0
+  fi
+  if [ "$inh" != "$n" ]; then
+    GR_STATE=other; GR_WHY="a red leg reads OWN, MIXED, DEAD PROBE or CONTENDED, so this red is the run's to fix"; return 0
+  fi
+  if [ "$pol" = land ] && [ "$aged" = 0 ]; then GR_STATE=land; return 0; fi
+  GR_STATE=hold
+  [ "$aged" -gt 0 ] && GR_WHY="$aged INHERITED leg(s) read aged or unproven past the age bound, which never lands"
+  return 0
+}
+
+# ---- THE BAR'S BACKSTOP - TOOL-dDerivedDocket-27 S2 and S4.
+# THE BAR'S BOUND IS WALL + QUEUE + MARGIN, never GATE_BOUND alone. The runner arms its wall at the
+# first dispatch, AFTER the turnstile queue, and the queue fails open at its own bound, so the
+# longest a HEALTHY bar can take is queue plus wall; the margin covers what follows a wall that
+# fired. A backstop that fires therefore means the runner outlived its own wall - a wedge, never a
+# slow leg - and that holds only because the red attribution runs inside the wall.
+#
+# THE PROFILE IS A DECLARED COMMAND, run under GATE_BOUND like every other one. Probing
+# `$GATE_CMD --print-profile` would guess that the declared gate is this runner, and an adopter's
+# gate that ignores its arguments would start a whole bar at preflight. Blank means NO profile: the
+# bar stays at GATE_BOUND, announced, which is where every adopter starts. A profile that answers
+# without a usable `wall` or `queue` falls back the same way and names the key it lacked, because a
+# sum over a missing term bounds the bar at the margin alone and kills a healthy one.
+#
+# ONE CALL SERVES BOTH QUESTIONS. GB_CMP carries `check_gate_wall`'s verdict on the same answer, so
+# `--preflight` compares the wall with the largest leg ceiling without running the profile twice.
+GB_SUM=""; GB_WALL=""; GB_QUEUE=""; GB_MARGIN=""; GB_WHY=""; GB_CMP=2
+derive_gate_backstop() { # -> 0 with GB_SUM and its three terms, or 1 with GB_WHY; GB_CMP and GW_WHY either way
+  local _db_rc _db_miss=""
+  GB_SUM=""; GB_WALL=""; GB_QUEUE=""; GB_MARGIN=""; GB_WHY=""; GB_CMP=2; GW_WHY=""
+  if [ -z "$GATE_PROFILE_CMD" ]; then
+    GB_WHY="this project declares no GATE_PROFILE_CMD, so the bar has no profile to size a backstop from"
+    GW_WHY="this project declares no GATE_PROFILE_CMD, so the wall cannot be compared with the largest leg ceiling"
+    return 1
+  fi
+  # shellcheck disable=SC2086
+  run_bounded $GATE_PROFILE_CMD; _db_rc=$?
+  if [ "$_db_rc" != 0 ]; then
+    GB_WHY="the declared GATE_PROFILE_CMD exited $_db_rc after ${RB_TOOK}s, so it gave no profile to size a backstop from: $GATE_PROFILE_CMD"
+    GW_WHY="the declared GATE_PROFILE_CMD exited $_db_rc, so the wall cannot be compared with the largest leg ceiling"
+    return 1
+  fi
+  parse_gate_profile "$RB_STDOUT"
+  check_gate_wall "$GATE_WALL"; GB_CMP=$?
+  [ -n "$GPF_WALL" ] || _db_miss="no usable wall"
+  [ -n "$GPF_QUEUE" ] || _db_miss="${_db_miss:+$_db_miss and }no usable queue"
+  if [ -n "$_db_miss" ]; then
+    GB_WHY="the declared GATE_PROFILE_CMD printed $_db_miss, so a backstop summed over it would bound the bar at the margin alone: $GATE_PROFILE_CMD"
+    return 1
+  fi
+  GB_WALL=${GATE_WALL:-$GPF_WALL}; GB_QUEUE=$GPF_QUEUE; GB_MARGIN=$GATE_BACKSTOP_MARGIN
+  GB_SUM=$(( GB_WALL + GB_QUEUE + GB_MARGIN ))
+  return 0
+}
+
+# THE PINNED BACKSTOP, READ BACK. The fact reads `<sum> (wall <w> + queue <q> + margin <m>)`, the one
+# shape `--preflight` writes, and its sum must equal its terms: a value in any other shape, or a sum a
+# hand edited, is not a backstop, and the caller recomputes rather than bounding the bar by a number
+# it cannot account for.
+parse_gate_backstop() { # the gate-backstop fact's value -> 0 with GB_SUM, GB_WALL, GB_QUEUE and GB_MARGIN, or 1
+  local _rg_v=$1 _rg_re='^([0-9]+) \(wall ([0-9]+) \+ queue ([0-9]+) \+ margin ([0-9]+)\)$'
+  GB_SUM=""; GB_WALL=""; GB_QUEUE=""; GB_MARGIN=""
+  [[ $_rg_v =~ $_rg_re ]] || return 1
+  [ "$(( 10#${BASH_REMATCH[1]} ))" = "$(( 10#${BASH_REMATCH[2]} + 10#${BASH_REMATCH[3]} + 10#${BASH_REMATCH[4]} ))" ] || return 1
+  [ "$(( 10#${BASH_REMATCH[1]} ))" -gt 0 ] || return 1
+  GB_SUM=$(( 10#${BASH_REMATCH[1]} )); GB_WALL=$(( 10#${BASH_REMATCH[2]} ))
+  GB_QUEUE=$(( 10#${BASH_REMATCH[3]} )); GB_MARGIN=$(( 10#${BASH_REMATCH[4]} ))
+  return 0
+}
+
+# ONE SPELLING OF THE BOUND LINE, printed at `--preflight` and at every `gates-green`, with all three
+# terms, so the sum re-derives in front of whoever reads it.
+print_gate_backstop() { # where the bound came from -> the line, from GB_SUM and its terms
+  echo "unattended: the merge bar is bounded at ${GB_SUM}s — wall $GB_WALL + queue $GB_QUEUE + margin $GB_MARGIN ($1)"
+}
+
+# ---- THE AUTO-FILE, DARK UNTIL `ASKS_CMD` IS DECLARED. S10.
+# Every INHERITED leg gets an OWNER ON THE RECORD: one ask in the build's own `BACKLOG.md`, a SEV row
+# and a KEEP row, in the grammar the memory-tree kit's parser reads. This driver is shell and has no
+# declared route to that kit's Python renderers, so it writes the rows in their grammar and has the
+# parser, reached through `ASKS_CMD` in call shape 1 with no `--at` (the rows are staged and exist at
+# no rev), read each new id back. One `ask` row, status OPEN, SEV HIGH and this slug as its home is
+# the only acceptance; anything else REMOVES the rows and prints the witness, so a grammar drift
+# between this writer and that parser is caught at write time rather than by the next reader.
+#
+# REUSED BEFORE IT IS FILED. An ask this build already filed for the SAME leg red at the SAME R, read
+# back OPEN, is named and nothing is written: each resume of a held run reruns this item over the same
+# inherited red, and a second HIGH ask per hold is noise an owner has to dispose of. The match needs R
+# as well as the leg, because the ask's `seen` locator and `run` command pin R.
+#
+# STAGED, NEVER COMMITTED: no driver verb commits. On the MET path the rows ride the close's records
+# commit; on a path that prints a `hold ·` line the Skill's Close sequence commits them before `--hold`.
+# With `ASKS_CMD` blank the rows are PRINTED and nothing is written, so the auto-file cannot arm itself
+# before the project adopts the ask contract.
+read_leg_argv() { # run dir · R · leg name -> that leg's argv in R's manifest, space-joined; rc 1 unreadable
+  local d=$1 r=$2 m rel py
+  m=$(awk -F'\t' '$1=="manifest"{print $2; exit}' "$d/header" 2>/dev/null)
+  [ -n "$m" ] || return 1
+  rel=$(GIT ls-files --full-name -- "$m" 2>/dev/null | head -1)
+  [ -n "$rel" ] || return 1
+  py=$(resolve_python 2>/dev/null) || return 1
+  GIT show "$r:$rel" 2>/dev/null | RLA_LEG="$3" "$py" -c '
+import json, os, sys
+try:
+    data = json.load(sys.stdin)
+except Exception:
+    sys.exit(1)
+for row in (data if isinstance(data, list) else []):
+    if isinstance(row, dict) and row.get("name") == os.environ["RLA_LEG"]:
+        argv = [str(a) for a in (row.get("argv") or [])]
+        if not argv:
+            sys.exit(1)
+        sys.stdout.write(" ".join(argv))
+        sys.exit(0)
+sys.exit(1)
+'
+}
+
+derive_ask_seq() { # family · slug -> one past the highest <family>-<slug>-<n> in the tracked and working trees
+  local f=$1 s=$2 hi=0 v
+  while IFS= read -r v; do
+    v=${v##*-}
+    case "$v" in ''|*[!0-9]*) continue ;; esac
+    [ "$((10#$v))" -gt "$hi" ] && hi=$((10#$v))
+  done < <( { GIT grep -h -o -w -I -E --untracked "$f-$s-[0-9]+" 2>/dev/null
+              GIT grep -h -o -w -I -E "$f-$s-[0-9]+" HEAD 2>/dev/null; } )
+  printf '%s' "$((hi + 1))"
+}
+
+write_backlog_rows() { # BACKLOG.md path · slug · ask row · SEV row · KEEP row
+  local f=$1 tmp
+  tmp=$(mktemp) || return 1
+  if [ ! -f "$f" ]; then
+    printf '# %s — asks\n\n## Asks\n%s\n\n## Dispositions\n%s\n%s\n' "$2" "$3" "$4" "$5" > "$tmp"
+  else
+    WBR_A="$3" WBR_S="$4" WBR_K="$5" awk '
+      { l = $0; sub(/\r$/, "", l); line[++n] = l }
+      END {
+        a = ENVIRON["WBR_A"]; s = ENVIRON["WBR_S"]; k = ENVIRON["WBR_K"]
+        for (i = 1; i <= n; i++) {
+          if (line[i] == "## Asks" && !ai) ai = i
+          if (line[i] == "## Dispositions" && !di) di = i
+        }
+        if (ai) { stop = di > ai ? di : n + 1; at = ai
+                  for (i = ai + 1; i < stop; i++) if (line[i] ~ /[^ \t]/) at = i }
+        if (di) { dl = di; for (i = di + 1; i <= n; i++) if (line[i] ~ /[^ \t]/) dl = i }
+        for (i = 1; i <= n; i++) {
+          if (!ai && di && i == di) { print "## Asks"; print a; print "" }
+          print line[i]
+          if (ai && i == at) print a
+          if (di && i == dl) { print s; print k }
+        }
+        if (!ai && !di) { print ""; print "## Asks"; print a; print ""; print "## Dispositions"; print s; print k }
+        else if (!di)   { print ""; print "## Dispositions"; print s; print k }
+      }' "$f" > "$tmp"
+  fi
+  mv "$tmp" "$f"
+}
+
+read_ask_back() { # ask id · slug -> 0 when ASKS_CMD reads it back as ONE OPEN HIGH ask homed at slug; AB_WHY
+  local id=$1 slug=$2 rc rows n
+  AB_WHY=""
+  run_bounded $ASKS_CMD --tsv --ready "$id" --target "$slug"; rc=$?
+  if [ -z "$RB_STDOUT" ]; then AB_WHY=$(derive_stream_verdict "$rc"); return 1; fi
+  if [ "$rc" != 0 ]; then AB_WHY="the declared ask generator exited $rc after ${RB_TOOK}s"; return 1; fi
+  rows=$(printf '%s\n' "$RB_STDOUT" \
+    | ASK_HEAD="$ASK_TSV_HEAD" ASK_EX="$ASK_TSV_EXAMINED" ASK_N="$ASK_TSV_FIELDS" awk -F'\t' '
+        BEGIN { h = ENVIRON["ASK_HEAD"]; ex = ENVIRON["ASK_EX"]; want = ENVIRON["ASK_N"] + 0 }
+        $0 == "" || $1 == ex { next }
+        $1 == h && NF == want { print $2 "\t" $3 "\t" $5 "\t" $6; next }
+        { print "BAD\t" $0 }')
+  n=$(printf '%s\n' "$rows" | awk 'NF' | wc -l | tr -d ' ')
+  if [ "$n" != 1 ]; then AB_WHY="the declared ask generator returned $n row(s) for $id, and one is the only answer"; return 1; fi
+  case "$rows" in
+    "$id	OPEN	$slug	HIGH") return 0 ;;
+  esac
+  AB_WHY="the declared ask generator read $id back as: $rows"
+  return 1
+}
+
+write_inherited_asks() { # slug · R · run dir
+  local slug=$1 r=$2 d=$3 bl leg ver age own8 ownid cand reused fam seq id argv file tok a s k prior had restored
+  local r8=${2:0:8} today
+  bl="$M/builds/$slug/BACKLOG.md"
+  today=$(date -u +%Y-%m-%d)
+  [ -f "$d/attribution" ] || return 0
+  while IFS=$'\t' read -r leg ver _ _ _ age own8 ownid _; do
+    [ "$ver" = INHERITED ] || continue
+    # REUSE FIRST, over this build's own filings for the same leg AND the same R.
+    reused=""
+    if [ -f "$bl" ] && [ -n "${ASKS_CMD:-}" ]; then
+      while IFS= read -r cand; do
+        [ -n "$cand" ] || continue
+        if read_ask_back "$cand" "$slug"; then
+          echo "gates-green: ask $cand already OPEN for leg $leg at $r8 · reused"; reused=1; break
+        fi
+      done < <(grep -F -- "inherited red: leg $leg red at $r8," "$bl" 2>/dev/null \
+                 | awk '/^- [A-Z][A-Z]*-[A-Za-z0-9]+-[0-9]+ · filed / { v = $2; print v }')
+    fi
+    [ -z "$reused" ] || continue
+    # THE ID, minted under this run's slug: the owner id's family when the age probe named one, else
+    # the first family of the build README's roster.
+    fam=""
+    case "$ownid" in [A-Z]*-*) fam=${ownid%%-*} ;; esac
+    if [ -z "$fam" ]; then
+      fam=$(awk 'NR == 1 { next } /^---/ { exit } /^roster:/ { v = $0; sub(/^roster:[[:space:]]*/, "", v); print v; exit }' \
+              "$(readme_of "$slug")" 2>/dev/null | tr '+, ' '\n\n\n' | grep -m1 -E '^[A-Z]+$')
+    fi
+    if [ -z "$fam" ]; then
+      echo "gates-green: no ask filed for leg $leg — the build README names no roster family and the age probe named no owner id, so there is no family to mint the id in"
+      continue
+    fi
+    if ! argv=$(read_leg_argv "$d" "$r" "$leg") || [ -z "$argv" ]; then
+      echo "gates-green: no ask filed for leg $leg — its argv at $r8 could not be read from the manifest the bar's header names, so the ask would carry no runnable command"
+      continue
+    fi
+    file=""
+    for tok in ${argv#* }; do case "$tok" in -*) ;; *) file=$tok; break ;; esac; done
+    [ -n "$file" ] || file=${argv%% *}
+    seq=$(derive_ask_seq "$fam" "$slug")
+    id="$fam-$slug-$seq"
+    if [ "$own8" != - ] && [ -n "$own8" ]; then
+      a="- $id · filed $today · inherited red: leg $leg red at $r8, introduced by $own8 · seen \`$file\`@$r8 run \`$argv\` · accept the leg is green at the default branch's tip → $own8"
+    else
+      a="- $id · filed $today · inherited red: leg $leg red at $r8, introduced by an unknown landing · seen \`$file\`@$r8 run \`$argv\` · accept the leg is green at the default branch's tip"
+    fi
+    s="- SEV · $id · HIGH · a merge-bar leg is red on the default branch"
+    k="- KEEP · $id · filed by an unattended run for the owning build; outside this build's goal"
+    if [ -z "${ASKS_CMD:-}" ]; then
+      echo "gates-green: ASKS_CMD is blank, so the auto-file is DARK and writes nothing; it would have filed, in $bl:"
+      printf '    %s\n' "$a" "$s" "$k"
+      continue
+    fi
+    # THE BACKUP IS THE ROLLBACK'S PRECONDITION, so it is PROVEN before the file is touched, and a
+    # file that cannot be backed up is not written at all (closing diff review of dDerivedDocket,
+    # F4). This used to set `had=1` before the backup existed and never look again: under a temp store
+    # that failed after the bar ran, `mktemp` left `prior` empty, the restore guard read false, and
+    # the rollback's other arm DELETED a BACKLOG.md that existed before the write and staged the
+    # deletion into the close's records commit. A `cp` that failed or stopped short left a backup the
+    # restore then copied over the file. `cmp` is the proof: a backup that is not byte for byte the
+    # file is not a backup.
+    had=0; prior=""
+    if [ -f "$bl" ]; then
+      had=1
+      if ! prior=$(mktemp) || ! cp -- "$bl" "$prior" || ! cmp -s "$bl" "$prior"; then
+        [ -z "$prior" ] || rm -f -- "$prior"
+        echo "gates-green: no ask filed for leg $leg — $bl could not be backed up before the write, so a rollback could not put it back, and it is left exactly as it was"
+        continue
+      fi
+    fi
+    mkdir -p "${bl%/*}" && write_backlog_rows "$bl" "$slug" "$a" "$s" "$k" && GIT add -- "$bl" 2>/dev/null
+    if read_ask_back "$id" "$slug"; then
+      echo "gates-green: filed ask $id for leg $leg red at $r8, staged in $bl"
+    else
+      # REMOVED, and the file put back exactly as it was: a row the parser cannot read back is a row
+      # every later reader would read differently from this writer. A path that EXISTED before the
+      # write is only ever restored from its proven backup and never removed; a restore that fails
+      # KEEPS the backup and names it, because deleting the one good copy is the step to refuse.
+      restored=1
+      if [ "$had" = 1 ]; then
+        if cp -- "$prior" "$bl"; then GIT add -- "$bl" 2>/dev/null; else restored=0; fi
+      else GIT rm -q --cached -f -- "$bl" >/dev/null 2>&1; rm -f -- "$bl"; fi
+      if [ "$restored" = 1 ]; then
+        echo "gates-green: the rows for leg $leg were REMOVED — the declared ask generator did not read $id back as one OPEN HIGH ask homed at $slug: $AB_WHY"
+      else
+        echo "gates-green: the rows for leg $leg could NOT be removed — $bl was not put back from its backup, which is KEPT at $prior; restore it by hand before committing. The declared ask generator did not read $id back as one OPEN HIGH ask homed at $slug: $AB_WHY"
+        prior=""
+      fi
+      [ -z "${RB_OUT:-}" ] || printf '%s\n' "$RB_OUT" | sed 's/^/    /'
+    fi
+    [ -z "$prior" ] || rm -f -- "$prior"
+  done < "$d/attribution"
+}
+
+# ---- S7: THE TWO ESCAPE ROUTES, BACKED BY THE ATTRIBUTION OR REFUSED.
+# `--close --override gates-green` and `--abort --code gate-red-out-of-scope` are the two ways a run
+# can say "that red is not mine" without the bar agreeing. Both are refused unless the attribution
+# record the `gates-run` fact names reads EVERY red leg INHERITED, and it counts only when its header
+# shows `head` equal to HEAD and `tree_clean yes` and its verdict shows `tree_moved no`. An override
+# runs no bar — the item is skipped — so the record is always an EARLIER one, and those three fields
+# are what tie it to the tree being closed: an all-INHERITED record from before the run committed its
+# own red, from a dirty tree, or from a bar whose tree moved describes some other tree.
+#
+# WHAT IT DOES NOT BUY, said here because a structural check reads as a semantic one. The fact lives
+# in the run's own record and the run record under the git dir, and the run writes both under its own
+# uid, so a run set on forging them can plant an all-INHERITED record and point the fact at it. What
+# this closes is the SENTENCE — "not mine", asserted with nothing behind it — and what remains is a
+# forgery, the limit protocol section 9 states for every check that runs beside the thing it grades.
+check_inherited_override() { # run-state file · the verb as the refusal names it -> 0 when admitted
+  local rel=$1 verb=$2 f id gd head d hh htc tm why="" n=0 leg ver
+  f=$(fact "$rel" gates-run); id=${f%% *}
+  # The git dir comes off the sidecar root's ONE derivation in the library (check 32), never a
+  # second spelling of it here.
+  gd=$(resolve_sidecar_dir) && gd=${gd%/unattended} || gd=""; head=$(GIT rev-parse HEAD 2>/dev/null)
+  d="$gd/gate-run/$id"
+  if [ -z "$f" ]; then
+    why="no gates-run fact in this record names a bar"
+  elif [ -z "$gd" ] || [ ! -f "$d/header" ]; then
+    why="the bar the gates-run fact names, $id, left no run record header in this clone"
+  else
+    hh=$(awk -F'\t' '$1=="head"{print $2; exit}' "$d/header" 2>/dev/null)
+    htc=$(awk -F'\t' '$1=="tree_clean"{print $2; exit}' "$d/header" 2>/dev/null)
+    tm=$(awk -F'\t' '$1=="tree_moved"{print $2; exit}' "$d/verdict" 2>/dev/null)
+    if [ "$hh" != "$head" ]; then
+      why="the bar it names ran at ${hh:0:8} and HEAD is now ${head:0:8}, so its record describes another commit"
+    elif [ "$htc" != yes ]; then
+      why="the bar it names ran on a tree whose header reads tree_clean ${htc:-none}, so its record may grade edits HEAD does not carry"
+    elif [ "$tm" != no ]; then
+      why="the bar it names reads tree_moved ${tm:-none}, so no verdict describes the tree it graded"
+    elif [ ! -f "$d/attribution" ]; then
+      why="the bar it names wrote no attribution record, so no red leg is shown to be inherited"
+    else
+      while IFS=$'\t' read -r leg ver _; do
+        [ -n "$leg" ] || continue
+        n=$((n + 1))
+        [ "$ver" = INHERITED ] || { why="its attribution reads $leg $ver"; break; }
+      done < "$d/attribution"
+      [ -n "$why" ] || [ "$n" -gt 0 ] || why="its attribution record names no red leg"
     fi
   fi
-  return 0
+  [ -z "$why" ] && return 0
+  fail 83 "$verb is refused unless the attribution record of the last gates-green bar reads every red leg INHERITED on the tree being closed, so gates-green must run on HEAD first; the condition that failed: $why"
+  return 1
 }
 
 # TOOL-cBriefedPilot-1 - EVERY accumulated override is validated, skipped and parked, not just the
@@ -3628,9 +6995,124 @@ is_overridden() { # item -> 0 when it appears in OV_ITEMS
   return 1
 }
 
+# TOOL-dDerivedDocket-3 S3 - WHAT THE BAR IS ALLOWED TO GRADE UNDER `in-place`. Two preconditions,
+# both REFUSALS and neither an unmet item, for the reason GG_HARD's comment gives.
+#
+# THE TREE FIRST, and in `git status --porcelain`'s FULL sense with untracked files included.
+# The run-gates kit's `run-gates.sh` writes its full-green stamp only over an EMPTY porcelain listing
+# (its `TREE_CLEAN` term, beside the at-a-rev fingerprint the push later reproduces), while
+# `--prepare`'s own cleanliness check passes `-uno`. A tree carrying nothing but an untracked file
+# therefore prepares cleanly, greens the bar and stamps NOTHING - and the push then pays a second
+# full bar or scopes against an older stamp, which is the whole saving this mode exists for. The
+# cheaper check runs first because it needs no lander and no network.
+#
+# THEN THE MERGE, asked of the lander rather than re-derived here. Two spellings of one predicate
+# disagree, and the lander is where the landing happens.
+check_inplace_preconditions() { # slug -> 0 when the bar may run over a prepared merge in a clean tree
+  local _rc
+  if [ -n "$(GIT status --porcelain 2>/dev/null)" ]; then
+    fail 62 "the working tree is not clean in the full porcelain sense, untracked files included, and the bar writes its full-green stamp only over an empty listing - so a green run here would stamp nothing and the push would pay a second full bar or scope against an older stamp; commit or remove what the listing names, then close again"
+    GIT status --porcelain 2>/dev/null | sed 's/^/    /'
+    return 1
+  fi
+  run_lander --prepared "$1"; _rc=$?
+  case "$_rc" in
+    0) return 0 ;;
+    1) fail 63 "HEAD carries no prepared merge, so the bar would grade this branch and never the merge the push publishes - which is the one thing this landing mode exists to stop; make it first with: $LANDER --prepare --slug $1" ;;
+    2) fail 64 "the declared lander refused the read-only flag this precondition asks it, as an argument it does not implement, so LANDER_MODE names a landing shape this lander cannot perform: $LANDER" ;;
+    *) fail 65 "the declared lander could not observe whether HEAD carries the merge this landing would publish, and that is the remote or the clone rather than anything on this branch; the run holds on the outage instead of remaking a merge that would meet the same failure: $LANDER" ;;
+  esac
+  [ -z "$RB_OUT" ] || printf '%s\n' "$RB_OUT" | sed 's/^/    /'
+  return 1
+}
+
+# S3 - THE SELF-TEST TERM IS DERIVED, AND WHAT THE DERIVATION PRODUCES IS AN ANNOUNCEMENT.
+# `AGENTS.md` records `GATE_SELFTESTS=1` as ON DEMAND ONLY with no boundary setting it (owner,
+# 2026-08-27), and a landing's `gates-green` IS a boundary, since its stamp is the one the push
+# reuses. So this verb ADDS the flag to nothing and REMOVES it from nothing: an owner who runs the
+# close with it already exported keeps it by inheritance, which is exactly the on-demand use that
+# ruling sanctions. What the derivation buys is that nobody has to REMEMBER the run is owed.
+print_selftests_owed() { # -> announces when the landing range owes the flagged bar
+  local _p _q _hit="" _touched
+  # BLANK IS NEVER, AND IT SAYS SO. A skip that looks like a pass is indistinguishable from
+  # coverage, and this one silently un-owes a whole Definition-of-Done clause.
+  if [ -z "$SELFTESTS_OWED_PATHS" ]; then
+    echo "unattended: close - SELFTESTS_OWED_PATHS is blank, so no landing range can ever owe the flagged bar here and this close will never announce one; the charter's 'owed by a DoD only for KIT work' then has no declared kit surface to be read against."
+    return 0
+  fi
+  # THE LANDING RANGE, which is what the push publishes and not what the branch contains: the
+  # prepared merge's FIRST parent is the tip the remote advertised, so this is the delta the default
+  # branch actually gains.
+  _touched=$(GIT diff --name-only HEAD^1 HEAD 2>/dev/null)
+  while IFS= read -r _p; do
+    [ -n "$_p" ] || continue
+    for _q in $SELFTESTS_OWED_PATHS; do
+      case "$_p" in
+        "$_q"*) case " $_hit " in *" $_q "*) ;; *) _hit="$_hit $_q" ;; esac ;;
+      esac
+    done
+  done < <(printf '%s
+' "$_touched")
+  [ -n "$_hit" ] || return 0
+  echo "unattended: close - the landing range HEAD^1..HEAD touches a declared self-test surface (${_hit# }), so the kit Definition of Done owes the flagged bar. This close does NOT run it and does NOT set the flag, which the charter reserves to a person: run it BY HAND at VERIFYING as 'GATE_FULL=1 GATE_SELFTESTS=1 $GATE_CMD' and name the command you ran in the run's record."
+}
+
+# S4 - THE CARRY CHECK, ASKED BEFORE ANY WRITE. A landing that would publish another build's
+# unpushed commits is refused while the record still reads what it read before the close, so there
+# is no LANDING record left behind that cannot land. The list is the LANDER's, quoted rather than
+# re-derived, for `check_inplace_preconditions`'s reason.
+check_landing_carry() { # slug -> 0 when this landing publishes nothing foreign
+  local _rc
+  run_lander --carry "$1"; _rc=$?
+  case "$_rc" in
+    0) return 0 ;;
+    1) fail 66 "the landing this close would authorize publishes a commit that belongs to another build, which rode in through the local default branch; the lander's own list follows and nothing was written" ;;
+    2) fail 67 "the declared lander refused the carry flag as an argument it does not implement, so LANDER_MODE names a landing shape this lander cannot perform and nothing was written: $LANDER" ;;
+    *) fail 68 "the declared lander could not observe what this landing would publish, which is the remote or the clone, so the close cannot say whether the set is clean and refuses rather than guessing; nothing was written: $LANDER" ;;
+  esac
+  [ -z "$RB_OUT" ] || printf '%s\n' "$RB_OUT" | sed 's/^/    /'
+  return 1
+}
+
+# S5 - THE CLOSE COMMITS ITS OWN RECORD, under `in-place` and only there. TOOL-dUnstalledConvoy-24
+# is the defect this closes: a LANDING evaluated in one tree has to TRAVEL, and a staged-but-
+# uncommitted phase carries the OLDER phase into any merge. Under `in-place` there is no other tree
+# and no merge left to make - the graded merge is already HEAD - so the record can simply land on
+# top of it, and the push boundary's scoped bar covers that records-only delta because the
+# full-green stamp at the prepared merge sits in the same git dir.
+#
+# NOTHING STAGED IS NOT A FAILURE (F5). A re-close over a record already at LANDING - which is what
+# a re-prepare after a red push produces - writes the same bytes, so an unconditional commit would
+# refuse on an empty commit AFTER a full bar had already been paid, and both documented re-prepare
+# paths would wedge. The verb reports the commit that last changed the record and exits 0.
+#
+# THE SUBJECT NAMES THE SLUG AND NO UNIT ID, so `build_commit` never takes this for a unit's build
+# commit and no verdict derived from that join moves.
+write_close_commit() { # slug · run-state file
+  local _c
+  if GIT diff --cached --quiet -- "$2" 2>/dev/null; then
+    _c=$(GIT log -1 --format=%h -- "$2" 2>/dev/null)
+    echo "unattended: close OK - every declared DoD item met; the record already reads LANDING and this close changed no byte of it, so nothing was committed. The close record is already committed at ${_c:-an earlier commit}. Land the prepared merge with: $LANDER --land --slug $1"
+    return 0
+  fi
+  # BOUNDED like every other command this driver runs that is not git plumbing: the pre-commit hook
+  # is a gate leg in some adopters and takes minutes. NEVER with the declared bypass flag - the
+  # gate greps this path for it, and a close that bypassed its own hooks would be the run certifying
+  # its own record.
+  if ! run_bounded git -c "$GIT_PIN_REPLACE" -c "$GIT_PIN_GRAFTADV" commit -q -m "records($1): close — LANDING"; then
+    fail 69 "the close evaluated the whole Definition of Done and then could not commit its own record, so the phase is written and staged but does not travel; the commit's own output follows"
+    [ -z "$RB_OUT" ] || printf '%s\n' "$RB_OUT" | sed 's/^/    /'
+    return 1
+  fi
+  _c=$(GIT rev-parse --short HEAD 2>/dev/null)
+  echo "unattended: close OK — every declared DoD item met; phase LANDING, committed at ${_c:-HEAD} on top of the graded merge. Land it with: $LANDER --land --slug $1"
+  return 0
+}
+
 verb_close() { # slug   (override pairs arrive in OV_ITEMS / OV_REASONS)
   local slug="$1" rel item ck unmet=0 i=0 n ov reason _why
   n=${#OV_ITEMS[@]}
+  GG_RUN_FACT=""; GG_INH_FACT=""
   check_slug "$slug" || return 1
   # THE FREE REFUSALS COME FIRST, and the ordering is the point rather than tidiness. This function
   # used to open with a network round-trip and only then discover that the record was already
@@ -3642,6 +7124,16 @@ verb_close() { # slug   (override pairs arrive in OV_ITEMS / OV_REASONS)
   rel=$(runmd_of "$slug")
   [ -f "$rel" ] || { fail 10 "no run-state file, so there is no run to close: $rel"; return 1; }
   refuse_if_terminal "$rel" --close || return 1
+  # THE BAR KEEPS THE LEASE FRESH BY ITS GATE LOGS. --close runs the whole bar through `run_bounded`
+  # before its own write gate; each leg that finishes writes a log under this worktree's git dir,
+  # which `derive_last_move` reads, so nothing here writes a refresh (TOOL-dDerivedDocket-61).
+  # S9 - HELD BLOCKS --close. LANDING is the record that the Definition-of-Done set was evaluated,
+  # and a run that paused on a cause outside itself has not finished the work that set is about.
+  read_derived_phase "$rel"
+  if [ "$DP_PHASE" = HELD ]; then
+    fail 82 "the run is HELD, so the Definition-of-Done set would be evaluated against a run that stopped part-way for a cause outside itself; --resume it first, and close it when the work it paused in the middle of is done"
+    return 1
+  fi
   # The SAME observation preflight made, made again here rather than read back from the record the
   # run wrote. Its refusals are not fatal to --close: authorization-reachable simply cannot be met without
   # an anchor, which is the honest outcome and is not overridable.
@@ -3697,6 +7189,17 @@ verb_close() { # slug   (override pairs arrive in OV_ITEMS / OV_REASONS)
     esac
     i=$((i + 1))
   done
+  # TOOL-dDerivedDocket-24 S7 - AN OVERRIDE ON `gates-green` IS BACKED BY THE ATTRIBUTION OR REFUSED,
+  # after every pair has been validated, so a malformed pair still reports as itself. The override
+  # recorded at aStagedLane's close - a red declared "not this build's" by a stash-and-rerun nobody
+  # else could see - is the path this closes: the claim now has to be the bar's own reading.
+  if is_overridden gates-green; then
+    check_inherited_override "$rel" "--close --override gates-green" || return 1
+  fi
+  # TOOL-dDerivedDocket-5 - S9, the sibling of --abort's line. Printed BEFORE the set is evaluated,
+  # because the agent-attested `keepalive-reaped` item is read back from the record and the list is
+  # what the attestation is made over.
+  print_reap_targets "$rel" "$slug"
   for item in $(dod); do
     item=${item%%:*}; ck=$(checker_of "$item")
     is_overridden "$item" && continue
@@ -3704,7 +7207,16 @@ verb_close() { # slug   (override pairs arrive in OV_ITEMS / OV_REASONS)
     # item that says nothing would otherwise inherit whatever the previous item left behind and
     # attribute one item's explanation to another.
     DOD_OUT=""
+    GG_HARD=""
     if ! dod_met "$slug" "$rel" "$item" "$ck"; then
+      # TOOL-dDerivedDocket-3 - A NUMBERED REFUSAL ENDS THE VERB, and is never counted as an unmet
+      # item. An unmet item invites `--override`, and the preconditions that set this flag are what
+      # keep an UNGRADED merge from landing: overriding one would land exactly that. The refusal has
+      # already printed itself; this says only that nothing was written.
+      if [ -n "$GG_HARD" ]; then
+        echo "unattended: --close refused; the run-state file is unchanged"
+        return 1
+      fi
       unmet=$((unmet + 1))
       if [ "$ck" = agent ]; then
         # TOOL-aBoundedVerdict-12 S5 - the RECORD KEY, not only the item. `parked-decisions-surfaced`
@@ -3760,6 +7272,24 @@ verb_close() { # slug   (override pairs arrive in OV_ITEMS / OV_REASONS)
     fi
   done
   [ "$unmet" = 0 ] || return 1
+  # TOOL-dDerivedDocket-3 S4 - AFTER the Definition of Done evaluates and BEFORE any write. The
+  # override parks below are writes, so a carry refusal placed after them would leave a record
+  # carrying overrides for a landing that cannot happen. Under `primary` this does not run at all.
+  if [ "$LANDER_MODE" = in-place ]; then
+    check_landing_carry "$slug" || return 1
+    # TOOL-dDerivedDocket-22 S6 - UNDER `in-place` THE FREEZE IS WRITTEN HERE, beside LANDING, in the
+    # record this verb commits. `--landed` is an observation in this mode and writes nothing to the
+    # tree, so a freeze left there would never reach the record the push carries. Derived BEFORE any
+    # write, for `--landed`'s own ordering reason: a witness that cannot answer refuses while the
+    # record still reads what it read before the close.
+    if ! derive_ask_freeze "$slug" "$(GIT rev-parse HEAD 2>/dev/null)"; then
+      fail 77 "this run's asks cannot be read at the merge it is closing on, so the LANDING record the push carries would freeze no answer to the question it was authorized by, and under in-place landing no later verb writes that freeze; nothing was written: $AW_WHY"
+      return 1
+    fi
+  fi
+  # TOOL-dDerivedDocket-24 - THE BAR'S FACTS, with the close's other writes and after the carry check.
+  if [ -n "$GG_RUN_FACT" ]; then set_fact "$rel" gates-run "$GG_RUN_FACT" || return 1; fi
+  if [ -n "$GG_INH_FACT" ]; then set_fact "$rel" gates-inherited "$GG_INH_FACT" || return 1; fi
   i=0
   while [ "$i" -lt "$n" ]; do
     ov=${OV_ITEMS[$i]}
@@ -3767,6 +7297,16 @@ verb_close() { # slug   (override pairs arrive in OV_ITEMS / OV_REASONS)
     echo "unattended: override recorded for '$ov' (checker $(checker_of "$ov")) — parked entry written"
     i=$((i + 1))
   done
+  # S6 - THE ROSTER AND THE ASKS AT LANDING, written by the close under `in-place` in the same
+  # spelling `--landed` uses under `primary`, so a record reads the same whichever verb froze it.
+  if [ "$LANDER_MODE" = in-place ]; then
+    set_fact "$rel" units-at-landing \
+      "$(unit_rows "$(readme_of "$slug")" \
+         | sed -e 's/^| \[//' -e 's/ —.*//' | tr '\n' ' ' | sed 's/ $//')" || return 1
+    if [ -n "$AD_FREEZE" ]; then
+      set_fact "$rel" asks-at-landing "$AD_FREEZE" || return 1
+    fi
+  fi
   # The phase write is the CLOSE. Reporting success before checking it printed "close OK" over a
   # file still reading RUNNING, which is the two-answers class in the verb whose whole job is to
   # make the record agree with reality.
@@ -3776,6 +7316,13 @@ verb_close() { # slug   (override pairs arrive in OV_ITEMS / OV_REASONS)
   # invisible to every leg check; worse, --landed's `check_clean` then refuses because the tree is
   # dirty and the dirt is THIS verb's own write, with a message that blames the operator's tree.
   stage_or_fail "$rel" || return 1
+  # S5 - UNDER `in-place` THE VERB COMMITS, and under `primary` it stages and names the commit the
+  # operator owes, exactly as at BASE. The two differ because under `in-place` there is no second
+  # tree and no later merge: the graded merge is already HEAD, so the record lands on top of it.
+  if [ "$LANDER_MODE" = in-place ]; then
+    write_close_commit "$slug" "$rel" || return 1
+    return 0
+  fi
   # THE COMMIT IS NAMED because this verb only STAGES the phase. A run that merges from another
   # tree without committing carries the older phase into the merge, and `--landed` then refuses a
   # run whose Definition of Done was in fact evaluated. TOOL-dUnstalledConvoy-24.
@@ -3815,18 +7362,164 @@ dod_met() { # slug · run-state file · item · checker
       # fixed that call site and did not grep for this one.
       DOD_OUT=""
       [ -n "$GATE_CMD" ] || return 1
-      # BOUNDED. TOOL-aBoundedCeiling-6. $GATE_CMD is deliberately unquoted here, as it always was:
-      # the project declares a command line, not a path.
-      # shellcheck disable=SC2086
-      run_bounded $GATE_CMD && { DOD_OUT=""; return 0; }
-      local _grc=$?
-      DOD_OUT=$RB_OUT
-      # A BREACH IS NOT A RED BAR, and the difference is the whole information this adds. A red bar
-      # says a check ran and said no; a breach says the bar never answered. Reporting them the same
-      # way is how an operator spends an hour looking for a failing leg that does not exist.
-      if { [ "$_grc" = 124 ] || [ "$_grc" = 137 ]; } && [ "$GATE_BOUND_LIVE" = 1 ] && [ "${GATE_BOUND:-0}" -gt 0 ]; then
-        DOD_OUT="the merge bar did not answer within the declared ${GATE_BOUND}s bound and was killed after ${RB_TOOK}s, so this item is unmet because the bar never returned rather than because a leg failed: $GATE_CMD"
+      local _grc _gr _gid _ggd _gh _gdir _gout _hold _gtry=0 _gbs=0 _gbound
+      local -a _genv
+      # TOOL-dDerivedDocket-24 S6 - THE BAR IS ATTRIBUTED AGAINST R AND HANDED THE POLICY READ AT R.
+      # R is the tip `observe_anchor` saw the remote ADVERTISE, never local main or any other local
+      # ref: a run's own commit on local main carrying `land` and its own red would sit at R, read
+      # INHERITED and land - the local-ref base the protocol records as a reproduced bypass. The run
+      # id is PINNED, unpredictable and cleared first, because this arm reads THAT bar's record after
+      # it and a record the runner never wrote must not be mistaken for one it did.
+      _gr=${ASHA:-}
+      read_gate_policy "$_gr"
+      echo "unattended: gates-green — the inherited-red policy reads $GP_POLICY: $GP_WHY"
+      # TOOL-dDerivedDocket-27 S4 - THE BAR'S BOUND IS THE BACKSTOP `--preflight` PINNED, because
+      # GATE_WALL is a working-tree declaration the run can edit and a bound that moves between the
+      # two reads is two bounds. A record that predates the fact is recomputed HERE, announced; no
+      # profile at all leaves the bar at GATE_BOUND, announced too.
+      if parse_gate_backstop "$(fact "$rel" gate-backstop)"; then
+        _gbs=1
+        print_gate_backstop "the backstop --preflight pinned"
+      else
+        if [ -z "$(fact "$rel" gate-backstop)" ]; then
+          echo "unattended: gates-green — this record pins no gate-backstop fact, so the backstop is recomputed now"
+        else
+          echo "unattended: gates-green — this record's gate-backstop fact does not read as <sum> (wall <w> + queue <q> + margin <m>), so the backstop is recomputed now: $(fact "$rel" gate-backstop)"
+        fi
+        if derive_gate_backstop; then _gbs=1; print_gate_backstop "recomputed at this close"
+        else echo "unattended: the merge bar is bounded at GATE_BOUND, ${GATE_BOUND}s, and its turnstile queue is charged to that bound — $GB_WHY"; fi
       fi
+      if [ "$_gbs" = 1 ]; then _gbound=$GB_SUM; else _gbound=${GATE_BOUND:-0}; fi
+      # The git dir comes off the sidecar root's ONE derivation in the library (check 32).
+      _ggd=$(resolve_sidecar_dir) && _ggd=${_ggd%/unattended} || _ggd=""
+      # S5 - EXIT 3, TREE MOVED, RUNS THE BAR ONCE MORE, and only once. The re-run pins a FRESH run id,
+      # so the record the decision table below reads is the re-run's and never the moved one's.
+      while :; do
+        _gtry=$((_gtry + 1))
+        if [ -n "${EPOCHREALTIME:-}" ]; then _gid="unattended-${EPOCHREALTIME//[!0-9]/}${RANDOM}-$$"
+        else _gid="unattended-$(date -u +%Y%m%d%H%M%S)${RANDOM}-$$"; fi
+        _gdir=""
+        if [ -n "$_ggd" ]; then _gdir="$_ggd/gate-run/$_gid"; rm -rf "$_gdir" 2>/dev/null; fi
+        _genv=(GATE_RUN_ID="$_gid" GATE_INHERITED_RED="$GP_POLICY")
+        [ -n "$_gr" ] && _genv+=(GATE_ATTRIBUTE="$_gr")
+        [ -n "$GP_MAX_AGE" ] && _genv+=(GATE_INHERITED_RED_MAX_AGE="$GP_MAX_AGE")
+        # S1 - THE DECLARED WALL REACHES THE BAR AND NOTHING ELSE. Blank is unset in the bar's
+        # environment rather than empty, so the runner's own profile wall is what applies.
+        [ -n "$GATE_WALL" ] && _genv+=(GATE_WALL="$GATE_WALL")
+        # TOOL-dDerivedDocket-3 S3 - UNDER `in-place` THE BAR GRADES THE MERGE, and two preconditions
+        # stand between it and running at all. `GATE_FULL=1` is exported through `env` rather than as
+        # a bare assignment prefix, because this kit's own guard is that the bar must not be scoped by
+        # a leg guard here: a guarded manifest would grade the landing merge by guard, which is the
+        # shape two reproduced aborts already have. `GATE_SELFTESTS` is neither set nor unset, so the
+        # bar's environment carries exactly what this close inherited.
+        # TOOL-dDerivedDocket-28 S3 - THE ORPHANS OF AN EARLIER BAR ARE REAPED BEFORE THIS ONE STARTS.
+        # i26's run reached `gates-green` again without passing through `--resume`, and found the legs
+        # of the bar its dead session had started still running beside its own.
+        # THE BOUND IS HANDED FOR THIS ONE CALL and cleared on the next line, so the ask generator and
+        # the lander this arm reaches afterwards keep GATE_BOUND.
+        if [ "$LANDER_MODE" = in-place ]; then
+          check_inplace_preconditions "$slug" || { GG_HARD=1; return 1; }
+          [ "$_gtry" = 1 ] && print_selftests_owed
+          run_orphan_reap "$slug"
+          RB_BOUND=$_gbound
+          # shellcheck disable=SC2086
+          run_bounded env -u GATE_WALL GATE_FULL=1 "${_genv[@]}" $GATE_CMD; _grc=$?
+          RB_BOUND=""
+        else
+          run_orphan_reap "$slug"
+          # BOUNDED. TOOL-aBoundedCeiling-6. $GATE_CMD is deliberately unquoted here, as it always
+          # was: the project declares a command line, not a path.
+          RB_BOUND=$_gbound
+          # shellcheck disable=SC2086
+          run_bounded env -u GATE_WALL "${_genv[@]}" $GATE_CMD; _grc=$?
+          RB_BOUND=""
+        fi
+        { [ "$_grc" = 3 ] && [ "$_gtry" = 1 ]; } || break
+        echo "unattended: gates-green — the bar exited 3, TREE MOVED: the tree changed while it ran, so no verdict describes it; running it once more"
+      done
+      # THE `gates-run` FACT, naming this bar's id and the HEAD it graded - the record S7's two
+      # refusals consult. On a MET bar it is written with the close's other writes, after the carry
+      # check, so a refusal there still writes nothing; on an UNMET one it is written HERE, because
+      # the close returns before any later write. A bar that left no record under the pinned id is
+      # recorded only over an earlier fact, so a stub bar in a project that never ran the runner
+      # writes nothing new and an older record can never answer for a newer bar.
+      _gh=$(GIT rev-parse HEAD 2>/dev/null)
+      GG_RUN_FACT="$_gid ${_gh:0:8}"
+      if [ "$_grc" = 0 ]; then
+        [ "$_gtry" = 1 ] || echo "unattended: gates-green — the one re-run after TREE MOVED exited 0"
+        DOD_OUT=""; return 0
+      fi
+      if { [ -n "$_gdir" ] && [ -d "$_gdir" ]; } || [ -n "$(fact "$rel" gates-run)" ]; then
+        set_fact "$rel" gates-run "$GG_RUN_FACT" && stage_or_fail "$rel"
+      fi
+      GG_RUN_FACT=""
+      DOD_OUT=$RB_OUT
+      _gout=$(printf '%s\n' "$RB_OUT" | grep -vE '^(GATE (ok|skip) )')
+      # S5 - HOW THE BAR ENDED, a CLOSED table, first match wins. A red bar says a check ran and said
+      # no; every other ending says something else, and reporting them all as a red leg is how an
+      # operator spends an hour looking for a failing leg that does not exist, or a run fixes a
+      # subject that is not at fault. The `hold ·` lines are the Skill's to take: `--hold` needs a
+      # committed tree and a reaped keepalive, which a close that has just failed an item cannot have.
+      case "$_grc" in
+        3)
+          DOD_OUT="the merge bar exited 3, TREE MOVED, on its run and again on its one re-run: the tree changed while it ran both times, so no verdict describes the commit being closed. Something writes to this tree while the bar runs; find it before closing again: $GATE_CMD"$'\n'"$_gout"
+          return 1 ;;
+        4)
+          _hold="the runner exited HOST"
+          DOD_OUT="hold · host-degraded · until probe host · $_hold"
+          DOD_OUT="$DOD_OUT"$'\n'"  every leg that failed timed out twice, the second time alone, while a spawn cost more than the runner's HOST ratio over this clone's floor, so the verdict is about the host and not the tree"
+          DOD_OUT="$DOD_OUT"$'\n'"  commit the staged records, push the branch, reap the keepalive, then: bash $0 --hold $slug --code host-degraded --until \"probe host\" --reason \"$_hold\" --reaped <the keepalive id you deleted>"
+          DOD_OUT="$DOD_OUT"$'\n'"$_gout"
+          return 1 ;;
+        124|137)
+          if [ "$GATE_BOUND_LIVE" = 1 ] && [ "${_gbound:-0}" -gt 0 ]; then
+            # THE ACQUIRE LINE DECIDES, and only against the backstop. The runner prints it the moment
+            # it takes the repository, so a kill with none in the output fell in the turnstile queue
+            # or before it: no leg of this run was graded, and a retry is the right next step. Under
+            # the GATE_BOUND fallback the gate may not be this runner at all, and a gate that never
+            # prints the line would read every kill as never started.
+            if [ "$_gbs" = 1 ] && ! printf '%s\n' "$RB_OUT" | grep -q '^gate queue: acquired'; then
+              _hold="the bar was killed at its backstop before it acquired the repository"
+              DOD_OUT="hold · host-degraded · until probe gate · $_hold"
+              DOD_OUT="$DOD_OUT"$'\n'"  it was killed after ${RB_TOOK}s against its ${_gbound}s backstop (wall $GB_WALL + queue $GB_QUEUE + margin $GB_MARGIN) and never printed a gate queue: acquired line, so the host or another bar held the repository the whole time and no leg of this run was graded"
+              DOD_OUT="$DOD_OUT"$'\n'"  commit the staged records, push the branch, reap the keepalive, then: bash $0 --hold $slug --code host-degraded --until \"probe gate\" --reason \"$_hold\" --reaped <the keepalive id you deleted>"
+              return 1
+            fi
+            if [ "$_gbs" = 1 ]; then
+              DOD_OUT="the merge bar did not answer within its ${_gbound}s backstop (wall $GB_WALL + queue $GB_QUEUE + margin $GB_MARGIN) and was killed after ${RB_TOOK}s, having acquired the repository, so the runner outlived its own wall and this item is unmet because the bar never returned rather than because a leg failed: $GATE_CMD"
+            else
+              DOD_OUT="the merge bar did not answer within the declared ${_gbound}s bound and was killed after ${RB_TOOK}s, so this item is unmet because the bar never returned rather than because a leg failed: $GATE_CMD"
+            fi
+            return 1
+          fi ;;
+        1)
+          # TOOL-dDerivedDocket-24 S6 - THE DECISION TABLE over this bar's own record;
+          # `read_gates_record` states it, first matching row wins. Every red leg INHERITED within
+          # its age under `land` is MET; the same under `park`, or with an age past the bound, is
+          # UNMET and prints the hold line the Skill acts on; anything else is UNMET with the
+          # attribution lines exactly as before that unit.
+          read_gates_record "$_gdir" "$GP_POLICY"
+          case "$GR_STATE" in
+            moved)
+              DOD_OUT="$GR_WHY"$'\n'"$_gout" ;;
+            land|hold|other)
+              # S10 - an owner on the record for every INHERITED leg, on every path whose record is usable.
+              write_inherited_asks "$slug" "$_gr" "$_gdir"
+              if [ "$GR_STATE" = land ]; then
+                GG_RUN_FACT="$_gid ${_gh:0:8}"
+                GG_INH_FACT="${_gr:0:8} $GR_LEGS"
+                DOD_OUT="gates-green MET over an inherited-only red under INHERITED_RED=land: $GR_LEGS red at ${_gr:0:8}, every one INHERITED within the ${GP_MAX_AGE}-landing age bound"
+                return 0
+              fi
+              if [ "$GR_STATE" = hold ]; then
+                _hold="$GR_LEGS red at ${_gr:0:8}, INHERITED; INHERITED_RED=$GP_POLICY"
+                DOD_OUT="hold · inherited-red · until probe gate · $_hold"
+                [ -z "$GR_WHY" ] || DOD_OUT="$DOD_OUT"$'\n'"  $GR_WHY"
+                DOD_OUT="$DOD_OUT"$'\n'"  commit the staged records, push the branch, reap the keepalive, then: bash $0 --hold $slug --code inherited-red --until \"probe gate\" --reason \"$_hold\" --reaped <the keepalive id you deleted>"
+                DOD_OUT="$DOD_OUT"$'\n'"$_gout"
+              fi ;;
+          esac ;;
+      esac
       return 1 ;;
     records-current)
       # The unit list is DERIVED from the build README, so "current" is not a comparison between two
@@ -4131,6 +7824,7 @@ $_bcnon"
       # cutoff grandfathers — and a term that passes over any of them silently is indistinguishable
       # from a term that graded them clean.
       local _bcskip=""
+      load_fork_cutoff || return 1
       if ! load_spec_facts $(GIT ls-files -- "$M/builds/$slug/spec/*.md" 2>/dev/null) >/dev/null 2>&1; then
         _bcskip="$_bcskip · the spec-fact reader refused, so no unit could be graded"
       fi
@@ -4146,7 +7840,7 @@ $_bcnon"
         if ! printf '%s\n%s\n' "$SPEC_THIN_CUTOFF" "$_bcdate" | sort -C; then
           _bcskip="$_bcskip · $_bcid (dated $_bcdate, before the declared cutoff $SPEC_THIN_CUTOFF)"; continue
         fi
-        [ "$(plan_state "$_bcsp")" = THIN ] && _bcthin="$_bcthin $_bcid"
+        [ "$(plan_state "$_bcsp" "$FORK_CUTOFF")" = THIN ] && _bcthin="$_bcthin $_bcid"
       done
       if [ -n "$_bcthin" ]; then
         DOD_OUT="a unit is CLOSED against a spec the kit's own predicate grades THIN — its scope, its acceptance criteria or its gates section is empty or names nothing observable, so nothing ever stated what done meant for it:$_bcthin"
@@ -4485,6 +8179,231 @@ $_bcnon"
         return 1
       fi
       DOD_OUT="$_tn probe row(s) recorded for this tree: ${_rn:-0} recall, ${_mn:-0} map"
+      return 0 ;;
+    asks-disposed)
+      # TOOL-dDerivedDocket-17. THE THIRTEENTH ITEM, and the only one that asks whether the run
+      # answered the QUESTIONS it was pointed at rather than whether it produced the artefacts.
+      #
+      # STATUS COMES FROM THE WITNESS AND FROM NOWHERE ELSE. The fold that turns rows into a derived
+      # status is the declared generator's, and a second fold here would be two answers to one
+      # question with the copy here as the one that rots. What this reads from the tree is FILING
+      # (does a row exist), a disposition ROW (which verb, which slot) and a spec header VERB - three
+      # line matches, none of them a verdict.
+      #
+      # THE SCOPE IS ENUMERATED BEFORE THE WITNESS RUNS. A loop over the rows that came back can only
+      # confirm what came back, so an id the producer dropped would never be mentioned
+      # (`memory/gotchas/inputs-inside-the-subjects-reach.md`). `read_ask_scope` reads the tree; T2
+      # compares the witness against THAT.
+      #
+      # OVERRIDABLE, by owner ruling D12-b, on the condition that overrides are counted - which the
+      # drift-audit signal `asks_disposed_overrides` does. It is deliberately NOT in
+      # `DOD_NO_OVERRIDE`: the design recommended non-overridable on the `pieces-complete` argument
+      # and the owner reversed it.
+      DOD_OUT=""
+      local _ad_m _ad_f _ad_rev _ad_mb _ad_now _ad_was _ad_n _ad_rn _ad_id _ad_st _ad_row _ad_verb
+      local _ad_slot _ad_by _ad_full _ad_isha _ad_grade _ad_closes _ad_adv _ad_sp _ad_u _ad_c
+      local _ad_own="" _ad_bc="" _ad_walked=0 _ad_dec _ad_resc _ad_wasrow _ad_specs
+      _ad_rev=$(GIT rev-parse HEAD 2>/dev/null)
+      _ad_m=$(mandate_of "$slug")
+      _ad_now=$(backlog_blob_of "$slug" "$_ad_rev")
+      _ad_f=$(asks_filed_by "$_ad_now" "$slug")
+      # ---- TERM 0, both halves. MET and ANNOUNCED, never silent: a skip that looks like a pass is
+      # ---- indistinguishable from coverage, and `pieces-complete` two arms up is the precedent.
+      # ---- The two halves are different facts - "this project has no ask contract" and "this build
+      # ---- has nothing to dispose" - and an operator who confuses them hunts the wrong thing.
+      if [ -z "$_ad_m" ] && [ -z "${ASKS_CMD:-}" ]; then
+        DOD_OUT="skipped — asks-disposed: this build carries no asks: mandate and this project declares no ASKS_CMD, so the ask contract is NOT ADOPTED here and there is nothing this item could grade"
+        return 0
+      fi
+      if [ -z "$_ad_m" ] && [ -z "${_ad_f//[[:space:]]/}" ]; then
+        DOD_OUT="skipped — asks-disposed: nothing to dispose — this build carries no asks: mandate and its own folder files no ask under its own slug"
+        return 0
+      fi
+      # ---- TERM 1: a mandate with no grader. `--preflight` refuses this outright, so reaching
+      # ---- `--close` in this state means the refusal did not fire - and every check keyed on the
+      # ---- pinned set has been passing over a list nothing graded ever since.
+      if [ -z "${ASKS_CMD:-}" ]; then
+        DOD_OUT="this build README carries an asks: mandate and this project declares no ASKS_CMD, which --preflight refuses outright, so this run was authorized by a mandate nothing in the project can grade: $_ad_m"
+        return 1
+      fi
+      # ---- TERM 2: the witness, against the scope READ FROM THE TREE. A mandate that does not read
+      # ---- whole refuses first (closing review F2): read as nothing, M would leave the scope and
+      # ---- this item would grade the run's own filings alone.
+      if ! read_ask_scope "$slug" "$_ad_rev"; then
+        DOD_OUT="$AW_WHY"
+        return 1
+      fi
+      _ad_n=$(printf '%s\n' $AD_SCOPE | grep -c . || true)
+      if ! run_ask_witness "$slug" "$_ad_rev" $AD_SCOPE; then
+        DOD_OUT="the ask witness did not answer for this build's scope, so no ask below is graded and any verdict here would be invented: $AW_WHY"
+        return 1
+      fi
+      _ad_rn=$(printf '%s\n' "$AW_ROWS" | grep -c . || true)
+      if [ "$_ad_rn" != "$_ad_n" ] || [ "${AW_EXAMINED:-}" != "$_ad_n" ]; then
+        DOD_OUT="DEAD PROBE - the declared ask generator disagrees with the scope this item enumerated from the tree, so an ask it disposed of and one it never looked at are indistinguishable here: scope $_ad_n · rows $_ad_rn · examined ${AW_EXAMINED:-(none)} · scope is $AD_SCOPE"
+        return 1
+      fi
+      # ---- THE THREE TREE READS the terms below share, taken ONCE.
+      _ad_mb=$(fact "$rel" m-base)
+      _ad_was=$(backlog_blob_of "$slug" "$_ad_mb")
+      _ad_specs=$(GIT ls-files -- "$M/builds/$slug/spec/*.md" 2>/dev/null)
+      # A spec set this reader refuses is a REFUSAL and not an empty set: with the maps empty every
+      # ask below would grade "no CLOSED unit delivered it", which is the same sentence a genuinely
+      # abandoned scope earns. Same rule `build-complete` states one arm up.
+      if ! load_spec_facts $_ad_specs >/dev/null 2>&1; then
+        DOD_OUT="the spec-fact reader refused over this build's specs, so nothing here could tell an ask a CLOSED unit delivered from one this run abandoned: $M/builds/$slug/spec/"
+        return 1
+      fi
+      _ad_closes=" "; _ad_adv=" "
+      for _ad_sp in $_ad_specs; do
+        [ "${SPEC_ST[$_ad_sp]:-}" = CLOSED ] || continue
+        _ad_closes="$_ad_closes$(spec_ask_verbs "$_ad_sp" closes | tr '\n' ' ')"
+        _ad_adv="$_ad_adv$(spec_ask_verbs "$_ad_sp" advances | tr '\n' ' ')"
+      done
+      # THE MEMBERSHIP TEST IS A SPACE-PADDED STRING, built once. A `case` pattern asking for
+      # `*" $id "*` over a NEWLINE-separated list matches nothing, and matching nothing here reads
+      # as "not mandated" - the direction that skips the terms rather than firing them.
+      #
+      # ONE TEST AND NOT TWO: the scope IS M ∪ F, so "not in M" is exactly "in F" and a second
+      # membership string would be a second way to answer one question.
+      local _ad_mlist
+      _ad_mlist=" $(printf '%s ' $(asks_ids_of "$_ad_m"))"
+      for _ad_id in $AD_SCOPE; do
+        _ad_st=$(ask_field "$_ad_id" status)
+        _ad_row=$(ask_disposition_row_of "$_ad_now" "$_ad_id")
+        _ad_verb=$(printf '%s\n' "$_ad_row" | awk -F' · ' '{ sub(/^- /, "", $1); print $1; exit }')
+        # ---- TERM 3, the F half: an ask THIS build filed and neither disposed nor finished. It is
+        # ---- graded on the SCOPE's own membership, never on the witness's `home` field, so a
+        # ---- producer that declined to print it cannot shrink F to match itself.
+        case "$_ad_mlist" in
+          *" $_ad_id "*) ;;
+          *)
+            case "$_ad_st" in
+              CLOSED|WONTDO) continue ;;
+            esac
+            [ -n "$_ad_verb" ] && continue
+            DOD_OUT="this build filed an ask and left it neither disposed nor terminal, so a question this run raised for itself is going out of the record unanswered: $_ad_id reads ${_ad_st:--} and this build's own file carries no status row for it"
+            return 1 ;;
+        esac
+        # ---- From here the ask is MANDATED, and T3's three admitted end states apply.
+        _ad_slot=$(ask_disposition_slot_of "$_ad_row")
+        # THE GRADE, BY EXACT KEY. Through awk with the id in the ENVIRONMENT rather than a `sed`
+        # expression built around it: the id is a value out of a build README, and a caller's bytes
+        # spliced into an expression are that expression's metacharacters
+        # (`memory/gotchas/conf-value-interpolated-into-a-regex.md`).
+        _ad_grade=$(printf '%s\n' $(fact "$rel" asks-ready) \
+                    | ADG_ID="$_ad_id" awk -F= 'BEGIN { i = ENVIRON["ADG_ID"] } $1 == i { print $2; exit }')
+        _ad_dec=$(id_rows "$(grep -E '^[0-9][0-9-]*T[0-9:]*Z decision · ' "$rel" 2>/dev/null || true)" "$_ad_id" | head -1)
+        _ad_resc=$(id_rows "$(grep -E "^[0-9][0-9-]*T[0-9:]*Z rescope · item ($(kinds_re "$PARK_ACTS_OWED")) " "$rel" 2>/dev/null || true)" "$_ad_id" | head -1)
+        case "$_ad_st" in
+          CLOSED|WONTDO) ;;
+          *)
+            case "$_ad_verb" in
+              BLOCKED|DEFERRED)
+                # F3's first restriction: a READY ask held anyway owes the veto that stopped it.
+                # `--park`'s own M3 vocabulary is `veto 2` and `veto 3`; a hold with no veto named
+                # is a run choosing not to do work it had every input for.
+                if [ "$_ad_grade" = yes ] && ! printf '%s\n' "$_ad_dec" | grep -qE 'veto (2|3)'; then
+                  DOD_OUT="a mandated ask this run graded READY is held rather than answered, and no parked decision names the M3 veto that stopped it, so the hold is a choice nobody recorded: $_ad_id held by '$_ad_verb' on '${_ad_slot:-?}'"
+                  return 1
+                fi
+                # F3's second: a READY ask held on something THIS RUN filed is a run holding itself
+                # up on a question it raised, which is admitted only where the ask was never ready.
+                if [ "$_ad_grade" = yes ] && [ -n "$_ad_slot" ] \
+                   && [ "$(ask_home_of "$_ad_slot")" = "$slug" ]; then
+                  DOD_OUT="a mandated ask this run graded READY is held on an owner-call ask this same run filed under its own slug, so the run deferred a question it was ready to answer behind one it raised itself: $_ad_id held on $_ad_slot"
+                  return 1
+                fi ;;
+              KEEP)
+                # D12-c: KEEP after a DELIVERED partial, and never as a silent way not to do the
+                # work. The evidence is a CLOSED spec of this build carrying `advances <id>`.
+                case "$_ad_adv" in
+                  *" $_ad_id "*) ;;
+                  *) DOD_OUT="a mandated ask is KEPT live and no CLOSED unit of this build advances it, so the KEEP records a decision not to do the work rather than a partial that was delivered: $_ad_id"
+                     return 1 ;;
+                esac ;;
+              *)
+                DOD_OUT="a mandated ask ended in none of the states this item admits - it is not derived terminal, and this build's own file holds no BLOCKED, DEFERRED or KEEP row for it: $_ad_id reads ${_ad_st:--}"
+                return 1 ;;
+            esac ;;
+        esac
+        # ---- F3's third: a WONTDO this run itself wrote. A row present at HEAD and absent at
+        # ---- `m-base` was written by this run, and a run may not meet this item by declaring the
+        # ---- work unnecessary as it goes. The one admitted shape is a `stale:` reason WITH a
+        # ---- parked decision, which is the owner's turn rather than the run's own.
+        if [ "$_ad_st" = WONTDO ] && [ "$_ad_grade" = yes ] && [ "$_ad_verb" = WONTDO ]; then
+          _ad_wasrow=$(ask_disposition_row_of "$_ad_was" "$_ad_id")
+          if [ -z "$_ad_wasrow" ] \
+             && { ! printf '%s\n' "$_ad_row" | grep -qF 'stale:' || [ -z "$_ad_dec" ]; }; then
+            DOD_OUT="a mandated ask this run graded READY was written off by a WONTDO row this same run added after its pinned m-base, so the run met this item by deciding the work was unnecessary: $_ad_id"
+            return 1
+          fi
+        fi
+        # ---- TERM 4: CLOSED by a commit THIS RUN wrote that is not a CLOSED unit's build commit.
+        # ---- `read_run_commits` excludes the advertised tip, so a FOREIGN build's row landed on the
+        # ---- default branch since `m-base:` is not this run's - T5 already owns "closed with
+        # ---- somebody else's evidence" and the two must not both fire on one ask.
+        _ad_by=$(ask_field "$_ad_id" decided)
+        _ad_isha=0
+        case "$_ad_by" in
+          *[!0-9a-f]*) ;;
+          ???????*) _ad_isha=1 ;;
+        esac
+        if [ "$_ad_st" = CLOSED ] && [ "$_ad_isha" = 1 ]; then
+          if [ "$_ad_walked" = 0 ]; then
+            # THE EXCLUSION TIP IS REQUIRED, not optional. Without it `m-base..HEAD` counts every
+            # default-branch commit landed in the window as this run's own, which is the reading
+            # section 8 F5 rejected; refusing is the honest outcome and `authorization-reachable`
+            # has already spoken for an anchor nobody could observe.
+            if [ -z "${ASHA:-}" ]; then
+              DOD_OUT="a mandated ask is recorded CLOSED by a sha and no anchor was observed, so 'this run wrote it' could only be decided over a range that counts every commit landed on the default branch since m-base: $_ad_id by $_ad_by"
+              return 1
+            fi
+            if ! _ad_own=$(read_run_commits "$_ad_rev" "$_ad_mb" "$ASHA"); then
+              DOD_OUT="this run's own commits cannot be enumerated, so this term would pass by finding nothing: endpoint $_ad_rev · m-base ${_ad_mb:-(none)} · anchor $ASHA"
+              return 1
+            fi
+            # THE CLOSED UNITS COME FROM THE SPEC HEADERS, the same fact `_ad_closes` and `_ad_adv`
+            # were built from one screen up. The generated units region carries the same statuses
+            # and is rendered FROM these headers, so reading it here would be a second reader of one
+            # fact — and the two disagree exactly while a unit's status header has moved and the
+            # index has not been re-rendered, which is every unit pass between its commit and the
+            # generator's.
+            for _ad_u in $(for _ad_sp in $_ad_specs; do
+                             [ "${SPEC_ST[$_ad_sp]:-}" = CLOSED ] || continue
+                             printf '%s\n' "${SPEC_ID[$_ad_sp]:-}"
+                           done); do
+              [ -n "$_ad_u" ] || continue
+              _ad_c=$(build_commit "$_ad_mb..$_ad_rev" "$_ad_u" "$M/builds/$slug" "$GENERATED_INDEXES" "$SHARED_RECORDS" || true)
+              case "$_ad_c" in ''|TRUNCATED) continue ;; esac
+              _ad_bc="$_ad_bc$_ad_c
+"
+            done
+            _ad_walked=1
+          fi
+          _ad_full=$(GIT rev-parse --verify --quiet "$_ad_by^{commit}" 2>/dev/null)
+          # A sha this clone cannot resolve is not a commit this run wrote - nothing here could have
+          # written one it cannot read - so T4 says nothing about it and T5 below still grades the
+          # ask on whether a unit of this build delivered it.
+          if [ -n "$_ad_full" ] && printf '%s\n' "$_ad_own" | grep -qxF -- "$_ad_full" \
+             && ! printf '%s\n' "$_ad_bc" | grep -qxF -- "$_ad_full"; then
+            DOD_OUT="a mandated ask is recorded CLOSED by a commit this run wrote that is not any CLOSED unit's build commit, so the run closed an ask with evidence minted outside the units it was reviewed on: $_ad_id by $_ad_by"
+            return 1
+          fi
+        fi
+        # ---- TERM 5: SCOPE RESOLUTION, never scope abandonment. An ask a CLOSED unit of this build
+        # ---- delivered - `closes` it, or `advances` it under the KEEP T3 admitted - is resolved. An
+        # ---- ask nothing of this build delivered is resolved only where the run OWED the owner an
+        # ---- answer and wrote one: a parked decision, or a rescope whose act is in
+        # ---- `PARK_ACTS_OWED`. That constant's own argument is the whole of this term's.
+        case "$_ad_closes$_ad_adv" in
+          *" $_ad_id "*) continue ;;
+        esac
+        if [ -z "$_ad_dec" ] && [ -z "$_ad_resc" ]; then
+          DOD_OUT="a mandated ask was neither delivered by a CLOSED unit of this build nor answered to the owner, so this run is landing having dropped scope it was authorized for without recording that it did: $_ad_id reads ${_ad_st:--}"
+          return 1
+        fi
+      done
       return 0 ;;
     keepalive-reaped)
       # STILL AGENT-ATTESTED HERE, and READ BACK at --landed (TOOL-aWokenSentinel-7): the stop-guard
@@ -5394,7 +9313,7 @@ verb_record_piece() { # slug · piece · leg · verdict
 # PYTHON function in a different kit, each kit is copy-installed standalone, and check 10's own
 # header records that an adopter may hold one and not the other.
 verb_rescope() { # slug · act · unit · successor · reason
-  local slug="$1" act="$2" unit="$3" succ="$4" reason="$5" rel want pl ids shaped
+  local slug="$1" act="$2" unit="$3" succ="$4" reason="$5" rel want pl ids shaped _rs_bl
   check_slug "$slug" || return 1
   rel=$(runmd_of "$slug")
   [ -f "$rel" ] || { fail 48 "no run-state file, so there is no run to record an amendment against: $rel"; return 1; }
@@ -5448,8 +9367,27 @@ RESCOPED
   ids=$(unit_ids_of "$slug")
   case "$act" in
     retire|supersede)
-      printf '%s\n' "$ids" | grep -qxF -- "$unit" || { fail 48 "a rescope names a unit the build README's generated units region does not carry, and a run cannot retire what its roster never held: $unit"; return 1; } ;;
+      # TOOL-dDerivedDocket-16 S10 - A `unit` ASK IS ROSTER. Design section 19.4 makes a filed
+      # `unit` ask a planned unit of the build whose folder files it, and such a unit may have no
+      # spec and therefore no generated row - which is exactly the unit a run most often needs to
+      # retire. Refusing it left the roster carrying a unit nothing could remove, and `--close`'s
+      # build-complete term then demanded it forever.
+      if ! printf '%s\n' "$ids" | grep -qxF -- "$unit"; then
+        if ! asks_unit_in "$(backlog_text_of "$slug")" | grep -qxF -- "$unit"; then
+          fail 48 "a rescope names a unit the build README's generated units region does not carry and this build's folder does not file as a \`unit\` ask either, and a run cannot retire what its roster never held: $unit"; return 1
+        fi
+        echo "unattended: the retired id is a \`unit\` ask of this build's own folder and carries no generated unit row — the roster half design section 19.4 adds"
+      fi ;;
     add)
+      # TOOL-dDerivedDocket-16 S10 - AN ADD MAY NOT NAME A FILED ASK THAT IS NOT A UNIT. The two
+      # populations share one id grammar, so a mistyped amendment can silently mint a "unit" whose
+      # id already belongs to somebody's ask - and from then on the two records contest the id, which
+      # is the collision section 2's whole slug discipline exists to make impossible. A `unit` ask is
+      # the sanctioned overlap and is admitted; anything else filed is refused by name.
+      _rs_bl=$(backlog_text_of "$slug")
+      if ask_filed_in "$_rs_bl" "$unit" && ! asks_unit_in "$_rs_bl" | grep -qxF -- "$unit"; then
+        fail 76 "a rescope adds a unit whose id is already a filed ask of this build that is not a \`unit\` ask, so the amendment would mint a second record under an id an ask already owns and the two would contest it from here on: $unit"; return 1
+      fi
       # THE QUESTION IS NOT "is it in the region NOW". It is "was it in the roster this run STARTED
       # with", which is the question check 24 asks and the only one that separates a fabricated row
       # from a late one. Asking the current region instead made the two checks unsatisfiable
@@ -5572,7 +9510,8 @@ verb_dispatch() { # slug · unit · writes...
     fail 49 "--dispatch declares a build pass for a unit no tracked spec under this build defines, which is M2's MISSING: the method's hard floor is that a MISSING unit is never built, and writing the spec afterwards is the same act with the record written last: $unit"
     return 1
   fi
-  _d_state=$(plan_state "$_d_spec")
+  load_fork_cutoff || return 1
+  _d_state=$(plan_state "$_d_spec" "$FORK_CUTOFF")
   case "$_d_state" in
     THIN) fail 49 "--dispatch declares a build pass for a unit whose spec grades THIN — its scope, its acceptance criteria or its gates section is empty or names nothing observable, so nothing states what done MEANS for it: $unit ($_d_spec)"; return 1 ;;
   esac
@@ -5649,6 +9588,44 @@ verb_dispatch() { # slug · unit · writes...
   if [ -n "$_blockers" ]; then
     fail 49 "--dispatch declares a build pass out of the build's own declared order: $unit is at order $_d_ord and an earlier step still holds a unit that is neither terminal nor dispatched:$_blockers"
     return 1
+  fi
+  # -------------------------------------------------- TOOL-dDerivedDocket-16 S9, THE HOLD GATE
+  # The order gate above enforces DECLARED orders and nothing else, so a unit whose spec closes an
+  # ask that is BLOCKED on another mandated ask sails through it whenever nobody typed an `order`
+  # verb. The hold is the dependency the design cares about - `order` expresses sequence, a hold
+  # expresses that one ask cannot be finished until another is - and it is data the owner filed
+  # rather than a number a run wrote.
+  #
+  # BESIDE code 49, not under a new one: this is the same question the gate above asks (may this
+  # pass start yet) over a second source of the same edge, and one question answered under two codes
+  # makes a reader work out whether they are looking at one refusal or two.
+  #
+  # MANDATE-CONDITIONAL, so a build with no `asks:` fact makes no bounded call and behaves exactly
+  # as it did. The witness runs at the PINNED `m-base:`, which is the tree the hold edges were
+  # asserted in; grading HEAD would let a hold filed after the run began block a dispatch.
+  local _dh_mandate _dh_ids _dh_a _dh_b _dh_block="" _dh_st
+  _dh_mandate=$(fact "$rel" asks)
+  if [ -n "$_dh_mandate" ]; then
+    # The PINNED line, which preflight and every resume refuse unless it reads whole (closing review
+    # F2). Its rc 1 here needs a record pinned before that refusal existed and never resumed since;
+    # it then holds nothing back at this gate, and `asks-disposed` refuses the same line at the close.
+    _dh_ids=$(asks_ids_of "$_dh_mandate")
+    _dh_a=$(spec_ask_verbs "$_d_spec" closes)
+    if [ -n "$_dh_a" ] && run_ask_witness "$slug" "$(fact "$rel" m-base)" $_dh_ids; then
+      for _o_id in $_dh_a; do
+        for _dh_b in $(ask_field "$_o_id" holds | tr ',' ' '); do
+          [ -n "$_dh_b" ] && [ "$_dh_b" != "-" ] || continue
+          printf '%s\n' "$_dh_ids" | grep -qxF -- "$_dh_b" || continue
+          _dh_st=$(ask_field "$_dh_b" status)
+          case "$_dh_st" in CLOSED|WONTDO) continue ;; esac
+          _dh_block="$_dh_block $_o_id holds on $_dh_b ($_dh_st)"
+        done
+      done
+    fi
+    if [ -n "$_dh_block" ]; then
+      fail 49 "--dispatch declares a build pass for a unit that closes an ask held on a mandated ask that is not terminal, so the unit would be finished against a question its own dependency has not answered yet:$_dh_block"
+      return 1
+    fi
   fi
   # EACH --writes IS ONE PATH. A space-joined value cannot carry the whitespace refusal below: the
   # path has already become two tokens by the time this verb sees it, and nothing recovers that.
@@ -5817,8 +9794,8 @@ SIBS
 # ONE `unattended: run log` line on stderr and the verb goes on.
 #
 # NO SIGNAL TRAP, ON PURPOSE. A trapped TERM waits for the foreground child, and `--close` runs the
-# merge bar in the foreground under GATE_BOUND, so a TERM trap would hold a killed close for up to an
-# hour. Every exit the driver CHOOSES sets RUNLOG_CLEAN=1 immediately before it instead, and the EXIT
+# merge bar in the foreground under its backstop or GATE_BOUND, so a TERM trap would hold a killed close
+# for hours. Every exit the driver CHOOSES sets RUNLOG_CLEAN=1 immediately before it instead, and the EXIT
 # trap, which an untrapped TERM still runs, writes `exit=clean` or `exit=unclean`. A KILL runs nothing,
 # so a START with no END is the killed-call signature. An unclean END's `rc` is whatever `$?` the trap
 # saw, often 0: read `exit=` first. The runlog-writer suite enumerates every `exit` in this file and
@@ -6065,6 +10042,10 @@ write_runlog_end() { # the status the EXIT trap saw -> the END line, then the ou
 # EMPTY reason it was pushed with, so it meets the missing-reason refusal that already exists instead
 # of vanishing - the refusal is reached by the value, not by a second branch.
 VERB=""; SLUG=""; KID=""; REASON=""; arg=""; AT_VALUE="yes"
+# --hold's own four, and --resume's one. Initialised here rather than in the conf-default block,
+# for the reason PK_ITEM is: a tracked .unattended.conf could otherwise pre-set one and satisfy a
+# refusal nobody typed an argument for.
+HOLD_UNTIL=""; HOLD_REAPED=""; HOLD_UNREACH=""; HOLD_RUN=""; RS_REPLACES=""; RS_SCHEDULED=""
 RP_PATH=""; RP_LEG=""; VERDICT=""; RP_ROOT=""; RP_PBSHA=""; RP_RUN=""; RP_SET=""; BR_UNIT=""
 RS_ACT=""; RS_SUCC=""
 DP_WRITES=()
@@ -6104,6 +10085,11 @@ refuse_waive_unless_preflight() { # verb
   fail 37 "--waive is accepted by --preflight alone; the owner turn that grants a waiver is the last one there is, and a verb reachable mid-run is a place the run could answer its own question: $v"
   return 1
 }
+# THE ARGUMENT LOOP IS FENCED by a bare argv sentinel pair, and the gate leg's check 26 reads every
+# `--<name>` token between them - sub-loops included - and joins it to this file's header lines and to
+# the sibling suite, both directions. A flag parsed here and documented nowhere reds that check, so a
+# new flag gets its header line in the same edit. TOOL-dDerivedDocket-30 S4.
+# gov:argv-begin
 while [ $# -gt 0 ]; do
   case "$1" in
     --pass)         PK_ITEM="${2:-}"; shift 2 || shift ;;
@@ -6125,6 +10111,12 @@ while [ $# -gt 0 ]; do
     --run)          RP_RUN="${2:-}"; shift 2 || shift ;;
     --set)          RP_SET="${2:-}"; shift 2 || shift ;;
     --keepalive-id) KID="${2:-}"; shift 2 || shift ;;
+    --until)        HOLD_UNTIL="${2:-}"; shift 2 || shift ;;
+    --reaped)       HOLD_REAPED="${2:-}"; shift 2 || shift ;;
+    --keepalive-unreachable) HOLD_UNREACH="${2:-}"; shift 2 || shift ;;
+    --pending-run)  HOLD_RUN="${2:-}"; shift 2 || shift ;;
+    --replaces)     RS_REPLACES="${2:-}"; shift 2 || shift ;;
+    --scheduled)    RS_SCHEDULED="${2:-}"; shift 2 || shift ;;
     # TOOL-aBoundedVerdict-15 S2 - optional, defaulting to `yes`. It exists so the COUNTABLE
     # ATTESTATION unit needs no second verb: that unit wants the parked key's value to carry a COUNT
     # the close can verify, and the current predicate already tolerates trailing text after
@@ -6159,10 +10151,11 @@ while [ $# -gt 0 ]; do
                     # subshell gives the same isolation a separate process gave, at a fork instead of
                     # an exec. The per-slug rc is emitted rather than accumulated, because the caller
                     # skips a build whose plan REFUSES and cannot recover that from a summary status.
-                    PLAN_PATHS=""; _pl_slugs=""; _pl_framed=""
+                    PLAN_PATHS=""; PLAN_ASKS=""; _pl_slugs=""; _pl_framed=""
                     while [ $# -gt 0 ]; do
                       case "${1:-}" in
                         --paths)  PLAN_PATHS=paths; shift ;;
+                        --asks)   PLAN_ASKS=asks; shift ;;
                         --framed) _pl_framed=1; shift ;;
                         --*)     break ;;
                         "")      shift ;;
@@ -6203,6 +10196,7 @@ while [ $# -gt 0 ]; do
             fail 14 "unknown argument; the verbs are $vl: $arg"; RUNLOG_CLEAN=1; exit 1; fi ;;
   esac
 done
+# gov:argv-end
 # S10, and then the verb-carrier unit, because S10's fix did not hold: the three spellings were
 # re-synchronised by hand and drifted again at the next verb. Both survivors now DERIVE - the refusal
 # above from VERBS_SLUG, this usage text from the header's own invocation lines - so there is nothing
@@ -6219,6 +10213,7 @@ case "$VERB" in
   --close)     verb_close "$SLUG" ;;
   --landed)    verb_landed "$SLUG" ;;
   --abort)     verb_abort "$SLUG" "$REASON" "$HALT_CODE" ;;
+  --hold)      run_hold "$SLUG" "$HALT_CODE" "$HOLD_UNTIL" "$REASON" "$HOLD_REAPED" "$HOLD_UNREACH" "$HOLD_RUN" ;;
   --park)      verb_park "$SLUG" "$PK_ITEM" "$REASON" ;;
   --propose)   verb_propose "$SLUG" "$PK_ITEM" "$PK_STEP" "$REASON" ;;
   --brief)     verb_brief "$SLUG" "$BR_UNIT" "$RP_PATH" ;;

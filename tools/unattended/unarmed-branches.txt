@@ -48,9 +48,13 @@ unattended.sh	29	2	cannot retire the finished record, and a half-rotated build i
 # against a driver carrying a bogus member and a Skill naming an invented one. The other five are
 # degradation branches — a constant the leg cannot read, a template the kit does not ship — and are
 # unobserved. They drain when that suite is next run and its arms are written.
-check-unattended.sh	2	11	the driver declares owed rescope ACTS but this leg cannot find the closed act alternation --rescope validates against, so the act axis would be graded against nothing
-check-unattended.sh	2	12	the parked-ACT taxonomy names an act --rescope's own closed case cannot accept, so no row can ever carry it and the surfaced count is silently narrower than the set says
-check-unattended.sh	2	13	the driver declares no readable PARK_ACTS_OWED, so the act axis of the surfaced count would range over an empty set and a retirement would silently stop being owed
+# THE THREE CHECK-2 ORDINALS MOVED 11 -> 15, 12 -> 16 and 13 -> 17 at the reconcile of
+# dDerivedDocket onto this file: that build's hold vocabulary put four `fail 2` refusals ABOVE
+# them in the leg, the insertion-point class the 27 row records, and the branches they pin did
+# not change.
+check-unattended.sh	2	15	the driver declares owed rescope ACTS but this leg cannot find the closed act alternation --rescope validates against, so the act axis would be graded against nothing
+check-unattended.sh	2	16	the parked-ACT taxonomy names an act --rescope's own closed case cannot accept, so no row can ever carry it and the surfaced count is silently narrower than the set says
+check-unattended.sh	2	17	the driver declares no readable PARK_ACTS_OWED, so the act axis of the surfaced count would range over an empty set and a retirement would silently stop being owed
 check-unattended.sh	16	14	cannot read DOD_NO_OVERRIDE from the driver, so the join below would compare the Skill against an empty set and pass by finding nothing
 check-unattended.sh	16	15	the kit ships no SKILL.template.md, so the non-overridable set an agent reads cannot be joined to the constant the verb enforces
 check-unattended.sh	16	16	the Skill template carries no non-overridable paragraph this leg can read, so the join would compare the driver's set against nothing and pass by finding nothing; the sentence it looks for names the items and the item names are backticked
@@ -76,3 +80,23 @@ unattended.sh	49	21	a sibling spec status header carries something shaped like t
 # `resolve_python` RUNS each candidate and cannot be made to fail from the suite's fixture
 # without hiding every python launcher from PATH, which the suite's own arms need on it.
 unattended.sh	49	18	--dispatch: the inline resolver found no usable python: none of its candidates runs, so the declared spec-token checker cannot run
+# `--hold` reaches HEAD only after `check_clean` has passed, and `check_clean` counts UNTRACKED
+# paths - so a repository whose HEAD cannot resolve, which is one carrying no commit at all, has
+# already been refused for a dirty tree before this line runs. The guard stays because the
+# alternative is a HELD record carrying an empty witness, which `--status` then refuses with a
+# message about the wrong thing. Pinned rather than armed with a synthetic break, which proves the
+# mechanism for the synthetic value and not the real one. TOOL-dDerivedDocket-4.
+unattended.sh	56	4	HEAD does not resolve on this node, so the hold has no witness to record and a witnessless pause is the claim an oracle skips
+#
+# TOOL-dDerivedDocket-5 pins two CLOCK branches in `--hold`, and they are one hazard read twice.
+# Both fire only when `date -u` answers nothing on a host where the same binary answered a moment
+# earlier - `read_utc_now` for the first, and `date -u -d` over a `held-at` the driver itself just
+# wrote for the second. A fixture cannot stage that without hiding `date` from PATH, which would
+# take the rest of the suite down with it. They are branches rather than silent fallbacks for the
+# reason the sibling condition reader states: a hold recorded as owing a restart nobody can name
+# is worse than one that owes none, and a zero from a dead clock reads as an instant.
+# MOVED HERE from the central file at the reconcile of dDerivedDocket onto the sidecar layout, and
+# both signatures re-copied WHOLE: the rows carried a prefix of each message, which a later unit
+# extended, so they read as reworded against the branch they pin.
+unattended.sh	56	5	the clock answered nothing, so this hold has no held-at to record and every later reader — the release condition, the scheduled restart's own refusal and the fire instant — joins on exactly that field
+unattended.sh	56	6	the fire instant of this hold's restart cannot be computed on this node, because a clock probe it needs answered nothing, and a hold recorded as owing a schedule nobody can name is worse than one that owes none
