@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-29 — gov's own gates and declarations derive the prefix they name
 
-**Status:** SPECCED · rev-2 · 2026-09-25 · node a · Tier-2 · base 2143b6d6 · streams tooling · order 13
+**Status:** SPECCED · rev-3 · 2026-09-29 · node a · Tier-2 · base 2143b6d6 · streams tooling · order 13
 
 <!-- gen:spec-records -->
 
@@ -94,6 +94,42 @@ This unit owns every literal in a gov-side file: a withheld file that is not a t
 descriptor resolves that is not a test, a kit descriptor, and the registry. A `sentinel =` line is
 `TOOL-aRepatriatedFork-24`'s. The rule is `TOOL-aRepatriatedFork-23` §8 F3's.
 
+### Rev-3 decisions, made by the unit pass before code
+
+Measured at `e3d91e32` with the gate's epoch-5 counter, run per line, because five drain units moved
+the tree after the census.
+
+- **The registry and the descriptors spell a gov-side path through the `{prefix}` token.** That
+  covers an entry's `descriptor`, an exemption's `path`, a surface glob, a gov-only pin's `pattern`,
+  a `root_relative` include and a `claims` row. S1 said "relative to the tool root", but the ban
+  counts a bare `<kit>/<file>` wherever it sits, so the kit-relative spelling is itself a literal.
+  The token is the one the descriptors already use for a destination. A `home` stays kit-relative,
+  as §8 F2 resolves, and a flat entry's home is `.`, the tool root itself.
+- **One home sits outside the tool root.** The kickoff entry's engine lives under `skills/`, which
+  machine-junction discovery fixes, so that descriptor carries `home_root_relative = true` and its
+  home keeps its repo-root spelling.
+- **govkit joins these paths once, at load.** `load_registry` and `resolve_descriptor_paths` join
+  every token and home to the root `derive_tool_root` derives, so each reader downstream keeps the
+  repo-relative spelling it always had. The tool root is govkit's grandparent, and the checkout root
+  is the first directory above it holding a `.git` entry.
+- **§8 F1 reaches every reader of the manifest's argv and guards, not the runner alone.** These are
+  `run-gates.sh`, `run-selftests.sh` with its budget and pooled-evidence sidecars,
+  `check-testsuite-counts.sh`, `check-spec-tokens.py` and govkit's guard-class arm. The runbook's
+  harness-migration program reads the registry and descriptors raw, so its reader learns the new
+  shape too. The literal registry path on its read line is `TOOL-aRepatriatedFork-46`'s.
+- **§8 F3's population rule is `TOOL-aRepatriatedFork-30`'s to build**, as the Edges hand-off says.
+  AC7's render clause is observed there, and the rows for `unattended-build.js` and
+  `drift-audit-state.js` stay until then.
+- **Lines left to their owners.** Three executing lines join a literal kit segment under a derived
+  base, and they belong to `TOOL-aRepatriatedFork-46`: govkit's runner probe, and the workflows and
+  lexicon joins in `map_extractors.py`. Four text cells in `dead-path-waivers.txt` must match lines of
+  the frozen adopter-receipt fixture byte for byte, so they drain only with that fixture, which is
+  `TOOL-aRepatriatedFork-28`'s. The same unit owns the selftest fixture strings in
+  `render_playbook.py` and the whole of `govkit/matrix.py`, the acceptance-matrix harness.
+- **The install-prefix gate's own predicate still reads gov's literal prefix**, in arm 3 and in the
+  counter. That is the definition of the class it bans, which is `TOOL-aRepatriatedFork-30`'s to
+  change. Only the kit-source test moved to `SELF_PREFIX`, as S3 says.
+
 ### Files touched (estimate)
 
 `tools/govkit/registry.toml` · `tools/govkit/govkit.py` · `tools/gate-legs.json` ·
@@ -104,7 +140,12 @@ descriptor resolves that is not a test, a kit descriptor, and the registry. A `s
 `tools/codebase-map/map_extractors.py` · `tools/codebase-map/scen-adversarial.json` ·
 `tools/drift-audit/drift_signals.py` · `tools/run-gates/selftest-budgets.txt` ·
 `tools/lib/pyrun.sh` · `tools/lib/extract-arms.sh` · every `kit.toml` descriptor under `tools/` ·
-`tools/install-prefix-carried.txt`
+`tools/install-prefix-carried.txt` · (rev-3) `tools/run-gates/run-selftests.sh` ·
+`tools/run-gates/selftest-pooled-evidence.txt` · `tools/run-gates/derive-ceilings.py` ·
+`tools/run-gates/ceiling-evidence.txt` · `tools/check-testsuite-counts.sh` ·
+`tools/codebase-map/rank_harness.py` · `tools/govkit/check_runbook_parity.py` ·
+`tools/govkit/refusal_join.py` · `tools/govkit/subject-pins.tsv` · `tools/dead-path-waivers.txt` ·
+`WIRE-INTO-PROJECT.md` · every carrier of the thirteen kit versions this unit moves
 
 ### Alternatives rejected
 
@@ -161,7 +202,7 @@ descriptor resolves that is not a test, a kit descriptor, and the registry. A `s
 
 ## 7. Gates
 
-`install-prefix (shipped surface)` · `install-prefix self-test` · `kit version markers` · `kit epoch (shipped bytes move, the version moves)` · `govkit selfcheck` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `govkit runbook parity` · `run-gates canary` · `run-gates gov canary` · `every held leg is budgeted, every budget row resolves` · `leg ceilings clear their evidenced maximum` · `dead-path carriers (deleted files still named)` · `spec tokens (a spec's own names resolve)` · `playbook parity` · `hook destinations (every declared hook path ships)` · `template size <=48KiB` · `kit placeholders (a declared token its adopter substitutes)` · `playbook render selftest` · `lexicon naming predicates` · `playbook parity selftest` · `codebase-map kit selftest` · `codebase-map gate coverage` · `codebase-map adopter e2e` · `recall floor arms` · `drift-audit selftest` · `hook destinations self-test` · `extract-arms self-test`
+`install-prefix (shipped surface)` · `install-prefix self-test` · `kit version markers` · `kit epoch (shipped bytes move, the version moves)` · `govkit selfcheck` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `govkit runbook parity` · `run-gates canary` · `run-gates gov canary` · `every held leg is budgeted, every budget row resolves` · `leg ceilings clear their evidenced maximum` · `dead-path carriers (deleted files still named)` · `spec tokens (a spec's own names resolve)` · `playbook parity` · `hook destinations (every declared hook path ships)` · `template size <=48KiB` · `kit placeholders (a declared token its adopter substitutes)` · `playbook render selftest` · `lexicon naming predicates` · `playbook parity selftest` · `codebase-map kit selftest` · `codebase-map gate coverage` · `codebase-map adopter e2e` · `recall floor arms` · `drift-audit selftest` · `hook destinations self-test` · `extract-arms self-test` · `run-selftests self-test`
 
 New arm: `tools/govkit/selftest.py` · a registry and descriptors at a `scripts/` root, which the
 `2143b6d6` resolver misreads · none
@@ -203,6 +244,11 @@ New arm: `tools/govkit/selftest.py` · a registry and descriptors at a `scripts/
   listed the `corpus_ids.py` and `gotchas.py` fixtures here; census §1 classes them D, and they
   moved to `TOOL-aRepatriatedFork-28`, whose mechanism drains them.
 - rev-2 · 2026-09-25 · §8 resolved by the owner: every fork takes its recommendation.
+- rev-3 · 2026-09-29 · the unit pass, before code. §4 gains the decisions the build met: the
+  `{prefix}` spelling for every gov-side registry and descriptor path, since a kit-relative
+  `<kit>/<file>` is itself a counted literal; the one repo-root home and its declaring key; the load
+  seam; every argv and guard reader §8 F1 reaches; F3's rule left to `TOOL-aRepatriatedFork-30`;
+  and the lines left to other owners. The Files touched list gains what they reach.
 
 ## 10. Reuse audit
 
