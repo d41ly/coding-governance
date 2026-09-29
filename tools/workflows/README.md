@@ -1,4 +1,4 @@
-# `tools/workflows/` — the review harness and the gates over it
+# `<prefix>/workflows/` — the review harness and the gates over it
 
 Three gates in this directory read the tree and delegate their verdict to the agent-cap hook:
 
@@ -102,8 +102,8 @@ the population is then every `*.js` the repo holds.
 
 **The predicate.** Three rungs, tried in order, then a refusal:
 
-1. `$HERE/hooks/agent-cap.js`
-2. `$HERE/../hooks/agent-cap.js` — gov and adopter nc both resolve here
+1. `agent-cap.js` in `$HERE/hooks/`
+2. `agent-cap.js` in `$HERE/../hooks/` — gov and adopter nc both resolve here
 3. `$ROOT/.claude/hooks/agent-cap.js` — adopter ic has no sibling `hooks/` at all, and this is its only copy
 
 The third rung is not a fallback for tidiness; a two-rung chain strands a real adopter, which was
@@ -118,10 +118,10 @@ said here rather than left for a reader to find.
 ## Running them
 
 ```bash
-bash tools/workflows/check-review-join.sh              # the whole population
-bash tools/workflows/check-review-join.sh --explain    # plus the resolved predicate and population
-bash tools/workflows/check-verifier-fanout.sh
-node tools/workflows/check-workflow-syntax.js
+bash <prefix>/workflows/check-review-join.sh              # the whole population
+bash <prefix>/workflows/check-review-join.sh --explain    # plus the resolved predicate and population
+bash <prefix>/workflows/check-verifier-fanout.sh
+node <prefix>/workflows/check-workflow-syntax.js
 ```
 
 Each also accepts explicit files, which is how the suites drive their fixtures. The `--explain`

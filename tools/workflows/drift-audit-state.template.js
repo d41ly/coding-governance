@@ -1,6 +1,6 @@
 export const meta = {
   name: 'drift-audit-state',
-  version: '1.16',
+  version: '1.17',
   description:
     "Drift audit Tier 1/2: are this repo's own records still true? Stale maps, stale memory, charter drift, work-state uncertainty, record-gate integrity. Project-agnostic; all repo facts arrive via args.",
   whenToUse:
@@ -12,7 +12,7 @@ export const meta = {
   ],
 }
 
-// gov:kit drift-audit@1.16
+// gov:kit drift-audit@1.17
 // --- bounded fan-out (inlined; workflow scripts cannot import) ------------
 // BOTH THE CONCURRENCY CAP AND THE VERIFIER TOTAL ARE BARE LITERALS, and neither is caller-settable.
 // The retired form bound each of them from an `<expr> || 5` fallback, which read as a constant to the
@@ -75,7 +75,7 @@ function chunk(a, n) {
 //   repo, base, outDir,                      // as in drift-audit-code
 //   memoryRoot: "memory",                    // from .memory-tree.conf
 //   charter: "AGENTS.md",                    // the file holding the binding rules + node registry
-//   gateManifest: "tools/gate-legs.json",    // the generated/authoritative leg list, if any
+//   gateManifest: "{{TOOL_ROOT}}gate-legs.json",    // the generated/authoritative leg list, if any
 //   measured: "Tier-0 numbers, to interrogate not re-derive",
 //   heuristics: "any orchestrator heuristic handed over, WITH its known failure mode",
 //   byDesign: "recorded/backlogged issues reviewers must NOT re-report",

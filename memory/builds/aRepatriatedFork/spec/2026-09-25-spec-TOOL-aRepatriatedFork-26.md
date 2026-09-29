@@ -1,12 +1,13 @@
 # TOOL-aRepatriatedFork-26 — the runbook and every shipped doc name no install prefix
 
-**Status:** SPECCED · rev-3 · 2026-09-29 · node a · Tier-1 · base 2143b6d6 · streams tooling · order 11
+**Status:** CLOSED · rev-3 · 2026-09-29 · node a · Tier-1 · base 2143b6d6 · streams tooling · order 11
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-25-build-TOOL-aRepatriatedFork-23-prefix-census.md](../build/2026-09-25-build-TOOL-aRepatriatedFork-23-prefix-census.md) | research | TOOL-aRepatriatedFork-23 TOOL-aRepatriatedFork-24 TOOL-aRepatriatedFork-25 TOOL-aRepatriatedFork-27 TOOL-aRepatriatedFork-28 TOOL-aRepatriatedFork-29 TOOL-aRepatriatedFork-30 |
+| [2026-09-29-build-TOOL-aRepatriatedFork-26-1-acceptance-ledger.md](../build/2026-09-29-build-TOOL-aRepatriatedFork-26-1-acceptance-ledger.md) | journal | — |
 | [2026-09-29-prompt-TOOL-aRepatriatedFork-26-build-brief.md](../prompts/2026-09-29-prompt-TOOL-aRepatriatedFork-26-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
@@ -25,11 +26,14 @@ at any prefix, chosen by the doc's role.
   the operator chose, as §8 F1 resolves. There are 19 of them. Observed by AC1.
 - **S2** — Every other kit path in WIRE, the `contribute` verb's among them, is spelled with the
   `<prefix>/` prose token. A `<gov>/tools/…` or `<gov-repo>/tools/…` spelling follows
-  `TOOL-aRepatriatedFork-23` §8 F2. Observed by AC1, AC2.
+  `TOOL-aRepatriatedFork-23` §8 F2. (rev-3) The executing `harness-migration` block lines are
+  returned, as §4 says. Observed by AC1, AC2.
 - **S3** — A doc govkit writes verbatim, which is every kit README, `LEXICON.md` and
   `skills/session-kickoff/SKILL.md`, uses the `<prefix>/` prose token. Observed by AC2.
 - **S4** — A doc govkit renders, the `*.template.*` files whose role is `rendered`, uses the render
-  token its renderer already substitutes, so the adopter reads the real path. Observed by AC3.
+  token its renderer already substitutes, so the adopter reads the real path. (rev-3) Where the
+  renderer substitutes none for the path, as the lexicon Skill marker's, the file is named in
+  words, as §4 says. Observed by AC3.
 - **S5** — A seeded doc, which is the charter template, `MANIFEST-TEMPLATE.md` and
   `drift_signals.template.py`, uses the token its adopter substitutes at seed time where one exists,
   and the `<prefix>/` prose token where none does. `drift-audit-state.template.js`'s commented

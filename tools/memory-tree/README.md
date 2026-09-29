@@ -55,8 +55,8 @@ put the KA tag in each discipline's `README.md`, not in the folder name.
 
 ```bash
 cp <kit>/.memory-tree.conf.example .memory-tree.conf   # then edit
-bash tools/memory-tree/adopt-memory-tree.sh --scaffold             # creates memory/ + project/ + backlog shards + the generated index
-bash tools/memory-tree/check-memory-hygiene.sh ; echo $?           # expect 0
+bash <prefix>/memory-tree/adopt-memory-tree.sh --scaffold             # creates memory/ + project/ + backlog shards + the generated index
+bash <prefix>/memory-tree/check-memory-hygiene.sh ; echo $?           # expect 0
 git add memory/ .memory-tree.conf && git commit
 ```
 
@@ -77,15 +77,15 @@ pattern:
 
 ## Wire the gate (all three)
 
-- **CI:** a job running `bash tools/memory-tree/check-memory-hygiene.sh` (no args = full check, includes TREE drift).
+- **CI:** a job running `bash <prefix>/memory-tree/check-memory-hygiene.sh` (no args = full check, includes TREE drift).
 - **Local gate runner:** add it as a concurrent leg (cheap, parallel with your test/typecheck legs).
 - **pre-commit hook:** BEFORE any linked-worktree early-exit, guarded so a hook-proof in a scripts-less repo
   stays green:
   ```sh
   top=$(git rev-parse --show-toplevel 2>/dev/null) || exit 0
-  if [ -f "$top/memory-tree/check-memory-hygiene.sh" ] &&
+  if [ -f "$top/<prefix>/memory-tree/check-memory-hygiene.sh" ] &&
      git diff --cached --name-only --diff-filter=ACMR -- 'memory/**' | grep -q .; then
-    bash "$top/memory-tree/check-memory-hygiene.sh" --staged || exit 1
+    bash "$top/<prefix>/memory-tree/check-memory-hygiene.sh" --staged || exit 1
   fi
   ```
 
@@ -100,21 +100,18 @@ memory/backlog/*.md merge=rows
 
 The driver COMMAND is git config, so it is per node — and both of its path arguments carry the
 install prefix, so there is no single literal that starts in both layouts. Do not hand-type it; this
-one spelling is correct in both, because the runbook installs `check-wiring.sh` at `<root>/tools/`
+one spelling is correct in both, because the runbook installs `check-wiring.sh` at `<root>/<prefix>/`
 either way:
 
 ```bash
-bash tools/check-wiring.sh --fix     # resolves both prefixes, then sets ONE string
+bash <prefix>/check-wiring.sh --fix  # resolves both prefixes, then sets ONE string
 ```
 
-`check-wiring.sh` probes for `merge-rows.sh` and `merge-rows.py` at each prefix and sets exactly one
-of the two commands below. They are quoted here so you can VERIFY what it set — not so you can retype
-one of them:
+`check-wiring.sh` probes for `merge-rows.sh` and `merge-rows.py` at each prefix and sets the one
+command below, with `<prefix>/` read as the prefix it found, and as nothing for a kit copy-installed
+at the repo root. It is quoted here so you can VERIFY what it set — not so you can retype it:
 
-- kit under a `tools/` prefix (what this repo dogfoods):
-  `bash tools/memory-tree/merge-rows.sh %O %A %B %P`
-- kit copy-installed at the repo root:
-  `bash memory-tree/merge-rows.sh %O %A %B %P`
+- `bash <prefix>/memory-tree/merge-rows.sh %O %A %B %P`
 
 A command that MIXES the two prefixes names a driver that exists in neither layout, and that failure
 is not loud. Git prints `CONFLICT (content)`, but a driver that never starts never writes `%A`, so

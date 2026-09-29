@@ -70,6 +70,8 @@ placeholders = ["KIT_DIR", "TOOL_ROOT", "MEMORY_TREE_DIR", "FANOUT_CAP"]
 # a hand fork of all four. The renderer asks the hook for the value (`--print-cap`), and at no conf
 # every render is byte-identical to the file it replaces. The same engine-to-rendered move the build
 # harness made above, and the same adopter migration: the runbook section the kit README points at.
+# drift-audit-state takes `TOOL_ROOT` as well, for the example leg-manifest path its input block shows
+# (TOOL-aRepatriatedFork-26): the renderer substitutes every token into every template it pairs.
 [[files]]
 include = ["tier2-review.template.js"]
 role = "rendered"
@@ -86,7 +88,7 @@ placeholders = ["FANOUT_CAP"]
 include = ["drift-audit-state.template.js"]
 role = "rendered"
 to = "{kit}/drift-audit-state.js"
-placeholders = ["FANOUT_CAP"]
+placeholders = ["FANOUT_CAP", "TOOL_ROOT"]
 
 [adopt]
 argv = []

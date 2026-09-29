@@ -34,8 +34,8 @@ to the surviving copy FIRST; the second copy is withdrawn SECOND. Reversed, the 
 the window between — a security guard silently off, which is the one failure mode this whole change
 had to avoid.
 
-    python tools/settings-merge.py                 # repaths an already-wired command in place
-    bash tools/check-wiring.sh --check             # says which copy is wired, every session
+    python <prefix>/settings-merge.py              # repaths an already-wired command in place
+    bash <prefix>/check-wiring.sh --check          # says which copy is wired, every session
 
 `settings-merge.py` repaths rather than no-ops: a command whose marker matches but whose path
 differs is rewritten. It used to return unchanged in that case, which meant every already-wired tree
@@ -164,7 +164,7 @@ hand narrowing passes green (the aReplayedCard closing review, F12).
 nothing. It exists so a file gate can share this predicate instead of re-implementing it.
 
 **A WIRED command must never carry it.** `--only=join` in `.claude/settings.json` would turn the cap
-rules off with no diff and a hook that still looks wired. `tools/check-wiring.sh` asserts its absence.
+rules off with no diff and a hook that still looks wired. `<prefix>/check-wiring.sh` asserts its absence.
 
 An array LITERAL of ≤5 elements — the finder-lens fan — is a RECEIVER the hook can size, which is
 one of the three ways a receiver branch qualifies above; it needs no helper. It is not a blanket
@@ -178,7 +178,7 @@ effective cap's worth per user prompt, claimed as atomic slots. That count is th
 reaching a fan-out made outside a workflow script, which is why the matcher must name both tools.
 
 `AGENT_CAP` in the environment is REFUSED, not honoured — the ceiling is a file constant. A ready-made
-harness that satisfies every rule above ships at `tools/workflows/tier2-review.js`.
+harness that satisfies every rule above ships at `<prefix>/workflows/tier2-review.js`.
 
 ## Lowering the cap — `.agent-cap.conf`
 

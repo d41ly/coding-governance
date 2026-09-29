@@ -992,4 +992,4 @@ def main(argv: list[str]) -> int:
 if __name__ == '__main__':
     raise SystemExit(main(sys.argv[1:]))
 
-KIT_PLAYBOOK_RENDER_VERSION = "1.12"  # gov:kit playbook-render@1.12
+KIT_PLAYBOOK_RENDER_VERSION = "1.13"  # gov:kit playbook-render@1.13

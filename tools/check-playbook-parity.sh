@@ -77,8 +77,10 @@ waived=$(grep -vE '^[[:space:]]*(#|$)' "$WAIVERS" | awk '{print $1}' | sort -u)
 # prevent, committed by the gate itself. No count is written here: the figure was measured at 7
 # when this comment was drafted and was 9 by the time the build landed, which is the same
 # stale-count defect one file over.
+# `<prefix>/<kit>/` is the third form (TOOL-aRepatriatedFork-26 S9): the charter and the runbook spell
+# a kit path with that prose token, because no install prefix is correct for every adopter.
 named_in_playbook() { # <kit>
-  grep -qE "tools/$1/|\`$1/\`" "$TEMPLATE" "$RUNBOOK" 2>/dev/null
+  grep -qE "tools/$1/|<prefix>/$1/|\`$1/\`" "$TEMPLATE" "$RUNBOOK" 2>/dev/null
 }
 
 for k in $kits; do

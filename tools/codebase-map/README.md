@@ -62,7 +62,7 @@ project specifics live in exactly two files the adopting repo owns.
 
 1. Copy this directory into the target repo as a directory NAMED `codebase-map` (the fixed name
    the gate resolves — don't rename). Its PREFIX is free: `<root>/codebase-map/` and
-   `<root>/tools/codebase-map/` both work, so a repo that keeps its kits under one directory
+   `<root>/<prefix>/codebase-map/` both work, so a repo that keeps its kits under one directory
    needs no exception. Below, `<kit>` is wherever you put it.
 2. `cp <kit>/.codebase-map.conf.example .codebase-map.conf` and edit (map root, gate path). It
    goes at the repo ROOT whatever the kit's prefix — it is the marker the kit walks up to find.

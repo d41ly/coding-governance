@@ -1,4 +1,4 @@
-<!-- gov:kit lexicon@1.11 -->
+<!-- gov:kit lexicon@1.12 -->
 # lexicon — a declared naming vocabulary, gated
 
 An OPT-IN kit that gates two naming predicates against a per-repo DECLARATION, and refuses an import
@@ -424,15 +424,15 @@ a pattern set that goes inert fails there.
 ## Supply — how the table reaches whoever is writing the name
 
 The declaration is the half of this kit with a measured record, and the measurement is NOT written
-here: `python tools/drift-audit/drift_report.py` derives `lexicon_marginal_offense_rate` live, over
+here: `python <prefix>/drift-audit/drift_report.py` derives `lexicon_marginal_offense_rate` live, over
 the window from the declaration's adoption commit to HEAD, splitting fresh files from pre-existing
 ones. A figure typed into this paragraph was wrong within a week of being written and nothing caught
 it, which is the rule this repo breaks most often — a value stated in prose beside the source that
 owns it rots between changes. Read it from the signal.
 
 ```bash
-python tools/lexicon/lexicon.py --suggest <identifier> --as <ext>.<surface>   # one line, no corpus pass
-bash tools/lexicon/adopt-lexicon.sh --render             # re-render the Skill after a declaration edit
+python <prefix>/lexicon/lexicon.py --suggest <identifier> --as <ext>.<surface>   # one line, no corpus pass
+bash <prefix>/lexicon/adopt-lexicon.sh --render             # re-render the Skill after a declaration edit
 ```
 
 `--suggest` answers from the declaration FIRST and the shipped canon second, in that fixed
@@ -572,7 +572,7 @@ languages, all measured pins, the proposed verb table and the rename debt adopti
 and writes nothing into the repo itself:
 
 ```bash
-python tools/lexicon/scaffold_lexicon.py /tmp/proposed.lexicon.conf
+python <prefix>/lexicon/scaffold_lexicon.py /tmp/proposed.lexicon.conf
 ```
 
 Read `/tmp/proposed.lexicon.conf`, decide, and only then scaffold into the repo for real.
@@ -613,10 +613,10 @@ text is gone reds as STALE, so a registry cannot quietly outlive what it excuses
 ## Adopting
 
 ```bash
-bash tools/lexicon/adopt-lexicon.sh --scaffold   # derive a PROPOSED table + measure the pins
-bash tools/lexicon/adopt-lexicon.sh --check      # the drift mode
-python tools/lexicon/lexicon.py                  # the gate
-python tools/lexicon/lexicon.py --list           # every offender, waived or not (authoring aid)
+bash <prefix>/lexicon/adopt-lexicon.sh --scaffold   # derive a PROPOSED table + measure the pins
+bash <prefix>/lexicon/adopt-lexicon.sh --check      # the drift mode
+python <prefix>/lexicon/lexicon.py                  # the gate
+python <prefix>/lexicon/lexicon.py --list           # every offender, waived or not (authoring aid)
 ```
 
 `--scaffold` asks your corpus ONE question per concept — does any spelling of this have a live
@@ -695,13 +695,13 @@ stale, removing the `EXTRACTORS` entry makes the dossier claim an id outside `in
 1. **Remove the dossier's `lexicon-verbs` claims** — `memory/map/features/lexicon.md`, the
    `gate-legs`/`kits` block. Claims first, or the next step orphans them.
 2. **Remove the `lexicon-verbs` entry** from `map_extractors.py:EXTRACTORS`.
-3. **Re-render** `memory/map/generated/` (`python tools/codebase-map/gen_map.py --write`).
+3. **Re-render** `memory/map/generated/` (`python <prefix>/codebase-map/gen_map.py --write`).
 4. **Delete `.lexicon.conf`** and drop the kit's legs from the gate manifest.
 
 Between steps 2 and 4 the engine reports `NOT ADOPTED` and exits 0, and the two `drift-audit` signals
 report NOT ASKED rather than a clean zero.
 
-**The mid-teardown safety arm.** `bash tools/lexicon/adopt-lexicon.sh --check` NAMES an orphaned
+**The mid-teardown safety arm.** `bash <prefix>/lexicon/adopt-lexicon.sh --check` NAMES an orphaned
 `lexicon-verbs` extractor — a conf deleted while the extractor remains, i.e. step 4 done before
 step 2. That is the state a hurried uninstall actually lands in, and it is the one the map gate
 reports least legibly.

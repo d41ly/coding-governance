@@ -131,7 +131,7 @@ fi
 # could not stamp" is not enough on its own — a mangled write plus an honest note would still leave
 # a broken conf on disk. The last two prefixes are ordinary ones the conf grammar accepts, so the
 # stamping's HAPPY path is armed too and this loop cannot pass by only ever declining.
-DEFAULT_MDC='python codebase-map/map_diff.py'   # gov:literal-python — the conf VALUE compared against, never run; gov:root-fixture — the example default, pre-stamp
+DEFAULT_MDC='python <prefix>/codebase-map/map_diff.py'   # gov:literal-python — the conf VALUE compared against, never run: the example's pre-stamp shape
 i=0
 for prefix in 'R&D' 'a b' "x'y" 'ok-dir' 'ok.dir'; do
   i=$((i+1))

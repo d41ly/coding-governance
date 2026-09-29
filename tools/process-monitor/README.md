@@ -1,6 +1,6 @@
 # process-monitor — find, report and kill the processes an agent session forgot
 
-<!-- gov:kit process-monitor@0.8 -->
+<!-- gov:kit process-monitor@0.9 -->
 
 Every deadline a repo like this owns bounds a command a CHECKER launched. Nothing bounds a process
 an AGENT launched — a `Bash run_in_background` job, a `Monitor` pipeline, a suite invoked by hand —
@@ -30,10 +30,10 @@ editor invisible.
 ## Adopting it
 
 ```bash
-cp -r <this kit> <your repo>/tools/process-monitor
-cp tools/process-monitor/process-monitor.template.conf .process-monitor.conf   # then EDIT it
-bash tools/process-monitor/adopt-process-monitor.sh
-bash tools/process-monitor/adopt-process-monitor.sh --check
+cp -r <this kit> <your repo>/<prefix>/process-monitor
+cp <prefix>/process-monitor/process-monitor.template.conf .process-monitor.conf   # then EDIT it
+bash <prefix>/process-monitor/adopt-process-monitor.sh
+bash <prefix>/process-monitor/adopt-process-monitor.sh --check
 ```
 
 You declare `PROCMON_ROOTS` and nothing else is required. The conf carries the reason for every key

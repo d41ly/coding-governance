@@ -55,7 +55,7 @@ have moved since). No card → add `git worktree list` when multi-tree.
 
 If the ff moved the default branch AND the project has a codebase map (manifest-declared, or
 `.codebase-map.conf` at the repo root): run the manifest's map-diff command over
-`<old-sha>..<new-sha>` (default `python tools/codebase-map/map_diff.py <old>..<new>`) and report
+`<old-sha>..<new-sha>` (default `python <prefix>/codebase-map/map_diff.py <old>..<new>`) and report
 the rollup + coverage line, `--verbose` only if asked.
 
 **STOP and tell the user first** when: a foreign `MERGE_HEAD` or `UU` conflict entries exist;
@@ -100,8 +100,8 @@ A manifest with no `kickoff-manifest:` marker (an unmanaged prototype) → skip 
 clause. **A manifest found at the skill's base directory (Step 2 location 3) → skip this step too,
 and say so**: it is outside every repository, the checker refuses an out-of-repo path by design, and
 claiming to have audited it would be a lie the READY card carries. Otherwise resolve the checker —
-the manifest's `check-script:` value, else `tools/manifest-check.sh`, else
-`scripts/manifest-check.sh` (the pre-2026-08 default, still honoured), else the `manifest-check.sh`
+the manifest's `check-script:` value, else a TRACKED `<prefix>/manifest-check.sh`
+(`git ls-files '*manifest-check.sh'`), else the `manifest-check.sh`
 shipped beside THIS skill (resolve the skill dir's real path through the junction, as in Scaffolding
 step 1) — and RUN it; **never
 reimplement its checks inline** (single source: the script IS the semantics). Trust guard: honor
@@ -177,7 +177,7 @@ design pass (the map's convergence rule).
 
 **The bug classes this area can hit** (when the project ships the memory-tree kit): the checklist is
 reachable before a diff exists, over the pointer-map row's entrypoints. `<MEMORY_TREE_KIT>` is whichever
-of `memory-tree/` or `tools/memory-tree/` holds `gotchas.py` — a DIFFERENT kit from the `<KIT>` the
+of `memory-tree/` or `<prefix>/memory-tree/` holds `gotchas.py` — a DIFFERENT kit from the `<KIT>` the
 recall step below resolves, and the two are not interchangeable:
 
 ```bash
@@ -188,7 +188,7 @@ Its stdout IS the list; report the class names on the READY card. This is what t
 front-load as prose and no longer needs to.
 
 **Memory-recall for the prior records** (when the project has the kit — `<KIT>` is whichever of
-`memory-recall/` or `tools/memory-recall/` holds `query.py`; both spellings ship, so resolve it
+`memory-recall/` or `<prefix>/memory-recall/` holds `query.py`; both spellings ship, so resolve it
 rather than assuming): issue ONE query for the unit's question instead of guessing which
 decision log binds it — `python3 <KIT>/query.py "<the question>" --terms "<8-14 words in
 THIS corpus's own jargon>"`. The terms are yours to write: the CLI is offline and cannot coin
@@ -261,13 +261,13 @@ the parked decisions). It does not merge and it does not push.
    stamp rule — a repo with no commits yet gets its initial commit first). Ask only for the
    non-derivable (multi-node? stream ownership? tier policy?). Write the result to the FIRST location
    `bash <check-script> --locations` prints (create the directory if needed).
-   Copy `manifest-check.sh` (it ships beside this file) into the project — default `tools/`,
-   any other home recorded in `check-script:` — keep the template's standing gate-fence line
+   Copy `manifest-check.sh` (it ships beside this file) into the project under `<prefix>/`,
+   that home recorded in `check-script:` — keep the template's standing gate-fence line
    pointing at it, add the adopting repo's `.gitattributes` LF rule for it, and `git add`
    everything copied/edited (the checker tests tracked-ness). Verify: `bash <check-script>` →
    exit 0, and `grep -nE '\{\{[A-Z]'` over the written manifest → empty. Offer separately —
    don't bundle — the pre-commit `--staged` leg (stated plainly: it narrows the drift remedy to
    the bundle-into-this-commit form) and a CI leg with `fetch-depth: 0` on the checkout step.
 3. **Offer separately — don't bundle:** instantiating the full governance playbook
-   (`coding-governance-agents.template.md`, via `tools/playbook/adopt-playbook.sh --target <repo>`) for
+   (`coding-governance-agents.template.md`, via `<prefix>/playbook/adopt-playbook.sh --target <repo>`) for
    projects that want the whole multi-node ruleset. The manifest is just the kickoff layer.

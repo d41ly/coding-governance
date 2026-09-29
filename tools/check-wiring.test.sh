@@ -904,10 +904,16 @@ done
 if [ -z "$RDM" ]; then
   echo "skip README-command case — the memory-tree kit README is not installed in this repo"
 else
-  grep -qF "$S_TOOLS" "$RDM" && ck "AC12 README publishes the tools/-prefix command" 1 \
-                             || ck "AC12 README publishes the tools/-prefix command" 0
-  grep -qF "$S_ROOT"  "$RDM" && ck "AC12 README publishes the root-prefix command" 1 \
-                             || ck "AC12 README publishes the root-prefix command" 0
+  # The README spells the command ONCE, with the `<prefix>/` prose token (TOOL-aRepatriatedFork-26
+  # S9), so each layout's command is that line with the token read as the fixture's prefix or as
+  # nothing. Both must come out equal to what `--fix` derived, or the doc names a third command.
+  PUB=$(grep -oE 'bash <prefix>/[A-Za-z0-9_./-]*merge-rows\.sh %O %A %B %P' "$RDM" | head -1)
+  { [ -n "$PUB" ] && [ "${PUB//<prefix>\//tools/}" = "$S_TOOLS" ]; } \
+    && ck "AC12 README publishes the tools/-prefix command" 1 \
+    || ck "AC12 README publishes the tools/-prefix command" 0
+  { [ -n "$PUB" ] && [ "${PUB//<prefix>\//}" = "$S_ROOT" ]; } \
+    && ck "AC12 README publishes the root-prefix command" 1 \
+    || ck "AC12 README publishes the root-prefix command" 0
   # ...and NO third spelling. This is the half that fires on a mixed-prefix literal, which is a
   # command both greps above are perfectly happy to coexist with.
   STRAY=$(grep -oE 'bash [A-Za-z0-9_./-]*pyrun\.sh [A-Za-z0-9_./-]*merge-rows\.py %O %A %B %P' "$RDM" \

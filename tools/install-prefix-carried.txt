@@ -10,14 +10,9 @@
 .githooks/pre-push.runlog.test.sh	4	govkit,lib,run-gates
 .githooks/pre-push.test.sh	2	run-gates
 .githooks/pre_push_bar_selftest.py	2	run-gates
-WIRE-INTO-PROJECT.md	115	(loose),codebase-map,drift-audit,gate-lint,govkit,hooks,lexicon,memory-recall,memory-tree,playbook,process-monitor,pytest-parallel-guardrails,workflows	the 29th is `contribute`, a GOV-SIDE verb an adopter never runs: it is invoked from a gov checkout against an adopter tree, so the path is gov's own and is correct at gov's prefix. DEPL-dRetiredFork-6. The other 28 predate this column and are recorded, not justified. RAISED 47 -> 53 by hand, 2026-09-08, for the process-monitor section 3e: this file is the RUNBOOK, so an install path an operator types is its content rather than a carried literal, and the six new hits are the adopter, the two scope probes, the two gate legs and the sweep. Deriving them would hand the operator a variable to expand. TOOL-aReapedSpinner-11.
-coding-governance-agents.template.md	3	(loose),hooks,playbook
-skills/deploy-governance/SKILL.md	7	govkit
-skills/session-kickoff/MANIFEST-TEMPLATE.md	2	(loose)
-skills/session-kickoff/SKILL.md	5	(loose),codebase-map,memory-recall,memory-tree,playbook
+WIRE-INTO-PROJECT.md	7	govkit	WRITTEN BY HAND, TOOL-aRepatriatedFork-26 rev-3. All seven sit in the harness-migration blocks, which the govkit self-test cuts out of this file and RUNS as written: six `$GOV/tools/govkit/govkit.py` invocations and the embedded program's read of gov's registry. They are executing lines joining a literal under the operator's `$GOV`, so they drain with the other executing derived-base joins, where a suite can observe the change, and not in a doc pass. Every other kit path in the runbook spells the `<prefix>/` token its Definitions line declares.
 skills/session-kickoff/manifest-check.sh	3	lib,unattended	the third is the `# >>> resolve_python — canonical copy: tools/lib/resolve-python.sh` marker line of the resolver block this file now carries INLINE (the aReplayedCard closing review, F2: its card append spawned a python it never ran). The marker is part of the byte-compared block, so the literal cannot be derived away; the same marker is the `lib` literal every other inline copy carries. The comments beside it name no prefix.
 skills/session-kickoff/manifest-check.test.sh	9	(loose),lib,memory-tree	WRITTEN BY HAND, TOOL-aRepatriatedFork-18 S1, when this suite began to SHIP beside its checker as the check-arms sibling every adopter reads. All three are the inline resolver block's own header and `# >>> resolve_python — canonical copy` marker, byte-compared against the canonical copy, so they cannot be derived away; the same `lib` literal every inline copy carries. Its sibling-kit paths are no longer spelled: S3 runs the checker's own `resolve_id_reader`.
-tools/agent-instructions/README.md	4	agent-instructions,playbook
 tools/agent-instructions/adopt-agent-instructions.test.sh	1	agent-instructions
 tools/agent-instructions/kit.toml	3	agent-instructions,codebase-map,govkit	a kit descriptor that gained the withholding comment TOOL-aQuenchedHarness-3 pasted into eleven of them; the literal it carries is `tools/codebase-map/kit.toml`, the descriptor that ALREADY used this mechanism and whose header explains it, cited as prior art rather than as a path this kit reads. Gov-side prose in a gov-side file. TOOL-aQuenchedHarness-3.
 tools/check-agent-cap-restatement.sh	2	hooks,workflows	RAISED 3 -> 4 by the epoch-4 widening, TOOL-cMendedVintage-5, and NOT a repair. The fourth occurrence is the argv default `WAIVERS=${1:-...}` at :54, which spells the waiver registry at gov's own prefix. The shipped gate leg passes `{prefix}/agent-cap-restatement-waivers.txt` as $1, so an adopter's wired invocation never takes the default and the literal strands only a bare hand-run at another prefix. Recorded, not drained: this unit changes the PREDICATE and section 3 of its spec makes draining the newly-seen sites a follow-up. The repair when someone takes it is the sidecar derivation this gate already does for itself.
@@ -45,10 +40,8 @@ tools/check-testsuite-counts.sh	3	(loose),lib	the counts gate names the harness 
 tools/check-testsuite-counts.test.sh	49	(loose),lib	its arms build fixtures that source the harness by path, which is what the new spelling requires them to grade. TOOL-aQuenchedHarness-6.
 tools/check-wiring.sh	3	hooks,lib	RAISED 1 -> 2 BY HAND, TOOL-aRepatriatedFork-36 rev-3: the second is the `# >>> resolve_python — canonical copy` marker of the resolver block this file now carries INLINE, because it RUNS settings-merge.py for an adopter-owned hook and the shared copy ships to no adopter. The marker is part of the byte-compared block, so the literal cannot be derived away; the same `lib` literal every inline copy carries.
 tools/check-wiring.test.sh	60	(loose),hooks,lib,memory-recall,memory-tree
-tools/codebase-map/.codebase-map.conf.example	2	codebase-map
-tools/codebase-map/README.md	1	codebase-map
 tools/codebase-map/adopt-codebase-map.sh	5	codebase-map,lib
-tools/codebase-map/adopt-codebase-map.test.sh	15	codebase-map,lib
+tools/codebase-map/adopt-codebase-map.test.sh	14	codebase-map,lib
 tools/codebase-map/gen_map.py	1	codebase-map
 tools/codebase-map/kit.toml	3	codebase-map,govkit	a kit descriptor that gained the withholding comment TOOL-aQuenchedHarness-3 pasted into eleven of them; the literal it carries is `tools/codebase-map/kit.toml`, the descriptor that ALREADY used this mechanism and whose header explains it, cited as prior art rather than as a path this kit reads. Gov-side prose in a gov-side file. TOOL-aQuenchedHarness-3.
 tools/codebase-map/map_extractors.py	13	(loose),codebase-map,hooks,lexicon,lib,run-gates,workflows
@@ -57,14 +50,11 @@ tools/codebase-map/selftest.py	34	(loose),codebase-map,lexicon,lib
 tools/codebase-map/test_codebase_map.py	1	codebase-map
 tools/codebase-map/test_codebase_map.template.py	1	codebase-map
 tools/dead-path-waivers.txt	16	govkit,lexicon,memory-tree
-tools/drift-audit/README.md	7	(loose),drift-audit,workflows
 tools/drift-audit/adopt-drift-audit.sh	6	drift-audit,lib,workflows
 tools/drift-audit/drift_signals.py	3	(loose),drift-audit
-tools/drift-audit/drift_signals.template.py	3	(loose),drift-audit
 tools/drift-audit/kit.toml	4	codebase-map,drift-audit,govkit,workflows	a kit descriptor that gained the withholding comment TOOL-aQuenchedHarness-3 pasted into eleven of them; the literal it carries is `tools/codebase-map/kit.toml`, the descriptor that ALREADY used this mechanism and whose header explains it, cited as prior art rather than as a path this kit reads. Gov-side prose in a gov-side file. TOOL-aQuenchedHarness-3.
 tools/drift-audit/selftest.py	22	drift-audit,lexicon,memory-recall,unattended,workflows
 tools/gate-legs.json	214	(loose),agent-instructions,codebase-map,drift-audit,gate-lint,govkit,hooks,lexicon,lib,memory-recall,memory-tree,playbook,process-monitor,pytest-parallel-guardrails,run-gates,runlog,unattended,workflows
-tools/gate-lint/README.md	3	gate-lint
 tools/gate-lint/kit.toml	2	gate-lint,govkit
 tools/govkit/adopters.toml	1	govkit
 tools/govkit/census.py	1	govkit
@@ -90,15 +80,11 @@ tools/govkit/refusal_join.py	3	govkit,memory-tree
 tools/govkit/registry.toml	101	(loose),agent-instructions,codebase-map,drift-audit,gate-lint,govkit,hooks,lexicon,lib,memory-recall,memory-tree,playbook,process-monitor,pytest-parallel-guardrails,run-gates,runlog,unattended,workflows	the deployer registry: every `[[exempt_leg]]` reason NAMES the descriptor that withholds the file, which is the whole content of the exemption. TOOL-aQuenchedHarness-3 added twenty-three of them and TOOL-aQuenchedHarness-6 three more. A registry that could not name a path could not record an exemption. RAISED 58 -> 59, TOOL-aReapedSpinner-6: this file IS the declared deployable population, so every entry it gains is one more path literal by construction. There is nothing to derive — a registry that globbed its own entries would stop being a declaration, which is the whole reason it is not a directory listing. RAISED 59 -> 61 by hand, TOOL-dLoggedFlight-1: the runlog entry names its descriptor, and its `[[exempt_leg]]` reason names the descriptor that withholds the self-test. Both are the registry's content for the reason above, and a kit that lands with a held self-test cannot add fewer than two. RAISED 61 -> 62 by hand, TOOL-dLoggedFlight-3: the run-gates suite for the run-log line is held on gov's bar and withheld from adopters, and its `[[exempt_leg]]` reason names the descriptor that withholds it, which is the one literal an exemption of that kind cannot do without. RECONCILED 70 -> 73 by hand at the origin/main merge into dLoggedFlight: main's own registry rows took the count to 70, and this build's three rows, counted above as 59 -> 62, add three. RAISED 73 -> 74 by hand at the aWokenSentinel reconcile, TOOL-aWokenSentinel-21: the `unattended-build self-test` [[exempt_leg]] row names the withheld suite by path, which is the whole content of an exemption.
 tools/govkit/selftest.py	596	(loose),codebase-map,drift-audit,gate-lint,govkit,hooks,lexicon,memory-recall,memory-tree,playbook,process-monitor,pytest-parallel-guardrails,run-gates,unattended,workflows
 tools/govkit/subject-pins.tsv	4	(loose),govkit,run-gates
-tools/hooks/README.md	4	(loose),workflows
 tools/hooks/agent-cap.js	3	(loose),workflows
 tools/hooks/agent-cap.test.sh	15	hooks,lib,workflows
 tools/hooks/kit.toml	3	govkit,hooks
 tools/hooks/scratch-guard.js	3	lib,run-gates
 tools/hooks/scratch-guard.test.sh	5	hooks,lib,run-gates
-tools/lexicon/LEXICON.md	2	lexicon
-tools/lexicon/README.md	10	codebase-map,drift-audit,lexicon
-tools/lexicon/SKILL.template.md	1	lexicon
 tools/lexicon/adopt-lexicon.sh	2	lib,run-gates
 tools/lexicon/kit.toml	4	codebase-map,govkit,lexicon,memory-recall	a kit descriptor that gained the withholding comment TOOL-aQuenchedHarness-3 pasted into eleven of them; the literal it carries is `tools/codebase-map/kit.toml`, the descriptor that ALREADY used this mechanism and whose header explains it, cited as prior art rather than as a path this kit reads. Gov-side prose in a gov-side file. TOOL-aQuenchedHarness-3.
 tools/lexicon/lexicon_conf.py	2	lexicon
@@ -115,7 +101,6 @@ tools/lib/resolve-python.sh	3	lib,memory-tree
 tools/lib/resolve-python.test.sh	18	drift-audit,lib,unattended
 tools/lib/resolve_kit_dir.py	2	lib
 tools/line-length-limits.txt	1	(loose)
-tools/memory-recall/README.md	8	memory-recall
 tools/memory-recall/adopt-memory-recall.sh	5	(loose),lib,memory-recall
 tools/memory-recall/extract.py	1	(loose)
 tools/memory-recall/kit.toml	3	codebase-map,govkit,memory-recall	a kit descriptor that gained the withholding comment TOOL-aQuenchedHarness-3 pasted into eleven of them; the literal it carries is `tools/codebase-map/kit.toml`, the descriptor that ALREADY used this mechanism and whose header explains it, cited as prior art rather than as a path this kit reads. Gov-side prose in a gov-side file. TOOL-aQuenchedHarness-3.
@@ -123,7 +108,6 @@ tools/memory-recall/recall-fixture.json	1	memory-recall
 tools/memory-recall/recall-opened.js	1	memory-recall
 tools/memory-recall/selftest.py	3	(loose),memory-tree
 tools/memory-recall/test_recall_floor.py	2	govkit,memory-recall
-tools/memory-tree/README.md	8	(loose),memory-tree
 tools/memory-tree/adopt-memory-tree.sh	4	lib
 tools/memory-tree/build-readme-slot-highwater.txt	1	(loose)
 tools/memory-tree/build-readme-slot-limits.txt	1	(loose)
@@ -144,17 +128,14 @@ tools/memory-tree/merge-rows.py	1	memory-recall
 tools/memory-tree/merge-rows.sh	6	lib
 tools/memory-tree/merge-rows.test.sh	46	lib,memory-recall,memory-tree
 tools/playbook-kit-waivers.txt	1	(loose)
-tools/playbook/README.md	3	govkit,playbook
 tools/playbook/kit.toml	5	govkit,playbook
 tools/playbook/render_playbook.py	10	(loose),govkit,lexicon
-tools/process-monitor/README.md	4	process-monitor	the install commands a human copies. A derived spelling would print a token rather than a runnable line, which is the opposite of what a README is for.
 tools/process-monitor/adopt-process-monitor.sh	2	lib,process-monitor	an adopter's own USAGE lines. LOWERED 5 -> 3: the settings-merge invocation this file PRINTS as its wiring remedy used to be counted here as "one command a human types", and that justification was wrong — the string is emitted at runtime by the unwired arm, so at a `scripts/` prefix it named a file the operator does not have, measured at two adopters. It is derived through KIT_REL now, like every other runtime path here. What is left is prose a human reads. The `lib` hit is the inlined resolve_python's canonical-copy pointer, which the sibling adopters carry identically.
 tools/process-monitor/adopt-process-monitor.test.sh	7	lib,process-monitor	a suite that must name the files it grades. It is `project-owned` in kit.toml and is withheld from `govkit apply`, so no adopter ever receives these bytes at any prefix. LOWERED 4 -> 1, 2026-09-08: the four adopter invocations now go through KIT_REL, derived from git rev-parse --show-prefix. What is left is one usage line a human reads.
 tools/process-monitor/kit.toml	3	govkit,process-monitor
 tools/process-monitor/selftest.py	1	(loose)
 tools/pytest-parallel-guardrails/kit.toml	3	codebase-map,govkit,pytest-parallel-guardrails	a kit descriptor that gained the withholding comment TOOL-aQuenchedHarness-3 pasted into eleven of them; the literal it carries is `tools/codebase-map/kit.toml`, the descriptor that ALREADY used this mechanism and whose header explains it, cited as prior art rather than as a path this kit reads. Gov-side prose in a gov-side file. TOOL-aQuenchedHarness-3.
 tools/pytest-parallel-guardrails/pytest-parallel-guardrails.test.sh	3	lib
-tools/run-gates/README.md	3	(loose),lib
 tools/run-gates/adopt-run-gates.test.sh	10	run-gates
 tools/run-gates/ceiling-evidence.txt	1	run-gates	gov's own recorded readings, withheld from adopters by a `project-owned` rule: the paths are gov leg names and travel nowhere. TOOL-aQuenchedHarness-2.
 tools/run-gates/gate-profiles.txt	1	(loose)
@@ -201,14 +182,12 @@ tools/unattended/stall-recorder.test.sh	4	lib,unattended	WRITTEN BY HAND, TOOL-a
 tools/unattended/stop-guard.test.sh	4	lib,unattended	WRITTEN BY HAND, TOOL-aWokenSentinel-3. The one literal is `KIT_REL="${KIT_REL:-tools/unattended}"`, the fixture's kit home for the real-driver arm, which borrows `adopt-unattended.test.sh`'s `seed()` and must spell the same default that suite's own row records: the seed installs the kit there and the arm runs it there, and an adopter at another prefix sets the variable once. FIXTURE-INTERNAL, correct at every prefix.
 tools/unattended/unattended.sh	3	(loose),lib,workflows	RAISED 7 -> 8 BY HAND at aDeferredBar's closing round 2 (R2, R8): the eighth literal is the `# >>> resolve_python` marker line naming its canonical copy, which every inline copy of that block carries verbatim because the resolver's parity gate compares the block INCLUDING its marker line. Same class as the `lib` literal check-memory-hygiene.sh, run-gates.sh and adopt-lexicon.sh carry for the same block. Not a path the driver reads: the block is inline precisely because `../lib/` does not exist where the driver ships.
 tools/unattended/unattended.test.sh	41	(loose),govkit,memory-recall,memory-tree,unattended	RAISED 3 -> 8 BY HAND at aDeferredBar's closing review F3: the SPEC_TOKENS_CLI dispatch arms copy the real checker INTO the scratch fixture at `tools/check-spec-tokens.py`, write the fixture's own `tools/gate-legs.json`, declare that path in the fixture's conf and name a missing `tools/gone.py`. FIXTURE-INTERNAL PATHS, the class the check-pass-order and check-brief-recorded rows record: the fixture tree is built by the suite and the driver under test reads the declaration from that tree, so `tools/` is the fixture's own layout and is correct at every prefix.
-tools/workflows/README.md	7	hooks,workflows
 tools/workflows/check-protocol-parity.test.sh	3	memory-tree,workflows
 tools/workflows/check-review-join.sh	4	(loose),hooks
 tools/workflows/check-review-join.test.sh	39	hooks,workflows
 tools/workflows/check-verifier-fanout.sh	3	hooks
 tools/workflows/check-verifier-fanout.test.sh	24	(loose),hooks,workflows
 tools/workflows/drift-audit-state.js	1	(loose)
-tools/workflows/drift-audit-state.template.js	1	(loose)	MOVED, not new: TOOL-aRepatriatedFork-7 made the rendered `tools/workflows/drift-audit-state.js` a render of this template, so the gate now grades the source, and these are the same comment literals, on the same lines, that `tools/workflows/drift-audit-state.js`'s row carried. Deriving a path inside a comment would change what the comment points a reader at.
 tools/workflows/kit.toml	3	codebase-map,govkit,workflows	a kit descriptor that gained the withholding comment TOOL-aQuenchedHarness-3 pasted into eleven of them; the literal it carries is `tools/codebase-map/kit.toml`, the descriptor that ALREADY used this mechanism and whose header explains it, cited as prior art rather than as a path this kit reads. Gov-side prose in a gov-side file. TOOL-aQuenchedHarness-3.
 tools/workflows/tier2-review.js	3	hooks,memory-tree,workflows
 tools/workflows/tier2-review.template.js	3	hooks,memory-tree,workflows	MOVED, not new: TOOL-aRepatriatedFork-7 made the rendered `tools/workflows/tier2-review.js` a render of this template, so the gate now grades the source, and these are the same comment literals, on the same lines, that `tools/workflows/tier2-review.js`'s row carried. Deriving a path inside a comment would change what the comment points a reader at.
