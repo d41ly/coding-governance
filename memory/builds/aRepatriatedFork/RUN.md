@@ -26,3 +26,19 @@ anchor-ref: refs/heads/main
 base: d6e1749c0542218004260928f1399174daafb789
 
 ## Parked
+
+2026-09-29T11:05:21Z brief · item TOOL-aRepatriatedFork-23 · reason 07d15bb623a8 memory/builds/aRepatriatedFork/prompts/2026-09-29-prompt-TOOL-aRepatriatedFork-23-build-brief.md
+
+2026-09-29T11:05:23Z brief · item TOOL-aRepatriatedFork-24 · reason 0b9d262bef72 memory/builds/aRepatriatedFork/prompts/2026-09-29-prompt-TOOL-aRepatriatedFork-24-build-brief.md
+
+2026-09-29T11:05:24Z brief · item TOOL-aRepatriatedFork-25 · reason 7e6a0af28dec memory/builds/aRepatriatedFork/prompts/2026-09-29-prompt-TOOL-aRepatriatedFork-25-build-brief.md
+
+2026-09-29T11:05:25Z brief · item TOOL-aRepatriatedFork-26 · reason 34dc1149aa68 memory/builds/aRepatriatedFork/prompts/2026-09-29-prompt-TOOL-aRepatriatedFork-26-build-brief.md
+
+2026-09-29T11:05:27Z brief · item TOOL-aRepatriatedFork-27 · reason 7ab34a4719ce memory/builds/aRepatriatedFork/prompts/2026-09-29-prompt-TOOL-aRepatriatedFork-27-build-brief.md
+
+2026-09-29T11:05:28Z brief · item TOOL-aRepatriatedFork-29 · reason ef5fbd0b3c19 memory/builds/aRepatriatedFork/prompts/2026-09-29-prompt-TOOL-aRepatriatedFork-29-build-brief.md
+
+2026-09-29T11:05:29Z brief · item TOOL-aRepatriatedFork-28 · reason 6ace46627006 memory/builds/aRepatriatedFork/prompts/2026-09-29-prompt-TOOL-aRepatriatedFork-28-build-brief.md
+
+2026-09-29T11:05:31Z brief · item TOOL-aRepatriatedFork-30 · reason 5f43f647b722 memory/builds/aRepatriatedFork/prompts/2026-09-29-prompt-TOOL-aRepatriatedFork-30-build-brief.md
