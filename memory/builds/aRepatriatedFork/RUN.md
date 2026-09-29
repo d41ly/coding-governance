@@ -14,12 +14,12 @@ phase: BUILDING
 mode: slug
 run-branch: refs/heads/branch/arepatriated-fork-build-e42158
 anchor-kind: default-branch
-lease-utc: 2026-09-29T11:02:51Z
+lease-utc: 2026-09-29T13:57:52Z
 pid-image: claude.exe
 host: compeeto-agent
-pid: 11996
+pid: 17728
 session: 3b534792-4ade-4a9d-8dfa-4cb264c0af0d
-keepalive: b1bc1d24
+keepalive: 953a4b2c
 anchor-url: https://github.com/d41ly/coding-governance.git
 anchor-sha: d6e1749c0542218004260928f1399174daafb789
 anchor-ref: refs/heads/main
