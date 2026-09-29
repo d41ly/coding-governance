@@ -9,6 +9,8 @@
 - TOOL-aRepatriatedFork-33 · filed 2026-09-25 · candidate gov check from inCMS's retired check 27: every minted id owns a recorded row. DEPL-aRepatriatedFork-20 F3 retired it at inCMS → builds/aRepatriatedFork/
 - TOOL-aRepatriatedFork-34 · filed 2026-09-25 · candidate gov check from inCMS's retired check 28: an id that shipped is not still SPECCED. DEPL-aRepatriatedFork-20 F3 retired it at inCMS → builds/aRepatriatedFork/
 - TOOL-aRepatriatedFork-35 · filed 2026-09-25 · DRAIN THE CARRIED ADOPTER NAME: `tools/govkit/adopters.toml` carries every site where a shipped file names inCMS, counted and shrink-only, so nc and swydee still receive it. Some are fixtures (a remote named `incms`, TS conformance sources). Filed per TOOL-aRepatriatedFork-31 §8 F1. Drained 2026-09-25: every site now cites `adopter ic`, fixtures take neutral names, and the carry table is gone, so arm 10 is a pure ban. Built as TOOL-aRepatriatedFork-35 → builds/aRepatriatedFork/spec/2026-09-25-spec-TOOL-aRepatriatedFork-35.md
+- TOOL-aRepatriatedFork-41 · filed 2026-09-28 · run-gates.turnstile.test.sh flakes on node a: 1 red in 3 solo runs at ca4bff24, a different arm each red run (peak-2 overlap; held-not-expired); green at 869209ed → builds/aRepatriatedFork/
+- TOOL-aRepatriatedFork-43 · filed 2026-09-29 · govkit `[[own]]` cannot name a root_relative source: inCMS's `.githooks/pre-push` fork is refused (resolve_owned_rows builds <home>/<rel>), so it stays unattributed and every update withholds the re-stamp → builds/aRepatriatedFork/
 
 ## Dispositions
 

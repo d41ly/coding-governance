@@ -419,3 +419,6 @@
 - KEEP · TOOL-dDerivedDocket-68 · declined under the unattended protocol's section 11; still wanted after this build closes, outside its goal
 - SEV · TOOL-dDerivedDocket-69 · MED · a crashed suite's unrun half is reported as a smaller red, never as unrun
 - KEEP · TOOL-dDerivedDocket-69 · declined under the unattended protocol's section 11; still wanted after this build closes, outside its goal
+- RELOCATED · TOOL-aProbedToolkit-14 · by 86c636b473df3433c707a38dff4fcf1c12cca4cc · dropped: main 2e2087a3 rewrote its prose (TOOL-dHashedPrelude-3 answered the memory-recall half, the lexicon half keeps it OPEN); its ask row in builds/aProbedToolkit/BACKLOG.md was hand-amended to that wording by the owner decision of 2026-09-29 to take main's wording
+- RELOCATED · TOOL-aRepatriatedFork-41 · by 2444c5f817f8a1490725095f95221fbddb753050 · kept: new ask
+- RELOCATED · TOOL-aRepatriatedFork-43 · by 5e4476afb7b328210bc6664140ed40708742f557 · kept: new ask

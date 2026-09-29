@@ -19,7 +19,7 @@ git-hooks = []
 workflow-scripts = []
 skill-engines = []
 rendered-skills = ["memory-recall"]
-gotcha-classes = []
+gotcha-classes = ["anchor-literal-resolves-above-its-target.md"]
 guides = []
 backlog-shards = []
 lexicon-verbs = []
@@ -119,6 +119,14 @@ floor on the merge bar.
   `(h-1)/(R-1)` beside the declared value and reds only when the pin has become LOOSER than that
   worst case. A pin left conservative by a fixture edit is caught instead by the arms, which assert
   the literal counts. Nothing recomputes the pin, by design.
+
+- **The suite's own guard was blind until 2026-09-28.** `selftest.py` brackets this repo's
+  live query log because a gate that writes to the instrument it measures is how upstream's log
+  became 96% self-inflicted refusals. `check()` runs each arm at decoration time and `main()`
+  took the baseline afterwards, so the row could not fail. `TOOL-dHashedPrelude-1` moved the
+  baseline above the arms and `-2` gated the ordering. What the guard still cannot see is in
+  its own comment: a concurrent writer in another session on the same repo, the cache directory
+  beside the log, a log absent at both readings, and a write reverted before the compare.
 
 ## Reuse affordance
 

@@ -1,10 +1,10 @@
-<!-- gov:kit memory-tree@2.102 -->
+<!-- gov:kit memory-tree@2.104 -->
 # The build method — how a multi-pass build runs
 
 ## M1 — What this is
 
 Binding for any build of more than one pass, attended or not. Template §1 defines a READY unit and a DONE unit;
-this is the middle. It is a PROCEDURE — nothing here grades a run, and the merge bar is `{{TOOL_ROOT}}run-gates/run-gates.sh`.
+this is the middle. It is a PROCEDURE — nothing here grades a run, and the merge bar is {{GATE_RUNNER}}.
 **Budget: ≤30720 bytes, ≤400 lines**, a LOCAL constraint and not rule 6's — that rule gives a guide far more, and this file is stricter for its own reason: M7 re-reads it
 WHOLE at every pass boundary and a method too expensive to re-read is skipped exactly when it is needed.
 It rose from ≤20 KB / ≤250 lines when M12 landed, to ≤24 KB / ≤310 on 2026-08-21, the LINE half to
@@ -37,9 +37,9 @@ pass unreviewable — the closing diff cannot tell which half a finding lands on
 Grouping asks into one unit is written ONLY as that unit's `closes` list.
 
 **Detect.** The roster is the build README's authored Units table where one exists, else the conforming specs under
-`memory/builds/<slug>/spec/`. **`ids:` is not it either** — it is DERIVED and rewritten by the index generator, so it
+`{{MEMORY_ROOT}}/builds/<slug>/spec/`. **`ids:` is not it either** — it is DERIVED and rewritten by the index generator, so it
 answers "which ids exist", never "which units are planned", and a planned unit cannot be added to it by hand. A unit's spec is the file under `spec/` whose status header carries the id. Shape, tiers and sub-spec form are
-`memory/TEMPLATE-SPEC.md`. Rebuild the roster after any fork resolution that adds a unit.
+`{{MEMORY_ROOT}}/TEMPLATE-SPEC.md`. Rebuild the roster after any fork resolution that adds a unit.
 
 **Classify, first match wins.** Write it into the build README's BUILD-LEVEL RULES slot before acting on it — a canon closes the HEADING set, never slot bodies, so this needs no slot of its own.
 
@@ -50,7 +50,7 @@ answers "which ids exist", never "which units are planned", and a planned unit c
 
 **Act.** **MISSING → author the spec, then re-classify.** *Authoring a spec is allowed:* the rule that a run may not
 write its own mandate is about AUTHORIZATION — the mandate authorizes, the spec is the WORK. Write it at the tier
-`memory/guides/SESSION-KICKOFF.md` assigns, same slug and folder; a spec you wrote this run is unreviewed by definition.
+{{MANIFEST_PATH}} assigns, same slug and folder; a spec you wrote this run is unreviewed by definition.
 **THIN → fill it as a `rev-N` bump on the existing file** with its §9 line, never a second file for a unit that has
 one — that is how a spec set stops agreeing with itself. **FORKED → M3.** **READY → build what it says**; to
 diverge, change the spec first (rev bump + §9 line), then code. **AMEND → RETIRE (status `WONTDO`), SUPERSEDE
@@ -108,7 +108,7 @@ puts code before the fork is resolved — a rewrite, not a decision.
 vacuous-selector class, and a probe cannot tell "satisfied" from "matched nothing". A real fork here was resolved
 AGAINST the better measurement for that reason, so a testing rule without this exception gets it wrong.
 
-**Mark it in place**, in the shape `memory/TEMPLATE-SPEC.md` §8 states with what its readers grade.
+**Mark it in place**, in the shape `{{MEMORY_ROOT}}/TEMPLATE-SPEC.md` §8 states with what its readers grade.
 
 ## M4 — The spec audit — owed only where the build or its project declares it
 
@@ -125,17 +125,17 @@ reviewed by that run is false.
 **Run it as a `Workflow` script, not as direct `Agent` spawns.** The direct-spawn budget is keyed per PROMPT TURN
 and an unattended run has no next prompt to reset it: three specs audited directly exhaust it mid-set and the rest
 are refused with nobody reading. Agents inside a `Workflow` sidechain are not counted. Shape and caps:
-`memory/guides/REVIEW-PROTOCOL.md`, **read there.**
+{{REVIEW_PROTOCOL}}, **read there.**
 
 **Lenses: 3–5, primed with the mandate, the overview and the spec format.** The catalogue —
 underspecification, contradiction, unstated assumption, prior art — with what each hunts, is in
 `{{KIT_DIR}}/README.md`.
 
-**Record it** under `memory/builds/<slug>/reviews/` per `memory/HYGIENE.md` check 5's filename grammar, opening with
+**Record it** under `{{MEMORY_ROOT}}/builds/<slug>/reviews/` per `{{MEMORY_ROOT}}/HYGIENE.md` check 5's filename grammar, opening with
 the literal line `## Verdict: CLEAN` — or `CLEAN WITH FIXES`, or `BLOCKED`. Older records lack it; write it, M9
 derives from it. **Carry the binding line** check 21 requires —
 `**Serves:** spec-audit <the ids you reviewed>` — what makes "unreviewed" answerable from the tree.
-Grammar: `memory/HYGIENE.md`, "Record bindings". **Fold fixes into the spec** (rev bump + §9 line), then **STOP** once
+Grammar: `{{MEMORY_ROOT}}/HYGIENE.md`, "Record bindings". **Fold fixes into the spec** (rev bump + §9 line), then **STOP** once
 a synthesis pass calls the design clean.
 
 **A BLOCKED verdict has a disposition.** A SPEC subject takes `REVIEW_ROUNDS` rounds (protocol §8) and exits BOUNDED; the DIFF review converges: a round re-arms only on a count STRICTLY SMALLER than the round before, never merely "changed" (2, 1, 2 satisfies that forever). **At the exit every CONFIRMED finding is DISPOSED BY SEVERITY, on CONVERGED too**: a BLOCKER or HIGH is PROMOTED to a unit whose mechanism closes it, audited as a SPEC; a MEDIUM or LOW is FOLDED into its spec as a rev-N bump with a §9 line; never parked, waived, retired or re-reviewed. Both terminate. **Folding a round's own fixes does not re-arm the loop** — the fold is what the next round measures. **The CHAIN of promotions is bounded by PRECISION.** Each takes a FRESH subject, so `REVIEW_ROUNDS` re-arms per subject and bounds no chain of them. A PROMOTING round whose precision, which its own record states, falls below the review protocol's floor ENDS the chain: its promotions are built from their specs as written, and where `specs-audited` is owed they close under a recorded override of it, because the run CLOSES units no audit names.
@@ -146,7 +146,7 @@ refuses the round and names this route.
 
 ## M5 — Recall and reuse
 
-The obligation is `reuse-first`, written as `memory/TEMPLATE-SPEC.md` §10 and machine-checked there. Satisfy it once for the SET, not per
+The obligation is `reuse-first`, written as `{{MEMORY_ROOT}}/TEMPLATE-SPEC.md` §10 and machine-checked there. Satisfy it once for the SET, not per
 spec, in this order — map dossier first, decision records second:
 
 ```bash
@@ -199,7 +199,7 @@ sequence its own and says so in the unit's brief) when, and only when: (1) their
 actual paths, written down before dispatch — do
 not intersect; (2) neither writes a file the other reads as a contract (conf, template, interface, generator
 input) or as an acceptance input, and neither depends on the other's output either way; (3) neither touches a
-shared mutable record — `memory/DECISIONS.md`, an authored backlog shard, the run-state file, or a generated index
+shared mutable record — `{{MEMORY_ROOT}}/DECISIONS.md`, an authored backlog shard, the run-state file, or a generated index
 TOGETHER WITH its generator. If you cannot write both path lists down, the work is not known to be disjoint —
 sequence it. Both lists are RECORDED, not merely written: the unattended kit's `--dispatch`.
 
@@ -226,7 +226,7 @@ says*, and *the phase and its witness*. If either is not already in your head, y
 anything was compacted. Read in this order, and nothing else:
 
 1. `git log --oneline -5` — under a mandate, `bash {{TOOL_ROOT}}unattended/unattended.sh --resume <slug>`.
-2. The build's authored record whole (under a mandate `memory/builds/<slug>/RUN.md`, which survived compaction and
+2. The build's authored record whole (under a mandate `{{MEMORY_ROOT}}/builds/<slug>/RUN.md`, which survived compaction and
    process death where your context did not) — mandate, phase, witness, parked entries.
 3. **This file, whole.** It is capped so this stays cheap.
 4. The CURRENT sub-spec, whole — that one, not the set, which was read in M2 and is on disk.
@@ -250,25 +250,25 @@ re-scan overlapping code and never see the seam between two passes.
 Workflow { scriptPath: '{{TOOL_ROOT}}workflows/tier2-review.js',
            args: { repo: '<abs repo path>', base: '<sha: BASE at round 1, round N-1's tip after>',
                    head: 'HEAD', round: <n>, priorFindings: [<round N-1's confirmed set>],
-                   reviewDir: 'memory/builds/<slug>/reviews' } }
+                   reviewDir: '{{MEMORY_ROOT}}/builds/<slug>/reviews' } }
 ```
 
 **Pass `reviewDir` explicitly** — its default is repo-root-relative and writes the report outside the memory tree,
-where nothing indexes it. The harness names the file it wrote: **rename it to `memory/HYGIENE.md` check 5's
+where nothing indexes it. The harness names the file it wrote: **rename it to `{{MEMORY_ROOT}}/HYGIENE.md` check 5's
 recording grammar before the next gate run**, or check 5 reds on a free-named file. A closing review is a
 `diff-review`, not a `spec-audit`: give it `**Serves:** diff-review <every id in the diff>` and do not let it stand
 in for the per-spec pass M4 owns — the two answer different questions and only one of them is about a design.
 
 Fix every blocker, then re-review the FIX, not the diff again. A blocker unfixable inside the mandate's scope is a
 park, not a waiver, and its unit does not close. Left-shift every confirmed finding — a regression gate, or a
-`memory/gotchas/` class when the class cannot be gated; a finding fixed and not left-shifted returns.
+`{{MEMORY_ROOT}}/gotchas/` class when the class cannot be gated; a finding fixed and not left-shifted returns.
 
 **Re-read the build README against the code before closing** — every owner ruling and every sentence naming a shipped mechanism. `readme_mechanism_drift` reports only the pairs that spell it identically; the fold owns the rest.
 
 **Landing** — `land-once-done` and `conflicts-reconciled` between them: merge and push
 authorization, the lander, the bypass ban, additive reconciliation of a shared record, and when a
 build may land at all. Both are template §1 Landing and
-`memory/guides/UNATTENDED-PROTOCOL.md`; neither is restated here.
+{{UNATTENDED_PROTOCOL}}; neither is restated here.
 
 ## M9 — The wrap-up — a derivation, not a recollection
 
@@ -279,8 +279,8 @@ from, the line does not go in.**
 
 | item | derived from |
 |---|---|
-| build log and slug | `memory/builds/<slug>/` + generated `memory/LIVE.md` and `memory/ledger/<month>.md` |
-| decisions taken | every §8 `RESOLVED` mark across the spec set (M3) + the `memory/DECISIONS.md` rows this build minted + its commits' `Decided:` trailers (M10) |
+| build log and slug | `{{MEMORY_ROOT}}/builds/<slug>/` + generated `{{MEMORY_ROOT}}/LIVE.md` and `{{MEMORY_ROOT}}/ledger/<month>.md` |
+| decisions taken | every §8 `RESOLVED` mark across the spec set (M3) + the `{{MEMORY_ROOT}}/DECISIONS.md` rows this build minted + its commits' `Decided:` trailers (M10) |
 | asks filed and disposed | the index generator's `--asks --build <slug> --all` |
 | problems resolved | each review record's `## Verdict` line and its blockers/highs (M4, M8) + the bug classes the checklist selected |
 | open / parked | every `surfaced`-class parked entry in the authored record (M6) with question, options and reason, plus any recorded DoD override or directive waiver. `history`-class entries — a review round, say — are append-only sequence, carry no question, and are not the owner's to adjudicate |
@@ -294,7 +294,7 @@ apply: §16 budgets a completion message, and this is the only turn the owner ge
 ## M10 — If the run is unattended
 
 Three deltas, and no others. The contract — mandate, run state, phases, witnesses, DoD, keepalive, landing — is
-`memory/guides/UNATTENDED-PROTOCOL.md`, deliberately not paraphrased here.
+{{UNATTENDED_PROTOCOL}}, deliberately not paraphrased here.
 
 - **Nobody reads the transcript**, which is `minimal-prose`. Speak only when it changes what happens
   next: a refusal, an abort, a park, the
@@ -312,12 +312,9 @@ Three deltas, and no others. The contract — mandate, run state, phases, witnes
 ## M11 — Where everything else lives — read these, do not restate them
 
 The carriers, what each owns, and when to load it: **`{{KIT_DIR}}/README.md`, section "The method's
-pointer table"**. The six are `skills/session-kickoff/SKILL.md`, `memory/TEMPLATE-SPEC.md`,
-`memory/guides/REVIEW-PROTOCOL.md`, `memory/HYGIENE.md`, the governance template with its companion, and
-`memory/guides/UNATTENDED-PROTOCOL.md`. Names here, scopes there — one hop, and this file stays re-readable.
-
-*The memory root is spelled `memory/` throughout; an adopter whose `MEMORY_ROOT` differs renames it here, the same
-caveat `HYGIENE.template.md` carries.*
+pointer table"**. The six are {{KICKOFF_SKILL}}, `{{MEMORY_ROOT}}/TEMPLATE-SPEC.md`,
+{{REVIEW_PROTOCOL}}, `{{MEMORY_ROOT}}/HYGIENE.md`, the governance template with its companion, and
+{{UNATTENDED_PROTOCOL}}. Names here, scopes there — one hop, and this file stays re-readable.
 
 ## M12 — Research, test, choose — when the solution is not given
 

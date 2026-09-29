@@ -201,6 +201,8 @@ Cite ids, never line numbers.
 | [TOOL-aRepatriatedFork-22](../builds/aRepatriatedFork/BACKLOG.md) | OPEN | — | — | 2026-09-24 | check_waivers in tools/unattended/unattended.sh tests *"$BYPASS_BAN"*,… |
 | [TOOL-aRepatriatedFork-33](../builds/aRepatriatedFork/BACKLOG.md) | OPEN | — | — | 2026-09-25 | candidate gov check from inCMS's retired check 27: every minted id owns… |
 | [TOOL-aRepatriatedFork-34](../builds/aRepatriatedFork/BACKLOG.md) | OPEN | — | — | 2026-09-25 | candidate gov check from inCMS's retired check 28: an id that shipped… |
+| [TOOL-aRepatriatedFork-41](../builds/aRepatriatedFork/BACKLOG.md) | OPEN | — | — | 2026-09-28 | run-gates.turnstile.test.sh flakes on node a: 1 red in 3 solo runs at… |
+| [TOOL-aRepatriatedFork-43](../builds/aRepatriatedFork/BACKLOG.md) | OPEN | — | — | 2026-09-29 | govkit [[own]] cannot name a root_relative source: inCMS's… |
 | [TOOL-aReplayedCard-6](../builds/aReplayedCard/BACKLOG.md) | OPEN | — | — | 2026-09-14 | drift-audit's closed_specs_with_no_product_commit signal joins by build… |
 | [TOOL-aReplayedCard-7](../builds/aReplayedCard/BACKLOG.md) | OPEN | — | — | 2026-09-14 | manifest-check.sh --card --write spawns about ten git processes for its… |
 | [TOOL-aReplayedCard-8](../builds/aReplayedCard/BACKLOG.md) | OPEN | — | — | 2026-09-14 | WIRE-INTO-PROJECT.md §4 spells the kickoff-manifest format version… |

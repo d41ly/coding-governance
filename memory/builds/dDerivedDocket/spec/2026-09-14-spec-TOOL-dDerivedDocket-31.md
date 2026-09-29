@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-31 — fork items and delegated-pass carriers
 
-**Status:** CLOSED · rev-6 · 2026-09-27 · node d · Tier-2 · base fb07ca25 · streams tooling · order 29
+**Status:** CLOSED · rev-7 · 2026-09-29 · node d · Tier-2 · base fb07ca25 · streams tooling · order 29
 
 <!-- gen:spec-records -->
 
@@ -359,7 +359,9 @@ NO CAP IS RAISED here.
   invocation is what `tools/unattended/gate-guard.js` denies in the pass.
 - **AC8** — When `bash tools/memory-tree/check-memory-hygiene.sh` runs on the real tree, it is
   green with `FORK_ITEM_CUTOFF` set later than every tracked spec's filename date, and
-  `unattended.sh --plan` prints the same verdict for every live build as it did at BASE.
+  `unattended.sh --plan` prints the same verdict for every live build with the key set as with it
+  blank, which isolates this key; later units changed `--plan`'s verdicts on purpose (units 16 and
+  17's UNDECIDED ask rung), so a comparison with BASE no longer measures this unit.
   Red when: the cutoff sits at or before a tracked spec's date, and a landed spec goes red.
   figure: the value is DERIVED at build time from the newest tracked spec filename date, and the
   unit's journal records it.
@@ -622,6 +624,10 @@ New arm: `tools/unattended/unattended.test.sh` · a fixture conf whose cutoff is
   pass-order leg act on MISSING and THIN alone at BASE and after, so none of them can report FORKED
   and their half is the structural count. §7 names the driver suite's new arm; §10's citations are
   re-measured.
+- rev-7 · 2026-09-29 · §6 · AC8 · at the landing reconcile the BASE comparison could not hold for
+  a reason outside this unit: four live builds' `--plan` read UNDECIDED at HEAD and none at BASE,
+  the ask rung units 16 and 17 added. AC8 now compares the key set with the key blank at the
+  landing tree, which is the question this unit owns. The unit stays CLOSED.
 
 ## 10. Reuse audit
 

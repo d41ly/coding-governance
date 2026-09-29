@@ -1,7 +1,7 @@
-<!-- gov:kit memory-tree@2.102 -->
-# memory/ retention & hygiene
+<!-- gov:kit memory-tree@2.104 -->
+# {{MEMORY_ROOT}}/ retention & hygiene
 
-`memory/` is the project's AI-first memory: version-controlled, travelling to every node on clone.
+`{{MEMORY_ROOT}}/` is the project's AI-first memory: version-controlled, travelling to every node on clone.
 It holds one append-only decision log, per-build folders, the gate's own waiver registries, and
 long-lived guides.
 The tree is FLAT: the discipline is a SIGNAL, not a directory. Which discipline a build served is
@@ -10,12 +10,12 @@ repo-root `.memory-tree.conf` declares as `DISCIPLINES`. A build spanning two di
 build, in one folder.
 This file is the rule set; the single mechanical enforcement is `{{KIT_DIR}}/check-memory-hygiene.sh`
 (run by CI, the pre-commit hook, and the local gate runner). Prose rules with no wiring rot — the
-script is the law, this doc explains it. (Replace `memory/` throughout with your `MEMORY_ROOT` if you renamed it.)
+script is the law, this doc explains it.
 
 ## Structure
 
 ```
-memory/
+{{MEMORY_ROOT}}/
 ├── README.md              root index (one-liners)
 ├── LIVE.md                GENERATED — builds with a non-terminal unit ({{KIT_DIR}}/gen_build_index.py)
 ├── ledger/<YYYY-MM>.md    GENERATED — one row per build opened that month; freezes when the month passes
@@ -88,7 +88,7 @@ folder holding nothing but `BACKLOG.md`, which is a FILING HOME for asks nobody 
   under a header promising terminal ones only, with 49 of its ids also live in the shard and 7 of
   those disagreeing about status.
 - **Either mode:** the fresh or surviving index notes the rotation in its PREAMBLE, naming the archive
-  file (check 10, which greps for that basename and reads nothing else) and what moved; rotated archives stay inside `memory/` so the all-time id-collision
+  file (check 10, which greps for that basename and reads nothing else) and what moved; rotated archives stay inside `{{MEMORY_ROOT}}/` so the all-time id-collision
   grep still reaches them; and rotation never rewrites or renumbers a ratified record.
 - **The live-row floor.** Non-terminal rows survive the rotation under either mode, so a shard's floor
   is its LIVE ROW COUNT: when nothing terminal is left, rotating is a no-op and the next row breaches
@@ -131,7 +131,7 @@ there is no UNDECLARED third state, because every check below has to grade some 
 
 ## The grandfather ratchet
 
-The plain lists in `memory/project/` — the whole of what that directory holds — read as exact-key
+The plain lists in `{{MEMORY_ROOT}}/project/` — the whole of what that directory holds — read as exact-key
 set membership rather than a `grep -qxF` per call, because that fork ran once per scanned file:
 - **`legacy-files.txt`** — recording files kept under historical names (e.g. from a migration), permanently
   exempt from the recording-file naming check, from check 4's build-folder shape (a listed folder
@@ -142,8 +142,9 @@ set membership rather than a `grep -qxF` per call, because that fork ran once pe
   and — since `TOOL-cGradedDebt-1` — if a listed path would PASS all three unwaived, because a row
   that hides nothing has stopped shrinking. The same run prints which of the three each row earns,
   so a waiver wider than its fault is visible without being failed. Held under `--staged`.
-- **`id-orphan-waiver.txt`** — ids cited but never defined, deliberately (check 14). Shrink-only
-  against `ORPHAN_ID_PIN`, with a stale-entry guard: a waived id that now resolves reds.
+- **`id-orphan-waiver.txt`** — ids cited in the present tense but never defined, deliberately
+  (check 14). Shrink-only against `ORPHAN_ID_PIN`, with a stale-entry guard: a waived id that
+  now resolves, or that no present-tense file cites, reds.
 - **`corpus-path-unresolved.txt`** — rooted repo-path citations that resolve to nothing (check 15),
   one TAB-separated row per `(citing-file, cited-path)`. Shrink-only against `DEAD_PATH_PIN`.
 - **`unarmed-branches.txt`** — `fail` branches no assertion reaches (the harness meta-gate below).
@@ -169,7 +170,7 @@ to every consumer, so a registry a gate names and nothing creates is invisible u
 1. **prompt placement** — prompt-kind files only under `builds/*/prompts/` or `archive/`.
 2. **link integrity** — every relative md link resolves (exempt: DECISIONS.md, `decisions/`, `archive/`,
    and `legacy-files.txt`-listed recordings). The generated index files are NOT exempt.
-3. **structure lint** — the `memory/` root holds only the sanctioned set; `backlog/` holds only
+3. **structure lint** — the `{{MEMORY_ROOT}}/` root holds only the sanctioned set; `backlog/` holds only
    `<FAMILY>.md`; `builds/` holds only folders; `decisions/ guides/ archive/` contents are
    unconstrained; `project/` holds ONLY the waiver registries — no catch-all — and its selector
    carries rule 5's guard, so a mis-segmented `project/` path reds instead of admitting everything;
@@ -297,9 +298,11 @@ to every consumer, so a registry a gate names and nothing creates is invisible u
     or not zero-padded disarms the comparison rather than being compared raw, and one line names the
     verdict — comparing a blank cutoff as the empty string would read every migrated ask as filed
     after it and red them all at once.
-14. **orphan ids** — an id cited but never defined fails unless listed in
-    `project/id-orphan-waiver.txt`, which carries a shrink-only pin (`ORPHAN_ID_PIN`) and a
-    stale-entry guard: a waived id that now resolves is a stale row and reds.
+14. **orphan ids** — an id cited in the PRESENT-tense corpus but never defined fails unless listed
+    in `project/id-orphan-waiver.txt`. The population is check 15's, decided by one test for both:
+    a record of a moment or an append-only file is not a claim about now. The waiver is not a
+    citation. It carries a shrink-only pin (`ORPHAN_ID_PIN`) and a stale-entry guard: a waived
+    id that now resolves, or that no present-tense file cites, is a stale row and reds.
 15. **dead repo-path citations** — a rooted repo-path citation in the PRESENT-tense corpus that
     resolves to nothing must be registered in `project/corpus-path-unresolved.txt`. A DIRECTORY
     citation counts: it is exactly as broken when it does not resolve, and the flatten left four of

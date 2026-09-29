@@ -17,6 +17,7 @@ The module name follows the codebase-map kit's `map_lib.py` and the runlog kit's
 from __future__ import annotations
 
 import pathlib
+import re
 
 # The lifecycle vocabulary, one declaration for the index generator's front-matter check, check 24's
 # rotation grading and the backlog-row census.
@@ -162,3 +163,35 @@ def unfenced_lines(text: str):
             yield n, line
     if fence:
         yield opened_at, None
+
+
+def build_spec_path_re(memory_root: str):
+    """The path half of `parse_spec_h1`: a build's `spec/` folder, at any depth. Exposed so a caller
+    walking a whole tree can skip reading a file the predicate would refuse on its path alone."""
+    return re.compile(r"^" + re.escape(memory_root) + r"/builds/[^/]+/spec/")
+
+
+def parse_spec_h1(rel: str, text: str, memory_root: str, families) -> tuple[int, str] | None:
+    """`(lineno, id)` of the H1 that DEFINES a unit id in a spec file, or None.
+
+    THE one predicate for "which id does this spec define" (TOOL-aRepatriatedFork-40). Two kits read
+    it: `gen_build_index.spec_ids`, the index generator's resolution set, and the memory-recall
+    kit's `extract_records`, which anchors a record on the same line. The recall kit reaches it
+    through the sibling-kit resolver because it `requires` this kit; a copy of the regex there is
+    the two-answers-to-one-question class.
+
+    `rel` is repo-relative and must sit under `<memory_root>/builds/<slug>/spec/`, at any depth. The
+    first UNFENCED H1 whose first token is `<FAMILY>-<slug>-<seq>` wins, one per file. `families`
+    is the prefixes alone (`TOOL`, not `tooling:TOOL`).
+    """
+    if not build_spec_path_re(memory_root).match(rel):
+        return None
+    alt = "|".join(sorted(set(families))) or "(?!)"
+    pat = re.compile(r"^#\s+[`*]*(?P<id>(?:" + alt + r")-[A-Za-z0-9]+-\d+)\b")
+    for n, line in unfenced_lines(text):
+        if line is None:
+            continue
+        m = pat.match(line)
+        if m:
+            return n, m.group("id")
+    return None

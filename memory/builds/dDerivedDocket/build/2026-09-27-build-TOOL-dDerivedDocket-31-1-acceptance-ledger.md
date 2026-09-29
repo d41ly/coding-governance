@@ -54,6 +54,12 @@ the new hygiene-suite arm, the driver-suite arm, and the ratchet half of AC12.
   2026-09-20 and its twin `none line, later open` silent and READY at 2026-08-09; every planning row
   there is handed the cutoff the sliced `read_fork_cutoff` returns for the fixture conf, and the
   `item/cutoff` assertion that it reads 2026-09-15 held
+- AC8 — amended rev-7 — `FORK_ITEM_CUTOFF` was re-derived at the landing reconcile to
+  2026-09-30, the day after the merged tree's newest tracked spec filename date, 2026-09-29, and
+  `bash tools/memory-tree/check-memory-hygiene.sh` exited 0 over that reconcile tree. `unattended.sh
+  --plan` over the seven live builds printed byte-identical output with the key set and with it
+  blank (conf restored byte for byte after); against BASE four builds differ only by units 16 and
+  17's UNDECIDED ask rung, which the section 9 rev-7 line records.
 - AC9 — `bash tools/memory-tree/kit-dogfood-parity.test.sh --check` — exit 0, 4 pairs agree after
   `--render`; the F-item grammar and the section-reading sentence sit in `memory/TEMPLATE-SPEC.md`
   where the fork-format unit moved M3's paragraph, check 12 in `memory/HYGIENE.md` carries the

@@ -147,7 +147,8 @@ SPEC_RECORDS_CLOSE = "<!-- /gen:spec-records -->"
 # longer imports a sibling ENGINE: an adopter's own `corpus_ids.py` stops being able to kill it.
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from tree_lib import (  # noqa: E402  the kit's shared helpers
-    STATUS_TOKENS, TERMINAL, kit_rel, parse_conf, unfenced_lines,
+    STATUS_TOKENS, TERMINAL, build_spec_path_re, kit_rel, parse_conf, parse_spec_h1,
+    unfenced_lines,
 )
 
 
@@ -559,10 +560,13 @@ def spec_ids(root: str, tracked: list, conf: dict) -> set:
     citations anywhere, and it admits backlog and decision rows as if they were units — measured on
     this corpus, two thirds of its ids had no spec at all. Resolving a record against it would let a
     binding name something no spec ever defined.
+
+    The predicate itself is `tree_lib.parse_spec_h1`, shared with the memory-recall kit's extractor
+    so the two readers cannot disagree about which line defines an id (TOOL-aRepatriatedFork-40).
     """
     m = conf["MEMORY_ROOT"]
-    pat = re.compile(r"^#\s+[`*]*(?P<id>(?:" + _id_alternation(conf) + r")-[A-Za-z0-9]+-\d+)\b")
-    sel = re.compile(r"^" + re.escape(m) + r"/builds/[^/]+/spec/")
+    fams = [p.split(":", 1)[1] for p in conf.get("FAMILIES", "").split() if ":" in p]
+    sel = build_spec_path_re(m)
     out = set()
     for rel in tracked:
         if not sel.match(rel):
@@ -570,11 +574,9 @@ def spec_ids(root: str, tracked: list, conf: dict) -> set:
         text, _why = read_text_or_none(os.path.join(root, rel))
         if text is None:
             continue
-        for line in unfenced(text):
-            mm = pat.match(line)
-            if mm:
-                out.add(mm.group("id"))
-                break
+        hit = parse_spec_h1(rel, text, m, fams)
+        if hit:
+            out.add(hit[1])
     return out
 
 

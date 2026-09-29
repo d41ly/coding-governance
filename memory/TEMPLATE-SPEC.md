@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.102 -->
+<!-- gov:kit memory-tree@2.104 -->
 # TEMPLATE-SPEC — the canonical spec / design-pass format (memory-tree kit)
 
 Every spec file under `<MEMORY_ROOT>/builds/*/spec/` (at any depth — sub-spec folders are scanned
@@ -190,7 +190,7 @@ requires reading the handoff.
 
 ## §7 Gates — the shape the leg join reads, and where a new arm lives
 
-`tools/check-spec-tokens.py` resolves a §7 gate name against `tools/gate-legs.json`, and
+`tools/check-spec-tokens.py` resolves a §7 gate name against its own repo's gate-leg manifest, and
 it reads only lines that ARE the list: a line carrying nothing but backticked names and `·` or `,`
 separators. A line with a `- ` bullet marker, a prose prefix or a trailing clause is NOT read. Prose
 may sit above or below that line freely.

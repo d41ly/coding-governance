@@ -18,6 +18,7 @@ hard rule here, and the last arm re-hashes the live log to prove this run did no
 
 from __future__ import annotations
 
+import ast
 import datetime
 import hashlib
 import inspect
@@ -108,7 +109,7 @@ def resolve_memory_root() -> str:
 # `main()` already asserts `len(order) == len(_checks)`, which is DECLARED versus RAN: delete an arm
 # from both the order list and the definitions and it passes silently. This is the external number
 # that cannot be satisfied by deleting both halves.
-SELFTEST_ARMS = 71
+SELFTEST_ARMS = 75
 # 34 -> 58 on 2026-08-24 (adopter ic's recall contrib branch): twenty-four arms — twenty-three ported from
 #   adopter ic's scripts/recall/selftest.py plus one written here. NINE over `bench.py`/`union.py`,
 #   which `verbatim.json` pinned by digest and nothing exercised; ELEVEN over the half of
@@ -127,6 +128,17 @@ SELFTEST_ARMS = 71
 #   into the conf, each observed red against the kit before the unit - the archive segment after
 #   `archive/`, `RECALL_NODE_TAG_CLASS`, `RECALL_CITED_FAMILIES`, `RECALL_BUILD_QID_CUTOFF`,
 #   `RECALL_EXPORT_DIR`, and the digest moving with the two grammar keys and only those.
+# 71 -> 73 on 2026-09-28 (TOOL-aRepatriatedFork-40): TWO arms, both red against the d486ea50
+#   extractor - a spec's defining H1 anchors its id by the index generator's own predicate, and a
+#   query for that id returns the defining spec's record first.
+# 73 -> 75 on 2026-09-28 (TOOL-dHashedPrelude-2): TWO arms over the live-log guard that
+#   brackets this suite, which until now could not fail - `main()` took its baseline after every
+#   arm had already run, so the row it feeds compared post-arm state against itself. One asserts
+#   from source that the baseline precedes the first decorated arm and that `main()` appends the
+#   row exactly once, unconditionally and argument-free; one drives the verdict over all FIVE of
+#   its states, three of which no run in a repo with a readable log produces. Both this line and
+#   the one above it were written as `71 -> 73` on two branches that did not know about each
+#   other; the merge renumbered this one, which is the whole reason the chain is checked.
 
 
 def check_provenance_chain(src: str | None = None, pinned: int | None = None) -> str:
@@ -189,6 +201,13 @@ def make_repo(kitname: str = "memory-recall", conf: str = CONF, gitignore: str |
     kitdir.mkdir(parents=True)
     for f in SHIPPED:
         shutil.copyfile(KIT / f, kitdir / f)
+    # The two memory-tree files this kit reaches, where the resolver's probe finds them: this kit
+    # `requires` that one, `extract_records` imports `parse_spec_h1` from `tree_lib.py` on first use,
+    # and the spec-H1 arm compares against `gen_build_index.spec_ids` (TOOL-aRepatriatedFork-40).
+    import extract as E
+    (root / "memory-tree").mkdir()
+    for f in ("tree_lib.py", "gen_build_index.py"):
+        shutil.copyfile(E.resolve_kit_dir("memory-tree", f, KIT) / f, root / "memory-tree" / f)
     (root / ".memory-tree.conf").write_text(conf, encoding="utf-8", newline="\n")
     # `flat` writes <root>/DECISIONS.md, which is the layout the memory-tree kit's own adopter
     # creates; the default writes <root>/<discipline>/DECISIONS.md, which is upstream's. `DURABLE`
@@ -279,6 +298,104 @@ def cleanup(root: pathlib.Path) -> None:
         shutil.rmtree(root, **{key: _set_writable})
     except OSError:
         pass          # survivors are the final arm's business, not an exception here
+
+
+# ---- the live-log baseline, taken HERE and not in main() ----------------------------------------
+# `check()` above runs each arm INSIDE the decorator, so every arm has already executed by the time
+# `main()` is entered. A baseline taken there brackets nothing, and the row it feeds reported `ok`
+# while four fixture queries (qids 592-595) sat in this repository's real log — observed 2026-09-22
+# on node `d`. Module scope, above the first `@check`, is what brackets the arms. TOOL-dHashedPrelude-1.
+#
+# WHAT THIS DOES NOT CHECK, stated so the row is never read as more than it is:
+#   * A CONCURRENT WRITER. This is a whole-file digest and the log is shared by every session in
+#     this repository, so a row another session appends while this suite runs is indistinguishable
+#     from a row an arm wrote. That cuts both ways: it can red an innocent run and it can mask a
+#     guilty one. Measured: rows arrived here mid-run during this unit's own build.
+#   * THE CACHE. Only `recall/queries.jsonl` is bracketed. The `recall/cache/` tree beside it is
+#     written by ordinary queries and by eviction, and nothing here looks at it.
+#   * A LOG ABSENT AT BOTH ENDS. Two absent readings compare equal, so a tree with no log at all
+#     reports exactly like a tree whose log was protected.
+#   * A WRITE THAT IS REVERTED. Only the endpoints are read. An arm that appends a row and removes
+#     it again before `main()` reaches the compare leaves nothing for this to see.
+#   * A LOG THAT BECOMES UNREADABLE. Either reading can come back `(unreadable)`, and the verdict is
+#     then a skip rather than a comparison, so a write followed by a permission change is not caught.
+#
+# AND THE LIMIT THAT IS NOT A GAP BUT A CEILING: everything above is enforced from inside this
+# module, so an author editing this module can defeat any of it. The arm below catches ACCIDENTS —
+# a conditional reintroduced, a baseline moved, a helper rewritten — and it does not pretend to
+# withstand someone who is trying. That is why the pair is bound at DEF TIME below rather than
+# looked up at call time: it removes the accidents from reach instead of policing their spellings.
+
+
+def _resolve_live_log():
+    """The path this suite brackets, or None when no repository resolves.
+
+    `repo_root()` anchors on this kit's own file rather than the cwd (TOOL-aCollapsedScan-7), so
+    this is the REAL repository even for an arm that has chdir'd into a throwaway fixture. That is
+    exactly why the bracket is worth taking.
+    """
+    try:
+        return git_common_dir(recall_conf.repo_root()) / "recall" / "queries.jsonl"
+    except Exception:  # noqa: BLE001 — no repo, no log to protect
+        return None
+
+
+def _derive_live_log_digest(live):
+    """The digest of `live`, or a sentinel. RAISES FOR NOTHING.
+
+    `exists()` then `read_bytes()` is a TOCTOU pair and the second half can fail on its own — a
+    permission bit, a lock, a file replaced between the two calls. The old code let that escape into
+    `main()`, so the guard crashed the suite instead of reporting, which is the one outcome a guard
+    must never have. `(unreadable)` is its own sentinel and NOT `(absent)`: two unreadable readings
+    would otherwise compare equal and report a protected log nobody could read.
+    """
+    if live is None or not live.exists():
+        return "(absent)"
+    try:
+        return hashlib.sha256(live.read_bytes()).hexdigest()
+    except OSError:
+        return "(unreadable)"
+
+
+_LIVE_LOG = _resolve_live_log()
+_LIVE_LOG_BEFORE = _derive_live_log_digest(_LIVE_LOG)
+_LIVE_LOG_ROW = "the live query log is byte-identical after this run"
+
+
+def _read_live_log_verdict(_live=_LIVE_LOG, _before=_LIVE_LOG_BEFORE) -> tuple[str, str, str]:
+    """The guard's row for THIS run, over the prelude's pair, bound HERE at def time.
+
+    THE DEFAULT ARGUMENTS ARE THE MECHANISM, not a shorthand. They are evaluated once, at this
+    point in the module, above the first `@check`. Nothing that runs later can change what this
+    compares: not an assignment inside `main()`, not `global`, not `globals()[...] = `, and not a
+    second module-scope assignment placed below the arms. All four of those were GREEN against the
+    arm that policed spellings inside `main()`, and three of them restore the original defect
+    exactly — the baseline taken after every arm has already run.
+
+    `main()` calls this with NO arguments, so there is nothing for a local to shadow either.
+    """
+    return _build_live_log_row(_live, _before)
+
+
+def _build_live_log_row(live, before) -> tuple[str, str, str]:
+    """The guard's verdict, as the `(state, name, detail)` triple `_checks` holds.
+
+    A FUNCTION rather than a branch inside `main()`, so an arm can drive all four states. Two of
+    them cannot be produced by running this suite in a real repository at all: an unresolvable
+    repository, and a log that does not exist.
+
+    The unresolvable case returns a `skip`. It used to emit NO ROW — `main()` guarded the append on
+    the path being set — and a row that is absent is indistinguishable from a clean run, which is
+    the same green-by-absence this guard exists to catch, on the guard's own row.
+    """
+    if live is None:
+        return ("skip", _LIVE_LOG_ROW, "the repository did not resolve, so nothing was bracketed")
+    after = _derive_live_log_digest(live)
+    if "(unreadable)" in (before, after):
+        return ("skip", _LIVE_LOG_ROW, "the log exists and could not be read, so nothing was compared")
+    if after == before:
+        return ("ok", _LIVE_LOG_ROW, before[:12])
+    return ("FAIL", _LIVE_LOG_ROW, f"the gate wrote to it: {before[:12]} -> {after[:12]}")
 
 
 # ------------------------------------------------------------------------------------ the arms
@@ -1578,6 +1695,12 @@ def test_one_walk_two_callers():
         return f"query sees {len(live)} file(s), measurement sees {len(tracked)}"
     finally:
         os.chdir(cwd)
+        # `reload` re-executes the ONE module object `query` also holds, from the fixture's copy;
+        # left there, every later in-process arm ran a kit whose directory `cleanup` deletes, and
+        # anything resolving a sibling from `extract.__file__` looked beside nothing
+        # (TOOL-aRepatriatedFork-40). Put the kit's own source back.
+        sys.path.remove(str(kitdir))
+        importlib.reload(E)
         cleanup(root)
 
 
@@ -2615,6 +2738,152 @@ def test_export_dir_is_declared_and_bounded():
     return "declared dir honoured with an honest header, `../out` exits 2 writing nothing, absent = git dir"
 
 
+# The anchors the ordering arm below compares. Each carries a LEADING NEWLINE, making it a
+# column-0 anchor, and that is load-bearing rather than tidy: a literal written inside this file's
+# own source with a backslash-n escape is the two characters backslash and n, NOT a newline, so a
+# real-newline search never matches one. Counted on the blob at BASE 3cf05f29 — bare `@check(`
+# occurs 72 times and first resolves to LINE 145, inside `check_provenance_chain()`'s docstring,
+# while the anchored form occurs 71 times and first resolves to line 287; bare `def main() -> int:`
+# occurs twice, first at line 2379 inside a `src.partition` literal, while the anchored form occurs
+# once. An arm anchored on the BARE forms would compare an offset inside a docstring against the
+# baseline's and red against a CORRECT file. Line numbers are quoted here and byte offsets are not:
+# an offset differs by one per preceding line between this CRLF working copy and the LF blob, and a
+# rev-2 draft of the spec pinned the worktree pair by mistake. TOOL-dHashedPrelude-2.
+_ANCHOR_ARM = "\n@check("
+_ANCHOR_BASELINE = "\n_LIVE_LOG_BEFORE = "
+_ANCHOR_MAIN = "\ndef main() -> int:"
+_ANCHOR_LOG = "\n_LIVE_LOG = "
+_ANCHOR_VERDICT = "\ndef _read_live_log_verdict("
+
+
+@check("the live-log baseline precedes every arm, and main() appends its row unconditionally")
+def test_the_live_log_baseline_is_taken_before_any_arm_runs(src: str | None = None):
+    """The guard is only a guard if its baseline precedes the arms it brackets.
+
+    READ FROM SOURCE, not from behaviour. The behavioural test would write a row to the REAL QUERY
+    LOG, run the suite and expect FAIL. That is not available: the only log the guard watches is
+    this repository's own, because `repo_root()` anchors on this kit's file and no arm can point it
+    at a fixture, so an arm that writes there IS the defect the guard exists to catch. Reading text
+    is what is left.
+
+    `src` is a parameter for the reason `check_provenance_chain` takes one: every failure direction
+    has to be reachable from a synthetic string, the absent-anchor one included.
+    """
+    if src is None:
+        src = pathlib.Path(__file__).read_text(encoding="utf-8", errors="replace")
+
+    # COUNTS FIRST. A second column-0 spelling of either unique anchor would silently re-point the
+    # offset compare below, so it reds here instead, naming the anchor that moved.
+    for anchor in (_ANCHOR_BASELINE, _ANCHOR_LOG, _ANCHOR_MAIN, _ANCHOR_VERDICT):
+        n = src.count(anchor)
+        assert n == 1, f"{anchor!r} occurs {n} time(s) at column 0, expected exactly 1"
+    arms = src.count(_ANCHOR_ARM)
+    assert arms >= 1, f"{_ANCHOR_ARM!r} occurs {arms} time(s) at column 0, expected at least 1"
+
+    base = src.find(_ANCHOR_BASELINE)
+    first = src.find(_ANCHOR_ARM)
+    mn = src.find(_ANCHOR_MAIN)
+    assert base < first, (
+        f"the baseline is assigned at offset {base}, after the first decorated arm at {first} — "
+        "every arm runs at decoration time, so a baseline below them brackets nothing")
+
+    # THE APPEND CLAUSE IS STRUCTURAL, and the three substring tests it replaces are the reason.
+    # Those tests greened on SEVEN ways of disabling the guard -- commenting the append out (which
+    # preserves its text by definition), an `if _LIVE_LOG:` wrapper, a try/except, a renamed local,
+    # a duplicate, and `global _LIVE_LOG_BEFORE` plus a re-derive inside main(), which restores the
+    # exact defect this build closed. Only outright deletion redded. Measured, closing review of
+    # TOOL-dHashedPrelude-2. A text search cannot see structure, so it cannot see this property.
+    try:
+        tree = ast.parse(src)
+    except SyntaxError as exc:
+        raise AssertionError(f"the source does not parse, so no structural claim is available: {exc}")
+    mains = [n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "main"]
+    # EXACTLY one, not the first: a second `main` defined below shadows the first at runtime
+    # while `next(...)` would keep inspecting the one that no longer runs.
+    assert len(mains) == 1, f"{len(mains)} module-level `main` definitions, expected exactly 1"
+    fn = mains[0]
+    assert not fn.decorator_list, (
+        "`main` carries a decorator, so what runs is not the function this arm inspected")
+
+    # DIRECT body statements, never `ast.walk`: an append nested under `if`, `try` or `for` is
+    # invisible here and therefore reds, which IS the unconditionality claim.
+    # Statements after a `return` are still in `fn.body`, so position is its own claim: an append
+    # relocated below the return is unreachable, the row vanishes, and the summary silently drops.
+    stop = next((i for i, s in enumerate(fn.body) if isinstance(s, ast.Return)), len(fn.body))
+    rows = []
+    for stmt in fn.body[:stop]:
+        if not (isinstance(stmt, ast.Expr) and isinstance(stmt.value, ast.Call)):
+            continue
+        call = stmt.value
+        if not (isinstance(call.func, ast.Attribute) and call.func.attr == "append"
+                and isinstance(call.func.value, ast.Name) and call.func.value.id == "_checks"):
+            continue
+        if (call.args and isinstance(call.args[0], ast.Call)
+                and isinstance(call.args[0].func, ast.Name)
+                and call.args[0].func.id == "_read_live_log_verdict"):
+            rows.append(call.args[0])
+    assert len(rows) == 1, (
+        f"{len(rows)} unconditional `_read_live_log_verdict` append(s) in main(), expected 1 — a "
+        "conditional, a try, a comment-out, a duplicate, a relocation below the return and a "
+        "deletion all land here")
+    assert not rows[0].args and not rows[0].keywords, (
+        "the verdict is called with arguments; it takes none precisely so that nothing at the call "
+        "site can substitute the pair it was bound with")
+
+    # THE BINDING ITSELF, asserted rather than assumed. Its defaults are what make a later rebind
+    # unreachable, so an edit that turns them into call-time lookups has to red here.
+    vfn = next((n for n in tree.body
+                if isinstance(n, ast.FunctionDef) and n.name == "_read_live_log_verdict"), None)
+    assert vfn is not None, "no module-level `_read_live_log_verdict` to inspect"
+    defaults = [d.id if isinstance(d, ast.Name) else type(d).__name__ for d in vfn.args.defaults]
+    assert defaults == ["_LIVE_LOG", "_LIVE_LOG_BEFORE"], (
+        f"the verdict's defaults are {defaults}, not the prelude pair — bound at def time is the "
+        "whole mechanism, and a call-time lookup puts a rebind back in reach")
+    assert src.find(_ANCHOR_VERDICT) < first, (
+        "`_read_live_log_verdict` is defined below the first decorated arm, so its defaults capture "
+        "post-arm state")
+    return (f"baseline {base} < first arm {first}, {arms} arm(s), main() at {mn}; "
+            f"1 argument-free append, defaults {defaults}")
+
+
+@check("the live-log verdict is total over its five states")
+def test_the_live_log_verdict_is_total_over_its_states():
+    """`_build_live_log_row` answers for every state, including two no run in this repo can produce.
+
+    DRIVEN DIRECTLY rather than by running the suite: an unresolvable repository and a missing log
+    cannot be produced inside a repository that has one, and the behavioural alternative — making
+    the guard witness a real write — means writing to the live query log, which this suite may not
+    do. The fourth state is the one that used to emit NO ROW, which reads exactly like a clean run.
+    """
+    state, name, detail = _build_live_log_row(None, "(absent)")
+    assert state == "skip", f"an unresolvable repository reported {state!r}, not a skip"
+    assert name == _LIVE_LOG_ROW and "resolve" in detail, f"the skip does not say why: {detail!r}"
+
+    assert _build_live_log_row(pathlib.Path(__file__), "(unreadable)")[0] == "skip", (
+        "an unreadable log reported a verdict; two unreadable readings compare EQUAL, so the only "
+        "honest answer is a skip")
+
+    bound = _read_live_log_verdict()
+    assert bound[1] == _LIVE_LOG_ROW and bound[0] in ("ok", "skip"), (
+        f"the def-time-bound verdict did not answer for this run: {bound}")
+
+    root = pathlib.Path(tempfile.mkdtemp(prefix="recall-row-"))
+    try:
+        log = root / "queries.jsonl"
+        assert _build_live_log_row(log, "(absent)")[0] == "ok", "a log absent at both readings is not ok"
+        log.write_bytes(b'{"qid": 1}\n')
+        before = _derive_live_log_digest(log)
+        assert _build_live_log_row(log, before)[0] == "ok", "an unchanged log did not report ok"
+        log.write_bytes(b'{"qid": 1}\n{"qid": 2}\n')
+        state, _, detail = _build_live_log_row(log, before)
+        assert state == "FAIL", f"an appended-to log reported {state!r}"
+        assert before[:12] in detail and _derive_live_log_digest(log)[:12] in detail, (
+            f"the FAIL detail names only one digest, so it says nothing about what changed: {detail!r}")
+    finally:
+        cleanup(root)
+    return "skip / skip / ok / ok / FAIL, and the FAIL names both digests"
+
+
 @check("CONF_DIGEST moves with the two grammar keys and ONLY with them")
 def test_digest_follows_grammar_keys_only():
     """A grammar key must invalidate a warm cache; a non-corpus key must not force a rebuild (AC6)."""
@@ -2637,15 +2906,92 @@ def test_digest_follows_grammar_keys_only():
     return f"base {dig['base']}; tag and cited move it, cutoff and export do not"
 
 
-def main() -> int:
-    # The live log of the repo this kit sits in, hashed before and after: a gate that writes to the
-    # instrument it measures is how upstream's log came to be 96% self-inflicted refusals.
-    try:
-        live = git_common_dir(recall_conf.repo_root()) / "recall" / "queries.jsonl"
-        before = hashlib.sha256(live.read_bytes()).hexdigest() if live.exists() else "(absent)"
-    except Exception:  # noqa: BLE001 — no repo, no log to protect
-        live, before = None, "(absent)"
+# --- TOOL-aRepatriatedFork-40: a spec's defining H1 anchors its id, by the index generator's predicate
+SPEC_H1_REL = "builds/bQuill/spec/2026-09-28-spec-TOOL-aQuill-9.md"
+SPEC_H1_CORPUS = {
+    # The ONLY defining line TOOL-aQuill-9 has: a spec H1. The section under it must stay out of
+    # its record.
+    SPEC_H1_REL: "# TOOL-aQuill-9 — the quibbler rotation\n\n**Status:** SPECCED\n\n"
+                 "## 1. Goal\n\nThe zanzibar gasket rotates every flush.\n",
+    # A sub-spec, any depth under spec/ — the index generator reads it too. It carries a status
+    # line as every real spec does: a ONE-LINE file's record and chunk share the fusion key, so
+    # they sum in `rrf` and that file outranks every other hit whatever the query named.
+    "builds/bQuill/spec/subspecs/sub.md": "# TOOL-aQuill-6 — the sub-spec\n\n**Status:** SPECCED\n",
+    # Citation only, in prose: never a definition.
+    "tooling/cite.md": "Notes. The quibbler rotation from TOOL-aQuill-9 is discussed here at length, "
+                       "with the quibbler and its rotation, again and again, quibbler rotation.\n",
+    # An H1 outside spec/ and a FENCED H1 inside one: neither defines anything.
+    "builds/bQuill/build/journal.md": "# TOOL-aQuill-8 — a journal titled with an id\n",
+    "builds/bOther/spec/fenced.md": "Intro.\n\n```\n# TOOL-aQuill-7 — fenced\n```\n",
+}
 
+
+def seed_spec_h1(root: pathlib.Path) -> str:
+    m = resolve_memory_root()
+    for rel, text in SPEC_H1_CORPUS.items():
+        p = root / m / rel
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text(text, encoding="utf-8", newline="\n")
+    subprocess.run(["git", "-C", str(root), "add", "-A"], check=True, capture_output=True)
+    return m
+
+
+@check("a spec H1 anchors the id it defines, by the index generator's own predicate")
+def test_spec_h1_anchors_the_id_it_defines():
+    """AC1-AC3. Before this, `A_HEADING` was `#{2,6}` and nothing else looked at an H1, so an id
+    whose only defining line is its spec's H1 had no record and resolved to nothing."""
+    import extract as E
+    root, kitdir = make_repo()
+    out = root / ".x"
+    try:
+        m = seed_spec_h1(root)
+        p = run(root, kitdir, str(root), str(out), script="extract.py")
+        assert p.returncode == 0, f"extract exited {p.returncode}: {p.stderr[-400:]}"
+        anchors = json.loads((out / "anchors.json").read_text(encoding="utf-8"))
+        recs = [json.loads(x) for x in (out / "records.jsonl").read_text(encoding="utf-8").splitlines()]
+        tree_kit = E.resolve_kit_dir("memory-tree", "gen_build_index.py", kitdir)
+        if str(tree_kit) not in sys.path:
+            sys.path.insert(0, str(tree_kit))
+        import gen_build_index as G
+        tracked = subprocess.run(["git", "-C", str(root), "ls-files"], capture_output=True,
+                                 text=True, encoding="utf-8", check=True).stdout.split()
+        want = G.spec_ids(str(root), tracked, {"MEMORY_ROOT": m, "FAMILIES": "tooling:TOOL"})
+    finally:
+        cleanup(root)
+    spec = f"{m}/{SPEC_H1_REL}"
+    assert anchors.get("TOOL-aQuill-9") == [spec], f"the spec H1 did not anchor: {anchors}"
+    rec = next(r for r in recs if r["id"] == "TOOL-aQuill-9")
+    assert rec["text"] == "# TOOL-aQuill-9 — the quibbler rotation", f"the record ran on: {rec['text']!r}"
+    assert not any(r["path"] == f"{m}/tooling/cite.md" for r in recs), "a citation wrote a record"
+    assert "TOOL-aQuill-8" not in anchors, "an H1 outside spec/ anchored"
+    assert "TOOL-aQuill-7" not in anchors, "a fenced H1 anchored"
+    h1 = {r["id"] for r in recs if r["text"].startswith("# ")}
+    assert h1 == want == {"TOOL-aQuill-9", "TOOL-aQuill-6"}, f"extract {h1} vs spec_ids {want}"
+    return f"H1-anchored {sorted(h1)} == spec_ids; the journal H1, the fenced H1 and the citation do not"
+
+
+@check("a query for a spec-defined id returns the defining spec's record first")
+def test_spec_h1_record_outranks_a_citation():
+    """AC4. The citing file repeats the words; the defining spec must still come back as hit 1."""
+    root, kitdir = make_repo()
+    try:
+        m = seed_spec_h1(root)
+        p = run(root, kitdir, "what is TOOL-aQuill-9", "--terms",
+                "TOOL-aQuill-9 quibbler rotation zanzibar gasket flush")
+    finally:
+        cleanup(root)
+    hits = [ln for ln in p.stdout.splitlines() if re.match(r"^\[\d+\] ", ln)]
+    want = f"[1] TOOL-aQuill-9 · {m}/{SPEC_H1_REL}:1"
+    assert hits and hits[0] == want, f"hit 1 is {hits[:1]}, wanted {want!r}\n{p.stdout[-600:]}{p.stderr[-300:]}"
+    cite = next((ln for ln in hits if f"{m}/tooling/cite.md" in ln), None)
+    assert cite, f"the citing file never surfaced, so nothing was outranked: {hits}"
+    return f"{hits[0]}; the citation comes back as {cite.split(' ', 1)[0]}"
+
+
+def main() -> int:
+    # The live-log baseline is NOT taken here. It is taken at module scope, above the first `@check`,
+    # because every arm runs at decoration time and a baseline taken in this function brackets
+    # nothing. The block above the arms says what the bracket does and does not cover.
     order = [
         test_parser_vs_bash, test_no_conf_query, test_no_conf_adopt, test_empty_alias,
         test_spine_flat_layout, test_spine_nested_layout, test_durable_derives_families, test_chunk_arm_rolls_up,
@@ -2684,6 +3030,11 @@ def main() -> int:
         test_archive_segment_after_archive_is_durable, test_node_tag_class_is_declared,
         test_cited_families_are_ids_not_homes, test_build_qid_cutoff_is_read_from_conf,
         test_export_dir_is_declared_and_bounded, test_digest_follows_grammar_keys_only,
+        # TOOL-aRepatriatedFork-40: the spec H1 anchor
+        test_spec_h1_anchors_the_id_it_defines, test_spec_h1_record_outranks_a_citation,
+        # TOOL-dHashedPrelude-2: the guard that brackets this suite, gated
+        test_the_live_log_baseline_is_taken_before_any_arm_runs,
+        test_the_live_log_verdict_is_total_over_its_states,
     ]
     assert len(order) == len(_checks), f"{len(order)} arms declared, {len(_checks)} ran"
     # DECLARED-versus-RAN above is satisfied by deleting an arm from both halves; this is the
@@ -2703,13 +3054,9 @@ def main() -> int:
         else ("FAIL", "the arm-count pin ends an unbroken provenance chain", _chain)
     )
 
-    if live is not None:
-        after = hashlib.sha256(live.read_bytes()).hexdigest() if live.exists() else "(absent)"
-        _checks.append(
-            ("ok", "the live query log is byte-identical after this run", f"{before[:12]}")
-            if after == before
-            else ("FAIL", "the live query log is byte-identical after this run", "the gate wrote to it")
-        )
+    # UNCONDITIONAL. A row that is absent reads as a clean run, so every state gets a row and the
+    # count of appended run-property rows stops depending on the environment.
+    _checks.append(_read_live_log_verdict())
 
     # TOOL-dRetiredFork-2 — the git-environment scrub at the top of this file, asserted rather than
     # trusted. Appended here for the same reason the sweep below is: it is a property of the RUN.

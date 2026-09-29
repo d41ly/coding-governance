@@ -9678,7 +9678,8 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                     continue
                 _res = [resolve_tokens(a, _ctx_rr)[0] for a in _argv]
                 _out = subprocess.run(resolve_shell_argv(_res), cwd=str(target),
-                                      capture_output=True, text=True)
+                                      capture_output=True, text=True, encoding="utf-8",
+                                      errors="replace")
                 # THE EXIT CODE GOES THROUGH THE DECLARED PROBE, exactly as `_cmd_apply`'s
                 # CONFIGURE step does, and NOT through `rc != 0`. Writing the naive test here
                 # would have failed every update that touched `memory-tree`, whose adopter
@@ -9703,9 +9704,15 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                     # staged (build dPolishedVitrine, round-1 F2). Even a kit WITH a check is
                     # rolled back only on a green-to-red transition, so neither branch promises.
                     _has_check = bool((_d.get("check") or {}).get("argv"))
+                    # TOOL-aRepatriatedFork-42 rev-3 (review I1): the argv's own REASON, which its
+                    # stderr carries and this line used to capture and drop, so the operator was
+                    # told a code and sent to repair a render nobody had said was wrong.
+                    _why_rr = [ln.strip() for ln in (_out.stderr or "").splitlines() if ln.strip()]
                     r.fail(f"kit '{_eid}': the declared re-render/regenerate argv exited "
                            f"{_out.returncode} and no declared outcome accepts that, so the "
                            f"receipt is not re-stamped. "
+                           + (f"Its stderr ended: {' | '.join(_why_rr[-3:])}. " if _why_rr else
+                              "It printed nothing to stderr. ")
                            + ("This kit's own [check] runs next and rolls its writes back only "
                               "if it passed before this run and fails after; a check already red, "
                               "or one blind to the render, leaves them standing"

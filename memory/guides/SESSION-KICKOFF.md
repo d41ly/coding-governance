@@ -2,7 +2,7 @@
 
 <!-- kickoff-manifest: v1.4 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-09-29T08:32:54+03:00 @ f7e7192e34882334d71c2f45c4e69a604b78be91
+last-audit: 2026-09-29T17:52:07+03:00 @ 37f3d2aa6d70feb7cb760554c49275322b534530
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/run-gates/run-selftests.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
 last-body-change: 8d46bc3ef670986b820158e2dc52f35ae6bd4c6c
@@ -147,9 +147,7 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   silently breaks the checks that use it. Rewrite that file in BYTES. Hit during the 2026-09-21
   reconcile; the class is `memory/gotchas/text-mode-read-eats-a-bare-cr.md`, which was already
   registered and not read.
-  THE BYTES ARE NAMED RATHER THAN SHOWN, deliberately. Two earlier attempts at this sentence put a
-  raw CR in it and both were eaten by the next tool that rewrote the file -- the manifest is the
-  document most likely to be rewritten in text mode, which is the bullet's own subject.
+  The bytes are NAMED, not shown: a raw CR here was eaten twice by a text-mode rewrite.
 
 - **The read-path byte budget is RETIRED** (`TOOL-dSpentCeiling-1`). Check 6's per-class caps are
   the bound; check 16 keeps rules 3 and 4, structural and behind no pin. Do not re-add a sum.
@@ -215,7 +213,9 @@ same primary tree, so the path cannot tell them apart) + CamelCase adjective-nou
 READ from the GENERATED `memory/LIVE.md` + `memory/ledger/<month>.md` (`gen_build_index.py --write`
 re-renders them from build front matter); there is no authored ledger to update. Build folders are
 `memory/builds/<slug>/`; the discipline is the spec header's `streams` value (`STREAMS_CUTOFF` in
-`.memory-tree.conf` arms it).
+`.memory-tree.conf` arms it). A unit id is DEFINED by its spec's H1 under `builds/<slug>/spec/`: the
+index generator and recall read that line through one predicate, `tree_lib.parse_spec_h1`, and
+check 14 counts only present-tense citations against it. `TOOL-aRepatriatedFork-39`, `-40`.
 
 ### Current posture — dated corrections
 
@@ -282,6 +282,8 @@ does — hit three times in one file in one session; also the whole-signature an
 - A kit path a tool WRITES, RENDERS or PRINTS is DERIVED from that tool's own location, never spelled.
   A hardcoded prefix in a RENDERED artifact is the worst case: it lands a dead path in the adopter's
   committed tree and the byte-compare guarding that file agrees with it.
+- An ADOPTER-declared path renders from deploy.toml via the playbook engine's `--answers` (1.11+,
+  else a phrase), a protocol from its receipt row; never gov's layout. `TOOL-aRepatriatedFork-42`.
 - A gate that returns a VALUE on stdout cannot also report on stdout — `fail` echoes, so `x=$(check …)`
   captures the diagnostics and the operator sees only the downstream symptom. Use a separate channel.
 - A NEW record under `memory/gotchas/` needs `gotchas.py --write` AND a dossier claim, and the

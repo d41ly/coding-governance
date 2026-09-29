@@ -158,7 +158,7 @@ ids TOOL-dDerivedDocket-60 TOOL-dDerivedDocket-61 TOOL-dDerivedDocket-62 TOOL-dD
 | [TOOL-dDerivedDocket-26 — honest verdicts under contention](spec/2026-09-14-spec-TOOL-dDerivedDocket-26.md) | 27 | 2 | CLOSED | rev-8 | 2026-09-22 |
 | [TOOL-dDerivedDocket-28 — run-owned process ledger](spec/2026-09-14-spec-TOOL-dDerivedDocket-28.md) | 27 | 2 | CLOSED | rev-10 | 2026-09-29 |
 | [TOOL-dDerivedDocket-27 — declared gate wall](spec/2026-09-14-spec-TOOL-dDerivedDocket-27.md) | 28 | 2 | CLOSED | rev-12 | 2026-09-29 |
-| [TOOL-dDerivedDocket-31 — fork items and delegated-pass carriers](spec/2026-09-14-spec-TOOL-dDerivedDocket-31.md) | 29 | 2 | CLOSED | rev-6 | 2026-09-27 |
+| [TOOL-dDerivedDocket-31 — fork items and delegated-pass carriers](spec/2026-09-14-spec-TOOL-dDerivedDocket-31.md) | 29 | 2 | CLOSED | rev-7 | 2026-09-29 |
 | [TOOL-dDerivedDocket-32 — remote CI on every push](spec/2026-09-14-spec-TOOL-dDerivedDocket-32.md) | 30 | 2 | CLOSED | rev-7 | 2026-09-27 |
 | [TOOL-dDerivedDocket-61 — one lease record, and HELD known to every out-of-session actor](spec/2026-09-22-spec-TOOL-dDerivedDocket-61.md) | 31 | 2 | CLOSED | rev-11 | 2026-09-29 |
 | [TOOL-dDerivedDocket-62 — one worktree answers for a slug, and every other copy reads ELSEWHERE](spec/2026-09-22-spec-TOOL-dDerivedDocket-62.md) | 32 | 2 | CLOSED | rev-8 | 2026-09-29 |
@@ -172,7 +172,7 @@ ids TOOL-dDerivedDocket-60 TOOL-dDerivedDocket-61 TOOL-dDerivedDocket-62 TOOL-dD
 | [DEPL-dDerivedDocket-1 — adopter runbook: backlog switch and merge attribute](spec/2026-09-14-spec-DEPL-dDerivedDocket-1.md) | 40 | 1 | CLOSED | rev-11 | 2026-09-28 |
 <!-- /gen:build-units -->
 
-Records: 89 bound to this build, across 4 record folder(s).
+Records: 95 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

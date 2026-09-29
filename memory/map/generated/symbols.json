@@ -1193,6 +1193,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "build_spec_path_re",
+      "kind": "function",
+      "file": "tools/memory-tree/tree_lib.py"
+    },
+    {
       "id": "build_spec_record_index",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -1521,6 +1526,11 @@
       "id": "check_anomaly_sources",
       "kind": "function",
       "file": "tools/runlog/model.py"
+    },
+    {
+      "id": "check_answers_parity",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
     },
     {
       "id": "check_apply_owned",
@@ -3913,6 +3923,11 @@
       "file": "tools/codebase-map/map_lib.py"
     },
     {
+      "id": "load_parse_spec_h1",
+      "kind": "function",
+      "file": "tools/memory-recall/extract.py"
+    },
+    {
       "id": "load_project_layer",
       "kind": "function",
       "file": "tools/drift-audit/drift_report.py"
@@ -4738,6 +4753,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "parse_spec_h1",
+      "kind": "function",
+      "file": "tools/memory-tree/tree_lib.py"
+    },
+    {
       "id": "parse_spec_text",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -5313,6 +5333,11 @@
       "file": "tools/memory-tree/corpus_ids.py"
     },
     {
+      "id": "read_deploy",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
+    },
+    {
       "id": "read_descriptors",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -5501,6 +5526,11 @@
       "id": "read_kit_root",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "read_kits",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
     },
     {
       "id": "read_kits_json",
@@ -6808,6 +6838,11 @@
       "file": "tools/memory-tree/transition_audit.py"
     },
     {
+      "id": "resolve_answers",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
+    },
+    {
       "id": "resolve_backend",
       "kind": "function",
       "file": "tools/process-monitor/census.py"
@@ -6971,6 +7006,11 @@
       "id": "resolve_kit_dir",
       "kind": "function",
       "file": "tools/lib/resolve_kit_dir.py"
+    },
+    {
+      "id": "resolve_kit_dir",
+      "kind": "function",
+      "file": "tools/memory-recall/extract.py"
     },
     {
       "id": "resolve_kit_dir",
@@ -7996,6 +8036,11 @@
       "id": "seed_shards_base",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "seed_spec_h1",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
     },
     {
       "id": "seed_transition",
@@ -9818,6 +9863,16 @@
       "file": "tools/drift-audit/selftest.py"
     },
     {
+      "id": "test_spec_h1_anchors_the_id_it_defines",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_spec_h1_record_outranks_a_citation",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
       "id": "test_spine_flat_layout",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
@@ -9886,6 +9941,16 @@
       "id": "test_the_gate_and_its_template_are_byte_identical",
       "kind": "function",
       "file": "tools/codebase-map/selftest.py"
+    },
+    {
+      "id": "test_the_live_log_baseline_is_taken_before_any_arm_runs",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_the_live_log_verdict_is_total_over_its_states",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
     },
     {
       "id": "test_the_selftest_pin_carries_an_unbroken_provenance_chain",

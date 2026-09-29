@@ -1,6 +1,6 @@
 # memory-recall — ask your decision corpus a question, get the records that answer it
 
-<!-- gov:kit memory-recall@1.19 -->
+<!-- gov:kit memory-recall@1.20 -->
 
 A project-agnostic kit that turns a memory-tree corpus into two derived FTS5 indexes — one document
 per anchored record, one per heading-bounded chunk — fuses them with reciprocal rank fusion, and
@@ -23,7 +23,7 @@ Ported from adopter ic's `scripts/recall/` implementation at `5318064`.
 | `extract.py` | record + chunk extraction and the alias join. **Forked**. |
 | `bench.py` | the FTS5 index builder and the retrieval-substrate harness. **Forked** — one delta, see Maintenance. |
 | `union.py` | the two-source ensemble scorer. **Verbatim** upstream. |
-| `selftest.py` | the kit's contract gate — 18 checks, every arm inside a throwaway repo. |
+| `selftest.py` | the kit's contract gate. Every arm runs inside a throwaway git repo, and the run's own summary line reports how many checks it made — no count is written here, because a count typed beside the thing it counts is wrong on the next commit. |
 | `adopt-memory-recall.sh` | renders the Skill from the conf (`--scaffold`), and reds when it drifts (`--check`). |
 | `SKILL.template.md` | the agent-facing Skill, with the project values as placeholders. Rendered, never copied. |
 | `recall-opened.js` | **optional** PostToolUse hook that infers which hit was read. **Forked**. |

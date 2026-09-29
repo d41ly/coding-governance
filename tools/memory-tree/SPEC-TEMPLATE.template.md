@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.102 -->
+<!-- gov:kit memory-tree@2.104 -->
 # TEMPLATE-SPEC — the canonical spec / design-pass format (memory-tree kit)
 
 Every spec file under `<MEMORY_ROOT>/builds/*/spec/` (at any depth — sub-spec folders are scanned
@@ -109,7 +109,7 @@ an absent region cannot be told from a spec nobody has recorded against.
   §4's inventories and estimates included; §6's `figure:` sub-field is where an acceptance criterion
   answers it.
 - A codebase-map dossier claims EXACT inventory keys, so a sentence saying a dossier claims a path,
-  a glob or a code symbol books a grader that does not exist. `{{TOOL_ROOT}}check-spec-tokens.py`
+  a glob or a code symbol books a grader that does not exist. {{SPEC_TOKEN_CHECKER}}
   refuses three shapes as the object of such a sentence in every spec that is OPEN, SPECCED,
   INPROGRESS or BLOCKED, each for the reason the map's own contract gives. A DEFERRED spec is not
   graded by this join, though check 25 below grades it. A PATH carries `/` and a GLOB carries `*` or `?`, and the map rules path
@@ -190,7 +190,7 @@ requires reading the handoff.
 
 ## §7 Gates — the shape the leg join reads, and where a new arm lives
 
-`{{TOOL_ROOT}}check-spec-tokens.py` resolves a §7 gate name against `{{TOOL_ROOT}}gate-legs.json`, and
+{{SPEC_TOKEN_CHECKER}} resolves a §7 gate name against its own repo's gate-leg manifest, and
 it reads only lines that ARE the list: a line carrying nothing but backticked names and `·` or `,`
 separators. A line with a `- ` bullet marker, a prose prefix or a trailing clause is NOT read. Prose
 may sit above or below that line freely.
