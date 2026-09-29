@@ -1814,6 +1814,16 @@ hit "$(run --preflight tRun --keepalive-id k1)" "preflight OK"
 same "a no-handle re-preflight left the recorded set intact" \
   "$(grep -c 'waiver · item ' memory/builds/tRun/RUN.md)" "2"
 
+# ---- NO ONE REGION BLOCK MAY GROW PAST THE SHELL'S OWN STACK. bash 5.3 on Cygwin (node d, measured
+# ---- 2026-09-29) segfaults, exit 139 and no output, executing one compound command that holds more
+# ---- than about 3000 commands: a synthetic `if true; then` over 3000 assignments ran, one over 3500
+# ---- died. Region two had grown past that, so the suite died on entering it, and an earlier red in
+# ---- region one hid the crash from the runner's dead-probe reading. Region two is now cut into
+# ---- `in_shard 2` blocks at top-level seams; this arm holds every such block under 2500 LINES, a
+# ---- bound on commands with a margin, so the next arm added cannot silently re-cross the ceiling.
+_blk_max=$(awk '/^if in_shard [12]; then/ { s = NR; next } /^fi   # ---- / && s { if (NR - s > m) m = NR - s; s = 0 } END { print m + 0 }' "$HERE/unattended.test.sh")
+same "no in_shard block of this suite exceeds 2500 lines (longest: $_blk_max)" "$([ "$_blk_max" -gt 0 ] && [ "$_blk_max" -le 2500 ] && echo ok || echo "too long: $_blk_max")" "ok"
+
 fi   # ---- end REGION ONE ----------------------------------------------------------------------
 
 # ---- REGION TWO ----------------------------------------------------------------------------------
@@ -3367,6 +3377,10 @@ git add -A && git commit -q -m "the fixture, on the default branch, unmerged" --
 hit "$(run --landed tRun)" "the run's own branch ref does not resolve in this clone, so whether its work reached the local default branch cannot be judged:"
 git checkout -q unit; git branch -f main "$BASE"
 
+fi   # ---- region two continues below: one compound block past about 3000 commands segfaults
+     # ---- bash 5.3 on Cygwin (exit 139), so the region is cut into blocks at top-level seams
+if in_shard 2; then
+
 # ---- THE HONEST LIMIT IS IN THE SOURCE, not only in the protocol. A reader who reaches the second
 # ---- arm has to be told there what it does and does not buy.
 same "the verb's own header states what the local anchor cannot buy" \
@@ -4884,6 +4898,10 @@ printf '# ARCH-tRun-1 — u\n\n**Status:** SPECCED · rev-1 · 2026-08-20 · nod
 git add memory/builds/tRun/spec/one.md >/dev/null 2>&1
 o=$(run --dispatch tRun --pass ARCH-tRun-1 --writes tools/a.sh)
 n=$((n+1)); case "$o" in *"dispatch declared"*) ;; *) echo "FAIL dispatch: a READY unit was REFUSED, so the guard cannot be satisfied -- $o"; st=1 ;; esac
+
+fi   # ---- region two continues below: one compound block past about 3000 commands segfaults
+     # ---- bash 5.3 on Cygwin (exit 139), so the region is cut into blocks at top-level seams
+if in_shard 2; then
 
 # ---- aDeferredBar closing review F3 - THE DECLARED SPEC-TOKEN CHECKER RUNS BEFORE THE DISPATCH.
 # ---- The memory kit's bar join grades LIVE specs and this harness closes every unit spec in its
@@ -6455,6 +6473,10 @@ miss "$out" "verdict:"
 unset CLAUDE_CONFIG_DIR
 reset_tree
 
+fi   # ---- region two continues below: one compound block past about 3000 commands segfaults
+     # ---- bash 5.3 on Cygwin (exit 139), so the region is cut into blocks at top-level seams
+if in_shard 2; then
+
 # ---- TOOL-dUnstalledConvoy-5: `--rescope`, the amendment record. M3 now delegates the build's own
 # ---- scope, and an authority with no record is indistinguishable from a run doing what it likes.
 # ---- Every refusal below is its own `fail` call site and carries that site's ENTIRE literal
@@ -7958,6 +7980,10 @@ case "$(uname -s)" in
   *) DD_PID=$$ ;;
 esac
 n=$((n+1)); [ -n "$DD_PID" ] || { echo "FAIL fixture: no pid for this shell, so the two-process arm would probe an empty value"; st=1; }
+
+fi   # ---- region two continues below: one compound block past about 3000 commands segfaults
+     # ---- bash 5.3 on Cygwin (exit 139), so the region is cut into blocks at top-level seams
+if in_shard 2; then
 
 # ---- AC5: `--liveness` over an aged HELD record reads `state: held` and `verdict: HELD`, never the
 # ---- STALE the resume tick acts on, and prints every key it printed before, in the same order.
@@ -9572,6 +9598,10 @@ dispspec() { # slug · status · header-tail
 }
 dispsetup
 
+fi   # ---- region two continues below: one compound block past about 3000 commands segfaults
+     # ---- bash 5.3 on Cygwin (exit 139), so the region is cut into blocks at top-level seams
+if in_shard 2; then
+
 # ---- AC2 / AC18 term zero, BOTH halves, and they are different facts. A run in a project with no
 # ---- ask contract at all, and a run in a project that HAS one over a build with nothing to grade.
 dispreset; askmode ok; askrows ''
@@ -11076,6 +11106,10 @@ n=$((n+1)); kill -0 "$PL_ORPH" 2>/dev/null || { echo "FAIL AC5/AC9 a verb that d
 n=$((n+1)); grep -q '^reap ' "$pl_out/order.log" 2>/dev/null && { echo "FAIL AC5/AC9 a verb that does not hold the lease called the reaper"; st=1; }
 run_pl_kill "$PL_ORPH"
 
+fi   # ---- region two continues below: one compound block past about 3000 commands segfaults
+     # ---- bash 5.3 on Cygwin (exit 139), so the region is cut into blocks at top-level seams
+if in_shard 2; then
+
 # ---- AC6: `--hold` refuses, numbered and before any record write, while a recorded bar is alive under
 # ---- a LIVE driver — this suite's own shell stands in for it — and proceeds once the bar has exited.
 init_pl_fixture
@@ -11511,7 +11545,8 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # the producer's half of the parity table and its REFUSED rows do not, as they should. Thirteen
 # OLDER arms of those two blocks red in the replica, identically at HEAD and on the fold, and this
 # raise neither counts on nor moves them. No suite ran.
-FLOOR_ASSERTIONS=1836
+# RAISED 1836 -> 1837: region one's in_shard block-length arm (the Cygwin stack-ceiling split, 2026-09-29).
+FLOOR_ASSERTIONS=1837
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -11632,7 +11667,8 @@ FLOOR_ASSERTIONS=1836
 # The per-shard floors carry the same proportional discount the unsharded pin does (338 against a
 # measured 419 is ~19 % of headroom), rather than pinning at 100 % of observation.
 PROLOGUE_ARMS=18
-FLOOR_SHARD_1=208
+# RAISED 208 -> 209: region one's in_shard block-length arm, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_1=209
 # +6 for the run_bounded and verb arms, which sit above the REGION TWO terminator and are therefore
 # paid by shard 2 as well as by an unsharded run.
 # +61 for the TOOL-dDerivedDocket-28 process-ledger arms, all in region two - see FLOOR_ASSERTIONS.
