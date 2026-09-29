@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # adopt-unattended.sh — install the unattended-run kit's project-facing surface.
 #
-#   tools/unattended/adopt-unattended.sh            # render .claude/skills/unattended/SKILL.md
-#   tools/unattended/adopt-unattended.sh --check    # verify the rendered Skill still matches the kit + conf
+#   <prefix>/unattended/adopt-unattended.sh            # render .claude/skills/unattended/SKILL.md
+#   <prefix>/unattended/adopt-unattended.sh --check    # verify the rendered Skill still matches the kit + conf
 #
 # Exit 0 = rendered / in sync · 1 = drift or a missing prerequisite · 2 = misconfigured.
 #

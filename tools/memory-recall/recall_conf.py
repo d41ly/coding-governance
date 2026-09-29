@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """The memory-recall kit's project layer: read `.memory-tree.conf`, declare nothing of its own.
 
-gov:kit memory-recall@1.19
+gov:kit memory-recall@1.20
 
 The kit indexes the memory tree the memory-tree kit already declares. Two of that conf's keys are
 read and no third declaration is invented:
@@ -47,7 +47,7 @@ import sys
 # The kit never leaves bytecode in the adopter's worktree — see query.py's note.
 sys.dont_write_bytecode = True
 
-KIT_MEMORY_RECALL_VERSION = "1.19"
+KIT_MEMORY_RECALL_VERSION = "1.20"
 
 CONF_NAME = ".memory-tree.conf"
 # The DEFAULT: a-z, per the memory-tree hygiene gate's own `node [a-z]` (spec Q1 option (b)).
@@ -65,7 +65,7 @@ def repo_root() -> pathlib.Path:
     """The adopting repo's root, anchored on THIS FILE rather than on the cwd.
 
     The kit directory lives inside the adopting repo (`memory-recall/` at the root in an adopter,
-    `tools/memory-recall/` in this one), so the anchor is exact from any cwd, and a throwaway-repo
+    `<prefix>/memory-recall/` in this one), so the anchor is exact from any cwd, and a throwaway-repo
     test that copies the kit in resolves to that repo rather than to wherever the runner stood.
 
     WALK UP FOR THE CONF RATHER THAN ASKING GIT (TOOL-aCollapsedScan-7), which is the choice

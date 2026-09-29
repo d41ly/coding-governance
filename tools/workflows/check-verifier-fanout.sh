@@ -6,8 +6,8 @@
 # clean — but a header describing a one-rule gate would be a structural check reading as a
 # semantic one, which is the class the charter names. Disclosed rather than widened silently.
 #
-#   bash tools/workflows/check-verifier-fanout.sh          # every workflow script git can see
-#   bash tools/workflows/check-verifier-fanout.sh <file>…  # explicit files (the self-test's fixtures)
+#   bash <prefix>/workflows/check-verifier-fanout.sh          # every workflow script git can see
+#   bash <prefix>/workflows/check-verifier-fanout.sh <file>…  # explicit files (the self-test's fixtures)
 #   ... --print-cap                                         # the hook's effective fan-out cap
 #
 # Exit 0 = clean · 1 = a rule the hook enforces is broken · 2 = misconfigured.

@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # check-review-join.sh — the retirement gate for the ref-keyed verdict join.
 #
-#   bash tools/workflows/check-review-join.sh          # every *.js under tools/ or .claude/workflows/ git can see
-#   bash tools/workflows/check-review-join.sh <file>…  # explicit files (the self-test's fixtures)
+#   bash <prefix>/workflows/check-review-join.sh          # every *.js under tools/ or .claude/workflows/ git can see
+#   bash <prefix>/workflows/check-review-join.sh <file>…  # explicit files (the self-test's fixtures)
 #
 # Exit 0 = clean · 1 = a ref-keyed join reappeared · 2 = THIS GATE REFUSED.
 #

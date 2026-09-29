@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # check-verdict-epoch.sh — the kit version DATES the engine's verdicts, so it must move when they do.
 #
-#   bash tools/memory-tree/check-verdict-epoch.sh [<base>]     # default base: the mainline merge-base
+#   bash <prefix>/memory-tree/check-verdict-epoch.sh [<base>]     # default base: the mainline merge-base
 #
 # Exit 0 = the constant is honest for this range · 1 = the engine moved and the constant did not ·
 # 2 = misconfigured.

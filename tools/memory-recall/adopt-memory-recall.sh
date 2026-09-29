@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # adopt-memory-recall.sh — render the memory-recall Skill from `.memory-tree.conf` and converge.
 #
-#   tools/memory-recall/adopt-memory-recall.sh --scaffold [--with-hook]
-#   tools/memory-recall/adopt-memory-recall.sh --check                  # gate leg: has the skill drifted?
+#   <prefix>/memory-recall/adopt-memory-recall.sh --scaffold [--with-hook]
+#   <prefix>/memory-recall/adopt-memory-recall.sh --check                  # gate leg: has the skill drifted?
 #
 # The Skill's `description` is the whole trigger mechanism and it names project values (the id
 # families, the query-script path, the corpus root), so the skill is GENERATED from the conf rather
@@ -198,11 +198,12 @@ if [ "$with_hook" = 1 ]; then
   # operator is told to copy the merger INTO is the directory the next line then runs it from. A
   # hardcoded tools/ path printed here died with errno 2 in an adopter, because no runbook step
   # delivered the tool; at any prefix but gov's own it also named a directory that is not there.
-  # The `<gov>/tools/…` source half stays literal: it names gov's OWN checkout, not the adopter's.
+  # The `<gov>/` source half names gov's OWN checkout, whose kit root no adopter tree can reveal, so it
+# is spelled with the `<prefix>/` prose token rather than guessed (TOOL-aRepatriatedFork-23 §8 F2).
   smerge=""
   for c in "${TOOL_ROOT}settings-merge.py" settings-merge.py; do [ -f "$ROOT/$c" ] && { smerge="$c"; break; }; done
   if [ -z "$smerge" ]; then
-    echo "  cp <gov>/tools/settings-merge.py ${TOOL_ROOT:-./}     # not installed here yet (WIRE §3c step 4)"
+    echo "  cp <gov>/<prefix>/settings-merge.py ${TOOL_ROOT:-./}     # <prefix>: where your gov checkout keeps its kits; not installed here yet (WIRE §3c step 4)"
     smerge="${TOOL_ROOT}settings-merge.py"
   fi
   echo "  $PY $smerge --fragment $REL/recall-opened.fragment.json"

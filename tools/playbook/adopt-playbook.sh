@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # adopt-playbook.sh — render the governance charter into a target, and verify it later.
 #
-#   bash tools/playbook/adopt-playbook.sh --target <repo>            # write the region
-#   bash tools/playbook/adopt-playbook.sh --target <repo> --check    # assert it still matches
-#   bash tools/playbook/adopt-playbook.sh --selftest                 # the engine's own arms
+#   bash <prefix>/playbook/adopt-playbook.sh --target <repo>            # write the region
+#   bash <prefix>/playbook/adopt-playbook.sh --target <repo> --check    # assert it still matches
+#   bash <prefix>/playbook/adopt-playbook.sh --selftest                 # the engine's own arms
 #
 # This is the shape every other adopter in this repo has, which is why the playbook entry no longer
 # carries a `why_no_adopter` reason: installation stopped being a copy an operator finishes by hand.

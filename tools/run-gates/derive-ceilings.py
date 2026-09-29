@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """derive-ceilings.py — make a leg's ceiling arguable. TOOL-aQuenchedHarness-2.
 
-Ninety-four ceilings sit in `tools/gate-legs.json` with no evidence beside them, so nobody can tell a
+Ninety-four ceilings sit in `<legs>` with no evidence beside them, so nobody can tell a
 bound that was measured from one that was raised to make a leg stop complaining. This verb reads what
 the runner already records and puts a number beside each one.
 
@@ -60,6 +60,8 @@ import sys
 HERE = pathlib.Path(__file__).resolve().parent
 EVIDENCE = HERE / "ceiling-evidence.txt"
 MARGIN_FILE = HERE / "ceiling-margin.txt"
+# The leg manifest is this kit dir's SIBLING, and GATE_LEGS outranks it, as in run-gates.sh (S1).
+LEGS_BESIDE = HERE.parent / "gate-legs.json"
 
 # How far ABOVE its declared ceiling a failing reading may sit and still be admitted as evidence.
 # 5 s of it is arithmetic: `run-gates.sh` wraps a bounded leg in `timeout -k 5s "$bound"`, so
@@ -108,9 +110,7 @@ def resolve_git_dir(root: pathlib.Path) -> pathlib.Path:
 
 
 def read_legs(root: pathlib.Path) -> dict:
-    # The manifest is this kit dir's SIBLING and GATE_LEGS outranks it, as in run-gates.sh (S1).
-    beside = pathlib.Path(__file__).resolve().parent.parent / "gate-legs.json"
-    p = pathlib.Path(os.environ.get("GATE_LEGS") or beside)
+    p = pathlib.Path(os.environ.get("GATE_LEGS") or LEGS_BESIDE)
     p = p if p.is_absolute() else root / p
     return {l["name"]: l for l in json.loads(p.read_text(encoding="utf-8"))}
 
@@ -613,7 +613,9 @@ def cmd_check(root, gd, args) -> int:
 
 
 def main() -> int:
-    ap = argparse.ArgumentParser(description=__doc__)
+    # TOOL-aRepatriatedFork-25 S1: `--help` names the manifest this run would read, not gov's path.
+    legs = os.environ.get("GATE_LEGS") or str(LEGS_BESIDE)
+    ap = argparse.ArgumentParser(description=(__doc__ or "").replace("<legs>", legs))
     g = ap.add_mutually_exclusive_group(required=True)
     g.add_argument("--report", action="store_true", help="print the ceiling-vs-recorded table")
     g.add_argument("--write", action="store_true", help="refresh the tracked evidence file")

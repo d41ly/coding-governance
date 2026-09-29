@@ -250,7 +250,7 @@ fi
 # from a spawn count and a per-spawn cost, both measured, and not from a stopwatch on the whole thing.
 # The equivalence that replaces it is 19 staged breaks, 18 of them red, whose output and exit status
 # are byte-identical before and after the unit. To settle it, one command:
-#   bash tools/unattended/run-unattended-gates.sh --selftests --serial
+#   bash <prefix>/unattended/run-unattended-gates.sh --selftests --serial
 
 st=0
 ran=0

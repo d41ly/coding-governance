@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """gen_build_index.py — the generated build index for a flat memory tree (memory-tree kit 1.5).
 
-    python tools/memory-tree/gen_build_index.py --check         # drift gate (writes nothing)
-    python tools/memory-tree/gen_build_index.py --write         # (re)render every artifact
-    python tools/memory-tree/gen_build_index.py --check-format  # the slot contract + heading canon
-    python tools/memory-tree/gen_build_index.py --survey        # the canon over every README, never fails
-    python tools/memory-tree/gen_build_index.py --selftest      # fixtures, in a temp dir
+    python <prefix>/memory-tree/gen_build_index.py --check         # drift gate (writes nothing)
+    python <prefix>/memory-tree/gen_build_index.py --write         # (re)render every artifact
+    python <prefix>/memory-tree/gen_build_index.py --check-format  # the slot contract + heading canon
+    python <prefix>/memory-tree/gen_build_index.py --survey        # the canon over every README, never fails
+    python <prefix>/memory-tree/gen_build_index.py --selftest      # fixtures, in a temp dir
 
 WHAT --check-format DOES NOT CHECK. It grades POSITION for every tracked build README and SHAPE — the
 closed heading canon — only for the ones the declared registry BINDS. It never grades what a slot

@@ -3,7 +3,7 @@
 # no brief. TOOL-aHoistedPass-7. Contract: memory/guides/UNATTENDED-PROTOCOL.md. Project layer:
 # .unattended.conf.
 #
-#   bash tools/unattended/check-brief-recorded.sh
+#   bash <prefix>/unattended/check-brief-recorded.sh
 #
 # Exit 0 = clean. Exit 1 = a violation. Exit 2 = misconfigured.
 #
@@ -103,7 +103,7 @@
 # post-run subset joined it rather than moving the increment, which would change what the sibling's
 # identically named count means.
 set -u
-KIT_UNATTENDED_VERSION=1.41   # gov:kit unattended@1.41 — must match unattended.sh; check-kit-versions.sh pairs them
+KIT_UNATTENDED_VERSION=1.42   # gov:kit unattended@1.42 — must match unattended.sh; check-kit-versions.sh pairs them
 
 # The dereference pin, identical to this kit's other readers and for the identical reason: a graft
 # file rewrites the commit GRAPH, so every ancestry answer below could be honest about a sha and

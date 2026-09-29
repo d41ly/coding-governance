@@ -3,7 +3,7 @@
 # For a NEW project. (A project MIGRATING an existing docs tree does that once as its own landing —
 # see README.md "Adopting into an existing tree"; the tree shape below is the target either way.)
 #
-#   tools/memory-tree/adopt-memory-tree.sh --scaffold   # a NEW tree: dirs, registries, renders, index
+#   <prefix>/memory-tree/adopt-memory-tree.sh --scaffold   # a NEW tree: dirs, registries, renders, index
 #                                          --render     # an ADOPTED tree: the four rendered docs, nothing else
 set -eu
 ROOT="$(git rev-parse --show-toplevel)" || exit 2

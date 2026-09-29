@@ -2,7 +2,7 @@
 # check-pass-order.sh - the merge-bar leg that refuses a unit BUILT BEFORE IT WAS SPECCED.
 # TOOL-dBriefedPass-3. Contract: memory/guides/UNATTENDED-PROTOCOL.md. Project layer: .unattended.conf.
 #
-#   bash tools/unattended/check-pass-order.sh
+#   bash <prefix>/unattended/check-pass-order.sh
 #
 # Exit 0 = clean. Exit 1 = a violation. Exit 2 = misconfigured.
 #
@@ -35,7 +35,7 @@
 # below. `--preview` grades the live tree and prints violations without setting exit status, which is
 # how a candidate predicate gets run over the real tree before it is wired.
 set -u
-KIT_UNATTENDED_VERSION=1.41   # gov:kit unattended@1.41 — must match unattended.sh; check-kit-versions.sh pairs them
+KIT_UNATTENDED_VERSION=1.42   # gov:kit unattended@1.42 — must match unattended.sh; check-kit-versions.sh pairs them
 
 # The dereference pin, identical to this kit's other two readers and for the identical reason: a graft
 # file rewrites the commit GRAPH, so every ancestry answer below could be honest about a sha and wrong

@@ -383,8 +383,8 @@ def test_remedy_paths_are_real(tmp: Path):
     moment someone is stuck.
 
     Two halves. The pure half pins `relative_kit` across install shapes and pins the legacy
-    `REGEN_CMD` constant EQUAL to the accessor's root-install answer, so the last hardcoded
-    spelling cannot drift from the computed one. The end-to-end half is the real acceptance: build
+    `REGEN_CMD` constant EQUAL to `regen_cmd()`, so an old gate that reads it prints the command
+    for its own prefix (TOOL-aRepatriatedFork-25 S4). The end-to-end half is the real acceptance: build
     a prefixed install, stale an artifact, then RUN THE COMMAND THE GATE PRINTED, verbatim, and
     require that it fixes the staleness — no hardcoded expectation of what the remedy should say."""
     import os
@@ -402,8 +402,8 @@ def test_remedy_paths_are_real(tmp: Path):
     # not under the root (a CODEBASE_MAP_ROOT pointed at a fixture): the bare NAME, so a render
     # never embeds an absolute temp path and fixture bytes stay deterministic.
     assert m.relative_kit(tmp / "elsewhere" / "codebase-map", root) == "codebase-map"
-    # the legacy constant IS the accessor's root-install answer — one fact, not two.
-    assert m.REGEN_CMD == f"python {m.relative_kit(root / 'codebase-map', root)}/gen_map.py --write"
+    # the legacy constant IS the accessor's answer for this install — one fact, not two.
+    assert m.REGEN_CMD == m.regen_cmd(), (m.REGEN_CMD, m.regen_cmd())
 
     # --- end-to-end: the printed remedy, executed --------------------------------------------
     repo = tmp / "e2e"
@@ -436,6 +436,12 @@ def test_remedy_paths_are_real(tmp: Path):
 
     got = run("tools/codebase-map/gen_map.py", "--scaffold")
     assert got.returncode == 0, got.stdout + got.stderr
+
+    # S4 of TOOL-aRepatriatedFork-25: the legacy constant a pre-1.1 GATE_FILE reads names THIS
+    # install's generator, so an old gate at a prefix prints a command that exists.
+    got = run("-c", f"import sys; sys.path.insert(0, {str(kit)!r}); import map_lib as m; print(m.REGEN_CMD)")
+    want = f"python {kit.relative_to(repo).as_posix()}/gen_map.py --write"
+    assert got.stdout.strip() == want, got.stdout + got.stderr
 
     # the scaffolded map README must name the real kit dir, not the convention
     readme = (repo / "memory" / "map" / "README.md").read_text(encoding="utf-8")

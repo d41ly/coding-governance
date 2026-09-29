@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 # adopt-process-monitor.sh — wire the process-monitor kit into a project.
 #
-# gov:kit process-monitor@0.7
+# gov:kit process-monitor@0.8
 #
 # Run from anywhere INSIDE the target repo AFTER copying this kit dir in as `tools/process-monitor/`.
 # The kit dir's NAME is load-bearing; the one-segment prefix is free and every path below is DERIVED
 # from it, so a root install still works.
 #
-#   tools/process-monitor/adopt-process-monitor.sh           # grade the declaration
-#   tools/process-monitor/adopt-process-monitor.sh --check   # grade it again; REPAIRS NOTHING
+#   <prefix>/process-monitor/adopt-process-monitor.sh           # grade the declaration
+#   <prefix>/process-monitor/adopt-process-monitor.sh --check   # grade it again; REPAIRS NOTHING
 #
 # WHAT IT DOES NOT DO, said here because the header used to claim both: it does NOT create
 # `.process-monitor.conf` (the roots are yours and a placeholder root is worse than none), and it
@@ -24,7 +24,7 @@
 #   Exit 0 = adopted / wired · 1 = unwired or refused · 2 = wrong invocation or not a repo.
 set -u
 
-KIT_PROCESS_MONITOR_VERSION="0.7"   # gov:kit process-monitor@0.7 — the deployer's read (kit.toml version_from)
+KIT_PROCESS_MONITOR_VERSION="0.8"   # gov:kit process-monitor@0.8 — the deployer's read (kit.toml version_from)
 
 # >>> resolve_python — canonical copy: tools/lib/resolve-python.sh (byte-identical; gated)
 resolve_python() {

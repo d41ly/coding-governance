@@ -2,7 +2,7 @@
 # check-method-carriers.sh — every file that POINTS AT the build method is declared, and points
 # rather than copies. Exit 0 = clean · 1 = drift · 2 = misconfigured.
 #
-#   bash tools/memory-tree/check-method-carriers.sh
+#   bash <prefix>/memory-tree/check-method-carriers.sh
 #
 # WHY THIS EXISTS. The build method landed with four pointers, each a path and never a summary.
 # Nothing stopped a fifth being added tomorrow as a paraphrase, and this repo grew FOUR spellings of

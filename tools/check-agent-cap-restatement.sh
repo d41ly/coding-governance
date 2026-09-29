@@ -6,7 +6,7 @@
 # executable first one, and this repo has ruled on that shape before: a kit version written in prose
 # rots between bumps. The digit is what rots; the pointer is what does not.
 #
-#   bash tools/check-agent-cap-restatement.sh [<waiver-registry>]
+#   bash <prefix>/check-agent-cap-restatement.sh [<waiver-registry>]
 #
 # The registry is a POSITIONAL, never an environment read. An env-settable registry path is a gate
 # neutralised with no diff and no committed evidence -- the exact channel this build RETIRED one

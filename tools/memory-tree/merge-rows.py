@@ -5,7 +5,7 @@
 # SyntaxWarning to stderr during `git merge` reads as a broken driver.
 r"""A row-keyed three-way merge driver for the id-anchored index files (aMendedLedger U9).
 
-    git config merge.rows.driver 'bash tools/lib/pyrun.sh tools/memory-tree/merge-rows.py %O %A %B %P'
+    git config merge.rows.driver 'bash <kit>/merge-rows.sh %O %A %B %P'
 
 Auto-resolves the index conflicts that are pure append-collisions — two nodes each appending a row to
 `memory/DECISIONS.md` or `memory/backlog/<FAMILY>.md` — without duplicating a record, ENFORCED by
@@ -1124,7 +1124,17 @@ def main(argv: list[str]) -> int:
         # The first TWO paragraphs: the summary sentence AND the `git config` line carrying the four
         # `%O %A %B %P` placeholders. Upstream prints `[0]` — the summary alone — so its usage text
         # tells an operator nothing about how to wire the driver it is refusing to run.
-        print("\n\n".join((__doc__ or "").split("\n\n")[:2]), file=sys.stderr)
+        # TOOL-aRepatriatedFork-25 S1: `<kit>` is filled with this kit's directory from the repo
+        # root, derived from `__file__`, so the wiring line is right at any install prefix. It names
+        # the kit's own `merge-rows.sh`, the launcher that ships beside this file.
+        kit = pathlib.Path(__file__).resolve().parent
+        top = subprocess.run(["git", "-C", str(kit), "rev-parse", "--show-toplevel"],
+                             capture_output=True, text=True, encoding="utf-8").stdout.strip()
+        try:
+            here = kit.relative_to(pathlib.Path(top).resolve()).as_posix() if top else kit.as_posix()
+        except ValueError:  # a kit outside the repo git reports: its absolute path is still true
+            here = kit.as_posix()
+        print("\n\n".join((__doc__ or "").split("\n\n")[:2]).replace("<kit>", here), file=sys.stderr)
         return 2
     o, a, b = argv[1], argv[2], argv[3]
     # FAIL CLOSED. A merge driver that raises exits non-zero WITHOUT writing %A, and git then leaves

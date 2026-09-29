@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # adopt-lexicon.sh — scaffold or verify this repo's naming-lexicon declaration.
 #
-#   bash tools/lexicon/adopt-lexicon.sh --scaffold   # DERIVE a proposed verb table + measure pins
-#   bash tools/lexicon/adopt-lexicon.sh --check      # the drift mode every kit here carries
+#   bash <prefix>/lexicon/adopt-lexicon.sh --scaffold   # DERIVE a proposed verb table + measure pins
+#   bash <prefix>/lexicon/adopt-lexicon.sh --check      # the drift mode every kit here carries
 #
 # WHY THE SEED IS DERIVED AND THEN FROZEN. Companion §12 bans a gate whose vocabulary is a
 # hand-kept mirror of the codebase's own identifiers; a PRESCRIPTIVE verb table is the inverse and

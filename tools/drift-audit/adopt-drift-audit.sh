@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 # adopt-drift-audit.sh — wire the drift-audit kit into a project.
 #
-# gov:kit drift-audit@1.15
+# gov:kit drift-audit@1.16
 #
 # Run from anywhere INSIDE the target repo AFTER copying this kit dir in as `tools/drift-audit/`.
 # The kit dir's NAME is load-bearing; the one-segment prefix is free and every path below is derived
 # from it, so a root install still works and still prints runnable commands:
 #
-#   tools/drift-audit/adopt-drift-audit.sh            # seed the project layer + render the Skill
-#   tools/drift-audit/adopt-drift-audit.sh --check    # verify the rendered Skill still matches the kit
+#   <prefix>/drift-audit/adopt-drift-audit.sh            # seed the project layer + render the Skill
+#   <prefix>/drift-audit/adopt-drift-audit.sh --check    # verify the rendered Skill still matches the kit
 #
 # Steps: require .memory-tree.conf (owned by the memory-tree kit; refuse, never create) -> seed
 # drift_signals.py from the template IF ABSENT (never overwrite: the pins are measured project

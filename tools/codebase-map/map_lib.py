@@ -18,7 +18,7 @@ Python >= 3.11 (tomllib).
 
 The kit DIRECTORY is named `codebase-map` by convention (the gate resolves it by that name), but
 its PREFIX under the repo root is free: `<repo-root>/codebase-map/` and
-`<repo-root>/tools/codebase-map/` are both supported — see repo_root/resolve_root.
+`<repo-root>/<prefix>/codebase-map/` are both supported — see repo_root/resolve_root.
 
 Portability rules baked in (each was a review finding once — do not relax):
 - every extractor FAILS CLOSED: a missing artifact or unexpected tree shape raises MapError,
@@ -44,9 +44,9 @@ from dataclasses import dataclass, field
 from fnmatch import fnmatchcase
 from pathlib import Path
 
-#: gov:kit codebase-map@1.12 — engine identity. Bump on any engine/render change; mirrored into the
+#: gov:kit codebase-map@1.13 — engine identity. Bump on any engine/render change; mirrored into the
 #: generated artifacts as `codebase-map@<v>` so the deployer can grep the installed version.
-KIT_CODEBASE_MAP_VERSION = "1.12"
+KIT_CODEBASE_MAP_VERSION = "1.13"
 
 #: The per-repo conf, at the adopting repo's ROOT. Also the MARKER resolve_root walks up for: a
 #: repo that has adopted the kit has this file, and the kit needs no other declaration of where
@@ -89,8 +89,8 @@ def resolve_root(kit_dir: Path) -> Path:
     ancestor holding ``.git``; otherwise fall back to ``kit_dir``'s parent. That fallback IS the
     kit's original convention (a kit dir at ``<repo-root>/codebase-map/`` makes the parent the
     root), so a root-installed adopter with a conf and one without both resolve exactly as before.
-    The walk is what makes a PREFIXED install work: at ``<repo-root>/tools/codebase-map/`` the
-    parent is ``tools/`` and every derived path was wrong by one segment.
+    The walk is what makes a PREFIXED install work: at ``<repo-root>/<prefix>/codebase-map/`` the
+    parent is ``<prefix>/`` and every derived path was wrong by one segment.
 
     The ``.git`` stop is not decoration. Worktrees are commonly kept INSIDE the primary tree (this
     repo puts them under ``.claude/worktrees/``), so an unbounded walk from a worktree's kit dir
@@ -142,7 +142,7 @@ def relative_kit(kit: Path, root: Path) -> str:
 
 def kit_rel(root: Path | None = None) -> str:
     """This install's kit dir, relative to the repo root (e.g. ``codebase-map`` or
-    ``tools/codebase-map``)."""
+    ``<prefix>/codebase-map``)."""
     return relative_kit(kit_dir(), root or repo_root())
 
 
@@ -441,7 +441,7 @@ def scan_js_definitions(
     tracked ``tools/**/*.js`` carry **30** top-level definitions and the recall index carried **3**
     rows for that layer — the three workflow ``meta`` blocks, which are objects and are DISJOINT from
     the 30. So the index carried none of the definitions, and ``reuse_lookup.py`` could not see
-    ``boundedK`` (``tools/hooks/agent-cap.js``), the binder every fan-out consumer routes through.
+    ``boundedK`` (the hooks kit's ``agent-cap.js``), the binder every fan-out consumer routes through.
     The comment that kept it that way read "accurate coverage of a layer with few exports, not a
     hole"; it was true about exports and false about the layer.
 
@@ -1492,13 +1492,13 @@ def owners_of(tree: MapTree) -> dict[str, dict[str, tuple[str, ...]]]:
 # Generated artifacts (deterministic renders; byte-compared by the freshness gate)
 # ======================================================================================
 
-#: LEGACY, and the only hardcoded spelling left: the regen command for a ROOT install. Nothing in
-#: this kit reads it — use ``regen_cmd()``, which is prefix-correct. It survives because a
-#: ``GATE_FILE`` installed before 1.1 references ``m.REGEN_CMD``, and an installed gate is
-#: project-owned: the maintenance rule overwrites ENGINE files, never GATE_FILE, so removing this
-#: would break those gates on an ordinary engine update. The selftest pins it EQUAL to
-#: ``regen_cmd()``'s root-install answer, so the two spellings cannot drift apart.
-REGEN_CMD = "python codebase-map/gen_map.py --write"
+#: LEGACY: nothing in this kit reads it — use ``regen_cmd()``. It survives because a ``GATE_FILE``
+#: installed before 1.1 references ``m.REGEN_CMD``, and an installed gate is project-owned: the
+#: maintenance rule overwrites ENGINE files, never GATE_FILE, so removing this would break those
+#: gates on an ordinary engine update. It used to be the ROOT-install spelling, so an old gate at any
+#: other prefix printed a command naming nothing; it is now ``regen_cmd()``'s answer, computed at
+#: import for THIS install (TOOL-aRepatriatedFork-25 S4), and the selftest pins the two equal.
+REGEN_CMD = regen_cmd()
 
 
 def render_inventories_json(inventories: dict[str, list[str]], inventory_ids: tuple[str, ...]) -> str:

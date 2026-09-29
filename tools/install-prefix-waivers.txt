@@ -6,7 +6,6 @@
 # retrofit — each names the root form as a fallback on purpose. (2) The codebase-map REGEN_CMD
 # legacy, preserved for adopters carrying a pre-1.1 gate file the maintenance rule never overwrites.
 
-tools/codebase-map/map_lib.py:1501      REGEN_CMD legacy, deliberate: a pre-1.1 GATE_FILE is project-owned and never overwritten
 tools/codebase-map/gen_map.py:47        prose quoting that legacy literal
 tools/codebase-map/adopt-codebase-map.sh:155  prose quoting that legacy literal
 tools/memory-tree/README.md:117         the PUBLISHED root-prefix driver command; check-wiring.test.sh AC12 derives and requires it

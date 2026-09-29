@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # check-placeholders.sh — the playbook's version-marker lockstep, and the survival predicate.
 #
-#   bash tools/check-placeholders.sh              # assert the marker lockstep over the SOURCES
-#   bash tools/check-placeholders.sh --check A B  # assert no placeholder SURVIVED in two FILLED files
+#   bash <prefix>/check-placeholders.sh              # assert the marker lockstep over the SOURCES
+#   bash <prefix>/check-placeholders.sh --check A B  # assert no placeholder SURVIVED in two FILLED files
 #
 # SCOPE, and what deliberately is NOT here. This gate landed carrying a third assertion — that
 # a deploy-time placeholder CATALOGUE agreed with the measured sets — and `tools/check-playbook-

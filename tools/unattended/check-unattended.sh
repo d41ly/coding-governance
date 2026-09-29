@@ -7,7 +7,7 @@
 # prints exactly one.
 # Contract: memory/guides/UNATTENDED-PROTOCOL.md (binding). Project layer: .unattended.conf.
 #
-#   bash tools/unattended/check-unattended.sh
+#   bash <prefix>/unattended/check-unattended.sh
 #
 # Exit 0 + no output = clean, EXCEPT for the two announcements named below. Anything else printed
 # is a violation. Exit 2 = misconfigured.
@@ -37,7 +37,7 @@
 # THE CORE SETS ARE READ FROM THE DRIVER, never restated here. A second spelling of `PHASES_CORE` one
 # file away from the thing that enforces it is the drift this leg exists to catch.
 set -u
-KIT_UNATTENDED_VERSION=1.41   # gov:kit unattended@1.41 — must match unattended.sh; check-kit-versions.sh pairs them
+KIT_UNATTENDED_VERSION=1.42   # gov:kit unattended@1.42 — must match unattended.sh; check-kit-versions.sh pairs them
 
 # ------------------------------------------------------------------------------ the dereference pin
 # Identical to the driver's, and for the identical reason: `git replace` rewrites what a sha MEANS for

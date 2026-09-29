@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # check-line-length.sh — a declared maximum line length for agent-instruction prose.
 #
-#   bash tools/check-line-length.sh                    # every declared subject
-#   bash tools/check-line-length.sh <file>             # one subject
-#   LINE_MAX=200 bash tools/check-line-length.sh <file>
+#   bash <prefix>/check-line-length.sh                    # every declared subject
+#   bash <prefix>/check-line-length.sh <file>             # one subject
+#   LINE_MAX=200 bash <prefix>/check-line-length.sh <file>
 #
 # WHY. A rule that runs past a screen is a rule nobody re-reads and a diff nobody can review. The
 # default is 450 characters, which is generous: it catches the paragraph-as-a-line class without

@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """drift_report.py — does this repo's own RECORD of its state still describe reality?
 
-gov:kit drift-audit@1.15
+gov:kit drift-audit@1.16
 
-    python tools/drift-audit/drift_report.py            # human table, always exits 0
-    python tools/drift-audit/drift_report.py --json     # machine-readable, always exits 0
-    python tools/drift-audit/drift_report.py --check    # exit 1 if a GATEABLE signal is over its pin
+    python <prefix>/drift-audit/drift_report.py            # human table, always exits 0
+    python <prefix>/drift-audit/drift_report.py --json     # machine-readable, always exits 0
+    python <prefix>/drift-audit/drift_report.py --check    # exit 1 if a GATEABLE signal is over its pin
 
 WHY THIS KIT EXISTS. A governance repo gates its CODE contracts hard and its RECORD contracts not at
 all: a memory-hygiene gate checks that a spec Status token is spelled legally, never that it is TRUE.
@@ -85,7 +85,7 @@ def resolve_kit_dir(home, anchor, here):
 # <<< resolve_kit_dir
 
 
-KIT_DRIFT_AUDIT_VERSION = "1.15"
+KIT_DRIFT_AUDIT_VERSION = "1.16"
 
 CONF_NAME = ".memory-tree.conf"
 

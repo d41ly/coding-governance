@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # check-microformats.sh — grade the charter's micro-format DEFINITIONS against their own grammar.
 #
-#   bash tools/check-microformats.sh [<file>]
+#   bash <prefix>/check-microformats.sh [<file>]
 #
 # SUBJECT. The RULESET — `coding-governance-agents.template.md` — because that is the source. A
 # target's rendered charter carries the same block, and it is proved equal to this one by

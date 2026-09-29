@@ -2,7 +2,7 @@
 # check-testsuite-counts.sh — TOOL-cSettledDocket-5. Every self-test the BAR runs must print an
 # executed assertion count, in one agreed shape, against a shrink-only floor.
 #
-#   bash tools/check-testsuite-counts.sh    # silent + exit 0 = good
+#   bash <prefix>/check-testsuite-counts.sh    # silent + exit 0 = good
 #
 # WHY. `TOOL-cBriefedPilot-23` gave three suites a runtime count and a floor, after one of them had
 # printed a hardcoded `PASS (130 assertions)` for its whole life with no counter behind it. The floor

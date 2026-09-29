@@ -2,7 +2,7 @@
 """settings-merge.py — idempotently wire a hook into a target repo's .claude/settings.json.
 Stdlib only (json, argparse, pathlib); py>=3.10 (write_text newline=).
 
-# gov:kit settings-merge@1.9
+# gov:kit settings-merge@1.10
 
 The default hook, with no --fragment (shape mirrors WIRE-INTO-PROJECT.md and
 tools/hooks/agent-cap.js verbatim):
@@ -21,8 +21,8 @@ carries no comment marker, so that command substring IS the deployer's "is-it-wi
 it is what tools/check-wiring.sh joins each arm on.
 
 Usage:
-    python tools/settings-merge.py [SETTINGS_FILE] [--fragment F] [--hook-path P] [--check]
-    python tools/settings-merge.py --selftest      (or: --resolve-fragment F)
+    python <prefix>/settings-merge.py [SETTINGS_FILE] [--fragment F] [--hook-path P] [--check]
+    python <prefix>/settings-merge.py --selftest      (or: --resolve-fragment F)
       SETTINGS_FILE  default .claude/settings.json (resolved from cwd = target repo root)
       --fragment     a JSON file declaring {name, event, matcher, marker, hook_path} plus the
                      optional {interpreter, args}; omitted = the built-in agent-cap PreToolUse
@@ -72,7 +72,7 @@ import sys
 import tempfile
 from pathlib import Path, PurePosixPath
 
-KIT_SETTINGS_MERGE_VERSION = "1.9"  # gov:kit settings-merge@1.9 — engine identity
+KIT_SETTINGS_MERGE_VERSION = "1.10"  # gov:kit settings-merge@1.10 — engine identity
 HOOK_MARKER = "agent-cap.js"  # the loose join: dedup key AND the deployer's "is-it-wired?" grep target
 
 
@@ -758,7 +758,7 @@ def _selftest() -> int:
             #      substring (`--write-log`) but not the writer's basename survives the card merge
             #      byte-identical and in its own group; the card lands beside it under its matcher.
             sf14c = root / "s14c.json"
-            foreign = 'node "${CLAUDE_PROJECT_DIR}/tools/mine.js" --write-log'
+            foreign = 'node "${CLAUDE_PROJECT_DIR}/vendor/mine.js" --write-log'
             sf14c.write_text(json.dumps({"hooks": {"SessionStart": [
                 {"matcher": "startup", "hooks": [{"type": "command", "command": foreign}]}]}}) + "\n",
                 encoding="utf-8")

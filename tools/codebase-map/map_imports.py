@@ -58,7 +58,7 @@ def build_module_index(files: list[str]) -> dict[str, list[str]]:
     A LAYERS glob is spelled as a repo PATH. An import target is a NAMESPACE. Turning one into the
     other by swapping dots for slashes only works when the two happen to coincide, and it silently
     fails whenever they do not — most importantly when a directory name contains a character no
-    module name may contain. `tools/codebase-map/` is exactly that case: no Python import can ever
+    module name may contain. The `codebase-map` kit directory is exactly that case: no Python import can ever
     produce the hyphen, so a rule naming it was unmatchable by construction and P3 reported a clean
     zero over a population it could not select. That is the vacuous-selector class this kit's own
     docstring names as its dominant failure mode.
