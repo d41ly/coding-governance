@@ -16,7 +16,7 @@
 # config only inside it, and never writes into the real tree. Execution order is a scheduling detail;
 # REPORTING is always manifest order, so the output is byte-stable whatever the width.
 set -u
-KIT_RUN_GATES_VERSION=1.14   # gov:kit run-gates@1.14
+KIT_RUN_GATES_VERSION=1.15   # gov:kit run-gates@1.15
 # 1.7 -> 1.8: every bar appends one line to the run log under the git common dir, from the EXIT trap
 # (TOOL-dLoggedFlight-3). No manifest key, profile knob or stdout line moves, so neither direction of
 # a skew between the runner and its table or manifest changes a verdict.
@@ -1394,6 +1394,16 @@ if not isinstance(data, list) or not data:
     sys.stderr.write("gate-legs.json empty or not a list\n"); sys.exit(3)
 durs = {}
 cache = sys.argv[2] if len(sys.argv) > 2 else ""   # argv[1] is the MANIFEST; the cache is argv[2]
+# argv[3] is the TOOL ROOT this runner derived from its own location. A manifest names its programs
+# and guards through the {prefix} token (TOOL-aRepatriatedFork-29, its spec section 8 F1), resolved
+# here ONCE, so every field below and every reader of these rows sees a repo-relative path. A
+# manifest carrying no token, which is what the deployer emits for an adopter, passes unchanged.
+troot = sys.argv[3] if len(sys.argv) > 3 else ""
+def resolve_prefix(s):
+    s = str(s)
+    if troot in ("", "."):
+        return s.replace("{prefix}/", "").replace("{prefix}", ".")
+    return s.replace("{prefix}", troot)
 if cache and os.path.exists(cache):
     try:
         for line in open(cache, encoding="utf-8"):
@@ -1424,7 +1434,8 @@ rows = [" ".join(str(i) for i in order)]
 # the live hook installed here, so "what does it test" has two true answers and the failure question
 # has one. Those four legs are `repo`: a broken boundary in THIS repository cannot wait for somebody
 # to remember a variable. TOOL-dUnstalledConvoy-30.
-rows += [l["name"] + "\x1e" + ",".join(l.get("guard", [])) + "\x1e" + "\x1f".join(l["argv"])
+rows += [l["name"] + "\x1e" + ",".join(resolve_prefix(g) for g in l.get("guard", []))
+         + "\x1e" + "\x1f".join(resolve_prefix(a) for a in l["argv"])
          + "\x1e" + ("1" if l.get("impure") else "")
          + "\x1e" + str(l.get("chunk", "") or "")
          + "\x1e" + (l.get("subject") or "repo")
@@ -1439,7 +1450,7 @@ rows += [l["name"] + "\x1e" + ",".join(l.get("guard", [])) + "\x1e" + "\x1f".joi
                             and not isinstance(l.get("ceiling"), bool) and l["ceiling"] > 0 else "")
          for l in data]
 sys.stdout.buffer.write(("\n".join(rows) + "\n").encode())   # LF bytes (Windows text stdout is CRLF); \x1e field sep is non-whitespace so an empty guard field is preserved (a tab would collapse)
-' "$LEGS_FILE" "$TIMINGS") || { echo "run-gates: cannot parse $LEGS_FILE"; exit 2; }
+' "$LEGS_FILE" "$TIMINGS" "$(dirname "$KITREL")") || { echo "run-gates: cannot parse $LEGS_FILE"; exit 2; }
 
 # Rows stay 1:1 with the manifest so the dispatch indices address the same legs the reader reports.
 # An empty name is the drop-sentinel: kept in the arrays to hold the index, never run and never counted.

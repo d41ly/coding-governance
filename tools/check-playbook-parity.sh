@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # check-playbook-parity.sh — the playbook's claims about THIS repo, machine-checked.
 #
-#   bash tools/check-playbook-parity.sh
+#   bash <prefix>/check-playbook-parity.sh
 #
 # Exit 0 = every claim holds · 1 = a claim disagrees with its source · 2 = the gate could not run.
 #
@@ -28,8 +28,15 @@
 #   2. the S1 kit set must be non-empty AND contain the frozen sentinel `memory-tree`;
 #   3. the sibling self-test proves each arm reds, by feeding it a synthetic violation.
 set -u
+_self_dir=$(cd "$(dirname "$0")" 2>/dev/null && pwd) || _self_dir=""   # before the cd: $0 may be relative
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "playbook-parity: not a git tree"; exit 2; }
 cd "$ROOT" || exit 2
+# THE TOOL ROOT, DERIVED (TOOL-aRepatriatedFork-29 S3): the directory this gate sits in, which is
+# where the kits, their sources and this gate's waiver file live. Underivable is a refusal.
+if ! SELF_PRE=$(git -C "$_self_dir" rev-parse --show-prefix 2>/dev/null); then
+  echo "playbook-parity: cannot derive this gate's own directory from '$_self_dir' — REFUSING"
+  exit 2
+fi
 
 TEMPLATE=coding-governance-agents.template.md
 # The charter converged to ONE file at v3.0, so the kit-coverage haystack is the charter PLUS the
@@ -37,7 +44,7 @@ TEMPLATE=coding-governance-agents.template.md
 # with no precondition on the runbook, an absent one reds every kit with a wrong reason instead of
 # exiting 2 with the right one.
 RUNBOOK=WIRE-INTO-PROJECT.md
-WAIVERS=${PLAYBOOK_KIT_WAIVERS:-tools/playbook-kit-waivers.txt}
+WAIVERS=${PLAYBOOK_KIT_WAIVERS:-${SELF_PRE}playbook-kit-waivers.txt}
 SENTINEL=memory-tree
 
 status=0
@@ -50,7 +57,7 @@ done
 # ================================================================= S1 — kit coverage ============
 # The kit set is DERIVED from the tree, never hand-listed. Same derivation check-install-prefix.sh
 # and the codebase-map extractor already use — a third enumeration would be a third thing to drift.
-kits=$(git ls-files -- 'tools/*/*' | awk -F/ 'NF>2 {print $2}' | sort -u)
+kits=$(git ls-files -- "${SELF_PRE}*/*" | sed "s#^${SELF_PRE}##" | awk -F/ 'NF>1 {print $1}' | sort -u)
 
 # ARM 2 of the anti-vacuity set. An empty or broken derivation must red by NAME rather than report
 # universal coverage: with no kits, "every kit is documented" is vacuously true.
@@ -72,7 +79,7 @@ waived=$(grep -vE '^[[:space:]]*(#|$)' "$WAIVERS" | awk '{print $1}' | sort -u)
 
 # The match is an anchored PATH SEGMENT, case-sensitive — `tools/<kit>/` or a backticked `<kit>/` —
 # never a bare substring. A substring search scores the kit `lib` many times over the trio — every
-# hit inside "deliberate"/"deliberately" or "stdlib", none of them about `tools/lib/` — and would
+# hit inside "deliberate"/"deliberately" or "stdlib", none of them about `<prefix>/lib/` — and would
 # certify it documented on that evidence. That is the vacuous-selector shape this gate exists to
 # prevent, committed by the gate itself. No count is written here: the figure was measured at 7
 # when this comment was drafted and was 9 by the time the build landed, which is the same
@@ -119,11 +126,11 @@ done
 # the stamp. The datetime half, whether a stamp is FRESH, and whether the sha it names is reachable
 # are manifest-check.sh's checks 3 and 5, not this gate's.
 PAIRS="
-lens-array bound~$TEMPLATE~sed -n 's/.*array LITERAL of ≤\([0-9]\+\) elements.*/\1/p'~tools/hooks/agent-cap.js~sed -n 's/^const MAX_LENSES = \([0-9]\+\).*/\1/p'
+lens-array bound~$TEMPLATE~sed -n 's/.*array LITERAL of ≤\([0-9]\+\) elements.*/\1/p'~${SELF_PRE}hooks/agent-cap.js~sed -n 's/^const MAX_LENSES = \([0-9]\+\).*/\1/p'
 agent-cap hook matcher~$TEMPLATE~sed -n 's/.*matcher \`\([A-Za-z|]*\)\`.*/\1/p'~.claude/settings.json~sed -n 's/.*\"matcher\": \"\(Workflow[^\"]*\)\".*/\1/p'
-verify-agent total~$TEMPLATE~sed -n 's/.*at most \([0-9]\+\) verify agents TOTAL.*/\1/p'~tools/hooks/agent-cap.js~sed -n 's/^const MAX_VERIFIERS = \([0-9]\+\).*/\1/p'
-bounded-helper width~$TEMPLATE~sed -n 's/.*boundedParallel(thunks, \([0-9]\+\)).*/\1/p'~tools/hooks/agent-cap.js~sed -n 's/^const MAX_VERIFIERS = \([0-9]\+\).*/\1/p'
-resolved-K ceiling~$TEMPLATE~sed -n 's/.*cannot resolve to an integer ≤\([0-9]\+\).*/\1/p'~tools/hooks/agent-cap.js~sed -n 's/^const MAX_VERIFIERS = \([0-9]\+\).*/\1/p'
+verify-agent total~$TEMPLATE~sed -n 's/.*at most \([0-9]\+\) verify agents TOTAL.*/\1/p'~${SELF_PRE}hooks/agent-cap.js~sed -n 's/^const MAX_VERIFIERS = \([0-9]\+\).*/\1/p'
+bounded-helper width~$TEMPLATE~sed -n 's/.*boundedParallel(thunks, \([0-9]\+\)).*/\1/p'~${SELF_PRE}hooks/agent-cap.js~sed -n 's/^const MAX_VERIFIERS = \([0-9]\+\).*/\1/p'
+resolved-K ceiling~$TEMPLATE~sed -n 's/.*cannot resolve to an integer ≤\([0-9]\+\).*/\1/p'~${SELF_PRE}hooks/agent-cap.js~sed -n 's/^const MAX_VERIFIERS = \([0-9]\+\).*/\1/p'
 stamp rule sha expression~skills/session-kickoff/MANIFEST-TEMPLATE.md~sed -n 's/.*Stamp rule: sha = \`\([A-Z]*\)\` on any branch.*/\1/p'~skills/session-kickoff/manifest-check.sh~sed -n 's/^STAMP_SHA_RULE=\"sha = \([A-Z]*\) on any branch\".*/\1/p'
 "
 

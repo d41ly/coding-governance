@@ -8,7 +8,7 @@
 #
 # ---- WHAT THE MEASUREMENT SAID, because every decision below follows from it and none of it was
 # ---- reasoned out in advance. `memory/builds/aQuenchedHarness/build/2026-09-07-build-TOOL-aQuenchedHarness-5-candidate-test.md`
-# ---- traced `tools/check-line-length.test.sh`: 36 s, 18 arms, and the dominant term is the SUBJECT'S
+# ---- traced `<prefix>/check-line-length.test.sh`: 36 s, 18 arms, and the dominant term is the SUBJECT'S
 # ---- OWN COST PER INVOCATION — 31 python spawns in the outer script alone at 773 ms each, before
 # ---- counting the 12 python call sites inside the subject that `bash -x` cannot see. Not the
 # ---- harness. Not fixture construction, which is three file writes.

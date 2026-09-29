@@ -35,6 +35,12 @@ SELF="$(git -C "$(dirname -- "$0")" rev-parse --show-prefix 2>/dev/null)$(basena
 BUDGETS="$HERE/selftest-budgets.txt"
 # The manifest is this kit dir's SIBLING, derived exactly as run-gates.sh derives it (S1).
 LEGS="${GATE_LEGS:-$(dirname -- "$HERE")/gate-legs.json}"
+# THE TOOL ROOT, derived the same way (TOOL-aRepatriatedFork-29 S2): the manifest, this kit's
+# declaration and its evidence header name their paths through the `{prefix}` token, and every
+# reader below resolves it against this answer. Empty is the repo root, a legal install.
+TROOT=$(git -C "$(dirname -- "$HERE")" rev-parse --show-prefix 2>/dev/null) || {
+  echo "run-selftests: cannot derive the tool root above $HERE" >&2; exit 2; }
+TROOT=${TROOT%/}
 # The python-launcher resolver, INLINED byte-identically from the canonical copy named on
 # the marker line below, for
 # the reason the sibling runner states: this kit is deployable and gov's lib dir is gov-internal.
@@ -287,9 +293,10 @@ read_margin() {
 # bootstrap state --calibrate fills and --pooled refuses row by row.
 read_evidence() {
   [ -f "$EVIDENCE" ] || return 0
-  "$PYBIN" - "$EVIDENCE" <<'PY'
+  "$PYBIN" - "$EVIDENCE" "$TROOT" <<'PY'
 import re, sys
 sys.stdout.reconfigure(newline="")
+troot = sys.argv[2]
 seen = {}
 for n, raw in enumerate(open(sys.argv[1], encoding="utf-8"), 1):
     line = raw.rstrip("\r\n")
@@ -302,7 +309,10 @@ for n, raw in enumerate(open(sys.argv[1], encoding="utf-8"), 1):
             print("NOTRAILER\t" + m.group(1))
         m = re.match(r"#\s*pooled-kit:\s*(.+?)\s*$", s)
         if m:
-            print("POOLEDKIT\t" + m.group(1))
+            kd = m.group(1)
+            kd = kd.replace("{prefix}/", "").replace("{prefix}", ".") if not troot \
+                else kd.replace("{prefix}", troot)
+            print("POOLEDKIT\t" + kd)
         continue
     f = line.split("\t")
     if len(f) != 9:
@@ -443,7 +453,7 @@ fi
 # ---- A row whose argv is empty takes it from `<prefix>/gate-legs.json`, so the manifest stays the one
 # ---- place a held leg's command is written and this file carries only what the manifest cannot.
 read_population() {
-  "$PYBIN" - "$BUDGETS" "$LEGS" "$FILTER" <<'PY'
+  "$PYBIN" - "$BUDGETS" "$LEGS" "$FILTER" "$TROOT" <<'PY'
 import json, sys
 
 # LF, NOT CRLF, and this is a bug fix rather than tidiness. On Windows `print` translates every
@@ -477,6 +487,10 @@ for line in open(budgets, encoding="utf-8"):
             print("\t".join(["UNRESOLVED", name, budget, ""]))
             continue
         argv = " ".join(leg.get("argv", []))
+    # The `{prefix}` token, resolved against the tool root this script derived (argv 4).
+    troot = sys.argv[4] if len(sys.argv) > 4 else ""
+    argv = argv.replace("{prefix}/", "").replace("{prefix}", ".") if not troot \
+        else argv.replace("{prefix}", troot)
     if filt and filt not in argv:
         continue
     print("\t".join(["ok", name, budget, argv]))

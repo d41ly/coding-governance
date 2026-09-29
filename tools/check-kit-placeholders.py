@@ -46,8 +46,8 @@ reports the same zero as a clean tree. A descriptor that is not valid TOML refus
 whose `[adopt]` block names no resolvable script refuses rather than skipping, because a skipped
 kit is a kit this gate silently does not cover.
 
-  python tools/check-kit-placeholders.py           # assert; exit 1 on an unsubstituted token
-  python tools/check-kit-placeholders.py --list    # every pair and both directions, exit 0
+  python <prefix>/check-kit-placeholders.py           # assert; exit 1 on an unsubstituted token
+  python <prefix>/check-kit-placeholders.py --list    # every pair and both directions, exit 0
 """
 import pathlib
 import re
@@ -60,8 +60,24 @@ KIT_PLACEHOLDERS_VERSION = "1.0"  # gov:kit kit-placeholders@1.0 — the deploye
 #: EXISTS FOR THE SELF-TEST: without it every hermetic arm silently graded the real tree instead of
 #: its own fixture, and three arms passed because the real tree happens to be green — the
 #: `fixture-passes-by-finding-nothing` class, inside the suite written to prevent it.
-DEFAULT_ROOT = pathlib.Path(__file__).resolve().parent.parent
-KIT_GLOB = "tools/*/kit.toml"
+#: TOOL-aRepatriatedFork-29 S3: this gate sits IN the tool root, so the root is the first directory
+#: above it holding a `.git` entry — not its grandparent, which is the root only at a one-segment
+#: prefix — and the descriptor glob is spelled from the tool root it derives, never a literal one.
+HERE = pathlib.Path(__file__).resolve().parent
+DEFAULT_ROOT = next((p for p in (HERE, *HERE.parents) if (p / ".git").exists()), HERE.parent)
+
+
+def derive_kit_glob(root):
+    """`<tool root>/*/kit.toml` for `root`. This gate's own directory when it sits under `root`;
+    for a fixture tree handed in by `--root`, the one directory whose children hold a `kit.toml`
+    at depth 2, or the root itself when that is not exactly one."""
+    root = pathlib.Path(root).resolve()
+    if HERE == root or root in HERE.parents:
+        rel = HERE.relative_to(root).as_posix()
+    else:
+        cands = {p.parent.parent.relative_to(root).as_posix() for p in root.glob("*/*/kit.toml")}
+        rel = cands.pop() if len(cands) == 1 else "."
+    return "*/kit.toml" if rel == "." else f"{rel}/*/kit.toml"
 
 # `{kit}` is the descriptor's own spelling for its kit directory.
 _SCRIPT_IN_ARGV = re.compile(r"^\{kit\}/(?P<name>[A-Za-z0-9._-]+\.sh)$")
@@ -78,7 +94,7 @@ def load_descriptor(path):
     the one condition worth surviving, and any other failure is this file's bug and should raise.
     """
     try:
-        sys.path.insert(0, str(DEFAULT_ROOT / "tools" / "govkit"))
+        sys.path.insert(0, str(next(iter(HERE.glob("*/registry.toml")), HERE).parent))
         from govkit import load_toml  # the corpus's one descriptor reader
     except ImportError:
         import tomllib
@@ -107,7 +123,7 @@ def resolve_adopter(kit_dir, doc):
 
     Returns the path, or the string "exempt" for a descriptor that DECLARES it has no adopter via
     `why_no_adopter`, or None when neither holds. The exemption is honoured because it is DECLARED
-    and carries its own reason: `tools/workflows/kit.toml` renders through the parity gate's own
+    and carries its own reason: `<prefix>/workflows/kit.toml` renders through the parity gate's own
     `--render` mode instead of a separate adopter, and redding it would be redding a kit for a
     design its descriptor states. An exemption is not coverage, so exempt kits are COUNTED and named
     on every run rather than silently passed."""
@@ -137,7 +153,7 @@ def build_report(root):
     """One row per kit that declares at least one placeholder."""
     rows = []
     silent = []
-    for desc in sorted(root.glob(KIT_GLOB)):
+    for desc in sorted(root.glob(derive_kit_glob(root))):
         kit_dir = desc.parent
         doc = load_descriptor(desc)
         declared = extract_declared(doc)
@@ -200,7 +216,7 @@ def scan_conf_leaks(root):
     line for it, older than the build, then read as gov's value."""
     leaks = []
     templates = 0
-    for desc in sorted(root.glob(KIT_GLOB)):
+    for desc in sorted(root.glob(derive_kit_glob(root))):
         kit_dir = desc.parent
         doc = load_descriptor(desc)
         keys = extract_conf_keys(kit_dir, doc)
@@ -240,7 +256,7 @@ def main(argv):
 
     if not rows:
         sys.stderr.write(
-            "kit-placeholders: REFUSED — no `tools/*/kit.toml` rule declares a `placeholders` list, "
+            "kit-placeholders: REFUSED — no `<prefix>/*/kit.toml` rule declares a `placeholders` list, "
             "so this run graded NOTHING and a clean exit would report the same zero as a clean "
             "tree.\n")
         return 2

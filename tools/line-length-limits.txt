@@ -2,7 +2,7 @@
 #
 # GRAMMAR: `<repo-relative-path>\t<characters>` per row. Comments carry the justification for a value
 # and every movement of it, because a number with no history beside it is a number nobody can
-# question. Modelled on tools/template-size-limits.txt, which is this tree's established answer to
+# question. Modelled on <prefix>/template-size-limits.txt, which is this tree's established answer to
 # the same problem — a budget whose every raise is argued next to the figure.
 #
 # WHO WRITES THIS FILE: a person, deliberately, per repo. GOV DOES NOT SHIP ITS ROWS TO ADOPTERS.

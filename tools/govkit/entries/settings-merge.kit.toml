@@ -1,9 +1,9 @@
-# kit.toml — this entry, declared as data. Read by tools/govkit/. Contract: the deployer unit's spec under memory/builds/aSealedCaravan/spec/.
+# kit.toml — this entry, declared as data. Read by <prefix>/govkit/. Contract: the deployer unit's spec under memory/builds/aSealedCaravan/spec/.
 
 id = "settings-merge"
 scope = "repo"
 kind = "flat"
-home = "tools"
+home = "."
 version_from = { file = "settings-merge.py", pattern = "^KIT_SETTINGS_MERGE_VERSION = " }
 requires = []
 
@@ -11,7 +11,7 @@ requires = []
 include = ["settings-merge.py"]
 role = "engine"
 to = "{prefix}/settings-merge.py"
-claims = ["tools/settings-merge.py"]
+claims = ["{prefix}/settings-merge.py"]
 
 [[files]]
 include = []

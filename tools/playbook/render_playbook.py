@@ -51,7 +51,7 @@ cannot write one (`resolve_selection` refuses an empty selection), so it can onl
 
 WHERE THE INPUTS COME FROM, AND WHY IT IS NOT `__file__`'s GRANDPARENT. This engine ships into a
 target at `{prefix}/playbook/`, so its grandparent there is the TARGET's repo root — which holds
-neither `tools/govkit/entries/playbook.kit.toml` (a registry exemption that never lands in a target)
+neither `<prefix>/govkit/entries/playbook.kit.toml` (a registry exemption that never lands in a target)
 nor a repo-root charter template (the deployer lands it at the operator-chosen `playbook_path`).
 Resolving from the grandparent worked in gov and died in every adopter with an uncaught
 FileNotFoundError, straight past `main`'s `except Refusal`. So: the DECLARATIONS are read from beside
@@ -212,9 +212,21 @@ def derive_gate_runner(root: Path, _a: dict) -> str:
         return f'bash {(kit / "run-gates.sh").relative_to(top).as_posix()}'
     except (LookupError, ValueError):
         pass
-    for cand in ('tools/run-gates.sh', 'scripts/run-gates.sh', 'scripts/gate.sh'):
-        if (root / cand).is_file():
-            return f'bash {cand}'
+    # TOOL-aRepatriatedFork-29 S5 — NO FIXED CANDIDATE LIST. The fallback used to probe three paths
+    # at two hard-coded prefixes, so a runner installed anywhere else rendered no bar at all. It now
+    # probes under the TARGET'S kit root: the deploy answer's `prefix` when it states one, else every
+    # directory at depth 1 or 2 holding the kit — and only an unambiguous single answer is taken.
+    home, anchor = 'run-gates', 'run-gates.sh'
+    pfx = _a.get('prefix') if isinstance(_a, dict) else None
+    roots = [pfx.strip('/')] if isinstance(pfx, str) and pfx.strip('/') else sorted(
+        {p.parent.parent.relative_to(top).as_posix()
+         for pat in ('*/', '*/*/') for p in top.glob(f'{pat}{home}/{anchor}')
+         if not any(s.startswith('.') for s in p.relative_to(top).parts)})
+    if len(roots) != 1:
+        return ''
+    for rel in (f'{home}/{anchor}', anchor, 'gate.sh'):
+        if (top / roots[0] / rel).is_file():
+            return f'bash {roots[0]}/{rel}'
     return ''
 
 
@@ -386,14 +398,26 @@ def read_input(path: Path, what: str) -> str:
 def resolve_declaration_paths(engine_dir: Path, gov_root: Path) -> tuple[Path, Path]:
     """The descriptor and the registry, from the INSTALLED layout first and gov's own second.
 
-    An installed kit carries both beside the engine, because `tools/govkit/` is a registry exemption
-    that never lands in a target. Gov has no copy beside the engine and falls through to its own
-    tree, which is what keeps one source of truth for these two files.
+    An installed kit carries both beside the engine, because the deployer's own directory is a
+    registry exemption that never lands in a target. Gov has no copy beside the engine and falls
+    through to its own tree, which is what keeps one source of truth for these two files.
+
+    TOOL-aRepatriatedFork-29 S5: the fallback is DERIVED from the engine's own location, not joined
+    under `gov_root` at a spelled prefix. The engine's parent is gov's tool root; the registry is the
+    one `*/registry.toml` there and the descriptor the one `*/entries/playbook.kit.toml`, so neither
+    the tool root nor the deployer's directory is named. `gov_root` stays in the signature for the
+    template, which sits at the checkout's root.
     """
     desc = engine_dir / 'playbook.kit.toml'
     reg = engine_dir / 'registry.toml'
-    return (desc if desc.is_file() else gov_root / 'tools' / 'govkit' / 'entries' / desc.name,  # gov:prefix-literal — falls back to gov's own checkout, whose layout is gov's by definition
-            reg if reg.is_file() else gov_root / 'tools' / 'govkit' / reg.name)  # gov:prefix-literal — falls back to gov's own checkout, whose layout is gov's by definition
+    tool_root = engine_dir.parent
+
+    def derive_one(pattern: str, fallback: Path) -> Path:
+        hits = sorted(tool_root.glob(pattern))
+        return hits[0] if len(hits) == 1 else fallback
+
+    return (desc if desc.is_file() else derive_one(f'*/entries/{desc.name}', desc),
+            reg if reg.is_file() else derive_one(f'*/{reg.name}', reg))
 
 
 def resolve_template_path(gov_root: Path, target: Path, answers: dict) -> Path:
@@ -897,6 +921,25 @@ def run_selftest() -> int:
         failed += 1
         print(f'  arm FAIL a conf value keeps no trailing comment — got {got!r}')
 
+    # TOOL-aRepatriatedFork-29 AC6 — the bar fallback probes the TARGET's kit root, not a fixed list:
+    # a runner under `vendor/gov/run-gates/` with no receipt renders that path, and two candidate
+    # roots render nothing rather than a guess.
+    kit_home, kit_anchor = 'run-gates', 'run-gates.sh'
+    with tempfile.TemporaryDirectory() as td:
+        tgt = Path(td) / 'tgt'
+        for n, base in enumerate((('vendor', 'gov'), ('alt',))):
+            kd = tgt.joinpath(*base, kit_home)
+            kd.mkdir(parents=True)
+            (kd / kit_anchor).write_text('#!/bin/sh\n', encoding='utf-8')
+            if n == 0:
+                one = derive_gate_runner(tgt, {})
+        two = derive_gate_runner(tgt, {})
+    if one == f'bash vendor/gov/{kit_home}/{kit_anchor}' and two == '':
+        passed += 1
+    else:
+        failed += 1
+        print(f'  arm FAIL the bar fallback probes the target kit root — got {one!r} then {two!r}')
+
     if failed:
         print(f'render_playbook.selftest FAILED — {failed} of {passed + failed} arm(s)')
         return 1
@@ -992,4 +1035,4 @@ def main(argv: list[str]) -> int:
 if __name__ == '__main__':
     raise SystemExit(main(sys.argv[1:]))
 
-KIT_PLAYBOOK_RENDER_VERSION = "1.13"  # gov:kit playbook-render@1.13
+KIT_PLAYBOOK_RENDER_VERSION = "1.14"  # gov:kit playbook-render@1.14

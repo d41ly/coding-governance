@@ -1,5 +1,5 @@
 # adopters.toml — the trees gov ships INTO, as a declaration. GOV-INTERNAL: it sits under the
-# registry's `tools/govkit` exemption and no descriptor ships it. `registry.toml` is the wrong home
+# registry's `<prefix>/govkit` exemption and no descriptor ships it. `registry.toml` is the wrong home
 # for it, because the playbook renderer ships that file to every adopter.
 #
 # TOOL-aRepatriatedFork-31. `govkit.py selfcheck` arm 10 bans every `names` spelling,

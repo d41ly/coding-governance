@@ -1,7 +1,7 @@
-# kit.toml — this entry, declared as data. Read by tools/govkit/. Contract: the deployer unit's spec under memory/builds/aSealedCaravan/spec/.
+# kit.toml — this entry, declared as data. Read by <prefix>/govkit/. Contract: the deployer unit's spec under memory/builds/aSealedCaravan/spec/.
 
 id = "unattended"
-home = "tools/unattended"
+home = "unattended"
 scope = "repo"
 version_from = { file = "unattended.sh", pattern = "^KIT_UNATTENDED_VERSION=" }
 # `settings-merge` since TOOL-aRepatriatedFork-11 (section 8 F2): this kit ships hook fragments and its
@@ -19,7 +19,7 @@ role = "engine"
 # the kit and never edits it. That is the 2026-08-23 owner ruling, applied to what SHIPS rather than
 # only to what runs.
 #
-# WITHHELD BY CLAIMING THE DESTINATION, the mechanism `tools/codebase-map/kit.toml` already uses and
+# WITHHELD BY CLAIMING THE DESTINATION, the mechanism `<prefix>/codebase-map/kit.toml` already uses and
 # explains: govkit has no `exclude` key, a `**` rule's pool drops only what another rule owns, and
 # `project-owned` is absent from LANDABLE_ROLES so `apply` never writes it.
 #
@@ -196,10 +196,10 @@ means = "render-failed-half-stamped"
 # memory/builds/dScriptedRepeat/build/2026-08-23-build-TOOL-dScriptedRepeat-5-bar-cost-measurement.md.
 #
 # THE COMPENSATING CHECK, because an exemption is not coverage (charter §7). Work touching
-# `tools/unattended/` is not done until this prints parity GREEN and the verdict is in the landing report:
+# `<prefix>/unattended/` is not done until this prints parity GREEN and the verdict is in the landing report:
 #
-#     bash tools/unattended/run-unattended-gates.sh --pooled        # the self-tests through the bounded pool, parity graded
-#     bash tools/unattended/run-unattended-gates.sh --checks        # and the legs beside them, which take no mode
+#     bash <prefix>/unattended/run-unattended-gates.sh --pooled        # the self-tests through the bounded pool, parity graded
+#     bash <prefix>/unattended/run-unattended-gates.sh --checks        # and the legs beside them, which take no mode
 #
 # The mode is DECLARED and never defaulted (TOOL-aBatchedArm-4): a route reaching the self-tests
 # with neither `--serial` nor `--pooled` refuses. `--pooled` runs them through the shared runner's
@@ -258,7 +258,7 @@ red_after_land = true
 
 # the structural group linter's self-test (TOOL-aBatchedArm-2). A KIT leg, held off the automatic
 # bar like every `subject = kit` row. This kit declares NO self-test as a leg: the arms-groups
-# linter had one, and the owner's 2026-08-23 ruling takes every `tools/unattended/*.test.sh` leg
+# linter had one, and the owner's 2026-08-23 ruling takes every `<prefix>/unattended/*.test.sh` leg
 # off the manifest without exception — which main's runlog-writer AC9 asserts. The linter's suite
 # runs through `run-unattended-gates.sh` with the rest, from its budget row.
 

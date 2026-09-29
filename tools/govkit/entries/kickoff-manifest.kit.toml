@@ -1,9 +1,13 @@
-# kit.toml — this entry, declared as data. Read by tools/govkit/. Contract: the deployer unit's spec under memory/builds/aSealedCaravan/spec/.
+# kit.toml — this entry, declared as data. Read by <prefix>/govkit/. Contract: the deployer unit's spec under memory/builds/aSealedCaravan/spec/.
 
 id = "kickoff-manifest"
 scope = "repo"
 kind = "flat"
 home = "skills/session-kickoff"
+# THE ONE HOME OUTSIDE THE TOOL ROOT, so it is spelled from the repo root and says so. Every other
+# `home` is kit-relative and joined to the derived tool root at load (TOOL-aRepatriatedFork-29 §8 F2);
+# the kickoff engine sits at machine-junction discovery's fixed path, which no install prefix moves.
+home_root_relative = true
 version_from = { file = "manifest-check.sh", pattern = "^KIT_MANIFEST_VERSION=" }
 requires = []
 

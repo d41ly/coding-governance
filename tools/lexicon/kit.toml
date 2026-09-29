@@ -1,8 +1,8 @@
-# kit.toml — this entry, declared as data. Read by tools/govkit/. Contract: the unit spec under
+# kit.toml — this entry, declared as data. Read by <prefix>/govkit/. Contract: the unit spec under
 # memory/builds/dClosedLexicon/spec/.
 
 id = "lexicon"
-home = "tools/lexicon"
+home = "lexicon"
 scope = "repo"
 version_from = { file = "lexicon.py", pattern = "^KIT_LEXICON_VERSION = " }
 
@@ -23,7 +23,7 @@ role = "engine"
 # the kit and never edits it. That is the 2026-08-23 owner ruling, applied to what SHIPS rather than
 # only to what runs.
 #
-# WITHHELD BY CLAIMING THE DESTINATION, the mechanism `tools/codebase-map/kit.toml` already uses and
+# WITHHELD BY CLAIMING THE DESTINATION, the mechanism `<prefix>/codebase-map/kit.toml` already uses and
 # explains: govkit has no `exclude` key, a `**` rule's pool drops only what another rule owns, and
 # `project-owned` is absent from LANDABLE_ROLES so `apply` never writes it.
 #
@@ -104,7 +104,7 @@ argv = ["bash", "{kit}/adopt-lexicon.sh", "--check"]
 # THE PROBE NAMES WHAT THE ADOPTER PRODUCES, not what the WRITE phase copied. `{kit}/lexicon.py` is
 # satisfied by the `include = "**"` rule above before `[adopt]` ever runs, so it was a liveness
 # assertion true by construction -- govkit classified any rc-0 run as adopted even when no Skill had
-# been rendered. Closing review M1; `tools/memory-recall/kit.toml` already has the right shape.
+# been rendered. Closing review M1; `<prefix>/memory-recall/kit.toml` already has the right shape.
 [[outcome]]
 code = 0
 probe = { must_exist = ".claude/skills/lexicon/SKILL.md" }
@@ -157,7 +157,7 @@ ok = true
 name = "lexicon naming predicates"
 subject = "repo"
 argv = ["python", "{kit}/lexicon.py"]
-guard = ["tools/", "skills/session-kickoff/", ".githooks/", ".claude/"]
+guard = ["{prefix}/", "skills/session-kickoff/", ".githooks/", ".claude/"]
 
 [[gate_leg]]
 name = "lexicon wiring"

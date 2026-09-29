@@ -1,12 +1,13 @@
 # TOOL-aRepatriatedFork-29 — gov's own gates and declarations derive the prefix they name
 
-**Status:** SPECCED · rev-3 · 2026-09-29 · node a · Tier-2 · base 2143b6d6 · streams tooling · order 13
+**Status:** CLOSED · rev-3 · 2026-09-29 · node a · Tier-2 · base 2143b6d6 · streams tooling · order 13
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-25-build-TOOL-aRepatriatedFork-23-prefix-census.md](../build/2026-09-25-build-TOOL-aRepatriatedFork-23-prefix-census.md) | research | TOOL-aRepatriatedFork-23 TOOL-aRepatriatedFork-24 TOOL-aRepatriatedFork-25 TOOL-aRepatriatedFork-26 TOOL-aRepatriatedFork-27 TOOL-aRepatriatedFork-28 TOOL-aRepatriatedFork-30 |
+| [2026-09-29-build-TOOL-aRepatriatedFork-29-1-acceptance-ledger.md](../build/2026-09-29-build-TOOL-aRepatriatedFork-29-1-acceptance-ledger.md) | journal | — |
 | [2026-09-29-prompt-TOOL-aRepatriatedFork-29-build-brief.md](../prompts/2026-09-29-prompt-TOOL-aRepatriatedFork-29-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->

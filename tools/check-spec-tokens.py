@@ -66,7 +66,7 @@ being a grammar over the spec's own prose outside its fenced blocks.
          trips must be a name on the section 7 leg line, in a LIVE spec dated at or after
          SPEC_GUARD_LEGS_CUTOFF (blank = off) -> a hit whose token is the composite
          `<leg> <- <path>` (TOOL-aBlindedTrial-8). A DIRECTORY token under the sub-head — one
-         ending in `/` and of TWO OR MORE segments, `tools/run-gates/` — is a declared PREFIX and
+         ending in `/` and of TWO OR MORE segments, `<prefix>/run-gates/` — is a declared PREFIX and
          trips SYMMETRICALLY: a guard it equals or sits under, and a guard that sits under it
          (closing review round 1, R3; writing the folder instead of the files was a clean pass
          before). A ONE-segment token, `tools/`, is a ROOT and declares nothing: it is how prose
@@ -87,7 +87,7 @@ being a grammar over the spec's own prose outside its fenced blocks.
          apart. The join reads the ESTIMATE as written, not the write set the build actually made;
          it reads no path named in prose outside the sub-head; and it reads a guard as a directory
          or an exact file, never as git pathspec magic. The motivating case: a unit that edited
-         `tools/hooks/scratch-guard.js` and omitted `scratch-guard self-test`, found by a closing
+         `<prefix>/hooks/scratch-guard.js` and omitted `scratch-guard self-test`, found by a closing
          review and not by a gate.
   claims every backticked OBJECT a dossier-claim SENTENCE names, in a LIVE spec, outside fenced
          blocks, with no cutoff key (owner, 2026-09-21) -> a hit when the object is a PATH (a
@@ -115,8 +115,8 @@ is not a real ISO date, SPEC_LEGLINE_CUTOFF and SPEC_GUARD_LEGS_CUTOFF included,
 them pass through `read_cutoff_key`: the comparisons are string comparisons, and a malformed value
 would report the join as set while it graded nothing.
 
-  python tools/check-spec-tokens.py            # assert; exit 1 on an unwaived hit
-  python tools/check-spec-tokens.py --list     # every hit and near-miss, authoring aid, exit 0
+  python <prefix>/check-spec-tokens.py            # assert; exit 1 on an unwaived hit
+  python <prefix>/check-spec-tokens.py --list     # every hit and near-miss, authoring aid, exit 0
 """
 import datetime
 import json
@@ -129,7 +129,26 @@ KIT_SPEC_TOKENS_VERSION = "1.1"  # gov:kit spec-tokens@1.1 — the deployer's re
 
 WAIVERS = "memory/project/spec-token-waivers.txt"
 SPEC_GLOB = "memory/builds/*/spec/*.md"
-LEGS = "tools/gate-legs.json"
+LEGS_NAME = "gate-legs.json"
+#: TOOL-aRepatriatedFork-29 S3 — the manifest sits in the tool root, which is this file's own
+#: directory; `LEGS` is the repo-relative spelling `main` derives, for its messages.
+LEGS = LEGS_NAME
+HERE = pathlib.Path(__file__).resolve().parent
+
+
+def derive_legs_path(root):
+    """The leg manifest for `root`: beside this file when this file sits in `root`, else the ONE
+    `gate-legs.json` at depth 0 to 2 under it (a fixture tree the self-test builds). Returns the
+    repo-relative tool root with it, since the manifest's `{prefix}` token resolves to that."""
+    root = pathlib.Path(root).resolve()
+    if HERE == root or root in HERE.parents:
+        cands = [HERE / LEGS_NAME]
+    else:
+        cands = sorted({c for pat in ("", "*/", "*/*/") for c in root.glob(pat + LEGS_NAME)})
+    if len(cands) != 1:
+        return None, None
+    rel = cands[0].parent.relative_to(root).as_posix()
+    return cands[0], ("" if rel == "." else rel)
 
 SEC = r"^## %s\.[^\n]*\n(.*?)(?=\n## |\Z)"
 TICK = re.compile(r"`([^`\n]+)`")
@@ -169,9 +188,9 @@ DIRECT_KEY = "SPEC_DIRECT_CUTOFF"
 GUARDS_KEY = "SPEC_GUARD_LEGS_CUTOFF"
 FILES_HEAD = re.compile(r"^### Files touched( \(estimate\))?[ \t]*$", re.M)
 # A guard carried by MORE than this many legs is BROAD and leaves the guards join (closing review
-# round 1, R1). Measured on the manifest at 144cd1fb: 5 keeps `tools/hooks/` (5 legs, the motivating
-# case) and `.githooks/` (5) joined and drops `tools/lib/` (30), `tools/` (11), `tools/memory-tree/`
-# (9) and `tools/run-gates/` (6). The figures live here as the reason for the floor, dated; the set
+# round 1, R1). Measured on the manifest at 144cd1fb: 5 keeps `<prefix>/hooks/` (5 legs, the motivating
+# case) and `.githooks/` (5) joined and drops `<prefix>/lib/` (30), `<prefix>/` (11), `<prefix>/memory-tree/`
+# (9) and `<prefix>/run-gates/` (6). The figures live here as the reason for the floor, dated; the set
 # the floor excludes TODAY is derived and printed on every run, never typed.
 BROAD_LEG_FLOOR = 5
 # The acceptance section by HEADING TEXT, the shape GATES_HEAD already has and for the same reason:
@@ -251,12 +270,12 @@ CLAIM_ARMS = [(name, re.compile(shape.format(**CLAIM_PARTS), re.I)) for name, sh
 CLAIM_REFUSALS = (
     ("", re.compile(r"\s"), "cleared by the space clause: a token carrying a space is never refused"),
     ("GLOB", re.compile(r"[*?]"), "the map README rules that path globs are digest-only, never gated "
-     "(memory/map/README.md, rendered by tools/codebase-map/gen_map.py)"),
+     "(memory/map/README.md, rendered by <prefix>/codebase-map/gen_map.py)"),
     ("PATH", re.compile(r"/"), "the map README rules that path globs are digest-only, never gated "
-     "(memory/map/README.md, rendered by tools/codebase-map/gen_map.py)"),
+     "(memory/map/README.md, rendered by <prefix>/codebase-map/gen_map.py)"),
     ("CODE SYMBOL", re.compile(r"^(?![\w.-]+\.(?:py|sh|js|json|toml|md|txt)$).*?(?:[A-Za-z0-9]_[A-Za-z0-9]|[()])"),
      "the symbol tier feeds "
-     "generated/symbols.json only and never the ratchet (tools/codebase-map/map_extractors.py)"),
+     "generated/symbols.json only and never the ratchet (<prefix>/codebase-map/map_extractors.py)"),
 )
 CLAIMS_WHY = ("a codebase-map dossier claims EXACT inventory keys and no key is a {cls}: {cite}; name "
               "the key the dossier will claim, or describe the thing in prose")
@@ -267,8 +286,8 @@ CLAIMS_WHY = ("a codebase-map dossier claims EXACT inventory keys and no key is 
 # `check_claim_canary` tests the entries STRUCTURALLY and never against a typed total.
 CLAIM_CANARY = [
     ("`memory/map/features/runlog.md` CLAIMS `derive_window_closer`.", "active", "CODE SYMBOL"),
-    ("`tools/runlog/*.py` is CLAIMED BY `runlog.md`.", "passive", "GLOB"),
-    ("`runlog.md`'s CLAIM on `tools/runlog/runlog.py` stands.", "noun", "PATH"),
+    ("`src/runner/*.py` is CLAIMED BY `runlog.md`.", "passive", "GLOB"),
+    ("`runlog.md`'s CLAIM on `src/runner/run.py` stands.", "noun", "PATH"),
     ("`read_window()`, which `memory/map/features/runlog.md` CLAIMS, stays.", "fronted", "CODE SYMBOL"),
     ("`memory/map/features/spec-tokens.md` CLAIMS `spec tokens (a spec's own names resolve)`.",
      "active", ""),
@@ -357,7 +376,7 @@ def derive_dir_segments(tok):
     """The REAL segments of a `/`-terminated token this join could read, or `[]` for anything else:
     a token that is not `/`-terminated, opens like a deploy-time token, carries a glob or a space, or
     has a segment that is empty, `.` or `..` — so `./`, `../` and `tools/./` are nothing, not a path
-    (round 2, R8). `tools/` -> `['tools']`; `tools/run-gates/` -> `['tools', 'run-gates']`."""
+    (round 2, R8). `src/` -> `['src']`; `src/app/` -> `['src', 'app']`."""
     if NOT_A_TOKEN.match(tok) or " " in tok or "*" in tok or "?" in tok or not tok.endswith("/"):
         return []
     parts = tok.rstrip("/").split("/")
@@ -376,7 +395,7 @@ def check_dir_shaped(tok):
 
 def check_guard_trips(path, guard):
     """Git-pathspec semantics for a manifest guard: the exact path, or anything under it as a
-    directory. Never a bare prefix, so `tools/x.sh` does not trip on `tools/x.sh.bak`. A declared
+    directory. Never a bare prefix, so `src/x.sh` does not trip on `src/x.sh.bak`. A declared
     DIRECTORY (its trailing `/` kept by `extract_files_touched`, two or more segments — a root never
     reaches here) trips symmetrically: it also trips a guard that sits under it, an exact-file guard
     included, because `tools/x/` declares `tools/x/y.sh` (R3)."""
@@ -393,7 +412,7 @@ def derive_guarded_legs(rows):
     as NEAR; `joined` is `(name, [guards])` for every leg carrying at least one guard that is not
     broad, with the broad ones dropped from its list. A leg with no `guard` key is absent from both
     (fixture manifests omit it). rev-1 split on DEPTH — one segment or more — and on the real
-    manifest that joined `tools/lib/` (30 legs) and excluded `.githooks/` (5); the count is the
+    manifest that joined `<prefix>/lib/` (30 legs) and excluded `.githooks/` (5); the count is the
     property the exclusion was written for (closing review round 1, R1)."""
     count = {}
     for r in rows:
@@ -628,12 +647,25 @@ def main(argv):
               f"{SPEC_GLOB}; a lint that graded nothing reports the same zero as a clean tree")
         return 1
 
-    legs_path = root / LEGS
+    global LEGS
+    legs_path, troot = derive_legs_path(root)
+    if legs_path is None:
+        print(f"spec-tokens: REFUSING — no single {LEGS_NAME} is derivable under {root.as_posix()}, "
+              "so the leg join cannot run")
+        return 1
+    LEGS = legs_path.relative_to(root.resolve()).as_posix()
     if not legs_path.exists():
         print(f"spec-tokens: REFUSING — {LEGS} is missing, so the leg join cannot run")
         return 1
     try:
         rows = json.loads(legs_path.read_bytes().decode("utf-8"))
+        # The manifest's `{prefix}` token (§8 F1 of TOOL-aRepatriatedFork-29) resolves to the tool
+        # root it sits in, so a guard joins a spec's repo-relative write set as it always has.
+        for r in rows:
+            if r.get("guard"):
+                r["guard"] = [(g.replace("{prefix}", troot) if troot else
+                               g.replace("{prefix}/", "").replace("{prefix}", "."))
+                              for g in r["guard"]]
         legs = {r["name"] for r in rows}
         guarded, broad = derive_guarded_legs(rows)
     except Exception as exc:  # noqa: BLE001 - a malformed manifest is a refusal, not a pass

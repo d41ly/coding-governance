@@ -1375,11 +1375,14 @@ def receipt():
 def templates(gov):  # {rendered destination: [gov template]}, from gov's own descriptors and the plan
     with open(f"{gov}/tools/govkit/registry.toml", "rb") as fh:
         entries = tomllib.load(fh).get("entry", [])
+    tr = os.path.relpath(os.path.dirname(os.path.dirname(fh.name)), gov).replace(os.sep, "/")
     plan, out = planned(), {}
-    for e in entries:
-        with open(f"{gov}/{e['descriptor']}", "rb") as fh:
+    for e in entries:  # a registry path names the tool root as `{prefix}`, a kit home kit-relatively
+        with open(f"{gov}/{e['descriptor'].replace('{prefix}', tr)}", "rb") as fh:
             d = tomllib.load(fh)
-        home = (d.get("home") or "").rstrip("/")
+        home = (d.get("home") or "").strip("/")
+        if "home" in d and not d.get("home_root_relative"):
+            home = tr if home in ("", ".") else f"{tr}/{home}"
         for rule in d.get("files", []):
             if rule.get("role") != "rendered":
                 continue

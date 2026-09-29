@@ -27,11 +27,11 @@
 # its trailer unconditionally — a `PASS (` behind `[ "$st" = 0 ] &&` is the same class as no
 # trailer, since the run that most needs a reading is the red one — or be declared `no-trailer:`
 # above. The closing review of TOOL-aBatchedArm found five such green-only trailers in this kit.
-# pooled-kit: tools/unattended
+# pooled-kit: {prefix}/unattended
 #
 # NO ROW YET, and that is the announced-unarmed state: `--pooled` over any population refuses every
 # uncalibrated row by name until `--pooled --calibrate` has run it to its end. The build's landing
-# step calibrates the population `--kit tools/unattended --list` resolves and commits the rows.
+# step calibrates the population `--kit <prefix>/unattended --list` resolves and commits the rows.
 #
 # <row>	<condition>	<node>	<max seconds>	<rc>	<fails>	<executed>	<readings>	<date>
 unattended adopter e2e	pooled@8x1	a	363	0	0	100	4	2026-09-24

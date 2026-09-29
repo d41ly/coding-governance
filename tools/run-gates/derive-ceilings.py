@@ -494,7 +494,10 @@ def cmd_write(root, gd, args) -> int:
         observed = 1
     # The header names THIS install's own path, derived, so an adopter's committed evidence file
     # carries a command that exists in their tree (TOOL-aRepatriatedFork-2 S5).
-    own = os.path.relpath(pathlib.Path(__file__).resolve(), root.resolve()).replace(os.sep, "/")
+    # TOOL-aRepatriatedFork-29 S4: spelled through the `<prefix>/` prose token rather than the tool
+    # root's own name, so the tracked artifact carries no install prefix wherever it is written.
+    _me = pathlib.Path(__file__).resolve()
+    own = f"<prefix>/{_me.parent.name}/{_me.name}"
     lines = [
         "# ceiling-evidence.txt — the recorded maximum per gate leg, TRACKED so a gate can read it.",
         "#",

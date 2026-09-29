@@ -1,7 +1,7 @@
-# kit.toml — this entry, declared as data. Read by tools/govkit/. Contract: the deployer unit's spec under memory/builds/aSealedCaravan/spec/.
+# kit.toml — this entry, declared as data. Read by <prefix>/govkit/. Contract: the deployer unit's spec under memory/builds/aSealedCaravan/spec/.
 
 id = "review-harness"
-home = "tools/workflows"
+home = "workflows"
 scope = "repo"
 # The TEMPLATE, since TOOL-aRepatriatedFork-7: `tier2-review.js` is a render now, and a version constant
 # the [[files]] rules do not land is one an adopter cannot pin against. Both carry the same line.
@@ -19,7 +19,7 @@ role = "engine"
 # the kit and never edits it. That is the 2026-08-23 owner ruling, applied to what SHIPS rather than
 # only to what runs.
 #
-# WITHHELD BY CLAIMING THE DESTINATION, the mechanism `tools/codebase-map/kit.toml` already uses and
+# WITHHELD BY CLAIMING THE DESTINATION, the mechanism `<prefix>/codebase-map/kit.toml` already uses and
 # explains: govkit has no `exclude` key, a `**` rule's pool drops only what another rule owns, and
 # `project-owned` is absent from LANDABLE_ROLES so `apply` never writes it.
 #

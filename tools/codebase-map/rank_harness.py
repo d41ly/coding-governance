@@ -63,10 +63,17 @@ def load_scenarios(path: Path) -> list[dict]:
 
 
 def derive_targets(row: dict) -> set[str]:
-    """Every file that counts as a correct answer for this row."""
-    out = {row["expected_file"]}
+    """Every file that counts as a correct answer for this row.
+
+    A path may name the tool root through the `{prefix}` token (TOOL-aRepatriatedFork-29 S4): gov's
+    own set does, so it grades gov at whatever kit root it was checked out under. The token resolves
+    to this kit dir's parent, spelled from the repo root the way `kit_rel` spells the kit.
+    """
+    pre = Path(m.kit_rel()).parent.as_posix()
+    sub = "" if pre == "." else pre + "/"
+    out = {row["expected_file"].replace("{prefix}/", sub)}
     for alt in row.get("also_acceptable", ()):
-        out.add(alt.split("::", 1)[0])
+        out.add(alt.split("::", 1)[0].replace("{prefix}/", sub))
     return out
 
 

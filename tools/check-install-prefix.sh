@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # check-install-prefix.sh — nothing this repo SHIPS may spell a root-install kit path.
 #
-#   bash tools/check-install-prefix.sh            # assert; exit 1 on an unwaived hit
-#   bash tools/check-install-prefix.sh --list     # print every hit, waived or not (authoring aid)
-#   bash tools/check-install-prefix.sh --write-ratchet   # (re)write the carried-prefix ratchet
+#   bash <prefix>/check-install-prefix.sh            # assert; exit 1 on an unwaived hit
+#   bash <prefix>/check-install-prefix.sh --list     # print every hit, waived or not (authoring aid)
+#   bash <prefix>/check-install-prefix.sh --write-ratchet   # (re)write the carried-prefix ratchet
 #
 # WHY. Kits install at `tools/<kit>/` in a target repo (one segment; the codebase-map gate template
 # resolves no deeper). Every ENGINE already derives its own prefix, so what actually strands an
@@ -97,12 +97,15 @@ case "$MODE" in --check|--list|--write-ratchet|--rebaseline) ;;
 # does not name — so a repo with no registry ships nothing and neither arm has a population. Arm 1
 # used to grade `${SELF_PREFIX}*` regardless, and at a consumer that is the consumer's own tree plus
 # every gov file it received, against waivers keyed on gov's paths: measured at a `scripts/` adopter,
-# nine hits, five of them gov's own waived bytes, and the kit was deselected. The two paths stay
-# literal on purpose: a kit source's registry sits at gov's layout by definition, because the
-# registry's own directory is an exemption that never travels.
-REGISTRY=tools/govkit/registry.toml  # gov:prefix-literal — the kit-source test: a SOURCE's registry sits at gov's layout by definition
+# nine hits, five of them gov's own waived bytes, and the kit was deselected.
+# TOOL-aRepatriatedFork-29 S3: BOTH PATHS ARE DERIVED from `SELF_PREFIX`. They used to stay literal
+# on the argument that a kit source's registry sits at gov's layout by definition — true of the
+# layout BELOW the tool root, and false of the tool root itself, which gov may be checked out under
+# at any name. The registry and the resolver sit beside this gate's own directory in a source, and a
+# consumer receives neither, so the test answers the same question at every prefix.
+REGISTRY="${SELF_PREFIX}govkit/registry.toml"
 KIT_SOURCE=no
-[ -f "$REGISTRY" ] && [ -f tools/lib/resolve-python.sh ] && KIT_SOURCE=yes  # gov:prefix-literal — the kit-source test: a SOURCE's resolver sits at gov's layout by definition
+[ -f "$REGISTRY" ] && [ -f "${SELF_PREFIX}lib/resolve-python.sh" ] && KIT_SOURCE=yes
 if [ "$KIT_SOURCE" != yes ]; then
   # A SKIP ANNOUNCES ITSELF (§7), and exits 0 (§8 F1, owner): a consumer's bar stays green when it
   # has nothing to police, and a printed skip cannot be misread as a graded run.
@@ -118,11 +121,11 @@ fi
 # TOOL-aRepatriatedFork-23 — sourced ONCE, here, for the two python programs below: arm 3 and the
 # ban's counter. It used to sit inside arm 3, which the ban's modes never reach.
 # shellcheck source=/dev/null
-. "${REGISTRY%/*}/../lib/resolve-python.sh"   # the resolver beside the registry the kit-source test found
+. "${SELF_PREFIX}lib/resolve-python.sh"   # the resolver the kit-source test found
 # The python launcher for the carried-prefix arm below, resolved through the repo's ONE resolver and
 # through nothing else. There is deliberately no `PY=python` fallback: the MS-Store `python3` stub
 # answers `command -v` and exits 9009, so a bare launcher name is not an answer — and the idiom ban
-# in `tools/lib/resolve-python.test.sh` reds on one, which is how this line got written correctly the
+# in `<prefix>/lib/resolve-python.test.sh` reds on one, which is how this line got written correctly the
 # second time. A tree without the resolver has no shippable set to grade either; the arm says so and
 # skips, rather than guessing at an interpreter.
 
@@ -159,7 +162,7 @@ derive_received_files() {
   # sits beside the registry the kit-source test already found. A verb that fails prints NOTHING
   # here, not the named addition alone, so the liveness checks below still see a dead probe.
   # shellcheck source=/dev/null
-  . tools/lib/resolve-python.sh  # gov:prefix-literal — reached only inside a kit SOURCE, whose layout is gov's by definition
+  . "${SELF_PREFIX}lib/resolve-python.sh"  # reached only inside a kit SOURCE, where the kit-source test found it
   local _shipped
   _shipped=$("$(resolve_python)" "${REGISTRY%/*}/govkit.py" shipped) || return 0
   [ -n "$_shipped" ] || return 0
@@ -348,7 +351,8 @@ fi
 # runtime literal rides inside a file's recorded count. This arm grades CODE lines only, with ZERO
 # tolerance, because a path an engine RUNS or READS at run time is a defect the day it lands, not a
 # count to drain. Measured before it was wired: the first carried-prefix-style grep missed every
-# `$ROOT/tools/…` argv and every `"tools" / "<kit>"` join, and those were the forks both adopters
+# argv spelled under the repo root's own prefix and every quoted prefix segment joined to a kit,
+# and those were the forks both adopters
 # carried.
 #
 # THE POPULATION is `govkit shipped` rows with role `engine` or `rendered`, minus the suffix
@@ -558,7 +562,7 @@ fi
 # a file-and-line pair in prose; six candidate populations were re-measured against it afterwards and
 # none reproduced the pair, because "shippable" has several defensible spellings and a sentence and a
 # script are free to spell it differently forever. So NO number is written here or in the spec.
-# `tools/install-prefix-carried.txt` carries them, and ONE function below emits both that file and
+# `<prefix>/install-prefix-carried.txt` carries them, and ONE function below emits both that file and
 # the `--list` section, so the artifact and the report cannot disagree.
 #
 # INERT WHERE THIS REPO IS NOT A KIT SOURCE, and it SAYS SO rather than passing silently. This script
@@ -587,7 +591,7 @@ PREDICATE_EPOCH=5
 #   Counted ONLY when the named file actually exists in the tree, and that test is not tidiness —
 #   measured over the real population before wiring, per S5, it separates 50 real literals from 76
 #   FIXTURE names (`gate-a.sh`, `some-gate.sh`, `alpha.sh`) inside test helpers, which would
-#   otherwise red seven innocent files. Its one known false drop is `tools/manifest-check.sh`,
+#   otherwise red seven innocent files. Its one known false drop is `<prefix>/manifest-check.sh`,
 #   which is real but ships from `skills/session-kickoff/`, so gov does not carry it at that path;
 #   recorded here rather than papered over, because a heuristic with an unstated blind spot is how
 #   this arm got its first one.

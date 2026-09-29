@@ -18,7 +18,7 @@ them survives the refactor this build makes likely — a branch moved into a NEW
 set GROW and leaves the branch count unchanged, so both pins pass and neither grades it. What grades
 that is the enumerated anchor SET, which is a membership assertion rather than a count.
 
-REUSE, and the correction it carries. `tools/memory-tree/corpus_ids.py` already walks a parsed Python
+REUSE, and the correction it carries. `<prefix>/memory-tree/corpus_ids.py` already walks a parsed Python
 source for a statement shape, records which lines were REACHED at runtime with a trace hook, and
 joins the two — AST enumeration plus an execution-observed join, both liveness halves, already on the
 bar. This extends that doctrine: the matcher changes from one statement kind to two call shapes, and
@@ -118,7 +118,7 @@ BRANCH_PIN = 255    # DERIVED on the first run over the real engine, not guessed
 # before the guard was written. Armed by four arms on `plan` and `apply`, and its failing case was
 # observed: neutering the guard puts all 29 escaping rows back.
 # NOTE the FILE count also moved, 2 -> 3, and that is the second pin doing its job rather than a
-# surprise: `tools/govkit/fixtures/make_adopter_receipt.py` is tracked Python under the deployer's own
+# surprise: `<prefix>/govkit/fixtures/make_adopter_receipt.py` is tracked Python under the deployer's own
 # directory, so the DISCOVERED population picked it up. It contributes no refusal branches.
 # 212 -> 214 at ROUND 2's fold. Two new refusals, both from confirmed blockers: the
 # token-value guard `demand_safe_token` (a target-supplied `prefix` or answer outside
@@ -187,7 +187,9 @@ FILE_PIN = 4        # 1 -> 4 at DEPL-cMendedVintage-9. MEASURED at the same run:
 
 
 def population(root: pathlib.Path) -> list[pathlib.Path]:
-    out = subprocess.run(["git", "-C", str(root), "ls-files", "tools/govkit/*.py"],
+    # This file's own directory, spelled from `root` (TOOL-aRepatriatedFork-29 S1).
+    own = HERE.relative_to(root.resolve()).as_posix() if root.resolve() in HERE.parents else HERE.name
+    out = subprocess.run(["git", "-C", str(root), "ls-files", f"{own}/*.py"],
                          capture_output=True, text=True)
     return [root / p for p in out.stdout.split("\n")
             if p.strip() and pathlib.PurePosixPath(p).name not in HARNESS]
@@ -223,7 +225,7 @@ def enumerate_branches(root: pathlib.Path) -> list[dict]:
 
 
 def main(argv: list[str]) -> int:
-    root = HERE.parents[1]
+    root = next((p for p in HERE.parents if (p / ".git").exists()), HERE.parents[1])
     branches = enumerate_branches(root)
     files = population(root)
     problems: list[str] = []

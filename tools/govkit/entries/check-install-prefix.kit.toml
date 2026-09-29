@@ -1,9 +1,9 @@
-# kit.toml — this entry, declared as data. Read by tools/govkit/. Contract: the deployer unit's spec under memory/builds/aSealedCaravan/spec/.
+# kit.toml — this entry, declared as data. Read by <prefix>/govkit/. Contract: the deployer unit's spec under memory/builds/aSealedCaravan/spec/.
 
 id = "check-install-prefix"
 scope = "repo"
 kind = "flat"
-home = "tools"
+home = "."
 selectable = "conditional"
 why_conditional = "the runbook prescribes it only for a target that itself ships kits onward; a target that merely consumes them has nothing for it to police. Installed at such a target anyway, it grades nothing and says so: with no govkit registry both arms print a SKIP line and the gate exits 0 (TOOL-aRepatriatedFork-16)"
 version_from = { none = "no version constant exists; measured 2026-08-11." }
@@ -14,20 +14,20 @@ sentinel = "check-install-prefix.sh"
 include = ["check-install-prefix.sh", "check-install-prefix.test.sh"]
 role = "engine"
 to = "{prefix}/{relpath}"
-claims = ["tools/check-install-prefix.sh", "tools/check-install-prefix.test.sh"]
+claims = ["{prefix}/check-install-prefix.sh", "{prefix}/check-install-prefix.test.sh"]
 
 [[files]]
 include = ["install-prefix-waivers.txt"]
 role = "generated"
 to = "{prefix}/install-prefix-waivers.txt"
-claims = ["tools/install-prefix-waivers.txt"]
+claims = ["{prefix}/install-prefix-waivers.txt"]
 note = "MEASURED optional: the gate is green with the file absent and with it empty. gov's own waiver rows are gov-specific and must not travel, so this is seeded empty rather than copied."
 
 [[files]]
 include = ["install-prefix-carried.txt"]
 role = "generated"
 to = "{prefix}/install-prefix-carried.txt"
-claims = ["tools/install-prefix-carried.txt"]
+claims = ["{prefix}/install-prefix-carried.txt"]
 note = "DEPL-dCarriedReceipt-15 S4. The carried-prefix ban list, one row per tracked file under the kit surface that spells a kit path in its body (every such file since predicate epoch 5, TOOL-aRepatriatedFork-23, shipped or not). `generated` and NOT copied for the same reason the waiver registry beside it is not: the rows are measurements of THIS repo's shippable set, and a target's set is its own. An adopter that ships kits onward runs `--write-ratchet` once and commits what it measured; a target that does not is skipped by the arm entirely and never needs the file."
 
 [adopt]

@@ -38,7 +38,9 @@ fail() { echo "TESTSUITE-COUNTS FAILED — $1"; status=1; }
 
 # Every `*.test.sh` the manifest names, deduplicated. Selected from the argv strings rather than by
 # globbing the tree, so the leg's population and the bar's are the same set by construction.
-suites=$(grep -oE '"[^"]*\.test\.sh"' "$MANIFEST" | tr -d '"' | sort -u)
+# A `{prefix}` token (gov's own manifest, TOOL-aRepatriatedFork-29 §8 F1) resolves to this gate's
+# own directory, which is the tool root the manifest sits in.
+suites=$(grep -oE '"[^"]*\.test\.sh"' "$MANIFEST" | tr -d '"' | sed "s#{prefix}/#${_self_pre}#g" | sort -u)
 if [ -z "$suites" ]; then
   fail "the gate manifest names no *.test.sh, so this leg would grade an empty population — the vacuous-selector shape it exists to prevent"
   exit "$status"

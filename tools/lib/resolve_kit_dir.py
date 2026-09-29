@@ -1,7 +1,7 @@
 """resolve_kit_dir — where a SIBLING kit sits in this install (TOOL-aRepatriatedFork-2 S3).
 
-The canonical copy. `tools/lib/` is gov-internal and ships nothing, so every consumer carries the
-block below INLINE, byte-identical, and `tools/lib/resolve-python.test.sh`'s parity table reds a copy
+The canonical copy. `<prefix>/lib/` is gov-internal and ships nothing, so every consumer carries the
+block below INLINE, byte-identical, and `<prefix>/lib/resolve-python.test.sh`'s parity table reds a copy
 that drifts. A Python consumer carries it at module level; a shell consumer carries it inside a
 quoted heredoc and runs it with the python it already resolved.
 

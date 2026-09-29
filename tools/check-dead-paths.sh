@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # check-dead-paths.sh — nothing outside `memory/` may name a file this repo DELETED.
 #
-#   bash tools/check-dead-paths.sh            # assert; exit 1 on an unwaived hit
-#   bash tools/check-dead-paths.sh --list     # print every hit, waived or not (authoring aid)
-#   bash tools/check-dead-paths.sh --needles  # print the derived needle set (authoring aid)
+#   bash <prefix>/check-dead-paths.sh            # assert; exit 1 on an unwaived hit
+#   bash <prefix>/check-dead-paths.sh --list     # print every hit, waived or not (authoring aid)
+#   bash <prefix>/check-dead-paths.sh --needles  # print the derived needle set (authoring aid)
 #
-# WHY. `tools/check-install-prefix.sh` already owns half of the dead-path class: a path spelled at
+# WHY. `<prefix>/check-install-prefix.sh` already owns half of the dead-path class: a path spelled at
 # the wrong PREFIX. The other half is a path that is dead because the file was DELETED, and until
 # this gate landed nothing held it. Measured on the v3.0 charter convergence, which deleted two
 # companion files: carriers still naming them survived in the repo's front door, the charter every
@@ -55,10 +55,19 @@
 # exposure; the owner ruled ONE file, and a registry moves when its own keying has actually failed,
 # not by association. Do not "restore" the parity.
 set -u
+# Captured BEFORE the `cd`, because `$0` may be relative (TOOL-aRepatriatedFork-29 S3).
+_self_dir=$(cd "$(dirname "$0")" 2>/dev/null && pwd) || _self_dir=""
 ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || { echo "dead-paths: not a git repo"; exit 2; }
 cd "$ROOT" || exit 2
 
-WAIVERS="tools/dead-path-waivers.txt"
+# THIS GATE'S OWN DIRECTORY, DERIVED, and an underivable one REFUSES. Its waiver registry and its own
+# two files sit here, and every waiver row names its file through the `{prefix}` token the loop below
+# resolves against this answer, so gov runs at whatever kit root it was checked out under.
+if ! SELF_PRE=$(git -C "$_self_dir" rev-parse --show-prefix 2>/dev/null); then
+  echo "dead-paths: cannot derive this gate's own directory from '$_self_dir' — REFUSING"
+  exit 2
+fi
+WAIVERS="${SELF_PRE}dead-path-waivers.txt"
 TABC=$(printf '\t')
 # FROZEN SENTINEL. The needle derivation walks history and could go silently empty — a bad
 # `--diff-filter`, a shallow clone, a `git log` that stops answering — and an empty needle set makes
@@ -132,8 +141,8 @@ fi
 RE=$(printf '%s\n' "$needles" | sed 's/[.[\*^$]/\\&/g' | tr '\n' '|'); RE=${RE%|}
 hits=$(git grep -nE "$RE" -- ':(exclude)memory/*' \
                             ":(exclude)$WAIVERS" \
-                            ':(exclude)tools/check-dead-paths.sh' \
-                            ':(exclude)tools/check-dead-paths.test.sh' 2>/dev/null \
+                            ":(exclude)${SELF_PRE}check-dead-paths.sh" \
+                            ":(exclude)${SELF_PRE}check-dead-paths.test.sh" 2>/dev/null \
        | awk -F: '{print $1":"$2}' | sort -u)
 
 # --- resolve the registry -------------------------------------------------------------------------
@@ -157,6 +166,7 @@ if [ -f "$WAIVERS" ]; then
   while IFS= read -r _row || [ -n "$_row" ]; do
     case "$_row" in *"$TABC"*) ;; *) continue ;; esac
     _wpath=${_row%%"$TABC"*}; _rest=${_row#*"$TABC"}
+    case "$_wpath" in "{prefix}/"*) _wpath="${SELF_PRE}${_wpath#"{prefix}/"}" ;; esac
     _word=${_rest%%"$TABC"*}; _rest=${_rest#*"$TABC"}
     _wtext=${_rest%"$TABC"*}
     case "$_word" in ''|*[!0-9]*) malformed="$malformed$_wpath:<ordinal [$_word] is not a positive integer>

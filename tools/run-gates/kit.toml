@@ -1,15 +1,15 @@
-# kit.toml — this entry, declared as data. Read by tools/govkit/. Contract: the aPacedTurnstile build's spec set under `memory/builds/aPacedTurnstile/spec/`
+# kit.toml — this entry, declared as data. Read by <prefix>/govkit/. Contract: the aPacedTurnstile build's spec set under `memory/builds/aPacedTurnstile/spec/`
 # under memory/builds/aPacedTurnstile/spec/.
 #
 # WHY THIS KIT EXISTS AT ALL. The runner was a registry EXEMPTION with two stated reasons, both
-# exact: it sourced tools/lib/, which is gov-internal and never travels, and with that path absent
+# exact: it sourced <prefix>/lib/, which is gov-internal and never travels, and with that path absent
 # it exited 2 having run ZERO legs. So `govkit apply` wired legs into a runner the target was
 # assumed to already own, and a target that owned none received a merge bar that could not start.
 # S2 cut the dependency by inlining the resolver into every shipped file that had one; this
 # descriptor is what makes the result deployable.
 
 id = "run-gates"
-home = "tools/run-gates"
+home = "run-gates"
 scope = "repo"
 version_from = { file = "run-gates.sh", pattern = "^KIT_RUN_GATES_VERSION=" }
 requires = []
@@ -24,7 +24,7 @@ role = "engine"
 # the kit and never edits it. That is the 2026-08-23 owner ruling, applied to what SHIPS rather than
 # only to what runs.
 #
-# WITHHELD BY CLAIMING THE DESTINATION, the mechanism `tools/codebase-map/kit.toml` already uses and
+# WITHHELD BY CLAIMING THE DESTINATION, the mechanism `<prefix>/codebase-map/kit.toml` already uses and
 # explains: govkit has no `exclude` key, a `**` rule's pool drops only what another rule owns, and
 # `project-owned` is absent from LANDABLE_ROLES so `apply` never writes it.
 #
@@ -46,11 +46,11 @@ role = "project-owned"
 # memory/gotchas/pin-copied-from-another-corpus.md, the class this kit's own spec refuses by name
 # when it declines to seed an adopter with gov's leg names.
 #
-# Withheld by CLAIMING the destination, exactly as tools/memory-recall/kit.toml withholds
+# Withheld by CLAIMING the destination, exactly as <prefix>/memory-recall/kit.toml withholds
 # check-recall.py, recall-fixture.json and test_recall_floor.py: govkit has no `exclude` key, a `**`
 # rule's pool drops only what another rule owns, and `project-owned` is absent from the landable
 # roles so `apply` never writes it. It is a leg on GOV's bar and carries an [[exempt_leg]] row in
-# tools/govkit/registry.toml — deliberately NOT a [[gate_leg]] below, because a descriptor row
+# <prefix>/govkit/registry.toml — deliberately NOT a [[gate_leg]] below, because a descriptor row
 # naming a leg the target's manifest cannot carry is what reds the deployer's selfcheck.
 [[files]]
 include = ["run-gates.gov.test.sh"]
