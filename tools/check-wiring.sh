@@ -26,7 +26,7 @@
 # sets core.hooksPath ONLY when unset and NEVER overwrites an already-set value (e.g. a deliberate
 # out-of-tree copy per WIRE-INTO-PROJECT.md §5). Agent-cap wiring is never auto-applied — it would mean
 # rewriting settings.json, the file the SessionStart hook lives in.
-KIT_CHECK_WIRING_VERSION=1.12   # gov:kit check-wiring@1.12 — the deployer's read
+KIT_CHECK_WIRING_VERSION=1.13   # gov:kit check-wiring@1.13 — the deployer's read
 set -u
 # ---- S6: this file's own install prefix, DERIVED ------------------------------------------------
 # TOOL-dRetiredFork-8. Six `tools/<kit>/` literals were spelled here, and `govkit apply` ships these
@@ -558,10 +558,13 @@ check_agentcap() {
 # Advisory like every other arm: no mode rewrites settings.json.
 check_scratch_guard() {
   local frag smerge marker hookjs smatcher found
-  frag=$(first_of "$(resolve_receipt_path hooks scratch-guard.fragment.json)" "${KIT_REL:+$KIT_REL/}hooks/scratch-guard.fragment.json" hooks/scratch-guard.fragment.json)
+  # TWO RUNGS, the receipt and this checker's own prefix. A third, bare root spelling used to follow
+  # them, a guess at a layout the derivation had already missed. A miss is now the skip below, which
+  # names both rungs (TOOL-aRepatriatedFork-24 S8), and the same holds for the recall and merge arms.
+  frag=$(first_of "$(resolve_receipt_path hooks scratch-guard.fragment.json)" "${KIT_REL:+$KIT_REL/}hooks/scratch-guard.fragment.json")
   if [ -z "$frag" ]; then
     local miss; miss=$(derive_receipt_miss hooks scratch-guard.fragment.json)
-    echo "skip     scratch   — ${miss:-hooks kit does not ship scratch-guard.fragment.json here}"
+    echo "skip     scratch   — ${miss:-hooks kit does not ship scratch-guard.fragment.json here (no install-receipt row, and none at ${KIT_REL:+$KIT_REL/}hooks/)}"
     return
   fi
   smerge=$SMERGE
@@ -619,10 +622,10 @@ check_recall_opened() {
   local frag smerge marker hookjs rmatcher
   # Resolved by path because the kit is COPIED: <root>/memory-recall/ in an adopter,
   # <root>/$KIT_REL/memory-recall/ in this repo.
-  frag=$(first_of "$(resolve_receipt_path memory-recall recall-opened.fragment.json)" "${KIT_REL:+$KIT_REL/}memory-recall/recall-opened.fragment.json" memory-recall/recall-opened.fragment.json)
+  frag=$(first_of "$(resolve_receipt_path memory-recall recall-opened.fragment.json)" "${KIT_REL:+$KIT_REL/}memory-recall/recall-opened.fragment.json")
   if [ -z "$frag" ]; then
     local miss; miss=$(derive_receipt_miss memory-recall recall-opened.fragment.json)
-    echo "skip     recall    — ${miss:-memory-recall kit not adopted (no recall-opened.fragment.json)}"
+    echo "skip     recall    — ${miss:-memory-recall kit not adopted (no recall-opened.fragment.json: no install-receipt row, and none at ${KIT_REL:+$KIT_REL/}memory-recall/)}"
     return
   fi
   smerge=$SMERGE
@@ -862,17 +865,17 @@ check_merge_rows() {
   # Resolved by path because the kit is COPIED: <root>/memory-tree/ in an adopter,
   # <root>/$KIT_REL/memory-tree/ here. The remedy string is BUILT from the two resolved paths rather
   # than hand-kept, so it cannot drift from the layout it is describing.
-  drv=$(first_of "$(resolve_receipt_path memory-tree merge-rows.py)" "${KIT_REL:+$KIT_REL/}memory-tree/merge-rows.py" memory-tree/merge-rows.py)
+  drv=$(first_of "$(resolve_receipt_path memory-tree merge-rows.py)" "${KIT_REL:+$KIT_REL/}memory-tree/merge-rows.py")
   if [ -z "$drv" ]; then
     local miss; miss=$(derive_receipt_miss memory-tree merge-rows.py)
-    echo "skip     merge     — ${miss:-memory-tree merge driver not adopted (no merge-rows.py)}"
+    echo "skip     merge     — ${miss:-memory-tree merge driver not adopted (no merge-rows.py: no install-receipt row, and none at ${KIT_REL:+$KIT_REL/}memory-tree/)}"
     return
   fi
   # The KIT-INTERNAL launcher first. It travels with the kit, so it is the only one an adopter is
   # guaranteed to have; `tools/lib/pyrun.sh` is gov-internal and ships nothing, and a wiring that
   # names it in an adopting repo execs a command that cannot start. A driver that never starts never
   # writes %A, so git reports CONFLICT and leaves the path holding OURS-ONLY content with no markers.
-  launcher=$(first_of "$(dirname "$drv")/merge-rows.sh" "${KIT_REL:+$KIT_REL/}lib/pyrun.sh" lib/pyrun.sh)
+  launcher=$(first_of "$(dirname "$drv")/merge-rows.sh" "${KIT_REL:+$KIT_REL/}lib/pyrun.sh")
   if [ -z "$launcher" ]; then
     echo "UNWIRED  merge     — $drv is present but no launcher is: expected $(dirname "$drv")/merge-rows.sh beside it. git would exec a command that cannot start, and a driver that never starts leaves OURS-only content with no conflict markers. Fix: re-copy the memory-tree kit"
     unwired=$((unwired+1))

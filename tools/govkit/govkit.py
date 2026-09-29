@@ -5488,7 +5488,7 @@ def gov_tree_mode(root: pathlib.Path, commit: str, path: str) -> str | None:
 
 
 def foreign_kit_present(target: pathlib.Path, descs: dict[str, tuple[dict, str]],
-                        receipt: dict | None) -> list[str]:
+                        receipt: dict | None, deploy: dict) -> list[str]:
     """Registry entries resolvable in the target that THIS target's receipt does not claim.
 
     The unqualified form of this predicate refuses every re-run the unit designs for: after the
@@ -5501,16 +5501,22 @@ def foreign_kit_present(target: pathlib.Path, descs: dict[str, tuple[dict, str]]
     for eid, (d, _p) in descs.items():
         if eid in claimed:
             continue
-        # Probe the entry's DECLARED destinations, at both the canonical and the root prefix. An
-        # earlier form guessed a kit-relative path from the entry id, which missed every FLAT entry
-        # — the ones with no kit directory at all — so a target already carrying one of those was
-        # not detected as kitted. Caught by this file's own arm.
+        # Probe the entry's DECLARED destinations, at the prefix THIS INTAKE declared and at the
+        # root. An earlier form guessed a kit-relative path from the entry id, which missed every
+        # FLAT entry — the ones with no kit directory at all — so a target already carrying one of
+        # those was not detected as kitted. Caught by this file's own arm.
+        #
+        # THE PREFIX IS THE TARGET'S, per entry (TOOL-aRepatriatedFork-24 S7). This probed gov's
+        # prefix and the root, so a foreign install at `scripts/`, where the intake itself puts
+        # kits, was not detected. `target_context` is the ctx `apply` resolves the entry's
+        # destinations with, so the probe asks where THIS install would write, per-entry overrides
+        # included. The root stays as the second ctx, which the old pair also covered.
         probes: list[str] = []
         vf = d.get("version_from") or {}
         vf_name = pathlib.PurePosixPath(vf["file"]).name if vf.get("file") else None
-        for prefix in ("tools", ""):
-            ctx = {"prefix": prefix, "kit_id": eid,
-                   "kit": f"{prefix}/{eid}" if prefix else eid, "memory_root": "memory"}
+        own = target_context(target, deploy, eid, d)
+        for ctx in (own, {**own, "prefix": "", "kit": eid}):
+            prefix = ctx["prefix"]
             for rule in d.get("files", []):
                 # A `merged` destination is a file the TARGET owns and gov writes a region of, so its
                 # existing is the normal case and not evidence of a foreign kit. Probing it made the
@@ -5525,9 +5531,12 @@ def foreign_kit_present(target: pathlib.Path, descs: dict[str, tuple[dict, str]]
                     if vf_name is None or pathlib.PurePosixPath(resolved).name == vf_name:
                         probes.append(resolved)
             if vf_name:
-                probes.append(f"{prefix}/{eid}/{vf_name}" if prefix else f"{eid}/{vf_name}")
-        if d.get("sentinel"):
-            probes.append(d["sentinel"])
+                probes.append(f"{ctx['kit']}/{vf_name}")
+            # A `sentinel` is relative to the entry's HOME in the target: the kit dir, or the
+            # prefix for a flat entry, which has none. It used to be a path spelled at gov's prefix.
+            if d.get("sentinel"):
+                home = prefix if d.get("kind") == "flat" else ctx["kit"]
+                probes.append(f"{home}/{d['sentinel']}" if home else d["sentinel"])
         for pr in dict.fromkeys(probes):
             if pr and (target / pr).exists():
                 found.append(f"{eid} (at {pr})")
@@ -6049,7 +6058,7 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
 
     # ---- AC8: refuse a FOREIGN kit before writing anything. A kit this target's own receipt claims
     # ---- is the authorized re-run and proceeds.
-    foreign = foreign_kit_present(target, descs, receipt)
+    foreign = foreign_kit_present(target, descs, receipt, deploy)
     if foreign and not resume:
         raise Refusal(
             "the target already carries " + ", ".join(sorted(foreign)) + " and this target's "

@@ -6,7 +6,7 @@ kind = "flat"
 home = "tools"
 version_from = { none = "no version constant exists; measured 2026-08-11. Prescribed for copy by the runbook and detectable only by its sentinel path." }
 requires = []
-sentinel = "tools/push-main.sh"
+sentinel = "push-main.sh"
 
 [[files]]
 include = ["push-main.sh", "push-main.test.sh"]

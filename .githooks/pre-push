@@ -355,23 +355,12 @@ write_refusal() { # token · one-line message -> the refusal file, and the run-l
 # whether the authoritative bar is owed at all. TOOL-aBoundedCeiling-7; adopter nc carries the fix by
 # hand as its carve-out 14/20.
 #
-# PROBED ON THE LEG MANIFEST, not on the run-gates directory. The manifest is what predicates 6 and 7
-# actually read, and the two are not interchangeable: this repo's own pre-push fixtures write a
-# `gate-legs.json` and never create a `run-gates/` directory at all, so a probe keyed on the
-# directory falls through and takes twenty arms with it. Measured, on the first cut of this change.
-#
-# `tools` FIRST, because it is this kit's default and gov's tree must resolve unchanged; the fallback
-# is only consulted when this tree shows no sign of `tools` at all. Adopter nc probes `scripts` first
-# for the mirror-image reason — the order is a default, never a rule.
-GOV_KITROOT=tools
-if [ ! -f "$top/tools/gate-legs.json" ] && [ ! -d "$top/tools/run-gates" ]; then  # gov:prefix-literal — probes gov's own layout first and falls back to the derived prefix below
-  if [ -f "$top/scripts/gate-legs.json" ] || [ -d "$top/scripts/run-gates" ]; then
-    GOV_KITROOT=scripts
-  fi
-fi
-# The kit's own runner, spelled ONCE: it is the default bar, the one undeclared value the bar check
-# accepts, and the path the default bar's verdict records.
-GATE_RUNNER=$GOV_KITROOT/run-gates/run-gates.sh
+# The fix above was a probe of `tools`, then `scripts`, so the root could only ever be one of those
+# two. At a root install or under `vendor/gov/`, the default bar named a runner that does not exist
+# (TOOL-aRepatriatedFork-24 S2). The root is now RESOLVED, below the `gate-env.sh` source, because
+# that file is one of the rungs. The environment's copy is dropped HERE, before that file runs, so
+# only the vetted file can declare it.
+unset GOV_KITROOT
 
 # $def decides which pushed ref gets gated, so whoever supplies $def decides whether the gate runs AT
 # ALL. GOV_DEFAULT_BRANCH used to outrank the observed default and was never checked for meaning, which
@@ -475,6 +464,55 @@ if [ -f "$_gate_env" ]; then
   . "$_gate_env"
 fi
 
+# ---- THE KIT ROOT, RESOLVED — TOOL-aRepatriatedFork-24 S2 ----------------------------------------
+# The same ladder `.githooks/pre-commit` walks, and `check-wiring.sh` before both:
+#   1. the install receipt, `.governance/install.json`, whose row for the runner records where it
+#      landed; the root is that row's grandparent. It is the only record of a prefix nobody could guess.
+#   2. `resolve_kit_dir`'s probe, from the repo root: the leg manifest or the runner directory at the
+#      root is a root install. It is probed on the MANIFEST as well as the directory, because that is
+#      what predicates 6 and 7 read and this hook's own fixtures write one with no runner beside it.
+#   3. `GOV_KITROOT` as the vetted `gate-env.sh` above declared it, and never as the environment
+#      set it: that copy was unset before the file ran.
+# A MISS leaves KITROOT_FROM empty. Where a miss strands a push, the refusals further down say so: the
+# default bar has no runner to name, and a tracked manifest this ladder did not reach is still a
+# refusal. A declared bar does not need the root to find itself.
+_kr_declared=${GOV_KITROOT-}; _kr_bad=""
+GOV_KITROOT=""; KITROOT_FROM=""
+read_receipt_path() { # <kit dir, or ""> <file> -> the repo-relative path the install receipt records ("" if none)
+  [ -f "$top/.governance/install.json" ] || return 0
+  awk -v want="${1:+$1/}$2" '
+    function val(l) { sub(/^[^:]*:[[:space:]]*"/, "", l); sub(/".*$/, "", l); return l }
+    /^[[:space:]]*\{[[:space:]]*$/          { p = ""; s = ""; next }
+    /^[[:space:]]*"path"[[:space:]]*:/      { p = val($0); next }
+    /^[[:space:]]*"source"[[:space:]]*:/    { s = val($0); next }
+    /^[[:space:]]*\}[[:space:]]*,?[[:space:]]*$/ {
+      if (p != "" && (s == want || (length(s) > length(want) && substr(s, length(s) - length(want)) == "/" want)) \
+          && p !~ /^\// && p !~ /^[A-Za-z]:/ && p !~ /(^|\/)\.\.(\/|$)/) { print p; exit }
+      p = ""; s = ""
+    }' "$top/.governance/install.json" 2>/dev/null
+}
+_kr_row=$(read_receipt_path run-gates run-gates.sh)
+if [ -n "$_kr_row" ] && [ -f "$top/$_kr_row" ]; then
+  GOV_KITROOT=$(dirname -- "$(dirname -- "$_kr_row")"); [ "$GOV_KITROOT" = . ] && GOV_KITROOT=""
+  KITROOT_FROM="the install receipt's row for the runner"
+elif [ -f "$top/gate-legs.json" ] || [ -d "$top/run-gates" ]; then
+  KITROOT_FROM="a root install"
+elif [ -n "$_kr_declared" ]; then
+  case "${_kr_declared%/}" in
+    ''|/*|*..*|*[!A-Za-z0-9._/-]*) _kr_bad=$_kr_declared ;;
+    *) GOV_KITROOT=${_kr_declared%/}; KITROOT_FROM="GOV_KITROOT in .githooks/gate-env.sh" ;;
+  esac
+fi
+print_kitroot_miss() { # -> one line naming every rung that missed
+  printf 'no install-receipt row for the runner, no leg manifest or runner directory at the root, and %s' \
+    "${_kr_bad:+a GOV_KITROOT in .githooks/gate-env.sh that is not a relative path: '$_kr_bad'}${_kr_bad:-no GOV_KITROOT declared in .githooks/gate-env.sh}"
+}
+KP=${GOV_KITROOT:+$GOV_KITROOT/}   # the root as a path head: empty at a root install, never a bare '/'
+# The kit's own runner, spelled ONCE: it is the default bar, the one undeclared value the bar check
+# accepts, and the path the default bar's verdict records. EMPTY on a miss, so nothing downstream can
+# name a runner the ladder never found.
+GATE_RUNNER=""; [ -n "$KITROOT_FROM" ] && GATE_RUNNER=${KP}run-gates/run-gates.sh
+
 # ---- WHICH BAR RUNS, and has this repository ever seen it? — TOOL-aRepatriatedFork-5 ----------
 # The bar used to be resolved on the line that ran it, out of an environment variable nothing checked.
 # Reproduced 2026-09-23 in a scratch repo with the default bar stubbed RED: with no override the push
@@ -545,8 +583,8 @@ check_bar_command() { # knob name · command · sha its scripts must be tracked 
   _bar_decl=$cmd
   # THE ADVICE a refusal prints is a value this check ADMITS (closing review round 2 L2): the
   # declared GATE_CMD when there is one, else the kit's own runner. The self-test pushes it back.
-  _bar_ok="bash $GATE_RUNNER"
-  if [ "${4-}" = declared ] && [ "$cmd" != "bash $GATE_RUNNER" ]; then
+  _bar_ok="bash ${GATE_RUNNER:-<the kit runner, once the kit root resolves>}"
+  if [ "${4-}" = declared ] && { [ -z "$GATE_RUNNER" ] || [ "$cmd" != "bash $GATE_RUNNER" ]; }; then
     _bar_decl=$(unset GATE_CMD; eval "$(git show "$at:.unattended.conf" 2>/dev/null)" >/dev/null 2>&1 </dev/null; printf '%s' "${GATE_CMD-}")
     [ -n "$_bar_decl" ] && _bar_ok=$_bar_decl
   fi
@@ -670,9 +708,9 @@ fi
 # push refused, feature branches included, on a hook whose own header says "Other pushes do
 # nothing". Reproduced by the closing review on a scratch remote: a `vendor/gov/` install
 # refused `git push origin feature` with a message about forcing predicates and a green earned
-# on a different leg set, neither of which applies to a push this hook never gates. There is no
-# escape hatch either — `GOV_KITROOT` is assigned, not defaulted from the environment — so such
-# an adopter had to hand-edit the hook or pass --no-verify on every branch push.
+# on a different leg set, neither of which applies to a push this hook never gates. There was no
+# escape hatch either, so such an adopter had to hand-edit the hook or pass --no-verify on every
+# branch push. The environment still cannot set `GOV_KITROOT`; the vetted `gate-env.sh` can.
 #
 # On a DEFAULT-BRANCH push the refusal is still exactly right, and that is where it now lives:
 # their bar genuinely cannot run, and saying so at the one boundary that reads the manifest is
@@ -682,12 +720,17 @@ fi
 # made the original failure silent: `git diff -- <unresolvable>` reports "no change here" and the
 # push sails through. A repo with no manifest anywhere is a different and legitimate case (a fresh
 # adopter, a project not using run-gates, this hook's own fixtures), and it is left alone.
-if [ ! -f "$top/$GOV_KITROOT/gate-legs.json" ]; then
+# A LADDER MISS is the same case from the other side: nothing resolved, so nothing can be read.
+if [ -z "$KITROOT_FROM" ] || [ ! -f "$top/${KP}gate-legs.json" ]; then
   _elsewhere=$(git ls-files --cached -- '*gate-legs.json' 2>/dev/null | head -1)
   if [ -n "$_elsewhere" ]; then
     why="pre-push: REFUSING — this tree tracks a leg manifest at '$_elsewhere', but this hook"
     echo "$why" >&2
-    echo "  resolved its kit root to '$GOV_KITROOT' and looked for '$GOV_KITROOT/gate-legs.json'." >&2
+    if [ -n "$KITROOT_FROM" ]; then
+      echo "  resolved its kit root to '${GOV_KITROOT:-the repo root}' from $KITROOT_FROM and looked for '${KP}gate-legs.json'." >&2
+    else
+      echo "  resolved its kit root nowhere: $(print_kitroot_miss)." >&2
+    fi
     echo "  Left alone, the two forcing predicates that read that path would match NOTHING and the" >&2
     echo "  push would be scoped against a green earned on a different leg set." >&2
     echo "  Deliberate override, as always: git push --no-verify" >&2
@@ -701,7 +744,7 @@ fi
 # push lacks it and is refused (--no-verify bypasses). The kit hook has no code/docs split, so EVERY
 # unmarked default-branch push is refused.
 if [ ! -f "$(git rev-parse --git-dir)/push-main-active" ]; then
-  why="pre-push: refusing a raw push to $def — land via $GOV_KITROOT/push-main.sh (it reconciles before the gate), or --no-verify to bypass."
+  why="pre-push: refusing a raw push to $def — land via ${KP}push-main.sh (it reconciles before the gate), or --no-verify to bypass."
   echo "$why" >&2
   write_refusal raw-push "$why"; RUNLOG_CLEAN=1; exit 1
 fi
@@ -752,7 +795,7 @@ _tree_dirty=$(git status --porcelain --ignore-submodules=untracked 2>/dev/null) 
 GATE_FULL_MAX_LAG=10
 
 gd=$(git rev-parse --git-dir 2>/dev/null)
-kitfp="$top/$GOV_KITROOT/run-gates/gate-fingerprint.sh"
+kitfp="$top/${KP}run-gates/gate-fingerprint.sh"
 rec="$gd/gate-full-green"
 force=""
 rec_sha=""; rec_fp=""; rec_blob=""; rec_st=""
@@ -807,7 +850,7 @@ fi
 # 6. the diff touches the LEG MANIFEST, so the scoping decision itself has changed. A guard added,
 #    widened or removed in this very push cannot be trusted to scope this very push.
 if [ -z "$force" ]; then
-  git diff --quiet "$rec_sha" "$main_local" -- "$GOV_KITROOT/gate-legs.json" 2>/dev/null \
+  git diff --quiet "$rec_sha" "$main_local" -- "${KP}gate-legs.json" 2>/dev/null \
     || force="the pushed diff touches the leg manifest, so the scoping rules themselves moved"
 fi
 
@@ -815,7 +858,7 @@ fi
 #    the record's side, and it catches an uncommitted or differently-resolved manifest that a diff
 #    between two commits cannot see.
 if [ -z "$force" ] && [ -n "$rec_blob" ]; then
-  now_blob=$(git hash-object -- "$GOV_KITROOT/gate-legs.json" 2>/dev/null)
+  now_blob=$(git hash-object -- "${KP}gate-legs.json" 2>/dev/null)
   [ -n "$now_blob" ] && [ "$now_blob" != "$rec_blob" ] \
     && force="the leg manifest differs from the one the recorded green was earned on"
 fi
@@ -842,10 +885,25 @@ if [ -n "${GOV_GATE_CMD:-}" ]; then
   [ "$bar_class" = stub ] && bar_label="STUB $gate"
 else
   bar_path=$GATE_RUNNER
-  bar_blob=$(git rev-parse -q --verify "$main_local:$bar_path" 2>/dev/null || true)
+  [ -n "$bar_path" ] && bar_blob=$(git rev-parse -q --verify "$main_local:$bar_path" 2>/dev/null || true)
 fi
 RUNLOG_BAR=${RUNLOG_BAR:-default}   # set only once the value is vetted, so a refusal records no bar
 RUNLOG_BAR_PATH=$bar_path; RUNLOG_BAR_BLOB=$bar_blob
+
+# THE DEFAULT BAR WITH NO KIT ROOT — TOOL-aRepatriatedFork-24 S2, the owner's F1 (c). A commit hook
+# skips on a miss, because its legs are an early signal. This is the merge bar, so a push that cannot
+# find it and passes is the silent skip the unit exists to remove. It used to name the runner under
+# a guessed prefix and fail on "no such file", which reads as a red bar rather than as a hook that
+# never found one. Recorded as the default bar first, so the run log says
+# which bar was refused.
+if [ -z "${GOV_GATE_CMD:-}" ] && [ -z "$KITROOT_FROM" ]; then
+  why="pre-push: REFUSING — the default bar is this tree's kit runner, and the kit root resolved nowhere"
+  echo "$why" >&2
+  echo "  ($(print_kitroot_miss))." >&2
+  echo "  Declare GOV_KITROOT=<the directory holding the run-gates kit> in .githooks/gate-env.sh and" >&2
+  echo "  commit it, or name a bar with GOV_GATE_CMD. Deliberate override, as always: git push --no-verify" >&2
+  write_refusal bar-refused "$why"; RUNLOG_CLEAN=1; exit 1
+fi
 
 # S3's refusal, measured above the forcing predicates and refused here, once the bar is vetted.
 if [ -n "$_tree_dirty" ]; then

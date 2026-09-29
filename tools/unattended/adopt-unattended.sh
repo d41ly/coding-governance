@@ -233,6 +233,46 @@ else
   fi
 fi
 
+# THE STAMP — TOOL-aRepatriatedFork-24 S3. The shipped example spells `{{TOOL_ROOT}}` in LANDER,
+# GATE_CMD and WIRING_CHECK, and `{{MEMORY_TREE_DIR}}` for the generator in GENERATED_INDEXES. It
+# used to spell the authoring repo's own paths, which resolved to nothing at any other prefix, and
+# the driver EXECUTES three of the four values while the fourth keys a refusal. This adopter knows
+# both values, derived above, so it writes them into the conf the operator copied, as the
+# codebase-map adopter stamps MAP_DIFF_CMD. Only a line of one of those four keys that still carries
+# a token is rewritten, so a conf the project already owns is never touched. NO `sed`, for the reason
+# that adopter gives: a replacement grammar turns a path into a different path. Nothing is claimed
+# until it is read back. `--check` NEVER writes: it refuses a conf that still carries a token, which
+# is a driver that would run a brace.
+STAMP_RE='^(LANDER|GATE_CMD|WIRING_CHECK|GENERATED_INDEXES)=.*[{][{](TOOL_ROOT|MEMORY_TREE_DIR)[}][}]'
+if _stamp=$(grep -nE "$STAMP_RE" "$CONF") && [ -n "$_stamp" ]; then
+  if [ "$MODE" = "--check" ]; then
+    echo "unattended: .unattended.conf still carries a path token this adopter stamps — run $0 to write this install's paths:"
+    printf '%s\n' "$_stamp" | tr -d '\r' | sed 's/^/    /'
+    exit 1
+  fi
+  case "$TOOL_ROOT$MEMORY_TREE_DIR" in
+    *[!A-Za-z0-9._/+@-]*)
+      echo "unattended: cannot stamp .unattended.conf — the tool root '$TOOL_ROOT' or MEMORY_TREE_DIR '$MEMORY_TREE_DIR'"
+      echo "  holds a character outside [A-Za-z0-9._/+@-], and the stamped values are shell commands."
+      exit 2 ;;
+  esac
+  while IFS= read -r _line || [ -n "$_line" ]; do
+    case "$_line" in
+      LANDER=*|GATE_CMD=*|WIRING_CHECK=*|GENERATED_INDEXES=*)
+        _line=${_line//\{\{TOOL_ROOT\}\}/"$TOOL_ROOT"}
+        _line=${_line//\{\{MEMORY_TREE_DIR\}\}/"$MEMORY_TREE_DIR"} ;;
+    esac
+    printf '%s\n' "$_line"
+  done < "$CONF" > "$CONF.new" && mv "$CONF.new" "$CONF" \
+    || { rm -f "$CONF.new"; echo "unattended: could not write the stamp into $CONF"; exit 1; }
+  if grep -qE "$STAMP_RE" "$CONF"; then
+    echo "unattended: the stamp did not land — .unattended.conf still carries a path token after the rewrite"; exit 1
+  fi
+  # The render below reads LANDER from memory, sourced before the stamp: the same substitution.
+  LANDER=${LANDER//\{\{TOOL_ROOT\}\}/"$TOOL_ROOT"}
+  echo "unattended: stamped this install's paths into .unattended.conf (tool root '${TOOL_ROOT:-the repo root}', memory-tree '$MEMORY_TREE_DIR')"
+fi
+
 SKILL_DIR="$ROOT/.claude/skills/unattended"
 SKILL_OUT="$SKILL_DIR/SKILL.md"
 PROTO_SHIP="$KIT_DIR/PROTOCOL.template.md"

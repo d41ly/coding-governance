@@ -1616,10 +1616,13 @@ def test_js_probe_against_the_lexicon():
     TOLD the arm did not run, rather than shown a green it did not earn — a silent skip here would be
     this repo's own `fixture-passes-by-finding-nothing` class inside the kit that gates it.
     """
-    kit = m.repo_root() / "tools" / "lexicon"
+    # A SIBLING of this kit, found from where the kit sits and never from gov's prefix
+    # (TOOL-aRepatriatedFork-24 S6): at an adopter whose kits live under `scripts/`, the spelled path
+    # skipped this arm with a false "not installed" over a lexicon that was right beside it.
+    kit = m.kit_dir().with_name("lexicon")
     if not (kit / "lexicon.py").is_file():
-        raise Skipped("tools/lexicon/ is not installed here, so the independent definition set "
-                      "this arm compares against does not exist")
+        raise Skipped(f"no lexicon kit beside this one at {kit.as_posix()}, so the independent "
+                      f"definition set this arm compares against does not exist")
     sys.path.insert(0, str(kit))
     try:
         import lexicon as lx

@@ -317,7 +317,11 @@ done
 if [ -f "$SMERGE" ] && [ -n "$FRAG" ]; then
   newrepo
   git config core.hooksPath .githooks        # isolate: hooks wired, so only the recall arm can be unwired
-  mkdir -p ${KIT_REL:-.} memory-recall .claude/hooks; cp "$SMERGE" ${KP}settings-merge.py
+  # THE CHECKER'S OWN PREFIX, not the root: the arm probes the receipt and ${KP}memory-recall/, and the
+  # bare root rung that used to follow them is gone (TOOL-aRepatriatedFork-24 S8), so a fixture laid
+  # at the root under a checker at another prefix is the mixed layout that now SKIPS by name.
+  rk=${KP}memory-recall
+  mkdir -p ${KIT_REL:-.} "$rk" .claude/hooks; cp "$SMERGE" ${KP}settings-merge.py
 
   # state 1 — kit not adopted (no fragment anywhere) -> skip, exit 0
   out=$(chk --check); rc=$?
@@ -325,7 +329,7 @@ if [ -f "$SMERGE" ] && [ -n "$FRAG" ]; then
     && ck "AC8 recall kit absent -> skip, exit 0" 1 || ck "AC8 recall kit absent -> skip, exit 0" 0
 
   # state 2 — kit adopted, hook opt-in NOT taken -> skip, exit 0 (never UNWIRED)
-  cp "$FRAG" memory-recall/recall-opened.fragment.json  # gov:root-fixture — scratch repo built at the ROOT prefix, which is the install this asserts
+  cp "$FRAG" "$rk/recall-opened.fragment.json"
   out=$(chk --check); rc=$?
   { [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'skip     recall' && printf '%s' "$out" | grep -q 'opt-in not taken'; } \
     && ck "AC8 recall opt-in not taken -> skip, exit 0" 1 || ck "AC8 recall opt-in not taken -> skip, exit 0" 0
@@ -335,7 +339,7 @@ if [ -f "$SMERGE" ] && [ -n "$FRAG" ]; then
   # TOOL-dRetiredFork-14 moved the shipped copy under the kit directory, so a fixture that
   # keeps installing into `.claude/hooks/` is testing a layout the kit no longer produces --
   # the arm then reports "not adopted" and the state it exists to catch goes ungraded.
-  printf '// stub\n' > memory-recall/recall-opened.js  # gov:root-fixture — scratch repo built at the ROOT prefix, which is the install this asserts
+  printf '// stub\n' > "$rk/recall-opened.js"
   out=$(chk --check); rc=$?
   { [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'UNWIRED  recall'; } \
     && ck "AC8 recall hook present, unmerged -> UNWIRED, exit 1" 1 || ck "AC8 recall hook present, unmerged -> UNWIRED, exit 1" 0
@@ -351,7 +355,7 @@ if [ -f "$SMERGE" ] && [ -n "$FRAG" ]; then
   cp "$SMERGE" ${KP}settings-merge.py
 
   # state 4 — merged into settings.json -> ok, exit 0
-  "$py" ${KP}settings-merge.py --fragment memory-recall/recall-opened.fragment.json >/dev/null 2>&1  # gov:root-fixture — scratch repo built at the ROOT prefix, which is the install this asserts
+  "$py" ${KP}settings-merge.py --fragment "$rk/recall-opened.fragment.json" >/dev/null 2>&1
   out=$(chk --check); rc=$?
   { [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'ok       recall'; } \
     && ck "AC8 recall merged -> ok, exit 0" 1 || ck "AC8 recall merged -> ok, exit 0" 0
@@ -359,7 +363,7 @@ if [ -f "$SMERGE" ] && [ -n "$FRAG" ]; then
   # state 5 — settings still dispatch the hook, the script is gone: UNWIRED, exit 1. Reachable from
   # WIRE §3c step 4 (two separate commands) in reverse order, and from any later loss of the
   # untracked hook file; Claude Code then runs `node` against nothing on every Read.
-  rm -f memory-recall/recall-opened.js  # gov:root-fixture — scratch repo built at the ROOT prefix, which is the install this asserts
+  rm -f "$rk/recall-opened.js"
   out=$(chk --check); rc=$?
   { [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'UNWIRED  recall' && printf '%s' "$out" | grep -q 'is missing'; } \
     && ck "AC8 recall wired but script gone -> UNWIRED, exit 1" 1 || ck "AC8 recall wired but script gone -> UNWIRED, exit 1" 0
@@ -369,7 +373,6 @@ if [ -f "$SMERGE" ] && [ -n "$FRAG" ]; then
   # source of gov's engine row at the fragment's path. The fragment resolves to the owned copy, both
   # readers agree on it, and the arm is ok. Without the seam this is state 5's false UNWIRED.
   src6="$KIT_REL/memory-recall/recall-opened.js"  # gov:root-fixture — the receipt's gov-side source, any string both rows share
-  rk=memory-recall  # gov:root-fixture — scratch repo built at the ROOT prefix; every path below is spelled through it
   write_owned_receipt() {  # <owned path, raw JSON string body> [role] -> a pretty receipt: gov's engine row, then the owned row
     printf '{\n  "files": [\n    {\n      "path": "%s",\n      "role": "engine",\n      "source": "%s"\n    },\n    {\n      "path": "%s",\n      "role": "%s",\n      "source": "%s"\n    }\n  ]\n}\n' \
       "$rk/recall-opened.js" "$src6" "$1" "${2:-adopter-owned}" "$src6" > .governance/install.json
@@ -430,8 +433,8 @@ if [ -f "$SMERGE" ] && [ -n "$FRAG" ]; then
   # its control: the owned row alone, with no engine row at the fragment's path, joins to nothing.
   printf '{\n  "files": [\n    {\n      "path": "%s",\n      "role": "adopter-owned",\n      "source": "%s"\n    }\n  ]\n}\n' \
     .claude/hooks/recall-opened.js "$src6" > .governance/install.json
-  got=$(bash "$SCRIPT" --resolve-fragment memory-recall/recall-opened.fragment.json 2>/dev/null)  # gov:root-fixture — scratch repo built at the ROOT prefix
-  ck "AC8 control — with no engine row at the fragment's path the hook stays beside the fragment" "$([ "$got" = memory-recall/recall-opened.js ] && echo 1 || echo 0)"  # gov:root-fixture — scratch repo built at the ROOT prefix
+  got=$(bash "$SCRIPT" --resolve-fragment "$rk/recall-opened.fragment.json" 2>/dev/null)
+  ck "AC8 control — with no engine row at the fragment's path the hook stays beside the fragment" "$([ "$got" = "$rk/recall-opened.js" ] && echo 1 || echo 0)"
   rm -rf .governance .claude/hooks/recall-opened.js
   cleanup
 else
@@ -882,15 +885,20 @@ fi
 # third one. A future prefix change moves the derived strings and reds the doc automatically.
 newrepo; git config core.hooksPath .githooks; install_driver "tools/"
 chk --fix >/dev/null; S_TOOLS=$(git config merge.rows.driver 2>/dev/null || true); cleanup
-newrepo; git config core.hooksPath .githooks; install_driver ""
-chk --fix >/dev/null; S_ROOT=$(git config merge.rows.driver 2>/dev/null || true); cleanup
+# The ROOT layout's command comes from a checker installed AT the root. The checker finds a kit at
+# its own prefix or through the receipt and no longer guesses the root from another prefix
+# (TOOL-aRepatriatedFork-24 S8), so a root-layout fixture holds its own root copy of the checker.
+newrepo; git config core.hooksPath .githooks; install_driver ""; cp "$SCRIPT" ./check-wiring.sh
+bash ./check-wiring.sh --fix >/dev/null 2>&1; S_ROOT=$(git config merge.rows.driver 2>/dev/null || true); cleanup
 cd "$REPO"
 # LIVENESS, before anything is compared against the doc: two layouts that produced the SAME string,
 # or no string at all, would turn the two greps below into one assertion wearing two hats.
 { [ -n "$S_TOOLS" ] && [ -n "$S_ROOT" ] && [ "$S_TOOLS" != "$S_ROOT" ]; } \
   && ck "AC12 the two layouts yield two distinct commands" 1 \
   || ck "AC12 the two layouts yield two distinct commands" 0
-RDM=""; for c in "$REPO/tools/memory-tree/README.md" "$REPO/memory-tree/README.md"; do
+# Beside this suite first, the way `src_of` and ATTR_DRV above resolve a kit file, so a `scripts/`
+# install finds its own README instead of skipping with a false reason (TOOL-aRepatriatedFork-24 S5).
+RDM=""; for c in "$HERE/memory-tree/README.md" "$REPO/memory-tree/README.md"; do
   [ -f "$c" ] && { RDM="$c"; break; }
 done
 if [ -z "$RDM" ]; then

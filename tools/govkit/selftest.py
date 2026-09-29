@@ -3596,6 +3596,22 @@ user_skills = "/tmp/gk-fake-skills"
         check("the refusal happened BEFORE any write",
               not (for_ / ".governance" / "install.json").exists(), "")
 
+        # --- TOOL-aRepatriatedFork-24 AC8: a foreign kit at the INTAKE'S OWN prefix. The probe asked
+        # --- only at gov's prefix and the root, so a `scripts/` intake over a `scripts/` install read
+        # --- as a clean target and the apply went ahead. Red against `2143b6d6`'s probe.
+        for_s = make_target(tmp / "e24", DEPLOY_FULL.replace('prefix = "tools"', 'prefix = "scripts"', 1))
+        (for_s / "scripts").mkdir(parents=True, exist_ok=True)
+        (for_s / "scripts" / "check-wiring.sh").write_text("KIT_CHECK_WIRING_VERSION=9.9\n",
+                                                          encoding="utf-8")
+        _sel24 = "memory-tree"  # a selection NAME, held apart from the argv so no path shape forms
+        p = run("apply", "--target", str(for_s), "--kits", _sel24)
+        check("[aRF-24 AC8] apply refuses a foreign kit at the intake's own prefix", p.returncode == 2,
+              p.stdout + p.stderr)
+        check("[aRF-24 AC8] ...and the refusal names it where the intake put it",
+              "check-wiring (at scripts/check-wiring.sh)" in p.stderr, p.stderr)
+        check("[aRF-24 AC8] ...before any write",
+              not (for_s / ".governance" / "install.json").exists(), "")
+
         # --- SUPERSEDED. These two arms asserted that a `merged` rule REFUSES by name, and the
         # --- merged-region writer inverts them: the role is honourable now. Replaced with a
         # --- POSITIVE on-disk assertion rather than deleted — an arm that asserts a refusal string

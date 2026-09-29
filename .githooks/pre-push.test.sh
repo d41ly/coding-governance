@@ -135,7 +135,7 @@ stamp() {    # write a full-green record naming a sha, with a reproducible finge
   local fp=""
   [ -x $KIT_REL/run-gates/gate-fingerprint.sh ] && fp=$(bash $KIT_REL/run-gates/gate-fingerprint.sh "$sha" 2>/dev/null)
   printf 'sha\t%s\nfingerprint\t%s\nmanifest_blob\t%s\nrun_id\ttest\n' \
-    "$sha" "$fp" "$(git hash-object -- tools/gate-legs.json 2>/dev/null)" > "$gd/gate-full-green"
+    "$sha" "$fp" "$(git hash-object -- gate-legs.json 2>/dev/null)" > "$gd/gate-full-green"
   [ -n "$st" ] && printf 'selftests\t%s\n' "$st" >> "$gd/gate-full-green"
   return 0
 }
@@ -186,8 +186,9 @@ fi
 stamp "$(git rev-parse HEAD)"
 case "$(decide)" in *"scoped gate"*) : ;; *) bad "13 precondition — could not get back to a scoped decision" ;; esac
 prev=$(git rev-parse HEAD)
-mkdir -p tools
-printf '%s\n' '[{"name":"x","argv":["bash","x.sh"]}]' > tools/gate-legs.json
+# AT THE ROOT, which the hook's ladder finds with no declaration (TOOL-aRepatriatedFork-24 S2). A
+# manifest under a prefix this fixture never declares is the refusal case the AC3 arm below grades.
+printf '%s\n' '[{"name":"x","argv":["bash","x.sh"]}]' > gate-legs.json
 git add -A >/dev/null 2>&1; git commit -qm "touch the manifest" >/dev/null 2>&1
 stamp "$prev"
 case "$(decide)" in
@@ -413,8 +414,9 @@ rm -rf "$wt" "$nr"
 # ============================================================================================
 # TOOL-dRetiredFork-11 — THE HOOK RESOLVES ITS OWN KIT ROOT.
 #
-# Everything above this line runs in a fixture that keeps its leg manifest at `tools/`, which is
-# where gov keeps it — so every arm above would pass unchanged with the prefix hardcoded, and did.
+# Everything above this line runs in a fixture that keeps its leg manifest at ONE fixed place — gov's
+# own prefix when this was written, the root since TOOL-aRepatriatedFork-24 — so every arm above
+# would pass unchanged with that place hardcoded, and did.
 # That is the shape of the defect: the suite could not tell a resolving hook from a hardcoded one,
 # because it only ever asked in the layout the hardcoding happened to match.
 #
@@ -461,6 +463,12 @@ pfx_fixture() {
   git config core.hooksPath "$d/hooks"
   mkdir -p "$pfx"
   printf '%s\n' '[{"name":"x","argv":["bash","a.sh"]}]' > "$pfx/gate-legs.json"
+  # THE ROOT IS DECLARED, as a copy-installed adopter declares it (TOOL-aRepatriatedFork-24 S2): no
+  # receipt and no root install, so the committed gate-env.sh is the rung that reaches it. `nowhere`
+  # declares nothing, because the AC3 arm grades a manifest the ladder does NOT reach.
+  if [ "$pfx" != nowhere ]; then
+    mkdir -p .githooks; printf 'GOV_KITROOT=%s\n' "$pfx" > .githooks/gate-env.sh
+  fi
   git add -A >/dev/null 2>&1; git commit -q -m init; git branch -M main
   git remote add origin "$d/remote.git"
   touch "$(git rev-parse --git-dir)/push-main-active"
@@ -533,6 +541,55 @@ git commit -qm "no manifest at all" >/dev/null 2>&1
 if GOV_GATE_CMD="bash $green" git push -q origin main >/dev/null 2>&1; then
   ok "AC3 a tree with no manifest ANYWHERE is left alone, so the refusal is not universal"
 else bad "AC3 the hook refused a tree that simply has no leg manifest"; fi
+
+# --- TOOL-aRepatriatedFork-24 AC3: the DEFAULT bar under `vendor/gov/`, a prefix the old probe
+# --- could never produce. `tools` or `scripts` were its only answers, so the bar named a runner that
+# --- does not exist. The kit and its runner are joined at run time, as the hook joins them.
+vg=vendor/gov; rgk=run-gates
+vgd="$tmp/vg"; mkdir -p "$vgd/hooks"; cp "$SRC/.githooks/pre-push" "$vgd/hooks/pre-push"
+git init -q --bare "$vgd/remote.git"; git init -q "$vgd/work"
+cd "$vgd/work" || exit 2
+git config user.email t@example.com; git config user.name t; git config core.autocrlf false
+git config core.hooksPath "$vgd/hooks"
+mkdir -p "${vg}/$rgk" .githooks
+printf '#!/usr/bin/env bash\necho "VENDOR BAR RAN"; exit 0\n' > "${vg}/$rgk/$rgk.sh"
+printf '%s\n' '[]' > "${vg}/gate-legs.json"
+printf 'GOV_KITROOT=%s\n' "$vg" > .githooks/gate-env.sh
+git add -A >/dev/null 2>&1; git commit -q -m init; git branch -M main
+git remote add origin "$vgd/remote.git"
+touch "$(git rev-parse --git-dir)/push-main-active"
+_out=$( ( unset GOV_GATE_CMD GOV_GATE_CMD_TEST; git push -q origin main 2>&1 ) ); _rc=$?
+case "$_rc|$_out" in
+  0\|*"bar: bash ${vg}/$rgk/$rgk.sh"*"VENDOR BAR RAN"*)
+    ok "AC3 (24) the default bar at ${vg}/ names that runner and runs it" ;;
+  *) bad "AC3 (24) the default bar did not name the ${vg}/ runner: rc=$_rc ${_out:-<no output>}" ;;
+esac
+git commit -q --allow-empty -m again
+printf '#!/usr/bin/env bash\necho "MODIFIED BAR RAN"; exit 0\n' > "${vg}/$rgk/$rgk.sh"
+_out=$( ( unset GOV_GATE_CMD GOV_GATE_CMD_TEST; git push -q origin main 2>&1 ) ); _rc=$?
+case "$_rc|$_out" in
+  0\|*|*"MODIFIED BAR RAN"*) bad "AC3 (24) a modified runner at ${vg}/ was run or passed: rc=$_rc $_out" ;;
+  *) ok "AC3 (24) a modified runner at ${vg}/ is refused before it runs" ;;
+esac
+git checkout -q -- "${vg}/$rgk/$rgk.sh"
+# ...and with NOTHING declared the same default bar is REFUSED by name (F1 (c)), never run as a
+# guessed path that reads as a red bar.
+git rm -q .githooks/gate-env.sh; git commit -q -m undeclare
+_out=$( ( unset GOV_GATE_CMD GOV_GATE_CMD_TEST; git push -q origin main 2>&1 ) ); _rc=$?
+case "$_rc|$_out" in
+  0\|*) bad "AC3 (24) an undeclared ${vg}/ root let the default-bar push through" ;;
+  *"leg manifest at '${vg}/gate-legs.json'"*"resolved its kit root nowhere"*)
+    ok "AC3 (24) an undeclared root with a tracked manifest refuses, naming every rung that missed" ;;
+  *) bad "AC3 (24) expected the manifest refusal naming the missed rungs, got: $_out" ;;
+esac
+git rm -q "${vg}/gate-legs.json"; git commit -q -m nomanifest
+_out=$( ( unset GOV_GATE_CMD GOV_GATE_CMD_TEST; git push -q origin main 2>&1 ) ); _rc=$?
+case "$_rc|$_out" in
+  0\|*) bad "AC3 (24) an unresolvable kit root let the default-bar push through" ;;
+  *"the default bar is this tree's kit runner, and the kit root resolved nowhere"*)
+    ok "AC3 (24) an unresolvable kit root refuses the default bar by name (F1 c)" ;;
+  *) bad "AC3 (24) expected the no-kit-root refusal, got: $_out" ;;
+esac
 
 cd "$pfx_home" || exit 2
 

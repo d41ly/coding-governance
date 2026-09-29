@@ -6,6 +6,11 @@
 # permanently red; this fleet tracks that as a named bug class. Every value below is either a
 # placeholder to replace or a number to MEASURE against your own tree.
 #
+# FOUR VALUES ARE STAMPED, not typed: LANDER, GATE_CMD, WIRING_CHECK and GENERATED_INDEXES carry a
+# brace-quoted path token that `adopt-unattended.sh` replaces with where THIS install keeps its kits,
+# the first time it renders, and `--check` refuses a conf that still carries one. A copy of the
+# authoring repo's own paths resolved to nothing at any other prefix (TOOL-aRepatriatedFork-24).
+#
 # Contract: <MEMORY_ROOT>/guides/UNATTENDED-PROTOCOL.md (binding). The driver and the gate leg READ
 # these declarations; neither restates one. A phase token or a DoD item spelled into a script is a
 # defect the leg reds on.
@@ -15,14 +20,14 @@ MEMORY_ROOT=memory
 
 # REPLACE. The mandated landing command. If your pre-push hook refuses an un-marked default-branch
 # push, name the script that sets the marker — it exists so the remote is reconciled BEFORE the gate.
-LANDER="bash tools/push-main.sh"
+LANDER="bash {{TOOL_ROOT}}push-main.sh"
 
 # REPLACE if your hook uses a different bypass. The close path must never emit this, and the leg
 # greps the run-state record for it in both directions.
 BYPASS_BAN="--no-verify"
 
 # REPLACE. Your full merge bar, for the `gates-green` DoD item.
-GATE_CMD="bash tools/run-gates/run-gates.sh"
+GATE_CMD="bash {{TOOL_ROOT}}run-gates/run-gates.sh"
 
 # The wall-clock bound, in seconds, on any command this driver runs that the PROJECT declared --
 # GATE_CMD and WIRING_CHECK. OPTIONAL: leave it out and the kit default applies, announced on
@@ -68,7 +73,7 @@ REVIEW_ROUNDS="1"
 # REPLACE. The NON-repairing wiring check `--preflight` delegates to. Only read-only flags are
 # accepted (--check, --dry-run, --verify, -n): a repairing mode sets git config and rewrites tracked
 # bytes, and the run's first act must not be that.
-WIRING_CHECK="bash tools/check-wiring.sh --check"
+WIRING_CHECK="bash {{TOOL_ROOT}}check-wiring.sh --check"
 
 # REPLACE with YOUR harness's scheduler tool names. These are named for the AGENT to call — no
 # script can reach the store, which is in-memory and session-scoped. The driver only records the id
@@ -265,7 +270,7 @@ LANDER_MARKER=""
 # generator, because a generated index alone is what every ordinary pass touches. The run-state file
 # is derived, never declared. Blank is the empty set; absent takes the kit default.
 SHARED_RECORDS="memory/DECISIONS.md memory/backlog"
-GENERATED_INDEXES="memory/LIVE.md:tools/memory-tree/gen_build_index.py memory/ledger:tools/memory-tree/gen_build_index.py"
+GENERATED_INDEXES="memory/LIVE.md:{{MEMORY_TREE_DIR}}/gen_build_index.py memory/ledger:{{MEMORY_TREE_DIR}}/gen_build_index.py"
 
 # The date from which a LANDED record must name its anchor kind (`remote` or `local`). A record whose
 # first commit predates it is read as `remote`, which is what every pre-existing record in fact is.

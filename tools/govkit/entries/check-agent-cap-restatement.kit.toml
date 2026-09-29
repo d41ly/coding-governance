@@ -8,7 +8,7 @@ selectable = "conditional"
 why_conditional = "it polices PROSE about the agent-cap fan-out bound, so it is worth installing only in a target that adopts the agent-cap hook AND writes governance prose of its own; a target that consumes the hook without documenting it has nothing for this to scan"
 version_from = { none = "no version constant exists; measured 2026-08-18." }
 requires = ["agent-cap"]
-sentinel = "tools/check-agent-cap-restatement.sh"
+sentinel = "check-agent-cap-restatement.sh"
 
 [[files]]
 include = ["check-agent-cap-restatement.sh", "check-agent-cap-restatement.test.sh"]

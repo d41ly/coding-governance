@@ -37,7 +37,12 @@
 # The `export` line is DELETED rather than commented out. A commented assignment is a line somebody
 # uncomments without reading the paragraph above it.
 #
-# THE KEYS THIS FILE MAY DECLARE, as documentation only; gov declares none of them today.
+# THE KEYS THIS FILE MAY DECLARE. Gov declares one of them, GOV_KITROOT, at the bottom.
+#   GOV_KITROOT=<dir>         where this tree keeps its kits, relative to the root. It is the LAST rung
+#                             both hooks walk, after the install receipt and a root install, so a tree
+#                             govkit installed never needs it (TOOL-aRepatriatedFork-24). pre-push
+#                             reads it from the sourced file; pre-commit reads the one assignment
+#                             and never sources it. Gov keeps no receipt, so it declares one.
 #   GATE_SELFTESTS=1          run the kit self-tests on every default-branch push (the switch above).
 #   GOV_GATE_CMD=<cmd>        the merge bar, when it is not `run-gates.sh`. It must run a script this
 #                             repo tracks, unmodified in the working tree, at word 1 or after bash/sh,
@@ -54,3 +59,4 @@
 # the push otherwise, so an ignored or excluded copy cannot set the test escape or `exit 0`.
 # The default branch is deliberately NOT a key here: this file is sourced after the hook has decided
 # which ref is the default, so a tracked file cannot choose which branch escapes the bar.
+GOV_KITROOT=tools

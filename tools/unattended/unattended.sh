@@ -41,7 +41,7 @@
 # The generated region holds NO copy: the unit list is DERIVED from the build README's already-derived,
 # already-byte-compared slice. One derivation in the tree; this file is not a second one.
 set -u
-KIT_UNATTENDED_VERSION=1.40   # gov:kit unattended@1.40 — kit identity; set HERE, never from .unattended.conf
+KIT_UNATTENDED_VERSION=1.41   # gov:kit unattended@1.41 — kit identity; set HERE, never from .unattended.conf
 
 # ------------------------------------------------------------------------------ the dereference pin
 # A sha is a NAME, and turning a name into bytes or into ancestry happens in the run's own object
@@ -5739,9 +5739,25 @@ verb_dispatch() { # slug · unit · writes...
   if [ -z "$_sibothers" ]; then
     echo "unattended: dispatch — no sibling pass is open, so condition 1 is a proof over an empty set for $unit" >&2
   fi
+  # THE GENERATOR KEYS BY WHERE IT IS, as well as by how it is spelled (TOOL-aRepatriatedFork-24 S4,
+  # the owner's F2 (a)). A conf seeded before the adopter stamped paths names the AUTHORING repo's
+  # prefix, and it is adopter-owned after that first write. At any other prefix that spelling names no
+  # file, the real generator never matched it, and this refusal could not fire. When the declared path
+  # names nothing, the ONE tracked file ending in its `<dir>/<file>` keys too. The declared spelling
+  # still keys, so nothing that refused before can stop refusing; two tracked candidates key neither.
+  resolve_generator() { # declared generator -> its spelling, then the tracked file it resolves to when that differs
+    local _g _t _hit
+    _g=$(normpath "$1"); printf '%s\n' "$_g"
+    [ -e "$ROOT/$_g" ] && return 0
+    case "$_g" in */*) _t=${_g%/*}; _t="${_t##*/}/${_g##*/}" ;; *) return 0 ;; esac
+    _hit=$(git -C "$ROOT" ls-files -- "$_t" "*/$_t" 2>/dev/null)
+    case "$_hit" in *"
+"*|"") ;; *) printf '%s\n' "$_hit" ;; esac
+  }
   for pair in ${GENERATED_INDEXES:-}; do
     idx=${pair%%:*}; gen=${pair#*:}
     [ "$idx" = "$pair" ] && continue
+    gens=$(resolve_generator "$gen")
     # BOTH HALVES read our paths AND the siblings'. Searching for the index in our own declaration
     # only made the refusal order-dependent: the pass that declares the index first is clean, and the
     # sibling that later declares the generator never looks for the index anywhere but its own args.
@@ -5751,9 +5767,12 @@ verb_dispatch() { # slug · unit · writes...
         # OVERLAP on both halves. `covers` asks whether q sits under the generator, which misses a
         # declaration that CONTAINS the generator — the same one-way reading that let `--writes
         # memory` through the shared-records refusal, left behind at this one site.
-        if overlaps "$gen" "$q"; then
-          fail 49 "--dispatch declares a generated index together with its generator, which is the one pairing the build method's condition 3 forbids - the index alone is fine and refusing it was the reading that condition retracted: $idx with $gen"; return 1
-        fi
+        for g in $gens; do
+          if overlaps "$g" "$q"; then
+            _as=""; [ "$g" = "${gens%%$'\n'*}" ] || _as=" (declared as $gen)"
+            fail 49 "--dispatch declares a generated index together with its generator, which is the one pairing the build method's condition 3 forbids - the index alone is fine and refusing it was the reading that condition retracted: $idx with $g$_as"; return 1
+          fi
+        done
       done
     done
   done

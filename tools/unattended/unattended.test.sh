@@ -5440,6 +5440,18 @@ run --preflight tRun --keepalive-id k1 >/dev/null
 run --dispatch tRun --pass ARCH-tRun-1 --writes $TOOL_REL/memory-tree/gen_build_index.py >/dev/null
 hit "$(run --dispatch tRun --pass ARCH-tRun-2 --writes memory/LIVE.md)" "--dispatch declares a generated index together with its generator, which is the one pairing the build method's condition 3 forbids - the index alone is fine and refusing it was the reading that condition retracted:"
 
+# ...and a generator SPELLED AT ANOTHER INSTALL'S PREFIX still keys (TOOL-aRepatriatedFork-24 AC5).
+# A conf seeded before the adopter stamped paths names the authoring repo's layout, and it is the
+# project's after that first write. That spelling names no file here, so the one tracked generator
+# ending in the same `<dir>/<file>` keys too. The pieces are joined at run time, as a conf seeded at
+# any prefix would spell them.
+build_specced_tree
+g24d=memory-tree; g24f=gen_build_index.py
+mkdir -p "$TOOL_REL/$g24d"; printf '# a stand-in generator\n' > "$TOOL_REL/$g24d/$g24f"; fixture
+printf '\nGENERATED_INDEXES="memory/LIVE.md:old/%s/%s"\n' "$g24d" "$g24f" >> .unattended.conf
+run --preflight tRun --keepalive-id k1 >/dev/null
+hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes memory/LIVE.md --writes "$TOOL_REL/$g24d/$g24f")" "reading that condition retracted: memory/LIVE.md with $TOOL_REL/$g24d/$g24f (declared as old/$g24d/$g24f)"
+
 # ---- THE PATH REFUSALS. The whitespace one is implementable ONLY because --writes is repeatable: in
 # ---- a space-joined value the path has already become two tokens by the time the verb sees it.
 build_specced_tree; run --preflight tRun --keepalive-id k1 >/dev/null

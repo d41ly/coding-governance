@@ -10,8 +10,10 @@
 # tracked sources, which carry placeholders permanently and by design — a leg that did would red on
 # its own landing commit.
 set -u
-ROOT="$(git rev-parse --show-toplevel)" || exit 2
-GATE="$ROOT/tools/check-placeholders.sh"
+git rev-parse --show-toplevel >/dev/null || exit 2
+# The gate sits BESIDE this suite at every prefix, so it is found from here (TOOL-aRepatriatedFork-24
+# S5). It was spelled under gov's prefix, which at any other install named a gate that is not there.
+GATE="$(cd "$(dirname "$0")" && pwd)/check-placeholders.sh"
 PASS=0; FAIL=0
 ok() { PASS=$((PASS+1)); }
 bad() { FAIL=$((FAIL+1)); echo "  FAIL: $1"; }

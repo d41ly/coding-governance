@@ -144,6 +144,11 @@ class Fixture:
               '#!/usr/bin/env bash\necho "OTHER BAR RAN"; exit 0\n')
         # THE DECLARATION the hook reads at the pushed sha (M1), in the unattended driver's own file.
         write(os.path.join(self.work, ".unattended.conf"), 'GATE_CMD="bash scripts/unattended-bar.sh"\n')
+        # THE KIT ROOT, declared the way a copy-installed adopter declares it: no receipt and no root
+        # install, so the committed gate-env.sh is the rung that reaches `scripts/`. The hook used to
+        # guess `scripts` on its own and no longer guesses (TOOL-aRepatriatedFork-24 S2).
+        os.makedirs(os.path.join(self.work, ".githooks"))
+        write(os.path.join(self.work, ".githooks", "gate-env.sh"), "GOV_KITROOT=scripts\n")
         write(os.path.join(self.work, "f.txt"), "hi\n")
         run(["git", "add", "-A"], cwd=self.work)
         run(["git", "commit", "-qm", "init"], cwd=self.work)

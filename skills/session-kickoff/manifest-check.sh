@@ -34,7 +34,7 @@
 #          verb with no session id, a path-shaped one, a card over its byte cap, an append whose
 #          READY line pins a BASE that is not HEAD, or an id reader that could not answer).
 set -u
-KIT_MANIFEST_VERSION="1.8"   # gov:kit kickoff-manifest@1.8 — the registry id
+KIT_MANIFEST_VERSION="1.9"   # gov:kit kickoff-manifest@1.9 — the registry id
 # TWO NUMBERS, not one (TOOL-aRepatriatedFork-15 S4). KIT_MANIFEST_VERSION above is the kit's
 # VINTAGE: it bumps whenever a shipped byte of this kit moves, which is what `govkit.py epoch` grades.
 # MANIFEST_FORMAT is the manifest FORMAT, the only number an adopter's `kickoff-manifest: v<N>`
@@ -412,8 +412,10 @@ print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
 # kit. Anchored at this script's dir FIRST, then at the repo root: the per-machine junction copy
 # resolves into gov's checkout, where neither rung sees the graded repo (closing review round 1
 # L3). An answer counts only if the file is in THIS repo. Gov homes THIS kit under skills/, which
-# no probe walks from, and gov keeps no receipt, so gov's own layout is a named fallback, then the
-# flat `memory-tree/` for a run with no python. Empty when nothing answers; the caller says so.
+# no probe walks from, and gov keeps no receipt, so the last rung is the ONE reader this repo
+# TRACKS. It is derived from the index, where the rung it replaced was two spelled prefixes, gov's
+# and the root (TOOL-aRepatriatedFork-24 S8). Two tracked readers are ambiguous, and so is none;
+# either way this returns empty, and the caller says so.
 resolve_id_reader() {
   local d py here
   py=$(resolve_python 2>/dev/null) || py=""
@@ -423,9 +425,9 @@ resolve_id_reader() {
       [ -f "$ROOT/$d/corpus_ids.py" ] && { printf '%s\n' "$ROOT/$d/corpus_ids.py"; return 0; }
     done
   fi
-  for d in "$ROOT/tools/memory-tree" "$ROOT/memory-tree"; do   # gov:prefix-literal — gov homes this kit under skills/ and keeps no receipt, so neither rung can reach gov's own reader
-    [ -f "$d/corpus_ids.py" ] && { printf '%s\n' "$d/corpus_ids.py"; return 0; }
-  done
+  d=$(git -C "$ROOT" ls-files -- corpus_ids.py '*/corpus_ids.py' 2>/dev/null)
+  case "$d" in *"
+"*|"") ;; *) [ -f "$ROOT/$d" ] && printf '%s\n' "$ROOT/$d" ;; esac
   return 0
 }
 

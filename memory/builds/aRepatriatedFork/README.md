@@ -157,7 +157,7 @@ ids TOOL-aRepatriatedFork-43 TOOL-aRepatriatedFork-44 TOOL-aRepatriatedFork-45
 | [TOOL-aRepatriatedFork-12 — memory-recall reads the adopter's corpus shape from conf](spec/2026-09-23-spec-TOOL-aRepatriatedFork-12.md) | 6 | 2 | CLOSED | rev-3 | 2026-09-24 |
 | [TOOL-aRepatriatedFork-44 — the adopter-ic receipt fixture carries no adopter name](spec/2026-09-29-spec-TOOL-aRepatriatedFork-44.md) | 7 | 1 | CLOSED | rev-2 | 2026-09-29 |
 | [TOOL-aRepatriatedFork-23 — the install-prefix ban counts every kit path it cannot see today](spec/2026-09-25-spec-TOOL-aRepatriatedFork-23.md) | 8 | 2 | CLOSED | rev-3 | 2026-09-29 |
-| [TOOL-aRepatriatedFork-24 — no line that executes strands an adopter at another prefix](spec/2026-09-25-spec-TOOL-aRepatriatedFork-24.md) | 9 | 2 | SPECCED | rev-3 | 2026-09-29 |
+| [TOOL-aRepatriatedFork-24 — no line that executes strands an adopter at another prefix](spec/2026-09-25-spec-TOOL-aRepatriatedFork-24.md) | 9 | 2 | CLOSED | rev-3 | 2026-09-29 |
 | [TOOL-aRepatriatedFork-25 — printed and usage strings in received code name no install prefix](spec/2026-09-25-spec-TOOL-aRepatriatedFork-25.md) | 10 | 1 | SPECCED | rev-2 | 2026-09-25 |
 | [TOOL-aRepatriatedFork-26 — the runbook and every shipped doc name no install prefix](spec/2026-09-25-spec-TOOL-aRepatriatedFork-26.md) | 11 | 1 | SPECCED | rev-2 | 2026-09-25 |
 | [TOOL-aRepatriatedFork-27 — canonical-copy markers and comment prose name no install prefix](spec/2026-09-25-spec-TOOL-aRepatriatedFork-27.md) | 12 | 1 | SPECCED | rev-1 | 2026-09-25 |
@@ -176,7 +176,7 @@ ids TOOL-aRepatriatedFork-43 TOOL-aRepatriatedFork-44 TOOL-aRepatriatedFork-45
 | [DEPL-aRepatriatedFork-20 — inCMS converges onto gov's memory-tree programs](spec/2026-09-23-spec-DEPL-aRepatriatedFork-20.md) | 20 | 2 | CLOSED | rev-11 | 2026-09-29 |
 <!-- /gen:build-units -->
 
-Records: 86 bound to this build, across 4 record folder(s).
+Records: 87 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

@@ -506,6 +506,23 @@ same "arm 9 a tracked override holding a space refuses at exit 2" "$rc" "2"
 hit "$out" "holds a character outside"
 absent "$H9c/.claude/skills/unattended/SKILL.md" "arm 9 wrote a Skill for an override holding a space"
 
+# ---- ARM 10 (TOOL-aRepatriatedFork-24 AC4): the shipped example, copied as its header says, is
+# ---- STAMPED with this install's own paths. It spelled the authoring repo's, which resolved to nothing
+# ---- at any other prefix. `--check` first, because it must refuse the unstamped conf and write nothing.
+S10="$TMP/stamp"; seed "$S10"; cp "$HERE/.unattended.conf.example" "$S10/.unattended.conf"
+out=$( cd "$S10" && bash "$KIT_REL"/adopt-unattended.sh --check 2>&1 ); rc=$?
+same "arm 10 --check refuses a conf still carrying a path token" "$rc" "1"
+hit "$out" "still carries a path token this adopter stamps"
+hit "$(grep -c '{{TOOL_ROOT}}' "$S10/.unattended.conf")" "3"
+( cd "$S10" && bash "$KIT_REL"/adopt-unattended.sh >/dev/null 2>&1 )
+same "arm 10 LANDER is stamped at this tool root" "$(grep '^LANDER=' "$S10/.unattended.conf")" "LANDER=\"bash ${TR_T}push-main.sh\""
+same "arm 10 GATE_CMD is stamped at this tool root" "$(grep '^GATE_CMD=' "$S10/.unattended.conf")" "GATE_CMD=\"bash ${TR_T}run-gates/run-gates.sh\""
+same "arm 10 WIRING_CHECK is stamped at this tool root" "$(grep '^WIRING_CHECK=' "$S10/.unattended.conf")" "WIRING_CHECK=\"bash ${TR_T}check-wiring.sh --check\""
+same "arm 10 the generator is stamped at the probed memory-tree dir" \
+  "$(grep '^GENERATED_INDEXES=' "$S10/.unattended.conf")" \
+  "GENERATED_INDEXES=\"memory/LIVE.md:${TR_T}memory-tree/gen_build_index.py memory/ledger:${TR_T}memory-tree/gen_build_index.py\""
+same "arm 10 no path token survives the stamp" "$(grep -cE '[{][{](TOOL_ROOT|MEMORY_TREE_DIR)[}][}]' "$S10/.unattended.conf")" "0"
+
 # FLOOR_ASSERTIONS — a shrink-only pin on the EXECUTED count, not on the written one. Authored from a
 # static count of the assertion sites in this file — `grep -cE '^\s*(same|hit|miss|absent|present) '`
 # over it, 87 at 4255e292 (TOOL-aWokenSentinel-19) — at ~10 % headroom, rounded down, because the
