@@ -67,6 +67,7 @@ does not import that implementation, which would be a cross-kit edge the contrac
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import re
 import subprocess
@@ -514,20 +515,19 @@ def resolve_placeholder_value(row: dict, charter: dict, answers: dict,
     raise Refusal(f'{key} declares class `{cls}`, which is not derived, asked or defaulted')
 
 
-def render(engine_dir: Path, gov_root: Path, target: Path,
-           charter_path: Path | None = None) -> tuple[str, list[str]]:
-    desc, blocks, entries = load_declarations(*resolve_declaration_paths(engine_dir, gov_root))
+def read_deploy(target: Path) -> tuple[Path, dict, dict]:
+    """The target's deploy.toml, parsed, and its `[answers]` keyed lowercase. Absent is a refusal."""
     dep = target / '.governance' / 'deploy.toml'
     if not dep.is_file():
         raise Refusal(f'{dep.as_posix()} does not exist. Run `govkit intake` first — it writes the '
                       f'answers this render reads, once, and refuses to overwrite them afterwards')
     cfg = tomllib.loads(dep.read_text(encoding='utf-8'))
-    answers = {k.lower(): v for k, v in (cfg.get('answers') or {}).items()}
-    rows = desc.get('placeholder', [])
-    charter = read_charter_table(cfg, rows, read_argv_tokens(desc))
-    kits = set(cfg.get('kits') or [])
-    drop_names = list(cfg.get('drop_blocks') or [])
+    return dep, cfg, {k.lower(): v for k, v in (cfg.get('answers') or {}).items()}
 
+
+def read_kits(dep: Path, cfg: dict, entries: set[str]) -> set[str]:
+    """The `kits` selection, graded against the registry it is drawn from."""
+    kits = set(cfg.get('kits') or [])
     # THE `kits` ARRAY IS GRADED, and it was not. A member is a registry entry id — that is the
     # population it is drawn from — and an unrecognised one selects nothing, so the whole kit section
     # it was meant to keep is DROPPED and `--check` re-renders from the same file and stays green
@@ -543,6 +543,62 @@ def render(engine_dir: Path, gov_root: Path, target: Path,
         raise Refusal(f'`kits` names {", ".join(unknown)}, which {"is" if len(unknown) == 1 else "are"} '
                       f'not a registry entry id. An unrecognised member selects nothing, so a kit '
                       f'fence it was meant to keep drops instead — the failure that reads as success')
+    return kits
+
+
+def resolve_answers(engine_dir: Path, gov_root: Path, target: Path,
+                    keys: list[str]) -> dict:
+    """TOOL-aRepatriatedFork-42. The value this engine would use for each of KEYS, for a SIBLING
+    renderer that must state the same answer rather than read deploy.toml a second time.
+
+    A key the descriptor declares as a placeholder resolves exactly as `render` resolves it: the
+    same precedence, the same probe, the same refusal. `kits` is the selection `render` grades.
+    `kit.<entry>.<key>` is the value govkit's `target_context` interpolates for that entry's
+    `{<key>}` token: the `[kit.<entry>]` value over the `[answers]` value, or None when neither
+    table answers it, where govkit falls back to its own default (`memory` for `memory_root`).
+    Any other key is the `[answers]` value, then the file's top-level value, or None when it has
+    neither — the caller owns what an absent answer means, because only it knows whether it needs one.
+
+    rev-3 (the closing review's C6): every key compares case-insensitively, as `[answers]` and
+    `[charter]` already do here, so one question never has two answers selected by spelling.
+    """
+    desc, _blocks, entries = load_declarations(*resolve_declaration_paths(engine_dir, gov_root))
+    dep, cfg, answers = read_deploy(target)
+    rows = desc.get('placeholder', [])
+    by_key = {r['key'].upper(): r for r in rows}
+    charter = read_charter_table(cfg, rows, read_argv_tokens(desc))
+    top = {str(k).lower(): v for k, v in cfg.items()}
+    per_entry = cfg.get('kit') if isinstance(cfg.get('kit'), dict) else {}
+    out: dict = {}
+    for key in keys:
+        low = key.lower()
+        if key.upper() in by_key:
+            out[key] = resolve_placeholder_value(by_key[key.upper()], charter, answers, target)[0]
+            continue
+        if low == 'kits':
+            out[key] = sorted(read_kits(dep, cfg, entries))
+            continue
+        if low.startswith('kit.') and low.count('.') >= 2:
+            eid, sub = low[len('kit.'):].rsplit('.', 1)
+            table = per_entry.get(eid)
+            val = ({str(k).lower(): v for k, v in table.items()}.get(sub)
+                   if isinstance(table, dict) else None)
+            if not isinstance(val, str):
+                val = answers.get(sub)
+        else:
+            val = answers.get(low, top.get(low))
+        out[key] = val if isinstance(val, str) and val else None
+    return out
+
+
+def render(engine_dir: Path, gov_root: Path, target: Path,
+           charter_path: Path | None = None) -> tuple[str, list[str]]:
+    desc, blocks, entries = load_declarations(*resolve_declaration_paths(engine_dir, gov_root))
+    dep, cfg, answers = read_deploy(target)
+    rows = desc.get('placeholder', [])
+    charter = read_charter_table(cfg, rows, read_argv_tokens(desc))
+    kits = read_kits(dep, cfg, entries)
+    drop_names = list(cfg.get('drop_blocks') or [])
 
     declared_blocks = {b['name'] for b in blocks}
     for d in drop_names:
@@ -775,6 +831,58 @@ def run_selftest() -> int:
             print(f'  arm FAIL a template that is its own charter is refused — rc {rc}, '
                   f'{err.getvalue()!r}, file now {left!r}')
 
+    # TOOL-aRepatriatedFork-42 — `--answers` states what `render` would use, and grades `kits` alike.
+    with tempfile.TemporaryDirectory() as td:
+        eng, tgt = _write_fixture(Path(td), ok_kits, ok_var)
+        (eng / 'playbook.kit.toml').write_text(
+            DESC_FIXTURE + '\n[[placeholder]]\nkey = "GATE_RUNNER"\nclass = "derived"\n'
+            'probe = "gate_runner"\n', encoding='utf-8')
+        dep = tgt / '.governance' / 'deploy.toml'
+        dep.write_text('gov_source = "../gov"\n' + dep.read_text(encoding='utf-8')
+                       + 'gate_runner = "bash scripts/gate.sh"\nmanifest_path = "m.md"\n',
+                       encoding='utf-8')
+        got = resolve_answers(eng, Path(td), tgt, ['GATE_RUNNER', 'kits', 'manifest_path',
+                                                   'gov_source', 'nope'])
+        want = {'GATE_RUNNER': 'bash scripts/gate.sh', 'kits': ['codebase-map', 'lexicon'],
+                'manifest_path': 'm.md', 'gov_source': '../gov', 'nope': None}
+        dep.write_text(dep.read_text(encoding='utf-8').replace('"lexicon"', '"lexcon"'),
+                       encoding='utf-8')
+        try:
+            resolve_answers(eng, Path(td), tgt, ['kits'])
+            graded = False
+        except Refusal as e:
+            graded = 'not a registry entry id' in str(e)
+    if got == want and graded:
+        passed += 1
+    else:
+        failed += 1
+        print(f'  arm FAIL --answers agrees with render — got {got!r}, kits graded {graded}')
+
+    # TOOL-aRepatriatedFork-42 rev-3 (C4, C6) — one answer whatever the spelling, and govkit's
+    # per-entry overlay: `[kit.<entry>]` over `[answers]`, falling back to it, null when neither says.
+    with tempfile.TemporaryDirectory() as td:
+        eng, tgt = _write_fixture(Path(td), ok_kits, ok_var)
+        (eng / 'playbook.kit.toml').write_text(
+            DESC_FIXTURE + '\n[[placeholder]]\nkey = "GATE_RUNNER"\nclass = "derived"\n'
+            'probe = "gate_runner"\n', encoding='utf-8')
+        (tgt / '.governance' / 'deploy.toml').write_text(
+            'gov_source = "../gov"\nkits = ["codebase-map", "lexicon"]\n\n[answers]\n'
+            'playbook_path = "CHARTER.md"\nvariances_a = "plain"\nGate_Runner = "bash g.sh"\n'
+            'manifest_path = "m.md"\n\n[kit.kickoff-manifest]\nManifest_Path = "x.md"\n',
+            encoding='utf-8')
+        keys = ['gate_runner', 'GATE_RUNNER', 'KITS', 'Manifest_Path', 'GOV_SOURCE',
+                'kit.kickoff-manifest.manifest_path', 'KIT.Kickoff-Manifest.MANIFEST_PATH',
+                'kit.memory-tree.manifest_path', 'kit.kickoff-manifest.nope']
+        got = resolve_answers(eng, Path(td), tgt, keys)
+    want = dict(zip(keys, ['bash g.sh', 'bash g.sh', ['codebase-map', 'lexicon'], 'm.md', '../gov',
+                           'x.md', 'x.md', 'm.md', None]))
+    if got == want:
+        passed += 1
+    else:
+        failed += 1
+        print(f'  arm FAIL --answers is case-insensitive and applies the per-entry overlay — '
+              f'got {got!r}')
+
     # TOOL-aRepatriatedFork-38 — a conf value keeps no trailing comment, quoted or not.
     with tempfile.TemporaryDirectory() as td:
         (Path(td) / '.memory-tree.conf').write_text(
@@ -802,6 +910,8 @@ def main(argv: list[str]) -> int:
     ap.add_argument('--charter', default='AGENTS.md')
     ap.add_argument('--check', action='store_true')
     ap.add_argument('--selftest', action='store_true')
+    # TOOL-aRepatriatedFork-42: another kit's renderer asks for the answers this engine would use.
+    ap.add_argument('--answers', nargs='+', metavar='KEY')
     a = ap.parse_args(argv)
 
     if a.selftest:
@@ -813,6 +923,14 @@ def main(argv: list[str]) -> int:
     gov_root = engine_dir.parent.parent
     target = Path(a.target).resolve()
     charter_path = target / a.charter
+
+    if a.answers:
+        try:
+            print(json.dumps(resolve_answers(engine_dir, gov_root, target, a.answers)))
+        except Refusal as e:
+            print(f'render-playbook: REFUSED — {e}', file=sys.stderr)
+            return 1
+        return 0
 
     # NOT ADOPTED is exit 0, and only in --check. A wiring leg runs unguarded against a tree that
     # has not run intake yet — gov's own, until its charter is rendered — and a leg that refuses
@@ -874,4 +992,4 @@ def main(argv: list[str]) -> int:
 if __name__ == '__main__':
     raise SystemExit(main(sys.argv[1:]))
 
-KIT_PLAYBOOK_RENDER_VERSION = "1.9"  # gov:kit playbook-render@1.9
+KIT_PLAYBOOK_RENDER_VERSION = "1.11"  # gov:kit playbook-render@1.11

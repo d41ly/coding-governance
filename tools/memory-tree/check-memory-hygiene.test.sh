@@ -2848,6 +2848,198 @@ else
 fi
 rm -rf "$_fl"
 
+# ---- TOOL-aRepatriatedFork-42: every adopter path in the renders comes from the adopter's own
+# ---- declarations. A flat install at `scripts/`, memory root `notes`, a gate runner that is not
+# ---- the run-gates kit, kickoff selected with its two answers, review-harness and unattended NOT
+# ---- selected, and not the shipping repo. The playbook engine is copied from the sibling kit and
+# ---- given a two-row fixture descriptor, so no gov-only declaration is read.
+_pbk=""
+for _c in "$HERE/playbook" "$(dirname "$HERE")/playbook"; do
+  [ -f "$_c/render_playbook.py" ] && { _pbk=$_c; break; }
+done
+if [ -z "$_pbk" ]; then
+  echo "skip adopter-declared paths: no playbook-render engine beside this kit, so its three arms are UNEXERCISED here"; n_skip=$((${n_skip:-0}+3))
+else
+_ad=$(mktemp -d)
+(
+  cd "$_ad" || exit 1
+  git init -q .; git config user.email t@t.test; git config user.name t
+  mkdir -p scripts/playbook notes .governance
+  cp "$HERE"/*.template.md "$HERE/adopt-memory-tree.sh" scripts/
+  cp "$_pbk/render_playbook.py" scripts/playbook/
+  printf '[[placeholder]]\nkey = "GATE_RUNNER"\nclass = "derived"\nprobe = "gate_runner"\n' > scripts/playbook/playbook.kit.toml
+  printf '[[entry]]\nid = "%s"\n\n' memory-tree kickoff-manifest review-harness unattended > scripts/playbook/registry.toml
+  printf 'gov_source = "../gov"\nkits = ["memory-tree", "kickoff-manifest"]\n\n[answers]\ngate_runner = "bash scripts/gate.sh"\nmanifest_path = ".claude/SESSION-KICKOFF.md"\nuser_skills = "~/.claude/skills"\n' > .governance/deploy.toml
+  printf 'MEMORY_ROOT=notes\nDISCIPLINES="arch"\nFAMILIES="arch:ARCH"\nREADINESS_ROWS="security|risks"\n' > .memory-tree.conf
+  printf '<!-- gov:kit memory-tree@0 -->\n' > notes/HYGIENE.md
+  git add -A && git -c commit.gpgsign=false commit -q -m adopter --no-verify
+  bash scripts/adopt-memory-tree.sh --render
+) >/dev/null 2>&1
+_bm="$_ad/notes/guides/BUILD-METHOD.md"
+_docs="$_ad/notes/HYGIENE.md $_ad/notes/TEMPLATE-SPEC.md $_bm $_ad/notes/guides/ANNOTATION-STYLE.md"
+n=$((n+1))
+# shellcheck disable=SC2086
+if grep -qF '`bash scripts/gate.sh`' "$_bm" 2>/dev/null && grep -qF '`.claude/SESSION-KICKOFF.md`' "$_bm" \
+   && grep -qF '`~/.claude/skills/session-kickoff/SKILL.md`' "$_bm" && grep -qF '`notes/TEMPLATE-SPEC.md`' "$_bm" \
+   && ! grep -qE 'run-gates\.sh|check-spec-tokens\.py|REVIEW-PROTOCOL\.md|UNATTENDED-PROTOCOL\.md|`memory/|`skills/session-kickoff/' $_docs; then
+  echo "ok   --render names the adopter's declared bar, manifest, skill and memory root, and no gov path"
+else
+  echo "FAIL --render put a gov path in an adopter's docs, or missed its declared bar, manifest, skill or memory root"; st=1
+fi
+# With no engine to answer, every placeholder states its phrase and no brace survives.
+( cd "$_ad" && rm -rf scripts/playbook && bash scripts/adopt-memory-tree.sh --render ) >/dev/null 2>&1
+n=$((n+1))
+# shellcheck disable=SC2086
+if grep -qF 'the merge bar of this repo' "$_bm" 2>/dev/null && grep -qF 'The spec-token checker of the shipping repo' "$_ad/notes/TEMPLATE-SPEC.md" \
+   && ! grep -q '{{[A-Z_]*}}' $_docs && ! grep -qE 'run-gates\.sh|check-spec-tokens\.py' $_docs; then
+  echo "ok   with no playbook engine every adopter placeholder states its phrase and names no path"
+else
+  echo "FAIL with no playbook engine a placeholder survived, or a default named a path"; st=1
+fi
+# A selected kickoff kit with no manifest answer is a named refusal, and no doc moves.
+cp "$_bm" "$_ad/bm.before"
+( cd "$_ad" && mkdir -p scripts/playbook && cp "$_pbk/render_playbook.py" scripts/playbook/ \
+  && printf '[[placeholder]]\nkey = "GATE_RUNNER"\nclass = "derived"\nprobe = "gate_runner"\n' > scripts/playbook/playbook.kit.toml \
+  && printf '[[entry]]\nid = "%s"\n\n' memory-tree kickoff-manifest > scripts/playbook/registry.toml \
+  && sed -i '/^manifest_path/d' .governance/deploy.toml ) >/dev/null 2>&1
+o=$( cd "$_ad" && bash scripts/adopt-memory-tree.sh --render 2>&1 ); rc=$?
+n=$((n+1))
+if [ "$rc" != 0 ] && printf '%s' "$o" | grep -q 'answers no manifest_path' && cmp -s "$_bm" "$_ad/bm.before"; then
+  echo "ok   a selected kickoff kit with no manifest_path is refused by name and no doc moves"
+else
+  echo "FAIL a selected kickoff kit with no manifest_path rendered anyway (rc=$rc), or the refusal named nothing:"; printf '%s\n' "$o" | head -3 | sed 's/^/      /'; st=1
+fi
+rm -rf "$_ad"
+fi
+
+# ---- TOOL-aRepatriatedFork-42 rev-3: the round-1 closing review, one arm per defect, each on its
+# ---- own copy of the fixture above with MEMORY_ROOT declared the way the real engine declares it.
+if [ -z "$_pbk" ]; then
+  echo "skip the rev-3 render arms: no playbook-render engine beside this kit, so its 9 arms are UNEXERCISED here"; n_skip=$((${n_skip:-0}+9))
+else
+build_fixture_r3() {
+  local d; d=$(mktemp -d)
+  ( cd "$d" || exit 1
+    git init -q .; git config user.email t@t.test; git config user.name t; git config core.autocrlf false
+    mkdir -p scripts/playbook notes .governance
+    cp "$HERE"/*.template.md "$HERE/adopt-memory-tree.sh" scripts/
+    cp "$_pbk/render_playbook.py" scripts/playbook/
+    printf '[[placeholder]]\nkey = "GATE_RUNNER"\nclass = "derived"\nprobe = "gate_runner"\n\n[[placeholder]]\nkey = "MEMORY_ROOT"\nclass = "derived"\nprobe = "memory_root"\n' > scripts/playbook/playbook.kit.toml
+    printf '[[entry]]\nid = "%s"\n\n' memory-tree kickoff-manifest review-harness unattended > scripts/playbook/registry.toml
+    printf 'gov_source = "../gov"\nkits = ["memory-tree", "kickoff-manifest"]\n\n[answers]\ngate_runner = "bash scripts/gate.sh"\nmanifest_path = ".claude/SESSION-KICKOFF.md"\nuser_skills = "~/.claude/skills"\n' > .governance/deploy.toml
+    printf 'MEMORY_ROOT=notes\nDISCIPLINES="arch"\nFAMILIES="arch:ARCH"\nREADINESS_ROWS="security|risks"\n' > .memory-tree.conf
+    printf '<!-- gov:kit memory-tree@0 -->\n' > notes/HYGIENE.md
+    git add -A && git -c commit.gpgsign=false commit -q -m adopter --no-verify ) >/dev/null 2>&1
+  printf '%s\n' "$d"
+}
+derive_bm_r3() { printf '%s/notes/guides/BUILD-METHOD.md' "$1"; }
+check_untouched_r3() { [ "$(cat "$1/notes/HYGIENE.md")" = '<!-- gov:kit memory-tree@0 -->' ] && [ ! -e "$(derive_bm_r3 "$1")" ]; }
+# C1 — a multi-line [charter] value is refused by name before any doc is written.
+_d=$(build_fixture_r3); printf '\n[charter]\ngate_runner = """bash run.sh\nbuild\nz"""\n' >> "$_d/.governance/deploy.toml"
+o=$( cd "$_d" && bash scripts/adopt-memory-tree.sh --render 2>&1 ); rc=$?
+n=$((n+1))
+if [ "$rc" != 0 ] && printf '%s' "$o" | grep -qF 'value for {{GATE_RUNNER}} carries a tab, CR or newline' && check_untouched_r3 "$_d"; then
+  echo "ok   a multi-line answer is refused by name and no doc is written"
+else
+  echo "FAIL a multi-line answer rendered (rc=$rc), or a doc moved:"; printf '%s\n' "$o" | tail -2 | sed 's/^/      /'; st=1
+fi
+rm -rf "$_d"
+# C2 — an engine below the floor is no engine: the phrases, one named line, no usage error.
+_d=$(build_fixture_r3); sed -i 's/^KIT_PLAYBOOK_RENDER_VERSION = "[0-9.]*"/KIT_PLAYBOOK_RENDER_VERSION = "1.10"/' "$_d/scripts/playbook/render_playbook.py"
+o=$( cd "$_d" && bash scripts/adopt-memory-tree.sh --render 2>&1 ); rc=$?
+n=$((n+1))
+if [ "$rc" = 0 ] && grep -qF 'the merge bar of this repo' "$(derive_bm_r3 "$_d")" && printf '%s' "$o" | grep -qF 'is 1.10, below the 1.11' \
+   && printf '%s' "$o" | grep -qF 'govkit update --kits playbook-render' && ! printf '%s' "$o" | grep -q 'unrecognized arguments'; then
+  echo "ok   an engine below the floor renders the phrases and names the update that repairs it"
+else
+  echo "FAIL an engine below the floor refused or rendered an answer (rc=$rc):"; printf '%s\n' "$o" | tail -2 | sed 's/^/      /'; st=1
+fi
+rm -rf "$_d"
+# C3 — a non-ASCII answer on a node without UTF-8 mode lands as UTF-8.
+_d=$(build_fixture_r3); sed -i 's|^gate_runner = .*|gate_runner = "bash run.sh \\u2192 the bar"|' "$_d/.governance/deploy.toml"
+o=$( cd "$_d" && PYTHONUTF8=0 PYTHONIOENCODING= bash scripts/adopt-memory-tree.sh --render 2>&1 ); rc=$?
+n=$((n+1))
+if [ "$rc" = 0 ] && "$_PY" -c 'import sys; sys.exit(0 if "bash run.sh " + chr(0x2192) + " the bar" in open(sys.argv[1], encoding="utf-8").read() else 1)' "$(derive_bm_r3 "$_d")" 2>/dev/null; then
+  echo "ok   a non-ASCII answer renders as UTF-8 without UTF-8 mode"
+else
+  echo "FAIL a non-ASCII answer did not land as UTF-8 without UTF-8 mode (rc=$rc):"; printf '%s\n' "$o" | tail -2 | sed 's/^/      /'; st=1
+fi
+rm -rf "$_d"
+# I2 — the engine refusal itself reaches the operator without UTF-8 mode, not a traceback.
+_d=$(build_fixture_r3); sed -i 's|^kits = .*|kits = ["memory-tree", "kickoff-manifest", "lexcon"]|' "$_d/.governance/deploy.toml"
+o=$( cd "$_d" && PYTHONUTF8=0 PYTHONIOENCODING= bash scripts/adopt-memory-tree.sh --render 2>&1 ); rc=$?
+n=$((n+1))
+if [ "$rc" != 0 ] && printf '%s' "$o" | grep -qF 'render-playbook: REFUSED' && ! printf '%s' "$o" | grep -q 'Traceback' && check_untouched_r3 "$_d"; then
+  echo "ok   an engine refusal prints by name without UTF-8 mode"
+else
+  echo "FAIL an engine refusal became a traceback without UTF-8 mode, or rendered (rc=$rc):"; printf '%s\n' "$o" | tail -2 | sed 's/^/      /'; st=1
+fi
+rm -rf "$_d"
+# C4 — a manifest answered under [kit.kickoff-manifest] alone is the one govkit installs at.
+_d=$(build_fixture_r3); sed -i '/^manifest_path/d' "$_d/.governance/deploy.toml"
+printf '\n[kit.kickoff-manifest]\nmanifest_path = "x.md"\n' >> "$_d/.governance/deploy.toml"
+o=$( cd "$_d" && bash scripts/adopt-memory-tree.sh --render 2>&1 ); rc=$?
+n=$((n+1))
+if [ "$rc" = 0 ] && grep -qF '`x.md`' "$(derive_bm_r3 "$_d")"; then
+  echo "ok   a manifest answered in its kit table renders where govkit installs it"
+else
+  echo "FAIL a manifest answered in its kit table was refused or missed (rc=$rc):"; printf '%s\n' "$o" | tail -2 | sed 's/^/      /'; st=1
+fi
+rm -rf "$_d"
+# C4 — a memory root declared apart from the conf and differing from it is refused, naming both.
+_d=$(build_fixture_r3); sed -i 's|^\[answers\]|[answers]\nmemory_root = "docs/mem"|' "$_d/.governance/deploy.toml"
+o=$( cd "$_d" && bash scripts/adopt-memory-tree.sh --render 2>&1 ); rc=$?
+n=$((n+1))
+if [ "$rc" != 0 ] && printf '%s' "$o" | grep -qF 'MEMORY_ROOT=notes' && printf '%s' "$o" | grep -qF 'docs/mem' && check_untouched_r3 "$_d"; then
+  echo "ok   two memory roots are refused by name and no doc is written"
+else
+  echo "FAIL two memory roots rendered (rc=$rc), or the refusal named neither:"; printf '%s\n' "$o" | tail -2 | sed 's/^/      /'; st=1
+fi
+rm -rf "$_d"
+# I4, C5 — a protocol renders where its kit's rendered receipt row says, and a selected kit with
+# no such row states the phrase, which asserts nothing about what is installed.
+_d=$(build_fixture_r3); sed -i 's|^kits = .*|kits = ["memory-tree", "kickoff-manifest", "review-harness", "unattended"]|' "$_d/.governance/deploy.toml"
+printf '{"files": [{"path": "docs/rp.md", "source": "kit/REVIEW-PROTOCOL.template.md", "role": "rendered", "kit": "review-harness"}]}\n' > "$_d/.governance/install.json"
+o=$( cd "$_d" && bash scripts/adopt-memory-tree.sh --render 2>&1 ); rc=$?
+_bm=$(derive_bm_r3 "$_d")
+n=$((n+1))
+if [ "$rc" = 0 ] && grep -qF '`docs/rp.md`' "$_bm" && grep -qF 'the unattended-run protocol of this repo' "$_bm" \
+   && ! grep -qE 'PROTOCOL\.md`|not installed here\)' "$_bm"; then
+  echo "ok   a protocol renders at its receipt row, and one with no row states the phrase"
+else
+  echo "FAIL a protocol path is not the receipt's, or a phrase asserted an install state (rc=$rc):"; printf '%s\n' "$o" | tail -2 | sed 's/^/      /'; st=1
+fi
+rm -rf "$_d"
+# I3 — a repo-relative skill path renders only once git tracks it there.
+_d=$(build_fixture_r3); sed -i 's|^user_skills = .*|user_skills = ".claude/skills"|' "$_d/.governance/deploy.toml"
+mkdir -p "$_d/.claude/skills"; echo x > "$_d/.claude/skills/session-kickoff"
+( cd "$_d" && git add -A && git -c commit.gpgsign=false commit -qm file --no-verify ) >/dev/null 2>&1
+o=$( cd "$_d" && bash scripts/adopt-memory-tree.sh --render 2>&1 ); rc=$?
+_bm=$(derive_bm_r3 "$_d")
+_un=no; grep -qF 'the session-kickoff skill' "$_bm" && ! grep -qF 'session-kickoff/SKILL.md' "$_bm" && _un=yes
+( cd "$_d" && git rm -q .claude/skills/session-kickoff && mkdir -p .claude/skills/session-kickoff && echo s > .claude/skills/session-kickoff/SKILL.md \
+  && git add -A && git -c commit.gpgsign=false commit -qm dir --no-verify && bash scripts/adopt-memory-tree.sh --render ) >/dev/null 2>&1
+n=$((n+1))
+if [ "$rc" = 0 ] && [ "$_un" = yes ] && grep -qF '`.claude/skills/session-kickoff/SKILL.md`' "$_bm"; then
+  echo "ok   a repo-relative skill renders only when git tracks it"
+else
+  echo "FAIL an untracked repo-relative skill was named, or a tracked one was not (rc=$rc, untracked phrase $_un)"; st=1
+fi
+rm -rf "$_d"
+# C5, C7 — with no engine, the unattended phrase asserts no install state, and the spec template
+# names no gate-leg path for the shipping repo's checker.
+_d=$(build_fixture_r3); rm -rf "$_d/scripts/playbook"
+o=$( cd "$_d" && bash scripts/adopt-memory-tree.sh --render 2>&1 ); rc=$?
+n=$((n+1))
+if [ "$rc" = 0 ] && grep -qF 'the unattended-run protocol of this repo' "$(derive_bm_r3 "$_d")" && ! grep -qF 'not installed here)' "$(derive_bm_r3 "$_d")" \
+   && grep -qF "gate name against its own repo's gate-leg manifest" "$_d/notes/TEMPLATE-SPEC.md"; then
+  echo "ok   with no engine the unattended phrase asserts nothing and the checker sentence names no path"
+else
+  echo "FAIL with no engine a phrase asserted an install state, or the checker sentence named a path (rc=$rc)"; st=1
+fi
+rm -rf "$_d"
+fi
+
 # PROJECT_REGISTRY_EXTRA — it only WIDENS, so the arm that matters is that it does not widen to
 # everything. The first cut of this key sat above the named cases in check 3 and matched all of
 # them, accepting any file under project/ and disabling the check while reporting clean. BOTH
@@ -2885,8 +3077,14 @@ esac
 # each one top-level increment of `n`.
 # RAISED 448 -> 454 by TOOL-aRepatriatedFork-32: its control, four cutoff arms and the U-row arm, each top-level.
 # RAISED 454 -> 456 by its rev-3 fold: the slack arm and the measurement-line arm, both top-level.
-FLOOR_ASSERTIONS=456
-[ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
+# RAISED 456 -> 462 by TOOL-aRepatriatedFork-42, to the PRINTED count: its three adopter-declared-path
+# arms, each top-level, and three earlier top-level arms that landed without a raise.
+# A tree with no playbook-render engine skips them ALOUD and n_skip carries the three, so the floor
+# still catches an unreachable block without redding a kit installed without its sibling.
+# RAISED 462 -> 471 by its rev-3 fold: nine top-level arms, one per defect of the closing review,
+# skipped aloud with the three above when no engine sits beside the kit.
+FLOOR_ASSERTIONS=471
+[ "$((n + ${n_skip:-0}))" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 
 [ "$st" = 0 ] && echo "PASS ($n assertions)"
 exit "$st"

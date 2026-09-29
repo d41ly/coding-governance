@@ -5,7 +5,7 @@ home = "tools/memory-tree"
 scope = "repo"
 version_from = { file = "check-memory-hygiene.sh", pattern = "^KIT_MEMORY_TREE_VERSION=" }
 requires = []
-requires_if = [{ kit = "memory-recall", when_any_key_set = ["DEAD_PATH_PIN", "ORPHAN_ID_PIN"], when_verb_used = ["--print-defined-ids"], why = "corpus_ids.py arms checks 13-15 on either of these pins and raises when the memory-recall sibling is absent; the edge is FALSE at apply time because the pins ship blank, and becomes TRUE when the measured-pins hole is discharged. Check 16 is NOT on this edge: it is structural since memory-tree 2.42 and reaches neither walk() nor the grammar, so it stays available to an adopter who took memory-tree alone. The `--print-defined-ids` verb (the kickoff kit's id-citation reader) is on this edge too, and it DEGRADES rather than raises: exit 3 with one line naming this kit, which the kickoff checker maps onto its 'id citations unchecked' branch — memory-tree + kickoff-manifest without memory-recall is supported, with id citations unchecked (the aReplayedCard closing review, F1). `when_verb_used` is documentation the selfcheck does not resolve; the mechanism is corpus_ids.py's exit 3" }]
+requires_if = [{ kit = "memory-recall", when_any_key_set = ["DEAD_PATH_PIN", "ORPHAN_ID_PIN"], when_verb_used = ["--print-defined-ids"], why = "corpus_ids.py arms checks 13-15 on either of these pins and raises when the memory-recall sibling is absent; the edge is FALSE at apply time because the pins ship blank, and becomes TRUE when the measured-pins hole is discharged. Check 16 is NOT on this edge: it is structural since memory-tree 2.42 and reaches neither walk() nor the grammar, so it stays available to an adopter who took memory-tree alone. The `--print-defined-ids` verb (the kickoff kit's id-citation reader) is on this edge too, and it DEGRADES rather than raises: exit 3 with one line naming this kit, which the kickoff checker maps onto its 'id citations unchecked' branch — memory-tree + kickoff-manifest without memory-recall is supported, with id citations unchecked (the aReplayedCard closing review, F1). `when_verb_used` is documentation the selfcheck does not resolve; the mechanism is corpus_ids.py's exit 3" }, { kit = "playbook-render", why = "TOOL-aRepatriatedFork-42: the four renders ask the playbook-render engine's `--answers` for every adopter-declared path, and rev-3 speaks keys only 1.11 answers. A FLOOR, which govkit cannot express: a plain `requires` would refuse every default apply, since the default selection carries this kit and not that one, and no key couples two kits' rollbacks. So the render enforces it: it reads KIT_PLAYBOOK_RENDER_VERSION before spawning the engine, and an engine below 1.11, or none, renders each path's stated phrase with one stderr line naming `govkit update --kits playbook-render`. No condition key: the edge holds wherever the target carries a deploy.toml, which no key of this kit's config names" }]
 
 [[files]]
 path = "build-readme-slot-limits.txt"
@@ -56,19 +56,19 @@ role = "project-owned"
 include = ["HYGIENE.template.md"]
 role = "rendered"
 to = "{memory_root}/HYGIENE.md"
-placeholders = ["KIT_DIR", "TOOL_ROOT", "INDEX_CAP_LINES", "ENTRY_CAP_UNIT"]
+placeholders = ["KIT_DIR", "TOOL_ROOT", "MEMORY_ROOT", "INDEX_CAP_LINES", "ENTRY_CAP_UNIT"]
 
 [[files]]
 include = ["SPEC-TEMPLATE.template.md"]
 role = "rendered"
 to = "{memory_root}/TEMPLATE-SPEC.md"
-placeholders = ["KIT_DIR", "TOOL_ROOT", "READINESS_ROWS"]
+placeholders = ["KIT_DIR", "TOOL_ROOT", "READINESS_ROWS", "SPEC_TOKEN_CHECKER"]
 
 [[files]]
 include = ["BUILD-METHOD.template.md"]
 role = "rendered"
 to = "{memory_root}/guides/BUILD-METHOD.md"
-placeholders = ["KIT_DIR", "TOOL_ROOT"]
+placeholders = ["KIT_DIR", "TOOL_ROOT", "MEMORY_ROOT", "GATE_RUNNER", "MANIFEST_PATH", "KICKOFF_SKILL", "REVIEW_PROTOCOL", "UNATTENDED_PROTOCOL"]
 
 [[files]]
 include = ["ANNOTATION-STYLE.template.md"]

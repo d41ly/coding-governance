@@ -1258,6 +1258,11 @@
       "file": "tools/runlog/model.py"
     },
     {
+      "id": "check_answers_parity",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
+    },
+    {
       "id": "check_apply_owned",
       "kind": "function",
       "file": "tools/govkit/selftest.py"
@@ -4468,6 +4473,11 @@
       "file": "tools/memory-tree/corpus_ids.py"
     },
     {
+      "id": "read_deploy",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
+    },
+    {
       "id": "read_descriptors",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -4596,6 +4606,11 @@
       "id": "read_kinds",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "read_kits",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
     },
     {
       "id": "read_kits_json",
@@ -5546,6 +5561,11 @@
       "id": "resolve_adopter",
       "kind": "function",
       "file": "tools/check-kit-placeholders.py"
+    },
+    {
+      "id": "resolve_answers",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
     },
     {
       "id": "resolve_backend",
@@ -8371,6 +8391,16 @@
       "id": "test_the_gate_and_its_template_are_byte_identical",
       "kind": "function",
       "file": "tools/codebase-map/selftest.py"
+    },
+    {
+      "id": "test_the_live_log_baseline_is_taken_before_any_arm_runs",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_the_live_log_verdict_is_total_over_its_states",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
     },
     {
       "id": "test_the_selftest_pin_carries_an_unbroken_provenance_chain",

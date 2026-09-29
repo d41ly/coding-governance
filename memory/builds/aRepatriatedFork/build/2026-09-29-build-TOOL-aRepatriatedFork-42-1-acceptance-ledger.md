@@ -1,0 +1,28 @@
+# TOOL-aRepatriatedFork-42 — acceptance ledger
+
+**Serves:** journal TOOL-aRepatriatedFork-42
+
+Written by the unit pass on node a, 2026-09-29. The red-first runs used a temp slice of the hygiene
+suite, its prologue plus the three new arms, run beside a kit directory holding the four templates
+and the adopter script as `012d9dd5` holds them; both were removed after. The inCMS run used a
+read-only `git clone --local` copy under the temp root at `71180c796`, carrying the new templates,
+adopter script and playbook engine, removed after.
+
+The rev-3 fold, node a, 2026-09-29. Each new arm was run twice: in a slice of its suite over the
+fold's bytes, and in the same slice placed inside a scratch clone at `f02a3a56`, where every rev-3
+arm reds and the rev-2 arms stay green. The adopter runs used scratch clones under the temp root,
+inCMS at `f1d1c75a3` and nc at `1e308c9b`, each taken through `govkit update --write` from the
+fold's HEAD, removed after.
+
+**Evidences:** TOOL-aRepatriatedFork-42
+- AC1 — `check-memory-hygiene.test.sh` — `ok   --render names the adopter's declared bar, manifest, skill and memory root, and no gov path`. Over the 012d9dd5 kit the same arm reds, and the fixture's build method reads `the merge bar is` followed by the run-gates runner, the gov kickoff manifest, the in-repo kickoff skill, the review protocol twice and `memory/` literals under a `notes` memory root, while its spec template names `check-spec-tokens.py` twice
+- AC2 — `check-memory-hygiene.test.sh` — `ok   with no playbook engine every adopter placeholder states its phrase and names no path`. Red over the 012d9dd5 kit
+- AC3 — `check-memory-hygiene.test.sh` — `ok   a selected kickoff kit with no manifest_path is refused by name and no doc moves`. Over the 012d9dd5 kit the render exits 0. On gov, before gov declared its two answers, the parity leg refused with `kickoff-manifest is selected and .governance/deploy.toml answers no manifest_path`
+- AC4 — `render_playbook.py --selftest` — `render_playbook.selftest OK — 20 arm(s)`. With `resolve_answers` reading `kits` ungraded, the new arm reads `arm FAIL --answers agrees with render` and `kits graded False`, 1 of 20
+- AC5 — `adopt-memory-tree.sh --render` — on gov it rewrites the four docs, and against `012d9dd5` the diff is the version marker in each, the merge-bar line (`bash tools/run-gates/run-gates.sh`), the kickoff-skill line (`~/.claude/skills/session-kickoff/SKILL.md`) and the two memory-root caveats removed. `TEMPLATE-SPEC.md` and `ANNOTATION-STYLE.md` move by the marker alone. `bash tools/check-kit-versions.sh` exits 0 at memory-tree 2.102 and playbook-render 1.10, and `python tools/govkit/govkit.py epoch --base f8fdd873` reports no FAILED entry. At the inCMS clone the render names `bash scripts/gate.sh`, `.claude/SESSION-KICKOFF.md` and the skill under `~/.claude/skills`, and states the checker phrase. `corpus_ids.py --measure` reads `DEAD_PATH_PIN="6"` before and `DEAD_PATH_PIN="3"` after. The three left are inCMS's two own rows and the review protocol, which inCMS selects `review-harness` for and has not rendered
+- AC6 — `check-memory-hygiene.test.sh` — `ok   a multi-line answer is refused by name and no doc is written`: the `--render` refusal names `{{GATE_RUNNER}}`. Over the f02a3a56 kit it reads `FAIL a multi-line answer rendered (rc=0)`
+- AC7 — `check-memory-hygiene.test.sh` — `ok   an engine below the floor renders the phrases and names the update that repairs it`, with `KIT_PLAYBOOK_RENDER_VERSION` rewritten to 1.10. Over the f02a3a56 kit it reads `FAIL an engine below the floor refused or rendered an answer (rc=0)`. At the nc clone, whose update rolled playbook-render back to 1.0 for a conflict in its own descriptor, the render prints the floor line naming `govkit update --kits playbook-render`
+- AC8 — `check-memory-hygiene.test.sh` — `ok   a non-ASCII answer renders as UTF-8 without UTF-8 mode` and `ok   an engine refusal prints by name without UTF-8 mode`, both under `PYTHONUTF8=0`, the second with `kits` naming `lexcon`. Over the f02a3a56 kit the first exits 2 and the second is a traceback
+- AC9 — `render_playbook.py --selftest` — `render_playbook.selftest OK — 21 arm(s)`, and with the f02a3a56 `resolve_answers` swapped in `FAILED — 1 of 21`, `KITS` and every `kit.<entry>.<key>` answering None. The govkit selftest's `[aRF-42 rev-3 AC9]` arm agrees `--answers` with `target_context` and reds over the f02a3a56 engine. The hygiene suite's `ok   a manifest answered in its kit table renders where govkit installs it` reads `[kit.kickoff-manifest]`, and `ok   two memory roots are refused by name and no doc is written` refuses `[answers] memory_root`; both red over the f02a3a56 kit
+- AC10 — `check-memory-hygiene.test.sh` — `ok   a protocol renders at its receipt row, and one with no row states the phrase` names `docs/rp.md`; `ok   a repo-relative skill renders only when git tracks it`; `ok   with no engine the unattended phrase asserts nothing and the checker sentence names no path`. All three red over the f02a3a56 kit. At the inCMS clone the build method names `bash scripts/gate.sh` and `.claude/SESSION-KICKOFF.md` and states the review-protocol phrase, its parity leg is green, and hygiene check 15 asks for four dead-path rows to be deleted, the review protocol's among them. At nc no unwaived dead path appears, and with the 1.11 engine in place its parity leg is green
+- AC11 — `tools/govkit/selftest.py` — `[aRF-42 rev-3 AC11] a refused regenerate argv's stderr reason is in update's failure line`, red over the f02a3a56 govkit. At an inCMS clone of `f1d1c75a3` under that govkit, `update --kits memory-tree --write` printed `exit 2  REFUSED` twice with no reason anywhere in its output
