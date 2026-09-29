@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-30 — the suites run at a foreign prefix, and the install-prefix gate is a pure ban
 
-**Status:** SPECCED · rev-2 · 2026-09-25 · node a · Tier-2 · base 2143b6d6 · streams tooling · order 15
+**Status:** SPECCED · rev-3 · 2026-09-30 · node a · Tier-2 · base 2143b6d6 · streams tooling · order 18
 
 <!-- gen:spec-records -->
 
@@ -47,7 +47,7 @@ state.
   **Readers:** by name: `tools/check-install-prefix.sh` and its suite are the only programs that
   read either marker; every other file only carries one, and units 24 to 29 strike those.
   by value: NO VALUE READERS, because a marker carries no value beyond its reason text.
-- **S5** — The gate grades one predicate, epoch 5's, over `TOOL-aRepatriatedFork-23` S2's
+- **S5** — The gate grades one predicate, epoch 6's, over `TOOL-aRepatriatedFork-23` S2's
   population, with zero tolerance: any hit reds, naming `<path>:<line>`. Arms 1 and 3 are folded
   into it. Observed by AC5, AC6.
 - **S6** — The gate's header states what it does not check, rewritten for the pure ban: a path
@@ -79,6 +79,10 @@ state.
   them S1's leg is red by construction.
 - **consumes-from** `TOOL-aRepatriatedFork-29` — gov-side files that derive their root, and the
   population rule for gov's own renders.
+- **consumes-from** `TOOL-aRepatriatedFork-46` — the epoch-6 predicate, with its homonym and brace
+  rules, and a ledger left holding only the literal-prefix classes this unit's population rule owns.
+- **consumes-from** `TOOL-aRepatriatedFork-47` — one answer for the `{prefix}` token in every reader,
+  which S1's installs at three prefixes depend on.
 
 ## 4. Design
 
@@ -147,7 +151,7 @@ and an adopter's `govkit update` reports both files as withdrawn.
 - **AC4** — When `git grep -nE 'gov:(root-fixture|prefix-literal)' -- tools skills .githooks` runs,
   it finds nothing.
   Red when: a marker survives anywhere the gate grades.
-- **AC5** — When a scratch clone adds one literal of each epoch-5 spelling to one file, `bash
+- **AC5** — When a scratch clone adds one literal of each epoch-6 spelling to one file, `bash
   tools/check-install-prefix.sh` exits 1 naming each `<path>:<line>`, and with the literals gone
   it exits 0.
   Red when: any spelling passes, or the clean tree reds.
@@ -169,7 +173,7 @@ and an adopter's `govkit update` reports both files as withdrawn.
 New arm: the S1 held leg beside `tools/run-gates/run-selftests.sh` · one suite given back a
 literal prefix in a scratch clone · a new budget row
 
-New arm: `tools/check-install-prefix.test.sh` · one fixture literal per epoch-5 spelling against
+New arm: `tools/check-install-prefix.test.sh` · one fixture literal per epoch-6 spelling against
 the pure ban, and a clean fixture · the suite's floor moves to its new arm count
 
 ## 8. Open questions
@@ -202,6 +206,11 @@ the pure ban, and a clean fixture · the suite's floor moves to its new arm coun
   file and both markers end empty and are deleted, and the gate is a pure ban with no
   grandfathering.
 - rev-2 · 2026-09-25 · §8 resolved by the owner: every fork takes its recommendation.
+- rev-3 · 2026-09-30 · header order 15 -> 18 · §3 Edges · S5 · AC5 · §7 New arm: this unit now
+  follows `TOOL-aRepatriatedFork-46` and `TOOL-aRepatriatedFork-47`, adopted after the drain. The
+  predicate it makes pure is epoch 6's, which 46 moves. The kit-id argv class
+  `TOOL-aRepatriatedFork-28` returned here is closed by 46's homonym rule instead; the other classes
+  28 returned stay this unit's.
 
 ## 10. Reuse audit
 

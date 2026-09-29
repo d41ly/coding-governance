@@ -101,9 +101,9 @@ The ones that set build policy:
 | 12 | `TOOL-aRepatriatedFork-27` | 1 | canonical-copy markers and comment prose name no install prefix |
 | 13 | `TOOL-aRepatriatedFork-29` | 2 | gov's own gates and declarations derive the prefix they name |
 | 14 | `TOOL-aRepatriatedFork-28` | 2 | every suite builds its fixtures at a prefix it derives |
-| 15 | `TOOL-aRepatriatedFork-30` | 2 | the suites run at a foreign prefix; the install-prefix gate is a pure ban |
 | 16 | `TOOL-aRepatriatedFork-31` | 1 | gov's shipped files carry no adopter name |
 | 17 | `TOOL-aRepatriatedFork-32` | 1 | every branch of hygiene check 21 honours RECORD_SERVES_CUTOFF |
+| 18 | `TOOL-aRepatriatedFork-30` | 2 | the suites run at a foreign prefix; the install-prefix gate is a pure ban |
 | 18 | `TOOL-aRepatriatedFork-35` | 1 | gov's shipped files name no adopter, inCMS included |
 | 19 | `TOOL-aRepatriatedFork-36` | 2 | the recall kit converges at adopters: no forked rule, and an owned hook is declared |
 | 19 | `TOOL-aRepatriatedFork-37` | 1 | the unattended suite derives the repair pointer it asserts |
@@ -163,9 +163,9 @@ ids TOOL-aRepatriatedFork-43 TOOL-aRepatriatedFork-44 TOOL-aRepatriatedFork-45 T
 | [TOOL-aRepatriatedFork-27 — canonical-copy markers and comment prose name no install prefix](spec/2026-09-25-spec-TOOL-aRepatriatedFork-27.md) | 12 | 1 | CLOSED | rev-2 | 2026-09-29 |
 | [TOOL-aRepatriatedFork-29 — gov's own gates and declarations derive the prefix they name](spec/2026-09-25-spec-TOOL-aRepatriatedFork-29.md) | 13 | 2 | CLOSED | rev-3 | 2026-09-29 |
 | [TOOL-aRepatriatedFork-28 — every suite builds its fixtures at a prefix it derives](spec/2026-09-25-spec-TOOL-aRepatriatedFork-28.md) | 14 | 2 | CLOSED | rev-3 | 2026-09-30 |
-| [TOOL-aRepatriatedFork-30 — the suites run at a foreign prefix, and the install-prefix gate is a pure ban](spec/2026-09-25-spec-TOOL-aRepatriatedFork-30.md) | 15 | 2 | SPECCED | rev-2 | 2026-09-25 |
 | [TOOL-aRepatriatedFork-31 — gov's shipped files carry no adopter name](spec/2026-09-25-spec-TOOL-aRepatriatedFork-31.md) | 16 | 1 | CLOSED | rev-2 | 2026-09-25 |
 | [TOOL-aRepatriatedFork-32 — every branch of hygiene check 21 honours `RECORD_SERVES_CUTOFF`](spec/2026-09-25-spec-TOOL-aRepatriatedFork-32.md) | 17 | 1 | CLOSED | rev-3 | 2026-09-26 |
+| [TOOL-aRepatriatedFork-30 — the suites run at a foreign prefix, and the install-prefix gate is a pure ban](spec/2026-09-25-spec-TOOL-aRepatriatedFork-30.md) | 18 | 2 | SPECCED | rev-3 | 2026-09-30 |
 | [TOOL-aRepatriatedFork-35 — gov's shipped files name no adopter, inCMS included](spec/2026-09-25-spec-TOOL-aRepatriatedFork-35.md) | 18 | 1 | CLOSED | rev-2 | 2026-09-25 |
 | [TOOL-aRepatriatedFork-36 — the recall kit converges at adopters](spec/2026-09-25-spec-TOOL-aRepatriatedFork-36.md) | 19 | 2 | CLOSED | rev-3 | 2026-09-26 |
 | [TOOL-aRepatriatedFork-37 — the unattended suite derives the repair pointer it asserts](spec/2026-09-25-spec-TOOL-aRepatriatedFork-37.md) | 19 | 1 | CLOSED | rev-2 | 2026-09-25 |
@@ -204,10 +204,9 @@ TOOL-aRepatriatedFork-37 TOOL-aRepatriatedFork-38 TOOL-aRepatriatedFork-39 TOOL-
 | 12 | `TOOL-aRepatriatedFork-27` | no |
 | 13 | `TOOL-aRepatriatedFork-29` | no |
 | 14 | `TOOL-aRepatriatedFork-28` | no |
-| 15 | `TOOL-aRepatriatedFork-30` | no |
 | 16 | `TOOL-aRepatriatedFork-31` | no |
 | 17 | `TOOL-aRepatriatedFork-32` | no |
-| 18 | `TOOL-aRepatriatedFork-35` | no |
+| 18 | `TOOL-aRepatriatedFork-30`, `TOOL-aRepatriatedFork-35` | yes |
 | 19 | `TOOL-aRepatriatedFork-36`, `TOOL-aRepatriatedFork-37`, `TOOL-aRepatriatedFork-38`, `TOOL-aRepatriatedFork-39`, `TOOL-aRepatriatedFork-40`, `TOOL-aRepatriatedFork-42` | yes |
 | 20 | `DEPL-aRepatriatedFork-20` | no |
 <!-- /gen:build-order -->
