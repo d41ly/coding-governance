@@ -41,10 +41,13 @@
 # WHAT THIS GATE DOES NOT CHECK, said out loud because a structural check reads as a semantic one to
 # everyone who did not write it. It does not know whether a path is CORRECT — only whether it is
 # spelled at a prefix that will not exist in an adopter's tree. It does not read `memory/`, this
-# repo's own records, which are not shipped and are repo-root-relative by convention. It does not
-# grade a file no descriptor resolves, so a kit whose descriptor forgets a file is invisible here
-# and is `selfcheck`'s job. And it grades TEXT: a path assembled at run time from variables is
-# outside the predicate entirely.
+# repo's own records, which are not shipped and are repo-root-relative by convention. Arms 1 and 3
+# do not grade a file no descriptor resolves; the ban list below DOES, since epoch 5, because its
+# population is every tracked file under the kit surface, shipped or not, and it is the one account
+# of what is left to drain. It grades TEXT: a path assembled at run time from two variables is
+# outside every predicate. The ban does not count a bare `tools/` with no segment after it, a
+# directory-only kit reference under any prefix but gov's, or a kit segment with no file after it;
+# its homonym rule is a context heuristic (see the epoch-5 block) and says where it stops.
 set -u
 # TOOL-cWidenedNet-1 S4 — CAPTURED BEFORE THE `cd`, because `$0` may be relative and the `cd` below
 # moves out from under it.
@@ -112,6 +115,10 @@ if [ "$KIT_SOURCE" != yes ]; then
   echo "install-prefix: that looks like a pass is indistinguishable from coverage."
   exit 0
 fi
+# TOOL-aRepatriatedFork-23 — sourced ONCE, here, for the two python programs below: arm 3 and the
+# ban's counter. It used to sit inside arm 3, which the ban's modes never reach.
+# shellcheck source=/dev/null
+. "${REGISTRY%/*}/../lib/resolve-python.sh"   # the resolver beside the registry the kit-source test found
 # The python launcher for the carried-prefix arm below, resolved through the repo's ONE resolver and
 # through nothing else. There is deliberately no `PY=python` fallback: the MS-Store `python3` stub
 # answers `command -v` and exits 9009, so a bare launcher name is not an answer — and the idiom ban
@@ -364,8 +371,6 @@ fi
 # text built at run time, a Python path built by `str.join`, and any file no descriptor resolves.
 # An empty population is a dead probe and refuses; it never reads as clean.
 if [ "$MODE" = --check ] || [ "$MODE" = --list ]; then
-  # shellcheck source=/dev/null
-  . "${REGISTRY%/*}/../lib/resolve-python.sh"   # the resolver beside the registry the kit-source test found
   _rt_py=$(resolve_python) || { echo "install-prefix: the runtime-literal arm has no usable python"; exit 1; }
   _rt_pop=$("$_rt_py" "${REGISTRY%/*}/govkit.py" shipped | tr -d '\r' \
             | awk -F'\t' '$2 == "engine" || $2 == "rendered" { print $3 }' \
@@ -574,7 +579,7 @@ fi
 # So it is guarded by a value that a definitional change MUST move and an ordinary pass CANNOT:
 # this epoch, recorded in the ratchet's own header. `--rebaseline` refuses unless the two differ,
 # which makes it one-shot per predicate change and useless for absorbing a literal.
-PREDICATE_EPOCH=4
+PREDICATE_EPOCH=5
 
 # epoch 1 — `tools/<kit>/<file>.<ext>`, a kit DIRECTORY segment required.
 # epoch 2 — TOOL-aScouredKit-20. Adds a LOOSE file directly under `tools/`, which epoch 1 could not
@@ -609,6 +614,37 @@ PREDICATE_EPOCH=4
 #   THE LEAD CLASS IS ALSO THIS COMMENT'S PROBLEM. A backtick is not in it, so a sentence here that
 #   quotes a kit path in full is itself a hit — TOOL-cMendedVintage-4 held its own row that way.
 #   Name the prefix or name the file, never both.
+# epoch 5 — TOOL-aRepatriatedFork-23. The ban stops grading a SUBSET of the class. Epoch 4 counted
+#   one spelling inside the shipped set, and a census at 2143b6d6 found about 1500 more literals it
+#   could not see, so a drain graded by it would have read zero with most of the class in place.
+#   Five changes, each measured over the real tree before it was wired:
+#   * THE POPULATION is every tracked file under the kit surface, `skills/`, `.githooks/`, every
+#     template and the runbook, shipped or not — `git ls-files`, no descriptor consulted. Only this
+#     ban list and the waiver registry stay out, both being lists of paths.
+#   * `/` LEFT THE LEAD CLASS, so `$ROOT/`, `<project>/` and `<gov>/` leads count (§8 F2 of the
+#     unit's spec: a `<gov>/` spelling is derived where printed and a prose token elsewhere). A
+#     directory-only `tools/<kit>` counts, and a loose `tools/<name>.<ext>` counts whether or not that
+#     file exists: the epoch-2 existence filter is gone, because a fixture's loose name is a literal
+#     the owner ruled in scope.
+#   * A KIT SEGMENT followed by a file counts at the root, under ANY literal prefix and under a
+#     derived base — F4 and F1: a kit's name typed as a literal is the class whatever leads it. Only
+#     the drained forms do not: a `{prefix}`, `{kit}` or `{{TOOL_ROOT}}` render token, or a
+#     `<prefix>/` or `<tool-root>/` prose token.
+#   * A QUOTED `"tools"` counts when it is JOINED — by `/`, by `,` to a quoted segment, or inside a
+#     `join(` call — and a quoted kit segment counts when used as a path segment. A mapping key is
+#     not joined and does not count.
+#   * HOMONYMS are read from context: a path through a tool-owned dot directory (a Skill directory
+#     under `.claude/skills/`, a git `hooks/`, a CI `workflows/`), or joined onto an operand naming a
+#     git directory or a transcript. That last one is a NAME heuristic and its ceiling is written
+#     where it lives, in the counter below.
+#   The grep and awk pipeline could not read a join's operand, so the counter is a python program
+#   beside arm 3's, and a counter that DIES refuses rather than printing zero rows (the D3 class).
+#   Markers and waiver rows have NO effect here: they still excuse a line from arms 1 and 3, and the
+#   ban counts it, so this list is the one account of what is left to drain.
+#   COST, measured by the one --rebaseline on node a: rows 139 -> 223 and occurrences 905 -> 3674,
+#   over 324 tracked files of which 58 no descriptor ships. The unit's acceptance ledger splits the
+#   rise by rule and reconciles it to the census. A --check went from 27-28 s to 22-24 s wall: one
+#   python pass replaced three derivations of the received set and a grep per epoch-2 filter.
 
 
 carried_live() {
@@ -620,74 +656,158 @@ carried_live() {
   # the placeholder form arm 9 blesses and the identical run claims the derivation DIED.
   #
   # The population is what proves the probe can move. The hit count is the answer and is free to be
-  # zero.
-  derive_received_files | tr -d '\r' | grep -c . || true
+  # zero. Epoch 5: it is the ban's OWN population, the one the counter reads.
+  derive_carried_files | grep -c . || true
+}
+
+derive_carried_files() {
+  # TOOL-aRepatriatedFork-23 S2 — EVERY tracked file under the kit surface, shipped or not. The ban
+  # used to read `derive_received_files`, so a file no descriptor resolved carried literals nobody
+  # counted: 57 of them at 2143b6d6, and the drain would have reached zero with them in place. This
+  # list and the waiver registry stay out, because every row in either IS a path.
+  git ls-files -- "${SELF_PREFIX}*" 'skills/*' '.githooks/*' '*.template.*' 'WIRE-INTO-PROJECT.md' \
+    | tr -d '\r' | grep -vxF -e "$CARRIED" -e "$WAIVERS" | LC_ALL=C sort -u
 }
 
 carried_rows() {
   # THE ONE EMITTER. `--list`'s section and the ratchet file are the same rows from the same call, so
-  # a report that disagrees with the artifact is not reachable. A row is
-  # `<path>\t<count>\t<kits>`: the count is OCCURRENCES per path,
-  # not hit lines. `grep -c` counted a line carrying two literals ONCE, so a second literal added
-  # beside an existing one -- or one kit's path swapped for another's -- held the count level while
-  # the surface it grades changed. DEPL-dGaugedVintage-7. Measured before the change: appending one
-  # line carrying two literals moved a file 3 -> 4 where occurrences make it 3 -> 5. `grep -o` emits
-  # one line per MATCH prefixed `<path>:`, and awk tallies per path; repo-relative paths carry no
-  # colon, so splitting on the first is exact here. The old note read: hit LINES per path, a
-  # line carrying two literals counts once. The regex is the arm above's with the SHIPPING prefix
-  # bound, and `{`/`}` stay in the excluded lead class for the reason that arm already gives — the
-  # corrected placeholder form must not be a hit.
-  # EPOCH 2. The second alternative is the loose file, and it is fenced on both sides: `(?!/)` is
-  # unavailable in POSIX ERE, so the trailing `[^/]` job is done by the existence filter below —
-  # a `tools/foo/` prefix never names an existing loose file, so it cannot double-count.
-  # EPOCH 4, THE LEAD CLASS. `-` left this class so a shell default expansion reaches the ban: a
-  # variable that resolves at the target's prefix, with a hardcoded fallback that resolves only at
-  # gov's, is the commonest way a dead literal is spelled here and every one of them was invisible.
-  # `/` STAYS, and that is measured rather than tidy — see the epoch block above.
-  local re_ship="(^|[^/{}[:alnum:]._])tools/(($alt)/[A-Za-z0-9_.-]+|[A-Za-z0-9_.-]+)\.($EXT)"
-  # `tr -d '\r'` because python's `print` translates newlines on Windows, so every path arrives with
-  # a trailing CR and `[ -f "$f" ]` answers false for all 181 of them — a population that silently
-  # becomes empty, which is the shape this whole unit is written against. The arm above already does
-  # this to its own file list, one line up, for the same reason.
-  # TOOL-aScouredKit-6 — ONE `grep -cE` over the whole population, not one PER FILE. With several
-  # files `grep -c` prefixes each count with `<file>:`, which is the `<file>\t<count>` pair this
-  # loop was building by hand — so the awk below only re-shapes the separator and drops the zeros
-  # the loop was dropping with its own `-gt 0` test. Output is byte-identical, sort included.
+  # a report that disagrees with the artifact is not reachable. A row is `<path>\t<count>\t<kits>`:
+  # the count is OCCURRENCES per path, not hit lines, because a line carrying two literals counted
+  # once held the count level while the surface it grades changed (DEPL-dGaugedVintage-7). The kits
+  # column names each kit a path's literals name, sorted, and `(loose)` for a name directly under
+  # gov's prefix or a join to no kit.
   #
-  # The `[ -f "$f" ]` guard is preserved as a filter on the LIST rather than as a per-file test:
-  # grep would report a missing path on stderr and skip it, so dropping the guard would change
-  # what a stale population does, and this arm exists to grade one.
+  # EPOCH 5 — the counter is the python program below, not a `grep -oE` and two awks. What it needs
+  # that a regex cannot give it is the OPERAND a join starts from: `common / "<kit>"` and
+  # `parent / "<kit>"` are one shape, and only the operand says which is a git-dir sidecar and which
+  # names a sibling kit. Its rules and their order are the epoch-5 block above.
   #
-  # `grep -c` exits 1 when every file counts zero, which is a legitimate and desirable state here,
-  # so the pipeline is terminated with `|| true`.
-  derive_received_files | tr -d '\r' | while IFS= read -r f; do
-    [ -n "$f" ] || continue
-    [ -f "$f" ] || continue
-    printf '%s\0' "$f"
-  done | xargs -0 -r grep -oHE "$re_ship" -- 2>/dev/null \
-       | awk -F: -v ext="$EXT" -v tracked="$(git ls-files -- 'tools/*' | tr '\n' ' ')" '
-           BEGIN { n = split(tracked, T, " "); for (i = 1; i <= n; i++) have[T[i]] = 1 }
-           {
-             p = $1; m = $0; sub(/^[^:]*:/, "", m)
-             if (match(m, /tools\/[^\/]+\//)) { k = substr(m, RSTART+6, RLENGTH-7) }
-             else {
-               # EPOCH 2, THE EXISTENCE FILTER. A loose-file literal counts only when the file it
-               # names is really there. Without it, 76 FIXTURE names in seven test helpers become
-               # hits and the arm reds files whose only crime is having a fixture called `gate-a.sh`.
-               # TOOL-cWidenedNet-1 S1: the extension class arrives as `ext` rather than being
-               # spelled again here. This was the third copy of one alternation, and a third copy
-               # is a third chance for the widening to reach two of them.
-               if (match(m, "tools/[A-Za-z0-9_.-]+\\.(" ext ")") == 0) next
-               lit = substr(m, RSTART, RLENGTH)
-               sub(/^[^t]*/, "", lit)
-               if (!(lit in have)) next
-               k = "(loose)"
-             }
-             print p "\t" k
-           }' \
-       | LC_ALL=C sort \
-       | awk -F'\t' '{ n[$1]++; if ($2 != last[$1]) { kits[$1] = (kits[$1] == "" ? $2 : kits[$1] "," $2); last[$1] = $2 } } END { for (q in n) printf "%s\t%s\t%s\n", q, n[q], kits[q] }' \
-       | LC_ALL=C sort || true
+  # A COUNTER THAT DIES REFUSES. The D3 class from DEPL-dCarriedReceipt's closing review: a dead
+  # producer at the head of a pipe yields zero rows at the pipe's exit 0, and the ban then compares
+  # empty against empty forever. So the status returned here is python's, and every caller reds on
+  # it. The rows go out as BYTES, because python's text-mode `print` writes CRLF on Windows.
+  local _py _out _rc
+  _py=$(resolve_python) || return 1
+  IFS= read -r -d '' _carried_src <<'CARRIED_PY' || true
+import os
+import re
+import sys
+
+files = [f.strip("\r") for f in sys.stdin.read().split("\n") if f.strip()]
+kits = [k for k in os.environ.get("CARRIED_KITS", "").split("\n") if k]
+EXT = os.environ.get("CARRIED_EXT", "")
+if not files or not kits or not EXT:
+    sys.stderr.write("install-prefix: the ban's counter got %d file(s), %d kit name(s) and %s extension"
+                     " class — a dead probe, not a pass\n" % (len(files), len(kits), "an" if EXT else "no"))
+    sys.exit(2)
+NP = "A-Za-z0-9_.-"
+Q = "[\"']"
+KIT = "|".join(sorted(map(re.escape, kits), key=len, reverse=True))
+FILE = re.compile(r"[%s]+\.(?:%s)(?![%s])" % (NP, EXT, NP))
+GOVPFX = re.compile(r"(?<![{}A-Za-z0-9_.])tools/(?:(?P<k>%s)(?![%s])(?:/[%s]*)?|[%s]+\.(?:%s)(?![%s]))"
+                    % (KIT, NP, NP, NP, EXT, NP))
+QGOV = re.compile(r"(%s)tools\1" % Q)
+KSEG = re.compile(r"(?<![%s])(?P<k>%s)/(?P<rest>[%s]*)" % (NP, KIT, NP))
+QKIT = re.compile(r"(%s)(?P<k>%s)\1" % (Q, KIT))
+DOTDIR = re.compile(r"^\.[A-Za-z]")
+# ponytail: a NAME heuristic over the operand a join starts from. Its ceiling: a git directory or a
+# transcript held in a variable named otherwise counts as a kit path. The remedy is a name that says
+# what the variable holds, never a marker: markers have no effect on this list.
+NONKIT = re.compile(r"(?i)git|\bgd\b|\bcommon\b|\bsdir\b|session|transcript")
+
+
+def derive_operand(before):
+    """The operand a join starts from: the text after the last `=`, `,`, `(`, `[` or `{`, every
+    balanced call collapsed first so that `f(g())` does not hide `f`."""
+    s = before
+    while True:
+        t = re.sub(r"\([^()]*\)", "", s)
+        if t == s:
+            return re.split(r"[=,(\[{]", s)[-1]
+        s = t
+
+
+def check_homonym(operand):
+    return bool(NONKIT.search(operand) or re.search(r"%s\.[A-Za-z]" % Q, operand))
+
+
+def scan_line(line):
+    work = re.sub(r"\\[ntr]", "  ", line)  # a path after a `\n` escape reads as after a space
+    out = []
+
+    def add(a, b, kit):
+        nonlocal work
+        out.append(kit)
+        work = work[:a] + "\0" * (b - a) + work[b:]
+
+    # 1. a quoted gov-prefix segment, JOINED: by `/`, by `,` to a quoted segment, or in a join( call
+    for m in QGOV.finditer(work):
+        a, b = m.span()
+        before, after = work[:a], work[b:]
+        if not (re.match(r"\s*/(?!/)", after) or re.match(r"\s*,\s*%s" % Q, after)
+                or re.search(r"/\s*$", before) or re.search(r"join\([^()]*,\s*$", before)):
+            continue  # a mapping key, a list member, an argument: not a path segment (S4)
+        nx = re.match(r"\s*[/,]\s*(%s)(?P<s>[%s]*)\1" % (Q, NP), after)
+        kit, end = "(loose)", b
+        if nx:
+            kit, end = (nx.group("s") if nx.group("s") in kits else "(loose)"), b + nx.end()
+        add(a, end, kit)
+    # 2. gov's prefix followed by a kit (directory-only or not) or a loose `<name>.<ext>`, after any
+    #    lead but a path character or a brace — `/` included, so `$ROOT/`, `<gov>/`, `<project>/`
+    for m in GOVPFX.finditer(work):
+        add(m.start(), m.end(), m.group("k") or "(loose)")
+    # 3. `<kit>/<file>.<ext>` at the root, under any literal prefix (F4) and under a derived base (F1)
+    for m in KSEG.finditer(work):
+        a, before = m.start(), work[:m.start()]
+        if not FILE.match(m.group("rest")):
+            continue
+        if before.endswith("/"):
+            if before[-2:-1] in ("}", "\0") or re.search(r"<(?:prefix|tool-root)>/$", before):
+                continue  # `{prefix}/`, `{kit}/`, `<prefix>/`: the drained form
+            operand = re.split(r"[\s\"'`=(]", before)[-1]
+            if any(DOTDIR.match(s) for s in operand.split("/")) or NONKIT.search(operand):
+                continue  # a Skill dir, a git `hooks/`, a sidecar under the git dir (S4)
+        elif before[-1:] in ("}", "{", "\0"):
+            continue  # `{{TOOL_ROOT}}<kit>/…`, the drained form
+        add(a, m.end(), m.group("k"))
+    # 4. a quoted kit segment used as a path segment: joined by `/` (F1, arm 3's P3 shape), or by `,`
+    #    after a quoted literal prefix segment (F4) — unless the operand makes it a homonym (S4)
+    for m in QKIT.finditer(work):
+        a, b = m.span()
+        before, after = work[:a], work[b:]
+        if re.search(r"/\s*$", before) or re.match(r"\s*/(?!/)", after):
+            if check_homonym(derive_operand(before)):
+                continue
+        else:
+            pre = re.search(r"(%s)(?P<p>[%s]+)\1\s*,\s*$" % (Q, NP), before)
+            if not pre or DOTDIR.match(pre.group("p")) or pre.group("p") == "..":
+                continue
+        add(a, b, m.group("k"))
+    return out
+
+
+rows = {}
+for f in files:
+    try:
+        src = open(f, encoding="utf-8", errors="replace", newline="").read().replace("\r\n", "\n")
+    except OSError:
+        continue
+    for line in src.split("\n"):
+        got = scan_line(line)
+        if got:
+            rows.setdefault(f, []).extend(got)
+sys.stdout.buffer.write("".join("%s\t%d\t%s\n" % (f, len(rows[f]), ",".join(sorted(set(rows[f]))))
+                                for f in sorted(rows)).encode("utf-8"))
+CARRIED_PY
+  _out=$(derive_carried_files | CARRIED_KITS="$kits" CARRIED_EXT="$EXT" "$_py" -c "$_carried_src"); _rc=$?
+  [ -n "$_out" ] && printf '%s\n' "$_out"
+  return "$_rc"
+}
+
+print_counter_death() {
+  echo "install-prefix: the ban's COUNTER died (no usable python, or it refused its input), so it"
+  echo "install-prefix: measured nothing. Refusing to read that as a population carrying zero"
+  echo "install-prefix: literals: a dead producer is the D3 class, not a clean result."
 }
 
 # A repo that is not a kit source exited at the kit-source test near the top, with this arm's SKIP.
@@ -708,7 +828,7 @@ if [ "$MODE" = --write-ratchet ]; then
 install-prefix: the derivation resolved no shippable sources at all, which means it DIED rather than
 install-prefix: that this repo ships nothing. Refusing to truncate $CARRIED over a probe that cannot
 install-prefix: move. A zero HIT count is fine and is the goal; a zero population is a dead probe."; exit 1; }
-  rows=$(carried_rows)
+  rows=$(carried_rows) || { print_counter_death; exit 1; }
   # ==================== TOOL-dRetiredFork-17 S3 — THE RATCHET IS NOW A BAN ====================
   # THE ONE CHANGE THAT CONVERTS THEM, and it is here rather than on the check path. A shrink-only
   # ratchet slows the class without closing it: a new literal may still enter, it just has to be
@@ -783,7 +903,7 @@ elif [ "$MODE" = --rebaseline ]; then
   fi
   [ "$(carried_live)" -gt 0 ] || { echo "install-prefix: the population is empty — refusing to rebaseline over a dead probe."; exit 1; }
   before=$(grep -cE '^[^#]' "$CARRIED" 2>/dev/null || echo 0)
-  rows=$(carried_rows)
+  rows=$(carried_rows) || { print_counter_death; exit 1; }
   keep=$(grep -E '^[[:space:]]*#' "$CARRIED" 2>/dev/null | grep -v '^# predicate-epoch:' || true)
   reasons=$(printf '%s\n' "$rows" | awk -F'\t' -v OFS='\t' '
     NR==FNR { if ($0 !~ /^[[:space:]]*(#|$)/ && NF>3) { r[$1]=$4 } next }
@@ -798,8 +918,9 @@ elif [ "$MODE" = --rebaseline ]; then
   echo "install-prefix: say in the commit message what the predicate now sees that it did not."
   exit 0
 elif [ "$MODE" = --list ]; then
-  echo "install-prefix: carried-prefix rows (the shipping spelling, inside the shippable set):"
-  carried_rows | sed 's/^/  /'
+  echo "install-prefix: carried-prefix rows (every kit-path spelling, over every tracked file under the kit surface):"
+  _lr=$(carried_rows) || print_counter_death
+  [ -n "$_lr" ] && printf '%s\n' "$_lr" | sed 's/^/  /'
 else
   # D3's other half: the same liveness assertion on the CHECK path, so a dead derivation cannot
   # report a clean empty population against an empty ratchet either. It is FIRST because everything
@@ -807,7 +928,7 @@ else
   [ "$(carried_live)" -gt 0 ] || { echo "install-prefix: the carried-prefix POPULATION is empty — that is not a pass.
 install-prefix: the derivation resolved no shippable sources, which means it DIED rather than that
 install-prefix: this repo ships nothing. A zero HIT count is fine; a zero population is a dead probe."; exit 1; }
-  rows=$(carried_rows)
+  rows=$(carried_rows) || { print_counter_death; exit 1; }
   # `-s` not `-f` (D4): an empty-but-present file passed an existence check and then met the awk.
   # L1's other half: once the hit set legitimately reaches zero, an EMPTY ratchet is the correct
   # committed state, so it is only "missing" while something still carries a literal. This sits

@@ -28,7 +28,7 @@ include = ["install-prefix-carried.txt"]
 role = "generated"
 to = "{prefix}/install-prefix-carried.txt"
 claims = ["tools/install-prefix-carried.txt"]
-note = "DEPL-dCarriedReceipt-15 S4. The carried-prefix ratchet, one row per shipped file that spells the SHIPPING prefix in its body. `generated` and NOT copied for the same reason the waiver registry beside it is not: the rows are measurements of THIS repo's shippable set, and a target's set is its own. An adopter that ships kits onward runs `--write-ratchet` once and commits what it measured; a target that does not is skipped by the arm entirely and never needs the file."
+note = "DEPL-dCarriedReceipt-15 S4. The carried-prefix ban list, one row per tracked file under the kit surface that spells a kit path in its body (every such file since predicate epoch 5, TOOL-aRepatriatedFork-23, shipped or not). `generated` and NOT copied for the same reason the waiver registry beside it is not: the rows are measurements of THIS repo's shippable set, and a target's set is its own. An adopter that ships kits onward runs `--write-ratchet` once and commits what it measured; a target that does not is skipped by the arm entirely and never needs the file."
 
 [adopt]
 argv = []

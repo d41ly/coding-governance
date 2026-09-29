@@ -1,12 +1,13 @@
 # TOOL-aRepatriatedFork-23 — the install-prefix ban counts every kit path it cannot see today
 
-**Status:** SPECCED · rev-3 · 2026-09-29 · node a · Tier-2 · base 2143b6d6 · streams tooling · order 8
+**Status:** CLOSED · rev-3 · 2026-09-29 · node a · Tier-2 · base 2143b6d6 · streams tooling · order 8
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-25-build-TOOL-aRepatriatedFork-23-prefix-census.md](../build/2026-09-25-build-TOOL-aRepatriatedFork-23-prefix-census.md) | research | TOOL-aRepatriatedFork-24 TOOL-aRepatriatedFork-25 TOOL-aRepatriatedFork-26 TOOL-aRepatriatedFork-27 TOOL-aRepatriatedFork-28 TOOL-aRepatriatedFork-29 TOOL-aRepatriatedFork-30 |
+| [2026-09-29-build-TOOL-aRepatriatedFork-23-1-acceptance-ledger.md](../build/2026-09-29-build-TOOL-aRepatriatedFork-23-1-acceptance-ledger.md) | journal | — |
 | [2026-09-29-prompt-TOOL-aRepatriatedFork-23-build-brief.md](../prompts/2026-09-29-prompt-TOOL-aRepatriatedFork-23-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
