@@ -9,7 +9,9 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-gates-run: unattended-179069523247802327612-3834684 9f4384f1
+asks-at-landing: TOOL-dDerivedDocket-38=OPEN TOOL-dDerivedDocket-39=OPEN TOOL-dDerivedDocket-40=OPEN TOOL-dDerivedDocket-41=OPEN TOOL-dDerivedDocket-42=OPEN TOOL-dDerivedDocket-43=OPEN TOOL-dDerivedDocket-44=OPEN TOOL-dDerivedDocket-45=OPEN TOOL-dDerivedDocket-46=OPEN TOOL-dDerivedDocket-47=OPEN TOOL-dDerivedDocket-55=OPEN TOOL-dDerivedDocket-56=OPEN TOOL-dDerivedDocket-57=OPEN TOOL-dDerivedDocket-58=OPEN TOOL-dDerivedDocket-59=OPEN TOOL-dDerivedDocket-60=OPEN TOOL-dDerivedDocket-66=OPEN TOOL-dDerivedDocket-67=OPEN TOOL-dDerivedDocket-68=OPEN TOOL-dDerivedDocket-69=OPEN
+units-at-landing: TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-37 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-50 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-51 TOOL-dDerivedDocket-53 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-48 TOOL-dDerivedDocket-49 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-52 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-54 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-61 TOOL-dDerivedDocket-62 TOOL-dDerivedDocket-63 TOOL-dDerivedDocket-64 TOOL-dDerivedDocket-65 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 PLAY-dDerivedDocket-1 TOOL-dDerivedDocket-36 DEPL-dDerivedDocket-1
+gates-run: unattended-1790696014933778447-3921195 620137e8
 parked-surfaced: yes
 keepalive-reaped: yes
 lease-utc: 2026-09-28T17:10:32Z
@@ -26,7 +28,7 @@ hold-until: owner
 hold-code: host-owner-action
 held-from: VERIFYING
 witness: ef34d15c537c1b990ed3f6608c20296e7db46d81
-phase: VERIFYING
+phase: LANDING
 branch-sha: abac6d59cae3baf711fac4d275bf13a401e01901
 branch-ref: refs/heads/branch/backlog-maintenance-mechanics-10588f
 mode: prompt
