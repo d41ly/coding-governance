@@ -68,8 +68,8 @@ state.
 
 ### Edges
 
-- **consumes-from** `TOOL-aRepatriatedFork-23` — the epoch-5 predicate and population, which become
-  the pure ban's.
+- **consumes-from** `TOOL-aRepatriatedFork-23` — the ban's population, which becomes the pure ban's.
+  Its predicate reaches this unit as epoch 6, through `TOOL-aRepatriatedFork-46`.
 - **consumes-from** `TOOL-aRepatriatedFork-24` — a waiver registry four rows shorter, and hooks that
   run at the prefixes S1 installs at.
 - **consumes-from** `TOOL-aRepatriatedFork-25` — ledger rows at zero for received code.

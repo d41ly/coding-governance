@@ -103,6 +103,7 @@ The ones that set build policy:
 | 14 | `TOOL-aRepatriatedFork-28` | 2 | every suite builds its fixtures at a prefix it derives |
 | 15 | `TOOL-aRepatriatedFork-45` | 1 | a renamed-away filename is a dead-path needle |
 | 16 | `TOOL-aRepatriatedFork-31` | 1 | gov's shipped files carry no adopter name |
+| 16 | `TOOL-aRepatriatedFork-46` | 2 | no line joins a literal kit name under a derived base |
 | 17 | `TOOL-aRepatriatedFork-32` | 1 | every branch of hygiene check 21 honours RECORD_SERVES_CUTOFF |
 | 18 | `TOOL-aRepatriatedFork-30` | 2 | the suites run at a foreign prefix; the install-prefix gate is a pure ban |
 | 18 | `TOOL-aRepatriatedFork-35` | 1 | gov's shipped files name no adopter, inCMS included |
@@ -125,7 +126,7 @@ with no hand edit between the update and the bar.** One observation at each adop
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 41 unit(s) · node a · opened 2026-09-23 · streams tooling+deployer+playbook
+**Build status:** SPECCED · 42 unit(s) · node a · opened 2026-09-23 · streams tooling+deployer+playbook
 ids DEPL-aRepatriatedFork-1 DEPL-aRepatriatedFork-13 DEPL-aRepatriatedFork-14 DEPL-aRepatriatedFork-17 DEPL-aRepatriatedFork-20 DEPL-aRepatriatedFork-21 DEPL-aRepatriatedFork-22 DEPL-aRepatriatedFork-23 TOOL-aRepatriatedFork-2 TOOL-aRepatriatedFork-3 TOOL-aRepatriatedFork-4 TOOL-aRepatriatedFork-5
 ids TOOL-aRepatriatedFork-6 TOOL-aRepatriatedFork-7 TOOL-aRepatriatedFork-8 TOOL-aRepatriatedFork-9 TOOL-aRepatriatedFork-10 TOOL-aRepatriatedFork-11 TOOL-aRepatriatedFork-12 TOOL-aRepatriatedFork-15 TOOL-aRepatriatedFork-16 TOOL-aRepatriatedFork-18 TOOL-aRepatriatedFork-19 TOOL-aRepatriatedFork-20
 ids TOOL-aRepatriatedFork-21 TOOL-aRepatriatedFork-22 TOOL-aRepatriatedFork-23 TOOL-aRepatriatedFork-24 TOOL-aRepatriatedFork-25 TOOL-aRepatriatedFork-26 TOOL-aRepatriatedFork-27 TOOL-aRepatriatedFork-28 TOOL-aRepatriatedFork-29 TOOL-aRepatriatedFork-30 TOOL-aRepatriatedFork-31
@@ -166,6 +167,7 @@ ids TOOL-aRepatriatedFork-43 TOOL-aRepatriatedFork-44 TOOL-aRepatriatedFork-45 T
 | [TOOL-aRepatriatedFork-28 — every suite builds its fixtures at a prefix it derives](spec/2026-09-25-spec-TOOL-aRepatriatedFork-28.md) | 14 | 2 | CLOSED | rev-3 | 2026-09-30 |
 | [TOOL-aRepatriatedFork-45 — a renamed-away filename is a dead-path needle](spec/2026-09-30-spec-TOOL-aRepatriatedFork-45.md) | 15 | 1 | SPECCED | rev-1 | 2026-09-30 |
 | [TOOL-aRepatriatedFork-31 — gov's shipped files carry no adopter name](spec/2026-09-25-spec-TOOL-aRepatriatedFork-31.md) | 16 | 1 | CLOSED | rev-2 | 2026-09-25 |
+| [TOOL-aRepatriatedFork-46 — no line joins a literal kit name under a derived base](spec/2026-09-30-spec-TOOL-aRepatriatedFork-46.md) | 16 | 2 | SPECCED | rev-1 | 2026-09-30 |
 | [TOOL-aRepatriatedFork-32 — every branch of hygiene check 21 honours `RECORD_SERVES_CUTOFF`](spec/2026-09-25-spec-TOOL-aRepatriatedFork-32.md) | 17 | 1 | CLOSED | rev-3 | 2026-09-26 |
 | [TOOL-aRepatriatedFork-30 — the suites run at a foreign prefix, and the install-prefix gate is a pure ban](spec/2026-09-25-spec-TOOL-aRepatriatedFork-30.md) | 18 | 2 | SPECCED | rev-3 | 2026-09-30 |
 | [TOOL-aRepatriatedFork-35 — gov's shipped files name no adopter, inCMS included](spec/2026-09-25-spec-TOOL-aRepatriatedFork-35.md) | 18 | 1 | CLOSED | rev-2 | 2026-09-25 |
@@ -178,14 +180,14 @@ ids TOOL-aRepatriatedFork-43 TOOL-aRepatriatedFork-44 TOOL-aRepatriatedFork-45 T
 | [DEPL-aRepatriatedFork-20 — inCMS converges onto gov's memory-tree programs](spec/2026-09-23-spec-DEPL-aRepatriatedFork-20.md) | 20 | 2 | CLOSED | rev-11 | 2026-09-29 |
 <!-- /gen:build-units -->
 
-Records: 93 bound to this build, across 4 record folder(s).
+Records: 94 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: DEPL-aRepatriatedFork-1 DEPL-aRepatriatedFork-13 DEPL-aRepatriatedFork-14 DEPL-aRepatriatedFork-17 DEPL-aRepatriatedFork-20 TOOL-aRepatriatedFork-10 TOOL-aRepatriatedFork-11 TOOL-aRepatriatedFork-12 TOOL-aRepatriatedFork-15 TOOL-aRepatriatedFork-16
 TOOL-aRepatriatedFork-18 TOOL-aRepatriatedFork-19 TOOL-aRepatriatedFork-2 TOOL-aRepatriatedFork-3 TOOL-aRepatriatedFork-4 TOOL-aRepatriatedFork-5 TOOL-aRepatriatedFork-6 TOOL-aRepatriatedFork-7 TOOL-aRepatriatedFork-8 TOOL-aRepatriatedFork-9 DEPL-aRepatriatedFork-21 TOOL-aRepatriatedFork-21
 TOOL-aRepatriatedFork-23 TOOL-aRepatriatedFork-24 TOOL-aRepatriatedFork-25 TOOL-aRepatriatedFork-26 TOOL-aRepatriatedFork-27 TOOL-aRepatriatedFork-28 TOOL-aRepatriatedFork-29 TOOL-aRepatriatedFork-30 TOOL-aRepatriatedFork-31 TOOL-aRepatriatedFork-32 TOOL-aRepatriatedFork-35 TOOL-aRepatriatedFork-36
-TOOL-aRepatriatedFork-37 TOOL-aRepatriatedFork-38 TOOL-aRepatriatedFork-39 TOOL-aRepatriatedFork-40 TOOL-aRepatriatedFork-42 TOOL-aRepatriatedFork-44 TOOL-aRepatriatedFork-45.
+TOOL-aRepatriatedFork-37 TOOL-aRepatriatedFork-38 TOOL-aRepatriatedFork-39 TOOL-aRepatriatedFork-40 TOOL-aRepatriatedFork-42 TOOL-aRepatriatedFork-44 TOOL-aRepatriatedFork-45 TOOL-aRepatriatedFork-46.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -207,7 +209,7 @@ TOOL-aRepatriatedFork-37 TOOL-aRepatriatedFork-38 TOOL-aRepatriatedFork-39 TOOL-
 | 13 | `TOOL-aRepatriatedFork-29` | no |
 | 14 | `TOOL-aRepatriatedFork-28` | no |
 | 15 | `TOOL-aRepatriatedFork-45` | no |
-| 16 | `TOOL-aRepatriatedFork-31` | no |
+| 16 | `TOOL-aRepatriatedFork-31`, `TOOL-aRepatriatedFork-46` | yes |
 | 17 | `TOOL-aRepatriatedFork-32` | no |
 | 18 | `TOOL-aRepatriatedFork-30`, `TOOL-aRepatriatedFork-35` | yes |
 | 19 | `TOOL-aRepatriatedFork-36`, `TOOL-aRepatriatedFork-37`, `TOOL-aRepatriatedFork-38`, `TOOL-aRepatriatedFork-39`, `TOOL-aRepatriatedFork-40`, `TOOL-aRepatriatedFork-42` | yes |
