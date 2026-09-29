@@ -1280,7 +1280,7 @@ Relocation = collections.namedtuple(
                   "builds")
 
 
-def run_unchecked(*argv, cwd=None) -> tuple:
+def run_unchecked(*argv, cwd=None, joined=True) -> tuple:
     """One git call whose NON-ZERO exit is an ANSWER, not a failure. Counted like every other.
 
     `merge-base --is-ancestor` answers containment with its exit status and `rev-parse --verify`
@@ -1290,15 +1290,21 @@ def run_unchecked(*argv, cwd=None) -> tuple:
     _PROCESSES[0] += 1
     proc = subprocess.run(argv, cwd=cwd, capture_output=True, text=True,
                           encoding="utf-8", errors="replace")
-    # BOTH STREAMS, joined. A refusal this engine needs to read — the row driver's recipe banner,
-    # the generator's guarded-view remedy — goes to stderr, and a reader of stdout alone would see
-    # an empty string and report that the command said nothing.
-    return proc.returncode, proc.stdout + proc.stderr
+    # BOTH STREAMS, joined, for a caller that READS a message: a refusal this engine needs — the row
+    # driver's recipe banner, the generator's guarded-view remedy — goes to stderr, and a reader of
+    # stdout alone would see an empty string and report that the command said nothing.
+    # STDOUT ALONE (`joined=False`) for a caller that PARSES A VALUE — a sha, a branch name. Git
+    # writes advice to stderr on commands that succeed: under the `GIT_GRAFT_FILE=/dev/null` the
+    # unattended driver exports, every commit git parses prints a graft-deprecation hint, and a
+    # joined read made that hint part of the `--not` revision the straggler walk passes, so the
+    # inventory exited 1 in every bar a `--close` ran and nowhere else.
+    return proc.returncode, (proc.stdout + proc.stderr) if joined else proc.stdout
 
 
 def read_rev(root: str, rev: str) -> str:
     """`rev` as a 40-hex sha, or "" when this repository does not hold it."""
-    code, out = run_unchecked("git", "rev-parse", "--verify", "--quiet", rev + "^{commit}", cwd=root)
+    code, out = run_unchecked("git", "rev-parse", "--verify", "--quiet", rev + "^{commit}",
+                              cwd=root, joined=False)
     return out.strip() if code == 0 else ""
 
 
@@ -1344,7 +1350,8 @@ def resolve_default_tip(root: str) -> tuple:
     `TOOL-aStandingWrit-5` records an environment value that named the branch already checked out
     and disabled a guard by doing so; a resolution that lets the environment SELECT repeats it.
     """
-    code, out = run_unchecked("git", "symbolic-ref", "--short", "refs/remotes/origin/HEAD", cwd=root)
+    code, out = run_unchecked("git", "symbolic-ref", "--short", "refs/remotes/origin/HEAD", cwd=root,
+                              joined=False)
     observed = out.strip()[len("origin/"):] if code == 0 and out.strip() else ""
     declared = os.environ.get("GOV_DEFAULT_BRANCH", "").strip()
     if observed and declared and observed != declared:

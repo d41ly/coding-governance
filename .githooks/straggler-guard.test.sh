@@ -86,7 +86,7 @@ PY=$(resolve_python) || { echo "FAIL no usable python launcher"; exit 2; }
 
 # 57, then 83: the F6 fold of the closing diff review round 1 added exactly 26 executed assertions —
 # 21 conf-table agreement rows, the finding's two spellings read as builds, and 2 x 2 end to end.
-FLOOR_ASSERTIONS=83
+FLOOR_ASSERTIONS=84
 
 TMP=$(mktemp -d) || exit 2
 trap 'rm -rf "$TMP"' EXIT
@@ -346,6 +346,13 @@ sess=$(run_in "$F1" bash "$FX_ROOT/check-wiring.sh" --session); rc=$?
 line=$(printf '%s\n' "$sess" | grep '^note     straggler')
 check_contains "$line" "refs/heads/wt12" || print_failure "AC12: the session note does not name the local straggler: $sess"; add_arm
 check_contains "$line" "hooks own-tree" || print_failure "AC12: the session note does not mark a straggler whose worktree runs its own hooks: $line"; add_arm
+# The SAME session step under the graft neutralizer the unattended driver exports to every child,
+# the bar a `--close` runs included. Git prints a deprecation hint on stderr for each commit it
+# parses under it, and the inventory once read a sha out of a stream joined with stderr: the hint
+# became part of a `--not` revision, so this note read "exited 1" there and nowhere else.
+gsess=$( export GIT_GRAFT_FILE=/dev/null; run_in "$F1" bash "$FX_ROOT/check-wiring.sh" --session )
+gline=$(printf '%s\n' "$gsess" | grep '^note     straggler')
+check_contains "$gline" "refs/heads/wt12" || print_failure "AC12: under GIT_GRAFT_FILE=/dev/null the session note does not name the local straggler: $gline"; add_arm
 # And under an ABSOLUTE value naming the primary tree's post-flip hooks, the same worktree IS refused.
 git -C "$F1" config core.hooksPath "$F1/hk"
 printf -- '- TOOL-aSeed-9 \xc2\xb7 filed 2026-07-02 \xc2\xb7 an ask under the absolute value\n' >> "$WT4/memory/backlog/TOOL.md"

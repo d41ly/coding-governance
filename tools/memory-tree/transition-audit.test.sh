@@ -524,9 +524,15 @@ else
   git -C "$F10" commit -qam "the straggler edits a row"
   git -C "$F10" checkout -q main
   flip_to_builds "$F10"
-  # A NON-MERGE commit passes with no output at all.
+  # A NON-MERGE commit passes with no output at all. Git's own advice is not the hook's output: the
+  # unattended driver exports `GIT_GRAFT_FILE=/dev/null` to the bar a `--close` runs, and git then
+  # prints a graft-deprecation hint for every commit it parses, which this arm read as the hook
+  # speaking. The advice is switched off for this call and every git the hook runs under it
+  # (`-c` travels to child gits). The graft is SET here rather than inherited, so the hook is
+  # measured under it on every bar and not only on the one a `--close` runs.
   printf 'a note\n' > "$F10/memory/builds/aSeed/README.md"
-  hout=$( cd "$F10" && git commit -qam "an ordinary commit" 2>&1 )
+  hout=$( cd "$F10" && GIT_GRAFT_FILE=/dev/null git -c advice.graftFileDeprecated=false \
+    commit -qam "an ordinary commit" 2>&1 )
   [ -z "$hout" ] || bad "AC8: the hook printed something on an ordinary non-merge commit: $hout"; ok
   # The CLEAN merge, which fires pre-merge-commit with no MERGE_HEAD and then this hook with one.
   mout=$( cd "$F10" && git merge --no-ff -m "merge the straggler" strag 2>&1 ); mrc=$?
