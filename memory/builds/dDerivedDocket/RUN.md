@@ -9,7 +9,7 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
-gates-run: unattended-17906939313392088338-3732453 8c4dcd31
+gates-run: unattended-179069523247802327612-3834684 9f4384f1
 parked-surfaced: yes
 keepalive-reaped: yes
 lease-utc: 2026-09-28T17:10:32Z
