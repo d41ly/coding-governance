@@ -51,6 +51,18 @@ owed.
   `stat -c %Y on .git/gate-queue-heartbeat`, with no `verdict:` line. The term-less copy read
   `commit` and `stale: yes` with the fresh file, and `verdict: STALE` rather than a refusal under
   the stub.
+- AC2 — amended rev-6 — the arm in `tools/unattended/unattended.test.sh` is waived: the owner
+  ruled on 2026-09-29 that the unattended kit's own self-test suites are not run for this landing,
+  so the attributed run the permission line named is not made and the criterion stays unobserved.
+  Section 9 rev-6 logs the amendment. The AC2 block's 8 assertions ran once behind a replica
+  prologue in the build pass, as the prose above records; that is not the suite run and is not
+  claimed as it.
+- AC3 — amended rev-6 — the arm in `tools/unattended/resume-tick.test.sh` is waived: the owner
+  ruled on 2026-09-29 that the unattended kit's own self-test suites are not run for this landing,
+  so that arm stays unobserved. Section 9 rev-6 logs the amendment. The fixture half stands
+  observed as the build pass's direct check recorded above: `resume-tick.sh --dry-run` printed
+  `skip · verdict LIVE` with the heartbeat fresh and `resumed · attempt 1` with it dated
+  2001-01-01, and the term-less copy printed `resumed · attempt 1` for both.
 - AC4 — `run-gates turnstile` — at 364278a8 the leg prints `PASS (74 assertions)`, exit 0, and its
   position fixture's arms read ok: a waiter writes `gate-queue-heartbeat` under its own git dir,
   its mtime advances while the waiter waits at one position (1790567195 -> 1790567196), the
@@ -65,6 +77,17 @@ owed.
   the in-pass reads above.
 - AC7 — `git cat-file -s` — the protocol template and its render each read 64424 bytes in 703 lines
   at the parent and 64357 in 703 at the build commit, −67 bytes and 0 lines each.
+- AC8 — amended rev-6 — the attributed run over `tools/unattended/unattended.test.sh` and the
+  resume-tick suite is waived: the owner ruled on 2026-09-29 that the unattended kit's own
+  self-test suites are not run for this landing, so that half stays unobserved. Section 9 rev-6
+  logs the amendment. The `run-gates turnstile` half stands observed at 364278a8, where AC4's line
+  above records the leg printing `PASS (74 assertions)` with this unit's position-fixture arms
+  reading ok. The floor half stands observed, read on 2026-09-29 with `git show`: the driver
+  suite's `FLOOR_ASSERTIONS` reads 1717 at the first parent e8fce76d and 1736 at the build commit
+  e59a35a8, `FLOOR_SHARD_2` 1521 and 1540, `FLOOR_SHARD_1` 208 at both, the resume-tick suite's
+  173 and 176, and the turnstile suite's 71 and 74, none moved by the follow-up e0643748. Those
+  deltas, 19, 3 and 3, are the counts the build pass took off the new arms' blocks, as the prose
+  above records.
 - AC9 — `install-prefix (shipped surface)` — at 364278a8 the leg exits 0 printing `clean` over 322
   shipped files with no undeclared root-install spelling, its runtime-literal and carried-prefix
   passes clean too. The `harness arms (fail branches armed or pinned)` leg exits 0 with no finding.

@@ -57,6 +57,10 @@ carry a `permission:` line deferring their observation and get no line here: AC3
   `GATE_SELFTESTS=1` when the owner exports it into the close, so the driver adds nothing and removes
   nothing. A range touching a declared entry carries the announcement naming the by-hand run; a
   range touching none carries the same environment and no announcement.
+- AC11 — amended rev-8 — `run-unattended-gates.sh --attribute` is not run for this landing: the
+  owner ruled on 2026-09-29 that the unattended kit's own self-test suites are not run for it. The
+  permission line now records that the suite observation is waived and the criterion stays
+  unobserved. Section 9 rev-8 logs it.
 - AC12 — `gates-green` — with one untracked file in an otherwise prepared tree the close refuses by
   number naming the stamp precondition, and the fixture bar's environment dump is never written, so
   no bar ran.

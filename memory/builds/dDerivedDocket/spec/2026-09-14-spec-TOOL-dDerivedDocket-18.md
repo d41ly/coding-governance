@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-18 — leg second opinions over the ask mandate
 
-**Status:** CLOSED · rev-6 · 2026-09-21 · node d · Tier-2 · base fb07ca25 · streams tooling · order 18
+**Status:** CLOSED · rev-7 · 2026-09-29 · node d · Tier-2 · base fb07ca25 · streams tooling · order 18
 
 <!-- gen:spec-records -->
 
@@ -336,6 +336,10 @@ nothing else.
   observed by hand against a scratch fixture. That folds the conservative reading of the D12-h
   conflict and does not decide it: S7, §5 and §10 keep the ruling's wording, and the run record
   parks it for the owner.
+  The owner ruled on 2026-09-29 that the unattended kit's own self-test suites are not run for
+  this landing, so the attributed run and the suite run that grades every added arm passing are
+  waived and stay unobserved; the RED half stands observed in the pass, by hand against scratch
+  fixtures, as the ledger's opening records (§9 rev-7).
 - **AC11** — When a fixture record's `asks-ready:` reads `EXMP-aFoo-3=yes` while the stub producer
   at the recorded `m-base:` grades that id `no`, and the record's preflight commit is not on the
   fixture remote's advertised tip, `bash tools/unattended/check-unattended.sh` reds check 19 naming
@@ -495,6 +499,12 @@ New arm: `tools/unattended/check-unattended.test.sh` · one fixture record per a
   it on every bar. Two refusals §5 already named get their own branches and arms: an `m-base:` this
   clone cannot read, and the ancestry fallback failing. The suite block adds a rotated mandated
   record, which is where `TOOL-dDerivedDocket-52`'s AC1 and AC3 left their check-19 half.
+
+- rev-7 · 2026-09-29 · §6 AC10 · the owner's ruling of 2026-09-29, "just skip the unattended
+  test": the unattended kit's own self-test suites, the attributed run included, are not run for
+  this landing. AC10's `permission:` line gains one sentence saying the attributed run and the
+  suite run are waived and stay unobserved, and that the RED half stands observed in the pass.
+  No assertion, `Red when:` arm, design or edge moved, and the status stays CLOSED.
 
 ## 10. Reuse audit
 

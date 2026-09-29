@@ -37,6 +37,11 @@ AC14, the attributed unattended run the main loop makes at VERIFYING.
   owed), commits that hold together with a new row in the build's `BACKLOG.md`, resumes, commits the
   take-over, and holds again: streak 2 and `resume-owed` `none · limit`. A third hold after a commit
   touching `progress.txt` writes streak 1 and owes a schedule again.
+- AC7 — amended rev-9 — the arms in `tools/unattended/unattended.test.sh` are waived: the owner
+  ruled on 2026-09-29 that the unattended kit's own self-test suites are not run for this landing,
+  so the attributed run the permission line named is not made and the arms stay unobserved.
+  Section 9 rev-9 logs the amendment. No direct check of these refusals is recorded above, and
+  none is claimed.
 - AC8 — `--scheduled` — `--resume tRun --scheduled <held-at> --keepalive-id C` against the matching
   HELD record completes the take-over, records `keepalive: C`, and writes
   `resume · item tRun · reason held · keepalive C · scheduled`, observed both with the remote at the
@@ -71,6 +76,10 @@ AC14, the attributed unattended run the main loop makes at VERIFYING.
   46 refusal. `.unattended.conf` there declares `RESUME_SCHEDULE_CREATE="create_scheduled_task"` and
   `RESUME_SCHEDULE_DELETE="delete_scheduled_task"`, while `KEEPALIVE_CREATE` is `CronCreate`, a
   different tool.
+- AC14 — amended rev-9 — the attributed `run-unattended-gates.sh --attribute <BASE>` run is
+  waived: the owner ruled on 2026-09-29 that the unattended kit's own self-test suites are not run
+  for this landing, so no attribution summary exists and the criterion stays unobserved. Section 9
+  rev-9 logs the amendment.
 - AC15 — `tools/unattended/kit.toml` — the conf-placeholder hole's discharge command, read out of
   the descriptor, exits 1 over a fixture holding the shipped example with its three `KEEPALIVE_`
   lines filled and its two resume placeholder lines verbatim, and exits 0 once those two are filled

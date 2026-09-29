@@ -66,11 +66,23 @@ protocol copy here, with exactly the reverse at the parent.
   break. With `asks-disposed` deleted from `DOD_CORE` and `.unattended.conf` declaring `13:13`,
   check 3 reds with `the kit's CORE Definition-of-Done set has shrunk below its floor … 12 against
   13`. The same copy unbroken exits 0 with no FAILED line at all, which is the control.
+- AC10 — amended rev-8 — the `tools/unattended/check-unattended.test.sh` arm is waived: the owner
+  ruled on 2026-09-29 that the unattended kit's own self-test suites are not run for this landing,
+  so that arm stays unobserved. Section 9 rev-8 logs the amendment. The parse itself stands
+  observed on the `unattended kit gate` leg at 364278a8, as AC1's line above records: the leg
+  exited 0 with check 16's joins holding while `memory/guides/UNATTENDED-PROTOCOL.md` states
+  "Thirteen kit-owned core items", a sentence check 16 maps through the word table and compares
+  to the driver's core set, and which a table stopping at twelve maps to -1 and reds.
 - AC11 — `asks_disposed_overrides` — a fixture holding two `override … item asks-disposed` rows, one
   `override … item gates-green` row and one `decision` row naming the same item reads
   `asks_disposed_overrides` = 2, `of` = 2, `live` true and `gateable` false, with a per-record
   detail row each. A third override raises it to 3. A fixture with no run-state file at all reads
   value 0 with `live` false, which the human table prints as a DEAD PROBE rather than a clean zero.
+- AC12 — amended rev-8 — the attributed `run-unattended-gates.sh --attribute <BASE>` run is
+  waived: the owner ruled on 2026-09-29 that the unattended kit's own self-test suites are not run
+  for this landing, so no attribution summary exists and the criterion stays unobserved. Section 9
+  rev-8 logs the amendment. The by-hand fixture exercises the opening paragraph records are not
+  that run and are not claimed as it.
 - AC13 — `BACKLOG.md` — `--close` on a no-mandate fixture whose own folder files
   `EXMP-tDispF-1`, with `ASKS_CMD` set, is UNMET naming that ask and its derived `OPEN`. The same
   ask with a `KEEP` row in that file is admitted, which is the green control.

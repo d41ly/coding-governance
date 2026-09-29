@@ -52,6 +52,11 @@ with digits folded and `git status --porcelain` alike.
   for the run worktree and `skip · ELSEWHERE` naming `refs/heads/run` for the linked one, and no
   `resumed ·`; with the gate log removed, one `resumed · attempt 1`, for the run worktree, beside the
   same ELSEWHERE skip.
+- AC3 — amended rev-8 — `tools/unattended/resume-tick.test.sh` is not run for this landing, by the
+  owner's ruling of 2026-09-29, so the non-dry-run half, a live `sleep` left alive and no stub
+  `claude` invoked, is waived and stays unobserved. The dry-run half stands observed in this pass,
+  as the prose above reads: `skip · HELD` for the run worktree, `skip · ELSEWHERE` for the linked
+  one and no `resumed ·`. Section 9, rev-8.
 - AC4 — `tRun.procs` — in the linked worktree on `wave`, session `T`'s `--resume tRun --keepalive-id C`
   refused at check 58 naming `refs/heads/unit` and the run worktree's path, and the no-id call printed
   the status block and then the same refusal; both worktrees' `git status --porcelain` printed
@@ -87,6 +92,11 @@ with digits folded and `git status --porcelain` alike.
 - AC10 — `git cat-file -s` — against the first parent's figures: protocol template and render 64456
   -> 64424 bytes and 703 -> 703 lines, stop contract and render 35321 -> 35303 and 518 -> 517, verb
   carrier and render 19142 -> 19136 and 209 -> 208; none grew.
+- AC11 — amended rev-8 — `tools/unattended/unattended.test.sh`, like the resume-tick and stop-guard
+  suites, is not run for this landing, by the owner's ruling of 2026-09-29, so the three suites'
+  `verdict clean` is waived and every arm it names stays unobserved. The floor figures, read with
+  `git show` at the build commit and its first parent, are not a suite run and the ruling does not
+  reach them; this ledger records no reading of them. Section 9, rev-8.
 - AC12 — `lexicon naming predicates` — at 364278a8 the leg exits 0 ending `lexicon OK`, and there
   `lexicon.py --suggest <name> --as sh.function` answers `OK` for `resolve_holder_worktree`,
   `check_holder_worktree` and `add_sibling_worktree`. The
@@ -95,3 +105,13 @@ with digits folded and `git status --porcelain` alike.
   `this worktree is not on the run's branch`, as ARMED. The `kit version markers` and
   `install-prefix (shipped surface)` legs each exit 0 clean. The version pin, the pin file and the
   added-line reads are the in-pass reads above.
+- AC13 — amended rev-8 — `tools/unattended/resume-tick.test.sh` is not run for this landing, by the
+  owner's ruling of 2026-09-29, so its arm over `add_sibling_worktree` is waived and stays
+  unobserved. The dry-run decisions stand observed in this pass, as the prose above reads: one
+  `resumed · attempt 1`, for the run worktree reading FINISHED-UNSTAMPED, and `skip · ELSEWHERE` for
+  the sibling. Section 9, rev-8.
+- AC14 — amended rev-8 — `tools/unattended/unattended.test.sh` is not run for this landing, by the
+  owner's ruling of 2026-09-29, so its run of the repeating arm is waived and stays unobserved. The
+  direct fixture runs stand observed in this pass, as the prose above reads: the run-worktree calls
+  matched a copy whose `check_holder_worktree` returns 0, and the arm was staged RED against one
+  called for every record. Section 9, rev-8.

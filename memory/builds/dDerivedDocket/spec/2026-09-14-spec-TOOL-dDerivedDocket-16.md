@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-16 — driver ask-awareness: the asks key, preflight and plan
 
-**Status:** CLOSED · rev-7 · 2026-09-21 · node d · Tier-2 · base fb07ca25 · streams tooling · order 16
+**Status:** CLOSED · rev-8 · 2026-09-29 · node d · Tier-2 · base fb07ca25 · streams tooling · order 16
 
 <!-- gen:spec-records -->
 
@@ -472,6 +472,10 @@ commit, never against that figure.
   under M6, and the byte read above is a `wc -c`. Deferring the real-tree and suite runs folds the
   conservative reading of the D12-h conflict; it does not decide it. S12 and §5 keep the ruling's own
   wording, and the run record parks the conflict for the owner.
+  The owner ruled on 2026-09-29 that the unattended kit's own self-test suites are not run for
+  this landing, so the attributed run and the suite run that grades every added arm passing are
+  waived and stay unobserved; the check-22 half stands observed on the `unattended kit gate` leg
+  at 364278a8, and the byte, line and phrase halves are read in the ledger (§9 rev-8).
 - **AC14** — When a foreign live spec closes a mandated fixture ask, the pinned `asks-ready:` grade
   is `no` in four fixtures: the foreign build's run-state file absent; tracked and reading a terminal
   phase through `derived_phase()`; tracked and reading HELD; and present only on an unmerged fixture
@@ -730,6 +734,13 @@ New arm: `tools/unattended/unattended.test.sh` · one fixture per refusal and ou
   §7's `ARMS_FLOORS` pin moves `tools/unattended/unattended.sh` from `104:101` to `115:112`, the
   eleven new `fail` branches and their eleven arms, and the suite's own executed-assertion floors
   move with it.
+
+- rev-8 · 2026-09-29 · §6 AC13 · the owner's ruling of 2026-09-29, "just skip the unattended
+  test": the unattended kit's own self-test suites, the attributed run included, are not run for
+  this landing. AC13's `permission:` line gains one sentence saying its two suite halves are
+  waived and stay unobserved, and naming the check-22 half as observed on the
+  `unattended kit gate` leg at 364278a8. No assertion, `Red when:` arm, design or edge moved,
+  and the status stays CLOSED.
 
 ## 10. Reuse audit
 

@@ -121,9 +121,9 @@ ids TOOL-dDerivedDocket-60 TOOL-dDerivedDocket-61 TOOL-dDerivedDocket-62 TOOL-dD
 |---|---|---|---|---|---|
 | [TOOL-dDerivedDocket-1 — held-suite failure baseline](spec/2026-09-14-spec-TOOL-dDerivedDocket-1.md) | 1 | 2 | CLOSED | rev-7 | 2026-09-22 |
 | [TOOL-dDerivedDocket-2 — in-place landing merge](spec/2026-09-14-spec-TOOL-dDerivedDocket-2.md) | 2 | 2 | CLOSED | rev-6 | 2026-09-28 |
-| [TOOL-dDerivedDocket-4 — HELD phase, lease and derived phase](spec/2026-09-14-spec-TOOL-dDerivedDocket-4.md) | 3 | 2 | CLOSED | rev-9 | 2026-09-22 |
-| [TOOL-dDerivedDocket-3 — the run's landing path](spec/2026-09-14-spec-TOOL-dDerivedDocket-3.md) | 4 | 2 | CLOSED | rev-7 | 2026-09-22 |
-| [TOOL-dDerivedDocket-5 — auto-resume from HELD](spec/2026-09-14-spec-TOOL-dDerivedDocket-5.md) | 5 | 2 | CLOSED | rev-8 | 2026-09-22 |
+| [TOOL-dDerivedDocket-4 — HELD phase, lease and derived phase](spec/2026-09-14-spec-TOOL-dDerivedDocket-4.md) | 3 | 2 | CLOSED | rev-10 | 2026-09-29 |
+| [TOOL-dDerivedDocket-3 — the run's landing path](spec/2026-09-14-spec-TOOL-dDerivedDocket-3.md) | 4 | 2 | CLOSED | rev-8 | 2026-09-29 |
+| [TOOL-dDerivedDocket-5 — auto-resume from HELD](spec/2026-09-14-spec-TOOL-dDerivedDocket-5.md) | 5 | 2 | CLOSED | rev-9 | 2026-09-29 |
 | [TOOL-dDerivedDocket-37 — a hands-off's payload tokens are named by the sibling it names](spec/2026-09-14-spec-TOOL-dDerivedDocket-37.md) | 6 | 2 | CLOSED | rev-6 | 2026-09-28 |
 | [TOOL-dDerivedDocket-6 — ask parser and status fold](spec/2026-09-14-spec-TOOL-dDerivedDocket-6.md) | 6 | 2 | CLOSED | rev-6 | 2026-09-21 |
 | [TOOL-dDerivedDocket-7 — generated family view](spec/2026-09-14-spec-TOOL-dDerivedDocket-7.md) | 7 | 2 | CLOSED | rev-6 | 2026-09-21 |
@@ -140,31 +140,31 @@ ids TOOL-dDerivedDocket-60 TOOL-dDerivedDocket-61 TOOL-dDerivedDocket-62 TOOL-dD
 | [TOOL-dDerivedDocket-15 — ask envelope, READY predicate and new-build scaffold](spec/2026-09-14-spec-TOOL-dDerivedDocket-15.md) | 15 | 2 | CLOSED | rev-8 | 2026-09-21 |
 | [TOOL-dDerivedDocket-48 — the ask witness reads a stream the capture does not merge](spec/2026-09-20-spec-TOOL-dDerivedDocket-48.md) | 15 | 2 | CLOSED | rev-2 | 2026-09-21 |
 | [TOOL-dDerivedDocket-49 — one declared ladder decides which next: shape the plan prints](spec/2026-09-20-spec-TOOL-dDerivedDocket-49.md) | 15 | 2 | CLOSED | rev-2 | 2026-09-21 |
-| [TOOL-dDerivedDocket-16 — driver ask-awareness: the asks key, preflight and plan](spec/2026-09-14-spec-TOOL-dDerivedDocket-16.md) | 16 | 2 | CLOSED | rev-7 | 2026-09-21 |
-| [TOOL-dDerivedDocket-17 — asks-disposed DoD item and freeze](spec/2026-09-14-spec-TOOL-dDerivedDocket-17.md) | 17 | 2 | CLOSED | rev-7 | 2026-09-21 |
+| [TOOL-dDerivedDocket-16 — driver ask-awareness: the asks key, preflight and plan](spec/2026-09-14-spec-TOOL-dDerivedDocket-16.md) | 16 | 2 | CLOSED | rev-8 | 2026-09-29 |
+| [TOOL-dDerivedDocket-17 — asks-disposed DoD item and freeze](spec/2026-09-14-spec-TOOL-dDerivedDocket-17.md) | 17 | 2 | CLOSED | rev-8 | 2026-09-29 |
 | [TOOL-dDerivedDocket-52 — the introducing commit of a pinned record line, across the rotation rename](spec/2026-09-20-spec-TOOL-dDerivedDocket-52.md) | 17 | 2 | CLOSED | rev-2 | 2026-09-21 |
-| [TOOL-dDerivedDocket-18 — leg second opinions over the ask mandate](spec/2026-09-14-spec-TOOL-dDerivedDocket-18.md) | 18 | 2 | CLOSED | rev-6 | 2026-09-21 |
+| [TOOL-dDerivedDocket-18 — leg second opinions over the ask mandate](spec/2026-09-14-spec-TOOL-dDerivedDocket-18.md) | 18 | 2 | CLOSED | rev-7 | 2026-09-29 |
 | [TOOL-dDerivedDocket-54 — the cross-run exclusion probe reads history unsimplified](spec/2026-09-20-spec-TOOL-dDerivedDocket-54.md) | 18 | 2 | CLOSED | rev-2 | 2026-09-21 |
-| [TOOL-dDerivedDocket-19 — authority only from an owner-committed README](spec/2026-09-14-spec-TOOL-dDerivedDocket-19.md) | 19 | 2 | CLOSED | rev-7 | 2026-09-21 |
+| [TOOL-dDerivedDocket-19 — authority only from an owner-committed README](spec/2026-09-14-spec-TOOL-dDerivedDocket-19.md) | 19 | 2 | CLOSED | rev-8 | 2026-09-29 |
 | [TOOL-dDerivedDocket-20 — unattended carriers and the two-key refusal](spec/2026-09-14-spec-TOOL-dDerivedDocket-20.md) | 20 | 2 | CLOSED | rev-6 | 2026-09-21 |
 | [TOOL-dDerivedDocket-21 — remote-relative bases and complete leg guards](spec/2026-09-14-spec-TOOL-dDerivedDocket-21.md) | 21 | 2 | CLOSED | rev-6 | 2026-09-21 |
-| [TOOL-dDerivedDocket-22 — LANDED derived from the tip](spec/2026-09-14-spec-TOOL-dDerivedDocket-22.md) | 22 | 2 | CLOSED | rev-8 | 2026-09-22 |
+| [TOOL-dDerivedDocket-22 — LANDED derived from the tip](spec/2026-09-14-spec-TOOL-dDerivedDocket-22.md) | 22 | 2 | CLOSED | rev-9 | 2026-09-29 |
 | [TOOL-dDerivedDocket-23 — red attribution, report-only](spec/2026-09-14-spec-TOOL-dDerivedDocket-23.md) | 23 | 2 | CLOSED | rev-6 | 2026-09-21 |
 | [TOOL-dDerivedDocket-29 — review durability across a dead fan](spec/2026-09-14-spec-TOOL-dDerivedDocket-29.md) | 23 | 2 | CLOSED | rev-7 | 2026-09-21 |
 | [TOOL-dDerivedDocket-25 — runner scratch hygiene and a tree-moved exit](spec/2026-09-14-spec-TOOL-dDerivedDocket-25.md) | 24 | 2 | CLOSED | rev-6 | 2026-09-22 |
-| [TOOL-dDerivedDocket-30 — checker defects from the stop census](spec/2026-09-14-spec-TOOL-dDerivedDocket-30.md) | 24 | 2 | CLOSED | rev-7 | 2026-09-22 |
+| [TOOL-dDerivedDocket-30 — checker defects from the stop census](spec/2026-09-14-spec-TOOL-dDerivedDocket-30.md) | 24 | 2 | CLOSED | rev-8 | 2026-09-29 |
 | [TOOL-dDerivedDocket-33 — delegated signing of the same-id and triage tables](spec/2026-09-14-spec-TOOL-dDerivedDocket-33.md) | 25 | 2 | CLOSED | rev-6 | 2026-09-22 |
-| [TOOL-dDerivedDocket-24 — inherited-red policy](spec/2026-09-14-spec-TOOL-dDerivedDocket-24.md) | 26 | 2 | CLOSED | rev-7 | 2026-09-22 |
+| [TOOL-dDerivedDocket-24 — inherited-red policy](spec/2026-09-14-spec-TOOL-dDerivedDocket-24.md) | 26 | 2 | CLOSED | rev-8 | 2026-09-29 |
 | [TOOL-dDerivedDocket-26 — honest verdicts under contention](spec/2026-09-14-spec-TOOL-dDerivedDocket-26.md) | 27 | 2 | CLOSED | rev-8 | 2026-09-22 |
-| [TOOL-dDerivedDocket-28 — run-owned process ledger](spec/2026-09-14-spec-TOOL-dDerivedDocket-28.md) | 27 | 2 | CLOSED | rev-9 | 2026-09-22 |
-| [TOOL-dDerivedDocket-27 — declared gate wall](spec/2026-09-14-spec-TOOL-dDerivedDocket-27.md) | 28 | 2 | CLOSED | rev-11 | 2026-09-22 |
+| [TOOL-dDerivedDocket-28 — run-owned process ledger](spec/2026-09-14-spec-TOOL-dDerivedDocket-28.md) | 27 | 2 | CLOSED | rev-10 | 2026-09-29 |
+| [TOOL-dDerivedDocket-27 — declared gate wall](spec/2026-09-14-spec-TOOL-dDerivedDocket-27.md) | 28 | 2 | CLOSED | rev-12 | 2026-09-29 |
 | [TOOL-dDerivedDocket-31 — fork items and delegated-pass carriers](spec/2026-09-14-spec-TOOL-dDerivedDocket-31.md) | 29 | 2 | CLOSED | rev-6 | 2026-09-27 |
 | [TOOL-dDerivedDocket-32 — remote CI on every push](spec/2026-09-14-spec-TOOL-dDerivedDocket-32.md) | 30 | 2 | CLOSED | rev-7 | 2026-09-27 |
-| [TOOL-dDerivedDocket-61 — one lease record, and HELD known to every out-of-session actor](spec/2026-09-22-spec-TOOL-dDerivedDocket-61.md) | 31 | 2 | CLOSED | rev-10 | 2026-09-27 |
-| [TOOL-dDerivedDocket-62 — one worktree answers for a slug, and every other copy reads ELSEWHERE](spec/2026-09-22-spec-TOOL-dDerivedDocket-62.md) | 32 | 2 | CLOSED | rev-7 | 2026-09-27 |
-| [TOOL-dDerivedDocket-63 — the holder keeps its own `--replaces`: row precedence in the re-keyed resume matrix](spec/2026-09-22-spec-TOOL-dDerivedDocket-63.md) | 33 | 2 | CLOSED | rev-6 | 2026-09-27 |
-| [TOOL-dDerivedDocket-64 — the turnstile queue's heartbeat, a move the liveness clock sees](spec/2026-09-22-spec-TOOL-dDerivedDocket-64.md) | 34 | 2 | CLOSED | rev-5 | 2026-09-27 |
-| [TOOL-dDerivedDocket-65 — a session waiting on its own sub-agents, a move the liveness clock sees](spec/2026-09-22-spec-TOOL-dDerivedDocket-65.md) | 35 | 2 | CLOSED | rev-2 | 2026-09-27 |
+| [TOOL-dDerivedDocket-61 — one lease record, and HELD known to every out-of-session actor](spec/2026-09-22-spec-TOOL-dDerivedDocket-61.md) | 31 | 2 | CLOSED | rev-11 | 2026-09-29 |
+| [TOOL-dDerivedDocket-62 — one worktree answers for a slug, and every other copy reads ELSEWHERE](spec/2026-09-22-spec-TOOL-dDerivedDocket-62.md) | 32 | 2 | CLOSED | rev-8 | 2026-09-29 |
+| [TOOL-dDerivedDocket-63 — the holder keeps its own `--replaces`: row precedence in the re-keyed resume matrix](spec/2026-09-22-spec-TOOL-dDerivedDocket-63.md) | 33 | 2 | CLOSED | rev-7 | 2026-09-29 |
+| [TOOL-dDerivedDocket-64 — the turnstile queue's heartbeat, a move the liveness clock sees](spec/2026-09-22-spec-TOOL-dDerivedDocket-64.md) | 34 | 2 | CLOSED | rev-6 | 2026-09-29 |
+| [TOOL-dDerivedDocket-65 — a session waiting on its own sub-agents, a move the liveness clock sees](spec/2026-09-22-spec-TOOL-dDerivedDocket-65.md) | 35 | 2 | CLOSED | rev-3 | 2026-09-29 |
 | [TOOL-dDerivedDocket-34 — the switch-over: migration applied and the views rendered](spec/2026-09-14-spec-TOOL-dDerivedDocket-34.md) | 36 | 2 | CLOSED | rev-13 | 2026-09-28 |
 | [TOOL-dDerivedDocket-35 — arming and the real-tree staged reds](spec/2026-09-14-spec-TOOL-dDerivedDocket-35.md) | 37 | 2 | CLOSED | rev-10 | 2026-09-28 |
 | [PLAY-dDerivedDocket-1 — charter backlog wording and unattended landing exception](spec/2026-09-14-spec-PLAY-dDerivedDocket-1.md) | 38 | 2 | CLOSED | rev-9 | 2026-09-28 |

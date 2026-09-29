@@ -30,6 +30,12 @@ post-build bar. AC1's hand observation over the scratch fixture pinned
 one declaring nothing.
 
 **Evidences:** TOOL-dDerivedDocket-19
+- AC1 — amended rev-8 — `tools/unattended/unattended.test.sh` — the suite proof the
+  criterion names is waived by the owner's ruling of 2026-09-29 that the unattended kit's own
+  self-test suites are not run for this landing, and it stays unobserved. The hand half stands
+  observed in the pass, as this record's prose says: `--preflight` over a scratch `slug` README
+  pinned the grant's path and decision id from a backticked-and-bare spelling, and `none` from
+  one declaring nothing. Section 9 rev-8 logs the amendment.
 - AC2 — `recipe` — `--preflight` over a `prompt`-mode README carrying `may:` and over a `recipe` one
   carrying `may: none` each refuses under check 78 naming the mode, prints no pin and leaves the
   tree clean. Staged RED: with the refusal keyed on `prompt` alone the `recipe` arm misses it.

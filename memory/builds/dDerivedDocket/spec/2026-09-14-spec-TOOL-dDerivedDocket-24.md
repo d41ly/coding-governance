@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-24 — inherited-red policy
 
-**Status:** CLOSED · rev-7 · 2026-09-22 · node d · Tier-2 · base fb07ca25 · streams tooling · order 26
+**Status:** CLOSED · rev-8 · 2026-09-29 · node d · Tier-2 · base fb07ca25 · streams tooling · order 26
 
 <!-- gen:spec-records -->
 
@@ -334,6 +334,9 @@ companion template · `tools/unattended/SKILL.template.md` · `tools/unattended/
   bar; the driver suite is on no bar leg and runs at VERIFYING, after the last unit, through
   `bash tools/unattended/run-unattended-gates.sh`, not at this unit's end (D12-i8's in-pass
   lift is parked, §9).
+  The owner ruled on 2026-09-29 that the unattended kit's own self-test suites are not run for
+  this landing, so the driver half is waived and stays unobserved, while the hook half stands
+  observed on the `pre-push self-test` leg at 364278a8 (§9 rev-8).
 - **AC2** — When a fixture push under `land` at R fails only on a leg attributed INHERITED and not
   aged, `.githooks/pre-push.test.sh` sees the hook exit 0 and print the leg; when the red leg reads
   MIXED, the push is blocked.
@@ -361,6 +364,9 @@ companion template · `tools/unattended/SKILL.template.md` · `tools/unattended/
   permission: the driver suite is on no bar leg; it runs at VERIFYING, after the last unit,
   through `bash tools/unattended/run-unattended-gates.sh`, not at this unit's end (D12-i8's
   in-pass lift is parked, §9).
+  The owner ruled on 2026-09-29 that the unattended kit's own self-test suites are not run for
+  this landing, so this driver-suite observation is waived and its arm stays unobserved
+  (§9 rev-8).
 - **AC6** — When a fixture replays the override recorded at
   `memory/builds/aStagedLane/RUN.md:51` over an
   attribution with an OWN leg, `--close --override gates-green` refuses with a numbered message; over
@@ -369,12 +375,18 @@ companion template · `tools/unattended/SKILL.template.md` · `tools/unattended/
   permission: the driver suite is on no bar leg; it runs at VERIFYING, after the last unit,
   through `bash tools/unattended/run-unattended-gates.sh`, not at this unit's end (D12-i8's
   in-pass lift is parked, §9).
+  The owner ruled on 2026-09-29 that the unattended kit's own self-test suites are not run for
+  this landing, so this driver-suite observation is waived and its arm stays unobserved
+  (§9 rev-8).
 - **AC7** — When `--abort --code gate-red-out-of-scope` runs over an attribution with a MIXED leg, it
   refuses; over an inherited-only one, it proceeds.
   Red when: the abort is admitted over a red the run worsened.
   permission: the driver suite is on no bar leg; it runs at VERIFYING, after the last unit,
   through `bash tools/unattended/run-unattended-gates.sh`, not at this unit's end (D12-i8's
   in-pass lift is parked, §9).
+  The owner ruled on 2026-09-29 that the unattended kit's own self-test suites are not run for
+  this landing, so this driver-suite observation is waived and its arm stays unobserved
+  (§9 rev-8).
 - **AC8** — When `bash tools/unattended/check-unattended.sh` grades a fixture run whose dispatched
   pass declared one path and whose `absorb(` commit wrote another, check 23 prints an `ABSORB` line
   for that commit and no anomaly; a commit with the same paths and a unit id in its subject is still
@@ -396,6 +408,9 @@ companion template · `tools/unattended/SKILL.template.md` · `tools/unattended/
   permission: the driver suite is on no bar leg; it runs at VERIFYING, after the last unit,
   through `bash tools/unattended/run-unattended-gates.sh`, not at this unit's end (D12-i8's
   in-pass lift is parked, §9).
+  The owner ruled on 2026-09-29 that the unattended kit's own self-test suites are not run for
+  this landing, so this driver-suite observation is waived and its arm stays unobserved
+  (§9 rev-8).
 - **AC10** — When `bash tools/unattended/check-unattended.sh` and the skill-wiring check run over the
   rendered tree, the companion guide states ABSORB's four conditions and the absorb subject, and the
   Skill's Close section names the hold for an inherited red under `park`, and the Close section
@@ -417,6 +432,10 @@ companion template · `tools/unattended/SKILL.template.md` · `tools/unattended/
   bar; the driver suite is on no bar leg and runs at VERIFYING, after the last unit, through
   `bash tools/unattended/run-unattended-gates.sh`, not at this unit's end (D12-i8's in-pass
   lift is parked, §9).
+  The owner ruled on 2026-09-29 that the unattended kit's own self-test suites are not run for
+  this landing, so the driver reader's half is waived and stays unobserved, while the hook
+  reader's half stands observed on the `pre-push self-test` leg at 364278a8 and the two
+  declarations are read in the ledger (§9 rev-8).
 - **AC12** — When `bash tools/unattended/run-unattended-gates.sh --attribute <BASE>` runs once after
   the last unit, at VERIFYING, its attribution summary reads `verdict clean`: no NEW FAIL, no
   `DEAD PROBE at L` and no `OVER BUDGET at L`. Every suite it reports with INHERITED lines or `DEAD PROBE at R` is named by
@@ -429,6 +448,9 @@ companion template · `tools/unattended/SKILL.template.md` · `tools/unattended/
   cost: the unattended suites' declared budgets, once, with the BASE side cached.
   permission: the unattended suites are on no bar leg; they run at VERIFYING, after the last
   unit, not at this unit's end (D12-i8's in-pass lift is parked, §9).
+  The owner ruled on 2026-09-29 that the unattended kit's own self-test suites are not run for
+  this landing, its attributed run included, so this observation is waived and stays unobserved
+  (§9 rev-8).
 - **AC13** — When the fixture run's `gates-run` fact names a bar whose record reads every red leg
   INHERITED at an earlier HEAD, and the run then commits, `--close --override gates-green` and
   `--abort --code gate-red-out-of-scope` each refuse with the numbered code naming the moved HEAD;
@@ -448,6 +470,9 @@ companion template · `tools/unattended/SKILL.template.md` · `tools/unattended/
   permission: the driver suite is on no bar leg; it runs at VERIFYING, after the last unit,
   through `bash tools/unattended/run-unattended-gates.sh`, not at this unit's end (D12-i8's
   in-pass lift is parked, §9).
+  The owner ruled on 2026-09-29 that the unattended kit's own self-test suites are not run for
+  this landing, so this driver-suite observation is waived and its arm stays unobserved
+  (§9 rev-8).
 - **AC14** — When `.githooks/pre-push.test.sh` finds a `gate-inherited-green` whose `max_age` is 50
   while `INHERITED_RED_MAX_AGE` at the remote sha is 10, the hook prints `FULL gate` naming both
   bounds.
@@ -466,6 +491,9 @@ companion template · `tools/unattended/SKILL.template.md` · `tools/unattended/
   bar; the driver suite is on no bar leg and runs at VERIFYING, after the last unit, through
   `bash tools/unattended/run-unattended-gates.sh`, not at this unit's end (D12-i8's in-pass
   lift is parked, §9).
+  The owner ruled on 2026-09-29 that the unattended kit's own self-test suites are not run for
+  this landing, so the driver half is waived and stays unobserved, while the hook half stands
+  observed on the `pre-push self-test` leg at 364278a8 (§9 rev-8).
 - **AC16** — When the fixture git dir holds a stale `gate-full-green` that predicate 2 rejects and a
   `gate-inherited-green` whose base equals the pushed remote sha under `land`,
   `.githooks/pre-push.test.sh` sees `scoped gate` naming the inherited green, not `FULL gate`.
@@ -488,6 +516,9 @@ companion template · `tools/unattended/SKILL.template.md` · `tools/unattended/
   bar; the driver suite is on no bar leg and runs at VERIFYING, after the last unit, through
   `bash tools/unattended/run-unattended-gates.sh`, not at this unit's end (D12-i8's in-pass
   lift is parked, §9).
+  The owner ruled on 2026-09-29 that the unattended kit's own self-test suites are not run for
+  this landing, so the driver half is waived and stays unobserved, while the hook half stands
+  observed on the `pre-push self-test` leg at 364278a8 (§9 rev-8).
 - **AC18** — When the fixture's local main carries a commit the bare remote lacks, which sets
   `INHERITED_RED=land` in `.githooks/gate-env.sh` and introduces the red, an environment-printing stub
   gate shows `gates-green` exporting `GATE_ATTRIBUTE` equal to the remote's advertised sha, and the
@@ -498,6 +529,9 @@ companion template · `tools/unattended/SKILL.template.md` · `tools/unattended/
   permission: the driver suite is on no bar leg; it runs at VERIFYING, after the last unit,
   through `bash tools/unattended/run-unattended-gates.sh`, not at this unit's end (D12-i8's
   in-pass lift is parked, §9).
+  The owner ruled on 2026-09-29 that the unattended kit's own self-test suites are not run for
+  this landing, so this driver-suite observation is waived and its arm stays unobserved
+  (§9 rev-8).
 - **AC19** — When `gates-green` in `tools/unattended/unattended.test.sh` runs the REAL
   `tools/run-gates/run-gates.sh` as `$GATE_CMD` over a scratch repository whose one-leg manifest is
   red at L and identically red at R, under `land` at R, the item is MET reading the `attribution` file
@@ -508,6 +542,9 @@ companion template · `tools/unattended/SKILL.template.md` · `tools/unattended/
   permission: the driver suite is on no bar leg; it runs at VERIFYING, after the last unit,
   through `bash tools/unattended/run-unattended-gates.sh`, not at this unit's end (D12-i8's
   in-pass lift is parked, §9).
+  The owner ruled on 2026-09-29 that the unattended kit's own self-test suites are not run for
+  this landing, so this driver-suite observation is waived and its arm stays unobserved
+  (§9 rev-8).
 - **AC20** — When `memory/DECISIONS.md` is read, its TOOL heading carries one row keyed by this
   unit's id that names D12-i4 and the charter's push-boundary sentence it departs from, within the
   300-character entry budget.
@@ -522,6 +559,9 @@ companion template · `tools/unattended/SKILL.template.md` · `tools/unattended/
   permission: the driver suite is on no bar leg; it runs at VERIFYING, after the last unit,
   through `bash tools/unattended/run-unattended-gates.sh`, not at this unit's end (D12-i8's
   in-pass lift is parked, §9).
+  The owner ruled on 2026-09-29 that the unattended kit's own self-test suites are not run for
+  this landing, so this driver-suite observation is waived and its arm stays unobserved
+  (§9 rev-8).
 - **AC22** — When `tools/govkit/selftest.py` plants `INHERITED_RED=land` in a shipped fixture path,
   `govkit selfcheck` reds naming the file; with `export INHERITED_RED_MAX_AGE=10  # gov only` it reds
   too.
@@ -545,6 +585,9 @@ companion template · `tools/unattended/SKILL.template.md` · `tools/unattended/
   permission: the driver suite is on no bar leg; it runs at VERIFYING, after the last unit,
   through `bash tools/unattended/run-unattended-gates.sh`, not at this unit's end (D12-i8's
   in-pass lift is parked, §9).
+  The owner ruled on 2026-09-29 that the unattended kit's own self-test suites are not run for
+  this landing, so this driver-suite observation is waived and its arm stays unobserved
+  (§9 rev-8).
 - **AC24** — When `wc -c < memory/guides/UNATTENDED-PROTOCOL.md` and
   `wc -l < memory/guides/UNATTENDED-PROTOCOL.md` are read at this unit's commit and at its parent,
   EACH reading at this unit's commit is NO LARGER than the reading at the parent, and
@@ -765,6 +808,15 @@ New arm: tools/govkit/selftest.py · a shipped fixture path carrying `INHERITED_
   filed ask can name the owner; the hook's pinned id reads `push-<digits><RANDOM>-<pid>`, `$RANDOM`
   riding the digit run so the run log's `push-<digits>-<pid>` join still parses; and the ask's `run`
   command is read at R from the manifest the bar's own header names. No criterion moved.
+- rev-8 · 2026-09-29 · §6 AC1 AC5 AC6 AC7 AC9 AC11 AC12 AC13 AC15 AC17 AC18 AC19 AC21 AC23 ·
+  the owner's ruling of 2026-09-29, "just skip the unattended test": the unattended kit's own
+  self-test suites, run through its suite runner and in its attributed form alike, are not run
+  for this landing. Each of these fourteen criteria, observed through the driver suite or
+  through the attributed run, gains one sentence on its `permission:` line saying that
+  observation is waived and its arm stays unobserved. AC1, AC11, AC15 and AC17 also say their
+  hook half stands observed on the `pre-push self-test` leg at 364278a8, and AC11 that its two
+  declarations are read in the ledger. No assertion, `Red when:` arm, design or edge moved, and
+  the status stays CLOSED.
 
 ## 10. Reuse audit
 

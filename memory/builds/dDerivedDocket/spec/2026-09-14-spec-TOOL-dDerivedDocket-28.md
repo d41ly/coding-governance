@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-28 — run-owned process ledger
 
-**Status:** CLOSED · rev-9 · 2026-09-22 · node d · Tier-2 · base fb07ca25 · streams tooling · order 27
+**Status:** CLOSED · rev-10 · 2026-09-29 · node d · Tier-2 · base fb07ca25 · streams tooling · order 27
 
 <!-- gen:spec-records -->
 
@@ -246,7 +246,8 @@ anything the other writes.
   the VERIFYING run's attributed
   `bash tools/unattended/run-unattended-gates.sh --attribute <BASE>` and not its
   `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, which carries no leg for that
-  suite.
+  suite. The owner ruled on 2026-09-29 that the unattended kit's own self-test suites are not run
+  for this landing, so the suite observation is waived and the arm stays unobserved.
 - **AC2** — When the fixture holds an unrecorded process whose parent is gone, no reaping verb kills
   it, and `--status` does not count it.
   Red when: the reap walks the process table instead of the ledger.
@@ -291,7 +292,9 @@ anything the other writes.
   last unit: the attributed `bash tools/unattended/run-unattended-gates.sh --attribute <BASE>`
   made beside that run's `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, which
   carries no leg for these suites at any flag setting. This folds the conservative reading of
-  the parked ruling conflict and decides nothing.
+  the parked ruling conflict and decides nothing. The owner ruled on 2026-09-29 that the unattended
+  kit's own self-test suites are not run for this landing, so the suite observation is waived and
+  the criterion stays unobserved.
 - **AC11** — A fixture driver is killed while its stub bar sleeps. When the same slug's `gates-green`
   then runs, the orphan is reaped before the new stub bar starts. The same holds for `--preflight`.
   When `--hold` then runs over a fresh orphan left the same way, it reaps that orphan and proceeds.
@@ -476,6 +479,12 @@ New arm: tools/unattended/unattended.test.sh · a driver killed mid-bar, a same-
   wiring check therefore runs before the reap, and AC11's preflight arm observes the reap and the
   prune. The `--hold` precondition S7 fills is refusal 84, a new number rather than a fifth
   `fail 56`, so no pinned ordinal moves. S8's gate is check 41 of the kit leg.
+- rev-10 · 2026-09-29 · §6 AC1 AC10 · the owner ruled on 2026-09-29, "just skip the unattended
+  test": the unattended kit's own self-test suites, run through `run-unattended-gates.sh` with every
+  `--attribute <BASE>` run included, are not run for this landing. Each named criterion's permission
+  line now records that its suite observation is waived and stays unobserved, and the acceptance
+  ledger carries an AMENDED line for each. No design, scope or other criterion moved, and the unit
+  stays CLOSED.
 
 ## 10. Reuse audit
 

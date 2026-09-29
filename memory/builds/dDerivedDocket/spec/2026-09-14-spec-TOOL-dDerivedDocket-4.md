@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-4 — HELD phase, lease and derived phase
 
-**Status:** CLOSED · rev-9 · 2026-09-22 · node d · Tier-2 · base fb07ca25 · streams tooling · order 3
+**Status:** CLOSED · rev-10 · 2026-09-29 · node d · Tier-2 · base fb07ca25 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -577,6 +577,8 @@ is raised here: raising one is an owner turn, and the other units of this build 
   made beside that run's `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, which
   carries no leg for these suites at any flag setting. This folds the conservative reading of
   the parked ruling conflict and decides nothing.
+  The owner ruled on 2026-09-29 that the unattended kit's own self-test suites are not run for
+  this landing, so this attributed run is waived and the criterion stays unobserved.
 - **AC13** — When `--phase <slug> HELD --witness <sha>` runs on a working-phase fixture, it refuses
   with a numbered message and the run-state file is byte-unchanged. When
   `bash tools/unattended/check-unattended.sh` grades a driver copy in which `verb_phase` accepts a
@@ -623,6 +625,8 @@ is raised here: raising one is an owner turn, and the other units of this build 
   `bash tools/unattended/run-unattended-gates.sh --attribute <BASE>` and not its
   `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, which carries no leg for that
   suite.
+  The owner ruled on 2026-09-29 that the unattended kit's own self-test suites are not run for
+  this landing, so that attributed run is waived and the arm stays unobserved.
 - **AC18** — When `--resume` runs on a HELD fixture whose mandate no longer verifies at the pinned
   BASE, it refuses with a numbered message, and the run-state file and the lease file are
   byte-unchanged.
@@ -1003,6 +1007,11 @@ New arm: `tools/unattended/check-unattended.test.sh` · a driver copy reading th
   unit's consumes-from for `--replaces` as the holder's own path (§8 F9), identity by the keepalive
   (§8 F3), the refusal-before-write property and the AC6 and AC20 arms whose verdicts it keeps.
   Edges only: the unit stays CLOSED, and nothing it built moved.
+- rev-10 · 2026-09-29 · §6 AC12 · AC17 · the owner's ruling of 2026-09-29, "just skip the
+  unattended test": the unattended kit's own self-test suites are not run for this landing. Each
+  named criterion's permission line gains one sentence saying the attributed suite run it named
+  is waived and its arm stays unobserved. The unit stays CLOSED, and no design, order or edge
+  moved.
 
 ## 10. Reuse audit
 

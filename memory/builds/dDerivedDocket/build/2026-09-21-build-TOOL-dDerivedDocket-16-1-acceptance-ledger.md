@@ -80,6 +80,18 @@ strictly below the parent.
   of an id neither carrier knows still refuses under check 48.
 - AC12 — `BACKLOG_MODE` — with the anchor's `.memory-tree.conf` declaring nothing and HEAD's
   declaring `builds`, preflight prints one notice naming both.
+- AC13 — amended rev-8 — `run-unattended-gates.sh --attribute` — the attributed run and the
+  suite run grading every arm this unit added are waived by the owner's ruling of 2026-09-29
+  that the unattended kit's own self-test suites are not run for this landing, and stay
+  unobserved. The check-22 half stands observed: `bash tools/unattended/check-unattended.sh` is
+  the `unattended kit gate` leg, which exited 0 at 364278a8, where `ASKS_CMD` sits in the
+  example conf and in both protocol copies. Read with `git cat-file` on 2026-09-29 at
+  117f2c60 against its parent: each protocol copy falls from 60036 to 59827 bytes and rises
+  from 673 to 674 lines, under 61440 and 750, and the two copies are one blob;
+  `The checker gov declares is gov-internal` counts 1 then 0 in each, and
+  `The checker this repo declares is gov-internal` counts 1 at both commits in
+  `tools/unattended/.unattended.conf.example`. No record here says each added arm was seen RED
+  with its fix unstaged, so that clause is not claimed. Section 9 rev-8 logs the amendment.
 - AC14 — `derived_phase` — a foreign live spec closing a mandated ask prints one report-only line in
   all four fixtures, and labels the build terminal in exactly one: record absent, record tracked and
   LANDED, record tracked and HELD, record present only on a branch this tree does not carry. The

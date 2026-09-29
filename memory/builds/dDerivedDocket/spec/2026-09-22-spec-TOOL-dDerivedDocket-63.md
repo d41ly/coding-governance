@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-63 — the holder keeps its own `--replaces`: row precedence in the re-keyed resume matrix
 
-**Status:** CLOSED · rev-6 · 2026-09-27 · node d · Tier-2 · base 07997375 · streams tooling · order 33
+**Status:** CLOSED · rev-7 · 2026-09-29 · node d · Tier-2 · base 07997375 · streams tooling · order 33
 
 <!-- gen:spec-records -->
 
@@ -425,7 +425,10 @@ window harm named above, and unit 61's Rollout waits for this unit before it mak
   local bare remote; the tree holds none outside that suite.
   permission: the arm is written and staged RED in the pass, against a driver copy carrying unit
   61's row order; the driver suite that executes it is a held kit suite on no bar leg, so it runs in
-  the orchestrator's attributed VERIFYING run and never in this pass.
+  the orchestrator's attributed VERIFYING run and never in this pass. The owner ruled on 2026-09-29
+  that the unattended kit's own self-test suites, `tools/unattended/unattended.test.sh` among them,
+  are not run for this landing, so the suite observation is waived and the arm stays unobserved at
+  VERIFYING, while the pass's staged RED stands as the unit's acceptance ledger records it.
 - **AC2** — On AC1's fixture, `--resume tRun --keepalive-id kB --replaces kX` under the prologue's
   pid, and again under `CLAUDE_PID=999999998`, each refuses at check 58 with `--replaces names an id
   this slug's lease does not hold`, and `git hash-object` of the record and
@@ -433,7 +436,10 @@ window harm named above, and unit 61's Rollout waits for this unit before it mak
   Red when: the same-session row takes the call first, so a `--replaces` naming a job that is not
   the one driving the run takes the slug over instead of refusing.
   fixture: AC1's.
-  permission: as AC1, staged RED against the same copy.
+  permission: as AC1, staged RED against the same copy. The owner ruled on 2026-09-29 that the
+  unattended kit's own self-test suites, `tools/unattended/unattended.test.sh` among them, are not
+  run for this landing, so the suite observation is waived and the arm stays unobserved at
+  VERIFYING, while the pass's staged RED stands as the unit's acceptance ledger records it.
 - **AC3** — On AC1's fixture with no `--replaces`, `--resume tRun --keepalive-id kB` under the
   prologue's session and its pid `999999999`, which the record names, refuses at check 58 with the
   text naming `--replaces` and leaves `git hash-object` of the record unchanged. So does the same
@@ -449,7 +455,10 @@ window harm named above, and unit 61's Rollout waits for this unit before it mak
   recorded one, is refused.
   fixture: AC1's; the live pid is found the way the driver suite's lease arm finds its `OWN_PID`.
   permission: as AC1; the first two calls are staged RED against the copy, and the last two are its
-  controls.
+  controls. The owner ruled on 2026-09-29 that the unattended kit's own self-test suites,
+  `tools/unattended/unattended.test.sh` among them, are not run for this landing, so the suite
+  observation is waived and the arm stays unobserved at VERIFYING, while the pass's staged RED
+  stands as the unit's acceptance ledger records it.
 - **AC4** — When the orchestrator's attributed unattended run at VERIFYING reports on the driver
   suite, it reads `verdict clean`, with the four arms of §4's first arms table executed under the
   prologue's session and pid. The three at `tools/unattended/unattended.test.sh:7181`, `:7236` and
@@ -525,7 +534,11 @@ window harm named above, and unit 61's Rollout waits for this unit before it mak
   wrote a broken record could still print `keepalive replaced`.
   permission: the arm is written and staged RED in the pass, against a driver copy whose moved
   block tests the fresh return alone; the driver suite that executes it is a held kit suite on no
-  bar leg, so it runs in the orchestrator's attributed VERIFYING run and never in this pass.
+  bar leg, so it runs in the orchestrator's attributed VERIFYING run and never in this pass. The
+  owner ruled on 2026-09-29 that the unattended kit's own self-test suites,
+  `tools/unattended/unattended.test.sh` among them, are not run for this landing, so the suite
+  observation is waived and the arm stays unobserved at VERIFYING, while the pass's staged RED
+  stands as the unit's acceptance ledger records it.
 
 ## 7. Gates
 
@@ -618,6 +631,11 @@ guard the estimate trips is broad and leaves the join.
   edits and one comment line, now say what this pass changed, the one local included, after the
   build commit's bug-class checklist named the amendment-leaves-its-other-half-standing class. No
   row, order or edge moved.
+- rev-7 · 2026-09-29 · §6 AC1 AC2 AC3 AC7 · the owner's ruling of 2026-09-29, "just skip the
+  unattended test": the unattended kit's own self-test suites are not run for this landing. The four
+  criteria whose observation waited on the driver suite's run at VERIFYING each gain one sentence on
+  their permission line saying that observation is waived and the arm stays unobserved at VERIFYING,
+  while the staged RED the pass made stands. No design, row, order or edge moved.
 
 ## 10. Reuse audit
 

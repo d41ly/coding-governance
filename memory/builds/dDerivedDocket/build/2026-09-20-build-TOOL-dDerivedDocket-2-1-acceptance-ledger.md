@@ -50,6 +50,11 @@ none, and its own verdict is AC9's, owed to the VERIFYING run.
   Observed RED against break H, the conflict path's checkout of the branch removed: the refusal text
   still read correctly while HEAD sat detached at the tip, which is the half of this criterion that
   a message assertion alone would never catch.
+- AC9 — `tools/push-main.test.sh` — the post-build bar at bed37c25 (`GATE_FULL=1 GATE_SELFTESTS=1`)
+  ran the `push-main self-test` leg: exit 0, every case `ok` through arm 22b, closing
+  `push-main.test: all cases ok`. Beside it, `run-selftests.sh --serial --attribute 869209ed --kit
+  tools/push-main.test.sh` at 1efafd8f read NEW 0 · INHERITED 0 · FIXED 0 · DEAD L 0 · DEAD R 0 ·
+  OVER 0 · `verdict clean`, so no filed record is owed for the suite.
 - AC10 — `--carry --slug tFix` — fixture arm 16: a single-parent records commit on top of the
   prepared merge is accepted and HEAD, not T, is what reaches the remote. Arm 17: a SECOND merge on
   top of it is refused and the remote does not move. Arm 13: `--carry` over arm 13's fixture exits 1

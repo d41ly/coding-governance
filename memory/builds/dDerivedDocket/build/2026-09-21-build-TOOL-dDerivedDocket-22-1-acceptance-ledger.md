@@ -87,6 +87,11 @@ and so does AC9's one reading over the real tree.
 - AC12 — `LANDED_FACTS_CUTOFF` — under primary, a derived-LANDED record first committed after a
   2000-01-01 cutoff and lacking `units-at-landing` is refused under code 81 naming `--landed tRun`,
   with the record, the tree and the archive set unchanged; with a 2999-01-01 cutoff it rotates.
+- AC13 — amended rev-9 — `run-unattended-gates.sh --attribute` — the criterion's only
+  observation is the attributed run of the unattended suites at VERIFYING, grading every arm
+  units 19 and 20 added, and the owner's ruling of 2026-09-29 that the unattended kit's own
+  self-test suites are not run for this landing waives it; its `verdict clean` reading stays
+  unobserved. Section 9 rev-9 logs the amendment.
 - AC14 — `asks-at-landing:` — in the ask fixture under in-place, a committed LANDING carrying
   `asks:` and no freeze reds check 15 naming the record; under primary it does not, and with the
   freeze present it passes. RED with the arm grading LANDED alone.

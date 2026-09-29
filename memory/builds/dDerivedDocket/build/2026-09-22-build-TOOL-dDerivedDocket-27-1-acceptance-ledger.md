@@ -55,10 +55,18 @@ so none of them gets a line here. AC1, AC3, AC13 and AC15 were nonetheless exerc
 runs above; their lines are the orchestrator's.
 
 **Evidences:** TOOL-dDerivedDocket-27
+- AC1 — amended rev-12 — `tools/unattended/unattended.test.sh` is not run for this landing: the
+  owner ruled on 2026-09-29 that the unattended kit's own self-test suites are not run for it. The
+  permission line now records that the suite observation is waived and the arm stays unobserved.
+  Section 9 rev-12 logs it.
 - AC2 — `probe gate` — a stub bar that never printed the acquire line, under a backstop of 3 pinned
   as `3 (wall 1 + queue 1 + margin 1)` by the margin seam, was killed and `gates-green` was UNMET
   printing the `host-degraded` hold line released by `probe gate`, reason "the bar was killed at its
   backstop before it acquired the repository", and the `--hold` it names, and no never-returned text.
+- AC3 — amended rev-12 — `tools/unattended/unattended.test.sh` is not run for this landing: the
+  owner ruled on 2026-09-29 that the unattended kit's own self-test suites are not run for it. The
+  permission line now records that the suite observation is waived and the arm stays unobserved.
+  Section 9 rev-12 logs it.
 - AC4 — `--preflight` — over a fixture declaring `GATE_WALL="10"` under a profile printing wall 40,
   queue 20 and ceiling_max 30, `--preflight` refused as check 85 naming 10s and 30s, printed that the
   run-state file is unchanged, and left the record byte-identical and the tree clean; at a wall of 30
@@ -87,6 +95,10 @@ runs above; their lines are the orchestrator's.
   the `unattended skill wiring` leg printed `in sync` for the Skill rendered from that template.
 - AC9 — amended rev-8 — withdrawn with S11, as `TOOL-dDerivedDocket-61` deletes the lease bound
   it graded; rev-9 names what that unit carries of the property and what it does not.
+- AC10 — amended rev-12 — `run-unattended-gates.sh --attribute` is not run for this landing: the
+  owner ruled on 2026-09-29 that the unattended kit's own self-test suites are not run for it. The
+  permission line now records that the suite observation is waived and the criterion stays
+  unobserved. Section 9 rev-12 logs it.
 - AC11 — `gate queue: acquired` — a stub bar that printed the acquire line and then hung past the
   same 3 s backstop left `gates-green` UNMET with "the merge bar did not answer within its 3s
   backstop (wall 1 + queue 1 + margin 1) and was killed after", and no `hold ·` line.
@@ -94,6 +106,10 @@ runs above; their lines are the orchestrator's.
   read `wall 7`; under a blank wall, with `GATE_WALL=99` exported to the driver, it recorded
   `GATE_WALL=<unset>` and the driver printed the NOTE that the unattended bar runs under the gate
   runner's own profile wall.
+- AC13 — amended rev-12 — `tools/unattended/unattended.test.sh` is not run for this landing: the
+  owner ruled on 2026-09-29 that the unattended kit's own self-test suites are not run for it. The
+  permission line now records that the suite observation is waived and the arm stays unobserved.
+  Section 9 rev-12 logs it.
 - AC14 — amended rev-10 — `git cat-file -s` and `wc -l` read `memory/guides/UNATTENDED-PROTOCOL.md`
   at 64615 bytes and 704 lines at the parent and 64589 bytes and 704 lines at the build commit, and
   `tools/unattended/PROTOCOL.template.md` the same. In the template the row-anchored
@@ -107,3 +123,7 @@ runs above; their lines are the orchestrator's.
   already and carried by `memory/project/curation-debt.txt`, which is what rev-10 amended.
   `memory/guides/BUILD-METHOD.md` reads 27268 bytes and 349 lines, unchanged, below both guide caps
   and below its row in `tools/template-size-limits.txt`.
+- AC15 — amended rev-12 — `unattended.test.sh` and `check-unattended.test.sh` are not run for this
+  landing: the owner ruled on 2026-09-29 that the unattended kit's own self-test suites are not run
+  for it. The permission line now records that the suite observation is waived and the arms stay
+  unobserved. Section 9 rev-12 logs it.

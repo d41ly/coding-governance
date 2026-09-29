@@ -39,6 +39,12 @@ over the real tree, carries a `permission:` line deferring it to VERIFYING, so n
 line here: AC1 to AC7, AC9, AC11 to AC19, and AC21 to AC23. The same goes for AC10's leg half.
 
 **Evidences:** TOOL-dDerivedDocket-24
+- AC1 — amended rev-8 — `run-unattended-gates.sh` — the driver half is waived by the owner's
+  ruling of 2026-09-29 that the unattended kit's own self-test suites are not run for this
+  landing, and it stays unobserved. The hook half stands observed: at 364278a8 the
+  `pre-push self-test` leg exited 0, `pre-push.test: all cases ok`, as this block's AC2 line
+  records, over a suite whose `IR AC1` arm reads R's `park` and blocks the red a branch-committed
+  `land` would have landed. Section 9 rev-8 logs the amendment.
 - AC2 — `pre-push self-test` — at 364278a8 the leg exited 0, `pre-push.test: all cases ok`, with
   `IR AC2 an inherited-only red within its age lands under land`, whose arm matches exit 0 and
   `red on inherited legs only — landing under INHERITED_RED=land: x` naming leg `x`;
@@ -55,30 +61,93 @@ line here: AC1 to AC7, AC9, AC11 to AC19, and AC21 to AC23. The same goes for AC
   and the leg, and writes no `gate-full-green` into a git dir that held none. `pre-push self-test`
   (exit 0, all cases ok) logged `IR AC4 an inherited green at the remote sha scopes the gate` and
   `IR AC4 a moved remote sha forces FULL past the inherited green`.
+- AC5 — amended rev-8 — `run-unattended-gates.sh` — the criterion's only observation is the driver
+  suite's inherited-only fixture bar in `tools/unattended/unattended.test.sh`, and the owner's
+  ruling of 2026-09-29 that the unattended kit's own self-test suites are not run for this landing
+  waives it, so the arm stays unobserved. Section 9 rev-8 logs the amendment.
+- AC6 — amended rev-8 — `run-unattended-gates.sh` — the criterion's only observation is the driver
+  suite's replay of the recorded override over an OWN and an all-INHERITED attribution, and the
+  owner's ruling of 2026-09-29 that the unattended kit's own self-test suites are not run for this
+  landing waives it, so the arm stays unobserved. Section 9 rev-8 logs the amendment.
+- AC7 — amended rev-8 — `run-unattended-gates.sh` — the criterion's only observation is the driver
+  suite's abort over a MIXED and an inherited-only attribution, and the owner's ruling of 2026-09-29
+  that the unattended kit's own self-test suites are not run for this landing waives it, so the arm
+  stays unobserved. Section 9 rev-8 logs the amendment.
 - AC8 — `ABSORB` — over the leg suite's fixture: a pass that declared `work/one.txt` and an
   `absorb(tRun): memory hygiene inherited at 0123abcd` commit writing `fix/leg.txt` printed
   `check 23 ABSORB` naming that path, with no FAILED and no dodged-join line. The same commit moving
   a declared path while no commit named the pass was an ABSORB too. The same paths under a subject
   that also named the unit id printed no ABSORB and reded the ceiling as an undeclared write.
+- AC9 — amended rev-8 — `run-unattended-gates.sh` — the criterion's only observation is the driver
+  suite's `ASKS_CMD` arms, blank, witnessed and unreadable, on the MET path, and the owner's ruling
+  of 2026-09-29 that the unattended kit's own self-test suites are not run for this landing waives
+  it, so the arm stays unobserved. Section 9 rev-8 logs the amendment.
 - AC10 — `hold ·` — the skill-wiring half. `adopt-unattended.sh --check` reads `in sync`, and the
   rendered Skill's Close section names the hold for an inherited red under `park` once. Its steps run
   commit, push, reap, then `--hold`, and the rendered stops guide states ABSORB's four conditions and
   the absorb subject. The leg half over the rendered tree is owed at VERIFYING.
+- AC11 — amended rev-8 — `run-unattended-gates.sh` — the driver reader's half, run in
+  `tools/unattended/unattended.test.sh`, is waived by the owner's ruling of 2026-09-29 that the
+  unattended kit's own self-test suites are not run for this landing, and stays unobserved. The
+  hook reader's half stands observed: at 364278a8 the `pre-push self-test` leg exited 0,
+  `pre-push.test: all cases ok`, over a suite whose `IR AC11` arm resolves `land` with a bound
+  of `10` from this repository at HEAD. The declarations were read at that commit with
+  `git show` on 2026-09-29: `.githooks/gate-env.sh` lines 83 and 84 carry `INHERITED_RED=land`
+  and `INHERITED_RED_MAX_AGE=10`, and `.unattended.conf` line 190 carries `GATE_POLICY_FILE`
+  naming that file. Section 9 rev-8 logs the amendment.
+- AC12 — amended rev-8 — `run-unattended-gates.sh --attribute` — the criterion's only
+  observation is the attributed run of the unattended suites at VERIFYING, which the owner's
+  ruling of 2026-09-29 does not make for this landing, so its `verdict clean` reading and the
+  backlog join it feeds stay unobserved. Section 9 rev-8 logs the amendment.
+- AC13 — amended rev-8 — `run-unattended-gates.sh` — the criterion's only observation is the driver
+  suite's override and abort over a record at an earlier HEAD, a dirty tree and a moved tree, and
+  the owner's ruling of 2026-09-29 that the unattended kit's own self-test suites are not run for
+  this landing waives it, so the arm stays unobserved. Section 9 rev-8 logs the amendment.
 - AC14 — `pre-push self-test` — at 364278a8 the leg exited 0, `pre-push.test: all cases ok`, with
   `IR AC14 a stamp's wider window is not trusted`, whose arm matches `FULL gate on main push` and
   a reason naming the stamp's `max_age 50` and the bound 10 at the remote sha.
+- AC15 — amended rev-8 — `run-unattended-gates.sh` — the `gates-green` half in
+  `tools/unattended/unattended.test.sh` is waived by the owner's ruling of 2026-09-29 that the
+  unattended kit's own self-test suites are not run for this landing, and stays unobserved. The
+  hook half stands observed: at 364278a8 the `pre-push self-test` leg exited 0,
+  `pre-push.test: all cases ok`, over a suite whose `IR AC15` arm blocks an inherited-only red
+  on a bar whose verdict reads `tree_moved yes`, naming the move. Section 9 rev-8 logs the
+  amendment.
 - AC16 — `pre-push self-test` — at 364278a8 the leg exited 0, `pre-push.test: all cases ok`, with
   `IR AC16 a stale full green still reaches the inherited green`, whose arm matches
   `scoped gate on main push` naming the inherited green, over a full green that
   `is not an ancestor of the pushed tip`.
+- AC17 — amended rev-8 — `run-unattended-gates.sh` — the `gates-green` half in
+  `tools/unattended/unattended.test.sh` is waived by the owner's ruling of 2026-09-29 that the
+  unattended kit's own self-test suites are not run for this landing, and stays unobserved. The
+  hook half stands observed: at 364278a8 the `pre-push self-test` leg exited 0,
+  `pre-push.test: all cases ok`, over a suite whose `IR AC17` arms block an `aged` inherited leg
+  under `land` and read `park`, announced, beside a blank, `0` and `ten` bound. Section 9
+  rev-8 logs the amendment.
+- AC18 — amended rev-8 — `run-unattended-gates.sh` — the criterion's only observation is the driver
+  suite's environment-printing stub under a local main the remote lacks, and the owner's ruling of
+  2026-09-29 that the unattended kit's own self-test suites are not run for this landing waives it,
+  so the arm stays unobserved. Section 9 rev-8 logs the amendment.
+- AC19 — amended rev-8 — `run-unattended-gates.sh` — the criterion's only observation is the driver
+  suite's run of the real runner as `$GATE_CMD` over a one-leg scratch manifest, and the owner's
+  ruling of 2026-09-29 that the unattended kit's own self-test suites are not run for this landing
+  waives it, so the arm stays unobserved. Section 9 rev-8 logs the amendment.
 - AC20 — `memory/DECISIONS.md` — the TOOL heading carries one `TOOL-dDerivedDocket-24` row naming
   D12-i4, the charter's 'blocks a red one' and 'green at the push boundary', and the protocol's
   `gates-green`, at 287 bytes against the 300 budget.
+- AC21 — amended rev-8 — `run-unattended-gates.sh` — the criterion's only observation is the driver
+  suite's commit, push, reap and `--hold` sequence under `park`, and the owner's ruling of
+  2026-09-29 that the unattended kit's own self-test suites are not run for this landing waives it,
+  so the arm stays unobserved. Section 9 rev-8 logs the amendment.
 - AC22 — `govkit selftest` — at 364278a8 the leg exited 0, `govkit-selftest: all arms held`, with
   `AC22: a bare INHERITED_RED assignment inside a kit's payload REDS, naming the file` and the same
   arm for `INHERITED_RED_MAX_AGE` both `ok`. Each runs `govkit.py selfcheck` over a scratch kit
   whose `tools/demo/policy.sh` carries `INHERITED_RED=land`, then
   `export INHERITED_RED_MAX_AGE=10  # gov only`, and matches exit 1 naming that file.
+- AC23 — amended rev-8 — `run-unattended-gates.sh` — the criterion's only observation is the driver
+  suite's second hold over one inherited red at one R, and the owner's ruling of 2026-09-29 that the
+  unattended kit's own self-test suites are not run for this landing waives it, so the arm stays
+  unobserved. Section 9 rev-8 logs the amendment.
 - AC24 — `wc -c < memory/guides/UNATTENDED-PROTOCOL.md` — 64744 bytes and 706 lines at the parent,
   64719 and 704 here, the `GATE_POLICY_FILE` row being one line of 170 bytes against the 195-byte
   paragraph it replaced. `grep -c 'contend on the bar' tools/unattended/README.md` prints 1.

@@ -50,9 +50,29 @@ suites. The unit names no function, so no lexicon answer is owed.
   `stat -c %Y over <config>/projects/<enc>/S65/subagents`, with no `verdict:` line. The term-less
   copy read `commit` and `stale: yes` with every fresh file, and printed `verdict: STALE` under
   the stub.
+- AC2 — amended rev-3 — the arm in `tools/unattended/unattended.test.sh` is waived: the owner
+  ruled on 2026-09-29 that the unattended kit's own self-test suites are not run for this landing,
+  so the attributed run the permission line named is not made and the criterion stays unobserved.
+  Section 9 rev-3 logs the amendment. The block's 8 assertions ran once behind a replica prologue
+  in the build pass, as the prose above records; that is not the suite run and is not claimed as
+  it.
+- AC3 — amended rev-3 — the arm in `tools/unattended/resume-tick.test.sh` is waived: the owner
+  ruled on 2026-09-29 that the unattended kit's own self-test suites are not run for this landing,
+  so that arm stays unobserved. Section 9 rev-3 logs the amendment. The fixture half stands
+  observed as the build pass's direct check recorded above: `resume-tick.sh --dry-run` printed
+  `skip · verdict LIVE` with the sub-agent transcript fresh and `resumed · attempt 1` with it
+  dated 2000-01-01, and the term-less copy printed `resumed · attempt 1` for both.
 - AC4 — `grep -cF '/**/agent-*.jsonl'` — printed 1 over the driver, and
   `grep -cE '^[^#]*subagents'` printed 1, the one line deriving the directory from the transcript
   path. The count of `grep -cF "'----'"` read 1 at the parent and 1 at the build.
+- AC5 — amended rev-3 — the attributed run over `tools/unattended/unattended.test.sh` and the
+  resume-tick suite is waived: the owner ruled on 2026-09-29 that the unattended kit's own
+  self-test suites are not run for this landing, so the verdict half stays unobserved. Section 9
+  rev-3 logs the amendment. The floor half stands observed, read on 2026-09-29 with `git show`:
+  the driver suite's `FLOOR_ASSERTIONS` reads 1736 at the first parent e0643748 and 1759 at the
+  build commit 5491f7bc, `FLOOR_SHARD_2` 1540 and 1563, `FLOOR_SHARD_1` 208 at both, and the
+  resume-tick suite's `FLOOR_ASSERTIONS` 176 and 179. Those deltas, 23 and 3, are the counts the
+  build pass took off the new arms' blocks, as the prose above records.
 - AC6 — `grep -c 'KIT_UNATTENDED_VERSION=1.29' tools/unattended/unattended.sh` — printed 1 at the
   build commit 5491f7bc, as at its parent e0643748. Over the driver, `git diff -U0` adds no line
   spelling a `tools/<kit>/` literal; the function-definition and `fail` counts read 199 and 289 at

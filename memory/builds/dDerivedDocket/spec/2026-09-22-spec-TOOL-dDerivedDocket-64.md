@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-64 — the turnstile queue's heartbeat, a move the liveness clock sees
 
-**Status:** CLOSED · rev-5 · 2026-09-27 · node d · Tier-2 · base 07997375 · streams tooling · order 34
+**Status:** CLOSED · rev-6 · 2026-09-29 · node d · Tier-2 · base 07997375 · streams tooling · order 34
 
 <!-- gen:spec-records -->
 
@@ -350,6 +350,9 @@ queue, and a default-off flag would switch the kill of a healthy queued bar back
   driver suite's prologue builds; the tree holds none outside that suite.
   permission: the arm lives in the driver suite, a held kit suite on no bar leg, so it runs in the
   orchestrator's attributed VERIFYING run and never in this pass.
+  The owner ruled on 2026-09-29 that the unattended kit's own self-test suites are not run for
+  this landing, so the `tools/unattended/unattended.test.sh` observation is waived and the arm
+  stays unobserved.
 - **AC3** — When `bash tools/unattended/resume-tick.sh --repo <fixture> --dry-run` runs over AC1's
   fixture with the heartbeat dated inside the bound, it prints `skip · verdict LIVE` and no
   `resumed ·` decision; with the heartbeat dated past the bound it prints `resumed · attempt 1`.
@@ -363,6 +366,10 @@ queue, and a default-off flag would switch the kill of a healthy queued bar back
   its `build_fixture`, which that unit makes write `run-branch: refs/heads/main`.
   permission: the fixture run is this pass's direct check; the arm that keeps it lives in the
   resume-tick suite, a held kit suite, executed at VERIFYING beside AC2's.
+  The owner ruled on 2026-09-29 that the unattended kit's own self-test suites are not run for
+  this landing, so the arm in `tools/unattended/resume-tick.test.sh` is waived and stays
+  unobserved, while the fixture run stands observed as the build pass's direct check, recorded in
+  this unit's acceptance ledger.
 - **AC4** — When the `run-gates turnstile` leg runs its position fixture, where a planted live holder
   makes the waiter queue, `gate-queue-heartbeat` exists under the fixture's git dir while the waiter
   waits, and its `stat -c %Y` reading advances between two reads. Once the holder is released and the
@@ -412,6 +419,12 @@ queue, and a default-off flag would switch the kill of a healthy queued bar back
   `tools/unattended/unattended.test.sh:5882`; or a floor moves by a number no arm accounts for.
   permission: all three are held kit suites on no plain bar leg, so they run at VERIFYING and never
   in this pass.
+  The owner ruled on 2026-09-29 that the unattended kit's own self-test suites are not run for
+  this landing, so the attributed run over `tools/unattended/unattended.test.sh` and
+  `tools/unattended/resume-tick.test.sh` is waived and its half stays unobserved, while the
+  `run-gates turnstile` leg's half stands observed on that leg at 364278a8 and the floor half,
+  read with `git show` at the build commit and its first parent, stands observed, both in this
+  unit's acceptance ledger.
 - **AC9** — When `grep -c 'KIT_UNATTENDED_VERSION=1.29' tools/unattended/unattended.sh` and
   `grep -c 'KIT_RUN_GATES_VERSION=1.9' tools/run-gates/run-gates.sh` run at the build commit, each
   prints 1. The lines this unit adds to every shipped kit file it edits, read by `git diff -U0` of
@@ -498,6 +511,12 @@ suite carries AC4's arm, and both canaries run the edited runner.
   under `TOOL-dDerivedDocket-62`, which builds before this unit, a copy off its run branch reads
   ELSEWHERE; the bullet now names both verdicts, which the tick skips, so its conclusion stands. No
   criterion, row, order or edge moved.
+- rev-6 · 2026-09-29 · §6 AC2 · AC3 · AC8 · the owner's ruling of 2026-09-29, "just skip the
+  unattended test": the unattended kit's own self-test suites are not run for this landing. Each
+  named criterion's permission line gains one sentence saying its suite observation is waived and
+  the arm stays unobserved; AC3's fixture half and AC8's `run-gates turnstile` and floor halves
+  stand observed as the acceptance ledger records. The unit stays CLOSED, and no design, order or
+  edge moved.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-17 — asks-disposed DoD item and freeze
 
-**Status:** CLOSED · rev-7 · 2026-09-21 · node d · Tier-2 · base fb07ca25 · streams tooling · order 17
+**Status:** CLOSED · rev-8 · 2026-09-29 · node d · Tier-2 · base fb07ca25 · streams tooling · order 17
 
 <!-- gen:spec-records -->
 
@@ -367,6 +367,10 @@ Its drift-audit bytes (S6) ride unit 13's move of `KIT_DRIFT_AUDIT_VERSION`, bec
   permission: that file is a self-test suite, which `tools/unattended/gate-guard.js` denies before
   VERIFYING, so the arm runs at the one post-build bar the main loop runs at VERIFYING, after the
   last unit; in the pass the same protocol text is fed to the word table by hand in a scratch copy.
+  The owner ruled on 2026-09-29 that the unattended kit's own self-test suites are not run for
+  this landing, so the arm is waived and stays unobserved, while the parse itself stands observed
+  over the real protocol on the `unattended kit gate` leg at 364278a8, whose check 16 joins its
+  "Thirteen kit-owned core items" to the driver's set, as this unit's acceptance ledger records.
 - **AC11** — When `python tools/drift-audit/drift_report.py` runs over a fixture holding two
   `override` rows for `asks-disposed` and one for `gates-green`, `asks_disposed_overrides` reads 2
   and is not gateable; over a fixture with no run-state file it reads DEAD PROBE.
@@ -392,6 +396,8 @@ Its drift-audit bytes (S6) ride unit 13's move of `KIT_DRIFT_AUDIT_VERSION`, bec
   observed by hand against a scratch fixture. That folds the conservative reading of the D12-h
   conflict and does not decide it: S7, §5 and §10 keep the ruling's wording, and the run record
   parks it for the owner.
+  The owner ruled on 2026-09-29 that the unattended kit's own self-test suites are not run for
+  this landing, so this attributed run is waived and the criterion stays unobserved.
 - **AC13** — When `--close` runs in `tools/unattended/unattended.test.sh` on a no-mandate fixture
   whose own `BACKLOG.md` files an ask that has no disposition row and is not terminal, with
   `ASKS_CMD` set, the item is UNMET naming that ask under T3.
@@ -598,6 +604,11 @@ New arm: `tools/drift-audit/selftest.py` · a fixture with override rows for two
     taken the new refusal code. The freeze now takes term zero's first answer: where the ask
     contract is NOT ADOPTED there is no derived status to freeze. Rollout's "no record gains an
     `asks-at-landing` line" is what this makes true.
+- rev-8 · 2026-09-29 · §6 AC10 · AC12 · the owner's ruling of 2026-09-29, "just skip the
+  unattended test": the unattended kit's own self-test suites are not run for this landing. Each
+  named criterion's permission line gains one sentence saying its suite observation is waived and
+  the arm stays unobserved; AC10's parse stands observed on the `unattended kit gate` leg as the
+  acceptance ledger records. The unit stays CLOSED, and no design, order or edge moved.
 
 ## 10. Reuse audit
 

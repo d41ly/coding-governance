@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-5 — auto-resume from HELD
 
-**Status:** CLOSED · rev-8 · 2026-09-22 · node d · Tier-2 · base fb07ca25 · streams tooling · order 5
+**Status:** CLOSED · rev-9 · 2026-09-29 · node d · Tier-2 · base fb07ca25 · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
@@ -351,6 +351,8 @@ which receives the trimmed §8 rationale · the rendered guides and Skill ·
   `bash tools/unattended/run-unattended-gates.sh --attribute <BASE>` and not its
   `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, which carries no leg for that
   suite.
+  The owner ruled on 2026-09-29 that the unattended kit's own self-test suites are not run for
+  this landing, so that attributed run is waived and these arms stay unobserved.
 - **AC8** — When `--resume <slug> --scheduled <held-at> --keepalive-id C` runs against the matching
   HELD record, once with the remote at the pre-hold `witness` and once with the hold commit pushed,
   unit 4's take-over completes, records C, and the new history row carries `scheduled`. The same
@@ -411,6 +413,8 @@ which receives the trimmed §8 rationale · the rendered guides and Skill ·
   made beside that run's `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, which
   carries no leg for these suites at any flag setting. This folds the conservative reading of
   the parked ruling conflict and decides nothing.
+  The owner ruled on 2026-09-29 that the unattended kit's own self-test suites are not run for
+  this landing, so this attributed run is waived and the criterion stays unobserved.
 - **AC15** — The discharge command of `tools/unattended/kit.toml`'s conf-placeholder hole runs in a
   fixture whose `.unattended.conf` is the shipped example with its three `KEEPALIVE_` lines filled
   and its `RESUME_SCHEDULE_CREATE` and `RESUME_SCHEDULE_DELETE` lines left verbatim. It exits
@@ -694,6 +698,11 @@ pair, and recorded in the unit's journal. No gate can make it.
 - rev-8 · 2026-09-22 · §3 · one hands-off edge added, to `TOOL-dDerivedDocket-61`, answering that
   unit's consumes-from for `RESUME_SCHEDULE` as HELD's restart and the `--scheduled` refusals ahead
   of the resume matrix. Edges only: the unit stays CLOSED, and nothing it built or specified
+  moved.
+- rev-9 · 2026-09-29 · §6 AC7 · AC14 · the owner's ruling of 2026-09-29, "just skip the
+  unattended test": the unattended kit's own self-test suites are not run for this landing. Each
+  named criterion's permission line gains one sentence saying the attributed suite run it named
+  is waived and its arms stay unobserved. The unit stays CLOSED, and no design, order or edge
   moved.
 
 ## 10. Reuse audit

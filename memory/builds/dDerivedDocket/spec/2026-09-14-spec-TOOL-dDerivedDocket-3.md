@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-3 — the run's landing path
 
-**Status:** CLOSED · rev-7 · 2026-09-22 · node d · Tier-2 · base fb07ca25 · streams tooling · order 4
+**Status:** CLOSED · rev-8 · 2026-09-29 · node d · Tier-2 · base fb07ca25 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
@@ -392,7 +392,9 @@ NOT `memory/DECISIONS.md`: S9 records why a unit pass cannot write it.
   last unit: the attributed `bash tools/unattended/run-unattended-gates.sh --attribute <BASE>`
   made beside that run's `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, which
   carries no leg for these suites at any flag setting. This folds the conservative reading of
-  the parked ruling conflict and decides nothing.
+  the parked ruling conflict and decides nothing. The owner ruled on 2026-09-29 that the unattended
+  kit's own self-test suites are not run for this landing, so the suite observation is waived and
+  the criterion stays unobserved.
 - **AC12** — When `--close` runs under `in-place` over a prepared merge with one untracked file in
   the tree, `gates-green` refuses with a numbered message naming the stamp precondition, and no bar
   runs.
@@ -627,6 +629,12 @@ New arm: `tools/unattended/check-unattended.test.sh` · a Skill render missing `
   unit's consumes-from for the in-place landing sequence S6 carries and its no-commit-after-the-push
   order, against which it scopes the Skill's Record-the-run placements. Edges only: the unit stays
   CLOSED, and nothing it built or specified moved.
+- rev-8 · 2026-09-29 · §6 AC11 · the owner ruled on 2026-09-29, "just skip the unattended test": the
+  unattended kit's own self-test suites, run through `run-unattended-gates.sh` with every
+  `--attribute <BASE>` run included, are not run for this landing. The named criterion's permission
+  line now records that its suite observation is waived and stays unobserved, and the acceptance
+  ledger carries an AMENDED line for it. No design, scope or other criterion moved, and the unit
+  stays CLOSED.
 
 ## 10. Reuse audit
 

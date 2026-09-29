@@ -50,6 +50,10 @@ carry a `permission:` line deferring their observation and get no line here.
   back; its `/session-kickoff` step comes after that `--resume`; and its keepalive section runs
   `--resume <slug> --keepalive-id` first and `--audit <slug>` only when that first act neither
   refuses nor prints `still held`.
+- AC12 — amended rev-10 — the attributed `run-unattended-gates.sh --attribute <BASE>` run is
+  waived: the owner ruled on 2026-09-29 that the unattended kit's own self-test suites are not run
+  for this landing, so no attribution summary exists and the criterion stays unobserved. Section 9
+  rev-10 logs the amendment.
 - AC13 — `verb_phase` — `--phase <slug> HELD --witness <sha>` on a working-phase fixture refuses with
   a numbered message and writes nothing; and over a fixture driver copy whose `verb_phase` no longer
   guards HELD, the kit gate's check 33 reds naming HELD.
@@ -62,6 +66,12 @@ carry a `permission:` line deferring their observation and get no line here.
   its first line of stdout (the reading rev-7 records).
 - AC16 — `--code bogus` — refuses, as does `--until 'after tomorrow'`, each writing nothing; a code
   declared in `HOLD_CODES_EXTRA` is accepted and the record reads `phase HELD · code vendor-outage`.
+- AC17 — amended rev-10 — the arm in `tools/unattended/unattended.test.sh` is waived: the owner
+  ruled on 2026-09-29 that the unattended kit's own self-test suites are not run for this landing,
+  so the attributed run the permission line named is not made and the arm stays unobserved.
+  Section 9 rev-10 logs the amendment. The same verb sequence was exercised against a fixture by
+  the build pass's direct driver run, as the section below records; that is not the suite this
+  criterion names and is not claimed as it.
 - AC18 — `--resume` — on a HELD fixture whose recorded BASE no longer resolves in this history, the
   take-over refuses through `trusted_base` before the lease is taken; record and lease byte-unchanged.
 - AC19 — `presumed-stopped` — a leaseless BUILDING fixture whose newest build-folder commit is dated

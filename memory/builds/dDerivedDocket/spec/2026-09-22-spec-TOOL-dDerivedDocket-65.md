@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-65 — a session waiting on its own sub-agents, a move the liveness clock sees
 
-**Status:** CLOSED · rev-2 · 2026-09-27 · node d · Tier-2 · base 67d2ccfc · streams tooling · order 35
+**Status:** CLOSED · rev-3 · 2026-09-29 · node d · Tier-2 · base 67d2ccfc · streams tooling · order 35
 
 <!-- gen:spec-records -->
 
@@ -308,6 +308,9 @@ session's `--resume --keepalive-id` in the run worktree, which nothing in this b
   through to the rows read here; the tree holds none outside that suite.
   permission: the arm lives in the driver suite, a held kit suite on no bar leg, so it runs in the
   orchestrator's attributed VERIFYING run and never in this pass.
+  The owner ruled on 2026-09-29 that the unattended kit's own self-test suites are not run for
+  this landing, so the `tools/unattended/unattended.test.sh` observation is waived and the arm
+  stays unobserved.
 - **AC3** — When `bash tools/unattended/resume-tick.sh --repo <fixture> --dry-run` runs over AC1's
   fixture with the sub-agent transcript dated inside the bound, it prints `skip · verdict LIVE` and
   no `resumed ·` decision; with it dated past the bound it prints `resumed · attempt 1`. The
@@ -320,6 +323,10 @@ session's `--resume --keepalive-id` in the run worktree, which nothing in this b
   suite's `build_fixture` with `CONF_EXTRA='RESUME_STALE_BOUND="1800"'`, because that fixture's
   declared 1 s bound is shorter than one tick call; it is a held kit suite, executed at VERIFYING
   beside AC2's.
+  The owner ruled on 2026-09-29 that the unattended kit's own self-test suites are not run for
+  this landing, so the arm in `tools/unattended/resume-tick.test.sh` is waived and stays
+  unobserved, while the fixture run stands observed as the build pass's direct check, recorded in
+  this unit's acceptance ledger.
 - **AC4** — When `grep -cE '^[^#]*subagents' tools/unattended/unattended.sh` runs at the build
   commit it prints 1, and `grep -cF '/**/agent-*.jsonl'` over the same file prints 1. The count of
   `grep -cF "'----'"` over it, the root encoding's one spelling, is what it was at the first parent,
@@ -337,6 +344,11 @@ session's `--resume --keepalive-id` in the run worktree, which nothing in this b
   or a floor moves by a number no arm accounts for.
   permission: both are held kit suites on no plain bar leg, so they run at VERIFYING and never in
   this pass.
+  The owner ruled on 2026-09-29 that the unattended kit's own self-test suites are not run for
+  this landing, so the attributed run over `tools/unattended/unattended.test.sh` and
+  `tools/unattended/resume-tick.test.sh` is waived and its verdict half stays unobserved, while
+  the floor half, read with `git show` at the build commit and its first parent, stands observed
+  in this unit's acceptance ledger.
 - **AC6** — When `grep -c 'KIT_UNATTENDED_VERSION=1.29' tools/unattended/unattended.sh` runs at the
   build commit it prints 1. The lines this unit adds to the driver, read by `git diff -U0` of the
   build commit, carry no `tools/<kit>/` literal. `grep -cE '^[a-z_]+\(\) *\{'` and
@@ -425,6 +437,11 @@ broad `tools/` one, so the legs above are named by choice.
   at `d5ae776b`, so §1, the Rollout and §5 risk (1) date the kill window from that commit rather
   than from unit 61's Rollout, and the resume tick stays unregistered from now until this unit
   lands. No order or edge moved, and no criterion but AC6 changed.
+- rev-3 · 2026-09-29 · §6 AC2 · AC3 · AC5 · the owner's ruling of 2026-09-29, "just skip the
+  unattended test": the unattended kit's own self-test suites are not run for this landing. Each
+  named criterion's permission line gains one sentence saying its suite observation is waived and
+  the arm stays unobserved; AC3's fixture half and AC5's floor half stand observed as the
+  acceptance ledger records. The unit stays CLOSED, and no design, order or edge moved.
 
 ## 10. Reuse audit
 

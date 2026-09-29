@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-27 — declared gate wall
 
-**Status:** CLOSED · rev-11 · 2026-09-22 · node d · Tier-2 · base fb07ca25 · streams tooling · order 28
+**Status:** CLOSED · rev-12 · 2026-09-29 · node d · Tier-2 · base fb07ca25 · streams tooling · order 28
 
 <!-- gen:spec-records -->
 
@@ -288,7 +288,8 @@ raised: raising one is an owner turn.
   the VERIFYING run's attributed
   `bash tools/unattended/run-unattended-gates.sh --attribute <BASE>` and not its
   `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, which carries no leg for that
-  suite.
+  suite. The owner ruled on 2026-09-29 that the unattended kit's own self-test suites are not run
+  for this landing, so the suite observation is waived and the arm stays unobserved.
 - **AC2** — When the stub hangs without printing `gate queue: acquired` and the margin seam makes the
   backstop 3 s, the item is UNMET as never started, with a `hold` line naming `host-degraded` and
   `probe gate`.
@@ -302,7 +303,8 @@ raised: raising one is an owner turn.
   the VERIFYING run's attributed
   `bash tools/unattended/run-unattended-gates.sh --attribute <BASE>` and not its
   `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, which carries no leg for that
-  suite.
+  suite. The owner ruled on 2026-09-29 that the unattended kit's own self-test suites are not run
+  for this landing, so the suite observation is waived and the arm stays unobserved.
 - **AC4** — When `bash tools/unattended/check-unattended.sh` grades a FIXTURE conf declaring
   `GATE_WALL` below the profile's `ceiling_max`, it reds naming both numbers, and `--preflight` over
   that same fixture refuses before any write.
@@ -363,7 +365,9 @@ raised: raising one is an owner turn.
   last unit: the attributed `bash tools/unattended/run-unattended-gates.sh --attribute <BASE>`
   made beside that run's `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, which
   carries no leg for these suites at any flag setting. This folds the conservative reading of
-  the parked ruling conflict and decides nothing.
+  the parked ruling conflict and decides nothing. The owner ruled on 2026-09-29 that the unattended
+  kit's own self-test suites are not run for this landing, so the suite observation is waived and
+  the criterion stays unobserved.
 - **AC11** — When the stub prints `gate queue: acquired` and then hangs past the backstop, the item
   is UNMET with the never-returned text and no `hold` line.
   Red when: every backstop kill maps to `host-degraded` and `probe gate`, so a wedged leg gets up to
@@ -390,7 +394,8 @@ raised: raising one is an owner turn.
   the VERIFYING run's attributed
   `bash tools/unattended/run-unattended-gates.sh --attribute <BASE>` and not its
   `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, which carries no leg for that
-  suite.
+  suite. The owner ruled on 2026-09-29 that the unattended kit's own self-test suites are not run
+  for this landing, so the suite observation is waived and the arm stays unobserved.
 - **AC14** — When `git cat-file -s` reads `memory/guides/UNATTENDED-PROTOCOL.md` at this unit's
   build commit and at that commit's first parent, the build-commit size is NOT GREATER than the
   parent's, and neither is its `wc -l` line count. Both trims are taken, both landed, and both left
@@ -453,7 +458,8 @@ raised: raising one is an owner turn.
   bar leg at all, so the run that executes them is the VERIFYING run's attributed
   `bash tools/unattended/run-unattended-gates.sh --attribute <BASE>` and not its
   `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, which carries no leg for either
-  suite.
+  suite. The owner ruled on 2026-09-29 that the unattended kit's own self-test suites are not run
+  for this landing, so the suite observation is waived and the arms stay unobserved.
 
 ## 7. Gates
 
@@ -656,6 +662,12 @@ New arm: tools/run-gates/run-gates.test.sh · a profile print over a manifest wi
 - rev-11 · 2026-09-22 · §3 · §6 AC9 · the G9 audit's M8, the half left in this spec: the queued bar
   is `TOOL-dDerivedDocket-64`'s and the silent long leg is carried by no unit, which 64 hands off
   external. Wording only; the unit stays CLOSED and nothing it built moved.
+- rev-12 · 2026-09-29 · §6 AC1 AC3 AC10 AC13 AC15 · the owner ruled on 2026-09-29, "just skip the
+  unattended test": the unattended kit's own self-test suites, run through `run-unattended-gates.sh`
+  with every `--attribute <BASE>` run included, are not run for this landing. Each named criterion's
+  permission line now records that its suite observation is waived and stays unobserved, and the
+  acceptance ledger carries an AMENDED line for each. No design, scope or other criterion moved, and
+  the unit stays CLOSED.
 
 ## 10. Reuse audit
 

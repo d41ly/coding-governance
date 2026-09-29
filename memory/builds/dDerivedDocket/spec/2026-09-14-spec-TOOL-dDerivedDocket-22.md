@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-22 — LANDED derived from the tip
 
-**Status:** CLOSED · rev-8 · 2026-09-22 · node d · Tier-2 · base fb07ca25 · streams tooling · order 22
+**Status:** CLOSED · rev-9 · 2026-09-29 · node d · Tier-2 · base fb07ca25 · streams tooling · order 22
 
 <!-- gen:spec-records -->
 
@@ -498,6 +498,9 @@ the rendered guides and Skill · `memory/map/features/unattended.md`.
   made beside that run's `GATE_FULL=1 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh`, which
   carries no leg for these suites at any flag setting. This folds the conservative reading of
   the parked ruling conflict and decides nothing.
+  The owner ruled on 2026-09-29 that the unattended kit's own self-test suites are not run for
+  this landing, its attributed run included, so this observation is waived and stays unobserved
+  (§9 rev-9).
 - **AC14** — When the leg grades a fixture under `LANDER_MODE=in-place` holding a committed LANDING
   record that carries `asks:` and no `asks-at-landing:`, check 15 reds naming the record. The same
   record under `primary` does not red, and with the fact present it passes.
@@ -820,6 +823,11 @@ New arm: tools/unattended/check-unattended.sh self-scan · a `--diff-filter=A` f
   unit's consumes-from for the LANDED derivation, `read_landing_commit` and the in-place `--landed`
   observation, which it moves into `landed.<slug>.log`. Edges only: the unit stays CLOSED, and
   nothing it built or specified moved.
+- rev-9 · 2026-09-29 · §6 AC13 · the owner's ruling of 2026-09-29, "just skip the unattended
+  test": the unattended kit's own self-test suites, the attributed run included, are not run for
+  this landing. AC13's `permission:` line gains one sentence saying its observation, which is
+  that attributed run alone, is waived and stays unobserved. No assertion, `Red when:` arm,
+  design or edge moved, and the status stays CLOSED.
 
 ## 10. Reuse audit
 

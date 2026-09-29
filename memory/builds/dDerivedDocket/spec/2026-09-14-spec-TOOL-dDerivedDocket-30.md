@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-30 — checker defects from the stop census
 
-**Status:** CLOSED · rev-7 · 2026-09-22 · node d · Tier-2 · base fb07ca25 · streams tooling · order 24
+**Status:** CLOSED · rev-8 · 2026-09-29 · node d · Tier-2 · base fb07ca25 · streams tooling · order 24
 
 <!-- gen:spec-records -->
 
@@ -299,7 +299,8 @@ prose.
   `pass_commit` skips the commit that edited the brief and check 23 never grades it.
   permission: the leg suite is on no bar leg; it runs at VERIFYING, after the last unit, through
   `bash tools/unattended/run-unattended-gates.sh`, not at this unit's end (D12-i8's in-pass lift
-  is parked, §9).
+  is parked, §9). The owner ruled on 2026-09-29 that the unattended kit's own self-test suites are
+  not run for this landing, so the suite observation is waived and the arm stays unobserved.
 - **AC2** — When `bash tools/unattended/check-unattended.sh --skip 28` runs on the real tree, no
   check 23 line names a brief whose row, directory and blob all match.
   Red when: the blob is read from the working tree instead of the pass commit, so a brief edited
@@ -339,19 +340,22 @@ prose.
   failing case unobserved.
   permission: the leg suite is on no bar leg; it runs at VERIFYING, after the last unit, through
   `bash tools/unattended/run-unattended-gates.sh`, not at this unit's end (D12-i8's in-pass lift
-  is parked, §9).
+  is parked, §9). The owner ruled on 2026-09-29 that the unattended kit's own self-test suites are
+  not run for this landing, so the suite observation is waived and the arm stays unobserved.
 - **AC5** — When a fixture copy of the driver documents `--frobnicate` on a header line with no parser
   token, the leg fails 26 naming `--frobnicate`.
   Red when: the flag arm reads only case labels, so a documented flag parsed nowhere is not missed.
   permission: the leg suite is on no bar leg; it runs at VERIFYING, after the last unit, through
   `bash tools/unattended/run-unattended-gates.sh`, not at this unit's end (D12-i8's in-pass lift
-  is parked, §9).
+  is parked, §9). The owner ruled on 2026-09-29 that the unattended kit's own self-test suites are
+  not run for this landing, so the suite observation is waived and the arm stays unobserved.
 - **AC6** — When a fixture copy of the driver adds a parser arm `--frobnicate)` that no header line
   names, the leg fails 26 naming it.
   Red when: the arm joins one direction only, and an undocumented flag reaches no reader.
   permission: the leg suite is on no bar leg; it runs at VERIFYING, after the last unit, through
   `bash tools/unattended/run-unattended-gates.sh`, not at this unit's end (D12-i8's in-pass lift
-  is parked, §9).
+  is parked, §9). The owner ruled on 2026-09-29 that the unattended kit's own self-test suites are
+  not run for this landing, so the suite observation is waived and the arm stays unobserved.
 - **AC7** — When `bash tools/unattended/check-unattended.sh` runs on the real tree after this unit,
   the flag arm passes with every parser flag, the seven S5 names included, on its verb's header line,
   and with every slug verb found through `VERBS_SLUG`.
@@ -367,7 +371,8 @@ prose.
   Red when: an absent suite is read as an empty one and reds every flag in an adopter tree.
   permission: the leg suite is on no bar leg; it runs at VERIFYING, after the last unit, through
   `bash tools/unattended/run-unattended-gates.sh`, not at this unit's end (D12-i8's in-pass lift
-  is parked, §9).
+  is parked, §9). The owner ruled on 2026-09-29 that the unattended kit's own self-test suites are
+  not run for this landing, so the suite observation is waived and the arm stays unobserved.
 - **AC9** — When `bash tools/unattended/run-unattended-gates.sh --attribute <BASE>` runs once after
   the last unit, at VERIFYING, its attribution summary reads `verdict clean`, meaning no NEW FAIL,
   no `DEAD PROBE at L` and no `OVER BUDGET at L`. Every suite it reports with INHERITED lines or
@@ -383,7 +388,11 @@ prose.
   permission: the unattended suites are on no bar leg; they run at VERIFYING, after the last unit,
   not at this unit's end (D12-i8's in-pass lift is parked, §9). The
   `python3 tools/memory-tree/check-arms.py --check` half is a read-only verb and stays an in-pass
-  observation.
+  observation. The owner ruled on 2026-09-29 that the unattended kit's own self-test suites are not
+  run for this landing, so the attributed-run half is waived and stays unobserved. The
+  `check-arms.py --check` half stands observed: the
+  `harness arms (fail branches armed or pinned)` leg, which runs that command, exited 0 at the
+  post-build bar at 364278a8.
 - **AC10** — When `grep -n 'belt and braces' tools/unattended/check-unattended.sh` runs after this
   unit, the check 31 comment names `${core:-}` and `${M:-}` as belt and braces and no longer gives
   the `--only 28` crash as their reason.
@@ -401,7 +410,8 @@ prose.
   reads as undocumented-parser or missing-parser by accident.
   permission: the leg suite is on no bar leg; it runs at VERIFYING, after the last unit, through
   `bash tools/unattended/run-unattended-gates.sh`, not at this unit's end (D12-i8's in-pass lift
-  is parked, §9).
+  is parked, §9). The owner ruled on 2026-09-29 that the unattended kit's own self-test suites are
+  not run for this landing, so the suite observation is waived and the arm stays unobserved.
 - **AC13** — When a fixture copy of `check-unattended.test.sh` drops every line naming `--skip`, the
   leg fails 26 naming `--skip`; with the leg's `gov:argv-begin` sentinel deleted, it fails 26 naming
   the region.
@@ -409,7 +419,8 @@ prose.
   passes every other criterion.
   permission: the leg suite is on no bar leg; it runs at VERIFYING, after the last unit, through
   `bash tools/unattended/run-unattended-gates.sh`, not at this unit's end (D12-i8's in-pass lift
-  is parked, §9).
+  is parked, §9). The owner ruled on 2026-09-29 that the unattended kit's own self-test suites are
+  not run for this landing, so the suite observation is waived and the arm stays unobserved.
 - **AC14** — When `wc -c < memory/guides/SESSION-KICKOFF.md` is read at this unit's commit and at
   its parent, the reading at this unit's commit is NO LARGER than the reading at the parent, and
   `git diff --numstat` over `memory/guides/SESSION-KICKOFF.md` between those same two commits,
@@ -563,6 +574,14 @@ New arm: `tools/unattended/check-unattended.test.sh` · the leg run with `--skip
   `--replaces` in, and AC7's slug-verb count moves from fifteen to seventeen. S6 records that
   `--skip` is already on three lines of the leg suite. §4 carries both re-measurements. The
   permission lines, the edges and every other criterion are unchanged.
+- rev-8 · 2026-09-29 · §6 AC1 AC4 AC5 AC6 AC8 AC9 AC12 AC13 · the owner ruled on 2026-09-29, "just
+  skip the unattended test": the unattended kit's own self-test suites, run through
+  `run-unattended-gates.sh` with every `--attribute <BASE>` run included, are not run for this
+  landing. Each named criterion's permission line now records that its suite observation is waived
+  and stays unobserved, and the acceptance ledger carries an AMENDED line for each. AC9's
+  `check-arms.py --check` half keeps its wording and stands observed by the
+  `harness arms (fail branches armed or pinned)` leg at 364278a8. No design, scope or other
+  criterion moved, and the unit stays CLOSED.
 
 ## 10. Reuse audit
 

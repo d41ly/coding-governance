@@ -108,6 +108,11 @@ line spells a kit path, every new name answered `OK` to `lexicon.py --suggest`, 
   render -133 bytes and -1 line, stop contract and render -9 and -12, verb carrier and render -85 and
   -1, the `unattended` dossier -49 and 0, the `unattended-stops` dossier -1 and 0, the kickoff
   manifest -4 lines; none grew.
+- AC15 — amended rev-11 — `tools/unattended/unattended.test.sh`, like the stop-guard and resume-tick
+  suites, is not run for this landing, by the owner's ruling of 2026-09-29, so the three suites'
+  `verdict clean` is waived and every arm it names stays unobserved. The floor figures, read with
+  `git show` at the build commit and its first parent, are not a suite run and the ruling does not
+  reach them; this ledger records no reading of them. Section 9, rev-11.
 - AC16 — `TOOL-dDerivedDocket-61` — `memory/DECISIONS.md`'s TOOL heading carries one row keyed by it,
   294 characters, naming the one lease record, the one bound and the HELD carve-outs.
 - AC17 — `grep -c 'one lease and one restart path' memory/guides/SESSION-KICKOFF.md` — prints 0.
@@ -125,3 +130,25 @@ line spells a kit path, every new name answered `OK` to `lexicon.py --suggest`, 
   `harness arms (fail branches armed or pinned)` leg exited 0. That registry is byte-unchanged
   from cd4127f4 to da80b2e5, and that diff adds or removes no `fail 9`, `fail 27`, `fail 29`,
   `fail 49` or `fail 56` line in the driver.
+- AC20 — amended rev-11 — `tools/unattended/unattended.test.sh` is not run for this landing, by the
+  owner's ruling of 2026-09-29, so the driver suite's run of this arm is waived and stays
+  unobserved. The pass's fixture run and its staged RED against a `derive_last_move` with the
+  gate-log term cut stand as the prose above reads them. Section 9, rev-11.
+- AC21 — amended rev-11 — `tools/unattended/unattended.test.sh` is not run for this landing, by the
+  owner's ruling of 2026-09-29, so the driver suite's run of the repeating arm is waived and stays
+  unobserved. The direct fixture runs stand observed in this pass, as the prose above reads, and so
+  does the staged RED against a `check_lease_fresh` that reads a dead probe as stale. Section 9,
+  rev-11.
+- AC22 — amended rev-11 — `tools/unattended/unattended.test.sh` is not run for this landing, by the
+  owner's ruling of 2026-09-29, so the driver suite's run of the repeating arm is waived and stays
+  unobserved. The direct fixture runs stand observed in this pass, as the prose above reads. Section
+  9, rev-11.
+- AC23 — amended rev-11 — `tools/unattended/unattended.test.sh` is not run for this landing, by the
+  owner's ruling of 2026-09-29, so the driver suite's run of the repeating arm is waived and stays
+  unobserved. The direct fixture runs stand observed in this pass, as the prose above reads. Section
+  9, rev-11.
+- AC24 — amended rev-11 — `tools/unattended/unattended.test.sh` is not run for this landing, by the
+  owner's ruling of 2026-09-29, so the driver suite's run of the repeating arm is waived and stays
+  unobserved. The direct fixture runs stand observed in this pass, as the prose above reads, and so
+  does the staged RED against the ledger path through `resolve_sidecar_dir` and a fifth field
+  stamped `-`. Section 9, rev-11.

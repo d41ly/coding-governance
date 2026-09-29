@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-61 — one lease record, and HELD known to every out-of-session actor
 
-**Status:** CLOSED · rev-10 · 2026-09-27 · node d · Tier-2 · base 285701d5 · streams tooling · order 31
+**Status:** CLOSED · rev-11 · 2026-09-29 · node d · Tier-2 · base 285701d5 · streams tooling · order 31
 
 <!-- gen:spec-records -->
 
@@ -880,7 +880,12 @@ promoted at the G9 exit.
   floors rose by the new arms alone; or a floor is left where the arms found it, or moves by a
   number no new arm accounts for.
   permission: the three suites are held kit suites on no bar leg, so they run in the orchestrator's
-  attributed VERIFYING run and never in this pass.
+  attributed VERIFYING run and never in this pass. The owner ruled on 2026-09-29 that the unattended
+  kit's own self-test suites, `tools/unattended/unattended.test.sh`,
+  `tools/unattended/stop-guard.test.sh` and `tools/unattended/resume-tick.test.sh` among them, are
+  not run for this landing, so the suite observation is waived and the arms stay unobserved at
+  VERIFYING; the floor figures, read with `git show` and not by a suite, are not reached by the
+  ruling.
 - **AC16** — When `memory/DECISIONS.md` is read, its TOOL heading carries one row keyed by
   `TOOL-dDerivedDocket-61` that names the one lease record, the one bound and the HELD carve-outs,
   within the 300-character entry budget.
@@ -928,7 +933,10 @@ promoted at the G9 exit.
   own git dir and dated with `touch -d`, so no bar runs.
   permission: the arm is written and staged RED in the pass; the driver suite that executes it is a
   held kit suite on no bar leg, so it runs in the orchestrator's attributed VERIFYING run beside
-  AC15's arms and never in this pass.
+  AC15's arms and never in this pass. The owner ruled on 2026-09-29 that the unattended kit's own
+  self-test suites, `tools/unattended/unattended.test.sh` among them, are not run for this landing,
+  so the suite observation is waived and the arm stays unobserved at VERIFYING, while the pass's
+  staged RED stands as the unit's acceptance ledger records it.
 - **AC21** — Take AC3's fixture, whose lease facts name session `S`, and put first on `PATH` a
   `date` that exits 1, the dead-clock stub the driver suite already stages. With
   `CLAUDE_CODE_SESSION_ID=T`, `--resume <slug> --keepalive-id C` prints the UNKNOWN announcement,
@@ -945,7 +953,11 @@ promoted at the G9 exit.
   fixture: AC3's authorized record, with the `date` stub on `PATH` for these three calls only.
   permission: the direct fixture runs above are this pass's check; the arm that repeats them is
   written and staged RED in the pass, and the driver suite that executes it is a held kit suite on no
-  bar leg, so it runs in the orchestrator's attributed VERIFYING run beside AC15's arms.
+  bar leg, so it runs in the orchestrator's attributed VERIFYING run beside AC15's arms. The owner
+  ruled on 2026-09-29 that the unattended kit's own self-test suites,
+  `tools/unattended/unattended.test.sh` among them, are not run for this landing, so the suite
+  observation is waived and the arm stays unobserved at VERIFYING, while the direct fixture runs and
+  the staged RED stand observed in the pass, as the unit's acceptance ledger records them.
 - **AC22** — Take AC3's authorized record with its `session`, `pid`, `host`, `pid-image` and
   `lease-utc` lines deleted and its `keepalive` line kept, five of the six lease facts gone, so it
   carries no lease and its `keepalive` fact names `k1`, as a pre-lease record's does (§4), and
@@ -969,7 +981,11 @@ promoted at the G9 exit.
   build-folder commit dated by `GIT_COMMITTER_DATE`, so no clock is faked.
   permission: the direct fixture runs above are this pass's check; the arm that repeats them is
   written and staged RED in the pass, and the driver suite that executes it is a held kit suite on no
-  bar leg, so it runs in the orchestrator's attributed VERIFYING run beside AC15's arms.
+  bar leg, so it runs in the orchestrator's attributed VERIFYING run beside AC15's arms. The owner
+  ruled on 2026-09-29 that the unattended kit's own self-test suites,
+  `tools/unattended/unattended.test.sh` among them, are not run for this landing, so the suite
+  observation is waived and the arm stays unobserved at VERIFYING, while the direct fixture runs
+  stand observed in the pass, as the unit's acceptance ledger records them.
 - **AC23** — Take AC8's pushed LANDING fixture under `LANDER_MODE="in-place"`, its landing not yet
   observed, and switch to a new branch at the pushed tip, as a re-run build's fresh worktree is.
   `--resume <slug> --keepalive-id k3` prints nothing to resume and names the record's run branch,
@@ -989,7 +1005,11 @@ promoted at the G9 exit.
   facts by hand before the record is committed and pushed.
   permission: the direct fixture runs above are this pass's check; the arm that repeats them is
   written and staged RED in the pass, and the driver suite that executes it is a held kit suite on no
-  bar leg, so it runs in the orchestrator's attributed VERIFYING run beside AC15's arms.
+  bar leg, so it runs in the orchestrator's attributed VERIFYING run beside AC15's arms. The owner
+  ruled on 2026-09-29 that the unattended kit's own self-test suites,
+  `tools/unattended/unattended.test.sh` among them, are not run for this landing, so the suite
+  observation is waived and the arm stays unobserved at VERIFYING, while the direct fixture runs
+  stand observed in the pass, as the unit's acceptance ledger records them.
 - **AC24** — Take AC3's authorized record, committed with `keepalive` `k1`, and a LINKED worktree
   `W1` made on the record's run branch once the main worktree is moved off it, as AC10 makes one.
   From `W1`, a same-id re-preflight, `--preflight <slug> --keepalive-id k1`, the bounded run unit
@@ -1011,7 +1031,11 @@ promoted at the G9 exit.
   written and staged RED in the pass, against a driver copy whose `resolve_procs_path` derives from
   `resolve_sidecar_dir` and one whose `write_proc_record` stamps `-`, and the driver suite that
   executes it is a held kit suite on no bar leg, so it runs in the orchestrator's attributed
-  VERIFYING run beside AC15's arms.
+  VERIFYING run beside AC15's arms. The owner ruled on 2026-09-29 that the unattended kit's own
+  self-test suites, `tools/unattended/unattended.test.sh` among them, are not run for this landing,
+  so the suite observation is waived and the arm stays unobserved at VERIFYING, while the direct
+  fixture runs and the staged RED stand observed in the pass, as the unit's acceptance ledger
+  records them.
 
 ## 7. Gates
 
@@ -1265,6 +1289,13 @@ is the post-merge audit this build already takes after each wave, as `c361e347` 
   whose new id came from the record's own session are asked from another session, unit 22's
   derived-LANDED resume drops its id, and unit 22's observed-landing reader ages its tree with an
   empty commit. No criterion, row, order or edge moved.
+- rev-11 · 2026-09-29 · §6 AC15 AC20 AC21 AC22 AC23 AC24 · the owner's ruling of 2026-09-29, "just
+  skip the unattended test": the unattended kit's own self-test suites are not run for this landing.
+  The six criteria whose observation waited on a suite run at VERIFYING each gain one sentence on
+  their permission line saying that observation is waived and its arms stay unobserved at VERIFYING.
+  AC21 to AC24's direct fixture runs and the staged RED of AC20, AC21 and AC24 stand observed in the
+  pass, and AC15's floor figures, read with `git show` rather than by a suite, are not reached by
+  the ruling. No design, row, order or edge moved.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-62 — one worktree answers for a slug, and every other copy reads ELSEWHERE
 
-**Status:** CLOSED · rev-7 · 2026-09-27 · node d · Tier-2 · base 07997375 · streams tooling · order 32
+**Status:** CLOSED · rev-8 · 2026-09-29 · node d · Tier-2 · base 07997375 · streams tooling · order 32
 
 <!-- gen:spec-records -->
 
@@ -513,7 +513,11 @@ undo.
   Red when: the tick kills the holder's process and relaunches the run from a stale BUILDING copy in
   a sibling worktree, B1's first case.
   permission: the non-dry-run half is the tick suite's arm, a held kit suite on no bar leg, executed
-  in the orchestrator's attributed VERIFYING run; the pass observes the dry-run decisions.
+  in the orchestrator's attributed VERIFYING run; the pass observes the dry-run decisions. The owner
+  ruled on 2026-09-29 that the unattended kit's own self-test suites,
+  `tools/unattended/resume-tick.test.sh` among them, are not run for this landing, so the
+  non-dry-run half's suite observation is waived and that arm stays unobserved at VERIFYING, while
+  the dry-run half stands observed in the pass, as the unit's acceptance ledger records it.
 - **AC4** — On the authorized fixture with a linked worktree on `wave`, `CLAUDE_CODE_SESSION_ID=T`
   `--resume tRun --keepalive-id C` run in the linked worktree refuses at check 58 naming
   `refs/heads/unit` and the run worktree's path, and `--resume tRun` with no id there prints the
@@ -614,7 +618,12 @@ undo.
   retargeted, so the executed count falls while the floors rose by the new arms alone; or a floor is
   left where the arms found it, or moves by a number no new arm accounts for.
   permission: the three suites are held kit suites on no bar leg, so they run in the orchestrator's
-  attributed VERIFYING run and never in this pass.
+  attributed VERIFYING run and never in this pass. The owner ruled on 2026-09-29 that the unattended
+  kit's own self-test suites, `tools/unattended/unattended.test.sh`,
+  `tools/unattended/resume-tick.test.sh` and `tools/unattended/stop-guard.test.sh` among them, are
+  not run for this landing, so the suite observation is waived and the arms stay unobserved at
+  VERIFYING; the floor figures, read with `git show` and not by a suite, are not reached by the
+  ruling.
 - **AC12** — When `python tools/lexicon/lexicon.py --suggest <name> --as sh.function` runs for
   `resolve_holder_worktree`, `check_holder_worktree` and `add_sibling_worktree`, each prints `OK`.
   The new check-58 branch has an arm. The rows of `memory/project/unarmed-branches.txt` for the
@@ -643,7 +652,10 @@ undo.
   so no landing runs; the tree holds none.
   permission: the dry-run decisions are this pass's direct check; the arm that repeats them over
   `add_sibling_worktree` lives in the resume-tick suite, a held kit suite on no bar leg, executed
-  in the orchestrator's attributed VERIFYING run.
+  in the orchestrator's attributed VERIFYING run. The owner ruled on 2026-09-29 that the unattended
+  kit's own self-test suites, `tools/unattended/resume-tick.test.sh` among them, are not run for
+  this landing, so the suite observation is waived and that arm stays unobserved at VERIFYING, while
+  the dry-run decisions stand observed in the pass, as the unit's acceptance ledger records them.
 - **AC14** — Take AC4's authorized record made leaseless as unit 61's S13 makes it, keeping
   `keepalive` `k1` and none of `session`, `pid`, `host`, `pid-image` and `lease-utc`, with its
   `run-branch` rewritten to `refs/heads/gone`, a branch no ref of the fixture names, committed on
@@ -664,7 +676,11 @@ undo.
   rewritten; the tree holds none outside the driver suite.
   permission: the direct fixture runs are this pass's check; the arm that repeats them is written
   and staged RED in the pass, and the driver suite that executes it is a held kit suite on no bar
-  leg, so it runs in the orchestrator's attributed VERIFYING run.
+  leg, so it runs in the orchestrator's attributed VERIFYING run. The owner ruled on 2026-09-29 that
+  the unattended kit's own self-test suites, `tools/unattended/unattended.test.sh` among them, are
+  not run for this landing, so the suite observation is waived and the arm stays unobserved at
+  VERIFYING, while the direct fixture runs and the staged RED stand observed in the pass, as the
+  unit's acceptance ledger records them.
 
 ## 7. Gates
 
@@ -870,6 +886,13 @@ read off a run, which this pass does not make. The driver's new arms are written
   ELSEWHERE row, such a record still prints `holder-ref: absent`, so the tick skips it by name and
   that arm stays green, measured over a replica of the suite's prologue. No design, criterion, row,
   order or edge moved.
+- rev-8 · 2026-09-29 · §6 AC3 AC11 AC13 AC14 · the owner's ruling of 2026-09-29, "just skip the
+  unattended test": the unattended kit's own self-test suites are not run for this landing. The four
+  criteria whose observation waited on a suite run at VERIFYING each gain one sentence on their
+  permission line saying that observation is waived and its arms stay unobserved at VERIFYING. AC3's
+  and AC13's dry-run decisions and AC14's direct fixture runs stand observed in the pass, and AC11's
+  floor figures, read with `git show` rather than by a suite, are not reached by the ruling. No
+  design, row, order or edge moved.
 
 ## 10. Reuse audit
 

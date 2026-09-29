@@ -1,6 +1,6 @@
 # TOOL-dDerivedDocket-19 — authority only from an owner-committed README
 
-**Status:** CLOSED · rev-7 · 2026-09-21 · node d · Tier-2 · base fb07ca25 · streams tooling · order 19
+**Status:** CLOSED · rev-8 · 2026-09-29 · node d · Tier-2 · base fb07ca25 · streams tooling · order 19
 
 <!-- gen:spec-records -->
 
@@ -330,6 +330,9 @@ not a thing this unit's pass can observe.
   permission: this unit may not run the unattended suites; the observation is made by hand in a
   scratch fixture repo with a local bare remote, and the suite runs in unit 22's attributed run (its
   AC13), which the main loop makes at the one post-build bar at VERIFYING, after the last unit.
+  The owner ruled on 2026-09-29 that the unattended kit's own self-test suites are not run for
+  this landing, so the suite's proof is waived and stays unobserved; the hand observation over
+  the scratch fixture stands, as the ledger's prose records (§9 rev-8).
 - **AC2** — When `--preflight` runs over a `prompt`-mode fixture README carrying `may:`, and over a
   `recipe`-mode one, it refuses under its new code and writes nothing.
   Red when: preflight pins `may: none` and continues, which hides the attempt, or the refusal keys on
@@ -658,6 +661,12 @@ New arm: `tools/unattended/check-unattended.test.sh` · a forged fact, a `prompt
   measured count rather than by two, the tightening direction. One defect outside the design is
   fixed on the way: the driver suite's `mkconf` heredoc quoted its run helper in backticks, so every
   conf written after that helper existed ran the driver into the file and left the tree dirty.
+
+- rev-8 · 2026-09-29 · §6 AC1 · the owner's ruling of 2026-09-29, "just skip the unattended
+  test": the unattended kit's own self-test suites, the attributed run included, are not run for
+  this landing. AC1's `permission:` line gains one sentence saying the suite's proof is waived
+  and stays unobserved, while the hand observation over the scratch fixture stands. No
+  assertion, `Red when:` arm, design or edge moved, and the status stays CLOSED.
 
 ## 10. Reuse audit
 

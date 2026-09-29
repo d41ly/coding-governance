@@ -65,6 +65,12 @@ mandated record, printed the vacuity line with the count 0.
   `bash tools/unattended/check-unattended.sh`, over the real tree in the frozen verify worktree at
   364278a8: it exited 0 and printed exactly one report-channel line on the ask mandate, calling
   checks 19, 15 and 37 VACUOUS because 0 run-state records pin an `asks:` fact.
+- AC10 — amended rev-7 — `run-unattended-gates.sh --attribute` — the attributed run and the
+  suite run grading every arm this unit added are waived by the owner's ruling of 2026-09-29
+  that the unattended kit's own self-test suites are not run for this landing, and stay
+  unobserved. The RED half stands observed in the pass: twenty-four staged breaks of the leg
+  and five of the suite block, each RED on only the arm it targets, as this record's opening
+  lists. Section 9 rev-7 logs the amendment.
 - AC11 — `asks-ready:` — on an unpublished record, `EXMP-aFoo-3=no` against the stub's `yes` at the
   pinned tree reds check 19 naming both pairs; pushed to the advertised tip it is counted as
   `published, not re-derived`; a stub sleeping past a 2 s bound is reported UNANSWERED and does not

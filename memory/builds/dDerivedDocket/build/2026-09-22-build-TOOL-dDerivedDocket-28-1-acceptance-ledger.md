@@ -46,6 +46,10 @@ AC1, AC7 and AC10 carry `permission:` lines deferring them to VERIFYING, so none
 here. AC1 was nonetheless exercised by the block above; its line is the orchestrator's.
 
 **Evidences:** TOOL-dDerivedDocket-28
+- AC1 — amended rev-10 — `tools/unattended/unattended.test.sh` is not run for this landing: the
+  owner ruled on 2026-09-29 that the unattended kit's own self-test suites are not run for it. The
+  permission line now records that the suite observation is waived and the arm stays unobserved.
+  Section 9 rev-10 logs it.
 - AC2 — `--status` — a sleeper whose parent subshell had exited, recorded nowhere, was alive after
   `--status` printed `orphans 1` for the one RECORDED orphan beside it and after the holder's
   `--resume` reaped that orphan; the stub reaper's log never named the stray pid, and a second
@@ -74,6 +78,10 @@ here. AC1 was nonetheless exercised by the block above; its line is the orchestr
   `--resume` refused as check 59 after its status block counted `orphans 1`, and
   `--resume --keepalive-id kB` refused as check 58; the ledger and the lease were byte-unchanged,
   the orphan was alive and no reaper was called.
+- AC10 — amended rev-10 — `run-unattended-gates.sh --attribute` is not run for this landing: the
+  owner ruled on 2026-09-29 that the unattended kit's own self-test suites are not run for it. The
+  permission line now records that the suite observation is waived and the criterion stays
+  unobserved. Section 9 rev-10 logs it.
 - AC11 — `gates-green` — after a driver was killed mid-command, `--close` logged `reap <pid>` BEFORE
   `bar` in the stub bar's own log; a same-id `--preflight` printed `reaped orphan <pid>` and
   `preflight OK`; `--hold` printed `reaped orphan <pid>` and `phase HELD`. After each, the orphan

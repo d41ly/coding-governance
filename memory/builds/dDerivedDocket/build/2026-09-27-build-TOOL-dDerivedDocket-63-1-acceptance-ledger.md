@@ -44,9 +44,22 @@ an unexposed pid as a match, and the restart row reads it as no match.
 
 All seven criteria carry `permission:` lines, so none gets an observed line here. The orchestrator
 writes those after its attributed VERIFYING run. AC4 was changed at rev-6, so it takes the amended
-form.
+form. AC1, AC2, AC3 and AC7 take it too, at rev-7: the owner's ruling of 2026-09-29 waived the
+driver suite run their observed lines waited on.
 
 **Evidences:** TOOL-dDerivedDocket-63
+- AC1 — amended rev-7 — `tools/unattended/unattended.test.sh` is not run for this landing, by the
+  owner's ruling of 2026-09-29, so the driver suite's run of this arm is waived and stays
+  unobserved. The staged RED stands as the prose above reads it: every AC1 call red against the
+  parent's driver, and the second call red against S2's pid clause alone. Section 9, rev-7.
+- AC2 — amended rev-7 — `tools/unattended/unattended.test.sh` is not run for this landing, by the
+  owner's ruling of 2026-09-29, so the driver suite's run of this arm is waived and stays
+  unobserved. The staged RED stands as the prose above reads it: both AC2 calls red against the
+  parent's driver, and the second call red against S2's pid clause alone. Section 9, rev-7.
+- AC3 — amended rev-7 — `tools/unattended/unattended.test.sh` is not run for this landing, by the
+  owner's ruling of 2026-09-29, so the driver suite's run of this arm is waived and stays
+  unobserved. The staged RED stands as the prose above reads it: every AC3 call but its relaunch
+  control red against the parent's driver. Section 9, rev-7.
 - AC4 — amended rev-6 — `CLAUDE_CODE_SESSION_ID=sOther` was on four arms at the parent, from unit
   61's build pass. The criterion now counts it, 5 at the parent and 1 after, and names the one
   lease-fact line rewritten, AC20's, which reads `lease-utc` re-stamped. Section 9, rev-6.
@@ -58,3 +71,7 @@ form.
   finding, and the `kit version markers` and `install-prefix (shipped surface)` legs each exit 0
   clean. The function list, the `fail 58` and `fail 59` counts, the pin-file diff, the version
   greps and the added-line reads are the in-pass reads above.
+- AC7 — amended rev-7 — `tools/unattended/unattended.test.sh` is not run for this landing, by the
+  owner's ruling of 2026-09-29, so the driver suite's run of this arm is waived and stays
+  unobserved. The staged RED stands as the prose above reads it: both AC7 calls red against a copy
+  whose moved block tests the fresh return alone. Section 9, rev-7.
