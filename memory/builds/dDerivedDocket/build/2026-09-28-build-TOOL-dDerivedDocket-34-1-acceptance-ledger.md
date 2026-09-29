@@ -191,7 +191,17 @@ hand-edited one could. The break was restaged on a row with no pointer and went 
   step 2's `--plan` exited 0, the signer's `--check` read 2 of 2 re-derived, and step 4's landing
   form with `--dry-run` exited 2 naming the contained tip; the worktree was removed and the run
   tree's porcelain was unchanged. The classified count is owed at the landing reconcile only if the
-  tip moves, as the section 9 rev-13 line logs.
+  tip moves, as the section 9 rev-13 line logs. It moved: at the first landing reconcile, on
+  2026-09-29, `git ls-remote origin refs/heads/main` and the observed `origin/HEAD` both named
+  `db130e9a`, twenty commits past the fork. Step 2's `--plan` at that tip exited 0 with 715 row
+  copies, 156 same-id pairs and 372 triage asks, the signer's `--tail landing` signed KEEP 366,
+  CLOSED 5 and 1 exclusion and its `--check` read 2 of 2 re-derived, and step 4's landing form with
+  `--dry-run`, run inside the reconcile merge, exited 1 classifying 2 delta entries: 1 new ask
+  carrying 2 records and 1 NEEDS-HUMAN text amendment, with 0 flipped, 0 CONFIRM and 0 already
+  present. The landing triage population is those 372 asks, and it printed `ASK_CUTOFF=2026-09-29`.
+  The text amendment was not classified as a flip, so the criterion's red did not occur. It parks
+  the landing by section 4's Confirmation rule, and the remote tip moved again before step 5, so
+  that merge was aborted unconcluded and its landing records were never committed.
 - AC21 — `drift-audit selftest` — the held leg ran at the post-build bar at 364278a8, all checks
   passing at 315 executed against a floor of 277, and its dDD-34 lines held: in shards mode the
   three new signals are NOT ASKED, never DEAD, and the live-row count still reads the shards; in
