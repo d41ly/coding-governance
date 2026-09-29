@@ -23,7 +23,7 @@ cd "$ROOT" || exit 2
 KIT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CONF="$ROOT/.lexicon.conf"
 
-# >>> resolve_python — canonical copy: tools/lib/resolve-python.sh (byte-identical; gated)
+# >>> resolve_python — canonical copy: resolve-python.sh in gov's lib dir (byte-identical; gated)
 resolve_python() {
   # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
   # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
@@ -319,7 +319,7 @@ if [ "$MODE" = "--expand" ]; then
   # proposal was measured against, and a clean tree's worktree IS its HEAD tree; a dirty one has no
   # such sha, so HEAD would name a tree this run did not read.
   #
-  # THE WEAKER OF THE TWO DEFINITIONS THIS REPO CARRIES, ON PURPOSE. `tools/run-gates` treats
+  # THE WEAKER OF THE TWO DEFINITIONS THIS REPO CARRIES, ON PURPOSE. The run-gates kit treats
   # untracked files as dirt and has an arm asserting it. That definition cannot be used here: a kit
   # fixture copies this directory in UNTRACKED by design, so porcelain is non-empty there forever
   # and a refusal built on it could never be exercised — the arm would be unobservable for the life

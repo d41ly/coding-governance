@@ -79,7 +79,7 @@
  */
 'use strict'
 
-const KIT_AGENT_CAP_VERSION = '1.24' // gov:kit agent-cap@1.24 — engine identity (this file is deployed verbatim; the constant is the deployer's version marker)
+const KIT_AGENT_CAP_VERSION = '1.25' // gov:kit agent-cap@1.25 — engine identity (this file is deployed verbatim; the constant is the deployer's version marker)
 // A BARE LITERAL, never an environment read. An env-settable ceiling is the defeatable class this
 // guard exists to remove, and it leaves no diff behind when someone raises it.
 const CAP = 5
@@ -1729,7 +1729,7 @@ function guardAgentSpawn(data) {
 }
 
 // TOOL-dTieredTribunal-14 S1 - RULE 5, the ref-keyed verdict join. Ported from the awk in
-// tools/workflows/check-review-join.sh, which is a FILE gate and therefore blind to the modality
+// <prefix>/workflows/check-review-join.sh, which is a FILE gate and therefore blind to the modality
 // where this defect actually happens: an ad-hoc review harness is an inline `script` string on a
 // Workflow tool call and is never a file. That gate covered four already-compliant committed
 // harnesses and none of the observed failures. The three `why` strings are FROZEN at the bytes that
@@ -1964,7 +1964,7 @@ function main() {
   // for ONE rule. Absent runs every rule, which is the wiring's invocation and is unchanged.
   // Anything outside the set REFUSES rather than silently matching nothing, which would be this
   // repo's vacuous-selector-empty-population class arriving in the file whose job is to refuse what
-  // it cannot resolve. A WIRED command must never carry it: tools/check-wiring.sh asserts that,
+  // it cannot resolve. A WIRED command must never carry it: <prefix>/check-wiring.sh asserts that,
   // because `--only=join` in settings.json would turn the three cap rules off with no diff.
   const ONLY_RULES = ["join"]
   const onlyArg = process.argv.slice(2).find((a) => a.startsWith("--only="))
@@ -2036,7 +2036,7 @@ function main() {
 
   // A saved script is a FILE, and a node hook has fs — exiting 0 here made the rules unenforceable
   // the moment anyone wrote the offending script to disk. A `name:`-only run supplies no source and
-  // stays unscannable; that hole is covered by the merge-bar leg over tools/workflows/, and is
+  // stays unscannable; that hole is covered by the merge-bar leg over <prefix>/workflows/, and is
   // declared in memory/guides/REVIEW-PROTOCOL.md rather than implied away.
   let script = (data.tool_input && data.tool_input.script) || ''
   const spath = (data.tool_input && data.tool_input.scriptPath) || ''

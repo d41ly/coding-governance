@@ -5,7 +5,7 @@
 #
 # SUBJECT. The RULESET — `coding-governance-agents.template.md` — because that is the source. A
 # target's rendered charter carries the same block, and it is proved equal to this one by
-# `tools/playbook/adopt-playbook.sh --check` rather than graded twice.
+# `<prefix>/playbook/adopt-playbook.sh --check` rather than graded twice.
 #
 # WHAT IT KEYS ON. The HTML-comment fence pair around the definition list, and nothing else. It
 # cannot key on a heading: the section has none. It cannot key on a column-zero list marker either,

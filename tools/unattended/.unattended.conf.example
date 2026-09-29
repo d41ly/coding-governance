@@ -104,7 +104,7 @@ CORE_FLOOR="12:12"
 #
 # A DECLARATION rather than a path in the driver, for the reason every other key here exists: gov
 # ships its own bytes verbatim, so a `tools/<kit>/` literal in a script arrives unchanged in a tree
-# installed at another prefix and resolves to nothing there — `tools/check-install-prefix.sh` reds
+# installed at another prefix and resolves to nothing there — gov's `<prefix>/check-install-prefix.sh` reds
 # on exactly that. You know where your recall kit lives; the driver does not.
 #
 # It is NOT a `requires_if` edge in kit.toml. `govkit` resolves such an edge against a condition key,

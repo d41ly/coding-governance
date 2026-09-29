@@ -6,7 +6,7 @@
 # nobody editing a kit, so it stays a merge-bar leg. A SELF-TEST reads the KIT — it stages a break
 # into a copy of a checker and asserts the checker still catches it — so it has a job only when the
 # source under that kit changes, and none at all in a tree that copy-installs the kit and never edits
-# it. `tools/unattended/run-unattended-gates.sh` took that ruling for ONE kit. This is the same thing
+# it. `<prefix>/unattended/run-unattended-gates.sh` took that ruling for ONE kit. This is the same thing
 # for every kit, which is what the ruling always implied and nobody had built.
 #
 # WHAT IS THEREFORE NOT COVERED, said plainly because an exemption is not coverage (charter §7):
@@ -37,10 +37,10 @@ BUDGETS="$HERE/selftest-budgets.txt"
 LEGS="${GATE_LEGS:-$(dirname -- "$HERE")/gate-legs.json}"
 # The python-launcher resolver, INLINED byte-identically from the canonical copy named on
 # the marker line below, for
-# the reason the sibling runner states: this kit is deployable and tools/lib/ is gov-internal.
+# the reason the sibling runner states: this kit is deployable and gov's lib dir is gov-internal.
 # The line this replaces used `command -v`, which the MS-Store python3 stub answers before
 # exiting 9009 -- the exact idiom the resolver-parity gate bans, and it had been red on it.
-# >>> resolve_python — canonical copy: tools/lib/resolve-python.sh (byte-identical; gated)
+# >>> resolve_python — canonical copy: resolve-python.sh in gov's lib dir (byte-identical; gated)
 resolve_python() {
   # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
   # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
@@ -440,7 +440,7 @@ PY
 fi
 
 # ---- the declaration, read once. Emitted as: STATE, name, budget, argv -- in that order.
-# ---- A row whose argv is empty takes it from `tools/gate-legs.json`, so the manifest stays the one
+# ---- A row whose argv is empty takes it from `<prefix>/gate-legs.json`, so the manifest stays the one
 # ---- place a held leg's command is written and this file carries only what the manifest cannot.
 read_population() {
   "$PYBIN" - "$BUDGETS" "$LEGS" "$FILTER" <<'PY'

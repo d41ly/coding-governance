@@ -105,7 +105,7 @@ else
   # --cached AND --others: a NEW workflow script is judged the moment it exists, not the moment
   # someone remembers to stage it. --exclude-standard keeps ignored files ignored, and that is the
   # escape hatch: a scratch .js you do not want judged is a .gitignore line, not an unstaged file.
-  # This DOES change the landing boundary — tools/push-main.sh gates on `git status --porcelain -uno`
+  # This DOES change the landing boundary — <prefix>/push-main.sh gates on `git status --porcelain -uno`
   # and so deliberately permits untracked files at a push — which is the point: a banned join sitting
   # unstaged in the tree was previously invisible to the gate that exists to ban it.
   FILES=$(git ls-files --cached --others --exclude-standard -- '*.js' \
@@ -118,7 +118,7 @@ if [ "$EXPLICIT" = 0 ] && [ -z "$FILES" ]; then
   exit 1
 fi
 
-# TOOL-dTieredTribunal-14 S5 - THE PREDICATE MOVED. It lives in tools/hooks/agent-cap.js as rule 5,
+# TOOL-dTieredTribunal-14 S5 - THE PREDICATE MOVED. It lives in <prefix>/hooks/agent-cap.js as rule 5,
 # and this gate delegates to it so both entry points share one predicate. The reason is the modality:
 # an ad-hoc review harness is an inline `script` string on a Workflow tool call and is NEVER a file,
 # so this gate covered the already-compliant committed harnesses and none of the observed failures.

@@ -8,7 +8,7 @@ cd "$ROOT" || exit 2
 # The resolver, INLINED byte-identically from tools/lib/resolve-python.sh -- this harness SHIPS
 # with the kit and tools/lib/ never travels. Enrols itself in the parity population, which is
 # grep-derived from the marker below (the aPacedTurnstile build's spec set under `memory/builds/aPacedTurnstile/spec/` S2).
-# >>> resolve_python — canonical copy: tools/lib/resolve-python.sh (byte-identical; gated)
+# >>> resolve_python — canonical copy: resolve-python.sh in gov's lib dir (byte-identical; gated)
 resolve_python() {
   # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
   # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes

@@ -12,7 +12,7 @@
 #
 # Exit 0 = clean · 1 = a rule the hook enforces is broken · 2 = misconfigured.
 #
-# THIS GATE DOES NOT IMPLEMENT THE RULE. It feeds each script to `tools/hooks/agent-cap.js` — the
+# THIS GATE DOES NOT IMPLEMENT THE RULE. It feeds each script to `<prefix>/hooks/agent-cap.js` — the
 # same predicate the `PreToolUse` hook applies at the `Workflow` tool call — and reports what the hook
 # says. A bash re-implementation of a node predicate is two answers to one question: they would not
 # disagree loudly, they would drift the day either side is tightened, and the gate would then bless

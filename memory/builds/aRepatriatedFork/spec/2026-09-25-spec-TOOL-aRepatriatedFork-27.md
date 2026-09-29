@@ -1,12 +1,13 @@
 # TOOL-aRepatriatedFork-27 — canonical-copy markers and comment prose name no install prefix
 
-**Status:** SPECCED · rev-2 · 2026-09-29 · node a · Tier-1 · base 2143b6d6 · streams tooling · order 12
+**Status:** CLOSED · rev-2 · 2026-09-29 · node a · Tier-1 · base 2143b6d6 · streams tooling · order 12
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-25-build-TOOL-aRepatriatedFork-23-prefix-census.md](../build/2026-09-25-build-TOOL-aRepatriatedFork-23-prefix-census.md) | research | TOOL-aRepatriatedFork-23 TOOL-aRepatriatedFork-24 TOOL-aRepatriatedFork-25 TOOL-aRepatriatedFork-26 TOOL-aRepatriatedFork-28 TOOL-aRepatriatedFork-29 TOOL-aRepatriatedFork-30 |
+| [2026-09-29-build-TOOL-aRepatriatedFork-27-1-acceptance-ledger.md](../build/2026-09-29-build-TOOL-aRepatriatedFork-27-1-acceptance-ledger.md) | journal | — |
 | [2026-09-29-prompt-TOOL-aRepatriatedFork-27-build-brief.md](../prompts/2026-09-29-prompt-TOOL-aRepatriatedFork-27-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->

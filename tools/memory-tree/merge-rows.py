@@ -137,7 +137,7 @@ import re
 import subprocess
 import sys
 
-# Same rationale as `tools/memory-recall/extract.py`: CPython writes a module's bytecode next to its
+# Same rationale as `<prefix>/memory-recall/extract.py`: CPython writes a module's bytecode next to its
 # SOURCE, which is inside the worktree being merged. A merge driver that reads three blobs and writes
 # one should write nothing else, and this is the whole of that property on the deferred import below.
 sys.dont_write_bytecode = True

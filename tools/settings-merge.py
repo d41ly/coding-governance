@@ -2,10 +2,10 @@
 """settings-merge.py — idempotently wire a hook into a target repo's .claude/settings.json.
 Stdlib only (json, argparse, pathlib); py>=3.10 (write_text newline=).
 
-# gov:kit settings-merge@1.10
+# gov:kit settings-merge@1.11
 
 The default hook, with no --fragment (shape mirrors WIRE-INTO-PROJECT.md and
-tools/hooks/agent-cap.js verbatim):
+<prefix>/hooks/agent-cap.js verbatim):
 
     {"hooks": {"PreToolUse": [
       {"matcher": "Workflow|Agent",
@@ -18,7 +18,7 @@ groups under that event are preserved; a foreign command inside the matcher grou
 
 A wired target is DETECTED by grepping the fragment's `marker` in .claude/settings.json — JSON
 carries no comment marker, so that command substring IS the deployer's "is-it-wired?" signal, and
-it is what tools/check-wiring.sh joins each arm on.
+it is what <prefix>/check-wiring.sh joins each arm on.
 
 Usage:
     python <prefix>/settings-merge.py [SETTINGS_FILE] [--fragment F] [--hook-path P] [--check]
@@ -72,7 +72,7 @@ import sys
 import tempfile
 from pathlib import Path, PurePosixPath
 
-KIT_SETTINGS_MERGE_VERSION = "1.10"  # gov:kit settings-merge@1.10 — engine identity
+KIT_SETTINGS_MERGE_VERSION = "1.11"  # gov:kit settings-merge@1.11 — engine identity
 HOOK_MARKER = "agent-cap.js"  # the loose join: dedup key AND the deployer's "is-it-wired?" grep target
 
 
@@ -595,7 +595,7 @@ def _selftest() -> int:
         # 12) a PER-ENTRY `prefix` in the target's deploy.toml decides agent-cap's home, and this
         #     file's own location does not. Staged as the reported break: settings-merge at the
         #     top-level prefix, the hook at its own. Before the fix the composition below read
-        #     "scripts/hooks/agent-cap.js" and the merge refused a settings.json that was correct.
+        #     the top-level prefix joined to the hook's own path, and the merge refused a settings.json that was correct.
         gov = root / "dep" / ".governance"
         gov.mkdir(parents=True)
         dep = gov / "deploy.toml"

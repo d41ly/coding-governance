@@ -16,7 +16,7 @@
 # config only inside it, and never writes into the real tree. Execution order is a scheduling detail;
 # REPORTING is always manifest order, so the output is byte-stable whatever the width.
 set -u
-KIT_RUN_GATES_VERSION=1.13   # gov:kit run-gates@1.13
+KIT_RUN_GATES_VERSION=1.14   # gov:kit run-gates@1.14
 # 1.7 -> 1.8: every bar appends one line to the run log under the git common dir, from the EXIT trap
 # (TOOL-dLoggedFlight-3). No manifest key, profile knob or stdout line moves, so neither direction of
 # a skew between the runner and its table or manifest changes a verdict.
@@ -32,19 +32,19 @@ KIT_RUN_GATES_VERSION=1.13   # gov:kit run-gates@1.13
 # 1.1 case above no govkit floor withholds the table today. TOOL-aQuenchedHarness-1.
 # THIS SCRIPT'S OWN DIRECTORY, RESOLVED BEFORE THE `cd`. A relative `$0` is relative to the caller's
 # cwd, so deriving it after `cd "$ROOT"` resolves it against the repo root instead: invoked as
-# `bash ../tools/run-gates/run-gates.sh` from a subdirectory the kit dir collapsed to the root, the
+# `bash ../<prefix>/run-gates/run-gates.sh` from a subdirectory the kit dir collapsed to the root, the
 # manifest to `./gate-legs.json`, and the runner ran ZERO legs. Captured here, used below.
 KITDIR=$(cd "$(dirname "$0")" && pwd)
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "run-gates: not a git repo"; exit 2; }
 cd "$ROOT" || exit 2
-# The python-launcher resolver, INLINED byte-identically from tools/lib/resolve-python.sh. This
-# kit is deployable (the aPacedTurnstile build's spec set under `memory/builds/aPacedTurnstile/spec/`), and tools/lib/ is gov-internal and never travels:
+# The python-launcher resolver, INLINED byte-identically from resolve-python.sh in gov's lib dir. This
+# kit is deployable (the aPacedTurnstile build's spec set under `memory/builds/aPacedTurnstile/spec/`), and gov's lib dir is gov-internal and never travels:
 # sourcing it made this runner exit 2 with zero legs run in any tree that did not have it.
 # The resolver parity gate derives its copy population by grepping for the marker below, so this
 # copy enrols itself. Do not edit it here. (That gate's own script path is deliberately NOT
 # spelled in this file: the canary forbids a leg's script path appearing in the runner, and it
 # is right to — a comment naming one is one edit away from an inlined leg command.)
-# >>> resolve_python — canonical copy: tools/lib/resolve-python.sh (byte-identical; gated)
+# >>> resolve_python — canonical copy: resolve-python.sh in gov's lib dir (byte-identical; gated)
 resolve_python() {
   # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
   # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
@@ -136,7 +136,7 @@ fails=0; n=0; skips=0; ondemands=0
 # re-runs the whole bar recursively and clobbers the live gate-last-summary.txt mid-run -- so the
 # evidence guarantee below had no way to be tested at all (TOOL-dNomadicAtlas-1).
 # The manifest is the kit dir's SIBLING, derived rather than spelled: this kit installs at
-# <prefix>/run-gates/ and a hardcoded "tools/gate-legs.json" resolves to nothing at any other
+# <prefix>/run-gates/ and a hardcoded path to gate-legs.json at gov's prefix resolves to nothing at any other
 # prefix. GATE_LEGS still outranks the derivation (the aPacedTurnstile build's spec set under `memory/builds/aPacedTurnstile/spec/` S3).
 # Both sides are normalised through the SAME `cd ... && pwd` chain before the strip. Under MSYS one
 # directory has two spellings — `git rev-parse --show-toplevel` answers `C:/...` and `pwd` answers
@@ -248,7 +248,7 @@ prof_die() { echo "run-gates: $*" >&2; exit 2; }
 num_ok() { case "$1" in ''|*[!0-9]*) return 1 ;; esac; [ ${#1} -le 15 ] || return 1; [ "$1" -gt 0 ]; }
 
 # Every source is RUN and its output validated, never probed for existence — being on PATH is not
-# evidence, the lesson tools/lib/resolve-python.sh records. Measured on node `a`: the three core
+# evidence, the lesson gov's lib-dir resolve-python.sh records. Measured on node `a`: the three core
 # sources all report 16, the page arithmetic and /proc/meminfo agree within 1 MB, and `sysctl` exits
 # 127, which is the case the chain must survive and does. CORE_SRC/RAM_SRC accumulate what was TRIED,
 # so the visibility line names the chain whether it answered on the first source or the third.

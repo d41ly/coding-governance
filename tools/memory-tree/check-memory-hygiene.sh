@@ -18,7 +18,7 @@
 #
 # Exit 0 + no output = clean. Anything printed is a hygiene regression.
 set -u
-KIT_MEMORY_TREE_VERSION=2.105   # gov:kit memory-tree@2.105 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
+KIT_MEMORY_TREE_VERSION=2.106   # gov:kit memory-tree@2.106 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 MEMORY_ROOT=memory
@@ -338,11 +338,11 @@ derive_waived() { # check-number · findings → sets _UNWAIVED to the failing o
 }
 
 # The resolver, INLINE. This kit is copy-installed as a standalone directory, so `../lib/` does
-# not exist in an adopting repo. The block below is byte-identical to tools/lib/resolve-python.sh
-# and tools/lib/resolve-python.test.sh reds if any copy drifts.
+# not exist in an adopting repo. The block below is byte-identical to resolve-python.sh in gov's lib dir,
+# and that dir's resolve-python.test.sh reds if any copy drifts.
 # Resolved ONCE for all three delegating checks (9, 13-16, 17-19) — the retired idiom sat at
 # three separate sites in this file, which is three chances to fix two of them.
-# >>> resolve_python — canonical copy: tools/lib/resolve-python.sh (byte-identical; gated)
+# >>> resolve_python — canonical copy: resolve-python.sh in gov's lib dir (byte-identical; gated)
 resolve_python() {
   # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
   # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
@@ -939,7 +939,7 @@ fi
 # WHY THIS IS ITS OWN CHECK NUMBER. Check 5 is a recording-FILENAME grammar and check 21 asks which
 # spec a record is evidence ABOUT; hanging a verdict assertion off either would make a structural
 # check read as a semantic one to everybody who did not write it. A new CHECK is the cheap option
-# here — the leg's name carries no count and `tools/gate-legs.json` does not move — so the honest
+# here — the leg's name carries no count and `<prefix>/gate-legs.json` does not move — so the honest
 # home costs an arms floor and an entry in the hygiene doc.
 #
 # FORWARD-ONLY, by a dated cutoff set strictly ahead of every committed record. 45 records carry no
@@ -1234,7 +1234,7 @@ SPEC_CANON='## 1. Goal
 ## 9. Revision log'
 # §10 is date-gated exactly as the section canon itself is: a spec dated before SPEC10_CUTOFF keeps
 # the nine-section shape, so adopting reuse-audit never retroactively reds a landed spec. The kit
-# already ships tools/codebase-map/reuse_lookup.py; this is the check that makes anyone use it.
+# already ships <prefix>/codebase-map/reuse_lookup.py; this is the check that makes anyone use it.
 # The DECLARATION moved up beside its three sibling cutoffs (TOOL-aDeclaredBound-2). It used to sit
 # here as `${SPEC10_CUTOFF:-<date>}`, which read the ENVIRONMENT after the conf had been sourced —
 # two channels for one value, and the only cutoff of the four with an env form. That form is
@@ -2343,7 +2343,7 @@ alcut="${ACCEPTANCE_LEDGER_CUTOFF:-}"
 # ---- `TOOL-aThawedCorpus-5` derived the same guard on a branch that never landed, and its
 # ---- merge kept THIS half because the branch's spelling skipped SILENTLY — no announce
 # ---- line — which is the class the paragraph above exists to refuse. `TOOL-aThawedCorpus-2`
-# ---- was retired to keep `memory hygiene` guardless in tools/gate-legs.json, which is what
+# ---- was retired to keep `memory hygiene` guardless in <prefix>/gate-legs.json, which is what
 # ---- makes the push-boundary compensating control above actually hold on BOTH pre-push arms.
 if [ "$STAGED" = 1 ] && [ -n "$alcut" ]; then
   printf 'memory-hygiene: check 23 HELD under --staged — a corpus-wide join over every closed Tier-2 unit; the push-boundary run is where they bind

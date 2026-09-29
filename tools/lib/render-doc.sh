@@ -25,7 +25,7 @@
 # born in the first place.
 # DEPL-dCarriedReceipt-15 S6.
 
-# >>> render_doc — canonical copy: tools/lib/render-doc.sh (byte-identical; gated)
+# >>> render_doc — canonical copy: render-doc.sh in gov's lib dir (byte-identical; gated)
 render_doc() {
   # No `sed`: a substituted value carrying `|` closes the s||| delimiter and `&` re-inserts the
   # whole match. Parameter substitution has neither, PROVIDED the replacement is quoted — bash

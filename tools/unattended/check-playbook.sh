@@ -13,7 +13,7 @@
 # refusal needs a recorded mode and a run's commit set, and both exist only through the driver.
 # Unit 10's attended path is gated on what it PRODUCED, never on how it ran.
 #
-# THE VERDICT CHANNEL. `tools/run-gates/run-gates.sh` maps a leg's own exit: 0 prints `GATE ok`,
+# THE VERDICT CHANNEL. `<prefix>/run-gates/run-gates.sh` maps a leg's own exit: 0 prints `GATE ok`,
 # anything else `GATE FAIL`; `skip` comes only from a guard file written before dispatch, so a leg
 # CANNOT say "skipped". An empty PLAYBOOK population therefore exits NON-ZERO — a leg carrying this
 # much enforcement must not print `GATE ok` over nothing. A zero-PIECE enumeration is a different

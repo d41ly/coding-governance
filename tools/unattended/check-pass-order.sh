@@ -35,7 +35,7 @@
 # below. `--preview` grades the live tree and prints violations without setting exit status, which is
 # how a candidate predicate gets run over the real tree before it is wired.
 set -u
-KIT_UNATTENDED_VERSION=1.42   # gov:kit unattended@1.42 — must match unattended.sh; check-kit-versions.sh pairs them
+KIT_UNATTENDED_VERSION=1.43   # gov:kit unattended@1.43 — must match unattended.sh; check-kit-versions.sh pairs them
 
 # The dereference pin, identical to this kit's other two readers and for the identical reason: a graft
 # file rewrites the commit GRAPH, so every ancestry answer below could be honest about a sha and wrong
@@ -103,7 +103,7 @@ while IFS= read -r -d '' _ck; do
     # through exactly that gap before it took a declared key list of its own. Both legs now carry
     # one. The sentence here used to say the glob was safe THERE, which described neither the code
     # nor the risk and is the reasoning that produced the hole. This one sets DRIVER at :51 — the path it
-    # eval's the classifier out of — so one tracked conf line `DRIVER="tools/unattended/evil.sh"`
+    # eval's the classifier out of — so one tracked conf line `DRIVER="<prefix>/unattended/evil.sh"`
     # made the leg eval an attacker-chosen file and exit 0 with its own FAILED line printed.
     # Reproduced end to end before this line existed. Only the keys this leg DECLARES are assignable,
     # so the stream cannot reach a name the leg did not ask for.

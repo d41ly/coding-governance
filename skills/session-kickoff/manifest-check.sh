@@ -34,7 +34,7 @@
 #          verb with no session id, a path-shaped one, a card over its byte cap, an append whose
 #          READY line pins a BASE that is not HEAD, or an id reader that could not answer).
 set -u
-KIT_MANIFEST_VERSION="1.10"   # gov:kit kickoff-manifest@1.10 — the registry id
+KIT_MANIFEST_VERSION="1.11"   # gov:kit kickoff-manifest@1.11 — the registry id
 # TWO NUMBERS, not one (TOOL-aRepatriatedFork-15 S4). KIT_MANIFEST_VERSION above is the kit's
 # VINTAGE: it bumps whenever a shipped byte of this kit moves, which is what `govkit.py epoch` grades.
 # MANIFEST_FORMAT is the manifest FORMAT, the only number an adopter's `kickoff-manifest: v<N>`
@@ -322,7 +322,7 @@ render_tree_cell() {
 # resolver here, and on a host with only `python3` or with the Store stub it exited 127 or 9009,
 # the append refused every body, and the commit deny's remedy re-ran the refusing append
 # (the aReplayedCard closing review, F2).
-# >>> resolve_python — canonical copy: tools/lib/resolve-python.sh (byte-identical; gated)
+# >>> resolve_python — canonical copy: resolve-python.sh in gov's lib dir (byte-identical; gated)
 resolve_python() {
   # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
   # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
@@ -661,8 +661,8 @@ fi
 status=0
 fail() { echo "MANIFEST check $1 FAILED — $2"; status=1; }
 
-# LIFTED VERBATIM from tools/unattended/check-unattended.sh, and gated as an inline copy by the
-# parity table in tools/lib/resolve-python.test.sh. Do not re-type it:
+# LIFTED VERBATIM from <prefix>/unattended/check-unattended.sh, and gated as an inline copy by the
+# parity table in resolve-python.test.sh, in gov's lib dir. Do not re-type it:
 # it carries two fixes that were each reproduced before they were written. A marker line IS the marker
 # or it is malformed — the prefix test IDENTIFIES the line and equality JUDGES it, because the older
 # form let a run append its own text to a marker line and still compare byte-equal. And the pair must

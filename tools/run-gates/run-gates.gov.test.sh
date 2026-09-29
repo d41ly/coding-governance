@@ -32,7 +32,7 @@ set -u
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "gov-canary: not a git repo"; exit 2; }
 cd "$ROOT" || exit 2
 
-# >>> resolve_python — canonical copy: tools/lib/resolve-python.sh (byte-identical; gated)
+# >>> resolve_python — canonical copy: resolve-python.sh in gov's lib dir (byte-identical; gated)
 resolve_python() {
   # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
   # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes

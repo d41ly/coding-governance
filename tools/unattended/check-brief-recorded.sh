@@ -103,7 +103,7 @@
 # post-run subset joined it rather than moving the increment, which would change what the sibling's
 # identically named count means.
 set -u
-KIT_UNATTENDED_VERSION=1.42   # gov:kit unattended@1.42 — must match unattended.sh; check-kit-versions.sh pairs them
+KIT_UNATTENDED_VERSION=1.43   # gov:kit unattended@1.43 — must match unattended.sh; check-kit-versions.sh pairs them
 
 # The dereference pin, identical to this kit's other readers and for the identical reason: a graft
 # file rewrites the commit GRAPH, so every ancestry answer below could be honest about a sha and
@@ -159,7 +159,7 @@ while IFS= read -r -d '' _ck; do
     # AN ALLOW-LIST, NOT A GLOB, and it is THIS leg's own declared four rather than the sibling's
     # five. The sibling assigns every uppercase key it sees and had to stop: it sets `DRIVER` above
     # its import - the path it eval's a classifier out of - so one tracked conf line
-    # `DRIVER="tools/unattended/evil.sh"` made that leg eval an attacker-chosen file and exit 0 with
+    # `DRIVER="<prefix>/unattended/evil.sh"` made that leg eval an attacker-chosen file and exit 0 with
     # its own FAILED line printed. This leg sets `DRIVER` and `CONF` above its import too. Only the
     # keys declared on the line above are assignable, so the stream cannot reach a name this leg did
     # not ask for.

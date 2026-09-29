@@ -95,9 +95,9 @@ fi
 M="$MEMORY_ROOT"
 
 # The resolver, INLINE. This kit is copy-installed as a standalone directory, so `../lib/` does
-# not exist in an adopting repo. The block below is byte-identical to tools/lib/resolve-python.sh
-# and tools/lib/resolve-python.test.sh reds if any copy drifts.
-# >>> resolve_python — canonical copy: tools/lib/resolve-python.sh (byte-identical; gated)
+# not exist in an adopting repo. The block below is byte-identical to resolve-python.sh in gov's lib dir,
+# and that dir's resolve-python.test.sh reds if any copy drifts.
+# >>> resolve_python — canonical copy: resolve-python.sh in gov's lib dir (byte-identical; gated)
 resolve_python() {
   # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
   # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
@@ -334,7 +334,7 @@ KIT_PATHS=$(derive_kit_paths "$_PY" "$KIT_REL" "$HERE"/*.template.md) || exit 2
 # RENDERED, not copied: these land in the adopter's tree as their committed rule set, so a
 # verbatim copy would stamp whatever prefix the SHIPPING repo used into a document the adopter now
 # owns. Every kit path in them is a placeholder; `render_doc` is what the parity gate grades.
-# >>> render_doc — canonical copy: tools/lib/render-doc.sh (byte-identical; gated)
+# >>> render_doc — canonical copy: render-doc.sh in gov's lib dir (byte-identical; gated)
 render_doc() {
   # No `sed`: a substituted value carrying `|` closes the s||| delimiter and `&` re-inserts the
   # whole match. Parameter substitution has neither, PROVIDED the replacement is quoted — bash

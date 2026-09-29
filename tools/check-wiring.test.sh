@@ -46,7 +46,7 @@ chke() { bash "$SCRIPT" "$@" 2>&1; }
 # ships to no adopter, so at an adopter the suite fell back to a bare launcher NAME. The block is
 # byte-identical to the canonical copy its marker line names, gated by the parity table in the
 # resolve-python self-test.
-# >>> resolve_python — canonical copy: tools/lib/resolve-python.sh (byte-identical; gated)
+# >>> resolve_python — canonical copy: resolve-python.sh in gov's lib dir (byte-identical; gated)
 resolve_python() {
   # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
   # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes

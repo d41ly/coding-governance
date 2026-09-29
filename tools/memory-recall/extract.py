@@ -315,7 +315,7 @@ def resolve_declared_sources(repo: pathlib.Path, rev: str | None = None) -> list
     """The DECLARED extra sources, from ``RECALL_EXTRA_SOURCES``.
 
     Repo-relative, not repo-root-only: the first design admitted root confs alone, which would have
-    left ``tools/template-size-limits.txt`` -- a declaration created in the same build -- outside
+    left ``<prefix>/template-size-limits.txt`` -- a declaration created in the same build -- outside
     the corpus this widening exists to reach.
 
     Declared, never globbed. A glob would sweep whatever a project happens to keep, and the

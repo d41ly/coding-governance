@@ -14,7 +14,7 @@
 # twenty-seven and there was no agreed shape for a leg to check. Per-suite editing has no end and no
 # ratchet: the twenty-eighth suite lands silent and nobody notices.
 #
-# THE POPULATION IS DERIVED from `tools/gate-legs.json`, never hand-kept. A hand-maintained second
+# THE POPULATION IS DERIVED from `<prefix>/gate-legs.json`, never hand-kept. A hand-maintained second
 # list is how `check-kit-versions.sh` grew a duplicate assertion that printed two messages for one
 # defect, and the manifest is already the single source for what the bar runs — `run-gates.test.sh`
 # treats it that way. A suite nobody runs has no count worth checking.
@@ -50,12 +50,12 @@ fi
 waived=""
 [ -f "$WAIVERS" ] && waived=$(grep -vE '^[[:space:]]*(#|$)' "$WAIVERS" || true)
 
-# THE HARNESS SPELLING, and why it is a second FORM rather than a loophole. `tools/lib/lib-selftest.sh`
+# THE HARNESS SPELLING, and why it is a second FORM rather than a loophole. gov's lib-dir `lib-selftest.sh`
 # suites do not print their own count and do not compare their own floor: `run_arms` does both, and it
 # REFUSES a suite that declared fewer arms than its pin before running one of them. The property this
 # leg asserts is unchanged — an executed count, a non-zero floor, and something that compares them —
 # but two of the three now live one file over. What makes that checkable rather than trusted is that
-# `tools/lib/lib-selftest.test.sh` arms the comparison directly: an arm asserts a suite below its
+# gov's lib-dir `lib-selftest.test.sh` arms the comparison directly: an arm asserts a suite below its
 # floor reds by name, and another asserts an unparseable floor REFUSES instead of defaulting to 0.
 #
 # All three clauses are required and each is anchored, for the reason the classic form's are: an

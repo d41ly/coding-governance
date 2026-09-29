@@ -110,7 +110,7 @@ esac
 
 # THE TOOL ROOT, derived exactly as `adopt-memory-tree.sh` derives it, and for the same reason: the
 # Skill names the harness scripts, which live BESIDE this kit rather than inside it. Spelled as a
-# literal they were `tools/workflows/…` in every render, which resolves to nothing in a root install
+# literal they were gov's prefix plus `workflows/…` in every render, which resolves to nothing in a root install
 # and disagreed with the build-method carrier that already spelled the same two paths through this
 # placeholder. Two carriers, one route, two answers. Closing-review F6.
 TOOL_ROOT=${KIT_REL%/*}; [ "$TOOL_ROOT" = "$KIT_REL" ] && TOOL_ROOT=""   # "tools" at a prefix, "" at the root

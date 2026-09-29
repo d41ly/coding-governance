@@ -1,7 +1,7 @@
 """lexicon_conf.py — the ONE reader of `.lexicon.conf`.
 
-FOUR consumers need this file: the engine (`tools/lexicon/lexicon.py`), the adopter script
-(`tools/lexicon/adopt-lexicon.sh`, in bash), this repo's `map_extractors.py`, and `drift-audit`'s
+FOUR consumers need this file: the engine (`<prefix>/lexicon/lexicon.py`), the adopter script
+(`<prefix>/lexicon/adopt-lexicon.sh`, in bash), this repo's `map_extractors.py`, and `drift-audit`'s
 signals. Two hand-written parsers for one file is the two-answers-to-one-question class, so the bash
 side calls `--print-verbs` here rather than reimplementing the grammar, and every Python consumer
 imports `load_conf`. The count above read "three" and hedged the third with "when its unit unparks"

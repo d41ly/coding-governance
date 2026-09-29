@@ -3,7 +3,7 @@
  * scratch-guard — a PreToolUse guard that keeps agent scratch out of the home directory.
  *
  * WHY THIS IS A HOOK AND NOT A RULE. The defect it exists for was eighteen files in the operator's
- * home, written by tool calls shaped like `bash tools/run-gates/run-gates.sh > ~/.merge-bar.log`.
+ * home, written by tool calls shaped like `bash <prefix>/run-gates/run-gates.sh > ~/.merge-bar.log`.
  * No script was involved, so no script could have caught it, and the charter rule against it was
  * loaded in every session that broke it. The tool call is the only surface that sees the act.
  *
@@ -70,7 +70,7 @@
  */
 'use strict'
 
-const KIT_SCRATCH_GUARD_VERSION = '1.2' // gov:kit agent-cap@1.24 — ships inside the hooks kit entry
+const KIT_SCRATCH_GUARD_VERSION = '1.2' // gov:kit agent-cap@1.25 — ships inside the hooks kit entry
 
 const TOOLS = ['Bash', 'PowerShell']
 const MAX_FINDINGS = 6

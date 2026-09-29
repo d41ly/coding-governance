@@ -1443,7 +1443,7 @@ def slot_violations(readme_text: str, readme: str, canon: bool = False) -> list:
     # silently restoring the vacuous pass it exists to remove.
     #
     # THE DISCIPLINE IS THE DRIVER'S, not `_marker_index`'s. `region()` in
-    # tools/unattended/unattended.sh refuses unless there is exactly one open, exactly one close, and
+    # <prefix>/unattended/unattended.sh refuses unless there is exactly one open, exactly one close, and
     # the open comes first; `_marker_index` returns the FIRST match and has no notion of duplicates or
     # order. An assertion built on the helper would accept what the driver rejects, which is two
     # answers to one question in the two tools that both read this marker.

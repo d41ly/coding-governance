@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # adopt-process-monitor.sh — wire the process-monitor kit into a project.
 #
-# gov:kit process-monitor@0.9
+# gov:kit process-monitor@0.10
 #
-# Run from anywhere INSIDE the target repo AFTER copying this kit dir in as `tools/process-monitor/`.
+# Run from anywhere INSIDE the target repo AFTER copying this kit dir in as `<prefix>/process-monitor/`.
 # The kit dir's NAME is load-bearing; the one-segment prefix is free and every path below is DERIVED
 # from it, so a root install still works.
 #
@@ -24,9 +24,9 @@
 #   Exit 0 = adopted / wired · 1 = unwired or refused · 2 = wrong invocation or not a repo.
 set -u
 
-KIT_PROCESS_MONITOR_VERSION="0.9"   # gov:kit process-monitor@0.9 — the deployer's read (kit.toml version_from)
+KIT_PROCESS_MONITOR_VERSION="0.10"   # gov:kit process-monitor@0.10 — the deployer's read (kit.toml version_from)
 
-# >>> resolve_python — canonical copy: tools/lib/resolve-python.sh (byte-identical; gated)
+# >>> resolve_python — canonical copy: resolve-python.sh in gov's lib dir (byte-identical; gated)
 resolve_python() {
   # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
   # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes

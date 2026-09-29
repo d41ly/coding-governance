@@ -26,7 +26,7 @@
 # sets core.hooksPath ONLY when unset and NEVER overwrites an already-set value (e.g. a deliberate
 # out-of-tree copy per WIRE-INTO-PROJECT.md §5). Agent-cap wiring is never auto-applied — it would mean
 # rewriting settings.json, the file the SessionStart hook lives in.
-KIT_CHECK_WIRING_VERSION=1.14   # gov:kit check-wiring@1.14 — the deployer's read
+KIT_CHECK_WIRING_VERSION=1.15   # gov:kit check-wiring@1.15 — the deployer's read
 set -u
 # ---- S6: this file's own install prefix, DERIVED ------------------------------------------------
 # TOOL-dRetiredFork-8. Six `tools/<kit>/` literals were spelled here, and `govkit apply` ships these
@@ -308,7 +308,7 @@ wired() { # marker · the matcher the fragment declares · [the hook's resolved 
 # inline because the shared copy ships to no adopter. It named a remedy string only, until the
 # round-1 fold made settings-merge.py the one reader of an adopter-owned hook: `resolve_owned_hook`
 # above RUNS it now, so a name that cannot execute refuses every owned hook, never a stale hint.
-# >>> resolve_python — canonical copy: tools/lib/resolve-python.sh (byte-identical; gated)
+# >>> resolve_python — canonical copy: resolve-python.sh in gov's lib dir (byte-identical; gated)
 resolve_python() {
   # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
   # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
@@ -486,7 +486,7 @@ check_agentcap() {
   # probes that already have one.
   # `${KIT_REL:+...}` LIKE EVERY SIBLING ARM, and this one was the only probe in the file
   # without it. Unguarded, a ROOT install (KIT_REL empty) built the absolute path
-  # `/hooks/agent-cap.js`, matched nothing, and printed `skip -- not adopted` over a hook that
+  # rooted at `/` with the hook's kit-relative path, matched nothing, and printed `skip -- not adopted` over a hook that
   # was present and correctly wired. A silent skip over the concurrency hook, which is the
   # one arm in this file where a false skip has a security shape. Found by the closing review
   # of TOOL-dRetiredFork-17, reproduced on a scratch root-layout tree.
@@ -872,7 +872,7 @@ check_merge_rows() {
     return
   fi
   # The KIT-INTERNAL launcher first. It travels with the kit, so it is the only one an adopter is
-  # guaranteed to have; `tools/lib/pyrun.sh` is gov-internal and ships nothing, and a wiring that
+  # guaranteed to have; gov's lib-dir `pyrun.sh` is gov-internal and ships nothing, and a wiring that
   # names it in an adopting repo execs a command that cannot start. A driver that never starts never
   # writes %A, so git reports CONFLICT and leaves the path holding OURS-ONLY content with no markers.
   launcher=$(first_of "$(dirname "$drv")/merge-rows.sh" "${KIT_REL:+$KIT_REL/}lib/pyrun.sh")

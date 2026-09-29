@@ -74,7 +74,7 @@ TOOL_ROOT="$TOOLROOT"
 # The render resolves every sibling path the templates cite for THIS install, so the dogfood copy
 # is graded against what `adopt-memory-tree.sh --render` would write here. Both blocks below are
 # marked inline copies, gated byte for byte by the same parity table as `render_doc`.
-# >>> resolve_python — canonical copy: tools/lib/resolve-python.sh (byte-identical; gated)
+# >>> resolve_python — canonical copy: resolve-python.sh in gov's lib dir (byte-identical; gated)
 resolve_python() {
   # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
   # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
@@ -302,7 +302,7 @@ if pfx and pfx != ".":
 # <<< derive_kit_paths
 KIT_PATHS=$(derive_kit_paths "$PY" "$KITREL" "$KITREL"/*.template.md) || { echo "kit-parity: could not resolve the sibling paths the templates cite"; exit 2; }
 
-# >>> render_doc — canonical copy: tools/lib/render-doc.sh (byte-identical; gated)
+# >>> render_doc — canonical copy: render-doc.sh in gov's lib dir (byte-identical; gated)
 render_doc() {
   # No `sed`: a substituted value carrying `|` closes the s||| delimiter and `&` re-inserts the
   # whole match. Parameter substitution has neither, PROVIDED the replacement is quoted — bash

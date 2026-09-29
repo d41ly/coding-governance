@@ -514,7 +514,7 @@ def cmd_selftest() -> int:
             lambda: 0 if d1 == [] else 1)
         # Defect 2 is the one this implementation does NOT share, and the arm says so rather than
         # asserting upstream's behaviour out of deference. Upstream's token pattern required a
-        # non-empty tail after the slash, so `tools/memory-tree/` harvested to nothing and a record
+        # non-empty tail after the slash, so a directory-only kit token harvested to nothing and a record
         # written that way was silently unanchored. Here the tail may be empty, the directory token
         # IS harvested, and it selects everything beneath it. The arm pins the DIFFERENCE, so a
         # future tightening of the pattern reintroduces the upstream defect loudly.

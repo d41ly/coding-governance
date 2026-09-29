@@ -22,7 +22,7 @@
 # supported end state: a hook file copied in but never merged into settings.json reads as UNWIRED
 # forever, which is the fastest way to train every node to ignore the wiring verifier.
 #
-# The interpreter is resolved python3-first with a `python` fallback (the tools/check-wiring.sh:69
+# The interpreter is resolved python3-first with a `python` fallback (the <prefix>/check-wiring.sh:69
 # form), overridable with RECALL_PY. `--check` is a merge-bar leg, and a stock Debian/Ubuntu adopter
 # without `python-is-python3` would red the whole gate suite on a working kit if this defaulted to
 # bare `python`. The gate runner's argv rewrite cannot rescue it — this leg's argv[0] is `bash`.
@@ -41,7 +41,7 @@ ROOT="$(pwd)"
 # HERE still no-ops under an MSYS mount alias, and REL then comes out ABSOLUTE and machine-local
 # — measured, the same tree at the same commit gave --check EXIT 0 from one spelling and a
 # three-hunk DRIFTED diff from the other, and --scaffold writes that into a COMMITTED artifact
-# silently. Works whether the kit sits at <root>/memory-recall/ or <root>/tools/memory-recall/.
+# silently. Works whether the kit sits at <root>/memory-recall/ or <root>/<prefix>/memory-recall/.
 REL="$(cd "$HERE" && git rev-parse --show-prefix)" || exit 2
 REL="${REL%/}"
 # THE TOOL ROOT, derived exactly as `adopt-unattended.sh` derives it and for the same reason: the
@@ -52,9 +52,9 @@ TOOL_ROOT=${REL%/*}; [ "$TOOL_ROOT" = "$REL" ] && TOOL_ROOT=""   # "tools" at a 
 [ -z "$TOOL_ROOT" ] || TOOL_ROOT="$TOOL_ROOT/"                   # trailing slash so a root install renders clean
 
 # The resolver, INLINE. This kit is copy-installed as a standalone directory, so `../lib/` does
-# not exist in an adopting repo. The block below is byte-identical to tools/lib/resolve-python.sh
-# and tools/lib/resolve-python.test.sh reds if any copy drifts.
-# >>> resolve_python — canonical copy: tools/lib/resolve-python.sh (byte-identical; gated)
+# not exist in an adopting repo. The block below is byte-identical to resolve-python.sh in gov's lib dir,
+# and that dir's resolve-python.test.sh reds if any copy drifts.
+# >>> resolve_python — canonical copy: resolve-python.sh in gov's lib dir (byte-identical; gated)
 resolve_python() {
   # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
   # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes

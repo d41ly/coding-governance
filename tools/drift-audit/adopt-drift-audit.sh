@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # adopt-drift-audit.sh — wire the drift-audit kit into a project.
 #
-# gov:kit drift-audit@1.17
+# gov:kit drift-audit@1.18
 #
-# Run from anywhere INSIDE the target repo AFTER copying this kit dir in as `tools/drift-audit/`.
+# Run from anywhere INSIDE the target repo AFTER copying this kit dir in as `<prefix>/drift-audit/`.
 # The kit dir's NAME is load-bearing; the one-segment prefix is free and every path below is derived
 # from it, so a root install still works and still prints runnable commands:
 #
@@ -27,7 +27,7 @@ set -u
 # env-only answer set at render time is gone by the time `--check` grades what was rendered, and
 # the two disagree. The descriptor passes `{prefix}/review-harness` instead, so the answer travels
 # with the install. Absent, the derivation further down still applies, which is what keeps a
-# hand-install — and this repo's own dogfood, where the sibling really is `tools/workflows` —
+# hand-install — and this repo's own dogfood, where the sibling really is `<prefix>/workflows` —
 # working unchanged.
 MODE=""
 WORKFLOWS_ARG=""
@@ -70,14 +70,14 @@ TEMPLATE="$KIT_DIR/SKILL.template.md"
 
 # The kit dir's name as the adopter sees it, so the rendered Skill's commands are copy-pasteable.
 # The resolver, INLINE. This kit is copy-installed as a standalone directory, so `../lib/` does
-# not exist in an adopting repo. The block below is byte-identical to tools/lib/resolve-python.sh
-# and tools/lib/resolve-python.test.sh reds if any copy drifts.
+# not exist in an adopting repo. The block below is byte-identical to resolve-python.sh in gov's lib dir,
+# and that dir's resolve-python.test.sh reds if any copy drifts.
 #
 # This site spelled `python` BARE, which is why V5's migration missed it: the idiom ban matches
 # `command -v`, and a bare launcher name carries no such marker. On a python3-only host — or one
 # where the MS-Store stub answers for python3 — this line produced an empty KIT_REL and the
 # `--check` leg then reported drift on a Skill that had never changed.
-# >>> resolve_python — canonical copy: tools/lib/resolve-python.sh (byte-identical; gated)
+# >>> resolve_python — canonical copy: resolve-python.sh in gov's lib dir (byte-identical; gated)
 resolve_python() {
   # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
   # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
@@ -122,7 +122,7 @@ KIT_REL="$("$DA_PY" -c "import os,sys;print(os.path.relpath(sys.argv[1],sys.argv
 # tree the guess is wrong. govkit lands a kit at `{prefix}/{entry-id}` and the harnesses' entry id is
 # `review-harness`, not `workflows` — so an adopter at `vendor/gov` got a Skill pointing at
 # `vendor/gov/workflows/`, which govkit never creates. gov itself is right BY COINCIDENCE: its own
-# directory is literally `tools/workflows` and it does not deploy into itself. The comment above
+# directory is literally gov's prefix plus `workflows` and it does not deploy into itself. The comment above
 # claimed a derived value "cannot drift from the install"; it cannot drift from the PREFIX, which is
 # a different and weaker property, and this is what that gap cost.
 #

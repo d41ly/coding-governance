@@ -7,7 +7,7 @@ KIT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # The resolver, INLINE. This kit is copy-installed as a standalone directory, so `../lib/` does
 # not exist in an adopting repo. The block below is byte-identical to tools/lib/resolve-python.sh
 # and tools/lib/resolve-python.test.sh reds if any copy drifts.
-# >>> resolve_python — canonical copy: tools/lib/resolve-python.sh (byte-identical; gated)
+# >>> resolve_python — canonical copy: resolve-python.sh in gov's lib dir (byte-identical; gated)
 resolve_python() {
   # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
   # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes

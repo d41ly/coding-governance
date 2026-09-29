@@ -41,7 +41,7 @@ trap 'rm -rf "$TMP"' EXIT
 # it survived the V5 migration. On a python3-only host it happened to work; on a host where the
 # MS-Store stub answers for python3 it renders nothing and the young-tree arm below reds for a
 # reason that has nothing to do with hygiene.
-# >>> resolve_python — canonical copy: tools/lib/resolve-python.sh (byte-identical; gated)
+# >>> resolve_python — canonical copy: resolve-python.sh in gov's lib dir (byte-identical; gated)
 resolve_python() {
   # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
   # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes

@@ -2,7 +2,7 @@
 # check-unattended.sh - the merge-bar leg for the unattended-run kit. The check COUNT is written in no
 # prose here, because it has now been wrong twice and a cross-build merge left this header stating two
 # different totals at once. Derive it with
-# `grep -oE 'fail [0-9]+' tools/unattended/check-unattended.sh | grep -oE '[0-9]+' | sort -un` -
+# `grep -oE 'fail [0-9]+' <prefix>/unattended/check-unattended.sh | grep -oE '[0-9]+' | sort -un` -
 # the second grep is load-bearing: `sort -un` on `fail 7` sorts the WORD, reads every line as 0, and
 # prints exactly one.
 # Contract: memory/guides/UNATTENDED-PROTOCOL.md (binding). Project layer: .unattended.conf.
@@ -37,7 +37,7 @@
 # THE CORE SETS ARE READ FROM THE DRIVER, never restated here. A second spelling of `PHASES_CORE` one
 # file away from the thing that enforces it is the drift this leg exists to catch.
 set -u
-KIT_UNATTENDED_VERSION=1.42   # gov:kit unattended@1.42 — must match unattended.sh; check-kit-versions.sh pairs them
+KIT_UNATTENDED_VERSION=1.43   # gov:kit unattended@1.43 — must match unattended.sh; check-kit-versions.sh pairs them
 
 # ------------------------------------------------------------------------------ the dereference pin
 # Identical to the driver's, and for the identical reason: `git replace` rewrites what a sha MEANS for
@@ -65,7 +65,7 @@ _LIB_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
 # The python launcher, INLINED byte-identically from the canonical copy named on its marker line
 # (this kit is copy-installed and has no shared lib to source). Check 21's repair hint runs the
 # sibling resolver with it, which reads the receipt in Python; nothing else here spawns one.
-# >>> resolve_python — canonical copy: tools/lib/resolve-python.sh (byte-identical; gated)
+# >>> resolve_python — canonical copy: resolve-python.sh in gov's lib dir (byte-identical; gated)
 resolve_python() {
   # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
   # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes

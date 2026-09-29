@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # coding-governance pre-push: the authoritative merge bar. On a push to the default branch it runs the
-# FULL gate (tools/run-gates/run-gates.sh) once and BLOCKS the push if it reds. Other pushes are gated
+# FULL gate (<prefix>/run-gates/run-gates.sh) once and BLOCKS the push if it reds. Other pushes are gated
 # only by a branch bar the repository itself declares (GOV_BRANCH_GATE_CMD, see THE BRANCH BAR). Every
 # refusal leaves a machine verdict in the git dir (see THE REFUSAL CHANNEL), and every push this hook
 # sees, gated or not, leaves its lines in the run log (see THE RUN LOG).
@@ -739,7 +739,7 @@ if [ -z "$KITROOT_FROM" ] || [ ! -f "$top/${KP}gate-legs.json" ]; then
 fi
 
 
-# TOOL-aLeasedGauntlet-1: a default-branch push must go through tools/push-main.sh, which reconciles
+# TOOL-aLeasedGauntlet-1: a default-branch push must go through <prefix>/push-main.sh, which reconciles
 # origin BEFORE this full gate so it never runs on a stale tree. The lander sets this marker; a raw
 # push lacks it and is refused (--no-verify bypasses). The kit hook has no code/docs split, so EVERY
 # unmarked default-branch push is refused.

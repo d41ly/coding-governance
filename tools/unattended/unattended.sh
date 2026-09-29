@@ -41,7 +41,7 @@
 # The generated region holds NO copy: the unit list is DERIVED from the build README's already-derived,
 # already-byte-compared slice. One derivation in the tree; this file is not a second one.
 set -u
-KIT_UNATTENDED_VERSION=1.42   # gov:kit unattended@1.42 — kit identity; set HERE, never from .unattended.conf
+KIT_UNATTENDED_VERSION=1.43   # gov:kit unattended@1.43 — kit identity; set HERE, never from .unattended.conf
 
 # ------------------------------------------------------------------------------ the dereference pin
 # A sha is a NAME, and turning a name into bytes or into ancestry happens in the run's own object
@@ -206,7 +206,7 @@ run_bounded() { # argv...
 # stub that answers `command -v` and exits 9009 without running anything. The block is
 # byte-identical to the canonical copy and its parity gate reds if it drifts; the driver suite
 # asserts the resolved variable is the only launcher spelling outside it.
-# >>> resolve_python — canonical copy: tools/lib/resolve-python.sh (byte-identical; gated)
+# >>> resolve_python — canonical copy: resolve-python.sh in gov's lib dir (byte-identical; gated)
 resolve_python() {
   # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
   # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
@@ -4175,7 +4175,7 @@ $_bcnon"
       # give. It said `^## Verdict: CLEAN` matched zero of a 46-record corpus; RE-MEASURED
       # 2026-08-31 the corpus is 208 tracked review records with 170 carrying `^## Verdict`, made
       # mandatory forward of `REVIEW_VERDICT_CUTOFF` by memory hygiene check 22 and written by
-      # tools/workflows/tier2-review.js. The rule survives its own premise dying, for a better
+      # <prefix>/workflows/tier2-review.js. The rule survives its own premise dying, for a better
       # reason: this walk selects the FIRST matching record in ls-files order, a converged loop's
       # round-1 record legitimately reads BLOCKED and is never rewritten, so a verdict anchored here
       # reds honest landings. The DISPOSITION of a review loop is read from the --review rows
@@ -5171,7 +5171,7 @@ record_path_of() { # records-root · piece-path
 #
 #   * a leg named `.*` matched EVERY verdict row and deleted them all, silently erasing a recorded
 #     FAIL and flipping the piece back to verified on the next write;
-#   * a leg containing `/` — `tools/lint.sh`, an ordinary thing to call a leg — closed the address
+#   * a leg containing `/` — `scripts/lint.sh`, an ordinary thing to call a leg — closed the address
 #     early, so sed aborted while the `printf` that follows still ran, leaving TWO verdict rows for
 #     one leg on a record the reader then cannot decide either way.
 #

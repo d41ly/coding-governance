@@ -24,7 +24,7 @@
 # WHAT IS THEREFORE NOT COVERED, said plainly because an exemption is not coverage (charter §7):
 # nothing runs the self-tests automatically. A change under this directory that guts a check lands
 # green. The compensating check is a person invoking this script, and the DoD for any work touching
-# `tools/unattended/` is a GREEN parity verdict from `run-unattended-gates.sh --selftests --pooled` pasted
+# `<prefix>/unattended/` is a GREEN parity verdict from `run-unattended-gates.sh --selftests --pooled` pasted
 # into the landing report. The mode is DECLARED (TOOL-aBatchedArm-4): --serial grades each suite
 # against its budget, --pooled runs them through the runner's pool and withholds every cost verdict,
 # and a route that reaches the self-test half with neither REFUSES rather than defaulting.
@@ -113,7 +113,7 @@ BUDGET_pass_order_history=1800 # TOOL-aStagedLane-1 widened the population to bu
                               # this edit.
 # ---- THE TWO *_selftest BUDGETS THAT USED TO SIT HERE ARE GONE, and their absence is the merge
 # ---- rather than a deletion: TOOL-aQuenchedHarness-4 moved every self-test budget into
-# ---- `tools/run-gates/selftest-budgets.txt`, and this branch and main each added a suite while
+# ---- `<prefix>/run-gates/selftest-budgets.txt`, and this branch and main each added a suite while
 # ---- the other was in flight. `BUDGET_brief_recorded` stays because its leg is a REPOSITORY
 # ---- check on the merge bar, which is the line this delegation does not cross.
 BUDGET_brief_recorded=900     # measured 38 s on node `a` 2026-09-05, on the day it landed, when the
@@ -292,13 +292,13 @@ run_one "pass-order history"        checks bash "$HERE/check-pass-order.sh"
 run_one "brief-recorded"            checks bash "$HERE/check-brief-recorded.sh"
 
 # THE SELF-TEST HALF IS DELEGATED. TOOL-aQuenchedHarness-4 S7. These six suites are now rows in
-# `tools/run-gates/selftest-budgets.txt` alongside every other kit's, and one runner executes them
+# `<prefix>/run-gates/selftest-budgets.txt` alongside every other kit's, and one runner executes them
 # all -- which is what the 2026-08-23 ruling always implied and what this file could only do for one
 # kit. Their budgets travelled with them; the `--checks` half above keeps its own, because those four
 # are REPOSITORY checks that stay on the merge bar and are not this delegation's business.
 #
 # WHY THEY WERE THE HARD CASE, recorded because it is why the population is declared rather than
-# derived: the ruling removed all six from `tools/gate-legs.json` AND from `tools/unattended/kit.toml`,
+# derived: the ruling removed all six from `<prefix>/gate-legs.json` AND from `<prefix>/unattended/kit.toml`,
 # so they exist in no manifest at all. A runner deriving its population from held manifest legs sees
 # none of them, which a spec audit caught before this was built.
 # THE COUNT IS DERIVED, NOT TYPED. It read `ran + 6` and this merge is exactly why that was

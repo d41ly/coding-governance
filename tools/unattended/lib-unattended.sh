@@ -414,7 +414,7 @@ pass_commit() {  # anchor · unit · run-state-path · [upper-bound, default HEA
   # THE SUBJECT COMES OUT OF THE SAME WALK AS THE SHA. It used to cost a `git log -1` per
   # commit in the window, on every call, and this function is called once per (anchor, unit)
   # pair -- so the same commits were re-read once per pair. Profiled on node `a` 2026-09-07
-  # over a full run of `bash tools/unattended/check-unattended.sh`: 1528 of that run's 2513
+  # over a full run of `bash <prefix>/unattended/check-unattended.sh`: 1528 of that run's 2513
   # git spawns were this one line, against 31 for the `--follow` walk everyone assumes is the
   # expensive one. `%H%x09%s` gets both out of one walk. TOOL-aQuenchedHarness-7.
   #
