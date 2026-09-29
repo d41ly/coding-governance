@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-26 — the runbook and every shipped doc name no install prefix
 
-**Status:** SPECCED · rev-2 · 2026-09-25 · node a · Tier-1 · base 2143b6d6 · streams tooling · order 11
+**Status:** SPECCED · rev-3 · 2026-09-29 · node a · Tier-1 · base 2143b6d6 · streams tooling · order 11
 
 <!-- gen:spec-records -->
 
@@ -41,6 +41,13 @@ at any prefix, chosen by the doc's role.
   struck. Observed by AC4.
 - **S8** — The ledger rows for these files are lowered, and every kit moved takes its version bump in
   every carrier. Observed by AC5.
+- **S9** — (rev-3) The seams these spellings are read through move with them.
+  `check-playbook-parity.sh` S1 counts a kit as named when the charter or WIRE spells
+  `<prefix>/<kit>/`, beside the two forms it accepts today. `check-wiring.test.sh` AC12 still
+  derives both merge-driver commands in fixtures, and requires the memory-tree README to publish
+  the one `<prefix>/` line that yields each when `<prefix>/` is read as `tools/` and as empty.
+  The review-harness descriptor declares `TOOL_ROOT` on `drift-audit-state.template.js`, which its
+  renderer already substitutes. Observed by AC6.
 
 ## 3. Non-goals (OUT)
 
@@ -90,6 +97,29 @@ of eleven kits under `tools/` · `tools/lexicon/LEXICON.md` · `tools/lexicon/SK
 `tools/codebase-map/.codebase-map.conf.example` · `tools/install-prefix-waivers.txt` ·
 `tools/install-prefix-carried.txt`
 
+### rev-3 — what the unit pass found before code
+
+- **One token, both sides.** The gate's drained forms are `<prefix>/` and `<tool-root>/`, and
+  `TOOL-aRepatriatedFork-25` already printed gov's side as `<gov>/<prefix>/`. WIRE defines
+  `<prefix>` once, in its Definitions line: the directory a tree keeps its kits in, the operator's
+  choice under `<project>` and whatever gov's checkout uses under `<gov>`. `<gov-repo>` leads
+  keep their lead.
+- **Executing lines are returned, not drained.** WIRE's `harness-migration` blocks are cut out
+  and RUN by the govkit self-test, and seven of their lines join `tools/govkit/…` under the
+  operator's `$GOV`. Deriving that path changes a program whose only observer is a suite this
+  pass cannot run, which is M3 veto 3. They go to `TOOL-aRepatriatedFork-46` with the other
+  executing derived-base joins, so WIRE keeps a row of exactly those seven.
+- **The lexicon Skill marker names its file in words.** The lexicon renderer substitutes no token
+  that names its own kit directory, so S4 has no render token to reuse there. The marker says
+  "this kit's `SKILL.template.md`", and the rendered Skill still names the adopter's real paths
+  through `{{SUGGEST_CLI}}` and `{{GATE_CLI}}`.
+- **The kickoff manifest seed has no prefix token.** `check-script:` and the standing gate line
+  take `<prefix>/manifest-check.sh`, and the Customize block names `<prefix>` as the one angle
+  token to fill. A `check-script:` left unfilled names no tracked file, so the engine's trust
+  guard falls through to its next candidate, which is existing behaviour.
+- **The charter moves, so the playbook bumps to v3.2**, with the v3.1 text cut to
+  `memory/archive/` as v3.1 was, and gov's own `AGENTS.md` render follows.
+
 ### Alternatives rejected
 
 - `{prefix}` in a verbatim README. It would reach the adopter unrendered.
@@ -117,8 +147,9 @@ of eleven kits under `tools/` · `tools/lexicon/LEXICON.md` · `tools/lexicon/SK
   step names the prefix the §8 F1 ruling gives.
   Red when: a destination still prescribes `tools/`.
 - **AC2** — When `bash tools/check-install-prefix.sh --list` runs, no ledger row remains for any file
-  this unit owns.
-  Red when: an owned file keeps a row.
+  this unit owns, except WIRE's row, which (rev-3) counts only the `harness-migration` block lines
+  §4 returns, as a per-line scan with the gate's own counter shows.
+  Red when: an owned file keeps a row, or WIRE's row counts a line outside those blocks.
   figure: DERIVED at observation time.
 - **AC3** — When `python tools/govkit/govkit.py apply` writes a fixture target at prefix `scripts`,
   every rendered doc and every seeded doc this unit touched names `scripts/` paths, and
@@ -130,6 +161,11 @@ of eleven kits under `tools/` · `tools/lexicon/LEXICON.md` · `tools/lexicon/SK
 - **AC5** — `bash tools/check-kit-versions.sh` exits 0, `python tools/govkit/govkit.py epoch --base
   2143b6d6` names no kit this unit moved, and `bash tools/check-template-size.sh` exits 0.
   Red when: a moved kit's carrier was missed, or the charter template grew past its cap.
+- **AC6** — (rev-3) `bash tools/check-playbook-parity.sh` exits 0 over the drained charter and WIRE,
+  and exits 1 naming kits under the pre-rev-3 `named_in_playbook`. The AC12 block of
+  `check-wiring.test.sh`, run as a slice with its prologue, passes against the drained README and
+  fails with the README's line put back to `tools/`.
+  Red when: either check keeps its verdict across the break.
 
 ## 7. Gates
 
@@ -156,6 +192,12 @@ of eleven kits under `tools/` · `tools/lexicon/LEXICON.md` · `tools/lexicon/SK
   prefix, with no class exempted, before `TOOL-aRepatriatedFork-18`'s held leg. This unit is census
   class C, WIRE's destinations first as census §6 recommends.
 - rev-2 · 2026-09-25 · §8 resolved by the owner: every fork takes its recommendation.
+- rev-3 · 2026-09-29 · the unit pass, before code. S9 and AC6 name the three seams that read these
+  spellings and would red on the drain: the playbook parity gate's kit coverage, the check-wiring
+  suite's published-command arm and the review-harness placeholder declaration. §4 pins one
+  `<prefix>` token for both sides, returns WIRE's seven executing migration-block lines to
+  `TOOL-aRepatriatedFork-46` under M3 veto 3 and narrows AC2 to match, and records the lexicon
+  marker, the manifest seed and the charter's v3.2 bump.
 
 ## 10. Reuse audit
 
