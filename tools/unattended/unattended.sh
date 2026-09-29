@@ -43,7 +43,7 @@
 # The generated region holds NO copy: the unit list is DERIVED from the build README's already-derived,
 # already-byte-compared slice. One derivation in the tree; this file is not a second one.
 set -u
-KIT_UNATTENDED_VERSION=1.44   # gov:kit unattended@1.44 — kit identity; set HERE, never from .unattended.conf
+KIT_UNATTENDED_VERSION=1.45   # gov:kit unattended@1.45 — kit identity; set HERE, never from .unattended.conf
 
 # ------------------------------------------------------------------------------ the dereference pin
 # A sha is a NAME, and turning a name into bytes or into ancestry happens in the run's own object
@@ -5134,8 +5134,10 @@ verb_preflight() { # slug · keepalive-id
   # S6's second half, HERE because it needs the anchor and must still run before `trusted_base`:
   # under `ANCHOR_SCOPE=published` a README absent at the first anchor's merge-base widens to the
   # second anchor, and an unpushed branch is then refused with a push instruction that carries no
-  # recipe and, once followed, writes to the remote.
-  check_filing_home "$slug" || true
+  # recipe and, once followed, writes to the remote. It RETURNS, like the ids test above: S6 has both
+  # answer before any other preflight refusal can, and joining the others let the no-README refusal
+  # (and fail 32 under `published`) answer beside it.
+  check_filing_home "$slug" || return 1
   check_clean || true
   check_branch || true
   check_wiring || true
@@ -6157,6 +6159,13 @@ run_takeover() { # slug · run-state file · keepalive id · held|working · pha
     fail 59 "a take-over is a change of driver and the new driver has to name itself, because the lease is keyed on the keepalive id and a blank one wedges the slug until the bound expires — the holder's own later resume would then meet the different-id refusal and --replaces cannot name a blank; nothing was written: pass --keepalive-id"
     return 1
   fi
+  # THE BYPASS FLAG, refused beside the blank id and before any write: the lease records the id and
+  # the history row below parks it VERBATIM (TOOL-dDerivedDocket-5 rev-7), and the gate greps this
+  # file whole for the flag. Every park caller screens its text this way (TOOL-aBoundedVerdict-15 S4).
+  if [ -n "$BYPASS_BAN" ] && printf '%s' "$kid" | grep -qF -- "$BYPASS_BAN"; then
+    fail 59 "the keepalive id spells the declared bypass flag, and the take-over records it in the lease and parks it in the history row of a file the gate greps whole, so this would red the bar on a record no verb can rewrite; nothing was written, so name the keepalive job without the literal flag: $BYPASS_BAN"
+    return 1
+  fi
   unp=$(fact "$rel" hold-unpushed)
   if [ -n "$unp" ]; then
     echo "unattended: PUSH THIS FIRST — this hold was taken while the remote did not answer, so the branch tip exists only on the node that held it and this take-over's first act is to push it: $unp"
@@ -6301,11 +6310,14 @@ verb_resume() { # slug
       _rs_bt=$(branch_tip_quiet); _rs_rc=$?
       case "$_rs_rc" in
         0) echo "unattended: --scheduled — the remote advertises ${_rs_bt%% *} at ${_rs_bt##* }, which is HEAD or an ancestor of it, so no session has pushed work this worktree lacks" ;;
-        4) fail 60 "the remote advertises a tip for this run's branch that is neither HEAD nor an ancestor of it, so a session somewhere pushed work after this hold and a restart here would drive one slug from two places; nothing was written, and a human decides this one"
+        # 3 IS RULE 3 TOO: this driver never fetches, so work another session pushed is a tip this
+        # clone LACKS, and a commit absent here is neither HEAD nor an ancestor of it. Reading 3 as
+        # "cannot be confirmed" left the double-drive rule 3 exists for on the catch-all's message.
+        3|4) fail 60 "the remote advertises a tip for this run's branch that is neither HEAD nor an ancestor of it, so a session somewhere pushed work after this hold and a restart here would drive one slug from two places; nothing was written, and a human decides this one"
            return 1 ;;
         5) fail 60 "the remote did not answer, so whether another session has pushed work this worktree lacks is UNKNOWN rather than no, and a restart that might double-drive the slug is worse than one that waits for a human; nothing was written"
            return 1 ;;
-        *) fail 60 "this run's branch tip cannot be confirmed on its remote, so the freshness this restart turns on cannot be shown: the run is not on a named branch, the remote advertises no tip for it, or the advertised tip is one this clone does not have. Nothing was written"
+        *) fail 60 "this run's branch tip cannot be confirmed on its remote, so the freshness this restart turns on cannot be shown: the run is not on a named branch, or the remote advertises no tip for it. Nothing was written"
            return 1 ;;
       esac
     else

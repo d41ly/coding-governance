@@ -2627,8 +2627,11 @@ done <<<"$ug"
 # ---- fold that made it false. Now: the marker-delimited `>>> resolve_python` block is the ONE place
 # ---- the candidate names may appear (its parity gate holds it byte-identical to the canonical copy),
 # ---- and outside it and outside comments the only launcher spelling is the resolved variable.
+# ---- `_` joins the excluded neighbours since TOOL-dDerivedDocket-24 S10, whose `read_leg_argv` is the
+# ---- first CALL of the resolver with a word after it (`resolve_python 2>/dev/null`): the name ends
+# ---- in `python `, and a launcher word preceded by an identifier character is never a bare launcher.
 n=$((n+1)); [ "$(grep -c '^# >>> resolve_python' "$SCRIPT")" = 1 ] || { echo "FAIL the driver carries no inline resolve_python block, so any launcher it runs is unresolved"; st=1; }
-np=$(awk '/^# >>> resolve_python/{b=1} b{if(/^# <<< resolve_python/)b=0; next} /^[[:space:]]*#/{next} {print NR": "$0}' "$SCRIPT" | grep -E '(^|[^-[:alnum:]])(python3?|py) ' || true)
+np=$(awk '/^# >>> resolve_python/{b=1} b{if(/^# <<< resolve_python/)b=0; next} /^[[:space:]]*#/{next} {print NR": "$0}' "$SCRIPT" | grep -E '(^|[^-_[:alnum:]])(python3?|py) ' || true)
 n=$((n+1)); [ -z "$np" ] || { echo "FAIL the driver invokes a python launcher without the resolver: $np"; st=1; }
 n=$((n+1)); grep -q 'run_bounded "\$_stpy" "\$SPEC_TOKENS_CLI"' "$SCRIPT" || { echo "FAIL the declared spec-token checker is not run through the resolved launcher"; st=1; }
 
@@ -3157,7 +3160,10 @@ remove_landed_fixture
 # ---- hook copy with that row reverted to allow: nothing prints and the block assertions fail, which
 # ---- is the B1 wedge as an arm. The listing names ANOTHER job, so the pass is the id's absence and
 # ---- not the listing's emptiness. `node` is on PATH wherever gate-guard.js runs.
-build_landed_fixture; rm -f "$STOP7"
+# ---- ON THE RUN BRANCH at the fixture's commit, by TOOL-dDerivedDocket-62 S8: from `main` the
+# ---- liveness reads ELSEWHERE and the hook allows with `elsewhere` (its S5), and the block binds only
+# ---- in the run's worktree (its F7), which is the session this continuation exists for.
+build_landed_fixture; rm -f "$STOP7"; git checkout -q unit
 printf '%s\n' '{"utc":"2026-09-16T12:00:00Z","phase":"BUILDING","session_crons":[]}' > "$STOP7"
 out=$(run --landed tRun)
 hit "$out" "no stop after the close exists to check the reap against"
@@ -3275,8 +3281,13 @@ remove_landed_fixture; rm -f "$STOP7"
 # ---- the `next` value intact; `--resume`'s first line carries the same field. This is the header's
 # ---- `# one line` as an arm: a future field that arrives on a second line reds here by name. RED
 # ---- against unit 17's two-line driver copy, never against the field-clause copy.
-build_landed_fixture; rm -f "$STOP7"
+# ---- THE ROW IS PARKED BEFORE THE PUSH: `--park` reads the DERIVED phase (TOOL-dDerivedDocket-4 S8),
+# ---- and a LANDING record the advertised tip carries derives LANDED, which check 26 refuses. So
+# ---- build_landed_fixture is spelled out here, the park riding its commit, as AC16 above does.
+reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
+sed -i 's/^phase: .*/phase: LANDING/' memory/builds/tRun/RUN.md
 run --park tRun --item x --reason y >/dev/null
+fixture; git push -q -f origin HEAD:main; git checkout -q -B main HEAD; rm -f "$STOP7"
 printf '2026-09-20T10:00:00Z attempt 1 session s pid 1 pid-alive no out o1\n2026-09-20T10:10:00Z attempt 2 session s pid 1 pid-alive no out o2\n' > "${STOP7%/*}/resume.tRun.log"
 printf '%s\n' '{"utc":"2026-09-16T12:00:00Z","phase":"LANDING","session_crons":[{"id":"k1"}]}' > "$STOP7"
 check_status_one_line tRun > "$ORIGIN_DIR/s9.line"
@@ -3442,14 +3453,17 @@ hit "$(cat memory/builds/tRun/RUN.md)" "override · item records-current · reas
 # than refusing it (TOOL-dClosedLexicon-11), and is proven separately below. The derived count still
 # covers all FIVE writers: four refuse here and the fifth is the rotation arm, so a SIXTH writer
 # still reds this arm until someone places it.
+# SEVEN since TOOL-dDerivedDocket-4 S9, which placed its two here: `--hold` writes HELD and the
+# take-over (`--resume --keepalive-id`) writes the held-from phase back, each behind its own
+# terminal refusal. Six refuse here and the rotation arm drives the seventh.
 writers=$(grep -c 'set_fact "$rel" phase' "$SCRIPT")
-n=$((n+1)); [ "$writers" = 5 ]   || { echo "FAIL the driver has $writers phase writer(s); this arm drives 4 of them and the rotation arm below drives the fifth — place the new verb in one of the two, or the terminal guard is unproven for it"; st=1; }
+n=$((n+1)); [ "$writers" = 7 ]   || { echo "FAIL the driver has $writers phase writer(s); this arm drives 6 of them and the rotation arm below drives the seventh — place the new verb in one of the two, or the terminal guard is unproven for it"; st=1; }
 
 reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
 sed -i 's/^phase: .*/phase: LANDED/' memory/builds/tRun/RUN.md
 fixture
 before=$(sum)
-for v in "--phase tRun BUILDING --witness abc" "--close tRun" "--abort tRun --reason r" "--landed tRun"; do
+for v in "--phase tRun BUILDING --witness abc" "--close tRun" "--abort tRun --reason r" "--landed tRun" "--hold tRun --code host-degraded --until owner --reason r --reaped k1" "--resume tRun --keepalive-id k2"; do
   # shellcheck disable=SC2086
   out=$(run $v)
   hit "$out" "the run is already finished and a finished record is not something to move, re-open or re-pin"
@@ -4345,14 +4359,16 @@ hit "$out" "skipped — set-checks-recorded is scoped to recipe-mode runs and th
 # fixture's close is unmet for, it is not these.
 miss "$out" "a machine-checked DoD item is unmet, so --close blocks: pieces-complete"
 miss "$out" "a machine-checked DoD item is unmet, so --close blocks: set-checks-recorded"
-# ...and EXACTLY THREE announcements, not one per MET item. dod_met does not clear DOD_OUT on entry,
+# ...and EXACTLY FOUR announcements, not one per MET item. dod_met does not clear DOD_OUT on entry,
 # so an item with nothing to say would otherwise inherit the previous item's text and print one
 # item's explanation under another item's name — that is what this count guards and it still does.
 # It was TWO until kit 1.13 added `reuse-probed`, whose kit-absent outcome is a THIRD legitimate
 # skip in this fixture: the fixture conf declares no RECALL_CLI, so the item
 # announces that it has nothing to observe rather than reporting a zero. Raising the pin without
 # this sentence would be indistinguishable from weakening the leak guard.
-same "exactly three skip announcements" "$(grep -c '^unattended: skipped — ' <<<"$out")" "3"
+# FOUR since TOOL-dDerivedDocket-17 added `asks-disposed`, whose T0 row (no `asks:` fact and a blank
+# ASKS_CMD, which this fixture's conf is) is MET and announced as not adopted: that spec's AC2.
+same "exactly four skip announcements" "$(grep -c '^unattended: skipped — ' <<<"$out")" "4"
 reset_tree
 
 # ---- ABSENT is `slug`, which is every build README written before this key existed. Run over
@@ -7737,6 +7753,14 @@ out=$(CLAUDE_PID=999999998 run --resume tRun --keepalive-id kB)
 hit  "$out" "the session this record names resumes under a new keepalive, so its process restarted and this resume TAKES THE RUN OVER in its place"
 hit  "$out" "lease replaced · keepalive k1 -> kB"
 miss "$out" "UNATTENDED check 58"
+# ---- The same restart handed an id spelling the fixture's declared bypass flag: refused before the
+# ---- lease, the phase or the history row, whose park wrote the id unscreened (TOOL-dDerivedDocket-5
+# ---- rev-7) until region two first ran and rule 2 of the source arms named run_takeover. RED against
+# ---- the driver without the guard: the take-over lands and the record carries the flag.
+build_hold_fixture; before=$(sum)
+out=$(CLAUDE_PID=999999998 run --resume tRun --keepalive-id "kB--no-verify")
+hit  "$out" "the keepalive id spells the declared bypass flag, and the take-over records it in the lease and parks it in the history row of a file the gate greps whole, so this would red the bar on a record no verb can rewrite; nothing was written, so name the keepalive job without the literal flag"
+same "a take-over refused for the bypass flag wrote nothing" "$(sum)" "$before"
 # ---- AC7: `--replaces` at an UNKNOWN clock. The `date` stub fails the one `+%s` probe the clock reads
 # ---- and hands every other call to the real `date`, so `write_lease` still stamps `lease-utc`; a stub
 # ---- answering nothing to any call would let a broken record print `keepalive replaced` as well.
@@ -7804,7 +7828,9 @@ run --phase tRun BUILDING --witness deadbeef >/dev/null
 git add -A >/dev/null && git commit -q -m ph --no-verify
 out=$(run --hold tRun --code host-owner-action --until owner --reason "the owner is rebooting it" --keepalive-unreachable nodeX)
 hit "$out" "phase HELD · code host-owner-action"
-n=$((n+1)); grep -q '· unreachable nodeX$' memory/builds/tRun/RUN.md || { echo "FAIL AC4 the history row does not record the unreachable node"; st=1; }
+# The row's last field is ` · resume <name>|none(<why>)` since TOOL-dDerivedDocket-5 §4, so the node
+# is no longer line-final; an owner hold owes no restart, so that field reads `none(owner)`.
+n=$((n+1)); grep -q '· unreachable nodeX · resume none(owner)$' memory/builds/tRun/RUN.md || { echo "FAIL AC4 the history row does not record the unreachable node"; st=1; }
 n=$((n+1)); grep -q '^held-from: BUILDING$' memory/builds/tRun/RUN.md || { echo "FAIL AC4 held-from does not name the working phase"; st=1; }
 git add -A >/dev/null && git commit -q -m held --no-verify
 out=$(run --resume tRun --keepalive-id kC)
@@ -8565,7 +8591,9 @@ ip_out=$(mktemp -d)
 iprun() { ( cd "$ip_dir" && env -u GATE_SELFTESTS GOV_DEFAULT_BRANCH=main IPOUT="$ip_out" bash "$SCRIPT" "$@" 2>&1 ); }
 ipgit() { git -C "$ip_dir" "$@"; }
 ipreset() {
-  ipgit checkout -q --detach "$ip_unit" 2>/dev/null
+  # FORCED: a refused or `primary` close leaves its record staged, a plain checkout refuses over it,
+  # and `branch -f` then printed "cannot force update the branch 'unit'" on a correct reset.
+  ipgit checkout -qf --detach "$ip_unit" 2>/dev/null
   ipgit branch -qf unit "$ip_unit"; ipgit checkout -q unit
   ipgit reset -q --hard "$ip_unit"; ipgit clean -qfd
   ipgit update-ref refs/heads/main "$ip_base"; ipgit push -q -f origin main; ipgit fetch -q origin main
@@ -8728,13 +8756,16 @@ hit  "$out" "a machine-checked DoD item is unmet, so --close blocks: gates-green
 same "the red landing bar left the record RUNNING" "$(sed -n 's/^phase: //p' "$ip_dir/memory/builds/tRun/RUN.md")" "RUNNING"
 ipgit checkout -q --detach "$ip_base"; ipgit push -q -f origin HEAD:main; ipgit checkout -q unit
 
-# ---- S5's refusal: the close evaluated everything and then could not commit. Staged by removing the
-# ---- fixture's git identity, which is the one way to fail `git commit` while `git add` succeeds.
+# ---- S5's refusal: the close evaluated everything and then could not commit. Staged by a pre-commit
+# ---- hook that refuses, which spec §4 step 4 says the close commit runs "as for any commit". Unsetting
+# ---- the fixture's identity was the first cut, and git fell back to the node's GLOBAL identity and
+# ---- committed, so the arm graded the machine; `core.hooksPath` is local, so it outranks a global one.
 ipprep ""
-ipgit config --unset user.email
+mkdir -p "$ip_out/hooks"; printf '#!/bin/sh\necho "fixture pre-commit: refused"\nexit 1\n' > "$ip_out/hooks/pre-commit"
+chmod +x "$ip_out/hooks/pre-commit"; ipgit config core.hooksPath "$ip_out/hooks"
 out=$(STUB_PREPARED=0 STUB_CARRY=0 iprun --close tRun $IPOVR)
 hit "$out" "the close evaluated the whole Definition of Done and then could not commit its own record, so the phase is written and staged but does not travel; the commit's own output follows"
-ipgit config user.email t@t.test
+ipgit config --unset core.hooksPath
 
 # ---- S7: under `primary` every verb behaves as it did at BASE — no probe, no carry check, no
 # ---- commit, and no GATE_FULL in the bar's environment. This is the control the whole unit rests on.
@@ -8748,12 +8779,14 @@ miss "$out" "cannot land in it"
 same "the primary close made no commit"          "$(ipgit rev-parse HEAD)" "$ip_h"
 same "the primary bar is not handed GATE_FULL"   "$(grep -c '^GATE_FULL=<unset>$' "$ip_out/barenv.txt")" "1"
 
-# ---- F5, the OTHER half: a re-close over a record ALREADY at LANDING commits NOTHING and names the
-# ---- commit that already carries it. This is the state a re-prepare after a red push leaves, and an
-# ---- unconditional commit would refuse on an empty commit AFTER a full bar had been paid - wedging
-# ---- both documented re-prepare routes. It needs a close with NO overrides, because every override
-# ---- writes a parked row and a written row is a changed record, so the fixture's Definition of Done
-# ---- is satisfied outright rather than bought.
+# ---- F5, the OTHER half: a re-close over a record ALREADY at LANDING, the state a re-prepare after a
+# ---- red push leaves. An unconditional commit there would refuse on an empty commit AFTER a full bar
+# ---- had been paid - wedging both documented re-prepare routes. It needs a close with NO overrides,
+# ---- because every override writes a parked row, so the Definition of Done is met outright.
+# ---- AMENDED by TOOL-dDerivedDocket-24 S6: every MET bar now writes a fresh `gates-run` fact, its
+# ---- pinned id and the HEAD it graded, so this write is never byte-identical. The re-close commits
+# ---- that fact ON TOP of the re-prepared merge - a non-empty stage, so the wedge cannot arise - and
+# ---- the fact names the merge this bar graded rather than the one the first close's bar did.
 ipreset
 sed -i 's/^LANDER_MODE=.*/LANDER_MODE="in-place"/' "$ip_dir/.unattended.conf"
 iprun --preflight tRun --keepalive-id k1 >/dev/null
@@ -8797,7 +8830,6 @@ ipgit merge -q --no-ff "$ip_old" -m "merge: tRun - land onto origin/main" >/dev/
 ipgit update-ref refs/heads/unit "$(ipgit rev-parse HEAD)"; ipgit checkout -q unit
 out=$(STUB_PREPARED=0 STUB_CARRY=0 iprun --close tRun)
 hit "$out" "phase LANDING, committed at"
-ip_c2=$(ipgit rev-parse --short HEAD)
 # the remote moves and the landing is re-prepared, which is what a red push leaves behind
 ipgit checkout -q --detach "$ip_base"; printf 'later
 ' > "$ip_dir/later.txt"
@@ -8809,9 +8841,10 @@ ipgit merge -q --no-ff "$ip_old" -m "merge: tRun - re-prepared" >/dev/null
 ipgit update-ref refs/heads/unit "$(ipgit rev-parse HEAD)"; ipgit checkout -q unit
 ip_reprep=$(ipgit rev-parse HEAD)
 out=$(STUB_PREPARED=0 STUB_CARRY=0 iprun --close tRun)
-hit  "$out" "the record already reads LANDING and this close changed no byte of it, so nothing was committed"
-hit  "$out" "$ip_c2"
-same "the re-close left HEAD on the re-prepared merge" "$(ipgit rev-parse HEAD)" "$ip_reprep"
+hit  "$out" "phase LANDING, committed at"
+same "the re-close committed on top of the re-prepared merge" "$(ipgit rev-parse HEAD^)" "$ip_reprep"
+same "the re-close's gates-run names the merge its bar graded" \
+     "$(sed -n 's/^gates-run: //p' "$ip_dir/memory/builds/tRun/RUN.md" | cut -d' ' -f2)" "${ip_reprep:0:8}"
 same "the re-close left a clean tree"                  "$(ipgit status --porcelain)" ""
 ipgit checkout -q --detach "$ip_base"; ipgit push -q -f origin HEAD:main; ipgit checkout -q unit
 
@@ -8915,7 +8948,8 @@ same "AC6 the second hold with no progress writes streak 2" \
      "$(sed -n 's/^hold-streak: //p' memory/builds/tRun/RUN.md | cut -d' ' -f1)" "2"
 same "AC6 the limit stops the run owing restarts" \
      "$(sed -n 's/^resume-owed: //p' memory/builds/tRun/RUN.md)" "none · limit"
-hit "$out" "phase HELD · code platform-limit"
+# S5: at the limit the hold STILL SUCCEEDS - under the code this hold was taken with.
+hit "$out" "phase HELD · code host-degraded"
 git add -A >/dev/null && git commit -q -m held2 --no-verify
 run --resume tRun --keepalive-id k3 >/dev/null
 printf 'real work\n' > progress.txt
@@ -8982,7 +9016,7 @@ same "AC7 a scheduled resume over an unreachable remote wrote nothing" "$(sum)" 
 git remote set-url origin "$ORIGIN"
 git checkout -q --detach
 out=$(run --resume tRun --scheduled "$RSAT" --keepalive-id kS)
-hit "$out" "this run's branch tip cannot be confirmed on its remote, so the freshness this restart turns on cannot be shown: the run is not on a named branch, the remote advertises no tip for it, or the advertised tip is one this clone does not have. Nothing was written"
+hit "$out" "this run's branch tip cannot be confirmed on its remote, so the freshness this restart turns on cannot be shown: the run is not on a named branch, or the remote advertises no tip for it. Nothing was written"
 git checkout -q unit
 rm -rf "$RS_CLONE"
 
@@ -9061,10 +9095,16 @@ rm -rf "$RS_FIX"
 # real producer's eleven-field projection looks like, and AC15's arm — which runs the REAL declared
 # producer — is the one that holds this stub honest; it skips only where the key is blank.
 #
-# THE STUB LIVES OUTSIDE THE WORK TREE, under $TMP. Written inside it, it is an untracked file, and
-# `check_clean` counts untracked paths — so every preflight below would refuse on a DIRTY TREE and
-# the arms would all pass while testing nothing they claim to.
-ASKSTUB="$TMP/askstub.sh"
+# THE STUB LIVES OUTSIDE THE WORK TREE, under the fixture's GIT DIR. Written inside it, it is an
+# untracked file, and `check_clean` counts untracked paths — so every preflight below would refuse on
+# a DIRTY TREE and the arms would all pass while testing nothing they claim to. `$TMP` itself is NOT
+# outside: it IS the shared fixture's work tree. Region two's first complete run measured all three
+# ways that bit: argv.txt, mode.txt or rows.tsv was the one dirty path check 2 refused; the `git clean`
+# in each reset deleted the rows an arm had just set; and the stub, swept into the ask fixture's
+# commit, was deleted by the next `reset_tree`, so the in-place close arms ran an ASKS_CMD naming no
+# file. Under `.git` none of that reaches it, and its state holds across resets until an arm sets it.
+ASKSTUB_DIR="$TMP/.git/askstub"; mkdir -p "$ASKSTUB_DIR"
+ASKSTUB="$ASKSTUB_DIR/askstub.sh"
 cat > "$ASKSTUB" <<'ASKSTUBEOF'
 #!/usr/bin/env bash
 set -u
@@ -9094,9 +9134,9 @@ printf 'examined\t%s\n' "$n"
 case "$MODE" in exit1) exit 1 ;; esac
 exit 0
 ASKSTUBEOF
-export ASKSTUB_DIR="$TMP"
-askmode() { printf '%s\n' "$1" > "$TMP/mode.txt"; }
-askrows() { printf '%b' "$1" > "$TMP/rows.tsv"; }
+export ASKSTUB_DIR
+askmode() { printf '%s\n' "$1" > "$ASKSTUB_DIR/mode.txt"; }
+askrows() { printf '%b' "$1" > "$ASKSTUB_DIR/rows.tsv"; }
 askconf() { printf 'ASKS_CMD="bash %s"\n' "$ASKSTUB" >> .unattended.conf; }
 
 asksetup() {
@@ -9200,8 +9240,8 @@ hit "$out" "mandate pinned at m-base"
 same "the mandate is pinned as the README spells it" "$(sed -n 's/^asks: //p' memory/builds/tAskA/RUN.md)" "EXMP-aFoo-3..4"
 same "every mandated id carries a grade" "$(sed -n 's/^asks-ready: //p' memory/builds/tAskA/RUN.md)" "EXMP-aFoo-3=yes EXMP-aFoo-4=yes"
 same "m-base is the merge base of the anchor and HEAD" "$(sed -n 's/^m-base: //p' memory/builds/tAskA/RUN.md)" "$(git merge-base main HEAD)"
-same "the witness was asked at that same tree" "$(sed -n 's/.*--at //p' "$TMP/argv.txt")" "$(git merge-base main HEAD)"
-miss "$(cat "$TMP/argv.txt")" "--live-builds"
+same "the witness was asked at that same tree" "$(sed -n 's/.*--at //p' "$ASKSTUB_DIR/argv.txt")" "$(git merge-base main HEAD)"
+miss "$(cat "$ASKSTUB_DIR/argv.txt")" "--live-builds"
 askreset
 out=$(run --preflight tAskLate --keepalive-id KA-1)
 hit "$out" "a mandated ask is not filed in the tree this run is anchored to, so the run would be choosing among records it could have written itself"
@@ -9234,7 +9274,7 @@ askreset
 out=$(run --preflight tAskC --keepalive-id KA-1)
 hit "$out" "mandate pinned at m-base"
 same "F2 a -N continuation is graded as the id it names" "$(sed -n 's/^asks-ready: //p' memory/builds/tAskC/RUN.md)" "EXMP-aFoo-3=yes EXMP-aFoo-4=yes"
-same "F2 ...and the witness was asked about both" "$(sed -n 's/.*--ready \(.*\) --target.*/\1/p' "$TMP/argv.txt")" "EXMP-aFoo-3 EXMP-aFoo-4"
+same "F2 ...and the witness was asked about both" "$(sed -n 's/.*--ready \(.*\) --target.*/\1/p' "$ASKSTUB_DIR/argv.txt")" "EXMP-aFoo-3 EXMP-aFoo-4"
 askreset
 out=$(run --preflight tAskK --keepalive-id KA-1)
 hit "$out" "the build README's asks: line does not read whole as an id list, and a mandate taken from the ids that did parse is the owner's own list silently narrowed - write each id, an id range or a -N continuation, and nothing else: "
@@ -9948,7 +9988,10 @@ maysetup() {
   git checkout -qf unit && git merge -q --no-edit main >/dev/null 2>&1
   MAYP=$(git rev-parse HEAD)
 }
-mayreset() { git checkout -qf unit >/dev/null 2>&1; git reset -q --hard "$MAYP"; git clean -qfd; mkconf; }
+# COMMITS ITS CONF, for askreset's reason: MAYP carries the conf dispreset committed with ASKS_CMD,
+# so a bare mkconf left `.unattended.conf` modified and every preflight below refused at check 2.
+mayreset() { git checkout -qf unit >/dev/null 2>&1; git reset -q --hard "$MAYP"; git clean -qfd; mkconf
+             git add -A >/dev/null; git commit -q -m mayconf --no-verify >/dev/null; }
 maypin() { sed -n 's/^may: //p' "memory/builds/$1/RUN.md" 2>/dev/null; }
 maysetup
 # THE BACKSLASH FIXTURE MUST CARRY ITS BYTE, or the backslash arm below grades a README that is
@@ -11546,7 +11589,8 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # OLDER arms of those two blocks red in the replica, identically at HEAD and on the fold, and this
 # raise neither counts on nor moves them. No suite ran.
 # RAISED 1836 -> 1837: region one's in_shard block-length arm (the Cygwin stack-ceiling split, 2026-09-29).
-FLOOR_ASSERTIONS=1837
+# RAISED 1837 -> 1843: region two's structural fixes at VERIFYING, +4 from the --hold and take-over entries in the phase-writer drive list and +2 from the take-over bypass-flag arm.
+FLOOR_ASSERTIONS=1843
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -11672,7 +11716,8 @@ FLOOR_SHARD_1=209
 # +6 for the run_bounded and verb arms, which sit above the REGION TWO terminator and are therefore
 # paid by shard 2 as well as by an unsharded run.
 # +61 for the TOOL-dDerivedDocket-28 process-ledger arms, all in region two - see FLOOR_ASSERTIONS.
-FLOOR_SHARD_2=1640
+# RAISED 1640 -> 1646: the same six region-two assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_2=1646
 # +58 for the fold of dDerivedDocket's closing diff review, round 1 (F2, F3, F4), all in region two - see FLOOR_ASSERTIONS.
 # +14 for TOOL-dDerivedDocket-16's AC15 arm at the VERIFYING pass, all in region two - see FLOOR_ASSERTIONS.
 # +5 for the --hold line-end refusal arms at the second origin/main reconcile, region two - see FLOOR_ASSERTIONS.
