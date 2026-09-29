@@ -7,6 +7,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-25-build-TOOL-aRepatriatedFork-23-prefix-census.md](../build/2026-09-25-build-TOOL-aRepatriatedFork-23-prefix-census.md) | research | TOOL-aRepatriatedFork-23 TOOL-aRepatriatedFork-24 TOOL-aRepatriatedFork-25 TOOL-aRepatriatedFork-26 TOOL-aRepatriatedFork-27 TOOL-aRepatriatedFork-29 TOOL-aRepatriatedFork-30 |
+| [2026-09-29-prompt-TOOL-aRepatriatedFork-28-build-brief.md](../prompts/2026-09-29-prompt-TOOL-aRepatriatedFork-28-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
