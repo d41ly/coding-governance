@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-44 — the adopter-ic receipt fixture carries no adopter name
 
-**Status:** CLOSED · rev-1 · 2026-09-29 · node a · Tier-1 · base d6e1749c · streams tooling · order 7
+**Status:** CLOSED · rev-2 · 2026-09-29 · node a · Tier-1 · base d6e1749c · streams tooling · order 7
 
 <!-- gen:spec-records -->
 
@@ -73,7 +73,8 @@ No new function, file or arm. One file renamed, three readers re-pointed.
 - perf / scale — none.
 - error / empty / loading states — a stale reader fails loudly: the selftest's `json.loads` raises.
 - observability — the S13 LIVENESS arms print the fixture's row count every run.
-- risks — the old name becomes a dead-path needle; any later carrier outside `memory/` reds.
+- risks — the old name is NOT a dead-path needle: the gate derives needles from deletions, and git
+  records this as a rename. A later carrier of the old name outside `memory/` is caught by nothing.
 - testing — AC1 to AC4.
 - migration — none.
 - user docs — none.
@@ -87,7 +88,7 @@ No new function, file or arm. One file renamed, three readers re-pointed.
   renamed `adopter-ic-2cff5855.receipt.json` returns 52 `files` rows, each carrying
   `gov_oid`, `oid` and `lf_oid`. Red when: the reader names a path that does not exist.
 - **AC3** — `bash tools/check-dead-paths.sh` exits 0. Red when: a waiver row keyed on the old path
-  resolves to nothing and goes stale, or a carrier outside `memory/` names the old basename.
+  resolves to nothing and goes stale.
 - **AC4** — `python tools/govkit/govkit.py selfcheck` exits 0, `python tools/govkit/govkit.py epoch`
   reports no FAILED entry, and `bash tools/check-kit-versions.sh` exits 0. Red when: the rename moved
   a shipped byte without a version bump.
@@ -96,7 +97,7 @@ No new function, file or arm. One file renamed, three readers re-pointed.
 
 `dead-path carriers (deleted files still named)` · `govkit selfcheck` · `kit epoch (shipped bytes move, the version moves)` · `govkit selftest` · `recall floor arms` · `govkit refusal join` · `govkit acceptance matrix` · `lexicon naming predicates` · `encoding posture (text IO names its encoding)`
 
-New arm: none · the old basename becomes a dead-path needle by git's own derivation · none
+New arm: none · none · none
 
 ## 8. Open questions
 
@@ -106,6 +107,10 @@ none
 
 - rev-1 · 2026-09-29 · initial draft, adopted per the unattended protocol §11 when
   `TOOL-aRepatriatedFork-23`'s widened ledger named the fixture.
+- rev-2 · 2026-09-29 · §5 risks · AC3 · §7 New arm: the claim that the old basename becomes a
+  dead-path needle is withdrawn. Measured after the build commit: `check-dead-paths.sh --needles`
+  lists no receipt name, and a staged carrier of the old basename in `tools/push-main.sh` exits 0,
+  because the needle set reads deletions and git records this one as a rename.
 
 ## 10. Reuse audit
 
