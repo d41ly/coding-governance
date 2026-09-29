@@ -42,3 +42,7 @@ base: d6e1749c0542218004260928f1399174daafb789
 2026-09-29T11:05:29Z brief · item TOOL-aRepatriatedFork-28 · reason 6ace46627006 memory/builds/aRepatriatedFork/prompts/2026-09-29-prompt-TOOL-aRepatriatedFork-28-build-brief.md
 
 2026-09-29T11:05:31Z brief · item TOOL-aRepatriatedFork-30 · reason 5f43f647b722 memory/builds/aRepatriatedFork/prompts/2026-09-29-prompt-TOOL-aRepatriatedFork-30-build-brief.md
+
+2026-09-29T11:09:07Z dispatch · item c88a328b TOOL-aRepatriatedFork-23 · reason tools/check-install-prefix.sh tools/check-install-prefix.test.sh tools/install-prefix-carried.txt tools/govkit/entries/check-install-prefix.kit.toml memory/builds/aRepatriatedFork/spec/2026-09-25-spec-TOOL-aRepatriatedFork-23.md memory/builds/aRepatriatedFork/build/2026-09-29-build-TOOL-aRepatriatedFork-23-1-acceptance-ledger.md
+
+2026-09-29T11:22:58Z dispatch · item c88a328b TOOL-aRepatriatedFork-23 · reason tools/check-install-prefix.sh tools/check-install-prefix.test.sh tools/install-prefix-carried.txt tools/govkit/entries/check-install-prefix.kit.toml memory/builds/aRepatriatedFork/spec/2026-09-25-spec-TOOL-aRepatriatedFork-23.md memory/builds/aRepatriatedFork/build/2026-09-29-build-TOOL-aRepatriatedFork-23-1-acceptance-ledger.md memory/builds/aRepatriatedFork/README.md
