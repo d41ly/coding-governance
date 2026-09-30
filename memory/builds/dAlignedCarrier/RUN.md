@@ -10,8 +10,8 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 
 ## Run facts
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 3e17abf639974f6b4aa9ce046f649bcce640d9c7
-phase: FOLDING
+witness: d72be700b3c078577cbf3a5032975d45dcec95b9
+phase: VERIFYING
 asks-ready: TOOL-dDerivedDocket-70=yes TOOL-dDerivedDocket-71=yes TOOL-dDerivedDocket-72=yes TOOL-dDerivedDocket-73=yes TOOL-dDerivedDocket-74=yes
 asks: TOOL-dDerivedDocket-70..74
 m-base: 87c245b3e950cbf7bc46b8216db8b4e4fba253dd
