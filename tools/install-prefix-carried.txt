@@ -33,7 +33,6 @@ tools/govkit/govkit.py	1	run-gates
 tools/govkit/matrix.py	7	govkit
 tools/govkit/selftest.py	213	codebase-map,drift-audit,govkit,hooks,memory-recall,memory-tree,playbook,process-monitor,pytest-parallel-guardrails,run-gates,unattended,workflows
 tools/memory-tree/check-memory-hygiene.test.sh	8	codebase-map,playbook
-tools/process-monitor/adopt-process-monitor.test.sh	2	lib	LOWERED 7 -> 2 by TOOL-aRepatriatedFork-28. The two left source the resolver beside this kit, a kit segment joined under a derived base, TOOL-aRepatriatedFork-46's class (spec rev-3 §4, Returned). Still `project-owned` and withheld from `govkit apply`.
 tools/run-gates/adopt-run-gates.test.sh	7	run-gates
 tools/settings-merge.py	6	hooks,memory-recall,process-monitor
 tools/unattended/adopt-unattended.test.sh	1	unattended
