@@ -163,6 +163,12 @@ printf '\357\273\277FANOUT_CAP=4\r\n' > "$CR/.agent-cap.conf"
 arm 'a BOM-led conf prints the enforced cap' 'obey the ≤4-verifier rule' bash -c 'cd "$1" && bash "$2" bounded4.js' _ "$CR" "$GATE"
 printf 'FANOUT_CAP=4\nFANOUT_CAP=abc\n' > "$CR/.agent-cap.conf"
 arm '--print-cap relays the hook refusal, naming the file' '.agent-cap.conf declares FANOUT_CAP=abc' bash -c 'cd "$1" && bash "$2" --print-cap' _ "$CR" "$GATE"
+# Closing review round 2 L1 (TOOL-aRepatriatedFork-46 S8): an exported `GIT_DIR` turned the gate's
+# second question to git into its own directory, so the hook path named nothing and node threw.
+GR="$TMP/gitdirrepo"; mkdir -p "$GR" && git -C "$GR" init -q
+out=$(cd "$GR" && GIT_DIR="$GR/.git" bash "$GATE" --print-cap 2>&1)
+if [ "$out" = 5 ]; then printf 'arm ok    L1: --print-cap with GIT_DIR exported prints the cap\n'
+else fails=$((fails+1)); printf 'arm FAIL  L1: --print-cap with GIT_DIR exported printed:\n%s\n' "$out" | head -5; fi
 
 # The DISCOVERY path — the shipped tree. Every arm above hands the gate explicit files, and the
 # explicit path never touches git, so none of them exercises the population.

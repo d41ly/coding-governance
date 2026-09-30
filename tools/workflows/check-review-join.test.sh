@@ -409,6 +409,11 @@ printf "export const meta = { name: 'x', description: 'y' }\nconst verdictById =
 ( cd "$H1R" && git init -q . && git add -A ) >/dev/null 2>&1
 arm 'H1: run from a checkout holding no hooks kit, the gate finds agent-cap.js beside itself' 'review-join: clean' \
   bash -c 'cd "$1" && bash "$2"' _ "$H1R" "$ROOT/$GATE"
+# Closing review round 2 L1 (TOOL-aRepatriatedFork-46 S8): with `GIT_DIR` exported, as `git rebase
+# --exec` and a merge driver export it, the second question to git answered the gate's own directory
+# and node threw MODULE_NOT_FOUND on a hook path under this kit.
+arm 'L1: with GIT_DIR exported, the gate still finds agent-cap.js beside itself' 'review-join: clean' \
+  bash -c 'cd "$1" && GIT_DIR="$1/.git" bash "$2"' _ "$H1R" "$ROOT/$GATE"
 rm -rf "$H1R"
 
 # ---- verdict, LAST -------------------------------------------------------------------------------

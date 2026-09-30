@@ -134,8 +134,9 @@ HOOK=""
 _hk_py=$(resolve_python 2>/dev/null) || echo "verifier-fanout: no usable python, so the install receipt and the kit probes were NOT read; only the .claude/hooks/ rung was tried" >&2
 if [ -n "$_hk_py" ] && _hk_dir=$(resolve_kit_dir "$_hk_py" hooks agent-cap.js "$HERE" 2>/dev/null); then
   # The resolver answers relative to the checkout holding THIS gate, which is not the caller's
-  # `$ROOT` when the gate runs from another repo (closing review round 1 H1).
-  HOOK="$(git -C "$HERE" rev-parse --show-toplevel)/$_hk_dir/agent-cap.js"
+  # `$ROOT` when the gate runs from another repo (closing review round 1 H1). Asked with an inherited
+  # `GIT_DIR` unset (round 2 L1): with one exported, git answers `$HERE` itself and the path names nothing.
+  HOOK="$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)/$_hk_dir/agent-cap.js"
 elif [ -f "$ROOT/.claude/hooks/agent-cap.js" ]; then
   HOOK="$ROOT/.claude/hooks/agent-cap.js"
 fi
