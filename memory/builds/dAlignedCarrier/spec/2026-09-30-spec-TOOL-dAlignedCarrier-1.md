@@ -1,11 +1,12 @@
 # TOOL-dAlignedCarrier-1 — the driver stops saying no verb commits, and the kit gate reads the whole kit for it
 
-**Status:** SPECCED · rev-2 · 2026-09-30 · node d · Tier-2 · base 87c245b3 · streams tooling · order 1 · closes TOOL-dDerivedDocket-74 · ratified 2026-09-30
+**Status:** CLOSED · rev-3 · 2026-09-30 · node d · Tier-2 · base 87c245b3 · streams tooling · order 1 · closes TOOL-dDerivedDocket-74 · ratified 2026-09-30
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-30-build-TOOL-dAlignedCarrier-1-1-acceptance-ledger.md](../build/2026-09-30-build-TOOL-dAlignedCarrier-1-1-acceptance-ledger.md) | journal | — |
 | [2026-09-30-prompt-TOOL-dAlignedCarrier-1-build-brief.md](../prompts/2026-09-30-prompt-TOOL-dAlignedCarrier-1-build-brief.md) | journal | TOOL-dAlignedCarrier-2 TOOL-dAlignedCarrier-3 TOOL-dAlignedCarrier-4 TOOL-dAlignedCarrier-5 TOOL-dAlignedCarrier-6 |
 | [2026-09-30-prompt-TOOL-dAlignedCarrier-1-spec-brief.md](../prompts/2026-09-30-prompt-TOOL-dAlignedCarrier-1-spec-brief.md) | journal | TOOL-dAlignedCarrier-2 TOOL-dAlignedCarrier-3 TOOL-dAlignedCarrier-4 TOOL-dAlignedCarrier-5 TOOL-dAlignedCarrier-6 |
 
@@ -101,6 +102,14 @@ landing only, and the superseding decision row says so.
 - **Header, the does-NOT-check paragraph.** A spelling outside the two alternatives passes. A file
   outside the kit directory is not read. A match inside a
   string literal counts like one in prose, because the premise misleads a reader either way.
+- **The join, as built.** One awk pass over the whole population, carrying a window of the previous
+  six words into each line. Seven words is the widest instance the predicate admits, so the window
+  reads every instance the whole-file join would, and a match is reported only where it ends on the
+  current line, so each is named once. The whole-file join costs a copy per line on awks without an
+  in-place append, which is quadratic over the driver.
+- **Liveness, on the report channel.** Every run prints `check 47 graded <n> shipped file(s)`, the
+  coverage-count shape the fixture suite already treats as standing; an EMPTY population prints a
+  `did not grade` line instead of passing silently. Neither is a `fail` branch, so no arm is owed.
 
 ### Inventory
 
@@ -153,13 +162,16 @@ The comment edit in the driver and the suite arm are ordinary text edits. No ren
   across two lines of `tools/unattended/README.md`, and `nothing commits` / `it` wrapped across two
   `#` comment lines of `tools/unattended/kit.toml`, plus a fourth, a `#` comment line appended to
   `tools/unattended/check-unattended.sh` itself (written in bytes) — then
-  `bash tools/unattended/check-unattended.sh`, the argv of the `unattended kit gate` leg in
-  `tools/gate-legs.json`, exits 1 with `UNATTENDED check 47 FAILED`, naming exactly those four files
+  `bash tools/unattended/check-unattended.sh --skip 28`, the argv of the `unattended kit gate` leg in
+  `tools/gate-legs.json` scoped past the 28 region, which check 47 sits outside of, exits 1 with
+  `UNATTENDED check 47 FAILED`, naming exactly those four files
   and not the brief-record suite whose line 177 is the nearest miss. When the four files are restored
   from byte-identical backups and it runs again, it exits 0 with no `FAILED` line.
   Red when: any of the four spellings passes, the checker's own file is not read, the near-miss is
   named, or the restored tree reds.
-  cost: two runs of the kit gate, 593 s each on node d on 2026-09-30 (PINNED).
+  cost: two scoped runs of the kit gate, 560 s for the red one on node d on 2026-09-30 (MEASURED).
+  The unscoped leg, 593 s whole, sits at a unit pass's 600 s command bound, so its verdict over
+  the 28 region is the close bar's, which runs this leg whole.
   fixture: the tree itself; the backups go under the run's scratchpad and are restored before commit.
 - **AC3** — When `awk '/^# ---- check 47 /,/^[^#]/' tools/unattended/check-unattended.sh` runs, its
   output holds the header paragraph naming what the check does not read, and a `grep -c 'NOT check'`
@@ -209,6 +221,11 @@ New arm: `tools/unattended/check-unattended.test.sh` · a kit file copy carrying
   its suite narrowed the ask's accept clause ("the kit's shipped files"). F2 is re-resolved to (b):
   both files are scanned, the header describes the premise without spelling it, and AC2 stages a
   fourth instance in the checker itself.
+- rev-3 · 2026-09-30 · §4 §6 · AC2 · the build pass. §4 records the join as built, a six-word window
+  carried across lines instead of a whole-file join, and the report-channel liveness lines, neither
+  of which changes what the scan reads. AC2 runs the kit gate scoped `--skip 28`: the unscoped leg
+  measures 593 s against a unit pass's 600 s command bound, and check 47 sits outside the 28 region,
+  so the scope reads the check whole and leaves only the 28 region's verdict to the close bar.
 
 ## 10. Reuse audit
 

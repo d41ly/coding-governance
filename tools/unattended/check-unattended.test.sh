@@ -5492,6 +5492,28 @@ reset_tree
 mutate $KIT_REL/SKILL.template.md 's/then run `--hold` with the code/then run `--close --override gates-green` or `--hold` with the code/'
 hit  "$(run)" "the Skill's hold paragraph routes a hold line to an override, which spends the one check between a run and its landing on a fault that is not the run's"
 reset_tree
+
+# ==== TOOL-dAlignedCarrier-1: CHECK 47, the retired commit premise in any shipped file of the kit
+# ---- The staged line is ASSEMBLED FROM FRAGMENTS split inside their words, so the staged sentence
+# ---- never exists contiguously in this suite's own bytes, and the real-tree leg, which reads this
+# ---- file too, stays clean. It is written to a file and appended by sed's `r`, as check 33's arm
+# ---- does, and the copy it lands in is the fixture's tracked lib, one of the population's plain
+# ---- shell files.
+reset_tree
+_c47_no="n""o"; _c47_dv="dri""ver ve""rb"; _c47_cm="comm""its"
+printf '# the rows: %s %s %s them\n' "$_c47_no" "$_c47_dv" "$_c47_cm" > "$TMPBIN_PARENT/c47.line"
+mutate $KIT_REL/lib-unattended.sh "\$r $TMPBIN_PARENT/c47.line"
+out=$(run)
+hit  "$out" "a shipped file of this kit states the retired premise that the driver makes no commit of its own, but under LANDER_MODE=in-place --close commits its own records commit, so a reader who trusts the sentence expects staged rows to stay uncommitted after the close has committed them; reword it to name the step that commits them. matches: "
+hit  "$(printf '%s\n' "$out" | grep 'UNATTENDED check 47 FAILED')" "matches: $KIT_REL/lib-unattended.sh: "
+# ...the NEAR-MISS, a control on the predicate rather than a second break: the same words ending in
+# a verb that makes no commit, the shape a sibling suite carries, stay silent. Without it the arm
+# above is equally consistent with a ban on every sentence that names the driver's verbs at all.
+reset_tree
+printf '# the rows: %s %s does\n' "$_c47_no" "$_c47_dv" > "$TMPBIN_PARENT/c47.line"
+mutate $KIT_REL/lib-unattended.sh "\$r $TMPBIN_PARENT/c47.line"
+miss "$(run)" "UNATTENDED check 47 FAILED"
+reset_tree
 fi   # ---- end REGION 8 ------------------------------------------------------------------------
 
 # ---- RE-MEASURED AT THE dUnstalledConvoy MERGE, 2026-08-21, node d. Both sides of that merge

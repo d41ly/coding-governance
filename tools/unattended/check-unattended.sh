@@ -5450,6 +5450,68 @@ else
   fi
 fi
 
+# ---- check 47 - NO SHIPPED FILE OF THIS KIT STATES THE RETIRED COMMIT PREMISE. TOOL-dAlignedCarrier-1,
+# ---- closing TOOL-dDerivedDocket-74. The premise said the driver's verbs never make a commit, and it
+# ---- stopped being true when `--close` began committing its own records commit under
+# ---- `LANDER_MODE=in-place`. It was taken out of three carriers once, by fixed-string greps that were
+# ---- case-sensitive and read three named files, and the next day it was back, lowercase, in a fourth
+# ---- place none of them read. This is the CLASS, so the next spelling reds in whichever file it lands.
+# ----
+# ---- POPULATION: every file the kit's own ls-files lists under KITREL, the kit directory this leg
+# ---- already derives, so an adopter's install prefix is honoured and no path is spelled. NOTHING IS
+# ---- EXCLUDED, this checker and its suite included, because the ask names the kit's shipped files and
+# ---- both ship. This header DESCRIBES the premise rather than spelling it, the pattern below is written
+# ---- with optional groups and bracketed spaces so its own source never forms an instance, and the
+# ---- suite assembles its staged line from fragments. A listed file the worktree lacks is skipped.
+# ----
+# ---- NORMALISATION, per file: CR bytes stripped; on each line the leading whitespace and ONE leading
+# ---- comment marker (`#`, `//`, `*` or `<!--`) stripped; the lines joined by one space, whitespace
+# ---- squeezed, the whole folded to lower case. A wrap inside a comment or a paragraph therefore reads
+# ---- as one sentence, which is the shape the retired greps could not see. The join is a window of the
+# ---- previous six words plus the current line, which holds the widest instance the pattern admits,
+# ---- and a match is reported only where it ends on the current line, so each is named once.
+# ----
+# ---- THE PREDICATE, two alternatives, word-bounded: the word `no`, at most two words, the word
+# ---- `verb`, at most two words, then the third-person form of commit; or the three-word sentence that
+# ---- makes `nothing` the subject of that same form with `it` as its object.
+# ----
+# ---- What this does NOT check: a spelling outside those two alternatives passes. A file outside the
+# ---- kit directory is not read, the rendered carriers included, whose parity legs already hold each
+# ---- to its template. A match inside a string literal counts like one in prose, because the premise
+# ---- misleads a reader either way.
+_c47_re='[^a-z0-9_]no( [^ ]+)?( [^ ]+)?[ ]verb( [^ ]+)?( [^ ]+)?[ ]commits[^a-z0-9_]|[^a-z0-9_]nothing[ ]commits[ ]it[^a-z0-9_]'
+_c47_files=()
+while IFS= read -r _c47_p; do
+  [ -f "$_c47_p" ] && _c47_files+=("$_c47_p")
+done < <(GIT ls-files -- "$KITREL" 2>/dev/null)
+if [ "${#_c47_files[@]}" -eq 0 ]; then
+  report "check 47 did not grade this kit's shipped files for the retired commit premise - ls-files listed none under $KITREL"
+else
+  report "check 47 graded ${#_c47_files[@]} shipped file(s) of this kit for the retired commit premise"
+  _c47_hits=$(RE="$_c47_re" awk '
+      BEGIN { re = ENVIRON["RE"] }
+      FNR == 1 { if (hits != "") out = out (out == "" ? "" : "; ") cur ": " hits
+                 hits = ""; tail = ""; cur = FILENAME }
+      { ln = $0; gsub(/\r/, "", ln); sub(/^[ \t]+/, "", ln)
+        if (!sub(/^<!--/, "", ln)) if (!sub(/^\/\//, "", ln)) if (!sub(/^#/, "", ln)) sub(/^\*/, "", ln)
+        ln = tolower(ln); gsub(/[[:space:]]+/, " ", ln); sub(/^ /, "", ln); sub(/ $/, "", ln)
+        if (ln == "") next
+        p = (tail == "" ? 0 : length(tail) + 1)
+        w = " " (tail == "" ? ln : tail " " ln) " "
+        s = w; off = 0
+        while (match(s, re)) {
+          e = off + RSTART + RLENGTH - 2
+          if (e > p) hits = hits (hits == "" ? "" : ", ") "\"" substr(s, RSTART + 1, RLENGTH - 2) "\""
+          off = e; s = substr(s, RSTART + RLENGTH - 1)
+        }
+        k = split(w, tk, " "); tail = ""
+        for (i = (k > 6 ? k - 5 : 1); i <= k; i++) tail = tail (tail == "" ? "" : " ") tk[i]
+      }
+      END { if (hits != "") out = out (out == "" ? "" : "; ") cur ": " hits
+            printf "%s", out }' "${_c47_files[@]}")
+  [ -z "$_c47_hits" ] || fail 47 "a shipped file of this kit states the retired premise that the driver makes no commit of its own, but under LANDER_MODE=in-place --close commits its own records commit, so a reader who trusts the sentence expects staged rows to stay uncommitted after the close has committed them; reword it to name the step that commits them. matches: $_c47_hits"
+fi
+
 fi   # ---- end of the checks `--only 28` skips
 
 

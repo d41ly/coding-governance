@@ -6747,8 +6747,10 @@ print_gate_backstop() { # where the bound came from -> the line, from GB_SUM and
 # inherited red, and a second HIGH ask per hold is noise an owner has to dispose of. The match needs R
 # as well as the leg, because the ask's `seen` locator and `run` command pin R.
 #
-# STAGED, NEVER COMMITTED: no driver verb commits. On the MET path the rows ride the close's records
-# commit; on a path that prints a `hold ·` line the Skill's Close sequence commits them before `--hold`.
+# STAGED BY THIS ITEM, and committed by the step that closes the run. On the MET path, under
+# `LANDER_MODE=in-place`, `--close` commits them in its own records commit (`write_close_commit`),
+# and under `primary` they ride the records commit the close names as owed; on a path that prints a
+# `hold ·` line the Skill's Close sequence commits them before `--hold`.
 # With `ASKS_CMD` blank the rows are PRINTED and nothing is written, so the auto-file cannot arm itself
 # before the project adopts the ask contract.
 read_leg_argv() { # run dir · R · leg name -> that leg's argv in R's manifest, space-joined; rc 1 unreadable

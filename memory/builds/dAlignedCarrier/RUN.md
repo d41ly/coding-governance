@@ -10,8 +10,8 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 
 ## Run facts
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 87c245b3e950cbf7bc46b8216db8b4e4fba253dd
-phase: SPECCING
+witness: fd3ac307507d3474e2194e79826a4b5e2d497bc0
+phase: BUILDING
 asks-ready: TOOL-dDerivedDocket-70=yes TOOL-dDerivedDocket-71=yes TOOL-dDerivedDocket-72=yes TOOL-dDerivedDocket-73=yes TOOL-dDerivedDocket-74=yes
 asks: TOOL-dDerivedDocket-70..74
 m-base: 87c245b3e950cbf7bc46b8216db8b4e4fba253dd
@@ -43,3 +43,9 @@ base: 87c245b3e950cbf7bc46b8216db8b4e4fba253dd
 2026-09-30T14:38:22Z rescope · item add TOOL-dAlignedCarrier-5 · reason planned at orientation: answers mandated ask TOOL-dDerivedDocket-72
 
 2026-09-30T14:38:23Z rescope · item add TOOL-dAlignedCarrier-6 · reason planned at orientation: answers mandated ask TOOL-dDerivedDocket-70
+
+2026-09-30T15:48:38Z dispatch · item fd3ac307 TOOL-dAlignedCarrier-1 · reason tools/unattended/unattended.sh tools/unattended/check-unattended.sh tools/unattended/check-unattended.test.sh memory/builds/dAlignedCarrier/spec/2026-09-30-spec-TOOL-dAlignedCarrier-1.md memory/builds/dAlignedCarrier/build/2026-09-30-build-TOOL-dAlignedCarrier-1-1-acceptance-ledger.md memory/builds/dAlignedCarrier/README.md
+
+2026-09-30T15:48:42Z brief · item TOOL-dAlignedCarrier-1 · reason e16ea850f5ac memory/builds/dAlignedCarrier/prompts/2026-09-30-prompt-TOOL-dAlignedCarrier-1-build-brief.md
+
+2026-09-30T16:15:48Z dispatch · item fd3ac307 TOOL-dAlignedCarrier-1 · reason memory/backlog/TOOL.md
