@@ -2,7 +2,7 @@
 """settings-merge.py — idempotently wire a hook into a target repo's .claude/settings.json.
 Stdlib only (json, argparse, pathlib); py>=3.10 (write_text newline=).
 
-# gov:kit settings-merge@1.12
+# gov:kit settings-merge@1.13
 
 The default hook, with no --fragment (shape mirrors WIRE-INTO-PROJECT.md and
 <prefix>/hooks/agent-cap.js verbatim):
@@ -110,7 +110,7 @@ def resolve_kit_dir(home, anchor, here):
         home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
 # <<< resolve_kit_dir
 
-KIT_SETTINGS_MERGE_VERSION = "1.12"  # gov:kit settings-merge@1.12 — engine identity
+KIT_SETTINGS_MERGE_VERSION = "1.13"  # gov:kit settings-merge@1.13 — engine identity
 HOOK_MARKER = "agent-cap.js"  # the loose join: dedup key AND the deployer's "is-it-wired?" grep target
 
 
@@ -192,26 +192,31 @@ def _resolve_agent_cap_dir() -> Path | None:
 
 
 def _resolve_agent_cap_hook_path(root: Path = Path(".")) -> str:
-    """agent-cap's shipped copy: the target's declaration first, the resolved kit second.
+    """agent-cap's shipped copy: the resolved kit where it sits in the target, else the declaration.
 
     ONE composition, in one place, so the arm that stages the break has something to red on. It is
     also the only reader of `_load_declared_prefix`: the `{kit}` fragments need no lookup at all,
     because a fragment ships beside its hook, so resolving `{kit}` against the FRAGMENT's own
-    location already follows whatever prefix that kit was installed at. A declared prefix is joined
-    to the kit directory's NAME in this install. A kit the resolver cannot find yields a path that
+    location already follows whatever prefix that kit was installed at.
+
+    TOOL-aRepatriatedFork-46: the sibling-kit resolver answers first, because it reads the install
+    receipt, which records where the kit LANDED. A top-level `prefix` answers where kits go by
+    default, and a hooks kit homed under another name contradicted it: the declaration named a path
+    the receipt had moved. The declaration still answers where the resolver finds no kit inside the
+    target, joined to the kit directory's NAME in this install. A kit found nowhere yields a path that
     names the miss and exists nowhere, so the existence refusal in `main` fires on it: the wiring is
-    REFUSED, never pointed at a guessed prefix (TOOL-aRepatriatedFork-46).
+    REFUSED, never pointed at a guessed prefix.
     """
     kit = _resolve_agent_cap_dir()
+    if kit is not None:
+        try:
+            return kit.relative_to(Path(root).resolve()).as_posix() + "/agent-cap.js"
+        except ValueError:
+            pass  # a kit outside the target this merge writes into
     name = kit.name if kit is not None else "no-agent-cap-kit-resolved"
     declared = _load_declared_prefix("agent-cap", root)
     if declared:
         return f"{declared}/{name}/agent-cap.js"
-    if kit is not None:
-        try:
-            return kit.relative_to(Path.cwd().resolve()).as_posix() + "/agent-cap.js"
-        except ValueError:
-            pass
     return f"{_kit_rel()}/{name}/agent-cap.js"
 
 
