@@ -38,8 +38,6 @@ tools/govkit/fixtures/make_adopter_receipt.py	2	govkit
 tools/govkit/govkit.py	1	run-gates
 tools/govkit/matrix.py	7	govkit
 tools/govkit/selftest.py	213	codebase-map,drift-audit,govkit,hooks,memory-recall,memory-tree,playbook,process-monitor,pytest-parallel-guardrails,run-gates,unattended,workflows
-tools/hooks/agent-cap.test.sh	7	hooks,lib,workflows
-tools/hooks/scratch-guard.test.sh	3	lib,run-gates
 tools/lexicon/selftest.py	50	lexicon	LOWERED 55 -> 28 by TOOL-aRepatriatedFork-28, which derives the prefix every fixture copies the kit to. Each literal left is the kit's own segment joined under that derived prefix, a kit segment joined under a derived base, TOOL-aRepatriatedFork-46's class (spec rev-3 §4, Returned).
 tools/lib/extract-arms.test.sh	2	lib
 tools/lib/resolve-python.test.sh	5	lib,unattended

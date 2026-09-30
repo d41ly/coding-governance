@@ -30,12 +30,92 @@ TMP=$(mktemp -d); trap 'rm -rf "$TMP"' EXIT
 pass=0; fail=0
 # The one resolver, not the retired `command -v python3 || python` idiom this repo banned — which the
 # ban could not see here, because it matches only `command -v`.
-if [ -f "$HERE/../lib/resolve-python.sh" ]; then
-  . "$HERE/../lib/resolve-python.sh"
-  TESTPY=$(resolve_python) || { echo "agent-cap.test: no usable python"; exit 2; }
-else
-  TESTPY=python3   # gov:literal-python — last-resort fallback when ../lib/ is absent (adopter layout)
-fi
+# TOOL-aRepatriatedFork-46: the resolver is carried INLINE. It was sourced from a probe of the
+# library directory beside this kit, which ships nowhere, with a bare launcher as the fallback.
+# >>> resolve_python — canonical copy: resolve-python.sh in gov's lib dir (byte-identical; gated)
+resolve_python() {
+  # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
+  # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
+  # the candidate and every consumer uses "$PY" as a single word (measured: exit 127).
+  _rp_tried=""
+  for _rp_c in "${1:-}" "${GOV_PYTHON:-}" python3 python py; do
+    [ -n "$_rp_c" ] || continue
+    _rp_tried="$_rp_tried $_rp_c"
+    if "$_rp_c" -c "import sys" >/dev/null 2>&1; then
+      printf '%s\n' "$_rp_c"
+      return 0
+    fi
+  done
+  {
+    echo "resolve_python: no usable python launcher. Each candidate was RUN with -c 'import sys' and"
+    echo "resolve_python: none exited 0 — being on PATH is not evidence (the Microsoft Store python3"
+    echo "resolve_python: stub answers \`command -v\` and exits 9009 without running anything)."
+    echo "resolve_python: tried:$_rp_tried"
+    if [ -n "${1:-}" ]; then
+      echo "resolve_python: the caller's override '$1' was tried FIRST and did not run."
+    fi
+    if [ -n "${GOV_PYTHON:-}" ]; then
+      echo "resolve_python: GOV_PYTHON is set to '$GOV_PYTHON' and did not run. An override that is"
+      echo "resolve_python: set and unusable is THIS failure, never a silent fall-through — the"
+      echo "resolve_python: operator believes they chose, and would not have."
+    fi
+  } >&2
+  return 1
+}
+# <<< resolve_python
+# The sibling-kit resolver (TOOL-aRepatriatedFork-2 S3), INLINED byte-identically from the
+# canonical copy named on its marker line and gated by the resolve-python self-test's parity
+# table. A shell consumer runs it with the python it already resolved, so the receipt rung is
+# read in Python and never parsed in bash. `resolve_kit_dir <python> <home> <anchor> <here>`
+# prints the kit directory REPO-RELATIVE, or the resolver's named refusal on stderr and exits 1.
+resolve_kit_dir() {
+  "$1" -c "$(cat <<'RKD'
+# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
+def resolve_kit_dir(home, anchor, here):
+    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
+
+    1. receipt — the `.governance/install.json` row whose `source` ends in <home>/<anchor> and
+       whose `path` exists inside this tree. The only record of a RENAMED kit dir: no probe finds
+       a memory-recall kit an adopter homed at `scripts/recall/`.
+    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
+    3. refuse — LookupError naming the three places looked; never a guessed prefix.
+    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
+    """
+    import json
+    import pathlib
+    here = pathlib.Path(here).resolve()
+    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
+    receipt = root / ".governance" / "install.json"
+    try:
+        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("path"):
+            continue
+        if str(row.get("source") or "").split("/")[-2:] != [home, anchor]:
+            continue
+        hit = (root / str(row["path"])).resolve()
+        if hit.is_file() and root in hit.parents:
+            return hit.parent
+    probes = (here / home, here.parent / home)
+    for cand in probes:
+        if (cand / anchor).is_file():
+            return cand
+    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
+        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
+# <<< resolve_kit_dir
+RKD
+)"'
+import sys
+try:
+    d = resolve_kit_dir(*sys.argv[1:4])
+except LookupError as e:
+    sys.exit(str(e))
+r = next((p for p in (d, *d.parents) if (p / ".git").exists()), d.anchor)
+print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
+}
+TESTPY=$(resolve_python) || { echo "agent-cap.test: no usable python"; exit 2; }
 check() { # name expected_exit json
   # FROM "$TMP", not from wherever the suite was launched (TOOL-aRepatriatedFork-7): a payload with no
   # `cwd` makes the hook read `.agent-cap.conf` at the caller's checkout root, so an adopter that
@@ -788,7 +868,7 @@ check_spec_audit "rule0: kind [\"spec-audit\"] (an array) on the undeclared READ
 # of tier2-review.js that decides `isSpec` — asserting the two agree. An edit to either side reds
 # here until the other follows. The harness sits beside this kit in this repo; an adopter layout
 # without it gets an ANNOUNCED skip, never a silent green.
-T2R="$HERE/../workflows/tier2-review.js"
+T2R=""; _wf_dir=$(resolve_kit_dir "$TESTPY" workflows tier2-review.js "$HERE" 2>/dev/null) && T2R="$(git -C "$HERE" rev-parse --show-toplevel)/$_wf_dir/tier2-review.js"
 if [ -f "$T2R" ]; then
   kind_line=$(grep -m1 '^const kind = ' "$T2R")
   for k in '"spec-audit"' '["spec-audit"]' '"diff-review"' '"SPEC-AUDIT"' '{"k":"spec-audit"}' '7'; do
@@ -1187,7 +1267,7 @@ after=$(ls "$AGROOT" 2>/dev/null | grep -c .)
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null || true)
 KITJS=""
 if [ -n "$ROOT" ]; then
-  for c in "$ROOT/${PFX}hooks/agent-cap.js" "$ROOT/hooks/agent-cap.js"; do
+  for c in "$ROOT/$KIT_REL/agent-cap.js" "$ROOT/${KIT_REL##*/}/agent-cap.js"; do
     [ -f "$c" ] && { KITJS="$c"; break; }
   done
   # Last resort: ask git where it is, so a prefix nobody listed still arms the arm.
@@ -1195,8 +1275,8 @@ if [ -n "$ROOT" ]; then
     # The two globs sit in variables so the marked line carries no line continuation: a trailing
     # backslash would escape the space before a comment rather than the newline, and the resulting
     # break is valid shell that silently drops the rest of the command.
-    _g_prefixed='*/hooks/agent-cap.js'
-    _g_root="${ROOTPFX}hooks/agent-cap.js"   # a root install is half of what this searches
+    _g_prefixed="*/${KIT_REL##*/}/agent-cap.js"
+    _g_root="${ROOTPFX}${KIT_REL##*/}/agent-cap.js"   # a root install is half of what this searches
     rel=$(git -C "$ROOT" ls-files -- "$_g_prefixed" "$_g_root" 2>/dev/null \
           | grep -v '^\.claude/' | head -1)
     [ -n "$rel" ] && KITJS="$ROOT/$rel"
