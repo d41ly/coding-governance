@@ -1208,6 +1208,21 @@ ck "prefix: no remedy in that install still names the dead ${KP} merger" \
    "$(printf '%s' "$out" | grep -q ''"${KP}settings-merge"'' && echo 0 || echo 1)"
 cleanup
 
+# ---- closing review round 1 M6 (TOOL-aRepatriatedFork-46): NO PYTHON, AND THE HOOK IS THERE ------
+# This runs as a SessionStart hook on a host that may have no python. The probe rung went through the
+# python resolver and was simply lost without one, so the agent-cap arm printed `not adopted` over a
+# hook that sat beside the checker, naming a place nothing had probed. Every launcher name is
+# shadowed by a stub that exits non-zero, the way the Microsoft Store stub does.
+newrepo
+OOT=$(mktemp -d)
+for _n in python3 python py; do printf '#!/bin/sh\nexit 9\n' > "$OOT/$_n"; chmod +x "$OOT/$_n"; done
+mkdir -p "./${KP}$HOOKS"; cp "$SCRIPT" "./${KP}check-wiring.sh"; printf '// stub\n' > "${KP}$HOOKS/agent-cap.js"
+git add -A; git commit -q -m "a shipped agent-cap.js, and no usable python"
+out=$(PATH="$OOT:$PATH" GOV_PYTHON= bash "./${KP}check-wiring.sh" --check 2>&1)
+ck "M6 with no usable python the probe rung still finds a shipped agent-cap.js" \
+   "$(printf '%s' "$out" | grep -q 'UNWIRED  agent-cap' && ! printf '%s' "$out" | grep -q 'skip     agent-cap' && echo 1 || echo 0)"
+cleanup
+
 # ---- TOOL-aRepatriatedFork-19: the install RECEIPT is the first rung -----------------------------
 # An adopter that homes a kit somewhere no probe spells — the merge driver flat under `scripts/`, the
 # recall kit at `scripts/recall/`, the scratch guard in `.claude/hooks/` — got `skip … not adopted`

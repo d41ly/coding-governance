@@ -163,6 +163,46 @@ def resolve_prefix_token(spelled, troot):
 # <<< resolve_prefix_token
 
 
+# The sibling-kit resolver (TOOL-aRepatriatedFork-2 S3), INLINED byte-identically from the canonical
+# copy named on its marker line and gated by the resolve-python self-test. Selfcheck 5b resolves the
+# version gate's carrier directories through it, as the gate itself does (closing review round 1 M3).
+# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
+def resolve_kit_dir(home, anchor, here):
+    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
+
+    1. receipt — the `.governance/install.json` row whose `source` ends in <home>/<anchor> and
+       whose `path` exists inside this tree. The only record of a RENAMED kit dir: no probe finds
+       a memory-recall kit an adopter homed at `scripts/recall/`.
+    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
+    3. refuse — LookupError naming the three places looked; never a guessed prefix.
+    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
+    """
+    import json
+    import pathlib
+    here = pathlib.Path(here).resolve()
+    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
+    receipt = root / ".governance" / "install.json"
+    try:
+        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("path"):
+            continue
+        if str(row.get("source") or "").split("/")[-2:] != [home, anchor]:
+            continue
+        hit = (root / str(row["path"])).resolve()
+        if hit.is_file() and root in hit.parents:
+            return hit.parent
+    probes = (here / home, here.parent / home)
+    for cand in probes:
+        if (cand / anchor).is_file():
+            return cand
+    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
+        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
+# <<< resolve_kit_dir
+
+
 def resolve_tool_path(root: pathlib.Path | str, *parts: str) -> pathlib.Path:
     """`root` joined to its derived tool root and then to `parts` — a name spelled kit-relatively."""
     tr = derive_tool_root(root)
@@ -1666,8 +1706,34 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
         # TOOL-aRepatriatedFork-29 S3: the gate names each carrier kit-relatively under `${K}`, the
         # tool root it derives from its own location; joined here to the one this process derived.
         _k = (derive_tool_root(root) + "/") if derive_tool_root(root) else ""
-        gate_files = {f.strip('"').replace("${K}", _k)
-                      for f in re.findall(r'^need\s+"[^"]*"\s+(\S+)', gate_txt, re.M)}
+        # THE GATE'S OWN CARRIER VARIABLES, resolved as the gate resolves them (closing review round 1
+        # M3, TOOL-aRepatriatedFork-46). A `need` line names its file under a directory the gate asks
+        # the sibling-kit resolver for, `MT_DIR=$(resolve_carrier_kit memory-tree ...)`, and a scrape
+        # that substituted `${K}` alone matched no registry file: every kit read as a pair of notes.
+        # Each resolver-fed variable is resolved here by the same resolver from the gate's own
+        # directory, then each plain alias (`T2R="${WF_DIR}/tier2-review.js"`) in source order.
+        _vars = {"K": _k}
+        for _name, _home, _anchor in re.findall(
+                r'^(\w+)=\$\(resolve_carrier_kit (\S+) (\S+)\)\s*$', gate_txt, re.M):
+            try:
+                _vars[_name] = resolve_kit_dir(_home, _anchor, gate.parent).relative_to(
+                    root.resolve()).as_posix()
+            except (LookupError, ValueError):
+                pass                           # left unresolved, so the need line below FAILS by name
+
+        def _resolve_vars(text: str) -> str:
+            return re.sub(r'\$\{?(\w+)\}?', lambda m: _vars.get(m.group(1), m.group(0)),
+                          text.strip('"'))
+        for _name, _val in re.findall(r'^(\w+)="?(\$[^"\s]*)"?\s*$', gate_txt, re.M):
+            _vars.setdefault(_name, _resolve_vars(_val))
+        gate_files = {_resolve_vars(f) for f in re.findall(r'^need\s+"[^"]*"\s+(\S+)', gate_txt, re.M)}
+        # A LIVENESS ASSERTION, not a note: a carrier still spelled through a variable names no file
+        # this check can compare, so a scrape that resolved nothing would otherwise read as twenty
+        # notes of drift and stay green.
+        for f in sorted(x for x in gate_files if "$" in x):
+            r.fail(f"{gate_name} asserts a constant in '{f}', a carrier this check could not "
+                   f"resolve — selfcheck 5b compares nothing for it")
+        gate_files = {x for x in gate_files if "$" not in x}
         reg_files: dict[str, str] = {}
         for eid, (d, _dpath) in descs.items():
             vf = d.get("version_from") or {}

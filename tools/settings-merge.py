@@ -112,6 +112,9 @@ def resolve_kit_dir(home, anchor, here):
 
 KIT_SETTINGS_MERGE_VERSION = "1.14"  # gov:kit settings-merge@1.14 — engine identity
 HOOK_MARKER = "agent-cap.js"  # the loose join: dedup key AND the deployer's "is-it-wired?" grep target
+# The kit NAME a hook path carries when no hooks kit resolves in this install. It names the miss and
+# exists nowhere, so `main`'s existence refusal fires on it. Spelled once: the selftest reads it too.
+NO_HOOKS_KIT = "no-agent-cap-kit-resolved"
 
 
 def _kit_rel() -> str:
@@ -213,7 +216,7 @@ def _resolve_agent_cap_hook_path(root: Path = Path(".")) -> str:
             return kit.relative_to(Path(root).resolve()).as_posix() + "/agent-cap.js"
         except ValueError:
             pass  # a kit outside the target this merge writes into
-    name = kit.name if kit is not None else "no-agent-cap-kit-resolved"
+    name = kit.name if kit is not None else NO_HOOKS_KIT
     declared = _load_declared_prefix("agent-cap", root)
     if declared:
         return f"{declared}/{name}/agent-cap.js"
@@ -682,7 +685,12 @@ def _selftest() -> int:
         # THE COMPOSITION, not just the reader: reverting the lookup has to red something. This
         # assertion is what fails on the pre-fix engine, which answered "<this file's prefix>/hooks/
         # agent-cap.js" and then refused to wire a tree whose settings.json was already right.
-        _hk = _resolve_agent_cap_dir().name   # the hooks kit's directory NAME in this install
+        # The hooks kit's directory NAME in this install, or the miss name where no hooks kit sits
+        # beside this file: the entry declares `requires = []`, so a settings-merge-only install is
+        # legal, and `.name` on the None the resolver returns there crashed this arm (closing
+        # review round 1 M4). The composition asserted below is the same either way.
+        _hk_dir = _resolve_agent_cap_dir()
+        _hk = _hk_dir.name if _hk_dir is not None else NO_HOOKS_KIT
         assert _resolve_agent_cap_hook_path(gov.parent) == f".claude/{_hk}/agent-cap.js"
         assert _resolve_agent_cap_hook_path(root).endswith(f"/{_hk}/agent-cap.js")     # no deploy.toml -> derived
         assert _load_declared_prefix("agent-cap", gov.parent) == ".claude"
@@ -970,6 +978,22 @@ def _selftest() -> int:
                   + ("git is not available" if frags is None
                      else "no check-wiring.sh beside this script" if not cwsh.is_file()
                      else "no bash on PATH shares this filesystem"))
+
+        # 18) THIS FILE ALONE (closing review round 1 M4). The entry declares `requires = []`, so a
+        #     target may install settings-merge with no hooks kit beside it, and arm 12 read `.name`
+        #     off the None the resolver returns there. The whole selftest re-runs from a copy in a
+        #     scratch root holding nothing else; the copy's own run does not recurse.
+        if not os.environ.get("SETTINGS_MERGE_SELFTEST_ALONE"):
+            alone = root / "alone"
+            (alone / ".git").mkdir(parents=True)
+            copy = alone / "scripts" / Path(__file__).name
+            copy.parent.mkdir()
+            copy.write_bytes(Path(__file__).read_bytes())
+            got = subprocess.run([sys.executable, str(copy), "--selftest"], capture_output=True,
+                                 text=True, encoding="utf-8", cwd=alone,
+                                 env=dict(os.environ, SETTINGS_MERGE_SELFTEST_ALONE="1"))
+            assert got.returncode == 0 and "selftest: PASS" in got.stdout, \
+                f"a settings-merge-only install failed its own selftest: {(got.stdout + got.stderr)[-600:]}"
 
     print("settings-merge selftest: PASS")
     return 0

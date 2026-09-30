@@ -399,6 +399,18 @@ arm 'arm 2: agents dispatched but nothing judged REFUSES' 'judged NONE of them' 
 
 rm -rf "$A2"
 
+# ---- closing review round 1 H1 (TOOL-aRepatriatedFork-46): run from ANOTHER checkout ------------
+# Every `a2tree` fixture above copies agent-cap.js into its scratch tree, and that is what hid the
+# defect: the resolver answers relative to the checkout holding THIS gate, and the gate joined that
+# to the caller's root. This checkout carries no hooks kit, so only the gate's own one can answer.
+H1R=$(mktemp -d)
+mkdir -p "$H1R/.claude/workflows"
+printf "export const meta = { name: 'x', description: 'y' }\nconst verdictById = new Map()\n" > "$H1R/.claude/workflows/x.js"
+( cd "$H1R" && git init -q . && git add -A ) >/dev/null 2>&1
+arm 'H1: run from a checkout holding no hooks kit, the gate finds agent-cap.js beside itself' 'review-join: clean' \
+  bash -c 'cd "$1" && bash "$2"' _ "$H1R" "$ROOT/$GATE"
+rm -rf "$H1R"
+
 # ---- verdict, LAST -------------------------------------------------------------------------------
 if [ "$fails" = 0 ]; then echo "PASS — review-join + workflow-syntax gates: all arms held"; exit 0; fi
 echo "FAIL — $fails arm(s) failed"

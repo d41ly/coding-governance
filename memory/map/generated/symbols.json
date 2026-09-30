@@ -5830,6 +5830,11 @@
     {
       "id": "resolve_kit_dir",
       "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "resolve_kit_dir",
+      "kind": "function",
       "file": "tools/govkit/selftest.py"
     },
     {

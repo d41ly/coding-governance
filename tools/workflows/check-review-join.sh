@@ -172,7 +172,9 @@ print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
 HOOK=""
 _hk_py=$(resolve_python 2>/dev/null) || echo "review-join: no usable python, so the install receipt and the kit probes were NOT read; only the .claude/hooks/ rung was tried" >&2
 if [ -n "$_hk_py" ] && _hk_dir=$(resolve_kit_dir "$_hk_py" hooks agent-cap.js "$HERE" 2>/dev/null); then
-  HOOK="$ROOT/$_hk_dir/agent-cap.js"
+  # The resolver answers relative to the checkout holding THIS gate, which is not the caller's
+  # `$ROOT` when the gate runs from another repo (closing review round 1 H1).
+  HOOK="$(git -C "$HERE" rev-parse --show-toplevel)/$_hk_dir/agent-cap.js"
 elif [ -f "$ROOT/.claude/hooks/agent-cap.js" ]; then
   HOOK="$ROOT/.claude/hooks/agent-cap.js"
 fi

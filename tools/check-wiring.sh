@@ -394,13 +394,18 @@ print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
 # THE PROBE RUNG, through the sibling-kit resolver (TOOL-aRepatriatedFork-46). It used to be a kit's
 # name typed after this checker's own prefix, which is the class the carried-prefix ban counts. The
 # resolver probes the same two places, `<this dir>/<home>` and one level up, after its own receipt
-# read. It needs python, and this runs as a SessionStart hook on a host that may have none, so a
-# missing launcher costs this rung and SAYS so once; the awk receipt rung above it still runs.
+# read. It needs python, and this runs as a SessionStart hook on a host that may have none. With no
+# launcher the SAME two places are probed in bash (closing review round 1 M6): costing the rung
+# printed `not adopted` over a hook that was present, naming a place nothing had looked at. The awk
+# receipt rung above it runs either way.
 resolve_kit_file() { # <kit-home> <file> -> <repo-relative kit dir>/<file>, or nothing
   local py d
   if ! py=$(resolve_python 2>/dev/null); then
-    [ -n "${_rkf_said:-}" ] || echo "note     resolver  — no usable python, so the probe rung beside this checker did not run; only the install receipt was read" >&2
-    _rkf_said=1
+    echo "note     resolver  — no usable python, so the probe rung beside this checker ran in bash for $1/$2" >&2
+    for d in "${KIT_REL:+$KIT_REL/}$1" "$(dirname -- "${KIT_REL:-.}")/$1"; do
+      d=${d#./}
+      [ -f "$_KIT_ROOT/$d/$2" ] && { printf '%s/%s\n' "$d" "$2"; return 0; }
+    done
     return 0
   fi
   d=$(resolve_kit_dir "$py" "$1" "$2" "$_KIT_ROOT/$KIT_REL" 2>/dev/null) || return 0
