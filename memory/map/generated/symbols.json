@@ -5820,6 +5820,11 @@
     {
       "id": "resolve_kit_dir",
       "kind": "function",
+      "file": "tools/drift-audit/selftest.py"
+    },
+    {
+      "id": "resolve_kit_dir",
+      "kind": "function",
       "file": "tools/lib/resolve_kit_dir.py"
     },
     {
@@ -5911,6 +5916,11 @@
       "id": "resolve_projects_root",
       "kind": "function",
       "file": "tools/runlog/extract.py"
+    },
+    {
+      "id": "resolve_recall_name",
+      "kind": "function",
+      "file": "tools/drift-audit/selftest.py"
     },
     {
       "id": "resolve_record_path",

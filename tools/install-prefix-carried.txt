@@ -26,7 +26,6 @@ tools/check-testsuite-counts.test.sh	3	lib	LOWERED 49 -> 3 by TOOL-aRepatriatedF
 tools/check-wiring.sh	5	hooks,lib,memory-recall,memory-tree
 tools/check-wiring.test.sh	52	hooks,lib,memory-recall,memory-tree
 tools/dead-path-waivers.txt	2	lexicon
-tools/drift-audit/selftest.py	22	drift-audit,lexicon,memory-recall,unattended,workflows
 tools/govkit/census.test.sh	2	govkit,lib
 tools/govkit/fixtures/adopter-ic-2cff5855.receipt.json	91	codebase-map,drift-audit,gate-lint,lexicon,unattended,workflows
 tools/govkit/fixtures/make_adopter_receipt.py	2	govkit
