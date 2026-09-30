@@ -68,6 +68,45 @@ def derive_install_prefix() -> str:
 PFX = derive_install_prefix()
 
 
+# TOOL-aRepatriatedFork-46: a SIBLING kit's file is reached through the resolver, which reads the install
+# receipt first, never by typing that kit's name after the prefix.
+# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
+def resolve_kit_dir(home, anchor, here):
+    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
+
+    1. receipt — the `.governance/install.json` row whose `source` ends in <home>/<anchor> and
+       whose `path` exists inside this tree. The only record of a RENAMED kit dir: no probe finds
+       a memory-recall kit an adopter homed at `scripts/recall/`.
+    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
+    3. refuse — LookupError naming the three places looked; never a guessed prefix.
+    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
+    """
+    import json
+    import pathlib
+    here = pathlib.Path(here).resolve()
+    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
+    receipt = root / ".governance" / "install.json"
+    try:
+        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("path"):
+            continue
+        if str(row.get("source") or "").split("/")[-2:] != [home, anchor]:
+            continue
+        hit = (root / str(row["path"])).resolve()
+        if hit.is_file() and root in hit.parents:
+            return hit.parent
+    probes = (here / home, here.parent / home)
+    for cand in probes:
+        if (cand / anchor).is_file():
+            return cand
+    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
+        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
+# <<< resolve_kit_dir
+
+
 HERE = pathlib.Path(__file__).resolve().parent
 FIXTURES = HERE / "fixtures"
 CLI = HERE / "runlog.py"
@@ -838,10 +877,12 @@ def read_bash_conf_values(paths):
 
 def read_engine_conf_reader():
     """The memory-tree engine's own conf reader, loaded from its source where it sits beside this kit,
-    else None. The literal below is this withheld arm's second carried path: the reader the kit's copy
-    is held to is its subject, not a reference that would reach an adopter."""
-    top = pathlib.Path(run_git(["rev-parse", "--show-toplevel"], HERE).stdout.strip() or ".")
-    src = top / f"{PFX}memory-tree/corpus_ids.py"
+    else None. The memory-tree kit is found through the sibling-kit resolver, which reads the install
+    receipt first (TOOL-aRepatriatedFork-46), rather than by typing its name after the prefix."""
+    try:
+        src = resolve_kit_dir("memory-tree", "corpus_ids.py", HERE) / "corpus_ids.py"
+    except LookupError:
+        return None
     if not src.is_file():
         return None
     spec = importlib.util.spec_from_file_location("runlog_selftest_engine_conf", src)
@@ -1971,10 +2012,10 @@ def test_extract_edges():
           True)
     home, local, xdg = str(base / "h"), str(base / "l"), str(base / "x")
     cases = [
-        ({"LOCALAPPDATA": local}, "win32", pathlib.Path(local) / "runlog"),
-        ({"HOME": home}, "darwin", pathlib.Path(home) / "Library" / "Application Support" / "runlog"),
-        ({"HOME": home, "XDG_STATE_HOME": xdg}, "linux", pathlib.Path(xdg) / "runlog"),
-        ({"HOME": home}, "linux", pathlib.Path(home) / ".local" / "state" / "runlog"),
+        ({"LOCALAPPDATA": local}, "win32", pathlib.Path(local) / rx.STATE_DIR_NAME),
+        ({"HOME": home}, "darwin", pathlib.Path(home) / "Library" / "Application Support" / rx.STATE_DIR_NAME),
+        ({"HOME": home, "XDG_STATE_HOME": xdg}, "linux", pathlib.Path(xdg) / rx.STATE_DIR_NAME),
+        ({"HOME": home}, "linux", pathlib.Path(home) / ".local" / "state" / rx.STATE_DIR_NAME),
         ({"RUNLOG_STATE_DIR": str(base / "o"), "LOCALAPPDATA": local}, "win32", base / "o"),
     ]
     for env_in, plat, want in cases:
@@ -4279,11 +4320,13 @@ def test_zz_model_window_invariant():
 
 def test_model_driver_sets():
     """S4: the model's copies of the driver's parked-kind and owed sets, held to the driver's source in
-    both directions. The literal below is this withheld arm's one carried path; it runs where the
-    driver is present and announces its skip where it is not."""
-    top = pathlib.Path(run_git(["rev-parse", "--show-toplevel"], HERE).stdout.strip() or ".")
-    src = top / f"{PFX}unattended/unattended.sh"
-    if not src.is_file():
+    both directions. The driver is found through the sibling-kit resolver (TOOL-aRepatriatedFork-46);
+    the arm runs where the driver is present and announces its skip where it is not."""
+    try:
+        src = resolve_kit_dir("unattended", "unattended.sh", HERE) / "unattended.sh"
+    except LookupError:
+        src = None
+    if src is None or not src.is_file():
         print("  SKIP model driver sets: the unattended driver is not beside this kit, so its sets "
               "cannot be compared here")
         return

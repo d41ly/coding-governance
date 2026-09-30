@@ -35,7 +35,6 @@ tools/govkit/selftest.py	213	codebase-map,drift-audit,govkit,hooks,memory-recall
 tools/memory-tree/check-memory-hygiene.test.sh	8	codebase-map,playbook
 tools/process-monitor/adopt-process-monitor.test.sh	2	lib	LOWERED 7 -> 2 by TOOL-aRepatriatedFork-28. The two left source the resolver beside this kit, a kit segment joined under a derived base, TOOL-aRepatriatedFork-46's class (spec rev-3 §4, Returned). Still `project-owned` and withheld from `govkit apply`.
 tools/run-gates/adopt-run-gates.test.sh	7	run-gates
-tools/runlog/selftest.py	5	memory-tree,runlog,unattended	LOWERED 62 -> 4 by TOOL-aRepatriatedFork-28. The four left name no kit path: three per-OS state directories called runlog and the Skill's keyword tuple, which the epoch-5 counter reads as kit segments. TOOL-aRepatriatedFork-30's population rule.
 tools/settings-merge.py	6	hooks,memory-recall,process-monitor
 tools/unattended/adopt-unattended.test.sh	1	unattended
 tools/unattended/check-unattended.test.sh	3	workflows
