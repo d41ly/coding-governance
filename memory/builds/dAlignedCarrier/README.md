@@ -60,7 +60,7 @@ ids TOOL-dAlignedCarrier-1 TOOL-dAlignedCarrier-2 TOOL-dAlignedCarrier-3 TOOL-dA
 | [TOOL-dAlignedCarrier-5 — BUILD-METHOD M7 regrounds with `--status`](spec/2026-09-30-spec-TOOL-dAlignedCarrier-5.md) | 2 | 2 | CLOSED | rev-2 | 2026-09-30 |
 <!-- /gen:build-units -->
 
-Records: 9 bound to this build, across 4 record folder(s).
+Records: 10 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
