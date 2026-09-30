@@ -162,18 +162,18 @@ ids TOOL-aRepatriatedFork-43 TOOL-aRepatriatedFork-44 TOOL-aRepatriatedFork-45 T
 | [TOOL-aRepatriatedFork-12 — memory-recall reads the adopter's corpus shape from conf](spec/2026-09-23-spec-TOOL-aRepatriatedFork-12.md) | 6 | 2 | CLOSED | rev-3 | 2026-09-24 |
 | [TOOL-aRepatriatedFork-44 — the adopter-ic receipt fixture carries no adopter name](spec/2026-09-29-spec-TOOL-aRepatriatedFork-44.md) | 7 | 1 | CLOSED | rev-2 | 2026-09-29 |
 | [TOOL-aRepatriatedFork-23 — the install-prefix ban counts every kit path it cannot see today](spec/2026-09-25-spec-TOOL-aRepatriatedFork-23.md) | 8 | 2 | CLOSED | rev-3 | 2026-09-29 |
-| [TOOL-aRepatriatedFork-24 — no line that executes strands an adopter at another prefix](spec/2026-09-25-spec-TOOL-aRepatriatedFork-24.md) | 9 | 2 | CLOSED | rev-5 | 2026-09-30 |
+| [TOOL-aRepatriatedFork-24 — no line that executes strands an adopter at another prefix](spec/2026-09-25-spec-TOOL-aRepatriatedFork-24.md) | 9 | 2 | CLOSED | rev-6 | 2026-10-01 |
 | [TOOL-aRepatriatedFork-25 — printed and usage strings in received code name no install prefix](spec/2026-09-25-spec-TOOL-aRepatriatedFork-25.md) | 10 | 1 | CLOSED | rev-3 | 2026-09-29 |
 | [TOOL-aRepatriatedFork-26 — the runbook and every shipped doc name no install prefix](spec/2026-09-25-spec-TOOL-aRepatriatedFork-26.md) | 11 | 1 | CLOSED | rev-3 | 2026-09-29 |
 | [TOOL-aRepatriatedFork-27 — canonical-copy markers and comment prose name no install prefix](spec/2026-09-25-spec-TOOL-aRepatriatedFork-27.md) | 12 | 1 | CLOSED | rev-2 | 2026-09-29 |
-| [TOOL-aRepatriatedFork-29 — gov's own gates and declarations derive the prefix they name](spec/2026-09-25-spec-TOOL-aRepatriatedFork-29.md) | 13 | 2 | CLOSED | rev-4 | 2026-09-30 |
-| [TOOL-aRepatriatedFork-28 — every suite builds its fixtures at a prefix it derives](spec/2026-09-25-spec-TOOL-aRepatriatedFork-28.md) | 14 | 2 | CLOSED | rev-3 | 2026-09-30 |
+| [TOOL-aRepatriatedFork-29 — gov's own gates and declarations derive the prefix they name](spec/2026-09-25-spec-TOOL-aRepatriatedFork-29.md) | 13 | 2 | CLOSED | rev-5 | 2026-10-01 |
+| [TOOL-aRepatriatedFork-28 — every suite builds its fixtures at a prefix it derives](spec/2026-09-25-spec-TOOL-aRepatriatedFork-28.md) | 14 | 2 | CLOSED | rev-4 | 2026-10-01 |
 | [TOOL-aRepatriatedFork-45 — a renamed-away filename is a dead-path needle](spec/2026-09-30-spec-TOOL-aRepatriatedFork-45.md) | 15 | 1 | CLOSED | rev-2 | 2026-09-30 |
 | [TOOL-aRepatriatedFork-31 — gov's shipped files carry no adopter name](spec/2026-09-25-spec-TOOL-aRepatriatedFork-31.md) | 16 | 1 | CLOSED | rev-2 | 2026-09-25 |
-| [TOOL-aRepatriatedFork-46 — no line joins a literal kit name under a derived base](spec/2026-09-30-spec-TOOL-aRepatriatedFork-46.md) | 16 | 2 | CLOSED | rev-4 | 2026-09-30 |
+| [TOOL-aRepatriatedFork-46 — no line joins a literal kit name under a derived base](spec/2026-09-30-spec-TOOL-aRepatriatedFork-46.md) | 16 | 2 | CLOSED | rev-5 | 2026-10-01 |
 | [TOOL-aRepatriatedFork-32 — every branch of hygiene check 21 honours `RECORD_SERVES_CUTOFF`](spec/2026-09-25-spec-TOOL-aRepatriatedFork-32.md) | 17 | 1 | CLOSED | rev-3 | 2026-09-26 |
 | [TOOL-aRepatriatedFork-47 — every copy of the `{prefix}` resolution gives one answer](spec/2026-09-30-spec-TOOL-aRepatriatedFork-47.md) | 17 | 1 | CLOSED | rev-1 | 2026-09-30 |
-| [TOOL-aRepatriatedFork-30 — the suites run at a foreign prefix, and the install-prefix gate is a pure ban](spec/2026-09-25-spec-TOOL-aRepatriatedFork-30.md) | 18 | 2 | CLOSED | rev-7 | 2026-09-30 |
+| [TOOL-aRepatriatedFork-30 — the suites run at a foreign prefix, and the install-prefix gate is a pure ban](spec/2026-09-25-spec-TOOL-aRepatriatedFork-30.md) | 18 | 2 | CLOSED | rev-8 | 2026-10-01 |
 | [TOOL-aRepatriatedFork-35 — gov's shipped files name no adopter, inCMS included](spec/2026-09-25-spec-TOOL-aRepatriatedFork-35.md) | 18 | 1 | CLOSED | rev-2 | 2026-09-25 |
 | [TOOL-aRepatriatedFork-36 — the recall kit converges at adopters](spec/2026-09-25-spec-TOOL-aRepatriatedFork-36.md) | 19 | 2 | CLOSED | rev-3 | 2026-09-26 |
 | [TOOL-aRepatriatedFork-37 — the unattended suite derives the repair pointer it asserts](spec/2026-09-25-spec-TOOL-aRepatriatedFork-37.md) | 19 | 1 | CLOSED | rev-2 | 2026-09-25 |

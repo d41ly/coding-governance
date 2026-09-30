@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-29 — gov's own gates and declarations derive the prefix they name
 
-**Status:** CLOSED · rev-4 · 2026-09-30 · node a · Tier-2 · base 2143b6d6 · streams tooling · order 13
+**Status:** CLOSED · rev-5 · 2026-10-01 · node a · Tier-2 · base 2143b6d6 · streams tooling · order 13
 
 <!-- gen:spec-records -->
 
@@ -295,6 +295,16 @@ New arm: `tools/govkit/selftest.py` · rev-4: the fixture regenerator derives a 
   closing review round 1 fold: M1 — the bar deriver reads the deploy prefix where intake writes it
   (S8c, AC11). closing review round 1 fold: L2 — the fixture regenerator reads tokened
   descriptors and joins kit-relative homes (S8d, AC12).
+- rev-5 · 2026-10-01 · gate repair at VERIFYING, legs `govkit selftest` and `run-gates run-log line`.
+  S1 moved the registry and descriptors to `{prefix}`-tokened, kit-relative spellings, and four
+  readers in govkit's selftest still read them raw. The `[gate_runner_seed]` arm joined an
+  unresolved `{prefix}` and crashed the suite, leaving every later arm unrun. The `[dBF]` and
+  integrity-count arms loaded check-wiring's descriptor without `resolve_descriptor_paths`, so every
+  source read `./<file>`. Arm 7e staged its break against the old one-line `default`, matched
+  nothing and staged nothing; it now asserts that its edit took. The leg-name arm pinned the
+  `tools/gate-legs.json` text the message no longer prints, and takes the new text. run-gates.sh's
+  manifest-parse line gained the kit-dir argument, and the run-log suite's EXITS table still named
+  the old line; its row takes the new text.
 
 ## 10. Reuse audit
 

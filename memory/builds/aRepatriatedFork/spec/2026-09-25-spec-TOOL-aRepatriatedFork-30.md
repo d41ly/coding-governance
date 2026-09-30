@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-30 — the suites run at a foreign prefix, and the install-prefix gate is a pure ban
 
-**Status:** CLOSED · rev-7 · 2026-09-30 · node a · Tier-2 · base 2143b6d6 · streams tooling · order 18
+**Status:** CLOSED · rev-8 · 2026-10-01 · node a · Tier-2 · base 2143b6d6 · streams tooling · order 18
 
 <!-- gen:spec-records -->
 
@@ -298,6 +298,16 @@ New arm: `tools/check-dead-paths.test.sh` · rev-7: a gotcha page naming a delet
 - rev-7 · 2026-09-30 · closing review round 2 fold: L2 — the gotcha that still described the
   deleted install-prefix registries is reworded, and the gotcha pages join the dead-path haystack
   (S10, AC11).
+- rev-8 · 2026-10-01 · gate repair at VERIFYING, leg `foreign-prefix parity (every self-test at three
+  prefixes)`. Its first whole run, at 6e7cb0df, redded at the calibrate at gov's own prefix, so no
+  foreign prefix was graded. Three repairs are this unit's. The leg's ceiling is re-declared from
+  that run's 8302 s through `derive-ceilings.py --observed` and the margin file's rule, replacing
+  the sized 60000 s that broke the profiles' wall rule. The reading is of a run that stopped after
+  its calibrate, one pass of four, so the evidence understates a green run and the build record
+  says so. `pre-push run-log line`'s budget row carried its rationale in the argv column since
+  `TOOL-aRepatriatedFork-5`, already at base, so `--pooled` ran the rationale as a command and read
+  exit 127; the row gains its empty argv column. govkit's `ORDER|project-owned` preview count moves
+  from 27 to 28 for the `foreign-prefix.gov.test.sh` rule S1 added.
 
 ## 10. Reuse audit
 

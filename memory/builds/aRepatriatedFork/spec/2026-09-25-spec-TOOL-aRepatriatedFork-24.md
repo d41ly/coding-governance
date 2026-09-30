@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-24 — no line that executes strands an adopter at another prefix
 
-**Status:** CLOSED · rev-5 · 2026-09-30 · node a · Tier-2 · base 2143b6d6 · streams tooling · order 9
+**Status:** CLOSED · rev-6 · 2026-10-01 · node a · Tier-2 · base 2143b6d6 · streams tooling · order 9
 
 <!-- gen:spec-records -->
 
@@ -310,6 +310,11 @@ New arm: `tools/govkit/selftest.py` · rev-4: a foreign kit at gov's canonical p
   target's own and the root (S7b, AC12).
 - rev-5 · 2026-09-30 · §3 · closing review round 2: H1 is promoted to `TOOL-aRepatriatedFork-49`,
   and §3 gains the hands-off edge that unit consumes. No scope or criterion of this unit moves.
+- rev-6 · 2026-10-01 · gate repair at VERIFYING, leg `placeholder-catalogue self-test`. S5 found the
+  gate beside its suite and dropped `ROOT` with the gate's prefix, but the survival arm reads the
+  charter template at the REPO root, which no install prefix moves. Under `set -u` the suite died on
+  an unbound variable before its first verdict. `ROOT` is restored for that one read; no criterion
+  moves.
 
 ## 10. Reuse audit
 

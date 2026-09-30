@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-46 — no line joins a literal kit name under a derived base
 
-**Status:** CLOSED · rev-4 · 2026-09-30 · node a · Tier-2 · base 6830f257 · streams tooling · order 16 · ratified 2026-09-30
+**Status:** CLOSED · rev-5 · 2026-10-01 · node a · Tier-2 · base 6830f257 · streams tooling · order 16 · ratified 2026-09-30
 
 <!-- gen:spec-records -->
 
@@ -347,6 +347,17 @@ New arm: `tools/workflows/check-verifier-fanout.test.sh` · rev-4: `--print-cap`
   itself (S7d, AC13).
 - rev-4 · 2026-09-30 · closing review round 2 fold: L1 — the fan-out gates ask git for their own
   checkout with an inherited `GIT_DIR` unset (S8, AC14).
+- rev-5 · 2026-10-01 · gate repair at VERIFYING, leg `codebase-map kit selftest`, and the
+  foreign-prefix calibrate's `unattended adopter e2e`, `unattended stall-recorder selftest` and
+  `unattended stop-guard selftest` rows. The sibling-kit resolver `resolve()`d its anchor, which
+  follows a junction to its target and expands an 8.3 short name. S4 moved the codebase-map gate's
+  root rung and the unattended adopter's memory-tree probe onto it, so an adopter whose kit dir is a
+  junction adopted nothing (adopter arm 4), and the gate's root-install probe returned a spelling
+  its caller never passed. The canonical copy and every inline copy take `absolute()`, with a
+  lexical `..` refusal beside the containment test; the block keeps its line count. The adopter
+  suite's `seed()` reads `MT_KIT`, which only that suite's prologue sets, and the stall-recorder and
+  stop-guard suites borrow `seed()` by eval and died under `set -u` with no trailer. `seed()`
+  derives the name when it is unset.
 
 ## 10. Reuse audit
 

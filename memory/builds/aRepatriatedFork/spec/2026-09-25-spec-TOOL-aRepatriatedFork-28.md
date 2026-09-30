@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-28 — every suite builds its fixtures at a prefix it derives
 
-**Status:** CLOSED · rev-3 · 2026-09-30 · node a · Tier-2 · base 2143b6d6 · streams tooling · order 14
+**Status:** CLOSED · rev-4 · 2026-10-01 · node a · Tier-2 · base 2143b6d6 · streams tooling · order 14
 
 <!-- gen:spec-records -->
 
@@ -239,6 +239,17 @@ unchanged
   necessary, and five classes this mechanism cannot drain, each named for its owner. AC1 no longer
   counts the unattended kit's rendered fixture files. S6 names the one suite whose count moves by
   construction. §5 drops the printed-prefix line.
+- rev-4 · 2026-10-01 · gate repair at VERIFYING, legs `scratch-guard self-test`, `codebase-map kit
+  selftest` and `govkit selftest`, and the foreign-prefix calibrate's `unattended gate-guard
+  selftest` row. Three defects of this unit's derivation. The meta-arms of `scratch-guard.test.sh`
+  and `gate-guard.test.sh` copy the suite to `$TMP`, where `derive_self_rel` finds no repository
+  and the copy exits before the liveness guard can fire; the copy's `HERE` is pinned to the suite's
+  own. codebase-map's `derive_install_prefix` spelled `Path(__file__).resolve()`, which the kit's
+  own B2 arm bans; it takes `os.path.abspath`. govkit's pre-fix arms (`-14` AC8, `-24` AC5, `-26`
+  AC1 and AC4) run an engine read out of git inside a copy of a fixture gov this unit moved to the
+  `{prefix}` spelling. That engine predates the token and refused every entry as a missing
+  descriptor, so the arms graded a refusal. The pre-fix copy is re-spelled the way that engine
+  reads, by `write_pre_fix_spelling`; every expectation stays.
 
 ## 10. Reuse audit
 
