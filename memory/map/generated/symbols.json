@@ -5853,6 +5853,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "resolve_kit_dir",
+      "kind": "function",
+      "file": "tools/settings-merge.py"
+    },
+    {
       "id": "resolve_kit_homes",
       "kind": "function",
       "file": "tools/govkit/fixtures/make_adopter_receipt.py"

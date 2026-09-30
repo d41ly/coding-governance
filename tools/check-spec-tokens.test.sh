@@ -63,10 +63,103 @@ FLOOR_ASSERTIONS=96
 # RAISED 95 -> 96 at round 2 of that review (F3): one inline increment for the arm that uses the
 # composite waiver token alone and expects green, observed RED against a copy that never waives a claim.
 LINT="$(cd "$(dirname "$0")" && pwd)/check-spec-tokens.py"
-# The launcher is RESOLVED by running it (<prefix>/lib/resolve-python.sh); `PY=` overrides. A bare
-# default here was the parameter-default shape the resolver ban now catches.
-if [ -z "${PY:-}" ] && [ -f "${LINT%/*}/lib/resolve-python.sh" ]; then . "${LINT%/*}/lib/resolve-python.sh"; PY=$(resolve_python) || exit 2; fi
-PY=${PY:-python}   # gov:literal-python — last-resort fallback when lib/ is absent (adopter layout)
+# The launcher is RESOLVED by running it; `PY=` overrides. A bare default here was the
+# parameter-default shape the resolver ban now catches. TOOL-aRepatriatedFork-46: the resolver is
+# carried INLINE; it was sourced from the library directory beside this suite, which ships nowhere.
+# >>> resolve_python — canonical copy: resolve-python.sh in gov's lib dir (byte-identical; gated)
+resolve_python() {
+  # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
+  # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
+  # the candidate and every consumer uses "$PY" as a single word (measured: exit 127).
+  _rp_tried=""
+  for _rp_c in "${1:-}" "${GOV_PYTHON:-}" python3 python py; do
+    [ -n "$_rp_c" ] || continue
+    _rp_tried="$_rp_tried $_rp_c"
+    if "$_rp_c" -c "import sys" >/dev/null 2>&1; then
+      printf '%s\n' "$_rp_c"
+      return 0
+    fi
+  done
+  {
+    echo "resolve_python: no usable python launcher. Each candidate was RUN with -c 'import sys' and"
+    echo "resolve_python: none exited 0 — being on PATH is not evidence (the Microsoft Store python3"
+    echo "resolve_python: stub answers \`command -v\` and exits 9009 without running anything)."
+    echo "resolve_python: tried:$_rp_tried"
+    if [ -n "${1:-}" ]; then
+      echo "resolve_python: the caller's override '$1' was tried FIRST and did not run."
+    fi
+    if [ -n "${GOV_PYTHON:-}" ]; then
+      echo "resolve_python: GOV_PYTHON is set to '$GOV_PYTHON' and did not run. An override that is"
+      echo "resolve_python: set and unusable is THIS failure, never a silent fall-through — the"
+      echo "resolve_python: operator believes they chose, and would not have."
+    fi
+  } >&2
+  return 1
+}
+# <<< resolve_python
+[ -n "${PY:-}" ] || PY=$(resolve_python) || exit 2
+# TOOL-aRepatriatedFork-46: a kit is named by the name its directory has in THIS install, never
+# as a literal segment: a sibling's through the resolver, which reads the install receipt first.
+# A fixture mirrors that layout by the resolved NAME.
+# The sibling-kit resolver (TOOL-aRepatriatedFork-2 S3), INLINED byte-identically from the
+# canonical copy named on its marker line and gated by the resolve-python self-test's parity
+# table. A shell consumer runs it with the python it already resolved, so the receipt rung is
+# read in Python and never parsed in bash. `resolve_kit_dir <python> <home> <anchor> <here>`
+# prints the kit directory REPO-RELATIVE, or the resolver's named refusal on stderr and exits 1.
+resolve_kit_dir() {
+  "$1" -c "$(cat <<'RKD'
+# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
+def resolve_kit_dir(home, anchor, here):
+    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
+
+    1. receipt — the `.governance/install.json` row whose `source` ends in <home>/<anchor> and
+       whose `path` exists inside this tree. The only record of a RENAMED kit dir: no probe finds
+       a memory-recall kit an adopter homed at `scripts/recall/`.
+    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
+    3. refuse — LookupError naming the three places looked; never a guessed prefix.
+    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
+    """
+    import json
+    import pathlib
+    here = pathlib.Path(here).resolve()
+    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
+    receipt = root / ".governance" / "install.json"
+    try:
+        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("path"):
+            continue
+        if str(row.get("source") or "").split("/")[-2:] != [home, anchor]:
+            continue
+        hit = (root / str(row["path"])).resolve()
+        if hit.is_file() and root in hit.parents:
+            return hit.parent
+    probes = (here / home, here.parent / home)
+    for cand in probes:
+        if (cand / anchor).is_file():
+            return cand
+    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
+        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
+# <<< resolve_kit_dir
+RKD
+)"'
+import sys
+try:
+    d = resolve_kit_dir(*sys.argv[1:4])
+except LookupError as e:
+    sys.exit(str(e))
+r = next((p for p in (d, *d.parents) if (p / ".git").exists()), d.anchor)
+print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
+}
+RUN_GATES_DIR=$(resolve_kit_dir "$PY" run-gates run-gates.sh "$HERE") || exit 2
+RUN_GATES="${RUN_GATES_DIR##*/}"
+GOVKIT_DIR=$(resolve_kit_dir "$PY" govkit govkit.py "$HERE") || exit 2
+GOVKIT="${GOVKIT_DIR##*/}"
+RUNLOG_DIR=$(resolve_kit_dir "$PY" runlog runlog.py "$HERE") || exit 2
+RUNLOG="${RUNLOG_DIR##*/}"
+CODEBASE_MAP_DIR=$(resolve_kit_dir "$PY" codebase-map map_lib.py "$HERE") || exit 2
 pass=0; fail=0
 
 scratch() {          # $1 = dir. A repo with one live spec, a manifest and an empty waiver file.
@@ -271,7 +364,7 @@ arm "a manifest that does not parse REFUSES" 1 "$d" "REFUSING"
 #      so the bar line carries `relation unchecked` and a cutoff dated before the commit day is never
 #      refused. AC17 alone commits, because the refusal it observes reads the value's commit date.
 d=$base/bar; scratch "$d"
-mkdir -p "$d/${PFX}run-gates" "$d/${PFX}govkit"; : > "$d/${PFX}run-gates/run-gates.sh"; : > "$d/${PFX}govkit/selftest.py"
+mkdir -p "$d/${PFX}${RUN_GATES}" "$d/${PFX}${GOVKIT}"; : > "$d/${PFX}${RUN_GATES}/run-gates.sh"; : > "$d/${PFX}${GOVKIT}/selftest.py"
 git -C "$d" add -A >/dev/null; git -C "$d" commit -qm runner --no-verify
 clean=$(git -C "$d" rev-parse HEAD)
 spec="$d/memory/builds/tOne/spec/2026-09-02-spec-TOOL-tOne-1.md"
@@ -279,16 +372,16 @@ spec="$d/memory/builds/tOne/spec/2026-09-02-spec-TOOL-tOne-1.md"
 # AC1 — a post-cutoff §6 bullet backticking the flagged full bar REDS as [bar], with the substitute.
 #       The token opens `GATE_`, which NOT_A_TOKEN drops unread unless the bar test runs first.
 printf 'SPEC_DIRECT_CUTOFF="2026-09-01"\n' > "$d/.memory-tree.conf"
-sed -i 's|`'"${PFX}gate-legs.json"'` exists|`GATE_SELFTESTS=1 bash '"${PFX}run-gates/run-gates.sh"'` is green|' "$spec"
+sed -i 's|`'"${PFX}gate-legs.json"'` exists|`GATE_SELFTESTS=1 bash '"${PFX}${RUN_GATES}/run-gates.sh"'` is green|' "$spec"
 git -C "$d" add -A >/dev/null
-arm "a post-cutoff §6 bullet naming the flagged bar REDS as [bar]" 1 "$d" '-spec-TOOL-tOne-1.md [bar] `GATE_SELFTESTS=1 bash '"${PFX}run-gates/run-gates.sh"'` — a bar or suite is not an acceptance observation'
+arm "a post-cutoff §6 bullet naming the flagged bar REDS as [bar]" 1 "$d" '-spec-TOOL-tOne-1.md [bar] `GATE_SELFTESTS=1 bash '"${PFX}${RUN_GATES}/run-gates.sh"'` — a bar or suite is not an acceptance observation'
 git -C "$d" reset -q --hard "$clean"
 
 # AC2 — the same token on the §7 leg line REDS: NOT_A_LEG would discard it for its `bash ` opener.
 printf 'SPEC_DIRECT_CUTOFF="2026-09-01"\n' > "$d/.memory-tree.conf"
-sed -i 's|^`real leg`\.|`real leg` · `GATE_SELFTESTS=1 bash '"${PFX}run-gates/run-gates.sh"'`.|' "$spec"
+sed -i 's|^`real leg`\.|`real leg` · `GATE_SELFTESTS=1 bash '"${PFX}${RUN_GATES}/run-gates.sh"'`.|' "$spec"
 git -C "$d" add -A >/dev/null
-arm "the same token on the §7 leg line REDS, read before NOT_A_LEG discards it" 1 "$d" '[bar] `GATE_SELFTESTS=1 bash '"${PFX}run-gates/run-gates.sh"'`'
+arm "the same token on the §7 leg line REDS, read before NOT_A_LEG discards it" 1 "$d" '[bar] `GATE_SELFTESTS=1 bash '"${PFX}${RUN_GATES}/run-gates.sh"'`'
 git -C "$d" reset -q --hard "$clean"
 
 # AC3 — three placements that are NOT hits: §4 prose, a §7 `New arm:` line, and the un-backticked
@@ -302,13 +395,13 @@ cat > "$spec" <<'SPEC'
 
 ## 4. Design
 
-The bar is `GATE_SELFTESTS=1 bash {PFX}run-gates/run-gates.sh`, named here in prose.
+The bar is `GATE_SELFTESTS=1 bash {PFX}{RUN_GATES}/run-gates.sh`, named here in prose.
 
 ## 6. Acceptance criteria
 
 - **AC1** — `{PFX}gate-legs.json` exists.
   ```
-  bash {PFX}run-gates/run-selftests.sh
+  bash {PFX}{RUN_GATES}/run-selftests.sh
   ```
 
 ## 7. Gates
@@ -317,7 +410,7 @@ The bar is `GATE_SELFTESTS=1 bash {PFX}run-gates/run-gates.sh`, named here in pr
 
 New arm: `bash {PFX}check-spec-tokens.test.sh` · stages a break · none
 SPEC
-sed -i "s#{PFX}#${PFX}#g" "$spec"   # the quoted heredoc cannot expand the prefix
+sed -i "s#{PFX}#${PFX}#g; s#{RUN_GATES}#${RUN_GATES}#g" "$spec"   # the quoted heredoc cannot expand either
 git -C "$d" add -A >/dev/null
 arm "a bar token in §4 prose, on a New arm: line and in a fence body is no hit" 0 "$d" "0 pre-cutoff live spec(s) carry one and are not graded"
 out=$(cd "$d" && "$PY" "$LINT" --list 2>&1)
@@ -334,14 +427,14 @@ git -C "$d" reset -q --hard "$clean"
 # AC4 — a PRE-cutoff carrier is green, and COUNTED on the bar line rather than silently skipped.
 printf 'SPEC_DIRECT_CUTOFF="2026-09-01"\n' > "$d/.memory-tree.conf"
 git -C "$d" mv "$spec" "$d/memory/builds/tOne/spec/2026-08-30-spec-TOOL-tOne-1.md"
-sed -i 's|`'"${PFX}gate-legs.json"'` exists|`GATE_SELFTESTS=1 bash '"${PFX}run-gates/run-gates.sh"'` is green|' "$d/memory/builds/tOne/spec/2026-08-30-spec-TOOL-tOne-1.md"
+sed -i 's|`'"${PFX}gate-legs.json"'` exists|`GATE_SELFTESTS=1 bash '"${PFX}${RUN_GATES}/run-gates.sh"'` is green|' "$d/memory/builds/tOne/spec/2026-08-30-spec-TOOL-tOne-1.md"
 git -C "$d" add -A >/dev/null
 arm "a PRE-cutoff carrier is green, counted and not graded" 0 "$d" "1 pre-cutoff live spec(s) carry one and are not graded"
 git -C "$d" reset -q --hard "$clean"
 
 # AC5 — a BLANK key turns the join off over the AC1 tree, and the OFF line still counts the carrier.
 printf 'SPEC_DIRECT_CUTOFF=""\n' > "$d/.memory-tree.conf"
-sed -i 's|`'"${PFX}gate-legs.json"'` exists|`GATE_SELFTESTS=1 bash '"${PFX}run-gates/run-gates.sh"'` is green|' "$spec"
+sed -i 's|`'"${PFX}gate-legs.json"'` exists|`GATE_SELFTESTS=1 bash '"${PFX}${RUN_GATES}/run-gates.sh"'` is green|' "$spec"
 git -C "$d" add -A >/dev/null
 arm "a blank SPEC_DIRECT_CUTOFF turns the join off and still counts the carrier" 0 "$d" "SPEC_DIRECT_CUTOFF blank (arm off) · 1 live spec(s) carry a bar token"
 git -C "$d" reset -q --hard "$clean"
@@ -349,9 +442,9 @@ git -C "$d" reset -q --hard "$clean"
 # AC15 — the LIGHT profile: criteria under `## 5.`, Gates under `## 6.`. The ordinal read graded the
 #        Gates section as the bullet population and never saw the token; the heading read does.
 printf 'SPEC_DIRECT_CUTOFF="2026-09-01"\n' > "$d/.memory-tree.conf"
-sed -i 's|`'"${PFX}gate-legs.json"'` exists|`GATE_SELFTESTS=1 bash '"${PFX}run-gates/run-gates.sh"'` is green|; s|^## 6. Acceptance criteria$|## 5. Acceptance criteria|; s|^## 7. Gates$|## 6. Gates|' "$spec"
+sed -i 's|`'"${PFX}gate-legs.json"'` exists|`GATE_SELFTESTS=1 bash '"${PFX}${RUN_GATES}/run-gates.sh"'` is green|; s|^## 6. Acceptance criteria$|## 5. Acceptance criteria|; s|^## 7. Gates$|## 6. Gates|' "$spec"
 git -C "$d" add -A >/dev/null
-arm "a light-profile spec is graded where its criteria sit, not at the ordinal" 1 "$d" '[bar] `GATE_SELFTESTS=1 bash '"${PFX}run-gates/run-gates.sh"'`'
+arm "a light-profile spec is graded where its criteria sit, not at the ordinal" 1 "$d" '[bar] `GATE_SELFTESTS=1 bash '"${PFX}${RUN_GATES}/run-gates.sh"'`'
 git -C "$d" reset -q --hard "$clean"
 
 # AC16 — the EMPTY flag assignment is the OFF spelling and no hit (rev-1's branch matched it); the
@@ -377,9 +470,9 @@ git -C "$d" reset -q --hard "$clean"
 # `.test.sh`; the fixture tracks the file so the paths join stays green and the one hit is the bar's.
 # A `--selftest` FLAG on another file is the direct check the child prompt admits and is not a hit.
 printf 'SPEC_DIRECT_CUTOFF="2026-09-01"\n' > "$d/.memory-tree.conf"
-sed -i 's|`'"${PFX}gate-legs.json"'` exists|`python '"${PFX}govkit/selftest.py"'` is green|' "$spec"   # gov:literal-python — a fixture TOKEN the checker grades, never run
+sed -i 's|`'"${PFX}gate-legs.json"'` exists|`python '"${PFX}${GOVKIT}/selftest.py"'` is green|' "$spec"   # gov:literal-python — a fixture TOKEN the checker grades, never run
 git -C "$d" add -A >/dev/null
-arm "a post-cutoff §6 bullet naming a whole-suite selftest.py REDS as [bar]" 1 "$d" '[bar] `python '"${PFX}govkit/selftest.py"'`'   # gov:literal-python — the expected hit line, never run
+arm "a post-cutoff §6 bullet naming a whole-suite selftest.py REDS as [bar]" 1 "$d" '[bar] `python '"${PFX}${GOVKIT}/selftest.py"'`'   # gov:literal-python — the expected hit line, never run
 git -C "$d" reset -q --hard "$clean"
 
 # AC17 — a COMMITTED cutoff not strictly past its own commit day is REFUSED before grading, naming
@@ -413,9 +506,9 @@ git -C "$d" reset -q --hard "$clean"
 # closing round 2, R12 — `py`, the Windows launcher and the resolver's third candidate, is a launcher
 # to this reader as it is to the hook. The checker at 4d177329 graded this bullet clean.
 printf 'SPEC_DIRECT_CUTOFF="2026-09-01"\n' > "$d/.memory-tree.conf"
-sed -i 's|`'"${PFX}gate-legs.json"'` exists|`py '"${PFX}govkit/selftest.py"'` is green|' "$spec"   # gov:literal-python — a fixture TOKEN the checker grades, never run
+sed -i 's|`'"${PFX}gate-legs.json"'` exists|`py '"${PFX}${GOVKIT}/selftest.py"'` is green|' "$spec"   # gov:literal-python — a fixture TOKEN the checker grades, never run
 git -C "$d" add -A >/dev/null
-arm "a whole-suite selftest.py behind the py launcher REDS as [bar]" 1 "$d" '[bar] `py '"${PFX}govkit/selftest.py"'`'   # gov:literal-python — the expected hit line, never run
+arm "a whole-suite selftest.py behind the py launcher REDS as [bar]" 1 "$d" '[bar] `py '"${PFX}${GOVKIT}/selftest.py"'`'   # gov:literal-python — the expected hit line, never run
 git -C "$d" reset -q --hard "$clean"
 
 # ---- TOOL-aBlindedTrial-8: the guards join, over the same shared repo and reset the same way. A
@@ -639,21 +732,21 @@ git -C "$d" reset -q --hard "$clean"
 # The WAIVER family: its committed clean state IS the AC1 fixture, and the commit is dated the day
 # before its cutoff so the relation holds and the arms grade rather than refuse.
 d=$base/barwaiver; scratch "$d"
-mkdir -p "$d/${PFX}run-gates"; : > "$d/${PFX}run-gates/run-gates.sh"
+mkdir -p "$d/${PFX}${RUN_GATES}"; : > "$d/${PFX}${RUN_GATES}/run-gates.sh"
 printf 'SPEC_DIRECT_CUTOFF="2026-09-01"\n' > "$d/.memory-tree.conf"
-sed -i 's|`'"${PFX}gate-legs.json"'` exists|`GATE_SELFTESTS=1 bash '"${PFX}run-gates/run-gates.sh"'` is green|' "$d/memory/builds/tOne/spec/2026-09-02-spec-TOOL-tOne-1.md"
+sed -i 's|`'"${PFX}gate-legs.json"'` exists|`GATE_SELFTESTS=1 bash '"${PFX}${RUN_GATES}/run-gates.sh"'` is green|' "$d/memory/builds/tOne/spec/2026-09-02-spec-TOOL-tOne-1.md"
 git -C "$d" add -A >/dev/null
 GIT_COMMITTER_DATE=2026-08-31T12:00:00 git -C "$d" commit -qm ac1 --no-verify
 clean=$(git -C "$d" rev-parse HEAD)
 
 # AC6 — a waiver row keyed on the token, reason opening `[bar]`, clears the hit and is counted.
-printf 'GATE_SELFTESTS=1 bash '"${PFX}run-gates/run-gates.sh"'\t[bar] deliberate, for this arm\n' >> "$d/memory/project/spec-token-waivers.txt"
+printf 'GATE_SELFTESTS=1 bash '"${PFX}${RUN_GATES}/run-gates.sh"'\t[bar] deliberate, for this arm\n' >> "$d/memory/project/spec-token-waivers.txt"
 git -C "$d" add -A >/dev/null
 arm "a [bar] waiver row keyed on the token clears the hit and is counted" 0 "$d" "1 waiver(s)"
 git -C "$d" reset -q --hard "$clean"
 
 # AC7 — a [bar] row naming a token no spec carries REDS as stale, like any other row.
-printf 'GATE_FULL=1 bash '"${PFX}run-gates/run-gates.sh"'\t[bar] no spec names this\n' >> "$d/memory/project/spec-token-waivers.txt"
+printf 'GATE_FULL=1 bash '"${PFX}${RUN_GATES}/run-gates.sh"'\t[bar] no spec names this\n' >> "$d/memory/project/spec-token-waivers.txt"
 git -C "$d" add -A >/dev/null
 arm "a [bar] waiver row nothing produces REDS as stale" 1 "$d" "STALE WAIVER"
 git -C "$d" reset -q --hard "$clean"
@@ -663,7 +756,7 @@ git -C "$d" reset -q --hard "$clean"
 # 2026-09-20, so the gate refused a cutoff nobody re-set; `--pickaxe-regex -S` reads the occurrence
 # count, which a requote or a move leaves at one. The waiver row keeps the graded run at exit 0, so
 # the two outcomes differ in rc and not only in text. Observed RED-first on the `-G` checker.
-printf 'GATE_SELFTESTS=1 bash '"${PFX}run-gates/run-gates.sh"'\t[bar] deliberate, for this arm\n' >> "$d/memory/project/spec-token-waivers.txt"
+printf 'GATE_SELFTESTS=1 bash '"${PFX}${RUN_GATES}/run-gates.sh"'\t[bar] deliberate, for this arm\n' >> "$d/memory/project/spec-token-waivers.txt"
 sed -i 's|^SPEC_DIRECT_CUTOFF="2026-09-01"$|SPEC_DIRECT_CUTOFF=2026-09-01|' "$d/.memory-tree.conf"
 git -C "$d" add -A >/dev/null
 GIT_COMMITTER_DATE=2026-09-20T12:00:00 git -C "$d" commit -qm requote --no-verify
@@ -736,10 +829,11 @@ else echo "arm FAIL  parity: graded $popn + exempt $skipn != the manifest's $leg
 #      in a scratch repo: AC6's staged breaks, AC8's report line and --list rows, and AC1's hit as the
 #      report prints it. Each arm was observed RED on the checker before this join, which printed no
 #      claims line, carried no `scan_claims` and exited 0 over every fixture here.
-MAPKIT="$(dirname "$LINT")/codebase-map"
+MAPKIT="$(git -C "$HERE" rev-parse --show-toplevel)/$CODEBASE_MAP_DIR"
 cat > "$base/claims-direct.py" <<'PYEOF'
 import importlib.util, os, sys
 P = sys.argv[3]   # the install prefix with its slash, handed in by the suite
+RL = sys.argv[4]  # the runlog kit's directory NAME in this install (TOOL-aRepatriatedFork-46)
 spec = importlib.util.spec_from_file_location("cst", sys.argv[1])
 m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m)
 
@@ -782,8 +876,8 @@ runs, hits, clears = m.scan_claims("prose\n```\n" + s + "\n```\n" + s + "\n")
 print_verdict("AC7 fenced copy", len(hits) == 1 and hits[0][0] == 5, [(h[0], h[1]) for h in hits])
 # AC12 -- one fixture per arm, then the active arm with an UPPERCASE verb and with a SHOUTED constant.
 check_one_hit("AC12 active", "`memory/map/features/runlog.md` claims `derive_window_closer`.", "derive_window_closer", "CODE SYMBOL", "active")
-check_one_hit("AC12 passive", f"`{P}runlog/runlog.py` is claimed by `memory/map/features/runlog.md`.", f"{P}runlog/runlog.py", "PATH", "passive")
-check_one_hit("AC12 noun", f"`memory/map/features/runlog.md` makes a claim on `{P}runlog/*.py` here.", f"{P}runlog/*.py", "GLOB", "noun")
+check_one_hit("AC12 passive", f"`{P}{RL}/runlog.py` is claimed by `memory/map/features/runlog.md`.", f"{P}{RL}/runlog.py", "PATH", "passive")
+check_one_hit("AC12 noun", f"`memory/map/features/runlog.md` makes a claim on `{P}{RL}/*.py` here.", f"{P}{RL}/*.py", "GLOB", "noun")
 check_one_hit("AC12 fronted", "`check_count_sources`, which `runlog.md` now claims, stays.", "check_count_sources", "CODE SYMBOL", "fronted")
 check_one_hit("AC12 uppercase verb", "`memory/map/features/runlog.md` CLAIMS `derive_window_closer`.", "derive_window_closer", "CODE SYMBOL", "active")
 check_one_hit("AC12 shouted constant", "`memory/map/features/runlog.md` claims `KIT_MEMORY_TREE_VERSION`.", "KIT_MEMORY_TREE_VERSION", "CODE SYMBOL", "active")
@@ -809,7 +903,7 @@ try:
 except Exception as exc:  # the map kit absent or failing is a FAIL, never a skip
     print_verdict("AC4 live keys", False, "the key enumeration did not run: %r" % exc)
 PYEOF
-claims=$("$PY" "$base/claims-direct.py" "$LINT" "$MAPKIT" "$PFX" 2>&1 | tr -d '\r')
+claims=$("$PY" "$base/claims-direct.py" "$LINT" "$MAPKIT" "$PFX" "$RUNLOG" 2>&1 | tr -d '\r')
 printf '%s\n' "$claims" | grep '^info ' | sed 's/^info /          /'
 check_claims_verdict() { printf '%s\n' "$claims" | grep -qxF "ok $1"; }   # $1 = a label the direct half printed
 print_claims_detail() { printf '%s\n' "$claims" | grep -F "$1" | head -2; }
@@ -879,7 +973,7 @@ cat > "$spec" <<'SPEC'
 
 `real leg`.
 SPEC
-sed -i "s#{PFX}#${PFX}#g" "$spec"   # the quoted heredoc cannot expand the prefix
+sed -i "s#{PFX}#${PFX}#g; s#{RUN_GATES}#${RUN_GATES}#g" "$spec"   # the quoted heredoc cannot expand either
 cat > "$d/memory/builds/tOne/spec/2026-09-02-spec-TOOL-tOne-2.md" <<'SPEC'
 # TOOL-tOne-2 — a second unit, carrying no dossier-claim sentence
 

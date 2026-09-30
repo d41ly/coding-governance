@@ -26,7 +26,7 @@
 # sets core.hooksPath ONLY when unset and NEVER overwrites an already-set value (e.g. a deliberate
 # out-of-tree copy per WIRE-INTO-PROJECT.md §5). Agent-cap wiring is never auto-applied — it would mean
 # rewriting settings.json, the file the SessionStart hook lives in.
-KIT_CHECK_WIRING_VERSION=1.16   # gov:kit check-wiring@1.16 — the deployer's read
+KIT_CHECK_WIRING_VERSION=1.17   # gov:kit check-wiring@1.17 — the deployer's read
 set -u
 # ---- S6: this file's own install prefix, DERIVED ------------------------------------------------
 # TOOL-dRetiredFork-8. Six `tools/<kit>/` literals were spelled here, and `govkit apply` ships these
@@ -339,6 +339,73 @@ resolve_python() {
   return 1
 }
 # <<< resolve_python
+# The sibling-kit resolver (TOOL-aRepatriatedFork-2 S3), INLINED byte-identically from the
+# canonical copy named on its marker line and gated by the resolve-python self-test's parity
+# table. A shell consumer runs it with the python it already resolved, so the receipt rung is
+# read in Python and never parsed in bash. `resolve_kit_dir <python> <home> <anchor> <here>`
+# prints the kit directory REPO-RELATIVE, or the resolver's named refusal on stderr and exits 1.
+resolve_kit_dir() {
+  "$1" -c "$(cat <<'RKD'
+# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
+def resolve_kit_dir(home, anchor, here):
+    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
+
+    1. receipt — the `.governance/install.json` row whose `source` ends in <home>/<anchor> and
+       whose `path` exists inside this tree. The only record of a RENAMED kit dir: no probe finds
+       a memory-recall kit an adopter homed at `scripts/recall/`.
+    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
+    3. refuse — LookupError naming the three places looked; never a guessed prefix.
+    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
+    """
+    import json
+    import pathlib
+    here = pathlib.Path(here).resolve()
+    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
+    receipt = root / ".governance" / "install.json"
+    try:
+        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("path"):
+            continue
+        if str(row.get("source") or "").split("/")[-2:] != [home, anchor]:
+            continue
+        hit = (root / str(row["path"])).resolve()
+        if hit.is_file() and root in hit.parents:
+            return hit.parent
+    probes = (here / home, here.parent / home)
+    for cand in probes:
+        if (cand / anchor).is_file():
+            return cand
+    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
+        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
+# <<< resolve_kit_dir
+RKD
+)"'
+import sys
+try:
+    d = resolve_kit_dir(*sys.argv[1:4])
+except LookupError as e:
+    sys.exit(str(e))
+r = next((p for p in (d, *d.parents) if (p / ".git").exists()), d.anchor)
+print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
+}
+# THE PROBE RUNG, through the sibling-kit resolver (TOOL-aRepatriatedFork-46). It used to be a kit's
+# name typed after this checker's own prefix, which is the class the carried-prefix ban counts. The
+# resolver probes the same two places, `<this dir>/<home>` and one level up, after its own receipt
+# read. It needs python, and this runs as a SessionStart hook on a host that may have none, so a
+# missing launcher costs this rung and SAYS so once; the awk receipt rung above it still runs.
+resolve_kit_file() { # <kit-home> <file> -> <repo-relative kit dir>/<file>, or nothing
+  local py d
+  if ! py=$(resolve_python 2>/dev/null); then
+    [ -n "${_rkf_said:-}" ] || echo "note     resolver  — no usable python, so the probe rung beside this checker did not run; only the install receipt was read" >&2
+    _rkf_said=1
+    return 0
+  fi
+  d=$(resolve_kit_dir "$py" "$1" "$2" "$_KIT_ROOT/$KIT_REL" 2>/dev/null) || return 0
+  printf '%s/%s\n' "$d" "$2"
+}
 PY=$(resolve_python 2>/dev/null) || PY=python3   # gov:literal-python — a NAME a remedy prints when no launcher runs; the owned-hook call then refuses by name
 
 # The merger every remedy names, resolved ONCE across both install layouts. Four arms used to
@@ -493,7 +560,7 @@ check_agentcap() {
   #
   # The guard buys no waiver row: with KIT_REL empty the rung IS the bare spelling, so the
   # form the prefix gate bans never appears in the source.
-  shipped=$(first_of "$(resolve_receipt_path hooks agent-cap.js)" "${KIT_REL:+$KIT_REL/}hooks/agent-cap.js" .claude/hooks/agent-cap.js)
+  shipped=$(first_of "$(resolve_receipt_path hooks agent-cap.js)" "$(resolve_kit_file hooks agent-cap.js)" .claude/hooks/agent-cap.js)
   if [ -z "$shipped" ]; then
     # THE MESSAGE NAMES WHAT THE PROBE ACTUALLY TRIED. It used to advertise three locations
     # for a two-rung probe, one of them a hardcoded install-prefix literal in prose that
@@ -561,7 +628,7 @@ check_scratch_guard() {
   # TWO RUNGS, the receipt and this checker's own prefix. A third, bare root spelling used to follow
   # them, a guess at a layout the derivation had already missed. A miss is now the skip below, which
   # names both rungs (TOOL-aRepatriatedFork-24 S8), and the same holds for the recall and merge arms.
-  frag=$(first_of "$(resolve_receipt_path hooks scratch-guard.fragment.json)" "${KIT_REL:+$KIT_REL/}hooks/scratch-guard.fragment.json")
+  frag=$(first_of "$(resolve_receipt_path hooks scratch-guard.fragment.json)" "$(resolve_kit_file hooks scratch-guard.fragment.json)")
   if [ -z "$frag" ]; then
     local miss; miss=$(derive_receipt_miss hooks scratch-guard.fragment.json)
     echo "skip     scratch   — ${miss:-hooks kit does not ship scratch-guard.fragment.json here (no install-receipt row, and none at ${KIT_REL:+$KIT_REL/}hooks/)}"
@@ -622,7 +689,7 @@ check_recall_opened() {
   local frag smerge marker hookjs rmatcher
   # Resolved by path because the kit is COPIED: <root>/memory-recall/ in an adopter,
   # <root>/$KIT_REL/memory-recall/ in this repo.
-  frag=$(first_of "$(resolve_receipt_path memory-recall recall-opened.fragment.json)" "${KIT_REL:+$KIT_REL/}memory-recall/recall-opened.fragment.json")
+  frag=$(first_of "$(resolve_receipt_path memory-recall recall-opened.fragment.json)" "$(resolve_kit_file memory-recall recall-opened.fragment.json)")
   if [ -z "$frag" ]; then
     local miss; miss=$(derive_receipt_miss memory-recall recall-opened.fragment.json)
     echo "skip     recall    — ${miss:-memory-recall kit not adopted (no recall-opened.fragment.json: no install-receipt row, and none at ${KIT_REL:+$KIT_REL/}memory-recall/)}"
@@ -865,7 +932,7 @@ check_merge_rows() {
   # Resolved by path because the kit is COPIED: <root>/memory-tree/ in an adopter,
   # <root>/$KIT_REL/memory-tree/ here. The remedy string is BUILT from the two resolved paths rather
   # than hand-kept, so it cannot drift from the layout it is describing.
-  drv=$(first_of "$(resolve_receipt_path memory-tree merge-rows.py)" "${KIT_REL:+$KIT_REL/}memory-tree/merge-rows.py")
+  drv=$(first_of "$(resolve_receipt_path memory-tree merge-rows.py)" "$(resolve_kit_file memory-tree merge-rows.py)")
   if [ -z "$drv" ]; then
     local miss; miss=$(derive_receipt_miss memory-tree merge-rows.py)
     echo "skip     merge     — ${miss:-memory-tree merge driver not adopted (no merge-rows.py: no install-receipt row, and none at ${KIT_REL:+$KIT_REL/}memory-tree/)}"
@@ -875,7 +942,7 @@ check_merge_rows() {
   # guaranteed to have; gov's lib-dir `pyrun.sh` is gov-internal and ships nothing, and a wiring that
   # names it in an adopting repo execs a command that cannot start. A driver that never starts never
   # writes %A, so git reports CONFLICT and leaves the path holding OURS-ONLY content with no markers.
-  launcher=$(first_of "$(dirname "$drv")/merge-rows.sh" "${KIT_REL:+$KIT_REL/}lib/pyrun.sh")
+  launcher=$(first_of "$(dirname "$drv")/merge-rows.sh" "$(resolve_kit_file lib pyrun.sh)")
   if [ -z "$launcher" ]; then
     echo "UNWIRED  merge     — $drv is present but no launcher is: expected $(dirname "$drv")/merge-rows.sh beside it. git would exec a command that cannot start, and a driver that never starts leaves OURS-only content with no conflict markers. Fix: re-copy the memory-tree kit"
     unwired=$((unwired+1))

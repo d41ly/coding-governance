@@ -35,10 +35,41 @@ PFX="${KIT_REL:+$KIT_REL/}"
 # between them, because a pin nothing reads is the same nothing as no pin.
 FLOOR_ASSERTIONS=12
 GATE="$(cd "$(dirname "$0")" && pwd)/check-kit-placeholders.py"
-# The launcher is RESOLVED by running it (<prefix>/lib/resolve-python.sh); `PY=` overrides. A bare
-# default here was the parameter-default shape the resolver ban now catches.
-if [ -z "${PY:-}" ] && [ -f "${GATE%/*}/lib/resolve-python.sh" ]; then . "${GATE%/*}/lib/resolve-python.sh"; PY=$(resolve_python) || exit 2; fi
-PY=${PY:-python}   # gov:literal-python — last-resort fallback when lib/ is absent (adopter layout)
+# The launcher is RESOLVED by running it; `PY=` overrides. A bare default here was the
+# parameter-default shape the resolver ban now catches. TOOL-aRepatriatedFork-46: the resolver is
+# carried INLINE; it was sourced from the library directory beside this suite, which ships nowhere.
+# >>> resolve_python — canonical copy: resolve-python.sh in gov's lib dir (byte-identical; gated)
+resolve_python() {
+  # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
+  # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
+  # the candidate and every consumer uses "$PY" as a single word (measured: exit 127).
+  _rp_tried=""
+  for _rp_c in "${1:-}" "${GOV_PYTHON:-}" python3 python py; do
+    [ -n "$_rp_c" ] || continue
+    _rp_tried="$_rp_tried $_rp_c"
+    if "$_rp_c" -c "import sys" >/dev/null 2>&1; then
+      printf '%s\n' "$_rp_c"
+      return 0
+    fi
+  done
+  {
+    echo "resolve_python: no usable python launcher. Each candidate was RUN with -c 'import sys' and"
+    echo "resolve_python: none exited 0 — being on PATH is not evidence (the Microsoft Store python3"
+    echo "resolve_python: stub answers \`command -v\` and exits 9009 without running anything)."
+    echo "resolve_python: tried:$_rp_tried"
+    if [ -n "${1:-}" ]; then
+      echo "resolve_python: the caller's override '$1' was tried FIRST and did not run."
+    fi
+    if [ -n "${GOV_PYTHON:-}" ]; then
+      echo "resolve_python: GOV_PYTHON is set to '$GOV_PYTHON' and did not run. An override that is"
+      echo "resolve_python: set and unusable is THIS failure, never a silent fall-through — the"
+      echo "resolve_python: operator believes they chose, and would not have."
+    fi
+  } >&2
+  return 1
+}
+# <<< resolve_python
+[ -n "${PY:-}" ] || PY=$(resolve_python) || exit 2
 pass=0; fail=0
 
 arm() {              # $1 = what it asserts, $2 = expected rc, $3 = actual rc, $4 = haystack, $5 = needle
