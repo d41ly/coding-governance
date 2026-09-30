@@ -443,3 +443,8 @@
 - KEEP · TOOL-dDerivedDocket-75 · owner ruling on a parked decision, 2026-09-30; wanted after this build closed, outside its goal
 - SEV · TOOL-dDerivedDocket-76 · MED · the unattended kit shipped with its own suites unread after its last fixes
 - KEEP · TOOL-dDerivedDocket-76 · owner ruling on a parked decision, 2026-09-30; wanted after this build closed, outside its goal
+- SCOPE · TOOL-dDerivedDocket-70 · seen `tools/unattended/unattended.sh` matching `print_selftests_owed`
+- SCOPE · TOOL-dDerivedDocket-71 · seen `tools/unattended/unattended.sh` matching `DIRECTIVES_CORE=`
+- SCOPE · TOOL-dDerivedDocket-72 · seen `tools/memory-tree/BUILD-METHOD.template.md` matching `unattended.sh --resume <slug>`
+- SCOPE · TOOL-dDerivedDocket-73 · seen `tools/unattended/PROTOCOL.template.md` matching `full merge bar ran on the tip being landed and passed`
+- SCOPE · TOOL-dDerivedDocket-74 · seen `tools/unattended/unattended.sh` matching `no driver verb commits`
