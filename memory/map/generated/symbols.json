@@ -5945,6 +5945,11 @@
     {
       "id": "resolve_prefix_token",
       "kind": "function",
+      "file": "tools/govkit/fixtures/make_adopter_receipt.py"
+    },
+    {
+      "id": "resolve_prefix_token",
+      "kind": "function",
       "file": "tools/govkit/govkit.py"
     },
     {

@@ -121,7 +121,7 @@ fail=0
 # than written as a literal. A hardcoded count is the recorded failure this leg exists for.
 # 132, not 134: arms 1c/1d/1e SKIP on a host with no runnable `timeout -k`, so the floor is the
 # skipped-host count. A floor set to the lucky-host figure reds every box without coreutils.
-FLOOR_ASSERTIONS=149
+FLOOR_ASSERTIONS=150
 n=0
 # The manifest, derived exactly as run-gates.sh derives it: this kit's dir SIBLING. Hardcoding
 # `<prefix>/gate-legs.json` here would be a gov spelling in a harness that now ships (S1/S3).
@@ -347,28 +347,69 @@ rm -rf "$ctl"
 #     typo, a renamed kit or a deleted file skips on EVERY scoped run, forever, printing a reassuring
 #     `GATE skip`. Checked against `git ls-files` rather than the filesystem, because the guard is a
 #     pathspec git resolves, and an untracked file is invisible to it.
+#     RESOLVED FIRST, as the runner resolves it (closing review round 1 H2): the manifest spells its
+#     guards through the `{prefix}` token since TOOL-aRepatriatedFork-29, and this arm compared the
+#     raw spelling, so 114 guards read as matching nothing. The tool root is this kit's parent.
+TROOT=$(dirname "$KITREL")
 n=$((n+1))
 "$PYBIN" -c '
 import json, subprocess, sys
+# >>> resolve_prefix_token -- canonical copy: resolve_prefix_token.py in the gov lib dir (byte-identical; gated)
+def resolve_prefix_token(spelled, troot):
+    """<spelled> with its {prefix} token resolved against the tool root <troot>.
+
+    An empty or "." root is a root install: the token drops with its slash, and a bare token
+    becomes ".". Any other root replaces the token. Text with no token passes unchanged.
+    """
+    spelled = str(spelled)
+    if not troot or troot == ".":
+        return spelled.replace("{prefix}/", "").replace("{prefix}", ".")
+    return spelled.replace("{prefix}", troot)
+# <<< resolve_prefix_token
 tracked = subprocess.run(["git","ls-files"],capture_output=True,text=True).stdout.split()
 bad = []
 for l in json.load(open(sys.argv[1])):
     for g in l.get("guard", []):
+        g = resolve_prefix_token(g, sys.argv[2])
         if not any(t == g or t.startswith(g) for t in tracked):
             bad.append("%s -> %s" % (l["name"], g))
 if bad:
     print("canary: guard pathspec matches no tracked path (the leg would skip forever): " + "; ".join(bad))
     sys.exit(1)
-' "$LEGS_FILE" || fail=1
+' "$LEGS_FILE" "$TROOT" || fail=1
 
 # 2. no leg SCRIPT-PATH arg (argv[1..] that looks like a path) is hardcoded in run-gates.sh —
 #    launcher tokens (bash/python/python3) and flags are excluded; the parse path is the manifest
 #    filename, not a leg path, so it never matches.
+#    Each arg is RESOLVED before the grep (closing review round 1 M2): an inlined leg sits in the
+#    runner at its real path and never as `{prefix}/x.sh`, so grepping the raw spelling could not fire.
 paths=$("$PYBIN" -c '
 import json, sys
-rows = [a for l in json.load(open(sys.argv[1])) for a in l["argv"][1:] if "/" in a or a.endswith(".sh") or a.endswith(".py")]
+# >>> resolve_prefix_token -- canonical copy: resolve_prefix_token.py in the gov lib dir (byte-identical; gated)
+def resolve_prefix_token(spelled, troot):
+    """<spelled> with its {prefix} token resolved against the tool root <troot>.
+
+    An empty or "." root is a root install: the token drops with its slash, and a bare token
+    becomes ".". Any other root replaces the token. Text with no token passes unchanged.
+    """
+    spelled = str(spelled)
+    if not troot or troot == ".":
+        return spelled.replace("{prefix}/", "").replace("{prefix}", ".")
+    return spelled.replace("{prefix}", troot)
+# <<< resolve_prefix_token
+rows = [resolve_prefix_token(a, sys.argv[2]) for l in json.load(open(sys.argv[1])) for a in l["argv"][1:] if "/" in a or a.endswith(".sh") or a.endswith(".py")]
 sys.stdout.buffer.write(("\n".join(rows) + ("\n" if rows else "")).encode())   # LF bytes (Windows text stdout is CRLF)
-' "$LEGS_FILE")
+' "$LEGS_FILE" "$TROOT")
+# ...and that population is REAL PATHS (closing review round 1 M2). A grep over spellings nothing
+# tracks is an arm that cannot fire, and it reports ok. Every arg must name a tracked path.
+n=$((n+1))
+unreal=$(printf '%s\n' "$paths" | "$PYBIN" -c '
+import subprocess, sys
+tracked = subprocess.run(["git","ls-files"],capture_output=True,text=True).stdout.split()
+print(" ".join(p for p in sys.stdin.read().split() if not any(t == p or t.startswith(p) for t in tracked)))
+')
+[ -z "$paths" ] && unreal="<the population is empty>"
+[ -z "$unreal" ] || { echo "canary: arm 2 would grep for leg paths that name no tracked path, so it could not fire: $unreal"; fail=1; }
 # ONE assertion over a population, counted once. Incrementing per iteration made the reported count
 # track the MANIFEST SIZE rather than the assertion set, so the floor would red the day a leg was
 # removed — a count that moves for reasons unrelated to the arms is not a count of the arms.

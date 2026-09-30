@@ -216,8 +216,19 @@ def derive_gate_runner(root: Path, _a: dict) -> str:
     # at two hard-coded prefixes, so a runner installed anywhere else rendered no bar at all. It now
     # probes under the TARGET'S kit root: the deploy answer's `prefix` when it states one, else every
     # directory at depth 1 or 2 holding the kit — and only an unambiguous single answer is taken.
+    #
+    # `prefix` IS A TOP-LEVEL deploy.toml KEY, never an `[answers]` one (closing review round 1 M1):
+    # `govkit intake` writes it only at the top, and `_a` is the `[answers]` table, so this read
+    # found nothing and every flat runner below went unreachable. The target's own file is read
+    # when the answers do not carry it.
     home, anchor = 'run-gates', 'run-gates.sh'
     pfx = _a.get('prefix') if isinstance(_a, dict) else None
+    if not pfx:
+        try:
+            pfx = tomllib.loads((top / '.governance' / 'deploy.toml').read_text(
+                encoding='utf-8')).get('prefix')
+        except (OSError, ValueError):
+            pfx = None
     roots = [pfx.strip('/')] if isinstance(pfx, str) and pfx.strip('/') else sorted(
         {p.parent.parent.relative_to(top).as_posix()
          for pat in ('*/', '*/*/') for p in top.glob(f'{pat}{home}/{anchor}')
@@ -944,6 +955,26 @@ def run_selftest() -> int:
         failed += 1
         print(f'  arm FAIL the bar fallback probes the target kit root — got {one!r} then {two!r}')
 
+    # TOOL-aRepatriatedFork-29 AC11 (closing review round 1 M1) — a FLAT runner under the prefix the
+    # target's deploy.toml declares at its top level, which is where intake writes it. One arm per
+    # flat candidate main used to find; `7de665e5` read the prefix out of `[answers]` and rendered none.
+    # The third prefix is this engine's own tool root, DERIVED: typed, it is a kit-path literal.
+    flat = []
+    own_root = Path(__file__).resolve().parent.parent.name
+    for pfx, rel in (('scripts', 'gate.sh'), ('scripts', kit_anchor), (own_root, kit_anchor)):
+        with tempfile.TemporaryDirectory() as td:
+            tgt = Path(td) / 'tgt'
+            (tgt / '.governance').mkdir(parents=True)
+            (tgt / '.governance' / 'deploy.toml').write_text(f'prefix = "{pfx}"\n', encoding='utf-8')
+            (tgt / pfx).mkdir()
+            (tgt / pfx / rel).write_text('#!/bin/sh\n', encoding='utf-8')
+            flat.append((derive_gate_runner(tgt, read_deploy(tgt)[2]), f'bash {pfx}/{rel}'))
+    if all(got == want for got, want in flat):
+        passed += 1
+    else:
+        failed += 1
+        print(f'  arm FAIL a flat runner under the top-level deploy prefix renders — got {flat!r}')
+
     if failed:
         print(f'render_playbook.selftest FAILED — {failed} of {passed + failed} arm(s)')
         return 1
@@ -1039,4 +1070,4 @@ def main(argv: list[str]) -> int:
 if __name__ == '__main__':
     raise SystemExit(main(sys.argv[1:]))
 
-KIT_PLAYBOOK_RENDER_VERSION = "1.17"  # gov:kit playbook-render@1.17
+KIT_PLAYBOOK_RENDER_VERSION = "1.18"  # gov:kit playbook-render@1.18

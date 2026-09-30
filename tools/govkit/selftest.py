@@ -6816,6 +6816,24 @@ user_skills = "/tmp/gk-fake-skills"
         # TOOL-aRepatriatedFork-30 S8: the ADOPTER's paths go through the same token, and it is
         # resolved by FIELD — gov's tool root for a `source`, the adopter's recorded root for a
         # `path` — because the token names the root of the tree the path lives in.
+        # TOOL-aRepatriatedFork-29 AC12 (closing review round 1 L2) -- THE REGENERATOR'S OWN READ of
+        # gov's registry, at this checkout's pinned revision, where descriptors are spelled through
+        # `{prefix}` and homes are kit-relative. `7de665e5` handed the raw spelling to `git show`,
+        # every read came back empty, and the map it returned was empty with nothing said. Every
+        # entry needs a home, and every home must be a directory this revision tracks files under.
+        _mspec = importlib.util.spec_from_file_location(
+            "make_adopter_receipt", GOVKIT.parent / "fixtures" / "make_adopter_receipt.py")
+        _mar = importlib.util.module_from_spec(_mspec)
+        _mspec.loader.exec_module(_mar)
+        _homes = _mar.resolve_kit_homes(GOV_HEAD)
+        _ents = run_gov_git(HERE.parents[1], "show",
+                            f"{GOV_HEAD}:{PFX}{HERE.name}/registry.toml").count("[[entry]]")
+        _tree = run_gov_git(HERE.parents[1], "ls-tree", "-r", "--name-only", GOV_HEAD).split()
+        check("[aRF-29 AC12] the fixture regenerator derives a tracked home for every registry entry",
+              _ents > 0 and len(_homes) == _ents
+              and all(any(t.startswith(h + "/") for t in _tree) for h in _homes.values()),
+              f"{len(_homes)} home(s) for {_ents} entr(ies): {sorted(_homes.items())[:4]}")
+
         _fx9 = json.loads((GOVKIT.parent / "fixtures" / "adopter-ic-2cff5855.receipt.json")
                           .read_text(encoding="utf-8"))
         _fx9tr = _fx9["provenance"]["target_tool_root"]

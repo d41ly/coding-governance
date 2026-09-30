@@ -169,18 +169,50 @@ def render_token(src: str, rev_pfx: str) -> str:
     return "{prefix}/" + src[len(rev_pfx):] if rev_pfx and src.startswith(rev_pfx) else src
 
 
+# The `{prefix}` resolution (TOOL-aRepatriatedFork-47), INLINED byte-identically from the canonical
+# copy named on its marker line and gated by the resolve-python self-test.
+# >>> resolve_prefix_token -- canonical copy: resolve_prefix_token.py in the gov lib dir (byte-identical; gated)
+def resolve_prefix_token(spelled, troot):
+    """<spelled> with its {prefix} token resolved against the tool root <troot>.
+
+    An empty or "." root is a root install: the token drops with its slash, and a bare token
+    becomes ".". Any other root replaces the token. Text with no token passes unchanged.
+    """
+    spelled = str(spelled)
+    if not troot or troot == ".":
+        return spelled.replace("{prefix}/", "").replace("{prefix}", ".")
+    return spelled.replace("{prefix}", troot)
+# <<< resolve_prefix_token
+
+
 def resolve_kit_homes(gov_rev: str) -> dict[str, str]:
-    """kit id -> `home`, read from gov's own registry at the recorded commit."""
-    reg = tomllib.loads(read_gov_text(gov_rev, f"{derive_rev_prefix(gov_rev)}{HERE.parent.name}/registry.toml"))
+    """kit id -> `home` REPO-relative, read from gov's own registry at the recorded commit.
+
+    Closing review round 1 L2. From TOOL-aRepatriatedFork-29 on, a registry spells each descriptor
+    through the `{prefix}` token and each descriptor's `home` is KIT-relative (`memory-tree`, `.`).
+    This read passed the raw spelling to `git show`, every read came back empty, and a `continue`
+    turned that into an empty map. The token is resolved against that revision's own tool root, a
+    tokened descriptor's home is joined to it unless it declares `home_root_relative`, and a
+    descriptor that reads empty is a refusal.
+    """
+    rev_pfx = derive_rev_prefix(gov_rev)
+    troot = rev_pfx.rstrip("/")
+    reg = tomllib.loads(read_gov_text(gov_rev, f"{rev_pfx}{HERE.parent.name}/registry.toml"))
     homes: dict[str, str] = {}
     for entry in reg.get("entry", []):
-        txt = read_gov_text(gov_rev, entry["descriptor"])
+        spelled = entry["descriptor"]
+        txt = read_gov_text(gov_rev, resolve_prefix_token(spelled, troot))
         if not txt.strip():
-            continue
+            raise SystemExit(f"gov {gov_rev}: entry {entry['id']}'s descriptor {spelled} reads empty "
+                             f"there, so its home is not derivable")
         try:
-            homes[entry["id"]] = (tomllib.loads(txt).get("home") or "").rstrip("/")
+            desc = tomllib.loads(txt)
         except tomllib.TOMLDecodeError:
             continue
+        home = (desc.get("home") or "").rstrip("/")
+        if "{prefix}" in spelled and not desc.get("home_root_relative"):
+            home = troot if home in ("", ".") else "/".join(x for x in (troot, home) if x)
+        homes[entry["id"]] = home
     return homes
 
 
