@@ -8800,6 +8800,18 @@ ipgit mv kitsurface/thing.txt moved-out.txt
 ipgit commit -q -m "rename out of the declared prefix" --no-verify
 out=$(iprun --phase tRun VERIFYING --witness "$(ipgit rev-parse HEAD)")
 hit  "$out" "touches a declared self-test surface (kitsurface/)"
+# ---- closing review round 2, L2: a path whose name holds a TAB under the declared prefix, and
+# ---- nothing else, owes the flagged bar too. `core.quotepath=off` still C-quotes such a path, so the
+# ---- read is NUL-delimited. The path is committed through the index alone with protectNTFS off, since
+# ---- no Windows worktree can hold it, and the next ipreset's forced checkout drops it like any commit.
+ipreset
+iprun --preflight tRun --keepalive-id k1 >/dev/null
+ipgit add -A >/dev/null && ipgit commit -q -m fixture --no-verify
+ip_blob=$(printf 'tab\n' | ipgit hash-object -w --stdin)
+printf '100644 %s\tkitsurface/a\tb.sh\0' "$ip_blob" | ipgit -c core.protectNTFS=false update-index -z --index-info
+ipgit -c core.protectNTFS=false commit -q -m "a tab-bearing path under the declared prefix" --no-verify
+out=$(iprun --phase tRun VERIFYING --witness "$(ipgit rev-parse HEAD)")
+hit  "$out" "touches a declared self-test surface (kitsurface/)"
 # ---- closing review M2: the REMEDY the notice prints is EXERCISED, not read. The export is cut
 # ---- from the notice's own text and applied to the one --close exactly as printed, under BOTH
 # ---- modes, and the bar stub's own environment must carry both flags: under `primary` the close

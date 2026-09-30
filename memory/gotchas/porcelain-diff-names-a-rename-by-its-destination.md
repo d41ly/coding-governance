@@ -24,23 +24,28 @@ with `--name-only` a detected rename is ONE line, the new path. Plumbing (`git d
 plumbing never showed the gap, and why the gap goes unseen by anyone who tested with edits.
 
 Two quieter arms of the same read: a path outside ASCII is printed QUOTED under the default
-`core.quotePath`, so it cannot prefix-match anything; and a `$(git diff ...)` that FAILS yields the
-empty string, which reads exactly like a range that touched nothing.
+`core.quotePath`, so it cannot prefix-match anything, and `core.quotePath=off` does not cure that
+whole, because git still C-quotes a path holding a tab, a double quote, a backslash or a newline;
+and a `$(git diff ...)` that FAILS yields the empty string, which reads exactly like a range that
+touched nothing.
 
 ## Where it bit
 
 `print_selftests_owed` in `tools/unattended/unattended.sh`, the owed flagged-bar notice built by
 TOOL-dAlignedCarrier-6. Its closing diff review, round 1, finding L1, reproduced it: after a
 git mv of tools/k/a.sh to memory/a.sh, the default name-only diff printed the destination alone, and
-`--no-renames` printed the source too. The fold made the read
+`--no-renames` printed the source too. The round-1 fold made the read
 `GIT -c core.quotepath=off diff --no-renames --name-only`, and a failed diff now announces the
-answer is unknown instead of reading as untouched.
+answer is unknown instead of reading as untouched. Round 2, finding L2, showed the quoting half was
+overclaimed: a committed file under the declared prefix whose name held a tab printed as a quoted
+string under `quotepath=off` and matched no prefix. The read is now `GIT diff --no-renames --name-only -z`, split NUL-delimited and
+matched inside a `pipefail` pipeline.
 
 ## The fix
 
 A touched-set read that is PREFIX-MATCHED passes `--no-renames` (so both sides of a rename are named)
-and `-c core.quotepath=off` (so a path is compared as it is spelled), and treats a failed diff as
-"unknown", never as an empty range. A read that only asks "did anything change besides these two
+and `-z` (so every path prints verbatim, NUL-terminated, and is matched whole; `quotepath=off` is
+inert beside it), and treats a failed diff, across the pipe, as "unknown", never as an empty range. A read that only asks "did anything change besides these two
 named paths" does not need it: a rename still surfaces its destination, which is a change.
 
 ## The gate

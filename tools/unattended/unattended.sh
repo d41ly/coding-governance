@@ -7101,8 +7101,9 @@ check_inplace_preconditions() { # slug -> 0 when the bar may run over a prepared
 # Done names the pair. Under `in-place` the close adds `GATE_FULL=1` itself, but under `primary` its
 # bar carries none, so an export of the flag alone lifted the hold and left every guarded self-test leg
 # whose guard the branch did not move reporting `skip`: a guard-scoped run, not the flagged bar. The
-# pair is redundant and harmless under `in-place`, so one spelling serves both modes, and the driver
-# still sets neither.
+# pair's `GATE_FULL` half is redundant and harmless under `in-place`, so one spelling serves both
+# modes. The driver never sets `GATE_SELFTESTS`; the `GATE_FULL=1` of the in-place close is its own
+# (TOOL-dDerivedDocket-3 S3), which is WHY that half is redundant there (closing review round 2, M2).
 #
 # THE RANGE is the pinned `base` fact to HEAD, a recorded value read offline, because no prepared
 # merge exists yet at VERIFYING (spec §8 F2). After a merge brings in another landing's kit commits
@@ -7110,8 +7111,11 @@ check_inplace_preconditions() { # slug -> 0 when the bar may run over a prepared
 # That "never one fewer" holds only because the read names BOTH sides of a rename (`--no-renames`):
 # a porcelain diff detects renames by default and names one by its destination alone, so a range
 # whose only touch was moving a file OUT of a declared prefix read as untouched (closing review L1).
-# Paths are read unquoted (`core.quotepath=off`) so a non-ASCII path still prefix-matches, and a
-# diff that fails announces that the answer is unknown rather than reading as an empty range.
+# Names are read NUL-delimited (`-z`), which prints every path verbatim: `core.quotepath=off` stops
+# quoting only non-ASCII bytes, and git still C-quotes a path holding a tab, a double quote, a
+# backslash or a newline, which no prefix then matches (closing review round 2, L2). Each name is
+# matched WHOLE inside the pipeline, so only the prefixes it touched leave it, and `pipefail` there
+# makes a diff that fails announce that the answer is unknown rather than read as an empty range.
 print_selftests_owed() { # run-state file -> announces when the run's range owes the flagged bar
   local _p _q _hit="" _touched _b
   # BLANK IS NEVER, AND IT SAYS SO. A skip that looks like a pass is indistinguishable from
@@ -7131,20 +7135,22 @@ print_selftests_owed() { # run-state file -> announces when the run's range owes
     echo "unattended: the record's base ${_b:0:8} does not resolve in this clone, so the range that decides whether the flagged bar is owed cannot be read, and no notice is printed; whether it is owed is unanswerable here, not no"
     return 0
   fi
-  _touched=$(GIT -c core.quotepath=off diff --no-renames --name-only "$_b" HEAD 2>/dev/null) || {
+  _touched=$(set -o pipefail
+    GIT diff --no-renames --name-only -z "$_b" HEAD 2>/dev/null |
+      while IFS= read -r -d '' _p; do
+        for _q in $SELFTESTS_OWED_PATHS; do
+          case "$_p" in "$_q"*) printf '%s\n' "$_q" ;; esac
+        done
+      done) || {
     echo "unattended: the run's range ${_b:0:8}..HEAD could not be diffed, so whether the flagged bar is owed is unanswerable here, not no"
     return 0
   }
-  while IFS= read -r _p; do
-    [ -n "$_p" ] || continue
-    for _q in $SELFTESTS_OWED_PATHS; do
-      case "$_p" in
-        "$_q"*) case " $_hit " in *" $_q "*) ;; *) _hit="$_hit $_q" ;; esac ;;
-      esac
-    done
+  while IFS= read -r _q; do
+    [ -n "$_q" ] || continue
+    case " $_hit " in *" $_q "*) ;; *) _hit="$_hit $_q" ;; esac
   done < <(printf '%s\n' "$_touched")
   [ -n "$_hit" ] || return 0
-  echo "unattended: the run's range ${_b:0:8}..HEAD touches a declared self-test surface (${_hit# }), so the kit Definition of Done owes the flagged bar: export GATE_FULL=1 GATE_SELFTESTS=1 into this run's one --close, whose bar inherits both; this driver sets neither"
+  echo "unattended: the run's range ${_b:0:8}..HEAD touches a declared self-test surface (${_hit# }), so the kit Definition of Done owes the flagged bar: export GATE_FULL=1 GATE_SELFTESTS=1 into this run's one --close, whose bar inherits both; this driver never sets GATE_SELFTESTS"
 }
 
 # S4 - THE CARRY CHECK, ASKED BEFORE ANY WRITE. A landing that would publish another build's

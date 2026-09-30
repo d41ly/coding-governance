@@ -24,8 +24,8 @@ gotcha-classes = ["reflowed-prompt-string-reads-as-a-deleted-stop.md", "text-mod
   "process-creation-is-the-suite-cost.md", "trace-profile-measures-itself.md",
   "fallback-fabricates-the-passing-value.md", "two-readers-of-one-config-one-re-derived.md",
   "destructive-step-before-its-precondition.md", "line-count-reads-empty-capture-as-one.md",
-  "guard-fed-the-value-it-supersedes.md", "witness-graded-against-a-fact-written-after-it.md"
-]
+  "guard-fed-the-value-it-supersedes.md", "witness-graded-against-a-fact-written-after-it.md",
+  "porcelain-diff-names-a-rename-by-its-destination.md"]
 guides = ["UNATTENDED-PROTOCOL.md", "UNATTENDED-VERBS.md", "UNATTENDED-STOPS.md", "UNATTENDED-ASKS.md"]
 backlog-shards = []
 lexicon-verbs = []
@@ -118,8 +118,8 @@ containment in either direction; the driver refuses such a conf at load and the 
 **The run-state file is split mechanically, not by discipline.** The generated region is EMPTY by
 contract and the gate asserts it holds no copy: the unit list is DERIVED from the build README on
 every read, so "current" is the absence of a second answer rather than a comparison between two. The authored region holds only the facts nothing in the tree derives, enumerated in the
-protocol's own section 2 and deliberately not counted here — three carriers once held three different
-counts of them at once.
+protocol's own section 2 and not counted here: three carriers once held three counts of them at
+once.
 
 **The template is byte-gated and this feature is kit-conditional.** The unattended rules first landed
 in the domain-rules companion (§1) to stay inside the byte ceiling; v3.0 converged that companion into
@@ -132,7 +132,7 @@ check 18 keeps the template's FIRST kickoff mention below its first `--preflight
 mention sits far under both.
 
 **A run is bound by a set of named directives, and each is a POINTER.** The count lives in the
-driver's `DIRECTIVES_CORE` and in nothing else here, because this sentence has already been wrong
+driver's `DIRECTIVES_CORE` and nowhere here, because this sentence has already been wrong
 about it once. The set is a kit constant the project may extend but not delete; the rules live in the build method and the contract names zero
 handles, because naming them twice is the drift the design exists to avoid. A waiver is the owner's,
 taken at preflight and nowhere else — enforced by one branch rather than promised, so a later verb

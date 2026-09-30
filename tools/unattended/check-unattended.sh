@@ -5474,8 +5474,17 @@ fi
 # ---- comment marker (`#`, `//`, `*` or `<!--`) stripped; the lines joined by one space, whitespace
 # ---- squeezed, the whole folded to lower case. A wrap inside a comment or a paragraph therefore reads
 # ---- as one sentence, which is the shape the retired greps could not see. The join is a window of the
-# ---- previous six words plus the current line, which holds the widest instance the pattern admits,
-# ---- and a match is reported only where it ends on the current line, so each is named once.
+# ---- previous SEVEN words plus the current line, which holds the widest instance either row admits,
+# ---- row 2's eight words, and a match is reported only where it ends on the current line, so each is
+# ---- named once. Six words, the width row 1 needs, let row 2 through when a wrap fell before its last
+# ---- word (closing review round 2, L1).
+# ----
+# ---- EVERY ROW'S PATTERN ENDS BY CONSUMING ONE BOUNDARY CHARACTER after its last word, and the scanner
+# ---- strips that character, and the leading one, from the excerpt it reports and from the end offset
+# ---- it dedups on. Row 1 ends in a non-word byte; row 2 ends in the rest of its last word and the
+# ---- space after it, which the window always carries, so its matched set is what a bare word stem
+# ---- matched and its excerpt is whole (closing review round 2, L4: the stem lost a letter from every
+# ---- excerpt). A new row owes the same ending.
 # ----
 # ---- THE PREDICATE, word-bounded, one pattern per row. ROW 1, two alternatives: the word `no`, at
 # ---- most two words, the word `verb`, at most two words, then the third-person form of commit; or the
@@ -5495,7 +5504,7 @@ fi
 # ---- to its template. A match inside a string literal counts like one in prose, because the premise
 # ---- misleads a reader either way.
 _c47_re='[^a-z0-9_]no( [^ ]+)?( [^ ]+)?[ ]verb( [^ ]+)?( [^ ]+)?[ ]commits[^a-z0-9_]|[^a-z0-9_]nothing[ ]commits[ ]it[^a-z0-9_]'
-_c47_re2='[^a-z0-9_]in-place[^ ]*( [^ ]+)?( [^ ]+)?[ ]close[^ ]*( [^ ]+)?( [^ ]+)?( [^ ]+)?[ ]announc|[^a-z0-9_]announc[^ ]*( [^ ]+)?( [^ ]+)?( [^ ]+)?[ ]in-place[^ ]*[ ]close'
+_c47_re2='[^a-z0-9_]in-place[^ ]*( [^ ]+)?( [^ ]+)?[ ]close[^ ]*( [^ ]+)?( [^ ]+)?( [^ ]+)?[ ]announc[^ ]*[ ]|[^a-z0-9_]announc[^ ]*( [^ ]+)?( [^ ]+)?( [^ ]+)?[ ]in-place[^ ]*[ ]close[^ ]*[ ]'
 _c47_files=()
 while IFS= read -r _c47_p; do
   [ -f "$_c47_p" ] && _c47_files+=("$_c47_p")
@@ -5504,7 +5513,8 @@ if [ "${#_c47_files[@]}" -eq 0 ]; then
   report "check 47 did not grade this kit's shipped files for the retired premises - ls-files listed none under $KITREL"
 else
   report "check 47 graded ${#_c47_files[@]} shipped file(s) of this kit for the retired premises, two rows"
-  # ONE SCANNER, HELD ONCE AND RUN PER ROW, so the two rows cannot drift into two normalisations.
+  # ONE SCANNER, HELD ONCE AND RUN PER ROW, so the two rows cannot drift into two normalisations. Its
+  # excerpt and its end offset rely on the header's trailing-boundary contract, which every row keeps.
   _c47_awk='
       BEGIN { re = ENVIRON["RE"] }
       FNR == 1 { if (hits != "") out = out (out == "" ? "" : "; ") cur ": " hits
@@ -5522,7 +5532,7 @@ else
           off = e; s = substr(s, RSTART + RLENGTH - 1)
         }
         k = split(w, tk, " "); tail = ""
-        for (i = (k > 6 ? k - 5 : 1); i <= k; i++) tail = tail (tail == "" ? "" : " ") tk[i]
+        for (i = (k > 7 ? k - 6 : 1); i <= k; i++) tail = tail (tail == "" ? "" : " ") tk[i]
       }
       END { if (hits != "") out = out (out == "" ? "" : "; ") cur ": " hits
             printf "%s", out }'

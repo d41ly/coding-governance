@@ -10,8 +10,8 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 
 ## Run facts
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: e01f2ad9dee470063d7fa962c9812f34ffba5744
-phase: REVIEWING
+witness: 3e17abf639974f6b4aa9ce046f649bcce640d9c7
+phase: FOLDING
 asks-ready: TOOL-dDerivedDocket-70=yes TOOL-dDerivedDocket-71=yes TOOL-dDerivedDocket-72=yes TOOL-dDerivedDocket-73=yes TOOL-dDerivedDocket-74=yes
 asks: TOOL-dDerivedDocket-70..74
 m-base: 87c245b3e950cbf7bc46b8216db8b4e4fba253dd
@@ -79,3 +79,9 @@ base: 87c245b3e950cbf7bc46b8216db8b4e4fba253dd
 2026-09-30T18:37:58Z dispatch · item 14564580 TOOL-dAlignedCarrier-6 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/check-unattended.sh tools/unattended/check-unattended.test.sh tools/unattended/SKILL.template.md .claude/skills/unattended/SKILL.md tools/unattended/PROTOCOL.template.md memory/guides/UNATTENDED-PROTOCOL.md tools/unattended/.unattended.conf.example .unattended.conf memory/guides/SESSION-KICKOFF.md memory/builds/dAlignedCarrier/spec/2026-09-30-spec-TOOL-dAlignedCarrier-6.md memory/builds/dAlignedCarrier/build/2026-09-30-build-TOOL-dAlignedCarrier-6-1-acceptance-ledger.md memory/builds/dAlignedCarrier/README.md memory/backlog/TOOL.md memory/LIVE.md memory/ledger/2026-09.md memory/gotchas/porcelain-diff-names-a-rename-by-its-destination.md memory/gotchas/INDEX.md
 
 2026-09-30T18:38:02Z brief · item TOOL-dAlignedCarrier-6 · reason 40ddd8b74e3b memory/builds/dAlignedCarrier/prompts/2026-09-30-prompt-TOOL-dAlignedCarrier-6-fold-brief.md
+
+2026-09-30T20:08:01Z dispatch · item 3e17abf6 TOOL-dAlignedCarrier-6 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/check-unattended.sh tools/unattended/check-unattended.test.sh tools/unattended/SKILL.template.md .claude/skills/unattended/SKILL.md tools/unattended/PROTOCOL.template.md memory/guides/UNATTENDED-PROTOCOL.md tools/unattended/.unattended.conf.example .unattended.conf memory/guides/SESSION-KICKOFF.md memory/builds/dAlignedCarrier/spec/2026-09-30-spec-TOOL-dAlignedCarrier-6.md memory/builds/dAlignedCarrier/build/2026-09-30-build-TOOL-dAlignedCarrier-6-1-acceptance-ledger.md memory/builds/dAlignedCarrier/README.md memory/backlog/TOOL.md memory/LIVE.md memory/ledger/2026-09.md memory/gotchas/porcelain-diff-names-a-rename-by-its-destination.md memory/gotchas/INDEX.md memory/map/features/unattended.md memory/map/generated/inventories.json memory/map/generated/MAP.md
+
+2026-09-30T20:08:09Z brief · item TOOL-dAlignedCarrier-6 · reason c717c809d446 memory/builds/dAlignedCarrier/prompts/2026-09-30-prompt-TOOL-dAlignedCarrier-6-fold2-brief.md
+
+2026-09-30T20:16:05Z dispatch · item 3e17abf6 TOOL-dAlignedCarrier-6 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/check-unattended.sh tools/unattended/check-unattended.test.sh tools/unattended/SKILL.template.md .claude/skills/unattended/SKILL.md tools/unattended/PROTOCOL.template.md memory/guides/UNATTENDED-PROTOCOL.md tools/unattended/.unattended.conf.example .unattended.conf memory/guides/SESSION-KICKOFF.md memory/builds/dAlignedCarrier/spec/2026-09-30-spec-TOOL-dAlignedCarrier-6.md memory/builds/dAlignedCarrier/build/2026-09-30-build-TOOL-dAlignedCarrier-6-1-acceptance-ledger.md memory/builds/dAlignedCarrier/README.md memory/backlog/TOOL.md memory/LIVE.md memory/ledger/2026-09.md memory/gotchas/porcelain-diff-names-a-rename-by-its-destination.md memory/gotchas/fold-text-is-unreviewed-surface.md memory/gotchas/INDEX.md memory/map/features/unattended.md memory/map/generated/inventories.json memory/map/generated/MAP.md memory/map/generated/symbols.json

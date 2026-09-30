@@ -5524,17 +5524,41 @@ printf '# the %s close %s the owed bar\n' "$_c47_ip" "$_c47_an" > "$TMPBIN_PAREN
 mutate $KIT_REL/lib-unattended.sh "\$r $TMPBIN_PARENT/c47.line"
 out=$(run)
 hit  "$out" "a shipped file of this kit states the retired premise that the landing's close is where the owed flagged bar is told, but since TOOL-dAlignedCarrier-6 the move into VERIFYING announces it under every LANDER_MODE and the close says nothing, so a reader who trusts the sentence waits at the close for a notice that never comes; reword it to name the move into VERIFYING. matches: "
-hit  "$(printf '%s\n' "$out" | grep 'UNATTENDED check 47 FAILED')" "matches: $KIT_REL/lib-unattended.sh: "
+hit  "$(printf '%s\n' "$out" | grep 'UNATTENDED check 47 FAILED')" "matches: $KIT_REL/lib-unattended.sh: \"$_c47_ip close $_c47_an\""
 reset_tree
 printf '# it %s, on an %s close, that the bar is owed\n' "$_c47_an" "$_c47_ip" > "$TMPBIN_PARENT/c47.line"
 mutate $KIT_REL/lib-unattended.sh "\$r $TMPBIN_PARENT/c47.line"
-hit  "$(run)" "the retired premise that the landing's close is where the owed flagged bar is told"
+out=$(run)
+hit  "$out" "the retired premise that the landing's close is where the owed flagged bar is told"
+hit  "$(printf '%s\n' "$out" | grep 'UNATTENDED check 47 FAILED')" "matches: $KIT_REL/lib-unattended.sh: \"$_c47_an, on an $_c47_ip close,\""
 # ...the NEAR-MISS: the same mode's close with no announcing word stays silent, so the arm above is
 # not equally consistent with a ban on naming that close at all.
 reset_tree
 printf '# the %s close runs the bar\n' "$_c47_ip" > "$TMPBIN_PARENT/c47.line"
 mutate $KIT_REL/lib-unattended.sh "\$r $TMPBIN_PARENT/c47.line"
 miss "$(run)" "UNATTENDED check 47 FAILED"
+reset_tree
+
+# ==== TOOL-dAlignedCarrier-6 rev-5: CHECK 47's WINDOW HOLDS EACH ROW'S WIDEST INSTANCE WRAPPED AT
+# ---- EVERY WORD, AND EACH EXCERPT IS WHOLE (closing review round 2, L1 and L4). Row 2's widest
+# ---- instance is eight words and row 1's seven. Each is staged once per position it can wrap at,
+# ---- every copy after a line of eight neutral words that flushes the window, and the ONE run must
+# ---- report the whole quoted excerpt once per copy: 7 for row 2, 6 for row 1. A window a word short
+# ---- drops a copy and a pattern ending on a bare stem truncates every excerpt, so either reds the
+# ---- count. Fragments as above, so this suite's own bytes form no instance.
+_c47_ip="in-""place"; _c47_an="anno""unces"; _c47_no="n""o"; _c47_vb="ve""rb"; _c47_cm="comm""its"
+for _c47_row in "$_c47_ip p q close r s t $_c47_an" "$_c47_no p q $_c47_vb r s $_c47_cm"; do
+  read -r -a _c47_w <<<"$_c47_row"
+  for ((_c47_i = 1; _c47_i < ${#_c47_w[@]}; _c47_i++)); do
+    printf '# f f f f f f f f\n# %s\n# %s\n' "${_c47_w[*]:0:_c47_i}" "${_c47_w[*]:_c47_i}"
+  done
+done > "$TMPBIN_PARENT/c47.line"
+mutate $KIT_REL/lib-unattended.sh "\$r $TMPBIN_PARENT/c47.line"
+out=$(run)
+same "check 47 row 2 wrapped at each of its 7 positions" \
+  "$(printf '%s\n' "$out" | grep -F "the landing's close is where the owed flagged bar is told" | grep -oF "\"$_c47_ip p q close r s t $_c47_an\"" | wc -l | tr -d ' ')" 7
+same "check 47 row 1 wrapped at each of its 6 positions" \
+  "$(printf '%s\n' "$out" | grep -F "the driver makes no commit of its own" | grep -oF "\"$_c47_no p q $_c47_vb r s $_c47_cm\"" | wc -l | tr -d ' ')" 6
 reset_tree
 
 # ==== TOOL-dAlignedCarrier-6: CHECK 48, a run-state fact written after the function's last stage

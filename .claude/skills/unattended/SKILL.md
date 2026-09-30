@@ -577,8 +577,8 @@ definition, so the absence is a decision and not an oversight.
   `VERIFYING`, sidechain agents included, with the record and the phase named in the refusal. The
   move into `VERIFYING` ANNOUNCES when that flagged bar is owed, under every `LANDER_MODE` — when
   the run's range from its pinned BASE touches a path `SELFTESTS_OWED_PATHS` declares — so you are
-  told rather than left to remember; the driver still sets the flag nowhere, and you export it into
-  the one `--close`, as the Close section spells.
+  told rather than left to remember; the driver still sets `GATE_SELFTESTS` nowhere, and you export
+  the pair `GATE_FULL=1 GATE_SELFTESTS=1` into the one `--close`, as the Close section spells.
 - **A process not in the ledger is never killed**, whatever its command line says. The driver records
   every command it starts and reaps only those, once their driver is gone; `--status` prints
   `orphans <n>` while any wait. A stray process it did not record — another session's, another
@@ -946,8 +946,9 @@ build. Then it COMMITS its own record on top of the graded merge, so the phase t
 `primary` none of that happens: the verb stages the record and names the commit you owe.
 
 **When the `VERIFYING` notice named a surface, export the pair into that one close**, under either
-mode. The close announces nothing itself. Its bar inherits both flags, the driver never sets, adds or
-removes either, and gate-guard.js admits the prefix from `VERIFYING` on. `GATE_FULL=1` is the half
+mode. The close announces nothing itself. Its bar inherits both flags, the driver never sets
+`GATE_SELFTESTS`, and gate-guard.js admits the prefix from `VERIFYING` on. Under `in-place` the close
+adds `GATE_FULL=1` to its own bar, so the exported `GATE_FULL` is redundant there and is the half
 `primary` needs: that close's bar carries no `GATE_FULL` of its own, and `GATE_SELFTESTS=1` alone lifts
 the hold but leaves every guarded self-test leg the branch did not touch skipped. A notice saying the
 range cannot be read is not a no: read the range yourself before you decide.

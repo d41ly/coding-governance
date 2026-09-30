@@ -15,7 +15,16 @@ README's waiver. The rev-4 fold of the closing review's round 1 added AC9 to AC1
 each on an arm the fold moves), and by the kit gate scoped to skip check 28, red on a staged break
 with no other check red. Over the final tree the scoped leg did not return inside its 590 s bound and
 was stopped with no check failed up to check 23, so the tree-side reading of checks 47 and 48 is their
-own scanners, extracted from the checker and run alone; the same no-suite rule held.
+own scanners, extracted from the checker and run alone; the same no-suite rule held. The rev-5 fold
+of round 2 added AC13 to AC16, observed by the map's own test and freshness check, a 47-check scratch
+fixture over the folded driver (47 green) and the driver at e01f2ad9 (4 FAIL lines, each on an arm
+rev-5 adds), a failed-diff probe over the folded driver and a copy with its `pipefail` removed, and
+check 47's scanner, extracted verbatim, over a staged break holding each row's widest instance at
+every wrap position. They stood in for the `codebase-map coverage + freshness` and `unattended kit
+gate` legs. The kit gate itself, scoped to skip check 28 over that staged break, did not return
+inside its 590 s bound, was stopped in check 23 with no check failed, and was not re-run, so check
+47's reading is its extracted scanner. The two new suite arms are written and not run, under the
+waiver; the tab-path arm's reset shape was run alone over a scratch commit and left a clean tree.
 
 **Evidences:** TOOL-dAlignedCarrier-6
 - AC1 — `the run's range e7779aa9..HEAD touches a declared self-test surface (kitsurface/)` — the
@@ -73,4 +82,31 @@ own scanners, extracted from the checker and run alone; the same no-suite rule h
   message with `matches: tools/unattended/unattended.sh: "in-place close announ"`; over the final
   tree both rows' patterns, through the checker's own scanner run alone, named nothing.
   `grep -c 'in-place close derives' tools/unattended/check-unattended.sh` printed 0, where
-  `3c45a567` prints 1.
+  `3c45a567` prints 1. That quoted excerpt was one letter short, round 2's L4; since rev-5 the
+  same staged line reports `"in-place close announces"`, through the extracted scanner.
+- AC13 — `test_generated_artifacts_are_fresh` — after the `unattended` dossier claimed the
+  round-1 class record and `gen_map.py --write` ran, `test_codebase_map.py` printed six `ok` lines
+  and `gen_map.py --check` exited 0. Before the fix the same test printed
+  `FAIL test_generated_artifacts_are_fresh`, and `--check` exited 1 naming `inventories.json` and
+  `MAP.md`.
+- AC14 — `this driver never sets GATE_SELFTESTS` — the fixture's move into VERIFYING under
+  `primary` printed the owed line ending with it, where the e01f2ad9 driver's ended
+  `this driver sets neither`. The retired-claim grep printed 0 in each of the five carriers, where
+  e01f2ad9 prints 2 in the driver and 1 in each of the other four. The "While it runs" bullet's
+  closing sentence names `GATE_FULL=1 GATE_SELFTESTS=1`, and the adopter's `--check` printed
+  `in sync`.
+- AC15 — `"in-place p q close r s t announces"` — check 47's scanner and rows, extracted verbatim,
+  reported that whole excerpt 7 times over the staged break and row 1's `"no p q verb r s commits"`
+  6 times. The scanner at `e01f2ad9` reported row 2 six times, each excerpt ending `t announ"`, one
+  letter short. Over the kit's 49 tracked files neither row named anything at seven words, as at six,
+  and the near-miss sweeps named only true sentences, the Skill's "The close announces nothing
+  itself" among them.
+- AC16 — `touches a declared self-test surface (kitsurface/)` — the folded driver's move printed it
+  when the fixture's only commit after the preflight added a file under `kitsurface/` whose name
+  holds a tab, through `update-index --index-info` with `core.protectNTFS=false`. The e01f2ad9
+  driver printed no owed line there, while `-c core.quotepath=off diff --name-only` printed that
+  path C-quoted, a leading double quote and a `\t` escape. The same path under `other/` printed
+  nothing. A `git` stub failing
+  `diff --name-only` made the folded driver print `could not be diffed`, and a copy with its
+  `pipefail` removed printed only its phase line. The e01f2ad9 driver printed `could not be diffed`
+  too, having no pipe.

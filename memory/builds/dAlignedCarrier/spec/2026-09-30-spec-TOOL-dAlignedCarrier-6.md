@@ -1,6 +1,6 @@
 # TOOL-dAlignedCarrier-6 — the owed self-test bar is announced at VERIFYING, and the main loop exports its flag
 
-**Status:** CLOSED · rev-4 · 2026-09-30 · node d · Tier-2 · base 87c245b3 · streams tooling · order 1 · closes TOOL-dDerivedDocket-70 · ratified 2026-09-30
+**Status:** CLOSED · rev-5 · 2026-09-30 · node d · Tier-2 · base 87c245b3 · streams tooling · order 1 · closes TOOL-dDerivedDocket-70 · ratified 2026-09-30
 
 <!-- gen:spec-records -->
 
@@ -84,18 +84,29 @@ and has the Skill and the declarations describe the new order.
 - **S11** — The closing review's M2, resolved by §8 F5. The notice, the Skill's Close paragraph and its
   export line, the "While it runs" bullet, the protocol's `SELFTESTS_OWED_PATHS` row and both conf
   comments name the PAIR, `GATE_FULL=1 GATE_SELFTESTS=1`, as what the main loop exports into its one
-  `--close`. The driver still sets neither. A suite arm cuts the export out of the notice, applies it
+  `--close`. The driver never sets `GATE_SELFTESTS`; under `in-place` its close adds `GATE_FULL=1` to
+  its own bar (TOOL-dDerivedDocket-3 S3), so the exported `GATE_FULL` is redundant there and is the
+  half `primary` needs (rev-5). A suite arm cuts the export out of the notice, applies it
   to the close exactly as printed under both modes, and reads both flags from the bar stub's own
-  environment. Observed by AC10.
+  environment. Observed by AC10, AC14.
 - **S12** — The closing review's L1. The range read in `print_selftests_owed` passes `--no-renames`
-  and `-c core.quotepath=off`, and a diff that fails announces that the answer is unanswerable, not
-  no. A suite arm commits a rename out of the declared prefix and nothing else and expects the notice.
-  The class is a `memory/gotchas/` record. Observed by AC11.
+  and, since rev-5, `-z`, its names split NUL-delimited and prefix-matched inside a `pipefail`
+  pipeline, and a diff that fails announces that the answer is unanswerable, not
+  no. A suite arm commits a rename out of the declared prefix and nothing else and expects the notice,
+  and since rev-5 a second commits a tab-bearing path under it through the index.
+  The class is a `memory/gotchas/` record. Observed by AC11, AC16.
 - **S13** — The closing review's L2. Check 45's header, its blank-key echo and its fail message name a
   run's range and the move into VERIFYING, not the in-place close, and the two arm literals in
   `tools/unattended/check-unattended.test.sh` change in the same commit. Check 47 becomes a table of
   two retired premises, its second row the close as the announcer, each row with its own fail line and
   its own staged arm and near-miss control. Observed by AC12.
+- **S14** — The closing review's round 2, rev-5. M1: the round-1 gotcha record is claimed in the
+  `unattended` dossier's `gotcha-classes` and the map's generated files are regenerated. L1: check
+  47's window holds seven previous words, row 2's widest instance being eight. L4: row 2's pattern ends
+  on the rest of its last word and the space after it, so its excerpt is whole, and the header states
+  that trailing-boundary contract for every row. L3: the "While it runs" bullet names the pair where
+  it said "it". A suite arm stages each row's widest instance at every wrap position and counts whole
+  excerpts. Observed by AC13, AC14, AC15.
 
 ## 3. Non-goals (OUT)
 
@@ -125,7 +136,9 @@ close arms and appends the VERIFYING arms. The kickoff manifest's re-stamp is al
 its own watched file; the two re-stamps are sequential and neither reads the other. The rev-4 fold
 adds `tools/unattended/check-unattended.sh` and its suite, where unit 1 owns check 47's first row;
 this unit adds its second row, rewords check 45 and adds check 48, and leaves the first row's pattern
-and fail line byte-for-byte.
+and fail line byte-for-byte. The rev-5 fold widens the scanner both rows share and still leaves row
+1's pattern and fail line alone; it adds the `unattended` map dossier with the map's generated files
+and the `fold-text-is-unreviewed-surface` class record, which no sibling writes.
 
 none
 
@@ -146,15 +159,16 @@ The `base` fact is pinned by `--preflight` and read back unchanged. The gate-gua
 ### The notice
 
 ```
-unattended: the run's range <base8>..HEAD touches a declared self-test surface (<prefixes>), so the kit Definition of Done owes the flagged bar: export GATE_FULL=1 GATE_SELFTESTS=1 into this run's one --close, whose bar inherits both; this driver sets neither
+unattended: the run's range <base8>..HEAD touches a declared self-test surface (<prefixes>), so the kit Definition of Done owes the flagged bar: export GATE_FULL=1 GATE_SELFTESTS=1 into this run's one --close, whose bar inherits both; this driver never sets GATE_SELFTESTS
 unattended: SELFTESTS_OWED_PATHS is blank, so no range here can ever owe the flagged bar and no phase move will announce one
 unattended: the record pins no base, so the range that decides whether the flagged bar is owed cannot be read, and no notice is printed; whether it is owed is unanswerable here, not no
 unattended: the record's base <base8> does not resolve in this clone, so the range that decides whether the flagged bar is owed cannot be read, and no notice is printed; whether it is owed is unanswerable here, not no
 unattended: the run's range <base8>..HEAD could not be diffed, so whether the flagged bar is owed is unanswerable here, not no
 ```
 
-The first line names the pair since rev-4 (§8 F5), and the last line is rev-4's (S12). The range is
-read with `--no-renames` and `-c core.quotepath=off`, so a rename names both of its paths.
+The first line names the pair since rev-4 (§8 F5) and claims only `GATE_SELFTESTS` since rev-5, and
+the last line is rev-4's (S12). The range is read with `--no-renames` and `-z`, so a rename names
+both of its paths and a path holding a tab, a quote, a backslash or a newline prints verbatim.
 
 The builder may reword for accuracy, and must keep the leading `unattended:`, the phrase
 `touches a declared self-test surface` the suite already matches, the range and the prefixes.
@@ -181,6 +195,32 @@ The builder may reword for accuracy, and must keep the leading `unattended:`, th
   wiring: at BASE it names the protocol row, two Skill sentences and the check-45 header; on the tree
   it named the check-45 header alone, which S13 rewords.
 
+### The fold of the closing review's round 2 (rev-5)
+
+- **M1, S14.** One key added to the `unattended` dossier's `gotcha-classes`, then
+  `gen_map.py --write`; the map's own test is the observation, and the bar leg that reds is loud.
+  The key took the dossier 33 bytes past hygiene check 6's 20480-byte cap, so two of its sentences
+  were tightened with no fact dropped; it sits 2 bytes under, and its next claim owes the split
+  that check prescribes. The sibling unattended dossiers have room but not the subject.
+- **M2, S11.** Every carrier keeps the claim to `GATE_SELFTESTS`, the flag the owner's ruling covers,
+  and says the in-place close's `GATE_FULL=1` is its own. The protocol row never carried the claim.
+- **L1, S14.** The tail keeps tokens `k-6..k`. Measured before committing, over the kit's 49 tracked
+  files: no hit for either row at seven, as at six. The near-miss sweeps, row 2 without the mode token
+  and row 1 without its verb word, named only true sentences about other terms.
+- **L2, S12.** `-z` in place of `-c core.quotepath=off`, which is inert beside it. The names never
+  leave the pipeline: each is matched whole and only the prefixes it touched are printed, so a
+  newline inside a name cannot split it, and `pipefail` inside the capture keeps a failed diff loud.
+- **L4, S14.** Both row-2 alternatives end `[^ ]*[ ]` rather than the review's `[a-z]*[^a-z0-9_]`:
+  every window word is followed by a space, so the matched set is exactly rev-4's, where the review's
+  form would stop matching a stem followed by a digit or an underscore. The excerpt keeps trailing
+  punctuation, as in `announces, on an in-place close,`.
+- **L3, S14.** The bullet's closing sentence names the pair and the `GATE_SELFTESTS` claim.
+- **Left-shift.** M1's is its observation, per the fold brief. L1 and L4 share the per-position arm.
+  M2 and L3 are instances of the fold-text class, whose several-carriers practice now names pronoun
+  forms and a widened claim's second value. L2's is the corrected class record and the review's
+  tab-path arm, committed through the index in the suite's own in-place fixture: its next reset's
+  forced checkout drops the path on Windows too, as the scratch fixture showed.
+
 ### Rollout
 
 The render is `bash tools/unattended/adopt-unattended.sh`, run in the same pass after the template
@@ -194,7 +234,9 @@ is the parity observation.
 `memory/guides/UNATTENDED-PROTOCOL.md` · `tools/unattended/.unattended.conf.example` ·
 `.unattended.conf` · `memory/guides/SESSION-KICKOFF.md` · `tools/unattended/unattended.test.sh` ·
 `tools/unattended/check-unattended.sh` · `tools/unattended/check-unattended.test.sh` ·
-`memory/gotchas/porcelain-diff-names-a-rename-by-its-destination.md` · `memory/gotchas/INDEX.md`
+`memory/gotchas/porcelain-diff-names-a-rename-by-its-destination.md` · `memory/gotchas/INDEX.md` ·
+`memory/gotchas/fold-text-is-unreviewed-surface.md` · `memory/map/features/unattended.md` ·
+`memory/map/generated/inventories.json` · `memory/map/generated/MAP.md`
 
 ### Alternatives rejected
 
@@ -313,10 +355,36 @@ is the parity observation.
   `3c45a567` prints 1.
   Red when: the retired premise can come back unflagged, or check 45's header still names the close
   as the announcer.
+- **AC13** — When `python tools/codebase-map/test_codebase_map.py` runs, every test prints `ok`, and
+  `python tools/codebase-map/gen_map.py --check` exits 0, where at `e01f2ad9` two tests fail and the
+  check exits 1 naming `inventories.json` and `MAP.md`.
+  Red when: the round-1 class record is unclaimed or a generated map file is stale.
+- **AC14** — When `grep -c -E 'sets neither|never sets, adds|never sets either'` runs over
+  `tools/unattended/unattended.sh`, `tools/unattended/SKILL.template.md`, both conf files and the
+  rendered Skill, each prints 0, where `e01f2ad9` prints at least 1 for each; the move into VERIFYING
+  over the touching fixture prints the owed line ending `this driver never sets GATE_SELFTESTS`; the
+  "While it runs" bullet's closing sentence names `GATE_FULL=1 GATE_SELFTESTS=1`; and
+  `bash tools/unattended/adopt-unattended.sh --check` exits 0.
+  Red when: a carrier still says the driver sets neither flag, or the bullet still exports "it".
+- **AC15** — When check 47's scanner and row patterns, extracted verbatim from the checker, run over
+  row 2's eight-word instance and row 1's seven-word one, each wrapped at every word position after a
+  line that flushes the window, they report the whole excerpt 7 and 6 times; the checker at
+  `e01f2ad9` reports row 2 six times, each excerpt short of its last letter. Over the kit's tracked
+  files neither row names anything.
+  Red when: a wrap position escapes, or an excerpt is not the whole matched words.
+  permission: the suite arm making the same count is written and not run, under the build README's
+  rule; the extracted scanner runs its steps.
+- **AC16** — When the fixture's only commit after the preflight adds, through the index, a file under
+  `kitsurface/` whose name holds a tab, the move into VERIFYING prints the owed line naming `kitsurface/`, where the driver at
+  `e01f2ad9` prints none; the same path under `other/` prints none; and a `git` whose
+  `diff --name-only` fails makes the move print `could not be diffed`, where the driver with its
+  `pipefail` removed prints no line about the range.
+  Red when: a quoted path reads as untouched, or a failed diff reads as an empty range.
+  fixture: none in the tree; the pass builds a scratch repository under `%TEMP%`.
 
 ## 7. Gates
 
-`unattended kit gate` · `unattended skill wiring` · `unattended protocol size` · `kickoff-manifest ratchet` · `check-wiring self-test` · `lexicon naming predicates` · `recall floor` · `recall floor arms`
+`unattended kit gate` · `unattended skill wiring` · `unattended protocol size` · `kickoff-manifest ratchet` · `check-wiring self-test` · `lexicon naming predicates` · `recall floor` · `recall floor arms` · `codebase-map coverage + freshness`
 
 New arm: `tools/unattended/unattended.test.sh` · a move into VERIFYING over a range touching the fixture's declared prefix, an untouching range and a move into BUILDING · none
 New arm: `tools/unattended/unattended.test.sh` · the VERIFYING move's staged set committed alone, and a second `--phase` with a changed witness, each asserting nothing unstaged · none
@@ -324,6 +392,8 @@ New arm: `tools/unattended/unattended.test.sh` · the notice's printed export ap
 New arm: `tools/unattended/unattended.test.sh` · a rename out of the declared prefix and nothing else, expecting the notice · none
 New arm: `tools/unattended/check-unattended.test.sh` · check 47's second row staged in both word orders, with a near-miss control · none
 New arm: `tools/unattended/check-unattended.test.sh` · check 48 staged as a write after the last stage, with the reversed order as its near-miss control · none
+New arm: `tools/unattended/check-unattended.test.sh` · check 47's rows each staged at every wrap position of their widest instance, counting whole excerpts · none
+New arm: `tools/unattended/unattended.test.sh` · a tab-bearing path under the declared prefix and nothing else, committed through the index, expecting the notice · none
 
 ## 8. Open questions
 
@@ -351,7 +421,8 @@ New arm: `tools/unattended/check-unattended.test.sh` · check 48 staged as a wri
   `GATE_SELFTESTS=1` alone lifts the hold and leaves every guarded self-test leg the branch did not
   move reporting skip, while the notice, the Skill and the protocol row say the flagged bar was paid.
   (a) Name the pair, `GATE_FULL=1 GATE_SELFTESTS=1`, in the notice, the Skill's Close paragraph and
-  export line, the protocol row and both conf comments; the driver still sets neither, and gate-guard
+  export line, the protocol row and both conf comments; the driver never sets `GATE_SELFTESTS`, its
+  in-place close adds its own `GATE_FULL=1` so that half is redundant there, and gate-guard
   already admits both prefixes from VERIFYING. (b) Narrow the claim: under `primary` the notice says
   the export buys a guard-scoped run and names the pair as what the Definition of Done owes.
   Recommendation (a), the review's. RESOLVED (agent, 2026-09-30, delegated): (a). Owner ruling
@@ -388,6 +459,17 @@ New arm: `tools/unattended/check-unattended.test.sh` · check 48 staged as a wri
   message, their arm literals move with them, and check 47 gains a second row. The §3 non-goal on
   check 45 is narrowed to its verdicts, since rev-1's reason covered its message and never its
   header. AC6's 120-byte share measured the build pass (117); the fold's own share is AC10's.
+- rev-5 · 2026-09-30 · §2 §3 §4 §6 §7 §8 · S11 S12 S14 · AC13 AC14 AC15 AC16 · the fold of the closing
+  diff review's round 2, over the round-1 fold. Round 1 recorded CONVERGED, so its six items, none
+  above MEDIUM, are folded by severity with no further round. M1 (S14, AC13): the round-1 class record
+  was unclaimed by the map, which reds its unguarded leg. M2 (S11, AC14): rev-4 widened "the driver
+  never sets the flag" to both flags, which the in-place close's own `GATE_FULL=1` makes false; §8 F5
+  and every carrier now claim `GATE_SELFTESTS` alone. L1 (S14, AC15): check 47's six-word window let
+  row 2's eight-word instance through at one wrap. L2 (S12, AC16): `core.quotepath=off` still quoted a
+  tab-bearing path; the read is `-z`. L3 (S14, AC14): the "While it runs" bullet exported "it". L4
+  (S14, AC15): row 2's excerpt lost its last letter. §4 records the measurements, the one divergence
+  from the review's literal fix (L4's ending) and each item's left-shift. The protocol is untouched,
+  0 of AC10's 300 bytes.
 
 ## 10. Reuse audit
 
