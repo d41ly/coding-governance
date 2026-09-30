@@ -11,7 +11,6 @@
 .githooks/pre-push.test.sh	2	run-gates
 .githooks/pre_push_bar_selftest.py	2	run-gates
 WIRE-INTO-PROJECT.md	7	govkit	WRITTEN BY HAND, TOOL-aRepatriatedFork-26 rev-3. All seven sit in the harness-migration blocks, which the govkit self-test cuts out of this file and RUNS as written: six `$GOV/tools/govkit/govkit.py` invocations and the embedded program's read of gov's registry. They are executing lines joining a literal under the operator's `$GOV`, so they drain with the other executing derived-base joins, where a suite can observe the change, and not in a doc pass. Every other kit path in the runbook spells the `<prefix>/` token its Definitions line declares.
-skills/session-kickoff/manifest-check.test.sh	1	memory-tree	LOWERED 8 -> 1 by TOOL-aRepatriatedFork-28, which derives every fixture path. The one literal left is `$R/memory-tree/corpus_ids.py`, a kit segment joined under a derived base, TOOL-aRepatriatedFork-46's class (spec rev-3 §4, Returned).
 tools/check-install-prefix.test.sh	40	(loose),govkit,hooks,lib,memory-recall,memory-tree	LOWERED 72 -> 13 by TOOL-aRepatriatedFork-28, which spells every fixture path through the derived prefix. What is left is this gate's own red fixtures, root-install spellings under its marker and quoted-join samples of its literal predicate, and two layouts at a foreign literal prefix: all TOOL-aRepatriatedFork-30's, which rewrites that predicate (spec rev-3 §4, Returned).
 tools/check-wiring.test.sh	1	hooks
 tools/dead-path-waivers.txt	2	lexicon

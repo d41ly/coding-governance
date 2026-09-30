@@ -1156,9 +1156,73 @@ grep -q 'DEAD PROBE' "$CARD_OUT" && { echo "ok   K2 S7 --card --check over a tok
 # resolver is tried anchored at the repo root after its own dir. A stub reader defines
 # `TOOL-zFlatReader-1`; the body cites `-2` as well, so graded ids make 2 tokens with 1 miss, and
 # skipped ids make none at all (DEAD PROBE).
+# TOOL-aRepatriatedFork-46: the reader's directory is spelled by the memory-tree kit's NAME in this
+# install, resolved the way the checker resolves it: the sibling-kit resolver anchored at the
+# checker's directory and then at the repo root, then the one reader the repo tracks, which is the
+# checker's own last rung and the only one that reaches gov, whose kickoff kit sits under skills/.
+# The sibling-kit resolver (TOOL-aRepatriatedFork-2 S3), INLINED byte-identically from the
+# canonical copy named on its marker line and gated by the resolve-python self-test's parity
+# table. A shell consumer runs it with the python it already resolved, so the receipt rung is
+# read in Python and never parsed in bash. `resolve_kit_dir <python> <home> <anchor> <here>`
+# prints the kit directory REPO-RELATIVE, or the resolver's named refusal on stderr and exits 1.
+resolve_kit_dir() {
+  "$1" -c "$(cat <<'RKD'
+# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
+def resolve_kit_dir(home, anchor, here):
+    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
+
+    1. receipt — the `.governance/install.json` row whose `source` ends in <home>/<anchor> and
+       whose `path` exists inside this tree. The only record of a RENAMED kit dir: no probe finds
+       a memory-recall kit an adopter homed at `scripts/recall/`.
+    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
+    3. refuse — LookupError naming the three places looked; never a guessed prefix.
+    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
+    """
+    import json
+    import pathlib
+    here = pathlib.Path(here).resolve()
+    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
+    receipt = root / ".governance" / "install.json"
+    try:
+        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("path"):
+            continue
+        if str(row.get("source") or "").split("/")[-2:] != [home, anchor]:
+            continue
+        hit = (root / str(row["path"])).resolve()
+        if hit.is_file() and root in hit.parents:
+            return hit.parent
+    probes = (here / home, here.parent / home)
+    for cand in probes:
+        if (cand / anchor).is_file():
+            return cand
+    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
+        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
+# <<< resolve_kit_dir
+RKD
+)"'
+import sys
+try:
+    d = resolve_kit_dir(*sys.argv[1:4])
+except LookupError as e:
+    sys.exit(str(e))
+r = next((p for p in (d, *d.parents) if (p / ".git").exists()), d.anchor)
+print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
+}
+MT_DIR=""
+if _mt_py=$(resolve_python 2>/dev/null); then
+  for _mt_here in "$(dirname "$CHECK")" "$GOVROOT"; do
+    MT_DIR=$(resolve_kit_dir "$_mt_py" memory-tree corpus_ids.py "$_mt_here" 2>/dev/null) && break
+  done
+fi
+[ -n "$MT_DIR" ] || MT_DIR=$(dirname "$(git -C "$GOVROOT" ls-files -- '*/corpus_ids.py' | head -1)")
+MT_NAME=${MT_DIR##*/}
 mkrepo flatreader; write_manifest "$R" "$(head_sha "$R")" "Makefile" "docs/GOV.md"
-mkdir -p "$R/memory-tree" "$TMP/junction"
-printf 'print("# id-ere: TOOL-zFlatReader-[0-9]+")\nprint("TOOL-zFlatReader-1")\n' > "$R/memory-tree/corpus_ids.py"
+mkdir -p "$R/$MT_NAME" "$TMP/junction"
+printf 'print("# id-ere: TOOL-zFlatReader-[0-9]+")\nprint("TOOL-zFlatReader-1")\n' > "$R/$MT_NAME/corpus_ids.py"
 cp "$CHECK" "$TMP/junction/manifest-check.sh"
 L3_CHECK=$CHECK; CHECK="$TMP/junction/manifest-check.sh"
 run_card "L3 setup: a card in a flat-layout tree, from a checker outside it" "$R" 0 - --card --write --session "$NONCE-l3"
