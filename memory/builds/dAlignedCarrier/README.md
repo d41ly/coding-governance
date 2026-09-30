@@ -52,12 +52,12 @@ ids TOOL-dAlignedCarrier-1 TOOL-dAlignedCarrier-2 TOOL-dAlignedCarrier-3 TOOL-dA
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-dAlignedCarrier-1 — the driver stops saying no verb commits, and the kit gate reads the whole kit for it](spec/2026-09-30-spec-TOOL-dAlignedCarrier-1.md) | 1 | 2 | SPECCED | rev-1 | 2026-09-30 |
+| [TOOL-dAlignedCarrier-1 — the driver stops saying no verb commits, and the kit gate reads the whole kit for it](spec/2026-09-30-spec-TOOL-dAlignedCarrier-1.md) | 1 | 2 | SPECCED | rev-2 | 2026-09-30 |
 | [TOOL-dAlignedCarrier-2 — the protocol's gates-green text points at the inherited-red contract](spec/2026-09-30-spec-TOOL-dAlignedCarrier-2.md) | 1 | 2 | SPECCED | rev-1 | 2026-09-30 |
 | [TOOL-dAlignedCarrier-3 — the research and solution-test directives bind every mode](spec/2026-09-30-spec-TOOL-dAlignedCarrier-3.md) | 1 | 2 | SPECCED | rev-1 | 2026-09-30 |
-| [TOOL-dAlignedCarrier-4 — `--status` reports the holder-worktree and pinned-asks verdicts, read-only](spec/2026-09-30-spec-TOOL-dAlignedCarrier-4.md) | 1 | 2 | SPECCED | rev-1 | 2026-09-30 |
-| [TOOL-dAlignedCarrier-6 — the owed self-test bar is announced at VERIFYING, and the main loop exports its flag](spec/2026-09-30-spec-TOOL-dAlignedCarrier-6.md) | 1 | 2 | SPECCED | rev-1 | 2026-09-30 |
-| [TOOL-dAlignedCarrier-5 — BUILD-METHOD M7 regrounds with `--status`](spec/2026-09-30-spec-TOOL-dAlignedCarrier-5.md) | 2 | 2 | SPECCED | rev-1 | 2026-09-30 |
+| [TOOL-dAlignedCarrier-4 — `--status` reports the holder-worktree and pinned-asks verdicts, read-only](spec/2026-09-30-spec-TOOL-dAlignedCarrier-4.md) | 1 | 2 | SPECCED | rev-2 | 2026-09-30 |
+| [TOOL-dAlignedCarrier-6 — the owed self-test bar is announced at VERIFYING, and the main loop exports its flag](spec/2026-09-30-spec-TOOL-dAlignedCarrier-6.md) | 1 | 2 | SPECCED | rev-2 | 2026-09-30 |
+| [TOOL-dAlignedCarrier-5 — BUILD-METHOD M7 regrounds with `--status`](spec/2026-09-30-spec-TOOL-dAlignedCarrier-5.md) | 2 | 2 | SPECCED | rev-2 | 2026-09-30 |
 <!-- /gen:build-units -->
 
 Records: 2 bound to this build, across 2 record folder(s).

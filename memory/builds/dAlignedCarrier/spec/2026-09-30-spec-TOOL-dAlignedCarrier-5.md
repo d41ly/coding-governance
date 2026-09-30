@@ -1,6 +1,6 @@
 # TOOL-dAlignedCarrier-5 — BUILD-METHOD M7 regrounds with `--status`
 
-**Status:** SPECCED · rev-1 · 2026-09-30 · node d · Tier-2 · base 87c245b3 · streams tooling · order 2 · closes TOOL-dDerivedDocket-72 · ratified 2026-09-30
+**Status:** SPECCED · rev-2 · 2026-09-30 · node d · Tier-2 · base 87c245b3 · streams tooling · order 2 · closes TOOL-dDerivedDocket-72 · ratified 2026-09-30
 
 <!-- gen:spec-records -->
 
@@ -39,6 +39,10 @@ and without losing either check.
   that ask's accept clause that `TOOL-dAlignedCarrier-4` builds, and builds neither: `--status <slug>`
   reporting the holder-worktree and pinned-asks verdicts while writing nothing, and section 8 of
   `memory/guides/UNATTENDED-STOPS.md` following the new step 1. Observed by AC5 and AC6.
+- **S5** — The build commit re-stamps `last-audit` in `memory/guides/SESSION-KICKOFF.md`, because
+  `memory/guides/BUILD-METHOD.md` is on that manifest's `watch:` list and the pre-commit ratchet
+  refuses a commit that stages a watched file without moving the stamp. The commit message carries
+  the `manifest-audit:` delta line. Observed by AC7.
 
 ## 3. Non-goals (OUT)
 
@@ -59,7 +63,9 @@ and without losing either check.
   BASE (`grep -n -- '--resume' memory/map/features/build-method.md` prints nothing), so there is no
   prose to refresh.
 
-This unit writes no file a sibling writes. It READS three files `TOOL-dAlignedCarrier-4` writes, as
+One line is shared with a sibling: the `last-audit` stamp in `memory/guides/SESSION-KICKOFF.md`,
+which `TOOL-dAlignedCarrier-6` also re-stamps. This unit is ordered later, so it owns that line and
+its stamp supersedes unit 6's. Beside that, it READS three files `TOOL-dAlignedCarrier-4` writes, as
 acceptance inputs: `tools/unattended/unattended.sh`, `tools/unattended/STOPS.template.md` and
 `memory/guides/UNATTENDED-STOPS.md`. That read is why it is ordered after that unit rather than
 beside it.
@@ -128,6 +134,7 @@ grades it.
 
 - `tools/memory-tree/BUILD-METHOD.template.md` — M7 step 1, one line.
 - `memory/guides/BUILD-METHOD.md` — the same line, written by the render.
+- `memory/guides/SESSION-KICKOFF.md` — the `last-audit` line only (S5).
 
 ### Rollout
 
@@ -220,10 +227,15 @@ observed at the end of this unit's pass, before the sweep.
   of the render and its template twin.
   Red when: section 8 still says a session regrounding by the build method's no-id spelling reads the
   status block before its refusal, which after step 1 moves describes a caller that does not exist.
+- **AC7** — When `bash skills/session-kickoff/manifest-check.sh --staged` runs over the staged build
+  commit, it exits 0, and `git diff --cached -- memory/guides/SESSION-KICKOFF.md` shows the
+  `last-audit` line and no other line moving.
+  Red when: the pass staged the watched `memory/guides/BUILD-METHOD.md` without re-stamping the
+  manifest, which the ratchet's check 5 refuses at the commit.
 
 ## 7. Gates
 
-`kit/dogfood doc parity` · `build-method size` · `method carriers (every pointer declared)` · `unattended kit gate` · `recall floor` · `recall floor arms` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `codebase-map coverage + freshness`
+`kit/dogfood doc parity` · `kickoff-manifest ratchet` · `build-method size` · `method carriers (every pointer declared)` · `unattended kit gate` · `recall floor` · `recall floor arms` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `codebase-map coverage + freshness`
 
 New arm: none. This unit adds and moves no gate arm; its failing cases are the direct reads of §6.
 
@@ -244,6 +256,10 @@ close; none runs inside this unit's pass.
 
 - rev-1 · 2026-09-30 · initial draft, authored by the build harness's spec stage from the shared
   brief `memory/builds/dAlignedCarrier/prompts/2026-09-30-prompt-TOOL-dAlignedCarrier-1-spec-brief.md`.
+- rev-2 · 2026-09-30 · §2 §3 §4 §6 §7 · S5 AC7 · the M2 cross-read found the watched
+  `memory/guides/BUILD-METHOD.md` owes a kickoff-manifest re-stamp this spec never named, while unit 6
+  said it did. S5 and AC7 add it, the Edges name the shared `last-audit` line as this unit's, and §7
+  names the ratchet leg.
 
 ## 10. Reuse audit
 

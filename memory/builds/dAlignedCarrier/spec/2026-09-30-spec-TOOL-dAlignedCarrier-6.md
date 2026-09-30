@@ -1,6 +1,6 @@
 # TOOL-dAlignedCarrier-6 — the owed self-test bar is announced at VERIFYING, and the main loop exports its flag
 
-**Status:** SPECCED · rev-1 · 2026-09-30 · node d · Tier-2 · base 87c245b3 · streams tooling · order 1 · closes TOOL-dDerivedDocket-70 · ratified 2026-09-30
+**Status:** SPECCED · rev-2 · 2026-09-30 · node d · Tier-2 · base 87c245b3 · streams tooling · order 1 · closes TOOL-dDerivedDocket-70 · ratified 2026-09-30
 
 <!-- gen:spec-records -->
 
@@ -43,11 +43,16 @@ and has the Skill and the declarations describe the new order.
   Observed by AC4.
 - **S6** — The Skill template's "While it runs" bullet has its sentence on the flagged form rewritten:
   kit work owes that form too, paid by exporting `GATE_SELFTESTS=1` into the one `--close` when the
-  VERIFYING notice names a surface. The bullet's gate-guard sentence is kept. Its Close section opens
-  with the phase move into `VERIFYING` before the close, shows the close's exported spelling beside the
-  plain one, and says a commit after the move changes the range, so the move is repeated before the
-  close. The paragraph opening "It also ANNOUNCES, on an in-place close" is rewritten to match. The
-  render follows. Observed by AC5.
+  VERIFYING notice names a surface. The bullet's gate-guard sentence is kept, and its closing sentence
+  ("Under `LANDER_MODE` set to `in-place` the close ANNOUNCES ...") is rewritten: the move into
+  VERIFYING announces under every mode, and the main loop exports the flag into its one `--close`.
+  Its Close section gives the sequence per `LANDER_MODE`. Under `in-place`: the move
+  `--phase <slug> VERIFYING --witness <sha>`, a commit of the record it staged, then `--prepare`, then
+  the close, with `GATE_SELFTESTS=1` exported when the notice named a surface, and NO second move after
+  the prepare: a move stages the record, and the in-place close refuses a non-empty porcelain
+  (check 62). The range the prepared merge adds is the over-announce §8 F2 accepts. Under `primary`:
+  the move, its commit, then the close. The paragraph opening "It also ANNOUNCES, on an in-place
+  close" is rewritten to match. The render follows. Observed by AC5.
 - **S7** — The `SELFTESTS_OWED_PATHS` row of the protocol's §8 table
   (`tools/unattended/PROTOCOL.template.md:457` at BASE) is rewritten to §4's cell. The render follows.
   The pass grows the protocol by at most 120 bytes. Observed by AC6.
@@ -185,9 +190,12 @@ is the parity observation.
   Red when: the close still calls the notice, or any code line assigns or exports the flag.
 - **AC5** — When `grep -c -E 'nowhere earlier|by hand at' tools/unattended/SKILL.template.md` runs, it
   prints 0, where BASE prints 2; `awk '/^## Close/,0' tools/unattended/SKILL.template.md | grep -c -- '--phase <slug> VERIFYING'`
-  prints at least 1, where BASE prints 0; the Close section spells the exported close once; and
-  `bash tools/unattended/adopt-unattended.sh --check` exits 0.
-  Red when: the Skill still sends the flagged bar to a by-hand run, or the render differs.
+  prints at least 1, where BASE prints 0; inside `## Close` the `--phase <slug> VERIFYING` line comes
+  before the `--prepare` line; the Close section spells the exported close once;
+  `awk '/^## While it runs/,/^## While the work runs/' tools/unattended/SKILL.template.md | grep -c 'close ANNOUNCES'`
+  prints 0, where BASE prints 1; and `bash tools/unattended/adopt-unattended.sh --check` exits 0.
+  Red when: the Skill still sends the flagged bar to a by-hand run, still says the close announces,
+  orders a phase move after the prepare, or the render differs.
 - **AC6** — When `grep -n '^| .SELFTESTS_OWED_PATHS. |' memory/guides/UNATTENDED-PROTOCOL.md` runs, it
   prints one row naming `VERIFYING` and `--close`, and not the in-place close as the announcer;
   `cmp tools/unattended/PROTOCOL.template.md memory/guides/UNATTENDED-PROTOCOL.md` exits 0;
@@ -244,6 +252,11 @@ New arm: `tools/unattended/unattended.test.sh` · a move into VERIFYING over a r
 
 - rev-1 · 2026-09-30 · initial draft, from the ask's accept clause, the owner's ruling and the
   build's spec brief.
+- rev-2 · 2026-09-30 · §2 §6 · S6 AC5 · the M2 cross-read found S6's "repeat the move before the
+  close" refused under in-place landing, where a move stages the record and the close demands a clean
+  porcelain (check 62), and found the bullet's closing "the close ANNOUNCES" sentence left standing.
+  S6 now gives the sequence per `LANDER_MODE` with no move after `--prepare`, and rewrites that
+  sentence; AC5 observes both.
 
 ## 10. Reuse audit
 

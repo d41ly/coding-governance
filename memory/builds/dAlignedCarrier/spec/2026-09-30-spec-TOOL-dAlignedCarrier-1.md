@@ -1,6 +1,6 @@
 # TOOL-dAlignedCarrier-1 — the driver stops saying no verb commits, and the kit gate reads the whole kit for it
 
-**Status:** SPECCED · rev-1 · 2026-09-30 · node d · Tier-2 · base 87c245b3 · streams tooling · order 1 · closes TOOL-dDerivedDocket-74 · ratified 2026-09-30
+**Status:** SPECCED · rev-2 · 2026-09-30 · node d · Tier-2 · base 87c245b3 · streams tooling · order 1 · closes TOOL-dDerivedDocket-74 · ratified 2026-09-30
 
 <!-- gen:spec-records -->
 
@@ -84,9 +84,11 @@ landing only, and the superseding decision row says so.
 
 - **Population.** Every path `GIT ls-files -- "$KITREL"` lists, where `KITREL` is the kit directory
   this gate already derives, so an adopter's install prefix is honoured and nothing is spelled by
-  literal. This checker and `check-unattended.test.sh` are left out BY BASENAME, the precedent check
-  33 set: the checker's header must describe the premise to say what it checks, and the suite stages
-  it. The suite also assembles its staged line from fragments, so the exclusion is a second guard.
+  literal. NO file is excluded, the checker and `check-unattended.test.sh` included, because the ask's
+  accept clause names the kit's shipped files and both ship. The checker stays clean by construction:
+  its predicate is written with optional groups and its header DESCRIBES the premise without spelling
+  it, as the failure message does. The suite stays clean by assembling its staged line from fragments
+  spaced so the joined, squeezed text cannot match inside the predicate's two-word window.
 - **Normalisation, per file.** CR bytes stripped; on each line, leading whitespace and ONE leading
   comment marker (`#`, `//`, `*` or `<!--`) stripped; the lines joined by one space, runs of
   whitespace squeezed, the whole folded to lower case with POSIX `tolower`. A wrap inside a comment or
@@ -97,7 +99,7 @@ landing only, and the superseding decision row says so.
 - **Failure.** One `fail 47` naming every file that matched and the matched text. The message
   describes the premise without spelling it, so the arm that asserts the message stays clean too.
 - **Header, the does-NOT-check paragraph.** A spelling outside the two alternatives passes. A file
-  outside the kit directory is not read. The two excluded files are not read. A match inside a
+  outside the kit directory is not read. A match inside a
   string literal counts like one in prose, because the premise misleads a reader either way.
 
 ### Inventory
@@ -121,8 +123,9 @@ The comment edit in the driver and the suite arm are ordinary text edits. No ren
 - Three fixed strings, case-sensitive, over named files. That is the shape that missed the live
   instance.
 - Scanning `*.sh` only. The premise once lived in a markdown template.
-- Reading the checker and its suite, relying on fragment assembly alone. The checker's header has
-  to name what it guards, and a header that could not describe its own predicate is worse.
+- Excluding the checker and its suite by basename, the check 33 precedent. It narrows the ask's
+  accept clause, which names every shipped file, and a delegated run may not narrow an owner-signed
+  clause. A header that describes the premise without spelling it costs nothing.
 
 ## 5. Production-readiness checklist
 
@@ -148,12 +151,14 @@ The comment edit in the driver and the suite arm are ordinary text edits. No ren
 - **AC2** — When three instances are staged at once in three kit files, each spelled differently —
   one lowercase line appended to `tools/unattended/lib-unattended.sh`, one uppercase phrase wrapped
   across two lines of `tools/unattended/README.md`, and `nothing commits` / `it` wrapped across two
-  `#` comment lines of `tools/unattended/kit.toml` — then `bash tools/unattended/check-unattended.sh`,
-  the argv of the `unattended kit gate` leg in `tools/gate-legs.json`, exits 1 with
-  `UNATTENDED check 47 FAILED`, naming exactly those three files and not the brief-record suite whose
-  line 177 is the nearest miss. When the three files are restored from byte-identical backups and it
-  runs again, it exits 0 with no `FAILED` line.
-  Red when: any of the three spellings passes, the near-miss is named, or the restored tree reds.
+  `#` comment lines of `tools/unattended/kit.toml`, plus a fourth, a `#` comment line appended to
+  `tools/unattended/check-unattended.sh` itself (written in bytes) — then
+  `bash tools/unattended/check-unattended.sh`, the argv of the `unattended kit gate` leg in
+  `tools/gate-legs.json`, exits 1 with `UNATTENDED check 47 FAILED`, naming exactly those four files
+  and not the brief-record suite whose line 177 is the nearest miss. When the four files are restored
+  from byte-identical backups and it runs again, it exits 0 with no `FAILED` line.
+  Red when: any of the four spellings passes, the checker's own file is not read, the near-miss is
+  named, or the restored tree reds.
   cost: two runs of the kit gate, 593 s each on node d on 2026-09-30 (PINNED).
   fixture: the tree itself; the backups go under the run's scratchpad and are restored before commit.
 - **AC3** — When `awk '/^# ---- check 47 /,/^[^#]/' tools/unattended/check-unattended.sh` runs, its
@@ -193,12 +198,17 @@ New arm: `tools/unattended/check-unattended.test.sh` · a kit file copy carrying
 - **F2 — Does the population include the checker and its suite?** (a) Exclude both by name, as check
   33 does, and assemble the suite's staged line from fragments as well. (b) Include both and rely on
   fragment assembly and optional-group spelling alone. (b) forbids the checker's header from naming
-  what it guards. Recommendation (a). RESOLVED (agent, 2026-09-30, delegated): (a), reusing the
-  seam check 33 established.
+  what it guards. RESOLVED (agent, 2026-09-30, delegated): (b), re-resolved at rev-2. (a) narrows the
+  owner-signed accept clause, which names every shipped file; (b) is reachable because the header can
+  describe the premise without spelling it, and the suite's fragments can be spaced out of the window.
 
 ## 9. Revision log
 
 - rev-1 · 2026-09-30 · initial draft, from the ask's accept clause and the build's spec brief.
+- rev-2 · 2026-09-30 · §4 §6 §8 · AC2 F2 · the M2 cross-read found the exclusion of the checker and
+  its suite narrowed the ask's accept clause ("the kit's shipped files"). F2 is re-resolved to (b):
+  both files are scanned, the header describes the premise without spelling it, and AC2 stages a
+  fourth instance in the checker itself.
 
 ## 10. Reuse audit
 

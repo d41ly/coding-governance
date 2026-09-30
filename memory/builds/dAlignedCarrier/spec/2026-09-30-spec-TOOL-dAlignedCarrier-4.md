@@ -1,6 +1,6 @@
 # TOOL-dAlignedCarrier-4 — `--status` reports the holder-worktree and pinned-asks verdicts, read-only
 
-**Status:** SPECCED · rev-1 · 2026-09-30 · node d · Tier-2 · base 87c245b3 · streams tooling · order 1 · advances TOOL-dDerivedDocket-72 · ratified 2026-09-30
+**Status:** SPECCED · rev-2 · 2026-09-30 · node d · Tier-2 · base 87c245b3 · streams tooling · order 1 · advances TOOL-dDerivedDocket-72 · ratified 2026-09-30
 
 <!-- gen:spec-records -->
 
@@ -184,7 +184,8 @@ is the parity observation.
 - **AC3** — When the fixture's main worktree is on another branch and a linked worktree added with
   `git worktree add` holds the run branch, `--status` from the main worktree carries
   `worktree not the run's` naming the linked worktree's path, and a no-id `--resume` there prints
-  `UNATTENDED check 58 FAILED`; from the linked worktree the field is absent. With the `run-branch`
+  `UNATTENDED check 58 FAILED`; from the linked worktree it carries `worktree holds the run` and no
+  `worktree not the run's`. With the `run-branch`
   and `branch-ref` lines deleted from the record it carries `worktree unanswerable`, and with
   `lease-utc` deleted it carries no worktree field.
   Red when: any of the four readings differs from what `--resume` would do on the same record.
@@ -233,6 +234,9 @@ New arm: `tools/unattended/unattended.test.sh` · fixtures with a moved asks lin
 
 - rev-1 · 2026-09-30 · initial draft, from the ask's accept clause, the owner's ruling and the
   build's spec brief.
+- rev-2 · 2026-09-30 · §6 · AC3 · the M2 cross-read found AC3's "from the linked worktree the field is
+  absent" contradicting S3 and AC1, which print the verdict on a pass, and unit 5's AC5, which reads
+  `worktree holds the run` in the holder worktree. AC3 now names that pass verdict.
 
 ## 10. Reuse audit
 
