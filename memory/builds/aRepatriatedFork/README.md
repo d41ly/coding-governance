@@ -183,11 +183,11 @@ ids TOOL-aRepatriatedFork-43 TOOL-aRepatriatedFork-44 TOOL-aRepatriatedFork-45 T
 | [TOOL-aRepatriatedFork-42 — the memory-tree renders take every adopter path from the adopter's own declarations](spec/2026-09-29-spec-TOOL-aRepatriatedFork-42.md) | 19 | 1 | CLOSED | rev-3 | 2026-09-29 |
 | [DEPL-aRepatriatedFork-20 — inCMS converges onto gov's memory-tree programs](spec/2026-09-23-spec-DEPL-aRepatriatedFork-20.md) | 20 | 2 | CLOSED | rev-11 | 2026-09-29 |
 | [TOOL-aRepatriatedFork-49 — the push bar takes no manifest or interpreter from the environment](spec/2026-09-30-spec-TOOL-aRepatriatedFork-49.md) | 21 | 2 | CLOSED | rev-2 | 2026-09-30 |
-| [TOOL-aRepatriatedFork-50 — check 24's add baseline is this run's, on a build that ran before](spec/2026-10-01-spec-TOOL-aRepatriatedFork-50.md) | 22 | 1 | SPECCED | rev-1 | 2026-10-01 |
+| [TOOL-aRepatriatedFork-50 — check 24's add baseline is this run's, on a build that ran before](spec/2026-10-01-spec-TOOL-aRepatriatedFork-50.md) | 22 | 1 | CLOSED | rev-1 | 2026-10-01 |
 | [TOOL-aRepatriatedFork-51 — brief-recorded takes a declared waiver registry, as pass-order does](spec/2026-10-01-spec-TOOL-aRepatriatedFork-51.md) | 22 | 1 | SPECCED | rev-1 | 2026-10-01 |
 <!-- /gen:build-units -->
 
-Records: 107 bound to this build, across 4 record folder(s).
+Records: 108 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

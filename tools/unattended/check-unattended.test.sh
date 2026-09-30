@@ -3273,6 +3273,26 @@ miss "$(run)" "check 24 FAILED"
 same "the already-WONTDO fixture carries the row the exemption reads" \
   "$(grep -c '| WONTDO |' memory/builds/tRos/README.md)" "1"
 
+# ---- A RE-RUN BUILD's ADD baseline is THIS run's, not the finished run's (TOOL-aRepatriatedFork-50).
+# ---- The run-state path keeps the first run's history, so a walk over all of it stopped at that run's
+# ---- first live commit and read every unit specced between the two runs as added mid-run. Measured on
+# ---- aRepatriatedFork at 6e7cb0df: 19 units closed before the second run's preflight redded check 24.
+# ---- The first run goes live with unit 1 and lands; unit 7 is specced; the second run pins a new BASE
+# ---- and goes live; unit 9 arrives with no row. Unit 9 is the liveness half: the arm still grades.
+seed_ros
+sed -i 's/^phase: .*$/phase: LANDED/' memory/builds/tRos/RUN.md
+git add -A && git commit -q -m "the first run landed" --no-verify
+add_u7
+git add -A && git commit -q -m "unit 7 specced between the runs" --no-verify
+sed -i "s/^base: .*$/base: $(git rev-parse HEAD)/; s/^phase: .*$/phase: RUNNING/" memory/builds/tRos/RUN.md
+git add -A && git commit -q -m "the second run's preflight" --no-verify
+awk -v r='| [ARCH-tRos-9 — added mid-run](spec/nine.md) | OPEN | rev-1 | 2026-08-01 |' -v e="$UEND" \
+  '$0==e{print r} {print}' memory/builds/tRos/README.md > /tmp/ros9.$$ && mv /tmp/ros9.$$ memory/builds/tRos/README.md
+git add -A && git commit -q -m "unit 9 added while the second run is live" --no-verify
+out=$(run)
+miss "$out" "so the scope moved with nothing on the record saying so: ARCH-tRos-7 in"
+hit "$out" "so the scope moved with nothing on the record saying so: ARCH-tRos-9 in"
+
 # ---- THE EMPTY BASELINE SKIPS rather than accusing, and the REPORT CHANNEL is what makes that
 # ---- visible. A skip nobody can see is indistinguishable from coverage; the default run stays silent.
 reset_tree

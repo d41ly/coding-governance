@@ -126,3 +126,5 @@ base: d6e1749c0542218004260928f1399174daafb789
 2026-09-30T21:54:56Z rescope · item add TOOL-aRepatriatedFork-50 · reason the full bar at 6e7cb0df redded check 24 on this run's own record: baseline_units walked from the landed first run's first live commit, so 19 units closed before this run's preflight read as added mid-run
 
 2026-09-30T21:54:57Z rescope · item add TOOL-aRepatriatedFork-51 · reason the full bar at 6e7cb0df redded brief-recorded on TOOL-aRepatriatedFork-44, built with no recorded brief, and -46, misread at 09dae486; the leg has no waiver registry, so neither can be recorded honestly
+
+2026-09-30T22:09:28Z brief · item TOOL-aRepatriatedFork-50 · reason 6ff1dfe62270 memory/builds/aRepatriatedFork/prompts/2026-10-01-prompt-TOOL-aRepatriatedFork-50-build-brief.md
