@@ -30,13 +30,15 @@ derive_self_rel() {
 }
 # <<< derive_self_rel
 KIT_REL=$(derive_self_rel "$HERE") || { echo "adopt-codebase-map.test: not inside a git repository"; exit 2; }
+# TOOL-aRepatriatedFork-46: this kit's own directory NAME, which every fixture below mirrors.
+KIT_NAME="${KIT_REL##*/}"
 # PFX is the install prefix WITH its trailing slash, derived from where this file sits and empty
 # at a root install: every fixture and host path below is spelled through it, never through a
 # literal prefix (TOOL-aRepatriatedFork-28).
 case "$KIT_REL" in */*) PFX="${KIT_REL%/*}/" ;; *) PFX="" ;; esac
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
-KIT="$ROOT/${PFX}codebase-map"
+KIT="$ROOT/${PFX}${KIT_NAME}"
 fails=0
 TMP=$(mktemp -d); trap 'rm -rf "$TMP"' EXIT
 
@@ -164,7 +166,7 @@ for prefix in 'R&D' 'a b' "x'y" 'ok-dir' 'ok.dir'; do
     bad "3.$i prefix '$prefix': sourcing the conf EXECUTED something: $side"
   elif [ "$claim_fail" != 0 ] && [ "$claim_ok" != 0 ]; then
     bad "3.$i prefix '$prefix': printed BOTH a failure note and a success claim"
-  elif [ "$claim_ok" != 0 ] && [ "$got" != "python $prefix/codebase-map/map_diff.py" ]; then
+  elif [ "$claim_ok" != 0 ] && [ "$got" != "python $prefix/${KIT_NAME}/map_diff.py" ]; then
     bad "3.$i prefix '$prefix': claimed a stamp but MAP_DIFF_CMD is '$got'"
   elif [ "$claim_fail" != 0 ] && [ "$got" != "$DEFAULT_MDC" ]; then
     bad "3.$i prefix '$prefix': declined the stamp but left MAP_DIFF_CMD as '$got' (a half-write)"
@@ -205,10 +207,10 @@ fi
 # (Windows without Developer Mode) — a silent skip would be the absence-reads-as-pass class.
 # ---------------------------------------------------------------------------------------------
 mkdir -p "$TMP/a5-src" && git -C "$TMP/a5-src" init -q
-cp -r "$KIT" "$TMP/a5-src/codebase-map"; rm -f "$TMP/a5-src/codebase-map/adopt-codebase-map.test.sh"
+cp -r "$KIT" "$TMP/a5-src/${KIT_NAME}"; rm -f "$TMP/a5-src/${KIT_NAME}/adopt-codebase-map.test.sh"
 mkdir -p "$TMP/a5-adopting/${PFX}" && git -C "$TMP/a5-adopting" init -q
 mkdir -p "$TMP/a5-adopting/src"; printf 'def hello():\n    return 1\n' > "$TMP/a5-adopting/src/mod.py"
-cat > "$TMP/a5-src/codebase-map/map_extractors.py" <<'PY'
+cat > "$TMP/a5-src/${KIT_NAME}/map_extractors.py" <<'PY'
 import map_lib as m
 
 def inventory_ids():
@@ -221,14 +223,14 @@ PY
 # Mode and is the exact shape the blocker was measured on (a junctioned kit dir resolving to the
 # link target's repo). `git rev-parse --show-toplevel` follows both.
 link_made=0
-if ln -s "$TMP/a5-src/codebase-map" "$TMP/a5-adopting/${PFX}codebase-map" 2>/dev/null &&
-   [ -L "$TMP/a5-adopting/${PFX}codebase-map" ]; then
+if ln -s "$TMP/a5-src/${KIT_NAME}" "$TMP/a5-adopting/${PFX}${KIT_NAME}" 2>/dev/null &&
+   [ -L "$TMP/a5-adopting/${PFX}${KIT_NAME}" ]; then
   link_made=1
 elif command -v cygpath >/dev/null 2>&1 && command -v cmd >/dev/null 2>&1; then
-  rm -rf "$TMP/a5-adopting/${PFX}codebase-map"
-  cmd //c mklink //J "$(cygpath -w "$TMP/a5-adopting/${PFX}codebase-map")" \
-                     "$(cygpath -w "$TMP/a5-src/codebase-map")" >/dev/null 2>&1 || true
-  [ -f "$TMP/a5-adopting/${PFX}codebase-map/map_lib.py" ] && link_made=2
+  rm -rf "$TMP/a5-adopting/${PFX}${KIT_NAME}"
+  cmd //c mklink //J "$(cygpath -w "$TMP/a5-adopting/${PFX}${KIT_NAME}")" \
+                     "$(cygpath -w "$TMP/a5-src/${KIT_NAME}")" >/dev/null 2>&1 || true
+  [ -f "$TMP/a5-adopting/${PFX}${KIT_NAME}/map_lib.py" ] && link_made=2
 fi
 if [ "$link_made" != 0 ]; then
   out=$(cd "$TMP/a5-adopting" && bash $KIT_REL/adopt-codebase-map.sh --scaffold 2>&1); rc=$?

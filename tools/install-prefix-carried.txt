@@ -25,11 +25,6 @@ tools/check-spec-tokens.test.sh	25	govkit,lib,run-gates,runlog
 tools/check-testsuite-counts.test.sh	3	lib	LOWERED 49 -> 3 by TOOL-aRepatriatedFork-28. The three left are fixture suites that source the harness beside them, a kit segment joined under a derived base, TOOL-aRepatriatedFork-46's class (spec rev-3 §4, Returned).
 tools/check-wiring.sh	5	hooks,lib,memory-recall,memory-tree
 tools/check-wiring.test.sh	52	hooks,lib,memory-recall,memory-tree
-tools/codebase-map/adopt-codebase-map.test.sh	4	codebase-map
-tools/codebase-map/map_extractors.py	2	lexicon,workflows
-tools/codebase-map/selftest.py	25	codebase-map,lexicon
-tools/codebase-map/test_codebase_map.py	1	codebase-map
-tools/codebase-map/test_codebase_map.template.py	1	codebase-map
 tools/dead-path-waivers.txt	2	lexicon
 tools/drift-audit/selftest.py	22	drift-audit,lexicon,memory-recall,unattended,workflows
 tools/govkit/census.test.sh	2	govkit,lib

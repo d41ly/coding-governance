@@ -35,6 +35,43 @@ import sys
 from pathlib import Path
 
 
+# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
+def resolve_kit_dir(home, anchor, here):
+    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
+
+    1. receipt — the `.governance/install.json` row whose `source` ends in <home>/<anchor> and
+       whose `path` exists inside this tree. The only record of a RENAMED kit dir: no probe finds
+       a memory-recall kit an adopter homed at `scripts/recall/`.
+    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
+    3. refuse — LookupError naming the three places looked; never a guessed prefix.
+    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
+    """
+    import json
+    import pathlib
+    here = pathlib.Path(here).resolve()
+    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
+    receipt = root / ".governance" / "install.json"
+    try:
+        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("path"):
+            continue
+        if str(row.get("source") or "").split("/")[-2:] != [home, anchor]:
+            continue
+        hit = (root / str(row["path"])).resolve()
+        if hit.is_file() and root in hit.parents:
+            return hit.parent
+    probes = (here / home, here.parent / home)
+    for cand in probes:
+        if (cand / anchor).is_file():
+            return cand
+    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
+        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
+# <<< resolve_kit_dir
+
+
 def _kit_dir() -> Path:
     """The kit dir — the directory holding map_lib.py — found from this gate file's own location,
     so the gate still needs no per-project placeholders.
@@ -62,7 +99,14 @@ def _kit_dir() -> Path:
     probed: list[str] = []
     here = Path(os.path.abspath(__file__))
     for parent in here.parents:
-        candidates = [parent, parent / "codebase-map"]  # gov:prefix-literal — this kit's OWN dir, probed from the test's install dir in either layout
+        candidates = [parent]
+        # TOOL-aRepatriatedFork-46: the root-convention rung is the sibling-kit resolver's, which reads
+        # the install receipt before it probes `<ancestor>/codebase-map`, so a renamed kit dir the
+        # receipt records is found too. Its miss is recorded, never raised: the glob rung still runs.
+        try:
+            candidates.append(resolve_kit_dir("codebase-map", "map_lib.py", parent))
+        except LookupError as exc:
+            probed.append(f"{parent} (the sibling-kit resolver: {exc})")
         candidates += sorted(p for p in parent.glob("*/codebase-map") if p.is_dir())
         for candidate in candidates:
             if (candidate / "map_lib.py").is_file():

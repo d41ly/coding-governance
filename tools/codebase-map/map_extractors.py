@@ -40,6 +40,45 @@ ROOT = m.repo_root()
 TOOLS = ROOT / Path(m.kit_rel(ROOT)).parent
 
 
+# TOOL-aRepatriatedFork-46: a SIBLING kit is reached through the resolver, which reads the install
+# receipt first, never by joining that kit's name to the tool root.
+# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
+def resolve_kit_dir(home, anchor, here):
+    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
+
+    1. receipt — the `.governance/install.json` row whose `source` ends in <home>/<anchor> and
+       whose `path` exists inside this tree. The only record of a RENAMED kit dir: no probe finds
+       a memory-recall kit an adopter homed at `scripts/recall/`.
+    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
+    3. refuse — LookupError naming the three places looked; never a guessed prefix.
+    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
+    """
+    import json
+    import pathlib
+    here = pathlib.Path(here).resolve()
+    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
+    receipt = root / ".governance" / "install.json"
+    try:
+        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("path"):
+            continue
+        if str(row.get("source") or "").split("/")[-2:] != [home, anchor]:
+            continue
+        hit = (root / str(row["path"])).resolve()
+        if hit.is_file() and root in hit.parents:
+            return hit.parent
+    probes = (here / home, here.parent / home)
+    for cand in probes:
+        if (cand / anchor).is_file():
+            return cand
+    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
+        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
+# <<< resolve_kit_dir
+
+
 def _tool_kits() -> list[str]:
     """Every kit directory directly under the tool root.
 
@@ -102,7 +141,7 @@ EXTRACTORS: dict[str, object] = {
     "git-hooks": _git_hooks,
     # The multi-agent harnesses and the gates over them.
     "workflow-scripts": lambda: m.glob_inventory(
-        TOOLS / "workflows", "*.js", "workflow-scripts"
+        resolve_kit_dir("workflows", "tier2-review.js", TOOLS), "*.js", "workflow-scripts"
     ),
     # The skill ENGINE sources (machine-junctioned per node).
     "skill-engines": lambda: m.walk_dir_keys(
@@ -160,10 +199,10 @@ def _read_lexicon_verbs() -> list[str]:
     # and every leg that calls it, on account of an OPTIONAL kit. Fail to the empty inventory, which
     # is the same answer the absent-conf case gives and is what the dossier ratchet then reports.
     import sys as _sys
-    kit = str(TOOLS / "lexicon")
-    if kit not in _sys.path:
-        _sys.path.insert(0, kit)
     try:
+        kit = str(resolve_kit_dir("lexicon", "lexicon_conf.py", TOOLS))
+        if kit not in _sys.path:
+            _sys.path.insert(0, kit)
         from lexicon_conf import load_conf  # noqa: E402
         return sorted((load_conf(conf).get("VERBS") or {}).keys())
     except Exception:
