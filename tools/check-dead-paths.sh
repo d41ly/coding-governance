@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# check-dead-paths.sh — nothing outside `memory/` may name a file this repo DELETED.
+# check-dead-paths.sh — nothing outside `memory/` may name a file this repo DELETED or renamed away.
 #
 #   bash <prefix>/check-dead-paths.sh            # assert; exit 1 on an unwaived hit
 #   bash <prefix>/check-dead-paths.sh --list     # print every hit, waived or not (authoring aid)
@@ -41,6 +41,12 @@
 # block", "the product template + its two companions" — is invisible here, and carriers of exactly
 # that shape were in the v3.0 set. They were found by READING, not by this gate, and nothing here
 # would have caught them. It is a floor, not the answer.
+# A RENAME whose source sat under `memory/` is not a needle (TOOL-aRepatriatedFork-45): those are
+# records re-filed, and the one such name spelled outside `memory/`, `BACKLOG.md`, is an adopter's
+# live backlog file. And a rename is only seen as one above git's rename-similarity threshold (50% by
+# default); below it git records a delete plus an add, which the deletion half already reads, so the
+# threshold moves a name between the halves and drops none — unless rename detection is switched off
+# outright, which the rename sentinel refuses.
 #
 # `memory/` IS OUT OF SCOPE, and that is a rule rather than a convenience. Specs, reviews, build
 # ledgers and archived snapshots are append-only records: they describe what WAS true, and a record
@@ -76,13 +82,18 @@ TABC=$(printf '\t')
 # will never return, so its ABSENCE from the derived set means the derivation broke, not that the
 # tree got clean.
 SENTINEL="parallel-coding-governance.domain-rules.md"
+# The rename half's own frozen sentinel: the v3.0 product template's old name, reachable ONLY through
+# a rename row, so its absence means the rename read broke. It is checked against the rename half
+# alone, never the union, or a deletion of the same name could hold it up.
+RENAME_SENTINEL="parallel-coding-governance.template.md"
 
 MODE="${1:---check}"
 case "$MODE" in --check|--list|--needles) ;; *) echo "usage: $(basename "$0") [--check|--list|--needles]"; exit 2 ;; esac
 
 # --- the needle set, derived ----------------------------------------------------------------------
-# Every path ever deleted, reduced to basenames, minus every basename the tree still carries. A file
-# deleted from one directory and re-added in another is NOT dead: the name still resolves.
+# Every path ever deleted or renamed away, reduced to basenames, minus every basename the tree still
+# carries. A file deleted from one directory and re-added in another is NOT dead: the name still
+# resolves.
 tracked=$(git ls-files)
 [ -n "$tracked" ] || { echo "dead-paths: git ls-files is empty — that is not a pass"; exit 2; }
 tracked_base=$(printf '%s\n' "$tracked" | sed 's|.*/||' | sort -u)
@@ -91,7 +102,17 @@ deleted_base=$(git log --diff-filter=D --name-only --pretty=format: -- . \
                | sed '/^$/d; s|.*/||' | sort -u)
 [ -n "$deleted_base" ] || { echo "dead-paths: git history reports no deletion at all — the derivation is broken, not the tree clean"; exit 2; }
 
-gone=$(printf '%s\n' "$deleted_base" | grep -vxF -f <(printf '%s\n' "$tracked_base") || true)
+# THE RENAME HALF (TOOL-aRepatriatedFork-45). git records a `git mv` as R, never D, so the OLD name of
+# a renamed file is gone exactly as a deleted one is and the read above never sees it. Column 2 of an
+# `R<score>` row is the source. Sources under `memory/` are records re-filed, and the one such name
+# spelled outside it, `BACKLOG.md`, is an adopter's live file, so they stay out, mirroring the
+# haystack's own exclusion.
+renamed_base=$(git log --diff-filter=R --name-status --pretty=format: -- . \
+               | awk -F'\t' 'NF >= 3 && $2 !~ /^memory\// { print $2 }' \
+               | sed 's|.*/||' | sort -u)
+
+gone=$(printf '%s\n%s\n' "$deleted_base" "$renamed_base" | sort -u \
+       | grep -vxF -f <(printf '%s\n' "$tracked_base") || true)
 
 # Each gone basename plus its distinctive tail. `a.b.md` -> `a.b.md` and `b.md`; `a.md` -> `a.md`.
 # Then drop any needle that still SUFFIXES a tracked path, which is what stops a generic tail.
@@ -127,6 +148,14 @@ if ! printf '%s\n' "$needles" | grep -qxF "$SENTINEL"; then
   echo "dead-paths: the frozen sentinel '$SENTINEL' is not in the derived needle set."
   echo "dead-paths: it was deleted at 5b00666 and cannot come back, so the DERIVATION is broken —"
   echo "dead-paths: a clean verdict from here would be this gate matching nothing and calling it green."
+  exit 1
+fi
+# Read against the rename half ALONE, never the union, so a deletion of the same basename can never
+# mask an empty rename read. After the deletion sentinel, so each refusal keeps its own message.
+if ! printf '%s\n' "$renamed_base" | grep -qxF "$RENAME_SENTINEL"; then
+  echo "dead-paths: the frozen rename sentinel '$RENAME_SENTINEL' is not in the derived rename set."
+  echo "dead-paths: it was renamed away at 5b00666 and cannot come back, so the rename"
+  echo "dead-paths: DERIVATION is broken — renamed-away names would go unseen and the gate call it green."
   exit 1
 fi
 
@@ -226,9 +255,9 @@ stale_rows=$(printf '%s\n' "$waived_rows" | grep -vxF -f <(printf '%s' "$hits") 
 bad=0
 for h in $unwaived; do
   if [ "$bad" = 0 ]; then
-    echo "dead-paths: a file outside memory/ names a path this repo DELETED. A reader who follows it"
-    echo "dead-paths: finds nothing, and nothing else in the bar reds. Repoint it at what replaced the"
-    echo "dead-paths: file, or add a row to $WAIVERS with the reason the name must stay."
+    echo "dead-paths: a file outside memory/ names a path this repo DELETED or renamed away. A reader"
+    echo "dead-paths: who follows it finds nothing, and nothing else in the bar reds. Repoint it at what"
+    echo "dead-paths: replaced the file, or add a row to $WAIVERS with the reason the name must stay."
   fi
   bad=$((bad+1))
   printf '  %s  %s\n' "$h" "$(sed -n "${h##*:}p" "${h%:*}" | sed 's/^[[:space:]]*//' | cut -c1-90)"

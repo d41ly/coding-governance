@@ -13,11 +13,12 @@
 # an unwaived hit, a stale waiver, an empty needle set, a missing sentinel — and an arm reading only
 # `$?` cannot tell them apart, so it would report success while the gate failed for the wrong reason.
 #
-# THE FIXTURES ARE REAL GIT REPOS WITH REAL DELETION HISTORY, because the needle set is derived from
-# `git log --diff-filter=D`. A fixture that only writes files exercises nothing: there is no such
-# thing as a dead path in a repo that has never deleted one. Each fixture therefore commits a file,
-# deletes it in a LATER commit, and only then plants the carrier — never `git mv`, which git records
-# as a rename that `--diff-filter=D` never reports.
+# THE FIXTURES ARE REAL GIT REPOS WITH REAL DELETION AND RENAME HISTORY, because the needle set is
+# derived from `git log --diff-filter=D` and `--diff-filter=R`. A fixture that only writes files
+# exercises nothing: there is no such thing as a dead path in a repo that has never deleted or
+# renamed one. Each fixture therefore commits a file, deletes or `git mv`s it in a LATER commit, and
+# only then plants the carrier. The two halves are separate commits, so git's rename pairing can never
+# match a deleted file to a renamed one's destination.
 #
 # NOTHING HERE TOUCHES THE REAL TREE. The gate `cd`s to its own git toplevel, so every arm runs it
 # from inside the scratch repo it was built for.
@@ -45,7 +46,7 @@ cd "$ROOT" || exit 2
 GATE_SRC="$ROOT/${PFX}check-dead-paths.sh"
 [ -f "$GATE_SRC" ] || { echo "dead-paths.test: no gate at $GATE_SRC"; exit 2; }
 
-FLOOR_ASSERTIONS=19
+FLOOR_ASSERTIONS=22
 PASS=0
 FAIL=0
 ok()  { PASS=$((PASS+1)); }
@@ -65,20 +66,29 @@ arm() {
   case "$out" in *"$needle"*) ok ;; *) bad "$label — rc was right but the message was not: $(printf '%s' "$out" | head -3)" ;; esac
 }
 
-# mkrepo <dir> — a repo whose HISTORY contains a deletion of the gate's frozen sentinel basename.
-# The sentinel is gov's own deleted companion, so a fixture must delete that exact name for the
-# derivation to anchor. The fixtures that exercise the anti-vacuity refusals are built inline instead,
-# precisely because they must NOT satisfy the sentinel.
+# mkrepo <dir> [norename] — a repo whose HISTORY contains a deletion of the gate's frozen sentinel
+# basename and a rename away of its frozen RENAME sentinel. Both are gov's own v3.0 names, so a
+# fixture must retire those exact names for the derivation to anchor. It also renames a file from
+# under `memory/` to another `memory/` path, the re-filed record the rename half must NOT turn into a
+# needle. `norename` stops after the deletion, for the arm proving the rename sentinel refuses. The
+# fixtures that exercise the other anti-vacuity refusals are built inline, because they must NOT
+# satisfy the deletion sentinel.
 mkrepo() {
-  local d="$1"; shift
-  mkdir -p "$d/${PFX}"
+  local d="$1"
+  mkdir -p "$d/${PFX}" "$d/memory"
   ( cd "$d" && git init -q && git config core.autocrlf false \
       && git config user.email t@t && git config user.name t ) || return 1
   cp "$GATE_SRC" "$d/${PFX}check-dead-paths.sh"
   printf 'placeholder catalogue\n' > "$d/parallel-coding-governance.domain-rules.md"
+  printf 'the old product template\n' > "$d/parallel-coding-governance.template.md"
+  printf 'an old backlog\n' > "$d/memory/BACKLOG.md"
   printf 'a live file\n' > "$d/README.md"
   ( cd "$d" && git add -A && git commit -qm seed )
   ( cd "$d" && git rm -q parallel-coding-governance.domain-rules.md && git commit -qm delete )
+  [ "${2:-}" = norename ] && return 0
+  mkdir -p "$d/memory/backlog"
+  ( cd "$d" && git mv parallel-coding-governance.template.md coding-governance-agents.template.md \
+      && git mv memory/BACKLOG.md memory/backlog/TOOL.md && git commit -qm rename )
 }
 
 run() { ( cd "$1" && bash ${PFX}check-dead-paths.sh "${2:---check}" ); }
@@ -123,6 +133,16 @@ mkdir -p "$BASE/memory/builds/x"
 printf 'the spec cited parallel-coding-governance.domain-rules.md at the time\n' > "$BASE/memory/builds/x/spec.md"
 ( cd "$BASE" && git add -A )
 arm "green: an append-only record under memory/ is not a carrier" 0 "no undeclared carrier" -- run "$BASE"
+
+# ---- 3b. the rename half (TOOL-aRepatriatedFork-45) ----------------------------------------------
+# A `git mv` is recorded as R, never D, so before this half existed a carrier naming the OLD name of
+# a renamed file passed. Measured on the real tree: a planted citation of a renamed-away fixture exited 0.
+reset_base 'the charter template is parallel-coding-governance.template.md'
+arm "red: a carrier naming a basename RENAMED away outside memory/" 1 "DELETED or renamed away" -- run "$BASE"
+# A source under memory/ is a record re-filed, and `BACKLOG.md` is an adopter's live name: without
+# the exclusion this carrier reds, which is the fourteen false hits the spec measured.
+reset_base 'the adopter keeps its backlog in BACKLOG.md'
+arm "green: a basename renamed away from under memory/ is not a needle" 0 "no undeclared carrier" -- run "$BASE"
 
 # ---- 4. waivers — keyed by TEXT and an occurrence ORDINAL (TOOL-dHonouredPark-3) ------------------
 # A row is `<path>\t<ordinal>\t<line-text>\t<reason>`. Tab-separated rows are unreadable written
@@ -235,6 +255,12 @@ printf 'x\n' > "$SENT/unrelated.md"; printf 'y\n' > "$SENT/README.md"
 arm "red: the frozen sentinel missing from the derived set" 1 "frozen sentinel" -- run "$SENT"
 arm "red: and it says the derivation broke, not that the tree is clean" 1 "DERIVATION is broken" -- run "$SENT"
 
+# The RENAME half has its own sentinel, read against that half alone: a repo that deleted the
+# deletion sentinel but never renamed the rename one must red on it, or an empty rename read — a
+# config with rename detection off, a broken `--diff-filter=R` — would pass unseen.
+mkrepo "$TMPROOT/norename" norename || exit 2
+arm "red: the frozen RENAME sentinel missing from the rename half" 1 "frozen rename sentinel" -- run "$TMPROOT/norename"
+
 # A repo that HAS deletions but where every deleted basename was re-added leaves the needle set empty
 # AFTER filtering, which is a different branch from "git reports no deletion at all". It fired by
 # accident while this suite was being written and nothing pinned it, which is how a branch goes quiet.
@@ -261,10 +287,10 @@ arm "red: every deleted basename re-added leaves an EMPTY needle set" 1 "needle 
 # sentinel resolve again and red the derivation arm, which is the gate working as designed. So the
 # fixture keeps the sentinel deleted and moves a third file.
 #
-# DELETED AND RE-ADDED IN SEPARATE COMMITS, never `git mv`. A rename inside one commit is recorded as
-# R and `--diff-filter=D` never sees it, so a `git mv` fixture exercises NOTHING here — it passes
-# whether or not the tracked-suffix filter exists. Measured: the first draft of this arm used `git mv`
-# and was green against a gate whose filter had never run.
+# DELETED AND RE-ADDED IN SEPARATE COMMITS, not a `git mv` in one. Before the rename half existed a
+# rename was invisible to the derivation, so a `git mv` fixture exercised NOTHING here — it passed
+# whether or not the tracked-suffix filter existed. Measured: the first draft of this arm used one
+# and was green against a gate whose filter had never run. This arm grades the deletion half.
 mkrepo "$TMPROOT/readd" || exit 2
 mkdir -p "$TMPROOT/readd/docs"
 printf 'moved, not deleted\n' > "$TMPROOT/readd/moved-note.md"
