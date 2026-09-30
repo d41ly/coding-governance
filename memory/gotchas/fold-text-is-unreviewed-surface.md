@@ -67,7 +67,10 @@ Four practices, each earned by one of the shapes above:
 - **Re-derive every number and every citation the fold writes**, at the moment of writing it. A fold
   correcting a stale figure with a second stale figure is the commonest single instance.
 - **When a finding names several carriers, edit all of them or record the refusal.** Answering one
-  and logging the finding as folded is what turns a fold-created defect into an invisible one.
+  and logging the finding as folded is what turns a fold-created defect into an invisible one. Grep
+  them for the old value's pronoun forms too (`it`, `the flag`), not only its spelling, and a fold
+  that widens a claim from one value to two re-reads the code path for the SECOND value, not only
+  the ruling behind the first (`dAlignedCarrier`'s closing review, round 2, L3 and M2).
 
 The round that follows a fold should be primed AT the fold rather than at the document: pass it the
 previous round's confirmed set, tell it the diff under review is the fold, and require the by-kind

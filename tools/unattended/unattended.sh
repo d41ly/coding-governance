@@ -43,7 +43,7 @@
 # The generated region holds NO copy: the unit list is DERIVED from the build README's already-derived,
 # already-byte-compared slice. One derivation in the tree; this file is not a second one.
 set -u
-KIT_UNATTENDED_VERSION=1.45   # gov:kit unattended@1.45 — kit identity; set HERE, never from .unattended.conf
+KIT_UNATTENDED_VERSION=1.46   # gov:kit unattended@1.46 — kit identity; set HERE, never from .unattended.conf
 
 # ------------------------------------------------------------------------------ the dereference pin
 # A sha is a NAME, and turning a name into bytes or into ancestry happens in the run's own object
@@ -813,7 +813,7 @@ HALT_CODES_CORE="runaway-ceiling-unclean fork-unresolvable scope-approval-needed
 # through HOLD_CODES_EXTRA and deletes nothing, which HOLD_FLOOR pins the way HALT_FLOOR pins the
 # halt set.
 HOLD_CODES_CORE="host-degraded platform-limit platform-unavailable host-owner-action inherited-red"
-DIRECTIVES_CORE="minimal-prose:M10 sub-specced:M2 forks-resolved:M3 specs-reviewed:M4 reuse-first:M5 parallel-when-disjoint:M6 passes-committed:M6 diff-reviewed:M8 land-once-done:M8 conflicts-reconciled:M8 wrap-up-derived:M9 researched:M12:prompt solution-tested:M12:prompt pieces-recorded:M9:recipe playbook-followed:M7:recipe discoveries-adopted:M10 passes-harnessed:M6"
+DIRECTIVES_CORE="minimal-prose:M10 sub-specced:M2 forks-resolved:M3 specs-reviewed:M4 reuse-first:M5 parallel-when-disjoint:M6 passes-committed:M6 diff-reviewed:M8 land-once-done:M8 conflicts-reconciled:M8 wrap-up-derived:M9 researched:M12 solution-tested:M12 pieces-recorded:M9:recipe playbook-followed:M7:recipe discoveries-adopted:M10 passes-harnessed:M6"
 
 # the AUTHORIZATION MODE set, published as a constant so it is spelled
 # ONCE. It was a `case` arm in one file and a hardcoded pair in another, which is why check 19 could
@@ -3560,14 +3560,25 @@ check_filing_home() { # slug -> 1 and a printed refusal when the slug names a fi
 #
 # READ AT HEAD, which is what the property says and what a run can actually edit. A README absent at
 # HEAD reads as an EMPTY line and differs, which is this same refusal rather than a second branch.
+#
+# THE COMPARISON IS ITS OWN PREDICATE (TOOL-dAlignedCarrier-4 S1), so check 73 and `--status`'s
+# report of it read ONE answer. It prints nothing and calls no `fail`: `fail` records its check number
+# on the run journal's END line, and a read verb reporting the verdict must not. 0 = the two differ ·
+# 1 = they agree, or nothing is pinned. `AM_PIN` is the pinned value, empty when nothing is pinned, so
+# a reporter tells "agrees" from "never asked"; `AM_NOW` is the value at HEAD, set only when read.
+AM_PIN=""; AM_NOW=""
+check_asks_moved() { # slug · run-state file -> 0 when the asks: line at HEAD is not the pinned one; AM_PIN, AM_NOW
+  AM_PIN=""; AM_NOW=""
+  [ -f "$2" ] || return 1
+  AM_PIN=$(fact "$2" asks 2>/dev/null)
+  [ -n "$AM_PIN" ] || return 1
+  AM_NOW=$(read_asks_key "$(GIT show "HEAD:$(readme_of "$1")" 2>/dev/null)")
+  [ "$AM_PIN" != "$AM_NOW" ] || return 1
+  return 0
+}
 check_asks_pinned() { # slug · run-state file -> 1 with its own refusal printed
-  local _pin _now
-  [ -f "$2" ] || return 0
-  _pin=$(fact "$2" asks 2>/dev/null)
-  [ -n "$_pin" ] || return 0
-  _now=$(read_asks_key "$(GIT show "HEAD:$(readme_of "$1")" 2>/dev/null)")
-  [ "$_pin" != "$_now" ] || return 0
-  fail 73 "the build README's asks: line at HEAD is not the one this run pinned, and a run that re-read its own mandate could grow the set it is authorized for: pinned [$_pin] · at HEAD [$_now]"
+  check_asks_moved "$1" "$2" || return 0
+  fail 73 "the build README's asks: line at HEAD is not the one this run pinned, and a run that re-read its own mandate could grow the set it is authorized for: pinned [$AM_PIN] · at HEAD [$AM_NOW]"
   return 1
 }
 PF_MBASE=""; PF_ASKS_READY=""
@@ -4205,11 +4216,19 @@ verb_phase() { # slug · phase · witness
   fi
   [ -n "$wit" ] || { fail 11 "a phase claim carries a WITNESS - a sha, a tag or a run id - and presence is its own refusal because an unwitnessed claim is the one an oracle skips: $want"; return 1; }
   set_fact "$rel" phase "$want" || return 1
+  set_fact "$rel" witness "$wit" || return 1
   # TOOL-aBoundedVerdict-15 S1 - the SECOND omission, and the reason rev-1's "the only phase writer
   # that does not stage" was wrong. Three of five staged; this and --close were the two that did not.
+  # STAGED AFTER THE LAST WRITE, never between two (TOOL-dAlignedCarrier-6, closing review M1): staged
+  # between the phase and the witness, the index paired the new phase with the PREVIOUS witness and
+  # left the new one unstaged, so the Skill's "commit the record the move stages" committed half a
+  # record and the in-place prepare refused the dirty tree it left. Check 48 gates the order.
   stage_or_fail "$rel" || return 1
-  set_fact "$rel" witness "$wit" || return 1
   echo "unattended: phase $want · witness $wit"
+  # TOOL-dAlignedCarrier-6 S2 - THE MOVE INTO VERIFYING IS WHERE THE OWED FLAGGED BAR IS ANNOUNCED,
+  # under every LANDER_MODE, because it is the phase in which the main loop decides what its one
+  # `--close` exports. No other target announces.
+  [ "$want" = VERIFYING ] && print_selftests_owed "$rel"
   return 0
 }
 
@@ -5649,6 +5668,30 @@ BRIEFROWS
   # when there is one, each identity checked, and nothing killed — this is a read verb.
   local _orph; _orph=$(measure_orphans "$slug")
   [ "${_orph:-0}" -gt 0 ] 2>/dev/null && parked="$parked · orphans $_orph"
+  # THE TWO CHECKS A NO-ID `--resume` REACHES FIRST, REPORTED (TOOL-dAlignedCarrier-4 S3, S4): check
+  # 73's pinned-asks comparison and check 58's holder worktree, so a session regrounding with this
+  # verb loses neither. EACH PRINTS ON EXACTLY THE RECORDS WHOSE `--resume` WOULD RUN ITS CHECK, pass
+  # included — a report silent on a pass cannot be told from a verb that never asked — and a record on
+  # which neither runs prints the bytes it printed before. Asks: every record pinning `asks`, since
+  # `--resume` runs check 73 above every row. Worktree: a record carrying `lease-utc` whose phase is
+  # not terminal and which is not a LANDING the landed log observed — the rows on which `--resume`
+  # reaches check 58. READ-ONLY: both go through the predicates the refusals use, which print
+  # nothing, write nothing and call no `fail`, so this verb exits as it did whatever either reads.
+  local _hw=0
+  if check_asks_moved "$slug" "$rel"; then
+    parked="$parked · asks moved at HEAD, check 73 refuses a resume: pinned [$AM_PIN] at HEAD [$AM_NOW]"
+  elif [ -n "$AM_PIN" ]; then
+    parked="$parked · asks as pinned"
+  fi
+  if [ -n "$(fact "$rel" lease-utc)" ] && ! is_terminal "$p" \
+     && ! { [ "$p" = LANDING ] && [ -n "$DP_LANDING" ] && read_landed_observation "$slug" "$DP_LANDING"; }; then
+    resolve_holder_worktree "$rel" || _hw=$?
+    case "$_hw" in
+      0) parked="$parked · worktree holds the run" ;;
+      2) parked="$parked · worktree unanswerable, the record names no run branch" ;;
+      *) parked="$parked · worktree not the run's, check 58 refuses a resume here: $(derive_holder_where)" ;;
+    esac
+  fi
   # THE STOP-GUARD'S NEWEST LISTING, on the same rule (TOOL-aWokenSentinel-9): a FIELD on this one
   # line, printed only when the record names a keepalive id AND the sidecar holds a line, so a
   # record with nothing to report prints the bytes it printed before this unit. `present` and
@@ -6146,6 +6189,9 @@ print_resume_orientation() { # run-state file · phase
   echo "unattended: resume at phase $2 — read $1, then continue the first non-terminal unit above"
   [ -f "$M/guides/BUILD-METHOD.md" ] && echo "unattended: re-read the build method at $M/guides/BUILD-METHOD.md"
   echo "unattended: the directives and their waivers — the table in the unattended Skill; your waivers are parked in this file"
+  # TOOL-dAlignedCarrier-6 S3 - a session resuming or taking over a run at VERIFYING, after a
+  # compaction or a process death, reads the owed-bar notice again: it never saw the move's.
+  [ "$2" = VERIFYING ] && print_selftests_owed "$1"
   return 0
 }
 
@@ -6238,8 +6284,25 @@ run_takeover() { # slug · run-state file · keepalive id · held|working · pha
 # none does, else that no such branch exists here, so the remedy is one a caller can follow. A
 # record naming no branch is announced and passed: refusing it would wedge for ever the holder of a
 # run preflighted on a detached HEAD, which `check_branch` admits.
+#
+# WHERE THE RUN IS DRIVEN FROM, ONE DERIVATION (TOOL-dAlignedCarrier-4 S2): the worktree `git
+# worktree list` shows with `HW_REF` checked out, else the remedy for a branch no worktree has checked
+# out, else the remedy for a branch that does not exist here. Read after `resolve_holder_worktree`,
+# whose `HW_REF` it takes; it prints the text and writes nothing, so check 58's refusal and
+# `--status`'s report of that check name one place.
+derive_holder_where() { # (HW_REF) -> prints the holder worktree's path, or the remedy naming why there is none
+  local wp
+  wp=$(GIT worktree list --porcelain 2>/dev/null | awk -v b="branch $HW_REF" '/^worktree /{ p = substr($0, 10) } $0 == b { print p; exit }')
+  if [ -n "$wp" ]; then
+    printf '%s\n' "$wp"
+  elif GIT rev-parse --verify -q "$HW_REF" >/dev/null 2>&1; then
+    printf '%s\n' "no worktree on this node has it checked out, so check it out first"
+  else
+    printf '%s\n' "no branch of that name exists on this node, so create it at a commit that carries this record and check it out"
+  fi
+}
 check_holder_worktree() { # slug · run-state file -> 0 passes, 1 with its own refusal printed
-  local slug="$1" rel="$2" hw=0 wp where here
+  local slug="$1" rel="$2" hw=0 where here
   resolve_holder_worktree "$rel" || hw=$?
   [ "$hw" = 0 ] && return 0
   if [ "$hw" = 2 ]; then
@@ -6247,14 +6310,7 @@ check_holder_worktree() { # slug · run-state file -> 0 passes, 1 with its own r
     return 0
   fi
   if [ -z "$KID" ]; then verb_status "$slug" || true; fi
-  wp=$(GIT worktree list --porcelain 2>/dev/null | awk -v b="branch $HW_REF" '/^worktree /{ p = substr($0, 10) } $0 == b { print p; exit }')
-  if [ -n "$wp" ]; then
-    where="$wp"
-  elif GIT rev-parse --verify -q "$HW_REF" >/dev/null 2>&1; then
-    where="no worktree on this node has it checked out, so check it out first"
-  else
-    where="no branch of that name exists on this node, so create it at a commit that carries this record and check it out"
-  fi
+  where=$(derive_holder_where)
   case "$HW_HEAD" in
     detached) here="a detached HEAD" ;;
     unreadable) here="an unreadable HEAD" ;;
@@ -6267,8 +6323,10 @@ check_holder_worktree() { # slug · run-state file -> 0 passes, 1 with its own r
 # --resume IS TWO VERBS IN ONE — orientation and take-over — and the lease is what separates them.
 # The matrix it implements is in memory/guides/UNATTENDED-STOPS.md and is not restated here; what is
 # stated here is the property every row shares: a refusal happens before any write, and the rows that
-# refuse for want of an id print the --status block first, so a session regrounding by the build
-# method's no-id spelling still reads its phase and witness before it is told what to pass.
+# refuse for want of an id print the --status block first, so any caller spelling --resume without an
+# id still reads its phase and witness before it is told what to pass. --status carries the verdicts
+# those rows reach first, checks 58 and 73, as fields on its one line (TOOL-dAlignedCarrier-4), so a
+# session regrounding with --status loses neither.
 #
 # THE LEASE IS THE RUN-STATE FACTS (TOOL-dDerivedDocket-61 S7). Identity is the `keepalive` fact, or
 # the `session` fact against CLAUDE_CODE_SESSION_ID for the same-session row, whose caller is under
@@ -6747,8 +6805,10 @@ print_gate_backstop() { # where the bound came from -> the line, from GB_SUM and
 # inherited red, and a second HIGH ask per hold is noise an owner has to dispose of. The match needs R
 # as well as the leg, because the ask's `seen` locator and `run` command pin R.
 #
-# STAGED, NEVER COMMITTED: no driver verb commits. On the MET path the rows ride the close's records
-# commit; on a path that prints a `hold ·` line the Skill's Close sequence commits them before `--hold`.
+# STAGED BY THIS ITEM, and committed by the step that closes the run. On the MET path, under
+# `LANDER_MODE=in-place`, `--close` commits them in its own records commit (`write_close_commit`),
+# and under `primary` they ride the records commit the close names as owed; on a path that prints a
+# `hold ·` line the Skill's Close sequence commits them before `--hold`.
 # With `ASKS_CMD` blank the rows are PRINTED and nothing is written, so the auto-file cannot arm itself
 # before the project adopts the ask contract.
 read_leg_argv() { # run dir · R · leg name -> that leg's argv in R's manifest, space-joined; rc 1 unreadable
@@ -7026,35 +7086,71 @@ check_inplace_preconditions() { # slug -> 0 when the bar may run over a prepared
   return 1
 }
 
-# S3 - THE SELF-TEST TERM IS DERIVED, AND WHAT THE DERIVATION PRODUCES IS AN ANNOUNCEMENT.
-# `AGENTS.md` records `GATE_SELFTESTS=1` as ON DEMAND ONLY with no boundary setting it (owner,
-# 2026-08-27), and a landing's `gates-green` IS a boundary, since its stamp is the one the push
-# reuses. So this verb ADDS the flag to nothing and REMOVES it from nothing: an owner who runs the
-# close with it already exported keeps it by inheritance, which is exactly the on-demand use that
-# ruling sanctions. What the derivation buys is that nobody has to REMEMBER the run is owed.
-print_selftests_owed() { # -> announces when the landing range owes the flagged bar
-  local _p _q _hit="" _touched
+# S3 - THE SELF-TEST TERM IS DERIVED, AND WHAT THE DERIVATION PRODUCES IS AN ANNOUNCEMENT, READ AT
+# VERIFYING. TOOL-dDerivedDocket-70, OWNER RULING (2026-09-30): when the run's range touches a
+# declared self-test surface, the MAIN LOOP pays the flagged bar by exporting the flag into its one
+# `--close`, whose bar inherits it; an unattended main loop counts as the ON DEMAND use the charter's
+# merge-bar fence sanctions (owner, 2026-08-27); and no line of this driver sets the flag, adds it or
+# removes it. So the notice is read where that decision is MADE, on the move into VERIFYING and on a
+# resume or take-over that finds the record there (TOOL-dAlignedCarrier-6), and never inside the
+# verb that runs the bar: printed there, it arrived after VERIFYING was over and the one close had
+# already run without it. What the derivation buys is that nobody has to REMEMBER the run is owed.
+#
+# THE REMEDY NAMES THE PAIR, `GATE_FULL=1 GATE_SELFTESTS=1`, and not the flag alone (spec §8 F5,
+# closing review M2). The ruling names the flag the main loop exports; the charter's kit Definition of
+# Done names the pair. Under `in-place` the close adds `GATE_FULL=1` itself, but under `primary` its
+# bar carries none, so an export of the flag alone lifted the hold and left every guarded self-test leg
+# whose guard the branch did not move reporting `skip`: a guard-scoped run, not the flagged bar. The
+# pair's `GATE_FULL` half is redundant and harmless under `in-place`, so one spelling serves both
+# modes. The driver never sets `GATE_SELFTESTS`; the `GATE_FULL=1` of the in-place close is its own
+# (TOOL-dDerivedDocket-3 S3), which is WHY that half is redundant there (closing review round 2, M2).
+#
+# THE RANGE is the pinned `base` fact to HEAD, a recorded value read offline, because no prepared
+# merge exists yet at VERIFYING (spec §8 F2). After a merge brings in another landing's kit commits
+# it can announce a surface that landing touched: one flagged bar more than owed, never one fewer.
+# That "never one fewer" holds only because the read names BOTH sides of a rename (`--no-renames`):
+# a porcelain diff detects renames by default and names one by its destination alone, so a range
+# whose only touch was moving a file OUT of a declared prefix read as untouched (closing review L1).
+# Names are read NUL-delimited (`-z`), which prints every path verbatim: `core.quotepath=off` stops
+# quoting only non-ASCII bytes, and git still C-quotes a path holding a tab, a double quote, a
+# backslash or a newline, which no prefix then matches (closing review round 2, L2). Each name is
+# matched WHOLE inside the pipeline, so only the prefixes it touched leave it, and `pipefail` there
+# makes a diff that fails announce that the answer is unknown rather than read as an empty range.
+print_selftests_owed() { # run-state file -> announces when the run's range owes the flagged bar
+  local _p _q _hit="" _touched _b
   # BLANK IS NEVER, AND IT SAYS SO. A skip that looks like a pass is indistinguishable from
   # coverage, and this one silently un-owes a whole Definition-of-Done clause.
   if [ -z "$SELFTESTS_OWED_PATHS" ]; then
-    echo "unattended: close - SELFTESTS_OWED_PATHS is blank, so no landing range can ever owe the flagged bar here and this close will never announce one; the charter's 'owed by a DoD only for KIT work' then has no declared kit surface to be read against."
+    echo "unattended: SELFTESTS_OWED_PATHS is blank, so no range here can ever owe the flagged bar and no phase move will announce one; the charter's 'owed by a DoD only for KIT work' then has no declared kit surface to be read against"
     return 0
   fi
-  # THE LANDING RANGE, which is what the push publishes and not what the branch contains: the
-  # prepared merge's FIRST parent is the tip the remote advertised, so this is the delta the default
-  # branch actually gains.
-  _touched=$(GIT diff --name-only HEAD^1 HEAD 2>/dev/null)
-  while IFS= read -r _p; do
-    [ -n "$_p" ] || continue
-    for _q in $SELFTESTS_OWED_PATHS; do
-      case "$_p" in
-        "$_q"*) case " $_hit " in *" $_q "*) ;; *) _hit="$_hit $_q" ;; esac ;;
-      esac
-    done
-  done < <(printf '%s
-' "$_touched")
+  # AN UNREADABLE RANGE SAYS SO TOO. With no base, or one this clone cannot resolve, `git diff` would
+  # print nothing and read exactly like a range that touched nothing.
+  _b=$(fact "$1" base)
+  if [ -z "$_b" ]; then
+    echo "unattended: the record pins no base, so the range that decides whether the flagged bar is owed cannot be read, and no notice is printed; whether it is owed is unanswerable here, not no"
+    return 0
+  fi
+  if ! GIT rev-parse -q --verify "$_b^{commit}" >/dev/null 2>&1; then
+    echo "unattended: the record's base ${_b:0:8} does not resolve in this clone, so the range that decides whether the flagged bar is owed cannot be read, and no notice is printed; whether it is owed is unanswerable here, not no"
+    return 0
+  fi
+  _touched=$(set -o pipefail
+    GIT diff --no-renames --name-only -z "$_b" HEAD 2>/dev/null |
+      while IFS= read -r -d '' _p; do
+        for _q in $SELFTESTS_OWED_PATHS; do
+          case "$_p" in "$_q"*) printf '%s\n' "$_q" ;; esac
+        done
+      done) || {
+    echo "unattended: the run's range ${_b:0:8}..HEAD could not be diffed, so whether the flagged bar is owed is unanswerable here, not no"
+    return 0
+  }
+  while IFS= read -r _q; do
+    [ -n "$_q" ] || continue
+    case " $_hit " in *" $_q "*) ;; *) _hit="$_hit $_q" ;; esac
+  done < <(printf '%s\n' "$_touched")
   [ -n "$_hit" ] || return 0
-  echo "unattended: close - the landing range HEAD^1..HEAD touches a declared self-test surface (${_hit# }), so the kit Definition of Done owes the flagged bar. This close does NOT run it and does NOT set the flag, which the charter reserves to a person: run it BY HAND at VERIFYING as 'GATE_FULL=1 GATE_SELFTESTS=1 $GATE_CMD' and name the command you ran in the run's record."
+  echo "unattended: the run's range ${_b:0:8}..HEAD touches a declared self-test surface (${_hit# }), so the kit Definition of Done owes the flagged bar: export GATE_FULL=1 GATE_SELFTESTS=1 into this run's one --close, whose bar inherits both; this driver never sets GATE_SELFTESTS"
 }
 
 # S4 - THE CARRY CHECK, ASKED BEFORE ANY WRITE. A landing that would publish another build's
@@ -7411,7 +7507,10 @@ dod_met() { # slug · run-state file · item · checker
         # a bare assignment prefix, because this kit's own guard is that the bar must not be scoped by
         # a leg guard here: a guarded manifest would grade the landing merge by guard, which is the
         # shape two reproduced aborts already have. `GATE_SELFTESTS` is neither set nor unset, so the
-        # bar's environment carries exactly what this close inherited.
+        # bar's environment carries exactly what this close inherited: the main loop exports it, with
+        # `GATE_FULL=1` beside it for the `primary` arm below, when the move into VERIFYING announced
+        # the flagged bar owed, and this arm announces nothing (TOOL-dAlignedCarrier-6, above
+        # print_selftests_owed).
         # TOOL-dDerivedDocket-28 S3 - THE ORPHANS OF AN EARLIER BAR ARE REAPED BEFORE THIS ONE STARTS.
         # i26's run reached `gates-green` again without passing through `--resume`, and found the legs
         # of the bar its dead session had started still running beside its own.
@@ -7419,7 +7518,6 @@ dod_met() { # slug · run-state file · item · checker
         # the lander this arm reaches afterwards keep GATE_BOUND.
         if [ "$LANDER_MODE" = in-place ]; then
           check_inplace_preconditions "$slug" || { GG_HARD=1; return 1; }
-          [ "$_gtry" = 1 ] && print_selftests_owed
           run_orphan_reap "$slug"
           RB_BOUND=$_gbound
           # shellcheck disable=SC2086

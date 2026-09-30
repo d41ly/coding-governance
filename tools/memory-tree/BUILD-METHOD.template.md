@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.105 -->
+<!-- gov:kit memory-tree@2.106 -->
 # The build method — how a multi-pass build runs
 
 ## M1 — What this is
@@ -225,7 +225,7 @@ Self-probe, two questions you must answer without scrolling back: *the current u
 says*, and *the phase and its witness*. If either is not already in your head, you are regrounding whether or not
 anything was compacted. Read in this order, and nothing else:
 
-1. `git log --oneline -5` — under a mandate, `bash {{TOOL_ROOT}}unattended/unattended.sh --resume <slug>`.
+1. `git log --oneline -5` — under a mandate, `bash {{TOOL_ROOT}}unattended/unattended.sh --status <slug>`.
 2. The build's authored record whole (under a mandate `{{MEMORY_ROOT}}/builds/<slug>/RUN.md`, which survived compaction and
    process death where your context did not) — mandate, phase, witness, parked entries.
 3. **This file, whole.** It is capped so this stays cheap.

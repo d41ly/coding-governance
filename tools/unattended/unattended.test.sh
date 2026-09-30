@@ -2652,6 +2652,12 @@ bcopen
 run --phase tRun BUILDING --witness "$(git rev-parse HEAD)" >/dev/null 2>&1
 n=$((n+1)); [ -n "$(git diff --cached --name-only -- memory/builds/tRun/RUN.md)" ] \
   || { echo "FAIL --phase left its write unstaged, and it was the second of the two omissions"; st=1; }
+# ...and it stages the WHOLE write. TOOL-dAlignedCarrier-6, closing review M1: it staged between the
+# phase and the witness, so a witness that CHANGED was left unstaged beside a staged phase. The witness
+# below differs from the one the move above wrote, which is what makes an unstaged half observable.
+run --phase tRun BUILDING --witness "run-m1-witness" >/dev/null 2>&1
+n=$((n+1)); [ -z "$(git diff --name-only -- memory/builds/tRun/RUN.md)" ] \
+  || { echo "FAIL --phase staged its record before it wrote the witness, so the new witness was left unstaged"; st=1; }
 
 # ---- S2: --attest, because the two AGENT-attested keys had no writer and --abort REQUIRES both. Its
 # ---- refusals first: no item, an undeclared item, and a MACHINE-checked item.
@@ -4380,18 +4386,21 @@ hit "$(cat memory/builds/tFresh/RUN.md)" "mode: slug"
 git rm -q --cached memory/builds/tFresh/RUN.md >/dev/null 2>&1; rm -f memory/builds/tFresh/RUN.md
 reset_tree
 
-# ---- check 45: a waiver of a PROMPT-scoped directive on a run that is not prompt-authorized. The
-# ---- refusal cannot live in check_waivers, which runs BEFORE the authorization read that produces
-# ---- the mode - there AUTH_MODE is unset for both modes, so one spelling never fires and the other
-# ---- always does. These arms are what prove it is evaluated where the mode exists.
+# ---- check 45: a waiver of a MODE-scoped directive on a run of another mode. The refusal cannot
+# ---- live in check_waivers, which runs BEFORE the authorization read that produces the mode - there
+# ---- AUTH_MODE is unset for every mode, so one spelling never fires and the other always does. The
+# ---- RECIPE arm below is check 45's witness: TOOL-dAlignedCarrier-3 scoped `researched` and
+# ---- `solution-tested` `all`, so no core entry is prompt-scoped, and this slug run's waiver of
+# ---- `researched` is ACCEPTED - the owner's every-mode ruling, observed rather than assumed.
 reset_tree
 out=$(run --preflight tFresh --keepalive-id k1 --waive researched --reason "does not apply here")
-hit "$out" "--waive names a directive whose scope is a mode this run is not, so the waiver would record the relaxation of a rule that never bound it - handle"
-same "check 45 created no run-state file" "$([ -f memory/builds/tFresh/RUN.md ] && echo yes || echo no)" "no"
+hit "$out" "preflight OK"
+hit "$(cat memory/builds/tFresh/RUN.md)" "waiver · item researched · reason does not apply here"
+git rm -q --cached memory/builds/tFresh/RUN.md >/dev/null 2>&1; rm -f memory/builds/tFresh/RUN.md
 
-# ...and the SECOND scope value, on its own arm. This file's own history is the reason: an arm naming
-# one scoped member twice left a later member unenforced and green, so every new scope value gets an
-# arm the day it exists rather than the day someone notices it never had one.
+# ...and the recipe scope value, on its own arm, which is the one check 45 now refuses. This file's own
+# history is the reason: an arm naming one scoped member twice left a later member unenforced and
+# green, so every scope value a core entry carries has an arm refusing it on another mode.
 reset_tree
 out=$(run --preflight tFresh --keepalive-id k1 --waive playbook-followed --reason "no playbook here")
 hit "$out" "--waive names a directive whose scope is a mode this run is not, so the waiver would record the relaxation of a rule that never bound it - handle"
@@ -4415,8 +4424,8 @@ hit "$out" "preflight OK"
 hit "$out" "directive waived — reuse-first"
 git rm -q --cached memory/builds/tFresh/RUN.md >/dev/null 2>&1; rm -f memory/builds/tFresh/RUN.md
 
-# ---- ...and the PROMPT-scoped handle IS accepted on a prompt-authorized run, which is the whole
-# ---- point of the scope rather than a way to refuse things.
+# ---- ...and `researched` is accepted on a prompt-authorized run too: scope `all` binds every mode,
+# ---- so the mode that once scoped it still takes its waiver.
 reset_tree
 out=$(run --preflight tModeOk --keepalive-id k1 --waive researched --reason "the prompt named one solution")
 hit "$out" "preflight OK"
@@ -8699,12 +8708,13 @@ ipprep ""
 out=$(STUB_PREPARED=0 STUB_CARRY=3 iprun --close tRun $IPOVR)
 hit "$out" "the declared lander could not observe what this landing would publish, which is the remote or the clone, so the close cannot say whether the set is clean and refuses rather than guessing; nothing was written"
 
-# ---- S5: the close COMMITS its own record on top of the graded merge, and S3's derived term
-# ---- ANNOUNCES rather than exporting. TOOL-dUnstalledConvoy-24 for the first, F6 for the second.
+# ---- S5: the close COMMITS its own record on top of the graded merge, and S3's derived term is
+# ---- NOT announced here: TOOL-dAlignedCarrier-6 moved the notice to the move into VERIFYING, arms
+# ---- below. TOOL-dUnstalledConvoy-24 for the first, F6 and TOOL-dDerivedDocket-70 for the second.
 ipprep kitsurface/thing.txt; rm -f "$ip_out/barenv.txt"
 out=$(STUB_PREPARED=0 STUB_CARRY=0 iprun --close tRun $IPOVR)
 hit  "$out" "phase LANDING, committed at"
-hit  "$out" "the landing range HEAD^1..HEAD touches a declared self-test surface (kitsurface/), so the kit Definition of Done owes the flagged bar"
+miss "$out" "touches a declared self-test surface"
 same "the close left a clean tree"        "$(ipgit status --porcelain)" ""
 same "the close commit names the slug"    "$(ipgit log -1 --format=%s)" "records(tRun): close — LANDING"
 same "the record reached LANDING"         "$(sed -n 's/^phase: //p' "$ip_dir/memory/builds/tRun/RUN.md")" "LANDING"
@@ -8727,12 +8737,115 @@ ipprep kitsurface/thing.txt; rm -f "$ip_out/barenv.txt"
     bash "$SCRIPT" --close tRun $IPOVR ) >/dev/null 2>&1
 same "an inherited GATE_SELFTESTS reaches the bar unchanged" "$(grep -c '^GATE_SELFTESTS=1$' "$ip_out/barenv.txt")" "1"
 
-# ---- ...and a range touching NO declared entry gets the same environment and NO announcement. An
-# ---- announcement that fires on every landing says nothing a reader can act on.
+# ---- ...and a range touching NO declared entry gets the same environment. The close announces over
+# ---- neither range since TOOL-dAlignedCarrier-6; which range owes the flagged bar is the VERIFYING
+# ---- move's to say, and the arms below grade the untouching range there.
 ipprep ""; rm -f "$ip_out/barenv.txt"
 out=$(STUB_PREPARED=0 STUB_CARRY=0 iprun --close tRun $IPOVR)
 miss "$out" "touches a declared self-test surface"
 same "the untouching range still runs the bar with every guard off" "$(grep -c '^GATE_FULL=1$' "$ip_out/barenv.txt")" "1"
+
+# ---- TOOL-dAlignedCarrier-6: the owed flagged bar is ANNOUNCED on the move into VERIFYING, over the
+# ---- run's range from its pinned `base` fact, because that is where the main loop decides what its
+# ---- one --close exports. A move into another phase is silent, an untouching range is silent, and a
+# ---- resume that finds the record at VERIFYING reads the notice again after its orientation lines.
+ipreset
+iprun --preflight tRun --keepalive-id k1 >/dev/null
+ipgit add -A >/dev/null && ipgit commit -q -m fixture --no-verify
+ip_vb=$(sed -n 's/^base: //p' "$ip_dir/memory/builds/tRun/RUN.md")
+date +%s%N > "$ip_dir/kitsurface/thing.txt"
+ipgit add -A >/dev/null && ipgit commit -q -m touch --no-verify
+out=$(iprun --phase tRun BUILDING --witness "$(ipgit rev-parse HEAD)")
+hit  "$out" "phase BUILDING"
+miss "$out" "touches a declared self-test surface"
+# ---- The BUILDING move's own staged set is committed, so HEAD moves and the VERIFYING move below
+# ---- writes a witness that DIFFERS from the one on record, the common case a real run has.
+ipgit commit -q -m "records: BUILDING" --no-verify
+out=$(iprun --phase tRun VERIFYING --witness "$(ipgit rev-parse HEAD)")
+hit  "$out" "unattended: the run's range ${ip_vb:0:8}..HEAD touches a declared self-test surface (kitsurface/), so the kit Definition of Done owes the flagged bar: export GATE_FULL=1 GATE_SELFTESTS=1 into this run's one --close"
+# ---- closing review M1: the move stages the WHOLE record, so the commit below takes only what the
+# ---- move staged, as the Skill's Close section says to. An `add -A` here did that staging for the
+# ---- move and hid one that staged the new phase beside the previous witness.
+same "the VERIFYING move leaves nothing unstaged" "$(ipgit diff --name-only)" ""
+ipgit commit -q -m "records: VERIFYING" --no-verify
+out=$(iprun --resume tRun --keepalive-id k1)
+hit  "$out" "unattended: resume at phase VERIFYING"
+ip_lo=$(printf '%s\n' "$out" | grep -n 'resume at phase VERIFYING' | head -1 | cut -d: -f1)
+ip_lw=$(printf '%s\n' "$out" | grep -n 'touches a declared self-test surface (kitsurface/)' | head -1 | cut -d: -f1)
+n=$((n+1)); { [ -n "$ip_lo" ] && [ -n "$ip_lw" ] && [ "$ip_lw" -gt "$ip_lo" ]; } || { echo "FAIL the resume at VERIFYING printed no notice after its orientation: [$ip_lo] [$ip_lw]"; st=1; }
+# ---- ...an untouching range, a blank declaration and a record with no base: the first silent, the
+# ---- other two ANNOUNCED, because a skip that reads like a pass un-owes a Definition-of-Done clause.
+ipreset
+iprun --preflight tRun --keepalive-id k1 >/dev/null
+ipgit add -A >/dev/null && ipgit commit -q -m fixture --no-verify
+out=$(iprun --phase tRun VERIFYING --witness "$(ipgit rev-parse HEAD)")
+hit  "$out" "phase VERIFYING"
+miss "$out" "touches a declared self-test surface"
+miss "$out" "cannot be read"
+cp "$ip_dir/.unattended.conf" "$ip_out/keep.conf"
+sed -i 's/^SELFTESTS_OWED_PATHS=.*/SELFTESTS_OWED_PATHS=""/' "$ip_dir/.unattended.conf"
+out=$(iprun --phase tRun VERIFYING --witness "$(ipgit rev-parse HEAD)")
+hit  "$out" "unattended: SELFTESTS_OWED_PATHS is blank, so no range here can ever owe the flagged bar and no phase move will announce one"
+cp "$ip_out/keep.conf" "$ip_dir/.unattended.conf"
+sed -i '/^base: /d' "$ip_dir/memory/builds/tRun/RUN.md"
+out=$(iprun --phase tRun VERIFYING --witness "$(ipgit rev-parse HEAD)")
+hit  "$out" "unattended: the record pins no base, so the range that decides whether the flagged bar is owed cannot be read, and no notice is printed"
+# ---- closing review L1: a range whose ONLY touch on a declared prefix is a rename OUT of it still
+# ---- owes the flagged bar. A porcelain diff detects renames by default and names one by its
+# ---- destination alone, so the read carries --no-renames and names the source too.
+ipreset
+iprun --preflight tRun --keepalive-id k1 >/dev/null
+ipgit add -A >/dev/null && ipgit commit -q -m fixture --no-verify
+ipgit mv kitsurface/thing.txt moved-out.txt
+ipgit commit -q -m "rename out of the declared prefix" --no-verify
+out=$(iprun --phase tRun VERIFYING --witness "$(ipgit rev-parse HEAD)")
+hit  "$out" "touches a declared self-test surface (kitsurface/)"
+# ---- closing review round 2, L2: a path whose name holds a TAB under the declared prefix, and
+# ---- nothing else, owes the flagged bar too. `core.quotepath=off` still C-quotes such a path, so the
+# ---- read is NUL-delimited. The path is committed through the index alone with protectNTFS off, since
+# ---- no Windows worktree can hold it, and the next ipreset's forced checkout drops it like any commit.
+ipreset
+iprun --preflight tRun --keepalive-id k1 >/dev/null
+ipgit add -A >/dev/null && ipgit commit -q -m fixture --no-verify
+ip_blob=$(printf 'tab\n' | ipgit hash-object -w --stdin)
+printf '100644 %s\tkitsurface/a\tb.sh\0' "$ip_blob" | ipgit -c core.protectNTFS=false update-index -z --index-info
+ipgit -c core.protectNTFS=false commit -q -m "a tab-bearing path under the declared prefix" --no-verify
+out=$(iprun --phase tRun VERIFYING --witness "$(ipgit rev-parse HEAD)")
+hit  "$out" "touches a declared self-test surface (kitsurface/)"
+# ---- closing review M2: the REMEDY the notice prints is EXERCISED, not read. The export is cut
+# ---- from the notice's own text and applied to the one --close exactly as printed, under BOTH
+# ---- modes, and the bar stub's own environment must carry both flags: under `primary` the close
+# ---- adds no GATE_FULL, so an export naming the flag alone paid a guard-scoped run that read as
+# ---- the flagged bar. Both names are unset first, so only the printed export can supply them.
+for ip_mode in primary in-place; do
+  ipreset
+  if [ "$ip_mode" = primary ]; then
+    sed -i 's/^LANDER_MODE=.*/LANDER_MODE="primary"/' "$ip_dir/.unattended.conf"
+    ipgit add -A >/dev/null && ipgit commit -q -m "mode primary" --no-verify
+  fi
+  iprun --preflight tRun --keepalive-id k1 >/dev/null
+  add_facts "$ip_dir/memory/builds/tRun/RUN.md" "$(printf 'keepalive-reaped: yes\nparked-surfaced: yes\n')"
+  date +%s%N > "$ip_dir/kitsurface/thing.txt"
+  ipgit add -A >/dev/null && ipgit commit -q -m fixture --no-verify
+  out=$(iprun --phase tRun VERIFYING --witness "$(ipgit rev-parse HEAD)")
+  ip_exp=$(printf '%s\n' "$out" | sed -n 's/.*owes the flagged bar: export \(.*\) into this run.s one --close.*/\1/p')
+  n=$((n+1)); [ -n "$ip_exp" ] || { echo "FAIL $ip_mode: the VERIFYING notice printed no export to apply"; st=1; }
+  ipgit commit -q -m "records: VERIFYING" --no-verify
+  if [ "$ip_mode" = in-place ]; then
+    ip_old=$(ipgit rev-parse HEAD)
+    ipgit fetch -q origin main
+    ipgit checkout -q --detach origin/main
+    ipgit merge -q --no-ff "$ip_old" -m "merge: tRun - land onto origin/main" >/dev/null
+    ipgit update-ref refs/heads/unit "$(ipgit rev-parse HEAD)"
+    ipgit checkout -q unit
+  fi
+  rm -f "$ip_out/barenv.txt"
+  # shellcheck disable=SC2086
+  ( cd "$ip_dir" && env -u GATE_FULL -u GATE_SELFTESTS GOV_DEFAULT_BRANCH=main IPOUT="$ip_out" \
+      STUB_PREPARED=0 STUB_CARRY=0 $ip_exp bash "$SCRIPT" --close tRun $IPOVR ) >/dev/null 2>&1
+  same "$ip_mode: the printed export reaches the close's bar as GATE_FULL=1" "$(grep -c '^GATE_FULL=1$' "$ip_out/barenv.txt" 2>/dev/null)" "1"
+  same "$ip_mode: the printed export reaches the close's bar as GATE_SELFTESTS=1" "$(grep -c '^GATE_SELFTESTS=1$' "$ip_out/barenv.txt" 2>/dev/null)" "1"
+done
 
 # ---- AC1, the whole reason this mode exists: a branch that is GREEN ALONE and RED once merged onto
 # ---- a tip the remote moved. Under `primary` the bar would grade the branch and this would land.
@@ -9593,6 +9706,99 @@ AC15IDL
   cd "$TMP" || exit 2
   rm -rf "$ac15_dir"
 fi
+askreset
+
+fi   # ---- region two continues below: one compound block past about 3000 commands segfaults
+     # ---- bash 5.3 on Cygwin (exit 139), so the region is cut into blocks at top-level seams
+if in_shard 2; then
+
+# ==================================================================================================
+# TOOL-dAlignedCarrier-4 — `--status` REPORTS THE TWO CHECKS A NO-ID `--resume` REACHES FIRST.
+# Check 73's pinned `asks:` line and check 58's holder worktree ride the ONE status line as fields,
+# pass included, on exactly the records whose `--resume` would run each check, and nothing prints
+# where neither runs. The verb stays read-only: no fact written, nothing staged, no `fail`, exit 0
+# whatever either field reads. `tAskA` is the fixture because it is the one that pins `asks`, and the
+# linked worktree is TOOL-dDerivedDocket-62's wave. Every arm restores what it changed, and the block
+# ends on `askreset`, so the asks-disposed fixture below starts from the tree it always did.
+# WRITTEN AND NOT RUN at the unit's own pass: dAlignedCarrier's landing waived the kit's own suites,
+# so the close bar is the first run of these arms.
+# ==================================================================================================
+askmode ok; askrows ''
+run --preflight tAskA --keepalive-id KA-1 >/dev/null
+git add -A >/dev/null; git commit -q -m pinned --no-verify
+# ---- a passing record: both verdicts print on the one line, asks first. RED against a driver that
+# ---- prints a verdict only when it fails, the verb's older field rule.
+check_status_one_line tAskA > "$ORIGIN_DIR/dac4.line"
+dac4=$(cat "$ORIGIN_DIR/dac4.line")
+hit  "$dac4" " · asks as pinned · worktree holds the run"
+miss "$dac4" "asks moved at HEAD"
+miss "$dac4" "worktree not the run"
+miss "$dac4" "worktree unanswerable"
+# ---- ...read-only: the tree, the record's bytes and the exit status are the verb's own.
+dac4_st=$(git status --porcelain); dac4_rh=$(git hash-object memory/builds/tAskA/RUN.md)
+out=$(bash "$SCRIPT" --status tAskA 2>&1); rc=$?
+same "dAlignedCarrier-4 the passing report exits 0" "$rc" "0"
+miss "$out" "FAILED"
+same "dAlignedCarrier-4 the passing report writes and stages nothing" "$(git status --porcelain)" "$dac4_st"
+same "dAlignedCarrier-4 ...and leaves the record's bytes" "$(git hash-object memory/builds/tAskA/RUN.md)" "$dac4_rh"
+# ---- a record on which neither check runs, no `asks` and no `lease-utc`, prints the line the
+# ---- passing one prints with the two fields cut out. RED against a field printed unconditionally.
+sed -i '/^asks: /d; /^lease-utc: /d' memory/builds/tAskA/RUN.md
+out=$(bash "$SCRIPT" --status tAskA 2>/dev/null | sed -n '/· next /p')
+same "dAlignedCarrier-4 neither check runs, so the line gains no byte" "$out" "$(printf '%s\n' "$dac4" | sed 's/ · asks as pinned · worktree holds the run//')"
+git checkout -q -- memory/builds/tAskA/RUN.md
+
+# ---- the asks line moved at HEAD: the field names both values, and the no-id resume refuses at 73.
+# ---- RED against a report that reads a different predicate from the refusal.
+mutate memory/builds/tAskA/README.md 's/^asks: EXMP-aFoo-3\.\.4$/asks: EXMP-aFoo-3/'
+git add -A >/dev/null; git commit -q -m moved --no-verify
+dac4_st=$(git status --porcelain); dac4_rh=$(git hash-object memory/builds/tAskA/RUN.md)
+out=$(bash "$SCRIPT" --status tAskA 2>&1); rc=$?
+hit  "$out" " · asks moved at HEAD, check 73 refuses a resume: pinned [EXMP-aFoo-3..4] at HEAD [EXMP-aFoo-3]"
+miss "$out" "asks as pinned"
+miss "$out" "FAILED"
+same "dAlignedCarrier-4 the moved report exits 0" "$rc" "0"
+same "dAlignedCarrier-4 the moved report writes and stages nothing" "$(git status --porcelain)" "$dac4_st"
+same "dAlignedCarrier-4 ...and leaves the record's bytes" "$(git hash-object memory/builds/tAskA/RUN.md)" "$dac4_rh"
+check_status_one_line tAskA > "$ORIGIN_DIR/dac4.line"
+hit  "$(run --resume tAskA)" "UNATTENDED check 73 FAILED"
+git reset -q --hard HEAD~1
+
+# ---- a worktree that does not hold the run: from the wave, the field names the run worktree's path
+# ---- and the no-id resume there refuses at 58; the run worktree still reads the pass.
+add_wave_worktree
+dac4_st=$(git -C "$G62_W" status --porcelain); dac4_rh=$(git -C "$G62_W" hash-object memory/builds/tAskA/RUN.md)
+out=$(run_wave --status tAskA); rc=$?
+hit  "$out" " · worktree not the run's, check 58 refuses a resume here: $G62_MAIN"
+miss "$out" "worktree holds the run"
+miss "$out" "FAILED"
+same "dAlignedCarrier-4 the wrong-worktree report exits 0" "$rc" "0"
+same "dAlignedCarrier-4 the wrong-worktree report writes and stages nothing" "$(git -C "$G62_W" status --porcelain)" "$dac4_st"
+same "dAlignedCarrier-4 ...and leaves that worktree's record" "$(git -C "$G62_W" hash-object memory/builds/tAskA/RUN.md)" "$dac4_rh"
+hit  "$(run_wave --resume tAskA)" "UNATTENDED check 58 FAILED"
+hit  "$(run --status tAskA)" " · worktree holds the run"
+remove_wave_worktree
+
+# ---- a record naming no run branch: the field says the verdict is unanswerable, which `--resume`
+# ---- announces and passes rather than refusing at 58.
+sed -i '/^run-branch: /d; /^branch-ref: /d' memory/builds/tAskA/RUN.md; fixture
+out=$(run --status tAskA)
+hit  "$out" " · worktree unanswerable, the record names no run branch"
+miss "$out" "worktree holds the run"
+out=$(run --resume tAskA)
+hit  "$out" "this record names no run branch (neither run-branch nor branch-ref)"
+miss "$out" "UNATTENDED check 58"
+git reset -q --hard HEAD~1
+
+# ---- a record carrying no `lease-utc`: `--resume` never reaches check 58, so no worktree field.
+sed -i '/^lease-utc: /d' memory/builds/tAskA/RUN.md; fixture
+out=$(run --status tAskA)
+hit  "$out" " · asks as pinned"
+miss "$out" "worktree holds the run"
+miss "$out" "worktree not the run"
+miss "$out" "worktree unanswerable"
+git reset -q --hard HEAD~1
+rm -f "$ORIGIN_DIR/dac4.line"
 askreset
 
 

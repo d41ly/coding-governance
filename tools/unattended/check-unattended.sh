@@ -44,7 +44,7 @@
 # THE CORE SETS ARE READ FROM THE DRIVER, never restated here. A second spelling of `PHASES_CORE` one
 # file away from the thing that enforces it is the drift this leg exists to catch.
 set -u
-KIT_UNATTENDED_VERSION=1.45   # gov:kit unattended@1.45 — must match unattended.sh; check-kit-versions.sh pairs them
+KIT_UNATTENDED_VERSION=1.46   # gov:kit unattended@1.46 — must match unattended.sh; check-kit-versions.sh pairs them
 
 # ------------------------------------------------------------------------------ the dereference pin
 # Identical to the driver's, and for the identical reason: `git replace` rewrites what a sha MEANS for
@@ -2939,14 +2939,15 @@ else
   fi
 fi
 
-# ---- ...and the self-test surface the in-place close derives its announcement from. A DECLARED
+# ---- ...and the self-test surface the move into VERIFYING derives its notice from, over the run's
+# ---- range from its pinned BASE, under every LANDER_MODE (TOOL-dAlignedCarrier-6). A DECLARED
 # ---- prefix matching no tracked path is a refusal: it reads as coverage of a surface that is not
-# ---- there, and the landing of kit work under it is then never told the flagged bar is owed. A
+# ---- there, and a run of kit work under it is then never told the flagged bar is owed. A
 # ---- BLANK key is not a refusal - an adopter may owe no such bar at all - but it is ANNOUNCED,
 # ---- because a term that silently un-owes a Definition-of-Done clause is indistinguishable from
 # ---- one that found nothing to owe.
 if [ -z "$SELFTESTS_OWED_PATHS" ]; then
-  echo "unattended: SELFTESTS_OWED_PATHS is blank — no landing range in this project can ever be told the kit Definition of Done owes the flagged bar, so that clause has no declared surface to be read against"
+  echo "unattended: SELFTESTS_OWED_PATHS is blank — no run's range in this project can ever be told the kit Definition of Done owes the flagged bar, so that clause has no declared surface to be read against"
 else
   _c45_dead=""
   for _c45_p in $SELFTESTS_OWED_PATHS; do
@@ -2957,7 +2958,7 @@ else
     fi
   done
   [ -z "${_c45_dead// /}" ] \
-    || fail 45 "SELFTESTS_OWED_PATHS declares a prefix that matches no tracked path, so it reads as coverage of a surface that is not in this tree and an in-place landing of kit work under it would never be told the flagged bar is owed:$_c45_dead"
+    || fail 45 "SELFTESTS_OWED_PATHS declares a prefix that matches no tracked path, so it reads as coverage of a surface that is not in this tree and a run of kit work under it would never be told the flagged bar is owed:$_c45_dead"
 fi
 
 # ---- 12: the kickoff engine's hand-back. BLANK KICKOFF_ENGINE turns this off — an adopter may not
@@ -5448,6 +5449,174 @@ else
       *--override*) fail 43 "the Skill's hold paragraph routes a hold line to an override, which spends the one check between a run and its landing on a fault that is not the run's: $_c43_f" ;;
     esac
   fi
+fi
+
+# ---- check 47 - NO SHIPPED FILE OF THIS KIT STATES A RETIRED PREMISE, read off a table of two rows.
+# ---- ROW 1, TOOL-dAlignedCarrier-1 closing TOOL-dDerivedDocket-74: the premise said the driver's verbs
+# ---- never make a commit, and it stopped being true when `--close` began committing its own records
+# ---- commit under `LANDER_MODE=in-place`. It was taken out of three carriers once, by fixed-string
+# ---- greps that were case-sensitive and read three named files, and the next day it was back,
+# ---- lowercase, in a fourth place none of them read. ROW 2, TOOL-dAlignedCarrier-6 from its closing
+# ---- review's L2: the premise said the owed flagged bar is told by the close of a landing that
+# ---- prepares its merge in place, and it stopped being true when the move into VERIFYING took the
+# ---- notice under every LANDER_MODE; the check-45 header one file over still said it after every
+# ---- carrier was rewritten. Each row is the CLASS, so the next spelling reds in whichever file it
+# ---- lands, and each row has its own fail line, so a red names which premise came back.
+# ----
+# ---- POPULATION: every file the kit's own ls-files lists under KITREL, the kit directory this leg
+# ---- already derives, so an adopter's install prefix is honoured and no path is spelled. NOTHING IS
+# ---- EXCLUDED, this checker and its suite included, because the ask names the kit's shipped files and
+# ---- both ship. This header DESCRIBES the premise rather than spelling it, the pattern below is written
+# ---- with optional groups and bracketed spaces so its own source never forms an instance, and the
+# ---- suite assembles its staged line from fragments. A listed file the worktree lacks is skipped.
+# ----
+# ---- NORMALISATION, per file: CR bytes stripped; on each line the leading whitespace and ONE leading
+# ---- comment marker (`#`, `//`, `*` or `<!--`) stripped; the lines joined by one space, whitespace
+# ---- squeezed, the whole folded to lower case. A wrap inside a comment or a paragraph therefore reads
+# ---- as one sentence, which is the shape the retired greps could not see. The join is a window of the
+# ---- previous SEVEN words plus the current line, which holds the widest instance either row admits,
+# ---- row 2's eight words, and a match is reported only where it ends on the current line, so each is
+# ---- named once. Six words, the width row 1 needs, let row 2 through when a wrap fell before its last
+# ---- word (closing review round 2, L1).
+# ----
+# ---- EVERY ROW'S PATTERN ENDS BY CONSUMING ONE BOUNDARY CHARACTER after its last word, and the scanner
+# ---- strips that character, and the leading one, from the excerpt it reports and from the end offset
+# ---- it dedups on. Row 1 ends in a non-word byte; row 2 ends in the rest of its last word and the
+# ---- space after it, which the window always carries, so its matched set is what a bare word stem
+# ---- matched and its excerpt is whole (closing review round 2, L4: the stem lost a letter from every
+# ---- excerpt). A new row owes the same ending.
+# ----
+# ---- THE PREDICATE, word-bounded, one pattern per row. ROW 1, two alternatives: the word `no`, at
+# ---- most two words, the word `verb`, at most two words, then the third-person form of commit; or the
+# ---- three-word sentence that makes `nothing` the subject of that same form with `it` as its object.
+# ---- ROW 2, two alternatives: the hyphenated landing-mode token, at most two words, a word opening
+# ---- `close`, at most three words, then a word opening `announc`; or that word first, at most three
+# ---- words, then the mode token directly before a word opening `close`. Measured before it was
+# ---- wired: at BASE 87c245b3 it named four sentences in three files, the protocol row, two Skill
+# ---- sentences and the check-45 header, and on the tree it named that header alone. A near-miss
+# ---- sweep of `close` within four words of `announc` WITHOUT the mode token found only true sentences
+# ---- about other terms, which is why the token is required.
+# ----
+# ---- What this does NOT check: a spelling outside those alternatives passes, and a sentence that
+# ---- names the mode's close and NEGATES the announcement matches all the same, so name the move into
+# ---- VERIFYING rather than the close that says nothing. A file outside the
+# ---- kit directory is not read, the rendered carriers included, whose parity legs already hold each
+# ---- to its template. A match inside a string literal counts like one in prose, because the premise
+# ---- misleads a reader either way.
+_c47_re='[^a-z0-9_]no( [^ ]+)?( [^ ]+)?[ ]verb( [^ ]+)?( [^ ]+)?[ ]commits[^a-z0-9_]|[^a-z0-9_]nothing[ ]commits[ ]it[^a-z0-9_]'
+_c47_re2='[^a-z0-9_]in-place[^ ]*( [^ ]+)?( [^ ]+)?[ ]close[^ ]*( [^ ]+)?( [^ ]+)?( [^ ]+)?[ ]announc[^ ]*[ ]|[^a-z0-9_]announc[^ ]*( [^ ]+)?( [^ ]+)?( [^ ]+)?[ ]in-place[^ ]*[ ]close[^ ]*[ ]'
+_c47_files=()
+while IFS= read -r _c47_p; do
+  [ -f "$_c47_p" ] && _c47_files+=("$_c47_p")
+done < <(GIT ls-files -- "$KITREL" 2>/dev/null)
+if [ "${#_c47_files[@]}" -eq 0 ]; then
+  report "check 47 did not grade this kit's shipped files for the retired premises - ls-files listed none under $KITREL"
+else
+  report "check 47 graded ${#_c47_files[@]} shipped file(s) of this kit for the retired premises, two rows"
+  # ONE SCANNER, HELD ONCE AND RUN PER ROW, so the two rows cannot drift into two normalisations. Its
+  # excerpt and its end offset rely on the header's trailing-boundary contract, which every row keeps.
+  _c47_awk='
+      BEGIN { re = ENVIRON["RE"] }
+      FNR == 1 { if (hits != "") out = out (out == "" ? "" : "; ") cur ": " hits
+                 hits = ""; tail = ""; cur = FILENAME }
+      { ln = $0; gsub(/\r/, "", ln); sub(/^[ \t]+/, "", ln)
+        if (!sub(/^<!--/, "", ln)) if (!sub(/^\/\//, "", ln)) if (!sub(/^#/, "", ln)) sub(/^\*/, "", ln)
+        ln = tolower(ln); gsub(/[[:space:]]+/, " ", ln); sub(/^ /, "", ln); sub(/ $/, "", ln)
+        if (ln == "") next
+        p = (tail == "" ? 0 : length(tail) + 1)
+        w = " " (tail == "" ? ln : tail " " ln) " "
+        s = w; off = 0
+        while (match(s, re)) {
+          e = off + RSTART + RLENGTH - 2
+          if (e > p) hits = hits (hits == "" ? "" : ", ") "\"" substr(s, RSTART + 1, RLENGTH - 2) "\""
+          off = e; s = substr(s, RSTART + RLENGTH - 1)
+        }
+        k = split(w, tk, " "); tail = ""
+        for (i = (k > 7 ? k - 6 : 1); i <= k; i++) tail = tail (tail == "" ? "" : " ") tk[i]
+      }
+      END { if (hits != "") out = out (out == "" ? "" : "; ") cur ": " hits
+            printf "%s", out }'
+  _c47_hits=$(RE="$_c47_re" awk "$_c47_awk" "${_c47_files[@]}")
+  [ -z "$_c47_hits" ] || fail 47 "a shipped file of this kit states the retired premise that the driver makes no commit of its own, but under LANDER_MODE=in-place --close commits its own records commit, so a reader who trusts the sentence expects staged rows to stay uncommitted after the close has committed them; reword it to name the step that commits them. matches: $_c47_hits"
+  _c47_hits=$(RE="$_c47_re2" awk "$_c47_awk" "${_c47_files[@]}")
+  [ -z "$_c47_hits" ] || fail 47 "a shipped file of this kit states the retired premise that the landing's close is where the owed flagged bar is told, but since TOOL-dAlignedCarrier-6 the move into VERIFYING announces it under every LANDER_MODE and the close says nothing, so a reader who trusts the sentence waits at the close for a notice that never comes; reword it to name the move into VERIFYING. matches: $_c47_hits"
+fi
+
+# ---- check 48 - NO FUNCTION WRITES A RUN-STATE FACT AFTER ITS LAST STAGE OF THAT FILE.
+# ---- TOOL-dAlignedCarrier-6, from its closing review's M1. `--phase` staged the record between its
+# ---- phase write and its witness write, so the index paired the new phase with the previous witness
+# ---- and the new one stayed unstaged: the Skill's "commit the record the move stages" committed half
+# ---- a record, and the prepare that follows refused the dirty tree it left. The order predated the
+# ---- build and no leg read it; this reads it for the CLASS, in every shell file the kit ships.
+# ----
+# ---- POPULATION: every tracked `*.sh` file under KITREL, the kit directory this leg already derives,
+# ---- so an adopter's install prefix is honoured and no path is spelled. A listed file the worktree
+# ---- lacks is skipped.
+# ----
+# ---- THE PREDICATE, per function. A function opens on a column-0 `name() {` line and closes on the
+# ---- next column-0 `}`, or on its opening line when that line ends in `}`. Full-line comments are
+# ---- skipped. Inside it, every call of the fact writer or of the staging refusal whose first argument
+# ---- is a plain shell variable is an EVENT, in source order. A writer event on a variable the function
+# ---- stages, occurring after the function's LAST staging of that same variable, is a hit, named by
+# ---- file, line and function. Measured before it was wired, over every shell file of the kit: one
+# ---- hit, the `verb_phase` witness write this unit moved, and eight near-misses, all of them READS of
+# ---- the staged record after its last stage plus one write joined to its stage by `&&` in the right
+# ---- order.
+# ----
+# ---- What this does NOT check: a write through any other helper, a write whose first argument is not
+# ---- a plain variable, a function that writes and never stages (its caller may), a function spelled
+# ---- any other way, and a PATH: it reads source order, so a write that sits above the last stage but
+# ---- on a branch that returns before reaching it passes. A trailing comment on a code line is read
+# ---- as code.
+_c48_files=()
+while IFS= read -r _c48_p; do
+  case "$_c48_p" in *.sh) [ -f "$_c48_p" ] && _c48_files+=("$_c48_p") ;; esac
+done < <(GIT ls-files -- "$KITREL" 2>/dev/null)
+if [ "${#_c48_files[@]}" -eq 0 ]; then
+  report "check 48 did not grade this kit's shell files for a fact written after its last stage - ls-files listed none under $KITREL"
+else
+  _c48_out=$(awk '
+      function flush(   j) {
+        if (fn != "") { nfn++; if (ns > 0) nst++ }
+        for (j = 1; j <= nw; j++)
+          if ((wv[j] in last) && wi[j] > last[wv[j]])
+            hits = hits (hits == "" ? "" : ", ") wf[j] ":" wl[j] " " fn
+        fn = ""; nw = 0; ne = 0; ns = 0; split("", last)
+      }
+      function scan(s,   t, v) {
+        while (match(s, /(^|[^A-Za-z0-9_])(set_fact|stage_or_fail)[ \t]+"?\$[A-Za-z_][A-Za-z0-9_]*/)) {
+          t = substr(s, RSTART, RLENGTH); s = substr(s, RSTART + RLENGTH)
+          sub(/^[^a-z_]/, "", t)
+          v = t; sub(/^[a-z_]+[ \t]+"?\$/, "", v)
+          ne++
+          if (t ~ /^stage_or_fail/) { last[v] = ne; ns++ }
+          else { nw++; wv[nw] = v; wi[nw] = ne; wl[nw] = FNR; wf[nw] = FILENAME }
+        }
+      }
+      FNR == 1 { flush() }
+      { ln = $0; gsub(/\r/, "", ln) }
+      ln ~ /^[A-Za-z_][A-Za-z0-9_]*\(\)[ \t]*\{/ {
+        flush(); fn = ln; sub(/\(.*/, "", fn)
+        body = ln; sub(/^[^{]*\{/, "", body); scan(body)
+        if (ln ~ /\}[ \t;]*$/) flush()
+        next }
+      fn == "" { next }
+      ln ~ /^\}/ { flush(); next }
+      { c = ln; sub(/^[ \t]+/, "", c); if (c ~ /^#/) next; scan(c) }
+      END { flush(); printf "%d %d\t%s", nfn, nst, hits }' "${_c48_files[@]}")
+  _c48_hits=${_c48_out#*$'\t'}; _c48_n=${_c48_out%%$'\t'*}
+  # NO COUNTS IS NOT NO HITS. A scanner that died before its END block printed nothing, and an empty
+  # capture read as a hit list is the passing value by construction; it is announced and graded as
+  # nothing, never as clean.
+  if [ "$_c48_hits" = "$_c48_out" ]; then
+    report "check 48 did not grade this kit's shell files - its scanner printed no counts, so the order it reads was never read and a write after the last stage would pass unseen"
+    _c48_hits=""
+  elif [ "${_c48_n#* }" = 0 ]; then
+    report "check 48 graded ${_c48_n%% *} function(s) in ${#_c48_files[@]} shell file(s) and none of them stages a run-state file, so the order it reads was never read"
+  else
+    report "check 48 graded ${_c48_n%% *} function(s) in ${#_c48_files[@]} shell file(s) of this kit, ${_c48_n#* } of them staging a run-state file"
+  fi
+  [ -z "$_c48_hits" ] || fail 48 "a function in a shipped shell file of this kit writes a run-state fact after its last staging of that same file, so the index holds the file as it was before that write and the write stays unstaged: a commit of what the verb staged records half of it and leaves the tree dirty; stage after the last write. matches: $_c48_hits"
 fi
 
 fi   # ---- end of the checks `--only 28` skips

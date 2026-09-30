@@ -2,7 +2,7 @@
 name: unattended
 description: Start, resume, or close a run that will merge and push with NO owner turn between start and finish. Use when the owner wants a committed build carried to landing unattended, when a previous unattended run needs resuming after compaction or process death, or when one needs closing. Do NOT use for ordinary work where the explicit ask before a merge and a push still applies — that is the default, and this skill is the narrow exception to it.
 ---
-<!-- gov:kit unattended@1.45 -->
+<!-- gov:kit unattended@1.46 -->
 
 # Unattended runs
 
@@ -141,18 +141,18 @@ It schedules no idle-wake, and the section above does not bind it: there is an o
    | `wrap-up-derived` | how the wrap-up is composed | M9 | all | D8 |
    | `discoveries-adopted` | a beneficial discovery joins the running build, decided at once | M10 | all | D12 |
    | `passes-harnessed` | M6's pass sequence, DRIVEN as one program per protocol section 12 | M6 | all | D13 |
-   | `researched` | the candidate search when no seam fits | M12 | prompt | D9 |
-   | `solution-tested` | testing candidates before the pick | M12 | prompt | D10 |
+   | `researched` | the candidate search when no seam fits | M12 | all | D9 |
+   | `solution-tested` | testing candidates before the pick | M12 | all | D10 |
    | `playbook-followed` | the pass loop and its regrounding rule | M7 | recipe | D11 |
    | `pieces-recorded` | the wrap-up derivation, over the pieces | M9 | recipe | D11 |
 
    **`Scope`** is which runs a directive binds. `all` binds every unattended run; a scope naming a
-   mode binds only a run whose build README declared that `authorized-by:` value. `prompt` scopes
-   research and a solution test, which are obligations of a build whose solution was not given.
-   `recipe` scopes the two rows above, which are obligations of a build whose instructions were
-   given: following them to the letter, and recording what came out. A waiver of a scoped handle is
-   REFUSED on a run of another mode rather than recorded, since it would relax a rule that never
-   bound it.
+   mode binds only a run whose build README declared that `authorized-by:` value. Research and a
+   solution test bind every mode, and the build method's M12 decides when a build owes them: when
+   its solution was not given, whatever mode authorized the run. `recipe` scopes the two rows
+   above, which are obligations of a build whose instructions were given: following them to the
+   letter, and recording what came out. A waiver of a scoped handle is REFUSED on a run of another
+   mode rather than recorded, since it would relax a rule that never bound it.
 
    **Neither `recipe` row states its rule, and that is deliberate.** Following a declared procedure
    to the letter IS the pass loop and its regrounding rule, and recording what was produced IS the
@@ -390,9 +390,10 @@ comparison holds on this anchor only because you re-push; a roster grown and com
 is the ordinary state after research, and it blocks `--close` on `authorization-reachable` with no
 override available and nobody to interpret it.
 
-**The research and test obligations bind this path and not the slug path** — `researched` and
-`solution-tested` in the directive table are scoped `prompt`. They point at the build method's M12,
-which is where the loop is stated.
+**The research and test obligations bind this path and every other** — `researched` and
+`solution-tested` in the directive table are scoped `all`, so they bind every mode, and the build
+method's M12, which is where the loop is stated, decides when: a build whose solution was not given
+owes them.
 
 ## Start a PLAYBOOK run
 
@@ -469,7 +470,7 @@ provoked it; the amendment is a separate authoring run.
 `recipe`.** It has no playbook to name, so a `recipe`-mode preflight refuses it outright; and its
 whole diff lands outside any declared output glob, which is the shape a content run is scoped to
 avoid. There is no third mode here and no new discipline: the loop a playbook is written by is the
-build method's research-then-test-then-choose section, which this path's two scoped directives
+build method's research-then-test-then-choose section, which `researched` and `solution-tested`
 already bind. What this section adds is the ROUTING and one ordering property.
 
 **Arriving with no playbook and a topic is this path, not an error.** Research the subject and the
@@ -567,15 +568,17 @@ definition, so the absence is a decision and not an oversight.
   verifies with the direct check its spec names; a unit that needs a suite verdict returns the
   need in its `summary` and does not run one. The bar runs ONCE, at `VERIFYING`, after the last
   unit is terminal: `--close` runs the plain bar for `gates-green`, and kit work owes the
-  `GATE_SELFTESTS=1` form too, run by you at `VERIFYING` and nowhere earlier. Where a pass touched
+  flagged form too, paid by exporting `GATE_FULL=1 GATE_SELFTESTS=1` into that one `--close` when
+  the `VERIFYING` notice names a surface. Where a pass touched
   files a leg guards and you judge a bar necessary, the plain bar with no flag is the scoped form,
   at the main loop and never in a child. The rule is the build method's M6; this bullet points at
   it, and gate-guard.js refuses it at the tool call: a `GATE_FULL=`/`GATE_SELFTESTS=` prefix, a
   self-test runner or any `*.test.sh` is denied on this branch until the record reaches
-  `VERIFYING`, sidechain agents included, with the record and the phase named in the refusal. Under
-  `LANDER_MODE` set to `in-place` the close ANNOUNCES when that flagged run is owed — when the landing range
-  touches a path `SELFTESTS_OWED_PATHS` declares — so you are told rather than left to remember; it
-  still does not run it and does not set the flag, and you name the command you ran in the record.
+  `VERIFYING`, sidechain agents included, with the record and the phase named in the refusal. The
+  move into `VERIFYING` ANNOUNCES when that flagged bar is owed, under every `LANDER_MODE` — when
+  the run's range from its pinned BASE touches a path `SELFTESTS_OWED_PATHS` declares — so you are
+  told rather than left to remember; the driver still sets `GATE_SELFTESTS` nowhere, and you export
+  the pair `GATE_FULL=1 GATE_SELFTESTS=1` into the one `--close`, as the Close section spells.
 - **A process not in the ledger is never killed**, whatever its command line says. The driver records
   every command it starts and reaps only those, once their driver is gone; `--status` prints
   `orphans <n>` while any wait. A stray process it did not record — another session's, another
@@ -903,11 +906,23 @@ sentence here. Skip it silently if the project has no such skill, as the start p
 
 ## Close
 
+**Move into `VERIFYING` first, under every `LANDER_MODE`, and commit the record the move stages.**
+The move is where the owed flagged bar is ANNOUNCED: when the run's range from its pinned BASE
+touches a path `SELFTESTS_OWED_PATHS` declares, it prints that the kit Definition of Done owes it. A
+close run without the move is never told. A resume or take-over that finds the record at `VERIFYING`
+prints the notice again.
+
+```bash
+bash tools/unattended/unattended.sh --phase <slug> VERIFYING --witness $(git rev-parse HEAD)
+```
+
+**Under `primary`, the close follows that commit:**
+
 ```bash
 bash tools/unattended/unattended.sh --close <slug>
 ```
 
-**Under `LANDER_MODE` set to `in-place`, one step comes FIRST.** The close's bar grades what HEAD carries, so
+**Under `LANDER_MODE` set to `in-place`, the prepare comes between them.** The close's bar grades what HEAD carries, so
 the landing merge has to exist before it runs. Without it the bar grades this branch and never the
 merge the push publishes, and a branch that is green alone can still land red onto a tip the remote
 moved:
@@ -917,6 +932,11 @@ bash tools/push-main.sh --prepare --slug <slug>
 bash tools/unattended/unattended.sh --close <slug>
 ```
 
+Make NO second move after the prepare: a move stages the record, and this close refuses a non-empty
+porcelain. A resume after the prepare reads a range that also holds what the merge brought in from
+the default branch, so it can announce a surface another landing touched: one flagged bar more than
+owed, never one fewer.
+
 That close then refuses BY NUMBER, and not as an unmet item, when HEAD carries no prepared merge, or
 when the tree is not clean in the full porcelain sense — untracked files included, because the bar
 writes its full-green stamp only over an empty listing and the push reuses that stamp. A numbered
@@ -925,10 +945,17 @@ anything it asks the lander what that push would carry, and refuses on a commit 
 build. Then it COMMITS its own record on top of the graded merge, so the phase travels. Under
 `primary` none of that happens: the verb stages the record and names the commit you owe.
 
-It also ANNOUNCES, on an in-place close, when the landing range touches a path
-`SELFTESTS_OWED_PATHS` declares: the kit Definition of Done then owes the self-test bar, which this
-verb does not run and does not set the flag for. You run that one by hand at `VERIFYING` and name
-the command in the run's record.
+**When the `VERIFYING` notice named a surface, export the pair into that one close**, under either
+mode. The close announces nothing itself. Its bar inherits both flags, the driver never sets
+`GATE_SELFTESTS`, and gate-guard.js admits the prefix from `VERIFYING` on. Under `in-place` the close
+adds `GATE_FULL=1` to its own bar, so the exported `GATE_FULL` is redundant there and is the half
+`primary` needs: that close's bar carries no `GATE_FULL` of its own, and `GATE_SELFTESTS=1` alone lifts
+the hold but leaves every guarded self-test leg the branch did not touch skipped. A notice saying the
+range cannot be read is not a no: read the range yourself before you decide.
+
+```bash
+GATE_FULL=1 GATE_SELFTESTS=1 bash tools/unattended/unattended.sh --close <slug>
+```
 
 **The bar it runs is BOUNDED, by its BACKSTOP where the project declares a profile.** `--preflight`
 asks `GATE_PROFILE_CMD` for the runner's resolved profile and pins the bar's bound as the

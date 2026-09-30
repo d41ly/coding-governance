@@ -334,6 +334,7 @@ Cite ids, never line numbers.
 | [TOOL-cTracedPromise-4](../builds/cTracedPromise/BACKLOG.md) | OPEN | — | — | 2026-08-15 | check-memory-hygiene.test.sh printed an AUTHORED assertion count, stuck… |
 | [TOOL-cTracedPromise-5](../builds/cTracedPromise/BACKLOG.md) | OPEN | — | — | 2026-08-15 | an adopter who fills TRACE_CUTOFF before closing any spec after it reds… |
 | [TOOL-cTracedPromise-7](../builds/cTracedPromise/BACKLOG.md) | OPEN | — | — | 2026-08-15 | the unset-TRACE_CUTOFF row prints DEAD PROBE though --check ignores it:… |
+| [TOOL-dAlignedCarrier-7](../builds/dAlignedCarrier/BACKLOG.md) | OPEN | LOW | — | 2026-09-30 | THE VERB CONTRACT'S --status ENTRY NAMES FIELDS THE VERB HAS OUTGROWN.… |
 | [TOOL-dBriefedPass-6](../builds/dBriefedPass/BACKLOG.md) | OPEN | — | — | 2026-09-01 | THE --dispatch ORDER GATE HAS NO TEST ARM AND ITS FAILING CASE HAS… |
 | [TOOL-dBriefedPass-7](../builds/dBriefedPass/BACKLOG.md) | OPEN | — | — | 2026-09-01 | tools/workflows/unattended-build.test.sh is a 21-arm suite registered… |
 | [TOOL-dCarriedReceipt-1](../builds/dCarriedReceipt/BACKLOG.md) | OPEN | — | — | 2026-08-25 | --review's convergence predicate is scoped to ONE run's run-state file… |
@@ -361,11 +362,6 @@ Cite ids, never line numbers.
 | [TOOL-dDerivedDocket-67](../builds/dDerivedDocket/BACKLOG.md) | OPEN | — | — | 2026-09-28 | 89 FUNCTION NAMES THIS BUILD WROTE LEAD WITH NO DECLARED VERB. python… |
 | [TOOL-dDerivedDocket-68](../builds/dDerivedDocket/BACKLOG.md) | OPEN | LOW | — | 2026-09-29 | THE DRIVER READS A LANDER THAT CANNOT RUN AS AN OUTAGE.… |
 | [TOOL-dDerivedDocket-69](../builds/dDerivedDocket/BACKLOG.md) | OPEN | MED | — | 2026-09-29 | A SUITE THAT CRASHES AFTER ITS FIRST FAIL LINE READS AS FAILING, NEVER… |
-| [TOOL-dDerivedDocket-70](../builds/dDerivedDocket/BACKLOG.md) | OPEN | MED | — | 2026-09-30 | THE KIT SELF-TEST BAR A KIT LANDING OWES IS ANNOUNCED TOO LATE AND RUN… |
-| [TOOL-dDerivedDocket-71](../builds/dDerivedDocket/BACKLOG.md) | OPEN | LOW | — | 2026-09-30 | TWO CARRIERS DISAGREE ON WHEN A BUILD MUST RESEARCH CANDIDATES. The… |
-| [TOOL-dDerivedDocket-72](../builds/dDerivedDocket/BACKLOG.md) | OPEN | LOW | — | 2026-09-30 | BUILD-METHOD M7'S REGROUND LOGS A FALSE REFUSAL AT EVERY PASS BOUNDARY.… |
-| [TOOL-dDerivedDocket-73](../builds/dDerivedDocket/BACKLOG.md) | OPEN | LOW | — | 2026-09-30 | THE UNATTENDED PROTOCOL STILL SAYS A GATES-GREEN CLOSE MEANS THE FULL… |
-| [TOOL-dDerivedDocket-74](../builds/dDerivedDocket/BACKLOG.md) | OPEN | LOW | — | 2026-09-30 | A DRIVER COMMENT STILL SAYS NO DRIVER VERB COMMITS.… |
 | [TOOL-dDerivedDocket-75](../builds/dDerivedDocket/BACKLOG.md) | OPEN | LOW | — | 2026-09-30 | NODE d RUNS AN ABSOLUTE core.hooksPath FROM A WRITER NOBODY KNOWS. The… |
 | [TOOL-dDerivedDocket-76](../builds/dDerivedDocket/BACKLOG.md) | OPEN | MED | — | 2026-09-30 | THE UNATTENDED KIT'S COMPENSATING CHECK IS UNPAID FOR THIS LANDING.… |
 | [TOOL-dFoldedVerdict-7](../builds/dFoldedVerdict/BACKLOG.md) | OPEN | — | — | 2026-09-01 | THREE CARRIERS WERE FOUND SITTING EXACTLY ON THEIR DECLARED CEILING IN… |

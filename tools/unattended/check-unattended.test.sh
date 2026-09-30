@@ -2862,7 +2862,7 @@ reset_tree
 # G, the scopes disagree. ONE branch and not a comm pair: measured, a single changed scope cell puts
 # the same handle in BOTH differences, so an only-in-table branch could never fire alone and its arm
 # would have proved nothing. Arm A already covers the handle set in both directions.
-reset_tree; mutate $KIT_REL/SKILL.template.md 's/| M12 | prompt | D9 |/| M12 | all | D9 |/'
+reset_tree; mutate $KIT_REL/SKILL.template.md 's/| M7 | recipe | D11 |/| M7 | all | D11 |/'
 hit "$(run)" "the directive scopes the registry declares are not the scopes the Skill's table shows, so the agent is told which runs a rule binds by a table that disagrees with the verb enforcing it:"
 
 # G, the locator: the column REMOVED entirely. Without this the join compares two empty sets and is
@@ -4162,11 +4162,11 @@ lmrestore .unattended.conf
 # ---- that is not there. A BLANK key is not a fault and is announced instead.
 sed -i "s|^SELFTESTS_OWED_PATHS=.*|SELFTESTS_OWED_PATHS=\"$KIT_REL/ nosuchdir/\"|" "$lm_dir/.unattended.conf"
 out=$(lmrun)
-hit "$out" "SELFTESTS_OWED_PATHS declares a prefix that matches no tracked path, so it reads as coverage of a surface that is not in this tree and an in-place landing of kit work under it would never be told the flagged bar is owed"
+hit "$out" "SELFTESTS_OWED_PATHS declares a prefix that matches no tracked path, so it reads as coverage of a surface that is not in this tree and a run of kit work under it would never be told the flagged bar is owed"
 lmrestore .unattended.conf
 sed -i 's|^SELFTESTS_OWED_PATHS=.*|SELFTESTS_OWED_PATHS=""|' "$lm_dir/.unattended.conf"
 out=$(lmrun)
-hit  "$out" "SELFTESTS_OWED_PATHS is blank — no landing range in this project can ever be told the kit Definition of Done owes the flagged bar"
+hit  "$out" "SELFTESTS_OWED_PATHS is blank — no run's range in this project can ever be told the kit Definition of Done owes the flagged bar"
 miss "$out" "check 45 FAILED"
 lmrestore .unattended.conf
 
@@ -5491,6 +5491,92 @@ hit  "$(run)" "the Skill's hold paragraph names no platform-unavailable hold for
 reset_tree
 mutate $KIT_REL/SKILL.template.md 's/then run `--hold` with the code/then run `--close --override gates-green` or `--hold` with the code/'
 hit  "$(run)" "the Skill's hold paragraph routes a hold line to an override, which spends the one check between a run and its landing on a fault that is not the run's"
+reset_tree
+
+# ==== TOOL-dAlignedCarrier-1: CHECK 47, the retired commit premise in any shipped file of the kit
+# ---- The staged line is ASSEMBLED FROM FRAGMENTS split inside their words, so the staged sentence
+# ---- never exists contiguously in this suite's own bytes, and the real-tree leg, which reads this
+# ---- file too, stays clean. It is written to a file and appended by sed's `r`, as check 33's arm
+# ---- does, and the copy it lands in is the fixture's tracked lib, one of the population's plain
+# ---- shell files.
+reset_tree
+_c47_no="n""o"; _c47_dv="dri""ver ve""rb"; _c47_cm="comm""its"
+printf '# the rows: %s %s %s them\n' "$_c47_no" "$_c47_dv" "$_c47_cm" > "$TMPBIN_PARENT/c47.line"
+mutate $KIT_REL/lib-unattended.sh "\$r $TMPBIN_PARENT/c47.line"
+out=$(run)
+hit  "$out" "a shipped file of this kit states the retired premise that the driver makes no commit of its own, but under LANDER_MODE=in-place --close commits its own records commit, so a reader who trusts the sentence expects staged rows to stay uncommitted after the close has committed them; reword it to name the step that commits them. matches: "
+hit  "$(printf '%s\n' "$out" | grep 'UNATTENDED check 47 FAILED')" "matches: $KIT_REL/lib-unattended.sh: "
+# ...the NEAR-MISS, a control on the predicate rather than a second break: the same words ending in
+# a verb that makes no commit, the shape a sibling suite carries, stay silent. Without it the arm
+# above is equally consistent with a ban on every sentence that names the driver's verbs at all.
+reset_tree
+printf '# the rows: %s %s does\n' "$_c47_no" "$_c47_dv" > "$TMPBIN_PARENT/c47.line"
+mutate $KIT_REL/lib-unattended.sh "\$r $TMPBIN_PARENT/c47.line"
+miss "$(run)" "UNATTENDED check 47 FAILED"
+reset_tree
+
+# ==== TOOL-dAlignedCarrier-6: CHECK 47's SECOND ROW, the retired premise that the landing's close
+# ---- is where the owed flagged bar is told (closing review L2). Assembled from fragments split
+# ---- inside their words, as the first row's arm is, so this suite's own bytes form no instance.
+# ---- Both alternatives are staged, the mode token first and the announcing word first.
+_c47_ip="in-""place"; _c47_an="anno""unces"
+printf '# the %s close %s the owed bar\n' "$_c47_ip" "$_c47_an" > "$TMPBIN_PARENT/c47.line"
+mutate $KIT_REL/lib-unattended.sh "\$r $TMPBIN_PARENT/c47.line"
+out=$(run)
+hit  "$out" "a shipped file of this kit states the retired premise that the landing's close is where the owed flagged bar is told, but since TOOL-dAlignedCarrier-6 the move into VERIFYING announces it under every LANDER_MODE and the close says nothing, so a reader who trusts the sentence waits at the close for a notice that never comes; reword it to name the move into VERIFYING. matches: "
+hit  "$(printf '%s\n' "$out" | grep 'UNATTENDED check 47 FAILED')" "matches: $KIT_REL/lib-unattended.sh: \"$_c47_ip close $_c47_an\""
+reset_tree
+printf '# it %s, on an %s close, that the bar is owed\n' "$_c47_an" "$_c47_ip" > "$TMPBIN_PARENT/c47.line"
+mutate $KIT_REL/lib-unattended.sh "\$r $TMPBIN_PARENT/c47.line"
+out=$(run)
+hit  "$out" "the retired premise that the landing's close is where the owed flagged bar is told"
+hit  "$(printf '%s\n' "$out" | grep 'UNATTENDED check 47 FAILED')" "matches: $KIT_REL/lib-unattended.sh: \"$_c47_an, on an $_c47_ip close,\""
+# ...the NEAR-MISS: the same mode's close with no announcing word stays silent, so the arm above is
+# not equally consistent with a ban on naming that close at all.
+reset_tree
+printf '# the %s close runs the bar\n' "$_c47_ip" > "$TMPBIN_PARENT/c47.line"
+mutate $KIT_REL/lib-unattended.sh "\$r $TMPBIN_PARENT/c47.line"
+miss "$(run)" "UNATTENDED check 47 FAILED"
+reset_tree
+
+# ==== TOOL-dAlignedCarrier-6 rev-5: CHECK 47's WINDOW HOLDS EACH ROW'S WIDEST INSTANCE WRAPPED AT
+# ---- EVERY WORD, AND EACH EXCERPT IS WHOLE (closing review round 2, L1 and L4). Row 2's widest
+# ---- instance is eight words and row 1's seven. Each is staged once per position it can wrap at,
+# ---- every copy after a line of eight neutral words that flushes the window, and the ONE run must
+# ---- report the whole quoted excerpt once per copy: 7 for row 2, 6 for row 1. A window a word short
+# ---- drops a copy and a pattern ending on a bare stem truncates every excerpt, so either reds the
+# ---- count. Fragments as above, so this suite's own bytes form no instance.
+_c47_ip="in-""place"; _c47_an="anno""unces"; _c47_no="n""o"; _c47_vb="ve""rb"; _c47_cm="comm""its"
+for _c47_row in "$_c47_ip p q close r s t $_c47_an" "$_c47_no p q $_c47_vb r s $_c47_cm"; do
+  read -r -a _c47_w <<<"$_c47_row"
+  for ((_c47_i = 1; _c47_i < ${#_c47_w[@]}; _c47_i++)); do
+    printf '# f f f f f f f f\n# %s\n# %s\n' "${_c47_w[*]:0:_c47_i}" "${_c47_w[*]:_c47_i}"
+  done
+done > "$TMPBIN_PARENT/c47.line"
+mutate $KIT_REL/lib-unattended.sh "\$r $TMPBIN_PARENT/c47.line"
+out=$(run)
+same "check 47 row 2 wrapped at each of its 7 positions" \
+  "$(printf '%s\n' "$out" | grep -F "the landing's close is where the owed flagged bar is told" | grep -oF "\"$_c47_ip p q close r s t $_c47_an\"" | wc -l | tr -d ' ')" 7
+same "check 47 row 1 wrapped at each of its 6 positions" \
+  "$(printf '%s\n' "$out" | grep -F "the driver makes no commit of its own" | grep -oF "\"$_c47_no p q $_c47_vb r s $_c47_cm\"" | wc -l | tr -d ' ')" 6
+reset_tree
+
+# ==== TOOL-dAlignedCarrier-6: CHECK 48, a run-state fact written after the function's last stage
+# ---- of it (closing review M1). The staged function is written to a file and appended by sed's
+# ---- `r` into the fixture's tracked lib, one of the population's shell files; its two calls are
+# ---- spelled from fragments, so this suite's own bytes carry no function the real-tree leg grades.
+_c48_st="stage""_or_fail"; _c48_sw="set""_fact"
+printf 'c48probe() {\n  %s "$rel" || return 1\n  %s "$rel" witness x || return 1\n}\n' "$_c48_st" "$_c48_sw" > "$TMPBIN_PARENT/c48.fn"
+mutate $KIT_REL/lib-unattended.sh "\$r $TMPBIN_PARENT/c48.fn"
+out=$(run)
+hit  "$out" "a function in a shipped shell file of this kit writes a run-state fact after its last staging of that same file, so the index holds the file as it was before that write and the write stays unstaged: a commit of what the verb staged records half of it and leaves the tree dirty; stage after the last write. matches: "
+hit  "$(printf '%s\n' "$out" | grep 'UNATTENDED check 48 FAILED')" "matches: $KIT_REL/lib-unattended.sh:"
+# ...the NEAR-MISS: the same two calls with the write first and the stage last stay silent, so the
+# arm above is not equally consistent with a ban on writing a fact inside a staging function at all.
+reset_tree
+printf 'c48probe() {\n  %s "$rel" witness x || return 1\n  %s "$rel" || return 1\n}\n' "$_c48_sw" "$_c48_st" > "$TMPBIN_PARENT/c48.fn"
+mutate $KIT_REL/lib-unattended.sh "\$r $TMPBIN_PARENT/c48.fn"
+miss "$(run)" "UNATTENDED check 48 FAILED"
 reset_tree
 fi   # ---- end REGION 8 ------------------------------------------------------------------------
 

@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.45 -->
+<!-- gov:kit unattended@1.46 -->
 # Unattended runs — the protocol
 
 *Two legs byte-compare this file against the template it ships from. **They compare the two copies to
@@ -340,7 +340,7 @@ something no machine could have checked:
 
 | Item | Checked by | Asserts |
 |---|---|---|
-| `gates-green` | machine | the project's full merge bar ran on the tip being landed and passed |
+| `gates-green` | machine | the project's full merge bar ran on the tip being landed, and its verdict is one the inherited-red policy of `UNATTENDED-STOPS.md` §13 lands |
 | `records-current` | machine | the run-state file's GENERATED region is EMPTY — the unit list is derived from the build README on every read, so "current" is the absence of a second copy rather than a comparison between two — AND both marker pairs are well-formed, the run-state file's own and the build README's. Well-formedness is read from the region reader's EXIT STATUS, not from empty output: a malformed pair prints nothing and exits non-zero, so testing emptiness alone scores a broken pair as SATISFIED, passing loudest when the file is least readable. This cell once described a fresh-render comparison against unit status headers the driver never reads, which made an ordinary spec rev bump block the close with no reachable repair |
 | `authorization-reachable` | machine | the build README is reachable from the pinned BASE, parses as build front matter, and names this build |
 | `landed-via-lander` | machine, PRE-LANDING | a lander is DECLARED, and that is the whole predicate: the bypass-flag grep it carried duplicated leg check 11 and is gone. It runs inside `--close`, BEFORE the landing it names, so it cannot observe the push nor fail for anything the run did. The observation lives in `--landed`, the only verb after it |
@@ -369,7 +369,8 @@ run START, which is where the rule is decided and not where it is hit — an age
 is reading this section. An override on the authorization check IS the authorization check, so the
 verb refuses the pair rather than recording it. There is no waiver, no attestation route and no
 project escape: an item the kit will not let a run override is the one item whose absence would make
-every other check decorative.
+every other check decorative. `gates-green` does take an override, and check 83 refuses one except
+on the terms `UNATTENDED-STOPS.md` §13 states.
 
 ## 5. The idle-wake and the keepalive — three actors
 
@@ -454,7 +455,7 @@ In the repo-root `.unattended.conf`. Blank or absent turns the corresponding ass
 | `MEMORY_ROOT` | the memory tree's root, matching the memory-tree kit's conf |
 | `LANDER` | the mandated landing command |
 | `LANDER_MODE` | the landing SHAPE, closed set `primary` / `in-place`; blank reads `primary`, announced. §6 |
-| `SELFTESTS_OWED_PATHS` | path prefixes whose touch makes an `in-place` close ANNOUNCE the flagged bar is owed. Blank means never, announced |
+| `SELFTESTS_OWED_PATHS` | path prefixes whose touch in the run's range from its pinned BASE makes the move into `VERIFYING` ANNOUNCE the flagged bar is owed, which the main loop pays by exporting `GATE_FULL=1 GATE_SELFTESTS=1` into its one `--close`. Blank means never, announced |
 | `BYPASS_BAN` | the flag the close path must never emit |
 | `GATE_CMD` · `GATE_WALL` · `GATE_PROFILE_CMD` | the full merge bar, for `gates-green`; the whole-run wall in seconds on it, and the command printing its resolved profile. The last two OPTIONAL |
 | `GATE_BOUND` | the wall-clock bound, in seconds, on `GATE_CMD` and `WIRING_CHECK`. OPTIONAL: absent takes the kit default and says so on stderr; non-numeric or zero is a refusal |
@@ -579,18 +580,17 @@ pins its size shrink-only for the reason §3 and §4 give for theirs. A conf key
 was rejected: a project could then declare zero directives, which is a global waiver carrying no
 name, no reason and no record.
 
-**A directive may be SCOPED.** A registry entry is `<handle>:<section>[:<scope>]` over the closed set
-`all` / `prompt`. An absent third field is `all`, so every entry written before scopes existed keeps
-its meaning exactly. `all` binds every unattended run; `prompt` binds only a run whose build README
-declared `authorized-by: prompt`, because research and a solution test are obligations of a build
-whose solution was not given — imposing them on a run whose specs already chose one would be
-ceremony, not rigour.
+**A directive may be SCOPED.** A registry entry is `<handle>:<section>[:<scope>]`, and the scope is
+`all` or an authorization mode. An absent third field is `all`, so every entry written before scopes
+existed keeps its meaning exactly. `all` binds every unattended run; a mode binds only a run whose
+build README declared that `authorized-by:` value. Which handle carries which scope is the Skill's
+table.
 
 The scope is KIT-OWNED for the reason the set itself is: a project-selectable scope is a narrowing of
-the core wearing another name. A waiver of a `prompt`-scoped handle on a run that is not
-prompt-authorized is REFUSED rather than recorded, since a waiver relaxes a rule that never bound
-that run. That refusal is evaluated where the mode EXISTS — after the authorization read, not beside
-the other waiver checks — and an underivable mode refuses rather than grants.
+the core wearing another name. A waiver of a mode-scoped handle on a run of another mode is REFUSED
+rather than recorded, since a waiver relaxes a rule that never bound that run. That refusal is
+evaluated where the mode EXISTS — after the authorization read, not beside the other waiver checks —
+and an underivable mode refuses rather than grants.
 
 **This section names no handle.** The list an agent reads is the table in the rendered Skill, and
 naming it twice is the drift the pointer design exists to avoid. The leg joins the two in both
