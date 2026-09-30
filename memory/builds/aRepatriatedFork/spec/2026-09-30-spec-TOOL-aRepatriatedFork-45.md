@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-45 — a renamed-away filename is a dead-path needle
 
-**Status:** SPECCED · rev-1 · 2026-09-30 · node a · Tier-1 · base 6830f257 · streams tooling · order 15 · ratified 2026-09-30
+**Status:** SPECCED · rev-2 · 2026-09-30 · node a · Tier-1 · base 6830f257 · streams tooling · order 15 · ratified 2026-09-30
 
 <!-- gen:spec-records -->
 
@@ -24,8 +24,9 @@ measured it: after renaming the adopter receipt fixture, a planted citation of t
   its basename to the deletion set before the tracked-basename subtraction. The tail rule and the
   tracked-suffix filter then apply to it unchanged. Observed by AC1, AC2, AC3.
 - **S2** — The rename half carries its own frozen sentinel, `parallel-coding-governance.template.md`:
-  the v3.0 product template's old name, reachable only through a rename. Its absence from the derived
-  set refuses, exactly as the deletion sentinel does. Observed by AC4.
+  the v3.0 product template's old name, reachable only through a rename. Its absence from the
+  rename half's own basenames, read before the union, refuses as the deletion sentinel does. Read
+  there so a deletion of the same name could never mask an empty rename read. Observed by AC4.
 - **S3** — The gate's "what it does not catch" paragraph states the `memory/` rename exclusion and
   git's rename threshold. Observed by AC5.
 - **S4** — The self-test's fixture base records a rename in its history, and its header no longer
@@ -69,8 +70,10 @@ threshold is recorded as a delete plus an add, so the deletion half already cove
 
 ### Inventory
 
-This unit mints one shell variable for the rename half and one sentinel constant beside `SENTINEL`.
-Both are named by `python tools/lexicon/lexicon.py --suggest` at build time.
+This unit mints one shell variable for the rename half, `renamed_base`, and one sentinel constant
+beside `SENTINEL`, `RENAME_SENTINEL`. `.lexicon.conf` declares no shell-variable cell, so
+`--suggest --as sh.function` answers a function-verb scoping question that does not apply to either.
+Both names follow the siblings they sit beside, `deleted_base` and `SENTINEL`.
 
 ### Files touched (estimate)
 
@@ -149,6 +152,9 @@ absent from the fixture's history.
 
 - rev-1 · 2026-09-30 · initial draft, adopted under the unattended protocol §11 from
   `TOOL-aRepatriatedFork-44`'s rev-2 measurement.
+- rev-2 · 2026-09-30 · before code: §4 Inventory names the two identifiers, since the lexicon has no
+  shell-variable cell to suggest them from. S2 reads the rename sentinel from the rename half before
+  the union, so the deletion half cannot mask an empty rename read.
 
 ## 10. Reuse audit
 

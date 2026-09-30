@@ -84,3 +84,5 @@ base: d6e1749c0542218004260928f1399174daafb789
 2026-09-30T10:37:30Z brief · item TOOL-aRepatriatedFork-46 · reason 3ff772fc4b61 memory/builds/aRepatriatedFork/prompts/2026-09-30-prompt-TOOL-aRepatriatedFork-46-build-brief.md
 
 2026-09-30T10:37:31Z brief · item TOOL-aRepatriatedFork-47 · reason e3d76a20d8fa memory/builds/aRepatriatedFork/prompts/2026-09-30-prompt-TOOL-aRepatriatedFork-47-build-brief.md
+
+2026-09-30T10:59:19Z dispatch · item 542d35c1 TOOL-aRepatriatedFork-45 · reason tools/check-dead-paths.sh tools/check-dead-paths.test.sh memory/builds/aRepatriatedFork/spec/2026-09-30-spec-TOOL-aRepatriatedFork-45.md memory/builds/aRepatriatedFork/build/2026-09-30-build-TOOL-aRepatriatedFork-45-1-acceptance-ledger.md memory/builds/aRepatriatedFork/README.md memory/LIVE.md memory/ledger
