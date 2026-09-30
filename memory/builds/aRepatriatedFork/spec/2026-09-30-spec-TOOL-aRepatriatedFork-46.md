@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-46 — no line joins a literal kit name under a derived base
 
-**Status:** CLOSED · rev-2 · 2026-09-30 · node a · Tier-2 · base 6830f257 · streams tooling · order 16 · ratified 2026-09-30
+**Status:** CLOSED · rev-3 · 2026-09-30 · node a · Tier-2 · base 6830f257 · streams tooling · order 16 · ratified 2026-09-30
 
 <!-- gen:spec-records -->
 
@@ -40,6 +40,19 @@ does not see a kit name that follows a brace.
   Observed by AC8.
 - **S6** — Every kit whose shipped bytes move takes its version bump in every carrier. Observed by
   AC9.
+- **S7 (rev-3)** — The closing review's round-1 fold of four regressions S4's derivations left.
+  - **S7a** — H1. The two fan-out gates joined the resolver's answer, which is relative to the
+    checkout holding the gate, to the CALLER's `$ROOT`. They join it to
+    `git -C "$HERE" rev-parse --show-toplevel`. Observed by AC10.
+  - **S7b** — M3. govkit selfcheck 5b resolves the version gate's `resolve_carrier_kit` variables
+    through the canonical resolver, inlined into `govkit.py`, and then the gate's plain aliases. A
+    `need` carrier still spelled through a variable afterwards is a FAIL, not a note. Observed by
+    AC11.
+  - **S7c** — M4. `settings-merge.py`'s selftest reads the hooks kit's name only where one resolves,
+    else the miss name the hook path already carries, now one constant. A new arm re-runs the whole
+    selftest from a copy with nothing beside it. Observed by AC12.
+  - **S7d** — M6. With no usable python, `check-wiring.sh`'s `resolve_kit_file` probes the
+    resolver's own two places in bash rather than returning nothing. Observed by AC13.
 
 ## 3. Non-goals (OUT)
 
@@ -250,6 +263,21 @@ This unit mints no function. A shell file that needs a sibling kit gains the exi
 - **AC9** — `bash tools/check-kit-versions.sh` exits 0, and `python tools/govkit/govkit.py epoch
   --base 6830f257` names no kit this unit moved without its bump.
   Red when: a moved kit's carrier was missed.
+- **AC10** — rev-3. `tools/workflows/check-verifier-fanout.sh --print-cap` run from a fresh
+  `git init` checkout prints the cap, and `tools/workflows/check-review-join.test.sh` gains an arm
+  running `check-review-join.sh` from a checkout holding no hooks kit that reads
+  `review-join: clean`.
+  Red when: node reports MODULE_NOT_FOUND, the `7de665e5` behaviour.
+- **AC11** — rev-3. `python tools/govkit/govkit.py selfcheck` exits 0 and prints no
+  `reported, not repaired` note naming a `${...}` carrier. With the carrier resolution removed, the
+  same run FAILs naming each unresolved carrier.
+  Red when: a `${MT_DIR}`-style carrier is reported as a note, which is 28 notes at `7de665e5`.
+- **AC12** — rev-3. `python tools/settings-merge.py --selftest` exits 0, and its new arm re-runs
+  the selftest from a copy that has no hooks kit beside it.
+  Red when: the copy crashes on `.name`, which arm 12 of `7de665e5` does.
+- **AC13** — rev-3. A `tools/check-wiring.test.sh` arm with `agent-cap.js` shipped beside the
+  checker and every python launcher stubbed to fail reads `UNWIRED  agent-cap`, not a skip.
+  Red when: it prints `not adopted`, the `7de665e5` behaviour.
 
 ## 7. Gates
 
@@ -260,6 +288,12 @@ beside a path join, each staged against epoch 5 · the suite's floor rises by it
 
 New arm: `tools/check-install-prefix.test.sh` · `${PFX}<kit>/` and `{PFX}<kit>/` beside the three
 render tokens, each staged against epoch 5 · the suite's floor rises by its new arm count
+
+New arm: `tools/workflows/check-review-join.test.sh` · rev-3: the gate run from a checkout holding no hooks kit · none
+
+New arm: `tools/settings-merge.py` · rev-3: its selftest re-run from a copy with nothing beside it · none
+
+New arm: `tools/check-wiring.test.sh` · rev-3: a shipped agent-cap.js found with every python launcher stubbed to fail · none
 
 ## 8. Open questions
 
@@ -290,6 +324,12 @@ render tokens, each staged against epoch 5 · the suite's floor rises by its new
   the tool-root gates and the hooks with the runbook. The install-prefix self-test's source fixtures
   declared a prefixed descriptor home, which govkit reads as kit-relative since
   `TOOL-aRepatriatedFork-29`; the epoch-6 arms build on them, so their homes are repaired.
+- rev-3 · 2026-09-30 · closing review round 1 fold: H1 — the fan-out gates find the hook beside
+  themselves from any caller's checkout (S7a, AC10). closing review round 1 fold: M3 — selfcheck
+  5b resolves the version gate's carriers as the gate does and FAILs on one it cannot (S7b, AC11).
+  closing review round 1 fold: M4 — a settings-merge-only install passes its own selftest (S7c,
+  AC12). closing review round 1 fold: M6 — without python the wiring checker still probes beside
+  itself (S7d, AC13).
 
 ## 10. Reuse audit
 
