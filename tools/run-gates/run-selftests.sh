@@ -297,6 +297,20 @@ read_evidence() {
 import re, sys
 sys.stdout.reconfigure(newline="")
 troot = sys.argv[2]
+# The `{prefix}` resolution (TOOL-aRepatriatedFork-47), INLINED byte-identically from the
+# canonical copy named on its marker line and gated by the resolve-python self-test.
+# >>> resolve_prefix_token -- canonical copy: resolve_prefix_token.py in the gov lib dir (byte-identical; gated)
+def resolve_prefix_token(spelled, troot):
+    """<spelled> with its {prefix} token resolved against the tool root <troot>.
+
+    An empty or "." root is a root install: the token drops with its slash, and a bare token
+    becomes ".". Any other root replaces the token. Text with no token passes unchanged.
+    """
+    spelled = str(spelled)
+    if not troot or troot == ".":
+        return spelled.replace("{prefix}/", "").replace("{prefix}", ".")
+    return spelled.replace("{prefix}", troot)
+# <<< resolve_prefix_token
 seen = {}
 for n, raw in enumerate(open(sys.argv[1], encoding="utf-8"), 1):
     line = raw.rstrip("\r\n")
@@ -310,8 +324,7 @@ for n, raw in enumerate(open(sys.argv[1], encoding="utf-8"), 1):
         m = re.match(r"#\s*pooled-kit:\s*(.+?)\s*$", s)
         if m:
             kd = m.group(1)
-            kd = kd.replace("{prefix}/", "").replace("{prefix}", ".") if not troot \
-                else kd.replace("{prefix}", troot)
+            kd = resolve_prefix_token(kd, troot)
             print("POOLEDKIT\t" + kd)
         continue
     f = line.split("\t")
@@ -455,6 +468,20 @@ fi
 read_population() {
   "$PYBIN" - "$BUDGETS" "$LEGS" "$FILTER" "$TROOT" <<'PY'
 import json, sys
+# The `{prefix}` resolution (TOOL-aRepatriatedFork-47), INLINED byte-identically from the
+# canonical copy named on its marker line and gated by the resolve-python self-test.
+# >>> resolve_prefix_token -- canonical copy: resolve_prefix_token.py in the gov lib dir (byte-identical; gated)
+def resolve_prefix_token(spelled, troot):
+    """<spelled> with its {prefix} token resolved against the tool root <troot>.
+
+    An empty or "." root is a root install: the token drops with its slash, and a bare token
+    becomes ".". Any other root replaces the token. Text with no token passes unchanged.
+    """
+    spelled = str(spelled)
+    if not troot or troot == ".":
+        return spelled.replace("{prefix}/", "").replace("{prefix}", ".")
+    return spelled.replace("{prefix}", troot)
+# <<< resolve_prefix_token
 
 # LF, NOT CRLF, and this is a bug fix rather than tidiness. On Windows `print` translates every
 # newline to CR LF, so each row below reached the shell with a trailing CR. It was INVISIBLE while
@@ -489,8 +516,7 @@ for line in open(budgets, encoding="utf-8"):
         argv = " ".join(leg.get("argv", []))
     # The `{prefix}` token, resolved against the tool root this script derived (argv 4).
     troot = sys.argv[4] if len(sys.argv) > 4 else ""
-    argv = argv.replace("{prefix}/", "").replace("{prefix}", ".") if not troot \
-        else argv.replace("{prefix}", troot)
+    argv = resolve_prefix_token(argv, troot)
     if filt and filt not in argv:
         continue
     print("\t".join(["ok", name, budget, argv]))

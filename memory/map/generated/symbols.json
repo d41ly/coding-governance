@@ -5930,7 +5930,27 @@
     {
       "id": "resolve_prefix_token",
       "kind": "function",
+      "file": "tools/check-spec-tokens.py"
+    },
+    {
+      "id": "resolve_prefix_token",
+      "kind": "function",
+      "file": "tools/codebase-map/rank_harness.py"
+    },
+    {
+      "id": "resolve_prefix_token",
+      "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "resolve_prefix_token",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
+    },
+    {
+      "id": "resolve_prefix_token",
+      "kind": "function",
+      "file": "tools/lib/resolve_prefix_token.py"
     },
     {
       "id": "resolve_projects_root",

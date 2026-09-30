@@ -1380,13 +1380,27 @@ def deployer(gov):  # gov's deployer, located by its own file: every other gov p
     if len(hits) != 1:
         stop(f"gov at {gov} tracks {len(hits)} govkit.py file(s), so its deployer cannot be located")
     return hits[0]
+# The `{prefix}` resolution (TOOL-aRepatriatedFork-47), INLINED byte-identically from the
+# canonical copy named on its marker line and gated by the resolve-python self-test.
+# >>> resolve_prefix_token -- canonical copy: resolve_prefix_token.py in the gov lib dir (byte-identical; gated)
+def resolve_prefix_token(spelled, troot):
+    """<spelled> with its {prefix} token resolved against the tool root <troot>.
+
+    An empty or "." root is a root install: the token drops with its slash, and a bare token
+    becomes ".". Any other root replaces the token. Text with no token passes unchanged.
+    """
+    spelled = str(spelled)
+    if not troot or troot == ".":
+        return spelled.replace("{prefix}/", "").replace("{prefix}", ".")
+    return spelled.replace("{prefix}", troot)
+# <<< resolve_prefix_token
 def templates(gov):  # {rendered destination: [gov template]}, from gov's own descriptors and the plan
     with open(f"{gov}/{os.path.dirname(deployer(gov))}/registry.toml", "rb") as fh:
         entries = tomllib.load(fh).get("entry", [])
     tr = os.path.relpath(os.path.dirname(os.path.dirname(fh.name)), gov).replace(os.sep, "/")
     plan, out = planned(), {}
     for e in entries:  # a registry path names the tool root as `{prefix}`, a kit home kit-relatively
-        with open(f"{gov}/{e['descriptor'].replace('{prefix}', tr)}", "rb") as fh:
+        with open(f"{gov}/{resolve_prefix_token(e['descriptor'], tr)}", "rb") as fh:
             d = tomllib.load(fh)
         home = (d.get("home") or "").strip("/")
         if "home" in d and not d.get("home_root_relative"):

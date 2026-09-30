@@ -147,11 +147,20 @@ def derive_tool_root(root: pathlib.Path | str) -> str:
     return "" if rel == "." else rel
 
 
-def resolve_prefix_token(spelled: str, tool_root: str) -> str:
-    """Substitute the `{prefix}` token with `tool_root`; an empty root drops the token's slash."""
-    if not tool_root:
+# The `{prefix}` resolution (TOOL-aRepatriatedFork-47), INLINED byte-identically from the
+# canonical copy named on its marker line and gated by the resolve-python self-test.
+# >>> resolve_prefix_token -- canonical copy: resolve_prefix_token.py in the gov lib dir (byte-identical; gated)
+def resolve_prefix_token(spelled, troot):
+    """<spelled> with its {prefix} token resolved against the tool root <troot>.
+
+    An empty or "." root is a root install: the token drops with its slash, and a bare token
+    becomes ".". Any other root replaces the token. Text with no token passes unchanged.
+    """
+    spelled = str(spelled)
+    if not troot or troot == ".":
         return spelled.replace("{prefix}/", "").replace("{prefix}", ".")
-    return spelled.replace("{prefix}", tool_root)
+    return spelled.replace("{prefix}", troot)
+# <<< resolve_prefix_token
 
 
 def resolve_tool_path(root: pathlib.Path | str, *parts: str) -> pathlib.Path:

@@ -16,7 +16,7 @@
 # config only inside it, and never writes into the real tree. Execution order is a scheduling detail;
 # REPORTING is always manifest order, so the output is byte-stable whatever the width.
 set -u
-KIT_RUN_GATES_VERSION=1.15   # gov:kit run-gates@1.15
+KIT_RUN_GATES_VERSION=1.16   # gov:kit run-gates@1.16
 # 1.7 -> 1.8: every bar appends one line to the run log under the git common dir, from the EXIT trap
 # (TOOL-dLoggedFlight-3). No manifest key, profile knob or stdout line moves, so neither direction of
 # a skew between the runner and its table or manifest changes a verdict.
@@ -1399,11 +1399,18 @@ cache = sys.argv[2] if len(sys.argv) > 2 else ""   # argv[1] is the MANIFEST; th
 # here ONCE, so every field below and every reader of these rows sees a repo-relative path. A
 # manifest carrying no token, which is what the deployer emits for an adopter, passes unchanged.
 troot = sys.argv[3] if len(sys.argv) > 3 else ""
-def resolve_prefix(s):
-    s = str(s)
-    if troot in ("", "."):
-        return s.replace("{prefix}/", "").replace("{prefix}", ".")
-    return s.replace("{prefix}", troot)
+# >>> resolve_prefix_token -- canonical copy: resolve_prefix_token.py in the gov lib dir (byte-identical; gated)
+def resolve_prefix_token(spelled, troot):
+    """<spelled> with its {prefix} token resolved against the tool root <troot>.
+
+    An empty or "." root is a root install: the token drops with its slash, and a bare token
+    becomes ".". Any other root replaces the token. Text with no token passes unchanged.
+    """
+    spelled = str(spelled)
+    if not troot or troot == ".":
+        return spelled.replace("{prefix}/", "").replace("{prefix}", ".")
+    return spelled.replace("{prefix}", troot)
+# <<< resolve_prefix_token
 if cache and os.path.exists(cache):
     try:
         for line in open(cache, encoding="utf-8"):
@@ -1434,8 +1441,8 @@ rows = [" ".join(str(i) for i in order)]
 # the live hook installed here, so "what does it test" has two true answers and the failure question
 # has one. Those four legs are `repo`: a broken boundary in THIS repository cannot wait for somebody
 # to remember a variable. TOOL-dUnstalledConvoy-30.
-rows += [l["name"] + "\x1e" + ",".join(resolve_prefix(g) for g in l.get("guard", []))
-         + "\x1e" + "\x1f".join(resolve_prefix(a) for a in l["argv"])
+rows += [l["name"] + "\x1e" + ",".join(resolve_prefix_token(g, troot) for g in l.get("guard", []))
+         + "\x1e" + "\x1f".join(resolve_prefix_token(a, troot) for a in l["argv"])
          + "\x1e" + ("1" if l.get("impure") else "")
          + "\x1e" + str(l.get("chunk", "") or "")
          + "\x1e" + (l.get("subject") or "repo")

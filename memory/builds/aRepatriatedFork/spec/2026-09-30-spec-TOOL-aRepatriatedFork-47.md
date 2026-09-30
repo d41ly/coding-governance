@@ -1,11 +1,12 @@
 # TOOL-aRepatriatedFork-47 — every copy of the `{prefix}` resolution gives one answer
 
-**Status:** SPECCED · rev-1 · 2026-09-30 · node a · Tier-1 · base 6830f257 · streams tooling · order 17 · ratified 2026-09-30
+**Status:** CLOSED · rev-1 · 2026-09-30 · node a · Tier-1 · base 6830f257 · streams tooling · order 17 · ratified 2026-09-30
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-30-build-TOOL-aRepatriatedFork-47-1-acceptance-ledger.md](../build/2026-09-30-build-TOOL-aRepatriatedFork-47-1-acceptance-ledger.md) | journal | — |
 | [2026-09-30-prompt-TOOL-aRepatriatedFork-47-build-brief.md](../prompts/2026-09-30-prompt-TOOL-aRepatriatedFork-47-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->

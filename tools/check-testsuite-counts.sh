@@ -30,6 +30,18 @@ ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "testsuite-counts: n
 cd "$ROOT" || exit 2
 _self_pre=$(git -C "$_self_dir" rev-parse --show-prefix 2>/dev/null) || { echo "testsuite-counts: cannot derive this gate's own directory from '$_self_dir', so the manifest beside it cannot be found"; exit 2; }
 MANIFEST="${GATE_LEGS:-${_self_pre}gate-legs.json}"
+# The `{prefix}` resolution (TOOL-aRepatriatedFork-47), INLINED byte-identically from the
+# canonical copy named on its marker line and gated by the resolve-python self-test.
+# >>> resolve_prefix_sh -- canonical copy: kit-rel.sh in the gov lib dir (byte-identical; gated)
+resolve_prefix_sh() {
+  local _rps_s="$1"
+  case "${2:-}" in
+    ""|.) _rps_s=${_rps_s//"{prefix}/"/}; _rps_s=${_rps_s//"{prefix}"/.} ;;
+    *) _rps_s=${_rps_s//"{prefix}"/"$2"} ;;
+  esac
+  printf '%s\n' "$_rps_s"
+}
+# <<< resolve_prefix_sh
 WAIVERS=memory/project/testsuite-count-waivers.txt
 status=0
 fail() { echo "TESTSUITE-COUNTS FAILED — $1"; status=1; }
@@ -40,7 +52,8 @@ fail() { echo "TESTSUITE-COUNTS FAILED — $1"; status=1; }
 # globbing the tree, so the leg's population and the bar's are the same set by construction.
 # A `{prefix}` token (gov's own manifest, TOOL-aRepatriatedFork-29 §8 F1) resolves to this gate's
 # own directory, which is the tool root the manifest sits in.
-suites=$(grep -oE '"[^"]*\.test\.sh"' "$MANIFEST" | tr -d '"' | sed "s#{prefix}/#${_self_pre}#g" | sort -u)
+suites=$(grep -oE '"[^"]*\.test\.sh"' "$MANIFEST" | tr -d '"' \
+  | while IFS= read -r _s; do resolve_prefix_sh "$_s" "${_self_pre%/}"; done | sort -u)
 if [ -z "$suites" ]; then
   fail "the gate manifest names no *.test.sh, so this leg would grade an empty population — the vacuous-selector shape it exists to prevent"
   exit "$status"

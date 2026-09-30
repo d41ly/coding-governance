@@ -33,3 +33,22 @@ derive_self_rel() {
   printf '%s\n' "$_dsr_rel"
 }
 # <<< derive_self_rel
+
+# TOOL-aRepatriatedFork-47 S2 — the `{prefix}` token resolved against a tool root, the shell twin of
+# the `resolve_prefix_token` block in `resolve_prefix_token.py` beside this file. Same contract, and
+# `resolve-python.test.sh` runs both over one truth table: an empty or `.` root drops the token with
+# its slash and a bare token becomes `.`; any other root replaces the token. Carried INLINE by every
+# shell reader of the token, byte-identical, gated like the block above.
+#
+#   resolve_prefix_sh '{prefix}/a/b' "$TROOT"    # prints the resolved path
+#
+# >>> resolve_prefix_sh -- canonical copy: kit-rel.sh in the gov lib dir (byte-identical; gated)
+resolve_prefix_sh() {
+  local _rps_s="$1"
+  case "${2:-}" in
+    ""|.) _rps_s=${_rps_s//"{prefix}/"/}; _rps_s=${_rps_s//"{prefix}"/.} ;;
+    *) _rps_s=${_rps_s//"{prefix}"/"$2"} ;;
+  esac
+  printf '%s\n' "$_rps_s"
+}
+# <<< resolve_prefix_sh

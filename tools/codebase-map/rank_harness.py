@@ -41,6 +41,22 @@ sys.path.insert(0, str(Path(os.path.abspath(__file__)).parent))
 import map_lib as m  # noqa: E402
 import reuse_lookup as rl  # noqa: E402
 
+
+# The `{prefix}` resolution (TOOL-aRepatriatedFork-47), INLINED byte-identically from the
+# canonical copy named on its marker line and gated by the resolve-python self-test.
+# >>> resolve_prefix_token -- canonical copy: resolve_prefix_token.py in the gov lib dir (byte-identical; gated)
+def resolve_prefix_token(spelled, troot):
+    """<spelled> with its {prefix} token resolved against the tool root <troot>.
+
+    An empty or "." root is a root install: the token drops with its slash, and a bare token
+    becomes ".". Any other root replaces the token. Text with no token passes unchanged.
+    """
+    spelled = str(spelled)
+    if not troot or troot == ".":
+        return spelled.replace("{prefix}/", "").replace("{prefix}", ".")
+    return spelled.replace("{prefix}", troot)
+# <<< resolve_prefix_token
+
 KS = (1, 5, 10, 20)
 
 
@@ -70,10 +86,9 @@ def derive_targets(row: dict) -> set[str]:
     to this kit dir's parent, spelled from the repo root the way `kit_rel` spells the kit.
     """
     pre = Path(m.kit_rel()).parent.as_posix()
-    sub = "" if pre == "." else pre + "/"
-    out = {row["expected_file"].replace("{prefix}/", sub)}
+    out = {resolve_prefix_token(row["expected_file"], pre)}
     for alt in row.get("also_acceptable", ()):
-        out.add(alt.split("::", 1)[0].replace("{prefix}/", sub))
+        out.add(resolve_prefix_token(alt.split("::", 1)[0], pre))
     return out
 
 

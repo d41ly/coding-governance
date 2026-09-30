@@ -48,6 +48,22 @@ def derive_install_prefix() -> str:
 PFX = derive_install_prefix()
 
 
+# The `{prefix}` resolution (TOOL-aRepatriatedFork-47), INLINED byte-identically from the
+# canonical copy named on its marker line and gated by the resolve-python self-test.
+# >>> resolve_prefix_token -- canonical copy: resolve_prefix_token.py in the gov lib dir (byte-identical; gated)
+def resolve_prefix_token(spelled, troot):
+    """<spelled> with its {prefix} token resolved against the tool root <troot>.
+
+    An empty or "." root is a root install: the token drops with its slash, and a bare token
+    becomes ".". Any other root replaces the token. Text with no token passes unchanged.
+    """
+    spelled = str(spelled)
+    if not troot or troot == ".":
+        return spelled.replace("{prefix}/", "").replace("{prefix}", ".")
+    return spelled.replace("{prefix}", troot)
+# <<< resolve_prefix_token
+
+
 HERE = pathlib.Path(__file__).resolve().parent
 
 # TOOL-aRepatriatedFork-46: every kit is named by the NAME its directory has in this install, never as a
@@ -6779,8 +6795,9 @@ user_skills = "/tmp/gk-fake-skills"
         # ---- taken where inCMS was reachable -- and the arm reproduces it from gov's side.
         # TOOL-aRepatriatedFork-28 F1: the fixture spells gov's prefix as the `{prefix}` token, so
         # it carries no literal and the arms read it at whatever prefix this checkout sits at.
-        _fx9 = json.loads((GOVKIT.parent / "fixtures" / "adopter-ic-2cff5855.receipt.json")
-                          .read_text(encoding="utf-8").replace("{prefix}/", PFX))
+        _fx9 = json.loads(resolve_prefix_token(
+            (GOVKIT.parent / "fixtures" / "adopter-ic-2cff5855.receipt.json")
+            .read_text(encoding="utf-8"), PFX.rstrip("/")))
         _fx9rows = _fx9["files"]
         check("[-9] S13 LIVENESS the committed inCMS fixture carries the 52-row population",
               len(_fx9rows) == 52, f"{len(_fx9rows)} row(s)")

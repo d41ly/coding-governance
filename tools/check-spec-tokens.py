@@ -125,6 +125,22 @@ import re
 import subprocess
 import sys
 
+# The `{prefix}` resolution (TOOL-aRepatriatedFork-47), INLINED byte-identically from the
+# canonical copy named on its marker line and gated by the resolve-python self-test.
+# >>> resolve_prefix_token -- canonical copy: resolve_prefix_token.py in the gov lib dir (byte-identical; gated)
+def resolve_prefix_token(spelled, troot):
+    """<spelled> with its {prefix} token resolved against the tool root <troot>.
+
+    An empty or "." root is a root install: the token drops with its slash, and a bare token
+    becomes ".". Any other root replaces the token. Text with no token passes unchanged.
+    """
+    spelled = str(spelled)
+    if not troot or troot == ".":
+        return spelled.replace("{prefix}/", "").replace("{prefix}", ".")
+    return spelled.replace("{prefix}", troot)
+# <<< resolve_prefix_token
+
+
 KIT_SPEC_TOKENS_VERSION = "1.1"  # gov:kit spec-tokens@1.1 — the deployer's read
 
 WAIVERS = "memory/project/spec-token-waivers.txt"
@@ -663,9 +679,7 @@ def main(argv):
         # root it sits in, so a guard joins a spec's repo-relative write set as it always has.
         for r in rows:
             if r.get("guard"):
-                r["guard"] = [(g.replace("{prefix}", troot) if troot else
-                               g.replace("{prefix}/", "").replace("{prefix}", "."))
-                              for g in r["guard"]]
+                r["guard"] = [resolve_prefix_token(g, troot) for g in r["guard"]]
         legs = {r["name"] for r in rows}
         guarded, broad = derive_guarded_legs(rows)
     except Exception as exc:  # noqa: BLE001 - a malformed manifest is a refusal, not a pass

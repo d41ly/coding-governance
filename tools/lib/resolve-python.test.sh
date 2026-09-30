@@ -165,6 +165,8 @@ render_doc|$ROOT/$KIT_REL/render-doc.sh|$KIT_REL/render-doc
 resolve_kit_dir|$ROOT/$KIT_REL/resolve_kit_dir.py|$KIT_REL/resolve_kit_dir
 derive_self_rel|$ROOT/$KIT_REL/kit-rel.sh|$KIT_REL/kit-rel
 derive_kit_paths|$ROOT/$KIT_REL/render-doc.sh|$KIT_REL/render-doc
+resolve_prefix_token|$ROOT/$KIT_REL/resolve_prefix_token.py|$KIT_REL/resolve_prefix_token
+resolve_prefix_sh|$ROOT/$KIT_REL/kit-rel.sh|$KIT_REL/kit-rel
 "
 # CRs are dropped before the compare: a Python copy may sit CRLF in a Windows working copy while git
 # stores it LF, and the parity asked is of the block, not of a checkout's line endings.
@@ -175,23 +177,57 @@ derive_kit_paths|$ROOT/$KIT_REL/render-doc.sh|$KIT_REL/render-doc
 # that ships carries it inline because `<prefix>/lib/` travels to nobody.
 # derive_kit_paths (TOOL-aRepatriatedFork-10, closing review round 1 L4) is the receipt read the two
 # memory-tree renderers each used to spell as their own grep, with nothing comparing the two.
-blk() { awk -v s="$1" '$0 ~ ("^# >>> " s){f=1} f{print} $0 ~ ("^# <<< " s){if(f)exit}' "$2" | tr -d '\r'; }
+# resolve_prefix_token and resolve_prefix_sh (TOOL-aRepatriatedFork-47) are the `{prefix}` token's
+# two canonicals, one per language; §2b below holds them to one answer. The runbook's embedded
+# migration program carries the Python one, so the population grep reads that one Markdown file too.
+#
+# EVERY BLOCK IN A FILE IS GRADED, not the first (TOOL-aRepatriatedFork-47 S5). `blk` takes the
+# block's ordinal: the extractor used to stop at the first closing marker, so a second copy in one
+# file — `run-selftests.sh` carries two, one per embedded program — was never compared at all.
+blk() { awk -v s="$1" -v k="${3:-1}" '$0 ~ ("^# >>> " s){i++; if(i==k)f=1} f{print} f && $0 ~ ("^# <<< " s){exit}' "$2" | tr -d '\r'; }
 while IFS='|' read -r stem canon excl; do
   [ -n "$stem" ] || continue
   want=$(blk "$stem" "$canon")
   [ -n "$want" ] || bad "the canonical block for '$stem' is missing from $canon"; ok
-  copies=$(cd "$ROOT" && git grep -l "^# >>> $stem" -- '*.sh' '*.py' '.githooks/*' | grep -v "^$excl" || true)
+  copies=$(cd "$ROOT" && git grep -l "^# >>> $stem" -- '*.sh' '*.py' '.githooks/*' WIRE-INTO-PROJECT.md | grep -v "^$excl" || true)
   # NON-EMPTY POPULATION IS ITS OWN ARM, per row. A row whose copies all disappeared would otherwise
   # pass by judging nothing, which is the vacuity this whole file refuses.
   [ -n "$copies" ] || bad "no inline copy of '$stem' found — this row would be judging an empty population"; ok
   while IFS= read -r rel; do
     [ -n "$rel" ] || continue
-    if [ "$(blk "$stem" "$ROOT/$rel")" != "$want" ]; then
-      bad "inline copy of '$stem' drifted from $canon: $rel"
-    fi
-    ok
+    nblk=$(grep -c "^# >>> $stem" "$ROOT/$rel")
+    k=1
+    while [ "$k" -le "$nblk" ]; do
+      if [ "$(blk "$stem" "$ROOT/$rel" "$k")" != "$want" ]; then
+        bad "inline copy of '$stem' drifted from $canon: $rel (block $k of $nblk)"
+      fi
+      ok; k=$((k+1))
+    done
   done <<<"$copies"
 done <<<"$PARITY_ROWS"
+
+# ---- 2b. THE {prefix} CONTRACT, BEHAVIOUR ---------------------------------------------------------
+# Parity holds each copy to its canonical; this holds the two canonicals to ONE answer. Both run over
+# the contract table of TOOL-aRepatriatedFork-47 §4 and must print its third column, row for row.
+PT='{prefix}'
+PFX_ROWS="$PT/a/b||a/b
+$PT/a/b|.|a/b
+$PT||.
+$PT/a|tools|tools/a
+$PT/a|vendor/gov|vendor/gov/a
+x/y|tools|x/y"
+pfx_want=$(printf '%s\n' "$PFX_ROWS" | awk -F'|' '{print $3}')
+pfx_py=$(printf '%s\n' "$PFX_ROWS" | "$REALPY" -B -c '
+import sys
+sys.path.insert(0, sys.argv[1])
+from resolve_prefix_token import resolve_prefix_token
+for line in sys.stdin.read().splitlines():
+    s, t, _ = line.split("|")
+    print(resolve_prefix_token(s, t))' "$HERE" | tr -d '\r')
+pfx_sh=$(printf '%s\n' "$PFX_ROWS" | bash -c '. "$1"; while IFS="|" read -r s t _; do resolve_prefix_sh "$s" "$t"; done' _ "$HERE/kit-rel.sh")
+[ "$(printf '%s\n' "$pfx_want" | grep -c .)" = 6 ] || bad "the {prefix} contract table did not read as six rows"; ok
+[ "$pfx_py" = "$pfx_want" ] || bad "the Python {prefix} canonical disagrees with the contract table: $(printf '%s' "$pfx_py" | tr '\n' ' ')"; ok
+[ "$pfx_sh" = "$pfx_want" ] || bad "the shell {prefix} canonical disagrees with the contract table: $(printf '%s' "$pfx_sh" | tr '\n' ' ')"; ok
 
 # ---- 3. THE BAN ---------------------------------------------------------------------------------
 # The retired idiom, in any tracked `*.sh`. Comments are stripped first: this file and the resolver
@@ -304,6 +340,54 @@ printf '#!/usr/bin/env bash\nPY=$(resolve_python "${GOV_PYTHON:-}") || exit 2\n'
 # ...and the ban's own population is real, or it is a gate over nothing.
 nsh2=$(cd "$ROOT" && git ls-files -- '*.sh' | grep -cv '^'"$KIT_REL/resolve-python"'' || true)
 [ "$nsh2" -gt 10 ] || bad "the invocation ban scanned $nsh2 shell files — the population collapsed"; ok
+
+# ---- 3c. THE {prefix} RESOLUTION BAN ------------------------------------------------------------
+# §2 grades the MARKED copies of the `{prefix}` resolution; this is what stops an UNMARKED one, which
+# is how eleven of them came to exist unseen (TOOL-aRepatriatedFork-47 S7). Outside a
+# `resolve_prefix_token` or `resolve_prefix_sh` block, no tracked `*.sh` or `*.py` line and no line
+# of the runbook may resolve the token by hand. The forms matched are a Python `.replace(` whose
+# first argument opens with the token, in either quote style; a shell `#"{prefix}/"` prefix strip;
+# and a `sed` substitution whose pattern begins with the token and its slash.
+#
+# WHAT IT CANNOT SEE, so a green run is not misread: a line whose first non-blank is `#` (every
+# comment, so prose explaining the form never reds); `re.sub`, `str.replace(s, …)`, a token held in
+# a variable or built by concatenation; a bash `${x/…}` or `${x//…}` substitution; any file outside
+# the population named above, including `.githooks/*` and every other Markdown file.
+scan_prefix_token() {  # file paths on stdin -> "file:line:text" per hand-written resolution outside a block
+  awk '
+    { f = $0; b = 0; n = 0
+      while ((getline line < f) > 0) {
+        n++; sub(/\r$/, "", line)
+        if (line ~ /^# >>> resolve_prefix_(token|sh)/) b = 1
+        if (b) { if (line ~ /^# <<< resolve_prefix_(token|sh)/) b = 0; continue }
+        if (line ~ /^[[:space:]]*#/) continue
+        if (line ~ /\.replace\(["\047][{]prefix[}]/ || line ~ /#"[{]prefix[}]\/"/ ||
+            line ~ /sed[^|]*s[^[:alnum:][:space:]][{]prefix[}]\//)
+          printf "%s:%d:%s\n", f, n, line
+      }
+      close(f) }'
+}
+pfx_pop=$(cd "$ROOT" && git ls-files -- '*.sh' '*.py' WIRE-INTO-PROJECT.md)
+pfx_hits=$(cd "$ROOT" && printf '%s\n' "$pfx_pop" | scan_prefix_token)
+[ -z "$pfx_hits" ] || { echo "FAIL a {prefix} token is resolved by hand outside a marked block:"; printf '%s\n' "$pfx_hits" | sed 's/^/    /'; st=1; }
+ok
+# ...and the population is real: the shell and Python files, and the one Markdown file named.
+[ "$(printf '%s\n' "$pfx_pop" | grep -c .)" -gt 10 ] || bad "the {prefix} ban scanned a collapsed population"; ok
+printf '%s\n' "$pfx_pop" | grep -qx 'WIRE-INTO-PROJECT.md' || bad "the {prefix} ban does not read the runbook"; ok
+# ...and each banned form FIRES on a plant, spelled through $PT so this file carries none of them.
+plant="$TMP/pfx.py"
+for form in "x = s.replace(\"$PT/\", \"\")" "x = s.replace('$PT', tr)" \
+            "p=\"\${SELF_PRE}\${p#\"$PT/\"}\"" "s=\$(printf x | sed \"s#$PT/#\$pre#g\")"; do
+  printf '%s\n' "$form" > "$plant"
+  [ "$(printf '%s\n' "$plant" | scan_prefix_token | wc -l)" = 1 ] || bad "the {prefix} ban does not fire on: $form"; ok
+done
+# ...the block exemption, with its red half and its closing edge.
+{ printf '# >>> resolve_prefix_token\n'; printf '    return s.replace("%s/", "")\n' "$PT"; printf '# <<< resolve_prefix_token\n'; } > "$plant"
+[ -z "$(printf '%s\n' "$plant" | scan_prefix_token)" ] || bad "a resolution inside a marked block reds the {prefix} ban"; ok
+{ printf '# >>> resolve_prefix_sh\n'; printf '# <<< resolve_prefix_sh\n'; printf 'x = s.replace("%s/", "")\n' "$PT"; } > "$plant"
+[ -n "$(printf '%s\n' "$plant" | scan_prefix_token)" ] || bad "the {prefix} block exemption leaks past its closing marker"; ok
+printf '    # s.replace("%s/", "") is the hand-written form\n' "$PT" > "$plant"
+[ -z "$(printf '%s\n' "$plant" | scan_prefix_token)" ] || bad "the {prefix} ban fires on a COMMENT explaining the form"; ok
 
 [ "$st" = 0 ] && echo "PASS — resolve-python: $n assertions held"
 exit "$st"

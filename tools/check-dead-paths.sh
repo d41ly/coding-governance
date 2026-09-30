@@ -74,6 +74,18 @@ if ! SELF_PRE=$(git -C "$_self_dir" rev-parse --show-prefix 2>/dev/null); then
   exit 2
 fi
 WAIVERS="${SELF_PRE}dead-path-waivers.txt"
+# The `{prefix}` resolution (TOOL-aRepatriatedFork-47), INLINED byte-identically from the
+# canonical copy named on its marker line and gated by the resolve-python self-test.
+# >>> resolve_prefix_sh -- canonical copy: kit-rel.sh in the gov lib dir (byte-identical; gated)
+resolve_prefix_sh() {
+  local _rps_s="$1"
+  case "${2:-}" in
+    ""|.) _rps_s=${_rps_s//"{prefix}/"/}; _rps_s=${_rps_s//"{prefix}"/.} ;;
+    *) _rps_s=${_rps_s//"{prefix}"/"$2"} ;;
+  esac
+  printf '%s\n' "$_rps_s"
+}
+# <<< resolve_prefix_sh
 TABC=$(printf '\t')
 # FROZEN SENTINEL. The needle derivation walks history and could go silently empty — a bad
 # `--diff-filter`, a shallow clone, a `git log` that stops answering — and an empty needle set makes
@@ -195,7 +207,7 @@ if [ -f "$WAIVERS" ]; then
   while IFS= read -r _row || [ -n "$_row" ]; do
     case "$_row" in *"$TABC"*) ;; *) continue ;; esac
     _wpath=${_row%%"$TABC"*}; _rest=${_row#*"$TABC"}
-    case "$_wpath" in "{prefix}/"*) _wpath="${SELF_PRE}${_wpath#"{prefix}/"}" ;; esac
+    case "$_wpath" in *"{prefix}"*) _wpath=$(resolve_prefix_sh "$_wpath" "${SELF_PRE%/}") ;; esac
     _word=${_rest%%"$TABC"*}; _rest=${_rest#*"$TABC"}
     _wtext=${_rest%"$TABC"*}
     case "$_word" in ''|*[!0-9]*) malformed="$malformed$_wpath:<ordinal [$_word] is not a positive integer>
