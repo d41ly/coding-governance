@@ -120,8 +120,8 @@ UNATTENDED_DIR=$(resolve_kit_dir "$_rkd_py" unattended unattended.sh "$HERE") ||
 UNATTENDED="${UNATTENDED_DIR##*/}"
 HOOKS_DIR=$(resolve_kit_dir "$_rkd_py" hooks agent-cap.js "$HERE") || exit 2
 HOOKS="${HOOKS_DIR##*/}"
-MEMORY_TREE_DIR=$(resolve_kit_dir "$_rkd_py" memory-tree gotchas.py "$HERE") || exit 2
-MEMORY_TREE="${MEMORY_TREE_DIR##*/}"
+MT_KIT_DIR=$(resolve_kit_dir "$_rkd_py" memory-tree gotchas.py "$HERE") || exit 2
+MT_KIT="${MT_KIT_DIR##*/}"
 # In this suite KIT_REL names the TOOL ROOT, not the kit dir: the prefix without its slash.
 KIT_REL="${PFX%/}"; KIT_REL="${KIT_REL:-.}"
 # ROOTPFX is a ROOT install's prefix, empty by definition: a fixture that models a root install,
@@ -892,7 +892,7 @@ d=$(printf '%s\n' "$o" | grep '^RESULT ' | sed 's/.*"dispatch"://')
 has    "AC8 dispatch.args carries the repo" "$d" '"repo":"/tmp/r"'
 has    "AC8 dispatch.args carries the slug" "$d" '"slug":"tB"'
 has    "AC8 dispatch.args carries the driver" "$d" '"driver":"bash '"${PFX}${UNATTENDED}/unattended.sh"'"'
-has    "AC8 dispatch.args carries the bug-class checklist" "$d" '"checklist":"python '"${PFX}${MEMORY_TREE}/gotchas.py"' --for-diff HEAD~1..HEAD"'
+has    "AC8 dispatch.args carries the bug-class checklist" "$d" '"checklist":"python '"${PFX}${MT_KIT}/gotchas.py"' --for-diff HEAD~1..HEAD"'
 has    "AC8 dispatch names the three per-unit fields and only those" "$d" '"perUnit":["unitId","specPath","briefPath"]'
 hasnt_ "AC8 the child never receives the roster list" "$d" '"roster"'
 
@@ -1530,9 +1530,9 @@ has "PV-AC2 flat: ...and names the directory it probed" "$o" "MEMORY_TREE_DIR 's
 NE="$LAY/nested"; build_layout "$NE" scripts/workflows scripts/unattended scripts/memory-tree/gotchas.py
 run_layout "$NE" scripts/workflows --render >/dev/null
 check_layout "PV-AC3 nested:" "$NE" scripts/workflows scripts/ scripts/memory-tree GGGGG
-RT="$LAY/root"; build_layout "$RT" "$KIT" "$UNATTENDED" "${ROOTPFX}${MEMORY_TREE}/gotchas.py"   # the ROOT-install layout PV-AC3 builds on purpose
+RT="$LAY/root"; build_layout "$RT" "$KIT" "$UNATTENDED" "${ROOTPFX}${MT_KIT}/gotchas.py"   # the ROOT-install layout PV-AC3 builds on purpose
 run_layout "$RT" "$KIT" --render >/dev/null
-check_layout "PV-AC3 root:" "$RT" "$KIT" "" "$MEMORY_TREE" GGGGG
+check_layout "PV-AC3 root:" "$RT" "$KIT" "" "$MT_KIT" GGGGG
 RF="$LAY/rootflat"; build_layout "$RF" "$KIT" "$UNATTENDED" gotchas.py
 run_layout "$RF" "$KIT" --render >/dev/null
 check_layout "PV-AC3 root, flat memory-tree:" "$RF" "$KIT" "" . GGGGG
