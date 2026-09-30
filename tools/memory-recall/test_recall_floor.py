@@ -391,7 +391,9 @@ def test_kit_payload_withholds():
     """
     import tomllib  # noqa: PLC0415
 
-    sys.path.insert(0, str(ROOT / PFX / "govkit"))
+    import extract as E  # noqa: PLC0415 — the kit's own copy of the sibling-kit resolver
+
+    sys.path.insert(0, str(E.resolve_kit_dir("govkit", "govkit.py", KIT)))
     import govkit as G  # noqa: PLC0415
 
     desc = tomllib.loads((KIT / "kit.toml").read_text(encoding="utf-8"))

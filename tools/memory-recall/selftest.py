@@ -223,9 +223,11 @@ def make_repo(kitname: str = "memory-recall", conf: str = CONF, gitignore: str |
     # `requires` that one, `extract_records` imports `parse_spec_h1` from `tree_lib.py` on first use,
     # and the spec-H1 arm compares against `gen_build_index.spec_ids` (TOOL-aRepatriatedFork-40).
     import extract as E
-    (root / "memory-tree").mkdir()
+    # TOOL-aRepatriatedFork-46: the fixture names the sibling by the NAME its directory has here.
+    mt_name = E.resolve_kit_dir("memory-tree", "tree_lib.py", KIT).name
+    (root / mt_name).mkdir()
     for f in ("tree_lib.py", "gen_build_index.py"):
-        shutil.copyfile(E.resolve_kit_dir("memory-tree", f, KIT) / f, root / "memory-tree" / f)
+        shutil.copyfile(E.resolve_kit_dir("memory-tree", f, KIT) / f, root / mt_name / f)
     (root / ".memory-tree.conf").write_text(conf, encoding="utf-8", newline="\n")
     # `flat` writes <root>/DECISIONS.md, which is the layout the memory-tree kit's own adopter
     # creates; the default writes <root>/<discipline>/DECISIONS.md, which is upstream's. `DURABLE`
