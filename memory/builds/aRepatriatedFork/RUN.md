@@ -130,3 +130,9 @@ base: d6e1749c0542218004260928f1399174daafb789
 2026-09-30T22:09:28Z brief · item TOOL-aRepatriatedFork-50 · reason 6ff1dfe62270 memory/builds/aRepatriatedFork/prompts/2026-10-01-prompt-TOOL-aRepatriatedFork-50-build-brief.md
 
 2026-09-30T22:10:20Z brief · item TOOL-aRepatriatedFork-51 · reason 3ae2be6b2601 memory/builds/aRepatriatedFork/prompts/2026-10-01-prompt-TOOL-aRepatriatedFork-51-build-brief.md
+
+2026-09-30T22:11:13Z decision · item brief-recorded waiver row TOOL-aRepatriatedFork-44 in memory/project/brief-recorded-waiver.txt: keep the waiver (built at 76d21026 from an untracked orchestrator prompt, --brief never ran; a reconstructed brief is filed, joined by no row) or leave the leg red · reason the run cannot write an honest brief row for a unit built before it, and TOOL-aRepatriatedFork-51 built the registry this row uses; the owner decides every waiver row
+
+2026-09-30T22:11:14Z decision · item brief-recorded waiver row TOOL-aRepatriatedFork-46 in memory/project/brief-recorded-waiver.txt: the same build-commit misread pass-order-waiver.txt's fifth row waives (09dae486 adoption records commit; true build df18ab42 carries the brief row); keep it until TOOL-aRepatriatedFork-48 fixes the shared pick · reason a misread is not a violation, and the shared pick's fix is filed rather than built in this pass; the owner decides every waiver row
+
+2026-09-30T22:11:15Z decision · item TOOL-aRepatriatedFork-51 gives brief-recorded a waiver registry its header had argued against (an exemption is not coverage); keep the mechanism, or revert it and accept that a unit built without a brief blocks its run's landing forever · reason a new exemption surface on a merge-bar leg is a policy choice the run made to land; it mirrors pass-order's reviewed registry and reds a stale row

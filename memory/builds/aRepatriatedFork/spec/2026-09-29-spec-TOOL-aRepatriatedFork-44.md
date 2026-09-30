@@ -7,6 +7,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-29-build-TOOL-aRepatriatedFork-44-1-acceptance-ledger.md](../build/2026-09-29-build-TOOL-aRepatriatedFork-44-1-acceptance-ledger.md) | journal | — |
+| [2026-10-01-prompt-TOOL-aRepatriatedFork-44-reconstructed-build-brief.md](../prompts/2026-10-01-prompt-TOOL-aRepatriatedFork-44-reconstructed-build-brief.md) | journal | — |
 | [2026-09-30-review-TOOL-aRepatriatedFork-23-closing-diff-round1.md](../reviews/2026-09-30-review-TOOL-aRepatriatedFork-23-closing-diff-round1.md) | diff-review | TOOL-aRepatriatedFork-23 TOOL-aRepatriatedFork-24 TOOL-aRepatriatedFork-25 TOOL-aRepatriatedFork-26 TOOL-aRepatriatedFork-27 TOOL-aRepatriatedFork-28 TOOL-aRepatriatedFork-29 TOOL-aRepatriatedFork-30 TOOL-aRepatriatedFork-45 TOOL-aRepatriatedFork-46 TOOL-aRepatriatedFork-47 |
 
 <!-- /gen:spec-records -->

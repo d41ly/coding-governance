@@ -1,0 +1,23 @@
+# brief-recorded-waiver.txt — units the `brief-recorded` leg reds that are DECLARED exceptions.
+# TOOL-aRepatriatedFork-51. Legalised under `memory/project/` by PROJECT_REGISTRY_EXTRA in
+# `.memory-tree.conf`; that directory is a name-whitelisted closed set.
+#
+# FORMAT: one row per waived unit, `<unit-id><TAB><reason>`. Blank lines and `#` comments ignored.
+# Read from HEAD, never the working tree. An ABSENT file waives NOTHING, and a STALE ROW REDS: a row
+# naming a unit the leg no longer reports has outlived its reason, so delete it.
+#
+# BOTH ROWS were written by the aRepatriatedFork unattended run's VERIFYING repair pass R1 on
+# 2026-10-01 and parked for the owner. They are two different kinds, kept apart so neither reads as
+# precedent for the other.
+#
+# THE FIRST IS A GAP. TOOL-aRepatriatedFork-44 was built at 76d21026 from an orchestrator prompt that
+# was never written to a tracked file, and `--brief` never ran for it. History is append-only, so no
+# honest row can be added. A RECONSTRUCTED brief, labelled as one and joined by no `--brief` row, sits
+# at memory/builds/aRepatriatedFork/prompts/2026-10-01-prompt-TOOL-aRepatriatedFork-44-reconstructed-build-brief.md.
+#
+# THE SECOND IS A MISREAD, the same one `pass-order-waiver.txt`'s fifth row records. The shared
+# build-commit pick takes 09dae486, the records commit that adopted TOOL-aRepatriatedFork-46 and moved
+# .memory-tree.conf pins, as its build. Its true build commit df18ab42 carries its brief row.
+# TOOL-aRepatriatedFork-48 files the pick's fix for both legs.
+TOOL-aRepatriatedFork-44	built without a recorded brief at 76d21026: the orchestrator's prompt was never tracked and --brief never ran; a reconstructed brief sits under the build's prompts/
+TOOL-aRepatriatedFork-46	misread: 09dae486 is the adoption records commit (subject names the unit, diff moves .memory-tree.conf pins); first code df18ab42, which carries its brief row
