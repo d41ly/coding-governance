@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-46 — no line joins a literal kit name under a derived base
 
-**Status:** SPECCED · rev-1 · 2026-09-30 · node a · Tier-2 · base 6830f257 · streams tooling · order 16 · ratified 2026-09-30
+**Status:** SPECCED · rev-2 · 2026-09-30 · node a · Tier-2 · base 6830f257 · streams tooling · order 16 · ratified 2026-09-30
 
 <!-- gen:spec-records -->
 
@@ -112,6 +112,19 @@ One rule per shape, and every rule reuses a seam that already exists.
   three comment lines in `gate-env.sh` take the `<prefix>/` prose token.
 - **A literal that only equals a kit name.** `tools/runlog/selftest.py` asserts the runlog state
   directory, which the engine names in `STATE_DIR_NAME`. The suite reads that constant.
+- **A kit the resolver cannot reach from where the file sits.** The kickoff kit lives under
+  `skills/`, where no resolver probe walks, and gov keeps no receipt. Its suite's flat-reader
+  fixture takes the memory-tree kit's name the way `manifest-check.sh` itself finds that kit: the
+  resolver anchored at the checker's directory and then at the root, then the one tracked
+  `corpus_ids.py`, which is the checker's own last rung. This is the only use of an index lookup.
+- **A hook with no extension.** The pre-push hook finds its runner through the resolver under the
+  kit root its ladder chose, and a runner miss REFUSES the default bar. It carries both canonical
+  blocks, so the resolver self-test's parity population reads `.githooks/` as well.
+- **A gov-only suite.** govkit ships nowhere, so its self-test resolves every sibling it names at
+  import: a real read goes through the resolved directory, a fixture through its name.
+- **The install-prefix gate's own lines.** Its kit-source test finds govkit through the resolver,
+  anchored on the engine rather than the registry because the playbook renderer also ships the
+  registry, and it carries the python resolver inline. A launcher that does not run is a refusal.
 
 The homonym rule's ceiling is written beside it: a path a callee assembles from separate arguments,
 such as `a_evil_target('clean', 'scripts', 'drift-audit')`, is not seen. That is the same blind spot
@@ -121,8 +134,10 @@ as a path assembled from two variables, which `TOOL-aRepatriatedFork-30` S6 alre
 
 The counter changes and the rebaseline land first, in one commit, so the ledger shows the widened
 population before any line is derived. Each later commit derives one kit's lines, lowers its rows
-through the gate's write mode and bumps that kit's carriers. A suite whose lines move records its
-executed assertion count before and after, the discipline `TOOL-aRepatriatedFork-28` used.
+through the gate's write mode and bumps that kit's carriers. The flat gates at the tool root share
+one commit, since they share one directory, and so do the git hooks with the runbook. A suite whose
+lines move records its executed assertion count before and after, the discipline
+`TOOL-aRepatriatedFork-28` used.
 
 ### Inventory
 
@@ -267,6 +282,12 @@ render tokens, each staged against epoch 5 · the suite's floor rises by its new
 
 - rev-1 · 2026-09-30 · initial draft, adopted under the unattended protocol §11 from the returns of
   units 25 to 29 and the run's rescope entry of 2026-09-29.
+- rev-2 · 2026-09-30 · during the build, before the kits after the review harness: §4 Mechanism
+  names four shapes the build met that rev-1 did not, the kickoff suite, the pre-push hook, govkit's
+  gov-only self-test and the install-prefix gate's own kit-source test, and §4 Order of work groups
+  the tool-root gates and the hooks with the runbook. The install-prefix self-test's source fixtures
+  declared a prefixed descriptor home, which govkit reads as kit-relative since
+  `TOOL-aRepatriatedFork-29`; the epoch-6 arms build on them, so their homes are repaired.
 
 ## 10. Reuse audit
 
