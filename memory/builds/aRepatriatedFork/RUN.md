@@ -122,3 +122,7 @@ base: d6e1749c0542218004260928f1399174daafb789
 2026-09-30T18:04:25Z dispatch · item e3a18796 TOOL-aRepatriatedFork-30 · reason tools/check-dead-paths.sh tools/check-dead-paths.test.sh memory/gotchas memory/builds/aRepatriatedFork/build memory/builds/aRepatriatedFork/README.md memory/LIVE.md memory/ledger
 
 2026-09-30T18:14:57Z decision · item TOOL-aRepatriatedFork-49 F3: should the pre-push hook also clear PYTHONPATH, PYTHONHOME and NODE_OPTIONS before the bar? PATH stays inherited either way, so the interpreter-environment class remains open and the hook's header says so. · reason Options seen: (a) clear only the gov-named knobs, as built; (b) also clear the three interpreter variables. Refused (b) under M3 veto 2: it changes the environment every adopter's own legs receive from a hook that ships verbatim, which is a public-surface change the mandate does not reach.
+
+2026-09-30T21:54:56Z rescope · item add TOOL-aRepatriatedFork-50 · reason the full bar at 6e7cb0df redded check 24 on this run's own record: baseline_units walked from the landed first run's first live commit, so 19 units closed before this run's preflight read as added mid-run
+
+2026-09-30T21:54:57Z rescope · item add TOOL-aRepatriatedFork-51 · reason the full bar at 6e7cb0df redded brief-recorded on TOOL-aRepatriatedFork-44, built with no recorded brief, and -46, misread at 09dae486; the leg has no waiver registry, so neither can be recorded honestly
