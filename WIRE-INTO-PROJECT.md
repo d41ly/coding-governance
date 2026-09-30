@@ -1340,6 +1340,8 @@ Every other kit you are behind on waits for your routine pull, after the migrati
 <!-- harness-migration 1 -->
 ```bash
 ( export PYTHONUTF8=1; G=$(git rev-parse --git-dir); V=$(git -C "$GOV" rev-parse HEAD)
+  GK=$(git -C "$GOV" ls-files -- '*govkit.py' | grep -E '(^|/)govkit[.]py$')   # gov's deployer, by its own file
+  [ "$(printf '%s\n' "$GK" | grep -c .)" = 1 ] || { echo "STOP: GOV does not track exactly one govkit.py, so its deployer cannot be located."; exit 1; }
   RELEASE=review-harness,unattended   # the kits this release moves, named by gov: see "The scope"
   rm -f "$G/harness-migration-ready" "$G/harness-migration-moved-to.txt"
   git ls-files -z --others --exclude-standard > "$G/harness-migration-before.txt"
@@ -1372,8 +1374,14 @@ def rendered_here():  # every TRACKED destination the plan renders, with its kit
 def receipt():
     with open(RECEIPT[0], encoding="utf-8") as fh:
         return {f.get("path"): f for f in json.load(fh).get("files", [])}
+def deployer(gov):  # gov's deployer, located by its own file: every other gov path follows from it
+    hits = [p for p in git("-C", gov, "ls-files", "-z", "--", "*govkit.py").stdout.split("\0")
+            if p == "govkit.py" or p.endswith("/govkit.py")]
+    if len(hits) != 1:
+        stop(f"gov at {gov} tracks {len(hits)} govkit.py file(s), so its deployer cannot be located")
+    return hits[0]
 def templates(gov):  # {rendered destination: [gov template]}, from gov's own descriptors and the plan
-    with open(f"{gov}/tools/govkit/registry.toml", "rb") as fh:
+    with open(f"{gov}/{os.path.dirname(deployer(gov))}/registry.toml", "rb") as fh:
         entries = tomllib.load(fh).get("entry", [])
     tr = os.path.relpath(os.path.dirname(os.path.dirname(fh.name)), gov).replace(os.sep, "/")
     plan, out = planned(), {}
@@ -1549,7 +1557,7 @@ PY
   "$PY" "$G/harness-migration.py" "$G" scope "$RELEASE" || exit 1
   # 1. Move forward and re-render, then grade the harness this install holds. STOP unless update
   #    exits 0 with no conflict, the review harness's regenerate exited 0, and the harness is green.
-  GOVKIT_RERENDER=1 "$PY" "$GOV/tools/govkit/govkit.py" update --target . --write \
+  GOVKIT_RERENDER=1 "$PY" "$GOV/$GK" update --target . --write \
     --kits "$(cat "$G/harness-migration-kits.txt")" > "$G/harness-migration-update.txt"
   u=$?; echo "update exit $u" >> "$G/harness-migration-update.txt"; cat "$G/harness-migration-update.txt"
   #    A tree a flag-off pull already moved leaves update nothing to act on in review-harness, so
@@ -1562,7 +1570,7 @@ PY
   fi
   bash "$KIT/check-protocol-parity.test.sh" --tracked-only > "$G/harness-migration-parity.txt" 2>&1
   echo "parity exit $?" >> "$G/harness-migration-parity.txt"; cat "$G/harness-migration-parity.txt"
-  "$PY" "$GOV/tools/govkit/govkit.py" plan --target . > "$G/harness-migration-plan.txt" \
+  "$PY" "$GOV/$GK" plan --target . > "$G/harness-migration-plan.txt" \
     || { echo "STOP: plan failed."; exit 1; }
   "$PY" "$G/harness-migration.py" "$G" step1 || exit 1
   # 2. Commit update's own writes with the receipt that records them, and nothing the regenerate
@@ -1580,12 +1588,14 @@ PY
   V=$(cat "$G/harness-migration-moved-to.txt" 2>/dev/null) || { echo "STOP: block 1 has not finished clean."; exit 1; }
   [ "$(git -C "$GOV" rev-parse HEAD)" = "$V" ] \
     || { echo "STOP: GOV is not at $V, the vintage block 1 moved this tree to, so step 1's log says nothing about it."; exit 1; }
+  GK=$(git -C "$GOV" ls-files -- '*govkit.py' | grep -E '(^|/)govkit[.]py$')   # gov's deployer, by its own file
+  [ "$(printf '%s\n' "$GK" | grep -c .)" = 1 ] || { echo "STOP: GOV does not track exactly one govkit.py, so its deployer cannot be located."; exit 1; }
   # 3. Derive the pins from the plan at this vintage. 4. Run the re-adopt READ-ONLY and check it.
   #    Nothing here writes to the tree, so this block can be run again after you fix a STOP.
-  "$PY" "$GOV/tools/govkit/govkit.py" plan --target . > "$G/harness-migration-plan.txt" \
+  "$PY" "$GOV/$GK" plan --target . > "$G/harness-migration-plan.txt" \
     || { echo "STOP: plan failed."; exit 1; }
   "$PY" "$G/harness-migration.py" "$G" pins "$V" "$GOV" || exit 1
-  "$PY" "$GOV/tools/govkit/govkit.py" adopt --target . --re-adopt $(cat "$G/harness-migration-pins.txt") \
+  "$PY" "$GOV/$GK" adopt --target . --re-adopt $(cat "$G/harness-migration-pins.txt") \
     > "$G/harness-migration-adopt.txt"; rc=$?; cat "$G/harness-migration-adopt.txt"
   [ "$rc" = 0 ] || { echo "STOP: the read-only re-adopt refused."; exit 1; }
   "$PY" "$G/harness-migration.py" "$G" check || exit 1
@@ -1602,8 +1612,10 @@ paragraphs after block 3 say why each reason is expected.
   [ -f "$G/harness-migration-ready" ] || { echo "STOP: block 2 has not finished clean since the last block 3."; exit 1; }
   [ "$(cat "$G/harness-migration-stamp.txt")" = "$(git -C "$GOV" rev-parse HEAD) $(git hash-object .governance/install.json)" ] \
     || { echo "STOP: GOV or the receipt moved after block 2 derived these pins. Run block 2 again."; exit 1; }
+  GK=$(git -C "$GOV" ls-files -- '*govkit.py' | grep -E '(^|/)govkit[.]py$')   # gov's deployer, by its own file
+  [ "$(printf '%s\n' "$GK" | grep -c .)" = 1 ] || { echo "STOP: GOV does not track exactly one govkit.py, so its deployer cannot be located."; exit 1; }
   # 5. Re-row, then commit the re-rendered files with the receipt that now rows them `rendered`.
-  "$PY" "$GOV/tools/govkit/govkit.py" adopt --target . --re-adopt $PINS --write || { echo "STOP: adopt refused."; exit 1; }
+  "$PY" "$GOV/$GK" adopt --target . --re-adopt $PINS --write || { echo "STOP: adopt refused."; exit 1; }
   git add -- .governance/install.json .governance/install.sums
   [ ! -s "$G/harness-migration-renders.z" ] \
     || git add --pathspec-from-file="$G/harness-migration-renders.z" --pathspec-file-nul
@@ -1612,7 +1624,7 @@ paragraphs after block 3 say why each reason is expected.
   # 6. Re-adopt once more. Step 5 read each render's identity from the index before the render was
   #    staged, and this run reads the commit that holds it. A STOP from here on is recovered by
   #    running block 2 again and then this block, whose commits are skipped when nothing is staged.
-  "$PY" "$GOV/tools/govkit/govkit.py" adopt --target . --re-adopt $PINS --write || { echo "STOP: adopt refused."; exit 1; }
+  "$PY" "$GOV/$GK" adopt --target . --re-adopt $PINS --write || { echo "STOP: adopt refused."; exit 1; }
   git add -- .governance/install.json .governance/install.sums
   git diff --cached --quiet || git commit -q -m "govkit adopt --re-adopt: record the committed renders" ${TRAILER:+-m "$TRAILER"} \
     || { echo "STOP: that commit was refused. Unstage it with git reset -q, then run blocks 2 and 3 again."; exit 1; }

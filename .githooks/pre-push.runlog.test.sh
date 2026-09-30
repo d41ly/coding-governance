@@ -86,14 +86,99 @@ add_seen() { SEEN="$SEEN$1 "; }   # decision -> recorded as observed on a line t
 # ------------------------------------------------------------------------------ the scratch clone
 # A MISSING CAPABILITY IS A FAILURE HERE, not a skip: these arms are the only observation the writer
 # has, and a suite that skipped them would print a count that proves nothing.
-PY=""
-if [ -f "$SRC/$KIT_REL/lib/resolve-python.sh" ]; then
-  # shellcheck source=/dev/null
-  . "$SRC/$KIT_REL/lib/resolve-python.sh"
-  PY=$(resolve_python 2>/dev/null) || PY=""
+# TOOL-aRepatriatedFork-46: the resolver is carried INLINE, and each kit this suite reads is FOUND
+# under the kit root through the sibling-kit resolver, which reads the install receipt first. Both
+# used to be a kit's name typed after the kit root, and `lib/` ships nowhere.
+# >>> resolve_python — canonical copy: resolve-python.sh in gov's lib dir (byte-identical; gated)
+resolve_python() {
+  # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
+  # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
+  # the candidate and every consumer uses "$PY" as a single word (measured: exit 127).
+  _rp_tried=""
+  for _rp_c in "${1:-}" "${GOV_PYTHON:-}" python3 python py; do
+    [ -n "$_rp_c" ] || continue
+    _rp_tried="$_rp_tried $_rp_c"
+    if "$_rp_c" -c "import sys" >/dev/null 2>&1; then
+      printf '%s\n' "$_rp_c"
+      return 0
+    fi
+  done
+  {
+    echo "resolve_python: no usable python launcher. Each candidate was RUN with -c 'import sys' and"
+    echo "resolve_python: none exited 0 — being on PATH is not evidence (the Microsoft Store python3"
+    echo "resolve_python: stub answers \`command -v\` and exits 9009 without running anything)."
+    echo "resolve_python: tried:$_rp_tried"
+    if [ -n "${1:-}" ]; then
+      echo "resolve_python: the caller's override '$1' was tried FIRST and did not run."
+    fi
+    if [ -n "${GOV_PYTHON:-}" ]; then
+      echo "resolve_python: GOV_PYTHON is set to '$GOV_PYTHON' and did not run. An override that is"
+      echo "resolve_python: set and unusable is THIS failure, never a silent fall-through — the"
+      echo "resolve_python: operator believes they chose, and would not have."
+    fi
+  } >&2
+  return 1
+}
+# <<< resolve_python
+# The sibling-kit resolver (TOOL-aRepatriatedFork-2 S3), INLINED byte-identically from the
+# canonical copy named on its marker line and gated by the resolve-python self-test's parity
+# table. A shell consumer runs it with the python it already resolved, so the receipt rung is
+# read in Python and never parsed in bash. `resolve_kit_dir <python> <home> <anchor> <here>`
+# prints the kit directory REPO-RELATIVE, or the resolver's named refusal on stderr and exits 1.
+resolve_kit_dir() {
+  "$1" -c "$(cat <<'RKD'
+# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
+def resolve_kit_dir(home, anchor, here):
+    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
+
+    1. receipt — the `.governance/install.json` row whose `source` ends in <home>/<anchor> and
+       whose `path` exists inside this tree. The only record of a RENAMED kit dir: no probe finds
+       a memory-recall kit an adopter homed at `scripts/recall/`.
+    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
+    3. refuse — LookupError naming the three places looked; never a guessed prefix.
+    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
+    """
+    import json
+    import pathlib
+    here = pathlib.Path(here).resolve()
+    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
+    receipt = root / ".governance" / "install.json"
+    try:
+        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("path"):
+            continue
+        if str(row.get("source") or "").split("/")[-2:] != [home, anchor]:
+            continue
+        hit = (root / str(row["path"])).resolve()
+        if hit.is_file() and root in hit.parents:
+            return hit.parent
+    probes = (here / home, here.parent / home)
+    for cand in probes:
+        if (cand / anchor).is_file():
+            return cand
+    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
+        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
+# <<< resolve_kit_dir
+RKD
+)"'
+import sys
+try:
+    d = resolve_kit_dir(*sys.argv[1:4])
+except LookupError as e:
+    sys.exit(str(e))
+r = next((p for p in (d, *d.parents) if (p / ".git").exists()), d.anchor)
+print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
+}
+PY=$(resolve_python 2>/dev/null) || PY=""
+RUNLOG_KIT=""; RUNNER_KIT=""; GOVKIT_KIT=""
+if [ -n "$PY" ]; then
+  _r=$(resolve_kit_dir "$PY" runlog runlog_lib.py "$SRC/$KIT_REL" 2>/dev/null) && RUNLOG_KIT="$SRC/$_r"
+  _r=$(resolve_kit_dir "$PY" run-gates run-gates.sh "$SRC/$KIT_REL" 2>/dev/null) && RUNNER_KIT="$SRC/$_r"
+  _r=$(resolve_kit_dir "$PY" govkit govkit.py "$SRC/$KIT_REL" 2>/dev/null) && GOVKIT_KIT="$SRC/$_r"
 fi
-RUNLOG_KIT="$SRC/$KIT_REL/runlog"
-RUNNER_KIT="$SRC/$KIT_REL/run-gates"
 [ -n "$PY" ] && [ -f "$RUNLOG_KIT/runlog_lib.py" ] || {
   echo "FAIL no python, or no runlog kit under $KIT_REL: the journal cannot be graded, so nothing below can be"; exit 1; }
 [ -f "$RUNNER_KIT/run-gates.sh" ] || { echo "FAIL no gate runner under $KIT_REL: AC4 cannot run its real bar"; exit 1; }
@@ -819,13 +904,13 @@ check_ac7_spawns() {
 check_ac8_declarations() {
   local kr="$SRC/$KIT_REL"
   check "AC8 the suite is withheld by the push-main entry's project-owned rule" \
-    "$(awk '/^\[\[files\]\]/ { inc = "" } /^include = \[/ { inc = $0 } /^role = "project-owned"/ && inc ~ /"\.githooks\/pre-push\.runlog\.test\.sh"/ { print "withheld" }' "$kr/govkit/entries/push-main.kit.toml")" withheld
+    "$(awk '/^\[\[files\]\]/ { inc = "" } /^include = \[/ { inc = $0 } /^role = "project-owned"/ && inc ~ /"\.githooks\/pre-push\.runlog\.test\.sh"/ { print "withheld" }' "$GOVKIT_KIT/entries/push-main.kit.toml")" withheld
   check "AC8 the suite's leg has a budget row" \
-    "$(awk -F'\t' '$1 == "pre-push run-log line" && $2 ~ /^[0-9]+$/ { print "budgeted" }' "$kr/run-gates/selftest-budgets.txt")" budgeted
+    "$(awk -F'\t' '$1 == "pre-push run-log line" && $2 ~ /^[0-9]+$/ { print "budgeted" }' "$RUNNER_KIT/selftest-budgets.txt")" budgeted
   check "AC8 the suite's leg is held, guarded and bounded" \
     "$("$PY" "$WORK/jl.py" "$RUNLOG_KIT" legs "$kr/gate-legs.json" "pre-push run-log line")" declared
   check "AC8 the deployer's registry carries the leg as an exempt row" \
-    "$(awk '/^\[\[exempt_leg\]\]/ { e = 1; next } e && $0 == "name = \"pre-push run-log line\"" { print "exempt" } /^\[/ { e = 0 }' "$kr/govkit/registry.toml")" exempt
+    "$(awk '/^\[\[exempt_leg\]\]/ { e = 1; next } e && $0 == "name = \"pre-push run-log line\"" { print "exempt" } /^\[/ { e = 0 }' "$GOVKIT_KIT/registry.toml")" exempt
 }
 
 # ---------------------------------------------------------------------------------------- EXITS

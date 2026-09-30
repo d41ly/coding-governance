@@ -2,7 +2,7 @@
 # gate-env.sh — THIS REPOSITORY'S gate policy, and nothing else's. TOOL-dUnstalledConvoy-28.
 #
 # WHY THIS FILE EXISTS AT ALL. `.githooks/pre-push` is shipped VERBATIM as engine payload to every
-# push-main adopter (`tools/govkit/entries/push-main.kit.toml`), so a policy written into that hook
+# push-main adopter (`<prefix>/govkit/entries/push-main.kit.toml`), so a policy written into that hook
 # is a policy every adopter inherits without choosing it. Setting `GATE_SELFTESTS` there would turn
 # the kit self-tests back ON for exactly the repositories TOOL-dUnstalledConvoy-26 exists to spare,
 # at exactly the boundary it was measured for. The MECHANISM — the hook sourcing this file when it
@@ -24,8 +24,8 @@
 # automatically any more, at any boundary. A change under a kit directory that guts a check lands
 # green. The compensating check is a person running them, and the DoD for work touching a kit is a
 # GREEN parity verdict pasted into the landing report (the pooled evidence bound, TOOL-aBatchedArm-5):
-#     bash tools/unattended/run-unattended-gates.sh --selftests --pooled
-#     GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh
+#     bash <prefix>/unattended/run-unattended-gates.sh --selftests --pooled
+#     GATE_SELFTESTS=1 bash <prefix>/run-gates/run-gates.sh
 # It also costs the drift detection TOOL-aBoundedCeiling-10 filed: a held leg stops reporting when it
 # breaks, and two such reds were found on main in one session. That row is the follow-up.
 #
