@@ -30,6 +30,95 @@ KIT_REL=$(derive_self_rel "$HERE") || { echo "check-review-join.test: not inside
 # at a root install: every fixture and host path below is spelled through it, never through a
 # literal prefix (TOOL-aRepatriatedFork-28).
 case "$KIT_REL" in */*) PFX="${KIT_REL%/*}/" ;; *) PFX="" ;; esac
+# TOOL-aRepatriatedFork-46: a kit is named by the name its directory has in THIS install, never
+# as a literal segment: this suite's own from where it sits, a sibling's through the resolver,
+# which reads the install receipt first. A fixture mirrors that layout by the resolved NAME.
+# >>> resolve_python — canonical copy: resolve-python.sh in gov's lib dir (byte-identical; gated)
+resolve_python() {
+  # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
+  # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
+  # the candidate and every consumer uses "$PY" as a single word (measured: exit 127).
+  _rp_tried=""
+  for _rp_c in "${1:-}" "${GOV_PYTHON:-}" python3 python py; do
+    [ -n "$_rp_c" ] || continue
+    _rp_tried="$_rp_tried $_rp_c"
+    if "$_rp_c" -c "import sys" >/dev/null 2>&1; then
+      printf '%s\n' "$_rp_c"
+      return 0
+    fi
+  done
+  {
+    echo "resolve_python: no usable python launcher. Each candidate was RUN with -c 'import sys' and"
+    echo "resolve_python: none exited 0 — being on PATH is not evidence (the Microsoft Store python3"
+    echo "resolve_python: stub answers \`command -v\` and exits 9009 without running anything)."
+    echo "resolve_python: tried:$_rp_tried"
+    if [ -n "${1:-}" ]; then
+      echo "resolve_python: the caller's override '$1' was tried FIRST and did not run."
+    fi
+    if [ -n "${GOV_PYTHON:-}" ]; then
+      echo "resolve_python: GOV_PYTHON is set to '$GOV_PYTHON' and did not run. An override that is"
+      echo "resolve_python: set and unusable is THIS failure, never a silent fall-through — the"
+      echo "resolve_python: operator believes they chose, and would not have."
+    fi
+  } >&2
+  return 1
+}
+# <<< resolve_python
+# The sibling-kit resolver (TOOL-aRepatriatedFork-2 S3), INLINED byte-identically from the
+# canonical copy named on its marker line and gated by the resolve-python self-test's parity
+# table. A shell consumer runs it with the python it already resolved, so the receipt rung is
+# read in Python and never parsed in bash. `resolve_kit_dir <python> <home> <anchor> <here>`
+# prints the kit directory REPO-RELATIVE, or the resolver's named refusal on stderr and exits 1.
+resolve_kit_dir() {
+  "$1" -c "$(cat <<'RKD'
+# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
+def resolve_kit_dir(home, anchor, here):
+    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
+
+    1. receipt — the `.governance/install.json` row whose `source` ends in <home>/<anchor> and
+       whose `path` exists inside this tree. The only record of a RENAMED kit dir: no probe finds
+       a memory-recall kit an adopter homed at `scripts/recall/`.
+    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
+    3. refuse — LookupError naming the three places looked; never a guessed prefix.
+    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
+    """
+    import json
+    import pathlib
+    here = pathlib.Path(here).resolve()
+    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
+    receipt = root / ".governance" / "install.json"
+    try:
+        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("path"):
+            continue
+        if str(row.get("source") or "").split("/")[-2:] != [home, anchor]:
+            continue
+        hit = (root / str(row["path"])).resolve()
+        if hit.is_file() and root in hit.parents:
+            return hit.parent
+    probes = (here / home, here.parent / home)
+    for cand in probes:
+        if (cand / anchor).is_file():
+            return cand
+    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
+        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
+# <<< resolve_kit_dir
+RKD
+)"'
+import sys
+try:
+    d = resolve_kit_dir(*sys.argv[1:4])
+except LookupError as e:
+    sys.exit(str(e))
+r = next((p for p in (d, *d.parents) if (p / ".git").exists()), d.anchor)
+print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
+}
+_rkd_py=$(resolve_python) || { echo "check-review-join.test: no usable python, so the sibling kits cannot be resolved"; exit 2; }
+HOOKS_DIR=$(resolve_kit_dir "$_rkd_py" hooks agent-cap.js "$HERE") || exit 2
+HOOKS="${HOOKS_DIR##*/}"
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 GATE="$KIT_REL/check-review-join.sh"
@@ -115,21 +204,21 @@ arm 'a predicate refusing its ENVIRONMENT is not a join report' 'is its own refu
 # status was read, so a builder that threw fed empty stdin to a JSON.parse whose catch exits 0 and
 # the file was recorded clean. A stub predicate returning an unclassifiable status stands in for
 # every such shape. The gate's own header preaches that a probe which cannot move must say so.
-BS="$TMP/badstatus"; mkdir -p "$BS/${PFX}workflows" "$BS/${PFX}hooks"
+BS="$TMP/badstatus"; mkdir -p "$BS/${KIT_REL}" "$BS/${PFX}${HOOKS}"
 ( cd "$BS" && git init -q . && git config user.email t@t.test && git config user.name t
   printf "export const meta = { name: 'x' }
 await log('hi')
 " > $KIT_REL/w.js
   printf 'process.exit(3)
-' > ${PFX}hooks/agent-cap.js
+' > ${PFX}${HOOKS}/agent-cap.js
   git add -A && git commit -qm badstatus --no-verify )
 # TOOL-dRetiredFork-10: the gate resolves its predicate RELATIVE TO ITSELF now, so these
 # fixtures place it where an install actually puts it. They previously dropped it at the
 # fixture ROOT and worked only because the gate hard-coded `$ROOT/<prefix>/hooks/` -- the very
 # literal this unit removes. No kit installs a workflow gate at a repository root, so the old
 # shape described a layout that has never existed in any adopter.
-cp "$GATE" "$BS/${PFX}workflows/gate.sh"
-arm 'a status the gate cannot classify is a refusal, not a pass' 'neither clean nor a rule hit'   bash -c 'cd "$1" && bash ./'"${PFX}workflows/gate.sh"'' _ "$BS"
+cp "$GATE" "$BS/${KIT_REL}/gate.sh"
+arm 'a status the gate cannot classify is a refusal, not a pass' 'neither clean nor a rule hit'   bash -c 'cd "$1" && bash ./'"${KIT_REL}/gate.sh"'' _ "$BS"
 
 # ---- the gate cannot pass by looking at nothing --------------------------------------------------
 arm 'an empty scan is not a pass' 'nothing was scanned, which is not a pass' \
@@ -146,7 +235,7 @@ arm 'syntax: the shipped harness parses' 'workflow script(s) parsed clean' \
 # ---- the harness itself carries the indexed join --------------------------------------------------
 # Positive assertions on the SHIPPED file: a source-level absence ban proves the old join is gone,
 # and these prove the new one is present. Only both together mean "index-keyed".
-H=''"${PFX}workflows/tier2-review.js"''
+H=''"${KIT_REL}/tier2-review.js"''
 arm 'harness: orchestrator assigns the id' 'id: i + 1' grep -F 'id: i + 1' "$H"
 arm 'harness: the verdict map is keyed on the integer' 'verdictById = new Map()' grep -F 'verdictById = new Map()' "$H"
 arm 'harness: the schema demands an integer id' "id: { type: 'integer' }" grep -F "id: { type: 'integer' }" "$H"
@@ -165,7 +254,7 @@ arm 'harness: the bounded split carries the marker' 'gov:fixed-verifiers' grep -
 # throwaway repo where the offending file is UNTRACKED — which is exactly the state the widening is
 # about, and the state both gates were blind to.
 D="$TMP/discover"
-mkdir -p "$D/${PFX}workflows"
+mkdir -p "$D/${KIT_REL}"
 ( cd "$D" && git init -q . && git config user.email t@t.test && git config user.name t \
   && git config core.autocrlf false && git config commit.gpgsign false
   # Two seeds, because the two gates have DIFFERENT populations: review-join scans every .js under
@@ -176,19 +265,19 @@ mkdir -p "$D/${PFX}workflows"
   printf "export const meta = { name: 'seed', description: 'a tracked workflow' }\nawait log('hi')\n" \
     > $KIT_REL/seed-workflow.js
   git add -A && git commit -qm seed --no-verify )
-mkdir -p "$D/${PFX}workflows" && cp "$GATE" "$D/${PFX}workflows/gate.sh"; cp "$SYNTAX" "$D/syntax.js"
+mkdir -p "$D/${KIT_REL}" && cp "$GATE" "$D/${KIT_REL}/gate.sh"; cp "$SYNTAX" "$D/syntax.js"
 # TOOL-dTieredTribunal-14 S8 - the gate DELEGATES its predicate to the hook now, so a scratch repo
 # without one meets the missing-predicate refusal instead of the verdict this arm asserts.
-mkdir -p "$D/${PFX}hooks" && cp "$ROOT/${PFX}hooks/agent-cap.js" "$D/${PFX}hooks/agent-cap.js"
+mkdir -p "$D/${PFX}${HOOKS}" && cp "$ROOT/${HOOKS_DIR}/agent-cap.js" "$D/${PFX}${HOOKS}/agent-cap.js"
 
 # never staged, never committed — visible to `git ls-files --others`, invisible to `git ls-files`
-cat >"$D/${PFX}workflows/scratch-join.js" <<'EOF'
+cat >"$D/${KIT_REL}/scratch-join.js" <<'EOF'
 const verdicts = {}
 for (const v of all) verdicts[v.ref] = v
 EOF
 arm 'discovery: an UNTRACKED banned join is caught' 'scratch-join.js' \
-  bash -c 'cd "$1" && bash ./'"${PFX}workflows/gate.sh"'' _ "$D"
-cat >"$D/${PFX}workflows/scratch-workflow.js" <<'EOF'
+  bash -c 'cd "$1" && bash ./'"${KIT_REL}/gate.sh"'' _ "$D"
+cat >"$D/${KIT_REL}/scratch-workflow.js" <<'EOF'
 export const meta = { name: 'x', description: 'y' }
 const a = (
 EOF
@@ -197,9 +286,9 @@ arm 'discovery: an UNTRACKED workflow script is parsed' 'SyntaxError' \
 
 # ...and IGNORED stays ignored, which is the escape hatch the widening leans on. Same two files, one
 # .gitignore line: both gates must go quiet, or "untracked" would mean "unignorable".
-printf ''"${PFX}workflows/scratch-"'*.js\n' > "$D/.gitignore"
+printf ''"${KIT_REL}/scratch-"'*.js\n' > "$D/.gitignore"
 arm 'discovery: a git-ignored file is not judged (review-join)' 'clean — no ref-keyed verdict join' \
-  bash -c 'cd "$1" && bash ./'"${PFX}workflows/gate.sh"'' _ "$D"
+  bash -c 'cd "$1" && bash ./'"${KIT_REL}/gate.sh"'' _ "$D"
 arm 'discovery: a git-ignored file is not judged (syntax)' 'parsed clean' \
   bash -c 'cd "$1" && node ./syntax.js' _ "$D"
 
@@ -209,23 +298,23 @@ arm 'discovery: a git-ignored file is not judged (syntax)' 'parsed clean' \
 E="$TMP/emptyrepo"; mkdir -p "$E"
 ( cd "$E" && git init -q . && git config user.email t@t.test && git config user.name t
   printf 'x\n' > README.md && git add -A && git commit -qm empty --no-verify )
-mkdir -p "$E/${PFX}workflows" && cp "$GATE" "$E/${PFX}workflows/gate.sh"
+mkdir -p "$E/${KIT_REL}" && cp "$GATE" "$E/${KIT_REL}/gate.sh"
 # S8 - same reason as the $D site. `$E` and not `$D`: the scratch variable is per SITE, and `E` is
 # not bound until this block, so a `$D` spelling here would judge the wrong repo.
-mkdir -p "$E/${PFX}hooks" && cp "$ROOT/${PFX}hooks/agent-cap.js" "$E/${PFX}hooks/agent-cap.js"
+mkdir -p "$E/${PFX}${HOOKS}" && cp "$ROOT/${HOOKS_DIR}/agent-cap.js" "$E/${PFX}${HOOKS}/agent-cap.js"
 arm 'discovery: an empty population is still not a pass' 'the population is empty, which is not a pass' \
-  bash -c 'cd "$1" && bash ./'"${PFX}workflows/gate.sh"'' _ "$E"
+  bash -c 'cd "$1" && bash ./'"${KIT_REL}/gate.sh"'' _ "$E"
 
 # TOOL-dTieredTribunal-14 S8 - the missing-predicate refusal's own failing case, OBSERVED. A gate whose
 # predicate is absent must SAY SO rather than pass, and a refusal nobody has watched fire is an
 # assertion about nothing. Named `N` and not `D`, which is already bound to the discovery repo.
-N="$TMP/nohook"; mkdir -p "$N/${PFX}workflows"
+N="$TMP/nohook"; mkdir -p "$N/${KIT_REL}"
 ( cd "$N" && git init -q . && git config user.email t@t.test && git config user.name t
   printf "export const meta = { name: 'x' }\nawait log('hi')\n" > $KIT_REL/w.js
   git add -A && git commit -qm nohook --no-verify )
-cp "$GATE" "$N/${PFX}workflows/gate.sh"
+cp "$GATE" "$N/${KIT_REL}/gate.sh"
 arm 'the predicate being absent is a refusal, not a pass' 'a gate whose predicate is absent must say so' \
-  bash -c 'cd "$1" && bash ./'"${PFX}workflows/gate.sh"'' _ "$N"
+  bash -c 'cd "$1" && bash ./'"${KIT_REL}/gate.sh"'' _ "$N"
 
 # ---- TOOL-aRepatriatedFork-4: the population reaches .claude/workflows/, and only that ------------
 # A kit at a `scripts/` prefix, as both adopters install it, with the adopter's harness under
@@ -234,7 +323,7 @@ arm 'the predicate being absent is a refusal, not a pass' 'a gate whose predicat
 # stay OUT: `.claude/` wholesale admits the hook ban tables.
 H4="$TMP/harnessdir"; mkdir -p "$H4/scripts/workflows" "$H4/scripts/hooks" "$H4/.claude/workflows" "$H4/.claude/hooks"
 cp "$GATE" "$H4/scripts/workflows/check-review-join.sh"
-cp "$ROOT/${PFX}hooks/agent-cap.js" "$H4/scripts/hooks/agent-cap.js"
+cp "$ROOT/${HOOKS_DIR}/agent-cap.js" "$H4/scripts/hooks/agent-cap.js"
 ( cd "$H4" && git init -q . && git config user.email t@t.test && git config user.name t \
   && git add -A && git commit -qm h4 --no-verify ) >/dev/null 2>&1
 out=$(cd "$H4" && bash scripts/workflows/check-review-join.sh 2>&1); rc=$?
@@ -255,9 +344,9 @@ case "$out" in *ban-table.js*) fails=$((fails+1)); printf 'arm FAIL  a file unde
 # Each fixture is a whole scratch TREE, not a lone file, because arm 2's population and its liveness
 # refusal are both properties of the scan, and an explicit file list bypasses the refusal by design.
 a2tree() {  # $1 = dir · $2 = harness body
-  mkdir -p "$1/${PFX}workflows" "$1/${PFX}hooks"
-  cp "$ROOT/${PFX}hooks/agent-cap.js" "$1/${PFX}hooks/agent-cap.js"
-  printf '%s\n' "$2" > "$1/${PFX}workflows/h.js"
+  mkdir -p "$1/${KIT_REL}" "$1/${PFX}${HOOKS}"
+  cp "$ROOT/${HOOKS_DIR}/agent-cap.js" "$1/${PFX}${HOOKS}/agent-cap.js"
+  printf '%s\n' "$2" > "$1/${KIT_REL}/h.js"
   ( cd "$1" && git init -q . && git config user.email t@t.test && git config user.name t \
     && git add -A && git commit -q -m f --no-verify ) >/dev/null 2>&1
 }

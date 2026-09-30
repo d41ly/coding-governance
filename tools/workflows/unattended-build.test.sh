@@ -28,6 +28,100 @@ KIT_REL=$(derive_self_rel "$HERE") || { echo "unattended-build.test: not inside 
 # at a root install: every fixture and host path below is spelled through it, never through a
 # literal prefix (TOOL-aRepatriatedFork-28).
 case "$KIT_REL" in */*) PFX="${KIT_REL%/*}/" ;; *) PFX="" ;; esac
+# TOOL-aRepatriatedFork-46: a kit is named by the name its directory has in THIS install, never
+# as a literal segment: this suite's own from where it sits, a sibling's through the resolver,
+# which reads the install receipt first. A fixture mirrors that layout by the resolved NAME.
+KIT="${KIT_REL##*/}"
+# >>> resolve_python — canonical copy: resolve-python.sh in gov's lib dir (byte-identical; gated)
+resolve_python() {
+  # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
+  # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
+  # the candidate and every consumer uses "$PY" as a single word (measured: exit 127).
+  _rp_tried=""
+  for _rp_c in "${1:-}" "${GOV_PYTHON:-}" python3 python py; do
+    [ -n "$_rp_c" ] || continue
+    _rp_tried="$_rp_tried $_rp_c"
+    if "$_rp_c" -c "import sys" >/dev/null 2>&1; then
+      printf '%s\n' "$_rp_c"
+      return 0
+    fi
+  done
+  {
+    echo "resolve_python: no usable python launcher. Each candidate was RUN with -c 'import sys' and"
+    echo "resolve_python: none exited 0 — being on PATH is not evidence (the Microsoft Store python3"
+    echo "resolve_python: stub answers \`command -v\` and exits 9009 without running anything)."
+    echo "resolve_python: tried:$_rp_tried"
+    if [ -n "${1:-}" ]; then
+      echo "resolve_python: the caller's override '$1' was tried FIRST and did not run."
+    fi
+    if [ -n "${GOV_PYTHON:-}" ]; then
+      echo "resolve_python: GOV_PYTHON is set to '$GOV_PYTHON' and did not run. An override that is"
+      echo "resolve_python: set and unusable is THIS failure, never a silent fall-through — the"
+      echo "resolve_python: operator believes they chose, and would not have."
+    fi
+  } >&2
+  return 1
+}
+# <<< resolve_python
+# The sibling-kit resolver (TOOL-aRepatriatedFork-2 S3), INLINED byte-identically from the
+# canonical copy named on its marker line and gated by the resolve-python self-test's parity
+# table. A shell consumer runs it with the python it already resolved, so the receipt rung is
+# read in Python and never parsed in bash. `resolve_kit_dir <python> <home> <anchor> <here>`
+# prints the kit directory REPO-RELATIVE, or the resolver's named refusal on stderr and exits 1.
+resolve_kit_dir() {
+  "$1" -c "$(cat <<'RKD'
+# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
+def resolve_kit_dir(home, anchor, here):
+    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
+
+    1. receipt — the `.governance/install.json` row whose `source` ends in <home>/<anchor> and
+       whose `path` exists inside this tree. The only record of a RENAMED kit dir: no probe finds
+       a memory-recall kit an adopter homed at `scripts/recall/`.
+    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
+    3. refuse — LookupError naming the three places looked; never a guessed prefix.
+    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
+    """
+    import json
+    import pathlib
+    here = pathlib.Path(here).resolve()
+    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
+    receipt = root / ".governance" / "install.json"
+    try:
+        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("path"):
+            continue
+        if str(row.get("source") or "").split("/")[-2:] != [home, anchor]:
+            continue
+        hit = (root / str(row["path"])).resolve()
+        if hit.is_file() and root in hit.parents:
+            return hit.parent
+    probes = (here / home, here.parent / home)
+    for cand in probes:
+        if (cand / anchor).is_file():
+            return cand
+    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
+        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
+# <<< resolve_kit_dir
+RKD
+)"'
+import sys
+try:
+    d = resolve_kit_dir(*sys.argv[1:4])
+except LookupError as e:
+    sys.exit(str(e))
+r = next((p for p in (d, *d.parents) if (p / ".git").exists()), d.anchor)
+print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
+}
+_rkd_py=$(resolve_python) || { echo "unattended-build.test: no usable python, so the sibling kits cannot be resolved"; exit 2; }
+UNATTENDED_DIR=$(resolve_kit_dir "$_rkd_py" unattended unattended.sh "$HERE") || exit 2
+UNATTENDED="${UNATTENDED_DIR##*/}"
+HOOKS_DIR=$(resolve_kit_dir "$_rkd_py" hooks agent-cap.js "$HERE") || exit 2
+HOOKS="${HOOKS_DIR##*/}"
+MEMORY_TREE_DIR=$(resolve_kit_dir "$_rkd_py" memory-tree gotchas.py "$HERE") || exit 2
+MEMORY_TREE="${MEMORY_TREE_DIR##*/}"
 # In this suite KIT_REL names the TOOL ROOT, not the kit dir: the prefix without its slash.
 KIT_REL="${PFX%/}"; KIT_REL="${KIT_REL:-.}"
 # ROOTPFX is a ROOT install's prefix, empty by definition: a fixture that models a root install,
@@ -47,7 +141,7 @@ F="$HERE/unattended-build.js"
 C="$HERE/unattended-unit.js"
 [ -f "$C" ] || { echo "FAIL cannot find unattended-unit.js beside this test"; exit 2; }
 # The driver, for the DERIVED refusal set the child arms read. `$KIT_REL` above is the one knob.
-DRV="$ROOT/$KIT_REL/unattended/unattended.sh"
+DRV="$ROOT/${UNATTENDED_DIR}/unattended.sh"
 
 same() { n=$((n+1)); if [ "$2" = "$3" ]; then echo "ok   $1"; else echo "FAIL $1 -- got '$2' want '$3'"; st=1; fi }
 has()  { n=$((n+1)); case "$2" in *"$3"*) echo "ok   $1" ;; *) echo "FAIL $1 -- output lacked '$3'"; st=1 ;; esac }
@@ -242,7 +336,7 @@ done
 # every arm below could pass over a harness that reached BUILD by some other path entirely.
 o=$(run_wf "$UNITS" "$(returns CONVERGED 0)")
 has "S1 the AUDIT stage invokes tier2-review as a SUB-WORKFLOW from the script" "$o" \
-    "workflow:${PFX}workflows/tier2-review.js"
+    "workflow:${PFX}${KIT}/tier2-review.js"
 
 # S3 — CONVERGING paired with 0 blockers is REFUSED BY NAME. A loop with nothing left to
 # converge on has converged, so the pairing is this repo's signature for a record no verb
@@ -318,12 +412,12 @@ n=$((n+1)); if grep -q "DISPATCH IS STRICTLY SEQUENTIAL" "$F"; then
 else
   echo "FAIL the file no longer declares per-unit dispatch sequential"; st=1
 fi
-if [ -f "$ROOT/${PFX}hooks/agent-cap.js" ]; then
-  o=$(printf '{"tool_name":"Workflow","tool_input":{"scriptPath":"'"${PFX}workflows/unattended-build.js"'"}}' \
-      | (cd "$ROOT" && node $KIT_REL/hooks/agent-cap.js 2>&1); echo "rc=$?")
+if [ -f "$ROOT/${HOOKS_DIR}/agent-cap.js" ]; then
+  o=$(printf '{"tool_name":"Workflow","tool_input":{"scriptPath":"'"${PFX}${KIT}/unattended-build.js"'"}}' \
+      | (cd "$ROOT" && node ${HOOKS_DIR}/agent-cap.js 2>&1); echo "rc=$?")
   n=$((n+1)); case "$o" in *"rc=0"*) echo "ok   agent-cap ADMITS the harness" ;; *) echo "FAIL agent-cap denied the harness -- $o"; st=1 ;; esac
 else
-  echo "SKIP agent-cap admission — no hook at $ROOT/${PFX}hooks/agent-cap.js, so this arm was NOT exercised"
+  echo "SKIP agent-cap admission — no hook at $ROOT/${HOOKS_DIR}/agent-cap.js, so this arm was NOT exercised"
 fi
 
 # ---- AC5: the AUDIT stage must name the spec-audit kind. `tier2-review.js` DEFAULTS an absent kind
@@ -340,7 +434,7 @@ n=$((n+1)); grep -qE "kind: ['\"]spec-audit['\"]" "$F" \
 # ---- AC2: the DEFAULT is unchanged. Every existing caller keeps the contract it had.
 o=$(run_wf "$UNITS" '{"spec":{"authored":["A-tB-1"],"alreadyPresent":[],"refused":[],"summary":"s"},"workflow":{"blockers":0,"confirmed":0,"highs":0,"unverified":0,"report":"r.md"},"audit:record":{"token":"CONVERGED"},"dispose":{"disposed":true,"standing":[],"summary":"d"}}')
 has  "default mode: the round IS recorded through the driver" "$o" "agent:audit:record"
-has  "default mode: the return names the child the caller dispatches" "$o" '"scriptPath":"'"${PFX}workflows/unattended-unit.js"'"'
+has  "default mode: the return names the child the caller dispatches" "$o" '"scriptPath":"'"${PFX}${KIT}/unattended-unit.js"'"'
 has  "default mode: hands out a roster" "$o" '"roster":[{'
 
 # ---- AC1: attended mode reaches BUILD and spawns NO recorder agent.
@@ -789,7 +883,7 @@ o=$(run_wf "$UNITS" "$(returns NON-CONVERGENT 2)")
 has "AC7 the roster is the ordered array of {id, order, specPath, briefPath}" "$o" \
   '"roster":[{"id":"A-tB-1","order":1,"specPath":"s1","briefPath":"b1"},{"id":"A-tB-2","order":1,"specPath":"s2","briefPath":"b2"},{"id":"A-tB-3","order":2,"specPath":"s3","briefPath":"b3"}]'
 has "AC7 dispatch names the child script by its repo-relative path" "$o" \
-  '"scriptPath":"'"${PFX}workflows/unattended-unit.js"'"'
+  '"scriptPath":"'"${PFX}${KIT}/unattended-unit.js"'"'
 has "AC7 dispatch names the command that resolves the rest of the paths" "$o" '--plan tB --paths'
 has "AC7 the note names the hand-out" "$o" "prologue complete"
 # `dispatch` is sliced out and asserted on its own: the child receives its own unit and never the
@@ -797,8 +891,8 @@ has "AC7 the note names the hand-out" "$o" "prologue complete"
 d=$(printf '%s\n' "$o" | grep '^RESULT ' | sed 's/.*"dispatch"://')
 has    "AC8 dispatch.args carries the repo" "$d" '"repo":"/tmp/r"'
 has    "AC8 dispatch.args carries the slug" "$d" '"slug":"tB"'
-has    "AC8 dispatch.args carries the driver" "$d" '"driver":"bash '"${PFX}unattended/unattended.sh"'"'
-has    "AC8 dispatch.args carries the bug-class checklist" "$d" '"checklist":"python '"${PFX}memory-tree/gotchas.py"' --for-diff HEAD~1..HEAD"'
+has    "AC8 dispatch.args carries the driver" "$d" '"driver":"bash '"${PFX}${UNATTENDED}/unattended.sh"'"'
+has    "AC8 dispatch.args carries the bug-class checklist" "$d" '"checklist":"python '"${PFX}${MEMORY_TREE}/gotchas.py"' --for-diff HEAD~1..HEAD"'
 has    "AC8 dispatch names the three per-unit fields and only those" "$d" '"perUnit":["unitId","specPath","briefPath"]'
 hasnt_ "AC8 the child never receives the roster list" "$d" '"roster"'
 
@@ -1094,9 +1188,9 @@ has    "D ...and the uncovered unit is named as owing a later audit" "$o" 'NOT c
 # hand-out prescribes the callee's own opening order so the file it demands is one the bar accepts.
 has    "D ...and the demanded record carries the Verdict heading check 22 reads" "$o" '## Verdict: CLEAN'
 has    "D ...and the record path at the subject round" "$o" 'memory/builds/tB/reviews/<date>-review-A-tB-1-spec-audit-round1.md'
-has    "D ...and the resume route" "$o" 'dispatch every unit `bash '"${PFX}unattended/unattended.sh"' --plan tB --paths` lists as READY'
+has    "D ...and the resume route" "$o" 'dispatch every unit `bash '"${PFX}${UNATTENDED}/unattended.sh"' --plan tB --paths` lists as READY'
 has    "D ...and the note opens HELD" "$o" '"note":"HELD AT HAND-OUT — a clean round with no tracked spec-audit record'
-has    "D ...and dispatch still travels, for the resume route" "$o" '"dispatch":{"scriptPath":"'"${PFX}workflows/unattended-unit.js"'"'
+has    "D ...and dispatch still travels, for the resume route" "$o" '"dispatch":{"scriptPath":"'"${PFX}${KIT}/unattended-unit.js"'"'
 has    "D ...and the withholding is logged" "$o" "hand-out: WITHHELD"
 o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":{"confirmed":[],"report":null,"root":"/tmp/r","blockers":null,"highs":null,"lensesRun":4,"lensesDead":0,"note":"clean: 0 findings"},"audit:record":%s,"dispose:":%s}' "$SPEC_OK" "$(rec CONVERGED)" "$DISPOSE_OK")")
 has    "F zero findings, no unverified key: a RESULT too" "$o" "RESULT"
@@ -1358,7 +1452,7 @@ build_layout() { # dir · kit dir · unattended dir, or '-' for none · checklis
   # `--tracked-only` would SKIP an absent live copy, so an install carries both halves of each.
   cp "$HERE/tier2-review.template.js" "$HERE/drift-audit-code.template.js" "$HERE/drift-audit-code.js" \
      "$HERE/drift-audit-state.template.js" "$HERE/drift-audit-state.js" "$d/$kd/"
-  mkdir -p "$d/$kd/../hooks"; cp "$ROOT/$KIT_REL/hooks/agent-cap.js" "$d/$kd/../hooks/"
+  mkdir -p "$d/$kd/../${HOOKS}"; cp "$ROOT/${HOOKS_DIR}/agent-cap.js" "$d/$kd/../${HOOKS}/"
   # `-` IS A REVIEW-HARNESS-ONLY INSTALL, which `requires` permits: this kit requires agent-cap and
   # nothing else, so neither the unattended kit nor the memory-tree kit has to be there.
   if [ "$ud" != - ]; then mkdir -p "$d/$ud"; printf '#!/usr/bin/env bash\n' > "$d/$ud/unattended.sh"; fi
@@ -1384,7 +1478,7 @@ check_layout() { # label · dir · kit dir · tool root · checklist dir · five
   echo "ok   $label -- the harness ran to its hand-out"
   printf '%s\n' "$o" | grep -qxF "workflow:$kd/tier2-review.js" && got="${got}G" || got="${got}R"
   [ "$(read_field "$res" dispatch.scriptPath)" = "$kd/unattended-unit.js" ] && got="${got}G" || got="${got}R"
-  [ "$(read_field "$res" dispatch.args.driver)" = "bash ${tr}unattended/unattended.sh" ] && got="${got}G" || got="${got}R"
+  [ "$(read_field "$res" dispatch.args.driver)" = "bash ${tr}${UNATTENDED}/unattended.sh" ] && got="${got}G" || got="${got}R"
   [ "$(read_field "$res" dispatch.args.checklist)" = "python $mt/gotchas.py --for-diff HEAD~1..HEAD" ] && got="${got}G" || got="${got}R"
   # The population is every path-shaped token in the whole output, NOT the four sites above, and its
   # size is asserted: fewer than four means the extraction found nothing to grade.
@@ -1400,7 +1494,7 @@ EOF
   [ "$pop" -ge 4 ] && [ -z "$miss" ] && got="${got}G" || got="${got}R"
   set -- "(i) the AUDIT stage awaits $kd/tier2-review.js" \
          "(ii) dispatch.scriptPath is $kd/unattended-unit.js" \
-         "(iii) dispatch.args.driver runs ${tr}unattended/unattended.sh" \
+         "(iii) dispatch.args.driver runs ${tr}${UNATTENDED}/unattended.sh" \
          "(iv) dispatch.args.checklist runs $mt/gotchas.py" \
          "(v) all $pop emitted js/sh/py path(s) are tracked in the layout"
   for k in 1 2 3 4 5; do
@@ -1436,12 +1530,12 @@ has "PV-AC2 flat: ...and names the directory it probed" "$o" "MEMORY_TREE_DIR 's
 NE="$LAY/nested"; build_layout "$NE" scripts/workflows scripts/unattended scripts/memory-tree/gotchas.py
 run_layout "$NE" scripts/workflows --render >/dev/null
 check_layout "PV-AC3 nested:" "$NE" scripts/workflows scripts/ scripts/memory-tree GGGGG
-RT="$LAY/root"; build_layout "$RT" workflows unattended "${ROOTPFX}memory-tree/gotchas.py"   # the ROOT-install layout PV-AC3 builds on purpose
-run_layout "$RT" workflows --render >/dev/null
-check_layout "PV-AC3 root:" "$RT" workflows "" memory-tree GGGGG
-RF="$LAY/rootflat"; build_layout "$RF" workflows unattended gotchas.py
-run_layout "$RF" workflows --render >/dev/null
-check_layout "PV-AC3 root, flat memory-tree:" "$RF" workflows "" . GGGGG
+RT="$LAY/root"; build_layout "$RT" "$KIT" "$UNATTENDED" "${ROOTPFX}${MEMORY_TREE}/gotchas.py"   # the ROOT-install layout PV-AC3 builds on purpose
+run_layout "$RT" "$KIT" --render >/dev/null
+check_layout "PV-AC3 root:" "$RT" "$KIT" "" "$MEMORY_TREE" GGGGG
+RF="$LAY/rootflat"; build_layout "$RF" "$KIT" "$UNATTENDED" gotchas.py
+run_layout "$RF" "$KIT" --render >/dev/null
+check_layout "PV-AC3 root, flat memory-tree:" "$RF" "$KIT" "" . GGGGG
 
 # ---- AC4: no checklist script anywhere the probe looks SKIPS the harness pair out loud, and no
 # ---- harness is written. rev-5: this was a whole-run exit 2 until round 1's F3 scoped it to the pair
