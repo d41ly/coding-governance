@@ -8838,6 +8838,11 @@
       "file": "tools/runlog/model.py"
     },
     {
+      "id": "write_pre_fix_spelling",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
+    },
+    {
       "id": "write_receipt_pin",
       "kind": "function",
       "file": "tools/govkit/selftest.py"

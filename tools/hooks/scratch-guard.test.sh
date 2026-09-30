@@ -437,7 +437,9 @@ fi
 # A guard nobody has seen fail is an assertion about nothing. This runs a COPY of this file with the
 # payload builder stubbed to emit nothing, and requires that copy to fail naming the builder.
 if [ "${SG_META:-}" != "1" ]; then
-  sed 's#^  payload=$("$TESTPY".*#  payload=""#' "$0" > "$TMP/meta.sh"
+  # The copy runs from $TMP, outside every repository, so its HERE is pinned to this suite's own:
+  # derived from the copy's location it named no install and the copy exited before the guard ran.
+  sed -e 's#^  payload=$("$TESTPY".*#  payload=""#' -e "s#^HERE=.*#HERE='$HERE'#" "$0" > "$TMP/meta.sh"
   if SG_META=1 bash "$TMP/meta.sh" 2>&1 | grep -q 'the payload builder produced nothing'; then
     echo "ok   the payload-builder liveness guard fires when the builder is stubbed"; pass=$((pass+1))
   else

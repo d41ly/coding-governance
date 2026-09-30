@@ -544,7 +544,10 @@ else echo "FAIL PHASES_ALLOW [$got] != the driver's tail [$want] — a restateme
 
 # ---- the meta-arm: prove the liveness guard itself fires ------------------------------------------
 if [ "${GG_META:-}" != "1" ]; then
-  sed 's#^  payload=$("$TESTPY" -c .import json,sys; print(json.dumps({"tool_name":sys.argv\[1\].*#  payload=""#' "$0" > "$TMP/meta.sh"
+  # The copy runs from $TMP, outside every repository, so its HERE is pinned to this suite's own:
+  # derived from the copy's location it named no install and the copy exited before the guard ran.
+  sed -e 's#^  payload=$("$TESTPY" -c .import json,sys; print(json.dumps({"tool_name":sys.argv\[1\].*#  payload=""#' \
+      -e "s#^HERE=.*#HERE='$HERE'#" "$0" > "$TMP/meta.sh"
   if GG_META=1 bash "$TMP/meta.sh" 2>&1 | grep -q 'the payload builder produced nothing'; then
     echo "ok   the payload-builder liveness guard fires when the builder is stubbed"; pass=$((pass+1))
   else

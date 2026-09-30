@@ -594,6 +594,23 @@ def settle(t: pathlib.Path, msg: str = "fixture") -> None:
     git(t, "commit", "-qm", msg)
 
 
+def write_pre_fix_spelling(gov: pathlib.Path) -> None:
+    """Re-spell a scratch gov copy the way an engine read out of git before TOOL-aRepatriatedFork-29
+    reads it: the registry's `{prefix}` token resolved, each fixture descriptor's `home` spelled
+    repo-relative. That engine reads both from the WORKING TREE, so the copy's working tree is where
+    they change. Without it the pre-fix run refused every entry as a missing descriptor and the arms
+    comparing against it graded that refusal (TOOL-aRepatriatedFork-28, gate repair at VERIFYING).
+    """
+    reg = gov / PFX / KIT_NAMES["govkit"] / "registry.toml"
+    reg.write_text(resolve_prefix_token(reg.read_text(encoding="utf-8"), PFX.rstrip("/")),
+                   encoding="utf-8", newline="\n")
+    for kt in sorted((gov / PFX).glob("*/kit.toml")):
+        name = kt.parent.name
+        body = kt.read_text(encoding="utf-8")
+        kt.write_text(body.replace(f'\nhome = "{name}"\n', f'\nhome = "{PFX}{name}"\n', 1),
+                      encoding="utf-8", newline="\n")
+
+
 def write_vintage_receipt(govroot: pathlib.Path, target: pathlib.Path,
                           vintage: str) -> tuple[list[str], list[str]]:
     """Rewind an applied target's receipt and bytes to `vintage`. Returns (kept, dropped) paths.
@@ -9251,6 +9268,7 @@ user_skills = "/tmp/gk-fake-skills"
         _pre_gov = tmp / "v14-pre-gov"
         shutil.copytree(_g14, _pre_gov)
         (_pre_gov / PFX / KIT_NAMES["govkit"] / "govkit.py").write_bytes(_pe_src)
+        write_pre_fix_spelling(_pre_gov)
         _ac8_now = run_in_gov(_g14, "check", "--target", str(_t14))
         _ac8_was = run_in_gov(_pre_gov, "check", "--target", str(_t14))
         # DEPL-aRepatriatedFork-17 added ONE field to the integrity line, ` · eol-only <n>`, which
@@ -9533,6 +9551,7 @@ user_skills = "/tmp/gk-fake-skills"
         _g24pre = tmp / "v24-dirtypin-gov-pre"
         shutil.copytree(_g24, _g24pre)
         (_g24pre / PFX / KIT_NAMES["govkit"] / "govkit.py").write_bytes(_pd_src)
+        write_pre_fix_spelling(_g24pre)
 
         _tp24, _gp24, _bp24 = _t24["pre"]
         _up24 = run_in_gov(_g24pre, "update", "--target", str(_tp24), "--to", _to24, "--write")
@@ -9808,6 +9827,7 @@ user_skills = "/tmp/gk-fake-skills"
         _g26pre = tmp / "v26-scope-gov-pre"
         shutil.copytree(_g26, _g26pre)
         (_g26pre / PFX / KIT_NAMES["govkit"] / "govkit.py").write_bytes(_p26)
+        write_pre_fix_spelling(_g26pre)
 
         _t26p = build_verify_target(_g26, "scope26-pre", ["demo", "sib"])
         _t26n = build_verify_target(_g26, "scope26-now", ["demo", "sib"])
@@ -9912,6 +9932,7 @@ user_skills = "/tmp/gk-fake-skills"
         _g26rp = tmp / "v26-rename-gov-pre"
         shutil.copytree(_g26r, _g26rp)
         (_g26rp / PFX / KIT_NAMES["govkit"] / "govkit.py").write_bytes(_p26)
+        write_pre_fix_spelling(_g26rp)
         _u26rp = run_in_gov(_g26rp, "update", "--target", str(_t26rp), "--to", _to26r, "--write")
         _o26rp = _u26rp.stdout + _u26rp.stderr
         check("[-26] AC4 the PRE-FIX engine exits non-zero over a renaming vintage on the tally's "

@@ -21,7 +21,7 @@ def derive_install_prefix() -> str:
     root install. Every fixture and host path the self-test builds is spelled through it, never
     through a literal prefix (TOOL-aRepatriatedFork-28)."""
     import pathlib
-    here = pathlib.Path(__file__).resolve().parent
+    here = pathlib.Path(os.path.abspath(__file__)).parent
     for anc in here.parents:
         if (anc / ".git").exists():
             rel = here.parent.relative_to(anc).as_posix()
