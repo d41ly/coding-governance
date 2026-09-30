@@ -47,7 +47,8 @@
 # of what is left to drain. It grades TEXT: a path assembled at run time from two variables is
 # outside every predicate. The ban does not count a bare `tools/` with no segment after it, a
 # directory-only kit reference under any prefix but gov's, or a kit segment with no file after it;
-# its homonym rule is a context heuristic (see the epoch-5 block) and says where it stops.
+# its homonym rules are context heuristics (see the epoch-5 and epoch-6 blocks) and say where they
+# stop.
 set -u
 # TOOL-cWidenedNet-1 S4 — CAPTURED BEFORE THE `cd`, because `$0` may be relative and the `cd` below
 # moves out from under it.
@@ -103,25 +104,121 @@ case "$MODE" in --check|--list|--write-ratchet|--rebaseline) ;;
 # layout BELOW the tool root, and false of the tool root itself, which gov may be checked out under
 # at any name. The registry and the resolver sit beside this gate's own directory in a source, and a
 # consumer receives neither, so the test answers the same question at every prefix.
-REGISTRY="${SELF_PREFIX}govkit/registry.toml"
+# TOOL-aRepatriatedFork-46 S4: NEITHER IS PROBED BY NAME ANY MORE. Both were spelled as a kit name
+# joined to `SELF_PREFIX`, which is the class this gate bans, and `<prefix>/lib/` ships nowhere. The
+# python resolver is carried INLINE, and govkit is found by the sibling-kit resolver below, which
+# reads the install receipt first. Its anchor is govkit's ENGINE and not the registry, because the
+# registry also ships inside the playbook renderer: a consumer's receipt names a registry row, and
+# anchoring on it would read that consumer as a kit source. The engine ships nowhere.
+# >>> resolve_python — canonical copy: resolve-python.sh in gov's lib dir (byte-identical; gated)
+resolve_python() {
+  # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
+  # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
+  # the candidate and every consumer uses "$PY" as a single word (measured: exit 127).
+  _rp_tried=""
+  for _rp_c in "${1:-}" "${GOV_PYTHON:-}" python3 python py; do
+    [ -n "$_rp_c" ] || continue
+    _rp_tried="$_rp_tried $_rp_c"
+    if "$_rp_c" -c "import sys" >/dev/null 2>&1; then
+      printf '%s\n' "$_rp_c"
+      return 0
+    fi
+  done
+  {
+    echo "resolve_python: no usable python launcher. Each candidate was RUN with -c 'import sys' and"
+    echo "resolve_python: none exited 0 — being on PATH is not evidence (the Microsoft Store python3"
+    echo "resolve_python: stub answers \`command -v\` and exits 9009 without running anything)."
+    echo "resolve_python: tried:$_rp_tried"
+    if [ -n "${1:-}" ]; then
+      echo "resolve_python: the caller's override '$1' was tried FIRST and did not run."
+    fi
+    if [ -n "${GOV_PYTHON:-}" ]; then
+      echo "resolve_python: GOV_PYTHON is set to '$GOV_PYTHON' and did not run. An override that is"
+      echo "resolve_python: set and unusable is THIS failure, never a silent fall-through — the"
+      echo "resolve_python: operator believes they chose, and would not have."
+    fi
+  } >&2
+  return 1
+}
+# <<< resolve_python
+# The sibling-kit resolver (TOOL-aRepatriatedFork-2 S3), INLINED byte-identically from the
+# canonical copy named on its marker line and gated by the resolve-python self-test's parity
+# table. A shell consumer runs it with the python it already resolved, so the receipt rung is
+# read in Python and never parsed in bash. `resolve_kit_dir <python> <home> <anchor> <here>`
+# prints the kit directory REPO-RELATIVE, or the resolver's named refusal on stderr and exits 1.
+resolve_kit_dir() {
+  "$1" -c "$(cat <<'RKD'
+# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
+def resolve_kit_dir(home, anchor, here):
+    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
+
+    1. receipt — the `.governance/install.json` row whose `source` ends in <home>/<anchor> and
+       whose `path` exists inside this tree. The only record of a RENAMED kit dir: no probe finds
+       a memory-recall kit an adopter homed at `scripts/recall/`.
+    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
+    3. refuse — LookupError naming the three places looked; never a guessed prefix.
+    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
+    """
+    import json
+    import pathlib
+    here = pathlib.Path(here).resolve()
+    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
+    receipt = root / ".governance" / "install.json"
+    try:
+        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("path"):
+            continue
+        if str(row.get("source") or "").split("/")[-2:] != [home, anchor]:
+            continue
+        hit = (root / str(row["path"])).resolve()
+        if hit.is_file() and root in hit.parents:
+            return hit.parent
+    probes = (here / home, here.parent / home)
+    for cand in probes:
+        if (cand / anchor).is_file():
+            return cand
+    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
+        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
+# <<< resolve_kit_dir
+RKD
+)"'
+import sys
+try:
+    d = resolve_kit_dir(*sys.argv[1:4])
+except LookupError as e:
+    sys.exit(str(e))
+r = next((p for p in (d, *d.parents) if (p / ".git").exists()), d.anchor)
+print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
+}
+# The python the kit-source test needs. A launcher that does not run is a REFUSAL and never a
+# consumer: read as "no kit source here", it would skip a kit source's whole verdict at exit 0.
+PY_GATE=$(resolve_python) || {
+  echo "install-prefix: no usable python, so this gate cannot tell whether this repo is a kit"
+  echo "install-prefix: SOURCE. REFUSING rather than reading that as a consumer with nothing to police."
+  exit 2
+}
 KIT_SOURCE=no
-[ -f "$REGISTRY" ] && [ -f "${SELF_PREFIX}lib/resolve-python.sh" ] && KIT_SOURCE=yes
+REGISTRY=""
+if _gk_dir=$(resolve_kit_dir "$PY_GATE" govkit govkit.py "$_self_dir" 2>/dev/null) \
+   && [ -f "$_gk_dir/registry.toml" ]; then
+  KIT_SOURCE=yes
+  REGISTRY="$_gk_dir/registry.toml"
+fi
 if [ "$KIT_SOURCE" != yes ]; then
   # A SKIP ANNOUNCES ITSELF (§7), and exits 0 (§8 F1, owner): a consumer's bar stays green when it
   # has nothing to police, and a printed skip cannot be misread as a graded run.
-  echo "install-prefix: root-install arm SKIPPED — this repo is not a kit SOURCE (it carries no"
-  echo "install-prefix: govkit registry, or no python resolver beside it), so it ships nothing and"
+  echo "install-prefix: root-install arm SKIPPED — this repo is not a kit SOURCE (no govkit engine"
+  echo "install-prefix: and registry resolve from this gate's directory), so it ships nothing and"
   echo "install-prefix: its files under ${SELF_PREFIX:-the repo root} were NOT graded on this run."
-  echo "install-prefix: carried-prefix arm SKIPPED — this repo is not a kit SOURCE (it carries no"
-  echo "install-prefix: govkit registry, or no python resolver beside it) and so has no"
+  echo "install-prefix: carried-prefix arm SKIPPED — this repo is not a kit SOURCE (no govkit engine"
+  echo "install-prefix: and registry resolve from this gate's directory) and so has no"
   echo "install-prefix: shippable set to grade. Said out loud rather than passed silently: a skip"
   echo "install-prefix: that looks like a pass is indistinguishable from coverage."
   exit 0
 fi
-# TOOL-aRepatriatedFork-23 — sourced ONCE, here, for the two python programs below: arm 3 and the
-# ban's counter. It used to sit inside arm 3, which the ban's modes never reach.
-# shellcheck source=/dev/null
-. "${SELF_PREFIX}lib/resolve-python.sh"   # the resolver the kit-source test found
 # The python launcher for the carried-prefix arm below, resolved through the repo's ONE resolver and
 # through nothing else. There is deliberately no `PY=python` fallback: the MS-Store `python3` stub
 # answers `command -v` and exits 9009, so a bare launcher name is not an answer — and the idiom ban
@@ -161,8 +258,6 @@ derive_received_files() {
   # what this repo ships; this function used to carry its own heredoc over the same calls. The verb
   # sits beside the registry the kit-source test already found. A verb that fails prints NOTHING
   # here, not the named addition alone, so the liveness checks below still see a dead probe.
-  # shellcheck source=/dev/null
-  . "${SELF_PREFIX}lib/resolve-python.sh"  # reached only inside a kit SOURCE, where the kit-source test found it
   local _shipped
   _shipped=$("$(resolve_python)" "${REGISTRY%/*}/govkit.py" shipped) || return 0
   [ -n "$_shipped" ] || return 0
@@ -583,7 +678,7 @@ fi
 # So it is guarded by a value that a definitional change MUST move and an ordinary pass CANNOT:
 # this epoch, recorded in the ratchet's own header. `--rebaseline` refuses unless the two differ,
 # which makes it one-shot per predicate change and useless for absorbing a literal.
-PREDICATE_EPOCH=5
+PREDICATE_EPOCH=6
 
 # epoch 1 — `tools/<kit>/<file>.<ext>`, a kit DIRECTORY segment required.
 # epoch 2 — TOOL-aScouredKit-20. Adds a LOOSE file directly under `tools/`, which epoch 1 could not
@@ -649,6 +744,21 @@ PREDICATE_EPOCH=5
 #   over 324 tracked files of which 58 no descriptor ships. The unit's acceptance ledger splits the
 #   rise by rule and reconciles it to the census. A --check went from 27-28 s to 22-24 s wall: one
 #   python pass replaced three derivations of the received set and a grep per epoch-2 filter.
+# epoch 6 — TOOL-aRepatriatedFork-46. Two places epoch 5 misjudged its own class, each measured over
+#   the real tree before it was wired:
+#   * THE HOMONYM RULE. Rule 4's comma branch counted any quoted kit segment after a quoted literal
+#     segment, so a kit id passed as an argument, a list member and a JSON key all read as paths. It
+#     now counts only inside an open `join(`, `joinpath(` or `Path(` call. 47 occurrences stopped
+#     counting and none started: forty-one `--kits` argv and fixture-builder arguments in govkit's
+#     selftest, two system `lib` directories, two JSON `hooks` keys, a deploy list and a keyword
+#     tuple. Its ceiling is written beside it in the counter.
+#   * THE BRACE RULE. Rule 3 read EVERY brace before a kit name as a render token, so the `${PFX}`
+#     spelling an earlier unit drained the literal prefix into left the kit name after it uncounted.
+#     Only `{prefix}/`, `{kit}/` and `{{TOOL_ROOT}}`, and the prose tokens `<prefix>/` and
+#     `<tool-root>/`, drain now: 426 occurrences in 46 files joined the count.
+#   COST, measured on node a before this unit derived a line: rows 56 -> 82 and occurrences
+#   625 -> 1004, which is 625 - 47 + 426. The --rebaseline that recorded it ran after the gate's own
+#   four kit-source lines were derived in the same commit, so the file it wrote holds four fewer.
 
 
 carried_live() {
@@ -735,6 +845,28 @@ def check_homonym(operand):
     return bool(NONKIT.search(operand) or re.search(r"%s\.[A-Za-z]" % Q, operand))
 
 
+# Epoch 6, the brace rule: the ONLY spellings that drain a kit segment. Any other brace before a kit
+# name is a derived base the kit name was typed after, which is the class (`${PFX}<kit>/`).
+DRAINED = re.compile(r"(?:\{prefix\}/|\{kit\}/|\{\{TOOL_ROOT\}\}|<prefix>/|<tool-root>/)$")
+# Epoch 6, the homonym rule: a quoted kit segment after a quoted literal segment and a comma is a path
+# only inside an open path-join call. ponytail: its ceiling is a callee that assembles the path from
+# separate arguments, `f('clean', 'scripts', '<kit>')`, which reads as an argument list and is not
+# seen: the same blind spot as a path built from two variables.
+JOINCALL = re.compile(r"(?:\bjoin|\bjoinpath|\bPath)\s*$")
+
+
+def check_path_join(before):
+    """True when the innermost bracket still open at the end of <before> is a path-join call."""
+    s = before
+    while True:
+        t = re.sub(r"\([^()]*\)|\[[^\[\]]*\]|\{[^{}]*\}", "", s)
+        if t == s:
+            break
+        s = t
+    i = max(s.rfind("("), s.rfind("["), s.rfind("{"))
+    return i >= 0 and s[i] == "(" and bool(JOINCALL.search(s[:i]))
+
+
 def scan_line(line):
     work = re.sub(r"\\[ntr]", "  ", line)  # a path after a `\n` escape reads as after a space
     out = []
@@ -765,14 +897,12 @@ def scan_line(line):
         a, before = m.start(), work[:m.start()]
         if not FILE.match(m.group("rest")):
             continue
+        if before[-1:] == "\0" or DRAINED.search(before):
+            continue  # a render or prose token (epoch 6), or a span an earlier rule counted
         if before.endswith("/"):
-            if before[-2:-1] in ("}", "\0") or re.search(r"<(?:prefix|tool-root)>/$", before):
-                continue  # `{prefix}/`, `{kit}/`, `<prefix>/`: the drained form
             operand = re.split(r"[\s\"'`=(]", before)[-1]
             if any(DOTDIR.match(s) for s in operand.split("/")) or NONKIT.search(operand):
                 continue  # a Skill dir, a git `hooks/`, a sidecar under the git dir (S4)
-        elif before[-1:] in ("}", "{", "\0"):
-            continue  # `{{TOOL_ROOT}}<kit>/…`, the drained form
         add(a, m.end(), m.group("k"))
     # 4. a quoted kit segment used as a path segment: joined by `/` (F1, arm 3's P3 shape), or by `,`
     #    after a quoted literal prefix segment (F4) — unless the operand makes it a homonym (S4)
@@ -784,8 +914,9 @@ def scan_line(line):
                 continue
         else:
             pre = re.search(r"(%s)(?P<p>[%s]+)\1\s*,\s*$" % (Q, NP), before)
-            if not pre or DOTDIR.match(pre.group("p")) or pre.group("p") == "..":
-                continue
+            if not pre or DOTDIR.match(pre.group("p")) or pre.group("p") == ".." \
+                    or not check_path_join(before):
+                continue  # an argument, a list member, a mapping key: not inside a path join (epoch 6)
         add(a, b, m.group("k"))
     return out
 

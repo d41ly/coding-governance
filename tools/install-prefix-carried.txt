@@ -4,60 +4,85 @@
 #
 # A FOURTH COLUMN IS A HUMAN'S REASON for a literal that is genuinely correct. Only a person
 # writes one, in the pass that needs it; the write path preserves it but never invents it.
-# predicate-epoch: 5
+# predicate-epoch: 6
 .githooks/gate-env.sh	3	govkit,run-gates,unattended
+.githooks/pre-push	2	run-gates
 .githooks/pre-push.runlog.test.sh	4	govkit,lib,run-gates
 .githooks/pre-push.test.sh	2	run-gates
 .githooks/pre_push_bar_selftest.py	2	run-gates
 WIRE-INTO-PROJECT.md	7	govkit	WRITTEN BY HAND, TOOL-aRepatriatedFork-26 rev-3. All seven sit in the harness-migration blocks, which the govkit self-test cuts out of this file and RUNS as written: six `$GOV/tools/govkit/govkit.py` invocations and the embedded program's read of gov's registry. They are executing lines joining a literal under the operator's `$GOV`, so they drain with the other executing derived-base joins, where a suite can observe the change, and not in a doc pass. Every other kit path in the runbook spells the `<prefix>/` token its Definitions line declares.
 skills/session-kickoff/manifest-check.test.sh	1	memory-tree	LOWERED 8 -> 1 by TOOL-aRepatriatedFork-28, which derives every fixture path. The one literal left is `$R/memory-tree/corpus_ids.py`, a kit segment joined under a derived base, TOOL-aRepatriatedFork-46's class (spec rev-3 §4, Returned).
+tools/check-agent-cap-restatement.test.sh	1	hooks
+tools/check-hook-destinations.sh	1	lib
 tools/check-hook-destinations.test.sh	7	hooks,memory-recall
-tools/check-install-prefix.test.sh	13	(loose),hooks,memory-recall,memory-tree	LOWERED 72 -> 13 by TOOL-aRepatriatedFork-28, which spells every fixture path through the derived prefix. What is left is this gate's own red fixtures, root-install spellings under its marker and quoted-join samples of its literal predicate, and two layouts at a foreign literal prefix: all TOOL-aRepatriatedFork-30's, which rewrites that predicate (spec rev-3 §4, Returned).
+tools/check-install-prefix.test.sh	42	(loose),govkit,hooks,lib,memory-recall,memory-tree	LOWERED 72 -> 13 by TOOL-aRepatriatedFork-28, which spells every fixture path through the derived prefix. What is left is this gate's own red fixtures, root-install spellings under its marker and quoted-join samples of its literal predicate, and two layouts at a foreign literal prefix: all TOOL-aRepatriatedFork-30's, which rewrites that predicate (spec rev-3 §4, Returned).
+tools/check-kit-placeholders.test.sh	2	lib
+tools/check-kit-versions.sh	30	codebase-map,drift-audit,govkit,hooks,memory-recall,memory-tree,pytest-parallel-guardrails,run-gates,unattended,workflows
 tools/check-line-length.test.sh	1	lib	LOWERED 28 -> 1 by TOOL-aRepatriatedFork-28. The one literal left sources the harness beside this suite, a kit segment joined under a derived base, TOOL-aRepatriatedFork-46's class (spec rev-3 §4, Returned).
+tools/check-playbook-parity.sh	4	hooks
+tools/check-playbook-parity.test.sh	3	hooks,memory-tree
+tools/check-spec-tokens.test.sh	25	govkit,lib,run-gates,runlog
 tools/check-testsuite-counts.test.sh	3	lib	LOWERED 49 -> 3 by TOOL-aRepatriatedFork-28. The three left are fixture suites that source the harness beside them, a kit segment joined under a derived base, TOOL-aRepatriatedFork-46's class (spec rev-3 §4, Returned).
-tools/check-wiring.test.sh	30	hooks,lib,memory-recall,memory-tree
-tools/codebase-map/adopt-codebase-map.test.sh	3	codebase-map
+tools/check-wiring.sh	5	hooks,lib,memory-recall,memory-tree
+tools/check-wiring.test.sh	52	hooks,lib,memory-recall,memory-tree
+tools/codebase-map/adopt-codebase-map.test.sh	4	codebase-map
 tools/codebase-map/map_extractors.py	2	lexicon,workflows
-tools/codebase-map/selftest.py	19	codebase-map,lexicon
+tools/codebase-map/selftest.py	25	codebase-map,lexicon
 tools/codebase-map/test_codebase_map.py	1	codebase-map
 tools/codebase-map/test_codebase_map.template.py	1	codebase-map
 tools/dead-path-waivers.txt	2	lexicon
-tools/drift-audit/selftest.py	21	drift-audit,lexicon,memory-recall,unattended,workflows
+tools/drift-audit/selftest.py	22	drift-audit,lexicon,memory-recall,unattended,workflows
+tools/govkit/census.test.sh	2	govkit,lib
 tools/govkit/fixtures/adopter-ic-2cff5855.receipt.json	91	codebase-map,drift-audit,gate-lint,lexicon,unattended,workflows
+tools/govkit/fixtures/make_adopter_receipt.py	2	govkit
 tools/govkit/govkit.py	1	run-gates
 tools/govkit/matrix.py	7	govkit
-tools/govkit/selftest.py	213	codebase-map,drift-audit,gate-lint,govkit,hooks,memory-recall,memory-tree,playbook,process-monitor,pytest-parallel-guardrails,run-gates,unattended,workflows
-tools/hooks/agent-cap.test.sh	5	hooks,lib,workflows
-tools/hooks/scratch-guard.js	2	lib
-tools/hooks/scratch-guard.test.sh	2	lib
-tools/lexicon/selftest.py	28	lexicon	LOWERED 55 -> 28 by TOOL-aRepatriatedFork-28, which derives the prefix every fixture copies the kit to. Each literal left is the kit's own segment joined under that derived prefix, a kit segment joined under a derived base, TOOL-aRepatriatedFork-46's class (spec rev-3 §4, Returned).
+tools/govkit/selftest.py	213	codebase-map,drift-audit,govkit,hooks,memory-recall,memory-tree,playbook,process-monitor,pytest-parallel-guardrails,run-gates,unattended,workflows
+tools/hooks/agent-cap.test.sh	7	hooks,lib,workflows
+tools/hooks/scratch-guard.test.sh	3	lib,run-gates
+tools/lexicon/selftest.py	50	lexicon	LOWERED 55 -> 28 by TOOL-aRepatriatedFork-28, which derives the prefix every fixture copies the kit to. Each literal left is the kit's own segment joined under that derived prefix, a kit segment joined under a derived base, TOOL-aRepatriatedFork-46's class (spec rev-3 §4, Returned).
+tools/lib/extract-arms.test.sh	2	lib
+tools/lib/resolve-python.test.sh	5	lib,unattended
 tools/memory-recall/selftest.py	2	memory-tree
 tools/memory-recall/test_recall_floor.py	1	govkit
-tools/memory-tree/check-memory-hygiene.test.sh	10	codebase-map,playbook,unattended
-tools/memory-tree/check-verdict-epoch.sh	1	memory-recall
-tools/memory-tree/corpus_ids.py	1	memory-recall
+tools/memory-tree/check-memory-hygiene.test.sh	10	codebase-map,memory-tree,playbook
+tools/memory-tree/check-verdict-epoch.sh	2	memory-recall
+tools/memory-tree/check-verdict-epoch.test.sh	4	memory-tree
+tools/memory-tree/corpus_ids.py	6	memory-recall,memory-tree
+tools/memory-tree/gotchas.py	2	memory-tree
 tools/memory-tree/marker-contract.test.sh	2	unattended
-tools/memory-tree/merge-rows.test.sh	19	lib,memory-recall,memory-tree
+tools/memory-tree/merge-rows.test.sh	30	lib,memory-recall,memory-tree
 tools/process-monitor/adopt-process-monitor.test.sh	2	lib	LOWERED 7 -> 2 by TOOL-aRepatriatedFork-28. The two left source the resolver beside this kit, a kit segment joined under a derived base, TOOL-aRepatriatedFork-46's class (spec rev-3 §4, Returned). Still `project-owned` and withheld from `govkit apply`.
 tools/run-gates/adopt-run-gates.test.sh	9	run-gates
+tools/run-gates/profile_bar.test.sh	1	run-gates
+tools/run-gates/run-gates.evidence.test.sh	19	lib,run-gates
+tools/run-gates/run-gates.gov.test.sh	3	run-gates
 tools/run-gates/run-gates.runlog.test.sh	4	lib,run-gates
-tools/runlog/selftest.py	4	runlog,unattended	LOWERED 62 -> 4 by TOOL-aRepatriatedFork-28. The four left name no kit path: three per-OS state directories called runlog and the Skill's keyword tuple, which the epoch-5 counter reads as kit segments. TOOL-aRepatriatedFork-30's population rule.
-tools/settings-merge.py	8	hooks,memory-recall,process-monitor
-tools/unattended/adopt-unattended.test.sh	3	lib,unattended
+tools/run-gates/run-gates.test.sh	20	lib,run-gates
+tools/run-gates/run-gates.turnstile.test.sh	4	lib,run-gates
+tools/run-gates/run-selftests.test.sh	10	lib,run-gates,unattended
+tools/runlog/selftest.py	5	memory-tree,runlog,unattended	LOWERED 62 -> 4 by TOOL-aRepatriatedFork-28. The four left name no kit path: three per-OS state directories called runlog and the Skill's keyword tuple, which the epoch-5 counter reads as kit segments. TOOL-aRepatriatedFork-30's population rule.
+tools/settings-merge.py	6	hooks,memory-recall,process-monitor
+tools/unattended/adopt-unattended.sh	2	memory-tree
+tools/unattended/adopt-unattended.test.sh	13	lib,memory-tree,run-gates,unattended
+tools/unattended/check-brief-recorded.test.sh	4	memory-tree,unattended
+tools/unattended/check-pass-order.test.sh	5	memory-tree,unattended
+tools/unattended/check-playbook.test.sh	5	unattended
 tools/unattended/check-unattended.test.sh	3	workflows
 tools/unattended/fixture-records/tools~unattended~fixture-pieces~one~piece.md.md	2	unattended
 tools/unattended/fixture-records/tools~unattended~fixture-pieces~two~piece.md.md	2	unattended
-tools/unattended/gate-guard.test.sh	2	lib	LOWERED 105 -> 2 by TOOL-aRepatriatedFork-28, which spells every deny-shape command string through the derived prefix. The two left source the resolver beside this kit, a kit segment joined under a derived base, TOOL-aRepatriatedFork-46's class (spec rev-3 §4, Returned).
+tools/unattended/gate-guard.test.sh	64	govkit,lib,memory-tree,run-gates,unattended	LOWERED 105 -> 2 by TOOL-aRepatriatedFork-28, which spells every deny-shape command string through the derived prefix. The two left source the resolver beside this kit, a kit segment joined under a derived base, TOOL-aRepatriatedFork-46's class (spec rev-3 §4, Returned).
 tools/unattended/playbook.fixture.md	5	unattended
 tools/unattended/run-unattended-gates.sh	1	run-gates	REWRITTEN by TOOL-aRepatriatedFork-27, which reworded this file's comment prose: the one literal left is the executing `RUNNER=` join of the run-gates segment under the derived kit parent, which TOOL-aRepatriatedFork-46 owns.
 tools/unattended/runlog-writer.test.sh	3	lib,run-gates
 tools/unattended/stall-recorder.test.sh	2	lib	LOWERED 4 -> 2 by TOOL-aRepatriatedFork-28, which derives the fixture's kit home. The two left source the resolver beside this kit, a kit segment joined under a derived base, TOOL-aRepatriatedFork-46's class (spec rev-3 §4, Returned).
 tools/unattended/stop-guard.test.sh	2	lib	LOWERED 4 -> 2 by TOOL-aRepatriatedFork-28, which derives the fixture's kit home. The two left source the resolver beside this kit, a kit segment joined under a derived base, TOOL-aRepatriatedFork-46's class (spec rev-3 §4, Returned).
 tools/unattended/unattended.test.sh	5	govkit,memory-tree	LOWERED 41 -> 5 by TOOL-aRepatriatedFork-28, which spells the fixture tree through the derived prefix. The five left join a kit segment under a derived base, TOOL-aRepatriatedFork-46's class (spec rev-3 §4, Returned).
+tools/workflows/check-protocol-parity.test.sh	2	memory-tree
 tools/workflows/check-review-join.sh	2	hooks
-tools/workflows/check-review-join.test.sh	4	hooks,workflows
+tools/workflows/check-review-join.test.sh	25	hooks,workflows
 tools/workflows/check-verifier-fanout.sh	2	hooks
-tools/workflows/check-verifier-fanout.test.sh	11	hooks,workflows
+tools/workflows/check-verifier-fanout.test.sh	17	hooks,workflows
 tools/workflows/drift-audit-state.js	1	(loose)
 tools/workflows/unattended-build.js	6	memory-tree,unattended,workflows
-tools/workflows/unattended-build.test.sh	35	hooks,memory-tree,unattended,workflows	LOWERED 49 -> 35 by TOOL-aRepatriatedFork-28: every asserted sub-workflow path spells the derived prefix. What is left is the PV layouts built at the foreign literal prefix scripts/ on purpose, TOOL-aRepatriatedFork-30's, and kit segments under the derived tool root, TOOL-aRepatriatedFork-46's (spec rev-3 §4, Returned).
+tools/workflows/unattended-build.test.sh	48	hooks,memory-tree,unattended,workflows	LOWERED 49 -> 35 by TOOL-aRepatriatedFork-28: every asserted sub-workflow path spells the derived prefix. What is left is the PV layouts built at the foreign literal prefix scripts/ on purpose, TOOL-aRepatriatedFork-30's, and kit segments under the derived tool root, TOOL-aRepatriatedFork-46's (spec rev-3 §4, Returned).

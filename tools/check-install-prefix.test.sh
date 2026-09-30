@@ -83,7 +83,7 @@ mkfix() { # $1 = dir · $2 = the line to put in the shipped README
   cp "$ROOT/${PFX}govkit/govkit.py" "$d/${PFX}govkit/govkit.py"
   cp "$ROOT/${PFX}lib/resolve-python.sh" "$d/${PFX}lib/resolve-python.sh"
   printf '[[entry]]\nid = "memory-tree"\ndescriptor = "mt.kit.toml"\n' > "$d/${PFX}govkit/registry.toml"
-  printf 'id = "memory-tree"\nhome = "'"${PFX}memory-tree"'"\n\n[[files]]\ninclude = ["check-memory-hygiene.sh"]\nrole = "engine"\nto = "{prefix}/{relpath}"\n' > "$d/mt.kit.toml"
+  printf 'id = "memory-tree"\nhome = "memory-tree"\n\n[[files]]\ninclude = ["check-memory-hygiene.sh"]\nrole = "engine"\nto = "{prefix}/{relpath}"\n' > "$d/mt.kit.toml"
   : > "$d/${PFX}install-prefix-carried.txt"
   printf '# waivers\n' > "$d/${PFX}install-prefix-waivers.txt"
   git -C "$d" add -A >/dev/null 2>&1
@@ -165,7 +165,7 @@ mkfix_source() { # $1 = dir · $2 = the line to put in the shipped kit file
   cp "$ROOT/${PFX}govkit/govkit.py" "$d/${PFX}govkit/govkit.py"
   cp "$ROOT/${PFX}lib/resolve-python.sh" "$d/${PFX}lib/resolve-python.sh"
   printf '[surface]\nglobs = ["'"${PFX}"'*"]\n\n[selection]\ndefault = ["demo"]\n\n[[entry]]\nid = "demo"\ndescriptor = "'"${PFX}demo/kit.toml"'"\n\n[[exempt]]\npath = "'"${PFX}govkit"'"\nwhy = "the deployer itself"\n\n[[exempt]]\npath = "'"${PFX}lib"'"\nwhy = "the shared library"\n\n[[exempt]]\npath = "'"${PFX}check-install-prefix.sh"'"\nwhy = "the gate under test"\n' > "$d/${PFX}govkit/registry.toml"
-  printf 'id = "demo"\nhome = "'"${PFX}demo"'"\nversion_from = { none = "fixture" }\n\n[check]\nnone = "a fixture kit"\n\n[[files]]\ninclude = "**"\nrole = "engine"\n\n[adopt]\nargv = []\nmutates_index = false\n' > "$d/${PFX}demo/kit.toml"
+  printf 'id = "demo"\nhome = "demo"\nversion_from = { none = "fixture" }\n\n[check]\nnone = "a fixture kit"\n\n[[files]]\ninclude = "**"\nrole = "engine"\n\n[adopt]\nargv = []\nmutates_index = false\n' > "$d/${PFX}demo/kit.toml"
   printf '%s\n' "$2" > "$d/${PFX}demo/README.md"
   # TWO carrying files, not one, and the reason is an arm rather than symmetry: the UNRECORDED arm
   # drops ONE row and needs what is left to be non-empty, because the `-s` guard treats an emptied
@@ -290,21 +290,24 @@ rm -f "$M/${PFX}install-prefix-carried.txt"
 carried_arm "a MISSING ratchet reds rather than passing" "run --write-ratchet once" 1 "$M"
 
 # --- D3: a DEAD derivation must not write an empty ratchet at exit 0 ---------------------------
-# The producer is stubbed by removing the resolver the arm requires, which is the reachable
-# real-world shape: a kit source whose python cannot be resolved. Without a liveness assertion the
-# gate wrote 0 rows, exited 0, and the next --check compared empty against empty forever.
+# The producer is stubbed by naming a python that does not run, which is the reachable real-world
+# shape: a kit source whose python cannot be resolved. Without a liveness assertion the gate wrote 0
+# rows, exited 0, and the next --check compared empty against empty forever. TOOL-aRepatriatedFork-46:
+# the gate carries its resolver inline, so the stub is a PATH whose three launcher names all exit
+# 9009, first on PATH, rather than a replaced resolver file beside it.
 D="$TMP/src-dead"; mkfix_source "$D" 'The engine lives at '"${PFX}demo/thing.sh"' in this repo.'
 (cd "$D" && bash "$GATE_REL" --write-ratchet >/dev/null 2>&1)
 git -C "$D" add -A >/dev/null 2>&1
-printf 'resolve_python() { echo /nonexistent/python-xyzzy; }\n' > "$D/${PFX}lib/resolve-python.sh"
-dout=$(cd "$D" && bash "$GATE_REL" --write-ratchet 2>&1); drc=$?
+mkdir -p "$TMP/nopy"
+for _np in python3 python py; do printf '#!/usr/bin/env bash\nexit 9009\n' > "$TMP/nopy/$_np"; chmod +x "$TMP/nopy/$_np"; done
+dout=$(cd "$D" && PATH="$TMP/nopy:$PATH" bash "$GATE_REL" --write-ratchet 2>&1); drc=$?
 if [ "$drc" = 0 ] && [ ! -s "$D/${PFX}install-prefix-carried.txt" ]; then
   bad "D3: a dead derivation truncated the ratchet to zero rows and exited 0"
 else
   good "D3 a dead derivation does not write an empty ratchet at exit 0"
   CARRIED_ARMS=$((CARRIED_ARMS+1))
 fi
-dout2=$(cd "$D" && bash "$GATE_REL" 2>&1); drc2=$?
+dout2=$(cd "$D" && PATH="$TMP/nopy:$PATH" bash "$GATE_REL" 2>&1); drc2=$?
 if [ "$drc2" = 0 ]; then
   bad "D3: --check passed while the population derivation was dead"
 else
@@ -476,12 +479,12 @@ run_arm "S1 ...and the same sidecar at the declared prefix is clean" "no undecla
 # `vendor/gov/` enumerates `vendor/gov/*/` and a fixture that left its kits under `<prefix>/` handed it
 # an empty population — the refusal, not a verdict. Two segments on purpose: one segment is the
 # shape the walk was first written for and would not have caught the pinned field.
-# TOOL-aRepatriatedFork-16 S5: the registry STAYS at the kit-source layout — that is what makes the
-# fixture a kit source — and only the kit and the gate's sidecars move, with the descriptor's home.
+# TOOL-aRepatriatedFork-46: govkit and the library move WITH it. The gate finds govkit through the
+# sibling-kit resolver beside its own directory, and govkit reads a descriptor's home relative to the
+# tool root it sits in, so a registry left at the old layout is a consumer's tree to both.
 P="$TMP/prefix"; mkfix "$P" 'Run `bash memory-tree/check-memory-hygiene.sh` to lint.'   # gov:root-fixture — the fixture's own hit, waived below
 mkdir -p "$P/vendor/gov"
-(cd "$P/${PFX}" && git mv memory-tree install-prefix-waivers.txt install-prefix-carried.txt "${GATE##*/}" ../vendor/gov/)
-sed -i 's#^home = .*#home = "vendor/gov/memory-tree"#' "$P/mt.kit.toml"
+(cd "$P/${PFX}" && git mv memory-tree govkit lib install-prefix-waivers.txt install-prefix-carried.txt "${GATE##*/}" ../vendor/gov/)
 printf 'vendor/gov/memory-tree/README.md:1  the fixture hit this arm waives\n' > "$P/vendor/gov/install-prefix-waivers.txt"
 git -C "$P" add -A >/dev/null 2>&1
 write_ban_list "$P" "vendor/gov/${GATE##*/}"
@@ -651,25 +654,47 @@ for _site in 'gd.resolve() / "codebase-map" / "reinvention-backlog.md"' 'common 
   else bad "AC5 census homonym GONE, so its arm matches nothing: $_site"; fi
 done
 
-# AC8 — a counter that DIES refuses. The resolver hands the gate a wrapper that runs python for
-# everything but the ban's counter, so arms 1 and 3 stay alive and only the counter is dead.
+# AC8 — a counter that DIES refuses. GOV_PYTHON hands the gate's inline resolver a wrapper that runs
+# python for everything but the ban's counter, so arms 1 and 3 stay alive and only the counter is dead.
 A8="$TMP/e5-deadcounter"; mkfix_source "$A8" 'The engine lives at '"${PFX}demo/thing.sh"' in this repo.'
 (cd "$A8" && bash "$GATE_REL" --write-ratchet >/dev/null 2>&1); git -C "$A8" add -A >/dev/null 2>&1
 _realpy=$(. "$ROOT/${PFX}lib/resolve-python.sh" && resolve_python)
 printf '#!/usr/bin/env bash\ncase "${2:-}" in *"the ban'"'"'s counter"*) exit 3 ;; esac\nexec "%s" "$@"\n' "$_realpy" > "$A8/pywrap.sh"
 chmod +x "$A8/pywrap.sh"
-printf 'resolve_python() { echo "%s/pywrap.sh"; }\n' "$A8" > "$A8/${PFX}lib/resolve-python.sh"
-a8out=$(cd "$A8" && bash "$GATE_REL" --write-ratchet 2>&1); a8rc=$?
+a8out=$(cd "$A8" && GOV_PYTHON="$A8/pywrap.sh" bash "$GATE_REL" --write-ratchet 2>&1); a8rc=$?
 if [ "$a8rc" != 0 ] && [ -s "$A8/${PFX}install-prefix-carried.txt" ]; then
   case "$a8out" in *"COUNTER died"*) good "AC8 a dead counter REFUSES to write and names itself"; CARRIED_ARMS=$((CARRIED_ARMS+1)) ;;
     *) bad "AC8 a dead counter refused, but for another reason: $(printf '%s' "$a8out" | head -2)" ;; esac
 else
   bad "AC8 a dead counter wrote the ban list (rc $a8rc) — zero rows read as zero literals"
 fi
-a8out=$(cd "$A8" && bash "$GATE_REL" 2>&1); a8rc=$?
+a8out=$(cd "$A8" && GOV_PYTHON="$A8/pywrap.sh" bash "$GATE_REL" 2>&1); a8rc=$?
 case "$a8rc:$a8out" in 0:*) bad "AC8 --check passed with a dead counter" ;;
   *"COUNTER died"*) good "AC8 ...and --check reds on it" ;;
   *) bad "AC8 --check redded, but not on the counter: $(printf '%s' "$a8out" | tail -2)" ;; esac
+
+# ==================== TOOL-aRepatriatedFork-46 — EPOCH 6, HOMONYMS AND BRACES ===================
+# Every arm here was run RED against the epoch-5 gate first and is recorded in the unit's acceptance
+# ledger. One file per rule, each carrying the shapes that must NOT count beside one control that
+# must, so a row of 1 is the control and a missing row means the file was never read.
+# S1 — a quoted kit segment after a quoted literal and a comma is a path only inside a path join.
+E6A="$TMP/e6-homonyms"; mkfix_source "$E6A" 'A demo kit.'
+printf '%s\n' 'import os' 'run("plan", "--kits", "demo")' 'x = ["bin", "demo"]' \
+  'cfg = {"matcher": "a", "demo": []}' 'w = os.path.join(w, "scripts", "demo")' > "$E6A/${PFX}demo/e6-homonyms.py"
+git -C "$E6A" add -A >/dev/null 2>&1
+check_ban_row "E6 S1 an argv, a list member and a JSON key count nothing; the path join counts one" \
+  "$E6A" "${PFX}demo/e6-homonyms.py${T}1${T}demo"
+# S2 — a brace that is not a render token hides no kit name, in shell or in a Python f-string.
+E6B="$TMP/e6-braces"; mkfix_source "$E6B" 'A demo kit.'
+printf '%s\n' 'bash "$ROOT/${PFX}demo/thing.sh"' > "$E6B/${PFX}demo/e6-brace.sh"
+printf '%s\n' 'p = f"{PFX}demo/thing.py"' > "$E6B/${PFX}demo/e6-fstring.py"
+printf '%s\n' '{prefix}/demo/thing.sh' '{{TOOL_ROOT}}demo/thing.sh' '<prefix>/demo/thing.sh' \
+  '<tool-root>/demo/thing.sh' 'and the control, {PFX}demo/thing.sh' > "$E6B/${PFX}demo/e6-drained.md"
+git -C "$E6B" add -A >/dev/null 2>&1
+check_ban_row 'E6 S2 a ${PFX}-led kit path counts' "$E6B" "${PFX}demo/e6-brace.sh${T}1${T}demo"
+check_ban_row 'E6 S2 a {PFX}-led kit path in an f-string counts' "$E6B" "${PFX}demo/e6-fstring.py${T}1${T}demo"
+check_ban_row "E6 S2 the four drained tokens count nothing; the control counts one" \
+  "$E6B" "${PFX}demo/e6-drained.md${T}1${T}demo"
 
 # ==================== TOOL-aRepatriatedFork-2 S8 — ARM 3, RUNTIME LITERALS =====================
 # Three fixtures over one mechanism: an argv spelled `$ROOT/` plus gov's prefix (P1's `$VAR/` lead,
@@ -729,7 +754,7 @@ fi
 # A self-test whose every fixture takes one branch is `fixture-passes-by-finding-nothing` applied to
 # the grader, and it needs the same treatment as any other probe that cannot move. This is the arm
 # that reds if someone re-breaks `mkfix_source` and every carried arm silently goes back to SKIPPED.
-if [ "$CARRIED_ARMS" -ge 5 ]; then
+if [ "$CARRIED_ARMS" -ge 9 ]; then
   good "LIVENESS $CARRIED_ARMS arm(s) actually engaged the carried-prefix branch"
 else
   bad "LIVENESS only $CARRIED_ARMS arm(s) reached the carried-prefix branch — the rest SKIPPED, so this suite is grading one arm and reporting on two"
