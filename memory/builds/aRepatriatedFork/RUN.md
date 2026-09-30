@@ -102,3 +102,5 @@ base: d6e1749c0542218004260928f1399174daafb789
 2026-09-30T14:49:26Z dispatch · item 9b03d78a TOOL-aRepatriatedFork-30 · reason tools .githooks skills .gitattributes .lexicon.conf WIRE-INTO-PROJECT.md memory/project/testsuite-count-waivers.txt memory/builds/aRepatriatedFork/spec/2026-09-25-spec-TOOL-aRepatriatedFork-30.md memory/builds/aRepatriatedFork/build memory/builds/aRepatriatedFork/README.md memory/map memory/guides memory/HYGIENE.md memory/TEMPLATE-SPEC.md .claude/skills
 
 2026-09-30T15:50:56Z decision · item Deleting the carried install-prefix ledger left another build's live spec (TOOL-dPolishedVitrine-1 AC7, node d) citing it; the run added one row to memory/project/spec-token-waivers.txt, a registry documented as shrink-only (22 -> 23). Keep the row, or amend that AC? · reason Options seen: (a) the waiver row with its reason, reversible; (b) amend node d's in-progress spec, which is not this run's record to edit. The row is a documented-rule rise with no balancing fall, so it is surfaced rather than decided.
+
+2026-09-30T16:06:59Z review · item aRepatriatedFork · reason verdict BLOCKED · blockers 1
