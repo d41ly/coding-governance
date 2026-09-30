@@ -10,7 +10,9 @@
 # tracked sources, which carry placeholders permanently and by design — a leg that did would red on
 # its own landing commit.
 set -u
-git rev-parse --show-toplevel >/dev/null || exit 2
+# ROOT stays: the tracked charter template the survival arm reads sits at the REPO root, which no
+# install prefix moves. Dropping it with the gate's prefix left that arm on an unbound variable.
+ROOT="$(git rev-parse --show-toplevel)" || exit 2
 # The gate sits BESIDE this suite at every prefix, so it is found from here (TOOL-aRepatriatedFork-24
 # S5). It was spelled under gov's prefix, which at any other install named a gate that is not there.
 GATE="$(cd "$(dirname "$0")" && pwd)/check-placeholders.sh"
