@@ -225,7 +225,7 @@ why = "the red/green self-test for the above, which is itself an exemption. Exem
 [[exempt]]
 path = "{prefix}/check-dead-paths.sh"
 why = """
-gates gov's OWN corpus against gov's OWN deletion history. The needle set is derived from `git log --diff-filter=D` over this repo, and the anti-vacuity guard is a FROZEN SENTINEL naming a basename this repo deleted at 5b00666 — in a target tree that name was never present, so the sentinel could not resolve and the leg would red on install day. That is the exact defect the closing review filed against three other new gates; shipping this one would repeat it. An adopter who wants the class authors their own sentinel from their own deletion history.
+gates gov's OWN corpus against gov's OWN deletion and rename history. The needle set is derived from `git log --diff-filter=D` over this repo, plus the source of every `--diff-filter=R` row outside memory/ (TOOL-aRepatriatedFork-45), and each half's anti-vacuity guard is a FROZEN SENTINEL naming a basename this repo deleted or renamed away at 5b00666 — in a target tree neither name was ever present, so neither sentinel could resolve and the leg would red on install day. That is the exact defect the closing review filed against three other new gates; shipping this one would repeat it. An adopter who wants the class authors their own sentinels from their own deletion and rename history.
 """
 
 [[exempt]]
