@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-24 — no line that executes strands an adopter at another prefix
 
-**Status:** CLOSED · rev-3 · 2026-09-29 · node a · Tier-2 · base 2143b6d6 · streams tooling · order 9
+**Status:** CLOSED · rev-4 · 2026-09-30 · node a · Tier-2 · base 2143b6d6 · streams tooling · order 9
 
 <!-- gen:spec-records -->
 
@@ -55,6 +55,13 @@ stamped at adopt time; none keeps a `tools`, `scripts` or root candidate list.
     tracked where the ladder does not reach keeps the existing manifest refusal, which now also
     covers a miss. The hook's own fixtures that lay kits at `scripts/` declare that root in a
     committed `gate-env.sh`, and the one that tracks a manifest at `tools/` moves it to the root.
+  - **S2c (rev-4)** — The closing review's B1. The receipt rung made the default bar whatever
+    runner an untracked or modified `.governance/install.json` named, and nothing vetted that
+    runner either. On a default-branch push the hook now vets the receipt with the predicate it
+    already applies to `gate-env.sh`: tracked at the pushed sha, working copy hashing to that
+    blob. The default bar's resolved runner takes the same predicate. One function carries it for
+    all three files, and a failure is `bar-refused` before any forcing predicate reads the kit
+    root. A row under `.git/` names a path git cannot track, so it falls to the same refusal.
 - **S3** — `adopt-unattended.sh` stamps `LANDER`, `GATE_CMD`, `WIRING_CHECK` and
   `GENERATED_INDEXES` in the seeded `.unattended.conf` with the adopt-time kit root. This is the
   `MAP_DIFF_CMD` mechanism `adopt-codebase-map.sh:116-131` already uses. The example's four values
@@ -83,6 +90,10 @@ stamped at adopt time; none keeps a `tools`, `scripts` or root candidate list.
 - **S7** — govkit's `foreign_kit_present` (`tools/govkit/govkit.py:5415`) probes the intake's own
   prefix instead of the pair `("tools", "")`. The `sentinel =` lines it reads become kit-relative:
   two kit descriptors and five `tools/govkit/entries/` descriptors. Observed by AC8.
+  - **S7b (rev-4)** — The closing review's M5. S7a dropped the old pair's `tools` probe, so a
+    hand-copied kit at gov's canonical prefix was not detected under an intake that declares
+    another prefix, and `apply` installed a second copy. The probe takes the union: the target's own
+    ctx, gov's canonical ctx from `canonical_ctx`, and the root.
   - **S7a (rev-3)** — Each entry is probed at its own `target_context`: the intake's prefix, with
     any per-entry override, and then at the root, which the old pair also covered. A `sentinel` is
     relative to the entry's home, meaning the kit dir, or the prefix for a flat entry.
@@ -228,6 +239,17 @@ rev-3 adds `.githooks/pre-commit.test.sh` · `.githooks/pre-push.test.sh` ·
 - **AC10** — `bash tools/check-kit-versions.sh` exits 0, and `python tools/govkit/govkit.py epoch
   --base 2143b6d6` names no kit this unit moved.
   Red when: a moved kit's carrier was missed.
+- **AC11** — rev-4. In `.githooks/pre-push.test.sh`, a fixture whose tracked root runner exits 1
+  pushes the default bar three ways: with an ignored `.governance/install.json` naming a runner
+  under `.git/` beside a planted manifest, with that receipt tracked, and with a tracked receipt
+  naming the tracked runner and then modified. The first two and the last are refused as
+  `bar-refused` before the planted runner runs. The third reaches the tracked runner and is
+  refused as `gate-red`.
+  Red when: any push lands, or the planted runner prints. The `7de665e5` hook lands the first two.
+- **AC12** — rev-4. A `tools/govkit/selftest.py` arm runs `apply` against a target whose
+  `deploy.toml` declares `prefix = "scripts"` and which carries a foreign kit at gov's canonical
+  prefix. `foreign_kit_present` names it and `apply` refuses before writing a receipt.
+  Red when: the apply exits 0, which is the `7de665e5` behaviour.
 
 ## 7. Gates
 
@@ -243,6 +265,10 @@ New arm: `.githooks/pre-push.test.sh` · a `vendor/gov/` fixture whose default b
 New arm: `tools/unattended/unattended.test.sh` · a `GENERATED_INDEXES` generator spelled at a prefix the fixture does not have, still refusing its pairing · none
 
 New arm: `tools/unattended/adopt-unattended.test.sh` · a copied example conf stamped at the adopter's own tool root, and `--check` refusing an unstamped one · none
+
+New arm: `.githooks/pre-push.test.sh` · rev-4: an ignored receipt, a tracked receipt naming an untracked runner, and a modified receipt, each refused as bar-refused, beside a tracked-receipt control · none
+
+New arm: `tools/govkit/selftest.py` · rev-4: a foreign kit at gov's canonical prefix under a `scripts` intake · none
 
 ## 8. Open questions
 
@@ -274,6 +300,10 @@ New arm: `tools/unattended/adopt-unattended.test.sh` · a copied example conf st
   because the memory-tree kit may sit flat, and the adopter stamps a copied conf rather than seeding
   one. S4a: both keys are kept. S7a: the probe is per entry. S8a: the manifest checker gets a
   tracked-reader rung, and a fifth waiver row goes. Five suites join the files touched.
+- rev-4 · 2026-09-30 · closing review round 1 fold: B1 — the default bar follows only a receipt
+  and a runner the repository tracks unmodified, vetted as `gate-env.sh` is (S2c, AC11).
+  closing review round 1 fold: M5 — the foreign-kit probe keeps gov's canonical prefix beside the
+  target's own and the root (S7b, AC12).
 
 ## 10. Reuse audit
 
