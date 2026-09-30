@@ -94,7 +94,7 @@ def resolve_kit_dir(home, anchor, here):
     """
     import json
     import pathlib
-    here = pathlib.Path(here).resolve()
+    here = pathlib.Path(here).absolute()  # never resolve(): a junction must not move it
     root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
     receipt = root / ".governance" / "install.json"
     try:
@@ -106,8 +106,8 @@ def resolve_kit_dir(home, anchor, here):
             continue
         if str(row.get("source") or "").split("/")[-2:] != [home, anchor]:
             continue
-        hit = (root / str(row["path"])).resolve()
-        if hit.is_file() and root in hit.parents:
+        hit = (root / str(row["path"])).absolute()
+        if hit.is_file() and root in hit.parents and ".." not in hit.parts:
             return hit.parent
     probes = (here / home, here.parent / home)
     for cand in probes:
@@ -150,8 +150,15 @@ seed() { # dir  -> a git repo carrying the kit, a conf, and a TRACKED memory-tre
   # The Skill's bug-class checklist names the memory-tree kit's `gotchas.py`, and the adopter PROBES
   # the tracked tree for it and refuses when it finds none. Seeded NESTED, the default layout; the
   # flat, absent and override arms below each move it deliberately.
-  mkdir -p "$1/${TR_T}memory-tree" && printf '# a stub checklist\n' > "$1/${TR_T}${MT_KIT}/gotchas.py"
-  ( cd "$1" && git add -- "${TR_T}${MT_KIT}/gotchas.py" )
+  # The memory-tree kit's name in THIS install. stall-recorder and stop-guard borrow this function
+  # by eval and never run the prologue that sets MT_KIT, so under `set -u` the seed died silently.
+  local _mt="${MT_KIT:-}"
+  if [ -z "$_mt" ]; then
+    _mt=$(resolve_kit_dir "$TESTPY" memory-tree gotchas.py "$HERE") || return 2
+    _mt=${_mt##*/}
+  fi
+  mkdir -p "$1/${TR_T}${_mt}" && printf '# a stub checklist\n' > "$1/${TR_T}${_mt}/gotchas.py"
+  ( cd "$1" && git add -- "${TR_T}${_mt}/gotchas.py" )
   # BOTH SIDES ADDED A FILE HERE: main the playbook template, this branch the kit library. A fixture
   # missing either materialises a kit that cannot run, so the union is the only correct resolution.
   # EVERY TEMPLATE THE KIT SHIPS, BY GLOB. This line named three and the adopter grew two more — the
