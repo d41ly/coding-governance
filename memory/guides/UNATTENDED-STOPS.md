@@ -185,13 +185,15 @@ announced, and declines the take-over.
 | working, clock fresh or unknown | no id | the status block, then check 59 |
 | working, clock stale | an id, or none | `presumed-stopped`, announced: take-over; no id, the status block then check 59 |
 
-The no-id rows print the `--status` block FIRST, so a session regrounding by the build method's
-no-id spelling reads its phase and witness before it is told to pass the keepalive id its own
-scheduler lists. The re-bind stays uncommitted, since a commit would move HEAD off the pushed
-tip: a difference confined to the six lease-fact lines reads as none to the landing commit and to
-`--landed`'s `primary` clean check, and to no other clean check. `presumed-stopped` is ANNOUNCED,
-never a refusal. The run's branch is `run-branch`, else `branch-ref`, and git checks a branch out in
-one worktree at most; a record naming neither is graded where it is read.
+The no-id rows print the `--status` block FIRST, so any caller that spells `--resume` without an id
+reads its phase and witness before it is told to pass the keepalive id its own scheduler lists.
+`--status` carries the verdicts those rows reach first, the holder worktree of check 58 and the
+pinned `asks:` line of check 73, as fields on its one line, pass included, so a session regrounding
+with `--status` loses neither. The re-bind stays uncommitted, since a commit would move HEAD off the
+pushed tip: a difference confined to the six lease-fact lines reads as none to the landing commit
+and to `--landed`'s `primary` clean check, and to no other clean check. `presumed-stopped` is
+ANNOUNCED, never a refusal. The run's branch is `run-branch`, else `branch-ref`, and git checks a
+branch out in one worktree at most; a record naming neither is graded where it is read.
 
 ## 9. The take-over
 

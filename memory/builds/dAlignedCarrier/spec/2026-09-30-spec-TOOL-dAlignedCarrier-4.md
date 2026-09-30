@@ -1,11 +1,12 @@
 # TOOL-dAlignedCarrier-4 — `--status` reports the holder-worktree and pinned-asks verdicts, read-only
 
-**Status:** SPECCED · rev-2 · 2026-09-30 · node d · Tier-2 · base 87c245b3 · streams tooling · order 1 · advances TOOL-dDerivedDocket-72 · ratified 2026-09-30
+**Status:** CLOSED · rev-3 · 2026-09-30 · node d · Tier-2 · base 87c245b3 · streams tooling · order 1 · advances TOOL-dDerivedDocket-72 · ratified 2026-09-30
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-30-build-TOOL-dAlignedCarrier-4-1-acceptance-ledger.md](../build/2026-09-30-build-TOOL-dAlignedCarrier-4-1-acceptance-ledger.md) | journal | — |
 | [2026-09-30-prompt-TOOL-dAlignedCarrier-1-build-brief.md](../prompts/2026-09-30-prompt-TOOL-dAlignedCarrier-1-build-brief.md) | journal | TOOL-dAlignedCarrier-1 TOOL-dAlignedCarrier-2 TOOL-dAlignedCarrier-3 TOOL-dAlignedCarrier-5 TOOL-dAlignedCarrier-6 |
 | [2026-09-30-prompt-TOOL-dAlignedCarrier-1-spec-brief.md](../prompts/2026-09-30-prompt-TOOL-dAlignedCarrier-1-spec-brief.md) | journal | TOOL-dAlignedCarrier-1 TOOL-dAlignedCarrier-2 TOOL-dAlignedCarrier-3 TOOL-dAlignedCarrier-5 TOOL-dAlignedCarrier-6 |
 
@@ -73,8 +74,9 @@ regrounding follows it. Pointing the build method at `--status` is unit 5's.
 Files shared with a sibling, which are not edges. `tools/unattended/unattended.sh` is also written by
 units 1, 3 and 6; this unit touches `check_asks_pinned`, `verb_status`, `check_holder_worktree` and
 the comment above `verb_resume`, and nothing in the regions they own. `tools/unattended/unattended.test.sh`
-is also written by units 3 and 6; this unit appends a new arm region. The stop contract's template
-and render are this unit's alone.
+is also written by units 3 and 6; this unit adds a new arm block of its own in region two, directly
+after the ask-mandate block whose `tAskA` fixture it reads. The stop contract's template and render
+are this unit's alone.
 
 - **hands-off** `TOOL-dAlignedCarrier-5` — BUILD-METHOD M7 step 1 names `--status` for regrounding
   under a mandate; this unit makes that verb carry the two verdicts a no-id resume reached first.
@@ -237,6 +239,11 @@ New arm: `tools/unattended/unattended.test.sh` · fixtures with a moved asks lin
 - rev-2 · 2026-09-30 · §6 · AC3 · the M2 cross-read found AC3's "from the linked worktree the field is
   absent" contradicting S3 and AC1, which print the verdict on a pass, and unit 5's AC5, which reads
   `worktree holds the run` in the holder worktree. AC3 now names that pass verdict.
+- rev-3 · 2026-09-30 · §3 Edges · the build pass. The arms are a new `in_shard 2` block placed after
+  the ask-mandate block rather than appended at the end of the file: `tAskA` is the one fixture that
+  pins `asks`, and the block reads it where that block leaves it and restores it with `askreset`.
+  No acceptance criterion moved. The suite's `--status` arms were read for literal comparisons as
+  §5 asks and none compares a lease-carrying line with a literal, so none was amended.
 
 ## 10. Reuse audit
 

@@ -9598,6 +9598,99 @@ AC15IDL
 fi
 askreset
 
+fi   # ---- region two continues below: one compound block past about 3000 commands segfaults
+     # ---- bash 5.3 on Cygwin (exit 139), so the region is cut into blocks at top-level seams
+if in_shard 2; then
+
+# ==================================================================================================
+# TOOL-dAlignedCarrier-4 — `--status` REPORTS THE TWO CHECKS A NO-ID `--resume` REACHES FIRST.
+# Check 73's pinned `asks:` line and check 58's holder worktree ride the ONE status line as fields,
+# pass included, on exactly the records whose `--resume` would run each check, and nothing prints
+# where neither runs. The verb stays read-only: no fact written, nothing staged, no `fail`, exit 0
+# whatever either field reads. `tAskA` is the fixture because it is the one that pins `asks`, and the
+# linked worktree is TOOL-dDerivedDocket-62's wave. Every arm restores what it changed, and the block
+# ends on `askreset`, so the asks-disposed fixture below starts from the tree it always did.
+# WRITTEN AND NOT RUN at the unit's own pass: dAlignedCarrier's landing waived the kit's own suites,
+# so the close bar is the first run of these arms.
+# ==================================================================================================
+askmode ok; askrows ''
+run --preflight tAskA --keepalive-id KA-1 >/dev/null
+git add -A >/dev/null; git commit -q -m pinned --no-verify
+# ---- a passing record: both verdicts print on the one line, asks first. RED against a driver that
+# ---- prints a verdict only when it fails, the verb's older field rule.
+check_status_one_line tAskA > "$ORIGIN_DIR/dac4.line"
+dac4=$(cat "$ORIGIN_DIR/dac4.line")
+hit  "$dac4" " · asks as pinned · worktree holds the run"
+miss "$dac4" "asks moved at HEAD"
+miss "$dac4" "worktree not the run"
+miss "$dac4" "worktree unanswerable"
+# ---- ...read-only: the tree, the record's bytes and the exit status are the verb's own.
+dac4_st=$(git status --porcelain); dac4_rh=$(git hash-object memory/builds/tAskA/RUN.md)
+out=$(bash "$SCRIPT" --status tAskA 2>&1); rc=$?
+same "dAlignedCarrier-4 the passing report exits 0" "$rc" "0"
+miss "$out" "FAILED"
+same "dAlignedCarrier-4 the passing report writes and stages nothing" "$(git status --porcelain)" "$dac4_st"
+same "dAlignedCarrier-4 ...and leaves the record's bytes" "$(git hash-object memory/builds/tAskA/RUN.md)" "$dac4_rh"
+# ---- a record on which neither check runs, no `asks` and no `lease-utc`, prints the line the
+# ---- passing one prints with the two fields cut out. RED against a field printed unconditionally.
+sed -i '/^asks: /d; /^lease-utc: /d' memory/builds/tAskA/RUN.md
+out=$(bash "$SCRIPT" --status tAskA 2>/dev/null | sed -n '/· next /p')
+same "dAlignedCarrier-4 neither check runs, so the line gains no byte" "$out" "$(printf '%s\n' "$dac4" | sed 's/ · asks as pinned · worktree holds the run//')"
+git checkout -q -- memory/builds/tAskA/RUN.md
+
+# ---- the asks line moved at HEAD: the field names both values, and the no-id resume refuses at 73.
+# ---- RED against a report that reads a different predicate from the refusal.
+mutate memory/builds/tAskA/README.md 's/^asks: EXMP-aFoo-3\.\.4$/asks: EXMP-aFoo-3/'
+git add -A >/dev/null; git commit -q -m moved --no-verify
+dac4_st=$(git status --porcelain); dac4_rh=$(git hash-object memory/builds/tAskA/RUN.md)
+out=$(bash "$SCRIPT" --status tAskA 2>&1); rc=$?
+hit  "$out" " · asks moved at HEAD, check 73 refuses a resume: pinned [EXMP-aFoo-3..4] at HEAD [EXMP-aFoo-3]"
+miss "$out" "asks as pinned"
+miss "$out" "FAILED"
+same "dAlignedCarrier-4 the moved report exits 0" "$rc" "0"
+same "dAlignedCarrier-4 the moved report writes and stages nothing" "$(git status --porcelain)" "$dac4_st"
+same "dAlignedCarrier-4 ...and leaves the record's bytes" "$(git hash-object memory/builds/tAskA/RUN.md)" "$dac4_rh"
+check_status_one_line tAskA > "$ORIGIN_DIR/dac4.line"
+hit  "$(run --resume tAskA)" "UNATTENDED check 73 FAILED"
+git reset -q --hard HEAD~1
+
+# ---- a worktree that does not hold the run: from the wave, the field names the run worktree's path
+# ---- and the no-id resume there refuses at 58; the run worktree still reads the pass.
+add_wave_worktree
+dac4_st=$(git -C "$G62_W" status --porcelain); dac4_rh=$(git -C "$G62_W" hash-object memory/builds/tAskA/RUN.md)
+out=$(run_wave --status tAskA); rc=$?
+hit  "$out" " · worktree not the run's, check 58 refuses a resume here: $G62_MAIN"
+miss "$out" "worktree holds the run"
+miss "$out" "FAILED"
+same "dAlignedCarrier-4 the wrong-worktree report exits 0" "$rc" "0"
+same "dAlignedCarrier-4 the wrong-worktree report writes and stages nothing" "$(git -C "$G62_W" status --porcelain)" "$dac4_st"
+same "dAlignedCarrier-4 ...and leaves that worktree's record" "$(git -C "$G62_W" hash-object memory/builds/tAskA/RUN.md)" "$dac4_rh"
+hit  "$(run_wave --resume tAskA)" "UNATTENDED check 58 FAILED"
+hit  "$(run --status tAskA)" " · worktree holds the run"
+remove_wave_worktree
+
+# ---- a record naming no run branch: the field says the verdict is unanswerable, which `--resume`
+# ---- announces and passes rather than refusing at 58.
+sed -i '/^run-branch: /d; /^branch-ref: /d' memory/builds/tAskA/RUN.md; fixture
+out=$(run --status tAskA)
+hit  "$out" " · worktree unanswerable, the record names no run branch"
+miss "$out" "worktree holds the run"
+out=$(run --resume tAskA)
+hit  "$out" "this record names no run branch (neither run-branch nor branch-ref)"
+miss "$out" "UNATTENDED check 58"
+git reset -q --hard HEAD~1
+
+# ---- a record carrying no `lease-utc`: `--resume` never reaches check 58, so no worktree field.
+sed -i '/^lease-utc: /d' memory/builds/tAskA/RUN.md; fixture
+out=$(run --status tAskA)
+hit  "$out" " · asks as pinned"
+miss "$out" "worktree holds the run"
+miss "$out" "worktree not the run"
+miss "$out" "worktree unanswerable"
+git reset -q --hard HEAD~1
+rm -f "$ORIGIN_DIR/dac4.line"
+askreset
+
 
 # ============================== TOOL-dDerivedDocket-17 — asks-disposed AND THE FREEZE ============
 # Every term of the new Definition-of-Done item, one fixture each, plus the override, plus the

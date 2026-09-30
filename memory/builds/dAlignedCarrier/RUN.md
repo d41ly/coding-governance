@@ -57,3 +57,7 @@ base: 87c245b3e950cbf7bc46b8216db8b4e4fba253dd
 2026-09-30T16:36:14Z dispatch · item d9db9987 TOOL-dAlignedCarrier-3 · reason tools/unattended/unattended.sh tools/unattended/SKILL.template.md .claude/skills/unattended/SKILL.md tools/unattended/PROTOCOL.template.md memory/guides/UNATTENDED-PROTOCOL.md tools/unattended/unattended.test.sh tools/unattended/check-unattended.test.sh memory/builds/dAlignedCarrier/spec/2026-09-30-spec-TOOL-dAlignedCarrier-3.md memory/builds/dAlignedCarrier/build/2026-09-30-build-TOOL-dAlignedCarrier-3-1-acceptance-ledger.md memory/builds/dAlignedCarrier/README.md memory/backlog/TOOL.md
 
 2026-09-30T16:36:18Z brief · item TOOL-dAlignedCarrier-3 · reason f0e8b2c472e7 memory/builds/dAlignedCarrier/prompts/2026-09-30-prompt-TOOL-dAlignedCarrier-1-build-brief.md
+
+2026-09-30T17:04:00Z dispatch · item 683c7c4f TOOL-dAlignedCarrier-4 · reason tools/unattended/unattended.sh tools/unattended/STOPS.template.md memory/guides/UNATTENDED-STOPS.md tools/unattended/unattended.test.sh memory/builds/dAlignedCarrier/spec/2026-09-30-spec-TOOL-dAlignedCarrier-4.md memory/builds/dAlignedCarrier/build/2026-09-30-build-TOOL-dAlignedCarrier-4-1-acceptance-ledger.md memory/builds/dAlignedCarrier/README.md memory/backlog/TOOL.md
+
+2026-09-30T17:04:04Z brief · item TOOL-dAlignedCarrier-4 · reason f0e8b2c472e7 memory/builds/dAlignedCarrier/prompts/2026-09-30-prompt-TOOL-dAlignedCarrier-1-build-brief.md

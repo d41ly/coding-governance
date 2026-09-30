@@ -3560,14 +3560,25 @@ check_filing_home() { # slug -> 1 and a printed refusal when the slug names a fi
 #
 # READ AT HEAD, which is what the property says and what a run can actually edit. A README absent at
 # HEAD reads as an EMPTY line and differs, which is this same refusal rather than a second branch.
+#
+# THE COMPARISON IS ITS OWN PREDICATE (TOOL-dAlignedCarrier-4 S1), so check 73 and `--status`'s
+# report of it read ONE answer. It prints nothing and calls no `fail`: `fail` records its check number
+# on the run journal's END line, and a read verb reporting the verdict must not. 0 = the two differ ·
+# 1 = they agree, or nothing is pinned. `AM_PIN` is the pinned value, empty when nothing is pinned, so
+# a reporter tells "agrees" from "never asked"; `AM_NOW` is the value at HEAD, set only when read.
+AM_PIN=""; AM_NOW=""
+check_asks_moved() { # slug · run-state file -> 0 when the asks: line at HEAD is not the pinned one; AM_PIN, AM_NOW
+  AM_PIN=""; AM_NOW=""
+  [ -f "$2" ] || return 1
+  AM_PIN=$(fact "$2" asks 2>/dev/null)
+  [ -n "$AM_PIN" ] || return 1
+  AM_NOW=$(read_asks_key "$(GIT show "HEAD:$(readme_of "$1")" 2>/dev/null)")
+  [ "$AM_PIN" != "$AM_NOW" ] || return 1
+  return 0
+}
 check_asks_pinned() { # slug · run-state file -> 1 with its own refusal printed
-  local _pin _now
-  [ -f "$2" ] || return 0
-  _pin=$(fact "$2" asks 2>/dev/null)
-  [ -n "$_pin" ] || return 0
-  _now=$(read_asks_key "$(GIT show "HEAD:$(readme_of "$1")" 2>/dev/null)")
-  [ "$_pin" != "$_now" ] || return 0
-  fail 73 "the build README's asks: line at HEAD is not the one this run pinned, and a run that re-read its own mandate could grow the set it is authorized for: pinned [$_pin] · at HEAD [$_now]"
+  check_asks_moved "$1" "$2" || return 0
+  fail 73 "the build README's asks: line at HEAD is not the one this run pinned, and a run that re-read its own mandate could grow the set it is authorized for: pinned [$AM_PIN] · at HEAD [$AM_NOW]"
   return 1
 }
 PF_MBASE=""; PF_ASKS_READY=""
@@ -5649,6 +5660,30 @@ BRIEFROWS
   # when there is one, each identity checked, and nothing killed — this is a read verb.
   local _orph; _orph=$(measure_orphans "$slug")
   [ "${_orph:-0}" -gt 0 ] 2>/dev/null && parked="$parked · orphans $_orph"
+  # THE TWO CHECKS A NO-ID `--resume` REACHES FIRST, REPORTED (TOOL-dAlignedCarrier-4 S3, S4): check
+  # 73's pinned-asks comparison and check 58's holder worktree, so a session regrounding with this
+  # verb loses neither. EACH PRINTS ON EXACTLY THE RECORDS WHOSE `--resume` WOULD RUN ITS CHECK, pass
+  # included — a report silent on a pass cannot be told from a verb that never asked — and a record on
+  # which neither runs prints the bytes it printed before. Asks: every record pinning `asks`, since
+  # `--resume` runs check 73 above every row. Worktree: a record carrying `lease-utc` whose phase is
+  # not terminal and which is not a LANDING the landed log observed — the rows on which `--resume`
+  # reaches check 58. READ-ONLY: both go through the predicates the refusals use, which print
+  # nothing, write nothing and call no `fail`, so this verb exits as it did whatever either reads.
+  local _hw=0
+  if check_asks_moved "$slug" "$rel"; then
+    parked="$parked · asks moved at HEAD, check 73 refuses a resume: pinned [$AM_PIN] at HEAD [$AM_NOW]"
+  elif [ -n "$AM_PIN" ]; then
+    parked="$parked · asks as pinned"
+  fi
+  if [ -n "$(fact "$rel" lease-utc)" ] && ! is_terminal "$p" \
+     && ! { [ "$p" = LANDING ] && [ -n "$DP_LANDING" ] && read_landed_observation "$slug" "$DP_LANDING"; }; then
+    resolve_holder_worktree "$rel" || _hw=$?
+    case "$_hw" in
+      0) parked="$parked · worktree holds the run" ;;
+      2) parked="$parked · worktree unanswerable, the record names no run branch" ;;
+      *) parked="$parked · worktree not the run's, check 58 refuses a resume here: $(derive_holder_where)" ;;
+    esac
+  fi
   # THE STOP-GUARD'S NEWEST LISTING, on the same rule (TOOL-aWokenSentinel-9): a FIELD on this one
   # line, printed only when the record names a keepalive id AND the sidecar holds a line, so a
   # record with nothing to report prints the bytes it printed before this unit. `present` and
@@ -6238,8 +6273,25 @@ run_takeover() { # slug · run-state file · keepalive id · held|working · pha
 # none does, else that no such branch exists here, so the remedy is one a caller can follow. A
 # record naming no branch is announced and passed: refusing it would wedge for ever the holder of a
 # run preflighted on a detached HEAD, which `check_branch` admits.
+#
+# WHERE THE RUN IS DRIVEN FROM, ONE DERIVATION (TOOL-dAlignedCarrier-4 S2): the worktree `git
+# worktree list` shows with `HW_REF` checked out, else the remedy for a branch no worktree has checked
+# out, else the remedy for a branch that does not exist here. Read after `resolve_holder_worktree`,
+# whose `HW_REF` it takes; it prints the text and writes nothing, so check 58's refusal and
+# `--status`'s report of that check name one place.
+derive_holder_where() { # (HW_REF) -> prints the holder worktree's path, or the remedy naming why there is none
+  local wp
+  wp=$(GIT worktree list --porcelain 2>/dev/null | awk -v b="branch $HW_REF" '/^worktree /{ p = substr($0, 10) } $0 == b { print p; exit }')
+  if [ -n "$wp" ]; then
+    printf '%s\n' "$wp"
+  elif GIT rev-parse --verify -q "$HW_REF" >/dev/null 2>&1; then
+    printf '%s\n' "no worktree on this node has it checked out, so check it out first"
+  else
+    printf '%s\n' "no branch of that name exists on this node, so create it at a commit that carries this record and check it out"
+  fi
+}
 check_holder_worktree() { # slug · run-state file -> 0 passes, 1 with its own refusal printed
-  local slug="$1" rel="$2" hw=0 wp where here
+  local slug="$1" rel="$2" hw=0 where here
   resolve_holder_worktree "$rel" || hw=$?
   [ "$hw" = 0 ] && return 0
   if [ "$hw" = 2 ]; then
@@ -6247,14 +6299,7 @@ check_holder_worktree() { # slug · run-state file -> 0 passes, 1 with its own r
     return 0
   fi
   if [ -z "$KID" ]; then verb_status "$slug" || true; fi
-  wp=$(GIT worktree list --porcelain 2>/dev/null | awk -v b="branch $HW_REF" '/^worktree /{ p = substr($0, 10) } $0 == b { print p; exit }')
-  if [ -n "$wp" ]; then
-    where="$wp"
-  elif GIT rev-parse --verify -q "$HW_REF" >/dev/null 2>&1; then
-    where="no worktree on this node has it checked out, so check it out first"
-  else
-    where="no branch of that name exists on this node, so create it at a commit that carries this record and check it out"
-  fi
+  where=$(derive_holder_where)
   case "$HW_HEAD" in
     detached) here="a detached HEAD" ;;
     unreadable) here="an unreadable HEAD" ;;
@@ -6267,8 +6312,10 @@ check_holder_worktree() { # slug · run-state file -> 0 passes, 1 with its own r
 # --resume IS TWO VERBS IN ONE — orientation and take-over — and the lease is what separates them.
 # The matrix it implements is in memory/guides/UNATTENDED-STOPS.md and is not restated here; what is
 # stated here is the property every row shares: a refusal happens before any write, and the rows that
-# refuse for want of an id print the --status block first, so a session regrounding by the build
-# method's no-id spelling still reads its phase and witness before it is told what to pass.
+# refuse for want of an id print the --status block first, so any caller spelling --resume without an
+# id still reads its phase and witness before it is told what to pass. --status carries the verdicts
+# those rows reach first, checks 58 and 73, as fields on its one line (TOOL-dAlignedCarrier-4), so a
+# session regrounding with --status loses neither.
 #
 # THE LEASE IS THE RUN-STATE FACTS (TOOL-dDerivedDocket-61 S7). Identity is the `keepalive` fact, or
 # the `session` fact against CLAUDE_CODE_SESSION_ID for the same-session row, whose caller is under
