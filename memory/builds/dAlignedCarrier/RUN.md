@@ -10,8 +10,8 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 
 ## Run facts
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: fd3ac307507d3474e2194e79826a4b5e2d497bc0
-phase: BUILDING
+witness: 3c45a567159e7156bd40a5189fd61c2ac3365d9a
+phase: REVIEWING
 asks-ready: TOOL-dDerivedDocket-70=yes TOOL-dDerivedDocket-71=yes TOOL-dDerivedDocket-72=yes TOOL-dDerivedDocket-73=yes TOOL-dDerivedDocket-74=yes
 asks: TOOL-dDerivedDocket-70..74
 m-base: 87c245b3e950cbf7bc46b8216db8b4e4fba253dd
@@ -73,3 +73,5 @@ base: 87c245b3e950cbf7bc46b8216db8b4e4fba253dd
 2026-09-30T17:48:44Z brief · item TOOL-dAlignedCarrier-5 · reason f0e8b2c472e7 memory/builds/dAlignedCarrier/prompts/2026-09-30-prompt-TOOL-dAlignedCarrier-1-build-brief.md
 
 2026-09-30T17:50:50Z dispatch · item 2b42d13d TOOL-dAlignedCarrier-5 · reason tools/memory-tree/BUILD-METHOD.template.md memory/guides/BUILD-METHOD.md memory/guides/SESSION-KICKOFF.md memory/builds/dAlignedCarrier/spec/2026-09-30-spec-TOOL-dAlignedCarrier-5.md memory/builds/dAlignedCarrier/build/2026-09-30-build-TOOL-dAlignedCarrier-5-1-acceptance-ledger.md memory/builds/dAlignedCarrier/README.md memory/backlog/TOOL.md memory/LIVE.md memory/ledger/2026-09.md
+
+2026-09-30T18:28:05Z review · item dAlignedCarrier · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED
