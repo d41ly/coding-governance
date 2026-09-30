@@ -34,9 +34,9 @@ case "$KIT_REL" in */*) PFX="${KIT_REL%/*}/" ;; *) PFX="" ;; esac
 ROOT=$(git -C "$HERE" rev-parse --show-toplevel 2>/dev/null) || {
   echo "extract-arms.test: not a git work tree"; exit 2; }
 cd "$ROOT" || exit 2
-. "$ROOT/${PFX}lib/lib-selftest.sh"
+. "$ROOT/$KIT_REL/lib-selftest.sh"
 
-TOOL="$ROOT/${PFX}lib/extract-arms.sh"
+TOOL="$ROOT/$KIT_REL/extract-arms.sh"
 [ -f "$TOOL" ] || { echo "extract-arms.test: no extractor at $TOOL"; exit 2; }
 
 SELFTEST_FLOOR=9

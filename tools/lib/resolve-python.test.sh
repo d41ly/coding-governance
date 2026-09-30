@@ -94,6 +94,61 @@ grep -qF "the caller's override '$C/py' was tried FIRST and did not run" <<<"$ou
 out=$(PATH="$C:$PATH" bash -c 'set -u; . "$1"; PY=$(resolve_python) || { echo HALTED; exit 3; }; echo "NOTHALTED $PY"' _ "$CANON" 2>/dev/null); rc=$?
 [ "$out" = HALTED ] && [ "$rc" = 3 ] || bad "the caller could not halt on failure (out='$out' rc=$rc)"; ok
 
+# TOOL-aRepatriatedFork-46: the kickoff region's canonical copy lives in a SIBLING kit, found through the
+# resolver rather than by typing that kit's name after the prefix.
+# The sibling-kit resolver (TOOL-aRepatriatedFork-2 S3), INLINED byte-identically from the
+# canonical copy named on its marker line and gated by the resolve-python self-test's parity
+# table. A shell consumer runs it with the python it already resolved, so the receipt rung is
+# read in Python and never parsed in bash. `resolve_kit_dir <python> <home> <anchor> <here>`
+# prints the kit directory REPO-RELATIVE, or the resolver's named refusal on stderr and exits 1.
+resolve_kit_dir() {
+  "$1" -c "$(cat <<'RKD'
+# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
+def resolve_kit_dir(home, anchor, here):
+    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
+
+    1. receipt — the `.governance/install.json` row whose `source` ends in <home>/<anchor> and
+       whose `path` exists inside this tree. The only record of a RENAMED kit dir: no probe finds
+       a memory-recall kit an adopter homed at `scripts/recall/`.
+    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
+    3. refuse — LookupError naming the three places looked; never a guessed prefix.
+    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
+    """
+    import json
+    import pathlib
+    here = pathlib.Path(here).resolve()
+    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
+    receipt = root / ".governance" / "install.json"
+    try:
+        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("path"):
+            continue
+        if str(row.get("source") or "").split("/")[-2:] != [home, anchor]:
+            continue
+        hit = (root / str(row["path"])).resolve()
+        if hit.is_file() and root in hit.parents:
+            return hit.parent
+    probes = (here / home, here.parent / home)
+    for cand in probes:
+        if (cand / anchor).is_file():
+            return cand
+    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
+        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
+# <<< resolve_kit_dir
+RKD
+)"'
+import sys
+try:
+    d = resolve_kit_dir(*sys.argv[1:4])
+except LookupError as e:
+    sys.exit(str(e))
+r = next((p for p in (d, *d.parents) if (p / ".git").exists()), d.anchor)
+print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
+}
+UNATTENDED_DIR=$(resolve_kit_dir "$REALPY" unattended check-unattended.sh "$HERE") || exit 2
 # ---- 2. PARITY ----------------------------------------------------------------------------------
 # A TABLE of (marker, canonical source, exclude-prefix), not one hardcoded predicate. It held exactly
 # one row for a long time and read as a population; it was not one — the marker was hardcoded in both
@@ -104,17 +159,18 @@ out=$(PATH="$C:$PATH" bash -c 'set -u; . "$1"; PY=$(resolve_python) || { echo HA
 #
 # Each row is:  <marker-stem>|<canonical file>|<prefix excluded from the copy population>
 PARITY_ROWS="
-resolve_python|$CANON|${PFX}lib/resolve-python
-kickoff_region|$ROOT/${PFX}unattended/check-unattended.sh|${PFX}unattended/check-unattended
-render_doc|$ROOT/${PFX}lib/render-doc.sh|${PFX}lib/render-doc
-resolve_kit_dir|$ROOT/${PFX}lib/resolve_kit_dir.py|${PFX}lib/resolve_kit_dir
-derive_self_rel|$ROOT/${PFX}lib/kit-rel.sh|${PFX}lib/kit-rel
-derive_kit_paths|$ROOT/${PFX}lib/render-doc.sh|${PFX}lib/render-doc
+resolve_python|$CANON|$KIT_REL/resolve-python
+kickoff_region|$ROOT/$UNATTENDED_DIR/check-unattended.sh|$UNATTENDED_DIR/check-unattended
+render_doc|$ROOT/$KIT_REL/render-doc.sh|$KIT_REL/render-doc
+resolve_kit_dir|$ROOT/$KIT_REL/resolve_kit_dir.py|$KIT_REL/resolve_kit_dir
+derive_self_rel|$ROOT/$KIT_REL/kit-rel.sh|$KIT_REL/kit-rel
+derive_kit_paths|$ROOT/$KIT_REL/render-doc.sh|$KIT_REL/render-doc
 "
 # CRs are dropped before the compare: a Python copy may sit CRLF in a Windows working copy while git
 # stores it LF, and the parity asked is of the block, not of a checkout's line endings.
 # resolve_kit_dir (TOOL-aRepatriatedFork-2 S3) is the one row whose copies are Python as well as
-# shell, so the population grep below reads both.
+# shell, so the population grep below reads both. TOOL-aRepatriatedFork-46: it reads the extensionless
+# git hooks too, because the pre-push hook carries both blocks inline and a copy no row reads drifts.
 # derive_self_rel (TOOL-aRepatriatedFork-18 S2) is the shipped suites' own-directory walk: each suite
 # that ships carries it inline because `<prefix>/lib/` travels to nobody.
 # derive_kit_paths (TOOL-aRepatriatedFork-10, closing review round 1 L4) is the receipt read the two
@@ -124,7 +180,7 @@ while IFS='|' read -r stem canon excl; do
   [ -n "$stem" ] || continue
   want=$(blk "$stem" "$canon")
   [ -n "$want" ] || bad "the canonical block for '$stem' is missing from $canon"; ok
-  copies=$(cd "$ROOT" && git grep -l "^# >>> $stem" -- '*.sh' '*.py' | grep -v "^$excl" || true)
+  copies=$(cd "$ROOT" && git grep -l "^# >>> $stem" -- '*.sh' '*.py' '.githooks/*' | grep -v "^$excl" || true)
   # NON-EMPTY POPULATION IS ITS OWN ARM, per row. A row whose copies all disappeared would otherwise
   # pass by judging nothing, which is the vacuity this whole file refuses.
   [ -n "$copies" ] || bad "no inline copy of '$stem' found — this row would be judging an empty population"; ok
@@ -142,7 +198,7 @@ done <<<"$PARITY_ROWS"
 # both EXPLAIN the idiom they replace, and a predicate that fires on the prose documenting the fix is
 # the self-inflicted red this repo has a catalogue record about.
 banned=$(cd "$ROOT" && git grep -nE 'command -v (python3|python|py)\b' -- '*.sh' \
-  | grep -v '^'"${PFX}lib/resolve-python"'' \
+  | grep -v '^'"$KIT_REL/resolve-python"'' \
   | awk -F: '{ line=$0; sub(/^[^:]*:[0-9]+:/, "", line); if (line !~ /^[[:space:]]*#/) print }' || true)
 [ -z "$banned" ] || { echo "FAIL the retired python-launcher idiom is back:"; printf '%s\n' "$banned" | sed 's/^/    /'; st=1; }
 ok
@@ -199,7 +255,7 @@ bare_scan() {  # $1=file -> "file:line:text" per bare-launcher site
   ' "$1"
 }
 
-bare=$(cd "$ROOT" && git ls-files -- '*.sh' | grep -v '^'"${PFX}lib/resolve-python"'' | while IFS= read -r f; do
+bare=$(cd "$ROOT" && git ls-files -- '*.sh' | grep -v '^'"$KIT_REL/resolve-python"'' | while IFS= read -r f; do
          [ -n "$f" ] && [ -f "$f" ] && bare_scan "$f"
        done)
 [ -z "$bare" ] || { echo "FAIL a python launcher is invoked without being resolved:"; printf '%s\n' "$bare" | sed 's/^/    /'; st=1; }
@@ -246,7 +302,7 @@ printf '#!/usr/bin/env bash\nout=$( "${PYBIN:-python}" x.py 2>&1 )\n' > "$plant"
 printf '#!/usr/bin/env bash\nPY=$(resolve_python "${GOV_PYTHON:-}") || exit 2\n' > "$plant"
 [ -z "$(bare_scan "$plant")" ] || bad "an EMPTY default \${GOV_PYTHON:-} fires the parameter-default ban"; ok
 # ...and the ban's own population is real, or it is a gate over nothing.
-nsh2=$(cd "$ROOT" && git ls-files -- '*.sh' | grep -cv '^'"${PFX}lib/resolve-python"'' || true)
+nsh2=$(cd "$ROOT" && git ls-files -- '*.sh' | grep -cv '^'"$KIT_REL/resolve-python"'' || true)
 [ "$nsh2" -gt 10 ] || bad "the invocation ban scanned $nsh2 shell files — the population collapsed"; ok
 
 [ "$st" = 0 ] && echo "PASS — resolve-python: $n assertions held"
