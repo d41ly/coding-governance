@@ -4,7 +4,7 @@ node: d
 opened: 2026-09-30
 streams: tooling
 roster: TOOL
-ids: TOOL-dAlignedCarrier-1 TOOL-dAlignedCarrier-2 TOOL-dAlignedCarrier-3 TOOL-dAlignedCarrier-4 TOOL-dAlignedCarrier-5 TOOL-dAlignedCarrier-6
+ids: TOOL-dAlignedCarrier-1 TOOL-dAlignedCarrier-2 TOOL-dAlignedCarrier-3 TOOL-dAlignedCarrier-4 TOOL-dAlignedCarrier-5 TOOL-dAlignedCarrier-6 TOOL-dAlignedCarrier-7
 authorized-by: slug
 asks: TOOL-dDerivedDocket-70..74
 ---
@@ -47,7 +47,7 @@ Read at the working tree, each ask below is filed and live in the build that rai
 
 <!-- gen:build-index -->
 **Build status:** SPECCED · 6 unit(s) · node d · opened 2026-09-30 · streams tooling
-ids TOOL-dAlignedCarrier-1 TOOL-dAlignedCarrier-2 TOOL-dAlignedCarrier-3 TOOL-dAlignedCarrier-4 TOOL-dAlignedCarrier-5 TOOL-dAlignedCarrier-6
+ids TOOL-dAlignedCarrier-1 TOOL-dAlignedCarrier-2 TOOL-dAlignedCarrier-3 TOOL-dAlignedCarrier-4 TOOL-dAlignedCarrier-5 TOOL-dAlignedCarrier-6 TOOL-dAlignedCarrier-7
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
