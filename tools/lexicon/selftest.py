@@ -64,6 +64,8 @@ def build_tempdir():
 
 
 KIT = Path(__file__).resolve().parent
+# TOOL-aRepatriatedFork-46: every fixture names this kit by the NAME its directory has in this install.
+KIT_NAME = KIT.name
 FAILURES: list[str] = []
 PASSES = 0
 
@@ -111,7 +113,7 @@ def read_surface_disagreements(root):
     import io as _sio
     import re as _re
     root = Path(root).resolve()
-    kit = root / PFX / "lexicon"
+    kit = root / PFX / KIT_NAME
     sys.path.insert(0, str(kit))
     import lexicon as _lex
 
@@ -262,27 +264,27 @@ def run_case(files: dict, conf: str | None, waivers: dict | None = None, args: t
     """
     with build_tempdir() as td:
         root = Path(td)
-        shutil.copytree(KIT, root / PFX / "lexicon",
+        shutil.copytree(KIT, root / PFX / KIT_NAME,
                         ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
         if patch is not None:
             # A 3-tuple names the kit FILE to patch; a 2-tuple keeps the original `lexicon.py`
             # default byte for byte. The scaffold's S7 guard reads a sibling module, so the staged
             # break that proves it has to land in that file rather than in the engine.
             _rel, _old, _new = patch if len(patch) == 3 else ("lexicon.py", patch[0], patch[1])
-            _engine = root / PFX / "lexicon" / _rel
+            _engine = root / PFX / KIT_NAME / _rel
             _src = _engine.read_text(encoding="utf-8")
             if _old not in _src:
                 raise SystemExit(f"selftest: patch target not found in {_rel}: {_old!r}")
             _engine.write_text(_src.replace(_old, _new), encoding="utf-8", newline="\n")
         for name in drop:
-            _victim = root / PFX / "lexicon" / name
+            _victim = root / PFX / KIT_NAME / name
             if not _victim.is_file():
                 raise SystemExit(f"selftest: drop target not present in the kit copy: {name}")
             _victim.unlink()
         for name in ("lexicon-verb-waivers.txt", "lexicon-suffix-waivers.txt"):
-            (root / PFX / "lexicon" / name).unlink(missing_ok=True)
+            (root / PFX / KIT_NAME / name).unlink(missing_ok=True)
         for name, body in (waivers or {}).items():
-            (root / PFX / "lexicon" / name).write_text(body, encoding="utf-8")
+            (root / PFX / KIT_NAME / name).write_text(body, encoding="utf-8")
         for rel, body in files.items():
             p = root / rel
             p.parent.mkdir(parents=True, exist_ok=True)
@@ -297,7 +299,7 @@ def run_case(files: dict, conf: str | None, waivers: dict | None = None, args: t
         # identifiers — a fixture measuring itself rather than its fixture.
         subprocess.run(["git", "add", "--", *files, *([".lexicon.conf"] if conf is not None else [])],
                        cwd=root, check=True, capture_output=True)
-        r = subprocess.run([sys.executable, f"{PFX}lexicon/lexicon.py", *args], cwd=root,
+        r = subprocess.run([sys.executable, f"{PFX}{KIT_NAME}/lexicon.py", *args], cwd=root,
                            capture_output=True, text=True)
         return r.returncode, r.stdout + r.stderr
 
@@ -361,7 +363,7 @@ check("self-containment: ...over a NON-EMPTY population, or the green above mean
 # RED — a foreign import. `map_lib` is the real one this rule exists to forbid: `subtokens.py` is a
 # PORT of a `codebase-map` function precisely so this import never has to exist.
 with build_tempdir() as _td:
-    _kit = build_kit_copy(Path(_td) / "lexicon", {"scaffold_lexicon.py": "\nimport map_lib\n"})
+    _kit = build_kit_copy(Path(_td) / KIT_NAME, {"scaffold_lexicon.py": "\nimport map_lib\n"})
     _probs, _mods, _imps = _lex.check_self_containment(_kit)
     _hit = [x for x in _probs if "NOT SELF-CONTAINED" in x]
     check("self-containment: a foreign import REDS", len(_hit) == 1, str(_probs))
@@ -372,7 +374,7 @@ with build_tempdir() as _td:
 # THE DEDUPE, and it is a real shape rather than a hypothetical: `_python_defs` emits BOTH `map_lib`
 # and `map_lib._STOPWORDS` for this statement, so an undeduped refusal names one import twice.
 with build_tempdir() as _td:
-    _kit = build_kit_copy(Path(_td) / "lexicon",
+    _kit = build_kit_copy(Path(_td) / KIT_NAME,
                           {"scaffold_lexicon.py": "\nfrom map_lib import _STOPWORDS\n"})
     _probs, _, _ = _lex.check_self_containment(_kit)
     check("self-containment: `from x import y` reds ONCE, not once per emitted target",
@@ -381,7 +383,7 @@ with build_tempdir() as _td:
 # A RELATIVE import cannot leave the directory, so it is not judged. Without this arm the predicate
 # could red every `from . import x` in an adopter's kit and no fixture would say so.
 with build_tempdir() as _td:
-    _kit = build_kit_copy(Path(_td) / "lexicon",
+    _kit = build_kit_copy(Path(_td) / KIT_NAME,
                           {"scaffold_lexicon.py": "\nfrom . import canon\nimport subprocess\n"})
     _probs, _, _ = _lex.check_self_containment(_kit)
     check("self-containment: a RELATIVE import and a stdlib import are both silent",
@@ -408,7 +410,7 @@ with build_tempdir() as _td:
 # wrong side of it, each armed and unreachable from one mode.
 with build_tempdir() as _td:
     _r = Path(_td)
-    build_kit_copy(_r / PFX / "lexicon", {"scaffold_lexicon.py": "\nimport map_lib\n"})
+    build_kit_copy(_r / PFX / KIT_NAME, {"scaffold_lexicon.py": "\nimport map_lib\n"})
     (_r / "core").mkdir(parents=True, exist_ok=True)
     (_r / "core" / "a.py").write_text("def build_index():\n    pass\n", encoding="utf-8", newline="\n")
     (_r / ".lexicon.conf").write_text(BASE_CONF, encoding="utf-8", newline="\n")
@@ -417,7 +419,7 @@ with build_tempdir() as _td:
                    capture_output=True)
     _both = {}
     for _mode in ("--check", "--measure"):
-        _got = subprocess.run([sys.executable, f"{PFX}lexicon/lexicon.py", _mode], cwd=_r,
+        _got = subprocess.run([sys.executable, f"{PFX}{KIT_NAME}/lexicon.py", _mode], cwd=_r,
                               capture_output=True, text=True)
         _both[_mode] = (_got.returncode, _got.stdout + _got.stderr)
     for _mode, (_rc, _o) in _both.items():
@@ -769,7 +771,7 @@ check("S4: every SEED_SELECTORS row names a known kind, a known literal, a conve
 # rejects has no working adoption path at all.
 with build_tempdir() as td:
     root = Path(td)
-    shutil.copytree(KIT, root / PFX / "lexicon",
+    shutil.copytree(KIT, root / PFX / KIT_NAME,
                     ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
     (root / "src").mkdir()
     (root / "src" / "a.py").write_text(
@@ -791,7 +793,7 @@ with build_tempdir() as td:
         "export interface CardProps {\n  id: string;\n}\n", encoding="utf-8")
     subprocess.run(["git", "init", "-q"], cwd=root, check=True)
     subprocess.run(["git", "add", "--", "src"], cwd=root, check=True, capture_output=True)
-    r = subprocess.run([sys.executable, f"{PFX}lexicon/scaffold_lexicon.py", str(root / ".lexicon.conf")],
+    r = subprocess.run([sys.executable, f"{PFX}{KIT_NAME}/scaffold_lexicon.py", str(root / ".lexicon.conf")],
                        cwd=root, capture_output=True, text=True)
     check("scaffold: exits 0", r.returncode == 0, r.stdout + r.stderr)
     # GUARDED, because the arm above is allowed to FAIL and this line is not allowed to crash the
@@ -905,7 +907,7 @@ with build_tempdir() as td:
     check("AC5: ...and it no longer calls the cell `dark`, which it is not",
           _tsx_i >= 0 and "dark" not in _tsx_note, _tsx_note[:400])
 
-    r = subprocess.run(["bash", f"{PFX}lexicon/adopt-lexicon.sh", "--check"], cwd=root,
+    r = subprocess.run(["bash", f"{PFX}{KIT_NAME}/adopt-lexicon.sh", "--check"], cwd=root,
                        capture_output=True, text=True)
     out = r.stdout + r.stderr
     check("scaffold: --check REDS on the unratified seed", r.returncode != 0, out)
@@ -922,7 +924,7 @@ with build_tempdir() as td:
 
     crlf = (root / ".lexicon.conf").read_bytes().replace(b"\n", b"\r\n")
     (root / ".lexicon.conf").write_bytes(crlf)
-    r = subprocess.run(["bash", f"{PFX}lexicon/adopt-lexicon.sh", "--check"], cwd=root,
+    r = subprocess.run(["bash", f"{PFX}{KIT_NAME}/adopt-lexicon.sh", "--check"], cwd=root,
                        capture_output=True, text=True)
     out = r.stdout + r.stderr
     check("scaffold: --check STILL reds on an unratified seed in a CRLF conf (the reader strips CR)",
@@ -955,7 +957,7 @@ with build_tempdir() as td:
     (root / "spell.conf").write_text("A='a # b'\nB='a' # c\nC=#x\nD=   # note\nE=\"q\"   # n\n",
                                      encoding="utf-8", newline="\n")
     _fn = re.search(r"^read_conf_scalar\(\) \{.*?^\}",
-                    (root / PFX / "lexicon" / "adopt-lexicon.sh").read_text(encoding="utf-8"),
+                    (root / PFX / KIT_NAME / "adopt-lexicon.sh").read_text(encoding="utf-8"),
                     re.S | re.M)
     check("scaffold: adopt-lexicon.sh still defines the read_conf_scalar this arm lifts", _fn is not None)
     if _fn:
@@ -998,7 +1000,7 @@ with build_tempdir() as td:
           bool(_seed_cells), f"CELLS={_seed.get('CELLS')}")
     if _seed_cells:
         _cell = sorted(_seed_cells)[0]
-        _r = subprocess.run([sys.executable, f"{PFX}lexicon/lexicon.py",
+        _r = subprocess.run([sys.executable, f"{PFX}{KIT_NAME}/lexicon.py",
                              "--suggest", "fetch_thing", "--as", _cell],
                             cwd=root, capture_output=True, text=True)
         _o = _r.stdout + _r.stderr
@@ -1022,9 +1024,9 @@ with build_tempdir() as td:
                        .replace('ratified=""', 'ratified="2026-09-06 node a"'),
                        encoding="utf-8", newline="\n")
     subprocess.run(["git", "add", "--", ".lexicon.conf"], cwd=root, capture_output=True)
-    subprocess.run(["bash", f"{PFX}lexicon/adopt-lexicon.sh", "--render"], cwd=root,
+    subprocess.run(["bash", f"{PFX}{KIT_NAME}/adopt-lexicon.sh", "--render"], cwd=root,
                    capture_output=True, text=True)
-    _r = subprocess.run(["bash", f"{PFX}lexicon/adopt-lexicon.sh", "--check"], cwd=root,
+    _r = subprocess.run(["bash", f"{PFX}{KIT_NAME}/adopt-lexicon.sh", "--check"], cwd=root,
                         capture_output=True, text=True)
     _o = _r.stdout + _r.stderr
     check("B1 control: a ratified scaffolded seed passes --check, grade included",
@@ -1033,7 +1035,7 @@ with build_tempdir() as td:
     _conf_p.write_text(_conf_p.read_text(encoding="utf-8")
                        .replace('VERB_OFFENDER_PIN="', 'VERB_OFFENDER_PIN="9'),
                        encoding="utf-8", newline="\n")
-    _r = subprocess.run(["bash", f"{PFX}lexicon/adopt-lexicon.sh", "--check"], cwd=root,
+    _r = subprocess.run(["bash", f"{PFX}{KIT_NAME}/adopt-lexicon.sh", "--check"], cwd=root,
                         capture_output=True, text=True)
     _o = _r.stdout + _r.stderr
     check("B1: a CONF-ONLY pin change reds --check, which is the leg no guard scopes off a bar",
@@ -1051,7 +1053,7 @@ with build_tempdir() as td:
     # is the one that writes. A file whose name is a flag is also a live hazard for every unquoted
     # glob in its directory: `wc -l *` in that adopter's root printed wc's usage instead of counting.
     for flag in ("--help", "-h"):
-        r = subprocess.run([sys.executable, f"{PFX}lexicon/scaffold_lexicon.py", flag],
+        r = subprocess.run([sys.executable, f"{PFX}{KIT_NAME}/scaffold_lexicon.py", flag],
                            cwd=root, capture_output=True, text=True)
         out = r.stdout + r.stderr
         check(f"scaffold: refuses {flag} as a destination rather than writing it",
@@ -1071,7 +1073,7 @@ with build_tempdir() as td:
 # unconditionally.
 with build_tempdir() as td:
     root = Path(td)
-    shutil.copytree(KIT, root / PFX / "lexicon",
+    shutil.copytree(KIT, root / PFX / KIT_NAME,
                     ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
     (root / "src").mkdir()
     (root / "src" / "a.tsx").write_text(
@@ -1079,7 +1081,7 @@ with build_tempdir() as td:
         encoding="utf-8")
     subprocess.run(["git", "init", "-q"], cwd=root, check=True)
     subprocess.run(["git", "add", "--", "src"], cwd=root, check=True, capture_output=True)
-    r = subprocess.run([sys.executable, f"{PFX}lexicon/scaffold_lexicon.py", str(root / ".lexicon.conf")],
+    r = subprocess.run([sys.executable, f"{PFX}{KIT_NAME}/scaffold_lexicon.py", str(root / ".lexicon.conf")],
                        cwd=root, capture_output=True, text=True)
     _cf = root / ".lexicon.conf"
     _txt = _cf.read_text(encoding="utf-8") if _cf.exists() else ""
@@ -1110,7 +1112,7 @@ with build_tempdir() as td:
 # an unshipped set one line earlier, which is why the NOT EXTRACTED assertion rides along.
 with build_tempdir() as td:
     root = Path(td)
-    shutil.copytree(KIT, root / PFX / "lexicon",
+    shutil.copytree(KIT, root / PFX / KIT_NAME,
                     ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
     (root / "src").mkdir()
     (root / "src" / "a.py").write_text("def build_x():\n    pass\n", encoding="utf-8", newline="\n")
@@ -1129,7 +1131,7 @@ with build_tempdir() as td:
     subprocess.run(["git", "init", "-q"], cwd=root, check=True)
     subprocess.run(["git", "add", "--", "src/a.py", "web/widget.ts", ".lexicon.conf"],
                    cwd=root, check=True, capture_output=True)
-    r = subprocess.run([sys.executable, f"{PFX}lexicon/scaffold_lexicon.py", str(root / "seed.conf")],
+    r = subprocess.run([sys.executable, f"{PFX}{KIT_NAME}/scaffold_lexicon.py", str(root / "seed.conf")],
                        cwd=root, capture_output=True, text=True)
     check("re-scaffold: exits 0 over an existing declaration", r.returncode == 0, r.stdout + r.stderr)
     check("re-scaffold: the PATTERNS-armed language is not refused as unextractable",
@@ -1225,8 +1227,8 @@ check("coverage: a fenced code block in PROSE does not join the denominator",
 # in must also sniff positive. Staged by blinding the sniffer inside a fixture copy of the kit.
 with build_tempdir() as _td:
     _r = Path(_td)
-    shutil.copytree(KIT, _r / PFX / "lexicon", ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
-    _eng = _r / PFX / "lexicon" / "lexicon.py"
+    shutil.copytree(KIT, _r / PFX / KIT_NAME, ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
+    _eng = _r / PFX / KIT_NAME / "lexicon.py"
     _src = _eng.read_text(encoding="utf-8")
     _i = _src.index("DEFINITION_SNIFF = re.compile(")
     _j = _src.index("re.M | re.X,", _i)
@@ -1239,7 +1241,7 @@ with build_tempdir() as _td:
     (_r / ".lexicon.conf").write_text(BASE_CONF, encoding="utf-8")
     subprocess.run(["git", "init", "-q"], cwd=_r, check=True)
     subprocess.run(["git", "add", "--", *_U6, ".lexicon.conf"], cwd=_r, check=True, capture_output=True)
-    _got = subprocess.run([sys.executable, f"{PFX}lexicon/lexicon.py"], cwd=_r,
+    _got = subprocess.run([sys.executable, f"{PFX}{KIT_NAME}/lexicon.py"], cwd=_r,
                           capture_output=True, text=True)
     _all = _got.stdout + _got.stderr
     check("S6: a BLIND sniffer reds as DEAD SNIFFER rather than reporting perfect coverage",
@@ -1334,14 +1336,14 @@ _many = {"core/a%d.py" % i: "def frobnicate_thing%d():\n    pass\n" % i for i in
 _many["core/z.py"] = "def build_it():\n    pass\n"
 with build_tempdir() as _td:
     _r = Path(_td)
-    shutil.copytree(KIT, _r / PFX / "lexicon", ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
+    shutil.copytree(KIT, _r / PFX / KIT_NAME, ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
     for _rel, _b in _many.items():
         _p = _r / _rel
         _p.parent.mkdir(parents=True, exist_ok=True)
         _p.write_text(_b, encoding="utf-8")
     subprocess.run(["git", "init", "-q"], cwd=_r, check=True)
     subprocess.run(["git", "add", "--", *_many], cwd=_r, check=True, capture_output=True)
-    subprocess.run([sys.executable, f"{PFX}lexicon/scaffold_lexicon.py", ".lexicon.conf"],
+    subprocess.run([sys.executable, f"{PFX}{KIT_NAME}/scaffold_lexicon.py", ".lexicon.conf"],
                    cwd=_r, capture_output=True, text=True)
     _conf = (_r / ".lexicon.conf").read_text(encoding="utf-8")
     check("canon: 60 sites of an off-canon token do NOT put it in the proposed table",
@@ -1354,14 +1356,14 @@ with build_tempdir() as _td:
 _pol = {"core/a.py": "def get_row():\n    pass\n", "core/b.py": "def fetch_row():\n    pass\n"}
 with build_tempdir() as _td:
     _r = Path(_td)
-    shutil.copytree(KIT, _r / PFX / "lexicon", ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
+    shutil.copytree(KIT, _r / PFX / KIT_NAME, ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
     for _rel, _b in _pol.items():
         _p = _r / _rel
         _p.parent.mkdir(parents=True, exist_ok=True)
         _p.write_text(_b, encoding="utf-8")
     subprocess.run(["git", "init", "-q"], cwd=_r, check=True)
     subprocess.run(["git", "add", "--", *_pol], cwd=_r, check=True, capture_output=True)
-    subprocess.run([sys.executable, f"{PFX}lexicon/scaffold_lexicon.py", ".lexicon.conf"],
+    subprocess.run([sys.executable, f"{PFX}{KIT_NAME}/scaffold_lexicon.py", ".lexicon.conf"],
                    cwd=_r, capture_output=True, text=True)
     _conf = (_r / ".lexicon.conf").read_text(encoding="utf-8")
     check("POLARITY: a corpus of get and fetch proposes `read` and `load`, the forms it does not use",
@@ -1373,12 +1375,12 @@ with build_tempdir() as _td:
 # file it writes is tracked.
 with build_tempdir() as _td:
     _r = Path(_td)
-    shutil.copytree(KIT, _r / PFX / "lexicon", ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
+    shutil.copytree(KIT, _r / PFX / KIT_NAME, ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
     (_r / "core").mkdir(parents=True, exist_ok=True)
     (_r / "core" / "a.py").write_text("def build_it():\n    pass\n", encoding="utf-8")
     subprocess.run(["git", "init", "-q"], cwd=_r, check=True)
     subprocess.run(["git", "add", "--", "core/a.py"], cwd=_r, check=True, capture_output=True)
-    subprocess.run([sys.executable, f"{PFX}lexicon/scaffold_lexicon.py", ".lexicon.conf"],
+    subprocess.run([sys.executable, f"{PFX}{KIT_NAME}/scaffold_lexicon.py", ".lexicon.conf"],
                    cwd=_r, capture_output=True, text=True)
     _conf = (_r / ".lexicon.conf").read_text(encoding="utf-8")
     check("S8: `conf::dark` is seeded even though no .conf file was tracked at scaffold time",
@@ -1402,13 +1404,13 @@ with build_tempdir() as _td:
 # printing a reassuring `0.0%`, because zero offenders out of zero definitions is not a clean tree.
 with build_tempdir() as _td:
     _r = Path(_td)
-    shutil.copytree(KIT, _r / PFX / "lexicon", ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
+    shutil.copytree(KIT, _r / PFX / KIT_NAME, ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
     (_r / "docs").mkdir(parents=True, exist_ok=True)
     (_r / "docs" / "readme.md").write_text("# prose only\n\nNothing here defines anything.\n",
                                            encoding="utf-8")
     subprocess.run(["git", "init", "-q"], cwd=_r, check=True)
     subprocess.run(["git", "add", "--", "docs/readme.md"], cwd=_r, check=True, capture_output=True)
-    _rr = subprocess.run([sys.executable, f"{PFX}lexicon/scaffold_lexicon.py", ".lexicon.conf"],
+    _rr = subprocess.run([sys.executable, f"{PFX}{KIT_NAME}/scaffold_lexicon.py", ".lexicon.conf"],
                          cwd=_r, capture_output=True, text=True)
     check("AC3: --scaffold survives a corpus with ZERO extracted definitions",
           _rr.returncode == 0 and "ZeroDivision" not in _rr.stdout + _rr.stderr,
@@ -1660,7 +1662,7 @@ with tempfile.TemporaryDirectory(dir=str(KIT.parent.parent)) as _td:
     # with the kit under `<prefix>/lexicon/` and no declaration, which is exactly where the version is
     # read and one step before any conf check.
     subprocess.run(["git", "init", "-q", "."], cwd=_td, capture_output=True)
-    _kit = Path(_td) / PFX / "lexicon"
+    _kit = Path(_td) / PFX / KIT_NAME
     shutil.copytree(KIT, _kit, ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
     _lx = _kit / "lexicon.py"
     _lx.write_text(_lx.read_text(encoding="utf-8").replace("KIT_LEXICON_VERSION = ", "RENAMED_AWAY = "),
@@ -1677,7 +1679,7 @@ with tempfile.TemporaryDirectory(dir=str(KIT.parent.parent)) as _td:
     # directory" to with exit 127, even though python can stat the file. Both are NON-ZERO, so the
     # refusal arm above would have passed on a bash error rather than on the version check -- the
     # sibling arm below caught exactly that, twice, which is the whole reason a refusal arm needs one.
-    _r = subprocess.run(["bash", f"{PFX}lexicon/adopt-lexicon.sh", "--render"],
+    _r = subprocess.run(["bash", f"{PFX}{KIT_NAME}/adopt-lexicon.sh", "--render"],
                         capture_output=True, text=True, cwd=_td)
     check("a kit whose version constant cannot be read REFUSES to render",
           _r.returncode != 0, f"exit={_r.returncode} {(_r.stdout + _r.stderr)[:200]}")
@@ -2290,7 +2292,7 @@ if re.search(r"^[ \t]+py\.constant[ \t]+[A-Za-z]", _conf_text, re.M):
           "module BODY statements only" in _conf_text and "AnnAssign" in _conf_text
           and "Starred" in _conf_text, _ROOT_CONF.name)
     check("AC5: ...and the command that re-derives them",
-          f"python {PFX}lexicon/lexicon.py --check" in _conf_text, _ROOT_CONF.name)
+          f"python {PFX}{KIT_NAME}/lexicon.py --check" in _conf_text, _ROOT_CONF.name)
     # EACH FIGURE IS READ FROM THE ROW THAT OWNS IT, never searched for in the file. A bare
     # substring over the whole comment is green on any conf that happens to carry those digits
     # anywhere, and a falsified denominator survived exactly that — some other line held the
@@ -3658,11 +3660,11 @@ for _label, _tail in (
         ("frozen", "\n")):
     with build_tempdir() as _td:
         _sroot = Path(_td)
-        shutil.copytree(KIT, _sroot / PFX / "lexicon",
+        shutil.copytree(KIT, _sroot / PFX / KIT_NAME,
                         ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
         (_sroot / ".lexicon.conf").write_text(BASE_CONF + _tail, encoding="utf-8", newline="\n")
         subprocess.run(["git", "init", "-q"], cwd=_sroot, check=True)
-        _sr = subprocess.run(["bash", f"{PFX}lexicon/adopt-lexicon.sh", "--check"], cwd=_sroot,
+        _sr = subprocess.run(["bash", f"{PFX}{KIT_NAME}/adopt-lexicon.sh", "--check"], cwd=_sroot,
                              capture_output=True, text=True)
         _STAMP[_label] = _sr.stdout + _sr.stderr
 _EMPTY_STAMP_MSG = "declares a CANON: overlay"
@@ -4089,7 +4091,7 @@ with build_tempdir() as _td:
 # nothing. Reachable in the wild: `tracked_files` does not filter for existence.
 with build_tempdir() as _td:
     _rr = Path(_td)
-    shutil.copytree(KIT, _rr / PFX / "lexicon",
+    shutil.copytree(KIT, _rr / PFX / KIT_NAME,
                     ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
     (_rr / "core").mkdir()
     (_rr / "core" / "a.py").write_text("def build_x():\n    pass\n", encoding="utf-8", newline="\n")
@@ -4101,7 +4103,7 @@ with build_tempdir() as _td:
     subprocess.run(["git", "add", "--", "core", ".lexicon.conf"], cwd=_rr, check=True,
                    capture_output=True)
     (_rr / "core" / "gone.py").unlink()          # TRACKED, and no longer on disk
-    _r = subprocess.run([sys.executable, f"{PFX}lexicon/lexicon.py"], cwd=_rr,
+    _r = subprocess.run([sys.executable, f"{PFX}{KIT_NAME}/lexicon.py"], cwd=_rr,
                         capture_output=True, text=True)
     _o = _r.stdout + _r.stderr
     check("L4: a tracked file missing from the worktree is refused as `cannot be read as source`",
@@ -4158,12 +4160,12 @@ def read_agreement(root, patch=None):
                             capture_output=True, text=True)
         return _r.returncode, _r.stdout + _r.stderr
     _rel, _old, _new = patch
-    _f = Path(root) / PFX / "lexicon" / _rel
+    _f = Path(root) / PFX / KIT_NAME / _rel
     _src = _f.read_text(encoding="utf-8")
     if _old not in _src:
         raise SystemExit(f"selftest: agreement patch target not found in {_rel}: {_old!r}")
     _f.write_text(_src.replace(_old, _new), encoding="utf-8", newline="\n")
-    _r = subprocess.run([sys.executable, str(Path(root) / PFX / "lexicon" / "selftest.py"),
+    _r = subprocess.run([sys.executable, str(Path(root) / PFX / KIT_NAME / "selftest.py"),
                          "--agree", str(root)], capture_output=True, text=True)
     _f.write_text(_src, encoding="utf-8", newline="\n")
     return _r.returncode, _r.stdout + _r.stderr
@@ -4212,7 +4214,7 @@ _ROUTED_CONF = ('BANNED_SUFFIXES="Manager"\n'
                 '  build   create a new value and return it - NOT `create`\n')
 with build_tempdir() as _td:
     _rr = Path(_td)
-    shutil.copytree(KIT, _rr / PFX / "lexicon",
+    shutil.copytree(KIT, _rr / PFX / KIT_NAME,
                     ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
     (_rr / "core").mkdir()
     (_rr / "core" / "check_arms.py").write_text("def build_thing():\n    pass\n",
@@ -4320,7 +4322,7 @@ def read_expand_rows(out: str) -> list:
 
 def run_expand_wrapper(root, *args):
     """`adopt-lexicon.sh --expand` in a fixture repo — the SHELL surface, where the guard lives."""
-    r = subprocess.run(["bash", f"{PFX}lexicon/adopt-lexicon.sh", "--expand", *args],
+    r = subprocess.run(["bash", f"{PFX}{KIT_NAME}/adopt-lexicon.sh", "--expand", *args],
                        cwd=root, capture_output=True, text=True)
     return r.returncode, r.stdout + r.stderr
 
@@ -4493,7 +4495,7 @@ check("...and points at the wrapper, which is where --stamp actually lives",
 # ---- the SHELL surface: the guard, the stamp, and the CRLF inversion -----------------------------
 with build_tempdir() as td:
     _root = Path(td)
-    shutil.copytree(KIT, _root / PFX / "lexicon",
+    shutil.copytree(KIT, _root / PFX / KIT_NAME,
                     ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
     (_root / "src").mkdir()
     (_root / "src" / "a.py").write_text(EXPAND_FILES["src/a.py"], encoding="utf-8", newline="\n")
@@ -4606,7 +4608,7 @@ with build_tempdir() as td:
 # of them stages the conf.
 with build_tempdir() as td:
     _u = Path(td)
-    shutil.copytree(KIT, _u / PFX / "lexicon",
+    shutil.copytree(KIT, _u / PFX / KIT_NAME,
                     ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
     (_u / "src").mkdir()
     (_u / "src" / "a.py").write_text(EXPAND_FILES["src/a.py"], encoding="utf-8", newline="\n")
