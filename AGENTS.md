@@ -527,7 +527,8 @@ only the next RED run overwrites. Never pipe the bar through `tail` — it disca
 read the durable summary instead.
 
 **The push boundary is where the bar binds.** The tracked `.githooks/pre-push` hook runs
-`tools/run-gates/run-gates.sh` once on a default-branch push and blocks a red one (it classifies on the remote
+`tools/run-gates/run-gates.sh` once on a default-branch push and blocks a red one unless the inherited-red policy in
+`.githooks/gate-env.sh` lands it (it classifies on the remote
 ref, the validated tree must be the pushed tip, and `--no-verify` bypasses). `GOV_GATE_CMD` may
 name only a script this repo tracks, unmodified, and it must also EQUAL the kit's own runner or the
 `GATE_CMD` a committed `.unattended.conf` declares at the pushed sha. Anything else is refused before a bar runs;
@@ -537,8 +538,8 @@ refuses a dirty tree and a `HEAD` the bar moved, hands the bar `GATE_PUSH_BASE` 
 line, and leaves each refusal as a token in `<git-dir>/pre-push-refusal`, which the lander reads
 instead of the push's output. A repository may declare a branch bar, `GOV_BRANCH_GATE_CMD`, in
 `.githooks/gate-env.sh`; undeclared, a branch push stays ungated (`TOOL-aRepatriatedFork-8`).
-Earlier runs are diff-scoped and are developer-choice. `core.hooksPath` is
-repo-GLOBAL, so the hook gating your push is the PRIMARY tree's; check H REPORTS a divergence. A tracked pre-commit fast leg sits beside it and also enforces the
+Earlier runs are diff-scoped and are developer-choice. The `core.hooksPath` in effect decides whose
+hook gates your push, a per-worktree fact (the hookspath-resolves-into-another-checkout gotcha); check H REPORTS a divergence. A tracked pre-commit fast leg sits beside it and also enforces the
 branch guard, refusing a primary-tree commit off the default branch (`GOV_DEFAULT_BRANCH` pins it).
 A SessionStart hook runs `tools/check-wiring.sh --session`, which auto-sets an unset
 `core.hooksPath` and never clobbers a set one, so a fresh clone self-heals rather than running with

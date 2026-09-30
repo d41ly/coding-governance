@@ -12,7 +12,7 @@
 # and the value in effect decides which hook files run: an ABSOLUTE value runs the hooks of the
 # checkout it names, the relative `.githooks` check-wiring writes runs each worktree's own — so under
 # an absolute value the hook that gates YOUR push comes from the checkout it names, not from the tree
-# you are pushing, and seven of nine live worktrees on node `d` carry such an override. Measured at TOOL-dUnstalledConvoy-26's
+# you are pushing, and a linked worktree may carry such an override. Measured at TOOL-dUnstalledConvoy-26's
 # landing: the primary tree was on a contrib branch, so the push ran that branch's pre-push — no
 # gate-env sourcing, no predicate 8, and the boundary's coverage check absent. Nothing wrong shipped,
 # because a separate full bar had verified the pushed tree; the BOUNDARY was not the one that shipped.
@@ -89,8 +89,9 @@ fi
 # and writes the same value as `gate_run` on END, so the bar's own run-log line, which names its run,
 # joins this push exactly. The runner removes the variable once read, so no leg inherits it.
 #
-# ROLLOUT. `core.hooksPath` is absolute, so a push from ANY worktree runs the PRIMARY tree's copy of
-# this file: its lines appear once the primary tree has checked this change out, and not before.
+# ROLLOUT. Under an absolute `core.hooksPath` naming the primary tree, a push from ANY worktree runs
+# the PRIMARY tree's copy of this file: its lines appear once the primary tree has checked this change
+# out, and not before. Under the relative `.githooks` each worktree runs its own copy.
 #
 # WHAT THIS DOES NOT CATCH. The two refusals above; a KILL; and an `exit`, or an EXIT trap of its own,
 # inside the repository's `.githooks/gate-env.sh`, which is sourced below and is not this file. Every

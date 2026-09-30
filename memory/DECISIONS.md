@@ -122,6 +122,13 @@
 - **TOOL-dDerivedDocket-31** — **M6's parallel MUST binds DELEGATED passes only** (D12-i10): an inline author may sequence proven-disjoint passes and says so in the brief; narrows TOOL-aHoistedPass-10's parallel-on-proof. Rule `guides/BUILD-METHOD.md` M6.
 - **TOOL-dDerivedDocket-61** — **one lease record, the run-state facts** (owner ruling 2026-09-22, as relayed): the per-slug lease file retires, `RESUME_STALE_BOUND` is the one bound, and HELD is carved out of the stop-guard, `--liveness` and the tick. Contract `guides/UNATTENDED-STOPS.md` §7.
 - **TOOL-dDerivedDocket-34** — **`unit` and `advances` supersede DEPL-dGaugedVintage-13's "COUNTED, NEVER REFUSED"** (design §4.4): a signed `unit` ask derives its spec's status, so `backlog_rows_outliving_closed_specs` and its pin retire at the switch-over.
+- TOOL-dDerivedDocket-3 · SUPERSEDES TOOL-dClosedLexicon-11's 'no verb here commits': under LANDER_MODE=in-place `--close` commits `records(<slug>): close — LANDING` on the graded merge. The archive name still derives from the record's BYTES, since two runs can honestly share a witness
+- TOOL-dDerivedDocket-70 · OWNER RULING (2026-09-30): when a landing touches a declared self-test surface, the main loop exports GATE_SELFTESTS=1 into its one `--close`; the driver never sets it, and the owed notice moves to VERIFYING entry. An unattended main loop counts as on demand
+- TOOL-dDerivedDocket-71 · OWNER RULING (2026-09-30): `researched` and `solution-tested` bind every mode, and BUILD-METHOD M12's 'solution not given' decides when they apply. SUPERSEDES TOOL-aPromptedMandate-4's prompt-only scope and its rejection of unconditional
+- TOOL-dDerivedDocket-72 · OWNER RULING (2026-09-30): BUILD-METHOD M7 step 1 regrounds with `--status`, extended to report the holder-worktree and pinned-asks checks read-only, in place of a no-id `--resume` that logs check 59 at every pass boundary
+- TOOL-dDerivedDocket-73 · OWNER RULING (2026-09-30), narrowing TOOL-dDerivedDocket-24: AGENTS.md's merge-bar sentence points at the inherited-red policy, the template's section 7 line stays (true under the kit default park), and the protocol's gates-green text owes the same pointer
+- TOOL-dDerivedDocket-75 · OWNER RULING (2026-09-30): check-wiring keeps writing the relative `.githooks`. Straggler hooks are best-effort in a linked worktree, whose pre-rebase warning goes quiet; check 26 and CI are the guarantee. Reopens when TOOL-aWeldedTribunal-10 lands
+- TOOL-dDerivedDocket-76 · OWNER RULING (2026-09-29): the unattended kit's own suites were not run for dDerivedDocket's landing, and 'land it' is no ask to run them. D12-h and D12-i8 lapsed unexercised; the kit's compensating check is owed to remote CI's held job
 
 ## DEPL — deployer
 

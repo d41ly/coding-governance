@@ -40,9 +40,12 @@ depends on a different worktree's HEAD.
 
 **Each measurement below was taken under a particular value, and the two do not generalise to each
 other.** The landing described above ran under an absolute `core.hooksPath` naming the primary tree.
-Re-measured 2026-09-14 on node `d`: the shared config holds the relative `.githooks`, and seven of
-nine live worktrees carry an absolute `config.worktree` override naming the primary tree's copy — so
-on this fleet BOTH values are live at once and which one you are under is a per-worktree fact.
+Measured 2026-09-14 on node `d`: the shared config held the relative `.githooks`, and seven of nine
+live worktrees carried an absolute `config.worktree` override naming the primary tree's copy.
+Re-measured 2026-09-30: the shared value is now that absolute path too, and every linked worktree
+carries the same override. Nothing tracked writes it (`check-wiring.sh` writes the relative value), so
+its writer is unknown (TOOL-dDerivedDocket-75). Which value you are under is a per-worktree fact:
+`git config --show-origin --get core.hooksPath` answers it.
 
 It is invisible in the ordinary case, where the primary tree is on the default branch and its
 `.githooks/` is the landed one. It bites exactly when the primary tree is parked on a feature branch

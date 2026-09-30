@@ -38,8 +38,9 @@ That leg does not close the class, so the rest is a documented check:
 
 - The hook does not trigger on the map's other inventory inputs or on a dossier claim edit.
 - It grades the worktree, not the index.
-- A worktree's commits run the primary tree's copy of the hook, per
-  hookspath-resolves-into-another-checkout, so the leg binds only once it is on `main` there.
+- Under an absolute `core.hooksPath` naming the primary tree, a worktree's commits run the primary
+  tree's copy of the hook (hookspath-resolves-into-another-checkout), so the leg binds only once it is
+  on `main` there. Under the relative `.githooks` each worktree runs its own.
 - Any other unguarded leg can red the same way.
 
 Before calling a unit green, read the legs from `tools/gate-legs.json` rather than from the spec's
