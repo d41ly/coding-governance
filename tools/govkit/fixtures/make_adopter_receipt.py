@@ -137,7 +137,7 @@ def load_govkit():
     global _GK
     if _GK is None:
         import importlib.util
-        spec = importlib.util.spec_from_file_location("gk", GOV_ROOT / f"{PFX}govkit/govkit.py")
+        spec = importlib.util.spec_from_file_location("gk", GOV_ROOT / f"{PFX}{HERE.parent.name}/govkit.py")
         _GK = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(_GK)
     return _GK
@@ -166,7 +166,7 @@ def render_token(src: str, rev_pfx: str) -> str:
 
 def resolve_kit_homes(gov_rev: str) -> dict[str, str]:
     """kit id -> `home`, read from gov's own registry at the recorded commit."""
-    reg = tomllib.loads(read_gov_text(gov_rev, f"{derive_rev_prefix(gov_rev)}govkit/registry.toml"))
+    reg = tomllib.loads(read_gov_text(gov_rev, f"{derive_rev_prefix(gov_rev)}{HERE.parent.name}/registry.toml"))
     homes: dict[str, str] = {}
     for entry in reg.get("entry", []):
         txt = read_gov_text(gov_rev, entry["descriptor"])

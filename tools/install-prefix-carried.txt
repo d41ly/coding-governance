@@ -15,12 +15,8 @@ skills/session-kickoff/manifest-check.test.sh	1	memory-tree	LOWERED 8 -> 1 by TO
 tools/check-install-prefix.test.sh	40	(loose),govkit,hooks,lib,memory-recall,memory-tree	LOWERED 72 -> 13 by TOOL-aRepatriatedFork-28, which spells every fixture path through the derived prefix. What is left is this gate's own red fixtures, root-install spellings under its marker and quoted-join samples of its literal predicate, and two layouts at a foreign literal prefix: all TOOL-aRepatriatedFork-30's, which rewrites that predicate (spec rev-3 §4, Returned).
 tools/check-wiring.test.sh	1	hooks
 tools/dead-path-waivers.txt	2	lexicon
-tools/govkit/census.test.sh	2	govkit,lib
 tools/govkit/fixtures/adopter-ic-2cff5855.receipt.json	91	codebase-map,drift-audit,gate-lint,lexicon,unattended,workflows
-tools/govkit/fixtures/make_adopter_receipt.py	2	govkit
-tools/govkit/govkit.py	1	run-gates
-tools/govkit/matrix.py	7	govkit
-tools/govkit/selftest.py	213	codebase-map,drift-audit,govkit,hooks,memory-recall,memory-tree,playbook,process-monitor,pytest-parallel-guardrails,run-gates,unattended,workflows
+tools/govkit/selftest.py	7	hooks,run-gates,unattended,workflows
 tools/memory-tree/check-memory-hygiene.test.sh	8	codebase-map,playbook
 tools/run-gates/adopt-run-gates.test.sh	7	run-gates
 tools/unattended/adopt-unattended.test.sh	1	unattended

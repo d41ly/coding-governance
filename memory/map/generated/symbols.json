@@ -2663,6 +2663,11 @@
       "file": "tools/runlog/record.py"
     },
     {
+      "id": "derive_target_runner",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "derive_targets",
       "kind": "function",
       "file": "tools/codebase-map/rank_harness.py"
@@ -5821,6 +5826,11 @@
       "id": "resolve_kit_dir",
       "kind": "function",
       "file": "tools/drift-audit/selftest.py"
+    },
+    {
+      "id": "resolve_kit_dir",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
     },
     {
       "id": "resolve_kit_dir",

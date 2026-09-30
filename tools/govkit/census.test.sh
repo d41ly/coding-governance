@@ -35,14 +35,44 @@ KIT_REL=$(derive_self_rel "$HERE") || { echo "census.test: not inside a git repo
 # literal prefix (TOOL-aRepatriatedFork-28).
 case "$KIT_REL" in */*) PFX="${KIT_REL%/*}/" ;; *) PFX="" ;; esac
 HERE=$(cd "$(dirname "$0")/../.." && pwd)
-CENSUS="$HERE/${PFX}govkit/census.py"
+CENSUS="$HERE/$KIT_REL/census.py"   # this kit's own file, by the directory it sits in (TOOL-aRepatriatedFork-46)
 
 # THROUGH THE ONE RESOLVER, never a bare launcher name. The MS-Store `python3` stub answers
 # `command -v` and then exits 9009, so a bare name is not an answer — and the invocation ban in
 # `<prefix>/lib/resolve-python.test.sh` refuses one repo-wide, which is how this file was caught:
 # it shipped with six bare `python` calls and redded that leg on the closing bar.
-# shellcheck source=/dev/null
-. "$HERE/${PFX}lib/resolve-python.sh"
+# TOOL-aRepatriatedFork-46: carried INLINE; it was sourced from the library directory, which ships nowhere.
+# >>> resolve_python — canonical copy: resolve-python.sh in gov's lib dir (byte-identical; gated)
+resolve_python() {
+  # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
+  # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
+  # the candidate and every consumer uses "$PY" as a single word (measured: exit 127).
+  _rp_tried=""
+  for _rp_c in "${1:-}" "${GOV_PYTHON:-}" python3 python py; do
+    [ -n "$_rp_c" ] || continue
+    _rp_tried="$_rp_tried $_rp_c"
+    if "$_rp_c" -c "import sys" >/dev/null 2>&1; then
+      printf '%s\n' "$_rp_c"
+      return 0
+    fi
+  done
+  {
+    echo "resolve_python: no usable python launcher. Each candidate was RUN with -c 'import sys' and"
+    echo "resolve_python: none exited 0 — being on PATH is not evidence (the Microsoft Store python3"
+    echo "resolve_python: stub answers \`command -v\` and exits 9009 without running anything)."
+    echo "resolve_python: tried:$_rp_tried"
+    if [ -n "${1:-}" ]; then
+      echo "resolve_python: the caller's override '$1' was tried FIRST and did not run."
+    fi
+    if [ -n "${GOV_PYTHON:-}" ]; then
+      echo "resolve_python: GOV_PYTHON is set to '$GOV_PYTHON' and did not run. An override that is"
+      echo "resolve_python: set and unusable is THIS failure, never a silent fall-through — the"
+      echo "resolve_python: operator believes they chose, and would not have."
+    fi
+  } >&2
+  return 1
+}
+# <<< resolve_python
 PY="$(resolve_python)"
 n=0; st=0
 

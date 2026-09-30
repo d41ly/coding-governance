@@ -55,6 +55,8 @@ import govkit  # noqa: E402 — the deployer's OWN descriptor reader and token r
 HERE = pathlib.Path(__file__).resolve().parent
 ROOT = HERE.parent.parent
 GOVKIT = HERE / "govkit.py"
+# TOOL-aRepatriatedFork-46: this kit is named by the NAME its directory has in this install, never typed.
+KIT_NAMES = {"govkit": HERE.name}
 NL = chr(10)
 FAILURES: list[str] = []
 
@@ -166,7 +168,7 @@ def check_outcome_probes(tmp: pathlib.Path) -> None:
     """
     rep = govkit.Report()
     descs = govkit.read_descriptors(ROOT, govkit.load_toml(
-        ROOT / PFX / "govkit" / "registry.toml"), rep)
+        ROOT / PFX / KIT_NAMES["govkit"] / "registry.toml"), rep)
     stops = [(eid, b) for eid, (d, _p) in sorted(descs.items())
              for b in d.get("outcome", []) if b.get("ok")]
     # THE LIVENESS ASSERTION. Quantifying over an empty set prints nothing but ok lines, and a probe
@@ -291,7 +293,7 @@ ROLE_V2 = "gov's second vintage" + NL
 
 
 def run_in_gov(g: pathlib.Path, *args: str) -> subprocess.CompletedProcess:
-    return subprocess.run([sys.executable, str(g / PFX / "govkit" / "govkit.py"), *args],
+    return subprocess.run([sys.executable, str(g / PFX / KIT_NAMES["govkit"] / "govkit.py"), *args],
                           capture_output=True, text=True, env=ROLE_ENV)
 
 
@@ -321,10 +323,10 @@ def build_role_pair(tmp: pathlib.Path, tag: str, *, schema: int, edits: dict[str
     tree has it rather than whatever a later edit leaves behind.
     """
     g = tmp.resolve() / ("role-gov-" + tag)
-    (g / PFX / "govkit").mkdir(parents=True, exist_ok=True)
+    (g / PFX / KIT_NAMES["govkit"]).mkdir(parents=True, exist_ok=True)
     (g / PFX / "demo").mkdir(parents=True, exist_ok=True)
-    shutil.copy2(GOVKIT, g / PFX / "govkit" / "govkit.py")
-    (g / PFX / "govkit" / "registry.toml").write_text(
+    shutil.copy2(GOVKIT, g / PFX / KIT_NAMES["govkit"] / "govkit.py")
+    (g / PFX / KIT_NAMES["govkit"] / "registry.toml").write_text(
         '[surface]' + NL + 'globs = ["{prefix}/*"]' + NL + NL
         + '[selection]' + NL + 'default = ["demo"]' + NL + NL
         + '[[entry]]' + NL + 'id = "demo"' + NL + 'descriptor = "{prefix}/demo/kit.toml"' + NL + NL
@@ -689,7 +691,7 @@ def main() -> int:
         # see, and the stub is only the override the engine already honours when it cannot. A hand
         # list here would go stale the first time the charter grew a placeholder — which is the
         # rot this file's own header refuses.
-        pdesc = govkit.load_toml(ROOT / PFX / "govkit" / "entries" / "playbook.kit.toml")
+        pdesc = govkit.load_toml(ROOT / PFX / KIT_NAMES["govkit"] / "entries" / "playbook.kit.toml")
         ans = {r["key"].lower(): "stated for the scratch install"
                for r in pdesc.get("placeholder", [])}
         ans["playbook_path"] = "docs/PARALLEL.md"
@@ -713,7 +715,7 @@ def main() -> int:
         deploy = govkit.load_toml(g / ".governance" / "deploy.toml")
         rep = govkit.Report()
         descs = govkit.read_descriptors(ROOT, govkit.load_toml(
-            ROOT / PFX / "govkit" / "registry.toml"), rep)
+            ROOT / PFX / KIT_NAMES["govkit"] / "registry.toml"), rep)
         legs: list[tuple[str, list[str]]] = []
         for eid in SCRATCH_KITS:
             d, _dp = descs[eid]

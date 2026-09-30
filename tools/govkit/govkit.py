@@ -3399,7 +3399,7 @@ def write_gate_legs(verb: str, target: pathlib.Path, deploy: dict, gr: dict,
                 # deployer breaking a target's gate while installing something else.
                 # The floor is read from the TARGET's installed runner, not assumed.
                 row = {"name": nm, "argv": argv}
-                if check_target_reads_subject(target, deploy):
+                if check_target_reads_subject(target, deploy, descs):
                     row["subject"] = leg.get("subject") or "repo"
                 if guards:
                     row["guard"] = guards      # OMITTED, never `[]`, when everything dropped
@@ -4758,7 +4758,26 @@ def validate_gate_runner(deploy: dict, r: Report) -> dict:
 SUBJECT_FLOOR_RUN_GATES = (1, 1)
 
 
-def check_target_reads_subject(target: pathlib.Path, deploy: dict) -> bool:
+def derive_target_runner(target: pathlib.Path, deploy: dict,
+                         descs: dict[str, tuple[dict, str]] | None = None) -> pathlib.Path | None:
+    """The TARGET's run-gates runner, named through that entry's destination (TOOL-aRepatriatedFork-46).
+
+    The run-gates entry lands its engine at `{kit}/<relpath>`, and `target_context` resolves `{kit}`
+    from the target's own answers, a per-entry `prefix` or `kit` included. The probe used to join the
+    kit's name to the top-level prefix, which is the class the carried-prefix ban counts and which
+    missed a target that homed run-gates by a per-entry answer. None where gov declares no such entry.
+    """
+    if descs is None:
+        root = repo_root()
+        descs = read_descriptors(root, load_registry(root), Report())
+    got = descs.get("run-gates")
+    if not got:
+        return None
+    return target / target_context(target, deploy, "run-gates", got[0])["kit"] / "run-gates.sh"
+
+
+def check_target_reads_subject(target: pathlib.Path, deploy: dict,
+                               descs: dict[str, tuple[dict, str]] | None = None) -> bool:
     """Can this target's installed run-gates parse a `subject` key without redding its own canary?
 
     Read from the TARGET, never assumed and never taken from gov's own tree: the question is what
@@ -4767,9 +4786,8 @@ def check_target_reads_subject(target: pathlib.Path, deploy: dict) -> bool:
     BELOW the floor, because the direction that costs a feature is recoverable and the direction
     that reds somebody else's bar is not.
     """
-    prefix = (deploy.get("prefix") or "tools").strip("/")
-    runner = target / prefix / "run-gates" / "run-gates.sh"
-    if not runner.is_file():
+    runner = derive_target_runner(target, deploy, descs)
+    if runner is None or not runner.is_file():
         return True
     try:
         txt = runner.read_text(encoding="utf-8", errors="replace")
