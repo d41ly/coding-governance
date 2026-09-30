@@ -32,8 +32,14 @@
 # THE FOURTH ROW IS THE THIRD'S KIND. TOOL-dMergedTally-1 was built and committed as Tier-1, then
 # re-tiered to Tier-2 because the file it changes ships to adopters, so its spec came after the code in a
 # later commit. The owner chose to land it as it is, 2026-09-16, rather than rewrite the order.
-
+#
+# THE FIFTH ROW IS A MISREAD, NOT A SPEC-AFTER-CODE. TOOL-aRepatriatedFork-46 was ADOPTED by the records
+# commit 09dae486, whose subject names it and which also lowered backlog pins in .memory-tree.conf, a
+# path outside memory/. The leg reads the first unit-naming commit touching a non-record path as the
+# build. No TOOL-46 code precedes its spec (8d36c1d5); its first code commit is df18ab42. Waived by the
+# aRepatriatedFork unattended run and parked for the owner; TOOL-aRepatriatedFork-48 files the leg's fix.
 DEPL-dGaugedVintage-12	spec and product code in one commit (9ba3757d); landed 2026-09-01, before the leg graded run-state-free builds
 DEPL-dGaugedVintage-13	spec and product code in one commit (34492bb6); landed 2026-09-01, before the leg graded run-state-free builds
 TOOL-dMuffledSentinel-1	spec written after the code, both in one commit (a3b4ca1e); seen by the leg before landing and landed as-is by owner decision 2026-09-12
 TOOL-dMergedTally-1	spec written after the code (built at ff8f1a4c, spec at a8bc2230) when the unit was re-tiered to Tier-2; seen by the leg before landing and landed as-is by owner decision 2026-09-16
+TOOL-aRepatriatedFork-46	misread: 09dae486 is the adoption records commit (subject names the unit, diff lowers .memory-tree.conf pins); no code precedes the spec 8d36c1d5; first code df18ab42
