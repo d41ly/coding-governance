@@ -56,6 +56,65 @@ resolve_python() {
   return 1
 }
 # <<< resolve_python
+# TOOL-aRepatriatedFork-46: a kit is named by the name its directory has in THIS install, never
+# as a literal segment: this suite's own from where it sits, a sibling's through the resolver,
+# which reads the install receipt first. A fixture mirrors that layout by the resolved NAME.
+KIT="${KIT_REL##*/}"
+# The sibling-kit resolver (TOOL-aRepatriatedFork-2 S3), INLINED byte-identically from the
+# canonical copy named on its marker line and gated by the resolve-python self-test's parity
+# table. A shell consumer runs it with the python it already resolved, so the receipt rung is
+# read in Python and never parsed in bash. `resolve_kit_dir <python> <home> <anchor> <here>`
+# prints the kit directory REPO-RELATIVE, or the resolver's named refusal on stderr and exits 1.
+resolve_kit_dir() {
+  "$1" -c "$(cat <<'RKD'
+# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
+def resolve_kit_dir(home, anchor, here):
+    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
+
+    1. receipt — the `.governance/install.json` row whose `source` ends in <home>/<anchor> and
+       whose `path` exists inside this tree. The only record of a RENAMED kit dir: no probe finds
+       a memory-recall kit an adopter homed at `scripts/recall/`.
+    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
+    3. refuse — LookupError naming the three places looked; never a guessed prefix.
+    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
+    """
+    import json
+    import pathlib
+    here = pathlib.Path(here).resolve()
+    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
+    receipt = root / ".governance" / "install.json"
+    try:
+        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("path"):
+            continue
+        if str(row.get("source") or "").split("/")[-2:] != [home, anchor]:
+            continue
+        hit = (root / str(row["path"])).resolve()
+        if hit.is_file() and root in hit.parents:
+            return hit.parent
+    probes = (here / home, here.parent / home)
+    for cand in probes:
+        if (cand / anchor).is_file():
+            return cand
+    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
+        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
+# <<< resolve_kit_dir
+RKD
+)"'
+import sys
+try:
+    d = resolve_kit_dir(*sys.argv[1:4])
+except LookupError as e:
+    sys.exit(str(e))
+r = next((p for p in (d, *d.parents) if (p / ".git").exists()), d.anchor)
+print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
+}
+_rkd_py=$(resolve_python) || { echo "canary: no usable python, so the sibling kits cannot be resolved"; exit 2; }
+LIB_DIR=$(resolve_kit_dir "$_rkd_py" lib resolve-python.sh "$HERE") || exit 2
+LIB="${LIB_DIR##*/}"
 PYBIN=$(resolve_python) || { echo "canary: no usable python"; exit 2; }
 fail=0
 # the run-gates promotion spec's S11: an EXECUTED assertion count, incremented at each assertion rather
@@ -326,10 +385,10 @@ done <<<"$paths"
 #    bar, which would cost minutes and couple this canary to every other kit's health.
 SCRATCH=$(mktemp -d) || { echo "canary: cannot create a scratch dir"; exit 2; }
 trap 'rm -rf "$SCRATCH"' EXIT
-mkdir -p "$SCRATCH/${PFX}run-gates" "$SCRATCH/fx"
+mkdir -p "$SCRATCH/${PFX}${KIT}" "$SCRATCH/fx"
 # The runner is copied from THIS harness's own kit dir, not from gov's prefix. This file
 # SHIPS, and a hardcoded `<prefix>/run-gates/` here made it red on arrival at any other prefix.
-cp "$KITDIR/run-gates.sh" "$SCRATCH/${PFX}run-gates/run-gates.sh"
+cp "$KITDIR/run-gates.sh" "$SCRATCH/${PFX}${KIT}/run-gates.sh"
 # EVERY leg sleeps, and that is load-bearing. With only one slow leg a serial run and a concurrent
 # run both cost about that leg, so arm 3c could not tell them apart — measured: forcing width 1 left
 # the canary green. Four sleeping legs make serial (6.5s) and concurrent (2s) genuinely diverge.
@@ -510,7 +569,7 @@ clamp_target() {
 # clamp edit that this copy does not follow reds instead of silently sending the control to the
 # wrong width. The ORDER matters as much as the mapping - `nonsense` matches `?????*` too, and only
 # run-gates testing `*[!0-9]*` first makes it 1.
-_ct_src=$(sed -n 's/.*case "\$JOBS" in \(.*\) esac.*/\1/p' "$ROOT/${PFX}run-gates/run-gates.sh" | head -1)
+_ct_src=$(sed -n 's/.*case "\$JOBS" in \(.*\) esac.*/\1/p' "$ROOT/${PFX}${KIT}/run-gates.sh" | head -1)
 case "$_ct_src" in
   *'*[!0-9]*) JOBS=1'*'?????*) JOBS=64'*) ;;
   *) echo "canary: run-gates' clamp no longer reads as the two ordered arms clamp_target mirrors, so the control width this suite computes is no longer joined to the source it copies: $_ct_src"; fail=1 ;;
@@ -614,8 +673,8 @@ esac
 #     dispatches a worker and looks for its result immediately, which is the whole window. An earlier
 #     version of this arm used the 4-leg manifest at mixed widths, reproduced at 1-in-40, and let the
 #     pre-fix reader pass. Do not "simplify" this back to the shared fixture.
-mkdir -p "$SCRATCH/many/${PFX}run-gates" "$SCRATCH/many/fx"
-cp "$SCRATCH/${PFX}run-gates/run-gates.sh" "$SCRATCH/many/${PFX}run-gates/run-gates.sh"
+mkdir -p "$SCRATCH/many/${PFX}${KIT}" "$SCRATCH/many/fx"
+cp "$SCRATCH/${PFX}${KIT}/run-gates.sh" "$SCRATCH/many/${PFX}${KIT}/run-gates.sh"
 cp "$SCRATCH/fx/instant.sh" "$SCRATCH/many/fx/a.sh"
 "$PYBIN" -c '
 import json, sys
@@ -649,8 +708,8 @@ done
 #     skipped regardless of the diff, the canonical green-while-checking-less shape this file exists
 #     to forbid — kept the whole suite green BY CONSTRUCTION rather than by luck.
 G="$SCRATCH/guarded"
-mkdir -p "$G/${PFX}run-gates" "$G/fx"
-cp "$SCRATCH/${PFX}run-gates/run-gates.sh" "$G/${PFX}run-gates/run-gates.sh"
+mkdir -p "$G/${PFX}${KIT}" "$G/fx"
+cp "$SCRATCH/${PFX}${KIT}/run-gates.sh" "$G/${PFX}${KIT}/run-gates.sh"
 cp "$SCRATCH/fx/instant.sh" "$G/fx/a.sh"
 cat > "$G/${PFX}gate-legs.json" <<'JSON'
 [
@@ -696,12 +755,12 @@ grep -q '^guarded	' "$G/.git/gate-ledger.tsv" 2>/dev/null \
 #     .githooks/pre-push sets it whenever it decides a full run is owed, which is the one boundary an
 #     adopter actually feels. So the decision is a declared subject, not a guard.
 S="$SCRATCH/subject"
-mkdir -p "$S/${PFX}run-gates" "$S/fx"
-cp "$SCRATCH/${PFX}run-gates/run-gates.sh" "$S/${PFX}run-gates/run-gates.sh"
+mkdir -p "$S/${PFX}${KIT}" "$S/fx"
+cp "$SCRATCH/${PFX}${KIT}/run-gates.sh" "$S/${PFX}${KIT}/run-gates.sh"
 # The FINGERPRINT script too: `gate-full-green` is written only when FPRINT_START is non-empty, and
 # without this file the fingerprint is the empty string, so the stamp arm below would assert against
 # a stamp no fixture can produce — passing for the wrong reason or failing for one.
-cp "$KITDIR/gate-fingerprint.sh" "$S/${PFX}run-gates/" 2>/dev/null || true
+cp "$KITDIR/gate-fingerprint.sh" "$S/${PFX}${KIT}/" 2>/dev/null || true
 cp "$SCRATCH/fx/instant.sh" "$S/fx/a.sh"
 cat > "$S/${PFX}gate-legs.json" <<'JSON'
 [
@@ -769,9 +828,9 @@ grep -q '^selftests	1$' "$S/.git/gate-full-green" 2>/dev/null \
 #     `85/85 legs passed`, and the chunk holding nothing but kit self-tests closed GREEN. Both
 #     numbers are what a reader quotes, which is what makes this arithmetic worth an arm.
 S2="$SCRATCH/heldmath"
-mkdir -p "$S2/${PFX}run-gates" "$S2/fx"
-cp "$SCRATCH/${PFX}run-gates/run-gates.sh" "$S2/${PFX}run-gates/run-gates.sh"
-cp "$KITDIR/gate-fingerprint.sh" "$S2/${PFX}run-gates/" 2>/dev/null || true
+mkdir -p "$S2/${PFX}${KIT}" "$S2/fx"
+cp "$SCRATCH/${PFX}${KIT}/run-gates.sh" "$S2/${PFX}${KIT}/run-gates.sh"
+cp "$KITDIR/gate-fingerprint.sh" "$S2/${PFX}${KIT}/" 2>/dev/null || true
 cp "$SCRATCH/fx/instant.sh" "$S2/fx/a.sh"
 # TWO CHUNKS, ONE OF EACH SHAPE. `mixed` proves the tally is per-chunk and does not swallow the
 # chunk it appears in; `held` proves the all-held chunk changes verdict. A fixture with only the
@@ -834,9 +893,9 @@ printf '%s\n' "$o" | grep -q '^gates GREEN — 5/5 legs passed$' \
 #      executing not one leg, and stamp a record saying so. Measured before the fix: exit 0 and
 #      exactly that line.
 S3="$SCRATCH/allheld"
-mkdir -p "$S3/${PFX}run-gates" "$S3/fx"
-cp "$SCRATCH/${PFX}run-gates/run-gates.sh" "$S3/${PFX}run-gates/run-gates.sh"
-cp "$KITDIR/gate-fingerprint.sh" "$S3/${PFX}run-gates/" 2>/dev/null || true
+mkdir -p "$S3/${PFX}${KIT}" "$S3/fx"
+cp "$SCRATCH/${PFX}${KIT}/run-gates.sh" "$S3/${PFX}${KIT}/run-gates.sh"
+cp "$KITDIR/gate-fingerprint.sh" "$S3/${PFX}${KIT}/" 2>/dev/null || true
 cp "$SCRATCH/fx/instant.sh" "$S3/fx/a.sh"
 cat > "$S3/${PFX}gate-legs.json" <<'JSON'
 [
@@ -975,8 +1034,8 @@ if [ "$( cd "$P" 2>/dev/null && git rev-parse --show-toplevel 2>/dev/null )" = "
   exit 2
 fi
 n=$((n+1))
-mkdir -p "$P/${PFX}run-gates" "$P/fx" "$P/shim"
-cp "$SCRATCH/${PFX}run-gates/run-gates.sh" "$P/${PFX}run-gates/run-gates.sh"
+mkdir -p "$P/${PFX}${KIT}" "$P/fx" "$P/shim"
+cp "$SCRATCH/${PFX}${KIT}/run-gates.sh" "$P/${PFX}${KIT}/run-gates.sh"
 printf '#!/usr/bin/env bash\nexit 0\n'          > "$P/fx/a.sh"
 # An ORPHAN plus a foreground sleep, because that pair is what the blocker was made of: the
 # grandchild holds the leg's inherited write end open, and a pipe-captured leg then blocks for the
@@ -1012,7 +1071,7 @@ profname() { profline "$1" | sed 's/^gate profile: //; s/  (.*//'; }
 # the ordinary derivation is what finds it: an arm driving GATE_PROFILES would be grading the seam
 # rather than the path every real run takes.
 printf 'big\t16\t24000\twidth=8,timeout=0\nsmall\t4\t0\twidth=4,timeout=0\nany\t0\t0\twidth=2,timeout=0\n' \
-  > "$P/${PFX}run-gates/gate-profiles.txt"
+  > "$P/${PFX}${KIT}/gate-profiles.txt"
 
 # 4a. the most-capable row is selected when BOTH its thresholds are met. Seams, not real hardware:
 #     the node running this suite is whatever it is, and an arm that depends on that grades the box.
@@ -1471,10 +1530,10 @@ rm -rf "$P/cg"
 #    grade a distinction it cannot see.
 n=$((n+1))
 BB=$(mktemp -d)
-mkdir -p "$BB/${PFX}run-gates" "$BB/${PFX}lib" "$BB/fx" "$BB/ga" "$BB/gb"
-cp "$KITDIR/run-gates.sh" "$KITDIR/gate-profiles.txt" "$BB/${PFX}run-gates/" 2>/dev/null
-cp "$KITDIR/gate-fingerprint.sh" "$BB/${PFX}run-gates/" 2>/dev/null || true
-cp "$ROOT/${PFX}lib/resolve-python.sh" "$BB/${PFX}lib/" 2>/dev/null || true
+mkdir -p "$BB/${PFX}${KIT}" "$BB/${PFX}${LIB}" "$BB/fx" "$BB/ga" "$BB/gb"
+cp "$KITDIR/run-gates.sh" "$KITDIR/gate-profiles.txt" "$BB/${PFX}${KIT}/" 2>/dev/null
+cp "$KITDIR/gate-fingerprint.sh" "$BB/${PFX}${KIT}/" 2>/dev/null || true
+cp "$ROOT/${LIB_DIR}/resolve-python.sh" "$BB/${PFX}${LIB}/" 2>/dev/null || true
 printf '#!/usr/bin/env bash\nexit 0\n' > "$BB/fx/a.sh"
 echo x > "$BB/ga/f"; echo y > "$BB/gb/f"
 printf '%s\n' '[' \
@@ -1513,10 +1572,10 @@ rm -rf "$BB"
 #    which chunk names THIS repo declares is the gov harness's, next door.
 n=$((n+1))
 CK=$(mktemp -d)
-mkdir -p "$CK/${PFX}run-gates" "$CK/${PFX}lib" "$CK/fx" "$CK/g"
-cp "$KITDIR/run-gates.sh" "$KITDIR/gate-profiles.txt" "$CK/${PFX}run-gates/" 2>/dev/null
-cp "$KITDIR/gate-fingerprint.sh" "$CK/${PFX}run-gates/" 2>/dev/null || true
-cp "$ROOT/${PFX}lib/resolve-python.sh" "$CK/${PFX}lib/" 2>/dev/null || true
+mkdir -p "$CK/${PFX}${KIT}" "$CK/${PFX}${LIB}" "$CK/fx" "$CK/g"
+cp "$KITDIR/run-gates.sh" "$KITDIR/gate-profiles.txt" "$CK/${PFX}${KIT}/" 2>/dev/null
+cp "$KITDIR/gate-fingerprint.sh" "$CK/${PFX}${KIT}/" 2>/dev/null || true
+cp "$ROOT/${LIB_DIR}/resolve-python.sh" "$CK/${PFX}${LIB}/" 2>/dev/null || true
 printf '#!/usr/bin/env bash\nexit 0\n' > "$CK/fx/a.sh"
 echo g > "$CK/g/f"
 # INTERLEAVED ON PURPOSE. The manifest is not grouped, so the reader's walk is a real permutation
@@ -1589,10 +1648,10 @@ rm -rf "$CK"
 #     (`memory/builds/aPacedTurnstile/reviews/2026-08-20-review-TOOL-aPacedTurnstile-2.md` B1) and a
 #     leg without one would grade a mechanism simpler than the shipped case.
 _wd=$(mktemp -d) || { echo "canary: cannot create a scratch dir for the wall arms"; exit 2; }
-mkdir -p "$_wd/${PFX}run-gates" "$_wd/${PFX}lib"
-cp "$ROOT/$KITREL/run-gates.sh" "$ROOT/$KITREL/gate-profiles.txt" "$_wd/${PFX}run-gates/" 2>/dev/null
-cp "$ROOT/$KITREL/gate-fingerprint.sh" "$_wd/${PFX}run-gates/" 2>/dev/null || true
-cp "$ROOT/${PFX}lib/resolve-python.sh" "$_wd/${PFX}lib/" 2>/dev/null || true
+mkdir -p "$_wd/${PFX}${KIT}" "$_wd/${PFX}${LIB}"
+cp "$ROOT/$KITREL/run-gates.sh" "$ROOT/$KITREL/gate-profiles.txt" "$_wd/${PFX}${KIT}/" 2>/dev/null
+cp "$ROOT/$KITREL/gate-fingerprint.sh" "$_wd/${PFX}${KIT}/" 2>/dev/null || true
+cp "$ROOT/${LIB_DIR}/resolve-python.sh" "$_wd/${PFX}${LIB}/" 2>/dev/null || true
 ( cd "$_wd" && git init -q -b main . && git config user.email w@t.invalid && git config user.name w ) >/dev/null 2>&1
 printf 'x\n' > "$_wd/file.txt"
 printf '#!/bin/sh\n( sleep 120 ) &\nsleep 120\n' > "$_wd/slow.sh"
@@ -1610,7 +1669,7 @@ printf '[\n { "name": "slow leg", "argv": ["bash", "slow.sh"], "chunk": "product
 # DIFFERENCE survives any load this box can produce.
 _ws=$(date +%s)
 ( cd "$_wd" && GATE_LEGS="$_wd/legs.json" GATE_FULL=1 GATE_JOBS=2 GATE_WALL=8 \
-    timeout -k 5s 300 bash ${PFX}run-gates/run-gates.sh ) > "$_wd/walled.out" 2>&1
+    timeout -k 5s 300 bash ${PFX}${KIT}/run-gates.sh ) > "$_wd/walled.out" 2>&1
 _wrc=$?
 _wel=$(( $(date +%s) - _ws ))
 # THE WALLED RUN'S RECORD IS CAPTURED HERE, while it is the only one there is. Captured after
@@ -1622,7 +1681,7 @@ _wrec=$(ls -1d "$_wd"/.git/gate-run/*/ 2>/dev/null | tail -1)
 
 _cs=$(date +%s)
 ( cd "$_wd" && GATE_LEGS="$_wd/legs.json" GATE_FULL=1 GATE_JOBS=2 GATE_WALL=0 \
-    timeout -k 5s 300 bash ${PFX}run-gates/run-gates.sh ) > "$_wd/unwalled.out" 2>&1
+    timeout -k 5s 300 bash ${PFX}${KIT}/run-gates.sh ) > "$_wd/unwalled.out" 2>&1
 _cel=$(( $(date +%s) - _cs ))
 
 n=$((n+1))

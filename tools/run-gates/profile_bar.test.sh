@@ -38,6 +38,10 @@ KIT_REL=$(derive_self_rel "$HERE") || { echo "profile_bar.test: not inside a git
 # at a root install: every fixture and host path below is spelled through it, never through a
 # literal prefix (TOOL-aRepatriatedFork-28).
 case "$KIT_REL" in */*) PFX="${KIT_REL%/*}/" ;; *) PFX="" ;; esac
+# TOOL-aRepatriatedFork-46: a kit is named by the name its directory has in THIS install, never
+# as a literal segment: this suite's own from where it sits, a sibling's through the resolver,
+# which reads the install receipt first. A fixture mirrors that layout by the resolved NAME.
+KIT="${KIT_REL##*/}"
 export HERE_DIR="$HERE"   # the inline python arms import profile_bar from it
 n=0
 bad=0
@@ -60,8 +64,8 @@ done
 build_scratch() { # LEGS-JSON -> prints the scratch dir
   local legs=$1 d
   d=$(mktemp -d) || return 1
-  mkdir -p "$d/${PFX}run-gates" "$d/guarded"
-  cp "$HERE/run-gates.sh" "$HERE/profile_bar.py" "$d/${PFX}run-gates/" || return 1
+  mkdir -p "$d/${PFX}${KIT}" "$d/guarded"
+  cp "$HERE/run-gates.sh" "$HERE/profile_bar.py" "$d/${PFX}${KIT}/" || return 1
   ( cd "$d" \
     && git init -q . \
     && git config user.email profile-bar@test.invalid \
@@ -213,7 +217,7 @@ ledger_before=$(cat "$S6/.git/gate-ledger.tsv" 2>/dev/null)
 # durations, so every duration available belongs to an earlier run — without depending on
 # filesystem semantics this platform does not offer. It emits the runner's own verdict grammar so
 # the profiler gets that far, and never touches the ledger.
-cat > "$S6/${PFX}run-gates/run-gates.sh" <<'STUB'
+cat > "$S6/${PFX}${KIT}/run-gates.sh" <<'STUB'
 #!/usr/bin/env bash
 echo "gate profile: stub  (fixture; width 3, timeout off; stub)"
 # The leg NAMES come from the manifest, so they match the ledger rows the real first run wrote.

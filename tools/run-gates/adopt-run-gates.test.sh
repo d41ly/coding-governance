@@ -30,6 +30,10 @@ KIT_REL=$(derive_self_rel "$HERE") || { echo "adopt-e2e: not inside a git reposi
 # at a root install: every fixture and host path below is spelled through it, never through a
 # literal prefix (TOOL-aRepatriatedFork-28).
 case "$KIT_REL" in */*) PFX="${KIT_REL%/*}/" ;; *) PFX="" ;; esac
+# TOOL-aRepatriatedFork-46: a kit is named by the name its directory has in THIS install, never
+# as a literal segment: this suite's own from where it sits, a sibling's through the resolver,
+# which reads the install receipt first. A fixture mirrors that layout by the resolved NAME.
+KIT="${KIT_REL##*/}"
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "adopt-e2e: not a git repo"; exit 2; }
 cd "$ROOT" || exit 2
 KITDIR=$(cd "$(dirname "$0")" && pwd)
@@ -52,8 +56,8 @@ build_target() { # <name> <prefix> -> echoes the target root
   local t="$TMP/$1" pfx="$2"
   mkdir -p "$t/$pfx/run-gates" "$t/.governance"
   ( cd "$t" && git init -q . && git config user.email e@x && git config user.name t ) >/dev/null 2>&1
-  cp "$KITDIR/run-gates.sh" "$t/$pfx/run-gates/run-gates.sh"
-  cp "$ADOPT"               "$t/$pfx/run-gates/adopt-run-gates.sh"
+  cp "$KITDIR/run-gates.sh" "$t/$pfx/${KIT}/run-gates.sh"
+  cp "$ADOPT"               "$t/$pfx/${KIT}/adopt-run-gates.sh"
   printf '[]\n' > "$t/$pfx/gate-legs.json"
   ( cd "$t" && git add -A && git commit -qm init ) >/dev/null 2>&1
   printf '%s' "$t"

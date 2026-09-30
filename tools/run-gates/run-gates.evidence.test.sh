@@ -31,22 +31,111 @@ KIT_REL=$(derive_self_rel "$HERE") || { echo "evidence-test: not inside a git re
 # at a root install: every fixture and host path below is spelled through it, never through a
 # literal prefix (TOOL-aRepatriatedFork-28).
 case "$KIT_REL" in */*) PFX="${KIT_REL%/*}/" ;; *) PFX="" ;; esac
+KIT="${KIT_REL##*/}"   # this kit's own directory NAME (TOOL-aRepatriatedFork-46)
 
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "evidence-test: not a git repo"; exit 2; }
 cd "$ROOT" || exit 2
-RUNNER="$ROOT/${PFX}run-gates/run-gates.sh"
+RUNNER="$ROOT/${PFX}${KIT}/run-gates.sh"
 # The launcher is RESOLVED, not assumed, ONCE, for every python arm below: on Windows the bare name
 # `python` can be the Store stub that answers `command -v` and exits 9009, and an arm that dies on
 # the launcher would print FAIL and accuse the subject of a defect it never saw. `PYBIN=` overrides.
+# TOOL-aRepatriatedFork-46: the resolver is carried INLINE; it was sourced from the library
+# directory, which ships nowhere.
+# >>> resolve_python — canonical copy: resolve-python.sh in gov's lib dir (byte-identical; gated)
+resolve_python() {
+  # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
+  # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
+  # the candidate and every consumer uses "$PY" as a single word (measured: exit 127).
+  _rp_tried=""
+  for _rp_c in "${1:-}" "${GOV_PYTHON:-}" python3 python py; do
+    [ -n "$_rp_c" ] || continue
+    _rp_tried="$_rp_tried $_rp_c"
+    if "$_rp_c" -c "import sys" >/dev/null 2>&1; then
+      printf '%s\n' "$_rp_c"
+      return 0
+    fi
+  done
+  {
+    echo "resolve_python: no usable python launcher. Each candidate was RUN with -c 'import sys' and"
+    echo "resolve_python: none exited 0 — being on PATH is not evidence (the Microsoft Store python3"
+    echo "resolve_python: stub answers \`command -v\` and exits 9009 without running anything)."
+    echo "resolve_python: tried:$_rp_tried"
+    if [ -n "${1:-}" ]; then
+      echo "resolve_python: the caller's override '$1' was tried FIRST and did not run."
+    fi
+    if [ -n "${GOV_PYTHON:-}" ]; then
+      echo "resolve_python: GOV_PYTHON is set to '$GOV_PYTHON' and did not run. An override that is"
+      echo "resolve_python: set and unusable is THIS failure, never a silent fall-through — the"
+      echo "resolve_python: operator believes they chose, and would not have."
+    fi
+  } >&2
+  return 1
+}
+# <<< resolve_python
 DC_PY="${PYBIN:-}"
-if [ -z "$DC_PY" ] && [ -f "$ROOT/${PFX}lib/resolve-python.sh" ]; then
-  . "$ROOT/${PFX}lib/resolve-python.sh"
-  DC_PY=$(resolve_python 2>/dev/null)
-fi
+[ -n "$DC_PY" ] || DC_PY=$(resolve_python 2>/dev/null)
 # NO BARE FALLBACK. The idiom ban this repo's own bar carries reads `DC_PY=python` as a launcher
 # invoked without being resolved, and it was right: on the Store-stub machine that name is the
 # one launcher guaranteed NOT to run. A resolver that answered nothing is a refusal, said aloud.
 [ -n "$DC_PY" ] || { echo "evidence-test: no python launcher resolves, so the ceiling arms cannot run"; exit 2; }
+# TOOL-aRepatriatedFork-46: a kit is named by the name its directory has in THIS install, never
+# as a literal segment: this suite's own from where it sits, a sibling's through the resolver,
+# which reads the install receipt first. A fixture mirrors that layout by the resolved NAME. This
+# suite's own NAME is bound beside PFX, above, because RUNNER reads it before this point.
+# The sibling-kit resolver (TOOL-aRepatriatedFork-2 S3), INLINED byte-identically from the
+# canonical copy named on its marker line and gated by the resolve-python self-test's parity
+# table. A shell consumer runs it with the python it already resolved, so the receipt rung is
+# read in Python and never parsed in bash. `resolve_kit_dir <python> <home> <anchor> <here>`
+# prints the kit directory REPO-RELATIVE, or the resolver's named refusal on stderr and exits 1.
+resolve_kit_dir() {
+  "$1" -c "$(cat <<'RKD'
+# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
+def resolve_kit_dir(home, anchor, here):
+    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
+
+    1. receipt — the `.governance/install.json` row whose `source` ends in <home>/<anchor> and
+       whose `path` exists inside this tree. The only record of a RENAMED kit dir: no probe finds
+       a memory-recall kit an adopter homed at `scripts/recall/`.
+    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
+    3. refuse — LookupError naming the three places looked; never a guessed prefix.
+    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
+    """
+    import json
+    import pathlib
+    here = pathlib.Path(here).resolve()
+    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
+    receipt = root / ".governance" / "install.json"
+    try:
+        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("path"):
+            continue
+        if str(row.get("source") or "").split("/")[-2:] != [home, anchor]:
+            continue
+        hit = (root / str(row["path"])).resolve()
+        if hit.is_file() and root in hit.parents:
+            return hit.parent
+    probes = (here / home, here.parent / home)
+    for cand in probes:
+        if (cand / anchor).is_file():
+            return cand
+    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
+        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
+# <<< resolve_kit_dir
+RKD
+)"'
+import sys
+try:
+    d = resolve_kit_dir(*sys.argv[1:4])
+except LookupError as e:
+    sys.exit(str(e))
+r = next((p for p in (d, *d.parents) if (p / ".git").exists()), d.anchor)
+print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
+}
+LIB_DIR=$(resolve_kit_dir "$DC_PY" lib resolve-python.sh "$HERE") || exit 2
+LIB="${LIB_DIR##*/}"
 tmp="$(mktemp -d)"; trap 'rm -rf "$tmp"' EXIT
 bad=0
 # the run-gates promotion spec's S11. The count is INCREMENTED where the assertions actually happen -- in the
@@ -205,10 +294,10 @@ REC_OUT=$(mktemp)   # runner stdout goes OUTSIDE the repo under test: writing it
 
 rec_repo() {  # -> sets REC_T (worktree) and REC_GD (git dir)
   REC_T=$(mktemp -d)
-  mkdir -p "$REC_T/${PFX}run-gates" "$REC_T/${PFX}lib" "$REC_T/fx"
-  cp "$ROOT/${PFX}run-gates/run-gates.sh" "$ROOT/${PFX}run-gates/gate-fingerprint.sh" \
-     "$ROOT/${PFX}run-gates/gate-profiles.txt" "$REC_T/${PFX}run-gates/" || return 1
-  cp "$ROOT/${PFX}lib/resolve-python.sh" "$REC_T/${PFX}lib/" 2>/dev/null || true
+  mkdir -p "$REC_T/${PFX}${KIT}" "$REC_T/${PFX}${LIB}" "$REC_T/fx"
+  cp "$ROOT/${PFX}${KIT}/run-gates.sh" "$ROOT/${PFX}${KIT}/gate-fingerprint.sh" \
+     "$ROOT/${PFX}${KIT}/gate-profiles.txt" "$REC_T/${PFX}${KIT}/" || return 1
+  cp "$ROOT/${LIB_DIR}/resolve-python.sh" "$REC_T/${PFX}${LIB}/" 2>/dev/null || true
   ( cd "$REC_T" && git init -q -b main . && git config user.email rec@test.invalid \
       && git config user.name rec-test ) >/dev/null 2>&1 || return 1
   printf '#!/usr/bin/env bash\necho hello\nexit 0\n' > "$REC_T/fx/a.sh"
@@ -423,7 +512,7 @@ rec_repo
 for i in 1 2 3 4 5 6 7 8; do mkdir -p "$REC_GD/gate-run/old$i"; sleep 0.05; done
 rec_run GATE_FULL=1 >/dev/null
 left=$(ls -1 "$REC_GD/gate-run" 2>/dev/null | grep -cv '^current$')
-keep=$(grep -m1 -oE 'GATE_RUN_KEEP:-[0-9]+' "$ROOT/${PFX}run-gates/run-gates.sh" | grep -oE '[0-9]+')
+keep=$(grep -m1 -oE 'GATE_RUN_KEEP:-[0-9]+' "$ROOT/${PFX}${KIT}/run-gates.sh" | grep -oE '[0-9]+')
 # GRADED AGAINST THE CONSTANT BY NAME, read out of the runner. A bound written only into this arm is
 # satisfied by whatever a builder picked, including one above the fixture's size, which passes by
 # finding nothing.
@@ -460,7 +549,7 @@ rec_done
 
 # --- the fingerprint helper's two forms ------------------------------------------------------------
 rec_repo
-FP="$REC_T/${PFX}run-gates/gate-fingerprint.sh"
+FP="$REC_T/${PFX}${KIT}/gate-fingerprint.sh"
 a=$( cd "$REC_T" && bash "$FP" ); b=$( cd "$REC_T" && bash "$FP" HEAD )
 [ -n "$a" ] && [ "$a" = "$b" ] \
   && ok "on a clean tree the no-argument and at-a-rev forms agree" \
@@ -516,10 +605,10 @@ rm -f "$REC_OUT"
 
 ru_repo() {   # -> RU_T, RU_GD
   RU_T=$(mktemp -d)
-  mkdir -p "$RU_T/${PFX}run-gates" "$RU_T/${PFX}lib" "$RU_T/fx" "$RU_T/ga" "$RU_T/gb"
-  cp "$ROOT/${PFX}run-gates/run-gates.sh" "$ROOT/${PFX}run-gates/gate-fingerprint.sh" \
-     "$ROOT/${PFX}run-gates/gate-profiles.txt" "$RU_T/${PFX}run-gates/" || return 1
-  cp "$ROOT/${PFX}lib/resolve-python.sh" "$RU_T/${PFX}lib/" 2>/dev/null || true
+  mkdir -p "$RU_T/${PFX}${KIT}" "$RU_T/${PFX}${LIB}" "$RU_T/fx" "$RU_T/ga" "$RU_T/gb"
+  cp "$ROOT/${PFX}${KIT}/run-gates.sh" "$ROOT/${PFX}${KIT}/gate-fingerprint.sh" \
+     "$ROOT/${PFX}${KIT}/gate-profiles.txt" "$RU_T/${PFX}${KIT}/" || return 1
+  cp "$ROOT/${LIB_DIR}/resolve-python.sh" "$RU_T/${PFX}${LIB}/" 2>/dev/null || true
   ( cd "$RU_T" && git init -q -b main . && git config user.email ru@test.invalid \
       && git config user.name ru-test ) >/dev/null 2>&1 || return 1
   printf '#!/usr/bin/env bash\necho a\nexit 0\n' > "$RU_T/fx/a.sh"
@@ -624,9 +713,9 @@ ru_done
 # THE PROFILER STILL SEES A REUSED LEG. Without this the new verb is dropped by that tool's verdict
 # grammar and the bar is under-counted in silence — the same class as a leg that stops being
 # collected.
-if [ -f "$ROOT/${PFX}run-gates/profile_bar.py" ]; then
+if [ -f "$ROOT/${PFX}${KIT}/profile_bar.py" ]; then
   ru_repo
-  cp "$ROOT/${PFX}run-gates/profile_bar.py" "$RU_T/${PFX}run-gates/"
+  cp "$ROOT/${PFX}${KIT}/profile_bar.py" "$RU_T/${PFX}${KIT}/"
   ru_run GATE_FULL=1 >/dev/null
   ru_out=$( cd "$RU_T" && "$DC_PY" $KIT_REL/profile_bar.py --width 2 2>&1 )
   # Matched on the word the tool uses for a REFUSAL, not on 'executed leg' — which appears in its
@@ -654,13 +743,13 @@ fi
 # reached the installed file would rewrite the tracked `ceiling-evidence.txt` — a self-test that
 # edits the artifact its own merge-bar leg reads.
 DC_T=$(mktemp -d)
-mkdir -p "$DC_T/${PFX}run-gates"
-cp "$ROOT/${PFX}run-gates/derive-ceilings.py" "$ROOT/${PFX}run-gates/ceiling-margin.txt" \
-   "$DC_T/${PFX}run-gates/" || { echo "evidence-test: cannot copy the ceiling kit"; exit 2; }
+mkdir -p "$DC_T/${PFX}${KIT}"
+cp "$ROOT/${PFX}${KIT}/derive-ceilings.py" "$ROOT/${PFX}${KIT}/ceiling-margin.txt" \
+   "$DC_T/${PFX}${KIT}/" || { echo "evidence-test: cannot copy the ceiling kit"; exit 2; }
 ( cd "$DC_T" && git init -q -b main . ) >/dev/null 2>&1 \
   || { echo "evidence-test: cannot init the ceiling fixture repo"; exit 2; }
-DC_SCRIPT="$DC_T/${PFX}run-gates/derive-ceilings.py"
-DC_EV="$DC_T/${PFX}run-gates/ceiling-evidence.txt"
+DC_SCRIPT="$DC_T/${PFX}${KIT}/derive-ceilings.py"
+DC_EV="$DC_T/${PFX}${KIT}/ceiling-evidence.txt"
 # Three legs, ONE ceiling, three failing readings: AT it, well BELOW it, and at FOUR TIMES it. The
 # third is the class the window's upper edge refuses. It is not decoration — `run-gates.sh` sets
 # `bound=0` and runs every leg UNBOUNDED when its CEILINGS_LIVE probe fails, and the `.leg` row

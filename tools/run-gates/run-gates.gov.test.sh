@@ -47,6 +47,10 @@ KIT_REL=$(derive_self_rel "$HERE") || { echo "gov-canary: not inside a git repos
 # at a root install: every fixture and host path below is spelled through it, never through a
 # literal prefix (TOOL-aRepatriatedFork-28).
 case "$KIT_REL" in */*) PFX="${KIT_REL%/*}/" ;; *) PFX="" ;; esac
+# TOOL-aRepatriatedFork-46: a kit is named by the name its directory has in THIS install, never
+# as a literal segment: this suite's own from where it sits, a sibling's through the resolver,
+# which reads the install receipt first. A fixture mirrors that layout by the resolved NAME.
+KIT="${KIT_REL##*/}"
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "gov-canary: not a git repo"; exit 2; }
 cd "$ROOT" || exit 2
 
@@ -246,11 +250,11 @@ else
   # it cannot verify anywhere in the tree.
   a=$((a+1))
   if grep -qF 'min(8, nproc)' "$CHARTER"; then
-    echo "gov-canary: $CHARTER still states the built-in width formula; the width is declared in ${PFX}run-gates/gate-profiles.txt and read from there"; fail=1
+    echo "gov-canary: $CHARTER still states the built-in width formula; the width is declared in ${PFX}${KIT}/gate-profiles.txt and read from there"; fail=1
   fi
   a=$((a+1))
-  grep -qF ''"${PFX}run-gates/gate-profiles.txt"'' "$CHARTER" \
-    || { echo "gov-canary: $CHARTER does not name ${PFX}run-gates/gate-profiles.txt as the source of the pool width, so the negative half above would pass on a DELETED sentence"; fail=1; }
+  grep -qF ''"${PFX}${KIT}/gate-profiles.txt"'' "$CHARTER" \
+    || { echo "gov-canary: $CHARTER does not name ${PFX}${KIT}/gate-profiles.txt as the source of the pool width, so the negative half above would pass on a DELETED sentence"; fail=1; }
 fi
 
 # ---- G6. EVERY GOV LEG DECLARES A CEILING --------------------------------------------------------
