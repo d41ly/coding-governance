@@ -141,18 +141,18 @@ It schedules no idle-wake, and the section above does not bind it: there is an o
    | `wrap-up-derived` | how the wrap-up is composed | M9 | all | D8 |
    | `discoveries-adopted` | a beneficial discovery joins the running build, decided at once | M10 | all | D12 |
    | `passes-harnessed` | M6's pass sequence, DRIVEN as one program per protocol section 12 | M6 | all | D13 |
-   | `researched` | the candidate search when no seam fits | M12 | prompt | D9 |
-   | `solution-tested` | testing candidates before the pick | M12 | prompt | D10 |
+   | `researched` | the candidate search when no seam fits | M12 | all | D9 |
+   | `solution-tested` | testing candidates before the pick | M12 | all | D10 |
    | `playbook-followed` | the pass loop and its regrounding rule | M7 | recipe | D11 |
    | `pieces-recorded` | the wrap-up derivation, over the pieces | M9 | recipe | D11 |
 
    **`Scope`** is which runs a directive binds. `all` binds every unattended run; a scope naming a
-   mode binds only a run whose build README declared that `authorized-by:` value. `prompt` scopes
-   research and a solution test, which are obligations of a build whose solution was not given.
-   `recipe` scopes the two rows above, which are obligations of a build whose instructions were
-   given: following them to the letter, and recording what came out. A waiver of a scoped handle is
-   REFUSED on a run of another mode rather than recorded, since it would relax a rule that never
-   bound it.
+   mode binds only a run whose build README declared that `authorized-by:` value. Research and a
+   solution test bind every mode, and the build method's M12 decides when a build owes them: when
+   its solution was not given, whatever mode authorized the run. `recipe` scopes the two rows
+   above, which are obligations of a build whose instructions were given: following them to the
+   letter, and recording what came out. A waiver of a scoped handle is REFUSED on a run of another
+   mode rather than recorded, since it would relax a rule that never bound it.
 
    **Neither `recipe` row states its rule, and that is deliberate.** Following a declared procedure
    to the letter IS the pass loop and its regrounding rule, and recording what was produced IS the
@@ -390,9 +390,10 @@ comparison holds on this anchor only because you re-push; a roster grown and com
 is the ordinary state after research, and it blocks `--close` on `authorization-reachable` with no
 override available and nobody to interpret it.
 
-**The research and test obligations bind this path and not the slug path** — `researched` and
-`solution-tested` in the directive table are scoped `prompt`. They point at the build method's M12,
-which is where the loop is stated.
+**The research and test obligations bind this path and every other** — `researched` and
+`solution-tested` in the directive table are scoped `all`, so they bind every mode, and the build
+method's M12, which is where the loop is stated, decides when: a build whose solution was not given
+owes them.
 
 ## Start a PLAYBOOK run
 
@@ -469,7 +470,7 @@ provoked it; the amendment is a separate authoring run.
 `recipe`.** It has no playbook to name, so a `recipe`-mode preflight refuses it outright; and its
 whole diff lands outside any declared output glob, which is the shape a content run is scoped to
 avoid. There is no third mode here and no new discipline: the loop a playbook is written by is the
-build method's research-then-test-then-choose section, which this path's two scoped directives
+build method's research-then-test-then-choose section, which `researched` and `solution-tested`
 already bind. What this section adds is the ROUTING and one ordering property.
 
 **Arriving with no playbook and a topic is this path, not an error.** Research the subject and the

@@ -2862,7 +2862,7 @@ reset_tree
 # G, the scopes disagree. ONE branch and not a comm pair: measured, a single changed scope cell puts
 # the same handle in BOTH differences, so an only-in-table branch could never fire alone and its arm
 # would have proved nothing. Arm A already covers the handle set in both directions.
-reset_tree; mutate $KIT_REL/SKILL.template.md 's/| M12 | prompt | D9 |/| M12 | all | D9 |/'
+reset_tree; mutate $KIT_REL/SKILL.template.md 's/| M7 | recipe | D11 |/| M7 | all | D11 |/'
 hit "$(run)" "the directive scopes the registry declares are not the scopes the Skill's table shows, so the agent is told which runs a rule binds by a table that disagrees with the verb enforcing it:"
 
 # G, the locator: the column REMOVED entirely. Without this the join compares two empty sets and is

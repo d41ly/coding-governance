@@ -4380,18 +4380,21 @@ hit "$(cat memory/builds/tFresh/RUN.md)" "mode: slug"
 git rm -q --cached memory/builds/tFresh/RUN.md >/dev/null 2>&1; rm -f memory/builds/tFresh/RUN.md
 reset_tree
 
-# ---- check 45: a waiver of a PROMPT-scoped directive on a run that is not prompt-authorized. The
-# ---- refusal cannot live in check_waivers, which runs BEFORE the authorization read that produces
-# ---- the mode - there AUTH_MODE is unset for both modes, so one spelling never fires and the other
-# ---- always does. These arms are what prove it is evaluated where the mode exists.
+# ---- check 45: a waiver of a MODE-scoped directive on a run of another mode. The refusal cannot
+# ---- live in check_waivers, which runs BEFORE the authorization read that produces the mode - there
+# ---- AUTH_MODE is unset for every mode, so one spelling never fires and the other always does. The
+# ---- RECIPE arm below is check 45's witness: TOOL-dAlignedCarrier-3 scoped `researched` and
+# ---- `solution-tested` `all`, so no core entry is prompt-scoped, and this slug run's waiver of
+# ---- `researched` is ACCEPTED - the owner's every-mode ruling, observed rather than assumed.
 reset_tree
 out=$(run --preflight tFresh --keepalive-id k1 --waive researched --reason "does not apply here")
-hit "$out" "--waive names a directive whose scope is a mode this run is not, so the waiver would record the relaxation of a rule that never bound it - handle"
-same "check 45 created no run-state file" "$([ -f memory/builds/tFresh/RUN.md ] && echo yes || echo no)" "no"
+hit "$out" "preflight OK"
+hit "$(cat memory/builds/tFresh/RUN.md)" "waiver · item researched · reason does not apply here"
+git rm -q --cached memory/builds/tFresh/RUN.md >/dev/null 2>&1; rm -f memory/builds/tFresh/RUN.md
 
-# ...and the SECOND scope value, on its own arm. This file's own history is the reason: an arm naming
-# one scoped member twice left a later member unenforced and green, so every new scope value gets an
-# arm the day it exists rather than the day someone notices it never had one.
+# ...and the recipe scope value, on its own arm, which is the one check 45 now refuses. This file's own
+# history is the reason: an arm naming one scoped member twice left a later member unenforced and
+# green, so every scope value a core entry carries has an arm refusing it on another mode.
 reset_tree
 out=$(run --preflight tFresh --keepalive-id k1 --waive playbook-followed --reason "no playbook here")
 hit "$out" "--waive names a directive whose scope is a mode this run is not, so the waiver would record the relaxation of a rule that never bound it - handle"
@@ -4415,8 +4418,8 @@ hit "$out" "preflight OK"
 hit "$out" "directive waived — reuse-first"
 git rm -q --cached memory/builds/tFresh/RUN.md >/dev/null 2>&1; rm -f memory/builds/tFresh/RUN.md
 
-# ---- ...and the PROMPT-scoped handle IS accepted on a prompt-authorized run, which is the whole
-# ---- point of the scope rather than a way to refuse things.
+# ---- ...and `researched` is accepted on a prompt-authorized run too: scope `all` binds every mode,
+# ---- so the mode that once scoped it still takes its waiver.
 reset_tree
 out=$(run --preflight tModeOk --keepalive-id k1 --waive researched --reason "the prompt named one solution")
 hit "$out" "preflight OK"

@@ -1,11 +1,12 @@
 # TOOL-dAlignedCarrier-3 — the research and solution-test directives bind every mode
 
-**Status:** SPECCED · rev-1 · 2026-09-30 · node d · Tier-2 · base 87c245b3 · streams tooling · order 1 · closes TOOL-dDerivedDocket-71 · ratified 2026-09-30
+**Status:** CLOSED · rev-2 · 2026-09-30 · node d · Tier-2 · base 87c245b3 · streams tooling · order 1 · closes TOOL-dDerivedDocket-71 · ratified 2026-09-30
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-30-build-TOOL-dAlignedCarrier-3-1-acceptance-ledger.md](../build/2026-09-30-build-TOOL-dAlignedCarrier-3-1-acceptance-ledger.md) | journal | — |
 | [2026-09-30-prompt-TOOL-dAlignedCarrier-1-build-brief.md](../prompts/2026-09-30-prompt-TOOL-dAlignedCarrier-1-build-brief.md) | journal | TOOL-dAlignedCarrier-1 TOOL-dAlignedCarrier-2 TOOL-dAlignedCarrier-4 TOOL-dAlignedCarrier-5 TOOL-dAlignedCarrier-6 |
 | [2026-09-30-prompt-TOOL-dAlignedCarrier-1-spec-brief.md](../prompts/2026-09-30-prompt-TOOL-dAlignedCarrier-1-spec-brief.md) | journal | TOOL-dAlignedCarrier-1 TOOL-dAlignedCarrier-2 TOOL-dAlignedCarrier-4 TOOL-dAlignedCarrier-5 TOOL-dAlignedCarrier-6 |
 
@@ -110,6 +111,12 @@ The registry grammar says an absent third field is `all`, and every all-scoped e
 way. A `:all` suffix on two entries would make one value spelled two ways inside one constant. Both
 readers resolve the two spellings identically, so the choice is spelling, and F2 records it.
 
+As built, the Skill's Scope paragraph and its prompt-path paragraph each say both handles bind
+every mode beside M12, and the playbook-authoring paragraph names `researched` and
+`solution-tested` where it said "this path's two scoped directives". The check-45 region of
+`tools/unattended/unattended.test.sh` also rewords the comment above the `tModeOk` arm, which called
+`researched` PROMPT-scoped; that arm's assertions are unchanged.
+
 ### Rollout
 
 The render is `bash tools/unattended/adopt-unattended.sh`, run in the same pass after the template
@@ -156,12 +163,16 @@ is the parity observation.
   prints 2.
   Red when: either row's Scope cell reads anything but `all`, in the template or the render.
 - **AC3** — When the `researched` row's Scope cell in `tools/unattended/SKILL.template.md` is set back
-  to `prompt` and staged, `bash tools/unattended/check-unattended.sh` exits 1 with
+  to `prompt` and staged, `bash tools/unattended/check-unattended.sh --skip 28`, the argv of the
+  `unattended kit gate` leg scoped past the 28 region, exits 1 with
   `UNATTENDED check 16 FAILED — the directive scopes the registry declares are not the scopes the
   Skill's table shows`. When the file is restored from a byte-identical backup, the same command exits
   0 with no `FAILED` line, and `bash tools/unattended/adopt-unattended.sh --check` exits 0.
   Red when: the join stays silent over the staged disagreement, or the restored tree reds.
-  cost: two runs of the kit gate, 593 s each on node d on 2026-09-30 (PINNED).
+  cost: two scoped runs of the kit gate, their seconds MEASURED at observation. The unscoped leg,
+  593 s whole on node d on 2026-09-30 (PINNED), sits at a unit pass's 600 s command bound, so its
+  verdict over the 28 region, which reads the playbook template and not the directive registry, is
+  the close bar's.
 - **AC4** — When `grep -c -i -E 'scoped .prompt.|not the slug path|two scoped directives' tools/unattended/SKILL.template.md`
   runs, it prints 0, where BASE prints 3; and `grep -c -i 'every mode' tools/unattended/SKILL.template.md`
   prints at least 2, where BASE prints 0, one in the Scope paragraph and one in the prompt-path
@@ -209,6 +220,11 @@ New arm: `tools/unattended/check-unattended.test.sh` · the scope-disagreement a
 
 - rev-1 · 2026-09-30 · initial draft, from the ask's accept clause, the owner's ruling and the
   build's spec brief.
+- rev-2 · 2026-09-30 · §4 §6 · AC3 · the build pass. AC3 runs the kit gate scoped `--skip 28`, the
+  scope units 1 and 2 took for the same reason: the unscoped leg measures 593 s against a unit
+  pass's 600 s command bound, and check 16's scope join sits outside the 28 region, so the scope
+  reads the check whole and leaves only the 28 region's verdict to the close bar. §4 records the
+  Skill wording as built and the stale `tModeOk` comment the check-45 region also carried.
 
 ## 10. Reuse audit
 

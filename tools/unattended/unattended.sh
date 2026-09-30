@@ -813,7 +813,7 @@ HALT_CODES_CORE="runaway-ceiling-unclean fork-unresolvable scope-approval-needed
 # through HOLD_CODES_EXTRA and deletes nothing, which HOLD_FLOOR pins the way HALT_FLOOR pins the
 # halt set.
 HOLD_CODES_CORE="host-degraded platform-limit platform-unavailable host-owner-action inherited-red"
-DIRECTIVES_CORE="minimal-prose:M10 sub-specced:M2 forks-resolved:M3 specs-reviewed:M4 reuse-first:M5 parallel-when-disjoint:M6 passes-committed:M6 diff-reviewed:M8 land-once-done:M8 conflicts-reconciled:M8 wrap-up-derived:M9 researched:M12:prompt solution-tested:M12:prompt pieces-recorded:M9:recipe playbook-followed:M7:recipe discoveries-adopted:M10 passes-harnessed:M6"
+DIRECTIVES_CORE="minimal-prose:M10 sub-specced:M2 forks-resolved:M3 specs-reviewed:M4 reuse-first:M5 parallel-when-disjoint:M6 passes-committed:M6 diff-reviewed:M8 land-once-done:M8 conflicts-reconciled:M8 wrap-up-derived:M9 researched:M12 solution-tested:M12 pieces-recorded:M9:recipe playbook-followed:M7:recipe discoveries-adopted:M10 passes-harnessed:M6"
 
 # the AUTHORIZATION MODE set, published as a constant so it is spelled
 # ONCE. It was a `case` arm in one file and a hardcoded pair in another, which is why check 19 could
