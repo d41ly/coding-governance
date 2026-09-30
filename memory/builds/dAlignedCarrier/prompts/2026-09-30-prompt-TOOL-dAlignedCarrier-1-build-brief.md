@@ -28,6 +28,12 @@ with its section 9 line). Where they disagree about a RECORD SHAPE below, this b
   see it RED, unstage the break. Stage your real changes BEFORE a negative arm that ends in
   `git checkout --`, or the restore eats your edits.
 - **Stage explicit paths.** Never `git add -A`.
+- **Declare EVERY path your commit writes with `--dispatch`**, generated ones included: the build
+  README, the spec's records region, `memory/LIVE.md`, `memory/ledger/<month>.md`,
+  `memory/backlog/<FAMILY>.md`, every render. Re-declare WIDER before the commit when the render
+  touches one you missed. `--dispatch` refuses `RUN.md`, and the kit gate's check 23 excludes it. The
+  corpus sat one write under `UNDECLARED_WRITE_CEILING` after unit 1, so a single undeclared path in
+  your commit reds the bar at the close.
 
 ## What your ONE build commit carries
 
