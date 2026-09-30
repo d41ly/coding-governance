@@ -6,7 +6,7 @@
 # writes one, in the pass that needs it; the write path preserves it but never invents it.
 # predicate-epoch: 6
 .githooks/pre_push_bar_selftest.py	2	run-gates
-tools/check-install-prefix.test.sh	40	(loose),govkit,hooks,lib,memory-recall,memory-tree	LOWERED 72 -> 13 by TOOL-aRepatriatedFork-28, which spells every fixture path through the derived prefix. What is left is this gate's own red fixtures, root-install spellings under its marker and quoted-join samples of its literal predicate, and two layouts at a foreign literal prefix: all TOOL-aRepatriatedFork-30's, which rewrites that predicate (spec rev-3 §4, Returned).
+tools/check-install-prefix.test.sh	40	(loose),govkit,hooks,lib,memory-recall,memory-tree	LOWERED 72 -> 13 by TOOL-aRepatriatedFork-28, then RAISED to 42 by predicate epoch 6, whose one rebaseline counts the ${PFX}-led fixture paths the brace rule had hidden, and LOWERED to 40 by TOOL-aRepatriatedFork-46's fixture repairs. What is left is this gate's own red fixtures, root-install spellings under its marker, quoted-join samples of its literal predicate and two layouts at a foreign literal prefix: all TOOL-aRepatriatedFork-30's, which rewrites that predicate.
 tools/check-wiring.test.sh	1	hooks
 tools/dead-path-waivers.txt	2	lexicon
 tools/govkit/fixtures/adopter-ic-2cff5855.receipt.json	91	codebase-map,drift-audit,gate-lint,lexicon,unattended,workflows
@@ -22,4 +22,4 @@ tools/workflows/check-review-join.test.sh	4	hooks,workflows
 tools/workflows/check-verifier-fanout.test.sh	10	hooks,workflows
 tools/workflows/drift-audit-state.js	1	(loose)
 tools/workflows/unattended-build.js	6	memory-tree,unattended,workflows
-tools/workflows/unattended-build.test.sh	32	memory-tree,unattended,workflows	LOWERED 49 -> 35 by TOOL-aRepatriatedFork-28: every asserted sub-workflow path spells the derived prefix. What is left is the PV layouts built at the foreign literal prefix scripts/ on purpose, TOOL-aRepatriatedFork-30's, and kit segments under the derived tool root, TOOL-aRepatriatedFork-46's (spec rev-3 §4, Returned).
+tools/workflows/unattended-build.test.sh	32	memory-tree,unattended,workflows	LOWERED 49 -> 35 by TOOL-aRepatriatedFork-28, and from epoch 6's 48 to 32 by TOOL-aRepatriatedFork-46, which names every kit under the derived tool root by its resolved directory. What is left is the PV layouts built at the foreign literal prefix scripts/ on purpose: TOOL-aRepatriatedFork-30's.

@@ -1,11 +1,12 @@
 # TOOL-aRepatriatedFork-46 — no line joins a literal kit name under a derived base
 
-**Status:** SPECCED · rev-2 · 2026-09-30 · node a · Tier-2 · base 6830f257 · streams tooling · order 16 · ratified 2026-09-30
+**Status:** CLOSED · rev-2 · 2026-09-30 · node a · Tier-2 · base 6830f257 · streams tooling · order 16 · ratified 2026-09-30
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-30-build-TOOL-aRepatriatedFork-46-1-acceptance-ledger.md](../build/2026-09-30-build-TOOL-aRepatriatedFork-46-1-acceptance-ledger.md) | journal | — |
 | [2026-09-30-prompt-TOOL-aRepatriatedFork-46-build-brief.md](../prompts/2026-09-30-prompt-TOOL-aRepatriatedFork-46-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->

@@ -71,6 +71,13 @@ excused was their USAGE HEADERS, and six shipped files were telling an adopter t
 resolves to nothing in their tree. They are now graded when a descriptor says they ship, and the
 fixture exemption moved to the LINE, where the distinction actually lives.
 
+Epoch 6 (`TOOL-aRepatriatedFork-46`) fixed two places the ban misjudged its own class. A quoted kit
+segment after a quoted literal and a comma counts only inside an open path-join call, so a kit id
+passed as an argument, a list member or a JSON key is no path. And only the render and prose tokens
+drain a kit segment: a kit name typed after `${PFX}` or any other brace counts. The same unit drained
+every kit segment under a derived base, so what the ban list holds now is the literal-prefix fixture
+class `TOOL-aRepatriatedFork-30` owns.
+
 Two exemptions, and they are not interchangeable. `gov:root-fixture — <reason>` on the offending line
 is the live one; a marker with no reason is a refusal, because an exemption that costs eleven
 characters is the self-service form the ban arm already converted away from. The `<path>:<line>`
