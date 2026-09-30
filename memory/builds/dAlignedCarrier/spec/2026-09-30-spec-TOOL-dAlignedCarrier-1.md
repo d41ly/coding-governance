@@ -10,6 +10,7 @@
 | [2026-09-30-prompt-TOOL-dAlignedCarrier-1-build-brief.md](../prompts/2026-09-30-prompt-TOOL-dAlignedCarrier-1-build-brief.md) | journal | TOOL-dAlignedCarrier-2 TOOL-dAlignedCarrier-3 TOOL-dAlignedCarrier-4 TOOL-dAlignedCarrier-5 TOOL-dAlignedCarrier-6 |
 | [2026-09-30-prompt-TOOL-dAlignedCarrier-1-spec-brief.md](../prompts/2026-09-30-prompt-TOOL-dAlignedCarrier-1-spec-brief.md) | journal | TOOL-dAlignedCarrier-2 TOOL-dAlignedCarrier-3 TOOL-dAlignedCarrier-4 TOOL-dAlignedCarrier-5 TOOL-dAlignedCarrier-6 |
 | [2026-09-30-review-TOOL-dAlignedCarrier-1-closing-diff-round1.md](../reviews/2026-09-30-review-TOOL-dAlignedCarrier-1-closing-diff-round1.md) | diff-review | TOOL-dAlignedCarrier-2 TOOL-dAlignedCarrier-3 TOOL-dAlignedCarrier-4 TOOL-dAlignedCarrier-5 TOOL-dAlignedCarrier-6 |
+| [2026-09-30-review-TOOL-dAlignedCarrier-6-closing-diff-round2.md](../reviews/2026-09-30-review-TOOL-dAlignedCarrier-6-closing-diff-round2.md) | diff-review | TOOL-dAlignedCarrier-6 |
 
 <!-- /gen:spec-records -->
 

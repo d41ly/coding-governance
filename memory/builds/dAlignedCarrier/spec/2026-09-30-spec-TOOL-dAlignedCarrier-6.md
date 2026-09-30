@@ -11,6 +11,7 @@
 | [2026-09-30-prompt-TOOL-dAlignedCarrier-1-spec-brief.md](../prompts/2026-09-30-prompt-TOOL-dAlignedCarrier-1-spec-brief.md) | journal | TOOL-dAlignedCarrier-1 TOOL-dAlignedCarrier-2 TOOL-dAlignedCarrier-3 TOOL-dAlignedCarrier-4 TOOL-dAlignedCarrier-5 |
 | [2026-09-30-prompt-TOOL-dAlignedCarrier-6-fold-brief.md](../prompts/2026-09-30-prompt-TOOL-dAlignedCarrier-6-fold-brief.md) | journal | — |
 | [2026-09-30-review-TOOL-dAlignedCarrier-1-closing-diff-round1.md](../reviews/2026-09-30-review-TOOL-dAlignedCarrier-1-closing-diff-round1.md) | diff-review | TOOL-dAlignedCarrier-1 TOOL-dAlignedCarrier-2 TOOL-dAlignedCarrier-3 TOOL-dAlignedCarrier-4 TOOL-dAlignedCarrier-5 |
+| [2026-09-30-review-TOOL-dAlignedCarrier-6-closing-diff-round2.md](../reviews/2026-09-30-review-TOOL-dAlignedCarrier-6-closing-diff-round2.md) | diff-review | TOOL-dAlignedCarrier-1 |
 
 <!-- /gen:spec-records -->
 
