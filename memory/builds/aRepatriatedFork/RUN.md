@@ -104,3 +104,7 @@ base: d6e1749c0542218004260928f1399174daafb789
 2026-09-30T15:50:56Z decision · item Deleting the carried install-prefix ledger left another build's live spec (TOOL-dPolishedVitrine-1 AC7, node d) citing it; the run added one row to memory/project/spec-token-waivers.txt, a registry documented as shrink-only (22 -> 23). Keep the row, or amend that AC? · reason Options seen: (a) the waiver row with its reason, reversible; (b) amend node d's in-progress spec, which is not this run's record to edit. The row is a documented-rule rise with no balancing fall, so it is surfaced rather than decided.
 
 2026-09-30T16:06:59Z review · item aRepatriatedFork · reason verdict BLOCKED · blockers 1
+
+2026-09-30T17:26:09Z review · item aRepatriatedFork · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · disposition promote
+
+2026-09-30T17:26:09Z rescope · item add TOOL-aRepatriatedFork-49 · reason closing review round 2 H1 (HIGH, promoted): the B1 fold vets the receipt and runner, but GATE_LEGS or GOV_PYTHON from the environment, or an ignored gate-legs.json, still lets the tracked runner certify a planted green manifest over a red tracked bar
