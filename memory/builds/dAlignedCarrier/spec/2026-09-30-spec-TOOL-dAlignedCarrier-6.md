@@ -1,11 +1,12 @@
 # TOOL-dAlignedCarrier-6 — the owed self-test bar is announced at VERIFYING, and the main loop exports its flag
 
-**Status:** SPECCED · rev-2 · 2026-09-30 · node d · Tier-2 · base 87c245b3 · streams tooling · order 1 · closes TOOL-dDerivedDocket-70 · ratified 2026-09-30
+**Status:** CLOSED · rev-3 · 2026-09-30 · node d · Tier-2 · base 87c245b3 · streams tooling · order 1 · closes TOOL-dDerivedDocket-70 · ratified 2026-09-30
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-30-build-TOOL-dAlignedCarrier-6-1-acceptance-ledger.md](../build/2026-09-30-build-TOOL-dAlignedCarrier-6-1-acceptance-ledger.md) | journal | — |
 | [2026-09-30-prompt-TOOL-dAlignedCarrier-1-build-brief.md](../prompts/2026-09-30-prompt-TOOL-dAlignedCarrier-1-build-brief.md) | journal | TOOL-dAlignedCarrier-1 TOOL-dAlignedCarrier-2 TOOL-dAlignedCarrier-3 TOOL-dAlignedCarrier-4 TOOL-dAlignedCarrier-5 |
 | [2026-09-30-prompt-TOOL-dAlignedCarrier-1-spec-brief.md](../prompts/2026-09-30-prompt-TOOL-dAlignedCarrier-1-spec-brief.md) | journal | TOOL-dAlignedCarrier-1 TOOL-dAlignedCarrier-2 TOOL-dAlignedCarrier-3 TOOL-dAlignedCarrier-4 TOOL-dAlignedCarrier-5 |
 
@@ -28,7 +29,9 @@ and has the Skill and the declarations describe the new order.
   fact, instead of `HEAD^1..HEAD` of a prepared merge. Four outcomes: a range touching a declared
   prefix prints the owed line, §4 "The notice"; a range touching none prints nothing, as today; a blank
   `SELFTESTS_OWED_PATHS` prints the blank announcement, as today; a record pinning no `base` prints
-  that the range is unanswerable. No line is prefixed `close`. Observed by AC1, AC2.
+  that the range is unanswerable, and so does a pinned `base` this clone cannot resolve, whose
+  `git diff` would print nothing and read as an untouching range. No line is prefixed `close`.
+  Observed by AC1, AC2.
 - **S2** — `verb_phase` calls it after its `phase VERIFYING · witness` line when the target phase is
   `VERIFYING`, whatever `LANDER_MODE` declares, and for no other target. Observed by AC1, AC3.
 - **S3** — `print_resume_orientation` calls it when its phase argument is `VERIFYING`, so a session
@@ -114,7 +117,8 @@ The `base` fact is pinned by `--preflight` and read back unchanged. The gate-gua
 ```
 unattended: the run's range <base8>..HEAD touches a declared self-test surface (<prefixes>), so the kit Definition of Done owes the flagged bar: export GATE_SELFTESTS=1 into this run's one --close, whose bar inherits it; this driver sets it nowhere
 unattended: SELFTESTS_OWED_PATHS is blank, so no range here can ever owe the flagged bar and no phase move will announce one
-unattended: the record pins no base, so the range that decides whether the flagged bar is owed cannot be read, and no notice is printed
+unattended: the record pins no base, so the range that decides whether the flagged bar is owed cannot be read, and no notice is printed; whether it is owed is unanswerable here, not no
+unattended: the record's base <base8> does not resolve in this clone, so the range that decides whether the flagged bar is owed cannot be read, and no notice is printed; whether it is owed is unanswerable here, not no
 ```
 
 The builder may reword for accuracy, and must keep the leading `unattended:`, the phrase
@@ -257,6 +261,12 @@ New arm: `tools/unattended/unattended.test.sh` · a move into VERIFYING over a r
   porcelain (check 62), and found the bullet's closing "the close ANNOUNCES" sentence left standing.
   S6 now gives the sequence per `LANDER_MODE` with no move after `--prepare`, and rewrites that
   sentence; AC5 observes both.
+- rev-3 · 2026-09-30 · §2 §4 · S1 · the build pass. A pinned `base` this clone cannot resolve now reads
+  as the unanswerable outcome too, with its own line in §4 "The notice": `git diff` over it printed
+  nothing and read as an untouching range, the silent skip §5 rules out. Both unanswerable lines end
+  "unanswerable here, not no". The suite arms sit inside the in-place block after its untouching
+  close arm, reusing `ipreset`, and add the resume, blank and no-base readings beside S9's three. No
+  acceptance criterion moved.
 
 ## 10. Reuse audit
 

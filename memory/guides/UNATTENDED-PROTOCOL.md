@@ -455,7 +455,7 @@ In the repo-root `.unattended.conf`. Blank or absent turns the corresponding ass
 | `MEMORY_ROOT` | the memory tree's root, matching the memory-tree kit's conf |
 | `LANDER` | the mandated landing command |
 | `LANDER_MODE` | the landing SHAPE, closed set `primary` / `in-place`; blank reads `primary`, announced. §6 |
-| `SELFTESTS_OWED_PATHS` | path prefixes whose touch makes an `in-place` close ANNOUNCE the flagged bar is owed. Blank means never, announced |
+| `SELFTESTS_OWED_PATHS` | path prefixes whose touch in the run's range from its pinned BASE makes the move into `VERIFYING` ANNOUNCE the flagged bar is owed, which the main loop pays by exporting the flag into its one `--close`. Blank means never, announced |
 | `BYPASS_BAN` | the flag the close path must never emit |
 | `GATE_CMD` · `GATE_WALL` · `GATE_PROFILE_CMD` | the full merge bar, for `gates-green`; the whole-run wall in seconds on it, and the command printing its resolved profile. The last two OPTIONAL |
 | `GATE_BOUND` | the wall-clock bound, in seconds, on `GATE_CMD` and `WIRING_CHECK`. OPTIONAL: absent takes the kit default and says so on stderr; non-numeric or zero is a refusal |

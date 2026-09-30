@@ -8702,12 +8702,13 @@ ipprep ""
 out=$(STUB_PREPARED=0 STUB_CARRY=3 iprun --close tRun $IPOVR)
 hit "$out" "the declared lander could not observe what this landing would publish, which is the remote or the clone, so the close cannot say whether the set is clean and refuses rather than guessing; nothing was written"
 
-# ---- S5: the close COMMITS its own record on top of the graded merge, and S3's derived term
-# ---- ANNOUNCES rather than exporting. TOOL-dUnstalledConvoy-24 for the first, F6 for the second.
+# ---- S5: the close COMMITS its own record on top of the graded merge, and S3's derived term is
+# ---- NOT announced here: TOOL-dAlignedCarrier-6 moved the notice to the move into VERIFYING, arms
+# ---- below. TOOL-dUnstalledConvoy-24 for the first, F6 and TOOL-dDerivedDocket-70 for the second.
 ipprep kitsurface/thing.txt; rm -f "$ip_out/barenv.txt"
 out=$(STUB_PREPARED=0 STUB_CARRY=0 iprun --close tRun $IPOVR)
 hit  "$out" "phase LANDING, committed at"
-hit  "$out" "the landing range HEAD^1..HEAD touches a declared self-test surface (kitsurface/), so the kit Definition of Done owes the flagged bar"
+miss "$out" "touches a declared self-test surface"
 same "the close left a clean tree"        "$(ipgit status --porcelain)" ""
 same "the close commit names the slug"    "$(ipgit log -1 --format=%s)" "records(tRun): close — LANDING"
 same "the record reached LANDING"         "$(sed -n 's/^phase: //p' "$ip_dir/memory/builds/tRun/RUN.md")" "LANDING"
@@ -8730,12 +8731,52 @@ ipprep kitsurface/thing.txt; rm -f "$ip_out/barenv.txt"
     bash "$SCRIPT" --close tRun $IPOVR ) >/dev/null 2>&1
 same "an inherited GATE_SELFTESTS reaches the bar unchanged" "$(grep -c '^GATE_SELFTESTS=1$' "$ip_out/barenv.txt")" "1"
 
-# ---- ...and a range touching NO declared entry gets the same environment and NO announcement. An
-# ---- announcement that fires on every landing says nothing a reader can act on.
+# ---- ...and a range touching NO declared entry gets the same environment. The close announces over
+# ---- neither range since TOOL-dAlignedCarrier-6; which range owes the flagged bar is the VERIFYING
+# ---- move's to say, and the arms below grade the untouching range there.
 ipprep ""; rm -f "$ip_out/barenv.txt"
 out=$(STUB_PREPARED=0 STUB_CARRY=0 iprun --close tRun $IPOVR)
 miss "$out" "touches a declared self-test surface"
 same "the untouching range still runs the bar with every guard off" "$(grep -c '^GATE_FULL=1$' "$ip_out/barenv.txt")" "1"
+
+# ---- TOOL-dAlignedCarrier-6: the owed flagged bar is ANNOUNCED on the move into VERIFYING, over the
+# ---- run's range from its pinned `base` fact, because that is where the main loop decides what its
+# ---- one --close exports. A move into another phase is silent, an untouching range is silent, and a
+# ---- resume that finds the record at VERIFYING reads the notice again after its orientation lines.
+ipreset
+iprun --preflight tRun --keepalive-id k1 >/dev/null
+ipgit add -A >/dev/null && ipgit commit -q -m fixture --no-verify
+ip_vb=$(sed -n 's/^base: //p' "$ip_dir/memory/builds/tRun/RUN.md")
+date +%s%N > "$ip_dir/kitsurface/thing.txt"
+ipgit add -A >/dev/null && ipgit commit -q -m touch --no-verify
+out=$(iprun --phase tRun BUILDING --witness "$(ipgit rev-parse HEAD)")
+hit  "$out" "phase BUILDING"
+miss "$out" "touches a declared self-test surface"
+out=$(iprun --phase tRun VERIFYING --witness "$(ipgit rev-parse HEAD)")
+hit  "$out" "unattended: the run's range ${ip_vb:0:8}..HEAD touches a declared self-test surface (kitsurface/), so the kit Definition of Done owes the flagged bar: export GATE_SELFTESTS=1 into this run's one --close"
+ipgit add -A >/dev/null && ipgit commit -q -m "records: VERIFYING" --no-verify
+out=$(iprun --resume tRun --keepalive-id k1)
+hit  "$out" "unattended: resume at phase VERIFYING"
+ip_lo=$(printf '%s\n' "$out" | grep -n 'resume at phase VERIFYING' | head -1 | cut -d: -f1)
+ip_lw=$(printf '%s\n' "$out" | grep -n 'touches a declared self-test surface (kitsurface/)' | head -1 | cut -d: -f1)
+n=$((n+1)); { [ -n "$ip_lo" ] && [ -n "$ip_lw" ] && [ "$ip_lw" -gt "$ip_lo" ]; } || { echo "FAIL the resume at VERIFYING printed no notice after its orientation: [$ip_lo] [$ip_lw]"; st=1; }
+# ---- ...an untouching range, a blank declaration and a record with no base: the first silent, the
+# ---- other two ANNOUNCED, because a skip that reads like a pass un-owes a Definition-of-Done clause.
+ipreset
+iprun --preflight tRun --keepalive-id k1 >/dev/null
+ipgit add -A >/dev/null && ipgit commit -q -m fixture --no-verify
+out=$(iprun --phase tRun VERIFYING --witness "$(ipgit rev-parse HEAD)")
+hit  "$out" "phase VERIFYING"
+miss "$out" "touches a declared self-test surface"
+miss "$out" "cannot be read"
+cp "$ip_dir/.unattended.conf" "$ip_out/keep.conf"
+sed -i 's/^SELFTESTS_OWED_PATHS=.*/SELFTESTS_OWED_PATHS=""/' "$ip_dir/.unattended.conf"
+out=$(iprun --phase tRun VERIFYING --witness "$(ipgit rev-parse HEAD)")
+hit  "$out" "unattended: SELFTESTS_OWED_PATHS is blank, so no range here can ever owe the flagged bar and no phase move will announce one"
+cp "$ip_out/keep.conf" "$ip_dir/.unattended.conf"
+sed -i '/^base: /d' "$ip_dir/memory/builds/tRun/RUN.md"
+out=$(iprun --phase tRun VERIFYING --witness "$(ipgit rev-parse HEAD)")
+hit  "$out" "unattended: the record pins no base, so the range that decides whether the flagged bar is owed cannot be read, and no notice is printed"
 
 # ---- AC1, the whole reason this mode exists: a branch that is GREEN ALONE and RED once merged onto
 # ---- a tip the remote moved. Under `primary` the bar would grade the branch and this would land.

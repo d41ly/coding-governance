@@ -4221,6 +4221,10 @@ verb_phase() { # slug · phase · witness
   stage_or_fail "$rel" || return 1
   set_fact "$rel" witness "$wit" || return 1
   echo "unattended: phase $want · witness $wit"
+  # TOOL-dAlignedCarrier-6 S2 - THE MOVE INTO VERIFYING IS WHERE THE OWED FLAGGED BAR IS ANNOUNCED,
+  # under every LANDER_MODE, because it is the phase in which the main loop decides what its one
+  # `--close` exports. No other target announces.
+  [ "$want" = VERIFYING ] && print_selftests_owed "$rel"
   return 0
 }
 
@@ -6181,6 +6185,9 @@ print_resume_orientation() { # run-state file · phase
   echo "unattended: resume at phase $2 — read $1, then continue the first non-terminal unit above"
   [ -f "$M/guides/BUILD-METHOD.md" ] && echo "unattended: re-read the build method at $M/guides/BUILD-METHOD.md"
   echo "unattended: the directives and their waivers — the table in the unattended Skill; your waivers are parked in this file"
+  # TOOL-dAlignedCarrier-6 S3 - a session resuming or taking over a run at VERIFYING, after a
+  # compaction or a process death, reads the owed-bar notice again: it never saw the move's.
+  [ "$2" = VERIFYING ] && print_selftests_owed "$1"
   return 0
 }
 
@@ -7075,24 +7082,39 @@ check_inplace_preconditions() { # slug -> 0 when the bar may run over a prepared
   return 1
 }
 
-# S3 - THE SELF-TEST TERM IS DERIVED, AND WHAT THE DERIVATION PRODUCES IS AN ANNOUNCEMENT.
-# `AGENTS.md` records `GATE_SELFTESTS=1` as ON DEMAND ONLY with no boundary setting it (owner,
-# 2026-08-27), and a landing's `gates-green` IS a boundary, since its stamp is the one the push
-# reuses. So this verb ADDS the flag to nothing and REMOVES it from nothing: an owner who runs the
-# close with it already exported keeps it by inheritance, which is exactly the on-demand use that
-# ruling sanctions. What the derivation buys is that nobody has to REMEMBER the run is owed.
-print_selftests_owed() { # -> announces when the landing range owes the flagged bar
-  local _p _q _hit="" _touched
+# S3 - THE SELF-TEST TERM IS DERIVED, AND WHAT THE DERIVATION PRODUCES IS AN ANNOUNCEMENT, READ AT
+# VERIFYING. TOOL-dDerivedDocket-70, OWNER RULING (2026-09-30): when the run's range touches a
+# declared self-test surface, the MAIN LOOP pays the flagged bar by exporting the flag into its one
+# `--close`, whose bar inherits it; an unattended main loop counts as the ON DEMAND use the charter's
+# merge-bar fence sanctions (owner, 2026-08-27); and no line of this driver sets the flag, adds it or
+# removes it. So the notice is read where that decision is MADE, on the move into VERIFYING and on a
+# resume or take-over that finds the record there (TOOL-dAlignedCarrier-6), and never inside the
+# verb that runs the bar: printed there, it arrived after VERIFYING was over and the one close had
+# already run without it. What the derivation buys is that nobody has to REMEMBER the run is owed.
+#
+# THE RANGE is the pinned `base` fact to HEAD, a recorded value read offline, because no prepared
+# merge exists yet at VERIFYING (spec §8 F2). After a merge brings in another landing's kit commits
+# it can announce a surface that landing touched: one flagged bar more than owed, never one fewer.
+print_selftests_owed() { # run-state file -> announces when the run's range owes the flagged bar
+  local _p _q _hit="" _touched _b
   # BLANK IS NEVER, AND IT SAYS SO. A skip that looks like a pass is indistinguishable from
   # coverage, and this one silently un-owes a whole Definition-of-Done clause.
   if [ -z "$SELFTESTS_OWED_PATHS" ]; then
-    echo "unattended: close - SELFTESTS_OWED_PATHS is blank, so no landing range can ever owe the flagged bar here and this close will never announce one; the charter's 'owed by a DoD only for KIT work' then has no declared kit surface to be read against."
+    echo "unattended: SELFTESTS_OWED_PATHS is blank, so no range here can ever owe the flagged bar and no phase move will announce one; the charter's 'owed by a DoD only for KIT work' then has no declared kit surface to be read against"
     return 0
   fi
-  # THE LANDING RANGE, which is what the push publishes and not what the branch contains: the
-  # prepared merge's FIRST parent is the tip the remote advertised, so this is the delta the default
-  # branch actually gains.
-  _touched=$(GIT diff --name-only HEAD^1 HEAD 2>/dev/null)
+  # AN UNREADABLE RANGE SAYS SO TOO. With no base, or one this clone cannot resolve, `git diff` would
+  # print nothing and read exactly like a range that touched nothing.
+  _b=$(fact "$1" base)
+  if [ -z "$_b" ]; then
+    echo "unattended: the record pins no base, so the range that decides whether the flagged bar is owed cannot be read, and no notice is printed; whether it is owed is unanswerable here, not no"
+    return 0
+  fi
+  if ! GIT rev-parse -q --verify "$_b^{commit}" >/dev/null 2>&1; then
+    echo "unattended: the record's base ${_b:0:8} does not resolve in this clone, so the range that decides whether the flagged bar is owed cannot be read, and no notice is printed; whether it is owed is unanswerable here, not no"
+    return 0
+  fi
+  _touched=$(GIT diff --name-only "$_b" HEAD 2>/dev/null)
   while IFS= read -r _p; do
     [ -n "$_p" ] || continue
     for _q in $SELFTESTS_OWED_PATHS; do
@@ -7100,10 +7122,9 @@ print_selftests_owed() { # -> announces when the landing range owes the flagged 
         "$_q"*) case " $_hit " in *" $_q "*) ;; *) _hit="$_hit $_q" ;; esac ;;
       esac
     done
-  done < <(printf '%s
-' "$_touched")
+  done < <(printf '%s\n' "$_touched")
   [ -n "$_hit" ] || return 0
-  echo "unattended: close - the landing range HEAD^1..HEAD touches a declared self-test surface (${_hit# }), so the kit Definition of Done owes the flagged bar. This close does NOT run it and does NOT set the flag, which the charter reserves to a person: run it BY HAND at VERIFYING as 'GATE_FULL=1 GATE_SELFTESTS=1 $GATE_CMD' and name the command you ran in the run's record."
+  echo "unattended: the run's range ${_b:0:8}..HEAD touches a declared self-test surface (${_hit# }), so the kit Definition of Done owes the flagged bar: export GATE_SELFTESTS=1 into this run's one --close, whose bar inherits it; this driver sets it nowhere"
 }
 
 # S4 - THE CARRY CHECK, ASKED BEFORE ANY WRITE. A landing that would publish another build's
@@ -7460,7 +7481,9 @@ dod_met() { # slug · run-state file · item · checker
         # a bare assignment prefix, because this kit's own guard is that the bar must not be scoped by
         # a leg guard here: a guarded manifest would grade the landing merge by guard, which is the
         # shape two reproduced aborts already have. `GATE_SELFTESTS` is neither set nor unset, so the
-        # bar's environment carries exactly what this close inherited.
+        # bar's environment carries exactly what this close inherited: the main loop exports it here
+        # when the move into VERIFYING announced it owed, and this arm announces nothing
+        # (TOOL-dAlignedCarrier-6, above print_selftests_owed).
         # TOOL-dDerivedDocket-28 S3 - THE ORPHANS OF AN EARLIER BAR ARE REAPED BEFORE THIS ONE STARTS.
         # i26's run reached `gates-green` again without passing through `--resume`, and found the legs
         # of the bar its dead session had started still running beside its own.
@@ -7468,7 +7491,6 @@ dod_met() { # slug · run-state file · item · checker
         # the lander this arm reaches afterwards keep GATE_BOUND.
         if [ "$LANDER_MODE" = in-place ]; then
           check_inplace_preconditions "$slug" || { GG_HARD=1; return 1; }
-          [ "$_gtry" = 1 ] && print_selftests_owed
           run_orphan_reap "$slug"
           RB_BOUND=$_gbound
           # shellcheck disable=SC2086

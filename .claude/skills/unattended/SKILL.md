@@ -568,15 +568,17 @@ definition, so the absence is a decision and not an oversight.
   verifies with the direct check its spec names; a unit that needs a suite verdict returns the
   need in its `summary` and does not run one. The bar runs ONCE, at `VERIFYING`, after the last
   unit is terminal: `--close` runs the plain bar for `gates-green`, and kit work owes the
-  `GATE_SELFTESTS=1` form too, run by you at `VERIFYING` and nowhere earlier. Where a pass touched
+  `GATE_SELFTESTS=1` form too, paid by exporting `GATE_SELFTESTS=1` into that one `--close` when
+  the `VERIFYING` notice names a surface. Where a pass touched
   files a leg guards and you judge a bar necessary, the plain bar with no flag is the scoped form,
   at the main loop and never in a child. The rule is the build method's M6; this bullet points at
   it, and gate-guard.js refuses it at the tool call: a `GATE_FULL=`/`GATE_SELFTESTS=` prefix, a
   self-test runner or any `*.test.sh` is denied on this branch until the record reaches
-  `VERIFYING`, sidechain agents included, with the record and the phase named in the refusal. Under
-  `LANDER_MODE` set to `in-place` the close ANNOUNCES when that flagged run is owed — when the landing range
-  touches a path `SELFTESTS_OWED_PATHS` declares — so you are told rather than left to remember; it
-  still does not run it and does not set the flag, and you name the command you ran in the record.
+  `VERIFYING`, sidechain agents included, with the record and the phase named in the refusal. The
+  move into `VERIFYING` ANNOUNCES when that flagged bar is owed, under every `LANDER_MODE` — when
+  the run's range from its pinned BASE touches a path `SELFTESTS_OWED_PATHS` declares — so you are
+  told rather than left to remember; the driver still sets the flag nowhere, and you export it into
+  the one `--close`, as the Close section spells.
 - **A process not in the ledger is never killed**, whatever its command line says. The driver records
   every command it starts and reaps only those, once their driver is gone; `--status` prints
   `orphans <n>` while any wait. A stray process it did not record — another session's, another
@@ -904,11 +906,23 @@ sentence here. Skip it silently if the project has no such skill, as the start p
 
 ## Close
 
+**Move into `VERIFYING` first, under every `LANDER_MODE`, and commit the record the move stages.**
+The move is where the owed flagged bar is ANNOUNCED: when the run's range from its pinned BASE
+touches a path `SELFTESTS_OWED_PATHS` declares, it prints that the kit Definition of Done owes it. A
+close run without the move is never told. A resume or take-over that finds the record at `VERIFYING`
+prints the notice again.
+
+```bash
+bash tools/unattended/unattended.sh --phase <slug> VERIFYING --witness $(git rev-parse HEAD)
+```
+
+**Under `primary`, the close follows that commit:**
+
 ```bash
 bash tools/unattended/unattended.sh --close <slug>
 ```
 
-**Under `LANDER_MODE` set to `in-place`, one step comes FIRST.** The close's bar grades what HEAD carries, so
+**Under `LANDER_MODE` set to `in-place`, the prepare comes between them.** The close's bar grades what HEAD carries, so
 the landing merge has to exist before it runs. Without it the bar grades this branch and never the
 merge the push publishes, and a branch that is green alone can still land red onto a tip the remote
 moved:
@@ -918,6 +932,11 @@ bash tools/push-main.sh --prepare --slug <slug>
 bash tools/unattended/unattended.sh --close <slug>
 ```
 
+Make NO second move after the prepare: a move stages the record, and this close refuses a non-empty
+porcelain. A resume after the prepare reads a range that also holds what the merge brought in from
+the default branch, so it can announce a surface another landing touched: one flagged bar more than
+owed, never one fewer.
+
 That close then refuses BY NUMBER, and not as an unmet item, when HEAD carries no prepared merge, or
 when the tree is not clean in the full porcelain sense — untracked files included, because the bar
 writes its full-green stamp only over an empty listing and the push reuses that stamp. A numbered
@@ -926,10 +945,14 @@ anything it asks the lander what that push would carry, and refuses on a commit 
 build. Then it COMMITS its own record on top of the graded merge, so the phase travels. Under
 `primary` none of that happens: the verb stages the record and names the commit you owe.
 
-It also ANNOUNCES, on an in-place close, when the landing range touches a path
-`SELFTESTS_OWED_PATHS` declares: the kit Definition of Done then owes the self-test bar, which this
-verb does not run and does not set the flag for. You run that one by hand at `VERIFYING` and name
-the command in the run's record.
+**When the `VERIFYING` notice named a surface, export the flag into that one close**, under either
+mode. The close announces nothing itself. Its bar inherits the flag, the driver never sets, adds or
+removes it, and gate-guard.js admits the prefix from `VERIFYING` on. A notice saying the range cannot
+be read is not a no: read the range yourself before you decide.
+
+```bash
+GATE_SELFTESTS=1 bash tools/unattended/unattended.sh --close <slug>
+```
 
 **The bar it runs is BOUNDED, by its BACKSTOP where the project declares a profile.** `--preflight`
 asks `GATE_PROFILE_CMD` for the runner's resolved profile and pins the bar's bound as the

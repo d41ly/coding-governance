@@ -35,12 +35,13 @@ LANDER="bash tools/push-main.sh"
 # the start of the run and not after every unit is built.
 LANDER_MODE=""
 
-# THE SELF-TEST SURFACE, as repo-relative path PREFIXES, space separated. Under `in-place`, when
-# the landing range touches a path starting with one of these, `--close` ANNOUNCES that the kit
-# Definition of Done owes the flagged bar and names the by-hand run that pays it. It never sets the
-# flag: a landing's `gates-green` is a boundary, and the charter reserves that flag to a person.
-# Blank or absent means no landing here ever owes one, and the close announces THAT instead, since
-# a term that silently un-owes a Definition-of-Done clause is indistinguishable from coverage.
+# THE SELF-TEST SURFACE, as repo-relative path PREFIXES, space separated. Under every LANDER_MODE,
+# when the run's range from its pinned BASE touches a path starting with one of these, the move
+# into VERIFYING ANNOUNCES that the kit Definition of Done owes the flagged bar, and the main loop
+# pays it by exporting GATE_SELFTESTS=1 into its one `--close`, whose bar inherits it. The driver
+# never sets the flag, and nothing is announced at `--close`. Blank or absent means no range here
+# ever owes one, and the move announces THAT instead, since a term that silently un-owes a
+# Definition-of-Done clause is indistinguishable from coverage.
 SELFTESTS_OWED_PATHS=""
 
 # REPLACE if your hook uses a different bypass. The close path must never emit this, and the leg
