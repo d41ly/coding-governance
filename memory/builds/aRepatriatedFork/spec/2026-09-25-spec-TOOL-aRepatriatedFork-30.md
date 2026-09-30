@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-30 — the suites run at a foreign prefix, and the install-prefix gate is a pure ban
 
-**Status:** CLOSED · rev-5 · 2026-09-30 · node a · Tier-2 · base 2143b6d6 · streams tooling · order 18
+**Status:** CLOSED · rev-6 · 2026-09-30 · node a · Tier-2 · base 2143b6d6 · streams tooling · order 18
 
 <!-- gen:spec-records -->
 
@@ -74,6 +74,13 @@ state.
   shape. The install-prefix self-test's fixtures use a kit that exists only in the fixture, and they
   build gov's prefix from a variable. The fixture playbook, the fixture records and the four
   workflow renders drain through S5's render rule. Observed by AC3, AC9.
+- **S9 (rev-6)** — The closing review's L1. S2 and S3 deleted the ledger and the waiver registry,
+  and prose still described both as live: `check_entry_producer`'s docstring, the govkit and
+  four other map dossiers, two line-length comments and a merge-rows suite comment. Each is
+  rewritten to the pure ban or put in the past tense. The class gate: `tools/check-dead-paths.sh`
+  grades the map dossiers under `memory/map/features/` too, since a dossier is the live inventory a
+  session reads and not an append-only record; the rest of `memory/` stays out of scope. Observed
+  by AC10.
 
 ## 3. Non-goals (OUT)
 
@@ -200,6 +207,11 @@ that names either deleted file, which the dead-path gate reads
   seven renders it left out, and a scratch clone that appends one line to one of them makes the
   gate grade that file again.
   Red when: a render is graded while it matches its template, or stays left out once it does not.
+- **AC10** — rev-6. `bash tools/check-dead-paths.sh` exits 0 on the real tree with the map dossiers
+  in its haystack, and a `tools/check-dead-paths.test.sh` arm planting a dossier under
+  `memory/map/features/` that names a deleted file reds by its `<path>:<line>`.
+  Red when: the arm passes, which the `7de665e5` gate does, or six dossier lines still name a
+  deleted install-prefix file.
 
 ## 7. Gates
 
@@ -213,6 +225,8 @@ the pure ban, and a clean fixture · the suite's floor moves to its new arm coun
 
 New arm: `tools/check-install-prefix.test.sh` · a fixture render left out while it matches its
 template, and graded once a line is appended to it · none
+
+New arm: `tools/check-dead-paths.test.sh` · rev-6: a map dossier naming a deleted file is a carrier · the suite's floor rises by one
 
 ## 8. Open questions
 
@@ -262,6 +276,9 @@ template, and graded once a line is appended to it · none
   six markers the drain units left. AC9 observes the render rule.
 - rev-5 · 2026-09-30 · AC5 reflowed, no change of meaning: its command was wrapped across two lines,
   so hygiene check 23 read no token in it and could not join the acceptance ledger's answer.
+- rev-6 · 2026-09-30 · closing review round 1 fold: L1 — prose that still described the deleted
+  install-prefix ledger and registry as live is rewritten, and the dead-path gate grades the map
+  dossiers so a dossier cannot carry a deleted file again (S9, AC10).
 
 ## 10. Reuse audit
 
