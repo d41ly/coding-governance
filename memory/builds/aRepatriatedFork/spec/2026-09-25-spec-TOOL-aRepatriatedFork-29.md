@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-29 — gov's own gates and declarations derive the prefix they name
 
-**Status:** CLOSED · rev-3 · 2026-09-29 · node a · Tier-2 · base 2143b6d6 · streams tooling · order 13
+**Status:** CLOSED · rev-4 · 2026-09-30 · node a · Tier-2 · base 2143b6d6 · streams tooling · order 13
 
 <!-- gen:spec-records -->
 
@@ -49,6 +49,22 @@ every gov-side file, so gov itself runs at any kit root.
   shipped workflow templates are handled as §8 F3 resolves. Observed by AC7.
 - **S7** — The ledger rows for these files are lowered, and every kit moved takes its version bump in
   every carrier. Observed by AC8.
+- **S8 (rev-4)** — The closing review's round-1 fold of four readers S1 and S2's `{prefix}`
+  spelling left unmigrated.
+  - **S8a** — H2. The run-gates canary's arm 1b resolves each guard through the inlined
+    `resolve_prefix_token` block against the kit's parent before the tracked-path test. Observed by
+    AC9.
+  - **S8b** — M2. Its arm 2 resolves each leg path the same way before grepping the runner, and a
+    new assertion requires every path in that population to name a tracked path, so an arm whose
+    needles name nothing reds instead of reporting ok. The suite floor rises by one. Observed by
+    AC10.
+  - **S8c** — M1. `derive_gate_runner` reads the TOP-LEVEL `prefix` from the target's
+    `.governance/deploy.toml` when `[answers]` carries none, which is where `govkit intake` writes
+    it, so the flat `run-gates.sh` and `gate.sh` rungs are reachable again. Observed by AC11.
+  - **S8d** — L2. `make_adopter_receipt.py`'s `resolve_kit_homes` resolves each descriptor's token
+    against the revision's own tool root, joins a tokened descriptor's kit-relative home to it
+    unless the descriptor declares `home_root_relative`, and refuses a descriptor that reads empty.
+    Observed by AC12.
 
 ## 3. Non-goals (OUT)
 
@@ -201,6 +217,20 @@ the tree after the census.
 - **AC8** — `bash tools/check-kit-versions.sh` exits 0, and `python tools/govkit/govkit.py epoch
   --base 2143b6d6` names no kit this unit moved.
   Red when: a moved kit's carrier was missed.
+- **AC9** — rev-4. A slice of `tools/run-gates/run-gates.test.sh` over arm 1b passes on the real
+  manifest, and fails naming the guard when a manifest copy passed as `GATE_LEGS` adds a guard
+  under the `{prefix}` token that names no tracked path.
+  Red when: the arm reports 114 bad guards on the real manifest, the `7de665e5` behaviour.
+- **AC10** — rev-4. The same slice over arm 2 passes, fails when a copy of `run-gates.sh` carrying a
+  resolved leg path is graded, and fails its new liveness assertion when the resolution is removed.
+  Red when: the arm stays green over unresolved `{prefix}/…` needles.
+- **AC11** — rev-4. A `render_playbook.py --selftest` arm renders `bash scripts/gate.sh`,
+  `bash scripts/run-gates.sh` and `bash tools/run-gates.sh` for targets whose `deploy.toml`
+  declares the prefix at its top level.
+  Red when: any renders empty, which `7de665e5` does for all three.
+- **AC12** — rev-4. A `tools/govkit/selftest.py` arm asserts `resolve_kit_homes` yields a home for
+  every registry entry at the pinned revision, each a directory that revision tracks files under.
+  Red when: the map is empty, as it is at `7de665e5`.
 
 ## 7. Gates
 
@@ -208,6 +238,12 @@ the tree after the census.
 
 New arm: `tools/govkit/selftest.py` · a registry and descriptors at a `scripts/` root, which the
 `2143b6d6` resolver misreads · none
+
+New arm: `tools/run-gates/run-gates.test.sh` · rev-4: arm 2's population must name tracked paths · the floor rises by one
+
+New arm: `tools/playbook/render_playbook.py` · rev-4: flat runners under a top-level deploy prefix · none
+
+New arm: `tools/govkit/selftest.py` · rev-4: the fixture regenerator derives a tracked home for every registry entry · none
 
 ## 8. Open questions
 
@@ -251,6 +287,12 @@ New arm: `tools/govkit/selftest.py` · a registry and descriptors at a `scripts/
   `<kit>/<file>` is itself a counted literal; the one repo-root home and its declaring key; the load
   seam; every argv and guard reader §8 F1 reaches; F3's rule left to `TOOL-aRepatriatedFork-30`;
   and the lines left to other owners. The Files touched list gains what they reach.
+- rev-4 · 2026-09-30 · closing review round 1 fold: H2 — the canary's guard arm resolves the
+  `{prefix}` token before its tracked-path test (S8a, AC9). closing review round 1 fold: M2 — its
+  hardcoded-path arm resolves before grepping and asserts its needles are real paths (S8b, AC10).
+  closing review round 1 fold: M1 — the bar deriver reads the deploy prefix where intake writes it
+  (S8c, AC11). closing review round 1 fold: L2 — the fixture regenerator reads tokened
+  descriptors and joins kit-relative homes (S8d, AC12).
 
 ## 10. Reuse audit
 
