@@ -1,11 +1,12 @@
 # TOOL-dAlignedCarrier-5 — BUILD-METHOD M7 regrounds with `--status`
 
-**Status:** SPECCED · rev-2 · 2026-09-30 · node d · Tier-2 · base 87c245b3 · streams tooling · order 2 · closes TOOL-dDerivedDocket-72 · ratified 2026-09-30
+**Status:** CLOSED · rev-2 · 2026-09-30 · node d · Tier-2 · base 87c245b3 · streams tooling · order 2 · closes TOOL-dDerivedDocket-72 · ratified 2026-09-30
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-30-build-TOOL-dAlignedCarrier-5-1-acceptance-ledger.md](../build/2026-09-30-build-TOOL-dAlignedCarrier-5-1-acceptance-ledger.md) | journal | — |
 | [2026-09-30-prompt-TOOL-dAlignedCarrier-1-build-brief.md](../prompts/2026-09-30-prompt-TOOL-dAlignedCarrier-1-build-brief.md) | journal | TOOL-dAlignedCarrier-1 TOOL-dAlignedCarrier-2 TOOL-dAlignedCarrier-3 TOOL-dAlignedCarrier-4 TOOL-dAlignedCarrier-6 |
 | [2026-09-30-prompt-TOOL-dAlignedCarrier-1-spec-brief.md](../prompts/2026-09-30-prompt-TOOL-dAlignedCarrier-1-spec-brief.md) | journal | TOOL-dAlignedCarrier-1 TOOL-dAlignedCarrier-2 TOOL-dAlignedCarrier-3 TOOL-dAlignedCarrier-4 TOOL-dAlignedCarrier-6 |
 

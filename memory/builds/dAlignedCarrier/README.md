@@ -46,7 +46,7 @@ Read at the working tree, each ask below is filed and live in the build that rai
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 6 unit(s) · node d · opened 2026-09-30 · streams tooling
+**Build status:** CLOSED · 6 unit(s) · node d · opened 2026-09-30 · streams tooling
 ids TOOL-dAlignedCarrier-1 TOOL-dAlignedCarrier-2 TOOL-dAlignedCarrier-3 TOOL-dAlignedCarrier-4 TOOL-dAlignedCarrier-5 TOOL-dAlignedCarrier-6 TOOL-dAlignedCarrier-7
 
 <!-- gen:build-units -->
@@ -57,10 +57,10 @@ ids TOOL-dAlignedCarrier-1 TOOL-dAlignedCarrier-2 TOOL-dAlignedCarrier-3 TOOL-dA
 | [TOOL-dAlignedCarrier-3 — the research and solution-test directives bind every mode](spec/2026-09-30-spec-TOOL-dAlignedCarrier-3.md) | 1 | 2 | CLOSED | rev-2 | 2026-09-30 |
 | [TOOL-dAlignedCarrier-4 — `--status` reports the holder-worktree and pinned-asks verdicts, read-only](spec/2026-09-30-spec-TOOL-dAlignedCarrier-4.md) | 1 | 2 | CLOSED | rev-3 | 2026-09-30 |
 | [TOOL-dAlignedCarrier-6 — the owed self-test bar is announced at VERIFYING, and the main loop exports its flag](spec/2026-09-30-spec-TOOL-dAlignedCarrier-6.md) | 1 | 2 | CLOSED | rev-3 | 2026-09-30 |
-| [TOOL-dAlignedCarrier-5 — BUILD-METHOD M7 regrounds with `--status`](spec/2026-09-30-spec-TOOL-dAlignedCarrier-5.md) | 2 | 2 | SPECCED | rev-2 | 2026-09-30 |
+| [TOOL-dAlignedCarrier-5 — BUILD-METHOD M7 regrounds with `--status`](spec/2026-09-30-spec-TOOL-dAlignedCarrier-5.md) | 2 | 2 | CLOSED | rev-2 | 2026-09-30 |
 <!-- /gen:build-units -->
 
-Records: 7 bound to this build, across 3 record folder(s).
+Records: 8 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
