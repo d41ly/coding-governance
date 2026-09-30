@@ -4162,11 +4162,11 @@ lmrestore .unattended.conf
 # ---- that is not there. A BLANK key is not a fault and is announced instead.
 sed -i "s|^SELFTESTS_OWED_PATHS=.*|SELFTESTS_OWED_PATHS=\"$KIT_REL/ nosuchdir/\"|" "$lm_dir/.unattended.conf"
 out=$(lmrun)
-hit "$out" "SELFTESTS_OWED_PATHS declares a prefix that matches no tracked path, so it reads as coverage of a surface that is not in this tree and an in-place landing of kit work under it would never be told the flagged bar is owed"
+hit "$out" "SELFTESTS_OWED_PATHS declares a prefix that matches no tracked path, so it reads as coverage of a surface that is not in this tree and a run of kit work under it would never be told the flagged bar is owed"
 lmrestore .unattended.conf
 sed -i 's|^SELFTESTS_OWED_PATHS=.*|SELFTESTS_OWED_PATHS=""|' "$lm_dir/.unattended.conf"
 out=$(lmrun)
-hit  "$out" "SELFTESTS_OWED_PATHS is blank — no landing range in this project can ever be told the kit Definition of Done owes the flagged bar"
+hit  "$out" "SELFTESTS_OWED_PATHS is blank — no run's range in this project can ever be told the kit Definition of Done owes the flagged bar"
 miss "$out" "check 45 FAILED"
 lmrestore .unattended.conf
 
@@ -5513,6 +5513,46 @@ reset_tree
 printf '# the rows: %s %s does\n' "$_c47_no" "$_c47_dv" > "$TMPBIN_PARENT/c47.line"
 mutate $KIT_REL/lib-unattended.sh "\$r $TMPBIN_PARENT/c47.line"
 miss "$(run)" "UNATTENDED check 47 FAILED"
+reset_tree
+
+# ==== TOOL-dAlignedCarrier-6: CHECK 47's SECOND ROW, the retired premise that the landing's close
+# ---- is where the owed flagged bar is told (closing review L2). Assembled from fragments split
+# ---- inside their words, as the first row's arm is, so this suite's own bytes form no instance.
+# ---- Both alternatives are staged, the mode token first and the announcing word first.
+_c47_ip="in-""place"; _c47_an="anno""unces"
+printf '# the %s close %s the owed bar\n' "$_c47_ip" "$_c47_an" > "$TMPBIN_PARENT/c47.line"
+mutate $KIT_REL/lib-unattended.sh "\$r $TMPBIN_PARENT/c47.line"
+out=$(run)
+hit  "$out" "a shipped file of this kit states the retired premise that the landing's close is where the owed flagged bar is told, but since TOOL-dAlignedCarrier-6 the move into VERIFYING announces it under every LANDER_MODE and the close says nothing, so a reader who trusts the sentence waits at the close for a notice that never comes; reword it to name the move into VERIFYING. matches: "
+hit  "$(printf '%s\n' "$out" | grep 'UNATTENDED check 47 FAILED')" "matches: $KIT_REL/lib-unattended.sh: "
+reset_tree
+printf '# it %s, on an %s close, that the bar is owed\n' "$_c47_an" "$_c47_ip" > "$TMPBIN_PARENT/c47.line"
+mutate $KIT_REL/lib-unattended.sh "\$r $TMPBIN_PARENT/c47.line"
+hit  "$(run)" "the retired premise that the landing's close is where the owed flagged bar is told"
+# ...the NEAR-MISS: the same mode's close with no announcing word stays silent, so the arm above is
+# not equally consistent with a ban on naming that close at all.
+reset_tree
+printf '# the %s close runs the bar\n' "$_c47_ip" > "$TMPBIN_PARENT/c47.line"
+mutate $KIT_REL/lib-unattended.sh "\$r $TMPBIN_PARENT/c47.line"
+miss "$(run)" "UNATTENDED check 47 FAILED"
+reset_tree
+
+# ==== TOOL-dAlignedCarrier-6: CHECK 48, a run-state fact written after the function's last stage
+# ---- of it (closing review M1). The staged function is written to a file and appended by sed's
+# ---- `r` into the fixture's tracked lib, one of the population's shell files; its two calls are
+# ---- spelled from fragments, so this suite's own bytes carry no function the real-tree leg grades.
+_c48_st="stage""_or_fail"; _c48_sw="set""_fact"
+printf 'c48probe() {\n  %s "$rel" || return 1\n  %s "$rel" witness x || return 1\n}\n' "$_c48_st" "$_c48_sw" > "$TMPBIN_PARENT/c48.fn"
+mutate $KIT_REL/lib-unattended.sh "\$r $TMPBIN_PARENT/c48.fn"
+out=$(run)
+hit  "$out" "a function in a shipped shell file of this kit writes a run-state fact after its last staging of that same file, so the index holds the file as it was before that write and the write stays unstaged: a commit of what the verb staged records half of it and leaves the tree dirty; stage after the last write. matches: "
+hit  "$(printf '%s\n' "$out" | grep 'UNATTENDED check 48 FAILED')" "matches: $KIT_REL/lib-unattended.sh:"
+# ...the NEAR-MISS: the same two calls with the write first and the stage last stay silent, so the
+# arm above is not equally consistent with a ban on writing a fact inside a staging function at all.
+reset_tree
+printf 'c48probe() {\n  %s "$rel" witness x || return 1\n  %s "$rel" || return 1\n}\n' "$_c48_sw" "$_c48_st" > "$TMPBIN_PARENT/c48.fn"
+mutate $KIT_REL/lib-unattended.sh "\$r $TMPBIN_PARENT/c48.fn"
+miss "$(run)" "UNATTENDED check 48 FAILED"
 reset_tree
 fi   # ---- end REGION 8 ------------------------------------------------------------------------
 

@@ -71,6 +71,7 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [one-value-field-records-a-mixed-outcome](one-value-field-records-a-mixed-outcome.md) | class | 1 |  | a per-subject field holding ONE value has to record an outcome that was mixed — take the value that DEMANDS something, never the one that demands nothing |
 | [pin-copied-from-another-corpus](pin-copied-from-another-corpus.md) | class | 2 |  | a threshold measured on one tree is vacuous or permanently red on another |
 | [pin-gated-checks-arm-nothing-without-a-pin](pin-gated-checks-arm-nothing-without-a-pin.md) | class | 5 |  | hygiene checks 13-15 alone are behind a declared pin, so a fixture conf without one arms nothing there and the checks report clean by never loading |
+| [porcelain-diff-names-a-rename-by-its-destination](porcelain-diff-names-a-rename-by-its-destination.md) | class | 2 |  | a touched-set read built on porcelain `git diff --name-only` names a renamed file by its destination alone, so a prefix match misses a file moved OUT of the prefix |
 | [process-creation-is-the-suite-cost](process-creation-is-the-suite-cost.md) | class | 2 |  | a shell suite that is 93% not-CPU is paying an on-access antivirus scanner per exec, so its cost is spawn count and nothing in the code reads that way |
 | [record-citing-a-foreign-id-defines-or-orphans-it](record-citing-a-foreign-id-defines-or-orphans-it.md) | class | 2 |  | writing another build's id into a record either DEFINES it or ORPHANS it, and the orphan count sees only one of those, so the obvious check passes on the worse half |
 | [record-without-serves-or-with-a-round-counter](record-without-serves-or-with-a-round-counter.md) | class | 7 |  | a new build record owes a Serves line and a filename that projects it, and a round counter in that filename mints an id nothing defines |
@@ -104,6 +105,6 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [witness-graded-against-a-fact-written-after-it](witness-graded-against-a-fact-written-after-it.md) | class | 2 |  | a sidecar line that outlives the lease it was written under is graded against the id the new lease replaced, so a dead incarnation's witness passes the check the live one owes |
 | [worktree-crlf-outside-the-gated-population](worktree-crlf-outside-the-gated-population.md) | class | 3 |  | a worktree checkout lands CRLF on eol-pinned files, no wiring gate sees it, and the reader that breaks is a consumer no gate byte-compares |
 
-89 record(s): 89 class, 0 note, 0 superseded · 6 universal · 0 unanchored
+90 record(s): 90 class, 0 note, 0 superseded · 6 universal · 0 unanchored
 
 <!-- END GENERATED -->

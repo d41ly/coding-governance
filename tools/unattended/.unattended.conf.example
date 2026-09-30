@@ -38,8 +38,9 @@ LANDER_MODE=""
 # THE SELF-TEST SURFACE, as repo-relative path PREFIXES, space separated. Under every LANDER_MODE,
 # when the run's range from its pinned BASE touches a path starting with one of these, the move
 # into VERIFYING ANNOUNCES that the kit Definition of Done owes the flagged bar, and the main loop
-# pays it by exporting GATE_SELFTESTS=1 into its one `--close`, whose bar inherits it. The driver
-# never sets the flag, and nothing is announced at `--close`. Blank or absent means no range here
+# pays it by exporting GATE_FULL=1 GATE_SELFTESTS=1 into its one `--close`, whose bar inherits both;
+# under `primary` that bar carries no GATE_FULL of its own. The driver never sets either flag, and
+# nothing is announced at `--close`. Blank or absent means no range here
 # ever owes one, and the move announces THAT instead, since a term that silently un-owes a
 # Definition-of-Done clause is indistinguishable from coverage.
 SELFTESTS_OWED_PATHS=""

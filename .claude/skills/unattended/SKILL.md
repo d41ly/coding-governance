@@ -568,7 +568,7 @@ definition, so the absence is a decision and not an oversight.
   verifies with the direct check its spec names; a unit that needs a suite verdict returns the
   need in its `summary` and does not run one. The bar runs ONCE, at `VERIFYING`, after the last
   unit is terminal: `--close` runs the plain bar for `gates-green`, and kit work owes the
-  `GATE_SELFTESTS=1` form too, paid by exporting `GATE_SELFTESTS=1` into that one `--close` when
+  flagged form too, paid by exporting `GATE_FULL=1 GATE_SELFTESTS=1` into that one `--close` when
   the `VERIFYING` notice names a surface. Where a pass touched
   files a leg guards and you judge a bar necessary, the plain bar with no flag is the scoped form,
   at the main loop and never in a child. The rule is the build method's M6; this bullet points at
@@ -945,13 +945,15 @@ anything it asks the lander what that push would carry, and refuses on a commit 
 build. Then it COMMITS its own record on top of the graded merge, so the phase travels. Under
 `primary` none of that happens: the verb stages the record and names the commit you owe.
 
-**When the `VERIFYING` notice named a surface, export the flag into that one close**, under either
-mode. The close announces nothing itself. Its bar inherits the flag, the driver never sets, adds or
-removes it, and gate-guard.js admits the prefix from `VERIFYING` on. A notice saying the range cannot
-be read is not a no: read the range yourself before you decide.
+**When the `VERIFYING` notice named a surface, export the pair into that one close**, under either
+mode. The close announces nothing itself. Its bar inherits both flags, the driver never sets, adds or
+removes either, and gate-guard.js admits the prefix from `VERIFYING` on. `GATE_FULL=1` is the half
+`primary` needs: that close's bar carries no `GATE_FULL` of its own, and `GATE_SELFTESTS=1` alone lifts
+the hold but leaves every guarded self-test leg the branch did not touch skipped. A notice saying the
+range cannot be read is not a no: read the range yourself before you decide.
 
 ```bash
-GATE_SELFTESTS=1 bash tools/unattended/unattended.sh --close <slug>
+GATE_FULL=1 GATE_SELFTESTS=1 bash tools/unattended/unattended.sh --close <slug>
 ```
 
 **The bar it runs is BOUNDED, by its BACKSTOP where the project declares a profile.** `--preflight`

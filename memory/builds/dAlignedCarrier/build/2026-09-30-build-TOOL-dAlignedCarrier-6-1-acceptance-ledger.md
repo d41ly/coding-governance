@@ -10,7 +10,12 @@ run against the built driver and the BASE driver from `git archive 87c245b3`, th
 size check, the adopter's `--check` and the manifest's `--staged` check stood in for the `unattended
 kit gate`, `unattended skill wiring`, `unattended protocol size` and `kickoff-manifest ratchet` legs.
 No suite ran: the new suite arms are written and their run is not observed here, under the build
-README's waiver.
+README's waiver. The rev-4 fold of the closing review's round 1 added AC9 to AC12, observed by a
+39-check scratch fixture over the folded driver (39 green) and the driver at 3c45a567 (16 FAIL lines,
+each on an arm the fold moves), and by the kit gate scoped to skip check 28, red on a staged break
+with no other check red. Over the final tree the scoped leg did not return inside its 590 s bound and
+was stopped with no check failed up to check 23, so the tree-side reading of checks 47 and 48 is their
+own scanners, extracted from the checker and run alone; the same no-suite rule held.
 
 **Evidences:** TOOL-dAlignedCarrier-6
 - AC1 — `the run's range e7779aa9..HEAD touches a declared self-test surface (kitsurface/)` — the
@@ -43,3 +48,29 @@ README's waiver.
 - AC8 — `4` — `grep -c -E -- '--phase [A-Za-z]+ VERIFYING'` over the suite printed 4 where BASE
   prints 0, and `git diff -U0` over the suite shows no line of the unset-flag or pass-through arms.
   The fixture's MIRROR section ran the new arms' steps in-place and passed 10 of 10.
+- AC9 — `UNATTENDED check 48 FAILED` — `bash tools/unattended/check-unattended.sh --skip 28`, run
+  with `verb_phase`'s staging moved back between its two writes, printed it naming
+  `tools/unattended/unattended.sh:4220 verb_phase` beside the report line `check 48 graded 602
+  function(s) in 23 shell file(s)`, and no other check failed; over the final tree check 48's own
+  scanner, extracted from the checker and run alone, named no hit where it names `verb_phase` at
+  `3c45a567`, and the whole scoped leg did not return inside its bound. In the rev-4 scratch
+  fixture, BUILDING, a commit of what it staged, then VERIFYING left `git diff --name-only` empty,
+  the staged-only commit left a clean porcelain with the move's own witness committed, and a second
+  move with a changed witness left nothing unstaged; the driver at `3c45a567` failed all four
+  readings with `memory/builds/tRun/RUN.md` unstaged.
+- AC10 — `3c45a567` — the driver at that sha printed an export whose `primary` close left the bar's
+  `GATE_FULL` unset and whose `in-place` close was refused by check 62 on the half-staged record; the
+  folded driver's notice printed the pair, and applied as printed to `--close` with both names unset
+  beforehand it reached the bar stub's recorded environment with both flags at 1 under `primary` and
+  under `in-place`, in the fixture's own section and in its mirror of the written suite arm. `wc -c`
+  read 65288 before the fold and 65310 after, 22 bytes of the 300.
+- AC11 — `git mv kitsurface/thing.txt moved-out.txt` — as the fixture's only commit after the
+  preflight, the move into VERIFYING printed the owed line naming `kitsurface/`, where the driver at
+  `3c45a567` printed none; a rename into the prefix announced and a rename between undeclared paths
+  did not. `python tools/memory-tree/gotchas.py --check` exited 0 with the class record added.
+- AC12 — `UNATTENDED check 47 FAILED` — the same staged run, with the line
+  `# the in-place close announces the owed bar` appended to the driver, printed the second row's
+  message with `matches: tools/unattended/unattended.sh: "in-place close announ"`; over the final
+  tree both rows' patterns, through the checker's own scanner run alone, named nothing.
+  `grep -c 'in-place close derives' tools/unattended/check-unattended.sh` printed 0, where
+  `3c45a567` prints 1.

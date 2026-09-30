@@ -10,8 +10,8 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 
 ## Run facts
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 3c45a567159e7156bd40a5189fd61c2ac3365d9a
-phase: REVIEWING
+witness: 14564580436dd7d26ba32f870c998257249545d9
+phase: FOLDING
 asks-ready: TOOL-dDerivedDocket-70=yes TOOL-dDerivedDocket-71=yes TOOL-dDerivedDocket-72=yes TOOL-dDerivedDocket-73=yes TOOL-dDerivedDocket-74=yes
 asks: TOOL-dDerivedDocket-70..74
 m-base: 87c245b3e950cbf7bc46b8216db8b4e4fba253dd
@@ -75,3 +75,7 @@ base: 87c245b3e950cbf7bc46b8216db8b4e4fba253dd
 2026-09-30T17:50:50Z dispatch · item 2b42d13d TOOL-dAlignedCarrier-5 · reason tools/memory-tree/BUILD-METHOD.template.md memory/guides/BUILD-METHOD.md memory/guides/SESSION-KICKOFF.md memory/builds/dAlignedCarrier/spec/2026-09-30-spec-TOOL-dAlignedCarrier-5.md memory/builds/dAlignedCarrier/build/2026-09-30-build-TOOL-dAlignedCarrier-5-1-acceptance-ledger.md memory/builds/dAlignedCarrier/README.md memory/backlog/TOOL.md memory/LIVE.md memory/ledger/2026-09.md
 
 2026-09-30T18:28:05Z review · item dAlignedCarrier · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED
+
+2026-09-30T18:37:58Z dispatch · item 14564580 TOOL-dAlignedCarrier-6 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/check-unattended.sh tools/unattended/check-unattended.test.sh tools/unattended/SKILL.template.md .claude/skills/unattended/SKILL.md tools/unattended/PROTOCOL.template.md memory/guides/UNATTENDED-PROTOCOL.md tools/unattended/.unattended.conf.example .unattended.conf memory/guides/SESSION-KICKOFF.md memory/builds/dAlignedCarrier/spec/2026-09-30-spec-TOOL-dAlignedCarrier-6.md memory/builds/dAlignedCarrier/build/2026-09-30-build-TOOL-dAlignedCarrier-6-1-acceptance-ledger.md memory/builds/dAlignedCarrier/README.md memory/backlog/TOOL.md memory/LIVE.md memory/ledger/2026-09.md memory/gotchas/porcelain-diff-names-a-rename-by-its-destination.md memory/gotchas/INDEX.md
+
+2026-09-30T18:38:02Z brief · item TOOL-dAlignedCarrier-6 · reason 40ddd8b74e3b memory/builds/dAlignedCarrier/prompts/2026-09-30-prompt-TOOL-dAlignedCarrier-6-fold-brief.md

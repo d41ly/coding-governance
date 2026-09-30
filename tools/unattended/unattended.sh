@@ -4216,10 +4216,14 @@ verb_phase() { # slug · phase · witness
   fi
   [ -n "$wit" ] || { fail 11 "a phase claim carries a WITNESS - a sha, a tag or a run id - and presence is its own refusal because an unwitnessed claim is the one an oracle skips: $want"; return 1; }
   set_fact "$rel" phase "$want" || return 1
+  set_fact "$rel" witness "$wit" || return 1
   # TOOL-aBoundedVerdict-15 S1 - the SECOND omission, and the reason rev-1's "the only phase writer
   # that does not stage" was wrong. Three of five staged; this and --close were the two that did not.
+  # STAGED AFTER THE LAST WRITE, never between two (TOOL-dAlignedCarrier-6, closing review M1): staged
+  # between the phase and the witness, the index paired the new phase with the PREVIOUS witness and
+  # left the new one unstaged, so the Skill's "commit the record the move stages" committed half a
+  # record and the in-place prepare refused the dirty tree it left. Check 48 gates the order.
   stage_or_fail "$rel" || return 1
-  set_fact "$rel" witness "$wit" || return 1
   echo "unattended: phase $want · witness $wit"
   # TOOL-dAlignedCarrier-6 S2 - THE MOVE INTO VERIFYING IS WHERE THE OWED FLAGGED BAR IS ANNOUNCED,
   # under every LANDER_MODE, because it is the phase in which the main loop decides what its one
@@ -7092,9 +7096,22 @@ check_inplace_preconditions() { # slug -> 0 when the bar may run over a prepared
 # verb that runs the bar: printed there, it arrived after VERIFYING was over and the one close had
 # already run without it. What the derivation buys is that nobody has to REMEMBER the run is owed.
 #
+# THE REMEDY NAMES THE PAIR, `GATE_FULL=1 GATE_SELFTESTS=1`, and not the flag alone (spec §8 F5,
+# closing review M2). The ruling names the flag the main loop exports; the charter's kit Definition of
+# Done names the pair. Under `in-place` the close adds `GATE_FULL=1` itself, but under `primary` its
+# bar carries none, so an export of the flag alone lifted the hold and left every guarded self-test leg
+# whose guard the branch did not move reporting `skip`: a guard-scoped run, not the flagged bar. The
+# pair is redundant and harmless under `in-place`, so one spelling serves both modes, and the driver
+# still sets neither.
+#
 # THE RANGE is the pinned `base` fact to HEAD, a recorded value read offline, because no prepared
 # merge exists yet at VERIFYING (spec §8 F2). After a merge brings in another landing's kit commits
 # it can announce a surface that landing touched: one flagged bar more than owed, never one fewer.
+# That "never one fewer" holds only because the read names BOTH sides of a rename (`--no-renames`):
+# a porcelain diff detects renames by default and names one by its destination alone, so a range
+# whose only touch was moving a file OUT of a declared prefix read as untouched (closing review L1).
+# Paths are read unquoted (`core.quotepath=off`) so a non-ASCII path still prefix-matches, and a
+# diff that fails announces that the answer is unknown rather than reading as an empty range.
 print_selftests_owed() { # run-state file -> announces when the run's range owes the flagged bar
   local _p _q _hit="" _touched _b
   # BLANK IS NEVER, AND IT SAYS SO. A skip that looks like a pass is indistinguishable from
@@ -7114,7 +7131,10 @@ print_selftests_owed() { # run-state file -> announces when the run's range owes
     echo "unattended: the record's base ${_b:0:8} does not resolve in this clone, so the range that decides whether the flagged bar is owed cannot be read, and no notice is printed; whether it is owed is unanswerable here, not no"
     return 0
   fi
-  _touched=$(GIT diff --name-only "$_b" HEAD 2>/dev/null)
+  _touched=$(GIT -c core.quotepath=off diff --no-renames --name-only "$_b" HEAD 2>/dev/null) || {
+    echo "unattended: the run's range ${_b:0:8}..HEAD could not be diffed, so whether the flagged bar is owed is unanswerable here, not no"
+    return 0
+  }
   while IFS= read -r _p; do
     [ -n "$_p" ] || continue
     for _q in $SELFTESTS_OWED_PATHS; do
@@ -7124,7 +7144,7 @@ print_selftests_owed() { # run-state file -> announces when the run's range owes
     done
   done < <(printf '%s\n' "$_touched")
   [ -n "$_hit" ] || return 0
-  echo "unattended: the run's range ${_b:0:8}..HEAD touches a declared self-test surface (${_hit# }), so the kit Definition of Done owes the flagged bar: export GATE_SELFTESTS=1 into this run's one --close, whose bar inherits it; this driver sets it nowhere"
+  echo "unattended: the run's range ${_b:0:8}..HEAD touches a declared self-test surface (${_hit# }), so the kit Definition of Done owes the flagged bar: export GATE_FULL=1 GATE_SELFTESTS=1 into this run's one --close, whose bar inherits both; this driver sets neither"
 }
 
 # S4 - THE CARRY CHECK, ASKED BEFORE ANY WRITE. A landing that would publish another build's
@@ -7481,9 +7501,10 @@ dod_met() { # slug · run-state file · item · checker
         # a bare assignment prefix, because this kit's own guard is that the bar must not be scoped by
         # a leg guard here: a guarded manifest would grade the landing merge by guard, which is the
         # shape two reproduced aborts already have. `GATE_SELFTESTS` is neither set nor unset, so the
-        # bar's environment carries exactly what this close inherited: the main loop exports it here
-        # when the move into VERIFYING announced it owed, and this arm announces nothing
-        # (TOOL-dAlignedCarrier-6, above print_selftests_owed).
+        # bar's environment carries exactly what this close inherited: the main loop exports it, with
+        # `GATE_FULL=1` beside it for the `primary` arm below, when the move into VERIFYING announced
+        # the flagged bar owed, and this arm announces nothing (TOOL-dAlignedCarrier-6, above
+        # print_selftests_owed).
         # TOOL-dDerivedDocket-28 S3 - THE ORPHANS OF AN EARLIER BAR ARE REAPED BEFORE THIS ONE STARTS.
         # i26's run reached `gates-green` again without passing through `--resume`, and found the legs
         # of the bar its dead session had started still running beside its own.

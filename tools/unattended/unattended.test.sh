@@ -2652,6 +2652,12 @@ bcopen
 run --phase tRun BUILDING --witness "$(git rev-parse HEAD)" >/dev/null 2>&1
 n=$((n+1)); [ -n "$(git diff --cached --name-only -- memory/builds/tRun/RUN.md)" ] \
   || { echo "FAIL --phase left its write unstaged, and it was the second of the two omissions"; st=1; }
+# ...and it stages the WHOLE write. TOOL-dAlignedCarrier-6, closing review M1: it staged between the
+# phase and the witness, so a witness that CHANGED was left unstaged beside a staged phase. The witness
+# below differs from the one the move above wrote, which is what makes an unstaged half observable.
+run --phase tRun BUILDING --witness "run-m1-witness" >/dev/null 2>&1
+n=$((n+1)); [ -z "$(git diff --name-only -- memory/builds/tRun/RUN.md)" ] \
+  || { echo "FAIL --phase staged its record before it wrote the witness, so the new witness was left unstaged"; st=1; }
 
 # ---- S2: --attest, because the two AGENT-attested keys had no writer and --abort REQUIRES both. Its
 # ---- refusals first: no item, an undeclared item, and a MACHINE-checked item.
@@ -8752,9 +8758,16 @@ ipgit add -A >/dev/null && ipgit commit -q -m touch --no-verify
 out=$(iprun --phase tRun BUILDING --witness "$(ipgit rev-parse HEAD)")
 hit  "$out" "phase BUILDING"
 miss "$out" "touches a declared self-test surface"
+# ---- The BUILDING move's own staged set is committed, so HEAD moves and the VERIFYING move below
+# ---- writes a witness that DIFFERS from the one on record, the common case a real run has.
+ipgit commit -q -m "records: BUILDING" --no-verify
 out=$(iprun --phase tRun VERIFYING --witness "$(ipgit rev-parse HEAD)")
-hit  "$out" "unattended: the run's range ${ip_vb:0:8}..HEAD touches a declared self-test surface (kitsurface/), so the kit Definition of Done owes the flagged bar: export GATE_SELFTESTS=1 into this run's one --close"
-ipgit add -A >/dev/null && ipgit commit -q -m "records: VERIFYING" --no-verify
+hit  "$out" "unattended: the run's range ${ip_vb:0:8}..HEAD touches a declared self-test surface (kitsurface/), so the kit Definition of Done owes the flagged bar: export GATE_FULL=1 GATE_SELFTESTS=1 into this run's one --close"
+# ---- closing review M1: the move stages the WHOLE record, so the commit below takes only what the
+# ---- move staged, as the Skill's Close section says to. An `add -A` here did that staging for the
+# ---- move and hid one that staged the new phase beside the previous witness.
+same "the VERIFYING move leaves nothing unstaged" "$(ipgit diff --name-only)" ""
+ipgit commit -q -m "records: VERIFYING" --no-verify
 out=$(iprun --resume tRun --keepalive-id k1)
 hit  "$out" "unattended: resume at phase VERIFYING"
 ip_lo=$(printf '%s\n' "$out" | grep -n 'resume at phase VERIFYING' | head -1 | cut -d: -f1)
@@ -8777,6 +8790,50 @@ cp "$ip_out/keep.conf" "$ip_dir/.unattended.conf"
 sed -i '/^base: /d' "$ip_dir/memory/builds/tRun/RUN.md"
 out=$(iprun --phase tRun VERIFYING --witness "$(ipgit rev-parse HEAD)")
 hit  "$out" "unattended: the record pins no base, so the range that decides whether the flagged bar is owed cannot be read, and no notice is printed"
+# ---- closing review L1: a range whose ONLY touch on a declared prefix is a rename OUT of it still
+# ---- owes the flagged bar. A porcelain diff detects renames by default and names one by its
+# ---- destination alone, so the read carries --no-renames and names the source too.
+ipreset
+iprun --preflight tRun --keepalive-id k1 >/dev/null
+ipgit add -A >/dev/null && ipgit commit -q -m fixture --no-verify
+ipgit mv kitsurface/thing.txt moved-out.txt
+ipgit commit -q -m "rename out of the declared prefix" --no-verify
+out=$(iprun --phase tRun VERIFYING --witness "$(ipgit rev-parse HEAD)")
+hit  "$out" "touches a declared self-test surface (kitsurface/)"
+# ---- closing review M2: the REMEDY the notice prints is EXERCISED, not read. The export is cut
+# ---- from the notice's own text and applied to the one --close exactly as printed, under BOTH
+# ---- modes, and the bar stub's own environment must carry both flags: under `primary` the close
+# ---- adds no GATE_FULL, so an export naming the flag alone paid a guard-scoped run that read as
+# ---- the flagged bar. Both names are unset first, so only the printed export can supply them.
+for ip_mode in primary in-place; do
+  ipreset
+  if [ "$ip_mode" = primary ]; then
+    sed -i 's/^LANDER_MODE=.*/LANDER_MODE="primary"/' "$ip_dir/.unattended.conf"
+    ipgit add -A >/dev/null && ipgit commit -q -m "mode primary" --no-verify
+  fi
+  iprun --preflight tRun --keepalive-id k1 >/dev/null
+  add_facts "$ip_dir/memory/builds/tRun/RUN.md" "$(printf 'keepalive-reaped: yes\nparked-surfaced: yes\n')"
+  date +%s%N > "$ip_dir/kitsurface/thing.txt"
+  ipgit add -A >/dev/null && ipgit commit -q -m fixture --no-verify
+  out=$(iprun --phase tRun VERIFYING --witness "$(ipgit rev-parse HEAD)")
+  ip_exp=$(printf '%s\n' "$out" | sed -n 's/.*owes the flagged bar: export \(.*\) into this run.s one --close.*/\1/p')
+  n=$((n+1)); [ -n "$ip_exp" ] || { echo "FAIL $ip_mode: the VERIFYING notice printed no export to apply"; st=1; }
+  ipgit commit -q -m "records: VERIFYING" --no-verify
+  if [ "$ip_mode" = in-place ]; then
+    ip_old=$(ipgit rev-parse HEAD)
+    ipgit fetch -q origin main
+    ipgit checkout -q --detach origin/main
+    ipgit merge -q --no-ff "$ip_old" -m "merge: tRun - land onto origin/main" >/dev/null
+    ipgit update-ref refs/heads/unit "$(ipgit rev-parse HEAD)"
+    ipgit checkout -q unit
+  fi
+  rm -f "$ip_out/barenv.txt"
+  # shellcheck disable=SC2086
+  ( cd "$ip_dir" && env -u GATE_FULL -u GATE_SELFTESTS GOV_DEFAULT_BRANCH=main IPOUT="$ip_out" \
+      STUB_PREPARED=0 STUB_CARRY=0 $ip_exp bash "$SCRIPT" --close tRun $IPOVR ) >/dev/null 2>&1
+  same "$ip_mode: the printed export reaches the close's bar as GATE_FULL=1" "$(grep -c '^GATE_FULL=1$' "$ip_out/barenv.txt" 2>/dev/null)" "1"
+  same "$ip_mode: the printed export reaches the close's bar as GATE_SELFTESTS=1" "$(grep -c '^GATE_SELFTESTS=1$' "$ip_out/barenv.txt" 2>/dev/null)" "1"
+done
 
 # ---- AC1, the whole reason this mode exists: a branch that is GREEN ALONE and RED once merged onto
 # ---- a tip the remote moved. Under `primary` the bar would grade the branch and this would land.
