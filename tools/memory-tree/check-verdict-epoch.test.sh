@@ -21,6 +21,8 @@ KIT_REL=$(derive_self_rel "$HERE") || { echo "check-verdict-epoch.test: not insi
 # at a root install: every fixture and host path below is spelled through it, never through a
 # literal prefix (TOOL-aRepatriatedFork-28).
 case "$KIT_REL" in */*) PFX="${KIT_REL%/*}/" ;; *) PFX="" ;; esac
+# TOOL-aRepatriatedFork-46: this kit's own directory NAME, which every fixture below mirrors.
+KIT_NAME="${KIT_REL##*/}"
 GATE="$HERE/check-verdict-epoch.sh"
 TMP=$(mktemp -d); trap 'rm -rf "$TMP"' EXIT
 fails=0
@@ -42,13 +44,13 @@ arm() { # label · want-rc · expected-substring · dir · [base]
 }
 
 engine() { # $1=dir $2=version $3=extra-body-line
-  mkdir -p "$1/${PFX}memory-tree"
+  mkdir -p "$1/${PFX}${KIT_NAME}"
   { printf '#!/usr/bin/env bash\n'
     printf 'KIT_MEMORY_TREE_VERSION=%s   # gov:kit memory-tree@%s — engine identity\n' "$2" "$2"
     printf '# a comment line that never changes behaviour\n'
     printf 'echo hygiene\n'
     [ -n "$3" ] && printf '%s\n' "$3"
-  } > "$1/${PFX}memory-tree/check-memory-hygiene.sh"
+  } > "$1/${PFX}${KIT_NAME}/check-memory-hygiene.sh"
 }
 
 commit_engine() { # $1=dir $2=version $3=extra-body-line $4=message
@@ -141,7 +143,7 @@ arm 'the same change WITH a bump is clean' 0 'the version moved 1.5 -> 1.6' "$B"
 C=$(newrepo comment); engine "$C" 1.5 ""
 ( cd "$C" && git add -A && git commit -qm base --no-verify ) >/dev/null
 BASE_C=$(cd "$C" && git rev-parse HEAD)
-printf '# one more comment, and a blank line follows\n\n' >> "$C/${PFX}memory-tree/check-memory-hygiene.sh"
+printf '# one more comment, and a blank line follows\n\n' >> "$C/${PFX}${KIT_NAME}/check-memory-hygiene.sh"
 ( cd "$C" && git add -A && git commit -qm prose --no-verify ) >/dev/null
 arm 'a comment-only change needs no bump' 0 'no behaviour-bearing engine line moved' "$C" "$BASE_C"
 
@@ -149,10 +151,10 @@ arm 'a comment-only change needs no bump' 0 'no behaviour-bearing engine line mo
 D=$(newrepo indent); engine "$D" 1.5 ""
 ( cd "$D" && git add -A && git commit -qm base --no-verify ) >/dev/null
 BASE_D=$(cd "$D" && git rev-parse HEAD)
-printf '    # an indented comment\n' >> "$D/${PFX}memory-tree/check-memory-hygiene.sh"
+printf '    # an indented comment\n' >> "$D/${PFX}${KIT_NAME}/check-memory-hygiene.sh"
 ( cd "$D" && git add -A && git commit -qm indented --no-verify ) >/dev/null
 arm 'an indented comment is still a comment' 0 'no behaviour-bearing engine line moved' "$D" "$BASE_D"
-printf '    echo indented statement\n' >> "$D/${PFX}memory-tree/check-memory-hygiene.sh"
+printf '    echo indented statement\n' >> "$D/${PFX}${KIT_NAME}/check-memory-hygiene.sh"
 ( cd "$D" && git add -A && git commit -qm stmt --no-verify ) >/dev/null
 arm '...and an indented STATEMENT is not' 1 'changes KIT_MEMORY_TREE_VERSION (still 1.5)' "$D" "$BASE_D"
 

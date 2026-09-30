@@ -81,11 +81,16 @@ def resolve_kit_dir(home, anchor, here):
 
 # The grammar lives in the sibling kit, found by `resolve_kit_dir` (TOOL-aRepatriatedFork-2 S3): the
 # receipt first, which is the only record of a kit dir an adopter RENAMED, then the two probes. On a
-# miss it holds the last place probed, and the two readers below name it as "not installed".
+# miss it holds THIS kit's own directory, which carries no extract.py, so both readers below take
+# their not-installed branch, and GRAMMAR_WHERE carries the resolver's own account of where it looked.
+# TOOL-aRepatriatedFork-46: the miss used to name `<this kit's parent>/memory-recall`, a kit name typed
+# after a derived base, which is the class the carried-prefix ban counts.
 try:
     GRAMMAR_DIR = resolve_kit_dir("memory-recall", "extract.py", HERE)
-except LookupError:
-    GRAMMAR_DIR = HERE.parent / "memory-recall"  # gov:prefix-literal — the resolver missed; the last place probed, named by the not-installed message
+    GRAMMAR_WHERE = "%s/extract.py" % GRAMMAR_DIR.as_posix()
+except LookupError as _grammar_miss:
+    GRAMMAR_DIR = HERE
+    GRAMMAR_WHERE = "the kit's extract.py (%s)" % _grammar_miss
 
 # TOOL-dSpentCeiling-1 — the two keys this engine no longer reads. A conf that still declares one
 # is ANNOUNCED, never refused: the shipped example declared READ_PATH_CEILING blank, so refusing on
@@ -241,8 +246,8 @@ def grammar(root: str):
     if not (GRAMMAR_DIR / "extract.py").is_file():
         raise Problem(
             "corpus_ids: a pin is set in .memory-tree.conf, but the id grammar lives in the "
-            "memory-recall kit and %s/extract.py is not installed. Either adopt that kit or blank "
-            "DEAD_PATH_PIN / ORPHAN_ID_PIN to turn checks 13-15 off." % GRAMMAR_DIR
+            "memory-recall kit and %s is not installed. Either adopt that kit or blank "
+            "DEAD_PATH_PIN / ORPHAN_ID_PIN to turn checks 13-15 off." % GRAMMAR_WHERE
         )
     if str(GRAMMAR_DIR) not in sys.path:
         sys.path.insert(0, str(GRAMMAR_DIR))
@@ -734,8 +739,8 @@ def print_defined_ids(root: str, conf: dict) -> int:
     the grammar's Problem exited 1, the append refused every body, and the commit deny's printed
     remedy re-ran the refusing append — a lockout (the aReplayedCard closing review, F1)."""
     if not (GRAMMAR_DIR / "extract.py").is_file():
-        print("corpus_ids: no id set — the id grammar lives in the memory-recall kit and %s/extract.py "
-              "is not installed; adopt that kit to check id citations" % GRAMMAR_DIR)
+        print("corpus_ids: no id set — the id grammar lives in the memory-recall kit and %s "
+              "is not installed; adopt that kit to check id citations" % GRAMMAR_WHERE)
         return 3
     for line in _render_defined_ids(root, conf):
         print(line)
@@ -1025,19 +1030,19 @@ def cmd_selftest() -> int:
         root_pfx = ""
         tP = os.path.join(base, "prefix"); os.makedirs(tP)
         cP = _scratch(tP, extra={
-            f"{PFX}memory-tree/check-memory-hygiene.sh": "#!/usr/bin/env bash\n",  # gov:prefix-literal — fixture-internal: the selftest builds this layout in its own scratch tree
-            "memory/HYGIENE.md": f"sentinel\n\nRun `{root_pfx}memory-tree/check-memory-hygiene.sh` to lint.\n",
+            f"{PFX}{HERE.name}/check-memory-hygiene.sh": "#!/usr/bin/env bash\n",
+            "memory/HYGIENE.md": f"sentinel\n\nRun `{root_pfx}{HERE.name}/check-memory-hygiene.sh` to lint.\n",
         })
         cP["DEAD_PATH_PIN"] = "0"
         arm("check 15 catches a kit path written at the WRONG PREFIX",
-            f"{root_pfx}memory-tree/check-memory-hygiene.sh",
+            f"{root_pfx}{HERE.name}/check-memory-hygiene.sh",
             lambda: "\n".join(checks(walk(tP, cP))))
         # ...and the same citation spelled correctly is silent. Without this half the arm above would
         # also pass on a rule that reds every token whose first segment is not a top-level directory.
         tQ = os.path.join(base, "prefix-ok"); os.makedirs(tQ)
         cQ = _scratch(tQ, extra={
-            f"{PFX}memory-tree/check-memory-hygiene.sh": "#!/usr/bin/env bash\n",  # gov:prefix-literal — fixture-internal: the selftest builds this layout in its own scratch tree
-            "memory/HYGIENE.md": f"sentinel\n\nRun `{PFX}memory-tree/check-memory-hygiene.sh` to lint.\n",  # gov:prefix-literal — fixture-internal: the selftest builds this layout in its own scratch tree
+            f"{PFX}{HERE.name}/check-memory-hygiene.sh": "#!/usr/bin/env bash\n",
+            "memory/HYGIENE.md": f"sentinel\n\nRun `{PFX}{HERE.name}/check-memory-hygiene.sh` to lint.\n",
         })
         cQ["DEAD_PATH_PIN"] = "0"
         arm("...and the correctly-prefixed spelling of it is silent", None,

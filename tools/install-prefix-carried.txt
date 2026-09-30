@@ -41,13 +41,7 @@ tools/govkit/selftest.py	213	codebase-map,drift-audit,govkit,hooks,memory-recall
 tools/lexicon/selftest.py	50	lexicon	LOWERED 55 -> 28 by TOOL-aRepatriatedFork-28, which derives the prefix every fixture copies the kit to. Each literal left is the kit's own segment joined under that derived prefix, a kit segment joined under a derived base, TOOL-aRepatriatedFork-46's class (spec rev-3 §4, Returned).
 tools/memory-recall/selftest.py	2	memory-tree
 tools/memory-recall/test_recall_floor.py	1	govkit
-tools/memory-tree/check-memory-hygiene.test.sh	10	codebase-map,memory-tree,playbook
-tools/memory-tree/check-verdict-epoch.sh	2	memory-recall
-tools/memory-tree/check-verdict-epoch.test.sh	4	memory-tree
-tools/memory-tree/corpus_ids.py	6	memory-recall,memory-tree
-tools/memory-tree/gotchas.py	2	memory-tree
-tools/memory-tree/marker-contract.test.sh	2	unattended
-tools/memory-tree/merge-rows.test.sh	30	lib,memory-recall,memory-tree
+tools/memory-tree/check-memory-hygiene.test.sh	8	codebase-map,playbook
 tools/process-monitor/adopt-process-monitor.test.sh	2	lib	LOWERED 7 -> 2 by TOOL-aRepatriatedFork-28. The two left source the resolver beside this kit, a kit segment joined under a derived base, TOOL-aRepatriatedFork-46's class (spec rev-3 §4, Returned). Still `project-owned` and withheld from `govkit apply`.
 tools/run-gates/adopt-run-gates.test.sh	9	run-gates
 tools/run-gates/profile_bar.test.sh	1	run-gates

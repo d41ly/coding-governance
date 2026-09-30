@@ -534,12 +534,12 @@ def cmd_selftest() -> int:
         # written that way was silently unanchored. Here the tail may be empty, the directory token
         # IS harvested, and it selects everything beneath it. The arm pins the DIFFERENCE, so a
         # future tightening of the pattern reintroduces the upstream defect loudly.
-        d2 = ANCHOR_RE.findall(f"a directory `{PFX}memory-tree/` reference\n")  # gov:prefix-literal — fixture-internal: the selftest builds this layout in its own scratch tree
+        d2 = ANCHOR_RE.findall(f"a directory `{PFX}{HERE.name}/` reference\n")
         arm("harvest defect 2 does NOT apply here: a trailing slash harvests the directory", "[rc=0]",
-            lambda: 0 if d2 == [f"{PFX}memory-tree/"] else 1)  # gov:prefix-literal — fixture-internal: the selftest builds this layout in its own scratch tree
+            lambda: 0 if d2 == [f"{PFX}{HERE.name}/"] else 1)
         arm("...and that directory anchor selects everything beneath it", "[rc=0]",
-            lambda: 0 if selectable(f"{PFX}memory-tree/", [f"{PFX}memory-tree/gotchas.py"], "memory")  # gov:prefix-literal — fixture-internal: the selftest builds this layout in its own scratch tree
-            == {f"{PFX}memory-tree/gotchas.py"} else 1)  # gov:prefix-literal — fixture-internal: the selftest builds this layout in its own scratch tree
+            lambda: 0 if selectable(f"{PFX}{HERE.name}/", [f"{PFX}{HERE.name}/gotchas.py"], "memory")
+            == {f"{PFX}{HERE.name}/gotchas.py"} else 1)
         paths = [f"{PFX}some-gate.sh", "deep/nested/some-gate.sh", "memory/README.md"]
         sel = selectable("some-gate.sh", paths, "memory")
         arm("harvest defect 3: a basename selects tree-wide", "[rc=0]",

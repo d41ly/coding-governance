@@ -62,11 +62,103 @@ trap cleanup EXIT
 
 # The interpreter comes from the ONE resolver, never from a launcher name typed here: a name that is
 # on PATH and cannot run is the Microsoft-Store-stub defect the resolver exists for.
-# shellcheck source=/dev/null
-. "$ROOT/${PFX}lib/resolve-python.sh"
+# TOOL-aRepatriatedFork-46: the resolver is carried INLINE; it was sourced from the library directory,
+# which ships nowhere.
+# >>> resolve_python — canonical copy: resolve-python.sh in gov's lib dir (byte-identical; gated)
+resolve_python() {
+  # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
+  # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
+  # the candidate and every consumer uses "$PY" as a single word (measured: exit 127).
+  _rp_tried=""
+  for _rp_c in "${1:-}" "${GOV_PYTHON:-}" python3 python py; do
+    [ -n "$_rp_c" ] || continue
+    _rp_tried="$_rp_tried $_rp_c"
+    if "$_rp_c" -c "import sys" >/dev/null 2>&1; then
+      printf '%s\n' "$_rp_c"
+      return 0
+    fi
+  done
+  {
+    echo "resolve_python: no usable python launcher. Each candidate was RUN with -c 'import sys' and"
+    echo "resolve_python: none exited 0 — being on PATH is not evidence (the Microsoft Store python3"
+    echo "resolve_python: stub answers \`command -v\` and exits 9009 without running anything)."
+    echo "resolve_python: tried:$_rp_tried"
+    if [ -n "${1:-}" ]; then
+      echo "resolve_python: the caller's override '$1' was tried FIRST and did not run."
+    fi
+    if [ -n "${GOV_PYTHON:-}" ]; then
+      echo "resolve_python: GOV_PYTHON is set to '$GOV_PYTHON' and did not run. An override that is"
+      echo "resolve_python: set and unusable is THIS failure, never a silent fall-through — the"
+      echo "resolve_python: operator believes they chose, and would not have."
+    fi
+  } >&2
+  return 1
+}
+# <<< resolve_python
 PY=$(resolve_python) || { echo "FAIL no usable python on this host — every arm below is unrunnable"; exit 2; }
+# This kit's own directory NAME, and each sibling kit through the resolver, which reads the install
+# receipt first. `KIT_REL` in this suite is the tool root; the heredocs below read `KIT` from the
+# environment for the reason they read `KIT_REL` there. `lib` is a sibling here: `pyrun.sh` has no
+# inline canonical copy, so it is reached as a kit file rather than probed at `../lib/`.
+KIT="${HERE##*/}"; export KIT
+# The sibling-kit resolver (TOOL-aRepatriatedFork-2 S3), INLINED byte-identically from the
+# canonical copy named on its marker line and gated by the resolve-python self-test's parity
+# table. A shell consumer runs it with the python it already resolved, so the receipt rung is
+# read in Python and never parsed in bash. `resolve_kit_dir <python> <home> <anchor> <here>`
+# prints the kit directory REPO-RELATIVE, or the resolver's named refusal on stderr and exits 1.
+resolve_kit_dir() {
+  "$1" -c "$(cat <<'RKD'
+# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
+def resolve_kit_dir(home, anchor, here):
+    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
 
-DRV="bash $KIT_REL/lib/pyrun.sh $KIT_REL/memory-tree/merge-rows.py"
+    1. receipt — the `.governance/install.json` row whose `source` ends in <home>/<anchor> and
+       whose `path` exists inside this tree. The only record of a RENAMED kit dir: no probe finds
+       a memory-recall kit an adopter homed at `scripts/recall/`.
+    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
+    3. refuse — LookupError naming the three places looked; never a guessed prefix.
+    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
+    """
+    import json
+    import pathlib
+    here = pathlib.Path(here).resolve()
+    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
+    receipt = root / ".governance" / "install.json"
+    try:
+        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("path"):
+            continue
+        if str(row.get("source") or "").split("/")[-2:] != [home, anchor]:
+            continue
+        hit = (root / str(row["path"])).resolve()
+        if hit.is_file() and root in hit.parents:
+            return hit.parent
+    probes = (here / home, here.parent / home)
+    for cand in probes:
+        if (cand / anchor).is_file():
+            return cand
+    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
+        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
+# <<< resolve_kit_dir
+RKD
+)"'
+import sys
+try:
+    d = resolve_kit_dir(*sys.argv[1:4])
+except LookupError as e:
+    sys.exit(str(e))
+r = next((p for p in (d, *d.parents) if (p / ".git").exists()), d.anchor)
+print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
+}
+LIB_DIR=$(resolve_kit_dir "$PY" lib pyrun.sh "$HERE") || exit 2
+LIB="${LIB_DIR##*/}"
+MEMORY_RECALL_DIR=$(resolve_kit_dir "$PY" memory-recall extract.py "$HERE") || exit 2
+MEMORY_RECALL="${MEMORY_RECALL_DIR##*/}"
+
+DRV="bash $LIB_DIR/pyrun.sh $KIT_REL/${KIT}/merge-rows.py"
 bad() { echo "FAIL $1"; st=1; }
 
 # THE ORACLE — a family-agnostic id shape, deliberately NOT the driver's grammar. Keying the
@@ -232,7 +324,7 @@ printf -- '- a row\r\n' > "$TMP/bagcrlf"; printf -- '- a row\n' > "$TMP/baglf"
 
 # --- 0a. the driver PARSES under the interpreter the shim actually resolves -----------------------
 "$PY" -c 'import py_compile,sys; py_compile.compile(sys.argv[1], cfile=sys.argv[2], doraise=True)' \
-      $KIT_REL/memory-tree/merge-rows.py "$TMP/mr.pyc" >/dev/null 2>&1 \
+      $KIT_REL/${KIT}/merge-rows.py "$TMP/mr.pyc" >/dev/null 2>&1 \
   || bad "merge-rows.py does not compile under the resolved interpreter ($PY)"
 
 # ...and the version-INDEPENDENT half of the same concern, which py_compile on a modern node cannot
@@ -242,7 +334,7 @@ printf -- '- a row\r\n' > "$TMP/bagcrlf"; printf -- '- a row\n' > "$TMP/baglf"
 # leaves OURS-only content with no markers. Upstream's arm needed `uv python find 3.11` and SKIPPED
 # where uv was absent; this repo depends on uv nowhere, so a skippable arm would be a silent hole.
 FSTR='f"[^"]*\{[^}"]*"'
-nested=$(awk '!/^[[:space:]]*#/' $KIT_REL/memory-tree/merge-rows.py | grep -nE "$FSTR" || true)
+nested=$(awk '!/^[[:space:]]*#/' $KIT_REL/${KIT}/merge-rows.py | grep -nE "$FSTR" || true)
 [ -z "$nested" ] || { echo "FAIL merge-rows.py carries a nested same-quote f-string (PEP 701, 3.12+):"; printf '%s\n' "$nested" | sed 's/^/    /'; st=1; }
 # ...the ban FIRES on the shape it bans, or "clean" means "the predicate is broken".
 printf 'v = f"{"X" if c else "y"}"\n' > "$TMP/pep701.py"
@@ -283,14 +375,14 @@ printf '%s\n' "$out" | grep -qF "GOV_PYTHON is set to '$C/python3' and did not r
 # reason to be in.
 copies=$(git grep -l '^# >>> resolve_python' -- '*.sh' || true)
 [ -n "$copies" ] || bad "no inline resolver copy found — the marker-population assertion below is vacuous"
-printf '%s\n' "$copies" | grep -qx ''"${PFX}lib/pyrun.sh"'' \
-  && bad "$KIT_REL/lib/pyrun.sh carries the resolver marker block; it SOURCES the resolver instead"
+printf '%s\n' "$copies" | grep -qx ''"$LIB_DIR/pyrun.sh"'' \
+  && bad "$LIB_DIR/pyrun.sh carries the resolver marker block; it SOURCES the resolver instead"
 # ...and the COMPLEMENT, which is the half that matters to an adopter. The kit-internal launcher
 # ships inside the kit, where `../lib/` does not exist, so it MUST carry the inline block — and being
 # in the marker population is what puts it under the byte-identical parity gate. Asserting only the
 # exclusion above would pass on a kit that ships no launcher at all.
-printf '%s\n' "$copies" | grep -qx ''"${PFX}memory-tree/merge-rows.sh"'' \
-  || bad "$KIT_REL/memory-tree/merge-rows.sh does not carry the inline resolver block; a copy-installed kit cannot source ../lib/ and the driver would never start"
+printf '%s\n' "$copies" | grep -qx ''"${PFX}${KIT}/merge-rows.sh"'' \
+  || bad "$KIT_REL/${KIT}/merge-rows.sh does not carry the inline resolver block; a copy-installed kit cannot source ../lib/ and the driver would never start"
 
 # --- 0c. FAIL CLOSED: every deferred-resolution failure becomes a conflict, never a take-ours ------
 # The driver reads its anchor grammar from the worktree at merge time. At module scope that import
@@ -299,27 +391,27 @@ printf '%s\n' "$copies" | grep -qx ''"${PFX}memory-tree/merge-rows.sh"'' \
 # failures land in main()'s fail-closed handler. Simulated on scratch trees rather than by breaking
 # the real kit under a concurrently-running gate. This is corpus case C18, the worst class in it, and
 # the redesign does not touch the property — so it is re-proven here rather than assumed (AC17).
-failclosed() {  # $1 label · $2 scratch tree holding $KIT_REL/memory-tree/merge-rows.py
+failclosed() {  # $1 label · $2 scratch tree holding $KIT_REL/${KIT}/merge-rows.py
   { pre; row TOOL-zFixture-1 base; } > "$TMP/o"
   { pre; row TOOL-zFixture-1 base; } > "$TMP/a"
   { pre; row TOOL-zFixture-1 base; row TOOL-zFixture-2 INCOMING; } > "$TMP/b"
-  if "$PY" "$2/${PFX}memory-tree/merge-rows.py" "$TMP/o" "$TMP/a" "$TMP/b" x >/dev/null 2>&1; then
+  if "$PY" "$2/${PFX}${KIT}/merge-rows.py" "$TMP/o" "$TMP/a" "$TMP/b" x >/dev/null 2>&1; then
     bad "$1: the driver reported SUCCESS with no resolvable anchor grammar"
   fi
   grep -q 'INCOMING' "$TMP/a" || bad "$1: the incoming row vanished — this is the silent-take-ours shape"
   grep -q '^<<<<<<< ours$' "$TMP/a" || bad "$1: no conflict markers written"
 }
 mkscratch() { local d; d=$(mktemp -d); SCRATCH="$SCRATCH $d"
-  mkdir -p "$d/${PFX}memory-tree" "$d/${PFX}memory-recall"
-  cp $KIT_REL/memory-tree/merge-rows.py "$d/${PFX}memory-tree/"
+  mkdir -p "$d/${PFX}${KIT}" "$d/${PFX}${MEMORY_RECALL}"
+  cp $KIT_REL/${KIT}/merge-rows.py "$d/${PFX}${KIT}/"
   printf '%s' "$d"; }
 S=$(mkscratch); cp .memory-tree.conf "$S/"
-printf 'this is not valid syntax(\n' > "$S/${PFX}memory-recall/extract.py"
+printf 'this is not valid syntax(\n' > "$S/${PFX}${MEMORY_RECALL}/extract.py"
 failclosed "broken grammar" "$S"
 S=$(mkscratch); cp .memory-tree.conf "$S/"          # kit dir present, extract.py absent
 failclosed "missing grammar module" "$S"
 S=$(mkscratch)                                       # no .memory-tree.conf above the driver
-cp $KIT_REL/memory-recall/extract.py $KIT_REL/memory-recall/recall_conf.py "$S/${PFX}memory-recall/"
+cp $MEMORY_RECALL_DIR/extract.py $MEMORY_RECALL_DIR/recall_conf.py "$S/${PFX}${MEMORY_RECALL}/"
 failclosed "missing .memory-tree.conf" "$S"
 
 # --- 0d. the oracle sees a row the driver's grammar does NOT, and `dups` fires ---------------------
@@ -360,7 +452,7 @@ sys.dont_write_bytecode = True   # a test that leaves __pycache__ in <prefix>/ d
 # single-quoted SPANS and a quoted heredoc is a different quoting context it did not model.
 import os
 _kit = os.environ["KIT_REL"]
-spec = importlib.util.spec_from_file_location("mr", _kit + "/memory-tree/merge-rows.py")
+spec = importlib.util.spec_from_file_location("mr", _kit + "/" + os.environ["KIT"] + "/merge-rows.py")
 mr = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(mr)
 sys.exit(0 if mr.key(sys.argv[1] + "\n") is not None else 1)
@@ -610,17 +702,17 @@ audit "a structure conflict at rc 1" 1 0 0 1
 # configured command is `bash <prefix>/lib/pyrun.sh <prefix>/memory-tree/merge-rows.py …` and its paths are
 # RELATIVE, so a fixture carrying only the two kits cannot launch anything.
 E=$(mktemp -d); SCRATCH="$SCRATCH $E"
-mkdir -p "$E/${PFX}memory-tree" "$E/${PFX}memory-recall" "$E/${PFX}lib" "$E/memory/backlog"
+mkdir -p "$E/${PFX}${KIT}" "$E/${PFX}${MEMORY_RECALL}" "$E/${PFX}${LIB}" "$E/memory/backlog"
 cp .memory-tree.conf "$E/"
-cp $KIT_REL/memory-tree/merge-rows.py "$E/${PFX}memory-tree/"
-cp $KIT_REL/memory-recall/extract.py $KIT_REL/memory-recall/recall_conf.py "$E/${PFX}memory-recall/"
-cp $KIT_REL/lib/pyrun.sh $KIT_REL/lib/resolve-python.sh "$E/${PFX}lib/"
+cp $KIT_REL/${KIT}/merge-rows.py "$E/${PFX}${KIT}/"
+cp $MEMORY_RECALL_DIR/extract.py $MEMORY_RECALL_DIR/recall_conf.py "$E/${PFX}${MEMORY_RECALL}/"
+cp $LIB_DIR/pyrun.sh $LIB_DIR/resolve-python.sh "$E/${PFX}lib/"
 (
   cd "$E" || exit 2
   git init -q -b main
   git config user.email t@e; git config user.name t; git config core.autocrlf false
   printf 'memory/DECISIONS.md merge=rows\nmemory/backlog/*.md merge=rows\n' > .gitattributes
-  git config merge.rows.driver 'bash '"${PFX}lib/pyrun.sh"' '"${PFX}memory-tree/merge-rows.py"' %O %A %B %P'
+  git config merge.rows.driver 'bash '"${PFX}${LIB}/pyrun.sh"' '"${PFX}${KIT}/merge-rows.py"' %O %A %B %P'
   { printf '# tooling backlog\n\n> Mutable. Each row leads with one status token.\n'
     row TOOL-zFixture-1 base; } > memory/backlog/TOOL.md
   git add -A; git commit -q -m base
@@ -937,7 +1029,7 @@ sys.dont_write_bytecode = True
 # single-quoted SPANS and a quoted heredoc is a different quoting context it did not model.
 import os
 _kit = os.environ["KIT_REL"]
-spec = importlib.util.spec_from_file_location("mr", _kit + "/memory-tree/merge-rows.py")
+spec = importlib.util.spec_from_file_location("mr", _kit + "/" + os.environ["KIT"] + "/merge-rows.py")
 mr = importlib.util.module_from_spec(spec); spec.loader.exec_module(mr)
 a, b = mr._row_key(sys.argv[1] + "\n"), mr._row_key(sys.argv[1])
 sys.exit(0 if a == b and a.startswith("raw:") else 1)
@@ -1103,11 +1195,11 @@ cr=$(endings "$TMP/a")
 # ...and the fail-closed path, which is a THIRD synthesis site and the one an author hits when the
 # grammar cannot be read at all.
 S=$(mkscratch); cp .memory-tree.conf "$S/"
-printf 'this is not valid syntax(\n' > "$S/${PFX}memory-recall/extract.py"
+printf 'this is not valid syntax(\n' > "$S/${PFX}${MEMORY_RECALL}/extract.py"
 { cprose alpha beta; crow TOOL-zFixture-1 base; } > "$TMP/o"
 { cprose alpha beta; crow TOOL-zFixture-1 OURS; } > "$TMP/a"
 { cprose alpha beta; crow TOOL-zFixture-1 THEIRS; } > "$TMP/b"
-"$PY" "$S/${PFX}memory-tree/merge-rows.py" "$TMP/o" "$TMP/a" "$TMP/b" x >/dev/null 2>&1
+"$PY" "$S/${PFX}${KIT}/merge-rows.py" "$TMP/o" "$TMP/a" "$TMP/b" x >/dev/null 2>&1
 nocr=$(LC_ALL=C grep -cv $'\r$' "$TMP/a" || true)
 [ "$nocr" = 0 ] \
   || bad "crlf markers (fail-closed): $nocr line(s) end without CR — the fail-closed body is the third synthesis site"
@@ -1200,7 +1292,7 @@ sys.dont_write_bytecode = True
 # single-quoted SPANS and a quoted heredoc is a different quoting context it did not model.
 import os
 _kit = os.environ["KIT_REL"]
-spec = importlib.util.spec_from_file_location("mr", _kit + "/memory-tree/merge-rows.py")
+spec = importlib.util.spec_from_file_location("mr", _kit + "/" + os.environ["KIT"] + "/merge-rows.py")
 mr = importlib.util.module_from_spec(spec); spec.loader.exec_module(mr)
 lines = mr.read(sys.argv[1])
 leaked = [ln for ln in mr.settled(lines) if ln.lstrip().startswith(("<<<<<<<", "=======", ">>>>>>>"))]
@@ -1228,7 +1320,7 @@ grep -q '^|||||||' "$G/ctl3" \
 for style in diff3 zdiff3; do
   ( cd "$G" && git config merge.conflictStyle "$style" )
   cp "$G/a0" "$G/a"
-  ( cd "$G" && bash "$ROOT/${PFX}lib/pyrun.sh" "$ROOT/${PFX}memory-tree/merge-rows.py" o a b x >/dev/null 2>&1 ) && rc=0 || rc=$?
+  ( cd "$G" && bash "$ROOT/$LIB_DIR/pyrun.sh" "$ROOT/${PFX}${KIT}/merge-rows.py" o a b x >/dev/null 2>&1 ) && rc=0 || rc=$?
   [ "$rc" = 0 ] \
     || bad "conflict style=$style: the driver exited $rc where the same three blobs resolve at rc 0 with the style unset — a node's config changed the verdict"
   [ "$(grep -c '^## Section two$' "$G/a")" = 1 ] \
@@ -1271,7 +1363,7 @@ sys.dont_write_bytecode = True
 # single-quoted SPANS and a quoted heredoc is a different quoting context it did not model.
 import os
 _kit = os.environ["KIT_REL"]
-spec = importlib.util.spec_from_file_location("mr", _kit + "/memory-tree/merge-rows.py")
+spec = importlib.util.spec_from_file_location("mr", _kit + "/" + os.environ["KIT"] + "/merge-rows.py")
 mr = importlib.util.module_from_spec(spec); spec.loader.exec_module(mr)
 _real = mr.reconcile
 
@@ -1551,8 +1643,8 @@ fi
 # — that checker grades the literal `<prefix>/<kit>/<file>` spellings a body ships, because `apply`
 # writes gov's bytes verbatim and such a literal resolves to nothing at another prefix.
 W=$(mktemp -d); SCRATCH="$SCRATCH $W"
-MT=${PFX}memory-tree
-MR=${PFX}memory-recall
+MT=${PFX}${KIT}
+MR=${PFX}${MEMORY_RECALL}
 LIB=${PFX}lib
 mkdir -p "$W/$MT" "$W/$MR" "$W/$LIB" "$W/memory/backlog"
 cp "$ROOT/.memory-tree.conf" "$W/"

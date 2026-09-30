@@ -77,6 +77,64 @@ resolve_python() {
 }
 # <<< resolve_python
 _PY=$(resolve_python) || { echo "check-memory-hygiene.test: no usable python"; exit 2; }
+# TOOL-aRepatriatedFork-46: a kit is named by the name its directory has in THIS install, never
+# as a literal segment: this suite's own from where it sits, a sibling's through the resolver,
+# which reads the install receipt first. A fixture mirrors that layout by the resolved NAME.
+KIT="${KIT_REL##*/}"
+# The sibling-kit resolver (TOOL-aRepatriatedFork-2 S3), INLINED byte-identically from the
+# canonical copy named on its marker line and gated by the resolve-python self-test's parity
+# table. A shell consumer runs it with the python it already resolved, so the receipt rung is
+# read in Python and never parsed in bash. `resolve_kit_dir <python> <home> <anchor> <here>`
+# prints the kit directory REPO-RELATIVE, or the resolver's named refusal on stderr and exits 1.
+resolve_kit_dir() {
+  "$1" -c "$(cat <<'RKD'
+# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
+def resolve_kit_dir(home, anchor, here):
+    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
+
+    1. receipt — the `.governance/install.json` row whose `source` ends in <home>/<anchor> and
+       whose `path` exists inside this tree. The only record of a RENAMED kit dir: no probe finds
+       a memory-recall kit an adopter homed at `scripts/recall/`.
+    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
+    3. refuse — LookupError naming the three places looked; never a guessed prefix.
+    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
+    """
+    import json
+    import pathlib
+    here = pathlib.Path(here).resolve()
+    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
+    receipt = root / ".governance" / "install.json"
+    try:
+        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("path"):
+            continue
+        if str(row.get("source") or "").split("/")[-2:] != [home, anchor]:
+            continue
+        hit = (root / str(row["path"])).resolve()
+        if hit.is_file() and root in hit.parents:
+            return hit.parent
+    probes = (here / home, here.parent / home)
+    for cand in probes:
+        if (cand / anchor).is_file():
+            return cand
+    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
+        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
+# <<< resolve_kit_dir
+RKD
+)"'
+import sys
+try:
+    d = resolve_kit_dir(*sys.argv[1:4])
+except LookupError as e:
+    sys.exit(str(e))
+r = next((p for p in (d, *d.parents) if (p / ".git").exists()), d.anchor)
+print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
+}
+CODEBASE_MAP_DIR=$(resolve_kit_dir "$_PY" codebase-map reuse_lookup.py "$HERE") || exit 2
+CODEBASE_MAP="${CODEBASE_MAP_DIR##*/}"
 cd "$TMP" || exit 2
 git init -q . && git config user.email t@t.test && git config user.name t && git config core.autocrlf false
 # STREAMS_CUTOFF sits between the two fixture eras: the 2026-08-01 specs are grandfathered, the
@@ -465,7 +523,7 @@ no open-questions section at all
   > "$D/spec/2026-08-10-spec-tFixture-64.md"                                   # no such section -> must SAY SO, not pass
 # The witness sits on a CONTINUATION line. The accumulator that folds continuations into their
 # bullet had no fixture: deleting it left this harness unchanged while the real gate went red.
-wit | sed 's|- AC1 When run, `check-memory-hygiene.sh` passes.|- **AC1** When run, the gate named below passes:\n  `bash '"${PFX}memory-tree/check-memory-hygiene.sh"'`|' \
+wit | sed 's|- AC1 When run, `check-memory-hygiene.sh` passes.|- **AC1** When run, the gate named below passes:\n  `bash '"${PFX}${KIT}/check-memory-hygiene.sh"'`|' \
   > "$D/spec/2026-08-10-spec-tFixture-55.md"   # witness on a continuation -> silent
 # A hard-wrapped continuation that OPENS with a cross-reference to other ACs. The first selector
 # read this as a new bullet head: it closed the real bullet early and invented a phantom label, so
@@ -2824,7 +2882,7 @@ _fl=$(mktemp -d)
   # The second row RE-HOMES one sibling, as a `kit.codebase-map.prefix` override records it: only
   # per row. Closing review round 1 L4 — a top-level `prefix` read renders it at `scripts/` anyway.
   mkdir -p lib/cm; : > lib/cm/reuse_lookup.py
-  printf '{\n  "schema": 3,\n  "prefix": "scripts",\n  "files": [{"prefix": "decoy"}, {"path": "lib/cm/reuse_lookup.py", "source": "%s/codebase-map/reuse_lookup.py", "kit": "codebase-map"}]\n}\n' gov > .governance/install.json
+  printf '{\n  "schema": 3,\n  "prefix": "scripts",\n  "files": [{"prefix": "decoy"}, {"path": "lib/cm/reuse_lookup.py", "source": "%s/%s/reuse_lookup.py", "kit": "codebase-map"}]\n}\n' gov "$CODEBASE_MAP" > .governance/install.json
   printf 'MEMORY_ROOT=memory\nDISCIPLINES="arch"\nFAMILIES="arch:ARCH"\nREADINESS_ROWS="security|risks"\nINDEX_CAP_LINES="500"\nENTRY_CAP_UNIT="bytes"\n' > .memory-tree.conf
   printf '<!-- gov:kit memory-tree@0 -->\n' > memory/HYGIENE.md
   git add -A && git -c commit.gpgsign=false commit -q -m flat --no-verify

@@ -43,27 +43,82 @@ cd "$ROOT" || exit 2
 # out absolute in the wrong flavour. Measured here: every python case failed with
 # ModuleNotFoundError while the awk cases passed, so 3 of 4 readers still "agreed".
 KIT_MT="$(git -C "$(dirname "$0")" rev-parse --show-prefix)"; KIT_MT="${KIT_MT%/}"
-KITS_DIR="$(dirname "$KIT_MT")"        # the install prefix both kits sit under
-U="$KITS_DIR/unattended/unattended.sh"
-K="$KITS_DIR/unattended/check-unattended.sh"
-
-st=0; ncase=0
-O='<!-- gen:build-index -->'
-C='<!-- /gen:build-index -->'
-
-if [ ! -f "$U" ] || [ ! -f "$K" ]; then
-  echo "marker-contract: SKIP — the unattended kit is not installed at $KITS_DIR/unattended/,"
-  echo "marker-contract: so 3 of the 4 readers do not exist here. The Python reader is covered by"
-  echo "marker-contract: gen_build_index.py --selftest; this leg asserts AGREEMENT and needs both sides."
-  exit 0
-fi
-
 PY=""
 for c in "${GOV_PYTHON:-}" python3 python py; do
   [ -n "$c" ] || continue
   if "$c" -c "import sys" >/dev/null 2>&1; then PY=$c; break; fi
 done
 [ -n "$PY" ] || { echo "marker-contract: no usable python launcher"; exit 2; }
+# TOOL-aRepatriatedFork-46: the unattended kit is a SIBLING, found through the resolver, which reads
+# the install receipt before it probes beside this kit, rather than by typing its name after the
+# prefix. A miss leaves both paths naming nothing, which is the announced skip below.
+# The sibling-kit resolver (TOOL-aRepatriatedFork-2 S3), INLINED byte-identically from the
+# canonical copy named on its marker line and gated by the resolve-python self-test's parity
+# table. A shell consumer runs it with the python it already resolved, so the receipt rung is
+# read in Python and never parsed in bash. `resolve_kit_dir <python> <home> <anchor> <here>`
+# prints the kit directory REPO-RELATIVE, or the resolver's named refusal on stderr and exits 1.
+resolve_kit_dir() {
+  "$1" -c "$(cat <<'RKD'
+# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
+def resolve_kit_dir(home, anchor, here):
+    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
+
+    1. receipt — the `.governance/install.json` row whose `source` ends in <home>/<anchor> and
+       whose `path` exists inside this tree. The only record of a RENAMED kit dir: no probe finds
+       a memory-recall kit an adopter homed at `scripts/recall/`.
+    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
+    3. refuse — LookupError naming the three places looked; never a guessed prefix.
+    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
+    """
+    import json
+    import pathlib
+    here = pathlib.Path(here).resolve()
+    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
+    receipt = root / ".governance" / "install.json"
+    try:
+        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("path"):
+            continue
+        if str(row.get("source") or "").split("/")[-2:] != [home, anchor]:
+            continue
+        hit = (root / str(row["path"])).resolve()
+        if hit.is_file() and root in hit.parents:
+            return hit.parent
+    probes = (here / home, here.parent / home)
+    for cand in probes:
+        if (cand / anchor).is_file():
+            return cand
+    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
+        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
+# <<< resolve_kit_dir
+RKD
+)"'
+import sys
+try:
+    d = resolve_kit_dir(*sys.argv[1:4])
+except LookupError as e:
+    sys.exit(str(e))
+r = next((p for p in (d, *d.parents) if (p / ".git").exists()), d.anchor)
+print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
+}
+UNATTENDED_DIR=$(resolve_kit_dir "$PY" unattended unattended.sh "$ROOT/$KIT_MT" 2>/dev/null) || UNATTENDED_DIR=""
+U="${UNATTENDED_DIR:-/nonexistent}/unattended.sh"
+K="${UNATTENDED_DIR:-/nonexistent}/check-unattended.sh"
+
+st=0; ncase=0
+O='<!-- gen:build-index -->'
+C='<!-- /gen:build-index -->'
+
+if [ ! -f "$U" ] || [ ! -f "$K" ]; then
+  echo "marker-contract: SKIP — no unattended kit is installed beside this kit or in the install receipt,"
+  echo "marker-contract: so 3 of the 4 readers do not exist here. The Python reader is covered by"
+  echo "marker-contract: gen_build_index.py --selftest; this leg asserts AGREEMENT and needs both sides."
+  exit 0
+fi
+
 T=$(mktemp -d) || exit 2
 trap 'rm -rf "$T"' EXIT
 cat > "$T/reader.py" <<PYR
