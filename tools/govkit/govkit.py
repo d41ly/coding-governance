@@ -5632,11 +5632,18 @@ def foreign_kit_present(target: pathlib.Path, descs: dict[str, tuple[dict, str]]
         # kits, was not detected. `target_context` is the ctx `apply` resolves the entry's
         # destinations with, so the probe asks where THIS install would write, per-entry overrides
         # included. The root stays as the second ctx, which the old pair also covered.
+        #
+        # AND GOV'S CANONICAL PREFIX STAYS TOO (closing review round 1 M5, TOOL-aRepatriatedFork-24
+        # S7b). Replacing the old pair's `tools` with the target's own prefix traded one blindness
+        # for another: a hand-copied kit at gov's prefix under a `scripts` intake read as a clean
+        # target, and `apply` installed a second copy beside it. The probe is the UNION.
         probes: list[str] = []
         vf = d.get("version_from") or {}
         vf_name = pathlib.PurePosixPath(vf["file"]).name if vf.get("file") else None
         own = target_context(target, deploy, eid, d)
-        for ctx in (own, {**own, "prefix": "", "kit": eid}):
+        canon = canonical_ctx(eid)
+        for ctx in (own, {**own, "prefix": canon["prefix"], "kit": canon["kit"]},
+                    {**own, "prefix": "", "kit": eid}):
             prefix = ctx["prefix"]
             for rule in d.get("files", []):
                 # A `merged` destination is a file the TARGET owns and gov writes a region of, so its

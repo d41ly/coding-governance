@@ -682,6 +682,64 @@ case "$_rc|$_out" in
   *) bad "AC3 (24) expected the no-kit-root refusal, got: $_out" ;;
 esac
 
+# --- closing review round 1 B1 (TOOL-aRepatriatedFork-24): THE RECEIPT AND THE RUNNER IT NAMES ARE
+# --- VETTED AS gate-env.sh IS. The default bar is the runner the install receipt names, and neither
+# --- had to be tracked: an ignored receipt pointing at a runner under `.git/`, beside a planted
+# --- manifest, ran that runner over a RED tracked bar and landed, with `git status` empty. Each arm
+# --- stages that shape; the control proves a clean, tracked receipt still reaches its bar.
+b1="$tmp/b1"; mkdir -p "$b1/hooks"; cp "$SRC/.githooks/pre-push" "$b1/hooks/pre-push"
+git init -q --bare "$b1/remote.git"; git init -q "$b1/work"
+cd "$b1/work" || exit 2
+git config user.email t@example.com; git config user.name t; git config core.autocrlf false
+git config core.hooksPath "$b1/hooks"
+mkdir -p "$RUN_GATES"
+printf '#!/usr/bin/env bash\necho "TRACKED BAR RAN - RED"; exit 1\n' > "$RUN_GATES/$RUN_GATES.sh"
+printf '%s\n' '[]' > gate-legs.json
+git add -A >/dev/null 2>&1; git commit -q -m init; git branch -M main
+git remote add origin "$b1/remote.git"
+touch "$(git rev-parse --git-dir)/push-main-active"
+b1_gd=$(git rev-parse --git-dir)
+mkdir -p "$b1_gd/x/$RUN_GATES" .governance
+printf '#!/usr/bin/env bash\necho "PLANTED BAR RAN"; exit 0\n' > "$b1_gd/x/$RUN_GATES/$RUN_GATES.sh"
+printf '%s\n' '[]' > "$b1_gd/x/gate-legs.json"
+printf '.governance/\n' >> "$b1_gd/info/exclude"
+write_b1_receipt() { # <path the runner row records> -> the receipt, one key per line as the hook's reader expects
+  printf '{\n  "files": [\n    {\n      "path": "%s",\n      "source": "%s/%s.sh"\n    }\n  ]\n}\n' \
+    "$1" "$RUN_GATES" "$RUN_GATES" > .governance/install.json
+}
+run_b1_push() { git commit -q --allow-empty -m "b1 $RANDOM"; ( unset GOV_GATE_CMD GOV_GATE_CMD_TEST; git push -q origin main 2>&1 ); }
+read_b1_token() { cut -f1 "$b1_gd/pre-push-refusal" 2>/dev/null; }
+write_b1_receipt ".git/x/$RUN_GATES/$RUN_GATES.sh"
+[ -z "$(git status --porcelain)" ] || bad "B1 fixture — the planted receipt is visible to git status, so the arm below tests nothing hidden"
+_out=$(run_b1_push); _rc=$?
+case "$_rc|$_out|$(read_b1_token)" in
+  0\|*|*"PLANTED BAR RAN"*) bad "B1 an ignored receipt naming a runner under .git/ was followed: rc=$_rc $_out" ;;
+  *".governance/install.json"*"|bar-refused") ok "B1 an ignored install receipt is refused as bar-refused before its runner runs" ;;
+  *) bad "B1 expected the ignored receipt to be refused as bar-refused, got rc=$_rc: $_out | token '$(read_b1_token)'" ;;
+esac
+git add -f .governance/install.json; git commit -q -m "a tracked receipt naming an untracked runner"
+_out=$(run_b1_push); _rc=$?
+case "$_rc|$_out|$(read_b1_token)" in
+  0\|*|*"PLANTED BAR RAN"*) bad "B1 a tracked receipt naming an untracked runner was followed: rc=$_rc $_out" ;;
+  *"$RUN_GATES/$RUN_GATES.sh"*"|bar-refused") ok "B1 a tracked receipt naming an untracked runner is refused as bar-refused" ;;
+  *) bad "B1 expected the untracked runner to be refused as bar-refused, got rc=$_rc: $_out | token '$(read_b1_token)'" ;;
+esac
+write_b1_receipt "$RUN_GATES/$RUN_GATES.sh"
+git add -f .governance/install.json; git commit -q -m "a tracked receipt naming the tracked runner"
+_out=$(run_b1_push); _rc=$?
+case "$_rc|$_out|$(read_b1_token)" in
+  0\|*) bad "B1 control — the tracked RED runner let the push through: $_out" ;;
+  *"TRACKED BAR RAN - RED"*"|gate-red") ok "B1 control — a clean tracked receipt reaches its tracked runner, which refuses" ;;
+  *) bad "B1 control expected the tracked bar to run and refuse, got rc=$_rc: $_out | token '$(read_b1_token)'" ;;
+esac
+write_b1_receipt ".git/x/$RUN_GATES/$RUN_GATES.sh"
+_out=$(run_b1_push); _rc=$?
+case "$_rc|$_out|$(read_b1_token)" in
+  0\|*|*"PLANTED BAR RAN"*) bad "B1 a modified tracked receipt was followed: rc=$_rc $_out" ;;
+  *".governance/install.json"*"differs"*"|bar-refused") ok "B1 a tracked receipt whose working copy differs is refused as bar-refused" ;;
+  *) bad "B1 expected the modified receipt to be refused as bar-refused, got rc=$_rc: $_out | token '$(read_b1_token)'" ;;
+esac
+
 cd "$pfx_home" || exit 2
 
 # ============================================================================================

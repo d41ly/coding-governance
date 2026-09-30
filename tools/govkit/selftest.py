@@ -3690,6 +3690,20 @@ user_skills = "/tmp/gk-fake-skills"
         check("[aRF-24 AC8] ...before any write",
               not (for_s / ".governance" / "install.json").exists(), "")
 
+        # --- TOOL-aRepatriatedFork-24 AC12 (closing review round 1 M5): the same `scripts/` intake
+        # --- over a foreign kit at GOV'S canonical prefix. The per-entry probe dropped the old pair's
+        # --- canonical rung, so this target read as clean and apply installed a second copy.
+        # --- Red against `7de665e5`'s probe.
+        for_c = make_target(tmp / "e24c", DEPLOY_FULL.replace(f'prefix = "{PFX[:-1]}"', 'prefix = "scripts"', 1))
+        (for_c / PFX).mkdir(parents=True, exist_ok=True)
+        (for_c / PFX / "check-wiring.sh").write_text("KIT_CHECK_WIRING_VERSION=9.9\n", encoding="utf-8")
+        p = run("apply", "--target", str(for_c), "--kits", _sel24)
+        check("[aRF-24 AC12] apply refuses a foreign kit at gov's canonical prefix under a scripts intake",
+              p.returncode == 2 and f"check-wiring (at {PFX}check-wiring.sh)" in p.stderr,
+              p.stdout + p.stderr)
+        check("[aRF-24 AC12] ...before any write",
+              not (for_c / ".governance" / "install.json").exists(), "")
+
         # --- SUPERSEDED. These two arms asserted that a `merged` rule REFUSES by name, and the
         # --- merged-region writer inverts them: the role is honourable now. Replaced with a
         # --- POSITIVE on-disk assertion rather than deleted — an arm that asserts a refusal string
