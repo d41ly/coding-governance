@@ -115,20 +115,23 @@ echo "foreign-prefix: clone of $(git rev-parse --short HEAD) at $G, tool root '$
 
 remove_own_row() {
   # Both declarations at once: the budget row and the manifest leg. Bytes in, bytes out, so an LF
-  # file stays LF.
+  # file stays LF. EXACTLY ONE of each must go: `SELF_ROW` restates the leg's name, and a rename
+  # that left the two spellings apart would keep this leg in its own population, where it recurses.
   local py
   py=$(resolve_python) || return 1
-  "$py" - "$TROOT/$KIT/selftest-budgets.txt" "$TROOT/gate-legs.json" "$SELF_ROW" <<'PY'
+  "$py" -c '
 import json, sys
 budgets, legs, row = sys.argv[1], sys.argv[2], sys.argv[3]
 b = open(budgets, "rb").read().split(b"\n")
-open(budgets, "wb").write(b"\n".join(l for l in b if not l.startswith(row.encode() + b"\t")))
-raw = open(legs, "rb").read().decode("utf-8")
-doc = json.loads(raw)
-kept = [l for l in doc if l.get("name") != row]
-if len(kept) != len(doc):
-    open(legs, "wb").write((json.dumps(kept, indent=2, ensure_ascii=False) + "\n").encode("utf-8"))
-PY
+kb = [l for l in b if not l.startswith(row.encode() + b"\t")]
+doc = json.loads(open(legs, "rb").read().decode("utf-8"))
+kl = [l for l in doc if l.get("name") != row]
+if len(b) - len(kb) != 1 or len(doc) - len(kl) != 1:
+    sys.exit("foreign-prefix: %d budget row(s) and %d leg(s) named %r, and exactly one of each must"
+             " leave the clone" % (len(b) - len(kb), len(doc) - len(kl), row))
+open(budgets, "wb").write(b"\n".join(kb))
+open(legs, "wb").write((json.dumps(kl, indent=2, ensure_ascii=False) + "\n").encode("utf-8"))
+' "$TROOT/$KIT/selftest-budgets.txt" "$TROOT/gate-legs.json" "$SELF_ROW"
 }
 
 add_trailerless_rows() {
