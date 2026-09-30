@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-30 — the suites run at a foreign prefix, and the install-prefix gate is a pure ban
 
-**Status:** CLOSED · rev-6 · 2026-09-30 · node a · Tier-2 · base 2143b6d6 · streams tooling · order 18
+**Status:** CLOSED · rev-7 · 2026-09-30 · node a · Tier-2 · base 2143b6d6 · streams tooling · order 18
 
 <!-- gen:spec-records -->
 
@@ -83,6 +83,12 @@ state.
   grades the map dossiers under `memory/map/features/` too, since a dossier is the live inventory a
   session reads and not an append-only record; the rest of `memory/` stays out of scope. Observed
   by AC10.
+- **S10 (rev-7)** — The closing review's round-2 L2. A gotcha under `memory/gotchas/` still told the
+  reader to re-key and hand-write rows in the two deleted install-prefix files, and
+  `gotchas.py` serves that page as a live checklist item. The gotcha pages join the dead-path
+  haystack beside the map dossiers, because a surface served as live guidance is the class, not
+  the dossier folder. The three gotcha lines that spell a deleted install-prefix file are
+  rewritten to name it without its filename, the live one in the past tense. Observed by AC11.
 
 ## 3. Non-goals (OUT)
 
@@ -214,6 +220,11 @@ that names either deleted file, which the dead-path gate reads
   `memory/map/features/` that names a deleted file reds by its `<path>:<line>`.
   Red when: the arm passes, which the `7de665e5` gate does, or six dossier lines still name a
   deleted install-prefix file.
+- **AC11** — rev-7. `bash tools/check-dead-paths.sh` exits 0 on the real tree with the gotcha
+  pages in its haystack, and a `tools/check-dead-paths.test.sh` arm planting a page under
+  `memory/gotchas/` that names a deleted file reds by its `<path>:<line>`.
+  Red when: the arm passes, which the `ce8a78f5` gate does, or a gotcha still spells a deleted
+  install-prefix file.
 
 ## 7. Gates
 
@@ -229,6 +240,8 @@ New arm: `tools/check-install-prefix.test.sh` · a fixture render left out while
 template, and graded once a line is appended to it · none
 
 New arm: `tools/check-dead-paths.test.sh` · rev-6: a map dossier naming a deleted file is a carrier · the suite's floor rises by one
+
+New arm: `tools/check-dead-paths.test.sh` · rev-7: a gotcha page naming a deleted file is a carrier · the suite's floor rises by one
 
 ## 8. Open questions
 
@@ -281,6 +294,9 @@ New arm: `tools/check-dead-paths.test.sh` · rev-6: a map dossier naming a delet
 - rev-6 · 2026-09-30 · closing review round 1 fold: L1 — prose that still described the deleted
   install-prefix ledger and registry as live is rewritten, and the dead-path gate grades the map
   dossiers so a dossier cannot carry a deleted file again (S9, AC10).
+- rev-7 · 2026-09-30 · closing review round 2 fold: L2 — the gotcha that still described the
+  deleted install-prefix registries is reworded, and the gotcha pages join the dead-path haystack
+  (S10, AC11).
 
 ## 10. Reuse audit
 
