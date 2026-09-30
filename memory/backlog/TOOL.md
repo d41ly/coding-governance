@@ -335,6 +335,8 @@ Cite ids, never line numbers.
 | [TOOL-cTracedPromise-5](../builds/cTracedPromise/BACKLOG.md) | OPEN | — | — | 2026-08-15 | an adopter who fills TRACE_CUTOFF before closing any spec after it reds… |
 | [TOOL-cTracedPromise-7](../builds/cTracedPromise/BACKLOG.md) | OPEN | — | — | 2026-08-15 | the unset-TRACE_CUTOFF row prints DEAD PROBE though --check ignores it:… |
 | [TOOL-dAlignedCarrier-7](../builds/dAlignedCarrier/BACKLOG.md) | OPEN | LOW | — | 2026-09-30 | THE VERB CONTRACT'S --status ENTRY NAMES FIELDS THE VERB HAS OUTGROWN.… |
+| [TOOL-dAlignedCarrier-8](../builds/dAlignedCarrier/BACKLOG.md) | OPEN | HIGH | — | 2026-09-30 | inherited red: leg memory-recall kit selftest red at 87c245b3,… |
+| [TOOL-dAlignedCarrier-9](../builds/dAlignedCarrier/BACKLOG.md) | OPEN | MED | — | 2026-10-01 | AN IN-PLACE CLOSE THAT AUTO-FILES AN INHERITED-RED ASK CANNOT COMMIT… |
 | [TOOL-dBriefedPass-6](../builds/dBriefedPass/BACKLOG.md) | OPEN | — | — | 2026-09-01 | THE --dispatch ORDER GATE HAS NO TEST ARM AND ITS FAILING CASE HAS… |
 | [TOOL-dBriefedPass-7](../builds/dBriefedPass/BACKLOG.md) | OPEN | — | — | 2026-09-01 | tools/workflows/unattended-build.test.sh is a 21-arm suite registered… |
 | [TOOL-dCarriedReceipt-1](../builds/dCarriedReceipt/BACKLOG.md) | OPEN | — | — | 2026-08-25 | --review's convergence predicate is scoped to ONE run's run-state file… |

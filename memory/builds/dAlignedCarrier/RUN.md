@@ -9,11 +9,15 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+asks-at-landing: TOOL-dAlignedCarrier-7=OPEN TOOL-dDerivedDocket-70=CLOSED TOOL-dDerivedDocket-71=CLOSED TOOL-dDerivedDocket-72=CLOSED TOOL-dDerivedDocket-73=CLOSED TOOL-dDerivedDocket-74=CLOSED
+units-at-landing: TOOL-dAlignedCarrier-1 TOOL-dAlignedCarrier-2 TOOL-dAlignedCarrier-3 TOOL-dAlignedCarrier-4 TOOL-dAlignedCarrier-6 TOOL-dAlignedCarrier-5
+gates-inherited: 87c245b3 memory-recall kit selftest
+gates-run: unattended-17908011431172378332-1878567 d5d32fcd
 parked-surfaced: yes
 keepalive-reaped: yes
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: d72be700b3c078577cbf3a5032975d45dcec95b9
-phase: VERIFYING
+phase: LANDING
 asks-ready: TOOL-dDerivedDocket-70=yes TOOL-dDerivedDocket-71=yes TOOL-dDerivedDocket-72=yes TOOL-dDerivedDocket-73=yes TOOL-dDerivedDocket-74=yes
 asks: TOOL-dDerivedDocket-70..74
 m-base: 87c245b3e950cbf7bc46b8216db8b4e4fba253dd
