@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.4 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-09-30T00:11:06+03:00 @ 2d07d09c2276911d3e1975ac8023ec3138b3f201
+last-audit: 2026-09-30T14:31:20+03:00 @ 12e7f6d343e50a3fbb99e1e5935b452746b554ca
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/run-gates/run-selftests.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: c3098a92bde3b183b0f877cb36ca4e5c05dfc2b7
+last-body-change: 12e7f6d343e50a3fbb99e1e5935b452746b554ca
 check-script: skills/session-kickoff/manifest-check.sh
 registry: AGENTS.md
 -->
@@ -124,7 +124,7 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   floor is excluded and printed with its count, a one-segment root such as `tools/` under the sub-head
   declares nothing, and a spec with no Gates heading is not joined. `TOOL-aBlindedTrial-8`.
 
-- **The pre-code spec audit is owed where the build README's `spec-audit: <date>` OR the conf's
+- **The pre-code spec audit is owed where the build README's `spec-audit: <date>` OR `.unattended.conf`'s
   `SPEC_AUDIT_DEFAULT` (read at BASE, the README winning) declares it; under neither, nothing is owed
   and the kickoff engine asks the owner once at READY.** `TOOL-aBlindedTrial-6`, `-7`, `KICK-aBlindedTrial-1`.
 
@@ -181,7 +181,7 @@ GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh   # also run EVERY self-test 
 # Every leg declares a `ceiling` in tools/gate-legs.json and the runner KILLS one that outlives it, RED naming the leg and the number. TOOL-aBoundedCeiling-1
 # The whole RUN has a wall, per profile row; GATE_WALL overrides. A breach kills the legs. TOOL-aQuenchedHarness-1
 bash tools/run-gates/run-selftests.sh --serial  # the HELD population on demand, budget-timed; --pooled withholds cost verdicts and REFUSES any row with no calibrated reading until --pooled --calibrate has run (TOOL-aBatchedArm-5); bare REFUSES; GOV_NODE must be a registry tag; a pooled red keeps each row's output under <git-dir>/gate-logs/selftests/. TOOL-aBatchedArm-4, -5
-bash tools/unattended/run-unattended-gates.sh --pooled   # the DoD for work touching tools/unattended/: the kit self-tests through the bounded pool, PARITY against the calibrated evidence (twenty rows, node a, 2026-09-22); --serial is the on-demand cost reading. TOOL-aBatchedArm-5
+bash tools/unattended/run-unattended-gates.sh --pooled   # the DoD for work touching tools/unattended/: the kit self-tests through the bounded pool, PARITY against the calibrated rows in tools/run-gates/selftest-pooled-evidence.txt; --serial is the on-demand cost reading. TOOL-aBatchedArm-5
 python tools/memory-tree/gotchas.py --for-diff <base>..<head>   # the recurring-bug-class checklist for THIS diff — run it before a review
 python tools/drift-audit/drift_report.py   # ~seconds, no agents: do this repo's own RECORDS still match reality? Run it before theorizing about drift
 python tools/govkit/govkit.py epoch --base <base>   # a kit whose shipped bytes moved since <base> and whose version did not: run after a commit that touches a kit. TOOL-aRepatriatedFork-15
@@ -273,7 +273,7 @@ does — hit three times in one file in one session; also the whole-signature an
 - The memory-hygiene gate grades TRACKED files only, so running it on a new build folder BEFORE
   `git add` returns a clean exit that proves nothing. Stage first, then run it. Cost two cycles
   here: checks 5, 9 and 21 all fired only once the folder was staged.
-- `gate-guard` is the third `Bash|PowerShell` hook, from the unattended kit: while this branch's
+- `gate-guard` is a `Bash|PowerShell` hook from the unattended kit: while this branch's
   run-state record is before `VERIFYING` it DENIES a `GATE_FULL=`/`GATE_SELFTESTS=` bar and any
   `*.test.sh` or self-test runner, naming the record. Not a glitch: feed the hook the payload, or
   wait for the main loop's `VERIFYING`.
