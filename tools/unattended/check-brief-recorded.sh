@@ -93,6 +93,8 @@
 #     HEAD still carries. A run that forges one AND keeps it, or commits a retired record to carry it,
 #     leaves that record at HEAD, where the kit gate grades it - check 15 judges a LANDED witness. This
 #     leg buys the trace, not the verdict.
+#   - WHETHER A WAIVER ROW WAS DESERVED. The registry below grades only that each waived unit is
+#     still a violation (a stale row REDS), never why the waiver was granted.
 #   - ANYTHING ABOUT A UNIT BUILT AFTER ITS RUN FINISHED. It is announced by id and reason and graded by
 #     nothing here. Whether its spec came first is still `pass-order`'s, which grades it unchanged.
 #
@@ -296,6 +298,32 @@ fi
 graded=0; skipped_cutoff=0; nobase=0; unbuilt=0; postrun=0; unborne=0; regraded=0
 violations=""; announced=""
 
+# ------------------------------------------------------------------------- THE WAIVER REGISTRY
+# TOOL-aRepatriatedFork-51. The sibling `pass-order` leg's registry, ported with its two properties
+# and its read, because history is append-only: a unit built without a recorded brief, or one this
+# leg's shared build-commit pick misreads, cannot be fixed, and without a declared exemption the run
+# that carries it can never land. One row per waived unit, `<unit-id><TAB><reason>`.
+#   - AN ABSENT FILE WAIVES NOTHING, so the default direction is the one that reds.
+#   - A STALE ROW REDS: a waiver naming a unit this leg no longer reports has outlived its reason.
+# READ FROM THE GRADED COMMIT, never the working tree, for the sibling's reason: an uncommitted row
+# would waive a violation the pushed tree still carries. What this does NOT buy: the graded run can
+# commit a row, exactly as it can commit the conf, and nothing here asks whether a waiver was deserved.
+# ponytail: the path is fixed; pass-order's declarable-path key is added when an adopter needs one.
+WAIVER_FILE="$MEMORY_ROOT/project/brief-recorded-waiver.txt"
+waived_ids=""; waived_n=0; waived_seen=""
+if GIT cat-file -e "HEAD:$WAIVER_FILE" 2>/dev/null; then
+  waived_ids=$(GIT show "HEAD:$WAIVER_FILE" 2>/dev/null | sed -e 's/#.*//' -e 's/[[:space:]].*$//' | grep -E '^[A-Z]+-[A-Za-z]+-[0-9]+$' || true)
+  waived_ids=$(echo $waived_ids)   # one space-separated line: the membership test needs a space on both sides
+fi
+# Every violation routes through here, so a waived unit is counted rather than silently dropped.
+add_violation() { # unit-id · message line
+  case " $waived_ids " in
+    *" $1 "*) waived_n=$((waived_n+1)); waived_seen="$waived_seen $1" ;;
+    *) violations="$violations
+  $2" ;;
+  esac
+}
+
 # THE POPULATION COMES FROM THE GRADED COMMIT, selector included. `git ls-files` enumerates the INDEX,
 # so one `git rm --cached` of a build README - staged, nothing committed - would drop that whole build
 # from grading, and doing it across the tree would silence the leg while it reported a clean bill.
@@ -417,8 +445,7 @@ brief-recorded: GRADED ANYWAY — $id was BUILT at $(GIT rev-parse --short "$bui
 
     _rows=$(printf '%s\n' "$_sb" | grep -F " brief · item $id · reason " || true)
     if [ -z "$_rows" ]; then
-      violations="$violations
-  $id — BUILT at $(GIT rev-parse --short "$build_c") with NO brief row in $run at that commit; nothing on disk records what the agent that built it was handed"
+      add_violation "$id" "$id — BUILT at $(GIT rev-parse --short "$build_c") with NO brief row in $run at that commit; nothing on disk records what the agent that built it was handed"
       continue
     fi
     # TERM 2 - the LAST row wins, and the writer is why it can. A unit can be re-briefed and the
@@ -442,8 +469,7 @@ brief-recorded: GRADED ANYWAY — $id was BUILT at $(GIT rev-parse --short "$bui
     # message. The arm for it in `check-brief-recorded.test.sh` says the same thing.
     case "$_hash" in
       [0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]) ;;
-      *) violations="$violations
-  $id — its brief row at $(GIT rev-parse --short "$build_c") carries no twelve-hex hash in its reason field, so the join it claims to record cannot be made and a prefix comparison against it would match every blob in the repository: [$_rest]"
+      *) add_violation "$id" "$id — its brief row at $(GIT rev-parse --short "$build_c") carries no twelve-hex hash in its reason field, so the join it claims to record cannot be made and a prefix comparison against it would match every blob in the repository: [$_rest]"
          continue ;;
     esac
     # `ls-tree` AND NOT `rev-parse <commit>:<path>`: the latter is mangled by POSIX-emulation shells
@@ -451,14 +477,12 @@ brief-recorded: GRADED ANYWAY — $id was BUILT at $(GIT rev-parse --short "$bui
     # is a wrong verdict wearing a clean one's clothes (memory/gotchas/msys-mangles-rev-colon-dotpath).
     _blob=$(GIT ls-tree "$build_c" -- "$_path" 2>/dev/null | awk '$2 == "blob" { print $3 }' | head -1)
     if [ -z "$_blob" ]; then
-      violations="$violations
-  $id — its brief row at $(GIT rev-parse --short "$build_c") names $_path, which is not a tracked file at that commit, so the row records that a brief existed and joins to nothing"
+      add_violation "$id" "$id — its brief row at $(GIT rev-parse --short "$build_c") names $_path, which is not a tracked file at that commit, so the row records that a brief existed and joins to nothing"
       continue
     fi
     case "$_blob" in
       "$_hash"*) ;;
-      *) violations="$violations
-  $id — its brief row at $(GIT rev-parse --short "$build_c") carries hash $_hash for $_path, but that path's blob at the same commit is $_blob; the file moved under the row and no re-brief recorded it" ;;
+      *) add_violation "$id" "$id — its brief row at $(GIT rev-parse --short "$build_c") carries hash $_hash for $_path, but that path's blob at the same commit is $_blob; the file moved under the row and no re-brief recorded it" ;;
     esac
   done
 done
@@ -492,9 +516,19 @@ echo "brief-recorded: the record surface excluded from build-commit selection wa
 if [ -n "$announced" ]; then
   printf '%s\n' "${announced#?}"
 fi
+echo "brief-recorded: $waived_n violation(s) waived by $WAIVER_FILE:${waived_seen:- none}"
 
+stale=""
+for _w in $waived_ids; do
+  case " $waived_seen " in *" $_w "*) ;; *) stale="$stale $_w" ;; esac
+done
+rc=0
 if [ -n "$violations" ]; then
   echo "brief-recorded FAILED — a CLOSED unit's build commit records no usable brief:$violations"
-  exit 1
+  rc=1
 fi
-exit 0
+if [ -n "$stale" ]; then
+  echo "brief-recorded FAILED — $WAIVER_FILE waives unit(s) this leg no longer reports as a violation, and a stale exemption widens the surface it was written to narrow:$stale"
+  rc=1
+fi
+exit "$rc"

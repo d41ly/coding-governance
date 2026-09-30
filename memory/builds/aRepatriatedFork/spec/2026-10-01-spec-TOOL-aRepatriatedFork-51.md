@@ -1,11 +1,12 @@
 # TOOL-aRepatriatedFork-51 — brief-recorded takes a declared waiver registry, as pass-order does
 
-**Status:** SPECCED · rev-1 · 2026-10-01 · node a · Tier-1 · base 6e7cb0df · streams tooling · order 22
+**Status:** CLOSED · rev-1 · 2026-10-01 · node a · Tier-1 · base 6e7cb0df · streams tooling · order 22
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-01-build-TOOL-aRepatriatedFork-51-1-acceptance-ledger.md](../build/2026-10-01-build-TOOL-aRepatriatedFork-51-1-acceptance-ledger.md) | journal | — |
 | [2026-10-01-prompt-TOOL-aRepatriatedFork-51-build-brief.md](../prompts/2026-10-01-prompt-TOOL-aRepatriatedFork-51-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->

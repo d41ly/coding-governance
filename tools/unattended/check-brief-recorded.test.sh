@@ -638,5 +638,30 @@ hasnt "base-only: the base is never read as a phase" "$o" "GRADED ANYWAY"
 hasnt "base-only: and never skips the unit" "$o" "NOT GRADED"
 rm -rf "$T"
 
+# ---- THE WAIVER REGISTRY (TOOL-aRepatriatedFork-51), a matched pair plus the uncommitted control.
+# ---- A committed row waives a real violation and is COUNTED; the same row over a conforming unit is
+# ---- stale and REDS; a row only in the working tree waives nothing, because the leg reads HEAD.
+write_waiver() { # fixture root · commit? -> writes the one-row registry naming the fixture's unit
+  ( cd "$1" && mkdir -p memory/project \
+    && printf 'ARCH-tBrief-1\tbuilt without a recorded brief\n' > memory/project/brief-recorded-waiver.txt \
+    && if [ "$2" = commit ]; then git add -A >/dev/null && git commit -q -m "records: waive" --no-verify; fi ) >/dev/null 2>&1
+}
+T=$(mkfixture norow); write_waiver "$T" commit
+o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
+same  "a committed waiver over a missing brief row: green" "$rc" "0"
+has   "waived: the waiver is COUNTED, naming the unit" "$o" "1 violation(s) waived by memory/project/brief-recorded-waiver.txt: ARCH-tBrief-1"
+hasnt "waived: nothing is reported as a violation" "$o" "FAILED"
+rm -rf "$T"
+T=$(mkfixture ok); write_waiver "$T" commit
+o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
+same  "a waiver over a conforming unit: REDS as stale" "$rc" "1"
+has   "stale waiver: the message names the unit" "$o" "a stale exemption widens the surface it was written to narrow: ARCH-tBrief-1"
+rm -rf "$T"
+T=$(mkfixture norow); write_waiver "$T" worktree
+o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
+same  "an uncommitted waiver: still REDS" "$rc" "1"
+has   "uncommitted waiver: nothing is waived" "$o" "0 violation(s) waived"
+rm -rf "$T"
+
 echo "--- $n arms, exit $st"
 exit $st
