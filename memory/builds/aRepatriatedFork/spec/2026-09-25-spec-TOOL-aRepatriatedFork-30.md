@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-30 — the suites run at a foreign prefix, and the install-prefix gate is a pure ban
 
-**Status:** CLOSED · rev-4 · 2026-09-30 · node a · Tier-2 · base 2143b6d6 · streams tooling · order 18
+**Status:** CLOSED · rev-5 · 2026-09-30 · node a · Tier-2 · base 2143b6d6 · streams tooling · order 18
 
 <!-- gen:spec-records -->
 
@@ -181,9 +181,9 @@ that names either deleted file, which the dead-path gate reads
 - **AC4** — When `git grep -nE 'gov:(root-fixture|prefix-literal)' -- tools skills .githooks` runs,
   it finds nothing.
   Red when: a marker survives anywhere the gate grades.
-- **AC5** — When a scratch clone adds one literal of each epoch-6 spelling to one file, `bash
-  tools/check-install-prefix.sh` exits 1 naming each `<path>:<line>`, and with the literals gone
-  it exits 0.
+- **AC5** — When a scratch clone adds one literal of each epoch-6 spelling to one file,
+  `bash tools/check-install-prefix.sh` exits 1 naming each `<path>:<line>`, and with the literals
+  gone it exits 0.
   Red when: any spelling passes, or the clean tree reds.
 - **AC6** — When `bash tools/check-install-prefix.sh` runs on the real tree, it exits 0 and prints
   the population size.
@@ -259,6 +259,8 @@ template, and graded once a line is appended to it · none
   unattended-fixture rows are renders. S8 states how the classes `TOOL-aRepatriatedFork-28` and
   `TOOL-aRepatriatedFork-46` returned here drain, and §3 stops calling that out of scope. S4 names the
   six markers the drain units left. AC9 observes the render rule.
+- rev-5 · 2026-09-30 · AC5 reflowed, no change of meaning: its command was wrapped across two lines,
+  so hygiene check 23 read no token in it and could not join the acceptance ledger's answer.
 
 ## 10. Reuse audit
 
