@@ -115,7 +115,7 @@ EOF
 $(printf '%s' "$undeclared" | sed 's/^/    /')"
 
 # ---- 4: every declared row still HITS, in both directions. A stale row is the failure
-# ---- `install-prefix-waivers.txt` produced by keying on <path>:<line> — an edit ABOVE the line
+# ---- the install-prefix gate's old waiver registry produced by keying on <path>:<line> — an edit ABOVE the line
 # ---- unpinned it and the gate redded on a merge that touched nothing it guarded
 # ---- (TOOL-aSealedCaravan-1). This registry keys on PATH alone, so a row goes stale only when its
 # ---- file really stops pointing.

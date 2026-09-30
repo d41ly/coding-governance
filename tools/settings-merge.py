@@ -2,7 +2,7 @@
 """settings-merge.py — idempotently wire a hook into a target repo's .claude/settings.json.
 Stdlib only (json, argparse, pathlib); py>=3.10 (write_text newline=).
 
-# gov:kit settings-merge@1.13
+# gov:kit settings-merge@1.14
 
 The default hook, with no --fragment (shape mirrors WIRE-INTO-PROJECT.md and
 <prefix>/hooks/agent-cap.js verbatim):
@@ -110,7 +110,7 @@ def resolve_kit_dir(home, anchor, here):
         home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
 # <<< resolve_kit_dir
 
-KIT_SETTINGS_MERGE_VERSION = "1.13"  # gov:kit settings-merge@1.13 — engine identity
+KIT_SETTINGS_MERGE_VERSION = "1.14"  # gov:kit settings-merge@1.14 — engine identity
 HOOK_MARKER = "agent-cap.js"  # the loose join: dedup key AND the deployer's "is-it-wired?" grep target
 
 
@@ -130,7 +130,7 @@ def _kit_rel() -> str:
     try:
         return Path(__file__).resolve().parent.relative_to(Path.cwd().resolve()).as_posix()
     except (ValueError, OSError):
-        return "tools"  # gov:prefix-literal — a name-only default when run from outside the tree it writes into; whether it should refuse instead is the settings-merge owner's call (TOOL-aRepatriatedFork-2 section 8 F4)
+        return "tools"  # a name-only default when run from outside the tree it writes into; whether it should refuse instead is the settings-merge owner's call (TOOL-aRepatriatedFork-2 section 8 F4)
 
 
 # A path fragment and nothing else — the character class govkit's own `demand_safe_token` grades

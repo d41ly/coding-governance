@@ -173,7 +173,7 @@ default selection; decline it by naming a selection that omits it.
 Wire the leg into your gate runner and CI as `micro-format definitions`, running
 `bash {prefix}/check-microformats.sh <playbook>` — the argv the descriptor declares, with
 `{prefix}` resolved to your install prefix. The token form is deliberate: a literal `tools/` path
-here would raise this file's carried-prefix count and red `install-prefix`.
+here would be a kit path the `install-prefix` ban reds on, with no waiver to take.
 
 <!-- govkit:entry memory-tree -->
 ## 3 — Adopt the memory-tree kit (if chosen in §0)

@@ -1197,9 +1197,9 @@ ck "prefix: a ROOT install FINDS a shipped agent-cap.js instead of skipping it" 
 # the second assertion is not a restatement of the first — it reds if the literal comes back beside
 # a derived one. No merger is installed anywhere in this fixture, which is the fallback's own case.
 # That second pattern deliberately stops before the extension: spelled whole it would be a carried
-# `<prefix>/` literal in this file's own bytes and would RAISE the install-prefix row, which the ratchet
-# cannot absorb. Truncated it still matches the dead spelling and nothing else. Do not "complete" it.
-mkdir -p scripts/gov/hooks; printf '// stub\n' > scripts/gov/hooks/agent-cap.js
+# `<prefix>/` literal in this file's own bytes, which the install-prefix ban reds on with no waiver to
+# take. Truncated it still matches the dead spelling and nothing else. Do not "complete" it.
+mkdir -p "scripts/gov/$HOOKS"; printf '// stub\n' > "scripts/gov/$HOOKS/agent-cap.js"
 git add -A; git commit -q -m "ship agent-cap.js at the two-segment install"
 out=$(bash ./scripts/gov/check-wiring.sh --check 2>&1)
 ck "prefix: the agent-cap remedy names the INSTALL PREFIX's merger" \

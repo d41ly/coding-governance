@@ -1433,6 +1433,10 @@ has    "BT3-AC7 the render carries the engine version 1.2" "$(sed -n '3p' "$F")"
 # is an assertion about nothing. The harness spelled for this repo's own install — which is what
 # apply wrote before this unit — reds all five. A template whose checklist is `{{TOOL_ROOT}}memory-tree/`
 # reds (iv) and (v) and passes the rest, which is the prefix-only fix measured in one line.
+# The layouts type their PREFIX and take every kit segment from the directory the resolver found,
+# so a foreign layout spells no kit name (TOOL-aRepatriatedFork-30 S8). This suite's own directory is
+# the workflows kit.
+WFK=${HERE##*/}; UNK=${UNATTENDED_DIR##*/}; MTK=${MT_KIT_DIR##*/}
 LAY=$(mktemp -d) || exit 2
 trap 'rm -rf "$LAY"' EXIT
 
@@ -1514,22 +1518,22 @@ EOF
 }
 
 # ---- AC2: the FLAT layout, which is what both measured adopters are.
-FL="$LAY/flat"; build_layout "$FL" scripts/workflows scripts/unattended scripts/gotchas.py
-o=$(run_layout "$FL" scripts/workflows)
-has "PV-AC5 --check before any render: a missing live copy is a red" "$o" "missing live copy scripts/workflows/unattended-build.js"
+FL="$LAY/flat"; build_layout "$FL" scripts/$WFK scripts/$UNK scripts/gotchas.py
+o=$(run_layout "$FL" scripts/$WFK)
+has "PV-AC5 --check before any render: a missing live copy is a red" "$o" "missing live copy scripts/$WFK/unattended-build.js"
 has "PV-AC5 ...and it exits 1" "$o" "rc=1"
-o=$(run_layout "$FL" scripts/workflows --render)
-has "PV-AC5 --render creates the missing live copy" "$o" "rendered scripts/workflows/unattended-build.js from"
+o=$(run_layout "$FL" scripts/$WFK --render)
+has "PV-AC5 --render creates the missing live copy" "$o" "rendered scripts/$WFK/unattended-build.js from"
 has "PV-AC5 ...at exit 0" "$o" "rc=0"
-check_layout "PV-AC2 flat:" "$FL" scripts/workflows scripts/ scripts GGGGG
-o=$(run_layout "$FL" scripts/workflows)
+check_layout "PV-AC2 flat:" "$FL" scripts/$WFK scripts/ scripts GGGGG
+o=$(run_layout "$FL" scripts/$WFK)
 has "PV-AC2 flat: the parity leg passes on its own render" "$o" "rc=0"
 has "PV-AC2 flat: ...and names the directory it probed" "$o" "MEMORY_TREE_DIR 'scripts'"
 
 # ---- AC3: the NESTED layout, and two ROOT installs, one of each memory-tree shape.
-NE="$LAY/nested"; build_layout "$NE" scripts/workflows scripts/unattended scripts/memory-tree/gotchas.py
-run_layout "$NE" scripts/workflows --render >/dev/null
-check_layout "PV-AC3 nested:" "$NE" scripts/workflows scripts/ scripts/memory-tree GGGGG
+NE="$LAY/nested"; build_layout "$NE" scripts/$WFK scripts/$UNK scripts/$MTK/gotchas.py
+run_layout "$NE" scripts/$WFK --render >/dev/null
+check_layout "PV-AC3 nested:" "$NE" scripts/$WFK scripts/ scripts/$MTK GGGGG
 RT="$LAY/root"; build_layout "$RT" "$KIT" "$UNATTENDED" "${ROOTPFX}${MT_KIT}/gotchas.py"   # the ROOT-install layout PV-AC3 builds on purpose
 run_layout "$RT" "$KIT" --render >/dev/null
 check_layout "PV-AC3 root:" "$RT" "$KIT" "" "$MT_KIT" GGGGG
@@ -1540,24 +1544,24 @@ check_layout "PV-AC3 root, flat memory-tree:" "$RF" "$KIT" "" . GGGGG
 # ---- AC4: no checklist script anywhere the probe looks SKIPS the harness pair out loud, and no
 # ---- harness is written. rev-5: this was a whole-run exit 2 until round 1's F3 scoped it to the pair
 # ---- whose template carries the token; the review-harness-only arms below are why.
-NO="$LAY/none"; build_layout "$NO" scripts/workflows scripts/unattended ""
-o=$(run_layout "$NO" scripts/workflows --render)
-has "PV-AC4 no gotchas.py: --render skips the harness pair by name" "$o" "SKIP scripts/workflows/unattended-build.js"
+NO="$LAY/none"; build_layout "$NO" scripts/$WFK scripts/$UNK ""
+o=$(run_layout "$NO" scripts/$WFK --render)
+has "PV-AC4 no gotchas.py: --render skips the harness pair by name" "$o" "SKIP scripts/$WFK/unattended-build.js"
 has "PV-AC4 ...at exit 0, because the protocol pair still rendered" "$o" "rc=0"
 has "PV-AC4 ...and names the override" "$o" "set MEMORY_TREE_DIR="
-absent_harness=yes; [ -e "$NO/scripts/workflows/unattended-build.js" ] && absent_harness=no
+absent_harness=yes; [ -e "$NO/scripts/$WFK/unattended-build.js" ] && absent_harness=no
 same "PV-AC4 ...and writes no harness" "$absent_harness" "yes"
 # The OVERRIDE, both directions: honoured where it names a tracked script, refused where it does not.
-OV="$LAY/override"; build_layout "$OV" scripts/workflows scripts/unattended vendor/mt/gotchas.py
-o=$( (cd "$OV" && MEMORY_TREE_DIR=vendor/mt bash scripts/workflows/check-protocol-parity.test.sh --render 2>&1; echo "rc=$?") )
+OV="$LAY/override"; build_layout "$OV" scripts/$WFK scripts/$UNK vendor/mt/gotchas.py
+o=$( (cd "$OV" && MEMORY_TREE_DIR=vendor/mt bash scripts/$WFK/check-protocol-parity.test.sh --render 2>&1; echo "rc=$?") )
 has "PV-AC4 override: --render honours MEMORY_TREE_DIR" "$o" "rc=0"
-check_layout "PV-AC4 override:" "$OV" scripts/workflows scripts/ vendor/mt GGGGG
-o=$( (cd "$OV" && MEMORY_TREE_DIR=vendor/nowhere bash scripts/workflows/check-protocol-parity.test.sh --render 2>&1; echo "rc=$?") )
+check_layout "PV-AC4 override:" "$OV" scripts/$WFK scripts/ vendor/mt GGGGG
+o=$( (cd "$OV" && MEMORY_TREE_DIR=vendor/nowhere bash scripts/$WFK/check-protocol-parity.test.sh --render 2>&1; echo "rc=$?") )
 has "PV-AC4 override naming an untracked script is refused" "$o" "rc=2"
 # A TRACKED override that holds a space still refuses: the value lands in a shell command an agent
 # runs, where the space splits it. The tracked test passes first, so only the charset arm can stop it.
 mkdir -p "$OV/vendor/m t" && printf '# stub\n' > "$OV/vendor/m t/gotchas.py" && ( cd "$OV" && git add -A )
-o=$( (cd "$OV" && MEMORY_TREE_DIR='vendor/m t' bash scripts/workflows/check-protocol-parity.test.sh --render 2>&1; echo "rc=$?") )
+o=$( (cd "$OV" && MEMORY_TREE_DIR='vendor/m t' bash scripts/$WFK/check-protocol-parity.test.sh --render 2>&1; echo "rc=$?") )
 has "PV-AC4 a tracked override holding a space is refused" "$o" "holds a character outside"
 has "PV-AC4 ...at exit 2" "$o" "rc=2"
 
@@ -1566,22 +1570,22 @@ has "PV-AC4 ...at exit 2" "$o" "rc=2"
 # ---- unattended kit is legal, and in it nothing tracks a `gotchas.py`. The probe used to exit 2
 # ---- before any pair was graded, so that install lost `REVIEW-PROTOCOL.md` too: the document that
 # ---- states the concurrency cap could be neither rendered nor graded, over a harness it never runs.
-RO="$LAY/review-only"; build_layout "$RO" scripts/workflows - ""
-o=$(run_layout "$RO" scripts/workflows --render)
+RO="$LAY/review-only"; build_layout "$RO" scripts/$WFK - ""
+o=$(run_layout "$RO" scripts/$WFK --render)
 has "PV-F3 review-harness only: --render still renders the protocol" "$o" "rendered memory/guides/REVIEW-PROTOCOL.md from"
 has "PV-F3 ...at exit 0" "$o" "rc=0"
-has "PV-F3 ...and SKIPS the harness pair out loud, naming why" "$o" "SKIP scripts/workflows/unattended-build.js"
+has "PV-F3 ...and SKIPS the harness pair out loud, naming why" "$o" "SKIP scripts/$WFK/unattended-build.js"
 has "PV-F3 ...and names the override that would render it" "$o" "set MEMORY_TREE_DIR="
-absent_harness=yes; [ -e "$RO/scripts/workflows/unattended-build.js" ] && absent_harness=no
+absent_harness=yes; [ -e "$RO/scripts/$WFK/unattended-build.js" ] && absent_harness=no
 same "PV-F3 ...and writes no harness" "$absent_harness" "yes"
-o=$(run_layout "$RO" scripts/workflows)
+o=$(run_layout "$RO" scripts/$WFK)
 has "PV-F3 --check grades the protocol and passes" "$o" "in parity"
 has "PV-F3 ...at exit 0" "$o" "rc=0"
 has "PV-F3 ...and the green line says a pair went ungraded" "$o" "1 pair(s) SKIPPED"
 # THE PROTOCOL IS GRADED, NOT MERELY UNBLOCKED. A skip that also swallowed the protocol pair would pass
 # every arm above, so its drift has to still red.
 printf 'a hand edit\n' >> "$RO/memory/guides/REVIEW-PROTOCOL.md"
-o=$(run_layout "$RO" scripts/workflows)
+o=$(run_layout "$RO" scripts/$WFK)
 has "PV-F3 a drifted protocol still reds in that install" "$o" "DRIFT"
 has "PV-F3 ...at exit 1" "$o" "rc=1"
 
@@ -1592,13 +1596,13 @@ has "PV-F3 ...at exit 1" "$o" "rc=1"
 # ---- the file. The argv is read out of `kit.toml` and run exactly as declared, because a mode this
 # ---- arm chose for itself would pass while the descriptor still asked for the other one.
 
-RG="$LAY/regenerate"; build_layout "$RG" scripts/workflows scripts/unattended scripts/gotchas.py
-run_layout "$RG" scripts/workflows --render >/dev/null
-( cd "$RG" && git add scripts/workflows/unattended-build.js ) && rm -f "$RG/memory/guides/REVIEW-PROTOCOL.md"
-printf '// a stale render\n' >> "$RG/scripts/workflows/unattended-build.js"
+RG="$LAY/regenerate"; build_layout "$RG" scripts/$WFK scripts/$UNK scripts/gotchas.py
+run_layout "$RG" scripts/$WFK --render >/dev/null
+( cd "$RG" && git add scripts/$WFK/unattended-build.js ) && rm -f "$RG/memory/guides/REVIEW-PROTOCOL.md"
+printf '// a stale render\n' >> "$RG/scripts/$WFK/unattended-build.js"
 rg_argv=$(sed -n '/^\[\[regenerate\]\]/,/^argv/s/^argv = //p' "$HERE/kit.toml")
 rg_cmd=$(node -e 'console.log(JSON.parse(process.argv[1]).map(a => a.split("{kit}").join(process.argv[2])).join("\n"))' \
-           "$rg_argv" scripts/workflows 2>/dev/null)
+           "$rg_argv" scripts/$WFK 2>/dev/null)
 n=$((n+1))
 if [ -n "$rg_cmd" ]; then echo "ok   PV-R2-3 LIVENESS the regenerate argv was read out of kit.toml"
 else echo "FAIL PV-R2-3 LIVENESS no [[regenerate]] argv could be read out of $HERE/kit.toml, so the arms below grade nothing"; st=1; fi
@@ -1607,33 +1611,33 @@ $rg_cmd
 EOF
 o=$( (cd "$RG" && "${rg_words[@]}" 2>&1; echo "rc=$?") )
 has "PV-R2-3 the declared regenerate exits 0 over an install with no protocol copy" "$o" "rc=0"
-has "PV-R2-3 ...and still refreshes the harness this install tracks" "$o" "rendered scripts/workflows/unattended-build.js from"
+has "PV-R2-3 ...and still refreshes the harness this install tracks" "$o" "rendered scripts/$WFK/unattended-build.js from"
 has "PV-R2-3 ...and names the pair it would not create" "$o" "SKIP memory/guides/REVIEW-PROTOCOL.md"
 absent_proto=yes; [ -e "$RG/memory/guides/REVIEW-PROTOCOL.md" ] && absent_proto=no
 same "PV-R2-3 ...and writes no protocol the install never had" "$absent_proto" "yes"
-hasnt_ "PV-R2-3 ...and the refreshed harness lost its stale line" "$(cat "$RG/scripts/workflows/unattended-build.js")" "a stale render"
+hasnt_ "PV-R2-3 ...and the refreshed harness lost its stale line" "$(cat "$RG/scripts/$WFK/unattended-build.js")" "a stale render"
 
 # The same mode in --check, which the runbook's migration runs once its first step is done: an absent
 # and untracked protocol is a named skip there too, and the harness it tracks is still graded.
 
-o=$( (cd "$RG" && bash scripts/workflows/check-protocol-parity.test.sh --tracked-only 2>&1; echo "rc=$?") )
+o=$( (cd "$RG" && bash scripts/$WFK/check-protocol-parity.test.sh --tracked-only 2>&1; echo "rc=$?") )
 has "PV-R2-3 --check --tracked-only passes over the same install" "$o" "rc=0"
 has "PV-R2-3 ...naming the protocol it skipped" "$o" "SKIP memory/guides/REVIEW-PROTOCOL.md"
 has "PV-R2-3 ...and counting it in the green line" "$o" "1 pair(s) SKIPPED"
-printf '// drift\n' >> "$RG/scripts/workflows/unattended-build.js"
-o=$( (cd "$RG" && bash scripts/workflows/check-protocol-parity.test.sh --tracked-only 2>&1; echo "rc=$?") )
+printf '// drift\n' >> "$RG/scripts/$WFK/unattended-build.js"
+o=$( (cd "$RG" && bash scripts/$WFK/check-protocol-parity.test.sh --tracked-only 2>&1; echo "rc=$?") )
 has "PV-R2-3 ...and a drifted harness still reds under it" "$o" "DRIFT"
 
 # THE SKIP NEEDS BOTH HALVES, absent AND untracked, and each half is armed from its own side. A skip
 # keyed on the index alone would pass a present untracked copy by, and one keyed on the disk alone
 # would leave a tracked copy somebody deleted uninstalled; the arms above see neither.
 for rg_case in tracked-deleted present-untracked; do
-  RC="$LAY/regenerate-$rg_case"; build_layout "$RC" scripts/workflows scripts/unattended scripts/gotchas.py
-  run_layout "$RC" scripts/workflows --render >/dev/null
+  RC="$LAY/regenerate-$rg_case"; build_layout "$RC" scripts/$WFK scripts/$UNK scripts/gotchas.py
+  run_layout "$RC" scripts/$WFK --render >/dev/null
   if [ "$rg_case" = tracked-deleted ]; then
     ( cd "$RC" && git add -A ) && rm -f "$RC/memory/guides/REVIEW-PROTOCOL.md"
   else
-    ( cd "$RC" && git add scripts/workflows/unattended-build.js )
+    ( cd "$RC" && git add scripts/$WFK/unattended-build.js )
     printf 'an untracked copy, stale\n' > "$RC/memory/guides/REVIEW-PROTOCOL.md"
   fi
   o=$( (cd "$RC" && "${rg_words[@]}" 2>&1; echo "rc=$?") )
@@ -1644,44 +1648,44 @@ done
 # CREATION STAYS WITH THE HAND RENDER a fresh install runs, which the runbook's copy-install step
 # prescribes: without the flag, the same install gets the protocol it asks for.
 
-o=$(run_layout "$RG" scripts/workflows --render)
+o=$(run_layout "$RG" scripts/$WFK --render)
 has "PV-R2-3 the hand --render still creates a missing protocol" "$o" "rendered memory/guides/REVIEW-PROTOCOL.md from"
 
 # ---- AC5: the parity script catches what it exists to catch.
-cp "$FL/scripts/workflows/unattended-build.js" "$LAY/flat-render.js"
+cp "$FL/scripts/$WFK/unattended-build.js" "$LAY/flat-render.js"
 # APPENDED rather than substituted. The first cut edited one path in place, and when the template it
 # ran against spelled that path differently the edit matched nothing, the render stayed pristine and
 # this arm reported a missing DRIFT for a break that was never staged. An appended line cannot miss.
-printf '// a hand edit an adopter made in place\n' >> "$FL/scripts/workflows/unattended-build.js"
-o=$(run_layout "$FL" scripts/workflows)
+printf '// a hand edit an adopter made in place\n' >> "$FL/scripts/$WFK/unattended-build.js"
+o=$(run_layout "$FL" scripts/$WFK)
 has "PV-AC5 a hand-edited render reds the parity leg" "$o" "DRIFT"
 has "PV-AC5 ...at exit 1" "$o" "rc=1"
-cp "$LAY/flat-render.js" "$FL/scripts/workflows/unattended-build.js"
-cp "$FL/scripts/workflows/REVIEW-PROTOCOL.template.md" "$FL/scripts/workflows/stray.template.md"
-( cd "$FL" && git add scripts/workflows/stray.template.md )
-o=$(run_layout "$FL" scripts/workflows)
-has "PV-AC5 a template with no pair reds the parity leg" "$o" "renders to nothing this script grades: scripts/workflows/stray.template.md"
+cp "$LAY/flat-render.js" "$FL/scripts/$WFK/unattended-build.js"
+cp "$FL/scripts/$WFK/REVIEW-PROTOCOL.template.md" "$FL/scripts/$WFK/stray.template.md"
+( cd "$FL" && git add scripts/$WFK/stray.template.md )
+o=$(run_layout "$FL" scripts/$WFK)
+has "PV-AC5 a template with no pair reds the parity leg" "$o" "renders to nothing this script grades: scripts/$WFK/stray.template.md"
 has "PV-AC5 ...at exit 1" "$o" "rc=1"
-( cd "$FL" && git rm -q --cached scripts/workflows/stray.template.md ) && rm -f "$FL/scripts/workflows/stray.template.md"
-o=$(run_layout "$FL" scripts/workflows)
+( cd "$FL" && git rm -q --cached scripts/$WFK/stray.template.md ) && rm -f "$FL/scripts/$WFK/stray.template.md"
+o=$(run_layout "$FL" scripts/$WFK)
 has "PV-AC5 control: with the render and the pairs restored the leg is green again" "$o" "rc=0"
 
 # ---- AC6: the two NEGATIVE CONTROLS.
 # The harness spelled for THIS repo's install, which is what apply shipped before this unit. The
 # three values are this repo's own layout and none of them names a file, so the carried-prefix ban
 # has nothing here to count.
-VB="$LAY/verbatim"; build_layout "$VB" scripts/workflows scripts/unattended scripts/gotchas.py
+VB="$LAY/verbatim"; build_layout "$VB" scripts/$WFK scripts/$UNK scripts/gotchas.py
 # FANOUT_CAP is not a path and the control does not grade it; it is filled so the harness PARSES,
 # because a surviving token is a syntax error and the arm would grade a throw instead of the paths.
 sed -e 's|{{KIT_DIR}}|'"${PFX}workflows"'|g' -e 's|{{TOOL_ROOT}}|'"${PFX}"'|g' -e 's|{{MEMORY_TREE_DIR}}|'"${PFX}memory-tree"'|g' \
-    -e 's|{{FANOUT_CAP}}|5|g' "$HERE/unattended-build.template.js" > "$VB/scripts/workflows/unattended-build.js"
-check_layout "PV-AC6 the verbatim spelling:" "$VB" scripts/workflows scripts/ scripts RRRRR
+    -e 's|{{FANOUT_CAP}}|5|g' "$HERE/unattended-build.template.js" > "$VB/scripts/$WFK/unattended-build.js"
+check_layout "PV-AC6 the verbatim spelling:" "$VB" scripts/$WFK scripts/ scripts RRRRR
 # The prefix-only half-fix: correct for this repo, and wrong for both measured adopters.
-HF="$LAY/halffix"; build_layout "$HF" scripts/workflows scripts/unattended scripts/gotchas.py
-sed -i 's|{{MEMORY_TREE_DIR}}/gotchas.py|{{TOOL_ROOT}}memory-tree/gotchas.py|' "$HF/scripts/workflows/unattended-build.template.js"
+HF="$LAY/halffix"; build_layout "$HF" scripts/$WFK scripts/$UNK scripts/gotchas.py
+sed -i 's|{{MEMORY_TREE_DIR}}/gotchas.py|{{TOOL_ROOT}}memory-tree/gotchas.py|' "$HF/scripts/$WFK/unattended-build.template.js"
 ( cd "$HF" && git add -A )
-run_layout "$HF" scripts/workflows --render >/dev/null
-check_layout "PV-AC6 the prefix-only half-fix:" "$HF" scripts/workflows scripts/ scripts GGGRR
+run_layout "$HF" scripts/$WFK --render >/dev/null
+check_layout "PV-AC6 the prefix-only half-fix:" "$HF" scripts/$WFK scripts/ scripts GGGRR
 
 # ---- PV-AC12: THE TWO CARRIERS OF ONE COMMAND AGREE. The build harness hands each child the
 # ---- bug-class checklist, and the unattended Skill tells the run to execute the same checklist.
@@ -1693,16 +1697,16 @@ UK="$ROOT/$KIT_REL/unattended"
 if [ -f "$UK/adopt-unattended.sh" ]; then
   for shape in flat nested; do
     X="$LAY/carriers-$shape"
-    case $shape in flat) gp=scripts/gotchas.py ;; *) gp=scripts/memory-tree/gotchas.py ;; esac
-    build_layout "$X" scripts/workflows scripts/unattended "$gp"
+    case $shape in flat) gp=scripts/gotchas.py ;; *) gp=scripts/$MTK/gotchas.py ;; esac
+    build_layout "$X" scripts/$WFK scripts/$UNK "$gp"
     cp "$UK/adopt-unattended.sh" "$UK/unattended.sh" "$UK/lib-unattended.sh" "$UK/check-unattended.sh" \
-       "$UK"/*.template.md "$X/scripts/unattended/"
+       "$UK"/*.template.md "$X/scripts/$UNK/"
     printf 'MEMORY_ROOT=memory\nLANDER="true"\nKEEPALIVE_CREATE="c"\nKEEPALIVE_DELETE="d"\nKEEPALIVE_INTERVAL="i"\n' \
       > "$X/.unattended.conf"
     ( cd "$X" && git add -A )
-    run_layout "$X" scripts/workflows --render >/dev/null
-    ( cd "$X" && bash scripts/unattended/adopt-unattended.sh >/dev/null 2>&1 )
-    o=$(run_wf "$UNITS" "$(returns CONVERGED 0)" "$X/scripts/workflows/unattended-build.js")
+    run_layout "$X" scripts/$WFK --render >/dev/null
+    ( cd "$X" && bash scripts/$UNK/adopt-unattended.sh >/dev/null 2>&1 )
+    o=$(run_wf "$UNITS" "$(returns CONVERGED 0)" "$X/scripts/$WFK/unattended-build.js")
     hc=$(read_field "$(printf '%s\n' "$o" | sed -n 's/^RESULT //p')" dispatch.args.checklist)
     sc=""
     [ -f "$X/.claude/skills/unattended/SKILL.md" ] && \

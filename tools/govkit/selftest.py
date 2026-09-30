@@ -3793,8 +3793,9 @@ user_skills = "/tmp/gk-fake-skills"
         _d6 = (ik6 / ".governance" / "deploy.toml").read_text(encoding="utf-8")
         check("the emitted [gate_runner] follows the SUPPLIED prefix",
               'file = "scripts/gate-legs.json"' in _d6, _d6)
+        _rg6 = KIT_NAMES["run-gates"]
         check("the [gate_runner] command follows it too",
-              '"scripts/run-gates/run-gates.sh"' in _d6, _d6)
+              f'"scripts/{_rg6}/run-gates.sh"' in _d6, _d6)
         check(f"no {PFX} path survives in the descriptor's runner block",
               f"{PFX}gate-legs.json" not in _d6, _d6)
 
@@ -4764,11 +4765,13 @@ user_skills = "/tmp/gk-fake-skills"
                   "the two states collapsed to one kind")
 
             # A ROLE WITH NO PRODUCER IS AN ORDER, NOT A SIDE-EFFECT. Both entries say so themselves:
-            # `review-harness` renders through the parity gate's --render, `check-install-prefix`
+            # `review-harness` renders through the parity gate's --render, `check-agent-cap-restatement`
             # seeds an empty file. Neither declares an adopter, so `apply`'s CONFIGURE step runs
-            # nothing for them and a SIDE mark would promise a producer that does not exist.
+            # nothing for them and a SIDE mark would promise a producer that does not exist. The
+            # second arm named the install-prefix gate's waiver registry until TOOL-aRepatriatedFork-30
+            # deleted it; this entry's registry is the one generated rule with no adopter left.
             for kit, dest in (("review-harness", "memory/guides/REVIEW-PROTOCOL.md"),
-                              ("check-install-prefix", f"{PFX}install-prefix-waivers.txt")):
+                              ("check-agent-cap-restatement", f"{PFX}agent-cap-restatement-waivers.txt")):
                 out = run("plan", "--target", str(t2), "--kits", kit).stdout
                 row = next((l for l in out.splitlines() if dest in l), "")
                 check(f"{kit}: a rendered/generated rule with NO adopter is an ORDER",
@@ -6399,7 +6402,7 @@ user_skills = "/tmp/gk-fake-skills"
         # ---- and 582 while an adopter's own fixture records are named `scripts~unattended~…`. Its
         # ---- own map, so the criterion's literal strings are the ones asserted.
         _n4, _p4, _d4 = GK9.derive_carry_map(
-            [(f"{PFX}{KIT_NAMES['unattended']}/adopt.sh", "scripts/unattended/adopt.sh"),
+            [(f"{PFX}{KIT_NAMES['unattended']}/adopt.sh", f"scripts/{KIT_NAMES['unattended']}/adopt.sh"),
              (f"{PFX}top.txt", "scripts/top.txt")])
         check(f"[-9] AC4 the fixture map really carries BOTH `{PFX}unattended` and `tools`",
               _p4 == {f"{PFX}unattended": "scripts/unattended", "tools": "scripts"}, str(_p4))
@@ -6430,13 +6433,14 @@ user_skills = "/tmp/gk-fake-skills"
         #
         # The three arms below are one fixture read three ways, so the difference between them is the
         # only thing that can move: same base, same content, different needle source.
-        _f1 = [(f"{PFX}{KIT_NAMES['hooks']}/agent-cap.js", "scripts/hooks/agent-cap.js"),
+        _f1 = [(f"{PFX}{KIT_NAMES['hooks']}/agent-cap.js", f"scripts/{KIT_NAMES['hooks']}/agent-cap.js"),
                (f"{PFX}{KIT_NAMES['hooks']}/scratch-guard.js", ".claude/hooks/scratch-guard.js")]
         _nf, _pf, _df = GK9.derive_carry_map(_f1)
         check("[-1] S1 a fanned gov directory is still DROPPED from the global map",
               [d[0] for d in _df] == [f"{PFX}hooks"] and not _nf,
               f"dropped={_df} needles={_nf}")
-        _rowf = {"source": f"{PFX}{KIT_NAMES['hooks']}/agent-cap.js", "path": "scripts/hooks/agent-cap.js"}
+        _rowf = {"source": f"{PFX}{KIT_NAMES['hooks']}/agent-cap.js",
+                 "path": f"scripts/{KIT_NAMES['hooks']}/agent-cap.js"}
         _pf2 = GK9.resolve_row_needles(_nf, _rowf)
         check("[-1] S1 ...but the row's own overlay supplies the needle the map could not hold",
               _pf2.get(f"{PFX}hooks") == "scripts/hooks", repr(_pf2))
@@ -6795,9 +6799,18 @@ user_skills = "/tmp/gk-fake-skills"
         # ---- taken where inCMS was reachable -- and the arm reproduces it from gov's side.
         # TOOL-aRepatriatedFork-28 F1: the fixture spells gov's prefix as the `{prefix}` token, so
         # it carries no literal and the arms read it at whatever prefix this checkout sits at.
-        _fx9 = json.loads(resolve_prefix_token(
-            (GOVKIT.parent / "fixtures" / "adopter-ic-2cff5855.receipt.json")
-            .read_text(encoding="utf-8"), PFX.rstrip("/")))
+        # TOOL-aRepatriatedFork-30 S8: the ADOPTER's paths go through the same token, and it is
+        # resolved by FIELD — gov's tool root for a `source`, the adopter's recorded root for a
+        # `path` — because the token names the root of the tree the path lives in.
+        _fx9 = json.loads((GOVKIT.parent / "fixtures" / "adopter-ic-2cff5855.receipt.json")
+                          .read_text(encoding="utf-8"))
+        _fx9tr = _fx9["provenance"]["target_tool_root"]
+        _fx9["carry_map_population"] = [[resolve_prefix_token(s, PFX.rstrip("/")),
+                                         resolve_prefix_token(d, _fx9tr)]
+                                        for s, d in _fx9["carry_map_population"]]
+        for _w in _fx9["files"]:
+            _w["source"] = resolve_prefix_token(_w["source"], PFX.rstrip("/"))
+            _w["path"] = resolve_prefix_token(_w["path"], _fx9tr)
         _fx9rows = _fx9["files"]
         check("[-9] S13 LIVENESS the committed inCMS fixture carries the 52-row population",
               len(_fx9rows) == 52, f"{len(_fx9rows)} row(s)")
@@ -11000,7 +11013,7 @@ user_skills = "/tmp/gk-fake-skills"
         _k6GKC = govkit_module()
         # Class 4: the same line with a path rewritten, and nothing else.
         _k6g4 = f"load('{PFX}{KIT_NAMES['hooks']}/agent-cap.js')" + chr(10) + "x = 1" + chr(10)
-        _k6a4 = "load('scripts/hooks/agent-cap.js')" + chr(10) + "x = 1" + chr(10)
+        _k6a4 = f"load('scripts/{KIT_NAMES['hooks']}/agent-cap.js')" + chr(10) + "x = 1" + chr(10)
         _k6c4, _k6w4 = _k6GKC.contrib_propose_class({"path": "a.js", "gov_path": "a.js"}, _k6g4, _k6a4, "nc")
         check("[-6] a change that is only a repath proposes class 4", _k6c4 == 4, f"{_k6c4}: {_k6w4}")
         # ...and the DESTINATION differing does NOT, on its own, make it class 4. This is the arm
@@ -12210,9 +12223,10 @@ user_skills = "/tmp/gk-fake-skills"
         _pvT_B = ("// harness v2\nconst DRIVER = 'bash {{TOOL_ROOT}}unattended/unattended.sh'\n"
                   "const CHECKLIST = 'python {{MEMORY_TREE_DIR}}/gotchas.py --for-diff HEAD~1..HEAD'\n"
                   "const REVIEW = '{{KIT_DIR}}/tier2-review.js'\n")
-        _pvRENDERED = ("// harness v2\nconst DRIVER = 'bash scripts/unattended/unattended.sh'\n"
-                       "const CHECKLIST = 'python scripts/gotchas.py --for-diff HEAD~1..HEAD'\n"
-                       "const REVIEW = 'scripts/workflows/tier2-review.js'\n")
+        # The render IS the template with its values substituted, so it is derived from it: a
+        # fixture typing the rendered kit paths out spelled the literal the install-prefix ban counts.
+        _pvRENDERED = (_pvT_B.replace("{{TOOL_ROOT}}", "scripts/").replace("{{MEMORY_TREE_DIR}}", "scripts")
+                       .replace("{{KIT_DIR}}", "scripts/workflows"))
         _pvPROTO_T = ("# Review protocol, installed under {{TOOL_ROOT}}\n\n## The hard cap\n\n"
                       "The bound is what {{TOOL_ROOT}}hooks/agent-cap.js resolves.\n\n"
                       "## Concurrency\n\nSo is this one: {{TOOL_ROOT}}hooks/agent-cap.js.\n")

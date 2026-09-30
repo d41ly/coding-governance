@@ -463,7 +463,7 @@ code, out = run_case({"core/a.py": "def frobnicate_index():\n    pass\n"}, BASE_
                      {"lexicon-verb-waivers.txt": "frobnicate_index  deliberate, see the spec\n"})
 check("a waiver on the matched TEXT silences its offender", code == 0, out)
 
-# The whole reason for text keying: `install-prefix-waivers.txt` keys on <path>:<line>, so any edit
+# The whole reason for text keying: the install-prefix gate's old waiver registry keyed on <path>:<line>, so any edit
 # ABOVE a waived line unpins it and reds a merge that touched nothing the waiver guards.
 code, out = run_case({"core/a.py": "# a new comment line added above\n# and another\ndef frobnicate_index():\n    pass\n"},
                      BASE_CONF, {"lexicon-verb-waivers.txt": "frobnicate_index  deliberate, see the spec\n"})

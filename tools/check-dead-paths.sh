@@ -56,10 +56,10 @@
 # WAIVERS are a tracked file, one `<path>\t<ordinal>\t<line-text>\t<reason>` per row. Shrink-only,
 # and a waiver whose resolved line is no longer a hit reds as stale.
 #
-# IT NO LONGER MATCHES `install-prefix-waivers.txt`, and the divergence is DELIBERATE rather than an
-# oversight to tidy away. That sibling is still `<path>:<line>` and carries the same line-drift
-# exposure; the owner ruled ONE file, and a registry moves when its own keying has actually failed,
-# not by association. Do not "restore" the parity.
+# IT NEVER MATCHED THE INSTALL-PREFIX GATE'S OLD WAIVER REGISTRY, and the divergence was DELIBERATE
+# rather than an oversight: that sibling stayed `<path>:<line>` until TOOL-aRepatriatedFork-30
+# deleted it with the rest of that gate's exemptions. The owner ruled ONE file, and a registry moves
+# when its own keying has actually failed, not by association.
 set -u
 # Captured BEFORE the `cd`, because `$0` may be relative (TOOL-aRepatriatedFork-29 S3).
 _self_dir=$(cd "$(dirname "$0")" 2>/dev/null && pwd) || _self_dir=""

@@ -996,6 +996,19 @@
     "ceiling": 300
   },
   {
+    "name": "foreign-prefix parity (every self-test at three prefixes)",
+    "argv": [
+      "bash",
+      "{prefix}/run-gates/foreign-prefix.gov.test.sh"
+    ],
+    "guard": [
+      "{prefix}/"
+    ],
+    "chunk": "selftests",
+    "subject": "repo",
+    "ceiling": 60000
+  },
+  {
     "name": "run-gates run-log line",
     "argv": [
       "bash",

@@ -21,7 +21,7 @@ include = ["agent-cap-restatement-waivers.txt"]
 role = "generated"
 to = "{prefix}/agent-cap-restatement-waivers.txt"
 claims = ["{prefix}/agent-cap-restatement-waivers.txt"]
-note = "MEASURED optional: the gate is green with the file absent and with it empty (its own self-test carries both). gov's single waiver row is gov-specific prose and must not travel, so this is seeded empty rather than copied — the same rule the install-prefix registry beside it follows."
+note = "MEASURED optional: the gate is green with the file absent and with it empty (its own self-test carries both). gov's single waiver row is gov-specific prose and must not travel, so this is seeded empty rather than copied — the rule the install-prefix waiver registry beside it followed until TOOL-aRepatriatedFork-30 deleted that registry."
 
 [adopt]
 argv = []

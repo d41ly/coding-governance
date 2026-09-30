@@ -76,7 +76,7 @@ TOML
 
 echo "== 1. NOT ADOPTED is a real answer, and it writes nothing =="
 T=$(build_target notadopted vendor)
-out=$( cd "$T" && bash vendor/run-gates/adopt-run-gates.sh --check 2>&1 ); rc=$?
+out=$( cd "$T" && bash vendor/${KIT}/adopt-run-gates.sh --check 2>&1 ); rc=$?
 [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'NOT ADOPTED' \
   && ok "no deploy.toml -> exit 0 reporting NOT ADOPTED" \
   || nope "no deploy.toml did not report NOT ADOPTED (rc=$rc): $out"
@@ -87,7 +87,7 @@ out=$( cd "$T" && bash vendor/run-gates/adopt-run-gates.sh --check 2>&1 ); rc=$?
 echo "== 2. a matching declaration agrees, at a NON-gov prefix =="
 T=$(build_target agree vendor)
 write_decl "$T" vendor 'GATE ok    '
-out=$( cd "$T" && bash vendor/run-gates/adopt-run-gates.sh --check 2>&1 ); rc=$?
+out=$( cd "$T" && bash vendor/${KIT}/adopt-run-gates.sh --check 2>&1 ); rc=$?
 [ "$rc" = 0 ] && ok "a declaration matching the runner's printf exits 0" \
   || nope "a matching declaration did not exit 0 (rc=$rc): $out"
 printf '%s' "$out" | grep -q 'observed_ran' \
@@ -107,14 +107,14 @@ write_decl "$T" vendor 'GATE ok    '
 # it was supposed to have removed. A mutation arm whose mutation does not happen is the
 # fixture-passes-by-finding-nothing class sitting inside the arm written to prevent it, so the
 # mutation is ASSERTED before the adopter is asked anything.
-MUT="$T/vendor/run-gates/run-gates.sh"
+MUT="$T/vendor/${KIT}/run-gates.sh"
 sed -i 's/GATE ok    /GATE PASSED  /g' "$MUT"
 if grep -q 'GATE PASSED  ' "$MUT" && ! grep -q 'GATE ok    ' "$MUT"; then
   ok "the fixture mutation actually landed (so the arm below is not vacuous)"
 else
   nope "the fixture mutation did NOT land, so the drift arm would prove nothing"
 fi
-out=$( cd "$T" && bash vendor/run-gates/adopt-run-gates.sh --check 2>&1 ); rc=$?
+out=$( cd "$T" && bash vendor/${KIT}/adopt-run-gates.sh --check 2>&1 ); rc=$?
 [ "$rc" = 1 ] && ok "a declaration the runner no longer emits exits 1" \
   || nope "the drifted declaration did not exit 1 (rc=$rc): $out"
 if printf '%s' "$out" | grep -q 'DRIFT' && printf '%s' "$out" | grep -q 'observed_ran'; then
@@ -131,7 +131,7 @@ prefix = "vendor"
 kind = "manifest"
 observed_ran = ["GATE ok    {name}"]
 TOML
-out=$( cd "$T" && bash vendor/run-gates/adopt-run-gates.sh --check 2>&1 ); rc=$?
+out=$( cd "$T" && bash vendor/${KIT}/adopt-run-gates.sh --check 2>&1 ); rc=$?
 [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'observed_failed' \
   && ok "a missing observed_failed is reported by name, not read as empty-equals-empty" \
   || nope "a missing observed_failed was not reported (rc=$rc): $out"
@@ -160,7 +160,7 @@ kind = "manifest"
 observed_ran = "GATE ok    {name}"
 observed_failed = "GATE FAIL  {name}"
 TOML
-out=$( cd "$T" && bash vendor/run-gates/adopt-run-gates.sh --check 2>&1 ); rc=$?
+out=$( cd "$T" && bash vendor/${KIT}/adopt-run-gates.sh --check 2>&1 ); rc=$?
 if [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'must be an ARRAY'; then
   ok "a scalar observed_* is refused by name (closing review D2/D1)"
 else
@@ -170,7 +170,7 @@ fi
 # the arm above is satisfied by an adopter that refuses every declaration it is given.
 T=$(build_target arrayform vendor)
 write_decl "$T" vendor 'GATE ok    '
-out=$( cd "$T" && bash vendor/run-gates/adopt-run-gates.sh --check 2>&1 ); rc=$?
+out=$( cd "$T" && bash vendor/${KIT}/adopt-run-gates.sh --check 2>&1 ); rc=$?
 [ "$rc" = 0 ] && ok "the same heads in ARRAY form still pass (the refusal is about the shape)"   || nope "the array form did not pass (rc=$rc): $out"
 
 echo "== 6c. --help terminates and prints usage =="

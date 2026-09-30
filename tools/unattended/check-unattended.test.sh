@@ -2129,13 +2129,14 @@ hit "$(GOV_UNATTENDED_REPORT=1 run)" "check 31 skipped for memory/guides/BUILD-M
 # branches S5 then F1 at a FOREIGN PREFIX, which is what says the verdict follows the named path's
 # own `dirname` rather than an install-prefix literal. TOOL_ROOT renders to the empty string at a
 # root install, so a literal would be wrong in an adopter tree in BOTH directions - failing a correct
-# route installed elsewhere, or skipping forever over a broken one. This prefix is not a kit path,
-# so spelling it here carries nothing an adopter would have to repath.
+# route installed elsewhere, or skipping forever over a broken one. The route's kit segment is the
+# derived one above, so the foreign path types no kit name (TOOL-aRepatriatedFork-30 S8).
+_c31_far="vendor/harness/${_c31_dir##*/}/unattended-unit.js"
 reset_tree
-_bm31 vendor/harness/workflows/unattended-unit.js
-hit "$(GOV_UNATTENDED_REPORT=1 run)" "check 31 skipped for vendor/harness/workflows/unattended-unit.js — the directory that would hold it is absent"
-mkdir -p vendor/harness/workflows
-hit "$(run)" "so the route's kit was taken and its route is broken: vendor/harness/workflows/unattended-unit.js"
+_bm31 "$_c31_far"
+hit "$(GOV_UNATTENDED_REPORT=1 run)" "check 31 skipped for $_c31_far — the directory that would hold it is absent"
+mkdir -p "$(dirname "$_c31_far")"
+hit "$(run)" "so the route's kit was taken and its route is broken: $_c31_far"
 
 # branch S1, the registry itself unreadable, so the section holding the route is unnamed. Reached by
 # EMPTYING the driver's core set rather than by `--only 28`: that flag leaves `$core` unset for the

@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# check-install-prefix.test.sh — red/green arms for the install-prefix gate. Exit 0 = every arm held.
+# check-install-prefix.test.sh — red/green arms for the install-prefix gate, a PURE BAN since
+# TOOL-aRepatriatedFork-30. Exit 0 = every arm held.
 #
 #   bash <prefix>/check-install-prefix.test.sh
 #
@@ -8,9 +9,13 @@
 #    reports success while exercising nothing.
 #  * Every red arm has a green control over the SAME mechanism, so an arm cannot pass because the
 #    gate rejects everything.
-#  * The population guards get their own arms. This gate's two `that is not a pass` branches exist
-#    because an empty kit list or an empty file list would otherwise be silent success — the
-#    vacuous-selector class this repo catalogues.
+#  * The population guards get their own arms: an empty kit list, a dead counter and a python that
+#    does not run would otherwise be silent success — the vacuous-selector class this repo catalogues.
+#
+# THIS FILE IS IN THE POPULATION IT TESTS, so it may not spell a kit path either. Every fixture uses
+# `qdemo`, a kit that exists only inside the fixture, and gov's own prefix is assembled from `TL` at
+# run time: the bytes a fixture writes carry the literal, and the bytes of this file do not. The
+# sibling kits a fixture copies in are found by the FILE they hold, never by a typed directory name.
 set -u
 HERE="$(cd "$(dirname "$0")" && pwd)"
 # >>> derive_self_rel — canonical copy: kit-rel.sh in gov's lib dir (byte-identical; gated)
@@ -26,739 +31,211 @@ derive_self_rel() {
 }
 # <<< derive_self_rel
 KIT_REL=$(derive_self_rel "$HERE") || { echo "check-install-prefix.test: not inside a git repository"; exit 2; }
-# PFX is the install prefix WITH its trailing slash, derived from where this file sits and empty
-# at a root install: every fixture and host path below is spelled through it, never through a
-# literal prefix (TOOL-aRepatriatedFork-28).
+# PFX is the install prefix WITH its trailing slash, derived from where this file sits and empty at a
+# root install. Every fixture lays its kits out under the same prefix as the host.
 PFX="${KIT_REL:+$KIT_REL/}"
-# TOOL-aRepatriatedFork-16 S5 — the gate is the one BESIDE this suite, derived before the `cd`
-# because `$0` may be relative. Spelled at gov's prefix it did not exist at a `scripts/` install,
-# and every arm that ran it exited 127 there.
-GATE="$(cd "$(dirname "$0")" && pwd)/check-install-prefix.sh"
+GATE="$HERE/check-install-prefix.sh"
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
-# The gate's path INSIDE a fixture. Every fixture lays its kits out under `<prefix>/` whatever the host
-# prefix, so the gate sits there too: this is the fixture's layout, not the host's, and a path
-# derived from the host would name a directory no fixture has. `mkfix` and `mkfix_source` copy it
-# here, and every arm runs this copy.
 GATE_REL="${PFX}${GATE##*/}"
-fails=0
+# The deployer the kit-source test resolves, found by its ENGINE file rather than by a typed name.
+GK_SRC=$(git ls-files -- "${PFX}*/govkit.py" | head -1)
+[ -n "$GK_SRC" ] || { echo "check-install-prefix.test: no govkit engine under ${PFX:-the repo root}"; exit 2; }
+GK=${GK_SRC%/*}; GK=${GK##*/}
+TL=tool   # gov's own prefix is "${TL}s", assembled so that this file does not spell it
+T=$(printf '\t')
+FLOOR_ASSERTIONS=35
+fails=0; passed=0; GRADED=0
 TMP=$(mktemp -d); trap 'rm -rf "$TMP"' EXIT
 
 bad()  { fails=$((fails+1)); printf 'arm FAIL  %s\n' "$*"; }
-good() { printf 'arm ok    %s\n' "$*"; }
-# $1 label · $2 expected substring ("" = expect exit 0 and no match test) · $3 expected exit · rest: cwd
-run_arm() { # label · want-substring · want-rc · dir · [gate path inside dir]
+good() { passed=$((passed+1)); printf 'arm ok    %s\n' "$*"; }
+
+# A repo shaped like a KIT SOURCE: the gate, a copy of govkit's engine and a registry at the tool root,
+# and one kit `qdemo` whose descriptor ships everything it holds plus one rendered template.
+build_source_fixture() { # $1 = dir · $2 = the line to put in the kit README
+  local d="$1"
+  mkdir -p "$d/${PFX}$GK" "$d/${PFX}qdemo"
+  git -C "$d" init -q
+  git -C "$d" config user.email t@t.test; git -C "$d" config user.name t
+  cp "$GATE" "$d/$GATE_REL"
+  cp "$ROOT/$GK_SRC" "$d/${PFX}$GK/govkit.py"
+  printf 'version = 1\n\n[surface]\nglobs = ["{prefix}/*"]\n\n[selection]\ndefault = ["qdemo"]\n\n[[entry]]\nid = "qdemo"\ndescriptor = "{prefix}/qdemo/kit.toml"\n' \
+    > "$d/${PFX}$GK/registry.toml"
+  printf 'id = "qdemo"\nhome = "qdemo"\nversion_from = { none = "fixture" }\n\n[check]\nnone = "a fixture kit"\n\n[[files]]\ninclude = "**"\nrole = "engine"\n\n[[files]]\ninclude = ["page.template.md"]\nrole = "rendered"\nto = "{kit}/page.md"\nplaceholders = ["KIT_DIR"]\n\n[adopt]\nargv = []\nmutates_index = false\n' \
+    > "$d/${PFX}qdemo/kit.toml"
+  printf '%s\n' "$2" > "$d/${PFX}qdemo/README.md"
+  printf '#!/usr/bin/env bash\necho qdemo\n' > "$d/${PFX}qdemo/thing.sh"
+  printf 'Run {{KIT_DIR}}/thing.sh by hand.\n' > "$d/${PFX}qdemo/page.template.md"
+  printf 'Run %sqdemo/thing.sh by hand.\n' "$PFX" > "$d/${PFX}qdemo/page.md"
+  git -C "$d" add -A >/dev/null 2>&1
+}
+
+# ONE runner for every graded arm. `GRADED` counts the arms whose output proves the counter ran, so a
+# suite whose fixtures all stopped short of it reds by that fact rather than reporting on nothing.
+run_arm() { # label · want-substring · want-rc · dir · [gate path inside dir] · [argv...]
   local label="$1" want="$2" wrc="$3" dir="$4" g="${5:-$GATE_REL}" out rc
-  write_ban_list "$dir" "$g"
-  out=$(cd "$dir" && bash "$g" 2>&1); rc=$?
-  if [ "$rc" != "$wrc" ]; then bad "$label (exit $rc, wanted $wrc): $(printf '%s' "$out" | head -2)"; return; fi
-  if [ -n "$want" ] && ! printf '%s' "$out" | grep -qF "$want"; then
-    bad "$label (message missing '$want'): $(printf '%s' "$out" | head -3)"; return
-  fi
-  good "$label"
+  shift 5 2>/dev/null || shift $#
+  out=$(cd "$dir" && bash "$g" "$@" 2>&1); rc=$?
+  case "$out" in *"install-prefix: clean — "*|*"install-prefix: RED — "*) GRADED=$((GRADED+1)) ;; esac
+  if [ "$rc" != "$wrc" ]; then bad "$label (exit $rc, wanted $wrc): $(printf '%s' "$out" | tail -3)"; return; fi
+  case "$out" in *"$want"*) good "$label" ;; *) bad "$label (message missing '$want'): $(printf '%s' "$out" | tail -3)" ;; esac
+}
+LAST_OUT=""
+read_gate() { # dir -> the gate's --check output in LAST_OUT, its exit status returned
+  local rc
+  LAST_OUT=$(cd "$1" && bash "$GATE_REL" 2>&1); rc=$?
+  case "$LAST_OUT" in *"install-prefix: clean — "*|*"install-prefix: RED — "*) GRADED=$((GRADED+1)) ;; esac
+  return "$rc"
 }
 
-# TOOL-aRepatriatedFork-23 — the ban list is RE-MEASURED before an arm-1 arm runs. Since epoch 5 the
-# ban reads every tracked file, the fixture's copied scaffolding and its root-spelling fixtures
-# included, so an arm grading arm 1 would otherwise red on the ban's UNRECORDED verdict instead of
-# the verdict it exists for. The ban's own arms never call this: they grade that verdict directly.
-write_ban_list() { # dir · gate path inside dir
-  rm -f "$1/$(dirname "$2")/install-prefix-carried.txt"
-  (cd "$1" && bash "$2" --write-ratchet >/dev/null 2>&1) || true
-}
+# ==================== the GREEN control and the population ====================================
+G="$TMP/green"; build_source_fixture "$G" "The engine lives at {prefix}/qdemo/thing.sh in this repo."
+run_arm "a kit source spelling only drained forms is clean" "install-prefix: clean — " 0 "$G"
+read_gate "$G"
+case "$LAST_OUT" in *"clean — 0 tracked file(s)"*) bad "LIVENESS the green fixture graded NO file" ;;
+  *"tracked file(s) graded"*) good "LIVENESS the green fixture graded a non-empty population, and says how many" ;;
+  *) bad "LIVENESS the green fixture printed no population size: $LAST_OUT" ;; esac
 
-# A repo shaped like a KIT SOURCE: one kit under <prefix>/, one shipped file, a waiver registry.
-# TOOL-aRepatriatedFork-16 S5 — and a govkit registry, because since S2 a repo without one is a
-# consumer that ships nothing and both arms SKIP. The registry names only the kit's engine file, so
-# the carried arm grades a live, literal-free set against an empty ratchet and stays out of the way
-# of the root-install arms these fixtures exist for. The descriptor sits at the fixture root.
-mkfix() { # $1 = dir · $2 = the line to put in the shipped README
-  local d="$1"
-  mkdir -p "$d/${PFX}memory-tree" "$d/${PFX}govkit" "$d/${PFX}lib"
-  git -C "$d" init -q
-  git -C "$d" config user.email t@t.test; git -C "$d" config user.name t
-  printf '#!/usr/bin/env bash\n' > "$d/${PFX}memory-tree/check-memory-hygiene.sh"
-  printf '%s\n' "$2" > "$d/${PFX}memory-tree/README.md"
-  cp "$GATE" "$d/$GATE_REL"
-  cp "$ROOT/${PFX}govkit/govkit.py" "$d/${PFX}govkit/govkit.py"
-  cp "$ROOT/${PFX}lib/resolve-python.sh" "$d/${PFX}lib/resolve-python.sh"
-  printf '[[entry]]\nid = "memory-tree"\ndescriptor = "mt.kit.toml"\n' > "$d/${PFX}govkit/registry.toml"
-  printf 'id = "memory-tree"\nhome = "memory-tree"\n\n[[files]]\ninclude = ["check-memory-hygiene.sh"]\nrole = "engine"\nto = "{prefix}/{relpath}"\n' > "$d/mt.kit.toml"
-  : > "$d/${PFX}install-prefix-carried.txt"
-  printf '# waivers\n' > "$d/${PFX}install-prefix-waivers.txt"
-  git -C "$d" add -A >/dev/null 2>&1
-}
+# ==================== AC5 — one literal of each epoch-6 spelling, one file ======================
+# Each line below is ONE spelling the predicate counts, and the arm asserts every <path>:<line>, so a
+# spelling the gate stopped counting fails by its own line number rather than hiding in a total.
+S="$TMP/spellings"; build_source_fixture "$S" 'A qdemo kit.'
+{
+  printf '%s\n' "kit = pathlib.Path(\".\") / \"${TL}s\" / \"qdemo\""       # 1: a quoted gov segment, joined
+  printf '%s\n' "Run ${TL}s/qdemo/thing.sh from the checkout."             # 2: gov's prefix and a kit
+  printf '%s\n' "Run ${TL}s/ghost.sh first."                               # 2: gov's prefix and a loose name
+  printf '%s\n' 'Run qdemo/thing.sh from the root.'                         # 3: the root spelling
+  printf '%s\n' 'Run vendor/qdemo/thing.sh at a vendor install.'            # 3: any literal prefix
+  printf '%s\n' 'bash "$HERE/../qdemo/thing.sh"'                            # 3: after a derived shell base
+  printf '%s\n' 'bash "$ROOT/${PFX}qdemo/thing.sh"'                         # 3: after a brace that is no token
+  printf '%s\n' 'kit = HERE.parent / "qdemo"'                               # 4: a quoted kit joined by /
+  printf '%s\n' 'w = os.path.join(w, "scripts", "qdemo")'                   # 4: a quoted kit inside a join
+  printf '%s\n' "Copy it to <project>/${TL}s/qdemo/thing.sh by hand."       # 2: a /-led gov prefix
+} > "$S/${PFX}qdemo/spellings.py"
+git -C "$S" add -A >/dev/null 2>&1
+read_gate "$S"; _src=$?
+[ "$_src" = 1 ] && good "AC5 the spellings fixture exits 1" || bad "AC5 the spellings fixture exited $_src, wanted 1: $(printf '%s' "$LAST_OUT" | tail -2)"
+for _n in 1 2 3 4 5 6 7 8 9 10; do
+  case "$LAST_OUT" in *"  ${PFX}qdemo/spellings.py:$_n  qdemo"*|*"  ${PFX}qdemo/spellings.py:$_n  (loose)"*)
+    good "AC5 spelling on line $_n is named by <path>:<line>" ;;
+    *) bad "AC5 spelling on line $_n passed unnamed — $(sed -n "${_n}p" "$S/${PFX}qdemo/spellings.py")" ;; esac
+done
+case "$LAST_OUT" in *"there is no waiver"*) good "AC5 the refusal says there is no waiver to take" ;;
+  *) bad "AC5 the refusal does not say the ban has no waiver" ;; esac
+# ...and with the literals gone, the SAME file in drained and homonym forms exits 0.
+{
+  printf '%s\n' 'Run {prefix}/qdemo/thing.sh, or {{TOOL_ROOT}}qdemo/thing.sh.'
+  printf '%s\n' 'Run <prefix>/qdemo/thing.sh, or <tool-root>/qdemo/thing.sh.'
+  printf '%s\n' "cfg = {\"${TL}s\": 1}"
+  printf '%s\n' 'run("plan", "--kits", "qdemo")'
+  printf '%s\n' 'x = ["bin", "qdemo"]'
+  printf '%s\n' "ci = root / '.github' / 'qdemo'"
+  printf '%s\n' 'side = gd.resolve() / "qdemo" / "log.jsonl"'
+  printf '%s\n' '# its Skill lands at .claude/skills/qdemo/SKILL.md'
+  printf '%s\n' 'The `qdemo/` kit is described in prose.'
+} > "$S/${PFX}qdemo/spellings.py"
+git -C "$S" add -A >/dev/null 2>&1
+run_arm "AC5 ...and the drained forms and homonyms in the same file are clean" "install-prefix: clean — " 0 "$S"
 
-# 1. GREEN — a shipped file naming the kit at its declared prefix.
-CLEAN_LINE='Run `bash '"${PFX}memory-tree/check-memory-hygiene.sh"'` to lint.'
-A="$TMP/green"; mkfix "$A" "$CLEAN_LINE"
-run_arm "a ${PFX}-prefixed path is clean" "no undeclared root-install spelling" 0 "$A"
-
-# 2. RED — the same sentence at a root-install spelling. Same fixture, one path changed, so the arm
-#    cannot be passing for an unrelated reason.
-B="$TMP/red"; mkfix "$B" 'Run `bash memory-tree/check-memory-hygiene.sh` to lint.'  # gov:root-fixture — the RED fixture this arm exists to catch
-run_arm "a root-install path is caught" "spells a root-install kit path" 1 "$B"
-
-# 3. ...and naming it in the waiver registry makes the SAME tree pass.
-printf ''"${PFX}memory-tree/README.md"':1  deliberate, for the arm\n' >> "$B/${PFX}install-prefix-waivers.txt"
-git -C "$B" add -A >/dev/null 2>&1
-run_arm "a declared waiver clears that hit" "1 declared waiver" 0 "$B"
-
-# 4. ...and a waiver whose spelling is gone is STALE, not a free pass. Without this a registry
-#    outlives what it excused and the next violation slips in under a pin that never fell.
-printf '%s\n' 'Run `bash '"${PFX}memory-tree/check-memory-hygiene.sh"'` to lint.' > "$B/${PFX}memory-tree/README.md"
-git -C "$B" add -A >/dev/null 2>&1
-run_arm "a waiver whose hit is gone reds as stale" "stale waiver" 1 "$B"
-
-# 5. PROSE naming the kit is not a path. Gating it would make every sentence about a kit a violation,
-#    so the predicate requires a real filename — and that exemption needs its own arm, or a future
-#    tightening would silently start reporting documentation.
-C="$TMP/prose"; mkfix "$C" 'The `memory-tree/` kit lives under '"${PFX}."''
-run_arm "a bare kit name in prose is not a hit" "no undeclared root-install spelling" 0 "$C"
-
-# 6. A test file is out of the population BY DESIGN — fixtures build root-prefix installs on purpose.
-D="$TMP/testfile"; mkfix "$D" 'clean'
-printf 'bash memory-tree/check-memory-hygiene.sh\n' > "$D/${PFX}memory-tree/thing.test.sh"  # gov:root-fixture — the RED fixture this arm exists to catch
-git -C "$D" add -A >/dev/null 2>&1
-run_arm "a .test.sh fixture is excluded from the population" "no undeclared root-install spelling" 0 "$D"
-# ...and the SAME content in a non-test file is caught, so arm 6 is an exclusion and not a blind spot.
-mv "$D/${PFX}memory-tree/thing.test.sh" "$D/${PFX}memory-tree/thing.sh"
-git -C "$D" add -A >/dev/null 2>&1
-run_arm "...and the same content in a shipped file IS caught" "spells a root-install kit path" 1 "$D"
-
-# 7. POPULATION GUARDS. Both branches say "that is not a pass" out loud; a gate whose selector went
-#    empty would otherwise report success over nothing.
-#    A kit source always has kit directories under `<prefix>/`, so the gate moves to a prefix with none.
-E="$TMP/nokits"; mkfix "$E" 'clean'
-mkdir -p "$E/solo"; git -C "$E" mv "$GATE_REL" solo/
-run_arm "no kit directories -> refuses, not a silent pass" "that is not a pass" 1 "$E" "solo/${GATE##*/}"
-
-# 8. A placeholder-prefixed path is NOT a hit — it is the corrected form this gate exists to produce.
-F="$TMP/placeholder"; mkfix "$F" 'Run `bash {{TOOL_ROOT}}memory-tree/check-memory-hygiene.sh` to lint.'
-run_arm "a placeholder-prefixed path is not a hit" "no undeclared root-install spelling" 0 "$F"
-
-# THE VERDICT IS AT THE END OF THE FILE, and it moved there because it was not. The carried-prefix
-# arms below were appended after this block, so the suite printed PASS and exited 0 with a FAILING
-# arm in its own output — the grader reporting green while an arm redded, which is precisely the
-# class D10 is about, reproduced inside D10's own fix. A verdict that is not the last statement is
-# a verdict about a prefix of the suite.
-
-
-# ---------------------------------------------------------------------------------------------
-# D10, from the closing review of DEPL-dCarriedReceipt: every arm above builds a fixture carrying
-# none of the govkit registry the second arm's guard looks for, so that guard is true for ALL of
-# them and every one takes the SKIPPED branch. The `install-prefix self-test` leg therefore reported PASS
-# while the ratchet, the four awk conditions, `carried_population` and the SKIP branch itself went
-# ungraded — which is why D3 and D4 could not have been seen by this suite. The instance was fixed
-# during that build and the CLASS was not, which is the shape this file's own header warns about.
-#
-# `mkfix_source` builds a repo the second arm actually engages with: a registry, a descriptor, a
-# resolver and a copy of the engine, so `carried_population` can resolve a real shippable set.
-CARRIED_ARMS=0
-
-mkfix_source() { # $1 = dir · $2 = the line to put in the shipped kit file
-  local d="$1"
-  mkdir -p "$d/${PFX}govkit/entries" "$d/${PFX}demo" "$d/${PFX}lib"
-  git -C "$d" init -q
-  git -C "$d" config user.email t@t.test; git -C "$d" config user.name t
-  cp "$GATE" "$d/$GATE_REL"
-  cp "$ROOT/${PFX}govkit/govkit.py" "$d/${PFX}govkit/govkit.py"
-  cp "$ROOT/${PFX}lib/resolve-python.sh" "$d/${PFX}lib/resolve-python.sh"
-  printf '[surface]\nglobs = ["'"${PFX}"'*"]\n\n[selection]\ndefault = ["demo"]\n\n[[entry]]\nid = "demo"\ndescriptor = "'"${PFX}demo/kit.toml"'"\n\n[[exempt]]\npath = "'"${PFX}govkit"'"\nwhy = "the deployer itself"\n\n[[exempt]]\npath = "'"${PFX}lib"'"\nwhy = "the shared library"\n\n[[exempt]]\npath = "'"${PFX}check-install-prefix.sh"'"\nwhy = "the gate under test"\n' > "$d/${PFX}govkit/registry.toml"
-  printf 'id = "demo"\nhome = "demo"\nversion_from = { none = "fixture" }\n\n[check]\nnone = "a fixture kit"\n\n[[files]]\ninclude = "**"\nrole = "engine"\n\n[adopt]\nargv = []\nmutates_index = false\n' > "$d/${PFX}demo/kit.toml"
-  printf '%s\n' "$2" > "$d/${PFX}demo/README.md"
-  # TWO carrying files, not one, and the reason is an arm rather than symmetry: the UNRECORDED arm
-  # drops ONE row and needs what is left to be non-empty, because the `-s` guard treats an emptied
-  # ratchet as MISSING and never reaches the comparison. With a single carrying file that arm tested
-  # the path the fix had just closed and reported it as a failure to print UNRECORDED.
-  printf '#!/usr/bin/env bash\n# see '"${PFX}demo/README.md"' for what this does\n' > "$d/${PFX}demo/thing.sh"
-  git -C "$d" add -A >/dev/null 2>&1
-}
-
-# The carried-prefix arm reports through its own lines, so its arms read those rather than the
-# first arm's. `CARRIED_ARMS` counts how many arms actually engaged the non-SKIPPED branch — the
-# liveness assertion at the bottom is what makes a future all-SKIPPED suite red by that fact.
-carried_arm() { # label · want-substring · want-rc · dir · [extra argv...]
-  local label="$1" want="$2" wrc="$3" d="$4"; shift 4
-  local out rc
-  out=$(cd "$d" && bash "$GATE_REL" "$@" 2>&1); rc=$?
-  case "$out" in *"carried-prefix arm SKIPPED"*) bad "$label — fixture took the SKIPPED branch, so it graded nothing"; return ;; esac
-  CARRIED_ARMS=$((CARRIED_ARMS+1))
-  if [ "$rc" != "$wrc" ]; then bad "$label — rc $rc, wanted $wrc"; printf '%s\n' "$out" | sed 's/^/      /' | head -12; return; fi
-  case "$out" in *"$want"*) ;; *) bad "$label — output does not carry '$want'"; printf '%s\n' "$out" | sed 's/^/      /' | head -12; return ;; esac
-  good "$label"
-}
-
-# --- the SKIP branch itself gets an arm, because a skip that looks like a pass is the class ----
-# TOOL-aRepatriatedFork-16 AC3/AC6 — THE CONSUMER, which is where the skip actually happens: gov's
-# kits installed under `scripts/`, a govkit receipt, NO registry. Its files are COPIED from this
-# repo rather than retyped, so they carry gov's own waived dual-spelling probes and legacy literals
-# — the bytes a consumer receives, and the five of them that redded one at nine hits. gov's waiver
-# rows key on gov's paths and never reach them there, so a gate that graded this tree would red.
-build_consumer_fixture() { # $1 = dir
-  local d="$1" f
-  mkdir -p "$d/scripts/codebase-map" "$d/scripts/hooks" "$d/scripts/memory-recall" "$d/.governance"
-  git -C "$d" init -q
-  git -C "$d" config user.email t@t.test; git -C "$d" config user.name t
-  cp "$GATE" "$d/scripts/${GATE##*/}"
-  cp "$ROOT/${PFX}check-wiring.sh" "$d/scripts/check-wiring.sh"
-  for f in map_lib.py gen_map.py adopt-codebase-map.sh; do
-    cp "$ROOT/${PFX}codebase-map/$f" "$d/scripts/codebase-map/$f"
-  done
-  printf 'kit\n' > "$d/scripts/hooks/README.md"; printf 'kit\n' > "$d/scripts/memory-recall/README.md"
-  printf '{"schema": 2, "gov_source": "local", "kits": [], "files": []}\n' > "$d/.governance/install.json"
-  git -C "$d" add -A >/dev/null 2>&1
-}
-N="$TMP/consumer"; build_consumer_fixture "$N"
-# LIVENESS: the fixture must carry root spellings of its own kits, or the skip below proves nothing.
-if grep -rqE '(^|[^/{}[:alnum:]._-])(codebase-map|hooks|memory-recall)/[A-Za-z0-9_.-]+\.(sh|py|json)' "$N/scripts"; then
-  good "AC3 the consumer fixture carries root-install spellings a grading gate would red on"
-else
-  bad "AC3 the consumer fixture carries no root-install spelling — the skip arms below prove nothing"
-fi
-nout=$(cd "$N/scripts" && bash "${GATE##*/}" 2>&1); nrc=$?
-[ "$nrc" = 0 ] && good "AC3 a consumer exits 0 — it ships nothing, so there is nothing to red on" \
-  || { bad "AC3 a consumer redded (rc $nrc) on bytes it received"; printf '%s\n' "$nout" | sed 's/^/      /' | head -8; }
-case "$nout" in
-  *"root-install arm SKIPPED"*) good "AC6 a non-kit-source repo SAYS its root-install arm went ungraded" ;;
-  *) bad "AC6 the root-install skip was silent — a skip that looks like a pass is indistinguishable from coverage" ;;
-esac
-case "$nout" in
-  *"carried-prefix arm SKIPPED"*) good "a non-kit-source repo SKIPS the carried arm and SAYS so" ;;
-  *) bad "a non-kit-source repo does not announce the carried skip"; printf '%s\n' "$nout" | sed 's/^/      /' | head -8 ;;
-esac
-
-# --- GREEN control: a kit source whose ratchet matches what is measured -----------------------
-G="$TMP/src-green"; mkfix_source "$G" 'The engine lives at '"${PFX}demo/thing.sh"' in this repo.'
-(cd "$G" && bash "$GATE_REL" --write-ratchet >/dev/null 2>&1)
-git -C "$G" add -A >/dev/null 2>&1
-carried_arm "a kit source with a fresh ratchet is clean" "carried-prefix clean" 0 "$G"
-
-# --- LIVENESS on the population: the ratchet must be NON-EMPTY, or every arm below is vacuous --
-if [ -s "$G/${PFX}install-prefix-carried.txt" ]; then
-  good "...over a NON-EMPTY ratchet, so the arms below are not grading an empty set"
-else
-  bad "the green fixture's ratchet is empty — every carried-prefix arm here proves nothing"
-fi
-
-# --- RED: a count that ROSE ------------------------------------------------------------------
-R="$TMP/src-rose"; mkfix_source "$R" 'The engine lives at '"${PFX}demo/thing.sh"' in this repo.'
-(cd "$R" && bash "$GATE_REL" --write-ratchet >/dev/null 2>&1)
-printf 'And also '"${PFX}demo/thing.sh"' again.\n' >> "$R/${PFX}demo/README.md"
-git -C "$R" add -A >/dev/null 2>&1
-carried_arm "a shipped file gaining a carried literal reds as ROSE" "ROSE" 1 "$R"
-
-# --- RED: a count that FELL and a row that did not ---------------------------------------------
-K="$TMP/src-slack"; mkfix_source "$K" 'The engine lives at '"${PFX}demo/thing.sh"' in this repo.'
-(cd "$K" && bash "$GATE_REL" --write-ratchet >/dev/null 2>&1)
-printf ''"${PFX}demo/thing.sh"'\t9\n' > "$K/${PFX}install-prefix-carried.txt"
-git -C "$K" add -A >/dev/null 2>&1
-carried_arm "a row whose count fell reds as SLACK rather than passing quietly" "SLACK" 1 "$K"
-
-# --- RED: a carrying file with NO row, over a NON-EMPTY ratchet -------------------------------
-# The ratchet must be NON-EMPTY for this arm to reach the awk at all. D4's other half changed the
-# guard from `-f` to `-s`, so an empty-but-present ratchet is now treated as MISSING and never meets
-# the comparison — which is the right outcome and is asserted on its own below. UNRECORDED is for
-# the PARTIAL case: a ratchet recording some carrying files and not others. The first cut of this
-# arm used the empty file and therefore tested a path the fix had just closed.
-U="$TMP/src-unrec"; mkfix_source "$U" 'The engine lives at '"${PFX}demo/thing.sh"' in this repo.'
-(cd "$U" && bash "$GATE_REL" --write-ratchet >/dev/null 2>&1)
-grep -v 'README\.md' "$U/${PFX}install-prefix-carried.txt" > "$U/keep.tmp" || true
-mv "$U/keep.tmp" "$U/${PFX}install-prefix-carried.txt"
-git -C "$U" add -A >/dev/null 2>&1
-carried_arm "a carrying file with NO row reds as UNRECORDED, over a non-empty ratchet" \
-            "UNRECORDED" 1 "$U"
-
-# --- D4: an EMPTY-but-present ratchet must not invert the awk's roles -------------------------
-E2="$TMP/src-empty"; mkfix_source "$E2" 'The engine lives at '"${PFX}demo/thing.sh"' in this repo.'
-: > "$E2/${PFX}install-prefix-carried.txt"
-git -C "$E2" add -A >/dev/null 2>&1
-eout=$(cd "$E2" && bash "$GATE_REL" 2>&1); erc=$?
-case "$eout" in
-  *SLACK*) bad "D4: an empty ratchet inverted the awk roles and reported SLACK for every file" ;;
-  *) good "D4 an empty-but-present ratchet does not invert the awk roles into SLACK" ;;
-esac
-[ "$erc" != 0 ] || bad "D4: an empty ratchet passed at exit 0"
-case "$eout" in
-  *"run --write-ratchet once"*) good "D4 ...and is treated as MISSING, which the -s guard is for" ;;
-  *) bad "D4: an empty ratchet neither inverted nor read as missing"; printf '%s\n' "$eout" | sed 's/^/      /' | head -6 ;;
-esac
-
-# --- RED: a MISSING ratchet is not a clean one -------------------------------------------------
-M="$TMP/src-missing"; mkfix_source "$M" 'The engine lives at '"${PFX}demo/thing.sh"' in this repo.'
-rm -f "$M/${PFX}install-prefix-carried.txt"
-carried_arm "a MISSING ratchet reds rather than passing" "run --write-ratchet once" 1 "$M"
-
-# --- D3: a DEAD derivation must not write an empty ratchet at exit 0 ---------------------------
-# The producer is stubbed by naming a python that does not run, which is the reachable real-world
-# shape: a kit source whose python cannot be resolved. Without a liveness assertion the gate wrote 0
-# rows, exited 0, and the next --check compared empty against empty forever. TOOL-aRepatriatedFork-46:
-# the gate carries its resolver inline, so the stub is a PATH whose three launcher names all exit
-# 9009, first on PATH, rather than a replaced resolver file beside it.
-D="$TMP/src-dead"; mkfix_source "$D" 'The engine lives at '"${PFX}demo/thing.sh"' in this repo.'
-(cd "$D" && bash "$GATE_REL" --write-ratchet >/dev/null 2>&1)
-git -C "$D" add -A >/dev/null 2>&1
-mkdir -p "$TMP/nopy"
-for _np in python3 python py; do printf '#!/usr/bin/env bash\nexit 9009\n' > "$TMP/nopy/$_np"; chmod +x "$TMP/nopy/$_np"; done
-dout=$(cd "$D" && PATH="$TMP/nopy:$PATH" bash "$GATE_REL" --write-ratchet 2>&1); drc=$?
-if [ "$drc" = 0 ] && [ ! -s "$D/${PFX}install-prefix-carried.txt" ]; then
-  bad "D3: a dead derivation truncated the ratchet to zero rows and exited 0"
-else
-  good "D3 a dead derivation does not write an empty ratchet at exit 0"
-  CARRIED_ARMS=$((CARRIED_ARMS+1))
-fi
-dout2=$(cd "$D" && PATH="$TMP/nopy:$PATH" bash "$GATE_REL" 2>&1); drc2=$?
-if [ "$drc2" = 0 ]; then
-  bad "D3: --check passed while the population derivation was dead"
-else
-  good "D3 ...and --check reds rather than reporting a clean empty population"
-fi
-
-# --- L1: THE GOAL STATE, GATED. DEPL-dCarriedReceipt-15's stated direction is to shrink these
-# counts to zero, and the liveness assertion used to sit on the HIT set — so a live derivation over
-# a repo that genuinely carries no literals was indistinguishable from a dead one, and on the day
-# the repo reached its own goal this leg would red with a false statement and no override short of
-# editing the gate. Asserted here as the endpoint rather than as today's tree.
-Z="$TMP/src-goal"; mkfix_source "$Z" 'The engine lives at {{TOOL_ROOT}}demo/thing.sh in this repo.'
-printf '#!/usr/bin/env bash
-# see {{TOOL_ROOT}}demo/README.md for what this does
-' > "$Z/${PFX}demo/thing.sh"
-git -C "$Z" add -A >/dev/null 2>&1
-# TOOL-aRepatriatedFork-23: since epoch 5 the ban reads every TRACKED file under the kit surface, and
-# the scaffolding every kit-source fixture copies in carries literals of its own. The gate and govkit
-# read those from disk, so untracking them leaves a kit source whose ban population is exactly the
-# kit's two files, both drained. Without this the goal state below is a state no fixture can reach.
-git -C "$Z" rm -q --cached ${PFX}govkit/govkit.py ${PFX}govkit/registry.toml ${PFX}lib/resolve-python.sh \
-  "$GATE_REL" ${PFX}demo/kit.toml
-(cd "$Z" && bash "$GATE_REL" --write-ratchet >/dev/null 2>&1)
-if [ "$(grep -cE '^[^#]' "$Z/${PFX}install-prefix-carried.txt" 2>/dev/null || true)" = 0 ]; then
-  good "L1 the goal-state fixture's ban list records ZERO rows, so the arm below is the zero state"
-else
-  bad "L1 the goal-state fixture still carries a literal, so the arm below grades a non-zero ban list"
-fi
-zout=$(cd "$Z" && bash "$GATE_REL" 2>&1); zrc=$?
-if [ "$zrc" = 0 ]; then
-  good "L1 a kit source carrying ZERO literals is CLEAN — the goal state passes"
-  CARRIED_ARMS=$((CARRIED_ARMS+1))
-else
-  bad "L1: the goal state reds — a repo that reached zero cannot pass its own gate"
-  printf '%s
-' "$zout" | sed 's/^/      /' | head -8
-fi
-case "$zout" in
-  *"POPULATION is empty"*) bad "L1: a live derivation over a zero-hit repo was called DEAD" ;;
-  *) good "L1 ...and the liveness assertion does not misreport it as a dead probe" ;;
-esac
-
-# --- L5: THE `FILENAME == pinf` ROLE RULE, ARMED DIRECTLY ---------------------------------------
-# Round 2's L5 measured this: swapping `FILENAME == pinf` back to `NR==FNR` in the gate left all 22
-# arms green. The unreachability is structural rather than lucky — the roles only diverge when file
-# 1 has ZERO records, and the sibling `-s` guard exits before awk ever runs on an empty ratchet — so
-# no arm routed through the gate can reach the divergent input. Per §7, a rule whose failing case has
-# never been observed is an assertion about nothing, and the next person tidying that awk undoes it
-# silently.
-#
-# So this arm skips the gate and feeds the awk PROGRAM ITSELF the one input the roles disagree on.
-# The program text is EXTRACTED from the gate rather than copied here: a copy would be two answers to
-# one question, and an edit to the real awk has to reach this arm or the arm grades a fossil.
-_awkprog="$TMP/role.awk"
-awk '/^  awk -F/ {grab=1; next} grab && /^    \}.*CARRIED/ {print "}"; exit} grab {print}' \
-  ${PFX}check-install-prefix.sh > "$_awkprog"
-if [ ! -s "$_awkprog" ] || ! grep -q 'UNRECORDED' "$_awkprog"; then
-  bad "L5: could not EXTRACT the awk program from the gate — this arm is grading nothing, which is the exact class it exists to close"
-else
-  # File 1 is the ratchet and is EMPTY (zero records). File 2 carries one measured row.
-  : > "$TMP/role-pin.tsv"
-  printf ''"${PFX}demo/thing.sh"'\t2\n' > "$TMP/role-now.tsv"
-  _rout=$(awk -F'\t' -v pinf="$TMP/role-pin.tsv" -f "$_awkprog" \
-            "$TMP/role-pin.tsv" "$TMP/role-now.tsv" 2>&1)
-  # `FILENAME == pinf` — pin[] stays empty, now[] takes the row, so UNRECORDED, which is the truth.
-  # `NR==FNR`          — pin[] takes FILE 2's row, now[] stays empty, so `SLACK … -> 0 (delete the
-  #                      row)`: telling the operator to delete a ratchet that records nothing, while
-  #                      the correct verdict never prints. That is D4/D13's original defect verbatim.
-  case "$_rout" in
-    *UNRECORDED*)
-      good "L5 a ZERO-RECORD ratchet keeps the awk roles straight — UNRECORDED, the true verdict"
-      CARRIED_ARMS=$((CARRIED_ARMS+1)) ;;
-    *SLACK*)
-      bad "L5: the awk roles INVERTED on a zero-record file 1 — it read the MEASURED file as the pin and printed SLACK. This is the D4/D13 defect back, and it is what NR==FNR does on this input" ;;
-    *)
-      bad "L5: the awk printed neither verdict on a zero-record file 1, so this arm observed nothing: $_rout" ;;
-  esac
-fi
-
-# --- TOOL-dRetiredFork-17: THE RATCHET IS A BAN ------------------------------------------------
-# THESE ARMS INVOKE THE GATE, and the first version did not. It hand-copied the gate's awk into
-# the suite and asserted on the copy, so it graded a transcription rather than the shipped code.
-# The closing review proved the consequence by staging a break: replacing the whole refusal
-# condition with `if false; then` left every arm green and the suite closing PASS. A gate whose
-# failing case has never been observed is an assertion about nothing, and a SUITE that cannot see
-# its gate switched off is that same defect one level up.
-#
-# The copies had already drifted, which is the other half of why the shape was wrong: the suite's
-# `seen[$1]=1` clause had grown a comment filter the shipped gate does not have.
-BAN_ARMS=0
-ban_arm() { # label · want-substring · want-rc · dir · [argv...]
-  local before=$CARRIED_ARMS
-  carried_arm "$@"
-  [ "$CARRIED_ARMS" -gt "$before" ] && BAN_ARMS=$((BAN_ARMS+1))
-  return 0
-}
-
-# B1 — a NEW carrier is REFUSED by the writer, where the ratchet it replaced would have absorbed it.
-B1="$TMP/ban-new"; mkfix_source "$B1" 'The engine lives at '"${PFX}demo/thing.sh"' in this repo.'
-(cd "$B1" && bash "$GATE_REL" --write-ratchet >/dev/null 2>&1)
-printf '#!/usr/bin/env bash\n# and see '"${PFX}demo/thing.sh"' too\n' > "$B1/${PFX}demo/second.sh"
-git -C "$B1" add -A >/dev/null 2>&1
-ban_arm "B1 --write-ratchet REFUSES a new carrier instead of absorbing it" "NEW carrier" 1 "$B1" --write-ratchet
-
-# B2 — a RISEN count is refused too, and reported as its own verdict because the remedy differs.
-B2="$TMP/ban-rise"; mkfix_source "$B2" 'The engine lives at '"${PFX}demo/thing.sh"' in this repo.'
-(cd "$B2" && bash "$GATE_REL" --write-ratchet >/dev/null 2>&1)
-printf 'And again '"${PFX}demo/thing.sh."'\n' >> "$B2/${PFX}demo/README.md"
-git -C "$B2" add -A >/dev/null 2>&1
-ban_arm "B2 --write-ratchet REFUSES a risen count" "RISEN count" 1 "$B2" --write-ratchet
-
-# B3 — THE NEGATIVE, and the arm that stops B1 and B2 proving too much. A DROP must still be
-# writable, or the ban has broken the ratchet it replaced and the only legal state is whatever the
-# file already says, forever.
-B3="$TMP/ban-drop"; mkfix_source "$B3" 'The engine lives at '"${PFX}demo/thing.sh"' in this repo.'
-(cd "$B3" && bash "$GATE_REL" --write-ratchet >/dev/null 2>&1)
-printf 'nothing carried here now\n' > "$B3/${PFX}demo/README.md"
-git -C "$B3" add -A >/dev/null 2>&1
-b3out=$(cd "$B3" && bash "$GATE_REL" --write-ratchet 2>&1); b3rc=$?
-if [ "$b3rc" = 0 ]; then
-  good "B3 ...and a DROP is still written — the ban did not break progress"
-  BAN_ARMS=$((BAN_ARMS+1))
-else
-  bad "B3 a DROP was REFUSED (rc $b3rc) — the ban forbids recording progress, so the only legal state is the current one forever"
-  printf '%s\n' "$b3out" | sed 's/^/      /' | head -8
-fi
-
-# B4 — a hand-written reason column SURVIVES a legitimate write. Without the join that preserves
-# it, the next drop erases every justification in the file and leaves a ban nobody can account for.
-B4="$TMP/ban-reason"; mkfix_source "$B4" 'The engine lives at '"${PFX}demo/thing.sh"' in this repo.'
-(cd "$B4" && bash "$GATE_REL" --write-ratchet >/dev/null 2>&1)
-awk -F'\t' -v OFS='\t' '/README/ { print $1, $2, $3, "a person decided this"; next } { print }' \
-  "$B4/${PFX}install-prefix-carried.txt" > "$B4/.tmpban" \
-  && mv "$B4/.tmpban" "$B4/${PFX}install-prefix-carried.txt"
-printf 'nothing carried here now\n' > "$B4/${PFX}demo/thing.sh"
-git -C "$B4" add -A >/dev/null 2>&1
-(cd "$B4" && bash "$GATE_REL" --write-ratchet >/dev/null 2>&1)
-if grep -q 'a person decided this' "$B4/${PFX}install-prefix-carried.txt"; then
-  good "B4 a hand-written reason column survives a later write"
-  BAN_ARMS=$((BAN_ARMS+1))
-else
-  bad "B4 the reason column was ERASED by a later write — every justification in a ban list would be lost on the next drop"
-fi
-
-# B5 — the epoch guard. `--rebaseline` is the ONE mode that may add rows, so a guard that does not
-# hold turns the ban back into an exemption form with a longer name.
-B5="$TMP/ban-epoch"; mkfix_source "$B5" 'The engine lives at '"${PFX}demo/thing.sh"' in this repo.'
-(cd "$B5" && bash "$GATE_REL" --rebaseline >/dev/null 2>&1)
-ban_arm "B5 --rebaseline REFUSES when the recorded epoch already matches" "REFUSING to rebaseline" 1 "$B5" --rebaseline
-
-# ==================== TOOL-cWidenedNet-1 — THE WIDENED PREDICATE AND THE RECEIVED SET ===========
-# Every arm below was observed RED before its fix was wired, per §7. The controls matter more than
-# usual here: three of the four changes make the gate see MORE, and a suite with only red arms
-# cannot tell "the gate caught it" from "the gate rejects everything".
-
-# --- S1, the extension class. The `.txt` sidecar spelling was invisible to both arms until epoch 3.
-X1="$TMP/ext-red"; mkfix "$X1" 'The declared caps live in memory-tree/limits.txt, one row per subject.'  # gov:root-fixture — the RED fixture this arm exists to catch
-printf 'memory-tree/limits.txt\n' > "$X1/${PFX}memory-tree/limits.txt"  # gov:root-fixture — the RED fixture this arm exists to catch
-git -C "$X1" add -A >/dev/null 2>&1
-run_arm "S1 a .txt sidecar at a root spelling is caught" "spells a root-install kit path" 1 "$X1"
-X2="$TMP/ext-green"; mkfix "$X2" 'The declared caps live in '"${PFX}memory-tree/limits.txt"', one row per subject.'
-run_arm "S1 ...and the same sidecar at the declared prefix is clean" "no undeclared root-install spelling" 0 "$X2"
-
-# --- S4, the gate's own sidecars. The DISCRIMINATING fixture: the gate sits somewhere that is not
-# `<prefix>/`, and its waiver registry sits beside it. A gate still spelling `<prefix>/…` finds no waiver
-# registry, so the waived hit reds — which is the defect, visible as a failing arm rather than as a
-# wrong verdict nobody sees.
-# The WHOLE kit tree moves, not the gate alone: since the kit walk derives its prefix too, a gate at
-# `vendor/gov/` enumerates `vendor/gov/*/` and a fixture that left its kits under `<prefix>/` handed it
-# an empty population — the refusal, not a verdict. Two segments on purpose: one segment is the
-# shape the walk was first written for and would not have caught the pinned field.
-# TOOL-aRepatriatedFork-46: govkit and the library move WITH it. The gate finds govkit through the
-# sibling-kit resolver beside its own directory, and govkit reads a descriptor's home relative to the
-# tool root it sits in, so a registry left at the old layout is a consumer's tree to both.
-P="$TMP/prefix"; mkfix "$P" 'Run `bash memory-tree/check-memory-hygiene.sh` to lint.'   # gov:root-fixture — the fixture's own hit, waived below
-mkdir -p "$P/vendor/gov"
-(cd "$P/${PFX}" && git mv memory-tree govkit lib install-prefix-waivers.txt install-prefix-carried.txt "${GATE##*/}" ../vendor/gov/)
-printf 'vendor/gov/memory-tree/README.md:1  the fixture hit this arm waives\n' > "$P/vendor/gov/install-prefix-waivers.txt"
-git -C "$P" add -A >/dev/null 2>&1
-write_ban_list "$P" "vendor/gov/${GATE##*/}"
-pout=$(cd "$P" && bash "vendor/gov/${GATE##*/}" 2>&1); prc=$?
-if [ "$prc" != 0 ]; then
-  bad "S4 the gate resolves its sidecars beside ITSELF, not at ${PFX} (exit $prc): $(printf '%s' "$pout" | head -3)"
-else
-  case "$pout" in *"1 declared waiver"*) good "S4 the gate resolves its sidecars beside ITSELF, not at ${PFX}" ;;
-    *) bad "S4 the gate ran at vendor/gov but read no waiver registry: $(printf '%s' "$pout" | head -2)" ;; esac
-fi
-# TOOL-aRepatriatedFork-16 AC5 — with the waiver gone the SAME hit refuses, and the refusal names the
-# prefix this gate derived. It used to name gov's default, which is false here.
-printf '# waivers\n' > "$P/vendor/gov/install-prefix-waivers.txt"
-pout=$(cd "$P" && bash "vendor/gov/${GATE##*/}" 2>&1); prc=$?
-case "$prc:$pout" in
-  1:*"install at"*"vendor/gov/<kit>/"*) good "AC5 the refusal names the DERIVED prefix, vendor/gov/" ;;
-  *) bad "AC5 the refusal does not name vendor/gov/ (rc $prc): $(printf '%s' "$pout" | head -3)" ;;
-esac
-
-# --- S5/S6, the received set and the per-line marker. `arm_received_set` refuses a fixture that took the
-# skip branch, for the same reason `carried_arm` does: an arm reporting on a population it never
-# graded is the shape this whole unit exists to remove.
-arm_received_set() { # label · want-substring · want-rc · dir
-  local label="$1" want="$2" wrc="$3" d="$4" out rc
-  out=$(cd "$d" && bash "$GATE_REL" 2>&1); rc=$?
-  case "$out" in *"root-install arm SKIPPED"*) bad "$label — fixture took the SKIPPED branch, so it graded no received test"; return ;; esac
-  if [ "$rc" != "$wrc" ]; then bad "$label — rc $rc, wanted $wrc"; printf '%s\n' "$out" | sed 's/^/      /' | head -8; return; fi
-  case "$out" in *"$want"*) good "$label" ;; *) bad "$label — output does not carry '$want'"; printf '%s\n' "$out" | sed 's/^/      /' | head -8 ;; esac
-}
-build_received_fixture() { # $1 = dir · $2 = the line to put in the shipped .test.sh
-  mkfix_source "$1" 'The engine lives at '"${PFX}demo/thing.sh"' in this repo.'
-  printf '#!/usr/bin/env bash\n%s\n' "$2" > "$1/${PFX}demo/demo.test.sh"
-  git -C "$1" add -A >/dev/null 2>&1
-  (cd "$1" && bash "$GATE_REL" --write-ratchet >/dev/null 2>&1) || true
-}
-R1="$TMP/recv-red"; build_received_fixture "$R1" 'bash demo/thing.sh'
-arm_received_set "S5 a RECEIVED test carrying a root spelling is caught" "spells a root-install kit path" 1 "$R1"
-R2="$TMP/recv-marked"; build_received_fixture "$R2" 'bash demo/thing.sh   # gov:root-fixture — the scratch repo is built at the root prefix'
-arm_received_set "S6 ...and the same line with a reasoned marker is clean" "1 marked fixture line" 0 "$R2"
-R3="$TMP/recv-bare"; build_received_fixture "$R3" 'bash demo/thing.sh   # gov:root-fixture'
-arm_received_set "S6 ...and a marker with NO reason is a refusal, not an exemption" "MARKER WITH NO REASON" 1 "$R3"
-
-# --- S5's OTHER half: the file-level exclusion still holds for a test nobody receives. Without this
-# control the arms above would also pass if the exclusion had simply been deleted, which would red
-# every fixture in every kit's own suite.
-R4="$TMP/recv-unshipped"; build_received_fixture "$R4" 'bash demo/thing.sh   # gov:root-fixture — kept clean so the ratchet below is not the thing under test'
-mkdir -p "$R4/${PFX}other"
-printf '#!/usr/bin/env bash\nbash demo/thing.sh\n' > "$R4/${PFX}other/stray.test.sh"
-git -C "$R4" add -A >/dev/null 2>&1
-# Epoch 5's ban counts that stray file, shipped or not, so the ban list is re-measured from scratch
-# here: this arm grades arm 1's exclusion, and a ban verdict would answer a different question.
-rm -f "$R4/${PFX}install-prefix-carried.txt"; (cd "$R4" && bash "$GATE_REL" --write-ratchet >/dev/null 2>&1)
-arm_received_set "S5 an UNSHIPPED test keeps its exclusion — no descriptor resolves it" "no undeclared root-install spelling" 0 "$R4"
-
-# ==================== TOOL-cMendedVintage-5 — EPOCH 4, THE LEAD CLASS ==========================
-# A shell default expansion is a carried literal — a variable that resolves at the target's prefix
-# with a hardcoded fallback that resolves only at gov's — and it was invisible to every epoch before
-# this one, because `-` sat in the class of characters that may not precede a hit.
-#
-# TWO arms, because one of them alone only proves the gate reds at something. The RED fixture uses
-# the `:-` form the widening admits. The GREEN control used the `/`-preceded form epoch 4 kept
-# excluded; epoch 5 counts that form by the owner's ruling, so the control is now the drained form,
-# and the `/`-preceded arm below asserts the rise instead.
-#
-# NOTE FOR WHOEVER EDITS THIS BLOCK: do not complete a kit path anywhere in this comment. `-` is no
-# longer an excluded lead character, so a sentence quoting one is itself a hit, and a raised row is
-# the one thing `--write-ratchet` may not absorb. The fixture spellings below are safe only because
-# `demo` is not a kit in this repo.
-E4R="$TMP/epoch4-default"; mkfix_source "$E4R" 'The engine lives at '"${PFX}demo/thing.sh"' in this repo.'
-(cd "$E4R" && bash "$GATE_REL" --write-ratchet >/dev/null 2>&1)
-printf 'Run it as ENGINE=${GOV_ENGINE:-tools/demo/thing.sh} from anywhere in the tree.\n' >> "$E4R/${PFX}demo/README.md"
-git -C "$E4R" add -A >/dev/null 2>&1
-carried_arm 'epoch4 a ${VAR:-…} default RAISES the count the ratchet recorded' "ROSE" 1 "$E4R" --check
-
-# EPOCH 5 FLIPPED THIS CONTROL. It asserted a `<gov>/`-led spelling was NOT counted, which was epoch
-# 4's measured choice; the owner's ruling on TOOL-aRepatriatedFork-23 §8 F2 counts it (derived where
-# printed, a prose token elsewhere). The control that still discriminates is the DRAINED form: a
-# `<prefix>/` prose token and a `{prefix}/` render token lead a kit path and raise nothing.
-E4G="$TMP/epoch4-slash"; mkfix_source "$E4G" 'The engine lives at '"${PFX}demo/thing.sh"' in this repo.'
-(cd "$E4G" && bash "$GATE_REL" --write-ratchet >/dev/null 2>&1)
-printf "Copy it from <gov>/${PFX}demo/thing.sh into your own tree.\n" >> "$E4G/${PFX}demo/README.md"
-git -C "$E4G" add -A >/dev/null 2>&1
-carried_arm "epoch5 a <gov>/-led spelling of gov's own checkout now RAISES the count (F2)" "ROSE" 1 "$E4G"
-
-E5D="$TMP/epoch5-drained"; mkfix_source "$E5D" 'The engine lives at '"${PFX}demo/thing.sh"' in this repo.'
-(cd "$E5D" && bash "$GATE_REL" --write-ratchet >/dev/null 2>&1)
-printf 'Run <prefix>/demo/thing.sh, or {prefix}/demo/thing.sh, or {{TOOL_ROOT}}demo/thing.sh.\n' >> "$E5D/${PFX}demo/README.md"
-git -C "$E5D" add -A >/dev/null 2>&1
-carried_arm "epoch5 ...and the three DRAINED forms raise nothing" "carried-prefix clean" 0 "$E5D"
-
-# ==================== TOOL-aRepatriatedFork-23 — EPOCH 5, THE WHOLE CLASS ======================
-# Every arm here was run RED against the epoch-4 gate first and is recorded in the unit's
-# acceptance ledger. `read_ban_rows` is the gate's own `--list` section, so a row asserted here is the
-# row the ban list would record.
-read_ban_rows() { # dir -> the carried-prefix rows `--list` prints, one per line, unindented
-  (cd "$1" && bash "$GATE_REL" --list 2>&1) | sed -n '/carried-prefix rows/,$p' | sed -n 's/^  //p'
-}
-check_ban_row() { # label · dir · a fixed row prefix that must appear, e.g. "<prefix>/demo/x.md<TAB>1<TAB>"
-  local rows
-  rows=$(read_ban_rows "$2")
-  case "$rows" in *"carried-prefix arm SKIPPED"*|"") bad "$1 — the ban listed nothing, so the arm graded nothing"; return ;; esac
-  CARRIED_ARMS=$((CARRIED_ARMS+1))
-  if printf '%s\n' "$rows" | grep -qF -- "$3"; then good "$1"
-  else bad "$1 — no row starting '$3'"; printf '%s\n' "$rows" | sed 's/^/      /' | head -20; fi
-}
-
-# AC1 — one file per spelling, so each row IS one spelling and its count must be exactly 1.
-A1="$TMP/e5-spellings"; mkfix_source "$A1" 'A demo kit.'
-printf 'Copy it to <project>/'"${PFX}demo/thing.sh"' by hand.\n' > "$A1/${PFX}demo/s1-slash.md"
-printf 'The kit lives in '"${PFX}demo"' in every tree.\n' > "$A1/${PFX}demo/s1-dir.md"
-printf 'import pathlib\nkit = pathlib.Path(".") / "tools" / "demo"\n' > "$A1/${PFX}demo/s1-join.py"
-printf 'Run '"${PFX}ghost.sh"' first.\n' > "$A1/${PFX}demo/s1-loose.md"
-printf 'Run demo/thing.sh from the root.\n' > "$A1/${PFX}demo/s1-root.md"
-printf 'Run scripts/demo/thing.sh at a scripts install.\n' > "$A1/${PFX}demo/f4-prefix.md"
-printf 'bash "$HERE/../demo/thing.sh"\n' > "$A1/${PFX}demo/f1-shell.sh"
-printf 'from pathlib import Path\nHERE = Path(__file__).parent\nkit = HERE.parent / "demo"\n' > "$A1/${PFX}demo/f1-join.py"
-git -C "$A1" add -A >/dev/null 2>&1
-T=$(printf '\t')
-check_ban_row "AC1 a /-led path counts"                         "$A1" "${PFX}demo/s1-slash.md${T}1${T}demo"
-check_ban_row "AC1 a directory-only reference counts"           "$A1" "${PFX}demo/s1-dir.md${T}1${T}demo"
-check_ban_row "AC1 a quoted prefix joined to a kit counts once" "$A1" "${PFX}demo/s1-join.py${T}1${T}demo"
-check_ban_row "AC1 a loose name counts though no such file exists" "$A1" "${PFX}demo/s1-loose.md${T}1${T}(loose)"
-check_ban_row "AC1 the root spelling counts"                    "$A1" "${PFX}demo/s1-root.md${T}1${T}demo"
-check_ban_row "AC1 a kit under ANY literal prefix counts (F4)"  "$A1" "${PFX}demo/f4-prefix.md${T}1${T}demo"
-check_ban_row "AC1 a kit after a derived shell base counts (F1)" "$A1" "${PFX}demo/f1-shell.sh${T}1${T}demo"
-check_ban_row "AC1 a quoted kit joined onto a derived base counts (F1)" "$A1" "${PFX}demo/f1-join.py${T}1${T}demo"
-
-# AC3 — the population is every TRACKED file under the kit surface: a file under an exempt path no
-# descriptor resolves is counted, and the ban list's own rows are not.
-A3="$TMP/e5-population"; mkfix_source "$A3" 'The engine lives at '"${PFX}demo/thing.sh"' in this repo.'
-printf 'Run '"${PFX}demo/thing.sh"' by hand.\n' > "$A3/${PFX}lib/notes.md"
-git -C "$A3" add -A >/dev/null 2>&1
-(cd "$A3" && bash "$GATE_REL" --write-ratchet >/dev/null 2>&1); git -C "$A3" add -A >/dev/null 2>&1
-check_ban_row "AC3 a file NO descriptor resolves is counted" "$A3" "${PFX}lib/notes.md${T}1${T}demo"
-if read_ban_rows "$A3" | grep -q '^'"${PFX}install-prefix-carried"'\.txt'; then
-  bad "AC3 the ban list counted its OWN rows"
-else
-  good "AC3 ...and the ban list does not count its own rows"
-fi
-
-# AC4 — a `gov:root-fixture` marker excuses the line from arm 1 and NOT from the ban.
-A4="$TMP/e5-marker"; mkfix_source "$A4" 'Run demo/thing.sh by hand.  # gov:root-fixture — the arm-4 fixture line'
-(cd "$A4" && bash "$GATE_REL" --write-ratchet >/dev/null 2>&1); git -C "$A4" add -A >/dev/null 2>&1
-carried_arm "AC4 a marked root spelling passes arm 1" "1 marked fixture line" 0 "$A4"
-check_ban_row "AC4 ...and the ban still counts it" "$A4" "${PFX}demo/README.md${T}1${T}demo"
-
-# AC5 — the four homonym shapes count NOTHING, beside one control that counts ONE, so a row of 1 is
-# the control and a row of 0 would mean the file was never read.
-A5="$TMP/e5-homonyms"; mkfix_source "$A5" 'A demo kit.'
-cat > "$A5/${PFX}demo/homonyms.py" <<'PY'
-cfg = {"tools": 1}
-x = cfg["tools"]
-y = cfg.get("tools", [])
-ci = root / '.github' / 'demo'
-side = gd.resolve() / "demo" / "log.jsonl"
-path = common / "demo" / "lookups.jsonl"
-flow_dir = sdir / "demo"
-# its Skill lands at .claude/skills/demo/SKILL.md
-kit = parent / "demo"
-PY
-git -C "$A5" add -A >/dev/null 2>&1
-check_ban_row "AC5 the homonyms count nothing and the control counts one" "$A5" "${PFX}demo/homonyms.py${T}1${T}demo"
-# ...and each census homonym still exists in THIS tree, or the rule above guards a shape nobody spells.
+# The homonym shapes above are CENSUS shapes: each must still exist in THIS tree, or the rule guards a
+# spelling nobody writes.
 for _site in 'gd.resolve() / "codebase-map" / "reinvention-backlog.md"' 'common / "codebase-map" / "lookups.jsonl"' \
              "root / '.github' / 'workflows'" 'sdir / "workflows"'; do
-  if git -C "$ROOT" grep -qF -- "$_site"; then good "AC5 census homonym still present: $_site"
-  else bad "AC5 census homonym GONE, so its arm matches nothing: $_site"; fi
+  if git -C "$ROOT" grep -qF -- "$_site"; then good "census homonym still present: $_site"
+  else bad "census homonym GONE, so its arm matches nothing: $_site"; fi
 done
 
-# AC8 — a counter that DIES refuses. GOV_PYTHON hands the gate's inline resolver a wrapper that runs
-# python for everything but the ban's counter, so arms 1 and 3 stay alive and only the counter is dead.
-A8="$TMP/e5-deadcounter"; mkfix_source "$A8" 'The engine lives at '"${PFX}demo/thing.sh"' in this repo.'
-(cd "$A8" && bash "$GATE_REL" --write-ratchet >/dev/null 2>&1); git -C "$A8" add -A >/dev/null 2>&1
-_realpy=$(. "$ROOT/${PFX}lib/resolve-python.sh" && resolve_python)
-printf '#!/usr/bin/env bash\ncase "${2:-}" in *"the ban'"'"'s counter"*) exit 3 ;; esac\nexec "%s" "$@"\n' "$_realpy" > "$A8/pywrap.sh"
-chmod +x "$A8/pywrap.sh"
-a8out=$(cd "$A8" && GOV_PYTHON="$A8/pywrap.sh" bash "$GATE_REL" --write-ratchet 2>&1); a8rc=$?
-if [ "$a8rc" != 0 ] && [ -s "$A8/${PFX}install-prefix-carried.txt" ]; then
-  case "$a8out" in *"COUNTER died"*) good "AC8 a dead counter REFUSES to write and names itself"; CARRIED_ARMS=$((CARRIED_ARMS+1)) ;;
-    *) bad "AC8 a dead counter refused, but for another reason: $(printf '%s' "$a8out" | head -2)" ;; esac
-else
-  bad "AC8 a dead counter wrote the ban list (rc $a8rc) — zero rows read as zero literals"
-fi
-a8out=$(cd "$A8" && GOV_PYTHON="$A8/pywrap.sh" bash "$GATE_REL" 2>&1); a8rc=$?
-case "$a8rc:$a8out" in 0:*) bad "AC8 --check passed with a dead counter" ;;
-  *"COUNTER died"*) good "AC8 ...and --check reds on it" ;;
-  *) bad "AC8 --check redded, but not on the counter: $(printf '%s' "$a8out" | tail -2)" ;; esac
+# ==================== the POPULATION is every tracked file, shipped or not =====================
+P1="$TMP/population"; build_source_fixture "$P1" 'A qdemo kit.'
+mkdir -p "$P1/${PFX}notes"
+printf 'Run %sqdemo/thing.sh by hand.\n' "${TL}s/" > "$P1/${PFX}notes/aside.md"
+git -C "$P1" add -A >/dev/null 2>&1
+run_arm "a tracked file NO descriptor resolves is graded" "  ${PFX}notes/aside.md:1  qdemo" 1 "$P1"
+git -C "$P1" rm -q --cached "${PFX}notes/aside.md"
+run_arm "...and the same file UNTRACKED is not" "install-prefix: clean — " 0 "$P1"
 
-# ==================== TOOL-aRepatriatedFork-46 — EPOCH 6, HOMONYMS AND BRACES ===================
-# Every arm here was run RED against the epoch-5 gate first and is recorded in the unit's acceptance
-# ledger. One file per rule, each carrying the shapes that must NOT count beside one control that
-# must, so a row of 1 is the control and a missing row means the file was never read.
-# S1 — a quoted kit segment after a quoted literal and a comma is a path only inside a path join.
-E6A="$TMP/e6-homonyms"; mkfix_source "$E6A" 'A demo kit.'
-printf '%s\n' 'import os' 'run("plan", "--kits", "demo")' 'x = ["bin", "demo"]' \
-  'cfg = {"matcher": "a", "demo": []}' 'w = os.path.join(w, "scripts", "demo")' > "$E6A/${PFX}demo/e6-homonyms.py"
-git -C "$E6A" add -A >/dev/null 2>&1
-check_ban_row "E6 S1 an argv, a list member and a JSON key count nothing; the path join counts one" \
-  "$E6A" "${PFX}demo/e6-homonyms.py${T}1${T}demo"
-# S2 — a brace that is not a render token hides no kit name, in shell or in a Python f-string.
-E6B="$TMP/e6-braces"; mkfix_source "$E6B" 'A demo kit.'
-printf '%s\n' 'bash "$ROOT/${PFX}demo/thing.sh"' > "$E6B/${PFX}demo/e6-brace.sh"
-printf '%s\n' 'p = f"{PFX}demo/thing.py"' > "$E6B/${PFX}demo/e6-fstring.py"
-printf '%s\n' '{prefix}/demo/thing.sh' '{{TOOL_ROOT}}demo/thing.sh' '<prefix>/demo/thing.sh' \
-  '<tool-root>/demo/thing.sh' 'and the control, {PFX}demo/thing.sh' > "$E6B/${PFX}demo/e6-drained.md"
-git -C "$E6B" add -A >/dev/null 2>&1
-check_ban_row 'E6 S2 a ${PFX}-led kit path counts' "$E6B" "${PFX}demo/e6-brace.sh${T}1${T}demo"
-check_ban_row 'E6 S2 a {PFX}-led kit path in an f-string counts' "$E6B" "${PFX}demo/e6-fstring.py${T}1${T}demo"
-check_ban_row "E6 S2 the four drained tokens count nothing; the control counts one" \
-  "$E6B" "${PFX}demo/e6-drained.md${T}1${T}demo"
+# ==================== AC9 — the render rule ====================================================
+R="$TMP/render"; build_source_fixture "$R" 'A qdemo kit.'
+read_gate "$R"
+case "$LAST_OUT" in *"1 render(s) left out"*) good "AC9 a file matching its template whole is left out, and counted" ;;
+  *) bad "AC9 the fixture render was not left out: $(printf '%s' "$LAST_OUT" | tail -2)" ;; esac
+_list=$(cd "$R" && bash "$GATE_REL" --list 2>&1)
+case "$_list" in *"render  ${PFX}qdemo/page.md  <- ${PFX}qdemo/page.template.md"*) good "AC9 --list names the render and its template" ;;
+  *) bad "AC9 --list does not name the render: $(printf '%s' "$_list" | head -3)" ;; esac
+printf 'And also %sqdemo/thing.sh.\n' "$PFX" >> "$R/${PFX}qdemo/page.md"
+git -C "$R" add -A >/dev/null 2>&1
+run_arm "AC9 ...and one appended line puts it back in the population, named" "  ${PFX}qdemo/page.md:1  qdemo" 1 "$R"
+# A token is ONE LINE of text: a value spanning a newline is not a render of this template.
+printf 'Run %sqdemo\n/thing.sh by hand.\n' "$PFX" > "$R/${PFX}qdemo/page.md"
+git -C "$R" add -A >/dev/null 2>&1
+read_gate "$R"
+case "$LAST_OUT" in *"0 render(s) left out"*) good "AC9 a token value spanning a newline does not match" ;;
+  *) bad "AC9 a multi-line token value matched the template: $(printf '%s' "$LAST_OUT" | tail -1)" ;; esac
 
-# ==================== TOOL-aRepatriatedFork-2 S8 — ARM 3, RUNTIME LITERALS =====================
-# Three fixtures over one mechanism: an argv spelled `$ROOT/` plus gov's prefix (P1's `$VAR/` lead,
-# which no earlier epoch could see), a Python join of a quoted `tools` segment (P2), and that same
-# join carrying a marker with its reason, which is the green control. `RUNTIME_ARMS` counts the arms
-# whose output proves arm 3 actually ran, so a fixture that stopped reaching it reds the liveness row
-# below rather than passing by grading nothing. `demo` is no kit of this repo, so none of these
-# spellings is a literal the ban list counts here.
-RUNTIME_ARMS=0
-runtime_arm() { # label · want-substring · want-rc · dir
-  local label="$1" want="$2" wrc="$3" d="$4" out rc
-  out=$(cd "$d" && bash "$GATE_REL" --check 2>&1); rc=$?
-  case "$out" in *"runtime literals clean"*|*"SHIPPED engine spells"*) RUNTIME_ARMS=$((RUNTIME_ARMS+1)) ;;
-    *) bad "$label — arm 3 never ran"; printf '%s\n' "$out" | sed 's/^/      /' | head -8; return ;; esac
-  if [ "$rc" != "$wrc" ]; then bad "$label — rc $rc, wanted $wrc"; printf '%s\n' "$out" | sed 's/^/      /' | head -12; return; fi
-  case "$out" in *"$want"*) ;; *) bad "$label — output does not carry '$want'"; printf '%s\n' "$out" | sed 's/^/      /' | head -12; return ;; esac
-  good "$label"
-}
-RT1="$TMP/rt-argv"; mkfix_source "$RT1" 'A demo kit.'
-(cd "$RT1" && bash "$GATE_REL" --write-ratchet >/dev/null 2>&1)
-printf 'bash "$ROOT/'"${PFX}demo/thing.sh"'" --go\n' >> "$RT1/${PFX}demo/thing.sh"
-git -C "$RT1" add -A >/dev/null 2>&1
-runtime_arm 'runtime P1 a $ROOT/-led argv naming a kit path REDS by line' "${PFX}demo/thing.sh:3  P1" 1 "$RT1"
+# ==================== AC3 — no mode writes anything ==========================================
+for _m in --write-ratchet --rebaseline; do
+  run_arm "AC3 $_m is refused with the usage line" "a pure ban has no mode that writes anything" 2 "$G" "$GATE_REL" "$_m"
+done
 
-RT2="$TMP/rt-join"; mkfix_source "$RT2" 'A demo kit.'
-(cd "$RT2" && bash "$GATE_REL" --write-ratchet >/dev/null 2>&1)
-printf 'import pathlib\nkit = pathlib.Path(".") / "tools" / "demo"\n' > "$RT2/${PFX}demo/find.py"
-git -C "$RT2" add -A >/dev/null 2>&1
-runtime_arm 'runtime P2 a "tools" / "<kit>" join REDS by line' "${PFX}demo/find.py:2  P2" 1 "$RT2"
+# ==================== the prefix is DERIVED: a two-segment install ============================
+# The WHOLE tool root moves, the gate with it: a gate still spelling gov's prefix would enumerate no
+# kit there and refuse, and one pinning the kit's awk field at 2 would name `gov` as every kit.
+V="$TMP/vendor"; build_source_fixture "$V" 'A qdemo kit.'
+if [ -n "$PFX" ]; then (cd "$V" && mkdir -p vendor && git mv "${PFX%/}" vendor/gov)
+else (cd "$V" && mkdir -p vendor/gov && git mv "$GK" qdemo "${GATE##*/}" vendor/gov/); fi
+run_arm "a gate at vendor/gov/ grades its own tool root" "install-prefix: clean — " 0 "$V" "vendor/gov/${GATE##*/}"
+printf 'Run vendor/gov/qdemo/thing.sh there.\n' >> "$V/vendor/gov/qdemo/README.md"
+git -C "$V" add -A >/dev/null 2>&1
+run_arm "...and names a literal of its own prefix by <path>:<line>" "  vendor/gov/qdemo/README.md:2  qdemo" 1 "$V" "vendor/gov/${GATE##*/}"
 
-RT3="$TMP/rt-marked"; mkfix_source "$RT3" 'A demo kit.'
-printf 'import pathlib\nkit = pathlib.Path(".") / "tools" / "demo"  # gov:prefix-literal — a fixture layout, correct by construction\n' > "$RT3/${PFX}demo/find.py"
-git -C "$RT3" add -A >/dev/null 2>&1
-(cd "$RT3" && bash "$GATE_REL" --write-ratchet >/dev/null 2>&1)
-runtime_arm 'runtime ...and the same join, MARKED with a reason, is the green control' "1 marked line(s)" 0 "$RT3"
+# ==================== the SKIP, and the refusals that keep a dead probe from passing ==========
+# A CONSUMER: kits under a prefix, a receipt naming no deployer, no registry. It ships nothing, so it
+# is SKIPPED out loud — and it carries a spelling a grading gate WOULD red on, or the skip proves nothing.
+N="$TMP/consumer"; mkdir -p "$N/scripts/qdemo" "$N/.governance"
+git -C "$N" init -q; git -C "$N" config user.email t@t.test; git -C "$N" config user.name t
+cp "$GATE" "$N/scripts/${GATE##*/}"
+printf 'Run qdemo/thing.sh by hand.\n' > "$N/scripts/qdemo/README.md"
+printf '{"schema": 2, "gov_source": "local", "kits": [], "files": []}\n' > "$N/.governance/install.json"
+git -C "$N" add -A >/dev/null 2>&1
+nout=$(cd "$N/scripts" && bash "${GATE##*/}" 2>&1); nrc=$?
+[ "$nrc" = 0 ] && good "a consumer exits 0 — it ships nothing" || bad "a consumer redded (rc $nrc) on bytes it received: $nout"
+case "$nout" in *"SKIPPED — this repo is not a kit SOURCE"*) good "...and SAYS its files went ungraded" ;;
+  *) bad "the consumer skip was silent — a skip that looks like a pass is indistinguishable from coverage" ;; esac
 
-# The JS reader's comment scanner must know its strings: a quoted glob carrying `/*` opened a block
-# comment in the first cut, and every line after it went unread (a-pair-exists-and-it-is-the-wrong-one).
-RT4="$TMP/rt-js-glob"; mkfix_source "$RT4" 'A demo kit.'
-(cd "$RT4" && bash "$GATE_REL" --write-ratchet >/dev/null 2>&1)
-printf "const g = '*builds/*/README.md'\nconst p = path.join(root, 'tools', 'demo')\n" > "$RT4/${PFX}demo/find.js"
-git -C "$RT4" add -A >/dev/null 2>&1
-runtime_arm 'runtime a join AFTER a quoted /* glob in JS still REDS by line' "${PFX}demo/find.js:2  P2" 1 "$RT4"
+# NO KIT DIRECTORIES: the receipt points the resolver at a deployer outside the gate's own root, so the
+# kit-source test passes and the kit walk under the gate's directory finds nothing to enumerate.
+E="$TMP/nokits"; mkdir -p "$E/solo" "$E/elsewhere/gk" "$E/.governance"
+git -C "$E" init -q; git -C "$E" config user.email t@t.test; git -C "$E" config user.name t
+cp "$GATE" "$E/solo/${GATE##*/}"; cp "$ROOT/$GK_SRC" "$E/elsewhere/gk/govkit.py"
+printf 'version = 1\n' > "$E/elsewhere/gk/registry.toml"
+printf '{"schema": 3, "files": [{"source": "x/%s/govkit.py", "path": "elsewhere/gk/govkit.py"}]}\n' "$GK" > "$E/.governance/install.json"
+git -C "$E" add -A >/dev/null 2>&1
+run_arm "no kit directories under the gate's root -> refuses, not a silent pass" "that is not a pass" 1 "$E" "solo/${GATE##*/}"
 
-if [ "$RUNTIME_ARMS" -ge 3 ]; then
-  good "LIVENESS $RUNTIME_ARMS arm(s) reached the runtime-literal arm"
-else
-  bad "LIVENESS only $RUNTIME_ARMS arm(s) reached the runtime-literal arm — the rest stopped short of it, so arm 3 is reported on and not graded"
-fi
+# A COUNTER THAT DIES refuses. GOV_PYTHON hands the gate a wrapper that runs python for everything
+# but the ban's counter, so the kit-source test stays alive and only the counter is dead.
+D="$TMP/deadcounter"; build_source_fixture "$D" 'A qdemo kit.'
+_realpy=""
+for _c in python3 python py; do "$_c" -c "import sys" >/dev/null 2>&1 && { _realpy=$_c; break; }; done
+printf '#!/usr/bin/env bash\ncase "${2:-}" in *"the ban'"'"'s counter"*) exit 3 ;; esac\nexec "%s" "$@"\n' "$_realpy" > "$D/pywrap.sh"
+chmod +x "$D/pywrap.sh"
+dout=$(cd "$D" && GOV_PYTHON="$D/pywrap.sh" bash "$GATE_REL" 2>&1); drc=$?
+case "$drc:$dout" in 1:*"COUNTER died"*) good "a dead counter REFUSES and names itself" ;;
+  *) bad "a dead counter did not refuse by name (rc $drc): $(printf '%s' "$dout" | tail -2)" ;; esac
 
-if [ "$BAN_ARMS" -ge 5 ]; then
-  good "LIVENESS $BAN_ARMS ban arm(s) engaged the real gate"
-else
-  bad "LIVENESS only $BAN_ARMS ban arm(s) reached the gate — the rest fell through or SKIPPED, so this section reports on arms that did not run"
-fi
-# --- THE LIVENESS ASSERTION ON THE SUITE ITSELF ------------------------------------------------
-# A self-test whose every fixture takes one branch is `fixture-passes-by-finding-nothing` applied to
-# the grader, and it needs the same treatment as any other probe that cannot move. This is the arm
-# that reds if someone re-breaks `mkfix_source` and every carried arm silently goes back to SKIPPED.
-if [ "$CARRIED_ARMS" -ge 9 ]; then
-  good "LIVENESS $CARRIED_ARMS arm(s) actually engaged the carried-prefix branch"
-else
-  bad "LIVENESS only $CARRIED_ARMS arm(s) reached the carried-prefix branch — the rest SKIPPED, so this suite is grading one arm and reporting on two"
-fi
+# NO USABLE PYTHON: all three launcher names exit 9009, first on PATH. That is a REFUSAL, never a
+# consumer's skip, which would pass a kit source's whole verdict at exit 0.
+mkdir -p "$TMP/nopy"
+for _np in python3 python py; do printf '#!/usr/bin/env bash\nexit 9009\n' > "$TMP/nopy/$_np"; chmod +x "$TMP/nopy/$_np"; done
+pout=$(cd "$G" && PATH="$TMP/nopy:$PATH" bash "$GATE_REL" 2>&1); prc=$?
+case "$prc:$pout" in 2:*"cannot tell whether this repo is a kit"*) good "no usable python REFUSES rather than skipping" ;;
+  *) bad "no usable python did not refuse (rc $prc): $(printf '%s' "$pout" | tail -2)" ;; esac
 
-if [ "$fails" != 0 ]; then printf 'FAIL — %d arm(s) failed\n' "$fails"; exit 1; fi
-echo "PASS — check-install-prefix: all arms held"
+# ==================== THE LIVENESS ASSERTION ON THE SUITE ITSELF =============================
+if [ "$GRADED" -ge 8 ]; then good "LIVENESS $GRADED arm(s) reached the counter"
+else bad "LIVENESS only $GRADED arm(s) reached the counter — the rest stopped short of it, so this suite reports on arms that did not run"; fi
+
+[ "$passed" -ge "$FLOOR_ASSERTIONS" ] || bad "only $passed assertion(s) ran, under the floor of $FLOOR_ASSERTIONS"
+[ "$fails" = 0 ] && echo "PASS ($passed assertions)"
+[ "$fails" = 0 ] || { printf 'FAIL — %d arm(s) failed\n' "$fails"; exit 1; }

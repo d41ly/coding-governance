@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# gov:kit lexicon@1.14
+# gov:kit lexicon@1.15
 """lexicon.py — two naming predicates over a DECLARED vocabulary, plus one self-containment refusal.
 
 THE INVOCATIONS ARE NOT LISTED HERE. Run the file with no recognised mode and it prints them, with
@@ -86,7 +86,7 @@ from lexicon_conf import (ConfError, CONVENTIONS, PATTERN_PARTS, SURFACES, langs
 from subtokens import (check_convention, classify, leading_verb, read_stem,  # noqa: E402
                        render_convention, subtokens)
 
-KIT_LEXICON_VERSION = "1.14"
+KIT_LEXICON_VERSION = "1.15"
 
 CONF_NAME = ".lexicon.conf"
 WAIVER_FILES = {
@@ -236,7 +236,7 @@ def scan_definition_carriers(root: Path, files: list[str]) -> set[str]:
 
 class Offender:
     """One finding. `text` is the WAIVER KEY, and it is the matched text rather than
-    `<path>:<line>` on purpose: `install-prefix-waivers.txt` keys on position and any edit ABOVE a
+    `<path>:<line>` on purpose: the install-prefix gate's old waiver registry keyed on position and any edit ABOVE a
     waived line unpins it, which reds a merge that touched nothing the waiver guards.
 
     `verb` and `cls` carry TOOL-aSurfacedLexicon-7's P1 split and are `None` for every other

@@ -1,4 +1,4 @@
-<!-- gov:kit lexicon@1.14 -->
+<!-- gov:kit lexicon@1.15 -->
 # lexicon — a declared naming vocabulary, gated
 
 An OPT-IN kit that gates two naming predicates against a per-repo DECLARATION, and refuses an import
@@ -607,7 +607,7 @@ stays as the fast fail on a `tools/` diff. Closing review B1.
 The waiver registries beside this file are keyed on the matched **TEXT** rather than on
 `<path>:<line>`. Keying
 on position means any edit ABOVE a waived line unpins it, which reds a merge that touched nothing
-the waiver guards — that was hit on `install-prefix-waivers.txt`'s first real merge. A waiver whose
+the waiver guards — that was hit on the install-prefix gate's old waiver registry's first real merge. A waiver whose
 text is gone reds as STALE, so a registry cannot quietly outlive what it excuses. Shrink-only.
 
 ## Adopting

@@ -291,21 +291,14 @@ against the ceiling rather than against its value. This README and the repo char
 naming a kit path therefore arrives unchanged in a target that installed at its own prefix, where
 it resolves to nothing — silently, at the moment somebody needed it.
 
-**How it is enforced.** The carried-prefix arm of the install-prefix gate. As of
-`TOOL-dRetiredFork-17` it is a BAN rather than a shrink-only ratchet: its writer may lower a
-count or drop a row that reached zero, and may NOT add one. That single change is the whole
-conversion — before it, the remedy the gate printed was a self-service exemption form, and a new
-literal could be absorbed by anyone who followed the gate's own advice.
-
-A literal that is genuinely correct is justified BY HAND, as a reason column on its row in the
-ban list, in the pass that wants it. Those reasons survive later writes. A definitional widening
-of the predicate — which necessarily makes many literals newly visible at once — goes through a
-separate re-baseline mode guarded by a declared predicate epoch, so it can be spent once per
-change to the predicate and never to absorb a literal.
-
-A path an engine RUNS or READS at run time is graded again by the gate's runtime-literal arm, over
-CODE lines only and with zero tolerance, because it is a defect the day it lands rather than a count
-to drain. A line that is correct by construction carries `gov:prefix-literal — <reason>` on itself.
+**How it is enforced.** The install-prefix gate, a PURE BAN since `TOOL-aRepatriatedFork-30`: one
+predicate over every tracked file under the kit surface, zero tolerance, and a hit named by
+`<path>:<line>`. It carries no list of grandfathered literals, no waiver registry, no line marker
+and no mode that writes anything, because each of those was an exemption a pass could grant
+itself. A render of a shipped template is left out only while it matches that template whole, and
+the template is graded in its place. A path a fixture must lay out at a foreign prefix names each
+kit through a variable holding that kit's derived directory name, which is the one spelling the
+gate cannot see and says so in its header.
 
 ## scratch-guard — the write-target guard, and what it cannot see
 

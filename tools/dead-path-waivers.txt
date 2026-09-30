@@ -53,8 +53,8 @@ WIRE-INTO-PROJECT.md	1	`<MEMORY_ROOT>/archive/ledger/<tag>.md`, and fold `IN-FLI
 {prefix}/memory-tree/check-memory-hygiene.test.sh	1	chit 6 'memory/builds/tLong/STATUS.md'	positive arm: check 6 hits the banned STATUS.md
 {prefix}/memory-tree/check-memory-hygiene.test.sh	1	cnot 6 'memory/builds/tLong/STATUS.md'	negative arm: check 6 does NOT hit it once retired
 {prefix}/govkit/fixtures/adopter-ic-2cff5855.receipt.json	1	"{prefix}/lexicon/lexicon-layer-waivers.txt",	frozen adopter receipt: records what a real install WROTE, so editing it is falsification
-{prefix}/govkit/fixtures/adopter-ic-2cff5855.receipt.json	1	"scripts/lexicon/lexicon-layer-waivers.txt"	frozen adopter receipt: records what a real install WROTE, so editing it is falsification
-{prefix}/govkit/fixtures/adopter-ic-2cff5855.receipt.json	1	"path": "scripts/lexicon/lexicon-layer-waivers.txt",	frozen adopter receipt: records what a real install WROTE, so editing it is falsification
+{prefix}/govkit/fixtures/adopter-ic-2cff5855.receipt.json	1	"{prefix}/lexicon/lexicon-layer-waivers.txt"	frozen adopter receipt: records what a real install WROTE, its adopter-side paths spelled through {prefix} since TOOL-aRepatriatedFork-30 and resolved to the recorded target root on read
+{prefix}/govkit/fixtures/adopter-ic-2cff5855.receipt.json	1	"path": "{prefix}/lexicon/lexicon-layer-waivers.txt",	frozen adopter receipt: records what a real install WROTE, its adopter-side paths spelled through {prefix} since TOOL-aRepatriatedFork-30 and resolved to the recorded target root on read
 {prefix}/govkit/fixtures/adopter-ic-2cff5855.receipt.json	1	"source": "{prefix}/lexicon/lexicon-layer-waivers.txt"	frozen adopter receipt: records what a real install WROTE, so editing it is falsification
 {prefix}/govkit/matrix.py	1	+ "[[files]]" + NL + 'include = ["moved.template.txt"]' + NL	fixture literal: the arm WRITES this name into a scratch descriptor it builds, so no reader follows it to a deleted file
 {prefix}/govkit/matrix.py	1	_aged_rr = {"kept.txt": ROLE_V2, "moved.txt": ROLE_V2, "moved.template.txt": "<<BODY>>" + NL}	fixture literal: the same scratch name, as the aged receipt the role-move arm grades

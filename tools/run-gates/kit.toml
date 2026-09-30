@@ -52,8 +52,10 @@ role = "project-owned"
 # roles so `apply` never writes it. It is a leg on GOV's bar and carries an [[exempt_leg]] row in
 # <prefix>/govkit/registry.toml — deliberately NOT a [[gate_leg]] below, because a descriptor row
 # naming a leg the target's manifest cannot carry is what reds the deployer's selfcheck.
+# `foreign-prefix.gov.test.sh` rides the same rule for the same reason (TOOL-aRepatriatedFork-30 S1):
+# it moves GOV's tool root in a scratch clone and grades gov's own declared self-tests there.
 [[files]]
-include = ["run-gates.gov.test.sh"]
+include = ["run-gates.gov.test.sh", "foreign-prefix.gov.test.sh"]
 role = "project-owned"
 
 # GOV'S OWN CEILING EVIDENCE, withheld for the reason above one line over: these two files

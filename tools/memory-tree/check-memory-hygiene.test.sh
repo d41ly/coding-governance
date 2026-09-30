@@ -2897,7 +2897,7 @@ else
   echo "FAIL --render did not state the fixture's own INDEX_CAP_LINES=500 / ENTRY_CAP_UNIT=bytes, or still spells gov's INDEX_CAP_LINES=0"; st=1
 fi
 n=$((n+1))
-if grep -qF '`scripts/codebase-map/gen_map.py`' "$_fl/memory/TEMPLATE-SPEC.md" 2>/dev/null; then
+if grep -qF "\`scripts/${CODEBASE_MAP_DIR##*/}/gen_map.py\`" "$_fl/memory/TEMPLATE-SPEC.md" 2>/dev/null; then
   echo "ok   a flat install renders TOOL_ROOT from the receipt's prefix"
 else
   echo "FAIL a flat install with a receipt prefix of scripts did not render the codebase-map generator under scripts/ — TOOL_ROOT is still the empty parent"; st=1
@@ -2919,6 +2919,9 @@ _pbk=""
 for _c in "$HERE/playbook" "$(dirname "$HERE")/playbook"; do
   [ -f "$_c/render_playbook.py" ] && { _pbk=$_c; break; }
 done
+# The fixture's playbook kit takes the ENGINE's directory name, found above rather than typed: a
+# kit name typed under the fixture's literal prefix is what the install-prefix ban counts.
+_PB=${_pbk##*/}
 if [ -z "$_pbk" ]; then
   echo "skip adopter-declared paths: no playbook-render engine beside this kit, so its three arms are UNEXERCISED here"; n_skip=$((${n_skip:-0}+3))
 else
@@ -2926,11 +2929,11 @@ _ad=$(mktemp -d)
 (
   cd "$_ad" || exit 1
   git init -q .; git config user.email t@t.test; git config user.name t
-  mkdir -p scripts/playbook notes .governance
+  mkdir -p "scripts/$_PB" notes .governance
   cp "$HERE"/*.template.md "$HERE/adopt-memory-tree.sh" scripts/
-  cp "$_pbk/render_playbook.py" scripts/playbook/
-  printf '[[placeholder]]\nkey = "GATE_RUNNER"\nclass = "derived"\nprobe = "gate_runner"\n' > scripts/playbook/playbook.kit.toml
-  printf '[[entry]]\nid = "%s"\n\n' memory-tree kickoff-manifest review-harness unattended > scripts/playbook/registry.toml
+  cp "$_pbk/render_playbook.py" "scripts/$_PB/"
+  printf '[[placeholder]]\nkey = "GATE_RUNNER"\nclass = "derived"\nprobe = "gate_runner"\n' > "scripts/$_PB/playbook.kit.toml"
+  printf '[[entry]]\nid = "%s"\n\n' memory-tree kickoff-manifest review-harness unattended > "scripts/$_PB/registry.toml"
   printf 'gov_source = "../gov"\nkits = ["memory-tree", "kickoff-manifest"]\n\n[answers]\ngate_runner = "bash scripts/gate.sh"\nmanifest_path = ".claude/SESSION-KICKOFF.md"\nuser_skills = "~/.claude/skills"\n' > .governance/deploy.toml
   printf 'MEMORY_ROOT=notes\nDISCIPLINES="arch"\nFAMILIES="arch:ARCH"\nREADINESS_ROWS="security|risks"\n' > .memory-tree.conf
   printf '<!-- gov:kit memory-tree@0 -->\n' > notes/HYGIENE.md
@@ -2949,7 +2952,7 @@ else
   echo "FAIL --render put a gov path in an adopter's docs, or missed its declared bar, manifest, skill or memory root"; st=1
 fi
 # With no engine to answer, every placeholder states its phrase and no brace survives.
-( cd "$_ad" && rm -rf scripts/playbook && bash scripts/adopt-memory-tree.sh --render ) >/dev/null 2>&1
+( cd "$_ad" && rm -rf "scripts/$_PB" && bash scripts/adopt-memory-tree.sh --render ) >/dev/null 2>&1
 n=$((n+1))
 # shellcheck disable=SC2086
 if grep -qF 'the merge bar of this repo' "$_bm" 2>/dev/null && grep -qF 'The spec-token checker of the shipping repo' "$_ad/notes/TEMPLATE-SPEC.md" \
@@ -2960,9 +2963,9 @@ else
 fi
 # A selected kickoff kit with no manifest answer is a named refusal, and no doc moves.
 cp "$_bm" "$_ad/bm.before"
-( cd "$_ad" && mkdir -p scripts/playbook && cp "$_pbk/render_playbook.py" scripts/playbook/ \
-  && printf '[[placeholder]]\nkey = "GATE_RUNNER"\nclass = "derived"\nprobe = "gate_runner"\n' > scripts/playbook/playbook.kit.toml \
-  && printf '[[entry]]\nid = "%s"\n\n' memory-tree kickoff-manifest > scripts/playbook/registry.toml \
+( cd "$_ad" && mkdir -p "scripts/$_PB" && cp "$_pbk/render_playbook.py" "scripts/$_PB/" \
+  && printf '[[placeholder]]\nkey = "GATE_RUNNER"\nclass = "derived"\nprobe = "gate_runner"\n' > "scripts/$_PB/playbook.kit.toml" \
+  && printf '[[entry]]\nid = "%s"\n\n' memory-tree kickoff-manifest > "scripts/$_PB/registry.toml" \
   && sed -i '/^manifest_path/d' .governance/deploy.toml ) >/dev/null 2>&1
 o=$( cd "$_ad" && bash scripts/adopt-memory-tree.sh --render 2>&1 ); rc=$?
 n=$((n+1))
@@ -2983,11 +2986,11 @@ build_fixture_r3() {
   local d; d=$(mktemp -d)
   ( cd "$d" || exit 1
     git init -q .; git config user.email t@t.test; git config user.name t; git config core.autocrlf false
-    mkdir -p scripts/playbook notes .governance
+    mkdir -p "scripts/$_PB" notes .governance
     cp "$HERE"/*.template.md "$HERE/adopt-memory-tree.sh" scripts/
-    cp "$_pbk/render_playbook.py" scripts/playbook/
-    printf '[[placeholder]]\nkey = "GATE_RUNNER"\nclass = "derived"\nprobe = "gate_runner"\n\n[[placeholder]]\nkey = "MEMORY_ROOT"\nclass = "derived"\nprobe = "memory_root"\n' > scripts/playbook/playbook.kit.toml
-    printf '[[entry]]\nid = "%s"\n\n' memory-tree kickoff-manifest review-harness unattended > scripts/playbook/registry.toml
+    cp "$_pbk/render_playbook.py" "scripts/$_PB/"
+    printf '[[placeholder]]\nkey = "GATE_RUNNER"\nclass = "derived"\nprobe = "gate_runner"\n\n[[placeholder]]\nkey = "MEMORY_ROOT"\nclass = "derived"\nprobe = "memory_root"\n' > "scripts/$_PB/playbook.kit.toml"
+    printf '[[entry]]\nid = "%s"\n\n' memory-tree kickoff-manifest review-harness unattended > "scripts/$_PB/registry.toml"
     printf 'gov_source = "../gov"\nkits = ["memory-tree", "kickoff-manifest"]\n\n[answers]\ngate_runner = "bash scripts/gate.sh"\nmanifest_path = ".claude/SESSION-KICKOFF.md"\nuser_skills = "~/.claude/skills"\n' > .governance/deploy.toml
     printf 'MEMORY_ROOT=notes\nDISCIPLINES="arch"\nFAMILIES="arch:ARCH"\nREADINESS_ROWS="security|risks"\n' > .memory-tree.conf
     printf '<!-- gov:kit memory-tree@0 -->\n' > notes/HYGIENE.md
@@ -3007,7 +3010,7 @@ else
 fi
 rm -rf "$_d"
 # C2 — an engine below the floor is no engine: the phrases, one named line, no usage error.
-_d=$(build_fixture_r3); sed -i 's/^KIT_PLAYBOOK_RENDER_VERSION = "[0-9.]*"/KIT_PLAYBOOK_RENDER_VERSION = "1.10"/' "$_d/scripts/playbook/render_playbook.py"
+_d=$(build_fixture_r3); sed -i 's/^KIT_PLAYBOOK_RENDER_VERSION = "[0-9.]*"/KIT_PLAYBOOK_RENDER_VERSION = "1.10"/' "$_d/scripts/$_PB/render_playbook.py"
 o=$( cd "$_d" && bash scripts/adopt-memory-tree.sh --render 2>&1 ); rc=$?
 n=$((n+1))
 if [ "$rc" = 0 ] && grep -qF 'the merge bar of this repo' "$(derive_bm_r3 "$_d")" && printf '%s' "$o" | grep -qF 'is 1.10, below the 1.11' \
@@ -3090,7 +3093,7 @@ fi
 rm -rf "$_d"
 # C5, C7 — with no engine, the unattended phrase asserts no install state, and the spec template
 # names no gate-leg path for the shipping repo's checker.
-_d=$(build_fixture_r3); rm -rf "$_d/scripts/playbook"
+_d=$(build_fixture_r3); rm -rf "$_d/scripts/$_PB"
 o=$( cd "$_d" && bash scripts/adopt-memory-tree.sh --render 2>&1 ); rc=$?
 n=$((n+1))
 if [ "$rc" = 0 ] && grep -qF 'the unattended-run protocol of this repo' "$(derive_bm_r3 "$_d")" && ! grep -qF 'not installed here)' "$(derive_bm_r3 "$_d")" \

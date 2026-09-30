@@ -591,7 +591,7 @@ _rn=$(printf '%s\n' "$_rc" | grep -c . || true)
   printf '# method-carriers.txt - every file outside %s/ that POINTS AT guides/BUILD-METHOD.md.\n' "$M"
   printf '# One "<path> . <why>" row each; the why is what a future author reads when deciding whether\n'
   printf '# their new carrier is the next pointer or the first summary. Keyed on PATH alone, never\n'
-  printf '# <path>:<line> - that keying is what unpinned install-prefix-waivers.txt.\n'
+  printf '# <path>:<line> - that keying is what unpinned the install-prefix waiver registry.\n'
   printf '# SEEDED at adoption from this tree: every row below was measured, not assumed.\n\n'
   # The runbook order is `cp -r` then `--scaffold` then commit, so `git ls-files` is EMPTY here and
   # a tracked-only seed writes a header and nothing else — after which the adopter's first run reds

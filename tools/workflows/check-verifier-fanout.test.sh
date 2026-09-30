@@ -209,12 +209,16 @@ arm 'a missing predicate is a named failure' 'has no predicate to delegate to' \
 #
 # The fixtures are built here rather than borrowed, because the two real adopters are foreign trees
 # this suite must not depend on: a fixture keyed to adopter ic's current bytes grades a moving target.
+# Both kit segments are the DERIVED directory names, so the foreign layout types no kit name
+# (TOOL-aRepatriatedFork-30 S8): the workflows kit is this suite's own directory, the hooks kit the
+# one the resolver found.
+WFK=${KIT_REL##*/}; HKK=${HOOKS_DIR##*/}
 mkfix() { # $1 = fixture root · $2 = where the hook goes, relative to the root ("" = no hook at all)
   local fix=$1 hookrel=$2
-  mkdir -p "$fix/scripts/workflows"
-  cp "$HERE/check-verifier-fanout.sh" "$fix/scripts/workflows/"
+  mkdir -p "$fix/scripts/$WFK"
+  cp "$HERE/check-verifier-fanout.sh" "$fix/scripts/$WFK/"
   # a bounded harness, so the population is non-empty and the verdict is legitimately clean
-  cat >"$fix/scripts/workflows/harness.js" <<'JS'
+  cat >"$fix/scripts/$WFK/harness.js" <<'JS'
 export const meta = { name: 'fixture', description: 'a bounded harness', phases: [] }
 const LENSES = ['security', 'correctness', 'integration']
 const out = await boundedParallel(LENSES.map((l) => () => agent(`check ${l}`)), 5)
@@ -228,8 +232,8 @@ JS
 }
 
 # AC2 — the adopter nc shape: kit at `scripts/`, hook a directory up from the harnesses. Rung 2.
-FIX_A=$(mktemp -d); mkfix "$FIX_A" "scripts/hooks/agent-cap.js"
-out=$(cd "$FIX_A" && bash scripts/workflows/check-verifier-fanout.sh 2>&1); rc=$?
+FIX_A=$(mktemp -d); mkfix "$FIX_A" "scripts/$HKK/agent-cap.js"
+out=$(cd "$FIX_A" && bash "scripts/$WFK/check-verifier-fanout.sh" 2>&1); rc=$?
 if [ "$rc" = 0 ]; then printf 'arm ok    AC2: resolves at a scripts/ install and exits 0\n'
 else fails=$((fails+1)); printf 'arm FAIL  AC2: a scripts/ install did not pass (rc=%s)\n%s\n' "$rc" "$out"; fi
 case "$out" in *"1 workflow script"*) printf 'arm ok    AC2: and the population is non-empty there\n' ;;
@@ -238,14 +242,14 @@ case "$out" in *"1 workflow script"*) printf 'arm ok    AC2: and the population 
 # AC3 — the adopter ic shape: NO scripts/hooks/ at all, the only copy at .claude/hooks/. Rung 3, which a
 # two-rung chain strands. This arm is the one that would have caught that.
 FIX_B=$(mktemp -d); mkfix "$FIX_B" ".claude/hooks/agent-cap.js"
-out=$(cd "$FIX_B" && bash scripts/workflows/check-verifier-fanout.sh 2>&1); rc=$?
+out=$(cd "$FIX_B" && bash "scripts/$WFK/check-verifier-fanout.sh" 2>&1); rc=$?
 if [ "$rc" = 0 ]; then printf 'arm ok    AC3: resolves the .claude/hooks/ copy when no sibling exists\n'
 else fails=$((fails+1)); printf 'arm FAIL  AC3: the third rung did not resolve (rc=%s)\n%s\n' "$rc" "$out"; fi
 
 # AC4 — no hook anywhere. The gate must REFUSE and NAME what it probed. A gate that cannot find its
 # predicate and prints a clean line is the failure this whole build keeps finding.
 FIX_C=$(mktemp -d); mkfix "$FIX_C" ""
-out=$(cd "$FIX_C" && bash scripts/workflows/check-verifier-fanout.sh 2>&1); rc=$?
+out=$(cd "$FIX_C" && bash "scripts/$WFK/check-verifier-fanout.sh" 2>&1); rc=$?
 if [ "$rc" != 0 ]; then printf 'arm ok    AC4: an unresolvable predicate REFUSES (rc=%s)\n' "$rc"
 else fails=$((fails+1)); printf 'arm FAIL  AC4: no hook anywhere and the gate still passed\n%s\n' "$out"; fi
 case "$out" in *"hooks/"*".claude/hooks/"*) printf 'arm ok    AC4: and the refusal names the probes it tried\n' ;;
@@ -254,19 +258,19 @@ case "$out" in *"hooks/"*".claude/hooks/"*) printf 'arm ok    AC4: and the refus
 # ANTI-VACUITY. Every arm above would also pass if the fixtures were empty and the gate refused for
 # an unrelated reason, so pin the thing that actually distinguishes them: fixture A and fixture C
 # differ ONLY by the presence of the hook, and their verdicts must differ.
-outA=$(cd "$FIX_A" && bash scripts/workflows/check-verifier-fanout.sh 2>&1)
-outC=$(cd "$FIX_C" && bash scripts/workflows/check-verifier-fanout.sh 2>&1)
+outA=$(cd "$FIX_A" && bash "scripts/$WFK/check-verifier-fanout.sh" 2>&1)
+outC=$(cd "$FIX_C" && bash "scripts/$WFK/check-verifier-fanout.sh" 2>&1)
 if [ "$outA" != "$outC" ]; then printf 'arm ok    the hook is what the fixtures are testing, not the tree shape\n'
 else fails=$((fails+1)); printf 'arm FAIL  identical verdicts with and without the predicate\n'; fi
 
 # ---- TOOL-aRepatriatedFork-4: the harnesses live under .claude/workflows/ -----------------------
 # Both adopters keep their harnesses there, outside the kit prefix. The a7c78ad2 bytes read this
 # fixture as EMPTY (observed: `the population is empty`); the marker is now the whole selector.
-FIX_D=$(mktemp -d); mkfix "$FIX_D" "scripts/hooks/agent-cap.js"
-rm -f "$FIX_D/scripts/workflows/harness.js"; mkdir -p "$FIX_D/.claude/workflows"
+FIX_D=$(mktemp -d); mkfix "$FIX_D" "scripts/$HKK/agent-cap.js"
+rm -f "$FIX_D/scripts/$WFK/harness.js"; mkdir -p "$FIX_D/.claude/workflows"
 cp "$TMP/the-incident.js" "$FIX_D/.claude/workflows/incident.js"
 cp "$TMP/not-a-workflow.js" "$FIX_D/.claude/workflows/helper.js"
-out=$(cd "$FIX_D" && bash scripts/workflows/check-verifier-fanout.sh 2>&1); rc=$?
+out=$(cd "$FIX_D" && bash "scripts/$WFK/check-verifier-fanout.sh" 2>&1); rc=$?
 case "$rc:$out" in 1:*"FAILED — .claude/workflows/incident.js"*) printf 'arm ok    a harness under .claude/workflows/ is judged\n' ;;
   *) fails=$((fails+1)); printf 'arm FAIL  a harness under .claude/workflows/ was not judged (rc=%s)\n%s\n' "$rc" "$out" ;; esac
 # ...and dropping the prefix did not drop the marker: the unmarked file carries the banned shape.

@@ -1,12 +1,13 @@
 # TOOL-aRepatriatedFork-30 — the suites run at a foreign prefix, and the install-prefix gate is a pure ban
 
-**Status:** SPECCED · rev-4 · 2026-09-30 · node a · Tier-2 · base 2143b6d6 · streams tooling · order 18
+**Status:** CLOSED · rev-4 · 2026-09-30 · node a · Tier-2 · base 2143b6d6 · streams tooling · order 18
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-25-build-TOOL-aRepatriatedFork-23-prefix-census.md](../build/2026-09-25-build-TOOL-aRepatriatedFork-23-prefix-census.md) | research | TOOL-aRepatriatedFork-23 TOOL-aRepatriatedFork-24 TOOL-aRepatriatedFork-25 TOOL-aRepatriatedFork-26 TOOL-aRepatriatedFork-27 TOOL-aRepatriatedFork-28 TOOL-aRepatriatedFork-29 |
+| [2026-09-30-build-TOOL-aRepatriatedFork-30-1-acceptance-ledger.md](../build/2026-09-30-build-TOOL-aRepatriatedFork-30-1-acceptance-ledger.md) | journal | — |
 | [2026-09-29-prompt-TOOL-aRepatriatedFork-30-build-brief.md](../prompts/2026-09-29-prompt-TOOL-aRepatriatedFork-30-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->

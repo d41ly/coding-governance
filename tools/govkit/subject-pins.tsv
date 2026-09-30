@@ -36,6 +36,7 @@ drift-audit wiring	repo	wiring
 encoding posture (text IO names its encoding)	repo	product
 every held leg is budgeted, every budget row resolves	repo	declarations
 extract-arms self-test	kit	selftests
+foreign-prefix parity (every self-test at three prefixes)	repo	selftests
 gotchas selftest	kit	selftests
 govkit acceptance matrix	repo	declarations
 govkit refusal join	repo	declarations

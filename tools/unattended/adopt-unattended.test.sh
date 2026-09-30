@@ -470,8 +470,8 @@ absent "$A/.claude/skills/unattended/SKILL.md" "arm 2 wrote into the KIT OWNER's
 # ---- commands in the rendered Skill, so this is not cosmetic: the render would emit a command that
 # ---- word-splits. Refusing beats emitting a Skill that misfires at the first verb.
 C="$TMP/spaced"; seed "$C"
-mkdir -p "$C/my kits" && cp -r "$C/$KIT_REL" "$C/my kits/unattended"
-out=$( cd "$C" && bash "$C/my kits/unattended/adopt-unattended.sh" 2>&1 ); rc=$?
+mkdir -p "$C/my kits" && cp -r "$C/$KIT_REL" "$C/my kits/${KIT_REL##*/}"
+out=$( cd "$C" && bash "$C/my kits/${KIT_REL##*/}/adopt-unattended.sh" 2>&1 ); rc=$?
 hit "$out" "the kit path contains whitespace and is interpolated into shell commands"
 same "arm 3 refuses" "$rc" "2"
 absent "$C/.claude/skills/unattended/SKILL.md" "arm 3 wrote despite refusing"

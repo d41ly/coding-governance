@@ -59,6 +59,12 @@ import sys
 import tempfile
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# The run-gates kit's home, FOUND by the engine it holds and never typed. The fixture lays that kit
+# out at a foreign prefix, and a kit name typed there is the literal the install-prefix ban counts
+# (TOOL-aRepatriatedFork-30 S8).
+RUN_GATES_HOME = os.path.basename(os.path.dirname(subprocess.run(
+    ["git", "-C", ROOT, "ls-files", "--", "*/run-gates.sh"],
+    capture_output=True, text=True, encoding="utf-8").stdout.splitlines()[0]))
 HOOK = os.path.join(ROOT, ".githooks", "pre-push")
 
 # The anchor the mutation splices after. It is the end of the tokenising loop inside the hook's
@@ -130,10 +136,10 @@ class Fixture:
                     ["commit.gpgsign", "false"],
                     ["core.hooksPath", self.hooks.replace("\\", "/")]):
             run(["git", "config"] + cfg, cwd=self.work)
-        os.makedirs(os.path.join(self.work, "scripts", "run-gates"))
+        os.makedirs(os.path.join(self.work, "scripts", RUN_GATES_HOME))
         # The DEFAULT bar, stubbed RED. Every accept case below has to get past this, so a case that
         # reports "accepted" is reporting that the named bar ran, not that no bar did.
-        write(os.path.join(self.work, "scripts", "run-gates", "run-gates.sh"),
+        write(os.path.join(self.work, "scripts", RUN_GATES_HOME, "run-gates.sh"),
               '#!/usr/bin/env bash\necho "DEFAULT BAR RAN - RED"; exit 1\n')
         # A tracked bar, GREEN, so an accept case is visible by the bar's own text.
         write(os.path.join(self.work, "scripts", "unattended-bar.sh"),

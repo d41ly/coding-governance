@@ -112,7 +112,7 @@ $f
   fi
   if compliant "$f" || check_harness_form "$f"; then
     # A STALE waiver reds. A row whose suite now complies silently widens the surface it was written
-    # to narrow — the same rule `install-prefix-waivers.txt` already carries.
+    # to narrow — the same rule the install-prefix gate's old waiver registry carried.
     [ "$is_waived" = 0 ] || fail "a testsuite-count waiver names a suite that now complies, so the list has stopped shrinking and the row hides nothing: $f in $WAIVERS"
   else
     if [ "$is_waived" = 0 ]; then

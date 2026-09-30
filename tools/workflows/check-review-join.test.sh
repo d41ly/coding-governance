@@ -321,17 +321,19 @@ arm 'the predicate being absent is a refusal, not a pass' 'a gate whose predicat
 # `.claude/workflows/`. The a7c78ad2 bytes answered this fixture with `no JavaScript under
 # scripts/` (observed). The hook copy under `.claude/hooks/` carries the same banned join and must
 # stay OUT: `.claude/` wholesale admits the hook ban tables.
-H4="$TMP/harnessdir"; mkdir -p "$H4/scripts/workflows" "$H4/scripts/hooks" "$H4/.claude/workflows" "$H4/.claude/hooks"
-cp "$GATE" "$H4/scripts/workflows/check-review-join.sh"
-cp "$ROOT/${HOOKS_DIR}/agent-cap.js" "$H4/scripts/hooks/agent-cap.js"
+# Both kit segments are the DERIVED directory names, so the foreign layout types no kit name.
+WFK=${KIT_REL##*/}; HKK=${HOOKS_DIR##*/}
+H4="$TMP/harnessdir"; mkdir -p "$H4/scripts/$WFK" "$H4/scripts/$HKK" "$H4/.claude/workflows" "$H4/.claude/hooks"
+cp "$GATE" "$H4/scripts/$WFK/check-review-join.sh"
+cp "$ROOT/${HOOKS_DIR}/agent-cap.js" "$H4/scripts/$HKK/agent-cap.js"
 ( cd "$H4" && git init -q . && git config user.email t@t.test && git config user.name t \
   && git add -A && git commit -qm h4 --no-verify ) >/dev/null 2>&1
-out=$(cd "$H4" && bash scripts/workflows/check-review-join.sh 2>&1); rc=$?
+out=$(cd "$H4" && bash "scripts/$WFK/check-review-join.sh" 2>&1); rc=$?
 case "$rc:$out" in 1:*"no JavaScript under scripts/ or .claude/workflows/"*) printf 'arm ok    an empty refusal names both directories\n' ;;
   *) fails=$((fails+1)); printf 'arm FAIL  the empty refusal does not name both directories (rc=%s)\n%s\n' "$rc" "$out" ;; esac
 cp "$TMP/bracket.js" "$H4/.claude/workflows/review.js"
 cp "$TMP/bracket.js" "$H4/.claude/hooks/ban-table.js"
-out=$(cd "$H4" && bash scripts/workflows/check-review-join.sh 2>&1); rc=$?
+out=$(cd "$H4" && bash "scripts/$WFK/check-review-join.sh" 2>&1); rc=$?
 case "$rc:$out" in 1:*".claude/workflows/review.js:"*) printf 'arm ok    a join in a harness under .claude/workflows/ is caught\n' ;;
   *) fails=$((fails+1)); printf 'arm FAIL  a join under .claude/workflows/ was not caught (rc=%s)\n%s\n' "$rc" "$out" ;; esac
 case "$out" in *ban-table.js*) fails=$((fails+1)); printf 'arm FAIL  a file under .claude/hooks/ was judged\n%s\n' "$out" ;;

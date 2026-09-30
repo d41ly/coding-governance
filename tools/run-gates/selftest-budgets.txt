@@ -60,6 +60,7 @@ corpus-ids selftest	1080		worst of 10 readings 715s, x1.5
 dead-path carriers self-test	900		worst of 11 readings 599s, x1.5
 extract-arms self-test	60		measured 11s on node a 2026-09-07 at inner width 4, x1.5 floored at this file 60s minimum
 drift-audit selftest	1290		worst of 8 readings 855s, x1.5
+foreign-prefix parity (every self-test at three prefixes)	60000		sized, not measured: the pass that wrote it may run only a slice. One calibrate and three pooled passes over this file's own population, each floored by its longest reading (unattended driver selftest, 9936s pooled on node a), 4 x 9936s x 1.5. TOOL-aRepatriatedFork-30, the main loop's first whole run is the reading it is re-derived from
 gotchas selftest	90		worst of 10 readings 54s, x1.5
 govkit selftest	1600		worst of 7 readings 1065s, x1.5
 hook destinations self-test	510		worst of 4 readings 335s, x1.5

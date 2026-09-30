@@ -193,7 +193,7 @@ def derive_id_families(root: Path, _a: dict) -> str:
 
 
 def derive_ci_file(root: Path, _a: dict) -> str:
-    d = root / '.github' / 'workflows'  # gov:prefix-literal — the target's CI dir, not the review-harness kit
+    d = root / '.github' / 'workflows'  # the target's CI dir, not the review-harness kit
     if d.is_dir():
         hits = sorted(p.name for p in d.iterdir() if p.suffix in ('.yml', '.yaml'))
         if hits:
@@ -1039,4 +1039,4 @@ def main(argv: list[str]) -> int:
 if __name__ == '__main__':
     raise SystemExit(main(sys.argv[1:]))
 
-KIT_PLAYBOOK_RENDER_VERSION = "1.16"  # gov:kit playbook-render@1.16
+KIT_PLAYBOOK_RENDER_VERSION = "1.17"  # gov:kit playbook-render@1.17
