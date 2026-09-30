@@ -1006,7 +1006,7 @@
     ],
     "chunk": "selftests",
     "subject": "repo",
-    "ceiling": 60000
+    "ceiling": 16605
   },
   {
     "name": "run-gates run-log line",

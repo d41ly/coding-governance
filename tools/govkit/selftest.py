@@ -4709,9 +4709,11 @@ user_skills = "/tmp/gk-fake-skills"
             # mechanism, the only row that build added to the default selection.
             # 28 -> 27, TOOL-aRepatriatedFork-18 S1: check-line-length's self-test ships as `engine`,
             # the check-arms sibling of its gate, so it left the project-owned ORDER rows.
+            # 27 -> 28, TOOL-aRepatriatedFork-30 S1: run-gates withheld `foreign-prefix.gov.test.sh`
+            # by the same rule as `run-gates.gov.test.sh`.
             check("...and the playbook file previews as a seed WRITE, not as an order",
                   marks.get("write|seed", 0) + marks.get("KEEP|seed", 0) == 3
-                  and marks.get("ORDER|project-owned") == 27,
+                  and marks.get("ORDER|project-owned") == 28,
                   str(marks))
             check("...and 1 COVER|project-owned row, for the path a sibling seed writes",
                   marks.get("COVER|project-owned") == 1, str(marks))
