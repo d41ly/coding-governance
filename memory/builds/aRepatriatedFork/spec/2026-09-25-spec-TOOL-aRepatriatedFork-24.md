@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-24 — no line that executes strands an adopter at another prefix
 
-**Status:** CLOSED · rev-4 · 2026-09-30 · node a · Tier-2 · base 2143b6d6 · streams tooling · order 9
+**Status:** CLOSED · rev-5 · 2026-09-30 · node a · Tier-2 · base 2143b6d6 · streams tooling · order 9
 
 <!-- gen:spec-records -->
 
@@ -135,6 +135,8 @@ stamped at adopt time; none keeps a `tools`, `scripts` or root candidate list.
 - **hands-off** `TOOL-aRepatriatedFork-28` — the remaining fixture literals in the two test files
   S5 and S6 edit.
 - **hands-off** `TOOL-aRepatriatedFork-30` — a waiver registry four rows shorter.
+- **hands-off** `TOOL-aRepatriatedFork-49` — the default bar's remaining selection inputs: the leg
+  manifest its vetted runner reads, and the environment knobs that choose that manifest and its python.
 
 ## 4. Design
 
@@ -306,6 +308,8 @@ New arm: `tools/govkit/selftest.py` · rev-4: a foreign kit at gov's canonical p
   and a runner the repository tracks unmodified, vetted as `gate-env.sh` is (S2c, AC11).
   closing review round 1 fold: M5 — the foreign-kit probe keeps gov's canonical prefix beside the
   target's own and the root (S7b, AC12).
+- rev-5 · 2026-09-30 · §3 · closing review round 2: H1 is promoted to `TOOL-aRepatriatedFork-49`,
+  and §3 gains the hands-off edge that unit consumes. No scope or criterion of this unit moves.
 
 ## 10. Reuse audit
 

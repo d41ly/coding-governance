@@ -114,6 +114,7 @@ The ones that set build policy:
 | 19 | `TOOL-aRepatriatedFork-40` | 1 | recall anchors an id on the spec H1 that defines it |
 | 19 | `TOOL-aRepatriatedFork-42` | 1 | the memory-tree renders take every adopter path from its own declarations |
 | 20 | `DEPL-aRepatriatedFork-20` | 2 | inCMS converges onto gov's memory-tree programs |
+| 21 | `TOOL-aRepatriatedFork-49` | 2 | the push bar takes no manifest or interpreter from the environment |
 
 The `#` column is the `order` each spec declares, derived from its `### Edges`: a unit's order is one
 past the highest order it consumes from. Order 1 holds the independent units, the two security fixes
@@ -126,7 +127,7 @@ with no hand edit between the update and the bar.** One observation at each adop
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 43 unit(s) · node a · opened 2026-09-23 · streams tooling+deployer+playbook
+**Build status:** SPECCED · 44 unit(s) · node a · opened 2026-09-23 · streams tooling+deployer+playbook
 ids DEPL-aRepatriatedFork-1 DEPL-aRepatriatedFork-13 DEPL-aRepatriatedFork-14 DEPL-aRepatriatedFork-17 DEPL-aRepatriatedFork-20 DEPL-aRepatriatedFork-21 DEPL-aRepatriatedFork-22 DEPL-aRepatriatedFork-23 TOOL-aRepatriatedFork-2 TOOL-aRepatriatedFork-3 TOOL-aRepatriatedFork-4 TOOL-aRepatriatedFork-5
 ids TOOL-aRepatriatedFork-6 TOOL-aRepatriatedFork-7 TOOL-aRepatriatedFork-8 TOOL-aRepatriatedFork-9 TOOL-aRepatriatedFork-10 TOOL-aRepatriatedFork-11 TOOL-aRepatriatedFork-12 TOOL-aRepatriatedFork-15 TOOL-aRepatriatedFork-16 TOOL-aRepatriatedFork-18 TOOL-aRepatriatedFork-19 TOOL-aRepatriatedFork-20
 ids TOOL-aRepatriatedFork-21 TOOL-aRepatriatedFork-22 TOOL-aRepatriatedFork-23 TOOL-aRepatriatedFork-24 TOOL-aRepatriatedFork-25 TOOL-aRepatriatedFork-26 TOOL-aRepatriatedFork-27 TOOL-aRepatriatedFork-28 TOOL-aRepatriatedFork-29 TOOL-aRepatriatedFork-30 TOOL-aRepatriatedFork-31
@@ -159,7 +160,7 @@ ids TOOL-aRepatriatedFork-43 TOOL-aRepatriatedFork-44 TOOL-aRepatriatedFork-45 T
 | [TOOL-aRepatriatedFork-12 — memory-recall reads the adopter's corpus shape from conf](spec/2026-09-23-spec-TOOL-aRepatriatedFork-12.md) | 6 | 2 | CLOSED | rev-3 | 2026-09-24 |
 | [TOOL-aRepatriatedFork-44 — the adopter-ic receipt fixture carries no adopter name](spec/2026-09-29-spec-TOOL-aRepatriatedFork-44.md) | 7 | 1 | CLOSED | rev-2 | 2026-09-29 |
 | [TOOL-aRepatriatedFork-23 — the install-prefix ban counts every kit path it cannot see today](spec/2026-09-25-spec-TOOL-aRepatriatedFork-23.md) | 8 | 2 | CLOSED | rev-3 | 2026-09-29 |
-| [TOOL-aRepatriatedFork-24 — no line that executes strands an adopter at another prefix](spec/2026-09-25-spec-TOOL-aRepatriatedFork-24.md) | 9 | 2 | CLOSED | rev-4 | 2026-09-30 |
+| [TOOL-aRepatriatedFork-24 — no line that executes strands an adopter at another prefix](spec/2026-09-25-spec-TOOL-aRepatriatedFork-24.md) | 9 | 2 | CLOSED | rev-5 | 2026-09-30 |
 | [TOOL-aRepatriatedFork-25 — printed and usage strings in received code name no install prefix](spec/2026-09-25-spec-TOOL-aRepatriatedFork-25.md) | 10 | 1 | CLOSED | rev-3 | 2026-09-29 |
 | [TOOL-aRepatriatedFork-26 — the runbook and every shipped doc name no install prefix](spec/2026-09-25-spec-TOOL-aRepatriatedFork-26.md) | 11 | 1 | CLOSED | rev-3 | 2026-09-29 |
 | [TOOL-aRepatriatedFork-27 — canonical-copy markers and comment prose name no install prefix](spec/2026-09-25-spec-TOOL-aRepatriatedFork-27.md) | 12 | 1 | CLOSED | rev-2 | 2026-09-29 |
@@ -179,16 +180,17 @@ ids TOOL-aRepatriatedFork-43 TOOL-aRepatriatedFork-44 TOOL-aRepatriatedFork-45 T
 | [TOOL-aRepatriatedFork-40 — recall anchors an id on the spec H1 that defines it](spec/2026-09-28-spec-TOOL-aRepatriatedFork-40.md) | 19 | 1 | CLOSED | rev-2 | 2026-09-28 |
 | [TOOL-aRepatriatedFork-42 — the memory-tree renders take every adopter path from the adopter's own declarations](spec/2026-09-29-spec-TOOL-aRepatriatedFork-42.md) | 19 | 1 | CLOSED | rev-3 | 2026-09-29 |
 | [DEPL-aRepatriatedFork-20 — inCMS converges onto gov's memory-tree programs](spec/2026-09-23-spec-DEPL-aRepatriatedFork-20.md) | 20 | 2 | CLOSED | rev-11 | 2026-09-29 |
+| [TOOL-aRepatriatedFork-49 — the push bar takes no manifest or interpreter from the environment](spec/2026-09-30-spec-TOOL-aRepatriatedFork-49.md) | 21 | 2 | SPECCED | rev-1 | 2026-09-30 |
 <!-- /gen:build-units -->
 
-Records: 102 bound to this build, across 4 record folder(s).
+Records: 103 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: DEPL-aRepatriatedFork-1 DEPL-aRepatriatedFork-13 DEPL-aRepatriatedFork-14 DEPL-aRepatriatedFork-17 DEPL-aRepatriatedFork-20 TOOL-aRepatriatedFork-10 TOOL-aRepatriatedFork-11 TOOL-aRepatriatedFork-12 TOOL-aRepatriatedFork-15 TOOL-aRepatriatedFork-16
 TOOL-aRepatriatedFork-18 TOOL-aRepatriatedFork-19 TOOL-aRepatriatedFork-2 TOOL-aRepatriatedFork-3 TOOL-aRepatriatedFork-4 TOOL-aRepatriatedFork-5 TOOL-aRepatriatedFork-6 TOOL-aRepatriatedFork-7 TOOL-aRepatriatedFork-8 TOOL-aRepatriatedFork-9 DEPL-aRepatriatedFork-21 TOOL-aRepatriatedFork-21
 TOOL-aRepatriatedFork-23 TOOL-aRepatriatedFork-24 TOOL-aRepatriatedFork-25 TOOL-aRepatriatedFork-26 TOOL-aRepatriatedFork-27 TOOL-aRepatriatedFork-28 TOOL-aRepatriatedFork-29 TOOL-aRepatriatedFork-30 TOOL-aRepatriatedFork-31 TOOL-aRepatriatedFork-32 TOOL-aRepatriatedFork-35 TOOL-aRepatriatedFork-36
-TOOL-aRepatriatedFork-37 TOOL-aRepatriatedFork-38 TOOL-aRepatriatedFork-39 TOOL-aRepatriatedFork-40 TOOL-aRepatriatedFork-42 TOOL-aRepatriatedFork-44 TOOL-aRepatriatedFork-45 TOOL-aRepatriatedFork-46 TOOL-aRepatriatedFork-47.
+TOOL-aRepatriatedFork-37 TOOL-aRepatriatedFork-38 TOOL-aRepatriatedFork-39 TOOL-aRepatriatedFork-40 TOOL-aRepatriatedFork-42 TOOL-aRepatriatedFork-44 TOOL-aRepatriatedFork-45 TOOL-aRepatriatedFork-46 TOOL-aRepatriatedFork-47 TOOL-aRepatriatedFork-49.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -215,6 +217,7 @@ TOOL-aRepatriatedFork-37 TOOL-aRepatriatedFork-38 TOOL-aRepatriatedFork-39 TOOL-
 | 18 | `TOOL-aRepatriatedFork-30`, `TOOL-aRepatriatedFork-35` | yes |
 | 19 | `TOOL-aRepatriatedFork-36`, `TOOL-aRepatriatedFork-37`, `TOOL-aRepatriatedFork-38`, `TOOL-aRepatriatedFork-39`, `TOOL-aRepatriatedFork-40`, `TOOL-aRepatriatedFork-42` | yes |
 | 20 | `DEPL-aRepatriatedFork-20` | no |
+| 21 | `TOOL-aRepatriatedFork-49` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
