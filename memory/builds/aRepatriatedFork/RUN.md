@@ -14,12 +14,12 @@ phase: BUILDING
 mode: slug
 run-branch: refs/heads/branch/arepatriated-fork-build-e42158
 anchor-kind: default-branch
-lease-utc: 2026-09-29T13:57:52Z
+lease-utc: 2026-09-30T10:37:34Z
 pid-image: claude.exe
 host: compeeto-agent
-pid: 17728
+pid: 30228
 session: 3b534792-4ade-4a9d-8dfa-4cb264c0af0d
-keepalive: 953a4b2c
+keepalive: 7dc84930
 anchor-url: https://github.com/d41ly/coding-governance.git
 anchor-sha: d6e1749c0542218004260928f1399174daafb789
 anchor-ref: refs/heads/main
@@ -78,3 +78,9 @@ base: d6e1749c0542218004260928f1399174daafb789
 2026-09-29T19:47:02Z decision · item If gov ever moves its OWN tool root, govkit update reads four rendered-template rows as rename NOT taken and withdrawn, because at the new root each source maps to two destinations; should update learn that rename, or is gov's root fixed? · reason Options seen: (a) a unit teaching update to map a moved tool root for rendered rows; (b) record gov's tool root as fixed and adopters as the only movers. Refused to decide: no one plans to move gov's root, the owner's ruling is about adopters, and choosing (b) is a standing constraint on gov only the owner can set.
 
 2026-09-29T19:54:14Z dispatch · item ce3b68fb TOOL-aRepatriatedFork-28 · reason memory/builds/aRepatriatedFork/spec/2026-09-25-spec-TOOL-aRepatriatedFork-28.md memory/builds/aRepatriatedFork/build/2026-09-29-build-TOOL-aRepatriatedFork-28-1-acceptance-ledger.md memory/builds/aRepatriatedFork/README.md skills/session-kickoff .githooks .claude/skills memory/guides memory/HYGIENE.md memory/TEMPLATE-SPEC.md memory/map/generated memory/LIVE.md memory/ledger tools/agent-cap-restatement-waivers.txt tools/agent-instructions tools/check-agent-cap-restatement.sh tools/check-agent-cap-restatement.test.sh tools/check-dead-paths.sh tools/check-dead-paths.test.sh tools/check-hook-destinations.sh tools/check-hook-destinations.test.sh tools/check-install-prefix.sh tools/check-install-prefix.test.sh tools/check-kit-placeholders.py tools/check-kit-placeholders.test.sh tools/check-kit-versions.sh tools/check-line-length.sh tools/check-line-length.test.sh tools/check-microformats.sh tools/check-microformats.test.sh tools/check-placeholders.sh tools/check-placeholders.test.sh tools/check-playbook-parity.sh tools/check-playbook-parity.test.sh tools/check-spec-tokens.py tools/check-spec-tokens.test.sh tools/check-template-size.sh tools/check-template-size.test.sh tools/check-testsuite-counts.sh tools/check-testsuite-counts.test.sh tools/check-wiring.fragment.json tools/check-wiring.sh tools/check-wiring.test.sh tools/codebase-map tools/dead-path-waivers.txt tools/drift-audit tools/gate-legs.json tools/gate-lint tools/govkit tools/hooks tools/install-prefix-carried.txt tools/install-prefix-waivers.txt tools/lexicon tools/lib tools/line-length-limits.txt tools/memory-recall tools/playbook-kit-waivers.txt tools/playbook tools/process-monitor tools/push-main.sh tools/push-main.test.sh tools/pytest-parallel-guardrails tools/run-gates tools/runlog tools/settings-merge.py tools/template-size-highwater.txt tools/template-size-limits.txt tools/unattended tools/workflows tools/memory-tree/.memory-tree.conf.example tools/memory-tree/ANNOTATION-STYLE.template.md tools/memory-tree/BUILD-METHOD.template.md tools/memory-tree/HYGIENE.template.md tools/memory-tree/README.md tools/memory-tree/SPEC-TEMPLATE.template.md tools/memory-tree/adopt-memory-tree.sh tools/memory-tree/build-readme-slot-highwater.txt tools/memory-tree/build-readme-slot-limits.txt tools/memory-tree/check-arms.py tools/memory-tree/check-memory-hygiene.sh tools/memory-tree/check-memory-hygiene.test.sh tools/memory-tree/check-method-carriers.sh tools/memory-tree/check-method-carriers.test.sh tools/memory-tree/check-verdict-epoch.sh tools/memory-tree/check-verdict-epoch.test.sh tools/memory-tree/corpus_ids.py tools/memory-tree/gotchas.py tools/memory-tree/hygiene-parity.test.sh tools/memory-tree/kit-dogfood-parity.test.sh tools/memory-tree/kit.toml tools/memory-tree/marker-contract.test.sh tools/memory-tree/merge-rows.py tools/memory-tree/merge-rows.sh tools/memory-tree/merge-rows.test.sh tools/memory-tree/row_grammar.py tools/memory-tree/tree_lib.py
+
+2026-09-30T10:37:29Z brief · item TOOL-aRepatriatedFork-45 · reason 2f2da1f8cca0 memory/builds/aRepatriatedFork/prompts/2026-09-30-prompt-TOOL-aRepatriatedFork-45-build-brief.md
+
+2026-09-30T10:37:30Z brief · item TOOL-aRepatriatedFork-46 · reason 3ff772fc4b61 memory/builds/aRepatriatedFork/prompts/2026-09-30-prompt-TOOL-aRepatriatedFork-46-build-brief.md
+
+2026-09-30T10:37:31Z brief · item TOOL-aRepatriatedFork-47 · reason e3d76a20d8fa memory/builds/aRepatriatedFork/prompts/2026-09-30-prompt-TOOL-aRepatriatedFork-47-build-brief.md
