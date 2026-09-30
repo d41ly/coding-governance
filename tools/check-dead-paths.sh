@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# check-dead-paths.sh — nothing outside `memory/` may name a file this repo DELETED or renamed away.
+# check-dead-paths.sh — nothing outside `memory/`, and no map dossier, may name a file this repo DELETED
+# or renamed away.
 #
 #   bash <prefix>/check-dead-paths.sh            # assert; exit 1 on an unwaived hit
 #   bash <prefix>/check-dead-paths.sh --list     # print every hit, waived or not (authoring aid)
@@ -52,6 +53,11 @@
 # ledgers and archived snapshots are append-only records: they describe what WAS true, and a record
 # that names a file deleted after it was written is correct, not stale. Rewriting one to please a
 # gate would be falsifying the record.
+#
+# EXCEPT THE MAP DOSSIERS under `memory/map/features/` (closing review round 1 L1,
+# TOOL-aRepatriatedFork-30 S9). A dossier is not a record of what was true: it is the live inventory a
+# session reads to learn what the tree holds, rewritten on every touch, and one describing a deleted
+# registry as current was the worst place for a dead path to live. They are graded like any carrier.
 #
 # WAIVERS are a tracked file, one `<path>\t<ordinal>\t<line-text>\t<reason>` per row. Shrink-only,
 # and a waiver whose resolved line is no longer a hit reds as stale.
@@ -178,12 +184,13 @@ fi
 
 # --- the haystack ---------------------------------------------------------------------------------
 # Everything tracked except `memory/` (append-only records) and this gate's own two files, which name
-# every needle by construction.
+# every needle by construction, PLUS the map dossiers, which are live inventory and not records.
 RE=$(printf '%s\n' "$needles" | sed 's/[.[\*^$]/\\&/g' | tr '\n' '|'); RE=${RE%|}
-hits=$(git grep -nE "$RE" -- ':(exclude)memory/*' \
-                            ":(exclude)$WAIVERS" \
-                            ":(exclude)${SELF_PRE}check-dead-paths.sh" \
-                            ":(exclude)${SELF_PRE}check-dead-paths.test.sh" 2>/dev/null \
+hits=$( { git grep -nE "$RE" -- ':(exclude)memory/*' \
+                              ":(exclude)$WAIVERS" \
+                              ":(exclude)${SELF_PRE}check-dead-paths.sh" \
+                              ":(exclude)${SELF_PRE}check-dead-paths.test.sh"
+          git grep -nE "$RE" -- 'memory/map/features/*'; } 2>/dev/null \
        | awk -F: '{print $1":"$2}' | sort -u)
 
 # --- resolve the registry -------------------------------------------------------------------------
@@ -267,7 +274,7 @@ stale_rows=$(printf '%s\n' "$waived_rows" | grep -vxF -f <(printf '%s' "$hits") 
 bad=0
 for h in $unwaived; do
   if [ "$bad" = 0 ]; then
-    echo "dead-paths: a file outside memory/ names a path this repo DELETED or renamed away. A reader"
+    echo "dead-paths: a file outside memory/, or a map dossier, names a path this repo DELETED or renamed away. A reader"
     echo "dead-paths: who follows it finds nothing, and nothing else in the bar reds. Repoint it at what"
     echo "dead-paths: replaced the file, or add a row to $WAIVERS with the reason the name must stay."
   fi

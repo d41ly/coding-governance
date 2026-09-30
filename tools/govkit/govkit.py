@@ -2991,11 +2991,10 @@ def check_entry_producer(desc: dict) -> bool:
     """Does `apply` run anything for this entry that could produce a `rendered`/`generated` file?
 
     MEASURED, not assumed. CONFIGURE is `argv = d.get("adopt", {}).get("argv") or []` followed by
-    `if not argv: continue`, so an entry with an empty adopter runs NOTHING — and two entries
-    carrying a `rendered`/`generated` rule declare exactly that in writing: `review-harness`
-    ("the render is performed by the parity gate's own --render mode rather than by a separate
-    adopter") and `check-install-prefix` ("seeded empty rather than copied"). Previewing those two as
-    a side-effect would be the same over-promise this unit deletes, moved one mark over.
+    `if not argv: continue`, so an entry with an empty adopter runs NOTHING — and an entry carrying
+    a `rendered`/`generated` rule declares exactly that in writing: `review-harness` ("the render is
+    performed by the parity gate's own --render mode rather than by a separate adopter"). Previewing
+    it as a side-effect would be the same over-promise this unit deletes, moved one mark over.
 
     A `blocks_adopt` hole makes CONFIGURE skip too. No descriptor here declares one today, so that
     half is correct and unexercised by the shipped tree; `selftest.py` arms it with a FIXTURE, which

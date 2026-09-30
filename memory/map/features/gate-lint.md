@@ -115,7 +115,7 @@ therefore an `[[exempt_leg]]` row in the govkit registry, not a `[[gate_leg]]` i
 ## Shared seams
 
 - `memory/project/*.txt` — the shrink-only registry convention, shared with
-  `install-prefix-waivers.txt`, `unarmed-branches.txt` and `testsuite-count-waivers.txt`. Same
+  `unarmed-branches.txt` and `testsuite-count-waivers.txt`. Same
   directory, same both-directions rule. Membership is declared through `PROJECT_REGISTRY_EXTRA` in
   `.memory-tree.conf`, because hygiene check 3 keeps that directory a closed set.
 - `tools/gate-legs.json` — the leg manifest is the single source for what the bar runs. The kit

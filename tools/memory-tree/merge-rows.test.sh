@@ -1639,7 +1639,7 @@ fi
 # which is this script's own location two levels up, the idiom case 32 already uses; that makes them
 # independent of the ambient cwd, which a bare relative path is not once any subshell cds elsewhere.
 # It is NOT a claim about the install prefix: `$ROOT` is two segments up, so it answers the repo root
-# only for a kit installed two deep, which is where `check-install-prefix.sh` and its ratchet come in
+# only for a kit installed two deep, which is where the `check-install-prefix.sh` ban comes in
 # — that checker grades the literal `<prefix>/<kit>/<file>` spellings a body ships, because `apply`
 # writes gov's bytes verbatim and such a literal resolves to nothing at another prefix.
 W=$(mktemp -d); SCRATCH="$SCRATCH $W"

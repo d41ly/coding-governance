@@ -46,7 +46,7 @@ cd "$ROOT" || exit 2
 GATE_SRC="$ROOT/${PFX}check-dead-paths.sh"
 [ -f "$GATE_SRC" ] || { echo "dead-paths.test: no gate at $GATE_SRC"; exit 2; }
 
-FLOOR_ASSERTIONS=22
+FLOOR_ASSERTIONS=23
 PASS=0
 FAIL=0
 ok()  { PASS=$((PASS+1)); }
@@ -133,6 +133,14 @@ mkdir -p "$BASE/memory/builds/x"
 printf 'the spec cited parallel-coding-governance.domain-rules.md at the time\n' > "$BASE/memory/builds/x/spec.md"
 ( cd "$BASE" && git add -A )
 arm "green: an append-only record under memory/ is not a carrier" 0 "no undeclared carrier" -- run "$BASE"
+
+# ---- 3c. ...except a map dossier (closing review round 1 L1, TOOL-aRepatriatedFork-30 S9) --------
+# A dossier is live inventory, rewritten on touch, and not a record: one describing a deleted file as
+# current is exactly what a reader follows. The record planted above stays out of scope beside it.
+mkdir -p "$BASE/memory/map/features"
+printf 'the checklists live in parallel-coding-governance.domain-rules.md\n' > "$BASE/memory/map/features/x.md"
+( cd "$BASE" && git add -A )
+arm "red: a map dossier naming the deleted file is a carrier" 1 "memory/map/features/x.md:1" -- run "$BASE"
 
 # ---- 3b. the rename half (TOOL-aRepatriatedFork-45) ----------------------------------------------
 # A `git mv` is recorded as R, never D, so before this half existed a carrier naming the OLD name of

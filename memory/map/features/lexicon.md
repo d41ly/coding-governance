@@ -138,7 +138,8 @@ and with parameters — Go's `context` is the standing example — so an importe
 
 **Waivers key on the matched TEXT, never `<path>:<line>`.** Position keying means any edit ABOVE a
 waived line unpins it, reddening a merge that touched nothing the waiver guards; that was hit on
-`install-prefix-waivers.txt`'s first real merge and is tracked as `TOOL-aSealedCaravan-1`. A waiver
+the install-prefix waiver registry's first real merge, and is tracked as `TOOL-aSealedCaravan-1`,
+which closed when `TOOL-aRepatriatedFork-30` deleted that registry. A waiver
 whose text is gone reds as STALE, so a registry cannot quietly outlive what it excuses.
 
 **`check-placeholders.sh` asserts what is true of a SOURCE, not of a render.** In this repo the

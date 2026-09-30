@@ -7,7 +7,8 @@
 # and neither path exists in an adopter's tree — where a row naming an absent path is a stale red. So
 # an adopter would red on install day, which is the failure this gate's own fork called decisive.
 # The target authors its own declaration; a subject with no row is graded at the 450 default and says
-# so. The precedent is check-install-prefix, whose registry ships seeded empty rather than copied.
+# so. The precedent was check-install-prefix's waiver registry, seeded empty rather than copied
+# until TOOL-aRepatriatedFork-30 deleted it.
 
 id = "check-line-length"
 scope = "repo"
