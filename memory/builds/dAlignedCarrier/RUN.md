@@ -49,3 +49,7 @@ base: 87c245b3e950cbf7bc46b8216db8b4e4fba253dd
 2026-09-30T15:48:42Z brief · item TOOL-dAlignedCarrier-1 · reason e16ea850f5ac memory/builds/dAlignedCarrier/prompts/2026-09-30-prompt-TOOL-dAlignedCarrier-1-build-brief.md
 
 2026-09-30T16:15:48Z dispatch · item fd3ac307 TOOL-dAlignedCarrier-1 · reason memory/backlog/TOOL.md
+
+2026-09-30T16:19:54Z dispatch · item 4565ceea TOOL-dAlignedCarrier-2 · reason tools/unattended/PROTOCOL.template.md memory/guides/UNATTENDED-PROTOCOL.md memory/builds/dAlignedCarrier/spec/2026-09-30-spec-TOOL-dAlignedCarrier-2.md memory/builds/dAlignedCarrier/build/2026-09-30-build-TOOL-dAlignedCarrier-2-1-acceptance-ledger.md memory/builds/dAlignedCarrier/README.md memory/backlog/TOOL.md
+
+2026-09-30T16:19:58Z brief · item TOOL-dAlignedCarrier-2 · reason f0e8b2c472e7 memory/builds/dAlignedCarrier/prompts/2026-09-30-prompt-TOOL-dAlignedCarrier-1-build-brief.md

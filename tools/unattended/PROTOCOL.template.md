@@ -340,7 +340,7 @@ something no machine could have checked:
 
 | Item | Checked by | Asserts |
 |---|---|---|
-| `gates-green` | machine | the project's full merge bar ran on the tip being landed and passed |
+| `gates-green` | machine | the project's full merge bar ran on the tip being landed, and its verdict is one the inherited-red policy of `UNATTENDED-STOPS.md` §13 lands |
 | `records-current` | machine | the run-state file's GENERATED region is EMPTY — the unit list is derived from the build README on every read, so "current" is the absence of a second copy rather than a comparison between two — AND both marker pairs are well-formed, the run-state file's own and the build README's. Well-formedness is read from the region reader's EXIT STATUS, not from empty output: a malformed pair prints nothing and exits non-zero, so testing emptiness alone scores a broken pair as SATISFIED, passing loudest when the file is least readable. This cell once described a fresh-render comparison against unit status headers the driver never reads, which made an ordinary spec rev bump block the close with no reachable repair |
 | `authorization-reachable` | machine | the build README is reachable from the pinned BASE, parses as build front matter, and names this build |
 | `landed-via-lander` | machine, PRE-LANDING | a lander is DECLARED, and that is the whole predicate: the bypass-flag grep it carried duplicated leg check 11 and is gone. It runs inside `--close`, BEFORE the landing it names, so it cannot observe the push nor fail for anything the run did. The observation lives in `--landed`, the only verb after it |
@@ -369,7 +369,8 @@ run START, which is where the rule is decided and not where it is hit — an age
 is reading this section. An override on the authorization check IS the authorization check, so the
 verb refuses the pair rather than recording it. There is no waiver, no attestation route and no
 project escape: an item the kit will not let a run override is the one item whose absence would make
-every other check decorative.
+every other check decorative. `gates-green` does take an override, and check 83 refuses one except
+on the terms `UNATTENDED-STOPS.md` §13 states.
 
 ## 5. The idle-wake and the keepalive — three actors
 

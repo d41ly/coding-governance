@@ -364,7 +364,6 @@ Cite ids, never line numbers.
 | [TOOL-dDerivedDocket-70](../builds/dDerivedDocket/BACKLOG.md) | SPECCED | MED | TOOL-dAlignedCarrier-6 | 2026-09-30 | THE KIT SELF-TEST BAR A KIT LANDING OWES IS ANNOUNCED TOO LATE AND RUN… |
 | [TOOL-dDerivedDocket-71](../builds/dDerivedDocket/BACKLOG.md) | SPECCED | LOW | TOOL-dAlignedCarrier-3 | 2026-09-30 | TWO CARRIERS DISAGREE ON WHEN A BUILD MUST RESEARCH CANDIDATES. The… |
 | [TOOL-dDerivedDocket-72](../builds/dDerivedDocket/BACKLOG.md) | SPECCED | LOW | TOOL-dAlignedCarrier-4 | 2026-09-30 | BUILD-METHOD M7'S REGROUND LOGS A FALSE REFUSAL AT EVERY PASS BOUNDARY.… |
-| [TOOL-dDerivedDocket-73](../builds/dDerivedDocket/BACKLOG.md) | SPECCED | LOW | TOOL-dAlignedCarrier-2 | 2026-09-30 | THE UNATTENDED PROTOCOL STILL SAYS A GATES-GREEN CLOSE MEANS THE FULL… |
 | [TOOL-dDerivedDocket-75](../builds/dDerivedDocket/BACKLOG.md) | OPEN | LOW | — | 2026-09-30 | NODE d RUNS AN ABSOLUTE core.hooksPath FROM A WRITER NOBODY KNOWS. The… |
 | [TOOL-dDerivedDocket-76](../builds/dDerivedDocket/BACKLOG.md) | OPEN | MED | — | 2026-09-30 | THE UNATTENDED KIT'S COMPENSATING CHECK IS UNPAID FOR THIS LANDING.… |
 | [TOOL-dFoldedVerdict-7](../builds/dFoldedVerdict/BACKLOG.md) | OPEN | — | — | 2026-09-01 | THREE CARRIERS WERE FOUND SITTING EXACTLY ON THEIR DECLARED CEILING IN… |

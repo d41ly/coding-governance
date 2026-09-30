@@ -1,11 +1,12 @@
 # TOOL-dAlignedCarrier-2 — the protocol's gates-green text points at the inherited-red contract
 
-**Status:** SPECCED · rev-1 · 2026-09-30 · node d · Tier-2 · base 87c245b3 · streams tooling · order 1 · closes TOOL-dDerivedDocket-73 · ratified 2026-09-30
+**Status:** CLOSED · rev-2 · 2026-09-30 · node d · Tier-2 · base 87c245b3 · streams tooling · order 1 · closes TOOL-dDerivedDocket-73 · ratified 2026-09-30
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-09-30-build-TOOL-dAlignedCarrier-2-1-acceptance-ledger.md](../build/2026-09-30-build-TOOL-dAlignedCarrier-2-1-acceptance-ledger.md) | journal | — |
 | [2026-09-30-prompt-TOOL-dAlignedCarrier-1-build-brief.md](../prompts/2026-09-30-prompt-TOOL-dAlignedCarrier-1-build-brief.md) | journal | TOOL-dAlignedCarrier-1 TOOL-dAlignedCarrier-3 TOOL-dAlignedCarrier-4 TOOL-dAlignedCarrier-5 TOOL-dAlignedCarrier-6 |
 | [2026-09-30-prompt-TOOL-dAlignedCarrier-1-spec-brief.md](../prompts/2026-09-30-prompt-TOOL-dAlignedCarrier-1-spec-brief.md) | journal | TOOL-dAlignedCarrier-1 TOOL-dAlignedCarrier-3 TOOL-dAlignedCarrier-4 TOOL-dAlignedCarrier-5 TOOL-dAlignedCarrier-6 |
 
@@ -92,6 +93,10 @@ Both are pointers: they name where the rule lives and which check enforces it, a
 the policy's values, its age bound or the condition check 83 tests. The builder may reword for the
 line width, and must keep both anchors and the check number.
 
+As built, the appended sentence opens "`gates-green` does take an override, and check 83 refuses
+one": the paragraph names one item and no set, so "that set" had no antecedent there. Both anchors
+and the check number are unchanged.
+
 ### Rollout
 
 The render is `bash tools/unattended/adopt-unattended.sh`, run in the same pass after the template
@@ -138,10 +143,13 @@ is the parity observation.
   Red when: the protocol breaches its row, or this pass takes more than its share.
   figure: the 300-byte share is PINNED, allocated on 2026-09-30 from the 582 bytes free at BASE; the
   growth is DERIVED at observation from the two readings.
-- **AC5** — When `bash tools/unattended/check-unattended.sh` runs over the pass commit, it exits 0 and
-  prints no `FAILED` line.
+- **AC5** — When `bash tools/unattended/check-unattended.sh --skip 28`, the argv of the
+  `unattended kit gate` leg scoped past the 28 region, runs over the staged pass tree, it exits 0
+  and prints no `FAILED` line.
   Red when: a check reads either sentence and reds.
-  cost: 593 s on node d on 2026-09-30 (PINNED).
+  cost: one scoped run of the kit gate, its seconds MEASURED at observation. The unscoped leg, 593 s
+  whole on node d on 2026-09-30 (PINNED), sits at a unit pass's 600 s command bound, so its verdict
+  over the 28 region, which reads the playbook template and not the protocol, is the close bar's.
 
 ## 7. Gates
 
@@ -164,6 +172,12 @@ is the parity observation.
 
 - rev-1 · 2026-09-30 · initial draft, from the ask's accept clause, the owner's ruling and the
   build's spec brief.
+- rev-2 · 2026-09-30 · §4 §6 · AC5 · the build pass. AC5 runs the kit gate scoped `--skip 28` over
+  the staged pass tree, the scope unit 1 took for the same reason: the unscoped leg measures 593 s
+  against a unit pass's 600 s command bound, and the 28 region reads the playbook template and not
+  the protocol, so the scope reads every check that could grade either sentence. The 28 region's
+  verdict, and the grading of this pass's committed writes against its declaration, are the close
+  bar's. §4 records the appended sentence as built, reworded under the licence §4 already gave.
 
 ## 10. Reuse audit
 
