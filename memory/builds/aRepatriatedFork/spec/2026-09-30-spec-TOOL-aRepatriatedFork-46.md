@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-46 — no line joins a literal kit name under a derived base
 
-**Status:** CLOSED · rev-3 · 2026-09-30 · node a · Tier-2 · base 6830f257 · streams tooling · order 16 · ratified 2026-09-30
+**Status:** CLOSED · rev-4 · 2026-09-30 · node a · Tier-2 · base 6830f257 · streams tooling · order 16 · ratified 2026-09-30
 
 <!-- gen:spec-records -->
 
@@ -55,6 +55,10 @@ does not see a kit name that follows a brace.
     selftest from a copy with nothing beside it. Observed by AC12.
   - **S7d** — M6. With no usable python, `check-wiring.sh`'s `resolve_kit_file` probes the
     resolver's own two places in bash rather than returning nothing. Observed by AC13.
+- **S8 (rev-4)** — The closing review's round-2 L1. S7a's second question to git inherits an
+  exported `GIT_DIR`, and then answers the gate's own directory, so both fan-out gates named a hook
+  under `tools/workflows/` and node threw MODULE_NOT_FOUND. Each gate asks git with `GIT_DIR` and
+  `GIT_WORK_TREE` unset for that one call. Observed by AC14.
 
 ## 3. Non-goals (OUT)
 
@@ -280,6 +284,10 @@ This unit mints no function. A shell file that needs a sibling kit gains the exi
 - **AC13** — rev-3. A `tools/check-wiring.test.sh` arm with `agent-cap.js` shipped beside the
   checker and every python launcher stubbed to fail reads `UNWIRED  agent-cap`, not a skip.
   Red when: it prints `not adopted`, the `7de665e5` behaviour.
+- **AC14** — rev-4. With `GIT_DIR` exported to a scratch checkout's git dir, `check-review-join.sh`
+  run from that checkout reads `review-join: clean`, and `check-verifier-fanout.sh --print-cap`
+  prints the cap.
+  Red when: either reports MODULE_NOT_FOUND, the `ce8a78f5` behaviour.
 
 ## 7. Gates
 
@@ -296,6 +304,10 @@ New arm: `tools/workflows/check-review-join.test.sh` · rev-3: the gate run from
 New arm: `tools/settings-merge.py` · rev-3: its selftest re-run from a copy with nothing beside it · none
 
 New arm: `tools/check-wiring.test.sh` · rev-3: a shipped agent-cap.js found with every python launcher stubbed to fail · none
+
+New arm: `tools/workflows/check-review-join.test.sh` · rev-4: the gate run with `GIT_DIR` exported · none
+
+New arm: `tools/workflows/check-verifier-fanout.test.sh` · rev-4: `--print-cap` run with `GIT_DIR` exported · none
 
 ## 8. Open questions
 
@@ -332,6 +344,8 @@ New arm: `tools/check-wiring.test.sh` · rev-3: a shipped agent-cap.js found wit
   closing review round 1 fold: M4 — a settings-merge-only install passes its own selftest (S7c,
   AC12). closing review round 1 fold: M6 — without python the wiring checker still probes beside
   itself (S7d, AC13).
+- rev-4 · 2026-09-30 · closing review round 2 fold: L1 — the fan-out gates ask git for their own
+  checkout with an inherited `GIT_DIR` unset (S8, AC14).
 
 ## 10. Reuse audit
 
