@@ -180,7 +180,7 @@ ids TOOL-aRepatriatedFork-43 TOOL-aRepatriatedFork-44 TOOL-aRepatriatedFork-45 T
 | [TOOL-aRepatriatedFork-40 — recall anchors an id on the spec H1 that defines it](spec/2026-09-28-spec-TOOL-aRepatriatedFork-40.md) | 19 | 1 | CLOSED | rev-2 | 2026-09-28 |
 | [TOOL-aRepatriatedFork-42 — the memory-tree renders take every adopter path from the adopter's own declarations](spec/2026-09-29-spec-TOOL-aRepatriatedFork-42.md) | 19 | 1 | CLOSED | rev-3 | 2026-09-29 |
 | [DEPL-aRepatriatedFork-20 — inCMS converges onto gov's memory-tree programs](spec/2026-09-23-spec-DEPL-aRepatriatedFork-20.md) | 20 | 2 | CLOSED | rev-11 | 2026-09-29 |
-| [TOOL-aRepatriatedFork-49 — the push bar takes no manifest or interpreter from the environment](spec/2026-09-30-spec-TOOL-aRepatriatedFork-49.md) | 21 | 2 | SPECCED | rev-1 | 2026-09-30 |
+| [TOOL-aRepatriatedFork-49 — the push bar takes no manifest or interpreter from the environment](spec/2026-09-30-spec-TOOL-aRepatriatedFork-49.md) | 21 | 2 | SPECCED | rev-2 | 2026-09-30 |
 <!-- /gen:build-units -->
 
 Records: 103 bound to this build, across 4 record folder(s).

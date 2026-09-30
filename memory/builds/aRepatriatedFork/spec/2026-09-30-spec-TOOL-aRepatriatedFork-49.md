@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-49 — the push bar takes no manifest or interpreter from the environment
 
-**Status:** SPECCED · rev-1 · 2026-09-30 · node a · Tier-2 · base ce8a78f5 · streams tooling · order 21 · ratified 2026-09-30
+**Status:** SPECCED · rev-2 · 2026-09-30 · node a · Tier-2 · base ce8a78f5 · streams tooling · order 21 · ratified 2026-09-30
 
 <!-- gen:spec-records -->
 
@@ -46,6 +46,10 @@ through a python the environment did not name.
 - **S6** — The hook's "what this does not close" paragraph names the environment the bar still
   inherits: `PATH`, the language runtimes' own variables such as `PYTHONPATH` and `NODE_OPTIONS`,
   and the leg-level knobs an adopter's own legs read. Observed by AC8.
+- **S7 (rev-2)** — The run-log suite's exit table counts the hook's `bar-refused` sites as five.
+  It has read three since `baa7289a` added the kit-root refusal, and `07b238ee` added the
+  runner-miss refusal, so the `pre-push run-log line` leg this unit names has been red since. This
+  unit adds no exit site. Observed by AC9.
 
 ## 3. Non-goals (OUT)
 
@@ -109,6 +113,7 @@ upper-case constants, such as `GATE_FULL_MAX_LAG`.
 - `.githooks/pre-push`
 - `.githooks/pre-push.test.sh`
 - `.githooks/gate-env.sh`
+- `.githooks/pre-push.runlog.test.sh`
 
 ### Alternatives rejected
 
@@ -170,6 +175,9 @@ upper-case constants, such as `GATE_FULL_MAX_LAG`.
   hook's "what this does not close" paragraph, and that paragraph also names `PATH` and
   `NODE_OPTIONS`.
   Red when: the paragraph is unchanged.
+- **AC9** — rev-2. When the run-log suite's `EXITS` arm runs as a slice over the built hook, its
+  site count and every row's count hold, with `refuse-bar` at five sites.
+  Red when: the table still reads three, which the `ce8a78f5` slice fails naming five sites.
 
 ## 7. Gates
 
@@ -208,6 +216,9 @@ New arm: `.githooks/pre-push.test.sh` · the runner's knob set joined against th
 
 - rev-1 · 2026-09-30 · initial draft, promoted under BUILD-METHOD M4 from the round-2 closing diff
   review's H1, adopted by the run's rescope entry of 2026-09-30.
+- rev-2 · 2026-09-30 · S7, AC9, §4 · during the build, before its code: the run-log suite's exit
+  table has under-counted the hook's `bar-refused` sites since `baa7289a`, which keeps a leg this
+  unit names red. The table moves to five and the file joins the estimate.
 
 ## 10. Reuse audit
 

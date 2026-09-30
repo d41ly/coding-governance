@@ -108,3 +108,9 @@ base: d6e1749c0542218004260928f1399174daafb789
 2026-09-30T17:26:09Z review · item aRepatriatedFork · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · disposition promote
 
 2026-09-30T17:26:09Z rescope · item add TOOL-aRepatriatedFork-49 · reason closing review round 2 H1 (HIGH, promoted): the B1 fold vets the receipt and runner, but GATE_LEGS or GOV_PYTHON from the environment, or an ignored gate-legs.json, still lets the tracked runner certify a planted green manifest over a red tracked bar
+
+2026-09-30T17:44:07Z brief · item TOOL-aRepatriatedFork-49 · reason 5120a377942d memory/builds/aRepatriatedFork/prompts/2026-09-30-prompt-TOOL-aRepatriatedFork-49-build-brief.md
+
+2026-09-30T17:44:51Z dispatch · item 98c4261e TOOL-aRepatriatedFork-49 · reason .githooks/pre-push .githooks/pre-push.test.sh .githooks/gate-env.sh memory/builds/aRepatriatedFork/spec/2026-09-30-spec-TOOL-aRepatriatedFork-49.md memory/builds/aRepatriatedFork/build memory/builds/aRepatriatedFork/README.md
+
+2026-09-30T17:45:46Z dispatch · item 98c4261e TOOL-aRepatriatedFork-49 · reason .githooks/pre-push .githooks/pre-push.test.sh .githooks/gate-env.sh memory/builds/aRepatriatedFork/spec/2026-09-30-spec-TOOL-aRepatriatedFork-49.md memory/builds/aRepatriatedFork/build memory/builds/aRepatriatedFork/README.md memory/LIVE.md memory/ledger
