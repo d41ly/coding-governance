@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-30 — the suites run at a foreign prefix, and the install-prefix gate is a pure ban
 
-**Status:** SPECCED · rev-3 · 2026-09-30 · node a · Tier-2 · base 2143b6d6 · streams tooling · order 18
+**Status:** SPECCED · rev-4 · 2026-09-30 · node a · Tier-2 · base 2143b6d6 · streams tooling · order 18
 
 <!-- gen:spec-records -->
 
@@ -24,11 +24,14 @@ state.
 ## 2. Scope (IN)
 
 - **S1** — A held leg, with a row in `tools/run-gates/selftest-budgets.txt` as the owner ruled for
-  `TOOL-aRepatriatedFork-18` §8 F3, clones gov into a scratch directory. It installs every suite in
-  §8 F3's population with its kit through `govkit apply` at each prefix §8 F1 names, and runs each
-  suite there. Each suite's executed assertion count must equal its count at gov's prefix, and a
-  suite that fails or skips an arm it runs at gov's prefix reds the leg by name. Observed by AC1,
-  AC2.
+  `TOOL-aRepatriatedFork-18` §8 F3, clones gov into a scratch directory. Its population is §8 F3's:
+  every row that budget file declares, withheld suites included, less the leg's own row. It
+  calibrates that population at gov's prefix with `run-selftests.sh --pooled --calibrate`, then
+  moves the whole tool root with `git mv` to each prefix §8 F1 names and grades each move with
+  `run-selftests.sh --pooled`. That mode's parity compares every row's exit status, `FAIL` count and
+  executed count against the calibration, so a suite that fails, skips an arm or runs a different
+  count at a foreign prefix reds the leg, named with its prefix. A `--kit <substring>` argument
+  passes through, so one suite can be run as a slice. Observed by AC1, AC2.
 - **S2** — The carried ban list `tools/install-prefix-carried.txt` is deleted once every row has
   reached zero, together with the `--write-ratchet` and `--rebaseline` modes and the
   `PREDICATE_EPOCH` guard, as §8 F2 resolves. Observed by AC3.
@@ -45,21 +48,36 @@ state.
 - **S4** — The markers `gov:root-fixture` and `gov:prefix-literal` are deleted. The gate stops
   reading them, and no tracked line under the gate's globs carries one. Observed by AC4.
   **Readers:** by name: `tools/check-install-prefix.sh` and its suite are the only programs that
-  read either marker; every other file only carries one, and units 24 to 29 strike those.
+  read either marker; every other file only carries one. Units 24 to 29 struck most of them, and
+  this unit strikes the six they left in shipped code and in the hooks README.
   by value: NO VALUE READERS, because a marker carries no value beyond its reason text.
 - **S5** — The gate grades one predicate, epoch 6's, over `TOOL-aRepatriatedFork-23` S2's
   population, with zero tolerance: any hit reds, naming `<path>:<line>`. Arms 1 and 3 are folded
-  into it. Observed by AC5, AC6.
+  into it. The population leaves out a tracked file that re-renders byte-identically from a
+  `rendered` template `govkit shipped` names, which is `TOOL-aRepatriatedFork-29` §8 F3 (a). The
+  test is structural: the file must match its template whole, each `{{TOKEN}}` read as one line of
+  any text and a repeated token read as the same text. The template stays in the population, and the
+  gate prints how many renders it left out. Observed by AC5, AC6, AC9.
 - **S6** — The gate's header states what it does not check, rewritten for the pure ban: a path
   assembled from two variables, a literal inside run-time `eval` text, and a file outside its globs.
   Observed by AC7.
 - **S7** — The check-install-prefix entry and every other kit this unit moves take their version
   bump in every carrier. Observed by AC8.
+- **S8** — The classes `TOOL-aRepatriatedFork-28` §4 "Returned" and `TOOL-aRepatriatedFork-46`
+  handed this unit are drained, so the ledger reaches zero. A fixture laid out at a foreign literal
+  prefix names each kit through a variable that holds that kit's directory name, derived from gov's
+  tree or from the suite's existing kit-name map. The frozen adopter receipt writes its adopter-side
+  paths through the `{prefix}` token too, and its reader resolves that token by field: gov's tool
+  root for a `source`, and the adopter's recorded root for a `path`. Its generator emits the same
+  shape. The install-prefix self-test's fixtures use a kit that exists only in the fixture, and they
+  build gov's prefix from a variable. The fixture playbook, the fixture records and the four
+  workflow renders drain through S5's render rule. Observed by AC3, AC9.
 
 ## 3. Non-goals (OUT)
 
-- Draining any literal. A row that is not zero when this unit starts is returned to the unit that
-  owns it, and this unit does not delete the ledger over it.
+- Draining a literal of any class but S8's. A row outside those classes that is not zero when this
+  unit starts is returned to the unit that owns it, and this unit does not delete the ledger over
+  it.
 - Putting the S1 leg on the ordinary bar. The owner ruled it a held leg, run once per build.
 - Adopter repos. The gate still skips at a repo that is not a kit source.
 - Amending `TOOL-aRepatriatedFork-18`. The held leg S1 builds is the one that CLOSED spec specified
@@ -102,8 +120,11 @@ state.
 
 ### Inventory
 
-The S1 leg's driver is one new shell script beside the run-gates kit, named by the lexicon's
-`--suggest` at build time, and one new leg in `tools/gate-legs.json` whose `chunk` holds it.
+The S1 leg's driver is one new shell script in the run-gates kit, `foreign-prefix.gov.test.sh`,
+withheld from adopters beside its gov-only sibling `run-gates.gov.test.sh` and declared the same
+way: a `project-owned` rule in that kit's descriptor and an `[[exempt_leg]]` row in govkit's
+registry. The lexicon's `--suggest` grades no file-name cell, so it named the driver's functions and
+the sibling named the file. It adds one new leg in `tools/gate-legs.json` whose `chunk` holds it.
 
 ### Migration
 
@@ -115,7 +136,14 @@ and an adopter's `govkit update` reports both files as withdrawn.
 `tools/check-install-prefix.sh` · `tools/check-install-prefix.test.sh` ·
 `tools/install-prefix-carried.txt` · `tools/install-prefix-waivers.txt` ·
 `tools/govkit/entries/check-install-prefix.kit.toml` · `tools/gate-legs.json` ·
-`tools/run-gates/selftest-budgets.txt` · `tools/run-gates/ceiling-evidence.txt`
+`tools/run-gates/selftest-budgets.txt` · the run-gates descriptor and govkit's registry · the
+foreign-prefix fixtures of S8 in `tools/govkit/selftest.py`, `.githooks/pre_push_bar_selftest.py`,
+`tools/check-wiring.test.sh`, `tools/memory-tree/check-memory-hygiene.test.sh`,
+`tools/run-gates/adopt-run-gates.test.sh`, `tools/unattended/adopt-unattended.test.sh`,
+`tools/unattended/check-unattended.test.sh`, `tools/workflows/check-review-join.test.sh`,
+`tools/workflows/check-verifier-fanout.test.sh` and `tools/workflows/unattended-build.test.sh` · the
+frozen receipt, its generator and `tools/dead-path-waivers.txt` · the six marker lines · the prose
+that names either deleted file, which the dead-path gate reads
 
 ### Alternatives rejected
 
@@ -128,7 +156,8 @@ and an adopter's `govkit update` reports both files as withdrawn.
 - perf / scale — S1 costs hours, which is why it is held and budgeted. The pure ban is one grep over
   the population and is faster than the three arms it replaces; AC6 records both.
 - error / empty / loading states — an empty population still refuses as a dead probe.
-- observability — S1 prints one line per suite per prefix, with both counts.
+- observability — S1 prints `run-selftests.sh`'s pooled verdict for every suite at every prefix,
+  each block headed by the prefix it graded.
 - risks — a suite that passes at `scripts/` by skipping. S1 compares executed counts, not exit codes.
 - testing — AC2's staged break.
 - migration — the version bump in S7.
@@ -165,16 +194,23 @@ and an adopter's `govkit update` reports both files as withdrawn.
 - **AC8** — `bash tools/check-kit-versions.sh` exits 0, and `python tools/govkit/govkit.py epoch
   --base 2143b6d6` names no kit this unit moved.
   Red when: a moved kit's carrier was missed.
+- **AC9** — When `bash tools/check-install-prefix.sh --list` runs on the real tree, it names the
+  seven renders it left out, and a scratch clone that appends one line to one of them makes the
+  gate grade that file again.
+  Red when: a render is graded while it matches its template, or stays left out once it does not.
 
 ## 7. Gates
 
-`install-prefix (shipped surface)` · `install-prefix self-test` · `every held leg is budgeted, every budget row resolves` · `leg ceilings clear their evidenced maximum` · `testsuite counts (every bar self-test prints one)` · `kit version markers` · `kit epoch (shipped bytes move, the version moves)` · `govkit selfcheck` · `govkit selftest` · `run-gates canary` · `run-gates gov canary` · `dead-path carriers (deleted files still named)` · `lexicon naming predicates` · `recall floor arms` · `govkit refusal join` · `govkit acceptance matrix`
+`install-prefix (shipped surface)` · `install-prefix self-test` · `every held leg is budgeted, every budget row resolves` · `leg ceilings clear their evidenced maximum` · `testsuite counts (every bar self-test prints one)` · `kit version markers` · `kit epoch (shipped bytes move, the version moves)` · `govkit selfcheck` · `govkit selftest` · `run-gates canary` · `run-gates gov canary` · `dead-path carriers (deleted files still named)` · `lexicon naming predicates` · `recall floor arms` · `govkit refusal join` · `govkit acceptance matrix` · `review-join self-test` · `verifier fan-out self-test` · `tier2-review self-test` · `unattended-build self-test` · `check-wiring self-test` · `memory-hygiene self-test` · `pre-push bar self-test` · `run-gates adopter e2e` · `playbook validity gate` · `review-protocol parity (kit vs dogfood)`
 
 New arm: the S1 held leg beside `tools/run-gates/run-selftests.sh` · one suite given back a
 literal prefix in a scratch clone · a new budget row
 
 New arm: `tools/check-install-prefix.test.sh` · one fixture literal per epoch-6 spelling against
 the pure ban, and a clean fixture · the suite's floor moves to its new arm count
+
+New arm: `tools/check-install-prefix.test.sh` · a fixture render left out while it matches its
+template, and graded once a line is appended to it · none
 
 ## 8. Open questions
 
@@ -211,14 +247,27 @@ the pure ban, and a clean fixture · the suite's floor moves to its new arm coun
   predicate it makes pure is epoch 6's, which 46 moves. The kit-id argv class
   `TOOL-aRepatriatedFork-28` returned here is closed by 46's homonym rule instead; the other classes
   28 returned stay this unit's.
+- rev-4 · 2026-09-30 · S1 · S4 · S5 · S8 added · §3 Non-goals · §4 Inventory and Files touched ·
+  §5 · AC9 added · §7 New arm, the unit pass before code. S1 installs by moving gov's whole tool
+  root with `git mv` in the scratch clone rather than through `govkit apply`. An apply target has
+  neither gov's records nor its registry, and it receives no withheld suite, which §8 F3 (b) runs,
+  so its counts would differ from gov's for reasons other than the prefix. The parity it grades is
+  `run-selftests.sh --pooled` against a calibration taken at gov's prefix in the same clone, which
+  is the seam that already compares exit status, `FAIL` count and executed count. S5 gains the
+  render rule `TOOL-aRepatriatedFork-29` §8 F3 (a) handed this unit, since the ledger's workflow and
+  unattended-fixture rows are renders. S8 states how the classes `TOOL-aRepatriatedFork-28` and
+  `TOOL-aRepatriatedFork-46` returned here drain, and §3 stops calling that out of scope. S4 names the
+  six markers the drain units left. AC9 observes the render rule.
 
 ## 10. Reuse audit
 
 `python tools/codebase-map/reuse_lookup.py "count hardcoded kit prefix literals in shipped files"`
 found no seam that grades a spelling outside `tools/check-install-prefix.sh`, which this unit
-narrows in place. The S1 leg reuses `govkit apply --prefix` to install, which
-`TOOL-aRepatriatedFork-18` AC2 already drove, and the held-leg budget mechanism in
-`tools/run-gates/selftest-budgets.txt`.
+narrows in place. The S1 leg reuses the held-leg budget mechanism in
+`tools/run-gates/selftest-budgets.txt` as its population, and `run-selftests.sh --pooled` with its
+calibration as its parity check, rather than writing a comparison of its own. rev-4 dropped
+`govkit apply --prefix` as the installer, for the reason its §9 line gives. The render rule reads
+`govkit.py shipped`, the verb the gate already reads, for the `rendered` templates.
 
 Recall terms used: `held leg budget scripts prefix install shipped suites execution proof carried
 ban waiver marker pure ban`.
