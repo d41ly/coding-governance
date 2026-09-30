@@ -7,7 +7,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-30-build-TOOL-aRepatriatedFork-23-closing-fold-round1.md](../build/2026-09-30-build-TOOL-aRepatriatedFork-23-closing-fold-round1.md) | journal | TOOL-aRepatriatedFork-23 TOOL-aRepatriatedFork-24 TOOL-aRepatriatedFork-29 TOOL-aRepatriatedFork-30 |
-| [2026-09-30-build-TOOL-aRepatriatedFork-23-closing-fold-round2.md](../build/2026-09-30-build-TOOL-aRepatriatedFork-23-closing-fold-round2.md) | journal | TOOL-aRepatriatedFork-23 |
+| [2026-09-30-build-TOOL-aRepatriatedFork-23-closing-fold-round2.md](../build/2026-09-30-build-TOOL-aRepatriatedFork-23-closing-fold-round2.md) | journal | TOOL-aRepatriatedFork-23 TOOL-aRepatriatedFork-30 |
 | [2026-09-30-build-TOOL-aRepatriatedFork-46-1-acceptance-ledger.md](../build/2026-09-30-build-TOOL-aRepatriatedFork-46-1-acceptance-ledger.md) | journal | — |
 | [2026-09-30-prompt-TOOL-aRepatriatedFork-46-build-brief.md](../prompts/2026-09-30-prompt-TOOL-aRepatriatedFork-46-build-brief.md) | journal | — |
 | [2026-09-30-review-TOOL-aRepatriatedFork-23-closing-diff-round1.md](../reviews/2026-09-30-review-TOOL-aRepatriatedFork-23-closing-diff-round1.md) | diff-review | TOOL-aRepatriatedFork-23 TOOL-aRepatriatedFork-24 TOOL-aRepatriatedFork-25 TOOL-aRepatriatedFork-26 TOOL-aRepatriatedFork-27 TOOL-aRepatriatedFork-28 TOOL-aRepatriatedFork-29 TOOL-aRepatriatedFork-30 TOOL-aRepatriatedFork-44 TOOL-aRepatriatedFork-45 TOOL-aRepatriatedFork-47 |

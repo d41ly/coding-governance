@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# check-dead-paths.sh — nothing outside `memory/`, and no map dossier, may name a file this repo DELETED
+# check-dead-paths.sh — nothing outside `memory/`, and no map dossier or gotcha page, may name a file this repo DELETED
 # or renamed away.
 #
 #   bash <prefix>/check-dead-paths.sh            # assert; exit 1 on an unwaived hit
@@ -58,6 +58,9 @@
 # TOOL-aRepatriatedFork-30 S9). A dossier is not a record of what was true: it is the live inventory a
 # session reads to learn what the tree holds, rewritten on every touch, and one describing a deleted
 # registry as current was the worst place for a dead path to live. They are graded like any carrier.
+# SO ARE THE GOTCHA PAGES under `memory/gotchas/` (closing review round 2 L2, TOOL-aRepatriatedFork-30
+# S10): `gotchas.py` serves each as a live checklist item, and one still told its reader to hand-write
+# rows in a deleted registry. The class is a surface SERVED AS LIVE, not the one folder it bit first.
 #
 # WAIVERS are a tracked file, one `<path>\t<ordinal>\t<line-text>\t<reason>` per row. Shrink-only,
 # and a waiver whose resolved line is no longer a hit reds as stale.
@@ -184,13 +187,14 @@ fi
 
 # --- the haystack ---------------------------------------------------------------------------------
 # Everything tracked except `memory/` (append-only records) and this gate's own two files, which name
-# every needle by construction, PLUS the map dossiers, which are live inventory and not records.
+# every needle by construction, PLUS the map dossiers and the gotcha pages, which are served as live
+# guidance and not kept as records.
 RE=$(printf '%s\n' "$needles" | sed 's/[.[\*^$]/\\&/g' | tr '\n' '|'); RE=${RE%|}
 hits=$( { git grep -nE "$RE" -- ':(exclude)memory/*' \
                               ":(exclude)$WAIVERS" \
                               ":(exclude)${SELF_PRE}check-dead-paths.sh" \
                               ":(exclude)${SELF_PRE}check-dead-paths.test.sh"
-          git grep -nE "$RE" -- 'memory/map/features/*'; } 2>/dev/null \
+          git grep -nE "$RE" -- 'memory/map/features/*' 'memory/gotchas/*'; } 2>/dev/null \
        | awk -F: '{print $1":"$2}' | sort -u)
 
 # --- resolve the registry -------------------------------------------------------------------------

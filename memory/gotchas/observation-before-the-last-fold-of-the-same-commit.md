@@ -19,9 +19,9 @@ the commit, and the half left standing is the observation of the tree from befor
 
 ## Where it bit
 
-`TOOL-aDeferredBar-3`, node `a`, 2026-09-14. The pass wrote a hand-justified row in
-`tools/install-prefix-carried.txt` for its suite's 37 fixture-internal command strings, ran
-`bash tools/check-install-prefix.sh`, saw exit 0 and wrote the AC9 ledger line. Minutes later the
+`TOOL-aDeferredBar-3`, node `a`, 2026-09-14. The pass wrote a hand-justified row in the
+install-prefix gate's carried-literal ledger, since deleted, for its suite's 37 fixture-internal
+command strings, ran `bash tools/check-install-prefix.sh`, saw exit 0 and wrote the AC9 ledger line. Minutes later the
 wired hook denied the pass's own `bash -n` over its suite; the spec went to rev-5 and two arms
 carrying the suite's path as a command string joined `tools/unattended/gate-guard.test.sh` in the
 same build commit. The row said 37, the suite carried 39, `install-prefix (shipped surface)` was

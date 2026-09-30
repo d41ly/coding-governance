@@ -46,7 +46,7 @@ cd "$ROOT" || exit 2
 GATE_SRC="$ROOT/${PFX}check-dead-paths.sh"
 [ -f "$GATE_SRC" ] || { echo "dead-paths.test: no gate at $GATE_SRC"; exit 2; }
 
-FLOOR_ASSERTIONS=23
+FLOOR_ASSERTIONS=24
 PASS=0
 FAIL=0
 ok()  { PASS=$((PASS+1)); }
@@ -141,6 +141,15 @@ mkdir -p "$BASE/memory/map/features"
 printf 'the checklists live in parallel-coding-governance.domain-rules.md\n' > "$BASE/memory/map/features/x.md"
 ( cd "$BASE" && git add -A )
 arm "red: a map dossier naming the deleted file is a carrier" 1 "memory/map/features/x.md:1" -- run "$BASE"
+
+# ---- 3d. ...and a gotcha page (closing review round 2 L2, TOOL-aRepatriatedFork-30 S10) ------------
+# `gotchas.py` serves each page under memory/gotchas/ as a live checklist item, so one telling the
+# reader to edit a deleted file is the dossier case again. The class is "served as live", not a folder.
+reset_base
+mkdir -p "$BASE/memory/gotchas"
+printf 'hand-write a row in parallel-coding-governance.domain-rules.md\n' > "$BASE/memory/gotchas/x.md"
+( cd "$BASE" && git add -A )
+arm "red: a gotcha page naming the deleted file is a carrier" 1 "memory/gotchas/x.md:1" -- run "$BASE"
 
 # ---- 3b. the rename half (TOOL-aRepatriatedFork-45) ----------------------------------------------
 # A `git mv` is recorded as R, never D, so before this half existed a carrier naming the OLD name of

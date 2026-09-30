@@ -1,4 +1,4 @@
-**Serves:** journal TOOL-aRepatriatedFork-23 TOOL-aRepatriatedFork-46
+**Serves:** journal TOOL-aRepatriatedFork-23 TOOL-aRepatriatedFork-30 TOOL-aRepatriatedFork-46
 
 # aRepatriatedFork: the round-2 closing diff review, disposed
 
@@ -15,6 +15,7 @@ suite's prologue plus the changed block, in a temp script beside the suite, remo
 |---|---|---|---|---|---|
 | H1 | HIGH | PROMOTED to `TOOL-aRepatriatedFork-49`, specced and built | new unit | its own acceptance ledger | its own acceptance ledger |
 | L1 | LOW | FOLDED, spec rev-4, S8 | `TOOL-aRepatriatedFork-46` (`0a79f19b`) | both gates threw MODULE_NOT_FOUND with `GIT_DIR` exported | one arm in each fan-out gate's suite |
+| L2 | LOW | FOLDED, spec rev-7, S10 | `TOOL-aRepatriatedFork-30` (`19610a22`) | the dead-path gate stayed clean over a gotcha naming a deleted file | a dead-path suite arm, 3d |
 
 ## Beside the items
 
@@ -25,6 +26,14 @@ suite's prologue plus the changed block, in a temp script beside the suite, remo
   reaches them. They are not folded here, because the review named the two gates and a LOW's fold is
   bounded by its item.
 - **review-harness moves 1.22 to 1.23** in both carriers, because the two gates are its shipped bytes.
+- **L2's haystack widened, as the review asked it to decide.** Every gotcha page is served as a
+  live checklist item, so the gotcha folder joins the map dossiers. Measured before wiring: three
+  lines hit, two of them in the page the review named and one in
+  `observation-before-the-last-fold-of-the-same-commit.md`. Each now names the deleted file
+  without its filename. The named page's live guidance is rewritten for the pure ban.
 
 **Evidences:** TOOL-aRepatriatedFork-46
 - AC14 — `GIT_DIR` — `check-review-join.sh` run from a scratch checkout with `GIT_DIR` exported to that checkout's git dir reads `review-join: clean`, and `check-verifier-fanout.sh --print-cap` prints `5`. Red first: both threw MODULE_NOT_FOUND on the `ce8a78f5` gates, and both slice arms failed there
+
+**Evidences:** TOOL-aRepatriatedFork-30
+- AC11 — `bash tools/check-dead-paths.sh` — exits 0 with `memory/gotchas/` in its haystack, `34 derived needle(s), 14 declared waiver(s)`, after its first run named the three gotcha lines. A dead-path suite slice, the prologue plus arms 3c and 3d, passes 2; the new 3d arm planting a page under `memory/gotchas/` that names a deleted file failed on the `ce8a78f5` gate reading `clean`
