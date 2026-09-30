@@ -38,8 +38,98 @@ KIT_REL=$(derive_self_rel "$HERE") || { echo "check-brief-recorded.test: not ins
 # at a root install: every fixture and host path below is spelled through it, never through a
 # literal prefix (TOOL-aRepatriatedFork-28).
 case "$KIT_REL" in */*) PFX="${KIT_REL%/*}/" ;; *) PFX="" ;; esac
+# TOOL-aRepatriatedFork-46: a kit is named by the name its directory has in THIS install, never
+# as a literal segment: this suite's own from where it sits, a sibling's through the resolver,
+# which reads the install receipt first. A fixture mirrors that layout by the resolved NAME.
+KIT_NAME="${KIT_REL##*/}"
+# >>> resolve_python — canonical copy: resolve-python.sh in gov's lib dir (byte-identical; gated)
+resolve_python() {
+  # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
+  # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
+  # the candidate and every consumer uses "$PY" as a single word (measured: exit 127).
+  _rp_tried=""
+  for _rp_c in "${1:-}" "${GOV_PYTHON:-}" python3 python py; do
+    [ -n "$_rp_c" ] || continue
+    _rp_tried="$_rp_tried $_rp_c"
+    if "$_rp_c" -c "import sys" >/dev/null 2>&1; then
+      printf '%s\n' "$_rp_c"
+      return 0
+    fi
+  done
+  {
+    echo "resolve_python: no usable python launcher. Each candidate was RUN with -c 'import sys' and"
+    echo "resolve_python: none exited 0 — being on PATH is not evidence (the Microsoft Store python3"
+    echo "resolve_python: stub answers \`command -v\` and exits 9009 without running anything)."
+    echo "resolve_python: tried:$_rp_tried"
+    if [ -n "${1:-}" ]; then
+      echo "resolve_python: the caller's override '$1' was tried FIRST and did not run."
+    fi
+    if [ -n "${GOV_PYTHON:-}" ]; then
+      echo "resolve_python: GOV_PYTHON is set to '$GOV_PYTHON' and did not run. An override that is"
+      echo "resolve_python: set and unusable is THIS failure, never a silent fall-through — the"
+      echo "resolve_python: operator believes they chose, and would not have."
+    fi
+  } >&2
+  return 1
+}
+# <<< resolve_python
+# The sibling-kit resolver (TOOL-aRepatriatedFork-2 S3), INLINED byte-identically from the
+# canonical copy named on its marker line and gated by the resolve-python self-test's parity
+# table. A shell consumer runs it with the python it already resolved, so the receipt rung is
+# read in Python and never parsed in bash. `resolve_kit_dir <python> <home> <anchor> <here>`
+# prints the kit directory REPO-RELATIVE, or the resolver's named refusal on stderr and exits 1.
+resolve_kit_dir() {
+  "$1" -c "$(cat <<'RKD'
+# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
+def resolve_kit_dir(home, anchor, here):
+    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
+
+    1. receipt — the `.governance/install.json` row whose `source` ends in <home>/<anchor> and
+       whose `path` exists inside this tree. The only record of a RENAMED kit dir: no probe finds
+       a memory-recall kit an adopter homed at `scripts/recall/`.
+    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
+    3. refuse — LookupError naming the three places looked; never a guessed prefix.
+    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
+    """
+    import json
+    import pathlib
+    here = pathlib.Path(here).resolve()
+    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
+    receipt = root / ".governance" / "install.json"
+    try:
+        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("path"):
+            continue
+        if str(row.get("source") or "").split("/")[-2:] != [home, anchor]:
+            continue
+        hit = (root / str(row["path"])).resolve()
+        if hit.is_file() and root in hit.parents:
+            return hit.parent
+    probes = (here / home, here.parent / home)
+    for cand in probes:
+        if (cand / anchor).is_file():
+            return cand
+    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
+        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
+# <<< resolve_kit_dir
+RKD
+)"'
+import sys
+try:
+    d = resolve_kit_dir(*sys.argv[1:4])
+except LookupError as e:
+    sys.exit(str(e))
+r = next((p for p in (d, *d.parents) if (p / ".git").exists()), d.anchor)
+print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
+}
+_rkd_py=$(resolve_python) || { echo "check-brief-recorded.test: no usable python, so the sibling kits cannot be resolved"; exit 2; }
+MT_KIT_DIR=$(resolve_kit_dir "$_rkd_py" memory-tree gen_build_index.py "$HERE") || exit 2
+MT_KIT="${MT_KIT_DIR##*/}"
 st=0; n=0
-LEG="${PFX}unattended/check-brief-recorded.sh"
+LEG="${PFX}${KIT_NAME}/check-brief-recorded.sh"
 # The fixture's own driver, beside the fixture's own leg. Derived from LEG rather than spelled, so the
 # fixture layout is written in one place.
 DRV="${LEG%/*}/unattended.sh"
@@ -62,16 +152,16 @@ mkfixture() { # mode -> prints the fixture root
     git init -q .
     git config user.email t@t; git config user.name t; git config commit.gpgsign false
     mkdir -p ${PFX}unattended memory/builds/tBrief/spec memory/builds/tBrief/prompts
-    cp "$KIT/lib-unattended.sh" ${PFX}unattended/
-    cp "$KIT/unattended.sh"     ${PFX}unattended/
-    cp "$KIT/check-brief-recorded.sh" ${PFX}unattended/
+    cp "$KIT/lib-unattended.sh" ${PFX}${KIT_NAME}/
+    cp "$KIT/unattended.sh"     ${PFX}${KIT_NAME}/
+    cp "$KIT/check-brief-recorded.sh" ${PFX}${KIT_NAME}/
     cat > .unattended.conf <<'CONF'
 MEMORY_ROOT=memory
 BRIEF_RECORDED_CUTOFF="2026-01-01"
-GENERATED_INDEXES="memory/LIVE.md:{PFX}memory-tree/gen_build_index.py"
+GENERATED_INDEXES="memory/LIVE.md:{PFX}{MT_KIT}/gen_build_index.py"
 SHARED_RECORDS="memory/DECISIONS.md memory/backlog"
 CONF
-    sed -i "s#{PFX}#${PFX}#" .unattended.conf   # the quoted heredoc cannot expand the prefix
+    sed -i "s#{PFX}#${PFX}#; s#{MT_KIT}#${MT_KIT}#" .unattended.conf   # the quoted heredoc cannot expand either
     cat > memory/builds/tBrief/README.md <<'RM'
 ---
 slug: tBrief
@@ -305,7 +395,7 @@ rm -rf "$T"
 # ---- clothes, and the leg must refuse INSTEAD of reporting any of them. Staged on the conforming
 # ---- fixture, so the only thing that changed is the grammar.
 T=$(mkfixture ok)
-( cd "$T" && sed -i 's/brief · item/brief-item/g' ${PFX}unattended/unattended.sh )
+( cd "$T" && sed -i 's/brief · item/brief-item/g' ${PFX}${KIT_NAME}/unattended.sh )
 o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
 same "driver grammar gone: exits 2 rather than accusing every unit" "$rc" "2"
 has  "driver grammar gone: it says DEAD PROBE" "$o" "DEAD PROBE"
@@ -345,7 +435,7 @@ o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
 n=$((n+1)); [ "$rc" != 0 ] && echo "ok   hostile conf: an appended EXIT trap cannot force rc 0" || { echo "FAIL an appended EXIT trap forced rc 0 -- the worse shape, where the leg prints FAILED and exits green"; st=1; }
 # THE VECTOR THE SPLICE MISSED. This leg sets DRIVER above its import, exactly as the sibling does,
 # and the sibling's blanket uppercase assignment let one tracked conf line redirect that path.
-( cd "$T" && printf '\nDRIVER="'"${PFX}unattended/evil.sh"'"\n' >> .unattended.conf )
+( cd "$T" && printf '\nDRIVER="'"${PFX}${KIT_NAME}/evil.sh"'"\n' >> .unattended.conf )
 o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
 hasnt "hostile conf: DRIVER is not assignable from the conf" "$o" "evil.sh"
 rm -rf "$T"

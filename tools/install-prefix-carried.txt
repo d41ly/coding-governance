@@ -59,21 +59,11 @@ tools/run-gates/run-gates.turnstile.test.sh	4	lib,run-gates
 tools/run-gates/run-selftests.test.sh	10	lib,run-gates,unattended
 tools/runlog/selftest.py	5	memory-tree,runlog,unattended	LOWERED 62 -> 4 by TOOL-aRepatriatedFork-28. The four left name no kit path: three per-OS state directories called runlog and the Skill's keyword tuple, which the epoch-5 counter reads as kit segments. TOOL-aRepatriatedFork-30's population rule.
 tools/settings-merge.py	6	hooks,memory-recall,process-monitor
-tools/unattended/adopt-unattended.sh	2	memory-tree
-tools/unattended/adopt-unattended.test.sh	13	lib,memory-tree,run-gates,unattended
-tools/unattended/check-brief-recorded.test.sh	4	memory-tree,unattended
-tools/unattended/check-pass-order.test.sh	5	memory-tree,unattended
-tools/unattended/check-playbook.test.sh	5	unattended
+tools/unattended/adopt-unattended.test.sh	1	unattended
 tools/unattended/check-unattended.test.sh	3	workflows
 tools/unattended/fixture-records/tools~unattended~fixture-pieces~one~piece.md.md	2	unattended
 tools/unattended/fixture-records/tools~unattended~fixture-pieces~two~piece.md.md	2	unattended
-tools/unattended/gate-guard.test.sh	64	govkit,lib,memory-tree,run-gates,unattended	LOWERED 105 -> 2 by TOOL-aRepatriatedFork-28, which spells every deny-shape command string through the derived prefix. The two left source the resolver beside this kit, a kit segment joined under a derived base, TOOL-aRepatriatedFork-46's class (spec rev-3 §4, Returned).
 tools/unattended/playbook.fixture.md	5	unattended
-tools/unattended/run-unattended-gates.sh	1	run-gates	REWRITTEN by TOOL-aRepatriatedFork-27, which reworded this file's comment prose: the one literal left is the executing `RUNNER=` join of the run-gates segment under the derived kit parent, which TOOL-aRepatriatedFork-46 owns.
-tools/unattended/runlog-writer.test.sh	3	lib,run-gates
-tools/unattended/stall-recorder.test.sh	2	lib	LOWERED 4 -> 2 by TOOL-aRepatriatedFork-28, which derives the fixture's kit home. The two left source the resolver beside this kit, a kit segment joined under a derived base, TOOL-aRepatriatedFork-46's class (spec rev-3 §4, Returned).
-tools/unattended/stop-guard.test.sh	2	lib	LOWERED 4 -> 2 by TOOL-aRepatriatedFork-28, which derives the fixture's kit home. The two left source the resolver beside this kit, a kit segment joined under a derived base, TOOL-aRepatriatedFork-46's class (spec rev-3 §4, Returned).
-tools/unattended/unattended.test.sh	5	govkit,memory-tree	LOWERED 41 -> 5 by TOOL-aRepatriatedFork-28, which spells the fixture tree through the derived prefix. The five left join a kit segment under a derived base, TOOL-aRepatriatedFork-46's class (spec rev-3 §4, Returned).
 tools/workflows/check-review-join.test.sh	4	hooks,workflows
 tools/workflows/check-verifier-fanout.test.sh	10	hooks,workflows
 tools/workflows/drift-audit-state.js	1	(loose)

@@ -43,6 +43,46 @@ SCRIPT="$HERE/unattended.sh"
 # second spelling of `COMPUTERNAME` or `tasklist`. It defines functions and nothing else.
 # shellcheck source=lib-unattended.sh
 . "$HERE/lib-unattended.sh"
+# TOOL-aRepatriatedFork-46: a SIBLING kit is found through the resolver the library above carries, which
+# reads the install receipt first, and a fixture names it by the resolved NAME rather than typing it.
+# The python it runs under is resolved INLINE.
+# >>> resolve_python — canonical copy: resolve-python.sh in gov's lib dir (byte-identical; gated)
+resolve_python() {
+  # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
+  # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
+  # the candidate and every consumer uses "$PY" as a single word (measured: exit 127).
+  _rp_tried=""
+  for _rp_c in "${1:-}" "${GOV_PYTHON:-}" python3 python py; do
+    [ -n "$_rp_c" ] || continue
+    _rp_tried="$_rp_tried $_rp_c"
+    if "$_rp_c" -c "import sys" >/dev/null 2>&1; then
+      printf '%s\n' "$_rp_c"
+      return 0
+    fi
+  done
+  {
+    echo "resolve_python: no usable python launcher. Each candidate was RUN with -c 'import sys' and"
+    echo "resolve_python: none exited 0 — being on PATH is not evidence (the Microsoft Store python3"
+    echo "resolve_python: stub answers \`command -v\` and exits 9009 without running anything)."
+    echo "resolve_python: tried:$_rp_tried"
+    if [ -n "${1:-}" ]; then
+      echo "resolve_python: the caller's override '$1' was tried FIRST and did not run."
+    fi
+    if [ -n "${GOV_PYTHON:-}" ]; then
+      echo "resolve_python: GOV_PYTHON is set to '$GOV_PYTHON' and did not run. An override that is"
+      echo "resolve_python: set and unusable is THIS failure, never a silent fall-through — the"
+      echo "resolve_python: operator believes they chose, and would not have."
+    fi
+  } >&2
+  return 1
+}
+# <<< resolve_python
+_rkd_py=$(resolve_python) || { echo "FAIL no usable python, so the sibling kits cannot be resolved"; exit 2; }
+MT_KIT_DIR=$(resolve_kit_dir "$_rkd_py" memory-tree gen_build_index.py "$HERE") || exit 2
+MT_KIT="${MT_KIT_DIR##*/}"
+GOVKIT_DIR=""   # a kit SOURCE only: absent at an adopter, where the dispatch arms announce their skip
+_gk_rel=$(resolve_kit_dir "$_rkd_py" govkit govkit.py "$HERE" 2>/dev/null) \
+  && GOVKIT_DIR="$(git -C "$HERE" rev-parse --show-toplevel)/$_gk_rel"
 
 # ---- THE SHARD CONTRACT (TOOL-aShardedFloor-2) ---------------------------------------------------
 # This suite IS the merge bar's floor: one leg exceeding leg-seconds / width sets the whole bar's
@@ -4713,7 +4753,7 @@ if [ -f "$STC" ]; then
   sed -i '/^SPEC_TOKENS_CLI=/d' .unattended.conf
   git mv memory/builds/tRun/spec/2026-08-20-spec-ARCH-tRun-1.md memory/builds/tRun/spec/one.md
   rm -f ${PFX}check-spec-tokens.py ${PFX}gate-legs.json memory/project/spec-token-waivers.txt .memory-tree.conf
-elif [ -f "$HERE/../govkit/registry.toml" ]; then
+elif [ -n "$GOVKIT_DIR" ] && [ -f "$GOVKIT_DIR/registry.toml" ]; then
   # A KIT SOURCE, whose govkit registry sits beside this kit: there the checker belongs, and losing
   # it is a real red. This suite is not a leg in the bar's manifest, so no assertion floor would.
   echo "FAIL dispatch: check-spec-tokens.py is missing from a kit source at $STC, so the F3 arms have no subject"; st=1
@@ -5433,18 +5473,18 @@ build_specced_tree; run --preflight tRun --keepalive-id k1 >/dev/null
 # here for TWO reasons and the next arm separates them by declaring the key.
 hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes memory/LIVE.md)" "dispatch declared"
 build_specced_tree
-printf '\nGENERATED_INDEXES="memory/LIVE.md:%s/memory-tree/gen_build_index.py"\n' "$TOOL_REL" >> .unattended.conf
+printf '\nGENERATED_INDEXES="memory/LIVE.md:%s/%s/gen_build_index.py"\n' "$TOOL_REL" "$MT_KIT" >> .unattended.conf
 run --preflight tRun --keepalive-id k1 >/dev/null
 # ...DECLARED, the index ALONE is still accepted — that is the retraction M6 earned.
 hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes memory/LIVE.md)" "dispatch declared"
-hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes memory/LIVE.md --writes $TOOL_REL/memory-tree/gen_build_index.py)" "--dispatch declares a generated index together with its generator, which is the one pairing the build method's condition 3 forbids - the index alone is fine and refusing it was the reading that condition retracted:"
+hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes memory/LIVE.md --writes $TOOL_REL/${MT_KIT}/gen_build_index.py)" "--dispatch declares a generated index together with its generator, which is the one pairing the build method's condition 3 forbids - the index alone is fine and refusing it was the reading that condition retracted:"
 
 # ...and the pairing is caught ACROSS passes too, which is what makes it a condition about the GROUP
 # rather than about one declaration.
 build_specced_tree
-printf '\nGENERATED_INDEXES="memory/LIVE.md:%s/memory-tree/gen_build_index.py"\n' "$TOOL_REL" >> .unattended.conf
+printf '\nGENERATED_INDEXES="memory/LIVE.md:%s/%s/gen_build_index.py"\n' "$TOOL_REL" "$MT_KIT" >> .unattended.conf
 run --preflight tRun --keepalive-id k1 >/dev/null
-run --dispatch tRun --pass ARCH-tRun-1 --writes $TOOL_REL/memory-tree/gen_build_index.py >/dev/null
+run --dispatch tRun --pass ARCH-tRun-1 --writes $TOOL_REL/${MT_KIT}/gen_build_index.py >/dev/null
 hit "$(run --dispatch tRun --pass ARCH-tRun-2 --writes memory/LIVE.md)" "--dispatch declares a generated index together with its generator, which is the one pairing the build method's condition 3 forbids - the index alone is fine and refusing it was the reading that condition retracted:"
 
 # ...and a generator SPELLED AT ANOTHER INSTALL'S PREFIX still keys (TOOL-aRepatriatedFork-24 AC5).
