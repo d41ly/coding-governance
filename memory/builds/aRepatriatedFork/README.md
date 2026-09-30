@@ -127,7 +127,7 @@ with no hand edit between the update and the bar.** One observation at each adop
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 44 unit(s) · node a · opened 2026-09-23 · streams tooling+deployer+playbook
+**Build status:** CLOSED · 44 unit(s) · node a · opened 2026-09-23 · streams tooling+deployer+playbook
 ids DEPL-aRepatriatedFork-1 DEPL-aRepatriatedFork-13 DEPL-aRepatriatedFork-14 DEPL-aRepatriatedFork-17 DEPL-aRepatriatedFork-20 DEPL-aRepatriatedFork-21 DEPL-aRepatriatedFork-22 DEPL-aRepatriatedFork-23 TOOL-aRepatriatedFork-2 TOOL-aRepatriatedFork-3 TOOL-aRepatriatedFork-4 TOOL-aRepatriatedFork-5
 ids TOOL-aRepatriatedFork-6 TOOL-aRepatriatedFork-7 TOOL-aRepatriatedFork-8 TOOL-aRepatriatedFork-9 TOOL-aRepatriatedFork-10 TOOL-aRepatriatedFork-11 TOOL-aRepatriatedFork-12 TOOL-aRepatriatedFork-15 TOOL-aRepatriatedFork-16 TOOL-aRepatriatedFork-18 TOOL-aRepatriatedFork-19 TOOL-aRepatriatedFork-20
 ids TOOL-aRepatriatedFork-21 TOOL-aRepatriatedFork-22 TOOL-aRepatriatedFork-23 TOOL-aRepatriatedFork-24 TOOL-aRepatriatedFork-25 TOOL-aRepatriatedFork-26 TOOL-aRepatriatedFork-27 TOOL-aRepatriatedFork-28 TOOL-aRepatriatedFork-29 TOOL-aRepatriatedFork-30 TOOL-aRepatriatedFork-31
@@ -180,10 +180,10 @@ ids TOOL-aRepatriatedFork-43 TOOL-aRepatriatedFork-44 TOOL-aRepatriatedFork-45 T
 | [TOOL-aRepatriatedFork-40 — recall anchors an id on the spec H1 that defines it](spec/2026-09-28-spec-TOOL-aRepatriatedFork-40.md) | 19 | 1 | CLOSED | rev-2 | 2026-09-28 |
 | [TOOL-aRepatriatedFork-42 — the memory-tree renders take every adopter path from the adopter's own declarations](spec/2026-09-29-spec-TOOL-aRepatriatedFork-42.md) | 19 | 1 | CLOSED | rev-3 | 2026-09-29 |
 | [DEPL-aRepatriatedFork-20 — inCMS converges onto gov's memory-tree programs](spec/2026-09-23-spec-DEPL-aRepatriatedFork-20.md) | 20 | 2 | CLOSED | rev-11 | 2026-09-29 |
-| [TOOL-aRepatriatedFork-49 — the push bar takes no manifest or interpreter from the environment](spec/2026-09-30-spec-TOOL-aRepatriatedFork-49.md) | 21 | 2 | SPECCED | rev-2 | 2026-09-30 |
+| [TOOL-aRepatriatedFork-49 — the push bar takes no manifest or interpreter from the environment](spec/2026-09-30-spec-TOOL-aRepatriatedFork-49.md) | 21 | 2 | CLOSED | rev-2 | 2026-09-30 |
 <!-- /gen:build-units -->
 
-Records: 103 bound to this build, across 4 record folder(s).
+Records: 104 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

@@ -44,6 +44,10 @@
 #                             reads it from the sourced file; pre-commit reads the one assignment
 #                             and never sources it. Gov keeps no receipt, so it declares one.
 #   GATE_SELFTESTS=1          run the kit self-tests on every default-branch push (the switch above).
+#   GOV_PYTHON=<launcher>     the python the hook and its bar resolve first, and likewise a kit's own
+#                             `<KIT>_PY`. The hook DROPS the environment's copy of each before this file
+#                             runs (TOOL-aRepatriatedFork-49), so only a value declared here is honoured,
+#                             and it must be `export`ed to reach the bar.
 #   GOV_GATE_CMD=<cmd>        the merge bar, when it is not `run-gates.sh`. It must run a script this
 #                             repo tracks, unmodified in the working tree, at word 1 or after bash/sh,
 #                             AND equal the GATE_CMD `.unattended.conf` declares at the pushed sha; the

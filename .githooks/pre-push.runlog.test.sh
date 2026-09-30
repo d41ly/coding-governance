@@ -971,7 +971,7 @@ scan_exit_sites() { # file -> one TAB-separated row per shell exit
   printf '%s\t%s\t%s\n' 'write_refusal raw-push "$why"; RUNLOG_CLEAN=1; exit 1' 1 refuse-raw
   printf '%s\t%s\t%s\n' 'write_refusal head-mismatch "$why"; RUNLOG_CLEAN=1; exit 1' 1 refuse-head
   printf '%s\t%s\t%s\n' 'write_refusal dirty-tree "$why"; RUNLOG_CLEAN=1; exit 1' 1 refuse-dirty
-  printf '%s\t%s\t%s\n' 'write_refusal bar-refused "$why"; RUNLOG_CLEAN=1; exit 1' 3 refuse-bar
+  printf '%s\t%s\t%s\n' 'write_refusal bar-refused "$why"; RUNLOG_CLEAN=1; exit 1' 5 refuse-bar
   printf '%s\t%s\t%s\n' 'write_refusal head-moved "$why"; RUNLOG_CLEAN=1; exit 1' 1 'full|scoped'
   printf '%s\t%s\t%s\n' 'RUNLOG_CLEAN=1; exit "$rc"' 2 'full|scoped|branch-gated'
 } > "$WORK/exits.tsv"

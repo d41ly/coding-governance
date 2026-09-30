@@ -360,7 +360,18 @@ write_refusal() { # token · one-line message -> the refusal file, and the run-l
 # (TOOL-aRepatriatedFork-24 S2). The root is now RESOLVED, below the `gate-env.sh` source, because
 # that file is one of the rungs. The environment's copy is dropped HERE, before that file runs, so
 # only the vetted file can declare it.
-unset GOV_KITROOT
+#
+# THE INTERPRETER IS DROPPED THE SAME WAY (closing review round 2 H1, TOOL-aRepatriatedFork-49). This
+# hook's own resolver, the runner's, and every python leg's take `GOV_PYTHON` first, and each kit's
+# published `<KIT>_PY` before that, so an exported one chose the program every python leg ran: a
+# planted interpreter exiting 0 landed a RED tracked bar with `git status` empty. `gate-env.sh` may
+# declare one again, and it is vetted before it runs; it must export it for the bar to see it.
+ENV_DROPPED_KNOBS="GOV_KITROOT GOV_PYTHON"
+ENV_CLEARED=""
+for _k in $ENV_DROPPED_KNOBS $(compgen -e); do
+  case "$_k" in GOV_KITROOT) ;; GOV_PYTHON|*_PY) [ -n "${!_k+x}" ] && ENV_CLEARED+=" $_k" ;; *) continue ;; esac
+  unset "$_k"
+done
 
 # $def decides which pushed ref gets gated, so whoever supplies $def decides whether the gate runs AT
 # ALL. GOV_DEFAULT_BRANCH used to outrank the observed default and was never checked for meaning, which
@@ -643,6 +654,12 @@ fi
 # `BASH_ENV` runs an actor's own file inside this hook's interpreter before its first line; each needs
 # an act of its own, and the unattended protocol lists that class as open. What this closes is the
 # case where no such act is needed: the knob this hook documents, set to a four-letter word.
+# The bar still INHERITS every other variable (TOOL-aRepatriatedFork-49 names what it clears): `PATH`,
+# which chooses every launcher that is a bare word; the language runtimes' own variables, such as
+# `PYTHONPATH`, `PYTHONHOME` and `NODE_OPTIONS`, which can load code into any leg; and the leg-level
+# knobs an adopter's own legs read. Clearing the runtimes' variables would change the environment
+# every adopter's legs receive from a hook that ships verbatim, and `PATH` stays inherited either
+# way, so that class is open and is the owner's to decide.
 bar_class=""
 check_bar_command() { # knob name · command · sha its scripts must be tracked at · [declared] -> rc 0 with bar_class, bar_path and bar_blob, or rc 1 printed with its headline in `why`
   local knob=$1 cmd=$2 at=$3 _n=0
@@ -1031,6 +1048,30 @@ if [ -z "${GOV_GATE_CMD:-}" ] && [ -z "$GATE_RUNNER" ]; then
   echo "  Install the run-gates kit there, or name a bar with GOV_GATE_CMD. Deliberate override, as always: git push --no-verify" >&2
   write_refusal bar-refused "$why"; RUNLOG_CLEAN=1; exit 1
 fi
+
+# ---- WHAT THE BAR READS, NOT ONLY WHICH BAR — closing review round 2 H1, TOOL-aRepatriatedFork-49 ----
+# The runner takes its leg manifest from `GATE_LEGS` and reuses a proven-green ledger row under
+# `GATE_REUSE`, so either knob, exported, decided what a vetted runner checked: a manifest of one green
+# leg outside the tree landed a RED tracked bar. They are cleared for every bar not labelled STUB. The
+# label is the key, never `GOV_GATE_CMD_TEST` itself, which does not mark the DEFAULT bar and would
+# leave a planted manifest under a `default` label that earns the lander marker. A STUB keeps them,
+# because the hook's own fixtures drive a runner copy over a fixture manifest.
+# The manifest the runner then reads, the sibling of its kit directory, is vetted as the runner is:
+# an ignored one was read like a tracked one, and `git status` never reports it.
+BAR_SCRUBBED_KNOBS="GATE_LEGS GATE_REUSE"
+if [ "$bar_class" != stub ]; then
+  for _k in $BAR_SCRUBBED_KNOBS; do
+    [ -n "${!_k+x}" ] && ENV_CLEARED+=" $_k"
+    unset "$_k"
+  done
+  if [ -n "$GATE_RUNNER" ]; then
+    _legs=${GATE_RUNNER%/*}
+    case "$_legs" in */*) _legs=${_legs%/*}/gate-legs.json ;; *) _legs=gate-legs.json ;; esac
+    [ -f "$top/$_legs" ] && check_reviewed_file "$_legs" "$main_local" "is the leg manifest the bar's runner reads"
+  fi
+fi
+[ -n "$ENV_CLEARED" ] \
+  && echo "pre-push: not honoured from the environment by this bar:$ENV_CLEARED" >&2
 
 # S3's refusal, measured above the forcing predicates and refused here, once the bar is vetted.
 if [ -n "$_tree_dirty" ]; then

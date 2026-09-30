@@ -742,6 +742,126 @@ esac
 
 cd "$pfx_home" || exit 2
 
+# --- closing review round 2 H1 (TOOL-aRepatriatedFork-49): THE BAR'S MANIFEST AND PYTHON ARE THE
+# --- TRACKED ONES. B1 vetted the runner, and the runner still took its leg manifest from GATE_LEGS,
+# --- its python from GOV_PYTHON, reused a ledger row under GATE_REUSE, and read an IGNORED manifest
+# --- like a tracked one. Each route below landed a RED tracked bar on the ce8a78f5 hook. The fixture
+# --- runs a COPY OF THE REAL RUNNER, because a stub runner reads none of those knobs and would pass
+# --- every arm by never being asked. Each planted route writes a marker when it runs.
+h49="$tmp/h49"; h49_mark="$h49/mark"; mkdir -p "$h49/hooks" "$h49_mark"
+cp "$SRC/.githooks/pre-push" "$h49/hooks/pre-push"
+git init -q --bare "$h49/remote.git"; git init -q "$h49/work"
+cd "$h49/work" || exit 2
+git config user.email t@example.com; git config user.name t; git config core.autocrlf false
+git config core.hooksPath "$h49/hooks"
+mkdir -p "$RUN_GATES" fx
+cp "$SRC/$RUN_GATES_DIR/run-gates.sh" "$SRC/$RUN_GATES_DIR/gate-fingerprint.sh" \
+   "$SRC/$RUN_GATES_DIR/gate-profiles.txt" "$RUN_GATES/"
+printf 'import os, sys\nsys.exit(int(os.environ.get("H49_LEG_RC", "1")))\n' > fx/leg.py
+printf '%s\n' '[{"name": "red leg", "argv": ["python3", "fx/leg.py"]}]' > gate-legs.json
+git add -A >/dev/null 2>&1; git commit -q -m init; git branch -M main
+git remote add origin "$h49/remote.git"
+h49_gd=$(cd "$(git rev-parse --git-dir)" && pwd)
+touch "$h49_gd/push-main-active"
+run_h49_push() { # NAME=VALUE... -> the output of a default-bar push of HEAD; the record is cleared so every push runs FULL
+  ( unset GOV_GATE_CMD GOV_GATE_CMD_TEST; rm -f "$h49_gd/gate-full-green"
+    env GATE_PROFILE=minimal GATE_TURNSTILE=0 GATE_WALL=0 "$@" git push -q origin main 2>&1 )
+}
+read_h49_token() { cut -f1 "$h49_gd/pre-push-refusal" 2>/dev/null; }
+read_h49_mark() { [ -e "$h49_mark/$1" ] && echo MARK; }
+printf '[{"name": "planted", "argv": ["bash", "-c", "touch %s/legs"]}]\n' "$h49_mark" > "$h49/green.json"
+printf '#!/usr/bin/env bash\ncase "$*" in *fx/leg.py*) touch "%s/python"; exit 0 ;; esac\nexec %s "$@"\n' \
+  "$h49_mark" "$_rkd_py" > "$h49/fakepy"
+chmod +x "$h49/fakepy"
+
+git commit -q --allow-empty -m "h49 control"
+_out=$(run_h49_push); _rc=$?
+case "$_rc|$(read_h49_token)|$_out" in
+  0\|*) bad "H49 control — the tracked RED leg let the push through: $_out" ;;
+  *"|gate-red|"*"red leg"*) ok "H49 control — with nothing planted the tracked RED leg runs and refuses" ;;
+  *) bad "H49 control expected the tracked red leg to refuse as gate-red, got rc=$_rc token '$(read_h49_token)': $_out" ;;
+esac
+
+git commit -q --allow-empty -m "h49 GATE_LEGS"
+_out=$(run_h49_push GATE_LEGS="$h49/green.json"); _rc=$?
+case "$_rc|$(read_h49_token)|$(read_h49_mark legs)|$_out" in
+  0\|*|*\|MARK\|*) bad "H49 GATE_LEGS from the environment chose the manifest the bar ran: rc=$_rc $_out" ;;
+  *"|gate-red||"*GATE_LEGS*) ok "H49 GATE_LEGS is not honoured: the tracked manifest runs, and the push names the knob" ;;
+  *) bad "H49 expected GATE_LEGS to be ignored and named, with the push refused as gate-red, got rc=$_rc token '$(read_h49_token)': $_out" ;;
+esac
+
+git commit -q --allow-empty -m "h49 GOV_PYTHON"
+_out=$(run_h49_push GOV_PYTHON="$h49/fakepy"); _rc=$?
+case "$_rc|$(read_h49_token)|$(read_h49_mark python)" in
+  0\|*|*\|MARK) bad "H49 GOV_PYTHON from the environment chose the python the bar ran: rc=$_rc $_out" ;;
+  *"|gate-red|") ok "H49 GOV_PYTHON is not honoured: the red python leg runs under a resolved launcher" ;;
+  *) bad "H49 expected GOV_PYTHON to be dropped and the push refused as gate-red, got rc=$_rc token '$(read_h49_token)': $_out" ;;
+esac
+
+# A direct green run writes the ledger row; the push then runs over the SAME tree and base, so on the
+# old hook the row's key matched and the red leg was never executed.
+git commit -q --allow-empty -m "h49 GATE_REUSE"
+( unset GOV_GATE_CMD GOV_GATE_CMD_TEST
+  env GATE_PROFILE=minimal GATE_TURNSTILE=0 GATE_WALL=0 GATE_FULL=1 H49_LEG_RC=0 bash "$RUN_GATES/run-gates.sh" >/dev/null 2>&1 )
+_out=$(run_h49_push GATE_REUSE=1); _rc=$?
+case "$_rc|$(read_h49_token)" in
+  0\|*) bad "H49 GATE_REUSE from the environment reused a green row over the RED leg: $_out" ;;
+  *"|gate-red") ok "H49 GATE_REUSE is not honoured: the red leg executes and refuses" ;;
+  *) bad "H49 expected GATE_REUSE to be ignored and the push refused as gate-red, got rc=$_rc token '$(read_h49_token)': $_out" ;;
+esac
+
+# The IGNORED manifest: the repository tracks the runner and no manifest, and `git status` is empty.
+git rm -q --cached gate-legs.json; printf 'gate-legs.json\n' >> "$h49_gd/info/exclude"
+printf '[{"name": "planted", "argv": ["bash", "-c", "touch %s/ignored"]}]\n' "$h49_mark" > gate-legs.json
+git commit -q -m "h49 an ignored manifest"
+[ -z "$(git status --porcelain)" ] || bad "H49 fixture — the ignored manifest is visible to git status, so the arm below tests nothing hidden"
+_out=$(run_h49_push); _rc=$?
+case "$_rc|$(read_h49_token)|$(read_h49_mark ignored)|$_out" in
+  0\|*|*\|MARK\|*) bad "H49 an ignored gate-legs.json was read as the bar's manifest: rc=$_rc $_out" ;;
+  *"|bar-refused||"*gate-legs.json*) ok "H49 an ignored leg manifest is refused as bar-refused before the bar reads it" ;;
+  *) bad "H49 expected the ignored manifest to be refused as bar-refused, got rc=$_rc token '$(read_h49_token)': $_out" ;;
+esac
+cd "$pfx_home" || exit 2
+
+# THE CLASS (TOOL-aRepatriatedFork-49 S5): every GATE_/GOV_ name the runner reads through `$` is in
+# exactly one set — the names the hook clears before gate-env.sh runs, the names it clears before a
+# non-stub bar, or the inert set below, each of which the runner's own invariant keeps from turning a
+# leg into a PASS or a SKIP. A new knob reds here until someone decides which it is.
+#   GATE_BASE GATE_FULL GATE_RUN_ID — the hook sets each on the path where it matters; an inherited
+#     GATE_FULL only widens the run, and GATE_FULL=1 makes GATE_BASE irrelevant.
+#   GATE_SELFTESTS — adds legs, and predicate 8 forces a full bar for it.
+#   the rest — width, timeouts, the wall, the turnstile, reaping and the run log: a breach is RED.
+BAR_INERT_KNOBS="GATE_BASE GATE_CGROUP_ROOT GATE_CORES GATE_FULL GATE_JOBS GATE_PROFILE GATE_PROFILES GATE_RAM_MB GATE_REAP_BOUND GATE_RUN_ID GATE_RUN_KEEP GATE_SELFTESTS GATE_TURNSTILE GATE_TURNSTILE_HELD GATE_TURNSTILE_TICK GATE_TURNSTILE_TTL GATE_WALL GOV_RUNLOG"
+read_hook_const() { sed -n 's/^'"$1"'="\(.*\)"$/\1/p' "$SRC/.githooks/pre-push"; }
+check_knob_classes() { # <runner file> -> one line per unclassified, doubly classified or stale name; empty when clean
+  local knobs cleared scrubbed k n
+  knobs=" $(grep -oE '\$\{?(GATE|GOV)_[A-Z0-9_]+' "$1" | sed -E 's/^\$\{?//' | sort -u | tr '\n' ' ')"
+  cleared=$(read_hook_const ENV_DROPPED_KNOBS); scrubbed=$(read_hook_const BAR_SCRUBBED_KNOBS)
+  for k in $knobs; do
+    n=0
+    for s in "$cleared" "$scrubbed" "$BAR_INERT_KNOBS"; do case " $s " in *" $k "*) n=$((n + 1)) ;; esac; done
+    [ "$n" = 1 ] || echo "unclassified-or-twice $k ($n)"
+  done
+  for k in $scrubbed $BAR_INERT_KNOBS; do case "$knobs " in *" $k "*) ;; *) echo "stale $k" ;; esac; done
+}
+h49_n=$(grep -oE '\$\{?(GATE|GOV)_[A-Z0-9_]+' "$SRC/$RUN_GATES_DIR/run-gates.sh" | sed -E 's/^\$\{?//' | sort -u | grep -c .)
+_cls=$(check_knob_classes "$SRC/$RUN_GATES_DIR/run-gates.sh")
+if [ -z "$_cls" ] && [ "$h49_n" -ge 10 ] && grep -qE '\$\{?GATE_LEGS' "$SRC/$RUN_GATES_DIR/run-gates.sh"; then
+  ok "H49 class — every one of the runner's $h49_n GATE_/GOV_ knobs is classified exactly once"
+else
+  bad "H49 class — the runner's knobs ($h49_n) are not each classified exactly once: $(printf '%s' "$_cls" | tr '\n' ';')"
+fi
+{ cat "$SRC/$RUN_GATES_DIR/run-gates.sh"; printf ': "${GATE_PLANTED:-}"\n'; } > "$tmp/h49-runner-planted.sh"
+case "$(check_knob_classes "$tmp/h49-runner-planted.sh")" in
+  *"unclassified-or-twice GATE_PLANTED"*) ok "H49 class — a runner knob nobody classified reds by name" ;;
+  *) bad "H49 class — an unclassified GATE_PLANTED in a runner copy went unreported" ;;
+esac
+sed 's/GATE_LEGS/GATE_XLEGS/g' "$SRC/$RUN_GATES_DIR/run-gates.sh" > "$tmp/h49-runner-nolegs.sh"
+case "$(check_knob_classes "$tmp/h49-runner-nolegs.sh")" in
+  *"stale GATE_LEGS"*) ok "H49 class — a cleared name the runner no longer reads reds as stale" ;;
+  *) bad "H49 class — a stale GATE_LEGS member went unreported" ;;
+esac
+
 # ============================================================================================
 # TOOL-aRepatriatedFork-8 — THE CONTRACTS adopter ic's OWN HOOK CARRIED. A fresh fixture whose ONLY
 # remote is named `mirror`, not `origin`, as on adopter ic's node `d`, with its HEAD set and NO GOV_DEFAULT_BRANCH, so
