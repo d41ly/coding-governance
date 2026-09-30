@@ -148,10 +148,11 @@ covered the day it lands rather than the day someone remembers to add it to a li
 
 ## Reuse affordance
 
-seam: check-dead-paths.sh — reuse whenever a repo must forbid naming something it DELETED: derive
-the needle set from `git log --diff-filter=D`, subtract every basename the tree still carries, and
-anchor the derivation on a frozen sentinel so an empty needle set reds instead of reporting clean.
-Extend by widening the haystack; the sentinel is what stops it going quietly vacuous.
+seam: check-dead-paths.sh — reuse whenever a repo must forbid naming something it DELETED or
+renamed away: derive the needle set from `git log --diff-filter=D` plus the source of every
+`--diff-filter=R` row outside `memory/`, subtract every basename the tree still carries, and anchor
+each half on its own frozen sentinel so an empty read reds instead of reporting clean. Extend by
+widening the haystack; the sentinels are what stop it going quietly vacuous.
 
 seam: check-install-prefix.sh — reuse whenever a repo must forbid a SPELLED path in files it ships
 rather than in files it runs: derive the population from `git ls-files`, derive the alternation from
