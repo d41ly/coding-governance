@@ -1984,7 +1984,8 @@ def main() -> int:
         bf = stale_target("bf")
         _gbf = govkit_module()
         _bf_writes = _gbf.resolve_entry(
-            govroot, _gbf.load_toml(govroot / PFX / KIT_NAMES["govkit"] / "entries" / "check-wiring.kit.toml"),
+            govroot, _gbf.resolve_descriptor_paths(_gbf.load_toml(
+                govroot / PFX / KIT_NAMES["govkit"] / "entries" / "check-wiring.kit.toml"), PFX.rstrip("/")),
             _gbf.canonical_ctx("check-wiring"))["writes"]
         _bf_old = set(run_gov_git(govroot, "ls-tree", "-r", "--name-only", OLD).splitlines())
         _bf_drop = {d for d, w in _bf_writes.items() if w["src"] and w["src"] not in _bf_old}
@@ -2321,7 +2322,7 @@ def main() -> int:
 
         r1 = scratch_gov(kit("typo leg"))
         check("a descriptor leg absent from the manifest REDS",
-              f"is in no leg of {PFX}gate-legs.json" in r1.stdout, r1.stdout)
+              "is in no leg of <prefix>/gate-legs.json" in r1.stdout, r1.stdout)
         check("and the manifest leg it left unclaimed reds too — both directions, one fixture",
               "claimed by no descriptor and carried by no [[exempt_leg]]" in r1.stdout, r1.stdout)
 
@@ -2364,7 +2365,8 @@ def main() -> int:
         # TOOL-aReplayedCard-2 gave the kit a third file, which is the literal going stale in place.
         _g5 = govkit_module()
         _w5 = _g5.resolve_entry(
-            govroot, _g5.load_toml(govroot / PFX / KIT_NAMES["govkit"] / "entries" / "check-wiring.kit.toml"),
+            govroot, _g5.resolve_descriptor_paths(_g5.load_toml(
+                govroot / PFX / KIT_NAMES["govkit"] / "entries" / "check-wiring.kit.toml"), PFX.rstrip("/")),
             _g5.canonical_ctx("check-wiring"))["writes"].values()
         _n5 = sum(1 for w in _w5 if w["role"] == "engine")
         _p5 = sum(1 for w in _w5 if w["role"] == "engine" and w["src"])
@@ -2577,8 +2579,12 @@ user_skills = "/tmp/gk-fake-skills"
         #     is check-microformats' own state before TOOL-aHonedRuleset-8 moved it.
         reg = gcopy / PFX / KIT_NAMES["govkit"] / "registry.toml"
         rkeep = reg.read_text(encoding="utf-8")
-        reg.write_text(rkeep.replace('"run-gates",\n           "check-microformats"]',
-                                     '"run-gates"]', 1), encoding="utf-8")
+        # One id per line since TOOL-aRepatriatedFork-29. A replace that matches nothing stages no
+        # break at all, which is how this arm went red for the wrong reason, so it is asserted.
+        _r7e = rkeep.replace('  "run-gates",\n  "check-microformats",\n', '  "run-gates",\n', 1)
+        check("7e LIVENESS the staged registry really drops check-microformats from the default",
+              _r7e != rkeep, "the replace matched nothing in the registry")
+        reg.write_text(_r7e, encoding="utf-8")
         cm = gcopy / PFX / KIT_NAMES["govkit"] / "entries" / "check-microformats.kit.toml"
         ckeep = cm.read_text(encoding="utf-8")
         cl = ckeep.split("\n")
@@ -13348,7 +13354,8 @@ user_skills = "/tmp/gk-fake-skills"
     reg = load_seed_toml(_gov / PFX / KIT_NAMES["govkit"] / "registry.toml")
     seeded = []
     for e in reg.get("entry", []):
-        d = load_seed_toml(_gov / e["descriptor"])
+        # The registry spells descriptors through `{prefix}` (TOOL-aRepatriatedFork-29 S1).
+        d = load_seed_toml(_gov / resolve_prefix_token(e["descriptor"], PFX.rstrip("/")))
         if d.get("gate_runner_seed"):
             seeded.append((e["id"], d["gate_runner_seed"]))
     check("at least one registry entry declares a [gate_runner_seed] to round-trip",

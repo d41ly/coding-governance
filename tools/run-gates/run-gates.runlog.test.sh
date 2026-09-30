@@ -665,7 +665,7 @@ scan_exit_sites() { # file... -> one TAB-separated row per shell exit
 # as a count that moved rather than as a match.
 cat > "$WORK/exits.tsv" <<'EXITS'
 echo "run-gates: cannot create the run record at $RUNDIR" >&2; exit 2	1	AC8 run-dir
-' "$LEGS_FILE" "$TIMINGS") || { echo "run-gates: cannot parse $LEGS_FILE"; exit 2; }	1	AC8 manifest
+' "$LEGS_FILE" "$TIMINGS" "$(dirname "$KITREL")") || { echo "run-gates: cannot parse $LEGS_FILE"; exit 2; }	1	AC8 manifest
 kill -0 "$_me" 2>/dev/null || exit 0	1	exempt: the wall watcher's ( … ) & subshell, which runs no trap of the runner's
 [ -f "$_work/wall.disarm" ] && exit 0	1	exempt: the wall watcher's ( … ) & subshell, which runs no trap of the runner's
 exit 1	2	AC2 wall|AC1 red
