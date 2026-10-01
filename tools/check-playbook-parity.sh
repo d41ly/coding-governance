@@ -177,8 +177,11 @@ waived=$(grep -vE '^[[:space:]]*(#|$)' "$WAIVERS" | awk '{print $1}' | sort -u)
 # stale-count defect one file over.
 # `<prefix>/<kit>/` is the third form (TOOL-aRepatriatedFork-26 S9): the charter and the runbook spell
 # a kit path with that prose token, because no install prefix is correct for every adopter.
+# The first form is THIS install's own root, derived, never gov's literal one: spelled `tools/` it
+# graded every other install against a root it does not have (TOOL-aRepatriatedFork-26, VERIFYING
+# repair). At a root install there is no root head, and a bare `<kit>/` is the substring above.
 named_in_playbook() { # <kit>
-  grep -qE "tools/$1/|<prefix>/$1/|\`$1/\`" "$TEMPLATE" "$RUNBOOK" 2>/dev/null
+  grep -qE "${SELF_PRE:+$SELF_PRE$1/|}<prefix>/$1/|\`$1/\`" "$TEMPLATE" "$RUNBOOK" 2>/dev/null
 }
 
 for k in $kits; do
