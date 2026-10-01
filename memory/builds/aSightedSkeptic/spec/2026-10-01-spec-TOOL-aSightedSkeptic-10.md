@@ -1,6 +1,6 @@
 # TOOL-aSightedSkeptic-10 — discharge the two Observed-by claims no arm reads, and record the class
 
-**Status:** SPECCED · rev-1 · 2026-10-01 · node a · Tier-2 · base ef1dcdb6 · streams tooling · order 10 · ratified 2026-10-01
+**Status:** CLOSED · rev-1 · 2026-10-01 · node a · Tier-2 · base ef1dcdb6 · streams tooling · order 10 · ratified 2026-10-01
 
 <!-- gen:spec-records -->
 

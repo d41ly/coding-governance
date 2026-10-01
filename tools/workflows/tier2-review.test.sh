@@ -932,6 +932,54 @@ async function runWholeScriptArms() {
       r.logs.some((l) => l.indexOf('WARNING:') === 0 && l.indexOf('unread: security') !== -1),
       'intensity: a lens note for a skipped lens is reported unread')
   }
+
+  // ==== TOOL-aSightedSkeptic-10 — the surfaces two "Observed by" claims named and no arm read ==========
+  // Closing review round 1, H1 and H2. Each arm reads the surface its scope item renders on, counts what
+  // it reads before grading it, and was observed RED against the staged break its spec's §4 table names.
+  const OBS_NOTE = 'OBSNOTE-10 guard the other branch'
+  // A skeptic confirming every id at blocker, rejecting the finder's fix with a corrected one.
+  const buildRejectedVerdicts = (label, prompt) => {
+    const vr = buildFixVerdicts('unsound', OBS_NOTE)(label, prompt)
+    for (const v of vr.verdicts) v.severity = 'blocker'
+    return vr
+  }
+  const scanConfirmedLogs = (run) => run.logs.filter((l) => l.indexOf('  CONFIRMED [') === 0)
+  // ---- S1: a dead synthesis logs every confirmed finding at its binding grade, its fix through renderFixLine.
+  r = await runReview(DIFF, buildStubs({ synth: null, 'find:': buildFixLens, 'verify:': buildRejectedVerdicts }))
+  if (checkNoThrow(r, 'observed-by dead synthesis')) {
+    const cl = scanConfirmedLogs(r)
+    ck(cl.length === 5 && cl.every((l) => l.indexOf('  CONFIRMED [blocker] ') === 0),
+      'observed-by: a dead synthesis logs every CONFIRMED finding at its binding grade')
+    ck(cl.length === 5 && cl.every((l) => l.indexOf('REJECTED') !== -1 && l.indexOf(OBS_NOTE) !== -1 && l.indexOf('NOT JUDGED') === -1),
+      'observed-by: a dead synthesis logs every CONFIRMED finding\'s fix through renderFixLine')
+  }
+  // ---- S2: a dead skeptic batch logs the four confirmed findings at their binding grade.
+  r = await runReview(DIFF, buildStubs({ 'verify:': buildGradedVerdicts('confirmed', () => 'blocker'), 'verify:ids-2-2': null }))
+  if (checkNoThrow(r, 'observed-by dead batch')) {
+    const cl = scanConfirmedLogs(r)
+    ck(cl.length === 4 && cl.every((l) => l.indexOf('  CONFIRMED [blocker] ') === 0),
+      'observed-by: a dead skeptic batch logs every CONFIRMED finding at its binding grade')
+  }
+  // ---- S3: one uncertain answer, counted apart from no verdict in the note, RUN INTEGRITY and the log.
+  r = await runReview(DIFF, buildStubs({ 'verify:ids-3-3': buildGradedVerdicts('uncertain') }))
+  if (checkNoThrow(r, 'observed-by one uncertain')) {
+    const sp = r.trace.find((t) => t.label === 'synth')
+    const ri = sp ? sp.prompt.slice(sp.prompt.indexOf('RUN INTEGRITY')) : ''
+    const uw = r.logs.filter((l) => l.indexOf('WARNING: 1 finding(s) answered UNCERTAIN') === 0)
+    ck(r.result.uncertain === 1 && uw.length === 1 &&
+      String(r.result.note).indexOf('PARTIAL: 1 finding(s) are unverified — 1 answered uncertain by a skeptic, 0 with no usable verdict') === 0 &&
+      ri.indexOf('1 answered UNCERTAIN by a skeptic, 0 with NO usable verdict') !== -1 &&
+      !r.logs.some((l) => l.indexOf('with NO usable verdict') !== -1),
+      'observed-by: one uncertain answer is counted apart from no verdict in the note, RUN INTEGRITY and the log')
+  }
+  // ---- S4: every batch uncertain; the note never reads as none judged.
+  r = await runReview(DIFF, buildStubs({ 'verify:': buildGradedVerdicts('uncertain') }))
+  if (checkNoThrow(r, 'observed-by all uncertain')) {
+    const note = String(r.result.note)
+    ck(r.result.uncertain === 5 && r.result.unverified === 5 && note.indexOf('none confirmed or refuted') !== -1 &&
+      note.indexOf('5 answered uncertain by a skeptic, 0 with no usable verdict') !== -1 && note.indexOf('none judged') === -1,
+      'observed-by: an all-uncertain round never reads as none judged')
+  }
   await runLedgerArms()
 }
 
@@ -1159,7 +1207,10 @@ printf '%s\n' "$out"
 # assertions, counted off the block — two refused specs values (2), the unindented continuation (1), the
 # reason-only unsound verdict (1), the three fix verdicts together (1), the unread skipped-lens note (1),
 # the empty and blank unsound notes (2), the splitlines boundaries in a cell (1) and regraded per exit path (1).
-FLOOR_ASSERTIONS=175
+# RAISED 175 -> 180 by TOOL-aSightedSkeptic-10: 5 assertions, counted off the block — the synthesis-death
+# log's binding grade and rendered fix (2), the deferred log's binding grade (1), one uncertain answer
+# apart from no verdict (1) and an all-uncertain note (1).
+FLOOR_ASSERTIONS=180
 executed=$(printf '%s\n' "$out" | sed -n 's/^---- \([0-9][0-9]*\) passed.*/\1/p' | tail -1)
 if [ -z "$executed" ]; then
   echo "FAIL the runner printed no assertion count at all — it died before its summary line"
