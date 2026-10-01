@@ -196,9 +196,9 @@ ids TOOL-aRepatriatedFork-54 TOOL-aRepatriatedFork-55 TOOL-aRepatriatedFork-56
 | [TOOL-aRepatriatedFork-56 — brief-recorded does not grade a repair of a unit built before its run](spec/2026-10-02-spec-TOOL-aRepatriatedFork-56.md) | 27 | 1 | SPECCED | rev-1 | 2026-10-02 |
 <!-- /gen:build-units -->
 
-Records: 119 bound to this build, across 4 record folder(s).
+Records: 121 bound to this build, across 4 record folder(s).
 
-Ids no record names: TOOL-aRepatriatedFork-55 TOOL-aRepatriatedFork-56.
+Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: DEPL-aRepatriatedFork-1 DEPL-aRepatriatedFork-13 DEPL-aRepatriatedFork-14 DEPL-aRepatriatedFork-17 DEPL-aRepatriatedFork-20 TOOL-aRepatriatedFork-10 TOOL-aRepatriatedFork-11 TOOL-aRepatriatedFork-12 TOOL-aRepatriatedFork-15 TOOL-aRepatriatedFork-16
 TOOL-aRepatriatedFork-18 TOOL-aRepatriatedFork-19 TOOL-aRepatriatedFork-2 TOOL-aRepatriatedFork-3 TOOL-aRepatriatedFork-4 TOOL-aRepatriatedFork-5 TOOL-aRepatriatedFork-6 TOOL-aRepatriatedFork-7 TOOL-aRepatriatedFork-8 TOOL-aRepatriatedFork-9 DEPL-aRepatriatedFork-21 TOOL-aRepatriatedFork-21
