@@ -50,6 +50,8 @@ mkfixture() { # $1 = dir
 # 1. the green case — the one carrier well-formed
 mkfixture "$TMPROOT/good"
 arm "green: the single marker carrier is present and well-formed" 0 "check-placeholders OK" --   bash -c "cd '$TMPROOT/good' && bash '$GATE'"
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${FAIL:-0}" = 0 ] && echo "PASS (${PASS:-1} assertions)" || echo "FAIL (${PASS:-1} assertions)"; [ "${FAIL:-0}" = 0 ] && exit 0; exit 1; fi
 
 # 2. marker PRESENCE. With one carrier this is the whole marker question: there is no second file to
 # be in lockstep WITH, so presence plus well-formedness is what survives.

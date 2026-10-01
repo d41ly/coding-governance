@@ -137,6 +137,8 @@ green="$tmp/green.sh"; printf '#!/usr/bin/env bash\nexit 0\n' > "$green"
 
 # case 1 — push to main with a RED gate → blocked (non-zero push).
 if GOV_GATE_CMD="bash $red" git push -q origin main >/dev/null 2>&1; then bad "1 red gate must block a main push"; else ok "1 red gate blocks a main push"; fi
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${fail:-0}" = 0 ] && echo "PASS (${probe_n:-1} assertions)" || echo "FAIL (${probe_n:-1} assertions)"; [ "${fail:-0}" = 0 ] && exit 0; exit 1; fi
 
 # case 2 — push to main with a GREEN gate → proceeds (the gate actually ran).
 if GOV_GATE_CMD="bash $green" git push -q origin main >/dev/null 2>&1; then ok "2 green gate lets a main push through"; else bad "2 green gate must let a main push through"; fi

@@ -15,6 +15,8 @@ run(){ ( cd "$R" && bash "$TOOL" "$@" ); }
 mkrepo t1
 run --source src.md >/dev/null 2>&1
 [ -f "$R/AGENTS.md" ] && ok "1 AGENTS.md created" || bad "1" "no AGENTS.md"
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${fail:-0}" = 0 ] && echo "PASS (${pass:-1} assertions)" || echo "FAIL (${pass:-1} assertions)"; [ "${fail:-0}" = 0 ] && exit 0; exit 1; fi
 [ "$(cat "$R/CLAUDE.md")" = "@AGENTS.md" ] && ok "1 CLAUDE.md @import" || bad "1" "CLAUDE.md=$(cat "$R/CLAUDE.md")"
 grep -q '"context"' "$R/.gemini/settings.json" && grep -q '"fileName": "AGENTS.md"' "$R/.gemini/settings.json" && ok "1 gemini nested context.fileName" || bad "1" "gemini schema: $(cat "$R/.gemini/settings.json")"
 cmp -s "$R/AGENTS.md" "$R/.github/copilot-instructions.md" && ok "1 copilot copy" || bad "1" "copilot not a copy"

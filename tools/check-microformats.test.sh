@@ -59,6 +59,8 @@ arm() {
 }
 
 arm "control · a conforming block passes" ok ""
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${FAILED:-0}" = 0 ] && echo "PASS (${ASSERTIONS:-1} assertions)" || echo "FAIL (${ASSERTIONS:-1} assertions)"; [ "${FAILED:-0}" = 0 ] && exit 0; exit 1; fi
 
 # --- the could-not-run branch. THREE fence failures, because the anchor is the fence and the arm
 # --- for a renamed heading could not be built: the section has no heading to rename.

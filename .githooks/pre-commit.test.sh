@@ -27,6 +27,8 @@ git config core.hooksPath hk
 export GOV_DEFAULT_BRANCH=main   # throwaway has no origin/HEAD — pin the default explicitly
 
 echo a > a; git add a; git commit -q -m first; ck "commit on default branch allowed" $? 0
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${fail:-0}" = 0 ] && echo "PASS (${pass:-1} assertions)" || echo "FAIL (${pass:-1} assertions)"; [ "${fail:-0}" = 0 ] && exit 0; exit 1; fi
 
 git checkout -q -b feature/x
 echo b > b; git add b; git commit -q -m second 2>/dev/null; ck "commit off default branch refused" $? 1

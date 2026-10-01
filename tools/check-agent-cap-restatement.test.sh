@@ -139,6 +139,8 @@ mk red
 printf '# rules\n\nA review spawns at most 5 agents TOTAL.\n' > "$R/GUIDE.md"
 run
 ck "a bare bound in live prose is NAMED"            '[ "$rc" = 1 ] && printf "%s" "$out" | grep -q "GUIDE.md"'
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${st:-0}" = 0 ] && echo "PASS (${n:-1} assertions)" || echo "FAIL (${n:-1} assertions)"; [ "${st:-0}" = 0 ] && exit 0; exit 1; fi
 
 # ---- GREEN CONTROL: a digit near a bound word with NO fan-out noun stays silent. This is the real
 # ---- sentence from the kickoff engine — "report ≤5 lines" — which an earlier pattern DID flag.

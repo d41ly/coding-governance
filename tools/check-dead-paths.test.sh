@@ -112,6 +112,8 @@ reset_base() {
 # ---- 1. the derivation ---------------------------------------------------------------------------
 reset_base
 arm "green: a repo with a deletion and no carrier is clean" 0 "no undeclared carrier" -- run "$BASE"
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${FAIL:-0}" = 0 ] && echo "PASS (${PASS:-1} assertions)" || echo "FAIL (${PASS:-1} assertions)"; [ "${FAIL:-0}" = 0 ] && exit 0; exit 1; fi
 arm "the needle set names the deleted basename" 0 "parallel-coding-governance.domain-rules.md" -- run "$BASE" --needles
 # THE TAIL IS THE HALF A FULL-BASENAME SCAN MISSES. Four of the eleven real carriers spelled only
 # the tail, so this is not a refinement — it is most of the gate.

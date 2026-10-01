@@ -115,6 +115,8 @@ run() { "$PY" "$GATE" --root "$1" ${2:-} 2>&1; }
 T=$(mktemp -d); scratch "$T" '"KIT_DIR"' escaped 'argv = ["bash", "{kit}/adopt-demo.sh"]'
 o=$(run "$T"); rc=$?
 arm "every declared token substituted exits 0" 0 "$rc" "$o" "1 kit(s) graded"
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${fail:-0}" = 0 ] && echo "PASS (${pass:-1} assertions)" || echo "FAIL (${pass:-1} assertions)"; [ "${fail:-0}" = 0 ] && exit 0; exit 1; fi
 arm "...and the green line names the pair count" 0 "$rc" "$o" "rule-token pair(s)"
 
 # ---- THE ESCAPED SPELLING. This is the defect S5's pre-wiring run found; without it the gate reds

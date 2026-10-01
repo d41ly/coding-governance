@@ -105,6 +105,8 @@ else
   say_fail "A0 the shipped ceiling is $EXPECT_LIMIT" \
     "the gate reports $LIMIT — the ceiling moved and no other arm in this file would notice"
 fi
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${fails:-0}" = 0 ] && echo "PASS (${probe_n:-1} assertions)" || echo "FAIL (${probe_n:-1} assertions)"; [ "${fails:-0}" = 0 ] && exit 0; exit 1; fi
 
 # --- A14-A18 · the four-layer resolution, each arm pinning WHICH layer won -----------------------
 # Against a SCRATCH limits file via the 4th positional, never the tracked one: `run-gates.sh` runs

@@ -222,6 +222,8 @@ trap 'rm -rf "$base"' EXIT
 # 1 — the clean case, and it must GRADE something rather than pass on an empty population
 d=$base/clean; scratch "$d"
 arm "a conforming spec passes and reports what it graded" 0 "$d" "token(s) graded"
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${fail:-0}" = 0 ] && echo "PASS (${pass:-1} assertions)" || echo "FAIL (${pass:-1} assertions)"; [ "${fail:-0}" = 0 ] && exit 0; exit 1; fi
 
 # 2 — a section 6 criterion naming an untracked path
 d=$base/path; scratch "$d"

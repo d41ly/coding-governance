@@ -92,6 +92,8 @@ read_gate() { # dir -> the gate's --check output in LAST_OUT, its exit status re
 # ==================== the GREEN control and the population ====================================
 G="$TMP/green"; build_source_fixture "$G" "The engine lives at {prefix}/qdemo/thing.sh in this repo."
 run_arm "a kit source spelling only drained forms is clean" "install-prefix: clean — " 0 "$G"
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${fails:-0}" = 0 ] && echo "PASS (${passed:-1} assertions)" || echo "FAIL (${passed:-1} assertions)"; [ "${fails:-0}" = 0 ] && exit 0; exit 1; fi
 read_gate "$G"
 case "$LAST_OUT" in *"clean — 0 tracked file(s)"*) bad "LIVENESS the green fixture graded NO file" ;;
   *"tracked file(s) graded"*) good "LIVENESS the green fixture graded a non-empty population, and says how many" ;;
