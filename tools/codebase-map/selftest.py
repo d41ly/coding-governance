@@ -190,9 +190,11 @@ def test_install_prefix_resolution(tmp: Path):
     # --- the kit's own convention: <root>/codebase-map/ ---------------------------------------
     assert m.resolve_root(tree("a", "", conf=True)) == tmp / "a"
     # --- a PREFIXED install: <root>/<prefix>/codebase-map/ (the defect this closes) ---------------
-    kit_b = tree("b", PFX, conf=True)
+    # A root install has no prefix of its own, and this arm needs one.
+    fx_pfx = PFX or "scripts"
+    kit_b = tree("b", fx_pfx, conf=True)
     assert m.resolve_root(kit_b) == tmp / "b"
-    assert m.resolve_root(kit_b) != tmp / "b" / PFX, "resolved to the OLD grandparent answer"
+    assert m.resolve_root(kit_b) != tmp / "b" / fx_pfx, "resolved to the OLD grandparent answer"
     # both roots hold the conf AND .git, so this also pins the ORDER: the conf is tested first,
     # else the boundary would break the walk at the root and hand back the kit dir's parent.
     # --- the walk is not capped at one segment ------------------------------------------------
