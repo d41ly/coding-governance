@@ -139,6 +139,8 @@ if bad:
     print("gov-canary: leg name(s) contain a DOUBLE SPACE, which makes the report tail split"
           " ambiguous: " + "; ".join(bad)); sys.exit(1)
 ' "$LEGS_FILE"; then fail=1; fi
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${fail:-0}" = 0 ] && echo "PASS ($a assertions)" || echo "FAIL ($a assertions)"; [ "${fail:-0}" = 0 ] && exit 0; exit 1; fi
 
 # ---- G1b. `signature` sits on exactly the four legs TOOL-dDerivedDocket-23 S3 gave an `--offenders`
 # mode, and nowhere else. A fifth row would name a signature nobody built a key-only mode for, whose

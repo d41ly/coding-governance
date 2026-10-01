@@ -174,6 +174,8 @@ manifest() { # one argv entry per named suite
 build_ok ${PFX}a.test.sh; manifest ${PFX}a.test.sh
 out=$(run); rc=$?
 same "a conforming tree exits 0" "$rc" "0"
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${st:-0}" = 0 ] && echo "PASS ($n assertions)" || echo "FAIL ($n assertions)"; [ "${st:-0}" = 0 ] && exit 0; exit 1; fi
 same "a conforming tree prints nothing" "$out" ""
 
 # ---- a suite printing NO count, and not waived.

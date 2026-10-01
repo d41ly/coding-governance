@@ -289,6 +289,8 @@ check_ac1_red() {
   write_legs ac1-prev '[{"name": "passing leg", "argv": ["bash", "fx/ok.sh"]}]'
   run_bar GATE_LEGS="$WORK/ac1-prev.json"
   check "AC1 the previous bar is green" "$RC" 0
+  # FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+  if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${st:-0}" = 0 ] && echo "PASS ($n assertions)" || echo "FAIL ($n assertions)"; [ "${st:-0}" = 0 ] && exit 0; exit 1; fi
   write_legs ac1 '[{"name": "passing leg", "argv": ["bash", "fx/ok.sh"]}, {"name": "failing leg", "argv": ["bash", "fx/red.sh"]}]'
   l0=$(measure_lines)
   run_bar GATE_LEGS="$WORK/ac1.json" GATE_RUN_ID=push-1-1

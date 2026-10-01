@@ -238,6 +238,8 @@ else
   [ "${p_on:-0}" = 1 ] && ok "with the turnstile ON the peak is exactly 1 holder" \
                        || nope "two bars ran against one repository at once (peak $p_on)"
 fi
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${bad:-0}" = 0 ] && echo "PASS ($n assertions)" || echo "FAIL ($n assertions)"; [ "${bad:-0}" = 0 ] && exit 0; exit 1; fi
 
 # ------------------------------------------------------------- 3: a dead holder is reaped ---------
 # The reason MATTERS, not just the outcome: a reaper that only ever fires on the TTL would pass an

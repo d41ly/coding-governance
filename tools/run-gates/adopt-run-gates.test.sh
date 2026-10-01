@@ -80,6 +80,8 @@ out=$( cd "$T" && bash vendor/${KIT}/adopt-run-gates.sh --check 2>&1 ); rc=$?
 [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'NOT ADOPTED' \
   && ok "no deploy.toml -> exit 0 reporting NOT ADOPTED" \
   || nope "no deploy.toml did not report NOT ADOPTED (rc=$rc): $out"
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${bad:-0}" = 0 ] && echo "PASS ($n assertions)" || echo "FAIL ($n assertions)"; [ "${bad:-0}" = 0 ] && exit 0; exit 1; fi
 [ -z "$( cd "$T" && git status --porcelain )" ] \
   && ok "the NOT ADOPTED path left the target byte-identical" \
   || nope "the NOT ADOPTED path wrote into the target"

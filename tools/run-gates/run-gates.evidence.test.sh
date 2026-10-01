@@ -177,6 +177,8 @@ if [ -f "$log" ] && grep -q NEEDLE_UP_4c1 "$log"; then
 else
   nope "a red leg's output is NOT on disk (looked in $log)"
 fi
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${bad:-0}" = 0 ] && echo "PASS ($n assertions)" || echo "FAIL ($n assertions)"; [ "${bad:-0}" = 0 ] && exit 0; exit 1; fi
 
 # the durable summary must POINT at it — a pointer, never the bytes: this file is what an operator
 # is told to read after a refused push

@@ -107,6 +107,8 @@ FLOOR_LEGS='[
 S1=$(build_scratch "$FLOOR_LEGS") || { echo "profile_bar.test: could not build scratch (floor)"; exit 2; }
 ( cd "$S1" && "$PY" $KIT_REL/profile_bar.py --width 3 >"$S1/out.txt" 2>&1 )
 chk $? "floor fixture: profiler exited non-zero"
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${bad:-0}" = 0 ] && echo "PASS ($n assertions)" || echo "FAIL ($n assertions)"; [ "${bad:-0}" = 0 ] && exit 0; exit 1; fi
 chk $([ -s "$S1/.git/gate-profile.jsonl" ] && echo 0 || echo 1) "floor fixture: no record appended"
 B=$(field "$S1" "regime.bound" 2>/dev/null)
 chk $([ "$B" = floor ] && echo 0 || echo 1) "floor fixture: bound was '$B', expected floor"

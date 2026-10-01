@@ -332,6 +332,8 @@ case "$_bout" in
      printf '%s\n' "$_bout" | grep -E 'GATE (ok|FAIL|skip)' | sed 's/^/    /'
      fail=1 ;;
 esac
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${fail:-0}" = 0 ] && echo "PASS ($n assertions)" || echo "FAIL ($n assertions)"; [ "${fail:-0}" = 0 ] && exit 0; exit 1; fi
 
 # 1e-control: the SAME leg with NO ceiling must NOT be reported as timed out. Without this, an arm
 #     that reds every long leg for any reason would read as proof that ceilings work.
