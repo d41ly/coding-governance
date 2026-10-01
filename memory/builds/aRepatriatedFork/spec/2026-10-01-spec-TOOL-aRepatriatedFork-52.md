@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-10-01-build-TOOL-aRepatriatedFork-52-1-acceptance-ledger.md](../build/2026-10-01-build-TOOL-aRepatriatedFork-52-1-acceptance-ledger.md) | journal | — |
 | [2026-10-01-build-TOOL-aRepatriatedFork-52-redeclare-patch.md](../build/2026-10-01-build-TOOL-aRepatriatedFork-52-redeclare-patch.md) | research | — |
+| [2026-10-01-build-TOOL-aRepatriatedFork-52-verifying-repair-r3.md](../build/2026-10-01-build-TOOL-aRepatriatedFork-52-verifying-repair-r3.md) | journal | TOOL-aRepatriatedFork-46 TOOL-aRepatriatedFork-28 |
 | [2026-10-01-prompt-TOOL-aRepatriatedFork-52-build-brief.md](../prompts/2026-10-01-prompt-TOOL-aRepatriatedFork-52-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
