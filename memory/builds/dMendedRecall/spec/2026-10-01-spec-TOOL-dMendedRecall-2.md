@@ -1,0 +1,286 @@
+# TOOL-dMendedRecall-2 — the inherited-red auto-file re-renders the generated views it makes stale, and stages them with its rows
+
+**Status:** SPECCED · rev-1 · 2026-10-01 · node d · Tier-2 · base 1f915870 · streams tooling · order 1 · closes TOOL-dAlignedCarrier-9 · ratified 2026-10-01
+
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-01-prompt-TOOL-dMendedRecall-1-build-brief.md](../prompts/2026-10-01-prompt-TOOL-dMendedRecall-1-build-brief.md) | journal | TOOL-dMendedRecall-1 TOOL-dMendedRecall-3 |
+| [2026-10-01-prompt-TOOL-dMendedRecall-1-spec-brief.md](../prompts/2026-10-01-prompt-TOOL-dMendedRecall-1-spec-brief.md) | journal | TOOL-dMendedRecall-1 TOOL-dMendedRecall-3 |
+
+<!-- /gen:spec-records -->
+
+## 1. Goal
+
+When `gates-green` reads a red whose every leg is INHERITED, `write_inherited_asks` files an ask per
+leg in the build's `BACKLOG.md` and stages the rows. It renders nothing, so the generated views the
+index generator derives from that file go stale in the same index, and the in-place close's own
+records commit is then refused by the pre-commit's hygiene check 9 after the whole flagged bar was
+paid. This unit makes the writer of the rows also render and stage the views they move, so the
+close commits `records(<slug>): close — LANDING` with the views current.
+
+## 2. Scope (IN)
+
+- **S1** — `write_inherited_asks` in `tools/unattended/unattended.sh` counts the asks one call
+  FILES: written, staged and read back as one OPEN HIGH ask. A reused ask, the dark path under a
+  blank `ASKS_CMD`, a leg it could not file, and rows it rolled back count nothing. After its loop,
+  a count above zero calls `write_ask_views` once with that count; a count of zero calls nothing,
+  so every path that files nothing prints the bytes it printed at BASE. Observed by AC1, AC3, AC5.
+- **S2** — `write_ask_views` is minted in `tools/unattended/unattended.sh`, beside
+  `write_backlog_rows`. It resolves the generator with the library's `resolve_index_generator` and
+  the interpreter with `resolve_python`, and requires that path to be a file at the repository top,
+  where the driver already runs. It records the paths carrying unstaged or untracked changes, runs
+  `<python> <generator> --write` under `run_bounded`, records them again, and stages with
+  `GIT add -A --` exactly the paths in the second set and not in the first. It prints one line, §4's
+  success spelling. Observed by AC1, AC2.
+- **S3** — A path that carried unstaged or untracked changes BEFORE the render is never staged by
+  it. Its hash is taken before and after, and one the render changed too is named on the success
+  line as left unstaged, because staging it would commit work the run did not do. Observed by AC4.
+- **S4** — A miss is named and does not refuse. When no generator resolves, the resolved path is
+  not a file at the top, or the render exits non-zero or is killed by its bound, `write_ask_views`
+  prints §4's miss spelling, which carries `derive_index_repair`'s text, stages whatever paths the
+  render did change under S3's rule, and returns 1. The caller continues: the item's verdict, its
+  other lines and the close's exit are what they would have been, and no `fail` branch is added.
+  Observed by AC3.
+- **S5** — The comment block opening "STAGED BY THIS ITEM" (`tools/unattended/unattended.sh:6808`)
+  says the views are rendered and staged with the rows, by `write_ask_views`, so whichever step
+  commits the rows commits the views. Observed by AC5.
+- **S6** — Two arm sets are written in `tools/unattended/unattended.test.sh` and not run. In the
+  inherited-red block, the AC9 MET arm gains a `hit` on the miss spelling: that fixture holds no
+  generator at the path the resolver names. After that block, a new self-contained block builds the
+  AC1 fixture and asserts AC1's commit subject, AC2's committed paths and clean `--check`, and AC4's
+  untouched paths. Observed by AC6.
+
+## 3. Non-goals (OUT)
+
+- `write_close_commit`. It already commits everything staged; with the views staged it needs no
+  change, and its refusal 69 keeps its text.
+- The stop contract's §13 sentence on the owner-on-record ask (`tools/unattended/STOPS.template.md`
+  and its render). It stays true, since the rows are still staged and read back; saying that the
+  views ride with them is a change to a carrier no accept clause of this build names, which M3's
+  veto 2 leaves to the owner.
+- Rendering at commit time in `write_close_commit`, or in the Skill's close sequence. §8 F1 says
+  why the writer renders instead.
+- `GENERATED_INDEXES` in `.unattended.conf`. It declares the index outputs and their generators for
+  the history legs, and a build README's generated regions are outside it; it is not the staging
+  set here.
+- Any other auto-written records surface. TOOL-dDerivedDocket-42 owns the question of one
+  declaration for every path a run's machinery writes.
+- The unattended kit version. The orchestrator moves it once, at VERIFYING.
+
+### Edges
+
+- **hands-off** external — the stop contract's §13 sentence, to the owner under veto 2, if the
+  views are to be named there.
+- **hands-off** external — the clean reading of the S6 arms, owed with TOOL-dDerivedDocket-76 under
+  the build README's waiver of this kit's own suites.
+
+## 4. Design
+
+### Evidence
+
+Read at `1f915870` on 2026-10-01, PINNED to that date.
+
+- `write_inherited_asks` (`tools/unattended/unattended.sh:6900`) stages each ask with
+  `GIT add -- "$bl"` and reads it back through `ASKS_CMD`; nothing in it or in its caller, the
+  `gates-green` item of `dod_met` (`:7605`), runs a renderer.
+- `write_close_commit` (`:7187`) commits the whole index under `records(<slug>): close — LANDING`
+  with hooks on, and reports refusal 69 when the commit fails.
+- The pre-commit's memory-tree leg runs `check-memory-hygiene.sh --staged`, whose check 9 runs
+  `gen_build_index.py --check` whenever a `.md` file is staged
+  (`tools/memory-tree/check-memory-hygiene.sh:1039-1041`). `--check` renders from the working tree
+  and compares; `--write` writes every artifact, prints verdicts without refusing on them, and exits
+  1 only when its data-loss guard kept one view unwritten (`tools/memory-tree/gen_build_index.py:2306-2322`).
+- What the views are, measured on the one real occurrence: `10663361`, dAlignedCarrier's close made
+  by hand, carries the record, the `BACKLOG.md` rows, and three rendered files beside them,
+  `memory/backlog/TOOL.md`, the build's `README.md` and `memory/ledger/2026-09.md`. The README's
+  generated regions are outside `GENERATED_INDEXES`, which is why S2 stages by observed change
+  rather than by that declaration.
+- `resolve_index_generator` (`tools/unattended/lib-unattended.sh:128`) answers the generator's path
+  relative to the top of the repository holding the kit, and `derive_index_repair` (`:142`) spells
+  the repair from it. The driver `cd`s to the repository top at start (`unattended.sh:458`), so the
+  relative path resolves there. When the driver runs from a kit outside the repository it acts on,
+  as the suite does, the path names nothing there, and S2's file test is what keeps the render from
+  running anywhere but the tree being closed.
+- `--close` does not call `check_clean`, so a tree carrying other changes can reach this item;
+  S3 is not hypothetical.
+
+### Spellings
+
+```
+gates-green: re-rendered the generated views for <n> filed ask(s) and staged <k> path(s): <paths>
+gates-green: re-rendered the generated views for <n> filed ask(s); the render changed no path
+gates-green: the <n> filed ask(s) are staged, but the generated views were not re-rendered: <why>; until they are, a records commit meets a stale index — repair: <derive_index_repair>
+```
+
+The success spellings take the suffix `; left unstaged, dirty before the render: <paths>` when S3
+names a path. `<why>` is one of: `no memory-tree generator resolves beside this kit`, `the
+generator the resolver names is not a file here: <path>`, or `the generator exited <rc> after
+<s>s`, the last followed by `run_bounded`'s captured output indented four spaces, the shape every
+other bounded call site of this driver prints. None of them begins `UNATTENDED check`, because none
+is a refusal.
+
+### Inventory
+
+| Identifier | Kind | Cell |
+|---|---|---|
+| `write_ask_views` | shell function, verb `write` | `sh.function` |
+
+Asked of `python tools/lexicon/lexicon.py --suggest write_ask_views --as sh.function`, which read OK
+on 2026-10-01. `write`, persist to a store, is the row for a function that puts rendered bytes into
+the tree and the index; `render` would name only the generator's half, and `stage` is not a
+declared verb.
+
+### Fixture
+
+None in the tree, and AC1 to AC4 read one the pass builds under `%TEMP%` with a short name. It
+composes two existing suite blocks of `tools/unattended/unattended.test.sh`, read for their shapes
+and not run: the in-place block opening `TOOL-dDerivedDocket-3 — LANDER_MODE`, for its stub lander
+and its overrides of the items a fixture cannot meet, and the inherited-red block opening
+`TOOL-dDerivedDocket-24 — THE INHERITED-RED POLICY`, for its stub bar writing one INHERITED leg and
+its `INHERITED_RED=land` policy. To those it adds this repository's `tools/unattended/`,
+`tools/lib/` and the memory-tree kit's python modules under the same relative paths, a
+`.memory-tree.conf` declaring `BACKLOG_MODE="builds"` and the fixture's family, `ASKS_CMD` naming
+that generator's `--asks` exactly as this repository's conf does, and `core.hooksPath` naming a
+`pre-commit` that runs that generator's `--check`, which is the predicate check 9 delegates to. The
+fixture is rendered once with `--write` and committed, so `--check` is clean at its base. The BASE
+reading swaps in the kit extracted by `git archive 1f915870`.
+
+### Rollout
+
+No render: nothing this unit edits is a template. The pass edits the driver and the suite, observes
+AC1 to AC5 over the fixture, and commits.
+
+### Files touched (estimate)
+
+`tools/unattended/unattended.sh` · `tools/unattended/unattended.test.sh`
+
+### Alternatives rejected
+
+- **Render inside `write_close_commit`, before it commits.** It covers the in-place close only.
+  Under `primary` the operator commits the staged records, and on a `hold ·` path the Skill's close
+  sequence does; both would still carry stale views. The writer that makes the views stale is the
+  one step all three paths share.
+- **Stage everything under the memory root after the render.** S3's case is real because `--close`
+  does not refuse a dirty tree, and this would commit an operator's unrelated work under the
+  close's subject.
+- **Stage the `GENERATED_INDEXES` paths.** The 2026-09-30 recovery shows the build README's
+  regions moving too, and they are outside that declaration.
+- **Roll the rows back when the render misses.** The stop contract gives every inherited leg an
+  owner on the record; discarding the ask to keep a commit clean trades the record for the commit.
+  S4 keeps the ask and names the repair.
+
+## 5. Production-readiness checklist
+
+- security — N/A: the generator is the repository's own, resolved by the library resolver the
+  driver already uses for its repair text, and it writes only under the memory root; no new input
+  crosses a trust boundary.
+- perf / scale — one generator run per close that files an ask, a few seconds on node `d`, bounded
+  by the driver's existing bound; a close that files nothing pays nothing.
+- error / empty / loading states — S4's miss line for each failure; a render that changes nothing
+  says so; a pre-dirty path is named rather than swept in.
+- observability — one line per render naming what it staged, or why it did not.
+- risks — `--write` renders every artifact, so a tree whose index was already stale before the
+  close would have that drift staged into the records commit. The pre-commit keeps the default
+  branch's index clean, so on a run branch only the run's own writes can move it. A generator
+  verdict that `--check` refuses and `--write` only prints still meets refusal 69, now with the
+  render line above it naming the state.
+- testing — the scratch fixture of AC1 to AC4, RED on the BASE kit; the S6 arms written and not
+  run.
+- migration — none: no fact, file or format is added.
+- user docs — N/A here: the driver comment is S5, and the stop contract's sentence is a hands-off.
+
+## 6. Acceptance criteria
+
+- **AC1** — When `bash tools/unattended/unattended.sh --close <slug>` runs from the fixture's own
+  kit over the §4 fixture, whose stub bar leaves one INHERITED red under `INHERITED_RED=land`, the
+  output carries `gates-green: filed ask`, then `re-rendered the generated views`, then
+  `committed at`, and `git log -1 --format=%s` in the fixture reads
+  `records(<slug>): close — LANDING`. With the kit extracted by `git archive 1f915870` over a fresh
+  copy of the same fixture, the output carries `UNATTENDED check 69 FAILED` and
+  `could not commit its own record`.
+  Red when: the built close fails 69, or the BASE close commits, which would mean the fixture
+  does not reproduce the defect.
+  fixture: none in the tree; §4 "Fixture" is the recipe, and the pass builds it under `%TEMP%`.
+  cost: composing the fixture by hand from two suite blocks is the expensive half, tens of
+  minutes; each close over it runs in seconds against the stub bar.
+- **AC2** — When AC1's close has committed, `git show --name-only --format= HEAD` in the fixture
+  lists the build's `BACKLOG.md` and the family view under `memory/backlog/`,
+  `python tools/memory-tree/gen_build_index.py --check` run there prints `build-index: clean`, and
+  `git status --porcelain` there is empty.
+  Red when: the commit carries the rows without the views, or a rendered view is left unstaged.
+- **AC3** — When the fixture is rebuilt with the inherited-red block's stub `ASKS_CMD`, which reads
+  every id back as one OPEN HIGH ask, no memory-tree kit and no pre-commit hook, the close's output
+  carries `gates-green: filed ask` and `were not re-rendered`, that line carries `--write`, and
+  `git diff --name-only HEAD~1 HEAD` there still lists the build's `BACKLOG.md`. The close exits 0
+  and prints no `UNATTENDED check` line, as the BASE kit does over the same variant.
+  Red when: the miss is silent, unstages the rows, or turns the close into a refusal.
+- **AC4** — When AC1's fixture carries, before the close, an untracked `notes.md` under the memory
+  root and an unstaged edit to its tracked `BUILD-METHOD.md` guide, both are absent from
+  `git show --name-only --format= HEAD` after the close, `git status --porcelain` still shows both,
+  and the render line carries no `left unstaged` clause, since the render changed neither.
+  Red when: the render stages either path, which is the sweep S3 forbids.
+- **AC5** — When `grep -c 'write_ask_views' tools/unattended/unattended.sh` runs it prints at least
+  3, where BASE prints 0, for the definition, the one call after the loop and the S5 comment;
+  `grep -c 'fail 69 ' tools/unattended/unattended.sh` prints 1, its BASE count; and
+  `python tools/lexicon/lexicon.py --suggest write_ask_views --as sh.function` prints a line
+  opening `OK`.
+  Red when: the helper is called from anywhere but the auto-file, the comment does not name it, or
+  refusal 69 moved.
+- **AC6** — When `grep -c -F 'were not re-rendered' tools/unattended/unattended.test.sh` and
+  `grep -c -F 're-rendered the generated views' tools/unattended/unattended.test.sh` run, each prints
+  at least 1, where BASE prints 0 for both.
+  Red when: either path has no arm.
+  permission: running this kit's own suites is waived for this landing by the build README's rule;
+  the arms are written and their run is not observed here.
+
+## 7. Gates
+
+`unattended kit gate` · `harness arms (fail branches armed or pinned)` · `lexicon naming predicates` · `memory hygiene` · `install-prefix (shipped surface)`
+
+New arm: `tools/unattended/unattended.test.sh` · the inherited-red block's MET arm with no generator, and a new block composing the in-place and inherited-red fixtures with the real generator and a `--check` pre-commit · none
+
+## 8. Open questions
+
+- **F1 — Which step renders the views?** (a) `write_close_commit`, before it commits. (b) The
+  Skill's close sequence, by instruction. (c) `write_inherited_asks`, the writer that makes them
+  stale, after it files. (a) fixes the in-place close and leaves the `primary` and `hold ·` paths
+  committing stale views by hand; (b) is a governance carrier no accept clause names, which veto 2
+  refuses, and an instruction is the shape the 2026-09-30 close already had and missed. (c) covers
+  all three paths with one call and satisfies the accept clause. Recommendation (c). RESOLVED
+  (agent, 2026-10-01, delegated): (c), the most feature-rich survivor after M3's vetoes.
+- **F2 — What does a render that misses do?** (a) Refuse the item with a new numbered branch.
+  (b) Roll the filed rows back. (c) Keep the rows staged, name the miss and its repair, and let the
+  close proceed. (a) adds a refusal after the bar was paid, for a state a hand render repairs in
+  seconds, and an arm the waived suite cannot run; (b) drops the inherited leg's owner from the
+  record, against the stop contract's §13. (c) keeps both and loses nothing the BASE close had.
+  Recommendation (c). RESOLVED (agent, 2026-10-01, delegated): (c), the most feature-rich survivor
+  under M3's rule: it meets every criterion the other two meet, and keeps the ask on the record.
+
+## 9. Revision log
+
+- rev-1 · 2026-10-01 · initial draft, from the ask's accept clause, the build's spec brief, the
+  hand-made close commit `10663361`, and the driver read at BASE.
+
+## 10. Reuse audit
+
+The probe, run on 2026-10-01:
+
+```
+python tools/codebase-map/reuse_lookup.py "re-render the generated index views after a records write and stage what changed"
+```
+
+It ranked `write`, `write_text` and `records` as name-stem seams, the generator's own writer among
+them, and reported `.sh` as an unscanned layer, which is where this driver lives. The seams reused
+were found by reading the driver and its library: `resolve_index_generator` and
+`derive_index_repair` in `tools/unattended/lib-unattended.sh`, which already locate this install's
+generator and spell its `--write` repair; `resolve_python` and `run_bounded`, which every bounded
+call site of the driver uses; and the generator's own `--write`, which is the one renderer of these
+views. No existing seam fits the staging rule: nothing in the driver stages a renderer's output, and
+`GENERATED_INDEXES` was read and rejected as the staging set for the reason §4 gives.
+
+Recall terms used: write_close_commit write_inherited_asks gates-green inherited-red auto-file BACKLOG.md generated views check 9 check 69 in-place LANDER_MODE gen_build_index --write
+
+The question passed with them: "how does an in-place close commit its own record and why did an
+auto-filed ask leave the generated views stale".
