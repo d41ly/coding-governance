@@ -643,14 +643,17 @@ git -C "$d" reset -q --hard "$clean"
 # `--list` names it so the skip is not silent. Observed RED-first on the round-1 checker: exit 1.
 printf '%s\n' "$GUARD_LEGS" > "$d/${PFX}gate-legs.json"
 printf 'SPEC_GUARD_LEGS_CUTOFF="2026-09-01"\n' > "$d/.memory-tree.conf"
-write_files_touched '### Files touched (estimate)' 'New: `memory/builds/tOne/build/note.md`. No file under `'"${PFX}"'` is touched.'
+# ONE segment whatever this install's depth: the host's first, or a stand-in at a root install.
+# `${PFX}` is two segments at `vendor/gov/`, a declared prefix there, not a root (VERIFYING repair).
+ONESEG="${PFX%%/*}"; ONESEG="${ONESEG:-kits}/"
+write_files_touched '### Files touched (estimate)' 'New: `memory/builds/tOne/build/note.md`. No file under `'"${ONESEG}"'` is touched.'
 git -C "$d" add -A >/dev/null
 arm "a one-segment root in a negation sentence declares nothing and is no hit" 0 "$d" "guards join · 1 declared path(s) examined in 1 live spec(s)"
 out=$(cd "$d" && "$PY" "$LINT" --list 2>&1)
-if printf '%s\n' "$out" | grep -qF 'NEAR   [guards] memory/builds/tOne/spec/2026-09-02-spec-TOOL-tOne-1.md :: '"${PFX}"' — a one-segment root declares nothing, not joined - name the files or a directory of two or more segments'; then
+if printf '%s\n' "$out" | grep -qF 'NEAR   [guards] memory/builds/tOne/spec/2026-09-02-spec-TOOL-tOne-1.md :: '"${ONESEG}"' — a one-segment root declares nothing, not joined - name the files or a directory of two or more segments'; then
   echo "arm ok    --list names the one-segment root as NEAR [guards], not joined"; pass=$((pass+1))
 else
-  echo "arm FAIL  --list — expected a NEAR [guards] row naming ${PFX} as a root that declares nothing"
+  echo "arm FAIL  --list — expected a NEAR [guards] row naming ${ONESEG} as a root that declares nothing"
   printf '%s\n' "$out" | grep -F 'NEAR' | head -3; fail=$((fail+1))
 fi
 git -C "$d" reset -q --hard "$clean"

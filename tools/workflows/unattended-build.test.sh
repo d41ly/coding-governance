@@ -1674,12 +1674,18 @@ has "PV-AC5 control: with the render and the pairs restored the leg is green aga
 # The harness spelled for THIS repo's install, which is what apply shipped before this unit. The
 # three values are this repo's own layout and none of them names a file, so the carried-prefix ban
 # has nothing here to count.
+# AT AN INSTALL WHOSE OWN PREFIX IS THE FIXTURE'S, this repo's spelling IS the adopter's, so the
+# control cannot be negative there and is skipped by name (TOOL-aRepatriatedFork-28, VERIFYING repair).
+if [ "$PFX" = scripts/ ]; then
+  echo "SKIP PV-AC6 the verbatim spelling: this install's prefix is the fixture's own, scripts/, so the control would grade a correct spelling"
+else
 VB="$LAY/verbatim"; build_layout "$VB" scripts/$WFK scripts/$UNK scripts/gotchas.py
 # FANOUT_CAP is not a path and the control does not grade it; it is filled so the harness PARSES,
 # because a surviving token is a syntax error and the arm would grade a throw instead of the paths.
 sed -e 's|{{KIT_DIR}}|'"${PFX}workflows"'|g' -e 's|{{TOOL_ROOT}}|'"${PFX}"'|g' -e 's|{{MEMORY_TREE_DIR}}|'"${PFX}memory-tree"'|g' \
     -e 's|{{FANOUT_CAP}}|5|g' "$HERE/unattended-build.template.js" > "$VB/scripts/$WFK/unattended-build.js"
 check_layout "PV-AC6 the verbatim spelling:" "$VB" scripts/$WFK scripts/ scripts RRRRR
+fi
 # The prefix-only half-fix: correct for this repo, and wrong for both measured adopters.
 HF="$LAY/halffix"; build_layout "$HF" scripts/$WFK scripts/$UNK scripts/gotchas.py
 sed -i 's|{{MEMORY_TREE_DIR}}/gotchas.py|{{TOOL_ROOT}}memory-tree/gotchas.py|' "$HF/scripts/$WFK/unattended-build.template.js"

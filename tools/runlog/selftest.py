@@ -8298,6 +8298,12 @@ def test_skill_ac1_adopter():
     check("skill AC1: --scaffold exits 0 in a tree with the kit under a prefix no real layout uses",
           (fx["rc"], SKILL_REL in fx["out"]), (0, True))
     rendered = fx["text"]
+    # THE HEAD THE ADOPTER'S LINT REFUSES, read from the adopter rather than from this install: it is
+    # the published source layout's, a fact about where the template was authored, so it does not move
+    # with the prefix this suite runs at (TOOL-aRepatriatedFork-28, gate repair at VERIFYING).
+    _lint = re.search(r"\(([A-Za-z0-9_.-]+)\|memory\)/", (kit / "adopt-runlog.sh").read_text(encoding="utf-8"))
+    check("skill AC1: the adopter's template lint declares the source head it refuses", bool(_lint), True)
+    head = (_lint.group(1) if _lint else "") + "/"
     check("skill AC1: the rendered Skill is byte-identical to the template rendered here by plain "
           "replacement, a second operand the adopter does not produce",
           rendered, render_skill_copy(template.read_bytes().decode("utf-8"), SKILL_KIT_REL, SKILL_ROOT))
@@ -8305,13 +8311,13 @@ def test_skill_ac1_adopter():
           "rendered memory root",
           (f"python {SKILL_KIT_REL}/runlog.py model" in rendered,
            f"{SKILL_ROOT}/builds/<slug>/build/" in rendered), (True, True))
-    leftover = r"\{\{|\}\}|(?<![A-Za-z0-9_.-])(?:tools|memory)/"
-    check(f"skill AC1: no double brace survives the render, and no {PFX} or memory/ segment, which "
+    leftover = r"\{\{|\}\}|(?<![A-Za-z0-9_.-])(?:" + re.escape(head[:-1]) + r"|memory)/"
+    check(f"skill AC1: no double brace survives the render, and no {head} or memory/ segment, which "
           "this tree spells nowhere, so either would have come from the template",
           re.findall(leftover, rendered), [])
     check("skill AC1: ...and that search finds each shape when one is planted, so its empty answer "
-          "above is a reading", re.findall(leftover, rendered + f"see {PFX}a, memory/b, {{{{C}}}}\n"),
-          [f"{PFX}", "memory/", "{{", "}}"])
+          "above is a reading", re.findall(leftover, rendered + f"see {head}a, memory/b, {{{{C}}}}\n"),
+          [f"{head}", "memory/", "{{", "}}"])
     rc, out = run_adopter(base, kit, "--check")
     check("skill AC1: --check exits 0 over the fresh render", (rc, "fresh render" in out), (0, True))
     if not skill.is_file():
@@ -8352,11 +8358,11 @@ def test_skill_ac1_adopter():
     run_staged("a CRLF working copy of an untouched Skill is not drift", 0, "fresh render",
                skill_text=rendered.replace("\n", "\r\n"))
     run_staged("an unrendered Skill reds --check and names the scaffold", 1, "--scaffold", drop=skill)
-    got = run_staged(f"a template spelling a literal {PFX} path reds --check, naming the line", 1,
-                     f"literal {PFX} or memory/", template_text=tpl + f"Run python {PFX}x-kit/cli.py.\n")
+    got = run_staged(f"a template spelling a literal {head} path reds --check, naming the line", 1,
+                     f"literal {head} or memory/", template_text=tpl + f"Run python {head}x-kit/cli.py.\n")
     check("skill AC1: ...and the refusal quotes the line it found",
-          f"{tpl.count(chr(10)) + 1}:Run python {PFX}x-kit/cli.py." in got, True)
-    run_staged("a template spelling a literal memory/ path reds --check", 1, f"literal {PFX} or memory/",
+          f"{tpl.count(chr(10)) + 1}:Run python {head}x-kit/cli.py." in got, True)
+    run_staged("a template spelling a literal memory/ path reds --check", 1, f"literal {head} or memory/",
                template_text=tpl + "The record is under memory/builds/x/build/.\n")
     run_staged("near miss: `.memory/`, `in-memory/` and `xtools/` are not literal segments, so "
                "--scaffold renders", 0, "rendered",
