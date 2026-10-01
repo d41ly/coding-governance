@@ -528,32 +528,49 @@ for (const L of LENSES) {
   }
 }
 
+// TOOL-aSightedSkeptic-1 - THE BRIEF, one copy, opening every finder AND every skeptic prompt. The
+// skeptic used to be handed none of it, so it read whatever checkout its working directory was and
+// was told "by-design" refutes without being shown what is. Read at CALL time: the subject line
+// needs the shas the resume probe resolved. Two lines are worded by role, and a diff skeptic gets
+// one more, SCOPE; a spec audit has no range, so nothing in it is older than the review (spec F2).
+function renderBrief(role) {
+  const skeptic = role === 'skeptic'
+  const lines = [
+    `REPO: ${repo} — run every git command as \`git -C ${repo} …\`; every path below is relative to it.`,
+    isSpec
+      ? `SUBJECT: the spec set, each file at its pinned blob:\n` + subjects.map((x) => `  - ${x.path}  blob ${x.blob}`).join('\n')
+      : `SUBJECT: the diff \`${diffCmd}\`.`,
+    `CONTEXT: ${context}`,
+    `REVIEW ROUND: ${round}${round > 1 ? (isSpec ? ' - this is a FOLD review. Aim at the text the previous round\'s fixes introduced, which is the only text in these documents nobody has reviewed.' : ' - this is a FOLD review. The diff above is what the previous round\'s fixes introduced, not the whole build.') : ''}`,
+  ]
+  if (skeptic && !isSpec)
+    lines.push(`SCOPE: a finding is in scope only if this diff introduced its defect or made it reachable. A defect present unchanged at the base is PRE-EXISTING: refute it. Check with \`git -C ${repo} show ${baseSha}:<path>\`.`)
+  lines.push(skeptic ? `BY DESIGN (refute any finding one of these covers): ${byDesign}` : `BY DESIGN (do NOT re-report these): ${byDesign}`)
+  lines.push(priorFindings.length
+    ? (skeptic
+      ? `PRIOR ROUND'S CONFIRMED FINDINGS - these were RAISED AND FIXED. A finding that re-raises one of these originals, rather than a defect in its fix, is refuted as a duplicate:\n`
+      : `PRIOR ROUND'S CONFIRMED FINDINGS - these were RAISED AND FIXED. Judge the FIX, and do not re-raise the original:\n`) +
+      priorFindings.map((f) => `  - ${f.ref || '(no ref)'} - ${f.claim || f.title || '(no claim)'}`).join('\n')
+    : `PRIOR ROUND'S FINDINGS: none - this is a first-round review of ${isSpec ? 'the whole spec set' : 'the whole diff'}.`)
+  return lines.join('\n') + '\n\n'
+}
+
 phase('Find')
 const finderResults = await boundedParallel(
   LENSES.map((L) => () =>
     reusedLens.has(L.key)
       ? Promise.resolve(reusedLens.get(L.key))
       : agent(
+      renderBrief('finder') +
       (isSpec
         // S6 - the spec kind's acquire sentence. The lens holds a filesystem and the orchestrator does
         // not, so the BLOB COMPARISON happens here. Without it S5 is a string test any caller
         // satisfies; with it, a spec that moved since the caller pinned it is a blocker finding.
-        ? `You are the ${L.key} reviewer of a SPEC SET. For EACH subject below: first run ` +
+        ? `You are the ${L.key} reviewer of a SPEC SET. For EACH subject listed under SUBJECT above: first run ` +
           `\`git hash-object <path>\` in ${repo} and compare the result to the pinned blob. A mismatch ` +
           `means the spec MOVED since this review was commissioned — report it as a BLOCKER finding ` +
-          `and review the file as it now stands. Then Read the file WHOLE.\n\nSUBJECTS:\n` +
-          subjects.map((x) => `  - ${x.path}  blob ${x.blob}`).join('\n') + `\n\n`
-        : `You are the ${L.key} reviewer. Review ONLY this diff (run \`${diffCmd}\`, then Read/Grep the touched files + their immediate callers):\n\n`) +
-        `CONTEXT: ${context}\n` +
-        `REVIEW ROUND: ${round}${round > 1 ? (isSpec ? ' - this is a FOLD review. Aim at the text the previous round\'s fixes introduced, which is the only text in these documents nobody has reviewed.' : ' - this is a FOLD review. The diff above is what the previous round\'s fixes introduced, not the whole build.') : ''}\n` +
-        `BY DESIGN (do NOT re-report these): ${byDesign}\n` +
-        (priorFindings.length
-          ? `PRIOR ROUND'S CONFIRMED FINDINGS - these were RAISED AND FIXED. Judge the FIX, and do not re-raise the original:\n` +
-            priorFindings
-              .map((f) => `  - ${f.ref || '(no ref)'} - ${f.claim || f.title || '(no claim)'}`)
-              .join('\n') +
-            `\n\n`
-          : `PRIOR ROUND'S FINDINGS: none - this is a first-round review of ${isSpec ? 'the whole spec set' : 'the whole diff'}.\n\n`) +
+          `and review the file as it now stands. Then Read the file WHOLE.\n\n`
+        : `You are the ${L.key} reviewer. Review ONLY the diff named under SUBJECT above (run \`${diffCmd}\`, then Read/Grep the touched files + their immediate callers).\n\n`) +
         `LENS: ${L.brief}\n` +
         // TOOL-aSightedSkeptic-5 S5 - this lens's note and no other's, directly under its brief.
         (notedLenses.indexOf(L.key) !== -1 ? `PROJECT NOTE FOR THIS LENS (from the caller's lensNotes): ${lensNotes[L.key]}\n` : '') +
@@ -655,6 +672,7 @@ const verdictResults = await boundedParallel(
     reusedBatch[gi]
       ? Promise.resolve(reusedBatch[gi])
       : agent(
+      renderBrief('skeptic') +
       (isSpec
         ? `You are an adversarial skeptic. For EACH finding below, try hard to REFUTE it — Read the cited spec at the cited section, and the siblings it names, and decide "confirmed" (real, and it makes the spec unbuildable or wrong) or "refuted" (asks for detail a non-goal withholds / cites a section that says what the finding claims it does not / is a style preference). Default to refuted when uncertain.\n\n`
         : `You are an adversarial skeptic. For EACH finding below, try hard to REFUTE it — read the actual code (Read/Grep the cited file:line and callers) and decide "confirmed" (real, reachable, impactful) or "refuted" (not reachable / not a bug / by-design / duplicate). Default to refuted when uncertain.\n\n`) +

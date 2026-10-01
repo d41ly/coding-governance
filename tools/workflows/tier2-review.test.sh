@@ -426,6 +426,48 @@ async function runWholeScriptArms() {
   r = await runReview(DIFF, buildStubs({ 'resume:probe': buildProbe([buildLensFile('security', K)]) }))
   if (checkNoThrow(r, 'review shape fresh')) ck(r.scanSpawned('find:security').length === 0,
     'a lens file written under another review shape is dispatched: ...and one under the real key is reused')
+
+  // ==== TOOL-aSightedSkeptic-1 — renderBrief(role) opens every finder AND every skeptic prompt =======
+  // Every arm asserts a non-zero prompt count beside its every(), so none passes over a run that
+  // spawned nothing. Each is RED against the parent render, whose skeptic prompt carries no brief.
+  const scanPrompts = (run, prefix) => run.trace.filter((t) => t.label.indexOf(prefix) === 0)
+  r = await runReview(Object.assign({}, DIFF, { context: 'CTX-MARK', byDesign: 'BD-MARK' }), ALL_OK)
+  if (checkNoThrow(r, 'briefed skeptic')) {
+    const bv = scanPrompts(r, 'verify:')
+    ck(bv.length === 5 && bv.every((t) => t.prompt.indexOf('REPO: /tmp/r') !== -1 && t.prompt.indexOf('git -C /tmp/r diff ' + B + '...' + H) !== -1 &&
+      t.prompt.indexOf('CTX-MARK') !== -1 && t.prompt.indexOf('BD-MARK') !== -1),
+      'a skeptic prompt carries the repo, the range, the context and the by-design list')
+  }
+  for (const [what, args] of [['diff', DIFF], ['spec', SPEC]]) {
+    r = await runReview(args, ALL_OK)
+    if (!checkNoThrow(r, 'shared brief ' + what)) continue
+    const bf = scanPrompts(r, 'find:')
+    const bp = bf.concat(scanPrompts(r, 'verify:'))
+    const ctxLines = new Set(bp.map((t) => t.prompt.split('\n').find((l) => l.indexOf('CONTEXT: ') === 0) || '(no CONTEXT line)'))
+    ck(bf.length > 0 && bp.length > bf.length && bp.every((t) => t.prompt.indexOf('REPO: /tmp/r') === 0) && ctxLines.size === 1 && !ctxLines.has('(no CONTEXT line)'),
+      'every finder and skeptic prompt opens with the shared brief: ' + what + ' run, ' + bp.length + ' prompts, ' + ctxLines.size + ' distinct CONTEXT line(s)')
+  }
+  r = await runReview(DIFF, ALL_OK)
+  const rsp = await runReview(SPEC, ALL_OK)
+  if (checkNoThrow(r, 'pre-existing diff') && checkNoThrow(rsp, 'pre-existing spec')) {
+    const dv = scanPrompts(r, 'verify:')
+    const sv = scanPrompts(rsp, 'verify:')
+    ck(dv.length === 5 && dv.every((t) => t.prompt.indexOf('PRE-EXISTING') !== -1 && t.prompt.indexOf('refute any finding one of these covers') !== -1) &&
+      scanPrompts(r, 'find:').length === 5 && scanPrompts(r, 'find:').every((t) => t.prompt.indexOf('PRE-EXISTING') === -1) &&
+      sv.length === 4 && sv.every((t) => t.prompt.indexOf('PRE-EXISTING') === -1),
+      'a diff skeptic is told to refute a pre-existing defect and a by-design one')
+    ck(sv.every((t) => t.prompt.indexOf('/tmp/r') !== -1 && t.prompt.indexOf('s.md') !== -1 && t.prompt.indexOf('abc1234') !== -1) && sv.length === 4,
+      'a spec-audit skeptic prompt names the repo and every subject at its blob')
+  }
+  r = await runReview(Object.assign({}, DIFF, { round: 2, priorFindings: [{ ref: 'p.js:9', claim: 'PRIOR-MARK' }] }), ALL_OK)
+  if (checkNoThrow(r, 'fold-round brief')) {
+    const fv = scanPrompts(r, 'verify:')
+    const ff = scanPrompts(r, 'find:')
+    ck(fv.length === 5 && fv.every((t) => t.prompt.indexOf('PRIOR-MARK') !== -1 && t.prompt.indexOf('refuted as a duplicate') !== -1),
+      'a fold-round skeptic is shown the prior round\'s findings: every verify: prompt carries PRIOR-MARK and the duplicate rule')
+    ck(ff.length === 5 && ff.every((t) => t.prompt.indexOf('PRIOR-MARK') !== -1 && t.prompt.indexOf('Judge the FIX') !== -1),
+      'a fold-round skeptic is shown the prior round\'s findings: ...and every find: prompt still carries PRIOR-MARK and Judge the FIX')
+  }
 }
 
 runWholeScriptArms().then(() => {
@@ -450,7 +492,10 @@ printf '%s\n' "$out"
 # RAISED 60 -> 77 by TOOL-aSightedSkeptic-5: 17 assertions, counted off the block the same way — the
 # lensNotes key component's AC3 pair (2), the lens set (1), note placement (2), six malformed values
 # and their control (7), the announced absence (2) and the review-shape rewrite (3).
-FLOOR_ASSERTIONS=77
+# RAISED 77 -> 84 by TOOL-aSightedSkeptic-1: 7 assertions, counted off the block — the briefed skeptic
+# (1), the shared brief on a diff and a spec run (2), the pre-existing rule (1), the spec skeptic's
+# subjects (1) and the fold round, skeptic and finder halves (2).
+FLOOR_ASSERTIONS=84
 executed=$(printf '%s\n' "$out" | sed -n 's/^---- \([0-9][0-9]*\) passed.*/\1/p' | tail -1)
 if [ -z "$executed" ]; then
   echo "FAIL the runner printed no assertion count at all — it died before its summary line"
