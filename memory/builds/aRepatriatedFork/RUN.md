@@ -140,3 +140,5 @@ base: d6e1749c0542218004260928f1399174daafb789
 2026-10-01T09:35:10Z rescope · item add TOOL-aRepatriatedFork-52 · reason owner 2026-10-01: redesign the foreign-prefix leg to ask only the prefix question (per suite its path-finding prologue plus one subject arm at each prefix), take its baseline from the bar's recorded results instead of a calibrate pass, fail fast, and print per-suite progress; the full-run leg costs ~6 h and kept running after its verdict was decided
 
 2026-10-01T09:35:11Z rescope · item add TOOL-aRepatriatedFork-53 · reason owner 2026-10-01: the idle-wake --audit sees only driver-dispatched units, so a main-loop agent and a long leg ran silent for 8 h; every background task the run starts writes a heartbeat the audit reads, flagged STALLED past a declared bound
+
+2026-10-01T11:18:10Z rescope · item add TOOL-aRepatriatedFork-54 · reason VERIFYING repair R2 ran suites at a repo-root install and found two gate defects: check-playbook-parity.sh counts every top-level directory (.claude/, skills/) as a kit, and check-spec-tokens.py cannot grade a bare filename; both make the owner's every-prefix ruling fail at the root
