@@ -177,6 +177,8 @@ EOF
 # ---- RED arms: each ban fires with its OWN message ----------------------------------------------
 arm 'ban: object literal keyed by .ref' 'object/Map literal keyed by a .ref string' \
   bash "$GATE" "$TMP/bracket.js"
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${fails:-0}" = 0 ] && echo "PASS (${probe_n:-1} assertions)" || echo "FAIL (${probe_n:-1} assertions)"; [ "${fails:-0}" = 0 ] && exit 0; exit 1; fi
 arm 'ban: Map keyed by .ref'            'Map keyed by a .ref string' \
   bash "$GATE" "$TMP/mapset.js"
 arm 'ban: retired identifier'           'the retired verdictByRef identifier' \

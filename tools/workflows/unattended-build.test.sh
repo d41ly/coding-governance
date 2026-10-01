@@ -255,6 +255,8 @@ audit() { printf '%s' "$1"; }
 # over only one of them would leave the other's branch unexercised.
 o=$(run_wf '"just a prose string"' '{}')
 has "args: unparseable prose is REFUSED at the parse" "$o" "could not parse the string given"
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${st:-0}" = 0 ] && echo "PASS (${n:-1} assertions)" || echo "FAIL (${n:-1} assertions)"; [ "${st:-0}" = 0 ] && exit 0; exit 1; fi
 o=$(run_wf '"{\"slug\":\"tB\"}"' '{}')
 has "args: a JSON STRING with no repo parses, then is REFUSED" "$o" "must carry an explicit \`repo\`"
 o=$(run_wf '{"slug":"tB","units":[{"id":"A-tB-1"}]}' '{}')

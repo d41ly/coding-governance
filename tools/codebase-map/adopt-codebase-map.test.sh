@@ -125,6 +125,8 @@ elif [ -f "$TMP/a1-target/.codebase-map.conf" ]; then
 else
   good "1 by-path-from-another-repo refuses, naming both roots, writing nothing"
 fi
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${fails:-0}" = 0 ] && echo "PASS (${probe_n:-1} assertions)" || echo "FAIL (${probe_n:-1} assertions)"; [ "${fails:-0}" = 0 ] && exit 0; exit 1; fi
 
 # ---------------------------------------------------------------------------------------------
 # arm 2 (review M2) — a prefix deeper than one segment is refused BEFORE anything is written.

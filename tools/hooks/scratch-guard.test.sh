@@ -175,6 +175,8 @@ raw "no command key -> allow"         0 '{"tool_name":"Bash","tool_input":{}}'
 # would pass a suite that tested only `~/`. The near-miss beside each one stops the arm being
 # satisfied by a hook that denies everything.
 run "tilde home write -> deny"                    2 'echo x > ~/.litter'
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${fail:-0}" = 0 ] && echo "PASS (${pass:-1} assertions)" || echo "FAIL (${pass:-1} assertions)"; [ "${fail:-0}" = 0 ] && exit 0; exit 1; fi
 run "  near-miss: repo-relative write -> allow"   0 'echo x > memory/notes.md'
 run "\$HOME home write -> deny"                   2 'echo x > $HOME/.litter'
 run "  near-miss: \$PWD write -> allow"           0 'echo x > $PWD/notes.md'

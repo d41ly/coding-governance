@@ -113,6 +113,8 @@ echo "adopt-process-monitor: refusals"
 
 # --- the happy path, so every refusal below is a CONTRAST and not the only thing observed
 check_equal "test_valid_conf_is_accepted" "$(run_against "$(build_base_conf)")" 0
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${FAIL:-0}" = 0 ] && echo "PASS (${PASS:-1} assertions)" || echo "FAIL (${PASS:-1} assertions)"; [ "${FAIL:-0}" = 0 ] && exit 0; exit 1; fi
 
 # --- TOOL-aReplayedCard-2: the wiring count is PER EVENT. A file wired on PostToolUse alone — the
 # state every tree adopted before the SessionStart fragment existed — is refused naming the event

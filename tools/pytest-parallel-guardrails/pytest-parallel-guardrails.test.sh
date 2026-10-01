@@ -72,6 +72,8 @@ assert crashprobe.KIT_PYTEST_GUARDRAILS_VERSION
 else
   fail "crashprobe.py failed to import under bare stdlib"
 fi
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${fails:-0}" = 0 ] && echo "PASS (${probe_n:-1} assertions)" || echo "FAIL (${probe_n:-1} assertions)"; [ "${fails:-0}" = 0 ] && exit 0; exit 1; fi
 rm -rf "$tmpd"
 
 # 4. Version constant well-formed + every gov:kit marker agrees with it (deployer convention:

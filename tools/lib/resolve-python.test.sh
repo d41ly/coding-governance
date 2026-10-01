@@ -58,6 +58,8 @@ mkfake() { # $1=dir $2=name $3=exit-code — a launcher that EXISTS, answers `co
 B="$TMP/stub"; mkfake "$B" python3 9009
 got=$(PATH="$B:$PATH" bash -c '. "$1"; resolve_python' _ "$CANON" 2>/dev/null)
 { [ -n "$got" ] && [ "$got" != python3 ]; } || bad "a 9009 stub first on PATH was accepted (got '$got')"; ok
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${st:-0}" = 0 ] && echo "PASS (${n:-1} assertions)" || echo "FAIL (${n:-1} assertions)"; [ "${st:-0}" = 0 ] && exit 0; exit 1; fi
 PATH="$B:$PATH" "${got:-false}" -c 'import sys' >/dev/null 2>&1 || bad "the resolver returned '$got', which does not run"; ok
 # ...and the same PATH under the OLD idiom picks the stub — the arm is only meaningful because the
 # defect reproduces. Without this the green half above could be passing for an unrelated reason.
