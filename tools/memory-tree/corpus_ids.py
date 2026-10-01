@@ -1104,13 +1104,15 @@ def cmd_selftest() -> int:
         # ---- answers `hasattr(grammar_for)` and the outdated point is never reached — the arm would
         # ---- pass by exercising nothing.
         def _under_grammar_dir(d, fn):
-            saved_dir, saved_path = globals()["GRAMMAR_DIR"], list(sys.path)
+            # GRAMMAR_WHERE is swapped beside GRAMMAR_DIR: the refusal reads it (TOOL-aRepatriatedFork-46 S4).
+            saved_dir, saved_where = globals()["GRAMMAR_DIR"], globals()["GRAMMAR_WHERE"]
+            saved_path = list(sys.path)
             saved_mod = sys.modules.pop("extract", None)
-            globals()["GRAMMAR_DIR"] = d
+            globals()["GRAMMAR_DIR"], globals()["GRAMMAR_WHERE"] = d, "%s/extract.py" % d
             try:
                 return fn()
             finally:
-                globals()["GRAMMAR_DIR"] = saved_dir
+                globals()["GRAMMAR_DIR"], globals()["GRAMMAR_WHERE"] = saved_dir, saved_where
                 sys.path[:] = saved_path
                 sys.modules.pop("extract", None)
                 if saved_mod is not None:
