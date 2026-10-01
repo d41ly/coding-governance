@@ -118,6 +118,7 @@ The ones that set build policy:
 | 22 | `TOOL-aRepatriatedFork-50` | 1 | check 24's add baseline is this run's, on a build that ran before |
 | 22 | `TOOL-aRepatriatedFork-51` | 1 | brief-recorded takes a declared waiver registry, as pass-order does |
 | 23 | `TOOL-aRepatriatedFork-53` | 2 | every background task a run starts carries a heartbeat the audit reads |
+| 24 | `TOOL-aRepatriatedFork-54` | 1 | two gov gates grade a repo-root install correctly |
 
 The `#` column is the `order` each spec declares, derived from its `### Edges`: a unit's order is one
 past the highest order it consumes from. Order 1 holds the independent units, the two security fixes
@@ -130,7 +131,7 @@ with no hand edit between the update and the bar.** One observation at each adop
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 47 unit(s) · node a · opened 2026-09-23 · streams tooling+deployer+playbook
+**Build status:** SPECCED · 48 unit(s) · node a · opened 2026-09-23 · streams tooling+deployer+playbook
 ids DEPL-aRepatriatedFork-1 DEPL-aRepatriatedFork-13 DEPL-aRepatriatedFork-14 DEPL-aRepatriatedFork-17 DEPL-aRepatriatedFork-20 DEPL-aRepatriatedFork-21 DEPL-aRepatriatedFork-22 DEPL-aRepatriatedFork-23 TOOL-aRepatriatedFork-2 TOOL-aRepatriatedFork-3 TOOL-aRepatriatedFork-4 TOOL-aRepatriatedFork-5
 ids TOOL-aRepatriatedFork-6 TOOL-aRepatriatedFork-7 TOOL-aRepatriatedFork-8 TOOL-aRepatriatedFork-9 TOOL-aRepatriatedFork-10 TOOL-aRepatriatedFork-11 TOOL-aRepatriatedFork-12 TOOL-aRepatriatedFork-15 TOOL-aRepatriatedFork-16 TOOL-aRepatriatedFork-18 TOOL-aRepatriatedFork-19 TOOL-aRepatriatedFork-20
 ids TOOL-aRepatriatedFork-21 TOOL-aRepatriatedFork-22 TOOL-aRepatriatedFork-23 TOOL-aRepatriatedFork-24 TOOL-aRepatriatedFork-25 TOOL-aRepatriatedFork-26 TOOL-aRepatriatedFork-27 TOOL-aRepatriatedFork-28 TOOL-aRepatriatedFork-29 TOOL-aRepatriatedFork-30 TOOL-aRepatriatedFork-31
@@ -188,9 +189,10 @@ ids TOOL-aRepatriatedFork-54
 | [TOOL-aRepatriatedFork-50 — check 24's add baseline is this run's, on a build that ran before](spec/2026-10-01-spec-TOOL-aRepatriatedFork-50.md) | 22 | 1 | CLOSED | rev-1 | 2026-10-01 |
 | [TOOL-aRepatriatedFork-51 — brief-recorded takes a declared waiver registry, as pass-order does](spec/2026-10-01-spec-TOOL-aRepatriatedFork-51.md) | 22 | 1 | CLOSED | rev-1 | 2026-10-01 |
 | [TOOL-aRepatriatedFork-53 — every background task a run starts carries a heartbeat the audit reads](spec/2026-10-01-spec-TOOL-aRepatriatedFork-53.md) | 23 | 2 | SPECCED | rev-1 | 2026-10-01 |
+| [TOOL-aRepatriatedFork-54 — two gov gates grade a repo-root install correctly](spec/2026-10-01-spec-TOOL-aRepatriatedFork-54.md) | 24 | 1 | SPECCED | rev-1 | 2026-10-01 |
 <!-- /gen:build-units -->
 
-Records: 113 bound to this build, across 4 record folder(s).
+Records: 114 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
@@ -198,7 +200,7 @@ Ids no `spec-audit` record has ever named: DEPL-aRepatriatedFork-1 DEPL-aRepatri
 TOOL-aRepatriatedFork-18 TOOL-aRepatriatedFork-19 TOOL-aRepatriatedFork-2 TOOL-aRepatriatedFork-3 TOOL-aRepatriatedFork-4 TOOL-aRepatriatedFork-5 TOOL-aRepatriatedFork-6 TOOL-aRepatriatedFork-7 TOOL-aRepatriatedFork-8 TOOL-aRepatriatedFork-9 DEPL-aRepatriatedFork-21 TOOL-aRepatriatedFork-21
 TOOL-aRepatriatedFork-23 TOOL-aRepatriatedFork-24 TOOL-aRepatriatedFork-25 TOOL-aRepatriatedFork-26 TOOL-aRepatriatedFork-27 TOOL-aRepatriatedFork-28 TOOL-aRepatriatedFork-29 TOOL-aRepatriatedFork-30 TOOL-aRepatriatedFork-31 TOOL-aRepatriatedFork-32 TOOL-aRepatriatedFork-35 TOOL-aRepatriatedFork-36
 TOOL-aRepatriatedFork-37 TOOL-aRepatriatedFork-38 TOOL-aRepatriatedFork-39 TOOL-aRepatriatedFork-40 TOOL-aRepatriatedFork-42 TOOL-aRepatriatedFork-44 TOOL-aRepatriatedFork-45 TOOL-aRepatriatedFork-46 TOOL-aRepatriatedFork-47 TOOL-aRepatriatedFork-49 TOOL-aRepatriatedFork-50 TOOL-aRepatriatedFork-51
-TOOL-aRepatriatedFork-53.
+TOOL-aRepatriatedFork-53 TOOL-aRepatriatedFork-54.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -228,6 +230,7 @@ TOOL-aRepatriatedFork-53.
 | 21 | `TOOL-aRepatriatedFork-49` | no |
 | 22 | `TOOL-aRepatriatedFork-50`, `TOOL-aRepatriatedFork-51` | yes |
 | 23 | `TOOL-aRepatriatedFork-53` | no |
+| 24 | `TOOL-aRepatriatedFork-54` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
