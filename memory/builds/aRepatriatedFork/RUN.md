@@ -9,10 +9,13 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+asks-at-landing: TOOL-aRepatriatedFork-20=OPEN DEPL-aRepatriatedFork-22=OPEN TOOL-aRepatriatedFork-22=OPEN DEPL-aRepatriatedFork-23=OPEN TOOL-aRepatriatedFork-33=OPEN TOOL-aRepatriatedFork-34=OPEN TOOL-aRepatriatedFork-35=CLOSED TOOL-aRepatriatedFork-41=OPEN TOOL-aRepatriatedFork-43=OPEN TOOL-aRepatriatedFork-48=OPEN
+units-at-landing: DEPL-aRepatriatedFork-1 TOOL-aRepatriatedFork-10 TOOL-aRepatriatedFork-16 TOOL-aRepatriatedFork-21 TOOL-aRepatriatedFork-3 TOOL-aRepatriatedFork-4 TOOL-aRepatriatedFork-5 TOOL-aRepatriatedFork-6 TOOL-aRepatriatedFork-7 TOOL-aRepatriatedFork-9 DEPL-aRepatriatedFork-13 TOOL-aRepatriatedFork-15 TOOL-aRepatriatedFork-2 TOOL-aRepatriatedFork-8 DEPL-aRepatriatedFork-14 DEPL-aRepatriatedFork-17 DEPL-aRepatriatedFork-21 TOOL-aRepatriatedFork-18 TOOL-aRepatriatedFork-19 TOOL-aRepatriatedFork-11 TOOL-aRepatriatedFork-12 TOOL-aRepatriatedFork-44 TOOL-aRepatriatedFork-23 TOOL-aRepatriatedFork-24 TOOL-aRepatriatedFork-25 TOOL-aRepatriatedFork-26 TOOL-aRepatriatedFork-27 TOOL-aRepatriatedFork-29 TOOL-aRepatriatedFork-28 TOOL-aRepatriatedFork-45 TOOL-aRepatriatedFork-31 TOOL-aRepatriatedFork-46 TOOL-aRepatriatedFork-32 TOOL-aRepatriatedFork-47 TOOL-aRepatriatedFork-30 TOOL-aRepatriatedFork-35 TOOL-aRepatriatedFork-36 TOOL-aRepatriatedFork-37 TOOL-aRepatriatedFork-38 TOOL-aRepatriatedFork-39 TOOL-aRepatriatedFork-40 TOOL-aRepatriatedFork-42 DEPL-aRepatriatedFork-20 TOOL-aRepatriatedFork-49 TOOL-aRepatriatedFork-50 TOOL-aRepatriatedFork-51 TOOL-aRepatriatedFork-53 TOOL-aRepatriatedFork-54 TOOL-aRepatriatedFork-52 TOOL-aRepatriatedFork-55 TOOL-aRepatriatedFork-56
+gates-run: unattended-179089108218374732559-3280048 d6d51fa0
 parked-surfaced: yes
 keepalive-reaped: yes
 witness: ad299e92b64169de5b3c218b28e0f06f30ba49db
-phase: VERIFYING
+phase: LANDING
 mode: slug
 run-branch: refs/heads/branch/arepatriated-fork-build-e42158
 anchor-kind: default-branch
