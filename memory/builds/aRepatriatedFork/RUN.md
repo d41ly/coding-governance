@@ -142,3 +142,9 @@ base: d6e1749c0542218004260928f1399174daafb789
 2026-10-01T09:35:11Z rescope · item add TOOL-aRepatriatedFork-53 · reason owner 2026-10-01: the idle-wake --audit sees only driver-dispatched units, so a main-loop agent and a long leg ran silent for 8 h; every background task the run starts writes a heartbeat the audit reads, flagged STALLED past a declared bound
 
 2026-10-01T11:18:10Z rescope · item add TOOL-aRepatriatedFork-54 · reason VERIFYING repair R2 ran suites at a repo-root install and found two gate defects: check-playbook-parity.sh counts every top-level directory (.claude/, skills/) as a kit, and check-spec-tokens.py cannot grade a bare filename; both make the owner's every-prefix ruling fail at the root
+
+2026-10-01T11:41:29Z brief · item TOOL-aRepatriatedFork-53 · reason d27cf83bd91c memory/builds/aRepatriatedFork/prompts/2026-10-01-prompt-TOOL-aRepatriatedFork-53-build-brief.md
+
+2026-10-01T11:41:31Z brief · item TOOL-aRepatriatedFork-54 · reason b591fada98aa memory/builds/aRepatriatedFork/prompts/2026-10-01-prompt-TOOL-aRepatriatedFork-54-build-brief.md
+
+2026-10-01T11:41:33Z brief · item TOOL-aRepatriatedFork-52 · reason 2f1fa38c4db8 memory/builds/aRepatriatedFork/prompts/2026-10-01-prompt-TOOL-aRepatriatedFork-52-build-brief.md
