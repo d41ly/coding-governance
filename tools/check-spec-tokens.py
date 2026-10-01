@@ -42,7 +42,13 @@ spec's hands-off bullets, joined to the text of the sibling each one names.
          The bullet loop finds the acceptance section by heading text (`AC_HEAD`), never by its
          ordinal, so a light-profile spec is graded where its criteria sit (TOOL-aDeferredBar-2).
          Path-shaped is a slash AND an extension, or an exact tracked path
-         (TOOL-dRetiredFork-20 F2). A bare word is prose and is not a path.
+         (TOOL-dRetiredFork-20 F2). A bare word is prose and is not a path, EXCEPT at a repo-root
+         install (TOOL-aRepatriatedFork-54), where a root-level file has no slash to carry: there
+         a bare token whose extension some tracked file carries is graded, and resolves as a
+         tracked path or the basename of one, since the house style cites a kit file by basename.
+         What that does NOT grade: a bare name at any other tool root (measured, 10 live
+         citations in three specs name no tracked file), a bare name whose extension nothing
+         tracked carries, and WHICH file a basename shared by several tracked files means.
   cites  every backticked `<path>:<line>` -> that file's line count, SCOPED to citations whose path
          is TRACKED. Measured at b0108f13: 453 specs carry 1721 citations and 854 of them name an
          untracked path, because the house style cites a kit file by basename (`run-gates.sh:407`).
@@ -676,6 +682,17 @@ def check_path_shaped(tok, files):
     return ("/" in tok and "." in tok.rsplit("/", 1)[1]) or tok in files
 
 
+def check_bare_shaped(tok, exts):
+    """A bare file name the paths join grades at a ROOT install only (TOOL-aRepatriatedFork-54 S2):
+    no `/`, none of `check_path_shaped`'s exclusions, and an extension some tracked file carries, so
+    `kit.toml` is graded and `json.loads` is prose. It resolves as the basename of a tracked file."""
+    if "/" in tok or NOT_A_TOKEN.match(tok) or " " in tok or "*" in tok or "?" in tok:
+        return False
+    if CITE_TAIL.search(tok) or tok.rstrip("/.") != tok:
+        return False
+    return pathlib.PurePosixPath(tok).suffix in exts
+
+
 def scan_claims(text):
     """The claims join over one spec's text (TOOL-dGatedProse-2). Returns `(runs, hits, clears)`:
     `runs` counts the distinct matched runs, each hit is `(line, object, class, arms, cite)` and each
@@ -842,6 +859,12 @@ def main(argv):
         print(f"spec-tokens: REFUSING — CLAIM_CANARY does not hold: {canary}; the claims join would "
               "report a broken arm as a clean corpus")
         return 1
+    # A ROOT INSTALL's bare file names (TOOL-aRepatriatedFork-54 S2): the tracked extensions and
+    # basenames, built once. At any other tool root this stays None and the base rule holds.
+    bare = None
+    if not troot:
+        names = {f.rsplit("/", 1)[-1] for f in files}
+        bare = ({pathlib.PurePosixPath(n).suffix for n in names} - {""}, names)
     hits, skipped, graded, seen_waived = [], 0, 0, set()
     ungraded, noheading = 0, 0
     bar_examined, bar_specs, bar_carriers, near = 0, 0, 0, []
@@ -904,11 +927,14 @@ def main(argv):
                 if BAR.search(tok):
                     bar_toks.append(tok)
                 for word in tok.split():
-                    if not check_path_shaped(word, files):
-                        continue
-                    graded += 1
-                    if word not in files:
-                        hits.append((f, "path", word, "not tracked by git ls-files"))
+                    if check_path_shaped(word, files):
+                        graded += 1
+                        if word not in files:
+                            hits.append((f, "path", word, "not tracked by git ls-files"))
+                    elif bare is not None and check_bare_shaped(word, bare[0]):
+                        graded += 1
+                        if word not in bare[1]:
+                            hits.append((f, "path", word, "not tracked by git ls-files"))
         if armed:
             bar_specs += 1
             bar_examined += len(pop_toks)

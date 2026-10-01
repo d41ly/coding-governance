@@ -33,7 +33,9 @@ PFX="${KIT_REL:+$KIT_REL/}"
 # The shrink-only assertion floor. A suite that stops running arms must RED rather than report a
 # smaller success: `check-testsuite-counts.sh` reads this pin, the printed count, and the comparison
 # between them, because a pin nothing reads is the same nothing as no pin.
-FLOOR_ASSERTIONS=109
+FLOOR_ASSERTIONS=112
+# RAISED 109 -> 112 at TOOL-aRepatriatedFork-54, by its three root-install `arm` calls: the untracked
+# bare name, the basename citation and the dotted non-file word.
 # RAISED 32 -> 38 at the closing review's F2, F4, F9 and F10, by the static count of the arms they
 # added: the quoted-empty flag, the selftest.py hit, the two parity assertions over the manifest,
 # the requoted-cutoff arm and the non-ISO cutoff refusal.
@@ -174,6 +176,9 @@ scratch() {          # $1 = dir. A repo with one live spec, a manifest and an em
   git init -q "$d"; git -C "$d" config user.email t@t.test; git -C "$d" config user.name t
   mkdir -p "$d/memory/builds/tOne/spec" "$d/memory/project" "$d/${PFX}"
   printf '[{"name":"real leg"}]\n' > "$d/${PFX}gate-legs.json"
+  # A tool root holds a gate script. At a root install the paths join grades a bare name only when
+  # a tracked file carries its extension (TOOL-aRepatriatedFork-54), so without one `nope.sh` is prose.
+  printf '#!/bin/sh\n' > "$d/${PFX}gate.sh"
   printf '# waivers\n' > "$d/memory/project/spec-token-waivers.txt"
   cat > "$d/memory/builds/tOne/spec/2026-09-02-spec-TOOL-tOne-1.md" <<'SPEC'
 # TOOL-tOne-1 — a unit
@@ -235,6 +240,24 @@ d=$base/cite; scratch "$d"
 sed -i 's|`'"${PFX}gate-legs.json"'` exists|see `'"${PFX}gate-legs.json"':9999`|' "$d/memory/builds/tOne/spec/2026-09-02-spec-TOOL-tOne-1.md"
 git -C "$d" add -A >/dev/null
 arm "a citation beyond end of file REDS" 1 "$d" "lines"
+
+# ---- TOOL-aRepatriatedFork-54: a REPO-ROOT install grades bare file names, whatever prefix this
+# suite sits at. Each fixture is built at the root (PFX emptied in a subshell), so its manifest's
+# tool root is the repository root. Observed RED-first on the 56c7befa checker: the first two arms.
+rootspec=memory/builds/tOne/spec/2026-09-02-spec-TOOL-tOne-1.md
+d=$base/rootbare; ( PFX=; scratch "$d" )
+sed -i 's|`gate-legs.json` exists|`nope.sh` exists|' "$d/$rootspec"
+git -C "$d" add -A >/dev/null
+arm "at a root install an untracked bare file name in section 6 REDS" 1 "$d" "not tracked by git ls-files"
+d=$base/rootbase; ( PFX=; scratch "$d" )
+mkdir -p "$d/x"; : > "$d/x/kit.toml"
+sed -i 's|`gate-legs.json` exists|`gate-legs.json` exists and `kit.toml` is cited|' "$d/$rootspec"
+git -C "$d" add -A >/dev/null
+arm "at a root install a basename citation of a tracked file is graded and resolves" 0 "$d" "3 token(s) graded"
+d=$base/rootword; ( PFX=; scratch "$d" )
+sed -i 's|`gate-legs.json` exists|`gate-legs.json` exists and `json.loads` reads it|' "$d/$rootspec"
+git -C "$d" add -A >/dev/null
+arm "at a root install a dotted word no tracked extension matches is not graded" 0 "$d" "2 token(s) graded"
 
 # ---- TOOL-aJoinedCanon-7: the eight arms this unit owes. Each is named by its own criterion.
 # AC4 — a PROSE §7 contributes no leg name and raises the ungraded count, and stays GREEN while the

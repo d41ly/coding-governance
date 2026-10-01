@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-54 — two gov gates grade a repo-root install correctly
 
-**Status:** SPECCED · rev-2 · 2026-10-01 · node a · Tier-1 · base 56c7befa · streams tooling · order 24
+**Status:** CLOSED · rev-2 · 2026-10-01 · node a · Tier-1 · base 56c7befa · streams tooling · order 24
 
 <!-- gen:spec-records -->
 

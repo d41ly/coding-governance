@@ -1548,6 +1548,11 @@
       "file": "tools/memory-recall/check-recall.py"
     },
     {
+      "id": "check_bare_shaped",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.py"
+    },
+    {
       "id": "check_binary_mode",
       "kind": "function",
       "file": "tools/gate-lint/encoding_posture.py"
