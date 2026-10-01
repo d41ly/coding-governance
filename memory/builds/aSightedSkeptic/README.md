@@ -85,7 +85,7 @@ ids TOOL-aSightedSkeptic-1 TOOL-aSightedSkeptic-2 TOOL-aSightedSkeptic-3 TOOL-aS
 | [TOOL-aSightedSkeptic-9 — the replay benchmark: a review scored for recall against a past round](spec/2026-10-01-spec-TOOL-aSightedSkeptic-9.md) | 9 | 2 | CLOSED | rev-2 | 2026-10-01 |
 <!-- /gen:build-units -->
 
-Records: 20 bound to this build, across 3 record folder(s).
+Records: 21 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

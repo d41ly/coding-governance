@@ -31,9 +31,4 @@ is not evidenced in this record yet.
   `govkit.py selfcheck` and `check_gate_coverage.py` were outside the commands this pass could run;
   they run at the close.
 - AC7 — `grep -c "review_replay.py" tools/workflows/README.md` — printed 6.
-
-## What this ledger does not evidence
-
-AC8, the live replay of one round-1 record through the `Workflow` tool, was still running in the
-main loop when this record was written. Its line, with the record path, the range and the
-`replay: recall` line, is the main loop's to add.
+- AC8 — `replay: recall` — the main loop ran the new harness over dAlignedCarrier's round-1 record `memory/builds/dAlignedCarrier/reviews/2026-09-30-review-TOOL-dAlignedCarrier-1-closing-diff-round1.md`, range `87c245b3...3c45a567`, then `--known <record> --candidate <report>`, which exited 0 and printed `replay: recall 3/4 = 0.75`. The run and the score are in this build's live-replay record.
