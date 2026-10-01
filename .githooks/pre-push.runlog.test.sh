@@ -970,6 +970,7 @@ scan_exit_sites() { # file -> one TAB-separated row per shell exit
   printf '%s\t%s\t%s\n' 'write_refusal manifest "$why"; RUNLOG_CLEAN=1; exit 1' 1 refuse-manifest
   printf '%s\t%s\t%s\n' 'write_refusal raw-push "$why"; RUNLOG_CLEAN=1; exit 1' 1 refuse-raw
   printf '%s\t%s\t%s\n' 'write_refusal head-mismatch "$why"; RUNLOG_CLEAN=1; exit 1' 1 refuse-head
+  printf '%s\t%s\t%s\n' 'RUNLOG_DECISION=refuse-straggler; RUNLOG_CLEAN=1; exit 1' 1 'exempt: the straggler refusal, reachable only with straggler-guard.sh beside the hook and a transition-merge fixture this suite does not build; armed by straggler-guard.test.sh'
   printf '%s\t%s\t%s\n' 'write_refusal dirty-tree "$why"; RUNLOG_CLEAN=1; exit 1' 1 refuse-dirty
   printf '%s\t%s\t%s\n' 'write_refusal bar-refused "$why"; RUNLOG_CLEAN=1; exit 1' 5 refuse-bar
   printf '%s\t%s\t%s\n' 'write_refusal head-moved "$why"; RUNLOG_CLEAN=1; exit 1' 1 'full|scoped'

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# run-unattended-gates.sh — this kit's SELF-TESTS, run on demand and nowhere else.
+# run-unattended-gates.sh — this kit's SELF-TESTS, run on demand and never on the merge bar.
 #
 # THE SPLIT, which is the whole point of this file. Two kinds of check live in this directory and they
 # have different subjects:
@@ -22,12 +22,28 @@
 # memory/builds/dScriptedRepeat/build/2026-08-23-build-TOOL-dScriptedRepeat-5-bar-cost-measurement.md.
 #
 # WHAT IS THEREFORE NOT COVERED, said plainly because an exemption is not coverage (charter §7):
-# nothing runs the self-tests automatically. A change under this directory that guts a check lands
-# green. The compensating check is a person invoking this script, and the DoD for any work touching
-# `<prefix>/unattended/` is a GREEN parity verdict from `run-unattended-gates.sh --selftests --pooled` pasted
-# into the landing report. The mode is DECLARED (TOOL-aBatchedArm-4): --serial grades each suite
-# against its budget, --pooled runs them through the runner's pool and withholds every cost verdict,
-# and a route that reaches the self-test half with neither REFUSES rather than defaulting.
+# no merge bar and no push runs the self-tests. In gov itself the daily schedule in
+# `.github/workflows/remote-ci.yml` runs each one AFTER landing, under its hang bound and with no
+# cost verdict (TOOL-dDerivedDocket-32); an adopter's tree has that schedule only if it writes one.
+# So a change under this directory that guts a check still lands green. The compensating check is
+# a person invoking this script, and the DoD for any work touching `<prefix>/unattended/` is ONE of two
+# verdicts pasted into the landing report: a GREEN parity verdict from `--selftests --pooled`, or
+# `--selftests --serial --attribute <BASE>` reading `verdict clean` — no NEW FAIL, no DEAD PROBE at
+# L and no OVER BUDGET at L — with every suite reporting an INHERITED FAIL or a DEAD PROBE at R
+# named by a filed backlog record.
+#
+# THE MODE IS DECLARED (TOOL-aBatchedArm-4): --serial grades each suite against its budget, --pooled
+# runs them through the runner's pool and withholds every cost verdict, and a route that reaches the
+# self-test half with neither REFUSES rather than defaulting.
+#
+# WHY NOT A BARE GREEN, which is what this line demanded until `TOOL-dDerivedDocket-1`: this kit's
+# own suites are red at their base for causes filed elsewhere (`TOOL-aHoistedPass-36`,
+# `TOOL-aHoistedPass-38`), so the old wording named a state nobody could reach and every run of it
+# produced a red that said nothing about the change in front of it. `--attribute` forwards to the
+# self-test half, which is where those suites live, and composes with `--serial` alone: the pooled
+# route answers the same question another way, as parity against the runner's calibrated evidence,
+# and the runner refuses a baseline there. The `--checks` half is NOT attributed, because those are
+# repository checks and merge-bar legs.
 #
 # WHAT THIS DOES NOT CHECK: whether an unattended run was HONEST. These read records and stage
 # fixtures; §9 of the protocol says what a check running under the run's own uid can and cannot buy,
@@ -217,25 +233,33 @@ BUDGET_brief_recorded=900     # measured 38 s on node `a` 2026-09-05, on the day
                               # coinciding here is arithmetic, not a claim. Moving one does not move
                               # the other, and neither should be edited to match.
 
-# TWO POSITIONALS, EITHER ORDER: a VERB and a MODE. TOOL-aBatchedArm-4 S3. The verb defaults to
-# --selftests, as it always has (F3: the smaller diff, and the one that fits the charter's byte
-# headroom). The mode never defaults: three routes reach the self-test half — bare, --selftests,
-# --all — and a rule covering one of them would let --all print RED with "12 ran" for seven suites
-# that never ran, which is the defect rev-3 of the spec was built on. --checks reaches no self-test
-# and takes no mode.
-ONLY=selftests; MODE=""
-for _arg in "$@"; do
-case "$_arg" in
-  --all)       ONLY="" ;;
-  --checks)    ONLY=checks ;;
-  --selftests) ONLY=selftests ;;
+# ---- THE ARGV IS A LOOP, and it was a single positional. A VERB, a MODE and a baseline arrive in
+# ---- any order and compose rather than replace one another (TOOL-dDerivedDocket-1, onto
+# ---- TOOL-aBatchedArm-4 S3's verb-and-mode pair). The verb defaults to --selftests, as it always has
+# ---- (F3: the smaller diff, and the one that fits the charter's byte headroom). The mode never
+# ---- defaults: three routes reach the self-test half — bare, --selftests, --all — and a rule
+# ---- covering one of them would let --all print RED with "12 ran" for seven suites that never ran,
+# ---- which is the defect rev-3 of that spec was built on. --checks reaches no self-test and takes no
+# ---- mode. A shifting loop, not a `for` over "$@", because `--attribute` takes the next word.
+ONLY=selftests; MODE=""; ATTRIBUTE=""
+while [ $# -gt 0 ]; do
+case "$1" in
+  --all)       ONLY=""; shift ;;
+  --checks)    ONLY=checks; shift ;;
+  --selftests) ONLY=selftests; shift ;;
   --serial|--pooled)
     # A SECOND MODE IS NOT A DECLARATION. Last-wins would run the one the caller typed last and
     # never say so, which is the silent-default class in a new coat.
-    [ -z "$MODE" ] || { echo "run-unattended-gates: two modes were given (--$MODE and $_arg); declare ONE" >&2; exit 2; }
-    MODE=${_arg#--} ;;
+    [ -z "$MODE" ] || { echo "run-unattended-gates: two modes were given (--$MODE and $1); declare ONE" >&2; exit 2; }
+    MODE=${1#--}; shift ;;
+  # THE VALUE IS REQUIRED BEFORE THE SHIFT. `shift 2` with one positional left fails and leaves
+  # `$#` where it was, which spins this loop forever on a trailing bare `--attribute`.
+  --attribute)
+    ATTRIBUTE=${2:-}
+    [ -n "$ATTRIBUTE" ] || { echo "run-unattended-gates: --attribute needs a commit-ish to baseline against"; exit 2; }
+    shift 2 ;;
   -h|--help)
-    echo "usage: bash $SELF [--selftests|--all] (--serial|--pooled) | --checks"
+    echo "usage: bash $SELF [--selftests|--all] (--serial [--attribute <R>]|--pooled) | --checks"
     echo "  --selftests  every suite that stages breaks into this kit, and the only thing that"
     echo "               exercises them since none is a bar leg. The verb when none is given."
     echo "               It REFUSES without a mode: --serial runs each suite alone and grades it"
@@ -272,13 +296,23 @@ case "$_arg" in
     echo "               ceilings are in the same BUDGET_* block; no wall figure is typed here,"
     echo "               because the one that was is what round 8 filed. Takes no mode."
     echo "  --all        both, and it REFUSES without a mode exactly as --selftests does"
+    echo "  --attribute <R>"
+    echo "               forwarded to the SELF-TEST half only, and with --serial only, which runs"
+    echo "               each suite at this tree AND at R and reports NEW, INHERITED and FIXED"
+    echo "               failure sets. It exists because this kit's suites are red at their base"
+    echo "               for causes filed elsewhere, so an unqualified green is unreachable. The"
+    echo "               run ends in 'verdict clean' or 'verdict red'; a DEAD PROBE at L and an"
+    echo "               L-side OVER BUDGET red it, an inherited failure never does. --pooled"
+    echo "               takes no baseline: its parity against the calibrated evidence is the"
+    echo "               same question asked another way. The --checks half is NOT attributed:"
+    echo "               those are repository checks and merge-bar legs."
     echo ""
     echo "The gate selftest is declared as EIGHT --shard rows and the driver suite as one whole row;"
     echo "a --shard run is evidence about its region and nothing else, and the whole-suite claim"
     echo "for a sharded suite is the shard JOIN in run-selftests.sh --check: one arity per script,"
     echo "every index 1..n declared exactly once, so no region is green by absence."
     exit 0 ;;
-  *) echo "run-unattended-gates: unknown argument '$_arg'"; exit 2 ;;
+  *) echo "run-unattended-gates: unknown argument '$1'"; exit 2 ;;
 esac
 done
 # EVERY ROUTE TO THE SELF-TEST HALF REFUSES WITHOUT A MODE, and the refusal names both spellings so
@@ -297,6 +331,20 @@ fi
 if [ "$ONLY" = checks ] && [ -n "$MODE" ]; then
   echo "run-unattended-gates: --checks takes no mode; --$MODE was given and would have been dropped silently. Nothing was run." >&2
   exit 2
+fi
+# A BASELINE UNDER THE POOL IS REFUSED HERE, BY NAME, before anything runs. The runner takes
+# `--attribute` beside `--serial` only, so forwarding it under `--pooled` would stop the self-test
+# half AFTER the --checks half had already run, with the runner's refusal as the only word on why.
+if [ -n "$ATTRIBUTE" ] && [ "$MODE" = pooled ]; then
+  echo "run-unattended-gates: --attribute composes with --serial only; --pooled grades parity against the runner's calibrated evidence and takes no baseline. Nothing was run." >&2
+  exit 2
+fi
+
+# SAID ON EVERY ATTRIBUTED RUN, rather than left to be inferred from its absence: attributing a bar
+# leg needs the per-leg signature rules this kit does not own, so the repository checks are
+# reported exactly as they always were and carry no baseline.
+if [ -n "$ATTRIBUTE" ]; then
+  echo "run-unattended-gates: --attribute forwards to the SELF-TEST half only; the --checks half is NOT attributed"
 fi
 
 #
@@ -412,6 +460,10 @@ if [ "$ONLY" = selftests ] || [ -z "$ONLY" ]; then
   # baseline is green, so a perfect pass over the eight shard rows prints GREEN here; a crash, a
   # kill, a wall, an unrun, an unstarted or a mismatched row is red. The `WITHHELD` line the parse
   # below reads survives parity — the cost verdict stays withheld — so the parse is unchanged.
+  # THE BASELINE FLAG IS FORWARDED, not re-implemented (TOOL-dDerivedDocket-1). The baseline
+  # machinery — the R worktree, the FAIL normaliser, the per-(R, suite, blob) cache — lives in the
+  # one on-demand runner, and a second copy here would be a second answer to "what failed before
+  # this tree touched anything". It rides the serial path, the only one the runner attributes.
   if [ "$MODE" = pooled ]; then
     _pf=$(mktemp) || { echo "run-unattended-gates: cannot create a scratch file for the pooled withheld count" >&2; exit 2; }
     bash "$RUNNER" --kit "$KIT_REL" --pooled | tee "$_pf"
@@ -422,6 +474,9 @@ if [ "$ONLY" = selftests ] || [ -z "$ONLY" ]; then
     # timeout binary or an unbounded declaration, and "0 withheld" would read as a budget-clean run.
     [ -n "$_k" ] || _k="an UNPARSED number of"
     MODE_TOKEN=" · pooled, $_k cost verdicts withheld"
+  elif [ -n "$ATTRIBUTE" ]; then
+    bash "$RUNNER" --kit "$KIT_REL" --serial --attribute "$ATTRIBUTE" || st=1
+    MODE_TOKEN=" · serial, attributed against $ATTRIBUTE"
   else
     bash "$RUNNER" --kit "$KIT_REL" --serial || st=1
     MODE_TOKEN=" · serial"

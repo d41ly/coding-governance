@@ -83,6 +83,13 @@ prefix in the same clone. Its red control is a suite reading its gate through a 
 a literal prefix used only inside a suite's own scratch fixture is self-consistent and passes at
 every host prefix, measured, so that spelling stays the ban's to grade.
 
+**`--offenders` keys every hit** (`TOOL-dDerivedDocket-23`, carried onto the ban at the reconcile of
+origin/main into aRepatriatedFork). One `<path><TAB>ban<TAB><spelling>` per counted spelling, a
+repeat inside one file carrying `#<k>`, and nothing else on stdout; its exit is `--check`'s. The
+keys leave the counter in one write at its end, so a refusal or a dead counter leaves no key, which
+the bar's red attribution reads as a probe that could not answer. dDerivedDocket's `root`,
+`carried` and `runtime` kinds named the three arms the ban folded into its one counter.
+
 ## What the predicate can see (epochs 3 to 6)
 
 The counter reads ONE extension class, `sh py js md json toml txt tsv conf example`. The last four

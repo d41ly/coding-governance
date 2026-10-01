@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """selftest.py — the drift-audit kit's own falsifiability test.
 
-gov:kit drift-audit@1.20
+gov:kit drift-audit@1.21
 
     python <kit>/selftest.py
 
@@ -93,7 +93,10 @@ EXECUTED: list[str] = []
 # on a run where no arm skipped; it rises by hand when arms land and never falls to absorb a missing
 # one. A run with a SKIP does not compare it, and says so, because a skipped arm's checks are absent
 # for a reason the floor cannot see.
-CHECK_FLOOR = 261
+CHECK_FLOOR = 277
+# 261 -> 267, TOOL-dDerivedDocket-26: the six checks of `test_legs_retried_after_timeout`.
+# 267 -> 277, TOOL-dDerivedDocket-34: the five checks of the retired dGV-13 signal leave, one
+# retirement check and the fourteen of `test_backlog_ask_signals` arrive.
 
 
 def check(label: str, cond: bool, detail: str = "") -> None:
@@ -477,46 +480,10 @@ def test_signals_can_move(tmp: pathlib.Path) -> None:
     check("shrink-only signal goes quiet once the list actually shrinks", s3b["value"] == 0,
           str(s3b["detail"]))
 
-    # --- DEPL-dGaugedVintage-13: a backlog row that outlived its own CLOSED spec ---
-    print("backlog rows outliving closed specs (dGV-13)")
-    b13 = report(r)["backlog_rows_outliving_closed_specs"]
-    check("[dGV-13] a spec whose id is in NO backlog row is not a finding",
-          b13["value"] == 0, f"got {b13['value']} detail={b13['detail']}")
-    check("[dGV-13] ...and the signal is LIVE, so a zero means it looked",
-          b13["live"] is True and b13["of"] >= 1, f"live={b13['live']} of={b13['of']}")
-    _shard = r / "memory" / "backlog"
-    _shard.mkdir(parents=True, exist_ok=True)
-    _ids = [x["id"] for x in report(r)["spec_status_terminal_ids"]["detail"]] \
-        if "spec_status_terminal_ids" in report(r) else []
-    _sp = sorted((r / SPEC_DIR_FOR_FIXTURE).glob("*.md"))
-    _own = None
-    for _f in _sp:
-        _m = re.search(r"^#\s+([A-Z]+-[a-zA-Z]+-\d+)\b", _f.read_text(encoding="utf-8"), re.M)
-        _s = re.search(r"^\*\*Status:\*\*\s*([A-Za-z]+)", _f.read_text(encoding="utf-8"), re.M)
-        if _m and _s and _s.group(1).upper() in ("CLOSED", "WONTDO"):
-            _own = _m.group(1)
-            break
-    if _own is None:
-        skip("[dGV-13] the row arms", "this fixture carries no terminal spec to key a row on")
-    else:
-        _fam = _own.split("-", 1)[0]
-        _row = _shard / f"{_fam}.md"
-        _row.write_text(f"# fixture backlog\n\n- {_own} \u00b7 OPEN \u00b7 a row that outlived its spec\n",
-                        encoding="utf-8", newline="\n")
-        run(["git", "add", "-A"], r); run(["git", "commit", "-qm", "dgv13 open row"], r)
-        b13o = report(r)["backlog_rows_outliving_closed_specs"]
-        check("[dGV-13] a NON-terminal row under a CLOSED spec is counted",
-              b13o["value"] == 1, f"got {b13o['value']} detail={b13o['detail']}")
-        check("[dGV-13] ...and the detail names the id, the row's token and the spec's",
-              bool(b13o["detail"]) and b13o["detail"][0]["id"] == _own
-              and b13o["detail"][0]["row_status"] == "OPEN",
-              str(b13o["detail"][:1]))
-        _row.write_text(f"# fixture backlog\n\n- {_own} \u00b7 CLOSED \u00b7 reconciled\n",
-                        encoding="utf-8", newline="\n")
-        run(["git", "add", "-A"], r); run(["git", "commit", "-qm", "dgv13 closed row"], r)
-        b13c = report(r)["backlog_rows_outliving_closed_specs"]
-        check("[dGV-13] a TERMINAL row under the same spec is not counted",
-              b13c["value"] == 0, f"got {b13c['value']} detail={b13c['detail']}")
+    # --- DEPL-dGaugedVintage-13's signal RETIRED at the backlog switch-over (TOOL-dDerivedDocket-34
+    # --- S10). Its arms went with it; this one keeps the retirement from being undone by a merge.
+    check("[dDD-34] the retired backlog_rows_outliving_closed_specs is absent from the report",
+          "backlog_rows_outliving_closed_specs" not in report(r))
 
     # --- signal 6: a CLOSED spec must be backed by a commit that names it AND changed product ---
     print("closed-spec traceability (signal 6)")
@@ -726,6 +693,22 @@ def test_signals_can_move(tmp: pathlib.Path) -> None:
     over = run([sys.executable, REPORT_REL, "--check"], r)
     check("--check reds while a gateable signal is over its (default 0) pin", over.returncode == 1,
           f"rc={over.returncode}")
+    # --- 3a — --offenders, the SIGNATURE the merge bar grades this leg with (TOOL-dDerivedDocket-23
+    # S3). The bar's red attribution compares two trees' offender SETS, so the mode is graded on what
+    # a set needs: its exit is --check's, every line is one TAB-separated key naming a signal --check
+    # reds on, and no key carries a line locator, which an unrelated edit above a finding would move.
+    offs = run([sys.executable, REPORT_REL, "--offenders"], r)
+    olines = offs.stdout.splitlines()
+    red_now = {k for k, v in report(r).items()
+               if v["gateable"] and v["live"] and v["value"] > v["pin"]}
+    check("--offenders exits as --check does over the same tree", offs.returncode == over.returncode,
+          f"--offenders {offs.returncode}, --check {over.returncode}")
+    check("--offenders prints one TAB-separated key per finding, each naming a signal --check reds on",
+          bool(olines) and all(ln.count("\t") == 1 and ln.split("\t")[0] in red_now | {"ratchet"}
+                               for ln in olines),
+          f"lines={olines[:5]} red={sorted(red_now)}")
+    check("--offenders carries no line locator in any key",
+          not any(re.search(r":\d+(:|$)", ln) or '"line"' in ln for ln in olines), f"{olines[:5]}")
     sig.write_text(sig.read_text(encoding="utf-8").replace(
         "PINS = {}", "PINS = {'non_terminal_specs_cited_by_product_source': 1}"),
         encoding="utf-8", newline="\n")
@@ -1122,6 +1105,100 @@ def test_lexicon_marginal_rate(tmp: pathlib.Path) -> None:
 
 
 # ---------------------------------------------------------------------------------------------
+# 5 - backlog_stragglers: the fleet-wide half of the shards-to-builds transition
+# ---------------------------------------------------------------------------------------------
+
+
+def test_backlog_stragglers(tmp: pathlib.Path) -> None:
+    """The straggler inventory, in the three states it can report.
+
+    THE REMOTE-TRACKING HALF IS THE LOAD-BEARING ARM. The hooks beside `.githooks/` reach a
+    straggler only on the node that owns it, and `check-wiring.sh` names the LOCAL ones. A signal
+    that walked `refs/heads` alone would read a pushed straggler from another node as none, which is
+    the reassuring zero this kit exists to refuse - so the fixture plants one that exists ONLY as a
+    remote-tracking ref and the arm names it.
+    """
+    print("backlog stragglers (not asked without the relocation engine; falsifiable with it)")
+    r = make_repo(tmp, name="stragglers")
+
+    s = report(r)["backlog_stragglers"]
+    check("no memory-tree kit: backlog_stragglers is NOT ASKED, not a clean zero",
+          s.get("not_asked") is True and s["value"] == 0, f"{s}")
+    check("no memory-tree kit: and it says why",
+          "memory-tree" in str(s["detail"]), f"{s['detail']}")
+
+    kit_root = KIT.parent
+    missing = [n for n in ("memory-tree", "memory-recall", "lib") if not (kit_root / n).is_dir()]
+    if missing:
+        skip("backlog_stragglers: the live arms",
+             f"the sibling kits are not installed beside this one: {', '.join(missing)}")
+        return
+    for name in ("memory-tree", "memory-recall", "lib"):
+        shutil.copytree(kit_root / name, r / name,
+                        ignore=shutil.ignore_patterns("__pycache__"))
+    (r / ".memory-tree.conf").write_text(
+        "MEMORY_ROOT=memory\nDISCIPLINES=\"tooling\"\nFAMILIES=\"tooling:TOOL\"\n"
+        "ROTATION_MODE=\"cut\"\nBACKLOG_MODE=\"shards\"\n",
+        encoding="utf-8", newline="\n")
+    (r / ".gitignore").write_text("__pycache__/\n", encoding="utf-8", newline="\n")
+    bl = r / "memory" / "backlog"
+    bl.mkdir(parents=True, exist_ok=True)
+    (bl / "TOOL.md").write_text("# TOOL backlog\n\n- TOOL-aSeed-1 - the first ask\n",
+                                encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "a shards-mode backlog and the kits", "--no-verify"], r)
+
+    # One LOCAL straggler, and one that exists only as a REMOTE-TRACKING ref - the branch another
+    # node pushed. `update-ref` rather than a real remote on purpose: a remote would make
+    # `origin/HEAD` observable and change which branch the inventory keys on, which is a different
+    # question from the one this arm asks.
+    for branch, text in (("strag", "REWORDED by the local straggler"),
+                         ("elsewhere", "REWORDED by another node")):
+        run(["git", "checkout", "-q", "-b", branch, "main"], r)
+        (bl / "TOOL.md").write_text(f"# TOOL backlog\n\n- TOOL-aSeed-1 - {text}\n",
+                                    encoding="utf-8", newline="\n")
+        run(["git", "commit", "-q", "-am", f"the {branch} straggler edits a row", "--no-verify"], r)
+    far = run(["git", "rev-parse", "HEAD"], r).stdout.strip()
+    run(["git", "checkout", "-q", "main"], r)
+    run(["git", "branch", "-q", "-D", "elsewhere"], r)
+    run(["git", "update-ref", "refs/remotes/origin/elsewhere", far], r)
+
+    (r / ".memory-tree.conf").write_text(
+        "MEMORY_ROOT=memory\nDISCIPLINES=\"tooling\"\nFAMILIES=\"tooling:TOOL\"\n"
+        "ROTATION_MODE=\"cut\"\nBACKLOG_MODE=\"builds\"\n",
+        encoding="utf-8", newline="\n")
+    flip = r / "memory" / "builds" / "aFlip"
+    flip.mkdir(parents=True, exist_ok=True)
+    (flip / "BACKLOG.md").write_text("# aFlip\n\n## Asks\n\n## Dispositions\n",
+                                     encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "flip to builds", "--no-verify"], r)
+
+    s = report(r)["backlog_stragglers"]
+    check("two stragglers: the signal counts both", s["value"] == 2, f"{s}")
+    check("two stragglers: and reports how many refs it examined", s["of"] >= 3, f"of={s['of']}")
+    check("two stragglers: the probe is live", s["live"] is True, f"{s}")
+    check("two stragglers: and it is never gateable", s["gateable"] is False, f"{s}")
+    refs = [d.get("ref", "") for d in s["detail"]]
+    check("two stragglers: the LOCAL one is named", any("refs/heads/strag" in x for x in refs), f"{refs}")
+    check("two stragglers: the REMOTE-TRACKING one is named too",
+          any("refs/remotes/origin/elsewhere" in x for x in refs), f"{refs}")
+
+    # Nothing to examine: the inventory refuses rather than reporting a clean zero, and the signal
+    # carries that through as NOT LIVE. A ref walk that examined nothing is a fact about the clone.
+    tip = run(["git", "rev-parse", "HEAD"], r).stdout.strip()
+    run(["git", "checkout", "-q", "--detach"], r)
+    for branch in ("main", "strag", "sidework"):
+        run(["git", "branch", "-q", "-D", branch], r)
+    run(["git", "update-ref", "-d", "refs/remotes/origin/elsewhere"], r)
+    s = report(r, "--base-ref", tip)["backlog_stragglers"]
+    check("no ref to examine: the signal reports NOT LIVE, never a clean zero",
+          s["live"] is False and s["value"] == 0, f"{s}")
+    check("no ref to examine: and it carries the reason",
+          "DEAD PROBE" in str(s["detail"]), f"{s['detail']}")
+
+
+# ---------------------------------------------------------------------------------------------
 # 4 — DECLARED_EMPTY relabels a drained probe WITHOUT muzzling it (three directions)
 # ---------------------------------------------------------------------------------------------
 
@@ -1180,6 +1257,90 @@ def test_live_backlog_rows(tmp: pathlib.Path) -> None:
     dead = report(r2)["live_backlog_rows_per_shard"]
     check("no shards at all reports DEAD rather than 0",
           dead["live"] is False, f"live={dead['live']} value={dead['value']}")
+
+
+# The stub generator the builds-mode arms install as a sibling `memory-tree` kit. It prints the ask
+# projection a fixture file holds, so an arm can take ONE field away and watch its signal go DEAD.
+_STUB_GENERATOR = """import json, pathlib, sys
+rows = json.loads(pathlib.Path('projection.json').read_text(encoding='utf-8'))
+if '--all' not in sys.argv:
+    rows = [r for r in rows if r.get('status') not in ('CLOSED', 'WONTDO')]
+print(json.dumps({'mode': 'builds', 'examined': 1, 'asks': rows}))
+"""
+_ASK_SIGNALS = ("backlog_asks_contested", "backlog_evidence_sha", "backlog_asks_unlabelled")
+
+
+def test_backlog_ask_signals(tmp: pathlib.Path) -> None:
+    """TOOL-dDerivedDocket-34 AC21: the builds-mode backlog signals, NOT ASKED, live, and DEAD.
+
+    THREE STATES, EACH STAGED. Under `shards` the three report NOT ASKED and the live-row count
+    still reads the shards; under `builds` with no `BACKLOG.md` tracked they are NOT ASKED too, the
+    state right after an adopter sets the mode; and with a projection that lacks the field a signal
+    reads, that signal alone prints DEAD PROBE — a projection that stopped emitting it is a probe
+    that cannot move, and a clean zero there is the reassurance this kit refuses.
+    """
+    import json
+
+    print("builds-mode backlog signals (TOOL-dDerivedDocket-34)")
+    r = make_repo(tmp, name="asksignals")
+    bl = r / "memory" / "backlog"
+    bl.mkdir(parents=True, exist_ok=True)
+    (bl / "ARCH.md").write_text("# ARCH backlog\n- ARCH-tLive-1 · OPEN · one\n",
+                                encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "one shard", "--no-verify"], r)
+    got = report(r)
+    for name in _ASK_SIGNALS:
+        check(f"[dDD-34] shards mode: {name} is NOT ASKED, never DEAD",
+              got[name].get("not_asked") is True and got[name]["value"] == 0, f"{got[name]}")
+    check("[dDD-34] shards mode: the live-row count still reads the shards",
+          got["live_backlog_rows_per_shard"]["value"] == 1
+          and got["live_backlog_rows_per_shard"]["live"] is True,
+          f"{got['live_backlog_rows_per_shard']}")
+
+    conf = (r / ".memory-tree.conf").read_text(encoding="utf-8")
+    (r / ".memory-tree.conf").write_text(conf + 'BACKLOG_MODE="builds"\n',
+                                         encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "builds mode, no ask file yet", "--no-verify"], r)
+    got = report(r)
+    for name in _ASK_SIGNALS:
+        check(f"[dDD-34] builds mode, no BACKLOG.md: {name} is NOT ASKED, never DEAD",
+              got[name].get("not_asked") is True, f"{got[name]}")
+
+    _mt = resolve_kit_dir("memory-tree", "gen_build_index.py", KIT).name  # found, never typed
+    (r / _mt).mkdir()
+    (r / _mt / "gen_build_index.py").write_text(_STUB_GENERATOR, encoding="utf-8",
+                                                          newline="\n")
+    home = r / "memory" / "builds" / "aFoo"
+    home.mkdir(parents=True, exist_ok=True)
+    (home / "BACKLOG.md").write_text("# aFoo\n\n## Asks\n", encoding="utf-8", newline="\n")
+    full = [{"id": "ARCH-aFoo-1", "status": "CLOSED", "closing": ["deadbeefdeadbeef"],
+             "declining": ["aBar"], "live_specs": [], "sev": "unlabelled"},
+            {"id": "ARCH-aFoo-2", "status": "OPEN", "closing": [], "declining": [],
+             "live_specs": [], "sev": "unlabelled"}]
+    (r / "projection.json").write_text(json.dumps(full), encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "an ask file and a stub projection", "--no-verify"], r)
+    got = report(r)
+    check("[dDD-34] contested: closing AND declining evidence on one ask is counted",
+          got["backlog_asks_contested"]["value"] == 1 and got["backlog_asks_contested"]["live"],
+          f"{got['backlog_asks_contested']}")
+    check("[dDD-34] evidence sha: a `by` sha the object database cannot resolve is counted",
+          got["backlog_evidence_sha"]["value"] == 1 and got["backlog_evidence_sha"]["live"],
+          f"{got['backlog_evidence_sha']}")
+    check("[dDD-34] unlabelled: a LIVE ask with no severity is counted, the terminal one not",
+          got["backlog_asks_unlabelled"]["value"] == 1 and got["backlog_asks_unlabelled"]["live"],
+          f"{got['backlog_asks_unlabelled']}")
+    check("[dDD-34] builds mode: the live-row count is the LIVE projection's length",
+          got["live_backlog_rows_per_shard"]["value"] == 1, f"{got['live_backlog_rows_per_shard']}")
+    for name, field in (("backlog_asks_contested", "declining"), ("backlog_evidence_sha", "closing"),
+                        ("backlog_asks_unlabelled", "sev")):
+        rows = [{k: v for k, v in row.items() if k != field} for row in full]
+        (r / "projection.json").write_text(json.dumps(rows), encoding="utf-8", newline="\n")
+        dead = report(r)[name]
+        check(f"[dDD-34] a projection lacking `{field}` makes {name} a DEAD PROBE, not a 0",
+              dead["live"] is False and not dead.get("not_asked"), f"{dead}")
 
 
 NL_ = chr(10)
@@ -1603,6 +1764,120 @@ def test_ratchet_guard(tmp: pathlib.Path) -> None:
           out.returncode == 0 and "RATCHET WEAKENED" not in out.stderr,
           (out.stdout + out.stderr)[-400:])
 
+
+
+def test_base_is_remote_tracking(tmp: pathlib.Path) -> None:
+    """The comparison base is the REMOTE-TRACKING ref — TOOL-dDerivedDocket-21 S1 and S2, AC1 and AC2.
+
+    A pin raise that already LANDED on origin is the whole shape of the defect. Against the bare
+    branch name the report read the node's LOCAL main, so one commit graded a WEAKENED RATCHET on a
+    node whose local main was behind the raise and graded clean on every other node. Three states of
+    local main over ONE fixture — behind the raise, equal to origin, ahead by an unrelated commit —
+    must report the same signal values and the same verdict.
+
+    THE CONTROL IS WHAT MAKES THE THREE GREENS MEAN SOMETHING. The same behind state measured with
+    `--base-ref refs/heads/main`, the base the report used to take, must red: without it the three
+    agreeing states would pass just as well over a fixture whose raise never reached the ratchet.
+    """
+    import json
+
+    print("BASE is remote-tracking (local main behind, equal and ahead of origin: one answer)")
+    r = make_repo(tmp, name="remotebase")
+    conf = r / ".memory-tree.conf"
+    sig = r / KIT_NAME / "drift_signals.py"
+    conf.write_text(conf.read_text(encoding="utf-8") + 'ORPHAN_ID_PIN="5"\n',
+                    encoding="utf-8", newline="\n")
+    sig.write_text(
+        sig.read_text(encoding="utf-8")
+        + 'RATCHETS = [{"file": ".memory-tree.conf", "key": "ORPHAN_ID_PIN", "weakens": "up"}]\n',
+        encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "seed the ratchet", "--no-verify"], r)
+    before = run(["git", "rev-parse", "HEAD"], r).stdout.strip()
+
+    bare = tmp / "remotebase.git"
+    run(["git", "init", "-q", "--bare", str(bare)], tmp)
+    run(["git", "remote", "add", "origin", str(bare)], r)
+    # THE RAISE, UNJUSTIFIED, pushed — what a raise another node already landed looks like from here.
+    conf.write_text(conf.read_text(encoding="utf-8").replace('ORPHAN_ID_PIN="5"', 'ORPHAN_ID_PIN="9"'),
+                    encoding="utf-8", newline="\n")
+    run(["git", "commit", "-q", "-am", "raise the pin on origin", "--no-verify"], r)
+    tip = run(["git", "rev-parse", "HEAD"], r).stdout.strip()
+    pushed = run(["git", "push", "-q", "origin", "main"], r)
+    tracked = run(["git", "rev-parse", "--verify", "--quiet", "refs/remotes/origin/main"], r)
+    check("the fixture's origin carries the raise, and the tracking ref names it",
+          pushed.returncode == 0 and tracked.stdout.strip() == tip,
+          (pushed.stdout + pushed.stderr)[-300:])
+    # HEAD stays AT the raise throughout; only local main moves. Detached, so `branch -f` may move it.
+    run(["git", "checkout", "-q", "--detach", tip], r)
+
+    def read_signal_values(*extra: str) -> tuple:
+        out = run([sys.executable, REPORT_REL, "--json", "--check", *extra], r)
+        try:
+            vals = {s["signal"]: (s["value"], s["live"]) for s in json.loads(out.stdout)}
+        except ValueError:
+            vals = {}
+        return vals, out
+
+    run(["git", "branch", "-f", "main", before], r)
+    behind, behind_out = read_signal_values()
+    run(["git", "branch", "-f", "main", tip], r)
+    equal, equal_out = read_signal_values()
+    run(["git", "checkout", "-q", "main"], r)
+    (r / "src" / "unrelated.txt").write_text("local only\n", encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "an unrelated local commit", "--no-verify"], r)
+    run(["git", "checkout", "-q", "--detach", tip], r)
+    ahead, ahead_out = read_signal_values()
+
+    check("AC1: the report produced signals in all three states",
+          bool(behind) and bool(equal) and bool(ahead),
+          (behind_out.stderr + equal_out.stderr + ahead_out.stderr)[-400:])
+    check("AC1: local main BEHIND the raise reports the same signal values as EQUAL",
+          behind == equal, f"{behind} vs {equal}")
+    check("AC1: local main AHEAD by an unrelated commit reports the same signal values as EQUAL",
+          ahead == equal, f"{ahead} vs {equal}")
+    for label, out in (("behind", behind_out), ("equal", equal_out), ("ahead", ahead_out)):
+        check(f"AC1: {label}: the landed raise is NOT a weakened ratchet",
+              out.returncode == 0 and "RATCHET WEAKENED" not in out.stderr,
+              (out.stdout[-200:] + out.stderr)[-400:])
+
+    # THE CONTROL: the base the report used to take, over the behind state.
+    run(["git", "branch", "-f", "main", before], r)
+    _vals, stale = read_signal_values("--base-ref", "refs/heads/main")
+    check("control: against the stale LOCAL main the same raise reds as a weakened ratchet",
+          stale.returncode != 0 and "RATCHET WEAKENED" in stale.stderr,
+          (stale.stdout[-200:] + stale.stderr)[-400:])
+    run(["git", "branch", "-f", "main", tip], r)
+
+    # AC2 — the header carries the base ref AND an eight-hex sha.
+    head = run([sys.executable, REPORT_REL], r)
+    first = head.stdout.splitlines()[0] if head.stdout.strip() else ""
+    check("AC2: the header names refs/remotes/origin/main and the sha it resolved to",
+          re.search(r"\(base refs/remotes/origin/main @ [0-9a-f]{8}\)", first) is not None,
+          first or head.stderr[-300:])
+
+    # AC2 — `origin` configured, no tracking ref: a refusal naming the fetch, never a silent fallback.
+    run(["git", "update-ref", "-d", "refs/remotes/origin/main"], r)
+    unf = run([sys.executable, REPORT_REL, "--json"], r)
+    check("AC2: origin with no tracking ref REFUSES with exit 2",
+          unf.returncode == 2 and not unf.stdout.strip(), f"rc={unf.returncode} {unf.stdout[-200:]}")
+    check("AC2: ...and the refusal names `git fetch origin main`",
+          "git fetch origin main" in unf.stderr, unf.stderr[-400:])
+
+    # AC2 — no `origin` at all: the local branch IS the record, and the report says so.
+    run(["git", "remote", "remove", "origin"], r)
+    loc = run([sys.executable, REPORT_REL, "--json", "--check"], r)
+    check("AC2: a clone with no origin remote names the LOCAL base on stderr",
+          re.search(r"no origin remote, so the base is local main @ [0-9a-f]{8}", loc.stderr)
+          is not None, loc.stderr[-400:])
+    check("AC2: ...and exits as the signals decide, here clean",
+          loc.returncode == 0, (loc.stdout[-200:] + loc.stderr)[-400:])
+    txt = run([sys.executable, REPORT_REL], r)
+    first = txt.stdout.splitlines()[0] if txt.stdout.strip() else ""
+    check("AC2: ...and its header reads refs/heads/main with an eight-hex sha",
+          re.search(r"\(base refs/heads/main @ [0-9a-f]{8}\)", first) is not None,
+          first or txt.stderr[-300:])
 
 
 def test_ratchet_lookback(tmp: pathlib.Path) -> None:
@@ -2218,6 +2493,102 @@ def test_evidence_globs_exclude_test_templates(tmp: pathlib.Path) -> None:
           ":(exclude)*.test-template.*" in globs,
           "the shipped EVIDENCE_GLOBS lost the exclusion the arm above only proves is honoured")
 
+def test_asks_disposed_overrides(tmp: pathlib.Path) -> None:
+    """TOOL-dDerivedDocket-17: the count that makes owner ruling D12-b's override BOUNDED.
+
+    The ruling allows `--close --override asks-disposed` with a recorded reason on the condition
+    that the overrides are counted. Each one is a legitimate row in one record; the population is
+    the thing nobody can see, and this is the reader of it.
+    """
+    print("asks-disposed overrides per run-state record")
+    sep = chr(0xB7)
+    r = make_repo(tmp, name="askoverrides")
+    builds = r / "memory" / "builds"
+    for slug, body in (
+        ("aOne",
+         f"2026-09-01T00:00:00Z override {sep} item asks-disposed {sep} reason the owner took the call\n"
+         f"2026-09-02T00:00:00Z override {sep} item gates-green {sep} reason the bar was run by hand\n"),
+        ("aTwo",
+         f"2026-09-03T00:00:00Z override {sep} item asks-disposed {sep} reason a second, also recorded\n"
+         f"2026-09-04T00:00:00Z decision {sep} item asks-disposed came up {sep} reason parked, never bought\n"),
+    ):
+        (builds / slug).mkdir(parents=True, exist_ok=True)
+        (builds / slug / "RUN.md").write_text(
+            f"# {slug} - run state\n\n## Run facts\nphase: LANDED\n\n## Parked\n{body}",
+            encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "run-state records", "--no-verify"], r)
+
+    got = report(r)["asks_disposed_overrides"]
+    # THE OTHER TWO ROWS ARE THE LOAD-BEARING HALF of this fixture. A count over every `override`
+    # row reads 4, and a count over every row naming the item reads 4 as well — so a fixture with
+    # only this item's overrides in it would pass under either mistake.
+    check("counts THIS item's overrides and nobody else's: 2", got["value"] == 2, f"got {got['value']}")
+    check("reports every tracked record, so a total cannot hide one growing inside another",
+          got["of"] == 2, f"got {got['of']}")
+    check("the probe is LIVE where run-state records exist", got["live"] is True)
+    check("report-only: an unguarded merge-bar leg must not turn a recorded ruling into a refusal",
+          got["gateable"] is False)
+    per = {d["record"]: d["overrides"] for d in got["detail"]}
+    check("each record carries its own count",
+          per == {"memory/builds/aOne/RUN.md": 1, "memory/builds/aTwo/RUN.md": 1}, f"got {per}")
+
+    # --- it MOVES when another run buys the item. That is the whole point of the signal. --------
+    p = builds / "aTwo" / "RUN.md"
+    p.write_text(p.read_text(encoding="utf-8")
+                 + f"2026-09-05T00:00:00Z override {sep} item asks-disposed {sep} reason a third\n",
+                 encoding="utf-8", newline="\n")
+    check("a further override raises the count",
+          report(r)["asks_disposed_overrides"]["value"] == 3,
+          "the signal does not track the variable it exists for")
+
+    # --- DEAD, not a reassuring 0, where no run-state record exists at all ----------------------
+    r2 = make_repo(tmp, name="norunstate")
+    dead = report(r2)["asks_disposed_overrides"]
+    check("no run-state record at all reports DEAD rather than 0",
+          dead["live"] is False, f"live={dead['live']} value={dead['value']}")
+
+
+# ---------------------------------------------------------------------------------------------
+# TOOL-dDerivedDocket-26 — legs the merge bar retried after a timeout
+# ---------------------------------------------------------------------------------------------
+
+
+def _write_gate_verdict(r: pathlib.Path, run: str, body: str) -> None:
+    """One run record's verdict file under the fixture's git dir, where the gate runner writes it."""
+    d = r / ".git" / "gate-run" / run
+    d.mkdir(parents=True, exist_ok=True)
+    (d / "verdict").write_text(body, encoding="utf-8", newline="\n")
+
+
+def test_legs_retried_after_timeout(tmp: pathlib.Path) -> None:
+    """The sum of `retried` over the run records a git dir holds, and DEAD where none can move it.
+
+    The runner retries a leg whose own ceiling fired and counts a pass on that retry green, which is
+    right for one bar and invisible across many. This signal is the reader across them.
+    """
+    print("legs retried after a timeout, over the run records")
+    r = make_repo(tmp, name="retried")
+    _write_gate_verdict(r, "r1", "verdict\tGREEN\nretried\t1\n")
+    _write_gate_verdict(r, "r2", "verdict\tRED\nretried\t1\n")
+    got = report(r)["legs_retried_after_timeout"]
+    check("two records with retried 1 report 2", got["value"] == 2, f"got {got['value']}")
+    check("the probe is LIVE where a record carries the key", got["live"] is True)
+    check("report-only: a retried leg is not a refusal", got["gateable"] is False)
+    # --- a record from a runner that predates the retry is read but moves nothing ------------------
+    _write_gate_verdict(r, "r0", "verdict\tGREEN\nran\t4\n")
+    got = report(r)["legs_retried_after_timeout"]
+    check("a record without the key is counted in `of` and adds nothing",
+          got["value"] == 2 and got["of"] == 3, f"value {got['value']} of {got['of']}")
+    # --- it MOVES when another bar retries ---------------------------------------------------------
+    _write_gate_verdict(r, "r3", "verdict\tGREEN\nretried\t3\n")
+    check("a further record raises the sum",
+          report(r)["legs_retried_after_timeout"]["value"] == 5, "the signal does not track its variable")
+    # --- DEAD, not a reassuring 0, over a git dir holding no run record -------------------------------
+    dead = report(make_repo(tmp, name="noruns"))["legs_retried_after_timeout"]
+    check("a git dir with no run record reports DEAD rather than 0",
+          dead["live"] is False, f"live={dead['live']} value={dead['value']}")
+
 
 # ---------------------------------------------------------------------------------------------
 # TOOL-dLoggedFlight-13 — run records left non-terminal after their build merged
@@ -2559,9 +2930,14 @@ def main() -> int:
         test_lexicon_marginal_rate(tmp)
         test_no_signal_hardcodes_live(tmp)
         test_live_backlog_rows(tmp)
+        test_backlog_ask_signals(tmp)
+        test_asks_disposed_overrides(tmp)
+        test_legs_retried_after_timeout(tmp)
+        test_backlog_stragglers(tmp)
         test_readme_mechanism_drift(tmp)
         test_declared_empty(tmp)
         test_ratchet_guard(tmp)
+        test_base_is_remote_tracking(tmp)
         test_ratchet_lookback(tmp)
         test_ratchet_message_states_its_window(tmp)
         test_lang_mode_ratchet(tmp)

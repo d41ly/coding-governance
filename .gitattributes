@@ -25,8 +25,10 @@ tools/template-size-limits.txt text eol=lf
 tools/run-gates/gate-profiles.txt text eol=lf
 
 # Git hooks are extensionless (the *.sh rule above misses them); a CRLF hook won't execute.
+.githooks/commit-msg text eol=lf
 .githooks/pre-commit text eol=lf
 .githooks/pre-push text eol=lf
+.githooks/pre-rebase text eol=lf
 
 # memory-tree determinism (this repo dogfoods the kit). THREE gates read these bytes, and all three
 # are byte- or char-exact:
@@ -50,6 +52,11 @@ memory/**/*.md text eol=lf
 memory/**/*.py text eol=lf
 memory/**/*.toml text eol=lf
 memory/**/*.txt text eol=lf
+# A build record that a LATER unit re-computes and byte-compares. The migration planner's three
+# worksheets (`migrate_backlog.py --plan --record`) are the first of these: the switch-over's
+# staleness check re-derives the same worksheet over the same tree and compares, so a CRLF checkout
+# on one node would read as a stale record on that node alone. TOOL-dDerivedDocket-11.
+memory/**/*.tsv text eol=lf
 
 # The two AUTHORED indexes every node appends to. `merge=rows` routes a conflict through the
 # row-keyed driver (tools/memory-tree/merge-rows.py), which merges by record id: an append-collision
@@ -63,6 +70,12 @@ memory/**/*.txt text eol=lf
 # and the per-node config can land in one commit. `bash tools/check-wiring.sh --fix` configures it.
 memory/DECISIONS.md merge=rows
 memory/backlog/*.md merge=rows
+# The per-build ask files, AUTHORED by every build that files or disposes an ask, from the backlog
+# switch-over on (TOOL-dDerivedDocket-34 S5). The shard line above is KEPT, not replaced: those
+# paths are generated views now, and the row driver's shard-into-view refusal is what stops a
+# pre-switch branch's shard edits from line-merging into a view — without the attribute the driver
+# is never asked, and git's own text merge completes the merge with nothing refusing it.
+memory/builds/*/BACKLOG.md merge=rows
 
 # The governance template is under a STRICT byte gate — pin it (+ companions) to LF so a CRLF
 # checkout can't inflate the count past the limit. (The gate also normalizes, belt-and-suspenders.)
@@ -109,6 +122,10 @@ skills/session-kickoff/SKILL.md text eol=lf
 # core.autocrlf smudged every unpinned path on the way out.
 tools/hooks/*.js text eol=lf
 tools/workflows/*.js text eol=lf
+# The remote-CI workflow, TOOL-dDerivedDocket-32. GitHub runs the committed blob, whose `run:` bodies
+# are bash; the pin keeps this fleet's working copy LF too, so the bytes a person verifies before
+# staging are the bytes GitHub runs. A CLASS, so a second workflow file lands LF without an edit.
+.github/workflows/*.yml text eol=lf
 # The unattended kit's hooks and their shared module, pinned for the same reason as the two lines
 # above: they run under node from a settings.json command, and the index already holds them LF.
 tools/unattended/*.js text eol=lf

@@ -66,7 +66,4 @@ gotcha-classes = [
 guides = [
 ]
 backlog-shards = [
-  "KICK.md",
-  "PLAY.md",
-  "TOOL.md",
 ]

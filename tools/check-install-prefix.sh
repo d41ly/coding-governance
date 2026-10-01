@@ -3,6 +3,17 @@
 #
 #   bash <prefix>/check-install-prefix.sh            # assert; exit 1 naming every <path>:<line>
 #   bash <prefix>/check-install-prefix.sh --list     # print every hit and every render left out
+#   bash <prefix>/check-install-prefix.sh --offenders   # one <path> TAB ban TAB <spelling> per hit; exits as --check
+#
+# --offenders IS THE SIGNATURE THE MERGE BAR GRADES THIS LEG WITH (TOOL-dDerivedDocket-23 S3). Its red
+# attribution compares two trees' offender SETS, and `--check` cannot feed that: it keys every hit by
+# `<path>:<line>`, so one unrelated edit above an inherited hit moves it. This mode prints a KEY per
+# counted spelling and nothing else — no line number, no count, no prose; a key repeating inside one
+# file carries `#<k>`, its occurrence ordinal there. Every other line goes to /dev/null. The keys
+# come out of the counter in ONE write at its end, so a refusal or a counter that dies leaves NO key,
+# which the attribution reads as a probe that could not answer, never as a clean set. Merged into the
+# pure ban from dDerivedDocket's carried-prefix shape, whose `root`/`carried`/`runtime` kinds were the
+# three arms this gate no longer has: every hit here is one kind, `ban`.
 #
 # WHY. `govkit apply` writes gov's bytes VERBATIM: nothing substitutes into a file body anywhere, so
 # a kit path a file spells arrives unchanged in a target installed at another prefix and resolves to
@@ -55,6 +66,10 @@
 # re-renders with the real values. The homonym rules in rules 3 and 4 are context heuristics, and
 # each states its ceiling where it lives in the counter.
 set -u
+# --offenders: stdout is KEYS and nothing else, so prose goes to /dev/null from the first line and the
+# counter's keys to fd 3. Decided before anything can print, the not-a-repo refusal included.
+MODE="${1:---check}"
+[ "$MODE" = --offenders ] && exec 3>&1 1>/dev/null
 # TOOL-cWidenedNet-1 S4 — CAPTURED BEFORE THE `cd`, because `$0` may be relative and the `cd` below
 # moves out from under it.
 _self_dir=$(cd "$(dirname "$0")" 2>/dev/null && pwd) || _self_dir=""
@@ -79,9 +94,8 @@ SELF_PREFIX=${SELF_REL:+$SELF_REL/}
 # `<prefix…>/<kit>/<file>` and the kit is the field after the prefix's own segments, so a root
 # install reads field 1, `scripts/` field 2, `vendor/gov/` field 3.
 _seg_kit=$(( $(printf '%s' "$SELF_PREFIX" | tr -cd '/' | wc -c) + 1 ))
-MODE="${1:---check}"
-case "$MODE" in --check|--list) ;;
-  *) echo "usage: $(basename "$0") [--check|--list] — a pure ban has no mode that writes anything"; exit 2 ;; esac
+case "$MODE" in --check|--list|--offenders) ;;
+  *) echo "usage: $(basename "$0") [--check|--list|--offenders] — a pure ban has no mode that writes anything"; exit 2 ;; esac
 
 # THE KIT-SOURCE TEST (TOOL-aRepatriatedFork-16 S2). A repo SHIPS what its registry resolves, so a
 # repo with none ships nothing and there is no population to police. Neither path is probed by NAME
@@ -298,7 +312,7 @@ def scan_line(line):
 
     def add(a, b, kit):
         nonlocal work
-        out.append(kit)
+        out.append((kit, work[a:b]))  # the spelling, read before its span is masked
         work = work[:a] + "\0" * (b - a) + work[b:]
 
     # 1. a quoted gov-prefix segment, JOINED: by `/`, by `,` to a quoted segment, or in a join( call
@@ -387,6 +401,7 @@ for t in templates:
 
 graded = hits = 0
 bad = []
+keys, seen_keys = [], {}
 for f in files:
     if f in renders:
         continue
@@ -398,11 +413,24 @@ for f in files:
         got = scan_line(line)
         if got:
             hits += len(got)
-            bad.append("  %s:%d  %s  %s" % (f, n, ",".join(sorted(set(got))), line.strip()[:90]))
+            bad.append("  %s:%d  %s  %s" % (f, n, ",".join(sorted({k for k, _ in got})), line.strip()[:90]))
+            for _, spelling in got:
+                # One key per counted spelling, an ordinal on a repeat inside one file: the shape
+                # dDerivedDocket's attribution compares as a SET (TOOL-dDerivedDocket-23 S3).
+                k = "%s\tban\t%s" % (f, spelling.strip())
+                seen_keys[k] = seen_keys.get(k, 0) + 1
+                keys.append(k if seen_keys[k] == 1 else "%s#%d" % (k, seen_keys[k]))
 if graded == 0:
     sys.stderr.write("install-prefix: the ban's counter graded NO file out of %d tracked — a dead probe,"
                      " not a pass\n" % len(files))
     sys.exit(2)
+
+if MODE == "--offenders":
+    # LF bytes in ONE write: a text-mode stdout on Windows ends every line in CR, which an exact-match
+    # reader of the set meets as `<key>CR`. Exits as --check does.
+    if keys:
+        sys.stdout.buffer.write(("\n".join(keys) + "\n").encode("utf-8"))
+    sys.exit(1 if bad else 0)
 
 out = []
 if MODE == "--list":
@@ -421,7 +449,8 @@ out.append(summary)
 sys.stdout.buffer.write(("\n".join(out) + "\n").encode("utf-8"))
 sys.exit(1 if bad and MODE == "--check" else 0)
 BAN_PY
-derive_ban_files | BAN_KITS="$kits" BAN_EXT="$EXT" BAN_TEMPLATES="$TEMPLATES" "$PY_GATE" -c "$_ban_src" "$MODE"
+_out_fd=1; [ "$MODE" = --offenders ] && _out_fd=3   # the keys, and only the keys, reach the caller
+derive_ban_files | BAN_KITS="$kits" BAN_EXT="$EXT" BAN_TEMPLATES="$TEMPLATES" "$PY_GATE" -c "$_ban_src" "$MODE" >&"$_out_fd"
 rc=$?
 case "$rc" in
   0|1) exit "$rc" ;;

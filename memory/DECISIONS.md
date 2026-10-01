@@ -8,6 +8,7 @@
 ## PLAY — playbook
 
 - PLAY-aCandidStub-1 · the §10-into-`gotchas/` retirement is REFUTED, not deferred: the kit is Optional so no universal rule may route to its dir, `aFoldedQuarry` U4 §2 S8/§3 charter the corpora disjoint, and DERIVED anchors make a generic record inert. The drift is one level up
+- **PLAY-dDerivedDocket-1** — **attended landings keep local-main-first; an unattended run lands by its protocol's rule** (owner, D12-i3). §6's backlog bullet points at the memory tree's status rule, true in both modes. Detail `builds/dDerivedDocket/`. — _2026-09-28, `d`_
 
 ## KICK — kickoff
 
@@ -114,6 +115,20 @@
 - TOOL-aProbedUnit-11 · a run watches its own units: `--audit <slug>` grades each open dispatched unit's tree idle time against `UNIT_STALL_BOUND` (1800 s) and prints the remedy; the keepalive runs it. A git clone under the scratchpad hits MAX_PATH on Windows, so a clone takes `%TEMP%/<short>`.
 - **TOOL-aReplayedCard-1** — **the commit deny binds sessions started under the wiring**: `git commit` alone; a NEW `authorized-by: prompt|recipe` README exempts; an absent or replay-written card allows. Detail `builds/aReplayedCard/spec/2026-09-13-spec-TOOL-aReplayedCard-1.md` §8.
 - **TOOL-aReplayedCard-2** — **fragments carry `interpreter`/`args`; `{here}` serves a flat kit**: the merger renders unquoted, re-matches by marker and event; three readers resolve `{here}` with a parity refusal. Detail `builds/aReplayedCard/spec/2026-09-13-spec-TOOL-aReplayedCard-2.md` §4.
+- **TOOL-dDerivedDocket-5** — **auto-resume ships ON, in the kit and here**: the owner ruled it on everywhere, overriding charter §9's default-off gate for standing configuration for this feature alone; adopters opt out with `RESUME_SCHEDULE="off"`. Contract `guides/UNATTENDED-STOPS.md` §11.
+- **TOOL-dDerivedDocket-19** — **a `may:` grant is honoured only from an owner-committed `slug` README and lifts veto 2 only** (D12-j): an ask-row `may` is a proposal, a `SCOPE`-row one is V13, no run commit may write one. Contract `guides/UNATTENDED-PROTOCOL.md` §1.
+- **TOOL-dDerivedDocket-33** — **D2 and D6 signed by rule, under delegation**: `builds/dDerivedDocket/build/2026-09-22-build-TOOL-dDerivedDocket-33-signed-same-id.md`, `builds/dDerivedDocket/build/2026-09-22-build-TOOL-dDerivedDocket-33-signed-triage.md`; the rules are its spec's §4.
+- **TOOL-dDerivedDocket-24** — **gov lands over an inherited-only red** (D12-i4, bound 10 landings; the kit default parks): departs from the charter's 'blocks a red one' and 'green at the push boundary' and from the protocol's `gates-green`. Contract `guides/UNATTENDED-STOPS.md` §13.
+- **TOOL-dDerivedDocket-31** — **M6's parallel MUST binds DELEGATED passes only** (D12-i10): an inline author may sequence proven-disjoint passes and says so in the brief; narrows TOOL-aHoistedPass-10's parallel-on-proof. Rule `guides/BUILD-METHOD.md` M6.
+- **TOOL-dDerivedDocket-61** — **one lease record, the run-state facts** (owner ruling 2026-09-22, as relayed): the per-slug lease file retires, `RESUME_STALE_BOUND` is the one bound, and HELD is carved out of the stop-guard, `--liveness` and the tick. Contract `guides/UNATTENDED-STOPS.md` §7.
+- **TOOL-dDerivedDocket-34** — **`unit` and `advances` supersede DEPL-dGaugedVintage-13's "COUNTED, NEVER REFUSED"** (design §4.4): a signed `unit` ask derives its spec's status, so `backlog_rows_outliving_closed_specs` and its pin retire at the switch-over.
+- TOOL-dDerivedDocket-3 · SUPERSEDES TOOL-dClosedLexicon-11's 'no verb here commits': under LANDER_MODE=in-place `--close` commits `records(<slug>): close — LANDING` on the graded merge. The archive name still derives from the record's BYTES, since two runs can honestly share a witness
+- TOOL-dDerivedDocket-70 · OWNER RULING (2026-09-30): when a landing touches a declared self-test surface, the main loop exports GATE_SELFTESTS=1 into its one `--close`; the driver never sets it, and the owed notice moves to VERIFYING entry. An unattended main loop counts as on demand
+- TOOL-dDerivedDocket-71 · OWNER RULING (2026-09-30): `researched` and `solution-tested` bind every mode, and BUILD-METHOD M12's 'solution not given' decides when they apply. SUPERSEDES TOOL-aPromptedMandate-4's prompt-only scope and its rejection of unconditional
+- TOOL-dDerivedDocket-72 · OWNER RULING (2026-09-30): BUILD-METHOD M7 step 1 regrounds with `--status`, extended to report the holder-worktree and pinned-asks checks read-only, in place of a no-id `--resume` that logs check 59 at every pass boundary
+- TOOL-dDerivedDocket-73 · OWNER RULING (2026-09-30), narrowing TOOL-dDerivedDocket-24: AGENTS.md's merge-bar sentence points at the inherited-red policy, the template's section 7 line stays (true under the kit default park), and the protocol's gates-green text owes the same pointer
+- TOOL-dDerivedDocket-75 · OWNER RULING (2026-09-30): check-wiring keeps writing the relative `.githooks`. Straggler hooks are best-effort in a linked worktree, whose pre-rebase warning goes quiet; check 26 and CI are the guarantee. Reopens when TOOL-aWeldedTribunal-10 lands
+- TOOL-dDerivedDocket-76 · OWNER RULING (2026-09-29): the unattended kit's own suites were not run for dDerivedDocket's landing, and 'land it' is no ask to run them. D12-h and D12-i8 lapsed unexercised; the kit's compensating check is owed to remote CI's held job
 
 ## DEPL — deployer
 

@@ -318,6 +318,17 @@
     "ceiling": 4800
   },
   {
+    "name": "row-driver view refusal",
+    "argv": [
+      "python3",
+      "{prefix}/memory-tree/merge-rows.py",
+      "--check"
+    ],
+    "chunk": "declarations",
+    "subject": "repo",
+    "ceiling": 300
+  },
+  {
     "name": "row-keyed merge driver replay",
     "argv": [
       "bash",
@@ -344,7 +355,8 @@
       "memory/guides/BUILD-METHOD.md",
       "memory/guides/ANNOTATION-STYLE.md",
       "{prefix}/lib/",
-      "{prefix}/memory-tree/"
+      "{prefix}/memory-tree/",
+      ".memory-tree.conf"
     ],
     "chunk": "declarations",
     "subject": "repo",
@@ -431,6 +443,21 @@
     "argv": [
       "python3",
       "{prefix}/memory-tree/row_grammar.py",
+      "--selftest"
+    ],
+    "guard": [
+      "{prefix}/lib/",
+      "{prefix}/memory-tree/"
+    ],
+    "chunk": "selftests",
+    "subject": "kit",
+    "ceiling": 300
+  },
+  {
+    "name": "backlog migration selftest",
+    "argv": [
+      "python3",
+      "{prefix}/memory-tree/migrate_backlog.py",
       "--selftest"
     ],
     "guard": [
@@ -677,7 +704,8 @@
     "chunk": "declarations",
     "subject": "repo",
     "guard": [
-      "{prefix}/codebase-map/"
+      "{prefix}/codebase-map/",
+      ".codebase-map.conf"
     ],
     "ceiling": 180
   },
@@ -742,7 +770,8 @@
     ],
     "guard": [
       "{prefix}/memory-recall/",
-      "memory/"
+      "memory/",
+      ".memory-tree.conf"
     ],
     "chunk": "declarations",
     "subject": "repo",
@@ -879,6 +908,11 @@
       "python",
       "{prefix}/drift-audit/drift_report.py",
       "--check"
+    ],
+    "signature": [
+      "python",
+      "{prefix}/drift-audit/drift_report.py",
+      "--offenders"
     ],
     "chunk": "declarations",
     "subject": "repo",
@@ -1066,6 +1100,11 @@
       "bash",
       "{prefix}/check-install-prefix.sh"
     ],
+    "signature": [
+      "bash",
+      "{prefix}/check-install-prefix.sh",
+      "--offenders"
+    ],
     "chunk": "product",
     "subject": "repo",
     "ceiling": 2940
@@ -1193,11 +1232,17 @@
       "python",
       "{prefix}/lexicon/lexicon.py"
     ],
+    "signature": [
+      "python",
+      "{prefix}/lexicon/lexicon.py",
+      "--offenders"
+    ],
     "guard": [
       "{prefix}/",
       "skills/session-kickoff/",
       ".githooks/",
-      ".claude/"
+      ".claude/",
+      ".lexicon.conf"
     ],
     "chunk": "declarations",
     "subject": "repo",
@@ -1258,9 +1303,51 @@
       "bash",
       "{prefix}/memory-tree/check-memory-hygiene.sh"
     ],
+    "signature": [
+      "bash",
+      "{prefix}/memory-tree/check-memory-hygiene.sh",
+      "--offenders"
+    ],
     "chunk": "records",
     "subject": "repo",
     "ceiling": 12720
+  },
+  {
+    "name": "transition-audit arms",
+    "argv": [
+      "bash",
+      "{prefix}/memory-tree/transition-audit.test.sh"
+    ],
+    "guard": [
+      ".githooks/",
+      "{prefix}/check-wiring.sh",
+      "{prefix}/lib/",
+      "{prefix}/memory-recall/",
+      "{prefix}/memory-tree/",
+      ".memory-tree.conf"
+    ],
+    "chunk": "declarations",
+    "subject": "repo",
+    "ceiling": 900
+  },
+  {
+    "name": "straggler-guard arms",
+    "argv": [
+      "bash",
+      ".githooks/straggler-guard.test.sh"
+    ],
+    "guard": [
+      ".githooks/",
+      "{prefix}/check-wiring.sh",
+      "{prefix}/lib/",
+      "{prefix}/memory-recall/",
+      "{prefix}/memory-tree/",
+      ".memory-tree.conf",
+      ".lexicon.conf"
+    ],
+    "chunk": "declarations",
+    "subject": "repo",
+    "ceiling": 300
   },
   {
     "name": "marker contracts",
@@ -1315,7 +1402,8 @@
       "{prefix}/govkit/",
       "{prefix}/playbook/",
       "{prefix}/check-microformats.sh",
-      "{prefix}/check-line-length.sh"
+      "{prefix}/check-line-length.sh",
+      ".lexicon.conf"
     ],
     "chunk": "declarations",
     "subject": "repo",

@@ -38,6 +38,7 @@ lexicon-verbs = []
 globs = [
   "tools/run-gates/run-gates.sh",
   "tools/run-gates/run-selftests.sh",
+  "tools/run-gates/lib-attribute.sh",
   "tools/run-gates/run-selftests.test.sh",
   "tools/run-gates/selftest-budgets.txt",
   "tools/run-gates/derive-ceilings.py",
@@ -96,6 +97,27 @@ untracked file, so an implementation using it stamps a green over a tree with a 
 recorded digest then has a non-empty porcelain component that the at-a-rev fingerprint form cannot
 reproduce at any sha, which forces the full bar forever while printing that the record describes a
 different tree. Safe, permanent, and it reads as caution.
+
+**The runner owns its scratch, and a moved tree is its own exit.** `WORK` is a named `gate-work.*`
+dir under the ambient `TMPDIR` with an `owner` record (pid, common dir, epoch), and every leg's
+`TMPDIR` points into it, so a SIGKILLed bar's leak is swept by the next bar once its pid is dead —
+only this repository's, and never a dir whose owner it cannot read. `TMPDIR entries <n>` prints the
+ambient count once per bar. A relatively started runner re-execs through its absolute path so the
+process-monitor fence can attribute it. A bar over a tree that moved exits 3, `TREE MOVED`, unless a
+leg failed, which stays RED and names the move. Two readers compare whole outputs, the canary's width
+arm and the run-log suite's failed-append arm, so both keep the new count line stable.
+`TOOL-dDerivedDocket-25`.
+
+**A fired ceiling is deferred, not failed, and exit 0 needs a written verdict.** `check_ceiling_fired`,
+the predicate the red attribution reads CONTENDED by, defers a leg to ONE serial retry after the pool
+drains, inside the wall; a pass counts green and `retried`, and a second timeout is HOST (exit 4) when
+a spawn then costs more than `GATE_HOST_RATIO` times the clone's `gate-spawn-floor` as read before the
+bar measured. The reap is keyed on `timeout`'s PROCESS GROUP, because a descendant outliving the leg
+is reparented off every ppid chain and keeps only its group id; a walk rooted at the worker kills the
+worker. Retry files sit beside the first attempt's, so the attribution still reads the first. An
+empty manifest and an unwritten verdict file are REFUSED, and the pre-push hook reads `verdict GREEN`
+after every exit 0. Two whole-output readers filter the timestamped `gate queue: acquired` line.
+`TOOL-dDerivedDocket-26`.
 
 **Exactly one leg is impure, and it is the gate rather than a self-test.** Seven of the 86 legs name
 a network verb in their own script; six build their origin under `mktemp -d`. The seventh,
@@ -167,6 +189,35 @@ they set. Matching NOTHING is a refusal too, and deliberately not the same state
 heads the deployer matches to read verdicts; those heads are strings in the runner's own `printf`
 calls. When the runner's output moves and the declaration does not, the deployer reports a bar that
 ran nothing — silently, because "no lines matched" and "no legs ran" are one observation to a reader.
+
+**A held suite's verdict is ATTRIBUTED, not absolute.** `run-selftests.sh --attribute <R>` runs each
+selected suite at the working tree AND at R's own copy of it, in a detached worktree under the git
+common dir, and reports NEW, INHERITED and FIXED sets of normalised FAIL lines. It exists because
+several suites in the declared population are red at any base for causes filed against other units,
+so the bare GREEN the compensating-check wording used to demand named a state nobody could reach,
+and the red it produced instead was not about the change being graded. Exit 1 is a NEW FAIL, a DEAD
+PROBE at L or an L-side OVER BUDGET, and never an inherited one; consumers read the `verdict clean`
+token on the summary line and never the NEW count alone. SETS AND NOT COUNTS, because a failure this
+tree fixed plus one it introduced nets to zero. A dead side has no members, so everything at L over
+it reads NEW — the direction that fails toward noise rather than toward a false pass. The R-side set
+is cached per (R, suite, suite blob at R) and written only after a run that COMPLETED, which is what
+bounds a cache miss's doubled cost to once per pair. `TOOL-dDerivedDocket-1`.
+
+**A red BAR leg is attributed too, and it is REPORT-ONLY.** `GATE_ATTRIBUTE=<R>` re-runs each red
+leg alone at R from a detached worktree and prints a `GATE attr` line per red leg — OWN, INHERITED,
+MIXED, CONTENDED or DEAD PROBE — plus an `attribution` file in the run record; no exit code moves.
+The normaliser and the worktree runner are ONE sourced file, `lib-attribute.sh`, which both runners
+load only on the path that attributes, so a runner copied alone still runs every other mode. R's row
+supplies BOTH ends' `signature`, so a branch cannot choose its own grader, and a diff touching the
+runner, the fingerprint helper, the pre-push hook or that file reads every red OWN (KF3). The
+pre-push hook exports the REMOTE sha as R, because a "not mine" claim measured against a base the
+world moved past is indistinguishable from one nobody measured. `TOOL-dDerivedDocket-23`.
+
+**An INHERITED leg is aged and owned, and a landable red is stamped apart.** Under `GATE_INHERITED_RED_MAX_AGE=<n>` each INHERITED leg runs once more at R~n and, when not red there, a first-parent bisection names the landing that introduced it; a probe that cannot answer, a no-`signature` leg red there without every non-blank line of L's output included, reads `age unproven` and never counts toward the stamp; the three columns go before the reason. Under an exported `land` with every red leg aged inside the bound, `gate-inherited-green` records R and `max_age` and never touches `gate-full-green`. The pre-push hook reads the policy at the remote sha, trusts that stamp only at the same R and bound, and lands an inherited-only red on an unmoved tree. `TOOL-dDerivedDocket-24`.
+
+**`--print-profile` carries a backstop's two terms.** `queue` is `TS_MAXWAIT`, derived above the verb's exit so it never reads 0, and `ceiling_max` the manifest's largest positive ceiling by the parse's own predicate: `-` for none, absent for a manifest that will not parse. The unattended driver sizes its bar's backstop from them. `TOOL-dDerivedDocket-27`.
+
+**A waiting bar beats.** On every tick it waits, the turnstile rewrites `gate-queue-heartbeat` under its own worktree's git dir, beside `gate-logs/`, and never removes it, so an out-of-process liveness reader sees a queued bar move before its first leg lands; the unattended driver's clock reads its mtime. `TOOL-dDerivedDocket-64`.
 
 ## Shared seams
 

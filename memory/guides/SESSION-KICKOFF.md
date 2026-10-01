@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.4 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-10-01T03:30:22+03:00 @ 162f2d133289ff7d66635701ddbf0ee8175bb17d
+last-audit: 2026-10-01T13:31:52+03:00 @ aa660634b9df51bc0916036158448c1877926d77
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/run-gates/run-selftests.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 162f2d133289ff7d66635701ddbf0ee8175bb17d
+last-body-change: aa660634b9df51bc0916036158448c1877926d77
 check-script: skills/session-kickoff/manifest-check.sh
 registry: AGENTS.md
 -->
@@ -47,11 +47,11 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   rule, the pass loop, regrounding, the closing review, the README re-read and the wrap-up
   derivation. It is rendered by the memory-tree kit and is in `watch:`, so editing it forces this
   manifest to be re-audited.
-- **A build MAY restructure itself, and MUST parallelise what it can prove disjoint.** Both are
+- **A build MAY restructure itself, and MUST parallelise delegated disjoint passes.** Both are
   BUILD-METHOD's, both changed under `TOOL-dUnstalledConvoy`, and both invert what a session would
   otherwise assume: M2/M3 give a run delegated authority to retire, supersede or add units inside the
-  build's stated goal rather than stalling on a spec that turned out wrong, and M6's default is now
-  parallel-where-proven with sequence as the fallback. Conditions and bounds are M3's and M6's. What
+  build's stated goal rather than stalling on a spec that turned out wrong, and M6's parallel default
+  now binds delegated passes only. Conditions and bounds are M3's and M6's. What
   is NOT in force is the VERIFICATION: `--dispatch` records a pass's declared write set and the
   comparison only REPORTS (`TOOL-dUnstalledConvoy-23`). Declare them anyway; green is not a proof.
 
@@ -73,7 +73,7 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   "committed before the run's branch existed", which describes one anchor and is false of the other.
   `memory/guides/UNATTENDED-PROTOCOL.md` section 1 is the condition.
 - **Governing docs:** `AGENTS.md` (the charter — authoritative) · `coding-governance-agents.template.md`
-  (the playbook this repo follows + ships) · `memory/DECISIONS.md` + `memory/backlog/<FAMILY>.md`.
+  (the playbook this repo follows + ships) · `memory/DECISIONS.md` + asks in `memory/builds/<slug>/BACKLOG.md`.
   Two BINDING guides: `memory/guides/REVIEW-PROTOCOL.md` (fan-out) and
   `memory/guides/UNATTENDED-PROTOCOL.md` + `UNATTENDED-VERBS.md` (a run that merges and pushes
   with no owner turn).
@@ -90,10 +90,12 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   (`session:`, `pid:`, `host:`, `pid-image:`, `lease-utc:`) the driver records and the verdict
   `--liveness` derives. `RESUME_STALE_BOUND` is the bound they act on. Protocol §5; `aWokenSentinel`.
 
-- **`GATE_BOUND` bounds `GATE_CMD` and `WIRING_CHECK`; `GATE_REAP_BOUND` the
-  teardown reap.** A breach is KILLED, and `gates-green` then says the bar never RETURNED
-  — not a leg FAILING. None of them bounds an AGENT-launched
-  process; see `tools/process-monitor/`. `TOOL-aBoundedCeiling-6`.
+- **`GATE_BOUND` bounds every command a project declares, `GATE_CMD` only where no
+  `GATE_PROFILE_CMD` is; `GATE_REAP_BOUND` the teardown reap.** This repo declares a profile, so its
+  unattended bar is bounded by the backstop `--preflight` pins: `GATE_WALL` + the queue + a margin. A
+  breach is KILLED, and `gates-green` then says the bar never RETURNED — not a leg FAILING — or,
+  killed before it acquired the repository, prints a hold. None of them bounds an AGENT-launched
+  process; see `tools/process-monitor/`. `TOOL-aBoundedCeiling-6`, `TOOL-dDerivedDocket-27`.
 
 - **An unattended run declares a MODE, and which one decides what binds it**: the authorization
   discipline, WHICH ANCHOR may authorize it, which scoped directives apply, and whether the
@@ -145,9 +147,7 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   silently breaks the checks that use it. Rewrite that file in BYTES. Hit during the 2026-09-21
   reconcile; the class is `memory/gotchas/text-mode-read-eats-a-bare-cr.md`, which was already
   registered and not read.
-  THE BYTES ARE NAMED RATHER THAN SHOWN, deliberately. Two earlier attempts at this sentence put a
-  raw CR in it and both were eaten by the next tool that rewrote the file -- the manifest is the
-  document most likely to be rewritten in text mode, which is the bullet's own subject.
+  The bytes are NAMED, not shown: a raw CR here was eaten twice by a text-mode rewrite.
 
 - **The read-path byte budget is RETIRED** (`TOOL-dSpentCeiling-1`). Check 6's per-class caps are
   the bound; check 16 keeps rules 3 and 4, structural and behind no pin. Do not re-add a sum.
@@ -165,10 +165,10 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
 
 | Area / stream | Governing memory | First code entrypoints |
 |---|---|---|
-| playbook (`PLAY-`) | `memory/DECISIONS.md` §PLAY · `memory/backlog/PLAY.md` | `coding-governance-agents.template.md`, ONE file since v3.0, rendered into `AGENTS.md` by `tools/playbook/` · `check-playbook-parity.sh` (read its refusal before editing prose it owns) · `check-template-size.sh` · `check-placeholders.sh` |
-| kickoff (`KICK-`) | `memory/DECISIONS.md` §KICK · `memory/backlog/KICK.md` | `skills/session-kickoff/` (SKILL.md · MANIFEST-TEMPLATE.md · manifest-check.sh) |
-| tooling (`TOOL-`) | `memory/DECISIONS.md` §TOOL · `memory/backlog/TOOL.md` | the `tools/<kit>/` dirs THIS unit touches, not `tools/` — that is what the probes above take; kits self-describe in their own `README.md` |
-| deployer (`DEPL-`) | `memory/DECISIONS.md` §DEPL · `memory/backlog/DEPL.md` | `WIRE-INTO-PROJECT.md` · `memory/builds/aDeployScout/` (research) |
+| playbook (`PLAY-`) | `memory/DECISIONS.md` §PLAY · view `memory/backlog/PLAY.md` | `coding-governance-agents.template.md`, ONE file since v3.0, rendered into `AGENTS.md` by `tools/playbook/` · `check-playbook-parity.sh` (read its refusal before editing prose it owns) · `check-template-size.sh` · `check-placeholders.sh` |
+| kickoff (`KICK-`) | `memory/DECISIONS.md` §KICK · view `memory/backlog/KICK.md` | `skills/session-kickoff/` (SKILL.md · MANIFEST-TEMPLATE.md · manifest-check.sh) |
+| tooling (`TOOL-`) | `memory/DECISIONS.md` §TOOL · view `memory/backlog/TOOL.md` | the `tools/<kit>/` dirs THIS unit touches, not `tools/` — that is what the probes above take; kits self-describe in their own `README.md` |
+| deployer (`DEPL-`) | `memory/DECISIONS.md` §DEPL · view `memory/backlog/DEPL.md` | `WIRE-INTO-PROJECT.md` · `memory/builds/aDeployScout/` (research) |
 
 ### Gate commands (the merge bar)
 
@@ -178,12 +178,13 @@ bash tools/run-gates/run-gates.sh    # runs all legs CONCURRENTLY, at the width 
 GATE_JOBS=1 bash tools/run-gates/run-gates.sh   # the serial bar, same code path — the rollback for a suspected concurrency problem
 GATE_FULL=1 bash tools/run-gates/run-gates.sh   # ignore every leg GUARD. .githooks/pre-push no longer sets this unconditionally: it decides, and prints which it chose and why
 GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh   # also run EVERY self-test — `subject = kit` OR `chunk = selftests`, both held by default (owner ruling 2026-08-26). GATE_FULL does NOT unlock them. On demand only; the §B correction dated 2026-08-23 says what that costs
-# Every leg declares a `ceiling` in tools/gate-legs.json and the runner KILLS one that outlives it, RED naming the leg and the number. TOOL-aBoundedCeiling-1
+# Every leg declares a `ceiling` in tools/gate-legs.json; one outliving it gets ONE serial retry (a pass is green); all-HOST exits 4. TOOL-aBoundedCeiling-1
 # The whole RUN has a wall, per profile row; GATE_WALL overrides. A breach kills the legs. TOOL-aQuenchedHarness-1
+GATE_ATTRIBUTE=<rev> bash tools/run-gates/run-gates.sh   # re-run each RED leg at <rev> and print whose red it is: OWN, INHERITED, MIXED, CONTENDED or DEAD PROBE. Report-only, the exit never moves; .githooks/pre-push exports the remote sha. TOOL-dDerivedDocket-23
 bash tools/run-gates/run-selftests.sh --serial  # the HELD population on demand, budget-timed; --pooled withholds cost verdicts and REFUSES any row with no calibrated reading until --pooled --calibrate has run (TOOL-aBatchedArm-5); bare REFUSES; GOV_NODE must be a registry tag; a pooled red keeps each row's output under <git-dir>/gate-logs/selftests/. TOOL-aBatchedArm-4, -5
-bash tools/unattended/run-unattended-gates.sh --pooled   # the DoD for work touching tools/unattended/: the kit self-tests through the bounded pool, PARITY against the calibrated rows in tools/run-gates/selftest-pooled-evidence.txt; --serial is the on-demand cost reading. TOOL-aBatchedArm-5
+bash tools/unattended/run-unattended-gates.sh --pooled   # DoD for tools/unattended/ work: pooled PARITY against tools/run-gates/selftest-pooled-evidence.txt, or `--selftests --serial --attribute <BASE>` reading `verdict clean`. TOOL-dDerivedDocket-1
 python tools/memory-tree/gotchas.py --for-diff <base>..<head>   # the recurring-bug-class checklist for THIS diff — run it before a review
-python tools/drift-audit/drift_report.py   # ~seconds, no agents: do this repo's own RECORDS still match reality? Run it before theorizing about drift
+python tools/drift-audit/drift_report.py   # ~seconds, no agents: do this repo's own RECORDS still match reality?
 python tools/govkit/govkit.py epoch --base <base>   # a kit whose shipped bytes moved since <base> and whose version did not: run after a commit that touches a kit. TOOL-aRepatriatedFork-15
 python3 tools/gate-lint/encoding_posture.py memory/project/encoding-posture-sites.txt . tools skills   # text IO that names no encoding; the registry may fall and never rise. TOOL-aRepatriatedFork-3
 ```
@@ -221,9 +222,6 @@ check 14 counts only present-tense citations against it. `TOOL-aRepatriatedFork-
 *Correction OVERRIDES a stale doc/memory claim until fixed; entry: `<date> · <stale where> · <the
 correction> · prune when <condition>`. Starts empty; prune per-entry, never delete the section.*
 
-- 2026-09-22 · the unattended kit's self-tests · they are GREEN WHOLE for the first time: 76 failing
-  assertions across the gate, driver and cross-component suites were fixtures pinned to texts that had
-  moved, fixed at the aBatchedArm landing · prune when a later run finds one red again.
 - 2026-08-23 · the owner's standing instruction on the kit self-test suites · `--checks` yes,
   `--selftests --serial` only when they ask. The cost is process creation, not logic:
   `memory/gotchas/process-creation-is-the-suite-cost.md` · prune when a bar runs them automatically.
@@ -297,10 +295,10 @@ does — hit three times in one file in one session; also the whole-signature an
 - Under MSYS one directory has two spellings and mount points are NOT symlinks — never compare path
   strings across flavors. Decide repo membership via git identity, both sides normalized through the
   same `cd … && pwd` chain.
-- The full bar can TIME OUT on a node whose `TMPDIR` holds tens of thousands of stale scratch dirs:
-  every hermetic leg does its own `mktemp -d` into it. Measured on node `a`: 30733 entries, 58 legs,
-  >10 min and still running; the same bar finished on a fresh `TMPDIR`. Point `TMPDIR` at an empty
-  dir before blaming the diff, and do not delete the shared one.
+- The bar owns its scratch (TOOL-dDerivedDocket-25): every leg's `TMPDIR` is the runner's own
+  `gate-work.*/tmp`, gone on exit; a SIGKILLed bar's is swept by the next once its pid is dead.
+  `TMPDIR entries <n>` prints the ambient count, which now grows only from older bars or another
+  repository's. The measured cost is in the run-gates kit README.
 - A spent budget blocks RECORDING work, not doing it. The read-path ceiling that did that is
   RETIRED (`TOOL-dSpentCeiling-1`); the surviving lesson is general — measure with the checker
   before and after, never estimate, and record every movement beside the number.

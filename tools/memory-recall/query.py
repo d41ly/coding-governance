@@ -132,7 +132,10 @@ ROLLUP_DEPTH = 8
 # inside `ensure_cache` and read by `main`, and a module global keeps the function signature that
 # three callers already use.
 REBUILD_CAUSE: list[str] = []
-CACHE_VERSION = 3  # bump when extraction or schema changes, so an old cache is never queried
+CACHE_VERSION = 4  # bump when extraction or schema changes, so an old cache is never queried
+# 3 -> 4 at the backlog switch-over (TOOL-dDerivedDocket-34 S9): `DURABLE` gained the per-build
+# `builds/<slug>/BACKLOG.md` arm and the backlog archives were deleted, so a warm cache would serve
+# anchors from files that no longer exist and miss every migrated ask's new durable home.
 # 1 -> 2 on 2026-08-02 (ARCH-aGrittedFlagstone-3): records now carry the committed alias layer, so
 # every cache built before the join must rebuild rather than keep serving an alias-free index.
 # 2 -> 3 on 2026-08-03: the manifest carries the alias JOIN counts. A pre-bump manifest has no

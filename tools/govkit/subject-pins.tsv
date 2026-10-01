@@ -15,6 +15,7 @@ agent-cap restatement self-test	kit	selftests
 agent-cap self-test	kit	selftests
 agent-instructions self-test	kit	selftests
 agent-instructions wiring	repo	wiring
+backlog migration selftest	kit	selftests
 branch-guard self-test	repo	selftests
 brief-recorded	repo	declarations
 build README slot contract	repo	records
@@ -95,6 +96,7 @@ receipt sync (installed files match the receipt)	repo	declarations
 review-join ban (no ref-keyed join)	repo	declarations
 review-join self-test	kit	selftests
 review-protocol parity (kit vs dogfood)	repo	declarations
+row-driver view refusal	repo	declarations
 row-grammar selftest	kit	selftests
 row-keyed merge driver replay	kit	selftests
 run-gates adopter e2e	kit	e2e
@@ -115,11 +117,13 @@ shell hygiene (a loop fed by a command substitution)	repo	product
 shell-hygiene selftest	kit	selftests
 spec tokens (a spec's own names resolve)	repo	declarations
 spec-tokens self-test	kit	selftests
+straggler-guard arms	repo	declarations
 template size <=48KiB	repo	product
 template size gate selftest	kit	selftests
 testsuite counts (every bar self-test prints one)	repo	declarations
 testsuite counts self-test	kit	selftests
 tier2-review self-test	kit	selftests
+transition-audit arms	repo	declarations
 unattended kit gate	repo	declarations
 unattended protocol size	repo	product
 unattended skill wiring	repo	wiring

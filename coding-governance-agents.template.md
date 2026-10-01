@@ -1,12 +1,12 @@
 # Coding Governance — the agent charter template
 
-*Template **v3.2** · 2026-09-29. One file. One line per directive, and a wrapped line is still one
+*Template **v3.3** · 2026-10-01. One file. One line per directive, and a wrapped line is still one
 rule. This file BECOMES a project's `AGENTS.md`: `<prefix>/playbook/adopt-playbook.sh` fills every
 placeholder and drops the blocks a target has no kit for, so filling it is a program's job and not a
 reader's — see `WIRE-INTO-PROJECT.md` for what a program cannot decide. History lives in the
 `…-v-N-N.md` snapshots and in git.*
 
-<!-- governance-template: v3.2 -->
+<!-- governance-template: v3.3 -->
 
 > **What:** a project-agnostic charter for running Claude Code (or any agent) across several
 > machines/sessions ("nodes") on one repo. **Use:** deploy it with the renderer; the rules are
@@ -53,21 +53,22 @@ Keep units small: one stream/owner, no cross-stream contract change, reviewable 
 **Landing — merge protocol:**
 - Land on local `{{DEFAULT_BRANCH}}` first, verify, then push; the merge to shared `{{DEFAULT_BRANCH}}` and the push each need an explicit ask.
 <!-- kit:unattended -->
-- That explicit ask has ONE substitute: a committed build folder the run did not create, whose shape your merge bar validates. The mandate is ASSERTED, never written by the run that uses it, and must be reachable from a BASE observed on the remote rather than read from a local ref. A run with full shell access can still defeat that, and the control that actually binds lives on the remote.
+- That explicit ask has ONE substitute: a committed build folder the run did not create at the default-branch anchor (the protocol names a weaker second), whose shape your merge bar validates. It must be reachable from a BASE observed on the remote rather than read from a local ref. A run with full shell access can still defeat that, and the control that actually binds lives on the remote.
+- An unattended run lands by its protocol's landing rule, not the local-first one above.
 <!-- /kit:unattended -->
 - After each merge run a diff-scoped gate (a conflict-free merge is not a passing merge); the push boundary DECIDES whether a full bar is owed, against a recorded green and a declared staleness bound.
 - Reconcile shared mutable files (backlogs, indexes) additively, never pick-a-side; diff the merge against BOTH parents (the "auto-took" class, §10). A GENERATED index is never reconciled — re-render it (§5).
 - Land risky behavior dark: Tier-2 ships behind a default-OFF flag or as inert defaulted data, flipped on only after in-place verification — merges without endangering other nodes, reverts cleanly.
 - Migrations are reversible — test up/down/up.
-
-*Two independent blocks. The first applies whenever the project keeps a kickoff manifest. The second
-applies only when the project adopts the unattended-run kit — drop it otherwise.*
+<!-- kit:kickoff-manifest -->
 
 **Kickoff-manifest merge exception.**
 
 - The manifest reconciles additively EXCEPT its `last-audit` line — resolve a stamp conflict either way provisionally, complete the merge, then re-verify §B against the merged tree and re-stamp in a follow-up commit that supersedes both sides (post-merge HEAD; a commit can't embed its own sha); the same post-merge fresh audit closes any merge that brought in watch-touching commits.
+<!-- /kit:kickoff-manifest -->
+<!-- kit:unattended -->
 
-**Unattended runs** *(kit-conditional — drop this block if the project does not adopt the unattended-run kit).*
+**Unattended runs.**
 
 - The contract is `{{MEMORY_ROOT}}/guides/UNATTENDED-PROTOCOL.md`, installed by the kit: the committed
   build folder as the authorization and its provenance properties, the run-state file's generated and
@@ -75,6 +76,7 @@ applies only when the project adopts the unattended-run kit — drop it otherwis
   the keepalive split by actor, the default directive set and its named waiver, and the landing rule.
   It is NOT paraphrased here — a paraphrase and its source are two answers to one question, and the
   paraphrase is the copy that rots.
+<!-- /kit:unattended -->
 
 ## §2 — Nodes, identity & IDs
 
@@ -145,7 +147,7 @@ applies only when the project adopts the unattended-run kit — drop it otherwis
   because it does not read that name natively. Make ONE file canonical and the others thin imports of
   it, so there is one text and no copy to drift, and verify the wiring with a check rather than by
   eye — an unwired pair fails silently and looks fine.
-- Two record types per stream: the decision log is append-only (never rewrite a ratified record — supersede with a new id + note); the backlog is mutable (stable ids, status updated in place; gaps fine).
+- Two record types per stream: the decision log is append-only (never rewrite a ratified record — supersede with a new id + note); the backlog keeps stable ids (gaps fine), and how an ask's status is kept is the memory tree's rule (§5).
 - Per-stream id families (`{{ID_FAMILIES}}`): the family prefix routes an id to its log/backlog; allocation is slug-scoped (§2), so no shared "next free id" marker exists.
 - Record real decisions as you make them — future sessions and nodes rely on these being current.
 - Session-start reading order: ALWAYS load the master decision index first, then the stream logs for the area touched — routed by `{{DOC_ROUTING_TABLE}}` (work-area → doc tree → id families → backlog).

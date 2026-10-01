@@ -331,6 +331,37 @@ code, out = run_case(
     BASE_CONF)
 check("P2 green: an IMPORTED type and a parameter carrying the suffix do not red", code == 0, out)
 
+# ---- --offenders: the SIGNATURE the merge bar grades this leg with (TOOL-dDerivedDocket-23 S3) ---
+#
+# ONE KEY PER OFFENDER AND NOTHING ELSE. The bar's red attribution compares two trees' offender SETS,
+# so the mode is graded on the three ways a set goes wrong: a key carrying a line number, which moves
+# when an unrelated definition lands above it and reads as a new offender on every branch; a cut,
+# which hides a new offender behind a fixed one; and a duplicate collapsing, which hides the second
+# of two identical offenders. Each arm below would fail against exactly one of those.
+OFF_FILES = {
+    "core/a.py": "def frobnicate_a():\n    pass\n\n\ndef frobnicate_a():\n    pass\n\n\n"
+                 "class ThingManager:\n    pass\n",
+    "core/b.py": "def build_b():\n    pass\n\n\ndef zap_b():\n    pass\n",
+}
+OFF_WANT = ["core/a.py\tsuffix\tThingManager", "core/a.py\tverb\tfrobnicate_a",
+            "core/a.py\tverb\tfrobnicate_a#2", "core/b.py\tverb\tzap_b"]
+code, out = run_case(OFF_FILES, BASE_CONF, args=("--offenders",))
+check("--offenders prints exactly the known offender set, a repeat carrying its ordinal",
+      out.splitlines() == OFF_WANT, out)
+dcode, _dout = run_case(OFF_FILES, BASE_CONF)
+check("--offenders exits as the default mode does over the same tree", code == dcode == 1,
+      f"--offenders {code}, default {dcode}")
+_shifted = dict(OFF_FILES)
+_shifted["core/a.py"] = "def build_z():\n    pass\n\n\n" + OFF_FILES["core/a.py"]
+_shifted["core/c.py"] = "def build_c():\n    pass\n"
+code, out = run_case(_shifted, BASE_CONF, args=("--offenders",))
+check("--offenders keys do not move when an unrelated definition and file land above them",
+      out.splitlines() == OFF_WANT, out)
+code, out = run_case({"core/m.py": "".join(f"def zap_{k}():\n    pass\n\n\n" for k in range(45))},
+                     BASE_CONF, args=("--offenders",))
+check("--offenders cuts nothing: 45 offenders print 45 keys, where --list cuts its re-list at 40",
+      len(out.splitlines()) == 45 and "more" not in out, f"{len(out.splitlines())} line(s)")
+
 # ---- the self-containment refusal, which replaces the deleted P3 ---------------------------------
 #
 # IT GRADES THE KIT'S OWN DIRECTORY, never the fixture corpus, so these arms point it at a directory
@@ -1013,9 +1044,11 @@ with build_tempdir() as td:
     # sibling dirs, and the conf is at the repo ROOT — so a branch whose entire diff was the
     # declaration skipped its own verifier, and the tool's own red text instructs an author to
     # produce exactly that commit ("Paste this row into .lexicon.conf"). The guard could not be
-    # widened: govkit's guard taxonomy has no class for a root-level conf and declaring one reds
-    # `govkit selfcheck`, a ruling written into this kit's `kit.toml`. So the grade moved into
-    # `adopt-lexicon.sh --check`, which is the argv of the one leg here carrying an EMPTY guard.
+    # widened then: govkit's guard taxonomy had no class for a root-level conf, and declaring one
+    # redded `govkit selfcheck`. So the grade moved into `adopt-lexicon.sh --check`, which is the
+    # argv of the one leg here carrying an EMPTY guard. TOOL-dDerivedDocket-21 later gave the
+    # taxonomy a `root-conf` class and the guarded leg its conf; this arm still pins the UNGUARDED
+    # grade, which binds however a guard is narrowed.
     #
     # RATIFIED FIRST, because the unratified-seed refusal above would otherwise supply the red and
     # this arm would pass on the wrong refusal — the fixture-reds-for-another-reason class.

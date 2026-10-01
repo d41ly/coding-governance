@@ -44,9 +44,16 @@ import sys
 import tempfile
 import time
 
-KIT_GOVKIT_VERSION = "1.11"  # gov:kit govkit@1.11 — kit identity; set HERE, never from a conf
+KIT_GOVKIT_VERSION = "1.12"  # gov:kit govkit@1.12 — kit identity; set HERE, never from a conf
 
 RECEIPT_SCHEMA = 3  # bumped by any unit that adds a per-role row field; readers accept 1, 2 and 3
+
+# The REPO-LOCAL GATE POLICY keys, one tuple that check 7h3's predicate compiles its alternation from
+# (TOOL-dDerivedDocket-24 S14). `GATE_SELFTESTS` is TOOL-dUnstalledConvoy-28's; `INHERITED_RED` and
+# `INHERITED_RED_MAX_AGE` are the inherited-red policy, whose gov value is `land` — a choice no
+# adopter may inherit by a kit copying the file that makes it. A key typed into the pattern instead
+# would be a second list of what a policy is, and the one a new key forgets.
+POLICY_KEYS = ("GATE_SELFTESTS", "INHERITED_RED", "INHERITED_RED_MAX_AGE")
 
 # The hard order's step ids, RESERVED here in one ordered tuple — including the steps this engine
 # does not perform yet. A step id is data, not a print: the ordering criterion is an assertion about
@@ -1311,6 +1318,62 @@ class Report:
 
 
 # ------------------------------------------------------------------------------------- selfcheck
+def derive_root_confs(descs: dict) -> set[str]:
+    """The `root-conf` guard class's population. TOOL-dDerivedDocket-21 S4.
+
+    Every loaded descriptor's `[config] file`, minus empties and anything carrying a `/`: the root
+    files a kit declares as its own conf. DERIVED, never listed, so a kit that declares a conf widens
+    the class the day it lands and one that stops declaring it narrows it. A root file no descriptor
+    declares belongs to no class, and 7c still reds it — which is the half that keeps the class from
+    admitting every file without a `/`.
+    """
+    out: set[str] = set()
+    for _eid, (d, _dpath) in descs.items():
+        f = str((d.get("config") or {}).get("file") or "").strip()
+        if f and "/" not in f:
+            out.add(f)
+    return out
+
+
+def scan_argv_neighbours(root: pathlib.Path, rel: str, tracked: set[str]) -> list[str]:
+    """Tracked files an argv file pulls in BY NAME — the near-miss population of check 7c2.
+
+    Two shapes and no third. A Python `import x` or `from x import ...` whose `x.py` sits BESIDE the
+    file, and a shell `.` or `source` of a LITERAL path, resolved against the repo root and against
+    the file's own directory. A path composed at run time, a dotted or package import, or a module
+    found anywhere else on `sys.path` is outside both — which is why 7c2 REPORTS what this finds and
+    never reds on it. TOOL-dDerivedDocket-21 S5.
+    """
+    path = root / rel
+    try:
+        text = path.read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return []
+    here = posixpath.dirname(rel)
+    found: list[str] = []
+    if rel.endswith(".py"):
+        names: list[str] = []
+        for m in re.finditer(r"^[ \t]*from[ \t]+([A-Za-z_]\w*)[ \t]+import\b", text, re.M):
+            names.append(m.group(1))
+        for m in re.finditer(r"^[ \t]*import[ \t]+([A-Za-z_][\w \t,]*?)[ \t]*(?:#.*)?$", text, re.M):
+            for part in m.group(1).split(","):
+                word = part.split()
+                if word:
+                    names.append(word[0])
+        for name in names:
+            cand = posixpath.join(here, f"{name}.py") if here else f"{name}.py"
+            if cand in tracked and cand != rel:
+                found.append(cand)
+    else:
+        for m in re.finditer(r"""^[ \t]*(?:\.|source)[ \t]+["']?([^\s"'$`;|&<>()]+)""", text, re.M):
+            lit = m.group(1)
+            for cand in (posixpath.normpath(lit),
+                         posixpath.normpath(posixpath.join(here, lit)) if here else lit):
+                if cand in tracked and cand != rel:
+                    found.append(cand)
+    return sorted(set(found))
+
+
 # ---- DEPL-cMendedVintage-23 S3. THE MUTATORS, and they are a closed list rather than a guess.
 # ---- Every name here moves or destroys bytes at the path it is called on. `open` is deliberately
 # ---- absent: its read mode is the common case here, and a predicate that reds a read is the
@@ -1984,7 +2047,15 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
     #          majority and no rule for the rest — which is what happened when the hooks directory
     #          and the kickoff tree were classed "cannot exist in a target" while the same revision
     #          deployed both.
+    #
+    #          THE SIXTH CLASS, `root-conf` (TOOL-dDerivedDocket-21 S4). The five prefix classes gave
+    #          a root file no home, so a guard could not name the conf its own leg reads and a
+    #          conf-only commit skipped that leg: struck twice for `.lexicon.conf`, and the leg
+    #          TOOL-aWalkedCorpus-5 was filed on. Its population is DERIVED from the descriptors, so
+    #          a root file no kit declares as its conf still falls into none and still reds here.
+    root_confs = derive_root_confs(descs)
     legs_path = resolve_tool_path(root, "gate-legs.json")
+    _legs_rel = legs_path.relative_to(root).as_posix()  # named in the messages below, never typed
     if legs_path.is_file():
         _tr = derive_tool_root(root)
         kit_dirs = {f"{_tr}/{e}/" if _tr else f"{e}/" for e in descs} | ({f"{_tr}/"} if _tr else set())
@@ -2005,11 +2076,85 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
                     classes.append("exempt")
                 if any(g == k or g.startswith(k) for k in kit_dirs) and "exempt" not in classes:
                     classes.append("kit-relative")
+                if g in root_confs:
+                    classes.append("root-conf")
                 if len(classes) != 1:
                     r.fail(f"guard pathspec '{g}' (leg '{leg.get('name')}') falls into "
                            f"{len(classes)} declared classes {classes or '[]'}, not exactly one — "
                            f"a taxonomy that does not partition its own input gives the emitter no "
                            f"rule for the remainder")
+
+    # ---- 7c2: A GUARDED BAR LEG WHOSE ARGV READS A DECLARED ROOT CONF NAMES IT IN ITS GUARD.
+    #           TOOL-dDerivedDocket-21 S5.
+    #
+    #           A guard scopes a run, so a checker that reads `.lexicon.conf` while guarded on `tools/`
+    #           SKIPS on the one commit shape that moves its verdict without touching code: a conf-only
+    #           pin raise. 7c's `root-conf` class made the fix expressible; this makes it binding.
+    #
+    #           THE POPULATION IS THE RUNNER'S OWN: a non-empty guard and NOT held, where
+    #           `run-gates.sh` holds a leg when `subject == kit OR chunk == selftests`. A held leg runs
+    #           only under GATE_SELFTESTS=1, and the Definition-of-Done form of that run also sets
+    #           GATE_FULL=1, which bypasses every guard.
+    #
+    #           WHAT THIS DOES NOT CHECK, because a green row reads as more than it is. It reads the
+    #           BYTES of each argv element git tracks, and a mention anywhere counts — a comment, a
+    #           fixture write — which costs one re-run on a conf-only diff and never hides a red. It
+    #           does NOT see a conf reached through an import, a sourced library or a name composed
+    #           at run time: those print as NEAR-MISS notes and never red, since a transitive rule
+    #           would red on every shared library a conf name passes through. It does not grade held
+    #           legs, and it does not compare a descriptor's guard with the manifest's
+    #           (TOOL-aPacedTurnstile-12 records that nothing does).
+    if legs_path.is_file():
+        tracked_set = set(_tracked_gov)
+        graded = readers = 0
+        for leg in json.loads(legs_path.read_text(encoding="utf-8")):
+            guard = [g for g in (leg.get("guard") or []) if g]
+            if not guard or leg.get("subject") == "kit" or leg.get("chunk") == "selftests":
+                continue
+            graded += 1
+            nm = leg.get("name")
+            argv_files = [a for a in (leg.get("argv") or [])
+                          if isinstance(a, str) and a in tracked_set]
+            named: set[str] = set()
+            for rel in argv_files:
+                try:
+                    txt = (root / rel).read_text(encoding="utf-8", errors="replace")
+                except OSError:
+                    continue
+                for conf in sorted(root_confs - named):
+                    if conf not in txt:
+                        continue
+                    named.add(conf)
+                    if conf not in guard:
+                        r.fail(f"leg '{nm}' reads root conf {conf} (argv file {rel}) and its guard "
+                               f"does not name it — a commit touching only {conf} then skips the "
+                               f"leg whose verdict it moves. Add {conf} to that leg's guard in "
+                               f"{_legs_rel}, and in the descriptor row that declares it")
+            if named:
+                readers += 1
+            reach: dict[str, set[str]] = {}
+            for rel in argv_files:
+                for nb in scan_argv_neighbours(root, rel, tracked_set):
+                    try:
+                        ntxt = (root / nb).read_text(encoding="utf-8", errors="replace")
+                    except OSError:
+                        continue
+                    for conf in root_confs - set(guard) - named:
+                        if conf in ntxt:
+                            reach.setdefault(conf, set()).add(nb)
+            for conf in sorted(reach):
+                r.note(f"near-miss: leg '{nm}' may read root conf {conf} through "
+                       f"{', '.join(sorted(reach[conf]))} (not graded)")
+        r.note(f"guarded bar legs graded {graded} · root-conf readers {readers}")
+        # LIVENESS. A zero with confs to protect reads exactly like a corpus with nothing to fix. A
+        # zero with NO declared conf is true — a tree with nothing this check could ever grade — and
+        # a refusal there would red every fixture that is not about this check.
+        if graded == 0 and root_confs:
+            r.fail(f"check 7c2 graded ZERO guarded bar legs in {_legs_rel} while the "
+                   f"registry declares {len(root_confs)} root conf(s) — a probe that grades nothing "
+                   f"reads exactly like a corpus with nothing to fix. Either the manifest's "
+                   f"`guard`, `subject` or `chunk` keys moved, or no bar leg carries a guard any "
+                   f"more; say which")
 
     # ---- 7d: `mutates_index` is DERIVED, never trusted as a declared value. A `git add` string
     #          inside an `echo` is not a staging call, and mistaking one for the other is how this
@@ -2382,9 +2527,14 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
     # thinking: a trailing comment (`export GATE_SELFTESTS=1  # gov only`) and the shell default
     # form (`: ${GATE_SELFTESTS:=1}`), which assigns exactly as hard as `=`. Re-run over the tracked
     # tree after widening: still one hit, still no invocation matched.
+    # THE KEYS ARE `POLICY_KEYS`, compiled into one alternation (TOOL-dDerivedDocket-24 S14), so the
+    # inherited-red pair is caught in every spelling `GATE_SELFTESTS` is. Re-run over the tracked tree
+    # after widening: one policy file, `.githooks/gate-env.sh`, now assigning two of the three keys,
+    # and still no invocation matched. The first capture that matched names the key in the refusal.
+    _pk = "|".join(re.escape(k) for k in POLICY_KEYS)
     policy_re = re.compile(
         r"^[ \t]*(?::[ \t]+)?(?:export[ \t]+)?"
-        r"(?:GATE_SELFTESTS=\S*|\$\{GATE_SELFTESTS:?=[^}]*\})"
+        r"(?:(" + _pk + r")=\S*|\$\{(" + _pk + r"):?=[^}]*\})"
         r"[ \t]*(?:#.*)?$")
     # THE SHIPPED SET, resolved the way `apply` resolves it. `claims` covers only 13 of 58 file
     # rules in this tree, so deriving from that key alone would have quantified over a third of the
@@ -2405,6 +2555,7 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
             for _c in list(_paths) + [str(c) for c in (rule.get("claims") or [])]:
                 shipped_owner.setdefault(_c, eid)
     policy_files = []
+    policy_key: dict[str, str] = {}
     for f in _all_tracked:
         if not f or f.startswith("memory/") or f.endswith(".md"):
             continue
@@ -2412,15 +2563,19 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
             txt = (root / f).read_text(encoding="utf-8", errors="replace")
         except OSError:
             continue
-        if any(policy_re.match(ln) for ln in txt.split("\n")):
-            policy_files.append(f)
+        for ln in txt.split("\n"):
+            _pm = policy_re.match(ln)
+            if _pm:
+                policy_files.append(f)
+                policy_key[f] = _pm.group(1) or _pm.group(2)
+                break
     for f in sorted(set(policy_files) & set(shipped_owner)):
         owner = shipped_owner[f]
-        r.fail(f"'{f}' carries a bare GATE_SELFTESTS assignment AND is shipped by kit '{owner}' — "
+        r.fail(f"'{f}' carries a bare {policy_key[f]} assignment AND is shipped by kit '{owner}' — "
                f"a repo-local gate policy written into a file a kit copies is a policy every adopter "
                f"inherits without choosing it. Move the assignment to a path no kit claims; the "
                f"mechanism that reads it may travel, the choice may not")
-    r.note(f"gate policy: {len(policy_files)} file(s) assign GATE_SELFTESTS · "
+    r.note(f"gate policy: {len(policy_files)} file(s) assign a key of {' '.join(POLICY_KEYS)} · "
            f"{len(shipped_owner)} shipped path(s) derived from the descriptors")
 
     # ---- TOOL-aRepatriatedFork-18 S8. A SHIPPED GATE SHIPS ITS ARMS. The memory-tree kit's

@@ -142,6 +142,11 @@ the install-prefix waiver registry's first real merge, and is tracked as `TOOL-a
 which closed when `TOOL-aRepatriatedFork-30` deleted that registry. A waiver
 whose text is gone reds as STALE, so a registry cannot quietly outlive what it excuses.
 
+**`.lexicon.conf` is in the corpus leg's guard, and `lexicon wiring` still grades it unguarded.** A
+conf-only commit used to skip `lexicon naming predicates`, because govkit's guard partition had no
+class for a root file. Its `root-conf` class now takes every descriptor's `[config] file`, and govkit
+selfcheck reds a guarded bar leg whose argv names one its guard lacks. TOOL-dDerivedDocket-21.
+
 **`check-placeholders.sh` asserts what is true of a SOURCE, not of a render.** In this repo the
 shipped playbook file IS the un-instantiated template and carries placeholders permanently by
 design, so a bare leg asserting "no placeholder survives" would red on its own landing commit. The
@@ -156,6 +161,9 @@ comparison. The count has been miscounted in both directions — a spec once rea
 review fold, when the deploy-time catalogue's only `vN.N` was prose and a gate built to three would
 have compared a literal against a real version and redded forever. Both miscounts were caught only by
 measuring, which is why the gate derives the count instead of asserting one.
+
+**`--offenders` is a key per offender, for the bar's red attribution.** No `path:line`, no count, no
+cut, a repeat carrying `#<k>`; its exit is `--check`'s. `TOOL-dDerivedDocket-23`.
 
 ## Shared seams
 

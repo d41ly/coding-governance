@@ -277,8 +277,24 @@ path = ".githooks/gate-env.sh"
 why = "THIS repository's gate policy, deliberately not shipped. `.githooks/pre-push` travels to every push-main adopter, so a choice written into it is a choice they inherit; this file is the choice, and no kit claims it. Selfcheck ASSERTS that property rather than trusting this row — TOOL-dUnstalledConvoy-28"
 
 [[exempt]]
+path = ".githooks/commit-msg"
+why = "gov's own commit-time carrier for hygiene check 26, deliberately not shipped. It is the one hook that sees every CONCLUDED merge -- a clean `git merge` fires `pre-merge-commit` with no `MERGE_HEAD` and then this hook with one -- and it calls the memory-tree kit's transition audit over the pending merge. An adopter wires its own carrier per the runbook's switch section, because a hook file is copied whole and a target that already owns a `commit-msg` would have it overwritten. The runbook names this file as the REFERENCE. TOOL-dDerivedDocket-9."
+
+[[exempt]]
 path = ".githooks/pre-commit.test.sh"
 why = "gov's own red/green self-test of the reference branch-guard block. The runbook prescribes copying the BLOCK into the target's own pre-commit, not this file."
+
+[[exempt]]
+path = ".githooks/straggler-guard.sh"
+why = "the shards-to-builds straggler predicates, deliberately not shipped. A pre-flip branch carries the OLD kit and no straggler rule, so the rule cannot live in any kit the hook resolves through the committing tree — it has to sit beside the hook files, where `core.hooksPath` reaches it. That makes it gov-side only: an adopter's transition is their own, and each wires this library and its `pre-rebase` sibling in its own deployer build, with the runbook naming these files as the REFERENCE. `.githooks/pre-push` ships verbatim through the push-main kit and its new block is inert wherever this file is absent. TOOL-dDerivedDocket-13."
+
+[[exempt]]
+path = ".githooks/pre-rebase"
+why = "gov's own rebase-time carrier for the straggler rule, deliberately not shipped for the reason its `straggler-guard.sh` sibling states. A hook file is copied whole, so a target that already owns a `pre-rebase` would have it overwritten; the runbook's switch section names this file as the REFERENCE an adopter copies. Exemptions are exact-path, so the library's row does not cover this one. TOOL-dDerivedDocket-13."
+
+[[exempt]]
+path = ".githooks/straggler-guard.test.sh"
+why = "gov's own red/green arms for the two files above, which are themselves registry exemptions. Its fixtures build a memory tree, install this repo's kits into it and drive the real hooks; an adopter receives neither the library nor `pre-rebase`, so the suite would red there on absence rather than on behaviour. Exemptions are exact-path, so the subjects' rows do not cover their sibling — the precedent is `.githooks/pre-commit.test.sh` above. TOOL-dDerivedDocket-13."
 
 [[exempt_leg]]
 name = "hook destinations (every declared hook path ships)"
@@ -308,6 +324,12 @@ why = "it measures THIS repo's own rendered charter against a row in <prefix>/te
 name = "branch-guard self-test"
 why = """
 gov's own red/green proof of the reference branch-guard block. The runbook prescribes copying the BLOCK into the target's own pre-commit, not this file, and the path it drives is already a registry exemption for that reason.
+"""
+
+[[exempt_leg]]
+name = "straggler-guard arms"
+why = """
+gov's own red/green proof of the shards-to-builds straggler layer. The script it drives is a registry exemption, and so are both of its subjects: the library and `pre-rebase` are gov-only, because a pre-flip branch carries the old kit and the rule has to sit beside the hook files. An adopter receives neither, so there is no descriptor for this leg to be claimed by. TOOL-dDerivedDocket-13.
 """
 
 [[exempt_leg]]
@@ -512,6 +534,14 @@ why = "it runs `check-verdict-epoch.test.sh`, which `<prefix>/memory-tree/kit.to
 [[exempt_leg]]
 name = "memory-hygiene self-test"
 why = "it runs `check-memory-hygiene.test.sh`, which `<prefix>/memory-tree/kit.toml` withheld with `role = \"project-owned\"` until TOOL-aRepatriatedFork-18 narrowed that to the LEG: the FILE now ships, because every adopter's check-arms reads it for its gate's arms, and this row is what keeps the leg gov's: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-3."
+
+[[exempt_leg]]
+name = "transition-audit arms"
+why = "it runs `transition-audit.test.sh`, which the memory-tree kit's own `kit.toml` withholds with `role = \"project-owned\"`: the suite stages breaks into copies of this kit's checkers and asserts they still catch them, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. It also grades GOV's OWN hooks: one arm compares the tracked hook-named files under `.githooks/` with `GOV_WIRING_HOOKS` both ways, and an adopter's hook population is theirs, so the arm would red in their tree on arrival. Owner ruling 2026-08-23, applied to what SHIPS, as `memory-hygiene self-test` and `row-keyed merge driver replay` are declared beside it. Adopters keep check 26 itself, inside their `memory hygiene` leg. TOOL-dDerivedDocket-9."
+
+[[exempt_leg]]
+name = "row-driver view refusal"
+why = "it runs `merge-rows.py --check`, which asserts THIS repo's `.gitattributes` and THIS repo's own rendered view header. Both halves are gov facts: the attribute set it derives comes from gov's `.memory-tree.conf` and its index, and the probe renders through gov's install prefix. An adopter's tree carries neither until it switches to the per-build backlog, and a `[[gate_leg]]` in the memory-tree kit's own `kit.toml` would therefore assert the backlog attribute in every adopter's tree on upgrade -- including adopters whose attribute emission is the concurrent adopter-wiring work and adopters whose driver is inert, a shipped surface this unit does not scope. An adopter takes this leg in its own deployer build, at the commit where it switches. TOOL-dDerivedDocket-10 section 8 F4."
 
 [[exempt_leg]]
 name = "row-keyed merge driver replay"

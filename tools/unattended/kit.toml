@@ -61,7 +61,7 @@ role = "project-owned"
 include = ["SKILL.template.md"]
 role = "rendered"
 to = ".claude/skills/unattended/SKILL.md"
-placeholders = ["KIT_DIR", "TOOL_ROOT", "MEMORY_TREE_DIR", "MEMORY_ROOT", "LANDER", "KEEPALIVE_CREATE", "KEEPALIVE_DELETE", "KEEPALIVE_INTERVAL", "ANCHOR_SCOPE", "AUTH_PARAM"]
+placeholders = ["KIT_DIR", "TOOL_ROOT", "MEMORY_TREE_DIR", "MEMORY_ROOT", "LANDER", "KEEPALIVE_CREATE", "KEEPALIVE_DELETE", "KEEPALIVE_INTERVAL", "RESUME_SCHEDULE_CREATE", "RESUME_SCHEDULE_DELETE", "ANCHOR_SCOPE", "AUTH_PARAM"]
 
 [[files]]
 include = ["PROTOCOL.template.md"]
@@ -77,6 +77,25 @@ placeholders = []
 include = ["VERBS.template.md"]
 role = "rendered"
 to = "{memory_root}/guides/UNATTENDED-VERBS.md"
+placeholders = []
+
+# the stop contract, the verb carrier's twin. HELD, the hold codes, the release conditions, the
+# lease and the resume matrix live here so the protocol — which stood 1,116 bytes under
+# its cap — keeps two pointers instead of a contract. Placeholder-free like the three above it.
+[[files]]
+include = ["STOPS.template.md"]
+role = "rendered"
+to = "{memory_root}/guides/UNATTENDED-STOPS.md"
+placeholders = []
+
+# the ask guide (TOOL-dDerivedDocket-20 S4): routes, the mandate's two added properties, orientation,
+# owner-call parking, discovery filing, the asks-disposed terms and the ASKS_CMD call shapes. The
+# protocol stood a kilobyte under its cap with five units still owing it text, so the contract went
+# to its own pair, on the verb carrier's precedent. Placeholder-free like the four above it.
+[[files]]
+include = ["ASKS.template.md"]
+role = "rendered"
+to = "{memory_root}/guides/UNATTENDED-ASKS.md"
 placeholders = []
 
 # the playbook template. Placeholder-free like the protocol, so the
@@ -150,7 +169,7 @@ file = ".unattended.conf"
 owner = "unattended"
 required_keys_gate = ["LANDER", "BYPASS_BAN", "GATE_CMD", "WIRING_CHECK", "KEEPALIVE_CREATE", "KEEPALIVE_DELETE", "CORE_FLOOR", "DIRECTIVES_FLOOR"]
 required_keys_render = ["LANDER", "KEEPALIVE_CREATE", "KEEPALIVE_DELETE", "KEEPALIVE_INTERVAL"]
-optional_keys = ["MEMORY_ROOT", "KICKOFF_ENGINE", "KICKOFF_EXITS", "PHASES_EXTRA", "DOD_EXTRA", "DIRECTIVES_EXTRA", "ANCHOR_SCOPE", "AUTH_PARAM", "RECALL_CLI", "MAP_CLI", "SPEC_TOKENS_CLI", "UNIT_STALL_BOUND", "REVIEW_ROUNDS", "RESUME_STALE_BOUND", "STOP_GUARD_BLOCKS", "RESUME_ATTEMPTS", "RESUME_TURNS"]
+optional_keys = ["MEMORY_ROOT", "KICKOFF_ENGINE", "KICKOFF_EXITS", "PHASES_EXTRA", "DOD_EXTRA", "DIRECTIVES_EXTRA", "ANCHOR_SCOPE", "AUTH_PARAM", "RECALL_CLI", "MAP_CLI", "SPEC_TOKENS_CLI", "UNIT_STALL_BOUND", "REVIEW_ROUNDS", "RESUME_SCHEDULE", "RESUME_SCHEDULE_CREATE", "RESUME_SCHEDULE_DELETE", "RESUME_SCHEDULE_DELAY", "RESUME_SCHEDULE_LIMIT", "RESUME_STALE_BOUND", "STOP_GUARD_BLOCKS", "RESUME_ATTEMPTS", "RESUME_TURNS"]
 defaults = { MEMORY_ROOT = "memory" }
 
 [adopt]
@@ -196,16 +215,28 @@ means = "render-failed-half-stamped"
 # memory/builds/dScriptedRepeat/build/2026-08-23-build-TOOL-dScriptedRepeat-5-bar-cost-measurement.md.
 #
 # THE COMPENSATING CHECK, because an exemption is not coverage (charter §7). Work touching
-# `<prefix>/unattended/` is not done until this prints parity GREEN and the verdict is in the landing report:
+# `<prefix>/unattended/` is not done until ONE of two verdicts is in the landing report: parity GREEN
+# from the pooled self-tests, or `--attribute` against the build's BASE reading `verdict clean` —
+# no NEW FAIL, no DEAD PROBE at L and no OVER BUDGET at L — with every suite reporting an INHERITED
+# FAIL or a DEAD PROBE at R named by a filed backlog record:
 #
 #     bash <prefix>/unattended/run-unattended-gates.sh --pooled        # the self-tests through the bounded pool, parity graded
 #     bash <prefix>/unattended/run-unattended-gates.sh --checks        # and the legs beside them, which take no mode
+#
+# ...or, in place of the pooled line, the same runner with `--serial --attribute <BASE>`: the
+# self-tests one at a time, each run at this tree AND at BASE, attributed.
 #
 # The mode is DECLARED and never defaulted (TOOL-aBatchedArm-4): a route reaching the self-tests
 # with neither `--serial` nor `--pooled` refuses. `--pooled` runs them through the shared runner's
 # bounded pool, withholds every cost verdict and grades PARITY against the runner's calibrated
 # pooled evidence, taken on node a 2026-09-15 (`TOOL-aBatchedArm-5`); the on-demand cost reading
-# is the serial mode, which grades each suite against its budget.
+# is the serial mode, which grades each suite against its budget, and the only one `--attribute`
+# composes with.
+#
+# THE ATTRIBUTION IS NOT CEREMONY. This kit's suites are red at their base for causes filed against
+# other units (`TOOL-aHoistedPass-36`, `TOOL-aHoistedPass-38`), so the bare GREEN this block used to
+# demand named a state nobody could reach, and the red it produced instead said nothing about the
+# change in front of it. `TOOL-dDerivedDocket-1`.
 #
 # There is no gate behind that sentence. A kit edit that guts a check now lands green unless a person
 # runs it, and this file is where that trade is recorded as having been made deliberately.
@@ -281,7 +312,13 @@ why = "a key ABSENT from the conf reds both the adopter check arm and the kit ga
 # wrapped in angle brackets is still a placeholder", which is general rather than a literal match —
 # and it catches KEEPALIVE_INTERVAL, whose shipped value `<e.g. every 10 minutes (…)>` does NOT match
 # `<[a-z-]+>` and was undetectable under the old probe.
-discharge = { command = ["bash", "-c", "! grep -qE '^KEEPALIVE_(CREATE|DELETE|INTERVAL)=\"<.*>\"' .unattended.conf"] }
+#
+# EXTENDED to the DURABLE restart pair by TOOL-dDerivedDocket-5 S11. The two hazards are the same
+# one: an adopter who fills the keepalive keys and copies the example's resume placeholders verbatim
+# substitutes no `{{...}}` placeholder at all, so the render is clean, the skill-wiring arm passes,
+# and the Skill tells an agent to file restarts with a tool named `<your-durable-schedule-create-tool>`.
+# One alternation rather than a second hole, because it is one question about one file.
+discharge = { command = ["bash", "-c", "! grep -qE '^(KEEPALIVE_(CREATE|DELETE|INTERVAL)|RESUME_SCHEDULE_(CREATE|DELETE))=\"<.*>\"' .unattended.conf"] }
 
 [[hole]]
 id = "directives-floor"
@@ -290,6 +327,21 @@ blocks_adopt = false
 blocks_gate = true
 why = "undeclared or malformed reds the kit gate at check 16 arm C. The correct value for a faithful copy install is the driver's own DIRECTIVES_CORE member count, so this is a transcription hole rather than a corpus measurement — the same shape as core-floor, and declared in the SAME commit as the branch that refuses it. Without the declaration an adopter deploys green through govkit and reds their own unattended kit gate with no key and no hole to tell them why."
 discharge = { command = ["bash", "-c", "grep -qE '^DIRECTIVES_FLOOR=\"?[0-9]+' .unattended.conf"] }
+
+# The HOLD vocabulary's floor, the same shape as `directives-floor` above and for the same reason:
+# undeclared or malformed reds this kit's own gate leg, the correct value for a faithful copy
+# install is the driver's own HOLD_CODES_CORE member count, and without a hole an adopter deploys
+# green through govkit and then reds their unattended kit gate with no key and nothing to tell them
+# why. The probe admits the QUOTED form both shipped confs use for its sibling HALT_FLOOR and the
+# bare integer, because a probe matching only one of the two passes a fixture written that way and
+# reds every conf written the other.
+[[hole]]
+id = "hold-floor"
+kind = "measured-pin"
+blocks_adopt = false
+blocks_gate = true
+why = "undeclared or malformed reds the kit gate at check 2's hold arm. The correct value for a faithful copy install is the driver's own HOLD_CODES_CORE member count, so this is a transcription hole rather than a corpus measurement, declared in the SAME commit as the branch that refuses it. Without the declaration an adopter deploys green through govkit and reds their own unattended kit gate with no key and no hole to tell them why."
+discharge = { command = ["bash", "-c", "grep -qE '^HOLD_FLOOR=\"?[0-9]+' .unattended.conf"] }
 
 [[hole]]
 id = "core-floor"
@@ -313,6 +365,12 @@ pattern = "{memory_root}/guides/PLAYBOOK-TEMPLATE.md"
 why = "an installed artifact its own adopter byte-compares"
 [[lf_pin]]
 pattern = "{memory_root}/guides/UNATTENDED-VERBS.md"
+why = "an installed artifact both its adopter and check 10 byte-compare"
+[[lf_pin]]
+pattern = "{memory_root}/guides/UNATTENDED-STOPS.md"
+why = "an installed artifact its own adopter byte-compares"
+[[lf_pin]]
+pattern = "{memory_root}/guides/UNATTENDED-ASKS.md"
 why = "an installed artifact both its adopter and check 10 byte-compare"
 [[lf_pin]]
 pattern = ".claude/skills/unattended/SKILL.md"

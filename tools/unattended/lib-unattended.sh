@@ -20,10 +20,12 @@
 #
 # WHAT IT HOLDS: `GIT` and its two pins; `resolve_sidecar_dir`, the one derivation of the sidecar
 # root the driver and the resume tick both read; `read_bound_key`, the one reader of a bound conf
-# key both of them call; `read_host_name`, `read_pid_image` and `check_pid_alive`, the one reading
-# of "which node, which process" the lease writer and both pid probes share; the anchored id tests;
-# path containment; and "has this pass committed yet". The same rule admits the resume tick as a
-# third sourcer.
+# key both of them call; `read_fork_cutoff`, the one TEXT read of the memory kit's FORK_ITEM_CUTOFF
+# the driver and the pass-order leg share; `read_host_name`, `read_pid_image` and `check_pid_alive`, the one reading
+# of "which node, which process" the lease writer and both pid probes share; `parse_gate_profile` and
+# `check_gate_wall`, the one reading of the gate runner's profile the driver and the leg both ask; the
+# anchored id tests; path containment; and "has this pass committed yet". The same rule admits the
+# resume tick as a third sourcer.
 
 # --------------------------------------------------------------------------------- git, once
 # Replace refs and graft advice are both OFF: a leg that reads history must see the history that is
@@ -119,24 +121,36 @@ r = next((p for p in (d, *d.parents) if (p / ".git").exists()), d.anchor)
 print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
 }
 
-# The REPAIR POINTER for a missing or stale units region (TOOL-aRepatriatedFork-2 S6): the
-# memory-tree generator where THIS install put it. Both the driver and the gate leg print it, so it
-# is spelled once, here, with the caller's own inline `resolve_python`. -> the hint text; a miss
-# says what was not found, never a guess.
-derive_index_repair() {
+# THE MEMORY-TREE GENERATOR where THIS install put it, repo-relative, resolved with the caller's own
+# inline `resolve_python`. Two texts name it — the repair pointer below and the driver's scaffold
+# recipe — so it is derived once, here, and neither spells the sibling kit's home. -> the path, or
+# status 1 with nothing printed, which each caller turns into its own named miss, never a guess.
+resolve_index_generator() {
   local d="" py=""
   declare -F resolve_python >/dev/null && py=$(resolve_python 2>/dev/null) || py=""
   [ -n "$py" ] && d=$(resolve_kit_dir "$py" memory-tree gen_build_index.py "$(dirname -- "${BASH_SOURCE[0]}")" 2>/dev/null)
   case "$d" in
-    '') printf '%s' "the --write mode of the memory-tree kit's gen_build_index.py, which neither the receipt nor a probe beside this kit located" ;;
-    .) printf '%s' "the --write mode of gen_build_index.py" ;;
-    *) printf '%s' "the --write mode of $d/gen_build_index.py" ;;
+    '') return 1 ;;
+    .) printf '%s\n' "gen_build_index.py" ;;
+    *) printf '%s\n' "$d/gen_build_index.py" ;;
   esac
 }
 
+# The REPAIR POINTER for a missing or stale units region (TOOL-aRepatriatedFork-2 S6): the
+# generator's `--write` mode. Both the driver and the gate leg print it, so it is spelled once, here.
+# -> the hint text; a miss says what was not found, never a guess.
+derive_index_repair() {
+  local g
+  if g=$(resolve_index_generator); then
+    printf '%s' "the --write mode of $g"
+  else
+    printf '%s' "the --write mode of the memory-tree kit's gen_build_index.py, which neither the receipt nor a probe beside this kit located"
+  fi
+}
+
 # ------------------------------------------------------------------------------ bounds, once
-# MOVED from the driver by TOOL-aWokenSentinel-5, body unchanged: the resume tick reads its two
-# knobs through this function, and the driver its four, so it lives where both source it. THE
+# MOVED from the driver by TOOL-aWokenSentinel-5, body unchanged: the resume tick reads its knobs
+# through this function, and the driver its bound keys, so it lives where both source it. THE
 # CALLING-SHELL CONTRACT, on the function line and ASSERTED by its first line (TOOL-aWokenSentinel-18):
 # `${!name}` reads the calling shell, and the NOTE interpolates `$CONF`, so a caller that named no
 # conf would be handed a default announced with nowhere to change it — `Declare one in  to change
@@ -171,6 +185,144 @@ read_bound_key() { # NAME · DEFAULT · UNIT · NOTE — the caller sourced the 
         echo "unattended: REFUSING - $_bk_name is declared as '$_bk_val', which is not a positive integer of $_bk_unit. A bound that cannot be parsed is a bound nobody set, and 0 means no bound at all." >&2
         RUNLOG_CLEAN=1; exit 2 ;;
   esac
+}
+
+# ------------------------------------------------------------ the fork-item cutoff, read as TEXT
+# TOOL-dDerivedDocket-31 S5. `FORK_ITEM_CUTOFF` is declared ONCE, in the memory kit's conf, and two
+# readers grade section 8 by it: the hygiene engine, which SOURCES that file, and `plan_state`, whose
+# callers must not execute a second kit's conf (M3 veto 3). So this is a deliberate RE-PARSE, and the
+# two-readers gotcha sanctions one only beside guards, which are NAMED here rather than claimed: the
+# marker-contract harness compares this reader with a subshell `.` of the same fixture conf at TEST
+# time, and a line this reader does not model REFUSES instead of resolving blank. Blank is the
+# declared OFF state, so a spelling that fell through to blank would turn per-item grading off on the
+# planning side alone while the hygiene side kept it on, and nothing would red.
+#
+# WHAT RESOLVES: a column-0 `FORK_ITEM_CUTOFF=` whose value is double-quoted, single-quoted or bare,
+# followed by nothing but whitespace and a comment. The LAST such line wins, as sourcing does. WHAT
+# REFUSES: any other non-comment line naming the key as a word — an `export` prefix, an indent, an
+# assignment inside a conditional, a value followed by a command — and a resolved value that is
+# neither blank nor a date. An absent file, or one that never names the key, resolves blank.
+# It takes the conf PATH, so the memory kit's file name is spelled by each caller, not here.
+read_fork_cutoff() { # conf file -> the cutoff on stdout, blank when off; rc 2 with the reason on stdout
+  [ -f "$1" ] || return 0
+  awk -v sq="'" -v conf="$1" '
+    BEGIN { key = "FORK_ITEM_CUTOFF"; kl = length(key); val = ""; bad = 0; badtxt = "" }
+    { line = $0 }
+    line ~ /^[ \t]*#/ { next }
+    substr(line, 1, kl + 1) == key "=" {
+      v = substr(line, kl + 2); q = substr(v, 1, 1)
+      if (q == "\"" || q == sq) {
+        e = index(substr(v, 2), q)
+        if (e == 0) { if (!bad) { bad = NR; badtxt = line }; next }
+        got = substr(v, 2, e - 1); tail = substr(v, e + 2)
+      } else {
+        # A BARE value ends at the first blank or shell metacharacter; what follows is the tail.
+        m = 0
+        while (m < length(v)) { c = substr(v, m + 1, 1); if (c ~ /[ \t;&|<>()$`\\"]/ || c == sq) break; m++ }
+        got = substr(v, 1, m); tail = substr(v, m + 1)
+      }
+      # Only blanks and a comment may follow, the comment opened by a blank: `x# y` is one word.
+      if (tail !~ /^([ \t]+#.*)?[ \t]*$/) { if (!bad) { bad = NR; badtxt = line }; next }
+      val = got; next
+    }
+    {
+      # Any OTHER line naming the key as a word, its trailing comment set aside first.
+      scan = line
+      if (match(scan, /[ \t]#/)) scan = substr(scan, 1, RSTART)
+      off = 0
+      while ((p = index(substr(scan, off + 1), key)) > 0) {
+        at = off + p
+        pre = (at > 1) ? substr(scan, at - 1, 1) : ""
+        post = substr(scan, at + kl, 1)
+        if (pre !~ /[A-Za-z0-9_]/ && post !~ /[A-Za-z0-9_]/) { if (!bad) { bad = NR; badtxt = line }; break }
+        off = at + kl - 1
+      }
+    }
+    END {
+      if (bad) {
+        printf "%s names %s on line %d in a spelling this text reader does not resolve: %s -- resolving it blank would turn per-item fork grading OFF on the planning side while the hygiene engine, which sources the file, keeps its own value\n", conf, key, bad, badtxt
+        exit 2
+      }
+      if (val != "" && val !~ /^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]$/) {
+        printf "%s declares %s as %s, which is neither blank nor a zero-padded ISO date, so no spec filename date can be compared with it\n", conf, key, val
+        exit 2
+      }
+      printf "%s", val
+    }' "$1"
+}
+
+# ------------------------------------------------------------------------ the gate profile, once
+# TOOL-dDerivedDocket-27 S2, S3 and S6. The runner prints its resolved profile as TAB-separated
+# key/value lines, and two readers need three of those keys: the driver bounds its bar by `wall`
+# plus `queue`, and both the driver's `--preflight` and the gate leg compare the effective wall with
+# `ceiling_max`. One parse and one comparison here, because a threshold spelled in both callers is
+# two answers to one question. SHARING IT IS DELIBERATE, and it means the leg is NOT a second opinion
+# on the driver's arithmetic: it grades the same declaration on the bar, before any run reaches it,
+# and a defect in this predicate reads green in both. Its own arms, staged against it, are the check.
+#
+# THE KEYS ARE READ, NEVER GUESSED. A key the profile did not print, or printed as anything but a
+# plain integer, is MISSING and named in GPF_MISSING, so a caller can say which one it lacked. A
+# `wall` of 0 counts as missing too: the runner prints 0 for NO wall, and a bound derived from it
+# would be the margin alone, which kills a healthy bar. A `queue` of 0 is a real value, a turnstile
+# that never waits. `ceiling_max` may read `-`, the runner's word for a manifest declaring no
+# ceiling, and that is an answer rather than a missing key.
+#
+# NORMALISED WITH `10#`, because a value that arrives as `08` is otherwise read as a broken octal
+# literal by the first arithmetic that touches it.
+GPF_WALL=""; GPF_QUEUE=""; GPF_CEILING_MAX=""; GPF_MISSING=""
+parse_gate_profile() { # the profile command's stdout -> GPF_WALL, GPF_QUEUE, GPF_CEILING_MAX, GPF_MISSING; rc 1 when a key is missing
+  local _gp_k _gp_v _gp_w="" _gp_q="" _gp_c=""
+  GPF_WALL=""; GPF_QUEUE=""; GPF_CEILING_MAX=""; GPF_MISSING=""
+  while IFS=$'\t' read -r _gp_k _gp_v || [ -n "$_gp_k" ]; do
+    _gp_v=${_gp_v%$'\r'}
+    case "$_gp_k" in
+      wall) _gp_w=$_gp_v ;;
+      queue) _gp_q=$_gp_v ;;
+      ceiling_max) _gp_c=$_gp_v ;;
+    esac
+  done <<< "$1"
+  case "$_gp_w" in ''|*[!0-9]*) GPF_MISSING="wall" ;; *) GPF_WALL=$((10#$_gp_w)); [ "$GPF_WALL" -gt 0 ] || { GPF_WALL=""; GPF_MISSING="wall"; } ;; esac
+  case "$_gp_q" in ''|*[!0-9]*) GPF_MISSING="${GPF_MISSING:+$GPF_MISSING }queue" ;; *) GPF_QUEUE=$((10#$_gp_q)) ;; esac
+  case "$_gp_c" in
+    -) GPF_CEILING_MAX=- ;;
+    ''|*[!0-9]*) GPF_MISSING="${GPF_MISSING:+$GPF_MISSING }ceiling_max" ;;
+    *) GPF_CEILING_MAX=$((10#$_gp_c)) ;;
+  esac
+  [ -z "$GPF_MISSING" ]
+}
+
+# THE CONF CHECK, one predicate for both readers, called after `parse_gate_profile`. The EFFECTIVE
+# wall is the declared GATE_WALL, else the profile's own `wall`, because a blank GATE_WALL leaves the
+# runner's row in force. It may not sit below the largest leg ceiling the profile reports: a wall
+# below it fires on a healthy bar that dispatches that leg. rc 0 when it clears, 1 when it is below,
+# naming both numbers in GW_WHY, and 2 when there is nothing to compare, saying why. The caller
+# decides what each means; the leg announces a 2 and never reds on one.
+GW_EFFECTIVE=""; GW_WHY=""
+check_gate_wall() { # the declared GATE_WALL, blank or a positive integer -> rc 0 clears · 1 below the ceiling · 2 cannot compare
+  local _gw_w=$1 _gw_src="the declared GATE_WALL"
+  GW_EFFECTIVE=""; GW_WHY=""
+  if [ -z "$_gw_w" ]; then
+    _gw_w=$GPF_WALL; _gw_src="the profile's own wall, GATE_WALL being blank"
+    if [ -z "$_gw_w" ]; then
+      GW_WHY="GATE_WALL is blank and the profile printed no usable wall, so there is no wall to compare with the largest leg ceiling"
+      return 2
+    fi
+  fi
+  GW_EFFECTIVE=$_gw_w
+  if [ -z "$GPF_CEILING_MAX" ]; then
+    GW_WHY="the profile printed no usable ceiling_max, so the ${_gw_w}s wall cannot be compared with the largest leg ceiling"
+    return 2
+  fi
+  if [ "$GPF_CEILING_MAX" = - ]; then
+    GW_WHY="the profile reports that no leg declares a ceiling, so the ${_gw_w}s wall has no ceiling to clear"
+    return 2
+  fi
+  if [ "$_gw_w" -lt "$GPF_CEILING_MAX" ]; then
+    GW_WHY="the effective wall, $_gw_src, is ${_gw_w}s, below the largest declared leg ceiling of ${GPF_CEILING_MAX}s"
+    return 1
+  fi
+  GW_WHY="the effective wall, $_gw_src, is ${_gw_w}s and clears the largest declared leg ceiling of ${GPF_CEILING_MAX}s"
+  return 0
 }
 
 # --------------------------------------------------------------------------- processes, once
@@ -334,6 +486,56 @@ is_repo_root() {
   return 1
 }
 
+# ------------------------------------------------ condition 3's two keys, resolved and compared once
+# TOOL-dDerivedDocket-20 S1. `SHARED_RECORDS` and `GENERATED_INDEXES` are the two halves of the build
+# method's condition 3, and `--dispatch` answers each by its own rule: a shared record may never be
+# declared, a generated index may be declared alone. One path under BOTH keys is answered by whichever
+# rule the verb reaches first, and makes the other declaration mean nothing. So the pair is refused at
+# conf load by the driver AND by the gate leg, through the one predicate below — the driver alone would
+# let the bar pass a conf no run has read yet, and the leg alone would let a run start on one.
+#
+# THE DEFAULT IS RESOLVED HERE TOO, and that is half the point. An UNDECLARED `SHARED_RECORDS` means a
+# memory tree at its conventional layout, `<memory root>/DECISIONS.md <memory root>/backlog`; a DECLARED
+# blank means the empty set, which is why both callers initialise the key to the sentinel below rather
+# than to blank. The driver used to resolve that default inline while the leg read the key as blank, so
+# a conf leaving it undeclared would have been refused by one reader and passed by the other — two
+# readers of one config, one of them re-deriving it (memory/gotchas/two-readers-of-one-config-one-re-derived.md).
+# The sentinel itself, spelled ONCE. Both callers initialise the key to it before the conf is read,
+# and a second spelling in either would be a sentinel this comparison never recognises.
+SHARED_RECORDS_UNDECLARED="__kit-default__"
+resolve_shared_records() { # declared value · memory root -> the effective set
+  if [ "$1" = "$SHARED_RECORDS_UNDECLARED" ]; then
+    printf '%s' "$2/DECISIONS.md $2/backlog"
+  else
+    printf '%s' "$1"
+  fi
+}
+# One `<shared record><TAB><index>` line per pair that overlaps, on `overlaps` — CONTAINMENT, in either
+# direction, never string equality: `memory` shared beside a `memory/LIVE.md` index is the same
+# contradiction as the two spelled alike, and so is the reverse nesting. Only the INDEX half of a
+# `GENERATED_INDEXES` pair is compared, because the generator is product code a pass may write. Read
+# into arrays rather than word-split, so a glob character in a value is compared as written rather than
+# expanded against the working tree. Prints nothing when the keys agree; it reads no memory-tree state.
+scan_shared_index_overlaps() { # shared-records · generated-indexes -> the overlapping pairs
+  local -a _so_shared=() _so_pairs=()
+  local _so_s _so_p _so_i
+  read -ra _so_shared <<<"$1"
+  read -ra _so_pairs <<<"$2"
+  for _so_s in "${_so_shared[@]}"; do
+    [ -n "$_so_s" ] || continue
+    for _so_p in "${_so_pairs[@]}"; do
+      _so_i=${_so_p%%:*}
+      [ -n "$_so_i" ] || continue
+      # A whole-repository spelling contains everything and is under nothing, so `overlaps` cannot
+      # say so; it is a contradiction with every index there is.
+      if is_repo_root "$_so_s" || is_repo_root "$_so_i" || overlaps "$_so_s" "$_so_i"; then
+        printf '%s\t%s\n' "$_so_s" "$_so_i"
+      fi
+    done
+  done
+  return 0
+}
+
 # --------------------------------------------------- the paths a unit's brief rows name, once
 # Prints, one per line and normalised, every path a ` brief · item <unit> · reason ` row names in
 # the run-state file AS IT STANDS AT <commit>. Two consumers, one parser: `pass_commit` subtracts
@@ -371,9 +573,25 @@ is_repo_root() {
 # empty answer here MEANS "this pass declared no brief paths", which is a legitimate and common
 # state, so a broken TMPDIR answered with silence would read as a correct answer and forgive a write
 # nothing declared. The stderr line is the only thing that makes it visible.
+#
+# THREE CONDITIONS, AND A ROW MEETING TWO OF THEM COVERS NOTHING. TOOL-dDerivedDocket-30 S1, which
+# finishes what TOOL-aLeakedHandle-7 ruled and TOOL-aRatifiedRulings-2 built as the first of them.
+#   * THE UNIT: the row names THIS unit, so a pass cannot carry a sibling's brief unreported.
+#   * THE DIRECTORY: the path lies under the build's own `prompts/`, the folder beside the run-state
+#     file, so a row cannot name a product file and excuse it. The folder itself is not under itself.
+#   * THE BLOB: the path's blob AT <commit> starts with the row's twelve-hex hash, so a brief EDITED
+#     after `--brief` hashed it is not excused — that edit is exactly the write the declare-before-
+#     dispatch rule exists to see. A hash that is not twelve lowercase hex digits matches nothing.
+# All three are applied HERE and nowhere else, because this function's two consumers must excuse one
+# set: narrowed in check 23 alone, `pass_commit` would still skip a commit carrying an edited brief as
+# bookkeeping, and the commit that edited it would never be the one graded. The blob is read from
+# the COMMIT, never the working copy, because the question is what that commit wrote; it goes through
+# a scratch file for the substitution reason stated above, the same file reused per row.
 read_brief_paths() {  # commit · unit · run-state-path
   _rb_f=$(mktemp) || { printf 'lib-unattended: read_brief_paths cannot create a scratch file, so it cannot say which paths a brief row declared\n' >&2; return 2; }
+  _rb_b=$(mktemp) || { rm -f "$_rb_f"; printf 'lib-unattended: read_brief_paths cannot create a scratch file, so it cannot say which paths a brief row declared\n' >&2; return 2; }
   GIT show "$1:$3" >"$_rb_f" 2>/dev/null || :
+  _rb_d=$(normpath "$3"); _rb_d=${_rb_d%/*}/prompts/
   # THE `|| [ -n … ]` REPLACES A GUARANTEE THE HEREDOC GAVE FREE. Command substitution stripped the
   # trailing newlines and the heredoc put exactly one back, so every line was terminated; a FILE may
   # end without one, and a bare `read` drops that last line. Without this the repair would silently
@@ -381,10 +599,15 @@ read_brief_paths() {  # commit · unit · run-state-path
   # move a disjointness verdict while claiming to fix a stall.
   while IFS= read -r _rb_r || [ -n "$_rb_r" ]; do
     case "$_rb_r" in *" brief · item $2 · reason "*) ;; *) continue ;; esac
-    _rb_r=${_rb_r#* · reason }; _rb_r=${_rb_r#* }
-    normpath "$_rb_r"; printf '\n'
+    _rb_r=${_rb_r#* · reason }
+    _rb_h=${_rb_r%% *}; _rb_p=$(normpath "${_rb_r#* }")
+    case "$_rb_h" in [0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]) ;; *) continue ;; esac
+    case "$_rb_p" in "$_rb_d"?*) ;; *) continue ;; esac
+    GIT rev-parse --verify --quiet "$1:$_rb_p" </dev/null >"$_rb_b" 2>/dev/null || continue
+    _rb_o=""; IFS= read -r _rb_o <"$_rb_b" || :
+    case "$_rb_o" in "$_rb_h"*) printf '%s\n' "$_rb_p" ;; esac
   done <"$_rb_f"
-  rm -f "$_rb_f"
+  rm -f "$_rb_f" "$_rb_b"
 }
 
 # ------------------------------------------------------------- has this pass committed yet, once
@@ -486,11 +709,14 @@ pass_commit() {  # anchor · unit · run-state-path · [upper-bound, default HEA
 # and a spec pass legitimately writes more than those two: the regenerated index, the build README,
 # the run-state file and the month ledger all sit outside them. So a SPEC commit naming the unit id
 # won the selection and its caller then graded ITS parent — where, correctly, no spec exists yet.
-# `SHARED_RECORDS` was omitted after that and it is not a corner: template section 1 MANDATES a
-# backlog row, so a conforming spec-first run writes `memory/backlog/<FAMILY>.md` in the same commit,
-# which put the commit back outside the exclusion and redded the run that followed the method
-# exactly. `GENERATED_INDEXES` arrives as `index:generator` pairs; only the index half is an excluded
-# path, because a commit touching the GENERATOR is touching product code.
+# `SHARED_RECORDS` was omitted after that and it is not a corner. A backlog row is owed only by a
+# unit planned before its spec, and a run that plans one writes that row in the same commit as the
+# spec, which put the commit back outside the exclusion and redded a run that followed the method
+# exactly. So the exclusion is whatever the project DECLARES, in either backlog mode: every
+# `SHARED_RECORDS` path, and the index half of every `GENERATED_INDEXES` pair, whether the row lands
+# in a shared shard or as an ask in the run's own build. `GENERATED_INDEXES` arrives as
+# `index:generator` pairs; the generator half is never excluded, because a commit touching the
+# GENERATOR is touching product code.
 build_commit() {  # rev-range · unit-id · build-dir · generated-indexes · shared-records · [cap] · [order]
   _bc_range=$1; _bc_id=$2; _bc_dir=$3; _bc_gen=$4; _bc_shared=$5
   _bc_cap=${6:-}
@@ -569,6 +795,372 @@ build_commit() {  # rev-range · unit-id · build-dir · generated-indexes · sh
     fi
   done
   return 1
+}
+
+# ------------------------------------------------------------------- the run's OWN commits
+# TOOL-dDerivedDocket-17 S2/section 8 F5. The commits reachable from an ENDPOINT, not reachable from
+# a BASE, and not reachable from any of the one or more EXCLUSION TIPS it is handed.
+#
+# WHY THE EXCLUSIONS EXIST AT ALL, because `base..endpoint` looks like the whole answer. Under
+# `in-place` landing `--close` runs on a PREPARED MERGE whose first parent is the advertised tip, so
+# every default-branch commit landed since the base is reachable from the endpoint too — and a
+# foreign build's row landed in that window would be read as something this run wrote. Excluding the
+# advertised tip is what leaves exactly the run's own commits; the alternative that was rejected,
+# excluding the first parent of the first two-parent commit, misreads a run branch that merged the
+# default branch plainly.
+#
+# MORE THAN ONE TIP, because unit 19's terminal walk excludes one parent at each merge it reads. The
+# T4 caller passes exactly one and the arity costs it nothing.
+#
+# IT REFUSES RATHER THAN NARROWING. An endpoint or a base this clone cannot resolve would make
+# `rev-list` print nothing, and an empty list here reads as "this run wrote no commits" — the exact
+# reassuring zero a dead probe must never produce. An exclusion tip that does not resolve is refused
+# for the mirror reason: dropping it WIDENS the set silently, which is the direction that grades
+# somebody else's commit as this run's.
+read_run_commits() {  # endpoint · base · exclusion-tip…
+  _rrc_end=$1; _rrc_base=$2; shift 2
+  _rrc_ex=""
+  [ -n "$_rrc_end" ] && GIT rev-parse --verify --quiet "$_rrc_end^{commit}" >/dev/null 2>&1 || return 1
+  [ -n "$_rrc_base" ] && GIT rev-parse --verify --quiet "$_rrc_base^{commit}" >/dev/null 2>&1 || return 1
+  for _rrc_t in "$@"; do
+    [ -n "$_rrc_t" ] || continue
+    GIT rev-parse --verify --quiet "$_rrc_t^{commit}" >/dev/null 2>&1 || return 1
+    _rrc_ex="$_rrc_ex ^$_rrc_t"
+  done
+  GIT rev-list "$_rrc_end" "^$_rrc_base" $_rrc_ex 2>/dev/null
+}
+
+# ----------------------------------------------- is a commit touching a path reachable from here
+# TOOL-dDerivedDocket-54. Given a COMMIT, a BASE and a PATH: is a commit since BASE that touched PATH
+# reachable from COMMIT? The terminal-record exclusion asks it once per PARENT of each merge on a
+# witness's tail and reads the pair of answers, so the subject is always a parent - and a parent may
+# itself be a merge, which is the one subject at which the two spellings of this walk disagree.
+#
+# THREE ANSWERS, AND THE THIRD IS NOT THE SECOND. Status 0 is yes. Status 1 is no: the walk ran to
+# completion and reached none, which is the answer the caller's fail-closed rule trusts. Status 2 is
+# CANNOT ANSWER, with one stderr line naming the commit and the path - the channel `pass_commit`
+# uses for the same shape - and stdout stays empty on every answer. A caller that folds 2 into 1
+# turns a broken probe into a confident negative, so read the status with `case`, never with `if`.
+#
+# THE WALK IS UNSIMPLIFIED ON PURPOSE, and the path restriction does not make the flag redundant: a
+# path-limited walk prunes every other side of a merge that is TREESAME to one side for that path,
+# so a parent that is itself a merge resolving the path back to one side's content answers NO for a
+# touching commit it does reach - and what comes back is EXISTENCE only, never which commit, and
+# never who wrote either side.
+# Measured in a scratch repo on git 2.54.0: from such a nested-merge parent the simplified walk
+# prints nothing and `--full-history` prints the merge, while from a plain parent the two agree, so
+# the flag changes the answer only where the pruning does. The drift report's product-commit walk
+# records the same class for the same flag.
+#
+# BASE IS REFUSED BEFORE THE WALK unless it RESOLVES TO A COMMIT, and a non-empty test is not that
+# test. The caller reads BASE out of the record being graded, so the run supplies it. An empty BASE
+# under the range spelling is `HEAD..<commit>`, which exits 0 printing nothing - byte-identical to an
+# honest no. A blob or tree sha is a legal object, so `^<object>` excludes no commit and the walk
+# answers a confident YES over the whole history. The two fail in OPPOSITE directions, which is why
+# one refusal in front of the walk covers both and neither is left to whatever the walk prints.
+#
+# IT CHECKS THAT BASE IS A COMMIT, NEVER THAT IT IS THE RIGHT ONE. A run-written BASE naming another
+# real commit moves the range, and this answers faithfully over the moved range; whether the record
+# pins the commit it should is the leg's check 9, not a question this predicate can ask.
+#
+# A SHALLOW CLONE CANNOT ANSWER. Both ends of the range are computed over grafted roots there: the
+# walk from COMMIT can stop short of a touching commit, and "not reachable from BASE" can hold for a
+# commit that is BASE's ancestor through history the clone does not have - a wrong answer of either
+# sign, so neither is given.
+#
+# THE PATH IS ONE PATH. A pathspec is a pattern language, and a glob or `:(exclude)` in the value
+# would widen or invert the question, so the walk runs under `--literal-pathspecs`.
+#
+# `--max-count=1` prints one commit at most, so a yes never enumerates the range into this shell. A
+# no walks the whole range, and a bound on that belongs to the caller's budget.
+check_touching_commit_reachable() { # commit · base · path -> status 0 yes · 1 no · 2 cannot answer
+  _tc_c=$1; _tc_b=$2; _tc_p=$3
+  _tc_why="lib-unattended: check_touching_commit_reachable cannot answer for commit [$_tc_c] and path [$_tc_p]"
+  case $_tc_b in
+    *[![:space:]]*) ;;
+    *) printf '%s: the BASE is empty or blank, so no walk was started over a range nobody resolved\n' "$_tc_why" >&2
+       return 2 ;;
+  esac
+  _tc_bs=$(GIT rev-parse --verify --quiet "$_tc_b^{commit}" 2>/dev/null) || _tc_bs=""
+  if [ -z "$_tc_bs" ]; then
+    printf '%s: the BASE [%s] does not resolve to a commit, and a BASE that is not one excludes nothing from the walk\n' "$_tc_why" "$_tc_b" >&2
+    return 2
+  fi
+  _tc_cs=""
+  [ -n "$_tc_c" ] && { _tc_cs=$(GIT rev-parse --verify --quiet "$_tc_c^{commit}" 2>/dev/null) || _tc_cs=""; }
+  if [ -z "$_tc_cs" ]; then
+    printf '%s: the commit does not resolve to a commit in this history\n' "$_tc_why" >&2
+    return 2
+  fi
+  case $_tc_p in
+    *[![:space:]]*) ;;
+    *) printf '%s: the path is empty or blank, and an empty pathspec is not a path\n' "$_tc_why" >&2
+       return 2 ;;
+  esac
+  case $(GIT rev-parse --is-shallow-repository 2>/dev/null) in
+    false) ;;
+    true) printf '%s: this clone is shallow, so both ends of the range are computed over grafted history\n' "$_tc_why" >&2
+          return 2 ;;
+    *) printf '%s: this repository could not say whether it is shallow\n' "$_tc_why" >&2
+       return 2 ;;
+  esac
+  _tc_hit=$(GIT --literal-pathspecs rev-list --full-history --max-count=1 "$_tc_cs" "^$_tc_bs" -- "$_tc_p" 2>/dev/null) || {
+    printf '%s: the walk itself failed, so its empty output is not a completed walk\n' "$_tc_why" >&2
+    return 2
+  }
+  [ -n "$_tc_hit" ] && return 0
+  return 1
+}
+
+# ------------------------------------------------------------------------ the grant grammar
+# TOOL-dDerivedDocket-19 S3. A build README may carry ONE front-matter key, `may:`, whose value is one
+# physical line of space-separated GRANTS or the single word `none`. A grant is a decision id in the
+# grammar `expand_id_runs` reads, or a repo-relative PATH: no leading `/`, no `..` segment, no
+# backslash, and a `/` or a file extension somewhere in it. Either may be bare or wrapped in
+# backticks, the form an ask row's `may` clause uses, so an owner copying a proposal verbatim and one
+# typing it bare pin the SAME bytes.
+#
+# ONE FUNCTION, TWO CALLERS, and that is why it is here. `--preflight` normalises the README's line
+# into the pinned `may:` fact and the leg normalises the same line again to compare against that
+# fact. Two spellings would make the comparison depend on how the owner copied the grant, and the leg
+# would then red an honest record or pass a forged one according to a backtick.
+#
+# STATUS 0 prints the grants, backticks stripped and one space apart, or `none`. STATUS 1 prints the
+# ONE token it refused, as written, so the refusal can name it — nothing when the value is empty.
+# `none` beside a grant is refused like any other token that is neither an id nor a path: a value
+# that says both "nothing" and "this" has no honest reading.
+#
+# WHAT IT DOES NOT CHECK: that an id RESOLVES in the decision log, or that a path EXISTS. It is a typo
+# guard over shape, and whether a grant covers a given change is the run's M3 judgement, which no
+# code here observes. Split by `read -a`, never by an unquoted expansion, so a token that happens to
+# be a glob is refused as the token it is rather than expanded into file names.
+parse_grants() { # may: value -> status 0 the grants (or `none`) · status 1 the refused token
+  local _pg_w _pg_t _pg_s _pg_out=""
+  read -r -a _pg_w <<<"$1"
+  [ "${#_pg_w[@]}" -gt 0 ] || return 1
+  if [ "${#_pg_w[@]}" = 1 ] && [ "${_pg_w[0]}" = none ]; then printf 'none'; return 0; fi
+  for _pg_t in "${_pg_w[@]}"; do
+    _pg_s=$_pg_t
+    case $_pg_s in \`?*\`) _pg_s=${_pg_s#\`}; _pg_s=${_pg_s%\`} ;; esac
+    if ! [[ $_pg_s =~ ^[A-Z]+-[A-Za-z0-9]+-[0-9]+$ ]]; then
+      case $_pg_s in
+        /*|*\\*|*\`*|..|../*|*/..|*/../*) printf '%s' "$_pg_t"; return 1 ;;
+        */*|*?.?*) ;;
+        *) printf '%s' "$_pg_t"; return 1 ;;
+      esac
+    fi
+    _pg_out="$_pg_out${_pg_out:+ }$_pg_s"
+  done
+  printf '%s' "$_pg_out"
+}
+
+# ------------------------------------------- the terminal record's exclusions, read by content
+# TOOL-dDerivedDocket-19 section 4 and section 8 F8. Given a terminal record's WITNESS, its BASE and
+# its RUN-STATE PATH: the tips `read_run_commits` must exclude so that what is left is the commits the
+# run itself made. Unit 22's S17 applies the same function to a landing commit.
+#
+# THE RUN SIDE OF A MERGE IS READ BY CONTENT, never by parent order and never from a default-branch
+# tip. At every two-parent commit on the witness's tail, the witness included, the parent from which
+# a commit since BASE touching the run-state path is reachable is the run's side: the other parent is
+# printed as an exclusion and the walk descends the run side, so nested merges are read in turn. That
+# one rule reads unit 2's prepared merge, a plain reconcile on the run branch, the primary lander's
+# `--no-ff` landing merge and push-main's own reconcile on the default branch, whichever parent each
+# puts the run on. A single-parent commit passes the walk to its parent.
+#
+# THE RUN-STATE PATH IS THE BUILD FOLDER'S `RUN.md`, even for an archived record: every record commit
+# the run made touched that path, and rotation happens after them.
+#
+# IT STOPS, ADDING NOTHING, where it cannot tell — the fail-closed direction, because an exclusion
+# nobody earned removes a run commit from the arm's range. That is a merge where neither parent or
+# both reach such a commit, a commit BASE holds, a root, and a commit with more than two parents.
+# The walk is bounded by the witness's history since BASE, read ONCE with `rev-list --parents` into
+# this shell rather than one git call per step.
+#
+# STATUS 0 is a completed walk; the exclusions are on stdout, one per line. STATUS 2 is CANNOT
+# ANSWER: the witness or BASE does not resolve, or a reachability probe could not answer — its own
+# reason line is on stderr — and whatever was printed before that point stands, fewer exclusions
+# rather than invented ones. It makes no remote observation, so a stale tip moves no terminal range.
+#
+# STATED RESIDUAL: it tells a merge's sides by where the record's commits are, not by who made the
+# other commits. A side carrying run commits but no commit touching the run-state path since BASE
+# reads as default-branch content, and only a branch forked outside the run's history has that shape.
+read_run_exclusions() { # witness · base · run-state path -> the exclusion tips, one per line · status 0 read · 2 cannot answer
+  local _re_w="${1:-}" _re_b="${2:-}" _re_p="${3:-}" _re_ws _re_bs _re_map _re_cur _re_par _re_p1 _re_p2 _re_rest _re_r1 _re_r2
+  _re_ws=$(GIT rev-parse --verify --quiet "$_re_w^{commit}" 2>/dev/null) || _re_ws=""
+  _re_bs=$(GIT rev-parse --verify --quiet "$_re_b^{commit}" 2>/dev/null) || _re_bs=""
+  if [ -z "$_re_w" ] || [ -z "$_re_b" ] || [ -z "$_re_ws" ] || [ -z "$_re_bs" ]; then
+    printf 'lib-unattended: read_run_exclusions cannot answer for witness [%s] and base [%s]: one of them does not resolve to a commit\n' "$_re_w" "$_re_b" >&2
+    return 2
+  fi
+  _re_map=$(GIT rev-list --parents "$_re_ws" "^$_re_bs" 2>/dev/null) || {
+    printf 'lib-unattended: read_run_exclusions cannot answer for witness [%s]: the walk of its history since BASE failed\n' "$_re_w" >&2
+    return 2
+  }
+  _re_map=$'\n'"$_re_map"$'\n'
+  _re_cur=$_re_ws
+  while :; do
+    # A COMMIT OUTSIDE THE MAP IS ONE BASE HOLDS, because the map is exactly the witness's history
+    # not reachable from BASE. The line is `<commit> <parent>…`, so a match on "\n<commit>" is a
+    # match at the start of that commit's own line and never inside another's parent list.
+    case $_re_map in *$'\n'"$_re_cur"*) ;; *) break ;; esac
+    _re_par=${_re_map#*$'\n'"$_re_cur"}
+    _re_par=${_re_par%%$'\n'*}
+    read -r _re_p1 _re_p2 _re_rest <<<"$_re_par"
+    if [ -z "$_re_p1" ] || [ -n "$_re_rest" ]; then break; fi
+    if [ -z "$_re_p2" ]; then _re_cur=$_re_p1; continue; fi
+    check_touching_commit_reachable "$_re_p1" "$_re_bs" "$_re_p"; _re_r1=$?
+    check_touching_commit_reachable "$_re_p2" "$_re_bs" "$_re_p"; _re_r2=$?
+    if [ "$_re_r1" = 2 ] || [ "$_re_r2" = 2 ]; then return 2; fi
+    if [ "$_re_r1" = 0 ] && [ "$_re_r2" = 1 ]; then
+      printf '%s\n' "$_re_p2"; _re_cur=$_re_p1
+    elif [ "$_re_r1" = 1 ] && [ "$_re_r2" = 0 ]; then
+      printf '%s\n' "$_re_p1"; _re_cur=$_re_p2
+    else
+      break
+    fi
+  done
+  return 0
+}
+
+# ------------------------------------------------------------ the derived terminal (unit 22)
+# TOOL-dDerivedDocket-22, owner ruling D12-i2. A LANDING record whose OWN commit is reachable from
+# the tip the remote advertises is landed, and that is DERIVED by the readers rather than written by
+# a verb after the push. These four answer the parts both the driver and the gate leg must agree on.
+#
+# THE LANDING COMMIT, found by CONTENT and never by subject or by walking back. The in-place close
+# commits under a fixed subject and a primary close under whatever the agent wrote, so a subject key
+# finds one mode's records. And the run-state path is REUSED after a rotation, so walking the path's
+# history back to the newest LANDING copy passes a staged, uncommitted LANDING and finds an EARLIER
+# run's landing commit - which is on the remote, and would derive the new run landed.
+#
+# So: the record must match HEAD's copy, and HEAD's copy must read `phase: LANDING`; then the answer
+# is the commit that last changed the path, as HEAD's history simplifies it. A staged LANDING has no
+# landing commit and cannot derive, which is right: no history a remote could carry holds it. An
+# unreadable HEAD copy is NOT LANDING, never read as one. Status 1 prints nothing.
+#
+# THE SIX LEASE-FACT LINES, and nothing else, may differ. `keepalive`, `session`, `pid`, `host`,
+# `pid-image` and `lease-utc` are the lines `write_lease` writes together; a difference that adds,
+# removes or rewrites only those holds, and an equal file holds trivially. The header lines before
+# the first hunk are git's, never the file's, so the scan starts at the first `@@`. Two callers and
+# no third: `read_landing_commit` below, and `--landed`'s `primary` clean check in the driver.
+check_lease_only_diff() { # run-state file -> 0 when it differs from HEAD in lease-fact lines alone
+  local _ld_f="${1:-}" _ld_d
+  [ -n "$_ld_f" ] || return 1
+  _ld_d=$(GIT diff -U0 HEAD -- "$_ld_f" 2>/dev/null) || return 1
+  [ -n "$_ld_d" ] || return 0
+  printf '%s\n' "$_ld_d" | awk '
+    /^@@ / { h = 1; next }
+    !h { next }
+    /^\\/ { next }
+    /^[+-]/ { l = substr($0, 2); sub(/\r$/, "", l)
+              if (l !~ /^(keepalive|session|pid|host|pid-image|lease-utc):( |$)/) bad = 1 }
+    END { exit bad ? 1 : 0 }'
+}
+
+# "MATCH" IS `check_lease_only_diff`, not byte equality (TOOL-dDerivedDocket-61 S8). `--resume
+# --keepalive-id` re-binds a pushed landing `--landed` has not yet observed, and that re-bind rewrites
+# the six lease-fact lines of a record the push already carried. Committing it would move HEAD off
+# the pushed tip, so it stays a working-copy difference, and a difference confined to those six lines
+# is read as none. Every other byte, the phase line among them, must still match.
+read_landing_commit() { # run-state file -> the commit that carries it at LANDING, or status 1
+  local _lc_f="${1:-}" _lc_ph _lc_c
+  [ -n "$_lc_f" ] || return 1
+  check_lease_only_diff "$_lc_f" || return 1
+  _lc_ph=$(GIT show "HEAD:$_lc_f" 2>/dev/null | extract_run_facts | sed -n 's/^phase: *//p' | head -1 | tr -d '\r')
+  [ "$_lc_ph" = LANDING ] || return 1
+  _lc_c=$(GIT log -1 --format=%H HEAD -- "$_lc_f" 2>/dev/null)
+  [ -n "$_lc_c" ] || return 1
+  printf '%s\n' "$_lc_c"
+}
+
+# THE DATE A RECORD'S OWN RUN BEGAN, for a cutoff that grandfathers by age. It answers a DATE, never
+# a sha: `resolve_introducing_commit` in the leg answers the sha a re-derivation needs and refuses
+# `--follow` for it, which is a different question with a different ruling (TOOL-dDerivedDocket-52).
+#
+# `--follow` IS WHAT KEEPS A ROTATION FROM RE-DATING A RECORD. Without it an archived record dates to
+# the rotation commit that added its archived name, which moves a pre-cutoff record into the graded
+# set: aPacedTurnstile's `RUN.LANDED.a1fd98d8.md` reads 2026-08-20 without it and 2026-08-18 with it.
+#
+# WHAT `--follow` DOES NOT DO, and the direction of its error. It takes the OLDEST add along the
+# followed history, so an archive in a folder that rotated more than once can date to an EARLIER
+# run's first commit. That errs toward grandfathering and never toward a frozen red.
+#
+# THE FLOOR, for the LIVE path. A live `RUN.md` in a folder that has rotated is recorded `M` at the
+# rotation and never re-added, so its oldest add is the PREVIOUS run's preflight and the record would
+# grade older than it is. Its tenancy of the path began at the newest FIRST TOUCH of an archived
+# sibling in the same folder - the rotation - so the date is floored there. First touch rather than
+# an add search, because a rotation landing inside a merge records no add at all.
+#
+# `nofloor` SKIPS THE FLOOR, for a cutoff that predates it. Flooring moves a live record YOUNGER,
+# into a graded set it was never graded by, and where that record is already terminal no verb may
+# add what the cutoff asks for; the caller that passes it says which record that would be.
+#
+# `--follow` ALSO FOLLOWS COPIES: at a record's first commit it may continue into another file that
+# shares more than half its lines, and date by that one's add. On a real history the source is the
+# older file, so the error is again toward grandfathering.
+#
+# NOTHING PRINTED is "this path has no committed history", which a caller reads as NEW - the one
+# thing a record with no first commit certainly is.
+read_first_commit_date() { # record path · [nofloor] -> YYYY-MM-DD, or nothing
+  local _fd_p="${1:-}" _fd_d _fd_s _fd_t _fd_floor=""
+  [ -n "$_fd_p" ] || return 0
+  _fd_d=$(GIT log --follow --diff-filter=A --format=%cs -- "$_fd_p" 2>/dev/null | tail -1)
+  if [ "${_fd_p##*/}" = RUN.md ] && [ "${2:-}" != nofloor ]; then
+    while IFS= read -r _fd_s; do
+      [ -n "$_fd_s" ] || continue
+      _fd_t=$(GIT log --full-history --format=%cs -- "$_fd_s" 2>/dev/null | tail -1)
+      [ -n "$_fd_t" ] || continue
+      if [ -z "$_fd_floor" ] || [[ "$_fd_t" > "$_fd_floor" ]]; then _fd_floor=$_fd_t; fi
+    done < <(GIT ls-files -- "${_fd_p%/*}/RUN.*.md" 2>/dev/null)
+  fi
+  if [ -n "$_fd_floor" ] && { [ -z "$_fd_d" ] || [[ "$_fd_floor" > "$_fd_d" ]]; }; then _fd_d=$_fd_floor; fi
+  printf '%s' "$_fd_d"
+}
+
+# IS THIS RECORD GRADED by the landed fact-set arm. Status 0 graded · 1 grandfathered · 2 the arm is
+# OFF because the cutoff is blank. A record with no committed history is graded: nothing that has
+# not been committed yet can predate a cutoff that has.
+#
+# THE LAST COMMIT FIRST, because it is one cheap walk and the first-commit read is a `--follow` walk
+# per record: a path nothing wrote to at or after the cutoff cannot have begun after it, and on this
+# repo that answers almost every record. Its stated limit is a history whose commit DATES run
+# backwards along its parents, where the shortcut can grandfather a record the full read would grade.
+check_landed_facts_due() { # record path · cutoff -> 0 graded · 1 grandfathered · 2 off
+  local _ld_d _ld_l
+  [ -n "${2:-}" ] || return 2
+  _ld_l=$(GIT log -1 --format=%cs -- "$1" 2>/dev/null)
+  [ -n "$_ld_l" ] && [[ "$_ld_l" < "$2" ]] && return 1
+  _ld_d=$(read_first_commit_date "$1")
+  [ -z "$_ld_d" ] && return 0
+  [[ "$_ld_d" < "$2" ]] && return 1
+  return 0
+}
+
+# THE LANDED FACT SET, one predicate for two callers: the leg's fact-set arm, and `--preflight`,
+# which refuses to retire a record that arm would then red for ever. Three populations, each named
+# for what makes a record belong to it:
+#
+#   landed   a recorded LANDED with no `landed-derived` - `--landed` wrote it, so it carries every fact
+#            that verb writes: `landed-anchor`, `units-at-landing`, `unpushed-at-landing`
+#   derived  a recorded LANDED carrying `landed-derived`, which only the rotation writes - the roster
+#            the close froze, and the derivation itself
+#   landing  a committed LANDING under in-place landing - the roster `--close` froze beside the phase
+#
+# `asks-at-landing` is not here: the freeze-presence arm grades it, and one fact graded by two arms
+# is two answers to one question. PRESENCE of the key line is the test; a value is a record's own.
+# Prints the missing keys, space-separated, and nothing when the set is complete.
+read_missing_landed_facts() { # record file · landed|derived|landing -> the missing keys
+  local _mf_f="${1:-}" _mf_k _mf_want _mf_out=""
+  case "${2:-}" in
+    landed)  _mf_want="landed-anchor units-at-landing unpushed-at-landing" ;;
+    derived) _mf_want="units-at-landing landed-derived" ;;
+    landing) _mf_want="units-at-landing" ;;
+    *) return 2 ;;
+  esac
+  for _mf_k in $_mf_want; do
+    { extract_run_facts < "$_mf_f"; } 2>/dev/null | grep -q "^$_mf_k:" || _mf_out="$_mf_out${_mf_out:+ }$_mf_k"
+  done
+  printf '%s' "$_mf_out"
 }
 
 # THE NEXT ANCHOR for a unit after <anchor>, or empty when this is the unit's last row. Chosen by
@@ -749,4 +1341,155 @@ baseline_units() {  # run-state-path · build-README-path · [cutoff-date] · [f
     return 1
   fi
   printf '%s\n' "$_bu_was"
+}
+
+# ------------------------------------------------------------------------- the ask FILING match
+# TOOL-dDerivedDocket-16 S4. Property P5 asks one question of a `BACKLOG.md` blob: does this ask
+# have a row there. The DRIVER asks it at preflight, over the blob at `m-base:`; the gate leg asks
+# it again over the same blob when it re-derives the pinned facts. Two spellings of one grammar is
+# the class this whole file exists for, so the match lives here and neither caller writes its own.
+#
+# FILING IS NOT STATUS, and that is the whole reason this can live in a shell library at all. A row
+# says the ask EXISTS in a tree the run did not write; what its derived status IS comes from the
+# declared generator's fold, which this kit neither carries nor re-implements.
+#
+# ANCHORED AT COLUMN 1 BY `index(...) == 1`, not by a regex, because the id is a value a caller
+# supplies: a regex would give `.` and `*` in a malformed argument meaning they do not have, and a
+# substring test would let a `SCOPE` row or a prose mention answer for a filing.
+#
+# THE PREFIX IS `- <ID> · filed `, the ask row's own opening as the memory kit's grammar spells it.
+# A row whose separator or date field differs is not a filed ask and must not answer as one.
+#
+# ENVIRON RATHER THAN `awk -v`: a -v assignment expands backslash sequences, and the id is a caller's
+# bytes. Same rule the sibling suite's fixture writer already states for its row bodies.
+ask_filed_in() { # BACKLOG.md text · ask id -> 0 when that text FILES the ask
+  printf '%s\n' "$1" | AFI_ID="$2" awk '
+    BEGIN { p = "- " ENVIRON["AFI_ID"] " · filed " }
+    index($0, p) == 1 { f = 1 }
+    END { exit !f }'
+}
+# THE SAME GRAMMAR READ THE OTHER WAY: every id a blob files, in file order. `--plan --asks` needs
+# the SET (the asks filed in a build's own folder), and deriving it by calling the match above once
+# per candidate id would need a candidate list, which is the thing this answers.
+asks_filed_in() { # BACKLOG.md text -> every filed ask id, one per line, in file order
+  printf '%s\n' "$1" \
+    | sed -n 's/^- \([A-Z][A-Z]*-[A-Za-z0-9][A-Za-z0-9]*-[0-9][0-9]*\) · filed .*/\1/p'
+}
+# ...and the `unit` SUBSET. `- <ID> · filed <DATE> · unit · <TEXT>` is an ask that IS a unit of the
+# build whose folder files it, so design section 19.4 makes it roster. `unit` is recognised as the
+# WHOLE field after the date and never as a prefix of the text, which is the memory kit's own rule.
+asks_unit_in() { # BACKLOG.md text -> every filed `unit` ask id, one per line, in file order
+  printf '%s\n' "$1" \
+    | sed -n 's/^- \([A-Z][A-Z]*-[A-Za-z0-9][A-Za-z0-9]*-[0-9][0-9]*\) · filed [0-9][0-9-]* · unit · .*/\1/p'
+}
+# ------------------------------------------------------------ the id-run expander, and the home
+# MOVED HERE FROM THE DRIVER by TOOL-dDerivedDocket-18, unchanged, for the reason the ask match
+# above is here: the gate leg re-derives the pinned mandate and must answer "which ids is this run
+# under" with the SAME bytes the driver answered it with. Two expanders disagree silently on the
+# one input that matters - a range - and the leg would then red an honest record for a row it never
+# looked for. The leg can source no driver, so a shared answer has to live in the shared file.
+# THE MANDATE NO LONGER READS THROUGH IT: an `asks:` value is an IDLIST, and `read_id_list` below
+# is its reader on both sides (closing diff review of dDerivedDocket, F2). This one stays the
+# reader of BINDING LINES - spec-audit lines and status-header verbs - whose words it must skip.
+#
+# The RECORD-BINDING id grammar is WIDER than `_ids_of`'s, and reading it with the narrow one is
+# wrong in both directions. `memory/HYGIENE.md` admits a trailing `@rev-N` and a contiguous run
+# written `<family>-<slug>-N..M`, which EXPANDS at authoring time - and only `gen_build_index.py`
+# expands it, which is the memory-tree kit's, and this kit copy-installs without it. Measured over
+# this corpus: 18 of 123 tracked `spec-audit` binding lines use the range form. A join that does not
+# expand blocks a unit that WAS audited under `TOOL-x-1..5`; a join that matches as a SUBSTRING lets
+# `TOOL-x-19` satisfy `TOOL-x-1`. This emits whole tokens, one per line, for a `grep -qxF` join.
+expand_id_runs() { # stdin: binding-line text -> stdout: ids, ranges expanded, one per line
+  awk '{
+    n = split($0, w, /[ \t]+/)
+    for (i = 1; i <= n; i++) {
+      t = w[i]
+      sub(/@rev-[0-9]+$/, "", t)
+      if (t ~ /^[A-Z]+-[A-Za-z0-9]+-[0-9]+\.\.[0-9]+$/) {
+        p = index(t, "..")
+        head = substr(t, 1, p - 1); hi = substr(t, p + 2) + 0
+        match(head, /[0-9]+$/); lo = substr(head, RSTART) + 0
+        stem = substr(head, 1, RSTART - 1)
+        for (k = lo; k <= hi; k++) print stem k
+      } else if (t ~ /^[A-Z]+-[A-Za-z0-9]+-[0-9]+$/) print t
+    }
+  }'
+}
+# ------------------------------------------------------- the IDLIST reader, ALL OR NOTHING
+# THE `asks:` VALUE IS AN IDLIST, NOT A BINDING LINE, and the expander above is the wrong reader for
+# it (closing diff review of dDerivedDocket, round 1, F2). A binding line carries words, so that
+# expander takes the ids out of it and DROPS everything else without a word - which over a mandate
+# dropped every form the IDLIST grammar admits and it did not know (`-5`, `-5..6`) and every form
+# that grammar refuses (`<id>,`, an elision). The producer's own `read_idlist` reads the same value
+# all or nothing and refuses those by name, so the set a run pinned was silently narrower than the
+# one the owner wrote, and every check keyed on it passed over the narrowed set.
+#
+# THIS IS THAT GRAMMAR, token for token, and a parity arm runs both readers over one table:
+#   an id `<FAMILY>-<slug>-<n>`, a trailing `@rev-<n>` dropped · a run `<FAMILY>-<slug>-<lo>..<hi>`
+#   with lo <= hi, expanded · a continuation `-<n>` or `-<lo>..<hi>` taking the family and slug of
+#   the id before it · and NOTHING ELSE. An elision (`...` or `…` anywhere in a token), a trailing
+#   comma, a run counting backwards, a continuation with no id before it and any other word refuse
+#   the WHOLE list.
+# WHAT IT DOES NOT CHECK: that a family is DECLARED. The producer reads the family set out of its own
+# conf, which this kit copy-installs without, so an undeclared family reads here and is refused by the
+# witness every caller runs next.
+#
+# DUPLICATES ARE KEPT, where the producer collapses them: the producer returns a set to iterate, this
+# returns the owner's own listing, and a caller that needs a set collapses it (`read_ask_scope` does).
+# The parity arm compares the two after that collapse.
+read_id_tokens() { # stdin: an IDLIST value -> `id<TAB><id>` and `bad<TAB><token><TAB><why>` lines, in token order
+  awk '
+    function refuse(t, why) { printf "bad\t%s\t%s\n", t, why }
+    {
+      n = split($0, w, /[ \t\r]+/)
+      for (i = 1; i <= n; i++) {
+        t = w[i]
+        if (t == "") continue
+        if (index(t, "...") || index(t, "\342\200\246")) {
+          refuse(t, "carries an elision, which names no id; write every one, or a lo..hi range"); continue
+        }
+        if (t ~ /^-[0-9]+(\.\.[0-9]+)?$/) {
+          if (stem == "") { refuse(t, "a continuation with no id before it to continue"); continue }
+          lo = substr(t, 2); hi = lo; p = index(lo, "..")
+          if (p) { hi = substr(lo, p + 2); lo = substr(lo, 1, p - 1) }
+          if (hi + 0 < lo + 0) { refuse(t, "a range that counts backwards"); continue }
+          for (k = lo + 0; k <= hi + 0; k++) printf "id\t%s-%d\n", stem, k
+          continue
+        }
+        if (t ~ /^[A-Z]+-[A-Za-z0-9]+-[0-9]+(@rev-[0-9]+)?$/) {
+          sub(/@rev-[0-9]+$/, "", t)
+          printf "id\t%s\n", t
+          stem = t; sub(/-[0-9]+$/, "", stem)
+          continue
+        }
+        if (t ~ /^[A-Z]+-[A-Za-z0-9]+-[0-9]+\.\.[0-9]+$/) {
+          p = index(t, ".."); head = substr(t, 1, p - 1); hi = substr(t, p + 2) + 0
+          match(head, /[0-9]+$/); lo = substr(head, RSTART) + 0; s = substr(head, 1, RSTART - 2)
+          if (hi < lo) { refuse(t, "a range that counts backwards"); continue }
+          for (k = lo; k <= hi; k++) printf "id\t%s-%d\n", s, k
+          stem = s
+          continue
+        }
+        refuse(t, "neither an id, an id range, nor a -N continuation")
+      }
+    }'
+}
+# The ids, or NOTHING and rc 1. A caller holding rc 1 names the refusal through the reader below;
+# one that prints what did parse is the narrowing this reader exists to refuse.
+read_id_list() { # IDLIST value -> its ids, one per line, in listing order; rc 1 and nothing printed when any token is refused
+  local _rows
+  _rows=$(printf '%s\n' "$1" | read_id_tokens)
+  case $'\n'"$_rows" in *$'\n'bad$'\t'*) return 1 ;; esac
+  [ -z "$_rows" ] || printf '%s\n' "$_rows" | awk -F'\t' '{ print $2 }'
+}
+read_id_list_refusals() { # IDLIST value -> every refused token and why, on ONE line; nothing when the list reads whole
+  printf '%s\n' "$1" | read_id_tokens \
+    | awk -F'\t' '$1 == "bad" { printf "%s`%s` (%s)", (k++ ? "; " : ""), $2, $3 } END { if (k) print "" }'
+}
+# The build folder an ask is FILED in: the slug segment of its own id. An id nobody filed still
+# names its home this way, which is what lets the P5 refusal say WHERE to go and look. MOVED HERE
+# from the driver with the expander above, and for the same reason: the leg reads the same blob per
+# home and a second spelling of "which folder" would send the two readers at different files.
+ask_home_of() { # ask id -> the slug segment
+  local _t="${1#*-}"; printf '%s' "${_t%-*}"
 }

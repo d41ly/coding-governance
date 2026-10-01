@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.49 -->
+<!-- gov:kit unattended@1.50 -->
 # The unattended-run kit
 
 The binding contract is not here. It is `UNATTENDED-PROTOCOL.md` together with
@@ -21,6 +21,13 @@ Run `adopt-unattended.sh` from this directory; `--check` verifies without writin
 
 Copied artifacts carry no placeholder, so rendering them would be a second spelling of `cat`. The
 rendered ones do carry placeholders, and for them a render is the only correct install.
+
+**Why the verb entries are not in the protocol.** The move was a BYTE decision and is recorded as
+one. That document had reached its cap EXACTLY, and a contract with no room left to state its next
+rule has stopped being amendable — which is a failure mode of the contract, not of whoever wrote the
+rule that would not fit. The sentence lived in the protocol itself until `TOOL-dDerivedDocket-3`
+needed the bytes; it is the kit's own history rather than a rule any run follows, so it belongs
+here, where nothing is capped.
 
 **One Skill placeholder is probed rather than read.** The Skill tells a run to execute the
 memory-tree kit's bug-class checklist, so it names that kit's `gotchas.py` by path. An adopter may
@@ -87,6 +94,55 @@ necessarily carries unresolved braces, so grading one reds on a target that is n
 until render time. That second exclusion was widened from the first the moment a second template
 existed.
 
+## Two arguments moved out of the protocol's section 2
+
+`TOOL-dDerivedDocket-22` needed protocol bytes for the derived terminal, and it funded them by moving
+the REASONING behind two section 2 rules here, where nothing is capped. Both RULES stay in the
+protocol: the roster at landing is frozen by `--landed` alone (by `--close` under `in-place`), and
+facts 5-7 and 9-11 are evidence that is never read back as an input. What follows is why.
+
+**Why the roster is frozen at landing.** While a run is LIVE the unit list derives from the build
+README, which cannot go stale between reads. But a FINISHED record must still say which units the
+run covered, and that README is mutable: a later build adding a unit would change a landed run's
+answer retroactively. Freezing the ids keeps a terminal record a record.
+
+**Why the evidence facts are never inputs.** A verb branching on the recorded anchor kind would take
+a security decision from a value its subject wrote, the class this kit has been burned by three
+times; the derivation is monotone instead. They exist so a party outside this process can re-derive
+the pin without trusting a byte the run wrote, which is the only form of verification §9 concludes
+actually binds.
+
+## Why `brief-recorded` anchors on the build commit
+
+`TOOL-dDerivedDocket-28` needed a protocol key-table row for `PROCMON_CMD` and funded it by moving
+the ARGUMENT out of the `BRIEF_RECORDED_CUTOFF` row. The rule stays in the protocol: the anchor is
+the build commit and NOT its first parent. Why, unlike its `PASS_ORDER_CUTOFF` sibling: `--brief`
+STAGES its row, so the row lands in the same commit as the pass, and a first-parent anchor would red
+the CONFORMING runs. The two terms are jointly satisfiable — a spec in an earlier commit, the brief
+row alongside the code.
+
+## The process ledger — why the driver's death defines an orphan
+
+Every command the driver starts is recorded by identity in a per-slug ledger, and only a recorded
+process whose driver is gone is reaped (`UNATTENDED-STOPS.md` §14 is the rule). Two narrower
+definitions were rejected. "Any recorded process alive" kills the bar a background `--close` is
+still waiting on. "Recorded under a different keepalive id" never reaps a same-session orphan, which
+is the case that was observed: the harness killed the driver mid-bar and the session lived on.
+Matching by command line was rejected outright, because five of the six same-named processes one run
+found belonged to another repository. The driver never kills the pid itself either: a bare `kill -9`
+on a tree's top left every descendant alive, and a native process ignores the MSYS signal, which is
+why the declared reaper walks leaves first and verifies by a second census.
+
+## Why `RECALL_CLI` and `MAP_CLI` are declarations
+
+Both name a repo-relative path in `.unattended.conf` rather than carrying one in the driver, and the
+argument for that form lives here rather than in the protocol's key table, which states what each key
+IS. A kit literal in shipped bytes resolves to nothing in a tree installed at another prefix — the
+carried-prefix ratchet reds on exactly that. `MAP_CLI` is a declaration for the same reason its sibling
+is one. Until it existed the map log was a write-only surface: the unit that specced this reader shipped
+the logger and not the reader, and its acceptance ledger recorded a gate accepting a declaration that was
+nowhere in the product.
+
 ## The resume tick — registration is the owner's
 
 `resume-tick.sh` is the one keepalive actor that does not share the session's process: an
@@ -131,6 +187,60 @@ line per API-error end the stall-recorder saw (unit 4); `resume.<slug>.log`, one
 tick, with the launcher `resume.<slug>.<utc>.sh` and its `.out` beside it (unit 5). Append-only and
 never tracked; read by `--liveness`, `--status`, `--landed` and the tick.
 
+## The bar `--close` runs
+
+`gates-green` runs `GATE_CMD` under a run id the driver pins, attributes a red against the tip the
+remote advertises, and hands the bar the inherited-red policy it read at that tip. It then reads that
+bar's own run record: an inherited-only red within its age bound is met under `land`, parks as the
+`inherited-red` hold under `park`, and files an ask for each inherited leg once `ASKS_CMD` is
+declared. The contract is `UNATTENDED-STOPS.md`. One residual moved here from the protocol's §3 when
+that arm grew its decision table (`TOOL-dDerivedDocket-24`): two runs CLOSING together in one clone
+contend on the bar's turnstile. Where the project declares a profile, the queue wait has its own term
+in the bar's backstop and the second run waits it out; where it does not, the wait is charged
+against `GATE_BOUND`, so the second can fail `gates-green` for contention.
+
+## The bar's bound — wall, queue and margin
+
+`TOOL-dDerivedDocket-27`, under owner ruling D12-i7. The unattended bar has ONE declared number,
+`GATE_WALL`, the runner's whole-run wall, and `GATE_PROFILE_CMD` is the command that prints the
+runner's resolved profile. `--preflight` runs that command under `GATE_BOUND` and pins the bar's
+bound as the `gate-backstop` fact: the wall, plus the turnstile's queue bound, plus a margin that
+is a source constant of the driver. The runner arms its wall only after the queue, so a bound that
+charged the queue to `GATE_BOUND` killed a close for contention with its bar never started.
+
+- **Blank `GATE_PROFILE_CMD` is where every adopter starts.** The bar has no backstop and stays at
+  `GATE_BOUND`, announced at `--preflight` and at every `gates-green`. A profile that answers without
+  a usable `wall` or `queue` falls back the same way and names the key it lacked. Probing
+  `$GATE_CMD --print-profile` instead would guess that the declared gate is this repository's
+  runner, and a gate that ignores its arguments would run a whole bar at preflight.
+- **Blank `GATE_WALL` leaves the profile's own wall in force**, and the driver's NOTE says so. A value
+  that is not a positive integer refuses at conf load, on `GATE_BOUND`'s terms. The driver hands a
+  declared wall to `$GATE_CMD` and to no other command, so the push-boundary bar keeps the profile's.
+- **A wall below the largest leg ceiling is refused**, by `--preflight` and by the kit gate, naming
+  both numbers: it fires on a healthy bar that dispatches that leg. Where the profile cannot answer,
+  the kit gate announces on its report channel that it cannot compare, and does not red.
+
+`gates-green` then reads how the bar ended. An exit 3, TREE MOVED, runs it once more; an exit 4,
+HOST, prints a `host-degraded` hold released by `probe host`. A kill at the backstop before the bar
+printed `gate queue: acquired` prints a `host-degraded` hold released by `probe gate`. A kill after
+that line is the bar never returning, which no hold fits.
+
+## Two restatements moved out of the protocol's key table
+
+`TOOL-dDerivedDocket-27` widened the key table's `GATE_CMD` cell to carry the two keys above and
+funded the bytes by moving one RESTATEMENT and one ARGUMENT here. Both RULES stay in the table:
+`UNIT_STALL_BOUND` is OPTIONAL on `GATE_BOUND`'s terms, and `REVIEW_ROUNDS` also refuses a value at
+or above the runaway ceiling.
+
+**What `GATE_BOUND`'s terms are, for `UNIT_STALL_BOUND`.** The row keeps the pointer, and the sibling
+`GATE_BOUND` row states the terms in full. Spelled out, on one line so a reader can grep for the
+passage the row gave up:
+absent takes the kit default and says so on stderr; non-numeric or zero is a refusal.
+
+**Why `REVIEW_ROUNDS` refuses a value at or above the runaway ceiling.** The row keeps the refusal;
+this is its reason:
+because the ceiling would fire first and the declared bound could never be reached.
+
 ## Running the kit's own checks
 
 ```
@@ -147,5 +257,7 @@ run-unattended-gates.sh --pooled # the DoD for work touching this kit: parity ag
 
 The self-tests are deliberately **not** on the merge bar. A suite that stages breaks into a copy of
 a checker has a job only when that checker's source changes, and none at all in an adopter's repo
-that copy-installs this kit and never edits it. The legs whose subject is the *repository* stayed on
-the bar, because those go stale with nobody editing the kit; `<prefix>/gate-legs.json` names which.
+that copy-installs this kit and never edits it. So those suites left both the merge bar's leg
+manifest and this kit's own `kit.toml`, and adopters stop receiving them too. The legs whose
+subject is the *repository* stayed on the bar, because those go stale with nobody editing the kit;
+`<prefix>/gate-legs.json` names which.

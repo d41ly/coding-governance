@@ -1,0 +1,370 @@
+# dDerivedDocket - run state
+
+Created by `unattended.sh --preflight`. The unit list is NOT copied here — it is DERIVED
+from the build README on every read, so it cannot go stale between them. This file holds
+only what nothing else does: the phase and its witness, the keepalive id, the pinned BASE
+with its anchor evidence, and the parked decisions.
+
+<!-- run:generated -->
+<!-- /run:generated -->
+
+## Run facts
+asks-at-landing: TOOL-dDerivedDocket-38=OPEN TOOL-dDerivedDocket-39=OPEN TOOL-dDerivedDocket-40=OPEN TOOL-dDerivedDocket-41=OPEN TOOL-dDerivedDocket-42=OPEN TOOL-dDerivedDocket-43=OPEN TOOL-dDerivedDocket-44=OPEN TOOL-dDerivedDocket-45=OPEN TOOL-dDerivedDocket-46=OPEN TOOL-dDerivedDocket-47=OPEN TOOL-dDerivedDocket-55=OPEN TOOL-dDerivedDocket-56=OPEN TOOL-dDerivedDocket-57=OPEN TOOL-dDerivedDocket-58=OPEN TOOL-dDerivedDocket-59=OPEN TOOL-dDerivedDocket-60=OPEN TOOL-dDerivedDocket-66=OPEN TOOL-dDerivedDocket-67=OPEN TOOL-dDerivedDocket-68=OPEN TOOL-dDerivedDocket-69=OPEN
+units-at-landing: TOOL-dDerivedDocket-1 TOOL-dDerivedDocket-2 TOOL-dDerivedDocket-4 TOOL-dDerivedDocket-3 TOOL-dDerivedDocket-5 TOOL-dDerivedDocket-37 TOOL-dDerivedDocket-6 TOOL-dDerivedDocket-7 TOOL-dDerivedDocket-8 TOOL-dDerivedDocket-9 TOOL-dDerivedDocket-10 TOOL-dDerivedDocket-11 TOOL-dDerivedDocket-12 TOOL-dDerivedDocket-13 TOOL-dDerivedDocket-50 TOOL-dDerivedDocket-14 TOOL-dDerivedDocket-51 TOOL-dDerivedDocket-53 TOOL-dDerivedDocket-15 TOOL-dDerivedDocket-48 TOOL-dDerivedDocket-49 TOOL-dDerivedDocket-16 TOOL-dDerivedDocket-17 TOOL-dDerivedDocket-52 TOOL-dDerivedDocket-18 TOOL-dDerivedDocket-54 TOOL-dDerivedDocket-19 TOOL-dDerivedDocket-20 TOOL-dDerivedDocket-21 TOOL-dDerivedDocket-22 TOOL-dDerivedDocket-23 TOOL-dDerivedDocket-29 TOOL-dDerivedDocket-25 TOOL-dDerivedDocket-30 TOOL-dDerivedDocket-33 TOOL-dDerivedDocket-24 TOOL-dDerivedDocket-26 TOOL-dDerivedDocket-28 TOOL-dDerivedDocket-27 TOOL-dDerivedDocket-31 TOOL-dDerivedDocket-32 TOOL-dDerivedDocket-61 TOOL-dDerivedDocket-62 TOOL-dDerivedDocket-63 TOOL-dDerivedDocket-64 TOOL-dDerivedDocket-65 TOOL-dDerivedDocket-34 TOOL-dDerivedDocket-35 PLAY-dDerivedDocket-1 TOOL-dDerivedDocket-36 DEPL-dDerivedDocket-1
+gates-run: unattended-1790696014933778447-3921195 620137e8
+parked-surfaced: yes
+keepalive-reaped: yes
+lease-utc: 2026-09-28T17:10:32Z
+pid-image: claude.exe
+host: compeeto
+pid: 37484
+session: 2588f719-5358-4984-93bc-1f908a71e0ab
+hold-run: 
+hold-streak: 1 · at b052863c
+resume-owed: none · owner
+held-at: 2026-09-28T15:28:31Z
+hold-reason: VERIFYING is done except what only the owner may authorize: the unattended kit's own self-test suites (run-unattended-gates.sh --serial --attribute fb07ca25, or --pooled), which the standing instruction says are not run on the owner's behalf. 61 acceptance criteria and hygiene check 23's two green-run criteria wait on that run (parked rows 73 and 75); the final bar at bed37c25 is 121 of 122 green, the one red being check 23. Resume with --resume after that run or a permission to make it.
+hold-until: owner
+hold-code: host-owner-action
+held-from: VERIFYING
+witness: ef34d15c537c1b990ed3f6608c20296e7db46d81
+phase: LANDING
+branch-sha: abac6d59cae3baf711fac4d275bf13a401e01901
+branch-ref: refs/heads/branch/backlog-maintenance-mechanics-10588f
+mode: prompt
+anchor-kind: run-branch
+keepalive: c6325dfb
+anchor-url: https://github.com/d41ly/coding-governance
+anchor-sha: 7484d8d7b107c0357943345e11d9b1d9bc337bea
+anchor-ref: refs/heads/main
+base: abac6d59cae3baf711fac4d275bf13a401e01901
+
+## Parked
+
+2026-09-14T01:23:21Z rescope · item retire TOOL-dDerivedDocket-14 · reason regrounding at BASE found the work already landed: TOOL-cSpliceWarden-2 (CLOSED before BASE) made hygiene check 10 resolve backlog archives by filename, admit the b suffix and announce a skip; the spec is a WONTDO record naming that successor and re-checks the claim in its section 6
+
+2026-09-14T07:26:03Z review · item dDerivedDocket-specs-g1 · reason verdict BLOCKED · blockers 4
+
+2026-09-14T07:26:03Z review · item dDerivedDocket-specs-g2 · reason verdict BLOCKED · blockers 5
+
+2026-09-14T07:26:03Z review · item dDerivedDocket-specs-g3 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED
+
+2026-09-14T07:26:04Z review · item dDerivedDocket-specs-g4 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED
+
+2026-09-14T07:26:04Z review · item dDerivedDocket-specs-g5 · reason verdict BLOCKED · blockers 6
+
+2026-09-14T08:53:20Z decision · item Should BUILD-METHOD M7 step 1 pass --keepalive-id to --resume, so a lease holder's regrounding orients without a refusal? · reason Options: (a) edit M7 in the memory-tree template and its render; (b) leave M7, and unit 4's no-id resume prints the status block (phase and witness M7 needs) then refuses naming --keepalive-id. Refused: BUILD-METHOD is a governance carrier no unit scopes for M7, so veto 2. Folded meanwhile: (b), fully functional.
+
+2026-09-14T08:53:20Z decision · item Should researched and solution-tested (M12) bind ask-driven runs, which D12-a routes through a scaffolded slug-mode README carrying no chosen solution? · reason Options: (a) widen both directive entries to records carrying asks:, with a driver arm; (b) a DECISIONS row that per-ask orientation (unit 20 S6) replaces M12 for those runs; (c) status quo, with the gap stated in units 15 and 16. Refused: owner ruling TOOL-aPromptedMandate-4 scopes both directives to prompt runs; (a) widens it and (b) restates its reach. Folded meanwhile: (c).
+
+2026-09-14T08:53:21Z decision · item Should gov's governance carriers be edited to describe the push boundary D12-i4 changes (AGENTS.md merge-bar sentences, the section 7 green-suite line, the unattended protocol)? · reason Options: (i) unit 24 edits them; (ii) route AGENTS.md and protocol text through unit 36 and the template sentence through PLAY-dDerivedDocket-1; (iii) edit no carrier and let unit 24's DECISIONS row record the departure. Refused: (i) and (ii) change governance carriers no D12-i4 consequence names (veto 2). Folded meanwhile: (iii).
+
+2026-09-14T08:53:21Z decision · item Should check-wiring write core.hooksPath as an ABSOLUTE path, so the straggler-guard hook layer fires inside a linked straggler worktree? · reason Options: (a) write absolute when unset and upgrade relative values; (c) write absolute only when unset and report a relative one; (d) keep the relative .githooks value. Refused: (a) reverses the never-overwrite rule in check-wiring's header and AGENTS.md and rewrites persistent user config; (c) changes the value every adopter gets and brings back TOOL-aWeldedTribunal-7's hazard. Vetoes 2 and 3. Folded meanwhile: (d), the hook layer recorded inert under a relative value; the permanent transition audit still binds.
+
+2026-09-14T08:53:21Z decision · item AGENTS.md says core.hooksPath is repo-GLOBAL so the hook gating a push is the PRIMARY tree's; that is false under the relative value this repo's wiring writes. Should this build correct it? · reason Options: (i) unit 13 or PLAY-dDerivedDocket-1 corrects the sentence; (ii) leave it to the owner. Refused: the merge-bar paragraph of AGENTS.md is a governance carrier no unit scopes for that sentence (veto 2). It blocks nothing.
+
+2026-09-14T09:07:47Z rescope · item add TOOL-dDerivedDocket-37 · reason Protocol section 11 adoption. The round-1 spec audits found by hand, in two groups, a hands-off bullet promising a sibling a token the sibling never names. After the fold, a probe over this build's 37 live specs graded 131 hands-off payload tokens and found three more (units 7, 10 and 13 handing units 11, DEPL and 35 a token those never name), fixed by the orchestrator. The join makes the spec-tokens leg red where it should; nothing measured worsens; gov-internal file exempt from shipping, so no veto.
+
+2026-09-16T11:19:34Z review · item dDerivedDocket-specs-g1 · reason verdict BLOCKED · blockers 2
+
+2026-09-16T11:19:34Z review · item dDerivedDocket-specs-g2 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED
+
+2026-09-16T11:19:35Z review · item dDerivedDocket-specs-g5 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED
+
+2026-09-16T13:42:16Z decision · item Should this build correct the root README.md:56 sentence that an unattended run replaces the explicit-ask checkpoint with a committed standing mandate it ASSERTS and cannot have written, which is false for a run the protocol's second (published) anchor authorizes? · reason Options: (i) PLAY-dDerivedDocket-1 extends S8 to README.md:56 and drops its Non-goal that the root README is untouched; (ii) leave the line to the owner. Refused: (i) contradicts a written Non-goal and changes a carrier no unit scopes for that line (veto 2). Folded meanwhile: (ii); PLAY F7 corrects the two AGENTS.md lines carrying the same claim. It blocks nothing.
+
+2026-09-16T13:42:40Z review · item dDerivedDocket-specs-g6 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED
+
+2026-09-20T10:03:54Z decision · item Two owner rulings now conflict: D12-h and D12-i8 let twelve units of this build run the unattended suites once at each unit's end, while the later aDeferredBar ruling landed on main says unattended self-tests and gates never run inside build agents, and wires tools/unattended/gate-guard.js to deny them before VERIFYING. Which binds this build? · reason Options: (a) every attributed suite runs once at VERIFYING, after the last unit, which is what the landed rule and the hook allow; (b) a gate-guard exception keyed on this build's run-state file; (c) an owner re-ruling that restores the per-unit runs. Refused: both sides are owner rulings, and the later one is mechanically enforced by a hook no unit of this build scopes. Folded meanwhile: (a), because an acceptance criterion whose observation the hook denies cannot be met in a pass; every such criterion takes a permission line deferring it to the VERIFYING run, and the README's self-test list goes with it.
+
+2026-09-20T11:24:07Z decision · item Correction to the suite-permission question parked earlier today: how wide is the denied population, and does unit 1 have a route at all? · reason Measured at HEAD in tools/unattended/gate-guard.js: the hook carries THREE suite deny rows, not one. D2 denies a command whose head word ends run-selftests.sh, D3 one ending run-unattended-gates.sh, D4 one ending .test.sh or selftest.py; all three are exempt only for the five read-only verbs --list --check --rank --help --render, and --attribute is not one of them. So every attributed suite run in this build is denied, not merely disfavoured. A second carrier is checker-side: the bar join TOOL-aDeferredBar-2 added to tools/check-spec-tokens.py. TOOL-dDerivedDocket-1 is the one unit the deferral cannot reach, because it BUILDS --attribute and no post-build run exercises it. Folded meanwhile: its criteria run inside their own scratch-repository fixtures, whose cwd carries no .unattended.conf, where the hook fails open by its own header; every other attributed run defers to the VERIFYING run.
+
+2026-09-20T15:49:13Z review · item dDerivedDocket-specs-g1 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED
+
+2026-09-20T15:49:14Z review · item dDerivedDocket-specs-g2-folds · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED
+
+2026-09-20T15:49:14Z review · item dDerivedDocket-specs-g4-folds · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED
+
+2026-09-20T15:49:14Z review · item dDerivedDocket-specs-g5-folds · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED
+
+2026-09-20T15:49:15Z review · item dDerivedDocket-specs-g6-folds · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED
+
+2026-09-20T15:49:32Z review · item dDerivedDocket-specs-g3-folds · reason verdict BLOCKED · blockers 1 · BOUNDED · disposition promote
+
+2026-09-20T15:49:33Z rescope · item add TOOL-dDerivedDocket-48 · reason Promoted from the G3 round-2 spec audit's standing blocker at the review bound: units 16 and 17 route the ASKS_CMD witness through run_bounded, which redirects stdout and stderr into one capture file, so every notice unit 15 moved to stderr lands inside the text unit 17's parse rule refuses on and a healthy producer reads as a DEAD PROBE. No spec in the set carries a stream-splitting capture, so the fix is a unit rather than a fold.
+
+2026-09-20T15:50:37Z rescope · item add TOOL-dDerivedDocket-49 · reason Promoted at the G3 bounded exit (H1, id 1): unit 16 AC18 asserts the one next: shape its own fixture forbids, so the UNDECIDED contract and the fixture disagree and no unit scopes the reconciliation.
+
+2026-09-20T15:50:38Z rescope · item add TOOL-dDerivedDocket-50 · reason Promoted at the G3 bounded exit (H2, ids 7 and 32): unit 15 AC13 reaches anchor_at through RECALL_CLI, a route the memory-tree kit declares nowhere, so the witness rests on an undeclared seam.
+
+2026-09-20T15:50:38Z rescope · item add TOOL-dDerivedDocket-51 · reason Promoted at the G3 bounded exit (H3, id 22): the fixture ids of unit 15 AC13 sit in the EXMP family the row grammar does not admit, so anchor_at returns None and the criterion is green before the unit acts.
+
+2026-09-20T15:50:38Z rescope · item add TOOL-dDerivedDocket-52 · reason Promoted at the G3 bounded exit (H4, id 24): rotation renames a record inside its folder, so unit 18's announced ancestry fallback never fires and the rotated-record premise is false.
+
+2026-09-20T15:50:39Z rescope · item add TOOL-dDerivedDocket-53 · reason Promoted at the G3 bounded exit (H5, id 25): --at pins the records a read sees and leaves the conf at evaluation time, against the purity unit 18 F3 resolved by assertion.
+
+2026-09-20T15:50:39Z rescope · item add TOOL-dDerivedDocket-54 · reason Promoted at the G3 bounded exit (H6, id 27): unit 19's cross-run exclusion probe is history-simplified, reproduced in a scratch repo where --full-history prints the merge plain rev-list hides.
+
+2026-09-20T15:51:14Z decision · item Should a run's --close export GATE_SELFTESTS=1 for the VERIFYING bar, when the charter records that flag as ON DEMAND ONLY with no boundary setting it (AGENTS.md merge-bar section, owner 2026-08-27), while the same charter says a kit-work Definition of Done owes the flagged bar? · reason Options: (a) --close exports it, so a kit build cannot land without the suites, which is what TOOL-dDerivedDocket-3 S3 wrote; (b) --close never sets it and the run sets it by hand at VERIFYING, naming the command in the record. Refused: the two charter sentences are in tension and only the owner can say which binds; unit 3 had picked (a) silently, with no citation and no supersession. Folded meanwhile: (b), which keeps the recorded ruling intact and leaves the flagged bar an explicit act the run records.
+
+2026-09-20T18:40:23Z review · item dDerivedDocket-specs-g7 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED
+
+2026-09-20T19:34:22Z dispatch · item c1b4d827 TOOL-dDerivedDocket-1 · reason tools/run-gates/run-selftests.sh tools/run-gates/run-selftests.test.sh tools/run-gates/run-gates.sh tools/run-gates/README.md tools/unattended/run-unattended-gates.sh tools/unattended/kit.toml tools/unattended/unattended.sh tools/unattended/check-unattended.sh tools/unattended/check-pass-order.sh tools/unattended/check-brief-recorded.sh tools/unattended/gate-guard.js tools/unattended/PLAYBOOK-TEMPLATE.template.md tools/unattended/PROTOCOL.template.md tools/unattended/README.md tools/unattended/SKILL.template.md tools/unattended/VERBS.template.md tools/unattended/playbook.fixture.md tools/unattended/playbook.fixture.template.md .claude/skills/unattended/SKILL.md memory/guides/PLAYBOOK-TEMPLATE.md memory/guides/UNATTENDED-PROTOCOL.md memory/guides/UNATTENDED-VERBS.md .githooks/gate-env.sh memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-1.md memory/builds/dDerivedDocket/build/2026-09-20-build-TOOL-dDerivedDocket-1-1-acceptance-ledger.md memory/map/features memory/LIVE.md
+
+2026-09-20T19:34:27Z brief · item TOOL-dDerivedDocket-1 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
+
+2026-09-20T19:51:24Z dispatch · item c1b4d827 TOOL-dDerivedDocket-1 · reason tools/run-gates/run-selftests.sh tools/run-gates/run-selftests.test.sh tools/run-gates/run-gates.sh tools/run-gates/README.md tools/unattended/run-unattended-gates.sh tools/unattended/kit.toml tools/unattended/unattended.sh tools/unattended/check-unattended.sh tools/unattended/check-pass-order.sh tools/unattended/check-brief-recorded.sh tools/unattended/gate-guard.js tools/unattended/PLAYBOOK-TEMPLATE.template.md tools/unattended/PROTOCOL.template.md tools/unattended/README.md tools/unattended/SKILL.template.md tools/unattended/VERBS.template.md tools/unattended/playbook.fixture.md tools/unattended/playbook.fixture.template.md .claude/skills/unattended/SKILL.md memory/guides/PLAYBOOK-TEMPLATE.md memory/guides/UNATTENDED-PROTOCOL.md memory/guides/UNATTENDED-VERBS.md memory/guides/SESSION-KICKOFF.md .githooks/gate-env.sh memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-1.md memory/builds/dDerivedDocket/build/2026-09-20-build-TOOL-dDerivedDocket-1-1-acceptance-ledger.md memory/map/features memory/map/generated memory/LIVE.md
+
+2026-09-20T20:03:06Z dispatch · item 94c12e2f TOOL-dDerivedDocket-2 · reason tools/push-main.sh tools/push-main.test.sh memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-2.md memory/builds/dDerivedDocket/build memory/builds/dDerivedDocket/README.md memory/LIVE.md memory/ledger memory/map/features memory/map/generated
+
+2026-09-20T20:03:10Z brief · item TOOL-dDerivedDocket-2 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
+
+2026-09-20T20:38:35Z dispatch · item da437bd4 TOOL-dDerivedDocket-4 · reason tools/unattended/unattended.sh tools/unattended/check-unattended.sh tools/unattended/unattended.test.sh tools/unattended/check-unattended.test.sh tools/unattended/PROTOCOL.template.md tools/unattended/VERBS.template.md tools/unattended/SKILL.template.md tools/unattended/STOPS.template.md tools/unattended/kit.toml tools/unattended/adopt-unattended.sh tools/unattended/.unattended.conf.example .unattended.conf memory/guides/UNATTENDED-PROTOCOL.md memory/guides/UNATTENDED-STOPS.md memory/guides/UNATTENDED-VERBS.md .claude/skills/unattended/SKILL.md memory/map/features/unattended.md memory/map/generated memory/map/baseline.toml memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-4.md memory/builds/dDerivedDocket/build memory/LIVE.md memory/ledger
+
+2026-09-20T20:38:40Z brief · item TOOL-dDerivedDocket-4 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
+
+2026-09-20T21:21:32Z dispatch · item da437bd4 TOOL-dDerivedDocket-4 · reason memory/guides/SESSION-KICKOFF.md
+
+2026-09-20T21:23:22Z dispatch · item da437bd4 TOOL-dDerivedDocket-4 · reason memory/builds/dDerivedDocket/README.md
+
+2026-09-20T21:37:36Z dispatch · item 315eb4bb TOOL-dDerivedDocket-4 · reason memory/project/unarmed-branches.txt
+
+2026-09-20T21:48:37Z dispatch · item b7514c28 TOOL-dDerivedDocket-3 · reason tools/unattended/unattended.sh tools/unattended/check-unattended.sh tools/unattended/unattended.test.sh tools/unattended/check-unattended.test.sh tools/unattended/SKILL.template.md tools/unattended/PROTOCOL.template.md tools/unattended/STOPS.template.md tools/unattended/.unattended.conf.example tools/unattended/README.md .unattended.conf memory/guides/UNATTENDED-PROTOCOL.md memory/guides/UNATTENDED-STOPS.md .claude/skills/unattended/SKILL.md memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-3.md memory/builds/dDerivedDocket/build memory/builds/dDerivedDocket/README.md memory/LIVE.md memory/ledger memory/map/features memory/map/generated
+
+2026-09-20T21:48:42Z brief · item TOOL-dDerivedDocket-3 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
+
+2026-09-20T22:22:35Z decision · item TOOL-dDerivedDocket-3 S9 owes memory/DECISIONS.md a row superseding TOOL-dClosedLexicon-11's 'no verb here commits' clause, and a unit pass cannot write it. · reason Options seen: (a) declare memory/DECISIONS.md in the unit's write set - REFUSED by --dispatch check 49, which forbids a declared write overlapping a SHARED_RECORDS entry outright rather than conditionally; (b) write it undeclared - refused by kit-gate check 23, whose subset test reds a path outside the declaration; (c) a second commit not naming the unit, which evades check 23's window rather than satisfying it. Refused to take (c): it defeats a guard the build method and the kit both state. Folded meanwhile: the unit retires the premise from all three SHIPPED carriers (protocol, driver comment, test comment - AC14's greps each read 0) and the spec goes to rev-6 recording that the log row is OWED and handed to the orchestrator, which writes outside a pass. Until it is written, memory/DECISIONS.md:81 still states the retired premise with nothing pointing away from it.
+
+2026-09-20T22:27:42Z dispatch · item b7514c28 TOOL-dDerivedDocket-3 · reason memory/guides/SESSION-KICKOFF.md
+
+2026-09-20T22:37:03Z dispatch · item cdab9836 TOOL-dDerivedDocket-5 · reason tools/unattended/unattended.sh tools/unattended/check-unattended.sh tools/unattended/adopt-unattended.sh tools/unattended/unattended.test.sh tools/unattended/check-unattended.test.sh tools/unattended/adopt-unattended.test.sh tools/unattended/SKILL.template.md tools/unattended/VERBS.template.md tools/unattended/PROTOCOL.template.md tools/unattended/STOPS.template.md tools/unattended/.unattended.conf.example tools/unattended/README.md tools/unattended/kit.toml .unattended.conf memory/guides/UNATTENDED-PROTOCOL.md memory/guides/UNATTENDED-VERBS.md memory/guides/UNATTENDED-STOPS.md .claude/skills/unattended/SKILL.md memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-5.md memory/builds/dDerivedDocket/build memory/builds/dDerivedDocket/README.md memory/LIVE.md memory/ledger memory/map/features memory/map/generated
+
+2026-09-20T22:37:08Z brief · item TOOL-dDerivedDocket-5 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
+
+2026-09-20T23:11:43Z dispatch · item cdab9836 TOOL-dDerivedDocket-5 · reason memory/guides/SESSION-KICKOFF.md
+
+2026-09-20T23:20:19Z dispatch · item de946d81 TOOL-dDerivedDocket-37 · reason tools/check-spec-tokens.py tools/check-spec-tokens.test.sh .memory-tree.conf memory/guides/SESSION-KICKOFF.md memory/map/features/spec-tokens.md memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-37.md memory/builds/dDerivedDocket/build/2026-09-21-build-TOOL-dDerivedDocket-37-1-acceptance-ledger.md
+
+2026-09-20T23:20:23Z brief · item TOOL-dDerivedDocket-37 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
+
+2026-09-20T23:43:51Z dispatch · item 82df05c9 TOOL-dDerivedDocket-6 · reason tools/memory-tree/backlog.py tools/memory-tree/gen_build_index.py tools/memory-tree/.memory-tree.conf.example tools/memory-tree/kit.toml memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-6.md memory/builds/dDerivedDocket/build/2026-09-21-build-TOOL-dDerivedDocket-6-1-acceptance-ledger.md memory/map/features/memory-tree-backlog.md memory/map/generated/MAP.md memory/map/generated/symbols.json memory/map/generated/inventories.json
+
+2026-09-20T23:44:15Z brief · item TOOL-dDerivedDocket-6 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
+
+2026-09-21T00:07:48Z dispatch · item 82df05c9 TOOL-dDerivedDocket-6 · reason tools/memory-tree/backlog.py tools/memory-tree/gen_build_index.py tools/memory-tree/.memory-tree.conf.example tools/memory-tree/kit.toml memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-6.md memory/builds/dDerivedDocket/build/2026-09-21-build-TOOL-dDerivedDocket-6-1-acceptance-ledger.md memory/builds/dDerivedDocket/README.md memory/map/generated/symbols.json
+
+2026-09-21T00:16:41Z dispatch · item f6e64114 TOOL-dDerivedDocket-7 · reason tools/memory-tree/backlog.py tools/memory-tree/gen_build_index.py tools/memory-tree/.memory-tree.conf.example tools/memory-tree/kit.toml memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-7.md memory/builds/dDerivedDocket/build/2026-09-21-build-TOOL-dDerivedDocket-7-1-acceptance-ledger.md memory/map/features/memory-tree.md memory/map/generated/MAP.md memory/map/generated/symbols.json memory/map/generated/inventories.json
+
+2026-09-21T00:16:45Z brief · item TOOL-dDerivedDocket-7 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
+
+2026-09-21T00:55:38Z dispatch · item e7d3f70a TOOL-dDerivedDocket-8 · reason tools/memory-tree/check-memory-hygiene.sh tools/memory-tree/check-memory-hygiene.test.sh tools/memory-tree/corpus_ids.py tools/memory-tree/row_grammar.py tools/memory-tree/HYGIENE.template.md memory/HYGIENE.md tools/memory-tree/SPEC-TEMPLATE.template.md memory/TEMPLATE-SPEC.md .memory-tree.conf tools/install-prefix-waivers.txt memory/map/generated memory/map/features memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-8.md memory/builds/dDerivedDocket/build memory/builds/dDerivedDocket/README.md memory/LIVE.md memory/ledger
+
+2026-09-21T00:55:43Z brief · item TOOL-dDerivedDocket-8 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
+
+2026-09-21T01:23:09Z dispatch · item e7d3f70a TOOL-dDerivedDocket-8 · reason tools/memory-tree/check-memory-hygiene.sh tools/memory-tree/check-memory-hygiene.test.sh tools/memory-tree/corpus_ids.py tools/memory-tree/row_grammar.py tools/memory-tree/HYGIENE.template.md memory/HYGIENE.md tools/memory-tree/SPEC-TEMPLATE.template.md memory/TEMPLATE-SPEC.md .memory-tree.conf tools/install-prefix-waivers.txt tools/install-prefix-carried.txt memory/map/generated memory/map/features memory/guides/SESSION-KICKOFF.md memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-8.md memory/builds/dDerivedDocket/build memory/builds/dDerivedDocket/README.md memory/LIVE.md memory/ledger
+
+2026-09-21T01:29:53Z dispatch · item e8e8f4b5 TOOL-dDerivedDocket-9 · reason tools/memory-tree/transition_audit.py tools/memory-tree/transition-audit.test.sh tools/memory-tree/check-memory-hygiene.sh tools/memory-tree/HYGIENE.template.md memory/HYGIENE.md tools/memory-tree/kit.toml .githooks/commit-msg tools/gate-legs.json tools/check-wiring.sh tools/check-wiring.test.sh tools/govkit/registry.toml tools/govkit/subject-pins.tsv tools/install-prefix-waivers.txt tools/install-prefix-carried.txt memory/project/transition-audit.txt memory/map/generated memory/map/features memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-9.md memory/builds/dDerivedDocket/build memory/builds/dDerivedDocket/README.md memory/LIVE.md memory/ledger
+
+2026-09-21T01:29:59Z brief · item TOOL-dDerivedDocket-9 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
+
+2026-09-21T02:14:12Z dispatch · item e8e8f4b5 TOOL-dDerivedDocket-9 · reason tools/memory-tree/transition_audit.py tools/memory-tree/transition-audit.test.sh tools/memory-tree/check-memory-hygiene.sh tools/memory-tree/HYGIENE.template.md memory/HYGIENE.md tools/memory-tree/kit.toml .githooks/commit-msg .gitattributes tools/gate-legs.json tools/check-wiring.sh tools/check-wiring.test.sh tools/govkit/registry.toml tools/govkit/subject-pins.tsv memory/project/transition-audit.txt memory/map/generated memory/map/features memory/guides/SESSION-KICKOFF.md memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-9.md memory/builds/dDerivedDocket/build memory/builds/dDerivedDocket/README.md memory/LIVE.md memory/ledger
+
+2026-09-21T02:29:24Z dispatch · item 49c2467b TOOL-dDerivedDocket-10 · reason tools/memory-tree/merge-rows.py tools/memory-tree/merge-rows.test.sh tools/gate-legs.json tools/govkit/registry.toml tools/govkit/subject-pins.tsv memory/map/features/memory-tree-merge-driver.md memory/map/generated/MAP.md memory/map/generated/symbols.json memory/map/generated/inventories.json memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-10.md memory/builds/dDerivedDocket/build/2026-09-21-build-TOOL-dDerivedDocket-10-1-acceptance-ledger.md memory/builds/dDerivedDocket/README.md memory/LIVE.md
+
+2026-09-21T02:29:28Z brief · item TOOL-dDerivedDocket-10 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
+
+2026-09-21T03:13:35Z dispatch · item b8a77337 TOOL-dDerivedDocket-11 · reason tools/memory-tree/migrate_backlog.py tools/gate-legs.json tools/memory-tree/kit.toml tools/govkit/subject-pins.tsv tools/run-gates/selftest-budgets.txt memory/map/features/memory-tree-hygiene.md memory/map/generated/MAP.md memory/map/generated/inventories.json memory/map/generated/symbols.json memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-11.md memory/builds/dDerivedDocket/build memory/LIVE.md memory/ledger
+
+2026-09-21T03:13:39Z brief · item TOOL-dDerivedDocket-11 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
+
+2026-09-21T04:07:10Z dispatch · item b8a77337 TOOL-dDerivedDocket-11 · reason tools/memory-tree/migrate_backlog.py tools/gate-legs.json tools/memory-tree/kit.toml tools/govkit/subject-pins.tsv tools/run-gates/selftest-budgets.txt memory/map/features/memory-tree-hygiene.md memory/map/generated memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-11.md memory/builds/dDerivedDocket/build memory/guides/SESSION-KICKOFF.md .gitattributes memory/LIVE.md memory/ledger
+
+2026-09-21T04:32:24Z dispatch · item b8dc6a23 TOOL-dDerivedDocket-12 · reason tools/memory-tree/migrate_backlog.py memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-12.md memory/builds/dDerivedDocket/build/2026-09-21-build-TOOL-dDerivedDocket-12-1-acceptance-ledger.md memory/map/features/memory-tree-hygiene.md memory/map/generated/MAP.md memory/map/generated/symbols.json memory/map/generated/inventories.json memory/LIVE.md memory/ledger/2026-09.md memory/builds/dDerivedDocket/README.md tools/run-gates/selftest-budgets.txt
+
+2026-09-21T04:32:28Z brief · item TOOL-dDerivedDocket-12 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
+
+2026-09-21T05:53:33Z brief · item TOOL-dDerivedDocket-13 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
+
+2026-09-21T05:54:24Z dispatch · item b2a0de2e TOOL-dDerivedDocket-13 · reason .githooks/straggler-guard.sh .githooks/pre-rebase .githooks/straggler-guard.test.sh .githooks/pre-commit .githooks/pre-push tools/check-wiring.sh tools/check-wiring.test.sh tools/install-prefix-waivers.txt tools/drift-audit/drift_report.py tools/drift-audit/drift_signals.py tools/drift-audit/drift_signals.template.py tools/drift-audit/selftest.py tools/drift-audit/README.md tools/drift-audit/adopt-drift-audit.sh tools/workflows/drift-audit-code.js tools/workflows/drift-audit-state.js tools/gate-legs.json tools/govkit/registry.toml tools/govkit/subject-pins.tsv memory/map/features/memory-tree-hygiene.md memory/map/generated memory/gotchas/hookspath-resolves-into-another-checkout.md memory/gotchas/INDEX.md memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-13.md memory/builds/dDerivedDocket/build memory/LIVE.md memory/ledger
+
+2026-09-21T06:00:51Z dispatch · item b2a0de2e TOOL-dDerivedDocket-13 · reason .githooks/straggler-guard.sh .githooks/pre-rebase .githooks/straggler-guard.test.sh .githooks/pre-commit .githooks/pre-push .gitattributes tools/check-wiring.sh tools/check-wiring.test.sh tools/install-prefix-waivers.txt tools/install-prefix-carried.txt tools/drift-audit/drift_report.py tools/drift-audit/drift_signals.py tools/drift-audit/drift_signals.template.py tools/drift-audit/selftest.py tools/drift-audit/README.md tools/drift-audit/adopt-drift-audit.sh tools/workflows/drift-audit-code.js tools/workflows/drift-audit-state.js tools/gate-legs.json tools/govkit/registry.toml tools/govkit/subject-pins.tsv memory/map/features/memory-tree-hygiene.md memory/map/generated memory/gotchas/hookspath-resolves-into-another-checkout.md memory/gotchas/INDEX.md memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-13.md memory/builds/dDerivedDocket/build memory/LIVE.md memory/ledger
+
+2026-09-21T06:53:02Z dispatch · item b6b3f808 TOOL-dDerivedDocket-50 · reason tools/memory-tree/corpus_ids.py tools/memory-tree/check-memory-hygiene.test.sh tools/memory-tree/.memory-tree.conf.example memory/builds/dDerivedDocket/spec/2026-09-20-spec-TOOL-dDerivedDocket-50.md memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-15.md memory/map/features/memory-tree-hygiene.md memory/map/generated memory/builds/dDerivedDocket/build memory/LIVE.md memory/ledger memory/builds/dDerivedDocket/README.md
+
+2026-09-21T06:53:07Z brief · item TOOL-dDerivedDocket-50 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
+
+2026-09-21T07:18:16Z dispatch · item a07ad49d TOOL-dDerivedDocket-51 · reason tools/memory-tree/gen_build_index.py memory/builds/dDerivedDocket/spec/2026-09-20-spec-TOOL-dDerivedDocket-51.md memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-15.md memory/builds/dDerivedDocket/build memory/builds/dDerivedDocket/README.md memory/map/features memory/map/generated
+
+2026-09-21T07:18:20Z brief · item TOOL-dDerivedDocket-51 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
+
+2026-09-21T07:41:04Z dispatch · item 4fce85ec TOOL-dDerivedDocket-53 · reason tools/memory-tree/gen_build_index.py memory/builds/dDerivedDocket/spec/2026-09-20-spec-TOOL-dDerivedDocket-53.md memory/builds/dDerivedDocket/build memory/builds/dDerivedDocket/README.md memory/map/generated memory/map/features
+
+2026-09-21T07:41:08Z brief · item TOOL-dDerivedDocket-53 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
+
+2026-09-21T08:03:50Z dispatch · item 55fd961b TOOL-dDerivedDocket-15 · reason tools/memory-tree/backlog.py tools/memory-tree/gen_build_index.py tools/memory-tree/.memory-tree.conf.example tools/memory-tree/kit.toml .memory-tree.conf memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-15.md memory/builds/dDerivedDocket/build memory/builds/dDerivedDocket/README.md memory/map/features memory/map/generated
+
+2026-09-21T08:03:54Z brief · item TOOL-dDerivedDocket-15 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
+
+2026-09-21T08:52:47Z dispatch · item 55fd961b TOOL-dDerivedDocket-15 · reason memory/guides/SESSION-KICKOFF.md
+
+2026-09-21T09:04:30Z dispatch · item a36d5994 TOOL-dDerivedDocket-48 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh memory/builds/dDerivedDocket/spec/2026-09-20-spec-TOOL-dDerivedDocket-48.md memory/builds/dDerivedDocket/build/2026-09-21-build-TOOL-dDerivedDocket-48-1-acceptance-ledger.md
+
+2026-09-21T09:04:35Z brief · item TOOL-dDerivedDocket-48 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
+
+2026-09-21T09:39:46Z dispatch · item 3e53e2a3 TOOL-dDerivedDocket-49 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh .memory-tree.conf memory/builds/dDerivedDocket/spec/2026-09-20-spec-TOOL-dDerivedDocket-49.md memory/builds/dDerivedDocket/build/2026-09-21-build-TOOL-dDerivedDocket-49-1-acceptance-ledger.md memory/builds/dDerivedDocket/README.md memory/LIVE.md memory/ledger/2026-09.md
+
+2026-09-21T09:39:50Z brief · item TOOL-dDerivedDocket-49 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
+
+2026-09-21T10:05:37Z dispatch · item 537b6861 TOOL-dDerivedDocket-16 · reason tools/unattended/unattended.sh tools/unattended/lib-unattended.sh tools/unattended/unattended.test.sh tools/unattended/.unattended.conf.example tools/unattended/PROTOCOL.template.md memory/guides/UNATTENDED-PROTOCOL.md memory/guides/SESSION-KICKOFF.md .memory-tree.conf memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-16.md memory/builds/dDerivedDocket/build memory/builds/dDerivedDocket/README.md memory/LIVE.md memory/ledger/2026-09.md memory/map/features memory/map/generated
+
+2026-09-21T10:05:42Z brief · item TOOL-dDerivedDocket-16 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
+
+2026-09-21T10:56:13Z dispatch · item 0614e3b9 TOOL-dDerivedDocket-17 · reason tools/unattended/unattended.sh tools/unattended/lib-unattended.sh tools/unattended/unattended.test.sh tools/unattended/check-unattended.sh tools/unattended/check-unattended.test.sh tools/unattended/PROTOCOL.template.md memory/guides/UNATTENDED-PROTOCOL.md tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md .unattended.conf tools/unattended/.unattended.conf.example .memory-tree.conf tools/drift-audit/drift_report.py tools/drift-audit/selftest.py tools/drift-audit/README.md memory/map/features/unattended.md memory/map/generated memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-17.md memory/builds/dDerivedDocket/build memory/builds/dDerivedDocket/README.md
+
+2026-09-21T10:56:17Z brief · item TOOL-dDerivedDocket-17 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
+
+2026-09-21T12:14:17Z dispatch · item 6af11b57 TOOL-dDerivedDocket-52 · reason tools/unattended/check-unattended.sh tools/unattended/check-unattended.test.sh memory/builds/dDerivedDocket/spec/2026-09-20-spec-TOOL-dDerivedDocket-52.md memory/builds/dDerivedDocket/build memory/builds/dDerivedDocket/README.md memory/LIVE.md memory/ledger
+
+2026-09-21T12:14:22Z brief · item TOOL-dDerivedDocket-52 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
+
+2026-09-21T12:56:16Z dispatch · item 89cc16cf TOOL-dDerivedDocket-18 · reason tools/unattended/check-unattended.sh tools/unattended/check-unattended.test.sh tools/unattended/lib-unattended.sh tools/unattended/unattended.sh .memory-tree.conf memory/guides/SESSION-KICKOFF.md tools/install-prefix-carried.txt tools/install-prefix-waivers.txt memory/map/features/unattended.md memory/map/generated memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-18.md memory/builds/dDerivedDocket/build memory/builds/dDerivedDocket/README.md memory/LIVE.md memory/ledger
+
+2026-09-21T12:56:21Z brief · item TOOL-dDerivedDocket-18 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
+
+2026-09-21T14:30:30Z dispatch · item 3cb364d3 TOOL-dDerivedDocket-54 · reason tools/unattended/lib-unattended.sh tools/unattended/check-unattended.test.sh memory/builds/dDerivedDocket/spec/2026-09-20-spec-TOOL-dDerivedDocket-54.md memory/builds/dDerivedDocket/build memory/builds/dDerivedDocket/README.md memory/LIVE.md memory/ledger
+
+2026-09-21T14:30:34Z brief · item TOOL-dDerivedDocket-54 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
+
+2026-09-21T14:55:10Z dispatch · item 2adc40a3 TOOL-dDerivedDocket-19 · reason tools/unattended/unattended.sh tools/unattended/lib-unattended.sh tools/unattended/unattended.test.sh tools/unattended/check-unattended.sh tools/unattended/check-unattended.test.sh tools/unattended/PROTOCOL.template.md memory/guides/UNATTENDED-PROTOCOL.md tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md tools/memory-tree/BUILD-METHOD.template.md memory/guides/BUILD-METHOD.md tools/memory-tree/SPEC-TEMPLATE.template.md memory/TEMPLATE-SPEC.md tools/memory-tree/backlog.py .memory-tree.conf memory/project/unarmed-branches.txt memory/guides/SESSION-KICKOFF.md memory/map/features memory/map/generated memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-19.md memory/builds/dDerivedDocket/build memory/builds/dDerivedDocket/README.md memory/LIVE.md memory/ledger
+
+2026-09-21T14:55:15Z brief · item TOOL-dDerivedDocket-19 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
+
+2026-09-21T15:36:35Z dispatch · item a10e6d40 TOOL-dDerivedDocket-20 · reason tools/unattended/lib-unattended.sh tools/unattended/unattended.sh tools/unattended/check-unattended.sh tools/unattended/unattended.test.sh tools/unattended/check-unattended.test.sh tools/unattended/PROTOCOL.template.md memory/guides/UNATTENDED-PROTOCOL.md tools/unattended/ASKS.template.md memory/guides/UNATTENDED-ASKS.md tools/unattended/adopt-unattended.sh tools/unattended/kit.toml tools/unattended/README.md tools/unattended/SKILL.template.md .claude/skills/unattended/SKILL.md tools/memory-tree/BUILD-METHOD.template.md memory/guides/BUILD-METHOD.md tools/memory-tree/README.md tools/workflows/unattended-build.template.js tools/workflows/unattended-build.js tools/workflows/unattended-build.test.sh memory/project/method-carriers.txt memory/project/unarmed-branches.txt memory/map/features memory/map/generated .memory-tree.conf memory/guides/SESSION-KICKOFF.md memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-20.md memory/builds/dDerivedDocket/build memory/builds/dDerivedDocket/README.md memory/LIVE.md memory/ledger
+
+2026-09-21T15:36:39Z brief · item TOOL-dDerivedDocket-20 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
+
+2026-09-21T16:00:51Z dispatch · item a10e6d40 TOOL-dDerivedDocket-20 · reason tools/unattended/cross-component.test.sh
+
+2026-09-21T16:08:01Z dispatch · item 5da2c557 TOOL-dDerivedDocket-20 · reason tools/unattended/lib-unattended.sh tools/unattended/unattended.sh tools/unattended/check-unattended.sh tools/unattended/check-unattended.test.sh tools/install-prefix-waivers.txt memory/builds/dDerivedDocket/build memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-20.md memory/builds/dDerivedDocket/README.md memory/LIVE.md memory/ledger memory/map/features memory/map/generated
+
+2026-09-21T16:19:24Z dispatch · item 5ce18129 TOOL-dDerivedDocket-21 · reason tools/drift-audit/drift_report.py tools/drift-audit/selftest.py tools/drift-audit/README.md tools/govkit/govkit.py tools/govkit/selftest.py tools/gate-legs.json tools/lexicon/kit.toml tools/lexicon/adopt-lexicon.sh tools/lexicon/README.md tools/lexicon/selftest.py tools/lexicon/lexicon.py tools/lexicon/canon.py tools/lexicon/LEXICON.md .claude/skills/lexicon/SKILL.md tools/codebase-map/kit.toml tools/codebase-map/map_lib.py tools/memory-tree/kit.toml memory/guides/SESSION-KICKOFF.md memory/map/features memory/map/generated memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-21.md memory/builds/dDerivedDocket/build memory/builds/dDerivedDocket/README.md memory/LIVE.md memory/ledger
+
+2026-09-21T16:19:28Z brief · item TOOL-dDerivedDocket-21 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
+
+2026-09-21T16:40:04Z dispatch · item a0892aea TOOL-dDerivedDocket-22 · reason tools/unattended/lib-unattended.sh tools/unattended/unattended.sh tools/unattended/check-unattended.sh tools/unattended/unattended.test.sh tools/unattended/check-unattended.test.sh tools/unattended/PROTOCOL.template.md tools/unattended/STOPS.template.md tools/unattended/SKILL.template.md tools/unattended/VERBS.template.md tools/unattended/.unattended.conf.example tools/unattended/README.md .unattended.conf memory/guides/UNATTENDED-PROTOCOL.md memory/guides/UNATTENDED-STOPS.md memory/guides/UNATTENDED-VERBS.md .claude/skills/unattended/SKILL.md memory/guides/SESSION-KICKOFF.md memory/project/unarmed-branches.txt tools/install-prefix-waivers.txt memory/map/features memory/map/generated memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-22.md memory/builds/dDerivedDocket/build memory/builds/dDerivedDocket/README.md memory/LIVE.md memory/ledger
+
+2026-09-21T16:40:08Z brief · item TOOL-dDerivedDocket-22 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
+
+2026-09-21T18:26:02Z dispatch · item 8f354565 TOOL-dDerivedDocket-23 · reason tools/run-gates/run-gates.sh tools/run-gates/run-selftests.sh tools/run-gates/lib-attribute.sh tools/run-gates/run-gates.test.sh tools/run-gates/kit.toml tools/run-gates/README.md tools/gate-legs.json .githooks/pre-push .githooks/pre-push.test.sh tools/drift-audit/drift_report.py tools/drift-audit/selftest.py tools/memory-tree/check-memory-hygiene.sh tools/memory-tree/check-memory-hygiene.test.sh tools/lexicon/lexicon.py tools/lexicon/selftest.py tools/lexicon/README.md tools/lexicon/kit.toml .lexicon.conf tools/check-install-prefix.sh tools/check-install-prefix.test.sh memory/map/features/run-gates.md memory/map/features/lexicon.md memory/map/features/memory-tree-hygiene.md memory/map/features/install-prefix.md memory/map/baseline.toml memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-23.md
+
+2026-09-21T18:26:53Z dispatch · item 8f354565 TOOL-dDerivedDocket-29 · reason tools/workflows/tier2-review.js tools/workflows/tier2-review.test.sh tools/workflows/unattended-build.template.js tools/workflows/unattended-build.js tools/workflows/unattended-build.test.sh tools/workflows/REVIEW-PROTOCOL.template.md tools/workflows/README.md memory/guides/REVIEW-PROTOCOL.md tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/VERBS.template.md tools/unattended/SKILL.template.md tools/unattended/STOPS.template.md tools/unattended/PROTOCOL.template.md memory/guides/UNATTENDED-VERBS.md memory/guides/UNATTENDED-STOPS.md memory/guides/UNATTENDED-PROTOCOL.md .claude/skills/unattended/SKILL.md memory/map/features/review-harnesses.md memory/map/features/unattended.md memory/map/features/unattended-mandate.md memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-29.md
+
+2026-09-21T18:27:01Z brief · item TOOL-dDerivedDocket-23 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
+
+2026-09-21T18:27:02Z brief · item TOOL-dDerivedDocket-29 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
+
+2026-09-21T20:41:05Z dispatch · item 32a7ef06 TOOL-dDerivedDocket-25 · reason tools/run-gates/run-gates.sh tools/run-gates/run-gates.test.sh tools/run-gates/run-gates.turnstile.test.sh tools/run-gates/run-gates.runlog.test.sh tools/run-gates/README.md memory/map/features/run-gates.md memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-25.md
+
+2026-09-21T20:41:37Z dispatch · item 32a7ef06 TOOL-dDerivedDocket-30 · reason tools/unattended/check-unattended.sh tools/unattended/check-unattended.test.sh tools/unattended/lib-unattended.sh tools/unattended/unattended.sh tools/unattended/unattended.test.sh .memory-tree.conf memory/project/unarmed-branches.txt memory/map/features/unattended.md memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-30.md
+
+2026-09-21T20:41:38Z brief · item TOOL-dDerivedDocket-25 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
+
+2026-09-21T20:41:38Z brief · item TOOL-dDerivedDocket-30 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
+
+2026-09-22T04:06:08Z dispatch · item c361e347 TOOL-dDerivedDocket-33 · reason memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-33.md memory/builds/dDerivedDocket/build
+
+2026-09-22T04:06:09Z brief · item TOOL-dDerivedDocket-33 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
+
+2026-09-22T04:47:00Z dispatch · item b5610874 TOOL-dDerivedDocket-24 · reason tools/unattended/unattended.sh tools/unattended/check-unattended.sh tools/unattended/unattended.test.sh tools/unattended/check-unattended.test.sh tools/unattended/lib-unattended.sh tools/unattended/STOPS.template.md tools/unattended/SKILL.template.md tools/unattended/.unattended.conf.example tools/unattended/PROTOCOL.template.md tools/unattended/VERBS.template.md tools/unattended/README.md .unattended.conf tools/run-gates/run-gates.sh tools/run-gates/run-gates.test.sh tools/run-gates/run-gates.runlog.test.sh .githooks/pre-push .githooks/pre-push.test.sh .githooks/pre-push.runlog.test.sh .githooks/gate-env.sh tools/govkit/govkit.py tools/govkit/selftest.py memory/guides/UNATTENDED-PROTOCOL.md memory/guides/UNATTENDED-STOPS.md memory/guides/UNATTENDED-VERBS.md .claude/skills/unattended/SKILL.md memory/project/unarmed-branches.txt memory/map/features/unattended.md memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-24.md
+
+2026-09-22T04:47:01Z brief · item TOOL-dDerivedDocket-24 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
+
+2026-09-22T05:06:58Z rescope · item add TOOL-dDerivedDocket-61 · reason Adopted after the origin/main merge at c23d5701 by owner ruling of 2026-09-22 (reconcile fully): the merge kept two lease models and two restart paths, and none of main's out-of-session actors knew HELD. One Tier-2 unit reconciles them; it also takes the property TOOL-dDerivedDocket-27 S11 guarded, which that unit withdraws.
+
+2026-09-22T05:49:15Z review · item dDerivedDocket-specs-g8 · reason verdict BLOCKED · blockers 1 · BOUNDED · disposition promote
+
+2026-09-22T06:49:36Z rescope · item add TOOL-dDerivedDocket-62 · reason Promoted at the G8 bounded exit (B1): unit 61 moves the lease into each worktree's own copy of the run-state file, so the resume tick and the take-over matrix grade one slug many times; this unit gives one answer per slug, keyed on the checked-out run branch.
+
+2026-09-22T06:49:37Z rescope · item add TOOL-dDerivedDocket-63 · reason Promoted at the G8 bounded exit (H1): unit 61's same-session take-over row shadows --replaces, so the holder loses its own replace; this unit reorders and narrows the leased rows.
+
+2026-09-22T06:49:39Z rescope · item add TOOL-dDerivedDocket-64 · reason Promoted at the G8 bounded exit (H2): the gate turnstile queue writes no gate log, so a healthy queued bar reads STALE; this unit has the queue write a heartbeat the liveness clock reads.
+
+2026-09-22T06:52:30Z dispatch · item 3db00cab TOOL-dDerivedDocket-26 · reason tools/run-gates/run-gates.sh tools/run-gates/run-gates.test.sh tools/run-gates/run-gates.runlog.test.sh tools/run-gates/README.md .githooks/pre-push .githooks/pre-push.test.sh .githooks/pre-push.runlog.test.sh tools/drift-audit/drift_report.py tools/drift-audit/selftest.py tools/drift-audit/README.md memory/map/features/run-gates.md memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-26.md
+
+2026-09-22T06:53:30Z dispatch · item 3db00cab TOOL-dDerivedDocket-28 · reason tools/unattended/unattended.sh tools/unattended/check-unattended.sh tools/unattended/unattended.test.sh tools/unattended/check-unattended.test.sh tools/unattended/lib-unattended.sh tools/unattended/STOPS.template.md tools/unattended/SKILL.template.md tools/unattended/.unattended.conf.example tools/unattended/PROTOCOL.template.md tools/unattended/VERBS.template.md tools/unattended/README.md .unattended.conf memory/guides/UNATTENDED-PROTOCOL.md memory/guides/UNATTENDED-STOPS.md memory/guides/UNATTENDED-VERBS.md .claude/skills/unattended/SKILL.md memory/project/unarmed-branches.txt memory/map/features/unattended.md memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-28.md
+
+2026-09-22T06:53:31Z brief · item TOOL-dDerivedDocket-26 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
+
+2026-09-22T06:53:32Z brief · item TOOL-dDerivedDocket-28 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
+
+2026-09-22T07:58:51Z review · item dDerivedDocket-specs-g9 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · disposition promote
+
+2026-09-22T08:02:34Z dispatch · item 80f61cf9 TOOL-dDerivedDocket-27 · reason tools/unattended/unattended.sh tools/unattended/check-unattended.sh tools/unattended/unattended.test.sh tools/unattended/check-unattended.test.sh tools/unattended/lib-unattended.sh tools/unattended/SKILL.template.md tools/unattended/.unattended.conf.example tools/unattended/PROTOCOL.template.md tools/unattended/VERBS.template.md tools/unattended/STOPS.template.md tools/unattended/README.md .unattended.conf tools/run-gates/run-gates.sh tools/run-gates/run-gates.test.sh tools/run-gates/run-gates.runlog.test.sh tools/run-gates/README.md memory/guides/UNATTENDED-PROTOCOL.md memory/guides/UNATTENDED-VERBS.md memory/guides/UNATTENDED-STOPS.md .claude/skills/unattended/SKILL.md memory/project/unarmed-branches.txt memory/map/features/unattended.md memory/map/features/run-gates.md memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-27.md
+
+2026-09-22T08:02:35Z brief · item TOOL-dDerivedDocket-27 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
+
+2026-09-22T08:38:20Z rescope · item add TOOL-dDerivedDocket-65 · reason Promoted at the G9 converged exit (H1): once unit 61 records this session, a session waiting on its own sub-agents is not on the liveness clock, so a long wave reads STALE in the run worktree; this unit adds a sub-agent transcript term to derive_last_move.
+
+2026-09-22T09:24:22Z hold · item platform-limit · reason until owner · unreachable d · resume none(owner)
+
+2026-09-22T18:31:27Z resume · item dDerivedDocket · reason held · keepalive 3575a45e · manual
+
+2026-09-22T18:34:34Z dispatch · item e03d8fe8 TOOL-dDerivedDocket-31 · reason tools/memory-tree/check-memory-hygiene.sh tools/memory-tree/check-memory-hygiene.test.sh tools/memory-tree/marker-contract.test.sh tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/check-pass-order.sh tools/unattended/check-pass-order.test.sh tools/unattended/lib-unattended.sh tools/memory-tree/SPEC-TEMPLATE.template.md memory/TEMPLATE-SPEC.md tools/memory-tree/HYGIENE.template.md memory/HYGIENE.md tools/memory-tree/BUILD-METHOD.template.md memory/guides/BUILD-METHOD.md .memory-tree.conf tools/memory-tree/.memory-tree.conf.example memory/project/unarmed-branches.txt memory/map/features/memory-tree-hygiene.md memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-31.md
+
+2026-09-22T18:34:35Z brief · item TOOL-dDerivedDocket-31 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
+
+2026-09-27T14:17:19Z resume · item dDerivedDocket · reason working · keepalive 3575a45e · manual
+
+2026-09-27T14:48:26Z review · item dDerivedDocket-specs-g10 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED
+
+2026-09-27T15:13:46Z dispatch · item 6136f764 TOOL-dDerivedDocket-32 · reason .github/workflows/remote-ci.yml .gitattributes .lexicon.conf .governance/deploy.toml AGENTS.md tools/unattended/README.md tools/run-gates/run-selftests.sh tools/unattended/run-unattended-gates.sh memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-32.md
+
+2026-09-27T15:13:47Z brief · item TOOL-dDerivedDocket-32 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
+
+2026-09-27T15:57:57Z dispatch · item efca595b TOOL-dDerivedDocket-61 · reason tools/unattended memory/guides/UNATTENDED-PROTOCOL.md memory/guides/UNATTENDED-VERBS.md memory/guides/UNATTENDED-STOPS.md .claude/skills/unattended/SKILL.md .unattended.conf memory/map/features/unattended.md memory/map/features/unattended-mandate.md memory/map/features/unattended-stops.md memory/project/unarmed-branches.txt memory/guides/SESSION-KICKOFF.md memory/builds/dDerivedDocket/spec/2026-09-22-spec-TOOL-dDerivedDocket-61.md
+
+2026-09-27T15:57:58Z brief · item TOOL-dDerivedDocket-61 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
+
+2026-09-27T18:10:25Z dispatch · item 6c26f05a TOOL-dDerivedDocket-62 · reason tools/unattended memory/guides/UNATTENDED-PROTOCOL.md memory/guides/UNATTENDED-VERBS.md memory/guides/UNATTENDED-STOPS.md .claude/skills/unattended/SKILL.md memory/map/features/unattended.md memory/map/features/unattended-mandate.md memory/map/features/unattended-stops.md memory/project/unarmed-branches.txt memory/builds/dDerivedDocket/spec/2026-09-22-spec-TOOL-dDerivedDocket-62.md memory/builds/dDerivedDocket/build/2026-09-27-build-TOOL-dDerivedDocket-62-1-acceptance-ledger.md
+
+2026-09-27T18:10:29Z brief · item TOOL-dDerivedDocket-62 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
+
+2026-09-27T18:52:32Z dispatch · item 5751d264 TOOL-dDerivedDocket-63 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/STOPS.template.md memory/guides/UNATTENDED-STOPS.md memory/map/features/unattended-stops.md memory/builds/dDerivedDocket/spec/2026-09-22-spec-TOOL-dDerivedDocket-63.md memory/builds/dDerivedDocket/build/2026-09-27-build-TOOL-dDerivedDocket-63-1-acceptance-ledger.md
+
+2026-09-27T18:52:36Z brief · item TOOL-dDerivedDocket-63 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
+
+2026-09-27T19:22:35Z dispatch · item e8fce76d TOOL-dDerivedDocket-64 · reason tools/run-gates/run-gates.sh tools/run-gates/run-gates.turnstile.test.sh tools/run-gates/README.md tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/resume-tick.test.sh tools/unattended/PROTOCOL.template.md memory/guides/UNATTENDED-PROTOCOL.md tools/unattended/.unattended.conf.example .unattended.conf memory/guides/SESSION-KICKOFF.md memory/map/features/unattended.md memory/map/features/run-gates.md memory/map/generated memory/builds/dDerivedDocket/spec/2026-09-22-spec-TOOL-dDerivedDocket-64.md memory/builds/dDerivedDocket/build/2026-09-27-build-TOOL-dDerivedDocket-64-1-acceptance-ledger.md memory/builds/dDerivedDocket/README.md memory/LIVE.md memory/ledger
+
+2026-09-27T19:22:39Z brief · item TOOL-dDerivedDocket-64 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
+
+2026-09-27T19:41:50Z dispatch · item e0643748 TOOL-dDerivedDocket-65 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/resume-tick.test.sh memory/map/features/unattended.md memory/map/generated memory/builds/dDerivedDocket/spec/2026-09-22-spec-TOOL-dDerivedDocket-65.md memory/builds/dDerivedDocket/build/2026-09-27-build-TOOL-dDerivedDocket-65-1-acceptance-ledger.md memory/builds/dDerivedDocket/README.md memory/LIVE.md memory/ledger
+
+2026-09-27T19:41:54Z brief · item TOOL-dDerivedDocket-65 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
+
+2026-09-27T22:25:50Z dispatch · item 411fac91 TOOL-dDerivedDocket-34 · reason tools/memory-tree/migrate_backlog.py tools/memory-tree/.memory-tree.conf.example tools/memory-tree/check-memory-hygiene.sh tools/memory-tree/README.md tools/memory-tree/row_grammar.py tools/memory-recall/extract.py tools/memory-recall/query.py tools/memory-recall/recall_conf.py tools/memory-recall/README.md tools/drift-audit/drift_report.py tools/drift-audit/drift_signals.py tools/drift-audit/selftest.py tools/drift-audit/README.md .memory-tree.conf .unattended.conf .gitattributes memory/archive/TOOL.2026-08-14.md memory/archive/TOOL.2026-08-17.md memory/archive/TOOL.2026-08-17b.md memory/project/curation-debt.txt memory/guides/SESSION-KICKOFF.md memory/gotchas/row-driver-emits-a-plausible-file-with-rows-missing.md memory/gotchas/waiver-row-that-hides-nothing-reds.md memory/builds/dDerivedDocket/build memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-34.md memory/builds/dDerivedDocket/BACKLOG.md memory/builds/dDerivedDocket/README.md memory/LIVE.md memory/ledger memory/map/features memory/map/generated memory/map/baseline.toml memory/builds/aBatchedArm memory/builds/aBatchedLintel memory/builds/aBatchedTribunal memory/builds/aBlindedTrial memory/builds/aBoundedCeiling memory/builds/aBoundedVerdict memory/builds/aBranchedMandate memory/builds/aCandidStub memory/builds/aClosedDocket memory/builds/aCollapsedScan memory/builds/aDeclaredBound memory/builds/aDeclaredCeiling memory/builds/aDeferredBar memory/builds/aDeployScout memory/builds/aDrainedSluice memory/builds/aFerriedDossier memory/builds/aFoldedQuarry memory/builds/aFusedCharter memory/builds/aGradedDialect memory/builds/aGradedDoorway memory/builds/aGradedMandate memory/builds/aGroundedOrientation memory/builds/aGuardedTally memory/builds/aHoistedPass memory/builds/aHonedRuleset memory/builds/aJoinedCanon memory/builds/aKeyedAnnotation memory/builds/aKitHardener memory/builds/aLeakedHandle memory/builds/aLeanRework memory/builds/aLeasedGauntlet memory/builds/aLexedStripper memory/builds/aLoosenedCeiling memory/builds/aMendedLedger memory/builds/aMeteredTurnstile memory/builds/aMooredAnchor memory/builds/aMouldedFolio memory/builds/aNamedGesture memory/builds/aNumeralWarden memory/builds/aPacedTurnstile memory/builds/aPooledSweep memory/builds/aPortableWarden memory/builds/aPrimedKeepalive memory/builds/aProbedToolkit memory/builds/aProbedUnit memory/builds/aPromptedMandate memory/builds/aProvenReuse memory/builds/aPrunedCeremony memory/builds/aQuarriedLantern memory/builds/aQuenchedHarness memory/builds/aRatchetForge memory/builds/aRatifiedRulings memory/builds/aReapedSpinner memory/builds/aReapedTicket memory/builds/aRelaxedShard memory/builds/aRepatriatedFork memory/builds/aReplayedCard memory/builds/aRootedPrefix memory/builds/aRuledFrontispiece memory/builds/aRuledParchment memory/builds/aScannedThrottle memory/builds/aScouredKit memory/builds/aSealedCaravan memory/builds/aShardedFloor memory/builds/aSiftedPlaybook memory/builds/aStagedLane memory/builds/aStandingWrit memory/builds/aSurfacedLexicon memory/builds/aTetheredConvoy memory/builds/aTetheredRecord memory/builds/aTetheredScratch memory/builds/aThawedCorpus memory/builds/aTimedTurnstile memory/builds/aTunedCompass memory/builds/aUnblockedFleet memory/builds/aUnmannedHelm memory/builds/aWalkedCorpus memory/builds/aWeighedCanon memory/builds/aWeighedCompass memory/builds/aWeldedTribunal memory/builds/aWireWarden memory/builds/aWokenSentinel memory/builds/aWrittenMethod memory/builds/bConvergentLodestar memory/builds/bTamedTempest memory/builds/bThriftyBellows memory/builds/cBriefedPilot memory/builds/cFinalBerth memory/builds/cGradedDebt memory/builds/cKeyedLaunchpad memory/builds/cMendedVintage memory/builds/cRefutedPremise memory/builds/cSettledDocket memory/builds/cSightedPlumb memory/builds/cSpliceWarden memory/builds/cSteadyMetronome memory/builds/cTracedPromise memory/builds/cWidenedNet memory/builds/dBackdatedFixture memory/builds/dBriefedPass memory/builds/dCarriedReceipt memory/builds/dClosedLexicon memory/builds/dFoldedVerdict memory/builds/dFramedEntrypoint memory/builds/dGatedProse memory/builds/dGaugedVintage memory/builds/dHonouredPark memory/builds/dLandedVerdict memory/builds/dLoggedFlight memory/builds/dMergedTally memory/builds/dMispairedQuote memory/builds/dMuffledSentinel memory/builds/dNarrowedAnchor memory/builds/dNomadicAtlas memory/builds/dPinnedHandoff memory/builds/dPolishedVitrine memory/builds/dPromptedSeam memory/builds/dRatifiedSeam memory/builds/dRetiredFork memory/builds/dScaffoldedMirror memory/builds/dScriptedRepeat memory/builds/dScrubbedConduit memory/builds/dSealedTally memory/builds/dSettledRoster memory/builds/dSpentCeiling memory/builds/dTieredTribunal memory/builds/dTracedLattice memory/builds/dUnstalledConvoy memory/builds/aFlaggedScaffold memory/builds/aResumedRelay memory/builds/aSiftedFork memory/builds/aTracedSpawn memory/builds/aWidenedGuide memory/builds/aWiredReckoning
+
+2026-09-27T22:25:54Z brief · item TOOL-dDerivedDocket-34 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
+
+2026-09-27T23:01:41Z dispatch · item 411fac91 TOOL-dDerivedDocket-34 · reason memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-33.md
+
+2026-09-27T23:17:53Z dispatch · item c2fd68d6 TOOL-dDerivedDocket-35 · reason .unattended.conf memory/guides/SESSION-KICKOFF.md memory/builds/dDerivedDocket/BACKLOG.md memory/builds/dDerivedDocket/build memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-35.md memory/builds/dDerivedDocket/README.md memory/LIVE.md memory/ledger memory/backlog memory/map/features/unattended-mandate.md memory/map/generated
+
+2026-09-27T23:17:58Z brief · item TOOL-dDerivedDocket-35 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
+
+2026-09-28T00:02:05Z dispatch · item 3215c6cb PLAY-dDerivedDocket-1 · reason coding-governance-agents.template.md AGENTS.md memory/guides/SESSION-KICKOFF.md memory/builds/dDerivedDocket/spec/2026-09-14-spec-PLAY-dDerivedDocket-1.md memory/builds/dDerivedDocket/build/2026-09-28-build-PLAY-dDerivedDocket-1-1-acceptance-ledger.md memory/builds/dDerivedDocket/README.md memory/LIVE.md memory/ledger memory/map/features/unattended.md memory/map/generated
+
+2026-09-28T00:02:10Z brief · item PLAY-dDerivedDocket-1 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
+
+2026-09-28T00:14:00Z dispatch · item bfb89fa3 TOOL-dDerivedDocket-36 · reason tools/memory-tree/README.md tools/memory-tree/gen_build_index.py tools/memory-tree/check-memory-hygiene.sh tools/memory-tree/ANNOTATION-STYLE.template.md tools/memory-tree/BUILD-METHOD.template.md tools/memory-tree/HYGIENE.template.md tools/memory-tree/SPEC-TEMPLATE.template.md memory/HYGIENE.md memory/TEMPLATE-SPEC.md memory/guides/ANNOTATION-STYLE.md memory/guides/BUILD-METHOD.md tools/workflows/tier2-review.template.js tools/workflows/tier2-review.js tools/workflows/drift-audit-state.template.js tools/workflows/drift-audit-state.js tools/drift-audit/SKILL.template.md .claude/skills/drift-audit/SKILL.md tools/workflows/REVIEW-PROTOCOL.template.md memory/guides/REVIEW-PROTOCOL.md tools/memory-recall/SKILL.template.md .claude/skills/memory-recall/SKILL.md memory/README.md memory/map/features memory/map/baseline.toml memory/map/generated tools/codebase-map/map_extractors.py memory/guides/SESSION-KICKOFF.md memory/builds/dDerivedDocket/spec/2026-09-14-spec-TOOL-dDerivedDocket-36.md memory/builds/dDerivedDocket/build memory/builds/dDerivedDocket/README.md
+
+2026-09-28T00:14:04Z brief · item TOOL-dDerivedDocket-36 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
+
+2026-09-28T00:38:56Z dispatch · item 66f99c96 DEPL-dDerivedDocket-1 · reason WIRE-INTO-PROJECT.md tools/memory-tree/adopt-memory-tree.sh tools/install-prefix-carried.txt memory/builds/dDerivedDocket/spec/2026-09-14-spec-DEPL-dDerivedDocket-1.md memory/builds/dDerivedDocket/build/2026-09-28-build-DEPL-dDerivedDocket-1-1-acceptance-ledger.md memory/builds/dDerivedDocket/README.md memory/LIVE.md memory/ledger memory/map/features memory/map/generated
+
+2026-09-28T00:39:00Z brief · item DEPL-dDerivedDocket-1 · reason 064bc5da7e7a memory/builds/dDerivedDocket/prompts/2026-09-14-prompt-TOOL-dDerivedDocket-1-build-brief.md
+
+2026-09-28T04:16:13Z review · item dDerivedDocket · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED
+
+2026-09-28T15:28:33Z hold · item host-owner-action · reason until owner · reaped 6ed4075c · resume none(owner)
+
+2026-09-28T17:10:33Z resume · item dDerivedDocket · reason held · keepalive c6325dfb · manual

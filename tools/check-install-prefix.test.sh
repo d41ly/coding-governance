@@ -44,7 +44,7 @@ GK_SRC=$(git ls-files -- "${PFX}*/govkit.py" | head -1)
 GK=${GK_SRC%/*}; GK=${GK##*/}
 TL=tool   # gov's own prefix is "${TL}s", assembled so that this file does not spell it
 T=$(printf '\t')
-FLOOR_ASSERTIONS=35
+FLOOR_ASSERTIONS=40
 fails=0; passed=0; GRADED=0
 TMP=$(mktemp -d); trap 'rm -rf "$TMP"' EXIT
 
@@ -231,6 +231,36 @@ for _np in python3 python py; do printf '#!/usr/bin/env bash\nexit 9009\n' > "$T
 pout=$(cd "$G" && PATH="$TMP/nopy:$PATH" bash "$GATE_REL" 2>&1); prc=$?
 case "$prc:$pout" in 2:*"cannot tell whether this repo is a kit"*) good "no usable python REFUSES rather than skipping" ;;
   *) bad "no usable python did not refuse (rc $prc): $(printf '%s' "$pout" | tail -2)" ;; esac
+
+# ==================== --offenders: the SIGNATURE the merge bar grades this leg with ===========
+# TOOL-dDerivedDocket-23 S3, carried onto the pure ban at the reconcile with aRepatriatedFork. ONE
+# KEY PER COUNTED SPELLING AND NOTHING ELSE, because the bar's red attribution compares two trees' key
+# SETS. Graded on the three ways a set goes wrong: a key carrying its line number (it moves when an
+# unrelated line lands above it), two identical hits collapsing into one, and prose leaking into the
+# set — the exact-equality comparisons below catch the third. Its exit is `--check`'s.
+O="$TMP/offenders"; build_source_fixture "$O" 'Run qdemo/thing.sh, or qdemo/thing.sh again.'
+_owant=$(printf '%sqdemo/README.md\tban\tqdemo/thing.sh\n%sqdemo/README.md\tban\tqdemo/thing.sh#2' "$PFX" "$PFX")
+oout=$(cd "$O" && bash "$GATE_REL" --offenders 2>/dev/null); orc=$?
+(cd "$O" && bash "$GATE_REL" >/dev/null 2>&1); ocrc=$?
+[ "$oout" = "$_owant" ] && good "--offenders prints exactly the two keys, the repeat carrying its ordinal" \
+  || { bad "--offenders printed a different key set"; printf '%s\n' "$oout" | sed 's/^/      /' | head -6; }
+{ [ "$orc" = "$ocrc" ] && [ "$orc" = 1 ]; } && good "--offenders exits as --check does (1)" \
+  || bad "--offenders exited $orc where --check exited $ocrc"
+{ printf 'an unrelated first line\n\n'; cat "$O/${PFX}qdemo/README.md"; } > "$O/readme.tmp" && mv "$O/readme.tmp" "$O/${PFX}qdemo/README.md"
+printf 'unrelated\n' > "$O/${PFX}qdemo/other.md"; git -C "$O" add -A >/dev/null 2>&1
+oout2=$(cd "$O" && bash "$GATE_REL" --offenders 2>/dev/null)
+[ "$oout2" = "$_owant" ] && good "--offenders keys do not move when an unrelated line and file land above them" \
+  || { bad "--offenders keys moved under an unrelated edit"; printf '%s\n' "$oout2" | sed 's/^/      /' | head -6; }
+# ITS GREEN CONTROL: a clean kit source prints NO key and exits 0, so the arms above are not passed
+# by a mode that prints the same two lines over every tree.
+gout=$(cd "$G" && bash "$GATE_REL" --offenders 2>/dev/null); grc=$?
+{ [ -z "$gout" ] && [ "$grc" = 0 ]; } && good "--offenders over a clean source prints nothing and exits 0" \
+  || bad "--offenders over a clean source printed '$gout' (rc $grc)"
+# A DEAD COUNTER under --offenders leaves NO key and a non-zero exit: the attribution reads a keyless
+# red as a probe that could not answer, never as an empty — clean — set.
+dkout=$(cd "$D" && GOV_PYTHON="$D/pywrap.sh" bash "$GATE_REL" --offenders 2>/dev/null); dkrc=$?
+{ [ -z "$dkout" ] && [ "$dkrc" != 0 ]; } && good "--offenders with a dead counter exits $dkrc and prints no key" \
+  || bad "--offenders with a dead counter printed '$dkout' (rc $dkrc)"
 
 # ==================== THE LIVENESS ASSERTION ON THE SUITE ITSELF =============================
 if [ "$GRADED" -ge 8 ]; then good "LIVENESS $GRADED arm(s) reached the counter"

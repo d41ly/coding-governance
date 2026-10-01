@@ -126,6 +126,13 @@ CONF="$ROOT/.unattended.conf"
 # not presence-of-value, and "" made every such key invisible to the only check looking for it.
 MEMORY_ROOT=memory; LANDER="{{LANDER}}"; KEEPALIVE_CREATE="{{KEEPALIVE_CREATE}}"
 KEEPALIVE_DELETE="{{KEEPALIVE_DELETE}}"; KEEPALIVE_INTERVAL="{{KEEPALIVE_INTERVAL}}"
+# TOOL-dDerivedDocket-5 - the DURABLE restart carrier keeps its placeholders on exactly the
+# keepalive pair's terms, and that standing placeholder is the whole rollout: an adopter who
+# upgrades with an existing conf takes the kit default `on`, declares no carrier, and reds THIS
+# check rather than learning at its first hold that nothing will restart it. The switch itself
+# is pre-set EMPTY, for ANCHOR_SCOPE's reason - it is not interpolated, it SELECTS.
+RESUME_SCHEDULE=""; RESUME_SCHEDULE_CREATE="{{RESUME_SCHEDULE_CREATE}}"
+RESUME_SCHEDULE_DELETE="{{RESUME_SCHEDULE_DELETE}}"
 # TOOL-aPromptedMandate-5 - ANCHOR_SCOPE is the ONE interpolated key that must NOT keep its
 # placeholder when undeclared. Every adopter shipped today declares it blank, which is legal and
 # means the strict anchor; a placeholder there would red the placeholder arm for the majority case.
@@ -142,6 +149,16 @@ AUTH_PARAM=""
 _MTD_OVERRIDE=${MEMORY_TREE_DIR:-}
 # shellcheck disable=SC1090
 . "$CONF"
+# THE EFFECTIVE CARRIER PAIR. With the switch OFF the render writes one FIXED literal in place of
+# both tool names, so the Skill of a project that opted out says so in the sentence where a tool
+# name would otherwise stand - rather than carrying a placeholder that reds the arm below, which
+# is the one outcome an opt-out must not produce. Blank and absent both resolve to `on`, exactly
+# as the driver resolves them, because the two readings disagreeing is how an adopter gets a
+# green render for a switch the driver refuses.
+RS_OFF_LITERAL="not scheduled: RESUME_SCHEDULE is off"
+if [ "$RESUME_SCHEDULE" = off ]; then
+  RESUME_SCHEDULE_CREATE="$RS_OFF_LITERAL"; RESUME_SCHEDULE_DELETE="$RS_OFF_LITERAL"
+fi
 # The EFFECTIVE scope, not the raw declaration. Absent, blank and misspelled all keep the strict
 # anchor - the driver's own value guard falls through exactly this way - and the Skill has to state
 # what the run will DO rather than what the file happens to say. Deriving it here also means the
@@ -376,6 +393,21 @@ PBT_OUT="$ROOT/$PBT_REL"
 VERBS_SHIP="$KIT_DIR/VERBS.template.md"
 VERBS_REL="$MEMORY_ROOT/guides/UNATTENDED-VERBS.md"
 VERBS_OUT="$ROOT/$VERBS_REL"
+# the SIXTH artifact, and the verb carrier's twin. The protocol stood 1,116 bytes under its cap
+# with the stop contract still to write, so the codes, the release conditions, the lease and the
+# resume matrix go here and the protocol keeps two pointers. Copied rather than rendered, for the
+# reason the three above it are: it carries no placeholder, so a render step would be a second
+# spelling of `cat`.
+STOPS_SHIP="$KIT_DIR/STOPS.template.md"
+STOPS_REL="$MEMORY_ROOT/guides/UNATTENDED-STOPS.md"
+STOPS_OUT="$ROOT/$STOPS_REL"
+# the SEVENTH artifact, the ask guide (TOOL-dDerivedDocket-20 S4). The ask contract - routes,
+# orientation, owner-call parking, discovery filing and the asks-disposed terms - did not fit in a
+# protocol a kilobyte under its cap. Copied rather than rendered, for the reason the four above it
+# are: it carries no placeholder, so a render step would be a second spelling of `cat`.
+ASKS_SHIP="$KIT_DIR/ASKS.template.md"
+ASKS_REL="$MEMORY_ROOT/guides/UNATTENDED-ASKS.md"
+ASKS_OUT="$ROOT/$ASKS_REL"
 # the FIFTH artifact (TOOL-dRetiredFork-12), and the only one besides the Skill that is RENDERED
 # rather than copied: it carries `{{KIT_DIR}}` five times. It also lands inside the kit directory
 # rather than under the memory root, because it is a fixture the kit's own validity gate reads.
@@ -419,6 +451,8 @@ render() { # [template] -> stdout; LF only (the render is pinned eol=lf in .gita
   out=${out//\{\{KEEPALIVE_CREATE\}\}/"$KEEPALIVE_CREATE"}
   out=${out//\{\{KEEPALIVE_DELETE\}\}/"$KEEPALIVE_DELETE"}
   out=${out//\{\{KEEPALIVE_INTERVAL\}\}/"$KEEPALIVE_INTERVAL"}
+  out=${out//\{\{RESUME_SCHEDULE_CREATE\}\}/"$RESUME_SCHEDULE_CREATE"}
+  out=${out//\{\{RESUME_SCHEDULE_DELETE\}\}/"$RESUME_SCHEDULE_DELETE"}
   out=${out//\{\{ANCHOR_SCOPE\}\}/"$ANCHOR_EFFECTIVE"}
   # LAST, deliberately. Substitutions run in sequence over one string, so a value carrying another
   # key's placeholder text would be re-substituted by any pass that followed it. Appended here, such
@@ -450,6 +484,17 @@ if [ "$MODE" = "--check" ]; then
   trap 'rm -f "$TMP"' EXIT
   render > "$TMP" || { echo "unattended: the render FAILED — the template could not be read; refusing to compare"; exit 1; }
   [ -s "$TMP" ] || { echo "unattended: the render produced an EMPTY file — comparing it to an equally empty Skill is the green-by-absence shape this kit refuses"; exit 1; }
+  # TOOL-dDerivedDocket-5 - THE PLACEHOLDER ARM RUNS OVER THE FRESH RENDER TOO, and before the diff.
+  # The arm further down grades the INSTALLED file, which the install path refuses to write with a
+  # placeholder in it - so for a tree whose TEMPLATE grew a key its conf does not declare, the only
+  # thing that fired was "out of sync", which sends the reader to re-render and says nothing about
+  # the key. That is the upgrade shape: an adopter taking a kit version with a new conf key meets
+  # this before it meets a hold that files nothing.
+  if grep -qE '\{\{[A-Z_]+\}\}' "$TMP"; then
+    echo "unattended: the render this check just made carries an unfilled placeholder — .unattended.conf declares no value for it, so re-rendering would refuse and the installed Skill cannot be brought into sync"
+    grep -nE '\{\{[A-Z_]+\}\}' "$TMP" | head -5 | sed 's/^/    /'
+    exit 1
+  fi
   if ! diff -q <(tr -d '\r' < "$SKILL_OUT") "$TMP" >/dev/null 2>&1; then
     echo "unattended: $SKILL_OUT is out of sync with SKILL.template.md + .unattended.conf"
     echo "  re-render with: $0"
@@ -490,6 +535,21 @@ if [ "$MODE" = "--check" ]; then
   fi
   if ! diff -q <(tr -d '' < "$VERBS_OUT") "$VERBS_SHIP" >/dev/null 2>&1; then
     echo "unattended: $VERBS_REL has drifted from the shipped verb carrier; re-run $0"; exit 1
+  fi
+  # the SIXTH artifact, with the same two refusals and for the same reason: a reader sent to run
+  # the adopter and a reader sent to read a diff need different sentences.
+  if [ ! -f "$STOPS_OUT" ]; then
+    echo "unattended: $STOPS_REL is missing — run $0 to install the stop contract"; exit 1
+  fi
+  if ! diff -q <(tr -d '' < "$STOPS_OUT") "$STOPS_SHIP" >/dev/null 2>&1; then
+    echo "unattended: $STOPS_REL has drifted from the shipped stop contract; re-run $0"; exit 1
+  fi
+  # the SEVENTH artifact, the same two refusals for the same reason.
+  if [ ! -f "$ASKS_OUT" ]; then
+    echo "unattended: $ASKS_REL is missing — run $0 to install the ask guide"; exit 1
+  fi
+  if ! diff -q <(tr -d '' < "$ASKS_OUT") "$ASKS_SHIP" >/dev/null 2>&1; then
+    echo "unattended: $ASKS_REL has drifted from the shipped ask guide; re-run $0"; exit 1
   fi
   # the FIFTH artifact. RENDERED, so it is compared the way the Skill is and not the way the three
   # copied ones are: re-render from the template and diff. This is the parity assertion that makes
@@ -632,6 +692,18 @@ fi
 if [ ! -f "$VERBS_OUT" ] || ! diff -q <(tr -d '' < "$VERBS_OUT") "$VERBS_SHIP" >/dev/null 2>&1; then
   tr -d '' < "$VERBS_SHIP" > "$VERBS_OUT"
   echo "unattended: installed $VERBS_REL"
+fi
+# the stop contract, the same shape again. Without this the kit would ship a gate its own adopter
+# could not satisfy, which is the defect the protocol block above records having had.
+if [ ! -f "$STOPS_OUT" ] || ! diff -q <(tr -d '' < "$STOPS_OUT") "$STOPS_SHIP" >/dev/null 2>&1; then
+  tr -d '' < "$STOPS_SHIP" > "$STOPS_OUT"
+  echo "unattended: installed $STOPS_REL"
+fi
+# the ask guide, the same shape again. Without this the kit would ship a gate its own adopter could
+# not satisfy, which is the defect the protocol block above records having had.
+if [ ! -f "$ASKS_OUT" ] || ! diff -q <(tr -d '' < "$ASKS_OUT") "$ASKS_SHIP" >/dev/null 2>&1; then
+  tr -d '' < "$ASKS_SHIP" > "$ASKS_OUT"
+  echo "unattended: installed $ASKS_REL"
 fi
 # the fifth artifact, RENDERED rather than copied. It is written into the kit directory itself, so
 # an adopter installed at any prefix gets a fixture whose paths name THEIR prefix -- which is the

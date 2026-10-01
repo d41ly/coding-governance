@@ -24,9 +24,9 @@ gotcha-classes = ["reflowed-prompt-string-reads-as-a-deleted-stop.md", "text-mod
   "process-creation-is-the-suite-cost.md", "trace-profile-measures-itself.md",
   "fallback-fabricates-the-passing-value.md", "two-readers-of-one-config-one-re-derived.md",
   "destructive-step-before-its-precondition.md", "line-count-reads-empty-capture-as-one.md",
-  "guard-fed-the-value-it-supersedes.md", "witness-graded-against-a-fact-written-after-it.md"
-]
-guides = ["UNATTENDED-PROTOCOL.md", "UNATTENDED-VERBS.md"]
+  "guard-fed-the-value-it-supersedes.md", "witness-graded-against-a-fact-written-after-it.md",
+  "porcelain-diff-names-a-rename-by-its-destination.md"]
+guides = ["UNATTENDED-PROTOCOL.md", "UNATTENDED-VERBS.md", "UNATTENDED-STOPS.md", "UNATTENDED-ASKS.md"]
 backlog-shards = []
 lexicon-verbs = []
 [paths]
@@ -69,33 +69,36 @@ populations it walks rather than only the two it grades. `--dispatch` also runs 
 checker declared as `SPEC_TOKENS_CLI` over the live tree first: this harness closes each unit spec
 in its build commit, so no bar ever grades one (aDeferredBar F3).
 
-**The anchor is an OBSERVATION of the remote, and the kit no longer claims more than that.** Kit 1.0
-pinned BASE against `refs/remotes/origin/<default>`, claiming the ref could not move without a push.
-False — `git update-ref` moves it offline — and it was reproduced end to end: preflight printed OK
-over a base the run had authored, the leg agreed silently, and the push landed. The ref name and tip
-now come from what the remote advertises for its own HEAD, and `GOV_DEFAULT_BRANCH` is a cross-check
-that can only refuse. Both routes are inert, not detected: neither value is read at all.
+**THE DEFINITION OF DONE ASKS ONE QUESTION ABOUT THE WORK AND TWELVE ABOUT THE ARTEFACTS.**
+`asks-disposed` grades whether the QUESTIONS a run was pointed at ended somewhere the owner
+can accept; every other item grades what it PRODUCED. It folds nothing — status is the
+declared `ASKS_CMD` witness's, and what it reads off the tree is filing, a status ROW and a
+spec header VERB. Its scope is read BEFORE the witness runs, and its answer freezes into
+`asks-at-landing` because ruling D4 makes CLOSED non-absorbing.
 
-**A sha is a NAME, and the dereference is pinned separately.** `git replace` substitutes the object a
-sha resolves to and a graft file rewrites the commit graph, both at a perfectly honest anchor, so
-neither is closed by any amount of anchor hardening. Every read that turns a sha into bytes or into
-ancestry goes through a wrapper pinning `core.useReplaceRefs=false` with `GIT_GRAFT_FILE` pointed
-away from the repo. The two suppressions are not interchangeable; only the second stops a graft,
-measured.
-
-**The boundary is stated rather than implied.** A design panel broke four independent anchor
-mechanisms and converged on one reduction: a check under the run's own uid cannot constitute
-authorization. The protocol's §9 enumerates what remains reachable — editing the kit,
-shimming its tools, skipping the hook layer, relaying through a seeded endpoint, or never creating a
-run-state file at all — and names the only control that binds: re-running the same leg in a clone the
-run never touched.
+**What authorizes a run has its own dossier.** The anchor observation, the pinned sha dereference,
+the stated boundary and the ask mandate are `unattended-mandate`.
 
 **Nothing in a script can reach the scheduler.** The job the agent schedules there is the IDLE-WAKE:
-it fires only while the session is idle, so it cannot wake a stalled one, and its `--audit` prompt
-is a unit stall probe. What wakes a run is the keepalive — the stop-guard at turn end, the
-stall-recorder at error end, the resume tick from the OS scheduler — three actors outside the
-session, reading one predicate, `--liveness`. The tick launches only on a lease the INDEX holds,
-on the node that took it; the reap is read back at `--landed` against the stop-guard's listing.
+it fires only while the session is idle, so it cannot wake a stalled one; its prompt runs
+`--resume --keepalive-id`, then `--audit`, the unit stall probe. What wakes a run is the keepalive —
+the stop-guard at turn end, the stall-recorder at error end, the resume tick from the OS scheduler —
+three actors outside the session, reading one predicate, `--liveness`, whose clock counts a bar
+queued at the turnstile by the runner's heartbeat (`TOOL-dDerivedDocket-64`) and a session waiting
+on its Workflow by its sub-agents' transcripts (`TOOL-dDerivedDocket-65`). The tick launches only
+on a lease the INDEX holds, on the node that took it; the reap is read back at `--landed` against
+the stop-guard's listing.
+
+**How a run stops, who drives it and which processes are its own has its own dossier.** HELD, the
+lease and the process ledger are `unattended-stops`.
+
+**LANDED is DERIVED, not written after the push (TOOL-dDerivedDocket-22, ruling D12-i2).** A
+committed `LANDING` record whose own commit the advertised tip holds reads landed, found by CONTENT
+through the library's `read_landing_commit`, so the driver's readers and the leg's check 7, fact-set
+arm and grant arm agree about one record; the committed LIVE index never derives. In-place
+`--landed` only observes, and logs that; `--preflight` writes a derived record `LANDED` in a scratch
+copy, names and stages it, and only then moves it. The dating residual is `--follow` following a
+COPY at a record's first commit — toward grandfathering on a real history.
 
 **Declarations, not constants.** The phase vocabulary, the Definition-of-Done set, the lander, the
 bypass flag and the scheduler tool names all live in the repo-root `.unattended.conf`. The driver and
@@ -106,28 +109,30 @@ CORE of both sets and the project may only EXTEND them, asserted against a shrin
 without it, deleting an item is a silent, reason-free override of everything keyed on it, and the
 fleet has a recorded pin RAISE indistinguishable from a drain.
 
+**Condition 3's two keys may not name one path.** A `SHARED_RECORDS` path may never be declared by a
+pass and a `GENERATED_INDEXES` index may be, alone, so a path under both is answered by whichever
+rule `--dispatch` reaches first. The library's `scan_shared_index_overlaps` compares the two by
+containment in either direction; the driver refuses such a conf at load and the leg reports check
+38, both over the one `resolve_shared_records` default (`TOOL-dDerivedDocket-20`).
+
 **The run-state file is split mechanically, not by discipline.** The generated region is EMPTY by
 contract and the gate asserts it holds no copy: the unit list is DERIVED from the build README on
-every read, so "current" is the absence of a second answer rather than a comparison between two. It
-was once byte-compared against a fresh render, and that equality was unmaintainable in the ordinary
-case. The authored region holds only the facts nothing in the tree derives, enumerated in the
-protocol's own section 2 and deliberately not counted here — three carriers once held three
-different counts of them at once. The precedent is in this repo: one build's hand-kept status file
-still reads IN-PROGRESS while the generated region of its README correctly reads CLOSED.
+every read, so "current" is the absence of a second answer rather than a comparison between two. The authored region holds only the facts nothing in the tree derives, enumerated in the
+protocol's own section 2 and not counted here: three carriers once held three counts of them at
+once.
 
 **The template is byte-gated and this feature is kit-conditional.** The unattended rules first landed
 in the domain-rules companion (§1) to stay inside the byte ceiling; v3.0 converged that companion into
-the charter, so they now live in the charter's `kit:unattended` conditional block in §1 — dropped by
+the charter, so they now live in the charter's two `kit:unattended` conditional blocks in §1 — dropped by
 the renderer for a target that did not select the kit. Two amended clauses sit in the unconditional
-body, both written to stay true for a non-adopting re-puller. A new universal-core section for an
-opt-in kit was rejected on both counts. The Skill's `## Resume` section invokes `/session-kickoff`
+body, both written to stay true for a non-adopting re-puller. The Skill's `## Resume` section invokes `/session-kickoff`
 after the reap and the re-schedule (`TOOL-aReplayedCard-3`), so a session resumed after process
 death re-orients and its first commit is not denied on an un-oriented card; `check-unattended.sh`
 check 18 keeps the template's FIRST kickoff mention below its first `--preflight`, and the resume
 mention sits far under both.
 
 **A run is bound by a set of named directives, and each is a POINTER.** The count lives in the
-driver's `DIRECTIVES_CORE` and in nothing else here, because this sentence has already been wrong
+driver's `DIRECTIVES_CORE` and nowhere here, because this sentence has already been wrong
 about it once. The set is a kit constant the project may extend but not delete; the rules live in the build method and the contract names zero
 handles, because naming them twice is the drift the design exists to avoid. A waiver is the owner's,
 taken at preflight and nowhere else — enforced by one branch rather than promised, so a later verb
@@ -196,6 +201,10 @@ exist, because the act is a field of the reason. The history complement subtract
 without that a retire row matches both alternations and `--status` reports one row as a decision AND
 as a note.
 
+**An inherited red is a policy read at R.** `gates-green` maps its pinned bar's record by `GATE_POLICY_FILE` at the advertised tip, and S7 backs the two escapes. `TOOL-dDerivedDocket-24`.
+
+**The bar is bounded by its pinned backstop**, wall + queue + margin from `GATE_PROFILE_CMD`, and its ending is read, not assumed: TREE MOVED re-runs once, HOST and a kill before `acquired` print holds. Check 42 grades the wall, 43 the Skill's hold routing. `TOOL-dDerivedDocket-27`.
+
 ## Shared seams
 
 - `memory/guides/REVIEW-PROTOCOL.md` — the structural precedent for a BINDING guide: charter-cited,
@@ -237,20 +246,6 @@ silently; re-derive this section whenever the feature is touched.*
   `assertion-between-two-derived-values` was found here, in this kit's own leg, and the arm that
   proves it is this kit's. The class is general — any checker that composes both sides of a
   comparison has it — and nothing sweeps for it repo-wide.
-- **The gate leg still recomputes BASE against a live local ref.** The driver's anchor is observed;
-  the leg's is not. It reads `GOV_DEFAULT_BRANCH` and `refs/remotes/origin/<d>`, so handed a tree
-  with a forged tracking ref it recomputes the same wrong value and agrees. The driver refuses such a
-  run before a run-state file exists, so the reachable damage is bounded, but the leg's own
-  independence is not what it claims. Open as `TOOL-aStandingWrit-6`.
-
-- **Check 9's three silent exits were specced and never landed.** The `aMooredAnchor` spec's S4
-  scoped a named refusal for each — the default branch is unresolvable, no candidate ref resolves,
-  and a candidate resolves but the merge-base fails — and its rev-4 rebase note lists four items
-  carried forward with S4 absent from them. The spec closed anyway. So on a clone with no
-  `origin/HEAD` and no environment override, the whole `if [ -n "$d" ]` block is skipped in silence,
-  and check 15's ancestry half inherits that. This is an ABSENT ref, distinct from the forged one
-  above, and it was owned by nobody until this dossier row.
-
 - **The DIRECTIVE LAYER is gated on both halves.** The registry is joined to the Skill's table in
   both directions by check 16, every cited method section resolves, and the protocol's own §3 phase
   list, §4 DoD table and the count sentence above it are joined to the driver's constants by arms D
@@ -271,3 +266,7 @@ silently; re-derive this section whenever the feature is touched.*
 - **The reap is checked at `--landed`; the schedule is not.** With the stop-guard wired, it refuses
   while the newest harness listing names the recorded id. No script can schedule or reap for the
   agent, so that half stays attested and softest.
+- **Joins grade presence only** (`TOOL-dDerivedDocket-30`). Check 26 joins each fenced `gov:argv`
+  parser to the header and its suite, check 22 the import allow-list to the example, and check 23
+  excuses a brief only by unit, own `prompts/` and blob prefix. A suite line merely passing a flag
+  satisfies 26.

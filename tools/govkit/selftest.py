@@ -4250,6 +4250,118 @@ user_skills = "/tmp/gk-fake-skills"
         check("that message says the taxonomy must partition its own input",
               "does not partition its own input" in bad_g.stdout, bad_g.stdout)
 
+        # ---- THE `root-conf` CLASS AND GUARD COMPLETENESS (TOOL-dDerivedDocket-21) -----------------
+        # 7c had five prefix classes and no home for a root file, so no guard could name the conf its
+        # own leg reads and a conf-only commit skipped that leg. The class is DERIVED from each
+        # descriptor's `[config] file`; 7c2 then reds a guarded bar leg whose argv names such a conf
+        # its guard lacks. Every arm is a fixture, because over gov's own tree both checks are silent
+        # by construction once the guards are complete.
+        def build_scratch_gov_conf(tag: str, legs: list, files: dict) -> pathlib.Path:
+            """A scratch gov tree whose one kit declares `.lexicon.conf` as its `[config] file`.
+
+            `legs` are manifest rows as (name, argv, guard, chunk); `files` are paths under the kit.
+            """
+            g = tmp / f"govconf-{tag}"
+            (g / PFX / KIT_NAMES["govkit"]).mkdir(parents=True)
+            (g / PFX / "demo").mkdir(parents=True)
+            shutil.copy2(GOVKIT, g / PFX / KIT_NAMES["govkit"] / "govkit.py")
+            shutil.copy2(GOVKIT.parent / "adopters.toml", g / PFX / KIT_NAMES["govkit"] / "adopters.toml")  # arm 10 refuses a gov without it
+            (g / PFX / KIT_NAMES["govkit"] / "registry.toml").write_text(
+                '[surface]\nglobs = ["{prefix}/*"]\n\n'
+                '[selection]\ndefault = ["demo"]\n\n'
+                '[[entry]]\nid = "demo"\ndescriptor = "{prefix}/demo/kit.toml"\n\n'
+                '[[exempt]]\npath = "{prefix}/govkit"\nwhy = "the deployer itself"\n\n'
+                '[[exempt]]\npath = "{prefix}/gate-legs.json"\nwhy = "a gov-specific leg manifest"\n',
+                encoding="utf-8", newline="\n")
+            body = ('id = "demo"\nhome = "demo"\n'
+                    'version_from = { none = "fixture" }\n\n'
+                    '[check]\nnone = "a fixture kit"\n\n'
+                    '[config]\nfile = ".lexicon.conf"\n\n'
+                    '[[files]]\ninclude = "**"\nrole = "engine"\n\n'
+                    '[adopt]\nargv = ["bash", "{kit}/adopt-demo.sh"]\nmutates_index = true\n')
+            for nm, _argv, _guard, _chunk in legs:
+                body += (f'\n[[gate_leg]]\nname = "{nm}"\nargv = ["true"]\nguard = []\n'
+                         f'subject = "repo"\n')
+            (g / PFX / "demo" / "kit.toml").write_text(body, encoding="utf-8", newline="\n")
+            (g / PFX / "demo" / "adopt-demo.sh").write_text(
+                '#!/usr/bin/env bash\ngit add .\n', encoding="utf-8", newline="\n")
+            for rel, text in files.items():
+                (g / PFX / "demo" / rel).write_text(text, encoding="utf-8", newline="\n")
+            (g / ".lexicon.conf").write_text("VERB_OFFENDER_PIN=0\n", encoding="utf-8",
+                                             newline="\n")
+            (g / PFX / "gate-legs.json").write_text(
+                json.dumps([{"name": nm, "argv": argv, "guard": guard, "subject": "repo",
+                             "chunk": chunk} for nm, argv, guard, chunk in legs], indent=2) + "\n",
+                encoding="utf-8", newline="\n")
+            (g / PFX / KIT_NAMES["govkit"] / "subject-pins.tsv").write_text(
+                "# fixture pin\n" + "".join(f"{nm}\trepo\t{chunk}\n" for nm, _a, _g, chunk in legs),
+                encoding="utf-8", newline="\n")
+            git(g, "init", "-q", "-b", "main")
+            git(g, "config", "user.email", "t@e")
+            git(g, "config", "user.name", "t")
+            git(g, "add", "-A")
+            git(g, "commit", "-qm", "base")
+            return g
+
+        _rd = ["python", f"{PFX}demo/reader.py"]
+        _reads = {"reader.py": 'CONF = ".lexicon.conf"\n'}
+        _quiet = ("quiet", ["true"], [f"{PFX}demo/"], "declarations")
+
+        # AC4 — the class admits a DECLARED root conf, and only a declared one.
+        _c1 = run_in(build_scratch_gov_conf(
+            "class", [("demo", _rd, [f"{PFX}demo/", ".lexicon.conf"], "declarations")], _reads))
+        check("root-conf: a guard naming the kit's declared conf falls into exactly one class",
+              _c1.returncode == 0 and "declared classes" not in _c1.stdout, _c1.stdout)
+        _c2 = run_in(build_scratch_gov_conf(
+            "nosuch", [("demo", _rd, [f"{PFX}demo/", ".lexicon.conf", ".nosuch.conf"],
+                        "declarations")], _reads))
+        check("root-conf: a root file NO descriptor declares still reds 7c",
+              _c2.returncode == 1 and "'.nosuch.conf'" in _c2.stdout
+              and "declared classes" in _c2.stdout, _c2.stdout)
+        # The rc conjunct is load-bearing: a fixture govkit REFUSED (exit 2, empty stdout) passed
+        # this arm alone when the fixture lacked adopters.toml, an absence-shaped green.
+        check("root-conf: ...and the declared conf beside it is not the one named",
+              _c2.returncode == 1 and "'.lexicon.conf'" not in _c2.stdout,
+              _c2.stdout + _c2.stderr)
+
+        # AC5 — a guarded bar leg whose argv file names the conf, with the conf missing from its guard.
+        _c3 = run_in(build_scratch_gov_conf(
+            "lacks", [("demo", _rd, [f"{PFX}demo/"], "declarations")], _reads))
+        check("7c2: a conf-reading guarded leg WITHOUT the conf reds, naming the leg and the conf",
+              _c3.returncode == 1 and "leg 'demo' reads root conf .lexicon.conf" in _c3.stdout,
+              _c3.stdout)
+        check("7c2: ...and it prints how many legs it graded",
+              "guarded bar legs graded 1 · root-conf readers 1" in _c3.stdout, _c3.stdout)
+        check("7c2: with the conf in the guard the same tree is green",
+              _c1.returncode == 0 and "reads root conf" not in _c1.stdout
+              and "guarded bar legs graded 1 · root-conf readers 1" in _c1.stdout, _c1.stdout)
+        _c4 = run_in(build_scratch_gov_conf(
+            "held", [("demo", _rd, [f"{PFX}demo/"], "selftests"), _quiet], _reads))
+        check("7c2: the same leg moved to chunk `selftests` is not graded",
+              _c4.returncode == 0 and "reads root conf" not in _c4.stdout
+              and "guarded bar legs graded 1 · root-conf readers 0" in _c4.stdout, _c4.stdout)
+
+        # LIVENESS — nothing graded while a conf is declared refuses, it never reads as clean.
+        _c5 = run_in(build_scratch_gov_conf(
+            "dead", [("demo", _rd, [f"{PFX}demo/"], "selftests")], _reads))
+        check("7c2: ZERO guarded bar legs graded with a declared conf is a refusal, not a green zero",
+              _c5.returncode == 1 and "graded ZERO guarded bar legs" in _c5.stdout, _c5.stdout)
+
+        # The residual — a conf read through a module BESIDE the argv file is reported, never graded.
+        _via = {"reader.py": "import confname  # noqa: E402\n",
+                "confname.py": 'CONF_NAME = ".lexicon.conf"\n'}
+        _c6 = run_in(build_scratch_gov_conf(
+            "via", [("demo", _rd, [f"{PFX}demo/"], "declarations")], _via))
+        check("7c2: a conf read through a same-directory module does NOT red",
+              _c6.returncode == 0 and "reads root conf" not in _c6.stdout, _c6.stdout)
+        check("7c2: ...and prints a near-miss naming the leg, the conf and the module",
+              "near-miss: leg 'demo' may read root conf .lexicon.conf through "
+              f"{PFX}demo/confname.py" in _c6.stdout, _c6.stdout)
+        _c7 = run_in(build_scratch_gov_conf(
+            "via-named", [("demo", _rd, [f"{PFX}demo/", ".lexicon.conf"], "declarations")], _via))
+        check("7c2: once the guard names the conf, no near-miss line names the leg",
+              _c7.returncode == 0 and "near-miss: leg 'demo'" not in _c7.stdout, _c7.stdout)
+
         # ---- A REPO-LOCAL GATE POLICY MAY NOT RIDE OUT IN A KIT'S PAYLOAD ------------------------
         # TOOL-dUnstalledConvoy-28. `.githooks/pre-push` ships verbatim to every push-main adopter,
         # so a GATE_SELFTESTS assignment written into it turns the kit self-tests back on for
@@ -4270,6 +4382,19 @@ user_skills = "/tmp/gk-fake-skills"
               in _pol.stdout, _pol.stdout + _pol.stderr)
         check("AC2: and the refusal names the file and the kit that would ship it",
               f"'{PFX}demo/policy.sh'" in _pol.stdout and "kit 'demo'" in _pol.stdout, _pol.stdout)
+        # TOOL-dDerivedDocket-24 AC22: the inherited-red pair rides the same predicate. Gov's value is
+        # `land`, and a kit that copied the file carrying it would land every adopter over its reds.
+        # The trailing-comment spelling is the evasion the first predicate admitted for GATE_SELFTESTS.
+        for _line, _key in (("INHERITED_RED=land", "INHERITED_RED"),
+                            ("export INHERITED_RED_MAX_AGE=10  # gov only", "INHERITED_RED_MAX_AGE")):
+            (pg / PFX / "demo" / "policy.sh").write_text(
+                "#!/usr/bin/env sh\n" + _line + "\n", encoding="utf-8", newline="\n")
+            git(pg, "add", "-A")
+            git(pg, "commit", "-qm", f"{_key} in the payload")
+            _irp = run_in(pg)
+            check(f"AC22: a bare {_key} assignment inside a kit's payload REDS, naming the file",
+                  _irp.returncode == 1 and f"carries a bare {_key} assignment AND is shipped" in _irp.stdout
+                  and f"'{PFX}demo/policy.sh'" in _irp.stdout, _irp.stdout + _irp.stderr)
 
         # ITS CONTROL, and it is the arm that stops this being a ban on the variable. The same line
         # in a path no kit claims is the SANCTIONED shape — that is where gov keeps its own — and a
@@ -4511,19 +4636,30 @@ user_skills = "/tmp/gk-fake-skills"
         # default form, which assigns exactly as hard as `=`. The INVOCATION control is the half
         # that keeps the predicate from redding on its own source — `GATE_SELFTESTS=1 bash ...`
         # appears dozens of times across this tree in docs, arms and refusal strings.
+        # THE KEYS ARE govkit's OWN `POLICY_KEYS` (TOOL-dDerivedDocket-24 S14), imported rather than
+        # restated, so this arm grades the alternation the engine compiles and not a copy of it.
+        sys.path.insert(0, str(HERE))
+        import govkit as _gk_mod  # noqa: E402
+        _pk = "|".join(_re.escape(k) for k in _gk_mod.POLICY_KEYS)
         _pol_re = _re.compile(
             r"^[ \t]*(?::[ \t]+)?(?:export[ \t]+)?"
-            r"(?:GATE_SELFTESTS=\S*|\$\{GATE_SELFTESTS:?=[^}]*\})"
+            r"(?:(" + _pk + r")=\S*|\$\{(" + _pk + r"):?=[^}]*\})"
             r"[ \t]*(?:#.*)?$")
         _gk_src = (HERE / "govkit.py").read_text(encoding="utf-8")
         check("M5: the predicate this arm grades is the one govkit.py actually compiles",
-              "GATE_SELFTESTS=\\S*|" in _gk_src or "GATE_SELFTESTS=" in _gk_src, "")
+              '"|".join(re.escape(k) for k in POLICY_KEYS)' in _gk_src, "")
+        check("M5: POLICY_KEYS names the self-test switch and both inherited-red keys",
+              set(_gk_mod.POLICY_KEYS) == {"GATE_SELFTESTS", "INHERITED_RED", "INHERITED_RED_MAX_AGE"},
+              repr(_gk_mod.POLICY_KEYS))
         for _s in ("export GATE_SELFTESTS=1", "GATE_SELFTESTS=1",
-                   "export GATE_SELFTESTS=1  # gov only", ": ${GATE_SELFTESTS:=1}"):
+                   "export GATE_SELFTESTS=1  # gov only", ": ${GATE_SELFTESTS:=1}",
+                   "INHERITED_RED=land", "export INHERITED_RED_MAX_AGE=10  # gov only",
+                   ": ${INHERITED_RED:=land}"):
             check(f"M5: a policy line is caught — {_s!r}", bool(_pol_re.match(_s)), _s)
         for _s in (f"GATE_SELFTESTS=1 bash {PFX}{KIT_NAMES['run-gates']}/run-gates.sh",
                    'if [ -n "${GATE_SELFTESTS:-}" ]; then',
-                   'echo "set GATE_SELFTESTS=1 to run"'):
+                   'echo "set GATE_SELFTESTS=1 to run"',
+                   "INHERITED_RED=land bash .githooks/pre-push"):
             check(f"M5 control: an invocation is NOT a policy — {_s[:38]!r}",
                   not _pol_re.match(_s), _s)
 
@@ -4714,9 +4850,11 @@ user_skills = "/tmp/gk-fake-skills"
             # the check-arms sibling of its gate, so it left the project-owned ORDER rows.
             # 27 -> 28, TOOL-aRepatriatedFork-30 S1: run-gates withheld `foreign-prefix.gov.test.sh`
             # by the same rule as `run-gates.gov.test.sh`.
+            # 28 -> 29, TOOL-dDerivedDocket-9 (27 -> 28 on its own side; the two added rows summed at
+            # the reconcile): memory-tree withholds `transition-audit.test.sh` by the same `project-owned` include (its spec's S12: the suite grades gov's hooks).
             check("...and the playbook file previews as a seed WRITE, not as an order",
                   marks.get("write|seed", 0) + marks.get("KEEP|seed", 0) == 3
-                  and marks.get("ORDER|project-owned") == 28,
+                  and marks.get("ORDER|project-owned") == 29,
                   str(marks))
             check("...and 1 COVER|project-owned row, for the path a sibling seed writes",
                   marks.get("COVER|project-owned") == 1, str(marks))

@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-24 — no line that executes strands an adopter at another prefix
 
-**Status:** CLOSED · rev-6 · 2026-10-01 · node a · Tier-2 · base 2143b6d6 · streams tooling · order 9
+**Status:** CLOSED · rev-7 · 2026-10-01 · node a · Tier-2 · base 2143b6d6 · streams tooling · order 9
 
 <!-- gen:spec-records -->
 
@@ -258,7 +258,7 @@ rev-3 adds `.githooks/pre-commit.test.sh` · `.githooks/pre-push.test.sh` ·
 
 ## 7. Gates
 
-`install-prefix (shipped surface)` · `install-prefix self-test` · `branch-guard self-test` · `pre-push self-test` · `pre-push bar self-test` · `pre-push run-log line` · `push-main self-test` · `check-wiring self-test` · `micro-format gate selftest` · `placeholder-catalogue self-test` · `codebase-map kit selftest` · `codebase-map gate coverage` · `codebase-map adopter e2e` · `manifest-check self-test` · `scratch-guard self-test` · `recall floor arms` · `govkit selftest` · `govkit selfcheck` · `govkit refusal join` · `govkit acceptance matrix` · `kit version markers` · `kit epoch (shipped bytes move, the version moves)` · `unattended kit gate` · `lexicon naming predicates` · `harness arms (fail branches armed or pinned)`
+`install-prefix (shipped surface)` · `install-prefix self-test` · `branch-guard self-test` · `pre-push self-test` · `pre-push bar self-test` · `pre-push run-log line` · `push-main self-test` · `check-wiring self-test` · `micro-format gate selftest` · `placeholder-catalogue self-test` · `codebase-map kit selftest` · `codebase-map gate coverage` · `codebase-map adopter e2e` · `manifest-check self-test` · `scratch-guard self-test` · `recall floor arms` · `govkit selftest` · `govkit selfcheck` · `govkit refusal join` · `govkit acceptance matrix` · `kit version markers` · `kit epoch (shipped bytes move, the version moves)` · `unattended kit gate` · `lexicon naming predicates` · `harness arms (fail branches armed or pinned)` · `transition-audit arms` · `straggler-guard arms`
 
 New arm: `.githooks/pre-commit.test.sh` · a `vendor/gov/` fixture whose staged hygiene leg the
 `2143b6d6` hook skips · none
@@ -316,6 +316,10 @@ New arm: `tools/govkit/selftest.py` · rev-4: a foreign kit at gov's canonical p
   charter template at the REPO root, which no install prefix moves. Under `set -u` the suite died on
   an unbound variable before its first verdict. `ROOT` is restored for that one read; no criterion
   moves.
+- rev-7 · 2026-10-01 · §7 · the reconcile with origin/main carries dDerivedDocket's own rev-3 of
+  this spec (2026-09-28): its merge brought the legs `transition-audit arms` and `straggler-guard
+  arms`, whose guards name the check-wiring gate, a path §4 touches; the leg line names both.
+  Nothing else moved.
 
 ## 10. Reuse audit
 

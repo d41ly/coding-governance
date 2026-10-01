@@ -1,0 +1,573 @@
+#!/usr/bin/env bash
+# straggler-guard.test.sh — the arms for the shards-to-builds straggler layer.
+#
+#   bash .githooks/straggler-guard.test.sh                    # "PASS (n assertions)" + exit 0 = good
+#   bash .githooks/straggler-guard.test.sh --topology <repo> <branch>
+#
+# WHAT IT GRADES. `straggler-guard.sh` and the three hook bodies that source it: the commit refusal
+# and its two notices, the rebase refusal, the per-ref push layer, the recipe's parity with the one
+# constant that owns it, the library's conf reader's agreement with the kit's own parser, and the
+# session step's `hooks own-tree` mark. Every hook arm builds a throwaway git repository, installs
+# the real hooks and the real kits into it, writes a history whose SHAPE is the question, and runs
+# the real hook; the conf arm runs the real reader and the real parser side by side. Nothing here
+# re-implements the subject.
+#
+# WHY IT IS A REPO-SUBJECT LEG AND NOT A HELD SELF-TEST. The recipe-parity arm grades two tracked
+# TEXTS — the library's rendering and the relocation engine's `--recipe` — which drift with nobody
+# editing a hook. That is the repository-state class the merge bar keeps, so the leg is unguarded by
+# chunk and guarded by path, and the suite itself is WITHHELD from adopters: the library and
+# `pre-rebase` are gov-only and an adopter wires its own carriers.
+#
+# THE FIXTURES INSTALL THE KITS AT `scripts/`, deliberately, and it is not arbitrary. Every path in
+# the subject is DERIVED, so a fixture built at THIS tree's own prefix would pass a hook that had the
+# prefix spelled back in. It also keeps `.githooks/pre-commit`'s hygiene and manifest legs from
+# resolving at all, so an arm's verdict is the straggler layer's and never another gate's.
+#
+# THE STRAGGLER BRANCHES LIVE IN LINKED WORKTREES, for the same reason this project's charter says
+# they should: `pre-commit`'s branch guard refuses a commit in the PRIMARY tree while parked off the
+# default branch, so a straggler committed there would be refused by the wrong rule. It also puts
+# every arm on the topology where `core.hooksPath` actually decides which hook files run.
+#
+# WHAT IT DOES NOT GRADE, said out loud because a structural check reads as a semantic one. It never
+# asserts the hygiene engine's overall verdict over a fixture — a scratch tree is not a conforming
+# memory tree. It does not grade the transition audit's own judgement, which is unit 9's suite; it
+# grades only that this layer CALLS it at the right sha and routes its three exits correctly. And it
+# cannot see a rebase made with `--no-verify`, a squash, or a cherry-pick: those leave no hook call
+# and no merge, and that hole is pinned as absence rather than closed.
+set -u
+# The fixture kits are imported by the real engines, and CPython writes their bytecode beside the
+# SOURCE — inside a tree the arms then check out into a linked worktree, where the untracked `.pyc`
+# files abort the checkout. Measured, in this unit's own scratch fixture.
+export PYTHONDONTWRITEBYTECODE=1
+# THE FIXTURES OBSERVE `origin/HEAD`, so an ambient GOV_DEFAULT_BRANCH is machine state that
+# changes what they measure: the library cross-checks it and prints, and the relocation
+# inventory's own resolver REFUSES when it disagrees with the observed default.
+unset GOV_DEFAULT_BRANCH
+
+ROOT="$(git rev-parse --show-toplevel)" || exit 2
+cd "$ROOT" || exit 2
+HOOKDIR="$(cd "$(dirname "$0")" && pwd)"
+SELF="$HOOKDIR/$(basename "$0")"
+
+# ---------------------------------------------------------------------------- the topology helper
+# THE LINKED-WORKTREE TOPOLOGY, IN ONE PLACE. AC12's arms build their worktree through this, and the
+# deployer build's scratch clone runs the `--topology` mode, so the two cannot build two topologies
+# that drift. It sets NO `core.hooksPath`: each caller sets the value it means to measure, which is
+# the whole variable under test.
+add_topology_worktree() { # $1 = repo dir · $2 = branch -> prints the new linked worktree's path
+  local repo="$1" branch="$2" wt
+  [ -n "$repo" ] && [ -n "$branch" ] || { echo "topology: need <repo> and <branch>" >&2; return 2; }
+  [ -d "$repo/.git" ] || { echo "topology: '$repo' is no primary tree" >&2; return 2; }
+  wt="$repo-wt-$(printf '%s' "$branch" | tr '/' '-')"
+  rm -rf "$wt"
+  git -C "$repo" worktree prune >/dev/null 2>&1
+  git -C "$repo" worktree add -q "$wt" "$branch" || return 2
+  printf '%s\n' "$wt"
+}
+
+if [ "${1:-}" = "--topology" ]; then
+  add_topology_worktree "${2:-}" "${3:-}" || exit 2
+  exit 0
+fi
+
+# ------------------------------------------------------------------------ this tree's own sources
+ENGINE_REL=$(git ls-files -- '*/migrate_backlog.py' 'migrate_backlog.py' | head -n 1)
+[ -n "$ENGINE_REL" ] || { echo "FAIL the relocation engine is not tracked here, so the recipe has no canonical text to grade against"; exit 2; }
+KIT_MT=$(dirname "$ENGINE_REL")
+TOOL_ROOT=$(dirname "$KIT_MT")
+KIT_MR="$TOOL_ROOT/memory-recall"
+KIT_LIB="$TOOL_ROOT/lib"
+WIRING="$TOOL_ROOT/check-wiring.sh"
+[ -f "$KIT_MR/extract.py" ] || { echo "FAIL the memory-recall sibling is not beside the memory-tree kit at $KIT_MR, and the transition audit keys every row through its grammar"; exit 2; }
+[ -f "$WIRING" ] || { echo "FAIL the wiring checker is not at $WIRING, so the session step cannot be exercised"; exit 2; }
+# shellcheck source=/dev/null
+. "$KIT_LIB/resolve-python.sh"
+PY=$(resolve_python) || { echo "FAIL no usable python launcher"; exit 2; }
+
+# 57, then 83: the F6 fold of the closing diff review round 1 added exactly 26 executed assertions —
+# 21 conf-table agreement rows, the finding's two spellings read as builds, and 2 x 2 end to end.
+FLOOR_ASSERTIONS=84
+
+TMP=$(mktemp -d) || exit 2
+trap 'rm -rf "$TMP"' EXIT
+n=0; st=0
+# NAMED FOR THE DECLARED VERB TABLE, not for brevity. `.lexicon.conf` pins the count of shell
+# definitions leading with an undeclared verb, so a three-helper harness spelled `ok`/`bad`/`has`
+# would move that pin and red a leg nothing in this file is about.
+add_arm()        { n=$((n+1)); }
+print_failure()  { echo "FAIL $1"; st=1; }
+check_contains() { printf '%s' "$1" | grep -qF -- "$2"; }
+
+# ------------------------------------------------------------------------------ fixture machinery
+# The fixture's own kit prefix. `scripts` rather than this tree's, for the reason the header gives.
+FX_ROOT=scripts
+FX_MT="$FX_ROOT/memory-tree"
+
+write_conf() { # $1 = repo dir, $2 = mode
+  { printf 'MEMORY_ROOT=memory\n'
+    printf 'DISCIPLINES="tooling"\n'
+    printf 'FAMILIES="tooling:TOOL"\n'
+    printf 'ROTATION_MODE="cut"\n'
+    printf 'BACKLOG_MODE="%s"\n' "$2"
+  } > "$1/.memory-tree.conf"
+}
+write_shard() { # $1 = repo dir, $2 = the text of row 1
+  { printf '# TOOL backlog\n\n'
+    printf -- '- TOOL-aSeed-1 \xc2\xb7 filed 2026-01-01 \xc2\xb7 %s\n' "$2"
+    printf -- '- TOOL-aSeed-2 \xc2\xb7 filed 2026-01-02 \xc2\xb7 the second ask\n'
+  } > "$1/memory/backlog/TOOL.md"
+}
+write_hooks() { # $1 = repo dir — the POST-flip hook files, outside the tree, plus a pre-flip copy in it
+  mkdir -p "$1/hk" "$1/.githooks"
+  cp "$HOOKDIR/pre-commit" "$HOOKDIR/pre-push" "$HOOKDIR/pre-rebase" \
+     "$HOOKDIR/straggler-guard.sh" "$1/hk/"
+  chmod +x "$1/hk/pre-commit" "$1/hk/pre-push" "$1/hk/pre-rebase"
+  # A pre-flip branch's OWN hook files carry no straggler rule. This is what a linked worktree runs
+  # under the relative value `check-wiring.sh --fix` writes, and it is the inert case AC12 measures.
+  printf '#!/usr/bin/env bash\nexit 0\n' > "$1/.githooks/pre-commit"
+  chmod +x "$1/.githooks/pre-commit"
+}
+write_kits() { # $1 = repo dir — the real engines, at the fixture's own prefix
+  mkdir -p "$1/$FX_ROOT/run-gates"
+  printf 'the kit-root probe reads this directory, never a spelled prefix\n' > "$1/$FX_ROOT/run-gates/.keep"
+  cp -r "$ROOT/$KIT_MT" "$1/$FX_MT"
+  cp -r "$ROOT/$KIT_MR" "$1/$FX_ROOT/memory-recall"
+  cp -r "$ROOT/$KIT_LIB" "$1/$FX_ROOT/lib"
+  cp "$ROOT/$WIRING" "$1/$FX_ROOT/check-wiring.sh"
+  rm -rf "$1/$FX_MT/__pycache__" "$1/$FX_ROOT/memory-recall/__pycache__"
+}
+init_repo() { # $1 = repo dir — a shards-mode base commit, a bare origin, and the hooks wired
+  mkdir -p "$1/memory/backlog" "$1/memory/archive" "$1/memory/builds/aSeed"
+  write_hooks "$1"
+  printf '__pycache__/\n' > "$1/.gitignore"
+  printf '# the seed build\n' > "$1/memory/builds/aSeed/README.md"
+  printf '# decisions\n\n- TOOL-aSeed-9 - a decision\n' > "$1/memory/DECISIONS.md"
+  printf 'notes\n' > "$1/README.md"
+  write_conf "$1" shards
+  write_shard "$1" "the first ask"
+  git init -q -b main "$1"
+  git -C "$1" config user.email arms@example.invalid
+  git -C "$1" config user.name arms
+  git -C "$1" config commit.gpgsign false
+  git -C "$1" config core.autocrlf false
+  git -C "$1" add -A >/dev/null 2>&1
+  git -C "$1" commit -q --no-verify -m base
+  git init -q --bare -b main "$1.git"
+  git -C "$1" remote add origin "$1.git"
+}
+add_origin_head() { # $1 = repo dir — publish main and make origin/HEAD observable
+  git -C "$1" push -q --no-verify origin main
+  git -C "$1" remote set-head origin -a >/dev/null 2>&1
+}
+set_builds_mode() { # $1 = repo dir — the commit that switches the default branch
+  write_conf "$1" builds
+  mkdir -p "$1/memory/builds/aFlip"
+  printf '# aFlip\n\n## Asks\n\n## Dispositions\n' > "$1/memory/builds/aFlip/BACKLOG.md"
+  git -C "$1" add -A >/dev/null 2>&1
+  git -C "$1" commit -q --no-verify -m "flip to builds"
+}
+write_relocated() { # $1 = repo dir/worktree, $2 = id, $3 = sha
+  mkdir -p "$1/memory/builds/aFlip"
+  { printf '# aFlip\n\n## Asks\n\n## Dispositions\n\n'
+    printf -- '- RELOCATED \xc2\xb7 %s \xc2\xb7 by %s \xc2\xb7 kept: carried forward across the transition\n' "$2" "$3"
+  } > "$1/memory/builds/aFlip/BACKLOG.md"
+}
+run_in() { # $1 = dir, rest = argv — run with the CALLER's cwd inside the fixture
+  local d="$1"; shift
+  ( cd "$d" && "$@" 2>&1 )
+}
+read_lib_recipe() { # $1 = repo dir, $2 = hooks dir relative to it -> the library's own rendering
+  ( cd "$1" && bash -c ". \"$2/straggler-guard.sh\"; init_straggler_guard >/dev/null 2>&1; print_recipe" 2>/dev/null ) | tr -d '\r'
+}
+
+# ============================================================== F1 — a builds default and a straggler
+F1="$TMP/f1"
+init_repo "$F1"
+write_kits "$F1"
+git -C "$F1" add -A >/dev/null 2>&1; git -C "$F1" commit -q --no-verify -m "the kits"
+F1_BASE=$(git -C "$F1" rev-parse HEAD)
+git -C "$F1" checkout -q -b strag
+write_shard "$F1" "the first ask, REWORDED by the straggler"
+git -C "$F1" commit -q --no-verify -am "the straggler edits a row"
+F1_STRAG=$(git -C "$F1" rev-parse HEAD)
+git -C "$F1" checkout -q main
+set_builds_mode "$F1"
+add_origin_head "$F1"
+git -C "$F1" config core.hooksPath "$F1/hk"
+WT=$(add_topology_worktree "$F1" strag)
+
+# ---- AC1 — a staged shard edit on a pre-flip branch is refused, and --no-verify overrides --------
+printf -- '- TOOL-aSeed-3 \xc2\xb7 filed 2026-03-01 \xc2\xb7 a late ask\n' >> "$WT/memory/backlog/TOOL.md"
+git -C "$WT" add memory/backlog/TOOL.md
+out=$(run_in "$WT" git commit -m "the straggler stages a shard edit"); rc=$?
+[ "$rc" != 0 ] || print_failure "AC1: a staged shard edit on a pre-flip branch was COMMITTED (rc=$rc)"; add_arm
+check_contains "$out" "migrate_backlog.py --relocate --as <your-slug>" \
+  || print_failure "AC1: the refusal does not print the relocation recipe"; add_arm
+out=$(run_in "$WT" git commit --no-verify -m "the straggler stages a shard edit"); rc=$?
+[ "$rc" = 0 ] || print_failure "AC1: --no-verify did not override the refusal (rc=$rc): $out"; add_arm
+
+# ---- AC2 — a non-backlog commit gets ONE notice and is never refused -----------------------------
+printf 'more\n' >> "$WT/README.md"
+git -C "$WT" add README.md
+out=$(run_in "$WT" git commit -m "a non-backlog commit"); rc=$?
+[ "$rc" = 0 ] || print_failure "AC2: a non-backlog commit on a pre-flip branch was refused (rc=$rc): $out"; add_arm
+notices=$(printf '%s\n' "$out" | grep -c '^pre-commit: note — ')
+[ "$notices" = 1 ] || print_failure "AC2: a non-backlog commit printed $notices notice lines, not exactly one"; add_arm
+check_contains "$out" "still owes a relocation" || print_failure "AC2: the notice does not say the branch owes a relocation"; add_arm
+
+# ---- AC1/AC2 — the RELOCATION MERGE stages watched paths and is NOT refused ----------------------
+run_in "$WT" git merge --no-ff --no-commit --no-edit main >/dev/null 2>&1
+write_shard "$WT" "the first ask, as the RESTORED view renders it"
+write_relocated "$WT" TOOL-aSeed-1 "$F1_STRAG"
+git -C "$WT" add memory/ >/dev/null 2>&1
+out=$(run_in "$WT" git commit -m "conclude the relocation merge"); rc=$?
+[ "$rc" = 0 ] || print_failure "AC2: the relocation merge — watched paths staged under a builds-mode MERGE_HEAD — was REFUSED, so the recipe's own last step cannot complete (rc=$rc): $out"; add_arm
+check_contains "$out" "REFUSING" && print_failure "AC2: the relocation merge drew the straggler refusal"; add_arm
+
+# ============================================== F2 — the rebase arms, on an un-merged straggler ----
+git -C "$F1" branch -q strag2 "$F1_STRAG"
+WT2=$(add_topology_worktree "$F1" strag2)
+out=$(run_in "$WT2" git rebase main); rc=$?
+[ "$rc" != 0 ] || print_failure "AC3: a rebase of a HAS-DELTA pre-flip branch onto the builds-mode default was allowed"; add_arm
+check_contains "$out" "migrate_backlog.py --relocate --as <your-slug>" \
+  || print_failure "AC3: the rebase refusal does not print the relocation recipe"; add_arm
+check_contains "$out" "MERGE, never rebase or squash" || print_failure "AC3: the recipe's first step does not say merge and never rebase"; add_arm
+out=$(run_in "$WT2" git pull --rebase origin main); rc=$?
+[ "$rc" != 0 ] || print_failure "AC3: 'git pull --rebase' passes no branch argument and rebased the straggler anyway"; add_arm
+out=$(run_in "$WT2" git rebase --no-verify main); rc=$?
+[ "$rc" = 0 ] || print_failure "AC3: 'git rebase --no-verify' did not bypass the hook (rc=$rc): $out"; add_arm
+
+# ---- AC3 — a DECISION-LOG rotation is not a backlog delta ----------------------------------------
+# The archive population is the FAMILY-named one. A branch that only rotated the decision log has
+# nothing to relocate, so it must draw the merge-first notice and never the recipe, and it rebases.
+git -C "$F1" branch -q rot "$F1_BASE"
+WT3=$(add_topology_worktree "$F1" rot)
+# CREATED HERE, because git tracks no empty directory: `init_repo` makes `memory/archive/` in the
+# primary tree, but the base commit carries nothing under it, so a worktree checked out from that
+# commit has no such directory. Measured at the build's first bar: the write failed, nothing was
+# staged, and `git commit` exited 1 on "nothing to commit" — which this arm read as a refusal.
+mkdir -p "$WT3/memory/archive"
+printf '# rotated decisions\n\n- TOOL-aSeed-9 - a decision\n' > "$WT3/memory/archive/DECISIONS.2026-05-01.md"
+git -C "$WT3" add memory/archive >/dev/null 2>&1
+out=$(run_in "$WT3" git commit -m "rotate the decision log"); rc=$?
+[ "$rc" = 0 ] || print_failure "AC3: a decision-log rotation on a pre-flip branch was refused (rc=$rc): $out"; add_arm
+check_contains "$out" "merge it before filing a new ask" \
+  || print_failure "AC3: a branch with no backlog delta did not draw the merge-first notice: $out"; add_arm
+check_contains "$out" "migrate_backlog.py --relocate" && print_failure "AC3: a decision-log rotation drew the relocation recipe"; add_arm
+out=$(run_in "$WT3" git rebase main); rc=$?
+[ "$rc" = 0 ] || print_failure "AC3: a branch whose only archive change is a decision-log rotation was refused a rebase (rc=$rc): $out"; add_arm
+
+# ---- AC4 — a PRE-FLIP, HAS-DELTA feature push gets the recipe and LANDS --------------------------
+# Its OWN branch: AC3 rebased strag2 past the flip, so pushing that one would measure the
+# other row of the table.
+git -C "$F1" branch -q strag4 "$F1_STRAG"
+out=$(run_in "$F1" git push origin strag4); rc=$?
+[ "$rc" = 0 ] || print_failure "AC4: a pre-flip feature push was refused, which strands the straggler's only off-node copy (rc=$rc): $out"; add_arm
+check_contains "$out" "migrate_backlog.py --relocate --as <your-slug>" \
+  || print_failure "AC4: the feature push printed no relocation recipe"; add_arm
+git -C "$F1.git" rev-parse --verify --quiet refs/heads/strag4 >/dev/null \
+  || print_failure "AC4: the pre-flip feature branch did not reach the remote"; add_arm
+
+# ---- AC10 — the recipe is the ONE canonical text ------------------------------------------------
+# CR-normalised on both sides: the engine prints through python, whose text-mode stdout emits CRLF
+# on Windows, and the library prints through `echo`. The bytes under test are the TEXT, and a
+# comparison that reds on a platform's newline is a comparison nobody can keep.
+canon=$(run_in "$F1" "$PY" "$FX_MT/migrate_backlog.py" --recipe | tr -d '\r')
+mine=$(read_lib_recipe "$F1" hk)
+[ -n "$canon" ] || print_failure "AC10: the relocation engine printed no recipe, so the parity arm would compare two empty strings"; add_arm
+[ "$canon" = "$mine" ] || print_failure "AC10: the library's recipe differs from the engine's --recipe:
+--- engine ---
+$canon
+--- library ---
+$mine"; add_arm
+# The one-byte flip: a copy of the library with a single character changed must NOT compare equal.
+mkdir -p "$F1/hkflip"; cp "$F1/hk/straggler-guard.sh" "$F1/hkflip/straggler-guard.sh"
+sed -i 's/never rebase or squash/never rebase or squashh/' "$F1/hkflip/straggler-guard.sh"
+flipped=$(read_lib_recipe "$F1" hkflip)
+[ "$canon" != "$flipped" ] || print_failure "AC10: a one-byte change to the library's recipe still compared equal to the engine's, so the parity arm grades nothing"; add_arm
+
+# ============================== F3 — a tip that has INTEGRATED the flip, pushed to a bare remote ---
+git -C "$F1" checkout -q -b feat "$F1_STRAG"
+git -C "$F1" merge -q --no-ff --no-verify -m "merge the flipped default" main
+F3_MERGE=$(git -C "$F1" rev-parse HEAD)
+git -C "$F1" checkout -q main
+out=$(run_in "$F1" git push origin feat); rc=$?
+[ "$rc" != 0 ] || print_failure "AC5: a feature branch holding an UNACCOUNTED transition merge was pushed (rc=$rc)"; add_arm
+check_contains "$out" "$F3_MERGE" || print_failure "AC5: the push refusal does not name the transition merge sha"; add_arm
+check_contains "$out" "--repair" || print_failure "AC5: the push refusal does not name the repair verb"; add_arm
+
+git -C "$F1" checkout -q feat
+write_relocated "$F1" TOOL-aSeed-1 "$F1_STRAG"
+git -C "$F1" add -A >/dev/null 2>&1; git -C "$F1" commit -q --no-verify -m "account for the relocation"
+git -C "$F1" checkout -q main
+out=$(run_in "$F1" git push origin feat); rc=$?
+[ "$rc" = 0 ] || print_failure "AC5: a feature branch whose RELOCATED rows are committed was still refused (rc=$rc): $out"; add_arm
+
+# The audit module ABSENT from both trees: one skip line naming the ref, and the push lands.
+git -C "$F1" checkout -q feat
+printf -- '- TOOL-aSeed-5 \xc2\xb7 filed 2026-04-01 \xc2\xb7 another ask\n' >> "$F1/memory/backlog/TOOL.md"
+git -C "$F1" commit -q --no-verify -am "another shard edit after the merge"
+git -C "$F1" checkout -q main
+mv "$F1/$FX_MT/transition_audit.py" "$TMP/ta.bak"
+out=$(run_in "$F1" git push origin feat); rc=$?
+mv "$TMP/ta.bak" "$F1/$FX_MT/transition_audit.py"
+[ "$rc" = 0 ] || print_failure "AC5: an unresolvable audit module refused the push instead of announcing a skip (rc=$rc): $out"; add_arm
+{ check_contains "$out" "refs/heads/feat" && check_contains "$out" "did NOT run"; } \
+  || print_failure "AC5: an unresolvable audit module printed no skip line naming the ref: $out"; add_arm
+
+# The module's conf reader BROKEN: a DEAD PROBE line naming the ref, and the push lands.
+git -C "$F1" checkout -q feat
+printf -- '- TOOL-aSeed-6 \xc2\xb7 filed 2026-04-02 \xc2\xb7 yet another ask\n' >> "$F1/memory/backlog/TOOL.md"
+git -C "$F1" commit -q --no-verify -am "one more shard edit"
+git -C "$F1" checkout -q main
+cp "$F1/$FX_MT/transition_audit.py" "$TMP/ta.orig"
+sed -i 's/^def read_mode(/def read_mode_BROKEN(/' "$F1/$FX_MT/transition_audit.py"
+out=$(run_in "$F1" git push origin feat); rc=$?
+cp "$TMP/ta.orig" "$F1/$FX_MT/transition_audit.py"
+[ "$rc" = 0 ] || print_failure "AC5: a DEAD PROBE refused a feature push, stranding its only off-node copy (rc=$rc): $out"; add_arm
+{ check_contains "$out" "DEAD PROBE" && check_contains "$out" "refs/heads/feat"; } \
+  || print_failure "AC5: a dead audit printed no DEAD PROBE line naming the ref: $out"; add_arm
+
+# ============================================== AC12 — the two hooks-path values, one topology -----
+# Under the RELATIVE value `check-wiring.sh --fix` writes, the linked worktree runs its OWN pre-flip
+# hook files and the commit is not refused. That is the documented inert case, and the session step
+# is what names it.
+git -C "$F1" config core.hooksPath .githooks
+# Its OWN branch: `strag` concluded a relocation merge above and is no longer pre-flip.
+git -C "$F1" branch -q wt12 "$F1_STRAG"
+WT4=$(add_topology_worktree "$F1" wt12)
+printf -- '- TOOL-aSeed-8 \xc2\xb7 filed 2026-07-01 \xc2\xb7 an ask under the relative value\n' >> "$WT4/memory/backlog/TOOL.md"
+git -C "$WT4" add memory/backlog/TOOL.md
+out=$(run_in "$WT4" git commit -m "a shard edit under the relative hooks path"); rc=$?
+[ "$rc" = 0 ] || print_failure "AC12: under the relative core.hooksPath the worktree's own pre-flip hooks did not run, so the arm measured the primary tree's (rc=$rc): $out"; add_arm
+check_contains "$out" "REFUSING" && print_failure "AC12: the documented inert case was refused"; add_arm
+sess=$(run_in "$F1" bash "$FX_ROOT/check-wiring.sh" --session); rc=$?
+[ "$rc" = 0 ] || print_failure "AC12: check-wiring --session exited $rc on a tree holding a straggler"; add_arm
+line=$(printf '%s\n' "$sess" | grep '^note     straggler')
+check_contains "$line" "refs/heads/wt12" || print_failure "AC12: the session note does not name the local straggler: $sess"; add_arm
+check_contains "$line" "hooks own-tree" || print_failure "AC12: the session note does not mark a straggler whose worktree runs its own hooks: $line"; add_arm
+# The SAME session step under the graft neutralizer the unattended driver exports to every child,
+# the bar a `--close` runs included. Git prints a deprecation hint on stderr for each commit it
+# parses under it, and the inventory once read a sha out of a stream joined with stderr: the hint
+# became part of a `--not` revision, so this note read "exited 1" there and nowhere else.
+gsess=$( export GIT_GRAFT_FILE=/dev/null; run_in "$F1" bash "$FX_ROOT/check-wiring.sh" --session )
+gline=$(printf '%s\n' "$gsess" | grep '^note     straggler')
+check_contains "$gline" "refs/heads/wt12" || print_failure "AC12: under GIT_GRAFT_FILE=/dev/null the session note does not name the local straggler: $gline"; add_arm
+# And under an ABSOLUTE value naming the primary tree's post-flip hooks, the same worktree IS refused.
+git -C "$F1" config core.hooksPath "$F1/hk"
+printf -- '- TOOL-aSeed-9 \xc2\xb7 filed 2026-07-02 \xc2\xb7 an ask under the absolute value\n' >> "$WT4/memory/backlog/TOOL.md"
+git -C "$WT4" add memory/backlog/TOOL.md
+out=$(run_in "$WT4" git commit -m "a shard edit under the absolute hooks path"); rc=$?
+[ "$rc" != 0 ] || print_failure "AC12: under an absolute core.hooksPath naming the primary tree's hooks the shard edit was committed"; add_arm
+check_contains "$out" "migrate_backlog.py --relocate --as <your-slug>" \
+  || print_failure "AC12: the absolute-value refusal does not print the recipe"; add_arm
+
+# ================================================== AC11 — where the default branch is READ from ---
+# The REMOTE default carries the flip while the local branch is still in shards mode: a node whose
+# local `main` was never fast-forwarded must not stay dormant on a flip the fleet has taken.
+git -C "$F1" update-ref refs/heads/main "$F1_BASE"
+git -C "$F1" branch -q rs "$F1_STRAG"
+WT5=$(add_topology_worktree "$F1" rs)
+printf -- '- TOOL-aSeed-7 \xc2\xb7 filed 2026-06-01 \xc2\xb7 a late ask\n' >> "$WT5/memory/backlog/TOOL.md"
+git -C "$WT5" add memory/backlog/TOOL.md
+out=$(run_in "$WT5" git commit -m "a shard edit while the local default is still shards"); rc=$?
+[ "$rc" != 0 ] || print_failure "AC11: with origin/HEAD in builds mode and the local default still in shards, the shard edit was committed"; add_arm
+check_contains "$out" "migrate_backlog.py --relocate --as <your-slug>" \
+  || print_failure "AC11: the remote-default refusal does not print the recipe"; add_arm
+
+# No default branch this clone can resolve at all: a NAMED line, and the commit proceeds.
+U="$TMP/nodef"
+mkdir -p "$U/memory/backlog"
+write_hooks "$U"
+printf 'MEMORY_ROOT=memory\nFAMILIES="tooling:TOOL"\nBACKLOG_MODE="builds"\n' > "$U/.memory-tree.conf"
+printf '# TOOL backlog\n\n- TOOL-x-1 - a row\n' > "$U/memory/backlog/TOOL.md"
+git init -q -b trunk "$U"
+git -C "$U" config user.email arms@example.invalid; git -C "$U" config user.name arms
+git -C "$U" config core.autocrlf false; git -C "$U" config commit.gpgsign false
+git -C "$U" config core.hooksPath "$U/hk"
+git -C "$U" add -A >/dev/null 2>&1; git -C "$U" commit -q --no-verify -m base
+UW=$(git -C "$U" worktree add -q -b side "$U-wt" >/dev/null 2>&1; printf '%s' "$U-wt")
+printf -- '- TOOL-x-2 - another row\n' >> "$UW/memory/backlog/TOOL.md"
+git -C "$UW" add memory/backlog/TOOL.md
+out=$(run_in "$UW" git commit -m "a commit with no default branch anywhere"); rc=$?
+[ "$rc" = 0 ] || print_failure "AC11: an unresolvable default branch REFUSED a commit (rc=$rc): $out"; add_arm
+check_contains "$out" "observes no default branch" \
+  || print_failure "AC11: an unresolvable default branch printed no named line, so the layer is silently off: $out"; add_arm
+
+# ================================================== AC7 — dormancy, and the library-absent adopter -
+S="$TMP/shards"
+mkdir -p "$S/memory/backlog"
+write_hooks "$S"
+printf 'MEMORY_ROOT=memory\nFAMILIES="tooling:TOOL"\nBACKLOG_MODE="shards"\n' > "$S/.memory-tree.conf"
+printf '# TOOL backlog\n\n- TOOL-x-1 - a row\n' > "$S/memory/backlog/TOOL.md"
+git init -q -b main "$S"
+git -C "$S" config user.email arms@example.invalid; git -C "$S" config user.name arms
+git -C "$S" config core.autocrlf false; git -C "$S" config commit.gpgsign false
+git -C "$S" config core.hooksPath "$S/hk"
+git -C "$S" add -A >/dev/null 2>&1; git -C "$S" commit -q --no-verify -m base
+git init -q --bare -b main "$S.git"; git -C "$S" remote add origin "$S.git"
+add_origin_head "$S"
+printf -- '- TOOL-x-2 - another row\n' >> "$S/memory/backlog/TOOL.md"
+git -C "$S" add memory/backlog/TOOL.md
+out=$(run_in "$S" git commit -m "a shard edit on a shards-mode default"); rc=$?
+[ "$rc" = 0 ] || print_failure "AC7: a shards-mode default refused a shard edit (rc=$rc): $out"; add_arm
+printf '%s' "$out" | grep -q 'straggler-guard\|pre-commit: note\|pre-commit: REFUSING' \
+  && print_failure "AC7: the dormant path printed a line in a repository that has not flipped: $out"; add_arm
+git -C "$S" checkout -q -b featshards
+printf -- '- TOOL-x-3 - a third row\n' >> "$S/memory/backlog/TOOL.md"
+git -C "$S" commit -q --no-verify -am "a feature commit"
+out=$(run_in "$S" git push origin featshards); rc=$?
+[ "$rc" = 0 ] || print_failure "AC7: a shards-mode default refused a feature push (rc=$rc): $out"; add_arm
+printf '%s' "$out" | grep -q 'pre-push: note\|pre-push: REFUSING\|straggler-guard' \
+  && print_failure "AC7: the dormant push path printed a line in a repository that has not flipped: $out"; add_arm
+
+# The library ABSENT beside a shipped pre-push, on a builds-mode default: the block is inert, the
+# push lands, and the hook's exit is BASE's 0 for a feature ref. This is every adopter that took the
+# push-main kit and not the gov-only library, and no other arm exercises it.
+N="$TMP/nolib"
+mkdir -p "$N/hk" "$N/memory/backlog" "$N/memory/builds/aFlip"
+cp "$HOOKDIR/pre-push" "$N/hk/pre-push"; chmod +x "$N/hk/pre-push"
+printf 'MEMORY_ROOT=memory\nFAMILIES="tooling:TOOL"\nBACKLOG_MODE="builds"\n' > "$N/.memory-tree.conf"
+printf '# aFlip\n' > "$N/memory/builds/aFlip/BACKLOG.md"
+printf '# TOOL backlog\n\n- TOOL-x-1 - a row\n' > "$N/memory/backlog/TOOL.md"
+git init -q -b main "$N"
+git -C "$N" config user.email arms@example.invalid; git -C "$N" config user.name arms
+git -C "$N" config core.autocrlf false; git -C "$N" config commit.gpgsign false
+git -C "$N" config core.hooksPath "$N/hk"
+git -C "$N" add -A >/dev/null 2>&1; git -C "$N" commit -q --no-verify -m base
+git init -q --bare -b main "$N.git"; git -C "$N" remote add origin "$N.git"
+add_origin_head "$N"
+[ -f "$N/hk/straggler-guard.sh" ] && print_failure "AC7: the library-absent fixture carries the library, so its arm proves nothing"; add_arm
+git -C "$N" checkout -q -b featn
+printf -- '- TOOL-x-9 - a feature row\n' >> "$N/memory/backlog/TOOL.md"
+git -C "$N" commit -q --no-verify -am "a feature commit"
+out=$(run_in "$N" git push origin featn); rc=$?
+[ "$rc" = 0 ] || print_failure "AC7: with no straggler-guard.sh beside it the shipped pre-push refused a feature push — every push-main adopter (rc=$rc): $out"; add_arm
+printf '%s' "$out" | grep -q 'pre-push:' \
+  && print_failure "AC7: the library-absent block printed a line: $out"; add_arm
+git -C "$N.git" rev-parse --verify --quiet refs/heads/featn >/dev/null \
+  || print_failure "AC7: the library-absent feature push did not reach the remote"; add_arm
+
+# ================================================== AC14 — the topology helper is ONE definition ---
+T="$TMP/topo"
+init_repo "$T"
+git -C "$T" branch -q side
+before=$(git -C "$T" config --get core.hooksPath || true)
+tout=$(bash "$SELF" --topology "$T" side); trc=$?
+after=$(git -C "$T" config --get core.hooksPath || true)
+[ "$trc" = 0 ] || print_failure "AC14: --topology exited $trc"; add_arm
+[ "$(printf '%s\n' "$tout" | grep -c .)" = 1 ] || print_failure "AC14: --topology printed more or fewer than one line: $tout"; add_arm
+# COMPARED IN GIT'S OWN SPELLING ON BOTH SIDES. The mode prints the path as the shell gave it, and
+# `worktree list` prints git's: under a POSIX-emulation shell on Windows those are `/tmp/…` and
+# `C:/Users/…/Temp/…` for one directory, so a text match of the one against the other redded a
+# correct helper at the build's first bar. Git names the printed path's top level itself, the
+# printed path must BE that top level, and the listing must carry it on `side` (the spec's AC14).
+tl=$(git -C "$tout" rev-parse --show-toplevel 2>/dev/null || true)
+tp=$(git -C "$tout" rev-parse --show-prefix 2>/dev/null || echo not-a-tree)
+{ [ -n "$tl" ] && [ -z "$tp" ] && git -C "$T" worktree list --porcelain | tr -d '\r' |
+    awk -v p="$tl" '/^worktree / { w = substr($0, 10) } $1 == "branch" && w == p && $2 == "refs/heads/side" { f = 1 } END { exit !f }'; } \
+  || print_failure "AC14: the path --topology printed is not a worktree of the fixture on 'side': $tout (git names it '$tl')"; add_arm
+printf '%s' "$tout" | grep -q PASS && print_failure "AC14: --topology printed a PASS line, so the mode reads as a suite run"; add_arm
+[ "$before" = "$after" ] || print_failure "AC14: --topology changed core.hooksPath from '$before' to '$after'"; add_arm
+hits=$(grep -c 'add_topology_worktree' "$SELF")
+[ "$hits" -ge 3 ] || print_failure "AC14: the topology helper is named $hits times in this suite, so its definition, the mode's dispatch and AC12's call are not all routed through it"; add_arm
+grep -qE '^add_topology_worktree\(\) \{' "$SELF" || print_failure "AC14: the topology helper has no definition line in this suite"; add_arm
+
+# ============================================ F6 — ONE conf grammar, the library's and the kit's ---
+# Closing diff review round 1, F6 (its ids 6 and 14). The library re-parses `.memory-tree.conf`
+# because its subjects are git objects it must not execute, and its reader kept an unquoted trailing
+# comment and missed an `export` prefix, so a flipped tree spelling either read as unflipped and
+# every straggler layer went dormant with nothing printed. A deliberate re-parse is safe only beside
+# an assertion that it agrees with the authoritative reader, so BOTH run over one table of legal
+# spellings here: the kit's `tree_lib.parse_conf` imported from this tree, and the library's
+# `read_conf_value` sourced from beside this suite. Each side prints `<value> rc=<0|1>`, so an
+# absent key and a blank one are two answers, and a side that did not run prints no `rc=` at all.
+TL_DIR="$ROOT/$KIT_MT"
+[ -f "$TL_DIR/tree_lib.py" ] || { echo "FAIL the kit's conf parser is not at $TL_DIR/tree_lib.py, so the agreement arm has no authority to compare against"; exit 2; }
+cat > "$TMP/parse_conf.py" <<'PYEOF'
+import sys
+
+sys.path.insert(0, sys.argv[1])
+import tree_lib  # noqa: E402  the kit's ONE conf parser, the authority this arm compares against
+
+with open(sys.argv[2], encoding="utf-8", newline="") as fh:
+    conf = tree_lib.parse_conf(fh.read(), {})
+key = sys.argv[3]
+sys.stdout.write((conf[key] + " rc=0") if key in conf else " rc=1")
+PYEOF
+CF="$TMP/conf-cases"; mkdir -p "$CF"
+cfk=()
+printf 'MEMORY_ROOT=memory\n' > "$CF/1";                                         cfk+=(BACKLOG_MODE)  # absent
+printf 'BACKLOG_MODE=""\n' > "$CF/2";                                            cfk+=(BACKLOG_MODE)  # blank
+printf 'BACKLOG_MODE="builds"\n' > "$CF/3";                                      cfk+=(BACKLOG_MODE)  # quoted
+printf "BACKLOG_MODE='builds'\n" > "$CF/4";                                      cfk+=(BACKLOG_MODE)  # single-quoted
+printf 'BACKLOG_MODE=builds\n' > "$CF/5";                                        cfk+=(BACKLOG_MODE)  # bare
+printf 'BACKLOG_MODE=builds   # flipped by the switch-over\n' > "$CF/6";         cfk+=(BACKLOG_MODE)  # commented (F6)
+printf 'BACKLOG_MODE="builds"  # flipped\n' > "$CF/7";                           cfk+=(BACKLOG_MODE)  # quoted, commented
+printf 'export BACKLOG_MODE=builds\n' > "$CF/8";                                 cfk+=(BACKLOG_MODE)  # exported (F6)
+printf 'export\tBACKLOG_MODE="builds"\n' > "$CF/9";                              cfk+=(BACKLOG_MODE)  # exported after a tab
+printf 'BACKLOG_MODE="a # b"\n' > "$CF/10";                                      cfk+=(BACKLOG_MODE)  # a # inside quotes is data
+printf 'BACKLOG_MODE=a#b\n' > "$CF/11";                                          cfk+=(BACKLOG_MODE)  # a glued # is data
+printf 'BACKLOG_MODE= builds\n' > "$CF/12";                                      cfk+=(BACKLOG_MODE)  # blank after = ends it
+printf 'BACKLOG_MODE=shards\nBACKLOG_MODE=builds\n' > "$CF/13";                  cfk+=(BACKLOG_MODE)  # the last one wins
+printf 'BACKLOG_MODE="builds"\r\n' > "$CF/14";                                   cfk+=(BACKLOG_MODE)  # CRLF
+printf '# BACKLOG_MODE=builds\n' > "$CF/15";                                     cfk+=(BACKLOG_MODE)  # a comment line
+printf 'BACKLOG_MODE="builds\n' > "$CF/16";                                      cfk+=(BACKLOG_MODE)  # unterminated quote
+printf 'MEMORY_ROOT=mem   # the root\n' > "$CF/17";                              cfk+=(MEMORY_ROOT)   # the watched root
+printf 'export FAMILIES="tooling:TOOL deploy:DEPL"\n' > "$CF/18";                cfk+=(FAMILIES)      # the archive families
+printf '  BACKLOG_MODE = builds\n' > "$CF/19";                                   cfk+=(BACKLOG_MODE)  # spaced around =
+printf 'BACKLOG_MODE=builds#x # c\n' > "$CF/20";                                 cfk+=(BACKLOG_MODE)  # glued, then a comment
+printf 'BACKLOG_MODE_OLD=builds\n' > "$CF/21";                                   cfk+=(BACKLOG_MODE)  # a longer key is not this one
+for i in "${!cfk[@]}"; do
+  cf="$CF/$((i + 1))"; key=${cfk[$i]}
+  lib=$(bash -c '. "$1" && { read_conf_value "$(cat "$2")" "$3"; echo " rc=$?"; }' _ "$HOOKDIR/straggler-guard.sh" "$cf" "$key" 2>&1)
+  kit=$("$PY" "$TMP/parse_conf.py" "$TL_DIR" "$cf" "$key" 2>&1)
+  { check_contains "$kit" " rc=" && [ "$lib" = "$kit" ]; } \
+    || print_failure "F6 conf case $((i + 1)) ($key): the library read '$lib' and the kit's parser read '$kit'"; add_arm
+done
+# THE FINDING'S OWN TWO SPELLINGS, read as `builds` — agreement alone would pass a kit that had the
+# same defect, and these are the lines the review reproduced.
+c6=$(bash -c '. "$1" && read_conf_value "$(cat "$2")" BACKLOG_MODE' _ "$HOOKDIR/straggler-guard.sh" "$CF/6" 2>&1)
+c8=$(bash -c '. "$1" && read_conf_value "$(cat "$2")" BACKLOG_MODE' _ "$HOOKDIR/straggler-guard.sh" "$CF/8" 2>&1)
+[ "$c6|$c8" = "builds|builds" ] || print_failure "F6: the commented and the exported flip read '$c6' and '$c8', not builds"; add_arm
+
+# END TO END: a default branch that flipped with the commented spelling, then with the exported one,
+# and a straggler staging a shard edit under each. The old reader left the layer dormant on both.
+E="$TMP/spell"
+mkdir -p "$E/memory/backlog"
+write_hooks "$E"
+printf 'MEMORY_ROOT=memory\nFAMILIES="tooling:TOOL"\nBACKLOG_MODE="shards"\n' > "$E/.memory-tree.conf"
+printf '# TOOL backlog\n\n- TOOL-x-1 - a row\n' > "$E/memory/backlog/TOOL.md"
+git init -q -b main "$E"
+git -C "$E" config user.email arms@example.invalid; git -C "$E" config user.name arms
+git -C "$E" config core.autocrlf false; git -C "$E" config commit.gpgsign false
+git -C "$E" config core.hooksPath "$E/hk"
+git -C "$E" add -A >/dev/null 2>&1; git -C "$E" commit -q --no-verify -m base
+git -C "$E" branch -q spellstrag
+printf 'MEMORY_ROOT=memory   # the root\nFAMILIES="tooling:TOOL"\nBACKLOG_MODE=builds   # flipped by the switch-over\n' > "$E/.memory-tree.conf"
+git -C "$E" commit -q --no-verify -am "the flip, spelled with trailing comments"
+EW=$(add_topology_worktree "$E" spellstrag)
+printf -- '- TOOL-x-2 - a late row\n' >> "$EW/memory/backlog/TOOL.md"
+git -C "$EW" add memory/backlog/TOOL.md
+out=$(run_in "$EW" git commit -m "a shard edit under a commented flip"); rc=$?
+[ "$rc" != 0 ] || print_failure "F6: a default branch flipped as 'BACKLOG_MODE=builds   # …' left the straggler layer dormant — the shard edit was COMMITTED"; add_arm
+check_contains "$out" "REFUSING" || print_failure "F6: the commented flip drew no refusal: $out"; add_arm
+printf 'MEMORY_ROOT=memory\nexport FAMILIES="tooling:TOOL"\nexport BACKLOG_MODE=builds\n' > "$E/.memory-tree.conf"
+git -C "$E" commit -q --no-verify -am "the flip, respelled with export"
+# A FRESH EDIT, staged whatever the arm above did: had the commented flip been committed, a bare retry
+# would exit 1 on "nothing to commit" and read as a refusal. Measured, with the old reader staged.
+printf -- '- TOOL-x-3 - another late row\n' >> "$EW/memory/backlog/TOOL.md"
+git -C "$EW" add memory/backlog/TOOL.md
+out=$(run_in "$EW" git commit -m "a shard edit under an exported flip"); rc=$?
+[ "$rc" != 0 ] || print_failure "F6: a default branch flipped as 'export BACKLOG_MODE=builds' left the straggler layer dormant — the shard edit was COMMITTED"; add_arm
+check_contains "$out" "REFUSING" || print_failure "F6: the exported flip drew no refusal: $out"; add_arm
+
+# ---------------------------------------------------------------------------------------- verdict
+if [ "$n" -lt "$FLOOR_ASSERTIONS" ]; then
+  echo "FAIL executed $n assertions, below the declared floor of $FLOOR_ASSERTIONS — a block of arms"
+  echo "     is stranded past an exit, and a suite that reports success over half of itself is the"
+  echo "     green-by-absence shape this floor exists to catch."
+  st=1
+fi
+[ "$st" = 0 ] && echo "PASS ($n assertions)"
+exit "$st"

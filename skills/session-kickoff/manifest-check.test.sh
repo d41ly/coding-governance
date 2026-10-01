@@ -935,7 +935,10 @@ printf '%s\n' "$*" >> "$SPAWN_LOG"
 exec "$REAL_PY" "$@"
 SHIM_PY
 chmod +x "$SHIM/git" "$SHIM/python"
-printf '## task\n- **Title:** t\n## read\n- `skills/session-kickoff/SKILL.md:47-60` — the skeleton\n## records\n- TOOL-cBriefedPilot-11 — one clause — memory/backlog/TOOL.md:455\n%s\n' "$(render_ready_line "$wt_head")" \
+# The record row cites the ask's FILED home, never a line of `memory/backlog/TOOL.md`: that file is
+# a generated family view since TOOL-dDerivedDocket-7 and -34 ("Cite ids, never line numbers"), and
+# the `:455` it used to cite fell past its end at the switch-over.
+printf '## task\n- **Title:** t\n## read\n- `skills/session-kickoff/SKILL.md:47-60` — the skeleton\n## records\n- TOOL-cBriefedPilot-11 — one clause — memory/builds/cBriefedPilot/BACKLOG.md\n%s\n' "$(render_ready_line "$wt_head")" \
   | (cd "$CWT" && PATH="$SHIM:$PATH" GOV_PYTHON=python bash "$CHECK" --card --append --session "$K2A" > "$CARD_OUT" 2>&1); got=$?   # gov:literal-python — names the SHIM on PATH, which exec's the resolved REAL_PY
 [ "$got" = 0 ] && grep -q '^- TOOL-cBriefedPilot-11 — one clause' "$K2CARD" && ! grep -q 'UNVERIFIED' "$K2CARD" \
   && { echo "ok   K2 AC1 a clean body is appended with no UNVERIFIED line"; pass=$((pass+1)); } \

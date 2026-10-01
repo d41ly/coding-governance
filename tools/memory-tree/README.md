@@ -15,9 +15,27 @@ ARCH-bOrderlyAtlas-1.)
 | File | Role |
 |---|---|
 | `.memory-tree.conf.example` | the per-repo config — `MEMORY_ROOT`, `DISCIPLINES`, discipline→`FAMILIES`, optional `TOMBSTONE_ROOTS`. Copy to your repo root as `.memory-tree.conf`. |
-| `check-memory-hygiene.sh` | the gate — 25 checks (1-12, 21, 22, 23 and 25 in the shell, 13-16 delegated to `corpus_ids.py`, 17-19 to `gotchas.py`, 20 and 24 to `row_grammar.py`; 21 owns its fail branches in the shell and delegates only the PARSE to `gen_build_index.py`, because `check-arms.py` discovers its population from tracked shell and cannot see a Python raise), grandfather-aware, with a `--staged` pre-commit fast leg. THE single source; CI/hook/gate-runner all call it. |
+| `check-memory-hygiene.sh` | the gate — 26 checks (1-12, 21, 22, 23 and 25 in the shell, 13-16 delegated to `corpus_ids.py`, 17-19 to `gotchas.py`, 20 and 24 to `row_grammar.py`, 26 to `transition_audit.py`; 21 owns its fail branches in the shell and delegates only the PARSE to `gen_build_index.py`, because `check-arms.py` discovers its population from tracked shell and cannot see a Python raise), grandfather-aware, with a `--staged` pre-commit fast leg. THE single source; CI/hook/gate-runner all call it. |
 | `row_grammar.py` | check 20 — one id, one row per row document. Pinned shrink-only by `ROW_DUPLICATE_PIN`; undeclared means 0, the strictest value. Arms live in its own `--selftest`, which is a gate leg, because the shell arm-scanner cannot reach a Python module. Also the backlog-row grammar other engines import (`parse_row`, `census`), the `SEVERITY_UNLABELLED_PIN` and `LIVE_ROW_PIN` shard ratchets (blank = unarmed, announced as NOT MEASURED), `--emit-pin` for all three pins, and `--ages`, row age DERIVED from git. |
-| `gen_build_index.py` | the generated build index (`--write` / `--check` / `--selftest`); check 9 calls it. Renders each build README's generated region, `LIVE.md`, and `ledger/<month>.md` shards from build front matter plus every spec's status header — a build's status is a pure function of its units', so nothing is authored and nothing rots. |
+| `gen_build_index.py` | the generated build index (`--write` / `--check` / `--selftest`); check 9 calls it. Renders each build README's generated region, `LIVE.md`, and `ledger/<month>.md` shards from build front matter plus every spec's status header — a build's status is a pure function of its units', so nothing is authored and nothing rots. Under `BACKLOG_MODE=builds` it also renders the family views and owns the `--asks` print modes and the `--new-build` scaffold; its `--selftest` compares [Backlog modes](#backlog-modes--authored-shards-and-per-build-asks) against `backlog.py`'s declarations. |
+| `backlog.py` | the per-build ask model: the `BACKLOG.md` grammar, the spec-header verbs `closes` and `advances`, the order-free status fold, the verdicts as data (`VERDICT_CODES`), READY, and the family-view renderer with the one relocation recipe. A library that reads no tree; its arms run inside `gen_build_index.py --selftest`. |
+| `migrate_backlog.py` | the switch from shards to per-build asks: the planner (`--plan`), the switch-over writer (`--write`), the relocation engine (`--relocate` / `--ingest` / `--repair`), the straggler census (`--stragglers`) and the recipe (`--recipe`), plus `--selftest`. It calls `backlog.py`'s grammar and fold and `transition_audit.py`'s delta, and spells neither. |
+| `transition_audit.py` | hygiene check 26, the transition-merge audit: a merge joining a lineage that edits authored shards to one that renders them from build folders must account for every row change with one `RELOCATED` row. Dormant under `shards`; under `builds` it keys rows through the memory-recall kit's anchor grammar and refuses by name without it. |
+| `transition-audit.test.sh` | check 26's arms, each over a throwaway repository running the real checker. A repo-subject leg rather than a held self-test, because one arm compares the tracked hooks with the wiring declaration. |
+| `tree_lib.py` | the helpers two or more engines here share — the conf parser, the fence reader, the status vocabulary, `kit_rel` — so no engine imports a sibling engine. |
+| `check-verdict-epoch.sh` | the kit version DATES the engine's verdicts: across a range, the newest bump of `KIT_MEMORY_TREE_VERSION` must come at or after the newest commit moving a behaviour-bearing line of the engine or a delegate it names. |
+| `check-verdict-epoch.test.sh` | its arms, over synthetic engines in throwaway repositories. |
+| `check-method-carriers.sh` | every file that points at the build method is declared, and points rather than copies. Structural: a fluent paraphrase under new headings passes. |
+| `check-method-carriers.test.sh` | its arms, each in a scratch repository, green control first. |
+| `hygiene-parity.test.sh` | a differential harness: a before and an after copy of the engine over the same scratch corpora must print byte-identical output. It needs a before-revision, so it is kept for the next rewrite and is not a gate leg. |
+| `marker-contract.test.sh` | the reader contracts no shared code can carry across a kit boundary — marker-region well-formedness and the section-8 resolution mark — proven by the readers agreeing over one case table. |
+| `merge-rows.sh` | the launcher git runs as the merge driver: it resolves a python inline and execs `merge-rows.py`, so a copy-installed kit starts the driver at any prefix. |
+| `build-readme-slot-limits.txt` | the hard per-slot byte ceilings for a build README's authored half. A seed: an adopter receives the rows without gov's values. |
+| `build-readme-slot-highwater.txt` | the advisory high-water per slot, rewritten by `gen_build_index.py --bump` and never by hand. |
+| `BUILD-METHOD.template.md` | the build method, rendered to `memory/guides/BUILD-METHOD.md`; its displaced explanation is [below](#the-build-methods-displaced-sections). |
+| `ANNOTATION-STYLE.template.md` | the annotation style guide, rendered to `memory/guides/ANNOTATION-STYLE.md`. |
+| `kit.toml` | this kit's descriptor for the deployer: file roles, the withheld self-tests, and the `requires_if` rows naming the memory-recall kit. |
+| `README.md` | this file. |
 | `corpus_ids.py` | the id + path classifier behind checks 13-16 (13-15 pinned, 16 structural) (`--report` / `--check` / `--measure` / `--print-defined-ids` / `--selftest`): id collisions, orphan ids, dead repo-path citations with a four-rule registry, and read-path accounting. Declares NO grammar and NO set it does not own — the id grammar comes from the memory-recall kit and the append-only/index sets are asked of `check-memory-hygiene.sh` through its print modes. Every pin is measured per corpus; checks 13-15 are behind DEAD_PATH_PIN / ORPHAN_ID_PIN; check 16 is STRUCTURAL and behind none. `--print-defined-ids` prints the id grammar as a POSIX ERE on its first line, then every id the corpus DEFINES, for a caller that must join cited ids against the set without spelling the grammar — the kickoff checker's `--card --append` is that caller. |
 | `gotchas.py` | the bug-class catalogue behind checks 17-19 (`--check` / `--write` / `--report` / `--for-diff <range>` / `--for-paths <path>...` / `--declares` / `--selftest`). Anchors are DERIVED from each record's body, not authored; `--for-diff`'s stdout IS the reviewer's checklist for that diff. |
 | `check-arms.py` | the harness meta-gate: every `fail` BRANCH is armed by a positive assertion naming its own failure text, or pinned in a shrink-only list. Keyed on the call site, pinned in both directions, and excluded from its own scan. Arms are read from the gate's `<stem>.test.sh` and an optional `<stem>.local.test.sh`; pins from `<MEMORY_ROOT>/project/unarmed-branches.txt` and a sidecar `unarmed-branches.txt` beside the gate, and `--report` names the file that armed or pinned each branch. Floored per gate by `ARMS_FLOORS`, which is REFUSED blank while any gate is discovered; `--emit-floors` prints the measured line. Its helpers come from `tree_lib.py`, the one module the kit's engines share, so no engine imports a sibling engine. |
@@ -25,9 +43,17 @@ ARCH-bOrderlyAtlas-1.)
 | `adopt-memory-tree.sh` | `--scaffold` an empty tree that passes once its conf declares the keys the gate reads from the config (new projects). `--render` re-renders the four rendered documents in a tree that already carries the adoption marker, and writes nothing else — the mode `[[regenerate]]` names, and the only one that refreshes them after adoption. It REFUSES on a tree with no marker, and on a kit directory missing any of the four templates, rather than replacing your committed rule set with a placeholder. |
 | `HYGIENE.template.md` | the rule set, copied to `memory/HYGIENE.md` at scaffold time. |
 | `SPEC-TEMPLATE.template.md` | the canonical spec/design-pass format, copied to `memory/TEMPLATE-SPEC.md` at scaffold time; check 12 enforces it once `SPEC_FORMAT_CUTOFF` is set. |
-| `merge-rows.py` | the row-keyed three-way merge driver for the authored indexes (`DECISIONS.md`, `backlog/*.md`). TWO PLANES: one stateless predicate (`^\s*[-*]\s`) splits every line into ROW or STRUCTURE, structure is merged positionally by `git merge-file`, and only the row set is key-merged here. The two recombine through a SKELETON — each input projected to a line list where every row becomes a token (its id when the grammar keys it, else a digest of its text with the terminator and trailing whitespace dropped and LEADING whitespace kept, because indentation is nesting and nesting is content) and every other line passes through byte for byte — so placement comes from git's own diff rather than from a splice this driver computes. A conflict region that is entirely tokens on both sides resolves by concatenation, because both sides sit between the same context lines, so section membership is not in dispute and only sibling order is; ANY disputed structure line is always a conflict. Five postconditions run over the WRITTEN BYTES on every verdict: no row line or leading id written more often than any one input carried it, no row under a heading no input filed it under, per-key CONSERVATION (not uniqueness — a file may legitimately carry the same row line twice), and structure identity against the merged skeleton. The anchor grammar is IMPORTED from the sibling memory-recall kit (`grammar_for` / `anchor_at`), never vendored, and there is no degraded mode when it cannot be read: any failure becomes a conflict rather than a silent take-ours. Wiring is two facts in two places and the driver command carries the install prefix — see [Wire the row-keyed merge driver](#wire-the-row-keyed-merge-driver); do not hand-type it. NOT scaffolded by `adopt-memory-tree.sh` — wiring a merge driver is a per-node git config, not a file the scaffolder can write. The kit ships its own launcher, `merge-rows.sh`, carrying the python resolver inline, so a copy-installed kit at any prefix can start the driver. |
+| `merge-rows.py` | the row-keyed three-way merge driver for the authored indexes (`DECISIONS.md`, `backlog/*.md`, and each build's `BACKLOG.md` under `builds`). TWO PLANES: one stateless predicate (`^\s*[-*]\s`) splits every line into ROW or STRUCTURE, structure is merged positionally by `git merge-file`, and only the row set is key-merged here. The two recombine through a SKELETON — each input projected to a line list where every row becomes a token (its id when the grammar keys it, else a digest of its text with the terminator and trailing whitespace dropped and LEADING whitespace kept, because indentation is nesting and nesting is content) and every other line passes through byte for byte — so placement comes from git's own diff rather than from a splice this driver computes. A conflict region that is entirely tokens on both sides resolves by concatenation, because both sides sit between the same context lines, so section membership is not in dispute and only sibling order is; ANY disputed structure line is always a conflict. Five postconditions run over the WRITTEN BYTES on every verdict: no row line or leading id written more often than any one input carried it, no row under a heading no input filed it under, per-key CONSERVATION (not uniqueness — a file may legitimately carry the same row line twice), and structure identity against the merged skeleton. The anchor grammar is IMPORTED from the sibling memory-recall kit (`grammar_for` / `anchor_at`), never vendored, and there is no degraded mode when it cannot be read: any failure becomes a conflict rather than a silent take-ours. Wiring is two facts in two places and the driver command carries the install prefix — see [Wire the row-keyed merge driver](#wire-the-row-keyed-merge-driver); do not hand-type it. NOT scaffolded by `adopt-memory-tree.sh` — wiring a merge driver is a per-node git config, not a file the scaffolder can write. The kit ships its own launcher, `merge-rows.sh`, carrying the python resolver inline, so a copy-installed kit at any prefix can start the driver. |
 | `merge-rows.test.sh` | the driver's replay fixtures, built on ONE bar: **never worse than `git merge-file` on the identical three blobs**. Every case runs a live control and the comparison is arithmetic — losing a line git keeps, or writing a row more often than git does, fails the suite by name. Conflicting where git resolves correctly is acceptable and is COUNTED by name against a shrink-only constant, currently 2 — a row one side moved and the other deleted, in both directions, the one shape where the row plane and the skeleton disagree about intent. On top of that bar: id-set equality against a grammar-independent oracle, the audit line reconciled against the written file at BOTH exit codes, all seven newline sites, the three fail-closed grammar failures, an end-to-end two-branch `git merge` through the real attribute + config, and five sabotage arms that prove each postcondition is the sole net for a defect class. Every case runs a control — two of twenty-eight groups did before — but the arithmetic comparison can only bind where the control EXITS 0, which is 16 of 40 cases and is FLOORED so a fixture edit cannot quietly drop one. Stating that precisely is the point: a suite that reads stronger than it is, is how this driver twice signed off on rc-0 corruption. |
 | `check-memory-hygiene.test.sh` | fixture self-test for check 12 (red + green classes in a scratch repo). |
+
+**`gotchas.py --for-diff` takes a COMMITTED range, so it runs after the commit, not before it.**
+Staged-but-uncommitted work is not in `HEAD`, so the pre-commit spelling `<pass-base>..HEAD`
+resolves to an empty range and prints "touches no file" — which reads as a clean checklist and is
+not one. Its stdout IS the checklist and it always exits 0 — finish it, do not read its status. If a
+class it names is already violated, that is the next pass. Moved here from the build method's M6 by
+TOOL-dDerivedDocket-20, because it is prose about this tool rather than a rule of the method; M6
+keeps the one line that points here.
 
 ## Configure
 
@@ -96,7 +122,16 @@ TWO facts, wired in two different places. The attribute is COMMITTED, so it land
 ```gitattributes
 memory/DECISIONS.md merge=rows
 memory/backlog/*.md merge=rows
+memory/builds/*/BACKLOG.md merge=rows
 ```
+
+The third line covers the per-build ask files, which every build that files or disposes an ask
+appends to once `BACKLOG_MODE` is `builds`; under `shards` no such file exists and the line matches
+nothing. **The `memory/backlog/*.md merge=rows` line stays after the switch**, although those paths
+are then generated views nobody edits: the driver's view-against-shard refusal is what stops a
+pre-switch branch's shard edits from line-merging into a view, and git asks the driver only for a
+path whose attribute names it, so without that line git's own text merge completes the merge with
+nothing refusing it.
 
 The driver COMMAND is git config, so it is per node — and both of its path arguments carry the
 install prefix, so there is no single literal that starts in both layouts. Do not hand-type it; this
@@ -122,12 +157,192 @@ section honest rather than merely correct today: `check-wiring.sh` RUNS the conf
 scratch three-way before it reports `ok`, and `check-wiring.test.sh` DERIVES both spellings above by
 running `--fix` in a fixture of each layout, so a stray third spelling in this file reds the bar.
 
+## Backlog modes — authored shards and per-build asks
+
+Where an ask lives, and who decides its status, is one conf key. This section is the author-facing
+statement of the per-build model: the grammar a row is written in, the fold that derives a status,
+and the verdicts that name a record the fold disagrees with. The code is `backlog.py`, and
+`gen_build_index.py --selftest` fails when a verdict code or a row kind that module declares has no
+defining line below — it checks that each is DEFINED here, not that the definition is true.
+
+| Part | What it is |
+|---|---|
+| default | `BACKLOG_MODE` absent or blank reads `shards`: the authored `backlog/<FAMILY>.md` files, one status slot per row, with every render, gate and merge behaving as it did before per-build asks existed. `builds` switches to them, and any other value refuses by name. `ASK_CUTOFF`, `BACKLOG_EXCERPT_CHARS` and `PROBE_ALLOW` matter only under `builds`. |
+| row kinds | an ask row, filed once, and nine disposition kinds, each with its writer — [Row kinds](#row-kinds-and-who-writes-each) |
+| the fold | an ask's status, derived from sets of records by `backlog.derive_statuses`, in the order [The fold](#the-fold-in-order) gives |
+| verdicts | one code per record the fold disagrees with — [Verdicts](#verdicts) |
+| ask clauses | `seen`, `accept`, `out`, `may`, `verify` and `data`, the READY grade over them, and `PROBE_ALLOW` — [Clauses and READY](#clauses-and-ready) |
+| print modes | `gen_build_index.py --asks` and what qualifies it, and the `--new-build` scaffold — [Print modes](#print-modes) |
+| stragglers | the transition audit, and `migrate_backlog.py --stragglers`, `--relocate`, `--ingest` and `--repair`; the recipe itself is what `migrate_backlog.py --recipe` prints and is not copied here — [Stragglers](#stragglers) |
+| signed records | the two records an owner signs before the switch, their header cells `Ask`, `Verdict` and `Field`, and the verbs that read them — [Signed records](#signed-records) |
+
+### Row kinds, and who writes each
+
+The separator in every row is ` · `, U+00B7 between two spaces. A build's `BACKLOG.md` holds an H1,
+optional `>` quote lines, then `## Asks` and `## Dispositions`, each at most once; every row is ONE
+physical line.
+
+- ask — `- <ID> · filed <YYYY-MM-DD> [· unit] · <text> [· <label> <value>]… [→ <pointer>]`, under
+  `## Asks`. Written by sessions holding the id's own slug, in `builds/<that slug>/BACKLOG.md` and
+  nowhere else. `unit` declares that the same-id spec is the ask's answer; the pairing is never
+  inferred from two equal ids.
+
+Every row below sits under `## Dispositions`, and its writer puts it in ITS OWN build's `BACKLOG.md`,
+never in the ask's home file. A writer changes its mind by editing its own row.
+
+- `CLOSED` — `CLOSED · <id> · by <id|sha> · <why>`: closes an ask after the fact, by a record or a
+  commit. The forward tool is a spec status header's `closes`.
+- `WONTDO` — `WONTDO · <id> · <why>`: declines it. Its Decided-by value is the writer's build slug.
+- `BLOCKED` — `BLOCKED · <id> · on <id> · <why>`: holds a live ask while the target, an ask or a
+  spec, is live.
+- `DEFERRED` — `DEFERRED · <id> · until <id> · <why>`: the same hold, read as a deferral.
+- `KEEP` — `KEEP · <id> · <why>`: somebody looked and the ask stays live. It derives no status; it
+  answers V10 for an ask on a finished build.
+- `REOPEN` — `REOPEN · <id> · of <spec-id|sha|slug> · <why>`: cancels the one closing or declining
+  record it names.
+- `SEV` — `SEV · <id> · <BLOCKER|HIGH|MED|LOW> · <why>`: a severity. The most severe row wins, and
+  an ask with none reads `unlabelled`.
+- `SCOPE` — `SCOPE · <id> · <label> <value>…`: adds clauses to somebody else's ask. It derives no
+  status and may not carry `may`.
+- `RELOCATED` — `RELOCATED · <id> · by <sha> · <kept|dropped|amended>: <why>`: provenance for a row
+  a pre-switch branch changed. Written by `--relocate`, `--ingest` and `--repair`, never typed.
+
+A spec's own status header carries `closes <ids>` and `advances <ids>`, written by that spec's build.
+The family views, the build README regions, `LIVE.md` and the ledger are the generator's alone.
+
+### The fold, in order
+
+Terminality first, reading no hold at all; then the live statuses, reading terminality. A record a
+`REOPEN` names leaves every set below before any rule reads it.
+
+1. `CLOSED` — a closing record survives: a CLOSED spec whose header `closes` the ask, the ask's own
+   same-id spec when the ask carries `unit` and that spec is CLOSED, or a `CLOSED` row.
+2. `WONTDO` — else a declining record survives: a `WONTDO` row, or a `unit` ask's same-id spec
+   reading WONTDO. A closing spec without `unit` that reads WONTDO declines nothing: one attempt was
+   abandoned, not the ask.
+3. `INPROGRESS` — a linked spec, one whose header `closes` or `advances` the ask, reads INPROGRESS.
+4. `SPECCED` — a linked spec reads OPEN or SPECCED.
+5. `BLOCKED` — a linked spec reads BLOCKED, or a `BLOCKED` row's target is still live.
+6. `DEFERRED` — the same, for DEFERRED.
+7. `UNRESOLVED` — a hold names a target that is neither a filed ask nor a spec H1.
+8. `OPEN` — none of the above.
+
+Every rule is a set test, and the Decided-by value each names is the least member of a sorted set,
+so no date, file order or row order decides anything and a permuted corpus folds to the same bytes.
+A hold cycle among live asks is V6, not an undecidable status.
+
+### Verdicts
+
+`gen_build_index.py --check` prints them under a `VERDICT` header, apart from drift, because the
+remedy is an edit to the record named rather than `--write`. `--asks` still runs while one stands.
+Forward-only means graded only for an ask filed on or after `ASK_CUTOFF`.
+
+- `V1` — an ask's id slug is not the build folder it is filed in.
+- `V2` — a line no row shape reads: a continuation line, a heading other than the two sections, a
+  row under the wrong section or above both, a malformed row, or a file that parses to nothing.
+- `V3` — two ask rows for one id, anywhere in the tree.
+- `V4` — two status rows, or two `SEV` rows, for one target in one file.
+- `V5` — a derived token, `OPEN`, `SPECCED`, `INPROGRESS` or `WITHDRAWN`, written as a verb.
+- `V6` — a hold on itself, a hold whose target resolves to nothing (the ask reads `UNRESOLVED`), or a
+  hold cycle among live asks.
+- `V7` — a verb row, or a spec header's `closes` or `advances`, naming an ask nobody filed.
+- `V8` — a `CLOSED` row `by` a value that is neither a filed ask nor a spec H1; a sha is checked for
+  shape only.
+- `V9` — forward-only: an ask whose id is also a spec H1 and which does not carry `unit`.
+- `V10` — a finished build still holding an ask that derives OPEN with no status row anywhere.
+- `V11` — a `REOPEN` naming no record that currently closes or declines its target.
+- `V12` — forward-only: an ask with no `SEV` row anywhere.
+- `V13` — the clause tail's grammar: an empty clause, one label twice on a row, a malformed `seen` or
+  `may`, a `may` on a `SCOPE` row, a `SCOPE` row naming an unfiled ask, or two `SCOPE` rows for one
+  target in one file.
+- `V14` — forward-only: an ask whose merged clauses carry neither `accept` nor a `seen … run`.
+- `V15` — `ASK_CUTOFF` blank under `builds`, which disarms the forward-only verdicts.
+- `V16` — `ASK_CUTOFF` not a zero-padded date, which disarms them the same way.
+
+The generator continues the same sequence with three verdicts about the population it walks:
+
+- `V17` — a family view carrying content the view grammar never emits. `--write` leaves it
+  byte-unchanged, and the remedy is the relocation recipe, never `--write`.
+- `V18` — under `shards`, a tracked `BACKLOG.md` or a spec header carrying `closes` or `advances`:
+  half a migration, inert and otherwise silent.
+- `V19` — under `builds`, a rotated backlog archive named for a declared family.
+
+### Clauses and READY
+
+An ask row, and any `SCOPE` row naming it, may end in clauses. The tail is read right to left, so a
+text that happens to contain a label costs its writer that one clause, which V13 then names.
+
+`seen <locator>` says where the claim is observable — `` `<path>`@<sha>[:<line>] ``,
+`` `<path>` matching `<pattern>` ``, or `<repo>:<path>@<sha>` in another repository — and may end in
+`run` and a backticked command that re-observes it, which only `--probe` ever executes. `accept` says
+what done looks like, `out` where the cut-line is, `verify` how to verify it (the bar when absent),
+and `data` the data boundary an external locator owes. `may` lists grants, backticked paths or
+decision ids, or `none`: it is a PROPOSAL, honoured only from a build README an owner committed.
+Across an ask row and its `SCOPE` rows, five labels conjoin and `may` is a union with `none` absorbed.
+
+`--asks --ready [IDLIST]` grades each ask `yes`, `legacy` or `no` over six rules, all graded every
+time so every failing rule comes back at once: R1, filed exactly once in its own slug's folder; R2,
+live — OPEN, BLOCKED or DEFERRED, SPECCED or INPROGRESS with no foreign live claim, or a `unit` ask
+of the `--target` build; R3, every live hold names a target inside the mandate; R4, a pointer or
+`seen` names a path the tree holds, or an external locator; R5, an `accept` or a `seen … run`; R6, an
+external locator carries `data`. `legacy` is an ask filed before `ASK_CUTOFF` failing only one of R4
+and R5; every other failure is `no`. A grade never sets the exit status.
+
+`--asks --probe <id>` runs the one `seen … run` command an ask's merged clauses carry, and only when
+a `PROBE_ALLOW` entry admits it by whole-token prefix. Blank, which the kit ships, refuses every
+probe: ask text is written by whoever filed it.
+
+### Print modes
+
+`python <kit>/gen_build_index.py --asks` prints the live asks as a table and writes nothing.
+`--asks <FAMILY>` narrows it to one family, and `--asks <ID>` prints one ask's detail, terminal or
+not. `--all` adds the terminal asks. `--json` prints one object, `mode`, `examined` and `asks`, for a
+program: under `shards` its `mode` reads `shards` and its asks are empty by design, so a reader
+falls back to the authored shards. `--tsv` prints the READY grades as TAB rows. `--status <token>`,
+`--build <slug>`, `--ready [IDLIST]`, `--target <slug>`, `--live-builds <slug>…`, `--at <rev>` and
+`--probe <id>` qualify `--asks` and never run alone; `--at` reads the records and the conf at that
+revision. `--new-build <slug> --asks <IDLIST>` scaffolds the build README an owner lands: it prints
+the readiness table first, refuses when an id is filed nowhere or every id grades `no`, and
+otherwise writes and stages that README and its contract row, then renders.
+
+### Stragglers
+
+A branch that forked before the switch and kept editing authored shards carries row changes with no
+file to land in. Hygiene check 26, `transition_audit.py`, finds every merge that joins such a lineage
+to a switched one, and refuses until each row change it carries has exactly one `RELOCATED` row. It
+is dormant under `shards`. `python <kit>/migrate_backlog.py --stragglers [--local] [--tsv]` lists
+the refs still owing a relocation. `--relocate --as <slug>` moves a straggler's changes into build
+files after it merges the default branch; `--repair <merge-sha> --as <slug>` does the same for a
+transition that already landed; `--ingest <ref> --as <slug>` takes a ref nobody will revisit. Each
+takes `--dry-run`. The recipe a straggler follows is what `migrate_backlog.py --recipe` prints — one
+constant, rendered by every view banner, the row driver's refusal and V17's remedy.
+
+### Signed records
+
+The switch applies an owner's answer to two questions the planner cannot decide: which same-id pairs
+are one subject, and what becomes of each open ask on a finished build. In order:
+
+1. `migrate_backlog.py --plan --record <dir> --record-as <unit-id>` files the worksheets.
+2. The owner signs two markdown records, one per worksheet.
+3. `migrate_backlog.py --plan --signed same-id=<path> --signed triage=<path>` previews the result.
+4. `migrate_backlog.py --write --as <slug> --signed same-id=<path> --signed triage=<path>` applies
+   exactly what is signed; `--triage-ask <id>` names the ask the legacy holds naming no id are held on.
+
+- Each record's header carries one line per worksheet it signs, naming the worksheet's path and
+  its git blob sha: ``the same-id worksheet: `<path>` · blob `<40-hex sha>` ``, and the same with
+  `triage`. `--write` refuses a record whose worksheet is untracked or has moved since it was signed.
+- Columns are located by header cell, never by position, and a header lacking one refuses by name.
+  The same-id record carries `Ask` and `Verdict`, where Verdict is `unit` or `not-unit`. The triage
+  record carries `Ask`, `Verdict` and `Field`, where Verdict is `KEEP`, `CLOSED`, `WONTDO`, `BLOCKED`
+  or `DEFERRED` and Field holds the `by`, `on` or `until` value, or `-`. Other columns are read by
+  nobody; this repo's own records add `Rule`, `Spec`, `Evidence` and `Severity`.
+
 ## Upgrading to 2.73 — check 20's population widened, and your bar may red on arrival
 
 Before 2.71, hygiene check 20 admitted a rotated archive only when its basename began `DECISIONS.`,
 so **every rotated BACKLOG shard went unscanned**. From 2.73 an archive is recognised by the name of
 the document it ROTATED — `DECISIONS` or a value declared in `FAMILIES`, plus a date and an optional
-same-day disambiguator such as the `b` in `TOOL.2026-08-17b.md`.
+same-day disambiguator: a lower-case `b` after the date for the second rotation of one day.
 
 **Your `ROW_DUPLICATE_PIN` may red on the first upgraded bar, with no change of your own.** A
 duplicate id that has always been sitting in a rotated shard becomes visible, and the pin is an
@@ -163,6 +378,21 @@ the same commit.
 vocabulary and `kit_rel`, and `corpus_ids.py` and `gen_build_index.py` re-import them. A tree that
 replaced either of those two with its own program no longer breaks `check-arms.py`, `row_grammar.py`
 or `gotchas.py` on import.
+
+## Upgrading to 2.100 — per-build asks arrive dark
+
+**An upgrade changes nothing until `BACKLOG_MODE` is set to `builds`.** Absent or blank, the key
+reads `shards`: your authored `backlog/<FAMILY>.md` files stay the backlog, no family view is
+rendered, and check 26 prints its dormant line. `backlog.py`, `migrate_backlog.py` and
+`transition_audit.py` arrive with the kit and grade nothing on a shards tree, with one exception that
+reds only a tree already half-switched: V18 names a tracked build `BACKLOG.md`, or a spec header
+carrying `closes` or `advances`, in a tree still on `shards`.
+
+Switching is its own build in your repository, never a step of an upgrade: it migrates your corpus,
+so it takes signed records and one switch-over commit, and the adopter runbook gives the order. The
+grammar, the verdicts and the fold it switches to are
+[Backlog modes](#backlog-modes--authored-shards-and-per-build-asks) above. Install the memory-recall
+kit before you switch — check 26 keys every row through its anchor grammar and has no degraded mode.
 
 ## Arms and pins that travel with their gates — TOOL-aRepatriatedFork-18
 
@@ -245,9 +475,16 @@ LIVE to SHIPPED, which the source contradicts.
 
 ### M6 — why the disjointness clause 3 is worded as it is
 
-The method's parallelism test names `memory/DECISIONS.md`, `memory/backlog/*.md`, the run-state file, and a
+The method's parallelism test names `memory/DECISIONS.md`, an authored backlog shard, the run-state file, and a
 generated index TOGETHER WITH its generator. That last pairing is the whole point of the clause, and it replaced a
 form that could not fail.
+
+Which backlog file is which depends on `BACKLOG_MODE`. Under `shards` the family files under `memory/backlog/`
+are the authored shards the clause names. Under `builds` they are generated views, so they fall under the
+generator pairing instead, beside both files that render them, `gen_build_index.py` and `backlog.py`; and each
+build's own `BACKLOG.md` is written only by that build's passes, a disposer writing in its own folder, so two
+passes that could both write one already intersect under clause 1. The unattended kit's `--dispatch` is where both path lists
+are recorded, and it refuses a declaration pairing an index with its generator.
 
 The vacuous form was "neither touches a shared mutable record". Every pass touches some shared record, so read
 strictly it forbade all parallelism and read loosely it forbade none — and which reading applied was decided by

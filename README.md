@@ -53,7 +53,7 @@ machines/sessions on the same repo.
 - **`tools/unattended/`** — the unattended-run kit: the binding protocol, the four-verb driver, and
   the gate leg that reads a project's `.unattended.conf` rather than restating it. A run that merges
   and pushes with no owner turn replaces the explicit-ask checkpoint with a committed standing
-  mandate it ASSERTS and cannot have written. See `tools/unattended/README.md`.
+  mandate, the charter's §1 Landing substitute. See `tools/unattended/README.md`.
 - **`tools/govkit/`** — the deployer. The installable population is a DECLARATION (a registry plus a
   descriptor per entry), asserted against the tracked surface in both directions, so a new moving
   part reds until something claims it. Runs on the deployer machine; never installed into a target.

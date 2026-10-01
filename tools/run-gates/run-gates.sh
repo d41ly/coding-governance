@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 # run-gates.sh — the coding-governance merge bar: run every gate this repo dogfoods, report per leg.
-# The full bar green at the push boundary; earlier runs scoped. Exit 0 = all passed · 1 = one or more failed · 2 = must run from the repo.
+# The full bar green at the push boundary; earlier runs scoped. Exit 0 = all passed · 1 = one or more failed · 2 = must run from the repo, or REFUSED · 3 = TREE MOVED · 4 = HOST.
+# TREE MOVED: no leg failed, but the tree changed while the bar ran, so no verdict describes it; a failed leg outranks it.
+# HOST: every failed leg timed out twice, the second time alone, while one spawn cost more than GATE_HOST_RATIO
+# times this clone's floor. First match wins: 2 REFUSED, 1 RED, 4 HOST, 3 TREE MOVED, 0 GREEN, and exit 0 needs
+# a reported leg line AND a written verdict file (TOOL-dDerivedDocket-26).
 #   bash <prefix>/run-gates/run-gates.sh             # legs run CONCURRENTLY, at the width
 #                                                    # <prefix>/run-gates/gate-profiles.txt declares
 #                                                    # for the detected cores and RAM
@@ -8,15 +12,27 @@
 #   GATE_PROFILE=<row> bash …                        # select a table row by name, skipping detection
 #   GATE_PROFILES=<path> bash …                      # read a different table; an absent path falls
 #                                                    # back to the built-in formula (the rollback)
+#   GATE_ATTRIBUTE=<rev> bash …                      # re-run each RED leg at <rev> and say whose red
+#                                                    # it is: OWN, INHERITED, MIXED, CONTENDED or
+#                                                    # DEAD PROBE. REPORT-ONLY: no exit code moves
 # Legs live in the manifest DERIVED below as this kit dir's sibling (single source); this runner is
 # a thin iterator over it and holds no leg command of its own.
+#
+# THIS RUNNER GRADES ITSELF, and that predates the red attribution (TOOL-dDerivedDocket-23): every
+# verdict below is rendered by this file, so an edit here can move what any leg reads as and no leg
+# can see it. The attribution does not fix that and refuses to compound it (KF3): when the diff
+# between its base and the working tree touches this runner, `gate-fingerprint.sh`, the pre-push
+# hook or `lib-attribute.sh`, every red reads OWN and says why. Nobody grades their own grader.
 #
 # Legs run through a bounded worker pool. They are safe to run together
 # because each heavy leg is already hermetic — it builds its own `mktemp -d` scratch repo, sets git
 # config only inside it, and never writes into the real tree. Execution order is a scheduling detail;
 # REPORTING is always manifest order, so the output is byte-stable whatever the width.
 set -u
-KIT_RUN_GATES_VERSION=1.19   # gov:kit run-gates@1.19
+KIT_RUN_GATES_VERSION=1.20   # gov:kit run-gates@1.20
+# 1.8 -> 1.9: both sides of the origin/main merge into dDerivedDocket shipped a 1.8 - theirs the
+# run log below, ours red attribution (GATE_ATTRIBUTE, lib-attribute.sh and the manifest's eighth
+# field `signature`, TOOL-dDerivedDocket-23). 1.9 carries both, and neither moves a verdict.
 # 1.7 -> 1.8: every bar appends one line to the run log under the git common dir, from the EXIT trap
 # (TOOL-dLoggedFlight-3). No manifest key, profile knob or stdout line moves, so neither direction of
 # a skew between the runner and its table or manifest changes a verdict.
@@ -35,6 +51,22 @@ KIT_RUN_GATES_VERSION=1.19   # gov:kit run-gates@1.19
 # `bash ../<prefix>/run-gates/run-gates.sh` from a subdirectory the kit dir collapsed to the root, the
 # manifest to `./gate-legs.json`, and the runner ran ZERO legs. Captured here, used below.
 KITDIR=$(cd "$(dirname "$0")" && pwd)
+# AN ABSOLUTE ARGV, BY RE-EXECUTING THROUGH THE PATH JUST RESOLVED (TOOL-dDerivedDocket-25 S4). The
+# process-monitor fence attributes a process by its command line, and `bash <prefix>/run-gates/…`
+# carries a RELATIVE one that no declared root can reach, so a killed runner's tree could not be
+# reaped by it (TOOL-aReapedSpinner-14). Every leg subshell is a FORK of this process and inherits
+# the argv, so fixing it here fixes it for all of them and for every caller at once, the operator's
+# own catalogued invocation included. `exec` keeps the pid, so a caller holding it loses nothing, and
+# it runs before any output, lock or scratch exists. The loop guard is the absolute `$0` itself. A
+# `$0` naming no file beside the kit dir (a runner fed on stdin) is left alone rather than exec'd
+# into a path that does not exist. `-x` is carried because an exec'd bash would otherwise drop it.
+case "$0" in
+  /*) ;;
+  *) if [ -f "$KITDIR/${0##*/}" ]; then
+       case "$-" in *x*) exec "${BASH:-bash}" -x "$KITDIR/${0##*/}" "$@" ;; esac
+       exec "${BASH:-bash}" "$KITDIR/${0##*/}" "$@"
+     fi ;;
+esac
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "run-gates: not a git repo"; exit 2; }
 cd "$ROOT" || exit 2
 # The python-launcher resolver, INLINED byte-identically from resolve-python.sh in gov's lib dir. This
@@ -145,6 +177,22 @@ fails=0; n=0; skips=0; ondemands=0
 ROOTN=$(cd "$ROOT" && pwd)
 KITREL=${KITDIR#"$ROOTN"/}
 LEGS_FILE="${GATE_LEGS:-$(dirname "$KITREL")/gate-legs.json}"
+# THE ATTRIBUTION BASE IS THIS BAR'S AND NO LEG'S. Read once and removed from the environment, so a
+# leg that runs a bar of its own over a fixture — the canary does, many times — never inherits a base
+# that names a commit of THIS repository and attributes its fixture's reds against nothing.
+ATTR_REV=${GATE_ATTRIBUTE:-}
+unset GATE_ATTRIBUTE
+# THE INHERITED-RED POLICY THIS BAR WAS HANDED, and the age bound it ages an INHERITED leg under
+# (TOOL-dDerivedDocket-24). Read once and removed for the base's reason above: a leg that drives a
+# nested bar over a fixture must not inherit this repository's policy. The runner DECIDES nothing
+# with either. The bound sizes the age probe, and the policy only permits the `gate-inherited-green`
+# stamp to be WRITTEN; both readers that act on a red — the pre-push hook and the unattended driver —
+# read the policy at R themselves, so a caller exporting `land` buys a stamp nobody honours without a
+# read of its own. A bound that is not a positive integer, a leading zero included, asks for no age.
+ATTR_POLICY=${GATE_INHERITED_RED:-}
+ATTR_MAX_AGE=${GATE_INHERITED_RED_MAX_AGE:-}
+unset GATE_INHERITED_RED GATE_INHERITED_RED_MAX_AGE
+case "$ATTR_MAX_AGE" in ''|0*|*[!0-9]*) ATTR_MAX_AGE="" ;; esac
 
 # ---- durable per-leg evidence (TOOL-dNomadicAtlas-1) --------------------------------------------
 # leg() already holds every leg's merged output in $out and PRINTS it on failure, then keeps only the
@@ -528,6 +576,59 @@ remove_descendants() {
   return 0
 }
 
+# ---- A TIMED-OUT LEG'S PROCESS GROUP. TOOL-dDerivedDocket-26 F5 -----------------------------------
+# The walk above follows PPIDs from a root, and after a ceiling fires that is the wrong key. `timeout`
+# has returned, the leg command it ran is dead, and a descendant that outlived both was REPARENTED to
+# pid 1 when its parent died, so no walk from the worker or from `timeout` reaches it again. What it
+# KEEPS is its process group: `timeout` without `--foreground` makes itself the leader of a new group
+# before it starts the leg, and every process the leg starts stays in that group unless it leaves.
+# Measured on node `d`: a TERM-ignoring grandchild outlived `timeout -k 2s 2` returning 124, with
+# PPID 1 and a PGID equal to `timeout`'s pid. The worker itself is in the RUNNER's group, which is
+# why keying on `timeout`'s group can never reach the process that still has `.sec` and `.rc` to write.
+#
+# WHAT THIS DOES NOT REACH: a descendant that left the group on its own, by `setsid` or by job control.
+# Nothing in this runner can see one of those once its parent is gone, and the retry pass that asserts
+# the group is empty says nothing about it either.
+#
+# scan_group <pgid> — the pids in that process group, from ONE `ps` snapshot. The HEADER names the
+# columns, so procps' `-o pid,pgid` and cygwin's default table (PID PPID PGID ...) both parse. A cygwin
+# row may lead with a one-letter state column its header does not name, and a row whose PID field is
+# not a number is the continuation of a multi-line argv, which is skipped for the reason
+# `scan_descendants` gives. A PROBE THAT CANNOT MOVE SAYS SO: rc 2 when neither form yields a header
+# naming both columns, so a host whose `ps` cannot show a group is never read as a group that emptied.
+scan_group() {
+  local snap
+  snap=$(ps -e -o pid,pgid 2>/dev/null) || snap=""
+  case "$snap" in *PGID*) ;; *) snap=$(ps -e 2>/dev/null) || snap="" ;; esac
+  printf '%s\n' "$snap" | awk -v g="$1" '
+    NR == 1 { for (k = 1; k <= NF; k++) { if ($k == "PID") p = k; if ($k == "PGID") q = k }; next }
+    p && q { o = ($1 ~ /^[0-9]+$/) ? 0 : 1
+             if ($(p + o) ~ /^[0-9]+$/ && $(q + o) ~ /^[0-9]+$/ && $(q + o) == g) printf "%s ", $(p + o) }
+    END     { if (!p || !q) exit 2 }'
+}
+
+# remove_group_residue <pgid> — kills every process still in that group, snapshot then kill, up to
+# three rounds because a loop in the group can spawn between a snapshot and its kill. Prints the pids
+# it still found after the last round, and nothing when the group emptied. This shell and its parent
+# are skipped by name: neither is in the group, and the guard is a belt over that fact.
+remove_group_residue() {
+  local g=$1 p round=0 left members
+  case "$g" in ''|*[!0-9]*) return 0 ;; esac
+  while :; do
+    left=""
+    members=$(scan_group "$g") || { printf 'unscannable'; return 0; }
+    for p in $members; do
+      [ "$p" = "$$" ] && continue
+      [ "$p" = "${BASHPID:-}" ] && continue
+      left="$left $p"
+    done
+    [ -n "$left" ] || return 0
+    [ "$round" -lt 3 ] || { printf '%s' "${left# }"; return 0; }
+    for p in $left; do kill -9 "$p" 2>/dev/null || true; done
+    round=$((round + 1))
+  done
+}
+
 # THERE IS NO STARTUP LIVENESS PROBE, and its removal is the single most load-bearing correction in
 # this unit. One shipped, and it GRADED NOTHING on every host: it built its subject as
 # `( ( sleep 90 & ) ; sleep 90 ) &`, and bash exec-replaces a subshell's last command, so `$!` WAS
@@ -551,6 +652,39 @@ if [ "$CEILINGS_LIVE" != 1 ]; then
 fi
 PROF_LINE="gate profile: $PROF_NAME  ($prof_where; width $JOBS, timeout $prof_t, ceilings $prof_c, wall $prof_w; $PROF_TAG)"
 
+# HOISTED ABOVE `--print-profile`, TOOL-dDerivedDocket-27 S3. That verb reports the queue bound,
+# and a queue printed before the TTL is resolved reads 0, which is a bound on nothing. Deriving it
+# takes no beacon, runs no leg and writes nothing, so the verb still exits before the turnstile.
+# THE TTL IS DERIVED, never a wall clock copied out of a timing cache. What has to be outlasted is
+# the gap between two heartbeat refreshes — and since TOOL-aQuenchedHarness-8 that gap is
+# `TS_TICK_EVERY`, a TIMER, not "how long can one leg take". The distinction is the whole unit:
+# liveness is a property of the PROCESS and is cheap to assert often; progress is a property of the
+# WORK and is what the per-leg ceiling and the whole-bar wall are for. The reaper wants the first.
+#
+# WHAT THIS REPLACED, recorded because the cliff was real and measured. `ts_hb` used to be called at
+# exactly ONE site — a leg COMPLETING — so the TTL had to outlast a whole leg. Every shipped profile
+# row sets `timeout=0`, so every real run used the 1800 s fallback, while the longest recorded leg
+# was 3837 s. A bar therefore went stale mid-leg on every full run, the next bar reaped its beacon as
+# "stalled", and both ran. Reproduced in a scratch repo with this file unmodified: bar B printed
+# `reaping the beacon of a stalled holder (heartbeat 13s old, ttl 6s)` while bar A was alive and
+# working, and both exited 0. The old note here said the fix was to set `timeout=` on a profile row;
+# it is not, because that value would have to exceed the longest leg, which puts TS_TTL at three
+# times it and TS_MAXWAIT — a declared TS_TTL * 4 — near thirteen hours.
+#
+# A BACKGROUND TICKER WAS REJECTED ONCE, in `memory/builds/aPacedTurnstile/spec/2026-08-18-spec-TOOL-aPacedTurnstile-4.md`,
+# on two premises. The second — "a leg-sized TTL makes it unnecessary" — is refuted by the two
+# numbers above. The first — one more process on a spawn-bound machine — survives and is PRICED: at
+# `TS_TTL / 6` a 4000 s bar ticks about 13 times, two spawns each, at the 319 ms per-spawn cost
+# measured on node `a`; roughly 8 s against a bar that makes tens of thousands. That is the
+# supersession `AGENTS.md` §6 requires, written where the reversal happens.
+if [ "${PROF_TIMEOUT:-0}" -gt 0 ]; then TS_TTL=$(( PROF_TIMEOUT * 3 ))
+else TS_TTL=${GATE_TURNSTILE_TTL:-1800}; fi
+# The bounded wait is a DECLARED MULTIPLE OF THE TTL, so it moves with the one number this unit
+# derives and is never sized against a bar's wall clock. Four: long enough that a queue three deep
+# behind a stalled holder still drains rather than stampeding, short enough that a wedged node
+# releases within an hour.
+TS_MAXWAIT=$(( TS_TTL * 4 ))
+
 # ---- `--print-profile`: ONE RESOLVER, TWO READERS. TOOL-aQuenchedHarness-4 S11 ------------------
 # Profile selection -- the hardware detection, the table walk, the clamp, the GATE_JOBS override --
 # is 200 lines and lives inline here, so any second script wanting the width had to re-implement it.
@@ -564,11 +698,33 @@ PROF_LINE="gate profile: $PROF_NAME  ($prof_where; width $JOBS, timeout $prof_t,
 #
 # TAB-SEPARATED KEY/VALUE, because the caller is a shell script and `read -r k v` is the cheapest
 # correct parse there. Adding a key is safe; a reader takes the keys it knows.
+#
+# TWO KEYS FOR THE UNATTENDED DRIVER'S BACKSTOP, TOOL-dDerivedDocket-27 S3. `queue` is TS_MAXWAIT, the
+# longest the turnstile waits before it fails open, which the driver adds to the wall because the
+# wall is armed only after the queue. `ceiling_max` is the largest positive `ceiling` in the resolved
+# manifest, read with the parse's own predicate, or `-` when no leg declares one; a wall below it
+# fires on a healthy bar that dispatches that leg. A manifest that does not parse prints NO
+# `ceiling_max` line, because "none declared" and "could not read" are two answers, and a reader
+# names the key it did not get.
 if [ "${1:-}" = "--print-profile" ]; then
+  PROF_CEILING_MAX=$("$PYBIN" -c '
+import json, sys
+try:
+    data = json.load(open(sys.argv[1], encoding="utf-8"))
+except Exception:
+    sys.exit(1)
+if not isinstance(data, list):
+    sys.exit(1)
+c = [l["ceiling"] for l in data if isinstance(l, dict) and isinstance(l.get("ceiling"), int)
+     and not isinstance(l.get("ceiling"), bool) and l["ceiling"] > 0]
+sys.stdout.write(str(max(c)) if c else "-")
+' "$LEGS_FILE" 2>/dev/null) || PROF_CEILING_MAX=""
   printf 'name\t%s\n'      "$PROF_NAME"
   printf 'width\t%s\n'     "$JOBS"
   printf 'timeout\t%s\n'   "$PROF_TIMEOUT"
   printf 'wall\t%s\n'      "$WALL"
+  printf 'queue\t%s\n'     "$TS_MAXWAIT"
+  [ -n "$PROF_CEILING_MAX" ] && printf 'ceiling_max\t%s\n' "$PROF_CEILING_MAX"
   printf 'ceilings\t%s\n'  "$CEILINGS_LIVE"
   printf 'line\t%s\n'      "$PROF_LINE"
   exit 0
@@ -634,35 +790,6 @@ if [ "${GATE_TURNSTILE:-1}" != 0 ]; then
   [ -n "$TS_COMMON" ] && TS_COMMON=$(cd "$TS_COMMON" 2>/dev/null && pwd) || TS_COMMON=""
 fi
 
-# THE TTL IS DERIVED, never a wall clock copied out of a timing cache. What has to be outlasted is
-# the gap between two heartbeat refreshes — and since TOOL-aQuenchedHarness-8 that gap is
-# `TS_TICK_EVERY`, a TIMER, not "how long can one leg take". The distinction is the whole unit:
-# liveness is a property of the PROCESS and is cheap to assert often; progress is a property of the
-# WORK and is what the per-leg ceiling and the whole-bar wall are for. The reaper wants the first.
-#
-# WHAT THIS REPLACED, recorded because the cliff was real and measured. `ts_hb` used to be called at
-# exactly ONE site — a leg COMPLETING — so the TTL had to outlast a whole leg. Every shipped profile
-# row sets `timeout=0`, so every real run used the 1800 s fallback, while the longest recorded leg
-# was 3837 s. A bar therefore went stale mid-leg on every full run, the next bar reaped its beacon as
-# "stalled", and both ran. Reproduced in a scratch repo with this file unmodified: bar B printed
-# `reaping the beacon of a stalled holder (heartbeat 13s old, ttl 6s)` while bar A was alive and
-# working, and both exited 0. The old note here said the fix was to set `timeout=` on a profile row;
-# it is not, because that value would have to exceed the longest leg, which puts TS_TTL at three
-# times it and TS_MAXWAIT — a declared TS_TTL * 4 — near thirteen hours.
-#
-# A BACKGROUND TICKER WAS REJECTED ONCE, in `memory/builds/aPacedTurnstile/spec/2026-08-18-spec-TOOL-aPacedTurnstile-4.md`,
-# on two premises. The second — "a leg-sized TTL makes it unnecessary" — is refuted by the two
-# numbers above. The first — one more process on a spawn-bound machine — survives and is PRICED: at
-# `TS_TTL / 6` a 4000 s bar ticks about 13 times, two spawns each, at the 319 ms per-spawn cost
-# measured on node `a`; roughly 8 s against a bar that makes tens of thousands. That is the
-# supersession `AGENTS.md` §6 requires, written where the reversal happens.
-if [ "${PROF_TIMEOUT:-0}" -gt 0 ]; then TS_TTL=$(( PROF_TIMEOUT * 3 ))
-else TS_TTL=${GATE_TURNSTILE_TTL:-1800}; fi
-# The bounded wait is a DECLARED MULTIPLE OF THE TTL, so it moves with the one number this unit
-# derives and is never sized against a bar's wall clock. Four: long enough that a queue three deep
-# behind a stalled holder still drains rather than stampeding, short enough that a wedged node
-# releases within an hour.
-TS_MAXWAIT=$(( TS_TTL * 4 ))
 TS_TICK=${GATE_TURNSTILE_TICK:-2}
 # The heartbeat cadence is DERIVED from the TTL and declared nowhere else, so the pair cannot drift —
 # the same rule TS_MAXWAIT above already follows. Six, so a single missed tick cannot trip the reap.
@@ -958,6 +1085,18 @@ if [ -n "$TS_COMMON" ]; then
     # EXISTING, which is precisely the guard that made it unable to see the wedge.
     { ts_try_reap || ts_sweep_queue; } && continue
     TS_WAITED=$(( $(ts_now) - ts_start ))
+    # THE WAIT BEATS (TOOL-dDerivedDocket-64). Nothing else a waiter writes moves while it waits:
+    # the ticket is created once, the status file below is rewritten only when the position changes,
+    # and a gate log lands only when a leg finishes, which no waiter reaches. An out-of-process
+    # liveness reader dating a worktree by its newest write therefore read a healthy queued bar as
+    # silent, and a resumer acting on that verdict killed it. This write, on every tick that neither
+    # acquires nor makes reap or sweep progress, is the move such a reader sees: a file under THIS
+    # worktree's git dir, beside `gate-logs/`, read by its mtime and never parsed. It sits above the
+    # bound test so the tick that fails open still beats. It is NEVER REMOVED — not at the acquire,
+    # not by a trap: a removal would drop the newest move just before the first leg lands, and a
+    # leftover ages out by its mtime exactly as an old gate log does. No spawn: `printf` and the
+    # redirect are builtins, and `TS_WAITED` is already computed.
+    [ -n "$gd" ] && printf 'waited\t%s\n' "$TS_WAITED" > "$gd/gate-queue-heartbeat" 2>/dev/null || true
     if [ "$TS_WAITED" -ge "$TS_MAXWAIT" ]; then
       # FAILS OPEN, LOUDLY. A turnstile that can wedge a bar is worse than two bars: the run drops
       # its ticket and proceeds unqueued rather than becoming the outage. It contributes nothing to
@@ -1039,8 +1178,108 @@ QUEUE_SUMMARY="gate queue: queued $QUEUED from $QUEUED_FROM"
 # `run-gates.turnstile.test.sh` — so the state word above is NOT appended here. It goes to the
 # header and the summary file, which is why `QUEUE_SUMMARY` is a separate string.
 echo "gate queue: waited ${TS_WAITED}s"
+# THE ACQUIRE LINE (TOOL-dDerivedDocket-26 S4): the instant this bar stopped waiting and started
+# working, with the state word the header records beside it. The queue-status file above is deleted
+# before a bar can be killed, so a caller holding a bar that died needs something durable to say
+# whether it ever acquired: this line, and the `acquired` header key written from the same two
+# variables. It is a line of its own so the wait line's pinned bytes do not move, and it matches no
+# verdict prefix, so no wrapper counts it as a leg.
+ACQUIRED=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+echo "gate queue: acquired $ACQUIRED from $QUEUED_FROM"
 
-WORK=$(mktemp -d) || { echo "run-gates: cannot create a scratch dir"; exit 2; }
+# ---- the scratch dir: OWNED, REDIRECTED and SWEPT (TOOL-dDerivedDocket-25) -----------------------
+# Every hermetic leg makes its own `mktemp -d` scratch, and before this unit every one of them landed
+# in the AMBIENT `TMPDIR` and none was ever swept: node `a` measured 30733 entries there, and a bar
+# killed by signal 9 left its whole scratch dir besides, since no trap runs on SIGKILL. Three moves:
+#
+#   OWNED     `WORK` is a NAMED `gate-work.*` dir under the ambient `TMPDIR`, captured here before
+#             anything redirects it — `/tmp` when unset or empty, which is where `mktemp -d` itself
+#             falls back. Its `owner` file holds this pid, the resolved git common dir and the start
+#             epoch, written tmp-then-`mv` the way the run record is, so no sweeper reads half a line.
+#   SWEPT     each bar removes every `gate-work.*` whose owner names THIS common dir and whose pid
+#             fails `ts_alive`, with the predicate of `ts_sweep_queue`: a live pid only WITHHOLDS the
+#             sweep, so a pid table that errs can only keep a dir, never remove a live bar's. A dir
+#             with no readable owner is never touched, which is also why a bar that predates this
+#             unit, or another repository's, is left alone (the spec's F1 kept the delete surface to
+#             this repository). The owner record is removed LAST, so a sweep that fails part-way
+#             leaves a dir the next bar can still prove dead and retry.
+#   REDIRECTED  `TMPDIR` is exported as `$WORK/tmp` before the first leg dispatches, so every leg's
+#             `mktemp -d` and every Python `tempfile` lands inside the scratch the `cleanup` trap
+#             already removes. The spelling is the one `mktemp -d` returned and never a drive-letter
+#             rewrite, which is what broke four arms of the template-size self-test when an external
+#             root was tried (measured by the aTetheredScratch build).
+#
+# It runs HERE, after the turnstile, so a bar still queued never sweeps. Every refusal in this block
+# sits ABOVE the `cleanup` trap, the same class as the `mktemp -d` beside it, so each removes what it
+# made before it exits.
+GATE_AMBIENT_TMP=${TMPDIR:-/tmp}
+WORK=$(mktemp -d "$GATE_AMBIENT_TMP/gate-work.XXXXXXXX") || { echo "run-gates: cannot create a scratch dir"; exit 2; }
+# THE COMMON DIR THE OWNER NAMES, resolved exactly as the turnstile resolves its key and reused from
+# it when it ran. With the turnstile off it is resolved here, because the sweep must still know which
+# repository a scratch dir belongs to.
+WORK_COMMON=$TS_COMMON
+if [ -z "$WORK_COMMON" ]; then
+  WORK_COMMON=$(git rev-parse --git-common-dir 2>/dev/null) || WORK_COMMON=""
+  [ -n "$WORK_COMMON" ] && WORK_COMMON=$(cd "$WORK_COMMON" 2>/dev/null && pwd) || WORK_COMMON=""
+fi
+
+write_work_owner() { # -> $WORK/owner, one line: pid TAB common dir TAB start epoch; rc 1 when unwritten
+  printf '%s\t%s\t%s\n' "$$" "$WORK_COMMON" "${EPOCHSECONDS:-$(date +%s)}" > "$WORK/owner.tmp" 2>/dev/null \
+    && mv -f "$WORK/owner.tmp" "$WORK/owner" 2>/dev/null
+}
+
+scan_dead_work() { # -> removes each gate-work dir under the ambient TMPDIR that this repo's dead bar owns
+  local d own pid rest common f
+  local -a doomed
+  # No common dir, no proof of ownership: sweep nothing rather than match an empty field.
+  [ -n "$WORK_COMMON" ] || return 0
+  for d in "$GATE_AMBIENT_TMP"/gate-work.*; do
+    [ -d "$d" ] || continue
+    # NEVER OUR OWN, guarded explicitly although our live pid already withholds it — the same belt
+    # `ts_sweep_queue` wears, for the same reason: a later edit to the pid test must not reach here.
+    [ "${d##*/}" = "${WORK##*/}" ] && continue
+    own=""
+    { IFS= read -r own < "$d/owner"; } 2>/dev/null
+    own=${own%$'\r'}
+    [ -n "$own" ] || continue
+    pid=${own%%$'\t'*}; rest=${own#*$'\t'}; common=${rest%%$'\t'*}
+    case "$pid" in ''|*[!0-9]*) continue ;; esac
+    [ "$common" = "$WORK_COMMON" ] || continue
+    ts_alive "$pid" && continue
+    printf 'run-gates: sweeping the scratch of a dead bar (pid %s)\n' "$pid" >&2
+    doomed=()
+    for f in "$d"/* "$d"/.[!.]*; do
+      [ -e "$f" ] || [ -L "$f" ] || continue
+      [ "${f##*/}" = owner ] && continue
+      doomed+=("$f")
+    done
+    if { [ "${#doomed[@]}" = 0 ] || rm -rf "${doomed[@]}" 2>/dev/null; } && rm -rf "$d" 2>/dev/null; then
+      :
+    else
+      printf 'run-gates: NOTE - the scratch of dead bar %s was not removed whole; its owner record stays, so the next bar retries: %s\n' "$pid" "$d" >&2
+    fi
+  done
+  return 0
+}
+
+write_work_owner \
+  || echo "run-gates: NOTE - no owner record could be written into $WORK, so if this bar is killed no later bar can prove it dead and sweep its scratch" >&2
+mkdir "$WORK/tmp" 2>/dev/null \
+  || { rm -rf "$WORK" 2>/dev/null; echo "run-gates: cannot create the legs' scratch dir under $WORK"; exit 2; }
+scan_dead_work
+# THE AMBIENT COUNT, ONCE PER BAR, measured after the sweep and counting this bar's own dir, so two
+# bars over an unchanged ambient print the same figure and a leak reads as growth. A glob rather than
+# `ls | wc -l`: no process, and no per-entry stat on a directory that may hold tens of thousands.
+_te_ng=0; shopt -q nullglob && _te_ng=1
+_te_dg=0; shopt -q dotglob && _te_dg=1
+shopt -s nullglob dotglob
+_te_all=("$GATE_AMBIENT_TMP"/*)
+[ "$_te_ng" = 1 ] || shopt -u nullglob
+[ "$_te_dg" = 1 ] || shopt -u dotglob
+TMPDIR_ENTRIES=${#_te_all[@]}
+unset _te_all _te_ng _te_dg
+echo "TMPDIR entries $TMPDIR_ENTRIES"
+export TMPDIR="$WORK/tmp"
 # THE TRAP COVERS THE SCRATCH DIR AND THE BEACON, AND NOTHING ELSE. That exclusion is load-bearing:
 # the run record below lives under the git dir and is DURABLE, so a trap that swept it would erase
 # the record on every ordinary exit and on every caught signal — which is every path except the
@@ -1130,7 +1369,8 @@ run_outstanding_reap() {
 # ever runs pays one `mkdir` for the journal directory, and a clone that has one pays nothing.
 #
 # WHAT THIS DOES NOT CATCH. An exit above the EXIT trap: not a repo, no python, a refused profile,
-# `--print-profile`, the turnstile queue and the scratch-dir `mktemp`. A SIGKILL, which runs no trap.
+# `--print-profile`, the turnstile queue, the scratch-dir `mktemp` and its legs' `tmp` subdir. A
+# SIGKILL, which runs no trap.
 # A leg reported `(no result)`, which is counted in `failed` but has no `.leg` row and so no name on
 # the line. And an unset name read inside the handler, which `set -u` would turn into a handler that
 # writes nothing: every read here is defaulted for that reason, and a new read must be too.
@@ -1208,7 +1448,11 @@ write_runlog_verdict() { # the status the EXIT trap saw -> one ev=once line appe
       case "$i" in ""|*[!0-9]*) continue ;; esac
       nm=""; st=""
       { IFS=$'\t' read -r nm st _ < "$f"; } 2>/dev/null || [ -n "$nm" ] || continue
-      [ "$st" = fail ] && fails[10#$i]=$nm
+      # A RETRIED leg ended on its retry (TOOL-dDerivedDocket-26 S2): the first attempt's row reads
+      # `timeout` and stays as written, and the `<i>.retry.leg` beside it says how the leg ended. A
+      # `timeout` with no retry row is a leg the wall cut before its retry, and it did not pass.
+      [ -f "$RUNDIR/$i.retry.leg" ] && { IFS=$'\t' read -r _ st _ < "$RUNDIR/$i.retry.leg"; } 2>/dev/null
+      case "$st" in fail|timeout) fails[10#$i]=$nm ;; esac
     done
   else
     stage=pre-header
@@ -1290,7 +1534,14 @@ write_runlog_verdict() { # the status the EXIT trap saw -> one ev=once line appe
   return 0
 }
 
-cleanup() { write_runlog_verdict "$?"; run_outstanding_reap; rm -rf "$WORK" 2>/dev/null || true; ts_release; ts_drop_ticket; }
+# THE ATTRIBUTION WORKTREE goes on every exit path too, AFTER the reap (its R run may be what is
+# being reaped) and before the scratch dir. ATTR_WT is set only once lib-attribute.sh is sourced.
+# FORGOTTEN ONCE REMOVED, because `cleanup` runs twice on every caught signal (the arm below, then
+# the EXIT trap its `exit` fires): the second removal of a worktree already gone fails, and printed
+# an orphan line naming a path that no longer exists (the dDerivedDocket closing diff review's F5,
+# the sibling runner's instance of the same class).
+ATTR_WT=""
+cleanup() { write_runlog_verdict "$?"; run_outstanding_reap; if [ -n "${ATTR_WT:-}" ]; then if remove_scratch_worktree "$ATTR_WT"; then ATTR_WT=""; else echo "run-gates: the R worktree at $ATTR_WT could not be removed — remove it by hand" >&2; fi; fi; rm -rf "$WORK" 2>/dev/null || true; ts_release; ts_drop_ticket; }
 trap cleanup EXIT
 trap 'RUNLOG_RC=130; cleanup; exit 130' INT
 trap 'RUNLOG_RC=143; cleanup; exit 143' TERM
@@ -1390,8 +1641,11 @@ try:
     data = json.load(open(sys.argv[1]))
 except Exception as e:
     sys.stderr.write("parse error: %s\n" % e); sys.exit(3)
-if not isinstance(data, list) or not data:
-    sys.stderr.write("gate-legs.json empty or not a list\n"); sys.exit(3)
+# AN EMPTY LIST IS NOT A PARSE ERROR (TOOL-dDerivedDocket-26 S6). It used to exit here naming no
+# verdict at all; it now reaches the refusal at the foot of the runner, which refuses exit 0 over a
+# run that reported no leg line and says which half was missing. Not a list is still a parse error.
+if not isinstance(data, list):
+    sys.stderr.write("gate-legs.json is not a list\n"); sys.exit(3)
 durs = {}
 cache = sys.argv[2] if len(sys.argv) > 2 else ""   # argv[1] is the MANIFEST; the cache is argv[2]
 # argv[3] is the TOOL ROOT this runner derived from its own location. A manifest names its programs
@@ -1455,18 +1709,25 @@ rows += [l["name"] + "\x1e" + ",".join(resolve_prefix_token(g, troot) for g in l
          # leg whose declaration was malformed.
          + "\x1e" + (str(l["ceiling"]) if isinstance(l.get("ceiling"), int)
                             and not isinstance(l.get("ceiling"), bool) and l["ceiling"] > 0 else "")
+         # THE EIGHTH FIELD, `signature`, appended after `ceiling` for the reason every field since
+         # `subject` was appended rather than inserted. CARRIED AND NEVER EXECUTED AT L: the red
+         # attribution grades both ends with the signature in the BASE revision row, so a run cannot
+         # choose its own grader by editing this one (TOOL-dDerivedDocket-23 F4). A non-list reads
+         # as absent, which is the byte-identical rule and the safe direction.
+         + "\x1e" + ("\x1f".join(str(a) for a in l["signature"])
+                            if isinstance(l.get("signature"), list) else "")
          for l in data]
 sys.stdout.buffer.write(("\n".join(rows) + "\n").encode())   # LF bytes (Windows text stdout is CRLF); \x1e field sep is non-whitespace so an empty guard field is preserved (a tab would collapse)
 ' "$LEGS_FILE" "$TIMINGS" "$(dirname "$KITREL")") || { echo "run-gates: cannot parse $LEGS_FILE"; exit 2; }
 
 # Rows stay 1:1 with the manifest so the dispatch indices address the same legs the reader reports.
 # An empty name is the drop-sentinel: kept in the arrays to hold the index, never run and never counted.
-names=(); guards=(); argvs=(); impures=(); chunks=(); subjects=(); ceilings=(); ORDER=""; first=1
+names=(); guards=(); argvs=(); impures=(); chunks=(); subjects=(); ceilings=(); signatures=(); ORDER=""; first=1
 while IFS= read -r line; do
   if [ "$first" = 1 ]; then ORDER=$line; first=0; continue; fi
-  IFS=$'\x1e' read -r nm gd_ av im ch sj ce <<<"$line"
+  IFS=$'\x1e' read -r nm gd_ av im ch sj ce sg <<<"$line"
   names+=("$nm"); guards+=("$gd_"); argvs+=("$av"); impures+=("${im:-}"); chunks+=("${ch:-default}")
-  subjects+=("${sj:-repo}"); ceilings+=("${ce:-}")
+  subjects+=("${sj:-repo}"); ceilings+=("${ce:-}"); signatures+=("${sg:-}")
 done <<<"$legs"
 total=${#names[@]}
 
@@ -1602,6 +1863,13 @@ if [ -n "$RUNDIR" ]; then
     # additive key breaks none, and a bump could not be armed because nothing reads the field.
     printf 'queued\t%s\n'      "$QUEUED"
     printf 'queued_from\t%s\n' "$QUEUED_FROM"
+    # THE ACQUIRE PAIR (TOOL-dDerivedDocket-26 S4), from the variables the stdout line printed, so the
+    # header and the line cannot disagree about one run. Outside the envelope block for the reason above.
+    printf 'acquired\t%s\n'      "$ACQUIRED"
+    printf 'acquired_from\t%s\n' "$QUEUED_FROM"
+    # The ambient TMPDIR count the bar printed, measured once after its sweep (TOOL-dDerivedDocket-25
+    # S3). Outside the run-envelope block for the reason the queue keys above give.
+    printf 'tmpdir_entries\t%s\n' "$TMPDIR_ENTRIES"
     # The RESOLVED dispatch order, recorded here because this is the point at which it is in
     # scope. The chunking unit's ordering criteria read it from the record rather than
     # re-deriving it, which is what keeps the record's key set single-sourced.
@@ -1637,12 +1905,126 @@ if [ -n "${GATE_REUSE:-}" ] && [ -n "$LEDGER" ] && [ -s "$LEDGER" ]; then
   done
 fi
 
-runleg() { # leg index — writes .out, then .sec, then ATOMICALLY .rc (the completion signal)
-  local i=$1 s e out rc
+# ---- CALIBRATION: THE SPAWN FLOOR. TOOL-dDerivedDocket-26 S5 ---------------------------------------
+# A leg killed by its ceiling on a loaded host reads FAIL exactly as a real hang does. The serial
+# retry below answers most of that; what is left is a leg that times out AGAIN, alone, and whether that
+# is about the subject or the host is a question only a measurement can answer. The measurement is the
+# cost of ONE process creation, judged against the lowest this CLONE has recorded and never against a
+# wall clock or another node: node `a` pays about 251 ms a process where node `d` pays 19-39, so an
+# absolute figure would call one node permanently degraded (the process-creation gotcha).
+#
+# THE FLOOR IS READ BEFORE THIS BAR MEASURES, and the retry compares against that reading, so a bar
+# never calibrates against itself and a clone's first bar cannot read HOST (the spec's F4). The start
+# measurement is then folded in, the lower figure kept, tmp-then-rename so no reader sees half a
+# line. A bar with no live-bounded leg to run measures nothing: none of its legs can be deferred, and
+# ten spawns on every nested suite bar would buy a floor that bar can never read.
+#
+# THREE ARM SEAMS, none a conf key, each read once and then UNSET so no leg's nested runner inherits
+# one, exactly as `GATE_RUN_ID` is: `GATE_SPAWN_CMD` names what is timed, `GATE_SPAWN_FLOOR` names the
+# floor file, and `GATE_VERDICT_FAULT` makes the verdict write fail, the only way to reach the refusal
+# at the foot of this file. `GATE_HOST_RATIO` is a SOURCE CONSTANT: 4 is twice the 2x spread measured
+# on one node, the one value a recorded measurement supports (the spec's F1).
+#
+# WHAT THIS DOES NOT CHECK: that a high figure is caused by another tenant and not by something this
+# bar left running. The retry pass asserts the timed-out attempts' processes are gone before it
+# measures and says so when they are not, but a descendant that left its leg's process group is
+# invisible to that assertion, as `remove_group_residue` states.
+GATE_HOST_RATIO=4
+SPAWN_CMD=${GATE_SPAWN_CMD:-}; SPAWN_FLOOR_FILE=${GATE_SPAWN_FLOOR:-}; VERDICT_FAULT=${GATE_VERDICT_FAULT:-}
+unset GATE_SPAWN_CMD GATE_SPAWN_FLOOR GATE_VERDICT_FAULT
+[ -n "$SPAWN_FLOOR_FILE" ] || { [ -n "$WORK_COMMON" ] && SPAWN_FLOOR_FILE="$WORK_COMMON/gate-spawn-floor"; }
+SPAWN_FLOOR_US=""; SPAWN_FLOOR_STATE=absent; SPAWN_US=""
+
+# read_spawn_floor <path> — SPAWN_FLOOR_US, the recorded cost of one spawn in microseconds, and
+# SPAWN_FLOOR_STATE: `read`, `absent`, or `unreadable` for anything but one well-formed
+# `<ms>.<3 digits>` line in a regular file. A zero is unreadable and never a floor, since every
+# measurement would exceed it and every double timeout would read HOST.
+read_spawn_floor() {
+  local f=$1 line="" ms whole frac
+  SPAWN_FLOOR_US=""; SPAWN_FLOOR_STATE=absent
+  [ -n "$f" ] && [ -e "$f" ] || return 0
+  SPAWN_FLOOR_STATE=unreadable
+  [ -f "$f" ] || return 0
+  { IFS= read -r line < "$f"; } 2>/dev/null || [ -n "$line" ] || return 0
+  line=${line%$'\r'}; ms=${line%%$'\t'*}
+  case "$ms" in *.*) whole=${ms%%.*}; frac=${ms#*.} ;; *) whole=$ms; frac=000 ;; esac
+  case "$whole" in ''|*[!0-9]*) return 0 ;; esac
+  case "$frac" in [0-9][0-9][0-9]) ;; *) return 0 ;; esac
+  [ "${#whole}" -le 9 ] || return 0
+  SPAWN_FLOOR_US=$(( 10#$whole * 1000 + 10#$frac ))
+  if [ "$SPAWN_FLOOR_US" -le 0 ]; then SPAWN_FLOOR_US=""; return 0; fi
+  SPAWN_FLOOR_STATE=read
+}
+
+# measure_spawn_cost — SPAWN_US, the mean microseconds of one spawn over ten, or empty when a spawn
+# failed, bash has no `EPOCHREALTIME`, or the clock did not move: a failed spawn measures nothing, a
+# builtin clock is the only one that does not spawn a process of its own inside the measurement, and
+# a zero is NEVER rounded up to a figure. A floor fabricated at one microsecond would read every later
+# double timeout as HOST, which is the fallback-fabricates-the-passing-value class pointed at the host.
+measure_spawn_cost() {
+  local -a cmd=()
+  local t0 t1 k
+  SPAWN_US=""
+  if [ -n "$SPAWN_CMD" ]; then read -ra cmd <<<"$SPAWN_CMD"; else cmd=("$(type -P true 2>/dev/null)"); fi
+  [ -n "${cmd[0]:-}" ] || return 0
+  t0=${EPOCHREALTIME:-}; t0=${t0//[.,]/}
+  [ -n "$t0" ] || return 0
+  for k in 1 2 3 4 5 6 7 8 9 10; do
+    "${cmd[@]}" </dev/null >/dev/null 2>&1 || return 0
+  done
+  t1=${EPOCHREALTIME//[.,]/}
+  SPAWN_US=$(( (10#$t1 - 10#$t0) / 10 ))
+  [ "$SPAWN_US" -gt 0 ] || SPAWN_US=""
+}
+
+# write_spawn_floor <path> <microseconds> — the floor file holds the lower of its reading and this
+# figure. A path that exists and is not a regular file is left alone, and a write that fails leaves
+# the old line in force; each says so on stderr.
+write_spawn_floor() {
+  local f=$1 us=$2
+  [ -n "$f" ] && [ -n "$us" ] || return 0
+  [ -n "$SPAWN_FLOOR_US" ] && [ "$SPAWN_FLOOR_US" -le "$us" ] && return 0
+  if [ -e "$f" ] && [ ! -f "$f" ]; then
+    echo "run-gates: the spawn floor at $f is not a regular file, so this bar's measurement is not recorded there" >&2
+    return 0
+  fi
+  if { printf '%d.%03d\t%s\n' "$(( us / 1000 ))" "$(( us % 1000 ))" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > "$f.tmp"; } 2>/dev/null \
+     && mv -f "$f.tmp" "$f" 2>/dev/null; then
+    return 0
+  fi
+  [ -f "$f.tmp" ] && rm -f "$f.tmp" 2>/dev/null
+  echo "run-gates: the spawn floor at $f could not be written, so the floor it held stays in force" >&2
+  return 0
+}
+
+read_spawn_floor "$SPAWN_FLOOR_FILE"
+[ "$SPAWN_FLOOR_STATE" = unreadable ] \
+  && echo "run-gates: the spawn floor at $SPAWN_FLOOR_FILE cannot be read, so it is treated as absent and no leg of this bar can read HOST" >&2
+_sf_bounded=0
+if [ "$CEILINGS_LIVE" = 1 ]; then
+  for ((i=0; i<total; i++)); do
+    [ -z "${names[$i]}" ] && continue
+    [ -f "$WORK/$i.rc" ] && continue          # held, skipped or reused: it will not run, so it cannot time out
+    if [ -n "${ceilings[$i]:-}" ] || [ "${PROF_TIMEOUT:-0}" -gt 0 ]; then _sf_bounded=1; break; fi
+  done
+fi
+if [ "$_sf_bounded" = 1 ]; then
+  measure_spawn_cost
+  [ -n "$SPAWN_US" ] \
+    || echo "run-gates: the spawn cost could not be measured, so this bar adds nothing to the floor at ${SPAWN_FLOOR_FILE:-<no common dir>}" >&2
+  write_spawn_floor "$SPAWN_FLOOR_FILE" "$SPAWN_US"
+fi
+unset _sf_bounded
+
+runleg() { # leg index · attempt suffix — writes .out, then .sec, then ATOMICALLY .rc (the completion signal)
+  # The suffix is empty on a leg's first attempt and `.retry` on its serial retry (TOOL-dDerivedDocket-26
+  # S2), so every file a retry writes sits BESIDE the first attempt's and the red attribution still
+  # reads that first attempt exactly as it was written.
+  local i=$1 sfx=${2:-} s e out rc tpid=""
   # THE WALL'S HANDLE ON THIS LEG. `$BASHPID`, never `$$`: inside a backgrounded function `$$` is
   # still the RUNNER's pid, and a wall that killed that would kill the shell that has to print the
   # verdict. Written before anything else so a leg that wedges on its first line is still reachable.
-  printf '%s' "$BASHPID" > "$WORK/$i.pid" 2>/dev/null || true
+  printf '%s' "$BASHPID" > "$WORK/$i$sfx.pid" 2>/dev/null || true
   local argv; IFS=$'\x1f' read -ra argv <<<"${argvs[$i]}"
   case "${argv[0]}" in python|python3) argv[0]=$PYBIN ;; esac   # the manifest stores the canonical python3; run under the resolved PYBIN
   s=$(date +%s%N)
@@ -1669,11 +2051,34 @@ runleg() { # leg index — writes .out, then .sec, then ATOMICALLY .rc (the comp
   # the leg runs UNBOUNDED rather than being skipped. A knob may cost speed and may turn a hang into
   # a RED; it may never turn a leg into a pass or a skip (gate-profiles.txt, the governing invariant).
   [ "$CEILINGS_LIVE" = 1 ] || bound=0
-  printf '%s' "$bound" > "$WORK/$i.bound"
-  if [ "${bound:-0}" -gt 0 ]; then timeout -k 5s "$bound" "${argv[@]}" </dev/null >"$WORK/$i.raw" 2>&1; rc=$?
-  else "${argv[@]}" </dev/null >"$WORK/$i.raw" 2>&1; rc=$?; fi
-  out=$(cat "$WORK/$i.raw" 2>/dev/null)
+  printf '%s' "$bound" > "$WORK/$i$sfx.bound"
+  # `timeout` RUNS IN THE BACKGROUND AND IS WAITED ON, so this worker holds its pid (TOOL-dDerivedDocket-26
+  # F5). That pid is the id of the process group `timeout` made for the leg, and it is the only handle
+  # left on a descendant once the ceiling has fired: see `scan_group`. The verdict and the clock are
+  # unchanged, since `wait` returns `timeout`'s own status and the capture is still through a file.
+  # The `wait`'s own `2>/dev/null` is the SHELL's: a `timeout` that dies by SIGKILL makes bash print a
+  # `Killed` job notice naming this file's line, and the verdict line already says it, as `run_leg_at`
+  # below states for the same notice. The leg's own stderr is in the capture file either way.
+  if [ "${bound:-0}" -gt 0 ]; then
+    timeout -k 5s "$bound" "${argv[@]}" </dev/null >"$WORK/$i$sfx.raw" 2>&1 &
+    tpid=$!
+    printf '%s' "$tpid" > "$WORK/$i$sfx.tpid" 2>/dev/null || true
+    wait "$tpid" 2>/dev/null; rc=$?
+  else "${argv[@]}" </dev/null >"$WORK/$i$sfx.raw" 2>&1; rc=$?; fi
+  out=$(cat "$WORK/$i$sfx.raw" 2>/dev/null)
   e=$(date +%s%N)
+  local secs; secs=$(printf '%s.%03d' "$(( (e-s)/1000000000 ))" "$(( ((e-s)/1000000)%1000 ))")
+  # THE REAP, IN THE WORKER AND BEFORE ITS COMPLETION SIGNAL (TOOL-dDerivedDocket-26 F5). Whatever the
+  # timed-out leg left in its group is killed here, so by the time `.rc` exists the attempt's residue
+  # is gone and the serial retry and its spawn measurement run beside nothing of this attempt's. It is
+  # keyed on the GROUP: the worker is not in it, so this cannot take the worker down before `.sec` and
+  # `.rc`, which a walk rooted at `$BASHPID` would. Only a FIRED ceiling reaps; a leg that ends on its
+  # own leaves nothing `timeout` did not already wait for, and a scan per leg would cost a `ps` each.
+  local fired=0
+  if [ -n "$tpid" ] && check_ceiling_fired "$rc" "$bound" "$secs"; then
+    fired=1
+    remove_group_residue "$tpid" >/dev/null
+  fi
   # TOOL-dNomadicAtlas-1, ported into the worker: persist EVERY leg, not only the failing one — a
   # passing leg's output is what a later bisect reads, and the bytes are already in memory. Redacted,
   # because a terminal line is ephemeral and a file is not.
@@ -1682,9 +2087,8 @@ runleg() { # leg index — writes .out, then .sec, then ATOMICALLY .rc (the comp
     { printf '# run-gates | leg %s | exit %s\n' "${names[$i]}" "$rc"; printf '%s\n' "$out"; } | redact >"$lf" 2>/dev/null || true
     chmod 600 "$lf" 2>/dev/null || true
   fi
-  printf '%s\n' "$out" > "$WORK/$i.out"
-  local secs; secs=$(printf '%s.%03d' "$(( (e-s)/1000000000 ))" "$(( ((e-s)/1000000)%1000 ))")
-  printf '%s\n' "$secs" > "$WORK/$i.sec"
+  printf '%s\n' "$out" > "$WORK/$i$sfx.out"
+  printf '%s\n' "$secs" > "$WORK/$i$sfx.sec"
   # THE DURABLE HALF. One TSV row per leg and one copy of its output, both inside the run
   # directory, and both written BEFORE the completion signal so a concurrent reader that sees
   # `.rc` sees a complete row rather than a half-written one.
@@ -1694,16 +2098,19 @@ runleg() { # leg index — writes .out, then .sec, then ATOMICALLY .rc (the comp
     # the masking its sibling applies is a credential leak the old scratch-dir lifetime was
     # merely hiding.
     { printf '# run-gates | leg %s | exit %s\n' "${names[$i]}" "$rc"; printf '%s\n' "$out"; } \
-      | redact >"$RUNDIR/$i.out" 2>/dev/null || true
-    chmod 600 "$RUNDIR/$i.out" 2>/dev/null || true
+      | redact >"$RUNDIR/$i$sfx.out" 2>/dev/null || true
+    chmod 600 "$RUNDIR/$i$sfx.out" 2>/dev/null || true
     local st; case "$rc" in 0) st=ok ;; *) st=fail ;; esac
+    # `timeout` WHEN THE CEILING FIRED (TOOL-dDerivedDocket-26 S2), so a first attempt that is about to
+    # be retried is never recorded as a failure, and a retry that timed out again says which kind it was.
+    [ "$fired" = 1 ] && st=timeout
     # TAB-SEPARATED and NEWLINE-FREE by construction: every field is a leg name, a token, a
     # number or a digest. The leg name is the only one an author controls, and the canary
     # already forbids a tab inside one.
     printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\n' \
       "${names[$i]}" "$st" "$rc" "$secs" "$s" "$e" "$(input_key "$i")" \
-      > "$RUNDIR/$i.leg.tmp" 2>/dev/null \
-      && mv -f "$RUNDIR/$i.leg.tmp" "$RUNDIR/$i.leg" 2>/dev/null || true
+      > "$RUNDIR/$i$sfx.leg.tmp" 2>/dev/null \
+      && mv -f "$RUNDIR/$i$sfx.leg.tmp" "$RUNDIR/$i$sfx.leg" 2>/dev/null || true
   fi
   # THE ONE HEARTBEAT SITE, and it is here rather than in the reader loop because this is the
   # event the TTL is sized against: S4 refreshes at a leg COMPLETING, so "can the holder still be
@@ -1711,7 +2118,7 @@ runleg() { # leg index — writes .out, then .sec, then ATOMICALLY .rc (the comp
   # loop would refresh while no leg was making progress, which is the state the reaper exists to
   # detect.
   ts_hb
-  printf '%s' "$rc" > "$WORK/$i.rc.tmp" && mv -f "$WORK/$i.rc.tmp" "$WORK/$i.rc"
+  printf '%s' "$rc" > "$WORK/$i$sfx.rc.tmp" && mv -f "$WORK/$i$sfx.rc.tmp" "$WORK/$i$sfx.rc"
 }
 
 # THE TAIL CONTRACT (the run-gates promotion spec's S5). Every tailed line is `<verb>  <leg name>  <tail>`:
@@ -1721,10 +2128,53 @@ runleg() { # leg index — writes .out, then .sec, then ATOMICALLY .rc (the comp
 # target's verdicts exactly that way. The canary forbids a double space INSIDE a leg NAME, which is
 # what keeps the split unambiguous rather than merely usually right. Every verb the sibling units
 # add conforms: two spaces before any parenthesised tail.
+# derive_fail_tail <rc> <bound> <seconds> — a failed attempt's tail text, without its parentheses. ONE
+# derivation for a leg's first attempt and for its serial retry (TOOL-dDerivedDocket-26), so the two
+# lines a retried leg can print cannot disagree about what an exit status means.
+#
+# `timeout` exits 124 on the TERM, and 137 once `-k` escalates to KILL — which is exactly the leg the
+# kill-after exists for, so mapping only 124 left the worst case reported as a bare exit code. 124
+# stays behind the bound guard, so a leg that chooses it for its own reasons is still reported as the
+# code it chose; 137 has no such case to protect, because bash reports 128+9 for a SIGKILLed child and
+# a leg that "chose" 137 is indistinguishable from one killed.
+#
+# THE BOUND IS THE ONE THAT ACTUALLY FIRED, read by the caller from what runleg recorded rather than
+# re-derived. The old spelling read `PROF_TIMEOUT` for both the guard and the number, so once a leg
+# carried its own ceiling and PROF_TIMEOUT stayed 0 -- which is every shipped profile row -- a killed
+# leg reported a bare `(exit 124)` naming nothing. TOOL-aBoundedCeiling-1.
+#
+# THE SECONDS ARE THE ONES THE LEG RAN, from `.sec`, which the ledger block reads as its field 2 too,
+# so this is a third reader of one value and never a second source. Verbatim, decimals and all,
+# because byte-equality with the ledger row is the property; a `?` when unreadable, because any
+# numeric fallback would be a second wrong answer. TOOL-aLeakedHandle-3.
+#
+# 124 KEEPS THE CEILING DELIBERATELY, and the asymmetry with 137 is a decision rather than an
+# oversight. rc=124 means `timeout` fired its own TERM, so the ceiling is the CAUSE of the verdict and
+# true by construction, while the elapsed value on that path is the ceiling plus kill-path overhead --
+# measured at 12 s against a 2 s bound under load, which would send a reader hunting for a bound
+# nobody declared. rc=137 is the opposite case: SIGKILL says nothing about who sent it, and
+# `timeout -k`, an operator, an OOM killer and a CI cancel all arrive here identically, so the verb
+# states the kill and the two numbers stay apart.
+#
+# NO BOUND IN PLAY, and the leg was still killed: an operator, an OOM killer, a CI cancel, or any leg
+# on a host with no runnable `timeout`. The guard is the positive-bound line NEGATED so the two
+# PARTITION rc=137 and nothing falls between; there is no ceiling clause because the absence IS the
+# information. TOOL-aLeakedHandle-9.
+derive_fail_tail() {
+  local rc=$1 fired=${2:-0} secs=${3:-} t
+  case "$fired" in ''|*[!0-9]*) fired=0 ;; esac
+  t="exit $rc"
+  { [ "$rc" = 124 ] && [ "$fired" -gt 0 ]; } && t="timed out after ${fired}s"
+  { [ "$rc" = 137 ] && [ "$fired" -gt 0 ]; } && t="killed after ${secs:-?}s, ceiling ${fired}s"
+  { [ "$rc" = 137 ] && ! [ "$fired" -gt 0 ]; } && t="killed after ${secs:-?}s"
+  printf '%s' "$t"
+}
+
 report_one() { # leg index — emits exactly the line the serial bar has always emitted
   local i=$1 rc ftail
   n=$((n+1))
   if [ ! -f "$WORK/$i.rc" ]; then
+    RED_LEGS="$RED_LEGS $i"
     fails=$((fails+1)); c_ran=$((c_ran+1)); c_fail=$((c_fail+1)); printf 'GATE FAIL  %s  (no result)\n' "${names[$i]}"
     FAILED_LEGS="${FAILED_LEGS:-}GATE FAIL  ${names[$i]}  (no result)"$'\n'; return
   fi
@@ -1743,38 +2193,25 @@ report_one() { # leg index — emits exactly the line the serial bar has always 
     # contract: a reader splits the remainder on a double space and gets the bare leg name back.
     reuses=$((reuses+1)); c_reuse=$((c_reuse+1)); printf 'GATE reuse %s  (proven green, inputs unchanged)\n' "${names[$i]}"
   elif [ "$rc" = 0 ]; then c_ran=$((c_ran+1)); printf 'GATE ok    %s\n' "${names[$i]}"
-  else fails=$((fails+1)); c_ran=$((c_ran+1)); c_fail=$((c_fail+1))
-       # `timeout` exits 124 on the TERM, and 137 once `-k` escalates to KILL — which is exactly the
-       # leg the kill-after exists for, so mapping only 124 left the worst case reported as a bare
-       # exit code. 124 stays behind the bound guard, so a leg that chooses it for its own reasons is
-       # still reported as the code it chose; 137 has no such case to protect, because bash reports
-       # 128+9 for a SIGKILLed child and a leg that "chose" 137 is indistinguishable from one killed.
-       # THE BOUND THAT ACTUALLY FIRED, read from what runleg recorded rather than re-derived. The
-       # old spelling read `PROF_TIMEOUT` for both the guard and the number, so once a leg carried
-       # its own ceiling and PROF_TIMEOUT stayed 0 -- which is every shipped profile row -- a killed
-       # leg reported a bare `(exit 124)` naming nothing. TOOL-aBoundedCeiling-1.
+  else c_ran=$((c_ran+1))
        local fired; fired=$(cat "$WORK/$i.bound" 2>/dev/null || printf 0)
-       # THE SECONDS THE LEG ACTUALLY RAN, from the file that already holds them. `runleg` writes
-       # `.sec` before it writes `.rc`, and the ledger block below reads that same file as its field
-       # 2 -- so this is a THIRD READER of one value, never a second source. Read VERBATIM, decimals
-       # and all, because byte-equality with the ledger row is the property; a `?` when it is
-       # unreadable, because any numeric fallback would be a second wrong answer. TOOL-aLeakedHandle-3.
        local secs; secs=$(cat "$WORK/$i.sec" 2>/dev/null) || secs=""
-       ftail="(exit $rc)"
-       # 124 KEEPS THE CEILING DELIBERATELY, and the asymmetry with 137 below is a decision rather
-       # than an oversight. rc=124 means `timeout` fired its own TERM, so the ceiling is the CAUSE of
-       # the verdict and true by construction, while the elapsed value on that path is the ceiling
-       # plus kill-path overhead -- measured at 12 s against a 2 s bound under load, which would send
-       # a reader hunting for a bound nobody declared. rc=137 is the opposite case: SIGKILL says
-       # nothing about who sent it, and `timeout -k`, an operator, an OOM killer and a CI cancel all
-       # arrive here identically, so the verb states the kill and the two numbers stay apart.
-       { [ "$rc" = 124 ] && [ "${fired:-0}" -gt 0 ]; } && ftail="(timed out after ${fired}s)"
-       { [ "$rc" = 137 ] && [ "${fired:-0}" -gt 0 ]; } && ftail="(killed after ${secs:-?}s, ceiling ${fired}s)"
-       # NO BOUND IN PLAY, and the leg was still killed: an operator, an OOM killer, a CI cancel, or
-       # any leg on a host with no runnable `timeout`. The guard is the line above NEGATED so the two
-       # PARTITION rc=137 and nothing falls between; the seconds are the same `.sec` read, verbatim,
-       # and there is no ceiling clause because the absence IS the information. TOOL-aLeakedHandle-9.
-       { [ "$rc" = 137 ] && ! [ "${fired:-0}" -gt 0 ]; } && ftail="(killed after ${secs:-?}s)"
+       # THE SERIAL RETRY'S DEFERRAL (TOOL-dDerivedDocket-26 S1). A leg whose OWN ceiling fired is not
+       # failed here: a bar under its own concurrency kills a leg at 5400 s that ran in 267 s alone
+       # (TOOL-aSurfacedLexicon-22), so the first timeout is not yet a finding. It is DEFERRED, printed
+       # in its manifest position with the neighbours that were running beside it, and run once more
+       # alone after the pool drains. The predicate is `check_ceiling_fired`, the one the red
+       # attribution reads CONTENDED by: 124 under a positive bound, or 137 under a positive bound
+       # whose seconds reached it. Every other 137 -- a self-kill, an OOM kill, an operator's or a CI
+       # cancel, under a bound or with none -- is a failure now, exactly as it always was.
+       if check_ceiling_fired "$rc" "$fired" "$secs"; then
+         c_defer=$((c_defer+1)); DEFERRED="$DEFERRED $i"
+         printf 'GATE retry  %s  (timed out after %ss beside %s neighbours; one serial retry after the pool drains)\n' \
+           "${names[$i]}" "$fired" "$(measure_neighbours "$i")"
+         return
+       fi
+       fails=$((fails+1)); c_fail=$((c_fail+1)); RED_LEGS="$RED_LEGS $i"
+       ftail="($(derive_fail_tail "$rc" "$fired" "$secs"))"
        printf 'GATE FAIL  %s  %s\n' "${names[$i]}" "$ftail"; sed 's/^/    /' "$WORK/$i.out"
        FAILED_LEGS="${FAILED_LEGS:-}GATE FAIL  ${names[$i]}  $ftail"$'\n'   # TOOL-aLeasedGauntlet-1 S3: keep for the durable summary
        # TOOL-dNomadicAtlas-1: a POINTER at the leg's own output, so the durable summary answers WHY
@@ -1819,12 +2256,17 @@ nwalk=${#WALK[@]}
 disp=($ORDER); ndisp=${#disp[@]}; di=0; wi=0; next=0
 [ "$nwalk" -gt 0 ] && next=${WALK[0]}
 # per-chunk tallies, reset at each boundary
-cur_chunk=""; c_ran=0; c_fail=0; c_skip=0; c_reuse=0; c_ondemand=0; c_t0=$(date +%s)
+cur_chunk=""; c_ran=0; c_fail=0; c_skip=0; c_reuse=0; c_ondemand=0; c_defer=0; c_t0=$(date +%s)
 CHUNK_ROLLUP=""
 chunk_close() {   # emit the verdict for the chunk just finished
   [ -n "$cur_chunk" ] || return 0
   local secs=$(( $(date +%s) - c_t0 )) verdict
   if   [ "$c_fail" -gt 0 ]; then verdict="RED"
+  # A CHUNK HOLDING A DEFERRED LEG IS `pending`, NEVER `green` (TOOL-dDerivedDocket-26 S2). Its leg has
+  # not passed: it timed out once and waits for its serial retry, whose verdict the `---- retry:` line
+  # after the pool drains carries. RED still outranks it, because a leg that failed outright is a
+  # finding whatever the retry does.
+  elif [ "${c_defer:-0}" -gt 0 ]; then verdict="pending"
   # A CHUNK IN WHICH EVERY LEG WAS SKIPPED REPORTS AS SKIPPED, never as green. On a scoped run the
   # guard pre-pass decides those legs before dispatch, so the chunk closes at once — and calling that
   # green would be the loudest possible green-by-absence, one altitude above a single leg.
@@ -1850,7 +2292,7 @@ chunk_close() {   # emit the verdict for the chunk just finished
   # line invites comparison between runs that are not comparable, which is the whole reason the
   # profiling verb records an envelope.
   CHUNK_ROLLUP="${CHUNK_ROLLUP}chunk\t${cur_chunk}\t${verdict}\t${c_ran}\t${c_fail}\t${c_skip}\t${c_reuse}\t${c_ondemand:-0}\t${secs}\n"
-  cur_chunk=""; c_ran=0; c_fail=0; c_skip=0; c_reuse=0; c_ondemand=0; c_t0=$(date +%s)
+  cur_chunk=""; c_ran=0; c_fail=0; c_skip=0; c_reuse=0; c_ondemand=0; c_defer=0; c_t0=$(date +%s)
 }
 # S2. ARMED AT THE FIRST DISPATCH AND NOT AT PROCESS START. Everything above this point -- the
 # turnstile wait most of all -- is a bar waiting for its turn rather than a bar running, and a wall
@@ -1865,6 +2307,9 @@ arm_wall() {
   [ "$WALL" -gt 0 ] || return 0
   [ "$WALL_ARMED" = 0 ] || return 0
   WALL_ARMED=1
+  # THE DEADLINE, KEPT IN THIS SHELL TOO, so the red attribution can say how much of the wall its
+  # own bound would need. The watcher below computes the same instant for itself.
+  WALL_END=$(( EPOCHSECONDS + WALL ))
   local _w=$WALL _work=$WORK _me=$$
   (
     # A DEADLINE, NOT A COUNTER. The first cut slept 1 second `$WALL` times, and `sleep` is external:
@@ -1912,6 +2357,697 @@ remove_wall_watcher() {
   WALL_PID=""; WALL_ARMED=0
 }
 
+# ---- RED ATTRIBUTION, REPORT-ONLY. TOOL-dDerivedDocket-23 ----------------------------------------
+# A red bar names WHICH legs failed and never WHOSE failure each one is. Five recorded stops were a
+# run deciding, with nobody to ask, that a red "was not mine", and at least two of those claims were
+# wrong. `GATE_ATTRIBUTE=<R>` re-runs each red leg ALONE at R — R's own manifest row, in a detached
+# scratch worktree of R, under R's ceiling for that row — and prints one `GATE attr` line per red leg
+# in manifest order, then `attributed N of M red legs against <R8>`. The same rows land in the run
+# record as `attribution`, TAB-separated: leg · verdict · inherited · own · R sha · age · owner sha8 ·
+# owner id · reason, the reason LAST, and a unit that extends the row inserts its columns before it,
+# never after. The three age columns are TOOL-dDerivedDocket-24's, `-` wherever no age was asked for.
+#
+# IT CHANGES NO EXIT CODE. A bar red before this block is red after it; the policy that acts on a
+# verdict is the inherited-red policy unit's, not this one's.
+#
+# R IS THE LANDING BASE, never the branch point. `TOOL-aStagedLane-6` withdrew a "not mine" claim
+# measured against a base the default branch had already moved past, and left the rule this block
+# implements: such a claim is indistinguishable from one nobody measured. The pre-push hook exports
+# the remote sha it reads for the default branch; an R passed as a merge-base or a local ref buys an
+# attribution only as fresh as that ref.
+#
+# THE CLASSIFIER, first match wins:
+#   1  OWN, forced — the diff between R and the working tree touches this runner, the fingerprint
+#      helper, the pre-push hook or lib-attribute.sh (KF3). Every red, a timed-out one included.
+#   2  CONTENDED   — the leg's own attempt ended with its ceiling FIRED (`check_ceiling_fired`, spelled
+#      identically on the retry side). Never re-run at R. A bound-0 rc 137 is a failure and goes on.
+#   3  OWN         — no row at R · its argv differs from R's · the diff touches its COMPARATOR (every
+#      tracked file under the directory of a tracked file in its argv or in R's signature argv, plus
+#      each tracked root-level file those files' bytes name) · it is GREEN at R.
+#   4  DEAD PROBE  — R cannot answer: no worktree, R's argv file absent, R's run past its ceiling, R's
+#      output empty after normalising while it exits non-zero, the wall cut the run — or L's own
+#      output normalises to nothing (KF14: an empty S(L) with a non-zero exit is evidence of nothing).
+#   5  INHERITED / MIXED — with a `signature` in R's row, S(X) is that argv's stdout run in the tree
+#      at X, normalised, as a SET: INHERITED when S(L) is non-empty and S(L) ⊆ S(R). Without one, S(X)
+#      is the leg's normalised output, INHERITED only when byte-identical. L's own `signature` is
+#      never run, so a run cannot choose its grader (F4).
+#
+# WHAT IT DOES NOT CHECK, said out loud. The comparator reads each grader's own directory and the root
+# files its bytes name: a module imported from ANOTHER directory, or a conf named only at run time, is
+# outside it, and an edit there that hides the run's own offender can read INHERITED. A grader
+# directly under a top-level directory is compared against that whole directory, which reads its reds
+# OWN on any edit there — the safe direction. And an untracked file is invisible to the diff.
+#
+# IT RUNS INSIDE THE WALL, before the watcher is removed, so one bound covers the bar and its
+# attribution and the declared-wall backstop stays one number. A run the wall cuts reads DEAD PROBE
+# `cut by the wall`, which reads as not inherited: the safe direction.
+RED_LEGS=""; ATTR_CUT=0; WALL_END=0; ATTR_LANDABLE=0; ATTR_LAND_LEGS=""
+# The serial retry's state (TOOL-dDerivedDocket-26): the legs deferred on a fired ceiling, how many
+# ran again and failed again, the first attempts whose processes were not cleared, and the HOST legs
+# with the lowest ratio among them, which is the figure the `gates HOST` line can claim of all of them.
+DEFERRED=""; RETRIED=0; RETRY_FAILS=0; UNCLEARED=""; HOST_N=0; HOST_LEGS=""; HOST_R10=""; RESIDUE=""
+ATTR_US=$'\x1f'; ATTR_RS=$'\x1e'
+
+# check_ceiling_fired <rc> <bound> <seconds> — rc 0 when the attempt's OWN ceiling fired: 124 under a
+# positive bound, or 137 under a positive bound whose seconds reached it (`timeout -k`'s KILL after an
+# ignored TERM). A 137 under no bound, or short of it, is a failure like any other.
+check_ceiling_fired() {
+  local rc=$1 b=${2:-0} s=${3:-} si
+  case "$b" in ''|*[!0-9]*) b=0 ;; esac
+  [ "$b" -gt 0 ] || return 1
+  [ "$rc" = 124 ] && return 0
+  [ "$rc" = 137 ] || return 1
+  si=${s%%.*}
+  case "$si" in ''|*[!0-9]*) return 1 ;; esac
+  [ "$si" -ge "$b" ]
+}
+
+# ---- THE SERIAL RETRY. TOOL-dDerivedDocket-26 S1 to S5 ---------------------------------------------
+# A leg whose own ceiling fired was DEFERRED by `report_one` rather than failed. After the pool drains,
+# and while the run's wall is still armed so the retry cannot outlast it, each such leg runs ONCE more,
+# alone, under its own ceiling. A pass counts green and is counted in `retried`; a second timeout is a
+# failure, and it is HOST when a spawn measured then costs more than GATE_HOST_RATIO times the floor
+# this clone recorded before the bar began. One retry, and only for a fired ceiling: an assertion
+# failure is never retried, which is why TOOL-dSpentCeiling-8's two assertion reds stay open.
+#
+# measure_neighbours <leg index> — how many OTHER legs were running when this one timed out: those
+# whose run-record interval contains its end time, plus those still holding a pid and no result when
+# the reader reaches it. A retry's pid and an attribution run's are not pool legs and are not counted.
+measure_neighbours() {
+  local i=$1 e="" f j k=0 js je
+  [ -n "$RUNDIR" ] && [ -f "$RUNDIR/$i.leg" ] && { IFS=$'\t' read -r _ _ _ _ _ e _ < "$RUNDIR/$i.leg"; } 2>/dev/null
+  case "$e" in ''|*[!0-9]*) e="" ;; esac
+  for f in "$WORK"/*.pid; do
+    [ -e "$f" ] || continue
+    j=${f##*/}; j=${j%.pid}
+    case "$j" in ''|*[!0-9]*) continue ;; esac
+    [ "$j" = "$i" ] && continue
+    if [ -n "$e" ] && [ -f "$RUNDIR/$j.leg" ]; then
+      js=""; je=""
+      { IFS=$'\t' read -r _ _ _ _ js je _ < "$RUNDIR/$j.leg"; } 2>/dev/null
+      case "$js$je" in ''|*[!0-9]*) continue ;; esac
+      [ "$js" -le "$e" ] && [ "$e" -le "$je" ] && k=$((k + 1))
+    elif [ ! -f "$WORK/$j.rc" ]; then
+      k=$((k + 1))
+    fi
+  done
+  printf '%s' "$k"
+}
+
+# check_residue_gone <leg index> <attempt suffix> — rc 0 when that attempt's worker has exited and no
+# process is left in the group its `timeout` led. RESIDUE names what is left otherwise: a live worker
+# with its ppid-descendants from one snapshot, then any live member of the group, or the fact that the
+# group could not be read at all. It ASSERTS and never kills, because the reap is the worker's and a
+# second reaper here would hide a first one that failed.
+#
+# WHAT IT DOES NOT CHECK: that `scan_group` itself works. The reap and this assertion read the group
+# through the same scan, so a scan that returned a wrong empty answer would blind both at once; an
+# unparseable table is caught by the scan's own rc, and the canary grades the reap from the leg's side
+# instead, by the grandchild's pid as the leg itself recorded it.
+check_residue_gone() {
+  local i=$1 sfx=${2:-} p g q snap members
+  RESIDUE=""
+  p=$(cat "$WORK/$i$sfx.pid" 2>/dev/null) || p=""
+  if [ -n "$p" ] && kill -0 "$p" 2>/dev/null; then
+    RESIDUE=$p
+    if snap=$(mktemp 2>/dev/null); then
+      ps -ef > "$snap" 2>/dev/null || : > "$snap"
+      RESIDUE=$(scan_descendants "$p" "$snap")
+      rm -f "$snap" 2>/dev/null
+    fi
+  fi
+  g=$(cat "$WORK/$i$sfx.tpid" 2>/dev/null) || g=""
+  if [ -n "$g" ]; then
+    if members=$(scan_group "$g"); then
+      for q in $members; do
+        kill -0 "$q" 2>/dev/null && RESIDUE="$RESIDUE${RESIDUE:+ }$q"
+      done
+    else
+      RESIDUE="$RESIDUE${RESIDUE:+ }(ps shows no process group here, so group $g could not be read)"
+    fi
+  fi
+  [ -z "$RESIDUE" ]
+}
+
+# derive_host_note <leg index> — HOST_NOTE for a leg that timed out on its serial retry, and rc 0 when
+# it reads HOST: a floor was READ before this bar measured, the processes of both attempts are
+# verified gone, and one more measurement exceeds GATE_HOST_RATIO times that floor. Every other outcome
+# says why HOST was not read, so a FAIL never looks as though the host was measured and cleared.
+derive_host_note() {
+  local i=$1 r10
+  HOST_NOTE=""
+  case "$SPAWN_FLOOR_STATE" in
+    absent)     HOST_NOTE="no spawn floor is recorded for this clone, so HOST was not measured"; return 1 ;;
+    unreadable) HOST_NOTE="the spawn floor could not be read, so HOST was not measured"; return 1 ;;
+  esac
+  case " $UNCLEARED " in
+    *" $i "*) HOST_NOTE="its first attempt left processes running, so a spawn cost says nothing about the host"; return 1 ;;
+  esac
+  if ! check_residue_gone "$i" .retry; then
+    printf 'run-gates: the serial retry of %s left processes running: %s\n' "${names[$i]}" "$RESIDUE" >&2
+    HOST_NOTE="its serial retry left processes running, so a spawn cost says nothing about the host"; return 1
+  fi
+  measure_spawn_cost
+  if [ -z "$SPAWN_US" ]; then HOST_NOTE="the spawn cost could not be measured, so HOST was not measured"; return 1; fi
+  r10=$(( SPAWN_US * 10 / SPAWN_FLOOR_US ))
+  if [ "$SPAWN_US" -gt $(( GATE_HOST_RATIO * SPAWN_FLOOR_US )) ]; then
+    HOST_N=$((HOST_N + 1)); HOST_LEGS="$HOST_LEGS${HOST_LEGS:+, }${names[$i]}"
+    { [ -z "$HOST_R10" ] || [ "$r10" -lt "$HOST_R10" ]; } && HOST_R10=$r10
+    HOST_NOTE="HOST: a spawn cost $((r10 / 10)).$((r10 % 10))x this clone's floor"
+    return 0
+  fi
+  HOST_NOTE="a spawn cost $((r10 / 10)).$((r10 % 10))x this clone's floor, under the ${GATE_HOST_RATIO}x HOST ratio"
+  return 1
+}
+
+# run_leg_retry — the pass itself. Each deferred leg, in the reader's order, into fresh `.retry` files,
+# its worker a background job waited on so it has a pid of its own for the wall to reach, which a
+# foreground call would not: `$BASHPID` there is this shell's, and the wall would kill the runner.
+# Prints one `GATE ok` or `GATE FAIL` line per retried leg and one `---- retry:` line after them.
+run_leg_retry() {
+  local i rc fired secs tail v
+  [ -n "$DEFERRED" ] || return 0
+  [ -f "$WORK/wall.breach" ] && return 0
+  for i in $DEFERRED; do
+    [ -f "$WORK/wall.breach" ] && break
+    # THE FIRST ATTEMPT IS VERIFIED CLEAR, never assumed clear: its worker reaped its group before it
+    # wrote `.rc`, and this is the assertion that the reap worked. A survivor is named and the leg is
+    # still retried, but a second timeout then cannot read HOST, since the spawn cost is not
+    # attributable to the host while this bar's own processes are running.
+    if ! check_residue_gone "$i" ""; then
+      printf 'run-gates: the timed-out attempt of %s left processes running before its serial retry: %s\n' \
+        "${names[$i]}" "$RESIDUE" >&2
+      UNCLEARED="$UNCLEARED $i"
+    fi
+    RETRIED=$((RETRIED + 1))
+    runleg "$i" .retry &
+    wait "$!" 2>/dev/null
+    if [ ! -f "$WORK/$i.retry.rc" ]; then
+      [ -f "$WORK/wall.breach" ] && break      # the wall killed it: the breach block names the leg
+      fails=$((fails + 1)); RETRY_FAILS=$((RETRY_FAILS + 1)); RED_LEGS="$RED_LEGS $i"
+      printf 'GATE FAIL  %s  (no result on its serial retry)\n' "${names[$i]}"
+      FAILED_LEGS="${FAILED_LEGS:-}GATE FAIL  ${names[$i]}  (no result on its serial retry)"$'\n'
+      continue
+    fi
+    rc=$(cat "$WORK/$i.retry.rc")
+    if [ "$rc" = 0 ]; then printf 'GATE ok    %s  (retried after timeout)\n' "${names[$i]}"; continue; fi
+    fails=$((fails + 1)); RETRY_FAILS=$((RETRY_FAILS + 1)); RED_LEGS="$RED_LEGS $i"
+    fired=$(cat "$WORK/$i.retry.bound" 2>/dev/null) || fired=0
+    secs=$(cat "$WORK/$i.retry.sec" 2>/dev/null) || secs=""
+    if check_ceiling_fired "$rc" "$fired" "$secs"; then
+      if [ "$rc" = 124 ]; then tail="timed out after ${fired}s, again on its serial retry"
+      else tail="killed after ${secs:-?}s, ceiling ${fired}s, again on its serial retry"; fi
+      derive_host_note "$i"
+      tail="$tail; $HOST_NOTE"
+    else
+      tail="$(derive_fail_tail "$rc" "$fired" "$secs"), on its serial retry"
+    fi
+    printf 'GATE FAIL  %s  (%s)\n' "${names[$i]}" "$tail"; sed 's/^/    /' "$WORK/$i.retry.out"
+    FAILED_LEGS="${FAILED_LEGS:-}GATE FAIL  ${names[$i]}  ($tail)"$'\n'
+    lf="$(leg_log "${names[$i]}")" && [ -n "$lf" ] && FAILED_LEGS="${FAILED_LEGS}    log: $lf"$'\n'
+  done
+  if [ -f "$WORK/wall.breach" ]; then v=killed
+  elif [ "$RETRY_FAILS" = 0 ]; then v=green
+  elif [ "$HOST_N" = "$RETRY_FAILS" ]; then v=HOST
+  else v=RED; fi
+  printf -- '---- retry: %s  (%s retried, %s failed)\n' "$v" "$RETRIED" "$RETRY_FAILS"
+  CHUNK_ROLLUP="${CHUNK_ROLLUP}retry\t${v}\t${RETRIED}\t${RETRY_FAILS}\n"
+  return 0
+}
+
+# run_leg_at <dir> <bound> <out> <tag> <both|stdout> <argv…> — one argv run from <dir>, stdin denied,
+# captured through a FILE (a pipe would bound the verdict and not the clock), the same launcher
+# substitution `runleg` applies. The pid goes where the wall looks for unfinished legs, and the `.rc`
+# beside it is what tells the wall and the teardown reap that this one returned.
+run_leg_at() {
+  local dir=$1 bound=$2 out=$3 tag=$4 streams=$5 rc
+  shift 5
+  local -a av=("$@")
+  case "${av[0]:-}" in python|python3) av[0]=$PYBIN ;; esac
+  case "$bound" in ''|*[!0-9]*) bound=0 ;; esac
+  [ "$CEILINGS_LIVE" = 1 ] || bound=0
+  # THE BRACE GROUP'S `2>/dev/null` IS THE SHELL'S, not the run's: a subshell the wall SIGKILLs makes
+  # this shell print a `Killed` job notice on its own stderr, and the verdict line already says it.
+  # The run's own stderr is re-pointed inside, to the capture file or to nothing.
+  {
+    (
+      printf '%s' "$BASHPID" > "$WORK/attr-$tag.pid" 2>/dev/null
+      cd "$dir" || exit 97
+      if [ "$streams" = stdout ]; then exec 2>/dev/null; else exec 2>&1; fi
+      if [ "$bound" -gt 0 ]; then exec timeout -k 5s "$bound" "${av[@]}"; else exec "${av[@]}"; fi
+    ) </dev/null >"$out"
+  } 2>/dev/null
+  rc=$?
+  printf '%s' "$rc" > "$WORK/attr-$tag.rc" 2>/dev/null || true
+  return "$rc"
+}
+
+# read_row_at <leg name> — R's row for that leg (name · argv · ceiling · signature, RS-separated), or
+# nothing. The name goes through the environment, never `-v`, which would process its escapes.
+read_row_at() {
+  AT_NAME=$1 awk -F"$ATTR_RS" '$1 == ENVIRON["AT_NAME"] { print; exit }' "$ATTR_ROWS" 2>/dev/null
+}
+
+# derive_comparator <L argv> <R signature argv> — the first comparator path the diff against R
+# touches, or nothing. Both argvs arrive US-joined; argv[0] is the launcher and is not a grader.
+derive_comparator() {
+  local spec tok d r f files="" dirs=""
+  local -a toks
+  for spec in "$1" "$2"; do
+    [ -n "$spec" ] || continue
+    IFS="$ATTR_US" read -ra toks <<<"$spec"
+    for tok in "${toks[@]:1}"; do
+      case "$tok" in ''|-*) continue ;; esac
+      if [ "$(git ls-files --full-name -- "$tok" 2>/dev/null | head -1)" = "$tok" ] \
+         || [ "$(git cat-file -t "$ATTR_RSHA:$tok" 2>/dev/null)" = blob ]; then
+        # The directory by EXPANSION, not `$(dirname …)`: `dirs` feeds a here-string loop below, and
+        # a value assembled from a substitution is the shell-hygiene leg's class one hop away. `tok`
+        # is a tracked FILE path (it passed one of the two tests above), so it has no trailing `/`
+        # and the two spellings agree; a bare name is `.`, as dirname says.
+        d=${tok%/*}; [ "$d" = "$tok" ] && d=.
+        files="$files$tok"$'\n'; dirs="$dirs$d"$'\n'
+      fi
+    done
+  done
+  [ -n "$files" ] || return 0
+  while IFS= read -r d; do
+    [ -n "$d" ] || continue
+    if [ "$d" = . ]; then r=$(printf '%s\n' "$ATTR_CHG" | awk 'NF { print; exit }')
+    else r=$(printf '%s\n' "$ATTR_CHG" | AT_DIR="$d/" awk 'index($0, ENVIRON["AT_DIR"]) == 1 { print; exit }'); fi
+    [ -n "$r" ] && { printf '%s' "$r"; return 0; }
+  done <<<"$dirs"
+  while IFS= read -r r; do
+    case "$r" in ''|*/*) continue ;; esac
+    while IFS= read -r f; do
+      [ -n "$f" ] || continue
+      if [ -f "$f" ]; then
+        grep -qF -- "$r" "$f" 2>/dev/null && { printf '%s' "$r"; return 0; }
+      else
+        git show "$ATTR_RSHA:$f" 2>/dev/null | grep -qF -- "$r" && { printf '%s' "$r"; return 0; }
+      fi
+    done <<<"$files"
+  done <<<"$ATTR_CHG"
+  return 0
+}
+
+# read_offender_set <raw> <set> <set|text> — the normalised offender set, or the normalised text.
+read_offender_set() {
+  if [ "$3" = set ]; then
+    sed -E -f "$ATTR_NORM" "$1" 2>/dev/null | grep -v '^[[:space:]]*$' | LC_ALL=C sort -u > "$2"
+  else
+    sed -E -f "$ATTR_NORM" "$1" > "$2" 2>/dev/null
+  fi
+}
+
+# derive_attribution <leg index> — sets A_V (verdict), A_WHY (reason) and A_I / A_O (the inherited and
+# own counts, or `-` where no comparison was made). Reads the globals `run_attribution` resolved.
+# An INHERITED verdict also leaves what the age probe re-uses (TOOL-dDerivedDocket-24): L's normalised
+# set or text in A_LSET, and R's argv, signature and ceiling in A_RARGV, A_RSIG and A_RBOUND.
+derive_attribution() {
+  local i=$1 rc bound secs row rargv rce rsig f rbound rc_r t0 t1 rsecs lset rset raw src src_rc
+  local -a rav rsv
+  A_V="DEAD PROBE"; A_WHY=""; A_I=-; A_O=-
+  A_LSET=""; A_RARGV=""; A_RSIG=""; A_RBOUND=""
+  if [ -n "$ATTR_WHY_ALL" ]; then A_WHY=$ATTR_WHY_ALL; return 0; fi
+  if [ -f "$WORK/wall.breach" ]; then ATTR_CUT=1; A_WHY="cut by the wall"; return 0; fi
+  if [ -n "$ATTR_KF3" ]; then
+    A_V=OWN; A_WHY="KF3: the diff against R touches $ATTR_KF3, so this run edited its own grader"; return 0
+  fi
+  if [ ! -f "$WORK/$i.rc" ]; then A_WHY="no result at L, so there is nothing to compare"; return 0; fi
+  rc=$(cat "$WORK/$i.rc" 2>/dev/null)
+  bound=$(cat "$WORK/$i.bound" 2>/dev/null) || bound=0
+  secs=$(cat "$WORK/$i.sec" 2>/dev/null) || secs=""
+  if check_ceiling_fired "$rc" "$bound" "$secs"; then
+    A_V=CONTENDED
+    if [ "$rc" = 124 ]; then A_WHY="timed out after ${bound}s; not re-run at R"
+    else A_WHY="killed after ${secs}s at its ${bound}s ceiling; not re-run at R"; fi
+    return 0
+  fi
+  case "$ATTR_ROWS_STATE" in
+    unparseable) A_WHY="the manifest at R does not parse, so R's row cannot be read"; return 0 ;;
+    untracked)   A_WHY="the manifest is not tracked, so R's row cannot be read"; return 0 ;;
+  esac
+  row=$(read_row_at "${names[$i]}")
+  if [ -z "$row" ]; then A_V=OWN; A_WHY="no row in R's manifest"; return 0; fi
+  IFS="$ATTR_RS" read -r _ rargv rce rsig <<<"$row"
+  if [ "$rargv" != "${argvs[$i]}" ]; then A_V=OWN; A_WHY="its argv differs from R's row"; return 0; fi
+  f=$(derive_comparator "${argvs[$i]}" "${rsig:-}")
+  if [ -n "$f" ]; then A_V=OWN; A_WHY="the diff against R touches its comparator: $f"; return 0; fi
+
+  # ---- THE R RUN. One worktree serves every red leg of one bar, made on first need.
+  if [ -z "$ATTR_WT" ]; then
+    if [ "$ATTR_WT_FAILED" = 1 ] || ! add_scratch_worktree "$ATTR_WT_PATH" "$ATTR_RSHA"; then
+      ATTR_WT_FAILED=1; A_WHY="the R worktree could not be made at $ATTR_WT_PATH"; return 0
+    fi
+    ATTR_WT=$ATTR_WT_PATH
+    echo "run-gates: R worktree $ATTR_WT — removed on exit; an orphan is removable by hand"
+  fi
+  IFS="$ATTR_US" read -ra rav <<<"$rargv"
+  f=${rav[1]:-}
+  if [ -n "$f" ] && [ -f "$f" ] && [ ! -f "$ATTR_WT/$f" ]; then
+    A_WHY="R's argv file $f is absent at R"; return 0
+  fi
+  rbound=${rce:-$PROF_TIMEOUT}
+  t0=$(date +%s%N)
+  run_leg_at "$ATTR_WT" "$rbound" "$ATMP/$i.r.raw" "$i" both "${rav[@]}"; rc_r=$?
+  t1=$(date +%s%N); rsecs=$(( (t1 - t0) / 1000000000 ))
+  if [ -f "$WORK/wall.breach" ]; then ATTR_CUT=1; A_WHY="cut by the wall"; return 0; fi
+  [ "$CEILINGS_LIVE" = 1 ] || rbound=0
+  if check_ceiling_fired "$rc_r" "$rbound" "$rsecs"; then
+    A_WHY="R's run hit its ${rbound}s ceiling, so R gave no answer"; return 0
+  fi
+  if [ "$rc_r" = 0 ]; then A_V=OWN; A_WHY="green at R"; return 0; fi
+
+  # ---- THE TWO SETS.
+  lset="$ATMP/$i.l.set"; rset="$ATMP/$i.r.set"
+  if [ -n "${rsig:-}" ]; then
+    IFS="$ATTR_US" read -ra rsv <<<"$rsig"
+    for src in l r; do
+      if [ "$src" = l ]; then run_leg_at "$ROOT" "$rbound" "$ATMP/$i.sl.raw" "$i-sl" stdout "${rsv[@]}"
+      else run_leg_at "$ATTR_WT" "$rbound" "$ATMP/$i.sr.raw" "$i-sr" stdout "${rsv[@]}"; fi
+      src_rc=$?
+      if [ -f "$WORK/wall.breach" ]; then ATTR_CUT=1; A_WHY="cut by the wall"; return 0; fi
+      if { [ "$src_rc" = 124 ] || [ "$src_rc" = 137 ]; } && [ "${rbound:-0}" -gt 0 ]; then
+        A_WHY="R's signature ran past its ${rbound}s ceiling at $(printf '%s' "$src" | tr lr LR)"; return 0
+      fi
+    done
+    read_offender_set "$ATMP/$i.sl.raw" "$lset" set
+    read_offender_set "$ATMP/$i.sr.raw" "$rset" set
+  else
+    raw=$(cat "$ATMP/$i.r.raw" 2>/dev/null)
+    printf '%s\n' "$raw" > "$ATMP/$i.r.out"
+    read_offender_set "$WORK/$i.out" "$lset" text
+    read_offender_set "$ATMP/$i.r.out" "$rset" text
+  fi
+  if ! grep -q '[^[:space:]]' "$rset" 2>/dev/null; then
+    A_WHY="R's output normalises to nothing while it exits $rc_r"; return 0
+  fi
+  if ! grep -q '[^[:space:]]' "$lset" 2>/dev/null; then
+    A_WHY="L's output normalises to nothing while it exits ${rc:-?} (KF14)"; return 0
+  fi
+
+  # ---- RULE 5. Sets for a signature; byte-identity without one, with set counts for the MIXED line.
+  if [ -z "${rsig:-}" ] && cmp -s "$lset" "$rset"; then
+    A_V=INHERITED; A_I=$(grep -c '[^[:space:]]' "$lset" || true); A_O=0
+    A_LSET=$lset; A_RARGV=$rargv; A_RSIG=""; A_RBOUND=$rbound
+    A_WHY="byte-identical output at L and R"; return 0
+  fi
+  if [ -z "${rsig:-}" ]; then
+    grep -v '^[[:space:]]*$' "$lset" | LC_ALL=C sort -u > "$lset.u"
+    grep -v '^[[:space:]]*$' "$rset" | LC_ALL=C sort -u > "$rset.u"
+    lset="$lset.u"; rset="$rset.u"
+  fi
+  A_I=$(LC_ALL=C comm -12 "$lset" "$rset" | grep -c . || true)
+  A_O=$(LC_ALL=C comm -23 "$lset" "$rset" | grep -c . || true)
+  if [ -n "${rsig:-}" ] && [ "$A_O" = 0 ]; then
+    A_V=INHERITED; A_LSET=$lset; A_RARGV=$rargv; A_RSIG=$rsig; A_RBOUND=$rbound
+    A_WHY="every offender at L is an offender at R, by R's signature"; return 0
+  fi
+  A_V=MIXED
+  if [ -n "${rsig:-}" ]; then A_WHY="offenders at L that R does not carry, by R's signature"
+  else A_WHY="the output differs from R's, and R's row declares no signature"; fi
+  return 0
+}
+
+# ---- AGE AND OWNER, for an INHERITED leg only. TOOL-dDerivedDocket-24 --------------------------
+# An INHERITED red is one the landing base already carries, and that alone never says for how long.
+# Under `GATE_INHERITED_RED_MAX_AGE=<n>` each INHERITED leg is run once more at R~n, R's n-th
+# first-parent ancestor: red there with every offender L carries is `aged`, which no policy lands
+# over. Otherwise the red arrived inside (R~n, R], and a bisection of that first-parent window finds
+# the first landing whose run carries L's offenders — its sha8, and the first id its subject carries,
+# name the OWNER. With n = 10 that is at most five more runs of one leg, on a red bar only.
+#
+# THE SAME COMPARISON RULE 5 MADE AT R, run from R's own row in the SAME scratch worktree checked out
+# at each probe, so the normaliser that strips that worktree's path still strips it. A probe that
+# cannot answer — the wall, a ceiling, a checkout that fails, an output that normalises to nothing —
+# leaves the age UNPROVEN (`-`), which reads as not landable: the safe direction.
+#
+# WITHOUT A SIGNATURE the probe reads red there only when every non-blank line of L's output is in
+# the probe's, and red with any other output is one more probe that cannot answer: text is not an
+# offender set, so a fixed offender and a moved count line look alike. Such a leg's age is therefore
+# proven only while its text holds still or shrinks toward L's; a row that wants its red aged across
+# a changing count declares a `signature`. Green is the only rc-1 answer, because rc 1 moves the
+# bisection toward R and so makes an old red read young (closing diff review F1).
+#
+# WHAT IT DOES NOT CHECK. The bisection assumes the red, once present, stayed on the line: a leg that
+# went red, green and red again inside the window is owned by whichever landing the search meets,
+# which may be the later one. A flaky leg can bisect to the wrong owner too. The ask the driver files
+# names the leg's argv so a reader can re-run it, which is the only defence this block claims.
+ATTR_FPL=(); ATTR_WT_MOVED=0
+# check_red_at <leg index> <sha> <probe tag> — rc 0 when the leg, run from R's row with the R worktree
+# checked out at <sha>, is red there carrying every offender L carries (every line of L's, for a row
+# with no signature); rc 1 when it is green there, its argv file is absent there, or a signature
+# offender of L's is missing; rc 2 when that tree could not answer, or a row with no signature is red
+# there with output that is not L's, with the reason in A_AGE_WHY.
+check_red_at() {
+  local i=$1 sha=$2 tag=$3 rc_x t0 t1 xsecs raw xset f rb=${A_RBOUND:-0}
+  local -a xav xsv
+  A_AGE_WHY=""
+  if [ -f "$WORK/wall.breach" ]; then ATTR_CUT=1; A_AGE_WHY="cut by the wall"; return 2; fi
+  ATTR_WT_MOVED=1
+  if ! git -C "$ATTR_WT" checkout -q -f --detach "$sha" >/dev/null 2>&1 \
+     || ! git -C "$ATTR_WT" clean -q -f -d -x >/dev/null 2>&1; then
+    A_AGE_WHY="the R worktree could not be checked out at ${sha:0:8}"; return 2
+  fi
+  IFS="$ATTR_US" read -ra xav <<<"$A_RARGV"
+  f=${xav[1]:-}
+  if [ -n "$f" ] && [ -f "$f" ] && [ ! -f "$ATTR_WT/$f" ]; then return 1; fi
+  t0=$(date +%s%N)
+  run_leg_at "$ATTR_WT" "$rb" "$ATMP/$i.$tag.raw" "$i-$tag" both "${xav[@]}"; rc_x=$?
+  t1=$(date +%s%N); xsecs=$(( (t1 - t0) / 1000000000 ))
+  if [ -f "$WORK/wall.breach" ]; then ATTR_CUT=1; A_AGE_WHY="cut by the wall"; return 2; fi
+  if check_ceiling_fired "$rc_x" "$rb" "$xsecs"; then
+    A_AGE_WHY="the run at ${sha:0:8} hit its ${rb}s ceiling"; return 2
+  fi
+  [ "$rc_x" = 0 ] && return 1
+  xset="$ATMP/$i.$tag.set"
+  if [ -n "$A_RSIG" ]; then
+    IFS="$ATTR_US" read -ra xsv <<<"$A_RSIG"
+    run_leg_at "$ATTR_WT" "$rb" "$ATMP/$i.$tag.sig" "$i-$tag-s" stdout "${xsv[@]}"
+    if [ -f "$WORK/wall.breach" ]; then ATTR_CUT=1; A_AGE_WHY="cut by the wall"; return 2; fi
+    read_offender_set "$ATMP/$i.$tag.sig" "$xset" set
+  else
+    raw=$(cat "$ATMP/$i.$tag.raw" 2>/dev/null)
+    printf '%s\n' "$raw" > "$ATMP/$i.$tag.out"
+    read_offender_set "$ATMP/$i.$tag.out" "$xset" text
+  fi
+  if ! grep -q '[^[:space:]]' "$xset" 2>/dev/null; then
+    A_AGE_WHY="the output at ${sha:0:8} normalises to nothing while it exits $rc_x"; return 2
+  fi
+  if [ -n "$A_RSIG" ]; then
+    [ -z "$(LC_ALL=C comm -23 "$A_LSET" "$xset")" ] && return 0
+    return 1
+  fi
+  # NO SIGNATURE: THE TEXT IS NOT AN OFFENDER SET, so a line of L's missing here cannot be read as an
+  # offender of L's missing here — a count line that moved reads exactly the same. Red with every
+  # line L prints is red there; red with any other output is a probe that cannot answer, never the
+  # rc 1 that means green, which is what it returned until the closing diff review's F1: an old red
+  # whose text a later landing changed then bisected to that landing and landed as young.
+  cmp -s "$A_LSET" "$xset" && return 0
+  grep -v '^[[:space:]]*$' "$A_LSET" | LC_ALL=C sort -u > "$ATMP/$i.$tag.lu"
+  grep -v '^[[:space:]]*$' "$xset" | LC_ALL=C sort -u > "$ATMP/$i.$tag.xu"
+  [ -z "$(LC_ALL=C comm -23 "$ATMP/$i.$tag.lu" "$ATMP/$i.$tag.xu")" ] && return 0
+  A_AGE_WHY="red at ${sha:0:8} with output that is not L's, and R's row declares no signature to compare offenders by"
+  return 2
+}
+
+# derive_age <leg index> — after an INHERITED verdict, sets A_AGE (the owner's first-parent distance
+# from R, `aged`, or `-` when not asked or unproven), A_OWN8 and A_OWNID (`-` when unknown), and
+# A_AGE_NOTE, the clause the record's reason gains.
+derive_age() {
+  local i=$1 lo=0 hi mid rc owner
+  A_AGE=-; A_OWN8=-; A_OWNID=-; A_AGE_NOTE=""
+  [ -n "$ATTR_MAX_AGE" ] && [ -n "$ATTR_WT" ] && [ "${#ATTR_FPL[@]}" -gt 0 ] || return 0
+  hi=${#ATTR_FPL[@]}
+  # THE FAR END. A line shorter than n+1 commits has none, and the window is the whole line.
+  if [ "$hi" -gt "$ATTR_MAX_AGE" ]; then
+    check_red_at "$i" "${ATTR_FPL[$ATTR_MAX_AGE]}" far; rc=$?
+    case "$rc" in
+      0) A_AGE=aged
+         A_AGE_NOTE="red with every offender at R~$ATTR_MAX_AGE ${ATTR_FPL[$ATTR_MAX_AGE]:0:8}, so older than the age bound"
+         return 0 ;;
+      1) ;;
+      *) A_AGE_NOTE="age unproven: $A_AGE_WHY"; return 0 ;;
+    esac
+    hi=$ATTR_MAX_AGE
+  fi
+  while [ $((hi - lo)) -gt 1 ]; do
+    mid=$(( (lo + hi) / 2 ))
+    check_red_at "$i" "${ATTR_FPL[$mid]}" "b$mid"; rc=$?
+    case "$rc" in
+      0) lo=$mid ;;
+      1) hi=$mid ;;
+      *) A_AGE_NOTE="age unproven: $A_AGE_WHY"; return 0 ;;
+    esac
+  done
+  owner=${ATTR_FPL[$lo]}
+  A_AGE=$lo; A_OWN8=${owner:0:8}
+  A_OWNID=$(git log -1 --format=%s "$owner" 2>/dev/null | grep -oE '[A-Z]+-[A-Za-z0-9]+-[0-9]+' | head -1)
+  [ -n "$A_OWNID" ] || A_OWNID=-
+  A_AGE_NOTE="introduced by $A_OWN8, $lo first-parent landing(s) before R"
+}
+
+# run_attribution — the pass. Runs only when asked AND something is red: a green bar pays nothing.
+run_attribution() {
+  [ -n "${ATTR_REV:-}" ] || return 0
+  [ -n "$RED_LEGS" ] || return 0
+  local i m=0 nattr=0 dead=0 sum=0 unbounded=0 row rce legs_rel gcd hp k tail rec="" rem summary land_n=0
+  ATMP="$WORK/attr"; mkdir -p "$ATMP" 2>/dev/null
+  ATTR_WHY_ALL=""; ATTR_KF3=""; ATTR_CHG=""; ATTR_ROWS="$ATMP/rows-at-R"; ATTR_ROWS_STATE=ok
+  ATTR_NORM="$ATMP/normalise.sed"; ATTR_WT_FAILED=0; ATTR_WT_PATH=""
+  : > "$ATTR_ROWS"
+  ATTR_RSHA=$(git rev-parse --verify -q "${ATTR_REV}^{commit}" 2>/dev/null) || ATTR_RSHA=""
+  if [ -z "$ATTR_RSHA" ]; then
+    ATTR_R8="${ATTR_REV}, which does not resolve to a commit here"
+    ATTR_WHY_ALL="R '${ATTR_REV}' does not resolve to a commit, so nothing was run at R"
+  else
+    ATTR_R8=${ATTR_RSHA:0:8}
+  fi
+  # SOURCED HERE AND NOWHERE EARLIER, derived from this script's own directory. A runner copied into
+  # a fixture without it still runs every other path; this one reads every red DEAD PROBE instead.
+  if [ -z "$ATTR_WHY_ALL" ] && { [ ! -f "$KITDIR/lib-attribute.sh" ] || ! . "$KITDIR/lib-attribute.sh"; }; then
+    ATTR_WHY_ALL="lib-attribute.sh is missing beside the runner, so there is no normaliser to compare with"
+  fi
+  if [ -z "$ATTR_WHY_ALL" ] && ! ATTR_CHG=$(git diff --name-only "$ATTR_RSHA" -- 2>/dev/null); then
+    ATTR_WHY_ALL="the diff between R and this tree could not be read"
+  fi
+  if [ -z "$ATTR_WHY_ALL" ]; then
+    # KF3. The hook's path is DERIVED from `core.hooksPath`, relative ones only: an unset path means
+    # no tracked hook gates this repository's pushes, so there is no tracked hook to have edited.
+    hp=$(git config --get core.hooksPath 2>/dev/null) || hp=""
+    case "$hp" in ''|/*|[A-Za-z]:*) hp="" ;; *) hp="${hp%/}/pre-push" ;; esac
+    for k in "$KITREL/$(basename -- "$0")" "$FPRINT" "$KITREL/lib-attribute.sh" "$hp"; do
+      [ -n "$k" ] || continue
+      if printf '%s\n' "$ATTR_CHG" | grep -qxF -- "$k"; then ATTR_KF3=$k; break; fi
+    done
+    # R'S MANIFEST, from the object store. An untracked manifest has no R copy to read.
+    legs_rel=$(git ls-files --full-name -- "$LEGS_FILE" 2>/dev/null | head -1)
+    if [ -z "$legs_rel" ]; then ATTR_ROWS_STATE=untracked
+    elif git cat-file -e "$ATTR_RSHA:$legs_rel" 2>/dev/null; then
+      git show "$ATTR_RSHA:$legs_rel" > "$ATMP/manifest-at-R" 2>/dev/null
+      "$PYBIN" -c '
+import json, sys
+try:
+    data = json.load(open(sys.argv[1], encoding="utf-8"))
+except Exception:
+    sys.exit(3)
+if not isinstance(data, list):
+    sys.exit(3)
+# R'S ROWS RESOLVE THE {prefix} TOKEN AGAINST THIS RUNNER'S TOOL ROOT, exactly as L'S rows do, or an
+# R manifest that spells its argv through the token never equals L's resolved argv and every red
+# reads OWN by "its argv differs". A manifest at R that predates the token passes unchanged.
+troot = sys.argv[2] if len(sys.argv) > 2 else ""
+# >>> resolve_prefix_token -- canonical copy: resolve_prefix_token.py in the gov lib dir (byte-identical; gated)
+def resolve_prefix_token(spelled, troot):
+    """<spelled> with its {prefix} token resolved against the tool root <troot>.
+
+    An empty or "." root is a root install: the token drops with its slash, and a bare token
+    becomes ".". Any other root replaces the token. Text with no token passes unchanged.
+    """
+    spelled = str(spelled)
+    if not troot or troot == ".":
+        return spelled.replace("{prefix}/", "").replace("{prefix}", ".")
+    return spelled.replace("{prefix}", troot)
+# <<< resolve_prefix_token
+out = []
+for l in data:
+    if not isinstance(l, dict) or not l.get("name"):
+        continue
+    ce = l.get("ceiling")
+    ce = str(ce) if isinstance(ce, int) and not isinstance(ce, bool) and ce > 0 else ""
+    sig = l.get("signature") if isinstance(l.get("signature"), list) else []
+    out.append(l["name"] + "\x1e" + "\x1f".join(resolve_prefix_token(a, troot) for a in (l.get("argv") or []))
+               + "\x1e" + ce + "\x1e" + "\x1f".join(resolve_prefix_token(a, troot) for a in sig))
+sys.stdout.buffer.write(("\n".join(out) + "\n").encode())
+' "$ATMP/manifest-at-R" "$(dirname "$KITREL")" > "$ATTR_ROWS" 2>/dev/null || ATTR_ROWS_STATE=unparseable
+    fi
+    # The worktree lives under the git COMMON dir, made absolute, as the baseline runner places its own.
+    gcd=$(git rev-parse --git-common-dir 2>/dev/null) || gcd=""
+    case "$gcd" in /*|[A-Za-z]:/*) : ;; '') gcd="$GD" ;; *) gcd="$ROOT/$gcd" ;; esac
+    ATTR_WT_PATH="$gcd/gate-attr.$$"
+    write_normaliser "$ATTR_NORM" "$ROOT" "$ATTR_WT_PATH" \
+      || ATTR_WHY_ALL="the normaliser could not be written into the scratch dir"
+  fi
+
+  # THE PASS'S OWN BOUND, printed before it starts: the sum of the red legs' R ceilings.
+  for i in $RED_LEGS; do
+    row=$(read_row_at "${names[$i]}")
+    [ -n "$row" ] || continue
+    IFS="$ATTR_RS" read -r _ _ rce _ <<<"$row"
+    rce=${rce:-$PROF_TIMEOUT}
+    case "$rce" in ''|0|*[!0-9]*) unbounded=$((unbounded + 1)) ;; *) sum=$((sum + rce)) ;; esac
+  done
+  printf 'run-gates: attributing red legs against %s; bound %ss, the sum of their R ceilings' "$ATTR_R8" "$sum"
+  [ "$unbounded" -gt 0 ] && printf ', plus %s leg(s) R leaves unbounded' "$unbounded"
+  if [ "$WALL" -gt 0 ] && [ "$WALL_END" -gt 0 ]; then
+    rem=$(( WALL_END - EPOCHSECONDS ))
+    { [ "$sum" -gt "$rem" ] || [ "$unbounded" -gt 0 ]; } \
+      && printf ' — it can outrun the %ss the wall has left, and an R run the wall cuts reads DEAD PROBE `cut by the wall`' "$rem"
+  fi
+  printf '\n'
+  # THE AGE PROBE'S BOUND, printed before it starts too (TOOL-dDerivedDocket-24): one run at R~n and a
+  # bisection of the window, so at most 1 + ceil(log2 n) more runs of each INHERITED leg, each under
+  # R's ceiling for its row and all of them inside the same wall.
+  ATTR_FPL=(); ATTR_WT_MOVED=0; ATTR_LANDABLE=0; ATTR_LAND_LEGS=""; land_n=0
+  if [ -n "$ATTR_MAX_AGE" ] && [ -n "$ATTR_RSHA" ] && [ -z "$ATTR_WHY_ALL" ]; then
+    mapfile -t ATTR_FPL < <(git rev-list --first-parent --max-count=$((ATTR_MAX_AGE + 1)) "$ATTR_RSHA" 2>/dev/null)
+    k=1; rem=1; while [ "$rem" -lt "$ATTR_MAX_AGE" ]; do rem=$((rem * 2)); k=$((k + 1)); done
+    printf 'run-gates: ageing each INHERITED leg against R~%s on the first-parent line; at most %s more run(s) of that leg, each under its R ceiling\n' "$ATTR_MAX_AGE" "$k"
+  fi
+
+  [ -n "$RUNDIR" ] && rec="$RUNDIR/attribution" && : > "$rec" 2>/dev/null
+  for i in $(printf '%s\n' $RED_LEGS | LC_ALL=C sort -n -u); do
+    m=$((m + 1))
+    derive_attribution "$i"
+    A_AGE=-; A_OWN8=-; A_OWNID=-; A_AGE_NOTE=""
+    if [ "$A_V" = INHERITED ]; then
+      derive_age "$i"
+      # BACK TO R before the next leg's R run, which reads this same worktree. A worktree that cannot
+      # be returned reads every later leg DEAD PROBE rather than grading it at the wrong commit.
+      if [ "$ATTR_WT_MOVED" = 1 ]; then
+        ATTR_WT_MOVED=0
+        git -C "$ATTR_WT" checkout -q -f --detach "$ATTR_RSHA" >/dev/null 2>&1 \
+          && git -C "$ATTR_WT" clean -q -f -d -x >/dev/null 2>&1 \
+          || ATTR_WHY_ALL="the R worktree could not be returned to R after an age probe"
+      fi
+    fi
+    case "$A_V" in
+      INHERITED) tail="INHERITED · offenders $A_I · at $ATTR_R8"
+                 case "$A_AGE" in
+                   aged) tail="$tail · aged at R~$ATTR_MAX_AGE" ;;
+                   -)    [ -n "$A_AGE_NOTE" ] && tail="$tail · age unproven" ;;
+                   *)    tail="$tail · age $A_AGE · owner $A_OWN8"
+                         [ "$A_OWNID" != - ] && tail="$tail $A_OWNID"
+                         land_n=$((land_n + 1)); ATTR_LAND_LEGS="$ATTR_LAND_LEGS${ATTR_LAND_LEGS:+,}${names[$i]}" ;;
+                 esac ;;
+      MIXED)     tail="MIXED · inherited $A_I · own $A_O · at $ATTR_R8" ;;
+      *)         tail="$A_V · $A_WHY" ;;
+    esac
+    if [ "$A_V" = "DEAD PROBE" ]; then dead=$((dead + 1)); else nattr=$((nattr + 1)); fi
+    printf 'GATE attr  %s  %s\n' "${names[$i]}" "$tail"
+    # THE ROW: leg · verdict · inherited · own · R sha · age · owner sha8 · owner id · reason, the
+    # reason LAST as the red-attribution unit requires, the three age columns inserted before it.
+    if [ -n "$rec" ]; then
+      printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' "${names[$i]}" "$A_V" "$A_I" "$A_O" "${ATTR_RSHA:--}" \
+        "$A_AGE" "$A_OWN8" "$A_OWNID" \
+        "$(printf '%s%s' "$A_WHY" "${A_AGE_NOTE:+; $A_AGE_NOTE}" | tr '\t\n\r' '   ')" >> "$rec" 2>/dev/null || true
+    fi
+  done
+  # LANDABLE, for the inherited-green stamp alone: every red leg INHERITED with a proven age inside
+  # the bound. The stamp's other preconditions are the full green's, read where it is written.
+  [ "$m" -gt 0 ] && [ "$land_n" = "$m" ] && ATTR_LANDABLE=1
+  summary="attributed $nattr of $m red legs against $ATTR_R8"
+  [ "$dead" -gt 0 ] && summary="$summary · DEAD PROBE $dead"
+  printf '%s\n' "$summary"
+  [ -n "$rec" ] && chmod 600 "$rec" 2>/dev/null
+  if [ -n "$ATTR_WT" ]; then
+    remove_scratch_worktree "$ATTR_WT" \
+      || echo "run-gates: the R worktree at $ATTR_WT could not be removed — remove it by hand" >&2
+    ATTR_WT=""
+  fi
+  return 0
+}
+
 live() { jobs -rp | wc -l; }
 while [ "$wi" -lt "$nwalk" ]; do
   [ -f "$WORK/wall.breach" ] && break
@@ -1953,8 +3089,14 @@ while [ "$wi" -lt "$nwalk" ]; do
   report_one "$next"; wi=$((wi+1))         # genuinely no result: report it, never hang
 done
 wait
-remove_wall_watcher
 chunk_close                                # the last chunk has no successor to close it
+# THE SERIAL RETRY, after the pool drains and INSIDE the wall (TOOL-dDerivedDocket-26 S1), and before
+# the attribution below, which reads the red set the retry decides and each red leg's FIRST attempt.
+run_leg_retry
+# AFTER the pool drains and every leg has its verdict, and BEFORE the watcher goes: the wall bounds
+# the bar and its attribution together (TOOL-dDerivedDocket-23 F6). A no-op unless asked and red.
+run_attribution
+remove_wall_watcher
 
 # THE LEDGER. It replaces the old `gate-timings.tsv` rather than sitting beside it: two stores of
 # one fact, with the older one read by the only tool that grades the newer, is exactly the shape
@@ -1968,15 +3110,24 @@ if [ -n "$LEDGER" ]; then
   for ((i=0; i<total; i++)); do
     [ -z "${names[$i]}" ] && continue
     [ -f "$WORK/$i.sec" ] || continue
-    lst=ok; lkey=-; lend=""
+    lst=ok; lkey=-; lend=""; lsec="$WORK/$i.sec"
     if [ -n "$RUNDIR" ] && [ -f "$RUNDIR/$i.leg" ]; then
       IFS=$'\t' read -r _ lst _ _ _ lend lkey < "$RUNDIR/$i.leg" 2>/dev/null || { lst=ok; lkey=-; }
+    fi
+    # A RETRIED LEG takes its retry's seconds and the status `retried`, whatever the retry did
+    # (TOOL-dDerivedDocket-26 S2). The seconds are the leg's cost ALONE, which is the better dispatch
+    # hint; the status is one the reuse predicate below never accepts, because it reads `ok` and nothing
+    # else, so a pass that needed a second attempt is never copied forward as a proven green.
+    if [ -f "$WORK/$i.retry.sec" ]; then
+      lsec="$WORK/$i.retry.sec"; lst=retried
+      [ -n "$RUNDIR" ] && [ -f "$RUNDIR/$i.retry.leg" ] \
+        && IFS=$'\t' read -r _ _ _ _ _ lend _ < "$RUNDIR/$i.retry.leg" 2>/dev/null
     fi
     # A RED leg is never reusable, and the ledger says so in the field the reuse unit reads
     # rather than leaving that rule to be re-implemented there. A key on a failed row would be a
     # true statement about the inputs and a dangerous one about the verdict.
     [ "$lst" = ok ] || lkey=-
-    printf '%s\t%s\t%s\t%s\t%s\n' "${names[$i]}" "$(cat "$WORK/$i.sec")" "$lst" "$lkey" "$lend" >> "$new"
+    printf '%s\t%s\t%s\t%s\t%s\n' "${names[$i]}" "$(cat "$lsec")" "$lst" "$lkey" "$lend" >> "$new"
   done
   # A guard-SKIPPED leg never enters runleg(), so it produces no .sec. Rewriting the file from this
   # run's rows alone therefore DELETED the cached duration of every skipped leg — and the runs where
@@ -1997,6 +3148,9 @@ skipnote=""; [ "$skips" -gt 0 ] && skipnote=" ($skips skipped)"
 # total that shrank silently reads as a bar that shrank for reasons nobody recorded. Naming the
 # population is what keeps the smaller number from being a smaller lie. TOOL-dUnstalledConvoy-31.
 [ "${ondemands:-0}" -gt 0 ] && skipnote="$skipnote (${ondemands} held: every self-test, GATE_SELFTESTS=1 runs them)"
+# A RETRIED LEG IS NAMED IN THE TOTAL TOO (TOOL-dDerivedDocket-26 S2): a green that needed a second
+# attempt is green, and a reader of the one summary line should still be able to see it was one.
+[ "${RETRIED:-0}" -gt 0 ] && skipnote="$skipnote (${RETRIED} retried after timeout)"
 
 # THE COUNT THAT RAN, computed ONCE and read by the verdict record, the durable summary and stdout.
 # Three call sites recomputing one figure is how two of them end up disagreeing, and this figure is
@@ -2019,11 +3173,22 @@ if [ -f "$WORK/wall.breach" ]; then
   WALL_STUCK=""
   for ((i=0; i<total; i++)); do
     [ -z "${names[$i]}" ] && continue
+    # A SERIAL RETRY IN FLIGHT is named as one (TOOL-dDerivedDocket-26): its first attempt has an
+    # `.rc`, so the test below it would skip the very leg the wall stopped.
+    if [ -f "$WORK/$i.retry.pid" ] && [ ! -f "$WORK/$i.retry.rc" ]; then
+      WALL_STUCK="${WALL_STUCK}  still running at the wall: ${names[$i]} (its serial retry)
+"
+      continue
+    fi
     [ -f "$WORK/$i.rc" ] && continue
     [ -f "$WORK/$i.pid" ] || continue
     WALL_STUCK="${WALL_STUCK}  still running at the wall: ${names[$i]}
 "
   done
+  # A WALL THAT FIRED DURING THE RED ATTRIBUTION found every leg returned, and says which pass it cut
+  # rather than reading as a wall that fired on nothing.
+  [ -z "$WALL_STUCK" ] && [ "${ATTR_CUT:-0}" = 1 ] && WALL_STUCK="  cut by the wall: the red attribution pass, after every leg had returned
+"
   [ -n "$WALL_STUCK" ] || WALL_STUCK="  (no leg was still marked running — the wall fired as the last leg returned)
 "
   [ -n "$sfile" ] && { printf '%s
@@ -2055,6 +3220,7 @@ if [ -f "$WORK/wall.breach" ]; then
       printf 'skipped\t%s\n' "$skips"
       printf 'held\t%s\n' "${ondemands:-0}"
       printf 'reused\t%s\n' "$reuses"
+      printf 'retried\t%s\n' "${RETRIED:-0}"
       printf 'wall_breach\t%s\n' "$WALL"
     } > "$RUNDIR/verdict.tmp" 2>/dev/null && mv -f "$RUNDIR/verdict.tmp" "$RUNDIR/verdict" 2>/dev/null || true
     chmod 600 "$RUNDIR/verdict" 2>/dev/null || true
@@ -2080,6 +3246,7 @@ if [ "$fails" = 0 ] && [ "$ran" -le 0 ] && [ "${ondemands:-0}" -gt 0 ] \
       printf 'skipped\t%s\n' "$skips"
       printf 'held\t%s\n' "${ondemands:-0}"
       printf 'reused\t0\n'
+      printf 'retried\t0\n'
     } > "$RUNDIR/verdict.tmp" 2>/dev/null && mv -f "$RUNDIR/verdict.tmp" "$RUNDIR/verdict" 2>/dev/null || true
     chmod 600 "$RUNDIR/verdict" 2>/dev/null || true
   fi
@@ -2102,12 +3269,32 @@ tree_moved=no
 # over a bar whose legs the wall had just SIGKILLed, and that file's absence is this runner's
 # documented crash signal: a breach left a plausible green one instead.
 gate_verdict=GREEN; [ "$fails" = 0 ] || gate_verdict=RED
+# HOST ONLY WHEN EVERY FAILED LEG IS HOST (TOOL-dDerivedDocket-26 S5). A bar with one leg that failed
+# for a reason of its own is RED whatever else timed out, and its RED line names the HOST legs; HOST
+# is a claim about the host, and one real failure is enough to make the claim unsafe to act on.
+[ "$gate_verdict" = RED ] && [ "${HOST_N:-0}" -gt 0 ] && [ "$HOST_N" = "$fails" ] && gate_verdict=HOST
 [ -f "$WORK/wall.breach" ] && gate_verdict=RED
+# NO LEG LINE, NO GREEN (TOOL-dDerivedDocket-26 S6). A bar that reported not one leg -- an empty
+# manifest is the reachable case -- has graded nothing, and exit 0 over it is the zero-verdict pass
+# the push boundary cannot tell from a real one. It is REFUSED, and that outranks everything below.
+[ "$gate_verdict" = GREEN ] && [ "$n" = 0 ] && gate_verdict=REFUSED
+# A MOVED TREE OUTRANKS GREEN AND NOTHING ELSE (TOOL-dDerivedDocket-25 S5). A bar whose tree changed
+# under it graded a tree that no longer exists — it may have graded a mixture — so exit 0 over it
+# asserted something nobody observed, and until this line that is exactly what the runner did: the
+# stamp below already refused it, and the verdict and the exit code did not. It never outranks a
+# red: a failed leg is a real finding about SOME tree, and exit 3 over it would hide that, so a bar
+# that failed AND moved stays RED with exit 1 and its RED line names the move.
+[ "$gate_verdict" = GREEN ] && [ "$tree_moved" = yes ] && gate_verdict="TREE MOVED"
 
 if [ -n "$RUNDIR" ]; then
   # WRITTEN LAST, and its ABSENCE is the crash signal — the only one needed. A run that dies
   # anywhere between the header and here leaves a directory with a header and no verdict, which
   # is unambiguous and costs no watchdog, no heartbeat and no second mechanism.
+  # `GATE_VERDICT_FAULT` is an ARM SEAM, not a conf key (TOOL-dDerivedDocket-26 S6): it points this
+  # write into a directory that does not exist, which is the only way to reach the refusal below that
+  # will not certify a green whose record was never written.
+  _vtmp="$RUNDIR/verdict.tmp"
+  [ -n "$VERDICT_FAULT" ] && _vtmp="$RUNDIR/verdict-fault/verdict.tmp"
   {
     printf 'ended\t%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
     printf 'verdict\t%s\n' "$gate_verdict"
@@ -2118,7 +3305,10 @@ if [ -n "$RUNDIR" ]; then
     printf 'reused\t%s\n' "$reuses"
     printf 'fingerprint_end\t%s\n' "$FPRINT_END"
     printf 'tree_moved\t%s\n' "$tree_moved"
-  } > "$RUNDIR/verdict.tmp" 2>/dev/null && mv -f "$RUNDIR/verdict.tmp" "$RUNDIR/verdict" 2>/dev/null || true
+    # How many deferred legs ran again, pass or fail (TOOL-dDerivedDocket-26 S2). The drift report
+    # sums it across the records it can read.
+    printf 'retried\t%s\n' "${RETRIED:-0}"
+  } > "$_vtmp" 2>/dev/null && mv -f "$_vtmp" "$RUNDIR/verdict" 2>/dev/null || true
   chmod 600 "$RUNDIR/verdict" 2>/dev/null || true
 fi
 
@@ -2136,9 +3326,12 @@ fi
 # `fails` at zero, because a killed leg writes no `.rc`. The verdict block above already exits on a
 # breach, so this can never fire today — and that is exactly why it is here. A guard that reads the
 # same state the bug corrupts is disabled by the bug it exists to catch.
+# A SEVENTH, TOOL-dDerivedDocket-26 S6: the verdict is GREEN and its file was WRITTEN. A bar that
+# refuses its own exit 0 below must not have left the stamp a later push trusts in its place.
 if [ -n "$gd" ] && [ "$fails" = 0 ] && [ "$skips" = 0 ] && [ "$reuses" = 0 ] \
    && [ ! -f "$WORK/wall.breach" ] \
-   && [ "$tree_moved" = no ] && [ "$TREE_CLEAN" = yes ] && [ -n "$FPRINT_START" ]; then
+   && [ "$tree_moved" = no ] && [ "$TREE_CLEAN" = yes ] && [ -n "$FPRINT_START" ] \
+   && [ "$gate_verdict" = GREEN ] && [ -f "$RUNDIR/verdict" ]; then
   {
     printf 'sha\t%s\n' "$(git rev-parse HEAD 2>/dev/null)"
     printf 'fingerprint\t%s\n' "$FPRINT_START"
@@ -2154,6 +3347,36 @@ if [ -n "$gd" ] && [ "$fails" = 0 ] && [ "$skips" = 0 ] && [ "$reuses" = 0 ] \
     && mv -f "$gd/gate-full-green.tmp" "$gd/gate-full-green" 2>/dev/null || true
 fi
 
+# THE INHERITED-GREEN STAMP (TOOL-dDerivedDocket-24, KF2). A DIFFERENT FILE from the full green, and
+# that is the whole of its safety: no reader of `gate-full-green` can ever take it for one, and this
+# block never touches that file. It is written under EVERY precondition of the full green except
+# "failed nothing" — skipped nothing, reused nothing, no wall, an unmoved tree that was clean when the
+# run started — plus three of its own: the caller exported `land`, at least one leg failed, and every
+# failed leg read INHERITED with an age proven inside the bound. It records R and the bound it was
+# written under, because the pre-push hook trusts it only where the remote sha it receives equals
+# `base` and the bound it reads at that sha equals `max_age`.
+#
+# WHAT IT DOES NOT CHECK: the policy itself. `land` here is whatever the caller exported; the hook
+# reads the policy at R before it reads this file, so a stamp written under a caller's own `land`
+# selects nothing at a boundary whose R says `park`.
+if [ -n "$gd" ] && [ "$ATTR_POLICY" = land ] && [ -n "$ATTR_MAX_AGE" ] && [ "$ATTR_LANDABLE" = 1 ] \
+   && [ "$fails" -gt 0 ] && [ "$skips" = 0 ] && [ "$reuses" = 0 ] && [ ! -f "$WORK/wall.breach" ] \
+   && [ "$tree_moved" = no ] && [ "$TREE_CLEAN" = yes ] && [ -n "$FPRINT_START" ] && [ -n "${ATTR_RSHA:-}" ]; then
+  {
+    printf 'sha\t%s\n' "$(git rev-parse HEAD 2>/dev/null)"
+    printf 'fingerprint\t%s\n' "$FPRINT_START"
+    printf 'manifest_blob\t%s\n' "$(git hash-object -- "$LEGS_FILE" 2>/dev/null)"
+    printf 'selftests\t%s\n' "${GATE_SELFTESTS:+1}"
+    printf 'base\t%s\n' "$ATTR_RSHA"
+    printf 'max_age\t%s\n' "$ATTR_MAX_AGE"
+    printf 'legs\t%s\n' "$ATTR_LAND_LEGS"
+    printf 'run_id\t%s\n' "$RUNID"
+    printf 'stamped\t%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+  } > "$gd/gate-inherited-green.tmp" 2>/dev/null \
+    && mv -f "$gd/gate-inherited-green.tmp" "$gd/gate-inherited-green" 2>/dev/null || true
+  echo "run-gates: inherited-green stamp written — every red leg is INHERITED within the ${ATTR_MAX_AGE}-landing bound at ${ATTR_RSHA:0:8}: $ATTR_LAND_LEGS"
+fi
+
 # THE SWEEP runs AFTER the verdict is written and NEVER before the first leg dispatches. Both
 # halves matter: sweeping at the start would delete the crashed run's record an operator came
 # back to read, and it can partially fail on this platform against an open handle, which is how a
@@ -2165,7 +3388,36 @@ if [ -n "$RUNROOT" ] && [ -d "$RUNROOT" ]; then
 fi
 # TOOL-aLeasedGauntlet-1 S3: write the verdict + failing-leg rows to a durable file (worktree-safe
 # gitdir) so a `| tail`/`Select-Object -Last N` can't discard which leg failed.
-if [ "$fails" = 0 ]; then
+# THE MOVE NOTE rides the RED line only, where a failed leg outranked the move and the reader would
+# otherwise never learn the tree also changed. A green bar that moved does not reach that line.
+movenote=""; [ "$tree_moved" = yes ] && movenote=" (the tree moved while the bar ran)"
+# THE HOST LEGS ride a RED line that outranked them, as the move does, so a reader of a red bar still
+# learns which of its failures the host explains. The ratio the HOST line claims is the LOWEST among
+# its legs, the one figure that is true of every one of them (TOOL-dDerivedDocket-26 S5).
+hostnote=""; [ "${HOST_N:-0}" -gt 0 ] && hostnote=" ($HOST_N HOST: $HOST_LEGS)"
+host_x="?"; [ -n "$HOST_R10" ] && host_x="$((HOST_R10 / 10)).$((HOST_R10 % 10))"
+HOST_LINE="gates HOST — $HOST_N leg(s) timed out twice while a spawn cost ${host_x}x this clone's floor; the verdict is about the host, not the subject$movenote"
+if [ "$gate_verdict" = REFUSED ]; then
+  # EXIT 2, THE NO-LEG-LINE HALF OF S6 (TOOL-dDerivedDocket-26). Its verdict file already says REFUSED,
+  # and the summary file says it too, so the previous run's `gates GREEN` does not stand there.
+  [ -n "$sfile" ] && { printf '%s\n' "$PROF_LINE"; printf '%s\n' "$QUEUE_SUMMARY"; printf 'gates REFUSED — no leg line was reported, so this run has no verdict to give\n'; } >"$sfile" 2>/dev/null || true
+  echo "gates REFUSED — no leg line was reported, so this run has no verdict to give"; exit 2
+elif [ "$gate_verdict" = "TREE MOVED" ]; then
+  # EXIT 3, its own status and never 0 or 1: 0 would certify a tree nobody graded, and 1 would send
+  # the reader hunting a failing leg that does not exist. Every caller that reads any non-zero exit as
+  # "not green" reads this one correctly without learning it. The summary file says it too, so the
+  # previous run's `gates GREEN` does not stand there for anyone reading the durable record.
+  [ -n "$sfile" ] && { printf '%s\n' "$PROF_LINE"; printf '%s\n' "$QUEUE_SUMMARY"; printf '%b' "${CHUNK_ROLLUP:-}"; printf 'gates TREE MOVED — the tree changed while the bar ran, so no verdict describes it\n'; } >"$sfile" 2>/dev/null || true
+  echo "gates TREE MOVED — the tree changed while the bar ran, so no verdict describes it"; exit 3
+elif [ "$fails" = 0 ]; then
+  # THE VERDICT-FILE HALF OF S6 (TOOL-dDerivedDocket-26). A green whose record was never written is a
+  # green no boundary can confirm: the pre-push hook reads that file after an exit 0 and blocks
+  # without it, and a caller that trusts the status alone is the TOOL-aSurfacedLexicon-25 path, where
+  # a push proceeded with no bar run. So this runner never exits 0 without having written it.
+  if [ -z "$RUNDIR" ] || [ ! -f "$RUNDIR/verdict" ]; then
+    [ -n "$sfile" ] && { printf '%s\n' "$PROF_LINE"; printf '%s\n' "$QUEUE_SUMMARY"; printf 'gates REFUSED — every leg that ran passed, but the run record has no verdict file, so nothing can confirm it\n'; } >"$sfile" 2>/dev/null || true
+    echo "gates REFUSED — every leg that ran passed, but the verdict file ${RUNDIR:-<no run record>}/verdict was not written, so nothing can confirm this green"; exit 2
+  fi
   # THE CHUNK ROLL-UP, with per-chunk wall time, goes into the DURABLE records and never to stdout.
   # A wall clock on a terminal line invites comparison between two runs that are not comparable —
   # the profiling verb exists precisely because a duration without its envelope is not a
@@ -2174,21 +3426,33 @@ if [ "$fails" = 0 ]; then
   # UNCONDITIONALLY. A line that is present on some runs and absent on others means two things.
   [ -n "$sfile" ] && { printf '%s\n' "$PROF_LINE"; printf '%s\n' "$QUEUE_SUMMARY"; printf '%b' "${CHUNK_ROLLUP:-}"; printf 'gates GREEN — %s/%s legs passed%s\n' "$ran" "$ran" "$skipnote"; } >"$sfile" 2>/dev/null || true
   echo "gates GREEN — $ran/$ran legs passed$skipnote"; exit 0
+elif [ "$gate_verdict" = HOST ]; then
+  # EXIT 4, HOST (TOOL-dDerivedDocket-26 S5): every failed leg timed out on its first attempt beside
+  # the pool and again ALONE, while a spawn cost more than GATE_HOST_RATIO times this clone's floor.
+  # Its own status because neither neighbour is true: 1 blames the subject for a fault the host
+  # explains, and 0 certifies legs that never finished. The failure record is written as a red's is,
+  # so the next bar's green cannot erase the evidence of this one.
+  [ -n "$sfile" ] && { printf '%s\n' "$PROF_LINE"; printf '%s\n' "$QUEUE_SUMMARY"; printf '%b' "${CHUNK_ROLLUP:-}"; printf '%s' "${FAILED_LEGS:-}"; printf '%s\n' "$HOST_LINE"; } >"$sfile" 2>/dev/null || true
+  if [ -n "$gd" ]; then
+    { printf '%s\n' "$PROF_LINE"; printf '%s\n' "$QUEUE_SUMMARY"; printf '%b' "${CHUNK_ROLLUP:-}"; printf '%s' "${FAILED_LEGS:-}"; printf '%s\n' "$HOST_LINE"; } >"$gd/gate-last-failure.txt" 2>/dev/null || true
+    chmod 600 "$gd/gate-last-failure.txt" 2>/dev/null || true
+  fi
+  echo "$HOST_LINE"; exit 4
 else
   # THE SAME DENOMINATOR THE GREEN LINE USES. `$n` is the whole manifest, so a red bar that held
   # 42 legs reported `1/85 legs failed` — a ratio against a population it never ran. The two lines
   # are read by the same person in the same terminal and a figure that changes meaning between them
   # is worse than either. TOOL-dUnstalledConvoy-31.
-  [ -n "$sfile" ] && { printf '%s\n' "$PROF_LINE" >"$sfile"; printf '%s\n' "$QUEUE_SUMMARY" >>"$sfile"; printf '%b' "${CHUNK_ROLLUP:-}" >>"$sfile"; printf '%s' "${FAILED_LEGS:-}" >>"$sfile"; printf 'gates RED — %s/%s legs failed%s\n' "$fails" "$ran" "$skipnote" >>"$sfile"; } 2>/dev/null || true
+  [ -n "$sfile" ] && { printf '%s\n' "$PROF_LINE" >"$sfile"; printf '%s\n' "$QUEUE_SUMMARY" >>"$sfile"; printf '%b' "${CHUNK_ROLLUP:-}" >>"$sfile"; printf '%s' "${FAILED_LEGS:-}" >>"$sfile"; printf 'gates RED — %s/%s legs failed%s%s%s\n' "$fails" "$ran" "$skipnote" "$movenote" "$hostnote" >>"$sfile"; } 2>/dev/null || true
   # TOOL-dNomadicAtlas-1: a SECOND copy on RED ONLY. gate-last-summary.txt is overwritten by every
   # run, so the reflexive "let me just re-run it" — which passes, when the red was a flake — erases
   # the evidence of the run that failed. This one is only ever overwritten by the next RED run.
   if [ -n "$gd" ]; then
     ffile="$gd/gate-last-failure.txt"
-    { printf '%s\n' "$PROF_LINE"; printf '%s\n' "$QUEUE_SUMMARY"; printf '%b' "${CHUNK_ROLLUP:-}"; printf '%s' "${FAILED_LEGS:-}"; printf 'gates RED — %s/%s legs failed%s\n' "$fails" "$n" "$skipnote"; } >"$ffile" 2>/dev/null || true
+    { printf '%s\n' "$PROF_LINE"; printf '%s\n' "$QUEUE_SUMMARY"; printf '%b' "${CHUNK_ROLLUP:-}"; printf '%s' "${FAILED_LEGS:-}"; printf 'gates RED — %s/%s legs failed%s%s%s\n' "$fails" "$n" "$skipnote" "$movenote" "$hostnote"; } >"$ffile" 2>/dev/null || true
     chmod 600 "$ffile" 2>/dev/null || true
   fi
-  echo "gates RED — $fails/$ran legs failed$skipnote"
+  echo "gates RED — $fails/$ran legs failed$skipnote$movenote$hostnote"
   [ -n "$sfile" ] && echo "gate summary saved to $sfile"
   [ -n "$gd" ] && [ -f "$gd/gate-last-failure.txt" ] && echo "gate failure record saved to $gd/gate-last-failure.txt"
   exit 1

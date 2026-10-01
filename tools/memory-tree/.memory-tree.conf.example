@@ -158,6 +158,13 @@ SPEC_GUARD_LEGS_CUTOFF=""
 # Blank = never required. Set it ahead of your corpus at adoption, as with the two above.
 FORK_MARK_CUTOFF=""
 
+# F-item ratchet (check 12): at or after this date a spec's §8 is F-item shaped — each fork opens on a
+# column-0 `- **F<n>` bullet or a `### F<n>` sub-head and carries its own resolution mark in its span —
+# and it supersedes the key above for the specs it reaches. A Tier-2 §8 of any other shape reds at
+# any status. Blank = never required. The unattended kit's planning verb reads this same line as
+# TEXT, so keep it a plain column-0 assignment: an `export` prefix or an indent is refused there.
+FORK_ITEM_CUTOFF=""
+
 # Review-verdict ratchet (check 22): a review record whose FILENAME date is on or after this must
 # open with one `## Verdict: <member>` line from the closed set. Blank = never required. Same
 # grandfathering rule; the wrap-up derivation reads these verdicts, so a corpus without them makes
@@ -222,9 +229,10 @@ BUILD_README_ENTRY_CAP_CHARS="350"  # a build README, whose authored rows were m
 # always described and what adopter ic practises (its scripts/rotate_index.py R1-R6 and carry_backlog.py).
 # MEASURED, and the reason the key exists: memory/HYGIENE.md stated BOTH procedures in one paragraph
 # — move the whole file AND carry every non-terminal row forward — and the pair writes every live row
-# into a frozen file. memory/archive/TOOL.2026-08-17.md is what that produced: a header promising
-# terminal rows only over 90 rows of which 66 were not, 49 ids also live in the shard and 7 of those
-# disagreeing about status. TOOL-cSpliceWarden-1, owner-ratified 2026-09-12.
+# into a frozen file. The TOOL backlog archive rotated on 2026-08-17 is what that produced: a header
+# promising terminal rows only over 90 rows of which 66 were not, 49 ids also live in the shard and 7
+# of those disagreeing about status. TOOL-cSpliceWarden-1, owner-ratified 2026-09-12. That archive
+# was deleted at the backlog switch-over (TOOL-dDerivedDocket-34), its rows migrated first.
 # BLANK IS UNDECLARED, and nothing refuses it today. That is the honest cost of not breaking every
 # adopter tree on a kit upgrade, and it is weaker than this comment's "no default" reads: an adopter
 # can run forever undeclared. An UNRECOGNISED value is a different answer from a blank one and does
@@ -248,6 +256,14 @@ UNIVERSAL_BUDGET="3"
 # `<git-common-dir>/recall/cache/` tree, in megabytes. ABSENT = the kit's default (512 MB);
 # BLANK = uncapped.
 RECALL_CACHE_BUDGET_MB="512"
+
+# check-arms.py: the per-gate floors on armed fail branches, space-separated, each
+# `<gate>:<branches>:<armed>` and each one-sided UPWARD. BLANK = no floors at all, which is the state
+# every tree that never declared it is already in — so nothing changes until you measure your own.
+# The gate ships with this kit's descriptor, so an adopter receives a leg that reads this key and
+# could not discover it anywhere else. `<kit>/check-arms.py` prints the measured pair for a tree
+# that already has gates.
+ARMS_FLOORS=""
 
 # Check 20 — ids duplicated INSIDE one row document. A POLICY refusal, not a measured-blank
 # pin: ship it with a value. `row_grammar.py --emit-pin` prints the measured count for a tree
@@ -326,3 +342,55 @@ RECORD_UNDATED_ARTIFACTS=""
 # default counts BYTES, so `chars` is the value that changes anything there — which is precisely the
 # platform-dependence this key exists to take out of the shadows.
 ENTRY_CAP_UNIT=""
+
+# ---------------------------------------------------------------------------------------------
+# BACKLOG_MODE — `shards`, `builds`, or blank. It selects WHERE asks live: `shards` is the
+# family-sharded backlog this kit has always rendered, `builds` is the per-build `BACKLOG.md`
+# whose grammar and status fold `backlog.py` owns. Blank and absent both read `shards`, so a tree
+# that never sets it keeps today's behaviour byte for byte. ANY OTHER VALUE IS A REFUSAL, naming
+# the legal set: defaulting a typo to `shards` would keep the old renderer alive after a tree had
+# migrated, and a migration that half-happened is worse than one that refused.
+#
+# THE KEY'S SPELLING IS FROZEN FOREVER. The transition audit classifies a commit by this key, so a
+# rename would make every commit written before it unclassifiable.
+BACKLOG_MODE=""
+
+# ASK_CUTOFF — a zero-padded YYYY-MM-DD date, read ONLY while BACKLOG_MODE is `builds`. It arms the
+# forward-only verdicts: an ask filed on or after it owes a severity row, and owes the `unit` marker
+# when its id is also a spec H1. Older asks are grandfathered, so adopting the model reds nothing
+# retroactively.
+#
+# BLANK UNDER `builds` IS REPORTED, NOT SILENT (verdict V15), and so is a value that is not
+# zero-padded (V16) — `2026-9-30` compares as a raw string, where "2026-10-01" sorts BEFORE it, so
+# an October ask would fall outside a September cutoff and the forward-only verdicts would go quiet
+# on exactly the asks they were armed for. Either verdict DISARMS them and says so.
+ASK_CUTOFF=""
+
+# BACKLOG_EXCERPT_CHARS — how many characters of an ask's text the family view's Summary column
+# carries, read ONLY while BACKLOG_MODE is `builds`. Blank or absent reads 72, which the design
+# measured the widest view row at 186 characters against the 300-character entry budget the hygiene
+# engine grades — so the default has slack and raising this key spends it.
+#
+# A NON-POSITIVE OR NON-NUMERIC VALUE REFUSES BY NAME rather than falling back. The cut applies to
+# every row in every view, so a silent fallback lands a corpus-wide re-render nobody asked for and
+# nobody can explain — and the value that caused it is still sitting in the conf looking deliberate.
+BACKLOG_EXCERPT_CHARS=""
+
+# PROBE_ALLOW — which commands `gen_build_index.py --asks --probe <id>` may EXECUTE. Blank means
+# none, blank is what this kit ships, and blank is what gov itself declares: ask text is written by
+# whoever filed the ask, so `--probe` is the one place in this kit that runs a filer's bytes, and a
+# tree that has not thought about that must not be able to do it by default.
+#
+# ENTRIES ARE SEPARATED BY `|`. An entry is one or more whitespace-separated argv tokens, and it
+# admits a command only when each of its tokens EQUALS the command's token at the same position —
+# a PREFIX of whole tokens, never a string prefix. That is the whole security claim: a string
+# prefix would let an entry reading `python3` admit `python3x`, and one reading `tools/` admit
+# `tools/../x`. A command carrying a shell metacharacter or a newline is refused before it is
+# split, because nothing here starts a shell.
+#
+# A SINGLE-TOKEN INTERPRETER ENTRY ADMITS ARBITRARY CODE. `python3` admits `python3 -c` followed by
+# anything a filer wrote. That is stated rather than prevented — a tree may legitimately declare
+# one — so declare the SCRIPT, not the interpreter, unless you mean it.
+#
+#   PROBE_ALLOW="python3 <prefix>/check-one-thing.py|git --version"
+PROBE_ALLOW=""

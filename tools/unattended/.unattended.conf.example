@@ -22,6 +22,35 @@ MEMORY_ROOT=memory
 # push, name the script that sets the marker — it exists so the remote is reconciled BEFORE the gate.
 LANDER="bash {{TOOL_ROOT}}push-main.sh"
 
+# WHICH SHAPE THAT LANDING HAS. A CLOSED set: `primary` or `in-place`. Blank or absent reads
+# `primary` and says so on stderr; anything else is a REFUSAL, because a misspelling falling through
+# to the wider behaviour would grant a landing nobody declared.
+#
+#   primary   the run leaves its own tree and lands through the primary tree's default branch.
+#             `gates-green` grades the BRANCH, so a branch that is green alone can still land red
+#             once merged onto a tip the remote moved. `--close` STAGES its record; you commit it.
+#   in-place  the landing merge is prepared in the run's OWN worktree first and `gates-green`
+#             grades THAT merge, with `GATE_FULL=1`. `--close` also asks the lander what the push
+#             would carry, and COMMITS its own record on top of the graded merge, so the phase
+#             travels. The push then reuses the full-green stamp sitting in the same git dir.
+#
+# `in-place` requires a LANDER that implements `--prepare`, `--land`, `--carry` and `--prepared`
+# with the exit codes the protocol's section 6 states. `--preflight` PROBES for them rather than
+# trusting the declaration, so a mode declared against a lander that cannot perform it refuses at
+# the start of the run and not after every unit is built.
+LANDER_MODE=""
+
+# THE SELF-TEST SURFACE, as repo-relative path PREFIXES, space separated. Under every LANDER_MODE,
+# when the run's range from its pinned BASE touches a path starting with one of these, the move
+# into VERIFYING ANNOUNCES that the kit Definition of Done owes the flagged bar, and the main loop
+# pays it by exporting GATE_FULL=1 GATE_SELFTESTS=1 into its one `--close`, whose bar inherits both.
+# The driver never sets GATE_SELFTESTS; under `in-place` the close adds GATE_FULL=1 to its own bar,
+# so the exported GATE_FULL is redundant there and is the half `primary` needs, whose bar carries
+# none. Nothing is announced at `--close`. Blank or absent means no range here
+# ever owes one, and the move announces THAT instead, since a term that silently un-owes a
+# Definition-of-Done clause is indistinguishable from coverage.
+SELFTESTS_OWED_PATHS=""
+
 # REPLACE if your hook uses a different bypass. The close path must never emit this, and the leg
 # greps the run-state record for it in both directions.
 BYPASS_BAN="--no-verify"
@@ -37,6 +66,17 @@ GATE_CMD="bash {{TOOL_ROOT}}run-gates/run-gates.sh"
 # Set it ABOVE your slowest legitimate bar. A bound that fires on a healthy run gets deleted.
 GATE_BOUND="3600"
 
+# The unattended bar's whole-run wall, in seconds, handed to GATE_CMD as GATE_WALL, and the command
+# that prints your gate runner's resolved profile as TAB-separated `wall`, `queue` and `ceiling_max`
+# lines. BOTH OPTIONAL, and blank is where every adopter starts: with no profile command the bar has
+# no backstop and stays bounded at GATE_BOUND, announced. Declare one and `--preflight` bounds the
+# bar at wall + queue + a fixed margin instead, so the turnstile's wait is no longer charged to
+# GATE_BOUND, and refuses a wall below the largest leg ceiling the profile reports. A blank
+# GATE_WALL leaves the profile's own wall in force; a value that is not a positive integer is a
+# refusal. The run-gates kit's runner answers the profile question with its `--print-profile` verb.
+GATE_WALL=""
+GATE_PROFILE_CMD=""
+
 # The idle bound, in seconds, `--audit` measures a dispatched-and-open unit against: STALLED when
 # BOTH the newest write in the tree and the newest commit are older than this. OPTIONAL, on
 # GATE_BOUND's terms: absent takes the kit default and says so on stderr; non-numeric or zero is a
@@ -48,8 +88,8 @@ UNIT_STALL_BOUND="1800"
 # the stop-guard blocks a bound session's turn end at most this many times per run and session, then allows and says so; the harness itself ends a turn after 8 consecutive blocks, so a value above 8 is unreachable inside one turn
 STOP_GUARD_BLOCKS="6"
 
-# The bound, in seconds, past which `--liveness` reads a RUN as STALE when none of its four signals
-# has moved: the last commit, the newest dirty write, the newest gate log, the session transcript.
+# The bound, in seconds, past which `--liveness` reads a RUN as STALE when no signal it reads has
+# moved within it; its header in the driver names them, and `last-move-source` the newest.
 # OPTIONAL: absent takes the DERIVED default GATE_BOUND + UNIT_STALL_BOUND and says so on stderr;
 # non-numeric or zero is a refusal; a value BELOW that sum is accepted with a NOTE, because under it
 # a full bar's silence reads STALE and an out-of-process resumer may kill a healthy bar.
@@ -87,6 +127,27 @@ KEEPALIVE_DELETE="<your-schedule-delete-tool>"
 # rendering "at the cadence this project declares — ." with every gate green.
 KEEPALIVE_INTERVAL="<e.g. every 10 minutes (cron 3-59/10 * * * *)>"
 
+# REPLACE with YOUR harness's DURABLE scheduler tool names, or write RESUME_SCHEDULE="off" below.
+# These file the restart a hold owes, and the carrier must be durable — a filed task outlives the
+# session that filed it — and must accept a caller-chosen name. It may NOT be the keepalive pair
+# above where that store is session-scoped: the kit gate reds a create tool equal to KEEPALIVE_CREATE,
+# because a restart filed there dies with the session it exists to outlive.
+#
+# The switch takes `on` or `off`; absent or blank is `on` and says so on stderr, and any other
+# spelling is a refusal. Leaving these two placeholders standing while the switch is on reds both the
+# adopter check and this kit's own discharge probe, which is what forces the choice at your upgrade
+# rather than at your first hold.
+RESUME_SCHEDULE="on"
+RESUME_SCHEDULE_CREATE="<your-durable-schedule-create-tool>"
+RESUME_SCHEDULE_DELETE="<your-durable-schedule-delete-tool>"
+
+# OPTIONAL, on GATE_BOUND's terms: absent takes the kit default and says so on stderr, and anything
+# that is not a positive integer is a refusal. The DELAY is how long after a `probe` hold its restart
+# fires, in seconds; the LIMIT is how many consecutive holds with no progress a run may take before
+# it stops owing restarts at all.
+RESUME_SCHEDULE_DELAY="1800"
+RESUME_SCHEDULE_LIMIT="6"
+
 # MEASURE, do not copy. `<phases>:<dod>` — the SIZE of the kit's core sets as your installed copy
 # ships them. Count them in `unattended.sh` (`PHASES_CORE`, `DOD_CORE`) and write the two numbers
 # here. Undeclared or malformed leaves BOTH shrink-only pins unenforced, so both are refusals.
@@ -95,7 +156,14 @@ KEEPALIVE_INTERVAL="<e.g. every 10 minutes (cron 3-59/10 * * * *)>"
 # `reuse-probed`, and the floor is shrink-only, so leaving it at 10 makes `check-unattended.sh`
 # check 3 red with "the declared floor sits below the kit's own core count". Bump it when you take
 # the version.
-CORE_FLOOR="12:12"
+#
+# UPDATING TO THE KIT THAT ADDS `HELD`: the PHASE half moves 12 -> 13. `HELD` is the non-terminal
+# stop a run enters by `--hold` and leaves by `--resume`, and the floor is shrink-only.
+#
+# UPDATING TO THE KIT THAT ADDS `asks-disposed`: the DoD half moves 12 -> 13. The item grades whether
+# every mandated ask, and every ask the build filed itself, ended somewhere the owner can accept; it
+# is inert where `ASKS_CMD` is blank and the build files nothing, and it announces that skip.
+CORE_FLOOR="13:13"
 
 # The recall CLI whose query log the `reuse-probed` Definition-of-Done item reads. REPO-RELATIVE
 # path, and BLANK is the default and means "not adopted": the item then reports an announced SKIP
@@ -127,6 +195,32 @@ MAP_CLI=""
 # checker grades LIVE specs and an unattended build closes every unit spec in its build commit,
 # so the dispatch is the one point that sees a spec while it can still be changed.
 SPEC_TOKENS_CLI=""
+
+# OPTIONAL. The repo-relative GATE POLICY FILE `gates-green` reads `INHERITED_RED=park|land` and
+# `INHERITED_RED_MAX_AGE=<n>` from, when the bar is red only on legs the landing base already carries.
+# Both this key and the file it names are read AS COMMITTED AT the tip the remote advertises and are
+# PARSED, never sourced, so a run cannot grant itself a landing by editing either. BLANK means no
+# policy is adopted and every inherited red PARKS as a hold, announced, which is the kit default.
+GATE_POLICY_FILE=""
+
+# OPTIONAL, the same shape again, and the one key an ASK-DRIVEN run needs. The generator the driver
+# calls to grade whether a mandated ask can be executed without asking anybody, and to list a filing
+# home's live asks in a refusal. The driver appends its own arguments; the call shapes are listed in
+# the companion guide beside this kit's protocol and are not restated here.
+#
+# BLANK IS THE KIT DEFAULT and means the ask envelope is NOT adopted: a build README carrying an
+# `asks:` key then REFUSES at preflight naming this key, rather than pinning a mandate nothing can
+# grade. A repo with no `asks:` key anywhere takes today's path unchanged and is told so on stdout.
+ASKS_CMD=""
+
+# OPTIONAL. The REAPER a run's own orphaned processes go through: every command the driver starts is
+# recorded by identity in a per-slug ledger, and a recorded process whose driver is gone is killed
+# by calling `<this> --kill-msys <pid>`, one at a time. The process-monitor kit's `reap.py` is the
+# reaper this is written for — declare it with a launcher and its path in YOUR tree — because it
+# kills a tree leaves first and never outside its declared roots. BLANK turns reaping OFF: orphans
+# are still counted, on `--status` and at every verb that would have reaped, and nothing is killed.
+# A process the ledger does not name is never killed, whatever this key says.
+PROCMON_CMD=""
 
 # OPTIONAL. The kickoff engine whose unattended hand-back the gate reads; BLANK turns that check off,
 # which is correct for a repo with no kickoff skill. KICKOFF_EXITS is a shrink-only floor on how many
@@ -244,6 +338,15 @@ DOD_EXTRA=""
 HALT_CODES_EXTRA=""
 HALT_FLOOR="7"
 
+# The HOLD VOCABULARY, a SECOND set beside the halt codes and never an extension of them: a halt
+# code ENDS a run and a hold code PAUSES one, and one list would let a pause be recorded as an
+# ending. A run enters HELD with one of these, a release condition and a witness, and leaves it by
+# `--resume` with no owner turn. The floor is shrink-only and REQUIRED, exactly as HALT_FLOOR is:
+# undeclared or malformed is a refusal, not a defaulted value, because a pin that quietly defaults
+# is a pin nobody set.
+HOLD_CODES_EXTRA=""
+HOLD_FLOOR="5"
+
 # The UNDECLARED-WRITE CEILING. A concurrently dispatched pass declares its write set before it
 # starts, and that declaration is the disjointness proof two passes rest on. Check 23 compares the
 # declaration against what the pass actually committed and grades the COUNT against this pin, which
@@ -276,6 +379,14 @@ GENERATED_INDEXES="memory/LIVE.md:{{MEMORY_TREE_DIR}}/gen_build_index.py memory/
 # first commit predates it is read as `remote`, which is what every pre-existing record in fact is.
 # Blank or absent grandfathers every record. Set it to the day you adopt the two-anchor landing.
 LANDED_ANCHOR_CUTOFF=""
+
+# The date from which a landed record must carry the facts its landing verb writes (the roster and,
+# where they apply, the anchor kind and the unpushed count). Graded by LANDER_MODE: a recorded LANDED,
+# a rotated derived-LANDED, and under in-place landing a committed LANDING, each on its FIRST-commit
+# date read with --follow. A NEW key and not LANDED_ANCHOR_CUTOFF, because records that key admits
+# may lack facts nobody can reconstruct. --preflight refuses to retire a record this would red.
+# Blank or absent turns the arm off, announced. Set it to the day you adopt the derived terminal.
+LANDED_FACTS_CUTOFF=""
 
 # TOOL-dBriefedPass-3 — the date from which a CLOSED unit whose BUILD COMMIT predates a conforming
 # spec for it blocks the bar. Graded on the build README's `opened:` date, the same idiom

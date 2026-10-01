@@ -106,7 +106,8 @@ Both scripts take an `args` object; set `repo`, `base`, and the by-design primin
 
 Every finder prompt must carry the by-design set, or agents re-report known debt as new findings:
 
-- the OPEN backlog rows for the area under audit (derive them at run time; do not hand-keep a list);
+- the OPEN backlog rows for the area under audit, derived at run time and never hand-kept: the asks
+  `gen_build_index.py --asks --json` prints, or the backlog shards when its `mode` field says `shards`;
 - any already-recorded duplication or dead-code findings from prior audits;
 - the known false-positive classes for whatever metric you are quoting.
 

@@ -1,6 +1,6 @@
 export const meta = {
   name: 'drift-audit-state',
-  version: '1.20',
+  version: '1.21',
   description:
     "Drift audit Tier 1/2: are this repo's own records still true? Stale maps, stale memory, charter drift, work-state uncertainty, record-gate integrity. Project-agnostic; all repo facts arrive via args.",
   whenToUse:
@@ -12,7 +12,7 @@ export const meta = {
   ],
 }
 
-// gov:kit drift-audit@1.20
+// gov:kit drift-audit@1.21
 // --- bounded fan-out (inlined; workflow scripts cannot import) ------------
 // BOTH THE CONCURRENCY CAP AND THE VERIFIER TOTAL ARE BARE LITERALS, and neither is caller-settable.
 // The retired form bound each of them from an `<expr> || 5` fallback, which read as a constant to the
@@ -195,10 +195,11 @@ note. Audit it:
     brief: `LENS — IS THE MEMORY TREE STILL TRUE, AND IS IT AFFORDABLE?
  - THE SPEC STATUS QUESTION (highest value). For each non-terminal spec (OPEN/SPECCED/BLOCKED/
    INPROGRESS), determine whether its unit actually landed — cross-reference the generated build
-   index, the decision indexes, the backlog rows, and git (\`git log --grep=<id>\`, and whether a
-   named merge sha is an ancestor of ${BASE}). Report the REAL count whose header contradicts
-   reality, with the list. A spec frozen mid-build is a named rot class; a spec that shipped and
-   still says SPECCED is the same class.
+   index, the decision indexes, the backlog rows (the asks \`gen_build_index.py --asks --json --all\`
+   prints, or the backlog shards when its \`mode\` field says \`shards\`), and git
+   (\`git log --grep=<id>\`, and whether a named merge sha is an ancestor of ${BASE}). Report the
+   REAL count whose header contradicts reality, with the list. A spec frozen mid-build is a named
+   rot class; a spec that shipped and still says SPECCED is the same class.
  - Which memory documents make claims now FALSE about the code at ${BASE}? Sample the
    highest-traffic notes and verify their concrete claims — paths, flags, commands, ports.
  - Does any CURRENT (non-archive) doc still instruct a session to use a RETIRED mechanism? That

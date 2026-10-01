@@ -606,6 +606,35 @@ has   "above cap: one wave, and it is at or under the cap" "$o" "parallel:4"
 # ---- behaviour with no signal.
 has "fallback: the unit with no brief is named" "$o" "A-tB-1 has no specBriefPath"
 
+# ---- TOOL-dDerivedDocket-20 S8: a unit's `closes` ids reach ITS writer's SPEC prompt, and only its.
+# ---- Two slices at a cap of five are two writers, one unit each, so the per-unit claim is visible as
+# ---- a per-writer one. The control is the SAME args with no `closes` anywhere: the writer of the unit
+# ---- that carries none must be handed a byte-identical prompt, or the new clause leaked into a group
+# ---- that asked for nothing.
+# ---- `specAudit` IS DECLARED in all three fixtures (VERIFYING, dDerivedDocket): they carry `subjects`,
+# ---- and TOOL-aBlindedTrial-3 refuses `subjects` beside no `specAudit` before any stage runs, so
+# ---- without it both controls threw and the byte comparison compared two empty prompts.
+CL_RET='{"spec":{"authored":["x"],"alreadyPresent":[],"refused":[],"summary":"s"},"workflow":{"blockers":0,"confirmed":0,"highs":0,"unverified":0,"report":"r.md"},"audit:record":{"token":"CONVERGED"}}'
+CL_WITH='{"repo":"/tmp/r","slug":"tB","scratch":"/tmp/s","specAudit":"2026-09-20","subjects":[{"path":"s1","blob":"abc1234"}],"units":[
+  {"id":"A-tB-1","order":1,"specPath":"s1","closes":["EXMP-aFoo-3","EXMP-aFoo-4"]},
+  {"id":"A-tB-2","order":2,"specPath":"s2"}]}'
+CL_NONE='{"repo":"/tmp/r","slug":"tB","scratch":"/tmp/s","specAudit":"2026-09-20","subjects":[{"path":"s1","blob":"abc1234"}],"units":[
+  {"id":"A-tB-1","order":1,"specPath":"s1"},
+  {"id":"A-tB-2","order":2,"specPath":"s2"}]}'
+o=$(run_wf "$CL_WITH" "$CL_RET")
+cw0=$(printf '%s\n' "$o" | grep '^prompt:spec:tB:g0:')
+cw1=$(printf '%s\n' "$o" | grep '^prompt:spec:tB:g1:')
+o=$(run_wf "$CL_NONE" "$CL_RET")
+cn0=$(printf '%s\n' "$o" | grep '^prompt:spec:tB:g0:')
+cn1=$(printf '%s\n' "$o" | grep '^prompt:spec:tB:g1:')
+has    "closes: the unit's ids reach its own writer" "$cw0" "A-tB-1: this unit closes EXMP-aFoo-3 EXMP-aFoo-4"
+hasnt_ "closes: the other unit's writer is not handed them" "$cw1" "EXMP-aFoo-3"
+same   "closes: a unit with no closes gets its prompt unchanged" "$cw1" "$cn1"
+hasnt_ "closes: with no closes anywhere, no writer is told of any" "$cn0" "this unit closes"
+n=$((n+1)); if [ -n "$cw1" ] && [ -n "$cn1" ]; then echo "ok   closes: both controls captured a prompt"; else echo "FAIL closes: a control captured no prompt, so the byte comparison above compared two empty strings"; st=1; fi
+o=$(run_wf '{"repo":"/tmp/r","slug":"tB","scratch":"/tmp/s","specAudit":"2026-09-20","subjects":[{"path":"s1","blob":"abc1234"}],"units":[{"id":"A-tB-1","order":1,"specPath":"s1","closes":"EXMP-aFoo-3"}]}' "$CL_RET")
+has "closes: a string in place of a list THROWS by name" "$o" "carries a \`closes\` that is not a non-empty array of ask ids"
+
 # ---- AC4: one dead writer is REFUSED, not dropped, and its siblings still return.
 o=$(run_wf "$S3" '{"spec:tB:g0":null,"spec":{"authored":["x"],"alreadyPresent":[],"refused":[],"summary":"s"},"workflow":{"blockers":0,"confirmed":0,"highs":0,"unverified":0,"report":"r.md"},"audit:record":{"token":"CONVERGED"}}')
 has "one dead writer: reported as DEGRADED" "$o" "DEGRADED — 1 of 3 writer(s) returned nothing"
@@ -719,6 +748,9 @@ MT_ARGS='{"repo":"/tmp/r","kind":"spec-audit","subjects":[{"path":"s1","blob":"a
 # matches them, `typed` as the blockers and highs that audit's synthesis typed, and its `summary`.
 # `run_merged_review <returns>` runs the callee with its doubles answering as their SCHEMAS allow, so
 # a synthesis schema that stopped requiring `items` drops the key and reds the counting arms.
+# The lens and verdict doubles carry `path` because TOOL-dDerivedDocket-29 S1 made it REQUIRED on
+# both finding schemas and the verdict schema: under the strict runner a double without it comes back
+# null, every lens reads as dead, and the callee DEFERS before a single count is derived.
 build_merged_returns() {
   node -e '
     const shape = process.argv[3] ? JSON.parse(process.argv[3]) : {
@@ -730,8 +762,8 @@ build_merged_returns() {
       ({ id: i + 1, verdict: confirmed.has(i + 1) ? "confirmed" : "refuted", reason: "r" }))
     const out = {}
     for (const [prefix, count] of Object.entries(shape.lenses))
-      out[prefix] = { lens: "l", findings: Array.from({ length: count }, () => finding) }
-    out["verify:"] = { verdicts }
+      out[prefix] = { lens: "l", path: "/cd/find.json", findings: Array.from({ length: count }, () => finding) }
+    out["verify:"] = { path: "/cd/verify.json", verdicts }
     out.synth = { path: "r/merged.md", summary: shape.summary, blockers: shape.typed[0], highs: shape.typed[1],
       items: process.argv[1] === "absent" ? undefined : JSON.parse(process.argv[1]) }
     console.log(JSON.stringify(out))
@@ -1204,6 +1236,23 @@ has    "F every lens dead: still THROWS" "$o" "non-integer blocker count"
 has    "F ...naming the lens deaths" "$o" "lensesDead 4"
 o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":{"confirmed":[],"report":null,"blockers":null,"highs":null,"lensesRun":3,"lensesDead":1,"skepticsDead":0,"unverified":0,"note":"all findings refuted, but 1/4 lenses died"},"audit:record":%s,"dispose:":%s}' "$SPEC_OK" "$(rec CONVERGED)" "$DISPOSE_OK")")
 has    "F all-refuted beside a dead lens: THROWS" "$o" "non-integer blocker count"
+# ---- TOOL-dDerivedDocket-29 AC8: a DEFERRED callee return is recognised BEFORE the clean-round test
+# ---- and the non-integer refusal. The two arms above keep a return that carries NO `exit` field on
+# ---- the throw, which is still how a callee predating the field reads. A deferral records no round,
+# ---- builds nothing, and tells the caller to re-run once and then hold with the Workflow runId.
+DEF='{"exit":"deferred-platform","key":"spec-audit-r1-x-y","pending":["find:security","find:seams"],"confirmed":[],"report":null,"blockers":null,"highs":null,"lensesRun":2,"lensesDead":2,"note":"DEFERRED: 2/4 lenses died"}'
+o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' "$SPEC_OK" "$DEF" "$(rec CONVERGED)" "$DISPOSE_OK")")
+has    "DP a deferred audit is a RESULT, not a throw" "$o" "RESULT"
+hasnt_ "DP ...and the non-integer refusal does not fire first" "$o" "non-integer blocker count"
+has    "DP ...returning exit deferred-platform" "$o" '"exit":"deferred-platform"'
+has    "DP ...naming the Audit stage" "$o" '"stage":"Audit"'
+has    "DP ...and the pending labels" "$o" '"pending":["find:security","find:seams"]'
+has    "DP ...with the empty roster every non-throwing exit carries" "$o" '"roster":[]'
+hasnt_ "DP ...and no review round is recorded" "$o" "agent:audit:record"
+hasnt_ "DP ...and the Disposal stage is not reached" "$o" "phase:Disposal"
+has    "DP ...and the next step re-runs once, then holds naming the runId" "$o" "--pending-run <that Workflow runId>"
+o=$(run_wf "$A_UNITS" "$(printf '{"spec":{"authored":[],"alreadyPresent":["A-tB-1"],"refused":[],"summary":"s"},"workflow":%s}' "$DEF")")
+has    "DP attended: deferred too, and told to stop rather than hold" "$o" "an attended run has no driver to hold"
 # id 14: unverified findings are OUTSTANDING and run the stage.
 o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
     "$SPEC_OK" "$(review_out 0 0 0 2)" "$(rec CONVERGED)" '{"disposed":true,"standing":[],"promoted":0,"folded":2,"promotedIds":[],"edges":[],"placements":[],"summary":"d"}')")
@@ -1707,7 +1756,11 @@ if [ -f "$UK/adopt-unattended.sh" ]; then
     build_layout "$X" scripts/$WFK scripts/$UNK "$gp"
     cp "$UK/adopt-unattended.sh" "$UK/unattended.sh" "$UK/lib-unattended.sh" "$UK/check-unattended.sh" \
        "$UK"/*.template.md "$X/scripts/$UNK/"
-    printf 'MEMORY_ROOT=memory\nLANDER="true"\nKEEPALIVE_CREATE="c"\nKEEPALIVE_DELETE="d"\nKEEPALIVE_INTERVAL="i"\n' \
+    # The durable-restart carrier pair is DECLARED (TOOL-dDerivedDocket-5 S1): with the switch at its
+    # default `on` the adopter keeps both placeholders standing and refuses to install the Skill, so a
+    # conf without them compared the harness's command against an empty string. Distinct from the
+    # keepalive pair, which S2 refuses as a carrier.
+    printf 'MEMORY_ROOT=memory\nLANDER="true"\nKEEPALIVE_CREATE="c"\nKEEPALIVE_DELETE="d"\nKEEPALIVE_INTERVAL="i"\nRESUME_SCHEDULE_CREATE="rc"\nRESUME_SCHEDULE_DELETE="rd"\n' \
       > "$X/.unattended.conf"
     ( cd "$X" && git add -A )
     run_layout "$X" scripts/$WFK --render >/dev/null

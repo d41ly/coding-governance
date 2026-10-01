@@ -106,6 +106,15 @@ same() { n=$((n+1)); [ "$2" = "$3" ] || { echo "FAIL $1: expected [$3], got [$2]
 # ---- the run named beside the group. `"?"` is refused BY NAME — one FAIL line per group, so the
 # ---- converted file cannot pass in the window — and `out` is still stripped, so the `hit` lines
 # ---- below it read exactly what they will read once the set exists. AC3's recipe counts these.
+# ---- TWO REPORT SHAPES ARE NOT SKIPS, and dDerivedDocket put both on every run over this fixture,
+# ---- so read as skips each turned a group's own coverage into a dark branch. A COVERAGE COUNT,
+# ---- `check <n> byte-compared|compared|graded <count> …` - check 10's pair count is one
+# ---- (TOOL-dDerivedDocket-20 S4, AC4) - says what a check graded; a half it could not grade is a
+# ---- failure line or a skip line of its own, which the dark scan still reads. And check 26's
+# ---- SUITE-ABSENT skip (TOOL-dDerivedDocket-30 S6, AC8), printed on every run because this fixture
+# ---- carries neither suite, as no adopter tree does, so no group-mate can have pushed check 26
+# ---- onto it. WHAT THIS DOES NOT CHECK: a count reading zero, which is its check's own liveness.
+CE_STANDING='^unattended-report: check [0-9]+ (byte-compared|compared|graded) [0-9]+ |^unattended-report: check 26 skipped for .*/(check-)?unattended[.]test[.]sh .* this tree does not carry the suite, which is withheld from every adopter install'
 check_emitted() { # signatures · output
   local _s _l _num _ok _exp _miss="" _extra="" _dark="" _nums=" " _skips
   n=$((n+1))
@@ -139,6 +148,7 @@ check_emitted() { # signatures · output
   printf '%s\n' "$_skips" > "$_ced/skips"
   while IFS= read -r _l; do
     [ -n "$_l" ] || continue
+    [[ $_l =~ $CE_STANDING ]] && continue
     _num=${_l#*check }; _num=${_num%%[!0-9]*}
     [ -n "$_num" ] || continue
     case "$_nums" in *" $_num "*) _dark="$_dark [$_l]" ;; esac
@@ -166,6 +176,10 @@ cp "$HERE/PROTOCOL.template.md" memory/guides/UNATTENDED-PROTOCOL.md
 # iterates two pairs and check 26 reads this carrier ALONE, so a fixture missing either half
 # models a broken install and every arm below grades that refusal instead of its own subject.
 cp "$HERE/VERBS.template.md" memory/guides/UNATTENDED-VERBS.md
+# THE ASK GUIDE, BOTH HALVES (TOOL-dDerivedDocket-20 S4), for the verb carrier's reason: check 10
+# iterates a third pair, and a fixture missing either half grades that refusal in every arm below.
+cp "$HERE/ASKS.template.md" $KIT_REL/
+cp "$HERE/ASKS.template.md" memory/guides/UNATTENDED-ASKS.md
 # THE REPAIR POINTER'S TARGET (closing review round 1 M5). `derive_index_repair` probes for the
 # memory-tree kit's generator beside this kit, and a fixture holding only the unattended kit made it
 # print its not-found text, so check 21's arm asserted a literal the leg never produced here. The
@@ -199,6 +213,15 @@ DIRECTIVES_EXTRA_TABLE=""
 # 50-minute suite run to find, which is the only reason it is this loud.
 HALT_CODES_EXTRA=""
 HALT_FLOOR="${HFLOOR_OVERRIDE:-$HALT_FLOOR_DERIVED}"
+HOLD_CODES_EXTRA=""
+HOLD_FLOOR="${HDFLOOR_OVERRIDE:-$HOLD_FLOOR_DERIVED}"
+# THE DURABLE RESTART CARRIER, DECLARED (TOOL-dDerivedDocket-5 S1). RESUME_SCHEDULE is absent, so it
+# defaults to on, and check 46 requires the pair while it is on: without these two lines every run
+# over this fixture printed two check 46 FAILED lines, which every batched group read as a branch
+# nobody asserted. Spelled apart from KEEPALIVE_CREATE, or check 46's carrier refusal fires instead.
+# The driver suite's fixture declares the same pair for the same reason.
+RESUME_SCHEDULE_CREATE="TheScheduleCreate"
+RESUME_SCHEDULE_DELETE="TheScheduleDelete"
 # DECLARED HERE, AND THAT IS A FIXTURE FIX RATHER THAN A PRODUCT ONE (TOOL-dFoldedVerdict-2 fallout).
 # The key was absent from this block, so the DEFAULT fixture took check 2's blank branch and the leg
 # announced it on stdout once per run. That announcement is CORRECT for a blank cutoff and wrong for
@@ -263,6 +286,7 @@ EOF
 
 DIRECTIVES_FLOOR_DERIVED="$(grep '^DIRECTIVES_CORE=' "$HERE/unattended.sh" | sed 's/^DIRECTIVES_CORE="//; s/"$//' | wc -w)"
 HALT_FLOOR_DERIVED="$(grep '^HALT_CODES_CORE=' "$HERE/unattended.sh" | sed 's/^HALT_CODES_CORE="//; s/"$//' | wc -w)"
+HOLD_FLOOR_DERIVED="$(grep '^HOLD_CODES_CORE=' "$HERE/unattended.sh" | sed 's/^HOLD_CODES_CORE="//; s/"$//' | wc -w)"
 CORE_FLOOR_DERIVED="$(grep '^PHASES_CORE=' "$HERE/unattended.sh" | tr -d '
 ' | sed 's/^PHASES_CORE="//; s/"$//' | wc -w):$(grep '^DOD_CORE=' "$HERE/unattended.sh" | tr -d '
 ' | sed 's/^DOD_CORE="//; s/"$//' | wc -w)"
@@ -360,6 +384,14 @@ reset_tree() {
   printf 'delete refs/heads/ahead\ndelete refs/heads/trunk\n' | git --git-dir="$ORIGIN" update-ref --stdin
 }
 run() { bash "$SCRIPT" 2>&1; }
+# THE WHOLE-OUTPUT GREEN CONTROLS GRADE "NOTHING ELSE PRINTED", NOT "NOTHING PRINTED". Checks 45 and
+# 46 announce the effective LANDER_MODE, RESUME_SCHEDULE and SELFTESTS_OWED_PATHS on the DEFAULT
+# channel by design (the checker's header, THREE), so a control comparing the whole output to empty
+# reds on every tree once those checks exist. This removes exactly those announcement shapes and
+# nothing else; the lm_dir arms assert the announcements themselves, so the pair grades both halves.
+remove_announcements() { # leg output -> the same output without the check-45/46 announcement lines
+  printf '%s\n' "$1" | grep -v -E '^unattended: (LANDER_MODE [^ ]+ \((declared|defaulted)\) — |RESUME_SCHEDULE [^ ]+ \((declared|defaulted)\) — |RESUME_SCHEDULE is off — |SELFTESTS_OWED_PATHS is blank — |SELFTESTS_OWED_PATHS entry [^ ]+ — resolves to tracked paths$)'
+}
 # A scratch dir for STUBBED BINARIES, prepended to PATH by the arms that need one. Used to fire a
 # code path whose real trigger is a network partition, which no fixture can arrange.
 # ITS PARENT IS TRAPPED, not just the stub inside it. `$(mktemp -d)/bin` leaked one scratch directory
@@ -588,7 +620,7 @@ if in_shard 1; then
 # ---- a leg that reds on everything arms every branch and checks nothing.
 out=$(run); rc=$?
 same "a conforming tree exits 0" "$rc" "0"
-same "a conforming tree prints nothing" "$out" ""
+same "a conforming tree prints nothing" "$(remove_announcements "$out")" ""
 
 # ---- check 1, all three branches: no conf, a key undeclared, and the driver's core sets unreadable.
 # ---- ROUND 9's BLOCKER: the conf could no longer END this leg and could still HIJACK it, because the
@@ -798,7 +830,13 @@ verbs=$(grep -oE '^ +--[a-z]+\)' "$D" | tr -d ' )' | sort -u)
 # pre-existing reds: `--unit` is a flag of `--brief` and `--disposition` one of `--review`, both
 # dispatched as case arms and both documented by the verb they belong to, so both are denied and
 # the floor below is re-derived over the population they were inflating.
-_denied='--keepalive-id --item --value --override --waive --reason --code --subject --verdict --blockers --act --pass --successor --writes --leg --path --step --records-root --playbook-sha --run --set --framed --paths --unit --disposition'
+#
+# FIVE MORE FLAGS, from dDerivedDocket, each a case arm that assigns and documented on its verb's
+# header line: `--asks` is an output mode of `--plan` as `--paths` is (TOOL-dDerivedDocket-16 S8);
+# `--until` and `--reaped` are arguments of `--hold` (TOOL-dDerivedDocket-4 S2); `--replaces` and
+# `--scheduled` are arguments of `--resume` (TOOL-dDerivedDocket-4 S6, TOOL-dDerivedDocket-5 S6).
+# Undenied, each demanded a Skill section, a synopsis line and a VERBS_ entry of its own.
+_denied='--keepalive-id --item --value --override --waive --reason --code --subject --verdict --blockers --act --pass --successor --writes --leg --path --step --records-root --playbook-sha --run --set --framed --paths --unit --disposition --asks --until --reaped --replaces --scheduled'
 for _f in $_denied; do
   verbs=$(printf '%s
 ' "$verbs" | grep -vxF -- "$_f" || true)
@@ -814,7 +852,10 @@ _nverbs=$(printf '%s
 # `--disposition`, the two flags the line above now denies. It was 14 against a polluted population
 # of 20, so six verbs could have stopped being dispatched with the floor still green. A floor set
 # against a polluted population pins nothing.
-n=$((n+1)); [ "$_nverbs" -ge 18 ] || { echo "FAIL the dispatched-verb population read $_nverbs verbs against a floor of 18, so the documentation join below would grade a set smaller than the kit actually ships"; st=1; }
+# NINETEEN since dDerivedDocket, re-derived the same way: `--hold` is a verb it added
+# (TOOL-dDerivedDocket-4 S2), and the five flags it added are denied above. The assertion count is
+# unchanged; only the number it compares against moved.
+n=$((n+1)); [ "$_nverbs" -ge 19 ] || { echo "FAIL the dispatched-verb population read $_nverbs verbs against a floor of 19, so the documentation join below would grade a set smaller than the kit actually ships"; st=1; }
 # ...and every DENYLIST entry must really be a flag, or a stale exemption silently narrows the
 # population the join covers. A name is a flag when it is dispatched but assigns rather than acting;
 # the cheap proxy is that it must still appear as a case arm in the driver.
@@ -959,7 +1000,7 @@ miss "$out" "the driver declares no PARK_KINDS_OWED taxonomy"
 reset_tree; mkconf "PARKED" ""
 out=$(run)
 miss "$out" "the kit's CORE phase vocabulary has shrunk below its floor"
-same "a project phase EXTENSION is green" "$(run)" ""
+same "a project phase EXTENSION is green" "$(remove_announcements "$(run)")" ""
 
 reset_tree
 mkdir -p $KIT_REL && cp "$HERE/unattended.sh" "$HERE/lib-unattended.sh" $KIT_REL/
@@ -971,7 +1012,7 @@ hit "$out" "the kit's CORE Definition-of-Done set has shrunk below its floor, an
 hit "$out" "$((ndod-1)) against $ndod"
 
 reset_tree; mkconf "" "project-item:machine"
-same "a project DoD EXTENSION is green" "$(run)" ""
+same "a project DoD EXTENSION is green" "$(remove_announcements "$(run)")" ""
 
 # ---- ...and the floor itself must be DECLARED. Omitting the key is the quietest way to disarm a
 # ---- shrink-only pin, so the omission is its own refusal rather than a skipped check.
@@ -999,7 +1040,7 @@ reset_tree; git rm -q memory/builds/tRun/RUN.md && git commit -q -m young --no-v
 out=$(run); rc=$?
 miss "$out" "the selector is mis-segmented"
 same "a young tree with no run-state file anywhere exits 0" "$rc" "0"
-same "a young tree prints nothing" "$out" ""
+same "a young tree prints nothing" "$(remove_announcements "$out")" ""
 
 # ---- check 4 branches 2 and 3: no phase, and a phase outside the vocabulary.
 
@@ -1357,7 +1398,10 @@ mutate memory/builds/tRun/RUN.md 's/^phase: RUNNING$/phase: ABORTED/'
 sed -i 's/^phase: ABORTED/halt-code: fork-unresolvable\nphase: ABORTED/' memory/builds/tRun/RUN.md
 out=$(run)
 miss "$out" "a run-state file's generated region carries a COPY of the unit list"
-same "a terminal record carrying a copy leaves the leg green" "$(run; echo $?)" "0"
+# NOTHING ELSE PRINTED AND EXIT 0, through the announcement filter: checks 45 and 46 announce
+# LANDER_MODE, RESUME_SCHEDULE and SELFTESTS_OWED_PATHS on every run (the checker's header, THREE;
+# TOOL-dDerivedDocket-3 S1, TOOL-dDerivedDocket-5 S1), so the output is never the status line alone.
+same "a terminal record carrying a copy leaves the leg green" "$(remove_announcements "$(run; echo $?)")" "0"
 
 # ---- check 9: a recorded BASE the run could quietly move is not a pin.
 reset_tree; sed -i 's/^base: .*/base: 0000000000000000000000000000000000000000/' memory/builds/tRun/RUN.md
@@ -1392,6 +1436,46 @@ hit "$out" "drifted line"
 reset_tree; rm -f $KIT_REL/VERBS.template.md
 hit "$(run)" "one half of the verb-carrier pair is missing, and a parity check with one file is a check that cannot fail"
 
+# ---- check 10, THE THIRD PAIR. TOOL-dDerivedDocket-20 S4 moved the ask contract into its own
+# ---- byte-compared guide, and a pair added without its own two arms is a pair nothing watches.
+reset_tree; printf '\ndrifted line\n' >> memory/guides/UNATTENDED-ASKS.md
+out=$(run)
+hit "$out" "the shipped ask guide and this repo's installed copy have drifted, so the kit ships something other than what it runs on"
+hit "$out" "drifted line"
+reset_tree; rm -f memory/guides/UNATTENDED-ASKS.md
+hit "$(run)" "one half of the ask-guide pair is missing, and a parity check with one file is a check that cannot fail"
+# ...and the report channel names every pair it compared, so a pair whose row was never added to the
+# count is visible in one run rather than only by reading the source.
+reset_tree
+hit "$(GOV_UNATTENDED_REPORT=1 run)" "check 10 byte-compared 3 of its 3 pairs: protocol verbs asks"
+
+# ---- check 38: NO PATH IS BOTH A SHARED RECORD AND A GENERATED INDEX (TOOL-dDerivedDocket-20 S1).
+# ---- Three shapes, because each is a different way to get the predicate wrong: a nested pair in
+# ---- EACH direction reds an equality test, and an UNDECLARED SHARED_RECORDS reds a leg that reads the
+# ---- key as blank instead of taking the kit default the driver takes. The control is the pristine
+# ---- conf, which declares neither key, so the default is compared against an empty index set.
+C38_MSG="a path is declared under both SHARED_RECORDS and GENERATED_INDEXES, so --dispatch answers it by whichever of condition 3's two rules it reaches first and the other declaration means nothing"
+reset_tree
+miss "$(run)" "$C38_MSG"
+# ...and the control is LIVE: the report channel names the two populations it compared, the kit
+# default's two records against an index set the fixture conf leaves empty.
+hit "$(GOV_UNATTENDED_REPORT=1 run)" "check 38 compared 2 shared record(s) against 0 index half(s)"
+printf '\nSHARED_RECORDS="memory"\nGENERATED_INDEXES="memory/LIVE.md:gen.py"\n' >> .unattended.conf
+out=$(run)
+hit "$out" "a path is declared under both SHARED_RECORDS and GENERATED_INDEXES, so --dispatch answers it by whichever of condition 3's two rules it reaches first and the other declaration means nothing"
+hit "$out" "SHARED_RECORDS memory overlaps the index memory/LIVE.md"
+reset_tree
+printf '\nSHARED_RECORDS="memory/LIVE.md"\nGENERATED_INDEXES="memory:gen.py"\n' >> .unattended.conf
+hit "$(run)" "SHARED_RECORDS memory/LIVE.md overlaps the index memory"
+reset_tree
+printf '\nGENERATED_INDEXES="memory/backlog:gen.py"\n' >> .unattended.conf
+hit "$(run)" "SHARED_RECORDS memory/backlog overlaps the index memory/backlog"
+# ...and a DECLARED blank is the empty set, not the default, so the same index is then accepted.
+reset_tree
+printf '\nSHARED_RECORDS=""\nGENERATED_INDEXES="memory/backlog:gen.py"\n' >> .unattended.conf
+miss "$(run)" "$C38_MSG"
+reset_tree
+
 # ---- check 12: the kickoff hand-back, all four states. This is the only check that reads a file
 # ---- outside the kit, and it exists because nothing else read the engine's TEXT — the manifest
 # ---- ratchet watches the project layer and the coverage gate enumerates the skill's PATH.
@@ -1410,7 +1494,7 @@ control back: *"Ready — say go and I'll start, or adjust any field."* Do not s
 ENG
 printf 'KICKOFF_ENGINE="skills/session-kickoff/SKILL.md"\nKICKOFF_EXITS="6"\n' >> .unattended.conf
 git add -A && git commit -q -m engine --no-verify
-same "a conforming kickoff engine is green" "$(run)" ""
+same "a conforming kickoff engine is green" "$(remove_announcements "$(run)")" ""
 
 # ...the hand-back deleted: a mandated run halts at the card with nobody to answer it.
 sed -i '/^## Step 5b/d' skills/session-kickoff/SKILL.md
@@ -1474,7 +1558,7 @@ hit "$(run)" "KICKOFF_ENGINE names a file that does not exist, so the hand-back 
 
 # ...blank turns it off, which is what lets an adopter without the kickoff skill stay green.
 sed -i 's|^KICKOFF_ENGINE=.*|KICKOFF_ENGINE=""|' .unattended.conf
-same "a blank KICKOFF_ENGINE turns the check off" "$(run)" ""
+same "a blank KICKOFF_ENGINE turns the check off" "$(remove_announcements "$(run)")" ""
 
 # ---- check 1 branch 5: a MALFORMED floor is a refusal, not a skip. Only the wholly UNDECLARED case
 # ---- was caught, so `CORE_FLOOR="6"` left BOTH shrink-only pins unenforced while the conf still
@@ -1638,7 +1722,7 @@ git checkout -q main && git merge -q --no-ff unit -m "land the run"
 # which is what the predicate now reads.
 git push -q -f origin main
 out=$(run); rc=$?
-same "a LANDED run-state record leaves the bar green" "$out" ""
+same "a LANDED run-state record leaves the bar green" "$(remove_announcements "$out")" ""
 same "a LANDED run-state record exits 0" "$rc" "0"
 git checkout -q unit; reset_tree
 
@@ -1717,8 +1801,13 @@ reset_tree
 # ---- from the mktemp assignments means the exemption shrinks and grows with the code it describes.
 reset_tree
 # the variables this file assigns from mktemp — the only legal redirect targets
-mkt=$(grep -oE '^[[:space:]]*(local +)?[A-Za-z_][A-Za-z0-9_]*=\$\(mktemp' "$HERE/check-unattended.sh" \
-      | sed -E 's/^[[:space:]]*(local +)?//; s/=\$\(mktemp$//' | sort -u)
+# AN ASSIGNMENT IN A CONDITION COUNTS TOO. Check 42 (TOOL-dDerivedDocket-27) creates its capture dir
+# as `elif ! _c42_d=$(mktemp -d …); then`, and a derivation anchored at the line start missed it, so
+# the redirect into that scratch read as a write into the tree. Comment lines are dropped first, or a
+# header quoting the shape would bless a name nothing assigns.
+mkt=$(grep -vE '^[[:space:]]*#' "$HERE/check-unattended.sh" \
+      | grep -oE '(^[[:space:]]*|(^|[;&|[:space:]])(if|elif|while|until)[[:space:]]+(![[:space:]]+)?)(local +)?[A-Za-z_][A-Za-z0-9_]*=\$\(mktemp' \
+      | sed -E 's/=\$\(mktemp$//; s/^.*[[:space:]!;&|]//' | sort -u)
 # ONE PATTERN VARIABLE, shared by this arm and by the BOUND on its exemption below. They used to
 # carry two different regexes: this one ends with a LITERAL dollar, matching a redirect into a
 # variable; the bound ended with a bare dollar, an end-of-line anchor, and dropped the leading
@@ -1988,7 +2077,7 @@ git checkout -q main; git reset -q --hard "$ANCHOR0"; git push -q -f origin main
 
 # GREEN CONTROL: the template this kit actually ships orders the two correctly.
 reset_tree; kick_engine
-same "the shipped Skill template orders kickoff after preflight" "$(run)" ""
+same "the shipped Skill template orders kickoff after preflight" "$(remove_announcements "$(run)")" ""
 
 # ...TRANSPOSED. The deadlock: kickoff invoked first halts at its READY card with nobody under a
 # mandate to answer it. Judged on the FIRST occurrence of each, which is the one the agent reads.
@@ -2312,10 +2401,18 @@ mutate $KIT_REL/unattended.sh '/print "spec-audit=" v/d'
 hit "$(run)" "a run-state read exemption matches no read in the kit, and a stale exemption silently widens the surface it was written to narrow; unattended.sh ^spec-audit:"
 reset_tree
 # ...and the two LIVENESS refusals, each reached by removing what it asserts is there. No scoped read
-# at all: both of the fixture kit's section-filtered reads spelled with `cat` instead.
-mutate $KIT_REL/lib-unattended.sh 's#| extract_run_facts | grep -m1 #| cat | grep -m1 #'
-mutate $KIT_REL/check-unattended.sh 's#extract_run_facts < "[$]rvf"#cat < "$rvf"#'
-hit "$(run)" "no key read in the kit carries the Run facts scope, so the scan matched nothing it was written to find and a clean result would be coverage of nothing"
+# at all: EVERY section-filtered read in the fixture kit respelled unscoped, `extract_run_facts`
+# before a pipe or a redirect as `cat` and an awk `sec && /…/` guard without its `sec &&`. This arm
+# named the kit's two such reads one by one; dDerivedDocket took the fixture kit to six, across the
+# library, this leg and the driver, so the four it did not name kept the scan live and the refusal
+# never fired. The report's count is read first, so a scoped read the respelling misses reds here
+# as a count, not as a missing refusal. RAISED the floors by 2: one `mutate` more and that `hit`.
+for _sf in lib-unattended.sh check-unattended.sh unattended.sh; do
+  mutate $KIT_REL/$_sf '/^[[:space:]]*#/!{s/extract_run_facts\([[:space:]]*[|<]\)/cat\1/g; s/\([^A-Za-z_]\)sec *&& *\//\1\//g;}'
+done
+out=$(GOV_UNATTENDED_REPORT=1 run)
+hit "$out" " anchored reads, 0 scoped to the Run facts section, "
+hit "$out" "no key read in the kit carries the Run facts scope, so the scan matched nothing it was written to find and a clean result would be coverage of nothing"
 reset_tree
 # No `phase` key derived: every `fact`/`set_fact`/`fact_of` call naming it respelled.
 mutate $KIT_REL/unattended.sh 's/\(fact[a-z_]* "[^"]*"\) phase/\1 phaze/g'
@@ -2351,7 +2448,7 @@ miss "$(run)" "well-formed generated-units marker pair"
 # silent because the project ships no kickoff skill, not because the template is conforming.
 reset_tree
 mutate $KIT_REL/SKILL.template.md '2i Invoke /session-kickoff before anything else.'
-same "a blank KICKOFF_ENGINE turns check 18 off even on a transposed template" "$(run)" ""
+same "a blank KICKOFF_ENGINE turns check 18 off even on a transposed template" "$(remove_announcements "$(run)")" ""
 reset_tree
 
 # ---- 34 (TOOL-aRepatriatedFork-6 AC5): a Run facts key carried twice with two DIFFERENT values is a
@@ -2395,7 +2492,7 @@ fi   # ---- end REGION 4 -------------------------------------------------------
 if in_shard 5; then
 read_topo 5
 reset_tree
-same "the shipped protocol's two tables join clean" "$(run)" ""
+same "the shipped protocol's two tables join clean" "$(remove_announcements "$(run)")" ""
 
 # D, driver -> protocol: a core phase the contract never publishes.
 reset_tree; pedit 's/`SPECCING` · //'   # mid-line: VERIFYING ends a line, so it has no trailing space to match
@@ -2448,6 +2545,33 @@ reset_tree; pedit 's/^[A-Z][a-z]* kit-owned core items\. //'
 hit "$(run)" "the protocol states no count of kit-owned core Definition-of-Done items, so the sentence that summarises the table cannot be joined to the table or to the driver"
 reset_tree
 
+# ---- E, THE COUNT WORD TABLE PAST TWELVE (TOOL-dDerivedDocket-17). The table stopped at `twelve`,
+# ---- which was exactly the size of the core set — so the FIRST correct sentence written after the
+# ---- thirteenth item landed mapped to -1 and red the leg for stating the right number.
+# ----
+# ---- THE WORD IS READ FROM THE SHIPPED CONTRACT, never typed into the arm. A locator spelling last
+# ---- month's count is a `mutate` no-op, and the two arms directly above this one are exactly that:
+# ---- they say `Ten` over a contract that has said `Twelve` and now says `Thirteen`. Deriving it is
+# ---- what keeps this arm from joining them the next time an item lands.
+reset_tree
+_c16cw=$(sed -n 's/^\([A-Za-z]*\) kit-owned core items\..*/\1/p' $KIT_REL/PROTOCOL.template.md | head -1)
+same "the shipped contract states a count word at all" \
+  "$(printf '%s\n' "$_c16cw" | grep -c '^[A-Za-z][A-Za-z]*$' || true)" "1"
+same "...and the word table READS that word rather than mapping it to -1" \
+  "$(run | grep -c 'stated count of core Definition-of-Done items disagrees' || true)" "0"
+# ...and the boundary still refuses a word the table cannot read, or the arm above is satisfied by a
+# table that maps everything to something.
+reset_tree; pedit "s/^$_c16cw kit-owned core items\./Thirtyone kit-owned core items./"
+hit "$(run)" "the protocol's stated count of core Definition-of-Done items disagrees with the set the driver enforces, and that sentence sits directly above the table it miscounts: says '"
+
+# ---- E, the new item's OWN row: the thirteenth item is enforced by --close, so a contract that
+# ---- does not publish it blocks a run on something nobody was told about.
+reset_tree; pedit '/^| `asks-disposed` |/d'
+out=$(run)
+hit "$out" "a CORE Definition-of-Done item is enforced by --close and absent from the protocol's table, so a run is blocked by an item the contract never told anyone about"
+hit "$out" "asks-disposed"
+reset_tree
+
 # ---- `mutate` itself, both ways. The failing direction runs in a SUBSHELL, or the FAIL it is
 # ---- supposed to emit would fail this suite instead of being observed by it.
 reset_tree
@@ -2472,7 +2596,7 @@ reset_tree
 # GREEN CONTROL: undeclared is the empty set, which is every adopter today, and is what keeps this
 # change from reddening anyone who uses no extras.
 reset_tree
-same "an undeclared row source changes nothing" "$(run)" ""
+same "an undeclared row source changes nothing" "$(remove_announcements "$(run)")" ""
 
 # ...an extra handle with NO row source is REFUSED now, where it was silently waivable.
 reset_tree; mutate .unattended.conf 's/^DIRECTIVES_EXTRA=""$/DIRECTIVES_EXTRA="house-style:M9"/'
@@ -2482,7 +2606,7 @@ hit "$(run)" "a directive is declared in the registry and absent from the Skill'
 mutate .unattended.conf 's|^DIRECTIVES_EXTRA_TABLE=""$|DIRECTIVES_EXTRA_TABLE="memory/project/extra-directives.md"|'
 mkdir -p memory/project
 printf '| Handle | What it points at | Method | Directive |\n|---|---|---|---|\n| `house-style` | the prose rules this project adds | M9 | P1 |\n' > memory/project/extra-directives.md
-same "declared + shown is silent" "$(run)" ""
+same "declared + shown is silent" "$(remove_announcements "$(run)")" ""
 
 # ...a row source naming a handle the registry does NOT declare reds the other way, so the join stays
 # two-directional across the union rather than one-directional over it.
@@ -2553,7 +2677,8 @@ reset_tree; frozen
 mutate memory/builds/tRun/RUN.md '/<!-- run:generated -->/a | [ARCH-tRun-1 — the unit](spec/one.md) | OPEN | rev-1 | 2026-08-01 |'
 out=$(run)
 miss "$out" "a run-state file's generated region carries a COPY of the unit list"
-same "move 1 leaves a terminal record green" "$(run; echo $?)" "0"
+# Through the announcement filter, for the reason the terminal-copy control in check 8's block gives.
+same "move 1 leaves a terminal record green" "$(remove_announcements "$(run; echo $?)")" "0"
 
 # ...LIVE control. Without it, move 1's silence is satisfiable by deleting check 8 altogether.
 reset_tree
@@ -2738,7 +2863,7 @@ reset_tree
 # G, the scopes disagree. ONE branch and not a comm pair: measured, a single changed scope cell puts
 # the same handle in BOTH differences, so an only-in-table branch could never fire alone and its arm
 # would have proved nothing. Arm A already covers the handle set in both directions.
-reset_tree; mutate $KIT_REL/SKILL.template.md 's/| M12 | prompt | D9 |/| M12 | all | D9 |/'
+reset_tree; mutate $KIT_REL/SKILL.template.md 's/| M7 | recipe | D11 |/| M7 | all | D11 |/'
 hit "$(run)" "the directive scopes the registry declares are not the scopes the Skill's table shows, so the agent is told which runs a rule binds by a table that disagrees with the verb enforcing it:"
 
 # G, the locator: the column REMOVED entirely. Without this the join compares two empty sets and is
@@ -2858,7 +2983,9 @@ reset_tree; mutate $KIT_REL/unattended.sh '/^#   unattended[.]sh --propose /d'
 mutate $KIT_REL/VERBS.template.md '/^- .--propose. — writes a PROPOSAL/d'
 mutate memory/guides/UNATTENDED-VERBS.md '/^- .--propose. — writes a PROPOSAL/d'
 out=$(GOV_UNATTENDED_REPORT=1 run)
-check_emitted "a declared verb is absent from the driver's own header, and the usage text is RENDERED from that header, so the verb has no documented arguments anywhere a reader looks|a declared verb has no entry in the verb carrier, so the contract a run is measured against does not describe a verb that run can call" "$out"  # set OBSERVED 2026-09-15 node a, direct run shard 6/8 at 72f54937 (aBatchedArm landing step 0)
+# THE THIRD SIGNATURE is check 26's flag join (TOOL-dDerivedDocket-30 S5): the deleted header line
+# was the only one naming `--propose` and `--step`, so both are now parsed and documented nowhere.
+check_emitted "a declared verb is absent from the driver's own header, and the usage text is RENDERED from that header, so the verb has no documented arguments anywhere a reader looks|a declared verb has no entry in the verb carrier, so the contract a run is measured against does not describe a verb that run can call|the driver's parser accepts a flag no header line documents, and the usage text is rendered from that header, so the argument reaches no reader" "$out"  # set OBSERVED 2026-09-15 node a, direct run shard 6/8 at 72f54937 (aBatchedArm landing step 0); third signature OBSERVED 2026-09-29 node d, attributed run of shard 6/8 at 8331469c
 hit "$out" "a declared verb is absent from the driver's own header, and the usage text is RENDERED from that header, so the verb has no documented arguments anywhere a reader looks:"
 hit "$out" "a declared verb has no entry in the verb carrier, so the contract a run is measured against does not describe a verb that run can call:"
 
@@ -3321,6 +3448,40 @@ mkdir -p work && printf 'a\n' > work/one.txt && printf 'b\n' > work/stray.txt
 git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
 hit "$(run)" "more dispatched passes committed outside the set they declared before dispatch than the shrink-only ceiling admits, and that declaration is the disjointness proof two concurrent passes rest on"
 
+# ---- ABSORB (TOOL-dDerivedDocket-24 S9, AC8). The pass declared one path; a commit of its own, whose
+# ---- subject is the absorb grammar and names no unit id, fixed an inherited red at another path. It
+# ---- is reported on an ABSORB line and reaches neither anomaly branch. The CONTROL is the same paths
+# ---- under a subject that also names the unit: that commit IS the pass commit, and the path is an
+# ---- undeclared write whatever the subject starts with.
+reset_tree
+drow ARCH-tRun-1 "work/one.txt"
+mkdir -p work && printf 'a\n' > work/one.txt
+git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
+mkdir -p fix && printf 'f\n' > fix/leg.txt
+git add -A && git commit -q -m "absorb(tRun): memory hygiene inherited at 0123abcd" --no-verify
+out=$(GOV_UNATTENDED_REPORT=1 bash "$SCRIPT" 2>&1)
+hit  "$out" "check 23 ABSORB"
+hit  "$out" "'absorb(tRun): memory hygiene inherited at 0123abcd' wrote fix/leg.txt; an inherited red fixed in its own commit, graded as neither a dodged join nor an undeclared write"
+miss "$out" "check 23 FAILED"
+miss "$out" "the only join this check has was dodged"
+# ...and an absorb commit moving a DECLARED path while no commit names the pass is not a dodged join.
+reset_tree
+drow ARCH-tRun-1 "work/one.txt"
+mkdir -p work && printf 'a\n' > work/one.txt
+git add -A && git commit -q -m "absorb(tRun): memory hygiene inherited at 0123abcd" --no-verify
+out=$(GOV_UNATTENDED_REPORT=1 bash "$SCRIPT" 2>&1)
+hit  "$out" "check 23 ABSORB"
+miss "$out" "the only join this check has was dodged"
+miss "$out" "check 23 FAILED"
+# CONTROL: the same paths with a unit id in the subject are the pass commit, graded and anomalous.
+reset_tree
+drow ARCH-tRun-1 "work/one.txt"
+mkdir -p work fix && printf 'a\n' > work/one.txt && printf 'f\n' > fix/leg.txt
+git add -A && git commit -q -m "absorb(tRun): memory hygiene inherited at 0123abcd ARCH-tRun-1" --no-verify
+out=$(GOV_UNATTENDED_REPORT=1 bash "$SCRIPT" 2>&1)
+miss "$out" "check 23 ABSORB"
+hit  "$out" "more dispatched passes committed outside the set they declared before dispatch than the shrink-only ceiling admits, and that declaration is the disjointness proof two concurrent passes rest on"
+
 # ---- THE WIDENING REPAIR, AND THE POST-HOC REWRITE THAT WEARS ITS CLOTHES (closing review F3/F4).
 # ---- `--dispatch`'s widening supersedes an OPEN pass's row and parks the replacement AT THE SAME
 # ---- ANCHOR, so a widened declaration is two rows under one key and the later binds. A widening
@@ -3558,6 +3719,52 @@ printf 'a\n' > work/one.txt && printf 'b\n' > work/stray.txt
 git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
 hit "$(run)" "wrote work/stray.txt in memory/builds/tRun/RUN.md"
 
+# ---- TOOL-dDerivedDocket-30 S1: THE DIRECTORY AND THE BLOB, the two conditions A to F left out. Four
+# ---- fixtures on arm A's shape, each graded through `--skip 28` because check 23 sits outside that
+# ---- region. G: the brief EDITED after its row hashed it is no longer the brief the row names, so it
+# ---- reports. H: a row naming a SIBLING unit excuses nothing for this one. I: a row naming a path
+# ---- outside the build's own `prompts/` - a product file, hashed correctly - excuses nothing. J: the
+# ---- `{brief, row}` commit carrying an EDITED brief is not skipped as bookkeeping, so it is the commit
+# ---- graded and the edit reports rather than the clean commit after it. G, I and J were silent at
+# ---- the base, where the row's unit alone decided; H is the unit condition's control.
+run_skip_leg() { bash "$SCRIPT" --skip 28 2>&1; }
+# G: edited after hashing
+reset_tree
+drow ARCH-tRun-1 "work/one.txt"
+mkdir -p work memory/builds/tRun/prompts && printf 'a\n' > work/one.txt && printf '# brief\n' > "$BRIEF"
+printf '2026-08-21T00:00:01Z brief · item ARCH-tRun-1 · reason %s %s\n' \
+  "$(git hash-object "$BRIEF" | cut -c1-12)" "$BRIEF" >> memory/builds/tRun/RUN.md
+printf '# brief, edited after the row hashed it\n' > "$BRIEF"
+git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
+hit "$(run_skip_leg)" "wrote $BRIEF in memory/builds/tRun/RUN.md"
+# H: a sibling's row
+reset_tree
+drow ARCH-tRun-1 "work/one.txt"
+mkdir -p work memory/builds/tRun/prompts && printf 'a\n' > work/one.txt && printf '# brief\n' > "$BRIEF"
+printf '2026-08-21T00:00:01Z brief · item ARCH-tRun-2 · reason %s %s\n' \
+  "$(git hash-object "$BRIEF" | cut -c1-12)" "$BRIEF" >> memory/builds/tRun/RUN.md
+git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
+hit "$(run_skip_leg)" "wrote $BRIEF in memory/builds/tRun/RUN.md"
+# I: a product file named by a correctly hashed row
+reset_tree
+drow ARCH-tRun-1 "work/one.txt"
+mkdir -p work && printf 'a\n' > work/one.txt && printf 'p\n' > work/product.txt
+printf '2026-08-21T00:00:01Z brief · item ARCH-tRun-1 · reason %s work/product.txt\n' \
+  "$(git hash-object work/product.txt | cut -c1-12)" >> memory/builds/tRun/RUN.md
+git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
+hit "$(run_skip_leg)" "wrote work/product.txt in memory/builds/tRun/RUN.md"
+# J: the bookkeeping commit carrying an edited brief is graded, not skipped
+reset_tree
+drow ARCH-tRun-1 "work/one.txt"
+mkdir -p memory/builds/tRun/prompts && printf '# brief\n' > "$BRIEF"
+printf '2026-08-21T00:00:01Z brief · item ARCH-tRun-1 · reason %s %s\n' \
+  "$(git hash-object "$BRIEF" | cut -c1-12)" "$BRIEF" >> memory/builds/tRun/RUN.md
+printf '# brief, edited after the row hashed it\n' > "$BRIEF"
+git add -A && git commit -q -m "ARCH-tRun-1 brief handed" --no-verify
+mkdir -p work && printf 'a\n' > work/one.txt
+git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
+hit "$(run_skip_leg)" "wrote $BRIEF in memory/builds/tRun/RUN.md"
+
 # ---- THE COMPARISON NOW FAILS THE LEG, ABOVE ITS CEILING (TOOL-cMendedVintage-14). This arm used
 # ---- to assert the opposite - spec 23 S1 / AC9 pinned "reports without failing" - and that pin is
 # ---- SUPERSEDED rather than deleted quietly, because it is the whole of what the ruling changed:
@@ -3745,6 +3952,1656 @@ reset_tree
 # ---- Main sharded this suite while this branch added arms to it. The SHARDING is kept — it is
 # ---- the structure — and the floors below are RE-MEASURED against the merged suite rather than
 # ---- carried over, because a floor inherited across a merge is a number, not a floor.
+
+# ============== TOOL-dDerivedDocket-4: the phase-read routing, the core floor, --phase ============
+# CHECKS 39 AND 40 here are the pair this unit's spec calls 32 and 33: main numbered its own 32 and
+# 33 first, and the reconcile merge kept main's numbers and moved this pair.
+# Every arm below grades a DRIVER COPY in the fixture, which is the only place the sets and the call
+# sites live. The re-stage before each edit is load-bearing for the reason the parked-kind arms
+# above already record: `reset_tree`'s `git clean -qfd` removes the copied kit, and without it the
+# sed edits nothing, the grep finds nothing, and the arm passes by finding nothing.
+
+# ---- CHECK 39, arm one: a direct read of the phase fact in a function that is neither reader.
+reset_tree
+mkdir -p $KIT_REL && cp "$HERE/unattended.sh" "$HERE/lib-unattended.sh" $KIT_REL/
+mutate $KIT_REL/unattended.sh 's|^  read_derived_phase "$rel"; p="$DP_PHASE"; w=$(fact "$rel" witness)$|  p=$(fact "$rel" phase); w=$(fact "$rel" witness)|'
+out=$(run)
+hit "$out" "the phase fact is read outside the two readers, or the recorded-phase allow-list disagrees with the source, so the effective phase and the recorded one can differ at a call site nobody classified"
+hit "$out" "reads the phase fact directly inside verb_status()"
+
+# ---- CHECK 39, arm two: the same read inside a function that also WRITES the phase. The exemption
+# ---- is a LINE and never a function, so `verb_preflight`'s rotation test is graded although the
+# ---- same function carries the `set_fact … phase RUNNING` guard the exemption covers. This is the
+# ---- one live instance at BASE, and a function-wide exemption would cover five of the ten rows.
+reset_tree
+mkdir -p $KIT_REL && cp "$HERE/unattended.sh" "$HERE/lib-unattended.sh" $KIT_REL/
+mutate $KIT_REL/unattended.sh 's|^  if \[ -f "$rel" \] \&\& is_terminal "$DP_PHASE"; then$|  if [ -f "$rel" ] \&\& is_terminal "$(fact "$rel" phase)"; then|'
+out=$(run)
+hit "$out" "reads the phase fact directly inside verb_preflight()"
+
+# ---- CHECK 39, arm three: a `read_recorded_phase` call in a function the allow-list does not name.
+reset_tree
+mkdir -p $KIT_REL && cp "$HERE/unattended.sh" "$HERE/lib-unattended.sh" $KIT_REL/
+mutate $KIT_REL/unattended.sh 's|^  read_derived_phase "$rel"; p="$DP_PHASE"$|  p=$(read_recorded_phase "$rel")|'
+out=$(run)
+hit "$out" "calls read_recorded_phase() inside verb_resume(), which the allow-list does not name"
+
+# ---- CHECK 39, arm four: a STALE allow-list row. A row naming a function that no longer reads the
+# ---- phase silently widens the very set it was written to narrow, so the join runs both ways.
+reset_tree
+mkdir -p $KIT_REL && cp "$HERE/unattended.sh" "$HERE/lib-unattended.sh" $KIT_REL/
+mutate $KIT_REL/check-unattended.sh 's|^PHASE_RECORDED_FNS=.*|PHASE_RECORDED_FNS="refuse_if_terminal archive_name_of verb_landed print_liveness ghostfn"|'
+out=$(run)
+hit "$out" "the allow-list names ghostfn(), which no longer calls read_recorded_phase()"
+
+# ---- CHECK 39, the CONTROL: the shipped driver and the shipped allow-list are silent. Without it
+# ---- every arm above could be passing because the check reds on anything at all.
+reset_tree
+mkdir -p $KIT_REL && cp "$HERE/unattended.sh" "$HERE/lib-unattended.sh" $KIT_REL/
+out=$(run)
+miss "$out" "the phase fact is read outside the two readers"
+# ...and the liveness refusal below is silent over the shipped readers, or it could be passing
+# because it reds on every driver.
+miss "$out" "a phase reader holds no read the classifier recognises"
+
+# ---- CHECK 1's CORE_FLOOR, over the PHASE half: deleting HELD reds against a floor of 13:12.
+reset_tree
+mkdir -p $KIT_REL && cp "$HERE/unattended.sh" "$HERE/lib-unattended.sh" $KIT_REL/
+mutate $KIT_REL/unattended.sh 's/ HELD VERIFYING / VERIFYING /'
+out=$(run)
+hit "$out" "the kit's CORE phase vocabulary has shrunk below its floor"
+
+# ---- CHECK 2's HOLD_FLOOR: deleting a hold code a sibling unit routes to reds the shrink-only pin.
+reset_tree
+mkdir -p $KIT_REL && cp "$HERE/unattended.sh" "$HERE/lib-unattended.sh" $KIT_REL/
+mutate $KIT_REL/unattended.sh 's/ inherited-red"$/"/'
+out=$(run)
+hit "$out" "the kit's CORE hold vocabulary has shrunk below its floor, and deleting a member is a silent, reason-free override of every record and every sibling unit that routes to it"
+
+# ---- ...and its two conf branches, which behave exactly as HALT_FLOOR's do: undeclared and
+# ---- malformed are both REFUSALS, because a pin that quietly defaults is a pin nobody set.
+reset_tree
+mkdir -p $KIT_REL && cp "$HERE/unattended.sh" "$HERE/lib-unattended.sh" $KIT_REL/
+mutate .unattended.conf 's/^HOLD_FLOOR=.*/HOLD_FLOOR=""/'
+out=$(run)
+hit "$out" "HOLD_FLOOR is undeclared in .unattended.conf, and with no floor a deleted hold code is indistinguishable from a vocabulary that never had one"
+
+reset_tree
+mkdir -p $KIT_REL && cp "$HERE/unattended.sh" "$HERE/lib-unattended.sh" $KIT_REL/
+mutate .unattended.conf 's/^HOLD_FLOOR=.*/HOLD_FLOOR="five"/'
+out=$(run)
+hit "$out" "HOLD_FLOOR is not a single integer, so the shrink-only comparison below would be a string test wearing a numeric name"
+
+# ---- The PHASE TAIL the gate-guard hook restates. HELD sits BEFORE VERIFYING, so the hook's own
+# ---- parity arm keeps reading the list it already spells and a run held from BUILDING is refused
+# ---- the flagged bar and the suites. Read off the shipped driver, never off a copy of the list.
+n=$((n+1))
+c39_tail=$(sed -n 's/^PHASES_CORE="\(.*\)"/\1/p' "$HERE/unattended.sh" | grep -o 'VERIFYING.*')
+[ "$c39_tail" = "VERIFYING LANDING LANDED ABORTED" ] \
+  || { echo "FAIL the driver's phase tail from VERIFYING is [$c39_tail], which is not the list gate-guard.js spells in PHASES_ALLOW"; st=1; }
+
+# ---- CHECK 40: a phase another verb PRODUCES is not reachable through --phase. Dropping HELD's
+# ---- guard makes one phase move write a HELD record with no held-at, hold-until, hold-code or
+# ---- held-from — a pause nothing can evaluate and --resume cannot release.
+reset_tree
+mkdir -p $KIT_REL && cp "$HERE/unattended.sh" "$HERE/lib-unattended.sh" $KIT_REL/
+mutate $KIT_REL/unattended.sh 's|^  if \[ "$want" = HELD \]; then$|  if [ "$want" = NEVERAPHASE ]; then|'
+out=$(run)
+hit "$out" "a phase another verb PRODUCES is reachable through --phase, so one phase move would write that phase with none of the facts its producer writes beside it, and the verb that releases it would have nothing to read"
+hit "$out" "HELD"
+
+# ---- ...and CHECK 40's CONTROL, for arm four's reason.
+reset_tree
+mkdir -p $KIT_REL && cp "$HERE/unattended.sh" "$HERE/lib-unattended.sh" $KIT_REL/
+out=$(run)
+miss "$out" "a phase another verb PRODUCES is reachable through --phase"
+reset_tree
+
+
+# ---- the hold vocabulary's VACUITY arm: an empty core set makes the hold verb validate against
+# ---- nothing and record a pause under any word at all.
+reset_tree
+mkdir -p $KIT_REL && cp "$HERE/unattended.sh" "$HERE/lib-unattended.sh" $KIT_REL/
+mutate $KIT_REL/unattended.sh 's/^HOLD_CODES_CORE=.*/HOLD_CODES_CORE=""/'
+out=$(run)
+hit "$out" "the driver declares no HOLD_CODES_CORE vocabulary, so the hold verb would validate against an empty set and record a pause under any word at all"
+
+# ---- ...and check 39's own liveness refusal. A read predicate that matches nothing classifies
+# ---- nothing, and grading no read is how a structural arm passes by finding nothing. Staged by
+# ---- quoting the key in ONE reader's own read, `fact "$1" "phase"`: the same read to bash, a
+# ---- spelling the predicate does not match, so every direct read spelled that way would be
+# ---- invisible to it too. This arm used to REMOVE the driver, a state check 1 refuses and exits on
+# ---- before check 39 runs, so it never passed; the leg's guard now asserts what can fail. One
+# ---- `mutate` more than that arm, and the check-39 control above gained a `miss`: floors +2.
+reset_tree
+mkdir -p $KIT_REL && cp "$HERE/unattended.sh" "$HERE/lib-unattended.sh" $KIT_REL/
+mutate $KIT_REL/unattended.sh 's/^  fact "\$1" phase$/  fact "$1" "phase"/'
+out=$(run)
+hit "$out" "a phase reader holds no read the classifier recognises, so its predicate no longer matches how the driver reads the fact and the routing below would be graded over no lines at all and would pass by finding nothing"
+reset_tree
+
+# ---- TOOL-dDerivedDocket-3 — checks 44 and 45 (this build's 34 and 35, renumbered above main's 34 to 36) ----
+# ---- ITS OWN scratch repository, for the reason the driver suite's sibling block gives: these arms
+# ---- edit the SKILL TEMPLATE and the DRIVER the leg reads its closed set out of, and doing that in
+# ---- the shared fixture would leave every later arm grading a mutated carrier.
+# ----
+# ---- EVERY RED ARM HAS A GREEN CONTROL, and the controls come first: a check that was never reached
+# ---- is silent for the same reason a passing one is, and this leg's whole contract is that silence
+# ---- means clean.
+lm_dir=$(mktemp -d)
+(
+  cd "$lm_dir" || exit 2
+  git init -q -b main . && git config user.email t@t.test && git config user.name t \
+    && git config core.autocrlf false
+  # THE KIT HOME IS THE SUITE'S OWN `$KIT_REL`, never a spelled prefix: the kit is installed and
+  # run here at the same derived path the shared fixture uses, so the block grades at any prefix.
+  mkdir -p "$KIT_REL" memory/guides
+  cp "$HERE/check-unattended.sh" "$HERE/unattended.sh" "$HERE/lib-unattended.sh" \
+     "$HERE/PROTOCOL.template.md" "$HERE/SKILL.template.md" "$HERE/VERBS.template.md" \
+     "$HERE/STOPS.template.md" "$HERE/check-playbook.sh" "$HERE/PLAYBOOK-TEMPLATE.template.md" \
+     "$HERE/.unattended.conf.example" "$KIT_REL/"
+  cp "$HERE/PROTOCOL.template.md" memory/guides/UNATTENDED-PROTOCOL.md
+  cp "$HERE/VERBS.template.md" memory/guides/UNATTENDED-VERBS.md
+  cp "$HERE/ASKS.template.md" "$KIT_REL/"
+  cp "$HERE/ASKS.template.md" memory/guides/UNATTENDED-ASKS.md
+  cp "$HERE/STOPS.template.md" memory/guides/UNATTENDED-STOPS.md
+  # LANDER is graded for presence only (check 1), so it carries the shared fixture's inert value.
+  cat > .unattended.conf <<'LMC'
+MEMORY_ROOT=memory
+LANDER="echo land"
+LANDER_MODE="in-place"
+BYPASS_BAN="--no-verify"
+GATE_CMD="true"
+WIRING_CHECK="true"
+KEEPALIVE_CREATE="CronCreate"
+KEEPALIVE_DELETE="CronDelete"
+LMC
+  # The owed surface is the kit home this block installs, so it resolves to tracked paths here.
+  printf 'SELFTESTS_OWED_PATHS="%s/"\n' "$KIT_REL" >> .unattended.conf
+  git add -A >/dev/null && git commit -q -m seed --no-verify
+) >/dev/null 2>&1
+lmrun() { ( cd "$lm_dir" && bash "$KIT_REL/check-unattended.sh" 2>&1 ); }
+lmrestore() { git -C "$lm_dir" checkout -q -- "$1"; }
+# The Land SECTION alone, rewritten in place. A file-wide edit would also move the Close section,
+# which names `--prepare` too, so an arm made that way could not tell the two apart.
+lmland() { # python-expression-free: awk over the section boundaries
+  LMREPL="$1" awk -v mode="$2" '
+    $0 == "## Land" { inl = 1; print; next }
+    inl && /^## / { inl = 0 }
+    inl && mode == "empty" { next }
+    inl && mode == "sub" { gsub(ENVIRON["LMFROM"], ENVIRON["LMREPL"]) }
+    { print }
+    END { }' "$lm_dir/$KIT_REL/SKILL.template.md" > "$lm_dir/.land.tmp" \
+    && mv "$lm_dir/.land.tmp" "$lm_dir/$KIT_REL/SKILL.template.md"
+}
+
+# ---- GREEN CONTROLS: the shipped Land section passes, and both announcements are on the DEFAULT
+# ---- channel, because a reader of a green bar is owed the landing shape and the declared surface.
+out=$(lmrun)
+miss "$out" "check 44 FAILED"
+hit  "$out" "LANDER_MODE in-place (declared)"
+hit  "$out" "SELFTESTS_OWED_PATHS entry $KIT_REL/ — resolves to tracked paths"
+
+# ---- 44: the Land section without `--prepare`, and without `--land`. Two arms, because a section
+# ---- missing either one sends an agent to a landing it cannot complete and the messages differ.
+LMFROM="--prepare" lmland "--ready" sub
+out=$(lmrun)
+hit "$out" "the Skill's Land section names neither landing shape in full - an in-place landing prepares the merge and then pushes exactly it, and a section missing either verb sends an agent to a landing it cannot complete"
+lmrestore "$KIT_REL/SKILL.template.md"
+LMFROM="--land" lmland "--ship" sub
+out=$(lmrun)
+hit "$out" "and a section missing either verb sends an agent to a landing it cannot complete"
+lmrestore "$KIT_REL/SKILL.template.md"
+
+# ---- 44: the primary path's fallback text surviving into the Land section. It is wrong twice over
+# ---- under `in-place`: that ref is one the session can move, and it carries whatever else on the
+# ---- node is unpushed. PLACED UNDER THE LAND HEADING, never appended: Land is not the template's
+# ---- last section, so an EOF append lands in whichever section closes the file and the
+# ---- section-scoped check never reads it.
+awk '{ print } /^## Land[ \t]*$/ { print ""; print "If the push fails, merge the branch into local main and land from the primary tree." }' \
+  "$lm_dir/$KIT_REL/SKILL.template.md" > "$lm_dir/.land.tmp" \
+  && mv "$lm_dir/.land.tmp" "$lm_dir/$KIT_REL/SKILL.template.md"
+out=$(lmrun)
+hit "$out" "the Skill's Land section directs a merge into the node's own default branch, which is a ref this session can move and which carries whatever else here is unpushed, so the landing it describes is not the one the bar graded"
+lmrestore "$KIT_REL/SKILL.template.md"
+
+# ---- 44: an EMPTY section. Without this arm the two above would pass over nothing the day the
+# ---- section is renamed, which is this leg's own could-not-fail shape one level up.
+lmland "" empty
+out=$(lmrun)
+hit "$out" "the Skill template carries no Land section body, so every assertion about the landing an agent is told to perform would be graded over nothing and would pass by finding nothing"
+lmrestore "$KIT_REL/SKILL.template.md"
+
+# ---- 45: a declared mode outside the DRIVER's own closed set. Every run in such a project refuses
+# ---- at conf load, so the bar must say so rather than leave it to the next invocation.
+sed -i 's/^LANDER_MODE=.*/LANDER_MODE="inplace"/' "$lm_dir/.unattended.conf"
+out=$(lmrun)
+hit "$out" "LANDER_MODE is declared outside the driver's closed set, so every run in this project refuses at conf load and no landing is reachable at all, declared"
+lmrestore .unattended.conf
+
+# ---- 45: a declared self-test prefix that matches no tracked path reads as coverage of a surface
+# ---- that is not there. A BLANK key is not a fault and is announced instead.
+sed -i "s|^SELFTESTS_OWED_PATHS=.*|SELFTESTS_OWED_PATHS=\"$KIT_REL/ nosuchdir/\"|" "$lm_dir/.unattended.conf"
+out=$(lmrun)
+hit "$out" "SELFTESTS_OWED_PATHS declares a prefix that matches no tracked path, so it reads as coverage of a surface that is not in this tree and a run of kit work under it would never be told the flagged bar is owed"
+lmrestore .unattended.conf
+sed -i 's|^SELFTESTS_OWED_PATHS=.*|SELFTESTS_OWED_PATHS=""|' "$lm_dir/.unattended.conf"
+out=$(lmrun)
+hit  "$out" "SELFTESTS_OWED_PATHS is blank — no run's range in this project can ever be told the kit Definition of Done owes the flagged bar"
+miss "$out" "check 45 FAILED"
+lmrestore .unattended.conf
+
+# ---- 45: the DRIVER's marker removed. The closed set is read off the driver's own line rather than
+# ---- retyped here, so a marker that stops resolving must REFUSE: a set read as empty would make
+# ---- every declared value, including a misspelling, read as legal.
+sed -i '/gov:lander-mode-set/d' "$lm_dir/$KIT_REL/unattended.sh"
+out=$(lmrun)
+hit "$out" "this leg cannot read the closed LANDER_MODE set and its default off the driver's own marked lines, so the declared mode would be graded against an empty set and every value, including a misspelling, would read as legal"
+lmrestore "$KIT_REL/unattended.sh"
+
+
+# ---- 46: the DURABLE restart carrier, TOOL-dDerivedDocket-5. GREEN CONTROL first: this conf
+# ---- declares no switch at all, which is the population every upgrading adopter is in, and the
+# ---- effective value has to be ANNOUNCED rather than silently applied. AC1 says the default does
+# ---- not red ON THAT ACCOUNT, and S1 requires the carrier pair while the value is on, so the control
+# ---- declares the pair (apart from the keepalive's tools) and leaves the switch alone: without the
+# ---- pair the switch-on-no-carrier refusal below fires here, and the control grades that instead.
+printf 'RESUME_SCHEDULE_CREATE="TheScheduleCreate"\nRESUME_SCHEDULE_DELETE="TheScheduleDelete"\n' >> "$lm_dir/.unattended.conf"
+out=$(lmrun)
+hit  "$out" "RESUME_SCHEDULE on (defaulted)"
+miss "$out" "check 46 FAILED"
+lmrestore .unattended.conf
+
+# ---- 46: an unrecognised spelling. The driver refuses it at conf load, so every verb in such a
+# ---- project is unreachable and a leg that resolved it silently to either value would be reporting
+# ---- about a project that cannot run at all.
+printf 'RESUME_SCHEDULE="maybe"\n' >> "$lm_dir/.unattended.conf"
+out=$(lmrun)
+hit "$out" "RESUME_SCHEDULE is declared outside the driver's closed set, so every run in this project refuses at conf load and no verb is reachable at all, declared"
+lmrestore .unattended.conf
+
+# ---- 46: the switch on and no carrier declared. Undeclared is not defaulted: every hold such a
+# ---- project takes records `none · no carrier` and pauses with nothing filed to restart it.
+printf 'RESUME_SCHEDULE="on"\n' >> "$lm_dir/.unattended.conf"
+out=$(lmrun)
+hit "$out" "(declared) and this key is undeclared, so every hold this project takes records 'none · no carrier' and pauses with nothing filed to restart it; declare the pair, or write RESUME_SCHEDULE=\"off\""
+hit "$out" "RESUME_SCHEDULE_DELETE"
+lmrestore .unattended.conf
+
+# ---- 46: the carrier declared as the KEEPALIVE's own create tool. That store is session-scoped by
+# ---- this project's own conf, so every restart filed there dies with the session it exists to
+# ---- outlive — and the hold that filed it reads as owing a restart that can never fire.
+printf 'RESUME_SCHEDULE="on"\nRESUME_SCHEDULE_CREATE="CronCreate"\nRESUME_SCHEDULE_DELETE="CronDelete"\n' >> "$lm_dir/.unattended.conf"
+out=$(lmrun)
+hit "$out" "the declared durable restart carrier is the keepalive's own create tool, and that store is session-scoped, so every restart filed there dies with the session it exists to outlive: RESUME_SCHEDULE_CREATE and KEEPALIVE_CREATE are both"
+lmrestore .unattended.conf
+
+# ---- 46: OFF is a legal declaration and is announced, not a refusal. A project may decide that
+# ---- every held run waits for a person, and a leg that red on that would be policy, not a check.
+printf 'RESUME_SCHEDULE="off"\n' >> "$lm_dir/.unattended.conf"
+out=$(lmrun)
+hit  "$out" "RESUME_SCHEDULE is off — no hold in this project owes a durable restart, and every held run waits for a person to type --resume"
+miss "$out" "check 46 FAILED"
+lmrestore .unattended.conf
+
+# ---- 46: the DRIVER's marker removed, on check 45's own terms. A set read as empty would make
+# ---- every declared value, a misspelling included, read as legal.
+sed -i '/gov:resume-schedule-set/d' "$lm_dir/$KIT_REL/unattended.sh"
+out=$(lmrun)
+hit "$out" "this leg cannot read the closed RESUME_SCHEDULE set and its default off the driver's own marked lines, so the declared switch would be graded against an empty set and every value, a misspelling included, would read as legal"
+lmrestore "$KIT_REL/unattended.sh"
+
+rm -rf "$lm_dir"
+
+# ==== TOOL-dDerivedDocket-52: resolve_introducing_commit, over scratch fixtures ==================
+# THE FUNCTION IS EXTRACTED AND SOURCED, the way the driver suite's bound arms grade `run_bounded`:
+# nothing calls this resolver at its own commit — unit 18's S2 is its first caller, at a later order
+# — so a suite that ran the leg would grade a code path no check reaches yet. An EMPTY extraction is
+# a refusal rather than a silent skip, because a sourced empty file defines no function and every
+# assertion below would then grade the shell's "command not found".
+#
+# EVERY FIXTURE IS ITS OWN REPOSITORY, outside the scratch tree: the arms need rotations, merges,
+# shallow clones and windows deeper than a cap, and none of those may be staged in the tree whose
+# cleanliness the controls above depend on. `reset_tree` would delete them anyway.
+#
+# NO ARM READS THE REAL TREE. No tracked record carries the facts these arms grade until unit 35
+# arms gov, so a real-tree assertion here would be an assertion about nothing.
+#
+# COST: eight repositories, about sixty commits and forty resolver calls, measured at 13 s on node d
+# 2026-09-21 running this block standalone. Process creation is this suite's cost centre and its
+# budget row is in the run-gates kit's selftest-budgets.txt; 13 s against that row needs no raise.
+# PRISTINE FIRST. Every arm above that mutates the fixture's copy of the kit restores it, but the
+# extraction below reads that copy, and an arm that graded a leg some earlier block left mutated
+# would be grading someone else's break. This costs a reset and removes the question.
+reset_tree
+ric_fn=$(mktemp)
+sed -n '/^resolve_introducing_commit() {/,/^}$/p' "$SCRIPT" > "$ric_fn"
+[ -s "$ric_fn" ] || { echo "FAIL could not extract resolve_introducing_commit from $SCRIPT — every arm below would grade nothing"; st=1; }
+ric_root=$(mktemp -d)
+ric_d=memory/builds/b
+# ONE CALL, IN A SUBSHELL, so the `cd` and the sourced kit library cannot reach the arms that follow
+# — and the assertions stay in THIS shell, where `n` and `st` live. A subshell that ran the
+# assertions too would lose every failure it found.
+ric() { # fixture dir · record path · literal line · [cap]
+  ( cd "$1" || exit 2
+    INTRODUCING_WALK_CAP=${4:-400}; export INTRODUCING_WALK_CAP
+    # shellcheck disable=SC1091
+    . "$TMP/$KIT_REL/lib-unattended.sh"
+    # shellcheck disable=SC1090
+    . "$ric_fn"
+    resolve_introducing_commit "$2" "$3" )
+}
+# A FIXTURE THAT DID NOT BUILD COMPARES TWO EMPTIES AND PASSES. Every sha below is derived from the
+# fixture by `git log --grep`, and an arm asserting an empty answer against an empty expectation is
+# the fixture-passes-by-finding-nothing class in its purest form — so each derivation is refused
+# before it is used.
+ric_want() { # label · derived sha
+  n=$((n+1)); [ -n "$2" ] || { echo "FAIL $1 derived no commit — the fixture did not build, and every assertion over it would compare two empties"; st=1; }
+}
+ric_init() { # dir -> a fresh repository with one seed commit
+  mkdir -p "$1/$ric_d"; ( cd "$1" || exit 2
+    git init -q -b main . && git config user.email t@t.test && git config user.name t \
+      && git config core.autocrlf false
+    echo seed > seed.txt; git add seed.txt; git commit -qm seed ) >/dev/null 2>&1
+}
+
+# ---- FIXTURE A: a record rotated by a later run's preflight, the shape `--preflight` actually
+# ---- writes — a staged `git mv` inside the folder plus a fresh live record in the same commit.
+ric_a=$ric_root/a; ric_init "$ric_a"
+( cd "$ric_a" || exit 2
+  printf 'phase: LANDED\nm-base: AAAA\nanchor-kind: default-branch\n' > $ric_d/RUN.md
+  git add $ric_d/RUN.md; git commit -qm "run one preflight"
+  echo x >> seed.txt; git add seed.txt; git commit -qm "body one"
+  git mv $ric_d/RUN.md $ric_d/RUN.LANDED.deadbeef.md
+  printf 'phase: BUILDING\nm-base: BBBB\nanchor-kind: default-branch\n' > $ric_d/RUN.md
+  git add $ric_d/RUN.md $ric_d/RUN.LANDED.deadbeef.md
+  git commit -qm "run two preflight, prior LANDED retired"
+  echo y >> seed.txt; git add seed.txt; git commit -qm "body two" ) >/dev/null 2>&1
+ric_a_pre=$(git -C "$ric_a" log --format=%H --grep='run one preflight')
+ric_a_rot=$(git -C "$ric_a" log --format=%H --grep='run two preflight')
+ric_want "fixture A's preflight commit" "$ric_a_pre"
+ric_want "fixture A's rotation commit" "$ric_a_rot"
+
+# ---- AC1: the archived record grades against the value ITS OWN run recorded. A path-scoped search
+# ---- answers the rotation here, which is a wrong sha and not a missing one.
+ric_out=$(ric "$ric_a" "$ric_d/RUN.LANDED.deadbeef.md" "m-base: AAAA" 2>"$ric_root/err"); ric_err=$(cat "$ric_root/err")
+same "AC1 a rotated record answers its own preflight commit" "$ric_out" "$ric_a_pre"
+same "AC1 an answer prints no reason line" "$ric_err" ""
+n=$((n+1)); [ "$ric_out" != "$ric_a_rot" ] || { echo "FAIL AC1 the resolver answered the ROTATION commit, so a caller would re-derive a base nobody wrote"; st=1; }
+
+# ---- AC8: two tenancies at ONE path, sharing a line byte for byte. The floor is what separates
+# ---- them; the verification step cannot and is not asked to.
+ric_out=$(ric "$ric_a" "$ric_d/RUN.md" "anchor-kind: default-branch" 2>"$ric_root/err")
+same "AC8 the live record answers the SECOND tenancy's own preflight" "$ric_out" "$ric_a_rot"
+ric_unfloored=$(git -C "$ric_a" rev-list --full-history --reverse HEAD -- $ric_d/RUN.md | head -1)
+same "AC8 control: the UNFLOORED walk answers the first run's commit instead" "$ric_unfloored" "$ric_a_pre"
+ric_out=$(ric "$ric_a" "$ric_d/RUN.md" "m-base: BBBB" 2>"$ric_root/err")
+same "AC2 the second tenancy's own line is introduced at its own preflight" "$ric_out" "$ric_a_rot"
+
+# ---- FIXTURE B: the rotation lands inside a MERGE commit. The obvious spelling for either end of
+# ---- the window — the newest `--diff-filter=A` at the path — answers NOTHING here under both
+# ---- spellings, because git computes no diff for a merge. Both ends are resolved by first TOUCH.
+ric_b=$ric_root/b; ric_init "$ric_b"
+( cd "$ric_b" || exit 2
+  printf 'phase: LANDED\nm-base: AAAA\n' > $ric_d/RUN.md
+  git add $ric_d/RUN.md; git commit -qm "run one preflight"
+  git checkout -qb side; echo s > side.txt; git add side.txt; git commit -qm "side work"
+  git checkout -q main; echo m > main.txt; git add main.txt; git commit -qm "main work"
+  git merge -q --no-commit --no-ff side
+  git mv $ric_d/RUN.md $ric_d/RUN.LANDED.deadbeef.md
+  printf 'phase: BUILDING\nm-base: BBBB\n' > $ric_d/RUN.md
+  git add $ric_d/RUN.md $ric_d/RUN.LANDED.deadbeef.md
+  git commit -qm "merge side; run two preflight"
+  echo z >> main.txt; git add main.txt; git commit -qm after ) >/dev/null 2>&1
+ric_b_pre=$(git -C "$ric_b" log --format=%H --grep='run one preflight')
+ric_want "fixture B's preflight commit" "$ric_b_pre"
+ric_out=$(ric "$ric_b" "$ric_d/RUN.LANDED.deadbeef.md" "m-base: AAAA" 2>"$ric_root/err")
+same "AC4 a rotation inside a merge still answers the preflight commit" "$ric_out" "$ric_b_pre"
+same "AC4 control: the add search answers nothing there, plain" \
+  "$(git -C "$ric_b" log --diff-filter=A --format=%H -- $ric_d/RUN.LANDED.deadbeef.md)" ""
+same "AC4 control: and nothing with --full-history either" \
+  "$(git -C "$ric_b" log --full-history --diff-filter=A --format=%H -- $ric_d/RUN.LANDED.deadbeef.md)" ""
+
+# ---- FIXTURE C: an `-s ours` merge, the shape the drift-audit kit's drift_report.py reproduced for
+# ---- this same flag. The commit that introduced the line is TREESAME-pruned out of a simplified
+# ---- walk, so the simplified spelling answers nothing at all — an absent answer wearing the face
+# ---- of a clean one.
+ric_c=$ric_root/c; ric_init "$ric_c"
+( cd "$ric_c" || exit 2
+  printf 'phase: BUILDING\nm-base: AAAA\n' > $ric_d/RUN.md
+  git add $ric_d/RUN.md; git commit -qm "run one preflight"
+  git checkout -qb side
+  printf 'phase: BUILDING\nm-base: AAAA\nasks-at-landing: 3\n' > $ric_d/RUN.md
+  git add $ric_d/RUN.md; git commit -qm "side touches the record"
+  git checkout -q main; echo m > main.txt; git add main.txt; git commit -qm "main work"
+  git merge -q -s ours --no-ff side -m "merge side, ours"
+  echo z >> main.txt; git add main.txt; git commit -qm after ) >/dev/null 2>&1
+ric_c_side=$(git -C "$ric_c" log --all --format=%H --grep='side touches the record')
+ric_want "fixture C's pruned side commit" "$ric_c_side"
+ric_out=$(ric "$ric_c" "$ric_d/RUN.md" "asks-at-landing: 3" 2>"$ric_root/err")
+same "AC4 the unsimplified walk reaches the pruned commit that introduced the line" "$ric_out" "$ric_c_side"
+same "AC4 control: a simplified walk cannot see that commit at all" \
+  "$(git -C "$ric_c" rev-list HEAD -- $ric_d/RUN.md | grep -cF "$ric_c_side")" "0"
+
+# ---- FIXTURE D: a shallow clone. Every file in a graft commit reads as INTRODUCED there, so the
+# ---- floor — the one place this resolver stops applying the parent test — would hand back a
+# ---- confident wrong sha. It refuses instead, and says which refusal it is.
+ric_dd=$ric_root/d; ric_init "$ric_dd"
+( cd "$ric_dd" || exit 2
+  printf 'phase: BUILDING\nm-base: AAAA\n' > $ric_d/RUN.md
+  git add $ric_d/RUN.md; git commit -qm "run one preflight"
+  printf 'phase: BUILDING\nm-base: AAAA\nwitness: c0ffee\n' > $ric_d/RUN.md
+  git add $ric_d/RUN.md; git commit -qm "witness recorded"
+  printf 'phase: LANDING\nm-base: AAAA\nwitness: c0ffee\n' > $ric_d/RUN.md
+  git add $ric_d/RUN.md; git commit -qm landing ) >/dev/null 2>&1
+git clone -q --depth 1 --no-local "file://$ric_dd" "$ric_root/d-shallow" >/dev/null 2>&1
+ric_out=$(ric "$ric_root/d-shallow" "$ric_d/RUN.md" "m-base: AAAA" 2>"$ric_root/err"); ric_err=$(cat "$ric_root/err")
+same "AC3 a shallow clone answers nothing" "$ric_out" ""
+hit "$ric_err" "the range could not be resolved - the oldest end of the window names a parent this repository does not have"
+
+# ---- FIXTURE E: a record with no committed history at all — the tenancy floor cannot be resolved,
+# ---- which is a DIFFERENT unknown from "the window held no introduction" and says so.
+ric_e=$ric_root/e; ric_init "$ric_e"
+printf 'phase: BUILDING\nm-base: AAAA\n' > "$ric_e/$ric_d/RUN.md"
+ric_out=$(ric "$ric_e" "$ric_d/RUN.md" "m-base: AAAA" 2>"$ric_root/err"); ric_err=$(cat "$ric_root/err")
+same "AC8 an unresolvable tenancy floor answers nothing" "$ric_out" ""
+hit  "$ric_err" "the tenancy floor could not be resolved"
+miss "$ric_err" "the whole tenancy window was walked"
+
+# ---- FIXTURE F: a tenancy window DEEPER than the cap, with the line introduced at its oldest end.
+# ---- `--max-count` applies during a newest-first traversal, so a capped walk keeps the wrong end;
+# ---- the cap therefore detects the window rather than selecting one.
+ric_f=$ric_root/f; ric_init "$ric_f"
+( cd "$ric_f" || exit 2
+  printf 'phase: BUILDING\nm-base: AAAA\n' > $ric_d/RUN.md
+  git add $ric_d/RUN.md; git commit -qm "run one preflight"
+  i=0; while [ $i -lt 8 ]; do i=$((i+1))
+    printf 'phase: BUILDING\nm-base: AAAA\npass: %s\n' "$i" > $ric_d/RUN.md
+    git add $ric_d/RUN.md; git commit -qm "pass $i"
+  done ) >/dev/null 2>&1
+ric_f_pre=$(git -C "$ric_f" log --format=%H --grep='run one preflight')
+ric_want "fixture F's preflight commit" "$ric_f_pre"
+ric_out=$(ric "$ric_f" "$ric_d/RUN.md" "m-base: AAAA" 4 2>"$ric_root/err"); ric_err=$(cat "$ric_root/err")
+same "AC6 a window deeper than the cap answers nothing" "$ric_out" ""
+hit  "$ric_err" "the tenancy window is deeper than the 4-commit walk cap"
+miss "$ric_err" "the whole tenancy window was walked"
+ric_out=$(ric "$ric_f" "$ric_d/RUN.md" "m-base: AAAA" 400 2>"$ric_root/err"); ric_err=$(cat "$ric_root/err")
+same "AC6 the same fixture answers once the cap is raised past the window" "$ric_out" "$ric_f_pre"
+same "AC6 and that answer prints no reason line" "$ric_err" ""
+
+# ---- FIXTURE G: deeper than the cap AND carrying an introduce-remove-re-introduce shape inside the
+# ---- window. A window that merely lacks its answer cannot tell a walk that ANNOUNCES from one that
+# ---- answers wrongly: here a sentinel met mid-walk returns the RE-introduction, with no reason
+# ---- line at all, which is a wrong sha wearing the face of an answer.
+ric_g=$ric_root/g; ric_init "$ric_g"
+( cd "$ric_g" || exit 2
+  printf 'phase: BUILDING\nm-base: AAAA\n' > $ric_d/RUN.md
+  git add $ric_d/RUN.md; git commit -qm "run one preflight"
+  i=0; while [ $i -lt 4 ]; do i=$((i+1))
+    printf 'phase: BUILDING\npass: %s\n' "$i" > $ric_d/RUN.md
+    git add $ric_d/RUN.md; git commit -qm "pass $i, the line removed"
+  done
+  i=0; while [ $i -lt 3 ]; do i=$((i+1))
+    printf 'phase: BUILDING\nm-base: AAAA\nlate: %s\n' "$i" > $ric_d/RUN.md
+    git add $ric_d/RUN.md; git commit -qm "late $i, the line back"
+  done ) >/dev/null 2>&1
+ric_g_pre=$(git -C "$ric_g" log --format=%H --grep='run one preflight')
+ric_g_re=$(git -C "$ric_g" log --format=%H --grep='late 1, the line back')
+ric_want "fixture G's preflight commit" "$ric_g_pre"
+ric_want "fixture G's re-introduction commit" "$ric_g_re"
+ric_out=$(ric "$ric_g" "$ric_d/RUN.md" "m-base: AAAA" 4 2>"$ric_root/err"); ric_err=$(cat "$ric_root/err")
+same "AC6 the re-introduction fixture answers nothing at a cap below its window" "$ric_out" ""
+hit  "$ric_err" "the tenancy window is deeper than the 4-commit walk cap"
+n=$((n+1)); [ "$ric_out" != "$ric_g_re" ] || { echo "FAIL AC6 the truncated walk returned the RE-introduction among its retained newest commits"; st=1; }
+ric_out=$(ric "$ric_g" "$ric_d/RUN.md" "m-base: AAAA" 400 2>"$ric_root/err")
+same "AC6 control: uncapped, the same fixture answers the FIRST introduction" "$ric_out" "$ric_g_pre"
+
+# ---- FIXTURE H: a candidate whose FIRST PARENT already carries the line. The boundary here is an
+# ---- archived sibling filed on its own, so the floor is not itself a candidate and the oldest
+# ---- candidate is not an introduction. Returned unverified it would be a wrong sha; passed over it
+# ---- leaves the window with no introduction in it, which is the truth and is announced as such.
+ric_h=$ric_root/h; ric_init "$ric_h"
+( cd "$ric_h" || exit 2
+  printf 'phase: LANDED\nm-base: AAAA\nanchor-kind: default-branch\n' > $ric_d/RUN.md
+  git add $ric_d/RUN.md; git commit -qm "run one preflight"
+  printf 'phase: LANDED\nm-base: AAAA\nanchor-kind: default-branch\n' > $ric_d/RUN.ABORTED.cafebabe.md
+  git add $ric_d/RUN.ABORTED.cafebabe.md; git commit -qm "an archived sibling filed on its own"
+  printf 'phase: LANDED\nm-base: AAAA\nanchor-kind: default-branch\nwitness: c0ffee\n' > $ric_d/RUN.md
+  git add $ric_d/RUN.md; git commit -qm "the record is touched, the line unchanged" ) >/dev/null 2>&1
+ric_out=$(ric "$ric_h" "$ric_d/RUN.md" "m-base: AAAA" 2>"$ric_root/err"); ric_err=$(cat "$ric_root/err")
+same "AC2 a candidate whose first parent carries the line is passed over" "$ric_out" ""
+hit  "$ric_err" "the whole tenancy window was walked and no commit in it introduced that line"
+ric_h_tip=$(git -C "$ric_h" rev-parse HEAD 2>/dev/null)
+ric_want "fixture H's tip" "$ric_h_tip"
+ric_out=$(ric "$ric_h" "$ric_d/RUN.md" "witness: c0ffee" 2>"$ric_root/err")
+same "AC2 control: a genuine introduction inside the same window IS answered" "$ric_out" "$ric_h_tip"
+
+# ---- AC7: the header states what the resolver does NOT answer, in ONE sentence naming BOTH limits.
+# ---- A header that states only what a function does is how a resolution gets read as a guarantee.
+same "AC7 the resolver's header names both limits, once" \
+  "$(grep -cF "answers only inside the queried record's own tenancy of that path, says nothing about an earlier" "$SCRIPT")" "1"
+hit "$(sed -n '/answers only inside the queried/,+2p' "$SCRIPT")" "does not follow a record moved out of its build folder"
+
+rm -f "$ric_fn"; rm -rf "$ric_root"
+
+
+# ---- TOOL-dDerivedDocket-18: THE ASK-MANDATE SECOND OPINIONS ------------------------------------
+# Six arms over the four facts the ask path pins (`asks:`, `m-base:`, `asks-ready:` and the
+# `asks-at-landing:` freeze), each observed RED here and each beside the control that shows the
+# break is the only thing that changed. The leg re-derives every fact from inputs the run cannot
+# move; a fixture that let the run move them would grade the leg against itself.
+#
+# ITS OWN REPOSITORY, outside the scratch tree, for the reason the resolver block above gives: the
+# arms need a second branch, a pushed tip, a remote whose HEAD can be repointed and a build folder
+# whose README carries an `asks:` line AT THE ANCHOR, and `reset_tree` would delete all of it.
+#
+# THE RECALL KIT'S REAL EXTRACTOR, copied in. S3's whole claim is that it judges an anchor by that
+# kit's `anchor_at` and holds no copy of its shapes, so a fixture carrying a stub extractor would be
+# grading a double this block wrote - a green arm over a shape the real callee never returns.
+#
+# THE STUB PRODUCER READS ITS TABLE AT THE REV IT IS ASKED ABOUT, so an arm can tell "re-derived at
+# the pinned tree" from "re-derived at HEAD": a table that moves after the pin changes the answer
+# only for a leg that asked about the wrong tree.
+#
+# `--skip 28` ON EVERY RUN. These arms live in the per-record loop, and check 28 is half the leg's
+# wall clock and none of this block's subject.
+reset_tree
+ak_root=$(mktemp -d)
+ak="$ak_root/repo"; ak_origin="$ak_root/origin.git"
+ak_R=memory/builds/tRun/RUN.md
+ak_B=memory/builds/tRun/README.md
+mkdir -p "$ak/$KIT_REL" "$ak/rk" "$ak/memory/guides" "$ak/memory/builds/tRun" "$ak/memory/builds/aFoo"
+cp "$TMP/$KIT_REL/check-unattended.sh" "$TMP/$KIT_REL/unattended.sh" "$TMP/$KIT_REL/lib-unattended.sh" \
+   "$TMP/$KIT_REL/check-playbook.sh" "$TMP/$KIT_REL/PROTOCOL.template.md" "$TMP/$KIT_REL/SKILL.template.md" \
+   "$TMP/$KIT_REL/VERBS.template.md" "$TMP/$KIT_REL/PLAYBOOK-TEMPLATE.template.md" \
+   "$TMP/$KIT_REL/.unattended.conf.example" "$ak/$KIT_REL/"
+cp "$TMP/$KIT_REL/PROTOCOL.template.md" "$ak/memory/guides/UNATTENDED-PROTOCOL.md"
+cp "$TMP/$KIT_REL/VERBS.template.md" "$ak/memory/guides/UNATTENDED-VERBS.md"
+cp "$TMP/$KIT_REL/ASKS.template.md" "$ak/$KIT_REL/"
+cp "$TMP/$KIT_REL/ASKS.template.md" "$ak/memory/guides/UNATTENDED-ASKS.md"
+# the recall kit's extractor and its conf reader, into a directory the declared RECALL_CLI names
+# FOUND by the file only that kit holds, never by a typed kit directory (the carried-prefix ban).
+_rk_rel=$(git -C "$HERE" ls-files --full-name -- ':(top)*recall_conf.py' | head -n 1)
+_rk_src="$(git -C "$HERE" rev-parse --show-toplevel)/${_rk_rel%/*}"
+cp "$_rk_src/extract.py" "$_rk_src/recall_conf.py" "$ak/rk/"
+n=$((n+1)); [ -f "$ak/rk/extract.py" ] || { echo "FAIL the ask block could not copy the recall kit's extractor, so every S3 arm below would grade a missing grammar"; st=1; }
+printf 'MEMORY_ROOT=memory\nFAMILIES="example:EXMP tooling:TOOL"\n' > "$ak/.memory-tree.conf"
+cat > "$ak/.unattended.conf" <<AKCONF
+MEMORY_ROOT=memory
+LANDER="echo land"
+BYPASS_BAN="--no-verify"
+GATE_CMD="true"
+WIRING_CHECK="true"
+CORE_FLOOR="$CORE_FLOOR_DERIVED"
+KEEPALIVE_CREATE="CronCreate"
+KEEPALIVE_DELETE="CronDelete"
+PHASES_EXTRA=""
+DOD_EXTRA=""
+DIRECTIVES_EXTRA=""
+DIRECTIVES_FLOOR="$DIRECTIVES_FLOOR_DERIVED"
+DIRECTIVES_EXTRA_TABLE=""
+HALT_CODES_EXTRA=""
+HALT_FLOOR="$HALT_FLOOR_DERIVED"
+HOLD_CODES_EXTRA=""
+HOLD_FLOOR="$HOLD_FLOOR_DERIVED"
+RECALL_CLI="rk/query.py"
+ASKS_CMD="bash stub-asks.sh"
+AKCONF
+cat > "$ak/stub-asks.sh" <<'AKSTUB'
+#!/usr/bin/env bash
+set -u
+ids=""; mode=""; rev=""
+for a in "$@"; do
+  case "$a" in
+    --ready) mode=ids; continue ;;
+    --at) mode=at; continue ;;
+    --*) mode=""; continue ;;
+  esac
+  [ "$mode" = ids ] && ids="$ids $a"
+  [ "$mode" = at ] && rev="$a"
+done
+tbl=$(git show "$rev:stub-table.txt" 2>/dev/null)
+k=0
+for i in $ids; do
+  s=$(printf '%s\n' "$tbl" | sed -n "s/^$i status //p"); [ -n "$s" ] || s=OPEN
+  r=$(printf '%s\n' "$tbl" | sed -n "s/^$i ready //p"); [ -n "$r" ] || r=yes
+  printf 'ask\t%s\t%s\tnobody\t-\tHIGH\t%s\t-\t-\t-\t-\n' "$i" "$s" "$r"
+  k=$((k+1))
+done
+printf 'examined\t%s\n' "$k"
+AKSTUB
+printf 'EXMP-aFoo-3 ready yes\nEXMP-aFoo-3 status OPEN\n' > "$ak/stub-table.txt"
+printf '# aFoo asks\n\n- EXMP-aFoo-3 · filed 2026-09-01 · unit · do the thing\n' > "$ak/memory/builds/aFoo/BACKLOG.md"
+printf -- '---\nslug: tRun\nnode: a\nopened: 2026-08-01\nstreams: architecture\nroster: TOOL\nids: TOOL-tRun-1\nasks: EXMP-aFoo-3\n---\n\n# tRun\n\n<!-- gen:build-index -->\n<!-- gen:build-units -->\n<!-- /gen:build-units -->\n<!-- /gen:build-index -->\n' > "$ak/$ak_B"
+printf '# tRun - run state\n\n<!-- run:generated -->\n<!-- /run:generated -->\n\n## Run facts\nphase: RUNNING\nwitness: WITNESS\nbase: BASE\nmode: slug\nasks: EXMP-aFoo-3\n' > "$ak/$ak_R"
+(
+  cd "$ak" || exit 2
+  git init -q -b main . && git config user.email t@t.test && git config user.name t && git config core.autocrlf false
+  git add -A >/dev/null && git commit -q -m base --no-verify
+  printf 'a second commit, so the anchor has an OLDER ancestor to forge a pin to\n' > second.txt
+  git add -A >/dev/null && git commit -q -m second --no-verify
+  git init -q --bare "$ak_origin"
+  git --git-dir="$ak_origin" symbolic-ref HEAD refs/heads/main
+  git remote add origin "$ak_origin" && git push -q origin main
+  git checkout -q -b unit && git commit -q --allow-empty -m "unit work" --no-verify
+  # THE THREE PINNED ASK FACTS IN ONE COMMIT, which is what preflight's staging produces, so the
+  # commit introducing `m-base:` is findable and its first parent is HEAD at preflight.
+  # FROM THE LOCAL `main`, not `origin/main`: the tracking ref exists only if the push above
+  # succeeded, and a push that failed would leave both pins EMPTY while every arm below went on
+  # grading a record that pins nothing.
+  mb=$(git merge-base main HEAD)
+  sed -i "s|^witness: WITNESS$|witness: $(git rev-parse HEAD)|; s|^base: BASE$|base: $mb|" "$ak_R"
+  printf 'anchor-sha: %s\nm-base: %s\nasks-ready: EXMP-aFoo-3=yes\n' "$(git rev-parse main)" "$mb" >> "$ak_R"
+  git add -A >/dev/null && git commit -q -m facts --no-verify
+)
+AK_PRISTINE=$(git -C "$ak" rev-parse HEAD); AK_ANCHOR=$(git -C "$ak" rev-parse main); AK_C1=$(git -C "$ak" rev-parse main~1)
+# THE FIXTURE MUST ACTUALLY PIN SOMETHING, and the remote must actually hold the anchor: a build that
+# half-failed would red thirty arms below for a reason none of them names.
+n=$((n+1)); { grep -qE '^m-base: [0-9a-f]{40}$' "$ak/$ak_R" && [ "$(git --git-dir="$ak_origin" rev-parse main 2>/dev/null)" = "$AK_ANCHOR" ]; } \
+  || { echo "FAIL the ask block's fixture pinned no m-base or its remote holds no anchor, so every arm below would grade a record that pins nothing"; st=1; }
+set_ak_pristine() {
+  ( cd "$ak" && git reset -q --hard "$AK_PRISTINE" && git clean -qfd && git branch -f main "$AK_ANCHOR" \
+      && git push -q -f origin "$AK_ANCHOR":main && git --git-dir="$ak_origin" symbolic-ref HEAD refs/heads/main )
+}
+run_ak_leg() { ( cd "$ak" && GOV_UNATTENDED_REPORT=1 bash "$KIT_REL/check-unattended.sh" --skip 28 2>&1 ); }
+add_ak_commit() { ( cd "$ak" && git add -A >/dev/null && git commit -q -m "$1" --no-verify ); }
+
+# control: the conforming mandated record fires none of the six arms, and says what it examined
+set_ak_pristine; out=$(run_ak_leg)
+miss "$out" "UNATTENDED check 19 FAILED"
+miss "$out" "UNATTENDED check 15 FAILED"
+miss "$out" "UNATTENDED check 37 FAILED"
+hit  "$out" "check 37 found no foreign anchor under memory/builds/tRun"
+hit  "$out" "the ask-mandate second opinions examined 1 run-state record(s) pinning an asks: fact"
+
+# AC1: the pinned fact differs by one id from the README line at the recorded BASE
+set_ak_pristine; sed -i 's/^asks: EXMP-aFoo-3$/asks: EXMP-aFoo-3 EXMP-aFoo-4/' "$ak/$ak_R"; out=$(run_ak_leg)
+hit "$out" "a run-state file pins an asks: mandate the build README at its own recorded BASE does not declare, so the set the run says authorized it is not the set its authorization asked for - pinned against declared follow: ["
+hit "$out" "pinned against declared follow: [EXMP-aFoo-3 EXMP-aFoo-4] against [EXMP-aFoo-3]"
+
+# CLOSING REVIEW F2: the pinned value reads through the driver's own IDLIST reader, ALL OR NOTHING.
+# A comma-suffixed token reds BY NAME rather than dropping out of every arm keyed on the ids; a `-N`
+# continuation is an id, so P5 looks for the row it names. RED under the binding-line expander this
+# replaced, which read the first record as no id at all and the second as `-3` alone.
+set_ak_pristine; sed -i 's/^asks: EXMP-aFoo-3$/asks: EXMP-aFoo-3,/' "$ak/$ak_R"; out=$(run_ak_leg)
+hit "$out" "a run-state file pins an asks: mandate that does not read whole as an id list, so every arm below would grade the ids that did parse and the owner's own list would narrow with the leg green: "
+hit "$out" "\`EXMP-aFoo-3,\` (neither an id, an id range, nor a -N continuation)"
+set_ak_pristine; sed -i 's/^asks: EXMP-aFoo-3$/asks: EXMP-aFoo-3 -4/' "$ak/$ak_R"; out=$(run_ak_leg)
+hit  "$out" "EXMP-aFoo-4, wanted in memory/builds/aFoo/BACKLOG.md"
+miss "$out" "does not read whole as an id list"
+
+# AC2: a LIVE record's README edited at HEAD reds; the same edit under a record past its close does not
+set_ak_pristine; sed -i 's/^asks: EXMP-aFoo-3$/asks: EXMP-aFoo-3 EXMP-aFoo-4/' "$ak/$ak_B"; add_ak_commit "head edit"; out=$(run_ak_leg)
+hit "$out" "a LIVE run's build README carries an asks: line at HEAD that is not the one the run pinned, so the mandate this run will be measured against was edited underneath it - pinned against HEAD follow: ["
+set_ak_pristine; sed -i 's/^asks: EXMP-aFoo-3$/asks: EXMP-aFoo-3 EXMP-aFoo-4/' "$ak/$ak_B"
+sed -i 's/^phase: RUNNING$/phase: LANDING/' "$ak/$ak_R"; add_ak_commit "head edit under LANDING"; out=$(run_ak_leg)
+miss "$out" "carries an asks: line at HEAD that is not the one the run pinned"
+hit  "$out" "which is past its close, and the pinned-mandate property binds a LIVE run"
+set_ak_pristine; sed -i 's/^asks: EXMP-aFoo-3$/asks: EXMP-aFoo-3 EXMP-aFoo-4/' "$ak/$ak_B"
+mutate "$ak/$ak_R" 's/^phase: RUNNING$/phase: LANDED/'
+printf 'asks-at-landing: EXMP-aFoo-3=OPEN\nlanded-anchor: local\n' >> "$ak/$ak_R"; add_ak_commit "head edit under LANDED"; out=$(run_ak_leg)
+miss "$out" "carries an asks: line at HEAD that is not the one the run pinned"
+
+# AC3: no filed row for the mandated ask in its home BACKLOG at the recorded m-base. The anchor moves
+# too, so the equality arm stays green and this is the only refusal the fixture can reach.
+set_ak_pristine
+( cd "$ak" && git checkout -q main && sed -i '/EXMP-aFoo-3/d' memory/builds/aFoo/BACKLOG.md \
+    && git commit -q -am "drop the ask row" --no-verify && git push -q -f origin main \
+    && git checkout -q unit && git merge -q --no-edit main >/dev/null 2>&1 \
+    && nm=$(git rev-parse main) \
+    && sed -i "s|^m-base: .*|m-base: $nm|; s|^anchor-sha: .*|anchor-sha: $nm|; s|^base: .*|base: $nm|" "$ak_R" \
+    && git commit -q -am "re-record against the row-less anchor" --no-verify )
+out=$(run_ak_leg)
+hit  "$out" "a mandated ask has no filed row in the tree this run pinned its mandate against, so the run was authorized by a record that tree does not carry and could have written the row itself"
+hit  "$out" "EXMP-aFoo-3, wanted in memory/builds/aFoo/BACKLOG.md"
+miss "$out" "is not the merge-base of the anchor it pinned"
+
+# AC4: base: and m-base: forged TOGETHER to an older ancestor of anchor-sha still red, naming m-base:
+set_ak_pristine; sed -i "s|^m-base: .*|m-base: $AK_C1|; s|^base: .*|base: $AK_C1|" "$ak/$ak_R"; add_ak_commit "forge the pair"; out=$(run_ak_leg)
+hit "$out" "a run-state file's m-base: is not the merge-base of the anchor it pinned and the tree its own preflight stood on, so the tree its mandate was asserted against was chosen rather than derived - recorded against re-derived follow: ["
+hit "$out" "[$AK_C1] against [$AK_ANCHOR]"
+# ...an m-base: line no commit introduced falls back to ANCESTRY and says so, and S8 skips by name
+set_ak_pristine; sed -i "s|^m-base: .*|m-base: $AK_C1|" "$ak/$ak_R"; out=$(run_ak_leg)
+hit  "$out" "FELL BACK TO ANCESTRY for the m-base:"
+hit  "$out" "SKIPPED the pin re-derivation"
+miss "$out" "is not an ancestor of both the anchor it pinned"
+# ...and the fallback is a test that can fail: a pin OFF the anchor's history reds under it
+set_ak_pristine; sed -i "s|^m-base: .*|m-base: $(git -C "$ak" rev-parse HEAD~1)|" "$ak/$ak_R"; out=$(run_ak_leg)
+hit "$out" "a run-state file's m-base: is not an ancestor of both the anchor it pinned and this working history, so the tree its mandate was asserted against does not lie on the history that authorized the run: m-base ["
+# ...and an m-base: nothing can read is its own refusal rather than a skip
+set_ak_pristine; sed -i '/^m-base: /d' "$ak/$ak_R"; out=$(run_ak_leg)
+hit "$out" "a run-state file pins an asks: mandate and no m-base: this clone can read, so every property about the tree that mandate was asserted against would be graded over an empty blob or, worse, over the index the run itself staged: m-base ["
+
+# AC5: a backticked foreign id in a table row's first cell ANCHORS; a link-wrapped one does not
+set_ak_pristine
+printf '# notes\n\n| `TOOL-zOther-7` | a foreign id, backticked |\n| [TOOL-zOther-8](x.md) | a foreign id, link-wrapped |\n' > "$ak/memory/builds/tRun/notes.md"
+add_ak_commit "foreign anchors"; out=$(run_ak_leg)
+hit  "$out" "a mandated run's own build folder ANCHORS a record id belonging to another build, so this folder is a second claimant for an id it does not own and the two builds' records can no longer be told apart"
+hit  "$out" "memory/builds/tRun/notes.md:3:TOOL-zOther-7"
+miss "$out" "TOOL-zOther-8"
+
+# AC6: a blank RECALL_CLI is a named skip, never zero anchors found
+set_ak_pristine
+printf '# notes\n\n| `TOOL-zOther-7` | a foreign id, backticked |\n' > "$ak/memory/builds/tRun/notes.md"
+sed -i 's|^RECALL_CLI=.*|RECALL_CLI=""|' "$ak/.unattended.conf"; add_ak_commit "blank recall cli"; out=$(run_ak_leg)
+hit  "$out" "check 37 SKIPPED for memory/builds/tRun"
+hit  "$out" "RECALL_CLI is blank in this project"
+miss "$out" "ANCHORS a record id belonging to another build"
+
+# AC7: a LANDED record under a mandate with no freeze (its control is AC12b's record below)
+set_ak_pristine; sed -i 's/^phase: RUNNING$/phase: LANDED/' "$ak/$ak_R"; printf 'landed-anchor: local\n' >> "$ak/$ak_R"
+add_ak_commit "landed, no freeze"; out=$(run_ak_leg)
+hit "$out" "a record claims LANDED under an asks: mandate and freezes no answer to it, so what that run actually answered is whatever the tree says today rather than what it said at landing"
+
+# AC8: EVERY member of the driver's second-anchor set is refused, read from the constant; and a slug
+# record under a blank ASKS_CMD is refused by the conf half alone
+ak_modes=$(sed -n 's/^SECOND_ANCHOR_MODES="\(.*\)"$/\1/p' "$TMP/$KIT_REL/unattended.sh")
+n=$((n+1)); [ -n "$ak_modes" ] || { echo "FAIL the driver's SECOND_ANCHOR_MODES read empty, so the mode arms below would loop over nothing"; st=1; }
+for ak_m in $ak_modes; do
+  set_ak_pristine; sed -i "s/^mode: slug$/mode: $ak_m/" "$ak/$ak_R"; out=$(run_ak_leg)
+  hit "$out" "a run-state file pins an asks: mandate while recording an authorization mode whose discipline lets the run reach the anchor it writes, so the mandate and the tree it is asserted against could both be this run's own: mode ["
+done
+set_ak_pristine; sed -i 's|^ASKS_CMD=.*|ASKS_CMD=""|' "$ak/.unattended.conf"; out=$(run_ak_leg)
+hit  "$out" "a run-state file pins an asks: mandate while this project declares no ASKS_CMD, so nothing here or in the driver ever said whether any of that mandate is executable and every check keyed on it passes over an ungraded list"
+miss "$out" "recording an authorization mode whose discipline"
+
+# AC9's direct form: a tree where no record pins an asks: fact announces the vacuity with its count
+set_ak_pristine; sed -i '/^asks: EXMP-aFoo-3$/d' "$ak/$ak_R" "$ak/$ak_B"; add_ak_commit "no mandate anywhere"; out=$(run_ak_leg)
+hit "$out" "0 run-state records pin an asks: fact"
+
+# AC11: a forged grade on an UNPUBLISHED record reds naming both pairs...
+set_ak_pristine; sed -i 's/^asks-ready: .*/asks-ready: EXMP-aFoo-3=no/' "$ak/$ak_R"; add_ak_commit "forge the grade"; out=$(run_ak_leg)
+hit "$out" "a run-state file's asks-ready: is not what the declared producer says at the very tree the run pinned, so the grades that mandate was admitted on are not the producer's - recorded against re-derived follow: ["
+hit "$out" "[EXMP-aFoo-3=no] against [EXMP-aFoo-3=yes]"
+# ...the same forgery once PUBLISHED is counted and not re-derived...
+set_ak_pristine; sed -i 's/^asks-ready: .*/asks-ready: EXMP-aFoo-3=no/' "$ak/$ak_R"; add_ak_commit "forge the grade"
+git -C "$ak" push -q -f origin HEAD:main; out=$(run_ak_leg)
+miss "$out" "is not what the declared producer says at the very tree the run pinned"
+hit  "$out" "is published, not re-derived"
+# ...a producer past the bound is UNANSWERED and never a red...
+set_ak_pristine; mutate "$ak/$KIT_REL/unattended.sh" 's/^REMOTE_BOUND="[0-9]*"/REMOTE_BOUND="2"/'
+printf '#!/usr/bin/env bash\nsleep 30\n' > "$ak/stub-asks.sh"
+sed -i 's/^asks-ready: .*/asks-ready: EXMP-aFoo-3=no/' "$ak/$ak_R"; add_ak_commit "a stalled producer over a forged grade"; out=$(run_ak_leg)
+hit  "$out" "UNANSWERED rather than red"
+hit  "$out" "was KILLED by this leg's wall-clock bound"
+miss "$out" "is not what the declared producer says at the very tree the run pinned"
+# ...an unobserved default tip re-derives EVERY mandated record and prints why...
+set_ak_pristine; git --git-dir="$ak_origin" symbolic-ref HEAD refs/heads/nothing-here; out=$(run_ak_leg)
+hit "$out" "re-deriving the pins of EVERY mandated record because this run observed no readable default-branch tip"
+git --git-dir="$ak_origin" symbolic-ref HEAD refs/heads/main
+# ...and a producer whose answer MOVED after the pin is graded at the pinned tree, not at HEAD
+set_ak_pristine; mutate "$ak/stub-table.txt" 's/^EXMP-aFoo-3 ready yes$/EXMP-aFoo-3 ready no/'
+add_ak_commit "the table moves after the pin"; out=$(run_ak_leg)
+miss "$out" "is not what the declared producer says at the very tree the run pinned"
+
+# AC12: a forged freeze on an unpublished record reds naming both...
+set_ak_pristine; sed -i 's/^phase: RUNNING$/phase: LANDED/' "$ak/$ak_R"
+printf 'asks-at-landing: EXMP-aFoo-3=CLOSED\nlanded-anchor: local\n' >> "$ak/$ak_R"; add_ak_commit "forge the freeze"; out=$(run_ak_leg)
+hit "$out" "a landed record's asks-at-landing: is not what the declared producer says at the tree its landing verb examined, so the answer frozen into a terminal record is not the one that tree gives - recorded against re-derived follow: ["
+hit "$out" "[EXMP-aFoo-3=CLOSED] against [EXMP-aFoo-3=OPEN]"
+# ...a REOPEN at HEAD does not red a PUBLISHED record...
+set_ak_pristine; sed -i 's/^phase: RUNNING$/phase: LANDED/' "$ak/$ak_R"
+printf 'asks-at-landing: EXMP-aFoo-3=CLOSED\nlanded-anchor: local\n' >> "$ak/$ak_R"; add_ak_commit "the freeze"
+git -C "$ak" push -q -f origin HEAD:main
+mutate "$ak/stub-table.txt" 's/^EXMP-aFoo-3 status OPEN$/EXMP-aFoo-3 status REOPEN/'
+add_ak_commit "a later REOPEN"; out=$(run_ak_leg)
+miss "$out" "is not what the declared producer says at the tree its landing verb examined"
+# ...nor an UNPUBLISHED one, whose freeze is graded at the tree the landing examined. This record
+# is also AC7's control: LANDED, mandated, and carrying its freeze.
+set_ak_pristine; sed -i 's/^phase: RUNNING$/phase: LANDED/' "$ak/$ak_R"
+mutate "$ak/stub-table.txt" 's/^EXMP-aFoo-3 status OPEN$/EXMP-aFoo-3 status CLOSED/'
+add_ak_commit "the tree the landing examined"
+printf 'asks-at-landing: EXMP-aFoo-3=CLOSED\nlanded-anchor: local\n' >> "$ak/$ak_R"; add_ak_commit "the freeze"
+sed -i 's/^EXMP-aFoo-3 status CLOSED$/EXMP-aFoo-3 status REOPEN/' "$ak/stub-table.txt"; add_ak_commit "a later REOPEN"; out=$(run_ak_leg)
+miss "$out" "is not what the declared producer says at the tree its landing verb examined"
+miss "$out" "freezes no answer to it"
+
+# AC13: a freeze that omits one mandated id reds naming that id
+set_ak_pristine; sed -i 's/^asks: EXMP-aFoo-3$/asks: EXMP-aFoo-3 EXMP-aFoo-4/' "$ak/$ak_R"
+sed -i 's/^phase: RUNNING$/phase: LANDED/' "$ak/$ak_R"
+printf 'asks-at-landing: EXMP-aFoo-3=OPEN\nlanded-anchor: local\n' >> "$ak/$ak_R"; add_ak_commit "freeze missing an id"; out=$(run_ak_leg)
+hit "$out" "a landed record's asks-at-landing: omits an ask its own mandate names, so that ask's answer at landing is lost and the freeze covers less than the question the run was authorized by"
+hit "$out" "EXMP-aFoo-4 in memory/builds/tRun/RUN.md"
+
+# THE ROTATED RECORD, which is where S2 meets TOOL-dDerivedDocket-52's resolver for the first time
+# (that unit's AC1 and AC3 left their check-19 half to this commit). The anchor MOVES after
+# preflight, the run merges it, lands and is rotated by the next preflight, so HEAD-at-preflight and
+# the rotation's first parent have DIFFERENT merge-bases with the pinned anchor. A resolver that
+# answered the rotation commit would grade this honest archived record against a base nobody wrote.
+set_ak_pristine
+( cd "$ak" && git checkout -q main && printf 'the anchor moves after preflight\n' > third.txt \
+    && git add -A >/dev/null && git commit -q -m "main moves" --no-verify && git push -q -f origin main \
+    && nm=$(git rev-parse main) && git checkout -q unit \
+    && sed -i "s|^anchor-sha: .*|anchor-sha: $nm|" "$ak_R" && git commit -q -am "the anchor preflight observed" --no-verify \
+    && git merge -q --no-edit main >/dev/null 2>&1 \
+    && sed -i 's/^phase: RUNNING$/phase: LANDED/' "$ak_R" \
+    && printf 'asks-at-landing: EXMP-aFoo-3=OPEN\nlanded-anchor: local\n' >> "$ak_R" \
+    && git commit -q -am "land" --no-verify \
+    && git mv "$ak_R" memory/builds/tRun/RUN.LANDED.deadbeef.md \
+    && printf '# tRun - run state\n\n<!-- run:generated -->\n<!-- /run:generated -->\n\n## Run facts\nphase: RUNNING\nwitness: %s\nbase: %s\n' "$(git rev-parse HEAD)" "$nm" > "$ak_R" \
+    && git add -A >/dev/null && git commit -q -m "the next preflight rotates the record" --no-verify )
+out=$(run_ak_leg)
+miss "$out" "is not the merge-base of the anchor it pinned"
+miss "$out" "FELL BACK TO ANCESTRY for the m-base: of memory/builds/tRun/RUN.LANDED.deadbeef.md"
+hit  "$out" "the ask-mandate second opinions examined 1 run-state record(s) pinning an asks: fact"
+
+
+# ---- TOOL-dDerivedDocket-22 S15 / AC14: under `in-place` landing the freeze is due at the CLOSE, so a
+# ---- COMMITTED LANDING record carrying `asks:` and no `asks-at-landing:` reds; under `primary` the same
+# ---- record does not, because there the freeze is `--landed`'s; and with the fact present it passes.
+set_ak_pristine; printf 'LANDER_MODE="in-place"\nLANDER="echo land"\n' >> "$ak/.unattended.conf"
+sed -i 's/^phase: RUNNING$/phase: LANDING/' "$ak/$ak_R"; add_ak_commit "committed LANDING, no freeze"; out=$(run_ak_leg)
+hit "$out" "a committed LANDING record under an asks: mandate carries no asks-at-landing:, and under in-place landing --close writes that freeze beside the phase, so the record the push carries answers nothing about the question the run was authorized by: memory/builds/tRun/RUN.md"
+set_ak_pristine
+sed -i 's/^phase: RUNNING$/phase: LANDING/' "$ak/$ak_R"; add_ak_commit "committed LANDING under primary"; out=$(run_ak_leg)
+miss "$out" "a committed LANDING record under an asks: mandate carries no asks-at-landing:"
+set_ak_pristine; printf 'LANDER_MODE="in-place"\nLANDER="echo land"\n' >> "$ak/.unattended.conf"
+sed -i 's/^phase: RUNNING$/phase: LANDING/' "$ak/$ak_R"; printf 'asks-at-landing: EXMP-aFoo-3=OPEN\n' >> "$ak/$ak_R"
+add_ak_commit "committed LANDING, frozen at close"; out=$(run_ak_leg)
+miss "$out" "a committed LANDING record under an asks: mandate carries no asks-at-landing:"
+miss "$out" "freezes no answer to it"
+rm -rf "$ak_root"
+
+# ==== TOOL-dDerivedDocket-54: check_touching_commit_reachable, over one scratch fixture ==========
+# SOURCED FROM THE KIT LIBRARY rather than extracted: the predicate lives in `lib-unattended.sh`,
+# which defines functions and nothing else, so sourcing it is exactly how its callers reach it.
+# Nothing calls it at its own commit - the terminal-record exclusion is its first caller, at a later
+# order - so a suite that ran the leg would grade a code path no check reaches yet.
+#
+# THE SUBJECT IS A PARENT, NEVER THE WITNESS. The caller asks once per parent of each merge on a
+# witness's tail, and the one parent at which the simplified and unsimplified spellings disagree is
+# a parent that is ITSELF a merge, TREESAME to one of its own parents for the record's path. At a
+# plain parent the simplified spelling is already right, so an arm graded there certifies nothing.
+# The fixture's witness therefore takes such a NESTED merge as its first parent and an unrelated
+# side branch off BASE as its second, and every yes/no arm below grades one of those two parents.
+#
+# ITS OWN REPOSITORY, outside the scratch tree, for the reason the two blocks above give. The walks
+# are COUNTED through git's own trace rather than through a shim over the wrapper, so the empty-BASE
+# arm can assert the refusal came BEFORE any walk, and a control below proves the counter moves.
+reset_tree
+tc_root=$(mktemp -d)
+tc_fx=$tc_root/fx
+tc_P=memory/builds/b/RUN.md
+# ONE CALL, IN A SUBSHELL, so the `cd` and the sourced library reach no arm that follows, and the
+# assertions stay in THIS shell, where `n` and `st` live. The STATUS is the answer, so it is printed
+# as `rc=<n>` and is the only stdout a call may carry; the reason line lands in `err`.
+run_touching_probe() { # fixture dir · commit · base · path -> rc=<status>; reason in $tc_root/err, git trace in $tc_root/trace
+  rm -f "$tc_root/err" "$tc_root/trace"
+  ( cd "$1" || exit 9
+    # shellcheck disable=SC1091
+    . "$TMP/$KIT_REL/lib-unattended.sh"
+    GIT_TRACE="$tc_root/trace"; export GIT_TRACE
+    check_touching_commit_reachable "$2" "$3" "$4"; echo "rc=$?" ) 2>"$tc_root/err"
+}
+mkdir -p "$tc_fx/memory/builds/b"
+( cd "$tc_fx" || exit 2
+  git init -q -b main . && git config user.email t@t.test && git config user.name t \
+    && git config core.autocrlf false
+  printf 'phase: BUILDING\n' > $tc_P; echo seed > seed.txt
+  git add $tc_P seed.txt; git commit -qm "base"
+  git checkout -qb side; echo s > side.txt; git add side.txt; git commit -qm "side work"
+  git checkout -q main; git checkout -qb run
+  printf 'phase: LANDED\n' > $tc_P; git add $tc_P; git commit -qm "run touches the record"
+  git checkout -q main; echo m > main.txt; git add main.txt; git commit -qm "default branch work"
+  git merge -q --no-ff --no-commit run
+  printf 'phase: BUILDING\n' > $tc_P; git add $tc_P
+  git commit -qm "nested merge resolves the record to the default side"
+  git merge -q --no-ff -m "witness" side ) >/dev/null 2>&1
+tc_base=$(git -C "$tc_fx" log --format=%H --grep='^base$')
+tc_nest=$(git -C "$tc_fx" rev-parse --verify --quiet 'HEAD^1' 2>/dev/null)
+tc_other=$(git -C "$tc_fx" rev-parse --verify --quiet 'HEAD^2' 2>/dev/null)
+# A FIXTURE THAT DID NOT BUILD COMPARES EMPTIES, and every arm below would then grade a refusal of
+# its own inputs. The shape is asserted, not inferred: the first parent is a merge, and it is TREESAME
+# to its default-branch parent for the record's path and not to its run-branch parent.
+n=$((n+1)); [ -n "$tc_base" ] && [ -n "$tc_nest" ] && [ -n "$tc_other" ] \
+  || { echo "FAIL the TOOL-dDerivedDocket-54 fixture derived no base, nested parent or other parent - every arm below would grade nothing"; st=1; }
+same "fixture: the witness's first parent is itself a merge" \
+  "$(git -C "$tc_fx" rev-parse --verify --quiet "$tc_nest^2" >/dev/null 2>&1 && echo merge)" "merge"
+same "fixture: the nested merge is TREESAME to its default-branch parent for the record" \
+  "$(git -C "$tc_fx" diff --name-only "$tc_nest^1" "$tc_nest" -- $tc_P)" ""
+same "fixture: the nested merge is NOT treesame to its run-branch parent for the record" \
+  "$(git -C "$tc_fx" diff --name-only "$tc_nest^2" "$tc_nest" -- $tc_P)" "$tc_P"
+
+# ---- AC1: the nested-merge PARENT answers yes, and the simplified spelling answers nothing for that
+# ---- same parent - rows 5 and 6 of the spec's table, reproduced here rather than quoted.
+same "AC1 the witness's nested-merge parent answers yes" \
+  "$(run_touching_probe "$tc_fx" "$tc_nest" "$tc_base" "$tc_P")" "rc=0"
+same "AC1 a yes prints no reason line" "$(cat "$tc_root/err")" ""
+same "AC1 control: the walk counter counts the one walk that ran" \
+  "$(cat "$tc_root/trace" 2>/dev/null | grep -c 'built-in: git rev-list')" "1"
+same "AC1 control: the SIMPLIFIED spelling answers nothing for that same parent" \
+  "$(git -C "$tc_fx" rev-list -1 "$tc_nest" "^$tc_base" -- $tc_P)" ""
+same "AC1 control: the unsimplified spelling answers the nested merge for it" \
+  "$(git -C "$tc_fx" rev-list --full-history -1 "$tc_nest" "^$tc_base" -- $tc_P)" "$tc_nest"
+
+# ---- AC2: the witness's OTHER parent reaches no touching commit and answers no, so exactly one
+# ---- side is excluded. Without this, a predicate that now matches everything passes AC1.
+same "AC2 the witness's other parent answers no" \
+  "$(run_touching_probe "$tc_fx" "$tc_other" "$tc_base" "$tc_P")" "rc=1"
+same "AC2 a no prints no reason line, so it cannot be mistaken for a refusal" "$(cat "$tc_root/err")" ""
+
+# ---- AC3: three BASEs that fail three different ways. Not an object: any spelling catches it.
+same "AC3 a BASE that is not an object cannot answer" \
+  "$(run_touching_probe "$tc_fx" "$tc_nest" 0123456789abcdef0123456789abcdef01234567 "$tc_P")" "rc=2"
+hit "$(cat "$tc_root/err")" "check_touching_commit_reachable cannot answer for commit [$tc_nest] and path [$tc_P]"
+# ---- ...EMPTY: the range spelling would exit 0 printing nothing, byte-identical to an honest no,
+# ---- and the caret spelling would fail closed for free - so the arm asserts NO WALK RAN.
+same "AC3 an empty BASE cannot answer" "$(run_touching_probe "$tc_fx" "$tc_nest" "" "$tc_P")" "rc=2"
+hit "$(cat "$tc_root/err")" "the BASE is empty or blank, so no walk was started"
+same "AC3 an empty BASE is refused WITHOUT walking" \
+  "$(cat "$tc_root/trace" 2>/dev/null | grep -c 'built-in: git rev-list')" "0"
+# ---- ...a legal object of another TYPE: `^<object>` excludes nothing, so a non-empty test lets the
+# ---- walk answer a confident YES over the whole history. The control proves this fixture shows it.
+tc_blob=$(git -C "$tc_fx" rev-parse --verify --quiet "$tc_base:$tc_P" 2>/dev/null)
+tc_tree=$(git -C "$tc_fx" rev-parse --verify --quiet "$tc_base^{tree}" 2>/dev/null)
+n=$((n+1)); [ -n "$(git -C "$tc_fx" rev-list --full-history -1 "$tc_other" "^$tc_blob" -- $tc_P 2>/dev/null)" ] \
+  || { echo "FAIL AC3 control: a blob BASE excluded something here, so the wrong-type arm below grades nothing"; st=1; }
+same "AC3 a BLOB BASE gives no answer rather than a yes" \
+  "$(run_touching_probe "$tc_fx" "$tc_other" "$tc_blob" "$tc_P")" "rc=2"
+hit "$(cat "$tc_root/err")" "does not resolve to a commit"
+same "AC3 a TREE BASE gives no answer rather than a yes" \
+  "$(run_touching_probe "$tc_fx" "$tc_other" "$tc_tree" "$tc_P")" "rc=2"
+
+# ---- The other cannot-answer branches, each a distinct status from the honest no.
+same "an unknown commit cannot answer" "$(run_touching_probe "$tc_fx" deadbeef "$tc_base" "$tc_P")" "rc=2"
+hit "$(cat "$tc_root/err")" "the commit does not resolve to a commit in this history"
+same "a blank path cannot answer" "$(run_touching_probe "$tc_fx" "$tc_nest" "$tc_base" " ")" "rc=2"
+hit "$(cat "$tc_root/err")" "the path is empty or blank"
+same "a walk git refuses cannot answer" "$(run_touching_probe "$tc_fx" "$tc_nest" "$tc_base" ../outside)" "rc=2"
+hit "$(cat "$tc_root/err")" "the walk itself failed"
+# the path is LITERAL: as a pattern this one matches the record and would answer yes
+same "a glob-shaped path is one literal path, which nothing touched" \
+  "$(run_touching_probe "$tc_fx" "$tc_nest" "$tc_base" 'memory/builds/*/RUN.md')" "rc=1"
+# a shallow clone keeping every commit, BASE included, so only the shallowness can refuse it
+git clone -q --depth 3 --no-local "file://$tc_fx" "$tc_root/shallow" >/dev/null 2>&1
+same "a shallow clone cannot answer" "$(run_touching_probe "$tc_root/shallow" "$tc_nest" "$tc_base" "$tc_P")" "rc=2"
+hit "$(cat "$tc_root/err")" "this clone is shallow"
+
+# ---- AC4: the header sentence naming the simplification, ONCE, naming both the TREESAME shape and
+# ---- the existence-only limit. A flag with no clause beside it survives until the next tidy reader.
+same "AC4 the header sentence naming the simplification appears once" \
+  "$(grep -cF 'THE WALK IS UNSIMPLIFIED ON PURPOSE' "$TMP/$KIT_REL/lib-unattended.sh")" "1"
+hit "$(sed -n '/THE WALK IS UNSIMPLIFIED ON PURPOSE/,+4p' "$TMP/$KIT_REL/lib-unattended.sh")" "TREESAME to one side for that path"
+hit "$(sed -n '/THE WALK IS UNSIMPLIFIED ON PURPOSE/,+4p' "$TMP/$KIT_REL/lib-unattended.sh")" "EXISTENCE only, never which commit"
+
+rm -rf "$tc_root"
+# ==== TOOL-dDerivedDocket-19: THE GRANT, SECOND-OPINIONED ========================================
+# Three arms of check 19 over the `may:` fact. The first two compare the fact against the README at
+# the recorded BASE and against the recorded mode; the third walks each run's OWN commits for a
+# commit that writes a `may:` line into any build README.
+#
+# THE THIRD ARM IS WHY THESE ARE SEVERAL REPOSITORIES. It reads a record's range off the SHAPE of
+# the history behind its witness - a prepared merge, a plain reconcile, a primary landing merge, a
+# fix commit on top of one, push-main's own reconcile - and the scratch tree above is one linear
+# history `reset_tree` rewinds. Each group builds its own repository with a bare origin, from ONE
+# builder, so every graph starts from the same BASE and differs only in what it is testing.
+#
+# EVERY GRAPH CARRIES BOTH SIDES OF THE QUESTION. An OWNER commit on the default branch, made after
+# BASE, adds a grant to `tOther` - the channel ruling D12-j keeps open, which must never red - and
+# the RUN's own commit adds one to `tOther2`, which must always red. An arm asserting only the red
+# half would pass a walk over `base..HEAD`, and one asserting only the quiet half would pass a walk
+# over nothing. `--skip 28` on every run, for the reason the ask block above gives.
+reset_tree
+ma_root=$(mktemp -d)
+ma_leg() { ( cd "$1" && GOV_UNATTENDED_REPORT=1 bash "$KIT_REL/check-unattended.sh" --skip 28 2>&1 ); }
+ma_commit() { ( cd "$1" && git add -A >/dev/null && git commit -q -m "$2" --no-verify ) }
+ma_sha() { git -C "$1" rev-parse "$2" 2>/dev/null; }
+# BASE is the commit named `second`, found by subject so a moved `main` can never re-point it.
+ma_base() { git -C "$1" log --format=%H --grep='^second$' -1; }
+ma_readme() { # dir · slug · [extra front-matter line]
+  mkdir -p "$1/memory/builds/$2"
+  printf -- '---\nslug: %s\nnode: a\nopened: 2026-08-01\nstreams: architecture\nroster: TOOL\nids: TOOL-%s-1\n%s---\n\n# %s\n\n<!-- gen:build-index -->\n<!-- gen:build-units -->\n<!-- /gen:build-units -->\n<!-- /gen:build-index -->\n' \
+    "$2" "$2" "${3:+$3
+}" "$2" > "$1/memory/builds/$2/README.md"
+}
+ma_run() { # dir · slug -> an empty record; ma_facts fills it
+  printf '# %s - run state\n\n<!-- run:generated -->\n<!-- /run:generated -->\n\n## Run facts\nphase: RUNNING\nwitness: WITNESS\nbase: BASE\nmode: slug\nmay: none\n' \
+    "$2" > "$1/memory/builds/$2/RUN.md"
+}
+ma_facts() { # dir · slug · phase · witness-rev · base-rev
+  sed -i "s|^phase: .*|phase: $3|; s|^witness: .*|witness: $(ma_sha "$1" "$4")|; s|^base: .*|base: $(ma_sha "$1" "$5")|" \
+    "$1/memory/builds/$2/RUN.md"
+}
+ma_grant() { # dir · slug · value -> a `may:` line added to that build's README front matter
+  sed -i "/^slug: $2\$/a may: $3" "$1/memory/builds/$2/README.md"
+}
+# THE BUILDER. BASE is `second` on main; the run branch `unit` opens with the record's first commit
+# (its facts), then the RUN'S grant to tOther2, then ordinary work; main then takes the OWNER'S grant
+# to tOther and is pushed. What each group does after that is the thing it tests.
+ma_init() { # name -> $ma_root/<name>, built to the shape above
+  local d="$ma_root/$1"
+  mkdir -p "$d/$KIT_REL" "$d/memory/guides"
+  cp "$TMP/$KIT_REL/check-unattended.sh" "$TMP/$KIT_REL/unattended.sh" "$TMP/$KIT_REL/lib-unattended.sh" \
+     "$TMP/$KIT_REL/check-playbook.sh" "$TMP/$KIT_REL/PROTOCOL.template.md" "$TMP/$KIT_REL/SKILL.template.md" \
+     "$TMP/$KIT_REL/VERBS.template.md" "$TMP/$KIT_REL/PLAYBOOK-TEMPLATE.template.md" \
+     "$TMP/$KIT_REL/.unattended.conf.example" "$d/$KIT_REL/"
+  cp "$TMP/$KIT_REL/PROTOCOL.template.md" "$d/memory/guides/UNATTENDED-PROTOCOL.md"
+  cp "$TMP/$KIT_REL/VERBS.template.md" "$d/memory/guides/UNATTENDED-VERBS.md"
+  cp "$TMP/$KIT_REL/ASKS.template.md" "$d/$KIT_REL/"
+  cp "$TMP/$KIT_REL/ASKS.template.md" "$d/memory/guides/UNATTENDED-ASKS.md"
+  cp "$TMP/.unattended.conf" "$d/.unattended.conf"
+  ma_readme "$d" tRun; ma_readme "$d" tOther; ma_readme "$d" tOther2; ma_readme "$d" tOther3
+  ma_run "$d" tRun
+  ( cd "$d" || exit 2
+    git init -q -b main . && git config user.email t@t.test && git config user.name t && git config core.autocrlf false
+    git add -A >/dev/null && git commit -q -m base --no-verify
+    printf 'second\n' > second.txt; git add -A >/dev/null && git commit -q -m second --no-verify
+    git init -q --bare "$d.git" && git --git-dir="$d.git" symbolic-ref HEAD refs/heads/main
+    git remote add origin "$d.git" && git push -q origin main
+    git checkout -q -b unit ) >/dev/null 2>&1
+  ma_facts "$d" tRun RUNNING main "$(ma_base "$d")"; ma_commit "$d" facts
+  ma_grant "$d" tOther2 bin/run-granted.sh; ma_commit "$d" "run grants"
+  ( cd "$d" && git commit -q --allow-empty -m "unit work" --no-verify )
+  ( cd "$d" && git checkout -q main ) >/dev/null 2>&1
+  ma_grant "$d" tOther bin/owner-granted.sh; ma_commit "$d" "owner grants"
+  ( cd "$d" && git push -q origin main && git checkout -q unit ) >/dev/null 2>&1
+}
+MA_RUN_RD="in memory/builds/tOther2/README.md, run memory/builds/tRun/RUN.md"
+MA_OWN_RD="in memory/builds/tOther/README.md, run"
+MA_WRITES="a commit among a run's own commits writes a may: line into a build README, so a run could land the grant the next run would be authorized by - commit and README follow:"
+
+# ---- G0: THE FACT AGAINST THE README AT BASE (AC4), THE MODE (AC5), AND THE TWO SPELLINGS (AC3). Four
+# ---- records in one tree, each named in every message, so one run grades all four at once.
+ma0="$ma_root/g0"
+mkdir -p "$ma0/$KIT_REL" "$ma0/memory/guides"
+cp "$TMP/$KIT_REL/check-unattended.sh" "$TMP/$KIT_REL/unattended.sh" "$TMP/$KIT_REL/lib-unattended.sh" \
+   "$TMP/$KIT_REL/check-playbook.sh" "$TMP/$KIT_REL/PROTOCOL.template.md" "$TMP/$KIT_REL/SKILL.template.md" \
+   "$TMP/$KIT_REL/VERBS.template.md" "$TMP/$KIT_REL/PLAYBOOK-TEMPLATE.template.md" \
+   "$TMP/$KIT_REL/.unattended.conf.example" "$ma0/$KIT_REL/"
+cp "$TMP/$KIT_REL/PROTOCOL.template.md" "$ma0/memory/guides/UNATTENDED-PROTOCOL.md"
+cp "$TMP/$KIT_REL/VERBS.template.md" "$ma0/memory/guides/UNATTENDED-VERBS.md"
+cp "$TMP/$KIT_REL/ASKS.template.md" "$ma0/$KIT_REL/"
+cp "$TMP/$KIT_REL/ASKS.template.md" "$ma0/memory/guides/UNATTENDED-ASKS.md"
+cp "$TMP/.unattended.conf" "$ma0/.unattended.conf"
+ma_readme "$ma0" tRun
+ma_readme "$ma0" tTick 'may: `bin/lander-granted.sh`'
+ma_readme "$ma0" tBare 'may: bin/lander-granted.sh'
+ma_readme "$ma0" tPrompt 'authorized-by: prompt'
+for ma_s in tRun tTick tBare tPrompt; do ma_run "$ma0" "$ma_s"; done
+sed -i 's/^mode: slug$/mode: prompt/' "$ma0/memory/builds/tPrompt/RUN.md"
+sed -i 's/^may: none$/may: tools\/lander-granted.sh/' "$ma0/memory/builds/tTick/RUN.md" "$ma0/memory/builds/tBare/RUN.md"
+( cd "$ma0" || exit 2
+  git init -q -b main . && git config user.email t@t.test && git config user.name t && git config core.autocrlf false
+  git add -A >/dev/null && git commit -q -m base --no-verify
+  git init -q --bare "$ma0.git" && git --git-dir="$ma0.git" symbolic-ref HEAD refs/heads/main
+  git remote add origin "$ma0.git" && git push -q origin main
+  git checkout -q -b unit && git commit -q --allow-empty -m "unit work" --no-verify ) >/dev/null 2>&1
+for ma_s in tRun tTick tBare tPrompt; do ma_facts "$ma0" "$ma_s" RUNNING unit main; done
+ma_commit "$ma0" facts
+MA0_PRISTINE=$(ma_sha "$ma0" HEAD)
+n=$((n+1)); { [ -n "$MA0_PRISTINE" ] && grep -q '^may: bin/lander-granted.sh$' "$ma0/memory/builds/tTick/RUN.md" \
+  && grep -q '^may: `bin/lander-granted.sh`$' "$ma0/memory/builds/tTick/README.md"; } \
+  || { echo "FAIL the TOOL-dDerivedDocket-19 G0 fixture did not build its four records, so every arm below would grade a missing one"; st=1; }
+ma0_reset() { ( cd "$ma0" && git reset -q --hard "$MA0_PRISTINE" && git clean -qfd ); }
+
+# control: the backticked and the bare README both agree with a bare fact (AC3's leg half), and the
+# honest `none` records fire nothing
+out=$(ma_leg "$ma0")
+miss "$out" "pins a may: grant the build README at its own recorded BASE does not declare"
+miss "$out" "pins a may: grant while recording an authorization mode that resolves at the second anchor"
+miss "$out" "$MA_WRITES"
+hit  "$out" "the ask-mandate second opinions (checks 19, 15 and 37) are VACUOUS on this tree"
+# AC4: a fact that differs from the README's line at BASE reds, naming both values
+ma0_reset; sed -i 's/^may: none$/may: tools\/lander-granted.sh/' "$ma0/memory/builds/tRun/RUN.md"; ma_commit "$ma0" forged
+out=$(ma_leg "$ma0")
+hit "$out" "a run-state file pins a may: grant the build README at its own recorded BASE does not declare, so the authority the run says its owner committed is not the authority that README carries - pinned against declared follow: ["
+hit "$out" "pinned against declared follow: [bin/lander-granted.sh] against [none] in memory/builds/tRun/RUN.md"
+# ...and against BASE, never HEAD: the README edited on the run branch to match the fact still reds
+ma_grant "$ma0" tRun bin/lander-granted.sh; ma_commit "$ma0" "matched at head"
+out=$(ma_leg "$ma0")
+hit "$out" "pinned against declared follow: [bin/lander-granted.sh] against [none] in memory/builds/tRun/RUN.md"
+# AC5: a `prompt` record carrying a grant reds by its mode, whatever its README says
+ma0_reset; sed -i 's/^may: none$/may: tools\/lander-granted.sh/' "$ma0/memory/builds/tPrompt/RUN.md"; ma_commit "$ma0" "prompt grant"
+out=$(ma_leg "$ma0")
+hit "$out" "a run-state file pins a may: grant while recording an authorization mode that resolves at the second anchor, so the grant could be one the run wrote for itself - ruling D12-j honours a grant only under slug: mode [prompt], may: [bin/lander-granted.sh] in memory/builds/tPrompt/RUN.md"
+
+# ---- G1: A LIVE RECORD, AND AN IN-PLACE TERMINAL ONE, over unit 2's prepared merge T - first parent
+# ---- the advertised tip, which carries the owner's grant, second parent the run branch.
+ma_init g1; ma1="$ma_root/g1"
+( cd "$ma1" && git checkout -q --detach main && git merge -q --no-ff --no-edit -m "merge: tRun — land onto main" unit \
+    && git checkout -q -B unit ) >/dev/null 2>&1
+ma_facts "$ma1" tRun RUNNING HEAD "$(ma_base "$ma1")"; ma_commit "$ma1" "record on the prepared merge"
+MA_RUN=$(git -C "$ma1" log --format=%H --grep='^run grants$' -1)
+MA_OWN=$(git -C "$ma1" log --format=%H --grep='^owner grants$' -1)
+n=$((n+1)); { [ -n "$MA_RUN" ] && [ -n "$MA_OWN" ] && [ -n "$(ma_sha "$ma1" 'HEAD~1^2')" ]; } \
+  || { echo "FAIL the TOOL-dDerivedDocket-19 G1 fixture built no prepared merge over both grants"; st=1; }
+out=$(ma_leg "$ma1")
+hit  "$out" "$MA_WRITES $MA_RUN $MA_RUN_RD"
+miss "$out" "$MA_OWN_RD"
+# the in-place close: a single-parent commit on T is the witness of a terminal record
+ma_facts "$ma1" tRun LANDED HEAD "$(ma_base "$ma1")"
+printf 'landed-anchor: local\n' >> "$ma1/memory/builds/tRun/RUN.md"; ma_commit "$ma1" "the close"
+out=$(ma_leg "$ma1")
+hit  "$out" "$MA_WRITES $MA_RUN $MA_RUN_RD"
+miss "$out" "$MA_OWN_RD"
+
+# ---- G2: THE PRIMARY LANDER'S --no-ff LANDING MERGE L as the witness, unpushed and then pushed, and
+# ---- then a single-parent fix commit on the pushed L. L's run side is its SECOND parent.
+ma_init g2; ma2="$ma_root/g2"
+( cd "$ma2" && git checkout -q main && git merge -q --no-ff --no-edit -m "land tRun" unit ) >/dev/null 2>&1
+MA_L=$(ma_sha "$ma2" HEAD)
+ma_facts "$ma2" tRun LANDED "$MA_L" "$(ma_base "$ma2")"
+printf 'landed-anchor: remote\n' >> "$ma2/memory/builds/tRun/RUN.md"; ma_commit "$ma2" "landed record"
+MA_RUN=$(git -C "$ma2" log --format=%H --grep='^run grants$' -1)
+same "fixture: the landing merge's first parent is the owner's grant" \
+  "$(git -C "$ma2" log -1 --format=%s "$MA_L^1")" "owner grants"
+out=$(ma_leg "$ma2")
+hit  "$out" "$MA_WRITES $MA_RUN $MA_RUN_RD"
+miss "$out" "$MA_OWN_RD"
+( cd "$ma2" && git push -q origin main ) >/dev/null 2>&1
+out=$(ma_leg "$ma2")
+hit  "$out" "$MA_WRITES $MA_RUN $MA_RUN_RD"
+miss "$out" "$MA_OWN_RD"
+# a fix commit on the pushed landing merge, pushed, is the witness
+printf 'fix\n' > "$ma2/fix.txt"; ma_commit "$ma2" "fix after landing"
+ma_facts "$ma2" tRun LANDED HEAD "$(ma_base "$ma2")"; ma_commit "$ma2" "record the fix"
+( cd "$ma2" && git push -q origin main ) >/dev/null 2>&1
+out=$(ma_leg "$ma2")
+hit  "$out" "$MA_WRITES $MA_RUN $MA_RUN_RD"
+miss "$out" "$MA_OWN_RD"
+
+# ---- G4: PUSH-MAIN'S OWN RECONCILE as the witness. L is made locally and NOT pushed; another node
+# ---- pushes a SECOND owner grant onto the remote meanwhile, and the lander merges the remote in.
+# ---- The reconcile's run side is its FIRST parent, the one holding L, and the walk goes on to L.
+ma_init g4; ma4="$ma_root/g4"
+( cd "$ma4" && git checkout -q main && git merge -q --no-ff --no-edit -m "land tRun" unit ) >/dev/null 2>&1
+( git clone -q "$ma4.git" "$ma_root/g4-other" && cd "$ma_root/g4-other" \
+    && git config user.email o@t.test && git config user.name o \
+    && sed -i '/^slug: tOther3$/a may: bin/other-node.sh' memory/builds/tOther3/README.md \
+    && git commit -qam "other node grants" --no-verify && git push -q origin main ) >/dev/null 2>&1
+( cd "$ma4" && git fetch -q origin && git merge -q --no-ff --no-edit -m "reconcile origin/main" origin/main ) >/dev/null 2>&1
+MA_M=$(ma_sha "$ma4" HEAD)
+MA_RUN=$(git -C "$ma4" log --format=%H --grep='^run grants$' -1)
+same "fixture: push-main's reconcile takes the other node's grant as its second parent" \
+  "$(git -C "$ma4" log -1 --format=%s "$MA_M^2")" "other node grants"
+same "fixture: ...and the landing merge as its first" "$(git -C "$ma4" log -1 --format=%s "$MA_M^1")" "land tRun"
+ma_facts "$ma4" tRun LANDED "$MA_M" "$(ma_base "$ma4")"
+printf 'landed-anchor: remote\n' >> "$ma4/memory/builds/tRun/RUN.md"; ma_commit "$ma4" "record the reconcile"
+( cd "$ma4" && git push -q origin main ) >/dev/null 2>&1
+out=$(ma_leg "$ma4")
+hit  "$out" "$MA_WRITES $MA_RUN $MA_RUN_RD"
+miss "$out" "$MA_OWN_RD"
+miss "$out" "in memory/builds/tOther3/README.md, run"
+
+# ---- G3: A RUN ABORTED BEFORE --prepare, after a PLAIN reconcile R brought the owner's grant in.
+# ---- Graded live, then terminal with R as the witness, then with a single-parent commit after R.
+ma_init g3; ma3="$ma_root/g3"
+( cd "$ma3" && git merge -q --no-edit main ) >/dev/null 2>&1
+MA_R=$(ma_sha "$ma3" HEAD)
+MA_RUN=$(git -C "$ma3" log --format=%H --grep='^run grants$' -1)
+same "fixture: the plain reconcile takes the owner's grant as its SECOND parent" \
+  "$(git -C "$ma3" log -1 --format=%s "$MA_R^2")" "owner grants"
+ma_facts "$ma3" tRun RUNNING "$MA_R" "$(ma_base "$ma3")"; ma_commit "$ma3" "live after the reconcile"
+out=$(ma_leg "$ma3")
+hit  "$out" "$MA_WRITES $MA_RUN $MA_RUN_RD"
+miss "$out" "$MA_OWN_RD"
+ma_facts "$ma3" tRun ABORTED "$MA_R" "$(ma_base "$ma3")"; ma_commit "$ma3" "aborted at the reconcile"
+out=$(ma_leg "$ma3")
+hit  "$out" "$MA_WRITES $MA_RUN $MA_RUN_RD"
+miss "$out" "$MA_OWN_RD"
+printf 'after\n' > "$ma3/after.txt"; ma_commit "$ma3" "work after the reconcile"
+ma_facts "$ma3" tRun ABORTED HEAD "$(ma_base "$ma3")"; ma_commit "$ma3" "aborted after the reconcile"
+out=$(ma_leg "$ma3")
+hit  "$out" "$MA_WRITES $MA_RUN $MA_RUN_RD"
+miss "$out" "$MA_OWN_RD"
+
+
+# ---- TOOL-dDerivedDocket-22 S17 / AC17: A DERIVED-LANDED record's own commits run from its landing
+# ---- commit C, with the exclusions its merges' run sides give. Read as LIVE, its range would be what
+# ---- this tree has not pushed - nothing, once it landed - and the run's own grant would go ungraded.
+# ---- In-place: the prepared merge T takes the owner's grant as its first parent, and C sits on T.
+ma_init g22a; ma22="$ma_root/g22a"
+( cd "$ma22" && git fetch -q origin && git checkout -q --detach origin/main \
+    && git merge -q --no-ff --no-edit -m "merge: tRun - land onto origin/main" unit \
+    && git branch -qf unit HEAD && git checkout -q unit ) >/dev/null 2>&1
+ma_facts "$ma22" tRun LANDING unit "$(ma_base "$ma22")"; ma_commit "$ma22" "records(tRun): close — LANDING"
+( cd "$ma22" && git push -q origin HEAD:main ) >/dev/null 2>&1
+MA_RUN=$(git -C "$ma22" log --format=%H --grep='^run grants$' -1)
+same "fixture: the in-place landing commit is on the advertised tip" \
+  "$(git --git-dir="$ma22.git" rev-parse main)" "$(ma_sha "$ma22" HEAD)"
+out=$(ma_leg "$ma22")
+hit  "$out" "$MA_WRITES $MA_RUN $MA_RUN_RD"
+miss "$out" "$MA_OWN_RD"
+# ---- Primary: the run branch reconciled the default branch PLAINLY mid-run, after the owner's grant
+# ---- landed there, then committed its LANDING and was landed by a --no-ff merge. The reconcile's
+# ---- excluded parent is its SECOND, the owner's side, never the first.
+ma_init g22b; ma22="$ma_root/g22b"
+( cd "$ma22" && git merge -q --no-edit main ) >/dev/null 2>&1
+MA_R=$(ma_sha "$ma22" HEAD)
+same "fixture: the plain reconcile takes the owner's grant as its SECOND parent" \
+  "$(git -C "$ma22" log -1 --format=%s "$MA_R^2")" "owner grants"
+ma_facts "$ma22" tRun LANDING HEAD "$(ma_base "$ma22")"; ma_commit "$ma22" "close by hand"
+( cd "$ma22" && git checkout -q main && git merge -q --no-ff --no-edit -m "land tRun" unit \
+    && git push -q origin main && git checkout -q unit ) >/dev/null 2>&1
+MA_RUN=$(git -C "$ma22" log --format=%H --grep='^run grants$' -1)
+out=$(ma_leg "$ma22")
+hit  "$out" "$MA_WRITES $MA_RUN $MA_RUN_RD"
+miss "$out" "$MA_OWN_RD"
+rm -rf "$ma_root"
+
+
+# ================== TOOL-dDerivedDocket-22 — the derived terminal, graded by the leg ==============
+# ---- In the shared fixture, each arm from `reset_tree` and each one that pushes restoring the
+# ---- remote's anchor, so no later arm inherits a moved tip. The leg is run with the report channel
+# ---- on, because the fact-set arm's counts and its disabled state are announced there.
+run_lg_leg() { GOV_UNATTENDED_REPORT=1 bash "$SCRIPT" --skip 28 2>&1; }
+write_lg_commit() { # message · [committer date]
+  if [ -n "${2:-}" ]; then
+    GIT_COMMITTER_DATE="$2T12:00:00Z" GIT_AUTHOR_DATE="$2T12:00:00Z" git commit -q -m "$1" --no-verify
+  else
+    git commit -q -m "$1" --no-verify
+  fi
+}
+write_lg_record() { # slug · phase · witness · extra fact lines (printf %b) -> a README and a record, unstaged
+  build "$1"
+  sed -i "s/^phase: .*/phase: $2/; s/^witness: .*/witness: $3/; s/^base: .*/base: $ANCHOR0/" "memory/builds/$1/RUN.md"
+  [ -z "${4:-}" ] || printf '%b' "$4" >> "memory/builds/$1/RUN.md"
+}
+# `--follow` FOLLOWS COPIES as well as renames, so a record sharing more than half its lines with
+# another at its first commit is followed INTO that one and dated by its add. On a real history the
+# source is older and that errs toward grandfathering, but a BACKDATED fixture commit is older than
+# its own copy source, so the dated arms make their records dissimilar rather than assert an artifact.
+write_lg_filler() { # slug -> twenty lines no other record carries
+  local i; for i in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20; do
+    printf '<!-- %s filler %s, unique to this record -->\n' "$1" "$i" >> "memory/builds/$1/RUN.md"
+  done
+}
+
+# ---- AC8, the leg's half: a LANDING record whose WITNESS is on the remote and whose record commit is
+# ---- not is counted live by check 7; with the record commit pushed it is EXCLUDED as derived LANDED.
+# ---- The witness reading this replaced excluded the first record too.
+reset_tree
+write_lg_record tLand LANDING "$ANCHOR0"
+git add -A >/dev/null && write_lg_commit "tLand closes"
+out=$(run)
+hit  "$out" "2 concurrent unattended run(s) — none of them blocks another"
+miss "$out" "check 7 EXCLUDED memory/builds/tLand/RUN.md"
+git push -q -f origin HEAD:main
+out=$(run)
+hit  "$out" "check 7 EXCLUDED memory/builds/tLand/RUN.md — derived LANDED: its landing commit $(git rev-parse HEAD)"
+miss "$out" "concurrent unattended run(s)"
+git push -q -f origin "$ANCHOR0":main
+
+# ---- AC18: a rotated record's `landed-derived` is TESTED, not trusted. The witness is pinned on the
+# ---- advertised tip, so the witness ancestry test cannot red the record in this arm's place.
+reset_tree
+lg_off=$(git rev-parse HEAD)
+write_lg_record tArch LANDED "$ANCHOR0" "landed-derived: $lg_off $ANCHOR0\nunits-at-landing: ARCH-tArch-1\n"
+git add memory/builds/tArch >/dev/null
+git mv -f memory/builds/tArch/RUN.md memory/builds/tArch/RUN.LANDED.deadbeef.md
+git add -A >/dev/null
+out=$(run_lg_leg)
+hit "$out" "a record claims LANDED on derived evidence and the landing commit its landed-derived: names is not on the tip the remote advertises, so the derivation it records is one this remote does not support: $lg_off against $ANCHOR0 in memory/builds/tArch/RUN.LANDED.deadbeef.md"
+miss "$out" "names no anchor kind while its own first commit"
+sed -i "s/^landed-derived: .*/landed-derived: $ANCHOR0 $ANCHOR0/" memory/builds/tArch/RUN.LANDED.deadbeef.md
+git add -A >/dev/null
+out=$(run_lg_leg)
+miss "$out" "a record claims LANDED on derived evidence"
+
+# ---- AC9 and AC16: the fact-set arm, by population and by date. A malformed cutoff refuses; a blank
+# ---- one announces that the arm is off; a recorded LANDED missing the roster reds naming the fact;
+# ---- the count line names every population and says so at zero.
+reset_tree
+printf 'LANDED_FACTS_CUTOFF="soon"\n' >> .unattended.conf
+out=$(run_lg_leg)
+hit "$out" "LANDED_FACTS_CUTOFF is declared and is not an ISO date, and a cutoff nothing can compare would grade every landed record or none while reading as configured"
+reset_tree
+out=$(run_lg_leg)
+hit "$out" "the landed fact-set arm of check 15 is OFF - LANDED_FACTS_CUTOFF is blank or undeclared"
+printf 'LANDED_FACTS_CUTOFF="2026-06-01"\n' >> .unattended.conf
+out=$(run_lg_leg)
+hit "$out" "recorded LANDED 0 · rotated derived LANDED 0 · committed LANDING 0 - a count of 0, so this arm graded nothing on this tree"
+write_lg_record tFacts LANDED "$ANCHOR0" "landed-anchor: remote\nunpushed-at-landing: 0\n"
+git add -A >/dev/null && write_lg_commit "a landed record with no roster"
+out=$(run_lg_leg)
+hit "$out" "a landed record first committed on or after LANDED_FACTS_CUTOFF is missing a fact its landing verb writes, so what that landing covered cannot be read from the record it left, and no verb adds a fact to a record once it is terminal or pushed - population landed, missing [units-at-landing] in memory/builds/tFacts/RUN.md"
+hit "$out" "recorded LANDED 1 · rotated derived LANDED 0 · committed LANDING 0"
+# ...a rotated derived record is graded as its own population
+write_lg_record tDer LANDED "$ANCHOR0" "landed-derived: $ANCHOR0 $ANCHOR0\n"
+git add memory/builds/tDer >/dev/null
+git mv -f memory/builds/tDer/RUN.md memory/builds/tDer/RUN.LANDED.cafef00d.md
+git add -A >/dev/null && write_lg_commit "a rotated derived record with no roster"
+out=$(run_lg_leg)
+hit "$out" "population derived, missing [units-at-landing] in memory/builds/tDer/RUN.LANDED.cafef00d.md"
+
+# ---- AC9: a record first committed BEFORE the cutoff and rotated AFTER it is not graded, by either
+# ---- cutoff: `--follow` dates the archive by the run's own first commit, not by the rotation that
+# ---- added its name. Anchorless and factless, so an undated reading reds it twice.
+reset_tree
+printf 'LANDED_FACTS_CUTOFF="2026-06-01"\n' >> .unattended.conf
+sed -i 's/^LANDED_ANCHOR_CUTOFF=.*//' .unattended.conf; printf 'LANDED_ANCHOR_CUTOFF="2026-06-01"\n' >> .unattended.conf
+write_lg_record tOld LANDED "$ANCHOR0"; write_lg_filler tOld
+git add memory/builds/tOld >/dev/null && write_lg_commit "an old landed run" 2026-01-01
+git mv memory/builds/tOld/RUN.md memory/builds/tOld/RUN.LANDED.0bd0bd00.md
+write_lg_commit "rotated after the cutoff"
+out=$(run_lg_leg)
+miss "$out" "in memory/builds/tOld/RUN.LANDED.0bd0bd00.md"
+miss "$out" "names no anchor kind while its own first commit is at or after the declared cutoff"
+hit  "$out" "recorded LANDED 0 · rotated derived LANDED 0 · committed LANDING 0"
+same "the archive is dated by its run's first commit" \
+  "$( . "$TMP/$KIT_REL/lib-unattended.sh"; read_first_commit_date memory/builds/tOld/RUN.LANDED.0bd0bd00.md )" "2026-01-01"
+
+# ---- AC9: the LIVE record in a folder that has rotated is dated by its OWN tenancy, the rotation,
+# ---- and not by the previous run's first commit, which `--follow --diff-filter=A` alone returns.
+# ---- The ANCHOR cutoff keeps the unfloored reading, and the same record shows it: anchorless, it
+# ---- is not red for naming no anchor kind, because flooring that older key would red terminal
+# ---- records no verb may now repair.
+reset_tree
+printf 'LANDED_FACTS_CUTOFF="2026-02-01"\nLANDED_ANCHOR_CUTOFF="2026-02-01"\n' >> .unattended.conf
+write_lg_record tFloor ABORTED "$ANCHOR0" "halt-code: fork-unresolvable\n"; write_lg_filler tFloor
+git add memory/builds/tFloor >/dev/null && write_lg_commit "the first run" 2026-01-01
+git mv memory/builds/tFloor/RUN.md memory/builds/tFloor/RUN.ABORTED.f1007000.md
+write_lg_record tFloor LANDED "$ANCHOR0" "unpushed-at-landing: 0\n"
+git add memory/builds/tFloor >/dev/null && write_lg_commit "the rotation, and the second run" 2026-03-01
+same "the live record is dated by its own tenancy" \
+  "$( . "$TMP/$KIT_REL/lib-unattended.sh"; read_first_commit_date memory/builds/tFloor/RUN.md )" "2026-03-01"
+same "the anchor cutoff's unfloored reading dates the path's first add" \
+  "$( . "$TMP/$KIT_REL/lib-unattended.sh"; read_first_commit_date memory/builds/tFloor/RUN.md nofloor )" "2026-01-01"
+out=$(run_lg_leg)
+hit  "$out" "population landed, missing [landed-anchor units-at-landing] in memory/builds/tFloor/RUN.md"
+miss "$out" "names no anchor kind while its own first commit is at or after the declared cutoff, so which history was meant to bless its witness cannot be read at all: memory/builds/tFloor/RUN.md"
+
+# ---- AC16: under `in-place` a hand-committed LANDING record with no roster reds, counted as its
+# ---- own population; under `primary` the same record, pushed so it derives LANDED, is REPORTED
+# ---- naming --landed and never graded.
+reset_tree
+printf 'LANDED_FACTS_CUTOFF="2026-06-01"\nLANDER_MODE="in-place"\n' >> .unattended.conf
+sed -i 's/^phase: .*/phase: LANDING/' memory/builds/tRun/RUN.md
+git add -A >/dev/null && write_lg_commit "a hand-committed LANDING"
+out=$(run_lg_leg)
+hit  "$out" "population landing, missing [units-at-landing] in memory/builds/tRun/RUN.md"
+hit  "$out" "recorded LANDED 0 · rotated derived LANDED 0 · committed LANDING 1"
+sed -i 's/^LANDER_MODE=.*//' .unattended.conf
+git push -q -f origin HEAD:main
+out=$(run_lg_leg)
+miss "$out" "population landing, missing [units-at-landing] in memory/builds/tRun/RUN.md"
+hit  "$out" "check 15 did not grade the landed facts of memory/builds/tRun/RUN.md - it is a committed LANDING the remote already carries, so it derives LANDED, and under primary landing the verb that writes those facts has not run yet: --landed tRun"
+git push -q -f origin "$ANCHOR0":main
+
+# ---- THE DATING SELF-SCAN: a first-commit DATE read with --diff-filter=A and no --follow anywhere in
+# ---- the kit's shell reds, naming the file and line; the same read with --follow does not.
+# The flag rides a variable so no single line of THIS suite spells the offending read: check 15 scans
+# every `*.sh` beside the checker, this suite included, and a literal here reds the real-tree leg.
+reset_tree
+_c15_dfa='--diff-filter=A'
+printf '#!/usr/bin/env bash\nd=$(git log %s --format=%%cs -- x | tail -1)\n' "$_c15_dfa" > "$TMP/$KIT_REL/probe-date.sh"
+out=$(run_lg_leg)
+hit  "$out" "a first-commit DATE is read with --diff-filter=A and no --follow in this kit's own shell, so a rotation re-dates an archived record to the commit that added its name and a cutoff grades a record it was written to grandfather"
+hit  "$out" "probe-date.sh:2"
+printf '#!/usr/bin/env bash\nd=$(git log --follow --diff-filter=A --format=%%cs -- x | tail -1)\n' > "$TMP/$KIT_REL/probe-date.sh"
+out=$(run_lg_leg)
+miss "$out" "a first-commit DATE is read with --diff-filter=A and no --follow"
+rm -f "$TMP/$KIT_REL/probe-date.sh"
+reset_tree
+
+# ==== TOOL-dDerivedDocket-30: the conf hoist, the allow-list join and the flag arm =================
+# ---- AC3. `--only 28` used to die on `set -u` at check 30, because the conf import sat inside the
+# ---- guard it skips. Now it exits 0, announces one skip per numbered check after the 28 region on
+# ---- the report channel, and prints nothing by default. The list below is this suite's pin of the
+# ---- population; the leg DERIVES it, which the staged header after it is what proves.
+reset_tree
+out=$(GOV_UNATTENDED_REPORT=1 bash "$SCRIPT" --only 28 2>&1); rc=$?
+same "--only 28 exits 0 once the conf is read above the scope guard" "$rc" "0"
+miss "$out" "unbound variable"
+for o28 in 30 31 32 33 39 40 15 41 42 43; do
+  hit "$out" "check $o28 skipped under --only 28 — this run asked for the 28 region alone"
+done
+out=$(bash "$SCRIPT" --only 28 2>&1); rc=$?
+same "--only 28 without the report channel exits 0" "$rc" "0"
+same "--only 28 without the report channel prints nothing" "$out" ""
+# ...and the population is DERIVED: a header staged after the region is announced with no list edited.
+# 97 is a number no check of the leg uses.
+mutate $KIT_REL/check-unattended.sh '/^if \[ "\$SCOPE" = only28 \]; then$/a # ---- check 97 - a fixture header, staged after the 28 region'
+hit "$(GOV_UNATTENDED_REPORT=1 bash "$SCRIPT" --only 28 2>&1)" "check 97 skipped under --only 28 — this run asked for the 28 region alone"
+# ---- S6: the `--skip 28` smoke arm, the leg's other scope over the pristine fixture. It is also the
+# ---- GREEN CONTROL for every fixture below: the flag arm and the allow-list join read the pristine
+# ---- driver and leg without a finding, which is AC12's restored-verb half. Graded by what checks 22
+# ---- and 26 say rather than by the whole verdict, because this fixture's conf predates keys other
+# ---- checks now require, and a control that asserted the whole leg green would measure those.
+reset_tree
+out=$(run_skip_leg)
+miss "$out" "unknown argument"
+miss "$out" "UNATTENDED check 22 FAILED"
+miss "$out" "UNATTENDED check 26 FAILED"
+
+# ---- AC4, the allow-list join. A key removed from the region reds NAMING it; then the three region
+# ---- shapes that yield no usable key - one sentinel gone, an empty pair, a doubled pair - each red
+# ---- naming the REGION, because each would otherwise subtract nothing or everything and pass.
+reset_tree
+mutate $KIT_REL/check-unattended.sh 's/RECALL_CLI|ASKS_CMD|/RECALL_CLI|/'
+hit "$(run_skip_leg)" "a key the shipped example declares and this leg initialises is missing from the import allow-list, so a project that declares it keeps the initialised default and every gate stays green: ASKS_CMD"
+reset_tree
+mutate $KIT_REL/check-unattended.sh '/^    # gov:conf-allow-end$/d'
+hit "$(run_skip_leg)" "the import allow-list is not exactly one bare gov:conf-allow-begin and gov:conf-allow-end pair enclosing at least one key, so the join that reads it would subtract nothing or everything and report green over a real mismatch"
+reset_tree
+mutate $KIT_REL/check-unattended.sh '/^    # gov:conf-allow-begin$/,/^    # gov:conf-allow-end$/{/# gov:conf-allow-/!d}'
+hit "$(run_skip_leg)" "the import allow-list is not exactly one bare gov:conf-allow-begin and gov:conf-allow-end pair enclosing at least one key, so the join that reads it would subtract nothing or everything and report green over a real mismatch"
+reset_tree
+mutate $KIT_REL/check-unattended.sh 's/^    # gov:conf-allow-end$/&\n    # gov:conf-allow-begin\n    # gov:conf-allow-end/'
+hit "$(run_skip_leg)" "the import allow-list is not exactly one bare gov:conf-allow-begin and gov:conf-allow-end pair enclosing at least one key, so the join that reads it would subtract nothing or everything and report green over a real mismatch"
+
+# ---- AC5 and AC6, the flag arm in both directions: a header flag no parser takes, and a parser arm
+# ---- no header names.
+reset_tree
+mutate $KIT_REL/unattended.sh 's/^#   unattended\.sh --status <slug> /#   unattended.sh --status <slug> [--frobnicate] /'
+hit "$(run_skip_leg)" "the driver's header documents a flag no parser token accepts, so the usage text a reader follows names an argument the driver refuses: --frobnicate"
+reset_tree
+mutate $KIT_REL/unattended.sh 's/^    --pass)         PK_ITEM=/    --frobnicate)   shift ;;\n    --pass)         PK_ITEM=/'
+hit "$(run_skip_leg)" "the driver's parser accepts a flag no header line documents, and the usage text is rendered from that header, so the argument reaches no reader: --frobnicate"
+# ---- AC12: a slug verb is parsed by SET MEMBERSHIP. Dropped from VERBS_SLUG with its header line
+# ---- kept, it is a documented flag nothing parses; restored, the pristine control above is silent.
+reset_tree
+mutate $KIT_REL/unattended.sh '/^VERBS_SLUG=/s/ --audit / /'
+hit "$(run_skip_leg)" "the driver's header documents a flag no parser token accepts, so the usage text a reader follows names an argument the driver refuses: --audit"
+
+# ---- AC8, the suite half. The fixture carries NEITHER suite, which is every adopter tree: one
+# ---- announced skip per suite, and the verdict is the other checks'. Then a driver suite with every
+# ---- `--version` line dropped, and one with every `--framed` line dropped, each red naming the flag.
+reset_tree
+out=$(GOV_UNATTENDED_REPORT=1 bash "$SCRIPT" --skip 28 2>&1)
+miss "$out" "UNATTENDED check 26 FAILED"
+hit "$out" "/unattended.test.sh — this tree does not carry the suite, which is withheld from every adopter install, so no arm can be joined to the flags its parser accepts"
+hit "$out" "/check-unattended.test.sh — this tree does not carry the suite, which is withheld from every adopter install, so no arm can be joined to the flags its parser accepts"
+grep -v -- '--version' "$HERE/unattended.test.sh" > "$TMP/$KIT_REL/unattended.test.sh"
+out=$(run_skip_leg)
+hit "$out" "a flag a parser accepts appears on no non-comment line of its suite, so no arm has ever passed it and it is the one invocation nobody runs"
+hit "$out" "/unattended.test.sh lacks --version"
+grep -v -- '--framed' "$HERE/unattended.test.sh" > "$TMP/$KIT_REL/unattended.test.sh"
+hit "$(run_skip_leg)" "unattended.test.sh lacks --framed"
+# ---- AC13, the leg's own half: its suite with every `--skip` line dropped reds naming `--skip`, and
+# ---- the leg with its argv-begin sentinel deleted reds naming the region.
+reset_tree
+grep -v -- '--skip' "$HERE/check-unattended.test.sh" > "$TMP/$KIT_REL/check-unattended.test.sh"
+hit "$(run_skip_leg)" "check-unattended.test.sh lacks --skip"
+reset_tree
+mutate $KIT_REL/check-unattended.sh '/^# gov:argv-begin$/d'
+hit "$(run_skip_leg)" "a parser's argument region is not exactly one bare gov:argv-begin and gov:argv-end pair holding at least one flag, so the flag join would grade that parser against nothing and pass by finding nothing"
+reset_tree
+
+# ==== TOOL-dDerivedDocket-28 S8: CHECK 41, a process not in the ledger is never killed ===============
+# ---- Both carriers an agent acts from must say so. The stops template is SEEDED into the kit copy
+# ---- here, because the shared fixture carries only the Skill's; the pristine pair is the GREEN control,
+# ---- each carrier with the sentence reworded is a RED naming that file, and an absent carrier is
+# ---- announced on the report channel rather than graded green in silence.
+reset_tree
+cp "$HERE/STOPS.template.md" $KIT_REL/
+out=$(GOV_UNATTENDED_REPORT=1 run)
+miss "$out" "does not state that a process not in the ledger is never killed"
+hit  "$out" "check 41 graded 2 of 2 carriers of the process-ledger rule"
+mutate $KIT_REL/STOPS.template.md 's/never killed/sometimes killed/I'
+out=$(run)
+hit  "$out" "a carrier an agent acts from does not state that a process not in the ledger is never killed, so a stray process carrying this kit's command line is left to the agent's judgement, which is how a run had to be parked over five processes that were another repository's"
+hit  "$(printf '%s\n' "$out" | grep 'UNATTENDED check 41 FAILED')" "/STOPS.template.md"
+reset_tree
+mutate $KIT_REL/SKILL.template.md 's/never killed/sometimes killed/I'
+out=$(GOV_UNATTENDED_REPORT=1 run)
+hit  "$(printf '%s\n' "$out" | grep 'UNATTENDED check 41 FAILED')" "/SKILL.template.md"
+hit  "$out" "check 41 did not grade"
+hit  "$out" "check 41 graded 1 of 2 carriers of the process-ledger rule"
+reset_tree
+
+# ==== TOOL-dDerivedDocket-27 S6 and S7: CHECK 42, the unattended bar's wall, and CHECK 43, the hold routing
+# ---- Check 42 runs the project's declared GATE_PROFILE_CMD, so a STUB profile is written after every
+# ---- reset: it prints `wall`, `queue` and `ceiling_max` from C42_WALL, C42_QUEUE and C42_CMAX, each only
+# ---- when set, and exits C42_RC. The shared fixture's conf declares no GATE_* key, which is the state
+# ---- every adopter starts in and the first arm's subject.
+seed_c42() {
+  cat > c42-profile.sh <<'C42P'
+#!/usr/bin/env bash
+printf 'name\tstub\n'
+if [ -n "${C42_WALL:-}" ]; then printf 'wall\t%s\n' "$C42_WALL"; fi
+if [ -n "${C42_QUEUE:-}" ]; then printf 'queue\t%s\n' "$C42_QUEUE"; fi
+if [ -n "${C42_CMAX:-}" ]; then printf 'ceiling_max\t%s\n' "$C42_CMAX"; fi
+exit "${C42_RC:-0}"
+C42P
+}
+# ...and the two keys appended to the working conf, the later spelling winning when it is sourced.
+write_c42_conf() { # GATE_WALL · GATE_PROFILE_CMD
+  printf 'GATE_WALL="%s"\nGATE_PROFILE_CMD="%s"\n' "$1" "$2" >> .unattended.conf
+}
+# AC15, the leg's half: a BLANK profile command is announced on the report channel and never reds.
+reset_tree; seed_c42
+out=$(GOV_UNATTENDED_REPORT=1 run)
+hit  "$out" "check 42 cannot compare the unattended bar's wall with the largest leg ceiling: this project declares no GATE_PROFILE_CMD, so there is no profile to read ceiling_max from"
+miss "$out" "UNATTENDED check 42 FAILED"
+# ...and a declared profile printing neither queue nor wall is announced naming the key it lacked,
+# as is one printing no ceiling_max under a declared wall.
+write_c42_conf "" "bash c42-profile.sh"
+out=$(GOV_UNATTENDED_REPORT=1 run)
+hit  "$out" "check 42 cannot compare the unattended bar's wall with the largest leg ceiling: GATE_WALL is blank and the profile printed no usable wall, so there is no wall to compare with the largest leg ceiling"
+miss "$out" "UNATTENDED check 42 FAILED"
+write_c42_conf "40" "bash c42-profile.sh"
+hit  "$(GOV_UNATTENDED_REPORT=1 run)" "check 42 cannot compare the unattended bar's wall with the largest leg ceiling: the profile printed no usable ceiling_max, so the 40s wall cannot be compared with the largest leg ceiling"
+# AC4, the leg's half: a declared wall below the profile's largest ceiling reds, naming both numbers,
+# although the profile's OWN wall clears it. RED against a comparison with that wall.
+write_c42_conf "10" "bash c42-profile.sh"
+out=$(C42_WALL=40 C42_QUEUE=20 C42_CMAX=30 run)
+hit  "$out" "the unattended bar's wall is below the largest declared leg ceiling, so a healthy bar that dispatches that leg is killed by its own wall and every unattended close reads red over a bound nobody chose"
+hit  "$out" "the effective wall, the declared GATE_WALL, is 10s, below the largest declared leg ceiling of 30s"
+# ...the GREEN control: a wall equal to the ceiling clears it, and the report channel says so.
+write_c42_conf "30" "bash c42-profile.sh"
+out=$(GOV_UNATTENDED_REPORT=1 C42_WALL=40 C42_QUEUE=20 C42_CMAX=30 run)
+hit  "$out" "check 42 graded the unattended bar's wall: the effective wall, the declared GATE_WALL, is 30s and clears the largest declared leg ceiling of 30s"
+miss "$out" "UNATTENDED check 42 FAILED"
+# ...a BLANK wall is the profile's own, graded the same way.
+write_c42_conf "" "bash c42-profile.sh"
+hit  "$(C42_WALL=5 C42_QUEUE=20 C42_CMAX=30 run)" "the effective wall, the profile's own wall, GATE_WALL being blank, is 5s, below the largest declared leg ceiling of 30s"
+# ...a wall the driver would refuse at conf load is a red: no verb of any run is reachable under it.
+write_c42_conf "ten" "bash c42-profile.sh"
+hit  "$(run)" "', which is not a positive integer of seconds, so the driver refuses at conf load and no verb of any unattended run in this project is reachable"
+# ...a profile command that fails, and one reporting no ceiling at all, are announced and never red.
+write_c42_conf "30" "bash c42-profile.sh"
+out=$(GOV_UNATTENDED_REPORT=1 C42_RC=3 run)
+hit  "$out" "check 42 cannot compare the unattended bar's wall with the largest leg ceiling: the declared GATE_PROFILE_CMD exited 3: bash c42-profile.sh"
+miss "$out" "UNATTENDED check 42 FAILED"
+hit  "$(GOV_UNATTENDED_REPORT=1 C42_WALL=40 C42_QUEUE=20 C42_CMAX=- run)" "the profile reports that no leg declares a ceiling, so the 30s wall has no ceiling to clear"
+# CHECK 43, the GREEN control first: the kit's own Skill template routes a hold line correctly.
+reset_tree
+miss "$(run)" "UNATTENDED check 43 FAILED"
+# ...the hold lead gone is a red, because a paragraph this cannot find would pass by finding nothing.
+mutate $KIT_REL/SKILL.template.md 's/^\*\*A `hold ·` line from `gates-green` is your next step/**A hold line is next/'
+hit  "$(run)" "the Skill template's Close section carries no paragraph opening with the hold lead, so nothing tells a run what to do with the hold line gates-green prints, and this check would pass by finding nothing"
+# ...--hold named before the commit is a red, which the HELD unit's clean-tree precondition refuses.
+reset_tree
+mutate $KIT_REL/SKILL.template.md 's/Take it in this order: commit the staged records/Take it in this order: run --hold, then commit the staged records/'
+out=$(run)
+hit  "$out" "the Skill's hold paragraph does not name the commit of the staged records, the branch push, the keepalive reap and --hold in that order, and --hold refuses a dirty tree and, under ANCHOR_SCOPE=published, an unpublished tip; the first step missing or out of order"
+hit  "$(printf '%s\n' "$out" | grep 'UNATTENDED check 43 FAILED')" "the first step missing or out of order: --hold"
+# ...no platform-unavailable hold for a push the remote does not answer is a red.
+reset_tree
+mutate $KIT_REL/SKILL.template.md 's/take the hold as `platform-unavailable` instead/take another hold instead/'
+hit  "$(run)" "the Skill's hold paragraph names no platform-unavailable hold for a branch push the remote does not answer, so under ANCHOR_SCOPE=published the run's only documented ending is refused"
+# ...and a hold line routed to an override is a red, which spends the one check on a host fault.
+reset_tree
+mutate $KIT_REL/SKILL.template.md 's/then run `--hold` with the code/then run `--close --override gates-green` or `--hold` with the code/'
+hit  "$(run)" "the Skill's hold paragraph routes a hold line to an override, which spends the one check between a run and its landing on a fault that is not the run's"
+reset_tree
+
+# ==== TOOL-dAlignedCarrier-1: CHECK 47, the retired commit premise in any shipped file of the kit
+# ---- The staged line is ASSEMBLED FROM FRAGMENTS split inside their words, so the staged sentence
+# ---- never exists contiguously in this suite's own bytes, and the real-tree leg, which reads this
+# ---- file too, stays clean. It is written to a file and appended by sed's `r`, as check 33's arm
+# ---- does, and the copy it lands in is the fixture's tracked lib, one of the population's plain
+# ---- shell files.
+reset_tree
+_c47_no="n""o"; _c47_dv="dri""ver ve""rb"; _c47_cm="comm""its"
+printf '# the rows: %s %s %s them\n' "$_c47_no" "$_c47_dv" "$_c47_cm" > "$TMPBIN_PARENT/c47.line"
+mutate $KIT_REL/lib-unattended.sh "\$r $TMPBIN_PARENT/c47.line"
+out=$(run)
+hit  "$out" "a shipped file of this kit states the retired premise that the driver makes no commit of its own, but under LANDER_MODE=in-place --close commits its own records commit, so a reader who trusts the sentence expects staged rows to stay uncommitted after the close has committed them; reword it to name the step that commits them. matches: "
+hit  "$(printf '%s\n' "$out" | grep 'UNATTENDED check 47 FAILED')" "matches: $KIT_REL/lib-unattended.sh: "
+# ...the NEAR-MISS, a control on the predicate rather than a second break: the same words ending in
+# a verb that makes no commit, the shape a sibling suite carries, stay silent. Without it the arm
+# above is equally consistent with a ban on every sentence that names the driver's verbs at all.
+reset_tree
+printf '# the rows: %s %s does\n' "$_c47_no" "$_c47_dv" > "$TMPBIN_PARENT/c47.line"
+mutate $KIT_REL/lib-unattended.sh "\$r $TMPBIN_PARENT/c47.line"
+miss "$(run)" "UNATTENDED check 47 FAILED"
+reset_tree
+
+# ==== TOOL-dAlignedCarrier-6: CHECK 47's SECOND ROW, the retired premise that the landing's close
+# ---- is where the owed flagged bar is told (closing review L2). Assembled from fragments split
+# ---- inside their words, as the first row's arm is, so this suite's own bytes form no instance.
+# ---- Both alternatives are staged, the mode token first and the announcing word first.
+_c47_ip="in-""place"; _c47_an="anno""unces"
+printf '# the %s close %s the owed bar\n' "$_c47_ip" "$_c47_an" > "$TMPBIN_PARENT/c47.line"
+mutate $KIT_REL/lib-unattended.sh "\$r $TMPBIN_PARENT/c47.line"
+out=$(run)
+hit  "$out" "a shipped file of this kit states the retired premise that the landing's close is where the owed flagged bar is told, but since TOOL-dAlignedCarrier-6 the move into VERIFYING announces it under every LANDER_MODE and the close says nothing, so a reader who trusts the sentence waits at the close for a notice that never comes; reword it to name the move into VERIFYING. matches: "
+hit  "$(printf '%s\n' "$out" | grep 'UNATTENDED check 47 FAILED')" "matches: $KIT_REL/lib-unattended.sh: \"$_c47_ip close $_c47_an\""
+reset_tree
+printf '# it %s, on an %s close, that the bar is owed\n' "$_c47_an" "$_c47_ip" > "$TMPBIN_PARENT/c47.line"
+mutate $KIT_REL/lib-unattended.sh "\$r $TMPBIN_PARENT/c47.line"
+out=$(run)
+hit  "$out" "the retired premise that the landing's close is where the owed flagged bar is told"
+hit  "$(printf '%s\n' "$out" | grep 'UNATTENDED check 47 FAILED')" "matches: $KIT_REL/lib-unattended.sh: \"$_c47_an, on an $_c47_ip close,\""
+# ...the NEAR-MISS: the same mode's close with no announcing word stays silent, so the arm above is
+# not equally consistent with a ban on naming that close at all.
+reset_tree
+printf '# the %s close runs the bar\n' "$_c47_ip" > "$TMPBIN_PARENT/c47.line"
+mutate $KIT_REL/lib-unattended.sh "\$r $TMPBIN_PARENT/c47.line"
+miss "$(run)" "UNATTENDED check 47 FAILED"
+reset_tree
+
+# ==== TOOL-dAlignedCarrier-6 rev-5: CHECK 47's WINDOW HOLDS EACH ROW'S WIDEST INSTANCE WRAPPED AT
+# ---- EVERY WORD, AND EACH EXCERPT IS WHOLE (closing review round 2, L1 and L4). Row 2's widest
+# ---- instance is eight words and row 1's seven. Each is staged once per position it can wrap at,
+# ---- every copy after a line of eight neutral words that flushes the window, and the ONE run must
+# ---- report the whole quoted excerpt once per copy: 7 for row 2, 6 for row 1. A window a word short
+# ---- drops a copy and a pattern ending on a bare stem truncates every excerpt, so either reds the
+# ---- count. Fragments as above, so this suite's own bytes form no instance.
+_c47_ip="in-""place"; _c47_an="anno""unces"; _c47_no="n""o"; _c47_vb="ve""rb"; _c47_cm="comm""its"
+for _c47_row in "$_c47_ip p q close r s t $_c47_an" "$_c47_no p q $_c47_vb r s $_c47_cm"; do
+  read -r -a _c47_w <<<"$_c47_row"
+  for ((_c47_i = 1; _c47_i < ${#_c47_w[@]}; _c47_i++)); do
+    printf '# f f f f f f f f\n# %s\n# %s\n' "${_c47_w[*]:0:_c47_i}" "${_c47_w[*]:_c47_i}"
+  done
+done > "$TMPBIN_PARENT/c47.line"
+mutate $KIT_REL/lib-unattended.sh "\$r $TMPBIN_PARENT/c47.line"
+out=$(run)
+same "check 47 row 2 wrapped at each of its 7 positions" \
+  "$(printf '%s\n' "$out" | grep -F "the landing's close is where the owed flagged bar is told" | grep -oF "\"$_c47_ip p q close r s t $_c47_an\"" | wc -l | tr -d ' ')" 7
+same "check 47 row 1 wrapped at each of its 6 positions" \
+  "$(printf '%s\n' "$out" | grep -F "the driver makes no commit of its own" | grep -oF "\"$_c47_no p q $_c47_vb r s $_c47_cm\"" | wc -l | tr -d ' ')" 6
+reset_tree
+
+# ==== TOOL-dAlignedCarrier-6: CHECK 48, a run-state fact written after the function's last stage
+# ---- of it (closing review M1). The staged function is written to a file and appended by sed's
+# ---- `r` into the fixture's tracked lib, one of the population's shell files; its two calls are
+# ---- spelled from fragments, so this suite's own bytes carry no function the real-tree leg grades.
+_c48_st="stage""_or_fail"; _c48_sw="set""_fact"
+printf 'c48probe() {\n  %s "$rel" || return 1\n  %s "$rel" witness x || return 1\n}\n' "$_c48_st" "$_c48_sw" > "$TMPBIN_PARENT/c48.fn"
+mutate $KIT_REL/lib-unattended.sh "\$r $TMPBIN_PARENT/c48.fn"
+out=$(run)
+hit  "$out" "a function in a shipped shell file of this kit writes a run-state fact after its last staging of that same file, so the index holds the file as it was before that write and the write stays unstaged: a commit of what the verb staged records half of it and leaves the tree dirty; stage after the last write. matches: "
+hit  "$(printf '%s\n' "$out" | grep 'UNATTENDED check 48 FAILED')" "matches: $KIT_REL/lib-unattended.sh:"
+# ...the NEAR-MISS: the same two calls with the write first and the stage last stay silent, so the
+# arm above is not equally consistent with a ban on writing a fact inside a staging function at all.
+reset_tree
+printf 'c48probe() {\n  %s "$rel" witness x || return 1\n  %s "$rel" || return 1\n}\n' "$_c48_sw" "$_c48_st" > "$TMPBIN_PARENT/c48.fn"
+mutate $KIT_REL/lib-unattended.sh "\$r $TMPBIN_PARENT/c48.fn"
+miss "$(run)" "UNATTENDED check 48 FAILED"
+reset_tree
 fi   # ---- end REGION 8 ------------------------------------------------------------------------
 
 # ---- RE-MEASURED AT THE dUnstalledConvoy MERGE, 2026-08-21, node d. Both sides of that merge
@@ -3776,6 +5633,60 @@ fi   # ---- end REGION 8 -------------------------------------------------------
 # ---- re-armed after round 5 found all three of them instance gates - eight staged breaks and, as much
 # ---- to the point, two CONTROLS: a rule tightened until it reds on an honest caller has traded one
 # ---- false answer for another, and only a control says which happened.
+# ---- RAISED 410 -> 419 by TOOL-dDerivedDocket-5: check 36's nine arms, all in the LANDER_MODE
+# ---- fixture block inside region two, so FLOOR_SHARD_2 carries the same +9 and FLOOR_SHARD_1
+# ---- is untouched.
+# ---- RAISED 419 -> 457 by exactly the arm, TOOL-dDerivedDocket-52: the resolver's thirty-eight
+# ---- assertions over its eight scratch fixtures, all in the block at the END of region two, so
+# ---- FLOOR_SHARD_2 carries the same +38 and FLOOR_SHARD_1 is untouched. COUNTED, not measured
+# ---- through a suite run: this unit's pass may run no suite, so the figure is the block's own
+# ---- `hit`/`same`/`miss` calls plus its two bare `n=$((n+1))` sites, and the block was executed
+# ---- once standalone in a replica of this prologue to confirm it -- thirty-eight assertions,
+# ---- green, and red under each of six staged breaks.
+# ---- RAISED 457 -> 517 by exactly the arm, TOOL-dDerivedDocket-18: the ask-mandate block's
+# ---- sixty executed assertions, all in its own repository at the END of region two, so
+# ---- FLOOR_SHARD_2 carries the same +60 and FLOOR_SHARD_1 is untouched. COUNTED by executing the
+# ---- block standalone in a replica of this prologue, the same way and for the same reason as the
+# ---- line above: this unit's pass may run no suite.
+# ---- RAISED 517 -> 549 by exactly the arm, TOOL-dDerivedDocket-54: the reachability probe's
+# ---- thirty-two executed assertions over its one fixture repository, all at the END of region
+# ---- two, so FLOOR_SHARD_2 carries the same +32 and FLOOR_SHARD_1 is untouched. COUNTED by
+# ---- executing the block standalone in a replica of this prologue, for the reason above.
+# ---- RAISED 549 -> 582 by exactly the arm, TOOL-dDerivedDocket-19: the grant block's 33
+# ---- assertions, all in region two, so FLOOR_SHARD_2 moves by the same 33. Measured by running the
+# ---- block alone behind this suite's prologue by hand, n 0 -> 33; this pass runs no suite.
+# ---- RAISED 582 -> 592 by exactly the arm, TOOL-dDerivedDocket-20: the ask-guide pair's three
+# ---- check-10 arms, its pair-count report arm and check 38's six, ten unconditional `hit`/`miss`
+# ---- calls, all beside check 10 inside region one, so FLOOR_SHARD_1 carries the same +10 and
+# ---- FLOOR_SHARD_2 is untouched. COUNTED off the diff; this pass runs no suite. Its checklist fold
+# ---- added check 38's report-channel liveness arm, one more in the same place: 592 -> 593.
+# ---- RAISED 593 -> 633 by exactly the arm, TOOL-dDerivedDocket-22: forty assertions, all in
+# ---- region two - four in the ask block, six in the grant block and thirty in the derived-
+# ---- terminal block at its END - so FLOOR_SHARD_2 carries the same +40 and FLOOR_SHARD_1 is
+# ---- untouched. MEASURED by running the three blocks behind a replica of this prologue by hand,
+# ---- n 0 -> 40 and green, and red under eight staged breaks; this pass runs no suite.
+# ---- MERGED 2026-09-21 at the reconcile of origin/main into dDerivedDocket: both sides raised all
+# ---- three floors from one base - the dDerivedDocket and aWokenSentinel raise lines above - so
+# ---- each constant is base + ours + theirs. FLOOR_ASSERTIONS 410 + 223 + 24 = 657; FLOOR_SHARD_1
+# ---- 91 + 11 + 0 = 102; FLOOR_SHARD_2 319 + 212 + 24 = 555. COUNTED off the two sides' own raise
+# ---- lines, not measured through a suite run: the merge runs no suite. main's check-32 and
+# ---- check-33 arms keep main's numbers; this build's phase-routing pair, which its own spec
+# ---- calls 32 and 33, is checks 39 and 40 in the merged leg.
+# ---- RAISED 657 -> 700 by exactly the arm, TOOL-dDerivedDocket-30: forty-three executed assertions,
+# ---- all in region two - four check-23 brief fixtures G to J beside arm F, and thirty-nine in the
+# ---- unit's block at the END of region two - so FLOOR_SHARD_2 carries the same +43 and
+# ---- FLOOR_SHARD_1 is untouched. COUNTED by executing both blocks behind a replica of this
+# ---- prologue by hand; this pass runs no suite.
+# ---- RAISED 700 -> 710 by exactly the arm, TOOL-dDerivedDocket-28: the check-41 block at the END
+# ---- of region two executes nine assertions (two `mutate`, six `hit`, one `miss`) and the
+# ---- `--only 28` announcement loop one more for check 41, so FLOOR_SHARD_2 carries the same +10 and
+# ---- FLOOR_SHARD_1 is untouched. COUNTED off the diff; this pass runs no suite, and the check's
+# ---- block was run sliced out of the leg over the kit and its staged breaks.
+# ---- RAISED 710 -> 736 by exactly the arm, TOOL-dDerivedDocket-27: the check-42 and check-43 block at
+# ---- the END of region two executes twenty-four assertions (four `mutate`, fifteen `hit`, five
+# ---- `miss`) and the `--only 28` announcement loop two more, so FLOOR_SHARD_2 carries the same +26
+# ---- and FLOOR_SHARD_1 is untouched. COUNTED by running the block behind a replica of this prologue
+# ---- by hand, n 0 -> 24 and green, and red under four staged breaks; this pass runs no suite.
 # ---- RE-MEASURED at TOOL-aBatchedArm-3, 2026-09-13, node a, from the xtrace of one unsharded run at
 # ---- BASE (every `n=` increment attributed to the region it fired in) and confirmed by the eight
 # ---- shard runs and the unsharded run at the commit: figures beside each constant below, ~3 % under
@@ -3815,19 +5726,40 @@ fi   # ---- end REGION 8 -------------------------------------------------------
 # ---- a frozen clone at a5d54fb6 — the first run of this file with EVERY arm reaching its assertion,
 # ---- since the twenty-two reds it carried were all fixtures pinned to texts that had moved. Readings
 # ---- 86 · 69 · 49 · 102 · 64 · 78 · 95 · 94 (sum 637); every floor ~3 %% under its own, the unsharded floor the sum's discount.
-FLOOR_ASSERTIONS=617
+# ---- MERGED 2026-09-27 at the second reconcile of origin/main into dDerivedDocket. This build's raise
+# ---- lines above counted its arms in the TWO-region cut it was written against: +302 over base 434,
+# ---- eleven in its region one and 291 in its region two. main re-cut the suite into eight regions
+# ---- and re-read every floor, 434 -> 617, +183. FLOOR_ASSERTIONS is base + ours + theirs, 434 + 302 +
+# ---- 183 = 919. The per-shard floors are main's, each raised by this build's arms that LAND in that
+# ---- region of the eight-way cut: the eleven beside checks 10 and 38 sit in region 3 (47 -> 58), the
+# ---- five check-16 count-word and asks-disposed arms in region 5 (62 -> 67), and the other 286 at the
+# ---- END of region 8 (91 -> 377). COUNTED off both sides' own raise lines and a static census of where
+# ---- each arm landed, not measured: the merge runs no suite, and all nine are owed a re-read at the
+# ---- build's next gate pass. The `check 36` of the TOOL-dDerivedDocket-5 raise line above is check 46
+# ---- in the merged leg: main took 34 to 36 first, so this build's three moved to 44 to 46.
+# ---- RAISED 919 -> 923 by exactly the arm, the fold of dDerivedDocket's closing diff review, round
+# ---- 1, F2: the IDLIST arms after the ask block's AC1, three `hit` and one `miss`, all at the END of
+# ---- region 8, so FLOOR_SHARD_8 carries the same +4 and the other seven are untouched. MEASURED by
+# ---- running that block alone behind a replica of this prologue by hand, n 64 -> 68, green on the
+# ---- fold and red on HEAD's kit for all but the `miss`, which is the control; this pass runs no suite.
+# ---- RAISED 923 -> 932 by exactly the arms dDerivedDocket's VERIFYING suite fix added, 2026-09-29:
+# ---- region 1 +5, the five flags the dispatched-verb denylist gained, each one pass of its stale-
+# ---- exemption loop; region 4 +2, check 36's scope liveness arm respelling all three fixture files
+# ---- and reading the report's count; region 8 +2, check 39's liveness arm staging its break with a
+# ---- `mutate` and the check-39 control's new `miss`. FLOOR_SHARD_1, _4 and _8 carry the same.
+FLOOR_ASSERTIONS=932
 # THE FLOOR IS MODE-SELECTED, or every shard leg reds forever against the unsharded floor. The
 # per-shard floors carry the SAME proportional discount the unsharded pin does rather than pinning
 # at 100 % of observation, which would red on the first arm anyone legitimately removes. The
 # figure every floor reads is the FLOOR-GRADED count — `$n` at the grade below — never the PASS line.
-FLOOR_SHARD_1=83
+FLOOR_SHARD_1=88
 FLOOR_SHARD_2=66
-FLOOR_SHARD_3=47
-FLOOR_SHARD_4=98
-FLOOR_SHARD_5=62
+FLOOR_SHARD_3=58
+FLOOR_SHARD_4=100
+FLOOR_SHARD_5=67
 FLOOR_SHARD_6=75
 FLOOR_SHARD_7=92
-FLOOR_SHARD_8=91
+FLOOR_SHARD_8=383
 case "$SH_I" in
   0) FLOOR=$FLOOR_ASSERTIONS; MODE="unsharded" ;;
   *) _fv="FLOOR_SHARD_$SH_I"; FLOOR=${!_fv}; MODE="shard $SH_I/$SHARD_ARITY" ;;

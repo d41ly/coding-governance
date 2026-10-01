@@ -35,7 +35,7 @@
 # below. `--preview` grades the live tree and prints violations without setting exit status, which is
 # how a candidate predicate gets run over the real tree before it is wired.
 set -u
-KIT_UNATTENDED_VERSION=1.49   # gov:kit unattended@1.49 — must match unattended.sh; check-kit-versions.sh pairs them
+KIT_UNATTENDED_VERSION=1.50   # gov:kit unattended@1.50 — must match unattended.sh; check-kit-versions.sh pairs them
 
 # The dereference pin, identical to this kit's other two readers and for the identical reason: a graft
 # file rewrites the commit GRAPH, so every ancestry answer below could be honest about a sha and wrong
@@ -137,6 +137,15 @@ if [ -z "$_ps_start" ] || [ -z "$_ps_end" ] || [ "$_ps_end" -le "$_ps_start" ]; 
 fi
 eval "$(sed -n "${_ps_start},${_ps_end}p" "$DRIVER")"
 declare -F plan_state >/dev/null || { echo "pass-order: plan_state did not survive the slice, so this leg would grade nothing and report clean"; exit 2; }
+# TOOL-dDerivedDocket-31 S5 - the classifier's second argument, the memory kit's FORK_ITEM_CUTOFF,
+# read as TEXT through the library reader the driver uses, never by sourcing that kit's conf. This leg
+# acts on MISSING and THIN alone, which the cutoff never changes; it passes it anyway, so the sliced
+# classifier grades exactly what the driver grades and a later FORKED branch here cannot inherit a
+# silent blank. An unreadable value refuses like every other conf value this leg cannot read.
+if ! FORK_CUTOFF=$(read_fork_cutoff "$ROOT/.memory-tree.conf"); then
+  echo "pass-order: the memory tree's FORK_ITEM_CUTOFF cannot be read as text, so the sliced classifier would grade section 8 under a cutoff the hygiene gate does not use: $FORK_CUTOFF"
+  exit 2
+fi
 
 # ------------------------------------------------------------------------------- THE LIVENESS PROBE
 # A PROBE THAT CANNOT MOVE SAYS SO. The classifier must return a real token on a real spec before a
@@ -147,7 +156,7 @@ declare -F plan_state >/dev/null || { echo "pass-order: plan_state did not survi
 # PROBE guard — the one whose job is to say the leg graded nothing — skipped silently.
 _probe=$(GIT ls-tree -r --name-only HEAD -- "$MEMORY_ROOT/builds" 2>/dev/null | grep -E "/spec/.*\.md$" | head -1)
 if [ -n "$_probe" ]; then
-  case "$(plan_state "$_probe")" in
+  case "$(plan_state "$_probe" "$FORK_CUTOFF")" in
     MISSING|THIN|FORKED|READY) ;;
     *) echo "pass-order: DEAD PROBE — the sliced classifier returned no known state on $_probe, so no verdict below would mean anything"; exit 2 ;;
   esac
@@ -270,6 +279,8 @@ fi
 
 graded=0; skipped_cutoff=0; norun_graded=0; unbuilt=0; preanchor_hits=0; waived_n=0; truncated=0
 violations=""; waived_seen=""; previews=""
+PS_DIR=$(mktemp -d) || { echo "pass-order: cannot make a scratch directory for the historical spec blobs, so no unit could be classified"; exit 2; }
+trap 'rm -rf "$PS_DIR"' EXIT
 
 # THE POPULATION COMES FROM THE GRADED COMMIT TOO, and this line was the last one left behind.
 # The fold moved four record READS to `HEAD:` and left the SELECTOR that decides which builds are
@@ -436,9 +447,12 @@ $1" ;;
       case "$_cands" in *" $sp "*) ;; *) continue ;; esac
       blob=$(GIT show "$parent:$sp" 2>/dev/null) || continue
       case " $(printf '%s' "$blob" | head -5 | tr -c 'A-Za-z0-9-' ' ') " in *" $id "*) ;; *) continue ;; esac
-      tmp=$(mktemp) || exit 2
+      # UNDER ITS OWN BASENAME, in the one scratch directory made before the walk: `plan_state` reads
+      # the spec's FILENAME date to decide whether the F-item reading applies, and a bare temp name
+      # carries none. One directory for the whole walk also costs one spawn fewer per unit.
+      tmp="$PS_DIR/${sp##*/}"
       printf '%s\n' "$blob" > "$tmp"
-      state=$(plan_state "$tmp"); rm -f "$tmp"
+      state=$(plan_state "$tmp" "$FORK_CUTOFF"); rm -f "$tmp"
       found="$sp"; break
     done
     # EVERY VIOLATION ROUTES THROUGH THE WAIVER, and one helper does it so a future violation class
