@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-53 — every background task a run starts carries a heartbeat the audit reads
 
-**Status:** SPECCED · rev-1 · 2026-10-01 · node a · Tier-2 · base 56c7befa · streams tooling · order 23
+**Status:** SPECCED · rev-2 · 2026-10-01 · node a · Tier-2 · base 56c7befa · streams tooling · order 23
 
 <!-- gen:spec-records -->
 
@@ -27,7 +27,10 @@ exactly as it does for a dispatched unit.
   task before starting it: the main loop for an `Agent` or a background leg, a brief's author for a
   unit's own long command. It refuses a name carrying a tab or a newline, a heartbeat path that is
   not absolute, a name already registered and not yet released, and a run whose derived phase is
-  terminal. Observed by AC1, AC6 and AC8.
+  terminal. Absolute is `/…` or a drive letter followed by `/` or `\`. An empty name or path, a
+  path carrying a tab or a newline, and a slug with no run-state file refuse too. The terminal
+  refusal is `refuse_if_terminal`'s check 26; every other refusal of both verbs is check 88.
+  Observed by AC1, AC6 and AC8.
 - **S2** — A second verb, `--release-task <slug> --task <name>`, appends `<ISO> release <name>`. A
   name with no open registration refuses. A released name may be registered again, and the newer
   registration is the one graded. Observed by AC6.
@@ -49,7 +52,9 @@ exactly as it does for a dispatched unit.
   terms, with the kit default 5400 s: three of the thirty-minute beats the build briefs ask for, the
   same three-cadence rule `UNIT_STALL_BOUND_DEFAULT` records for its own figure. It is declared in
   `tools/unattended/.unattended.conf.example`, in the kit descriptor's optional keys, in the
-  protocol's conf-key table, and in gov's own `.unattended.conf`. Observed by AC7.
+  protocol's conf-key table, and in gov's own `.unattended.conf`. It is read at the top of
+  `--audit`, before any line prints, and not at driver load, so its NOTE prints on the one verb
+  that grades it rather than on every verb. Observed by AC7.
 - **S7** — The idle-wake's instructions in `tools/unattended/SKILL.template.md` act on a task's
   STALLED line: read its heartbeat file, stop the task, record why with `--park` or a `Decided:`
   line, release it, and either re-run it bounded or leave it parked. An `Agent` stops by its task
@@ -113,7 +118,7 @@ there with an absolute path to its heartbeat, which is why S1 refuses a relative
 ### Inventory
 
 Minted names, to be confirmed by `python tools/lexicon/lexicon.py --suggest <name>` before writing:
-`verb_register_task`, `verb_release_task` and `print_task_audit` (the shell function cell);
+`write_task_register`, `write_task_release` and `print_task_audit` (the shell function cell);
 `TASK_STALL_BOUND` and `TASK_STALL_BOUND_DEFAULT` (conf keys and their default); the verbs
 `--register-task` and `--release-task`. A refusal renames, and the rename lands as a rev bump here
 first.
@@ -227,6 +232,12 @@ New arm: `tools/unattended/unattended.test.sh` · a fixture run with a registry 
 ## 9. Revision log
 
 - rev-1 · 2026-10-01 · initial draft from the owner's 2026-10-01 ruling adopting this unit.
+- rev-2 · 2026-10-01 · build pass. The lexicon refused `verb_register_task` and
+  `verb_release_task` (`verb` is not in the declared table), so §4 names `write_task_register` and
+  `write_task_release`. S1 names the refusal numbers and the three empty, forged-path and no-run
+  refusals the build adds. S6 reads the bound at the top of `--audit` rather than at driver load.
+  The §7 arm lands in the suite unrun inside the pass; the pass verifies AC1 to AC8 with a direct
+  fixture driving the driver, and the slice run of the arm is owed to the main loop.
 
 ## 10. Reuse audit
 

@@ -148,3 +148,5 @@ base: d6e1749c0542218004260928f1399174daafb789
 2026-10-01T11:41:31Z brief · item TOOL-aRepatriatedFork-54 · reason b591fada98aa memory/builds/aRepatriatedFork/prompts/2026-10-01-prompt-TOOL-aRepatriatedFork-54-build-brief.md
 
 2026-10-01T11:41:33Z brief · item TOOL-aRepatriatedFork-52 · reason 2f1fa38c4db8 memory/builds/aRepatriatedFork/prompts/2026-10-01-prompt-TOOL-aRepatriatedFork-52-build-brief.md
+
+2026-10-01T11:48:30Z dispatch · item 7880f0c8 TOOL-aRepatriatedFork-53 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/SKILL.template.md tools/unattended/PROTOCOL.template.md tools/unattended/VERBS.template.md tools/unattended/.unattended.conf.example tools/unattended/kit.toml tools/unattended/README.md memory/guides/UNATTENDED-PROTOCOL.md memory/guides/UNATTENDED-VERBS.md .claude/skills/unattended/SKILL.md .unattended.conf memory/builds/aRepatriatedFork/spec/2026-10-01-spec-TOOL-aRepatriatedFork-53.md
