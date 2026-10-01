@@ -1,6 +1,6 @@
 # TOOL-aSightedSkeptic-6 — one severity rubric, a skeptic's binding grade, and an uncertain verdict
 
-**Status:** SPECCED · rev-1 · 2026-10-01 · node a · Tier-2 · base ef1dcdb6 · streams tooling · order 6 · ratified 2026-10-01
+**Status:** CLOSED · rev-1 · 2026-10-01 · node a · Tier-2 · base ef1dcdb6 · streams tooling · order 6 · ratified 2026-10-01
 
 <!-- gen:spec-records -->
 

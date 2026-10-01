@@ -697,6 +697,86 @@ async function runWholeScriptArms() {
     ck(print.length === 8 && r.scanSpawned('find:').length === 0 && r.scanSpawned('verify:ids-1-1').length === 1,
       'fix verdict: a verify file judged over another fix is dispatched')
   }
+
+  // ==== TOOL-aSightedSkeptic-6 — one severity rubric, a skeptic's binding grade, an uncertain verdict ==
+  // Every arm is RED against the parent render: no prompt carries a rubric, the verdict schema closes
+  // at confirmed and refuted, the synthesis bracket is the finder's grade, no ungraded count exists, an
+  // uncertain verdict is held as neither confirmed, refuted nor unverified, and no `regraded` returns.
+  const RUBRIC_END = 'how alarming the defect looks.'
+  const scanRubric = (p) => {
+    const i = p.indexOf('SEVERITY RUBRIC')
+    const j = i === -1 ? -1 : p.indexOf(RUBRIC_END, i)
+    return j === -1 ? null : p.slice(i, j + RUBRIC_END.length)
+  }
+  // A skeptic stub answering `verdict` for every id, with `grade(id)` as the skeptic's severity.
+  const buildGradedVerdicts = (verdict, grade) => (label, prompt) => {
+    const vr = buildVerdicts(verdict)(label, prompt)
+    for (const v of vr.verdicts) {
+      v.reason = 'RSN-' + v.id
+      const g = grade ? grade(v.id) : undefined
+      if (g) v.severity = g
+    }
+    return vr
+  }
+  // ---- AC1: the same rubric bytes in every find:, verify: and synth prompt, on both kinds.
+  const rrd = await runReview(DIFF, ALL_OK)
+  const rrs = await runReview(SPEC, ALL_OK)
+  if (checkNoThrow(rrd, 'rubric diff') && checkNoThrow(rrs, 'rubric spec')) {
+    const scanRubricOk = (run, n) => {
+      const rp = scanPrompts(run, 'find:').concat(scanPrompts(run, 'verify:'), scanPrompts(run, 'synth'))
+      const texts = [...new Set(rp.map((t) => scanRubric(t.prompt)))]
+      return rp.length === n && texts.length === 1 && !!texts[0] && ['blocker:', 'high:', 'medium:', 'low:'].every((g) => texts[0].indexOf(g) !== -1)
+    }
+    ck(scanRubricOk(rrd, 11) && scanRubricOk(rrs, 9), 'severity: one rubric reaches every finder, skeptic and synthesis prompt')
+  }
+  // ---- AC2: the item schema the skeptic was handed.
+  const vs6 = scanPrompts(rrd, 'verify:')[0]
+  const vi6 = vs6 && vs6.schema && vs6.schema.properties && vs6.schema.properties.verdicts && vs6.schema.properties.verdicts.items
+  const vp6 = (vi6 && vi6.properties) || {}
+  ck(!!vp6.verdict && Array.isArray(vp6.verdict.enum) && vp6.verdict.enum.indexOf('uncertain') !== -1 &&
+    !!vp6.severity && JSON.stringify(vp6.severity.enum) === '["blocker","high","medium","low"]' &&
+    Array.isArray(vi6.required) && vi6.required.indexOf('severity') === -1,
+    'severity: the verdict schema carries uncertain and an optional severity')
+  // ---- AC3: the finder grades every finding high; the skeptic confirms id 1 at blocker, the rest at high.
+  r = await runReview(DIFF, buildStubs({ 'verify:': buildGradedVerdicts('confirmed', (id) => (id === 1 ? 'blocker' : 'high')) }))
+  if (checkNoThrow(r, 'binding grade')) {
+    const ce = scanConfirmedEntries(r)
+    ck(ce.length === 5 && /^1 \[blocker\] \(finder graded high, skeptic graded blocker\)/.test(ce[0]) &&
+      ce.slice(1).every((e) => /^\d+ \[high\] /.test(e) && e.indexOf('finder graded') === -1) &&
+      r.logs.some((l) => /^note: 1 confirmed finding\(s\) RE-GRADED/.test(l) && /ids 1$/.test(l)),
+      'severity: the skeptic\'s grade binds the synthesis line')
+  }
+  // ---- AC4: the existing stub verdicts carry no grade, so every finding falls back to the finder's.
+  if (checkNoThrow(rrd, 'ungraded')) {
+    const ce = scanConfirmedEntries(rrd)
+    const sp = rrd.trace.find((t) => t.label === 'synth')
+    const ri = sp ? sp.prompt.slice(sp.prompt.indexOf('RUN INTEGRITY')) : ''
+    ck(ce.length === 5 && ce.every((e) => /^\d+ \[high\] /.test(e)) &&
+      rrd.logs.some((l) => l.indexOf('WARNING:') === 0 && l.indexOf('UNGRADED') !== -1 && /ids 1, 2, 3, 4, 5$/.test(l)) &&
+      ri.indexOf('5 UNGRADED') !== -1,
+      'severity: a confirmed verdict with no grade falls back to the finder\'s, counted and announced')
+  }
+  // ---- AC5: one batch answers uncertain; it is unverified, outside precision, and listed with its reason.
+  r = await runReview(DIFF, buildStubs({ 'verify:ids-3-3': buildGradedVerdicts('uncertain') }))
+  if (checkNoThrow(r, 'uncertain verdict')) {
+    const sp = r.trace.find((t) => t.label === 'synth')
+    const uv = sp ? sp.prompt.slice(sp.prompt.indexOf('UNVERIFIED findings')) : ''
+    const head = sp ? sp.prompt.split('UNVERIFIED findings')[0] : ''
+    ck(r.result.uncertain === 1 && r.result.unverified === 1 && r.result.confirmed === 4 && r.result.refuted === 0 &&
+      r.result.precision === 1 && /id=3 \[high\][^\n]*\n[\s\S]*status: UNCERTAIN[^\n]*RSN-3/.test(uv) && head.indexOf('id=3 [') === -1,
+      'severity: an uncertain verdict is counted unverified, never refuted or confirmed')
+  }
+  // ---- AC6: skeptics confirm at blocker; the stub synthesis places every id in one HIGH item.
+  r = await runReview(DIFF, buildStubs({ 'verify:': buildGradedVerdicts('confirmed', () => 'blocker') }))
+  if (checkNoThrow(r, 'regraded')) {
+    ck(Array.isArray(r.result.regraded) && r.result.regraded.join(' ') === '1 2 3 4 5' && r.result.highs === 5 && r.result.blockers === 0,
+      'severity: a synthesis placing an id off its binding grade is returned in regraded')
+  }
+  // ---- AC7: every verify prompt, both kinds, answers uncertain only for a blocker or high finding.
+  const uvp = scanPrompts(rrd, 'verify:').concat(scanPrompts(rrs, 'verify:'))
+  ck(uvp.length === 9 && uvp.every((t) => t.prompt.indexOf('graded blocker or high is answered "uncertain"') !== -1 &&
+    t.prompt.indexOf('graded medium or low (the bracketed grade) is "refuted"') !== -1 && t.prompt.indexOf('Default to refuted when uncertain') === -1),
+    'severity: the uncertain rule follows the finder\'s grade')
 }
 
 runWholeScriptArms().then(() => {
@@ -733,7 +813,10 @@ printf '%s\n' "$out"
 # RAISED 117 -> 123 by TOOL-aSightedSkeptic-2: 6 assertions, counted off the block — the fix in every
 # verify prompt (1), the schema (1), unsound with and without a note (2), the unjudged count (1) and
 # the batch print over the fix (1).
-FLOOR_ASSERTIONS=123
+# RAISED 123 -> 130 by TOOL-aSightedSkeptic-6: 7 assertions, counted off the block — the rubric in every
+# prompt (1), the schema (1), the binding grade (1), the ungraded fallback (1), the uncertain verdict
+# (1), the regraded return (1) and the uncertain rule in every verify prompt (1).
+FLOOR_ASSERTIONS=130
 executed=$(printf '%s\n' "$out" | sed -n 's/^---- \([0-9][0-9]*\) passed.*/\1/p' | tail -1)
 if [ -z "$executed" ]; then
   echo "FAIL the runner printed no assertion count at all — it died before its summary line"

@@ -328,7 +328,11 @@ const FINDING_SCHEMA = {
 // never fails its batch into regeneration, and `id` stays the only join key. The harness tests
 // membership in FIX_VERDICTS again after the join, because a reused file and a stub reach it without
 // the platform's schema validation.
+// TOOL-aSightedSkeptic-6 S3 - `uncertain` is a third verdict, and the skeptic's `severity` is OPTIONAL
+// and read on a confirmed verdict only. The harness tests membership in SEVERITIES itself, for the
+// same reason it tests FIX_VERDICTS.
 const FIX_VERDICTS = ['sound', 'unsound', 'none']
+const SEVERITIES = ['blocker', 'high', 'medium', 'low']
 const VERDICT_SCHEMA = {
   type: 'object',
   required: ['path', 'verdicts'],
@@ -343,15 +347,28 @@ const VERDICT_SCHEMA = {
         required: ['id', 'verdict', 'reason'],
         properties: {
           id: { type: 'integer' }, // the orchestrator-assigned finding id, echoed back
-          verdict: { type: 'string', enum: ['confirmed', 'refuted'] },
+          verdict: { type: 'string', enum: ['confirmed', 'refuted', 'uncertain'] },
           reason: { type: 'string' },
           fixVerdict: { type: 'string', enum: FIX_VERDICTS },
           fixNote: { type: 'string' },
+          severity: { type: 'string', enum: SEVERITIES },
         },
       },
     },
   },
 }
+
+// TOOL-aSightedSkeptic-6 S1/S2 - ONE severity rubric, graded by CONSEQUENCE. Severity drives the
+// costliest disposal there is (a BLOCKER or HIGH is promoted to a unit, TOOL-aProbedUnit-9), and no
+// prompt defined a grade. It is interpolated byte-identically into every finder, verify and synthesis
+// prompt of the run and restated nowhere; the spec kind reads each grade as what the design would do.
+const SEVERITY_RUBRIC =
+  `SEVERITY RUBRIC - grade every finding by its CONSEQUENCE. ` +
+  `blocker: ${isSpec ? 'the design, built as written, would ship' : 'on a reachable path it ships'} a wrong result, a security hole or data loss, or a check that certifies what it does not check. ` +
+  `high: ${isSpec ? 'the design, built as written, would cause ' : ''}the same consequence on a narrow or unlikely path, or a defect that will mislead the next change. ` +
+  `medium: ${isSpec ? 'the design, built as written, would ship ' : ''}a real defect whose effect is contained. ` +
+  `low: ${isSpec ? 'the design, built as written, would differ only cosmetically or in a comment' : 'cosmetic, or a comment'}, with no effect on behaviour. ` +
+  `A grade follows the consequence, never the confidence or how alarming the defect looks.`
 
 // S3 - the spec kind's schema. `where` replaces `line` and is REQUIRED, so the address obligation is
 // machine-enforced on both kinds rather than relaxed on one.
@@ -710,6 +727,8 @@ const finderResults = await boundedParallel(
         (isSpec
           ? `Emit CONCRETE findings only — each needs file, where, severity (blocker|high|medium|low), with "where" being the section address, e.g. "section 2 S5", a one-line claim, the impact, and a proposed fix. A spec finding is often the ABSENCE of a line, so address it by section. No speculation, no style nits, nothing outside the spec set. If nothing real, return findings: [].\n`
           : `Emit CONCRETE findings only — each needs file, line, severity (blocker|high|medium|low), a one-line claim, the impact, and a proposed fix. No speculation, no style nits, nothing outside the diff. If nothing real, return findings: [].\n`) +
+        // TOOL-aSightedSkeptic-6 S2 - the rubric beside the instruction that asks for a severity.
+        SEVERITY_RUBRIC + `\n` +
         // TOOL-dDerivedDocket-29 S1 - WRITE BEFORE RETURN. A fan that dies on a session limit loses
         // every structured return with it; a file on disk survives, and the next run's probe reuses it.
         `\nDURABILITY — BEFORE you return, whatever you found, Write the exact JSON object you are about to return, plus one more field "key":"${reviewKey}", to ${keyDir}/find-${L.key}.json, creating the directory if it is missing.${keyDirHow} Set path to that file's absolute, forward-slash path.\n` +
@@ -808,8 +827,16 @@ const verdictResults = await boundedParallel(
       : agent(
       renderBrief('skeptic') +
       (isSpec
-        ? `You are an adversarial skeptic. For EACH finding below, try hard to REFUTE it — Read the cited spec at the cited section, and the siblings it names, and decide "confirmed" (real, and it makes the spec unbuildable or wrong) or "refuted" (asks for detail a non-goal withholds / cites a section that says what the finding claims it does not / is a style preference). Default to refuted when uncertain.\n\n`
-        : `You are an adversarial skeptic. For EACH finding below, try hard to REFUTE it — read the actual code (Read/Grep the cited file:line and callers) and decide "confirmed" (real, reachable, impactful) or "refuted" (not reachable / not a bug / by-design / duplicate). Default to refuted when uncertain.\n\n`) +
+        ? `You are an adversarial skeptic. For EACH finding below, try hard to REFUTE it — Read the cited spec at the cited section, and the siblings it names, and decide "confirmed" (real, and it makes the spec unbuildable or wrong) or "refuted" (asks for detail a non-goal withholds / cites a section that says what the finding claims it does not / is a style preference).\n\n`
+        : `You are an adversarial skeptic. For EACH finding below, try hard to REFUTE it — read the actual code (Read/Grep the cited file:line and callers) and decide "confirmed" (real, reachable, impactful) or "refuted" (not reachable / not a bug / by-design / duplicate).\n\n`) +
+        // TOOL-aSightedSkeptic-6 S4 - the default follows the FINDER's grade (spec section 8 F3). An
+        // unsure skeptic refuting a real blocker loses the defect; one answering uncertain on every
+        // low-precision nit floods disposal. So only a costly finding is left outstanding.
+        `WHEN YOU CANNOT ESTABLISH A FINDING either way: one the finder graded medium or low (the bracketed grade) is "refuted"; ` +
+        `one the finder graded blocker or high is answered "uncertain", and its reason says what you could not establish. ` +
+        `"uncertain" is never a substitute for a judgment you can make.\n\n` +
+        SEVERITY_RUBRIC + `\n` +
+        `For each finding you CONFIRM, also return \`severity\`, graded by this rubric against what you read, independent of the finder's bracketed grade.\n\n` +
         `Findings to judge:\n` +
         group
           .map((f) => `id=${f.id} [${f.severity}] ${f.ref} — ${f.claim} | impact: ${f.impact} | fix: ${f.fix}`)
@@ -824,7 +851,7 @@ const verdictResults = await boundedParallel(
         `\n\nDURABILITY — BEFORE you return, Write the exact JSON object you are about to return, plus two more fields ` +
         `"key":"${reviewKey}" and "batch":"${batchPrints[gi]}", to ${keyDir}/verify-${group[0].id}-${group[group.length - 1].id}.json, ` +
         `creating the directory if it is missing.${keyDirHow} Set path to that file's absolute, forward-slash path.` +
-        `\n\nReturn JSON {path, verdicts:[{id:<the integer id shown above>, verdict:"confirmed"|"refuted", reason, fixVerdict:"sound"|"unsound"|"none", fixNote}]}. ` +
+        `\n\nReturn JSON {path, verdicts:[{id:<the integer id shown above>, verdict:"confirmed"|"refuted"|"uncertain", reason, severity:"blocker"|"high"|"medium"|"low" (on a confirmed verdict), fixVerdict:"sound"|"unsound"|"none", fixNote}]}. ` +
         `Emit EXACTLY one verdict per finding above (${group.length} verdicts, ids ${group.map((f) => f.id).join(', ')}). ` +
         `Copy the integer id — do NOT re-type the file path, and do not renumber.`,
         { label: batchLabels[gi], phase: 'Verify', schema: VERDICT_SCHEMA },
@@ -879,14 +906,28 @@ function renderFixLine(f) {
   return `fix (NOT JUDGED - the finder's proposal only): ${f.fix}`
 }
 
+// TOOL-aSightedSkeptic-6 S5 - the BINDING grade: the skeptic's on a confirmed verdict when it is in
+// the closed set, else the finder's. Read at call time, so it is called only after the join above.
+function deriveBindingSeverity(f) {
+  const v = verdictById.get(f.id)
+  return v && v.verdict === 'confirmed' && SEVERITIES.indexOf(v.severity) !== -1 ? v.severity : f.severity
+}
+
 const confirmed = allFindings.filter((f) => verdictById.get(f.id)?.verdict === 'confirmed')
 const refuted = allFindings.filter((f) => verdictById.get(f.id)?.verdict === 'refuted')
-const unverified = allFindings.filter((f) => !verdictById.has(f.id))
-// precision is confirmed/(confirmed+refuted): an unjudged finding is not evidence either way.
+// TOOL-aSightedSkeptic-6 S8 - UNVERIFIED is every finding with neither a confirmed nor a refuted
+// verdict: those a skeptic answered `uncertain`, and those with no usable verdict at all. The two are
+// counted apart, so a run whose skeptics all answered never reads as one where none returned.
+const unverified = allFindings.filter((f) => ['confirmed', 'refuted'].indexOf(verdictById.get(f.id)?.verdict) === -1)
+const uncertainFindings = unverified.filter((f) => verdictById.get(f.id)?.verdict === 'uncertain')
+const noVerdict = unverified.filter((f) => verdictById.get(f.id)?.verdict !== 'uncertain')
+// precision is confirmed/(confirmed+refuted): an unjudged or uncertain finding is not evidence either way.
 const judged = confirmed.length + refuted.length
 const precision = judged ? confirmed.length / judged : 0
-if (unverified.length)
-  log(`WARNING: ${unverified.length} finding(s) came back with NO usable verdict — counted UNVERIFIED, not refuted: ids ${unverified.map((f) => f.id).join(', ')}`)
+if (uncertainFindings.length)
+  log(`WARNING: ${uncertainFindings.length} finding(s) answered UNCERTAIN by a skeptic — counted UNVERIFIED, neither confirmed nor refuted: ids ${uncertainFindings.map((f) => f.id).join(', ')}`)
+if (noVerdict.length)
+  log(`WARNING: ${noVerdict.length} finding(s) came back with NO usable verdict — counted UNVERIFIED, not refuted: ids ${noVerdict.map((f) => f.id).join(', ')}`)
 if (conflicts.size)
   log(`WARNING: ${conflicts.size} finding(s) got CONTRADICTORY verdicts — demoted to UNVERIFIED: ids ${[...conflicts].join(', ')}`)
 if (duplicates) log(`note: ${duplicates} repeat verdict(s) agreed with the standing one — idempotent.`)
@@ -902,10 +943,23 @@ for (const f of confirmed) {
 }
 if (unjudgedFixIds.length)
   log(`WARNING: ${unjudgedFixIds.length} confirmed finding(s) carry a fix no skeptic judged — ids ${unjudgedFixIds.join(', ')}`)
+// TOOL-aSightedSkeptic-6 S5 - UNGRADED (no legal skeptic grade, so the finder's binds) and RE-GRADED
+// (the skeptic's grade differs from the finder's, and binds). The finding's own `severity` stays the
+// finder's grade; deriveBindingSeverity is the only reader of the skeptic's.
+const ungradedIds = []
+const skepticRegradedIds = []
+for (const f of confirmed) {
+  if (SEVERITIES.indexOf(verdictById.get(f.id).severity) === -1) ungradedIds.push(f.id)
+  else if (deriveBindingSeverity(f) !== f.severity) skepticRegradedIds.push(f.id)
+}
+if (ungradedIds.length)
+  log(`WARNING: ${ungradedIds.length} confirmed finding(s) carry no skeptic grade — UNGRADED, bound at the finder's grade: ids ${ungradedIds.join(', ')}`)
+if (skepticRegradedIds.length)
+  log(`note: ${skepticRegradedIds.length} confirmed finding(s) RE-GRADED by the skeptic, whose grade binds: ids ${skepticRegradedIds.join(', ')}`)
 if (skepticsDead)
   log(`WARNING: ${skepticsDead}/${verdictResults.length} skeptic batch(es) died — verification is PARTIAL.`)
 log(
-  `confirmed ${confirmed.length} / refuted ${refuted.length} / unverified ${unverified.length} — precision ${precision.toFixed(2)}` +
+  `confirmed ${confirmed.length} / refuted ${refuted.length} / unverified ${unverified.length} (${uncertainFindings.length} uncertain) — precision ${precision.toFixed(2)}` +
     (judged === 0
       ? ' (NOTHING was judged — the number is a placeholder, not a result)'
       : precision < 0.5 ? ' (below 0.5 — tighten scope/priming next time, don\'t add agents)' : ''),
@@ -928,7 +982,7 @@ if (confirmed.length + unverified.length === 0) {
     // TOOL-dTieredTribunal-1 S3 - null, never 0. Every finding was refuted, which is a RESULT, but
     // no synthesis pass ran to adjudicate a blocker count, so there is none to report.
     confirmed: [], report: null, precision, root: repo, blockers: null, highs: null,
-    lensesRun: liveResults.length, lensesDead, skepticsDead, unverified: 0,
+    lensesRun: liveResults.length, lensesDead, skepticsDead, unverified: 0, uncertain: 0,
     conflicts: conflicts.size, duplicates, spurious, lensesReused: reusedLens.size, batchesReused,
     note: deferred
       ? `DEFERRED: every finding raised was refuted, but ${lensesDead}/${LENSES.length} lenses died — re-run with identical args to dispatch only ${pendingLabels.join(', ')}`
@@ -945,12 +999,12 @@ if (confirmed.length + unverified.length === 0) {
 if (pendingLabels.length) {
   log(`WARNING: ${pendingLabels.length} agent(s) did not return (${pendingLabels.join(', ')}) — DEFERRED, and no synthesis runs over a partial set. ` +
     `The ${confirmed.length} confirmed and ${unverified.length} unverified finding(s) so far:`)
-  for (const f of confirmed) log(`  CONFIRMED [${f.severity}] ${f.ref} - ${f.claim}`)
+  for (const f of confirmed) log(`  CONFIRMED [${deriveBindingSeverity(f)}] ${f.ref} - ${f.claim}`)
   for (const f of unverified) log(`  UNVERIFIED [${f.severity}] ${f.ref} - ${f.claim}`)
   return {
     exit: 'deferred-platform', key: reviewKey, pending: pendingLabels,
     root: repo, raw: allFindings.length, confirmed: confirmed.length, refuted: refuted.length,
-    unverified: unverified.length, conflicts: conflicts.size, duplicates, spurious, precision,
+    unverified: unverified.length, uncertain: uncertainFindings.length, conflicts: conflicts.size, duplicates, spurious, precision,
     lensesRun: liveResults.length, lensesDead, skepticsDead, lensesReused: reusedLens.size, batchesReused,
     report: null, summary: '', blockers: null, highs: null,
     note: `DEFERRED: ${lensesDead} lens(es) and ${skepticsDead} skeptic batch(es) did not return — re-run with identical args to dispatch only ${pendingLabels.join(', ')}`,
@@ -962,27 +1016,40 @@ if (pendingLabels.length) {
 phase('Synthesize')
 const synth = await agent(
   `Write the Tier-2 review report for: ${context}\n\n` +
-    `CONFIRMED findings (survived an adversarial skeptic):\n` +
+    // TOOL-aSightedSkeptic-6 S6 - the bracket is the BINDING grade, and both grades follow it when the
+    // skeptic's differs from the finder's.
+    `CONFIRMED findings (survived an adversarial skeptic; the bracketed grade is BINDING):\n` +
     (confirmed.length
       ? confirmed
-          .map(
-            (f) =>
-              `- id=${f.id} [${f.severity}] ${f.ref} — ${f.claim}\n  impact: ${f.impact}\n  ${renderFixLine(f)}\n  why-real: ${verdictById.get(f.id)?.reason || ''}`,
-          )
+          .map((f) => {
+            const g = deriveBindingSeverity(f)
+            const grades = g !== f.severity
+              ? ` (finder graded ${f.severity}, skeptic graded ${g})`
+              : ungradedIds.indexOf(f.id) !== -1 ? ` (no skeptic grade - the finder's binds)` : ''
+            return `- id=${f.id} [${g}]${grades} ${f.ref} — ${f.claim}\n  impact: ${f.impact}\n  ${renderFixLine(f)}\n  why-real: ${verdictById.get(f.id)?.reason || ''}`
+          })
           .join('\n')
       : '  (none)') +
-    `\n\nUNVERIFIED findings (no usable skeptic verdict came back — OUTSTANDING, not cleared; read the code yourself before classifying each):\n` +
+    // TOOL-aSightedSkeptic-6 S8 - each UNVERIFIED finding says which of the two kinds it is.
+    `\n\nUNVERIFIED findings (no confirmed or refuted verdict — OUTSTANDING, not cleared; read the code yourself before classifying each):\n` +
     (unverified.length
       ? unverified
-          .map((f) => `- id=${f.id} [${f.severity}] ${f.ref} — ${f.claim}\n  impact: ${f.impact}\n  fix: ${f.fix}`)
+          .map((f) => `- id=${f.id} [${f.severity}] ${f.ref} — ${f.claim}\n  impact: ${f.impact}\n  fix: ${f.fix}\n  ` +
+            (verdictById.get(f.id)?.verdict === 'uncertain'
+              ? `status: UNCERTAIN - the skeptic could not establish it: ${verdictById.get(f.id).reason || '(no reason given)'}`
+              : `status: NO USABLE VERDICT came back`))
           .join('\n')
       : '  (none)') +
+    `\n\n` + SEVERITY_RUBRIC + ` ` +
+    `Each CONFIRMED finding's bracketed grade is its BINDING grade under this rubric: put each confirmed id in an item ` +
+    `whose severity is that grade, merge findings of one binding grade only, and where you judge a different grade right, ` +
+    `write the reason in the report beside that finding.` +
     `\n\nWrite a markdown report (severity-ranked, blockers first, each with ${isSpec ? 'its file and section address' : 'file:line'} + fix + a left-shift gate suggestion) to a file under ${repo}/${reviewDir}. ` +
     // TOOL-aSightedSkeptic-2 S3 - a REJECTED fix never reaches the report as the fix.
     `Each CONFIRMED finding's fix line says whether a skeptic judged its fix. Where it is REJECTED, write the skeptic's ` +
     `corrected fix into the report, never the rejected one; where the note gives no correction, say the fix is still to be ` +
     `designed. Where it is NOT JUDGED, present it as the finder's proposal only. ` +
-    `State the review shape near the top — raw ${allFindings.length}, confirmed ${confirmed.length}, refuted ${refuted.length}, unverified ${unverified.length}, precision ${precision.toFixed(2)}. ` +
+    `State the review shape near the top — raw ${allFindings.length}, confirmed ${confirmed.length}, refuted ${refuted.length}, unverified ${unverified.length} (${uncertainFindings.length} uncertain), precision ${precision.toFixed(2)}. ` +
     // TOOL-aWeldedTribunal-4 — RUN INTEGRITY. This harness computes every counter below and logged
     // them to stdout, which is not the record; the AGENT writes the record, so a run whose lenses
     // half died wrote a durable report that could not say so. The two drift-audit siblings were
@@ -1004,6 +1071,10 @@ const synth = await agent(
     // TOOL-aSightedSkeptic-2 S4 - how many confirmed fixes a skeptic actually judged.
     `fixes on confirmed findings: ${fixCounts.sound} judged sound, ${fixCounts.unsound} judged UNSOUND, ` +
     `${fixCounts.none} none proposed, ${unjudgedFixIds.length} NOT JUDGED - an unjudged fix is the finder's proposal and nothing more; ` +
+    // TOOL-aSightedSkeptic-6 S5/S8 - the grades, and the two kinds of unverified finding, apart.
+    `severity on confirmed findings: ${ungradedIds.length} UNGRADED by the skeptic (bound at the finder's grade), ` +
+    `${skepticRegradedIds.length} RE-GRADED by the skeptic; ` +
+    `unverified findings: ${uncertainFindings.length} answered UNCERTAIN by a skeptic, ${noVerdict.length} with NO usable verdict; ` +
     (notedLenses.length
       ? `lens notes supplied for: ${notedLenses.join(', ')}.\n`
       : `lens notes: none supplied, so every lens ran on the kit's generic brief.\n`) +
@@ -1119,6 +1190,7 @@ const synth = await agent(
 let blockers = null
 let highs = null
 let tallyFault = ''
+const regraded = []
 if (synth) {
   const confirmedIds = new Set(confirmed.map((f) => f.id))
   const severityById = new Map()
@@ -1154,6 +1226,12 @@ if (synth) {
     log(`adjudicated BLOCKER/HIGH/MEDIUM/LOW — by item ${perItem.BLOCKER}/${perItem.HIGH}/${perItem.MEDIUM}/${perItem.LOW}, ` +
       `by raw confirmed finding ${perRaw.BLOCKER}/${perRaw.HIGH}/${perRaw.MEDIUM}/${perRaw.LOW}`)
   }
+  // TOOL-aSightedSkeptic-6 S7 - the counts above stay derived from the items (spec section 8 F2); a
+  // placement off the binding grade is reported, never a tally fault and never silently re-counted.
+  for (const f of confirmed)
+    if (severityById.has(f.id) && severityById.get(f.id) !== String(deriveBindingSeverity(f)).toUpperCase()) regraded.push(f.id)
+  if (regraded.length)
+    log(`WARNING: the synthesis placed ${regraded.length} confirmed finding(s) at a grade other than their binding one: ids ${regraded.join(', ')}`)
 }
 
 // TOOL-aBoundedVerdict-14 S6 - the SYNTH-DEATH hole. Lens deaths and skeptic deaths are both counted
@@ -1165,7 +1243,7 @@ if (synth) {
 if (!synth) {
   log(`WARNING: the synthesis agent DIED. No report was written, and the ${confirmed.length} confirmed finding(s) below are in this log and in ${keyDir}; a re-run with identical args dispatches only the synthesis:`)
   for (const f of confirmed)
-    log(`  CONFIRMED [${f.severity}] ${f.ref} - ${f.claim} | ${renderFixLine(f)}`)
+    log(`  CONFIRMED [${deriveBindingSeverity(f)}] ${f.ref} - ${f.claim} | ${renderFixLine(f)}`)
   for (const f of unverified) log(`  UNVERIFIED [${f.severity}] ${f.ref} - ${f.claim}`)
 }
 
@@ -1184,6 +1262,7 @@ return {
   confirmed: confirmed.length,
   refuted: refuted.length,
   unverified: unverified.length,
+  uncertain: uncertainFindings.length,
   conflicts: conflicts.size,
   duplicates,
   spurious,
@@ -1200,6 +1279,8 @@ return {
   // ids, and are null as well when that list does not place every confirmed id exactly once.
   blockers,
   highs,
+  // TOOL-aSightedSkeptic-6 S7 - absent where no synthesis ran, as no adjudicated count exists there.
+  ...(synth ? { regraded } : {}),
   // TOOL-dTieredTribunal-1, closing-review D1 - a dead synthesis was tested LAST, so it was
   // reportable only when nothing else was degraded and the most serious note was the least reachable
   // one. Worst outcome first. Found by the closing review of the build that ported this ternary into
@@ -1211,11 +1292,15 @@ return {
       ? `DEFERRED: the synthesis agent died, so NO report was written; ${confirmed.length} confirmed finding(s) are in the run log and on disk — re-run with identical args to dispatch only the synthesis`
       : tallyFault
         ? `UNVERIFIED: the report was written, but its item list does not place every confirmed finding exactly once (${tallyFault}), so blockers and highs are null`
-        : judged === 0
+        // TOOL-aSightedSkeptic-6 S8 - the uncertain count apart from the no-verdict count, so a run whose
+        // skeptics all answered never reads as one where none returned.
+        : judged === 0 && !uncertainFindings.length
           ? `UNVERIFIED: ${allFindings.length} finding(s) raised, none judged — no skeptic batch returned a usable verdict — the report lists them as outstanding`
-          : unverified.length
-            ? `PARTIAL: ${unverified.length} finding(s) came back with no usable verdict and are unverified`
-            : 'complete',
+          : judged === 0
+            ? `UNVERIFIED: ${allFindings.length} finding(s) raised, none confirmed or refuted — ${uncertainFindings.length} answered uncertain by a skeptic, ${noVerdict.length} with no usable verdict — the report lists them as outstanding`
+            : unverified.length
+              ? `PARTIAL: ${unverified.length} finding(s) are unverified — ${uncertainFindings.length} answered uncertain by a skeptic, ${noVerdict.length} with no usable verdict`
+              : 'complete',
   round,
   priorFindings: priorFindings.length,
 }

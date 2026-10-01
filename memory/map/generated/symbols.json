@@ -2653,6 +2653,16 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "deriveBindingSeverity",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "deriveBindingSeverity",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
+    },
+    {
       "id": "deriveChecklistShares",
       "kind": "function",
       "file": "tools/workflows/tier2-review.js"

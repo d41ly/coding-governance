@@ -79,7 +79,7 @@ ids TOOL-aSightedSkeptic-1 TOOL-aSightedSkeptic-2 TOOL-aSightedSkeptic-3 TOOL-aS
 | [TOOL-aSightedSkeptic-3 — finders and skeptics are handed intent: a `specs` argument, and the range's commit messages by default](spec/2026-10-01-spec-TOOL-aSightedSkeptic-3.md) | 3 | 2 | CLOSED | rev-1 | 2026-10-01 |
 | [TOOL-aSightedSkeptic-4 — a `checklist` argument whose classes are split across the lenses that run](spec/2026-10-01-spec-TOOL-aSightedSkeptic-4.md) | 4 | 2 | CLOSED | rev-1 | 2026-10-01 |
 | [TOOL-aSightedSkeptic-2 — the skeptic judges each finding's proposed fix as well as its claim](spec/2026-10-01-spec-TOOL-aSightedSkeptic-2.md) | 5 | 2 | CLOSED | rev-1 | 2026-10-01 |
-| [TOOL-aSightedSkeptic-6 — one severity rubric, a skeptic's binding grade, and an uncertain verdict](spec/2026-10-01-spec-TOOL-aSightedSkeptic-6.md) | 6 | 2 | SPECCED | rev-1 | 2026-10-01 |
+| [TOOL-aSightedSkeptic-6 — one severity rubric, a skeptic's binding grade, and an uncertain verdict](spec/2026-10-01-spec-TOOL-aSightedSkeptic-6.md) | 6 | 2 | CLOSED | rev-1 | 2026-10-01 |
 | [TOOL-aSightedSkeptic-7 — an intensity argument whose light setting announces the lenses it skips](spec/2026-10-01-spec-TOOL-aSightedSkeptic-7.md) | 7 | 2 | SPECCED | rev-1 | 2026-10-01 |
 | [TOOL-aSightedSkeptic-8 — every finding keeps its lens, a findings ledger lands beside the report, and the confirmed set is returned](spec/2026-10-01-spec-TOOL-aSightedSkeptic-8.md) | 8 | 2 | SPECCED | rev-1 | 2026-10-01 |
 | [TOOL-aSightedSkeptic-9 — the replay benchmark: a review scored for recall against a past round](spec/2026-10-01-spec-TOOL-aSightedSkeptic-9.md) | 9 | 2 | SPECCED | rev-1 | 2026-10-01 |
