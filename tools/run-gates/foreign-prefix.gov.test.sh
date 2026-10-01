@@ -136,7 +136,8 @@ G="$TMPD/g"
 HEADSHA=$(git -C "$ROOT" rev-parse HEAD) || exit 2
 git clone -q --no-hardlinks "$ROOT" "$G" || { echo "foreign-prefix: could not clone $ROOT"; exit 2; }
 cd "$G" || exit 2
-git -c advice.detachedHead=false checkout -q --detach "$HEADSHA" || { echo "foreign-prefix: the clone cannot check out HEAD $HEADSHA"; exit 2; }
+# A named branch, not a detached HEAD: govkit's self-test pins a vintage some ref contains.
+git checkout -q -B foreign-prefix "$HEADSHA" || { echo "foreign-prefix: the clone cannot check out HEAD $HEADSHA"; exit 2; }
 git config user.email foreign-prefix@gov.test; git config user.name foreign-prefix
 BASE=$HEADSHA
 echo "foreign-prefix: clone of ${HEADSHA:0:8} at $G, tool root '$TROOT', pool width $WIDTH${FILTER:+, rows matching '$FILTER'}"
