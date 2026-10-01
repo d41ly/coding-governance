@@ -10,8 +10,8 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 
 ## Run facts
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 9fdd0c18d5afac1744c226c3e8ea2716e6d49e30
-phase: RUNNING
+witness: 54774e91c02ae489dd9336aa88292acfc3b1d3b6
+phase: SPECCING
 branch-sha: 9fdd0c18d5afac1744c226c3e8ea2716e6d49e30
 branch-ref: refs/heads/run/aSightedSkeptic
 may: none
