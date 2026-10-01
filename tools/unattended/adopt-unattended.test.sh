@@ -577,7 +577,9 @@ H7="$TMP/flatmt"; seed "$H7"
 printf '# a stub checklist\n' > "$H7/${TR_T}gotchas.py" && ( cd "$H7" && git add -- "${TR_T}gotchas.py" )
 out=$( cd "$H7" && bash "$KIT_REL"/adopt-unattended.sh 2>&1 ); rc=$?
 same "arm 7 a flat memory-tree adopts" "$rc" "0"
-hit "$(cat "$H7/.claude/skills/unattended/SKILL.md")" "python ${TR_T}gotchas.py --for-diff HEAD~1..HEAD"
+# At a root install the flat checklist's directory is `.`, which the adopter renders as `./`
+# (VERIFYING repair: an empty head left nothing to tell the flat render from a bare word).
+hit "$(cat "$H7/.claude/skills/unattended/SKILL.md")" "python ${TR_T:-./}gotchas.py --for-diff HEAD~1..HEAD"
 same "arm 7 the flat Skill names no nested checklist path" \
   "$(grep -c "${ROOTPFX}${MT_KIT}/gotchas.py" "$H7/.claude/skills/unattended/SKILL.md" || true)" "0"   # the nested spelling the flat render must NOT contain
 ( cd "$H7" && bash "$KIT_REL"/adopt-unattended.sh --check >/dev/null 2>&1 )

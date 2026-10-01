@@ -181,7 +181,9 @@ echo "== 7. the adopter derives its own prefix — no gov path is spelled in it 
 grep -qE '^\s*KITDIR=\$\(cd "\$\(dirname "\$0"\)" && pwd\)' "$ADOPT" \
   && ok "the kit dir is derived from the script's own location" \
   || nope "the adopter does not derive its kit dir"
-grep -q ''"${PFX}run-gates"'' "$ADOPT" \
+# ANY path head before the kit's own directory, not this install's: at a root install `${PFX}` is
+# empty and the old predicate matched every bare mention of the kit (VERIFYING repair).
+grep -qE '[A-Za-z0-9_.-]/'"${KIT}"'/' "$ADOPT" \
   && nope "the adopter SPELLS a gov install prefix, which lands a dead path in an adopter's tree" \
   || ok "the adopter spells no install prefix"
 
