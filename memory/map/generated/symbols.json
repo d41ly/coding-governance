@@ -6243,6 +6243,16 @@
       "file": "tools/unattended/gate-guard.js"
     },
     {
+      "id": "renderIntent",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "renderIntent",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
+    },
+    {
       "id": "renderLexedView",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"

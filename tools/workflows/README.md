@@ -149,6 +149,24 @@ announced: a `WARNING:` log line, and a clause in the report's RUN INTEGRITY blo
 review-shape literal both join the review key, so a lens file written by older prompts or under
 other notes is never reused. An adopter test that counted four diff lenses sees five from 1.17.
 
+`specs` names the documents that say what the change was for, so the lenses review against intent
+rather than against the code alone:
+
+```js
+args: { repo, base, head, reviewDir,
+        specs: ['memory/builds/<slug>/spec/<date>-spec-<unit>.md'] }
+```
+
+Every finder and skeptic prompt then opens with an `INTENT` block that lists them, and, on a diff
+review, always names the range's commit log, `git log --format=%B <base>..<head>` over the resolved
+shas. With no `specs` that log is the statement of intent. On a spec audit `specs` is sibling context
+the subjects must agree with, never reported against, and naming a subject there refuses. Each member
+must be a non-empty repo-relative path: no backslash, no leading `/`, no drive letter and no `..`
+segment, or the run refuses before any agent spawns. The harness cannot check that a listed document
+exists; the lens that reads it reports a missing one. A run given neither `specs` nor `context` logs a
+`WARNING:`, and every report's RUN INTEGRITY block says where intent came from. `specs` joins the
+review key, like `lensNotes`.
+
 ## `orient-counterfactual.js` — one stage-2 arm per call
 
 The stage-2 `orient` subagent is deferred behind a measurement: whether moving a kickoff's

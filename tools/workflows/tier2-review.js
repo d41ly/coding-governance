@@ -79,6 +79,8 @@ function buildKeyedSchema(schema, extra) {
 //   subjects: [{ path, blob }],           // spec-audit ONLY; blob is 7-40 hex, per subject
 //   round: <integer>,                     // inferred as 2 when priorFindings arrive without one
 //   priorFindings: [ ... ],               // a previous round's confirmed set
+//   specs: ["<repo-relative path>", ...], // intent documents: a diff review's statement of intent, a spec audit's
+//                                         // sibling context; absent -> [], and with no context a WARNING
 //   lensNotes: { "<lens key>": "<note>" } } // project addendum per lens of THIS kind; absent -> {} and a WARNING
 // D9 - `kind` and `subjects` were added without extending this block, and BUILD-METHOD M4 sends a
 // reader HERE for the spec-audit spelling. An absent `kind` does not refuse - it defaults - so a
@@ -207,6 +209,24 @@ if (isSpec) {
     log('WARNING: ' + why)
   }
 }
+// TOOL-aSightedSkeptic-3 S1/S3 - `specs`, the intent documents the caller names. Validated here,
+// before the base-shape ladder and the first agent, so a bad value refuses in milliseconds. A path
+// reaches a prompt as text an agent then reads, so anything that could point a reviewer outside the
+// repository - absolute, drive-lettered, backslashed or `..` - is refused rather than normalized.
+// The offender is an INDEX, never a value: `''` is one of the values refused (the D6 class above).
+const SPECS = a.specs === undefined ? [] : a.specs
+const specsRule = 'an array of repo-relative paths, each a non-empty string with no backslash, no leading /, no drive letter and no .. segment'
+if (!Array.isArray(SPECS))
+  throw new Error('tier2-review: `specs` must be ' + specsRule + '. Got ' + JSON.stringify(a.specs) + ', which is not an array.')
+const specsBadIdx = SPECS.findIndex(
+  (s) => typeof s !== 'string' || !s || s.indexOf('\\') !== -1 || s[0] === '/' || /^[A-Za-z]:/.test(s) || s.split('/').indexOf('..') !== -1
+)
+if (specsBadIdx !== -1)
+  throw new Error('tier2-review: `specs` must be ' + specsRule + '. Member ' + specsBadIdx + ' is ' + JSON.stringify(SPECS[specsBadIdx]) + '.')
+// S3 - on a spec audit `specs` is sibling context, NOT under audit, so one document cannot be both.
+const specsOverlap = isSpec ? SPECS.find((p) => subjects.some((x) => x && x.path === p)) : undefined
+if (specsOverlap !== undefined)
+  throw new Error('tier2-review: `specs` names ' + JSON.stringify(specsOverlap) + ', which is also a subject of this spec audit; a document cannot be both under audit and sibling context to it.')
 const baseLooksPinned = isSpec || PINNED_SHA.test(String(base))
 if (!baseLooksPinned) {
   const why =
@@ -416,6 +436,13 @@ if (lensNotesBad) {
 const notedLenses = Object.keys(lensNotes)
 if (!notedLenses.length)
   log('WARNING: no `lensNotes` supplied — every lens runs on the kit\'s generic brief, with no project addendum')
+// TOOL-aSightedSkeptic-3 S4 - a run told nothing about what its subject is FOR is announced, on both
+// kinds: here before the first agent, and in the synthesis's RUN INTEGRITY block on every run.
+const intentAbsent = !a.context && !SPECS.length
+if (intentAbsent)
+  log('WARNING: neither `specs` nor `context` was supplied — the lenses were told nothing about what this ' +
+    (isSpec ? 'spec set' : 'change') + ' is for' + (isSpec ? '' : ', beyond the range\'s commit messages') +
+    '; pass the intent documents as `specs` or describe the change in `context`')
 
 // ---- TOOL-dDerivedDocket-29 S2/S3 — THE RESUME PROBE, one agent, before the Find phase ----------
 // WHY ONE AGENT. The script has no filesystem, so something with one has to read the key directory.
@@ -427,7 +454,7 @@ if (!notedLenses.length)
 // through the skeptics.
 //
 // THE KEY: kind, round, the pinned subject, and a fingerprint over `context`, `byDesign`,
-// `priorFindings`, `lensNotes` and the REVIEW_SHAPE literal - every input a lens prompt interpolates,
+// `priorFindings`, `lensNotes`, `specs` and the REVIEW_SHAPE literal - every input a lens prompt interpolates,
 // and the prompts' own shape, except `repo`, which is left out on
 // purpose: the common dir is shared by every worktree on the node, and a take-over from another
 // worktree of the same commits is exactly the re-run this exists for. A spec audit's subject is every
@@ -441,7 +468,8 @@ if (!notedLenses.length)
 // lens set moves this literal again. It rides the print rather than the key's string, so the probe
 // prompt's hand-spelled directory follows without a second edit.
 const REVIEW_SHAPE = 'lenses5-r1'
-const inputPrint = deriveFnv1a(renderCanonical({ shape: REVIEW_SHAPE, context: context, byDesign: byDesign, priorFindings: priorFindings, lensNotes: lensNotes }))
+// TOOL-aSightedSkeptic-3 S5 - `specs` is interpolated by renderIntent(), so it joins the print too.
+const inputPrint = deriveFnv1a(renderCanonical({ shape: REVIEW_SHAPE, context: context, byDesign: byDesign, priorFindings: priorFindings, lensNotes: lensNotes, specs: SPECS }))
 const specSubject = isSpec
   ? deriveFnv1a(subjects.map((x) => (x && typeof x === 'object' ? `${x.path}@${x.blob}` : String(x))).join('\n'))
   : ''
@@ -533,6 +561,27 @@ for (const L of LENSES) {
 // was told "by-design" refutes without being shown what is. Read at CALL time: the subject line
 // needs the shas the resume probe resolved. Two lines are worded by role, and a diff skeptic gets
 // one more, SCOPE; a spec audit has no range, so nothing in it is older than the review (spec F2).
+// TOOL-aSightedSkeptic-3 S2/S3 - THE INTENT BLOCK, inside the brief so finders and skeptics share it.
+// The diff kind ALWAYS names the range's commit log over the RESOLVED shas (two dots: `log a..b`
+// lists the commits `diff a...b` introduces), with or without `specs` (spec F2). The harness has no
+// filesystem, so a listed document that is missing is the lens's to report. A spec audit has no
+// range: its `specs` are sibling context, read for agreement and never reported against.
+function renderIntent() {
+  const listed = SPECS.map((p) => `  - ${p}`).join('\n')
+  if (isSpec)
+    return SPECS.length
+      ? `SIBLING CONTEXT — documents NOT under audit, named by the caller as what the subjects must agree with. Read them for agreement and report nothing against them:\n${listed}`
+      : `SIBLING CONTEXT — none supplied; the subjects are their own statement of intent.`
+  return `INTENT — what this change was meant to do.\n` +
+    (SPECS.length
+      ? `The caller named these documents as its statement of intent:\n${listed}\n` +
+        `Read the ones your lens or your finding touches; the intent lens reads every one WHOLE before it reads the diff. ` +
+        `A listed document that does not exist in ${repo} is itself a finding against its path.\n`
+      : '') +
+    `Read the range's commit messages, \`git -C ${repo} log --format=%B ${baseSha}..${headSha}\`, and any spec or design document the diff touches or those messages name.` +
+    (SPECS.length ? '' : ' No spec was supplied, so these are the statement of intent.')
+}
+
 function renderBrief(role) {
   const skeptic = role === 'skeptic'
   const lines = [
@@ -541,6 +590,7 @@ function renderBrief(role) {
       ? `SUBJECT: the spec set, each file at its pinned blob:\n` + subjects.map((x) => `  - ${x.path}  blob ${x.blob}`).join('\n')
       : `SUBJECT: the diff \`${diffCmd}\`.`,
     `CONTEXT: ${context}`,
+    renderIntent(),
     `REVIEW ROUND: ${round}${round > 1 ? (isSpec ? ' - this is a FOLD review. Aim at the text the previous round\'s fixes introduced, which is the only text in these documents nobody has reviewed.' : ' - this is a FOLD review. The diff above is what the previous round\'s fixes introduced, not the whole build.') : ''}`,
   ]
   if (skeptic && !isSpec)
@@ -832,6 +882,12 @@ const synth = await agent(
     (notedLenses.length
       ? `lens notes supplied for: ${notedLenses.join(', ')}.\n`
       : `lens notes: none supplied, so every lens ran on the kit's generic brief.\n`) +
+    // TOOL-aSightedSkeptic-3 S4 - where intent came from, stated on EVERY run.
+    (SPECS.length
+      ? `Intent: ${SPECS.length} spec document(s) supplied as \`specs\`${isSpec ? ', as sibling context' : ', beside the range\'s commit messages'}.\n`
+      : a.context
+        ? `Intent: no spec was supplied; \`context\` was the caller's statement${isSpec ? '' : ', beside the range\'s commit messages'}.\n`
+        : `Intent: NEITHER \`specs\` nor \`context\` was supplied${isSpec ? '' : ', so the lenses had only the range\'s commit messages'} - the report must say so.\n`) +
     `If lenses died, the finding set is INCOMPLETE and a zero count is not evidence of absence. ` +
     `Say so where you would otherwise call a zero positive evidence.\n\n` +
     // The range line is what the unattended kit's `closing-review-recorded` joins on, so the value

@@ -279,6 +279,7 @@ async function runWholeScriptArms() {
     ['another byDesign', Object.assign({}, DIFF, { byDesign: 'bd2' }), null],
     ['another priorFindings', Object.assign({}, DIFF, { priorFindings: [{ ref: 'a:1', claim: 'c' }] }), null],
     ['another lensNotes', Object.assign({}, DIFF, { lensNotes: { security: 'n2' } }), null],
+    ['another specs', Object.assign({}, DIFF, { specs: ['x.md'] }), null],
   ]
   for (const [what, args, probe] of variants) {
     const own = await runReview(args, buildStubs(probe ? { 'resume:probe': probe } : {}))
@@ -468,6 +469,58 @@ async function runWholeScriptArms() {
     ck(ff.length === 5 && ff.every((t) => t.prompt.indexOf('PRIOR-MARK') !== -1 && t.prompt.indexOf('Judge the FIX') !== -1),
       'a fold-round skeptic is shown the prior round\'s findings: ...and every find: prompt still carries PRIOR-MARK and Judge the FIX')
   }
+
+  // ==== TOOL-aSightedSkeptic-3 — `specs`, and the range's commit messages, reach every reader ========
+  // Every arm is RED against the parent render, which reads no `specs` and names no commit log.
+  // ---- AC1: both paths and the INTENT block in every finder AND skeptic prompt.
+  r = await runReview(Object.assign({}, DIFF, { specs: ['a.md', 'b.md'] }), ALL_OK)
+  if (checkNoThrow(r, 'specs reach every prompt')) {
+    const ip = scanPrompts(r, 'find:').concat(scanPrompts(r, 'verify:'))
+    ck(ip.length === 10 && ip.every((t) => t.prompt.indexOf('INTENT') !== -1 && t.prompt.indexOf('  - a.md') !== -1 && t.prompt.indexOf('  - b.md') !== -1),
+      'specs reach every finder and skeptic prompt: ' + ip.length + ' prompts')
+  }
+  // ---- AC2: no specs - the commit log over the RESOLVED shas. The base is handed as an abbreviation
+  // ---- and the head as a ref, so a command built from the refs as given cannot match.
+  r = await runReview(Object.assign({}, DIFF, { base: 'bbbbbbb', head: 'HEAD' }), ALL_OK)
+  if (checkNoThrow(r, 'commit log default')) {
+    const lf = scanPrompts(r, 'find:')
+    ck(lf.length === 5 && lf.every((t) => t.prompt.indexOf('log --format=%B ' + B + '..' + H) !== -1 && t.prompt.indexOf('these are the statement of intent') !== -1),
+      'no specs: every diff finder is handed the commit log over the resolved shas')
+  }
+  // ---- AC3: neither context nor specs is announced twice; the control supplies specs.
+  const NOCTX = Object.assign({}, DIFF)
+  delete NOCTX.context
+  r = await runReview(NOCTX, ALL_OK)
+  if (checkNoThrow(r, 'no intent')) {
+    const sp = r.trace.find((t) => t.label === 'synth')
+    const ri = sp ? sp.prompt.slice(sp.prompt.indexOf('RUN INTEGRITY')) : ''
+    ck(r.logs.some((l) => l.indexOf('WARNING:') === 0 && l.indexOf('`specs`') !== -1 && l.indexOf('`context`') !== -1) && /Intent: NEITHER/.test(ri),
+      'no specs and no context: announced in the log and RUN INTEGRITY')
+  }
+  r = await runReview(Object.assign({}, NOCTX, { specs: ['a.md', 'b.md'] }), ALL_OK)
+  if (checkNoThrow(r, 'intent supplied')) {
+    const sp = r.trace.find((t) => t.label === 'synth')
+    ck(!r.logs.some((l) => l.indexOf('WARNING:') === 0 && l.indexOf('`specs`') !== -1) && !!sp && sp.prompt.indexOf('Intent: 2 spec document(s)') !== -1,
+      'specs supplied: no intent warning, and RUN INTEGRITY counts the two documents')
+  }
+  // ---- AC4: each malformed value refuses before any agent, naming the field.
+  const refusedSpecs = [['not an array', 'a.md'], ['a non-string member', [7]], ['an empty member', ['']], ['a leading slash', ['/abs.md']],
+    ['a drive letter', ['C:/x.md']], ['a .. segment', ['a/../b.md']], ['a backslash', ['a\\b.md']], ['null', null]]
+  for (const [what, v] of refusedSpecs) {
+    r = await runReview(Object.assign({}, DIFF, { specs: v }), ALL_OK)
+    ck(typeof r.threw === 'string' && r.threw.indexOf('`specs`') !== -1 && r.trace.length === 0,
+      'specs refused before any agent: ' + what + (r.threw ? '' : ' (accepted)'))
+  }
+  // ---- AC5: on a spec audit, `specs` is sibling context and may not name a subject.
+  r = await runReview(Object.assign({}, SPEC, { specs: ['s.md'] }), ALL_OK)
+  ck(typeof r.threw === 'string' && r.threw.indexOf('`specs`') !== -1 && r.trace.length === 0,
+    'spec-audit: a spec that is also a subject is refused')
+  r = await runReview(Object.assign({}, SPEC, { specs: ['overview.md'] }), ALL_OK)
+  if (checkNoThrow(r, 'spec sibling context')) {
+    const sf = scanPrompts(r, 'find:')
+    ck(sf.length === 4 && sf.every((t) => t.prompt.indexOf('SIBLING CONTEXT') !== -1 && t.prompt.indexOf('  - overview.md') !== -1 && t.prompt.indexOf('log --format=%B') === -1),
+      'spec-audit: specs render as sibling context')
+  }
 }
 
 runWholeScriptArms().then(() => {
@@ -495,7 +548,10 @@ printf '%s\n' "$out"
 # RAISED 77 -> 84 by TOOL-aSightedSkeptic-1: 7 assertions, counted off the block — the briefed skeptic
 # (1), the shared brief on a diff and a spec run (2), the pre-existing rule (1), the spec skeptic's
 # subjects (1) and the fold round, skeptic and finder halves (2).
-FLOOR_ASSERTIONS=84
+# RAISED 84 -> 100 by TOOL-aSightedSkeptic-3: 16 assertions, counted off the block — the specs key
+# component's AC3 pair (2), specs in every prompt (1), the commit-log default (1), the announced
+# absence and its control (2), eight refused values (8) and the spec-audit overlap and sibling arms (2).
+FLOOR_ASSERTIONS=100
 executed=$(printf '%s\n' "$out" | sed -n 's/^---- \([0-9][0-9]*\) passed.*/\1/p' | tail -1)
 if [ -z "$executed" ]; then
   echo "FAIL the runner printed no assertion count at all — it died before its summary line"
