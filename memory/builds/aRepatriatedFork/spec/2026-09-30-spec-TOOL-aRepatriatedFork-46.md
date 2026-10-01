@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-46 — no line joins a literal kit name under a derived base
 
-**Status:** CLOSED · rev-6 · 2026-10-01 · node a · Tier-2 · base 6830f257 · streams tooling · order 16 · ratified 2026-09-30
+**Status:** CLOSED · rev-7 · 2026-10-01 · node a · Tier-2 · base 6830f257 · streams tooling · order 16 · ratified 2026-09-30
 
 <!-- gen:spec-records -->
 
@@ -366,6 +366,10 @@ New arm: `tools/workflows/check-verifier-fanout.test.sh` · rev-4: `--print-cap`
   token, as gov's does. The gate's own kit derivation at a root install, which cannot tell a kit
   directory from `.claude/` or `skills/`, is a design question recorded in the VERIFYING repair
   record, not repaired here.
+- rev-7 · 2026-10-01 · S4: gate repair at VERIFYING, leg `corpus-ids selftest`, red at gov's own
+  prefix as well as at `scripts/`. S4 moved the not-installed refusal onto `GRAMMAR_WHERE`, and the
+  self-test's `_under_grammar_dir` still swapped only `GRAMMAR_DIR`, so the `nowhere` arms read the
+  real kit's path. The helper swaps and restores both.
 
 ## 10. Reuse audit
 

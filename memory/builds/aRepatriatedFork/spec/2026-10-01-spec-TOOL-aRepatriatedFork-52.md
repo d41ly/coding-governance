@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-52 — the foreign-prefix leg asks only the prefix question
 
-**Status:** CLOSED · rev-3 · 2026-10-01 · node a · Tier-2 · base 56c7befa · streams tooling · order 25
+**Status:** CLOSED · rev-4 · 2026-10-01 · node a · Tier-2 · base 56c7befa · streams tooling · order 25
 
 <!-- gen:spec-records -->
 
@@ -250,6 +250,9 @@ New arm: `tools/lib/lib-selftest.test.sh` · a harness suite run with the probe 
   engine is declared whole with that reason, since a probe site there is an adopter-facing surface.
 - rev-3 · 2026-10-01 · S1: a suite sharded into several population rows carries one site per
   shard, because a row runs only its own shard and a single site would probe one row of eight.
+- rev-4 · 2026-10-01 · S4: the clone sits on a named branch rather than a detached HEAD, because
+  the govkit self-test pins a vintage some ref contains, and AC10's run redded that row at
+  `scripts/` with every move commit reachable from no ref.
 
 ## 10. Reuse audit
 

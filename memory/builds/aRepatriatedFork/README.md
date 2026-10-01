@@ -174,7 +174,7 @@ ids TOOL-aRepatriatedFork-54
 | [TOOL-aRepatriatedFork-28 — every suite builds its fixtures at a prefix it derives](spec/2026-09-25-spec-TOOL-aRepatriatedFork-28.md) | 14 | 2 | CLOSED | rev-7 | 2026-10-01 |
 | [TOOL-aRepatriatedFork-45 — a renamed-away filename is a dead-path needle](spec/2026-09-30-spec-TOOL-aRepatriatedFork-45.md) | 15 | 1 | CLOSED | rev-2 | 2026-09-30 |
 | [TOOL-aRepatriatedFork-31 — gov's shipped files carry no adopter name](spec/2026-09-25-spec-TOOL-aRepatriatedFork-31.md) | 16 | 1 | CLOSED | rev-2 | 2026-09-25 |
-| [TOOL-aRepatriatedFork-46 — no line joins a literal kit name under a derived base](spec/2026-09-30-spec-TOOL-aRepatriatedFork-46.md) | 16 | 2 | CLOSED | rev-6 | 2026-10-01 |
+| [TOOL-aRepatriatedFork-46 — no line joins a literal kit name under a derived base](spec/2026-09-30-spec-TOOL-aRepatriatedFork-46.md) | 16 | 2 | CLOSED | rev-7 | 2026-10-01 |
 | [TOOL-aRepatriatedFork-32 — every branch of hygiene check 21 honours `RECORD_SERVES_CUTOFF`](spec/2026-09-25-spec-TOOL-aRepatriatedFork-32.md) | 17 | 1 | CLOSED | rev-3 | 2026-09-26 |
 | [TOOL-aRepatriatedFork-47 — every copy of the `{prefix}` resolution gives one answer](spec/2026-09-30-spec-TOOL-aRepatriatedFork-47.md) | 17 | 1 | CLOSED | rev-1 | 2026-09-30 |
 | [TOOL-aRepatriatedFork-30 — the suites run at a foreign prefix, and the install-prefix gate is a pure ban](spec/2026-09-25-spec-TOOL-aRepatriatedFork-30.md) | 18 | 2 | CLOSED | rev-8 | 2026-10-01 |
@@ -191,7 +191,7 @@ ids TOOL-aRepatriatedFork-54
 | [TOOL-aRepatriatedFork-51 — brief-recorded takes a declared waiver registry, as pass-order does](spec/2026-10-01-spec-TOOL-aRepatriatedFork-51.md) | 22 | 1 | CLOSED | rev-1 | 2026-10-01 |
 | [TOOL-aRepatriatedFork-53 — every background task a run starts carries a heartbeat the audit reads](spec/2026-10-01-spec-TOOL-aRepatriatedFork-53.md) | 23 | 2 | CLOSED | rev-2 | 2026-10-01 |
 | [TOOL-aRepatriatedFork-54 — two gov gates grade a repo-root install correctly](spec/2026-10-01-spec-TOOL-aRepatriatedFork-54.md) | 24 | 1 | CLOSED | rev-2 | 2026-10-01 |
-| [TOOL-aRepatriatedFork-52 — the foreign-prefix leg asks only the prefix question](spec/2026-10-01-spec-TOOL-aRepatriatedFork-52.md) | 25 | 2 | CLOSED | rev-3 | 2026-10-01 |
+| [TOOL-aRepatriatedFork-52 — the foreign-prefix leg asks only the prefix question](spec/2026-10-01-spec-TOOL-aRepatriatedFork-52.md) | 25 | 2 | CLOSED | rev-4 | 2026-10-01 |
 <!-- /gen:build-units -->
 
 Records: 118 bound to this build, across 4 record folder(s).
