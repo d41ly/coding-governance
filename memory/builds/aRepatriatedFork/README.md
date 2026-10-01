@@ -187,7 +187,7 @@ ids TOOL-aRepatriatedFork-43 TOOL-aRepatriatedFork-44 TOOL-aRepatriatedFork-45 T
 | [TOOL-aRepatriatedFork-51 — brief-recorded takes a declared waiver registry, as pass-order does](spec/2026-10-01-spec-TOOL-aRepatriatedFork-51.md) | 22 | 1 | CLOSED | rev-1 | 2026-10-01 |
 <!-- /gen:build-units -->
 
-Records: 110 bound to this build, across 4 record folder(s).
+Records: 111 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
