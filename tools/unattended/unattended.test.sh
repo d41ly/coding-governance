@@ -10967,6 +10967,12 @@ hit  "$(cat "$ih_dir/memory/builds/tRun/BACKLOG.md")" " · seen \`fx/x.sh\`@${IH
 hit  "$(cat "$ih_dir/memory/builds/tRun/BACKLOG.md")" "- SEV · ARCH-tRun-2 · HIGH · a merge-bar leg is red on the default branch"
 hit  "$(tail -1 "$ih_out/asks-calls.txt")" "--tsv --ready ARCH-tRun-2 --target tRun"
 miss "$(tail -1 "$ih_out/asks-calls.txt")" "--at"
+# TOOL-dMendedRecall-2 S4: this fixture holds no generator where the resolver looks, because the
+# driver runs from a kit outside it, so the views are NAMED as not re-rendered, the repair rides the
+# line, and the MET verdict above stands. Which of the two `why`s prints depends on whether this
+# install holds a memory-tree kit at all, so the arm reads the head they share and the repair.
+hit  "$out" "gates-green: the 1 filed ask(s) are staged, but the generated views were not re-rendered: "
+hit  "$out" "; until they are, a records commit meets a stale index — repair: the --write mode of "
 build_ih_policy "$IH_LAND"; write_ih_asks
 out=$(IH_ASK_EMPTY=1 run_ih --close tRun $IHOVR)
 hit  "$out" "gates-green: the rows for leg x leg were REMOVED — the declared ask generator did not read ARCH-tRun-2 back as one OPEN HIGH ask homed at tRun"
@@ -11003,6 +11009,10 @@ slice_fn write_inherited_asks; slice_fn write_backlog_rows
 read_leg_argv() { printf 'bash x.sh'; }
 derive_ask_seq() { printf '2'; }
 read_ask_back() { AB_WHY="the double reads nothing back"; [ "${F4_READBACK:-no}" = yes ]; }
+# TOOL-dMendedRecall-2 S1: the fourth neighbour, the views helper, doubled to a line naming the count
+# it was handed. Called only when the filer FILED, and with how many: a call on a rolled-back or
+# refused leg would render views for rows that are not there.
+write_ask_views() { echo "f4-views-double: $1 filed"; }
 run_f4_filer() { # temp store -> the sliced filer's output over the arm's repository; F4_CP_FAILS=backup|restore fails that copy
   local M=memory ASKS_CMD="bash asks.sh" RB_OUT=""
   local -x TMPDIR="$1" F4_BL="memory/builds/tRun/BACKLOG.md" F4_CP_FAILS="${F4_CP_FAILS:-}" F4_REAL_CP
@@ -11020,12 +11030,14 @@ same "F4 ...and staged nothing" "$(git -C "$f4_dir" status --porcelain)" ""
 seed_f4_tree
 out=$(F4_CP_FAILS=backup run_f4_filer "$TMP")
 hit  "$out" "memory/builds/tRun/BACKLOG.md could not be backed up before the write"
+miss "$out" "f4-views-double"
 n=$((n+1)); cmp -s "$f4_dir/memory/builds/tRun/BACKLOG.md" "$TMP/f4-authored.md" \
   || { echo "FAIL F4 a backup copy that failed let the restore overwrite the authored BACKLOG.md"; st=1; }
 same "F4 ...and staged nothing" "$(git -C "$f4_dir" status --porcelain)" ""
 seed_f4_tree
 out=$(run_f4_filer "$TMP")
 hit  "$out" "gates-green: the rows for leg x leg were REMOVED — the declared ask generator did not read ARCH-tRun-2 back"
+miss "$out" "f4-views-double"
 n=$((n+1)); cmp -s "$f4_dir/memory/builds/tRun/BACKLOG.md" "$TMP/f4-authored.md" \
   || { echo "FAIL F4 control: a proven backup did not restore the authored BACKLOG.md byte for byte"; st=1; }
 same "F4 control: the restored file stages back to HEAD" "$(git -C "$f4_dir" status --porcelain)" ""
@@ -11035,6 +11047,7 @@ seed_f4_tree
 out=$(F4_CP_FAILS=restore run_f4_filer "$TMP")
 hit  "$out" "gates-green: the rows for leg x leg could NOT be removed — memory/builds/tRun/BACKLOG.md was not put back from its backup, which is KEPT at "
 miss "$out" "were REMOVED"
+miss "$out" "f4-views-double"
 f4_kept=$(printf '%s\n' "$out" | sed -n 's/.*which is KEPT at \(.*\); restore it by hand.*/\1/p')
 n=$((n+1)); { [ -n "$f4_kept" ] && cmp -s "$f4_kept" "$TMP/f4-authored.md"; } \
   || { echo "FAIL F4 a restore that failed kept no backup byte-identical to the authored BACKLOG.md: [$f4_kept]"; st=1; }
@@ -11042,9 +11055,11 @@ n=$((n+1)); { [ -n "$f4_kept" ] && cmp -s "$f4_kept" "$TMP/f4-authored.md"; } \
 seed_f4_tree
 out=$(F4_READBACK=yes run_f4_filer "$TMP")
 hit  "$out" "gates-green: filed ask ARCH-tRun-2 for leg x leg red at"
+hit  "$out" "f4-views-double: 1 filed"
+same "F4 the views helper is called once per filing call" "$(printf '%s\n' "$out" | grep -c 'f4-views-double')" "1"
 hit  "$(cat "$f4_dir/memory/builds/tRun/BACKLOG.md")" "- KEEP · ARCH-tRun-1 · authored, and kept live on purpose"
 hit  "$(cat "$f4_dir/memory/builds/tRun/BACKLOG.md")" "- SEV · ARCH-tRun-2 · HIGH · a merge-bar leg is red on the default branch"
-unset -f write_inherited_asks write_backlog_rows read_leg_argv derive_ask_seq read_ask_back run_f4_filer seed_f4_tree
+unset -f write_inherited_asks write_backlog_rows read_leg_argv derive_ask_seq read_ask_back write_ask_views run_f4_filer seed_f4_tree
 rm -rf "$f4_dir" "$TMP/f4-authored.md" "$TMP/f4-not-a-dir" "$TMP/f4-shim"
 
 # AC21 and AC23: under park with the witness set, the rows are staged beside the hold line; commit,
@@ -11131,6 +11146,244 @@ same "AC11 this repository at HEAD reads land with a bound of 10" "$_o" "land 10
 
 cd "$TMP" || exit 2
 rm -rf "$ih_dir" "$ih_oroot" "$ih_out"
+
+# ================ TOOL-dMendedRecall-2: the auto-file re-renders and stages the views its rows move ==
+# ---- SELF-CONTAINED, for the in-place block's reason, and composed from that block and the one
+# ---- above: the in-place block's stub lander and overrides, and the inherited-red block's stub bar
+# ---- writing one INHERITED leg under INHERITED_RED=land. What neither holds is the REAL generator
+# ---- and a pre-commit running its `--check`, the predicate the hygiene gate's index-freshness check
+# ---- delegates to, so a records commit carrying the rows without their views is REFUSED here as it
+# ---- is in a real tree. Over the BASE kit this close failed 69, read when the unit was built; that
+# ---- reading is why the block exists, and the clean close below is the fix's.
+# ---- THE DRIVER IS THE FIXTURE'S OWN COPY of this kit, run from the fixture's root, because the
+# ---- resolver answers relative to the repository holding the kit: the suite's own copy names a
+# ---- generator in THIS repository, which the helper's file test refuses (the AC9 MET arm reads
+# ---- that). The copy leaves out the kit's suites, whose literal ids would feed the id it mints.
+# ---- THE GENERATOR IS INSTALLED, NEVER RESPELLED: the word of this repository's declared ASKS_CMD
+# ---- that names a file is copied with the python modules beside it, AC15's idiom, and the declared
+# ---- value runs verbatim. A repository declaring none prints a named SKIP and counts the arms.
+# ---- AC4's dirty tree is read under `primary`: under `in-place` refusal 62 stops a porcelain-dirty
+# ---- close before its bar, so a dirty in-place arm would pass over a render that never ran.
+rv_top=$(git -C "$HERE" rev-parse --show-toplevel)
+rv_asks=$(sed -n 's/^ASKS_CMD="\(.*\)"$/\1/p' "$rv_top/.unattended.conf" 2>/dev/null | head -1)
+rv_gen=""
+for _w in $rv_asks; do [ -f "$rv_top/$_w" ] && { rv_gen=$_w; break; }; done
+rv_py=""
+if slice_fn resolve_python; then rv_py=$(resolve_python 2>/dev/null) || rv_py=""; fi
+if [ -z "$rv_gen" ] || [ -z "$rv_py" ]; then
+  n=$((n+41))
+  echo "  SKIP TOOL-dMendedRecall-2 — this repository declares no ASKS_CMD naming a generator file it tracks, or no python runs here, so the view-render arms have no generator to install; their 39 assertions are counted, not run"
+else
+  rv_dir=$(mktemp -d); rv_oroot=$(mktemp -d); rv_out=$(mktemp -d)
+  RVOVR="--override closing-review-recorded --reason fixture-has-no-review --override build-complete --reason fixture-unit-is-open"
+  run_rv() { ( cd "$rv_dir" && env -u GATE_SELFTESTS GOV_DEFAULT_BRANCH=main STUB_PREPARED=0 STUB_CARRY=0 RVMAN="$TOOL_REL/gate-legs.json" bash "$KIT_REL/unattended.sh" "$@" 2>&1 ); }
+  run_rv_git() { git -C "$rv_dir" "$@"; }
+  build_rv_fixture() { # LANDER_MODE -> a preflighted tree whose next --close files one ask through the real generator
+    rm -rf "$rv_dir" "$rv_oroot"; mkdir -p "$rv_dir" "$rv_oroot" "$rv_out/hooks"
+    (
+      cd "$rv_dir" || exit 2
+      git init -q -b main . && git config user.email t@t.test && git config user.name t \
+        && git config core.autocrlf false
+      git init -q --bare "$rv_oroot/origin.git"
+      git --git-dir="$rv_oroot/origin.git" symbolic-ref HEAD refs/heads/main
+      git remote add origin "$rv_oroot/origin.git"
+      mkdir -p bin fx .githooks memory/guides memory/project memory/builds/tMend/spec \
+        "$KIT_REL" "${rv_gen%/*}" "$TOOL_REL"
+      for _f in "$HERE"/*; do case "$_f" in *.test.sh|*/__pycache__) ;; *) cp -r -- "$_f" "$KIT_REL/" ;; esac; done
+      cp -- "$rv_top/${rv_gen%/*}"/*.py "${rv_gen%/*}/"
+      echo '__pycache__/' > .gitignore
+      : > memory/project/stale-header-waiver.txt
+      printf '# build method\n' > memory/guides/BUILD-METHOD.md
+      printf '#!/usr/bin/env bash\nexit 0\n' > fx/x.sh
+      printf '[\n  {"name": "x leg", "argv": ["bash", "fx/x.sh"]}\n]\n' > "$TOOL_REL/gate-legs.json"
+      printf 'INHERITED_RED=land\nINHERITED_RED_MAX_AGE=10\n' > .githooks/gate-env.sh
+      cat > bin/lander.sh <<'RVL'
+#!/usr/bin/env bash
+m=""
+for a in "$@"; do case "$a" in --prepare|--land|--carry|--prepared) m=${a#--} ;; esac; done
+echo "lander-stub: $m"
+v="STUB_$(printf '%s' "$m" | tr 'a-z' 'A-Z')"
+exit "${!v:-0}"
+RVL
+      cat > bin/bar.sh <<'RVB'
+#!/usr/bin/env bash
+d="$(git rev-parse --git-dir)/gate-run/$GATE_RUN_ID"; mkdir -p "$d"
+printf 'head\t%s\ntree_clean\tyes\nmanifest\t%s\n' "$(git rev-parse HEAD)" "$RVMAN" > "$d/header"
+printf 'verdict\tRED\nfailed\t1\ntree_moved\tno\n' > "$d/verdict"
+printf 'x leg\tINHERITED\t1\t0\t%s\t3\t0badc0de\t-\tstub\n' "${GATE_ATTRIBUTE:--}" > "$d/attribution"
+echo "GATE FAIL  x leg  (exit 1)"
+echo "GATE attr  x leg  INHERITED · stub"
+exit 1
+RVB
+      cat > .unattended.conf <<RVC
+MEMORY_ROOT=memory
+UNITS_REGION_CUTOFF="2026-08-19"
+LANDER="bash bin/lander.sh"
+LANDER_MODE="$1"
+SELFTESTS_OWED_PATHS="kitsurface/"
+BYPASS_BAN="--no-verify"
+GATE_CMD="bash bin/bar.sh"
+GATE_BOUND="600"
+GATE_WALL="21600"
+UNIT_STALL_BOUND="1800"
+REVIEW_ROUNDS="7"
+WIRING_CHECK="true"
+KEEPALIVE_CREATE="CronCreate"
+KEEPALIVE_DELETE="CronDelete"
+RESUME_SCHEDULE="on"
+RESUME_SCHEDULE_CREATE="TheScheduleCreate"
+RESUME_SCHEDULE_DELETE="TheScheduleDelete"
+RESUME_SCHEDULE_DELAY="1800"
+RESUME_SCHEDULE_LIMIT="6"
+PHASES_EXTRA=""
+DOD_EXTRA=""
+GATE_POLICY_FILE=".githooks/gate-env.sh"
+ASKS_CMD="$rv_asks"
+RVC
+      printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nBACKLOG_MODE="builds"\nASK_CUTOFF="2026-06-01"\n' \
+        > .memory-tree.conf
+      printf -- '---\nslug: tMend\nnode: a\nopened: 2026-08-01\nstreams: architecture\nroster: ARCH\nids: ARCH-tMend-1\n---\n\n# tMend\n\nAn authored line.\n\n<!-- roster:units -->\n<!-- /roster:units -->\n\n<!-- gen:build-index -->\n<!-- gen:build-units -->\n<!-- /gen:build-units -->\n<!-- /gen:build-index -->\n' \
+        > memory/builds/tMend/README.md
+      printf '# ARCH-tMend-1 — the unit\n\n**Status:** SPECCED · rev-1 · 2026-08-01 · node a · Tier-2 · base 0123abcd · streams architecture\n\n## 1. Goal\ng\n## 2. Scope (IN)\nS1 a thing\n## 6. Acceptance criteria\nAC1 it works\n## 7. Gates\nthe bar\n' \
+        > memory/builds/tMend/spec/2026-08-01-spec-ARCH-tMend-1.md
+      printf '# tMend — run state\n\n<!-- run:generated -->\n<!-- /run:generated -->\n\n## Mandate\n<!-- run:mandate -->\nThe owner authorizes build tMend to merge to main and to push.\n<!-- /run:mandate -->\n\n## Run facts\n\n## Parked\n' \
+        > memory/builds/tMend/RUN.md
+      "$rv_py" -B "$rv_gen" --write
+      git add -A && git commit -q -m base --no-verify
+      git push -q origin main
+      git checkout -q -b unit
+      git commit -q --allow-empty -m "unit work" --no-verify
+    ) >/dev/null 2>&1
+    run_rv --preflight tMend --keepalive-id k1 >/dev/null
+    add_facts "$rv_dir/memory/builds/tMend/RUN.md" "$(printf 'keepalive-reaped: yes\nparked-surfaced: yes\n')"
+    ( cd "$rv_dir" && "$rv_py" -B "$rv_gen" --write ) >/dev/null 2>&1
+    run_rv_git add -A >/dev/null; run_rv_git commit -q -m fixture --no-verify
+    if [ "$1" = in-place ]; then
+      local _old; _old=$(run_rv_git rev-parse HEAD)
+      run_rv_git fetch -q origin main; run_rv_git checkout -q --detach origin/main
+      run_rv_git merge -q --no-ff "$_old" -m "merge: tMend - land onto origin/main" >/dev/null
+      run_rv_git update-ref refs/heads/unit "$(run_rv_git rev-parse HEAD)"; run_rv_git checkout -q unit
+    fi
+    # THE PRE-COMMIT, armed only now so every fixture commit above bypassed nothing it graded.
+    printf '#!/bin/sh\nexec %s -B %s --check\n' "$rv_py" "$rv_gen" > "$rv_out/hooks/pre-commit"
+    chmod +x "$rv_out/hooks/pre-commit"; run_rv_git config core.hooksPath "$rv_out/hooks"
+  }
+  # THE COMMIT, GRADED ON ITS OWN (rev-3, the closing review's left-shift of M1): `--check` over a
+  # CLEAN CHECKOUT of the fixture's HEAD, never over its worktree. The pre-commit's `--check` renders
+  # from the worktree, so it passed a records commit whose views were derived from an unstaged edit;
+  # a checkout of the commit carries only what was committed, and reds on any staged view its
+  # sources do not carry, whichever input moved it.
+  rv_check_commit() { # -> the generator's --check output over a fresh checkout of the fixture's HEAD
+    local _d; _d=$(mktemp -d)
+    run_rv_git archive HEAD | tar -x -C "$_d"
+    ( cd "$_d" && git init -q -b main . && git config core.autocrlf false && git add -A \
+        && git -c user.email=t@t.test -c user.name=t commit -q -m checkout --no-verify \
+        && "$rv_py" -B "$rv_gen" --check ) 2>&1
+    rm -rf "$_d"
+  }
+
+  # ---- AC1 and AC2: the in-place close files the ask, renders and stages the views, and commits its
+  # ---- own record through the `--check` pre-commit, in that order, leaving a clean tree and a clean
+  # ---- index. The family view is the path the BASE close left stale.
+  build_rv_fixture in-place
+  same "AC1 the fixture's index is clean before the close" \
+       "$( (cd "$rv_dir" && "$rv_py" -B "$rv_gen" --check) >/dev/null 2>&1; echo $?)" "0"
+  out=$(run_rv --close tMend $RVOVR)
+  hit  "$out" "gates-green: filed ask ARCH-tMend-2 for leg x leg red at"
+  hit  "$out" "gates-green: re-rendered the generated views for 1 filed ask(s) and staged "
+  hit  "$out" "phase LANDING, committed at"
+  miss "$out" "UNATTENDED check"
+  miss "$out" "left unstaged"
+  rv_l1=$(printf '%s\n' "$out" | grep -n 'gates-green: filed ask' | head -1 | cut -d: -f1)
+  rv_l2=$(printf '%s\n' "$out" | grep -n 're-rendered the generated views' | head -1 | cut -d: -f1)
+  rv_l3=$(printf '%s\n' "$out" | grep -n 'committed at' | head -1 | cut -d: -f1)
+  n=$((n+1)); { [ -n "$rv_l1" ] && [ -n "$rv_l2" ] && [ -n "$rv_l3" ] && [ "$rv_l1" -lt "$rv_l2" ] && [ "$rv_l2" -lt "$rv_l3" ]; } \
+    || { echo "FAIL AC1 the filed, rendered and committed lines are not in that order: [$rv_l1] [$rv_l2] [$rv_l3]"; st=1; }
+  same "AC1 the close committed its own record" "$(run_rv_git log -1 --format=%s)" "records(tMend): close — LANDING"
+  rv_names=$(run_rv_git show --name-only --format= HEAD)
+  hit  "$rv_names" "memory/builds/tMend/BACKLOG.md"
+  hit  "$rv_names" "memory/backlog/ARCH.md"
+  hit  "$(rv_check_commit)" "build-index: clean"
+  same "AC2 the close left a clean tree" "$(run_rv_git status --porcelain)" ""
+
+  # ---- AC4: under `primary`, an UNTRACKED path the operator left under the memory root is no input
+  # ---- of the render, so the views are rendered and staged, the path is never swept in, and the
+  # ---- operator's own records commit of that stage passes the pre-commit and is clean as a commit.
+  build_rv_fixture primary
+  printf 'scratch\n' > "$rv_dir/memory/notes.md"
+  out=$(run_rv --close tMend $RVOVR)
+  hit  "$out" "gates-green: filed ask ARCH-tMend-2 for leg x leg red at"
+  hit  "$out" "gates-green: re-rendered the generated views for 1 filed ask(s) and staged "
+  miss "$out" "left unstaged"
+  rv_cached=$(run_rv_git diff --cached --name-only)
+  hit  "$rv_cached" "memory/builds/tMend/BACKLOG.md"
+  hit  "$rv_cached" "memory/backlog/ARCH.md"
+  miss "$rv_cached" "memory/notes.md"
+  hit  "$(run_rv_git status --porcelain)" "?? memory/notes.md"
+  run_rv_git commit -q -m "records(tMend): close — LANDING" >/dev/null 2>&1
+  same "AC4 the operator's records commit passes the --check pre-commit" "$?" "0"
+  miss "$(run_rv_git show --name-only --format= HEAD)" "memory/notes.md"
+  hit  "$(rv_check_commit)" "build-index: clean"
+
+  # ---- ...a TRACKED input with an unstaged edit stages NO view (rev-3, M1): the miss line names the
+  # ---- input, the rows stay staged, and the edit stays the operator's.
+  build_rv_fixture primary
+  printf 'an operator edit\n' >> "$rv_dir/memory/guides/BUILD-METHOD.md"
+  out=$(run_rv --close tMend $RVOVR)
+  hit  "$out" "were not re-rendered: the views' inputs carry changes the index does not hold, and a render would stage views derived from them: memory/guides/BUILD-METHOD.md;"
+  hit  "$out" "repair: stage or discard those changes, then run the --write mode of "
+  rv_cached=$(run_rv_git diff --cached --name-only)
+  hit  "$rv_cached" "memory/builds/tMend/BACKLOG.md"
+  miss "$rv_cached" "memory/backlog/ARCH.md"
+  miss "$rv_cached" "BUILD-METHOD.md"
+  hit  "$(run_rv_git status --porcelain)" " M memory/guides/BUILD-METHOD.md"
+  miss "$out" "UNATTENDED check"
+
+  # ---- ...and so does the operator's authored edit to the build README, an input of the views too.
+  build_rv_fixture primary
+  sed -i 's/^An authored line\.$/An authored line, edited by the operator./' "$rv_dir/memory/builds/tMend/README.md"
+  out=$(run_rv --close tMend $RVOVR)
+  hit  "$out" "a render would stage views derived from them: memory/builds/tMend/README.md;"
+  miss "$out" "re-rendered the generated views"
+  miss "$(run_rv_git diff --cached --name-only)" "memory/builds/tMend/README.md"
+  hit  "$(run_rv_git diff -- memory/builds/tMend/README.md)" "+An authored line, edited by the operator."
+
+  # ---- ...while an UNTRACKED path the render writes, here the family view the tree stopped
+  # ---- tracking, is NAMED and left unstaged: S3's naming rule, which the README arm armed until
+  # ---- rev-3 made that README an input.
+  build_rv_fixture primary
+  run_rv_git rm -q --cached memory/backlog/ARCH.md
+  run_rv_git commit -q -m "untrack the family view" --no-verify
+  out=$(run_rv --close tMend $RVOVR)
+  hit  "$out" "; left unstaged, dirty before the render: memory/backlog/ARCH.md"
+  miss "$(run_rv_git diff --cached --name-only)" "memory/backlog/ARCH.md"
+
+  # ---- AC7 (rev-3): the closing review's M1 itself. An unstaged spec status-header flip moves
+  # ---- `memory/LIVE.md`, which was clean before the render; the rev-2 driver staged it beside the
+  # ---- edit it was derived from, read RED over a fixture before this arm was written.
+  build_rv_fixture primary
+  sed -i 's/^\*\*Status:\*\* SPECCED /**Status:** INPROGRESS /' "$rv_dir/memory/builds/tMend/spec/2026-08-01-spec-ARCH-tMend-1.md"
+  out=$(run_rv --close tMend $RVOVR)
+  hit  "$out" "a render would stage views derived from them: memory/builds/tMend/spec/2026-08-01-spec-ARCH-tMend-1.md;"
+  miss "$(run_rv_git diff --cached --name-only)" "memory/LIVE.md"
+  # ---- ...and the conf, which a bare memory-root predicate would miss: the generator reads it too.
+  build_rv_fixture primary
+  printf '# an operator note\n' >> "$rv_dir/.memory-tree.conf"
+  out=$(run_rv --close tMend $RVOVR)
+  hit  "$out" "a render would stage views derived from them: .memory-tree.conf;"
+  miss "$(run_rv_git diff --cached --name-only)" "memory/LIVE.md"
+  # ---- ...and the generator's own code (round 2, L1): `--write` imports its siblings from its own
+  # ---- directory, so an unstaged edit there feeds the render as surely as one under the memory root.
+  build_rv_fixture primary
+  printf '# an operator note\n' >> "$rv_dir/$rv_gen"
+  out=$(run_rv --close tMend $RVOVR)
+  hit  "$out" "a render would stage views derived from them: $rv_gen;"
+  miss "$(run_rv_git diff --cached --name-only)" "memory/LIVE.md"
+
+  cd "$TMP" || exit 2
+  rm -rf "$rv_dir" "$rv_oroot" "$rv_out"
+  unset -f run_rv run_rv_git build_rv_fixture rv_check_commit
+fi
 
 # ================ TOOL-dDerivedDocket-28: the run-owned process ledger =============================
 # ---- SELF-CONTAINED, for the in-place block's reason and one more: these arms KILL drivers, and a

@@ -4,8 +4,7 @@ node: d
 opened: 2026-10-01
 streams: tooling
 roster: TOOL
-ids:
-status: OPEN
+ids: TOOL-dMendedRecall-1 TOOL-dMendedRecall-2 TOOL-dMendedRecall-3
 authorized-by: slug
 asks: TOOL-dAlignedCarrier-7..9
 ---
@@ -29,29 +28,46 @@ Read at the working tree, each ask below is filed and live in the build that rai
 - The unattended kit's own self-test suites are WAIVED for this build's landing (owner, 2026-10-01).
   A criterion they would observe is amended citing this rule; their clean reading is owed with
   TOOL-dDerivedDocket-76. The memory-recall kit's self-test is not one of them: it runs at the close.
+- Classified at kickoff (M2): all three units MISSING. Each is authored by the build harness's spec
+  stage from the shared brief under `prompts/`, and built one at a time, 1 then 2 then 3.
+- No spec audit and no pre-code cross-read (owner, 2026-10-01): the specs go straight to building,
+  and the closing diff review is where they and the code are first reviewed.
 
 ## Parked decisions
 
 <!-- roster:units -->
+
+| # | Unit | Tier | Mechanism |
+|---|---|---|---|
+| 1 | `TOOL-dMendedRecall-1` | 2 | the memory-recall kit selftest green again in the adopter layout |
+| 2 | `TOOL-dMendedRecall-2` | 2 | an in-place close that auto-files an ask commits its record with the views re-rendered |
+| 3 | `TOOL-dMendedRecall-3` | 2 | the verb contract's `--status` entry names the pinned-asks and holder-worktree fields |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 0 unit(s) · node d · opened 2026-10-01 · streams tooling
+**Build status:** CLOSED · 3 unit(s) · node d · opened 2026-10-01 · streams tooling
+ids TOOL-dMendedRecall-1 TOOL-dMendedRecall-2 TOOL-dMendedRecall-3
 
 <!-- gen:build-units -->
-*No spec under this build carries a status header; the status above is declared in the front matter.*
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-dMendedRecall-1 — the recall selftest's memory-tree fixture carries the kit's python surface, and the spec-H1 arm reads only that](spec/2026-10-01-spec-TOOL-dMendedRecall-1.md) | 1 | 2 | CLOSED | rev-1 | 2026-10-01 |
+| [TOOL-dMendedRecall-2 — the inherited-red auto-file re-renders the generated views it makes stale, and stages them with its rows](spec/2026-10-01-spec-TOOL-dMendedRecall-2.md) | 1 | 2 | CLOSED | rev-4 | 2026-10-01 |
+| [TOOL-dMendedRecall-3 — the verb contract's `--status` entry names every field the line prints, the pinned-asks and holder-worktree verdicts among them](spec/2026-10-01-spec-TOOL-dMendedRecall-3.md) | 1 | 2 | CLOSED | rev-1 | 2026-10-01 |
 <!-- /gen:build-units -->
 
-Records: 0 bound to this build, across 0 record folder(s).
+Records: 8 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: none — every unit id has one.
+Ids no `spec-audit` record has ever named: TOOL-dMendedRecall-1 TOOL-dMendedRecall-2 TOOL-dMendedRecall-3.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
 
-*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+| Step | Units | Parallel |
+|---|---|---|
+| 1 | `TOOL-dMendedRecall-1`, `TOOL-dMendedRecall-2`, `TOOL-dMendedRecall-3` | yes |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
