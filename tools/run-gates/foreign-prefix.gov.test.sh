@@ -115,6 +115,11 @@ WHOLE_RUN=(
   "playbook render selftest|a --selftest mode of a shipped engine, so a probe site would be adopter-facing"
   "tier2-review self-test|its arms run inside ONE node process, which no shell site can stop between arms"
 )
+# THE GOV-LAYOUT DECLARATION, `row|reason` (S3, rev-6). An unshipped suite whose first arm grades
+# gov's own registry layout, which gov at the repo root is not. Not graded at the root, printed there.
+GOV_LAYOUT=(
+  "govkit selftest|its first arm is selfcheck over gov's own registry; govkit ships to no adopter, and gov at the repo root is no layout gov has"
+)
 FILTER=""
 while [ $# -gt 0 ]; do
   case "$1" in
@@ -143,6 +148,7 @@ BASE=$HEADSHA
 echo "foreign-prefix: clone of ${HEADSHA:0:8} at $G, tool root '$TROOT', pool width $WIDTH${FILTER:+, rows matching '$FILTER'}"
 echo "foreign-prefix: this leg's own row is skipped at every prefix: $SELF_ROW"
 for w in "${WHOLE_RUN[@]}"; do echo "foreign-prefix: declared whole run — ${w%%|*}: ${w#*|}"; done
+for w in "${GOV_LAYOUT[@]}"; do echo "foreign-prefix: declared gov layout, not graded at the repo root — ${w%%|*}: ${w#*|}"; done
 
 # ---- THE BASELINE, S5. Read from the HOST's git dir, where the bar wrote it; the clone has none.
 INHERITED="$TMPD/inherited.txt"; : > "$INHERITED"
@@ -269,6 +275,10 @@ run_at_prefix() { # $1 = prefix, empty for the repo root; returns 1 when the pre
       printf '[%s] %s · %s · not graded · red at gov'"'"'s prefix in the baseline bar run\n' "$label" "$name" "$kind"
       continue
     fi
+    if [ -z "$p" ]; then
+      why=""; for w in "${GOV_LAYOUT[@]}"; do [ "${w%%|*}" = "$name" ] && why=${w#*|}; done
+      if [ -n "$why" ]; then printf '[%s] %s · %s · not graded · gov layout: %s\n' "$label" "$name" "$kind" "$why"; continue; fi
+    fi
     case "$argv" in python3\ *|python\ *) argv="$PY ${argv#* }" ;; esac
     i=$((i + 1)); d="$TMPD/runs/$i"; mkdir -p "$d"; printf '%s\n' "$name" > "$d/name"
     # A whole row waits for the pool to drain (S6): its budget was measured one suite at a time.
@@ -295,7 +305,7 @@ run_at_prefix() { # $1 = prefix, empty for the repo root; returns 1 when the pre
   done
   dirty=$(git status --porcelain --untracked-files=all 2>/dev/null | head -n 10)
   if [ -n "$dirty" ]; then red=1; print_fail "a suite wrote into the clone at ${p:-the repo root}, outside its scratch: $(printf '%s' "$dirty" | tr '\n' ';')"; fi
-  [ "$red" = 0 ] && print_pass "all $i graded row(s) found their subject at ${p:-the repo root}$( [ "$i" = "$n" ] || printf ', %s inherited red and not graded' "$((n - i))")"
+  [ "$red" = 0 ] && print_pass "all $i graded row(s) found their subject at ${p:-the repo root}$( [ "$i" = "$n" ] || printf ', %s not graded, each named above' "$((n - i))")"
   return "$red"
 }
 
@@ -304,6 +314,9 @@ if [ -z "$FILTER" ]; then
   names=$(bash "$TROOT/$KIT/run-selftests.sh" --list 2>/dev/null | sed -nE 's/^  (.*[^ ]) +([0-9]+)s  (.+)$/\1/p')
   for w in "${WHOLE_RUN[@]}"; do
     printf '%s\n' "$names" | grep -qxF "${w%%|*}" || print_fail "a whole-run declaration names no row in the population: ${w%%|*}"
+  done
+  for w in "${GOV_LAYOUT[@]}"; do
+    printf '%s\n' "$names" | grep -qxF "${w%%|*}" || print_fail "a gov-layout declaration names no row in the population: ${w%%|*}"
   done
 fi
 
