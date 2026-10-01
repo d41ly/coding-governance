@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-54 — two gov gates grade a repo-root install correctly
 
-**Status:** SPECCED · rev-1 · 2026-10-01 · node a · Tier-1 · base 56c7befa · streams tooling · order 24
+**Status:** SPECCED · rev-2 · 2026-10-01 · node a · Tier-1 · base 56c7befa · streams tooling · order 24
 
 <!-- gen:spec-records -->
 
@@ -23,9 +23,9 @@ the way it grades every other prefix.
 ## 2. Scope (IN)
 
 - **S1** — `check-playbook-parity.sh` derives its kit population from govkit's declared registry
-  rather than from a listing of the tool root. A kit is a directory segment the registry declares
-  under its `{prefix}` token: the head of an `[[entry]]` descriptor path, or an `[[exempt]]` path
-  naming a tracked directory. The registry is found through the sibling-kit resolver the gate
+  rather than from a listing of the tool root. A kit is a TRACKED directory segment the registry
+  declares under its `{prefix}` token: the head of an `[[entry]]` descriptor path, or an `[[exempt]]`
+  path naming a tracked directory, in both cases holding a tracked file. The registry is found through the sibling-kit resolver the gate
   already inlines for the hooks kit, and an unresolvable registry exits 2 naming what it looked for,
   never an empty population. The frozen sentinel and both waiver arms are kept as they are.
   Observed by AC1, AC2 and AC3.
@@ -156,6 +156,10 @@ New arm: `tools/check-spec-tokens.test.sh` · a root-install fixture citing an u
 
 - rev-1 · 2026-10-01 · initial draft from the owner's 2026-10-01 ruling adopting this unit, with
   R2's root-install findings as its evidence.
+- rev-2 · 2026-10-01 · S1: an `[[entry]]` head counts as a kit only while it holds a tracked file,
+  as an `[[exempt]]` path already had to. A registry-only population keeps a kit whose directory
+  was deleted, so the suite's sentinel and empty-set arms, which untrack the kit, could never red,
+  and a waiver for a removed kit could never read stale.
 
 ## 10. Reuse audit
 
