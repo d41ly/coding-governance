@@ -151,6 +151,19 @@ mkfixture() { # mode -> prints the fixture root
   ( cd "$T" || exit 2
     git init -q .
     git config user.email t@t; git config user.name t; git config commit.gpgsign false
+    # BUILT BEFORE ITS RUN (TOOL-aRepatriatedFork-56): an earlier run built the unit, behind the base
+    # this run pins, and the in-range commit below is a later one naming it. `prebuilt-far` puts two
+    # commits between that build and the base, beyond a cap of one.
+    case "$mode" in
+      prebuilt|prebuilt-far)
+        mkdir -p src; printf 'v1\n' > src/x.txt
+        git add -A >/dev/null; git commit -q -m "ARCH-tBrief-1: the first run builds it" --no-verify ;;
+    esac
+    case "$mode" in
+      prebuilt-far)
+        printf 'a\n' > filler.txt; git add -A >/dev/null; git commit -q -m "filler one" --no-verify
+        printf 'b\n' > filler.txt; git add -A >/dev/null; git commit -q -m "filler two" --no-verify ;;
+    esac
     mkdir -p ${PFX}unattended memory/builds/tBrief/spec memory/builds/tBrief/prompts
     cp "$KIT/lib-unattended.sh" ${PFX}${KIT_NAME}/
     cp "$KIT/unattended.sh"     ${PFX}${KIT_NAME}/
@@ -193,7 +206,7 @@ RM
     R=memory/builds/tBrief/RUN.md
     REC='# tBrief — run state\n<!-- run:generated -->\n<!-- /run:generated -->\n## Run facts\nbase: %s\nphase: %s\nwitness: %s\n## Parked\n'
     case "$mode" in
-      live|reopened|baseonly) printf "$REC" "$BASE" BUILDING "$BASE" > "$R" ;;
+      live|reopened|baseonly|prebuilt|prebuilt-far) printf "$REC" "$BASE" BUILDING "$BASE" > "$R" ;;
       landing|flip)           printf "$REC" "$BASE" LANDING "$BASE" > "$R" ;;
       postrun|misselect)      printf "$REC" "$BASE" LANDED "$BASE" > "$R" ;;
       postrun-aborted|rotated|migrated) printf "$REC" "$BASE" ABORTED "$BASE" > "$R" ;;
@@ -205,7 +218,7 @@ RM
         printf "$REC" "$BASE" BUILDING "$BASE" > "$R" ;;
     esac
     case "$mode" in
-      live|reopened|baseonly|landing|flip|postrun|postrun-aborted|rotated|migrated|copied|misselect)
+      live|reopened|baseonly|landing|flip|postrun|postrun-aborted|rotated|migrated|copied|misselect|prebuilt|prebuilt-far)
         git add -A >/dev/null; git commit -q -m "records: the run's phase" --no-verify ;;
     esac
     # THE WRONG PICK, for round 3's R3-4. Between the first run landing and the second starting, a hand
@@ -267,7 +280,7 @@ RM
       # THE POST-RUN MODES RECORD NO BRIEF, every one of them: a unit built by hand after its run
       # is exactly the shape the owner ruled out of this leg, and the modes that must still RED
       # need the missing row to have something to red on.
-      live|landing|postrun|postrun-aborted|rotated|migrated|misselect) ;;
+      live|landing|postrun|postrun-aborted|rotated|migrated|misselect|prebuilt|prebuilt-far) ;;
       # THE BOUNDARY: the build commit is the one that writes the terminal phase.
       flip) printf "$REC" "$BASE" LANDED "$BASE" > "$R" ;;
       # THE FORGERY, two ways. The build commit claims the run finished and the next commit makes it
@@ -663,6 +676,23 @@ T=$(mkfixture norow); write_waiver "$T" worktree
 o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
 same  "an uncommitted waiver: still REDS" "$rc" "1"
 has   "uncommitted waiver: nothing is waived" "$o" "0 violation(s) waived"
+rm -rf "$T"
+
+# ---- BUILT BEFORE ITS RUN (TOOL-aRepatriatedFork-56). A commit naming the unit behind the run's base
+# ---- means an earlier run built it; the in-range commit with no brief is a later one, not graded.
+T=$(mkfixture prebuilt)
+o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
+same  "built before its run, repaired in range with no brief: GREEN" "$rc" "0"
+has   "built before its run: the line names it" "$o" "ARCH-tBrief-1 was built before its run"
+has   "built before its run: the summary counts it" "$o" "1 unit(s) built before their run, not graded"
+rm -rf "$T"
+# ...and a probe that reaches its cap answers nothing, so the unit is graded and reds.
+T=$(mkfixture prebuilt-far)
+( cd "$T" && printf 'PASS_ORDER_PREANCHOR_CAP="1"\n' >> .unattended.conf && git add -A >/dev/null && git commit -q -m "cap one" --no-verify )
+o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
+same  "a truncated probe: the unit is graded and REDS" "$rc" "1"
+has   "a truncated probe: the ordinary violation" "$o" "NO brief row"
+hasnt "a truncated probe: no built-before-its-run skip" "$o" "built before its run"
 rm -rf "$T"
 
 echo "--- $n arms, exit $st"

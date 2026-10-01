@@ -93,6 +93,8 @@
 #     HEAD still carries. A run that forges one AND keeps it, or commits a retired record to carry it,
 #     leaves that record at HEAD, where the kit gate grades it - check 15 judges a LANDED witness. This
 #     leg buys the trace, not the verdict.
+#   - A UNIT WITH AN EARLIER COMMIT NAMING IT, behind the run's base, is NOT GRADED even if its
+#     real build is in the run (TOOL-aRepatriatedFork-56). Its line names both commits.
 #   - WHETHER A WAIVER ROW WAS DESERVED. The registry below grades only that each waived unit is
 #     still a violation (a stale row REDS), never why the waiver was granted.
 #   - ANYTHING ABOUT A UNIT BUILT AFTER ITS RUN FINISHED. It is announced by id and reason and graded by
@@ -105,7 +107,7 @@
 # post-run subset joined it rather than moving the increment, which would change what the sibling's
 # identically named count means.
 set -u
-KIT_UNATTENDED_VERSION=1.54   # gov:kit unattended@1.54 — must match unattended.sh; check-kit-versions.sh pairs them
+KIT_UNATTENDED_VERSION=1.55   # gov:kit unattended@1.55 — must match unattended.sh; check-kit-versions.sh pairs them
 
 # The dereference pin, identical to this kit's other readers and for the identical reason: a graft
 # file rewrites the commit GRAPH, so every ancestry answer below could be honest about a sha and
@@ -136,7 +138,7 @@ CONF="$ROOT/.unattended.conf"
 [ -f "$CONF" ] || { echo "brief-recorded: no .unattended.conf at the repo root, and every value this leg needs is a declaration"; exit 2; }
 [ -f "$DRIVER" ] || { echo "brief-recorded: no driver beside this script, and the row grammar this leg matches is written by exactly one function in that file, so there would be nothing to assert the grammar against"; exit 2; }
 
-MEMORY_ROOT=""; BRIEF_RECORDED_CUTOFF=""; GENERATED_INDEXES=""; SHARED_RECORDS=""
+MEMORY_ROOT=""; BRIEF_RECORDED_CUTOFF=""; GENERATED_INDEXES=""; SHARED_RECORDS=""; PASS_ORDER_PREANCHOR_CAP=""
 # ---- THE CONF IS IMPORTED, NEVER SOURCED INTO THIS SHELL, and this block is `check-pass-order.sh`'s
 # ---- rather than a third hand-written reader. `$CONF` is a TRACKED file the graded run commits, so
 # ---- sourcing it here executes it. Both siblings hardened this one recorded incident at a time: an
@@ -165,7 +167,7 @@ while IFS= read -r -d '' _ck; do
     # its own FAILED line printed. This leg sets `DRIVER` and `CONF` above its import too. Only the
     # keys declared on the line above are assignable, so the stream cannot reach a name this leg did
     # not ask for.
-    MEMORY_ROOT|BRIEF_RECORDED_CUTOFF|GENERATED_INDEXES|SHARED_RECORDS) eval "$_ck=\$_cv" ;;
+    MEMORY_ROOT|BRIEF_RECORDED_CUTOFF|GENERATED_INDEXES|SHARED_RECORDS|PASS_ORDER_PREANCHOR_CAP) eval "$_ck=\$_cv" ;;
   esac
 done < <( . "$CONF" >/dev/null 2>&1 || exit 9
           for _n in $_conf_names; do eval "_cval=\${$_n:-}"; printf '%s\0%s\0' "$_n" "$_cval"; done
@@ -178,6 +180,14 @@ if [ "$_conf_ok" != 1 ]; then
   exit 2
 fi
 MEMORY_ROOT="${MEMORY_ROOT:-memory}"
+# THE PRE-ANCHOR CAP is pass-order's key and default, validated as that leg validates it: a value git
+# cannot parse would turn the built-before-its-run probe off while reporting nothing.
+PREANCHOR_CAP="${PASS_ORDER_PREANCHOR_CAP:-400}"
+case "$PREANCHOR_CAP" in
+  ''|*[!0-9]*) echo "brief-recorded: PASS_ORDER_PREANCHOR_CAP must be a non-negative integer: $PASS_ORDER_PREANCHOR_CAP"; exit 2 ;;
+esac
+[ "${#PREANCHOR_CAP}" -le 9 ] && [ "$PREANCHOR_CAP" -le 100000 ] || {
+  echo "brief-recorded: PASS_ORDER_PREANCHOR_CAP is out of range (max 100000): $PREANCHOR_CAP"; exit 2; }
 
 # --------------------------------------------------------------------------- THE GRAMMAR PROBE
 # A PROBE THAT CANNOT MOVE SAYS SO. The sibling leg's DEAD PROBE guards a classifier it slices out of
@@ -295,7 +305,7 @@ if [ "${#_SUBJ[@]}" -ne "$_n_hist" ]; then
   exit 2
 fi
 
-graded=0; skipped_cutoff=0; nobase=0; unbuilt=0; postrun=0; unborne=0; regraded=0
+graded=0; skipped_cutoff=0; nobase=0; unbuilt=0; postrun=0; unborne=0; regraded=0; prebuilt=0
 violations=""; announced=""
 
 # ------------------------------------------------------------------------- THE WAIVER REGISTRY
@@ -445,6 +455,17 @@ brief-recorded: GRADED ANYWAY — $id was BUILT at $(GIT rev-parse --short "$bui
 
     _rows=$(printf '%s\n' "$_sb" | grep -F " brief · item $id · reason " || true)
     if [ -z "$_rows" ]; then
+      # BUILT BEFORE ITS RUN (TOOL-aRepatriatedFork-56). A unit an earlier run built has its build
+      # commit behind the base, so a later repair naming it is the earliest in-range match. Asked
+      # through pass-order's own pre-anchor probe, newest first and capped; TRUNCATED answers
+      # nothing, and the unit is graded.
+      _pre=$(build_commit "$base" "$id" "$bdir" "$GENERATED_INDEXES" "$SHARED_RECORDS" "$PREANCHOR_CAP" "")
+      if [ -n "$_pre" ] && [ "$_pre" != TRUNCATED ]; then
+        prebuilt=$((prebuilt+1))
+        announced="$announced
+brief-recorded: NOT GRADED — $id was built before its run, at $(GIT rev-parse --short "$_pre") behind the run's base; $(GIT rev-parse --short "$build_c") is a later commit naming it"
+        continue
+      fi
       add_violation "$id" "$id — BUILT at $(GIT rev-parse --short "$build_c") with NO brief row in $run at that commit; nothing on disk records what the agent that built it was handed"
       continue
     fi
@@ -511,7 +532,7 @@ done
 # are worth a reader's eye whether or not the unit also carries a brief. The third is graded at a later
 # commit than the one `build_commit` picked, and it is counted because each is a pick the library got
 # wrong, which the sibling leg still trusts.
-echo "brief-recorded: graded $graded closed unit(s) · $skipped_cutoff build(s) skipped by the $BRIEF_RECORDED_CUTOFF cutoff · $nobase build(s) with no pinned run BASE · $unbuilt unit(s) unbuilt-in-range · $postrun unit(s) built after their run finished, not graded · $unborne unit(s) built under a finished claim HEAD does not bear out, graded · $regraded unit(s) whose earliest commit fell after their run finished and a later one inside a live run, graded at the later"
+echo "brief-recorded: graded $graded closed unit(s) · $skipped_cutoff build(s) skipped by the $BRIEF_RECORDED_CUTOFF cutoff · $nobase build(s) with no pinned run BASE · $unbuilt unit(s) unbuilt-in-range · $postrun unit(s) built after their run finished, not graded · $unborne unit(s) built under a finished claim HEAD does not bear out, graded · $regraded unit(s) whose earliest commit fell after their run finished and a later one inside a live run, graded at the later · $prebuilt unit(s) built before their run, not graded"
 echo "brief-recorded: the record surface excluded from build-commit selection was: <build folder> $(printf '%s ' $GENERATED_INDEXES $SHARED_RECORDS)"
 if [ -n "$announced" ]; then
   printf '%s\n' "${announced#?}"
