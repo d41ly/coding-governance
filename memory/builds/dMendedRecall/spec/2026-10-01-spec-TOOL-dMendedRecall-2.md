@@ -1,6 +1,6 @@
 # TOOL-dMendedRecall-2 — the inherited-red auto-file re-renders the generated views it makes stale, and stages them with its rows
 
-**Status:** CLOSED · rev-3 · 2026-10-01 · node d · Tier-2 · base 1f915870 · streams tooling · order 1 · closes TOOL-dAlignedCarrier-9 · ratified 2026-10-01
+**Status:** CLOSED · rev-4 · 2026-10-01 · node d · Tier-2 · base 1f915870 · streams tooling · order 1 · closes TOOL-dAlignedCarrier-9 · ratified 2026-10-01
 
 <!-- gen:spec-records -->
 
@@ -11,6 +11,7 @@
 | [2026-10-01-prompt-TOOL-dMendedRecall-1-spec-brief.md](../prompts/2026-10-01-prompt-TOOL-dMendedRecall-1-spec-brief.md) | journal | TOOL-dMendedRecall-1 TOOL-dMendedRecall-3 |
 | [2026-10-01-prompt-TOOL-dMendedRecall-2-fold-brief.md](../prompts/2026-10-01-prompt-TOOL-dMendedRecall-2-fold-brief.md) | journal | — |
 | [2026-10-01-review-TOOL-dMendedRecall-1-closing-diff-round1.md](../reviews/2026-10-01-review-TOOL-dMendedRecall-1-closing-diff-round1.md) | diff-review | TOOL-dMendedRecall-1 TOOL-dMendedRecall-3 |
+| [2026-10-01-review-TOOL-dMendedRecall-2-closing-diff-round2.md](../reviews/2026-10-01-review-TOOL-dMendedRecall-2-closing-diff-round2.md) | diff-review | — |
 
 <!-- /gen:spec-records -->
 
@@ -50,6 +51,10 @@ close commits `records(<slug>): close — LANDING` with the views current.
   `git ls-files`. It prints §4's miss spelling with the dirty-input `<why>`, naming the inputs, and
   the repair to stage or discard them and run the generator's `--write`, and returns 1 as S4 does.
   It never commits a view derived from a change the operator has not staged. Observed by AC4, AC7.
+  rev-4: the GENERATOR'S OWN CODE is an input too. `--write` imports its siblings from the directory
+  the resolved generator lives in, so a tracked path there with an unstaged change is a dirty input,
+  asked of git with that directory as the pathspec; a generator at the root names only its own
+  top-level modules. Observed by AC8.
 - **S4** — A miss is named and does not refuse. When no generator resolves, the resolved path is
   not a file at the top, or the render exits non-zero or is killed by its bound, `write_ask_views`
   prints §4's miss spelling, which carries `derive_index_repair`'s text, stages whatever paths the
@@ -330,6 +335,13 @@ AC1 to AC5 over the fixture, and commits. The rev-3 fold observes AC2, AC4 and A
   Red when: the built close stages a view over the dirty spec or conf, or the rev-2 kit's commit
   reads clean in its checkout, which would mean the fixture does not reproduce M1.
   fixture: AC1's, under `primary`, in `%TEMP%`.
+- **AC8** — When `write_ask_views`, extracted verbatim from the driver, runs over a scratch repository
+  whose tracked memory-tree generator carries an unstaged edit, it prints `were not re-rendered` with
+  the dirty-input `<why>` naming that generator's path, renders nothing, stages nothing and returns 1;
+  over the same repository with the edit absent, it renders and returns 0. The driver at `445eec56`
+  over the edited repository renders and returns 0.
+  Red when: an unstaged edit to the generator's own code still feeds a render whose views are staged.
+  fixture: a scratch repository in `%TEMP%` with `resolve_index_generator` and `run_bounded` stubbed.
 
 ## 7. Gates
 
@@ -385,6 +397,11 @@ New arm: `tools/unattended/unattended.test.sh` · the inherited-red block's MET 
   and README arms flip to the miss line, and an untracked-view arm takes the `left unstaged`
   naming. AC7 is new: the spec status-header flip of M1 itself, and the conf. S6 names the arms;
   §4 Fixture and Rollout and §5's testing line name AC7, and the driver's S5 comment names the miss.
+- rev-4 · 2026-10-01 · §2 §6 · S3 AC8 · the fold of the closing diff review's round 2. L1 (LOW): the
+  dirty-input predicate left out the generator's own code, so an unstaged edit to its modules still
+  fed a staged render, M1's mechanism again. S3 adds the generator's directory, and AC8 observes it.
+  L2 (LOW): the suite's `rv_check_commit` pins `core.autocrlf=false`, so git's CRLF warnings no longer
+  crowd a red arm's output. The new suite arm is written and not run; the block's skip count is 41.
 
 ## 10. Reuse audit
 

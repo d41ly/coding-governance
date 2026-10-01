@@ -52,11 +52,11 @@ ids TOOL-dMendedRecall-1 TOOL-dMendedRecall-2 TOOL-dMendedRecall-3
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-dMendedRecall-1 — the recall selftest's memory-tree fixture carries the kit's python surface, and the spec-H1 arm reads only that](spec/2026-10-01-spec-TOOL-dMendedRecall-1.md) | 1 | 2 | CLOSED | rev-1 | 2026-10-01 |
-| [TOOL-dMendedRecall-2 — the inherited-red auto-file re-renders the generated views it makes stale, and stages them with its rows](spec/2026-10-01-spec-TOOL-dMendedRecall-2.md) | 1 | 2 | CLOSED | rev-3 | 2026-10-01 |
+| [TOOL-dMendedRecall-2 — the inherited-red auto-file re-renders the generated views it makes stale, and stages them with its rows](spec/2026-10-01-spec-TOOL-dMendedRecall-2.md) | 1 | 2 | CLOSED | rev-4 | 2026-10-01 |
 | [TOOL-dMendedRecall-3 — the verb contract's `--status` entry names every field the line prints, the pinned-asks and holder-worktree verdicts among them](spec/2026-10-01-spec-TOOL-dMendedRecall-3.md) | 1 | 2 | CLOSED | rev-1 | 2026-10-01 |
 <!-- /gen:build-units -->
 
-Records: 7 bound to this build, across 4 record folder(s).
+Records: 8 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

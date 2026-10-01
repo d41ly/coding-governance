@@ -89,3 +89,8 @@ The suite arms for these readings are written in `tools/unattended/unattended.te
 not run, under the build README's waiver of this kit's own suites. The block's skip count moved
 from 27 to 39 to match its assertions. AC1, AC3, AC5 and AC6 did not change at rev-3; AC3's stub
 close and AC5's greps were read again over the built kit and gave the readings above.
+- AC8 — `were not re-rendered` — rev-4, observed by hand: `write_ask_views`, cut verbatim from the
+  built driver with awk, over a scratch repository whose tracked generator carried an unstaged edit,
+  printed the miss line naming `tools/memory-tree/gen_build_index.py` and returned 1 with nothing
+  rendered or staged; with the edit absent it rendered and returned 0. The driver at `445eec56` over
+  the edited repository rendered and returned 0, which is L1 reproduced.

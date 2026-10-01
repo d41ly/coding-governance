@@ -11171,7 +11171,7 @@ for _w in $rv_asks; do [ -f "$rv_top/$_w" ] && { rv_gen=$_w; break; }; done
 rv_py=""
 if slice_fn resolve_python; then rv_py=$(resolve_python 2>/dev/null) || rv_py=""; fi
 if [ -z "$rv_gen" ] || [ -z "$rv_py" ]; then
-  n=$((n+39))
+  n=$((n+41))
   echo "  SKIP TOOL-dMendedRecall-2 — this repository declares no ASKS_CMD naming a generator file it tracks, or no python runs here, so the view-render arms have no generator to install; their 39 assertions are counted, not run"
 else
   rv_dir=$(mktemp -d); rv_oroot=$(mktemp -d); rv_out=$(mktemp -d)
@@ -11276,7 +11276,7 @@ RVC
   rv_check_commit() { # -> the generator's --check output over a fresh checkout of the fixture's HEAD
     local _d; _d=$(mktemp -d)
     run_rv_git archive HEAD | tar -x -C "$_d"
-    ( cd "$_d" && git init -q -b main . && git add -A \
+    ( cd "$_d" && git init -q -b main . && git config core.autocrlf false && git add -A \
         && git -c user.email=t@t.test -c user.name=t commit -q -m checkout --no-verify \
         && "$rv_py" -B "$rv_gen" --check ) 2>&1
     rm -rf "$_d"
@@ -11371,6 +11371,13 @@ RVC
   printf '# an operator note\n' >> "$rv_dir/.memory-tree.conf"
   out=$(run_rv --close tMend $RVOVR)
   hit  "$out" "a render would stage views derived from them: .memory-tree.conf;"
+  miss "$(run_rv_git diff --cached --name-only)" "memory/LIVE.md"
+  # ---- ...and the generator's own code (round 2, L1): `--write` imports its siblings from its own
+  # ---- directory, so an unstaged edit there feeds the render as surely as one under the memory root.
+  build_rv_fixture primary
+  printf '# an operator note\n' >> "$rv_dir/$rv_gen"
+  out=$(run_rv --close tMend $RVOVR)
+  hit  "$out" "a render would stage views derived from them: $rv_gen;"
   miss "$(run_rv_git diff --cached --name-only)" "memory/LIVE.md"
 
   cd "$TMP" || exit 2

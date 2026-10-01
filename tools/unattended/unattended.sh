@@ -6916,7 +6916,7 @@ write_backlog_rows() { # BACKLOG.md path · slug · ask row · SEV row · KEEP r
 # stage that git itself refuses, a held index lock say, is named on a line of its own and returns 1
 # too, because the success line would otherwise claim paths the index does not hold.
 write_ask_views() { # count of asks this call filed -> 0 rendered and staged, 1 on a named miss; one line each
-  local n=$1 gen="" py="" rc=0 why="" fix="" p h line paths="" left="" staged=1 dirty=""
+  local n=$1 gen="" py="" rc=0 why="" fix="" p h line paths="" left="" staged=1 dirty="" gd=""
   local -a post=() stage=()
   local -A h0=()
   # ONE test for both halves of "resolves": the library resolver runs the inline `resolve_python`
@@ -6941,6 +6941,16 @@ write_ask_views() { # count of asks this call filed -> 0 rendered and staged, 1 
       h0[$p]=$(GIT hash-object -- "$p" 2>/dev/null) || h0[$p]=-
       [ "$p" != .memory-tree.conf ] || dirty="$dirty${dirty:+ }$p"
     done < <(GIT ls-files --others --exclude-standard -z 2>/dev/null)
+    # THE GENERATOR'S OWN CODE is an input too (closing review round 2, L1): `--write` imports its
+    # sibling modules from the directory it lives in, so an unstaged edit there feeds the render as
+    # surely as one under the memory root does. Asked of git with that directory as the pathspec, so
+    # the names come back repo-relative whatever spelling the resolver used; a generator at the root
+    # names its own top-level modules only, never the whole tree.
+    gd=$(dirname -- "$gen")
+    [ "$gd" != . ] || gd=':(glob)*.py'
+    while IFS= read -r -d '' p; do
+      case " $dirty " in *" $p "*) ;; *) dirty="$dirty${dirty:+ }$p" ;; esac
+    done < <(GIT diff --no-renames --name-only -z -- "$gd" 2>/dev/null)
     if [ -n "$dirty" ]; then
       why="the views' inputs carry changes the index does not hold, and a render would stage views derived from them: $dirty"
       fix="stage or discard those changes, then run "
