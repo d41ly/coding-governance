@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-52 — the foreign-prefix leg asks only the prefix question
 
-**Status:** SPECCED · rev-2 · 2026-10-01 · node a · Tier-2 · base 56c7befa · streams tooling · order 25
+**Status:** SPECCED · rev-3 · 2026-10-01 · node a · Tier-2 · base 56c7befa · streams tooling · order 25
 
 <!-- gen:spec-records -->
 
@@ -27,7 +27,8 @@ with no calibrate pass, failing fast and printing a line per suite. The owner ex
   prologue, then the first arm that exercises its subject, prints
   `foreign-prefix-probe: stopped after 1 arm`, prints its own trailer for that one arm and exits with
   that arm's verdict. One environment flag for shell and python suites alike, honoured at one site
-  per suite, placed by that suite after the arm it chooses. `tools/lib/lib-selftest.sh` honours it
+  per suite, placed by that suite after the arm it chooses; a suite sharded into several rows
+  carries one site per shard, since each row runs only its own shard. `tools/lib/lib-selftest.sh` honours it
   once inside `run_arms`, which runs only the first declared arm, so every suite on that harness is
   covered by one site. Without the flag every suite runs exactly as at base. Observed by AC2.
 - **S2** — THE POPULATION is every row `run-selftests.sh --list` prints, with the argv it prints,
@@ -246,6 +247,8 @@ New arm: `tools/lib/lib-selftest.test.sh` · a harness suite run with the probe 
 - rev-2 · 2026-10-01 · Inventory: R2's `redeclare_wiring` is `write_declarations`, because the
   lexicon refused `redeclare` as a verb outside its table. S3: a `--selftest` mode of a shipped
   engine is declared whole with that reason, since a probe site there is an adopter-facing surface.
+- rev-3 · 2026-10-01 · S1: a suite sharded into several population rows carries one site per
+  shard, because a row runs only its own shard and a single site would probe one row of eight.
 
 ## 10. Reuse audit
 
