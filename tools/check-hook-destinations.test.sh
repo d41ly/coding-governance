@@ -22,8 +22,10 @@ derive_self_rel() {
 }
 # <<< derive_self_rel
 KIT_REL=$(derive_self_rel "$HERE") || { echo "check-hook-destinations.test: not inside a git repository"; exit 2; }
+# KP is this kit dir as a path head: empty at a root install, where `$KIT_REL/` named `/` (VERIFYING repair).
+KP="${KIT_REL:+$KIT_REL/}"
 ROOT="$(git -C "$HERE" rev-parse --show-toplevel)" || exit 2
-GATE="$ROOT/$KIT_REL/check-hook-destinations.sh"
+GATE="$ROOT/${KP}check-hook-destinations.sh"
 # TOOL-aRepatriatedFork-46: a kit is named by the name its directory has in THIS install, never
 # as a literal segment: this suite's own from where it sits, a sibling's through the resolver,
 # which reads the install receipt first. A fixture mirrors that layout by the resolved NAME.
@@ -141,7 +143,7 @@ if bash "$GATE" >/dev/null 2>&1; then ok "the shipped tree passes"; else bad "th
 # ---- ARM 2: a fragment naming an undeclared destination REDS (AC4) -------------------------------
 d=$(scratch)
 sed -i 's|{kit}/hooks/scratch-guard.js|'"$WITHDRAWN"'|' "$d/$HOOKS_DIR/scratch-guard.fragment.json"
-out=$(cd "$d" && bash "$KIT_REL/check-hook-destinations.sh" 2>&1); rc=$?
+out=$(cd "$d" && bash "${KP}check-hook-destinations.sh" 2>&1); rc=$?
 [ "$rc" != 0 ] && ok "a fragment naming a withdrawn path REDS (rc=$rc)" \
                || bad "a fragment naming a withdrawn path was accepted"
 case "$out" in *"scratch-guard.fragment.json"*".claude/hooks/scratch-guard.js"*)
@@ -157,7 +159,7 @@ d=$(scratch)
 printf '\ncp "$HERE/recall-opened.js" "$ROOT/.claude/hooks/recall-opened.js"\n' \
   >> "$d/$MEMORY_RECALL_DIR/adopt-memory-recall.sh"
 ( cd "$d" && git add -A && git commit -q -m break --no-verify ) >/dev/null 2>&1
-out=$(cd "$d" && bash "$KIT_REL/check-hook-destinations.sh" 2>&1); rc=$?
+out=$(cd "$d" && bash "${KP}check-hook-destinations.sh" 2>&1); rc=$?
 [ "$rc" != 0 ] && ok "an adopter writing into .claude/hooks/ REDS (rc=$rc)" \
                || bad "an adopter re-creating the withdrawn copy was accepted"
 case "$out" in *"adopt-memory-recall.sh installs a hook"*) ok "and names the installer" ;;
@@ -169,7 +171,7 @@ rm -rf "$d"
 # fragments are tracked, so zero means the selector broke.
 d=$(scratch)
 ( cd "$d" && git rm -q $(git ls-files '*.fragment.json') && git commit -q -m nofrags --no-verify ) >/dev/null 2>&1
-out=$(cd "$d" && bash "$KIT_REL/check-hook-destinations.sh" 2>&1); rc=$?
+out=$(cd "$d" && bash "${KP}check-hook-destinations.sh" 2>&1); rc=$?
 [ "$rc" != 0 ] && ok "an empty fragment population REFUSES (rc=$rc)" \
                || bad "a gate with no subject reported success"
 case "$out" in *"REFUSING"*"no subject"*) ok "and says it has no subject rather than printing a zero" ;;
@@ -180,9 +182,9 @@ rm -rf "$d"
 # Every arm above would also pass if the gate refused unconditionally. This pins that the verdicts
 # actually diverge on the same fixture shape.
 d=$(scratch)
-a=$(cd "$d" && bash "$KIT_REL/check-hook-destinations.sh" >/dev/null 2>&1; echo $?)
+a=$(cd "$d" && bash "${KP}check-hook-destinations.sh" >/dev/null 2>&1; echo $?)
 sed -i 's|{kit}/hooks/scratch-guard.js|'"$WITHDRAWN"'|' "$d/$HOOKS_DIR/scratch-guard.fragment.json"
-b=$(cd "$d" && bash "$KIT_REL/check-hook-destinations.sh" >/dev/null 2>&1; echo $?)
+b=$(cd "$d" && bash "${KP}check-hook-destinations.sh" >/dev/null 2>&1; echo $?)
 [ "$a" = 0 ] && [ "$b" != 0 ] && ok "the same fixture passes clean and reds broken ($a then $b)" \
                               || bad "the gate does not discriminate (clean=$a broken=$b)"
 rm -rf "$d"
@@ -193,14 +195,14 @@ rm -rf "$d"
 # Under a DIRECTORY kit's home, `{here}` is the kit dir at every prefix, so a shipped file passes
 # and an unshipped one reds — the memory-recall fragment is that shape in the shipped tree.
 d=$(scratch)
-mkdir -p "$d/$KIT_REL/nohome"
+mkdir -p "$d/${KP}nohome"
 printf '{"name": "orphan", "event": "E", "matcher": "M", "marker": "agent-cap.js", "hook_path": "{here}/agent-cap.js"}\n' \
-  > "$d/$KIT_REL/nohome/orphan.fragment.json"
+  > "$d/${KP}nohome/orphan.fragment.json"
 ( cd "$d" && git add -A && git commit -q -m orphan --no-verify ) >/dev/null 2>&1
-out=$(cd "$d" && bash "$KIT_REL/check-hook-destinations.sh" 2>&1); rc=$?
+out=$(cd "$d" && bash "${KP}check-hook-destinations.sh" 2>&1); rc=$?
 [ "$rc" != 0 ] && ok "a {here} fragment under no descriptor's home REDS (rc=$rc)" \
                || bad "a {here} fragment under no descriptor's home was accepted"
-case "$out" in *"orphan.fragment.json"*"'$KIT_REL/nohome' is the home of NO descriptor"*)
+case "$out" in *"orphan.fragment.json"*"'${KP}nohome' is the home of NO descriptor"*)
   ok "and the refusal names the directory" ;;
   *) bad "the refusal does not name the directory: $(printf '%s' "$out" | grep orphan | head -2)" ;; esac
 rm -rf "$d"
@@ -208,13 +210,13 @@ d=$(scratch)
 printf '{"name": "dirkit", "event": "E", "matcher": "M", "marker": "agent-cap.js", "hook_path": "{here}/agent-cap.js"}\n' \
   > "$d/$HOOKS_DIR/dirkit.fragment.json"
 ( cd "$d" && git add -A && git commit -q -m dirkit --no-verify ) >/dev/null 2>&1
-out=$(cd "$d" && bash "$KIT_REL/check-hook-destinations.sh" 2>&1); rc=$?
+out=$(cd "$d" && bash "${KP}check-hook-destinations.sh" 2>&1); rc=$?
 [ "$rc" = 0 ] && ok "a {here} fragment under a directory kit's home naming a shipped file passes" \
               || bad "a {here} fragment under a directory kit's home was refused: $(printf '%s' "$out" | grep -E 'FAIL|REFUS' | head -2)"
 printf '{"name": "dirkit", "event": "E", "matcher": "M", "marker": "nobody.js", "hook_path": "{here}/nobody.js"}\n' \
   > "$d/$HOOKS_DIR/dirkit.fragment.json"
 ( cd "$d" && git add -A && git commit -q -m dirkit-unshipped --no-verify ) >/dev/null 2>&1
-out=$(cd "$d" && bash "$KIT_REL/check-hook-destinations.sh" 2>&1); rc=$?
+out=$(cd "$d" && bash "${KP}check-hook-destinations.sh" 2>&1); rc=$?
 [ "$rc" != 0 ] && ok "a {here} fragment under a directory kit's home naming an unshipped file REDS (rc=$rc)" \
                || bad "a {here} fragment naming an unshipped file under a directory kit's home was accepted"
 rm -rf "$d"
@@ -225,23 +227,23 @@ rm -rf "$d"
 # WHOLE declared set. The fixture names a file a flat kit ships beside the fragment.
 d=$(scratch)
 printf '{"name": "shared", "event": "E", "matcher": "M", "marker": "settings-merge.py", "hook_path": "{here}/settings-merge.py"}\n' \
-  > "$d/$KIT_REL/shared-home.fragment.json"
+  > "$d/${KP}shared-home.fragment.json"
 ( cd "$d" && git add -A && git commit -q -m shared --no-verify ) >/dev/null 2>&1
-out=$(cd "$d" && bash "$KIT_REL/check-hook-destinations.sh" 2>&1); rc=$?
+out=$(cd "$d" && bash "${KP}check-hook-destinations.sh" 2>&1); rc=$?
 [ "$rc" = 0 ] && ok "a {here} fragment under a shared flat home passes (rc=$rc)" \
               || bad "a {here} fragment under a shared flat home was refused: $(printf '%s' "$out" | grep -E 'FAIL|REFUS' | head -2)"
-case "$out" in *"shared-home.fragment.json -> $KIT_REL/settings-merge.py in the tree, ships as"*)
+case "$out" in *"shared-home.fragment.json -> ${KP}settings-merge.py in the tree, ships as"*)
   ok "and the ok line prints both spellings" ;;
   *) bad "the ok line does not print both spellings: $(printf '%s' "$out" | grep shared-home | head -1)" ;; esac
 # ...and the SAME shape naming a file the flat kits do NOT ship reds, both spellings printed: the
 # flat-home test alone must not be enough.
 printf '{"name": "unshipped", "event": "E", "matcher": "M", "marker": "nobody.sh", "hook_path": "{here}/nobody.sh"}\n' \
-  > "$d/$KIT_REL/unshipped.fragment.json"
+  > "$d/${KP}unshipped.fragment.json"
 ( cd "$d" && git add -A && git commit -q -m unshipped --no-verify ) >/dev/null 2>&1
-out=$(cd "$d" && bash "$KIT_REL/check-hook-destinations.sh" 2>&1); rc=$?
+out=$(cd "$d" && bash "${KP}check-hook-destinations.sh" 2>&1); rc=$?
 [ "$rc" != 0 ] && ok "a {here} fragment naming an unshipped file under a flat home REDS (rc=$rc)" \
                || bad "a {here} fragment naming an unshipped file was accepted"
-case "$out" in *"unshipped.fragment.json"*"'$KIT_REL/nobody.sh' in the tree, which would ship as"*"'$KIT_REL/nobody.sh'"*)
+case "$out" in *"unshipped.fragment.json"*"'${KP}nobody.sh' in the tree, which would ship as"*"'${KP}nobody.sh'"*)
   ok "and the refusal prints the in-tree and the adopter spelling" ;;
   *) bad "the refusal does not print both spellings: $(printf '%s' "$out" | grep unshipped | head -2)" ;; esac
 rm -rf "$d"
@@ -252,10 +254,10 @@ rm -rf "$d"
 # reader's `{here}` expansion in a COPY of the tree, so the two answers differ on every {here}
 # fragment and agree on every {kit} one.
 d=$(scratch)
-sed -i 's#{here}/|${here:+$here/}|g#{here}/|elsewhere/|g#' "$d/$KIT_REL/check-wiring.sh"
-grep -q 'elsewhere/' "$d/$KIT_REL/check-wiring.sh" || bad "the parity fixture did not stage its break (the resolver's {here} line moved)"
+sed -i 's#{here}/|${here:+$here/}|g#{here}/|elsewhere/|g#' "$d/${KP}check-wiring.sh"
+grep -q 'elsewhere/' "$d/${KP}check-wiring.sh" || bad "the parity fixture did not stage its break (the resolver's {here} line moved)"
 ( cd "$d" && git add -A && git commit -q -m parity --no-verify ) >/dev/null 2>&1
-out=$(cd "$d" && bash "$KIT_REL/check-hook-destinations.sh" 2>&1); rc=$?
+out=$(cd "$d" && bash "${KP}check-hook-destinations.sh" 2>&1); rc=$?
 [ "$rc" != 0 ] && ok "two readers disagreeing on a token REDS (rc=$rc)" \
                || bad "the gate accepted two readers that disagree"
 case "$out" in *"the two readers DISAGREE"*"elsewhere/"*) ok "and the refusal prints both readers' answers" ;;
