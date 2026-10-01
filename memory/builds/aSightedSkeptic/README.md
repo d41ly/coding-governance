@@ -87,7 +87,7 @@ ids TOOL-aSightedSkeptic-1 TOOL-aSightedSkeptic-2 TOOL-aSightedSkeptic-3 TOOL-aS
 | [TOOL-aSightedSkeptic-10 — discharge the two Observed-by claims no arm reads, and record the class](spec/2026-10-01-spec-TOOL-aSightedSkeptic-10.md) | 10 | 2 | CLOSED | rev-1 | 2026-10-01 |
 <!-- /gen:build-units -->
 
-Records: 26 bound to this build, across 4 record folder(s).
+Records: 27 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
