@@ -2653,6 +2653,16 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "deriveChecklistShares",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "deriveChecklistShares",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
+    },
+    {
       "id": "deriveFnv1a",
       "kind": "function",
       "file": "tools/workflows/tier2-review.js"
@@ -4581,6 +4591,16 @@
       "id": "parseBranches",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
+    },
+    {
+      "id": "parseChecklist",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "parseChecklist",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
     },
     {
       "id": "parseLiveness",

@@ -280,6 +280,7 @@ async function runWholeScriptArms() {
     ['another priorFindings', Object.assign({}, DIFF, { priorFindings: [{ ref: 'a:1', claim: 'c' }] }), null],
     ['another lensNotes', Object.assign({}, DIFF, { lensNotes: { security: 'n2' } }), null],
     ['another specs', Object.assign({}, DIFF, { specs: ['x.md'] }), null],
+    ['another checklist', Object.assign({}, DIFF, { checklist: ['a class'] }), null],
   ]
   for (const [what, args, probe] of variants) {
     const own = await runReview(args, buildStubs(probe ? { 'resume:probe': probe } : {}))
@@ -521,6 +522,107 @@ async function runWholeScriptArms() {
     ck(sf.length === 4 && sf.every((t) => t.prompt.indexOf('SIBLING CONTEXT') !== -1 && t.prompt.indexOf('  - overview.md') !== -1 && t.prompt.indexOf('log --format=%B') === -1),
       'spec-audit: specs render as sibling context')
   }
+
+  // ==== TOOL-aSightedSkeptic-4 — `checklist`, split round-robin over the lenses of the run's kind =====
+  // Every arm is RED against the parent render, which reads no `checklist`: no prompt carries an item,
+  // no line is logged, nothing refuses. Item names and descriptions are unique tokens, so "occurs
+  // exactly once" counts the item and never a neighbour that contains it.
+  const CL_N = 7
+  const clName = (n) => 'CLA' + n + 'X'
+  const clDesc = (n) => 'DSC' + n + 'X'
+  const countIn = (s, needle) => s.split(needle).length - 1
+  const CL_LINES = []
+  for (let n = 1; n <= CL_N; n++) CL_LINES.push('- [ ] ' + clName(n) + '\n    ' + clDesc(n) + '\n    memory/gotchas/c' + n + '.md')
+  const CL_STR = '# PRE-ONE header\n# PRE-TWO header\n\n' + CL_LINES.join('\n\n') + '\n'
+  const CL_ARR = []
+  for (let n = 1; n <= CL_N; n++) CL_ARR.push(clName(n) + ': ' + clDesc(n))
+  // Item n is in exactly ONE find: prompt, once, labelled C<n>, with its description beside it, and
+  // that prompt is the lens at (n - 1) % K in lens order.
+  const scanSplit = (run, keys) => {
+    const fp = scanPrompts(run, 'find:')
+    if (fp.length !== keys.length) return false
+    for (let n = 1; n <= CL_N; n++) {
+      const holders = fp.filter((t) => t.prompt.indexOf(clName(n)) !== -1)
+      if (holders.length !== 1 || countIn(holders[0].prompt, clName(n)) !== 1) return false
+      if (holders[0].label !== 'find:' + keys[(n - 1) % keys.length]) return false
+      if (!new RegExp('(^|\\n)C' + n + ' (\\[ \\] )?' + clName(n)).test(holders[0].prompt)) return false
+      if (holders[0].prompt.indexOf(clDesc(n)) === -1) return false
+    }
+    return true
+  }
+  const DIFF_ORDER = ['security', 'correctness', 'seams', 'verification', 'intent']
+  const SPEC_ORDER = ['underspecification', 'contradiction', 'unstated-assumption', 'prior-art']
+  // ---- AC1: a string checklist, preamble and seven items.
+  const rcl = await runReview(Object.assign({}, DIFF, { checklist: CL_STR }), ALL_OK)
+  if (checkNoThrow(rcl, 'checklist string')) {
+    const fp = scanPrompts(rcl, 'find:')
+    const vp = scanPrompts(rcl, 'verify:')
+    ck(scanSplit(rcl, DIFF_ORDER) && fp.every((t) => t.prompt.indexOf('PRE-ONE') !== -1 && t.prompt.indexOf('PRE-TWO') !== -1 &&
+      t.prompt.indexOf('Begin such a finding\'s claim with its C<n> label') !== -1) &&
+      vp.length === 5 && vp.every((t) => t.prompt.indexOf('CLA') === -1 && t.prompt.indexOf('DSC') === -1 && t.prompt.indexOf('CHECKLIST') === -1),
+      'checklist string: every item in exactly one finder prompt')
+  }
+  // ---- AC2: a CRLF twin splits identically and keys identically; an array is one item per element.
+  const rcr = await runReview(Object.assign({}, DIFF, { checklist: CL_STR.replace(/\n/g, '\r\n') }), ALL_OK)
+  if (checkNoThrow(rcr, 'checklist CRLF') && rcl.result) {
+    ck(scanSplit(rcr, DIFF_ORDER) && rcr.result.key === rcl.result.key,
+      'checklist string: continuation lines stay with their item')
+  }
+  r = await runReview(Object.assign({}, DIFF, { checklist: CL_ARR }), ALL_OK)
+  if (checkNoThrow(r, 'checklist array')) {
+    const fp = scanPrompts(r, 'find:')
+    ck(scanSplit(r, DIFF_ORDER) && fp.every((t) => t.prompt.indexOf('CHECKLIST') !== -1 && t.prompt.indexOf('PRE-ONE') === -1),
+      'checklist array: each element is one item')
+  }
+  // ---- AC3: the assignment is recoverable from the log and RUN INTEGRITY; an empty share is said.
+  if (rcl.result) {
+    const cl = rcl.logs.filter((l) => l.indexOf('checklist:') === 0)
+    const sp = rcl.trace.find((t) => t.label === 'synth')
+    const ri = sp ? sp.prompt.slice(sp.prompt.indexOf('RUN INTEGRITY')) : ''
+    ck(cl.length === 1 && / — security C1 C6; correctness C2 C7; seams C3; verification C4; intent C5$/.test(cl[0]) &&
+      ri.indexOf('Checklist: 7 item(s)') !== -1,
+      'checklist: the log names every lens\'s share')
+  }
+  r = await runReview(Object.assign({}, DIFF, { checklist: ['one', 'two', 'three'] }), ALL_OK)
+  if (checkNoThrow(r, 'checklist three items')) {
+    const none = scanPrompts(r, 'find:').filter((t) => t.prompt.indexOf('holds none') !== -1).map((t) => t.label)
+    ck(none.join(' ') === 'find:verification find:intent',
+      'checklist: fewer items than lenses leaves an explicit empty share: ' + none.join(' '))
+  }
+  // ---- AC4: absent and empty are each announced in their own words; a real checklist warns nothing.
+  r = await runReview(DIFF, ALL_OK)
+  if (checkNoThrow(r, 'checklist absent')) {
+    const sp = r.trace.find((t) => t.label === 'synth')
+    const fp = scanPrompts(r, 'find:')
+    ck(r.logs.some((l) => l.indexOf('WARNING:') === 0 && l.indexOf('no `checklist` was supplied') !== -1) && !!sp &&
+      sp.prompt.indexOf('Checklist: NONE swept — absent') !== -1 && fp.length === 5 && fp.every((t) => t.prompt.indexOf('CHECKLIST') === -1),
+      'checklist absent: announced in the log and RUN INTEGRITY')
+  }
+  r = await runReview(Object.assign({}, DIFF, { checklist: '   ' }), ALL_OK)
+  if (checkNoThrow(r, 'checklist empty')) {
+    const sp = r.trace.find((t) => t.label === 'synth')
+    ck(r.logs.some((l) => l.indexOf('WARNING:') === 0 && l.indexOf('`checklist` was supplied with no item') !== -1) && !!sp &&
+      sp.prompt.indexOf('Checklist: NONE swept — supplied with no item') !== -1,
+      'checklist empty: announced as supplied with no item')
+  }
+  if (rcl.result) {
+    ck(!rcl.logs.some((l) => l.indexOf('WARNING:') === 0 && l.indexOf('`checklist`') !== -1) && rcl.logs.some((l) => l.indexOf('checklist:') === 0),
+      'checklist supplied: no checklist warning')
+  }
+  // ---- AC5: six malformed values refuse before any agent spawns.
+  const refusedChecklists = [['7', 7], ['{}', {}], ['null', null], ['[1]', [1]], ["['  ']", ['  ']], ['a string with no item line', 'no item line here']]
+  for (const [what, v] of refusedChecklists) {
+    r = await runReview(Object.assign({}, DIFF, { checklist: v }), ALL_OK)
+    ck(typeof r.threw === 'string' && r.threw.indexOf('checklist') !== -1 && r.trace.length === 0,
+      'checklist refused before any agent: ' + what + (r.threw ? '' : ' (accepted)'))
+  }
+  // ---- AC6: a spec audit splits over its own four lenses and sweeps the spec set.
+  r = await runReview(Object.assign({}, SPEC, { checklist: CL_STR }), ALL_OK)
+  if (checkNoThrow(r, 'spec-audit checklist')) {
+    const fp = scanPrompts(r, 'find:')
+    ck(scanSplit(r, SPEC_ORDER) && fp.every((t) => t.prompt.indexOf('against the spec set') !== -1),
+      'spec-audit: the checklist splits over the spec lenses')
+  }
 }
 
 runWholeScriptArms().then(() => {
@@ -551,7 +653,10 @@ printf '%s\n' "$out"
 # RAISED 84 -> 100 by TOOL-aSightedSkeptic-3: 16 assertions, counted off the block — the specs key
 # component's AC3 pair (2), specs in every prompt (1), the commit-log default (1), the announced
 # absence and its control (2), eight refused values (8) and the spec-audit overlap and sibling arms (2).
-FLOOR_ASSERTIONS=100
+# RAISED 100 -> 117 by TOOL-aSightedSkeptic-4: 17 assertions, counted off the block — the checklist
+# key component's AC3 pair (2), the string split (1), the CRLF twin and the array (2), the log line and
+# the empty share (2), absent, empty and the control (3), six refused values (6) and the spec audit (1).
+FLOOR_ASSERTIONS=117
 executed=$(printf '%s\n' "$out" | sed -n 's/^---- \([0-9][0-9]*\) passed.*/\1/p' | tail -1)
 if [ -z "$executed" ]; then
   echo "FAIL the runner printed no assertion count at all — it died before its summary line"

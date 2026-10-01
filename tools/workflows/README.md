@@ -167,6 +167,24 @@ exists; the lens that reads it reports a missing one. A run given neither `specs
 `WARNING:`, and every report's RUN INTEGRITY block says where intent came from. `specs` joins the
 review key, like `lensNotes`.
 
+`checklist` carries the project's recurring bug classes. The harness produces none; this repository
+passes the stdout of `python tools/memory-tree/gotchas.py --for-diff <range>`:
+
+```js
+args: { repo, base, head, reviewDir,
+        checklist: '# preamble\n- [ ] class-one\n    what it is\n- [ ] class-two' }
+// or, already split:  checklist: ['class-one: what it is', 'class-two']
+```
+
+As a string, lines before the first line starting `- ` are a preamble, each `- ` line opens an item,
+and the lines after it continue that item; CRLF reads as LF. A non-blank string with no `- ` line
+refuses rather than becoming one item, and so does any value that is neither a string nor an array of
+non-empty strings. The items are split ROUND-ROBIN over the lenses of the run's kind: item `n` goes to
+lens `(n - 1) % K` in lens order, so each class is swept by exactly one finder, labelled `C<n>`, and
+a finder begins a hit's claim with that label. A lens with no share is told so; skeptics get none. The
+split is logged, and RUN INTEGRITY states it. An absent or itemless checklist logs a `WARNING:` and
+RUN INTEGRITY says no class was swept. The parsed checklist joins the review key.
+
 ## `orient-counterfactual.js` — one stage-2 arm per call
 
 The stage-2 `orient` subagent is deferred behind a measurement: whether moving a kickoff's

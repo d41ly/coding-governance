@@ -81,7 +81,9 @@ function buildKeyedSchema(schema, extra) {
 //   priorFindings: [ ... ],               // a previous round's confirmed set
 //   specs: ["<repo-relative path>", ...], // intent documents: a diff review's statement of intent, a spec audit's
 //                                         // sibling context; absent -> [], and with no context a WARNING
-//   lensNotes: { "<lens key>": "<note>" } } // project addendum per lens of THIS kind; absent -> {} and a WARNING
+//   lensNotes: { "<lens key>": "<note>" }, // project addendum per lens of THIS kind; absent -> {} and a WARNING
+//   checklist: "<preamble>\n- <item>\n  <continuation>" | ["<item>", ...] } // the project's recurring
+//                                         // bug classes, each item swept by exactly one lens; absent -> a WARNING
 // D9 - `kind` and `subjects` were added without extending this block, and BUILD-METHOD M4 sends a
 // reader HERE for the spec-audit spelling. An absent `kind` does not refuse - it defaults - so a
 // header missing the field buys exactly the failure M4 exists to prevent: a code-shaped review of a
@@ -227,6 +229,39 @@ if (specsBadIdx !== -1)
 const specsOverlap = isSpec ? SPECS.find((p) => subjects.some((x) => x && x.path === p)) : undefined
 if (specsOverlap !== undefined)
   throw new Error('tier2-review: `specs` names ' + JSON.stringify(specsOverlap) + ', which is also a subject of this spec audit; a document cannot be both under audit and sibling context to it.')
+// TOOL-aSightedSkeptic-4 S1 - `checklist`, the project's recurring bug classes. The harness produces
+// none and names no checker (the caller here passes `gotchas.py --for-diff` stdout). Parsed before
+// the base-shape ladder and the first agent, so a bad value refuses in milliseconds. A non-blank
+// string with no `- ` item line REFUSES rather than becoming one item: one item lands on one lens,
+// which is the whole-checklist-on-one-agent defect this argument exists to remove (spec F2).
+function parseChecklist(v) {
+  const rule = 'a string whose items are lines starting "- " (lines before the first item are a preamble, ' +
+    'indented lines after an item continue it) or an array of non-empty strings'
+  if (v === undefined) return { preamble: '', items: [] }
+  if (typeof v === 'string') {
+    const pre = []
+    const items = []
+    for (const raw of v.replace(/\r\n/g, '\n').split('\n')) {
+      const line = raw.replace(/\s+$/, '')
+      if (!line) continue
+      if (line.indexOf('- ') === 0) items.push(line.slice(2))
+      else if (items.length) items[items.length - 1] += '\n' + line
+      else pre.push(line)
+    }
+    if (!items.length && v.trim())
+      throw new Error('tier2-review: `checklist` must be ' + rule + '. Got a string with no line starting "- ": ' +
+        JSON.stringify(v.slice(0, 80)) + '. Pass the items as an array instead.')
+    return { preamble: pre.join('\n'), items: items }
+  }
+  if (!Array.isArray(v))
+    throw new Error('tier2-review: `checklist` must be ' + rule + '. Got ' + JSON.stringify(v) + '.')
+  const bad = v.findIndex((x) => typeof x !== 'string' || !x.trim())
+  if (bad !== -1)
+    throw new Error('tier2-review: `checklist` must be ' + rule + '. Member ' + bad + ' is ' + JSON.stringify(v[bad]) + '.')
+  return { preamble: '', items: v.slice() }
+}
+const checklist = parseChecklist(a.checklist)
+const CHECKLIST_ITEMS = checklist.items
 const baseLooksPinned = isSpec || PINNED_SHA.test(String(base))
 if (!baseLooksPinned) {
   const why =
@@ -443,6 +478,41 @@ if (intentAbsent)
   log('WARNING: neither `specs` nor `context` was supplied — the lenses were told nothing about what this ' +
     (isSpec ? 'spec set' : 'change') + ' is for' + (isSpec ? '' : ', beyond the range\'s commit messages') +
     '; pass the intent documents as `specs` or describe the change in `context`')
+// TOOL-aSightedSkeptic-4 S2-S6 - THE SPLIT. Item n goes to keys[(n - 1) % K], so every item is in
+// exactly one share and the split is a pure function of the items and the keys: a reused lens file
+// (S7) held the share this run would hand it. Round-robin, not contiguous `chunk`: a contiguous split
+// hands one lens a run of neighbouring classes and the last lens the short remainder (spec F1 and §10).
+// It runs over LENS_KEYS, never by reshaping the LENSES receiver the agent-cap hook sizes.
+function deriveChecklistShares(items, keys) {
+  const shares = {}
+  for (const k of keys) shares[k] = []
+  items.forEach((text, i) => shares[keys[i % keys.length]].push({ n: i + 1, text: text }))
+  return shares
+}
+const checklistShares = deriveChecklistShares(CHECKLIST_ITEMS, LENS_KEYS)
+const checklistSubject = isSpec ? 'the spec set' : 'the diff'
+// One block per lens, built here rather than in the prompt. Skeptics get none (S3).
+const checklistBlock = {}
+for (const k of LENS_KEYS) {
+  const share = checklistShares[k]
+  checklistBlock[k] = !CHECKLIST_ITEMS.length
+    ? ''
+    : `CHECKLIST — the project's recurring bug classes, split across the lenses so each is swept once.\n` +
+      (checklist.preamble ? checklist.preamble + '\n' : '') +
+      (share.length
+        ? `This lens holds ${share.length} of the ${CHECKLIST_ITEMS.length} items; the others hold the rest.\n` +
+          share.map((x) => `C${x.n} ${x.text}`).join('\n') + '\n' +
+          `Sweep EACH class above against ${checklistSubject} and report only a FRESH hit: a defect of that class ` +
+          `${checklistSubject} introduces or touches. Begin such a finding's claim with its C<n> label. A class with no hit needs no finding.\n`
+        : `This lens holds none of the ${CHECKLIST_ITEMS.length} items; the other lenses hold them all.\n`)
+}
+// S4/S5 - the assignment is recoverable from the log; an absence is ANNOUNCED, worded per cause.
+if (CHECKLIST_ITEMS.length)
+  log(`checklist: ${CHECKLIST_ITEMS.length} item(s) over ${LENS_KEYS.length} lens(es), each swept by exactly one — ` +
+    LENS_KEYS.map((k) => k + ' ' + (checklistShares[k].length ? checklistShares[k].map((x) => 'C' + x.n).join(' ') : 'none')).join('; '))
+else if (a.checklist === undefined)
+  log('WARNING: no `checklist` was supplied — no lens sweeps the project\'s recurring bug classes; pass the caller\'s checklist output as `checklist`')
+else log('WARNING: `checklist` was supplied with no item — no lens sweeps the project\'s recurring bug classes')
 
 // ---- TOOL-dDerivedDocket-29 S2/S3 — THE RESUME PROBE, one agent, before the Find phase ----------
 // WHY ONE AGENT. The script has no filesystem, so something with one has to read the key directory.
@@ -454,7 +524,7 @@ if (intentAbsent)
 // through the skeptics.
 //
 // THE KEY: kind, round, the pinned subject, and a fingerprint over `context`, `byDesign`,
-// `priorFindings`, `lensNotes`, `specs` and the REVIEW_SHAPE literal - every input a lens prompt interpolates,
+// `priorFindings`, `lensNotes`, `specs`, `checklist` and the REVIEW_SHAPE literal - every input a lens prompt interpolates,
 // and the prompts' own shape, except `repo`, which is left out on
 // purpose: the common dir is shared by every worktree on the node, and a take-over from another
 // worktree of the same commits is exactly the re-run this exists for. A spec audit's subject is every
@@ -469,7 +539,9 @@ if (intentAbsent)
 // prompt's hand-spelled directory follows without a second edit.
 const REVIEW_SHAPE = 'lenses5-r1'
 // TOOL-aSightedSkeptic-3 S5 - `specs` is interpolated by renderIntent(), so it joins the print too.
-const inputPrint = deriveFnv1a(renderCanonical({ shape: REVIEW_SHAPE, context: context, byDesign: byDesign, priorFindings: priorFindings, lensNotes: lensNotes, specs: SPECS }))
+// TOOL-aSightedSkeptic-4 S7 - so does the PARSED checklist: a CRLF string and its LF twin are one key,
+// and a lens swept under one checklist is never reused under another.
+const inputPrint = deriveFnv1a(renderCanonical({ shape: REVIEW_SHAPE, context: context, byDesign: byDesign, priorFindings: priorFindings, lensNotes: lensNotes, specs: SPECS, checklist: checklist }))
 const specSubject = isSpec
   ? deriveFnv1a(subjects.map((x) => (x && typeof x === 'object' ? `${x.path}@${x.blob}` : String(x))).join('\n'))
   : ''
@@ -624,6 +696,8 @@ const finderResults = await boundedParallel(
         `LENS: ${L.brief}\n` +
         // TOOL-aSightedSkeptic-5 S5 - this lens's note and no other's, directly under its brief.
         (notedLenses.indexOf(L.key) !== -1 ? `PROJECT NOTE FOR THIS LENS (from the caller's lensNotes): ${lensNotes[L.key]}\n` : '') +
+        // TOOL-aSightedSkeptic-4 S3 - this lens's checklist share, and no other's.
+        checklistBlock[L.key] +
         `\n` +
         (isSpec
           ? `Emit CONCRETE findings only — each needs file, where, severity (blocker|high|medium|low), with "where" being the section address, e.g. "section 2 S5", a one-line claim, the impact, and a proposed fix. A spec finding is often the ABSENCE of a line, so address it by section. No speculation, no style nits, nothing outside the spec set. If nothing real, return findings: [].\n`
@@ -888,6 +962,12 @@ const synth = await agent(
       : a.context
         ? `Intent: no spec was supplied; \`context\` was the caller's statement${isSpec ? '' : ', beside the range\'s commit messages'}.\n`
         : `Intent: NEITHER \`specs\` nor \`context\` was supplied${isSpec ? '' : ', so the lenses had only the range\'s commit messages'} - the report must say so.\n`) +
+    // TOOL-aSightedSkeptic-4 S4/S5 - which lens held which share, or that nothing was swept.
+    (CHECKLIST_ITEMS.length
+      ? `Checklist: ${CHECKLIST_ITEMS.length} item(s), each assigned to exactly one of ${LENS_KEYS.length} lens(es): ` +
+        LENS_KEYS.map((k) => `${k} ${checklistShares[k].length}`).join(', ') + `.\n`
+      : `Checklist: NONE swept — ${a.checklist === undefined ? 'absent' : 'supplied with no item'}; a zero count is not ` +
+        `evidence the project's recurring bug classes are absent.\n`) +
     `If lenses died, the finding set is INCOMPLETE and a zero count is not evidence of absence. ` +
     `Say so where you would otherwise call a zero positive evidence.\n\n` +
     // The range line is what the unattended kit's `closing-review-recorded` joins on, so the value

@@ -1,6 +1,6 @@
 # TOOL-aSightedSkeptic-4 — a `checklist` argument whose classes are split across the lenses that run
 
-**Status:** SPECCED · rev-1 · 2026-10-01 · node a · Tier-2 · base ef1dcdb6 · streams tooling · order 4 · ratified 2026-10-01
+**Status:** CLOSED · rev-1 · 2026-10-01 · node a · Tier-2 · base ef1dcdb6 · streams tooling · order 4 · ratified 2026-10-01
 
 <!-- gen:spec-records -->
 
