@@ -10,8 +10,8 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 
 ## Run facts
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 4174bd1cbf9c56c473cd321e8f316831adcf1669
-phase: BUILDING
+witness: 0cfb51da3adedf3063b03763e8838bcd54dc6c56
+phase: REVIEWING
 asks-ready: TOOL-dAlignedCarrier-7=yes TOOL-dAlignedCarrier-8=yes TOOL-dAlignedCarrier-9=yes
 asks: TOOL-dAlignedCarrier-7..9
 m-base: 1f9158708e4782dfe2d25a17fdf4153f57d38ae3
@@ -49,3 +49,5 @@ base: 1f9158708e4782dfe2d25a17fdf4153f57d38ae3
 2026-10-01T08:24:17Z dispatch · item 9cba3c3f TOOL-dMendedRecall-3 · reason tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md memory/builds/dMendedRecall/spec/2026-10-01-spec-TOOL-dMendedRecall-3.md memory/builds/dMendedRecall/build/2026-10-01-build-TOOL-dMendedRecall-3-1-acceptance-ledger.md memory/builds/dMendedRecall/README.md memory/LIVE.md memory/ledger/2026-10.md memory/backlog/TOOL.md
 
 2026-10-01T08:24:21Z brief · item TOOL-dMendedRecall-3 · reason cadf7f43bdfb memory/builds/dMendedRecall/prompts/2026-10-01-prompt-TOOL-dMendedRecall-1-build-brief.md
+
+2026-10-01T08:55:09Z review · item dMendedRecall · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED
