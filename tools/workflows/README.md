@@ -128,6 +128,27 @@ Each also accepts explicit files, which is how the suites drive their fixtures. 
 output is where the resolved predicate path is reported: the default run's bytes are pinned by an
 acceptance criterion, so diagnostics that would change them live behind the flag.
 
+## `tier2-review.js` — the five diff lenses, and `lensNotes`
+
+A diff review fans out over five finder lenses, in this order: `security`, `correctness`, `seams`,
+`verification` and `intent`. Since 1.17 `verification` asks whether every changed behaviour has a
+check that can fail, and `intent` whether the diff does what its commit messages and specs say; the
+old `regressions` lens is retired. A spec audit keeps its four lenses. Five is also the most the
+agent-cap hook admits on that receiver, so the set cannot grow a sixth.
+
+`lensNotes` appends a project addendum to one lens's brief, and to no other prompt:
+
+```js
+args: { repo, base, head, reviewDir,
+        lensNotes: { security: 'shell is built from conf values; treat .unattended.conf as input' } }
+```
+
+Its keys are the lens keys of the run's own kind. A key naming no such lens, a non-object, or an
+empty note refuses before any agent spawns, with the legal keys in the message. Absent, it is
+announced: a `WARNING:` log line, and a clause in the report's RUN INTEGRITY block. The notes and a
+review-shape literal both join the review key, so a lens file written by older prompts or under
+other notes is never reused. An adopter test that counted four diff lenses sees five from 1.17.
+
 ## `orient-counterfactual.js` — one stage-2 arm per call
 
 The stage-2 `orient` subagent is deferred behind a measurement: whether moving a kickoff's

@@ -1,13 +1,13 @@
 export const meta = {
   name: 'tier2-review',
-  version: '1.16', // gov:kit tier2-review@1.16 // gov:kit review-harness@1.16 — BOTH ids: the
+  version: '1.17', // gov:kit tier2-review@1.17 // gov:kit review-harness@1.17 — BOTH ids: the
   // second is this entry's REGISTRY id, and without it a deployer grepping the id the
   // registry uses finds nothing. DEPL-dGaugedVintage-5. — engine identity (deployed verbatim; this field is the deployer's version marker)
   description:
     'Consolidated, concurrency-capped (≤5) Tier-2 adversarial review, ≤5 verify agents TOTAL: find → batched-verify → synth, joined on an ORCHESTRATOR-ASSIGNED INTEGER id. Replaces the big-fan-out review that trips the server rate limiter. Project-agnostic — parameterize via `args`.',
   phases: [
     { title: 'Resume', detail: 'one probe reads the key directory; a lens or batch whose file carries the key is reused' },
-    { title: 'Find', detail: '4 finder lenses, one wave, ≤5 concurrent' },
+    { title: 'Find', detail: '5 finder lenses, one wave, ≤5 concurrent' },
     { title: 'Verify', detail: 'skeptics refute findings in ≤5 BATCHES — agent count fixed' },
     { title: 'Synthesize', detail: 'one pass → report file' },
   ],
@@ -78,7 +78,8 @@ function buildKeyedSchema(schema, extra) {
 //   kind: "diff-review" | "spec-audit",   // DEFAULTS to "diff-review" when absent
 //   subjects: [{ path, blob }],           // spec-audit ONLY; blob is 7-40 hex, per subject
 //   round: <integer>,                     // inferred as 2 when priorFindings arrive without one
-//   priorFindings: [ ... ] }              // a previous round's confirmed set
+//   priorFindings: [ ... ],               // a previous round's confirmed set
+//   lensNotes: { "<lens key>": "<note>" } } // project addendum per lens of THIS kind; absent -> {} and a WARNING
 // D9 - `kind` and `subjects` were added without extending this block, and BUILD-METHOD M4 sends a
 // reader HERE for the spec-audit spelling. An absent `kind` does not refuse - it defaults - so a
 // header missing the field buys exactly the failure M4 exists to prevent: a code-shaped review of a
@@ -323,16 +324,21 @@ const SPEC_FINDING_SCHEMA = {
 // whatever `boundedParallel`'s default parameter resolves to, which is the one place that owns
 // it. Closes TOOL-aDeclaredBound-6, whose own row cites the wrong line for this text.
 // The `phase('Find')` call moved below the resume probe (TOOL-dDerivedDocket-29 S3).
+// TOOL-aSightedSkeptic-5 - FIVE lenses, the owner's set. `regressions` is retired: it was told to run
+// "the PROJECT's checklist" and was handed none, and its sweep is now split over these five through
+// `args.checklist`. `verification` hunts the defect this repo finds most, a check that cannot fail,
+// which no brief named. No brief names a web surface. Five is the most the agent-cap hook admits on
+// an array-literal receiver, so a sixth lens is denied at the tool call rather than chosen against.
 const DIFF_LENSES = [
   {
     key: 'security',
     brief:
-      'Security + data-integrity: auth/RBAC gaps, sanitization/SSRF/egress, injection, secrets on the wrong surface, optimistic-concurrency clobbers, check-then-mutate races.',
+      'Security: trust boundaries for THIS kind of code. Commands built from interpolated input (shell, SQL, regex, paths), path traversal and symlinks, secrets reaching logs or output, authorization or enforcement that can be bypassed, and output from another program or agent trusted without validation.',
   },
   {
     key: 'correctness',
     brief:
-      'Correctness: logic bugs, wrong conditionals/edge cases, client/server validation divergence, error/empty/loading states, off-by-one, coercion drift.',
+      'Correctness: logic bugs, wrong conditionals and edge cases, off-by-one, type and encoding coercion drift, error and empty-input paths, and two copies of one rule that disagree.',
   },
   {
     key: 'seams',
@@ -340,9 +346,14 @@ const DIFF_LENSES = [
       'Integration seams + dead plumbing: values computed→passed→never read, stale caches not reset on every mutation path, indexes that don\'t serve their query, half-applied merges, cross-language catalog drift.',
   },
   {
-    key: 'regressions',
+    key: 'verification',
     brief:
-      'Recurring-bug-class sweep: run the PROJECT\'s recurring-bug-classes checklist against the diff and report only fresh hits.',
+      'Verification: does every behaviour this diff changes have a check that can FAIL? Report a test or gate whose fixture never triggers the rule, a predicate that matches nothing, a skip that reads as a pass, and a changed behaviour with no check at all.',
+  },
+  {
+    key: 'intent',
+    brief:
+      'Intent: does the diff do what its stated intent says? Read the range\'s commit messages and any spec or design document the diff touches or those messages name, then report an acceptance criterion with no code behind it, a stated mechanism that is not the one built, and scope beyond what was asked.',
   },
 ]
 
@@ -377,6 +388,35 @@ const SPEC_LENSES = [
 // this line sits on to require EVERY value branch bounded, and both branches here are literals.
 const LENSES = isSpec ? SPEC_LENSES : DIFF_LENSES // gov:fixed-verifiers
 
+// TOOL-aSightedSkeptic-5 S4/S6 - `lensNotes`, a project addendum per lens. It is validated HERE,
+// against the CURRENT kind's keys and before the resume probe, the first agent, so a typo'd key
+// refuses in milliseconds instead of reviewing on the generic brief while looking customised. Absent
+// defaults to {} and is ANNOUNCED, in the log now and in the synthesis's RUN INTEGRITY block, because
+// a silent default is how a degraded run reads as a full one.
+// The offence is carried by a FLAG, never by a sentinel value: `null` is itself one of the values
+// refused here, so `got === null` could not tell "nothing wrong" from "handed null" (the D6 class).
+const LENS_KEYS = LENSES.map((L) => L.key)
+const lensNotes = a.lensNotes === undefined ? {} : a.lensNotes
+let lensNotesBad = false
+let lensNotesGot = a.lensNotes
+if (!lensNotes || typeof lensNotes !== 'object' || Array.isArray(lensNotes)) lensNotesBad = true
+else
+  for (const k of Object.keys(lensNotes)) {
+    if (LENS_KEYS.indexOf(k) !== -1 && typeof lensNotes[k] === 'string' && lensNotes[k]) continue
+    lensNotesBad = true
+    lensNotesGot = LENS_KEYS.indexOf(k) === -1 ? k : { [k]: lensNotes[k] }
+    break
+  }
+if (lensNotesBad) {
+  throw new Error(
+    'tier2-review: `lensNotes` must be an object mapping a ' + kind + ' lens key to a non-empty string; ' +
+      'legal keys: ' + LENS_KEYS.join(' | ') + '. Got ' + JSON.stringify(lensNotesGot) + '.',
+  )
+}
+const notedLenses = Object.keys(lensNotes)
+if (!notedLenses.length)
+  log('WARNING: no `lensNotes` supplied — every lens runs on the kit\'s generic brief, with no project addendum')
+
 // ---- TOOL-dDerivedDocket-29 S2/S3 — THE RESUME PROBE, one agent, before the Find phase ----------
 // WHY ONE AGENT. The script has no filesystem, so something with one has to read the key directory.
 // A reader per reused lens would spend a spawn per lens on a platform that has just been refusing
@@ -393,7 +433,14 @@ const LENSES = isSpec ? SPEC_LENSES : DIFF_LENSES // gov:fixed-verifiers
 // `path@blob` in the order given; a diff review's is the RESOLVED base and head (F5), so a review
 // commissioned against `origin/main` is pinned to the sha that ref named, and a moved ref is a
 // different key rather than a stale answer.
-const inputPrint = deriveFnv1a(renderCanonical({ context: context, byDesign: byDesign, priorFindings: priorFindings }))
+// TOOL-aSightedSkeptic-5 S3/S5 - the print also carries `lensNotes`, an input the finder prompts
+// interpolate, and REVIEW_SHAPE, a literal standing for the prompts and schemas themselves: a lens
+// file written by OLD prompts under the same inputs must not be reused by new ones. ONE bump for the
+// whole aSightedSkeptic build (its shared invariant 5); a later change to a prompt, a schema or the
+// lens set moves this literal again. It rides the print rather than the key's string, so the probe
+// prompt's hand-spelled directory follows without a second edit.
+const REVIEW_SHAPE = 'lenses5-r1'
+const inputPrint = deriveFnv1a(renderCanonical({ shape: REVIEW_SHAPE, context: context, byDesign: byDesign, priorFindings: priorFindings, lensNotes: lensNotes }))
 const specSubject = isSpec
   ? deriveFnv1a(subjects.map((x) => (x && typeof x === 'object' ? `${x.path}@${x.blob}` : String(x))).join('\n'))
   : ''
@@ -506,7 +553,10 @@ const finderResults = await boundedParallel(
               .join('\n') +
             `\n\n`
           : `PRIOR ROUND'S FINDINGS: none - this is a first-round review of ${isSpec ? 'the whole spec set' : 'the whole diff'}.\n\n`) +
-        `LENS: ${L.brief}\n\n` +
+        `LENS: ${L.brief}\n` +
+        // TOOL-aSightedSkeptic-5 S5 - this lens's note and no other's, directly under its brief.
+        (notedLenses.indexOf(L.key) !== -1 ? `PROJECT NOTE FOR THIS LENS (from the caller's lensNotes): ${lensNotes[L.key]}\n` : '') +
+        `\n` +
         (isSpec
           ? `Emit CONCRETE findings only — each needs file, where, severity (blocker|high|medium|low), with "where" being the section address, e.g. "section 2 S5", a one-line claim, the impact, and a proposed fix. A spec finding is often the ABSENCE of a line, so address it by section. No speculation, no style nits, nothing outside the spec set. If nothing real, return findings: [].\n`
           : `Emit CONCRETE findings only — each needs file, line, severity (blocker|high|medium|low), a one-line claim, the impact, and a proposed fix. No speculation, no style nits, nothing outside the diff. If nothing real, return findings: [].\n`) +
@@ -759,7 +809,10 @@ const synth = await agent(
     `lenses ${liveResults.length}/${LENSES.length} returned, ${lensesDead} DIED; ` +
     `skeptic batches ${batches.length - skepticsDead}/${batches.length} returned, ${skepticsDead} DIED; ` +
     `${conflicts.size} contradictory verdict(s) demoted to unverified, ` +
-    `${spurious} spurious verdict(s) discarded, ${duplicates} duplicate(s).\n` +
+    `${spurious} spurious verdict(s) discarded, ${duplicates} duplicate(s); ` +
+    (notedLenses.length
+      ? `lens notes supplied for: ${notedLenses.join(', ')}.\n`
+      : `lens notes: none supplied, so every lens ran on the kit's generic brief.\n`) +
     `If lenses died, the finding set is INCOMPLETE and a zero count is not evidence of absence. ` +
     `Say so where you would otherwise call a zero positive evidence.\n\n` +
     // The range line is what the unattended kit's `closing-review-recorded` joins on, so the value

@@ -155,7 +155,8 @@ function resolveStub(stubs, label) {
   for (const k of Object.keys(stubs)) if (label.indexOf(k) === 0 && (best === null || k.length > best.length)) best = k
   return best === null ? undefined : stubs[best]
 }
-async function runReview(args, stubs) {
+// `source` evaluates a REWRITTEN script instead of the file; only the review-shape arm passes one.
+async function runReview(args, stubs, source) {
   const trace = []
   const logs = []
   const agent = async (prompt, opts) => {
@@ -169,7 +170,7 @@ async function runReview(args, stubs) {
   let result = null
   let threw = null
   try {
-    result = await new AsyncFunction('args', 'agent', 'parallel', 'pipeline', 'phase', 'log', 'budget', 'workflow', whole)(
+    result = await new AsyncFunction('args', 'agent', 'parallel', 'pipeline', 'phase', 'log', 'budget', 'workflow', source || whole)(
       args, agent, parallel, async () => [], () => {}, (m) => logs.push(String(m)), {}, async () => ({}))
   } catch (e) { threw = e.message }
   const scanSpawned = (p) => trace.filter((t) => t.label.indexOf(p) === 0).map((t) => t.label)
@@ -181,7 +182,7 @@ const H = 'c'.repeat(40)
 const DIFF = { repo: '/tmp/r', base: B, head: H, round: 1, context: 'ctx', reviewDir: 'memory/reviews' }
 const SPEC = { repo: '/tmp/r', kind: 'spec-audit', round: 1, context: 'ctx', subjects: [{ path: 's.md', blob: 'abc1234' }] }
 const buildProbe = (finds, verifies, base, head) => ({ commonDir: '/cd', base: base || B, head: head || H, finds: finds || [], verifies: verifies || [] })
-// One finding per lens, so four lenses make four ids and four batches of one: verify:ids-1-1 .. 4-4.
+// One finding per lens, so five lenses make five ids and five batches of one: verify:ids-1-1 .. 5-5.
 const buildLensReturn = (label) => {
   const lens = label.slice('find:'.length)
   return { lens: lens, path: '/cd/review-lenses/k/find-' + lens + '.json', findings: [{ file: lens + '.js', line: 1, where: 'section 1', severity: 'high', claim: lens + ' claim', impact: 'i', fix: 'f' }] }
@@ -221,9 +222,9 @@ async function runWholeScriptArms() {
   // ---- lens-only check would leave ungraded.
   const finds = r.trace.filter((t) => t.label.indexOf('find:') === 0)
   const verifies = r.trace.filter((t) => t.label.indexOf('verify:') === 0)
-  ck(finds.length === 4 && finds.every((t) => t.prompt.indexOf('/review-lenses/' + K + '/find-' + t.label.slice(5) + '.json') !== -1),
+  ck(finds.length === 5 && finds.every((t) => t.prompt.indexOf('/review-lenses/' + K + '/find-' + t.label.slice(5) + '.json') !== -1),
     'AC1 every find: prompt names review-lenses/<key>/find-<lens>.json')
-  ck(verifies.length === 4 && verifies.every((t) => {
+  ck(verifies.length === 5 && verifies.every((t) => {
     const m = /^verify:ids-(\d+)-(\d+)$/.exec(t.label)
     return m && t.prompt.indexOf('/review-lenses/' + K + '/verify-' + m[1] + '-' + m[2] + '.json') !== -1
   }), 'AC1 every verify: prompt names review-lenses/<key>/verify-<first id>-<last id>.json')
@@ -249,22 +250,22 @@ async function runWholeScriptArms() {
   // ---- AC4: a DEAD probe reuses nothing, dispatches every lens and says so.
   r = await runReview(DIFF, buildStubs({ 'resume:probe': null }))
   if (checkNoThrow(r, 'dead probe')) {
-    ck(r.scanSpawned('find:').length === 4, 'AC4 a dead probe dispatches all four lenses')
+    ck(r.scanSpawned('find:').length === 5, 'AC4 a dead probe dispatches all five lenses')
     ck(r.logs.some((l) => l.indexOf('nothing could be reused') !== -1), 'AC4 ...and the log says nothing could be reused')
   }
 
-  // ---- AC2: two lenses die; the re-run is fed the two survivors' files and dispatches exactly two.
-  r = await runReview(DIFF, buildStubs({ 'find:seams': null, 'find:regressions': null }))
+  // ---- AC2: two lenses die; the re-run is fed the three survivors' files and dispatches exactly two.
+  r = await runReview(DIFF, buildStubs({ 'find:seams': null, 'find:intent': null }))
   let k2 = ''
   if (checkNoThrow(r, 'two dead lenses')) {
     k2 = r.result.key
-    ck(r.result.exit === 'deferred-platform' && r.result.pending.join(' ') === 'find:seams find:regressions',
+    ck(r.result.exit === 'deferred-platform' && r.result.pending.join(' ') === 'find:seams find:intent',
       'AC2 the first run defers, pending the two dead lenses')
   }
-  r = await runReview(DIFF, buildStubs({ 'resume:probe': buildProbe([buildLensFile('security', k2), buildLensFile('correctness', k2)]) }))
+  r = await runReview(DIFF, buildStubs({ 'resume:probe': buildProbe([buildLensFile('security', k2), buildLensFile('correctness', k2), buildLensFile('verification', k2)]) }))
   if (checkNoThrow(r, 'two-survivor re-run')) {
-    ck(r.scanSpawned('find:').join(' ') === 'find:seams find:regressions', 'AC2 the re-run with identical args spawns exactly the two missing lenses: ' + r.scanSpawned('find:').join(' '))
-    ck(r.result.exit === 'complete' && r.result.lensesReused === 2, 'AC2 ...and completes, reporting two lenses reused')
+    ck(r.scanSpawned('find:').join(' ') === 'find:seams find:intent', 'AC2 the re-run with identical args spawns exactly the two missing lenses: ' + r.scanSpawned('find:').join(' '))
+    ck(r.result.exit === 'complete' && r.result.lensesReused === 3, 'AC2 ...and completes, reporting three lenses reused')
   }
 
   // ---- AC3: a file whose key differs in ONE component is dispatched; the variant's own key is
@@ -277,6 +278,7 @@ async function runWholeScriptArms() {
     ['another context', Object.assign({}, DIFF, { context: 'ctx2' }), null],
     ['another byDesign', Object.assign({}, DIFF, { byDesign: 'bd2' }), null],
     ['another priorFindings', Object.assign({}, DIFF, { priorFindings: [{ ref: 'a:1', claim: 'c' }] }), null],
+    ['another lensNotes', Object.assign({}, DIFF, { lensNotes: { security: 'n2' } }), null],
   ]
   for (const [what, args, probe] of variants) {
     const own = await runReview(args, buildStubs(probe ? { 'resume:probe': probe } : {}))
@@ -300,7 +302,7 @@ async function runWholeScriptArms() {
   if (checkNoThrow(r, 'AC3 name matches, key does not')) ck(r.scanSpawned('find:security').length === 1, 'AC3 a file with the right name and a different key field is dispatched')
 
   // ---- AC5: a verify file is reused ONLY with the right key AND the right claim print.
-  const allLensFiles = ['security', 'correctness', 'seams', 'regressions'].map((l) => buildLensFile(l, K))
+  const allLensFiles = ['security', 'correctness', 'seams', 'verification', 'intent'].map((l) => buildLensFile(l, K))
   r = await runReview(DIFF, buildStubs({ 'resume:probe': buildProbe(allLensFiles) }))
   let print = ''
   if (checkNoThrow(r, 'AC5 print capture')) {
@@ -319,17 +321,17 @@ async function runWholeScriptArms() {
   // ---- AC6: the three lens-stage death paths all defer and none reads clean or partial.
   r = await runReview(DIFF, buildStubs({ 'find:': null }))
   if (checkNoThrow(r, 'AC6 all lenses dead')) {
-    ck(r.result.exit === 'deferred-platform' && r.result.blockers === null && r.result.pending.length === 4 &&
-      r.result.pending.every((p) => p.indexOf('find:') === 0), 'AC6 every lens dead: deferred-platform, blockers null, four find: labels pending')
+    ck(r.result.exit === 'deferred-platform' && r.result.blockers === null && r.result.pending.length === 5 &&
+      r.result.pending.every((p) => p.indexOf('find:') === 0), 'AC6 every lens dead: deferred-platform, blockers null, five find: labels pending')
   }
   r = await runReview(DIFF, buildStubs({ 'find:': buildEmptyLens, 'find:security': null, 'find:seams': null }))
   if (checkNoThrow(r, 'AC6 two dead, survivors empty')) {
     ck(r.result.exit === 'deferred-platform' && r.result.pending.join(' ') === 'find:security find:seams' && !/^(clean|partial)/.test(r.result.note),
       'AC6 two lenses dead and the survivors found nothing: deferred, those two pending, a note that is neither clean nor partial')
   }
-  r = await runReview(DIFF, buildStubs({ 'find:regressions': null, 'verify:': buildVerdicts('refuted') }))
+  r = await runReview(DIFF, buildStubs({ 'find:intent': null, 'verify:': buildVerdicts('refuted') }))
   if (checkNoThrow(r, 'AC6 one dead, all refuted')) {
-    ck(r.result.exit === 'deferred-platform' && r.result.pending.join(' ') === 'find:regressions' && !/^(clean|partial)/.test(r.result.note),
+    ck(r.result.exit === 'deferred-platform' && r.result.pending.join(' ') === 'find:intent' && !/^(clean|partial)/.test(r.result.note),
       'AC6 one lens dead and every finding refuted: deferred')
   }
   r = await runReview(DIFF, buildStubs({ 'find:': buildEmptyLens }))
@@ -351,6 +353,79 @@ async function runWholeScriptArms() {
   if (checkNoThrow(r, 'AC7 tally fault')) {
     ck(r.result.exit === 'complete' && r.result.blockers === null, 'AC7 a synthesis leaving one confirmed id out: complete beside blockers null')
   }
+
+  // ==== TOOL-aSightedSkeptic-5 — five diff lenses, `lensNotes`, and the review-shape bump ===========
+  // ---- AC1: the lens set and its ORDER, read off what a complete run actually spawns.
+  r = await runReview(DIFF, ALL_OK)
+  if (checkNoThrow(r, 'five-lens run')) {
+    ck(r.scanSpawned('find:').join(' ') === 'find:security find:correctness find:seams find:verification find:intent',
+      'the diff lens set is security correctness seams verification intent: ' + r.scanSpawned('find:').join(' '))
+  }
+
+  // ---- AC3: a note reaches its OWN lens and no other prompt. The count of five is asserted beside
+  // ---- the absence, so "no other prompt carries it" cannot pass over a run that spawned fewer lenses.
+  r = await runReview(Object.assign({}, DIFF, { lensNotes: { verification: 'NOTE-MARK' } }), ALL_OK)
+  if (checkNoThrow(r, 'lensNotes placement')) {
+    const nf = r.trace.filter((t) => t.label.indexOf('find:') === 0)
+    const nv = r.trace.filter((t) => t.label.indexOf('verify:') === 0)
+    ck(nf.some((t) => t.label === 'find:verification' && t.prompt.indexOf('NOTE-MARK') !== -1),
+      'a lensNotes entry reaches its own lens prompt and no other: find:verification carries the note')
+    ck(nf.length === 5 && nv.length > 0 && nf.concat(nv).every((t) => t.label === 'find:verification' || t.prompt.indexOf('NOTE-MARK') === -1),
+      'a lensNotes entry reaches its own lens prompt and no other: the other four find: and every verify: prompt do not')
+  }
+
+  // ---- AC4: six malformed values refuse BEFORE any agent spawns, naming the field and the legal
+  // ---- keys of the run's own kind; the control is a legal spec-kind key, which proceeds.
+  const DIFF_KEYS = 'security | correctness | seams | verification | intent'
+  const SPEC_KEYS = 'underspecification | contradiction | unstated-assumption | prior-art'
+  const malformed = [
+    ['a string', DIFF, 'note', DIFF_KEYS],
+    ['an array', DIFF, ['security'], DIFF_KEYS],
+    ['null', DIFF, null, DIFF_KEYS],
+    // The retired key is spelled by concatenation, so this file keeps no literal of it (spec AC7).
+    ['the retired key on a diff review', DIFF, { ['regress' + 'ions']: 'n' }, DIFF_KEYS],
+    ['a diff key on a spec audit', SPEC, { verification: 'n' }, SPEC_KEYS],
+    ['an empty note', DIFF, { security: '' }, DIFF_KEYS],
+  ]
+  for (const [what, args, notes, keys] of malformed) {
+    r = await runReview(Object.assign({}, args, { lensNotes: notes }), ALL_OK)
+    ck(typeof r.threw === 'string' && r.threw.indexOf('lensNotes') !== -1 && r.threw.indexOf(keys) !== -1 && r.trace.length === 0,
+      'a malformed lensNotes refuses before any agent spawns: ' + what + (r.threw ? '' : ' (accepted)'))
+  }
+  r = await runReview(Object.assign({}, SPEC, { lensNotes: { 'prior-art': 'n' } }), ALL_OK)
+  ck(!r.threw && r.result && r.result.exit === 'complete' && r.scanSpawned('find:').length === 4,
+    'a malformed lensNotes refuses before any agent spawns: control, a spec-kind key on a spec audit, proceeds')
+
+  // ---- AC5: the absence is ANNOUNCED in the log and in RUN INTEGRITY; a supplied note silences the
+  // ---- warning and is named instead.
+  r = await runReview(DIFF, ALL_OK)
+  if (checkNoThrow(r, 'absent lensNotes')) {
+    const sp = r.trace.find((t) => t.label === 'synth')
+    ck(r.logs.some((l) => l.indexOf('WARNING:') === 0 && l.indexOf('lensNotes') !== -1) && !!sp && sp.prompt.indexOf('lens notes: none supplied') !== -1,
+      'absent lensNotes is announced in the log and in RUN INTEGRITY')
+  }
+  r = await runReview(Object.assign({}, DIFF, { lensNotes: { security: 'n' } }), ALL_OK)
+  if (checkNoThrow(r, 'supplied lensNotes')) {
+    const sp = r.trace.find((t) => t.label === 'synth')
+    ck(!r.logs.some((l) => l.indexOf('WARNING:') === 0 && l.indexOf('lensNotes') !== -1) && !!sp && sp.prompt.indexOf('lens notes supplied for: security') !== -1,
+      'absent lensNotes is announced in the log and in RUN INTEGRITY: a supplied note logs no warning and is named there')
+  }
+
+  // ---- AC6: a lens file written under ANOTHER review shape is dispatched. The literal is rewritten
+  // ---- in a copy of the script, and the rewrite is asserted to have TAKEN before its key is used:
+  // ---- a replace that matched nothing would evaluate the same script and prove nothing.
+  const shapeRe = /const REVIEW_SHAPE = '([^']*)'/
+  const shifted = whole.replace(shapeRe, (m, v) => "const REVIEW_SHAPE = '" + v + "-older'")
+  r = await runReview(DIFF, ALL_OK, shifted)
+  const KS = r.result ? r.result.key : ''
+  ck(shapeRe.test(whole) && shifted !== whole && !r.threw && KS !== '' && KS !== K,
+    'a lens file written under another review shape is dispatched: the rewrite took and the keys differ')
+  r = await runReview(DIFF, buildStubs({ 'resume:probe': buildProbe([buildLensFile('security', KS)]) }))
+  if (checkNoThrow(r, 'review shape stale')) ck(KS !== K && r.scanSpawned('find:security').length === 1,
+    'a lens file written under another review shape is dispatched: find:security under the older shape is dispatched')
+  r = await runReview(DIFF, buildStubs({ 'resume:probe': buildProbe([buildLensFile('security', K)]) }))
+  if (checkNoThrow(r, 'review shape fresh')) ck(r.scanSpawned('find:security').length === 0,
+    'a lens file written under another review shape is dispatched: ...and one under the real key is reused')
 }
 
 runWholeScriptArms().then(() => {
@@ -372,7 +447,10 @@ printf '%s\n' "$out"
 # RAISED 20 -> 60 by TOOL-dDerivedDocket-29: the whole-script arms execute 40 assertions, 30 call sites
 # with the AC3 pair run once per each of six key components. COUNTED off the block, not off a suite
 # run: the pass that wrote them runs no suite.
-FLOOR_ASSERTIONS=60
+# RAISED 60 -> 77 by TOOL-aSightedSkeptic-5: 17 assertions, counted off the block the same way — the
+# lensNotes key component's AC3 pair (2), the lens set (1), note placement (2), six malformed values
+# and their control (7), the announced absence (2) and the review-shape rewrite (3).
+FLOOR_ASSERTIONS=77
 executed=$(printf '%s\n' "$out" | sed -n 's/^---- \([0-9][0-9]*\) passed.*/\1/p' | tail -1)
 if [ -z "$executed" ]; then
   echo "FAIL the runner printed no assertion count at all — it died before its summary line"

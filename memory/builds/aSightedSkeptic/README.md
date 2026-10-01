@@ -74,7 +74,7 @@ ids TOOL-aSightedSkeptic-1 TOOL-aSightedSkeptic-2 TOOL-aSightedSkeptic-3 TOOL-aS
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aSightedSkeptic-5 — five diff lenses, with verification and intent added, project lens notes, and one review-shape bump](spec/2026-10-01-spec-TOOL-aSightedSkeptic-5.md) | 1 | 2 | SPECCED | rev-1 | 2026-10-01 |
+| [TOOL-aSightedSkeptic-5 — five diff lenses, with verification and intent added, project lens notes, and one review-shape bump](spec/2026-10-01-spec-TOOL-aSightedSkeptic-5.md) | 1 | 2 | CLOSED | rev-1 | 2026-10-01 |
 | [TOOL-aSightedSkeptic-1 — the skeptic is briefed with the repo, the range, the context and the by-design list](spec/2026-10-01-spec-TOOL-aSightedSkeptic-1.md) | 2 | 2 | SPECCED | rev-1 | 2026-10-01 |
 | [TOOL-aSightedSkeptic-3 — finders and skeptics are handed intent: a `specs` argument, and the range's commit messages by default](spec/2026-10-01-spec-TOOL-aSightedSkeptic-3.md) | 3 | 2 | SPECCED | rev-1 | 2026-10-01 |
 | [TOOL-aSightedSkeptic-4 — a `checklist` argument whose classes are split across the lenses that run](spec/2026-10-01-spec-TOOL-aSightedSkeptic-4.md) | 4 | 2 | SPECCED | rev-1 | 2026-10-01 |

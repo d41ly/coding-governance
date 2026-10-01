@@ -1,6 +1,6 @@
 # TOOL-aSightedSkeptic-5 — five diff lenses, with verification and intent added, project lens notes, and one review-shape bump
 
-**Status:** SPECCED · rev-1 · 2026-10-01 · node a · Tier-2 · base ef1dcdb6 · streams tooling · order 1 · ratified 2026-10-01
+**Status:** CLOSED · rev-1 · 2026-10-01 · node a · Tier-2 · base ef1dcdb6 · streams tooling · order 1 · ratified 2026-10-01
 
 <!-- gen:spec-records -->
 
