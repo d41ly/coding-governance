@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # check-line-length.sh — a declared maximum line length for agent-instruction prose.
 #
-#   bash tools/check-line-length.sh                    # every declared subject
-#   bash tools/check-line-length.sh <file>             # one subject
-#   LINE_MAX=200 bash tools/check-line-length.sh <file>
+#   bash <prefix>/check-line-length.sh                    # every declared subject
+#   bash <prefix>/check-line-length.sh <file>             # one subject
+#   LINE_MAX=200 bash <prefix>/check-line-length.sh <file>
 #
 # WHY. A rule that runs past a screen is a rule nobody re-reads and a diff nobody can review. The
 # default is 450 characters, which is generous: it catches the paragraph-as-a-line class without
@@ -13,7 +13,7 @@
 # default. The declaration outranks the environment deliberately — a declared per-subject pin is
 # policy, and an environment variable is a local override for a subject nobody declared. Without
 # that ordering one exported variable silently lifts every declared subject at once. This is the
-# same ordering `tools/check-template-size.sh` records at length, and for the same reason.
+# same ordering `<prefix>/check-template-size.sh` records at length, and for the same reason.
 #
 # CHARACTERS, NOT BYTES. These files carry non-ASCII glyphs, so a byte count would grade a line with
 # six em dashes as eighteen characters longer than it reads. Measured over this corpus the two differ
@@ -35,7 +35,7 @@
 # is opt-in — the declaration is deliberately withheld from the kit payload, because gov's rows name
 # gov's paths and a row naming an absent path is a stale red — so an adopter installs it with no
 # declaration at all, and an install-day exit 2 is the very failure that withholding was meant to
-# prevent. It is the `tools/lexicon/lexicon.py` posture and it is announced rather than silent. The
+# prevent. It is the `<prefix>/lexicon/lexicon.py` posture and it is announced rather than silent. The
 # vacuity it would otherwise open is closed elsewhere: gov's own declaration is a govkit `[[exempt]]`
 # row, and selfcheck reds on an exemption whose path is gone, so deleting it here cannot go quiet.
 # A declaration that EXISTS and selects nothing is still exit 2 — that is an authoring error, not an
@@ -159,7 +159,7 @@ for f in $subjects; do
   fi
   # THE RESOLVED limit is validated, not just the declared one. Check 1 above covers `$declared`
   # alone, and the other two documented invocations — the positional $2 and LINE_MAX — reached the
-  # scanner unchecked: `bash tools/check-line-length.sh AGENTS.md abc` printed a ValueError traceback
+  # scanner unchecked: `bash <prefix>/check-line-length.sh AGENTS.md abc` printed a ValueError traceback
   # and then `line-length OK — AGENTS.md: 0 over 0 characters`, rc=0.
   if ! printf '%s' "$limit" | grep -qE '^[0-9]+$'; then
     fail 4 "the line limit is not a number, so nothing could be compared against it: '$limit' for $f, resolved from $src"

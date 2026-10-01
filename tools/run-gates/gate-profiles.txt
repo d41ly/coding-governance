@@ -2,7 +2,7 @@
 #
 # GRAMMAR: `<name>\t<min cores>\t<min RAM MB>\t<comma-joined knobs>` per row. Comments carry the
 # justification for a threshold and every movement of it, because a number with no history beside it
-# is a number nobody can question. Modelled on `tools/template-size-limits.txt`, which is this tree's
+# is a number nobody can question. Modelled on gov's `<prefix>/template-size-limits.txt`, which is this tree's
 # settled answer to the same problem — a declared value read with `awk -F'\t'` and argued in place.
 #
 # SELECTION: rows are ordered MOST-CAPABLE-FIRST and the FIRST row whose BOTH thresholds are

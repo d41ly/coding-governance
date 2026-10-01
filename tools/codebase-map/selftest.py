@@ -15,6 +15,62 @@ import re
 import sys
 from pathlib import Path
 
+
+def derive_install_prefix() -> str:
+    """The install prefix WITH its trailing slash, derived from where this file sits and empty at a
+    root install. Every fixture and host path the self-test builds is spelled through it, never
+    through a literal prefix (TOOL-aRepatriatedFork-28)."""
+    import pathlib
+    here = pathlib.Path(os.path.abspath(__file__)).parent
+    for anc in here.parents:
+        if (anc / ".git").exists():
+            rel = here.parent.relative_to(anc).as_posix()
+            return "" if rel == "." else rel + "/"
+    raise SystemExit(f"{pathlib.Path(__file__).name}: not inside a git repository, so there is no "
+                     "install prefix to derive")
+
+
+PFX = derive_install_prefix()
+# TOOL-aRepatriatedFork-46: this kit's own directory is named by the NAME it has in this install, and a
+# SIBLING kit is reached through the resolver, which reads the install receipt first.
+KIT_NAME = Path(os.path.abspath(__file__)).parent.name
+# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
+def resolve_kit_dir(home, anchor, here):
+    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
+
+    1. receipt — the `.governance/install.json` row whose `source` ends in <home>/<anchor> and
+       whose `path` exists inside this tree. The only record of a RENAMED kit dir: no probe finds
+       a memory-recall kit an adopter homed at `scripts/recall/`.
+    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
+    3. refuse — LookupError naming the three places looked; never a guessed prefix.
+    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
+    """
+    import json
+    import pathlib
+    here = pathlib.Path(here).absolute()  # never resolve(): a junction must not move it
+    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
+    receipt = root / ".governance" / "install.json"
+    try:
+        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("path"):
+            continue
+        if str(row.get("source") or "").split("/")[-2:] != [home, anchor]:
+            continue
+        hit = (root / str(row["path"])).absolute()
+        if hit.is_file() and root in hit.parents and ".." not in hit.parts:
+            return hit.parent
+    probes = (here / home, here.parent / home)
+    for cand in probes:
+        if (cand / anchor).is_file():
+            return cand
+    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
+        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
+# <<< resolve_kit_dir
+
+
 # `abspath`, NOT `resolve()`: this insert decides which path string `map_lib.__file__` carries,
 # and map_lib.kit_dir()/the gate template both use abspath. Under a junctioned kit dir resolve()
 # yields the LINK TARGET, so this entrypoint would stamp one prefix into the byte-compared
@@ -121,7 +177,7 @@ def test_install_prefix_resolution(tmp: Path):
 
     def tree(name: str, prefix: str, *, conf: bool, git: str | None = "dir") -> Path:
         root = tmp / name
-        kit = root / prefix / "codebase-map" if prefix else root / "codebase-map"
+        kit = root / prefix / KIT_NAME if prefix else root / KIT_NAME
         kit.mkdir(parents=True)
         if git == "dir":
             (root / ".git").mkdir()
@@ -133,16 +189,18 @@ def test_install_prefix_resolution(tmp: Path):
 
     # --- the kit's own convention: <root>/codebase-map/ ---------------------------------------
     assert m.resolve_root(tree("a", "", conf=True)) == tmp / "a"
-    # --- a PREFIXED install: <root>/tools/codebase-map/ (the defect this closes) ---------------
-    kit_b = tree("b", "tools", conf=True)
+    # --- a PREFIXED install: <root>/<prefix>/codebase-map/ (the defect this closes) ---------------
+    # A root install has no prefix of its own, and this arm needs one.
+    fx_pfx = PFX or "scripts"
+    kit_b = tree("b", fx_pfx, conf=True)
     assert m.resolve_root(kit_b) == tmp / "b"
-    assert m.resolve_root(kit_b) != tmp / "b" / "tools", "resolved to the OLD grandparent answer"
+    assert m.resolve_root(kit_b) != tmp / "b" / fx_pfx, "resolved to the OLD grandparent answer"
     # both roots hold the conf AND .git, so this also pins the ORDER: the conf is tested first,
     # else the boundary would break the walk at the root and hand back the kit dir's parent.
     # --- the walk is not capped at one segment ------------------------------------------------
     assert m.resolve_root(tree("c", "x/y", conf=True)) == tmp / "c"
     # --- no conf anywhere -> the grandparent convention, unchanged from the old rule -----------
-    assert m.resolve_root(tree("d", "tools", conf=False)) == tmp / "d" / "tools"
+    assert m.resolve_root(tree("d", PFX, conf=False)) == tmp / "d" / PFX
     assert m.resolve_root(tree("e", "", conf=False)) == tmp / "e"  # a root install is unaffected
 
     # --- the .git boundary: a conf in a PARENT tree is a DIFFERENT checkout --------------------
@@ -151,18 +209,18 @@ def test_install_prefix_resolution(tmp: Path):
     primary = tmp / "primary"
     (primary / ".git").mkdir(parents=True)
     (primary / m.CONF_NAME).write_text("MAP_ROOT=memory/map\n", encoding="utf-8")
-    wt_kit = tree("primary/.claude/worktrees/w", "tools", conf=False, git="file")
+    wt_kit = tree("primary/.claude/worktrees/w", PFX, conf=False, git="file")
     wt = primary / ".claude" / "worktrees" / "w"
-    assert m.resolve_root(wt_kit) == wt / "tools", "the walk escaped the worktree into the primary tree"
+    assert m.resolve_root(wt_kit) == wt / PFX, "the walk escaped the worktree into the primary tree"
     (wt / m.CONF_NAME).write_text("MAP_ROOT=memory/map\n", encoding="utf-8")
     assert m.resolve_root(wt_kit) == wt  # the worktree's OWN conf resolves it
 
     # --- nearest conf wins (a repo vendored inside another adopting repo) ----------------------
     inner = tmp / "nest" / "inner"
-    (inner / "tools" / "codebase-map").mkdir(parents=True)
+    (inner / PFX / KIT_NAME).mkdir(parents=True)
     (tmp / "nest" / m.CONF_NAME).write_text("MAP_ROOT=outer\n", encoding="utf-8")
     (inner / m.CONF_NAME).write_text("MAP_ROOT=inner\n", encoding="utf-8")
-    assert m.resolve_root(inner / "tools" / "codebase-map") == inner
+    assert m.resolve_root(inner / PFX / KIT_NAME) == inner
 
     # --- repo_root: the override wins, otherwise resolve_root of the kit's OWN dir -------------
     os.environ["CODEBASE_MAP_ROOT"] = str(tmp / "a")
@@ -276,23 +334,27 @@ def test_gate_template_finds_the_kit(tmp: Path):
             capture_output=True, text=True, encoding="utf-8",
         )
 
+    # The gate searches a ONE-segment prefix and no deeper, by its own docstring, so the prefixed
+    # fixtures take one segment whatever this install's own depth is: the host's first segment, or
+    # a stand-in at a root install (TOOL-aRepatriatedFork-28, gate repair at VERIFYING).
+    seg = PFX.split("/")[0] or "kits"
     # (a) PREFIXED kit, gate collected somewhere else entirely — the shape the old walk missed
     r1 = tmp / "g1"
-    got = probe(r1, r1 / "tools" / "codebase-map", r1 / "tests")
+    got = probe(r1, r1 / seg / KIT_NAME, r1 / "tests")
     assert got.returncode == 0, got.stderr
-    assert Path(got.stdout.strip()) == r1 / "tools" / "codebase-map", got.stdout
+    assert Path(got.stdout.strip()) == r1 / seg / KIT_NAME, got.stdout
 
     # (b) gate installed INSIDE the kit dir (a repo with no test collector wires it as a leg)
     r2 = tmp / "g2"
-    got = probe(r2, r2 / "tools" / "codebase-map", r2 / "tools" / "codebase-map")
+    got = probe(r2, r2 / seg / KIT_NAME, r2 / seg / KIT_NAME)
     assert got.returncode == 0, got.stderr
-    assert Path(got.stdout.strip()) == r2 / "tools" / "codebase-map", got.stdout
+    assert Path(got.stdout.strip()) == r2 / seg / KIT_NAME, got.stdout
 
     # (c) root install — the original convention, unchanged
     r3 = tmp / "g3"
-    got = probe(r3, r3 / "codebase-map", r3 / "tests")
+    got = probe(r3, r3 / KIT_NAME, r3 / "tests")
     assert got.returncode == 0, got.stderr
-    assert Path(got.stdout.strip()) == r3 / "codebase-map", got.stdout
+    assert Path(got.stdout.strip()) == r3 / KIT_NAME, got.stdout
 
     # (d) no kit at all: a NAMED failure listing what was probed, never a silent wrong dir
     r4 = tmp / "g4"
@@ -341,7 +403,7 @@ def test_gate_template_boundary(tmp: Path):
     import sys as _sys
 
     # the PLANT: a valid-looking kit one level ABOVE the project, reachable only past the boundary
-    plant = tmp / "outside" / "codebase-map"
+    plant = tmp / "outside" / KIT_NAME
     plant.mkdir(parents=True)
     (plant / "map_lib.py").write_text(
         "import re\nDEFAULT_DECISION_ID_RE = re.compile(r'.')\nPLANT = True\n", encoding="utf-8"
@@ -379,12 +441,12 @@ def test_gate_template_boundary(tmp: Path):
 
 def test_remedy_paths_are_real(tmp: Path):
     """TOOL-aRootedPrefix-2: every path the kit PRINTS must exist from the repo root. A remedy
-    naming `codebase-map/gen_map.py` at a `tools/`-prefixed install is a dead end at exactly the (gov:root-fixture — quoting the defect, not naming a live path)
-    moment someone is stuck.
+    naming the kit's `gen_map.py` WITHOUT its prefix at a `<prefix>/`-prefixed install is a dead end
+    at exactly the moment someone is stuck.
 
     Two halves. The pure half pins `relative_kit` across install shapes and pins the legacy
-    `REGEN_CMD` constant EQUAL to the accessor's root-install answer, so the last hardcoded
-    spelling cannot drift from the computed one. The end-to-end half is the real acceptance: build
+    `REGEN_CMD` constant EQUAL to `regen_cmd()`, so an old gate that reads it prints the command
+    for its own prefix (TOOL-aRepatriatedFork-25 S4). The end-to-end half is the real acceptance: build
     a prefixed install, stale an artifact, then RUN THE COMMAND THE GATE PRINTED, verbatim, and
     require that it fixes the staleness — no hardcoded expectation of what the remedy should say."""
     import os
@@ -395,27 +457,29 @@ def test_remedy_paths_are_real(tmp: Path):
 
     # --- pure: the kit dir as a human must spell it from the repo root -------------------------
     root = tmp / "r"
-    assert m.relative_kit(root / "codebase-map", root) == "codebase-map"
-    assert m.relative_kit(root / "tools" / "codebase-map", root) == "tools/codebase-map"
-    assert m.relative_kit(root / "a" / "b" / "codebase-map", root) == "a/b/codebase-map"
-    assert "\\" not in m.relative_kit(root / "tools" / "codebase-map", root)  # POSIX on Windows too
+    assert m.relative_kit(root / KIT_NAME, root) == KIT_NAME
+    assert m.relative_kit(root / PFX / KIT_NAME, root) == f"{PFX}{KIT_NAME}"
+    assert m.relative_kit(root / "a" / "b" / KIT_NAME, root) == f"a/b/{KIT_NAME}"
+    assert "\\" not in m.relative_kit(root / PFX / KIT_NAME, root)  # POSIX on Windows too
     # not under the root (a CODEBASE_MAP_ROOT pointed at a fixture): the bare NAME, so a render
     # never embeds an absolute temp path and fixture bytes stay deterministic.
-    assert m.relative_kit(tmp / "elsewhere" / "codebase-map", root) == "codebase-map"
-    # the legacy constant IS the accessor's root-install answer — one fact, not two.
-    assert m.REGEN_CMD == f"python {m.relative_kit(root / 'codebase-map', root)}/gen_map.py --write"
+    assert m.relative_kit(tmp / "elsewhere" / KIT_NAME, root) == KIT_NAME
+    # the legacy constant IS the accessor's answer for this install — one fact, not two.
+    assert m.REGEN_CMD == m.regen_cmd(), (m.REGEN_CMD, m.regen_cmd())
 
     # --- end-to-end: the printed remedy, executed --------------------------------------------
     repo = tmp / "e2e"
-    kit = repo / "tools" / "codebase-map"
+    kit = repo / PFX / KIT_NAME
     kit.parent.mkdir(parents=True)
     shutil.copytree(Path(os.path.abspath(__file__)).parent, kit)
     (repo / ".git").mkdir()
     # H2: the conf carries the EXAMPLE's stale MAP_DIFF_CMD, which is what the documented adoption
     # path leaves behind (`cp` the example, THEN run the adopter — so the adopter's create-branch
     # stamp never fires). A truthy-but-dead value must not beat the prefix-correct fallback.
+    # The stale value is the ROOT-install spelling, built through a prefix variable set EMPTY.
+    root_pfx = ""
     (repo / m.CONF_NAME).write_text(
-        'MAP_ROOT=memory/map\nMAP_DIFF_CMD="python codebase-map/map_diff.py"\n', encoding="utf-8"  # gov:root-fixture — fixture conf written at the ROOT prefix, which is what this asserts
+        f'MAP_ROOT=memory/map\nMAP_DIFF_CMD="python {root_pfx}{KIT_NAME}/map_diff.py"\n', encoding="utf-8"
     )
     (repo / "src").mkdir()
     (repo / "src" / "mod.py").write_text("def hello():\n    return 1\n", encoding="utf-8")
@@ -434,12 +498,18 @@ def test_remedy_paths_are_real(tmp: Path):
             encoding="utf-8",
         )
 
-    got = run("tools/codebase-map/gen_map.py", "--scaffold")
+    got = run(f"{PFX}{KIT_NAME}/gen_map.py", "--scaffold")
     assert got.returncode == 0, got.stdout + got.stderr
+
+    # S4 of TOOL-aRepatriatedFork-25: the legacy constant a pre-1.1 GATE_FILE reads names THIS
+    # install's generator, so an old gate at a prefix prints a command that exists.
+    got = run("-c", f"import sys; sys.path.insert(0, {str(kit)!r}); import map_lib as m; print(m.REGEN_CMD)")
+    want = f"python {kit.relative_to(repo).as_posix()}/gen_map.py --write"
+    assert got.stdout.strip() == want, got.stdout + got.stderr
 
     # the scaffolded map README must name the real kit dir, not the convention
     readme = (repo / "memory" / "map" / "README.md").read_text(encoding="utf-8")
-    assert "tools/codebase-map/gen_map.py" in readme, readme[:400]
+    assert f"{PFX}{KIT_NAME}/gen_map.py" in readme, readme[:400]
     assert "`codebase-map/`" not in readme, "the scaffolded README still names the bare convention"
 
     # H2: EVERY path the kit printed must resolve — not just the regen command. Sweep every
@@ -462,7 +532,7 @@ def test_remedy_paths_are_real(tmp: Path):
     # stale an artifact, then take the remedy from the gate's OWN output and run it
     art = repo / "memory" / "map" / "generated" / "MAP.md"
     art.write_text(art.read_text(encoding="utf-8") + "\nhand-edited\n", encoding="utf-8")
-    got = run("tools/codebase-map/gen_map.py", "--check")
+    got = run(f"{PFX}{KIT_NAME}/gen_map.py", "--check")
     assert got.returncode == 1, f"--check did not detect the stale artifact: {got.stdout}"
     printed = re.search(r"regen:\s*python\s+(\S+)\s+--write", got.stdout)
     assert printed, f"no regen remedy printed: {got.stdout}"
@@ -470,12 +540,12 @@ def test_remedy_paths_are_real(tmp: Path):
     assert (repo / remedy_path).is_file(), f"the remedy names a path that does not exist: {remedy_path}"
     fixed = run(remedy_path, "--write")
     assert fixed.returncode == 0, fixed.stdout + fixed.stderr
-    again = run("tools/codebase-map/gen_map.py", "--check")
+    again = run(f"{PFX}{KIT_NAME}/gen_map.py", "--check")
     assert again.returncode == 0, f"the printed remedy did not fix the staleness: {again.stdout}"
 
     # the generated artifacts carry the same real prefix (they are the remedy's other home)
     inv = (repo / "memory" / "map" / "generated" / "inventories.json").read_text(encoding="utf-8")
-    assert "tools/codebase-map/gen_map.py" in inv, inv[:400]
+    assert f"{PFX}{KIT_NAME}/gen_map.py" in inv, inv[:400]
 
 
 def test_coverage_directions():
@@ -728,7 +798,7 @@ def test_symbol_extractors_fail_closed(tmp: Path):
 
     # --- scan_js_definitions: the DEFINITION probe the export scan cannot substitute for -------
     # The export scan is complete over export FORMS and blind to a file with no `export` line.
-    # Measured on gov's own tools/**/*.js: 30 definitions, 3 indexed export rows, DISJOINT.
+    # Measured on gov's own <prefix>/**/*.js: 30 definitions, 3 indexed export rows, DISJOINT.
     js = tmp / "js"
     js.mkdir()
     (js / "hooks.js").write_text(
@@ -847,7 +917,7 @@ def test_affordance_exemption_drop():
     kept = m.drop_touched_exemptions(exempt, attributed)
     assert kept == frozenset({"untouched"}), kept  # touched loses grace, untouched keeps it
     # a range that hits nothing graced (foundation/UNMAPPED are never in the exempt list) is a no-op
-    assert m.drop_touched_exemptions(exempt, {"UNMAPPED": ["z"], "foundation": ["lib/b.py"]}) == exempt  # gov:root-fixture — fixture data for an exemption map, not an install path
+    assert m.drop_touched_exemptions(exempt, {"UNMAPPED": ["z"], "foundation": ["vendor/b.py"]}) == exempt
 
     # gate consequence: the un-graced 'touched' dossier (no affordance block yet) is now an offender
     texts = {
@@ -1600,7 +1670,7 @@ def test_identifier_tokens_corpus_recall():
 
 
 def test_js_probe_against_the_lexicon():
-    """CROSS-CHECK: over this repo's own `tools/**/*.js`, the map's definition set is a SUPERSET of
+    """CROSS-CHECK: over this repo's own `<prefix>/**/*.js`, the map's definition set is a SUPERSET of
     the lexicon's independently-authored one.
 
     WHY THIS DIRECTION ONLY. If the lexicon learns a definition form the map has not, the map is
@@ -1612,14 +1682,17 @@ def test_js_probe_against_the_lexicon():
     questions, which is what makes the comparison worth anything; unifying them behind one pattern
     set would delete the signal along with the duplication.
 
-    SKIPS LOUDLY when `tools/lexicon/` is absent. An adopter who took the map without the lexicon is
+    SKIPS LOUDLY when `<prefix>/lexicon/` is absent. An adopter who took the map without the lexicon is
     TOLD the arm did not run, rather than shown a green it did not earn — a silent skip here would be
     this repo's own `fixture-passes-by-finding-nothing` class inside the kit that gates it.
     """
-    kit = m.repo_root() / "tools" / "lexicon"
+    # A SIBLING of this kit, found from where the kit sits and never from gov's prefix
+    # (TOOL-aRepatriatedFork-24 S6): at an adopter whose kits live under `scripts/`, the spelled path
+    # skipped this arm with a false "not installed" over a lexicon that was right beside it.
+    kit = m.kit_dir().with_name("lexicon")
     if not (kit / "lexicon.py").is_file():
-        raise Skipped("tools/lexicon/ is not installed here, so the independent definition set "
-                      "this arm compares against does not exist")
+        raise Skipped(f"no lexicon kit beside this one at {kit.as_posix()}, so the independent "
+                      f"definition set this arm compares against does not exist")
     sys.path.insert(0, str(kit))
     try:
         import lexicon as lx
@@ -1634,16 +1707,16 @@ def test_js_probe_against_the_lexicon():
     pset, mode = langs["js"]
     theirs = set()
     for f in lx.tracked_files(root):
-        if f.endswith(".js") and f.startswith("tools/"):
+        if f.endswith(".js") and f.startswith(f"{PFX}"):
             fns, types, _imports = lx.extract(root / f, mode, pset)
             theirs |= {(f, name) for name, _line in list(fns) + list(types)}
-    ours = {(r["file"], r["id"]) for r in m.scan_js_definitions(root / "tools", "kit-js")}
+    ours = {(r["file"], r["id"]) for r in m.scan_js_definitions(root / PFX, "kit-js")}
     missing = sorted(theirs - ours)
     assert not missing, (
         f"the map's JS definition probe misses {len(missing)} symbol(s) the lexicon's finds — the "
         f"map is under-indexing this layer: {missing[:8]}"
     )
-    assert theirs, "the lexicon found NO js definitions under tools/, so this arm compared to empty"
+    assert theirs, f"the lexicon found NO js definitions under {PFX}, so this arm compared to empty"
 
 
 def main() -> int:
@@ -1655,6 +1728,11 @@ def main() -> int:
             "root resolution: both install shapes + git boundary (S1/AC1)",
             lambda: test_install_prefix_resolution(Path(td)),
         )
+    # FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+    if os.environ.get("FOREIGN_PREFIX_PROBE") == "1":
+        print("foreign-prefix-probe: stopped after 1 arm")
+        print("FAIL (1 assertions)" if failures else "PASS (1 assertions)")
+        return 1 if failures else 0
     with tempfile.TemporaryDirectory() as td:
         failures += check(
             "unadopted root refuses, naming root + kit dir (AC2)",
@@ -1906,8 +1984,11 @@ def test_map_imports_matches_the_kit_it_was_rescued_from():
     `TOOL-aSurfacedLexicon-2` deletes the original, and after it lands this arm has nothing to
     compare against and says so instead of reporting a green it did not earn.
     """
-    origin = Path(os.path.abspath(__file__)).parent.parent / "lexicon" / "lexicon.py"
-    if not origin.exists():
+    try:
+        origin = resolve_kit_dir("lexicon", "lexicon.py", Path(os.path.abspath(__file__)).parent) / "lexicon.py"
+    except LookupError:
+        origin = None
+    if origin is None or not origin.exists():
         raise Skipped("the lexicon kit is not installed here, so the original this module was "
                       "rescued from cannot be compared against")
     import importlib.util
@@ -2034,7 +2115,7 @@ def test_gov_only_files_are_withheld_on_both_paths():
     assert claimed, "no project-owned claim in kit.toml, so this arm would prove nothing"
     for expect in ("rank_harness.py", "scen-adversarial.json"):
         assert expect in claimed, f"{expect} is not withheld from `govkit apply` by kit.toml"
-    runbook = (kit.parent.parent / "WIRE-INTO-PROJECT.md")
+    runbook = next((p for p in kit.parents if (p / ".git").exists()), kit.parent.parent) / "WIRE-INTO-PROJECT.md"
     if not runbook.is_file():
         raise Skipped("WIRE-INTO-PROJECT.md is not in this tree (an adopter's copy of the kit)")
     text = runbook.read_text(encoding="utf-8")

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """PowerShell source-hygiene scans — two classes that make a script misbehave SILENTLY.
 
-Project-agnostic. Run over any repo: `python tools/gate-lint/ps-hygiene.py [root]`.
+Project-agnostic. Run over any repo: `python <prefix>/gate-lint/ps-hygiene.py [root]`.
 Exit 0 clean, 1 on findings, 2 on usage error. `--selftest` proves both scans can FAIL.
 
 CLASS 1 — case-only identifier collisions. PowerShell variable names are case-INSENSITIVE, so

@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # adopt-lexicon.sh — scaffold or verify this repo's naming-lexicon declaration.
 #
-#   bash tools/lexicon/adopt-lexicon.sh --scaffold   # DERIVE a proposed verb table + measure pins
-#   bash tools/lexicon/adopt-lexicon.sh --check      # the drift mode every kit here carries
+#   bash <prefix>/lexicon/adopt-lexicon.sh --scaffold   # DERIVE a proposed verb table + measure pins
+#   bash <prefix>/lexicon/adopt-lexicon.sh --check      # the drift mode every kit here carries
 #
 # WHY THE SEED IS DERIVED AND THEN FROZEN. Companion §12 bans a gate whose vocabulary is a
 # hand-kept mirror of the codebase's own identifiers; a PRESCRIPTIVE verb table is the inverse and
@@ -23,7 +23,7 @@ cd "$ROOT" || exit 2
 KIT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CONF="$ROOT/.lexicon.conf"
 
-# >>> resolve_python — canonical copy: tools/lib/resolve-python.sh (byte-identical; gated)
+# >>> resolve_python — canonical copy: resolve-python.sh in gov's lib dir (byte-identical; gated)
 resolve_python() {
   # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
   # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
@@ -75,7 +75,7 @@ def resolve_kit_dir(home, anchor, here):
     """
     import json
     import pathlib
-    here = pathlib.Path(here).resolve()
+    here = pathlib.Path(here).absolute()  # never resolve(): a junction must not move it
     root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
     receipt = root / ".governance" / "install.json"
     try:
@@ -87,8 +87,8 @@ def resolve_kit_dir(home, anchor, here):
             continue
         if str(row.get("source") or "").split("/")[-2:] != [home, anchor]:
             continue
-        hit = (root / str(row["path"])).resolve()
-        if hit.is_file() and root in hit.parents:
+        hit = (root / str(row["path"])).absolute()
+        if hit.is_file() and root in hit.parents and ".." not in hit.parts:
             return hit.parent
     probes = (here / home, here.parent / home)
     for cand in probes:
@@ -319,7 +319,7 @@ if [ "$MODE" = "--expand" ]; then
   # proposal was measured against, and a clean tree's worktree IS its HEAD tree; a dirty one has no
   # such sha, so HEAD would name a tree this run did not read.
   #
-  # THE WEAKER OF THE TWO DEFINITIONS THIS REPO CARRIES, ON PURPOSE. `tools/run-gates` treats
+  # THE WEAKER OF THE TWO DEFINITIONS THIS REPO CARRIES, ON PURPOSE. The run-gates kit treats
   # untracked files as dirt and has an arm asserting it. That definition cannot be used here: a kit
   # fixture copies this directory in UNTRACKED by design, so porcelain is non-empty there forever
   # and a refusal built on it could never be exercised — the arm would be unobservable for the life

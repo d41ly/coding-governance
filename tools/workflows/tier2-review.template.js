@@ -1,6 +1,6 @@
 export const meta = {
   name: 'tier2-review',
-  version: '1.16', // gov:kit tier2-review@1.16 // gov:kit review-harness@1.16 — BOTH ids: the
+  version: '1.25', // gov:kit tier2-review@1.25 // gov:kit review-harness@1.25 — BOTH ids: the
   // second is this entry's REGISTRY id, and without it a deployer grepping the id the
   // registry uses finds nothing. DEPL-dGaugedVintage-5. — engine identity (deployed verbatim; this field is the deployer's version marker)
   description:
@@ -83,7 +83,7 @@ function buildKeyedSchema(schema, extra) {
 // reader HERE for the spec-audit spelling. An absent `kind` does not refuse - it defaults - so a
 // header missing the field buys exactly the failure M4 exists to prevent: a code-shaped review of a
 // spec, reported as a review. A pointer is only as true as the block it points at, and this one is
-// asserted against the fields actually read, in tools/workflows/tier2-review.test.sh.
+// asserted against the fields actually read, in <prefix>/workflows/tier2-review.test.sh.
 // S5 (TOOL-aGuardedTally-1): args MUST be a structured object. Passing a prose string used to
 // degrade silently to `repo = '.'`, i.e. "review whatever directory this process happens to be
 // standing in" -- which twice made this harness audit a DIFFERENT repository than the one it was
@@ -346,7 +346,7 @@ const DIFF_LENSES = [
   },
 ]
 
-// TOOL-dTieredTribunal-11 S2 - the M4 spec-audit catalogue, COPIED from tools/memory-tree/README.md
+// TOOL-dTieredTribunal-11 S2 - the M4 spec-audit catalogue, COPIED from <prefix>/memory-tree/README.md
 // rather than re-invented, so the method and the engine cannot drift into two answers.
 const SPEC_LENSES = [
   {
@@ -371,7 +371,7 @@ const SPEC_LENSES = [
   },
 ]
 
-// The ONE dialect tools/hooks/agent-cap.js admits here: two sibling top-level array literals and a
+// The ONE dialect <prefix>/hooks/agent-cap.js admits here: two sibling top-level array literals and a
 // marked ternary. A map, object or registry of lens sets is DENIED at the tool call, so this shape
 // is fixed by the enforcement point rather than chosen. TOOL-dTieredTribunal-13 tightened the branch
 // this line sits on to require EVERY value branch bounded, and both branches here are literals.

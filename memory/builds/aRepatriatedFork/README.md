@@ -4,7 +4,7 @@ node: a
 opened: 2026-09-23
 streams: tooling+deployer+playbook
 roster: TOOL+DEPL
-ids: DEPL-aRepatriatedFork-1 DEPL-aRepatriatedFork-13 DEPL-aRepatriatedFork-14 DEPL-aRepatriatedFork-17 DEPL-aRepatriatedFork-20 DEPL-aRepatriatedFork-21 DEPL-aRepatriatedFork-22 DEPL-aRepatriatedFork-23 TOOL-aRepatriatedFork-2 TOOL-aRepatriatedFork-3 TOOL-aRepatriatedFork-4 TOOL-aRepatriatedFork-5 TOOL-aRepatriatedFork-6 TOOL-aRepatriatedFork-7 TOOL-aRepatriatedFork-8 TOOL-aRepatriatedFork-9 TOOL-aRepatriatedFork-10 TOOL-aRepatriatedFork-11 TOOL-aRepatriatedFork-12 TOOL-aRepatriatedFork-15 TOOL-aRepatriatedFork-16 TOOL-aRepatriatedFork-18 TOOL-aRepatriatedFork-19 TOOL-aRepatriatedFork-20 TOOL-aRepatriatedFork-21 TOOL-aRepatriatedFork-22 TOOL-aRepatriatedFork-23 TOOL-aRepatriatedFork-24 TOOL-aRepatriatedFork-25 TOOL-aRepatriatedFork-26 TOOL-aRepatriatedFork-27 TOOL-aRepatriatedFork-28 TOOL-aRepatriatedFork-29 TOOL-aRepatriatedFork-30 TOOL-aRepatriatedFork-31 TOOL-aRepatriatedFork-32 TOOL-aRepatriatedFork-33 TOOL-aRepatriatedFork-34 TOOL-aRepatriatedFork-35 TOOL-aRepatriatedFork-36 TOOL-aRepatriatedFork-37 TOOL-aRepatriatedFork-38 TOOL-aRepatriatedFork-39 TOOL-aRepatriatedFork-40 TOOL-aRepatriatedFork-41 TOOL-aRepatriatedFork-42 TOOL-aRepatriatedFork-43
+ids: DEPL-aRepatriatedFork-1 DEPL-aRepatriatedFork-13 DEPL-aRepatriatedFork-14 DEPL-aRepatriatedFork-17 DEPL-aRepatriatedFork-20 DEPL-aRepatriatedFork-21 DEPL-aRepatriatedFork-22 DEPL-aRepatriatedFork-23 TOOL-aRepatriatedFork-2 TOOL-aRepatriatedFork-3 TOOL-aRepatriatedFork-4 TOOL-aRepatriatedFork-5 TOOL-aRepatriatedFork-6 TOOL-aRepatriatedFork-7 TOOL-aRepatriatedFork-8 TOOL-aRepatriatedFork-9 TOOL-aRepatriatedFork-10 TOOL-aRepatriatedFork-11 TOOL-aRepatriatedFork-12 TOOL-aRepatriatedFork-15 TOOL-aRepatriatedFork-16 TOOL-aRepatriatedFork-18 TOOL-aRepatriatedFork-19 TOOL-aRepatriatedFork-20 TOOL-aRepatriatedFork-21 TOOL-aRepatriatedFork-22 TOOL-aRepatriatedFork-23 TOOL-aRepatriatedFork-24 TOOL-aRepatriatedFork-25 TOOL-aRepatriatedFork-26 TOOL-aRepatriatedFork-27 TOOL-aRepatriatedFork-28 TOOL-aRepatriatedFork-29 TOOL-aRepatriatedFork-30 TOOL-aRepatriatedFork-31 TOOL-aRepatriatedFork-32 TOOL-aRepatriatedFork-33 TOOL-aRepatriatedFork-34 TOOL-aRepatriatedFork-35 TOOL-aRepatriatedFork-36 TOOL-aRepatriatedFork-37 TOOL-aRepatriatedFork-38 TOOL-aRepatriatedFork-39 TOOL-aRepatriatedFork-40 TOOL-aRepatriatedFork-41 TOOL-aRepatriatedFork-42 TOOL-aRepatriatedFork-43 TOOL-aRepatriatedFork-44 TOOL-aRepatriatedFork-45 TOOL-aRepatriatedFork-46 TOOL-aRepatriatedFork-47 TOOL-aRepatriatedFork-48 TOOL-aRepatriatedFork-49 TOOL-aRepatriatedFork-50 TOOL-aRepatriatedFork-51 TOOL-aRepatriatedFork-52 TOOL-aRepatriatedFork-53 TOOL-aRepatriatedFork-54 TOOL-aRepatriatedFork-55 TOOL-aRepatriatedFork-56
 ---
 
 # aRepatriatedFork — what the a7c78ad2 pull proved gov still does not carry, specced as gov's to fix
@@ -93,6 +93,7 @@ The ones that set build policy:
 | 5 | `TOOL-aRepatriatedFork-19` | 2 | check-wiring judges every arm at a relocated layout |
 | 6 | `TOOL-aRepatriatedFork-11` | 2 | unattended: pathspecs stop at the build root; a pull lands hooks wired and pins measurable |
 | 6 | `TOOL-aRepatriatedFork-12` | 2 | memory-recall reads the adopter's corpus shape from conf |
+| 7 | `TOOL-aRepatriatedFork-44` | 1 | the adopter-ic receipt fixture carries no adopter name |
 | 8 | `TOOL-aRepatriatedFork-23` | 2 | the install-prefix ban counts every kit path it cannot see today |
 | 9 | `TOOL-aRepatriatedFork-24` | 2 | no line that executes strands an adopter at another prefix |
 | 10 | `TOOL-aRepatriatedFork-25` | 1 | printed and usage strings in received code name no install prefix |
@@ -100,9 +101,11 @@ The ones that set build policy:
 | 12 | `TOOL-aRepatriatedFork-27` | 1 | canonical-copy markers and comment prose name no install prefix |
 | 13 | `TOOL-aRepatriatedFork-29` | 2 | gov's own gates and declarations derive the prefix they name |
 | 14 | `TOOL-aRepatriatedFork-28` | 2 | every suite builds its fixtures at a prefix it derives |
-| 15 | `TOOL-aRepatriatedFork-30` | 2 | the suites run at a foreign prefix; the install-prefix gate is a pure ban |
+| 15 | `TOOL-aRepatriatedFork-45` | 1 | a renamed-away filename is a dead-path needle |
 | 16 | `TOOL-aRepatriatedFork-31` | 1 | gov's shipped files carry no adopter name |
+| 16 | `TOOL-aRepatriatedFork-46` | 2 | no line joins a literal kit name under a derived base |
 | 17 | `TOOL-aRepatriatedFork-32` | 1 | every branch of hygiene check 21 honours RECORD_SERVES_CUTOFF |
+| 18 | `TOOL-aRepatriatedFork-30` | 2 | the suites run at a foreign prefix; the install-prefix gate is a pure ban |
 | 18 | `TOOL-aRepatriatedFork-35` | 1 | gov's shipped files name no adopter, inCMS included |
 | 19 | `TOOL-aRepatriatedFork-36` | 2 | the recall kit converges at adopters: no forked rule, and an owned hook is declared |
 | 19 | `TOOL-aRepatriatedFork-37` | 1 | the unattended suite derives the repair pointer it asserts |
@@ -111,6 +114,12 @@ The ones that set build policy:
 | 19 | `TOOL-aRepatriatedFork-40` | 1 | recall anchors an id on the spec H1 that defines it |
 | 19 | `TOOL-aRepatriatedFork-42` | 1 | the memory-tree renders take every adopter path from its own declarations |
 | 20 | `DEPL-aRepatriatedFork-20` | 2 | inCMS converges onto gov's memory-tree programs |
+| 21 | `TOOL-aRepatriatedFork-49` | 2 | the push bar takes no manifest or interpreter from the environment |
+| 22 | `TOOL-aRepatriatedFork-50` | 1 | check 24's add baseline is this run's, on a build that ran before |
+| 22 | `TOOL-aRepatriatedFork-51` | 1 | brief-recorded takes a declared waiver registry, as pass-order does |
+| 23 | `TOOL-aRepatriatedFork-53` | 2 | every background task a run starts carries a heartbeat the audit reads |
+| 24 | `TOOL-aRepatriatedFork-54` | 1 | two gov gates grade a repo-root install correctly |
+| 25 | `TOOL-aRepatriatedFork-52` | 2 | the foreign-prefix leg asks only the prefix question |
 
 The `#` column is the `order` each spec declares, derived from its `### Edges`: a unit's order is one
 past the highest order it consumes from. Order 1 holds the independent units, the two security fixes
@@ -123,12 +132,13 @@ with no hand edit between the update and the bar.** One observation at each adop
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 39 unit(s) · node a · opened 2026-09-23 · streams tooling+deployer+playbook
+**Build status:** CLOSED · 51 unit(s) · node a · opened 2026-09-23 · streams tooling+deployer+playbook
 ids DEPL-aRepatriatedFork-1 DEPL-aRepatriatedFork-13 DEPL-aRepatriatedFork-14 DEPL-aRepatriatedFork-17 DEPL-aRepatriatedFork-20 DEPL-aRepatriatedFork-21 DEPL-aRepatriatedFork-22 DEPL-aRepatriatedFork-23 TOOL-aRepatriatedFork-2 TOOL-aRepatriatedFork-3 TOOL-aRepatriatedFork-4 TOOL-aRepatriatedFork-5
 ids TOOL-aRepatriatedFork-6 TOOL-aRepatriatedFork-7 TOOL-aRepatriatedFork-8 TOOL-aRepatriatedFork-9 TOOL-aRepatriatedFork-10 TOOL-aRepatriatedFork-11 TOOL-aRepatriatedFork-12 TOOL-aRepatriatedFork-15 TOOL-aRepatriatedFork-16 TOOL-aRepatriatedFork-18 TOOL-aRepatriatedFork-19 TOOL-aRepatriatedFork-20
 ids TOOL-aRepatriatedFork-21 TOOL-aRepatriatedFork-22 TOOL-aRepatriatedFork-23 TOOL-aRepatriatedFork-24 TOOL-aRepatriatedFork-25 TOOL-aRepatriatedFork-26 TOOL-aRepatriatedFork-27 TOOL-aRepatriatedFork-28 TOOL-aRepatriatedFork-29 TOOL-aRepatriatedFork-30 TOOL-aRepatriatedFork-31
 ids TOOL-aRepatriatedFork-32 TOOL-aRepatriatedFork-33 TOOL-aRepatriatedFork-34 TOOL-aRepatriatedFork-35 TOOL-aRepatriatedFork-36 TOOL-aRepatriatedFork-37 TOOL-aRepatriatedFork-38 TOOL-aRepatriatedFork-39 TOOL-aRepatriatedFork-40 TOOL-aRepatriatedFork-41 TOOL-aRepatriatedFork-42
-ids TOOL-aRepatriatedFork-43
+ids TOOL-aRepatriatedFork-43 TOOL-aRepatriatedFork-44 TOOL-aRepatriatedFork-45 TOOL-aRepatriatedFork-46 TOOL-aRepatriatedFork-47 TOOL-aRepatriatedFork-48 TOOL-aRepatriatedFork-49 TOOL-aRepatriatedFork-50 TOOL-aRepatriatedFork-51 TOOL-aRepatriatedFork-52 TOOL-aRepatriatedFork-53
+ids TOOL-aRepatriatedFork-54 TOOL-aRepatriatedFork-55 TOOL-aRepatriatedFork-56
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -145,7 +155,7 @@ ids TOOL-aRepatriatedFork-43
 | [TOOL-aRepatriatedFork-9 — row_grammar and check-arms take NicoCares' additions, and stop importing sibling engines](spec/2026-09-23-spec-TOOL-aRepatriatedFork-9.md) | 1 | 2 | CLOSED | rev-2 | 2026-09-24 |
 | [DEPL-aRepatriatedFork-13 — an adopter's own engine is declared, not "unattributed"](spec/2026-09-23-spec-DEPL-aRepatriatedFork-13.md) | 2 | 2 | CLOSED | rev-6 | 2026-09-24 |
 | [TOOL-aRepatriatedFork-15 — a kit whose shipped bytes move bumps its version](spec/2026-09-23-spec-TOOL-aRepatriatedFork-15.md) | 2 | 2 | CLOSED | rev-2 | 2026-09-24 |
-| [TOOL-aRepatriatedFork-2 — every kit path a runtime string spells is derived](spec/2026-09-23-spec-TOOL-aRepatriatedFork-2.md) | 2 | 2 | CLOSED | rev-7 | 2026-09-24 |
+| [TOOL-aRepatriatedFork-2 — every kit path a runtime string spells is derived](spec/2026-09-23-spec-TOOL-aRepatriatedFork-2.md) | 2 | 2 | CLOSED | rev-8 | 2026-10-01 |
 | [TOOL-aRepatriatedFork-8 — the lander contracts inCMS carries](spec/2026-09-23-spec-TOOL-aRepatriatedFork-8.md) | 2 | 2 | CLOSED | rev-5 | 2026-09-24 |
 | [DEPL-aRepatriatedFork-14 — hole probes and descriptors that cannot pass at an adopter](spec/2026-09-23-spec-DEPL-aRepatriatedFork-14.md) | 3 | 1 | CLOSED | rev-3 | 2026-09-24 |
 | [DEPL-aRepatriatedFork-17 — govkit update is safe to run and says what it did](spec/2026-09-23-spec-DEPL-aRepatriatedFork-17.md) | 3 | 2 | CLOSED | rev-4 | 2026-09-24 |
@@ -154,16 +164,20 @@ ids TOOL-aRepatriatedFork-43
 | [TOOL-aRepatriatedFork-19 — check-wiring judges every arm at a relocated layout](spec/2026-09-23-spec-TOOL-aRepatriatedFork-19.md) | 5 | 2 | CLOSED | rev-3 | 2026-09-24 |
 | [TOOL-aRepatriatedFork-11 — unattended: build-root pathspecs stop at the build root, and a pull lands its hooks wired and its pins measurable](spec/2026-09-23-spec-TOOL-aRepatriatedFork-11.md) | 6 | 2 | CLOSED | rev-3 | 2026-09-24 |
 | [TOOL-aRepatriatedFork-12 — memory-recall reads the adopter's corpus shape from conf](spec/2026-09-23-spec-TOOL-aRepatriatedFork-12.md) | 6 | 2 | CLOSED | rev-3 | 2026-09-24 |
-| [TOOL-aRepatriatedFork-23 — the install-prefix ban counts every kit path it cannot see today](spec/2026-09-25-spec-TOOL-aRepatriatedFork-23.md) | 8 | 2 | SPECCED | rev-2 | 2026-09-25 |
-| [TOOL-aRepatriatedFork-24 — no line that executes strands an adopter at another prefix](spec/2026-09-25-spec-TOOL-aRepatriatedFork-24.md) | 9 | 2 | SPECCED | rev-3 | 2026-09-28 |
-| [TOOL-aRepatriatedFork-25 — printed and usage strings in received code name no install prefix](spec/2026-09-25-spec-TOOL-aRepatriatedFork-25.md) | 10 | 1 | SPECCED | rev-2 | 2026-09-25 |
-| [TOOL-aRepatriatedFork-26 — the runbook and every shipped doc name no install prefix](spec/2026-09-25-spec-TOOL-aRepatriatedFork-26.md) | 11 | 1 | SPECCED | rev-2 | 2026-09-25 |
-| [TOOL-aRepatriatedFork-27 — canonical-copy markers and comment prose name no install prefix](spec/2026-09-25-spec-TOOL-aRepatriatedFork-27.md) | 12 | 1 | SPECCED | rev-1 | 2026-09-25 |
-| [TOOL-aRepatriatedFork-29 — gov's own gates and declarations derive the prefix they name](spec/2026-09-25-spec-TOOL-aRepatriatedFork-29.md) | 13 | 2 | SPECCED | rev-2 | 2026-09-25 |
-| [TOOL-aRepatriatedFork-28 — every suite builds its fixtures at a prefix it derives](spec/2026-09-25-spec-TOOL-aRepatriatedFork-28.md) | 14 | 2 | SPECCED | rev-2 | 2026-09-25 |
-| [TOOL-aRepatriatedFork-30 — the suites run at a foreign prefix, and the install-prefix gate is a pure ban](spec/2026-09-25-spec-TOOL-aRepatriatedFork-30.md) | 15 | 2 | SPECCED | rev-2 | 2026-09-25 |
+| [TOOL-aRepatriatedFork-44 — the adopter-ic receipt fixture carries no adopter name](spec/2026-09-29-spec-TOOL-aRepatriatedFork-44.md) | 7 | 1 | CLOSED | rev-2 | 2026-09-29 |
+| [TOOL-aRepatriatedFork-23 — the install-prefix ban counts every kit path it cannot see today](spec/2026-09-25-spec-TOOL-aRepatriatedFork-23.md) | 8 | 2 | CLOSED | rev-3 | 2026-09-29 |
+| [TOOL-aRepatriatedFork-24 — no line that executes strands an adopter at another prefix](spec/2026-09-25-spec-TOOL-aRepatriatedFork-24.md) | 9 | 2 | CLOSED | rev-7 | 2026-10-01 |
+| [TOOL-aRepatriatedFork-25 — printed and usage strings in received code name no install prefix](spec/2026-09-25-spec-TOOL-aRepatriatedFork-25.md) | 10 | 1 | CLOSED | rev-3 | 2026-09-29 |
+| [TOOL-aRepatriatedFork-26 — the runbook and every shipped doc name no install prefix](spec/2026-09-25-spec-TOOL-aRepatriatedFork-26.md) | 11 | 1 | CLOSED | rev-4 | 2026-10-01 |
+| [TOOL-aRepatriatedFork-27 — canonical-copy markers and comment prose name no install prefix](spec/2026-09-25-spec-TOOL-aRepatriatedFork-27.md) | 12 | 1 | CLOSED | rev-2 | 2026-09-29 |
+| [TOOL-aRepatriatedFork-29 — gov's own gates and declarations derive the prefix they name](spec/2026-09-25-spec-TOOL-aRepatriatedFork-29.md) | 13 | 2 | CLOSED | rev-6 | 2026-10-01 |
+| [TOOL-aRepatriatedFork-28 — every suite builds its fixtures at a prefix it derives](spec/2026-09-25-spec-TOOL-aRepatriatedFork-28.md) | 14 | 2 | CLOSED | rev-8 | 2026-10-01 |
+| [TOOL-aRepatriatedFork-45 — a renamed-away filename is a dead-path needle](spec/2026-09-30-spec-TOOL-aRepatriatedFork-45.md) | 15 | 1 | CLOSED | rev-2 | 2026-09-30 |
 | [TOOL-aRepatriatedFork-31 — gov's shipped files carry no adopter name](spec/2026-09-25-spec-TOOL-aRepatriatedFork-31.md) | 16 | 1 | CLOSED | rev-2 | 2026-09-25 |
+| [TOOL-aRepatriatedFork-46 — no line joins a literal kit name under a derived base](spec/2026-09-30-spec-TOOL-aRepatriatedFork-46.md) | 16 | 2 | CLOSED | rev-8 | 2026-10-01 |
 | [TOOL-aRepatriatedFork-32 — every branch of hygiene check 21 honours `RECORD_SERVES_CUTOFF`](spec/2026-09-25-spec-TOOL-aRepatriatedFork-32.md) | 17 | 1 | CLOSED | rev-3 | 2026-09-26 |
+| [TOOL-aRepatriatedFork-47 — every copy of the `{prefix}` resolution gives one answer](spec/2026-09-30-spec-TOOL-aRepatriatedFork-47.md) | 17 | 1 | CLOSED | rev-1 | 2026-09-30 |
+| [TOOL-aRepatriatedFork-30 — the suites run at a foreign prefix, and the install-prefix gate is a pure ban](spec/2026-09-25-spec-TOOL-aRepatriatedFork-30.md) | 18 | 2 | CLOSED | rev-8 | 2026-10-01 |
 | [TOOL-aRepatriatedFork-35 — gov's shipped files name no adopter, inCMS included](spec/2026-09-25-spec-TOOL-aRepatriatedFork-35.md) | 18 | 1 | CLOSED | rev-2 | 2026-09-25 |
 | [TOOL-aRepatriatedFork-36 — the recall kit converges at adopters](spec/2026-09-25-spec-TOOL-aRepatriatedFork-36.md) | 19 | 2 | CLOSED | rev-3 | 2026-09-26 |
 | [TOOL-aRepatriatedFork-37 — the unattended suite derives the repair pointer it asserts](spec/2026-09-25-spec-TOOL-aRepatriatedFork-37.md) | 19 | 1 | CLOSED | rev-2 | 2026-09-25 |
@@ -172,16 +186,25 @@ ids TOOL-aRepatriatedFork-43
 | [TOOL-aRepatriatedFork-40 — recall anchors an id on the spec H1 that defines it](spec/2026-09-28-spec-TOOL-aRepatriatedFork-40.md) | 19 | 1 | CLOSED | rev-2 | 2026-09-28 |
 | [TOOL-aRepatriatedFork-42 — the memory-tree renders take every adopter path from the adopter's own declarations](spec/2026-09-29-spec-TOOL-aRepatriatedFork-42.md) | 19 | 1 | CLOSED | rev-3 | 2026-09-29 |
 | [DEPL-aRepatriatedFork-20 — inCMS converges onto gov's memory-tree programs](spec/2026-09-23-spec-DEPL-aRepatriatedFork-20.md) | 20 | 2 | CLOSED | rev-11 | 2026-09-29 |
+| [TOOL-aRepatriatedFork-49 — the push bar takes no manifest or interpreter from the environment](spec/2026-09-30-spec-TOOL-aRepatriatedFork-49.md) | 21 | 2 | CLOSED | rev-2 | 2026-09-30 |
+| [TOOL-aRepatriatedFork-50 — check 24's add baseline is this run's, on a build that ran before](spec/2026-10-01-spec-TOOL-aRepatriatedFork-50.md) | 22 | 1 | CLOSED | rev-1 | 2026-10-01 |
+| [TOOL-aRepatriatedFork-51 — brief-recorded takes a declared waiver registry, as pass-order does](spec/2026-10-01-spec-TOOL-aRepatriatedFork-51.md) | 22 | 1 | CLOSED | rev-1 | 2026-10-01 |
+| [TOOL-aRepatriatedFork-53 — every background task a run starts carries a heartbeat the audit reads](spec/2026-10-01-spec-TOOL-aRepatriatedFork-53.md) | 23 | 2 | CLOSED | rev-2 | 2026-10-01 |
+| [TOOL-aRepatriatedFork-54 — two gov gates grade a repo-root install correctly](spec/2026-10-01-spec-TOOL-aRepatriatedFork-54.md) | 24 | 1 | CLOSED | rev-2 | 2026-10-01 |
+| [TOOL-aRepatriatedFork-52 — the foreign-prefix leg asks only the prefix question](spec/2026-10-01-spec-TOOL-aRepatriatedFork-52.md) | 25 | 2 | CLOSED | rev-6 | 2026-10-01 |
+| [TOOL-aRepatriatedFork-55 — check 23 does not count a generated render as an undeclared write](spec/2026-10-02-spec-TOOL-aRepatriatedFork-55.md) | 26 | 1 | CLOSED | rev-1 | 2026-10-02 |
+| [TOOL-aRepatriatedFork-56 — brief-recorded does not grade a repair of a unit built before its run](spec/2026-10-02-spec-TOOL-aRepatriatedFork-56.md) | 27 | 1 | CLOSED | rev-1 | 2026-10-02 |
 <!-- /gen:build-units -->
 
-Records: 76 bound to this build, across 4 record folder(s).
+Records: 121 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: DEPL-aRepatriatedFork-1 DEPL-aRepatriatedFork-13 DEPL-aRepatriatedFork-14 DEPL-aRepatriatedFork-17 DEPL-aRepatriatedFork-20 TOOL-aRepatriatedFork-10 TOOL-aRepatriatedFork-11 TOOL-aRepatriatedFork-12 TOOL-aRepatriatedFork-15 TOOL-aRepatriatedFork-16
 TOOL-aRepatriatedFork-18 TOOL-aRepatriatedFork-19 TOOL-aRepatriatedFork-2 TOOL-aRepatriatedFork-3 TOOL-aRepatriatedFork-4 TOOL-aRepatriatedFork-5 TOOL-aRepatriatedFork-6 TOOL-aRepatriatedFork-7 TOOL-aRepatriatedFork-8 TOOL-aRepatriatedFork-9 DEPL-aRepatriatedFork-21 TOOL-aRepatriatedFork-21
 TOOL-aRepatriatedFork-23 TOOL-aRepatriatedFork-24 TOOL-aRepatriatedFork-25 TOOL-aRepatriatedFork-26 TOOL-aRepatriatedFork-27 TOOL-aRepatriatedFork-28 TOOL-aRepatriatedFork-29 TOOL-aRepatriatedFork-30 TOOL-aRepatriatedFork-31 TOOL-aRepatriatedFork-32 TOOL-aRepatriatedFork-35 TOOL-aRepatriatedFork-36
-TOOL-aRepatriatedFork-37 TOOL-aRepatriatedFork-38 TOOL-aRepatriatedFork-39 TOOL-aRepatriatedFork-40 TOOL-aRepatriatedFork-42.
+TOOL-aRepatriatedFork-37 TOOL-aRepatriatedFork-38 TOOL-aRepatriatedFork-39 TOOL-aRepatriatedFork-40 TOOL-aRepatriatedFork-42 TOOL-aRepatriatedFork-44 TOOL-aRepatriatedFork-45 TOOL-aRepatriatedFork-46 TOOL-aRepatriatedFork-47 TOOL-aRepatriatedFork-49 TOOL-aRepatriatedFork-50 TOOL-aRepatriatedFork-51
+TOOL-aRepatriatedFork-52 TOOL-aRepatriatedFork-53 TOOL-aRepatriatedFork-54 TOOL-aRepatriatedFork-55 TOOL-aRepatriatedFork-56.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -194,6 +217,7 @@ TOOL-aRepatriatedFork-37 TOOL-aRepatriatedFork-38 TOOL-aRepatriatedFork-39 TOOL-
 | 4 | `TOOL-aRepatriatedFork-18` | no |
 | 5 | `TOOL-aRepatriatedFork-19` | no |
 | 6 | `TOOL-aRepatriatedFork-11`, `TOOL-aRepatriatedFork-12` | yes |
+| 7 | `TOOL-aRepatriatedFork-44` | no |
 | 8 | `TOOL-aRepatriatedFork-23` | no |
 | 9 | `TOOL-aRepatriatedFork-24` | no |
 | 10 | `TOOL-aRepatriatedFork-25` | no |
@@ -201,12 +225,19 @@ TOOL-aRepatriatedFork-37 TOOL-aRepatriatedFork-38 TOOL-aRepatriatedFork-39 TOOL-
 | 12 | `TOOL-aRepatriatedFork-27` | no |
 | 13 | `TOOL-aRepatriatedFork-29` | no |
 | 14 | `TOOL-aRepatriatedFork-28` | no |
-| 15 | `TOOL-aRepatriatedFork-30` | no |
-| 16 | `TOOL-aRepatriatedFork-31` | no |
-| 17 | `TOOL-aRepatriatedFork-32` | no |
-| 18 | `TOOL-aRepatriatedFork-35` | no |
+| 15 | `TOOL-aRepatriatedFork-45` | no |
+| 16 | `TOOL-aRepatriatedFork-31`, `TOOL-aRepatriatedFork-46` | yes |
+| 17 | `TOOL-aRepatriatedFork-32`, `TOOL-aRepatriatedFork-47` | yes |
+| 18 | `TOOL-aRepatriatedFork-30`, `TOOL-aRepatriatedFork-35` | yes |
 | 19 | `TOOL-aRepatriatedFork-36`, `TOOL-aRepatriatedFork-37`, `TOOL-aRepatriatedFork-38`, `TOOL-aRepatriatedFork-39`, `TOOL-aRepatriatedFork-40`, `TOOL-aRepatriatedFork-42` | yes |
 | 20 | `DEPL-aRepatriatedFork-20` | no |
+| 21 | `TOOL-aRepatriatedFork-49` | no |
+| 22 | `TOOL-aRepatriatedFork-50`, `TOOL-aRepatriatedFork-51` | yes |
+| 23 | `TOOL-aRepatriatedFork-53` | no |
+| 24 | `TOOL-aRepatriatedFork-54` | no |
+| 25 | `TOOL-aRepatriatedFork-52` | no |
+| 26 | `TOOL-aRepatriatedFork-55` | no |
+| 27 | `TOOL-aRepatriatedFork-56` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

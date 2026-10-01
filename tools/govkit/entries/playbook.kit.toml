@@ -1,4 +1,4 @@
-# kit.toml — this entry, declared as data. Read by tools/govkit/. Contract: the deployer unit's spec under memory/builds/aSealedCaravan/spec/.
+# kit.toml — this entry, declared as data. Read by <prefix>/govkit/. Contract: the deployer unit's spec under memory/builds/aSealedCaravan/spec/.
 
 id = "playbook"
 scope = "repo"
@@ -8,7 +8,7 @@ requires = []
 
 # ONE file as of v3.0. The charter converged and the domain companion was deleted; the deploy-time
 # placeholder catalogue was never shipped either — it was prose the runbook said to read, and it is
-# now a program (`tools/playbook/`). What ships is the charter template and nothing else, which is
+# now a program (`<prefix>/playbook/`). What ships is the charter template and nothing else, which is
 # why `[[files]] include` names exactly one path.
 #
 # COUNTING THIS ENTRY has been wrong twice, in the same direction both times: a catalogue the runbook

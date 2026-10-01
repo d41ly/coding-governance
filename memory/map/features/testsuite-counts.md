@@ -55,7 +55,7 @@ leg. The shape is read from the file, which costs milliseconds against legs that
 tracked suites, 12 printing no count at all, four different spellings among the 15 that did, and 3
 floors. A leg with twelve silent exceptions checks nothing; one with twelve NAMED exceptions
 ratchets, and a row whose suite now complies REDS as stale — the same rule
-`install-prefix-waivers.txt` carries, for the same reason.
+`tools/dead-path-waivers.txt` carries, for the same reason.
 
 ## Shared seams
 
@@ -63,7 +63,7 @@ ratchets, and a row whose suite now complies REDS as stale — the same rule
   `run-gates.test.sh` already treat it as the single source for what the bar runs; this leg is the
   third reader and adds no second list.
 - `memory/project/*.txt` — the shrink-only registry convention, shared with
-  `install-prefix-waivers.txt`, `unarmed-branches.txt` and the method-carrier list. Same directory,
+  `unarmed-branches.txt` and the method-carrier list. Same directory,
   same stale-row-reds rule, and hygiene check 3's allowed set names it so a stray file there still
   reds.
 - `FLOOR_ASSERTIONS` — the constant `TOOL-cBriefedPilot-23` introduced in three suites. This leg does

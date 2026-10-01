@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
-# check-dead-paths.sh — nothing outside `memory/` may name a file this repo DELETED.
+# check-dead-paths.sh — nothing outside `memory/`, and no map dossier or gotcha page, may name a file this repo DELETED
+# or renamed away.
 #
-#   bash tools/check-dead-paths.sh            # assert; exit 1 on an unwaived hit
-#   bash tools/check-dead-paths.sh --list     # print every hit, waived or not (authoring aid)
-#   bash tools/check-dead-paths.sh --needles  # print the derived needle set (authoring aid)
+#   bash <prefix>/check-dead-paths.sh            # assert; exit 1 on an unwaived hit
+#   bash <prefix>/check-dead-paths.sh --list     # print every hit, waived or not (authoring aid)
+#   bash <prefix>/check-dead-paths.sh --needles  # print the derived needle set (authoring aid)
 #
-# WHY. `tools/check-install-prefix.sh` already owns half of the dead-path class: a path spelled at
+# WHY. `<prefix>/check-install-prefix.sh` already owns half of the dead-path class: a path spelled at
 # the wrong PREFIX. The other half is a path that is dead because the file was DELETED, and until
 # this gate landed nothing held it. Measured on the v3.0 charter convergence, which deleted two
 # companion files: carriers still naming them survived in the repo's front door, the charter every
@@ -41,24 +42,59 @@
 # block", "the product template + its two companions" — is invisible here, and carriers of exactly
 # that shape were in the v3.0 set. They were found by READING, not by this gate, and nothing here
 # would have caught them. It is a floor, not the answer.
+# A RENAME whose source sat under `memory/` is not a needle (TOOL-aRepatriatedFork-45): those are
+# records re-filed, and the one such name spelled outside `memory/`, `BACKLOG.md`, is an adopter's
+# live backlog file. And a rename is only seen as one above git's rename-similarity threshold (50% by
+# default); below it git records a delete plus an add, which the deletion half already reads, so the
+# threshold moves a name between the halves and drops none — unless rename detection is switched off
+# outright, which the rename sentinel refuses.
 #
 # `memory/` IS OUT OF SCOPE, and that is a rule rather than a convenience. Specs, reviews, build
 # ledgers and archived snapshots are append-only records: they describe what WAS true, and a record
 # that names a file deleted after it was written is correct, not stale. Rewriting one to please a
 # gate would be falsifying the record.
 #
+# EXCEPT THE MAP DOSSIERS under `memory/map/features/` (closing review round 1 L1,
+# TOOL-aRepatriatedFork-30 S9). A dossier is not a record of what was true: it is the live inventory a
+# session reads to learn what the tree holds, rewritten on every touch, and one describing a deleted
+# registry as current was the worst place for a dead path to live. They are graded like any carrier.
+# SO ARE THE GOTCHA PAGES under `memory/gotchas/` (closing review round 2 L2, TOOL-aRepatriatedFork-30
+# S10): `gotchas.py` serves each as a live checklist item, and one still told its reader to hand-write
+# rows in a deleted registry. The class is a surface SERVED AS LIVE, not the one folder it bit first.
+#
 # WAIVERS are a tracked file, one `<path>\t<ordinal>\t<line-text>\t<reason>` per row. Shrink-only,
 # and a waiver whose resolved line is no longer a hit reds as stale.
 #
-# IT NO LONGER MATCHES `install-prefix-waivers.txt`, and the divergence is DELIBERATE rather than an
-# oversight to tidy away. That sibling is still `<path>:<line>` and carries the same line-drift
-# exposure; the owner ruled ONE file, and a registry moves when its own keying has actually failed,
-# not by association. Do not "restore" the parity.
+# IT NEVER MATCHED THE INSTALL-PREFIX GATE'S OLD WAIVER REGISTRY, and the divergence was DELIBERATE
+# rather than an oversight: that sibling stayed `<path>:<line>` until TOOL-aRepatriatedFork-30
+# deleted it with the rest of that gate's exemptions. The owner ruled ONE file, and a registry moves
+# when its own keying has actually failed, not by association.
 set -u
+# Captured BEFORE the `cd`, because `$0` may be relative (TOOL-aRepatriatedFork-29 S3).
+_self_dir=$(cd "$(dirname "$0")" 2>/dev/null && pwd) || _self_dir=""
 ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || { echo "dead-paths: not a git repo"; exit 2; }
 cd "$ROOT" || exit 2
 
-WAIVERS="tools/dead-path-waivers.txt"
+# THIS GATE'S OWN DIRECTORY, DERIVED, and an underivable one REFUSES. Its waiver registry and its own
+# two files sit here, and every waiver row names its file through the `{prefix}` token the loop below
+# resolves against this answer, so gov runs at whatever kit root it was checked out under.
+if ! SELF_PRE=$(git -C "$_self_dir" rev-parse --show-prefix 2>/dev/null); then
+  echo "dead-paths: cannot derive this gate's own directory from '$_self_dir' — REFUSING"
+  exit 2
+fi
+WAIVERS="${SELF_PRE}dead-path-waivers.txt"
+# The `{prefix}` resolution (TOOL-aRepatriatedFork-47), INLINED byte-identically from the
+# canonical copy named on its marker line and gated by the resolve-python self-test.
+# >>> resolve_prefix_sh -- canonical copy: kit-rel.sh in the gov lib dir (byte-identical; gated)
+resolve_prefix_sh() {
+  local _rps_s="$1"
+  case "${2:-}" in
+    ""|.) _rps_s=${_rps_s//"{prefix}/"/}; _rps_s=${_rps_s//"{prefix}"/.} ;;
+    *) _rps_s=${_rps_s//"{prefix}"/"$2"} ;;
+  esac
+  printf '%s\n' "$_rps_s"
+}
+# <<< resolve_prefix_sh
 TABC=$(printf '\t')
 # FROZEN SENTINEL. The needle derivation walks history and could go silently empty — a bad
 # `--diff-filter`, a shallow clone, a `git log` that stops answering — and an empty needle set makes
@@ -67,13 +103,18 @@ TABC=$(printf '\t')
 # will never return, so its ABSENCE from the derived set means the derivation broke, not that the
 # tree got clean.
 SENTINEL="parallel-coding-governance.domain-rules.md"
+# The rename half's own frozen sentinel: the v3.0 product template's old name, reachable ONLY through
+# a rename row, so its absence means the rename read broke. It is checked against the rename half
+# alone, never the union, or a deletion of the same name could hold it up.
+RENAME_SENTINEL="parallel-coding-governance.template.md"
 
 MODE="${1:---check}"
 case "$MODE" in --check|--list|--needles) ;; *) echo "usage: $(basename "$0") [--check|--list|--needles]"; exit 2 ;; esac
 
 # --- the needle set, derived ----------------------------------------------------------------------
-# Every path ever deleted, reduced to basenames, minus every basename the tree still carries. A file
-# deleted from one directory and re-added in another is NOT dead: the name still resolves.
+# Every path ever deleted or renamed away, reduced to basenames, minus every basename the tree still
+# carries. A file deleted from one directory and re-added in another is NOT dead: the name still
+# resolves.
 tracked=$(git ls-files)
 [ -n "$tracked" ] || { echo "dead-paths: git ls-files is empty — that is not a pass"; exit 2; }
 tracked_base=$(printf '%s\n' "$tracked" | sed 's|.*/||' | sort -u)
@@ -82,7 +123,17 @@ deleted_base=$(git log --diff-filter=D --name-only --pretty=format: -- . \
                | sed '/^$/d; s|.*/||' | sort -u)
 [ -n "$deleted_base" ] || { echo "dead-paths: git history reports no deletion at all — the derivation is broken, not the tree clean"; exit 2; }
 
-gone=$(printf '%s\n' "$deleted_base" | grep -vxF -f <(printf '%s\n' "$tracked_base") || true)
+# THE RENAME HALF (TOOL-aRepatriatedFork-45). git records a `git mv` as R, never D, so the OLD name of
+# a renamed file is gone exactly as a deleted one is and the read above never sees it. Column 2 of an
+# `R<score>` row is the source. Sources under `memory/` are records re-filed, and the one such name
+# spelled outside it, `BACKLOG.md`, is an adopter's live file, so they stay out, mirroring the
+# haystack's own exclusion.
+renamed_base=$(git log --diff-filter=R --name-status --pretty=format: -- . \
+               | awk -F'\t' 'NF >= 3 && $2 !~ /^memory\// { print $2 }' \
+               | sed 's|.*/||' | sort -u)
+
+gone=$(printf '%s\n%s\n' "$deleted_base" "$renamed_base" | sort -u \
+       | grep -vxF -f <(printf '%s\n' "$tracked_base") || true)
 
 # Each gone basename plus its distinctive tail. `a.b.md` -> `a.b.md` and `b.md`; `a.md` -> `a.md`.
 # Then drop any needle that still SUFFIXES a tracked path, which is what stops a generic tail.
@@ -120,6 +171,14 @@ if ! printf '%s\n' "$needles" | grep -qxF "$SENTINEL"; then
   echo "dead-paths: a clean verdict from here would be this gate matching nothing and calling it green."
   exit 1
 fi
+# Read against the rename half ALONE, never the union, so a deletion of the same basename can never
+# mask an empty rename read. After the deletion sentinel, so each refusal keeps its own message.
+if ! printf '%s\n' "$renamed_base" | grep -qxF "$RENAME_SENTINEL"; then
+  echo "dead-paths: the frozen rename sentinel '$RENAME_SENTINEL' is not in the derived rename set."
+  echo "dead-paths: it was renamed away at 5b00666 and cannot come back, so the rename"
+  echo "dead-paths: DERIVATION is broken — renamed-away names would go unseen and the gate call it green."
+  exit 1
+fi
 
 if [ "$MODE" = --needles ]; then
   printf '%s\n' "$needles"
@@ -128,12 +187,14 @@ fi
 
 # --- the haystack ---------------------------------------------------------------------------------
 # Everything tracked except `memory/` (append-only records) and this gate's own two files, which name
-# every needle by construction.
+# every needle by construction, PLUS the map dossiers and the gotcha pages, which are served as live
+# guidance and not kept as records.
 RE=$(printf '%s\n' "$needles" | sed 's/[.[\*^$]/\\&/g' | tr '\n' '|'); RE=${RE%|}
-hits=$(git grep -nE "$RE" -- ':(exclude)memory/*' \
-                            ":(exclude)$WAIVERS" \
-                            ':(exclude)tools/check-dead-paths.sh' \
-                            ':(exclude)tools/check-dead-paths.test.sh' 2>/dev/null \
+hits=$( { git grep -nE "$RE" -- ':(exclude)memory/*' \
+                              ":(exclude)$WAIVERS" \
+                              ":(exclude)${SELF_PRE}check-dead-paths.sh" \
+                              ":(exclude)${SELF_PRE}check-dead-paths.test.sh"
+          git grep -nE "$RE" -- 'memory/map/features/*' 'memory/gotchas/*'; } 2>/dev/null \
        | awk -F: '{print $1":"$2}' | sort -u)
 
 # --- resolve the registry -------------------------------------------------------------------------
@@ -157,6 +218,7 @@ if [ -f "$WAIVERS" ]; then
   while IFS= read -r _row || [ -n "$_row" ]; do
     case "$_row" in *"$TABC"*) ;; *) continue ;; esac
     _wpath=${_row%%"$TABC"*}; _rest=${_row#*"$TABC"}
+    case "$_wpath" in *"{prefix}"*) _wpath=$(resolve_prefix_sh "$_wpath" "${SELF_PRE%/}") ;; esac
     _word=${_rest%%"$TABC"*}; _rest=${_rest#*"$TABC"}
     _wtext=${_rest%"$TABC"*}
     case "$_word" in ''|*[!0-9]*) malformed="$malformed$_wpath:<ordinal [$_word] is not a positive integer>
@@ -216,9 +278,9 @@ stale_rows=$(printf '%s\n' "$waived_rows" | grep -vxF -f <(printf '%s' "$hits") 
 bad=0
 for h in $unwaived; do
   if [ "$bad" = 0 ]; then
-    echo "dead-paths: a file outside memory/ names a path this repo DELETED. A reader who follows it"
-    echo "dead-paths: finds nothing, and nothing else in the bar reds. Repoint it at what replaced the"
-    echo "dead-paths: file, or add a row to $WAIVERS with the reason the name must stay."
+    echo "dead-paths: a file outside memory/, or a map dossier, names a path this repo DELETED or renamed away. A reader"
+    echo "dead-paths: who follows it finds nothing, and nothing else in the bar reds. Repoint it at what"
+    echo "dead-paths: replaced the file, or add a row to $WAIVERS with the reason the name must stay."
   fi
   bad=$((bad+1))
   printf '  %s  %s\n' "$h" "$(sed -n "${h##*:}p" "${h%:*}" | sed 's/^[[:space:]]*//' | cut -c1-90)"

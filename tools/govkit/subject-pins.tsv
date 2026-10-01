@@ -1,7 +1,7 @@
-# subject-pins.tsv — GENERATED. Regenerate with `python tools/govkit/govkit.py selfcheck --write`.
+# subject-pins.tsv — GENERATED. Regenerate with `python <prefix>/govkit/govkit.py selfcheck --write`.
 #
-# One row per gate leg in tools/gate-legs.json: <name>\t<subject>\t<chunk>. TWO fields
-# decide whether a leg runs on an automatic bar, and tools/run-gates/run-gates.sh is the
+# One row per gate leg in <prefix>/gate-legs.json: <name>\t<subject>\t<chunk>. TWO fields
+# decide whether a leg runs on an automatic bar, and <prefix>/run-gates/run-gates.sh is the
 # code that decides: it HOLDS a leg when `subject == kit` OR `chunk == selftests`, and
 # runs it otherwise. Both are pinned here, because pinning one left the other free to
 # take a leg off every bar with nothing in a diff to see (TOOL-aScouredKit-3).
@@ -9,7 +9,7 @@
 # THIS FILE GRADES CHANGE, NOT CORRECTNESS. It exists so a subject cannot move without
 # the move appearing in a diff. Whether any given value is RIGHT is a review judgement
 # — the criterion is stated once, at the `subject` field declaration in
-# tools/run-gates/run-gates.sh: ask what a FAILURE of the leg MEANS.
+# <prefix>/run-gates/run-gates.sh: ask what a FAILURE of the leg MEANS.
 agent-cap restatement	repo	product
 agent-cap restatement self-test	kit	selftests
 agent-cap self-test	kit	selftests
@@ -37,6 +37,7 @@ drift-audit wiring	repo	wiring
 encoding posture (text IO names its encoding)	repo	product
 every held leg is budgeted, every budget row resolves	repo	declarations
 extract-arms self-test	kit	selftests
+foreign-prefix parity (every self-test at three prefixes)	repo	selftests
 gotchas selftest	kit	selftests
 govkit acceptance matrix	repo	declarations
 govkit refusal join	repo	declarations

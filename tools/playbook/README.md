@@ -3,9 +3,9 @@
 Fills `coding-governance-agents.template.md` into a target repo's charter, as a re-renderable region.
 
 ```bash
-python tools/govkit/govkit.py intake --target <repo> --kits playbook,playbook-render,…
-bash  tools/playbook/adopt-playbook.sh --target <repo>
-bash  tools/playbook/adopt-playbook.sh --target <repo> --check
+python <prefix>/govkit/govkit.py intake --target <repo> --kits playbook,playbook-render,…
+bash  <prefix>/playbook/adopt-playbook.sh --target <repo>
+bash  <prefix>/playbook/adopt-playbook.sh --target <repo> --check
 ```
 
 ## Why this exists

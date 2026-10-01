@@ -6,7 +6,7 @@
 # nobody editing a kit, so it stays a merge-bar leg. A SELF-TEST reads the KIT — it stages a break
 # into a copy of a checker and asserts the checker still catches it — so it has a job only when the
 # source under that kit changes, and none at all in a tree that copy-installs the kit and never edits
-# it. `tools/unattended/run-unattended-gates.sh` took that ruling for ONE kit. This is the same thing
+# it. `<prefix>/unattended/run-unattended-gates.sh` took that ruling for ONE kit. This is the same thing
 # for every kit, which is what the ruling always implied and nobody had built.
 #
 # WHAT IS THEREFORE NOT COVERED, said plainly because an exemption is not coverage (charter §7):
@@ -47,6 +47,12 @@ SELF="$(git -C "$(dirname -- "$0")" rev-parse --show-prefix 2>/dev/null)$(basena
 BUDGETS="$HERE/selftest-budgets.txt"
 # The manifest is this kit dir's SIBLING, derived exactly as run-gates.sh derives it (S1).
 LEGS="${GATE_LEGS:-$(dirname -- "$HERE")/gate-legs.json}"
+# THE TOOL ROOT, derived the same way (TOOL-aRepatriatedFork-29 S2): the manifest, this kit's
+# declaration and its evidence header name their paths through the `{prefix}` token, and every
+# reader below resolves it against this answer. Empty is the repo root, a legal install.
+TROOT=$(git -C "$(dirname -- "$HERE")" rev-parse --show-prefix 2>/dev/null) || {
+  echo "run-selftests: cannot derive the tool root above $HERE" >&2; exit 2; }
+TROOT=${TROOT%/}
 
 # THE FAIL SELECTOR, ONE SPELLING. Every reader of a suite's output has to agree about what a
 # FAILURE is, or `--attribute` can report `NEW 0` over a suite whose printed tail shows four of
@@ -55,10 +61,10 @@ LEGS="${GATE_LEGS:-$(dirname -- "$HERE")/gate-legs.json}"
 FAIL_SELECTOR='^(FAIL|nope|.*FAILED)'
 # The python-launcher resolver, INLINED byte-identically from the canonical copy named on
 # the marker line below, for
-# the reason the sibling runner states: this kit is deployable and tools/lib/ is gov-internal.
+# the reason the sibling runner states: this kit is deployable and gov's lib dir is gov-internal.
 # The line this replaces used `command -v`, which the MS-Store python3 stub answers before
 # exiting 9009 -- the exact idiom the resolver-parity gate bans, and it had been red on it.
-# >>> resolve_python — canonical copy: tools/lib/resolve-python.sh (byte-identical; gated)
+# >>> resolve_python — canonical copy: resolve-python.sh in gov's lib dir (byte-identical; gated)
 resolve_python() {
   # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
   # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
@@ -344,9 +350,24 @@ read_margin() {
 # bootstrap state --calibrate fills and --pooled refuses row by row.
 read_evidence() {
   [ -f "$EVIDENCE" ] || return 0
-  "$PYBIN" - "$EVIDENCE" <<'PY'
+  "$PYBIN" - "$EVIDENCE" "$TROOT" <<'PY'
 import re, sys
 sys.stdout.reconfigure(newline="")
+troot = sys.argv[2]
+# The `{prefix}` resolution (TOOL-aRepatriatedFork-47), INLINED byte-identically from the
+# canonical copy named on its marker line and gated by the resolve-python self-test.
+# >>> resolve_prefix_token -- canonical copy: resolve_prefix_token.py in the gov lib dir (byte-identical; gated)
+def resolve_prefix_token(spelled, troot):
+    """<spelled> with its {prefix} token resolved against the tool root <troot>.
+
+    An empty or "." root is a root install: the token drops with its slash, and a bare token
+    becomes ".". Any other root replaces the token. Text with no token passes unchanged.
+    """
+    spelled = str(spelled)
+    if not troot or troot == ".":
+        return spelled.replace("{prefix}/", "").replace("{prefix}", ".")
+    return spelled.replace("{prefix}", troot)
+# <<< resolve_prefix_token
 seen = {}
 for n, raw in enumerate(open(sys.argv[1], encoding="utf-8"), 1):
     line = raw.rstrip("\r\n")
@@ -359,7 +380,9 @@ for n, raw in enumerate(open(sys.argv[1], encoding="utf-8"), 1):
             print("NOTRAILER\t" + m.group(1))
         m = re.match(r"#\s*pooled-kit:\s*(.+?)\s*$", s)
         if m:
-            print("POOLEDKIT\t" + m.group(1))
+            kd = m.group(1)
+            kd = resolve_prefix_token(kd, troot)
+            print("POOLEDKIT\t" + kd)
         continue
     f = line.split("\t")
     if len(f) != 9:
@@ -497,14 +520,28 @@ PY
 fi
 
 # ---- the declaration, read once. Emitted as: STATE, name, budget, argv -- in that order.
-# ---- A row whose argv is empty takes it from `tools/gate-legs.json`, so the manifest stays the one
+# ---- A row whose argv is empty takes it from `<prefix>/gate-legs.json`, so the manifest stays the one
 # ---- place a held leg's command is written and this file carries only what the manifest cannot.
 # ---- ITS INPUTS ARE ARGUMENTS, not the globals it used to read. `--attribute` resolves the SAME
 # ---- population at a second commit, from that commit's own declaration and manifest, and a second
 # ---- copy of this reader there would be two answers to "what is the population".
 read_population() { # budgets · legs · filter
-  "$PYBIN" - "$1" "$2" "$3" <<'PY'
+  "$PYBIN" - "$1" "$2" "$3" "$TROOT" <<'PY'
 import json, sys
+# The `{prefix}` resolution (TOOL-aRepatriatedFork-47), INLINED byte-identically from the
+# canonical copy named on its marker line and gated by the resolve-python self-test.
+# >>> resolve_prefix_token -- canonical copy: resolve_prefix_token.py in the gov lib dir (byte-identical; gated)
+def resolve_prefix_token(spelled, troot):
+    """<spelled> with its {prefix} token resolved against the tool root <troot>.
+
+    An empty or "." root is a root install: the token drops with its slash, and a bare token
+    becomes ".". Any other root replaces the token. Text with no token passes unchanged.
+    """
+    spelled = str(spelled)
+    if not troot or troot == ".":
+        return spelled.replace("{prefix}/", "").replace("{prefix}", ".")
+    return spelled.replace("{prefix}", troot)
+# <<< resolve_prefix_token
 
 # LF, NOT CRLF, and this is a bug fix rather than tidiness. On Windows `print` translates every
 # newline to CR LF, so each row below reached the shell with a trailing CR. It was INVISIBLE while
@@ -537,6 +574,9 @@ for line in open(budgets, encoding="utf-8"):
             print("\t".join(["UNRESOLVED", name, budget, ""]))
             continue
         argv = " ".join(leg.get("argv", []))
+    # The `{prefix}` token, resolved against the tool root this script derived (argv 4).
+    troot = sys.argv[4] if len(sys.argv) > 4 else ""
+    argv = resolve_prefix_token(argv, troot)
     if filt and filt not in argv:
         continue
     print("\t".join(["ok", name, budget, argv]))

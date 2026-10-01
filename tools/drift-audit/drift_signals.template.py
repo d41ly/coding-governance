@@ -1,9 +1,9 @@
 """drift_signals.py — THIS PROJECT's drift-signal declarations (the only project-owned code).
 
-gov:kit drift-audit@1.17
+gov:kit drift-audit@1.21
 
-Copied from tools/drift-audit/drift_signals.template.py at adoption. Fill the four required names below,
-then run `python tools/drift-audit/drift_report.py`.
+Copied from <prefix>/drift-audit/drift_signals.template.py at adoption. Fill the four required names below,
+then run `python <prefix>/drift-audit/drift_report.py`.
 
 The engine (`drift_report.py`) owns the signal IMPLEMENTATIONS. This file owns only what is
 genuinely repo-shaped. The corpus root and disciplines are NOT here — they come from
@@ -73,7 +73,7 @@ def _example_gate_leg_count(ctx) -> tuple[int, int]:
 
 
 HANDKEPT: list[dict] = [
-    # {"record": "charter gate-leg count", "source": "tools/gate-legs.json",
+    # {"record": "charter gate-leg count", "source": "<prefix>/gate-legs.json",
     #  "probe": _example_gate_leg_count},
 ]
 

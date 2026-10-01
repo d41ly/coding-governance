@@ -88,7 +88,7 @@ def resolve_kit_dir(home, anchor, here):
     """
     import json
     import pathlib
-    here = pathlib.Path(here).resolve()
+    here = pathlib.Path(here).absolute()  # never resolve(): a junction must not move it
     root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
     receipt = root / ".governance" / "install.json"
     try:
@@ -100,8 +100,8 @@ def resolve_kit_dir(home, anchor, here):
             continue
         if str(row.get("source") or "").split("/")[-2:] != [home, anchor]:
             continue
-        hit = (root / str(row["path"])).resolve()
-        if hit.is_file() and root in hit.parents:
+        hit = (root / str(row["path"])).absolute()
+        if hit.is_file() and root in hit.parents and ".." not in hit.parts:
             return hit.parent
     probes = (here / home, here.parent / home)
     for cand in probes:
@@ -637,7 +637,7 @@ pass_commit() {  # anchor · unit · run-state-path · [upper-bound, default HEA
   # THE SUBJECT COMES OUT OF THE SAME WALK AS THE SHA. It used to cost a `git log -1` per
   # commit in the window, on every call, and this function is called once per (anchor, unit)
   # pair -- so the same commits were re-read once per pair. Profiled on node `a` 2026-09-07
-  # over a full run of `bash tools/unattended/check-unattended.sh`: 1528 of that run's 2513
+  # over a full run of `bash <prefix>/unattended/check-unattended.sh`: 1528 of that run's 2513
   # git spawns were this one line, against 31 for the `--follow` walk everyone assumes is the
   # expensive one. `%H%x09%s` gets both out of one walk. TOOL-aQuenchedHarness-7.
   #
@@ -1287,8 +1287,22 @@ baseline_units() {  # run-state-path · build-README-path · [cutoff-date] · [f
     return 1
   }
   _bu_base=""
+  # THIS RUN'S COMMITS ONLY (TOOL-aRepatriatedFork-50). A re-run build keeps the finished run's
+  # history at the same path, so the first live commit was THAT run's, and every unit specced between
+  # the two runs read as added mid-run: 19 of them redded check 24 on aRepatriatedFork at 6e7cb0df.
+  # A run is its pinned `base:`, so a commit whose record pins another base belongs to another run.
+  # ponytail: a run re-preflighted at the SAME base still walks from the earlier run's first live
+  # commit; that baseline is a subset of this one's, so the ceiling is a row owed, never one skipped.
+  # A record with no base filters nothing, which is the walk this function made before. Every read
+  # keeps the `| extract_run_facts | grep -m1 ` spelling that check 36's staged breaks rewrite.
+  _bu_cur=$(cat "$_bu_rel" 2>/dev/null | extract_run_facts | grep -m1 '^base:'); _bu_cur=${_bu_cur%$'\r'}
   for _bu_c in $(GIT log --reverse --format=%H -- "$_bu_rel" 2>/dev/null); do
-    case "$(GIT show "$_bu_c:$_bu_rel" 2>/dev/null | extract_run_facts | grep -m1 '^phase:')" in
+    _bu_blob=$(GIT show "$_bu_c:$_bu_rel" 2>/dev/null)
+    if [ -n "$_bu_cur" ]; then
+      _bu_b=$(printf '%s\n' "$_bu_blob" | extract_run_facts | grep -m1 '^base:'); _bu_b=${_bu_b%$'\r'}
+      [ "$_bu_b" = "$_bu_cur" ] || continue
+    fi
+    case "$(printf '%s\n' "$_bu_blob" | extract_run_facts | grep -m1 '^phase:')" in
       *BUILDING*|*RUNNING*|*VERIFYING*|*LANDING*|*LANDED*) _bu_base="$_bu_c"; break ;;
     esac
   done

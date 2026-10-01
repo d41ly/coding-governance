@@ -15,8 +15,115 @@
 # Intersecting recorded start and end times was tried in a sibling build and retired by name: it
 # graded the node's clock rather than the runner, and red three consecutive pushes on a tree it had
 # already passed.
-KIT_REL="${KIT_REL:-tools/run-gates}"
 set -u
+HERE="$(cd "$(dirname "$0")" && pwd)"
+# >>> derive_self_rel — canonical copy: kit-rel.sh in gov's lib dir (byte-identical; gated)
+derive_self_rel() {
+  local _dsr_p _dsr_rel=""
+  _dsr_p=$(cd "$1" 2>/dev/null && pwd) || return 1
+  while [ ! -e "$_dsr_p/.git" ]; do
+    [ "$(dirname "$_dsr_p")" = "$_dsr_p" ] && return 1
+    _dsr_rel="$(basename "$_dsr_p")${_dsr_rel:+/$_dsr_rel}"
+    _dsr_p=$(dirname "$_dsr_p")
+  done
+  printf '%s\n' "$_dsr_rel"
+}
+# <<< derive_self_rel
+KIT_REL=$(derive_self_rel "$HERE") || { echo "turnstile-test: not inside a git repository"; exit 2; }
+# PFX is the install prefix WITH its trailing slash, derived from where this file sits and empty
+# at a root install: every fixture and host path below is spelled through it, never through a
+# literal prefix (TOOL-aRepatriatedFork-28).
+case "$KIT_REL" in */*) PFX="${KIT_REL%/*}/" ;; *) PFX="" ;; esac
+# TOOL-aRepatriatedFork-46: a kit is named by the name its directory has in THIS install, never
+# as a literal segment: this suite's own from where it sits, a sibling's through the resolver,
+# which reads the install receipt first. A fixture mirrors that layout by the resolved NAME.
+KIT="${KIT_REL##*/}"
+# >>> resolve_python — canonical copy: resolve-python.sh in gov's lib dir (byte-identical; gated)
+resolve_python() {
+  # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
+  # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
+  # the candidate and every consumer uses "$PY" as a single word (measured: exit 127).
+  _rp_tried=""
+  for _rp_c in "${1:-}" "${GOV_PYTHON:-}" python3 python py; do
+    [ -n "$_rp_c" ] || continue
+    _rp_tried="$_rp_tried $_rp_c"
+    if "$_rp_c" -c "import sys" >/dev/null 2>&1; then
+      printf '%s\n' "$_rp_c"
+      return 0
+    fi
+  done
+  {
+    echo "resolve_python: no usable python launcher. Each candidate was RUN with -c 'import sys' and"
+    echo "resolve_python: none exited 0 — being on PATH is not evidence (the Microsoft Store python3"
+    echo "resolve_python: stub answers \`command -v\` and exits 9009 without running anything)."
+    echo "resolve_python: tried:$_rp_tried"
+    if [ -n "${1:-}" ]; then
+      echo "resolve_python: the caller's override '$1' was tried FIRST and did not run."
+    fi
+    if [ -n "${GOV_PYTHON:-}" ]; then
+      echo "resolve_python: GOV_PYTHON is set to '$GOV_PYTHON' and did not run. An override that is"
+      echo "resolve_python: set and unusable is THIS failure, never a silent fall-through — the"
+      echo "resolve_python: operator believes they chose, and would not have."
+    fi
+  } >&2
+  return 1
+}
+# <<< resolve_python
+# The sibling-kit resolver (TOOL-aRepatriatedFork-2 S3), INLINED byte-identically from the
+# canonical copy named on its marker line and gated by the resolve-python self-test's parity
+# table. A shell consumer runs it with the python it already resolved, so the receipt rung is
+# read in Python and never parsed in bash. `resolve_kit_dir <python> <home> <anchor> <here>`
+# prints the kit directory REPO-RELATIVE, or the resolver's named refusal on stderr and exits 1.
+resolve_kit_dir() {
+  "$1" -c "$(cat <<'RKD'
+# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
+def resolve_kit_dir(home, anchor, here):
+    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
+
+    1. receipt — the `.governance/install.json` row whose `source` ends in <home>/<anchor> and
+       whose `path` exists inside this tree. The only record of a RENAMED kit dir: no probe finds
+       a memory-recall kit an adopter homed at `scripts/recall/`.
+    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
+    3. refuse — LookupError naming the three places looked; never a guessed prefix.
+    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
+    """
+    import json
+    import pathlib
+    here = pathlib.Path(here).absolute()  # never resolve(): a junction must not move it
+    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
+    receipt = root / ".governance" / "install.json"
+    try:
+        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("path"):
+            continue
+        if str(row.get("source") or "").split("/")[-2:] != [home, anchor]:
+            continue
+        hit = (root / str(row["path"])).absolute()
+        if hit.is_file() and root in hit.parents and ".." not in hit.parts:
+            return hit.parent
+    probes = (here / home, here.parent / home)
+    for cand in probes:
+        if (cand / anchor).is_file():
+            return cand
+    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
+        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
+# <<< resolve_kit_dir
+RKD
+)"'
+import sys
+try:
+    d = resolve_kit_dir(*sys.argv[1:4])
+except LookupError as e:
+    sys.exit(str(e))
+r = next((p for p in (d, *d.parents) if (p / ".git").exists()), d.anchor)
+print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
+}
+_rkd_py=$(resolve_python) || { echo "turnstile-test: no usable python, so the sibling kits cannot be resolved"; exit 2; }
+LIB_DIR=$(resolve_kit_dir "$_rkd_py" lib resolve-python.sh "$HERE") || exit 2
+LIB="${LIB_DIR##*/}"
 
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "turnstile-test: not a git repo"; exit 2; }
 HERE=$(cd "$(dirname "$0")" && pwd)
@@ -60,10 +167,10 @@ hdrkey() {
 # mk_repo <dir> — a scratch repository carrying the runner and its table.
 mk_repo() {
   local d=$1
-  mkdir -p "$d/tools/run-gates" "$d/tools/lib" "$d/fx"
-  cp "$HERE/run-gates.sh" "$HERE/gate-profiles.txt" "$d/tools/run-gates/" || return 1
-  cp "$HERE/gate-fingerprint.sh" "$d/tools/run-gates/" 2>/dev/null || true
-  cp "$ROOT/tools/lib/resolve-python.sh" "$d/tools/lib/" 2>/dev/null || true
+  mkdir -p "$d/${PFX}${KIT}" "$d/${PFX}${LIB}" "$d/fx"
+  cp "$HERE/run-gates.sh" "$HERE/gate-profiles.txt" "$d/${PFX}${KIT}/" || return 1
+  cp "$HERE/gate-fingerprint.sh" "$d/${PFX}${KIT}/" 2>/dev/null || true
+  cp "$ROOT/${LIB_DIR}/resolve-python.sh" "$d/${PFX}${LIB}/" 2>/dev/null || true
   ( cd "$d" && git init -q -b main . && git config user.email ts@test.invalid \
       && git config user.name ts-test ) >/dev/null 2>&1 || return 1
   # The occupancy leg: register, count everyone registered, record the count, dwell, deregister.
@@ -84,10 +191,10 @@ OCC
   printf '#!/usr/bin/env bash\nsleep "${TS_LONG:-12}"\nexit 0\n' > "$d/fx/long.sh"
   # several quick legs, so a holder's heartbeat refreshes repeatedly across a run
   printf '#!/usr/bin/env bash\nsleep 1\nexit 0\n' > "$d/fx/tick.sh"
-  printf '%s\n' '[ {"name": "occupy", "argv": ["bash", "fx/occupy.sh"]} ]' > "$d/tools/gate-legs.json"
+  printf '%s\n' '[ {"name": "occupy", "argv": ["bash", "fx/occupy.sh"]} ]' > "$d/${PFX}gate-legs.json"
   ( cd "$d" && git add -A && git commit -qm seed ) >/dev/null 2>&1 || return 1
 }
-legs()  { printf '%s\n' "$2" > "$1/tools/gate-legs.json"; }
+legs()  { printf '%s\n' "$2" > "$1/${PFX}gate-legs.json"; }
 runbg() { ( cd "$1" && shift; env "$@" bash $KIT_REL/run-gates.sh; ) >>"$tmp/out.$RANDOM" 2>&1 & }
 peak()  { awk 'BEGIN{m=0} {if ($1+0>m) m=$1+0} END{print m+0}' "$1/peaks" 2>/dev/null; }
 # RESOLVED ABSOLUTELY, the way the runner resolves it. `git rev-parse --git-common-dir` answers a
@@ -131,6 +238,8 @@ else
   [ "${p_on:-0}" = 1 ] && ok "with the turnstile ON the peak is exactly 1 holder" \
                        || nope "two bars ran against one repository at once (peak $p_on)"
 fi
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${bad:-0}" = 0 ] && echo "PASS ($n assertions)" || echo "FAIL ($n assertions)"; [ "${bad:-0}" = 0 ] && exit 0; exit 1; fi
 
 # ------------------------------------------------------------- 3: a dead holder is reaped ---------
 # The reason MATTERS, not just the outcome: a reaper that only ever fires on the TTL would pass an
@@ -490,11 +599,11 @@ done
 # The launcher, RESOLVED by running it where the shared resolver is present; this suite SHIPS, so
 # the fallback is the bare name, marked as the guess it is. `PYBIN=` overrides.
 TS_PY="${PYBIN:-}"
-if [ -z "$TS_PY" ] && [ -f "$ROOT/tools/lib/resolve-python.sh" ]; then . "$ROOT/tools/lib/resolve-python.sh"; TS_PY=$(resolve_python 2>/dev/null); fi
-[ -n "$TS_PY" ] || TS_PY=python   # gov:literal-python — last-resort fallback when ../lib/ is absent (adopter layout)
+[ -n "$TS_PY" ] || TS_PY=$(resolve_python 2>/dev/null)
+[ -n "$TS_PY" ] || TS_PY=python   # gov:literal-python — last-resort fallback when the inline resolver found no launcher that runs
 nested=$( "$TS_PY" -c '
 import json, os, sys
-p = os.environ.get("GATE_LEGS") or "tools/gate-legs.json"
+p = os.environ.get("GATE_LEGS") or "'"${PFX}gate-legs.json"'"
 try: legs = json.load(open(p))
 except Exception: sys.exit(0)
 print("\n".join(l["name"] for l in legs if any("run-gates.sh" in str(a) for a in l.get("argv", []))))
@@ -786,7 +895,7 @@ fi
 # fix. `TOOL-aBoundedCeiling-8` records arm 4c grading a source COMMENT and thereby asserting
 # nothing; this asserts that three real statements appear in the required order, so an edit that
 # moves the trap back inside the winning branch reds here rather than shipping the wedge again.
-rgs=$ROOT/tools/run-gates/run-gates.sh
+rgs=$ROOT/${PFX}${KIT}/run-gates.sh
 tl=$(grep -n 'TS_TICKET="\$TS_Q/' "$rgs" | head -1 | cut -d: -f1)
 pl=$(grep -n "^  trap 'ts_drop_ticket' EXIT" "$rgs" | head -1 | cut -d: -f1)
 wl=$(grep -n '^  while \[ -n "\$TS_TICKET" \]' "$rgs" | head -1 | cut -d: -f1)

@@ -79,13 +79,13 @@ its shards sit frozen under `memory/archive/`.
 <!-- gov:playbook -->
 # Coding Governance — the agent charter template
 
-*Template **v3.2** · 2026-09-28. One file. One line per directive, and a wrapped line is still one
-rule. This file BECOMES a project's `AGENTS.md`: `tools/playbook/adopt-playbook.sh` fills every
+*Template **v3.3** · 2026-10-01. One file. One line per directive, and a wrapped line is still one
+rule. This file BECOMES a project's `AGENTS.md`: `<prefix>/playbook/adopt-playbook.sh` fills every
 placeholder and drops the blocks a target has no kit for, so filling it is a program's job and not a
 reader's — see `WIRE-INTO-PROJECT.md` for what a program cannot decide. History lives in the
 `…-v-N-N.md` snapshots and in git.*
 
-<!-- governance-template: v3.2 -->
+<!-- governance-template: v3.3 -->
 
 > **What:** a project-agnostic charter for running Claude Code (or any agent) across several
 > machines/sessions ("nodes") on one repo. **Use:** deploy it with the renderer; the rules are
@@ -304,9 +304,9 @@ matched its target population.
   sits at the tool call, on matcher `Workflow|Agent` — the exact pair, since `Workflow` alone
   leaves direct spawns unguarded. The hook denies any K it cannot resolve to an integer ≤5, and
   an array LITERAL of ≤5 elements is a receiver it can size. FIVE of these values are
-  machine-compared against the sources that own them by `tools/check-playbook-parity.sh`; retyping
+  machine-compared against the sources that own them by `<prefix>/check-playbook-parity.sh`; retyping
   one wrong reds the bar rather than drifting. The marker spellings and the full resolvable-bound
-  grammar are the hook's own, in `tools/hooks/README.md`; a ready harness ships beside it.
+  grammar are the hook's own, in `<prefix>/hooks/README.md`; a ready harness ships beside it.
 - Finders emit CONCRETE findings — `file:line` + repro/impact + proposed fix — so skeptics can actually verify them.
 - Precision (confirmed/(confirmed+refuted)) is the #1 token lever — below ~0.5, tighten scope/priming before adding agents; scale a large fresh surface with LENSES (coverage), not skeptics; past ~25 agents returns diminish.
 - Feed reviewers the security model, the already-tracked open issues, and what's by-design — so they hunt NEW issues, not re-report known ones.

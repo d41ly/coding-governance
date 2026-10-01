@@ -4,7 +4,7 @@
 # test can cover: that a refusal writes NOTHING, that the generated region holds NO copy (the unit
 # list is derived from the build README), and that --status and --resume agree.
 #
-#   bash tools/unattended/unattended.test.sh    # "PASS (…assertions)" + exit 0 = good
+#   bash <prefix>/unattended/unattended.test.sh    # "PASS (…assertions)" + exit 0 = good
 #
 # ONE scratch repo, reset between arms. Twenty-six git inits would triple the runtime and buy
 # nothing: every arm's state is reachable from the pristine tree by a checkout and a clean.
@@ -27,6 +27,13 @@ derive_self_rel() {
 }
 # <<< derive_self_rel
 KIT_REL=$(derive_self_rel "$HERE") || { echo "FAIL this suite is not inside a git repository"; exit 2; }
+# PFX is the install prefix WITH its trailing slash, derived from where this file sits and empty
+# at a root install: every fixture and host path below is spelled through it, never through a
+# literal prefix (TOOL-aRepatriatedFork-28).
+case "$KIT_REL" in */*) PFX="${KIT_REL%/*}/" ;; *) PFX="" ;; esac
+# ROOTPFX is a ROOT install's prefix, empty by definition: a fixture that models a root install,
+# or a key relative to the tool root, is spelled through it rather than bare (TOOL-aRepatriatedFork-28 S2).
+ROOTPFX=""
 # `KIT_REL` used to mean the TOOL ROOT in this one suite and the kit dir in every other; it means
 # the kit dir everywhere now, and the directory holding it is `TOOL_REL`.
 TOOL_REL=$(dirname -- "$KIT_REL")
@@ -36,13 +43,53 @@ SCRIPT="$HERE/unattended.sh"
 # second spelling of `COMPUTERNAME` or `tasklist`. It defines functions and nothing else.
 # shellcheck source=lib-unattended.sh
 . "$HERE/lib-unattended.sh"
+# TOOL-aRepatriatedFork-46: a SIBLING kit is found through the resolver the library above carries, which
+# reads the install receipt first, and a fixture names it by the resolved NAME rather than typing it.
+# The python it runs under is resolved INLINE.
+# >>> resolve_python — canonical copy: resolve-python.sh in gov's lib dir (byte-identical; gated)
+resolve_python() {
+  # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
+  # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
+  # the candidate and every consumer uses "$PY" as a single word (measured: exit 127).
+  _rp_tried=""
+  for _rp_c in "${1:-}" "${GOV_PYTHON:-}" python3 python py; do
+    [ -n "$_rp_c" ] || continue
+    _rp_tried="$_rp_tried $_rp_c"
+    if "$_rp_c" -c "import sys" >/dev/null 2>&1; then
+      printf '%s\n' "$_rp_c"
+      return 0
+    fi
+  done
+  {
+    echo "resolve_python: no usable python launcher. Each candidate was RUN with -c 'import sys' and"
+    echo "resolve_python: none exited 0 — being on PATH is not evidence (the Microsoft Store python3"
+    echo "resolve_python: stub answers \`command -v\` and exits 9009 without running anything)."
+    echo "resolve_python: tried:$_rp_tried"
+    if [ -n "${1:-}" ]; then
+      echo "resolve_python: the caller's override '$1' was tried FIRST and did not run."
+    fi
+    if [ -n "${GOV_PYTHON:-}" ]; then
+      echo "resolve_python: GOV_PYTHON is set to '$GOV_PYTHON' and did not run. An override that is"
+      echo "resolve_python: set and unusable is THIS failure, never a silent fall-through — the"
+      echo "resolve_python: operator believes they chose, and would not have."
+    fi
+  } >&2
+  return 1
+}
+# <<< resolve_python
+_rkd_py=$(resolve_python) || { echo "FAIL no usable python, so the sibling kits cannot be resolved"; exit 2; }
+MT_KIT_DIR=$(resolve_kit_dir "$_rkd_py" memory-tree gen_build_index.py "$HERE") || exit 2
+MT_KIT="${MT_KIT_DIR##*/}"
+GOVKIT_DIR=""   # a kit SOURCE only: absent at an adopter, where the dispatch arms announce their skip
+_gk_rel=$(resolve_kit_dir "$_rkd_py" govkit govkit.py "$HERE" 2>/dev/null) \
+  && GOVKIT_DIR="$(git -C "$HERE" rev-parse --show-toplevel)/$_gk_rel"
 
 # ---- THE SHARD CONTRACT (TOOL-aShardedFloor-2) ---------------------------------------------------
 # This suite IS the merge bar's floor: one leg exceeding leg-seconds / width sets the whole bar's
 # wall clock, and no width change moves it. Splitting it into two legs is the only lever that does.
 #
 # ONE FILE, TWO GUARDED REGIONS — never a physical split. That is refused by a gate, not by taste:
-# `tools/memory-tree/check-arms.py` maps one gate to EXACTLY one sibling test, and `.memory-tree.conf`
+# `<prefix>/memory-tree/check-arms.py` maps one gate to EXACTLY one sibling test, and `.memory-tree.conf`
 # pins this pair's armed-branch floor. Split the file and half the branches go unarmed and that pin
 # breaks. The regions are also CONTIGUOUS rather than hashed per arm: the fixture builds three
 # sequential anchors by real work (`UNIT0`, `RPRISTINE`, `BCP`) and a hash assignment would cut
@@ -159,7 +206,7 @@ git init -q -b main . && git config user.email t@t.test && git config user.name 
 # reconcile took main's (e197267e, the later and the one its spec-audit call sites already spell):
 # RESUME_STALE_BOUND eighth, SPEC_AUDIT_DEFAULT ninth, and this branch's two schedule bounds
 # stay tenth and eleventh.
-mkconf() { # wiring · gate · UNITS_REGION_CUTOFF · GATE_BOUND · SPEC_THIN_CUTOFF · UNIT_STALL_BOUND · REVIEW_ROUNDS · RESUME_STALE_BOUND · SPEC_AUDIT_DEFAULT · RESUME_SCHEDULE_DELAY · RESUME_SCHEDULE_LIMIT
+mkconf() { # wiring · gate · UNITS_REGION_CUTOFF · GATE_BOUND · SPEC_THIN_CUTOFF · UNIT_STALL_BOUND · REVIEW_ROUNDS · RESUME_STALE_BOUND · SPEC_AUDIT_DEFAULT · RESUME_SCHEDULE_DELAY · RESUME_SCHEDULE_LIMIT · TASK_STALL_BOUND
   # ELEVEN SLOTS, NOT EIGHT. `RESUME_STALE_BOUND` and `SPEC_AUDIT_DEFAULT` both read ${8-}: the
   # liveness arms pass a seconds bound there and the spec-audit arms a DATE, so those arms set
   # RESUME_STALE_BOUND to a date and the driver refused at exit 2 before any verb ran. One slot
@@ -182,6 +229,7 @@ GATE_BOUND="${4-3600}"
 # verb, and the arms that read WHOLE output, or its first line, would read that NOTE instead.
 GATE_WALL="21600"
 UNIT_STALL_BOUND="${6-1800}"
+TASK_STALL_BOUND="${12-5400}"
 REVIEW_ROUNDS="${7-7}"
 RESUME_STALE_BOUND="${8-5400}"
 WIRING_CHECK="${1-true}"
@@ -585,6 +633,8 @@ if in_shard 1; then
 reset_tree; before=$(sum)
 out=$(run --status ../etc)
 hit "$out" "the slug is not a build-folder name; expected the slug alone, a letter then letters, digits or dashes: ../etc"
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${st:-0}" = 0 ] && echo "PASS (${n:-1} assertions)" || echo "FAIL (${n:-1} assertions)"; [ "${st:-0}" = 0 ] && exit 0; exit 1; fi
 same "check 1 wrote nothing" "$(sum)" "$before"
 
 # ---- check 2: dirty tree. The check refreshes the stat cache first and then asks about CONTENT —
@@ -1062,7 +1112,7 @@ rm -f "$(_rp_log)" "$(_rp_maplog)"
 out=$(_rp_close)
 hit "$out" "every declared probe log is ABSENT"
 hit "$out" "recall/queries.jsonl"
-hit "$out" "codebase-map/lookups.jsonl"  # gov:root-fixture — expected-output substring from a fixture probe log
+hit "$out" "${ROOTPFX}codebase-map/lookups.jsonl"   # expected-output substring from a fixture probe log
 
 # 4e. ADOPTED AND PRESENT — a map log naming THIS tree, and NO recall log. MET on the map half
 #     alone, which is the arm the closed unit claimed and never had: before this reader existed the
@@ -2542,7 +2592,7 @@ printf '%s %s
 # inherit it. The driver `export`s GIT_GRAFT_FILE=/dev/null as deliberate hardening, and that
 # export reaches every child — so when `--close` ran the merge bar, which runs this selftest,
 # the control got an empty merge-base and the leg redded. The gate could not pass in a state
-# that was entirely legitimate: a branch touching tools/unattended/ un-skips this leg, and
+# that was entirely legitimate: a branch touching <prefix>/unattended/ un-skips this leg, and
 # --close is exactly where it then runs.
 same "graft-control: the graft gives two unrelated histories a merge-base"      "$(env -u GIT_GRAFT_FILE git -C "$gtmp" merge-base "$gz" main 2>/dev/null)" "$gz"
 same "graft-arm: GIT_GRAFT_FILE suppresses it, which is what the driver exports"      "$(GIT_GRAFT_FILE=/dev/null git -C "$gtmp" merge-base "$gz" main 2>/dev/null)" ""
@@ -3021,7 +3071,7 @@ same "the refused --landed wrote nothing" "$(sum)" "$before"
 
 # ---- S2: the refusal names the OTHER TREE holding the uncommitted LANDING. The fixture is a real
 # ---- second worktree, because the whole class is that a phase does not cross trees; the precedent
-# ---- for building one in a fixture is tools/memory-recall/recall-opened.test.sh.
+# ---- for building one in a fixture is <prefix>/memory-recall/recall-opened.test.sh.
 reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
 git add -A && git commit -q -m runstate --no-verify
 OTHER=$(mktemp -d)/wt
@@ -4056,10 +4106,10 @@ same "a leg named .* erased no other row in the PIECE record" \
   "$(grep -c '^leg honest · verdict FAIL$' "$(ls recs3/*.md | head -1)")" "1"
 # ...and a leg carrying a SLASH does not abort the dropper while the append still runs, which left two
 # verdict rows for one leg on a record no reader can decide.
-run --record-piece tRun --records-root recs3 --path pc3/one.md --leg 'tools/lint.sh' --verdict PASS >/dev/null
-run --record-piece tRun --records-root recs3 --path pc3/one.md --leg 'tools/lint.sh' --verdict FAIL >/dev/null
+run --record-piece tRun --records-root recs3 --path pc3/one.md --leg ''"${PFX}lint.sh"'' --verdict PASS >/dev/null
+run --record-piece tRun --records-root recs3 --path pc3/one.md --leg ''"${PFX}lint.sh"'' --verdict FAIL >/dev/null
 same "a slashed leg name leaves exactly ONE verdict row" \
-  "$(grep -c '^leg tools/lint.sh · verdict ' "$(ls recs3/*.md | head -1)")" "1"
+  "$(grep -c '^leg '"${PFX}lint.sh"' · verdict ' "$(ls recs3/*.md | head -1)")" "1"
 reset_tree
 mkdir -p recs2; git add -A >/dev/null
 run --record-set tRun --records-root recs2 --run R1 --leg S --verdict PASS >/dev/null
@@ -4836,7 +4886,7 @@ o=$(run --brief tRun --unit "A · B" --path memory/builds/tRun/prompts/armbrief.
 n=$((n+1)); case "$o" in *"a brief unit or path spells the record's own field separator ' · ', which makes the row unparseable by the check that reads it"*) echo "ok   brief: the field separator in the unit is refused" ;; *) echo "FAIL brief: the field separator in the unit is refused -- $o"; st=1 ;; esac
 o=$(run --brief tRun --unit "A--no-verify" --path memory/builds/tRun/prompts/armbrief.md)
 n=$((n+1)); case "$o" in *"a brief unit or path spells the declared bypass flag, and the gate greps this file whole for it, so recording this would red the bar on a record no verb can rewrite"*) echo "ok   brief: the declared bypass flag in the unit is refused" ;; *) echo "FAIL brief: the declared bypass flag in the unit is refused -- $o"; st=1 ;; esac
-o=$(run --dispatch tRun --pass ARCH-tRun-404 --writes tools/a.sh)
+o=$(run --dispatch tRun --pass ARCH-tRun-404 --writes ${PFX}a.sh)
 n=$((n+1)); case "$o" in *"--dispatch declares a build pass for a unit no tracked spec under this build defines, which is M2's MISSING: the method's hard floor is that a MISSING unit is never built, and writing the spec afterwards is the same act with the record written last"*) echo "ok   dispatch: a unit no spec defines is M2 MISSING" ;; *) echo "FAIL dispatch: a unit no spec defines is M2 MISSING -- $o"; st=1 ;; esac
 printf '# ARCH-tRun-1 — u
 
@@ -4857,7 +4907,7 @@ printf '# ARCH-tRun-1 — u
 none
 ' > memory/builds/tRun/spec/one.md
 git add memory/builds/tRun/spec/one.md >/dev/null 2>&1
-o=$(run --dispatch tRun --pass ARCH-tRun-1 --writes tools/a.sh)
+o=$(run --dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}a.sh)
 n=$((n+1)); case "$o" in *"--dispatch declares a build pass for a unit whose spec grades THIN — its scope, its acceptance criteria or its gates section is empty or names nothing observable, so nothing states what done MEANS for it"*) echo "ok   dispatch: a THIN unit is refused" ;; *) echo "FAIL dispatch: a THIN unit is refused -- $o"; st=1 ;; esac
 printf '# ARCH-tRun-1 — u
 
@@ -4880,7 +4930,7 @@ printf '# ARCH-tRun-1 — u
 none
 ' > memory/builds/tRun/spec/one.md
 git add memory/builds/tRun/spec/one.md >/dev/null 2>&1
-o=$(run --dispatch tRun --pass ARCH-tRun-1 --writes tools/a.sh)
+o=$(run --dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}a.sh)
 n=$((n+1)); case "$o" in *"a spec status header carries something shaped like the build-order verb that does not conform, and a reader taking its numeric prefix would sequence the build on a value nobody wrote: "*" spells ["*) echo "ok   order verb: a malformed value is REFUSED, not truncated to its prefix" ;; *) echo "FAIL order verb: a malformed value is REFUSED, not truncated to its prefix -- $o"; st=1 ;; esac
 rm -f memory/builds/tRun/spec/one.md
 
@@ -4905,7 +4955,7 @@ echo "MARK pass-order-dispatch" >&2
 # ----
 # ---- The passing case is armed BESIDE each refusal. A refusal with no observed pass is a gate that
 # ---- cannot be satisfied, and it is the arm most often missing.
-o=$(run --dispatch tRun --pass ARCH-tRun-404 --writes tools/a.sh)
+o=$(run --dispatch tRun --pass ARCH-tRun-404 --writes ${PFX}a.sh)
 n=$((n+1)); case "$o" in *"which is M2's MISSING"*) ;; *) echo "FAIL dispatch: a unit no tracked spec defines was accepted -- $o"; st=1 ;; esac
 
 # THIN: a spec whose acceptance section is empty. The state token is what the message must name,
@@ -4914,14 +4964,14 @@ n=$((n+1)); case "$o" in *"which is M2's MISSING"*) ;; *) echo "FAIL dispatch: a
 mkdir -p memory/builds/tRun/spec
 printf '# ARCH-tRun-1 — u\n\n**Status:** SPECCED · rev-1 · 2026-08-20 · node a · Tier-2 · base 0123abcd\n\n## 2. Scope (IN)\n\n- s\n\n## 6. Acceptance criteria\n\n## 7. Gates\n\n- g\n\n## 8. Open questions\n\nnone\n' > memory/builds/tRun/spec/one.md
 git add memory/builds/tRun/spec/one.md >/dev/null 2>&1
-o=$(run --dispatch tRun --pass ARCH-tRun-1 --writes tools/a.sh)
+o=$(run --dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}a.sh)
 n=$((n+1)); case "$o" in *"grades THIN"*) ;; *) echo "FAIL dispatch: a THIN unit was accepted, which is the hard floor this refusal IS -- $o"; st=1 ;; esac
 n=$((n+1)); case "$o" in *"section is empty or names nothing observable"*) ;; *) echo "FAIL dispatch: the THIN message did not say what THIN means -- $o"; st=1 ;; esac
 
 # THE PASSING CASE. The same unit with a filled acceptance section dispatches.
 printf '# ARCH-tRun-1 — u\n\n**Status:** SPECCED · rev-1 · 2026-08-20 · node a · Tier-2 · base 0123abcd\n\n## 2. Scope (IN)\n\n- s\n\n## 6. Acceptance criteria\n\n- AC1 observable.\n\n## 7. Gates\n\n- g\n\n## 8. Open questions\n\nnone\n' > memory/builds/tRun/spec/one.md
 git add memory/builds/tRun/spec/one.md >/dev/null 2>&1
-o=$(run --dispatch tRun --pass ARCH-tRun-1 --writes tools/a.sh)
+o=$(run --dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}a.sh)
 n=$((n+1)); case "$o" in *"dispatch declared"*) ;; *) echo "FAIL dispatch: a READY unit was REFUSED, so the guard cannot be satisfied -- $o"; st=1 ;; esac
 
 fi   # ---- region two continues below: one compound block past about 3000 commands segfaults
@@ -4937,42 +4987,42 @@ if in_shard 2; then
 # ---- dispatch over this fixture.
 STC="$HERE/../check-spec-tokens.py"
 if [ -f "$STC" ]; then
-  mkdir -p tools memory/project
-  cp "$STC" tools/check-spec-tokens.py
-  printf '[{"name":"g"}]\n' > tools/gate-legs.json
+  mkdir -p "./${PFX}" memory/project
+  cp "$STC" ${PFX}check-spec-tokens.py
+  printf '[{"name":"g"}]\n' > ${PFX}gate-legs.json
   printf '# waivers\n' > memory/project/spec-token-waivers.txt
   printf 'SPEC_DIRECT_CUTOFF="2026-08-01"\n' > .memory-tree.conf
   git mv memory/builds/tRun/spec/one.md memory/builds/tRun/spec/2026-08-20-spec-ARCH-tRun-1.md
   printf '# ARCH-tRun-1 — u\n\n**Status:** SPECCED · rev-1 · 2026-08-20 · node a · Tier-2 · base 0123abcd\n\n## 2. Scope (IN)\n\n- s\n\n## 6. Acceptance criteria\n\n- AC1 `GATE_SELFTESTS=1 bash run-gates.sh` is green.\n\n## 7. Gates\n\n- g\n\n## 8. Open questions\n\nnone\n' > memory/builds/tRun/spec/2026-08-20-spec-ARCH-tRun-1.md
   git add memory/builds/tRun/spec/2026-08-20-spec-ARCH-tRun-1.md >/dev/null 2>&1
-  printf 'SPEC_TOKENS_CLI="tools/check-spec-tokens.py"\n' >> .unattended.conf
-  o=$(run --dispatch tRun --pass ARCH-tRun-1 --writes tools/a.sh)
+  printf 'SPEC_TOKENS_CLI="'"${PFX}check-spec-tokens.py"'"\n' >> .unattended.conf
+  o=$(run --dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}a.sh)
   n=$((n+1)); case "$o" in *"--dispatch refuses: the declared spec-token checker reds over the live tree, so a live spec names a bar, a suite or a token that does not resolve and the unit would build against it ("*) echo "ok   dispatch: a live spec naming the flagged bar as its observation REFUSES the dispatch" ;; *) echo "FAIL dispatch: a live spec naming the flagged bar was dispatched against -- $o"; st=1 ;; esac
   n=$((n+1)); case "$o" in *"[bar]"*) echo "ok   dispatch: the refusal carries the checker's own [bar] line" ;; *) echo "FAIL dispatch: the refusal does not carry the checker's [bar] line -- $o"; st=1 ;; esac
   # The same tree with the key BLANK: an ANNOUNCED skip on stdout, and the dispatch is declared.
   sed -i 's|^SPEC_TOKENS_CLI=.*|SPEC_TOKENS_CLI=""|' .unattended.conf
-  o=$(run --dispatch tRun --pass ARCH-tRun-1 --writes tools/a.sh)
+  o=$(run --dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}a.sh)
   n=$((n+1)); case "$o" in *"SPEC_TOKENS_CLI is blank or undeclared, so no spec-token check ran over the live tree before this dispatch: an announced skip, not a pass"*) echo "ok   dispatch: a blank SPEC_TOKENS_CLI announces the skip" ;; *) echo "FAIL dispatch: a blank SPEC_TOKENS_CLI did not announce the skip -- $o"; st=1 ;; esac
   n=$((n+1)); case "$o" in *"dispatch declared"*) echo "ok   dispatch: the announced skip still declares" ;; *) echo "FAIL dispatch: the announced skip did not declare -- $o"; st=1 ;; esac
   # A declared path that is not there is a refusal, not a check that passes by running nothing.
-  sed -i 's|^SPEC_TOKENS_CLI=.*|SPEC_TOKENS_CLI="tools/gone.py"|' .unattended.conf
-  o=$(run --dispatch tRun --pass ARCH-tRun-1 --writes tools/a.sh)
+  sed -i 's|^SPEC_TOKENS_CLI=.*|SPEC_TOKENS_CLI="'"${PFX}gone.py"'"|' .unattended.conf
+  o=$(run --dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}a.sh)
   n=$((n+1)); case "$o" in *"--dispatch: SPEC_TOKENS_CLI names a file that is not there, so the spec-token check would pass by running nothing"*) echo "ok   dispatch: a declared checker that is not there is refused" ;; *) echo "FAIL dispatch: a missing declared checker was not refused -- $o"; st=1 ;; esac
   # ...and a checker whose WHOLE diagnosis is on stderr still refuses with a reason. Its stdout is
   # empty, so the `spec-tokens:` grep finds nothing and the refusal falls back to `head -1` of
   # RB_OUT -- which names the producer's first STDERR line only because RB_OUT is the concatenation
   # of both capture files. Built from stdout alone, or joined to it with a separator, this refusal
   # names an empty string and the run reports a failure nobody can read. TOOL-dDerivedDocket-48 AC3.
-  printf 'import sys\nsys.stderr.write("TOKENS-DIED-ON-STDERR\\n")\nsys.exit(1)\n' > tools/stub-tokens.py
-  sed -i 's|^SPEC_TOKENS_CLI=.*|SPEC_TOKENS_CLI="tools/stub-tokens.py"|' .unattended.conf
-  o=$(run --dispatch tRun --pass ARCH-tRun-1 --writes tools/a.sh)
+  printf 'import sys\nsys.stderr.write("TOKENS-DIED-ON-STDERR\\n")\nsys.exit(1)\n' > ${PFX}stub-tokens.py
+  sed -i 's|^SPEC_TOKENS_CLI=.*|SPEC_TOKENS_CLI="'"${PFX}stub-tokens.py"'"|' .unattended.conf
+  o=$(run --dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}a.sh)
   hit "$o" "--dispatch refuses: the declared spec-token checker reds over the live tree"
   hit "$o" "first line: TOKENS-DIED-ON-STDERR"
   # Restore the fixture the brief arms below read: the undated spec name, no extras.
   sed -i '/^SPEC_TOKENS_CLI=/d' .unattended.conf
   git mv memory/builds/tRun/spec/2026-08-20-spec-ARCH-tRun-1.md memory/builds/tRun/spec/one.md
-  rm -f tools/check-spec-tokens.py tools/stub-tokens.py tools/gate-legs.json memory/project/spec-token-waivers.txt .memory-tree.conf
-elif [ -f "$HERE/../govkit/registry.toml" ]; then
+  rm -f ${PFX}check-spec-tokens.py ${PFX}stub-tokens.py ${PFX}gate-legs.json memory/project/spec-token-waivers.txt .memory-tree.conf
+elif [ -n "$GOVKIT_DIR" ] && [ -f "$GOVKIT_DIR/registry.toml" ]; then
   # A KIT SOURCE, whose govkit registry sits beside this kit: there the checker belongs, and losing
   # it is a real red. This suite is not a leg in the bar's manifest, so no assertion floor would.
   echo "FAIL dispatch: check-spec-tokens.py is missing from a kit source at $STC, so the F3 arms have no subject"; st=1
@@ -5663,7 +5713,7 @@ reset_tree
 # ---- meaning and is refused as undecidable rather than faked.
 build_specced_tree; run --preflight tRun --keepalive-id k1 >/dev/null
 
-out=$(run --dispatch tRun --pass ARCH-tRun-1 --writes tools/a.sh --writes tools/b.sh)
+out=$(run --dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}a.sh --writes ${PFX}b.sh)
 hit "$out" "dispatch declared"
 same "one dispatch row" "$(grep -c 'dispatch · item ' memory/builds/tRun/RUN.md)" "1"
 
@@ -5672,7 +5722,7 @@ same "one dispatch row" "$(grep -c 'dispatch · item ' memory/builds/tRun/RUN.md
 # direction, and its last one let a pass that had already written outside its lane re-park a widened
 # row at the original anchor and RETRACT a check-23 failure the leg had emitted. The record is
 # append-only now, and TOOL-dUnstalledConvoy-23 built the comparison that reads it.
-out=$(run --dispatch tRun --pass ARCH-tRun-1 --writes tools/a.sh --writes tools/b.sh)
+out=$(run --dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}a.sh --writes ${PFX}b.sh)
 hit "$out" "dispatch declared"
 same "the repeat parked its own row" "$(grep -c 'dispatch · item ' memory/builds/tRun/RUN.md)" "2"
 miss "$out" "unchanged"
@@ -5680,13 +5730,13 @@ miss "$out" "WIDENED"
 
 # ---- CONDITION 1: two passes in one group claiming one path are not disjoint, decided the moment
 # ---- the second declaration arrives.
-# tools/b.sh, not tools/c.sh: c was only ever declared by the WIDENING arm above, and with that
+# <prefix>/b.sh, not <prefix>/c.sh: c was only ever declared by the WIDENING arm above, and with that
 # branch gone no row claims it — an arm pointed at it would pass by finding nothing.
-out=$(run --dispatch tRun --pass ARCH-tRun-2 --writes tools/b.sh)
+out=$(run --dispatch tRun --pass ARCH-tRun-2 --writes ${PFX}b.sh)
 hit "$out" "--dispatch declares a path a sibling pass in the same group already declared, and two passes claiming one file are not disjoint:"
 
 # ...and a genuinely disjoint sibling is ACCEPTED.
-out=$(run --dispatch tRun --pass ARCH-tRun-2 --writes tools/z.sh)
+out=$(run --dispatch tRun --pass ARCH-tRun-2 --writes ${PFX}z.sh)
 hit "$out" "dispatch declared"
 
 # ---- CONDITION 3, FLAT HALF: the records the method names outright, plus the derived run-state file.
@@ -5703,19 +5753,31 @@ build_specced_tree; run --preflight tRun --keepalive-id k1 >/dev/null
 # here for TWO reasons and the next arm separates them by declaring the key.
 hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes memory/LIVE.md)" "dispatch declared"
 build_specced_tree
-printf '\nGENERATED_INDEXES="memory/LIVE.md:%s/memory-tree/gen_build_index.py"\n' "$TOOL_REL" >> .unattended.conf
+printf '\nGENERATED_INDEXES="memory/LIVE.md:%s/%s/gen_build_index.py"\n' "$TOOL_REL" "$MT_KIT" >> .unattended.conf
 run --preflight tRun --keepalive-id k1 >/dev/null
 # ...DECLARED, the index ALONE is still accepted — that is the retraction M6 earned.
 hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes memory/LIVE.md)" "dispatch declared"
-hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes memory/LIVE.md --writes $TOOL_REL/memory-tree/gen_build_index.py)" "--dispatch declares a generated index together with its generator, which is the one pairing the build method's condition 3 forbids - the index alone is fine and refusing it was the reading that condition retracted:"
+hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes memory/LIVE.md --writes $TOOL_REL/${MT_KIT}/gen_build_index.py)" "--dispatch declares a generated index together with its generator, which is the one pairing the build method's condition 3 forbids - the index alone is fine and refusing it was the reading that condition retracted:"
 
 # ...and the pairing is caught ACROSS passes too, which is what makes it a condition about the GROUP
 # rather than about one declaration.
 build_specced_tree
-printf '\nGENERATED_INDEXES="memory/LIVE.md:%s/memory-tree/gen_build_index.py"\n' "$TOOL_REL" >> .unattended.conf
+printf '\nGENERATED_INDEXES="memory/LIVE.md:%s/%s/gen_build_index.py"\n' "$TOOL_REL" "$MT_KIT" >> .unattended.conf
 run --preflight tRun --keepalive-id k1 >/dev/null
-run --dispatch tRun --pass ARCH-tRun-1 --writes $TOOL_REL/memory-tree/gen_build_index.py >/dev/null
+run --dispatch tRun --pass ARCH-tRun-1 --writes $TOOL_REL/${MT_KIT}/gen_build_index.py >/dev/null
 hit "$(run --dispatch tRun --pass ARCH-tRun-2 --writes memory/LIVE.md)" "--dispatch declares a generated index together with its generator, which is the one pairing the build method's condition 3 forbids - the index alone is fine and refusing it was the reading that condition retracted:"
+
+# ...and a generator SPELLED AT ANOTHER INSTALL'S PREFIX still keys (TOOL-aRepatriatedFork-24 AC5).
+# A conf seeded before the adopter stamped paths names the authoring repo's layout, and it is the
+# project's after that first write. That spelling names no file here, so the one tracked generator
+# ending in the same `<dir>/<file>` keys too. The pieces are joined at run time, as a conf seeded at
+# any prefix would spell them.
+build_specced_tree
+g24d=memory-tree; g24f=gen_build_index.py
+mkdir -p "$TOOL_REL/$g24d"; printf '# a stand-in generator\n' > "$TOOL_REL/$g24d/$g24f"; fixture
+printf '\nGENERATED_INDEXES="memory/LIVE.md:old/%s/%s"\n' "$g24d" "$g24f" >> .unattended.conf
+run --preflight tRun --keepalive-id k1 >/dev/null
+hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes memory/LIVE.md --writes "$TOOL_REL/$g24d/$g24f")" "reading that condition retracted: memory/LIVE.md with $TOOL_REL/$g24d/$g24f (declared as old/$g24d/$g24f)"
 
 # ---- TOOL-dDerivedDocket-20 S1: THE TWO HALVES MAY NOT NAME ONE PATH, refused at CONF LOAD. A path
 # ---- under both keys is answered by whichever rule above --dispatch reaches first. Three shapes, each
@@ -5769,18 +5831,18 @@ miss "$(run --dispatch tRun --pass ARCH-tRun-1 --writes memory/gotchas)" "$SHARE
 mv .unattended.conf.bak .unattended.conf
 # ...and a genuinely disjoint sibling path is still ACCEPTED, so the widened relation did not simply
 # refuse everything — a refusal that fires on all inputs is the same nothing as one that fires on none.
-miss "$(run --dispatch tRun --pass ARCH-tRun-1 --writes tools/alpha.sh)" "$SHARED_MSG"
-miss "$(run --dispatch tRun --pass ARCH-tRun-1 --writes tools/alpha.sh)" "$RELF_MSG"
+miss "$(run --dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}alpha.sh)" "$SHARED_MSG"
+miss "$(run --dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}alpha.sh)" "$RELF_MSG"
 
 # ---- A GLOB METACHARACTER in a declared path is refused (M1): both readers of the recorded row
 # ---- expand it unquoted, so the declared set and the compared set would differ by construction.
-hit "$(run --dispatch tRun --pass ARCH-tRun-2 --writes 'tools/*.sh')" "--dispatch was given a --writes path carrying a glob metacharacter, and both readers of the recorded row expand it unquoted, so the declared set would differ from the compared one:"
+hit "$(run --dispatch tRun --pass ARCH-tRun-2 --writes ''"${PFX}"'*.sh')" "--dispatch was given a --writes path carrying a glob metacharacter, and both readers of the recorded row expand it unquoted, so the declared set would differ from the compared one:"
 
 # ---- THE SIBLING INTERSECTION USES OVERLAP, not string equality (H6). A pass declaring a directory
 # ---- and a sibling declaring a file inside it collide on every write, and equality called them
 # ---- disjoint. The pair below is exactly that shape.
-run --dispatch tRun --pass ARCH-tRun-3 --writes tools/beta >/dev/null 2>&1
-hit "$(run --dispatch tRun --pass ARCH-tRun-4 --writes tools/beta/one.sh)" "--dispatch declares a path a sibling pass in the same group already declared, and two passes claiming one file are not disjoint:"
+run --dispatch tRun --pass ARCH-tRun-3 --writes ${PFX}beta >/dev/null 2>&1
+hit "$(run --dispatch tRun --pass ARCH-tRun-4 --writes ${PFX}beta/one.sh)" "--dispatch declares a path a sibling pass in the same group already declared, and two passes claiming one file are not disjoint:"
 
 # ---- `normpath` AND THE DOT SPELLINGS (spec 23 S5 / AC7). A trailing `/.` and an interior `/./` name
 # ---- the same directory as the plain path, and every containment answer is built on normpath, so a
@@ -5942,7 +6004,7 @@ esac
 n=$((n+1)); [ "$_rc" = 2 ] || { echo "FAIL the missing-library refusal did not exit 2: got $_rc"; st=1; }
 rm -rf "$_nolib"
 
-hit "$(run --dispatch tRun --pass notanid --writes tools/a.sh)" "--dispatch was given a --pass value that is not id-shaped by the driver's own spelling, and the leg joins a declaration to a commit through that id:"
+hit "$(run --dispatch tRun --pass notanid --writes ${PFX}a.sh)" "--dispatch was given a --pass value that is not id-shaped by the driver's own spelling, and the leg joins a declaration to a commit through that id:"
 hit "$(run --dispatch tRun --pass ARCH-tRun-1)" "--dispatch requires at least one --writes path, because a declaration naming nothing is not a disjointness proof:"
 hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes /etc/passwd)" "--dispatch was given an absolute --writes path, and a declaration is repo-relative or it names a file no comparison can find:"
 hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes ../outside.sh)" "--dispatch was given a --writes path that escapes the repository, which no pass may declare and no comparison can bound:"
@@ -5965,7 +6027,7 @@ base: y
 # about: `ls-files` reads the index, which an unborn repository has, and HEAD still answers nothing.
 printf '# ARCH-tRun-1 — u\n\n**Status:** SPECCED · rev-1 · 2026-08-20 · node a · Tier-2 · base 0123abcd\n\n## 2. Scope (IN)\n\n- s\n\n## 6. Acceptance criteria\n\n- AC1 observable.\n\n## 7. Gates\n\n- g\n' > "$UNBORN/memory/builds/tRun/spec/u1.md"
 git -C "$UNBORN" add -A >/dev/null 2>&1
-hit "$(cd "$UNBORN" && bash "$SCRIPT" --dispatch tRun --pass ARCH-tRun-1 --writes tools/a.sh 2>&1)" "--dispatch cannot resolve HEAD, and HEAD is the group key two passes declared together share:"
+hit "$(cd "$UNBORN" && bash "$SCRIPT" --dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}a.sh 2>&1)" "--dispatch cannot resolve HEAD, and HEAD is the group key two passes declared together share:"
 rm -rf "$UNBORN"
 hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes 'has--no-verify.sh')" "--dispatch was given a --writes path spelling the declared bypass flag, and the gate greps this file whole for it:"
 
@@ -5974,9 +6036,9 @@ hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes 'has--no-verify.sh')" "--
 run --attest tRun --item keepalive-reaped >/dev/null 2>&1
 run --attest tRun --item parked-decisions-surfaced >/dev/null 2>&1
 run --abort tRun --reason stop --code fork-unresolvable >/dev/null 2>&1
-hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes tools/a.sh)" "the run is already finished and a finished record is not something to move, re-open or re-pin"
+hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}a.sh)" "the run is already finished and a finished record is not something to move, re-open or re-pin"
 build_specced_tree; rm -f memory/builds/tRun/RUN.md
-hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes tools/a.sh)" "no run-state file, so there is no run to declare a dispatch against:"
+hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}a.sh)" "no run-state file, so there is no run to declare a dispatch against:"
 
 # ---- TOOL-aProbedUnit-3: `--audit`, the dispatched-unit stall probe. One line per unit whose LATEST
 # ---- dispatch row is still open, the tree's two clocks, and a verdict against UNIT_STALL_BOUND.
@@ -6046,7 +6108,9 @@ build_audit_fixture
 out=$(run --audit tRun); rc=$?
 same "AC3 no dispatch row exits 0" "$rc" "0"
 same "AC3 the no-unit line, once" "$(printf '%s\n' "$out" | grep -c '^unattended-audit: no unit is dispatched and open$')" "1"
-same "AC3 and no other audit line" "$(printf '%s\n' "$out" | grep -c '^unattended-audit:')" "1"
+# TWO lines since TOOL-aRepatriatedFork-53: the unit population's and the task population's, each
+# saying it graded nothing, so neither half of an empty audit reads as a clean one.
+same "AC3 and no other audit line" "$(printf '%s\n' "$out" | grep -c '^unattended-audit:')" "2"
 # ...a commit naming the unit AND writing inside the declared set closes the pass — the openness
 # test is `check_pass_open`, the one `--dispatch` uses, so the two verbs cannot disagree.
 run --dispatch tRun --pass ARCH-tRun-1 --writes work/one.txt >/dev/null 2>&1
@@ -6122,6 +6186,89 @@ reset_tree; mkconf "true" "true" "" "3600" "" "0"
 out=$(run --audit tRun); rc=$?
 same "AC4 a zero UNIT_STALL_BOUND exits 2" "$rc" "2"
 hit "$out" "REFUSING - UNIT_STALL_BOUND is declared as"
+reset_tree
+
+# ---- TOOL-aRepatriatedFork-53: the TASK REGISTRY. `--register-task` and `--release-task` keep a
+# ---- per-slug sidecar under the git dir, and `--audit` grades every open task's heartbeat mtime
+# ---- against TASK_STALL_BOUND after its unit loop. The registry lives in the GIT DIR, which
+# ---- `reset_tree` does not clean, so this block removes it at both ends. Heartbeats and the `stat`
+# ---- stub live OUTSIDE the scratch repo: inside it they are untracked paths the tree clock stats
+# ---- first, and a stub would kill that probe instead of the one under test. Against the 56c7befa
+# ---- driver `--register-task` is check 14's unknown argument and no task line prints.
+build_audit_fixture
+TK_REG="$(git rev-parse --git-dir)/unattended/tasks.tRun.tsv"; rm -rf "$TK_REG"
+TK_DIR=$(mktemp -d); TK_BEAT="$TK_DIR/t53beat-a.txt"
+# AC3 — no registry is one line saying so, never silence that reads as a clean audit of the tasks.
+out=$(run --audit tRun); rc=$?
+same "task AC3 no registry exits 0" "$rc" "0"
+same "task AC3 the no-task line, once" "$(printf '%s\n' "$out" | grep -c '^unattended-audit: no heartbeat-bearing tasks registered$')" "1"
+# AC8 — a relative path and a tab-bearing name refuse and append no row; so do the empty and no-run cases.
+out=$(run --register-task tRun --task leg-a --heartbeat rel/beat.txt); rc=$?
+same "task AC8 a relative heartbeat exits 1" "$rc" "1"
+hit "$out" "--register-task was given a relative --heartbeat path, and the audit reads it from the run's own worktree while the task may beat in another, so only an absolute path names one file from both:"
+hit "$(run --register-task tRun --task "$(printf 'le\tg')" --heartbeat "$TK_BEAT")" "a task name or heartbeat path carries a tab or a newline, and the registry is one tab-separated row per act, so it would forge a field or a row nothing registered"
+same "task AC8 no row was appended" "$([ -e "$TK_REG" ] && echo row || echo none)" "none"
+hit "$(run --register-task tRun --heartbeat "$TK_BEAT")" "--register-task requires --task, because a task with no name is a STALLED line nobody can act on"
+hit "$(run --register-task tRun --task leg-a)" "--register-task requires --heartbeat, because a task with no heartbeat file is the silent background work this registry exists to end"
+hit "$(run --register-task tNoRun --task leg-a --heartbeat "$TK_BEAT")" "no run-state file, so there is no run to register a background task against:"
+hit "$(run --release-task tRun)" "--release-task requires --task, because a release naming nothing closes nothing"
+# AC1 — a heartbeat written one second earlier is PROGRESSING.
+echo beat > "$TK_BEAT"; touch -d "@$(( $(date -u +%s) - 1 ))" "$TK_BEAT"
+out=$(run --register-task tRun --task leg-a --heartbeat "$TK_BEAT"); rc=$?
+same "task AC1 registration exits 0" "$rc" "0"
+same "task AC1 one register row" "$(grep -c "$(printf '\tregister\tleg-a\t')" "$TK_REG")" "1"
+out=$(run --audit tRun); rc=$?
+same "task AC1 the audit exits 0" "$rc" "0"
+same "task AC1 leg-a PROGRESSING" "$(printf '%s\n' "$out" | grep -c '^unattended-audit: task leg-a · registered .* · last-beat [0-9]*s ago · PROGRESSING$')" "1"
+miss "$out" "no heartbeat-bearing tasks registered"
+# AC6, first half — a second registration of an open name refuses.
+hit "$(run --register-task tRun --task leg-a --heartbeat "$TK_BEAT")" "the task is registered and not yet released, and a second open row for one name would leave the audit grading whichever it read last; release it first:"
+# AC2 — aged past the bound: STALLED, then one remedy line naming the task, and still exit 0.
+mkconf "true" "true" "" "3600" "" "1800" "7" "5400" "" "1800" "6" "60"
+touch -d "@$(( $(date -u +%s) - 3600 ))" "$TK_BEAT"
+out=$(run --audit tRun); rc=$?
+same "task AC2 a STALLED task exits 0" "$rc" "0"
+same "task AC2 leg-a STALLED" "$(printf '%s\n' "$out" | grep -c '^unattended-audit: task leg-a · .* · STALLED$')" "1"
+hit "$out" "unattended-audit: remedy — read the heartbeat of task leg-a, stop the task, record why with --park or a Decided: line, release it with --release-task, then re-run it bounded or leave it parked"
+# AC5 — `stat` answering NOTHING for the heartbeat is a dead probe at check 51, never a zero.
+# Its own stub, passing every other path through, so the tree clock's own `stat` still answers.
+mkdir -p "$TK_DIR/stub"
+printf '#!/bin/sh\ncase "$*" in *t53beat*) exit 0 ;; esac\nexec %s "$@"\n' "$(command -v stat)" > "$TK_DIR/stub/stat"; chmod +x "$TK_DIR/stub/stat"
+out=$(PATH="$TK_DIR/stub:$PATH" bash "$SCRIPT" --audit tRun 2>&1); rc=$?
+same "task AC5 an undatable heartbeat exits 1" "$rc" "1"
+hit "$out" "a zero from a dead probe would read as written-just-now: stat -c %Y on the heartbeat of task leg-a,"
+miss "$out" "unattended-audit: task leg-a"
+# AC6 — release closes it, a second release refuses, and a fresh registration is graded anew.
+out=$(run --release-task tRun --task leg-a); rc=$?
+same "task AC6 release exits 0" "$rc" "0"
+out=$(run --audit tRun)
+miss "$out" "unattended-audit: task leg-a"
+hit "$(run --release-task tRun --task leg-a)" "the task has no open registration, so there is nothing to release, and a release row for it would record an act that never happened:"
+# AC4 — an absent heartbeat reads `none`, PROGRESSING inside the bound from its NEW row, STALLED
+# once that row is older than the bound.
+run --register-task tRun --task leg-a --heartbeat "$TK_DIR/t53never.txt" >/dev/null
+out=$(run --audit tRun)
+same "task AC4 absent heartbeat PROGRESSING" "$(printf '%s\n' "$out" | grep -c '^unattended-audit: task leg-a · .* · last-beat none · PROGRESSING$')" "1"
+mutate "$TK_REG" "\$s/^[^\t]*\tregister/$(date -u -d "@$(( $(date -u +%s) - 3600 ))" +%Y-%m-%dT%H:%M:%SZ)\tregister/"
+out=$(run --audit tRun)
+same "task AC4 absent heartbeat STALLED" "$(printf '%s\n' "$out" | grep -c '^unattended-audit: task leg-a · .* · last-beat none · STALLED$')" "1"
+# ...an append that fails is a refusal naming the registry, never a silent unrecorded act.
+run --release-task tRun --task leg-a >/dev/null
+mv "$TK_REG" "$TK_REG.held"; mkdir "$TK_REG"
+hit "$(run --register-task tRun --task leg-b --heartbeat "$TK_BEAT")" "cannot append to the task registry, so the act is not recorded and the audit would not see it:"
+rmdir "$TK_REG"; mv "$TK_REG.held" "$TK_REG"
+# AC7 — a zero bound exits 2 through `read_bound_key`; an absent key NOTEs the 5400s default.
+mkconf "true" "true" "" "3600" "" "1800" "7" "5400" "" "1800" "6" "0"
+out=$(run --audit tRun); rc=$?
+same "task AC7 a zero TASK_STALL_BOUND exits 2" "$rc" "2"
+hit "$out" "REFUSING - TASK_STALL_BOUND is declared as"
+mkconf; sed -i '/^TASK_STALL_BOUND=/d' .unattended.conf
+hit "$(run --audit tRun)" "NOTE - this project declares no TASK_STALL_BOUND, so a registered task reads STALLED after the kit default of 5400s with no heartbeat"
+# ...and a finished run refuses a registration through the one terminal refusal.
+mkconf
+mutate memory/builds/tRun/RUN.md 's/^phase: .*/phase: LANDED/'
+hit "$(run --register-task tRun --task leg-c --heartbeat "$TK_BEAT")" "the run is already finished and a finished record is not something to move, re-open or re-pin"
+rm -rf "$TK_REG" "$TK_DIR"
 reset_tree
 
 # ---- TOOL-aWokenSentinel-1: the LEASE. `--preflight` records `session:` and `pid:` beside the
@@ -9308,7 +9455,7 @@ askmode ok; askrows ''
 askreset
 out=$(run --preflight EXMP-aFoo-3 --keepalive-id KA-1)
 hit "$out" "this verb is addressed by SLUG and was given ids, or a slug mixed with them; a run may not write the folder that authorizes it, so an id list becomes a build through the scaffold the OWNER lands, and a mixed value has no honest reading because a run cannot extend a committed mandate"
-hit "$out" "recipe: $TOOL_REL/memory-tree/gen_build_index.py --new-build <new-slug> --asks EXMP-aFoo-3"
+hit "$out" "recipe: $TOOL_REL/$MT_KIT/gen_build_index.py --new-build <new-slug> --asks EXMP-aFoo-3"
 miss "$out" "no build README at the pinned BASE"
 miss "$out" "the slug is not a build-folder name"
 same "an ids invocation writes nothing" "$(git status --porcelain | grep -c . || true)" "0"
@@ -9324,7 +9471,7 @@ hit "$out" "this verb is addressed by SLUG and was given ids, or a slug mixed wi
 # ---- AC2: a FILING HOME under the same two scopes.
 out=$(run --preflight aFoo --keepalive-id KA-1)
 hit "$out" "this slug names a FILING HOME and not a build — at the first anchor's merge-base its folder holds a BACKLOG.md and nothing else, so there is no committed README to authorize a run and writing one into another build's records is what ruling D12-f refuses"
-hit "$out" "recipe: $TOOL_REL/memory-tree/gen_build_index.py --new-build <new-slug> --asks"
+hit "$out" "recipe: $TOOL_REL/$MT_KIT/gen_build_index.py --new-build <new-slug> --asks"
 same "a filing-home refusal writes nothing" "$(git status --porcelain | grep -c . || true)" "0"
 git checkout -q unit; git branch -qD unpushed-asks
 askreset
@@ -9537,13 +9684,13 @@ mkdir -p memory/builds/tAskA/spec
 printf '# ARCH-tAskA-1 the unit\n\n**Status:** SPECCED · rev-1 · 2026-08-01 · node a · Tier-1 · base 00000000 · streams architecture · closes EXMP-aFoo-3\n\n## 2. Scope\n\n- S1 do it\n\n## 6. Acceptance criteria\n\n- **AC1** it is done\n\n## 7. Gates\n\nthe bar\n' \
   > memory/builds/tAskA/spec/one.md
 git add -A >/dev/null; git commit -q -m spec --no-verify
-out=$(run --dispatch tAskA --pass ARCH-tAskA-1 --writes tools/x.sh)
+out=$(run --dispatch tAskA --pass ARCH-tAskA-1 --writes ${PFX}x.sh)
 hit "$out" "--dispatch declares a build pass for a unit that closes an ask held on a mandated ask that is not terminal, so the unit would be finished against a question its own dependency has not answered yet"
 hit "$out" "EXMP-aFoo-3 holds on EXMP-aFoo-4"
 # ...and the SAME dispatch is admitted the moment the ask it is held on goes terminal, which is the
 # green control: without it this arm passes over a gate that refuses everything.
 askrows 'EXMP-aFoo-3\tOPEN\t-\taFoo\tHIGH\tyes\t-\tEXMP-aFoo-4\t-\t-\nEXMP-aFoo-4\tCLOSED\t-\taFoo\tHIGH\tyes\t-\t-\t-\t-\n'
-hit "$(run --dispatch tAskA --pass ARCH-tAskA-1 --writes tools/x.sh)" "dispatch declared"
+hit "$(run --dispatch tAskA --pass ARCH-tAskA-1 --writes ${PFX}x.sh)" "dispatch declared"
 
 # ---- AC11: the two rescope rules a filed ask brings with it.
 askreset
@@ -10038,10 +10185,10 @@ dispreset
 dispspec tDisp CLOSED 'closes EXMP-aFoo-3'
 git add -A >/dev/null; git commit -q -m spec --no-verify
 run --preflight tDisp --keepalive-id KD-1 >/dev/null; git add -A >/dev/null; git commit -q -m pf --no-verify
-mkdir -p tools; printf 'not a record\n' > tools/x.sh
+mkdir -p src; printf 'not a record\n' > src/x.sh
 git add -A >/dev/null; git commit -q -m "build(ARCH-tDisp-1): the unit" --no-verify
 DISPBC=$(git rev-parse HEAD)
-printf 'still not a record\n' > tools/y.sh
+printf 'still not a record\n' > src/y.sh
 git add -A >/dev/null; git commit -q -m "chore: something else entirely" --no-verify
 DISPOTHER=$(git rev-parse HEAD)
 # AC17 — the unit's OWN build commit is admitted, or a run cannot record its own evidence.
@@ -10059,7 +10206,7 @@ hit "$out" "$DISPOTHER"
 # ---- run's own, whatever the range `m-base..HEAD` says. T4 must stay silent and T5 must speak.
 dispreset
 git checkout -qf main >/dev/null 2>&1
-mkdir -p tools; printf 'a foreign build landed this\n' > tools/z.sh
+mkdir -p src; printf 'a foreign build landed this\n' > src/z.sh
 git add -A >/dev/null; git commit -q -m "build(OTHR-aBar-4): somebody else's unit" --no-verify
 DISPFOREIGN=$(git rev-parse HEAD)
 git push -q -f origin main
@@ -10176,15 +10323,15 @@ dispreset
 MAY_BS=$(printf '\134')
 maysetup() {
   git checkout -qf main
-  readme tMaySlug; mutate memory/builds/tMaySlug/README.md '/^slug: tMaySlug$/a may: `tools/lander-granted.sh` TOOL-aStandingWrit-1'
+  readme tMaySlug; mutate memory/builds/tMaySlug/README.md '/^slug: tMaySlug$/a may: `bin/lander-granted.sh` TOOL-aStandingWrit-1'
   readme tMayNone
-  readme tMayTick; mutate memory/builds/tMayTick/README.md '/^slug: tMayTick$/a may: `tools/lander-granted.sh`'
-  readme tMayBare; mutate memory/builds/tMayBare/README.md '/^slug: tMayBare$/a may: tools/lander-granted.sh'
-  readme tMayP;    mutate memory/builds/tMayP/README.md '/^slug: tMayP$/a authorized-by: prompt\nmay: tools/lander-granted.sh'
+  readme tMayTick; mutate memory/builds/tMayTick/README.md '/^slug: tMayTick$/a may: `bin/lander-granted.sh`'
+  readme tMayBare; mutate memory/builds/tMayBare/README.md '/^slug: tMayBare$/a may: bin/lander-granted.sh'
+  readme tMayP;    mutate memory/builds/tMayP/README.md '/^slug: tMayP$/a authorized-by: prompt\nmay: bin/lander-granted.sh'
   readme tMayR;    mutate memory/builds/tMayR/README.md '/^slug: tMayR$/a authorized-by: recipe\nmay: none'
   readme tMayId;   mutate memory/builds/tMayId/README.md '/^slug: tMayId$/a may: EXMP-aFoo3'
-  readme tMayAbs;  mutate memory/builds/tMayAbs/README.md '/^slug: tMayAbs$/a may: /tools/lander-granted.sh'
-  readme tMayDots; mutate memory/builds/tMayDots/README.md '/^slug: tMayDots$/a may: ../tools/lander-granted.sh'
+  readme tMayAbs;  mutate memory/builds/tMayAbs/README.md '/^slug: tMayAbs$/a may: /bin/lander-granted.sh'
+  readme tMayDots; mutate memory/builds/tMayDots/README.md '/^slug: tMayDots$/a may: ../bin/lander-granted.sh'
   readme tMayLeaf; mutate memory/builds/tMayLeaf/README.md '/^slug: tMayLeaf$/a may: pushmain'
   readme tMaySlash
   MAY_LINE="may: tools${MAY_BS}lander-granted.sh" awk '{ print } /^slug: tMaySlash$/ { print ENVIRON["MAY_LINE"] }' \
@@ -10208,9 +10355,9 @@ same "fixture: the backslash README carries the byte it is named for" \
 # ---- AC1: a `slug` README's grants are pinned, normalised and in order; no key pins `none`.
 mayreset
 out=$(run --preflight tMaySlug --keepalive-id KA-1)
-hit "$out" "grant pinned as may: tools/lander-granted.sh TOOL-aStandingWrit-1"
+hit "$out" "grant pinned as may: bin/lander-granted.sh TOOL-aStandingWrit-1"
 same "a slug README's grants are pinned bare, in the order written" "$(maypin tMaySlug)" \
-  "tools/lander-granted.sh TOOL-aStandingWrit-1"
+  "bin/lander-granted.sh TOOL-aStandingWrit-1"
 mayreset
 out=$(run --preflight tMayNone --keepalive-id KA-1)
 hit "$out" "grant pinned as may: none"
@@ -10219,10 +10366,10 @@ same "a README with no may: key pins none" "$(maypin tMayNone)" "none"
 # ---- AC3, the positive half: the backticked and the bare spelling pin ONE fact.
 mayreset
 run --preflight tMayTick --keepalive-id KA-1 >/dev/null
-same "the backticked spelling pins the bare path" "$(maypin tMayTick)" "tools/lander-granted.sh"
+same "the backticked spelling pins the bare path" "$(maypin tMayTick)" "bin/lander-granted.sh"
 mayreset
 run --preflight tMayBare --keepalive-id KA-1 >/dev/null
-same "the bare spelling pins the same bytes" "$(maypin tMayBare)" "tools/lander-granted.sh"
+same "the bare spelling pins the same bytes" "$(maypin tMayBare)" "bin/lander-granted.sh"
 
 # ---- AC2: a grant under `prompt`, and under `recipe` even saying `none`, is refused and pins nothing.
 mayreset
@@ -10238,7 +10385,7 @@ same "a recipe-mode grant writes nothing" "$(git status --porcelain | grep -c . 
 # ---- AC3, the negative half: ONE fixture per refusal shape S3 declares, each naming its token. The
 # ---- shapes are an id prefix failing the id grammar, a leading `/`, a `..` segment, a backslash,
 # ---- and a bare token with neither a `/` nor a file extension - five, the number S3 declares.
-for may_case in "tMayId EXMP-aFoo3" "tMayAbs /tools/lander-granted.sh" "tMayDots ../tools/lander-granted.sh" \
+for may_case in "tMayId EXMP-aFoo3" "tMayAbs /bin/lander-granted.sh" "tMayDots ../bin/lander-granted.sh" \
                 "tMaySlash tools${MAY_BS}lander-granted.sh" "tMayLeaf pushmain"; do
   may_slug=${may_case%% *}; may_tok=${may_case#* }
   mayreset
@@ -10519,13 +10666,13 @@ build_dl_rotation() { # "owner" or "run" -> DL_C, the landing commit, pushed; th
   init_dl_fixture
   run_dl --preflight tRun --keepalive-id k1 >/dev/null
   if [ "$1" = run ]; then
-    sed -i '/^slug: tOther$/a may: tools/run-granted.sh' "$dl_dir/memory/builds/tOther/README.md"
+    sed -i '/^slug: tOther$/a may: bin/run-granted.sh' "$dl_dir/memory/builds/tOther/README.md"
   fi
   run_dl_git add -A >/dev/null && run_dl_git commit -q -m "run state" --no-verify
   DL_RUNC=$(run_dl_git rev-parse HEAD)
   if [ "$1" = owner ]; then
     run_dl_git checkout -q --detach "$dl_base"
-    sed -i '/^slug: tOther$/a may: tools/owner-granted.sh' "$dl_dir/memory/builds/tOther/README.md"
+    sed -i '/^slug: tOther$/a may: bin/owner-granted.sh' "$dl_dir/memory/builds/tOther/README.md"
     run_dl_git add -A >/dev/null && run_dl_git commit -q -m "owner grants" --no-verify
     run_dl_git push -q -f origin HEAD:main
     run_dl_git checkout -q unit
@@ -12049,7 +12196,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # raise neither counts on nor moves them. No suite ran.
 # RAISED 1836 -> 1837: region one's in_shard block-length arm (the Cygwin stack-ceiling split, 2026-09-29).
 # RAISED 1837 -> 1843: region two's structural fixes at VERIFYING, +4 from the --hold and take-over entries in the phase-writer drive list and +2 from the take-over bypass-flag arm.
-FLOOR_ASSERTIONS=1843
+# RAISED 1843 -> 1877 by TOOL-aRepatriatedFork-53: the task-registry block's 34 unconditional
+# hit/miss/same/mutate lines in region two beside the `--audit` arms, COUNTED off the block; no suite
+# ran in the pass, and each case was observed by a scratch fixture driving the driver itself.
+FLOOR_ASSERTIONS=1877
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -12176,7 +12326,8 @@ FLOOR_SHARD_1=209
 # paid by shard 2 as well as by an unsharded run.
 # +61 for the TOOL-dDerivedDocket-28 process-ledger arms, all in region two - see FLOOR_ASSERTIONS.
 # RAISED 1640 -> 1646: the same six region-two assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_2=1646
+# RAISED 1646 -> 1680: the same 34 region-two task-registry assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_2=1680
 # +58 for the fold of dDerivedDocket's closing diff review, round 1 (F2, F3, F4), all in region two - see FLOOR_ASSERTIONS.
 # +14 for TOOL-dDerivedDocket-16's AC15 arm at the VERIFYING pass, all in region two - see FLOOR_ASSERTIONS.
 # +5 for the --hold line-end refusal arms at the second origin/main reconcile, region two - see FLOOR_ASSERTIONS.

@@ -34,7 +34,7 @@
 #          verb with no session id, a path-shaped one, a card over its byte cap, an append whose
 #          READY line pins a BASE that is not HEAD, or an id reader that could not answer).
 set -u
-KIT_MANIFEST_VERSION="1.9"   # gov:kit kickoff-manifest@1.9 — the registry id
+KIT_MANIFEST_VERSION="1.16"   # gov:kit kickoff-manifest@1.16 — the registry id
 # TWO NUMBERS, not one (TOOL-aRepatriatedFork-15 S4). KIT_MANIFEST_VERSION above is the kit's
 # VINTAGE: it bumps whenever a shipped byte of this kit moves, which is what `govkit.py epoch` grades.
 # MANIFEST_FORMAT is the manifest FORMAT, the only number an adopter's `kickoff-manifest: v<N>`
@@ -322,7 +322,7 @@ render_tree_cell() {
 # resolver here, and on a host with only `python3` or with the Store stub it exited 127 or 9009,
 # the append refused every body, and the commit deny's remedy re-ran the refusing append
 # (the aReplayedCard closing review, F2).
-# >>> resolve_python — canonical copy: tools/lib/resolve-python.sh (byte-identical; gated)
+# >>> resolve_python — canonical copy: resolve-python.sh in gov's lib dir (byte-identical; gated)
 resolve_python() {
   # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
   # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
@@ -374,7 +374,7 @@ def resolve_kit_dir(home, anchor, here):
     """
     import json
     import pathlib
-    here = pathlib.Path(here).resolve()
+    here = pathlib.Path(here).absolute()  # never resolve(): a junction must not move it
     root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
     receipt = root / ".governance" / "install.json"
     try:
@@ -386,8 +386,8 @@ def resolve_kit_dir(home, anchor, here):
             continue
         if str(row.get("source") or "").split("/")[-2:] != [home, anchor]:
             continue
-        hit = (root / str(row["path"])).resolve()
-        if hit.is_file() and root in hit.parents:
+        hit = (root / str(row["path"])).absolute()
+        if hit.is_file() and root in hit.parents and ".." not in hit.parts:
             return hit.parent
     probes = (here / home, here.parent / home)
     for cand in probes:
@@ -412,8 +412,10 @@ print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
 # kit. Anchored at this script's dir FIRST, then at the repo root: the per-machine junction copy
 # resolves into gov's checkout, where neither rung sees the graded repo (closing review round 1
 # L3). An answer counts only if the file is in THIS repo. Gov homes THIS kit under skills/, which
-# no probe walks from, and gov keeps no receipt, so gov's own layout is a named fallback, then the
-# flat `memory-tree/` for a run with no python. Empty when nothing answers; the caller says so.
+# no probe walks from, and gov keeps no receipt, so the last rung is the ONE reader this repo
+# TRACKS. It is derived from the index, where the rung it replaced was two spelled prefixes, gov's
+# and the root (TOOL-aRepatriatedFork-24 S8). Two tracked readers are ambiguous, and so is none;
+# either way this returns empty, and the caller says so.
 resolve_id_reader() {
   local d py here
   py=$(resolve_python 2>/dev/null) || py=""
@@ -423,9 +425,9 @@ resolve_id_reader() {
       [ -f "$ROOT/$d/corpus_ids.py" ] && { printf '%s\n' "$ROOT/$d/corpus_ids.py"; return 0; }
     done
   fi
-  for d in "$ROOT/tools/memory-tree" "$ROOT/memory-tree"; do   # gov:prefix-literal — gov homes this kit under skills/ and keeps no receipt, so neither rung can reach gov's own reader
-    [ -f "$d/corpus_ids.py" ] && { printf '%s\n' "$d/corpus_ids.py"; return 0; }
-  done
+  d=$(git -C "$ROOT" ls-files -- corpus_ids.py '*/corpus_ids.py' 2>/dev/null)
+  case "$d" in *"
+"*|"") ;; *) [ -f "$ROOT/$d" ] && printf '%s\n' "$ROOT/$d" ;; esac
   return 0
 }
 
@@ -659,8 +661,8 @@ fi
 status=0
 fail() { echo "MANIFEST check $1 FAILED — $2"; status=1; }
 
-# LIFTED VERBATIM from tools/unattended/check-unattended.sh, and gated as an inline copy by the
-# parity table in tools/lib/resolve-python.test.sh. Do not re-type it:
+# LIFTED VERBATIM from <prefix>/unattended/check-unattended.sh, and gated as an inline copy by the
+# parity table in resolve-python.test.sh, in gov's lib dir. Do not re-type it:
 # it carries two fixes that were each reproduced before they were written. A marker line IS the marker
 # or it is malformed — the prefix test IDENTIFIES the line and equality JUDGES it, because the older
 # form let a run append its own text to a marker line and still compare byte-equal. And the pair must

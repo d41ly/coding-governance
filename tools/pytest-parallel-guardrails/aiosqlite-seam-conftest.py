@@ -1,4 +1,4 @@
-# gov:kit pytest-parallel-guardrails@1.2
+# gov:kit pytest-parallel-guardrails@1.3
 """aiosqlite closed-loop seam patch — copy this block into your tests/conftest.py (module level).
 
 THE CLASS THIS KILLS: a suite pairing per-test event loops (pytest-asyncio function scope) with

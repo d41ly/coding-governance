@@ -3,7 +3,7 @@
 # For a NEW project. (A project MIGRATING an existing docs tree does that once as its own landing —
 # see README.md "Adopting into an existing tree"; the tree shape below is the target either way.)
 #
-#   tools/memory-tree/adopt-memory-tree.sh --scaffold   # a NEW tree: dirs, registries, renders, index
+#   <prefix>/memory-tree/adopt-memory-tree.sh --scaffold   # a NEW tree: dirs, registries, renders, index
 #                                          --render     # an ADOPTED tree: the four rendered docs, nothing else
 set -eu
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
@@ -95,9 +95,9 @@ fi
 M="$MEMORY_ROOT"
 
 # The resolver, INLINE. This kit is copy-installed as a standalone directory, so `../lib/` does
-# not exist in an adopting repo. The block below is byte-identical to tools/lib/resolve-python.sh
-# and tools/lib/resolve-python.test.sh reds if any copy drifts.
-# >>> resolve_python — canonical copy: tools/lib/resolve-python.sh (byte-identical; gated)
+# not exist in an adopting repo. The block below is byte-identical to resolve-python.sh in gov's lib dir,
+# and that dir's resolve-python.test.sh reds if any copy drifts.
+# >>> resolve_python — canonical copy: resolve-python.sh in gov's lib dir (byte-identical; gated)
 resolve_python() {
   # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
   # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
@@ -171,7 +171,7 @@ def resolve_kit_dir(home, anchor, here):
     """
     import json
     import pathlib
-    here = pathlib.Path(here).resolve()
+    here = pathlib.Path(here).absolute()  # never resolve(): a junction must not move it
     root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
     receipt = root / ".governance" / "install.json"
     try:
@@ -183,8 +183,8 @@ def resolve_kit_dir(home, anchor, here):
             continue
         if str(row.get("source") or "").split("/")[-2:] != [home, anchor]:
             continue
-        hit = (root / str(row["path"])).resolve()
-        if hit.is_file() and root in hit.parents:
+        hit = (root / str(row["path"])).absolute()
+        if hit.is_file() and root in hit.parents and ".." not in hit.parts:
             return hit.parent
     probes = (here / home, here.parent / home)
     for cand in probes:
@@ -334,7 +334,7 @@ KIT_PATHS=$(derive_kit_paths "$_PY" "$KIT_REL" "$HERE"/*.template.md) || exit 2
 # RENDERED, not copied: these land in the adopter's tree as their committed rule set, so a
 # verbatim copy would stamp whatever prefix the SHIPPING repo used into a document the adopter now
 # owns. Every kit path in them is a placeholder; `render_doc` is what the parity gate grades.
-# >>> render_doc — canonical copy: tools/lib/render-doc.sh (byte-identical; gated)
+# >>> render_doc — canonical copy: render-doc.sh in gov's lib dir (byte-identical; gated)
 render_doc() {
   # No `sed`: a substituted value carrying `|` closes the s||| delimiter and `&` re-inserts the
   # whole match. Parameter substitution has neither, PROVIDED the replacement is quoted — bash
@@ -591,7 +591,7 @@ _rn=$(printf '%s\n' "$_rc" | grep -c . || true)
   printf '# method-carriers.txt - every file outside %s/ that POINTS AT guides/BUILD-METHOD.md.\n' "$M"
   printf '# One "<path> . <why>" row each; the why is what a future author reads when deciding whether\n'
   printf '# their new carrier is the next pointer or the first summary. Keyed on PATH alone, never\n'
-  printf '# <path>:<line> - that keying is what unpinned install-prefix-waivers.txt.\n'
+  printf '# <path>:<line> - that keying is what unpinned the install-prefix waiver registry.\n'
   printf '# SEEDED at adoption from this tree: every row below was measured, not assumed.\n\n'
   # The runbook order is `cp -r` then `--scaffold` then commit, so `git ls-files` is EMPTY here and
   # a tracked-only seed writes a header and nothing else — after which the adopter's first run reds

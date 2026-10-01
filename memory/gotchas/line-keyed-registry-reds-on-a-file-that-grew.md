@@ -12,7 +12,8 @@ A gate reds naming a literal you did not edit, in a file you did edit. The liter
 waiver row reads `<path>:<line>` and the line number no longer matches, because your change added
 lines ABOVE it.
 
-Measured on `tools/install-prefix-waivers.txt` during `dTracedLattice`: one row,
+Measured on the install-prefix gate's waiver registry during `dTracedLattice`, before
+`TOOL-aRepatriatedFork-30` deleted that registry: one row,
 `tools/codebase-map/map_lib.py`'s `REGEN_CMD`, re-keyed FOUR times in one build — 1387, 1426, 1454,
 1475, 1493 — once per pass that grew the file. Every red named a line the pass had not been near.
 
@@ -29,14 +30,13 @@ error message says so — it reads as a new violation.
 it unchanged, while adding a row raises it and needs a justification the situation does not have.
 Derive the new number from the checker's own output rather than counting by hand.
 
-## The sibling arm is a BAN, not a ratchet, and it behaves differently
+## Where this bit is gone, and what replaced it
 
-`tools/check-install-prefix.sh` has a second arm over `tools/install-prefix-carried.txt`, and
-`--write-ratchet` REFUSES to absorb a new carrier — deliberately, so the remedy the gate prints is
-not a self-service exemption form. A shipped file that starts carrying a `tools/<kit>/<file>`
-literal has two legal answers: DERIVE the path (`map_lib.kit_rel()`), or hand-write a row with a
-reason in the fourth column. **A test arm is a shipped file for this purpose** — a fixture spelling
-a kit path tripped it in this same build.
+The install-prefix gate kept that registry and a second, carried-literal ledger beside it. Both were
+deleted by `TOOL-aRepatriatedFork-30`, which left `tools/check-install-prefix.sh` a pure ban with no
+waiver file and no carried list. There is nothing there to re-key or hand-write any more: a shipped
+file that spells a kit path has one legal answer, DERIVE the path. A test arm is still a shipped file
+for that ban.
 
 ## The general shape
 
@@ -47,8 +47,9 @@ the point, expect to re-key and say so in the registry's own header.
 
 ## The gate
 
-GATED BY `bash tools/check-install-prefix.sh`, which is the thing that reds — that is
-the point of the class rather than a gap in it. What no gate covers is the RE-KEY: nothing
-distinguishes a waiver whose line moved from a waiver that should not exist, so the discipline is
-prose. A checker could compare each waived line's CONTENT against the row it was written for, and
-there is NO MACHINE GATE for it and that is a real unit nobody has specced.
+No registry in this repo is keyed by line today. `tools/dead-path-waivers.txt` is keyed by the
+waived line's TEXT and an occurrence ordinal instead (`TOOL-dHonouredPark-3`), which is this page's
+advice taken. The class stays for the next registry someone keys by position. Whatever gate owns
+such a registry is the thing that reds; what no gate covers is the RE-KEY, because nothing
+distinguishes a waiver whose line moved from a waiver that should not exist. There is
+NO MACHINE GATE for that, and the discipline is prose.

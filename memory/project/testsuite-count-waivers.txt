@@ -5,7 +5,6 @@
 .githooks/pre-commit.test.sh
 .githooks/pre-push.test.sh
 tools/agent-instructions/adopt-agent-instructions.test.sh
-tools/check-install-prefix.test.sh
 tools/check-wiring.test.sh
 tools/codebase-map/adopt-codebase-map.test.sh
 tools/hooks/agent-cap.test.sh

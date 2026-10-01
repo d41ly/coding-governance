@@ -2,7 +2,7 @@
 # check-hook-destinations.sh — every hook path a fragment DECLARES, and every hook destination an
 # adopter script WRITES, must resolve to a destination some kit.toml rule actually ships.
 #
-#   bash tools/check-hook-destinations.sh
+#   bash <prefix>/check-hook-destinations.sh
 #
 # WHY THIS EXISTS, and it is not hypothetical. TOOL-dRetiredFork-14 withdrew the `.claude/hooks/`
 # destinations for three hooks. Two of the three had their path supplied by a committed FRAGMENT
@@ -28,7 +28,7 @@
 #
 # A `{here}` FRAGMENT IS JUDGED AT ITS ADOPTER PATH. `{here}` is the fragment's own directory, and
 # it exists for a `kind = "flat"` kit: its engine ships to `{prefix}/<file>`, so the in-tree path
-# (`skills/session-kickoff/manifest-check.sh`) and the shipped path (`tools/manifest-check.sh` under
+# (`skills/session-kickoff/manifest-check.sh`) and the shipped path (`<prefix>/manifest-check.sh` under
 # the canonical prefix) DIFFER BY DESIGN, and comparing the in-tree spelling against the declared
 # set would red every correct flat-kit fragment. So where the fragment's directory is the `home` of
 # at least one flat descriptor, `{prefix}/<path relative to that directory>` is compared against the
@@ -40,12 +40,50 @@
 # resolution, as a `{kit}` one is. A directory that is the home of NO descriptor ships from nowhere,
 # and the gate refuses naming it.
 set -u
+_self_dir=$(cd "$(dirname "$0")" 2>/dev/null && pwd) || _self_dir=""   # before the cd: $0 may be relative
 ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || { echo "hook-dest: not a git repo"; exit 2; }
 cd "$ROOT" || exit 2
 st=0
+# THE TOOL ROOT, DERIVED (TOOL-aRepatriatedFork-29 S3): this gate sits in it, beside the deployer,
+# the resolver and the two readers it asks. Underivable is a refusal, never a guessed prefix.
+if ! SELF_PRE=$(git -C "$_self_dir" rev-parse --show-prefix 2>/dev/null); then
+  echo "hook-dest: cannot derive this gate's own directory from '$_self_dir' — REFUSING"
+  exit 2
+fi
 
-# shellcheck source=/dev/null
-. tools/lib/resolve-python.sh
+# TOOL-aRepatriatedFork-46: the resolver is carried INLINE. It was sourced from the library directory
+# beside this gate, which ships nowhere, spelled as a kit name after this gate's own prefix.
+# >>> resolve_python — canonical copy: resolve-python.sh in gov's lib dir (byte-identical; gated)
+resolve_python() {
+  # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
+  # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
+  # the candidate and every consumer uses "$PY" as a single word (measured: exit 127).
+  _rp_tried=""
+  for _rp_c in "${1:-}" "${GOV_PYTHON:-}" python3 python py; do
+    [ -n "$_rp_c" ] || continue
+    _rp_tried="$_rp_tried $_rp_c"
+    if "$_rp_c" -c "import sys" >/dev/null 2>&1; then
+      printf '%s\n' "$_rp_c"
+      return 0
+    fi
+  done
+  {
+    echo "resolve_python: no usable python launcher. Each candidate was RUN with -c 'import sys' and"
+    echo "resolve_python: none exited 0 — being on PATH is not evidence (the Microsoft Store python3"
+    echo "resolve_python: stub answers \`command -v\` and exits 9009 without running anything)."
+    echo "resolve_python: tried:$_rp_tried"
+    if [ -n "${1:-}" ]; then
+      echo "resolve_python: the caller's override '$1' was tried FIRST and did not run."
+    fi
+    if [ -n "${GOV_PYTHON:-}" ]; then
+      echo "resolve_python: GOV_PYTHON is set to '$GOV_PYTHON' and did not run. An override that is"
+      echo "resolve_python: set and unusable is THIS failure, never a silent fall-through — the"
+      echo "resolve_python: operator believes they chose, and would not have."
+    fi
+  } >&2
+  return 1
+}
+# <<< resolve_python
 PY="$(resolve_python)" || { echo "hook-dest: no usable python — refusing rather than skipping"; exit 2; }
 
 FRAGS=$(git ls-files '*.fragment.json' 2>/dev/null)
@@ -64,12 +102,12 @@ n=$(printf '%s\n' "$FRAGS" | grep -c .)
 
 # The declared destinations, from the descriptors themselves — never a list typed here. A gate that
 # carried its own copy of the shipped set would agree with itself and not with the deployer.
-DESTS=$("$PY" - <<'PYEOF'
+DESTS=$("$PY" - "${SELF_PRE}govkit" <<'PYEOF'
 import pathlib, sys
-sys.path.insert(0, "tools/govkit")
+sys.path.insert(0, sys.argv[1])
 import govkit
 root = pathlib.Path(".").resolve()
-reg = govkit.load_toml(root / "tools" / "govkit" / "registry.toml")
+reg = govkit.load_registry(root)
 out = set()
 for eid, (d, _p) in govkit.read_descriptors(root, reg, govkit.Report()).items():
     for row in govkit.resolve_entry(root, d, govkit.canonical_ctx(eid))["survivors"]:
@@ -78,7 +116,9 @@ for eid, (d, _p) in govkit.read_descriptors(root, reg, govkit.Report()).items():
             out.add(dst)
         elif isinstance(dst, (list, tuple)):
             out.update(x for x in dst if isinstance(x, str))
-print("\n".join(sorted(out)))
+# At a ROOT install the canonical prefix is ".", so a destination reads "./<kit>/<file>" where the
+# readers resolve "<kit>/<file>": one path, two spellings, compared as strings (VERIFYING repair).
+print("\n".join(sorted(x[2:] if x.startswith("./") else x for x in out)))
 PYEOF
 ) || { echo "hook-dest: could not resolve the descriptors — refusing"; exit 2; }
 
@@ -87,17 +127,19 @@ PYEOF
 # The canonical prefix the destinations above were resolved under, and every `kind = "flat"` home
 # — both from the deployer, never typed here. The flat-home set is what decides whether a `{here}`
 # fragment ships from anywhere at all.
-FLAT=$("$PY" - <<'PYEOF'
+FLAT=$("$PY" - "${SELF_PRE}govkit" <<'PYEOF'
 import pathlib, sys
-sys.path.insert(0, "tools/govkit")
+sys.path.insert(0, sys.argv[1])
 import govkit
 root = pathlib.Path(".").resolve()
-reg = govkit.load_toml(root / "tools" / "govkit" / "registry.toml")
+reg = govkit.load_registry(root)
 print(govkit.canonical_ctx("hook-dest")["prefix"])
 homes = set()
 for eid, (d, _p) in govkit.read_descriptors(root, reg, govkit.Report()).items():
-    if d.get("home"):
-        homes.add(("F " if d.get("kind") == "flat" else "D ") + d["home"].rstrip("/"))
+    # A flat home at a ROOT install resolves to "", the directory `dirname` spells "." (VERIFYING
+    # repair: skipping the empty home left every root-level {here} fragment homeless).
+    if isinstance(d.get("home"), str):
+        homes.add(("F " if d.get("kind") == "flat" else "D ") + (d["home"].rstrip("/") or "."))
 print("\n".join(sorted(homes)))
 PYEOF
 ) || { echo "hook-dest: could not read the flat-kit homes — refusing"; exit 2; }
@@ -112,7 +154,7 @@ DIR_HOMES=$(printf '%s\n' "$FLAT" | tail -n +2 | sed -n 's/^D //p')
 echo "hook-dest: $n fragment(s) against $(printf '%s\n' "$DESTS" | grep -c .) declared destination(s), $(printf '%s\n' "$FLAT_HOMES" | grep -c .) flat home(s), prefix $PFX"
 
 # The two readers whose value this gate asserts. Both are asked per fragment, below.
-CW="tools/check-wiring.sh"; SM="tools/settings-merge.py"
+CW="${SELF_PRE}check-wiring.sh"; SM="${SELF_PRE}settings-merge.py"
 for r in "$CW" "$SM"; do
   [ -f "$r" ] || { echo "hook-dest: REFUSING — $r is not here, and this gate reads its answer rather than deriving one"; exit 2; }
 done
@@ -162,7 +204,7 @@ for f in $FRAGS; do
         st=1
         continue
       fi
-      adopter="$PFX/${resolved#"$dir"/}"
+      adopter="$PFX/${resolved#"$dir"/}"; adopter="${adopter#./}"   # "." is a root install's prefix
       if printf '%s\n' "$DESTS" | grep -qxF -- "$adopter"; then
         echo "hook-dest: ok   $f -> $resolved in the tree, ships as $adopter"
       else
@@ -190,7 +232,7 @@ done
 # The fragment half above would have passed the whole time `adopt-memory-recall.sh` was re-creating
 # `.claude/hooks/recall-opened.js`, because that installer never reads a fragment. A gate over
 # declarations alone cannot see an installer, which is why this arm quantifies over the scripts.
-ADOPTERS=$(git ls-files 'tools/*/adopt-*.sh' 2>/dev/null)
+ADOPTERS=$(git ls-files "${SELF_PRE}*/adopt-*.sh" 2>/dev/null)
 if [ -z "$ADOPTERS" ]; then
   echo "hook-dest: REFUSING — no adopter script is tracked, so arm 2 has no subject"
   exit 1

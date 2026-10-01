@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """gotchas.py — the bug-class catalogue's index and its per-diff checklist (memory-tree kit 1.5).
 
-    python tools/memory-tree/gotchas.py --check                 # checks 17-19 + INDEX freshness
-    python tools/memory-tree/gotchas.py --write                 # render INDEX.md
-    python tools/memory-tree/gotchas.py --report                # the counts the budget is measured on
-    python tools/memory-tree/gotchas.py --for-diff <base>..<head>   # STDOUT IS THE CHECKLIST
-    python tools/memory-tree/gotchas.py --for-paths <path>...       # the same checklist, no diff yet
-    python tools/memory-tree/gotchas.py --declares < record.md   # prints `declares: yes|no`; rc 0 / 1, 2 unreadable
-    python tools/memory-tree/gotchas.py --selftest
+    python <prefix>/memory-tree/gotchas.py --check                 # checks 17-19 + INDEX freshness
+    python <prefix>/memory-tree/gotchas.py --write                 # render INDEX.md
+    python <prefix>/memory-tree/gotchas.py --report                # the counts the budget is measured on
+    python <prefix>/memory-tree/gotchas.py --for-diff <base>..<head>   # STDOUT IS THE CHECKLIST
+    python <prefix>/memory-tree/gotchas.py --for-paths <path>...       # the same checklist, no diff yet
+    python <prefix>/memory-tree/gotchas.py --declares < record.md   # prints `declares: yes|no`; rc 0 / 1, 2 unreadable
+    python <prefix>/memory-tree/gotchas.py --selftest
 
 `--for-diff`'s STDOUT IS THE CHECKLIST. That is the point: a reviewer is handed the classes their
 diff can actually hit instead of being pointed at a catalogue and trusted to remember which entries
@@ -23,7 +23,7 @@ THREE UPSTREAM HARVEST DEFECTS ARE CARRIED, each with its own arm in --selftest 
 this implementation shares, ONE as a difference:
   1. SHARED   — a token containing `::` inside backticks harvests to nothing.
   2. NOT HERE — upstream required a non-empty tail after the slash, so a directory anchor written
-                `tools/memory-tree/` harvested to nothing and its record was silently unanchored.
+                `<prefix>/memory-tree/` harvested to nothing and its record was silently unanchored.
                 Here the tail may be empty, the directory token IS harvested, and it selects
                 everything beneath it. The arm pins the DIFFERENCE, so a future tightening of the
                 pattern reintroduces the upstream defect loudly instead of quietly.
@@ -413,6 +413,7 @@ def _rec(name, desc, body, kind=None, universal=None, indent=False):
 
 
 def _scratch(tmp: str, recs: dict, extra=None):
+    PFX = derive_install_prefix()   # TOOL-aRepatriatedFork-28
     run("git", "init", "-q", ".", cwd=tmp)
     run("git", "config", "user.email", "t@t.test", cwd=tmp)
     run("git", "config", "user.name", "t", cwd=tmp)
@@ -424,7 +425,7 @@ def _scratch(tmp: str, recs: dict, extra=None):
     # reach one, so on a tree with an empty append-only area the rule ships green forever.
     write(os.path.join(tmp, "memory", "DECISIONS.md"), "# d\n\n- ARCH-tOne-1 · a decision\n")
     write(os.path.join(tmp, "memory", "archive", "OLD.2026-01-01.md"), "frozen\n")
-    write(os.path.join(tmp, "tools", "some-gate.sh"), "#!/usr/bin/env bash\n")
+    write(os.path.join(tmp, PFX, "some-gate.sh"), "#!/usr/bin/env bash\n")
     write(os.path.join(tmp, "deep", "nested", "some-gate.sh"), "#!/usr/bin/env bash\n")
     for name, text in recs.items():
         write(os.path.join(tmp, "memory", "gotchas", name), text)
@@ -435,7 +436,22 @@ def _scratch(tmp: str, recs: dict, extra=None):
     return load_conf(tmp)
 
 
+def derive_install_prefix() -> str:
+    """The install prefix WITH its trailing slash, derived from where this file sits and empty at a
+    root install. Every fixture and host path the self-test builds is spelled through it, never
+    through a literal prefix (TOOL-aRepatriatedFork-28)."""
+    import pathlib
+    here = pathlib.Path(__file__).resolve().parent
+    for anc in here.parents:
+        if (anc / ".git").exists():
+            rel = here.parent.relative_to(anc).as_posix()
+            return "" if rel == "." else rel + "/"
+    raise SystemExit(f"{pathlib.Path(__file__).name}: not inside a git repository, so there is no "
+                     "install prefix to derive")
+
+
 def cmd_selftest() -> int:
+    PFX = derive_install_prefix()   # TOOL-aRepatriatedFork-28
     import io
     import contextlib
 
@@ -456,7 +472,7 @@ def cmd_selftest() -> int:
         if not ok:
             fails.append(label)
 
-    GOOD = _rec("good-class", "a real class", "Fires on `tools/some-gate.sh`. Gated by the hygiene gate.\n")
+    GOOD = _rec("good-class", "a real class", f"Fires on `{PFX}some-gate.sh`. Gated by the hygiene gate.\n")
     with tempfile.TemporaryDirectory() as base:
         t = os.path.join(base, "clean"); os.makedirs(t)
         c = _scratch(t, {"good-class.md": GOOD})
@@ -470,7 +486,7 @@ def cmd_selftest() -> int:
 
         # 18 — declares.
         t2 = os.path.join(base, "nogate"); os.makedirs(t2)
-        c2 = _scratch(t2, {"x.md": _rec("x", "d", "Fires on `tools/some-gate.sh`. Nothing said about a gate.\n")})
+        c2 = _scratch(t2, {"x.md": _rec("x", "d", f"Fires on `{PFX}some-gate.sh`. Nothing said about a gate.\n")})
         cmd_write(t2, c2); run("git", "add", "-A", cwd=t2); run("git", "commit", "-q", "-m", "i", "--no-verify", cwd=t2)
         arm("check 18 catches a record that names no gate", "names no gate and does not say it has none",
             lambda: cmd_check(t2, c2))
@@ -504,7 +520,7 @@ def cmd_selftest() -> int:
 
         # front matter: an indented key is NAMED, not dropped.
         t7 = os.path.join(base, "indent"); os.makedirs(t7)
-        c7 = _scratch(t7, {"n.md": _rec("n", "d", "Body cites `tools/some-gate.sh`. No machine gate.\n", indent=True)})
+        c7 = _scratch(t7, {"n.md": _rec("n", "d", f"Body cites `{PFX}some-gate.sh`. No machine gate.\n", indent=True)})
         arm("an indented front-matter key is named", "keys live at COLUMN 0", lambda: cmd_check(t7, c7))
 
         # ---- the THREE CARRIED HARVEST DEFECTS. Each is asserted as OBSERVED behaviour so that a
@@ -514,20 +530,20 @@ def cmd_selftest() -> int:
             lambda: 0 if d1 == [] else 1)
         # Defect 2 is the one this implementation does NOT share, and the arm says so rather than
         # asserting upstream's behaviour out of deference. Upstream's token pattern required a
-        # non-empty tail after the slash, so `tools/memory-tree/` harvested to nothing and a record
+        # non-empty tail after the slash, so a directory-only kit token harvested to nothing and a record
         # written that way was silently unanchored. Here the tail may be empty, the directory token
         # IS harvested, and it selects everything beneath it. The arm pins the DIFFERENCE, so a
         # future tightening of the pattern reintroduces the upstream defect loudly.
-        d2 = ANCHOR_RE.findall("a directory `tools/memory-tree/` reference\n")  # gov:prefix-literal — fixture-internal: the selftest builds this layout in its own scratch tree
+        d2 = ANCHOR_RE.findall(f"a directory `{PFX}{HERE.name}/` reference\n")
         arm("harvest defect 2 does NOT apply here: a trailing slash harvests the directory", "[rc=0]",
-            lambda: 0 if d2 == ["tools/memory-tree/"] else 1)  # gov:prefix-literal — fixture-internal: the selftest builds this layout in its own scratch tree
+            lambda: 0 if d2 == [f"{PFX}{HERE.name}/"] else 1)
         arm("...and that directory anchor selects everything beneath it", "[rc=0]",
-            lambda: 0 if selectable("tools/memory-tree/", ["tools/memory-tree/gotchas.py"], "memory")  # gov:prefix-literal — fixture-internal: the selftest builds this layout in its own scratch tree
-            == {"tools/memory-tree/gotchas.py"} else 1)  # gov:prefix-literal — fixture-internal: the selftest builds this layout in its own scratch tree
-        paths = ["tools/some-gate.sh", "deep/nested/some-gate.sh", "memory/README.md"]
+            lambda: 0 if selectable(f"{PFX}{HERE.name}/", [f"{PFX}{HERE.name}/gotchas.py"], "memory")
+            == {f"{PFX}{HERE.name}/gotchas.py"} else 1)
+        paths = [f"{PFX}some-gate.sh", "deep/nested/some-gate.sh", "memory/README.md"]
         sel = selectable("some-gate.sh", paths, "memory")
         arm("harvest defect 3: a basename selects tree-wide", "[rc=0]",
-            lambda: 0 if sel == {"tools/some-gate.sh", "deep/nested/some-gate.sh"} else 1)
+            lambda: 0 if sel == {f"{PFX}some-gate.sh", "deep/nested/some-gate.sh"} else 1)
         arm("the catalogue never selects itself", "[rc=0]",
             lambda: 0 if selectable("INDEX.md", ["memory/gotchas/INDEX.md"], "memory") == set() else 1)
 
@@ -552,12 +568,12 @@ def cmd_selftest() -> int:
         # --for-diff: anchors that intersect, plus universal, and nothing else.
         t8 = os.path.join(base, "diff"); os.makedirs(t8)
         c8 = _scratch(t8, {
-            "hit.md": _rec("hit", "d", "Fires on `tools/some-gate.sh`. Gated by the hygiene gate.\n"),
+            "hit.md": _rec("hit", "d", f"Fires on `{PFX}some-gate.sh`. Gated by the hygiene gate.\n"),
             "miss.md": _rec("miss", "d", "Fires on `memory/README.md`. Gated by the hygiene gate.\n"),
             "uni.md": _rec("uni", "d", "Everywhere. No machine gate.\n", universal=True),
-            "note.md": _rec("note", "d", "A policy, not a class. Touches `tools/some-gate.sh`. No machine gate.\n", kind="note")})
+            "note.md": _rec("note", "d", f"A policy, not a class. Touches `{PFX}some-gate.sh`. No machine gate.\n", kind="note")})
         cmd_write(t8, c8); run("git", "add", "-A", cwd=t8); run("git", "commit", "-q", "-m", "i", "--no-verify", cwd=t8)
-        write(os.path.join(t8, "tools", "some-gate.sh"), "#!/usr/bin/env bash\n# edited\n")
+        write(os.path.join(t8, PFX, "some-gate.sh"), "#!/usr/bin/env bash\n# edited\n")
         run("git", "add", "-A", cwd=t8); run("git", "commit", "-q", "-m", "edit", "--no-verify", cwd=t8)
         out = io.StringIO()
         with contextlib.redirect_stdout(out):
@@ -570,7 +586,7 @@ def cmd_selftest() -> int:
         # ---- --for-paths: the same predicate, reached without a diff --------------------------------
         out = io.StringIO()
         with contextlib.redirect_stdout(out):
-            cmd_for_paths(t8, c8, ["tools/some-gate.sh"])
+            cmd_for_paths(t8, c8, [f"{PFX}some-gate.sh"])
         ptext = out.getvalue()
         arm("--for-paths emits the anchored hit", "[rc=0]", lambda: 0 if "- [ ] hit" in ptext else 1)
         arm("--for-paths omits a record whose anchors miss", "[rc=0]",

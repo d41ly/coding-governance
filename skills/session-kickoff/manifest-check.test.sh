@@ -115,6 +115,8 @@ mkrepo clean
 write_manifest "$R" "$(head_sha "$R")" "Makefile" "docs/GOV.md"
 commit_all "$R" manifest
 run "clean pass → 0, silent" "$R" 0 -
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${fail:-0}" = 0 ] && echo "PASS (${pass:-1} assertions)" || echo "FAIL (${pass:-1} assertions)"; [ "${fail:-0}" = 0 ] && exit 0; exit 1; fi
 
 # ---- 2 surviving placeholder → C1 --------------------------------------
 mkrepo c1
@@ -239,12 +241,12 @@ run "no-remote squash landing → 0 (C3+C5 hold)" "$R" 0 -
 
 # ---- 16 merged orphan-root watch history → clean fail, no raw fatal -----
 mkrepo orphan
-write_manifest "$R" "$(head_sha "$R")" "Makefile; tools/" "docs/GOV.md"
-mkdir -p "$R/tools"; echo t > "$R/tools/seed.txt"   # keeps the tools/ watch pathspec alive (C6)
+write_manifest "$R" "$(head_sha "$R")" "Makefile; vendor/" "docs/GOV.md"
+mkdir -p "$R/vendor"; echo t > "$R/vendor/seed.txt"   # keeps the vendor/ watch pathspec alive (C6)
 commit_all "$R" manifest
 git -C "$R" checkout -q --orphan lonely
 git -C "$R" rm -qrf . >/dev/null 2>&1
-mkdir -p "$R/tools"; echo o > "$R/tools/orphan.txt"   # watched path, no overlap with main
+mkdir -p "$R/vendor"; echo o > "$R/vendor/orphan.txt"   # watched path, no overlap with main
 git -C "$R" add -A; git -C "$R" commit -qm "orphan root touching watch"
 git -C "$R" checkout -q main
 git -C "$R" merge -q --no-edit --allow-unrelated-histories lonely
@@ -350,9 +352,9 @@ write_manifest "$R" "$(head_sha "$R")" "Makefile" "docs/GOV.md"
 commit_all "$R" manifest
 printf 'all:\n\ttrue\nro:\n\ttrue\n' > "$R/Makefile"; commit_all "$R" "unaudited drift"
 # The resolver, INLINE. This kit is copy-installed as a standalone directory, so `../lib/` does
-# not exist in an adopting repo. The block below is byte-identical to tools/lib/resolve-python.sh
-# and tools/lib/resolve-python.test.sh reds if any copy drifts.
-# >>> resolve_python — canonical copy: tools/lib/resolve-python.sh (byte-identical; gated)
+# not exist in an adopting repo. The block below is byte-identical to <prefix>/lib/resolve-python.sh
+# and <prefix>/lib/resolve-python.test.sh reds if any copy drifts.
+# >>> resolve_python — canonical copy: resolve-python.sh in gov's lib dir (byte-identical; gated)
 resolve_python() {
   # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
   # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
@@ -1137,10 +1139,10 @@ printf '## task\n- `skills/session-kickoff/SKILL.md` and ../../outside.md\n%s\n'
 # F9 — `--card --check` grades what the SESSION wrote: a commit subject in the writer's `recent —`
 # block naming an untracked path is git's text, blanked before the check, never an UNVERIFIED.
 K2F="$NONCE-k2f"
-git -C "$CWT2" commit -q --no-verify --allow-empty -m "drop tools/gone.sh from the bar" \
+git -C "$CWT2" commit -q --no-verify --allow-empty -m "drop vendor/gone.sh from the bar" \
   || { echo "FAIL F9 setup: the fixture commit in worktree B failed"; fail=$((fail+1)); }
 f9_head=$(git -C "$CWT2" rev-parse HEAD)
-run_card "F9 setup: a card whose recent block names tools/gone.sh" "$CWT2" 0 "drop tools/gone.sh from the bar" --card --write --session "$K2F"
+run_card "F9 setup: a card whose recent block names vendor/gone.sh" "$CWT2" 0 "drop vendor/gone.sh from the bar" --card --write --session "$K2F"
 printf '## task\n- `AGENTS.md:1`\nREADY — aTest · node a · card-wt2 · base %s · Tier-2 · gates x\n' "$f9_head" | (cd "$CWT2" && bash "$CHECK" --card --append --session "$K2F" > "$CARD_OUT" 2>&1); got=$?
 check_eq "F9 setup: the body over that card appends" "0" "$got"
 run_card "F9 --card --check over a card whose only miss is a commit subject exits 0" "$CWT2" 0 - --card --check --session "$K2F"
@@ -1159,9 +1161,73 @@ grep -q 'DEAD PROBE' "$CARD_OUT" && { echo "ok   K2 S7 --card --check over a tok
 # resolver is tried anchored at the repo root after its own dir. A stub reader defines
 # `TOOL-zFlatReader-1`; the body cites `-2` as well, so graded ids make 2 tokens with 1 miss, and
 # skipped ids make none at all (DEAD PROBE).
+# TOOL-aRepatriatedFork-46: the reader's directory is spelled by the memory-tree kit's NAME in this
+# install, resolved the way the checker resolves it: the sibling-kit resolver anchored at the
+# checker's directory and then at the repo root, then the one reader the repo tracks, which is the
+# checker's own last rung and the only one that reaches gov, whose kickoff kit sits under skills/.
+# The sibling-kit resolver (TOOL-aRepatriatedFork-2 S3), INLINED byte-identically from the
+# canonical copy named on its marker line and gated by the resolve-python self-test's parity
+# table. A shell consumer runs it with the python it already resolved, so the receipt rung is
+# read in Python and never parsed in bash. `resolve_kit_dir <python> <home> <anchor> <here>`
+# prints the kit directory REPO-RELATIVE, or the resolver's named refusal on stderr and exits 1.
+resolve_kit_dir() {
+  "$1" -c "$(cat <<'RKD'
+# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
+def resolve_kit_dir(home, anchor, here):
+    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
+
+    1. receipt — the `.governance/install.json` row whose `source` ends in <home>/<anchor> and
+       whose `path` exists inside this tree. The only record of a RENAMED kit dir: no probe finds
+       a memory-recall kit an adopter homed at `scripts/recall/`.
+    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
+    3. refuse — LookupError naming the three places looked; never a guessed prefix.
+    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
+    """
+    import json
+    import pathlib
+    here = pathlib.Path(here).absolute()  # never resolve(): a junction must not move it
+    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
+    receipt = root / ".governance" / "install.json"
+    try:
+        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("path"):
+            continue
+        if str(row.get("source") or "").split("/")[-2:] != [home, anchor]:
+            continue
+        hit = (root / str(row["path"])).absolute()
+        if hit.is_file() and root in hit.parents and ".." not in hit.parts:
+            return hit.parent
+    probes = (here / home, here.parent / home)
+    for cand in probes:
+        if (cand / anchor).is_file():
+            return cand
+    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
+        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
+# <<< resolve_kit_dir
+RKD
+)"'
+import sys
+try:
+    d = resolve_kit_dir(*sys.argv[1:4])
+except LookupError as e:
+    sys.exit(str(e))
+r = next((p for p in (d, *d.parents) if (p / ".git").exists()), d.anchor)
+print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
+}
+MT_DIR=""
+if _mt_py=$(resolve_python 2>/dev/null); then
+  for _mt_here in "$(dirname "$CHECK")" "$GOVROOT"; do
+    MT_DIR=$(resolve_kit_dir "$_mt_py" memory-tree corpus_ids.py "$_mt_here" 2>/dev/null) && break
+  done
+fi
+[ -n "$MT_DIR" ] || MT_DIR=$(dirname "$(git -C "$GOVROOT" ls-files -- '*/corpus_ids.py' | head -1)")
+MT_NAME=${MT_DIR##*/}
 mkrepo flatreader; write_manifest "$R" "$(head_sha "$R")" "Makefile" "docs/GOV.md"
-mkdir -p "$R/memory-tree" "$TMP/junction"
-printf 'print("# id-ere: TOOL-zFlatReader-[0-9]+")\nprint("TOOL-zFlatReader-1")\n' > "$R/memory-tree/corpus_ids.py"
+mkdir -p "$R/$MT_NAME" "$TMP/junction"
+printf 'print("# id-ere: TOOL-zFlatReader-[0-9]+")\nprint("TOOL-zFlatReader-1")\n' > "$R/$MT_NAME/corpus_ids.py"
 cp "$CHECK" "$TMP/junction/manifest-check.sh"
 L3_CHECK=$CHECK; CHECK="$TMP/junction/manifest-check.sh"
 run_card "L3 setup: a card in a flat-layout tree, from a checker outside it" "$R" 0 - --card --write --session "$NONCE-l3"

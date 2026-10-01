@@ -24,7 +24,7 @@
 #
 # AND SO IS PARTIAL EXTRACTION, which is the same defect one degree less obvious and which this file
 # CLAIMED to cover while guarding only the zero. A portability survey pointed the extractor at
-# `tools/memory-tree/check-memory-hygiene.test.sh`: 289 executed assertions, 31 output lines, and
+# `<prefix>/memory-tree/check-memory-hygiene.test.sh`: 289 executed assertions, 31 output lines, and
 # exactly 14 matching the grammar below. The old code returned those 14 at exit 0 — a confident
 # inventory over 4.8% of the population — so a port that silently dropped 275 assertions would have
 # diffed EMPTY and been certified by the very guard written to prevent it. Zero was never the
@@ -32,7 +32,7 @@
 #
 # THE FIX IS A LIVENESS ASSERTION, not a bigger grammar. The suite already reports its own executed
 # total — `PASS (N assertions)` is required of every bar self-test by
-# `tools/check-testsuite-counts.sh`, and the harness prints `PASS (N arms, width W)` — so the
+# `<prefix>/check-testsuite-counts.sh`, and the harness prints `PASS (N arms, width W)` — so the
 # extractor COMPARES what it recovered against what the suite says it ran, and refuses on any
 # inequality in either direction. A suite reporting no total at all is refused too: an inventory whose
 # coverage cannot be checked is exactly the unfalsifiable claim above, and "I found some" is not a
@@ -40,7 +40,7 @@
 # that cannot verify itself says so rather than reporting a reassuring number.
 set -u
 
-print_usage() { echo "usage: bash tools/lib/extract-arms.sh <suite.sh> [--out <file>]"; }
+print_usage() { echo "usage: bash $0 <suite.sh> [--out <file>]"; }   # derived: this file's own path
 
 [ $# -ge 1 ] || { print_usage; exit 2; }
 SUITE=$1; shift
@@ -99,7 +99,7 @@ if [ -z "$TOTAL" ]; then
   echo "extract-arms: so nothing here can say whether those $N are the whole population or a fraction"
   echo "extract-arms: of it. An inventory of unknown coverage compares equal for a port that dropped"
   echo "extract-arms: everything it did not cover. The suite needs a PASS (n assertions) line, which"
-  echo "extract-arms: tools/check-testsuite-counts.sh already requires of every self-test on the bar."
+  echo "extract-arms: the testsuite-counts gate already requires of every self-test on the bar."
   exit 4
 fi
 if [ "$N" != "$TOTAL" ]; then

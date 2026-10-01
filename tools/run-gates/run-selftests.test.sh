@@ -8,7 +8,7 @@
 # arrears, paid by `TOOL-aQuenchedHarness-6`, which added `--rank` to the same file and would
 # otherwise have added a fourth unobserved refusal to three.
 #
-# IT RUNS ON THE HARNESS IT EXISTS BECAUSE OF. `tools/lib/lib-selftest.sh` is this build's own
+# IT RUNS ON THE HARNESS IT EXISTS BECAUSE OF. `<prefix>/lib/lib-selftest.sh` is this build's own
 # product, and a suite written against it here is the second adopter after the ported one — which is
 # the only way to find out whether the three verbs fit a subject nobody designed them around.
 set -u
@@ -18,23 +18,132 @@ set -u
 # reason. The one arm that wants GOV_NODE sets it in its own subject.
 unset GOV_NODE
 HERE=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+# >>> derive_self_rel — canonical copy: kit-rel.sh in gov's lib dir (byte-identical; gated)
+derive_self_rel() {
+  local _dsr_p _dsr_rel=""
+  _dsr_p=$(cd "$1" 2>/dev/null && pwd) || return 1
+  while [ ! -e "$_dsr_p/.git" ]; do
+    [ "$(dirname "$_dsr_p")" = "$_dsr_p" ] && return 1
+    _dsr_rel="$(basename "$_dsr_p")${_dsr_rel:+/$_dsr_rel}"
+    _dsr_p=$(dirname "$_dsr_p")
+  done
+  printf '%s\n' "$_dsr_rel"
+}
+# <<< derive_self_rel
+KIT_REL=$(derive_self_rel "$HERE") || { echo "run-selftests.test: not inside a git repository"; exit 2; }
+# PFX is the install prefix WITH its trailing slash, derived from where this file sits and empty
+# at a root install: every fixture and host path below is spelled through it, never through a
+# literal prefix (TOOL-aRepatriatedFork-28).
+case "$KIT_REL" in */*) PFX="${KIT_REL%/*}/" ;; *) PFX="" ;; esac
+# TOOL-aRepatriatedFork-46: a kit is named by the name its directory has in THIS install, never
+# as a literal segment: this suite's own from where it sits, a sibling's through the resolver,
+# which reads the install receipt first. A fixture mirrors that layout by the resolved NAME.
+KIT="${KIT_REL##*/}"
+# >>> resolve_python — canonical copy: resolve-python.sh in gov's lib dir (byte-identical; gated)
+resolve_python() {
+  # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
+  # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
+  # the candidate and every consumer uses "$PY" as a single word (measured: exit 127).
+  _rp_tried=""
+  for _rp_c in "${1:-}" "${GOV_PYTHON:-}" python3 python py; do
+    [ -n "$_rp_c" ] || continue
+    _rp_tried="$_rp_tried $_rp_c"
+    if "$_rp_c" -c "import sys" >/dev/null 2>&1; then
+      printf '%s\n' "$_rp_c"
+      return 0
+    fi
+  done
+  {
+    echo "resolve_python: no usable python launcher. Each candidate was RUN with -c 'import sys' and"
+    echo "resolve_python: none exited 0 — being on PATH is not evidence (the Microsoft Store python3"
+    echo "resolve_python: stub answers \`command -v\` and exits 9009 without running anything)."
+    echo "resolve_python: tried:$_rp_tried"
+    if [ -n "${1:-}" ]; then
+      echo "resolve_python: the caller's override '$1' was tried FIRST and did not run."
+    fi
+    if [ -n "${GOV_PYTHON:-}" ]; then
+      echo "resolve_python: GOV_PYTHON is set to '$GOV_PYTHON' and did not run. An override that is"
+      echo "resolve_python: set and unusable is THIS failure, never a silent fall-through — the"
+      echo "resolve_python: operator believes they chose, and would not have."
+    fi
+  } >&2
+  return 1
+}
+# <<< resolve_python
+# The sibling-kit resolver (TOOL-aRepatriatedFork-2 S3), INLINED byte-identically from the
+# canonical copy named on its marker line and gated by the resolve-python self-test's parity
+# table. A shell consumer runs it with the python it already resolved, so the receipt rung is
+# read in Python and never parsed in bash. `resolve_kit_dir <python> <home> <anchor> <here>`
+# prints the kit directory REPO-RELATIVE, or the resolver's named refusal on stderr and exits 1.
+resolve_kit_dir() {
+  "$1" -c "$(cat <<'RKD'
+# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
+def resolve_kit_dir(home, anchor, here):
+    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
+
+    1. receipt — the `.governance/install.json` row whose `source` ends in <home>/<anchor> and
+       whose `path` exists inside this tree. The only record of a RENAMED kit dir: no probe finds
+       a memory-recall kit an adopter homed at `scripts/recall/`.
+    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
+    3. refuse — LookupError naming the three places looked; never a guessed prefix.
+    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
+    """
+    import json
+    import pathlib
+    here = pathlib.Path(here).absolute()  # never resolve(): a junction must not move it
+    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
+    receipt = root / ".governance" / "install.json"
+    try:
+        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("path"):
+            continue
+        if str(row.get("source") or "").split("/")[-2:] != [home, anchor]:
+            continue
+        hit = (root / str(row["path"])).absolute()
+        if hit.is_file() and root in hit.parents and ".." not in hit.parts:
+            return hit.parent
+    probes = (here / home, here.parent / home)
+    for cand in probes:
+        if (cand / anchor).is_file():
+            return cand
+    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
+        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
+# <<< resolve_kit_dir
+RKD
+)"'
+import sys
+try:
+    d = resolve_kit_dir(*sys.argv[1:4])
+except LookupError as e:
+    sys.exit(str(e))
+r = next((p for p in (d, *d.parents) if (p / ".git").exists()), d.anchor)
+print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
+}
+_rkd_py=$(resolve_python) || { echo "run-selftests.test: no usable python, so the sibling kits cannot be resolved"; exit 2; }
+LIB_DIR=$(resolve_kit_dir "$_rkd_py" lib lib-selftest.sh "$HERE") || exit 2
+LIB="${LIB_DIR##*/}"
+UNATTENDED_DIR=$(resolve_kit_dir "$_rkd_py" unattended check-unattended.test.sh "$HERE") || exit 2
+UNATTENDED="${UNATTENDED_DIR##*/}"
 ROOT=$(git -C "$HERE" rev-parse --show-toplevel 2>/dev/null) || {
   echo "run-selftests.test: not a git work tree"; exit 2; }
 cd "$ROOT" || exit 2
-. "$ROOT/tools/lib/lib-selftest.sh"
+. "$ROOT/${LIB_DIR}/lib-selftest.sh"
 
-RUNNER="$ROOT/tools/run-gates/run-selftests.sh"
+RUNNER="$ROOT/${PFX}${KIT}/run-selftests.sh"
 [ -f "$RUNNER" ] || { echo "run-selftests.test: no runner at $RUNNER"; exit 2; }
 
 # HOISTED ABOVE THE FIXTURE BUILDER so the generated helper below can interpolate them.
 # Re-spelling either path inside a printf would add a kit-path literal to this file, and
 # the install-prefix checker is a shrink-only BAN rather than a ratchet.
-R='bash tools/run-gates/run-selftests.sh'
-B='tools/run-gates/selftest-budgets.txt'
-LEGS='tools/gate-legs.json'
+R='bash '"${PFX}${KIT}/run-selftests.sh"''
+B=''"${PFX}${KIT}/selftest-budgets.txt"''
+LEGS=''"${PFX}gate-legs.json"''
 # THE POOLED EVIDENCE and the fixture's copy of the runner, both DERIVED from the lines above so
 # neither adds a carried literal (the install-prefix ban pins this file's count).
-E='tools/run-gates/selftest-pooled-evidence.txt'
+E=''"${PFX}${KIT}/selftest-pooled-evidence.txt"''
 RC=${R#bash }
 # THE NO-BASELINE SENTINEL, READ FROM THE RUNNER rather than retyped. The phrase is the unattended
 # suite's own; the runner pins it verbatim; and this file's fixture was a THIRD spelling that no
@@ -44,7 +153,7 @@ RC=${R#bash }
 # is the REAL suite under `$ROOT`, not a fixture copy — a prefixed path, which the install-prefix
 # leg reads as derived, so this file's carried count does not move.
 NOBASE_RX=$(sed -n "s/^SWEEP_NOBASELINE_RX='\(.*\)'$/\1/p" "$RUNNER")
-NOBASE_OWNER="$ROOT/tools/unattended/check-unattended.test.sh"
+NOBASE_OWNER="$ROOT/${UNATTENDED_DIR}/check-unattended.test.sh"
 
 # ---- THE SECOND KIT'S PATHS ARE DERIVED, never typed. `--attribute` forwards through
 # ---- `run-unattended-gates.sh`, whose own `--kit` filter names that kit's directory, so the
@@ -83,10 +192,10 @@ SELFTEST_FLOOR=139
 # with one held leg, and a declaration that covers it. Every arm below starts from this green state
 # and stages exactly one break into it, which is the only way a refusal can be attributed.
 build_repo() {
-  mkdir -p tools/run-gates || return 2
+  mkdir -p ${PFX}${KIT} || return 2
   git init -q . >/dev/null 2>&1 || return 2
   git config user.email t@t && git config user.name t || return 2
-  cp "$RUNNER" tools/run-gates/run-selftests.sh || return 2
+  cp "$RUNNER" ${PFX}${KIT}/run-selftests.sh || return 2
   # THE SHARED NORMALISER TRAVELS WITH IT. `--attribute` sources it from beside the runner since
   # TOOL-dDerivedDocket-23 S7, and every other mode runs without it; derived from the runner's own
   # directory rather than spelled, for the install-prefix reason the paths above give.
@@ -95,19 +204,19 @@ build_repo() {
   # EVERY COMPLETING SUITE PRINTS THE HARNESS TRAILER `PASS (`, because under parity
   # (TOOL-aBatchedArm-5 S2/S4) a completed exit with no trailer is not a reading and does not
   # match a baseline that has one; the suites that deliberately print none are named as such.
-  printf '#!/usr/bin/env bash\necho "PASS (1 assertions)"\nexit 0\n' > tools/suite-ok.sh
-  printf '#!/usr/bin/env bash\necho "FAIL something"\nexit 1\n' > tools/suite-red.sh
-  printf '#!/usr/bin/env bash\nsleep 3\necho "PASS (1 assertions)"\nexit 0\n' > tools/suite-slow.sh
+  printf '#!/usr/bin/env bash\necho "PASS (1 assertions)"\nexit 0\n' > ${PFX}suite-ok.sh
+  printf '#!/usr/bin/env bash\necho "FAIL something"\nexit 1\n' > ${PFX}suite-red.sh
+  printf '#!/usr/bin/env bash\nsleep 3\necho "PASS (1 assertions)"\nexit 0\n' > ${PFX}suite-slow.sh
   # THE WALL ARM'S PAIR. Its margins have to be SECONDS or the arm is a coin flip: the wall and
   # the per-suite bound both expire near the same instant otherwise, and whichever wins decides
   # whether the row renders WALL or TIMEOUT. A 5s first suite puts the wall 5s clear of the start
   # and 5s clear of the second suite's own bound.
-  printf '#!/usr/bin/env bash\nsleep 5\necho "PASS (1 assertions)"\nexit 0\n' > tools/suite-mid.sh
-  printf '#!/usr/bin/env bash\nsleep 30\nexit 0\n' > tools/suite-long.sh
+  printf '#!/usr/bin/env bash\nsleep 5\necho "PASS (1 assertions)"\nexit 0\n' > ${PFX}suite-mid.sh
+  printf '#!/usr/bin/env bash\nsleep 30\nexit 0\n' > ${PFX}suite-long.sh
   # THE WITNESS THAT A SUITE RAN. The refusal arms claim the runner executed nothing, and a
   # suite's stdout cannot show that -- the serial loop swallows it on a pass and the pool files
   # it. A file it leaves behind can.
-  printf '#!/usr/bin/env bash\ntouch ran.marker\necho "PASS (1 assertions)"\nexit 0\n' > tools/suite-mark.sh
+  printf '#!/usr/bin/env bash\ntouch ran.marker\necho "PASS (1 assertions)"\nexit 0\n' > ${PFX}suite-mark.sh
   # ---- TOOL-aBatchedArm-5's fixtures: the red-by-design shape unit 3's rows have (three FAIL
   # ---- lines, the executed-count trailer, exit 1); a suite that dies at once under `set -u` with
   # ---- no FAIL line and no trailer (the fast-red class the FAIL count exists to catch); and a
@@ -117,9 +226,9 @@ build_repo() {
     printf 'echo "FAIL one"; echo "FAIL two"; echo "FAIL three"\n'
     printf 'echo "  (81 assertions executed in shard 1/8 against a floor of 78)"\n'
     printf 'exit 1\n'
-  } > tools/suite-shard.sh
-  printf '#!/usr/bin/env bash\nset -u\necho "$THIS_IS_UNBOUND"\nexit 0\n' > tools/suite-crash.sh
-  printf '#!/usr/bin/env bash\nexit 0\n' > tools/suite-quiet.sh
+  } > ${PFX}suite-shard.sh
+  printf '#!/usr/bin/env bash\nset -u\necho "$THIS_IS_UNBOUND"\nexit 0\n' > ${PFX}suite-crash.sh
+  printf '#!/usr/bin/env bash\nexit 0\n' > ${PFX}suite-quiet.sh
   # ---- the NO-BASELINE SENTINEL shape (aBatchedArm closing D3): a batched group whose expected
   # ---- set is still unwritten prints the refusal, its observed set indented, and the shard's
   # ---- trailer all the same — so by (rc, FAIL, executed) alone it reads as a red-by-design row.
@@ -129,15 +238,15 @@ build_repo() {
     printf 'echo "    observed: UNATTENDED check 3 FAILED a-signature"\n'
     printf 'echo "  (81 assertions executed in shard 1/8 against a floor of 78)"\n'
     printf 'exit 1\n'
-  } > tools/suite-sentinel.sh
+  } > ${PFX}suite-sentinel.sh
   # ---- a suite that OUTLIVES TERM (aBatchedArm closing D8): the wall's TERM is ignored, so the
   # ---- worker's `timeout -k 5` KILLs it after the grace and it exits 137 — a kill with a
   # ---- WALL_BREACHED flag and an rc the WALL branch does not key on.
-  printf '#!/usr/bin/env bash\ntrap "" TERM\nfor _ in 1 2 3 4 5 6 7 8 9 10; do sleep 2; done\nexit 0\n' > tools/suite-stubborn.sh
+  printf '#!/usr/bin/env bash\ntrap "" TERM\nfor _ in 1 2 3 4 5 6 7 8 9 10; do sleep 2; done\nexit 0\n' > ${PFX}suite-stubborn.sh
   # ---- a suite that ECHOES A CREDENTIAL (aBatchedArm closing R1): the exact line a git call under
   # ---- an operator's global config prints; the kept per-row copy must mask the userinfo and keep
   # ---- the host, the way the sibling runner's durable leg logs already do.
-  printf '#!/usr/bin/env bash\necho "fatal: unable to access '"'"'https://u:p@example.com/x'"'"'"\nexit 1\n' > tools/suite-secret.sh
+  printf '#!/usr/bin/env bash\necho "fatal: unable to access '"'"'https://u:p@example.com/x'"'"'"\nexit 1\n' > ${PFX}suite-secret.sh
 
   # THE CHARTER STUB WITH ONE REGISTRY ROW. The runner keys pooled evidence by the charter's §2
   # node TAG, resolved from USERNAME/USER against the registry table at the repo root; a bare
@@ -149,11 +258,11 @@ build_repo() {
   # `max(budget, reading) + max(1, that)`, which is 2x the larger term, and every seed below is sized
   # against that: a budget-60 row with a 1 s seed bounds at 120 s, the TIMEOUT arm's budget-1 row
   # at 2 s (against a 3 s sleep), the suite-mid arm's budget-4 row at 8 s (against a 5 s sleep).
-  printf '# fixture margin: <floor seconds>\t<fraction of max>\n1\t1.0\tfixture\n' > tools/run-gates/ceiling-margin.txt
+  printf '# fixture margin: <floor seconds>\t<fraction of max>\n1\t1.0\tfixture\n' > ${PFX}${KIT}/ceiling-margin.txt
   # THE SEEDED, TRACKED EVIDENCE, under BOTH tokens the arms produce: `pooled@2x1` by default (W
   # falls to 2 with no run-gates.sh in the fixture, so outer 2, inner 1) and `pooled@1x2` under
   # SELFTEST_OUTER_WIDTH=1. Every row an arm appends at run time is seeded in that arm's setup
-  # with tools/seed.sh, under the token it runs at.
+  # with <prefix>/seed.sh, under the token it runs at.
   {
     printf '# fixture pooled evidence: seconds monotone; rc, fails, executed the latest reading'"'"'s.\n'
     printf '# <row>\t<condition>\t<node>\t<max seconds>\t<rc>\t<fails>\t<executed>\t<readings>\t<date>\n'
@@ -171,22 +280,22 @@ build_repo() {
     printf 'grep -vF -- "$k" "$E" > "$E.new"; mv "$E.new" "$E"\n'
     printf 'printf "%%s\\t%%s\\tt\\t%%s\\t%%s\\t%%s\\t%%s\\t1\\t2026-09-14\\n" "$1" "$2" "$3" "$4" "$5" "$6" >> "$E"\n'
     printf 'git add -A >/dev/null 2>&1\n'
-  } > tools/seed.sh
+  } > ${PFX}seed.sh
 
   # ONE held leg — `subject: kit` is half of the hold predicate — plus one leg the bar does not
   # hold, so the forward direction has something to find and something to correctly ignore.
   printf '%s\n' '[' \
-    '  {"name": "held one", "argv": ["bash", "tools/suite-ok.sh"], "subject": "kit"},' \
-    '  {"name": "not held", "argv": ["bash", "tools/suite-ok.sh"], "subject": "repo"}' \
-    ']' > tools/gate-legs.json
+    '  {"name": "held one", "argv": ["bash", "'"${PFX}suite-ok.sh"'"], "subject": "kit"},' \
+    '  {"name": "not held", "argv": ["bash", "'"${PFX}suite-ok.sh"'"], "subject": "repo"}' \
+    ']' > ${PFX}gate-legs.json
 
   {
     printf '# a fixture declaration.\n'
     printf '# port-majority-share: 0.50\n'
     printf '# port-minimum-factor: 3.0\n'
     printf 'held one\t60\t\tworst of 3 readings 10s, x1.5\n'
-    printf 'free one\t60\tbash tools/suite-ok.sh\tmeasured 2s on node t 2026-09-07, x1.5\n'
-  } > tools/run-gates/selftest-budgets.txt
+    printf 'free one\t60\tbash '"${PFX}suite-ok.sh"'\tmeasured 2s on node t 2026-09-07, x1.5\n'
+  } > ${PFX}${KIT}/selftest-budgets.txt
 
   # THE ROUND-TRIP SETUP, as a file rather than as an arm string. The capture needs a sed
   # expression, a tab and a newline, and an arm string is eval'd inside a fresh `bash -c` --
@@ -201,27 +310,27 @@ build_repo() {
     # write an ordinary reading, --rank would rank it, and the arm would red for a reason that
     # has nothing to do with the join it exists to observe.
     printf '[ -n "$tag" ] || { echo "the sweep emitted no condition line"; exit 1; }\n'
-    printf 'printf "roundtrip\\t60\\tbash tools/suite-ok.sh\\tmeasured 42s $tag on node t 2026-09-07, x1.5\\n" >> "$B"\n'
+    printf 'printf "roundtrip\\t60\\tbash '"${PFX}suite-ok.sh"'\\tmeasured 42s $tag on node t 2026-09-07, x1.5\\n" >> "$B"\n'
     printf 'git add -A >/dev/null 2>&1\n'
-  } > tools/roundtrip.sh
+  } > ${PFX}roundtrip.sh
   # ---- TOOL-aPooledSweep-3's fixtures: a suite per escape route, and a git that can only fail
   # ---- the one subcommand the fingerprint uses.
   { printf '#!/usr/bin/env bash\n'
     printf 'echo "FAIL tracked-write" >> subject.md\n'
     printf 'echo "FAIL wrote-into-the-checkout"\n'
     printf 'exit 1\n'
-  } > tools/suite-dirty.sh
+  } > ${PFX}suite-dirty.sh
   { printf '#!/usr/bin/env bash\n'
     printf 'echo x > "$(git rev-parse --git-common-dir)/aPooledSweep-probe"\n'
     printf 'echo "FAIL wrote-into-the-git-dir"\n'
     printf 'exit 1\n'
-  } > tools/suite-gitdir.sh
+  } > ${PFX}suite-gitdir.sh
   { printf '#!/usr/bin/env bash\n'
     printf '[ -n "${TMPDIR:-}" ] || { echo "FAIL no-tmpdir"; exit 1; }\n'
     printf 'case "$(mktemp -d)" in "$TMPDIR"*) echo "FAIL scratch-under-tmpdir";;'
     printf ' *) echo "FAIL scratch-escaped";; esac\n'
     printf 'exit 1\n'
-  } > tools/suite-tmpdir.sh
+  } > ${PFX}suite-tmpdir.sh
   # A GIT THAT ANSWERS EVERY SUBCOMMAND THE RUNNER NEEDS AND REFUSES `status`. Deleting the git
   # dir instead would break the runner's own root resolution, so the arm would observe a
   # different refusal than the one it is written for.
@@ -230,7 +339,7 @@ build_repo() {
     # THE REAL GIT'S PATH IS RESOLVED AT FIXTURE-BUILD TIME and baked in. Resolving it inside the
     # shim would find the shim, because the arm puts the shim's directory FIRST on PATH.
     printf 'exec %s "$@"\n' "$(command -v git)"
-  } > tools/git-nostatus.sh
+  } > ${PFX}git-nostatus.sh
   # The subject file the dirty suite appends to has to be TRACKED, or --untracked-files=no
   # cannot see it and the arm passes by finding nothing.
   printf 'a tracked subject\n' > subject.md
@@ -254,10 +363,10 @@ build_repo() {
   # them, which leaves the declaration the arms above this line read BYTE-IDENTICAL: the derived
   # run-wall arm computes its number from the budgets present, so two extra rows would red an arm
   # that has nothing to do with this flag.
-  mkdir -p tools/attr "$UDIR" || return 2
+  mkdir -p ${PFX}attr "$UDIR" || return 2
   attr_suite() { # file · body line...
     local f=$1; shift
-    { printf '#!/usr/bin/env bash\n'; printf '%s\n' "$@"; } > "tools/attr/$f"
+    { printf '#!/usr/bin/env bash\n'; printf '%s\n' "$@"; } > "${PFX}attr/$f"
   }
   # R's versions.
   attr_suite inherit.sh   'echo "FAIL arm A"' 'exit 1'
@@ -288,21 +397,21 @@ build_repo() {
   printf '#!/usr/bin/env bash\necho "the delegated suite ran"\nexit 0\n' > "$UDIR/attr-u.sh"
 
   {
-    printf 'attr inherit\t60\tbash tools/attr/inherit.sh\tmeasured 2s on node t 2026-09-20, x1.5\n'
-    printf 'attr both\t60\tbash tools/attr/both.sh\tmeasured 2s on node t 2026-09-20, x1.5\n'
-    printf 'attr fixed\t60\tbash tools/attr/fixed.sh\tmeasured 2s on node t 2026-09-20, x1.5\n'
-    printf 'attr deadl\t60\tbash tools/attr/deadl.sh\tmeasured 2s on node t 2026-09-20, x1.5\n'
-    printf 'attr deadl9\t60\tbash tools/attr/deadl9.sh\tmeasured 2s on node t 2026-09-20, x1.5\n'
-    printf 'attr over\t1\tbash tools/attr/over.sh\tmeasured 2s on node t 2026-09-20, x1.5\n'
-    printf 'attr deadr\t60\tbash tools/attr/deadr.sh\tmeasured 2s on node t 2026-09-20, x1.5\n'
-    printf 'attr deadboth\t60\tbash tools/attr/deadboth.sh\tmeasured 2s on node t 2026-09-20, x1.5\n'
-    printf 'attr cache\t60\tbash tools/attr/cache.sh\tmeasured 2s on node t 2026-09-20, x1.5\n'
-    printf 'attr term\t60\tbash tools/attr/term.sh\tmeasured 2s on node t 2026-09-20, x1.5\n'
+    printf 'attr inherit\t60\tbash {prefix}/attr/inherit.sh\tmeasured 2s on node t 2026-09-20, x1.5\n'
+    printf 'attr both\t60\tbash {prefix}/attr/both.sh\tmeasured 2s on node t 2026-09-20, x1.5\n'
+    printf 'attr fixed\t60\tbash {prefix}/attr/fixed.sh\tmeasured 2s on node t 2026-09-20, x1.5\n'
+    printf 'attr deadl\t60\tbash {prefix}/attr/deadl.sh\tmeasured 2s on node t 2026-09-20, x1.5\n'
+    printf 'attr deadl9\t60\tbash {prefix}/attr/deadl9.sh\tmeasured 2s on node t 2026-09-20, x1.5\n'
+    printf 'attr over\t1\tbash {prefix}/attr/over.sh\tmeasured 2s on node t 2026-09-20, x1.5\n'
+    printf 'attr deadr\t60\tbash {prefix}/attr/deadr.sh\tmeasured 2s on node t 2026-09-20, x1.5\n'
+    printf 'attr deadboth\t60\tbash {prefix}/attr/deadboth.sh\tmeasured 2s on node t 2026-09-20, x1.5\n'
+    printf 'attr cache\t60\tbash {prefix}/attr/cache.sh\tmeasured 2s on node t 2026-09-20, x1.5\n'
+    printf 'attr term\t60\tbash {prefix}/attr/term.sh\tmeasured 2s on node t 2026-09-20, x1.5\n'
     printf 'attr unattended\t60\tbash %s/attr-u.sh\tmeasured 2s on node t 2026-09-20, x1.5\n' "$UDIR"
     # LAST, and deliberately excluded from R's declaration below: this is the row that tests the
     # `absent` path, where the baseline declares no such suite at all.
-    printf 'attr absent\t60\tbash tools/attr/absent.sh\tmeasured 2s on node t 2026-09-20, x1.5\n'
-  } > tools/attr/rows.txt
+    printf 'attr absent\t60\tbash {prefix}/attr/absent.sh\tmeasured 2s on node t 2026-09-20, x1.5\n'
+  } > ${PFX}attr/rows.txt
 
   # THE DELEGATING WRAPPER, copied so the forwarding arm exercises the real file rather than a
   # description of it. Its `--checks` half is never reached under `--attribute`, which defaults the
@@ -325,8 +434,8 @@ build_repo() {
     # DURATIONS NORMALISED ON BOTH SIDES. The serial mode prints each suite's seconds, so an
     # unnormalised comparison is a coin flip on a loaded box and would red for the clock.
     printf 'norm() { sed -E "s/[0-9]+s/Ns/g"; }\n'
-    printf 'a=$(%s --serial --kit tools/suite-ok.sh 2>&1); ra=$?\n' "$R"
-    printf 'b=$(bash %s --kit tools/suite-ok.sh 2>&1); rb=$?\n' "$BASE_RUNNER"
+    printf 'a=$(%s --serial --kit %ssuite-ok.sh 2>&1); ra=$?\n' "$R" "$PFX"
+    printf 'b=$(bash %s --kit %ssuite-ok.sh 2>&1); rb=$?\n' "$BASE_RUNNER" "$PFX"
     printf '[ "$ra" = "$rb" ] || { echo "nope: exit $ra against $rb"; exit 1; }\n'
     printf 'if [ "$(printf "%%s\\n" "$a" | norm)" = "$(printf "%%s\\n" "$b" | norm)" ]; then\n'
     printf '  echo "default mode matches the BASE runner, exit $ra"\n'
@@ -335,16 +444,16 @@ build_repo() {
     printf '  diff <(printf "%%s\\n" "$a" | norm) <(printf "%%s\\n" "$b" | norm) | head -20\n'
     printf '  exit 1\n'
     printf 'fi\n'
-  } > tools/attr/parity.sh
+  } > ${PFX}attr/parity.sh
 
   {
     printf '#!/usr/bin/env bash\n'
     printf 'set -u\n'
     printf 'b=$(git worktree list | wc -l)\n'
-    printf '%s --serial --attribute HEAD~1 --kit tools/attr/cache.sh >/dev/null 2>&1\n' "$R"
+    printf '%s --serial --attribute HEAD~1 --kit %sattr/cache.sh >/dev/null 2>&1\n' "$R" "$PFX"
     printf 'a=$(git worktree list | wc -l)\n'
     printf '[ "$b" = "$a" ] && echo "worktree count unchanged $a" || { echo "nope: $b -> $a"; exit 1; }\n'
-  } > tools/attr/wtcount.sh
+  } > ${PFX}attr/wtcount.sh
 
   # THE SIGNAL DRIVER. It runs `--attribute` in the background, waits for the R run to announce
   # itself alive, TERMs the RUNNER, releases the suite, and grades what the signalled run left.
@@ -352,7 +461,7 @@ build_repo() {
     printf '#!/usr/bin/env bash\n'
     printf 'set -u\n'
     printf 'rdy="$PWD/term.ready"; out="$PWD/term.out"; rm -f "$rdy" "$rdy.go"\n'
-    printf 'ATTR_TERM_READY="$rdy" %s --serial --attribute HEAD~1 --kit tools/attr/term.sh > "$out" 2>&1 &\n' "$R"
+    printf 'ATTR_TERM_READY="$rdy" %s --serial --attribute HEAD~1 --kit %sattr/term.sh > "$out" 2>&1 &\n' "$R" "$PFX"
     printf 'pid=$!; i=0\n'
     printf 'while [ ! -s "$rdy" ] && [ "$i" -lt 600 ]; do sleep 0.1; i=$((i + 1)); done\n'
     printf 'if ! [ -s "$rdy" ] || ! kill -0 "$(cat "$rdy")" 2>/dev/null; then\n'
@@ -366,10 +475,10 @@ build_repo() {
     printf '[ "$(git worktree list | wc -l)" = 1 ] || { echo "nope: the R worktree outlived the run"; bad=1; }\n'
     printf '[ "$bad" = 0 ] || { sed "s/^/    /" "$out"; exit 1; }\n'
     printf 'echo "signalled run ended 143: no verdict, one cleanup, no worktree left"\n'
-  } > tools/attr/termrun.sh
+  } > ${PFX}attr/termrun.sh
 
   # ---- COMMIT ONE: R. Its declaration carries every attribution row EXCEPT `attr absent`.
-  grep -v '^attr absent' tools/attr/rows.txt >> "$B" || return 2
+  grep -v '^attr absent' ${PFX}attr/rows.txt >> "$B" || return 2
   git add -A >/dev/null 2>&1 || return 2
   git commit -q -m 'the baseline R' >/dev/null 2>&1 || return 2
 
@@ -391,7 +500,7 @@ build_repo() {
 build_fixture build_repo || exit 2
 
 # The one setup every attribution arm shares: L's declaration gains the rows R already carries.
-ATTR_ROWS="cat tools/attr/rows.txt >> $B"
+ATTR_ROWS="cat ${PFX}attr/rows.txt >> $B"
 
 # ---------------------------------------------------------------- the sentinel pair, round 2 R2
 # The runner's `SWEEP_NOBASELINE_RX` is a prose pin of a phrase the unattended suite owns, and
@@ -416,7 +525,7 @@ arm "a HELD leg with no budget row reds, because a suite arriving without one wo
     "$R --check"
 
 arm "a row naming a path git does not track reds" 1 "which git does not track" \
-    "printf 'ghost\t60\tbash tools/suite-ghost.sh\tworst of 3 readings 5s, x1.5\n' >> $B" \
+    "printf 'ghost\t60\tbash ${PFX}suite-ghost.sh\tworst of 3 readings 5s, x1.5\n' >> $B" \
     "$R --check"
 
 arm "a row with no argv and no leg of that name reds" 1 "has no argv and no leg of that name" \
@@ -429,7 +538,7 @@ arm "a row with no argv and no leg of that name reds" 1 "has no argv and no leg 
 # glob would have lost: a digit-led directory name is still handed to git and still reds.
 arm "a numeric-ratio token such as --shard 1/8 is admitted by --check, because it is not a path" 0 \
     "declaration clean" \
-    "for i in 1 2 3 4 5 6 7 8; do printf 'sharded %s\t60\tbash tools/suite-ok.sh --shard %s/8\tmeasured 2s on node t 2026-09-07, x1.5\n' \$i \$i; done >> $B && git add -A" \
+    "for i in 1 2 3 4 5 6 7 8; do printf 'sharded %s\t60\tbash ${PFX}suite-ok.sh --shard %s/8\tmeasured 2s on node t 2026-09-07, x1.5\n' \$i \$i; done >> $B && git add -A" \
     "$R --check"
 
 # ---------------------------------------------------------------- the shard join, TOOL-aBatchedArm-3 S4
@@ -440,12 +549,12 @@ arm "a numeric-ratio token such as --shard 1/8 is admitted by --check, because i
 # that declares `SHARD_ARITY` and is called whole is a declaration this file is right to carry.
 arm "a deleted shard row reds the join NAMING the missing index, rather than seven green rows" 1 \
     "no row for index 5" \
-    "for i in 1 2 3 4 6 7 8; do printf 'sharded %s\t60\tbash tools/suite-ok.sh --shard %s/8\tmeasured 2s on node t 2026-09-07, x1.5\n' \$i \$i; done >> $B && git add -A" \
+    "for i in 1 2 3 4 6 7 8; do printf 'sharded %s\t60\tbash ${PFX}suite-ok.sh --shard %s/8\tmeasured 2s on node t 2026-09-07, x1.5\n' \$i \$i; done >> $B && git add -A" \
     "$R --check"
 
 arm "a suite that declares SHARD_ARITY and is called WHOLE is not graded by the join" 0 \
     "declaration clean" \
-    "printf '#!/usr/bin/env bash\nSHARD_ARITY=2\nexit 0\n' > tools/suite-arity.sh && printf 'whole\t60\tbash tools/suite-arity.sh\tmeasured 2s on node t 2026-09-07, x1.5\n' >> $B && git add -A" \
+    "printf '#!/usr/bin/env bash\nSHARD_ARITY=2\nexit 0\n' > ${PFX}suite-arity.sh && printf 'whole\t60\tbash ${PFX}suite-arity.sh\tmeasured 2s on node t 2026-09-07, x1.5\n' >> $B && git add -A" \
     "$R --check"
 
 arm "a DIGIT-LED untracked path is still refused by name, so the ratio predicate is a regex and not a glob" 1 \
@@ -467,7 +576,7 @@ arm "--rank orders the population and names the set carrying the declared share"
 
 arm "--rank REFUSES a reading whose CONDITION it does not recognise, and computes no share at all" 1 \
     "carry no reading whose CONDITION this verb recognises" \
-    "printf 'carried\t60\tbash tools/suite-ok.sh\tcarried verbatim from somewhere else\n' >> $B && git add -A" \
+    "printf 'carried\t60\tbash ${PFX}suite-ok.sh\tcarried verbatim from somewhere else\n' >> $B && git add -A" \
     "$R --rank"
 
 arm "--rank REFUSES when the declaration states no share, rather than defaulting one" 1 \
@@ -488,7 +597,7 @@ arm "--rank REFUSES a declaration that ranks no row at all" 2 \
 # what proves "executes no suite" rather than the runner asserting it.
 arm "a run with NO mode REFUSES naming both spellings, and executes no suite" 2 \
     "declares --serial or --pooled" \
-    "sed -i 's|bash tools/suite-ok.sh|bash tools/suite-mark.sh|' $B" \
+    "sed -i 's|bash ${PFX}suite-ok.sh|bash ${PFX}suite-mark.sh|' $B" \
     "( $R; rc=\$?; [ -e ran.marker ] && exit 99; exit \$rc )"
 
 # The refusal sits AFTER --check and --list: both execute nothing and take no mode, and --check is
@@ -503,19 +612,19 @@ arm "--list takes no mode and is not refused, because it executes nothing" 0 \
 # the mode is the invocation's shape, the filter its content, and a wrong filter still reds.
 arm "a --kit filter matching nothing REFUSES, because an unknown filter and a clean sweep look alike" 2 \
     "so this run graded NOTHING at all" \
-    'true' "$R --serial --kit tools/nowhere"
+    'true' "$R --serial --kit ${PFX}nowhere"
 
 arm "a population whose every suite passes reports GREEN and says none of it runs on the bar" 0 \
     "self-tests GREEN" \
     'true' "$R --serial"
 
 arm "a suite that fails reds the run" 1 "self-tests RED" \
-    "sed -i 's|bash tools/suite-ok.sh|bash tools/suite-red.sh|' $B" \
+    "sed -i 's|bash ${PFX}suite-ok.sh|bash ${PFX}suite-red.sh|' $B" \
     "$R --serial"
 
 arm "a suite that overruns its declared budget reds and NAMES the number it broke" 1 \
     "OVER BUDGET" \
-    "sed -i 's|free one\t60|free one\t1|; s|bash tools/suite-ok.sh|bash tools/suite-slow.sh|' $B" \
+    "sed -i 's|free one\t60|free one\t1|; s|bash ${PFX}suite-ok.sh|bash ${PFX}suite-slow.sh|' $B" \
     "$R --serial"
 
 # ---------------------------------------------------------------- the state field is READ
@@ -523,13 +632,13 @@ arm "a suite that overruns its declared budget reds and NAMES the number it brok
 # that made a row with an empty budget print a GREEN line at 0s for a suite it never executed: the
 # empty column collapsed under IFS=tab, argv read back empty, `eval ""` returned 0, and the budget
 # comparison errored into "not over budget". Both halves are armed here, in both readers.
-arm "a NON-NUMERIC budget is a named refusal in --check, not a row that cannot be graded" 1     "declares a budget that is not a number"     "printf 'lopsided	lots	bash tools/suite-ok.sh	worst of 3 readings 5s, x1.5
+arm "a NON-NUMERIC budget is a named refusal in --check, not a row that cannot be graded" 1     "declares a budget that is not a number"     "printf 'lopsided	lots	bash ${PFX}suite-ok.sh	worst of 3 readings 5s, x1.5
 ' >> $B && git add -A"     "$R --check"
 
-arm "an EMPTY budget column is caught too, rather than collapsing into the argv" 1     "declares a budget that is not a number"     "printf 'hollow		bash tools/suite-ok.sh	worst of 3 readings 5s, x1.5
+arm "an EMPTY budget column is caught too, rather than collapsing into the argv" 1     "declares a budget that is not a number"     "printf 'hollow		bash ${PFX}suite-ok.sh	worst of 3 readings 5s, x1.5
 ' >> $B && git add -A"     "$R --check"
 
-arm "the RUN loop refuses a row it cannot resolve instead of printing ok for a suite it never ran" 1     "this row could not be resolved into a runnable suite"     "printf 'hollow		bash tools/suite-ok.sh	worst of 3 readings 5s, x1.5
+arm "the RUN loop refuses a row it cannot resolve instead of printing ok for a suite it never ran" 1     "this row could not be resolved into a runnable suite"     "printf 'hollow		bash ${PFX}suite-ok.sh	worst of 3 readings 5s, x1.5
 ' >> $B && git add -A"     "$R --serial"
 
 # ---------------------------------------------------------------- --sweep, TOOL-aPooledSweep-1
@@ -548,7 +657,7 @@ arm "--sweep prints the width pair it chose BEFORE the first verdict, so the inv
 # beneath it by the grep S4 preserves — the want-string is that output, unchanged.
 arm "--sweep reds a suite whose exit and FAIL count miss its baseline as MISMATCH, and prints that suite's OWN output beneath its row" 1 \
     "FAIL something" \
-    "sed -i 's|free one\t60\tbash tools/suite-ok.sh|free one\t60\tbash tools/suite-red.sh|' $B" \
+    "sed -i 's|free one\t60\tbash ${PFX}suite-ok.sh|free one\t60\tbash ${PFX}suite-red.sh|' $B" \
     "$R --sweep"
 
 # A suite past its bound did not FAIL and did not finish, and rendering it as either loses that.
@@ -556,7 +665,7 @@ arm "--sweep reds a suite whose exit and FAIL count miss its baseline as MISMATC
 # 1.0 x 1) = 2s — the evidence shape (TOOL-aBatchedArm-5 S1), where the factor once gave 1 x 2.
 arm "a suite past its evidence bound is TIMEOUT, distinguishable from both ok and MISMATCH" 1 \
     "TIMEOUT" \
-    "sed -i 's|free one\t60\tbash tools/suite-ok.sh|free one\t1\tbash tools/suite-slow.sh|' $B" \
+    "sed -i 's|free one\t60\tbash ${PFX}suite-ok.sh|free one\t1\tbash ${PFX}suite-slow.sh|' $B" \
     "$R --sweep"
 
 # The wall borrowed from run-gates.sh --print-profile was 10800s against a population declaring
@@ -579,7 +688,7 @@ arm "--sweep REFUSES when no timeout binary resolves, instead of running the bou
 
 arm "a --sweep filter matching nothing REFUSES, exactly as the serial mode's does" 2 \
     "so this run graded NOTHING at all" \
-    'true' "$R --sweep --kit tools/nowhere"
+    'true' "$R --sweep --kit ${PFX}nowhere"
 
 # ---------------------------------------------------------------- the withheld verdict, TOOL-aPooledSweep-2
 # The pool's readings are contended by construction, so the budget comparison is WITHHELD rather
@@ -611,12 +720,12 @@ arm "--pooled over a green population exits 0 and SAYS it graded no cost" 0 \
 # evidence shape clears the 5 s sleep by the same margin.)
 arm "under --serial a breaching suite gets OVER BUDGET, because an uncontended clock can grade it" 1 \
     "OVER BUDGET" \
-    "sed -i 's|free one\t60\tbash tools/suite-ok.sh|free one\t4\tbash tools/suite-mid.sh|' $B" \
+    "sed -i 's|free one\t60\tbash ${PFX}suite-ok.sh|free one\t4\tbash ${PFX}suite-mid.sh|' $B" \
     "$R --serial"
 
 arm "under --pooled the SAME breaching suite is 'cost withheld' and the run is green, not OVER BUDGET" 0 \
     "cost withheld" \
-    "sed -i 's|free one\t60\tbash tools/suite-ok.sh|free one\t4\tbash tools/suite-mid.sh|' $B" \
+    "sed -i 's|free one\t60\tbash ${PFX}suite-ok.sh|free one\t4\tbash ${PFX}suite-mid.sh|' $B" \
     "$R --pooled"
 
 # THE REMEDIES NAME A MODE. Three lines interpolate the runner's own path, so a grep over the
@@ -634,7 +743,7 @@ arm "a completed pooled run points at --serial for a cost verdict, by its own pa
 # takes a repaired suite's new baseline.
 arm "a RED pooled run names the calibrate as the remedy for a MISMATCH, by its own path, not a serial re-run" 1 \
     "one calibrate away: $R --pooled --calibrate" \
-    "sed -i 's|free one\t60\tbash tools/suite-ok.sh|free one\t60\tbash tools/suite-red.sh|' $B" \
+    "sed -i 's|free one\t60\tbash ${PFX}suite-ok.sh|free one\t60\tbash ${PFX}suite-red.sh|' $B" \
     "$R --pooled"
 
 # --rank sorts by recorded seconds, and a contended reading sorted against serial ones ranks the
@@ -642,7 +751,7 @@ arm "a RED pooled run names the calibrate as the remedy for a MISMATCH, by its o
 # seconds, and a match there is what RANKS a row rather than what refuses it.
 arm "--rank REFUSES a pooled reading by name rather than sorting it as a direct one" 1 \
     "carry no reading whose CONDITION this verb recognises" \
-    "printf 'contended\t60\tbash tools/suite-ok.sh\tmeasured 42s pooled@8x1 on node t 2026-09-07, x1.5\n' >> $B && git add -A" \
+    "printf 'contended\t60\tbash ${PFX}suite-ok.sh\tmeasured 42s pooled@8x1 on node t 2026-09-07, x1.5\n' >> $B && git add -A" \
     "$R --rank"
 
 # THE OTHER EDGE. A refusal that also drops the ordinary rows is a blanket, not a predicate, and the
@@ -657,7 +766,7 @@ arm "the same file WITHOUT the pooled row still ranks, so the refusal is a predi
 # drift on either side reds here and nowhere else.
 arm "the tag --sweep EMITS is the tag --rank refuses, captured rather than hand-typed" 1 \
     "carry no reading whose CONDITION this verb recognises" \
-    'bash tools/roundtrip.sh' \
+    'bash '"${PFX}roundtrip.sh"'' \
     "$R --rank"
 
 # ---------------------------------------------------------------- pool safety, TOOL-aPooledSweep-3
@@ -667,19 +776,19 @@ arm "the tag --sweep EMITS is the tag --rank refuses, captured rather than hand-
 # want-string is the suite's own FAIL line, still printed beneath the row.
 arm "each pooled suite gets its own TMPDIR, so a mktemp inside it cannot collide with a sibling (a MISMATCH row, its own output beneath)" 1 \
     "FAIL scratch-under-tmpdir" \
-    "sed -i 's|free one\t60\tbash tools/suite-ok.sh|free one\t60\tbash tools/suite-tmpdir.sh|' $B" \
+    "sed -i 's|free one\t60\tbash ${PFX}suite-ok.sh|free one\t60\tbash ${PFX}suite-tmpdir.sh|' $B" \
     "$R --sweep"
 
 arm "a suite that writes into a TRACKED file reds the sweep as UNSOUND after the pool drains" 1 \
     "THE SWEEP IS UNSOUND" \
-    "sed -i 's|free one\t60\tbash tools/suite-ok.sh|free one\t60\tbash tools/suite-dirty.sh|' $B" \
+    "sed -i 's|free one\t60\tbash ${PFX}suite-ok.sh|free one\t60\tbash ${PFX}suite-dirty.sh|' $B" \
     "$R --sweep"
 
 # S4: a whole-run fingerprint CANNOT attribute, so it must not pretend to. The refusal names the
 # serial mode as the tool that can, rather than guessing at a culprit.
 arm "the unsound verdict refuses to name a culprit suite and names the serial re-run instead" 1 \
     "Re-run the SERIAL mode, which can" \
-    "sed -i 's|free one\t60\tbash tools/suite-ok.sh|free one\t60\tbash tools/suite-dirty.sh|' $B" \
+    "sed -i 's|free one\t60\tbash ${PFX}suite-ok.sh|free one\t60\tbash ${PFX}suite-dirty.sh|' $B" \
     "$R --sweep"
 
 # THE OTHER EDGE, and the reason the git-common-dir arm was deleted rather than narrowed: that
@@ -687,7 +796,7 @@ arm "the unsound verdict refuses to name a culprit suite and names the serial re
 # reds on innocent runs. This arm pins that it does not.
 arm "a suite writing into the GIT COMMON DIR does not red the sweep, which is why that arm was dropped" 1 \
     "tree fingerprint MATCHED" \
-    "sed -i 's|free one\t60\tbash tools/suite-ok.sh|free one\t60\tbash tools/suite-gitdir.sh|' $B" \
+    "sed -i 's|free one\t60\tbash ${PFX}suite-ok.sh|free one\t60\tbash ${PFX}suite-gitdir.sh|' $B" \
     "$R --sweep"
 
 # A CLEAN SWEEP SAYS THE CHECK FIRED. A run where the fingerprint never ran and one where it
@@ -701,7 +810,7 @@ arm "a clean sweep STATES that the fingerprint matched, rather than being silent
 # what is asserted is that the command SUCCEEDED, and a failure refuses before any suite runs.
 arm "a fingerprint that cannot be TAKEN refuses before running anything, rather than reading clean" 2 \
     "a sweep would be UNGRADED" \
-    "mkdir -p shim && cp tools/git-nostatus.sh shim/git && chmod +x shim/git" \
+    "mkdir -p shim && cp ${PFX}git-nostatus.sh shim/git && chmod +x shim/git" \
     "PATH=\"\$PWD/shim:\$PATH\" $R --sweep"
 
 # THE INVARIANT AS REACHED, not as printed. The width-pair arm reads what the pool was ASKED for; a
@@ -722,7 +831,7 @@ arm "peak concurrency is REPORTED and never exceeds the outer width the run prin
 # lands at 10s -- five seconds clear of both, which is what keeps this arm from being a coin flip.
 arm "the run WALL kills an outstanding suite, renders it WALL, and NAMES it" 1 \
     "run wall killed" \
-    "sed -i 's|\t60\t|\t5\t|g; s|bash tools/suite-ok.sh|bash tools/suite-long.sh|g' $B && sed -i 's|suite-ok.sh|suite-mid.sh|g' $LEGS" \
+    "sed -i 's|\t60\t|\t5\t|g; s|bash ${PFX}suite-ok.sh|bash ${PFX}suite-long.sh|g' $B && sed -i 's|suite-ok.sh|suite-mid.sh|g' $LEGS" \
     "SELFTEST_WALL=10 SELFTEST_OUTER_WIDTH=1 $R --sweep"
 
 # A POOL OF ONE IS SERIAL, and the peak figure must say so. It said 2, because the overlap test
@@ -753,7 +862,7 @@ arm "a non-numeric SELFTEST_WALL REFUSES rather than being silently ignored" 2 \
 # because an unevidenced row refuses the whole run by name before anything is dispatched.
 arm "the wall STOPS the dispatch, so a suite it never reached is reported UNRUN rather than killed" 1 \
     "NEVER RUN and are UNGRADED" \
-    "sed -i 's|\t60\t|\t5\t|g; s|bash tools/suite-ok.sh|bash tools/suite-long.sh|g' $B && sed -i 's|suite-ok.sh|suite-mid.sh|g' $LEGS && printf 'three\t5\tbash tools/suite-long.sh\tmeasured 5s on node t 2026-09-07, x1.5\nfour\t5\tbash tools/suite-long.sh\tmeasured 5s on node t 2026-09-07, x1.5\n' >> $B && bash tools/seed.sh three pooled@1x2 1 0 0 - && bash tools/seed.sh four pooled@1x2 1 0 0 - && git add -A" \
+    "sed -i 's|\t60\t|\t5\t|g; s|bash ${PFX}suite-ok.sh|bash ${PFX}suite-long.sh|g' $B && sed -i 's|suite-ok.sh|suite-mid.sh|g' $LEGS && printf 'three\t5\tbash ${PFX}suite-long.sh\tmeasured 5s on node t 2026-09-07, x1.5\nfour\t5\tbash ${PFX}suite-long.sh\tmeasured 5s on node t 2026-09-07, x1.5\n' >> $B && bash ${PFX}seed.sh three pooled@1x2 1 0 0 - && bash ${PFX}seed.sh four pooled@1x2 1 0 0 - && git add -A" \
     "SELFTEST_WALL=10 SELFTEST_OUTER_WIDTH=1 $R --sweep"
 
 # THE DERIVED WALL IS THE RUN'S STRUCTURAL CEILING, not a multiple of its worst suite. `largest x
@@ -778,118 +887,118 @@ arm "the derived run wall is the bounded work over the pool, printed so it can b
 arm "--attribute separates a failure the BASELINE already had from one only this tree has" 1 \
     "NEW 1 · INHERITED 1 · FIXED 0" \
     "$ATTR_ROWS" \
-    "$R --serial --attribute HEAD~1 --kit tools/attr/inherit.sh"
+    "$R --serial --attribute HEAD~1 --kit ${PFX}attr/inherit.sh"
 
 arm "the INHERITED member line NAMES the failure, so a reader can file it rather than re-diagnose it" 1 \
     "INHERITED  FAIL arm A" \
     "$ATTR_ROWS" \
-    "$R --serial --attribute HEAD~1 --kit tools/attr/inherit.sh"
+    "$R --serial --attribute HEAD~1 --kit ${PFX}attr/inherit.sh"
 
 arm "the NEW member line names the failure this tree is actually answerable for" 1 \
     "NEW        FAIL arm B" \
     "$ATTR_ROWS" \
-    "$R --serial --attribute HEAD~1 --kit tools/attr/inherit.sh"
+    "$R --serial --attribute HEAD~1 --kit ${PFX}attr/inherit.sh"
 
 # S5/AC3. The no-flag loop sets st=1 whenever a suite exits non-zero, and inheriting that is the
 # whole defect: it fails every unit for failures filed against other units.
 arm "a failure present on BOTH sides is INHERITED and EXITS 0 — inheriting a red is not causing one" 0 \
     "verdict clean" \
     "$ATTR_ROWS" \
-    "$R --serial --attribute HEAD~1 --kit tools/attr/both.sh"
+    "$R --serial --attribute HEAD~1 --kit ${PFX}attr/both.sh"
 
 arm "that inherited-only suite reads NEW 0, so the token and the counts agree" 0 \
     "NEW 0 · INHERITED 1 · FIXED 0" \
     "$ATTR_ROWS" \
-    "$R --serial --attribute HEAD~1 --kit tools/attr/both.sh"
+    "$R --serial --attribute HEAD~1 --kit ${PFX}attr/both.sh"
 
 # S3/AC2. An abort produces an EMPTY failure set, which is indistinguishable from a clean run by
 # set membership alone — green by absence, and KF14's blocker.
 arm "a suite that ABORTS at L with no FAIL line is a DEAD PROBE, never an empty failure set" 1 \
     "DEAD PROBE at L" \
     "$ATTR_ROWS" \
-    "$R --serial --attribute HEAD~1 --kit tools/attr/deadl.sh"
+    "$R --serial --attribute HEAD~1 --kit ${PFX}attr/deadl.sh"
 
 arm "a DEAD PROBE at L is EXCLUDED from the attributed count and reds the verdict" 1 \
     "attributed 0 of 1 suite(s)" \
     "$ATTR_ROWS" \
-    "$R --serial --attribute HEAD~1 --kit tools/attr/deadl.sh"
+    "$R --serial --attribute HEAD~1 --kit ${PFX}attr/deadl.sh"
 
 arm "the summary counts that dead side separately, so a reader can tell it from a new failure" 1 \
     "DEAD L 1 · DEAD R 0 · OVER 0 · verdict red" \
     "$ATTR_ROWS" \
-    "$R --serial --attribute HEAD~1 --kit tools/attr/deadl.sh"
+    "$R --serial --attribute HEAD~1 --kit ${PFX}attr/deadl.sh"
 
 # AC9. The count line is the trap: a rule that also required it to be ABSENT would read a suite
 # that printed its count and then died as an empty set.
 arm "a suite that prints its COUNT line and then dies is still a DEAD PROBE at L" 1 \
     "DEAD PROBE at L" \
     "$ATTR_ROWS" \
-    "$R --serial --attribute HEAD~1 --kit tools/attr/deadl9.sh"
+    "$R --serial --attribute HEAD~1 --kit ${PFX}attr/deadl9.sh"
 
 # S1/AC5. A symmetric difference folds FIXED into NEW, which reds a unit for repairing something.
 arm "a failure present at R and GONE at L is FIXED, and the exit status is unaffected by it" 0 \
     "FIXED      FAIL arm F" \
     "$ATTR_ROWS" \
-    "$R --serial --attribute HEAD~1 --kit tools/attr/fixed.sh"
+    "$R --serial --attribute HEAD~1 --kit ${PFX}attr/fixed.sh"
 
 # F4/AC10. Charter §7 says a runner REDS on a cost breach, and the mode every self-test unit
 # verifies with is the last place to quietly suspend that.
 arm "an L-side budget breach still REDS under --attribute, and names the number it broke" 1 \
     "OVER BUDGET at L" \
     "$ATTR_ROWS" \
-    "$R --serial --attribute HEAD~1 --kit tools/attr/over.sh"
+    "$R --serial --attribute HEAD~1 --kit ${PFX}attr/over.sh"
 
 arm "that breach is reported APART from NEW, which reads 0, so the two causes never blur" 1 \
     "NEW 0 · INHERITED 0 · FIXED 0 · DEAD L 0 · DEAD R 0 · OVER 1 · verdict red" \
     "$ATTR_ROWS" \
-    "$R --serial --attribute HEAD~1 --kit tools/attr/over.sh"
+    "$R --serial --attribute HEAD~1 --kit ${PFX}attr/over.sh"
 
 # F5/AC12. A dead R is the baseline being broken, which is exactly the state the unit that FIXES it
 # starts from — so failing the run on it leaves that unit unable ever to verify its own fix.
 arm "a DEAD PROBE at R alone never reds the run, or the unit fixing that abort could not verify it" 0 \
     "DEAD R 1 · OVER 0 · verdict clean" \
     "$ATTR_ROWS" \
-    "$R --serial --attribute HEAD~1 --kit tools/attr/deadr.sh"
+    "$R --serial --attribute HEAD~1 --kit ${PFX}attr/deadr.sh"
 
 arm "that dead baseline is REPORTED rather than silently treated as a clean one" 0 \
     "DEAD PROBE at R" \
     "$ATTR_ROWS" \
-    "$R --serial --attribute HEAD~1 --kit tools/attr/deadr.sh"
+    "$R --serial --attribute HEAD~1 --kit ${PFX}attr/deadr.sh"
 
 arm "an L failure over a DEAD R reads NEW and never INHERITED — a dead side has no members" 1 \
     "NEW        FAIL arm A" \
-    "$ATTR_ROWS && cp tools/attr/variant-deadr-fail.sh tools/attr/deadr.sh" \
-    "$R --serial --attribute HEAD~1 --kit tools/attr/deadr.sh"
+    "$ATTR_ROWS && cp ${PFX}attr/variant-deadr-fail.sh ${PFX}attr/deadr.sh" \
+    "$R --serial --attribute HEAD~1 --kit ${PFX}attr/deadr.sh"
 
 arm "a suite dead on BOTH sides reds, or a consumer passes with its own arms never executed" 1 \
     "DEAD L 1 · DEAD R 1" \
     "$ATTR_ROWS" \
-    "$R --serial --attribute HEAD~1 --kit tools/attr/deadboth.sh"
+    "$R --serial --attribute HEAD~1 --kit ${PFX}attr/deadboth.sh"
 
 # S3. A suite the baseline never declared has no R-side set at all, which reads the same way a dead
 # R does: everything at L is this tree's own.
 arm "a suite the BASELINE does not declare reads 'absent' at R, and all of its L failures are NEW" 1 \
     " absent" \
     "$ATTR_ROWS" \
-    "$R --serial --attribute HEAD~1 --kit tools/attr/absent.sh"
+    "$R --serial --attribute HEAD~1 --kit ${PFX}attr/absent.sh"
 
 # S4/AC4. The cache is the only reason "each suite once per unit" is affordable across twelve
 # units, and the only dangerous way to build it is to write it before the R run returns.
 # These three arms need a `timeout` binary for the kill; without one the setup fails LOUDLY as ERR.
 arm "a KILLED R run caches nothing, so the next run measures the baseline FRESH" 0 \
     " fresh" \
-    "$ATTR_ROWS && timeout -k 1 2 $R --serial --attribute HEAD~1 --kit tools/attr/cache.sh >/dev/null 2>&1; true" \
-    "$R --serial --attribute HEAD~1 --kit tools/attr/cache.sh"
+    "$ATTR_ROWS && timeout -k 1 2 $R --serial --attribute HEAD~1 --kit ${PFX}attr/cache.sh >/dev/null 2>&1; true" \
+    "$R --serial --attribute HEAD~1 --kit ${PFX}attr/cache.sh"
 
 arm "a COMPLETED R run is served from the cache next time, which is what bounds the doubled cost" 0 \
     " cached" \
-    "$ATTR_ROWS && $R --serial --attribute HEAD~1 --kit tools/attr/cache.sh >/dev/null 2>&1; true" \
-    "$R --serial --attribute HEAD~1 --kit tools/attr/cache.sh"
+    "$ATTR_ROWS && $R --serial --attribute HEAD~1 --kit ${PFX}attr/cache.sh >/dev/null 2>&1; true" \
+    "$R --serial --attribute HEAD~1 --kit ${PFX}attr/cache.sh"
 
 arm "a cached run adds NO worktree entry at all, so the cache is a real saving and not a re-run" 0 \
     "worktree count unchanged" \
-    "$ATTR_ROWS && $R --serial --attribute HEAD~1 --kit tools/attr/cache.sh >/dev/null 2>&1; true" \
-    'bash tools/attr/wtcount.sh'
+    "$ATTR_ROWS && $R --serial --attribute HEAD~1 --kit ${PFX}attr/cache.sh >/dev/null 2>&1; true" \
+    "bash ${PFX}attr/wtcount.sh"
 
 # THE CLOSING DIFF REVIEW'S F5. The attribution trap named INT, TERM and HUP beside EXIT and never
 # exited, so a signal cleaned up and then RESUMED the suite loop over a deleted scratch root: a false
@@ -899,14 +1008,14 @@ arm "a cached run adds NO worktree entry at all, so the cache is a real saving a
 arm "a TERM mid-suite under --attribute EXITS 143 — no verdict, one cleanup, and no worktree left" 0 \
     "signalled run ended 143" \
     "$ATTR_ROWS" \
-    'bash tools/attr/termrun.sh'
+    "bash ${PFX}attr/termrun.sh"
 
 # AC8. The flag is additive or it is nothing: every consumer of the no-flag mode predates it. That
 # mode is `--serial` since TOOL-aBatchedArm-4 S2, and parity.sh compares it with the BASE bare form.
 arm "the SERIAL mode is byte-identical to the runner at BASE, so no attribution path runs without the flag" 0 \
     "default mode matches the BASE runner" \
     'true' \
-    'bash tools/attr/parity.sh'
+    "bash ${PFX}attr/parity.sh"
 
 # S6/F2/AC6. The delegating wrapper must forward the flag AND say what it did not attribute — a
 # half that runs unattributed and says nothing is the silence this repo keeps filing.
@@ -925,7 +1034,7 @@ arm "and it STATES that its checks half is not attributed, rather than leaving i
 arm "an --attribute value naming no commit REFUSES before running a single suite" 2 \
     "names no commit in this repository" \
     "$ATTR_ROWS" \
-    "$R --serial --attribute deadbeefdeadbeef --kit tools/attr/both.sh"
+    "$R --serial --attribute deadbeefdeadbeef --kit ${PFX}attr/both.sh"
 
 # A knob accepted and ignored leaves the operator believing a baseline they never got — the same
 # shape this file already arms for SELFTEST_WALL and SELFTEST_OUTER_WIDTH.
@@ -965,7 +1074,7 @@ arm "a pooled row is bounded from its serial BUDGET when the seeded reading is f
 # 120 s, i.e. the reading is read and ignored.
 arm "a pooled row is bounded from its READING when the seeded reading exceeds its budget, and says so" 0 \
     "bounded at 400s: reading won (budget 60s; reading 200s" \
-    "bash tools/seed.sh 'free one' pooled@2x1 200 0 0 -" \
+    "bash ${PFX}seed.sh 'free one' pooled@2x1 200 0 0 -" \
     "$R --pooled"
 
 # THE RUN WALL IS DERIVED FROM THE EVIDENCE BOUNDS: (120 + 400) over 2 slots is 260, floored at the
@@ -973,14 +1082,14 @@ arm "a pooled row is bounded from its READING when the seeded reading exceeds it
 # budget-derived 120 s, or is not floored at the largest bound.
 arm "the run wall is ceil(sum of evidence bounds / outer) floored at the largest evidence bound" 0 \
     "run wall 400s" \
-    "bash tools/seed.sh 'free one' pooled@2x1 200 0 0 -" \
+    "bash ${PFX}seed.sh 'free one' pooled@2x1 200 0 0 -" \
     "$R --pooled"
 
 # And the below-the-largest refusal compares against THAT bound. NOT YET OBSERVED RED — owner
 # ruling 2026-09-14. Red when: a 300 s wall is accepted over a 400 s evidence bound.
 arm "a run wall below the largest EVIDENCE bound refuses, naming that bound" 2 \
     "population is 400s (an evidence bound)" \
-    "bash tools/seed.sh 'free one' pooled@2x1 200 0 0 -" \
+    "bash ${PFX}seed.sh 'free one' pooled@2x1 200 0 0 -" \
     "SELFTEST_WALL=300 $R --pooled"
 
 # THE FACTOR IS RETIRED, not merely unread: a `sweep-ceiling-factor:` header staged back into the
@@ -996,7 +1105,7 @@ arm "a sweep-ceiling-factor header staged back in is IGNORED — the bound and t
 # NOT YET OBSERVED RED — owner ruling 2026-09-14. Red when: the run proceeds with no margin file.
 arm "a pooled run with the margin file absent REFUSES naming it, rather than defaulting a headroom" 2 \
     "no margin declared at" \
-    "rm tools/run-gates/ceiling-margin.txt" \
+    "rm ${PFX}${KIT}/ceiling-margin.txt" \
     "$R --pooled"
 
 # ---------------------------------------------------------------- the no-reading refusal, S1 / AC2
@@ -1059,7 +1168,7 @@ arm "a calibrate over a clean fixture reports the fingerprint MATCHED and has st
 # line's shape — row, token, tag, the kept seconds, rc, FAIL count.
 arm "a calibrate prints each reading it wrote with its token, tag, rc and FAIL count" 0 \
     "reading free one under pooled@2x1 on node t: 30s (kept at 30s" \
-    "bash tools/seed.sh 'free one' pooled@2x1 30 0 0 -" \
+    "bash ${PFX}seed.sh 'free one' pooled@2x1 30 0 0 -" \
     "$R --pooled --calibrate | grep 'rc 0, 0 FAIL, - executed'"
 
 # SECONDS ARE MONOTONE, rc/fails/executed FOLLOW THE LATEST READING. A 50 s seed re-read by the
@@ -1068,14 +1177,14 @@ arm "a calibrate prints each reading it wrote with its token, tag, rc and FAIL c
 # fall to the new reading, or rc/fails stay at the old ones.
 arm "a second calibrate with a LOWER reading and a different rc updates rc, fails and executed and NOT seconds" 0 \
     $'free one\tpooled@2x1\tt\t50\t1\t3\t81\t2\t' \
-    "bash tools/seed.sh 'free one' pooled@2x1 50 0 0 - && sed -i 's|free one\t60\tbash tools/suite-ok.sh|free one\t60\tbash tools/suite-shard.sh|' $B" \
+    "bash ${PFX}seed.sh 'free one' pooled@2x1 50 0 0 - && sed -i 's|free one\t60\tbash ${PFX}suite-ok.sh|free one\t60\tbash ${PFX}suite-shard.sh|' $B" \
     "$R --pooled --calibrate > /dev/null; cat $E"
 
 # And a HIGHER reading raises them: a 1 s seed re-read by a 3 s sleep is raised. NOT YET OBSERVED
 # RED — owner ruling 2026-09-14. Red when: the seconds stay at 1.
 arm "a calibrate with a HIGHER reading raises that row's seconds, and prints the raise" 0 \
     "reading free one under pooled@2x1 on node t: " \
-    "sed -i 's|free one\t60\tbash tools/suite-ok.sh|free one\t60\tbash tools/suite-slow.sh|' $B" \
+    "sed -i 's|free one\t60\tbash ${PFX}suite-ok.sh|free one\t60\tbash ${PFX}suite-slow.sh|' $B" \
     "$R --pooled --calibrate | grep 'raised from 1s'"
 
 # A ROW THE WALL KILLED WRITES NO READING, IS NAMED, AND REDS THE CALIBRATE. Its seed is removed
@@ -1083,7 +1192,7 @@ arm "a calibrate with a HIGHER reading raises that row's seconds, and prints the
 # 2026-09-14. Red when: a walled row's seconds land in the file (rc 99), or the run is green.
 arm "a row the calibrate wall kills writes NO reading, is named, and the calibrate exits RED counting it walled" 1 \
     "calibrated 1 row(s), 0 red, 1 walled, 0 untrailed, graded none" \
-    "grep -v '^free one' $E > tmp.e && mv tmp.e $E && sed -i 's|free one\t60\tbash tools/suite-ok.sh|free one\t60\tbash tools/suite-long.sh|' $B && git add -A" \
+    "grep -v '^free one' $E > tmp.e && mv tmp.e $E && sed -i 's|free one\t60\tbash ${PFX}suite-ok.sh|free one\t60\tbash ${PFX}suite-long.sh|' $B && git add -A" \
     "( SELFTEST_WALL=3 $R --pooled --calibrate; rc=\$?; grep -q '^free one' $E && exit 99; exit \$rc )"
 
 # A COMPLETED EXIT WITH NO TRAILER IS NOT A READING: a suite that exits 0 in under a second and
@@ -1091,14 +1200,14 @@ arm "a row the calibrate wall kills writes NO reading, is named, and the calibra
 # ruling 2026-09-14. Red when: the quiet exit is recorded as a reading (rc 99) or the run is green.
 arm "a suite that exits 0 with no trailer is UNTRAILED at calibrate: no reading written, the run RED" 1 \
     "calibrated 1 row(s), 0 red, 0 walled, 1 untrailed, graded none" \
-    "grep -v '^free one' $E > tmp.e && mv tmp.e $E && sed -i 's|free one\t60\tbash tools/suite-ok.sh|free one\t60\tbash tools/suite-quiet.sh|' $B && git add -A" \
+    "grep -v '^free one' $E > tmp.e && mv tmp.e $E && sed -i 's|free one\t60\tbash ${PFX}suite-ok.sh|free one\t60\tbash ${PFX}suite-quiet.sh|' $B && git add -A" \
     "( $R --pooled --calibrate; rc=\$?; grep -q '^free one' $E && exit 99; exit \$rc )"
 
 # A row the header DECLARES trailer-less is read as rc-plus-FAIL, and the gap is printed on the
 # row. NOT YET OBSERVED RED — owner ruling 2026-09-14. Red when: the declared row is untrailed.
 arm "a row the evidence header declares trailer-less is read as rc-plus-FAIL, and the gap is printed" 0 \
     "declared trailer-less: completion NOT witnessed" \
-    "sed -i '1i # no-trailer: free one' $E && sed -i 's|free one\t60\tbash tools/suite-ok.sh|free one\t60\tbash tools/suite-red.sh|' $B && git add -A" \
+    "sed -i '1i # no-trailer: free one' $E && sed -i 's|free one\t60\tbash ${PFX}suite-ok.sh|free one\t60\tbash ${PFX}suite-red.sh|' $B && git add -A" \
     "$R --pooled --calibrate"
 
 # --calibrate OFF --pooled REFUSES naming the pair and executes no suite — three spellings, the
@@ -1106,7 +1215,7 @@ arm "a row the evidence header declares trailer-less is read as rc-plus-FAIL, an
 # of them runs a row (rc 99) or writes a reading.
 arm "--serial --calibrate REFUSES naming the pair and executes no suite" 2 \
     "--calibrate modifies --pooled and nothing else, and was given with '--serial'" \
-    "sed -i 's|bash tools/suite-ok.sh|bash tools/suite-mark.sh|' $B" \
+    "sed -i 's|bash ${PFX}suite-ok.sh|bash ${PFX}suite-mark.sh|' $B" \
     "( $R --serial --calibrate; rc=\$?; [ -e ran.marker ] && exit 99; exit \$rc )"
 
 arm "--check --calibrate REFUSES naming the pair" 2 \
@@ -1117,9 +1226,9 @@ arm "--check --calibrate REFUSES naming the pair" 2 \
 # against the whole-file pooled-kit declaration, so `--check --kit <dir outside it>` redded with
 # `selects NO row` — a false red on a manual invocation. Refused by name, rc 2, never 1.
 arm "--check --kit REFUSES by name with rc 2, never a false red for a filter that selects no pooled-kit row" 2 \
-    "--check grades the WHOLE declaration and takes no --kit, and was given '--kit tools/suite-ok'" \
-    "printf '# pooled-kit: tools/elsewhere/\n' >> $E && git add -A" \
-    "$R --check --kit tools/suite-ok"
+    "--check grades the WHOLE declaration and takes no --kit, and was given '--kit ${PFX}suite-ok'" \
+    "printf '# pooled-kit: ${PFX}elsewhere/\n' >> $E && git add -A" \
+    "$R --check --kit ${PFX}suite-ok"
 
 arm "a bare --calibrate REFUSES naming the pair" 2 \
     "--calibrate modifies --pooled and nothing else, and was given with 'no mode'" \
@@ -1131,7 +1240,7 @@ arm "a bare --calibrate REFUSES naming the pair" 2 \
 # 2026-09-14. Red when: the other row ran (rc 99), or the reset ran silently.
 arm "--reset <row> narrows the calibrate to that row, runs no other, and prints the decision" 0 \
     "RESET free one under pooled@2x1 on node t: dropped its 500s reading" \
-    "bash tools/seed.sh 'free one' pooled@2x1 500 0 0 - && bash tools/seed.sh 'held one' pooled@2x1 500 0 0 - && sed -i 's|suite-ok.sh|suite-mark.sh|' $LEGS && git add -A" \
+    "bash ${PFX}seed.sh 'free one' pooled@2x1 500 0 0 - && bash ${PFX}seed.sh 'held one' pooled@2x1 500 0 0 - && sed -i 's|suite-ok.sh|suite-mark.sh|' $LEGS && git add -A" \
     "( $R --pooled --calibrate --reset 'free one'; rc=\$?; [ -e ran.marker ] && exit 99; exit \$rc )"
 
 # The reset row's seconds are LOWERED to the new reading — 500 to a sub-second suite's — with
@@ -1140,14 +1249,14 @@ arm "--reset <row> narrows the calibrate to that row, runs no other, and prints 
 # (monotone won) or readings is not 1.
 arm "--reset lowers exactly that row's seconds to the new reading, readings back at 1" 0 \
     "LOWERED free one" \
-    "bash tools/seed.sh 'free one' pooled@2x1 500 0 0 - && bash tools/seed.sh 'held one' pooled@2x1 500 0 0 -" \
+    "bash ${PFX}seed.sh 'free one' pooled@2x1 500 0 0 - && bash ${PFX}seed.sh 'held one' pooled@2x1 500 0 0 -" \
     "$R --pooled --calibrate --reset 'free one' > /dev/null; awk -F'\t' '\$1 == \"free one\" && \$4 + 0 < 500 && \$8 == 1 { print \"LOWERED \" \$0 }' $E"
 
 # And NO other row moves. NOT YET OBSERVED RED — owner ruling 2026-09-14. Red when: the other row's
 # 500 s is touched.
 arm "--reset moves no other row" 0 \
     $'held one\tpooled@2x1\tt\t500\t0\t0\t-\t1\t' \
-    "bash tools/seed.sh 'free one' pooled@2x1 500 0 0 - && bash tools/seed.sh 'held one' pooled@2x1 500 0 0 -" \
+    "bash ${PFX}seed.sh 'free one' pooled@2x1 500 0 0 - && bash ${PFX}seed.sh 'held one' pooled@2x1 500 0 0 -" \
     "$R --pooled --calibrate --reset 'free one' > /dev/null; cat $E"
 
 # --reset off --calibrate refuses; --reset naming a row the file lacks refuses; each by name.
@@ -1195,13 +1304,13 @@ arm "--check over a well-formed evidence file is green and counts its rows" 0 \
 # --check holds the rule over the rows under each `# pooled-kit:` the evidence header declares.
 # Observed RED first on a clone carrying the five kit suites the review named.
 arm "--check reds a pooled-kit row whose script prints its trailer only under [ \$st = 0 ], naming the row and the script" 1 \
-    "row 'free one': tools/suite-greenonly.sh prints no trailer outside a" \
-    "printf '#!/usr/bin/env bash\nst=1\n[ \"\$st\" = 0 ] && echo \"PASS (1 assertions)\"\nexit \$st\n' > tools/suite-greenonly.sh && printf '# pooled-kit: tools/\n' >> $E && sed -i 's|free one\t60\tbash tools/suite-ok.sh|free one\t60\tbash tools/suite-greenonly.sh|' $B && git add -A" \
+    "row 'free one': ${PFX}suite-greenonly.sh prints no trailer outside a" \
+    "printf '#!/usr/bin/env bash\nst=1\n[ \"\$st\" = 0 ] && echo \"PASS (1 assertions)\"\nexit \$st\n' > ${PFX}suite-greenonly.sh && printf '# pooled-kit: ${PFX}\n' >> $E && sed -i 's|free one\t60\tbash ${PFX}suite-ok.sh|free one\t60\tbash ${PFX}suite-greenonly.sh|' $B && git add -A" \
     "$R --check"
 
 arm "--check skips a pooled-kit row declared no-trailer and counts what it graded" 0 \
-    "trailer arm graded 1 row(s) under pooled-kit tools/ (1 declared no-trailer)" \
-    "printf '#!/usr/bin/env bash\nst=1\n[ \"\$st\" = 0 ] && echo \"PASS (1 assertions)\"\nexit \$st\n' > tools/suite-greenonly.sh && printf '# pooled-kit: tools/\n# no-trailer: free one\n' >> $E && sed -i 's|free one\t60\tbash tools/suite-ok.sh|free one\t60\tbash tools/suite-greenonly.sh|' $B && git add -A" \
+    "trailer arm graded 1 row(s) under pooled-kit ${PFX} (1 declared no-trailer)" \
+    "printf '#!/usr/bin/env bash\nst=1\n[ \"\$st\" = 0 ] && echo \"PASS (1 assertions)\"\nexit \$st\n' > ${PFX}suite-greenonly.sh && printf '# pooled-kit: ${PFX}\n# no-trailer: free one\n' >> $E && sed -i 's|free one\t60\tbash ${PFX}suite-ok.sh|free one\t60\tbash ${PFX}suite-greenonly.sh|' $B && git add -A" \
     "$R --check"
 
 arm "--check with no pooled-kit declared says the trailer arm graded NOTHING rather than passing silently" 0 \
@@ -1214,19 +1323,19 @@ arm "--check with no pooled-kit declared says the trailer arm graded NOTHING rat
 # assertion (rc 99 otherwise), and the seeded MISMATCH below is the same refusal under --pooled.
 arm "--pooled --calibrate reds a row whose output carries the no-baseline sentinel as UNTRAILED and writes no reading" 1 \
     "a group with no expected set is a refusal, not a reading" \
-    "sed -i 's|tools/suite-ok.sh|tools/suite-sentinel.sh|g' $B $LEGS && git add -A" \
+    "sed -i 's|${PFX}suite-ok.sh|${PFX}suite-sentinel.sh|g' $B $LEGS && git add -A" \
     "( $R --pooled --calibrate; rc=\$?; git diff --quiet -- $E || exit 99; exit \$rc )"
 
 arm "--pooled renders a sentinel-carrying row MISMATCH even when its (rc, fails, executed) equals the baseline" 1 \
     "a group with no expected set is a refusal, never parity" \
-    "bash tools/seed.sh 'free one' pooled@2x1 1 1 1 81 && sed -i 's|free one\t60\tbash tools/suite-ok.sh|free one\t60\tbash tools/suite-sentinel.sh|' $B" \
+    "bash ${PFX}seed.sh 'free one' pooled@2x1 1 1 1 81 && sed -i 's|free one\t60\tbash ${PFX}suite-ok.sh|free one\t60\tbash ${PFX}suite-sentinel.sh|' $B" \
     "$R --pooled"
 
 # The row's output outlives the scratch: the `observed:` line the paste is taken from is in the
 # kept file, and the row names it. rc 98 if the file lacks it, 99 if the file is absent.
 arm "a calibrate keeps each row's output under gate-logs/selftests and names the path on a row that is not ok" 1 \
     "output: " \
-    "sed -i 's|free one\t60\tbash tools/suite-ok.sh|free one\t60\tbash tools/suite-sentinel.sh|' $B && git add -A" \
+    "sed -i 's|free one\t60\tbash ${PFX}suite-ok.sh|free one\t60\tbash ${PFX}suite-sentinel.sh|' $B && git add -A" \
     "( $R --pooled --calibrate; rc=\$?; f=\$(git rev-parse --git-dir)/gate-logs/selftests/free_one.out; [ -s \"\$f\" ] || exit 99; grep -q '^    observed: ' \"\$f\" || exit 98; exit \$rc )"
 
 # AND THE KEPT COPY IS MASKED (round 2 R1), the shape of the sibling runner's redaction arm: a
@@ -1235,7 +1344,7 @@ arm "a calibrate keeps each row's output under gate-logs/selftests and names the
 # Observed RED against the runner whose copy was a bare `cp`.
 arm "a calibrate's kept per-row output masks URL userinfo and keeps the host, like the sibling runner's durable leg logs" 0 \
     "MASKED userinfo, host kept" \
-    "sed -i 's|free one\t60\tbash tools/suite-ok.sh|free one\t60\tbash tools/suite-secret.sh|' $B && git add -A" \
+    "sed -i 's|free one\t60\tbash ${PFX}suite-ok.sh|free one\t60\tbash ${PFX}suite-secret.sh|' $B && git add -A" \
     "( $R --pooled --calibrate > /dev/null; f=\$(git rev-parse --git-dir)/gate-logs/selftests/free_one.out; [ -s \"\$f\" ] || exit 99; grep -q 'u:p@' \"\$f\" && exit 98; grep -q 'example.com' \"\$f\" || exit 97; grep -q '\\*\\*\\*:\\*\\*\\*@example.com' \"\$f\" && echo 'MASKED userinfo, host kept' )"
 
 # ---------------------------------------------------------------- an unsound calibrate, D7
@@ -1243,7 +1352,7 @@ arm "a calibrate's kept per-row output masks URL userinfo and keeps the host, li
 # run UNSOUND, and an unsound calibrate writes NOTHING — the other row's clean reading included.
 arm "an UNSOUND calibrate writes no reading at all and says so, leaving the evidence file byte-unchanged" 1 \
     "readings NOT written: this calibrate was unsound" \
-    "sed -i 's|free one\t60\tbash tools/suite-ok.sh|free one\t60\tbash tools/suite-dirty.sh|' $B && git add -A" \
+    "sed -i 's|free one\t60\tbash ${PFX}suite-ok.sh|free one\t60\tbash ${PFX}suite-dirty.sh|' $B && git add -A" \
     "( $R --pooled --calibrate; rc=\$?; git diff --quiet -- $E || exit 99; exit \$rc )"
 
 # ---------------------------------------------------------------- a kill is not a completion, D8
@@ -1255,7 +1364,7 @@ arm "an UNSOUND calibrate writes no reading at all and says so, leaving the evid
 # silence about it is the observation (rc 99 otherwise).
 arm "a declared trailer-less row the wall KILLs at rc 137 is WALL, not read or killed: no reading written, the row named on the wall line" 1 \
     "(killed by the 3s calibrate wall — NO reading written)" \
-    "grep -v '^free one' $E > tmp.e && mv tmp.e $E && sed -i '1i # no-trailer: free one' $E && sed -i 's|free one\t60\tbash tools/suite-ok.sh|free one\t60\tbash tools/suite-stubborn.sh|' $B && git add -A" \
+    "grep -v '^free one' $E > tmp.e && mv tmp.e $E && sed -i '1i # no-trailer: free one' $E && sed -i 's|free one\t60\tbash ${PFX}suite-ok.sh|free one\t60\tbash ${PFX}suite-stubborn.sh|' $B && git add -A" \
     "( out=\$(SELFTEST_WALL=3 $R --pooled --calibrate); rc=\$?; printf '%s\n' \"\$out\"; grep -q '^free one' $E && exit 99; printf '%s\n' \"\$out\" | grep -q 'run wall killed: free one' || exit 98; exit \$rc )"
 
 # ---------------------------------------------------------------- GOV_NODE is a registry tag, D11
@@ -1293,14 +1402,14 @@ arm "--rank still exits 0 after a calibrate, because pooled readings never enter
 # NOT YET OBSERVED RED — owner ruling 2026-09-14. Red when: a matching red-by-design row exits 1.
 arm "a red-by-design row whose (rc, fails, executed) matches its baseline renders ok ... matched and the run exits 0" 0 \
     "ok (rc 1, 3 FAIL, 81 executed matched)" \
-    "bash tools/seed.sh 'free one' pooled@2x1 1 1 3 81 && sed -i 's|free one\t60\tbash tools/suite-ok.sh|free one\t60\tbash tools/suite-shard.sh|' $B" \
+    "bash ${PFX}seed.sh 'free one' pooled@2x1 1 1 3 81 && sed -i 's|free one\t60\tbash ${PFX}suite-ok.sh|free one\t60\tbash ${PFX}suite-shard.sh|' $B" \
     "$R --pooled"
 
 # One whose triple differs is MISMATCH naming both and the acceptance, exit 1. NOT YET OBSERVED
 # RED — owner ruling 2026-09-14. Red when: a mismatching triple exits 0 or names one triple only.
 arm "a row whose triple differs from its baseline renders MISMATCH naming both triples and the acceptance, and exits 1" 1 \
     "(rc 1, 3 FAIL, 81 executed) against baseline (rc 1, 2 FAIL, 81 executed); --calibrate to take the new baseline, --reset <row> to lower seconds" \
-    "bash tools/seed.sh 'free one' pooled@2x1 1 1 2 81 && sed -i 's|free one\t60\tbash tools/suite-ok.sh|free one\t60\tbash tools/suite-shard.sh|' $B" \
+    "bash ${PFX}seed.sh 'free one' pooled@2x1 1 1 2 81 && sed -i 's|free one\t60\tbash ${PFX}suite-ok.sh|free one\t60\tbash ${PFX}suite-shard.sh|' $B" \
     "$R --pooled"
 
 # THE FAST RED: exit 1 in under a second on an unbound variable, zero FAIL lines, no trailer,
@@ -1308,14 +1417,14 @@ arm "a row whose triple differs from its baseline renders MISMATCH naming both t
 # 2026-09-14. Red when: the crash reads as matched, which an rc-only oracle would say.
 arm "a row exiting 1 in under a second with zero FAIL lines against a baseline of three is MISMATCH" 1 \
     "(rc 1, 0 FAIL, - executed) against baseline (rc 1, 3 FAIL, 81 executed), and NO trailer in its output" \
-    "bash tools/seed.sh 'free one' pooled@2x1 1 1 3 81 && sed -i 's|free one\t60\tbash tools/suite-ok.sh|free one\t60\tbash tools/suite-crash.sh|' $B" \
+    "bash ${PFX}seed.sh 'free one' pooled@2x1 1 1 3 81 && sed -i 's|free one\t60\tbash ${PFX}suite-ok.sh|free one\t60\tbash ${PFX}suite-crash.sh|' $B" \
     "$R --pooled"
 
 # A trailer-less completion at GRADE against a seeded green row is MISMATCH too. NOT YET OBSERVED
 # RED — owner ruling 2026-09-14. Red when: the quiet exit 0 matches (0, 0, -) by numbers alone.
 arm "a suite that exits 0 with no trailer is MISMATCH at grade against a seeded green row" 1 \
     "(rc 0, 0 FAIL, - executed) against baseline (rc 0, 0 FAIL, - executed), and NO trailer in its output" \
-    "sed -i 's|free one\t60\tbash tools/suite-ok.sh|free one\t60\tbash tools/suite-quiet.sh|' $B" \
+    "sed -i 's|free one\t60\tbash ${PFX}suite-ok.sh|free one\t60\tbash ${PFX}suite-quiet.sh|' $B" \
     "$R --pooled"
 
 # THE GREEN SUMMARY names every count at zero. NOT YET OBSERVED RED — owner ruling 2026-09-14.
@@ -1329,17 +1438,17 @@ arm "a GREEN pooled summary prints killed, walled, unrun, unstarted and mismatch
 # sits under another word, or the run is green.
 arm "the summary counts a row killed at its own bound under 'killed'" 1 \
     "killed 1 · walled 0 · unrun 0 · unstarted 0 · mismatched 0" \
-    "sed -i 's|free one\t60\tbash tools/suite-ok.sh|free one\t1\tbash tools/suite-slow.sh|' $B" \
+    "sed -i 's|free one\t60\tbash ${PFX}suite-ok.sh|free one\t1\tbash ${PFX}suite-slow.sh|' $B" \
     "$R --pooled"
 
 arm "the summary counts a row the wall killed under 'walled'" 1 \
     "killed 0 · walled 1 · unrun 0 · unstarted 0 · mismatched 0" \
-    "sed -i 's|\t60\t|\t5\t|g; s|bash tools/suite-ok.sh|bash tools/suite-long.sh|g' $B && sed -i 's|suite-ok.sh|suite-mid.sh|g' $LEGS" \
+    "sed -i 's|\t60\t|\t5\t|g; s|bash ${PFX}suite-ok.sh|bash ${PFX}suite-long.sh|g' $B && sed -i 's|suite-ok.sh|suite-mid.sh|g' $LEGS" \
     "SELFTEST_WALL=10 SELFTEST_OUTER_WIDTH=1 $R --pooled"
 
 arm "the summary counts rows the wall never dispatched under 'unrun'" 1 \
     "killed 0 · walled 1 · unrun 2 · unstarted 0 · mismatched 0" \
-    "sed -i 's|\t60\t|\t5\t|g; s|bash tools/suite-ok.sh|bash tools/suite-long.sh|g' $B && sed -i 's|suite-ok.sh|suite-mid.sh|g' $LEGS && printf 'three\t5\tbash tools/suite-long.sh\tmeasured 5s on node t 2026-09-07, x1.5\nfour\t5\tbash tools/suite-long.sh\tmeasured 5s on node t 2026-09-07, x1.5\n' >> $B && bash tools/seed.sh three pooled@1x2 1 0 0 - && bash tools/seed.sh four pooled@1x2 1 0 0 - && git add -A" \
+    "sed -i 's|\t60\t|\t5\t|g; s|bash ${PFX}suite-ok.sh|bash ${PFX}suite-long.sh|g' $B && sed -i 's|suite-ok.sh|suite-mid.sh|g' $LEGS && printf 'three\t5\tbash ${PFX}suite-long.sh\tmeasured 5s on node t 2026-09-07, x1.5\nfour\t5\tbash ${PFX}suite-long.sh\tmeasured 5s on node t 2026-09-07, x1.5\n' >> $B && bash ${PFX}seed.sh three pooled@1x2 1 0 0 - && bash ${PFX}seed.sh four pooled@1x2 1 0 0 - && git add -A" \
     "SELFTEST_WALL=10 SELFTEST_OUTER_WIDTH=1 $R --pooled"
 
 # THE WORKER-DEATH CLASS: an unbound variable under `set -u` inside the fixture's copy of the
@@ -1354,7 +1463,7 @@ arm "a worker dying under set -u before its verdict file is counted under 'unsta
 
 arm "the summary counts a completed row that missed its baseline under 'mismatched'" 1 \
     "killed 0 · walled 0 · unrun 0 · unstarted 0 · mismatched 1" \
-    "sed -i 's|free one\t60\tbash tools/suite-ok.sh|free one\t60\tbash tools/suite-red.sh|' $B" \
+    "sed -i 's|free one\t60\tbash ${PFX}suite-ok.sh|free one\t60\tbash ${PFX}suite-red.sh|' $B" \
     "$R --pooled"
 
 # THE WITHHELD LINE THE KIT RUNNER PARSES SURVIVES parity, because §3's first non-goal keeps the
@@ -1362,7 +1471,7 @@ arm "the summary counts a completed row that missed its baseline under 'mismatch
 # red-by-design row is not counted as a withheld cost verdict.
 arm "a matched red-by-design row still counts as a WITHHELD cost verdict" 0 \
     "2 cost verdict(s) WITHHELD under pooled@2x1" \
-    "bash tools/seed.sh 'free one' pooled@2x1 1 1 3 81 && sed -i 's|free one\t60\tbash tools/suite-ok.sh|free one\t60\tbash tools/suite-shard.sh|' $B" \
+    "bash ${PFX}seed.sh 'free one' pooled@2x1 1 1 3 81 && sed -i 's|free one\t60\tbash ${PFX}suite-ok.sh|free one\t60\tbash ${PFX}suite-shard.sh|' $B" \
     "$R --pooled"
 
 run_arms run-selftests.test.sh

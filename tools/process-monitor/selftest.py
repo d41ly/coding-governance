@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """selftest.py — the process-monitor engine's arms.
 
-gov:kit process-monitor@0.7
+gov:kit process-monitor@0.11
 
 Two kinds of arm and the split is deliberate. PARSING arms run over captured fixtures, so they grade
 column contracts without a live table. LIVENESS arms run over a live read, because a property like
@@ -17,6 +17,24 @@ import shutil
 import subprocess
 import sys
 import tempfile
+
+
+def derive_install_prefix() -> str:
+    """The install prefix WITH its trailing slash, derived from where this file sits and empty at a
+    root install. Every fixture and host path the self-test builds is spelled through it, never
+    through a literal prefix (TOOL-aRepatriatedFork-28)."""
+    import pathlib
+    here = pathlib.Path(__file__).resolve().parent
+    for anc in here.parents:
+        if (anc / ".git").exists():
+            rel = here.parent.relative_to(anc).as_posix()
+            return "" if rel == "." else rel + "/"
+    raise SystemExit(f"{pathlib.Path(__file__).name}: not inside a git repository, so there is no "
+                     "install prefix to derive")
+
+
+PFX = derive_install_prefix()
+
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
@@ -299,6 +317,11 @@ def main():
     for name, fn in sorted(globals().items()):
         if name.startswith("test_") and callable(fn):
             fn()
+            # FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+            if os.environ.get("FOREIGN_PREFIX_PROBE") == "1":
+                print("foreign-prefix-probe: stopped after 1 arm")
+                print("FAIL (1 assertions)" if FAIL else "PASS (1 assertions)")
+                return 1 if FAIL else 0
     print("\nprocess-monitor census: %d passed, %d failed (%d assertions)"
           % (len(PASS), len(FAIL), len(PASS) + len(FAIL)))
     return 1 if FAIL else 0
@@ -421,7 +444,7 @@ def test_assignment_inside_a_dash_c_body_does_not_admit():
 
 def test_a_real_path_inside_a_dash_c_body_does_admit():
     """The other direction: the tokenizer must not simply discard `-c` bodies."""
-    rows = [build_row(31, 1, "bash -c \"/c/projects/gov/tools/run.sh --flag\"")]
+    rows = [build_row(31, 1, f"bash -c \"/c/projects/gov/{PFX}run.sh --flag\"")]
     sc, _ = scope.derive_scope(rows, ROOTS)
     check("test_a_real_path_inside_a_dash_c_body_does_admit", 31 in sc, True)
 

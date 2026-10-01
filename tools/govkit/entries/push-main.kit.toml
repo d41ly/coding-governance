@@ -1,18 +1,18 @@
-# kit.toml — this entry, declared as data. Read by tools/govkit/. Contract: the deployer unit's spec under memory/builds/aSealedCaravan/spec/.
+# kit.toml — this entry, declared as data. Read by <prefix>/govkit/. Contract: the deployer unit's spec under memory/builds/aSealedCaravan/spec/.
 
 id = "push-main"
 scope = "repo"
 kind = "flat"
-home = "tools"
+home = "."
 version_from = { none = "no version constant exists; measured 2026-08-11. Prescribed for copy by the runbook and detectable only by its sentinel path." }
 requires = []
-sentinel = "tools/push-main.sh"
+sentinel = "push-main.sh"
 
 [[files]]
 include = ["push-main.sh", "push-main.test.sh"]
 role = "engine"
 to = "{prefix}/{relpath}"
-claims = ["tools/push-main.sh", "tools/push-main.test.sh"]
+claims = ["{prefix}/push-main.sh", "{prefix}/push-main.test.sh"]
 
 # A verbatim repo-root destination with no prefix at all — the class the guard table calls
 # "verbatim repo-root", emitted under the identity substitution.

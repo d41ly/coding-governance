@@ -138,7 +138,7 @@ a path no spec cites, or one the tree now tracks, refuses — a stale exception 
 - `tools/gate-legs.json` — the manifest is READ for leg names, never mirrored. It is the single
   source for what the bar runs, and this join adds no second list.
 - `memory/project/*.txt` — the shrink-only registry convention, shared with
-  `testsuite-count-waivers.txt` and `install-prefix-waivers.txt`. Same directory, same
+  `testsuite-count-waivers.txt`. Same directory, same
   stale-row-reds rule, and hygiene check 3's allowed set names it so a stray file there still reds.
 - `git ls-files` — the tracked-path oracle, the same population every other gate here grades
   against. A gate that read the filesystem instead would pass on an unstaged file.

@@ -76,13 +76,97 @@ add_arm_seen() { ARMS_SEEN="$ARMS_SEEN$1|"; }
 # ------------------------------------------------------------------------------ the scratch clone
 # A MISSING CAPABILITY IS A FAILURE HERE, not a skip: these arms are the only observation the writer
 # has, and a suite that skipped them would print a count that proves nothing.
-PY=""
-if [ -f "$HERE/../lib/resolve-python.sh" ]; then
-  # shellcheck source=/dev/null
-  . "$HERE/../lib/resolve-python.sh"
-  PY=$(resolve_python 2>/dev/null) || PY=""
-fi
-RUNLOG_KIT="$HERE/../runlog"
+# TOOL-aRepatriatedFork-46: a kit is named by the name its directory has in THIS install, never
+# as a literal segment: this suite's own from where it sits, a sibling's through the resolver,
+# which reads the install receipt first. A fixture mirrors that layout by the resolved NAME.
+# >>> resolve_python — canonical copy: resolve-python.sh in gov's lib dir (byte-identical; gated)
+resolve_python() {
+  # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
+  # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
+  # the candidate and every consumer uses "$PY" as a single word (measured: exit 127).
+  _rp_tried=""
+  for _rp_c in "${1:-}" "${GOV_PYTHON:-}" python3 python py; do
+    [ -n "$_rp_c" ] || continue
+    _rp_tried="$_rp_tried $_rp_c"
+    if "$_rp_c" -c "import sys" >/dev/null 2>&1; then
+      printf '%s\n' "$_rp_c"
+      return 0
+    fi
+  done
+  {
+    echo "resolve_python: no usable python launcher. Each candidate was RUN with -c 'import sys' and"
+    echo "resolve_python: none exited 0 — being on PATH is not evidence (the Microsoft Store python3"
+    echo "resolve_python: stub answers \`command -v\` and exits 9009 without running anything)."
+    echo "resolve_python: tried:$_rp_tried"
+    if [ -n "${1:-}" ]; then
+      echo "resolve_python: the caller's override '$1' was tried FIRST and did not run."
+    fi
+    if [ -n "${GOV_PYTHON:-}" ]; then
+      echo "resolve_python: GOV_PYTHON is set to '$GOV_PYTHON' and did not run. An override that is"
+      echo "resolve_python: set and unusable is THIS failure, never a silent fall-through — the"
+      echo "resolve_python: operator believes they chose, and would not have."
+    fi
+  } >&2
+  return 1
+}
+# <<< resolve_python
+# The sibling-kit resolver (TOOL-aRepatriatedFork-2 S3), INLINED byte-identically from the
+# canonical copy named on its marker line and gated by the resolve-python self-test's parity
+# table. A shell consumer runs it with the python it already resolved, so the receipt rung is
+# read in Python and never parsed in bash. `resolve_kit_dir <python> <home> <anchor> <here>`
+# prints the kit directory REPO-RELATIVE, or the resolver's named refusal on stderr and exits 1.
+resolve_kit_dir() {
+  "$1" -c "$(cat <<'RKD'
+# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
+def resolve_kit_dir(home, anchor, here):
+    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
+
+    1. receipt — the `.governance/install.json` row whose `source` ends in <home>/<anchor> and
+       whose `path` exists inside this tree. The only record of a RENAMED kit dir: no probe finds
+       a memory-recall kit an adopter homed at `scripts/recall/`.
+    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
+    3. refuse — LookupError naming the three places looked; never a guessed prefix.
+    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
+    """
+    import json
+    import pathlib
+    here = pathlib.Path(here).absolute()  # never resolve(): a junction must not move it
+    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
+    receipt = root / ".governance" / "install.json"
+    try:
+        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("path"):
+            continue
+        if str(row.get("source") or "").split("/")[-2:] != [home, anchor]:
+            continue
+        hit = (root / str(row["path"])).absolute()
+        if hit.is_file() and root in hit.parents and ".." not in hit.parts:
+            return hit.parent
+    probes = (here / home, here.parent / home)
+    for cand in probes:
+        if (cand / anchor).is_file():
+            return cand
+    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
+        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
+# <<< resolve_kit_dir
+RKD
+)"'
+import sys
+try:
+    d = resolve_kit_dir(*sys.argv[1:4])
+except LookupError as e:
+    sys.exit(str(e))
+r = next((p for p in (d, *d.parents) if (p / ".git").exists()), d.anchor)
+print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
+}
+PY=$(resolve_python 2>/dev/null) || PY=""
+KIT="${HERE##*/}"
+RUNLOG_KIT=""
+[ -n "$PY" ] && RUNLOG_KIT=$(resolve_kit_dir "$PY" runlog runlog_lib.py "$HERE" 2>/dev/null) \
+  && RUNLOG_KIT="$(git -C "$HERE" rev-parse --show-toplevel)/$RUNLOG_KIT"
 [ -n "$PY" ] && [ -f "$RUNLOG_KIT/runlog_lib.py" ] || {
   echo "FAIL no python, or no runlog kit beside this one: the journal cannot be graded, so nothing below can be"; exit 1; }
 # AC3 LAUNCHES THROUGH `timeout --foreground`, and INT is the reason. An `&` job of a shell with no job
@@ -205,6 +289,8 @@ check_ac1_red() {
   write_legs ac1-prev '[{"name": "passing leg", "argv": ["bash", "fx/ok.sh"]}]'
   run_bar GATE_LEGS="$WORK/ac1-prev.json"
   check "AC1 the previous bar is green" "$RC" 0
+  # FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+  if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${st:-0}" = 0 ] && echo "PASS ($n assertions)" || echo "FAIL ($n assertions)"; [ "${st:-0}" = 0 ] && exit 0; exit 1; fi
   write_legs ac1 '[{"name": "passing leg", "argv": ["bash", "fx/ok.sh"]}, {"name": "failing leg", "argv": ["bash", "fx/red.sh"]}]'
   l0=$(measure_lines)
   run_bar GATE_LEGS="$WORK/ac1.json" GATE_RUN_ID=push-1-1
@@ -430,9 +516,9 @@ measure_execs() { # trace file · the runner it traced -> "<count> <sorted names
 
 build_traced_runner() { # side · runner source -> a copy with its siblings, OUTSIDE the scratch tree
   mkdir -p "$WORK/traced-$1/run-gates"
-  cp "$2" "$WORK/traced-$1/run-gates/run-gates.sh"
+  cp "$2" "$WORK/traced-$1/${KIT}/run-gates.sh"
   cp "$HERE/gate-fingerprint.sh" "$HERE/gate-profiles.txt" "$WORK/traced-$1/run-gates/"
-  printf '%s' "$WORK/traced-$1/run-gates/run-gates.sh"
+  printf '%s' "$WORK/traced-$1/${KIT}/run-gates.sh"
 }
 
 run_traced() { # trace file · runner · NAME=VALUE... -> one bar under xtrace into the file
@@ -649,7 +735,7 @@ scan_exit_sites() { # file... -> one TAB-separated row per shell exit
 # as a count that moved rather than as a match.
 cat > "$WORK/exits.tsv" <<'EXITS'
 echo "run-gates: cannot create the run record at $RUNDIR" >&2; exit 2	1	AC8 run-dir
-' "$LEGS_FILE" "$TIMINGS") || { echo "run-gates: cannot parse $LEGS_FILE"; exit 2; }	1	AC8 manifest
+' "$LEGS_FILE" "$TIMINGS" "$(dirname "$KITREL")") || { echo "run-gates: cannot parse $LEGS_FILE"; exit 2; }	1	AC8 manifest
 kill -0 "$_me" 2>/dev/null || exit 0	1	exempt: the wall watcher's ( … ) & subshell, which runs no trap of the runner's
 [ -f "$_work/wall.disarm" ] && exit 0	1	exempt: the wall watcher's ( … ) & subshell, which runs no trap of the runner's
 cd "$dir" || exit 97	1	exempt: run_leg_at's ( … ) subshell, from TOOL-dDerivedDocket-23's red attribution, which runs no trap of the runner's

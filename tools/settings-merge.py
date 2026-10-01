@@ -2,10 +2,10 @@
 """settings-merge.py — idempotently wire a hook into a target repo's .claude/settings.json.
 Stdlib only (json, argparse, pathlib); py>=3.10 (write_text newline=).
 
-# gov:kit settings-merge@1.9
+# gov:kit settings-merge@1.16
 
 The default hook, with no --fragment (shape mirrors WIRE-INTO-PROJECT.md and
-tools/hooks/agent-cap.js verbatim):
+<prefix>/hooks/agent-cap.js verbatim):
 
     {"hooks": {"PreToolUse": [
       {"matcher": "Workflow|Agent",
@@ -18,11 +18,11 @@ groups under that event are preserved; a foreign command inside the matcher grou
 
 A wired target is DETECTED by grepping the fragment's `marker` in .claude/settings.json — JSON
 carries no comment marker, so that command substring IS the deployer's "is-it-wired?" signal, and
-it is what tools/check-wiring.sh joins each arm on.
+it is what <prefix>/check-wiring.sh joins each arm on.
 
 Usage:
-    python tools/settings-merge.py [SETTINGS_FILE] [--fragment F] [--hook-path P] [--check]
-    python tools/settings-merge.py --selftest      (or: --resolve-fragment F)
+    python <prefix>/settings-merge.py [SETTINGS_FILE] [--fragment F] [--hook-path P] [--check]
+    python <prefix>/settings-merge.py --selftest      (or: --resolve-fragment F)
       SETTINGS_FILE  default .claude/settings.json (resolved from cwd = target repo root)
       --fragment     a JSON file declaring {name, event, matcher, marker, hook_path} plus the
                      optional {interpreter, args}; omitted = the built-in agent-cap PreToolUse
@@ -72,8 +72,49 @@ import sys
 import tempfile
 from pathlib import Path, PurePosixPath
 
-KIT_SETTINGS_MERGE_VERSION = "1.9"  # gov:kit settings-merge@1.9 — engine identity
+# TOOL-aRepatriatedFork-46: a SIBLING kit is reached through the resolver, which reads the install receipt
+# first, never by joining its name to this file's own directory.
+# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
+def resolve_kit_dir(home, anchor, here):
+    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
+
+    1. receipt — the `.governance/install.json` row whose `source` ends in <home>/<anchor> and
+       whose `path` exists inside this tree. The only record of a RENAMED kit dir: no probe finds
+       a memory-recall kit an adopter homed at `scripts/recall/`.
+    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
+    3. refuse — LookupError naming the three places looked; never a guessed prefix.
+    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
+    """
+    import json
+    import pathlib
+    here = pathlib.Path(here).absolute()  # never resolve(): a junction must not move it
+    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
+    receipt = root / ".governance" / "install.json"
+    try:
+        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("path"):
+            continue
+        if str(row.get("source") or "").split("/")[-2:] != [home, anchor]:
+            continue
+        hit = (root / str(row["path"])).absolute()
+        if hit.is_file() and root in hit.parents and ".." not in hit.parts:
+            return hit.parent
+    probes = (here / home, here.parent / home)
+    for cand in probes:
+        if (cand / anchor).is_file():
+            return cand
+    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
+        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
+# <<< resolve_kit_dir
+
+KIT_SETTINGS_MERGE_VERSION = "1.16"  # gov:kit settings-merge@1.16 — engine identity
 HOOK_MARKER = "agent-cap.js"  # the loose join: dedup key AND the deployer's "is-it-wired?" grep target
+# The kit NAME a hook path carries when no hooks kit resolves in this install. It names the miss and
+# exists nowhere, so `main`'s existence refusal fires on it. Spelled once: the selftest reads it too.
+NO_HOOKS_KIT = "no-agent-cap-kit-resolved"
 
 
 def _kit_rel() -> str:
@@ -92,7 +133,7 @@ def _kit_rel() -> str:
     try:
         return Path(__file__).resolve().parent.relative_to(Path.cwd().resolve()).as_posix()
     except (ValueError, OSError):
-        return "tools"  # gov:prefix-literal — a name-only default when run from outside the tree it writes into; whether it should refuse instead is the settings-merge owner's call (TOOL-aRepatriatedFork-2 section 8 F4)
+        return "tools"  # a name-only default when run from outside the tree it writes into; whether it should refuse instead is the settings-merge owner's call (TOOL-aRepatriatedFork-2 section 8 F4)
 
 
 # A path fragment and nothing else — the character class govkit's own `demand_safe_token` grades
@@ -140,15 +181,46 @@ def _load_declared_prefix(kit_id: str, root: Path = Path(".")) -> str | None:
     return pfx
 
 
+def _resolve_agent_cap_dir() -> Path | None:
+    """agent-cap's kit directory in THIS install, through the sibling-kit resolver, or None.
+
+    TOOL-aRepatriatedFork-46: the receipt is read first, so a hooks kit homed under another name is
+    found; the probes are this file's own directory and its parent, which is where the kit's NAME
+    used to be typed after this file's prefix.
+    """
+    try:
+        return resolve_kit_dir("hooks", "agent-cap.js", Path(__file__).resolve().parent)
+    except LookupError:
+        return None
+
+
 def _resolve_agent_cap_hook_path(root: Path = Path(".")) -> str:
-    """agent-cap's shipped copy: the target's declaration first, this file's own location second.
+    """agent-cap's shipped copy: the resolved kit where it sits in the target, else the declaration.
 
     ONE composition, in one place, so the arm that stages the break has something to red on. It is
     also the only reader of `_load_declared_prefix`: the `{kit}` fragments need no lookup at all,
     because a fragment ships beside its hook, so resolving `{kit}` against the FRAGMENT's own
     location already follows whatever prefix that kit was installed at.
+
+    TOOL-aRepatriatedFork-46: the sibling-kit resolver answers first, because it reads the install
+    receipt, which records where the kit LANDED. A top-level `prefix` answers where kits go by
+    default, and a hooks kit homed under another name contradicted it: the declaration named a path
+    the receipt had moved. The declaration still answers where the resolver finds no kit inside the
+    target, joined to the kit directory's NAME in this install. A kit found nowhere yields a path that
+    names the miss and exists nowhere, so the existence refusal in `main` fires on it: the wiring is
+    REFUSED, never pointed at a guessed prefix.
     """
-    return (_load_declared_prefix("agent-cap", root) or _kit_rel()) + "/hooks/agent-cap.js"
+    kit = _resolve_agent_cap_dir()
+    if kit is not None:
+        try:
+            return kit.relative_to(Path(root).resolve()).as_posix() + "/agent-cap.js"
+        except ValueError:
+            pass  # a kit outside the target this merge writes into
+    name = kit.name if kit is not None else NO_HOOKS_KIT
+    declared = _load_declared_prefix("agent-cap", root)
+    if declared:
+        return f"{declared}/{name}/agent-cap.js"
+    return f"{_kit_rel()}/{name}/agent-cap.js"
 
 
 # The built-in fragment. Identical to the three values this script hardcoded before --fragment
@@ -471,6 +543,15 @@ def run(settings_file: str, hook_path: str, check: bool, frag: dict = AGENT_CAP,
 
 
 def _selftest() -> int:
+    here = Path(__file__).resolve().parent
+
+    def resolve_sibling(home: str, name: str) -> Path | None:
+        """A SIBLING kit's file through the resolver (TOOL-aRepatriatedFork-46), or None where it is absent."""
+        try:
+            return resolve_kit_dir(home, name, here) / name
+        except LookupError:
+            return None
+
     hp = ".claude/hooks/agent-cap.js"
     cmd = render_command(hp)
     with tempfile.TemporaryDirectory() as d:
@@ -595,7 +676,7 @@ def _selftest() -> int:
         # 12) a PER-ENTRY `prefix` in the target's deploy.toml decides agent-cap's home, and this
         #     file's own location does not. Staged as the reported break: settings-merge at the
         #     top-level prefix, the hook at its own. Before the fix the composition below read
-        #     "scripts/hooks/agent-cap.js" and the merge refused a settings.json that was correct.
+        #     the top-level prefix joined to the hook's own path, and the merge refused a settings.json that was correct.
         gov = root / "dep" / ".governance"
         gov.mkdir(parents=True)
         dep = gov / "deploy.toml"
@@ -604,8 +685,14 @@ def _selftest() -> int:
         # THE COMPOSITION, not just the reader: reverting the lookup has to red something. This
         # assertion is what fails on the pre-fix engine, which answered "<this file's prefix>/hooks/
         # agent-cap.js" and then refused to wire a tree whose settings.json was already right.
-        assert _resolve_agent_cap_hook_path(gov.parent) == ".claude/hooks/agent-cap.js"
-        assert _resolve_agent_cap_hook_path(root).endswith("/hooks/agent-cap.js")     # no deploy.toml -> derived
+        # The hooks kit's directory NAME in this install, or the miss name where no hooks kit sits
+        # beside this file: the entry declares `requires = []`, so a settings-merge-only install is
+        # legal, and `.name` on the None the resolver returns there crashed this arm (closing
+        # review round 1 M4). The composition asserted below is the same either way.
+        _hk_dir = _resolve_agent_cap_dir()
+        _hk = _hk_dir.name if _hk_dir is not None else NO_HOOKS_KIT
+        assert _resolve_agent_cap_hook_path(gov.parent) == f".claude/{_hk}/agent-cap.js"
+        assert _resolve_agent_cap_hook_path(root).endswith(f"/{_hk}/agent-cap.js")     # no deploy.toml -> derived
         assert _load_declared_prefix("agent-cap", gov.parent) == ".claude"
         assert _load_declared_prefix("settings-merge", gov.parent) == "scripts"   # falls back to top-level
         assert _load_declared_prefix("agent-cap", root) is None                   # no deploy.toml at all
@@ -618,8 +705,8 @@ def _selftest() -> int:
 
         # 10) the SHIPPED fragment beside this script parses and declares the schema check-wiring
         #     joins on. Skipped, not failed, in a project that did not adopt memory-recall.
-        shipped = Path(__file__).resolve().parent / "memory-recall" / "recall-opened.fragment.json"  # gov:prefix-literal — selftest arm, skipped where no kit sits beside this file
-        if shipped.is_file():
+        shipped = resolve_sibling("memory-recall", "recall-opened.fragment.json")
+        if shipped is not None and shipped.is_file():
             got = load_fragment(shipped)
             # The shipped hook_path is `{here}`-relative (TOOL-aRepatriatedFork-2 S4), so a renamed
             # kit dir resolves; the fixture above keeps `{kit}` because it has no fragment file.
@@ -634,8 +721,6 @@ def _selftest() -> int:
         #     re-match. The four fragments are located the way the arms locate them — beside this
         #     script in an adopter, at the kit's home in gov — and an arm whose subject is absent
         #     SAYS so rather than passing over nothing.
-        here = Path(__file__).resolve().parent
-
         def resolve_shipped(*cands: Path) -> Path | None:
             return next((c for c in cands if c.is_file()), None)
 
@@ -644,7 +729,7 @@ def _selftest() -> int:
         replay = resolve_shipped(here / "orientation-replay.fragment.json",
                             here.parent / "skills" / "session-kickoff" / "orientation-replay.fragment.json")
         cw = resolve_shipped(here / "check-wiring.fragment.json")
-        pm = resolve_shipped(here / "process-monitor" / "procmon-session.fragment.json")  # gov:prefix-literal — a loose engine at the tool root: here/<home> is the resolver's own first probe
+        pm = resolve_sibling("process-monitor", "procmon-session.fragment.json")
 
         # 13) the render: a bash fragment with arguments lands as UNQUOTED tokens after the quoted
         #     path, `{here}` resolves to the fragment's own directory, and the token never survives.
@@ -758,7 +843,7 @@ def _selftest() -> int:
             #      substring (`--write-log`) but not the writer's basename survives the card merge
             #      byte-identical and in its own group; the card lands beside it under its matcher.
             sf14c = root / "s14c.json"
-            foreign = 'node "${CLAUDE_PROJECT_DIR}/tools/mine.js" --write-log'
+            foreign = 'node "${CLAUDE_PROJECT_DIR}/vendor/mine.js" --write-log'
             sf14c.write_text(json.dumps({"hooks": {"SessionStart": [
                 {"matcher": "startup", "hooks": [{"type": "command", "command": foreign}]}]}}) + "\n",
                 encoding="utf-8")
@@ -772,9 +857,9 @@ def _selftest() -> int:
 
         # 14b) the three fragments shipped BEFORE the optional keys render byte-identically to the
         #      pre-1.4 shape: the command is the interpreter default, the path, and nothing after.
-        for older in (here / "hooks" / "scratch-guard.fragment.json",  # gov:prefix-literal — a loose engine at the tool root: here/<home> is the resolver's own first probe
-                      here / "process-monitor" / "procmon-hook.fragment.json", shipped):  # gov:prefix-literal — a loose engine at the tool root: here/<home> is the resolver's own first probe
-            if older.is_file():
+        for older in (resolve_sibling("hooks", "scratch-guard.fragment.json"),
+                      resolve_sibling("process-monitor", "procmon-hook.fragment.json"), shipped):
+            if older is not None and older.is_file():
                 fr = load_fragment(older)
                 rp = resolve_hook_path(fr["hook_path"], str(older))
                 assert render_command(rp, fr["interpreter"], fr["args"]) == f'node "${{CLAUDE_PROJECT_DIR}}/{rp}"', older
@@ -893,6 +978,22 @@ def _selftest() -> int:
                   + ("git is not available" if frags is None
                      else "no check-wiring.sh beside this script" if not cwsh.is_file()
                      else "no bash on PATH shares this filesystem"))
+
+        # 18) THIS FILE ALONE (closing review round 1 M4). The entry declares `requires = []`, so a
+        #     target may install settings-merge with no hooks kit beside it, and arm 12 read `.name`
+        #     off the None the resolver returns there. The whole selftest re-runs from a copy in a
+        #     scratch root holding nothing else; the copy's own run does not recurse.
+        if not os.environ.get("SETTINGS_MERGE_SELFTEST_ALONE"):
+            alone = root / "alone"
+            (alone / ".git").mkdir(parents=True)
+            copy = alone / "scripts" / Path(__file__).name
+            copy.parent.mkdir()
+            copy.write_bytes(Path(__file__).read_bytes())
+            got = subprocess.run([sys.executable, str(copy), "--selftest"], capture_output=True,
+                                 text=True, encoding="utf-8", cwd=alone,
+                                 env=dict(os.environ, SETTINGS_MERGE_SELFTEST_ALONE="1"))
+            assert got.returncode == 0 and "selftest: PASS" in got.stdout, \
+                f"a settings-merge-only install failed its own selftest: {(got.stdout + got.stderr)[-600:]}"
 
     print("settings-merge selftest: PASS")
     return 0

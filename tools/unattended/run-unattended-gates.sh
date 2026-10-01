@@ -26,7 +26,7 @@
 # `.github/workflows/remote-ci.yml` runs each one AFTER landing, under its hang bound and with no
 # cost verdict (TOOL-dDerivedDocket-32); an adopter's tree has that schedule only if it writes one.
 # So a change under this directory that guts a check still lands green. The compensating check is
-# a person invoking this script, and the DoD for any work touching `tools/unattended/` is ONE of two
+# a person invoking this script, and the DoD for any work touching `<prefix>/unattended/` is ONE of two
 # verdicts pasted into the landing report: a GREEN parity verdict from `--selftests --pooled`, or
 # `--selftests --serial --attribute <BASE>` reading `verdict clean` — no NEW FAIL, no DEAD PROBE at
 # L and no OVER BUDGET at L — with every suite reporting an INHERITED FAIL or a DEAD PROBE at R
@@ -58,7 +58,96 @@ cd "$ROOT" || exit 2
 # prefix, so at another install `--selftests` ran a missing script and the filter matched nothing.
 KIT_REL=$(git -C "$HERE" rev-parse --show-prefix 2>/dev/null) || KIT_REL=""
 KIT_REL=${KIT_REL%/}
-RUNNER="$(dirname -- "$HERE")/run-gates/run-selftests.sh"
+# TOOL-aRepatriatedFork-46: the runner's kit is a SIBLING, found through the resolver, which reads the
+# install receipt before it probes beside this kit and one level up, rather than typed after this
+# kit's parent. A miss leaves RUNNER naming the miss, and the route that needs it refuses by name.
+# >>> resolve_python — canonical copy: resolve-python.sh in gov's lib dir (byte-identical; gated)
+resolve_python() {
+  # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
+  # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
+  # the candidate and every consumer uses "$PY" as a single word (measured: exit 127).
+  _rp_tried=""
+  for _rp_c in "${1:-}" "${GOV_PYTHON:-}" python3 python py; do
+    [ -n "$_rp_c" ] || continue
+    _rp_tried="$_rp_tried $_rp_c"
+    if "$_rp_c" -c "import sys" >/dev/null 2>&1; then
+      printf '%s\n' "$_rp_c"
+      return 0
+    fi
+  done
+  {
+    echo "resolve_python: no usable python launcher. Each candidate was RUN with -c 'import sys' and"
+    echo "resolve_python: none exited 0 — being on PATH is not evidence (the Microsoft Store python3"
+    echo "resolve_python: stub answers \`command -v\` and exits 9009 without running anything)."
+    echo "resolve_python: tried:$_rp_tried"
+    if [ -n "${1:-}" ]; then
+      echo "resolve_python: the caller's override '$1' was tried FIRST and did not run."
+    fi
+    if [ -n "${GOV_PYTHON:-}" ]; then
+      echo "resolve_python: GOV_PYTHON is set to '$GOV_PYTHON' and did not run. An override that is"
+      echo "resolve_python: set and unusable is THIS failure, never a silent fall-through — the"
+      echo "resolve_python: operator believes they chose, and would not have."
+    fi
+  } >&2
+  return 1
+}
+# <<< resolve_python
+# The sibling-kit resolver (TOOL-aRepatriatedFork-2 S3), INLINED byte-identically from the
+# canonical copy named on its marker line and gated by the resolve-python self-test's parity
+# table. A shell consumer runs it with the python it already resolved, so the receipt rung is
+# read in Python and never parsed in bash. `resolve_kit_dir <python> <home> <anchor> <here>`
+# prints the kit directory REPO-RELATIVE, or the resolver's named refusal on stderr and exits 1.
+resolve_kit_dir() {
+  "$1" -c "$(cat <<'RKD'
+# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
+def resolve_kit_dir(home, anchor, here):
+    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
+
+    1. receipt — the `.governance/install.json` row whose `source` ends in <home>/<anchor> and
+       whose `path` exists inside this tree. The only record of a RENAMED kit dir: no probe finds
+       a memory-recall kit an adopter homed at `scripts/recall/`.
+    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
+    3. refuse — LookupError naming the three places looked; never a guessed prefix.
+    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
+    """
+    import json
+    import pathlib
+    here = pathlib.Path(here).absolute()  # never resolve(): a junction must not move it
+    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
+    receipt = root / ".governance" / "install.json"
+    try:
+        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("path"):
+            continue
+        if str(row.get("source") or "").split("/")[-2:] != [home, anchor]:
+            continue
+        hit = (root / str(row["path"])).absolute()
+        if hit.is_file() and root in hit.parents and ".." not in hit.parts:
+            return hit.parent
+    probes = (here / home, here.parent / home)
+    for cand in probes:
+        if (cand / anchor).is_file():
+            return cand
+    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
+        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
+# <<< resolve_kit_dir
+RKD
+)"'
+import sys
+try:
+    d = resolve_kit_dir(*sys.argv[1:4])
+except LookupError as e:
+    sys.exit(str(e))
+r = next((p for p in (d, *d.parents) if (p / ".git").exists()), d.anchor)
+print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
+}
+RUNNER="<no run-gates kit resolved beside $HERE>/run-selftests.sh"
+if _rug_py=$(resolve_python 2>/dev/null) && _rug_rg=$(resolve_kit_dir "$_rug_py" run-gates run-selftests.sh "$HERE" 2>/dev/null); then
+  RUNNER="$ROOT/$_rug_rg/run-selftests.sh"
+fi
 SELF="${KIT_REL:+$KIT_REL/}$(basename -- "$0")"
 
 # ---- THE BUDGET, AND IT IS A VERDICT RATHER THAN A COMPLAINT. A check nobody can afford to run is a
@@ -129,7 +218,7 @@ BUDGET_pass_order_history=1800 # TOOL-aStagedLane-1 widened the population to bu
                               # this edit.
 # ---- THE TWO *_selftest BUDGETS THAT USED TO SIT HERE ARE GONE, and their absence is the merge
 # ---- rather than a deletion: TOOL-aQuenchedHarness-4 moved every self-test budget into
-# ---- `tools/run-gates/selftest-budgets.txt`, and this branch and main each added a suite while
+# ---- `<prefix>/run-gates/selftest-budgets.txt`, and this branch and main each added a suite while
 # ---- the other was in flight. `BUDGET_brief_recorded` stays because its leg is a REPOSITORY
 # ---- check on the merge bar, which is the line this delegation does not cross.
 BUDGET_brief_recorded=900     # measured 38 s on node `a` 2026-09-05, on the day it landed, when the
@@ -298,7 +387,7 @@ fi
 # from a spawn count and a per-spawn cost, both measured, and not from a stopwatch on the whole thing.
 # The equivalence that replaces it is 19 staged breaks, 18 of them red, whose output and exit status
 # are byte-identical before and after the unit. To settle it, one command:
-#   bash tools/unattended/run-unattended-gates.sh --selftests --serial
+#   bash <prefix>/unattended/run-unattended-gates.sh --selftests --serial
 
 st=0
 ran=0
@@ -340,13 +429,13 @@ run_one "pass-order history"        checks bash "$HERE/check-pass-order.sh"
 run_one "brief-recorded"            checks bash "$HERE/check-brief-recorded.sh"
 
 # THE SELF-TEST HALF IS DELEGATED. TOOL-aQuenchedHarness-4 S7. These six suites are now rows in
-# `tools/run-gates/selftest-budgets.txt` alongside every other kit's, and one runner executes them
+# `<prefix>/run-gates/selftest-budgets.txt` alongside every other kit's, and one runner executes them
 # all -- which is what the 2026-08-23 ruling always implied and what this file could only do for one
 # kit. Their budgets travelled with them; the `--checks` half above keeps its own, because those four
 # are REPOSITORY checks that stay on the merge bar and are not this delegation's business.
 #
 # WHY THEY WERE THE HARD CASE, recorded because it is why the population is declared rather than
-# derived: the ruling removed all six from `tools/gate-legs.json` AND from `tools/unattended/kit.toml`,
+# derived: the ruling removed all six from `<prefix>/gate-legs.json` AND from `<prefix>/unattended/kit.toml`,
 # so they exist in no manifest at all. A runner deriving its population from held manifest legs sees
 # none of them, which a spec audit caught before this was built.
 # THE COUNT IS DERIVED, NOT TYPED. It read `ran + 6` and this merge is exactly why that was

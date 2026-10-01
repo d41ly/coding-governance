@@ -16,12 +16,120 @@
 # before the leg landed; they are what stands in for a population.
 #
 # NO KIT_REL SWEEP IN THIS FILE, DELIBERATELY, and the sibling suite's header says why at length:
-# every path below is INSIDE the fixture tree this suite builds with `mkdir -p tools/unattended`, so
-# `tools/` here is the FIXTURE's own layout and not gov's install prefix. Sweeping it to a derived
+# every path below is INSIDE the fixture tree this suite builds with `mkdir -p <prefix>/unattended`, so
+# `<prefix>/` here is the FIXTURE's own layout and not gov's install prefix. Sweeping it to a derived
 # prefix broke 14 of 19 arms in the sibling, because the `.unattended.conf` heredoc is QUOTED.
 set -u
+HERE="$(cd "$(dirname "$0")" && pwd)"
+# >>> derive_self_rel — canonical copy: kit-rel.sh in gov's lib dir (byte-identical; gated)
+derive_self_rel() {
+  local _dsr_p _dsr_rel=""
+  _dsr_p=$(cd "$1" 2>/dev/null && pwd) || return 1
+  while [ ! -e "$_dsr_p/.git" ]; do
+    [ "$(dirname "$_dsr_p")" = "$_dsr_p" ] && return 1
+    _dsr_rel="$(basename "$_dsr_p")${_dsr_rel:+/$_dsr_rel}"
+    _dsr_p=$(dirname "$_dsr_p")
+  done
+  printf '%s\n' "$_dsr_rel"
+}
+# <<< derive_self_rel
+KIT_REL=$(derive_self_rel "$HERE") || { echo "check-brief-recorded.test: not inside a git repository"; exit 2; }
+# PFX is the install prefix WITH its trailing slash, derived from where this file sits and empty
+# at a root install: every fixture and host path below is spelled through it, never through a
+# literal prefix (TOOL-aRepatriatedFork-28).
+case "$KIT_REL" in */*) PFX="${KIT_REL%/*}/" ;; *) PFX="" ;; esac
+# TOOL-aRepatriatedFork-46: a kit is named by the name its directory has in THIS install, never
+# as a literal segment: this suite's own from where it sits, a sibling's through the resolver,
+# which reads the install receipt first. A fixture mirrors that layout by the resolved NAME.
+KIT_NAME="${KIT_REL##*/}"
+# >>> resolve_python — canonical copy: resolve-python.sh in gov's lib dir (byte-identical; gated)
+resolve_python() {
+  # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
+  # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
+  # the candidate and every consumer uses "$PY" as a single word (measured: exit 127).
+  _rp_tried=""
+  for _rp_c in "${1:-}" "${GOV_PYTHON:-}" python3 python py; do
+    [ -n "$_rp_c" ] || continue
+    _rp_tried="$_rp_tried $_rp_c"
+    if "$_rp_c" -c "import sys" >/dev/null 2>&1; then
+      printf '%s\n' "$_rp_c"
+      return 0
+    fi
+  done
+  {
+    echo "resolve_python: no usable python launcher. Each candidate was RUN with -c 'import sys' and"
+    echo "resolve_python: none exited 0 — being on PATH is not evidence (the Microsoft Store python3"
+    echo "resolve_python: stub answers \`command -v\` and exits 9009 without running anything)."
+    echo "resolve_python: tried:$_rp_tried"
+    if [ -n "${1:-}" ]; then
+      echo "resolve_python: the caller's override '$1' was tried FIRST and did not run."
+    fi
+    if [ -n "${GOV_PYTHON:-}" ]; then
+      echo "resolve_python: GOV_PYTHON is set to '$GOV_PYTHON' and did not run. An override that is"
+      echo "resolve_python: set and unusable is THIS failure, never a silent fall-through — the"
+      echo "resolve_python: operator believes they chose, and would not have."
+    fi
+  } >&2
+  return 1
+}
+# <<< resolve_python
+# The sibling-kit resolver (TOOL-aRepatriatedFork-2 S3), INLINED byte-identically from the
+# canonical copy named on its marker line and gated by the resolve-python self-test's parity
+# table. A shell consumer runs it with the python it already resolved, so the receipt rung is
+# read in Python and never parsed in bash. `resolve_kit_dir <python> <home> <anchor> <here>`
+# prints the kit directory REPO-RELATIVE, or the resolver's named refusal on stderr and exits 1.
+resolve_kit_dir() {
+  "$1" -c "$(cat <<'RKD'
+# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
+def resolve_kit_dir(home, anchor, here):
+    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
+
+    1. receipt — the `.governance/install.json` row whose `source` ends in <home>/<anchor> and
+       whose `path` exists inside this tree. The only record of a RENAMED kit dir: no probe finds
+       a memory-recall kit an adopter homed at `scripts/recall/`.
+    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
+    3. refuse — LookupError naming the three places looked; never a guessed prefix.
+    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
+    """
+    import json
+    import pathlib
+    here = pathlib.Path(here).absolute()  # never resolve(): a junction must not move it
+    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
+    receipt = root / ".governance" / "install.json"
+    try:
+        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("path"):
+            continue
+        if str(row.get("source") or "").split("/")[-2:] != [home, anchor]:
+            continue
+        hit = (root / str(row["path"])).absolute()
+        if hit.is_file() and root in hit.parents and ".." not in hit.parts:
+            return hit.parent
+    probes = (here / home, here.parent / home)
+    for cand in probes:
+        if (cand / anchor).is_file():
+            return cand
+    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
+        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
+# <<< resolve_kit_dir
+RKD
+)"'
+import sys
+try:
+    d = resolve_kit_dir(*sys.argv[1:4])
+except LookupError as e:
+    sys.exit(str(e))
+r = next((p for p in (d, *d.parents) if (p / ".git").exists()), d.anchor)
+print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
+}
+_rkd_py=$(resolve_python) || { echo "check-brief-recorded.test: no usable python, so the sibling kits cannot be resolved"; exit 2; }
+MT_KIT_DIR=$(resolve_kit_dir "$_rkd_py" memory-tree gen_build_index.py "$HERE") || exit 2
+MT_KIT="${MT_KIT_DIR##*/}"
 st=0; n=0
-LEG="tools/unattended/check-brief-recorded.sh"
+LEG="${PFX}${KIT_NAME}/check-brief-recorded.sh"
 # The fixture's own driver, beside the fixture's own leg. Derived from LEG rather than spelled, so the
 # fixture layout is written in one place.
 DRV="${LEG%/*}/unattended.sh"
@@ -36,23 +144,37 @@ hasnt(){ n=$((n+1)); case "$2" in *"$3"*) echo "FAIL $1 -- output carried '$3' a
 # THE FIXTURE. One build, one CLOSED unit, one build commit. What varies is the brief row that
 # commit carries. The build commit must touch a path OUTSIDE the build folder, the generated indexes
 # and the shared records, or `build_commit` correctly declines to call it a build commit at all --
-# `tools/product.sh` is that path, and dropping it would make every arm below pass vacuously.
+# `<prefix>/product.sh` is that path, and dropping it would make every arm below pass vacuously.
 mkfixture() { # mode -> prints the fixture root
   local mode="$1" T
   T=$(mktemp -d) || exit 2
   ( cd "$T" || exit 2
     git init -q .
     git config user.email t@t; git config user.name t; git config commit.gpgsign false
-    mkdir -p tools/unattended memory/builds/tBrief/spec memory/builds/tBrief/prompts
-    cp "$KIT/lib-unattended.sh" tools/unattended/
-    cp "$KIT/unattended.sh"     tools/unattended/
-    cp "$KIT/check-brief-recorded.sh" tools/unattended/
+    # BUILT BEFORE ITS RUN (TOOL-aRepatriatedFork-56): an earlier run built the unit, behind the base
+    # this run pins, and the in-range commit below is a later one naming it. `prebuilt-far` puts two
+    # commits between that build and the base, beyond a cap of one.
+    case "$mode" in
+      prebuilt|prebuilt-far)
+        mkdir -p src; printf 'v1\n' > src/x.txt
+        git add -A >/dev/null; git commit -q -m "ARCH-tBrief-1: the first run builds it" --no-verify ;;
+    esac
+    case "$mode" in
+      prebuilt-far)
+        printf 'a\n' > filler.txt; git add -A >/dev/null; git commit -q -m "filler one" --no-verify
+        printf 'b\n' > filler.txt; git add -A >/dev/null; git commit -q -m "filler two" --no-verify ;;
+    esac
+    mkdir -p ${PFX}unattended memory/builds/tBrief/spec memory/builds/tBrief/prompts
+    cp "$KIT/lib-unattended.sh" ${PFX}${KIT_NAME}/
+    cp "$KIT/unattended.sh"     ${PFX}${KIT_NAME}/
+    cp "$KIT/check-brief-recorded.sh" ${PFX}${KIT_NAME}/
     cat > .unattended.conf <<'CONF'
 MEMORY_ROOT=memory
 BRIEF_RECORDED_CUTOFF="2026-01-01"
-GENERATED_INDEXES="memory/LIVE.md:tools/memory-tree/gen_build_index.py"
+GENERATED_INDEXES="memory/LIVE.md:{PFX}{MT_KIT}/gen_build_index.py"
 SHARED_RECORDS="memory/DECISIONS.md memory/backlog"
 CONF
+    sed -i "s#{PFX}#${PFX}#; s#{MT_KIT}#${MT_KIT}#" .unattended.conf   # the quoted heredoc cannot expand either
     cat > memory/builds/tBrief/README.md <<'RM'
 ---
 slug: tBrief
@@ -84,7 +206,7 @@ RM
     R=memory/builds/tBrief/RUN.md
     REC='# tBrief — run state\n<!-- run:generated -->\n<!-- /run:generated -->\n## Run facts\nbase: %s\nphase: %s\nwitness: %s\n## Parked\n'
     case "$mode" in
-      live|reopened|baseonly) printf "$REC" "$BASE" BUILDING "$BASE" > "$R" ;;
+      live|reopened|baseonly|prebuilt|prebuilt-far) printf "$REC" "$BASE" BUILDING "$BASE" > "$R" ;;
       landing|flip)           printf "$REC" "$BASE" LANDING "$BASE" > "$R" ;;
       postrun|misselect)      printf "$REC" "$BASE" LANDED "$BASE" > "$R" ;;
       postrun-aborted|rotated|migrated) printf "$REC" "$BASE" ABORTED "$BASE" > "$R" ;;
@@ -96,7 +218,7 @@ RM
         printf "$REC" "$BASE" BUILDING "$BASE" > "$R" ;;
     esac
     case "$mode" in
-      live|reopened|baseonly|landing|flip|postrun|postrun-aborted|rotated|migrated|copied|misselect)
+      live|reopened|baseonly|landing|flip|postrun|postrun-aborted|rotated|migrated|copied|misselect|prebuilt|prebuilt-far)
         git add -A >/dev/null; git commit -q -m "records: the run's phase" --no-verify ;;
     esac
     # THE WRONG PICK, for round 3's R3-4. Between the first run landing and the second starting, a hand
@@ -158,7 +280,7 @@ RM
       # THE POST-RUN MODES RECORD NO BRIEF, every one of them: a unit built by hand after its run
       # is exactly the shape the owner ruled out of this leg, and the modes that must still RED
       # need the missing row to have something to red on.
-      live|landing|postrun|postrun-aborted|rotated|migrated|misselect) ;;
+      live|landing|postrun|postrun-aborted|rotated|migrated|misselect|prebuilt|prebuilt-far) ;;
       # THE BOUNDARY: the build commit is the one that writes the terminal phase.
       flip) printf "$REC" "$BASE" LANDED "$BASE" > "$R" ;;
       # THE FORGERY, two ways. The build commit claims the run finished and the next commit makes it
@@ -170,7 +292,7 @@ RM
       *)
         printf '\n2026-06-02T00:00:00Z brief · item ARCH-tBrief-1 · reason %s memory/builds/tBrief/prompts/brief.md\n' "$H" >> memory/builds/tBrief/RUN.md ;;
     esac
-    printf 'the product\n' > tools/product.sh
+    printf 'the product\n' > ${PFX}product.sh
     printf 'regenerated index\n' > memory/LIVE.md
     git add -A >/dev/null; git commit -q -m "ARCH-tBrief-1: build the thing" --no-verify
 
@@ -201,6 +323,8 @@ RM
 T=$(mkfixture ok)
 o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
 same "brief recorded at the build commit: the leg is green" "$rc" "0"
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${st:-0}" = 0 ] && echo "PASS (${n:-1} assertions)" || echo "FAIL (${n:-1} assertions)"; [ "${st:-0}" = 0 ] && exit 0; exit 1; fi
 has  "brief recorded: the unit was GRADED, not skipped" "$o" "graded 1 closed unit"
 hasnt "brief recorded: nothing is reported as a violation" "$o" "FAILED"
 rm -rf "$T"
@@ -286,7 +410,7 @@ rm -rf "$T"
 # ---- clothes, and the leg must refuse INSTEAD of reporting any of them. Staged on the conforming
 # ---- fixture, so the only thing that changed is the grammar.
 T=$(mkfixture ok)
-( cd "$T" && sed -i 's/brief · item/brief-item/g' tools/unattended/unattended.sh )
+( cd "$T" && sed -i 's/brief · item/brief-item/g' ${PFX}${KIT_NAME}/unattended.sh )
 o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
 same "driver grammar gone: exits 2 rather than accusing every unit" "$rc" "2"
 has  "driver grammar gone: it says DEAD PROBE" "$o" "DEAD PROBE"
@@ -326,7 +450,7 @@ o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
 n=$((n+1)); [ "$rc" != 0 ] && echo "ok   hostile conf: an appended EXIT trap cannot force rc 0" || { echo "FAIL an appended EXIT trap forced rc 0 -- the worse shape, where the leg prints FAILED and exits green"; st=1; }
 # THE VECTOR THE SPLICE MISSED. This leg sets DRIVER above its import, exactly as the sibling does,
 # and the sibling's blanket uppercase assignment let one tracked conf line redirect that path.
-( cd "$T" && printf '\nDRIVER="tools/unattended/evil.sh"\n' >> .unattended.conf )
+( cd "$T" && printf '\nDRIVER="'"${PFX}${KIT_NAME}/evil.sh"'"\n' >> .unattended.conf )
 o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
 hasnt "hostile conf: DRIVER is not assignable from the conf" "$o" "evil.sh"
 rm -rf "$T"
@@ -527,6 +651,48 @@ o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
 same  "a base-only record at the build commit: graded as live, REDS" "$rc" "1"
 hasnt "base-only: the base is never read as a phase" "$o" "GRADED ANYWAY"
 hasnt "base-only: and never skips the unit" "$o" "NOT GRADED"
+rm -rf "$T"
+
+# ---- THE WAIVER REGISTRY (TOOL-aRepatriatedFork-51), a matched pair plus the uncommitted control.
+# ---- A committed row waives a real violation and is COUNTED; the same row over a conforming unit is
+# ---- stale and REDS; a row only in the working tree waives nothing, because the leg reads HEAD.
+write_waiver() { # fixture root · commit? -> writes the one-row registry naming the fixture's unit
+  ( cd "$1" && mkdir -p memory/project \
+    && printf 'ARCH-tBrief-1\tbuilt without a recorded brief\n' > memory/project/brief-recorded-waiver.txt \
+    && if [ "$2" = commit ]; then git add -A >/dev/null && git commit -q -m "records: waive" --no-verify; fi ) >/dev/null 2>&1
+}
+T=$(mkfixture norow); write_waiver "$T" commit
+o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
+same  "a committed waiver over a missing brief row: green" "$rc" "0"
+has   "waived: the waiver is COUNTED, naming the unit" "$o" "1 violation(s) waived by memory/project/brief-recorded-waiver.txt: ARCH-tBrief-1"
+hasnt "waived: nothing is reported as a violation" "$o" "FAILED"
+rm -rf "$T"
+T=$(mkfixture ok); write_waiver "$T" commit
+o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
+same  "a waiver over a conforming unit: REDS as stale" "$rc" "1"
+has   "stale waiver: the message names the unit" "$o" "a stale exemption widens the surface it was written to narrow: ARCH-tBrief-1"
+rm -rf "$T"
+T=$(mkfixture norow); write_waiver "$T" worktree
+o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
+same  "an uncommitted waiver: still REDS" "$rc" "1"
+has   "uncommitted waiver: nothing is waived" "$o" "0 violation(s) waived"
+rm -rf "$T"
+
+# ---- BUILT BEFORE ITS RUN (TOOL-aRepatriatedFork-56). A commit naming the unit behind the run's base
+# ---- means an earlier run built it; the in-range commit with no brief is a later one, not graded.
+T=$(mkfixture prebuilt)
+o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
+same  "built before its run, repaired in range with no brief: GREEN" "$rc" "0"
+has   "built before its run: the line names it" "$o" "ARCH-tBrief-1 was built before its run"
+has   "built before its run: the summary counts it" "$o" "1 unit(s) built before their run, not graded"
+rm -rf "$T"
+# ...and a probe that reaches its cap answers nothing, so the unit is graded and reds.
+T=$(mkfixture prebuilt-far)
+( cd "$T" && printf 'PASS_ORDER_PREANCHOR_CAP="1"\n' >> .unattended.conf && git add -A >/dev/null && git commit -q -m "cap one" --no-verify )
+o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
+same  "a truncated probe: the unit is graded and REDS" "$rc" "1"
+has   "a truncated probe: the ordinary violation" "$o" "NO brief row"
+hasnt "a truncated probe: no built-before-its-run skip" "$o" "built before its run"
 rm -rf "$T"
 
 echo "--- $n arms, exit $st"

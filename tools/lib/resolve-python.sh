@@ -8,7 +8,7 @@
 #
 # USAGE — source it, then call it, and let the CALLER halt:
 #
-#   . "$HERE/../lib/resolve-python.sh"
+#   . "<prefix>/lib/resolve-python.sh"
 #   PY=$(resolve_python) || exit 2
 #   PY=$(resolve_python "${MAP_PY:-}") || exit 2     # a published per-kit override goes FIRST
 #
@@ -16,12 +16,12 @@
 # WITHOUT `set -e`, so a function that merely `return 1`s cannot stop its caller — the value has to
 # come back through a substitution the caller can test.
 #
-# A kit that is COPY-INSTALLED as a standalone directory (`cp -r <gov>/tools/memory-tree
+# A kit that is COPY-INSTALLED as a standalone directory (`cp -r <gov>/<prefix>/memory-tree
 # <project>/memory-tree`) cannot source this file: `../lib/` does not exist in the adopting repo.
 # Those scripts carry the block between the markers below INLINE, byte-identical, and
 # `resolve-python.test.sh` gates every copy against this one.
 
-# >>> resolve_python — canonical copy: tools/lib/resolve-python.sh (byte-identical; gated)
+# >>> resolve_python — canonical copy: resolve-python.sh in gov's lib dir (byte-identical; gated)
 resolve_python() {
   # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
   # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes

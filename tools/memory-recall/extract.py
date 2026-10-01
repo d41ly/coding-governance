@@ -72,7 +72,7 @@ def resolve_kit_dir(home, anchor, here):
     """
     import json
     import pathlib
-    here = pathlib.Path(here).resolve()
+    here = pathlib.Path(here).absolute()  # never resolve(): a junction must not move it
     root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
     receipt = root / ".governance" / "install.json"
     try:
@@ -84,8 +84,8 @@ def resolve_kit_dir(home, anchor, here):
             continue
         if str(row.get("source") or "").split("/")[-2:] != [home, anchor]:
             continue
-        hit = (root / str(row["path"])).resolve()
-        if hit.is_file() and root in hit.parents:
+        hit = (root / str(row["path"])).absolute()
+        if hit.is_file() and root in hit.parents and ".." not in hit.parts:
             return hit.parent
     probes = (here / home, here.parent / home)
     for cand in probes:
@@ -323,7 +323,7 @@ def resolve_declared_sources(repo: pathlib.Path, rev: str | None = None) -> list
     """The DECLARED extra sources, from ``RECALL_EXTRA_SOURCES``.
 
     Repo-relative, not repo-root-only: the first design admitted root confs alone, which would have
-    left ``tools/template-size-limits.txt`` -- a declaration created in the same build -- outside
+    left ``<prefix>/template-size-limits.txt`` -- a declaration created in the same build -- outside
     the corpus this widening exists to reach.
 
     Declared, never globbed. A glob would sweep whatever a project happens to keep, and the

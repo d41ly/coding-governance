@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# check-placeholders.test.sh — the arms for tools/check-placeholders.sh.
+# check-placeholders.test.sh — the arms for <prefix>/check-placeholders.sh.
 #
 # EVERY ARM ASSERTS A MESSAGE, never an exit code alone. These fixtures are deliberately broken in
 # several ways at once is exactly the trap: a fixture that reds for the wrong reason scores a pass
@@ -10,8 +10,12 @@
 # tracked sources, which carry placeholders permanently and by design — a leg that did would red on
 # its own landing commit.
 set -u
+# ROOT stays: the tracked charter template the survival arm reads sits at the REPO root, which no
+# install prefix moves. Dropping it with the gate's prefix left that arm on an unbound variable.
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
-GATE="$ROOT/tools/check-placeholders.sh"
+# The gate sits BESIDE this suite at every prefix, so it is found from here (TOOL-aRepatriatedFork-24
+# S5). It was spelled under gov's prefix, which at any other install named a gate that is not there.
+GATE="$(cd "$(dirname "$0")" && pwd)/check-placeholders.sh"
 PASS=0; FAIL=0
 ok() { PASS=$((PASS+1)); }
 bad() { FAIL=$((FAIL+1)); echo "  FAIL: $1"; }
@@ -46,6 +50,8 @@ mkfixture() { # $1 = dir
 # 1. the green case — the one carrier well-formed
 mkfixture "$TMPROOT/good"
 arm "green: the single marker carrier is present and well-formed" 0 "check-placeholders OK" --   bash -c "cd '$TMPROOT/good' && bash '$GATE'"
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${FAIL:-0}" = 0 ] && echo "PASS (${PASS:-1} assertions)" || echo "FAIL (${PASS:-1} assertions)"; [ "${FAIL:-0}" = 0 ] && exit 0; exit 1; fi
 
 # 2. marker PRESENCE. With one carrier this is the whole marker question: there is no second file to
 # be in lockstep WITH, so presence plus well-formedness is what survives.

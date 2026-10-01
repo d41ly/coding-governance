@@ -1,7 +1,7 @@
 # drift-audit kit
 
-`gov:kit drift-audit@1.17` — the marker a deployer greps; paired with `KIT_DRIFT_AUDIT_VERSION` in
-`drift_report.py` and asserted equal by `tools/check-kit-versions.sh`, which also holds each Tier-2
+`gov:kit drift-audit@1.21` — the marker a deployer greps; paired with `KIT_DRIFT_AUDIT_VERSION` in
+`drift_report.py` and asserted equal by `<prefix>/check-kit-versions.sh`, which also holds each Tier-2
 harness's own `meta.version` to the same number.
 
 **Migrating 1.10 → 1.11 (additive, no caller edit).** One new signal,
@@ -70,10 +70,10 @@ The fourth row is real. Keep it **small and loud**, not buried in prose.
 ## Install
 
 ```bash
-mkdir -p <target-repo>/tools
-cp -r <governance>/tools/drift-audit <target-repo>/tools/drift-audit
+mkdir -p <target-repo>/<prefix>
+cp -r <governance>/<prefix>/drift-audit <target-repo>/<prefix>/drift-audit
 cd <target-repo>
-tools/drift-audit/adopt-drift-audit.sh
+<prefix>/drift-audit/adopt-drift-audit.sh
 ```
 
 Requires `.memory-tree.conf` (owned by the memory-tree kit). This kit reads `MEMORY_ROOT` from it and
@@ -82,8 +82,8 @@ the same value is the hand-kept-second-copy defect the kit exists to detect.
 
 Then, in order:
 
-1. Fill `tools/drift-audit/drift_signals.py` — `PRODUCT_GLOBS` at minimum.
-2. Run `python tools/drift-audit/drift_report.py`.
+1. Fill `<prefix>/drift-audit/drift_signals.py` — `PRODUCT_GLOBS` at minimum.
+2. Run `python <prefix>/drift-audit/drift_report.py`.
 3. **`RATCHET_LOOKBACK` is optional and shipped at 14** — how many lines above a ratcheted pin the
    gate looks for the `<old> -> <new>` justification that excuses a weakening move. Narrow it if
    your pins sit close together, so a justification for a DIFFERENT pin cannot be read as this
@@ -104,7 +104,7 @@ Then, in order:
 | `adopt-drift-audit.sh` | kit | adopt + the `--check` sync arm for the merge bar |
 | `selftest.py` | kit | the kit's own falsifiability test |
 
-Tier 2 needs the two workflow scripts from `tools/workflows/drift-audit-{code,state}.js`.
+Tier 2 needs the two workflow scripts from `<prefix>/workflows/drift-audit-{code,state}.js`.
 
 ## The signals
 

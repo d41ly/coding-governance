@@ -16,13 +16,33 @@
 # Hermetic: every arm builds its own scratch repo under `mktemp -d`, sets git config only inside it,
 # and never touches the real tree. That is what makes this leg safe beside the others, and it keeps
 # fixture leg names out of the real timing cache, which the runner would carry forward forever.
-KIT_REL="${KIT_REL:-tools/run-gates}"
 set -u
 
 # 40: the interim-verdict arm added one executed assertion (TOOL-dDerivedDocket-26 and -23's verbs).
 FLOOR_ASSERTIONS=40
 
 HERE=$(cd "$(dirname "$0")" && pwd)
+# >>> derive_self_rel — canonical copy: kit-rel.sh in gov's lib dir (byte-identical; gated)
+derive_self_rel() {
+  local _dsr_p _dsr_rel=""
+  _dsr_p=$(cd "$1" 2>/dev/null && pwd) || return 1
+  while [ ! -e "$_dsr_p/.git" ]; do
+    [ "$(dirname "$_dsr_p")" = "$_dsr_p" ] && return 1
+    _dsr_rel="$(basename "$_dsr_p")${_dsr_rel:+/$_dsr_rel}"
+    _dsr_p=$(dirname "$_dsr_p")
+  done
+  printf '%s\n' "$_dsr_rel"
+}
+# <<< derive_self_rel
+KIT_REL=$(derive_self_rel "$HERE") || { echo "profile_bar.test: not inside a git repository"; exit 2; }
+# PFX is the install prefix WITH its trailing slash, derived from where this file sits and empty
+# at a root install: every fixture and host path below is spelled through it, never through a
+# literal prefix (TOOL-aRepatriatedFork-28).
+case "$KIT_REL" in */*) PFX="${KIT_REL%/*}/" ;; *) PFX="" ;; esac
+# TOOL-aRepatriatedFork-46: a kit is named by the name its directory has in THIS install, never
+# as a literal segment: this suite's own from where it sits, a sibling's through the resolver,
+# which reads the install receipt first. A fixture mirrors that layout by the resolved NAME.
+KIT="${KIT_REL##*/}"
 export HERE_DIR="$HERE"   # the inline python arms import profile_bar from it
 n=0
 bad=0
@@ -45,15 +65,15 @@ done
 build_scratch() { # LEGS-JSON -> prints the scratch dir
   local legs=$1 d
   d=$(mktemp -d) || return 1
-  mkdir -p "$d/tools/run-gates" "$d/guarded"
-  cp "$HERE/run-gates.sh" "$HERE/profile_bar.py" "$d/tools/run-gates/" || return 1
+  mkdir -p "$d/${PFX}${KIT}" "$d/guarded"
+  cp "$HERE/run-gates.sh" "$HERE/profile_bar.py" "$d/${PFX}${KIT}/" || return 1
   ( cd "$d" \
     && git init -q . \
     && git config user.email profile-bar@test.invalid \
     && git config user.name profile-bar-test \
     && echo seed > seed.txt && echo g > guarded/g.txt \
     && git add -A && git commit -qm seed ) >/dev/null 2>&1 || return 1
-  printf '%s' "$legs" > "$d/tools/gate-legs.json"
+  printf '%s' "$legs" > "$d/${PFX}gate-legs.json"
   printf '%s' "$d"
 }
 
@@ -87,6 +107,8 @@ FLOOR_LEGS='[
 S1=$(build_scratch "$FLOOR_LEGS") || { echo "profile_bar.test: could not build scratch (floor)"; exit 2; }
 ( cd "$S1" && "$PY" $KIT_REL/profile_bar.py --width 3 >"$S1/out.txt" 2>&1 )
 chk $? "floor fixture: profiler exited non-zero"
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${bad:-0}" = 0 ] && echo "PASS ($n assertions)" || echo "FAIL ($n assertions)"; [ "${bad:-0}" = 0 ] && exit 0; exit 1; fi
 chk $([ -s "$S1/.git/gate-profile.jsonl" ] && echo 0 || echo 1) "floor fixture: no record appended"
 B=$(field "$S1" "regime.bound" 2>/dev/null)
 chk $([ "$B" = floor ] && echo 0 || echo 1) "floor fixture: bound was '$B', expected floor"
@@ -198,13 +220,13 @@ ledger_before=$(cat "$S6/.git/gate-ledger.tsv" 2>/dev/null)
 # durations, so every duration available belongs to an earlier run — without depending on
 # filesystem semantics this platform does not offer. It emits the runner's own verdict grammar so
 # the profiler gets that far, and never touches the ledger.
-cat > "$S6/tools/run-gates/run-gates.sh" <<'STUB'
+cat > "$S6/${PFX}${KIT}/run-gates.sh" <<'STUB'
 #!/usr/bin/env bash
 echo "gate profile: stub  (fixture; width 3, timeout off; stub)"
 # The leg NAMES come from the manifest, so they match the ledger rows the real first run wrote.
 # A stub that invented its own names produced a different refusal — 'no executed leg carried a
 # duration' — which is also honest and is not the one this arm grades.
-nm=$(grep -o '"name"[[:space:]]*:[[:space:]]*"[^"]*"' tools/gate-legs.json | sed 's/.*"name"[[:space:]]*:[[:space:]]*"//; s/"$//')
+nm=$(grep -o '"name"[[:space:]]*:[[:space:]]*"[^"]*"' "$(dirname "$0")/../gate-legs.json" | sed 's/.*"name"[[:space:]]*:[[:space:]]*"//; s/"$//')
 cnt=0
 while IFS= read -r n; do [ -n "$n" ] || continue; printf 'GATE ok    %s
 ' "$n"; cnt=$((cnt+1)); done <<<"$nm"

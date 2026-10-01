@@ -9,7 +9,7 @@
 # genuinely experimental kit, because a kit missing from the playbook REDS. It drains through the
 # gate's two arms instead — a row whose kit is gone reds as stale, and a row whose kit IS named in
 # the playbook reds as excusing nothing. That is the one deliberate divergence from
-# tools/install-prefix-waivers.txt, which is shrink-only and can only lose rows.
+# the install-prefix gate's old waiver registry, which was shrink-only and could only lose rows.
 
 lib     gov-internal. Ships nothing to an adopter; every copy-installed kit carries its contents inline instead.
 run-gates	the merge-bar runner. The playbook names the BAR as a project obligation rather than naming this kit: an adopter reaches it through govkit's default selection, and the three shipped files describe the gate discipline without prescribing gov's runner by name. Promoted from a registry exemption by the aPacedTurnstile build's spec set under `memory/builds/aPacedTurnstile/spec/`.

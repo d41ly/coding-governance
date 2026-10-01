@@ -2,7 +2,7 @@
 
 Copied from `<kit>/map_extractors.template.py` at adoption; fill it per
 `<kit>/INVENTORY-DERIVATION.md`, then run `python <kit>/gen_map.py --scaffold`.
-(`<kit>` is this kit's install prefix — `codebase-map/`, or e.g. `tools/codebase-map/`.)
+(`<kit>` is this kit's install prefix — `codebase-map/`, or e.g. `<prefix>/codebase-map/`.)
 
 Rules (from the derivation checklist — each was a shipped bug once):
 - Prefer IMPORT/REGISTRY reads over file globs where the code already exposes a registry

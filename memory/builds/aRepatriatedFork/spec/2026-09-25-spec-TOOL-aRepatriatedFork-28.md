@@ -1,12 +1,17 @@
 # TOOL-aRepatriatedFork-28 — every suite builds its fixtures at a prefix it derives
 
-**Status:** SPECCED · rev-2 · 2026-09-25 · node a · Tier-2 · base 2143b6d6 · streams tooling · order 14
+**Status:** CLOSED · rev-8 · 2026-10-01 · node a · Tier-2 · base 2143b6d6 · streams tooling · order 14
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-25-build-TOOL-aRepatriatedFork-23-prefix-census.md](../build/2026-09-25-build-TOOL-aRepatriatedFork-23-prefix-census.md) | research | TOOL-aRepatriatedFork-23 TOOL-aRepatriatedFork-24 TOOL-aRepatriatedFork-25 TOOL-aRepatriatedFork-26 TOOL-aRepatriatedFork-27 TOOL-aRepatriatedFork-29 TOOL-aRepatriatedFork-30 |
+| [2026-09-29-build-TOOL-aRepatriatedFork-28-1-acceptance-ledger.md](../build/2026-09-29-build-TOOL-aRepatriatedFork-28-1-acceptance-ledger.md) | journal | — |
+| [2026-10-01-build-TOOL-aRepatriatedFork-23-verifying-repair.md](../build/2026-10-01-build-TOOL-aRepatriatedFork-23-verifying-repair.md) | journal | TOOL-aRepatriatedFork-23 TOOL-aRepatriatedFork-2 TOOL-aRepatriatedFork-24 TOOL-aRepatriatedFork-26 TOOL-aRepatriatedFork-29 TOOL-aRepatriatedFork-30 TOOL-aRepatriatedFork-46 |
+| [2026-10-01-build-TOOL-aRepatriatedFork-52-verifying-repair-r3.md](../build/2026-10-01-build-TOOL-aRepatriatedFork-52-verifying-repair-r3.md) | journal | TOOL-aRepatriatedFork-52 TOOL-aRepatriatedFork-46 |
+| [2026-09-29-prompt-TOOL-aRepatriatedFork-28-build-brief.md](../prompts/2026-09-29-prompt-TOOL-aRepatriatedFork-28-build-brief.md) | journal | — |
+| [2026-09-30-review-TOOL-aRepatriatedFork-23-closing-diff-round1.md](../reviews/2026-09-30-review-TOOL-aRepatriatedFork-23-closing-diff-round1.md) | diff-review | TOOL-aRepatriatedFork-23 TOOL-aRepatriatedFork-24 TOOL-aRepatriatedFork-25 TOOL-aRepatriatedFork-26 TOOL-aRepatriatedFork-27 TOOL-aRepatriatedFork-29 TOOL-aRepatriatedFork-30 TOOL-aRepatriatedFork-44 TOOL-aRepatriatedFork-45 TOOL-aRepatriatedFork-46 TOOL-aRepatriatedFork-47 |
 
 <!-- /gen:spec-records -->
 
@@ -38,7 +43,9 @@ same way. The same suite then runs correctly at any install prefix.
   `TOOL-aRepatriatedFork-25` and `TOOL-aRepatriatedFork-27`. This unit owns those lines because it
   owns the file. Observed by AC1.
 - **S6** — Suite by suite, each suite's executed assertion count is unchanged and its floor
-  (`SELFTEST_FLOOR` or `FLOOR_ASSERTIONS`) is unchanged. Observed by AC5.
+  (`SELFTEST_FLOOR` or `FLOOR_ASSERTIONS`) is unchanged. Observed by AC5. Rev-3: one suite's count
+  moves by construction. `resolve-python.test.sh` runs one parity arm per inline `derive_self_rel`
+  copy, so it gains one arm for each suite that now carries the block.
 - **S7** — The ledger rows for these files are lowered, and every kit moved takes its version bump in
   every carrier. Observed by AC6.
 
@@ -105,6 +112,50 @@ The 69 files the census record's section 7 lists for this unit, under `tools/run
 `skills/session-kickoff/` and `.githooks/`, plus the loose suites under `tools/` ·
 `tools/install-prefix-waivers.txt` · `tools/install-prefix-carried.txt`
 
+### The spelling (rev-3)
+
+- **One variable, `PFX`, carrying its trailing slash and empty at a root install.** A shell suite
+  derives it through the inline `derive_self_rel` block: a kit suite takes the parent of its
+  `KIT_REL`, a loose suite takes `KIT_REL` itself. A Python self-test carries an inline
+  `derive_install_prefix()`; an engine whose self-test is embedded binds it inside that self-test
+  only, so the engine's import never walks for a `.git`. A suite whose `KIT_REL` already meant the
+  tool root keeps that meaning, now derived. A quoted heredoc takes a `{PFX}` placeholder and one
+  `sed` after it, because a quoted heredoc cannot expand a variable, which is how the earlier sweep
+  of `check-pass-order.test.sh` broke 14 arms.
+- **The two `.githooks` suites read `GOV_KITROOT` from `.githooks/gate-env.sh`**, the value the
+  hooks under test read, since nothing about a hook's location says where the kits are. The
+  session-kickoff suite's `tools/` was never a prefix: it is a fixture adopter's watched directory,
+  renamed to `vendor/`.
+- **A root-install fixture spells its paths through a prefix variable set empty** (`ROOTPFX`,
+  `root_pfx`, `ROOT_PFX`), per S2. Each marker is struck, and the two `corpus_ids.py` waiver rows go
+  with them.
+- **govkit's scratch-gov fixtures move to `TOOL-aRepatriatedFork-29`'s spelling**: `{prefix}`
+  registry paths and kit-relative homes. The old `home = "tools/demo"` loaded as
+  `tools/tools/demo` after that unit, which redded both of `check_shipped_verb`'s arms and five of
+  `check_epoch_verb`'s. A fixture target's own `prefix = …` follows `PFX` too, so a target's
+  declaration and the paths asserted in it cannot disagree. The two intake arms that assert the
+  ENGINE's default keep the engine's value.
+- **F1 is `{prefix}`**, substituted by the reading arm on load. The generator derives the recorded
+  revision's tool root from that revision's own tree, since a recorded layout does not move with
+  this checkout, and emits the token.
+
+### Returned (rev-3)
+
+Classes this unit's mechanism cannot drain, each named for its owner:
+
+- A literal kit segment joined under an already-derived base (`$KIT_REL/hooks/…`,
+  `root / PFX / "lexicon"`): `TOOL-aRepatriatedFork-46`.
+- A fixture that models an adopter at a FOREIGN literal prefix on purpose (`scripts/`, `kit/`,
+  `vendor/gov/`): spelled through the derived prefix it would stop being foreign.
+  `TOOL-aRepatriatedFork-30`'s population rule.
+- A kit id used as an argv or list value that the epoch-5 counter reads as a join
+  (`"--kits", "memory-tree"`): `TOOL-aRepatriatedFork-30`.
+- The unattended kit's rendered fixture playbook and piece records. `adopt-unattended.sh` renders
+  them and `check-playbook.sh` reads their paths literally, so draining them is a leg change:
+  `TOOL-aRepatriatedFork-30`.
+- `check-install-prefix.test.sh`'s `"tools"`-join red fixtures, which exercise the ban's own literal
+  predicate: `TOOL-aRepatriatedFork-30` rewrites that predicate.
+
 ### Alternatives rejected
 
 - Exempting fixture-internal literals as correct at every prefix, which census §6 recommended. The
@@ -119,7 +170,9 @@ The 69 files the census record's section 7 lists for this unit, under `tools/run
   clone.
 - error / empty / loading states — an underivable prefix refuses in the suite's prologue rather than
   building at the root by accident.
-- observability — each suite prints the prefix it derived beside its assertion count.
+- observability — none added (rev-3). A printed prefix line was planned beside each suite's count,
+  but that count line is parsed by the testsuite-counts leg and the arm extractor, so a new line in
+  sixty suites is an output-contract change for no gain at gov's prefix.
 - risks — a fixture whose layout silently changes, passing arms that no longer exercise their
   subject. S6's unchanged count is the guard, and AC3's control is the check on it.
 - testing — this unit is testing.
@@ -130,7 +183,8 @@ The 69 files the census record's section 7 lists for this unit, under `tools/run
 
 - **AC1** — When `git grep -nE '(^|[^<{A-Za-z0-9_.-])tools/' -- '*.test.sh' '*selftest.py'` runs,
   together with the same pattern over this unit's other owned files, it finds no line outside
-  fixture data that §8 F1 keeps.
+  fixture data that §8 F1 keeps. Rev-3: the unattended kit's rendered fixture playbook and its two
+  rendered piece records are not owned files here (§4, "Returned").
   Red when: a literal prefix survives in an owned file.
 - **AC2** — When `git grep -l 'gov:root-fixture' -- tools skills .githooks` runs, it lists only the
   install-prefix gate and its own suite, which grade the marker until `TOOL-aRepatriatedFork-30`
@@ -181,6 +235,59 @@ unchanged
   and `gotchas.py` fixtures under `TOOL-aRepatriatedFork-29`; census §1 classes them D, and this
   unit's mechanism drains them.
 - rev-2 · 2026-09-25 · §8 resolved by the owner: every fork takes its recommendation.
+- rev-3 · 2026-09-30 · before code, from the unit pass. §4 gains "The spelling" and "Returned":
+  the `PFX` variable and where each file class takes it, the empty-prefix spelling S2 names, the
+  move of govkit's fixtures to `TOOL-aRepatriatedFork-29`'s spelling that unit's change made
+  necessary, and five classes this mechanism cannot drain, each named for its owner. AC1 no longer
+  counts the unattended kit's rendered fixture files. S6 names the one suite whose count moves by
+  construction. §5 drops the printed-prefix line.
+- rev-4 · 2026-10-01 · gate repair at VERIFYING, legs `scratch-guard self-test`, `codebase-map kit
+  selftest` and `govkit selftest`, and the foreign-prefix calibrate's `unattended gate-guard
+  selftest` row. Three defects of this unit's derivation. The meta-arms of `scratch-guard.test.sh`
+  and `gate-guard.test.sh` copy the suite to `$TMP`, where `derive_self_rel` finds no repository
+  and the copy exits before the liveness guard can fire; the copy's `HERE` is pinned to the suite's
+  own. codebase-map's `derive_install_prefix` spelled `Path(__file__).resolve()`, which the kit's
+  own B2 arm bans; it takes `os.path.abspath`. govkit's pre-fix arms (`-14` AC8, `-24` AC5, `-26`
+  AC1 and AC4) run an engine read out of git inside a copy of a fixture gov this unit moved to the
+  `{prefix}` spelling. That engine predates the token and refused every entry as a missing
+  descriptor, so the arms graded a refusal. The pre-fix copy is re-spelled the way that engine
+  reads, by `write_pre_fix_spelling`; every expectation stays.
+- rev-5 · 2026-10-01 · gate repair at VERIFYING, leg `foreign-prefix parity (every self-test at three
+  prefixes)`, measured by running suites directly in scratch clones whose tool root moved to
+  `vendor/gov/` and to the repo root. S3: nine suites took the repository root as their own grandparent,
+  `$HERE/../..` in shell and `parents[1]` or `parent.parent` in Python, which is the root only at a
+  one-segment prefix: `resolve-python.test.sh`, `merge-rows.test.sh`, `unattended-build.test.sh`,
+  `cross-component.test.sh`, `agent-cap.test.sh`, `check-verdict-epoch.test.sh`,
+  `test_recall_floor.py`, codebase-map's and drift-audit's selftests, and govkit's selftest at 21
+  sites. Each asks git or walks to the `.git` entry instead. codebase-map's gate-template arm built its
+  prefixed fixtures at this install's own depth, which the gate by its docstring does not search past
+  one segment; they take one segment. The classes this mechanism cannot drain are recorded in the
+  VERIFYING repair record for the owner: gov's own wiring and committed renders that name the tool
+  root and do not move with it, a kit that refuses a prefix deeper than one segment by design, and
+  arms that read an engine or fixture out of a historical commit laid out at gov's historical prefix.
+- rev-6 · 2026-10-01 · S1, S3: gate repair at VERIFYING, leg `foreign-prefix parity (every self-test at
+  three prefixes)`, the rows red at `scripts/` or `vendor/gov/` whose suite could not find its own
+  subject there. Four fixtures took this install's whole prefix where their subject asks something
+  else. The runlog skill arm planted the host prefix where the adopter's template lint refuses the
+  published source head; it reads that head from the adopter. Spec-tokens' one-segment-root arm and
+  the codebase-map adopter suite built at this install's depth, two segments at `vendor/gov/`, which
+  the rule and the kit treat differently from one; both take one segment. The build harness's
+  verbatim control cannot be negative where this install's prefix is its own fixture's, `scripts/`,
+  and is skipped there by name. `check-wiring.test.sh` took the repository as `$HERE/..`, a line
+  older than base; it asks git. The rows that red only because gov's own declarations do not move
+  with the tool root are the leg's, left to the owner-approved redesign of the leg, not repaired here.
+- rev-7 · 2026-10-01 · S1, S3: gate repair at VERIFYING, the same leg at the repo root, measured by
+  running each light suite in a clone whose tool root moved to the top level. Three suites could not
+  find their subject there. `check-hook-destinations.test.sh` joined `$KIT_REL/` to every path, a
+  line older than base, and named `/check-hook-destinations.sh` at a root install; it takes a path
+  head that is empty there. The run-gates adopter suite's no-prefix arm grepped `${PFX}run-gates`,
+  which at a root install matched every bare mention of the kit; it refuses any path head before the
+  kit's own directory. The unattended adopter suite's flat-checklist arm expected `python
+  gotchas.py` where a root install's directory is `.`, which the adopter renders `./`.
+- rev-8 · 2026-10-01 · S1: gate repair at VERIFYING, the redesigned foreign-prefix leg at the repo
+  root. The codebase-map kit selftest's prefixed-install arm built its fixture at the derived
+  prefix, which is empty at a root install, so the arm compared the root with itself. The fixture
+  takes a stand-in prefix when the derived one is empty.
 
 ## 10. Reuse audit
 

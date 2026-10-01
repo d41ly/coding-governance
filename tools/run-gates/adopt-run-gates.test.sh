@@ -12,6 +12,28 @@
 # distinguishes them: it edits the runner's printf out from under a real declaration and asserts the
 # red. Without it the criterion is satisfied by a no-op.
 set -u
+HERE="$(cd "$(dirname "$0")" && pwd)"
+# >>> derive_self_rel — canonical copy: kit-rel.sh in gov's lib dir (byte-identical; gated)
+derive_self_rel() {
+  local _dsr_p _dsr_rel=""
+  _dsr_p=$(cd "$1" 2>/dev/null && pwd) || return 1
+  while [ ! -e "$_dsr_p/.git" ]; do
+    [ "$(dirname "$_dsr_p")" = "$_dsr_p" ] && return 1
+    _dsr_rel="$(basename "$_dsr_p")${_dsr_rel:+/$_dsr_rel}"
+    _dsr_p=$(dirname "$_dsr_p")
+  done
+  printf '%s\n' "$_dsr_rel"
+}
+# <<< derive_self_rel
+KIT_REL=$(derive_self_rel "$HERE") || { echo "adopt-e2e: not inside a git repository"; exit 2; }
+# PFX is the install prefix WITH its trailing slash, derived from where this file sits and empty
+# at a root install: every fixture and host path below is spelled through it, never through a
+# literal prefix (TOOL-aRepatriatedFork-28).
+case "$KIT_REL" in */*) PFX="${KIT_REL%/*}/" ;; *) PFX="" ;; esac
+# TOOL-aRepatriatedFork-46: a kit is named by the name its directory has in THIS install, never
+# as a literal segment: this suite's own from where it sits, a sibling's through the resolver,
+# which reads the install receipt first. A fixture mirrors that layout by the resolved NAME.
+KIT="${KIT_REL##*/}"
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "adopt-e2e: not a git repo"; exit 2; }
 cd "$ROOT" || exit 2
 KITDIR=$(cd "$(dirname "$0")" && pwd)
@@ -34,8 +56,8 @@ build_target() { # <name> <prefix> -> echoes the target root
   local t="$TMP/$1" pfx="$2"
   mkdir -p "$t/$pfx/run-gates" "$t/.governance"
   ( cd "$t" && git init -q . && git config user.email e@x && git config user.name t ) >/dev/null 2>&1
-  cp "$KITDIR/run-gates.sh" "$t/$pfx/run-gates/run-gates.sh"
-  cp "$ADOPT"               "$t/$pfx/run-gates/adopt-run-gates.sh"
+  cp "$KITDIR/run-gates.sh" "$t/$pfx/${KIT}/run-gates.sh"
+  cp "$ADOPT"               "$t/$pfx/${KIT}/adopt-run-gates.sh"
   printf '[]\n' > "$t/$pfx/gate-legs.json"
   ( cd "$t" && git add -A && git commit -qm init ) >/dev/null 2>&1
   printf '%s' "$t"
@@ -54,10 +76,12 @@ TOML
 
 echo "== 1. NOT ADOPTED is a real answer, and it writes nothing =="
 T=$(build_target notadopted vendor)
-out=$( cd "$T" && bash vendor/run-gates/adopt-run-gates.sh --check 2>&1 ); rc=$?
+out=$( cd "$T" && bash vendor/${KIT}/adopt-run-gates.sh --check 2>&1 ); rc=$?
 [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'NOT ADOPTED' \
   && ok "no deploy.toml -> exit 0 reporting NOT ADOPTED" \
   || nope "no deploy.toml did not report NOT ADOPTED (rc=$rc): $out"
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${bad:-0}" = 0 ] && echo "PASS ($n assertions)" || echo "FAIL ($n assertions)"; [ "${bad:-0}" = 0 ] && exit 0; exit 1; fi
 [ -z "$( cd "$T" && git status --porcelain )" ] \
   && ok "the NOT ADOPTED path left the target byte-identical" \
   || nope "the NOT ADOPTED path wrote into the target"
@@ -65,7 +89,7 @@ out=$( cd "$T" && bash vendor/run-gates/adopt-run-gates.sh --check 2>&1 ); rc=$?
 echo "== 2. a matching declaration agrees, at a NON-gov prefix =="
 T=$(build_target agree vendor)
 write_decl "$T" vendor 'GATE ok    '
-out=$( cd "$T" && bash vendor/run-gates/adopt-run-gates.sh --check 2>&1 ); rc=$?
+out=$( cd "$T" && bash vendor/${KIT}/adopt-run-gates.sh --check 2>&1 ); rc=$?
 [ "$rc" = 0 ] && ok "a declaration matching the runner's printf exits 0" \
   || nope "a matching declaration did not exit 0 (rc=$rc): $out"
 printf '%s' "$out" | grep -q 'observed_ran' \
@@ -85,14 +109,14 @@ write_decl "$T" vendor 'GATE ok    '
 # it was supposed to have removed. A mutation arm whose mutation does not happen is the
 # fixture-passes-by-finding-nothing class sitting inside the arm written to prevent it, so the
 # mutation is ASSERTED before the adopter is asked anything.
-MUT="$T/vendor/run-gates/run-gates.sh"
+MUT="$T/vendor/${KIT}/run-gates.sh"
 sed -i 's/GATE ok    /GATE PASSED  /g' "$MUT"
 if grep -q 'GATE PASSED  ' "$MUT" && ! grep -q 'GATE ok    ' "$MUT"; then
   ok "the fixture mutation actually landed (so the arm below is not vacuous)"
 else
   nope "the fixture mutation did NOT land, so the drift arm would prove nothing"
 fi
-out=$( cd "$T" && bash vendor/run-gates/adopt-run-gates.sh --check 2>&1 ); rc=$?
+out=$( cd "$T" && bash vendor/${KIT}/adopt-run-gates.sh --check 2>&1 ); rc=$?
 [ "$rc" = 1 ] && ok "a declaration the runner no longer emits exits 1" \
   || nope "the drifted declaration did not exit 1 (rc=$rc): $out"
 if printf '%s' "$out" | grep -q 'DRIFT' && printf '%s' "$out" | grep -q 'observed_ran'; then
@@ -109,7 +133,7 @@ prefix = "vendor"
 kind = "manifest"
 observed_ran = ["GATE ok    {name}"]
 TOML
-out=$( cd "$T" && bash vendor/run-gates/adopt-run-gates.sh --check 2>&1 ); rc=$?
+out=$( cd "$T" && bash vendor/${KIT}/adopt-run-gates.sh --check 2>&1 ); rc=$?
 [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'observed_failed' \
   && ok "a missing observed_failed is reported by name, not read as empty-equals-empty" \
   || nope "a missing observed_failed was not reported (rc=$rc): $out"
@@ -138,7 +162,7 @@ kind = "manifest"
 observed_ran = "GATE ok    {name}"
 observed_failed = "GATE FAIL  {name}"
 TOML
-out=$( cd "$T" && bash vendor/run-gates/adopt-run-gates.sh --check 2>&1 ); rc=$?
+out=$( cd "$T" && bash vendor/${KIT}/adopt-run-gates.sh --check 2>&1 ); rc=$?
 if [ "$rc" = 1 ] && printf '%s' "$out" | grep -q 'must be an ARRAY'; then
   ok "a scalar observed_* is refused by name (closing review D2/D1)"
 else
@@ -148,7 +172,7 @@ fi
 # the arm above is satisfied by an adopter that refuses every declaration it is given.
 T=$(build_target arrayform vendor)
 write_decl "$T" vendor 'GATE ok    '
-out=$( cd "$T" && bash vendor/run-gates/adopt-run-gates.sh --check 2>&1 ); rc=$?
+out=$( cd "$T" && bash vendor/${KIT}/adopt-run-gates.sh --check 2>&1 ); rc=$?
 [ "$rc" = 0 ] && ok "the same heads in ARRAY form still pass (the refusal is about the shape)"   || nope "the array form did not pass (rc=$rc): $out"
 
 echo "== 6c. --help terminates and prints usage =="
@@ -159,7 +183,9 @@ echo "== 7. the adopter derives its own prefix — no gov path is spelled in it 
 grep -qE '^\s*KITDIR=\$\(cd "\$\(dirname "\$0"\)" && pwd\)' "$ADOPT" \
   && ok "the kit dir is derived from the script's own location" \
   || nope "the adopter does not derive its kit dir"
-grep -q 'tools/run-gates' "$ADOPT" \
+# ANY path head before the kit's own directory, not this install's: at a root install `${PFX}` is
+# empty and the old predicate matched every bare mention of the kit (VERIFYING repair).
+grep -qE '[A-Za-z0-9_.-]/'"${KIT}"'/' "$ADOPT" \
   && nope "the adopter SPELLS a gov install prefix, which lands a dead path in an adopter's tree" \
   || ok "the adopter spells no install prefix"
 

@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # check-placeholders.sh — the playbook's version-marker lockstep, and the survival predicate.
 #
-#   bash tools/check-placeholders.sh              # assert the marker lockstep over the SOURCES
-#   bash tools/check-placeholders.sh --check A B  # assert no placeholder SURVIVED in two FILLED files
+#   bash <prefix>/check-placeholders.sh              # assert the marker lockstep over the SOURCES
+#   bash <prefix>/check-placeholders.sh --check A B  # assert no placeholder SURVIVED in two FILLED files
 #
 # SCOPE, and what deliberately is NOT here. This gate landed carrying a third assertion — that
 # a deploy-time placeholder CATALOGUE agreed with the measured sets — and `tools/check-playbook-
@@ -10,7 +10,7 @@
 # asserting one property over one file is the two-answers-to-one-question class at gate level, and
 # the two disagreed immediately: each expected its own prose format, so satisfying one red the other.
 # The arithmetic was ceded to parity, and v3.0 then deleted the catalogue itself — the placeholders
-# are filled by `tools/playbook/` now, so there is no prose to agree with. What remains here is the
+# are filled by `<prefix>/playbook/` now, so there is no prose to agree with. What remains here is the
 # half nothing else checks.
 #
 # THE SUBJECT SPLIT, which is why the survival predicate is a separate mode. In this repo the shipped
@@ -18,7 +18,7 @@
 # design. A leg asserting "no placeholder survives" over it would red on its own landing commit and
 # could never go green here. So that predicate takes explicit targets and is exercised only by
 # fixtures in the sibling test — never over the tracked source. The RENDER-side owner of it already
-# exists and stays where it is: `tools/govkit/entries/playbook.kit.toml`'s `playbook-placeholders`
+# exists and stays where it is: govkit's `entries/playbook.kit.toml`'s `playbook-placeholders`
 # hole runs it over the DEPLOYED charter at `{playbook_path}`, which is the only place "survived" is
 # a meaningful question. The mode still takes TWO operands: an adopter whose charter renders beside a
 # second filled file has two subjects, and one operand could not express that.

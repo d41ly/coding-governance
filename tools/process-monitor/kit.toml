@@ -1,8 +1,8 @@
-# kit.toml — this entry, declared as data. Read by tools/govkit/.
+# kit.toml — this entry, declared as data. Read by <prefix>/govkit/.
 # Contract: memory/builds/aReapedSpinner/spec/2026-09-08-spec-TOOL-aReapedSpinner-6.md
 
 id = "process-monitor"
-home = "tools/process-monitor"
+home = "process-monitor"
 scope = "repo"
 
 # PINNED AT THE SHELL ADOPTER, not at an engine module, and the reason is a landing constraint
@@ -96,7 +96,7 @@ discharge = { command = ["bash", "{kit}/adopt-process-monitor.sh", "--check"] }
 # stray CR breaks the shebang and turns a declared value into one carrying an invisible byte, which
 # is the worst possible failure mode for a path prefix nothing else validates.
 [[lf_pin]]
-pattern = "tools/process-monitor/*.sh"
+pattern = "{kit}/*.sh"
 why = "a stray CR breaks the shebang and silently corrupts a declared path prefix"
 
 [[lf_pin]]

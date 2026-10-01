@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # adopt-runlog.sh — render the runlog Skill, and check that the rendered copy has not drifted.
-# gov:kit runlog@1.4
+# gov:kit runlog@1.6
 #
 #   bash <this kit>/adopt-runlog.sh --scaffold    # render .claude/skills/runlog/SKILL.md
 #   bash <this kit>/adopt-runlog.sh --check       # the gate leg: is the rendered Skill a fresh render?
@@ -83,7 +83,7 @@ fi
 # does not exist in an adopting repo. The block below is byte-identical to the canonical copy its
 # own marker line names, and that copy's self-test reds if any inline copy drifts. The marker line
 # is the ONE path literal this file carries, because the parity gate compares it byte for byte.
-# >>> resolve_python — canonical copy: tools/lib/resolve-python.sh (byte-identical; gated)
+# >>> resolve_python — canonical copy: resolve-python.sh in gov's lib dir (byte-identical; gated)
 resolve_python() {
   # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
   # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes

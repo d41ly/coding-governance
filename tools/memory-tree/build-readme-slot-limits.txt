@@ -3,7 +3,7 @@
 #
 # TWO FILES, not one. The advisory high-waters live in build-readme-slot-highwater.txt because the
 # `--bump` verb WRITES that file, and a ceiling sitting inside the write path of the thing that must
-# never move it is guarded only by whoever reads the diff. `tools/check-template-size.sh` splits the
+# never move it is guarded only by whoever reads the diff. `<prefix>/check-template-size.sh` splits the
 # same pair for the same reason and is the seam this copies.
 #
 # A ceiling that FAILS the bar, measured over the AUTHORED slice only — a slot's heading line to the

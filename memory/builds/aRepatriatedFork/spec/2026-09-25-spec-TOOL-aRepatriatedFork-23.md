@@ -1,12 +1,20 @@
 # TOOL-aRepatriatedFork-23 — the install-prefix ban counts every kit path it cannot see today
 
-**Status:** SPECCED · rev-2 · 2026-09-25 · node a · Tier-2 · base 2143b6d6 · streams tooling · order 8
+**Status:** CLOSED · rev-3 · 2026-09-29 · node a · Tier-2 · base 2143b6d6 · streams tooling · order 8
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-25-build-TOOL-aRepatriatedFork-23-prefix-census.md](../build/2026-09-25-build-TOOL-aRepatriatedFork-23-prefix-census.md) | research | TOOL-aRepatriatedFork-24 TOOL-aRepatriatedFork-25 TOOL-aRepatriatedFork-26 TOOL-aRepatriatedFork-27 TOOL-aRepatriatedFork-28 TOOL-aRepatriatedFork-29 TOOL-aRepatriatedFork-30 |
+| [2026-09-29-build-TOOL-aRepatriatedFork-23-1-acceptance-ledger.md](../build/2026-09-29-build-TOOL-aRepatriatedFork-23-1-acceptance-ledger.md) | journal | — |
+| [2026-09-30-build-TOOL-aRepatriatedFork-23-closing-fold-round1.md](../build/2026-09-30-build-TOOL-aRepatriatedFork-23-closing-fold-round1.md) | journal | TOOL-aRepatriatedFork-24 TOOL-aRepatriatedFork-29 TOOL-aRepatriatedFork-30 TOOL-aRepatriatedFork-46 |
+| [2026-09-30-build-TOOL-aRepatriatedFork-23-closing-fold-round2.md](../build/2026-09-30-build-TOOL-aRepatriatedFork-23-closing-fold-round2.md) | journal | TOOL-aRepatriatedFork-30 TOOL-aRepatriatedFork-46 |
+| [2026-10-01-build-TOOL-aRepatriatedFork-23-reconcile-main.md](../build/2026-10-01-build-TOOL-aRepatriatedFork-23-reconcile-main.md) | journal | — |
+| [2026-10-01-build-TOOL-aRepatriatedFork-23-verifying-repair.md](../build/2026-10-01-build-TOOL-aRepatriatedFork-23-verifying-repair.md) | journal | TOOL-aRepatriatedFork-2 TOOL-aRepatriatedFork-24 TOOL-aRepatriatedFork-26 TOOL-aRepatriatedFork-28 TOOL-aRepatriatedFork-29 TOOL-aRepatriatedFork-30 TOOL-aRepatriatedFork-46 |
+| [2026-09-29-prompt-TOOL-aRepatriatedFork-23-build-brief.md](../prompts/2026-09-29-prompt-TOOL-aRepatriatedFork-23-build-brief.md) | journal | — |
+| [2026-09-30-review-TOOL-aRepatriatedFork-23-closing-diff-round1.md](../reviews/2026-09-30-review-TOOL-aRepatriatedFork-23-closing-diff-round1.md) | diff-review | TOOL-aRepatriatedFork-24 TOOL-aRepatriatedFork-25 TOOL-aRepatriatedFork-26 TOOL-aRepatriatedFork-27 TOOL-aRepatriatedFork-28 TOOL-aRepatriatedFork-29 TOOL-aRepatriatedFork-30 TOOL-aRepatriatedFork-44 TOOL-aRepatriatedFork-45 TOOL-aRepatriatedFork-46 TOOL-aRepatriatedFork-47 |
+| [2026-09-30-review-TOOL-aRepatriatedFork-23-closing-diff-round2.md](../reviews/2026-09-30-review-TOOL-aRepatriatedFork-23-closing-diff-round2.md) | diff-review | TOOL-aRepatriatedFork-24 TOOL-aRepatriatedFork-29 TOOL-aRepatriatedFork-30 TOOL-aRepatriatedFork-46 |
 
 <!-- /gen:spec-records -->
 
@@ -28,6 +36,19 @@ once. Units 24 to 29 then lower it, and `TOOL-aRepatriatedFork-30` deletes it.
   `<kit>/<file>` that arm 1 bans. A `<gov>/tools/…` spelling is counted or not as §8 F2 resolves.
   A path led by a `<prefix>/` prose token or a `{prefix}`, `{kit}` or `{{TOOL_ROOT}}` render token
   is never counted, because it is the drained form. Observed by AC1, AC2.
+- **S1a** (rev-3) — F4 and F1 carried into the predicate. The kit-segment spelling
+  `<kit>/<file>.<ext>` counts at the root, under ANY literal prefix (`scripts/`, `vendor/gov/`), and
+  under a derived base (`$HERE/../`, `$KIT_REL/`, `${VAR}/`), because a kit's name typed as a literal
+  is the class whatever precedes it. A quoted kit segment used as a path segment counts the same way:
+  joined by `/` (`HERE.parent / "<kit>"`, arm 3's P3 shape) or by `,` after a quoted literal prefix
+  segment (`join(x, "scripts", "<kit>")`). A `<tool-root>/` prose token is drained like `<prefix>/`.
+  Outside every spelling, and recorded as near-misses rather than counted: a bare `tools/` with no
+  segment after it, a directory-only kit reference under any prefix but `tools/`, and a kit segment
+  with no file after it. Observed by AC1, AC2.
+- **S1b** (rev-3) — the counter is a python program inside the gate, run through the resolver the
+  gate already sources. A `grep -oE` cannot read the operand a join starts from, and S4 needs it. A
+  producer that dies refuses rather than yielding zero rows (the D3 class), and `carried_live`
+  counts S2's population, the one the counter reads. Observed by AC8.
 - **S2** — The ledger's population is every tracked file under `tools/`, `skills/` and `.githooks/`,
   every `*.template.*` file and `WIRE-INTO-PROJECT.md`, shipped or not. Tests, seeds and
   `.conf.example` files are in it. The ledger file itself and the waiver registry are not, because
@@ -40,6 +61,14 @@ once. Units 24 to 29 then lower it, and `TOOL-aRepatriatedFork-30` deletes it.
   transcript's `workflows` directory. The rule reads the literal's context; it is not a marker.
   The six kit segments joined under an already-derived base are handled as §8 F1 resolves.
   Observed by AC5.
+- **S4a** (rev-3) — the context rule, stated once. A kit-named segment is a homonym when its path
+  runs through a tool-owned dot directory (`.git`, `.github`, `.claude`, which also covers a
+  `.claude/skills/<name>/` Skill directory that F4's widening would otherwise count), or when the
+  operand it is joined onto names a git directory or a transcript (`git`, `gd`, `common`, `sdir`,
+  `session`, `transcript`). A quoted `"tools"` counts only when it is joined, so a mapping key, a list
+  member or a `.get("tools", [])` argument is not. The operand rule is a name heuristic, and its
+  ceiling is written beside it in the gate: a git directory held in a variable named otherwise counts,
+  and the remedy is a name that says what it holds. Observed by AC5.
 - **S5** — `PREDICATE_EPOCH` moves 4 to 5 and `--rebaseline` runs once, the path epochs 2, 3 and 4
   took. Every reason column is preserved. The epoch block records what the epoch cost, and the
   script header's "does not check" paragraph is rewritten for the new population. Observed by AC6.
@@ -91,7 +120,9 @@ Every count here is from the 2026-09-25 prefix census at `2143b6d6` (the census 
 
 This unit mints no identifier that a naming cell grades. It adds alternatives to the regex that
 `carried_rows` builds, and it replaces the population derivation `derive_received_files` feeds
-the ledger with a `git ls-files` over S2's globs.
+the ledger with a `git ls-files` over S2's globs. Rev-3: the alternatives live in a python program
+inside the gate, beside arm 3's, and `carried_rows` pipes S2's population into it. The shell side
+keeps the row shape, the ban, the rebaseline guard and the four verdicts unchanged.
 
 ### Migration
 
@@ -132,8 +163,9 @@ lowers rows in the commit that drains them.
 
 - **AC1** — When `check-install-prefix.sh --list` runs at epoch 5 inside a fixture kit source that
   carries exactly one literal of each S1 spelling, each of the five appears as one counted
-  occurrence.
-  Red when: any S1 spelling is absent from the rows.
+  occurrence. Rev-3: so do the three S1a spellings, a literal `scripts/` prefix, a shell
+  derived-base sibling path and a python `parent / "<kit>"` join, each in its own file.
+  Red when: any S1 or S1a spelling is absent from the rows.
 - **AC2** — Red-first control: the same fixture graded by `2143b6d6`'s gate counts none of the five.
   Recorded in the acceptance ledger before the predicate changes.
   Red when: epoch 4 already counts one of them, so the widening proves nothing about it.
@@ -154,6 +186,10 @@ lowers rows in the commit that drains them.
 - **AC7** — `bash tools/check-kit-versions.sh` exits 0, and `python tools/govkit/govkit.py epoch
   --base 2143b6d6` names no kit.
   Red when: a check-install-prefix carrier was missed.
+- **AC8** (rev-3) — When the resolver the counter runs through is replaced by one naming a python
+  that does not exist, `--write-ratchet` does not leave an empty ledger at exit 0 and `--check`
+  exits non-zero.
+  Red when: a dead counter reads as a population carrying zero literals.
 
 ## 7. Gates
 
@@ -210,6 +246,13 @@ the new arms
   no carried list, no waiver file and no marker. This unit is the widening that makes that
   population countable, on the epoch precedent of `TOOL-cMendedVintage-5`.
 - rev-2 · 2026-09-25 · §8 resolved by the owner: every fork takes its recommendation. F4 added and resolved: the ban counts a kit segment under any literal install prefix.
+- rev-3 · 2026-09-29 · the unit pass, before code. Measuring the predicate over the real tree
+  showed three things rev-2 did not say. F4 and F1(a) reach a kit's name typed after a derived base
+  in shell too, not only in the six python joins, so S1a counts both. F4's widening makes a
+  `.claude/skills/<name>/` Skill directory and a bare repo's `hooks/` count as kit paths, so S4a
+  states the context rule as one rule rather than four instances. And a regex over `grep -oE` cannot
+  read a join's operand, so S1b moves the counter into python and adds AC8 for the dead producer
+  that move makes possible.
 
 ## 10. Reuse audit
 

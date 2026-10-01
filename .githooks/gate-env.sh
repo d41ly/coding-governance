@@ -2,7 +2,7 @@
 # gate-env.sh — THIS REPOSITORY'S gate policy, and nothing else's. TOOL-dUnstalledConvoy-28.
 #
 # WHY THIS FILE EXISTS AT ALL. `.githooks/pre-push` is shipped VERBATIM as engine payload to every
-# push-main adopter (`tools/govkit/entries/push-main.kit.toml`), so a policy written into that hook
+# push-main adopter (`<prefix>/govkit/entries/push-main.kit.toml`), so a policy written into that hook
 # is a policy every adopter inherits without choosing it. Setting `GATE_SELFTESTS` there would turn
 # the kit self-tests back ON for exactly the repositories TOOL-dUnstalledConvoy-26 exists to spare,
 # at exactly the boundary it was measured for. The MECHANISM — the hook sourcing this file when it
@@ -27,10 +27,10 @@
 # PROBE at L and no OVER BUDGET at L — and every suite reporting an INHERITED FAIL or a DEAD PROBE at
 # R is named by a filed backlog record. Beside it, for the unattended kit, a GREEN parity verdict
 # pasted into the landing report (the pooled evidence bound, TOOL-aBatchedArm-5):
-#     bash tools/run-gates/run-selftests.sh --serial --attribute <BASE>
-#     bash tools/unattended/run-unattended-gates.sh --selftests --serial --attribute <BASE>
-#     bash tools/unattended/run-unattended-gates.sh --selftests --pooled
-#     GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh
+#     bash <prefix>/run-gates/run-selftests.sh --serial --attribute <BASE>
+#     bash <prefix>/unattended/run-unattended-gates.sh --selftests --serial --attribute <BASE>
+#     bash <prefix>/unattended/run-unattended-gates.sh --selftests --pooled
+#     GATE_SELFTESTS=1 bash <prefix>/run-gates/run-gates.sh
 # The wording was a bare GREEN until `TOOL-dDerivedDocket-1`, and that was unreachable: several of
 # the held suites are red at any base for causes filed against other units, so the DoD named a state
 # nobody could produce and the red it produced instead was not about the change being graded.
@@ -45,9 +45,17 @@
 # The `export` line is DELETED rather than commented out. A commented assignment is a line somebody
 # uncomments without reading the paragraph above it.
 #
-# THE KEYS THIS FILE MAY DECLARE, as documentation only; gov declares only the inherited-red pair
-# below.
+# THE KEYS THIS FILE MAY DECLARE. Gov declares GOV_KITROOT and the inherited-red pair at the bottom.
+#   GOV_KITROOT=<dir>         where this tree keeps its kits, relative to the root. It is the LAST rung
+#                             both hooks walk, after the install receipt and a root install, so a tree
+#                             govkit installed never needs it (TOOL-aRepatriatedFork-24). pre-push
+#                             reads it from the sourced file; pre-commit reads the one assignment
+#                             and never sources it. Gov keeps no receipt, so it declares one.
 #   GATE_SELFTESTS=1          run the kit self-tests on every default-branch push (the switch above).
+#   GOV_PYTHON=<launcher>     the python the hook and its bar resolve first, and likewise a kit's own
+#                             `<KIT>_PY`. The hook DROPS the environment's copy of each before this file
+#                             runs (TOOL-aRepatriatedFork-49), so only a value declared here is honoured,
+#                             and it must be `export`ed to reach the bar.
 #   GOV_GATE_CMD=<cmd>        the merge bar, when it is not `run-gates.sh`. It must run a script this
 #                             repo tracks, unmodified in the working tree, at word 1 or after bash/sh,
 #                             AND equal the GATE_CMD `.unattended.conf` declares at the pushed sha; the
@@ -69,6 +77,7 @@
 # the push otherwise, so an ignored or excluded copy cannot set the test escape or `exit 0`.
 # The default branch is deliberately NOT a key here: this file is sourced after the hook has decided
 # which ref is the default, so a tracked file cannot choose which branch escapes the bar.
+GOV_KITROOT=tools
 
 # ---- THE INHERITED-RED POLICY, by owner ruling D12-i4 (2026-09-13). TOOL-dDerivedDocket-24 -------
 # Gov LANDS over a red its default branch already carries, when every red leg reads INHERITED against

@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-2 — every kit path a runtime string spells is derived
 
-**Status:** CLOSED · rev-7 · 2026-09-24 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 2
+**Status:** CLOSED · rev-8 · 2026-10-01 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-09-24-build-DEPL-aRepatriatedFork-1-runlog-0e284ca8.md](../build/2026-09-24-build-DEPL-aRepatriatedFork-1-runlog-0e284ca8.md) | journal | DEPL-aRepatriatedFork-1 DEPL-aRepatriatedFork-13 DEPL-aRepatriatedFork-14 DEPL-aRepatriatedFork-17 DEPL-aRepatriatedFork-20 DEPL-aRepatriatedFork-21 TOOL-aRepatriatedFork-3 TOOL-aRepatriatedFork-4 TOOL-aRepatriatedFork-5 TOOL-aRepatriatedFork-6 TOOL-aRepatriatedFork-7 TOOL-aRepatriatedFork-8 TOOL-aRepatriatedFork-9 TOOL-aRepatriatedFork-10 TOOL-aRepatriatedFork-11 TOOL-aRepatriatedFork-12 TOOL-aRepatriatedFork-15 TOOL-aRepatriatedFork-16 TOOL-aRepatriatedFork-18 TOOL-aRepatriatedFork-19 TOOL-aRepatriatedFork-21 |
 | [2026-09-24-build-TOOL-aRepatriatedFork-2-1-acceptance-ledger.md](../build/2026-09-24-build-TOOL-aRepatriatedFork-2-1-acceptance-ledger.md) | journal | — |
+| [2026-10-01-build-TOOL-aRepatriatedFork-23-verifying-repair.md](../build/2026-10-01-build-TOOL-aRepatriatedFork-23-verifying-repair.md) | journal | TOOL-aRepatriatedFork-23 TOOL-aRepatriatedFork-24 TOOL-aRepatriatedFork-26 TOOL-aRepatriatedFork-28 TOOL-aRepatriatedFork-29 TOOL-aRepatriatedFork-30 TOOL-aRepatriatedFork-46 |
 | [2026-09-23-prompt-TOOL-aRepatriatedFork-2-build-brief.md](../prompts/2026-09-23-prompt-TOOL-aRepatriatedFork-2-build-brief.md) | journal | — |
 | [2026-09-24-prompt-TOOL-aRepatriatedFork-2-fold-d-brief.md](../prompts/2026-09-24-prompt-TOOL-aRepatriatedFork-2-fold-d-brief.md) | journal | — |
 | [2026-09-24-prompt-TOOL-aRepatriatedFork-2-repair-r3-brief.md](../prompts/2026-09-24-prompt-TOOL-aRepatriatedFork-2-repair-r3-brief.md) | journal | — |
@@ -465,6 +466,12 @@ New arm: `tools/lib/resolve-python.test.sh` parity table · one extra row per in
   path ships)` and its self-test, `drift-audit selftest`, `codebase-map kit selftest` and
   `process-monitor adopter selftest`: §4 "What the build found" gains the directory-kit `{here}`
   rule and the three fixtures that followed S2, S3 and S8. AC1-AC10 are unchanged.
+- rev-8 · 2026-10-01 · S1: gate repair at VERIFYING, leg `foreign-prefix parity (every self-test at
+  three prefixes)`, row `hook destinations self-test` at the repo root. At a root install the
+  canonical prefix is `.` and a flat entry's home resolves to the empty string. The gate skipped the
+  empty home, so every root-level `{here}` fragment was homeless, and it compared `./<kit>/<file>`
+  destinations with the readers' `<kit>/<file>` as strings. The empty home is recorded as `.`, and
+  both spellings of a destination drop the leading `./`. At `tools/` nothing either line reads moves.
 
 ## 10. Reuse audit
 

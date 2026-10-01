@@ -2206,13 +2206,13 @@ def run_arms(report: bool = True) -> list:
                                      render_scope_row("EXMP-aFoo-1", clauses)])]
 
     arm("V13 — a SCOPE row carrying a `may` grant", "[13]",
-        lambda: str(_read_codes(build_scope_fixture(("may", "`tools/lander-granted.sh`")))))
+        lambda: str(_read_codes(build_scope_fixture(("may", "`bin/lander-granted.sh`")))))
     arm("V13 — a SCOPE row carrying `may none` is the same finding", "[13]",
         lambda: str(_read_codes(build_scope_fixture(("may", GRANT_NONE)))))
     arm("V13 names the SCOPE row and the label it may not carry",
         "SCOPE row for EXMP-aFoo-1 carries a `may` clause, and a SCOPE row honours no grant",
         lambda: str([v.text for v in derive_verdicts(build_corpus(
-            build_scope_fixture(("may", "`tools/lander-granted.sh`"))), _CLEAN_CONF) if v.code == 13]))
+            build_scope_fixture(("may", "`bin/lander-granted.sh`"))), _CLEAN_CONF) if v.code == 13]))
     arm("a SCOPE row carrying no `may` is not V13", "[]",
         lambda: str(_read_codes(build_scope_fixture(("accept", "cured from outside")))))
     arm("V15 — a blank cutoff under `builds`", "[15]",

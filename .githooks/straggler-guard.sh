@@ -20,7 +20,7 @@
 # the checkout it names, the relative `.githooks` check-wiring writes runs each worktree's own. So
 # this library reaches a straggler checked out in a linked worktree only under an ABSOLUTE value.
 # Under the relative one that worktree runs its own pre-flip hook files and this layer is inert
-# there — the documented inert case. `tools/check-wiring.sh` marks such a straggler `hooks own-tree`
+# there — the documented inert case. `<prefix>/check-wiring.sh` marks such a straggler `hooks own-tree`
 # from any post-flip session tree, the drift signal lists it from any node, and hygiene check 26 at
 # the merge bar is what GUARANTEES. These layers instruct; the bar decides.
 #

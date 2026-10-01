@@ -16,12 +16,12 @@
 # `memory/gotchas/pin-copied-from-another-corpus.md`, the class run-gates' own spec refuses by name
 # when it declines to seed an adopter with gov's leg names.
 #
-# The precedent is settled: tools/memory-recall/kit.toml withholds check-recall.py, recall-fixture
+# The precedent is settled: <prefix>/memory-recall/kit.toml withholds check-recall.py, recall-fixture
 # .json and test_recall_floor.py from the payload with a `project-owned` rule, for the same reason
 # in the same words — arms keyed on this repo's own record ids are meaningless in another tree. This
-# file is withheld the same way, is a leg in gov's own tools/gate-legs.json, and carries an
-# [[exempt_leg]] row in tools/govkit/registry.toml. It is deliberately NOT a [[gate_leg]] row in
-# tools/run-gates/kit.toml: a descriptor row naming a leg that ships nowhere is the shape the
+# file is withheld the same way, is a leg in gov's own <prefix>/gate-legs.json, and carries an
+# [[exempt_leg]] row in <prefix>/govkit/registry.toml. It is deliberately NOT a [[gate_leg]] row in
+# <prefix>/run-gates/kit.toml: a descriptor row naming a leg that ships nowhere is the shape the
 # deployer's selfcheck reds on, and the descriptor's FOUR rows are the legs the kit SHIPS.
 #
 # THE REFUSAL BELOW IS THE POINT. A gov-only harness that quietly SUCCEEDS against a foreign corpus
@@ -29,10 +29,32 @@
 # one would inherit a green that means nothing. So this file asserts it is running in the corpus it
 # was written for, and exits 2 — not 0 — when it is not.
 set -u
+HERE="$(cd "$(dirname "$0")" && pwd)"
+# >>> derive_self_rel — canonical copy: kit-rel.sh in gov's lib dir (byte-identical; gated)
+derive_self_rel() {
+  local _dsr_p _dsr_rel=""
+  _dsr_p=$(cd "$1" 2>/dev/null && pwd) || return 1
+  while [ ! -e "$_dsr_p/.git" ]; do
+    [ "$(dirname "$_dsr_p")" = "$_dsr_p" ] && return 1
+    _dsr_rel="$(basename "$_dsr_p")${_dsr_rel:+/$_dsr_rel}"
+    _dsr_p=$(dirname "$_dsr_p")
+  done
+  printf '%s\n' "$_dsr_rel"
+}
+# <<< derive_self_rel
+KIT_REL=$(derive_self_rel "$HERE") || { echo "gov-canary: not inside a git repository"; exit 2; }
+# PFX is the install prefix WITH its trailing slash, derived from where this file sits and empty
+# at a root install: every fixture and host path below is spelled through it, never through a
+# literal prefix (TOOL-aRepatriatedFork-28).
+case "$KIT_REL" in */*) PFX="${KIT_REL%/*}/" ;; *) PFX="" ;; esac
+# TOOL-aRepatriatedFork-46: a kit is named by the name its directory has in THIS install, never
+# as a literal segment: this suite's own from where it sits, a sibling's through the resolver,
+# which reads the install receipt first. A fixture mirrors that layout by the resolved NAME.
+KIT="${KIT_REL##*/}"
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "gov-canary: not a git repo"; exit 2; }
 cd "$ROOT" || exit 2
 
-# >>> resolve_python — canonical copy: tools/lib/resolve-python.sh (byte-identical; gated)
+# >>> resolve_python — canonical copy: resolve-python.sh in gov's lib dir (byte-identical; gated)
 resolve_python() {
   # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
   # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
@@ -117,6 +139,8 @@ if bad:
     print("gov-canary: leg name(s) contain a DOUBLE SPACE, which makes the report tail split"
           " ambiguous: " + "; ".join(bad)); sys.exit(1)
 ' "$LEGS_FILE"; then fail=1; fi
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${fail:-0}" = 0 ] && echo "PASS ($a assertions)" || echo "FAIL ($a assertions)"; [ "${fail:-0}" = 0 ] && exit 0; exit 1; fi
 
 # ---- G1b. `signature` sits on exactly the four legs TOOL-dDerivedDocket-23 S3 gave an `--offenders`
 # mode, and nowhere else. A fifth row would name a signature nobody built a key-only mode for, whose
@@ -244,11 +268,11 @@ else
   # it cannot verify anywhere in the tree.
   a=$((a+1))
   if grep -qF 'min(8, nproc)' "$CHARTER"; then
-    echo "gov-canary: $CHARTER still states the built-in width formula; the width is declared in tools/run-gates/gate-profiles.txt and read from there"; fail=1
+    echo "gov-canary: $CHARTER still states the built-in width formula; the width is declared in ${PFX}${KIT}/gate-profiles.txt and read from there"; fail=1
   fi
   a=$((a+1))
-  grep -qF 'tools/run-gates/gate-profiles.txt' "$CHARTER" \
-    || { echo "gov-canary: $CHARTER does not name tools/run-gates/gate-profiles.txt as the source of the pool width, so the negative half above would pass on a DELETED sentence"; fail=1; }
+  grep -qF ''"${PFX}${KIT}/gate-profiles.txt"'' "$CHARTER" \
+    || { echo "gov-canary: $CHARTER does not name ${PFX}${KIT}/gate-profiles.txt as the source of the pool width, so the negative half above would pass on a DELETED sentence"; fail=1; }
 fi
 
 # ---- G6. EVERY GOV LEG DECLARES A CEILING --------------------------------------------------------
@@ -340,7 +364,7 @@ if "guard" in rows[0]:
 fi
 
 # ---- verdict -------------------------------------------------------------------------------------
-# The executed assertion count, in the shape tools/check-testsuite-counts.sh reads, against a floor
+# The executed assertion count, in the shape <prefix>/check-testsuite-counts.sh reads, against a floor
 # declared here. the run-gates promotion spec's S11: this file gets a counter and a floor at BIRTH, so it
 # never needs a row in memory/project/testsuite-count-waivers.txt.
 # EVERY LEG OF GOV'S REAL MANIFEST CARRIES A CHUNK, and its value is one of the six declared
@@ -358,7 +382,7 @@ if bad:
     print("gov-canary: leg(s) with no chunk key, or a value outside the six declared names %s: %s"
           % (sorted(SIX), ", ".join(bad)))
     sys.exit(1)
-' "$ROOT/tools/gate-legs.json" || fail=1
+' "$ROOT/${PFX}gate-legs.json" || fail=1
 # ---- THE SHARD CONTRACT, both directions (TOOL-aShardedFloor-2) ----------------------------------
 # A sharded suite is TWO manifest rows on ONE script, and the failure that costs is silent: delete
 # one row and the bar goes green having run half the suite. Nothing else notices, because every
@@ -420,7 +444,7 @@ if bad:
     for b in bad:
         print("  " + b)
     sys.exit(1)
-' "$ROOT" "$ROOT/tools/gate-legs.json" || fail=1
+' "$ROOT" "$ROOT/${PFX}gate-legs.json" || fail=1
 
 [ "$a" -ge "$FLOOR_ASSERTIONS" ] || { echo "gov-canary: executed $a assertions, below the pinned floor $FLOOR_ASSERTIONS"; fail=1; }
 if [ "$fail" = 0 ]; then

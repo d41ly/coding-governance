@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """selftest.py — the drift-audit kit's own falsifiability test.
 
-gov:kit drift-audit@1.17
+gov:kit drift-audit@1.21
 
     python <kit>/selftest.py
 
@@ -30,12 +30,62 @@ import tempfile
 sys.dont_write_bytecode = True
 
 KIT = pathlib.Path(__file__).resolve().parent
+# TOOL-aRepatriatedFork-46: this kit is named by the NAME its directory has in this install, and a
+# SIBLING kit is reached through the resolver, which reads the install receipt first.
+KIT_NAME = KIT.name
+# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
+def resolve_kit_dir(home, anchor, here):
+    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
+
+    1. receipt — the `.governance/install.json` row whose `source` ends in <home>/<anchor> and
+       whose `path` exists inside this tree. The only record of a RENAMED kit dir: no probe finds
+       a memory-recall kit an adopter homed at `scripts/recall/`.
+    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
+    3. refuse — LookupError naming the three places looked; never a guessed prefix.
+    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
+    """
+    import json
+    import pathlib
+    here = pathlib.Path(here).absolute()  # never resolve(): a junction must not move it
+    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
+    receipt = root / ".governance" / "install.json"
+    try:
+        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("path"):
+            continue
+        if str(row.get("source") or "").split("/")[-2:] != [home, anchor]:
+            continue
+        hit = (root / str(row["path"])).absolute()
+        if hit.is_file() and root in hit.parents and ".." not in hit.parts:
+            return hit.parent
+    probes = (here / home, here.parent / home)
+    for cand in probes:
+        if (cand / anchor).is_file():
+            return cand
+    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
+        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
+# <<< resolve_kit_dir
 # The report's path INSIDE the scratch repos this file builds, which install the kit at the ROOT
 # prefix on purpose — that is the dual-spelling support gov keeps for its not-retrofitted adopters,
 # and a selftest that could not build one could not test it. Written ONCE here rather than twelve
 # times below: a literal repeated twelve times is twelve chances for eleven of them to be updated.
-REPORT_REL = "drift-audit/drift_report.py"  # gov:root-fixture — scratch-repo path, never gov's own
+ROOT_PFX = ""   # a root install's prefix is empty, and the scratch repos are built through it
+REPORT_REL = f"{ROOT_PFX}{KIT_NAME}/drift_report.py"
 FAILS: list[str] = []
+
+
+def resolve_recall_name() -> str:
+    """The memory-recall kit's directory NAME in this install, or "" where none is installed: a
+    fixture built from this install cannot carry a kit this install does not have."""
+    try:
+        return resolve_kit_dir("memory-recall", "extract.py", KIT).name
+    except LookupError:
+        return ""
+
+
 SKIPS: list[str] = []
 EXECUTED: list[str] = []
 # TOOL-dLoggedFlight-13. The suite printed "all checks passed" with no count behind it, so an arm
@@ -197,7 +247,7 @@ def make_repo(tmp: pathlib.Path, name: str = "repo") -> pathlib.Path:
     (r / "memory" / "project" / "in-flight").mkdir(parents=True)
     (r / "src").mkdir(parents=True)
     (r / "conf").mkdir(parents=True)
-    (r / "drift-audit").mkdir(parents=True)
+    (r / KIT_NAME).mkdir(parents=True)
 
     (r / ".memory-tree.conf").write_text("MEMORY_ROOT=memory\n", encoding="utf-8", newline="\n")
     (r / "AGENTS.md").write_text("# charter\n\n| Tag | Machine | Tree |\n|---|---|---|\n",
@@ -258,8 +308,8 @@ def make_repo(tmp: pathlib.Path, name: str = "repo") -> pathlib.Path:
         encoding="utf-8", newline="\n")
 
     for f in ("drift_report.py", "drift_signals.template.py"):
-        (r / "drift-audit" / f).write_bytes((KIT / f).read_bytes())
-    (r / "drift-audit" / "drift_signals.py").write_text(
+        (r / KIT_NAME / f).write_bytes((KIT / f).read_bytes())
+    (r / KIT_NAME / "drift_signals.py").write_text(
         # PRODUCT_GLOBS is deliberately WIDER than TRACE_GLOBS here. The narrowing is the whole
         # point of TRACE_GLOBS -- in the shipping repo it drops `.claude/` and the kickoff
         # manifest so a records commit cannot certify the record -- and with the two equal, an
@@ -601,7 +651,7 @@ def test_signals_can_move(tmp: pathlib.Path) -> None:
     # over a spec a stray file already silenced would pass without the key doing anything. Then the
     # key names the new home and it is silent; then a declared path that is not there, and one outside
     # the tree, each come back as a finding of their own rather than as an empty waiver set.
-    sigp = r / "drift-audit" / "drift_signals.py"
+    sigp = r / KIT_NAME / "drift_signals.py"
     sig_base = sigp.read_text(encoding="utf-8")
     moved = r / "waivers" / "trace.txt"
     moved.parent.mkdir(parents=True, exist_ok=True)
@@ -639,7 +689,7 @@ def test_signals_can_move(tmp: pathlib.Path) -> None:
 
     # --- 3 — --check honours the pin in BOTH directions -------------------------------------
     print("--check pin semantics")
-    sig = r / "drift-audit" / "drift_signals.py"
+    sig = r / KIT_NAME / "drift_signals.py"
     over = run([sys.executable, REPORT_REL, "--check"], r)
     check("--check reds while a gateable signal is over its (default 0) pin", over.returncode == 1,
           f"rc={over.returncode}")
@@ -761,9 +811,9 @@ def test_lexicon_signals(tmp: pathlib.Path) -> None:
     # Adopt the kit INTO the fixture: the engine reaches it by `sys.path`, so the reader has to be
     # present exactly where an installed kit puts it -- BESIDE the drift-audit kit, which this fixture
     # installs at the root prefix, because the engine resolves its sibling through `resolve_kit_dir`
-    # (TOOL-aRepatriatedFork-2 S3), not at the graded root's `tools/`.
-    kit_src = pathlib.Path(__file__).resolve().parent.parent / "lexicon"
-    shutil.copytree(kit_src, r / "lexicon",
+    # (TOOL-aRepatriatedFork-2 S3), not at the graded root's `<prefix>/`.
+    kit_src = resolve_kit_dir("lexicon", "lexicon.py", KIT)
+    shutil.copytree(kit_src, r / kit_src.name,
                     ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
     src = r / "src" / "thing.py"
     src.write_text("def build_thing():\n    pass\n", encoding="utf-8", newline="\n")
@@ -899,8 +949,8 @@ def test_lexicon_marginal_rate(tmp: pathlib.Path) -> None:
           absent["gateable"] is False and absent["value"] == 0, f"{absent}")
     check("no .lexicon.conf: it says why", "not adopted" in str(absent["detail"]), f"{absent['detail']}")
 
-    kit_src = pathlib.Path(__file__).resolve().parent.parent / "lexicon"
-    shutil.copytree(kit_src, r / "lexicon",
+    kit_src = resolve_kit_dir("lexicon", "lexicon.py", KIT)
+    shutil.copytree(kit_src, r / kit_src.name,
                     ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
     (r / ".lexicon.conf").write_text(
         'BANNED_SUFFIXES="Manager"\nLANGS="py:python-ast:parser"\n'
@@ -1008,7 +1058,7 @@ def test_lexicon_marginal_rate(tmp: pathlib.Path) -> None:
     # carried an `or of > 0` escape to paper over that, which made it satisfiable by the very
     # population it was supposed to exclude -- observed staying green with the guard reverted.
     b = make_repo(tmp, "lexblind")
-    shutil.copytree(kit_src, b / "lexicon",
+    shutil.copytree(kit_src, b / kit_src.name,
                     ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
     (b / ".lexicon.conf").write_text(
         'BANNED_SUFFIXES="Manager"' + chr(10) + 'LANGS="py:python-ast:parser"' + chr(10)
@@ -1258,8 +1308,9 @@ def test_backlog_ask_signals(tmp: pathlib.Path) -> None:
         check(f"[dDD-34] builds mode, no BACKLOG.md: {name} is NOT ASKED, never DEAD",
               got[name].get("not_asked") is True, f"{got[name]}")
 
-    (r / "memory-tree").mkdir()
-    (r / "memory-tree" / "gen_build_index.py").write_text(_STUB_GENERATOR, encoding="utf-8",
+    _mt = resolve_kit_dir("memory-tree", "gen_build_index.py", KIT).name  # found, never typed
+    (r / _mt).mkdir()
+    (r / _mt / "gen_build_index.py").write_text(_STUB_GENERATOR, encoding="utf-8",
                                                           newline="\n")
     home = r / "memory" / "builds" / "aFoo"
     home.mkdir(parents=True, exist_ok=True)
@@ -1538,7 +1589,7 @@ def test_declared_empty(tmp: pathlib.Path) -> None:
     """
     print("DECLARED_EMPTY (a drained probe reports declared, never muzzles a live one, and LIFTS)")
     r = make_repo(tmp, name="declared")
-    sig = r / "drift-audit" / "drift_signals.py"
+    sig = r / KIT_NAME / "drift_signals.py"
     ledger_dir = r / "memory" / "project" / "in-flight"
 
     # --- direction one: the population is drained and the emptiness is declared ----------------
@@ -1652,7 +1703,7 @@ def test_ratchet_guard(tmp: pathlib.Path) -> None:
     print("RATCHET guard (a weakening move needs a reason; a tightening one never does)")
     r = make_repo(tmp, name="ratchet")
     conf = r / ".memory-tree.conf"
-    sig = r / "drift-audit" / "drift_signals.py"
+    sig = r / KIT_NAME / "drift_signals.py"
 
     # The pin must be COMMITTED before the arm moves it: the guard compares the working copy against
     # `git show <base>:<file>`, so a pin that exists only in the working tree has no prior value and
@@ -1680,7 +1731,7 @@ def test_ratchet_guard(tmp: pathlib.Path) -> None:
     committed = conf.read_text(encoding="utf-8")
 
     def _check() -> subprocess.CompletedProcess:
-        return run([sys.executable, str(r / "drift-audit" / "drift_report.py"), "--check"], r)
+        return run([sys.executable, str(r / KIT_NAME / "drift_report.py"), "--check"], r)
 
     base_ok = _check()
     check("the fixture is clean before the arm", base_ok.returncode == 0,
@@ -1733,7 +1784,7 @@ def test_base_is_remote_tracking(tmp: pathlib.Path) -> None:
     print("BASE is remote-tracking (local main behind, equal and ahead of origin: one answer)")
     r = make_repo(tmp, name="remotebase")
     conf = r / ".memory-tree.conf"
-    sig = r / "drift-audit" / "drift_signals.py"
+    sig = r / KIT_NAME / "drift_signals.py"
     conf.write_text(conf.read_text(encoding="utf-8") + 'ORPHAN_ID_PIN="5"\n',
                     encoding="utf-8", newline="\n")
     sig.write_text(
@@ -2057,7 +2108,7 @@ def test_harness_liveness_note_is_derived(tmp: pathlib.Path) -> None:
     LF = chr(10)
 
     for harness in ("drift-audit-code.js", "drift-audit-state.js"):
-        src = (KIT.parent / "workflows" / harness).read_text(encoding="utf-8")
+        src = (resolve_kit_dir("workflows", harness, KIT) / harness).read_text(encoding="utf-8")
         if "function deriveLiveness" not in src:
             check(f"{harness}: carries the derived note", False,
                   "deriveLiveness is absent — the hand-written ternary is back")
@@ -2127,7 +2178,7 @@ def test_harness_liveness_note_is_derived(tmp: pathlib.Path) -> None:
 
 def test_evidence_oracle(tmp: pathlib.Path) -> None:
     r = make_repo(tmp, name="evidence")
-    proj = r / "drift-audit" / "drift_signals.py"
+    proj = r / KIT_NAME / "drift_signals.py"
     conf = r / ".memory-tree.conf"
     spec_dir = r / SPEC_DIR_FOR_FIXTURE
 
@@ -2225,14 +2276,17 @@ def test_local_grammar_matches_the_extractor(tmp: pathlib.Path) -> None:
     """
     import importlib.util
 
-    extractor = KIT.parent / "memory-recall" / "extract.py"
-    if not extractor.exists():
+    try:
+        extractor = resolve_kit_dir("memory-recall", "extract.py", KIT) / "extract.py"
+    except LookupError:
+        extractor = None
+    if extractor is None or not extractor.exists():
         skip("local grammar equals the extractor's", "no memory-recall kit beside this one")
         return
     spec = importlib.util.spec_from_file_location("_drift_report_probe", KIT / "drift_report.py")
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
-    root = KIT.parent.parent
+    root = next((p for p in KIT.parents if (p / ".git").exists()), KIT.parent.parent)
     families = mod._read_families(mod.load_conf(root))
     # AGAINST THE EXTRACTOR ITSELF, not against the accessor. The accessor falls back to the local
     # copy on ANY import failure, so comparing the two compared the copy to itself and passed for
@@ -2263,7 +2317,7 @@ def test_source_cited_ids(tmp: pathlib.Path) -> None:
     NL = chr(10)
     r = make_repo(tmp, name="citations")
     conf = r / ".memory-tree.conf"
-    proj = r / "drift-audit" / "drift_signals.py"
+    proj = r / KIT_NAME / "drift_signals.py"
 
     def run_commit(msg: str) -> None:
         run(["git", "add", "-A"], r)
@@ -2348,7 +2402,7 @@ def test_source_cited_ids(tmp: pathlib.Path) -> None:
     # the assertion is that the run RETURNS at all rather than raising and taking the other signals
     # with it -- the failure mode is a dead leg for that adopter, not a missing signal.
     check("citations: the report returns in a tree with drift-audit and no recall kit",
-          not (r / "memory-recall").exists() and read_signal()["signal"],
+          not (resolve_recall_name() and (r / resolve_recall_name()).exists()) and read_signal()["signal"],
           "the fixture unexpectedly has a recall kit beside it")
 
 
@@ -2366,7 +2420,7 @@ def test_report_only_signal_is_judged_against_its_pin(tmp: pathlib.Path) -> None
     status line cannot afford that: it trains a reader to ignore the column.
     """
     r = make_repo(tmp, name="pinned")
-    proj = r / "drift-audit" / "drift_signals.py"
+    proj = r / KIT_NAME / "drift_signals.py"
     NL = chr(10)
 
     def read_human_table() -> str:
@@ -2411,7 +2465,7 @@ def test_evidence_globs_exclude_test_templates(tmp: pathlib.Path) -> None:
     re-admitting a template to the evidence population under a comment claiming total coverage.
     """
     r = make_repo(tmp, name="templates")
-    proj = r / "drift-audit" / "drift_signals.py"
+    proj = r / KIT_NAME / "drift_signals.py"
     proj.write_text(proj.read_text(encoding="utf-8").replace(
         "EVIDENCE_GLOBS = ['src', ':(exclude)*.test.sh']",
         "EVIDENCE_GLOBS = ['src', ':(exclude)*.test.sh', ':(exclude)*fixture*', "
@@ -2806,8 +2860,11 @@ def test_park_sets_match_the_driver(tmp: pathlib.Path) -> None:
     sys.path.insert(0, str(KIT))
     import drift_report as dr
 
-    driver = KIT.parent / "unattended" / "unattended.sh"
-    if not driver.exists():
+    try:
+        driver = resolve_kit_dir("unattended", "unattended.sh", KIT) / "unattended.sh"
+    except LookupError:
+        driver = None
+    if driver is None or not driver.exists():
         skip("run-record sets equal the driver's", "no unattended driver beside this kit")
         return
     text = driver.read_text(encoding="utf-8", errors="replace")
@@ -2867,6 +2924,11 @@ def main() -> int:
     with tempfile.TemporaryDirectory() as td:
         tmp = pathlib.Path(td)
         test_conf_parser_matches_bash(tmp)
+        # FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+        if os.environ.get("FOREIGN_PREFIX_PROBE") == "1":
+            print("foreign-prefix-probe: stopped after 1 arm")
+            print("FAIL (1 assertions)" if (FAILS) else "PASS (1 assertions)")
+            return 1 if (FAILS) else 0
         test_harness_liveness_note_is_derived(tmp)
         test_signals_can_move(tmp)
         test_lexicon_signals(tmp)

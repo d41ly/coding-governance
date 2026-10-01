@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# lib-selftest.test.sh — the arms for tools/lib/lib-selftest.sh. TOOL-aQuenchedHarness-5 S7.
+# lib-selftest.test.sh — the arms for <prefix>/lib/lib-selftest.sh. TOOL-aQuenchedHarness-5 S7.
 #
 # IT DOES NOT USE THE HARNESS TO TEST ITSELF, and that is not squeamishness: half of what must be
 # graded here is the harness FAILING correctly, and an arm that fails inside the harness fails the
@@ -20,7 +20,7 @@ nope() { n=$((n+1)); bad=1; printf 'nope %s — %s\n' "$1" "${2:-}"; }
 
 # FLOOR_ASSERTIONS grades whether this SUITE still carries its arms, not whether this box could run
 # them. A suite that silently shrinks reports green over a population it stopped grading.
-FLOOR_ASSERTIONS=17
+FLOOR_ASSERTIONS=18
 
 # run_harness <name> <body> -> writes $TMP/<name>.out, returns the harness's exit status
 run_harness() {
@@ -38,6 +38,8 @@ arm \"a control arm\" 0 \"base\" \"true\" \"cat subject.txt\"
 run_arms t"
 rc=$?
 [ "$rc" = 0 ] && ok "a suite whose every arm holds exits 0" || nope "a passing suite exited $rc" "$(head -3 "$TMP/pass.out")"
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "$bad" = 0 ] && echo "PASS ($n assertions)" || echo "FAIL ($n assertions)"; exit "$bad"; fi
 grep -q '^PASS (1 arms' "$TMP/pass.out" && ok "and reports its own arm count" || nope "no PASS line with a count" "$(cat "$TMP/pass.out")"
 
 # ---- 2. THE FAILING CASE. Charter section 7: a gate is not landed until this has been observed --
@@ -148,6 +150,16 @@ rc=$?
 [ "$rc" = 0 ] && ok "a second build_fixture starts a second batch rather than replaying the first"               || nope "the second batch exited $rc" "$(cat "$TMP/batches.out")"
 grep -q '^PASS (1 arms' "$TMP/batches.out" && [ "$(grep -c '^PASS (1 arms' "$TMP/batches.out")" = 2 ]   && ok "and each batch reports ONE arm, not the running total"   || nope "the batches did not report one arm each" "$(cat "$TMP/batches.out")"
 [ "$(grep -c '^ok    batch one arm' "$TMP/batches.out")" = 1 ]   && grep -q '^ok    batch two arm' "$TMP/batches.out"   && ok "and batch one's arm is graded ONCE, not replayed against batch two's fixture"   || nope "batch one leaked into batch two" "$(cat "$TMP/batches.out")"
+
+# ---- 10. THE FOREIGN-PREFIX PROBE, TOOL-aRepatriatedFork-52 S1. Under FOREIGN_PREFIX_PROBE=1 a
+# ----    harness suite runs its FIRST declared arm, says so, and exits with that arm's verdict, so
+# ----    the second batch the arm above ran never starts.
+FOREIGN_PREFIX_PROBE=1 run_harness probe "$(sed 1,2d "$TMP/batches.sh")"
+rc=$?
+[ "$rc" = 0 ] && grep -q '^foreign-prefix-probe: stopped after 1 arm$' "$TMP/probe.out" \
+  && [ "$(grep -c '^ok    batch' "$TMP/probe.out")" = 1 ] && grep -q '^PASS (1 arms' "$TMP/probe.out" \
+  && ok "a probe runs one arm, prints the probe marker and exits before a second batch" \
+  || nope "the probe flag did not stop the suite after one arm (exit $rc)" "$(cat "$TMP/probe.out")"
 
 echo
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "lib-selftest-test: executed $n assertions, below the pinned floor $FLOOR_ASSERTIONS"; bad=1; }
