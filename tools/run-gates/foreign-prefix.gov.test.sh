@@ -271,11 +271,18 @@ run_at_prefix() { # $1 = prefix, empty for the repo root; returns 1 when the pre
     fi
     case "$argv" in python3\ *|python\ *) argv="$PY ${argv#* }" ;; esac
     i=$((i + 1)); d="$TMPD/runs/$i"; mkdir -p "$d"; printf '%s\n' "$name" > "$d/name"
+    # A whole row waits for the pool to drain (S6): its budget was measured one suite at a time.
+    if [ "$kind" = whole ]; then printf '%s\t%s\t%s\t%s\n' "$d" "$name" "$bound" "$argv" >> "$TMPD/runs/whole"; continue; fi
     run_row "$label" "$d" "$name" "$bound" "$argv" "$kind" < /dev/null &
     live=$((live + 1))
     if [ "$live" -ge "$WIDTH" ]; then wait -n; live=$((live - 1)); fi
   done 3< <(printf '%s\n' "$list" | sed -nE 's/^  (.*[^ ]) +([0-9]+)s  (.+)$/\1\t\2\t\3/p')
   wait
+  if [ -f "$TMPD/runs/whole" ]; then
+    while IFS=$'\t' read -r -u 3 d name bound argv; do
+      run_row "$label" "$d" "$name" "$bound" "$argv" whole < /dev/null
+    done 3< "$TMPD/runs/whole"
+  fi
   [ "$n" -gt 0 ] || { print_fail "at ${p:-the repo root} the population selected no row${FILTER:+ matching '$FILTER'}, so this prefix graded nothing"; return 1; }
   for d in "$TMPD"/runs/*/; do
     [ -f "$d/name" ] || continue
