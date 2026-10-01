@@ -44,7 +44,7 @@ drift-audit wiring	9.8	1	a	2026-09-06	runner
 encoding posture (text IO names its encoding)	4.2	2	a	2026-09-24	runner
 every held leg is budgeted, every budget row resolves	35.6	2	a	2026-09-24	runner
 extract-arms self-test	23.1	2	a	2026-09-24	runner
-foreign-prefix parity (every self-test at three prefixes)	8302.2	1	a	2026-10-01	the leg own seconds in gate-run, full bar GATE_FULL=1 GATE_SELFTESTS=1 at 6e7cb0df; the run redded after its calibrate at gov prefix, one pass of four, so a green run costs more
+foreign-prefix parity (every self-test at three prefixes)	2494.0	1	a	2026-10-01	the redesigned leg alone at 19ef4230 on node a, PASS at three prefixes, 81 rows each, whole rows serial
 gotchas selftest	21.4	2	a	2026-09-24	runner
 govkit acceptance matrix	218.8	1	a	2026-09-06	runner
 govkit refusal join	2.6	1	a	2026-09-06	runner
