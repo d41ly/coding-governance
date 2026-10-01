@@ -201,6 +201,27 @@ lens counts as neither live nor dead. A spec audit has no light subset, so `'lig
 value other than the two refuses on both kinds. `intensity` joins the review key. A diff that crosses a
 trust boundary is not one to review light: the `security` lens is one of the two a light run skips.
 
+Every finding carries `lens`, the key of the lens the harness dispatched, never the label the agent
+echoed back, and every finding line in a skeptic prompt, the synthesis prompt and the run log names
+it as `lens=<key>`. Every return carries three fields beside the counts:
+
+- `ledger` — one entry per finding in id order: `id`, `lens`, `ref`, `severity` (the finder's),
+  `skepticSeverity`, `verdict` (`confirmed`, `refuted`, `uncertain`, or `unverified` when no verdict
+  stands), `reason`, `fixVerdict` and `claim`. An absent optional value is `null`.
+- `confirmedFindings` — one entry per confirmed finding: `id`, `lens`, `ref`, `claim`, `severity` (the
+  binding grade), `fix` and `fixVerdict`. A fix the skeptic judged unsound is replaced by its note
+  when it gave one. Pass this array as the next round's `priorFindings` rather than re-typing it.
+- `appendix` — the ledger as a markdown table under `## Appendix — every finding`, with the eight
+  columns `id | lens | ref | severity | skepticSeverity | verdict | reason | fixVerdict`. A cell is `-`
+  when its value is absent, a `|` is escaped, and line breaks fold to a space.
+
+The two exits before any skeptic runs, every lens dead and no finding raised, return `[]`, `[]` and
+`''`; a deferred return carries what was judged so far. The harness renders the appendix and tells the
+synthesis to copy it verbatim as the report's last section. That copy is the only way a REFUTED finding
+reaches a record, and the harness cannot check it was made: compare the report against the returned
+`appendix`. A run whose every finding is refuted writes no report, so there the appendix exists in the
+return alone, and the caller writes it down if it wants one.
+
 ## `orient-counterfactual.js` — one stage-2 arm per call
 
 The stage-2 `orient` subagent is deferred behind a measurement: whether moving a kickoff's

@@ -870,6 +870,156 @@ async function runWholeScriptArms() {
   if (checkNoThrow(rl6, 'light checklist') && checkNoThrow(rf6, 'full checklist')) {
     ck(scanSix(rl6, 3) && scanSix(rf6, 5), 'intensity: every checklist item reaches a running lens')
   }
+  await runLedgerArms()
+}
+
+// ==== TOOL-aSightedSkeptic-8 — every finding keeps its lens; ledger, confirmedFindings and appendix ====
+// Every arm is RED against the parent render: its findings carry no `lens`, no prompt line names one,
+// and no return carries `ledger`, `confirmedFindings` or `appendix`. Self-contained, so the block runs
+// the same wherever it is called from. The stub lens `<key>` writes its one finding at `<key>.js:1`,
+// which is how each arm tells which lens raised a finding without asking the harness.
+async function runLedgerArms() {
+  const LORDER = ['security', 'correctness', 'seams', 'verification', 'intent']
+  const lensOfRef = (ref) => String(ref).split('.js:')[0]
+  const scanLedger = (run, n) => !!run.result && Array.isArray(run.result.ledger) && run.result.ledger.length === n
+  const scanPrompts = (run, prefix) => run.trace.filter((t) => t.label.indexOf(prefix) === 0)
+  let r = null
+  // ---- AC1: the lens is the DISPATCH key — on a complete run, against an echo of 'bogus', and over
+  // ---- lens files reused from the probe.
+  const lc = await runReview(DIFF, ALL_OK)
+  if (checkNoThrow(lc, 'ledger complete run')) {
+    ck(scanLedger(lc, 5) && lc.result.ledger.every((e, i) => e.id === i + 1 && e.lens === LORDER[i] && lensOfRef(e.ref) === e.lens),
+      'ledger: every finding carries its dispatching lens: a complete run, five entries in id order')
+  }
+  const buildBogusLens = (label) => {
+    const lr = buildLensReturn(label)
+    lr.lens = 'bogus'
+    lr.findings[0].lens = 'bogus'
+    return lr
+  }
+  r = await runReview(DIFF, buildStubs({ 'find:seams': buildBogusLens }))
+  if (checkNoThrow(r, 'ledger bogus echo')) {
+    ck(scanLedger(r, 5) && r.result.ledger[2].lens === 'seams' && r.result.ledger.every((e) => e.lens !== 'bogus' && lensOfRef(e.ref) === e.lens),
+      'ledger: every finding carries its dispatching lens: an echo of bogus still yields seams')
+  }
+  const LK = lc.result ? lc.result.key : ''
+  r = await runReview(DIFF, buildStubs({ 'resume:probe': buildProbe(LORDER.map((l) => buildLensFile(l, LK))) }))
+  if (checkNoThrow(r, 'ledger reused lenses')) {
+    ck(r.scanSpawned('find:').length === 0 && r.result.lensesReused === 5 && scanLedger(r, 5) &&
+      r.result.ledger.every((e, i) => e.lens === LORDER[i] && lensOfRef(e.ref) === e.lens),
+      'ledger: every finding carries its dispatching lens: every lens file reused yields the same lenses')
+  }
+
+  // ---- AC2: `lens=<key>` follows the grade on every verify line and every CONFIRMED synthesis line,
+  // ---- and the stubs' own id patterns still match (the run completing with five confirmed says so).
+  // The synthesis line may carry TOOL-aSightedSkeptic-6's grade parenthetical between the bracket and the lens.
+  const LINE_RE = /^id=(\d+) \[high\](?: \([^)]*\))? lens=([a-z-]+) ([a-z-]+)\.js:1 — /
+  const vl = scanPrompts(lc, 'verify:')
+  ck(vl.length === 5 && vl.every((t) => {
+    const lines = t.prompt.split('\n').filter((l) => l.indexOf('id=') === 0)
+    return lines.length === 1 && lines.every((l) => { const m = LINE_RE.exec(l); return !!m && m[2] === m[3] && m[2] === LORDER[+m[1] - 1] })
+  }), 'ledger: the skeptic and synthesis lines name the lens: every verify: finding line')
+  const lsp = lc.trace.find((t) => t.label === 'synth')
+  const lhead = lsp ? lsp.prompt.split('UNVERIFIED findings')[0] : ''
+  const lcl = lhead.split('\n').filter((l) => l.indexOf('- id=') === 0).map((l) => l.slice(2))
+  ck(!!lc.result && lc.result.confirmed === 5 && [...lhead.matchAll(/id=(\d+) \[/g)].length === 5 && lcl.length === 5 &&
+    lcl.every((l) => { const m = LINE_RE.exec(l); return !!m && m[2] === m[3] }),
+    'ledger: the skeptic and synthesis lines name the lens: every CONFIRMED synth line, id pattern intact')
+  r = await runReview(DIFF, buildStubs({ 'verify:ids-2-2': null }))
+  if (checkNoThrow(r, 'ledger deferred log')) {
+    const dl = r.logs.filter((l) => /^ {2}(CONFIRMED|UNVERIFIED) \[/.test(l))
+    ck(dl.length === 5 && dl.every((l) => { const m = / lens=([a-z-]+) ([a-z-]+)\.js:1 - /.exec(l); return !!m && m[1] === m[2] }),
+      'ledger: the skeptic and synthesis lines name the lens: the deferred path\'s log lines')
+  }
+
+  // ---- AC3: one batch per state. id 1 refuted, 2 uncertain, 3 no verdict, 4 contradicted, 5 confirmed
+  // ---- at low with an unsound fix.
+  const VS = {
+    'verify:ids-1-1': { path: '/v', verdicts: [{ id: 1, verdict: 'refuted', reason: 'r1' }] },
+    'verify:ids-2-2': { path: '/v', verdicts: [{ id: 2, verdict: 'uncertain', reason: 'r2' }] },
+    'verify:ids-3-3': { path: '/v', verdicts: [] },
+    'verify:ids-4-4': { path: '/v', verdicts: [{ id: 4, verdict: 'confirmed', reason: 'a' }, { id: 4, verdict: 'refuted', reason: 'b' }] },
+    'verify:ids-5-5': { path: '/v', verdicts: [{ id: 5, verdict: 'confirmed', reason: 'r5', severity: 'low', fixVerdict: 'unsound', fixNote: 'n5' }] },
+  }
+  r = await runReview(DIFF, buildStubs(VS))
+  if (checkNoThrow(r, 'ledger verdict states')) {
+    const L = scanLedger(r, 5) ? r.result.ledger : []
+    ck(L.map((e) => e.verdict).join(' ') === 'refuted uncertain unverified unverified confirmed' &&
+      L[0].reason === 'r1' && L[3].reason === 'contradictory verdicts' && L[4].skepticSeverity === 'low' && L[4].fixVerdict === 'unsound' &&
+      L.every((e, i) => e.lens === LORDER[i] && e.severity === 'high' && e.claim === LORDER[i] + ' claim'),
+      'ledger: every verdict state reaches the ledger: ' + L.map((e) => e.verdict).join(' '))
+    ck(L.length === 5 && L[0].skepticSeverity === null && L[0].fixVerdict === null && L[2].skepticSeverity === null &&
+      L[2].fixVerdict === null && L[2].reason === '' && L[3].skepticSeverity === null,
+      'ledger: every verdict state reaches the ledger: the absent fields read null, a missing reason reads empty')
+  }
+
+  // ---- AC4: confirmedFindings is round N+1's priorFindings, with a rejected fix replaced.
+  const cf = lc.result && Array.isArray(lc.result.confirmedFindings) ? lc.result.confirmedFindings : null
+  ck(!!cf && cf.length === lc.result.confirmed && cf.length === 5 &&
+    cf.every((e, i) => e.id === i + 1 && e.lens === LORDER[i] && e.ref === LORDER[i] + '.js:1' && e.claim === LORDER[i] + ' claim' &&
+      e.severity === 'high' && e.fix === 'f' && e.fixVerdict === null),
+    'ledger: confirmedFindings feeds the next round: one entry per confirmed finding')
+  const unsound2 = (label, prompt) => {
+    const vr = buildVerdicts('confirmed')(label, prompt)
+    for (const v of vr.verdicts) Object.assign(v, { severity: 'blocker', fixVerdict: 'unsound', fixNote: 'better fix' })
+    return vr
+  }
+  r = await runReview(DIFF, buildStubs({ 'verify:ids-2-2': unsound2 }))
+  if (checkNoThrow(r, 'ledger rejected fix')) {
+    const c2 = Array.isArray(r.result.confirmedFindings) ? r.result.confirmedFindings : []
+    ck(c2.length === 5 && c2[1].fix === 'better fix' && c2[1].fixVerdict === 'unsound' && c2[1].severity === 'blocker' &&
+      c2.filter((e, i) => i !== 1).every((e) => e.fix === 'f' && e.severity === 'high'),
+      'ledger: confirmedFindings feeds the next round: a rejected fix is replaced by the skeptic\'s note, at the binding grade')
+  }
+  r = await runReview(Object.assign({}, DIFF, { round: 2, priorFindings: cf }), ALL_OK)
+  if (checkNoThrow(r, 'ledger round two')) {
+    const f2 = scanPrompts(r, 'find:')
+    ck(!!cf && f2.length === 5 && f2.every((t) => cf.every((e) => t.prompt.indexOf('  - ' + e.ref + ' - ' + e.claim) !== -1)),
+      'ledger: confirmedFindings feeds the next round: a round-2 run given it carries every ref and claim in every find: prompt')
+  }
+
+  // ---- AC5: the harness renders the table, refuted rows included, and hands it to the synthesis
+  // ---- verbatim. id 1's claim and reason carry a pipe and a line break; the row count does not move.
+  const buildPipeLens = (label) => {
+    const lr = buildLensReturn(label)
+    if (lr.lens === 'security') lr.findings[0].claim = 'a | b\nc'
+    return lr
+  }
+  r = await runReview(DIFF, buildStubs({ 'find:': buildPipeLens, 'verify:ids-1-1': { path: '/v', verdicts: [{ id: 1, verdict: 'refuted', reason: 'x | y\r\nz' }] } }))
+  if (checkNoThrow(r, 'ledger appendix')) {
+    const ap = typeof r.result.appendix === 'string' ? r.result.appendix : ''
+    const al = ap.split('\n')
+    const rows = al.slice(4)
+    const unescaped = (row) => row.split('').filter((ch, i) => ch === '|' && row[i - 1] !== '\\').length
+    ck(al[0] === '## Appendix — every finding' && al[1] === '' &&
+      al[2] === '| id | lens | ref | severity | skepticSeverity | verdict | reason | fixVerdict |' && al[3] === '|---|---|---|---|---|---|---|---|' &&
+      rows.length === 5 && rows.length === r.result.ledger.length && rows[0].indexOf('| 1 | security | security.js:1 | high | - | refuted |') === 0,
+      'ledger: the appendix is rendered by the harness: heading, eight columns, one row per finding, the refuted one included')
+    ck(rows.length === 5 && rows.every((row) => unescaped(row) === 9) && rows[0].indexOf('x \\| y z') !== -1 && ap.indexOf('\r') === -1,
+      'ledger: the appendix is rendered by the harness: a pipe and a line break in a cell leave the row count unchanged')
+    const sp = r.trace.find((t) => t.label === 'synth')
+    ck(ap.length > 0 && !!sp && sp.prompt.indexOf(ap) !== -1 && sp.prompt.indexOf('VERBATIM') !== -1,
+      'ledger: the appendix is handed to the synthesis verbatim')
+  }
+
+  // ---- AC6: six exit paths. `confirmed` keeps its per-path type, which unattended-build.js reads.
+  const fieldsOk = (run) => !!run.result && Array.isArray(run.result.ledger) && Array.isArray(run.result.confirmedFindings) && typeof run.result.appendix === 'string'
+  const paths = [
+    ['every lens dead', buildStubs({ 'find:': null }), 'array', (x) => x.ledger.length === 0 && x.appendix === ''],
+    ['no finding raised', buildStubs({ 'find:': buildEmptyLens }), 'array', (x) => x.ledger.length === 0 && x.appendix === ''],
+    ['every finding refuted', buildStubs({ 'verify:': buildVerdicts('refuted') }), 'array',
+      (x) => x.ledger.length === 5 && x.ledger.every((e) => e.verdict === 'refuted') && x.confirmedFindings.length === 0 && x.appendix.split('\n').length === 9],
+    ['one skeptic batch dead', buildStubs({ 'verify:ids-2-2': null }), 'integer',
+      (x) => x.exit === 'deferred-platform' && x.ledger.length === 5 && x.ledger[1].verdict === 'unverified' && x.confirmedFindings.length === 4],
+    ['the synthesis dead', buildStubs({ synth: null }), 'integer', (x) => x.exit === 'deferred-platform' && x.ledger.length === 5 && x.confirmedFindings.length === 5],
+    ['complete', ALL_OK, 'integer', (x) => x.exit === 'complete' && x.ledger.length === 5 && x.confirmedFindings.length === 5 && x.appendix.length > 0],
+  ]
+  for (const [what, stubs, ctype, extra] of paths) {
+    r = await runReview(DIFF, stubs)
+    if (!checkNoThrow(r, 'ledger exit ' + what)) continue
+    const typed = ctype === 'array' ? Array.isArray(r.result.confirmed) : Number.isInteger(r.result.confirmed)
+    ck(fieldsOk(r) && typed && extra(r.result), 'ledger: every exit path carries the ledger: ' + what)
+  }
 }
 
 runWholeScriptArms().then(() => {
@@ -913,7 +1063,11 @@ printf '%s\n' "$out"
 # intensity arms (6), the light lens set (1), a skip neither live nor dead, complete and all-dead (2),
 # the light and full announcements (2), the key by intensity (1), two LIGHT_LENSES rewrites (2) and the
 # checklist over the running lenses (1).
-FLOOR_ASSERTIONS=145
+# RAISED 145 -> 165 by TOOL-aSightedSkeptic-8: 20 assertions, counted off the block — the dispatching
+# lens on a complete, an echoing and a reused run (3), the lens on the verify, synthesis and deferred-log
+# lines (3), the verdict states and their null fields (2), confirmedFindings, the rejected fix and the
+# round-2 hand-off (3), the appendix table, its escaping and the synthesis hand-off (3) and six exit paths (6).
+FLOOR_ASSERTIONS=165
 executed=$(printf '%s\n' "$out" | sed -n 's/^---- \([0-9][0-9]*\) passed.*/\1/p' | tail -1)
 if [ -z "$executed" ]; then
   echo "FAIL the runner printed no assertion count at all — it died before its summary line"

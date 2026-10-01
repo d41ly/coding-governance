@@ -792,8 +792,12 @@ const lensesDead = finderResults.filter((x) => !x).length
 const deadLensLabels = LENSES.filter((L, i) => !finderResults[i]).map((L) => `find:${L.key}`)
 // `ref` is DISPLAY ONLY from here on — it rides the prompts and the report lines and is never a map
 // key. `id` is assigned once, after every lens has returned, and is the only join key.
-const allFindings = liveResults
-  .flatMap((r) => (r.findings || []).map((f) => ({ ...f, ref: `${f.file}:${isSpec ? f.where : f.line}` })))
+// TOOL-aSightedSkeptic-8 S1 - derived from finderResults BY INDEX, so each finding carries `lens`, the
+// key the harness DISPATCHED (spec F1), never the agent's echo. Same members, same order as
+// liveResults, so ids and batch membership do not move.
+const allFindings = finderResults
+  .flatMap((r, i) => (!r || skippedLenses.indexOf(LENSES[i].key) !== -1 ? [] : (r.findings || []).map((f) =>
+    ({ ...f, lens: LENSES[i].key, ref: `${f.file}:${isSpec ? f.where : f.line}` }))))
   .map((f, i) => ({ ...f, id: i + 1 }))
 
 // ---- TOOL-dDerivedDocket-29 S5 — THE `exit` FIELD, on every return. `complete` when every agent
@@ -811,6 +815,8 @@ if (lensesDead === lensesRunning) {
     lensesReused: reusedLens.size,
     note: `DEFERRED: no lens completed (${lensesDead}/${lensesRunning} died) — nothing was reviewed; re-run with identical args`,
     round, priorFindings: priorFindings.length, intensity, skippedLenses,
+    // TOOL-aSightedSkeptic-8 S5 - nothing was judged on this path.
+    ledger: [], confirmedFindings: [], appendix: '',
   }
 }
 if (allFindings.length === 0) {
@@ -826,6 +832,7 @@ if (allFindings.length === 0) {
     exit: deferred ? 'deferred-platform' : 'complete', key: reviewKey, pending: deadLensLabels,
     confirmed: [], report: null, root: repo, blockers: null, highs: null, lensesRun: liveResults.length, lensesDead,
     lensesReused: reusedLens.size, note, round, priorFindings: priorFindings.length, intensity, skippedLenses,
+    ledger: [], confirmedFindings: [], appendix: '', // TOOL-aSightedSkeptic-8 S5 - no finding raised
   }
 }
 log(`${allFindings.length} raw findings across ${lensesRunning} lenses — verifying in batches.`)
@@ -878,8 +885,9 @@ const verdictResults = await boundedParallel(
         SEVERITY_RUBRIC + `\n` +
         `For each finding you CONFIRM, also return \`severity\`, graded by this rubric against what you read, independent of the finder's bracketed grade.\n\n` +
         `Findings to judge:\n` +
+        // TOOL-aSightedSkeptic-8 S2 - `lens=` after the grade; `id=<n> [` stays first for the stubs' id pattern.
         group
-          .map((f) => `id=${f.id} [${f.severity}] ${f.ref} — ${f.claim} | impact: ${f.impact} | fix: ${f.fix}`)
+          .map((f) => `id=${f.id} [${f.severity}] lens=${f.lens} ${f.ref} — ${f.claim} | impact: ${f.impact} | fix: ${f.fix}`)
           .join('\n') +
         // TOOL-aSightedSkeptic-2 S2 - the fix is judged as a SECOND, separate question. It never moves
         // the claim's verdict (spec section 8 F1): a real defect with a bad fix is still a real defect.
@@ -1005,6 +1013,47 @@ log(
       : precision < 0.5 ? ' (below 0.5 — tighten scope/priming next time, don\'t add agents)' : ''),
 )
 
+// TOOL-aSightedSkeptic-8 S3 - THE LEDGER, every finding and its verdict in id order, refuted ones
+// included: the only place a refuted finding reaches a record. Read through verdictById by the
+// integer id, never by `ref` (two findings at one file:line would collapse into one row).
+const ledger = allFindings.map((f) => {
+  const v = verdictById.get(f.id)
+  return {
+    id: f.id,
+    lens: f.lens,
+    ref: f.ref,
+    severity: f.severity,
+    skepticSeverity: v && SEVERITIES.indexOf(v.severity) !== -1 ? v.severity : null,
+    verdict: v && ['confirmed', 'refuted', 'uncertain'].indexOf(v.verdict) !== -1 ? v.verdict : 'unverified',
+    reason: conflicts.has(f.id) ? 'contradictory verdicts' : v ? String(v.reason || '') : '',
+    fixVerdict: v && FIX_VERDICTS.indexOf(v.fixVerdict) !== -1 ? v.fixVerdict : null,
+    claim: f.claim,
+  }
+})
+// S4 - the confirmed set in the shape `priorFindings` reads, so round N+1 is handed it rather than a
+// re-typed copy. A rejected fix is replaced by the skeptic's correction when one was given.
+const confirmedFindings = confirmed.map((f) => {
+  const v = verdictById.get(f.id)
+  const fixVerdict = FIX_VERDICTS.indexOf(v.fixVerdict) !== -1 ? v.fixVerdict : null
+  const note = String(v.fixNote || '').trim()
+  return { id: f.id, lens: f.lens, ref: f.ref, claim: f.claim, severity: deriveBindingSeverity(f),
+    fix: fixVerdict === 'unsound' && note ? note : f.fix, fixVerdict }
+})
+// S6 - one cell: absent as `-`, a pipe escaped, a CR/LF run folded to one space, so no claim or
+// reason can forge a row in the table TOOL-aSightedSkeptic-9 parses.
+function renderCell(v) {
+  return v === null || v === undefined || v === '' ? '-' : String(v).replace(/[\r\n]+/g, ' ').replace(/\|/g, '\\|')
+}
+// The eight columns are the hand-off to TOOL-aSightedSkeptic-9; `claim` rides the ledger only (spec F4).
+function renderAppendix(rows) {
+  if (!rows.length) return ''
+  const cols = ['id', 'lens', 'ref', 'severity', 'skepticSeverity', 'verdict', 'reason', 'fixVerdict']
+  return ['## Appendix — every finding', '', '| ' + cols.join(' | ') + ' |', '|' + cols.map(() => '---').join('|') + '|']
+    .concat(rows.map((e) => '| ' + cols.map((c) => renderCell(e[c])).join(' | ') + ' |'))
+    .join('\n')
+}
+const appendix = renderAppendix(ledger)
+
 // U6/S7: the run that most needs a written report is the one where findings were raised and nothing
 // came back to judge them. The old `judged === 0` early return returned WITHOUT a report in exactly
 // that case. One test governs now: anything still outstanding — confirmed or unverified — is
@@ -1028,6 +1077,9 @@ if (confirmed.length + unverified.length === 0) {
       ? `DEFERRED: every finding raised was refuted, but ${lensesDead}/${lensesRunning} lenses died — re-run with identical args to dispatch only ${pendingLabels.join(', ')}`
       : 'all findings adjudicated and refuted',
     round, priorFindings: priorFindings.length, intensity, skippedLenses,
+    // TOOL-aSightedSkeptic-8 S5 - no report is written on this path (spec F3), so the return is the
+    // only place this ledger and appendix exist; a caller may write them.
+    ledger, confirmedFindings, appendix,
   }
 }
 
@@ -1039,8 +1091,8 @@ if (confirmed.length + unverified.length === 0) {
 if (pendingLabels.length) {
   log(`WARNING: ${pendingLabels.length} agent(s) did not return (${pendingLabels.join(', ')}) — DEFERRED, and no synthesis runs over a partial set. ` +
     `The ${confirmed.length} confirmed and ${unverified.length} unverified finding(s) so far:`)
-  for (const f of confirmed) log(`  CONFIRMED [${deriveBindingSeverity(f)}] ${f.ref} - ${f.claim}`)
-  for (const f of unverified) log(`  UNVERIFIED [${f.severity}] ${f.ref} - ${f.claim}`)
+  for (const f of confirmed) log(`  CONFIRMED [${deriveBindingSeverity(f)}] lens=${f.lens} ${f.ref} - ${f.claim}`)
+  for (const f of unverified) log(`  UNVERIFIED [${f.severity}] lens=${f.lens} ${f.ref} - ${f.claim}`)
   return {
     exit: 'deferred-platform', key: reviewKey, pending: pendingLabels,
     root: repo, raw: allFindings.length, confirmed: confirmed.length, refuted: refuted.length,
@@ -1049,6 +1101,7 @@ if (pendingLabels.length) {
     report: null, summary: '', blockers: null, highs: null,
     note: `DEFERRED: ${lensesDead} lens(es) and ${skepticsDead} skeptic batch(es) did not return — re-run with identical args to dispatch only ${pendingLabels.join(', ')}`,
     round, priorFindings: priorFindings.length, intensity, skippedLenses,
+    ledger, confirmedFindings, appendix, // TOOL-aSightedSkeptic-8 S5 - what was judged so far; `exit` says partial
   }
 }
 
@@ -1066,7 +1119,7 @@ const synth = await agent(
             const grades = g !== f.severity
               ? ` (finder graded ${f.severity}, skeptic graded ${g})`
               : ungradedIds.indexOf(f.id) !== -1 ? ` (no skeptic grade - the finder's binds)` : ''
-            return `- id=${f.id} [${g}]${grades} ${f.ref} — ${f.claim}\n  impact: ${f.impact}\n  ${renderFixLine(f)}\n  why-real: ${verdictById.get(f.id)?.reason || ''}`
+            return `- id=${f.id} [${g}]${grades} lens=${f.lens} ${f.ref} — ${f.claim}\n  impact: ${f.impact}\n  ${renderFixLine(f)}\n  why-real: ${verdictById.get(f.id)?.reason || ''}`
           })
           .join('\n')
       : '  (none)') +
@@ -1074,7 +1127,7 @@ const synth = await agent(
     `\n\nUNVERIFIED findings (no confirmed or refuted verdict — OUTSTANDING, not cleared; read the code yourself before classifying each):\n` +
     (unverified.length
       ? unverified
-          .map((f) => `- id=${f.id} [${f.severity}] ${f.ref} — ${f.claim}\n  impact: ${f.impact}\n  fix: ${f.fix}\n  ` +
+          .map((f) => `- id=${f.id} [${f.severity}] lens=${f.lens} ${f.ref} — ${f.claim}\n  impact: ${f.impact}\n  fix: ${f.fix}\n  ` +
             (verdictById.get(f.id)?.verdict === 'uncertain'
               ? `status: UNCERTAIN - the skeptic could not establish it: ${verdictById.get(f.id).reason || '(no reason given)'}`
               : `status: NO USABLE VERDICT came back`))
@@ -1196,6 +1249,14 @@ const synth = await agent(
     `id out or names one twice returns neither count. In the review shape, state the adjudicated ` +
     `tally BOTH ways, by item and by raw confirmed finding, so the table you wrote and the ids you ` +
     `return agree. ` +
+    // TOOL-aSightedSkeptic-8 S7 - the harness renders the appendix and the agent only copies it: a
+    // table composed from these lines would miss every refuted finding, which no line above shows.
+    // The copy is NOT verified here (spec F2); the return's `appendix` holds the exact text.
+    (appendix
+      ? `\n\nAPPENDIX - the report's LAST section, after everything else, is the text between the two marker lines ` +
+        `below, copied VERBATIM: unedited, no row added, dropped, reordered or reworded, and neither marker line copied.\n` +
+        `<<<APPENDIX\n${appendix}\nAPPENDIX>>>\n\n`
+      : '') +
     `Return JSON {path, items, summary} with a FORWARD-SLASH path.`,
   {
     label: 'synth',
@@ -1289,8 +1350,8 @@ if (synth) {
 if (!synth) {
   log(`WARNING: the synthesis agent DIED. No report was written, and the ${confirmed.length} confirmed finding(s) below are in this log and in ${keyDir}; a re-run with identical args dispatches only the synthesis:`)
   for (const f of confirmed)
-    log(`  CONFIRMED [${deriveBindingSeverity(f)}] ${f.ref} - ${f.claim} | ${renderFixLine(f)}`)
-  for (const f of unverified) log(`  UNVERIFIED [${f.severity}] ${f.ref} - ${f.claim}`)
+    log(`  CONFIRMED [${deriveBindingSeverity(f)}] lens=${f.lens} ${f.ref} - ${f.claim} | ${renderFixLine(f)}`)
+  for (const f of unverified) log(`  UNVERIFIED [${f.severity}] lens=${f.lens} ${f.ref} - ${f.claim}`)
 }
 
 // H1: the SUCCESS return carries the same trust counts as the early ones. A caller that only ever
@@ -1352,4 +1413,9 @@ return {
   // TOOL-aSightedSkeptic-7 S6 - on every exit path, so a light run is never read as a full one.
   intensity,
   skippedLenses,
+  // TOOL-aSightedSkeptic-8 S5 - every finding and its verdict, the confirmed set as round N+1's
+  // `priorFindings`, and the appendix the synthesis was told to copy, for a caller to compare.
+  ledger,
+  confirmedFindings,
+  appendix,
 }

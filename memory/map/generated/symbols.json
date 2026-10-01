@@ -6203,6 +6203,16 @@
       "file": "tools/playbook/render_playbook.py"
     },
     {
+      "id": "renderAppendix",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "renderAppendix",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
+    },
+    {
       "id": "renderBlankedLiterals",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
@@ -6241,6 +6251,16 @@
       "id": "renderCapSource",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
+    },
+    {
+      "id": "renderCell",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "renderCell",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
     },
     {
       "id": "renderCloses",
