@@ -185,6 +185,22 @@ a finder begins a hit's claim with that label. A lens with no share is told so; 
 split is logged, and RUN INTEGRITY states it. An absent or itemless checklist logs a `WARNING:` and
 RUN INTEGRITY says no class was swept. The parsed checklist joins the review key.
 
+`intensity` is `'full'` or `'light'`, and absent it is `'full'`. Only the caller picks it; the harness
+never chooses light for itself, whatever the diff's size or history:
+
+```js
+args: { repo, base, head, reviewDir, intensity: 'light', checklist }
+```
+
+A light diff review runs the lenses `LIGHT_LENSES` names, `correctness`, `seams` and `verification`,
+and skips `security` and `intent`. The checklist is split over the lenses that run, so a skipped lens
+takes no share and no class is lost with it. A light run says what it skipped: a `WARNING:` log line
+before the first finder, a RUN INTEGRITY clause telling the report not to call it a full review, and
+`intensity` and `skippedLenses` on every return (`skippedLenses` is `[]` on a full run). A skipped
+lens counts as neither live nor dead. A spec audit has no light subset, so `'light'` refuses there; any
+value other than the two refuses on both kinds. `intensity` joins the review key. A diff that crosses a
+trust boundary is not one to review light: the `security` lens is one of the two a light run skips.
+
 ## `orient-counterfactual.js` — one stage-2 arm per call
 
 The stage-2 `orient` subagent is deferred behind a measurement: whether moving a kickoff's

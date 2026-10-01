@@ -82,6 +82,8 @@ function buildKeyedSchema(schema, extra) {
 //   specs: ["<repo-relative path>", ...], // intent documents: a diff review's statement of intent, a spec audit's
 //                                         // sibling context; absent -> [], and with no context a WARNING
 //   lensNotes: { "<lens key>": "<note>" }, // project addendum per lens of THIS kind; absent -> {} and a WARNING
+//   intensity: "full" | "light",          // DEFAULTS to "full"; only the CALLER picks light, which runs
+//                                         // LIGHT_LENSES and names the lenses it skipped; a spec-audit refuses light
 //   checklist: "<preamble>\n- <item>\n  <continuation>" | ["<item>", ...] } // the project's recurring
 //                                         // bug classes, each item swept by exactly one lens; absent -> a WARNING
 // D9 - `kind` and `subjects` were added without extending this block, and BUILD-METHOD M4 sends a
@@ -144,6 +146,14 @@ if (KINDS.indexOf(kind) === -1) {
   )
 }
 const isSpec = kind === 'spec-audit'
+// TOOL-aSightedSkeptic-7 S1/S2 - `intensity`, the CALLER's choice of a full or a light review. A
+// closed set refused outside it, like `kind`, and the harness never picks light itself. A spec audit
+// has no light lens subset (spec F2), so light refuses there rather than buying a full audit silently.
+const intensity = a.intensity === undefined ? 'full' : a.intensity
+if (typeof intensity !== 'string' || ['full', 'light'].indexOf(intensity) === -1)
+  throw new Error('tier2-review: `intensity` must be one of full | light. Got ' + JSON.stringify(a.intensity) + '.')
+if (isSpec && intensity === 'light')
+  throw new Error('tier2-review: a spec-audit has no light lens subset; `intensity` must be full or absent. Got "light".')
 // S7 - the context default is per-kind, and each is wrong if the other kind inherits it.
 const context = a.context || (isSpec ? 'the spec set under audit' : 'the cumulative diff landing on main')
 const byDesign = a.byDesign || 'none supplied'
@@ -436,6 +446,10 @@ const DIFF_LENSES = [
       'Intent: does the diff do what its stated intent says? Read the range\'s commit messages and any spec or design document the diff touches or those messages name, then report an acceptance criterion with no code behind it, a stated mechanism that is not the one built, and scope beyond what was asked.',
   },
 ]
+// TOOL-aSightedSkeptic-7 S3 - a LIGHT diff review's lenses, as KEYS (spec F1: 70 of the 76 classed
+// findings in the owner's sample, inside the protocol's three-to-six range). Not a third lens set: the
+// skip happens inside the Find thunk, so the receiver the agent-cap hook sizes keeps its shape.
+const LIGHT_LENSES = ['correctness', 'seams', 'verification']
 
 // TOOL-dTieredTribunal-11 S2 - the M4 spec-audit catalogue, COPIED from tools/memory-tree/README.md
 // rather than re-invented, so the method and the engine cannot drift into two answers.
@@ -467,6 +481,14 @@ const SPEC_LENSES = [
 // is fixed by the enforcement point rather than chosen. TOOL-dTieredTribunal-13 tightened the branch
 // this line sits on to require EVERY value branch bounded, and both branches here are literals.
 const LENSES = isSpec ? SPEC_LENSES : DIFF_LENSES // gov:fixed-verifiers
+// S3 - checked on EVERY run of either kind, before the resume probe: a renamed lens would otherwise
+// empty the light set, and a light run would review nothing while reporting clean. An INDEX names the
+// offender, since `''` is itself a key this refuses (the D6 class).
+const lightBadIdx = LIGHT_LENSES.findIndex((k) => !DIFF_LENSES.some((L) => L.key === k))
+if (!LIGHT_LENSES.length)
+  throw new Error('tier2-review: LIGHT_LENSES is empty, so a light run would review nothing while reporting clean.')
+if (lightBadIdx !== -1)
+  throw new Error('tier2-review: LIGHT_LENSES names ' + JSON.stringify(LIGHT_LENSES[lightBadIdx]) + ', which DIFF_LENSES does not carry.')
 
 // TOOL-aSightedSkeptic-5 S4/S6 - `lensNotes`, a project addendum per lens. It is validated HERE,
 // against the CURRENT kind's keys and before the resume probe, the first agent, so a typo'd key
@@ -503,6 +525,14 @@ if (intentAbsent)
   log('WARNING: neither `specs` nor `context` was supplied — the lenses were told nothing about what this ' +
     (isSpec ? 'spec set' : 'change') + ' is for' + (isSpec ? '' : ', beyond the range\'s commit messages') +
     '; pass the intent documents as `specs` or describe the change in `context`')
+// TOOL-aSightedSkeptic-7 S4/S6 - the lenses a light run SKIPS, in LENSES order; [] on a spec audit and
+// on a full run. Derived once, announced here before the first agent, and read by the Find thunk, the
+// reuse loop, the counts and the checklist split, which runs over the lenses that RUN (S7).
+const skippedLenses = !isSpec && intensity === 'light' ? LENS_KEYS.filter((k) => LIGHT_LENSES.indexOf(k) === -1) : []
+const runningLensKeys = LENS_KEYS.filter((k) => skippedLenses.indexOf(k) === -1)
+const lensesRunning = runningLensKeys.length
+if (skippedLenses.length)
+  log(`WARNING: intensity light — the ${skippedLenses.join(', ')} lens(es) were NOT run; their classes are swept only through the checklist shares`)
 // TOOL-aSightedSkeptic-4 S2-S6 - THE SPLIT. Item n goes to keys[(n - 1) % K], so every item is in
 // exactly one share and the split is a pure function of the items and the keys: a reused lens file
 // (S7) held the share this run would hand it. Round-robin, not contiguous `chunk`: a contiguous split
@@ -514,11 +544,13 @@ function deriveChecklistShares(items, keys) {
   items.forEach((text, i) => shares[keys[i % keys.length]].push({ n: i + 1, text: text }))
   return shares
 }
-const checklistShares = deriveChecklistShares(CHECKLIST_ITEMS, LENS_KEYS)
+// TOOL-aSightedSkeptic-7 S7 - over the RUNNING keys, so a skipped lens takes no share and no item is
+// lost with it. On a full run these are LENS_KEYS, and the split is unchanged.
+const checklistShares = deriveChecklistShares(CHECKLIST_ITEMS, runningLensKeys)
 const checklistSubject = isSpec ? 'the spec set' : 'the diff'
 // One block per lens, built here rather than in the prompt. Skeptics get none (S3).
 const checklistBlock = {}
-for (const k of LENS_KEYS) {
+for (const k of runningLensKeys) {
   const share = checklistShares[k]
   checklistBlock[k] = !CHECKLIST_ITEMS.length
     ? ''
@@ -533,8 +565,8 @@ for (const k of LENS_KEYS) {
 }
 // S4/S5 - the assignment is recoverable from the log; an absence is ANNOUNCED, worded per cause.
 if (CHECKLIST_ITEMS.length)
-  log(`checklist: ${CHECKLIST_ITEMS.length} item(s) over ${LENS_KEYS.length} lens(es), each swept by exactly one — ` +
-    LENS_KEYS.map((k) => k + ' ' + (checklistShares[k].length ? checklistShares[k].map((x) => 'C' + x.n).join(' ') : 'none')).join('; '))
+  log(`checklist: ${CHECKLIST_ITEMS.length} item(s) over ${lensesRunning} lens(es), each swept by exactly one — ` +
+    runningLensKeys.map((k) => k + ' ' + (checklistShares[k].length ? checklistShares[k].map((x) => 'C' + x.n).join(' ') : 'none')).join('; '))
 else if (a.checklist === undefined)
   log('WARNING: no `checklist` was supplied — no lens sweeps the project\'s recurring bug classes; pass the caller\'s checklist output as `checklist`')
 else log('WARNING: `checklist` was supplied with no item — no lens sweeps the project\'s recurring bug classes')
@@ -549,7 +581,7 @@ else log('WARNING: `checklist` was supplied with no item — no lens sweeps the 
 // through the skeptics.
 //
 // THE KEY: kind, round, the pinned subject, and a fingerprint over `context`, `byDesign`,
-// `priorFindings`, `lensNotes`, `specs`, `checklist` and the REVIEW_SHAPE literal - every input a lens prompt interpolates,
+// `priorFindings`, `lensNotes`, `specs`, `checklist`, `intensity` and the REVIEW_SHAPE literal - every input a lens prompt interpolates,
 // and the prompts' own shape, except `repo`, which is left out on
 // purpose: the common dir is shared by every worktree on the node, and a take-over from another
 // worktree of the same commits is exactly the re-run this exists for. A spec audit's subject is every
@@ -566,7 +598,8 @@ const REVIEW_SHAPE = 'lenses5-r1'
 // TOOL-aSightedSkeptic-3 S5 - `specs` is interpolated by renderIntent(), so it joins the print too.
 // TOOL-aSightedSkeptic-4 S7 - so does the PARSED checklist: a CRLF string and its LF twin are one key,
 // and a lens swept under one checklist is never reused under another.
-const inputPrint = deriveFnv1a(renderCanonical({ shape: REVIEW_SHAPE, context: context, byDesign: byDesign, priorFindings: priorFindings, lensNotes: lensNotes, specs: SPECS, checklist: checklist }))
+// TOOL-aSightedSkeptic-7 S8 - and so does `intensity`: a light run and a full run never share a lens file.
+const inputPrint = deriveFnv1a(renderCanonical({ shape: REVIEW_SHAPE, context: context, byDesign: byDesign, priorFindings: priorFindings, lensNotes: lensNotes, specs: SPECS, checklist: checklist, intensity: intensity }))
 const specSubject = isSpec
   ? deriveFnv1a(subjects.map((x) => (x && typeof x === 'object' ? `${x.path}@${x.blob}` : String(x))).join('\n'))
   : ''
@@ -644,6 +677,7 @@ if (probeLive && Array.isArray(probe.skipped) && probe.skipped.length)
 // file into a current answer.
 const reusedLens = new Map()
 for (const L of LENSES) {
+  if (skippedLenses.indexOf(L.key) !== -1) continue // S4 - no `reused` line names a lens that will not run
   const file = presentFinds.find((f) => f && f.name === `find-${L.key}.json` && f.lens === L.key && Array.isArray(f.findings))
   if (file && file.key === reviewKey) {
     reusedLens.set(L.key, file)
@@ -705,7 +739,11 @@ function renderBrief(role) {
 phase('Find')
 const finderResults = await boundedParallel(
   LENSES.map((L) => () =>
-    reusedLens.has(L.key)
+    // TOOL-aSightedSkeptic-7 S4 - a skipped lens resolves to a SENTINEL and dispatches nothing. Never
+    // null: null is how a dead agent reaches the script, and every light run would defer forever.
+    skippedLenses.indexOf(L.key) !== -1
+      ? Promise.resolve({ lens: L.key, path: '', findings: [], skipped: true })
+      : reusedLens.has(L.key)
       ? Promise.resolve(reusedLens.get(L.key))
       : agent(
       renderBrief('finder') +
@@ -744,8 +782,10 @@ const finderResults = await boundedParallel(
 // all-dead run used to be indistinguishable from an all-clean one. Observed live: a review returned
 // `clean: 0 findings` with agents_done 0, four ENOTFOUND errors, and a journal of four `started`
 // lines and zero `result` lines. Count what actually came back and never call absence cleanliness.
-const liveResults = finderResults.filter(Boolean)
-const lensesDead = LENSES.length - liveResults.length
+// TOOL-aSightedSkeptic-7 S5 - a skipped lens is neither live nor dead. Membership in skippedLenses
+// decides it, never the sentinel's own field, which a reused file could also carry.
+const liveResults = finderResults.filter((x, i) => x && skippedLenses.indexOf(LENSES[i].key) === -1)
+const lensesDead = finderResults.filter((x) => !x).length
 // TOOL-dDerivedDocket-29 S5 - the LABEL of every agent that did not return, so a caller can say what a
 // re-run will dispatch. The harness cannot tell a user's mid-run skip from a death, because both
 // return null, and both defer: an unjudged finding was never a result.
@@ -762,15 +802,15 @@ const allFindings = liveResults
 // ---- with identical args will dispatch, everything else being reused from the key directory. The
 // ---- one null `blockers` that is NOT a death, the tally fault below, stays `complete`: a re-run
 // ---- cannot repair an adjudication, so that path keeps the refusal its callers already make.
-if (lensesDead === LENSES.length) {
-  log(`UNVERIFIED — all ${LENSES.length} lenses failed to return. Nothing was reviewed. Deferred: re-run with identical args.`)
+if (lensesDead === lensesRunning) {
+  log(`UNVERIFIED — all ${lensesRunning} lenses failed to return. Nothing was reviewed. Deferred: re-run with identical args.`)
   return {
     // TOOL-dTieredTribunal-1 S3 - null, never 0. No synthesis ran, so there is no adjudicated count.
     exit: 'deferred-platform', key: reviewKey, pending: deadLensLabels,
     confirmed: [], report: null, root: repo, blockers: null, highs: null, lensesRun: 0, lensesDead,
     lensesReused: reusedLens.size,
-    note: `DEFERRED: no lens completed (${lensesDead}/${LENSES.length} died) — nothing was reviewed; re-run with identical args`,
-    round, priorFindings: priorFindings.length,
+    note: `DEFERRED: no lens completed (${lensesDead}/${lensesRunning} died) — nothing was reviewed; re-run with identical args`,
+    round, priorFindings: priorFindings.length, intensity, skippedLenses,
   }
 }
 if (allFindings.length === 0) {
@@ -778,17 +818,17 @@ if (allFindings.length === 0) {
   // nothing`, which the build harness's clean-round test cannot tell from a result; it defers now.
   const deferred = lensesDead > 0
   const note = deferred
-    ? `DEFERRED: ${lensesDead}/${LENSES.length} lenses died and the survivors found nothing — re-run with identical args to dispatch only ${deadLensLabels.join(', ')}`
+    ? `DEFERRED: ${lensesDead}/${lensesRunning} lenses died and the survivors found nothing — re-run with identical args to dispatch only ${deadLensLabels.join(', ')}`
     : 'clean: 0 findings'
   log(note)
   // TOOL-dTieredTribunal-1 S3 - null, never 0: no synthesis ran on this path either.
   return {
     exit: deferred ? 'deferred-platform' : 'complete', key: reviewKey, pending: deadLensLabels,
     confirmed: [], report: null, root: repo, blockers: null, highs: null, lensesRun: liveResults.length, lensesDead,
-    lensesReused: reusedLens.size, note, round, priorFindings: priorFindings.length,
+    lensesReused: reusedLens.size, note, round, priorFindings: priorFindings.length, intensity, skippedLenses,
   }
 }
-log(`${allFindings.length} raw findings across ${LENSES.length} lenses — verifying in batches.`)
+log(`${allFindings.length} raw findings across ${lensesRunning} lenses — verifying in batches.`)
 
 // --- Phase 2: VERIFY — batched skeptics (NOT one agent per finding) -----
 phase('Verify')
@@ -985,9 +1025,9 @@ if (confirmed.length + unverified.length === 0) {
     lensesRun: liveResults.length, lensesDead, skepticsDead, unverified: 0, uncertain: 0,
     conflicts: conflicts.size, duplicates, spurious, lensesReused: reusedLens.size, batchesReused,
     note: deferred
-      ? `DEFERRED: every finding raised was refuted, but ${lensesDead}/${LENSES.length} lenses died — re-run with identical args to dispatch only ${pendingLabels.join(', ')}`
+      ? `DEFERRED: every finding raised was refuted, but ${lensesDead}/${lensesRunning} lenses died — re-run with identical args to dispatch only ${pendingLabels.join(', ')}`
       : 'all findings adjudicated and refuted',
-    round, priorFindings: priorFindings.length,
+    round, priorFindings: priorFindings.length, intensity, skippedLenses,
   }
 }
 
@@ -1008,7 +1048,7 @@ if (pendingLabels.length) {
     lensesRun: liveResults.length, lensesDead, skepticsDead, lensesReused: reusedLens.size, batchesReused,
     report: null, summary: '', blockers: null, highs: null,
     note: `DEFERRED: ${lensesDead} lens(es) and ${skepticsDead} skeptic batch(es) did not return — re-run with identical args to dispatch only ${pendingLabels.join(', ')}`,
-    round, priorFindings: priorFindings.length,
+    round, priorFindings: priorFindings.length, intensity, skippedLenses,
   }
 }
 
@@ -1049,7 +1089,8 @@ const synth = await agent(
     `Each CONFIRMED finding's fix line says whether a skeptic judged its fix. Where it is REJECTED, write the skeptic's ` +
     `corrected fix into the report, never the rejected one; where the note gives no correction, say the fix is still to be ` +
     `designed. Where it is NOT JUDGED, present it as the finder's proposal only. ` +
-    `State the review shape near the top — raw ${allFindings.length}, confirmed ${confirmed.length}, refuted ${refuted.length}, unverified ${unverified.length} (${uncertainFindings.length} uncertain), precision ${precision.toFixed(2)}. ` +
+    // TOOL-aSightedSkeptic-7 S6 - the intensity, in the review-shape sentence, on every run.
+    `State the review shape near the top — intensity ${intensity}, raw ${allFindings.length}, confirmed ${confirmed.length}, refuted ${refuted.length}, unverified ${unverified.length} (${uncertainFindings.length} uncertain), precision ${precision.toFixed(2)}. ` +
     // TOOL-aWeldedTribunal-4 — RUN INTEGRITY. This harness computes every counter below and logged
     // them to stdout, which is not the record; the AGENT writes the record, so a run whose lenses
     // half died wrote a durable report that could not say so. The two drift-audit siblings were
@@ -1064,7 +1105,7 @@ const synth = await agent(
     // whose skeptics disagreed and were demoted to UNVERIFIED) and does not compute the second.
     // Interpolating a counter nothing derives would put an invented number in a durable record.
     `\n\nRUN INTEGRITY - state these in the report and do NOT describe this run as complete if any is non-zero:\n` +
-    `lenses ${liveResults.length}/${LENSES.length} returned, ${lensesDead} DIED; ` +
+    `lenses ${liveResults.length}/${lensesRunning} returned, ${lensesDead} DIED; ` +
     `skeptic batches ${batches.length - skepticsDead}/${batches.length} returned, ${skepticsDead} DIED; ` +
     `${conflicts.size} contradictory verdict(s) demoted to unverified, ` +
     `${spurious} spurious verdict(s) discarded, ${duplicates} duplicate(s); ` +
@@ -1078,6 +1119,11 @@ const synth = await agent(
     (notedLenses.length
       ? `lens notes supplied for: ${notedLenses.join(', ')}.\n`
       : `lens notes: none supplied, so every lens ran on the kit's generic brief.\n`) +
+    // TOOL-aSightedSkeptic-7 S6 - a light run names every skipped lens; a full run carries no clause.
+    (skippedLenses.length
+      ? `Intensity: light - the ${skippedLenses.join(', ')} lens(es) were NOT run, so their classes were swept only ` +
+        `through the checklist shares; do NOT describe this run as a full review.\n`
+      : '') +
     // TOOL-aSightedSkeptic-3 S4 - where intent came from, stated on EVERY run.
     (SPECS.length
       ? `Intent: ${SPECS.length} spec document(s) supplied as \`specs\`${isSpec ? ', as sibling context' : ', beside the range\'s commit messages'}.\n`
@@ -1086,8 +1132,8 @@ const synth = await agent(
         : `Intent: NEITHER \`specs\` nor \`context\` was supplied${isSpec ? '' : ', so the lenses had only the range\'s commit messages'} - the report must say so.\n`) +
     // TOOL-aSightedSkeptic-4 S4/S5 - which lens held which share, or that nothing was swept.
     (CHECKLIST_ITEMS.length
-      ? `Checklist: ${CHECKLIST_ITEMS.length} item(s), each assigned to exactly one of ${LENS_KEYS.length} lens(es): ` +
-        LENS_KEYS.map((k) => `${k} ${checklistShares[k].length}`).join(', ') + `.\n`
+      ? `Checklist: ${CHECKLIST_ITEMS.length} item(s), each assigned to exactly one of ${lensesRunning} lens(es): ` +
+        runningLensKeys.map((k) => `${k} ${checklistShares[k].length}`).join(', ') + `.\n`
       : `Checklist: NONE swept — ${a.checklist === undefined ? 'absent' : 'supplied with no item'}; a zero count is not ` +
         `evidence the project's recurring bug classes are absent.\n`) +
     `If lenses died, the finding set is INCOMPLETE and a zero count is not evidence of absence. ` +
@@ -1270,7 +1316,7 @@ return {
   lensesRun: liveResults.length,
   lensesDead,
   skepticsDead,
-  agents: LENSES.length + batches.length + 1, // finders + batched skeptics + synth
+  agents: lensesRunning + batches.length + 1, // finders + batched skeptics + synth
   report: synth?.path || null,
   summary: synth?.summary || '',
   // TOOL-dTieredTribunal-1 S2/S3b - the counts the synthesis pass adjudicated, returned rather than
@@ -1303,4 +1349,7 @@ return {
               : 'complete',
   round,
   priorFindings: priorFindings.length,
+  // TOOL-aSightedSkeptic-7 S6 - on every exit path, so a light run is never read as a full one.
+  intensity,
+  skippedLenses,
 }

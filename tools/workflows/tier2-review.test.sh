@@ -121,6 +121,30 @@ arm('a moving ref as base, round 1 -> warns and proceeds', { round: 1, base: 'or
 arm('a moving ref as base, round 2 -> refused', { round: 2, base: 'origin/main' }, MOVING)
 arm('a spec audit ignores base entirely', { kind: 'spec-audit', round: 2, base: 'origin/main', subjects: [{ path: 'a.md', blob: BLOB }] }, null)
 
+// ---- TOOL-aSightedSkeptic-7 AC1 — `intensity`, a closed set read in the prelude ----------------------
+// The proceeding arms also read the RESOLVED value back, so they cannot pass over a prelude that never
+// reads `intensity`: on the parent the read throws `intensity is not defined`, a harness fault.
+function armIntensity(name, extra, want) {
+  let got = null
+  let threw = null
+  try {
+    got = new Function('args', 'log', 'parallel', 'agent', 'phase', body + '\nreturn intensity')(Object.assign({}, base, extra), () => {}, null, null, null)
+  } catch (e) { threw = e.message }
+  if (threw && /has already been declared|is not defined|Unexpected|Invalid or unexpected/.test(threw)) {
+    console.log('HARNESS-BROKEN ' + name + ' -> ' + threw)
+    fail++
+    return
+  }
+  ck(want === 'refused' ? !!threw && threw.indexOf('intensity') !== -1 : !threw && got === want, name + (threw ? ' (threw: ' + threw + ')' : ' (resolved ' + JSON.stringify(got) + ')'))
+}
+const GOOD_SPEC = { kind: 'spec-audit', round: 1, subjects: [{ path: 'a.md', blob: BLOB }] }
+armIntensity('intensity: an unknown value is refused', { intensity: 'medium' }, 'refused')
+armIntensity('intensity: a non-string is refused', { intensity: 7 }, 'refused')
+armIntensity('intensity: light on a diff review proceeds', { intensity: 'light' }, 'light')
+armIntensity('intensity: absent proceeds', {}, 'full')
+armIntensity('intensity: light on a spec audit is refused', Object.assign({ intensity: 'light' }, GOOD_SPEC), 'refused')
+armIntensity('intensity: full on a spec audit proceeds', Object.assign({ intensity: 'full' }, GOOD_SPEC), 'full')
+
 // ---- D9 — the `args` header must carry every field the file reads --------------------------------
 // BUILD-METHOD M4 sends a reader to that block for the spec-audit spelling, and it named neither
 // `kind` nor `subjects` when the rule was written to point at it. An omitted `kind` DEFAULTS rather
@@ -777,6 +801,75 @@ async function runWholeScriptArms() {
   ck(uvp.length === 9 && uvp.every((t) => t.prompt.indexOf('graded blocker or high is answered "uncertain"') !== -1 &&
     t.prompt.indexOf('graded medium or low (the bracketed grade) is "refuted"') !== -1 && t.prompt.indexOf('Default to refuted when uncertain') === -1),
     'severity: the uncertain rule follows the finder\'s grade')
+
+  // ==== TOOL-aSightedSkeptic-7 — `intensity`, and a light run that announces the lenses it skips ======
+  // Every arm is RED against the parent render: it reads no `intensity`, so a light run dispatches all
+  // five lenses, returns neither field, logs no skip, keys identically to a full run and carries no
+  // LIGHT_LENSES literal for the rewrite to take.
+  const LIGHT = Object.assign({}, DIFF, { intensity: 'light' })
+  const rl = await runReview(LIGHT, ALL_OK)
+  const rf = await runReview(DIFF, ALL_OK)
+  if (checkNoThrow(rl, 'light run') && checkNoThrow(rf, 'full run')) {
+    // ---- AC2: the light lenses alone are dispatched; an absent value dispatches all five.
+    ck(rl.scanSpawned('find:').join(' ') === 'find:correctness find:seams find:verification' && rf.scanSpawned('find:').length === 5,
+      'intensity: light dispatches only the light lenses: ' + rl.scanSpawned('find:').join(' '))
+    // ---- AC3: a skip is neither live nor dead, and every count runs over the three that ran.
+    ck(rl.result.exit === 'complete' && rl.result.lensesDead === 0 && rl.result.lensesRun === 3 && rl.result.intensity === 'light' &&
+      Array.isArray(rl.result.skippedLenses) && rl.result.skippedLenses.join(' ') === 'security intent' && rl.result.agents === 3 + 3 + 1 &&
+      rf.result.intensity === 'full' && Array.isArray(rf.result.skippedLenses) && rf.result.skippedLenses.length === 0,
+      'intensity: a skipped lens is neither live nor dead: a light run completes, three lenses in its agent count')
+    // ---- AC4: the light run's log and RUN INTEGRITY name both skipped lenses; the full run names
+    // ---- its intensity and carries no skipped-lens clause.
+    const lsp = rl.trace.find((t) => t.label === 'synth')
+    const fsp = rf.trace.find((t) => t.label === 'synth')
+    const lri = lsp ? lsp.prompt.slice(lsp.prompt.indexOf('RUN INTEGRITY')) : ''
+    const fri = fsp ? fsp.prompt.slice(fsp.prompt.indexOf('RUN INTEGRITY')) : ''
+    ck(rl.logs.some((l) => l.indexOf('WARNING: intensity light') === 0 && l.indexOf('security') !== -1 && l.indexOf('intent') !== -1 && l.indexOf('NOT run') !== -1) &&
+      /Intensity: light[^\n]*security[^\n]*intent[^\n]*NOT run/.test(lri) && lsp.prompt.indexOf('intensity light, raw') !== -1,
+      'intensity: a light run announces its skipped lenses in the log and RUN INTEGRITY')
+    ck(!!fsp && fsp.prompt.indexOf('intensity full, raw') !== -1 && fri.indexOf('NOT run') === -1 && fri.indexOf('Intensity:') === -1 &&
+      !rf.logs.some((l) => l.indexOf('intensity light') !== -1),
+      'intensity: a light run announces its skipped lenses: a full run names intensity full and no skipped lens')
+    // ---- AC7: the key differs by intensity; a full-key correctness file is dispatched in a light run,
+    // ---- a light-key one is reused, and a skipped lens's file is never reused or named as reused.
+    const KL = rl.result.key
+    const KF = rf.result.key
+    const rk1 = await runReview(LIGHT, buildStubs({ 'resume:probe': buildProbe([buildLensFile('correctness', KF)]) }))
+    const rk2 = await runReview(LIGHT, buildStubs({ 'resume:probe': buildProbe([buildLensFile('correctness', KL), buildLensFile('security', KL)]) }))
+    if (checkNoThrow(rk1, 'intensity key full file') && checkNoThrow(rk2, 'intensity key light file')) {
+      ck(KL !== KF && rk1.scanSpawned('find:correctness').length === 1 && rk2.scanSpawned('find:correctness').length === 0 &&
+        rk2.result.lensesReused === 1 && rk2.scanSpawned('find:security').length === 0 && !rk2.logs.some((l) => l.indexOf('reused find:security') !== -1),
+        'intensity: the key differs by intensity')
+    }
+  }
+  // ---- AC3 second half: the three running lenses all die; pending names exactly those three.
+  r = await runReview(LIGHT, buildStubs({ 'find:': null }))
+  if (checkNoThrow(r, 'light run all dead')) {
+    ck(r.result.exit === 'deferred-platform' && r.result.pending.join(' ') === 'find:correctness find:seams find:verification' &&
+      r.result.lensesDead === 3 && r.result.intensity === 'light' && r.result.skippedLenses.join(' ') === 'security intent',
+      'intensity: a skipped lens is neither live nor dead: three running lenses dead defer, pending only those three')
+  }
+  // ---- AC5: a copy whose LIGHT_LENSES names a dead key, or none, refuses before any agent, on either
+  // ---- kind and at full intensity. The rewrite is asserted to have TAKEN before the throw is graded.
+  const lightRe = /const LIGHT_LENSES = \[[^\]]*\]/
+  for (const [what, lit, args] of [['a renamed key, diff review', "['correctness', 'seams', 'verificaton']", DIFF], ['an empty literal, spec audit', '[]', SPEC]]) {
+    const src2 = whole.replace(lightRe, 'const LIGHT_LENSES = ' + lit)
+    r = await runReview(args, ALL_OK, src2)
+    ck(lightRe.test(whole) && src2 !== whole && typeof r.threw === 'string' && r.threw.indexOf('LIGHT_LENSES') !== -1 && r.trace.length === 0,
+      'intensity: LIGHT_LENSES must name live lenses: ' + what + (r.threw ? '' : ' (accepted)'))
+  }
+  // ---- AC6: a six-item checklist reaches a RUNNING lens, each item in exactly one find: prompt, on a
+  // ---- light run over three lenses and on a full run over five.
+  const SIX = [1, 2, 3, 4, 5, 6].map((n) => 'SIXA' + n + 'Z')
+  const scanSix = (run, n) => {
+    const fp = scanPrompts(run, 'find:')
+    return fp.length === n && SIX.every((s) => fp.filter((t) => t.prompt.indexOf(s) !== -1).length === 1 && fp.some((t) => countIn(t.prompt, s) === 1))
+  }
+  const rl6 = await runReview(Object.assign({}, LIGHT, { checklist: SIX }), ALL_OK)
+  const rf6 = await runReview(Object.assign({}, DIFF, { checklist: SIX }), ALL_OK)
+  if (checkNoThrow(rl6, 'light checklist') && checkNoThrow(rf6, 'full checklist')) {
+    ck(scanSix(rl6, 3) && scanSix(rf6, 5), 'intensity: every checklist item reaches a running lens')
+  }
 }
 
 runWholeScriptArms().then(() => {
@@ -816,7 +909,11 @@ printf '%s\n' "$out"
 # RAISED 123 -> 130 by TOOL-aSightedSkeptic-6: 7 assertions, counted off the block — the rubric in every
 # prompt (1), the schema (1), the binding grade (1), the ungraded fallback (1), the uncertain verdict
 # (1), the regraded return (1) and the uncertain rule in every verify prompt (1).
-FLOOR_ASSERTIONS=130
+# RAISED 130 -> 145 by TOOL-aSightedSkeptic-7: 15 assertions, counted off the block — six prelude
+# intensity arms (6), the light lens set (1), a skip neither live nor dead, complete and all-dead (2),
+# the light and full announcements (2), the key by intensity (1), two LIGHT_LENSES rewrites (2) and the
+# checklist over the running lenses (1).
+FLOOR_ASSERTIONS=145
 executed=$(printf '%s\n' "$out" | sed -n 's/^---- \([0-9][0-9]*\) passed.*/\1/p' | tail -1)
 if [ -z "$executed" ]; then
   echo "FAIL the runner printed no assertion count at all — it died before its summary line"
