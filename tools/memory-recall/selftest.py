@@ -219,15 +219,23 @@ def make_repo(kitname: str = "memory-recall", conf: str = CONF, gitignore: str |
     kitdir.mkdir(parents=True)
     for f in SHIPPED:
         shutil.copyfile(KIT / f, kitdir / f)
-    # The two memory-tree files this kit reaches, where the resolver's probe finds them: this kit
-    # `requires` that one, `extract_records` imports `parse_spec_h1` from `tree_lib.py` on first use,
-    # and the spec-H1 arm compares against `gen_build_index.spec_ids` (TOOL-aRepatriatedFork-40).
+    # The memory-tree kit's python surface, where the resolver's probe finds it: this kit `requires`
+    # that one, `extract_records` imports `parse_spec_h1` from `tree_lib.py` on first use, and the
+    # spec-H1 arm compares against `gen_build_index.spec_ids` (TOOL-aRepatriatedFork-40).
+    # DERIVED from the resolved kit directory, never spelled. The kit descriptor ships with
+    # `include = "**"`, so every install carries every sibling module beside the generator, and this
+    # set mirrors that. A hand-kept list of two went short the day `gen_build_index` gained `import
+    # backlog` on a branch that merged after the list was written, and only the nested run noticed
+    # (TOOL-dMendedRecall-1). Top-level `*.py` alone: the kit's withheld `*.test.sh` suites are not
+    # something an import reaches. In the nested run `KIT` is the outer fixture's copy, so the inner
+    # fixture inherits exactly this set.
     import extract as E
     # TOOL-aRepatriatedFork-46: the fixture names the sibling by the NAME its directory has here.
-    mt_name = E.resolve_kit_dir("memory-tree", "tree_lib.py", KIT).name
+    tree_src = E.resolve_kit_dir("memory-tree", "tree_lib.py", KIT)
+    mt_name = tree_src.name
     (root / mt_name).mkdir()
-    for f in ("tree_lib.py", "gen_build_index.py"):
-        shutil.copyfile(E.resolve_kit_dir("memory-tree", f, KIT) / f, root / mt_name / f)
+    for src in sorted(tree_src.glob("*.py")):
+        shutil.copyfile(src, root / mt_name / src.name)
     (root / ".memory-tree.conf").write_text(conf, encoding="utf-8", newline="\n")
     # `flat` writes <root>/DECISIONS.md, which is the layout the memory-tree kit's own adopter
     # creates; the default writes <root>/<discipline>/DECISIONS.md, which is upstream's. `DURABLE`
@@ -2961,6 +2969,23 @@ def seed_spec_h1(root: pathlib.Path) -> str:
     return m
 
 
+# TOOL-dMendedRecall-1: the spec-H1 arm reads `spec_ids` in a CHILD, `-I` with the resolved memory-tree
+# directory as the only path it inserts, so the fixture's `memory-tree/` is the one place an import
+# can resolve. In-process, the arm ran after earlier arms had put directories on `sys.path`, and on
+# 2026-09-30 it read `ok` over a fixture the nested run proved short of `backlog.py`. `-I` also drops
+# PYTHONPATH and the user site. Same shape as `_GRAMMAR_PROBE`. argv: the memory-tree directory, the
+# fixture root, the memory root. A non-zero exit carries the child's traceback into the arm's row.
+_SPEC_IDS_PROBE = (
+    "import sys, json, subprocess; sys.dont_write_bytecode = True\n"
+    "sys.path.insert(0, sys.argv[1])\n"
+    "from gen_build_index import spec_ids\n"
+    "root, m = sys.argv[2], sys.argv[3]\n"
+    "tracked = subprocess.run(['git', '-C', root, 'ls-files'], capture_output=True, text=True,\n"
+    "                         encoding='utf-8', check=True).stdout.splitlines()\n"
+    "print(json.dumps(sorted(spec_ids(root, tracked, {'MEMORY_ROOT': m, 'FAMILIES': 'tooling:TOOL'}))))\n"
+)
+
+
 @check("a spec H1 anchors the id it defines, by the index generator's own predicate")
 def test_spec_h1_anchors_the_id_it_defines():
     """AC1-AC3. Before this, `A_HEADING` was `#{2,6}` and nothing else looked at an H1, so an id
@@ -2975,12 +3000,12 @@ def test_spec_h1_anchors_the_id_it_defines():
         anchors = json.loads((out / "anchors.json").read_text(encoding="utf-8"))
         recs = [json.loads(x) for x in (out / "records.jsonl").read_text(encoding="utf-8").splitlines()]
         tree_kit = E.resolve_kit_dir("memory-tree", "gen_build_index.py", kitdir)
-        if str(tree_kit) not in sys.path:
-            sys.path.insert(0, str(tree_kit))
-        import gen_build_index as G
-        tracked = subprocess.run(["git", "-C", str(root), "ls-files"], capture_output=True,
-                                 text=True, encoding="utf-8", check=True).stdout.split()
-        want = G.spec_ids(str(root), tracked, {"MEMORY_ROOT": m, "FAMILIES": "tooling:TOOL"})
+        g = subprocess.run([sys.executable, "-I", "-c", _SPEC_IDS_PROBE, str(tree_kit), str(root), m],
+                           cwd=str(root), capture_output=True, text=True, encoding="utf-8")
+        assert g.returncode == 0, (
+            f"spec_ids could not be read from the fixture's memory-tree alone (exit {g.returncode}):\n"
+            f"{g.stderr[-800:]}")
+        want = set(json.loads(g.stdout))
     finally:
         cleanup(root)
     spec = f"{m}/{SPEC_H1_REL}"
