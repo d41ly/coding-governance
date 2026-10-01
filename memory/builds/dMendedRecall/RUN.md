@@ -10,8 +10,8 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 
 ## Run facts
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 445eec56394803a41f24e712e060ad99ac2a592d
-phase: REVIEWING
+witness: e19335af80f4d6a2915491bd2a7c07bd59e9902e
+phase: VERIFYING
 asks-ready: TOOL-dAlignedCarrier-7=yes TOOL-dAlignedCarrier-8=yes TOOL-dAlignedCarrier-9=yes
 asks: TOOL-dAlignedCarrier-7..9
 m-base: 1f9158708e4782dfe2d25a17fdf4153f57d38ae3
