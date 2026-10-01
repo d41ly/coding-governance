@@ -164,3 +164,5 @@ base: d6e1749c0542218004260928f1399174daafb789
 2026-10-01T12:59:13Z dispatch · item c80a7dfe TOOL-aRepatriatedFork-52 · reason tools .githooks skills/session-kickoff .claude memory/guides memory/map memory/builds/aRepatriatedFork/spec/2026-10-01-spec-TOOL-aRepatriatedFork-52.md memory/builds/aRepatriatedFork/README.md memory/builds/aRepatriatedFork/build
 
 2026-10-01T13:25:55Z dispatch · item 2ab948ad TOOL-aRepatriatedFork-52 · reason tools .githooks skills/session-kickoff .claude memory/guides memory/map memory/HYGIENE.md memory/TEMPLATE-SPEC.md memory/builds/aRepatriatedFork/spec/2026-10-01-spec-TOOL-aRepatriatedFork-52.md memory/builds/aRepatriatedFork/README.md memory/builds/aRepatriatedFork/build
+
+2026-10-01T16:11:04Z decision · item govkit selftest is declared not graded at the repo root in the foreign-prefix leg (TOOL-aRepatriatedFork-52 rev-6) · reason its first arm is selfcheck over gov's own registry, which reports 58 problems at an empty tool root; supporting gov at the root is the parked tool-root question, inventoried in the R3 repair record
