@@ -10,8 +10,8 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 
 ## Run facts
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 54774e91c02ae489dd9336aa88292acfc3b1d3b6
-phase: SPECCING
+witness: 81165652db8cb3da94829e40319a84130a281e0e
+phase: BUILDING
 branch-sha: 9fdd0c18d5afac1744c226c3e8ea2716e6d49e30
 branch-ref: refs/heads/run/aSightedSkeptic
 may: none
@@ -30,3 +30,23 @@ anchor-ref: refs/heads/main
 base: 9fdd0c18d5afac1744c226c3e8ea2716e6d49e30
 
 ## Parked
+
+2026-10-01T16:35:35Z brief · item TOOL-aSightedSkeptic-5 · reason 17aa84c8ea14 memory/builds/aSightedSkeptic/prompts/2026-10-01-prompt-TOOL-aSightedSkeptic-5-2-build-brief.md
+
+2026-10-01T16:35:39Z brief · item TOOL-aSightedSkeptic-1 · reason e7bf790d3e23 memory/builds/aSightedSkeptic/prompts/2026-10-01-prompt-TOOL-aSightedSkeptic-1-2-build-brief.md
+
+2026-10-01T16:35:42Z brief · item TOOL-aSightedSkeptic-3 · reason 49143c74aa2e memory/builds/aSightedSkeptic/prompts/2026-10-01-prompt-TOOL-aSightedSkeptic-3-2-build-brief.md
+
+2026-10-01T16:35:44Z brief · item TOOL-aSightedSkeptic-4 · reason 5de0075785b7 memory/builds/aSightedSkeptic/prompts/2026-10-01-prompt-TOOL-aSightedSkeptic-4-2-build-brief.md
+
+2026-10-01T16:35:49Z brief · item TOOL-aSightedSkeptic-2 · reason 29642590475e memory/builds/aSightedSkeptic/prompts/2026-10-01-prompt-TOOL-aSightedSkeptic-2-2-build-brief.md
+
+2026-10-01T16:35:52Z brief · item TOOL-aSightedSkeptic-6 · reason cf7011154b87 memory/builds/aSightedSkeptic/prompts/2026-10-01-prompt-TOOL-aSightedSkeptic-6-2-build-brief.md
+
+2026-10-01T16:35:55Z brief · item TOOL-aSightedSkeptic-7 · reason e475cde4e47a memory/builds/aSightedSkeptic/prompts/2026-10-01-prompt-TOOL-aSightedSkeptic-7-2-build-brief.md
+
+2026-10-01T16:35:57Z brief · item TOOL-aSightedSkeptic-8 · reason b12b7bdf3864 memory/builds/aSightedSkeptic/prompts/2026-10-01-prompt-TOOL-aSightedSkeptic-8-2-build-brief.md
+
+2026-10-01T16:35:59Z brief · item TOOL-aSightedSkeptic-9 · reason 3e5d43bf9914 memory/builds/aSightedSkeptic/prompts/2026-10-01-prompt-TOOL-aSightedSkeptic-9-2-build-brief.md
+
+2026-10-01T16:36:25Z dispatch · item 81165652 TOOL-aSightedSkeptic-5 · reason tools/workflows/tier2-review.template.js tools/workflows/tier2-review.js tools/workflows/tier2-review.test.sh tools/workflows/README.md README.md WIRE-INTO-PROJECT.md memory/builds/aSightedSkeptic/spec/2026-10-01-spec-TOOL-aSightedSkeptic-5.md memory/builds/aSightedSkeptic/README.md
