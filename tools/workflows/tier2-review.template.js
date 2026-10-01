@@ -7,7 +7,7 @@ export const meta = {
     'Consolidated, concurrency-capped (≤{{FANOUT_CAP}}) Tier-2 adversarial review, ≤{{FANOUT_CAP}} verify agents TOTAL: find → batched-verify → synth, joined on an ORCHESTRATOR-ASSIGNED INTEGER id. Replaces the big-fan-out review that trips the server rate limiter. Project-agnostic — parameterize via `args`.',
   phases: [
     { title: 'Resume', detail: 'one probe reads the key directory; a lens or batch whose file carries the key is reused' },
-    { title: 'Find', detail: '5 finder lenses, one wave, ≤{{FANOUT_CAP}} concurrent' },
+    { title: 'Find', detail: '5 finder lenses (3 on a light run), one wave, ≤{{FANOUT_CAP}} concurrent' },
     { title: 'Verify', detail: 'skeptics refute findings in ≤{{FANOUT_CAP}} BATCHES — agent count fixed' },
     { title: 'Synthesize', detail: 'one pass → report file' },
   ],
@@ -537,7 +537,7 @@ if (skippedLenses.length)
 // exactly one share and the split is a pure function of the items and the keys: a reused lens file
 // (S7) held the share this run would hand it. Round-robin, not contiguous `chunk`: a contiguous split
 // hands one lens a run of neighbouring classes and the last lens the short remainder (spec F1 and §10).
-// It runs over LENS_KEYS, never by reshaping the LENSES receiver the agent-cap hook sizes.
+// It runs over the keys of the lenses that RUN (S7 below), never by reshaping the LENSES receiver the agent-cap hook sizes.
 function deriveChecklistShares(items, keys) {
   const shares = {}
   for (const k of keys) shares[k] = []
