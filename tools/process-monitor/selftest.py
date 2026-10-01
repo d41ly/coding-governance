@@ -317,6 +317,11 @@ def main():
     for name, fn in sorted(globals().items()):
         if name.startswith("test_") and callable(fn):
             fn()
+            # FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+            if os.environ.get("FOREIGN_PREFIX_PROBE") == "1":
+                print("foreign-prefix-probe: stopped after 1 arm")
+                print("FAIL (1 assertions)" if FAIL else "PASS (1 assertions)")
+                return 1 if FAIL else 0
     print("\nprocess-monitor census: %d passed, %d failed (%d assertions)"
           % (len(PASS), len(FAIL), len(PASS) + len(FAIL)))
     return 1 if FAIL else 0

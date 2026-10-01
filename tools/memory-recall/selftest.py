@@ -468,6 +468,11 @@ def test_parser_vs_bash():
         cleanup(root)
 
 
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+if os.environ.get("FOREIGN_PREFIX_PROBE") == "1":
+    print("foreign-prefix-probe: stopped after 1 arm")
+    print("FAIL (1 assertions)" if (any(c[0] == "FAIL" for c in _checks)) else "PASS (1 assertions)")
+    sys.exit(1 if (any(c[0] == "FAIL" for c in _checks)) else 0)
 @check("no conf: query.py refuses, names memory-tree, prints a usable stub, creates nothing")
 def test_no_conf_query():
     root, kitdir = make_repo()

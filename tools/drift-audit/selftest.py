@@ -2924,6 +2924,11 @@ def main() -> int:
     with tempfile.TemporaryDirectory() as td:
         tmp = pathlib.Path(td)
         test_conf_parser_matches_bash(tmp)
+        # FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+        if os.environ.get("FOREIGN_PREFIX_PROBE") == "1":
+            print("foreign-prefix-probe: stopped after 1 arm")
+            print("FAIL (1 assertions)" if (FAILS) else "PASS (1 assertions)")
+            return 1 if (FAILS) else 0
         test_harness_liveness_note_is_derived(tmp)
         test_signals_can_move(tmp)
         test_lexicon_signals(tmp)

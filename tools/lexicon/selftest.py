@@ -307,6 +307,12 @@ def run_case(files: dict, conf: str | None, waivers: dict | None = None, args: t
 # ---- P1: the verb predicate ---------------------------------------------------------------------
 code, out = run_case({"core/a.py": "def build_index():\n    pass\n"}, BASE_CONF)
 check("P1 green: a declared verb passes", code == 0, out)
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+import os  # noqa: E402 — read once, for the probe flag alone
+if os.environ.get("FOREIGN_PREFIX_PROBE") == "1":
+    print("foreign-prefix-probe: stopped after 1 arm")
+    print("FAIL (1 assertions)" if FAILURES else "PASS (1 assertions)")
+    sys.exit(1 if FAILURES else 0)
 
 code, out = run_case({"core/a.py": "def frobnicate_index():\n    pass\n"}, BASE_CONF)
 check("P1 red: an undeclared leading token reds", code != 0 and "P1 verb" in out, out)

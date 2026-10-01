@@ -320,6 +320,11 @@ def main() -> int:
                        f"every case below is about something else: {out.strip()[:300]}")
         else:
             print_ok("0 control — the default bar runs and a RED one blocks the push")
+        # FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+        if os.environ.get("FOREIGN_PREFIX_PROBE") == "1":
+            print("foreign-prefix-probe: stopped after 1 arm")
+            print("FAIL (1 assertions)" if FAILURES else "PASS (1 assertions)")
+            return 1 if FAILURES else 0
         check_end(fx, "bar", "default", "0b the run log records the default bar as `bar=default`")
         # 1 — a tracked bar, no escape, is ACCEPTED. Without this the rest is an outage, not a gate.
         check_landed(fx, "bash scripts/unattended-bar.sh",

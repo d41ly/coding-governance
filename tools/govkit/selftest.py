@@ -1619,6 +1619,11 @@ def main() -> int:
         # --- below could pass because the tool is broken rather than because the input is bad.
         p = run("selfcheck")
         check("selfcheck exits 0 over this repo", p.returncode == 0, p.stdout + p.stderr)
+        # FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+        if os.environ.get("FOREIGN_PREFIX_PROBE") == "1":
+            print("foreign-prefix-probe: stopped after 1 arm")
+            print("FAIL (1 assertions)" if (FAILURES) else "PASS (1 assertions)")
+            return 1 if (FAILURES) else 0
         check("selfcheck reports a derived surface count rather than a spelled one",
               "surface " in p.stdout and "unclaimed" in p.stdout, p.stdout)
 

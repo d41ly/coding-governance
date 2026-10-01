@@ -8579,6 +8579,11 @@ def main():
                       [s[:80] for s in EMITTED if DECOY["sid"] in s], [])
                 check(f"decoy: no file {name} left in its own scratch is named for or holds the "
                       "decoy's session", scan_named(SCRATCH[made_before:], DECOY["sid"]), [])
+                # FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+                if os.environ.get("FOREIGN_PREFIX_PROBE") == "1":
+                    print("foreign-prefix-probe: stopped after 1 arm")
+                    print("FAIL (1 assertions)" if FAIL else "PASS (1 assertions)")
+                    return 1 if FAIL else 0
     finally:
         for d in SCRATCH:
             shutil.rmtree(d, ignore_errors=True)

@@ -1726,6 +1726,11 @@ def main() -> int:
             "root resolution: both install shapes + git boundary (S1/AC1)",
             lambda: test_install_prefix_resolution(Path(td)),
         )
+    # FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+    if os.environ.get("FOREIGN_PREFIX_PROBE") == "1":
+        print("foreign-prefix-probe: stopped after 1 arm")
+        print("FAIL (1 assertions)" if failures else "PASS (1 assertions)")
+        return 1 if failures else 0
     with tempfile.TemporaryDirectory() as td:
         failures += check(
             "unadopted root refuses, naming root + kit dir (AC2)",
