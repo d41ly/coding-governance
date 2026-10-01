@@ -3,7 +3,8 @@
 # detection, the never-clobber auto-fix, and the always-exit-0 --session mode. Run: bash <prefix>/check-wiring.test.sh
 set -u
 HERE="$(cd "$(dirname "$0")" && pwd)"
-REPO="$(cd "$HERE/.." && pwd)"      # safe dir to return to before any rm -rf
+# The repository, asked of git: `$HERE/..` is the root only at a one-segment prefix (VERIFYING repair).
+REPO="$(git -C "$HERE" rev-parse --show-toplevel)" || exit 2   # safe dir to return to before any rm -rf
 # THIS SUITE'S OWN DIRECTORY, DERIVED (TOOL-aRepatriatedFork-19 S4, on the canonical block
 # TOOL-aRepatriatedFork-18 S2 ships). It was a spelled gov-prefix default that nothing ever set, so at
 # any prefix but gov's every fixture below laid its kit files where the checker under test does not
