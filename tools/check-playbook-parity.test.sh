@@ -127,6 +127,13 @@ HOOKS_DIR=$(resolve_kit_dir "$_rkd_py" hooks agent-cap.js "$HERE") || exit 2
 HOOKS="${HOOKS_DIR##*/}"
 MT_KIT_DIR=$(resolve_kit_dir "$_rkd_py" memory-tree check-memory-hygiene.sh "$HERE") || exit 2
 MT_KIT="${MT_KIT_DIR##*/}"
+# TOOL-aRepatriatedFork-54: the gate reads its kit population from govkit's registry, so every
+# fixture carries one and DECLARES the kits it plants; an undeclared directory is not a kit.
+GK_DIR=$(resolve_kit_dir "$_rkd_py" govkit registry.toml "$HERE") || exit 2
+GK="${GK_DIR##*/}"
+# FX is the prefix the NEXT fixture is built at: this suite's own by default, and empty for the
+# root-install arms, which every install owes whatever prefix this suite itself sits at.
+FX=$PFX
 fails=0
 TMP=$(mktemp -d) || exit 2
 trap 'rm -rf "$TMP"' EXIT
@@ -137,12 +144,16 @@ say_fail() { fails=$((fails+1)); printf 'arm FAIL  %s — %s\n' "$1" "$2"; }
 # fixture <dir> — a minimal but VALID tree the gate passes on, so each arm breaks exactly one thing.
 fixture() {
   local d=$1
-  mkdir -p "$d/${PFX}${MT_KIT}" "$d/${PFX}${HOOKS}" "$d/${PFX}lib" "$d/.claude"
+  mkdir -p "$d/${FX}${MT_KIT}" "$d/${FX}${HOOKS}" "$d/${FX}lib" "$d/${FX}${GK}" "$d/.claude"
   git -C "$d" init -q 2>/dev/null
   git -C "$d" config user.email t@t; git -C "$d" config user.name t
-  cp "$GATE_SRC" "$d/${PFX}check-playbook-parity.sh"
-  : > "$d/${PFX}${MT_KIT}/engine.sh"
-  printf 'const CAP = 5\nconst MAX_VERIFIERS = 5\nconst MAX_LENSES = 5\n' > "$d/${PFX}${HOOKS}/agent-cap.js"
+  cp "$GATE_SRC" "$d/${FX}check-playbook-parity.sh"
+  : > "$d/${FX}${MT_KIT}/engine.sh"
+  printf 'const CAP = 5\nconst MAX_VERIFIERS = 5\nconst MAX_LENSES = 5\n' > "$d/${FX}${HOOKS}/agent-cap.js"
+  # The registry declares the two kits this fixture plants. `lib` is declared and holds no tracked
+  # file, so it is no kit; the registry's own directory is declared nowhere, so it is none either.
+  printf '[[entry]]\nid = "memory-tree"\ndescriptor = "{prefix}/%s/kit.toml"\n\n[[entry]]\nid = "agent-cap"\ndescriptor = "{prefix}/%s/kit.toml"\n\n[[exempt]]\npath = "{prefix}/lib"\nwhy = "gov-internal"\n' \
+    "$MT_KIT" "$HOOKS" > "$d/${FX}${GK}/registry.toml"
   printf '{ "hooks": { "PreToolUse": [ { "matcher": "Workflow|Agent" } ] } }\n' > "$d/.claude/settings.json"
   # The trio. hooks is waived; memory-tree is documented, and it is documented in the RUNBOOK.
   #
@@ -161,8 +172,8 @@ fixture() {
     | sed 's/<=/≤/' > "$d/coding-governance-agents.template.md"
   # A root install has no root head to name a kit by, so its runbook names it the way gov's does,
   # through the `<prefix>/` token (VERIFYING repair: a bare `memory-tree/` documents nothing).
-  printf 'runbook {{MEMORY_ROOT}}\nadopt '"${PFX:-<prefix>/}${MT_KIT}/"' into the target repo\n' > "$d/WIRE-INTO-PROJECT.md"
-  printf '# waivers\nhooks   not adopter-facing as a kit.\n' > "$d/${PFX}playbook-kit-waivers.txt"
+  printf 'runbook {{MEMORY_ROOT}}\nadopt '"${FX:-<prefix>/}${MT_KIT}/"' into the target repo\n' > "$d/WIRE-INTO-PROJECT.md"
+  printf '# waivers\nhooks   not adopter-facing as a kit.\n' > "$d/${FX}playbook-kit-waivers.txt"
   # The stamp-rule pair (TOOL-aHonedRuleset-5) is the one row whose two homes both sit OUTSIDE
   # <prefix>/: the manifest template states the expression and manifest-check.sh owns it. The control
   # redded on a missing owning source from the day that row landed, because this fixture built no
@@ -174,7 +185,16 @@ fixture() {
   git -C "$d" commit -qm f >/dev/null 2>&1
 }
 
-# arm <label> <expect: ok|red> <expected-substring-when-red> <mutator…>
+# add_kit <prefix> <kit> — a tracked kit directory the fixture's registry DECLARES. A kit planted
+# without its registry row is no kit to the gate, so an arm doing that would pass for the wrong reason.
+add_kit() {
+  mkdir -p "$1$2" && : > "$1$2/x.sh" &&
+    printf '\n[[entry]]\nid = "%s"\ndescriptor = "{prefix}/%s/kit.toml"\n' "$2" "$2" >> "$1${GK}/registry.toml"
+}
+add_substring_kit() { add_kit "$1" ape && printf 'the shape of a landscape\n' >> coding-governance-agents.template.md; }
+
+# arm <label> <expect: ok|red|refuse> <expected-substring-when-red> <mutator…>
+# `refuse` is a red that must ALSO exit 2: the gate could not run, which is not a finding.
 arm() {
   local label=$1 expect=$2 want=$3; shift 3
   local d="$TMP/$(printf '%s' "$label" | tr -c 'a-zA-Z0-9' '_')"
@@ -182,7 +202,7 @@ arm() {
   ( cd "$d" && "$@" >/dev/null 2>&1 )
   git -C "$d" add -A >/dev/null 2>&1
   local out rc
-  out=$(cd "$d" && bash ${PFX}check-playbook-parity.sh 2>&1); rc=$?
+  out=$(cd "$d" && bash ${FX}check-playbook-parity.sh 2>&1); rc=$?
   if [ "$expect" = ok ]; then
     if [ "$rc" -eq 0 ]; then say_ok "$label"
     else say_fail "$label" "expected the gate to PASS, it exited $rc"; printf '%s\n' "$out" | sed 's/^/      /'; fi
@@ -190,6 +210,10 @@ arm() {
   fi
   if [ "$rc" -eq 0 ]; then
     say_fail "$label" "expected the gate to RED, it exited 0 — the mutation was not caught"
+    printf '%s\n' "$out" | sed 's/^/      /'; return
+  fi
+  if [ "$expect" = refuse ] && [ "$rc" -ne 2 ]; then
+    say_fail "$label" "expected the gate to REFUSE with exit 2, it exited $rc"
     printf '%s\n' "$out" | sed 's/^/      /'; return
   fi
   case "$out" in
@@ -208,12 +232,28 @@ arm "control · a valid fixture passes" ok "" true
 # unrelated word, so a loosened matcher certifies it documented and the arm goes red.
 arm "S1 a kit named only as a substring is NOT documented" red \
   "a kit ships and the playbook never names it, with no waiver row to excuse it: ape" \
-  sh -c 'mkdir -p '"${PFX}ape"' && : > '"${PFX}ape/x.sh"' && printf "the shape of a landscape\n" >> coding-governance-agents.template.md'
+  add_substring_kit "$PFX"
 
 # --- AC1 · a kit named nowhere and waived nowhere --------------------------------------------------
 arm "AC1 an undocumented kit reds by name" red \
   "a kit ships and the playbook never names it, with no waiver row to excuse it: orphankit" \
-  sh -c 'mkdir -p '"${PFX}orphankit"' && : > '"${PFX}orphankit/x.sh"''
+  add_kit "$PFX" orphankit
+
+# --- TOOL-aRepatriatedFork-54 · the population is the registry's, at this prefix and at the root --------
+# Each root arm builds its fixture at the repository root whatever prefix this suite sits at. The
+# first is the red-first control of the unit: the listing gate reds on it naming `.claude`.
+REGISTRY_REFUSAL="cannot read the kit population from govkit's registry.toml"
+arm "AC3 an unresolvable registry REFUSES rather than reading as an empty population" refuse \
+  "$REGISTRY_REFUSAL" sh -c 'rm -f '"${PFX}${GK}/registry.toml"''
+FX=""
+arm "AC2 at a root install .claude/, skills/ and an undeclared dir are not kits" ok "" \
+  sh -c 'mkdir -p stray && : > stray/x.sh'
+arm "AC3 at a root install an unresolvable registry REFUSES" refuse \
+  "$REGISTRY_REFUSAL" sh -c 'rm -f '"${GK}/registry.toml"''
+arm "AC3 at a root install a declared kit the playbook never names reds by name" red \
+  "a kit ships and the playbook never names it, with no waiver row to excuse it: orphankit" \
+  add_kit "" orphankit
+FX=$PFX
 
 # --- AC2 · the unit's central proof: a stated value drifting from the source that owns it ----------
 arm "AC2 MAX_LENSES drifts from the template's stated bound" red \

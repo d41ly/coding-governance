@@ -9,7 +9,7 @@
 # four of those defects were RECURRENCES of ones a previous build had already fixed. This gate holds
 # the three classes that recurred:
 #
-#   S1 kit coverage      — every tracked kit dir under tools/ is named in a playbook file or waived.
+#   S1 kit coverage      — every kit govkit's registry declares is named in a playbook file or waived.
 #   S2 value parity      — a value the playbook STATES equals the source that OWNS it.
 #
 # THERE IS NO S3. It asserted the placeholder arithmetic a deploy-time catalogue stated, and v3.0
@@ -20,6 +20,14 @@
 # WHAT IT DOES NOT DO, said here rather than implied away: it holds STRUCTURAL claims only. A fluent
 # paraphrase that is subtly wrong still passes. Checking prose for accuracy in general is undecidable
 # and this gate does not pretend otherwise.
+#
+# THE KIT POPULATION IS DECLARED, NOT LISTED (TOOL-aRepatriatedFork-54). A kit is a directory govkit's
+# registry names under its `{prefix}` token — an `[[entry]]` descriptor's head, or an `[[exempt]]`
+# path that is itself a directory — and that holds a tracked file. A listing of the tool root was the
+# old rule, and at a repo-root install it counted `.claude/`, `skills/` and every other top-level
+# directory as an undocumented kit. What it does NOT grade: a kit directory the registry never
+# declares. That omission is govkit selfcheck's to red, because it asserts the registry against the
+# tracked surface; this gate trusts the declaration and an unresolvable registry exits 2.
 #
 # ANTI-VACUITY IS THE LOAD-BEARING CONSTRAINT. `memory/gotchas/vacuous-selector-empty-population.md`
 # owns the failure this gate is most likely to have: a selector that matches nothing prints nothing,
@@ -126,8 +134,11 @@ r = next((p for p in (d, *d.parents) if (p / ".git").exists()), d.anchor)
 print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
 }
 HK_DIR="<no hooks kit>"
+REGISTRY=""
 if _pp_py=$(resolve_python 2>/dev/null); then
   HK_DIR=$(resolve_kit_dir "$_pp_py" hooks agent-cap.js "$_self_dir" 2>/dev/null) || HK_DIR="<no hooks kit>"
+  # The S1 population's source, through the same resolver (TOOL-aRepatriatedFork-54).
+  REGISTRY=$(resolve_kit_dir "$_pp_py" govkit registry.toml "$_self_dir" 2>/dev/null) && REGISTRY="$REGISTRY/registry.toml"
 fi
 TEMPLATE=coding-governance-agents.template.md
 # The charter converged to ONE file at v3.0, so the kit-coverage haystack is the charter PLUS the
@@ -146,9 +157,30 @@ for f in "$TEMPLATE" "$RUNBOOK"; do
 done
 
 # ================================================================= S1 — kit coverage ============
-# The kit set is DERIVED from the tree, never hand-listed. Same derivation check-install-prefix.sh
-# and the codebase-map extractor already use — a third enumeration would be a third thing to drift.
-kits=$(git ls-files -- "${SELF_PRE}*/*" | sed "s#^${SELF_PRE}##" | awk -F/ 'NF>1 {print $1}' | sort -u)
+# The kit set is DERIVED, never hand-listed: govkit's registry declares it and the tracked surface
+# confirms each member (TOOL-aRepatriatedFork-54). check-install-prefix.sh and the codebase-map
+# extractor still LIST the tool root, so the three derivations now differ: a listing of a root
+# install is every top-level directory, which only this gate reads as a kit population, and R2
+# observed neither of the other two red there. Unresolvable or unparseable is a refusal, never an
+# empty population, because an empty one is what ARM 2 below reads as broken for the wrong reason.
+if [ -z "$REGISTRY" ] || ! kits=$("$_pp_py" -c '
+import subprocess, sys, tomllib
+with open(sys.argv[1], "rb") as fh:
+    reg = tomllib.load(fh)
+pre = sys.argv[2]
+tracked = subprocess.run(["git", "ls-files", "-z", "--", pre or "."], capture_output=True,
+                         check=True).stdout.decode("utf-8", "replace").split("\0")
+# an entry names its kit by its descriptor head; an exempt row names one only by being a directory
+named = [str(e.get("descriptor", "")) for e in reg.get("entry", [])]
+named = [d.split("/")[1] for d in named if d.startswith("{prefix}/") and d.count("/") > 1]
+named += [str(x.get("path", ""))[len("{prefix}/"):] for x in reg.get("exempt", [])
+          if str(x.get("path", "")).startswith("{prefix}/")]
+kits = sorted({n.split("/")[0] for n in named if n and any(t.startswith(pre + n + "/") for t in tracked)})
+sys.stdout.buffer.write("".join(k + "\n" for k in kits).encode())  # bytes: Windows text mode adds CR
+' "$REGISTRY" "$SELF_PRE" 2>/dev/null); then
+  echo "playbook-parity: cannot read the kit population from govkit's registry.toml — the sibling-kit resolver found none beside or above ${SELF_PRE:-the repository root}, or it did not parse — REFUSING"
+  exit 2
+fi
 
 # ARM 2 of the anti-vacuity set. An empty or broken derivation must red by NAME rather than report
 # universal coverage: with no kits, "every kit is documented" is vacuously true.
