@@ -241,8 +241,8 @@ does a lens set or a prompt change find MORE of what a previous review proved re
   the liveness check below and whose range resolves in this clone, with its round, range and scorable
   count. The summary line puts every scanned record in exactly one bucket. Ranges resolve through
   ONE `git cat-file --batch-check` for the whole corpus.
-- `python3 {kit}/review_replay.py --selftest` — fourteen named arms over inline fixtures, no file
-  or git access; red when an arm fails or fewer arms ran than were declared. It is the held leg
+- `python3 {kit}/review_replay.py --selftest` — named arms over inline fixtures, no file
+  or git access; red when an arm fails or fewer arms ran than its `ARMS_DECLARED` states. It is the held leg
   `review-replay selftest`.
 
 **Liveness, the reason a score can be trusted at all.** Both inputs must reproduce their own stated

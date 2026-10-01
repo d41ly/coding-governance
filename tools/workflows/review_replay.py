@@ -221,7 +221,9 @@ def scan_corpus(dirs, repo):
     for path in sorted(p for d in dirs for p in pathlib.Path(d).rglob("*.md")):
         try:
             text = path.read_text(encoding="utf-8")
-        except (OSError, UnicodeDecodeError):
+        except (OSError, UnicodeDecodeError) as exc:
+            # Not classifiable, so outside `scanned` — but named, never skipped in silence.
+            print(f"replay: unreadable, not scanned: {path.as_posix()} ({exc})", file=sys.stderr)
             continue
         first = next((line.strip() for line in text.splitlines() if line.strip()), "")
         if not first.startswith(SERVES_PREFIX):
