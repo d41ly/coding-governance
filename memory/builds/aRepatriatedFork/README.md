@@ -132,7 +132,7 @@ with no hand edit between the update and the bar.** One observation at each adop
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 49 unit(s) · node a · opened 2026-09-23 · streams tooling+deployer+playbook
+**Build status:** CLOSED · 49 unit(s) · node a · opened 2026-09-23 · streams tooling+deployer+playbook
 ids DEPL-aRepatriatedFork-1 DEPL-aRepatriatedFork-13 DEPL-aRepatriatedFork-14 DEPL-aRepatriatedFork-17 DEPL-aRepatriatedFork-20 DEPL-aRepatriatedFork-21 DEPL-aRepatriatedFork-22 DEPL-aRepatriatedFork-23 TOOL-aRepatriatedFork-2 TOOL-aRepatriatedFork-3 TOOL-aRepatriatedFork-4 TOOL-aRepatriatedFork-5
 ids TOOL-aRepatriatedFork-6 TOOL-aRepatriatedFork-7 TOOL-aRepatriatedFork-8 TOOL-aRepatriatedFork-9 TOOL-aRepatriatedFork-10 TOOL-aRepatriatedFork-11 TOOL-aRepatriatedFork-12 TOOL-aRepatriatedFork-15 TOOL-aRepatriatedFork-16 TOOL-aRepatriatedFork-18 TOOL-aRepatriatedFork-19 TOOL-aRepatriatedFork-20
 ids TOOL-aRepatriatedFork-21 TOOL-aRepatriatedFork-22 TOOL-aRepatriatedFork-23 TOOL-aRepatriatedFork-24 TOOL-aRepatriatedFork-25 TOOL-aRepatriatedFork-26 TOOL-aRepatriatedFork-27 TOOL-aRepatriatedFork-28 TOOL-aRepatriatedFork-29 TOOL-aRepatriatedFork-30 TOOL-aRepatriatedFork-31
@@ -191,10 +191,10 @@ ids TOOL-aRepatriatedFork-54
 | [TOOL-aRepatriatedFork-51 — brief-recorded takes a declared waiver registry, as pass-order does](spec/2026-10-01-spec-TOOL-aRepatriatedFork-51.md) | 22 | 1 | CLOSED | rev-1 | 2026-10-01 |
 | [TOOL-aRepatriatedFork-53 — every background task a run starts carries a heartbeat the audit reads](spec/2026-10-01-spec-TOOL-aRepatriatedFork-53.md) | 23 | 2 | CLOSED | rev-2 | 2026-10-01 |
 | [TOOL-aRepatriatedFork-54 — two gov gates grade a repo-root install correctly](spec/2026-10-01-spec-TOOL-aRepatriatedFork-54.md) | 24 | 1 | CLOSED | rev-2 | 2026-10-01 |
-| [TOOL-aRepatriatedFork-52 — the foreign-prefix leg asks only the prefix question](spec/2026-10-01-spec-TOOL-aRepatriatedFork-52.md) | 25 | 2 | SPECCED | rev-3 | 2026-10-01 |
+| [TOOL-aRepatriatedFork-52 — the foreign-prefix leg asks only the prefix question](spec/2026-10-01-spec-TOOL-aRepatriatedFork-52.md) | 25 | 2 | CLOSED | rev-3 | 2026-10-01 |
 <!-- /gen:build-units -->
 
-Records: 117 bound to this build, across 4 record folder(s).
+Records: 118 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

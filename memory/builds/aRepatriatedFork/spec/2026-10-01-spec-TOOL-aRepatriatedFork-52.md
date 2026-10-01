@@ -1,11 +1,12 @@
 # TOOL-aRepatriatedFork-52 — the foreign-prefix leg asks only the prefix question
 
-**Status:** SPECCED · rev-3 · 2026-10-01 · node a · Tier-2 · base 56c7befa · streams tooling · order 25
+**Status:** CLOSED · rev-3 · 2026-10-01 · node a · Tier-2 · base 56c7befa · streams tooling · order 25
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-01-build-TOOL-aRepatriatedFork-52-1-acceptance-ledger.md](../build/2026-10-01-build-TOOL-aRepatriatedFork-52-1-acceptance-ledger.md) | journal | — |
 | [2026-10-01-build-TOOL-aRepatriatedFork-52-redeclare-patch.md](../build/2026-10-01-build-TOOL-aRepatriatedFork-52-redeclare-patch.md) | research | — |
 | [2026-10-01-prompt-TOOL-aRepatriatedFork-52-build-brief.md](../prompts/2026-10-01-prompt-TOOL-aRepatriatedFork-52-build-brief.md) | journal | — |
 

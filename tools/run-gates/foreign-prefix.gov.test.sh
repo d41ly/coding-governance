@@ -285,7 +285,7 @@ run_at_prefix() { # $1 = prefix, empty for the repo root; returns 1 when the pre
   done
   dirty=$(git status --porcelain --untracked-files=all 2>/dev/null | head -n 10)
   if [ -n "$dirty" ]; then red=1; print_fail "a suite wrote into the clone at ${p:-the repo root}, outside its scratch: $(printf '%s' "$dirty" | tr '\n' ';')"; fi
-  [ "$red" = 0 ] && print_pass "all $n selected row(s) found their subject at ${p:-the repo root}"
+  [ "$red" = 0 ] && print_pass "all $i graded row(s) found their subject at ${p:-the repo root}$( [ "$i" = "$n" ] || printf ', %s inherited red and not graded' "$((n - i))")"
   return "$red"
 }
 
