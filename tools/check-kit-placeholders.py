@@ -70,12 +70,15 @@ DEFAULT_ROOT = next((p for p in (HERE, *HERE.parents) if (p / ".git").exists()),
 def derive_kit_glob(root):
     """`<tool root>/*/kit.toml` for `root`. This gate's own directory when it sits under `root`;
     for a fixture tree handed in by `--root`, the one directory whose children hold a `kit.toml`
-    at depth 2, or the root itself when that is not exactly one."""
+    at depth 2 or 3, or the root itself when that is not exactly one."""
     root = pathlib.Path(root).resolve()
     if HERE == root or root in HERE.parents:
         rel = HERE.relative_to(root).as_posix()
     else:
-        cands = {p.parent.parent.relative_to(root).as_posix() for p in root.glob("*/*/kit.toml")}
+        # One segment or two: `vendor/gov/<kit>/kit.toml` is as real a layout as `tools/<kit>/kit.toml`,
+        # and a one-segment-only search refused every fixture built at it (VERIFYING repair).
+        cands = {p.parent.parent.relative_to(root).as_posix()
+                 for pat in ("*/*/kit.toml", "*/*/*/kit.toml") for p in root.glob(pat)}
         rel = cands.pop() if len(cands) == 1 else "."
     return "*/kit.toml" if rel == "." else f"{rel}/*/kit.toml"
 
