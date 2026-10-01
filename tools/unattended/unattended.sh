@@ -6813,7 +6813,8 @@ print_gate_backstop() { # where the bound came from -> the line, from GB_SUM and
 # least one ask: the memory-tree generator derives generated views from this file, and rows staged
 # without them left the index stale for the pre-commit's freshness check, which refused the close's
 # own records commit after the whole bar was paid. So whichever step commits the rows commits the
-# views too, and none of the three needs a render of its own.
+# views too, and none of the three needs a render of its own, except after a miss the helper names:
+# a dirty input of the views, say, which it will not render over, and whose line carries the repair.
 # With `ASKS_CMD` blank the rows are PRINTED and nothing is written, so the auto-file cannot arm itself
 # before the project adopts the ask contract.
 read_leg_argv() { # run dir · R · leg name -> that leg's argv in R's manifest, space-joined; rc 1 unreadable
@@ -6898,14 +6899,24 @@ write_backlog_rows() { # BACKLOG.md path · slug · ask row · SEV row · KEEP r
 # unstaged, because staging it would commit work the run did not do.
 # `GENERATED_INDEXES` is not the staging set: the build README's regions move too, outside it.
 #
-# A MISS IS NAMED AND DOES NOT REFUSE. No generator, a path that is not a file here, or a render
-# that exits non-zero or is killed by its bound prints the miss line with the repair, stages what
-# the render did move under the same rule, and returns 1; the caller's verdict is unchanged. Rolling
-# the rows back instead would drop the inherited leg's owner from the record. A stage that git
-# itself refuses, a held index lock say, is named on a line of its own and returns 1 too, because
-# the success line would otherwise claim paths the index does not hold.
+# AND NOTHING IS RENDERED OVER A DIRTY INPUT (TOOL-dMendedRecall-2 rev-3, the closing review's M1).
+# The delta rule guards the render's OUTPUT side only. The generator reads its inputs off the disk —
+# every tracked path under the memory root, and `.memory-tree.conf` whether tracked or not — so an
+# unstaged edit to one, a spec's status header say, feeds the render, and the views it moves were
+# clean before it: the delta rule staged them while the edit itself stayed unstaged. That commit
+# passed the pre-commit, whose freshness check renders from the same worktree, and was stale in
+# every checkout of it. So a dirty input stages NO view: the miss line names the inputs and the
+# repair, and the operator's records commit then meets the freshness check loudly. An UNTRACKED path
+# under the memory root is no input, because the generator lists its inputs with `git ls-files`.
+#
+# A MISS IS NAMED AND DOES NOT REFUSE. No generator, a path that is not a file here, a dirty input,
+# or a render that exits non-zero or is killed by its bound prints the miss line with the repair,
+# stages what a render that ran did move under the same rule, and returns 1; the caller's verdict is
+# unchanged. Rolling the rows back instead would drop the inherited leg's owner from the record. A
+# stage that git itself refuses, a held index lock say, is named on a line of its own and returns 1
+# too, because the success line would otherwise claim paths the index does not hold.
 write_ask_views() { # count of asks this call filed -> 0 rendered and staged, 1 on a named miss; one line each
-  local n=$1 gen="" py="" rc=0 why="" p h line paths="" left="" staged=1
+  local n=$1 gen="" py="" rc=0 why="" fix="" p h line paths="" left="" staged=1 dirty=""
   local -a post=() stage=()
   local -A h0=()
   # ONE test for both halves of "resolves": the library resolver runs the inline `resolve_python`
@@ -6915,19 +6926,30 @@ write_ask_views() { # count of asks this call filed -> 0 rendered and staged, 1 
     why="no memory-tree generator resolves beside this kit"
   elif [ ! -f "$gen" ]; then
     why="the generator the resolver names is not a file here: $gen"
+  else
+    # BEFORE: every path carrying unstaged or untracked changes, keyed to the bytes it carried then,
+    # and the ones among them the render would read as input. NUL-read both times, because a
+    # C-quoted path would name nothing to `add`. The two listings are disjoint by construction,
+    # tracked and untracked, so no path arrives twice. `--no-renames`, so a path the render moves
+    # away is listed by its own name and staged as the deletion it is, never folded into a
+    # destination (memory/gotchas/porcelain-diff-names-a-rename-by-its-destination.md).
+    while IFS= read -r -d '' p; do
+      h0[$p]=$(GIT hash-object -- "$p" 2>/dev/null) || h0[$p]=-
+      case "$p" in "$M"/*|.memory-tree.conf) dirty="$dirty${dirty:+ }$p" ;; esac
+    done < <(GIT diff --no-renames --name-only -z 2>/dev/null)
+    while IFS= read -r -d '' p; do
+      h0[$p]=$(GIT hash-object -- "$p" 2>/dev/null) || h0[$p]=-
+      [ "$p" != .memory-tree.conf ] || dirty="$dirty${dirty:+ }$p"
+    done < <(GIT ls-files --others --exclude-standard -z 2>/dev/null)
+    if [ -n "$dirty" ]; then
+      why="the views' inputs carry changes the index does not hold, and a render would stage views derived from them: $dirty"
+      fix="stage or discard those changes, then run "
+    fi
   fi
   if [ -n "$why" ]; then
-    echo "gates-green: the $n filed ask(s) are staged, but the generated views were not re-rendered: $why; until they are, a records commit meets a stale index — repair: $(derive_index_repair)"
+    echo "gates-green: the $n filed ask(s) are staged, but the generated views were not re-rendered: $why; until they are, a records commit meets a stale index — repair: $fix$(derive_index_repair)"
     return 1
   fi
-  # BEFORE: every path carrying unstaged or untracked changes, keyed to the bytes it carried then.
-  # NUL-read both times, because a C-quoted path would name nothing to `add`. The two listings are
-  # disjoint by construction, tracked and untracked, so no path arrives twice. `--no-renames`, so a
-  # path the render moves away is listed by its own name and staged as the deletion it is, never
-  # folded into a destination (memory/gotchas/porcelain-diff-names-a-rename-by-its-destination.md).
-  while IFS= read -r -d '' p; do
-    h0[$p]=$(GIT hash-object -- "$p" 2>/dev/null) || h0[$p]=-
-  done < <(GIT diff --no-renames --name-only -z 2>/dev/null; GIT ls-files --others --exclude-standard -z 2>/dev/null)
   # `-B`, because the render is a Python process and its imports would otherwise leave bytecode
   # caches beside the kit: in a tree that does not ignore them they are new untracked paths, and the
   # delta rule above would stage them into the records commit (observed over this unit's fixture).

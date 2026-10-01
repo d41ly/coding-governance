@@ -53,3 +53,39 @@ staged break, in a tree that does not ignore bytecode, the close staged and comm
 `__pycache__` files; with it, none. A generator that exits 3 printed the miss line naming its exit
 and its own output indented beneath it. A generator that took the index lock after writing a view
 printed the stage-refused line, and the close then refused on its record.
+
+## The closing review's round-1 fold, rev-3
+
+The fold of M1 makes `write_ask_views` render nothing over a dirty input of the views, a tracked
+path under the memory root or `.memory-tree.conf`, and print the miss line naming the inputs and the
+`stage or discard` repair. The same scratch fixture stood in for the `unattended kit gate` and the
+driver suite, extended to run `--check` over a clean checkout of the commit, which is
+`git archive HEAD` extracted into a fresh directory with a repository committed over it. Every built reading ran
+from the fixture's own copy of the kit; the rev-2 reading ran from the kit at `6ab97e86`, which the
+rev-2 pass built. The lines above stay the record of what was read then. For a criterion rev-3
+changed or added, the line below is its current reading.
+
+**Evidences:** TOOL-dMendedRecall-2
+- AC2 — `build-index: clean (5 artifact(s))` — the built in-place close committed the rows, the
+  family view, the build README, `LIVE.md`, the ledger shard and `RUN.md`; `--check` over a clean
+  checkout of that commit printed the token, and the fixture's `git status --porcelain` was empty.
+- AC4 — `left unstaged, dirty before the render: memory/backlog/ARCH.md` — the untracked-view
+  arm's render line ended with the token and the view stayed out of the stage. With an untracked
+  `notes.md` the close printed `re-rendered the generated views` with no clause and staged the rows
+  and four views without it; the operator's commit passed the `--check` hook, HEAD did not name
+  `notes.md`, and `--check` over a clean checkout of it printed `build-index: clean`. With the
+  guide edited, and again with the README's authored line edited, the close printed
+  `were not re-rendered` naming that path and the `stage or discard` repair, staged only the rows
+  and `RUN.md`, printed no `UNATTENDED check` line, and left the edit unstaged; the operator's
+  commit was then refused by the hook.
+- AC7 — `were not re-rendered` — over an unstaged `SPECCED` to `INPROGRESS` flip the built close
+  named `memory/builds/tRun/spec/2026-08-01-spec-ARCH-tRun-1.md` and staged only the rows and
+  `RUN.md`, and the operator's commit was refused by the `--check` hook. The rev-2 kit over a fresh
+  fixture staged `memory/LIVE.md` and three other views, the operator's commit passed the hook, and
+  `--check` over a clean checkout of it printed `build-index DRIFT`. With `.memory-tree.conf`
+  edited instead, the built close named it and staged no view.
+
+The suite arms for these readings are written in `tools/unattended/unattended.test.sh` and were
+not run, under the build README's waiver of this kit's own suites. The block's skip count moved
+from 27 to 39 to match its assertions. AC1, AC3, AC5 and AC6 did not change at rev-3; AC3's stub
+close and AC5's greps were read again over the built kit and gave the readings above.

@@ -1,6 +1,6 @@
 # TOOL-dMendedRecall-2 — the inherited-red auto-file re-renders the generated views it makes stale, and stages them with its rows
 
-**Status:** CLOSED · rev-2 · 2026-10-01 · node d · Tier-2 · base 1f915870 · streams tooling · order 1 · closes TOOL-dAlignedCarrier-9 · ratified 2026-10-01
+**Status:** CLOSED · rev-3 · 2026-10-01 · node d · Tier-2 · base 1f915870 · streams tooling · order 1 · closes TOOL-dAlignedCarrier-9 · ratified 2026-10-01
 
 <!-- gen:spec-records -->
 
@@ -42,6 +42,14 @@ close commits `records(<slug>): close — LANDING` with the views current.
 - **S3** — A path that carried unstaged or untracked changes BEFORE the render is never staged by
   it. Its hash is taken before and after, and one the render changed too is named on the success
   line as left unstaged, because staging it would commit work the run did not do. Observed by AC4.
+  THE INPUT SIDE, rev-3: when any INPUT of the views carries a change the index does not hold before
+  the render, `write_ask_views` runs no render and stages no view. The inputs are every tracked path
+  under the memory root with an unstaged change, deletions included, and `.memory-tree.conf` with an
+  unstaged change or untracked, because the generator reads the conf off the disk either way. An
+  untracked path under the memory root is no input: the generator lists its inputs with
+  `git ls-files`. It prints §4's miss spelling with the dirty-input `<why>`, naming the inputs, and
+  the repair to stage or discard them and run the generator's `--write`, and returns 1 as S4 does.
+  It never commits a view derived from a change the operator has not staged. Observed by AC4, AC7.
 - **S4** — A miss is named and does not refuse. When no generator resolves, the resolved path is
   not a file at the top, or the render exits non-zero or is killed by its bound, `write_ask_views`
   prints §4's miss spelling, which carries `derive_index_repair`'s text, stages whatever paths the
@@ -60,6 +68,8 @@ close commits `records(<slug>): close — LANDING` with the views current.
   untouched paths and its left-unstaged naming. The inherited-red block's F4 slice, which runs the filer
   with its neighbours doubled, gains a double for the helper, so the sliced filer calls no function
   the slice lacks; its arms read whether the double was called and with what count (rev-2).
+  At rev-3 the new block grades the commit rather than the worktree: AC2's and AC4's `--check`
+  arms run over a clean checkout of the commit, and it gains AC4's split arms and AC7's two.
   Observed by AC6.
 
 ## 3. Non-goals (OUT)
@@ -118,6 +128,14 @@ Read at `1f915870` on 2026-10-01, PINNED to that date.
   `check_inplace_preconditions` refuses a tree that is not porcelain-clean with refusal 62 before
   the bar runs, measured over this unit's fixture, so there a dirty path can reach the item only
   through something the bar itself writes. AC4 therefore reads the `primary` close.
+- ADDED at rev-3, from the closing review's M1 and a fixture read on 2026-10-01: the rev-2 S3
+  guarded the render's output side only. `gen_build_index.py` lists its inputs with `git ls-files`
+  and reads their bytes off the disk (`read_text` at `:247`, the memory-root listing at `:851`), and
+  reads `.memory-tree.conf` with `load_conf` (`:293`) whether it is tracked or not. Under `primary`,
+  an unstaged `SPECCED` to `INPROGRESS` flip on a spec's status header was followed by the rev-2
+  close staging `memory/LIVE.md`, the family view, the build README and the ledger shard; the
+  operator's records commit passed the worktree `--check` pre-commit, and `--check` over a clean
+  checkout of that commit read `build-index DRIFT`.
 
 ### Spellings
 
@@ -139,7 +157,15 @@ gates-green: the generated views for <n> filed ask(s) were re-rendered, but git 
 generator the resolver names is not a file here: <path>`, or `the generator exited <rc> after
 <s>s`, the last followed by `run_bounded`'s captured output indented four spaces, the shape every
 other bounded call site of this driver prints. None of them begins `UNATTENDED check`, because none
-is a refusal.
+is a refusal. rev-3 adds a fourth, for S3's input side, whose repair is prefixed:
+
+```
+<why>    the views' inputs carry changes the index does not hold, and a render would stage views derived from them: <paths>
+<repair> stage or discard those changes, then run <derive_index_repair>
+```
+
+The miss line is spelled once in the driver for every `<why>` decided before a render runs, so the
+dirty-input line differs from the other two only in those two fields.
 
 ### Inventory
 
@@ -170,11 +196,14 @@ refuses a tree with no stale-header waiver registry, so the fixture carries an e
 memory root's project folder; it ignores `__pycache__/` as any tree carrying Python does; and the
 kit is copied without its own suites, whose literal ids would otherwise feed the id the auto-file
 mints. The `tools/lib/` copy turned out unneeded: the driver is copy-installed standalone.
+At rev-3 AC7 reads the same fixture under `primary`, its rev-2 reading swaps in the kit the rev-2
+pass built, and every `--check` that grades a commit runs over a clean checkout of it, as AC2
+states.
 
 ### Rollout
 
 No render: nothing this unit edits is a template. The pass edits the driver and the suite, observes
-AC1 to AC5 over the fixture, and commits.
+AC1 to AC5 over the fixture, and commits. The rev-3 fold observes AC2, AC4 and AC7 the same way.
 
 ### Files touched (estimate)
 
@@ -203,15 +232,21 @@ AC1 to AC5 over the fixture, and commits.
 - perf / scale — one generator run per close that files an ask, a few seconds on node `d`, bounded
   by the driver's existing bound; a close that files nothing pays nothing.
 - error / empty / loading states — S4's miss line for each failure; a render that changes nothing
-  says so; a pre-dirty path is named rather than swept in.
+  says so; a pre-dirty path is named rather than swept in; a dirty input is named and not rendered
+  over.
 - observability — one line per render naming what it staged, or why it did not.
 - risks — `--write` renders every artifact, so a tree whose index was already stale before the
   close would have that drift staged into the records commit. The pre-commit keeps the default
-  branch's index clean, so on a run branch only the run's own writes can move it. A generator
-  verdict that `--check` refuses and `--write` only prints still meets refusal 69, now with the
-  render line above it naming the state.
-- testing — the scratch fixture of AC1 to AC4, RED on the BASE kit; the S6 arms written and not
-  run.
+  branch's index clean. Under `primary` the operator's unstaged edits to the views' inputs can move
+  it too, and rev-3's input rule (S3) renders nothing over them rather than stage views derived from
+  them. A generator verdict that `--check` refuses and `--write` only prints still meets refusal 69,
+  now with the render line above it naming the state. Two residuals stay outside the input rule.
+  An untracked registry the generator reads off the disk, such as its stale-header waiver file, is
+  not an input here, because the rule follows `git ls-files`. An untracked VIEW the render rewrites
+  is named as left unstaged and is not staged, so a tree that stopped tracking one keeps that drift
+  in its records commit, as it had before the close.
+- testing — the scratch fixture of AC1 to AC4, RED on the BASE kit, and of AC7, RED on the rev-2
+  kit; the S6 arms written and not run.
 - migration — none: no fact, file or format is added.
 - user docs — N/A here: the driver comment is S5, and the stop contract's sentence is a hands-off.
 
@@ -231,9 +266,14 @@ AC1 to AC5 over the fixture, and commits.
   minutes; each close over it runs in seconds against the stub bar.
 - **AC2** — When AC1's close has committed, `git show --name-only --format= HEAD` in the fixture
   lists the build's `BACKLOG.md` and the family view under `memory/backlog/`,
-  `python tools/memory-tree/gen_build_index.py --check` run there prints `build-index: clean`, and
-  `git status --porcelain` there is empty.
-  Red when: the commit carries the rows without the views, or a rendered view is left unstaged.
+  `python tools/memory-tree/gen_build_index.py --check` run over a CLEAN CHECKOUT of that commit,
+  never over the fixture's worktree, prints `build-index: clean`, and `git status --porcelain` in
+  the fixture is empty. The checkout is `git archive HEAD` extracted into a fresh directory with a
+  repository initialised and committed over it.
+  Red when: the commit carries the rows without the views, a rendered view is left unstaged, or a
+  committed view is derived from bytes the commit does not carry.
+  rev-3: `--check` reads the commit, because the worktree `--check` the pre-commit runs passed a
+  commit whose views were derived from an unstaged edit (§4 Evidence, the closing review's M1).
 - **AC3** — When the fixture is rebuilt with the inherited-red block's stub `ASKS_CMD`, which reads
   every id back as one OPEN HIGH ask, no memory-tree kit and no pre-commit hook, the close's output
   carries `gates-green: filed ask` and `were not re-rendered`, that line carries `--write`, and
@@ -241,18 +281,30 @@ AC1 to AC5 over the fixture, and commits.
   and prints no `UNATTENDED check` line, as the BASE kit does over the same variant.
   Red when: the miss is silent, unstages the rows, or turns the close into a refusal.
 - **AC4** — When AC1's fixture is built with `LANDER_MODE="primary"` and carries, before the close,
-  an untracked `notes.md` under the memory root and an unstaged edit to its tracked
-  `BUILD-METHOD.md` guide, both are absent from `git diff --cached --name-only` after the close,
-  `git status --porcelain` still shows both, and the render line carries no `left unstaged` clause,
-  since the render changed neither; the operator's records commit of what the close staged then
-  passes the `--check` pre-commit, and both are absent from `git show --name-only --format= HEAD`.
-  When the same `primary` fixture instead carries an unstaged edit to an authored line of the
-  build's `README.md`, the render line names that README after `left unstaged` and it is absent
-  from `git diff --cached --name-only`.
-  Red when: the render stages either dirty path, which is the sweep S3 forbids, or names a path it
-  changed that was dirty before it nowhere.
+  an untracked `notes.md` under the memory root, the close prints `re-rendered the generated views`
+  with no `left unstaged` clause, `notes.md` is absent from `git diff --cached --name-only` and
+  still `??` in `git status --porcelain`; the operator's records commit of what the close staged
+  passes the `--check` pre-commit, `notes.md` is absent from `git show --name-only --format= HEAD`,
+  and `--check` over a clean checkout of that commit, as AC2 builds one, prints
+  `build-index: clean`. When the same `primary` fixture instead carries an unstaged edit to its
+  tracked `BUILD-METHOD.md` guide, the close prints `were not re-rendered` with the dirty-input
+  `<why>` naming `memory/guides/BUILD-METHOD.md` and the `stage or discard` repair, the build's
+  `BACKLOG.md` is in `git diff --cached --name-only` and the family view under `memory/backlog/`
+  and the guide are not, the guide is still ` M`, and no `UNATTENDED check` line prints. When it
+  instead carries an unstaged edit to an authored line of the build's `README.md`, the miss line
+  names that README, no `re-rendered the generated views` line prints, and the README is absent
+  from the cached names
+  with the edit intact in `git diff`. When the fixture instead stops tracking the family view in a
+  commit before the close, leaving it untracked on the disk, the render line names
+  `memory/backlog/ARCH.md` after `left unstaged` and it is absent from the cached names.
+  Red when: the render stages a dirty path, which is the sweep S3 forbids; renders over a dirty
+  tracked input; names a path it changed that was dirty before it nowhere; or the commit's own
+  checkout is not clean.
   rev-2: read under `primary`, because under `in-place` refusal 62 stops a porcelain-dirty close
   before the bar runs and the criterion as first written held vacuously (§4 Evidence).
+  rev-3: the guide and README arms flip from a render that leaves them unstaged to no render at all,
+  because both are inputs under the memory root; the untracked-view arm takes over the
+  `left unstaged` naming the README arm used to observe.
 - **AC5** — When `grep -c 'write_ask_views' tools/unattended/unattended.sh` runs it prints at least
   3, where BASE prints 0, for the definition, the one call after the loop and the S5 comment;
   `grep -c 'fail 69 ' tools/unattended/unattended.sh` prints 1, its BASE count; and
@@ -266,6 +318,18 @@ AC1 to AC5 over the fixture, and commits.
   Red when: either path has no arm.
   permission: running this kit's own suites is waived for this landing by the build README's rule;
   the arms are written and their run is not observed here.
+- **AC7** — When AC1's fixture is built with `LANDER_MODE="primary"` and carries, before the close,
+  an unstaged flip of its spec's status header from `SPECCED` to `INPROGRESS`, the close prints
+  `were not re-rendered` with the dirty-input `<why>` naming that spec's path, and `memory/LIVE.md`
+  is absent from `git diff --cached --name-only`; the operator's records commit then meets the
+  `--check` pre-commit and is refused, which is BASE's loud behaviour. With the rev-2 kit over a
+  fresh copy of the same fixture, the close stages `memory/LIVE.md`, the operator's commit passes
+  the pre-commit, and `--check` over a clean checkout of it prints `build-index DRIFT`. When the
+  fixture instead carries an unstaged edit to `.memory-tree.conf`, the miss line names
+  `.memory-tree.conf` and `memory/LIVE.md` is absent from the cached names.
+  Red when: the built close stages a view over the dirty spec or conf, or the rev-2 kit's commit
+  reads clean in its checkout, which would mean the fixture does not reproduce M1.
+  fixture: AC1's, under `primary`, in `%TEMP%`.
 
 ## 7. Gates
 
@@ -289,6 +353,18 @@ New arm: `tools/unattended/unattended.test.sh` · the inherited-red block's MET 
   record, against the stop contract's §13. (c) keeps both and loses nothing the BASE close had.
   Recommendation (c). RESOLVED (agent, 2026-10-01, delegated): (c), the most feature-rich survivor
   under M3's rule: it meets every criterion the other two meet, and keeps the ask on the record.
+- **F3 — What does the render do when an input of the views is dirty?** Raised by the closing
+  review's M1, round 1. (a) Before the render, intersect the dirty paths with the views' inputs,
+  the tracked paths under the memory root and `.memory-tree.conf`; when any is dirty, render nothing,
+  stage no view, name the inputs and the repair, and return 1 without refusing the close. (b) Render
+  against the index instead, in a scratch checkout of it, and stage only the outputs whose bytes
+  differ from the index blob and whose worktree path was clean. (b) keeps AC4's arms as first
+  written, but it adds a write surface outside the tree, a checkout per filing close, which veto 3
+  prices, to rescue a case the operator repairs in one command. (a) never commits a view derived
+  from a change the operator has not staged, and the operator's commit meets the freshness check
+  loudly, as at BASE.
+  RESOLVED (agent, 2026-10-01, delegated): (a), handed down by the fold brief. (b) falls to veto 3,
+  and (a) is the survivor that meets every criterion.
 
 ## 9. Revision log
 
@@ -301,6 +377,14 @@ New arm: `tools/unattended/unattended.test.sh` · the inherited-red block's MET 
   records commit. S4 and §4 gain the stage-refused line, and §4 the `staged 0 path(s): none` form.
   S6 gains the F4 slice's double. §4 Fixture records the waiver registry, the ignore line and the
   suite-less kit copy the fixture needed.
+- rev-3 · 2026-10-01 · the fold of the closing diff review's round 1, M1 (MEDIUM), as the fold brief
+  disposes it. §8 F3 resolved to (a). S3 gains the input side: a dirty input of the views stages no
+  view and prints the miss line naming it. §4 gains the M1 evidence and the dirty-input spelling;
+  §5's risks bullet loses "only the run's own writes can move it" and names the two residuals.
+  AC2 and AC4 read `--check` over a clean checkout of the commit, never the worktree. AC4's guide
+  and README arms flip to the miss line, and an untracked-view arm takes the `left unstaged`
+  naming. AC7 is new: the spec status-header flip of M1 itself, and the conf. S6 names the arms;
+  §4 Fixture and Rollout and §5's testing line name AC7, and the driver's S5 comment names the miss.
 
 ## 10. Reuse audit
 

@@ -11171,8 +11171,8 @@ for _w in $rv_asks; do [ -f "$rv_top/$_w" ] && { rv_gen=$_w; break; }; done
 rv_py=""
 if slice_fn resolve_python; then rv_py=$(resolve_python 2>/dev/null) || rv_py=""; fi
 if [ -z "$rv_gen" ] || [ -z "$rv_py" ]; then
-  n=$((n+27))
-  echo "  SKIP TOOL-dMendedRecall-2 — this repository declares no ASKS_CMD naming a generator file it tracks, or no python runs here, so the view-render arms have no generator to install; their 27 assertions are counted, not run"
+  n=$((n+39))
+  echo "  SKIP TOOL-dMendedRecall-2 — this repository declares no ASKS_CMD naming a generator file it tracks, or no python runs here, so the view-render arms have no generator to install; their 39 assertions are counted, not run"
 else
   rv_dir=$(mktemp -d); rv_oroot=$(mktemp -d); rv_out=$(mktemp -d)
   RVOVR="--override closing-review-recorded --reason fixture-has-no-review --override build-complete --reason fixture-unit-is-open"
@@ -11268,6 +11268,19 @@ RVC
     printf '#!/bin/sh\nexec %s -B %s --check\n' "$rv_py" "$rv_gen" > "$rv_out/hooks/pre-commit"
     chmod +x "$rv_out/hooks/pre-commit"; run_rv_git config core.hooksPath "$rv_out/hooks"
   }
+  # THE COMMIT, GRADED ON ITS OWN (rev-3, the closing review's left-shift of M1): `--check` over a
+  # CLEAN CHECKOUT of the fixture's HEAD, never over its worktree. The pre-commit's `--check` renders
+  # from the worktree, so it passed a records commit whose views were derived from an unstaged edit;
+  # a checkout of the commit carries only what was committed, and reds on any staged view its
+  # sources do not carry, whichever input moved it.
+  rv_check_commit() { # -> the generator's --check output over a fresh checkout of the fixture's HEAD
+    local _d; _d=$(mktemp -d)
+    run_rv_git archive HEAD | tar -x -C "$_d"
+    ( cd "$_d" && git init -q -b main . && git add -A \
+        && git -c user.email=t@t.test -c user.name=t commit -q -m checkout --no-verify \
+        && "$rv_py" -B "$rv_gen" --check ) 2>&1
+    rm -rf "$_d"
+  }
 
   # ---- AC1 and AC2: the in-place close files the ask, renders and stages the views, and commits its
   # ---- own record through the `--check` pre-commit, in that order, leaving a clean tree and a clean
@@ -11290,14 +11303,14 @@ RVC
   rv_names=$(run_rv_git show --name-only --format= HEAD)
   hit  "$rv_names" "memory/builds/tMend/BACKLOG.md"
   hit  "$rv_names" "memory/backlog/ARCH.md"
-  hit  "$(cd "$rv_dir" && "$rv_py" -B "$rv_gen" --check 2>&1)" "build-index: clean"
+  hit  "$(rv_check_commit)" "build-index: clean"
   same "AC2 the close left a clean tree" "$(run_rv_git status --porcelain)" ""
 
-  # ---- AC4: under `primary`, a path the operator was editing before the close is never swept into
-  # ---- what it stages, and the operator's own records commit of that stage passes the pre-commit.
+  # ---- AC4: under `primary`, an UNTRACKED path the operator left under the memory root is no input
+  # ---- of the render, so the views are rendered and staged, the path is never swept in, and the
+  # ---- operator's own records commit of that stage passes the pre-commit and is clean as a commit.
   build_rv_fixture primary
   printf 'scratch\n' > "$rv_dir/memory/notes.md"
-  printf 'an operator edit\n' >> "$rv_dir/memory/guides/BUILD-METHOD.md"
   out=$(run_rv --close tMend $RVOVR)
   hit  "$out" "gates-green: filed ask ARCH-tMend-2 for leg x leg red at"
   hit  "$out" "gates-green: re-rendered the generated views for 1 filed ask(s) and staged "
@@ -11306,28 +11319,63 @@ RVC
   hit  "$rv_cached" "memory/builds/tMend/BACKLOG.md"
   hit  "$rv_cached" "memory/backlog/ARCH.md"
   miss "$rv_cached" "memory/notes.md"
-  miss "$rv_cached" "BUILD-METHOD.md"
-  rv_st=$(run_rv_git status --porcelain)
-  hit  "$rv_st" "?? memory/notes.md"
-  hit  "$rv_st" " M memory/guides/BUILD-METHOD.md"
+  hit  "$(run_rv_git status --porcelain)" "?? memory/notes.md"
   run_rv_git commit -q -m "records(tMend): close — LANDING" >/dev/null 2>&1
   same "AC4 the operator's records commit passes the --check pre-commit" "$?" "0"
-  rv_names=$(run_rv_git show --name-only --format= HEAD)
-  miss "$rv_names" "memory/notes.md"
-  miss "$rv_names" "BUILD-METHOD.md"
+  miss "$(run_rv_git show --name-only --format= HEAD)" "memory/notes.md"
+  hit  "$(rv_check_commit)" "build-index: clean"
 
-  # ---- ...and a path dirty before the render that the render ALSO moved is NAMED and left unstaged:
-  # ---- the operator's authored edit and the render's generated region share one README.
+  # ---- ...a TRACKED input with an unstaged edit stages NO view (rev-3, M1): the miss line names the
+  # ---- input, the rows stay staged, and the edit stays the operator's.
+  build_rv_fixture primary
+  printf 'an operator edit\n' >> "$rv_dir/memory/guides/BUILD-METHOD.md"
+  out=$(run_rv --close tMend $RVOVR)
+  hit  "$out" "were not re-rendered: the views' inputs carry changes the index does not hold, and a render would stage views derived from them: memory/guides/BUILD-METHOD.md;"
+  hit  "$out" "repair: stage or discard those changes, then run the --write mode of "
+  rv_cached=$(run_rv_git diff --cached --name-only)
+  hit  "$rv_cached" "memory/builds/tMend/BACKLOG.md"
+  miss "$rv_cached" "memory/backlog/ARCH.md"
+  miss "$rv_cached" "BUILD-METHOD.md"
+  hit  "$(run_rv_git status --porcelain)" " M memory/guides/BUILD-METHOD.md"
+  miss "$out" "UNATTENDED check"
+
+  # ---- ...and so does the operator's authored edit to the build README, an input of the views too.
   build_rv_fixture primary
   sed -i 's/^An authored line\.$/An authored line, edited by the operator./' "$rv_dir/memory/builds/tMend/README.md"
   out=$(run_rv --close tMend $RVOVR)
-  hit  "$out" "; left unstaged, dirty before the render: memory/builds/tMend/README.md"
+  hit  "$out" "a render would stage views derived from them: memory/builds/tMend/README.md;"
+  miss "$out" "re-rendered the generated views"
   miss "$(run_rv_git diff --cached --name-only)" "memory/builds/tMend/README.md"
   hit  "$(run_rv_git diff -- memory/builds/tMend/README.md)" "+An authored line, edited by the operator."
 
+  # ---- ...while an UNTRACKED path the render writes, here the family view the tree stopped
+  # ---- tracking, is NAMED and left unstaged: S3's naming rule, which the README arm armed until
+  # ---- rev-3 made that README an input.
+  build_rv_fixture primary
+  run_rv_git rm -q --cached memory/backlog/ARCH.md
+  run_rv_git commit -q -m "untrack the family view" --no-verify
+  out=$(run_rv --close tMend $RVOVR)
+  hit  "$out" "; left unstaged, dirty before the render: memory/backlog/ARCH.md"
+  miss "$(run_rv_git diff --cached --name-only)" "memory/backlog/ARCH.md"
+
+  # ---- AC7 (rev-3): the closing review's M1 itself. An unstaged spec status-header flip moves
+  # ---- `memory/LIVE.md`, which was clean before the render; the rev-2 driver staged it beside the
+  # ---- edit it was derived from, read RED over a fixture before this arm was written.
+  build_rv_fixture primary
+  sed -i 's/^\*\*Status:\*\* SPECCED /**Status:** INPROGRESS /' "$rv_dir/memory/builds/tMend/spec/2026-08-01-spec-ARCH-tMend-1.md"
+  out=$(run_rv --close tMend $RVOVR)
+  hit  "$out" "a render would stage views derived from them: memory/builds/tMend/spec/2026-08-01-spec-ARCH-tMend-1.md;"
+  miss "$(run_rv_git diff --cached --name-only)" "memory/LIVE.md"
+  # ---- ...and the conf, which a bare memory-root predicate would miss: the generator reads it too.
+  build_rv_fixture primary
+  printf '# an operator note\n' >> "$rv_dir/.memory-tree.conf"
+  out=$(run_rv --close tMend $RVOVR)
+  hit  "$out" "a render would stage views derived from them: .memory-tree.conf;"
+  miss "$(run_rv_git diff --cached --name-only)" "memory/LIVE.md"
+
   cd "$TMP" || exit 2
   rm -rf "$rv_dir" "$rv_oroot" "$rv_out"
-  unset -f run_rv run_rv_git build_rv_fixture
+  unset -f run_rv run_rv_git build_rv_fixture rv_check_commit
 fi
 
 # ================ TOOL-dDerivedDocket-28: the run-owned process ledger =============================

@@ -10,8 +10,8 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 
 ## Run facts
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 0cfb51da3adedf3063b03763e8838bcd54dc6c56
-phase: REVIEWING
+witness: 6ab97e860dc2ec3f11229a7a819c0a029d607e7d
+phase: FOLDING
 asks-ready: TOOL-dAlignedCarrier-7=yes TOOL-dAlignedCarrier-8=yes TOOL-dAlignedCarrier-9=yes
 asks: TOOL-dAlignedCarrier-7..9
 m-base: 1f9158708e4782dfe2d25a17fdf4153f57d38ae3
@@ -51,3 +51,7 @@ base: 1f9158708e4782dfe2d25a17fdf4153f57d38ae3
 2026-10-01T08:24:21Z brief · item TOOL-dMendedRecall-3 · reason cadf7f43bdfb memory/builds/dMendedRecall/prompts/2026-10-01-prompt-TOOL-dMendedRecall-1-build-brief.md
 
 2026-10-01T08:55:09Z review · item dMendedRecall · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED
+
+2026-10-01T09:00:48Z dispatch · item 6ab97e86 TOOL-dMendedRecall-2 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh memory/builds/dMendedRecall/spec/2026-10-01-spec-TOOL-dMendedRecall-2.md memory/builds/dMendedRecall/build/2026-10-01-build-TOOL-dMendedRecall-2-1-acceptance-ledger.md memory/builds/dMendedRecall/README.md memory/LIVE.md memory/ledger/2026-10.md memory/backlog/TOOL.md
+
+2026-10-01T09:00:52Z brief · item TOOL-dMendedRecall-2 · reason 19e56239c3d2 memory/builds/dMendedRecall/prompts/2026-10-01-prompt-TOOL-dMendedRecall-2-fold-brief.md
