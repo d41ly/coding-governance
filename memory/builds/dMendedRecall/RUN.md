@@ -41,3 +41,7 @@ base: 1f9158708e4782dfe2d25a17fdf4153f57d38ae3
 2026-10-01T07:50:13Z dispatch · item 4174bd1c TOOL-dMendedRecall-1 · reason tools/memory-recall/selftest.py memory/builds/dMendedRecall/spec/2026-10-01-spec-TOOL-dMendedRecall-1.md memory/builds/dMendedRecall/build/2026-10-01-build-TOOL-dMendedRecall-1-1-acceptance-ledger.md memory/builds/dMendedRecall/README.md memory/LIVE.md memory/ledger/2026-10.md memory/backlog/TOOL.md
 
 2026-10-01T07:50:17Z brief · item TOOL-dMendedRecall-1 · reason cadf7f43bdfb memory/builds/dMendedRecall/prompts/2026-10-01-prompt-TOOL-dMendedRecall-1-build-brief.md
+
+2026-10-01T08:00:23Z dispatch · item 0d21d538 TOOL-dMendedRecall-2 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh memory/builds/dMendedRecall/spec/2026-10-01-spec-TOOL-dMendedRecall-2.md memory/builds/dMendedRecall/build/2026-10-01-build-TOOL-dMendedRecall-2-1-acceptance-ledger.md memory/builds/dMendedRecall/README.md memory/LIVE.md memory/ledger/2026-10.md memory/backlog/TOOL.md
+
+2026-10-01T08:00:28Z brief · item TOOL-dMendedRecall-2 · reason cadf7f43bdfb memory/builds/dMendedRecall/prompts/2026-10-01-prompt-TOOL-dMendedRecall-1-build-brief.md

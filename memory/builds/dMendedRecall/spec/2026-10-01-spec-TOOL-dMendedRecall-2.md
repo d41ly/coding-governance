@@ -1,11 +1,12 @@
 # TOOL-dMendedRecall-2 — the inherited-red auto-file re-renders the generated views it makes stale, and stages them with its rows
 
-**Status:** SPECCED · rev-1 · 2026-10-01 · node d · Tier-2 · base 1f915870 · streams tooling · order 1 · closes TOOL-dAlignedCarrier-9 · ratified 2026-10-01
+**Status:** CLOSED · rev-2 · 2026-10-01 · node d · Tier-2 · base 1f915870 · streams tooling · order 1 · closes TOOL-dAlignedCarrier-9 · ratified 2026-10-01
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-01-build-TOOL-dMendedRecall-2-1-acceptance-ledger.md](../build/2026-10-01-build-TOOL-dMendedRecall-2-1-acceptance-ledger.md) | journal | — |
 | [2026-10-01-prompt-TOOL-dMendedRecall-1-build-brief.md](../prompts/2026-10-01-prompt-TOOL-dMendedRecall-1-build-brief.md) | journal | TOOL-dMendedRecall-1 TOOL-dMendedRecall-3 |
 | [2026-10-01-prompt-TOOL-dMendedRecall-1-spec-brief.md](../prompts/2026-10-01-prompt-TOOL-dMendedRecall-1-spec-brief.md) | journal | TOOL-dMendedRecall-1 TOOL-dMendedRecall-3 |
 
@@ -31,9 +32,11 @@ close commits `records(<slug>): close — LANDING` with the views current.
   `write_backlog_rows`. It resolves the generator with the library's `resolve_index_generator` and
   the interpreter with `resolve_python`, and requires that path to be a file at the repository top,
   where the driver already runs. It records the paths carrying unstaged or untracked changes, runs
-  `<python> <generator> --write` under `run_bounded`, records them again, and stages with
-  `GIT add -A --` exactly the paths in the second set and not in the first. It prints one line, §4's
-  success spelling. Observed by AC1, AC2.
+  `<python> -B <generator> --write` under `run_bounded`, records them again, and stages with
+  `GIT add -A --` exactly the paths in the second set and not in the first. `-B` keeps the render's
+  own imports from leaving bytecode caches beside the kit, which in a tree that does not ignore them
+  are new untracked paths the delta rule would stage (rev-2). It prints one line, §4's success
+  spelling. Observed by AC1, AC2.
 - **S3** — A path that carried unstaged or untracked changes BEFORE the render is never staged by
   it. Its hash is taken before and after, and one the render changed too is named on the success
   line as left unstaged, because staging it would commit work the run did not do. Observed by AC4.
@@ -42,7 +45,9 @@ close commits `records(<slug>): close — LANDING` with the views current.
   prints §4's miss spelling, which carries `derive_index_repair`'s text, stages whatever paths the
   render did change under S3's rule, and returns 1. The caller continues: the item's verdict, its
   other lines and the close's exit are what they would have been, and no `fail` branch is added.
-  Observed by AC3.
+  A stage that git refuses after a render, a held index lock say, is named on §4's stage-refused
+  line and returns 1 the same way, because the success line would claim paths the index does not
+  hold (rev-2). Observed by AC3.
 - **S5** — The comment block opening "STAGED BY THIS ITEM" (`tools/unattended/unattended.sh:6808`)
   says the views are rendered and staged with the rows, by `write_ask_views`, so whichever step
   commits the rows commits the views. Observed by AC5.
@@ -50,7 +55,10 @@ close commits `records(<slug>): close — LANDING` with the views current.
   inherited-red block, the AC9 MET arm gains a `hit` on the miss spelling: that fixture holds no
   generator at the path the resolver names. After that block, a new self-contained block builds the
   AC1 fixture and asserts AC1's commit subject, AC2's committed paths and clean `--check`, and AC4's
-  untouched paths. Observed by AC6.
+  untouched paths and its left-unstaged naming. The inherited-red block's F4 slice, which runs the filer
+  with its neighbours doubled, gains a double for the helper, so the sliced filer calls no function
+  the slice lacks; its arms read whether the double was called and with what count (rev-2).
+  Observed by AC6.
 
 ## 3. Non-goals (OUT)
 
@@ -104,7 +112,10 @@ Read at `1f915870` on 2026-10-01, PINNED to that date.
   as the suite does, the path names nothing there, and S2's file test is what keeps the render from
   running anywhere but the tree being closed.
 - `--close` does not call `check_clean`, so a tree carrying other changes can reach this item;
-  S3 is not hypothetical.
+  S3 is not hypothetical. CORRECTED at rev-2: that holds under `primary` only. Under `in-place`,
+  `check_inplace_preconditions` refuses a tree that is not porcelain-clean with refusal 62 before
+  the bar runs, measured over this unit's fixture, so there a dirty path can reach the item only
+  through something the bar itself writes. AC4 therefore reads the `primary` close.
 
 ### Spellings
 
@@ -115,7 +126,14 @@ gates-green: the <n> filed ask(s) are staged, but the generated views were not r
 ```
 
 The success spellings take the suffix `; left unstaged, dirty before the render: <paths>` when S3
-names a path. `<why>` is one of: `no memory-tree generator resolves beside this kit`, `the
+names a path; a render that moved only such paths reads `and staged 0 path(s): none` before it.
+A stage git refuses after the render is its own line, added at rev-2:
+
+```
+gates-green: the generated views for <n> filed ask(s) were re-rendered, but git could not stage the <k> path(s) the render moved: <paths>; until it does, a records commit meets a stale index — stage them by hand
+```
+
+`<why>` is one of: `no memory-tree generator resolves beside this kit`, `the
 generator the resolver names is not a file here: <path>`, or `the generator exited <rc> after
 <s>s`, the last followed by `run_bounded`'s captured output indented four spaces, the shape every
 other bounded call site of this driver prints. None of them begins `UNATTENDED check`, because none
@@ -145,7 +163,11 @@ its `INHERITED_RED=land` policy. To those it adds this repository's `tools/unatt
 that generator's `--asks` exactly as this repository's conf does, and `core.hooksPath` naming a
 `pre-commit` that runs that generator's `--check`, which is the predicate check 9 delegates to. The
 fixture is rendered once with `--write` and committed, so `--check` is clean at its base. The BASE
-reading swaps in the kit extracted by `git archive 1f915870`.
+reading swaps in the kit extracted by `git archive 1f915870`. Measured at rev-2, the generator
+refuses a tree with no stale-header waiver registry, so the fixture carries an empty one under its
+memory root's project folder; it ignores `__pycache__/` as any tree carrying Python does; and the
+kit is copied without its own suites, whose literal ids would otherwise feed the id the auto-file
+mints. The `tools/lib/` copy turned out unneeded: the driver is copy-installed standalone.
 
 ### Rollout
 
@@ -216,11 +238,19 @@ AC1 to AC5 over the fixture, and commits.
   `git diff --name-only HEAD~1 HEAD` there still lists the build's `BACKLOG.md`. The close exits 0
   and prints no `UNATTENDED check` line, as the BASE kit does over the same variant.
   Red when: the miss is silent, unstages the rows, or turns the close into a refusal.
-- **AC4** — When AC1's fixture carries, before the close, an untracked `notes.md` under the memory
-  root and an unstaged edit to its tracked `BUILD-METHOD.md` guide, both are absent from
-  `git show --name-only --format= HEAD` after the close, `git status --porcelain` still shows both,
-  and the render line carries no `left unstaged` clause, since the render changed neither.
-  Red when: the render stages either path, which is the sweep S3 forbids.
+- **AC4** — When AC1's fixture is built with `LANDER_MODE="primary"` and carries, before the close,
+  an untracked `notes.md` under the memory root and an unstaged edit to its tracked
+  `BUILD-METHOD.md` guide, both are absent from `git diff --cached --name-only` after the close,
+  `git status --porcelain` still shows both, and the render line carries no `left unstaged` clause,
+  since the render changed neither; the operator's records commit of what the close staged then
+  passes the `--check` pre-commit, and both are absent from `git show --name-only --format= HEAD`.
+  When the same `primary` fixture instead carries an unstaged edit to an authored line of the
+  build's `README.md`, the render line names that README after `left unstaged` and it is absent
+  from `git diff --cached --name-only`.
+  Red when: the render stages either dirty path, which is the sweep S3 forbids, or names a path it
+  changed that was dirty before it nowhere.
+  rev-2: read under `primary`, because under `in-place` refusal 62 stops a porcelain-dirty close
+  before the bar runs and the criterion as first written held vacuously (§4 Evidence).
 - **AC5** — When `grep -c 'write_ask_views' tools/unattended/unattended.sh` runs it prints at least
   3, where BASE prints 0, for the definition, the one call after the loop and the S5 comment;
   `grep -c 'fail 69 ' tools/unattended/unattended.sh` prints 1, its BASE count; and
@@ -262,6 +292,13 @@ New arm: `tools/unattended/unattended.test.sh` · the inherited-red block's MET 
 
 - rev-1 · 2026-10-01 · initial draft, from the ask's accept clause, the build's spec brief, the
   hand-made close commit `10663361`, and the driver read at BASE.
+- rev-2 · 2026-10-01 · the unit pass, from the fixture it built. AC4 is read under `primary`: under
+  `in-place` refusal 62 refuses its dirty tree before the bar runs, so the §4 Evidence line on
+  `check_clean` was half true and AC4 held vacuously; it gains the left-unstaged half S3 names.
+  S2's render takes `-B`: without it the fixture's first close staged two bytecode caches into its
+  records commit. S4 and §4 gain the stage-refused line, and §4 the `staged 0 path(s): none` form.
+  S6 gains the F4 slice's double. §4 Fixture records the waiver registry, the ignore line and the
+  suite-less kit copy the fixture needed.
 
 ## 10. Reuse audit
 
