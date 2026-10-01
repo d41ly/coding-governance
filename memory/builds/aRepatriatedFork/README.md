@@ -151,7 +151,7 @@ ids TOOL-aRepatriatedFork-43 TOOL-aRepatriatedFork-44 TOOL-aRepatriatedFork-45 T
 | [TOOL-aRepatriatedFork-9 — row_grammar and check-arms take NicoCares' additions, and stop importing sibling engines](spec/2026-09-23-spec-TOOL-aRepatriatedFork-9.md) | 1 | 2 | CLOSED | rev-2 | 2026-09-24 |
 | [DEPL-aRepatriatedFork-13 — an adopter's own engine is declared, not "unattributed"](spec/2026-09-23-spec-DEPL-aRepatriatedFork-13.md) | 2 | 2 | CLOSED | rev-6 | 2026-09-24 |
 | [TOOL-aRepatriatedFork-15 — a kit whose shipped bytes move bumps its version](spec/2026-09-23-spec-TOOL-aRepatriatedFork-15.md) | 2 | 2 | CLOSED | rev-2 | 2026-09-24 |
-| [TOOL-aRepatriatedFork-2 — every kit path a runtime string spells is derived](spec/2026-09-23-spec-TOOL-aRepatriatedFork-2.md) | 2 | 2 | CLOSED | rev-7 | 2026-09-24 |
+| [TOOL-aRepatriatedFork-2 — every kit path a runtime string spells is derived](spec/2026-09-23-spec-TOOL-aRepatriatedFork-2.md) | 2 | 2 | CLOSED | rev-8 | 2026-10-01 |
 | [TOOL-aRepatriatedFork-8 — the lander contracts inCMS carries](spec/2026-09-23-spec-TOOL-aRepatriatedFork-8.md) | 2 | 2 | CLOSED | rev-5 | 2026-09-24 |
 | [DEPL-aRepatriatedFork-14 — hole probes and descriptors that cannot pass at an adopter](spec/2026-09-23-spec-DEPL-aRepatriatedFork-14.md) | 3 | 1 | CLOSED | rev-3 | 2026-09-24 |
 | [DEPL-aRepatriatedFork-17 — govkit update is safe to run and says what it did](spec/2026-09-23-spec-DEPL-aRepatriatedFork-17.md) | 3 | 2 | CLOSED | rev-4 | 2026-09-24 |
@@ -167,10 +167,10 @@ ids TOOL-aRepatriatedFork-43 TOOL-aRepatriatedFork-44 TOOL-aRepatriatedFork-45 T
 | [TOOL-aRepatriatedFork-26 — the runbook and every shipped doc name no install prefix](spec/2026-09-25-spec-TOOL-aRepatriatedFork-26.md) | 11 | 1 | CLOSED | rev-4 | 2026-10-01 |
 | [TOOL-aRepatriatedFork-27 — canonical-copy markers and comment prose name no install prefix](spec/2026-09-25-spec-TOOL-aRepatriatedFork-27.md) | 12 | 1 | CLOSED | rev-2 | 2026-09-29 |
 | [TOOL-aRepatriatedFork-29 — gov's own gates and declarations derive the prefix they name](spec/2026-09-25-spec-TOOL-aRepatriatedFork-29.md) | 13 | 2 | CLOSED | rev-6 | 2026-10-01 |
-| [TOOL-aRepatriatedFork-28 — every suite builds its fixtures at a prefix it derives](spec/2026-09-25-spec-TOOL-aRepatriatedFork-28.md) | 14 | 2 | CLOSED | rev-6 | 2026-10-01 |
+| [TOOL-aRepatriatedFork-28 — every suite builds its fixtures at a prefix it derives](spec/2026-09-25-spec-TOOL-aRepatriatedFork-28.md) | 14 | 2 | CLOSED | rev-7 | 2026-10-01 |
 | [TOOL-aRepatriatedFork-45 — a renamed-away filename is a dead-path needle](spec/2026-09-30-spec-TOOL-aRepatriatedFork-45.md) | 15 | 1 | CLOSED | rev-2 | 2026-09-30 |
 | [TOOL-aRepatriatedFork-31 — gov's shipped files carry no adopter name](spec/2026-09-25-spec-TOOL-aRepatriatedFork-31.md) | 16 | 1 | CLOSED | rev-2 | 2026-09-25 |
-| [TOOL-aRepatriatedFork-46 — no line joins a literal kit name under a derived base](spec/2026-09-30-spec-TOOL-aRepatriatedFork-46.md) | 16 | 2 | CLOSED | rev-5 | 2026-10-01 |
+| [TOOL-aRepatriatedFork-46 — no line joins a literal kit name under a derived base](spec/2026-09-30-spec-TOOL-aRepatriatedFork-46.md) | 16 | 2 | CLOSED | rev-6 | 2026-10-01 |
 | [TOOL-aRepatriatedFork-32 — every branch of hygiene check 21 honours `RECORD_SERVES_CUTOFF`](spec/2026-09-25-spec-TOOL-aRepatriatedFork-32.md) | 17 | 1 | CLOSED | rev-3 | 2026-09-26 |
 | [TOOL-aRepatriatedFork-47 — every copy of the `{prefix}` resolution gives one answer](spec/2026-09-30-spec-TOOL-aRepatriatedFork-47.md) | 17 | 1 | CLOSED | rev-1 | 2026-09-30 |
 | [TOOL-aRepatriatedFork-30 — the suites run at a foreign prefix, and the install-prefix gate is a pure ban](spec/2026-09-25-spec-TOOL-aRepatriatedFork-30.md) | 18 | 2 | CLOSED | rev-8 | 2026-10-01 |

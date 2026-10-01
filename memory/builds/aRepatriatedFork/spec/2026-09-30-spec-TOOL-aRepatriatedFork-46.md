@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-46 — no line joins a literal kit name under a derived base
 
-**Status:** CLOSED · rev-5 · 2026-10-01 · node a · Tier-2 · base 6830f257 · streams tooling · order 16 · ratified 2026-09-30
+**Status:** CLOSED · rev-6 · 2026-10-01 · node a · Tier-2 · base 6830f257 · streams tooling · order 16 · ratified 2026-09-30
 
 <!-- gen:spec-records -->
 
@@ -358,6 +358,13 @@ New arm: `tools/workflows/check-verifier-fanout.test.sh` · rev-4: `--print-cap`
   suite's `seed()` reads `MT_KIT`, which only that suite's prologue sets, and the stall-recorder and
   stop-guard suites borrow `seed()` by eval and died under `set -u` with no trailer. `seed()`
   derives the name when it is unset.
+- rev-6 · 2026-10-01 · S4: gate repair at VERIFYING, leg `foreign-prefix parity (every self-test at
+  three prefixes)`, row `playbook parity selftest` at the repo root. Its fixture runbook documented
+  the memory-tree kit as `${PFX}<kit>/`, a bare `memory-tree/` at a root install, which the gate
+  rightly does not count as naming a kit. A root install's runbook names it through the `<prefix>/`
+  token, as gov's does. The gate's own kit derivation at a root install, which cannot tell a kit
+  directory from `.claude/` or `skills/`, is a design question recorded in the VERIFYING repair
+  record, not repaired here.
 
 ## 10. Reuse audit
 

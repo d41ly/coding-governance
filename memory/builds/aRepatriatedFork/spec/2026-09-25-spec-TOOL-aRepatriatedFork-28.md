@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-28 — every suite builds its fixtures at a prefix it derives
 
-**Status:** CLOSED · rev-6 · 2026-10-01 · node a · Tier-2 · base 2143b6d6 · streams tooling · order 14
+**Status:** CLOSED · rev-7 · 2026-10-01 · node a · Tier-2 · base 2143b6d6 · streams tooling · order 14
 
 <!-- gen:spec-records -->
 
@@ -274,6 +274,14 @@ unchanged
   and is skipped there by name. `check-wiring.test.sh` took the repository as `$HERE/..`, a line
   older than base; it asks git. The rows that red only because gov's own declarations do not move
   with the tool root are the leg's, left to the owner-approved redesign of the leg, not repaired here.
+- rev-7 · 2026-10-01 · S1, S3: gate repair at VERIFYING, the same leg at the repo root, measured by
+  running each light suite in a clone whose tool root moved to the top level. Three suites could not
+  find their subject there. `check-hook-destinations.test.sh` joined `$KIT_REL/` to every path, a
+  line older than base, and named `/check-hook-destinations.sh` at a root install; it takes a path
+  head that is empty there. The run-gates adopter suite's no-prefix arm grepped `${PFX}run-gates`,
+  which at a root install matched every bare mention of the kit; it refuses any path head before the
+  kit's own directory. The unattended adopter suite's flat-checklist arm expected `python
+  gotchas.py` where a root install's directory is `.`, which the adopter renders `./`.
 
 ## 10. Reuse audit
 

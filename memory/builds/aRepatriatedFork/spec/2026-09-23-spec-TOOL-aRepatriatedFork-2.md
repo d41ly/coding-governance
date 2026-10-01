@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-2 — every kit path a runtime string spells is derived
 
-**Status:** CLOSED · rev-7 · 2026-09-24 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 2
+**Status:** CLOSED · rev-8 · 2026-10-01 · node a · Tier-2 · base a7c78ad2 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -465,6 +465,12 @@ New arm: `tools/lib/resolve-python.test.sh` parity table · one extra row per in
   path ships)` and its self-test, `drift-audit selftest`, `codebase-map kit selftest` and
   `process-monitor adopter selftest`: §4 "What the build found" gains the directory-kit `{here}`
   rule and the three fixtures that followed S2, S3 and S8. AC1-AC10 are unchanged.
+- rev-8 · 2026-10-01 · S1: gate repair at VERIFYING, leg `foreign-prefix parity (every self-test at
+  three prefixes)`, row `hook destinations self-test` at the repo root. At a root install the
+  canonical prefix is `.` and a flat entry's home resolves to the empty string. The gate skipped the
+  empty home, so every root-level `{here}` fragment was homeless, and it compared `./<kit>/<file>`
+  destinations with the readers' `<kit>/<file>` as strings. The empty home is recorded as `.`, and
+  both spellings of a destination drop the leading `./`. At `tools/` nothing either line reads moves.
 
 ## 10. Reuse audit
 
