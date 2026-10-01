@@ -110,8 +110,9 @@ different root from the one its grounding sentence tells the agent to use (`TOOL
 files.
 
 **`review_replay.py` scores a review for RECALL against a past round** (`TOOL-aSightedSkeptic-9`):
-`--known` reads a past diff-review record's adjudicated items (its finding appendix, else its legacy
-item table), `--candidate` reads the appendix of a report the harness wrote, and both are refused
+`--known` reads a past diff-review record's confirmed findings, one per RAW finding from its finding
+appendix, else one per adjudicated item from its legacy item table, and prints which unit it read;
+`--candidate` reads the appendix of a report the harness wrote, and both are refused
 unless they reproduce their own stated confirmed count. `--corpus` lists the replayable records with
 ONE `git cat-file` for the whole walk. Its `--selftest` is the held leg `review-replay selftest`,
 declared in this kit's `kit.toml` because the tool ships, unlike the `*.test.sh` suites beside it.

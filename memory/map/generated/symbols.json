@@ -4668,6 +4668,11 @@
       "file": "tools/codebase-map/map_lib.py"
     },
     {
+      "id": "parse_candidates",
+      "kind": "function",
+      "file": "tools/workflows/review_replay.py"
+    },
+    {
       "id": "parse_cell_key",
       "kind": "function",
       "file": "tools/lexicon/lexicon_conf.py"

@@ -7,15 +7,21 @@ Stdlib only. Every population arrives as an argument; nothing here names a path 
     python3 review_replay.py --corpus <dir> [<dir> ...] [--repo <clone>]
     python3 review_replay.py --selftest
 
-THE KNOWN SET is a past diff-review record's ADJUDICATED ITEMS, not its raw confirmed findings: a
-record lists items, each naming the raw ids it merged, and the raw text never reached it. A record
-carrying the appendix the harness now writes (`## Appendix — every finding`) is read from that
-appendix; any other is read from its legacy item table. Either way the record's own stated
-confirmed count must be REPRODUCED from what was extracted, or the record is refused — a parser
-that returns some of a population must not read as success.
+THE KNOWN SET is a past diff-review record's confirmed findings, in one of TWO units, and the
+`replay: known` line prints which. A record carrying the appendix the harness now writes
+(`## Appendix — every finding`) is read from that appendix, one known entry per RAW confirmed
+finding: the appendix has a row per raw finding, so a defect two lenses confirmed counts twice. Any
+other record is read from its legacy item table, one entry per ADJUDICATED ITEM, because a legacy
+record lists items naming the raw ids they merged and the raw locations never reached it. Recall
+from the two eras is therefore in different units. Either way the record's own stated confirmed
+count must be REPRODUCED from what was extracted, or the record is refused — a parser that returns
+some of a population must not read as success.
 
 THE CANDIDATE is the appendix of a report written by the harness. Columns are found by header
 name, only `confirmed` rows count, and their number must equal the report's stated confirmed count.
+A confirmed row whose ref names no file and line is UNSCORABLE and counted; when confirmed rows
+exist and none is scorable, the report is refused rather than scored as a recall of zero.
+A table row ends at a newline only, never at another character `str.splitlines` breaks on.
 
 THE SCORE matches a known item when any candidate is in the same file within `--window` lines
 (default 10). Two paths name one file when equal, or when one ends with `/` plus the other — that
@@ -53,14 +59,16 @@ ROUND_LINE = re.compile(r"\bRound:\W{0,4}(\d+)")
 ROUND_FILE = re.compile(r"round(\d+)\.md$", re.IGNORECASE)
 #: The arm count `--selftest` must reach. An arm stranded past an early exit is the one defect a
 #: per-arm verdict cannot see, so the runner compares what ran against this.
-ARMS_DECLARED = 14
+ARMS_DECLARED = 19
 
 
 def extract_line_ref(text):
-    """`(path, line)` from a ref like `a/b.py:12` or `b.py:12-20`, else None."""
+    """`(path, line)` from a ref like `a/b.py:12`, `b.py:12-20` or `C:\\x\\b.py:12`, else None."""
     if text is None:
         return None
     s = text.strip().strip("`").replace("\\", "/")
+    # A drive prefix keeps its absolute suffix, which check_same_file's endswith rule then matches.
+    s = re.sub(r"^[A-Za-z]:/", "/", s)
     while s.startswith("./"):
         s = s[2:]
     m = LINE_REF.match(s)
@@ -84,8 +92,10 @@ def parse_appendix_rows(text):
 
     Refused: no appendix, a missing column, or a confirmed-row count differing from the stated one.
     Cell encoding inverted: `\\|` is a literal bar, and a cell reading `-` is an absent value.
+    Rows split on a newline ONLY: `splitlines` also breaks on U+2028, `\\x85` and others a cell may
+    carry, and one cut row ends the table and drops every row after it.
     """
-    lines = text.splitlines()
+    lines = text.replace("\r\n", "\n").split("\n")
     starts = [i for i, line in enumerate(lines) if line.strip() == APPENDIX_HEADING]
     if not starts:
         return None, "no-appendix: no `" + APPENDIX_HEADING + "` heading"
@@ -114,10 +124,12 @@ def parse_appendix_rows(text):
 def parse_record_findings(text):
     """A past diff-review record's known set: `({items, range, stated}, None)` or `(None, error)`.
 
-    Each item is `{id, path, line}`, path and line None when the item is UNSCORABLE.
+    Each item is `{id, path, line}`, path and line None when the item is UNSCORABLE. `unit` names
+    what one item is: `raw-finding` from an appendix, `adjudicated-item` from a legacy table.
     """
     rng = extract_range(text)
     if APPENDIX_HEADING in text:
+        unit = "raw-finding"
         rows, err = parse_appendix_rows(text)
         if err:
             return None, err
@@ -127,6 +139,7 @@ def parse_record_findings(text):
             loc = extract_line_ref(r.get("ref"))
             items.append({"id": r.get("id") or "?", "path": loc and loc[0], "line": loc and loc[1]})
     else:
+        unit = "adjudicated-item"
         stated = extract_stated_count(text)
         if stated is None:
             return None, "no-count: no stated confirmed count"
@@ -147,7 +160,26 @@ def parse_record_findings(text):
         return None, f"no-scorable: {len(items)} item(s), none with a file-and-line location"
     if rng is None:
         return None, "no-range: no hex..hex range token"
-    return {"items": items, "range": rng, "stated": stated}, None
+    return {"items": items, "range": rng, "stated": stated, "unit": unit}, None
+
+
+def parse_candidates(text):
+    """A report's confirmed appendix rows as candidates `{lens, ref, path, line}`: `(list, None)` or `(None, error)`.
+
+    The ONE row-to-candidate mapping, called by `main` and the self-test alike. Refused when confirmed
+    rows exist and none names a file and line: a ref shape the parser cannot read would otherwise
+    score every candidate as a miss and print a recall of zero at exit 0.
+    """
+    rows, err = parse_appendix_rows(text)
+    if err:
+        return None, err
+    candidates = []
+    for r in rows:
+        loc = extract_line_ref(r.get("ref"))
+        candidates.append({"lens": r.get("lens"), "ref": r.get("ref") or "-", "path": loc and loc[0], "line": loc and loc[1]})
+    if candidates and not any(c["path"] for c in candidates):
+        return None, f"no-scorable: {len(candidates)} confirmed row(s), none with a file-and-line ref"
+    return candidates, None
 
 
 def check_same_file(a, b):
@@ -181,9 +213,10 @@ def measure_recall(items, candidates, window):
 
 def print_score(known_path, known, candidate_path, candidates, window, score):
     base, head = known["range"]
-    print(f"replay: known {known_path} · range {base}..{head} · items {len(known['items'])} · "
+    print(f"replay: known {known_path} · unit {known['unit']} · range {base}..{head} · items {len(known['items'])} · "
           f"scorable {score['scorable']} · unscorable {len(score['unscorable'])}")
-    print(f"replay: candidate {candidate_path} · confirmed {len(candidates)} · window {window}")
+    print(f"replay: candidate {candidate_path} · confirmed {len(candidates)} · "
+          f"unscorable {sum(1 for c in candidates if not c['path'])} · window {window}")
     for it, c in score["matched"]:
         print(f"MATCHED         {it['path']}:{it['line']}  <-  {c['ref']}  [{c['lens']}]")
     for it in score["missed"]:
@@ -285,8 +318,7 @@ CANDIDATE_ROWS = ("| confirmed | src/a.sh:14 | real \\| reached | 1 | correctnes
 def run_selftest():
     legacy3 = LEGACY.format(stated=3, extra="")
     cand_rows, _ = parse_appendix_rows(APPENDIX.format(stated=2, rows=CANDIDATE_ROWS))
-    candidates = [{"lens": r["lens"], "ref": r["ref"], "path": (extract_line_ref(r["ref"]) or (None, None))[0],
-                   "line": (extract_line_ref(r["ref"]) or (None, None))[1]} for r in cand_rows or []]
+    candidates = parse_candidates(APPENDIX.format(stated=2, rows=CANDIDATE_ROWS))[0] or []
     known3, _ = parse_record_findings(legacy3)
     score = measure_recall(known3["items"], candidates, 10) if known3 else None
     printed = io.StringIO()
@@ -294,6 +326,19 @@ def run_selftest():
         with contextlib.redirect_stdout(printed):
             print_score("k.md", known3, "c.md", candidates, 10, score)
     edge = [{"id": "E", "path": "src/e.py", "line": 20}]
+
+    def render_score(known, cands):
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            print_score("k.md", known, "c.md", cands, 10, measure_recall(known["items"], cands, 10))
+        return out.getvalue()
+
+    twin = APPENDIX.format(stated=2, rows="| confirmed | src/a.sh:12 | x | 1 | correctness |\n| confirmed | src/a.sh:12 | y | 2 | seams |")
+    drive_cands = APPENDIX.format(stated=2, rows="| confirmed | C:/projects/x/src/a.sh:12 | x | 1 | l |\n| confirmed | D:\\w\\lib\\c.py:7 | y | 2 | l |")
+    none_scorable = APPENDIX.format(stated=2, rows="| confirmed | - | x | 1 | l |\n| confirmed | x.js:undefined | y | 2 | l |")
+    one_scorable = APPENDIX.format(stated=2, rows="| confirmed | src/a.sh:1 | x | 1 | l |\n| confirmed | x.js:undefined | y | 2 | l |")
+    # chr(), never a typed escape: the character itself is the fixture. CRLF pins the normalisation.
+    split_cell = APPENDIX.format(stated=2, rows="| confirmed | src/a.sh:1 | a" + chr(0x2028) + "b | 1 | l |\r\n| confirmed | lib/c.py:7 | y | 2 | l |")
     arms = [
         ("known-legacy-parse", lambda: None if known3 and [i["id"] for i in known3["items"]] == ["F1", "M1"]
             and known3["items"][0]["path"] == "src/a.sh" else f"got {known3!r}"),
@@ -332,6 +377,23 @@ def run_selftest():
             else "the path-suffix rule is wrong"),
         ("candidate-only", lambda: None if score and [c["ref"] for c in score["candidate_only"]] == ["lib/c.py:7"]
             and "CANDIDATE-ONLY  lib/c.py:7  [security]" in printed.getvalue() else f"got {score!r}"),
+        ("known-unit-raw", lambda: (lambda r: None if r[0] and r[0]["unit"] == "raw-finding" and len(r[0]["items"]) == 2
+            and {(i["path"], i["line"]) for i in r[0]["items"]} == {("src/a.sh", 12)}
+            and "· unit raw-finding ·" in render_score(r[0], []) and "· unit adjudicated-item ·" in printed.getvalue()
+            else f"two raw rows at one location are not two raw-finding entries, or the header hides the unit: {r!r}")(
+            parse_record_findings(twin))),
+        ("drive-ref-candidate", lambda: (lambda c: None if c and [x["path"] for x in c] == ["/projects/x/src/a.sh", "/w/lib/c.py"]
+            and known3 and [it["id"] for it, _ in measure_recall(known3["items"], c, 10)["matched"]] == ["F1"]
+            else f"a drive-lettered candidate ref did not score: {c!r}")(parse_candidates(drive_cands)[0])),
+        ("drive-ref-known", lambda: (lambda r: None if r[0] and r[0]["items"][0]["path"] == "/projects/x/lib/b.py"
+            and measure_recall(r[0]["items"], [{"lens": "l", "ref": "r", "path": "lib/b.py", "line": 40}], 10)["matched"]
+            else f"a drive-lettered known ref did not score: {r!r}")(
+            parse_record_findings(APPENDIX.format(stated=1, rows="| confirmed | C:/projects/x/lib/b.py:41 | x | 1 | l |")))),
+        ("candidate-unscorable-refuses", lambda: (lambda r, mixed: None if r[0] is None and (r[1] or "").startswith("no-scorable")
+            and mixed[0] and "· unscorable 1 ·" in render_score(known3, mixed[0]).split("\n")[1]
+            else f"got {r!r} and {mixed!r}")(parse_candidates(none_scorable), parse_candidates(one_scorable))),
+        ("appendix-u2028-row", lambda: (lambda r: None if r[0] and [x["id"] for x in r[0]] == ["1", "2"] and chr(0x2028) in r[0][0]["reason"]
+            else f"a U+2028 in a cell cut the table: {r!r}")(parse_appendix_rows(split_cell))),
     ]
     passed = ran = 0
     for name, arm in arms:
@@ -388,14 +450,10 @@ def main(argv):
     if err:
         print(f"replay: REFUSED known {args.known} — {err}", file=sys.stderr)
         return 2
-    rows, err = parse_appendix_rows(cand_text)
+    candidates, err = parse_candidates(cand_text)
     if err:
         print(f"replay: REFUSED candidate {args.candidate} — {err}", file=sys.stderr)
         return 2
-    candidates = []
-    for r in rows:
-        loc = extract_line_ref(r.get("ref"))
-        candidates.append({"lens": r.get("lens"), "ref": r.get("ref") or "-", "path": loc and loc[0], "line": loc and loc[1]})
     print_score(args.known, known, args.candidate, candidates, args.window, measure_recall(known["items"], candidates, args.window))
     return 0
 

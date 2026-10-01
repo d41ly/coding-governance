@@ -1,6 +1,6 @@
 # TOOL-aSightedSkeptic-9 — the replay benchmark: a review scored for recall against a past round
 
-**Status:** CLOSED · rev-2 · 2026-10-01 · node a · Tier-2 · base ef1dcdb6 · streams tooling · order 9 · ratified 2026-10-01
+**Status:** CLOSED · rev-3 · 2026-10-01 · node a · Tier-2 · base ef1dcdb6 · streams tooling · order 9 · ratified 2026-10-01
 
 <!-- gen:spec-records -->
 
@@ -31,10 +31,11 @@ one be chosen by measurement.
   docstring's usage lines included. Every population it reads arrives as an argument. Observed by
   AC1 and AC4.
 - **S2** — The KNOWN set. `--known <record>` extracts a past diff-review record's confirmed
-  findings, one per adjudicated item, each with its location as file and line, plus the record's
-  reviewed range. Two record shapes are read, in this order. A record carrying the unit-8 appendix
-  is read from that appendix. Any other record is read from its legacy item table (§4, "Known-set
-  extraction"). Observed by AC1.
+  findings, each with its location as file and line, plus the record's reviewed range. Two record
+  shapes are read, in this order, and each has its own UNIT. A record carrying the unit-8 appendix
+  is read from that appendix, one known entry per RAW confirmed finding. Any other record is read
+  from its legacy item table, one entry per adjudicated item (§4, "Known-set extraction"). The
+  `replay: known` line prints the unit. Observed by AC1.
 - **S3** — The LIVENESS assertion on the known set. The record's own stated confirmed count must be
   reproduced from what was extracted, or the record is REFUSED with exit 2, naming both numbers.
   A record with zero scorable items is refused the same way. This is the guard against a parser that
@@ -42,7 +43,10 @@ one be chosen by measurement.
 - **S4** — The CANDIDATE set. `--candidate <report>` reads the `## Appendix — every finding` table of
   a report written by the harness after unit 8. Columns are found by HEADER NAME, never by position.
   Only rows whose `verdict` is `confirmed` are candidates. The confirmed row count must equal the
-  report's stated confirmed count, else exit 2. An absent appendix is exit 2. Observed by AC1.
+  report's stated confirmed count, else exit 2. An absent appendix is exit 2. A confirmed row whose
+  ref names no file and line is UNSCORABLE: the candidate line prints their count, and a report
+  whose confirmed rows are all unscorable is refused with exit 2. One function maps appendix rows to
+  candidates, and both `main` and the self-test call it. Observed by AC1.
 - **S5** — The SCORE. A known item is MATCHED when some candidate is in the same file and within a
   declared line window, `--window`, default 10. The tool prints matched, missed and candidate-only
   findings, a per-lens line of candidate confirmed and matched counts, and recall as matched over
@@ -58,7 +62,7 @@ one be chosen by measurement.
   differs from the number declared. Observed by AC1 and AC2.
 - **S8** — A held gate leg, `review-replay selftest`, running the S7 flag. It is declared in
   `tools/gate-legs.json` and as a `[[gate_leg]]` in `tools/workflows/kit.toml`, with subject `kit`,
-  chunk `selftests` and the kit directory as its guard. It is claimed in the review-harnesses map
+  chunk `selftests` and NO guard, so it runs on every self-test bar. It is claimed in the review-harnesses map
   dossier, and the generated subject pins and map artifacts are re-rendered in the same commit.
   Observed by AC6.
 - **S9** — The kit README documents the three modes, the live-replay procedure in §4, and what the
@@ -106,9 +110,13 @@ red self-test, and 2 for any refusal or argument error.
 
 ### Known-set extraction
 
-The unit of a known finding is the ADJUDICATED ITEM, not the raw confirmed finding. A past record
-does not carry the text or location of each raw finding. It carries item rows, each naming the raw
-ids it merged. F2 records the probe that decided this.
+The unit of a known finding depends on the record's era, and the `replay: known` line prints it.
+A LEGACY record's unit is the ADJUDICATED ITEM, not the raw confirmed finding: it does not carry
+the text or location of each raw finding, only item rows naming the raw ids they merged. F2
+records the probe that decided this, and F2 governs the legacy path. An APPENDIX record's unit is
+the RAW confirmed finding (`raw-finding`), because the unit-8 appendix carries one row per raw
+finding, so a defect two lenses confirmed counts twice there. Recall from the two eras is in
+different units, and the printed unit is what keeps a reader from comparing them as one.
 
 Read in order, first hit wins:
 
@@ -116,7 +124,9 @@ Read in order, first hit wins:
    `confirmed` are the items, and each row's `ref` is its location. Liveness: the confirmed row
    count equals the record's stated confirmed count. Unit 8 pins the cell encoding, and this reader
    inverts it: a row splits on a `|` that no backslash precedes, `\|` reads as a literal bar, and a
-   cell reading `-` is an absent value. A confirmed row whose `ref` is `-` is unscorable.
+   cell reading `-` is an absent value. A confirmed row whose `ref` is `-` is unscorable. Rows end
+   at a newline only, after CRLF is normalised: `str.splitlines` also breaks on U+2028, `\x85` and
+   others a cell may carry, and one cut row would end the table and drop every row after it.
 2. **Legacy item table.** A row is an item row when its first cell is an item id, its second cell is
    a severity word in any case and with or without bold, and its LAST cell is a list of raw finding
    ids and nothing else. The location is the FIRST backticked file-and-line token in the row.
@@ -137,8 +147,9 @@ name such as `HEAD` matches nothing and the record is refused as having no range
 
 ### Matching
 
-Both sides normalise a ref by stripping surrounding backticks, turning `\` into `/`, and stripping
-a leading `./`. A ref reading `<file>:<line>-<line>` takes its first line. Two paths name the
+Both sides normalise a ref by stripping surrounding backticks, turning `\` into `/`, turning a
+leading drive prefix such as `C:/` into `/` so the absolute suffix survives, and stripping a
+leading `./`. A ref reading `<file>:<line>-<line>` takes its first line. Two paths name the
 same file when they are equal, or when one ends with `/` followed by the other. That admits the
 basename-only refs older records carry, at a known ceiling: two files sharing a basename can match.
 The upgrade, if a scored run ever shows the collision, is to require the longer path on both sides.
@@ -148,8 +159,8 @@ candidate matches it. A candidate that matches no known item is candidate-only.
 ### Output
 
 ```text
-replay: known <record> · range <base>..<head> · items <n> · scorable <m> · unscorable <u>
-replay: candidate <report> · confirmed <c> · window <w>
+replay: known <record> · unit <raw-finding|adjudicated-item> · range <base>..<head> · items <n> · scorable <m> · unscorable <u>
+replay: candidate <report> · confirmed <c> · unscorable <u> · window <w>
 MATCHED         <known location>  <-  <candidate ref>  [<lens>]
 MISSED          <known location>  <item id>
 CANDIDATE-ONLY  <candidate ref>  [<lens>]
@@ -187,6 +198,11 @@ when fewer arms ran than were declared.
 | `window-edge` | a difference equal to the window matches, and one more line does not |
 | `path-suffix` | a basename matches its full path, and two directories sharing a basename do not |
 | `candidate-only` | a confirmed candidate matching nothing is listed as candidate-only |
+| `known-unit-raw` | two confirmed appendix rows at one location are two `raw-finding` entries, and each header prints its unit |
+| `drive-ref-candidate` | drive-lettered candidate refs, slash and backslash, parse and match a repo-relative known item |
+| `drive-ref-known` | a drive-lettered known appendix ref is scorable and matches a repo-relative candidate |
+| `candidate-unscorable-refuses` | all-unscorable confirmed candidates are refused; one unscorable of two is counted on the candidate line |
+| `appendix-u2028-row` | a U+2028 inside a cell, on a CRLF table, cuts no row |
 
 ### Live replay — the main loop's procedure at VERIFYING
 
@@ -206,7 +222,7 @@ New Python function names, each answered OK by `python tools/lexicon/lexicon.py 
 --as py.function` on 2026-10-01: `main`, `run_selftest`, `parse_record_findings`,
 `parse_appendix_rows`, `extract_line_ref`, `extract_range`, `extract_stated_count`,
 `check_same_file`, `measure_recall`, `scan_corpus`, `resolve_commits`, `print_score`,
-`print_corpus`. The file name grades in no cell, because `py.file` is undeclared in `.lexicon.conf`.
+`print_corpus`, and at rev-3 `parse_candidates` and the self-test's nested `render_score`. The file name grades in no cell, because `py.file` is undeclared in `.lexicon.conf`.
 New gate leg name: `review-replay selftest`.
 
 ### Files touched (estimate)
@@ -214,7 +230,7 @@ New gate leg name: `review-replay selftest`.
 - review_replay.py, new, in the kit directory
 - `tools/workflows/README.md` — a section for the tool
 - `tools/workflows/kit.toml` — one `[[gate_leg]]`
-- `tools/gate-legs.json` — one leg, subject `kit`, chunk `selftests`, guard on the kit, ceiling 300
+- `tools/gate-legs.json` — one leg, subject `kit`, chunk `selftests`, no guard, ceiling 300
 - `tools/govkit/subject-pins.tsv` — regenerated by `python tools/govkit/govkit.py selfcheck --write`
 - `memory/map/features/review-harnesses.md` — the leg claimed, and one prose line naming the tool
 - `memory/map/generated/MAP.md` and `memory/map/generated/inventories.json` — re-rendered
@@ -254,9 +270,9 @@ New gate leg name: `review-replay selftest`.
 `$KIT` below is the review-harness kit directory, which in this repository is the directory holding `tools/workflows/tier2-review.template.js`; the tool is named through it because it does not exist until this unit builds it.
 
 - **AC1** — When `python3 $KIT/review_replay.py --selftest` runs, it prints `ok` for every
-  arm in the §4 table, `score-miss` included, and `selftest: 14/14 arms`, then exits 0.
+  arm in the §4 table, `score-miss` included, and `selftest: 19/19 arms`, then exits 0.
   Red when: any arm fails, or fewer arms run than are declared.
-  figure: 14 is PINNED, the row count of the §4 arm table.
+  figure: 19 is PINNED, the row count of the §4 arm table.
 - **AC2** — When a scratch copy of the tool has its known-set liveness comparison deleted, and
   `python3 <copy> --selftest` runs, `known-liveness-refuses` prints `FAIL` and the run exits 1.
   Red when: the copy still exits 0, which means the arm cannot observe the guard it names.
@@ -274,7 +290,8 @@ New gate leg name: `review-replay selftest`.
   `git cat-file` appears in the trace exactly once. Red when: it appears once per record.
 - **AC6** — When `python tools/govkit/govkit.py selfcheck` and
   `python3 tools/codebase-map/check_gate_coverage.py` run, both pass, and `tools/gate-legs.json`
-  holds the review-replay selftest leg with subject `kit`, chunk `selftests` and guard `tools/workflows/`.
+  holds the review-replay selftest leg with subject `kit`, chunk `selftests` and no `guard` key, and
+  `python tools/check-spec-tokens.py` exits 0.
   Red when: the descriptor and the manifest disagree, the subject pin is stale, or no dossier claims
   the leg.
 - **AC7** — When `grep -c "review_replay.py" tools/workflows/README.md` runs, it prints at least 4:
@@ -333,6 +350,17 @@ its failing case.
 - rev-2 · 2026-10-01 · built. §7 names the new leg `review-replay selftest` now that it exists in
   `tools/gate-legs.json`. §4's file estimate missed one write the new held leg owes: a budget row in
   `tools/run-gates/selftest-budgets.txt`, which grades every held leg, so the build adds it.
+- rev-3 · 2026-10-01 · folds the round-1 closing review's replay-side findings
+  (`2026-10-01-review-TOOL-aSightedSkeptic-1-closing-diff-round1.md`). M1 (findings 5, 21): S2 and
+  §4 said every known set is adjudicated items while rule 1 and the code take one per raw appendix
+  row; the documents now state the built behaviour, the header prints the unit, and
+  `known-unit-raw` pins it. M2 (finding 4): §4 Matching strips a drive prefix, arms on both sides.
+  M4 (finding 17): S4 gains the candidate unscorable count and its refusal. L2 parser side
+  (finding 3): rows split on a newline only, `appendix-u2028-row`. L4 (finding 18): S4 names the one
+  row-to-candidate function `parse_candidates`. Five arms, AC1 14 to 19. The leg's guard is
+  REMOVED (S8, AC6, §4 Files touched): a guard on `tools/workflows/` made the spec-tokens guards
+  join demand the leg of four live aRepatriatedFork specs naming that kit, and the self-test costs
+  about a second, so it runs unguarded like `template size gate selftest`.
 
 ## 10. Reuse audit
 

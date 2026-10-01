@@ -83,7 +83,7 @@ ids TOOL-aSightedSkeptic-1 TOOL-aSightedSkeptic-2 TOOL-aSightedSkeptic-3 TOOL-aS
 | [TOOL-aSightedSkeptic-6 — one severity rubric, a skeptic's binding grade, and an uncertain verdict](spec/2026-10-01-spec-TOOL-aSightedSkeptic-6.md) | 6 | 2 | CLOSED | rev-2 | 2026-10-01 |
 | [TOOL-aSightedSkeptic-7 — an intensity argument whose light setting announces the lenses it skips](spec/2026-10-01-spec-TOOL-aSightedSkeptic-7.md) | 7 | 2 | CLOSED | rev-2 | 2026-10-01 |
 | [TOOL-aSightedSkeptic-8 — every finding keeps its lens, a findings ledger lands beside the report, and the confirmed set is returned](spec/2026-10-01-spec-TOOL-aSightedSkeptic-8.md) | 8 | 2 | CLOSED | rev-2 | 2026-10-01 |
-| [TOOL-aSightedSkeptic-9 — the replay benchmark: a review scored for recall against a past round](spec/2026-10-01-spec-TOOL-aSightedSkeptic-9.md) | 9 | 2 | CLOSED | rev-2 | 2026-10-01 |
+| [TOOL-aSightedSkeptic-9 — the replay benchmark: a review scored for recall against a past round](spec/2026-10-01-spec-TOOL-aSightedSkeptic-9.md) | 9 | 2 | CLOSED | rev-3 | 2026-10-01 |
 | [TOOL-aSightedSkeptic-10 — discharge the two Observed-by claims no arm reads, and record the class](spec/2026-10-01-spec-TOOL-aSightedSkeptic-10.md) | 10 | 2 | SPECCED | rev-1 | 2026-10-01 |
 <!-- /gen:build-units -->
 

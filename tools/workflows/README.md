@@ -161,8 +161,8 @@ Every finder and skeptic prompt then opens with an `INTENT` block that lists the
 review, always names the range's commit log, `git log --format=%B <base>..<head>` over the resolved
 shas. With no `specs` that log is the statement of intent. On a spec audit `specs` is sibling context
 the subjects must agree with, never reported against, and naming a subject there refuses. Each member
-must be a non-empty repo-relative path: no backslash, no leading `/`, no drive letter and no `..`
-segment, or the run refuses before any agent spawns. The harness cannot check that a listed document
+must be a non-empty repo-relative path: no backslash, no leading `/` or `~`, no drive letter, no `..`
+segment and no character below 0x20, or the run refuses before any agent spawns. The harness cannot check that a listed document
 exists; the lens that reads it reports a missing one. A run given neither `specs` nor `context` logs a
 `WARNING:`, and every report's RUN INTEGRITY block says where intent came from. `specs` joins the
 review key, like `lensNotes`.
@@ -228,14 +228,17 @@ Stdlib Python, run under the repo's python launcher. It answers one question not
 does a lens set or a prompt change find MORE of what a previous review proved real? Three modes:
 
 - `python3 {kit}/review_replay.py --known <record> --candidate <report> [--window N]` — the score.
-  The known set is the past diff-review record's ADJUDICATED ITEMS, read from its
-  `## Appendix — every finding` when it has one, else from its legacy item table (a row whose
+  The known set is the past diff-review record's confirmed findings in one of two UNITS, and the
+  `replay: known` line prints which. From its `## Appendix — every finding`, when it has one, the
+  unit is `raw-finding`: one entry per confirmed appendix row, so a defect two lenses confirmed
+  counts twice. Otherwise it is `adjudicated-item`, read from the legacy item table (a row whose
   second cell is a severity and whose last cell lists raw finding ids; the location is the row's
-  first backticked `file:line`). The candidate is the appendix of a report the harness wrote; only
-  `confirmed` rows count, columns are found by header name. A known item is MATCHED when a candidate
-  sits in the same file within `--window` lines (default 10). It prints MATCHED, MISSED,
-  UNSCORABLE and CANDIDATE-ONLY lines, a per-lens line, and `replay: recall k/m`, and exits 0 at any
-  recall.
+  first backticked `file:line`). Recall from the two record eras is therefore in different units.
+  The candidate is the appendix of a report the harness wrote; only `confirmed` rows count, columns
+  are found by header name. A known item is MATCHED when a candidate sits in the same file within
+  `--window` lines (default 10); a drive-lettered ref such as `C:/repo/a.sh:12` keeps its path after
+  the drive, so it matches a repo-relative one. It prints MATCHED, MISSED, UNSCORABLE and
+  CANDIDATE-ONLY lines, a per-lens line, and `replay: recall k/m`, and exits 0 at any recall.
 - `python3 {kit}/review_replay.py --corpus <dir> [<dir> ...] [--repo <clone>]` — which past records
   are replayable: each record whose first line is the `**Serves:** diff-review` binding, that passes
   the liveness check below and whose range resolves in this clone, with its round, range and scorable
@@ -249,7 +252,11 @@ does a lens set or a prompt change find MORE of what a previous review proved re
 confirmed count from what was extracted, or they are REFUSED with exit 2 naming both numbers — for a
 legacy table, the union of the raw ids across its item rows. Most legacy records are free prose and
 are refused; a refused record is never scored, which keeps a silent partial extraction out of every
-score. A record with no scorable item, no stated count or no hex range is refused the same way.
+score. A record with no scorable item, no stated count or no hex range is refused the same way. The
+candidate side prints how many of its confirmed rows carry no readable `file:line`, and is refused
+when it has confirmed rows and none is readable, so a drifted ref shape cannot read as a recall of
+zero. An appendix row ends at a newline only, never at another character Python's `splitlines`
+breaks on, so a U+2028 inside a cell cannot drop the rows after it.
 
 **The live replay**, run at the main loop because only it holds `Workflow`:
 
