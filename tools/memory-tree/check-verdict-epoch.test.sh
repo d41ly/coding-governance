@@ -182,7 +182,7 @@ arm 'a bogus base is a named failure' 2 'is not a commit in this repo' "$A" dead
 # It cannot demand a specific clean REASON: which of the two holds depends on whether this branch
 # currently carries an engine change, and both are correct answers. The arms above pin each reason to
 # a fixture where only one of them can be right.
-arm 'the live tree passes, and says so as a clean verdict' 0 'clean —' "$HERE/../.."
+arm 'the live tree passes, and says so as a clean verdict' 0 'clean —' "$(git -C "$HERE" rev-parse --show-toplevel)"
 
 if [ "$fails" = 0 ]; then echo "PASS — check-verdict-epoch: all arms held"; exit 0; fi
 echo "FAIL — $fails arm(s) failed"

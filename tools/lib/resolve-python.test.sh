@@ -28,7 +28,7 @@ KIT_REL=$(derive_self_rel "$HERE") || { echo "resolve-python.test: not inside a 
 # at a root install: every fixture and host path below is spelled through it, never through a
 # literal prefix (TOOL-aRepatriatedFork-28).
 case "$KIT_REL" in */*) PFX="${KIT_REL%/*}/" ;; *) PFX="" ;; esac
-ROOT=$(cd "$HERE/../.." && pwd)
+ROOT=$(git -C "$HERE" rev-parse --show-toplevel)
 CANON="$HERE/resolve-python.sh"
 TMP=$(mktemp -d); trap 'rm -rf "$TMP"' EXIT
 st=0; n=0

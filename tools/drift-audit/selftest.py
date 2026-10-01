@@ -2011,7 +2011,7 @@ def test_local_grammar_matches_the_extractor(tmp: pathlib.Path) -> None:
     spec = importlib.util.spec_from_file_location("_drift_report_probe", KIT / "drift_report.py")
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
-    root = KIT.parent.parent
+    root = next((p for p in KIT.parents if (p / ".git").exists()), KIT.parent.parent)
     families = mod._read_families(mod.load_conf(root))
     # AGAINST THE EXTRACTOR ITSELF, not against the accessor. The accessor falls back to the local
     # copy on ANY import failure, so comparing the two compared the copy to itself and passed for

@@ -74,8 +74,8 @@ mkdir -p memory/guides ${PFX}unattended .claude/skills/unattended
 cp "$HERE/unattended.sh" "$HERE/check-unattended.sh" "$HERE/lib-unattended.sh" "$HERE/PROTOCOL.template.md" \
    "$HERE/SKILL.template.md" "$HERE/check-playbook.sh" "$HERE/PLAYBOOK-TEMPLATE.template.md" \
    "$HERE/.unattended.conf.example" "$HERE/VERBS.template.md" ${PFX}unattended/
-cp "$HERE/../../memory/guides/BUILD-METHOD.md" memory/guides/
-cp "$HERE/../../memory/guides/UNATTENDED-PROTOCOL.md" memory/guides/
+cp "$(git -C "$HERE" rev-parse --show-toplevel)/memory/guides/BUILD-METHOD.md" memory/guides/
+cp "$(git -C "$HERE" rev-parse --show-toplevel)/memory/guides/UNATTENDED-PROTOCOL.md" memory/guides/
 cp "$HERE/VERBS.template.md" memory/guides/UNATTENDED-VERBS.md
 sed -e 's|{{MEMORY_ROOT}}|memory|g' -e 's|{{KIT_DIR}}|'"${PFX}unattended"'|g' \
     -e 's|{{KEEPALIVE_CREATE}}|CronCreate|g' -e 's|{{KEEPALIVE_DELETE}}|CronDelete|g' \
@@ -99,7 +99,7 @@ sed -e 's/^ANCHOR_SCOPE=.*/ANCHOR_SCOPE="published"/' -e 's|^GATE_CMD=.*|GATE_CM
     -e 's|^WIRING_CHECK=.*|WIRING_CHECK="true"|' -e 's|^KICKOFF_ENGINE=.*|KICKOFF_ENGINE=""|' \
     -e 's|^SPEC_TOKENS_CLI=.*|SPEC_TOKENS_CLI=""|' \
     -e 's|^UNDECLARED_WRITE_CEILING=.*|UNDECLARED_WRITE_CEILING="0"|' \
-    "$HERE/../../.unattended.conf" > .unattended.conf
+    "$(git -C "$HERE" rev-parse --show-toplevel)/.unattended.conf" > .unattended.conf
 git add -A >/dev/null && git commit -q -m base --no-verify
 git remote add origin ../origin.git && git push -q origin main
 

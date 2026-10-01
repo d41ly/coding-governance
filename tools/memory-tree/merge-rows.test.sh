@@ -53,7 +53,7 @@ export KIT_REL
 set -u
 HERE="$(cd "$(dirname "$0")" && pwd)"
 SELF="$HERE/$(basename "$0")"
-ROOT="$(cd "$HERE/../.." && pwd)"
+ROOT="$(git -C "$HERE" rev-parse --show-toplevel)"
 cd "$ROOT" || exit 2
 st=0
 TMP=$(mktemp -d); SCRATCH=""
@@ -1636,10 +1636,10 @@ fi
 # EACH KIT DIR IS NAMED ONCE, and the sources are anchored rather than left to the caller's cwd.
 # `MT`/`MR`/`LIB` each appear in three places — the scratch layout this case BUILDS, the copies into
 # it, and (for `MT`) the driver command — so those cannot drift apart. Sources hang off `$ROOT`,
-# which is this script's own location two levels up, the idiom case 32 already uses; that makes them
-# independent of the ambient cwd, which a bare relative path is not once any subshell cds elsewhere.
-# It is NOT a claim about the install prefix: `$ROOT` is two segments up, so it answers the repo root
-# only for a kit installed two deep, which is where the `check-install-prefix.sh` ban comes in
+# which is the repository git reports for this script's own location; that makes them independent of
+# the ambient cwd, which a bare relative path is not once any subshell cds elsewhere. It was two
+# levels up, which is the root only for a kit installed one segment deep (TOOL-aRepatriatedFork-28,
+# gate repair at VERIFYING). The `check-install-prefix.sh` ban is the other half
 # — that checker grades the literal `<prefix>/<kit>/<file>` spellings a body ships, because `apply`
 # writes gov's bytes verbatim and such a literal resolves to nothing at another prefix.
 W=$(mktemp -d); SCRATCH="$SCRATCH $W"

@@ -2048,7 +2048,7 @@ for f in ratified:
 print("population %d scanned, %d denied at BASE, %d denial(s) lost, %d ratified" % (n, denied, len(lost), len(ratified)))
 sys.exit(1 if lost or denied == 0 or not ratified else 0)
 PYEOF
-  "$TESTPY" "$TMP/nr.py" "$TMP/base-hook.js" "$HOOK" "$HERE/../.." "$TMP/nrfix" > "$TMP/nr.out" 2>&1
+  "$TESTPY" "$TMP/nr.py" "$TMP/base-hook.js" "$HOOK" "$(git -C "$HERE" rev-parse --show-toplevel)" "$TMP/nrfix" > "$TMP/nr.out" 2>&1
   if [ $? = 0 ]; then
     echo "ok   no-regress: no denial lost against BASE ($(tail -1 "$TMP/nr.out"))"; pass=$((pass+1))
   else

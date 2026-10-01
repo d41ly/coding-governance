@@ -130,7 +130,7 @@ ROOTPFX=""
 set -u
 st=0; n=0
 HERE="$(cd "$(dirname "$0")" && pwd)"
-ROOT="$(cd "$HERE/../.." && pwd)"
+ROOT="$(git -C "$HERE" rev-parse --show-toplevel)"
 F="$HERE/unattended-build.js"
 [ -f "$F" ] || { echo "FAIL cannot find unattended-build.js beside this test"; exit 2; }
 # THE CHILD IS IN THIS SUITE'S SCOPE, and it has no suite of its own. The parent hands out a roster

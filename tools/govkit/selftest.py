@@ -65,6 +65,9 @@ def resolve_prefix_token(spelled, troot):
 
 
 HERE = pathlib.Path(__file__).resolve().parent
+# The repository holding this kit, found by its `.git` entry. `GOV_ROOT` is that root only at
+# a one-segment install prefix (TOOL-aRepatriatedFork-28, gate repair at VERIFYING).
+GOV_ROOT = next(p for p in HERE.parents if (p / ".git").exists())
 
 # TOOL-aRepatriatedFork-46: every kit is named by the NAME its directory has in this install, never as a
 # literal segment. This kit's own comes from where this file sits; each SIBLING's comes from the
@@ -186,8 +189,8 @@ def resolve_gov_pin(root) -> str:
         "this tree and re-run; the suite will not grade it against a vintage nothing published.")
 
 
-GOV_PIN = resolve_gov_pin(HERE.parents[1])
-GOV_HEAD = run_gov_git(HERE.parents[1], "rev-parse", "HEAD")
+GOV_PIN = resolve_gov_pin(GOV_ROOT)
+GOV_HEAD = run_gov_git(GOV_ROOT, "rev-parse", "HEAD")
 print(f"govkit-selftest: gov vintage pin {GOV_PIN[:12]} "
       f"({'HEAD' if GOV_PIN == GOV_HEAD else 'a ref-reachable ancestor with this tree'})")
 
@@ -774,7 +777,7 @@ def check_answers_parity(tmp: pathlib.Path) -> None:
     pairs = [("kickoff-manifest", "manifest_path"), ("kickoff-manifest", "user_skills"),
              ("memory-tree", "memory_root"), ("review-harness", "memory_root"),
              ("memory-tree", "manifest_path")]
-    got = rp.resolve_answers(KIT_DIRS["playbook"], HERE.parent.parent, t,
+    got = rp.resolve_answers(KIT_DIRS["playbook"], GOV_ROOT, t,
                              [f"kit.{e}.{k}" for e, k in pairs])
     want = {f"kit.{e}.{k}": G.target_context(t, deploy, e, {}).get(k) for e, k in pairs}
     check("[aRF-42 rev-3 AC9] --answers kit.<entry>.<key> agrees with target_context on every "
@@ -1776,7 +1779,7 @@ def main() -> int:
         # --- AC3 provenance: the bytes are the INDEX's at the recorded commit, not the working
         # --- tree's. Asserted by comparing against `git show`, which is the receipt's whole claim.
         f0 = rec1["files"][0]
-        idx = subprocess.run(["git", "-C", str(HERE.parents[1]), "show",
+        idx = subprocess.run(["git", "-C", str(GOV_ROOT), "show",
                               f"{f0['commit']}:{f0['source']}"], capture_output=True).stdout
         check("a landed file's bytes equal the gov INDEX at the recorded commit",
               (ap / f0["path"]).read_bytes() == idx, f0["path"])
@@ -1801,7 +1804,7 @@ def main() -> int:
         cm = make_target(tmp / "u1a", DEPLOY_FULL)
         p = run("apply", "--target", str(cm), "--kits", "codebase-map,memory-tree")
         rec = json.loads((cm / ".governance" / "install.json").read_text(encoding="utf-8"))
-        govroot = HERE.parents[1]
+        govroot = GOV_ROOT
         # S5. AT THE PIN, not at HEAD: a pinned `update` writes the PIN's bytes, so an arm
         # comparing against HEAD reds on a correct fix whenever the two differ.
         idx_of = lambda q: subprocess.run(
@@ -2543,7 +2546,7 @@ user_skills = "/tmp/gk-fake-skills"
         # Staged in a COPY of gov. Asserting only that selfcheck is green would prove neither arm
         # can fire, which is the "gate satisfied by its own prose" shape the charter names by hand.
         gcopy = tmp / "gov-arms"
-        shutil.copytree(HERE.parents[1], gcopy, ignore=shutil.ignore_patterns(".git"))
+        shutil.copytree(GOV_ROOT, gcopy, ignore=shutil.ignore_patterns(".git"))
         # selfcheck derives its surface from `git ls-files`, so the copy needs to BE a repo. Copying
         # gov's own .git would drag its whole history; a fresh single commit is what the other
         # scratch-gov arms in this file do and is what the surface walk actually needs.
@@ -3739,7 +3742,7 @@ user_skills = "/tmp/gk-fake-skills"
               "merged [" in p.stdout, p.stdout)
 
         # --- deploying into gov itself is a stated non-goal, and is refused before anything.
-        p = run("apply", "--target", str(HERE.parents[1]), "--kits", "check-wiring")
+        p = run("apply", "--target", str(GOV_ROOT), "--kits", "check-wiring")
         check("apply refuses the gov checkout as its own target", p.returncode == 2)
         check("that refusal calls it a stated non-goal", "stated non-goal" in p.stderr, p.stderr)
 
@@ -5685,8 +5688,8 @@ user_skills = "/tmp/gk-fake-skills"
         _dangerous = []
         _scanned = 0
         _templates = 0
-        for _kt in sorted(pathlib.Path(HERE.parents[1]).glob(f"{PFX}*/kit.toml")) + sorted(
-                pathlib.Path(HERE.parents[1]).glob(f"{PFX}{KIT_NAMES['govkit']}/entries/*.kit.toml")):
+        for _kt in sorted(pathlib.Path(GOV_ROOT).glob(f"{PFX}*/kit.toml")) + sorted(
+                pathlib.Path(GOV_ROOT).glob(f"{PFX}{KIT_NAMES['govkit']}/entries/*.kit.toml")):
             try:
                 _d2 = govkit_module().load_toml(_kt)
             except Exception:
@@ -6851,9 +6854,9 @@ user_skills = "/tmp/gk-fake-skills"
         _mar = importlib.util.module_from_spec(_mspec)
         _mspec.loader.exec_module(_mar)
         _homes = _mar.resolve_kit_homes(GOV_HEAD)
-        _ents = run_gov_git(HERE.parents[1], "show",
+        _ents = run_gov_git(GOV_ROOT, "show",
                             f"{GOV_HEAD}:{PFX}{HERE.name}/registry.toml").count("[[entry]]")
-        _tree = run_gov_git(HERE.parents[1], "ls-tree", "-r", "--name-only", GOV_HEAD).split()
+        _tree = run_gov_git(GOV_ROOT, "ls-tree", "-r", "--name-only", GOV_HEAD).split()
         check("[aRF-29 AC12] the fixture regenerator derives a tracked home for every registry entry",
               _ents > 0 and len(_homes) == _ents
               and all(any(t.startswith(h + "/") for t in _tree) for h in _homes.values()),
@@ -6882,7 +6885,7 @@ user_skills = "/tmp/gk-fake-skills"
 
         def _derive_fx9_rung(w: dict) -> str | None:
             """The ladder, re-derived from gov's bytes. Same order as `derive_carry_rung`."""
-            base = subprocess.run(["git", "-C", str(HERE.parents[1]), "cat-file", "blob", w["gov_oid"]],
+            base = subprocess.run(["git", "-C", str(GOV_ROOT), "cat-file", "blob", w["gov_oid"]],
                                   capture_output=True).stdout
             if w["oid"] == _gk9.blob_oid(base):
                 return "verbatim"
@@ -7661,12 +7664,12 @@ user_skills = "/tmp/gk-fake-skills"
         # satisfied by a silently-defaulted HEAD. Tree identity is what makes the pin grade the tree
         # under test; ref-reachability is what makes `demand_published_vintage` accept it.
         check("[-ST5] AC3 LIVENESS the pin's tree IS the working tree's, so it grades THIS tree",
-              run_gov_git(HERE.parents[1], "rev-parse", GOV_PIN + "^{tree}")
-              == run_gov_git(HERE.parents[1], "rev-parse", "HEAD^{tree}"),
+              run_gov_git(GOV_ROOT, "rev-parse", GOV_PIN + "^{tree}")
+              == run_gov_git(GOV_ROOT, "rev-parse", "HEAD^{tree}"),
               f"pin {GOV_PIN}")
         check("[-ST5] AC3 LIVENESS ...and some ref contains it, which is what the published-vintage "
               "guard demands",
-              run_gov_git(HERE.parents[1], "for-each-ref", "--contains", GOV_PIN, "--count=1") != "",
+              run_gov_git(GOV_ROOT, "for-each-ref", "--contains", GOV_PIN, "--count=1") != "",
               f"pin {GOV_PIN} is reachable from no ref")
 
         # AC4: the refusal, driven against a scratch repository holding a detached commit no ref
@@ -9263,7 +9266,7 @@ user_skills = "/tmp/gk-fake-skills"
         # ref that moves is the one the unit is landing onto. `af9421d7` is `-14`'s parent, the last
         # commit whose engine predates the extraction.
         _PRE_EXTRACTION_SHA = "af9421d736d6cbd942e953c0159148b91cb425f8"
-        _pe_src = subprocess.run(["git", "-C", str(HERE.parents[1]), "show",
+        _pe_src = subprocess.run(["git", "-C", str(GOV_ROOT), "show",
                                   f"{_PRE_EXTRACTION_SHA}:{PFX}{KIT_NAMES['govkit']}/govkit.py"],
                                  capture_output=True).stdout
         check("[-14] AC8 the pre-extraction engine really came out of git, and it is the engine "
@@ -9497,7 +9500,7 @@ user_skills = "/tmp/gk-fake-skills"
         # landed inside this same diff — so `.gitattributes` is not in that engine's `written_paths`,
         # its rollback steps over the path, and the arm would have passed over an absence.
         _PRE_DIRTY_SHA = "a2f840b2e648850ef4b33d91148bc6054daf9866"
-        _pd_src = subprocess.run(["git", "-C", str(HERE.parents[1]), "show",
+        _pd_src = subprocess.run(["git", "-C", str(GOV_ROOT), "show",
                                   f"{_PRE_DIRTY_SHA}:{PFX}{KIT_NAMES['govkit']}/govkit.py"],
                                  capture_output=True).stdout
         check("[-24] LIVENESS the pre-fix engine really came out of git, and it is the engine that "
@@ -9800,7 +9803,7 @@ user_skills = "/tmp/gk-fake-skills"
         # defects rather than trusting the sentence, and it proves the shipped engine carries
         # neither — the second half is what stops this pair passing over an unchanged file.
         _PRE26_SHA = "60bd6a4d12669a844b436cefc11f99ed5d2754d4"
-        _p26 = subprocess.run(["git", "-C", str(HERE.parents[1]), "show",
+        _p26 = subprocess.run(["git", "-C", str(GOV_ROOT), "show",
                                f"{_PRE26_SHA}:{PFX}{KIT_NAMES['govkit']}/govkit.py"], capture_output=True).stdout
         _now26 = GOVKIT.read_bytes()
         # THE TALLY HALF IS A POSITION, not a string: the defect is WHERE the derivation sits
@@ -12561,7 +12564,7 @@ user_skills = "/tmp/gk-fake-skills"
         # by bash, with the variables the runbook asks an operator to set.
         _pvBLOCKS = {_m.group(1): _m.group(2) for _m in _re.finditer(
             r"<!-- harness-migration (\d+|restore) -->\n```bash\n(.*?)\n```\n",
-            (HERE.parents[1] / "WIRE-INTO-PROJECT.md").read_text(encoding="utf-8"), _re.S)}
+            (GOV_ROOT / "WIRE-INTO-PROJECT.md").read_text(encoding="utf-8"), _re.S)}
         check("[-PV] LIVENESS the runbook's three migration blocks and its restore block were cut out of "
               "WIRE-INTO-PROJECT.md",
               sorted(_pvBLOCKS) == ["1", "2", "3", "restore"]
@@ -13294,7 +13297,7 @@ user_skills = "/tmp/gk-fake-skills"
     # saw it: every other arm here hand-writes the ARRAY form, so the emitter and the reader had
     # never met. This arm is where they meet.
     import tomllib as seed_toml  # noqa: PLC0415
-    _gov = HERE.parent.parent
+    _gov = GOV_ROOT
 
     def load_seed_toml(path: pathlib.Path) -> dict:
         with path.open("rb") as fh:

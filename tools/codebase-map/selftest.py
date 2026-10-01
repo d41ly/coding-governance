@@ -332,17 +332,21 @@ def test_gate_template_finds_the_kit(tmp: Path):
             capture_output=True, text=True, encoding="utf-8",
         )
 
+    # The gate searches a ONE-segment prefix and no deeper, by its own docstring, so the prefixed
+    # fixtures take one segment whatever this install's own depth is: the host's first segment, or
+    # a stand-in at a root install (TOOL-aRepatriatedFork-28, gate repair at VERIFYING).
+    seg = PFX.split("/")[0] or "kits"
     # (a) PREFIXED kit, gate collected somewhere else entirely — the shape the old walk missed
     r1 = tmp / "g1"
-    got = probe(r1, r1 / PFX / KIT_NAME, r1 / "tests")
+    got = probe(r1, r1 / seg / KIT_NAME, r1 / "tests")
     assert got.returncode == 0, got.stderr
-    assert Path(got.stdout.strip()) == r1 / PFX / KIT_NAME, got.stdout
+    assert Path(got.stdout.strip()) == r1 / seg / KIT_NAME, got.stdout
 
     # (b) gate installed INSIDE the kit dir (a repo with no test collector wires it as a leg)
     r2 = tmp / "g2"
-    got = probe(r2, r2 / PFX / KIT_NAME, r2 / PFX / KIT_NAME)
+    got = probe(r2, r2 / seg / KIT_NAME, r2 / seg / KIT_NAME)
     assert got.returncode == 0, got.stderr
-    assert Path(got.stdout.strip()) == r2 / PFX / KIT_NAME, got.stdout
+    assert Path(got.stdout.strip()) == r2 / seg / KIT_NAME, got.stdout
 
     # (c) root install — the original convention, unchanged
     r3 = tmp / "g3"
@@ -2104,7 +2108,7 @@ def test_gov_only_files_are_withheld_on_both_paths():
     assert claimed, "no project-owned claim in kit.toml, so this arm would prove nothing"
     for expect in ("rank_harness.py", "scen-adversarial.json"):
         assert expect in claimed, f"{expect} is not withheld from `govkit apply` by kit.toml"
-    runbook = (kit.parent.parent / "WIRE-INTO-PROJECT.md")
+    runbook = next((p for p in kit.parents if (p / ".git").exists()), kit.parent.parent) / "WIRE-INTO-PROJECT.md"
     if not runbook.is_file():
         raise Skipped("WIRE-INTO-PROJECT.md is not in this tree (an adopter's copy of the kit)")
     text = runbook.read_text(encoding="utf-8")

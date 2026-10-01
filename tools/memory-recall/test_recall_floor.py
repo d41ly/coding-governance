@@ -56,7 +56,9 @@ sys.dont_write_bytecode = True
 KIT = pathlib.Path(__file__).resolve().parent
 CHECK = KIT / "check-recall.py"
 FIXTURE = KIT / "recall-fixture.json"
-ROOT = KIT.parent.parent
+# The repository holding this kit, found by its `.git` entry: the grandparent is the root only at
+# a one-segment install prefix (TOOL-aRepatriatedFork-28, gate repair at VERIFYING).
+ROOT = next(p for p in KIT.parents if (p / ".git").exists())
 
 # BEFORE the deferred sibling import below, not after it. Written after, the insert is a no-op and
 # the import resolves only because CPython seeds sys.path[0] with the script's directory -- the exact
