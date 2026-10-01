@@ -9,6 +9,7 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+parked-surfaced: yes
 keepalive-reaped: yes
 witness: ad299e92b64169de5b3c218b28e0f06f30ba49db
 phase: VERIFYING
