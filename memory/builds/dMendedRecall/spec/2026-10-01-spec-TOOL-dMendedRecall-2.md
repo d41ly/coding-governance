@@ -9,6 +9,7 @@
 | [2026-10-01-build-TOOL-dMendedRecall-2-1-acceptance-ledger.md](../build/2026-10-01-build-TOOL-dMendedRecall-2-1-acceptance-ledger.md) | journal | — |
 | [2026-10-01-prompt-TOOL-dMendedRecall-1-build-brief.md](../prompts/2026-10-01-prompt-TOOL-dMendedRecall-1-build-brief.md) | journal | TOOL-dMendedRecall-1 TOOL-dMendedRecall-3 |
 | [2026-10-01-prompt-TOOL-dMendedRecall-1-spec-brief.md](../prompts/2026-10-01-prompt-TOOL-dMendedRecall-1-spec-brief.md) | journal | TOOL-dMendedRecall-1 TOOL-dMendedRecall-3 |
+| [2026-10-01-prompt-TOOL-dMendedRecall-2-fold-brief.md](../prompts/2026-10-01-prompt-TOOL-dMendedRecall-2-fold-brief.md) | journal | — |
 | [2026-10-01-review-TOOL-dMendedRecall-1-closing-diff-round1.md](../reviews/2026-10-01-review-TOOL-dMendedRecall-1-closing-diff-round1.md) | diff-review | TOOL-dMendedRecall-1 TOOL-dMendedRecall-3 |
 
 <!-- /gen:spec-records -->
