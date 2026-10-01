@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-52 — the foreign-prefix leg asks only the prefix question
 
-**Status:** CLOSED · rev-4 · 2026-10-01 · node a · Tier-2 · base 56c7befa · streams tooling · order 25
+**Status:** CLOSED · rev-5 · 2026-10-01 · node a · Tier-2 · base 56c7befa · streams tooling · order 25
 
 <!-- gen:spec-records -->
 
@@ -58,8 +58,9 @@ with no calibrate pass, failing fast and printing a line per suite. The owner ex
   not graded at a foreign prefix, because the bar's own leg for it already reds. With no such run,
   or no row for a suite, the suite is expected green, and the leg prints once that no recorded run
   covers this tree. Observed by AC6.
-- **S6** — THE VERDICT AND ITS COST. At each prefix the population runs through a bounded pool of
-  the width `run-gates.sh --print-profile` reports. As each suite completes the leg prints one line,
+- **S6** — THE VERDICT AND ITS COST. At each prefix the probe rows run through a bounded pool of
+  the width `run-gates.sh --print-profile` reports, and the declared whole rows then run one at a
+  time, because their budgets are measured one suite at a time. As each suite completes the leg prints one line,
   `[<prefix>] <row> · probe|whole · rc <n> · <s>s`, which is also its heartbeat for
   `TOOL-aRepatriatedFork-53`'s audit when the run registers the leg's output log. A suite is green
   at a prefix when it exits 0 and, unless declared whole, printed the probe marker. After a prefix
@@ -253,6 +254,9 @@ New arm: `tools/lib/lib-selftest.test.sh` · a harness suite run with the probe 
 - rev-4 · 2026-10-01 · S4: the clone sits on a named branch rather than a detached HEAD, because
   the govkit self-test pins a vintage some ref contains, and AC10's run redded that row at
   `scripts/` with every move commit reachable from no ref.
+- rev-5 · 2026-10-01 · S6: the declared whole rows run one at a time after the probe pool drains.
+  AC10's fourth run timed out two of them at `vendor/gov/` inside the 8-wide pool, at budgets
+  sized for one suite at a time.
 
 ## 10. Reuse audit
 
