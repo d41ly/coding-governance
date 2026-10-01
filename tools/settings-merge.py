@@ -2,7 +2,7 @@
 """settings-merge.py — idempotently wire a hook into a target repo's .claude/settings.json.
 Stdlib only (json, argparse, pathlib); py>=3.10 (write_text newline=).
 
-# gov:kit settings-merge@1.15
+# gov:kit settings-merge@1.16
 
 The default hook, with no --fragment (shape mirrors WIRE-INTO-PROJECT.md and
 <prefix>/hooks/agent-cap.js verbatim):
@@ -110,7 +110,7 @@ def resolve_kit_dir(home, anchor, here):
         home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
 # <<< resolve_kit_dir
 
-KIT_SETTINGS_MERGE_VERSION = "1.15"  # gov:kit settings-merge@1.15 — engine identity
+KIT_SETTINGS_MERGE_VERSION = "1.16"  # gov:kit settings-merge@1.16 — engine identity
 HOOK_MARKER = "agent-cap.js"  # the loose join: dedup key AND the deployer's "is-it-wired?" grep target
 # The kit NAME a hook path carries when no hooks kit resolves in this install. It names the miss and
 # exists nowhere, so `main`'s existence refusal fires on it. Spelled once: the selftest reads it too.
