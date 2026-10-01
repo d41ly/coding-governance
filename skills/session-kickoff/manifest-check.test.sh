@@ -115,6 +115,8 @@ mkrepo clean
 write_manifest "$R" "$(head_sha "$R")" "Makefile" "docs/GOV.md"
 commit_all "$R" manifest
 run "clean pass → 0, silent" "$R" 0 -
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${fail:-0}" = 0 ] && echo "PASS (${pass:-1} assertions)" || echo "FAIL (${pass:-1} assertions)"; [ "${fail:-0}" = 0 ] && exit 0; exit 1; fi
 
 # ---- 2 surviving placeholder → C1 --------------------------------------
 mkrepo c1

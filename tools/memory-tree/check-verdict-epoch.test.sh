@@ -73,6 +73,8 @@ BASE_A=$(cd "$A" && git rev-parse HEAD)
 engine "$A" 1.5 "echo an extra behaviour-bearing line"
 ( cd "$A" && git add -A && git commit -qm change --no-verify ) >/dev/null
 arm 'an engine change with no bump FAILS' 1 'changes KIT_MEMORY_TREE_VERSION (still 1.5)' "$A" "$BASE_A"
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${fails:-0}" = 0 ] && echo "PASS (${probe_n:-1} assertions)" || echo "FAIL (${probe_n:-1} assertions)"; [ "${fails:-0}" = 0 ] && exit 0; exit 1; fi
 arm '...and the remedy names all three files' 1 'kit-dogfood-parity.test.sh --render' "$A" "$BASE_A"
 
 # ---- 1b. THE ENDPOINT HOLE. A bump ANYWHERE in the range used to satisfy this gate, so one early

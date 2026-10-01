@@ -1047,6 +1047,8 @@ before()  { local a b; n=$((n+1)); a=$(lineno "$1"); b=$(lineno "$2")
               || { echo "FAIL expected [$1] before [$2] (got '$a' vs '$b')"; st=1; }; }
 
 hit  'tFixture-3.md (missing/invalid'
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${st:-0}" = 0 ] && echo "PASS (${n:-1} assertions)" || echo "FAIL (${n:-1} assertions)"; [ "${st:-0}" = 0 ] && exit 0; exit 1; fi
 hit  'tFixture-4.md (## sections differ'
 hit  'tFixture-6.md (unfilled skeleton placeholder'
 hit  'tFixture-7.md (section with an empty body'

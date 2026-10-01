@@ -162,3 +162,5 @@ base: d6e1749c0542218004260928f1399174daafb789
 2026-10-01T12:28:13Z dispatch · item d60858d9 TOOL-aRepatriatedFork-54 · reason tools/check-playbook-parity.sh tools/check-playbook-parity.test.sh tools/check-spec-tokens.py tools/check-spec-tokens.test.sh tools/playbook-kit-waivers.txt memory/builds/aRepatriatedFork/spec/2026-10-01-spec-TOOL-aRepatriatedFork-54.md
 
 2026-10-01T12:59:13Z dispatch · item c80a7dfe TOOL-aRepatriatedFork-52 · reason tools .githooks skills/session-kickoff .claude memory/guides memory/map memory/builds/aRepatriatedFork/spec/2026-10-01-spec-TOOL-aRepatriatedFork-52.md memory/builds/aRepatriatedFork/README.md memory/builds/aRepatriatedFork/build
+
+2026-10-01T13:25:55Z dispatch · item 2ab948ad TOOL-aRepatriatedFork-52 · reason tools .githooks skills/session-kickoff .claude memory/guides memory/map memory/HYGIENE.md memory/TEMPLATE-SPEC.md memory/builds/aRepatriatedFork/spec/2026-10-01-spec-TOOL-aRepatriatedFork-52.md memory/builds/aRepatriatedFork/README.md memory/builds/aRepatriatedFork/build

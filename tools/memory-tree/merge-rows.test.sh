@@ -431,6 +431,8 @@ mkscratch() { local d; d=$(mktemp -d); SCRATCH="$SCRATCH $d"
 S=$(mkscratch); cp .memory-tree.conf "$S/"
 printf 'this is not valid syntax(\n' > "$S/${PFX}${MEMORY_RECALL}/extract.py"
 failclosed "broken grammar" "$S" "SyntaxError: "
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${st:-0}" = 0 ] && echo "PASS (${probe_n:-1} assertions)" || echo "FAIL (${probe_n:-1} assertions)"; [ "${st:-0}" = 0 ] && exit 0; exit 1; fi
 S=$(mkscratch); cp .memory-tree.conf "$S/"          # kit dir present, extract.py absent
 failclosed "missing grammar module" "$S" "LookupError: no memory-recall kit"
 S=$(mkscratch)                                       # no .memory-tree.conf above the driver
