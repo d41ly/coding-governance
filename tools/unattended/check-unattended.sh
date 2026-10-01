@@ -3604,6 +3604,24 @@ check_absorb_subject() { # subject · slug -> 0 when it is an absorb subject for
   printf '%s' "$1" | grep -qE '[A-Z]+-[A-Za-z0-9]+-[0-9]+' && return 1
   return 0
 }
+# ---- THE GENERATED-RENDER SKIP (TOOL-aRepatriatedFork-55). A path a GENERATED_INDEXES index covers
+# ---- is its generator's write, not the pass's, and so is a change confined to `<!-- gen:… -->`
+# ---- regions, which the build-index generator re-renders whenever a spec's status header moves. A
+# ---- blob missing on either side counts the path, so the skip fails closed.
+# ---- WHAT THIS DOES NOT SEE: a hand edit inside a gen region is not counted, because nothing here
+# ---- can tell it from a render. Regions NEST, the build README's unit table inside its index, so
+# ---- the strip counts depth rather than toggling.
+GEN_REGION_AWK='{ sub(/\r$/, "") } /^<!-- gen:[^ ]+ -->/ { g++; next } /^<!-- \/gen:[^ ]+ -->/ { if (g > 0) g--; next } !g'
+check_generated_render() { # commit · path -> 0, printing what generated it, when the write is a render
+  local _gi _ga _gb
+  for _gi in ${GENERATED_INDEXES:-}; do
+    covers "${_gi%%:*}" "$2" && { printf 'the %s index' "${_gi%%:*}"; return 0; }
+  done
+  _ga=$(GIT show "$1^:$2" 2>/dev/null) || return 1
+  _gb=$(GIT show "$1:$2" 2>/dev/null) || return 1
+  [ "$(printf '%s\n' "$_ga" | awk "$GEN_REGION_AWK")" = "$(printf '%s\n' "$_gb" | awk "$GEN_REGION_AWK")" ] || return 1
+  printf 'a change inside its gen regions only'
+}
 ds_over=""; ds_over_n=0; ds_graded=0
 for f in $RUNS; do
   [ -f "$f" ] || continue
@@ -3750,6 +3768,10 @@ DSSIBS
         # touched and redded this leg permanently, with narrowing refused and no in-band repair.
         covers "$dsp" "$dsq" && { dsok=1; break; }
       done
+      if [ "$dsok" != 1 ] && dsgen=$(check_generated_render "$dshit" "$dsq"); then
+        report "check 23 excluded $dsq for $dsunit in $f — a generated render, $dsgen, written by its generator rather than by the pass"
+        continue
+      fi
       [ "$dsok" = 1 ] || dsout="$dsout $dsq"
     done
     # THE FINDING NO LONGER PRINTS ITSELF ON STDOUT. It is COUNTED, and the ratchet below decides

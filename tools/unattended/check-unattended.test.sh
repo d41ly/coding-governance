@@ -3464,6 +3464,40 @@ mkdir -p work && printf 'a\n' > work/one.txt && printf 'b\n' > work/stray.txt
 git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
 hit "$(run)" "more dispatched passes committed outside the set they declared before dispatch than the shrink-only ceiling admits, and that declaration is the disjointness proof two concurrent passes rest on"
 
+# ---- GENERATED RENDERS (TOOL-aRepatriatedFork-55): a GENERATED_INDEXES index and a change confined to
+# ---- a gen region are the generator's writes, not the pass's; an authored line beside them is not.
+# a write a GENERATED_INDEXES index covers is not counted
+reset_tree
+printf '\nGENERATED_INDEXES="memory/LIVE.md:gen.py"\n' >> .unattended.conf
+git add -A && git commit -q -m "fixture: a generated index" --no-verify
+drow ARCH-tRun-1 "work/one.txt"
+mkdir -p work && printf 'a\n' > work/one.txt && printf 'live\n' >> memory/LIVE.md
+git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
+out=$(GOV_UNATTENDED_REPORT=1 bash "$SCRIPT" 2>&1)
+miss "$out" "check 23 FAILED"
+hit  "$out" "a generated render, the memory/LIVE.md index"
+# ...nor a change inside a README's gen regions, NESTED as the build README's are: the line between
+# the inner close and the outer close is still generated
+reset_tree
+printf '# r\n\nprose\n\n<!-- gen:index -->\n<!-- gen:units -->\nold\n<!-- /gen:units -->\nRecords: 1\n<!-- /gen:index -->\n' > memory/README.md
+git add -A && git commit -q -m "fixture: a README with a gen region" --no-verify
+drow ARCH-tRun-1 "work/one.txt"
+mkdir -p work && printf 'a\n' > work/one.txt && sed -i 's/^old$/new/; s/^Records: 1$/Records: 2/' memory/README.md
+git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
+out=$(GOV_UNATTENDED_REPORT=1 bash "$SCRIPT" 2>&1)
+miss "$out" "check 23 FAILED"
+hit  "$out" "a generated render, a change inside its gen regions only"
+# ...but an authored line of the same README is the pass's own write, and counts
+reset_tree
+printf '# r\n\nprose\n\n<!-- gen:index -->\n<!-- gen:units -->\nold\n<!-- /gen:units -->\nRecords: 1\n<!-- /gen:index -->\n' > memory/README.md
+git add -A && git commit -q -m "fixture: a README with a gen region" --no-verify
+drow ARCH-tRun-1 "work/one.txt"
+mkdir -p work && printf 'a\n' > work/one.txt && sed -i 's/^prose$/edited prose/' memory/README.md
+git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
+out=$(run)
+hit  "$out" "check 23 FAILED"
+hit  "$out" "wrote memory/README.md"
+
 # ---- ABSORB (TOOL-dDerivedDocket-24 S9, AC8). The pass declared one path; a commit of its own, whose
 # ---- subject is the absorb grammar and names no unit id, fixed an inherited red at another path. It
 # ---- is reported on an ABSORB line and reaches neither anomaly branch. The CONTROL is the same paths
@@ -5763,7 +5797,7 @@ fi   # ---- end REGION 8 -------------------------------------------------------
 # ---- exemption loop; region 4 +2, check 36's scope liveness arm respelling all three fixture files
 # ---- and reading the report's count; region 8 +2, check 39's liveness arm staging its break with a
 # ---- `mutate` and the check-39 control's new `miss`. FLOOR_SHARD_1, _4 and _8 carry the same.
-FLOOR_ASSERTIONS=932
+FLOOR_ASSERTIONS=938
 # THE FLOOR IS MODE-SELECTED, or every shard leg reds forever against the unsharded floor. The
 # per-shard floors carry the SAME proportional discount the unsharded pin does rather than pinning
 # at 100 % of observation, which would red on the first arm anyone legitimately removes. The
@@ -5775,7 +5809,7 @@ FLOOR_SHARD_4=100
 FLOOR_SHARD_5=67
 FLOOR_SHARD_6=75
 FLOOR_SHARD_7=92
-FLOOR_SHARD_8=383
+FLOOR_SHARD_8=389
 case "$SH_I" in
   0) FLOOR=$FLOOR_ASSERTIONS; MODE="unsharded" ;;
   *) _fv="FLOOR_SHARD_$SH_I"; FLOOR=${!_fv}; MODE="shard $SH_I/$SHARD_ARITY" ;;
