@@ -170,3 +170,7 @@ base: d6e1749c0542218004260928f1399174daafb789
 2026-10-01T21:01:10Z rescope · item add TOOL-aRepatriatedFork-55 · reason owner 2026-10-02: the final bar redded check 23 at 58 against its pin of 53; three of this build's six were spec revisions whose only out-of-set write was the build README's generated region. Check 23 skips a generated render: a GENERATED_INDEXES path, or a file whose change lies wholly inside its gen regions; the pin is lowered to the new measured count
 
 2026-10-01T21:01:12Z rescope · item add TOOL-aRepatriatedFork-56 · reason owner 2026-10-02: brief-recorded redded TOOL-aRepatriatedFork-2, reading R2's gate-repair commit c22ac2b8 as its build commit, though the unit was built before this run's base. The checker asks, before a violation, whether a commit naming the unit precedes the run's base, and announces such a unit as built before its run instead of grading a repair
+
+2026-10-01T21:04:42Z brief · item TOOL-aRepatriatedFork-55 · reason 905ac43f2cee memory/builds/aRepatriatedFork/prompts/2026-10-02-prompt-TOOL-aRepatriatedFork-55-build-brief.md
+
+2026-10-01T21:04:44Z brief · item TOOL-aRepatriatedFork-56 · reason 403a28ab5b90 memory/builds/aRepatriatedFork/prompts/2026-10-02-prompt-TOOL-aRepatriatedFork-56-build-brief.md
