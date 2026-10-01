@@ -1,6 +1,6 @@
 # TOOL-aSightedSkeptic-6 — one severity rubric, a skeptic's binding grade, and an uncertain verdict
 
-**Status:** CLOSED · rev-2 · 2026-10-01 · node a · Tier-2 · base ef1dcdb6 · streams tooling · order 6 · ratified 2026-10-01
+**Status:** CLOSED · rev-3 · 2026-10-01 · node a · Tier-2 · base ef1dcdb6 · streams tooling · order 6 · ratified 2026-10-01
 
 <!-- gen:spec-records -->
 
@@ -93,6 +93,7 @@ a costly finding stops refuting it by default.
 
 - **consumes-from** `TOOL-aSightedSkeptic-2` — `VERDICT_SCHEMA`'s item and the verify prompt as that unit leaves them, with its fix fields optional; this unit extends the same item and prompt.
 - **hands-off** `TOOL-aSightedSkeptic-8` — the `ledger` row's `skepticSeverity`, which is the verdict's own grade as this unit reads it, and the verdict value it carries, uncertain among them.
+- **hands-off** `TOOL-aSightedSkeptic-10` — `deriveBindingSeverity` on both CONFIRMED log paths and the uncertain count kept apart from the no-verdict count, which that unit's arms read.
 
 ## 4. Design
 
@@ -277,6 +278,7 @@ New arm: tools/workflows/tier2-review.test.sh · stub skeptics returning a grade
 - rev-2 · 2026-10-01 · fold of closing review round 1, L3 (finding 19): S7 says `regraded` is absent
   where no synthesis ran and cited AC6, whose arm read only a synthesis run, so an unconditional
   `regraded` stayed green. AC6 gains the six-exit-path arm; the code was already right.
+- rev-3 · 2026-10-02 · §3 gains the hands-off edge to `TOOL-aSightedSkeptic-10`, which declares consumes-from this unit; the close's memory hygiene leg (check 12) found the edge one-sided.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-aSightedSkeptic-2 — the skeptic judges each finding's proposed fix as well as its claim
 
-**Status:** CLOSED · rev-2 · 2026-10-01 · node a · Tier-2 · base ef1dcdb6 · streams tooling · order 5 · ratified 2026-10-01
+**Status:** CLOSED · rev-3 · 2026-10-01 · node a · Tier-2 · base ef1dcdb6 · streams tooling · order 5 · ratified 2026-10-01
 
 <!-- gen:spec-records -->
 
@@ -81,6 +81,7 @@ judged is counted and announced rather than passed on as if it had been.
 - **consumes-from** `TOOL-aSightedSkeptic-5` — the build's one `REVIEW_SHAPE` bump, which is what keeps a verify file written by the old prompts from being reused under these.
 - **hands-off** `TOOL-aSightedSkeptic-6` — the same `VERDICT_SCHEMA` item and verify prompt, extended next with the skeptic's grade and the `uncertain` verdict; both units' fields stay optional.
 - **hands-off** `TOOL-aSightedSkeptic-8` — carrying `fixVerdict` per finding in the `ledger`, and, where a confirmed finding's fix was judged unsound, the skeptic's corrected fix as the fix that `confirmedFindings` hands the next round.
+- **hands-off** `TOOL-aSightedSkeptic-10` — `renderFixLine` on the synthesis-death log path and the `REJECTED` wording, which that unit's arms read.
 
 ## 4. Design
 
@@ -258,6 +259,7 @@ New arm: tools/workflows/tier2-review.test.sh · stub skeptics returning `unsoun
   shape, was rendered as a correction; S2 now puts the why in `reason` and leaves `fixNote` for the
   correction alone, the cheaper of the two fixes the skeptic judged sound. M5: no arm drove `sound`
   or `none`; AC5 gains the three-value arm. AC4 gains the reason-only arm.
+- rev-3 · 2026-10-02 · §3 gains the hands-off edge to `TOOL-aSightedSkeptic-10`, which declares consumes-from this unit; the close's memory hygiene leg (check 12) found the edge one-sided.
 
 ## 10. Reuse audit
 

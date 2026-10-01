@@ -295,7 +295,7 @@ LEGACY = """**Serves:** diff-review X-1
 | # | Sev | Where | What | Raw ids |
 |---|---|---|---|---|
 | F1 | **BLOCKER** | `src/a.sh:10` | the claim, quoting `spec/s.md:4` | 1, 2 |
-| M1 | medium | `lib/b.py:40` | the claim | 3 |
+| M1 | medium | `mod/b.py:40` | the claim | 3 |
 | B1 | BLOCKER | 8 | §2 S6, §6 AC6 | the claim |
 {extra}"""
 
@@ -311,8 +311,8 @@ APPENDIX = """Review shape: raw 3, confirmed {stated}, refuted 1. Range `1234567
 """
 
 CANDIDATE_ROWS = ("| confirmed | src/a.sh:14 | real \\| reached | 1 | correctness |\n"
-                  "| refuted | lib/b.py:40 | not reachable | 2 | security |\n"
-                  "| confirmed | lib/c.py:7 | real | 3 | security |")
+                  "| refuted | mod/b.py:40 | not reachable | 2 | security |\n"
+                  "| confirmed | mod/c.py:7 | real | 3 | security |")
 
 
 def run_selftest():
@@ -334,11 +334,11 @@ def run_selftest():
         return out.getvalue()
 
     twin = APPENDIX.format(stated=2, rows="| confirmed | src/a.sh:12 | x | 1 | correctness |\n| confirmed | src/a.sh:12 | y | 2 | seams |")
-    drive_cands = APPENDIX.format(stated=2, rows="| confirmed | C:/projects/x/src/a.sh:12 | x | 1 | l |\n| confirmed | D:\\w\\lib\\c.py:7 | y | 2 | l |")
+    drive_cands = APPENDIX.format(stated=2, rows="| confirmed | C:/projects/x/src/a.sh:12 | x | 1 | l |\n| confirmed | D:\\w\\mod\\c.py:7 | y | 2 | l |")
     none_scorable = APPENDIX.format(stated=2, rows="| confirmed | - | x | 1 | l |\n| confirmed | x.js:undefined | y | 2 | l |")
     one_scorable = APPENDIX.format(stated=2, rows="| confirmed | src/a.sh:1 | x | 1 | l |\n| confirmed | x.js:undefined | y | 2 | l |")
     # chr(), never a typed escape: the character itself is the fixture. CRLF pins the normalisation.
-    split_cell = APPENDIX.format(stated=2, rows="| confirmed | src/a.sh:1 | a" + chr(0x2028) + "b | 1 | l |\r\n| confirmed | lib/c.py:7 | y | 2 | l |")
+    split_cell = APPENDIX.format(stated=2, rows="| confirmed | src/a.sh:1 | a" + chr(0x2028) + "b | 1 | l |\r\n| confirmed | mod/c.py:7 | y | 2 | l |")
     arms = [
         ("known-legacy-parse", lambda: None if known3 and [i["id"] for i in known3["items"]] == ["F1", "M1"]
             and known3["items"][0]["path"] == "src/a.sh" else f"got {known3!r}"),
@@ -365,7 +365,7 @@ def run_selftest():
         ("appendix-absent-refuses", lambda: (lambda r: None if r[0] is None and (r[1] or "").startswith("no-appendix")
             else f"not refused: {r!r}")(parse_appendix_rows(legacy3))),
         ("score-miss", lambda: None if score and len(score["matched"]) == 1 and score["scorable"] == 2
-            and "replay: recall 1/2 = 0.50" in printed.getvalue() and "MISSED          lib/b.py:40  M1" in printed.getvalue()
+            and "replay: recall 1/2 = 0.50" in printed.getvalue() and "MISSED          mod/b.py:40  M1" in printed.getvalue()
             else f"got {printed.getvalue()!r}"),
         ("score-refuted-ignored", lambda: None if score and [it["id"] for it in score["missed"]] == ["M1"]
             else "a refuted row at a known location matched it"),
@@ -375,20 +375,20 @@ def run_selftest():
         ("path-suffix", lambda: None if check_same_file("pkg/lib/kit.toml", "kit.toml") and check_same_file("kit.toml", "pkg/lib/kit.toml")
             and not check_same_file("a/kit.toml", "b/kit.toml") and not check_same_file("pkg/akit.toml", "kit.toml")
             else "the path-suffix rule is wrong"),
-        ("candidate-only", lambda: None if score and [c["ref"] for c in score["candidate_only"]] == ["lib/c.py:7"]
-            and "CANDIDATE-ONLY  lib/c.py:7  [security]" in printed.getvalue() else f"got {score!r}"),
+        ("candidate-only", lambda: None if score and [c["ref"] for c in score["candidate_only"]] == ["mod/c.py:7"]
+            and "CANDIDATE-ONLY  mod/c.py:7  [security]" in printed.getvalue() else f"got {score!r}"),
         ("known-unit-raw", lambda: (lambda r: None if r[0] and r[0]["unit"] == "raw-finding" and len(r[0]["items"]) == 2
             and {(i["path"], i["line"]) for i in r[0]["items"]} == {("src/a.sh", 12)}
             and "· unit raw-finding ·" in render_score(r[0], []) and "· unit adjudicated-item ·" in printed.getvalue()
             else f"two raw rows at one location are not two raw-finding entries, or the header hides the unit: {r!r}")(
             parse_record_findings(twin))),
-        ("drive-ref-candidate", lambda: (lambda c: None if c and [x["path"] for x in c] == ["/projects/x/src/a.sh", "/w/lib/c.py"]
+        ("drive-ref-candidate", lambda: (lambda c: None if c and [x["path"] for x in c] == ["/projects/x/src/a.sh", "/w/mod/c.py"]
             and known3 and [it["id"] for it, _ in measure_recall(known3["items"], c, 10)["matched"]] == ["F1"]
             else f"a drive-lettered candidate ref did not score: {c!r}")(parse_candidates(drive_cands)[0])),
-        ("drive-ref-known", lambda: (lambda r: None if r[0] and r[0]["items"][0]["path"] == "/projects/x/lib/b.py"
-            and measure_recall(r[0]["items"], [{"lens": "l", "ref": "r", "path": "lib/b.py", "line": 40}], 10)["matched"]
+        ("drive-ref-known", lambda: (lambda r: None if r[0] and r[0]["items"][0]["path"] == "/projects/x/mod/b.py"
+            and measure_recall(r[0]["items"], [{"lens": "l", "ref": "r", "path": "mod/b.py", "line": 40}], 10)["matched"]
             else f"a drive-lettered known ref did not score: {r!r}")(
-            parse_record_findings(APPENDIX.format(stated=1, rows="| confirmed | C:/projects/x/lib/b.py:41 | x | 1 | l |")))),
+            parse_record_findings(APPENDIX.format(stated=1, rows="| confirmed | C:/projects/x/mod/b.py:41 | x | 1 | l |")))),
         ("candidate-unscorable-refuses", lambda: (lambda r, mixed: None if r[0] is None and (r[1] or "").startswith("no-scorable")
             and mixed[0] and "· unscorable 1 ·" in render_score(known3, mixed[0]).split("\n")[1]
             else f"got {r!r} and {mixed!r}")(parse_candidates(none_scorable), parse_candidates(one_scorable))),

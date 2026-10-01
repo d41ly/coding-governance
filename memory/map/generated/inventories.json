@@ -234,6 +234,7 @@
       "node-check-is-not-a-syntax-gate.md",
       "nt-against-a-missing-file-is-true.md",
       "observation-before-the-last-fold-of-the-same-commit.md",
+      "observed-by-claim-no-arm-discharges.md",
       "one-value-field-records-a-mixed-outcome.md",
       "pin-copied-from-another-corpus.md",
       "pin-gated-checks-arm-nothing-without-a-pin.md",

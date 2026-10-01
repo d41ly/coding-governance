@@ -168,7 +168,8 @@ exists; the lens that reads it reports a missing one. A run given neither `specs
 review key, like `lensNotes`.
 
 `checklist` carries the project's recurring bug classes. The harness produces none; this repository
-passes the stdout of `python tools/memory-tree/gotchas.py --for-diff <range>`:
+passes the stdout of the memory-tree kit's `gotchas.py --for-diff <range>`, from wherever that kit
+is installed:
 
 ```js
 args: { repo, base, head, reviewDir,

@@ -31,7 +31,7 @@ workflow-scripts = [
 ]
 skill-engines = []
 rendered-skills = []
-gotcha-classes = ["degradation-known-but-unreported.md", "node-check-is-not-a-syntax-gate.md"]
+gotcha-classes = ["degradation-known-but-unreported.md", "node-check-is-not-a-syntax-gate.md", "observed-by-claim-no-arm-discharges.md"]
 guides = []
 backlog-shards = []
 lexicon-verbs = []
