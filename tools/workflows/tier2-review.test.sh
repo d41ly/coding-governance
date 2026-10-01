@@ -623,6 +623,80 @@ async function runWholeScriptArms() {
     ck(scanSplit(r, SPEC_ORDER) && fp.every((t) => t.prompt.indexOf('against the spec set') !== -1),
       'spec-audit: the checklist splits over the spec lenses')
   }
+
+  // ==== TOOL-aSightedSkeptic-2 — the skeptic judges each finding's proposed fix as well as its claim ====
+  // Every arm is RED against the parent render: its verify prompt shows no fix, its schema has no
+  // fixVerdict, its synthesis prints the finder's fix unmarked, and its batch print ignores the fix.
+  const buildFixLens = (label) => {
+    const lr = buildLensReturn(label)
+    lr.findings[0].fix = 'FIXMARK-' + lr.lens
+    return lr
+  }
+  const buildFixVerdicts = (fixVerdict, fixNote) => (label, prompt) => {
+    const vr = buildVerdicts('confirmed')(label, prompt)
+    for (const v of vr.verdicts) { v.fixVerdict = fixVerdict; v.fixNote = fixNote }
+    return vr
+  }
+  // The CONFIRMED section of the synthesis prompt, one entry per finding.
+  const scanConfirmedEntries = (run) => {
+    const sp = run.trace.find((t) => t.label === 'synth')
+    if (!sp) return []
+    const sec = sp.prompt.split('UNVERIFIED findings')[0]
+    return sec.slice(sec.indexOf('CONFIRMED findings')).split('\n- id=').slice(1)
+  }
+  // ---- AC1: one diff-kind and one spec-kind run; every verify prompt carries each finding's fix.
+  const rfd = await runReview(DIFF, buildStubs({ 'find:': buildFixLens }))
+  const rfs = await runReview(SPEC, buildStubs({ 'find:': buildFixLens }))
+  if (checkNoThrow(rfd, 'fix verdict diff') && checkNoThrow(rfs, 'fix verdict spec')) {
+    const vp = scanPrompts(rfd, 'verify:').concat(scanPrompts(rfs, 'verify:'))
+    ck(vp.length === 9 && vp.every((t) => /FIXMARK-[a-z-]+/.test(t.prompt) && t.prompt.indexOf('"sound"') !== -1 &&
+      t.prompt.indexOf('"unsound"') !== -1 && t.prompt.indexOf('fixVerdict') !== -1),
+      'fix verdict: every verify prompt shows each finding\'s fix and asks for fixVerdict')
+  }
+  // ---- AC2: the item schema, read off what the skeptic was actually handed.
+  const vs = rfd.trace.find((t) => t.label.indexOf('verify:') === 0)
+  const vItem = vs && vs.schema && vs.schema.properties && vs.schema.properties.verdicts && vs.schema.properties.verdicts.items
+  const vProps = (vItem && vItem.properties) || {}
+  ck(!!vProps.fixVerdict && JSON.stringify(vProps.fixVerdict.enum) === '["sound","unsound","none"]' &&
+    !!vProps.fixNote && vProps.fixNote.type === 'string' &&
+    Array.isArray(vItem.required) && vItem.required.indexOf('fixVerdict') === -1 && vItem.required.indexOf('fixNote') === -1,
+    'fix verdict: the verdict schema carries fixVerdict and fixNote, neither required')
+  // ---- AC3: confirmed + unsound with a note — the note and REJECTED on every CONFIRMED entry, and
+  // ---- the confirmed count unchanged against the plain run.
+  const rbase = await runReview(DIFF, ALL_OK)
+  r = await runReview(DIFF, buildStubs({ 'verify:': buildFixVerdicts('unsound', 'NOTEMARK use the other guard') }))
+  if (checkNoThrow(rbase, 'fix verdict base') && checkNoThrow(r, 'fix verdict unsound')) {
+    const ce = scanConfirmedEntries(r)
+    ck(ce.length === 5 && ce.every((e) => e.indexOf('REJECTED') !== -1 && e.indexOf('NOTEMARK use the other guard') !== -1) &&
+      r.result.confirmed === rbase.result.confirmed && r.result.confirmed === 5,
+      'fix verdict: an unsound fix reaches the synthesis as the correction, the finding still confirmed')
+  }
+  // ---- AC4: an unsound fix with an EMPTY note is still to be designed, never the finder's fix.
+  r = await runReview(DIFF, buildStubs({ 'verify:': buildFixVerdicts('unsound', '') }))
+  if (checkNoThrow(r, 'fix verdict unsound no note')) {
+    const ce = scanConfirmedEntries(r)
+    ck(ce.length === 5 && ce.every((e) => e.indexOf('REJECTED') !== -1 && e.indexOf('STILL TO BE DESIGNED') !== -1),
+      'fix verdict: an unsound fix with no correction is still to be designed')
+  }
+  // ---- AC5: the existing stub verdicts carry no fixVerdict, so all five confirmed fixes are unjudged.
+  if (checkNoThrow(rbase, 'fix verdict unjudged')) {
+    const sp = rbase.trace.find((t) => t.label === 'synth')
+    const ri = sp ? sp.prompt.slice(sp.prompt.indexOf('RUN INTEGRITY')) : ''
+    ck(rbase.logs.some((l) => l.indexOf('WARNING:') === 0 && l.indexOf('no skeptic judged') !== -1 && /ids 1, 2, 3, 4, 5$/.test(l)) &&
+      ri.indexOf('5 NOT JUDGED') !== -1,
+      'fix verdict: an unjudged fix is counted, logged and named in RUN INTEGRITY')
+  }
+  // ---- AC6: the AC5 print was taken over fix 'f'; the same ids and claims under another fix dispatch.
+  const otherFixFiles = allLensFiles.map((lf) => {
+    const c = JSON.parse(JSON.stringify(lf))
+    c.findings[0].fix = 'another fix'
+    return c
+  })
+  r = await runReview(DIFF, buildStubs({ 'resume:probe': buildProbe(otherFixFiles, [vfile(print)]) }))
+  if (checkNoThrow(r, 'fix verdict other fix')) {
+    ck(print.length === 8 && r.scanSpawned('find:').length === 0 && r.scanSpawned('verify:ids-1-1').length === 1,
+      'fix verdict: a verify file judged over another fix is dispatched')
+  }
 }
 
 runWholeScriptArms().then(() => {
@@ -656,7 +730,10 @@ printf '%s\n' "$out"
 # RAISED 100 -> 117 by TOOL-aSightedSkeptic-4: 17 assertions, counted off the block — the checklist
 # key component's AC3 pair (2), the string split (1), the CRLF twin and the array (2), the log line and
 # the empty share (2), absent, empty and the control (3), six refused values (6) and the spec audit (1).
-FLOOR_ASSERTIONS=117
+# RAISED 117 -> 123 by TOOL-aSightedSkeptic-2: 6 assertions, counted off the block — the fix in every
+# verify prompt (1), the schema (1), unsound with and without a note (2), the unjudged count (1) and
+# the batch print over the fix (1).
+FLOOR_ASSERTIONS=123
 executed=$(printf '%s\n' "$out" | sed -n 's/^---- \([0-9][0-9]*\) passed.*/\1/p' | tail -1)
 if [ -z "$executed" ]; then
   echo "FAIL the runner printed no assertion count at all — it died before its summary line"

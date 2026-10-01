@@ -1,6 +1,6 @@
 # TOOL-aSightedSkeptic-2 — the skeptic judges each finding's proposed fix as well as its claim
 
-**Status:** SPECCED · rev-1 · 2026-10-01 · node a · Tier-2 · base ef1dcdb6 · streams tooling · order 5 · ratified 2026-10-01
+**Status:** CLOSED · rev-1 · 2026-10-01 · node a · Tier-2 · base ef1dcdb6 · streams tooling · order 5 · ratified 2026-10-01
 
 <!-- gen:spec-records -->
 

@@ -6263,6 +6263,16 @@
       "file": "tools/unattended/gate-guard.js"
     },
     {
+      "id": "renderFixLine",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "renderFixLine",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
+    },
+    {
       "id": "renderIntent",
       "kind": "function",
       "file": "tools/workflows/tier2-review.js"

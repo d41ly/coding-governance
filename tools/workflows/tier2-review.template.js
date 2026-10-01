@@ -323,6 +323,12 @@ const FINDING_SCHEMA = {
 // function, and a plain `map[v.ref] = v` collapsed them so BOTH inherited whichever verdict landed
 // last. A model can echo a small integer reliably; it cannot re-type a path byte-identically, and an
 // integer cannot collide with another finding's.
+// TOOL-aSightedSkeptic-2 S1 - the skeptic also judges the finding's proposed FIX, as a second and
+// separate question. Both fields stay OPTIONAL: a skeptic that omits them degrades to "unjudged" and
+// never fails its batch into regeneration, and `id` stays the only join key. The harness tests
+// membership in FIX_VERDICTS again after the join, because a reused file and a stub reach it without
+// the platform's schema validation.
+const FIX_VERDICTS = ['sound', 'unsound', 'none']
 const VERDICT_SCHEMA = {
   type: 'object',
   required: ['path', 'verdicts'],
@@ -339,6 +345,8 @@ const VERDICT_SCHEMA = {
           id: { type: 'integer' }, // the orchestrator-assigned finding id, echoed back
           verdict: { type: 'string', enum: ['confirmed', 'refuted'] },
           reason: { type: 'string' },
+          fixVerdict: { type: 'string', enum: FIX_VERDICTS },
+          fixNote: { type: 'string' },
         },
       },
     },
@@ -778,7 +786,9 @@ log(`${allFindings.length} finding(s) -> ${batches.length} verifier(s) (cap ${MA
 // alone is not enough: when a dead lens is re-dispatched the ids after it shift, and an id-keyed
 // match would pair old verdicts with new findings. When every lens is reused the ids, the batches and
 // their prints come out identical, which is what lets a dead synthesis re-run alone.
-const batchPrints = batches.map((g) => deriveFnv1a(renderCanonical(g.map((f) => [f.id, String(f.claim)]))))
+// TOOL-aSightedSkeptic-2 S5 - the FIX joins the print, since the skeptic now judges it: a verify file
+// judged against one fix is never reused for a finding carrying another under the same claim.
+const batchPrints = batches.map((g) => deriveFnv1a(renderCanonical(g.map((f) => [f.id, String(f.claim), String(f.fix)]))))
 const batchLabels = batches.map((g) => `verify:ids-${g[0].id}-${g[g.length - 1].id}`)
 const reusedBatch = batches.map((g, gi) => {
   const name = `verify-${g[0].id}-${g[g.length - 1].id}.json`
@@ -802,12 +812,19 @@ const verdictResults = await boundedParallel(
         : `You are an adversarial skeptic. For EACH finding below, try hard to REFUTE it — read the actual code (Read/Grep the cited file:line and callers) and decide "confirmed" (real, reachable, impactful) or "refuted" (not reachable / not a bug / by-design / duplicate). Default to refuted when uncertain.\n\n`) +
         `Findings to judge:\n` +
         group
-          .map((f) => `id=${f.id} [${f.severity}] ${f.ref} — ${f.claim} | impact: ${f.impact}`)
+          .map((f) => `id=${f.id} [${f.severity}] ${f.ref} — ${f.claim} | impact: ${f.impact} | fix: ${f.fix}`)
           .join('\n') +
+        // TOOL-aSightedSkeptic-2 S2 - the fix is judged as a SECOND, separate question. It never moves
+        // the claim's verdict (spec section 8 F1): a real defect with a bad fix is still a real defect.
+        `\n\nTHE FIX, A SECOND AND SEPARATE QUESTION. For each finding also judge its proposed fix, as \`fixVerdict\`: ` +
+        `"sound" when applying it cures the defect and introduces none you can see in the ${isSpec ? 'spec' : 'code'} it touches; ` +
+        `"unsound" when it does not cure the defect, breaks a caller, an invariant or a sibling path, or introduces a defect of its own; ` +
+        `"none" when no fix was proposed. For "unsound", \`fixNote\` says why and gives the corrected fix when you have one. ` +
+        `The fix verdict NEVER changes the finding's verdict: judge the claim on its own, then the fix on its own.` +
         `\n\nDURABILITY — BEFORE you return, Write the exact JSON object you are about to return, plus two more fields ` +
         `"key":"${reviewKey}" and "batch":"${batchPrints[gi]}", to ${keyDir}/verify-${group[0].id}-${group[group.length - 1].id}.json, ` +
         `creating the directory if it is missing.${keyDirHow} Set path to that file's absolute, forward-slash path.` +
-        `\n\nReturn JSON {path, verdicts:[{id:<the integer id shown above>, verdict:"confirmed"|"refuted", reason}]}. ` +
+        `\n\nReturn JSON {path, verdicts:[{id:<the integer id shown above>, verdict:"confirmed"|"refuted", reason, fixVerdict:"sound"|"unsound"|"none", fixNote}]}. ` +
         `Emit EXACTLY one verdict per finding above (${group.length} verdicts, ids ${group.map((f) => f.id).join(', ')}). ` +
         `Copy the integer id — do NOT re-type the file path, and do not renumber.`,
         { label: batchLabels[gi], phase: 'Verify', schema: VERDICT_SCHEMA },
@@ -846,6 +863,22 @@ for (const r of liveVerdicts)
   }
 for (const id of conflicts) verdictById.delete(id)
 
+// TOOL-aSightedSkeptic-2 S3/S6 - a confirmed finding's fix as the synthesis and the death log carry it.
+// Read at call time, so it is called only after the join above. Absent or outside FIX_VERDICTS is
+// UNJUDGED, and the finder's fix is then marked as the finder's proposal and nothing more.
+function renderFixLine(f) {
+  const v = verdictById.get(f.id) || {}
+  const note = String(v.fixNote || '').trim()
+  if (v.fixVerdict === 'sound') return `fix (judged SOUND by the skeptic): ${f.fix}`
+  if (v.fixVerdict === 'none') return `fix: none proposed${f.fix ? ` (the finder wrote: ${f.fix})` : ''}`
+  if (v.fixVerdict === 'unsound')
+    return (note
+      ? `fix: REJECTED by the skeptic, whose note gives the reason and the corrected fix: ${note}`
+      : `fix: REJECTED by the skeptic, who gave no correction - the fix is STILL TO BE DESIGNED`) +
+      ` (the finder's rejected proposal, never to be written as the fix: ${f.fix})`
+  return `fix (NOT JUDGED - the finder's proposal only): ${f.fix}`
+}
+
 const confirmed = allFindings.filter((f) => verdictById.get(f.id)?.verdict === 'confirmed')
 const refuted = allFindings.filter((f) => verdictById.get(f.id)?.verdict === 'refuted')
 const unverified = allFindings.filter((f) => !verdictById.has(f.id))
@@ -858,6 +891,17 @@ if (conflicts.size)
   log(`WARNING: ${conflicts.size} finding(s) got CONTRADICTORY verdicts — demoted to UNVERIFIED: ids ${[...conflicts].join(', ')}`)
 if (duplicates) log(`note: ${duplicates} repeat verdict(s) agreed with the standing one — idempotent.`)
 if (spurious) log(`WARNING: ${spurious} verdict(s) carried an id this run never assigned — discarded.`)
+// TOOL-aSightedSkeptic-2 S4 - the fix verdicts over CONFIRMED findings only, since a refuted
+// finding's fix is never applied. The four counts sum to confirmed.length.
+const fixCounts = { sound: 0, unsound: 0, none: 0 }
+const unjudgedFixIds = []
+for (const f of confirmed) {
+  const fv = verdictById.get(f.id).fixVerdict
+  if (FIX_VERDICTS.indexOf(fv) !== -1) fixCounts[fv]++
+  else unjudgedFixIds.push(f.id)
+}
+if (unjudgedFixIds.length)
+  log(`WARNING: ${unjudgedFixIds.length} confirmed finding(s) carry a fix no skeptic judged — ids ${unjudgedFixIds.join(', ')}`)
 if (skepticsDead)
   log(`WARNING: ${skepticsDead}/${verdictResults.length} skeptic batch(es) died — verification is PARTIAL.`)
 log(
@@ -923,7 +967,7 @@ const synth = await agent(
       ? confirmed
           .map(
             (f) =>
-              `- id=${f.id} [${f.severity}] ${f.ref} — ${f.claim}\n  impact: ${f.impact}\n  fix: ${f.fix}\n  why-real: ${verdictById.get(f.id)?.reason || ''}`,
+              `- id=${f.id} [${f.severity}] ${f.ref} — ${f.claim}\n  impact: ${f.impact}\n  ${renderFixLine(f)}\n  why-real: ${verdictById.get(f.id)?.reason || ''}`,
           )
           .join('\n')
       : '  (none)') +
@@ -934,6 +978,10 @@ const synth = await agent(
           .join('\n')
       : '  (none)') +
     `\n\nWrite a markdown report (severity-ranked, blockers first, each with ${isSpec ? 'its file and section address' : 'file:line'} + fix + a left-shift gate suggestion) to a file under ${repo}/${reviewDir}. ` +
+    // TOOL-aSightedSkeptic-2 S3 - a REJECTED fix never reaches the report as the fix.
+    `Each CONFIRMED finding's fix line says whether a skeptic judged its fix. Where it is REJECTED, write the skeptic's ` +
+    `corrected fix into the report, never the rejected one; where the note gives no correction, say the fix is still to be ` +
+    `designed. Where it is NOT JUDGED, present it as the finder's proposal only. ` +
     `State the review shape near the top — raw ${allFindings.length}, confirmed ${confirmed.length}, refuted ${refuted.length}, unverified ${unverified.length}, precision ${precision.toFixed(2)}. ` +
     // TOOL-aWeldedTribunal-4 — RUN INTEGRITY. This harness computes every counter below and logged
     // them to stdout, which is not the record; the AGENT writes the record, so a run whose lenses
@@ -953,6 +1001,9 @@ const synth = await agent(
     `skeptic batches ${batches.length - skepticsDead}/${batches.length} returned, ${skepticsDead} DIED; ` +
     `${conflicts.size} contradictory verdict(s) demoted to unverified, ` +
     `${spurious} spurious verdict(s) discarded, ${duplicates} duplicate(s); ` +
+    // TOOL-aSightedSkeptic-2 S4 - how many confirmed fixes a skeptic actually judged.
+    `fixes on confirmed findings: ${fixCounts.sound} judged sound, ${fixCounts.unsound} judged UNSOUND, ` +
+    `${fixCounts.none} none proposed, ${unjudgedFixIds.length} NOT JUDGED - an unjudged fix is the finder's proposal and nothing more; ` +
     (notedLenses.length
       ? `lens notes supplied for: ${notedLenses.join(', ')}.\n`
       : `lens notes: none supplied, so every lens ran on the kit's generic brief.\n`) +
@@ -1114,7 +1165,7 @@ if (synth) {
 if (!synth) {
   log(`WARNING: the synthesis agent DIED. No report was written, and the ${confirmed.length} confirmed finding(s) below are in this log and in ${keyDir}; a re-run with identical args dispatches only the synthesis:`)
   for (const f of confirmed)
-    log(`  CONFIRMED [${f.severity}] ${f.ref} - ${f.claim} | fix: ${f.fix}`)
+    log(`  CONFIRMED [${f.severity}] ${f.ref} - ${f.claim} | ${renderFixLine(f)}`)
   for (const f of unverified) log(`  UNVERIFIED [${f.severity}] ${f.ref} - ${f.claim}`)
 }
 
