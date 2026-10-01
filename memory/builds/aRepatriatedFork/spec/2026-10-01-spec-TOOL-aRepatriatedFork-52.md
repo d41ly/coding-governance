@@ -6,6 +6,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-01-build-TOOL-aRepatriatedFork-52-redeclare-patch.md](../build/2026-10-01-build-TOOL-aRepatriatedFork-52-redeclare-patch.md) | research | — |
 | [2026-10-01-prompt-TOOL-aRepatriatedFork-52-build-brief.md](../prompts/2026-10-01-prompt-TOOL-aRepatriatedFork-52-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->

@@ -194,7 +194,7 @@ ids TOOL-aRepatriatedFork-54
 | [TOOL-aRepatriatedFork-52 — the foreign-prefix leg asks only the prefix question](spec/2026-10-01-spec-TOOL-aRepatriatedFork-52.md) | 25 | 2 | SPECCED | rev-1 | 2026-10-01 |
 <!-- /gen:build-units -->
 
-Records: 115 bound to this build, across 4 record folder(s).
+Records: 116 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
