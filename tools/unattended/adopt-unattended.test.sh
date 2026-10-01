@@ -237,6 +237,8 @@ unset GOV_SETTINGS_JSON
 A="$TMP/host"; seed "$A"
 out=$( cd "$A" && bash "$KIT_REL"/adopt-unattended.sh 2>&1 )
 present "$A/.claude/skills/unattended/SKILL.md" "arm 1 rendered the Skill"
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${st:-0}" = 0 ] && echo "PASS (${n:-1} assertions)" || echo "FAIL (${n:-1} assertions)"; [ "${st:-0}" = 0 ] && exit 0; exit 1; fi
 # check 10 of the gate compares the SHIPPED protocol against the installed copy and fails hard
 # when either half is missing, so before this the kit shipped a gate no adopter could satisfy.
 present "$A/memory/guides/UNATTENDED-PROTOCOL.md" "arm 1 installed the protocol's live half"

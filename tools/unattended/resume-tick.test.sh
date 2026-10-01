@@ -239,6 +239,8 @@ UTC_RE='^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z '
 mkdir -p "$TMP/notrepo"
 OUT=$(bash "$TICK" --repo "$TMP/notrepo" 2>&1); RC=$?
 check_same "AC8 a non-repo root exits 2" "$RC" "2"
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${fail:-0}" = 0 ] && echo "PASS (${pass:-1} assertions)" || echo "FAIL (${pass:-1} assertions)"; [ "${fail:-0}" = 0 ] && exit 0; exit 1; fi
 check_hit "$OUT" "REFUSED — $TMP/notrepo is not a git repository, so there is no worktree list to walk" "AC8 the refusal names the dir"
 check_same "AC8 the kit dir is derived from \$0" "$(grep -c 'dirname "$0"' "$HERE/resume-tick.sh")" "1"
 check_same "AC8 the tick spells no kit path by literal" "$(grep -cE ''"${PFX}"'(unattended|lib|memory-tree|run-gates)' "$HERE/resume-tick.sh")" "0"

@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.51 -->
+<!-- gov:kit unattended@1.52 -->
 # piece record — {{KIT_DIR}}/fixture-pieces/one/piece.md
 
 piece: {{KIT_DIR}}/fixture-pieces/one/piece.md

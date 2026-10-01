@@ -290,6 +290,8 @@ check_ac1_calls() {
   l0=$(measure_lines)
   run_driver --park "$SLUG" --item q1 --reason r1
   check "AC1 --park succeeds" "$RC" 0
+  # FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+  if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${st:-0}" = 0 ] && echo "PASS (${n:-1} assertions)" || echo "FAIL (${n:-1} assertions)"; [ "${st:-0}" = 0 ] && exit 0; exit 1; fi
   run_driver --park "$SLUG" --bogus
   check "AC1 an unknown argument refuses" "$RC" 1
   run_driver --phase "$SLUG" VERIFYING --witness "$BASE"

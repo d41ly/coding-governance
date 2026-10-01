@@ -339,6 +339,8 @@ RM3
 T=$(mkfixture run spec-first)
 o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
 same "spec BEFORE build: the leg is green" "$rc" "0"
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${st:-0}" = 0 ] && echo "PASS (${n:-1} assertions)" || echo "FAIL (${n:-1} assertions)"; [ "${st:-0}" = 0 ] && exit 0; exit 1; fi
 has  "spec BEFORE build: the unit was graded" "$o" "graded 1 closed unit"
 hasnt "spec BEFORE build: nothing is reported as a violation" "$o" "FAILED"
 rm -rf "$T"

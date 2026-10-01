@@ -310,6 +310,8 @@ RM
 T=$(mkfixture ok)
 o=$(cd "$T" && bash "$LEG" 2>&1); rc=$?
 same "brief recorded at the build commit: the leg is green" "$rc" "0"
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${st:-0}" = 0 ] && echo "PASS (${n:-1} assertions)" || echo "FAIL (${n:-1} assertions)"; [ "${st:-0}" = 0 ] && exit 0; exit 1; fi
 has  "brief recorded: the unit was GRADED, not skipped" "$o" "graded 1 closed unit"
 hasnt "brief recorded: nothing is reported as a violation" "$o" "FAILED"
 rm -rf "$T"

@@ -87,6 +87,8 @@ KEEP="$TMP/keep.md"; cp "$F" "$KEEP"
 # ---- the GREEN control, first and deliberately. Ten red arms with no green one are satisfied by a
 # ---- leg that reds on everything, and that leg looks exactly this armed.
 [ "$(rc)" = 0 ] && ok || bad "the shipped fixture does not pass its own leg"
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${st:-0}" = 0 ] && echo "PASS (${n:-1} assertions)" || echo "FAIL (${n:-1} assertions)"; [ "${st:-0}" = 0 ] && exit 0; exit 1; fi
 hitline=$(run | grep -c 'population 1 playbook' || true)
 [ "$hitline" = 1 ] && ok || bad "the leg did not report a population of exactly one over the seeded tree"
 

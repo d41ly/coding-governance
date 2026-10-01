@@ -189,6 +189,8 @@ print("same" if json.loads(ls[-1].split(" ",3)[3])==json.loads(sys.argv[2]) else
 F=$(build_fixture BUILDING absent)
 run_hook "$(build_payload "$F" '{"error":"rate_limit"}')"
 check_same "AC1 unbound rc" "$RC" "0"
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${fail:-0}" = 0 ] && echo "PASS (${pass:-1} assertions)" || echo "FAIL (${pass:-1} assertions)"; [ "${fail:-0}" = 0 ] && exit 0; exit 1; fi
 check_same "AC1 unbound stdout empty" "$OUT" ""
 [ ! -e "$(derive_sidecar "$F")" ] && print_ok "AC1 unbound writes no sidecar" || print_bad "AC1 unbound wrote $(derive_sidecar "$F")"
 run_hook "$(build_payload "$F" '{"session_id":"absent","error":"rate_limit"}')"

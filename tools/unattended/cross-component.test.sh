@@ -51,6 +51,8 @@ remove_announcements() { # leg output -> the same output without the check-45/46
 # ---- path, so the cwd here does not matter.
 _o=$(bash "$HERE/run-unattended-gates.sh" --checks --pooled 2>&1); _rc=$?
 same "--checks --pooled is refused" "$_rc" "2"
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${st:-0}" = 0 ] && echo "PASS (${n:-1} assertions)" || echo "FAIL (${n:-1} assertions)"; [ "${st:-0}" = 0 ] && exit 0; exit 1; fi
 hit "$_o" "--checks takes no mode; --pooled was given"
 
 # LOUD SKIP, never a silent one: a host that cannot host the fixture must not score a missing

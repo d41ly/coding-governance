@@ -201,6 +201,8 @@ read_now_ms() { "$TESTPY" -c 'import time;print(int(time.time()*1000))'; }
 F=$(build_fixture BUILDING absent); set_liveness BUILDING LIVE
 run_hook "$(build_payload "$F")"
 check_same "AC1 unbound rc" "$RC" "0"
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${fail:-0}" = 0 ] && echo "PASS (${pass:-1} assertions)" || echo "FAIL (${pass:-1} assertions)"; [ "${fail:-0}" = 0 ] && exit 0; exit 1; fi
 check_same "AC1 unbound stdout empty" "$OUT" ""
 [ ! -e "$(derive_sidecar "$F")" ] && print_ok "AC1 unbound writes no sidecar" || print_bad "AC1 unbound wrote $(derive_sidecar "$F")"
 # the literal `absent` is the driver's spelling of "no lease", so a payload whose session_id IS that

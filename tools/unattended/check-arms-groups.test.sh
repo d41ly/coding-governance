@@ -30,6 +30,8 @@ measure_rule() { printf '%s\n' "$2" | grep -c "^RED rule $1 " || true; }   # rul
 base=$(bash "$LINT" "$SUITE"); brc=$?
 echo "     tracked verdict (reported, not graded): $(printf '%s\n' "$base" | tail -1) · exit $brc"
 check_has  "T0 the header names what the linter does NOT grade (AC5)" "$base" "does NOT grade"
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${st:-0}" = 0 ] && echo "PASS (${n:-1} assertions)" || echo "FAIL (${n:-1} assertions)"; [ "${st:-0}" = 0 ] && exit 0; exit 1; fi
 check_has  "T0 the delimiter set is resolved from the file and names reset_tree" "$base" "delimiter set resolved from the file: reset_tree"
 check_has  "T0 the liveness line reports the boundary and group counts (S4)" "$base" "boundaries "
 groups=$(printf '%s\n' "$base" | sed -n 's/^check-arms-groups: boundaries [0-9]* ([0-9]* seams) · groups \([0-9]*\) .*/\1/p')

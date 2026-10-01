@@ -633,6 +633,8 @@ if in_shard 1; then
 reset_tree; before=$(sum)
 out=$(run --status ../etc)
 hit "$out" "the slug is not a build-folder name; expected the slug alone, a letter then letters, digits or dashes: ../etc"
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${st:-0}" = 0 ] && echo "PASS (${n:-1} assertions)" || echo "FAIL (${n:-1} assertions)"; [ "${st:-0}" = 0 ] && exit 0; exit 1; fi
 same "check 1 wrote nothing" "$(sum)" "$before"
 
 # ---- check 2: dirty tree. The check refreshes the stat cache first and then asks about CONTENT —

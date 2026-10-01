@@ -193,6 +193,8 @@ D4='bash '"${PFX}${KIT_NAME}/check-unattended.test.sh"''
 
 # ---- fail-open: the hook must never be the reason a good command dies -----------------------------
 run_raw "empty stdin -> allow"        0 ''
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${fail:-0}" = 0 ] && echo "PASS (${pass:-1} assertions)" || echo "FAIL (${pass:-1} assertions)"; [ "${fail:-0}" = 0 ] && exit 0; exit 1; fi
 run_raw "non-JSON stdin -> allow"     0 'not json at all'
 run_raw "JSON null -> allow"          0 'null'
 run_raw "unrelated tool -> allow"     0 "{\"tool_name\":\"Read\",\"cwd\":\"$(resolve_native "$B")\",\"tool_input\":{\"command\":\"$D4\"}}"

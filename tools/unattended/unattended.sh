@@ -45,7 +45,7 @@
 # The generated region holds NO copy: the unit list is DERIVED from the build README's already-derived,
 # already-byte-compared slice. One derivation in the tree; this file is not a second one.
 set -u
-KIT_UNATTENDED_VERSION=1.51   # gov:kit unattended@1.51 — kit identity; set HERE, never from .unattended.conf
+KIT_UNATTENDED_VERSION=1.52   # gov:kit unattended@1.52 — kit identity; set HERE, never from .unattended.conf
 
 # ------------------------------------------------------------------------------ the dereference pin
 # A sha is a NAME, and turning a name into bytes or into ancestry happens in the run's own object
