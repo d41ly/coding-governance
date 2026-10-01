@@ -1257,7 +1257,11 @@ fi
 # because the hook's own fixtures drive a runner copy over a fixture manifest.
 # The manifest the runner then reads, the sibling of its kit directory, is vetted as the runner is:
 # an ignored one was read like a tracked one, and `git status` never reports it.
-BAR_SCRUBBED_KNOBS="GATE_LEGS GATE_REUSE"
+# The three ARM SEAMS dDerivedDocket gave the runner (TOOL-dDerivedDocket-26 S6) join them at the
+# reconcile with aRepatriatedFork: `GATE_SPAWN_CMD` names what the host probe times, `GATE_SPAWN_FLOOR`
+# its floor file, `GATE_VERDICT_FAULT` a verdict write that fails. Each exists for the runner's own
+# suite, which drives it directly, so no bar this hook runs has any use for one.
+BAR_SCRUBBED_KNOBS="GATE_LEGS GATE_REUSE GATE_SPAWN_CMD GATE_SPAWN_FLOOR GATE_VERDICT_FAULT"
 if [ "$bar_class" != stub ]; then
   for _k in $BAR_SCRUBBED_KNOBS; do
     [ -n "${!_k+x}" ] && ENV_CLEARED+=" $_k"

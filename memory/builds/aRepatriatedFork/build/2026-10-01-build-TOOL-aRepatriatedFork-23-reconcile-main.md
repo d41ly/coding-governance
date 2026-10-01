@@ -78,7 +78,26 @@ re-stamp inside the merge commit, so §B was re-audited against the merged tree 
 the pre-merge HEAD. The follow-up commit re-stamps both at the merge, per the kickoff-manifest merge
 exception.
 
+## After the merge: the repo-subject hook suites
+
+Run alone after `5cb052da`, because their legs are on every bar. `transition-audit arms` exit 0.
+`pre-push self-test` and `straggler-guard arms` redded, and every red was this reconcile's:
+
+- The red-attribution parser added to `run-gates.sh` carried a comment with apostrophes inside its
+  single-quoted program, a runtime syntax error on every red. Rewritten without one.
+- dDerivedDocket gave the runner eight new `GATE_` names, and this branch's knob-class arm needs
+  each classified once: the three arm seams join the names the hook clears before a non-stub bar,
+  the other five the inert set.
+- Node d's IR fixture and the straggler fixture declared no kit root, which the old probe had
+  guessed; each now declares `GOV_KITROOT` in its tracked `gate-env.sh`. The straggler fixture's
+  memory-tree copy drops its hygiene gate, so the pre-commit hygiene leg still announces a skip
+  there, as the fixture's header requires. The AC3 (24) stub runner writes the GREEN record an
+  exit 0 needs since TOOL-dDerivedDocket-26.
+
+After the repair: `pre-push self-test` exit 0, `straggler-guard arms` PASS at 84.
+
 ## Not run
 
-The kit self-test suites outside that list, the pre-push, run-gates, merge-rows and unattended ones
-among them, were not run whole here.
+The held kit self-test suites were not run whole: run-gates canary, run-selftests, install-prefix
+(run once, PASS at 40, before the repair), check-wiring, merge-rows, govkit selftest and the
+unattended suites.

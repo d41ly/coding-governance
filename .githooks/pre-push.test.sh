@@ -676,7 +676,9 @@ cd "$vgd/work" || exit 2
 git config user.email t@example.com; git config user.name t; git config core.autocrlf false
 git config core.hooksPath "$vgd/hooks"
 mkdir -p "${vg}/$rgk" .githooks
-printf '#!/usr/bin/env bash\necho "VENDOR BAR RAN"; exit 0\n' > "${vg}/$rgk/$rgk.sh"
+# The stub writes the GREEN run record a real runner would: an exit 0 with no verdict is RED since
+# TOOL-dDerivedDocket-26, and this arm is about which runner is named, not about that rule.
+printf '%s\n' '#!/usr/bin/env bash' 'echo "VENDOR BAR RAN"'   'd="$(git rev-parse --git-dir)/gate-run/$GATE_RUN_ID"; mkdir -p "$d"; printf "verdict\tGREEN\n" > "$d/verdict"'   'exit 0' > "${vg}/$rgk/$rgk.sh"
 printf '%s\n' '[]' > "${vg}/gate-legs.json"
 printf 'GOV_KITROOT=%s\n' "$vg" > .githooks/gate-env.sh
 git add -A >/dev/null 2>&1; git commit -q -m init; git branch -M main
@@ -880,6 +882,8 @@ build_ir_fixture() { # tag · gate-env body (printf %b) -> a pushed main whose R
   mkdir -p .githooks "$KIT_REL"
   printf '%s\n' '[{"name":"x","argv":["bash","a.sh"]}]' > "$KIT_REL/gate-legs.json"
   printf '%b' "$body" > .githooks/gate-env.sh
+  # The kit root, on the rung this hook reads it from when no receipt or root install names it.
+  printf 'GOV_KITROOT=%s\n' "$KIT_REL" >> .githooks/gate-env.sh
   git add -A >/dev/null 2>&1; git commit -q -m init; git branch -M main
   git remote add origin "$d/remote.git"
   touch "$(git rev-parse --git-dir)/push-main-active"
@@ -900,7 +904,7 @@ write_ir_stamp() { # sha · base · max_age -> a planted gate-inherited-green
 # AC1, the hook's half: R says park and the pushed branch commits `land` into its OWN copy. The policy
 # line reads park, and an inherited-only red is blocked. A reader of the working tree would land it.
 build_ir_fixture ac1 'INHERITED_RED=park\nINHERITED_RED_MAX_AGE=10\n' || bad "IR AC1 could not build its fixture"
-printf 'INHERITED_RED=land\nINHERITED_RED_MAX_AGE=10\n' > .githooks/gate-env.sh
+printf 'INHERITED_RED=land\nINHERITED_RED_MAX_AGE=10\nGOV_KITROOT=%s\n' "$KIT_REL" > .githooks/gate-env.sh
 git add -A >/dev/null 2>&1; git commit -q -m "the branch grants itself land" >/dev/null 2>&1
 _o=$(run_ir_push)
 case "$_o" in
@@ -1107,7 +1111,10 @@ cd "$pfx_home" || exit 2
 #     GATE_FULL only widens the run, and GATE_FULL=1 makes GATE_BASE irrelevant.
 #   GATE_SELFTESTS — adds legs, and predicate 8 forces a full bar for it.
 #   the rest — width, timeouts, the wall, the turnstile, reaping and the run log: a breach is RED.
-BAR_INERT_KNOBS="GATE_BASE GATE_CGROUP_ROOT GATE_CORES GATE_FULL GATE_JOBS GATE_PROFILE GATE_PROFILES GATE_RAM_MB GATE_REAP_BOUND GATE_RUN_ID GATE_RUN_KEEP GATE_SELFTESTS GATE_TURNSTILE GATE_TURNSTILE_HELD GATE_TURNSTILE_TICK GATE_TURNSTILE_TTL GATE_WALL GOV_RUNLOG"
+#   GATE_ATTRIBUTE GATE_INHERITED_RED GATE_INHERITED_RED_MAX_AGE — the hook clears the policy pair
+#     and sets all three from R itself (TOOL-dDerivedDocket-23, -24), and attribution is report-only.
+#   GATE_AMBIENT_TMP GATE_HOST_RATIO — assigned in the runner, from TMPDIR and as a source constant.
+BAR_INERT_KNOBS="GATE_AMBIENT_TMP GATE_ATTRIBUTE GATE_HOST_RATIO GATE_INHERITED_RED GATE_INHERITED_RED_MAX_AGE GATE_BASE GATE_CGROUP_ROOT GATE_CORES GATE_FULL GATE_JOBS GATE_PROFILE GATE_PROFILES GATE_RAM_MB GATE_REAP_BOUND GATE_RUN_ID GATE_RUN_KEEP GATE_SELFTESTS GATE_TURNSTILE GATE_TURNSTILE_HELD GATE_TURNSTILE_TICK GATE_TURNSTILE_TTL GATE_WALL GOV_RUNLOG"
 read_hook_const() { sed -n 's/^'"$1"'="\(.*\)"$/\1/p' "$SRC/.githooks/pre-push"; }
 check_knob_classes() { # <runner file> -> one line per unclassified, doubly classified or stale name; empty when clean
   local knobs cleared scrubbed k n

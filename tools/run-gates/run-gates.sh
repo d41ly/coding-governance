@@ -2933,9 +2933,10 @@ except Exception:
     sys.exit(3)
 if not isinstance(data, list):
     sys.exit(3)
-# R'S ROWS RESOLVE THE {prefix} TOKEN AGAINST THIS RUNNER'S TOOL ROOT, exactly as L'S rows do, or an
-# R manifest that spells its argv through the token never equals L's resolved argv and every red
-# reads OWN by "its argv differs". A manifest at R that predates the token passes unchanged.
+# THE ROWS AT R RESOLVE THE {prefix} TOKEN AGAINST THE TOOL ROOT OF THIS RUNNER, exactly as the rows
+# at L do, or a manifest at R that spells its argv through the token never equals the resolved argv
+# at L and every red reads OWN by "its argv differs". A manifest at R that predates the token passes
+# unchanged. NOTE: this program is inside a single-quoted shell block, so it carries no apostrophe.
 troot = sys.argv[2] if len(sys.argv) > 2 else ""
 # >>> resolve_prefix_token -- canonical copy: resolve_prefix_token.py in the gov lib dir (byte-identical; gated)
 def resolve_prefix_token(spelled, troot):

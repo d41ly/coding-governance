@@ -20,8 +20,11 @@
 #
 # THE FIXTURES INSTALL THE KITS AT `scripts/`, deliberately, and it is not arbitrary. Every path in
 # the subject is DERIVED, so a fixture built at THIS tree's own prefix would pass a hook that had the
-# prefix spelled back in. It also keeps `.githooks/pre-commit`'s hygiene and manifest legs from
-# resolving at all, so an arm's verdict is the straggler layer's and never another gate's.
+# prefix spelled back in. The hooks find that root through the tracked `gate-env.sh` the fixture
+# declares (`GOV_KITROOT`), which is the only rung their ladder has for it since
+# TOOL-aRepatriatedFork-24, so the fixture's memory-tree kit carries NO hygiene gate: that keeps
+# `.githooks/pre-commit`'s hygiene leg announcing its skip rather than resolving, and the manifest
+# leg never resolves at all, so an arm's verdict is the straggler layer's and never another gate's.
 #
 # THE STRAGGLER BRANCHES LIVE IN LINKED WORKTREES, for the same reason this project's charter says
 # they should: `pre-commit`'s branch guard refuses a commit in the PRIMARY tree while parked off the
@@ -126,6 +129,10 @@ write_hooks() { # $1 = repo dir — the POST-flip hook files, outside the tree, 
   # under the relative value `check-wiring.sh --fix` writes, and it is the inert case AC12 measures.
   printf '#!/usr/bin/env bash\nexit 0\n' > "$1/.githooks/pre-commit"
   chmod +x "$1/.githooks/pre-commit"
+  # THE KIT ROOT, DECLARED where the hook's ladder reads it (TOOL-aRepatriatedFork-24): no receipt and
+  # no root install here, so the tracked `gate-env.sh` is the rung that names `$FX_ROOT`. The hook
+  # stopped probing a spelled `scripts` directory, and finds the memory-tree kit from this root.
+  printf 'GOV_KITROOT=%s\n' "$FX_ROOT" > "$1/.githooks/gate-env.sh"
 }
 write_kits() { # $1 = repo dir — the real engines, at the fixture's own prefix
   mkdir -p "$1/$FX_ROOT/run-gates"
@@ -135,6 +142,7 @@ write_kits() { # $1 = repo dir — the real engines, at the fixture's own prefix
   cp -r "$ROOT/$KIT_LIB" "$1/$FX_ROOT/lib"
   cp "$ROOT/$WIRING" "$1/$FX_ROOT/check-wiring.sh"
   rm -rf "$1/$FX_MT/__pycache__" "$1/$FX_ROOT/memory-recall/__pycache__"
+  rm -f "$1/$FX_MT/check-memory-hygiene.sh"   # the header says why: the hygiene leg must not resolve here
 }
 init_repo() { # $1 = repo dir — a shards-mode base commit, a bare origin, and the hooks wired
   mkdir -p "$1/memory/backlog" "$1/memory/archive" "$1/memory/builds/aSeed"
