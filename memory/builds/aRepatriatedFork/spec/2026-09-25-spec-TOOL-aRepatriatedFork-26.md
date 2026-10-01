@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-26 — the runbook and every shipped doc name no install prefix
 
-**Status:** CLOSED · rev-3 · 2026-09-29 · node a · Tier-1 · base 2143b6d6 · streams tooling · order 11
+**Status:** CLOSED · rev-4 · 2026-10-01 · node a · Tier-1 · base 2143b6d6 · streams tooling · order 11
 
 <!-- gen:spec-records -->
 
@@ -203,6 +203,11 @@ of eleven kits under `tools/` · `tools/lexicon/LEXICON.md` · `tools/lexicon/SK
   `<prefix>` token for both sides, returns WIRE's seven executing migration-block lines to
   `TOOL-aRepatriatedFork-46` under M3 veto 3 and narrows AC2 to match, and records the lexicon
   marker, the manifest seed and the charter's v3.2 bump.
+- rev-4 · 2026-10-01 · S9: gate repair at VERIFYING, leg `foreign-prefix parity (every self-test at
+  three prefixes)`, row `playbook parity selftest`, red at `scripts/` and `vendor/gov/`. The
+  documented-kit predicate in `check-playbook-parity.sh` took a kit named only as `tools/<kit>/`,
+  `<prefix>/<kit>/` or a backticked `<kit>/`, so at any other install a runbook naming its own root
+  was undocumented. Its first form is the gate's own derived root; at a root install there is none.
 
 ## 10. Reuse audit
 

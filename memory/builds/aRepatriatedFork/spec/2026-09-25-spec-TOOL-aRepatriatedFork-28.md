@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-28 — every suite builds its fixtures at a prefix it derives
 
-**Status:** CLOSED · rev-5 · 2026-10-01 · node a · Tier-2 · base 2143b6d6 · streams tooling · order 14
+**Status:** CLOSED · rev-6 · 2026-10-01 · node a · Tier-2 · base 2143b6d6 · streams tooling · order 14
 
 <!-- gen:spec-records -->
 
@@ -263,6 +263,17 @@ unchanged
   VERIFYING repair record for the owner: gov's own wiring and committed renders that name the tool
   root and do not move with it, a kit that refuses a prefix deeper than one segment by design, and
   arms that read an engine or fixture out of a historical commit laid out at gov's historical prefix.
+- rev-6 · 2026-10-01 · S1, S3: gate repair at VERIFYING, leg `foreign-prefix parity (every self-test at
+  three prefixes)`, the rows red at `scripts/` or `vendor/gov/` whose suite could not find its own
+  subject there. Four fixtures took this install's whole prefix where their subject asks something
+  else. The runlog skill arm planted the host prefix where the adopter's template lint refuses the
+  published source head; it reads that head from the adopter. Spec-tokens' one-segment-root arm and
+  the codebase-map adopter suite built at this install's depth, two segments at `vendor/gov/`, which
+  the rule and the kit treat differently from one; both take one segment. The build harness's
+  verbatim control cannot be negative where this install's prefix is its own fixture's, `scripts/`,
+  and is skipped there by name. `check-wiring.test.sh` took the repository as `$HERE/..`, a line
+  older than base; it asks git. The rows that red only because gov's own declarations do not move
+  with the tool root are the leg's, left to the owner-approved redesign of the leg, not repaired here.
 
 ## 10. Reuse audit
 

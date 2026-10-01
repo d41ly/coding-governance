@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-29 — gov's own gates and declarations derive the prefix they name
 
-**Status:** CLOSED · rev-5 · 2026-10-01 · node a · Tier-2 · base 2143b6d6 · streams tooling · order 13
+**Status:** CLOSED · rev-6 · 2026-10-01 · node a · Tier-2 · base 2143b6d6 · streams tooling · order 13
 
 <!-- gen:spec-records -->
 
@@ -305,6 +305,11 @@ New arm: `tools/govkit/selftest.py` · rev-4: the fixture regenerator derives a 
   `tools/gate-legs.json` text the message no longer prints, and takes the new text. run-gates.sh's
   manifest-parse line gained the kit-dir argument, and the run-log suite's EXITS table still named
   the old line; its row takes the new text.
+- rev-6 · 2026-10-01 · S3: gate repair at VERIFYING, leg `foreign-prefix parity (every self-test at
+  three prefixes)`, row `kit-placeholders self-test`, red at `vendor/gov/`. For a fixture tree handed
+  in by `--root`, `check-kit-placeholders.py` searched for `kit.toml` one segment below a single
+  root only, so every fixture built at a two-segment prefix was refused as declaring nothing. It
+  searches one or two segments deep.
 
 ## 10. Reuse audit
 
