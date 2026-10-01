@@ -8,7 +8,9 @@ Every finding now keeps the key of the lens that dispatched it. Every return car
 one VERIFYING run of the tier2-review self-test at 149e89d6 (165 passed, 0 failed) and from the same
 test file run against the BASE render at 9fdd0c18 in a frozen clone (56 passed, 109 failed). The
 greps and the direct checks were re-run on the build's tip, whose `tools/` is byte-identical to
-149e89d6.
+149e89d6. The round-1 fold (828a5ffa, rev-2) amended AC4 and AC5 and added their arms; those two
+lines were re-read from the self-test at fe3c29fc (180 passed, 0 failed) and from the same test file
+against the BASE render (56 passed, 124 failed).
 
 **Evidences:** TOOL-aSightedSkeptic-8
 - AC1 — `ledger: every finding carries its dispatching lens` — its three halves printed `ok`: "a
@@ -24,11 +26,19 @@ greps and the direct checks were re-run on the build's tip, whose `tools/` is by
 - AC4 — `ledger: confirmedFindings feeds the next round` — its three halves printed `ok`: "one entry
   per confirmed finding", "a rejected fix is replaced by the skeptic's note, at the binding grade"
   and "a round-2 run given it carries every ref and claim in every find: prompt". All three printed
-  `FAIL` against the BASE render.
+  `FAIL` against the BASE render. The rev-2 pair, "an unsound fix with an empty note keeps the
+  finder's fix, marked unsound" and the same with "a blank note", printed `ok` at fe3c29fc and
+  `FAIL` against the BASE render; 828a5ffa's message records them RED under a staged break of the
+  fixed render, since the code was already right.
 - AC5 — `ledger: the appendix is rendered by the harness` — the arm is split in three, all `ok` at
   VERIFYING: "heading, eight columns, one row per finding, the refuted one included", "a pipe and a
   line break in a cell leave the row count unchanged", and "ledger: the appendix is handed to the
-  synthesis verbatim". All three printed `FAIL` against the BASE render.
+  synthesis verbatim". All three printed `FAIL` against the BASE render. The rev-2 arm "a U+2028 in
+  a reason cell leaves the row count unchanged", whose reason also carries U+2029, NEL, VT, FF, 0x1C
+  and 0x1E and which compares the `str.splitlines` split with the `\n` split, the cell reading
+  `p q r s t u v w`,
+  printed `ok` at fe3c29fc and `FAIL` against the BASE render, and 828a5ffa's message records it
+  RED against the unfixed render.
 - AC6 — `ledger: every exit path carries the ledger` — all six paths printed `ok`: every lens dead,
   no finding raised, every finding refuted, one skeptic batch dead, the synthesis dead, and complete.
   All six printed `FAIL` against the BASE render.

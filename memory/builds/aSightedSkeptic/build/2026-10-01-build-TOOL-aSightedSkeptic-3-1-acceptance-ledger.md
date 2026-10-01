@@ -8,7 +8,9 @@ the range's commit log, and a run with neither specs nor context is announced. T
 from the main loop's one VERIFYING run of the tier2-review self-test at 149e89d6 (165 passed, 0
 failed) and from the same test file run against the BASE render at 9fdd0c18 in a frozen clone (56
 passed, 109 failed). The greps and the direct checks were re-run on the build's tip, whose `tools/`
-is byte-identical to 149e89d6.
+is byte-identical to 149e89d6. The round-1 fold (828a5ffa, rev-2) added two refused values to the
+list AC4 reads; AC4 was re-read from the self-test at fe3c29fc (180 passed, 0 failed) and from the
+same test file against the BASE render (56 passed, 124 failed), and AC7 and AC8 were re-run there.
 
 **Evidences:** TOOL-aSightedSkeptic-3
 - AC1 — `specs reach every finder and skeptic prompt` — `ok` at VERIFYING over 10 prompts; against
@@ -20,9 +22,10 @@ is byte-identical to 149e89d6.
 - AC3 — `no specs and no context: announced in the log and RUN INTEGRITY` — `ok` at VERIFYING, and
   its control `specs supplied: no intent warning` printed `ok` as "specs supplied: no intent warning,
   and RUN INTEGRITY counts the two documents". Both printed `FAIL` against the BASE render.
-- AC4 — `specs refused before any agent` — all eight values printed `ok` at VERIFYING: not an array,
-  a non-string member, an empty member, a leading slash, a drive letter, a `..` segment, a backslash
-  and null. Against the BASE render all eight printed `FAIL` with "(accepted)".
+- AC4 — `specs refused before any agent` — all ten values §4 "Refused values" lists at rev-2 printed
+  `ok` at fe3c29fc: not an array, a non-string member, an empty member, a leading slash, a drive
+  letter, a `..` segment, a backslash, null, and the rev-2 pair "a leading tilde" and "a control
+  character". Against the BASE render all ten printed `FAIL` with "(accepted)".
 - AC5 — `spec-audit: a spec that is also a subject is refused` — `ok` at VERIFYING, as was
   `spec-audit: specs render as sibling context`. Both printed `FAIL` against the BASE render.
 - AC6 — `another specs` — "AC3 another specs: a lens file under the old key is dispatched" and
@@ -30,7 +33,8 @@ is byte-identical to 149e89d6.
   dispatch half printed `FAIL`; the reuse half printed `ok` there too, since a file under its own key
   is reused whether or not `specs` reaches the key.
 - AC7 — `the args header documents all` — `grep -n 'specs:'` over the template listed line 82,
-  inside the `// --- inputs (via Workflow args)` block, and line 602, the `inputPrint` line. The arm
+  inside the `// --- inputs (via Workflow args)` block, and line 602, the `inputPrint` line, which
+  the rev-2 fold moved to line 614. The arm
   printed `ok` as "documents all 14 fields" at VERIFYING, where the BASE-render run read 10 fields.
   `grep -c -F 'specs' tools/workflows/README.md` printed 6, and over the BASE file 0.
 - AC8 — `python tools/lexicon/lexicon.py --suggest renderIntent --as js.function` — printed a line

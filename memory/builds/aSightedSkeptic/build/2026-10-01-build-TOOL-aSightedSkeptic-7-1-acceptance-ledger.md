@@ -8,7 +8,9 @@ what it skipped in the log and in RUN INTEGRITY. The arm readings come from the 
 VERIFYING run of the tier2-review self-test at 149e89d6 (165 passed, 0 failed) and from the same
 test file run against the BASE render at 9fdd0c18 in a frozen clone (56 passed, 109 failed). The
 greps and the direct checks were re-run on the build's tip, whose `tools/` is byte-identical to
-149e89d6.
+149e89d6. The round-1 fold (828a5ffa, rev-2) added an arm to AC4; that line was re-read from the
+self-test at fe3c29fc (180 passed, 0 failed) and from the same test file against the BASE render (56
+passed, 124 failed).
 
 **Evidences:** TOOL-aSightedSkeptic-7
 - AC1 — `intensity: an unknown value is refused` — the six prelude arms printed `ok` at VERIFYING:
@@ -23,7 +25,9 @@ greps and the direct checks were re-run on the build's tip, whose `tools/` is by
   those three". Both printed `FAIL` against the BASE render.
 - AC4 — `intensity: a light run announces its skipped lenses` — both halves printed `ok`: "in the log
   and RUN INTEGRITY" and "a full run names intensity full and no skipped lens". Both printed `FAIL`
-  against the BASE render.
+  against the BASE render. The rev-2 arm
+  `intensity: a lens note for a skipped lens is reported unread` printed `ok` at fe3c29fc and `FAIL`
+  against the BASE render, and 828a5ffa's message records it RED against the unfixed render.
 - AC5 — `intensity: LIGHT_LENSES must name live lenses` — both halves printed `ok`: "a renamed key,
   diff review" and "an empty literal, spec audit". Against the BASE render both printed `FAIL` with
   "(accepted)".

@@ -8,7 +8,9 @@ by exactly one finder; the split is logged and stated in RUN INTEGRITY. The arm 
 the main loop's one VERIFYING run of the tier2-review self-test at 149e89d6 (165 passed, 0 failed)
 and from the same test file run against the BASE render at 9fdd0c18 in a frozen clone (56 passed,
 109 failed). The greps and the direct checks were re-run on the build's tip, whose `tools/` is
-byte-identical to 149e89d6.
+byte-identical to 149e89d6. The round-1 fold (828a5ffa, rev-2) added an arm to AC2; that line was
+re-read from the self-test at fe3c29fc (180 passed, 0 failed) and from the same test file against
+the BASE render (56 passed, 124 failed).
 
 **Evidences:** TOOL-aSightedSkeptic-4
 - AC1 — `checklist string: every item in exactly one finder prompt` — `ok` at VERIFYING, `FAIL`
@@ -16,6 +18,10 @@ byte-identical to 149e89d6.
 - AC2 — `checklist string: continuation lines stay with their item` — `ok` at VERIFYING, as was
   `checklist array: each element is one item`. Both printed `FAIL` against the BASE render. Per
   f307976d's `Decided:` trailer the CRLF arm also asserts the CRLF run's key equals its LF twin's.
+  The rev-2 arm `checklist string: a line not starting "- " continues its item, indented or not`
+  printed `ok` at fe3c29fc and `FAIL` against the BASE render, and the template's refusal text at
+  line 254 now reads "every later line not starting "- " continues the item above it, indented or
+  not".
 - AC3 — `checklist: the log names every lens's share` — `ok` at VERIFYING, and
   `checklist: fewer items than lenses leaves an explicit empty share` printed `ok` naming
   `find:verification find:intent` as the two empty shares. Against the BASE render both printed
