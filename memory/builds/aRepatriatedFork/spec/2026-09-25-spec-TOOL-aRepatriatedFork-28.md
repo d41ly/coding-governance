@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-28 — every suite builds its fixtures at a prefix it derives
 
-**Status:** CLOSED · rev-4 · 2026-10-01 · node a · Tier-2 · base 2143b6d6 · streams tooling · order 14
+**Status:** CLOSED · rev-5 · 2026-10-01 · node a · Tier-2 · base 2143b6d6 · streams tooling · order 14
 
 <!-- gen:spec-records -->
 
@@ -250,6 +250,19 @@ unchanged
   `{prefix}` spelling. That engine predates the token and refused every entry as a missing
   descriptor, so the arms graded a refusal. The pre-fix copy is re-spelled the way that engine
   reads, by `write_pre_fix_spelling`; every expectation stays.
+- rev-5 · 2026-10-01 · gate repair at VERIFYING, leg `foreign-prefix parity (every self-test at three
+  prefixes)`, measured by running suites directly in scratch clones whose tool root moved to
+  `vendor/gov/` and to the repo root. S3: nine suites took the repository root as their own grandparent,
+  `$HERE/../..` in shell and `parents[1]` or `parent.parent` in Python, which is the root only at a
+  one-segment prefix: `resolve-python.test.sh`, `merge-rows.test.sh`, `unattended-build.test.sh`,
+  `cross-component.test.sh`, `agent-cap.test.sh`, `check-verdict-epoch.test.sh`,
+  `test_recall_floor.py`, codebase-map's and drift-audit's selftests, and govkit's selftest at 21
+  sites. Each asks git or walks to the `.git` entry instead. codebase-map's gate-template arm built its
+  prefixed fixtures at this install's own depth, which the gate by its docstring does not search past
+  one segment; they take one segment. The classes this mechanism cannot drain are recorded in the
+  VERIFYING repair record for the owner: gov's own wiring and committed renders that name the tool
+  root and do not move with it, a kit that refuses a prefix deeper than one segment by design, and
+  arms that read an engine or fixture out of a historical commit laid out at gov's historical prefix.
 
 ## 10. Reuse audit
 
