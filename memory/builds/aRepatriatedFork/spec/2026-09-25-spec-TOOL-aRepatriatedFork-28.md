@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-28 — every suite builds its fixtures at a prefix it derives
 
-**Status:** CLOSED · rev-7 · 2026-10-01 · node a · Tier-2 · base 2143b6d6 · streams tooling · order 14
+**Status:** CLOSED · rev-8 · 2026-10-01 · node a · Tier-2 · base 2143b6d6 · streams tooling · order 14
 
 <!-- gen:spec-records -->
 
@@ -283,6 +283,10 @@ unchanged
   which at a root install matched every bare mention of the kit; it refuses any path head before the
   kit's own directory. The unattended adopter suite's flat-checklist arm expected `python
   gotchas.py` where a root install's directory is `.`, which the adopter renders `./`.
+- rev-8 · 2026-10-01 · S1: gate repair at VERIFYING, the redesigned foreign-prefix leg at the repo
+  root. The codebase-map kit selftest's prefixed-install arm built its fixture at the derived
+  prefix, which is empty at a root install, so the arm compared the root with itself. The fixture
+  takes a stand-in prefix when the derived one is empty.
 
 ## 10. Reuse audit
 

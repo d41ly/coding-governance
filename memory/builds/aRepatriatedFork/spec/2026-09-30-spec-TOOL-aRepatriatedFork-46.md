@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-46 — no line joins a literal kit name under a derived base
 
-**Status:** CLOSED · rev-7 · 2026-10-01 · node a · Tier-2 · base 6830f257 · streams tooling · order 16 · ratified 2026-09-30
+**Status:** CLOSED · rev-8 · 2026-10-01 · node a · Tier-2 · base 6830f257 · streams tooling · order 16 · ratified 2026-09-30
 
 <!-- gen:spec-records -->
 
@@ -370,6 +370,10 @@ New arm: `tools/workflows/check-verifier-fanout.test.sh` · rev-4: `--print-cap`
   prefix as well as at `scripts/`. S4 moved the not-installed refusal onto `GRAMMAR_WHERE`, and the
   self-test's `_under_grammar_dir` still swapped only `GRAMMAR_DIR`, so the `nowhere` arms read the
   real kit's path. The helper swaps and restores both.
+- rev-8 · 2026-10-01 · S4: gate repair at VERIFYING, leg `corpus-ids selftest` at the repo root.
+  The check 15 wrong-prefix arm placed its real file at the derived prefix, which is empty at a
+  root install, so the wrong spelling was the right one. The fixture takes a stand-in prefix when
+  the derived one is empty.
 
 ## 10. Reuse audit
 
