@@ -1425,9 +1425,11 @@ def cmd_selftest() -> int:
         # of it written WITHOUT that prefix.
         # The wrong citation is the ROOT-install spelling, built through a prefix variable set EMPTY.
         root_pfx = ""
+        # At a root install PFX is empty, and the fixture still needs a prefixed shape to cite wrongly.
+        fx_pfx = PFX or "scripts/"
         tP = os.path.join(base, "prefix"); os.makedirs(tP)
         cP = _scratch(tP, extra={
-            f"{PFX}{HERE.name}/check-memory-hygiene.sh": "#!/usr/bin/env bash\n",
+            f"{fx_pfx}{HERE.name}/check-memory-hygiene.sh": "#!/usr/bin/env bash\n",
             "memory/HYGIENE.md": f"sentinel\n\nRun `{root_pfx}{HERE.name}/check-memory-hygiene.sh` to lint.\n",
         })
         cP["DEAD_PATH_PIN"] = "0"
@@ -1438,8 +1440,8 @@ def cmd_selftest() -> int:
         # also pass on a rule that reds every token whose first segment is not a top-level directory.
         tQ = os.path.join(base, "prefix-ok"); os.makedirs(tQ)
         cQ = _scratch(tQ, extra={
-            f"{PFX}{HERE.name}/check-memory-hygiene.sh": "#!/usr/bin/env bash\n",
-            "memory/HYGIENE.md": f"sentinel\n\nRun `{PFX}{HERE.name}/check-memory-hygiene.sh` to lint.\n",
+            f"{fx_pfx}{HERE.name}/check-memory-hygiene.sh": "#!/usr/bin/env bash\n",
+            "memory/HYGIENE.md": f"sentinel\n\nRun `{fx_pfx}{HERE.name}/check-memory-hygiene.sh` to lint.\n",
         })
         cQ["DEAD_PATH_PIN"] = "0"
         arm("...and the correctly-prefixed spelling of it is silent", None,
