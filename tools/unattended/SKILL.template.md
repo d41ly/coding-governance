@@ -2,7 +2,7 @@
 name: unattended
 description: Start, resume, or close a run that will merge and push with NO owner turn between start and finish. Use when the owner wants a committed build carried to landing unattended, when a previous unattended run needs resuming after compaction or process death, or when one needs closing. Do NOT use for ordinary work where the explicit ask before a merge and a push still applies — that is the default, and this skill is the narrow exception to it.
 ---
-<!-- gov:kit unattended@1.50 -->
+<!-- gov:kit unattended@1.51 -->
 
 # Unattended runs
 
@@ -46,7 +46,15 @@ been idle and a verdict against `UNIT_STALL_BOUND`. On `PROGRESSING` do nothing.
 act: stop the unit's task, record why with `--park` or a brief note, then re-dispatch that unit
 with a brief naming the stalled command and that it is skipped. The verb cannot see what the unit
 is doing or whether a process is stuck — its figures are the tree's, and the process side is the
-process-monitor kit's question, not this one's. Before this the tick fired every ten minutes
+process-monitor kit's question, not this one's. It then prints one line per open REGISTERED
+task, graded on its heartbeat file against `TASK_STALL_BOUND`. On a task's `STALLED` line, act:
+read its heartbeat file first, stop the task — an `Agent` by its task id, a process tree through
+the process-monitor kit's reap, the `PROCMON_CMD` this project declares, because a stopped
+background shell can leave its detached children running — record why with `--park` or a
+`Decided:` line, run `bash {{KIT_DIR}}/unattended.sh --release-task <slug> --task <name>`, then
+re-run it bounded or leave it parked. Whoever STARTS a background task registers it first:
+`bash {{KIT_DIR}}/unattended.sh --register-task <slug> --task <name> --heartbeat <absolute path>`,
+and releases it when it ends. Before this the tick fired every ten minutes
 while a `Workflow` ran in the background and did nothing with the turn. On `STALLED` act, and
 never end the turn by asking: the owner is absent, and a session bound to a non-terminal run has
 a stop-guard that refuses the stop and says so. The probe is also the run's heartbeat: the driver

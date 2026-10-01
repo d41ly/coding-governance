@@ -85,6 +85,12 @@ GATE_PROFILE_CMD=""
 # Set it to a few idle-wake cadences, so a verdict is never one missed tick.
 UNIT_STALL_BOUND="1800"
 
+# The bound, in seconds, `--audit` grades a REGISTERED background task's heartbeat file against:
+# STALLED when its mtime, or its registration time while the file is absent, is older than this.
+# OPTIONAL, on GATE_BOUND's terms. The kit default is 5400, three of the thirty-minute beats a
+# build brief asks for, so one late beat never reads STALLED.
+TASK_STALL_BOUND="5400"
+
 # the stop-guard blocks a bound session's turn end at most this many times per run and session, then allows and says so; the harness itself ends a turn after 8 consecutive blocks, so a value above 8 is unreachable inside one turn
 STOP_GUARD_BLOCKS="6"
 

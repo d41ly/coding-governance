@@ -206,7 +206,7 @@ git init -q -b main . && git config user.email t@t.test && git config user.name 
 # reconcile took main's (e197267e, the later and the one its spec-audit call sites already spell):
 # RESUME_STALE_BOUND eighth, SPEC_AUDIT_DEFAULT ninth, and this branch's two schedule bounds
 # stay tenth and eleventh.
-mkconf() { # wiring · gate · UNITS_REGION_CUTOFF · GATE_BOUND · SPEC_THIN_CUTOFF · UNIT_STALL_BOUND · REVIEW_ROUNDS · RESUME_STALE_BOUND · SPEC_AUDIT_DEFAULT · RESUME_SCHEDULE_DELAY · RESUME_SCHEDULE_LIMIT
+mkconf() { # wiring · gate · UNITS_REGION_CUTOFF · GATE_BOUND · SPEC_THIN_CUTOFF · UNIT_STALL_BOUND · REVIEW_ROUNDS · RESUME_STALE_BOUND · SPEC_AUDIT_DEFAULT · RESUME_SCHEDULE_DELAY · RESUME_SCHEDULE_LIMIT · TASK_STALL_BOUND
   # ELEVEN SLOTS, NOT EIGHT. `RESUME_STALE_BOUND` and `SPEC_AUDIT_DEFAULT` both read ${8-}: the
   # liveness arms pass a seconds bound there and the spec-audit arms a DATE, so those arms set
   # RESUME_STALE_BOUND to a date and the driver refused at exit 2 before any verb ran. One slot
@@ -229,6 +229,7 @@ GATE_BOUND="${4-3600}"
 # verb, and the arms that read WHOLE output, or its first line, would read that NOTE instead.
 GATE_WALL="21600"
 UNIT_STALL_BOUND="${6-1800}"
+TASK_STALL_BOUND="${12-5400}"
 REVIEW_ROUNDS="${7-7}"
 RESUME_STALE_BOUND="${8-5400}"
 WIRING_CHECK="${1-true}"
@@ -6105,7 +6106,9 @@ build_audit_fixture
 out=$(run --audit tRun); rc=$?
 same "AC3 no dispatch row exits 0" "$rc" "0"
 same "AC3 the no-unit line, once" "$(printf '%s\n' "$out" | grep -c '^unattended-audit: no unit is dispatched and open$')" "1"
-same "AC3 and no other audit line" "$(printf '%s\n' "$out" | grep -c '^unattended-audit:')" "1"
+# TWO lines since TOOL-aRepatriatedFork-53: the unit population's and the task population's, each
+# saying it graded nothing, so neither half of an empty audit reads as a clean one.
+same "AC3 and no other audit line" "$(printf '%s\n' "$out" | grep -c '^unattended-audit:')" "2"
 # ...a commit naming the unit AND writing inside the declared set closes the pass — the openness
 # test is `check_pass_open`, the one `--dispatch` uses, so the two verbs cannot disagree.
 run --dispatch tRun --pass ARCH-tRun-1 --writes work/one.txt >/dev/null 2>&1
@@ -6181,6 +6184,89 @@ reset_tree; mkconf "true" "true" "" "3600" "" "0"
 out=$(run --audit tRun); rc=$?
 same "AC4 a zero UNIT_STALL_BOUND exits 2" "$rc" "2"
 hit "$out" "REFUSING - UNIT_STALL_BOUND is declared as"
+reset_tree
+
+# ---- TOOL-aRepatriatedFork-53: the TASK REGISTRY. `--register-task` and `--release-task` keep a
+# ---- per-slug sidecar under the git dir, and `--audit` grades every open task's heartbeat mtime
+# ---- against TASK_STALL_BOUND after its unit loop. The registry lives in the GIT DIR, which
+# ---- `reset_tree` does not clean, so this block removes it at both ends. Heartbeats and the `stat`
+# ---- stub live OUTSIDE the scratch repo: inside it they are untracked paths the tree clock stats
+# ---- first, and a stub would kill that probe instead of the one under test. Against the 56c7befa
+# ---- driver `--register-task` is check 14's unknown argument and no task line prints.
+build_audit_fixture
+TK_REG="$(git rev-parse --git-dir)/unattended/tasks.tRun.tsv"; rm -rf "$TK_REG"
+TK_DIR=$(mktemp -d); TK_BEAT="$TK_DIR/t53beat-a.txt"
+# AC3 — no registry is one line saying so, never silence that reads as a clean audit of the tasks.
+out=$(run --audit tRun); rc=$?
+same "task AC3 no registry exits 0" "$rc" "0"
+same "task AC3 the no-task line, once" "$(printf '%s\n' "$out" | grep -c '^unattended-audit: no heartbeat-bearing tasks registered$')" "1"
+# AC8 — a relative path and a tab-bearing name refuse and append no row; so do the empty and no-run cases.
+out=$(run --register-task tRun --task leg-a --heartbeat rel/beat.txt); rc=$?
+same "task AC8 a relative heartbeat exits 1" "$rc" "1"
+hit "$out" "--register-task was given a relative --heartbeat path, and the audit reads it from the run's own worktree while the task may beat in another, so only an absolute path names one file from both:"
+hit "$(run --register-task tRun --task "$(printf 'le\tg')" --heartbeat "$TK_BEAT")" "a task name or heartbeat path carries a tab or a newline, and the registry is one tab-separated row per act, so it would forge a field or a row nothing registered"
+same "task AC8 no row was appended" "$([ -e "$TK_REG" ] && echo row || echo none)" "none"
+hit "$(run --register-task tRun --heartbeat "$TK_BEAT")" "--register-task requires --task, because a task with no name is a STALLED line nobody can act on"
+hit "$(run --register-task tRun --task leg-a)" "--register-task requires --heartbeat, because a task with no heartbeat file is the silent background work this registry exists to end"
+hit "$(run --register-task tNoRun --task leg-a --heartbeat "$TK_BEAT")" "no run-state file, so there is no run to register a background task against:"
+hit "$(run --release-task tRun)" "--release-task requires --task, because a release naming nothing closes nothing"
+# AC1 — a heartbeat written one second earlier is PROGRESSING.
+echo beat > "$TK_BEAT"; touch -d "@$(( $(date -u +%s) - 1 ))" "$TK_BEAT"
+out=$(run --register-task tRun --task leg-a --heartbeat "$TK_BEAT"); rc=$?
+same "task AC1 registration exits 0" "$rc" "0"
+same "task AC1 one register row" "$(grep -c "$(printf '\tregister\tleg-a\t')" "$TK_REG")" "1"
+out=$(run --audit tRun); rc=$?
+same "task AC1 the audit exits 0" "$rc" "0"
+same "task AC1 leg-a PROGRESSING" "$(printf '%s\n' "$out" | grep -c '^unattended-audit: task leg-a · registered .* · last-beat [0-9]*s ago · PROGRESSING$')" "1"
+miss "$out" "no heartbeat-bearing tasks registered"
+# AC6, first half — a second registration of an open name refuses.
+hit "$(run --register-task tRun --task leg-a --heartbeat "$TK_BEAT")" "the task is registered and not yet released, and a second open row for one name would leave the audit grading whichever it read last; release it first:"
+# AC2 — aged past the bound: STALLED, then one remedy line naming the task, and still exit 0.
+mkconf "true" "true" "" "3600" "" "1800" "7" "5400" "" "1800" "6" "60"
+touch -d "@$(( $(date -u +%s) - 3600 ))" "$TK_BEAT"
+out=$(run --audit tRun); rc=$?
+same "task AC2 a STALLED task exits 0" "$rc" "0"
+same "task AC2 leg-a STALLED" "$(printf '%s\n' "$out" | grep -c '^unattended-audit: task leg-a · .* · STALLED$')" "1"
+hit "$out" "unattended-audit: remedy — read the heartbeat of task leg-a, stop the task, record why with --park or a Decided: line, release it with --release-task, then re-run it bounded or leave it parked"
+# AC5 — `stat` answering NOTHING for the heartbeat is a dead probe at check 51, never a zero.
+# Its own stub, passing every other path through, so the tree clock's own `stat` still answers.
+mkdir -p "$TK_DIR/stub"
+printf '#!/bin/sh\ncase "$*" in *t53beat*) exit 0 ;; esac\nexec %s "$@"\n' "$(command -v stat)" > "$TK_DIR/stub/stat"; chmod +x "$TK_DIR/stub/stat"
+out=$(PATH="$TK_DIR/stub:$PATH" bash "$SCRIPT" --audit tRun 2>&1); rc=$?
+same "task AC5 an undatable heartbeat exits 1" "$rc" "1"
+hit "$out" "a zero from a dead probe would read as written-just-now: stat -c %Y on the heartbeat of task leg-a,"
+miss "$out" "unattended-audit: task leg-a"
+# AC6 — release closes it, a second release refuses, and a fresh registration is graded anew.
+out=$(run --release-task tRun --task leg-a); rc=$?
+same "task AC6 release exits 0" "$rc" "0"
+out=$(run --audit tRun)
+miss "$out" "unattended-audit: task leg-a"
+hit "$(run --release-task tRun --task leg-a)" "the task has no open registration, so there is nothing to release, and a release row for it would record an act that never happened:"
+# AC4 — an absent heartbeat reads `none`, PROGRESSING inside the bound from its NEW row, STALLED
+# once that row is older than the bound.
+run --register-task tRun --task leg-a --heartbeat "$TK_DIR/t53never.txt" >/dev/null
+out=$(run --audit tRun)
+same "task AC4 absent heartbeat PROGRESSING" "$(printf '%s\n' "$out" | grep -c '^unattended-audit: task leg-a · .* · last-beat none · PROGRESSING$')" "1"
+mutate "$TK_REG" "\$s/^[^\t]*\tregister/$(date -u -d "@$(( $(date -u +%s) - 3600 ))" +%Y-%m-%dT%H:%M:%SZ)\tregister/"
+out=$(run --audit tRun)
+same "task AC4 absent heartbeat STALLED" "$(printf '%s\n' "$out" | grep -c '^unattended-audit: task leg-a · .* · last-beat none · STALLED$')" "1"
+# ...an append that fails is a refusal naming the registry, never a silent unrecorded act.
+run --release-task tRun --task leg-a >/dev/null
+mv "$TK_REG" "$TK_REG.held"; mkdir "$TK_REG"
+hit "$(run --register-task tRun --task leg-b --heartbeat "$TK_BEAT")" "cannot append to the task registry, so the act is not recorded and the audit would not see it:"
+rmdir "$TK_REG"; mv "$TK_REG.held" "$TK_REG"
+# AC7 — a zero bound exits 2 through `read_bound_key`; an absent key NOTEs the 5400s default.
+mkconf "true" "true" "" "3600" "" "1800" "7" "5400" "" "1800" "6" "0"
+out=$(run --audit tRun); rc=$?
+same "task AC7 a zero TASK_STALL_BOUND exits 2" "$rc" "2"
+hit "$out" "REFUSING - TASK_STALL_BOUND is declared as"
+mkconf; sed -i '/^TASK_STALL_BOUND=/d' .unattended.conf
+hit "$(run --audit tRun)" "NOTE - this project declares no TASK_STALL_BOUND, so a registered task reads STALLED after the kit default of 5400s with no heartbeat"
+# ...and a finished run refuses a registration through the one terminal refusal.
+mkconf
+mutate memory/builds/tRun/RUN.md 's/^phase: .*/phase: LANDED/'
+hit "$(run --register-task tRun --task leg-c --heartbeat "$TK_BEAT")" "the run is already finished and a finished record is not something to move, re-open or re-pin"
+rm -rf "$TK_REG" "$TK_DIR"
 reset_tree
 
 # ---- TOOL-aWokenSentinel-1: the LEASE. `--preflight` records `session:` and `pid:` beside the
@@ -11855,7 +11941,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # raise neither counts on nor moves them. No suite ran.
 # RAISED 1836 -> 1837: region one's in_shard block-length arm (the Cygwin stack-ceiling split, 2026-09-29).
 # RAISED 1837 -> 1843: region two's structural fixes at VERIFYING, +4 from the --hold and take-over entries in the phase-writer drive list and +2 from the take-over bypass-flag arm.
-FLOOR_ASSERTIONS=1843
+# RAISED 1843 -> 1877 by TOOL-aRepatriatedFork-53: the task-registry block's 34 unconditional
+# hit/miss/same/mutate lines in region two beside the `--audit` arms, COUNTED off the block; no suite
+# ran in the pass, and each case was observed by a scratch fixture driving the driver itself.
+FLOOR_ASSERTIONS=1877
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -11982,7 +12071,8 @@ FLOOR_SHARD_1=209
 # paid by shard 2 as well as by an unsharded run.
 # +61 for the TOOL-dDerivedDocket-28 process-ledger arms, all in region two - see FLOOR_ASSERTIONS.
 # RAISED 1640 -> 1646: the same six region-two assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_2=1646
+# RAISED 1646 -> 1680: the same 34 region-two task-registry assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_2=1680
 # +58 for the fold of dDerivedDocket's closing diff review, round 1 (F2, F3, F4), all in region two - see FLOOR_ASSERTIONS.
 # +14 for TOOL-dDerivedDocket-16's AC15 arm at the VERIFYING pass, all in region two - see FLOOR_ASSERTIONS.
 # +5 for the --hold line-end refusal arms at the second origin/main reconcile, region two - see FLOOR_ASSERTIONS.

@@ -7,6 +7,8 @@
 #   unattended.sh --phase <slug> <phase> --witness <sha>   # move the run, with its witness
 #   unattended.sh --status <slug>                          # one line: phase · witness · next unit
 #   unattended.sh --audit <slug>                           # one line per open dispatched unit: idle time, PROGRESSING|STALLED
+#   unattended.sh --register-task <slug> --task <name> --heartbeat <absolute path>   # BEFORE starting a background task
+#   unattended.sh --release-task <slug> --task <name>      # the task ended; --audit stops grading its heartbeat
 #   unattended.sh --liveness <slug>                        # key: value lines and ONE verdict, for an out-of-session reader
 #   unattended.sh --resume <slug> [--keepalive-id <id> [--replaces <id>]]    # the same line, plus the next action; with the id, the resume matrix decides who drives
 #   unattended.sh --close <slug> [--override <item> --reason <text>]
@@ -43,7 +45,7 @@
 # The generated region holds NO copy: the unit list is DERIVED from the build README's already-derived,
 # already-byte-compared slice. One derivation in the tree; this file is not a second one.
 set -u
-KIT_UNATTENDED_VERSION=1.50   # gov:kit unattended@1.50 — kit identity; set HERE, never from .unattended.conf
+KIT_UNATTENDED_VERSION=1.51   # gov:kit unattended@1.51 — kit identity; set HERE, never from .unattended.conf
 
 # ------------------------------------------------------------------------------ the dereference pin
 # A sha is a NAME, and turning a name into bytes or into ancestry happens in the run's own object
@@ -88,7 +90,7 @@ KIT_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
 # read wrong, it does not RUN; the usage text is rendered from the docstring above, which is the only
 # place a verb's arguments are spelled; and the two carriers in other files are joined to this one by
 # the gate leg, because no runtime derivation crosses a file boundary.
-VERBS_SLUG="--preflight --status --audit --liveness --resume --close --landed --abort --hold --park --propose --attest --record-piece --record-set --rescope --dispatch --review --brief"
+VERBS_SLUG="--preflight --status --audit --register-task --release-task --liveness --resume --close --landed --abort --hold --park --propose --attest --record-piece --record-set --rescope --dispatch --review --brief"
 # The verbs whose argument is POSITIONAL and which exit inside the parse loop. Separate because the
 # dispatch cannot treat them alike, and merged again for every reader, who does not care.
 VERBS_INLINE="--plan --phase --version"
@@ -370,6 +372,9 @@ GATE_BOUND_DEFAULT=3600
 # 1800s: three keepalive cadences at this repo's ten-minute interval, so a `--audit` verdict of
 # STALLED is never one missed tick. The owner's figure, TOOL-aProbedUnit-3.
 UNIT_STALL_BOUND_DEFAULT=1800
+# 5400s: three of the thirty-minute beats the build briefs ask for, on the three-cadence rule the line
+# above records for its own figure, so one late beat never reads STALLED. TOOL-aRepatriatedFork-53.
+TASK_STALL_BOUND_DEFAULT=5400
 # 1 round: a spec-audit subject exits BOUNDED after its first blocked round (owner ruling
 # 2026-09-14, TOOL-aProbedUnit-6). ONE constant, interpolated into the NOTE the reader prints, so the
 # argument and the sentence cannot say two numbers — the closing review found them typed twice.
@@ -473,7 +478,7 @@ KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""; PHASES_EXTRA=""; DOD_EXTRA=""; DIRECTI
 HALT_CODES_EXTRA=""; HALT_FLOOR=""; LANDER_MARKER=""; RECALL_CLI=""; MAP_CLI=""; SPEC_TOKENS_CLI=""
 ASKS_CMD=""; HOLD_CODES_EXTRA=""; HOLD_FLOOR=""; LANDED_FACTS_CUTOFF=""; GATE_POLICY_FILE=""; PROCMON_CMD=""
 RESUME_SCHEDULE=""; RESUME_SCHEDULE_CREATE=""; RESUME_SCHEDULE_DELETE=""; RESUME_SCHEDULE_DELAY=""; RESUME_SCHEDULE_LIMIT=""
-GATE_BOUND=""; GATE_WALL=""; GATE_PROFILE_CMD=""; UNIT_STALL_BOUND=""; REVIEW_ROUNDS=""; RESUME_STALE_BOUND=""; RESUME_ATTEMPTS=""; RESUME_TURNS=""
+GATE_BOUND=""; GATE_WALL=""; GATE_PROFILE_CMD=""; UNIT_STALL_BOUND=""; TASK_STALL_BOUND=""; REVIEW_ROUNDS=""; RESUME_STALE_BOUND=""; RESUME_ATTEMPTS=""; RESUME_TURNS=""
 DISPOSITION_CUTOFF=""; SPEC_AUDIT_DEFAULT=""; RUNLOG_SESSION_VARS=""; RUNLOG_SWITCH=${GOV_RUNLOG:-}
 # TOOL-dLoggedFlight-2 - the run log's two inputs, on the init block's LAST line so the suite's
 # contiguous-block read still covers them (a comment inside the block ends it). RUNLOG_SESSION_VARS
@@ -587,6 +592,7 @@ read_bound_key RESUME_STALE_BOUND "$RESUME_STALE_BOUND_DEFAULT" seconds "a run r
 # supplying the item nobody typed.
 PK_ITEM=""; PK_STEP=""
 HALT_CODE=""
+TK_NAME=""; TK_BEAT=""
 # `--plan --paths` is an OUTPUT MODE on an existing verb, not a verb: check 26 joins every declared
 # verb to three carriers, so a new one would owe a header line, a VERBS entry and a Skill invocation
 # for a change that swaps one printf. Empty is the padded human table; `paths` is the TSV.
@@ -5833,6 +5839,9 @@ read_tree_clocks() {
 # verb "would rewrite" the record, and this verb rewrites nothing.
 print_audit() { # slug
   local slug="$1" rel ph now lastc lastw dead="" rows u iso g decl disp el wtxt verdict open=0 sp st
+  # THE TASK BOUND IS READ HERE AND NOT AT LOAD (TOOL-aRepatriatedFork-53 S6): this is the one verb
+  # that grades it, so its NOTE and its exit-2 refusal belong to this verb, before any line prints.
+  read_bound_key TASK_STALL_BOUND "$TASK_STALL_BOUND_DEFAULT" seconds "a registered task reads STALLED after the kit default of ${TASK_STALL_BOUND_DEFAULT}s with no heartbeat"
   check_slug "$slug" || return 1
   rel=$(runmd_of "$slug")
   [ -f "$rel" ] || { fail 51 "no run-state file, so there is no dispatched unit to audit for idleness: $rel"; return 1; }
@@ -5889,10 +5898,108 @@ print_audit() { # slug
     printf 'unattended-audit: %s · dispatched %s · elapsed %ss · last-write %s · last-commit %ss ago · %s\n' "$u" "$iso" "$el" "$wtxt" "$((now - lastc))" "$verdict"
     [ "$verdict" = STALLED ] && printf 'unattended-audit: remedy — stop the unit\047s task, then re-dispatch %s with a brief naming what stalled and that it is skipped\n' "$u"
   done <<<"$rows"
+  # THE SECOND POPULATION, the registered tasks, graded after the units and only when their probes
+  # all answered. A dead task probe joins the units' ONE refusal below rather than spelling a second.
+  if [ -z "$dead" ]; then
+    [ "$open" -gt 0 ] || echo "unattended-audit: no unit is dispatched and open"
+    print_task_audit "$slug" "$now"; dead=$TA_DEAD
+  fi
   if [ -n "$dead" ]; then
     fail 51 "the audit cannot measure idle time on this node, because a probe it needs answered nothing, so neither verdict is answerable and a zero from a dead probe would read as written-just-now: $dead"; return 1
   fi
-  [ "$open" -gt 0 ] || echo "unattended-audit: no unit is dispatched and open"
+  return 0
+}
+
+# THE TASK REGISTRY, TOOL-aRepatriatedFork-53. `--audit` above grades DISPATCHED units against the
+# tree's clocks, so a main-loop agent, a long gate leg or a suite started by hand was invisible to it:
+# on 2026-10-01 one waited eight hours and only the owner noticed. The STARTER of a background task
+# registers it first with an absolute heartbeat path, and `--audit` grades that file's mtime against
+# TASK_STALL_BOUND until `--release-task`. One per-slug sidecar under `resolve_sidecar_dir`, append-only:
+#
+#   <ISO>\tregister\t<name>\t<absolute heartbeat path>
+#   <ISO>\trelease\t<name>
+#
+# A task is OPEN when its newest row is a `register`; a released name may register again and its
+# newer row is the one graded. The awk program is ONE text read by all three functions below.
+#
+# WHAT THIS DOES NOT DO. It enforces nothing: a starter that never registers is still invisible
+# (spec F1). A beat proves only that something wrote the file, never that the work is useful. And it
+# stops nothing; the idle-wake acts on a STALLED line, through the process-monitor kit's reap.
+TASK_OPEN_AWK='{ sub(/\r$/, "") }
+  $2 == "register" { if (!($3 in seen)) { seen[$3] = 1; ord[++n] = $3 } o[$3] = 1; at[$3] = $1; hb[$3] = $4 }
+  $2 == "release"  { o[$3] = 0 }
+  END { for (i = 1; i <= n; i++) { k = ord[i]; if (o[k]) print k "\t" at[k] "\t" hb[k] } }'
+TA_DEAD=""
+print_task_audit() { # slug · now (epoch seconds) — sets TA_DEAD to the probe that answered nothing
+  local slug="$1" now="$2" dir reg rows name iso beat m since wtxt verdict n=0
+  TA_DEAD=""
+  dir=$(resolve_sidecar_dir) || dir=""
+  reg="$dir/tasks.$slug.tsv"
+  rows=""
+  if [ -n "$dir" ] && [ -e "$reg" ]; then
+    rows=$(awk -F'\t' "$TASK_OPEN_AWK" "$reg" 2>/dev/null) || { TA_DEAD="awk over the task registry $reg"; return 0; }
+  fi
+  while IFS=$'\t' read -r name iso beat; do
+    [ -n "$name" ] || continue
+    if [ -e "$beat" ]; then
+      m=$(stat -c %Y -- "$beat" 2>/dev/null) || m=""
+      case "$m" in ""|*[!0-9]*) TA_DEAD="stat -c %Y on the heartbeat of task $name, $beat"; break ;; esac
+      since=$m; wtxt="$((now - m))s ago"
+    else
+      # NO FILE YET reads `none` and is graded from the registration, so a task gets one bound to
+      # write its first beat and never reads PROGRESSING forever for having none.
+      since=$(date -u -d "$iso" +%s 2>/dev/null) || since=""
+      case "$since" in ""|*[!0-9]*) TA_DEAD="date -u -d on the registration time $iso of task $name"; break ;; esac
+      wtxt="none"
+    fi
+    n=$((n+1))
+    if [ $((now - since)) -gt "$TASK_STALL_BOUND" ]; then verdict=STALLED; else verdict=PROGRESSING; fi
+    printf 'unattended-audit: task %s · registered %s · heartbeat %s · last-beat %s · %s\n' "$name" "$iso" "$beat" "$wtxt" "$verdict"
+    [ "$verdict" = STALLED ] && printf 'unattended-audit: remedy — read the heartbeat of task %s, stop the task, record why with --park or a Decided: line, release it with --release-task, then re-run it bounded or leave it parked\n' "$name"
+  done <<<"$rows"
+  [ -n "$TA_DEAD" ] || [ "$n" -gt 0 ] || echo "unattended-audit: no heartbeat-bearing tasks registered"
+  return 0
+}
+
+write_task_register() { # slug · task name · heartbeat path
+  local slug="$1" name="$2" beat="$3" rel dir reg
+  check_slug "$slug" || return 1
+  rel=$(runmd_of "$slug")
+  [ -f "$rel" ] || { fail 88 "no run-state file, so there is no run to register a background task against: $rel"; return 1; }
+  [ -n "$name" ] || { fail 88 "--register-task requires --task, because a task with no name is a STALLED line nobody can act on"; return 1; }
+  [ -n "$beat" ] || { fail 88 "--register-task requires --heartbeat, because a task with no heartbeat file is the silent background work this registry exists to end"; return 1; }
+  case "$name$beat" in
+    *$'\t'*|*$'\n'*) fail 88 "a task name or heartbeat path carries a tab or a newline, and the registry is one tab-separated row per act, so it would forge a field or a row nothing registered"; return 1 ;;
+  esac
+  # ABSOLUTE, because the audit runs in the run's own worktree and a task may beat in another.
+  case "$beat" in
+    /*|[A-Za-z]:/*|[A-Za-z]:\\*) ;;
+    *) fail 88 "--register-task was given a relative --heartbeat path, and the audit reads it from the run's own worktree while the task may beat in another, so only an absolute path names one file from both: $beat"; return 1 ;;
+  esac
+  refuse_if_terminal "$rel" --register-task || return 1
+  dir=$(resolve_sidecar_dir) || dir=""
+  reg="$dir/tasks.$slug.tsv"
+  if [ -n "$dir" ] && [ -f "$reg" ] && awk -F'\t' "$TASK_OPEN_AWK" "$reg" 2>/dev/null | cut -f1 | grep -qxF -- "$name"; then
+    fail 88 "the task is registered and not yet released, and a second open row for one name would leave the audit grading whichever it read last; release it first: $name"; return 1
+  fi
+  { [ -n "$dir" ] && mkdir -p "$dir" && printf '%s\tregister\t%s\t%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$name" "$beat" >> "$reg"; } 2>/dev/null \
+    || { fail 88 "cannot append to the task registry, so the act is not recorded and the audit would not see it: $reg"; return 1; }
+  echo "unattended: task registered — $name · heartbeat $beat"
+  return 0
+}
+
+write_task_release() { # slug · task name
+  local slug="$1" name="$2" dir reg
+  check_slug "$slug" || return 1
+  [ -n "$name" ] || { fail 88 "--release-task requires --task, because a release naming nothing closes nothing"; return 1; }
+  dir=$(resolve_sidecar_dir) || dir=""
+  reg="$dir/tasks.$slug.tsv"
+  if ! { [ -n "$dir" ] && [ -f "$reg" ] && awk -F'\t' "$TASK_OPEN_AWK" "$reg" 2>/dev/null | cut -f1 | grep -qxF -- "$name"; }; then
+    fail 88 "the task has no open registration, so there is nothing to release, and a release row for it would record an act that never happened: $name"; return 1
+  fi
+  printf '%s\trelease\t%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$name" >> "$reg" 2>/dev/null \
+    || { fail 88 "cannot append to the task registry, so the act is not recorded and the audit would not see it: $reg"; return 1; }
+  echo "unattended: task released — $name"
   return 0
 }
 
@@ -10210,6 +10317,8 @@ refuse_waive_unless_preflight() { # verb
 while [ $# -gt 0 ]; do
   case "$1" in
     --pass)         PK_ITEM="${2:-}"; shift 2 || shift ;;
+    --task)         TK_NAME="${2:-}"; shift 2 || shift ;;
+    --heartbeat)    TK_BEAT="${2:-}"; shift 2 || shift ;;
     --writes)       DP_WRITES+=("${2:-}"); shift 2 || shift ;;
     --act)          RS_ACT="${2:-}"; shift 2 || shift ;;
     --successor)    RS_SUCC="${2:-}"; shift 2 || shift ;;
@@ -10325,6 +10434,8 @@ case "$VERB" in
   --preflight) verb_preflight "$SLUG" "$KID" ;;
   --status)    verb_status "$SLUG" ;;
   --audit)     print_audit "$SLUG" ;;
+  --register-task) write_task_register "$SLUG" "$TK_NAME" "$TK_BEAT" ;;
+  --release-task)  write_task_release "$SLUG" "$TK_NAME" ;;
   --liveness)  print_liveness "$SLUG" ;;
   --resume)    verb_resume "$SLUG" "$KID" ;;
   --close)     verb_close "$SLUG" ;;

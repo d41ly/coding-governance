@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.50 -->
+<!-- gov:kit unattended@1.51 -->
 # Unattended runs — the verbs
 
 *This file is the second half of the binding contract; `UNATTENDED-PROTOCOL.md` is the first. Two
@@ -93,7 +93,21 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
 - `--audit` — one line per unit whose dispatch rows at their newest anchor, taken together, are still
   open and whose spec is not terminal: how long the TREE has been idle (newest write, newest commit) and `PROGRESSING` or `STALLED` against `UNIT_STALL_BOUND`, a
   `STALLED` line followed by one remedy line. Read-only; the idle-wake runs it. It cannot see what
-  the unit is doing or whether a process is stuck — its figures are properties of the tree.
+  the unit is doing or whether a process is stuck — its figures are properties of the tree. After
+  the units it prints one line per open REGISTERED task: its heartbeat path, `last-beat <s>s ago`
+  or `none`, and `PROGRESSING` or `STALLED` against `TASK_STALL_BOUND`, a `STALLED` line again
+  followed by one remedy line — or `no heartbeat-bearing tasks registered`. A heartbeat that exists
+  and cannot be dated is check 51; one not written yet is graded from its registration.
+- `--register-task` — `--register-task <slug> --task <name> --heartbeat <absolute path>`, run by
+  the STARTER of a background task BEFORE it starts it: the main loop for an `Agent` or a background
+  leg, a brief's author for a unit's own long command. It appends one row to the per-slug sidecar
+  `tasks.<slug>.tsv` under `<git-dir>/unattended/`. A task beats by writing its heartbeat file; a
+  leg or a suite beats by its own output log growing, so that log can be the path. It refuses a
+  name or path carrying a tab or a newline, a relative path, a name still open, a missing run and a
+  finished one. NOTHING ENFORCES IT: a background task nobody registers stays invisible to `--audit`.
+- `--release-task` — `--release-task <slug> --task <name>`, when the task ends, so `--audit` stops
+  grading it. A name with no open registration refuses; a released name may register again, and
+  its newer row is the one graded.
 - `--liveness` — key: value lines and one verdict for an OUT-OF-SESSION reader: the phase, the
   lease, whether the recorded pid exists AND is the leased process (image and start time, not the
   number alone), seconds since anything moved, the last recorded stall, `TERMINAL`, `ELSEWHERE`,

@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.50 -->
+<!-- gov:kit unattended@1.51 -->
 # Fixture playbook — the kit's own, so the leg's population is never empty
 
 **This is a FIXTURE, not an example to copy.** It exists because `check-playbook.sh` carries the

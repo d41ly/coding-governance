@@ -1,11 +1,12 @@
 # TOOL-aRepatriatedFork-53 — every background task a run starts carries a heartbeat the audit reads
 
-**Status:** SPECCED · rev-2 · 2026-10-01 · node a · Tier-2 · base 56c7befa · streams tooling · order 23
+**Status:** CLOSED · rev-2 · 2026-10-01 · node a · Tier-2 · base 56c7befa · streams tooling · order 23
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-01-build-TOOL-aRepatriatedFork-53-1-acceptance-ledger.md](../build/2026-10-01-build-TOOL-aRepatriatedFork-53-1-acceptance-ledger.md) | journal | — |
 | [2026-10-01-prompt-TOOL-aRepatriatedFork-53-build-brief.md](../prompts/2026-10-01-prompt-TOOL-aRepatriatedFork-53-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->

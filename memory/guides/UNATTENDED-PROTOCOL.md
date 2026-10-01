@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.50 -->
+<!-- gov:kit unattended@1.51 -->
 # Unattended runs — the protocol
 
 *Two legs byte-compare this file against the template it ships from. **They compare the two copies to
@@ -384,6 +384,8 @@ the `keepalive` fact and attested as `keepalive-reaped`; that fact, that DoD ite
 and the `KEEPALIVE_*` keys keep their names: each has readers. Its limits, 2026-09-13: it fires only
 while the session is idle (documented) and, owner-reported, unmeasured, stays silent while a
 background task is pending. Its prompt is `--resume --keepalive-id` with its own id, then `--audit`.
+A background task's starter registers it (`--register-task`); `--audit` grades its heartbeat until
+`--release-task`.
 Presume a job you did not schedule ALIVE until a delete says so (`TOOL-aPromptedMandate-11`: two
 asserted dead fired). A hold may owe a DURABLE restart too; `UNATTENDED-STOPS.md` carries that
 contract.
@@ -460,6 +462,7 @@ In the repo-root `.unattended.conf`. Blank or absent turns the corresponding ass
 | `GATE_CMD` · `GATE_WALL` · `GATE_PROFILE_CMD` | the full merge bar, for `gates-green`; the whole-run wall in seconds on it, and the command printing its resolved profile. The last two OPTIONAL |
 | `GATE_BOUND` | the wall-clock bound, in seconds, on `GATE_CMD` and `WIRING_CHECK`. OPTIONAL: absent takes the kit default and says so on stderr; non-numeric or zero is a refusal |
 | `UNIT_STALL_BOUND` | the idle bound, in seconds, `--audit` measures a dispatched-and-open unit against: STALLED when both the newest write in the tree and the newest commit are older than it. OPTIONAL, on `GATE_BOUND`'s terms |
+| `TASK_STALL_BOUND` | the bound, in seconds, `--audit` grades a registered task's heartbeat mtime against, kit default 5400. OPTIONAL, on `GATE_BOUND`'s terms |
 | `RESUME_STALE_BOUND` | the bound, in seconds, `--liveness` reads a RUN as STALE past: when no signal `--liveness` reads has moved within it. OPTIONAL, on `GATE_BOUND`'s terms: absent takes the DERIVED default `GATE_BOUND + UNIT_STALL_BOUND` and says so on stderr; non-numeric or zero is a refusal; a value below that sum is accepted with a NOTE, because under it a full bar's silence reads STALE |
 | `STOP_GUARD_BLOCKS` | the cap on stop-guard blocks per run and session, kit default 6. OPTIONAL, on `GATE_BOUND`'s terms for absence: the hook says so on stderr; a malformed value ALLOWS the stop with `knob-malformed` on the sidecar line, because for a Stop hook a refusal is a block |
 | `RESUME_ATTEMPTS` | the cap on CONSECUTIVE fruitless launches per run the resume tick makes — the sidecar lines newer than the run's last move — kit default 6, then it prints `ATTEMPTS EXHAUSTED` and launches nothing. Read from the ROOT conf by the tick, so one repo has one cap. OPTIONAL, on `UNIT_STALL_BOUND`'s terms: absent takes the kit default and says so on stderr; non-numeric or zero is a refusal |
