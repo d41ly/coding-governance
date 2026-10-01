@@ -11273,7 +11273,7 @@ RVC
   # from the worktree, so it passed a records commit whose views were derived from an unstaged edit;
   # a checkout of the commit carries only what was committed, and reds on any staged view its
   # sources do not carry, whichever input moved it.
-  rv_check_commit() { # -> the generator's --check output over a fresh checkout of the fixture's HEAD
+  check_rv_commit() { # -> the generator's --check output over a fresh checkout of the fixture's HEAD
     local _d; _d=$(mktemp -d)
     run_rv_git archive HEAD | tar -x -C "$_d"
     ( cd "$_d" && git init -q -b main . && git config core.autocrlf false && git add -A \
@@ -11303,7 +11303,7 @@ RVC
   rv_names=$(run_rv_git show --name-only --format= HEAD)
   hit  "$rv_names" "memory/builds/tMend/BACKLOG.md"
   hit  "$rv_names" "memory/backlog/ARCH.md"
-  hit  "$(rv_check_commit)" "build-index: clean"
+  hit  "$(check_rv_commit)" "build-index: clean"
   same "AC2 the close left a clean tree" "$(run_rv_git status --porcelain)" ""
 
   # ---- AC4: under `primary`, an UNTRACKED path the operator left under the memory root is no input
@@ -11323,7 +11323,7 @@ RVC
   run_rv_git commit -q -m "records(tMend): close — LANDING" >/dev/null 2>&1
   same "AC4 the operator's records commit passes the --check pre-commit" "$?" "0"
   miss "$(run_rv_git show --name-only --format= HEAD)" "memory/notes.md"
-  hit  "$(rv_check_commit)" "build-index: clean"
+  hit  "$(check_rv_commit)" "build-index: clean"
 
   # ---- ...a TRACKED input with an unstaged edit stages NO view (rev-3, M1): the miss line names the
   # ---- input, the rows stay staged, and the edit stays the operator's.
@@ -11382,7 +11382,7 @@ RVC
 
   cd "$TMP" || exit 2
   rm -rf "$rv_dir" "$rv_oroot" "$rv_out"
-  unset -f run_rv run_rv_git build_rv_fixture rv_check_commit
+  unset -f run_rv run_rv_git build_rv_fixture check_rv_commit
 fi
 
 # ================ TOOL-dDerivedDocket-28: the run-owned process ledger =============================

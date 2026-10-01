@@ -1,6 +1,6 @@
 # TOOL-dMendedRecall-2 — the inherited-red auto-file re-renders the generated views it makes stale, and stages them with its rows
 
-**Status:** CLOSED · rev-4 · 2026-10-01 · node d · Tier-2 · base 1f915870 · streams tooling · order 1 · closes TOOL-dAlignedCarrier-9 · ratified 2026-10-01
+**Status:** CLOSED · rev-5 · 2026-10-01 · node d · Tier-2 · base 1f915870 · streams tooling · order 1 · closes TOOL-dAlignedCarrier-9 · ratified 2026-10-01
 
 <!-- gen:spec-records -->
 
@@ -400,8 +400,12 @@ New arm: `tools/unattended/unattended.test.sh` · the inherited-red block's MET 
 - rev-4 · 2026-10-01 · §2 §6 · S3 AC8 · the fold of the closing diff review's round 2. L1 (LOW): the
   dirty-input predicate left out the generator's own code, so an unstaged edit to its modules still
   fed a staged render, M1's mechanism again. S3 adds the generator's directory, and AC8 observes it.
-  L2 (LOW): the suite's `rv_check_commit` pins `core.autocrlf=false`, so git's CRLF warnings no longer
+  L2 (LOW): the suite's `check_rv_commit` pins `core.autocrlf=false`, so git's CRLF warnings no longer
   crowd a red arm's output. The new suite arm is written and not run; the block's skip count is 41.
+- rev-5 · 2026-10-01 · §9 · the close's flagged bar redded the two lexicon legs, verb offenders 1072
+  over the pin of 1071: the round-1 fold's suite helper led with `rv`, which the declared verb table
+  does not carry. Renamed to `check_rv_commit`, the spelling `lexicon.py --suggest` admits, at its
+  definition, both callers and its unset; rev-4's line above spells the new name.
 
 ## 10. Reuse audit
 
