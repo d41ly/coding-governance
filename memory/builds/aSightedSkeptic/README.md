@@ -4,9 +4,8 @@ node: a
 opened: 2026-10-01
 streams: tooling
 roster: TOOL
-status: OPEN
 authorized-by: prompt
-ids: TOOL-aSightedSkeptic-1
+ids: TOOL-aSightedSkeptic-1 TOOL-aSightedSkeptic-2 TOOL-aSightedSkeptic-3 TOOL-aSightedSkeptic-4 TOOL-aSightedSkeptic-5 TOOL-aSightedSkeptic-6 TOOL-aSightedSkeptic-7 TOOL-aSightedSkeptic-8 TOOL-aSightedSkeptic-9
 ---
 
 # aSightedSkeptic — the Tier-2 review harness, briefed, calibrated and measured
@@ -46,7 +45,7 @@ never measured. The owner's prompt and the list are in `prompts/`.
 - No governance carrier is edited. Five lenses sit inside the review protocol's stated three to six.
 - Each unit's arms go into `tools/workflows/tier2-review.test.sh` and are observed RED first; the suite runs once, at `VERIFYING`.
 - No spec audit (owner, 2026-10-01): the closing diff review is the specs' first review.
-- Classified at kickoff (M2): all nine units MISSING.
+- Classified at kickoff (M2): all nine units MISSING; specced by the build harness, built one at a time in spec order.
 
 ## Parked decisions
 
@@ -54,38 +53,58 @@ never measured. The owner's prompt and the list are in `prompts/`.
 
 <!-- roster:units -->
 
-| # | Unit | Status | Mechanism |
+| # | Unit | Tier | Mechanism |
 |---|---|---|---|
-| 1 | `TOOL-aSightedSkeptic-1` | MISSING | the skeptic is briefed with the repo, the range, the context and the by-design list |
-| 2 | `TOOL-aSightedSkeptic-2` | MISSING | the skeptic judges each proposed fix as well as the claim |
-| 3 | `TOOL-aSightedSkeptic-3` | MISSING | finders are handed intent: a `specs` argument, and the range's commit messages by default |
-| 4 | `TOOL-aSightedSkeptic-4` | MISSING | a `checklist` argument whose classes are split across the lenses |
-| 5 | `TOOL-aSightedSkeptic-5` | MISSING | five diff lenses, with verification and intent added, and project lens notes |
-| 6 | `TOOL-aSightedSkeptic-6` | MISSING | one severity rubric; a skeptic may re-grade, or answer uncertain |
-| 7 | `TOOL-aSightedSkeptic-7` | MISSING | an intensity argument whose light setting announces the lenses it skips |
-| 8 | `TOOL-aSightedSkeptic-8` | MISSING | every finding keeps its lens, a findings ledger lands beside the report, and the confirmed set is returned |
-| 9 | `TOOL-aSightedSkeptic-9` | MISSING | the replay benchmark: a ledger scored for recall against a past round's known findings |
+| 1 | `TOOL-aSightedSkeptic-1` | 2 | the skeptic is briefed with the repo, the range, the context and the by-design list |
+| 2 | `TOOL-aSightedSkeptic-2` | 2 | the skeptic judges each proposed fix as well as the claim |
+| 3 | `TOOL-aSightedSkeptic-3` | 2 | finders are handed intent: a `specs` argument, and the range's commit messages by default |
+| 4 | `TOOL-aSightedSkeptic-4` | 2 | a `checklist` argument whose classes are split across the lenses |
+| 5 | `TOOL-aSightedSkeptic-5` | 2 | five diff lenses, with verification and intent added, and project lens notes |
+| 6 | `TOOL-aSightedSkeptic-6` | 2 | one severity rubric; a skeptic may re-grade, or answer uncertain |
+| 7 | `TOOL-aSightedSkeptic-7` | 2 | an intensity argument whose light setting announces the lenses it skips |
+| 8 | `TOOL-aSightedSkeptic-8` | 2 | every finding keeps its lens, a findings ledger lands beside the report, and the confirmed set is returned |
+| 9 | `TOOL-aSightedSkeptic-9` | 2 | the replay benchmark: a ledger scored for recall against a past round's known findings |
 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 0 unit(s) · node a · opened 2026-10-01 · streams tooling
-ids TOOL-aSightedSkeptic-1
+**Build status:** SPECCED · 9 unit(s) · node a · opened 2026-10-01 · streams tooling
+ids TOOL-aSightedSkeptic-1 TOOL-aSightedSkeptic-2 TOOL-aSightedSkeptic-3 TOOL-aSightedSkeptic-4 TOOL-aSightedSkeptic-5 TOOL-aSightedSkeptic-6 TOOL-aSightedSkeptic-7 TOOL-aSightedSkeptic-8 TOOL-aSightedSkeptic-9
 
 <!-- gen:build-units -->
-*No spec under this build carries a status header; the status above is declared in the front matter.*
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-aSightedSkeptic-5 — five diff lenses, with verification and intent added, project lens notes, and one review-shape bump](spec/2026-10-01-spec-TOOL-aSightedSkeptic-5.md) | 1 | 2 | SPECCED | rev-1 | 2026-10-01 |
+| [TOOL-aSightedSkeptic-1 — the skeptic is briefed with the repo, the range, the context and the by-design list](spec/2026-10-01-spec-TOOL-aSightedSkeptic-1.md) | 2 | 2 | SPECCED | rev-1 | 2026-10-01 |
+| [TOOL-aSightedSkeptic-3 — finders and skeptics are handed intent: a `specs` argument, and the range's commit messages by default](spec/2026-10-01-spec-TOOL-aSightedSkeptic-3.md) | 3 | 2 | SPECCED | rev-1 | 2026-10-01 |
+| [TOOL-aSightedSkeptic-4 — a `checklist` argument whose classes are split across the lenses that run](spec/2026-10-01-spec-TOOL-aSightedSkeptic-4.md) | 4 | 2 | SPECCED | rev-1 | 2026-10-01 |
+| [TOOL-aSightedSkeptic-2 — the skeptic judges each finding's proposed fix as well as its claim](spec/2026-10-01-spec-TOOL-aSightedSkeptic-2.md) | 5 | 2 | SPECCED | rev-1 | 2026-10-01 |
+| [TOOL-aSightedSkeptic-6 — one severity rubric, a skeptic's binding grade, and an uncertain verdict](spec/2026-10-01-spec-TOOL-aSightedSkeptic-6.md) | 6 | 2 | SPECCED | rev-1 | 2026-10-01 |
+| [TOOL-aSightedSkeptic-7 — an intensity argument whose light setting announces the lenses it skips](spec/2026-10-01-spec-TOOL-aSightedSkeptic-7.md) | 7 | 2 | SPECCED | rev-1 | 2026-10-01 |
+| [TOOL-aSightedSkeptic-8 — every finding keeps its lens, a findings ledger lands beside the report, and the confirmed set is returned](spec/2026-10-01-spec-TOOL-aSightedSkeptic-8.md) | 8 | 2 | SPECCED | rev-1 | 2026-10-01 |
+| [TOOL-aSightedSkeptic-9 — the replay benchmark: a review scored for recall against a past round](spec/2026-10-01-spec-TOOL-aSightedSkeptic-9.md) | 9 | 2 | SPECCED | rev-1 | 2026-10-01 |
 <!-- /gen:build-units -->
 
-Records: 2 bound to this build, across 1 record folder(s).
+Records: 2 bound to this build, across 2 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: none — every unit id has one.
+Ids no `spec-audit` record has ever named: TOOL-aSightedSkeptic-1 TOOL-aSightedSkeptic-2 TOOL-aSightedSkeptic-3 TOOL-aSightedSkeptic-4 TOOL-aSightedSkeptic-5 TOOL-aSightedSkeptic-6 TOOL-aSightedSkeptic-7 TOOL-aSightedSkeptic-8 TOOL-aSightedSkeptic-9.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
 
-*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+| Step | Units | Parallel |
+|---|---|---|
+| 1 | `TOOL-aSightedSkeptic-5` | no |
+| 2 | `TOOL-aSightedSkeptic-1` | no |
+| 3 | `TOOL-aSightedSkeptic-3` | no |
+| 4 | `TOOL-aSightedSkeptic-4` | no |
+| 5 | `TOOL-aSightedSkeptic-2` | no |
+| 6 | `TOOL-aSightedSkeptic-6` | no |
+| 7 | `TOOL-aSightedSkeptic-7` | no |
+| 8 | `TOOL-aSightedSkeptic-8` | no |
+| 9 | `TOOL-aSightedSkeptic-9` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
