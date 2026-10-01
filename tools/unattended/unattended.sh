@@ -45,7 +45,7 @@
 # The generated region holds NO copy: the unit list is DERIVED from the build README's already-derived,
 # already-byte-compared slice. One derivation in the tree; this file is not a second one.
 set -u
-KIT_UNATTENDED_VERSION=1.53   # gov:kit unattended@1.53 — kit identity; set HERE, never from .unattended.conf
+KIT_UNATTENDED_VERSION=1.54   # gov:kit unattended@1.54 — kit identity; set HERE, never from .unattended.conf
 
 # ------------------------------------------------------------------------------ the dereference pin
 # A sha is a NAME, and turning a name into bytes or into ancestry happens in the run's own object
@@ -5956,7 +5956,7 @@ print_task_audit() { # slug · now (epoch seconds) — sets TA_DEAD to the probe
     if [ $((now - since)) -gt "$TASK_STALL_BOUND" ]; then verdict=STALLED; else verdict=PROGRESSING; fi
     printf 'unattended-audit: task %s · registered %s · heartbeat %s · last-beat %s · %s\n' "$name" "$iso" "$beat" "$wtxt" "$verdict"
     [ "$verdict" = STALLED ] && printf 'unattended-audit: remedy — read the heartbeat of task %s, stop the task, record why with --park or a Decided: line, release it with --release-task, then re-run it bounded or leave it parked\n' "$name"
-  done <<<"$rows"
+  done < <(printf '%s\n' "$rows")
   [ -n "$TA_DEAD" ] || [ "$n" -gt 0 ] || echo "unattended-audit: no heartbeat-bearing tasks registered"
   return 0
 }
