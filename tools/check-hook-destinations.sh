@@ -116,7 +116,9 @@ for eid, (d, _p) in govkit.read_descriptors(root, reg, govkit.Report()).items():
             out.add(dst)
         elif isinstance(dst, (list, tuple)):
             out.update(x for x in dst if isinstance(x, str))
-print("\n".join(sorted(out)))
+# At a ROOT install the canonical prefix is ".", so a destination reads "./<kit>/<file>" where the
+# readers resolve "<kit>/<file>": one path, two spellings, compared as strings (VERIFYING repair).
+print("\n".join(sorted(x[2:] if x.startswith("./") else x for x in out)))
 PYEOF
 ) || { echo "hook-dest: could not resolve the descriptors — refusing"; exit 2; }
 
@@ -134,8 +136,10 @@ reg = govkit.load_registry(root)
 print(govkit.canonical_ctx("hook-dest")["prefix"])
 homes = set()
 for eid, (d, _p) in govkit.read_descriptors(root, reg, govkit.Report()).items():
-    if d.get("home"):
-        homes.add(("F " if d.get("kind") == "flat" else "D ") + d["home"].rstrip("/"))
+    # A flat home at a ROOT install resolves to "", the directory `dirname` spells "." (VERIFYING
+    # repair: skipping the empty home left every root-level {here} fragment homeless).
+    if isinstance(d.get("home"), str):
+        homes.add(("F " if d.get("kind") == "flat" else "D ") + (d["home"].rstrip("/") or "."))
 print("\n".join(sorted(homes)))
 PYEOF
 ) || { echo "hook-dest: could not read the flat-kit homes — refusing"; exit 2; }
@@ -200,7 +204,7 @@ for f in $FRAGS; do
         st=1
         continue
       fi
-      adopter="$PFX/${resolved#"$dir"/}"
+      adopter="$PFX/${resolved#"$dir"/}"; adopter="${adopter#./}"   # "." is a root install's prefix
       if printf '%s\n' "$DESTS" | grep -qxF -- "$adopter"; then
         echo "hook-dest: ok   $f -> $resolved in the tree, ships as $adopter"
       else
