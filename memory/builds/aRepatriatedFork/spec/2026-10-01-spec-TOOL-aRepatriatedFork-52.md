@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-52 — the foreign-prefix leg asks only the prefix question
 
-**Status:** SPECCED · rev-1 · 2026-10-01 · node a · Tier-2 · base 56c7befa · streams tooling · order 25
+**Status:** SPECCED · rev-2 · 2026-10-01 · node a · Tier-2 · base 56c7befa · streams tooling · order 25
 
 <!-- gen:spec-records -->
 
@@ -38,7 +38,9 @@ with no calibrate pass, failing fast and printing a line per suite. The owner ex
   runs whole and is NAMED: the leg file carries a declared list of those rows, each with its reason.
   A row on the list that prints the probe marker reds as a stale declaration, and a row off the list
   that prints none reds as an undeclared whole run. Every whole-run row is printed on every run.
-  Observed by AC3.
+  A row whose self-test is a `--selftest` mode of a shipped ENGINE rather than a suite file is on
+  the list with that reason: an honouring site there would put a gov-only leg's flag into code
+  every adopter runs, which is a public surface this unit did not price. Observed by AC3.
 - **S4** — THE MOVE. A scratch clone at HEAD, the whole tool root moved with `git mv` to
   `scripts/`, then `vendor/gov/`, then the repository root, as `TOOL-aRepatriatedFork-30` §8 F1
   (b) ruled. Each move re-spells gov's own declarations by the old root's path head, as an install
@@ -115,8 +117,9 @@ with no calibrate pass, failing fast and printing a line per suite. The owner ex
 ### Inventory
 
 New identifiers: the environment flag `FOREIGN_PREFIX_PROBE`, the marker line
-`foreign-prefix-probe: stopped after 1 arm`, and the leg's whole-run list, one declared array in
-`foreign-prefix.gov.test.sh` of row name and reason. Function names in the leg are confirmed with
+`foreign-prefix-probe: stopped after 1 arm`, the leg's whole-run list, one declared array in
+`foreign-prefix.gov.test.sh` of row name and reason, and the re-declaration step
+`write_declarations`, which R2's patch spelled `redeclare_wiring`. Function names in the leg are confirmed with
 `python tools/lexicon/lexicon.py --suggest <name>` before writing, and a refusal renames them as a
 rev bump here first.
 
@@ -240,6 +243,9 @@ New arm: `tools/lib/lib-selftest.test.sh` · a harness suite run with the probe 
 
 - rev-1 · 2026-10-01 · initial draft from the owner's 2026-10-01 ruling adopting this unit, with
   R2's re-declaration patch folded in as S4.
+- rev-2 · 2026-10-01 · Inventory: R2's `redeclare_wiring` is `write_declarations`, because the
+  lexicon refused `redeclare` as a verb outside its table. S3: a `--selftest` mode of a shipped
+  engine is declared whole with that reason, since a probe site there is an adopter-facing surface.
 
 ## 10. Reuse audit
 
