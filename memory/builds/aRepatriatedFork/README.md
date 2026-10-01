@@ -191,7 +191,7 @@ ids TOOL-aRepatriatedFork-54
 | [TOOL-aRepatriatedFork-51 — brief-recorded takes a declared waiver registry, as pass-order does](spec/2026-10-01-spec-TOOL-aRepatriatedFork-51.md) | 22 | 1 | CLOSED | rev-1 | 2026-10-01 |
 | [TOOL-aRepatriatedFork-53 — every background task a run starts carries a heartbeat the audit reads](spec/2026-10-01-spec-TOOL-aRepatriatedFork-53.md) | 23 | 2 | CLOSED | rev-2 | 2026-10-01 |
 | [TOOL-aRepatriatedFork-54 — two gov gates grade a repo-root install correctly](spec/2026-10-01-spec-TOOL-aRepatriatedFork-54.md) | 24 | 1 | CLOSED | rev-2 | 2026-10-01 |
-| [TOOL-aRepatriatedFork-52 — the foreign-prefix leg asks only the prefix question](spec/2026-10-01-spec-TOOL-aRepatriatedFork-52.md) | 25 | 2 | CLOSED | rev-5 | 2026-10-01 |
+| [TOOL-aRepatriatedFork-52 — the foreign-prefix leg asks only the prefix question](spec/2026-10-01-spec-TOOL-aRepatriatedFork-52.md) | 25 | 2 | CLOSED | rev-6 | 2026-10-01 |
 <!-- /gen:build-units -->
 
 Records: 118 bound to this build, across 4 record folder(s).

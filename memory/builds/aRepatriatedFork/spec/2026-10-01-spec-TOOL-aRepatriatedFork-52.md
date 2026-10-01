@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-52 — the foreign-prefix leg asks only the prefix question
 
-**Status:** CLOSED · rev-5 · 2026-10-01 · node a · Tier-2 · base 56c7befa · streams tooling · order 25
+**Status:** CLOSED · rev-6 · 2026-10-01 · node a · Tier-2 · base 56c7befa · streams tooling · order 25
 
 <!-- gen:spec-records -->
 
@@ -42,7 +42,11 @@ with no calibrate pass, failing fast and printing a line per suite. The owner ex
   that prints none reds as an undeclared whole run. Every whole-run row is printed on every run.
   A row whose self-test is a `--selftest` mode of a shipped ENGINE rather than a suite file is on
   the list with that reason: an honouring site there would put a gov-only leg's flag into code
-  every adopter runs, which is a public surface this unit did not price. Observed by AC3.
+  every adopter runs, which is a public surface this unit did not price.
+  A second declared list names GOV-LAYOUT rows: an unshipped suite whose first arm grades gov's own
+  registry layout, which a root install of gov is not. At the repo root such a row prints
+  `not graded` with its reason on every run, and a declaration naming no row reds as stale.
+  Observed by AC3.
 - **S4** — THE MOVE. A scratch clone at HEAD, the whole tool root moved with `git mv` to
   `scripts/`, then `vendor/gov/`, then the repository root, as `TOOL-aRepatriatedFork-30` §8 F1
   (b) ruled. Each move re-spells gov's own declarations by the old root's path head, as an install
@@ -257,6 +261,10 @@ New arm: `tools/lib/lib-selftest.test.sh` · a harness suite run with the probe 
 - rev-5 · 2026-10-01 · S6: the declared whole rows run one at a time after the probe pool drains.
   AC10's fourth run timed out two of them at `vendor/gov/` inside the 8-wide pool, at budgets
   sized for one suite at a time.
+- rev-6 · 2026-10-01 · S3: a declared gov-layout list. AC10's runs redded `govkit selftest` at the
+  repo root on 58 selfcheck problems about gov's own registry at an empty tool root: `./`
+  destinations, guard classes, the surface glob. govkit is in no registry entry, so no adopter
+  installs it; gov at the root is the parked tool-root question, not a prefix defect.
 
 ## 10. Reuse audit
 
