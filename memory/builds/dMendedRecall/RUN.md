@@ -9,12 +9,14 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
-gates-run: unattended-179084756704337016435-2598157 245ec06e
+asks-at-landing: TOOL-dAlignedCarrier-7=CLOSED TOOL-dAlignedCarrier-8=CLOSED TOOL-dAlignedCarrier-9=CLOSED
+units-at-landing: TOOL-dMendedRecall-1 TOOL-dMendedRecall-2 TOOL-dMendedRecall-3
+gates-run: unattended-179085095945367420419-2853060 0cfdd64b
 parked-surfaced: yes
 keepalive-reaped: yes
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: e19335af80f4d6a2915491bd2a7c07bd59e9902e
-phase: VERIFYING
+phase: LANDING
 asks-ready: TOOL-dAlignedCarrier-7=yes TOOL-dAlignedCarrier-8=yes TOOL-dAlignedCarrier-9=yes
 asks: TOOL-dAlignedCarrier-7..9
 m-base: 1f9158708e4782dfe2d25a17fdf4153f57d38ae3
