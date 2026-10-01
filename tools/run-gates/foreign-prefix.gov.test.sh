@@ -256,7 +256,9 @@ run_at_prefix() { # $1 = prefix, empty for the repo root; returns 1 when the pre
   done
   list=$(bash "${p:+$p/}$KIT/run-selftests.sh" --list 2>&1) || { print_fail "run-selftests.sh --list refused at ${p:-the repo root}: $(printf '%s\n' "$list" | tail -2)"; return 1; }
   rm -rf "$TMPD/runs"; mkdir -p "$TMPD/runs"
-  while IFS=$'\t' read -r name bound argv; do
+  # The list rides fd 3 and each row reads /dev/null: a suite that reads stdin would otherwise eat
+  # the rest of the population, and the prefix would grade the rows before it as the whole.
+  while IFS=$'\t' read -r -u 3 name bound argv; do
     [ -n "$name" ] || continue
     [ "$name" = "$SELF_ROW" ] && continue
     if [ -n "$FILTER" ]; then case "$name $argv" in *"$FILTER"*) ;; *) continue ;; esac; fi
@@ -269,10 +271,10 @@ run_at_prefix() { # $1 = prefix, empty for the repo root; returns 1 when the pre
     fi
     case "$argv" in python3\ *|python\ *) argv="$PY ${argv#* }" ;; esac
     i=$((i + 1)); d="$TMPD/runs/$i"; mkdir -p "$d"; printf '%s\n' "$name" > "$d/name"
-    run_row "$label" "$d" "$name" "$bound" "$argv" "$kind" &
+    run_row "$label" "$d" "$name" "$bound" "$argv" "$kind" < /dev/null &
     live=$((live + 1))
     if [ "$live" -ge "$WIDTH" ]; then wait -n; live=$((live - 1)); fi
-  done < <(printf '%s\n' "$list" | sed -nE 's/^  (.*[^ ]) +([0-9]+)s  (.+)$/\1\t\2\t\3/p')
+  done 3< <(printf '%s\n' "$list" | sed -nE 's/^  (.*[^ ]) +([0-9]+)s  (.+)$/\1\t\2\t\3/p')
   wait
   [ "$n" -gt 0 ] || { print_fail "at ${p:-the repo root} the population selected no row${FILTER:+ matching '$FILTER'}, so this prefix graded nothing"; return 1; }
   for d in "$TMPD"/runs/*/; do
