@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-56 — brief-recorded does not grade a repair of a unit built before its run
 
-**Status:** SPECCED · rev-1 · 2026-10-02 · node a · Tier-1 · base 65bb64c2 · streams tooling · order 27
+**Status:** CLOSED · rev-1 · 2026-10-02 · node a · Tier-1 · base 65bb64c2 · streams tooling · order 27
 
 <!-- gen:spec-records -->
 

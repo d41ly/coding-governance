@@ -1,6 +1,6 @@
 # TOOL-aRepatriatedFork-55 — check 23 does not count a generated render as an undeclared write
 
-**Status:** SPECCED · rev-1 · 2026-10-02 · node a · Tier-1 · base 65bb64c2 · streams tooling · order 26
+**Status:** CLOSED · rev-1 · 2026-10-02 · node a · Tier-1 · base 65bb64c2 · streams tooling · order 26
 
 <!-- gen:spec-records -->
 
