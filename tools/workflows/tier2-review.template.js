@@ -426,15 +426,16 @@ if (!notedLenses.length)
 // trusted. It is trusted exactly as far as a lens is: everything a reused lens returns still passes
 // through the skeptics.
 //
-// THE KEY: kind, round, the pinned subject, and a fingerprint over `context`, `byDesign` and
-// `priorFindings` - every input a lens prompt interpolates except `repo`, which is left out on
+// THE KEY: kind, round, the pinned subject, and a fingerprint over `context`, `byDesign`,
+// `priorFindings`, `lensNotes` and the REVIEW_SHAPE literal - every input a lens prompt interpolates,
+// and the prompts' own shape, except `repo`, which is left out on
 // purpose: the common dir is shared by every worktree on the node, and a take-over from another
 // worktree of the same commits is exactly the re-run this exists for. A spec audit's subject is every
 // `path@blob` in the order given; a diff review's is the RESOLVED base and head (F5), so a review
 // commissioned against `origin/main` is pinned to the sha that ref named, and a moved ref is a
 // different key rather than a stale answer.
-// TOOL-aSightedSkeptic-5 S3/S5 - the print also carries `lensNotes`, an input the finder prompts
-// interpolate, and REVIEW_SHAPE, a literal standing for the prompts and schemas themselves: a lens
+// TOOL-aSightedSkeptic-5 S3/S5 - `lensNotes` is an input the finder prompts interpolate, and
+// REVIEW_SHAPE is a literal standing for the prompts and schemas themselves: a lens
 // file written by OLD prompts under the same inputs must not be reused by new ones. ONE bump for the
 // whole aSightedSkeptic build (its shared invariant 5); a later change to a prompt, a schema or the
 // lens set moves this literal again. It rides the print rather than the key's string, so the probe
