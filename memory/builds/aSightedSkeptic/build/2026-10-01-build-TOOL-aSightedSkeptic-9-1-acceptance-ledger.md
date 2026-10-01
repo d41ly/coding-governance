@@ -5,8 +5,8 @@
 `review_replay.py` scores a review report for recall against a past diff-review round's adjudicated
 items, lists the replayable records with `--corpus`, and declares 14 self-test arms that are the held
 leg `review-replay selftest`. Every reading below was taken on the build's tip, whose `tools/` is
-byte-identical to 149e89d6; `$KIT` is `tools/workflows`. AC8, the live replay, is the main loop's and
-is not evidenced in this record yet.
+byte-identical to 149e89d6; `$KIT` is `tools/workflows`. AC8, the live replay, is the main loop's;
+its evidence is the AC8 line below, and the run is in this build's live-replay record.
 
 **Evidences:** TOOL-aSightedSkeptic-9
 - AC1 — `selftest: 14/14 arms` — `python tools/workflows/review_replay.py --selftest` printed `ok`

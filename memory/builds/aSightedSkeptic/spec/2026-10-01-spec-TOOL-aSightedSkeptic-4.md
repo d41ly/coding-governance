@@ -1,6 +1,6 @@
 # TOOL-aSightedSkeptic-4 — a `checklist` argument whose classes are split across the lenses that run
 
-**Status:** CLOSED · rev-1 · 2026-10-01 · node a · Tier-2 · base ef1dcdb6 · streams tooling · order 4 · ratified 2026-10-01
+**Status:** CLOSED · rev-2 · 2026-10-01 · node a · Tier-2 · base ef1dcdb6 · streams tooling · order 4 · ratified 2026-10-01
 
 <!-- gen:spec-records -->
 
@@ -232,6 +232,10 @@ main loop's single suite run at `VERIFYING`, which the acceptance ledger cites.
   array, arm `checklist array: each element is one item` passes with the same split and no preamble.
   Red when: a CRLF string parses differently from its LF twin, or a continuation line lands in
   another lens's share.
+  Arm `checklist string: a line not starting "- " continues its item, indented or not` passes too
+  (rev-2): an UNINDENTED line after an item reaches only that item's prompt, under its `C<n>` line,
+  and the refusal's rule text says every later line not starting `- ` continues the item above it.
+  Red when: the rule text still says only indented lines continue an item, which S1 never said.
   permission: the suite run is the main loop's, at `VERIFYING`.
 - **AC3** — When the AC1 run is read, arm `checklist: the log names every lens's share` passes: the
   captured log holds one `checklist:` line naming each lens key with its labels, and the `synth`
@@ -303,6 +307,10 @@ New arm: `tools/workflows/tier2-review.test.sh` · stub-agent runs with a checkl
 
 - rev-1 · 2026-10-01 · initial draft, from the build's spec brief, the run mandate, the template read
   at `ef1dcdb6`, and two checklists `gotchas.py` produced for real ranges.
+- rev-2 · 2026-10-01 · fold of closing review round 1, L5 (finding 8): `parseChecklist`'s refusal and
+  rule text said indented lines continue an item, while S1, the code and the kit README all say every
+  following line does. The rule text now states S1's rule, the cheaper of the two options the skeptic
+  judged sound, since requiring indentation would refuse what S1 admits. AC2 gains the arm pinning it.
 
 ## 10. Reuse audit
 

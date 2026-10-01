@@ -1,6 +1,6 @@
 # TOOL-aSightedSkeptic-2 — the skeptic judges each finding's proposed fix as well as its claim
 
-**Status:** CLOSED · rev-1 · 2026-10-01 · node a · Tier-2 · base ef1dcdb6 · streams tooling · order 5 · ratified 2026-10-01
+**Status:** CLOSED · rev-2 · 2026-10-01 · node a · Tier-2 · base ef1dcdb6 · streams tooling · order 5 · ratified 2026-10-01
 
 <!-- gen:spec-records -->
 
@@ -32,8 +32,10 @@ judged is counted and announced rather than passed on as if it had been.
   tells the skeptic to judge the fix as a second, separate question: `sound` when applying it cures
   the defect and introduces none the skeptic can see in the code or spec it touches; `unsound` when it
   does not cure the defect, breaks a caller, an invariant or a sibling path, or introduces a defect
-  of its own; `none` when no fix was proposed. For `unsound` the `fixNote` says why and gives the
-  corrected fix when the skeptic has one. The prompt states that the fix verdict never changes the
+  of its own; `none` when no fix was proposed. For `unsound` the `fixNote` holds ONLY the corrected
+  fix and is empty when the skeptic has none, and why the fix is unsound goes in `reason`, so an
+  empty note is the one spelling of "no correction" and S3's branch reads exactly that (rev-2,
+  closing review finding 6). The prompt states that the fix verdict never changes the
   claim's verdict. The return line names both fields, and keeps the substring
   `(<n> verdicts, ids <list>)` the self-test's stub reads ids from. Observed by AC1.
 - **S3** — Disposition is unchanged by a fix verdict (§8 F1). A confirmed finding with an `unsound`
@@ -192,10 +194,21 @@ review records and built no arm.
   confirmed set.
 - **AC4** — Arm `fix verdict: an unsound fix with no correction is still to be designed` passes.
   Red when: an empty `fixNote` renders the finder's fix as the fix.
+  Arm `fix verdict: a reason-only unsound verdict is still to be designed, its why in reason` passes
+  too (rev-2): every verify prompt says `fixNote` holds ONLY the corrected fix and the why goes in
+  `reason`; with skeptics answering `unsound`, an empty note and the why in `reason`, every CONFIRMED
+  entry carries STILL TO BE DESIGNED and that reason on its why-real line, and every
+  `confirmedFindings` entry keeps the finder's fix beside `fixVerdict` `unsound`.
+  Red when: the prompt still asks for the why in `fixNote`, or that shape renders a correction.
 - **AC5** — Arm `fix verdict: an unjudged fix is counted, logged and named in RUN INTEGRITY` passes:
   with the existing stub verdicts, which carry no fix verdict, a log line opens `WARNING:` and names
   the unjudged ids, and the synthesis prompt carries `NOT JUDGED` in its RUN INTEGRITY block.
   Red when: an unjudged fix is silent in either place.
+  Arm `fix verdict: sound, none and unsound are each rendered and counted in RUN INTEGRITY` passes
+  too (rev-2): with skeptics answering `sound` for ids 1-2, `none` for id 3 and `unsound` with a note
+  for ids 4-5, the CONFIRMED entries carry `judged SOUND`, `none proposed` and REJECTED with the note,
+  and RUN INTEGRITY reads `2 judged sound, 2 judged UNSOUND, 1 none proposed, 0 NOT JUDGED`.
+  Red when: a `sound` or `none` verdict renders or counts as another value.
 - **AC6** — Arm `fix verdict: a verify file judged over another fix is dispatched` passes: a verify
   file carrying the print a run with the same ids and claims but another fix produced is not reused.
   Red when: `batchPrints` ignores the fix.
@@ -239,6 +252,11 @@ New arm: tools/workflows/tier2-review.test.sh · stub skeptics returning `unsoun
 
 - rev-1 · 2026-10-01 · initial draft, from the build's shared spec brief, the run mandate's finding 1,
   and the harness template read at `ef1dcdb6`.
+- rev-2 · 2026-10-01 · fold of closing review round 1, M3 (finding 6) and M5 (finding 15). M3: the
+  prompt asked for the why AND the correction in `fixNote`, so a reason-only note, the instructed
+  shape, was rendered as a correction; S2 now puts the why in `reason` and leaves `fixNote` for the
+  correction alone, the cheaper of the two fixes the skeptic judged sound. M5: no arm drove `sound`
+  or `none`; AC5 gains the three-value arm. AC4 gains the reason-only arm.
 
 ## 10. Reuse audit
 

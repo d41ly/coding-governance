@@ -224,14 +224,17 @@ if (isSpec) {
 // TOOL-aSightedSkeptic-3 S1/S3 - `specs`, the intent documents the caller names. Validated here,
 // before the base-shape ladder and the first agent, so a bad value refuses in milliseconds. A path
 // reaches a prompt as text an agent then reads, so anything that could point a reviewer outside the
-// repository - absolute, drive-lettered, backslashed or `..` - is refused rather than normalized.
-// The offender is an INDEX, never a value: `''` is one of the values refused (the D6 class above).
+// repository - absolute, home-relative (`~`), drive-lettered, backslashed or `..` - is refused rather
+// than normalized, and so is a control character, which would start a forged line in the brief
+// (closing review round 1, L1). The offender is an INDEX, never a value: `''` is one of the values
+// refused (the D6 class above).
 const SPECS = a.specs === undefined ? [] : a.specs
-const specsRule = 'an array of repo-relative paths, each a non-empty string with no backslash, no leading /, no drive letter and no .. segment'
+const specsRule = 'an array of repo-relative paths, each a non-empty string with no backslash, no leading / or ~, no drive letter, no .. segment and no control character'
 if (!Array.isArray(SPECS))
   throw new Error('tier2-review: `specs` must be ' + specsRule + '. Got ' + JSON.stringify(a.specs) + ', which is not an array.')
 const specsBadIdx = SPECS.findIndex(
-  (s) => typeof s !== 'string' || !s || s.indexOf('\\') !== -1 || s[0] === '/' || /^[A-Za-z]:/.test(s) || s.split('/').indexOf('..') !== -1
+  (s) => typeof s !== 'string' || !s || s.indexOf('\\') !== -1 || s[0] === '/' || s[0] === '~' || /[\x00-\x1f]/.test(s) ||
+    /^[A-Za-z]:/.test(s) || s.split('/').indexOf('..') !== -1
 )
 if (specsBadIdx !== -1)
   throw new Error('tier2-review: `specs` must be ' + specsRule + '. Member ' + specsBadIdx + ' is ' + JSON.stringify(SPECS[specsBadIdx]) + '.')
@@ -245,8 +248,10 @@ if (specsOverlap !== undefined)
 // string with no `- ` item line REFUSES rather than becoming one item: one item lands on one lens,
 // which is the whole-checklist-on-one-agent defect this argument exists to remove (spec F2).
 function parseChecklist(v) {
-  const rule = 'a string whose items are lines starting "- " (lines before the first item are a preamble, ' +
-    'indented lines after an item continue it) or an array of non-empty strings'
+  // Closing review round 1, L5 - the text says what the loop below does: ANY later line not starting
+  // "- " continues the item above it, indented or not (spec S1, and the kit README).
+  const rule = 'a string whose items are lines starting "- " (lines before the first item are a preamble; ' +
+    'every later line not starting "- " continues the item above it, indented or not) or an array of non-empty strings'
   if (v === undefined) return { preamble: '', items: [] }
   if (typeof v === 'string') {
     const pre = []
@@ -533,6 +538,13 @@ const runningLensKeys = LENS_KEYS.filter((k) => skippedLenses.indexOf(k) === -1)
 const lensesRunning = runningLensKeys.length
 if (skippedLenses.length)
   log(`WARNING: intensity light — the ${skippedLenses.join(', ')} lens(es) were NOT run; their classes are swept only through the checklist shares`)
+// Closing review round 1, L6 - a note for a lens this run skips reaches no prompt, so the log and RUN
+// INTEGRITY report it apart, as UNREAD. Wording only: the check above still accepts the key (spec 7's
+// non-goal), and the review key still carries it.
+const unreadNotes = notedLenses.filter((k) => skippedLenses.indexOf(k) !== -1)
+const readNotes = notedLenses.filter((k) => skippedLenses.indexOf(k) === -1)
+if (unreadNotes.length)
+  log(`WARNING: lens notes were supplied for skipped lens(es), unread: ${unreadNotes.join(', ')}`)
 // TOOL-aSightedSkeptic-4 S2-S6 - THE SPLIT. Item n goes to keys[(n - 1) % K], so every item is in
 // exactly one share and the split is a pure function of the items and the keys: a reused lens file
 // (S7) held the share this run would hand it. Round-robin, not contiguous `chunk`: a contiguous split
@@ -894,7 +906,10 @@ const verdictResults = await boundedParallel(
         `\n\nTHE FIX, A SECOND AND SEPARATE QUESTION. For each finding also judge its proposed fix, as \`fixVerdict\`: ` +
         `"sound" when applying it cures the defect and introduces none you can see in the ${isSpec ? 'spec' : 'code'} it touches; ` +
         `"unsound" when it does not cure the defect, breaks a caller, an invariant or a sibling path, or introduces a defect of its own; ` +
-        `"none" when no fix was proposed. For "unsound", \`fixNote\` says why and gives the corrected fix when you have one. ` +
+        // Closing review round 1, M3 - fixNote carries the CORRECTION and nothing else, so an empty note
+        // is the one way to say "no correction", and the harness branches on exactly that.
+        `"none" when no fix was proposed. For "unsound", \`fixNote\` holds ONLY the corrected fix, and is empty when you have none; ` +
+        `say why the fix is unsound in \`reason\`, never in \`fixNote\`. ` +
         `The fix verdict NEVER changes the finding's verdict: judge the claim on its own, then the fix on its own.` +
         `\n\nDURABILITY — BEFORE you return, Write the exact JSON object you are about to return, plus two more fields ` +
         `"key":"${reviewKey}" and "batch":"${batchPrints[gi]}", to ${keyDir}/verify-${group[0].id}-${group[group.length - 1].id}.json, ` +
@@ -948,7 +963,7 @@ function renderFixLine(f) {
   if (v.fixVerdict === 'none') return `fix: none proposed${f.fix ? ` (the finder wrote: ${f.fix})` : ''}`
   if (v.fixVerdict === 'unsound')
     return (note
-      ? `fix: REJECTED by the skeptic, whose note gives the reason and the corrected fix: ${note}`
+      ? `fix: REJECTED by the skeptic, whose corrected fix is: ${note}`
       : `fix: REJECTED by the skeptic, who gave no correction - the fix is STILL TO BE DESIGNED`) +
       ` (the finder's rejected proposal, never to be written as the fix: ${f.fix})`
   return `fix (NOT JUDGED - the finder's proposal only): ${f.fix}`
@@ -1031,7 +1046,8 @@ const ledger = allFindings.map((f) => {
   }
 })
 // S4 - the confirmed set in the shape `priorFindings` reads, so round N+1 is handed it rather than a
-// re-typed copy. A rejected fix is replaced by the skeptic's correction when one was given.
+// re-typed copy. A rejected fix is replaced by the skeptic's correction when one was given; with none,
+// the finder's fix stays, and `fixVerdict: 'unsound'` beside it marks it rejected.
 const confirmedFindings = confirmed.map((f) => {
   const v = verdictById.get(f.id)
   const fixVerdict = FIX_VERDICTS.indexOf(v.fixVerdict) !== -1 ? v.fixVerdict : null
@@ -1039,10 +1055,11 @@ const confirmedFindings = confirmed.map((f) => {
   return { id: f.id, lens: f.lens, ref: f.ref, claim: f.claim, severity: deriveBindingSeverity(f),
     fix: fixVerdict === 'unsound' && note ? note : f.fix, fixVerdict }
 })
-// S6 - one cell: absent as `-`, a pipe escaped, a CR/LF run folded to one space, so no claim or
-// reason can forge a row in the table TOOL-aSightedSkeptic-9 parses.
+// S6 - one cell: absent as `-`, a pipe escaped, and a run of any character Python's str.splitlines
+// breaks on folded to one space, so no claim or reason can forge or cut a row in the table
+// TOOL-aSightedSkeptic-9 parses (closing review round 1, L2: CR/LF alone let a U+2028 cut one).
 function renderCell(v) {
-  return v === null || v === undefined || v === '' ? '-' : String(v).replace(/[\r\n]+/g, ' ').replace(/\|/g, '\\|')
+  return v === null || v === undefined || v === '' ? '-' : String(v).replace(/[\r\n\x0b\x0c\x1c-\x1e\x85\u2028\u2029]+/g, ' ').replace(/\|/g, '\\|')
 }
 // The eight columns are the hand-off to TOOL-aSightedSkeptic-9; `claim` rides the ledger only (spec F4).
 function renderAppendix(rows) {
@@ -1170,7 +1187,8 @@ const synth = await agent(
     `${skepticRegradedIds.length} RE-GRADED by the skeptic; ` +
     `unverified findings: ${uncertainFindings.length} answered UNCERTAIN by a skeptic, ${noVerdict.length} with NO usable verdict; ` +
     (notedLenses.length
-      ? `lens notes supplied for: ${notedLenses.join(', ')}.\n`
+      ? `lens notes supplied for: ${readNotes.length ? readNotes.join(', ') : 'no lens that ran'}` +
+        (unreadNotes.length ? `; lens notes for skipped lenses, unread: ${unreadNotes.join(', ')}` : '') + `.\n`
       : `lens notes: none supplied, so every lens ran on the kit's generic brief.\n`) +
     // TOOL-aSightedSkeptic-7 S6 - a light run names every skipped lens; a full run carries no clause.
     (skippedLenses.length

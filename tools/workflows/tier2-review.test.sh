@@ -530,7 +530,9 @@ async function runWholeScriptArms() {
   }
   // ---- AC4: each malformed value refuses before any agent, naming the field.
   const refusedSpecs = [['not an array', 'a.md'], ['a non-string member', [7]], ['an empty member', ['']], ['a leading slash', ['/abs.md']],
-    ['a drive letter', ['C:/x.md']], ['a .. segment', ['a/../b.md']], ['a backslash', ['a\\b.md']], ['null', null]]
+    ['a drive letter', ['C:/x.md']], ['a .. segment', ['a/../b.md']], ['a backslash', ['a\\b.md']], ['null', null],
+    // Closing review round 1, L1: a home-relative path, and a newline that would forge a brief line.
+    ['a leading tilde', ['~/x.md']], ['a control character', ['a\nb.md']]]
   for (const [what, v] of refusedSpecs) {
     r = await runReview(Object.assign({}, DIFF, { specs: v }), ALL_OK)
     ck(typeof r.threw === 'string' && r.threw.indexOf('`specs`') !== -1 && r.trace.length === 0,
@@ -597,6 +599,17 @@ async function runWholeScriptArms() {
     const fp = scanPrompts(r, 'find:')
     ck(scanSplit(r, DIFF_ORDER) && fp.every((t) => t.prompt.indexOf('CHECKLIST') !== -1 && t.prompt.indexOf('PRE-ONE') === -1),
       'checklist array: each element is one item')
+  }
+  // ---- Closing review round 1, L5: a line NOT indented still continues the item above it, and the
+  // ---- refusal's rule text says so. Item 1 is the security lens's share.
+  r = await runReview(Object.assign({}, DIFF, { checklist: '- CLAQ1X\nTRAILQX\n- CLAQ2X' }), ALL_OK)
+  const rrule = await runReview(Object.assign({}, DIFF, { checklist: 'no item line here' }), ALL_OK)
+  if (checkNoThrow(r, 'checklist unindented continuation')) {
+    const fp = scanPrompts(r, 'find:')
+    ck(fp.length === 5 && fp.filter((t) => t.prompt.indexOf('TRAILQX') !== -1).map((t) => t.label).join(' ') === 'find:security' &&
+      /(^|\n)C1 CLAQ1X\nTRAILQX/.test(fp[0].prompt) && typeof rrule.threw === 'string' &&
+      rrule.threw.indexOf('every later line not starting "- " continues the item above it, indented or not') !== -1,
+      'checklist string: a line not starting "- " continues its item, indented or not')
   }
   // ---- AC3: the assignment is recoverable from the log and RUN INTEGRITY; an empty share is said.
   if (rcl.result) {
@@ -701,6 +714,44 @@ async function runWholeScriptArms() {
     const ce = scanConfirmedEntries(r)
     ck(ce.length === 5 && ce.every((e) => e.indexOf('REJECTED') !== -1 && e.indexOf('STILL TO BE DESIGNED') !== -1),
       'fix verdict: an unsound fix with no correction is still to be designed')
+  }
+  // ---- Closing review round 1, M3: the INSTRUCTED shape of "unsound, no correction" is an empty note
+  // ---- with the why in `reason`; the verify prompt says so, and that shape renders STILL TO BE
+  // ---- DESIGNED with the why on the why-real line and the finder's fix, marked unsound, handed on.
+  r = await runReview(DIFF, buildStubs({ 'verify:': (label, prompt) => {
+    const vr = buildFixVerdicts('unsound', '')(label, prompt)
+    for (const v of vr.verdicts) v.reason = 'WHYMARK-' + v.id
+    return vr
+  } }))
+  if (checkNoThrow(r, 'fix verdict reason only')) {
+    const ce = scanConfirmedEntries(r)
+    const vp = scanPrompts(r, 'verify:')
+    const cf3 = Array.isArray(r.result.confirmedFindings) ? r.result.confirmedFindings : []
+    ck(vp.length === 5 && vp.every((t) => t.prompt.indexOf('`fixNote` holds ONLY the corrected fix, and is empty when you have none') !== -1 &&
+      t.prompt.indexOf('say why the fix is unsound in `reason`') !== -1) &&
+      ce.length === 5 && ce.every((e, i) => e.indexOf('STILL TO BE DESIGNED') !== -1 && e.indexOf('why-real: WHYMARK-' + (i + 1)) !== -1) &&
+      cf3.length === 5 && cf3.every((e) => e.fix === 'f' && e.fixVerdict === 'unsound'),
+      'fix verdict: a reason-only unsound verdict is still to be designed, its why in reason')
+  }
+  // ---- Closing review round 1, M5: sound, none and unsound in one run, each rendered on its own
+  // ---- CONFIRMED entry and each counted in RUN INTEGRITY.
+  r = await runReview(DIFF, buildStubs({ 'find:': buildFixLens, 'verify:': (label, prompt) => {
+    const vr = buildVerdicts('confirmed')(label, prompt)
+    for (const v of vr.verdicts) {
+      v.fixVerdict = v.id <= 2 ? 'sound' : v.id === 3 ? 'none' : 'unsound'
+      if (v.id > 3) v.fixNote = 'CORR-' + v.id
+    }
+    return vr
+  } }))
+  if (checkNoThrow(r, 'fix verdict three values')) {
+    const ce = scanConfirmedEntries(r)
+    const sp = r.trace.find((t) => t.label === 'synth')
+    const ri = sp ? sp.prompt.slice(sp.prompt.indexOf('RUN INTEGRITY')) : ''
+    ck(ce.length === 5 && ce.slice(0, 2).every((e) => e.indexOf('fix (judged SOUND by the skeptic): FIXMARK-') !== -1) &&
+      ce[2].indexOf('fix: none proposed') !== -1 &&
+      ce.slice(3).every((e, i) => e.indexOf('REJECTED') !== -1 && e.indexOf('CORR-' + (i + 4)) !== -1) &&
+      ri.indexOf('2 judged sound, 2 judged UNSOUND, 1 none proposed, 0 NOT JUDGED') !== -1,
+      'fix verdict: sound, none and unsound are each rendered and counted in RUN INTEGRITY')
   }
   // ---- AC5: the existing stub verdicts carry no fixVerdict, so all five confirmed fixes are unjudged.
   if (checkNoThrow(rbase, 'fix verdict unjudged')) {
@@ -870,6 +921,17 @@ async function runWholeScriptArms() {
   if (checkNoThrow(rl6, 'light checklist') && checkNoThrow(rf6, 'full checklist')) {
     ck(scanSix(rl6, 3) && scanSix(rf6, 5), 'intensity: every checklist item reaches a running lens')
   }
+  // ---- Closing review round 1, L6: a note for a lens the light run skipped is reported UNREAD, in the
+  // ---- log and RUN INTEGRITY, and is never listed as supplied for a lens that ran.
+  r = await runReview(Object.assign({}, LIGHT, { lensNotes: { security: 'n' } }), ALL_OK)
+  if (checkNoThrow(r, 'light run skipped-lens note')) {
+    const sp = r.trace.find((t) => t.label === 'synth')
+    const ri = sp ? sp.prompt.slice(sp.prompt.indexOf('RUN INTEGRITY')) : ''
+    ck(ri.indexOf('lens notes supplied for: no lens that ran; lens notes for skipped lenses, unread: security.') !== -1 &&
+      ri.indexOf('lens notes supplied for: security') === -1 &&
+      r.logs.some((l) => l.indexOf('WARNING:') === 0 && l.indexOf('unread: security') !== -1),
+      'intensity: a lens note for a skipped lens is reported unread')
+  }
   await runLedgerArms()
 }
 
@@ -971,6 +1033,15 @@ async function runLedgerArms() {
       c2.filter((e, i) => i !== 1).every((e) => e.fix === 'f' && e.severity === 'high'),
       'ledger: confirmedFindings feeds the next round: a rejected fix is replaced by the skeptic\'s note, at the binding grade')
   }
+  // ---- Closing review round 1, L3 (finding 16): an EMPTY or blank note is no correction, so the
+  // ---- finder's fix stays, marked by fixVerdict unsound; dropping the `&& note` guard hands on ''.
+  for (const [what, note] of [['an empty note', ''], ['a blank note', '   ']]) {
+    r = await runReview(DIFF, buildStubs({ 'verify:ids-2-2': { path: '/v', verdicts: [{ id: 2, verdict: 'confirmed', reason: 'r', fixVerdict: 'unsound', fixNote: note }] } }))
+    if (!checkNoThrow(r, 'ledger unsound ' + what)) continue
+    const c3 = Array.isArray(r.result.confirmedFindings) ? r.result.confirmedFindings : []
+    ck(c3.length === 5 && c3[1].fix === 'f' && c3[1].fixVerdict === 'unsound',
+      'ledger: confirmedFindings feeds the next round: an unsound fix with ' + what + ' keeps the finder\'s fix, marked unsound')
+  }
   r = await runReview(Object.assign({}, DIFF, { round: 2, priorFindings: cf }), ALL_OK)
   if (checkNoThrow(r, 'ledger round two')) {
     const f2 = scanPrompts(r, 'find:')
@@ -1001,6 +1072,15 @@ async function runLedgerArms() {
     ck(ap.length > 0 && !!sp && sp.prompt.indexOf(ap) !== -1 && sp.prompt.indexOf('VERBATIM') !== -1,
       'ledger: the appendix is handed to the synthesis verbatim')
   }
+  // ---- Closing review round 1, L2: a reason carrying every other boundary Python's str.splitlines
+  // ---- breaks on. The appendix must split into the same lines under that rule as under `\n`.
+  r = await runReview(DIFF, buildStubs({ 'verify:ids-1-1': { path: '/v', verdicts: [{ id: 1, verdict: 'refuted', reason: 'p\u2028q\u2029r\x85s\x0bt\x0cu\x1cv\x1ew' }] } }))
+  if (checkNoThrow(r, 'ledger appendix splitlines')) {
+    const ap = typeof r.result.appendix === 'string' ? r.result.appendix : ''
+    const al = ap.split('\n')
+    ck(al.length === 9 && ap.split(/\r\n|[\n\r\x0b\x0c\x1c-\x1e\x85\u2028\u2029]/).length === al.length && al[4].indexOf('| p q r s t u v w |') !== -1,
+      'ledger: the appendix is rendered by the harness: a U+2028 in a reason cell leaves the row count unchanged')
+  }
 
   // ---- AC6: six exit paths. `confirmed` keeps its per-path type, which unattended-build.js reads.
   const fieldsOk = (run) => !!run.result && Array.isArray(run.result.ledger) && Array.isArray(run.result.confirmedFindings) && typeof run.result.appendix === 'string'
@@ -1014,12 +1094,20 @@ async function runLedgerArms() {
     ['the synthesis dead', buildStubs({ synth: null }), 'integer', (x) => x.exit === 'deferred-platform' && x.ledger.length === 5 && x.confirmedFindings.length === 5],
     ['complete', ALL_OK, 'integer', (x) => x.exit === 'complete' && x.ledger.length === 5 && x.confirmedFindings.length === 5 && x.appendix.length > 0],
   ]
+  // Closing review round 1, L3 (finding 19): `regraded` is an array where a synthesis ran, which is the
+  // complete path alone, and ABSENT on the other five, since no adjudicated count exists there.
+  let regradedSeen = 0
+  const regradedWrong = []
   for (const [what, stubs, ctype, extra] of paths) {
     r = await runReview(DIFF, stubs)
     if (!checkNoThrow(r, 'ledger exit ' + what)) continue
     const typed = ctype === 'array' ? Array.isArray(r.result.confirmed) : Number.isInteger(r.result.confirmed)
     ck(fieldsOk(r) && typed && extra(r.result), 'ledger: every exit path carries the ledger: ' + what)
+    regradedSeen++
+    if (what === 'complete' ? !Array.isArray(r.result.regraded) : 'regraded' in r.result) regradedWrong.push(what)
   }
+  ck(regradedSeen === 6 && regradedWrong.length === 0,
+    'severity: regraded is returned only where a synthesis ran, over the six exit paths' + (regradedWrong.length ? ' — wrong on: ' + regradedWrong.join(', ') : ''))
 }
 
 runWholeScriptArms().then(() => {
@@ -1067,7 +1155,11 @@ printf '%s\n' "$out"
 # lens on a complete, an echoing and a reused run (3), the lens on the verify, synthesis and deferred-log
 # lines (3), the verdict states and their null fields (2), confirmedFindings, the rejected fix and the
 # round-2 hand-off (3), the appendix table, its escaping and the synthesis hand-off (3) and six exit paths (6).
-FLOOR_ASSERTIONS=165
+# RAISED 165 -> 175 by the closing review's round-1 fold of the harness-side mediums and lows: 10
+# assertions, counted off the block — two refused specs values (2), the unindented continuation (1), the
+# reason-only unsound verdict (1), the three fix verdicts together (1), the unread skipped-lens note (1),
+# the empty and blank unsound notes (2), the splitlines boundaries in a cell (1) and regraded per exit path (1).
+FLOOR_ASSERTIONS=175
 executed=$(printf '%s\n' "$out" | sed -n 's/^---- \([0-9][0-9]*\) passed.*/\1/p' | tail -1)
 if [ -z "$executed" ]; then
   echo "FAIL the runner printed no assertion count at all — it died before its summary line"

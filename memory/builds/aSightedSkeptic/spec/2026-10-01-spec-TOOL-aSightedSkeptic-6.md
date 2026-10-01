@@ -1,6 +1,6 @@
 # TOOL-aSightedSkeptic-6 — one severity rubric, a skeptic's binding grade, and an uncertain verdict
 
-**Status:** CLOSED · rev-1 · 2026-10-01 · node a · Tier-2 · base ef1dcdb6 · streams tooling · order 6 · ratified 2026-10-01
+**Status:** CLOSED · rev-2 · 2026-10-01 · node a · Tier-2 · base ef1dcdb6 · streams tooling · order 6 · ratified 2026-10-01
 
 <!-- gen:spec-records -->
 
@@ -217,6 +217,10 @@ built no arm.
   passes: skeptics confirming at `blocker` and the stub synthesis placing every id in one HIGH item
   return those ids in `regraded`, with `highs` counted from the items as before.
   Red when: `regraded` is empty, or `blockers` and `highs` stop being counted from the items.
+  Arm `severity: regraded is returned only where a synthesis ran, over the six exit paths` passes
+  too (rev-2): over unit 8's six exit-path runs, `regraded` is an array on `complete` and absent on
+  the other five, the synthesis-death path among them.
+  Red when: `regraded` is returned unconditionally, so a run with no adjudication reads "no id moved".
 - **AC7** — When `grep -c 'SEVERITY_RUBRIC' tools/workflows/tier2-review.template.js` and the same grep
   over `tools/workflows/tier2-review.js` run, both print the same count of at least 4, where BASE
   prints 0, the definition and its three interpolations; and
@@ -269,6 +273,9 @@ New arm: tools/workflows/tier2-review.test.sh · stub skeptics returning a grade
 
 - rev-1 · 2026-10-01 · initial draft, from the build's shared spec brief, the run mandate's finding 6,
   and the harness template read at `ef1dcdb6`.
+- rev-2 · 2026-10-01 · fold of closing review round 1, L3 (finding 19): S7 says `regraded` is absent
+  where no synthesis ran and cited AC6, whose arm read only a synthesis run, so an unconditional
+  `regraded` stayed green. AC6 gains the six-exit-path arm; the code was already right.
 
 ## 10. Reuse audit
 

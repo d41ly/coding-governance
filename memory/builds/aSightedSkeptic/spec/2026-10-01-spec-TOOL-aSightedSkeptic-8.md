@@ -1,6 +1,6 @@
 # TOOL-aSightedSkeptic-8 — every finding keeps its lens, a findings ledger lands beside the report, and the confirmed set is returned
 
-**Status:** CLOSED · rev-1 · 2026-10-01 · node a · Tier-2 · base ef1dcdb6 · streams tooling · order 8 · ratified 2026-10-01
+**Status:** CLOSED · rev-2 · 2026-10-01 · node a · Tier-2 · base ef1dcdb6 · streams tooling · order 8 · ratified 2026-10-01
 
 <!-- gen:spec-records -->
 
@@ -47,9 +47,10 @@ appendix table of the ledger that the synthesis copies into the report.
 - **S4** — `confirmedFindings` holds one entry per CONFIRMED finding in id order with `id`, `lens`,
   `ref`, `claim`, `severity`, `fix` and `fixVerdict`. `severity` is the binding grade
   `TOOL-aSightedSkeptic-6`'s `deriveBindingSeverity(f)` returns. `fix` is the skeptic's `fixNote`
-  when `fixVerdict` is `unsound` and the note is not empty, else the finder's `fix`, so a rejected
-  fix is never handed to the next round. The entry is a legal `priorFindings` element as it stands.
-  Observed by AC4.
+  when `fixVerdict` is `unsound` and the note is not empty after trimming, else the finder's `fix`,
+  so a corrected fix is handed to the next round wherever the skeptic gave one; with none, the
+  finder's fix stays and `fixVerdict` `unsound` beside it marks it rejected (rev-2). The entry is
+  a legal `priorFindings` element as it stands. Observed by AC4.
 - **S5** — Every return carries `ledger`, `confirmedFindings` and `appendix`, on every exit path. The
   two paths that exit before the verify stage, every lens dead and no finding raised, carry `[]`,
   `[]` and `''`. The every-finding-refuted path carries the full ledger, an empty
@@ -61,7 +62,9 @@ appendix table of the ledger that the synthesis copies into the report.
   `## Appendix — every finding`, a blank line, a header row with the eight columns
   `id | lens | ref | severity | skepticSeverity | verdict | reason | fixVerdict` in that order, the
   separator row, and one row per ledger entry in id order. `renderCell(v)` writes each cell: `null`
-  and `''` as `-`, every `|` as `\|`, and each run of CR or LF as one space. It is rendered once,
+  and `''` as `-`, every `|` as `\|`, and each run of any character Python's `str.splitlines` breaks
+  on (CR, LF, VT, FF, the 0x1C-0x1E separators, NEL, U+2028 and U+2029) as one space (rev-2), so
+  `TOOL-aSightedSkeptic-9`'s parser and this renderer agree on what a line is. It is rendered once,
   after the verify stage, from the same `ledger` the return carries. Observed by AC5.
 - **S7** — The synthesis prompt hands the appendix to the agent and tells it to append it VERBATIM as
   the report's last section, after everything else and unedited. The harness does not verify the copy
@@ -217,15 +220,20 @@ The prompts change, which `REVIEW_SHAPE` already accounts for once for the build
   `confirmedFindings` has as many entries as its `confirmed` count, each carrying `ref`, `claim`,
   `severity` and `fix`; a confirmed finding whose verdict carries `fixVerdict` `unsound` and
   `fixNote` `better fix` returns `fix` `better fix`; and a round-2 run given that array as
-  `priorFindings` carries each `<ref> - <claim>` in every `find:` prompt.
-  Red when: the return carries only a count, or a rejected fix is handed to the next round.
+  `priorFindings` carries each `<ref> - <claim>` in every `find:` prompt. With `fixNote` `''` and
+  with `'   '` (rev-2), the same finding returns the finder's `fix` `f` beside `fixVerdict`
+  `unsound`.
+  Red when: the return carries only a count, a correction given is not handed on, or an empty or
+  blank note is handed on as the fix.
 - **AC5** — Arm `ledger: the appendix is rendered by the harness and handed to the synthesis`
   passes: the result's `appendix` opens with `## Appendix — every finding`, carries the eight-column
   header in order and one row per ledger entry, refuted ones included; the `synth` prompt contains
   that text verbatim; and a finding whose claim and reason carry `|` and a newline leaves the row
-  count unchanged.
-  Red when: a refuted finding has no row, an unescaped pipe splits a row, or the synthesis is not
-  handed the table.
+  count unchanged. A reason carrying U+2028, U+2029, NEL, VT, FF and the 0x1C-0x1E separators
+  (rev-2) leaves the appendix splitting into the same lines under Python's `str.splitlines` rule as
+  under `\n`, the reason's cell reading one space per separator.
+  Red when: a refuted finding has no row, an unescaped pipe splits a row, a cell holds a character
+  `str.splitlines` breaks on, or the synthesis is not handed the table.
 - **AC6** — Arm `ledger: every exit path carries the ledger` passes over six runs: every lens dead,
   no finding raised, every finding refuted, one skeptic batch dead, the synthesis dead, and complete.
   Each returns `ledger` and `confirmedFindings` as arrays and `appendix` as a string; the refuted
@@ -284,6 +292,15 @@ record whose table it cannot parse.
 - rev-1 · 2026-10-01 · initial draft, from the owner's mandate, the build's spec brief, the harness
   template and its self-test read at `ef1dcdb6`, and the sibling specs of units 2, 5, 6 and 7 as
   authored in this run.
+- rev-2 · 2026-10-01 · fold of closing review round 1. L2 (finding 3), harness side: `renderCell`
+  folded only CR and LF while the unit 9 parser splits on every `str.splitlines` boundary, so a
+  U+2028 in a cell cut the table, and the round-1 record itself carries one; S6 now folds them all
+  and AC5 gains the arm (the parser side is unit 9's fold). L3 (finding 16): no arm broke the
+  empty-note guard on `confirmedFindings[].fix`; AC4 gains an empty and a blank note, and S4 now says
+  what the code and unit 2's rev-2 build: a note-less rejection keeps the finder's fix, marked by
+  `fixVerdict`. L7 (finding 12): the codebase-map dossier's Gaps bullet claimed the three review
+  pipelines carry the same accounting; it now names what `tier2-review.js` gained here that the
+  drift-audit siblings lack.
 
 ## 10. Reuse audit
 

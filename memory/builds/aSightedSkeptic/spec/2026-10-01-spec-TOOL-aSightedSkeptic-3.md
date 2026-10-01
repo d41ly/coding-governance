@@ -1,6 +1,6 @@
 # TOOL-aSightedSkeptic-3 — finders and skeptics are handed intent: a `specs` argument, and the range's commit messages by default
 
-**Status:** CLOSED · rev-1 · 2026-10-01 · node a · Tier-2 · base ef1dcdb6 · streams tooling · order 3 · ratified 2026-10-01
+**Status:** CLOSED · rev-2 · 2026-10-01 · node a · Tier-2 · base ef1dcdb6 · streams tooling · order 3 · ratified 2026-10-01
 
 <!-- gen:spec-records -->
 
@@ -28,9 +28,10 @@ the range's commit messages, which exist in every git repository and so need no 
 - **S1** — `args.specs` is read in the prelude, after the `kind` check and before the base-shape
   ladder, so a bad value refuses before any agent spawns (invariant 3 of the build's spec brief).
   Absent (`undefined`) it is the empty list. Present, it must be an array whose every member is a
-  non-empty string that is repo-relative: no backslash, no leading `/`, no drive letter and no `..`
-  segment. Anything else throws an Error whose message opens `tier2-review:` and names `specs`, the
-  rule, the offending index and the value given. Observed by AC4.
+  non-empty string that is repo-relative: no backslash, no leading `/` or `~`, no drive letter, no
+  `..` segment and no character below 0x20 (rev-2). Anything else throws an Error whose message
+  opens `tier2-review:` and names `specs`, the rule, the offending index and the value given.
+  Observed by AC4.
 - **S2** — `renderIntent()` is minted and called from `renderBrief(role)`, so the same INTENT block
   reaches every finder prompt and every skeptic prompt. For the diff kind it names each spec path
   with the instruction to read the ones a lens or a finding touches, says that the intent lens reads
@@ -164,6 +165,8 @@ specs: ['C:/x.md']     // a drive letter
 specs: ['a/../b.md']   // a .. segment
 specs: ['a\\b.md']     // a backslash, as a JS string literal
 specs: null            // present, and not an array
+specs: ['~/x.md']      // a leading tilde, home-relative (rev-2)
+specs: ['a\nb.md']     // a control character, as a JS string literal (rev-2)
 ```
 
 ### Inventory
@@ -296,6 +299,10 @@ New arm: `tools/workflows/tier2-review.test.sh` · stub-agent runs with `specs` 
 
 - rev-1 · 2026-10-01 · initial draft, from the build's spec brief, the run mandate and the template
   read at `ef1dcdb6`.
+- rev-2 · 2026-10-01 · fold of closing review round 1, L1 (finding 2): S1's rule admitted `~/x`,
+  though the code comment claims anything pointing outside the repository is refused, and a member
+  carrying a newline was interpolated raw as a brief line. S1 and §4 "Refused values" gain a leading
+  `~` and a character below 0x20; AC4 reads that list, so its two new arms follow without a text edit.
 
 ## 10. Reuse audit
 

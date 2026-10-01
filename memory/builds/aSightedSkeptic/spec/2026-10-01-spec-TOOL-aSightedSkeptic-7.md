@@ -1,6 +1,6 @@
 # TOOL-aSightedSkeptic-7 — an intensity argument whose light setting announces the lenses it skips
 
-**Status:** CLOSED · rev-1 · 2026-10-01 · node a · Tier-2 · base ef1dcdb6 · streams tooling · order 7 · ratified 2026-10-01
+**Status:** CLOSED · rev-2 · 2026-10-01 · node a · Tier-2 · base ef1dcdb6 · streams tooling · order 7 · ratified 2026-10-01
 
 <!-- gen:spec-records -->
 
@@ -54,7 +54,10 @@ return which lenses it skipped.
   review-shape sentence on every run, and on a light run the RUN INTEGRITY block gains a clause
   naming each skipped key, saying their classes were swept only through the checklist shares, and
   telling the synthesis not to describe the run as a full review. The verdict token set is unchanged.
-  Every return carries `intensity` and `skippedLenses`, on every exit path. Observed by AC3, AC4.
+  Every return carries `intensity` and `skippedLenses`, on every exit path. A `lensNotes` key naming a
+  skipped lens reached no prompt, so the log's `WARNING:` line and RUN INTEGRITY report it apart, as
+  `lens notes for skipped lenses, unread`, and never as supplied for a lens that ran (rev-2).
+  Observed by AC3, AC4.
 - **S7** — The checklist split of `TOOL-aSightedSkeptic-4` is taken over the lenses that RUN: on a
   light run every item of `CHECKLIST_ITEMS` is assigned to exactly one lens outside `skippedLenses`,
   so a skipped lens takes no share and no item is lost with it. Observed by AC6.
@@ -78,7 +81,8 @@ return which lenses it skipped.
 - Retuning `LIGHT_LENSES` from per-lens yield. That needs the lens-labelled ledger of
   `TOOL-aSightedSkeptic-8` and enough runs to read it; the literal is one edit away when they exist.
 - Special handling of `args.lensNotes` naming a skipped lens. It names a lens of the current kind, so
-  `TOOL-aSightedSkeptic-5`'s check accepts it, and the WARNING line names the skipped lens.
+  `TOOL-aSightedSkeptic-5`'s check accepts it, and the WARNING line names the skipped lens. S6's
+  "unread" wording (rev-2) is reporting, not handling: the key is still accepted and still keyed.
 - `MAX_VERIFIERS`, the verify batching, `tools/hooks/agent-cap.js`, `REVIEW_SHAPE` and the version.
 - Any governance carrier. `memory/guides/REVIEW-PROTOCOL.md` says "Review light, or skip" and its
   M8 counterpart in `memory/guides/BUILD-METHOD.md` shows an invocation without `intensity`; both
@@ -209,6 +213,11 @@ moved once for the build, so no new reuse loss is introduced.
   block names both and the word `light`; a full run's `synth` prompt names the intensity `full` and
   carries no skipped-lens clause.
   Red when: a lens is skipped silently, or the full run's report is told lenses were skipped.
+  Arm `intensity: a lens note for a skipped lens is reported unread` passes too (rev-2): a light run
+  given `lensNotes {security: …}` carries, in RUN INTEGRITY,
+  `lens notes supplied for: no lens that ran; lens notes for skipped lenses, unread: security.`,
+  never `lens notes supplied for: security`, and logs a `WARNING:` line naming `unread: security`.
+  Red when: a note no prompt carried is reported as supplied for a lens.
 - **AC5** — Arm `intensity: LIGHT_LENSES must name live lenses` passes: a copy of the script whose
   `LIGHT_LENSES` literal names `verificaton` throws naming `LIGHT_LENSES` with no agent traced, and
   so does a copy whose literal is empty.
@@ -270,6 +279,10 @@ it is handed, which is what the self-test's own header says it grades.
 
 - rev-1 · 2026-10-01 · initial draft, from the owner's mandate, the build's spec brief, and the
   harness template and its self-test read at `ef1dcdb6`.
+- rev-2 · 2026-10-01 · fold of closing review round 1, L6 (finding 11; its sibling finding 7 was
+  refuted as by design under the §3 non-goal): RUN INTEGRITY listed a light run's note for a skipped
+  lens as supplied. S6 now reports such notes apart as unread, in the log and RUN INTEGRITY, which is
+  wording only and leaves the non-goal standing. AC4 gains the arm.
 
 ## 10. Reuse audit
 
