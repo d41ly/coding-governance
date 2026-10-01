@@ -1,11 +1,12 @@
 # TOOL-dMendedRecall-3 — the verb contract's `--status` entry names every field the line prints, the pinned-asks and holder-worktree verdicts among them
 
-**Status:** SPECCED · rev-1 · 2026-10-01 · node d · Tier-2 · base 1f915870 · streams tooling · order 1 · closes TOOL-dAlignedCarrier-7 · ratified 2026-10-01
+**Status:** CLOSED · rev-1 · 2026-10-01 · node d · Tier-2 · base 1f915870 · streams tooling · order 1 · closes TOOL-dAlignedCarrier-7 · ratified 2026-10-01
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-01-build-TOOL-dMendedRecall-3-1-acceptance-ledger.md](../build/2026-10-01-build-TOOL-dMendedRecall-3-1-acceptance-ledger.md) | journal | — |
 | [2026-10-01-prompt-TOOL-dMendedRecall-1-build-brief.md](../prompts/2026-10-01-prompt-TOOL-dMendedRecall-1-build-brief.md) | journal | TOOL-dMendedRecall-1 TOOL-dMendedRecall-2 |
 | [2026-10-01-prompt-TOOL-dMendedRecall-1-spec-brief.md](../prompts/2026-10-01-prompt-TOOL-dMendedRecall-1-spec-brief.md) | journal | TOOL-dMendedRecall-1 TOOL-dMendedRecall-2 |
 

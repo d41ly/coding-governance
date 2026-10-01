@@ -45,7 +45,7 @@ Read at the working tree, each ask below is filed and live in the build that rai
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 3 unit(s) · node d · opened 2026-10-01 · streams tooling
+**Build status:** CLOSED · 3 unit(s) · node d · opened 2026-10-01 · streams tooling
 ids TOOL-dMendedRecall-1 TOOL-dMendedRecall-2 TOOL-dMendedRecall-3
 
 <!-- gen:build-units -->
@@ -53,10 +53,10 @@ ids TOOL-dMendedRecall-1 TOOL-dMendedRecall-2 TOOL-dMendedRecall-3
 |---|---|---|---|---|---|
 | [TOOL-dMendedRecall-1 — the recall selftest's memory-tree fixture carries the kit's python surface, and the spec-H1 arm reads only that](spec/2026-10-01-spec-TOOL-dMendedRecall-1.md) | 1 | 2 | CLOSED | rev-1 | 2026-10-01 |
 | [TOOL-dMendedRecall-2 — the inherited-red auto-file re-renders the generated views it makes stale, and stages them with its rows](spec/2026-10-01-spec-TOOL-dMendedRecall-2.md) | 1 | 2 | CLOSED | rev-2 | 2026-10-01 |
-| [TOOL-dMendedRecall-3 — the verb contract's `--status` entry names every field the line prints, the pinned-asks and holder-worktree verdicts among them](spec/2026-10-01-spec-TOOL-dMendedRecall-3.md) | 1 | 2 | SPECCED | rev-1 | 2026-10-01 |
+| [TOOL-dMendedRecall-3 — the verb contract's `--status` entry names every field the line prints, the pinned-asks and holder-worktree verdicts among them](spec/2026-10-01-spec-TOOL-dMendedRecall-3.md) | 1 | 2 | CLOSED | rev-1 | 2026-10-01 |
 <!-- /gen:build-units -->
 
-Records: 4 bound to this build, across 3 record folder(s).
+Records: 5 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
