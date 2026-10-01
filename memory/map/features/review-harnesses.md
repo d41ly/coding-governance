@@ -12,6 +12,7 @@ gate-legs = [
   "workflow script syntax",
   "review-join ban (no ref-keyed join)",
   "review-join self-test",
+  "review-replay selftest",
   "tier2-review self-test",
   "unattended-build self-test",
 ]
@@ -107,6 +108,13 @@ and refuses a `ground` that does not name it, so a hand-composed dispatch cannot
 different root from the one its grounding sentence tells the agent to use (`TOOL-aProbedUnit-4`).
 `tier2-review.js` and the drift-audit siblings still tell their agents nothing about temporary
 files.
+
+**`review_replay.py` scores a review for RECALL against a past round** (`TOOL-aSightedSkeptic-9`):
+`--known` reads a past diff-review record's adjudicated items (its finding appendix, else its legacy
+item table), `--candidate` reads the appendix of a report the harness wrote, and both are refused
+unless they reproduce their own stated confirmed count. `--corpus` lists the replayable records with
+ONE `git cat-file` for the whole walk. Its `--selftest` is the held leg `review-replay selftest`,
+declared in this kit's `kit.toml` because the tool ships, unlike the `*.test.sh` suites beside it.
 
 ## Gaps
 

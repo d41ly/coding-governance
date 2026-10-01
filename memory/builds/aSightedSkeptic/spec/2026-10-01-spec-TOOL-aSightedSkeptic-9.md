@@ -1,6 +1,6 @@
 # TOOL-aSightedSkeptic-9 — the replay benchmark: a review scored for recall against a past round
 
-**Status:** SPECCED · rev-1 · 2026-10-01 · node a · Tier-2 · base ef1dcdb6 · streams tooling · order 9 · ratified 2026-10-01
+**Status:** CLOSED · rev-2 · 2026-10-01 · node a · Tier-2 · base ef1dcdb6 · streams tooling · order 9 · ratified 2026-10-01
 
 <!-- gen:spec-records -->
 
@@ -285,7 +285,7 @@ New gate leg name: `review-replay selftest`.
 
 ## 7. Gates
 
-`verifier fan-out self-test` · `tier2-review self-test` · `unattended-build self-test` · `review-join self-test` · `run-gates canary` · `run-gates gov canary` · `govkit selfcheck` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `recall floor` · `recall floor arms` · `codebase-map gate coverage` · `encoding posture (text IO names its encoding)` · `lexicon naming predicates` · `kit epoch (shipped bytes move, the version moves)`
+`verifier fan-out self-test` · `tier2-review self-test` · `unattended-build self-test` · `review-join self-test` · `run-gates canary` · `run-gates gov canary` · `govkit selfcheck` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `recall floor` · `recall floor arms` · `codebase-map gate coverage` · `encoding posture (text IO names its encoding)` · `lexicon naming predicates` · `kit epoch (shipped bytes move, the version moves)` · `review-replay selftest`
 
 The new leg is the one this unit adds. The four `tools/workflows/` self-tests, the two canaries,
 the three `tools/govkit/` legs and the two recall-floor legs are owed because the §4 file estimate
@@ -326,6 +326,9 @@ its failing case.
 
 - rev-1 · 2026-10-01 · initial draft, authored under the run mandate with no spec audit (owner,
   2026-10-01).
+- rev-2 · 2026-10-01 · built. §7 names the new leg `review-replay selftest` now that it exists in
+  `tools/gate-legs.json`. §4's file estimate missed one write the new held leg owes: a budget row in
+  `tools/run-gates/selftest-budgets.txt`, which grades every held leg, so the build adds it.
 
 ## 10. Reuse audit
 

@@ -222,6 +222,53 @@ reaches a record, and the harness cannot check it was made: compare the report a
 `appendix`. A run whose every finding is refuted writes no report, so there the appendix exists in the
 return alone, and the caller writes it down if it wants one.
 
+## `review_replay.py` — a review scored for recall against a past round
+
+Stdlib Python, run under the repo's python launcher. It answers one question nothing else here can:
+does a lens set or a prompt change find MORE of what a previous review proved real? Three modes:
+
+- `python3 {kit}/review_replay.py --known <record> --candidate <report> [--window N]` — the score.
+  The known set is the past diff-review record's ADJUDICATED ITEMS, read from its
+  `## Appendix — every finding` when it has one, else from its legacy item table (a row whose
+  second cell is a severity and whose last cell lists raw finding ids; the location is the row's
+  first backticked `file:line`). The candidate is the appendix of a report the harness wrote; only
+  `confirmed` rows count, columns are found by header name. A known item is MATCHED when a candidate
+  sits in the same file within `--window` lines (default 10). It prints MATCHED, MISSED,
+  UNSCORABLE and CANDIDATE-ONLY lines, a per-lens line, and `replay: recall k/m`, and exits 0 at any
+  recall.
+- `python3 {kit}/review_replay.py --corpus <dir> [<dir> ...] [--repo <clone>]` — which past records
+  are replayable: each record whose first line is the `**Serves:** diff-review` binding, that passes
+  the liveness check below and whose range resolves in this clone, with its round, range and scorable
+  count. The summary line puts every scanned record in exactly one bucket. Ranges resolve through
+  ONE `git cat-file --batch-check` for the whole corpus.
+- `python3 {kit}/review_replay.py --selftest` — fourteen named arms over inline fixtures, no file
+  or git access; red when an arm fails or fewer arms ran than were declared. It is the held leg
+  `review-replay selftest`.
+
+**Liveness, the reason a score can be trusted at all.** Both inputs must reproduce their own stated
+confirmed count from what was extracted, or they are REFUSED with exit 2 naming both numbers — for a
+legacy table, the union of the raw ids across its item rows. Most legacy records are free prose and
+are refused; a refused record is never scored, which keeps a silent partial extraction out of every
+score. A record with no scorable item, no stated count or no hex range is refused the same way.
+
+**The live replay**, run at the main loop because only it holds `Workflow`:
+
+1. List: `python3 {kit}/review_replay.py --corpus memory/builds`, then pick a `round 1` row.
+2. `git worktree add --detach <dir> <head>` in a short directory under `%TEMP%`, never inside the
+   worktree.
+3. Run `Workflow` with this kit's `tier2-review.js`, `repo` set to that checkout, the record's base
+   and head, round 1, no `priorFindings`, and a `reviewDir` inside the checkout.
+4. Score: `python3 {kit}/review_replay.py --known <record> --candidate <the report it wrote>`.
+5. Write the recall, matched, missed and per-lens lines to the acceptance ledger, then
+   `git worktree remove` the checkout.
+
+**What the score does NOT mean.** Recall is measured against what ONE past review confirmed, not
+against every defect in the range. A candidate-only finding may be a real defect that review missed,
+so it is listed and never counted as a false positive: there is no precision figure. Two files
+sharing a basename can match, because older records carry basename-only refs. And one replay is one
+sample of a stochastic fan — compare two harness versions by two scored runs side by side, never by
+one.
+
 ## `orient-counterfactual.js` — one stage-2 arm per call
 
 The stage-2 `orient` subagent is deferred behind a measurement: whether moving a kickoff's

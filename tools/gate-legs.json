@@ -667,6 +667,20 @@
     "ceiling": 300
   },
   {
+    "name": "review-replay selftest",
+    "argv": [
+      "python3",
+      "tools/workflows/review_replay.py",
+      "--selftest"
+    ],
+    "guard": [
+      "tools/workflows/"
+    ],
+    "chunk": "selftests",
+    "subject": "kit",
+    "ceiling": 300
+  },
+  {
     "name": "pytest-guardrails self-test",
     "argv": [
       "bash",
