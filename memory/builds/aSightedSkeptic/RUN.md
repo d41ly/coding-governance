@@ -9,12 +9,20 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+hold-run: 
+hold-streak: 1 · at b3502290
+resume-owed: none · owner
+held-at: 2026-10-01T23:02:12Z
+hold-reason: All ten units built, closing review CONVERGED, the self-test 180/180. The close's flagged bar is RED on two legs that need an owner ruling, both parked with options: check 23's shrink-only undeclared-write ceiling (60 vs 53), and the run-gates canary's AC5 arm, proven inherited at base but read OWN because unit 9 touched its comparator.
+hold-until: owner
+hold-code: host-owner-action
+held-from: VERIFYING
 gates-run: unattended-179088390600264712075-2914148 c1d75484
 parked-surfaced: yes, 1 surfaced
 keepalive-reaped: yes
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: f1f8eda6b3dd72a2d86b36405be6642b49244310
-phase: VERIFYING
+witness: b3502290578d7de0f2d7250ad83c13a4f4df6313
+phase: HELD
 branch-sha: 9fdd0c18d5afac1744c226c3e8ea2716e6d49e30
 branch-ref: refs/heads/run/aSightedSkeptic
 may: none
@@ -89,3 +97,5 @@ base: 9fdd0c18d5afac1744c226c3e8ea2716e6d49e30
 2026-10-01T23:01:44Z decision · item The close's bar reds the unattended kit gate at check 23: 60 undeclared writes against UNDECLARED_WRITE_CEILING 53. Eight of this build's unit passes committed paths their --dispatch rows did not declare, nearly all hook-forced generated files (build README units region, memory/LIVE.md, the ledger shard, symbols.json, gotchas INDEX, the SESSION-KICKOFF re-stamp, budgets and subject pins for the new leg). How should this land? · reason Options: (a) raise the pin to 61 with a dated reason in .unattended.conf; (b) exempt hook-forced generated indexes from check 23's subset test, which would also return the pin to 53 for this build except unit 9's three hand-written paths; (c) rewrite the run branch so each dispatch row declares the wider set before its pass. Refused: the pin is declared shrink-only and never rises, (b) weakens a gate to pass this build's own landing, and (c) would make the record claim a declaration that was not made before the pass. No may: grant covers any of them.
 
 2026-10-01T23:01:45Z decision · item run-gates canary fails its AC5 arm (KF3: a diff touching the runner should attribute OWN, it reads INHERITED). Proven inherited: the same arm fails identically at the build's base 9fdd0c18 in a frozen clone. The close's attribution still reads it OWN, because unit 9 added a budget row to tools/run-gates/selftest-budgets.txt, which is the canary's comparator. Investigate the canary, or accept the attribution? · reason Options: (a) absorb the canary fix into this run under UNATTENDED-STOPS 13; (b) land with the red recorded as inherited once the owner rules; (c) file an ask for a separate build. Refused to absorb because the root cause is unknown and the arm's fixture passed on node a at earlier shas, so a fix is an investigation rather than a bounded change; it is the owner's call together with the check 23 question.
+
+2026-10-01T23:02:14Z hold · item host-owner-action · reason until owner · reaped 5fbd3382 · resume none(owner)
