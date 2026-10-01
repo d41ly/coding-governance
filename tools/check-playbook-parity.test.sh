@@ -159,7 +159,9 @@ fixture() {
   # population; the control failed, correctly, until the fixture carried their sentences.
   printf 'template {{ALPHA}} {{MEMORY_ROOT}}\nan array LITERAL of <=5 elements passes\nthe hook (matcher `Workflow|Agent`) denies\nat most 5 verify agents TOTAL (batch grows)\nroute through boundedParallel(thunks, 5) always\ndenies any K it cannot resolve to an integer <=5 here\n' \
     | sed 's/<=/≤/' > "$d/coding-governance-agents.template.md"
-  printf 'runbook {{MEMORY_ROOT}}\nadopt '"${PFX}${MT_KIT}/"' into the target repo\n' > "$d/WIRE-INTO-PROJECT.md"
+  # A root install has no root head to name a kit by, so its runbook names it the way gov's does,
+  # through the `<prefix>/` token (VERIFYING repair: a bare `memory-tree/` documents nothing).
+  printf 'runbook {{MEMORY_ROOT}}\nadopt '"${PFX:-<prefix>/}${MT_KIT}/"' into the target repo\n' > "$d/WIRE-INTO-PROJECT.md"
   printf '# waivers\nhooks   not adopter-facing as a kit.\n' > "$d/${PFX}playbook-kit-waivers.txt"
   # The stamp-rule pair (TOOL-aHonedRuleset-5) is the one row whose two homes both sit OUTSIDE
   # <prefix>/: the manifest template states the expression and manifest-check.sh owns it. The control
