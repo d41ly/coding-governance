@@ -12,7 +12,8 @@
 #
 # HOW THE ARMS WORK. Every arm builds a scratch WORKTREE-SHAPED fixture — a real git repo with its
 # own <prefix>/, charter and runbook — and runs the gate inside it. Nothing here mutates the real tree,
-# which matters because the gate derives its kit set from `git ls-files` and would otherwise see
+# which matters because the gate derives its kit set from govkit's registry and `git ls-files`
+# (TOOL-aRepatriatedFork-54), so every fixture carries its own registry, and would otherwise see
 # this repo's own population.
 set -u
 HERE="$(cd "$(dirname "$0")" && pwd)"

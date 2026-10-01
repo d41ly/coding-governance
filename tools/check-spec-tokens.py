@@ -46,9 +46,9 @@ spec's hands-off bullets, joined to the text of the sibling each one names.
          install (TOOL-aRepatriatedFork-54), where a root-level file has no slash to carry: there
          a bare token whose extension some tracked file carries is graded, and resolves as a
          tracked path or the basename of one, since the house style cites a kit file by basename.
-         What that does NOT grade: a bare name at any other tool root (measured, 10 live
-         citations in three specs name no tracked file), a bare name whose extension nothing
-         tracked carries, and WHICH file a basename shared by several tracked files means.
+         What that does NOT grade: a bare name at any other tool root (that spec's F2 measured
+         live citations naming no tracked file, which would red specs nobody changed), a bare
+         name whose extension nothing tracked carries, and WHICH file a shared basename means.
   cites  every backticked `<path>:<line>` -> that file's line count, SCOPED to citations whose path
          is TRACKED. Measured at b0108f13: 453 specs carry 1721 citations and 854 of them name an
          untracked path, because the house style cites a kit file by basename (`run-gates.sh:407`).
