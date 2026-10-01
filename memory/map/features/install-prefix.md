@@ -78,8 +78,10 @@ FIELD on read: gov's root for a `source`, the recorded `target_tool_root` for a 
 
 `foreign-prefix parity` is the held leg that proves the drain by EXECUTION, which the ban cannot. It
 moves gov's whole tool root with `git mv` in a scratch clone to `scripts/`, `vendor/gov/` and the repo
-root, and grades each move with `run-selftests.sh --pooled` against a calibration taken at gov's
-prefix in the same clone. Its red control is a suite reading its gate through a literal gov prefix;
+root, re-spells gov's own declarations by the old root's path head at each move, and runs every
+population row there with `FOREIGN_PREFIX_PROBE=1`, under which each suite stops after its first
+subject-touching arm (`TOOL-aRepatriatedFork-52`). Its baseline is the bar's own gate-run record,
+never a calibrate, and it stops at the first red prefix. Its red control is a suite reading its gate through a literal gov prefix;
 a literal prefix used only inside a suite's own scratch fixture is self-consistent and passes at
 every host prefix, measured, so that spelling stays the ban's to grade.
 
