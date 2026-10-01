@@ -128,6 +128,154 @@ Each also accepts explicit files, which is how the suites drive their fixtures. 
 output is where the resolved predicate path is reported: the default run's bytes are pinned by an
 acceptance criterion, so diagnostics that would change them live behind the flag.
 
+## `tier2-review.js` — the five diff lenses, and `lensNotes`
+
+A diff review fans out over five finder lenses, in this order: `security`, `correctness`, `seams`,
+`verification` and `intent`. Since 1.17 `verification` asks whether every changed behaviour has a
+check that can fail, and `intent` whether the diff does what its commit messages and specs say; the
+old `regressions` lens is retired. A spec audit keeps its four lenses. Five is also the most the
+agent-cap hook admits on that receiver, so the set cannot grow a sixth.
+
+`lensNotes` appends a project addendum to one lens's brief, and to no other prompt:
+
+```js
+args: { repo, base, head, reviewDir,
+        lensNotes: { security: 'shell is built from conf values; treat .unattended.conf as input' } }
+```
+
+Its keys are the lens keys of the run's own kind. A key naming no such lens, a non-object, or an
+empty note refuses before any agent spawns, with the legal keys in the message. Absent, it is
+announced: a `WARNING:` log line, and a clause in the report's RUN INTEGRITY block. The notes and a
+review-shape literal both join the review key, so a lens file written by older prompts or under
+other notes is never reused. An adopter test that counted four diff lenses sees five from 1.17.
+
+`specs` names the documents that say what the change was for, so the lenses review against intent
+rather than against the code alone:
+
+```js
+args: { repo, base, head, reviewDir,
+        specs: ['memory/builds/<slug>/spec/<date>-spec-<unit>.md'] }
+```
+
+Every finder and skeptic prompt then opens with an `INTENT` block that lists them, and, on a diff
+review, always names the range's commit log, `git log --format=%B <base>..<head>` over the resolved
+shas. With no `specs` that log is the statement of intent. On a spec audit `specs` is sibling context
+the subjects must agree with, never reported against, and naming a subject there refuses. Each member
+must be a non-empty repo-relative path: no backslash, no leading `/` or `~`, no drive letter, no `..`
+segment and no character below 0x20, or the run refuses before any agent spawns. The harness cannot check that a listed document
+exists; the lens that reads it reports a missing one. A run given neither `specs` nor `context` logs a
+`WARNING:`, and every report's RUN INTEGRITY block says where intent came from. `specs` joins the
+review key, like `lensNotes`.
+
+`checklist` carries the project's recurring bug classes. The harness produces none; this repository
+passes the stdout of `python tools/memory-tree/gotchas.py --for-diff <range>`:
+
+```js
+args: { repo, base, head, reviewDir,
+        checklist: '# preamble\n- [ ] class-one\n    what it is\n- [ ] class-two' }
+// or, already split:  checklist: ['class-one: what it is', 'class-two']
+```
+
+As a string, lines before the first line starting `- ` are a preamble, each `- ` line opens an item,
+and the lines after it continue that item; CRLF reads as LF. A non-blank string with no `- ` line
+refuses rather than becoming one item, and so does any value that is neither a string nor an array of
+non-empty strings. The items are split ROUND-ROBIN over the lenses of the run's kind: item `n` goes to
+lens `(n - 1) % K` in lens order, so each class is swept by exactly one finder, labelled `C<n>`, and
+a finder begins a hit's claim with that label. A lens with no share is told so; skeptics get none. The
+split is logged, and RUN INTEGRITY states it. An absent or itemless checklist logs a `WARNING:` and
+RUN INTEGRITY says no class was swept. The parsed checklist joins the review key.
+
+`intensity` is `'full'` or `'light'`, and absent it is `'full'`. Only the caller picks it; the harness
+never chooses light for itself, whatever the diff's size or history:
+
+```js
+args: { repo, base, head, reviewDir, intensity: 'light', checklist }
+```
+
+A light diff review runs the lenses `LIGHT_LENSES` names, `correctness`, `seams` and `verification`,
+and skips `security` and `intent`. The checklist is split over the lenses that run, so a skipped lens
+takes no share and no class is lost with it. A light run says what it skipped: a `WARNING:` log line
+before the first finder, a RUN INTEGRITY clause telling the report not to call it a full review, and
+`intensity` and `skippedLenses` on every return (`skippedLenses` is `[]` on a full run). A skipped
+lens counts as neither live nor dead. A spec audit has no light subset, so `'light'` refuses there; any
+value other than the two refuses on both kinds. `intensity` joins the review key. A diff that crosses a
+trust boundary is not one to review light: the `security` lens is one of the two a light run skips.
+
+Every finding carries `lens`, the key of the lens the harness dispatched, never the label the agent
+echoed back, and every finding line in a skeptic prompt, the synthesis prompt and the run log names
+it as `lens=<key>`. Every return carries three fields beside the counts:
+
+- `ledger` — one entry per finding in id order: `id`, `lens`, `ref`, `severity` (the finder's),
+  `skepticSeverity`, `verdict` (`confirmed`, `refuted`, `uncertain`, or `unverified` when no verdict
+  stands), `reason`, `fixVerdict` and `claim`. An absent optional value is `null`.
+- `confirmedFindings` — one entry per confirmed finding: `id`, `lens`, `ref`, `claim`, `severity` (the
+  binding grade), `fix` and `fixVerdict`. A fix the skeptic judged unsound is replaced by its note
+  when it gave one. Pass this array as the next round's `priorFindings` rather than re-typing it.
+- `appendix` — the ledger as a markdown table under `## Appendix — every finding`, with the eight
+  columns `id | lens | ref | severity | skepticSeverity | verdict | reason | fixVerdict`. A cell is `-`
+  when its value is absent, a `|` is escaped, and line breaks fold to a space.
+
+The two exits before any skeptic runs, every lens dead and no finding raised, return `[]`, `[]` and
+`''`; a deferred return carries what was judged so far. The harness renders the appendix and tells the
+synthesis to copy it verbatim as the report's last section. That copy is the only way a REFUTED finding
+reaches a record, and the harness cannot check it was made: compare the report against the returned
+`appendix`. A run whose every finding is refuted writes no report, so there the appendix exists in the
+return alone, and the caller writes it down if it wants one.
+
+## `review_replay.py` — a review scored for recall against a past round
+
+Stdlib Python, run under the repo's python launcher. It answers one question nothing else here can:
+does a lens set or a prompt change find MORE of what a previous review proved real? Three modes:
+
+- `python3 {kit}/review_replay.py --known <record> --candidate <report> [--window N]` — the score.
+  The known set is the past diff-review record's confirmed findings in one of two UNITS, and the
+  `replay: known` line prints which. From its `## Appendix — every finding`, when it has one, the
+  unit is `raw-finding`: one entry per confirmed appendix row, so a defect two lenses confirmed
+  counts twice. Otherwise it is `adjudicated-item`, read from the legacy item table (a row whose
+  second cell is a severity and whose last cell lists raw finding ids; the location is the row's
+  first backticked `file:line`). Recall from the two record eras is therefore in different units.
+  The candidate is the appendix of a report the harness wrote; only `confirmed` rows count, columns
+  are found by header name. A known item is MATCHED when a candidate sits in the same file within
+  `--window` lines (default 10); a drive-lettered ref such as `C:/repo/a.sh:12` keeps its path after
+  the drive, so it matches a repo-relative one. It prints MATCHED, MISSED, UNSCORABLE and
+  CANDIDATE-ONLY lines, a per-lens line, and `replay: recall k/m`, and exits 0 at any recall.
+- `python3 {kit}/review_replay.py --corpus <dir> [<dir> ...] [--repo <clone>]` — which past records
+  are replayable: each record whose first line is the `**Serves:** diff-review` binding, that passes
+  the liveness check below and whose range resolves in this clone, with its round, range and scorable
+  count. The summary line puts every scanned record in exactly one bucket. Ranges resolve through
+  ONE `git cat-file --batch-check` for the whole corpus.
+- `python3 {kit}/review_replay.py --selftest` — named arms over inline fixtures, no file
+  or git access; red when an arm fails or fewer arms ran than its `ARMS_DECLARED` states. It is the held leg
+  `review-replay selftest`.
+
+**Liveness, the reason a score can be trusted at all.** Both inputs must reproduce their own stated
+confirmed count from what was extracted, or they are REFUSED with exit 2 naming both numbers — for a
+legacy table, the union of the raw ids across its item rows. Most legacy records are free prose and
+are refused; a refused record is never scored, which keeps a silent partial extraction out of every
+score. A record with no scorable item, no stated count or no hex range is refused the same way. The
+candidate side prints how many of its confirmed rows carry no readable `file:line`, and is refused
+when it has confirmed rows and none is readable, so a drifted ref shape cannot read as a recall of
+zero. An appendix row ends at a newline only, never at another character Python's `splitlines`
+breaks on, so a U+2028 inside a cell cannot drop the rows after it.
+
+**The live replay**, run at the main loop because only it holds `Workflow`:
+
+1. List: `python3 {kit}/review_replay.py --corpus memory/builds`, then pick a `round 1` row.
+2. `git worktree add --detach <dir> <head>` in a short directory under `%TEMP%`, never inside the
+   worktree.
+3. Run `Workflow` with this kit's `tier2-review.js`, `repo` set to that checkout, the record's base
+   and head, round 1, no `priorFindings`, and a `reviewDir` inside the checkout.
+4. Score: `python3 {kit}/review_replay.py --known <record> --candidate <the report it wrote>`.
+5. Write the recall, matched, missed and per-lens lines to the acceptance ledger, then
+   `git worktree remove` the checkout.
+
+**What the score does NOT mean.** Recall is measured against what ONE past review confirmed, not
+against every defect in the range. A candidate-only finding may be a real defect that review missed,
+so it is listed and never counted as a false positive: there is no precision figure. Two files
+sharing a basename can match, because older records carry basename-only refs. And one replay is one
+sample of a stochastic fan — compare two harness versions by two scored runs side by side, never by
+one.
+
 ## `orient-counterfactual.js` — one stage-2 arm per call
 
 The stage-2 `orient` subagent is deferred behind a measurement: whether moving a kickoff's

@@ -87,6 +87,7 @@ pytest-guardrails self-test	60		worst of 8 readings 28s, x1.5
 python resolver (behaviour + inline parity + idiom ban)	150		worst of 11 readings 99s, x1.5
 recall floor arms	120		worst of 11 readings 79s, x1.5
 review-join self-test	460		worst of 8 readings 301s, x1.5
+review-replay selftest	60		measured 0.2s on node a 2026-10-01 by direct invocation, x1.5 floored at this file 60s minimum
 row-grammar selftest	60		worst of 10 readings 36s, x1.5
 row-keyed merge driver replay	1620		worst of 10 readings 1077s, x1.5
 run-gates adopter e2e	300		worst of 8 readings 198s, x1.5

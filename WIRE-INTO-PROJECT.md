@@ -811,8 +811,8 @@ Only if the project runs multiple nodes/worktrees (playbook §3):
   `<MEMORY_ROOT>/guides/REVIEW-PROTOCOL.md` (the path `check-protocol-parity.test.sh` treats as LIVE)
   and cite THAT copy from your manifest, not this runbook.
 - Copy the kit dir in as `<project>/tools/workflows/` for a ready consolidated review harness
-  (`tier2-review.js`): four finder lenses, then at most five BATCHED verifiers, then one synthesis
-  pass — 6–10 agents over the whole run, all within the verify-stage and concurrency bounds
+  (`tier2-review.js`): five finder lenses, then at most five BATCHED verifiers, then one synthesis
+  pass — 7–11 agents over the whole run, all within the verify-stage and concurrency bounds
   `tools/hooks/agent-cap.js` resolves.
 - Then run `bash <project>/tools/workflows/check-protocol-parity.test.sh --render` once. The kit
   ships the unattended build harness as `unattended-build.template.js`, and this writes

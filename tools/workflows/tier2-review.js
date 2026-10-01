@@ -1,13 +1,13 @@
 export const meta = {
   name: 'tier2-review',
-  version: '1.16', // gov:kit tier2-review@1.16 // gov:kit review-harness@1.16 — BOTH ids: the
+  version: '1.17', // gov:kit tier2-review@1.17 // gov:kit review-harness@1.17 — BOTH ids: the
   // second is this entry's REGISTRY id, and without it a deployer grepping the id the
   // registry uses finds nothing. DEPL-dGaugedVintage-5. — engine identity (deployed verbatim; this field is the deployer's version marker)
   description:
     'Consolidated, concurrency-capped (≤5) Tier-2 adversarial review, ≤5 verify agents TOTAL: find → batched-verify → synth, joined on an ORCHESTRATOR-ASSIGNED INTEGER id. Replaces the big-fan-out review that trips the server rate limiter. Project-agnostic — parameterize via `args`.',
   phases: [
     { title: 'Resume', detail: 'one probe reads the key directory; a lens or batch whose file carries the key is reused' },
-    { title: 'Find', detail: '4 finder lenses, one wave, ≤5 concurrent' },
+    { title: 'Find', detail: '5 finder lenses (3 on a light run), one wave, ≤5 concurrent' },
     { title: 'Verify', detail: 'skeptics refute findings in ≤5 BATCHES — agent count fixed' },
     { title: 'Synthesize', detail: 'one pass → report file' },
   ],
@@ -78,7 +78,14 @@ function buildKeyedSchema(schema, extra) {
 //   kind: "diff-review" | "spec-audit",   // DEFAULTS to "diff-review" when absent
 //   subjects: [{ path, blob }],           // spec-audit ONLY; blob is 7-40 hex, per subject
 //   round: <integer>,                     // inferred as 2 when priorFindings arrive without one
-//   priorFindings: [ ... ] }              // a previous round's confirmed set
+//   priorFindings: [ ... ],               // a previous round's confirmed set
+//   specs: ["<repo-relative path>", ...], // intent documents: a diff review's statement of intent, a spec audit's
+//                                         // sibling context; absent -> [], and with no context a WARNING
+//   lensNotes: { "<lens key>": "<note>" }, // project addendum per lens of THIS kind; absent -> {} and a WARNING
+//   intensity: "full" | "light",          // DEFAULTS to "full"; only the CALLER picks light, which runs
+//                                         // LIGHT_LENSES and names the lenses it skipped; a spec-audit refuses light
+//   checklist: "<preamble>\n- <item>\n  <continuation>" | ["<item>", ...] } // the project's recurring
+//                                         // bug classes, each item swept by exactly one lens; absent -> a WARNING
 // D9 - `kind` and `subjects` were added without extending this block, and BUILD-METHOD M4 sends a
 // reader HERE for the spec-audit spelling. An absent `kind` does not refuse - it defaults - so a
 // header missing the field buys exactly the failure M4 exists to prevent: a code-shaped review of a
@@ -139,6 +146,14 @@ if (KINDS.indexOf(kind) === -1) {
   )
 }
 const isSpec = kind === 'spec-audit'
+// TOOL-aSightedSkeptic-7 S1/S2 - `intensity`, the CALLER's choice of a full or a light review. A
+// closed set refused outside it, like `kind`, and the harness never picks light itself. A spec audit
+// has no light lens subset (spec F2), so light refuses there rather than buying a full audit silently.
+const intensity = a.intensity === undefined ? 'full' : a.intensity
+if (typeof intensity !== 'string' || ['full', 'light'].indexOf(intensity) === -1)
+  throw new Error('tier2-review: `intensity` must be one of full | light. Got ' + JSON.stringify(a.intensity) + '.')
+if (isSpec && intensity === 'light')
+  throw new Error('tier2-review: a spec-audit has no light lens subset; `intensity` must be full or absent. Got "light".')
 // S7 - the context default is per-kind, and each is wrong if the other kind inherits it.
 const context = a.context || (isSpec ? 'the spec set under audit' : 'the cumulative diff landing on main')
 const byDesign = a.byDesign || 'none supplied'
@@ -206,6 +221,62 @@ if (isSpec) {
     log('WARNING: ' + why)
   }
 }
+// TOOL-aSightedSkeptic-3 S1/S3 - `specs`, the intent documents the caller names. Validated here,
+// before the base-shape ladder and the first agent, so a bad value refuses in milliseconds. A path
+// reaches a prompt as text an agent then reads, so anything that could point a reviewer outside the
+// repository - absolute, home-relative (`~`), drive-lettered, backslashed or `..` - is refused rather
+// than normalized, and so is a control character, which would start a forged line in the brief
+// (closing review round 1, L1). The offender is an INDEX, never a value: `''` is one of the values
+// refused (the D6 class above).
+const SPECS = a.specs === undefined ? [] : a.specs
+const specsRule = 'an array of repo-relative paths, each a non-empty string with no backslash, no leading / or ~, no drive letter, no .. segment and no control character'
+if (!Array.isArray(SPECS))
+  throw new Error('tier2-review: `specs` must be ' + specsRule + '. Got ' + JSON.stringify(a.specs) + ', which is not an array.')
+const specsBadIdx = SPECS.findIndex(
+  (s) => typeof s !== 'string' || !s || s.indexOf('\\') !== -1 || s[0] === '/' || s[0] === '~' || /[\x00-\x1f]/.test(s) ||
+    /^[A-Za-z]:/.test(s) || s.split('/').indexOf('..') !== -1
+)
+if (specsBadIdx !== -1)
+  throw new Error('tier2-review: `specs` must be ' + specsRule + '. Member ' + specsBadIdx + ' is ' + JSON.stringify(SPECS[specsBadIdx]) + '.')
+// S3 - on a spec audit `specs` is sibling context, NOT under audit, so one document cannot be both.
+const specsOverlap = isSpec ? SPECS.find((p) => subjects.some((x) => x && x.path === p)) : undefined
+if (specsOverlap !== undefined)
+  throw new Error('tier2-review: `specs` names ' + JSON.stringify(specsOverlap) + ', which is also a subject of this spec audit; a document cannot be both under audit and sibling context to it.')
+// TOOL-aSightedSkeptic-4 S1 - `checklist`, the project's recurring bug classes. The harness produces
+// none and names no checker (the caller here passes `gotchas.py --for-diff` stdout). Parsed before
+// the base-shape ladder and the first agent, so a bad value refuses in milliseconds. A non-blank
+// string with no `- ` item line REFUSES rather than becoming one item: one item lands on one lens,
+// which is the whole-checklist-on-one-agent defect this argument exists to remove (spec F2).
+function parseChecklist(v) {
+  // Closing review round 1, L5 - the text says what the loop below does: ANY later line not starting
+  // "- " continues the item above it, indented or not (spec S1, and the kit README).
+  const rule = 'a string whose items are lines starting "- " (lines before the first item are a preamble; ' +
+    'every later line not starting "- " continues the item above it, indented or not) or an array of non-empty strings'
+  if (v === undefined) return { preamble: '', items: [] }
+  if (typeof v === 'string') {
+    const pre = []
+    const items = []
+    for (const raw of v.replace(/\r\n/g, '\n').split('\n')) {
+      const line = raw.replace(/\s+$/, '')
+      if (!line) continue
+      if (line.indexOf('- ') === 0) items.push(line.slice(2))
+      else if (items.length) items[items.length - 1] += '\n' + line
+      else pre.push(line)
+    }
+    if (!items.length && v.trim())
+      throw new Error('tier2-review: `checklist` must be ' + rule + '. Got a string with no line starting "- ": ' +
+        JSON.stringify(v.slice(0, 80)) + '. Pass the items as an array instead.')
+    return { preamble: pre.join('\n'), items: items }
+  }
+  if (!Array.isArray(v))
+    throw new Error('tier2-review: `checklist` must be ' + rule + '. Got ' + JSON.stringify(v) + '.')
+  const bad = v.findIndex((x) => typeof x !== 'string' || !x.trim())
+  if (bad !== -1)
+    throw new Error('tier2-review: `checklist` must be ' + rule + '. Member ' + bad + ' is ' + JSON.stringify(v[bad]) + '.')
+  return { preamble: '', items: v.slice() }
+}
+const checklist = parseChecklist(a.checklist)
+const CHECKLIST_ITEMS = checklist.items
 const baseLooksPinned = isSpec || PINNED_SHA.test(String(base))
 if (!baseLooksPinned) {
   const why =
@@ -267,6 +338,16 @@ const FINDING_SCHEMA = {
 // function, and a plain `map[v.ref] = v` collapsed them so BOTH inherited whichever verdict landed
 // last. A model can echo a small integer reliably; it cannot re-type a path byte-identically, and an
 // integer cannot collide with another finding's.
+// TOOL-aSightedSkeptic-2 S1 - the skeptic also judges the finding's proposed FIX, as a second and
+// separate question. Both fields stay OPTIONAL: a skeptic that omits them degrades to "unjudged" and
+// never fails its batch into regeneration, and `id` stays the only join key. The harness tests
+// membership in FIX_VERDICTS again after the join, because a reused file and a stub reach it without
+// the platform's schema validation.
+// TOOL-aSightedSkeptic-6 S3 - `uncertain` is a third verdict, and the skeptic's `severity` is OPTIONAL
+// and read on a confirmed verdict only. The harness tests membership in SEVERITIES itself, for the
+// same reason it tests FIX_VERDICTS.
+const FIX_VERDICTS = ['sound', 'unsound', 'none']
+const SEVERITIES = ['blocker', 'high', 'medium', 'low']
 const VERDICT_SCHEMA = {
   type: 'object',
   required: ['path', 'verdicts'],
@@ -281,13 +362,28 @@ const VERDICT_SCHEMA = {
         required: ['id', 'verdict', 'reason'],
         properties: {
           id: { type: 'integer' }, // the orchestrator-assigned finding id, echoed back
-          verdict: { type: 'string', enum: ['confirmed', 'refuted'] },
+          verdict: { type: 'string', enum: ['confirmed', 'refuted', 'uncertain'] },
           reason: { type: 'string' },
+          fixVerdict: { type: 'string', enum: FIX_VERDICTS },
+          fixNote: { type: 'string' },
+          severity: { type: 'string', enum: SEVERITIES },
         },
       },
     },
   },
 }
+
+// TOOL-aSightedSkeptic-6 S1/S2 - ONE severity rubric, graded by CONSEQUENCE. Severity drives the
+// costliest disposal there is (a BLOCKER or HIGH is promoted to a unit, TOOL-aProbedUnit-9), and no
+// prompt defined a grade. It is interpolated byte-identically into every finder, verify and synthesis
+// prompt of the run and restated nowhere; the spec kind reads each grade as what the design would do.
+const SEVERITY_RUBRIC =
+  `SEVERITY RUBRIC - grade every finding by its CONSEQUENCE. ` +
+  `blocker: ${isSpec ? 'the design, built as written, would ship' : 'on a reachable path it ships'} a wrong result, a security hole or data loss, or a check that certifies what it does not check. ` +
+  `high: ${isSpec ? 'the design, built as written, would cause ' : ''}the same consequence on a narrow or unlikely path, or a defect that will mislead the next change. ` +
+  `medium: ${isSpec ? 'the design, built as written, would ship ' : ''}a real defect whose effect is contained. ` +
+  `low: ${isSpec ? 'the design, built as written, would differ only cosmetically or in a comment' : 'cosmetic, or a comment'}, with no effect on behaviour. ` +
+  `A grade follows the consequence, never the confidence or how alarming the defect looks.`
 
 // S3 - the spec kind's schema. `where` replaces `line` and is REQUIRED, so the address obligation is
 // machine-enforced on both kinds rather than relaxed on one.
@@ -323,16 +419,21 @@ const SPEC_FINDING_SCHEMA = {
 // whatever `boundedParallel`'s default parameter resolves to, which is the one place that owns
 // it. Closes TOOL-aDeclaredBound-6, whose own row cites the wrong line for this text.
 // The `phase('Find')` call moved below the resume probe (TOOL-dDerivedDocket-29 S3).
+// TOOL-aSightedSkeptic-5 - FIVE lenses, the owner's set. `regressions` is retired: it was told to run
+// "the PROJECT's checklist" and was handed none, and its sweep is now split over these five through
+// `args.checklist`. `verification` hunts the defect this repo finds most, a check that cannot fail,
+// which no brief named. No brief names a web surface. Five is the most the agent-cap hook admits on
+// an array-literal receiver, so a sixth lens is denied at the tool call rather than chosen against.
 const DIFF_LENSES = [
   {
     key: 'security',
     brief:
-      'Security + data-integrity: auth/RBAC gaps, sanitization/SSRF/egress, injection, secrets on the wrong surface, optimistic-concurrency clobbers, check-then-mutate races.',
+      'Security: trust boundaries for THIS kind of code. Commands built from interpolated input (shell, SQL, regex, paths), path traversal and symlinks, secrets reaching logs or output, authorization or enforcement that can be bypassed, and output from another program or agent trusted without validation.',
   },
   {
     key: 'correctness',
     brief:
-      'Correctness: logic bugs, wrong conditionals/edge cases, client/server validation divergence, error/empty/loading states, off-by-one, coercion drift.',
+      'Correctness: logic bugs, wrong conditionals and edge cases, off-by-one, type and encoding coercion drift, error and empty-input paths, and two copies of one rule that disagree.',
   },
   {
     key: 'seams',
@@ -340,11 +441,20 @@ const DIFF_LENSES = [
       'Integration seams + dead plumbing: values computed→passed→never read, stale caches not reset on every mutation path, indexes that don\'t serve their query, half-applied merges, cross-language catalog drift.',
   },
   {
-    key: 'regressions',
+    key: 'verification',
     brief:
-      'Recurring-bug-class sweep: run the PROJECT\'s recurring-bug-classes checklist against the diff and report only fresh hits.',
+      'Verification: does every behaviour this diff changes have a check that can FAIL? Report a test or gate whose fixture never triggers the rule, a predicate that matches nothing, a skip that reads as a pass, and a changed behaviour with no check at all.',
+  },
+  {
+    key: 'intent',
+    brief:
+      'Intent: does the diff do what its stated intent says? Read the range\'s commit messages and any spec or design document the diff touches or those messages name, then report an acceptance criterion with no code behind it, a stated mechanism that is not the one built, and scope beyond what was asked.',
   },
 ]
+// TOOL-aSightedSkeptic-7 S3 - a LIGHT diff review's lenses, as KEYS (spec F1: 70 of the 76 classed
+// findings in the owner's sample, inside the protocol's three-to-six range). Not a third lens set: the
+// skip happens inside the Find thunk, so the receiver the agent-cap hook sizes keeps its shape.
+const LIGHT_LENSES = ['correctness', 'seams', 'verification']
 
 // TOOL-dTieredTribunal-11 S2 - the M4 spec-audit catalogue, COPIED from tools/memory-tree/README.md
 // rather than re-invented, so the method and the engine cannot drift into two answers.
@@ -376,6 +486,102 @@ const SPEC_LENSES = [
 // is fixed by the enforcement point rather than chosen. TOOL-dTieredTribunal-13 tightened the branch
 // this line sits on to require EVERY value branch bounded, and both branches here are literals.
 const LENSES = isSpec ? SPEC_LENSES : DIFF_LENSES // gov:fixed-verifiers
+// S3 - checked on EVERY run of either kind, before the resume probe: a renamed lens would otherwise
+// empty the light set, and a light run would review nothing while reporting clean. An INDEX names the
+// offender, since `''` is itself a key this refuses (the D6 class).
+const lightBadIdx = LIGHT_LENSES.findIndex((k) => !DIFF_LENSES.some((L) => L.key === k))
+if (!LIGHT_LENSES.length)
+  throw new Error('tier2-review: LIGHT_LENSES is empty, so a light run would review nothing while reporting clean.')
+if (lightBadIdx !== -1)
+  throw new Error('tier2-review: LIGHT_LENSES names ' + JSON.stringify(LIGHT_LENSES[lightBadIdx]) + ', which DIFF_LENSES does not carry.')
+
+// TOOL-aSightedSkeptic-5 S4/S6 - `lensNotes`, a project addendum per lens. It is validated HERE,
+// against the CURRENT kind's keys and before the resume probe, the first agent, so a typo'd key
+// refuses in milliseconds instead of reviewing on the generic brief while looking customised. Absent
+// defaults to {} and is ANNOUNCED, in the log now and in the synthesis's RUN INTEGRITY block, because
+// a silent default is how a degraded run reads as a full one.
+// The offence is carried by a FLAG, never by a sentinel value: `null` is itself one of the values
+// refused here, so `got === null` could not tell "nothing wrong" from "handed null" (the D6 class).
+const LENS_KEYS = LENSES.map((L) => L.key)
+const lensNotes = a.lensNotes === undefined ? {} : a.lensNotes
+let lensNotesBad = false
+let lensNotesGot = a.lensNotes
+if (!lensNotes || typeof lensNotes !== 'object' || Array.isArray(lensNotes)) lensNotesBad = true
+else
+  for (const k of Object.keys(lensNotes)) {
+    if (LENS_KEYS.indexOf(k) !== -1 && typeof lensNotes[k] === 'string' && lensNotes[k]) continue
+    lensNotesBad = true
+    lensNotesGot = LENS_KEYS.indexOf(k) === -1 ? k : { [k]: lensNotes[k] }
+    break
+  }
+if (lensNotesBad) {
+  throw new Error(
+    'tier2-review: `lensNotes` must be an object mapping a ' + kind + ' lens key to a non-empty string; ' +
+      'legal keys: ' + LENS_KEYS.join(' | ') + '. Got ' + JSON.stringify(lensNotesGot) + '.',
+  )
+}
+const notedLenses = Object.keys(lensNotes)
+if (!notedLenses.length)
+  log('WARNING: no `lensNotes` supplied — every lens runs on the kit\'s generic brief, with no project addendum')
+// TOOL-aSightedSkeptic-3 S4 - a run told nothing about what its subject is FOR is announced, on both
+// kinds: here before the first agent, and in the synthesis's RUN INTEGRITY block on every run.
+const intentAbsent = !a.context && !SPECS.length
+if (intentAbsent)
+  log('WARNING: neither `specs` nor `context` was supplied — the lenses were told nothing about what this ' +
+    (isSpec ? 'spec set' : 'change') + ' is for' + (isSpec ? '' : ', beyond the range\'s commit messages') +
+    '; pass the intent documents as `specs` or describe the change in `context`')
+// TOOL-aSightedSkeptic-7 S4/S6 - the lenses a light run SKIPS, in LENSES order; [] on a spec audit and
+// on a full run. Derived once, announced here before the first agent, and read by the Find thunk, the
+// reuse loop, the counts and the checklist split, which runs over the lenses that RUN (S7).
+const skippedLenses = !isSpec && intensity === 'light' ? LENS_KEYS.filter((k) => LIGHT_LENSES.indexOf(k) === -1) : []
+const runningLensKeys = LENS_KEYS.filter((k) => skippedLenses.indexOf(k) === -1)
+const lensesRunning = runningLensKeys.length
+if (skippedLenses.length)
+  log(`WARNING: intensity light — the ${skippedLenses.join(', ')} lens(es) were NOT run; their classes are swept only through the checklist shares`)
+// Closing review round 1, L6 - a note for a lens this run skips reaches no prompt, so the log and RUN
+// INTEGRITY report it apart, as UNREAD. Wording only: the check above still accepts the key (spec 7's
+// non-goal), and the review key still carries it.
+const unreadNotes = notedLenses.filter((k) => skippedLenses.indexOf(k) !== -1)
+const readNotes = notedLenses.filter((k) => skippedLenses.indexOf(k) === -1)
+if (unreadNotes.length)
+  log(`WARNING: lens notes were supplied for skipped lens(es), unread: ${unreadNotes.join(', ')}`)
+// TOOL-aSightedSkeptic-4 S2-S6 - THE SPLIT. Item n goes to keys[(n - 1) % K], so every item is in
+// exactly one share and the split is a pure function of the items and the keys: a reused lens file
+// (S7) held the share this run would hand it. Round-robin, not contiguous `chunk`: a contiguous split
+// hands one lens a run of neighbouring classes and the last lens the short remainder (spec F1 and §10).
+// It runs over the keys of the lenses that RUN (S7 below), never by reshaping the LENSES receiver the agent-cap hook sizes.
+function deriveChecklistShares(items, keys) {
+  const shares = {}
+  for (const k of keys) shares[k] = []
+  items.forEach((text, i) => shares[keys[i % keys.length]].push({ n: i + 1, text: text }))
+  return shares
+}
+// TOOL-aSightedSkeptic-7 S7 - over the RUNNING keys, so a skipped lens takes no share and no item is
+// lost with it. On a full run these are LENS_KEYS, and the split is unchanged.
+const checklistShares = deriveChecklistShares(CHECKLIST_ITEMS, runningLensKeys)
+const checklistSubject = isSpec ? 'the spec set' : 'the diff'
+// One block per lens, built here rather than in the prompt. Skeptics get none (S3).
+const checklistBlock = {}
+for (const k of runningLensKeys) {
+  const share = checklistShares[k]
+  checklistBlock[k] = !CHECKLIST_ITEMS.length
+    ? ''
+    : `CHECKLIST — the project's recurring bug classes, split across the lenses so each is swept once.\n` +
+      (checklist.preamble ? checklist.preamble + '\n' : '') +
+      (share.length
+        ? `This lens holds ${share.length} of the ${CHECKLIST_ITEMS.length} items; the others hold the rest.\n` +
+          share.map((x) => `C${x.n} ${x.text}`).join('\n') + '\n' +
+          `Sweep EACH class above against ${checklistSubject} and report only a FRESH hit: a defect of that class ` +
+          `${checklistSubject} introduces or touches. Begin such a finding's claim with its C<n> label. A class with no hit needs no finding.\n`
+        : `This lens holds none of the ${CHECKLIST_ITEMS.length} items; the other lenses hold them all.\n`)
+}
+// S4/S5 - the assignment is recoverable from the log; an absence is ANNOUNCED, worded per cause.
+if (CHECKLIST_ITEMS.length)
+  log(`checklist: ${CHECKLIST_ITEMS.length} item(s) over ${lensesRunning} lens(es), each swept by exactly one — ` +
+    runningLensKeys.map((k) => k + ' ' + (checklistShares[k].length ? checklistShares[k].map((x) => 'C' + x.n).join(' ') : 'none')).join('; '))
+else if (a.checklist === undefined)
+  log('WARNING: no `checklist` was supplied — no lens sweeps the project\'s recurring bug classes; pass the caller\'s checklist output as `checklist`')
+else log('WARNING: `checklist` was supplied with no item — no lens sweeps the project\'s recurring bug classes')
 
 // ---- TOOL-dDerivedDocket-29 S2/S3 — THE RESUME PROBE, one agent, before the Find phase ----------
 // WHY ONE AGENT. The script has no filesystem, so something with one has to read the key directory.
@@ -386,14 +592,26 @@ const LENSES = isSpec ? SPEC_LENSES : DIFF_LENSES // gov:fixed-verifiers
 // trusted. It is trusted exactly as far as a lens is: everything a reused lens returns still passes
 // through the skeptics.
 //
-// THE KEY: kind, round, the pinned subject, and a fingerprint over `context`, `byDesign` and
-// `priorFindings` - every input a lens prompt interpolates except `repo`, which is left out on
+// THE KEY: kind, round, the pinned subject, and a fingerprint over `context`, `byDesign`,
+// `priorFindings`, `lensNotes`, `specs`, `checklist`, `intensity` and the REVIEW_SHAPE literal - every input a lens prompt interpolates,
+// and the prompts' own shape, except `repo`, which is left out on
 // purpose: the common dir is shared by every worktree on the node, and a take-over from another
 // worktree of the same commits is exactly the re-run this exists for. A spec audit's subject is every
 // `path@blob` in the order given; a diff review's is the RESOLVED base and head (F5), so a review
 // commissioned against `origin/main` is pinned to the sha that ref named, and a moved ref is a
 // different key rather than a stale answer.
-const inputPrint = deriveFnv1a(renderCanonical({ context: context, byDesign: byDesign, priorFindings: priorFindings }))
+// TOOL-aSightedSkeptic-5 S3/S5 - `lensNotes` is an input the finder prompts interpolate, and
+// REVIEW_SHAPE is a literal standing for the prompts and schemas themselves: a lens
+// file written by OLD prompts under the same inputs must not be reused by new ones. ONE bump for the
+// whole aSightedSkeptic build (its shared invariant 5); a later change to a prompt, a schema or the
+// lens set moves this literal again. It rides the print rather than the key's string, so the probe
+// prompt's hand-spelled directory follows without a second edit.
+const REVIEW_SHAPE = 'lenses5-r1'
+// TOOL-aSightedSkeptic-3 S5 - `specs` is interpolated by renderIntent(), so it joins the print too.
+// TOOL-aSightedSkeptic-4 S7 - so does the PARSED checklist: a CRLF string and its LF twin are one key,
+// and a lens swept under one checklist is never reused under another.
+// TOOL-aSightedSkeptic-7 S8 - and so does `intensity`: a light run and a full run never share a lens file.
+const inputPrint = deriveFnv1a(renderCanonical({ shape: REVIEW_SHAPE, context: context, byDesign: byDesign, priorFindings: priorFindings, lensNotes: lensNotes, specs: SPECS, checklist: checklist, intensity: intensity }))
 const specSubject = isSpec
   ? deriveFnv1a(subjects.map((x) => (x && typeof x === 'object' ? `${x.path}@${x.blob}` : String(x))).join('\n'))
   : ''
@@ -471,6 +689,7 @@ if (probeLive && Array.isArray(probe.skipped) && probe.skipped.length)
 // file into a current answer.
 const reusedLens = new Map()
 for (const L of LENSES) {
+  if (skippedLenses.indexOf(L.key) !== -1) continue // S4 - no `reused` line names a lens that will not run
   const file = presentFinds.find((f) => f && f.name === `find-${L.key}.json` && f.lens === L.key && Array.isArray(f.findings))
   if (file && file.key === reviewKey) {
     reusedLens.set(L.key, file)
@@ -480,36 +699,86 @@ for (const L of LENSES) {
   }
 }
 
+// TOOL-aSightedSkeptic-1 - THE BRIEF, one copy, opening every finder AND every skeptic prompt. The
+// skeptic used to be handed none of it, so it read whatever checkout its working directory was and
+// was told "by-design" refutes without being shown what is. Read at CALL time: the subject line
+// needs the shas the resume probe resolved. Two lines are worded by role, and a diff skeptic gets
+// one more, SCOPE; a spec audit has no range, so nothing in it is older than the review (spec F2).
+// TOOL-aSightedSkeptic-3 S2/S3 - THE INTENT BLOCK, inside the brief so finders and skeptics share it.
+// The diff kind ALWAYS names the range's commit log over the RESOLVED shas (two dots: `log a..b`
+// lists the commits `diff a...b` introduces), with or without `specs` (spec F2). The harness has no
+// filesystem, so a listed document that is missing is the lens's to report. A spec audit has no
+// range: its `specs` are sibling context, read for agreement and never reported against.
+function renderIntent() {
+  const listed = SPECS.map((p) => `  - ${p}`).join('\n')
+  if (isSpec)
+    return SPECS.length
+      ? `SIBLING CONTEXT — documents NOT under audit, named by the caller as what the subjects must agree with. Read them for agreement and report nothing against them:\n${listed}`
+      : `SIBLING CONTEXT — none supplied; the subjects are their own statement of intent.`
+  return `INTENT — what this change was meant to do.\n` +
+    (SPECS.length
+      ? `The caller named these documents as its statement of intent:\n${listed}\n` +
+        `Read the ones your lens or your finding touches; the intent lens reads every one WHOLE before it reads the diff. ` +
+        `A listed document that does not exist in ${repo} is itself a finding against its path.\n`
+      : '') +
+    `Read the range's commit messages, \`git -C ${repo} log --format=%B ${baseSha}..${headSha}\`, and any spec or design document the diff touches or those messages name.` +
+    (SPECS.length ? '' : ' No spec was supplied, so these are the statement of intent.')
+}
+
+function renderBrief(role) {
+  const skeptic = role === 'skeptic'
+  const lines = [
+    `REPO: ${repo} — run every git command as \`git -C ${repo} …\`; every path below is relative to it.`,
+    isSpec
+      ? `SUBJECT: the spec set, each file at its pinned blob:\n` + subjects.map((x) => `  - ${x.path}  blob ${x.blob}`).join('\n')
+      : `SUBJECT: the diff \`${diffCmd}\`.`,
+    `CONTEXT: ${context}`,
+    renderIntent(),
+    `REVIEW ROUND: ${round}${round > 1 ? (isSpec ? ' - this is a FOLD review. Aim at the text the previous round\'s fixes introduced, which is the only text in these documents nobody has reviewed.' : ' - this is a FOLD review. The diff above is what the previous round\'s fixes introduced, not the whole build.') : ''}`,
+  ]
+  if (skeptic && !isSpec)
+    lines.push(`SCOPE: a finding is in scope only if this diff introduced its defect or made it reachable. A defect present unchanged at the base is PRE-EXISTING: refute it. Check with \`git -C ${repo} show ${baseSha}:<path>\`.`)
+  lines.push(skeptic ? `BY DESIGN (refute any finding one of these covers): ${byDesign}` : `BY DESIGN (do NOT re-report these): ${byDesign}`)
+  lines.push(priorFindings.length
+    ? (skeptic
+      ? `PRIOR ROUND'S CONFIRMED FINDINGS - these were RAISED AND FIXED. A finding that re-raises one of these originals, rather than a defect in its fix, is refuted as a duplicate:\n`
+      : `PRIOR ROUND'S CONFIRMED FINDINGS - these were RAISED AND FIXED. Judge the FIX, and do not re-raise the original:\n`) +
+      priorFindings.map((f) => `  - ${f.ref || '(no ref)'} - ${f.claim || f.title || '(no claim)'}`).join('\n')
+    : `PRIOR ROUND'S FINDINGS: none - this is a first-round review of ${isSpec ? 'the whole spec set' : 'the whole diff'}.`)
+  return lines.join('\n') + '\n\n'
+}
+
 phase('Find')
 const finderResults = await boundedParallel(
   LENSES.map((L) => () =>
-    reusedLens.has(L.key)
+    // TOOL-aSightedSkeptic-7 S4 - a skipped lens resolves to a SENTINEL and dispatches nothing. Never
+    // null: null is how a dead agent reaches the script, and every light run would defer forever.
+    skippedLenses.indexOf(L.key) !== -1
+      ? Promise.resolve({ lens: L.key, path: '', findings: [], skipped: true })
+      : reusedLens.has(L.key)
       ? Promise.resolve(reusedLens.get(L.key))
       : agent(
+      renderBrief('finder') +
       (isSpec
         // S6 - the spec kind's acquire sentence. The lens holds a filesystem and the orchestrator does
         // not, so the BLOB COMPARISON happens here. Without it S5 is a string test any caller
         // satisfies; with it, a spec that moved since the caller pinned it is a blocker finding.
-        ? `You are the ${L.key} reviewer of a SPEC SET. For EACH subject below: first run ` +
+        ? `You are the ${L.key} reviewer of a SPEC SET. For EACH subject listed under SUBJECT above: first run ` +
           `\`git hash-object <path>\` in ${repo} and compare the result to the pinned blob. A mismatch ` +
           `means the spec MOVED since this review was commissioned — report it as a BLOCKER finding ` +
-          `and review the file as it now stands. Then Read the file WHOLE.\n\nSUBJECTS:\n` +
-          subjects.map((x) => `  - ${x.path}  blob ${x.blob}`).join('\n') + `\n\n`
-        : `You are the ${L.key} reviewer. Review ONLY this diff (run \`${diffCmd}\`, then Read/Grep the touched files + their immediate callers):\n\n`) +
-        `CONTEXT: ${context}\n` +
-        `REVIEW ROUND: ${round}${round > 1 ? (isSpec ? ' - this is a FOLD review. Aim at the text the previous round\'s fixes introduced, which is the only text in these documents nobody has reviewed.' : ' - this is a FOLD review. The diff above is what the previous round\'s fixes introduced, not the whole build.') : ''}\n` +
-        `BY DESIGN (do NOT re-report these): ${byDesign}\n` +
-        (priorFindings.length
-          ? `PRIOR ROUND'S CONFIRMED FINDINGS - these were RAISED AND FIXED. Judge the FIX, and do not re-raise the original:\n` +
-            priorFindings
-              .map((f) => `  - ${f.ref || '(no ref)'} - ${f.claim || f.title || '(no claim)'}`)
-              .join('\n') +
-            `\n\n`
-          : `PRIOR ROUND'S FINDINGS: none - this is a first-round review of ${isSpec ? 'the whole spec set' : 'the whole diff'}.\n\n`) +
-        `LENS: ${L.brief}\n\n` +
+          `and review the file as it now stands. Then Read the file WHOLE.\n\n`
+        : `You are the ${L.key} reviewer. Review ONLY the diff named under SUBJECT above (run \`${diffCmd}\`, then Read/Grep the touched files + their immediate callers).\n\n`) +
+        `LENS: ${L.brief}\n` +
+        // TOOL-aSightedSkeptic-5 S5 - this lens's note and no other's, directly under its brief.
+        (notedLenses.indexOf(L.key) !== -1 ? `PROJECT NOTE FOR THIS LENS (from the caller's lensNotes): ${lensNotes[L.key]}\n` : '') +
+        // TOOL-aSightedSkeptic-4 S3 - this lens's checklist share, and no other's.
+        checklistBlock[L.key] +
+        `\n` +
         (isSpec
           ? `Emit CONCRETE findings only — each needs file, where, severity (blocker|high|medium|low), with "where" being the section address, e.g. "section 2 S5", a one-line claim, the impact, and a proposed fix. A spec finding is often the ABSENCE of a line, so address it by section. No speculation, no style nits, nothing outside the spec set. If nothing real, return findings: [].\n`
           : `Emit CONCRETE findings only — each needs file, line, severity (blocker|high|medium|low), a one-line claim, the impact, and a proposed fix. No speculation, no style nits, nothing outside the diff. If nothing real, return findings: [].\n`) +
+        // TOOL-aSightedSkeptic-6 S2 - the rubric beside the instruction that asks for a severity.
+        SEVERITY_RUBRIC + `\n` +
         // TOOL-dDerivedDocket-29 S1 - WRITE BEFORE RETURN. A fan that dies on a session limit loses
         // every structured return with it; a file on disk survives, and the next run's probe reuses it.
         `\nDURABILITY — BEFORE you return, whatever you found, Write the exact JSON object you are about to return, plus one more field "key":"${reviewKey}", to ${keyDir}/find-${L.key}.json, creating the directory if it is missing.${keyDirHow} Set path to that file's absolute, forward-slash path.\n` +
@@ -525,16 +794,22 @@ const finderResults = await boundedParallel(
 // all-dead run used to be indistinguishable from an all-clean one. Observed live: a review returned
 // `clean: 0 findings` with agents_done 0, four ENOTFOUND errors, and a journal of four `started`
 // lines and zero `result` lines. Count what actually came back and never call absence cleanliness.
-const liveResults = finderResults.filter(Boolean)
-const lensesDead = LENSES.length - liveResults.length
+// TOOL-aSightedSkeptic-7 S5 - a skipped lens is neither live nor dead. Membership in skippedLenses
+// decides it, never the sentinel's own field, which a reused file could also carry.
+const liveResults = finderResults.filter((x, i) => x && skippedLenses.indexOf(LENSES[i].key) === -1)
+const lensesDead = finderResults.filter((x) => !x).length
 // TOOL-dDerivedDocket-29 S5 - the LABEL of every agent that did not return, so a caller can say what a
 // re-run will dispatch. The harness cannot tell a user's mid-run skip from a death, because both
 // return null, and both defer: an unjudged finding was never a result.
 const deadLensLabels = LENSES.filter((L, i) => !finderResults[i]).map((L) => `find:${L.key}`)
 // `ref` is DISPLAY ONLY from here on — it rides the prompts and the report lines and is never a map
 // key. `id` is assigned once, after every lens has returned, and is the only join key.
-const allFindings = liveResults
-  .flatMap((r) => (r.findings || []).map((f) => ({ ...f, ref: `${f.file}:${isSpec ? f.where : f.line}` })))
+// TOOL-aSightedSkeptic-8 S1 - derived from finderResults BY INDEX, so each finding carries `lens`, the
+// key the harness DISPATCHED (spec F1), never the agent's echo. Same members, same order as
+// liveResults, so ids and batch membership do not move.
+const allFindings = finderResults
+  .flatMap((r, i) => (!r || skippedLenses.indexOf(LENSES[i].key) !== -1 ? [] : (r.findings || []).map((f) =>
+    ({ ...f, lens: LENSES[i].key, ref: `${f.file}:${isSpec ? f.where : f.line}` }))))
   .map((f, i) => ({ ...f, id: i + 1 }))
 
 // ---- TOOL-dDerivedDocket-29 S5 — THE `exit` FIELD, on every return. `complete` when every agent
@@ -543,15 +818,17 @@ const allFindings = liveResults
 // ---- with identical args will dispatch, everything else being reused from the key directory. The
 // ---- one null `blockers` that is NOT a death, the tally fault below, stays `complete`: a re-run
 // ---- cannot repair an adjudication, so that path keeps the refusal its callers already make.
-if (lensesDead === LENSES.length) {
-  log(`UNVERIFIED — all ${LENSES.length} lenses failed to return. Nothing was reviewed. Deferred: re-run with identical args.`)
+if (lensesDead === lensesRunning) {
+  log(`UNVERIFIED — all ${lensesRunning} lenses failed to return. Nothing was reviewed. Deferred: re-run with identical args.`)
   return {
     // TOOL-dTieredTribunal-1 S3 - null, never 0. No synthesis ran, so there is no adjudicated count.
     exit: 'deferred-platform', key: reviewKey, pending: deadLensLabels,
     confirmed: [], report: null, root: repo, blockers: null, highs: null, lensesRun: 0, lensesDead,
     lensesReused: reusedLens.size,
-    note: `DEFERRED: no lens completed (${lensesDead}/${LENSES.length} died) — nothing was reviewed; re-run with identical args`,
-    round, priorFindings: priorFindings.length,
+    note: `DEFERRED: no lens completed (${lensesDead}/${lensesRunning} died) — nothing was reviewed; re-run with identical args`,
+    round, priorFindings: priorFindings.length, intensity, skippedLenses,
+    // TOOL-aSightedSkeptic-8 S5 - nothing was judged on this path.
+    ledger: [], confirmedFindings: [], appendix: '',
   }
 }
 if (allFindings.length === 0) {
@@ -559,17 +836,18 @@ if (allFindings.length === 0) {
   // nothing`, which the build harness's clean-round test cannot tell from a result; it defers now.
   const deferred = lensesDead > 0
   const note = deferred
-    ? `DEFERRED: ${lensesDead}/${LENSES.length} lenses died and the survivors found nothing — re-run with identical args to dispatch only ${deadLensLabels.join(', ')}`
+    ? `DEFERRED: ${lensesDead}/${lensesRunning} lenses died and the survivors found nothing — re-run with identical args to dispatch only ${deadLensLabels.join(', ')}`
     : 'clean: 0 findings'
   log(note)
   // TOOL-dTieredTribunal-1 S3 - null, never 0: no synthesis ran on this path either.
   return {
     exit: deferred ? 'deferred-platform' : 'complete', key: reviewKey, pending: deadLensLabels,
     confirmed: [], report: null, root: repo, blockers: null, highs: null, lensesRun: liveResults.length, lensesDead,
-    lensesReused: reusedLens.size, note, round, priorFindings: priorFindings.length,
+    lensesReused: reusedLens.size, note, round, priorFindings: priorFindings.length, intensity, skippedLenses,
+    ledger: [], confirmedFindings: [], appendix: '', // TOOL-aSightedSkeptic-8 S5 - no finding raised
   }
 }
-log(`${allFindings.length} raw findings across ${LENSES.length} lenses — verifying in batches.`)
+log(`${allFindings.length} raw findings across ${lensesRunning} lenses — verifying in batches.`)
 
 // --- Phase 2: VERIFY — batched skeptics (NOT one agent per finding) -----
 phase('Verify')
@@ -586,7 +864,9 @@ log(`${allFindings.length} finding(s) -> ${batches.length} verifier(s) (cap ${MA
 // alone is not enough: when a dead lens is re-dispatched the ids after it shift, and an id-keyed
 // match would pair old verdicts with new findings. When every lens is reused the ids, the batches and
 // their prints come out identical, which is what lets a dead synthesis re-run alone.
-const batchPrints = batches.map((g) => deriveFnv1a(renderCanonical(g.map((f) => [f.id, String(f.claim)]))))
+// TOOL-aSightedSkeptic-2 S5 - the FIX joins the print, since the skeptic now judges it: a verify file
+// judged against one fix is never reused for a finding carrying another under the same claim.
+const batchPrints = batches.map((g) => deriveFnv1a(renderCanonical(g.map((f) => [f.id, String(f.claim), String(f.fix)]))))
 const batchLabels = batches.map((g) => `verify:ids-${g[0].id}-${g[g.length - 1].id}`)
 const reusedBatch = batches.map((g, gi) => {
   const name = `verify-${g[0].id}-${g[g.length - 1].id}.json`
@@ -604,17 +884,37 @@ const verdictResults = await boundedParallel(
     reusedBatch[gi]
       ? Promise.resolve(reusedBatch[gi])
       : agent(
+      renderBrief('skeptic') +
       (isSpec
-        ? `You are an adversarial skeptic. For EACH finding below, try hard to REFUTE it — Read the cited spec at the cited section, and the siblings it names, and decide "confirmed" (real, and it makes the spec unbuildable or wrong) or "refuted" (asks for detail a non-goal withholds / cites a section that says what the finding claims it does not / is a style preference). Default to refuted when uncertain.\n\n`
-        : `You are an adversarial skeptic. For EACH finding below, try hard to REFUTE it — read the actual code (Read/Grep the cited file:line and callers) and decide "confirmed" (real, reachable, impactful) or "refuted" (not reachable / not a bug / by-design / duplicate). Default to refuted when uncertain.\n\n`) +
+        ? `You are an adversarial skeptic. For EACH finding below, try hard to REFUTE it — Read the cited spec at the cited section, and the siblings it names, and decide "confirmed" (real, and it makes the spec unbuildable or wrong) or "refuted" (asks for detail a non-goal withholds / cites a section that says what the finding claims it does not / is a style preference).\n\n`
+        : `You are an adversarial skeptic. For EACH finding below, try hard to REFUTE it — read the actual code (Read/Grep the cited file:line and callers) and decide "confirmed" (real, reachable, impactful) or "refuted" (not reachable / not a bug / by-design / duplicate).\n\n`) +
+        // TOOL-aSightedSkeptic-6 S4 - the default follows the FINDER's grade (spec section 8 F3). An
+        // unsure skeptic refuting a real blocker loses the defect; one answering uncertain on every
+        // low-precision nit floods disposal. So only a costly finding is left outstanding.
+        `WHEN YOU CANNOT ESTABLISH A FINDING either way: one the finder graded medium or low (the bracketed grade) is "refuted"; ` +
+        `one the finder graded blocker or high is answered "uncertain", and its reason says what you could not establish. ` +
+        `"uncertain" is never a substitute for a judgment you can make.\n\n` +
+        SEVERITY_RUBRIC + `\n` +
+        `For each finding you CONFIRM, also return \`severity\`, graded by this rubric against what you read, independent of the finder's bracketed grade.\n\n` +
         `Findings to judge:\n` +
+        // TOOL-aSightedSkeptic-8 S2 - `lens=` after the grade; `id=<n> [` stays first for the stubs' id pattern.
         group
-          .map((f) => `id=${f.id} [${f.severity}] ${f.ref} — ${f.claim} | impact: ${f.impact}`)
+          .map((f) => `id=${f.id} [${f.severity}] lens=${f.lens} ${f.ref} — ${f.claim} | impact: ${f.impact} | fix: ${f.fix}`)
           .join('\n') +
+        // TOOL-aSightedSkeptic-2 S2 - the fix is judged as a SECOND, separate question. It never moves
+        // the claim's verdict (spec section 8 F1): a real defect with a bad fix is still a real defect.
+        `\n\nTHE FIX, A SECOND AND SEPARATE QUESTION. For each finding also judge its proposed fix, as \`fixVerdict\`: ` +
+        `"sound" when applying it cures the defect and introduces none you can see in the ${isSpec ? 'spec' : 'code'} it touches; ` +
+        `"unsound" when it does not cure the defect, breaks a caller, an invariant or a sibling path, or introduces a defect of its own; ` +
+        // Closing review round 1, M3 - fixNote carries the CORRECTION and nothing else, so an empty note
+        // is the one way to say "no correction", and the harness branches on exactly that.
+        `"none" when no fix was proposed. For "unsound", \`fixNote\` holds ONLY the corrected fix, and is empty when you have none; ` +
+        `say why the fix is unsound in \`reason\`, never in \`fixNote\`. ` +
+        `The fix verdict NEVER changes the finding's verdict: judge the claim on its own, then the fix on its own.` +
         `\n\nDURABILITY — BEFORE you return, Write the exact JSON object you are about to return, plus two more fields ` +
         `"key":"${reviewKey}" and "batch":"${batchPrints[gi]}", to ${keyDir}/verify-${group[0].id}-${group[group.length - 1].id}.json, ` +
         `creating the directory if it is missing.${keyDirHow} Set path to that file's absolute, forward-slash path.` +
-        `\n\nReturn JSON {path, verdicts:[{id:<the integer id shown above>, verdict:"confirmed"|"refuted", reason}]}. ` +
+        `\n\nReturn JSON {path, verdicts:[{id:<the integer id shown above>, verdict:"confirmed"|"refuted"|"uncertain", reason, severity:"blocker"|"high"|"medium"|"low" (on a confirmed verdict), fixVerdict:"sound"|"unsound"|"none", fixNote}]}. ` +
         `Emit EXACTLY one verdict per finding above (${group.length} verdicts, ids ${group.map((f) => f.id).join(', ')}). ` +
         `Copy the integer id — do NOT re-type the file path, and do not renumber.`,
         { label: batchLabels[gi], phase: 'Verify', schema: VERDICT_SCHEMA },
@@ -653,26 +953,123 @@ for (const r of liveVerdicts)
   }
 for (const id of conflicts) verdictById.delete(id)
 
+// TOOL-aSightedSkeptic-2 S3/S6 - a confirmed finding's fix as the synthesis and the death log carry it.
+// Read at call time, so it is called only after the join above. Absent or outside FIX_VERDICTS is
+// UNJUDGED, and the finder's fix is then marked as the finder's proposal and nothing more.
+function renderFixLine(f) {
+  const v = verdictById.get(f.id) || {}
+  const note = String(v.fixNote || '').trim()
+  if (v.fixVerdict === 'sound') return `fix (judged SOUND by the skeptic): ${f.fix}`
+  if (v.fixVerdict === 'none') return `fix: none proposed${f.fix ? ` (the finder wrote: ${f.fix})` : ''}`
+  if (v.fixVerdict === 'unsound')
+    return (note
+      ? `fix: REJECTED by the skeptic, whose corrected fix is: ${note}`
+      : `fix: REJECTED by the skeptic, who gave no correction - the fix is STILL TO BE DESIGNED`) +
+      ` (the finder's rejected proposal, never to be written as the fix: ${f.fix})`
+  return `fix (NOT JUDGED - the finder's proposal only): ${f.fix}`
+}
+
+// TOOL-aSightedSkeptic-6 S5 - the BINDING grade: the skeptic's on a confirmed verdict when it is in
+// the closed set, else the finder's. Read at call time, so it is called only after the join above.
+function deriveBindingSeverity(f) {
+  const v = verdictById.get(f.id)
+  return v && v.verdict === 'confirmed' && SEVERITIES.indexOf(v.severity) !== -1 ? v.severity : f.severity
+}
+
 const confirmed = allFindings.filter((f) => verdictById.get(f.id)?.verdict === 'confirmed')
 const refuted = allFindings.filter((f) => verdictById.get(f.id)?.verdict === 'refuted')
-const unverified = allFindings.filter((f) => !verdictById.has(f.id))
-// precision is confirmed/(confirmed+refuted): an unjudged finding is not evidence either way.
+// TOOL-aSightedSkeptic-6 S8 - UNVERIFIED is every finding with neither a confirmed nor a refuted
+// verdict: those a skeptic answered `uncertain`, and those with no usable verdict at all. The two are
+// counted apart, so a run whose skeptics all answered never reads as one where none returned.
+const unverified = allFindings.filter((f) => ['confirmed', 'refuted'].indexOf(verdictById.get(f.id)?.verdict) === -1)
+const uncertainFindings = unverified.filter((f) => verdictById.get(f.id)?.verdict === 'uncertain')
+const noVerdict = unverified.filter((f) => verdictById.get(f.id)?.verdict !== 'uncertain')
+// precision is confirmed/(confirmed+refuted): an unjudged or uncertain finding is not evidence either way.
 const judged = confirmed.length + refuted.length
 const precision = judged ? confirmed.length / judged : 0
-if (unverified.length)
-  log(`WARNING: ${unverified.length} finding(s) came back with NO usable verdict — counted UNVERIFIED, not refuted: ids ${unverified.map((f) => f.id).join(', ')}`)
+if (uncertainFindings.length)
+  log(`WARNING: ${uncertainFindings.length} finding(s) answered UNCERTAIN by a skeptic — counted UNVERIFIED, neither confirmed nor refuted: ids ${uncertainFindings.map((f) => f.id).join(', ')}`)
+if (noVerdict.length)
+  log(`WARNING: ${noVerdict.length} finding(s) came back with NO usable verdict — counted UNVERIFIED, not refuted: ids ${noVerdict.map((f) => f.id).join(', ')}`)
 if (conflicts.size)
   log(`WARNING: ${conflicts.size} finding(s) got CONTRADICTORY verdicts — demoted to UNVERIFIED: ids ${[...conflicts].join(', ')}`)
 if (duplicates) log(`note: ${duplicates} repeat verdict(s) agreed with the standing one — idempotent.`)
 if (spurious) log(`WARNING: ${spurious} verdict(s) carried an id this run never assigned — discarded.`)
+// TOOL-aSightedSkeptic-2 S4 - the fix verdicts over CONFIRMED findings only, since a refuted
+// finding's fix is never applied. The four counts sum to confirmed.length.
+const fixCounts = { sound: 0, unsound: 0, none: 0 }
+const unjudgedFixIds = []
+for (const f of confirmed) {
+  const fv = verdictById.get(f.id).fixVerdict
+  if (FIX_VERDICTS.indexOf(fv) !== -1) fixCounts[fv]++
+  else unjudgedFixIds.push(f.id)
+}
+if (unjudgedFixIds.length)
+  log(`WARNING: ${unjudgedFixIds.length} confirmed finding(s) carry a fix no skeptic judged — ids ${unjudgedFixIds.join(', ')}`)
+// TOOL-aSightedSkeptic-6 S5 - UNGRADED (no legal skeptic grade, so the finder's binds) and RE-GRADED
+// (the skeptic's grade differs from the finder's, and binds). The finding's own `severity` stays the
+// finder's grade; deriveBindingSeverity is the only reader of the skeptic's.
+const ungradedIds = []
+const skepticRegradedIds = []
+for (const f of confirmed) {
+  if (SEVERITIES.indexOf(verdictById.get(f.id).severity) === -1) ungradedIds.push(f.id)
+  else if (deriveBindingSeverity(f) !== f.severity) skepticRegradedIds.push(f.id)
+}
+if (ungradedIds.length)
+  log(`WARNING: ${ungradedIds.length} confirmed finding(s) carry no skeptic grade — UNGRADED, bound at the finder's grade: ids ${ungradedIds.join(', ')}`)
+if (skepticRegradedIds.length)
+  log(`note: ${skepticRegradedIds.length} confirmed finding(s) RE-GRADED by the skeptic, whose grade binds: ids ${skepticRegradedIds.join(', ')}`)
 if (skepticsDead)
   log(`WARNING: ${skepticsDead}/${verdictResults.length} skeptic batch(es) died — verification is PARTIAL.`)
 log(
-  `confirmed ${confirmed.length} / refuted ${refuted.length} / unverified ${unverified.length} — precision ${precision.toFixed(2)}` +
+  `confirmed ${confirmed.length} / refuted ${refuted.length} / unverified ${unverified.length} (${uncertainFindings.length} uncertain) — precision ${precision.toFixed(2)}` +
     (judged === 0
       ? ' (NOTHING was judged — the number is a placeholder, not a result)'
       : precision < 0.5 ? ' (below 0.5 — tighten scope/priming next time, don\'t add agents)' : ''),
 )
+
+// TOOL-aSightedSkeptic-8 S3 - THE LEDGER, every finding and its verdict in id order, refuted ones
+// included: the only place a refuted finding reaches a record. Read through verdictById by the
+// integer id, never by `ref` (two findings at one file:line would collapse into one row).
+const ledger = allFindings.map((f) => {
+  const v = verdictById.get(f.id)
+  return {
+    id: f.id,
+    lens: f.lens,
+    ref: f.ref,
+    severity: f.severity,
+    skepticSeverity: v && SEVERITIES.indexOf(v.severity) !== -1 ? v.severity : null,
+    verdict: v && ['confirmed', 'refuted', 'uncertain'].indexOf(v.verdict) !== -1 ? v.verdict : 'unverified',
+    reason: conflicts.has(f.id) ? 'contradictory verdicts' : v ? String(v.reason || '') : '',
+    fixVerdict: v && FIX_VERDICTS.indexOf(v.fixVerdict) !== -1 ? v.fixVerdict : null,
+    claim: f.claim,
+  }
+})
+// S4 - the confirmed set in the shape `priorFindings` reads, so round N+1 is handed it rather than a
+// re-typed copy. A rejected fix is replaced by the skeptic's correction when one was given; with none,
+// the finder's fix stays, and `fixVerdict: 'unsound'` beside it marks it rejected.
+const confirmedFindings = confirmed.map((f) => {
+  const v = verdictById.get(f.id)
+  const fixVerdict = FIX_VERDICTS.indexOf(v.fixVerdict) !== -1 ? v.fixVerdict : null
+  const note = String(v.fixNote || '').trim()
+  return { id: f.id, lens: f.lens, ref: f.ref, claim: f.claim, severity: deriveBindingSeverity(f),
+    fix: fixVerdict === 'unsound' && note ? note : f.fix, fixVerdict }
+})
+// S6 - one cell: absent as `-`, a pipe escaped, and a run of any character Python's str.splitlines
+// breaks on folded to one space, so no claim or reason can forge or cut a row in the table
+// TOOL-aSightedSkeptic-9 parses (closing review round 1, L2: CR/LF alone let a U+2028 cut one).
+function renderCell(v) {
+  return v === null || v === undefined || v === '' ? '-' : String(v).replace(/[\r\n\x0b\x0c\x1c-\x1e\x85\u2028\u2029]+/g, ' ').replace(/\|/g, '\\|')
+}
+// The eight columns are the hand-off to TOOL-aSightedSkeptic-9; `claim` rides the ledger only (spec F4).
+function renderAppendix(rows) {
+  if (!rows.length) return ''
+  const cols = ['id', 'lens', 'ref', 'severity', 'skepticSeverity', 'verdict', 'reason', 'fixVerdict']
+  return ['## Appendix — every finding', '', '| ' + cols.join(' | ') + ' |', '|' + cols.map(() => '---').join('|') + '|']
+    .concat(rows.map((e) => '| ' + cols.map((c) => renderCell(e[c])).join(' | ') + ' |'))
+    .join('\n')
+}
+const appendix = renderAppendix(ledger)
 
 // U6/S7: the run that most needs a written report is the one where findings were raised and nothing
 // came back to judge them. The old `judged === 0` early return returned WITHOUT a report in exactly
@@ -691,12 +1088,15 @@ if (confirmed.length + unverified.length === 0) {
     // TOOL-dTieredTribunal-1 S3 - null, never 0. Every finding was refuted, which is a RESULT, but
     // no synthesis pass ran to adjudicate a blocker count, so there is none to report.
     confirmed: [], report: null, precision, root: repo, blockers: null, highs: null,
-    lensesRun: liveResults.length, lensesDead, skepticsDead, unverified: 0,
+    lensesRun: liveResults.length, lensesDead, skepticsDead, unverified: 0, uncertain: 0,
     conflicts: conflicts.size, duplicates, spurious, lensesReused: reusedLens.size, batchesReused,
     note: deferred
-      ? `DEFERRED: every finding raised was refuted, but ${lensesDead}/${LENSES.length} lenses died — re-run with identical args to dispatch only ${pendingLabels.join(', ')}`
+      ? `DEFERRED: every finding raised was refuted, but ${lensesDead}/${lensesRunning} lenses died — re-run with identical args to dispatch only ${pendingLabels.join(', ')}`
       : 'all findings adjudicated and refuted',
-    round, priorFindings: priorFindings.length,
+    round, priorFindings: priorFindings.length, intensity, skippedLenses,
+    // TOOL-aSightedSkeptic-8 S5 - no report is written on this path (spec F3), so the return is the
+    // only place this ledger and appendix exist; a caller may write them.
+    ledger, confirmedFindings, appendix,
   }
 }
 
@@ -708,16 +1108,17 @@ if (confirmed.length + unverified.length === 0) {
 if (pendingLabels.length) {
   log(`WARNING: ${pendingLabels.length} agent(s) did not return (${pendingLabels.join(', ')}) — DEFERRED, and no synthesis runs over a partial set. ` +
     `The ${confirmed.length} confirmed and ${unverified.length} unverified finding(s) so far:`)
-  for (const f of confirmed) log(`  CONFIRMED [${f.severity}] ${f.ref} - ${f.claim}`)
-  for (const f of unverified) log(`  UNVERIFIED [${f.severity}] ${f.ref} - ${f.claim}`)
+  for (const f of confirmed) log(`  CONFIRMED [${deriveBindingSeverity(f)}] lens=${f.lens} ${f.ref} - ${f.claim}`)
+  for (const f of unverified) log(`  UNVERIFIED [${f.severity}] lens=${f.lens} ${f.ref} - ${f.claim}`)
   return {
     exit: 'deferred-platform', key: reviewKey, pending: pendingLabels,
     root: repo, raw: allFindings.length, confirmed: confirmed.length, refuted: refuted.length,
-    unverified: unverified.length, conflicts: conflicts.size, duplicates, spurious, precision,
+    unverified: unverified.length, uncertain: uncertainFindings.length, conflicts: conflicts.size, duplicates, spurious, precision,
     lensesRun: liveResults.length, lensesDead, skepticsDead, lensesReused: reusedLens.size, batchesReused,
     report: null, summary: '', blockers: null, highs: null,
     note: `DEFERRED: ${lensesDead} lens(es) and ${skepticsDead} skeptic batch(es) did not return — re-run with identical args to dispatch only ${pendingLabels.join(', ')}`,
-    round, priorFindings: priorFindings.length,
+    round, priorFindings: priorFindings.length, intensity, skippedLenses,
+    ledger, confirmedFindings, appendix, // TOOL-aSightedSkeptic-8 S5 - what was judged so far; `exit` says partial
   }
 }
 
@@ -725,23 +1126,41 @@ if (pendingLabels.length) {
 phase('Synthesize')
 const synth = await agent(
   `Write the Tier-2 review report for: ${context}\n\n` +
-    `CONFIRMED findings (survived an adversarial skeptic):\n` +
+    // TOOL-aSightedSkeptic-6 S6 - the bracket is the BINDING grade, and both grades follow it when the
+    // skeptic's differs from the finder's.
+    `CONFIRMED findings (survived an adversarial skeptic; the bracketed grade is BINDING):\n` +
     (confirmed.length
       ? confirmed
-          .map(
-            (f) =>
-              `- id=${f.id} [${f.severity}] ${f.ref} — ${f.claim}\n  impact: ${f.impact}\n  fix: ${f.fix}\n  why-real: ${verdictById.get(f.id)?.reason || ''}`,
-          )
+          .map((f) => {
+            const g = deriveBindingSeverity(f)
+            const grades = g !== f.severity
+              ? ` (finder graded ${f.severity}, skeptic graded ${g})`
+              : ungradedIds.indexOf(f.id) !== -1 ? ` (no skeptic grade - the finder's binds)` : ''
+            return `- id=${f.id} [${g}]${grades} lens=${f.lens} ${f.ref} — ${f.claim}\n  impact: ${f.impact}\n  ${renderFixLine(f)}\n  why-real: ${verdictById.get(f.id)?.reason || ''}`
+          })
           .join('\n')
       : '  (none)') +
-    `\n\nUNVERIFIED findings (no usable skeptic verdict came back — OUTSTANDING, not cleared; read the code yourself before classifying each):\n` +
+    // TOOL-aSightedSkeptic-6 S8 - each UNVERIFIED finding says which of the two kinds it is.
+    `\n\nUNVERIFIED findings (no confirmed or refuted verdict — OUTSTANDING, not cleared; read the code yourself before classifying each):\n` +
     (unverified.length
       ? unverified
-          .map((f) => `- id=${f.id} [${f.severity}] ${f.ref} — ${f.claim}\n  impact: ${f.impact}\n  fix: ${f.fix}`)
+          .map((f) => `- id=${f.id} [${f.severity}] lens=${f.lens} ${f.ref} — ${f.claim}\n  impact: ${f.impact}\n  fix: ${f.fix}\n  ` +
+            (verdictById.get(f.id)?.verdict === 'uncertain'
+              ? `status: UNCERTAIN - the skeptic could not establish it: ${verdictById.get(f.id).reason || '(no reason given)'}`
+              : `status: NO USABLE VERDICT came back`))
           .join('\n')
       : '  (none)') +
+    `\n\n` + SEVERITY_RUBRIC + ` ` +
+    `Each CONFIRMED finding's bracketed grade is its BINDING grade under this rubric: put each confirmed id in an item ` +
+    `whose severity is that grade, merge findings of one binding grade only, and where you judge a different grade right, ` +
+    `write the reason in the report beside that finding.` +
     `\n\nWrite a markdown report (severity-ranked, blockers first, each with ${isSpec ? 'its file and section address' : 'file:line'} + fix + a left-shift gate suggestion) to a file under ${repo}/${reviewDir}. ` +
-    `State the review shape near the top — raw ${allFindings.length}, confirmed ${confirmed.length}, refuted ${refuted.length}, unverified ${unverified.length}, precision ${precision.toFixed(2)}. ` +
+    // TOOL-aSightedSkeptic-2 S3 - a REJECTED fix never reaches the report as the fix.
+    `Each CONFIRMED finding's fix line says whether a skeptic judged its fix. Where it is REJECTED, write the skeptic's ` +
+    `corrected fix into the report, never the rejected one; where the note gives no correction, say the fix is still to be ` +
+    `designed. Where it is NOT JUDGED, present it as the finder's proposal only. ` +
+    // TOOL-aSightedSkeptic-7 S6 - the intensity, in the review-shape sentence, on every run.
+    `State the review shape near the top — intensity ${intensity}, raw ${allFindings.length}, confirmed ${confirmed.length}, refuted ${refuted.length}, unverified ${unverified.length} (${uncertainFindings.length} uncertain), precision ${precision.toFixed(2)}. ` +
     // TOOL-aWeldedTribunal-4 — RUN INTEGRITY. This harness computes every counter below and logged
     // them to stdout, which is not the record; the AGENT writes the record, so a run whose lenses
     // half died wrote a durable report that could not say so. The two drift-audit siblings were
@@ -756,10 +1175,38 @@ const synth = await agent(
     // whose skeptics disagreed and were demoted to UNVERIFIED) and does not compute the second.
     // Interpolating a counter nothing derives would put an invented number in a durable record.
     `\n\nRUN INTEGRITY - state these in the report and do NOT describe this run as complete if any is non-zero:\n` +
-    `lenses ${liveResults.length}/${LENSES.length} returned, ${lensesDead} DIED; ` +
+    `lenses ${liveResults.length}/${lensesRunning} returned, ${lensesDead} DIED; ` +
     `skeptic batches ${batches.length - skepticsDead}/${batches.length} returned, ${skepticsDead} DIED; ` +
     `${conflicts.size} contradictory verdict(s) demoted to unverified, ` +
-    `${spurious} spurious verdict(s) discarded, ${duplicates} duplicate(s).\n` +
+    `${spurious} spurious verdict(s) discarded, ${duplicates} duplicate(s); ` +
+    // TOOL-aSightedSkeptic-2 S4 - how many confirmed fixes a skeptic actually judged.
+    `fixes on confirmed findings: ${fixCounts.sound} judged sound, ${fixCounts.unsound} judged UNSOUND, ` +
+    `${fixCounts.none} none proposed, ${unjudgedFixIds.length} NOT JUDGED - an unjudged fix is the finder's proposal and nothing more; ` +
+    // TOOL-aSightedSkeptic-6 S5/S8 - the grades, and the two kinds of unverified finding, apart.
+    `severity on confirmed findings: ${ungradedIds.length} UNGRADED by the skeptic (bound at the finder's grade), ` +
+    `${skepticRegradedIds.length} RE-GRADED by the skeptic; ` +
+    `unverified findings: ${uncertainFindings.length} answered UNCERTAIN by a skeptic, ${noVerdict.length} with NO usable verdict; ` +
+    (notedLenses.length
+      ? `lens notes supplied for: ${readNotes.length ? readNotes.join(', ') : 'no lens that ran'}` +
+        (unreadNotes.length ? `; lens notes for skipped lenses, unread: ${unreadNotes.join(', ')}` : '') + `.\n`
+      : `lens notes: none supplied, so every lens ran on the kit's generic brief.\n`) +
+    // TOOL-aSightedSkeptic-7 S6 - a light run names every skipped lens; a full run carries no clause.
+    (skippedLenses.length
+      ? `Intensity: light - the ${skippedLenses.join(', ')} lens(es) were NOT run, so their classes were swept only ` +
+        `through the checklist shares; do NOT describe this run as a full review.\n`
+      : '') +
+    // TOOL-aSightedSkeptic-3 S4 - where intent came from, stated on EVERY run.
+    (SPECS.length
+      ? `Intent: ${SPECS.length} spec document(s) supplied as \`specs\`${isSpec ? ', as sibling context' : ', beside the range\'s commit messages'}.\n`
+      : a.context
+        ? `Intent: no spec was supplied; \`context\` was the caller's statement${isSpec ? '' : ', beside the range\'s commit messages'}.\n`
+        : `Intent: NEITHER \`specs\` nor \`context\` was supplied${isSpec ? '' : ', so the lenses had only the range\'s commit messages'} - the report must say so.\n`) +
+    // TOOL-aSightedSkeptic-4 S4/S5 - which lens held which share, or that nothing was swept.
+    (CHECKLIST_ITEMS.length
+      ? `Checklist: ${CHECKLIST_ITEMS.length} item(s), each assigned to exactly one of ${lensesRunning} lens(es): ` +
+        runningLensKeys.map((k) => `${k} ${checklistShares[k].length}`).join(', ') + `.\n`
+      : `Checklist: NONE swept — ${a.checklist === undefined ? 'absent' : 'supplied with no item'}; a zero count is not ` +
+        `evidence the project's recurring bug classes are absent.\n`) +
     `If lenses died, the finding set is INCOMPLETE and a zero count is not evidence of absence. ` +
     `Say so where you would otherwise call a zero positive evidence.\n\n` +
     // The range line is what the unattended kit's `closing-review-recorded` joins on, so the value
@@ -820,6 +1267,14 @@ const synth = await agent(
     `id out or names one twice returns neither count. In the review shape, state the adjudicated ` +
     `tally BOTH ways, by item and by raw confirmed finding, so the table you wrote and the ids you ` +
     `return agree. ` +
+    // TOOL-aSightedSkeptic-8 S7 - the harness renders the appendix and the agent only copies it: a
+    // table composed from these lines would miss every refuted finding, which no line above shows.
+    // The copy is NOT verified here (spec F2); the return's `appendix` holds the exact text.
+    (appendix
+      ? `\n\nAPPENDIX - the report's LAST section, after everything else, is the text between the two marker lines ` +
+        `below, copied VERBATIM: unedited, no row added, dropped, reordered or reworded, and neither marker line copied.\n` +
+        `<<<APPENDIX\n${appendix}\nAPPENDIX>>>\n\n`
+      : '') +
     `Return JSON {path, items, summary} with a FORWARD-SLASH path.`,
   {
     label: 'synth',
@@ -860,6 +1315,7 @@ const synth = await agent(
 let blockers = null
 let highs = null
 let tallyFault = ''
+const regraded = []
 if (synth) {
   const confirmedIds = new Set(confirmed.map((f) => f.id))
   const severityById = new Map()
@@ -895,6 +1351,12 @@ if (synth) {
     log(`adjudicated BLOCKER/HIGH/MEDIUM/LOW — by item ${perItem.BLOCKER}/${perItem.HIGH}/${perItem.MEDIUM}/${perItem.LOW}, ` +
       `by raw confirmed finding ${perRaw.BLOCKER}/${perRaw.HIGH}/${perRaw.MEDIUM}/${perRaw.LOW}`)
   }
+  // TOOL-aSightedSkeptic-6 S7 - the counts above stay derived from the items (spec section 8 F2); a
+  // placement off the binding grade is reported, never a tally fault and never silently re-counted.
+  for (const f of confirmed)
+    if (severityById.has(f.id) && severityById.get(f.id) !== String(deriveBindingSeverity(f)).toUpperCase()) regraded.push(f.id)
+  if (regraded.length)
+    log(`WARNING: the synthesis placed ${regraded.length} confirmed finding(s) at a grade other than their binding one: ids ${regraded.join(', ')}`)
 }
 
 // TOOL-aBoundedVerdict-14 S6 - the SYNTH-DEATH hole. Lens deaths and skeptic deaths are both counted
@@ -906,8 +1368,8 @@ if (synth) {
 if (!synth) {
   log(`WARNING: the synthesis agent DIED. No report was written, and the ${confirmed.length} confirmed finding(s) below are in this log and in ${keyDir}; a re-run with identical args dispatches only the synthesis:`)
   for (const f of confirmed)
-    log(`  CONFIRMED [${f.severity}] ${f.ref} - ${f.claim} | fix: ${f.fix}`)
-  for (const f of unverified) log(`  UNVERIFIED [${f.severity}] ${f.ref} - ${f.claim}`)
+    log(`  CONFIRMED [${deriveBindingSeverity(f)}] lens=${f.lens} ${f.ref} - ${f.claim} | ${renderFixLine(f)}`)
+  for (const f of unverified) log(`  UNVERIFIED [${f.severity}] lens=${f.lens} ${f.ref} - ${f.claim}`)
 }
 
 // H1: the SUCCESS return carries the same trust counts as the early ones. A caller that only ever
@@ -925,6 +1387,7 @@ return {
   confirmed: confirmed.length,
   refuted: refuted.length,
   unverified: unverified.length,
+  uncertain: uncertainFindings.length,
   conflicts: conflicts.size,
   duplicates,
   spurious,
@@ -932,7 +1395,7 @@ return {
   lensesRun: liveResults.length,
   lensesDead,
   skepticsDead,
-  agents: LENSES.length + batches.length + 1, // finders + batched skeptics + synth
+  agents: lensesRunning + batches.length + 1, // finders + batched skeptics + synth
   report: synth?.path || null,
   summary: synth?.summary || '',
   // TOOL-dTieredTribunal-1 S2/S3b - the counts the synthesis pass adjudicated, returned rather than
@@ -941,6 +1404,8 @@ return {
   // ids, and are null as well when that list does not place every confirmed id exactly once.
   blockers,
   highs,
+  // TOOL-aSightedSkeptic-6 S7 - absent where no synthesis ran, as no adjudicated count exists there.
+  ...(synth ? { regraded } : {}),
   // TOOL-dTieredTribunal-1, closing-review D1 - a dead synthesis was tested LAST, so it was
   // reportable only when nothing else was degraded and the most serious note was the least reachable
   // one. Worst outcome first. Found by the closing review of the build that ported this ternary into
@@ -952,11 +1417,23 @@ return {
       ? `DEFERRED: the synthesis agent died, so NO report was written; ${confirmed.length} confirmed finding(s) are in the run log and on disk — re-run with identical args to dispatch only the synthesis`
       : tallyFault
         ? `UNVERIFIED: the report was written, but its item list does not place every confirmed finding exactly once (${tallyFault}), so blockers and highs are null`
-        : judged === 0
+        // TOOL-aSightedSkeptic-6 S8 - the uncertain count apart from the no-verdict count, so a run whose
+        // skeptics all answered never reads as one where none returned.
+        : judged === 0 && !uncertainFindings.length
           ? `UNVERIFIED: ${allFindings.length} finding(s) raised, none judged — no skeptic batch returned a usable verdict — the report lists them as outstanding`
-          : unverified.length
-            ? `PARTIAL: ${unverified.length} finding(s) came back with no usable verdict and are unverified`
-            : 'complete',
+          : judged === 0
+            ? `UNVERIFIED: ${allFindings.length} finding(s) raised, none confirmed or refuted — ${uncertainFindings.length} answered uncertain by a skeptic, ${noVerdict.length} with no usable verdict — the report lists them as outstanding`
+            : unverified.length
+              ? `PARTIAL: ${unverified.length} finding(s) are unverified — ${uncertainFindings.length} answered uncertain by a skeptic, ${noVerdict.length} with no usable verdict`
+              : 'complete',
   round,
   priorFindings: priorFindings.length,
+  // TOOL-aSightedSkeptic-7 S6 - on every exit path, so a light run is never read as a full one.
+  intensity,
+  skippedLenses,
+  // TOOL-aSightedSkeptic-8 S5 - every finding and its verdict, the confirmed set as round N+1's
+  // `priorFindings`, and the appendix the synthesis was told to copy, for a caller to compare.
+  ledger,
+  confirmedFindings,
+  appendix,
 }

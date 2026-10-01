@@ -88,6 +88,7 @@
       "review-join ban (no ref-keyed join)",
       "review-join self-test",
       "review-protocol parity (kit vs dogfood)",
+      "review-replay selftest",
       "row-driver view refusal",
       "row-grammar selftest",
       "row-keyed merge driver replay",

@@ -148,6 +148,18 @@ subject = "repo"
 argv = ["node", "{kit}/check-workflow-syntax.js"]
 guard = []
 
+# THE REPLAY TOOL'S SELF-TEST. TOOL-aSightedSkeptic-9 S8, mirroring `shell-hygiene selftest` in the
+# gate-lint kit. Unlike this kit's `*.test.sh` suites it SHIPS: the tool is an engine file under
+# `**`, and its `--selftest` reads inline fixtures only, so a target holding the tool can run it.
+# `subject = "kit"` puts it under the 2026-08-23 kit-self-test hold. UNGUARDED, so it runs on every
+# self-test bar: a guard naming this kit made the spec-tokens guards join demand that every live spec
+# touching this kit name the leg, and the self-test costs about a second (TOOL-aSightedSkeptic-9 rev-3).
+[[gate_leg]]
+name = "review-replay selftest"
+subject = "kit"
+argv = ["python3", "{kit}/review_replay.py", "--selftest"]
+guard = []
+
 [[lf_pin]]
 pattern = "{kit}/*.js"
 why = "measured: 350 CR bytes made the shipped harness unlaunchable while its own syntax leg stayed green"
