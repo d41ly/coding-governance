@@ -1,11 +1,12 @@
 # TOOL-dMendedRecall-1 — the recall selftest's memory-tree fixture carries the kit's python surface, and the spec-H1 arm reads only that
 
-**Status:** SPECCED · rev-1 · 2026-10-01 · node d · Tier-2 · base 1f915870 · streams tooling · order 1 · closes TOOL-dAlignedCarrier-8 · ratified 2026-10-01
+**Status:** CLOSED · rev-1 · 2026-10-01 · node d · Tier-2 · base 1f915870 · streams tooling · order 1 · closes TOOL-dAlignedCarrier-8 · ratified 2026-10-01
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-01-build-TOOL-dMendedRecall-1-1-acceptance-ledger.md](../build/2026-10-01-build-TOOL-dMendedRecall-1-1-acceptance-ledger.md) | journal | — |
 | [2026-10-01-prompt-TOOL-dMendedRecall-1-build-brief.md](../prompts/2026-10-01-prompt-TOOL-dMendedRecall-1-build-brief.md) | journal | TOOL-dMendedRecall-2 TOOL-dMendedRecall-3 |
 | [2026-10-01-prompt-TOOL-dMendedRecall-1-spec-brief.md](../prompts/2026-10-01-prompt-TOOL-dMendedRecall-1-spec-brief.md) | journal | TOOL-dMendedRecall-2 TOOL-dMendedRecall-3 |
 
