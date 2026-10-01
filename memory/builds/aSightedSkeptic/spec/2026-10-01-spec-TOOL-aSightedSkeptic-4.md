@@ -9,6 +9,7 @@
 | [2026-10-01-build-TOOL-aSightedSkeptic-4-1-acceptance-ledger.md](../build/2026-10-01-build-TOOL-aSightedSkeptic-4-1-acceptance-ledger.md) | journal | — |
 | [2026-10-01-prompt-TOOL-aSightedSkeptic-1-1-spec-brief.md](../prompts/2026-10-01-prompt-TOOL-aSightedSkeptic-1-1-spec-brief.md) | journal | TOOL-aSightedSkeptic-1 TOOL-aSightedSkeptic-2 TOOL-aSightedSkeptic-3 TOOL-aSightedSkeptic-5 TOOL-aSightedSkeptic-6 TOOL-aSightedSkeptic-7 TOOL-aSightedSkeptic-8 TOOL-aSightedSkeptic-9 |
 | [2026-10-01-prompt-TOOL-aSightedSkeptic-4-2-build-brief.md](../prompts/2026-10-01-prompt-TOOL-aSightedSkeptic-4-2-build-brief.md) | journal | — |
+| [2026-10-01-review-TOOL-aSightedSkeptic-1-closing-diff-round1.md](../reviews/2026-10-01-review-TOOL-aSightedSkeptic-1-closing-diff-round1.md) | diff-review | TOOL-aSightedSkeptic-1 TOOL-aSightedSkeptic-2 TOOL-aSightedSkeptic-3 TOOL-aSightedSkeptic-5 TOOL-aSightedSkeptic-6 TOOL-aSightedSkeptic-7 TOOL-aSightedSkeptic-8 TOOL-aSightedSkeptic-9 |
 
 <!-- /gen:spec-records -->
 
