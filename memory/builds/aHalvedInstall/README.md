@@ -42,7 +42,10 @@ rolls back for a kit with no `[check]`. The owner's prompt is in `prompts/`.
 
 ## Parked decisions
 
-- None yet.
+- Check 23 reds the close at 2 undeclared writes against a shrink-only ceiling of 0. Raise it to 2 for
+  this landing (it falls back once the run derives LANDED), or abort? Both writes are history.
+- Keep the brief-recorded waiver row for unit 5, built without a `--brief` row and now carrying a
+  reconstructed brief, or delete it and take the leg red?
 
 <!-- roster:units -->
 
