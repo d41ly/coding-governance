@@ -1627,6 +1627,10 @@ def check_update_safety(tmp: pathlib.Path) -> None:
     # ---- and a source the receipt's own vintage already shipped, which recurs on every run.
     kit_h5 = (SAFE_HEAD + 'version_from = { none = "fixture" }\n\n[check]\nnone = "fixture"\n\n'
               '[[files]]\ninclude = "**"\nrole = "engine"\n\n'
+              # The pin is load-bearing: a target with an `attributes` row walks `update`'s pin block,
+              # whose own local `_held` once rebound the held-kit set and crashed every pinned target
+              # at the HELD BACK print. The fixtures above carry no pin, so only the whole suite saw it.
+              '[[lf_pin]]\npattern = "{kit}/*.sh"\nwhy = "a fixture pin"\n\n'
               '[adopt]\nargv = []\nmutates_index = false\n')
     _h5_new = f"{PFX}demo/new.sh"
     _h5_own = b"the operator's own file at a path gov starts shipping\n"

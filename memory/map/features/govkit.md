@@ -15,7 +15,7 @@ git-hooks = []
 workflow-scripts = []
 skill-engines = ["deploy-governance"]
 rendered-skills = []
-gotcha-classes = ["fixture-lacks-a-gate-the-consumer-has.md",
+gotcha-classes = ["fixture-lacks-a-gate-the-consumer-has.md", "a-new-local-collides-in-a-long-function.md",
   "guard-above-a-fold-makes-its-fallback-dead.md"]
 guides = []
 backlog-shards = []

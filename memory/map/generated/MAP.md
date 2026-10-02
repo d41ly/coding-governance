@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 124 · kits: 17 · git-hooks: 7 · workflow-scripts: 11 · skill-engines: 2 · rendered-skills: 5 · gotcha-classes: 92 · guides: 9 · backlog-shards: 4 · lexicon-verbs: 23
+Inventories: gate-legs: 124 · kits: 17 · git-hooks: 7 · workflow-scripts: 11 · skill-engines: 2 · rendered-skills: 5 · gotcha-classes: 93 · guides: 9 · backlog-shards: 4 · lexicon-verbs: 23
 
 ## gate-legs
 
@@ -207,6 +207,7 @@ Inventories: gate-legs: 124 · kits: 17 · git-hooks: 7 · workflow-scripts: 11 
 | key | claimant |
 |---|---|
 | `a-new-leg-trips-a-growing-set-of-meta-gates.md` | run-gates |
+| `a-new-local-collides-in-a-long-function.md` | govkit |
 | `a-pair-exists-and-it-is-the-wrong-one.md` | agent-cap |
 | `a-spelling-change-strands-its-readers.md` | install-prefix |
 | `a-view-fix-trades-one-blindness-for-another.md` | agent-cap |

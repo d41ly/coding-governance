@@ -8545,11 +8545,13 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     # ---- calls `_add_held`, sits in a span whose hold is generic (the write loop's problem count, the
     # ---- landing loop's decision after it), or says `# hold-exempt:` and why it splits no kit.
     # ---- Round 1 of this build's closing review found two channels unit 4 had not routed (H1).
-    _held: dict[str, list[str]] = {}
+    # NOT `_held`: the lf-pin block below binds that name to a string, and the collision crashed
+    # `update` at every target with an `attributes` row (found by the whole govkit selftest).
+    _held_kits: dict[str, list[str]] = {}
 
     def _add_held(kit, path) -> None:
         if kit:
-            _held.setdefault(str(kit), []).append(str(path))
+            _held_kits.setdefault(str(kit), []).append(str(path))
 
     _role_res: dict[str, dict] = {}
     for row in rows_all:
@@ -10039,7 +10041,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
         if base_commit and _rs and blob_at(root, base_commit, _rs) is None:
             _add_held(_rk, _rd)
     # ---- HOLD REGION END
-    for _eid_h, _paths_h in sorted(_held.items()):
+    for _eid_h, _paths_h in sorted(_held_kits.items()):
         print(f"govkit update — HELD BACK {_eid_h}: {len(_paths_h)} row(s) refused "
               f"({', '.join(_paths_h)}), so none of this kit's writes from this run will stand")
 
@@ -10102,9 +10104,9 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             # the observed failure — and write renders the rollback would then have to chase. NOT
             # entered in `_rr_stale`: that set is the verify pass's declined-red exit, which leaves a
             # kit's writes STANDING, and a held kit's writes must not stand.
-            if _eid in _held:
+            if _eid in _held_kits:
                 _rr_declined.append((_eid, f"a row of this kit was refused this run "
-                                           f"({', '.join(_held[_eid])}), so the kit is HELD BACK "
+                                           f"({', '.join(_held_kits[_eid])}), so the kit is HELD BACK "
                                            f"whole and its re-render would run over a half-landed "
                                            f"engine"))
                 continue
@@ -10266,9 +10268,9 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
         # because a skip that looks like nothing happened is the class this build closes. The line is
         # read off the SAME set the merge is handed, so it cannot announce a skip the merge does not
         # make; `run_fragment_merges` honouring that set is the fragment-wiring arm's own assertion.
-        _fr_skip |= set(_held)
+        _fr_skip |= set(_held_kits)
         for _fp in sorted(str(f.get("path")) for f in receipt.get("files") or []
-                          if f.get("kit") in _fr_skip and f.get("kit") in _held
+                          if f.get("kit") in _fr_skip and f.get("kit") in _held_kits
                           and f.get("path") in _fr_landed
                           and str(f.get("path")).endswith(".fragment.json")):
             print(f"govkit update — hooks: {_fp} landed UNWIRED — its kit is HELD BACK this run, "
@@ -10377,7 +10379,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
         # DEPL-aHalvedInstall-4 S3. A HELD kit is rolled back WHATEVER its check says, so it skips
         # both exits that leave writes standing — the unmeasured one, which every `[check] none` kit
         # takes, and pre-existing red — and enters the restore below by its own condition.
-        _held_v = _held.get(eid)
+        _held_v = _held_kits.get(eid)
         if now == "landed-unmeasured" and not _held_v:
             n_unverified += 1
             print(f"govkit update — verify {eid}: {was} -> {now}{now_detail} · UNVERIFIED: nothing "
