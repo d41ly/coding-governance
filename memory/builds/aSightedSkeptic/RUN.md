@@ -21,20 +21,20 @@ gates-run: unattended-179092786196975023401-2052 4ffcca30
 parked-surfaced: yes, 3 surfaced
 keepalive-reaped: yes
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 262ffd4937bf441e4bdb6df7152baf0edd615aa3
-phase: VERIFYING
+witness: 72d0fe5ff155180e34e0a3b7af133ac99a8cc4d0
+phase: BUILDING
 branch-sha: 9fdd0c18d5afac1744c226c3e8ea2716e6d49e30
 branch-ref: refs/heads/run/aSightedSkeptic
 may: none
 mode: prompt
 run-branch: refs/heads/run/aSightedSkeptic
 anchor-kind: run-branch
-lease-utc: 2026-10-02T06:56:18Z
+lease-utc: 2026-10-02T09:10:57Z
 pid-image: claude.exe
 host: compeeto-agent
 pid: 8008
 session: 9ef6acea-ff2d-4306-9d05-6269ec36d027
-keepalive: b122fb8b
+keepalive: 941bcadc
 anchor-url: https://github.com/d41ly/coding-governance.git
 anchor-sha: ef1dcdb61f9e5f87c7e3f01dc8f0ccf60e8334df
 anchor-ref: refs/heads/main
@@ -101,3 +101,5 @@ base: 9fdd0c18d5afac1744c226c3e8ea2716e6d49e30
 2026-10-01T23:02:14Z hold · item host-owner-action · reason until owner · reaped 5fbd3382 · resume none(owner)
 
 2026-10-02T06:56:19Z resume · item aSightedSkeptic · reason held · keepalive b122fb8b · manual
+
+2026-10-02T09:11:11Z rescope · item add TOOL-aSightedSkeptic-13 · reason Adopted by the owner's ruling (2026-10-02): check 23 of the unattended kit gate skips only records whose own phase field reads LANDED or ABORTED, so every in-place landing (whose file stays LANDING) is re-graded on every bar forever; check 7 already excludes a record as derived LANDED. Check 23 gains that same exclusion.

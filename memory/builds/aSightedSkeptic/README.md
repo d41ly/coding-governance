@@ -5,7 +5,7 @@ opened: 2026-10-01
 streams: tooling
 roster: TOOL
 authorized-by: prompt
-ids: TOOL-aSightedSkeptic-1 TOOL-aSightedSkeptic-2 TOOL-aSightedSkeptic-3 TOOL-aSightedSkeptic-4 TOOL-aSightedSkeptic-5 TOOL-aSightedSkeptic-6 TOOL-aSightedSkeptic-7 TOOL-aSightedSkeptic-8 TOOL-aSightedSkeptic-9 TOOL-aSightedSkeptic-10 TOOL-aSightedSkeptic-11 TOOL-aSightedSkeptic-12
+ids: TOOL-aSightedSkeptic-1 TOOL-aSightedSkeptic-2 TOOL-aSightedSkeptic-3 TOOL-aSightedSkeptic-4 TOOL-aSightedSkeptic-5 TOOL-aSightedSkeptic-6 TOOL-aSightedSkeptic-7 TOOL-aSightedSkeptic-8 TOOL-aSightedSkeptic-9 TOOL-aSightedSkeptic-10 TOOL-aSightedSkeptic-11 TOOL-aSightedSkeptic-12 TOOL-aSightedSkeptic-13
 ---
 
 # aSightedSkeptic — the Tier-2 review harness, briefed, calibrated and measured
@@ -65,12 +65,14 @@ never measured. The owner's prompt and the list are in `prompts/`.
 | 8 | `TOOL-aSightedSkeptic-8` | 2 | every finding keeps its lens, a findings ledger lands beside the report, and the confirmed set is returned |
 | 9 | `TOOL-aSightedSkeptic-9` | 2 | the replay benchmark: a ledger scored for recall against a past round's known findings |
 | 10 | `TOOL-aSightedSkeptic-10` | 2 | promoted from the closing review: every 'Observed by' claim this build's specs make is discharged by an arm a staged break reds |
+| 13 | `TOOL-aSightedSkeptic-13` | 2 | adopted by the owner: check 23 excludes a derived-LANDED record through check 7's predicate |
 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
 **Build status:** CLOSED · 10 unit(s) · node a · opened 2026-10-01 · streams tooling
 ids TOOL-aSightedSkeptic-1 TOOL-aSightedSkeptic-2 TOOL-aSightedSkeptic-3 TOOL-aSightedSkeptic-4 TOOL-aSightedSkeptic-5 TOOL-aSightedSkeptic-6 TOOL-aSightedSkeptic-7 TOOL-aSightedSkeptic-8 TOOL-aSightedSkeptic-9 TOOL-aSightedSkeptic-10 TOOL-aSightedSkeptic-11 TOOL-aSightedSkeptic-12
+ids TOOL-aSightedSkeptic-13
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -87,7 +89,7 @@ ids TOOL-aSightedSkeptic-1 TOOL-aSightedSkeptic-2 TOOL-aSightedSkeptic-3 TOOL-aS
 | [TOOL-aSightedSkeptic-10 — discharge the two Observed-by claims no arm reads, and record the class](spec/2026-10-01-spec-TOOL-aSightedSkeptic-10.md) | 10 | 2 | CLOSED | rev-1 | 2026-10-01 |
 <!-- /gen:build-units -->
 
-Records: 27 bound to this build, across 4 record folder(s).
+Records: 29 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
