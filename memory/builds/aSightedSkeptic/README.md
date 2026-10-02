@@ -5,7 +5,7 @@ opened: 2026-10-01
 streams: tooling
 roster: TOOL
 authorized-by: prompt
-ids: TOOL-aSightedSkeptic-1 TOOL-aSightedSkeptic-2 TOOL-aSightedSkeptic-3 TOOL-aSightedSkeptic-4 TOOL-aSightedSkeptic-5 TOOL-aSightedSkeptic-6 TOOL-aSightedSkeptic-7 TOOL-aSightedSkeptic-8 TOOL-aSightedSkeptic-9 TOOL-aSightedSkeptic-10 TOOL-aSightedSkeptic-11
+ids: TOOL-aSightedSkeptic-1 TOOL-aSightedSkeptic-2 TOOL-aSightedSkeptic-3 TOOL-aSightedSkeptic-4 TOOL-aSightedSkeptic-5 TOOL-aSightedSkeptic-6 TOOL-aSightedSkeptic-7 TOOL-aSightedSkeptic-8 TOOL-aSightedSkeptic-9 TOOL-aSightedSkeptic-10 TOOL-aSightedSkeptic-11 TOOL-aSightedSkeptic-12
 ---
 
 # aSightedSkeptic — the Tier-2 review harness, briefed, calibrated and measured
@@ -70,7 +70,7 @@ never measured. The owner's prompt and the list are in `prompts/`.
 
 <!-- gen:build-index -->
 **Build status:** CLOSED · 10 unit(s) · node a · opened 2026-10-01 · streams tooling
-ids TOOL-aSightedSkeptic-1 TOOL-aSightedSkeptic-2 TOOL-aSightedSkeptic-3 TOOL-aSightedSkeptic-4 TOOL-aSightedSkeptic-5 TOOL-aSightedSkeptic-6 TOOL-aSightedSkeptic-7 TOOL-aSightedSkeptic-8 TOOL-aSightedSkeptic-9 TOOL-aSightedSkeptic-10 TOOL-aSightedSkeptic-11
+ids TOOL-aSightedSkeptic-1 TOOL-aSightedSkeptic-2 TOOL-aSightedSkeptic-3 TOOL-aSightedSkeptic-4 TOOL-aSightedSkeptic-5 TOOL-aSightedSkeptic-6 TOOL-aSightedSkeptic-7 TOOL-aSightedSkeptic-8 TOOL-aSightedSkeptic-9 TOOL-aSightedSkeptic-10 TOOL-aSightedSkeptic-11 TOOL-aSightedSkeptic-12
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
