@@ -42,3 +42,5 @@ base: cd90f7fa5c8cddf152e3a2a065f5df7ad64f355b
 2026-10-02T13:03:51Z dispatch · item e9dfe2cd DEPL-aHalvedInstall-1 · reason tools/govkit/govkit.py tools/govkit/selftest.py tools/unattended/kit.toml memory/builds/aHalvedInstall/spec/2026-10-02-spec-DEPL-aHalvedInstall-1.md memory/LIVE.md
 
 2026-10-02T13:04:39Z dispatch · item d53b503a DEPL-aHalvedInstall-1 · reason tools/govkit/govkit.py tools/govkit/selftest.py tools/unattended/kit.toml memory/builds/aHalvedInstall/spec/2026-10-02-spec-DEPL-aHalvedInstall-1.md memory/LIVE.md memory/ledger/2026-10.md memory/builds/aHalvedInstall/README.md
+
+2026-10-02T13:14:28Z dispatch · item c4ea9dd6 DEPL-aHalvedInstall-2 · reason tools/govkit/govkit.py tools/unattended/kit.toml tools/govkit/entries/playbook.kit.toml memory/builds/aHalvedInstall/spec/2026-10-02-spec-DEPL-aHalvedInstall-2.md memory/LIVE.md memory/ledger/2026-10.md memory/builds/aHalvedInstall/README.md memory/map/generated/symbols.json memory/map/generated/MAP.md

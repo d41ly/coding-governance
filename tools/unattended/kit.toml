@@ -302,7 +302,7 @@ id = "keepalive-tool-names"
 kind = "authoring"
 blocks_adopt = false
 blocks_gate = true
-why = "a key ABSENT from the conf reds both the adopter check arm and the kit gate leg. But the shipped conf example copied verbatim renders its angle-bracket placeholder text as literal prose and passes EVERY check, because the placeholder detector greps the brace shape only — so this hole is half-silent and the probe is the only thing that sees that half."
+why = "RESUME_SCHEDULE_CREATE and RESUME_SCHEDULE_DELETE are required unless RESUME_SCHEDULE is off, and a condition is the one requirement no [config] key list can carry, so govkit's required-key reader cannot see this pair. Absent, the render keeps their placeholders and refuses; copied verbatim from the example, they render angle-bracket text as a tool name. The probe asserts each is PRESENT with a real value."
 # NARROWED, and re-SUBJECTED, by TOOL-dScrubbedConduit-1 S4. The old probe grepped `<[a-z-]+>` over
 # the RENDERED SKILL.md — a file whose own template ships 25 `<slug>`, 6 `<name>` and more as
 # DOCUMENTED SYNTAX. It therefore failed for every adopter no matter how correctly the conf was
@@ -322,7 +322,15 @@ why = "a key ABSENT from the conf reds both the adopter check arm and the kit ga
 # substitutes no `{{...}}` placeholder at all, so the render is clean, the skill-wiring arm passes,
 # and the Skill tells an agent to file restarts with a tool named `<your-durable-schedule-create-tool>`.
 # One alternation rather than a second hole, because it is one question about one file.
-discharge = { command = ["bash", "-c", "! grep -qE '^(KEEPALIVE_(CREATE|DELETE|INTERVAL)|RESUME_SCHEDULE_(CREATE|DELETE))=\"<.*>\"' .unattended.conf"] }
+#
+# NARROWED AGAIN, AND MADE A PRESENCE TEST, by DEPL-aHalvedInstall-2. The probe above was a REFUTATION
+# -- red only on a key still holding the example's `<...>` -- so a conf with NO RESUME_SCHEDULE pair at
+# all passed it, and govkit said nothing until the render refused. The unconditional keepalive keys
+# left it in the same unit: they are `required_keys_render`, which govkit now reads against the
+# target conf by itself (DEPL-aHalvedInstall-1), so asserting them here too would be two answers.
+# What stays is the CONDITIONAL pair, required unless RESUME_SCHEDULE is off -- a condition no key
+# list can carry. Each must be assigned a value that is neither empty nor angle-bracketed.
+discharge = { command = ["bash", "-c", "grep -qE '^RESUME_SCHEDULE=\"?off\"?[[:space:]]*$' .unattended.conf || for k in RESUME_SCHEDULE_CREATE RESUME_SCHEDULE_DELETE; do grep -qE '^'\"$k\"'=\"?[^<\"[:space:]]' .unattended.conf || exit 1; done"] }
 
 [[hole]]
 id = "directives-floor"

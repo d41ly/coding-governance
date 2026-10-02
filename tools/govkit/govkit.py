@@ -1978,6 +1978,53 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
             else:
                 r.note(f"contract {cid} ({eid}:{c.get('source')}): {len(cl)} clause(s)")
 
+    # ---- 6b (DEPL-aHalvedInstall-2): EVERY HOLE PROBE IS RUN ON AN EMPTY TREE, AND MUST NOT PASS THERE.
+    #          A probe written as a refutation -- `! grep <bad value> <file>` -- exits 0 when the file
+    #          or the key is not there at all, so it reports DISCHARGED for exactly the target it was
+    #          written to catch. Two shipped holes had that shape, `keepalive-tool-names` and
+    #          `playbook-placeholders`, and the first let an adopter with no RESUME_SCHEDULE pair at all
+    #          through until its render refused. The class is any shape that passes on absence -- a
+    #          negated grep, an `|| true`, a loop over an empty glob -- so the arm RUNS each probe
+    #          rather than reading its text: an empty directory holds nothing to be discharged, and a
+    #          probe that exits 0 there has no liveness.
+    #
+    #          Tokens resolve through `canonical_ctx`, all of them relative, and a token that context
+    #          lacks -- a target answer such as `{playbook_path}` -- resolves to its own name, which
+    #          names nothing in an empty directory. WHAT THIS DOES NOT CHECK: that a probe goes red on
+    #          the specific bad value its hole names, only that it does not go green on nothing; and a
+    #          probe that cannot LAUNCH is counted apart and never refused, because it did not report
+    #          discharged. There is no waiver: no hole whose honest answer is "discharged when absent"
+    #          exists to write one for.
+    _vac_ran = _vac_bad = _vac_nolaunch = 0
+    for eid, (d, _dpath) in sorted(descs.items()):
+        for h in d.get("hole", []):
+            _cmd = (h.get("discharge") or {}).get("command")
+            if not isinstance(_cmd, list) or not _cmd:
+                continue
+            _ctx6 = dict(canonical_ctx(eid))
+            _argv6 = []
+            for _a in _cmd:
+                _s6, _miss6 = resolve_tokens(str(_a), _ctx6)
+                if _miss6:
+                    _s6, _ = resolve_tokens(str(_a), {**_ctx6, **{m: m for m in _miss6}})
+                _argv6.append(_s6)
+            with tempfile.TemporaryDirectory(prefix="govkit-6b-") as _empty:
+                try:
+                    _rc6 = subprocess.run(resolve_shell_argv(_argv6), cwd=_empty, capture_output=True,
+                                          text=True, timeout=120).returncode
+                except (OSError, subprocess.TimeoutExpired):
+                    _vac_nolaunch += 1
+                    continue
+            _vac_ran += 1
+            if _rc6 == 0:
+                _vac_bad += 1
+                r.fail(f"entry '{eid}' hole '{h.get('id')}': its discharge probe exits 0 in an EMPTY "
+                       f"directory, so it reports the hole discharged where there is nothing to "
+                       f"discharge it — assert the subject is PRESENT before refuting a bad value in "
+                       f"it: {' '.join(str(x) for x in _cmd)[:240]}")
+    r.note(f"hole probes on an empty tree: {_vac_ran} ran, {_vac_bad} exited 0, "
+           f"{_vac_nolaunch} could not launch")
+
     # ---- 7: a requires_if condition names keys that resolve in the named kit's config lists, and
     #         names a kit that is a registry entry. PLAIN `requires` gets the same name arm, because
     #         check 7 is already the single place a dependency edge's kit NAME is graded and splitting
