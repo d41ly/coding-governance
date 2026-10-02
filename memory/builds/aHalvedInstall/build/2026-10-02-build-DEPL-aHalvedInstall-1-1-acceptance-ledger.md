@@ -8,9 +8,10 @@ Every positive arm was observed RED with `read_conf_key_gaps` staged to return n
 `update` hole call staged to iterate nothing; the two negative controls stayed green under that
 break, which is what they are for.
 
-The slice carries one failure that is not this unit's: `[aRF-17 AC5]`, the `git merge-file -p
---diff3` reproduction arm, fails identically on a detached worktree at `d53b503a`, before any change
-here.
+The slice, run with its temp root under the session scratchpad, carried one failure that is not
+this unit's: `[aRF-17 AC5]`, the `git merge-file -p --diff3` reproduction arm. It failed identically
+on a detached worktree at `d53b503a`, and passed with the same code once the temp root was the short
+system one, so it is the slice's own path length, not a product defect.
 
 **Evidences:** DEPL-aHalvedInstall-1
 - AC1 — `check` — `[aHI-1 AC1-AC2] check over DEMO_KEY=None names it, 'is ABSENT'` passed; red under the staged break
