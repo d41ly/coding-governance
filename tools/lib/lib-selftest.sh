@@ -8,7 +8,7 @@
 #
 # ---- WHAT THE MEASUREMENT SAID, because every decision below follows from it and none of it was
 # ---- reasoned out in advance. `memory/builds/aQuenchedHarness/build/2026-09-07-build-TOOL-aQuenchedHarness-5-candidate-test.md`
-# ---- traced `tools/check-line-length.test.sh`: 36 s, 18 arms, and the dominant term is the SUBJECT'S
+# ---- traced `<prefix>/check-line-length.test.sh`: 36 s, 18 arms, and the dominant term is the SUBJECT'S
 # ---- OWN COST PER INVOCATION — 31 python spawns in the outer script alone at 773 ms each, before
 # ---- counting the 12 python call sites inside the subject that `bash -x` cannot see. Not the
 # ---- harness. Not fixture construction, which is three file writes.
@@ -219,6 +219,13 @@ run_arms() {
     echo "$label: declared $_st_n arm(s), below the pinned floor of $floor — this suite has SHRUNK" >&2
     return 1
   fi
+  # A FOREIGN-PREFIX PROBE RUNS ONE ARM (TOOL-aRepatriatedFork-52 S1). That leg asks only whether a
+  # suite still finds its subject with gov's tool root moved, so under FOREIGN_PREFIX_PROBE=1 every
+  # suite on this harness answers with its FIRST declared arm, and the floor above still grades the
+  # whole declaration. The suite EXITS after it with that arm's verdict, because a later batch would
+  # be a second arm.
+  local probe=0
+  [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ] && { probe=1; _st_n=1; }
   local w; w=$(_st_width)
   # EVERY ARM'S RESULT DIRECTORY IN ONE CALL. Per-arm `mkdir` is one more process per arm to create a
   # path whose name was known before the run began.
@@ -252,11 +259,13 @@ run_arms() {
     j=$((j + 1))
   done
   echo "----"
+  [ "$probe" = 1 ] && echo "foreign-prefix-probe: stopped after 1 arm"
   if [ "$fails" -eq 0 ]; then
     printf 'PASS (%s arms, width %s)\n' "$_st_n" "$w"
   else
     printf 'FAIL (%s of %s arms, width %s)\n' "$fails" "$_st_n" "$w"
   fi
   rm -rf "$SELFTEST_ROOT" 2>/dev/null
+  if [ "$probe" = 1 ]; then [ "$fails" -eq 0 ] && exit 0; exit 1; fi
   [ "$fails" -eq 0 ]
 }

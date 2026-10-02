@@ -11,8 +11,8 @@ two-line adoption step for that is documented here rather than left implicit.
 ## ps-hygiene.py
 
 ```bash
-python3 tools/gate-lint/ps-hygiene.py [root]   # exit 0 clean, 1 findings, 2 usage
-python3 tools/gate-lint/ps-hygiene.py --selftest
+python3 <prefix>/gate-lint/ps-hygiene.py [root]   # exit 0 clean, 1 findings, 2 usage
+python3 <prefix>/gate-lint/ps-hygiene.py --selftest
 ```
 
 Scans **every** `.ps1` under `root` for two classes:
@@ -108,7 +108,7 @@ Add it as a gate leg wherever that project enumerates them, e.g. an entry in a l
 step, or a pre-commit hook:
 
 ```bash
-python3 tools/gate-lint/ps-hygiene.py . || exit 1
+python3 <prefix>/gate-lint/ps-hygiene.py . || exit 1
 ```
 
 Run `--selftest` in the same place. Per `coding-governance-agents.template.md` §7, a gate

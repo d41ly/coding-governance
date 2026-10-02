@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Runnable check for stall-recorder.js — the `StopFailure` hook that appends one line per API-error
 # stall of a bound session to `<git-dir>/unattended/stall.<slug>.log`, and cannot block.
-# Run: bash tools/unattended/stall-recorder.test.sh   (exit 0 = all pass)
+# Run: bash <prefix>/unattended/stall-recorder.test.sh   (exit 0 = all pass)
 #
 # WITHHELD FROM THE BAR AND FROM ADOPTERS, like every suite in this kit (kit.toml `project-owned`):
 # its subject is the hook's key and its line shape, which move only when this file's siblings move.
@@ -22,6 +22,19 @@
 # scratch kit dir beside its module; no driver stub, because this hook never spawns one.
 set -u
 HERE="$(cd "$(dirname "$0")" && pwd)"
+# >>> derive_self_rel — canonical copy: kit-rel.sh in gov's lib dir (byte-identical; gated)
+derive_self_rel() {
+  local _dsr_p _dsr_rel=""
+  _dsr_p=$(cd "$1" 2>/dev/null && pwd) || return 1
+  while [ ! -e "$_dsr_p/.git" ]; do
+    [ "$(dirname "$_dsr_p")" = "$_dsr_p" ] && return 1
+    _dsr_rel="$(basename "$_dsr_p")${_dsr_rel:+/$_dsr_rel}"
+    _dsr_p=$(dirname "$_dsr_p")
+  done
+  printf '%s\n' "$_dsr_rel"
+}
+# <<< derive_self_rel
+KIT_REL=$(derive_self_rel "$HERE") || { echo "stall-recorder.test: not inside a git repository"; exit 2; }
 # STALL_RECORDER_TEST_TMP is the pass's seam: a unit pass runs one arm at a time from a sourced
 # copy of this prologue and must put its scratch under the session scratchpad, not /tmp.
 # STALL_RECORDER_TEST_GITTMP is the real-driver arm's: its `git init` fixture wants a SHORT path on
@@ -34,12 +47,95 @@ print_bad()  { echo "FAIL $1"; fail=$((fail+1)); }
 check_same() { if [ "$2" = "$3" ]; then print_ok "$1"; else print_bad "$1: expected [$3], got [$2]"; fi; }
 check_hit()  { if grep -qF -- "$2" <<<"$1"; then print_ok "$3"; else print_bad "$3: missing [$2]"; fi; }
 
-if [ -f "$HERE/../lib/resolve-python.sh" ]; then
-  . "$HERE/../lib/resolve-python.sh"
-  TESTPY=$(resolve_python) || { echo "stall-recorder.test: no usable python"; exit 2; }
-else
-  TESTPY=python3   # gov:literal-python — last-resort fallback when ../lib/ is absent (adopter layout)
-fi
+# TOOL-aRepatriatedFork-46: a kit is named by the name its directory has in THIS install, never
+# as a literal segment: this suite's own from where it sits, a sibling's through the resolver,
+# which reads the install receipt first. A fixture mirrors that layout by the resolved NAME.
+# The resolver is carried INLINE; it was sourced from a probe of the library directory beside
+# this kit, which ships nowhere.
+# >>> resolve_python — canonical copy: resolve-python.sh in gov's lib dir (byte-identical; gated)
+resolve_python() {
+  # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
+  # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
+  # the candidate and every consumer uses "$PY" as a single word (measured: exit 127).
+  _rp_tried=""
+  for _rp_c in "${1:-}" "${GOV_PYTHON:-}" python3 python py; do
+    [ -n "$_rp_c" ] || continue
+    _rp_tried="$_rp_tried $_rp_c"
+    if "$_rp_c" -c "import sys" >/dev/null 2>&1; then
+      printf '%s\n' "$_rp_c"
+      return 0
+    fi
+  done
+  {
+    echo "resolve_python: no usable python launcher. Each candidate was RUN with -c 'import sys' and"
+    echo "resolve_python: none exited 0 — being on PATH is not evidence (the Microsoft Store python3"
+    echo "resolve_python: stub answers \`command -v\` and exits 9009 without running anything)."
+    echo "resolve_python: tried:$_rp_tried"
+    if [ -n "${1:-}" ]; then
+      echo "resolve_python: the caller's override '$1' was tried FIRST and did not run."
+    fi
+    if [ -n "${GOV_PYTHON:-}" ]; then
+      echo "resolve_python: GOV_PYTHON is set to '$GOV_PYTHON' and did not run. An override that is"
+      echo "resolve_python: set and unusable is THIS failure, never a silent fall-through — the"
+      echo "resolve_python: operator believes they chose, and would not have."
+    fi
+  } >&2
+  return 1
+}
+# <<< resolve_python
+# The sibling-kit resolver (TOOL-aRepatriatedFork-2 S3), INLINED byte-identically from the
+# canonical copy named on its marker line and gated by the resolve-python self-test's parity
+# table. A shell consumer runs it with the python it already resolved, so the receipt rung is
+# read in Python and never parsed in bash. `resolve_kit_dir <python> <home> <anchor> <here>`
+# prints the kit directory REPO-RELATIVE, or the resolver's named refusal on stderr and exits 1.
+resolve_kit_dir() {
+  "$1" -c "$(cat <<'RKD'
+# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
+def resolve_kit_dir(home, anchor, here):
+    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
+
+    1. receipt — the `.governance/install.json` row whose `source` ends in <home>/<anchor> and
+       whose `path` exists inside this tree. The only record of a RENAMED kit dir: no probe finds
+       a memory-recall kit an adopter homed at `scripts/recall/`.
+    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
+    3. refuse — LookupError naming the three places looked; never a guessed prefix.
+    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
+    """
+    import json
+    import pathlib
+    here = pathlib.Path(here).absolute()  # never resolve(): a junction must not move it
+    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
+    receipt = root / ".governance" / "install.json"
+    try:
+        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("path"):
+            continue
+        if str(row.get("source") or "").split("/")[-2:] != [home, anchor]:
+            continue
+        hit = (root / str(row["path"])).absolute()
+        if hit.is_file() and root in hit.parents and ".." not in hit.parts:
+            return hit.parent
+    probes = (here / home, here.parent / home)
+    for cand in probes:
+        if (cand / anchor).is_file():
+            return cand
+    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
+        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
+# <<< resolve_kit_dir
+RKD
+)"'
+import sys
+try:
+    d = resolve_kit_dir(*sys.argv[1:4])
+except LookupError as e:
+    sys.exit(str(e))
+r = next((p for p in (d, *d.parents) if (p / ".git").exists()), d.anchor)
+print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
+}
+TESTPY=$(resolve_python) || { echo "stall-recorder.test: no usable python"; exit 2; }
 # The payload's `cwd` must be a path node resolves on this host: MSYS spells a scratch dir /tmp/x
 # where node wants C:/..., and a cwd node cannot walk keys nothing, which passes every silent arm
 # for the wrong reason.
@@ -93,6 +189,8 @@ print("same" if json.loads(ls[-1].split(" ",3)[3])==json.loads(sys.argv[2]) else
 F=$(build_fixture BUILDING absent)
 run_hook "$(build_payload "$F" '{"error":"rate_limit"}')"
 check_same "AC1 unbound rc" "$RC" "0"
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${fail:-0}" = 0 ] && echo "PASS (${pass:-1} assertions)" || echo "FAIL (${pass:-1} assertions)"; [ "${fail:-0}" = 0 ] && exit 0; exit 1; fi
 check_same "AC1 unbound stdout empty" "$OUT" ""
 [ ! -e "$(derive_sidecar "$F")" ] && print_ok "AC1 unbound writes no sidecar" || print_bad "AC1 unbound wrote $(derive_sidecar "$F")"
 run_hook "$(build_payload "$F" '{"session_id":"absent","error":"rate_limit"}')"
@@ -180,7 +278,6 @@ check_same "AC13 the suite is withheld by the descriptor" "$(grep -c 'stall-reco
 # ---- own seed() — extracted as one function, never the suite — which commits once so HEAD is
 # ---- born and the driver's clock probe is live. Before the payload `last-stall: none`; after it,
 # ---- the `last-stall:` line equals the sidecar's last line, both read from the fixture.
-KIT_REL="${KIT_REL:-tools/unattended}"
 TR_T=${KIT_REL%/*}; [ "$TR_T" = "$KIT_REL" ] && TR_T=""; [ -z "$TR_T" ] || TR_T="$TR_T/"
 eval "$(sed -n '/^seed() {/,/^}/p' "$HERE/adopt-unattended.test.sh")"
 FR="$GITTMP/real"; rm -rf "$FR"; mkdir -p "$GITTMP"; seed "$FR" >/dev/null 2>&1

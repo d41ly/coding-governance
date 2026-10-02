@@ -2,9 +2,27 @@
 # Self-test for check-verdict-epoch.sh. Every arm runs in a throwaway repo with a synthetic engine,
 # because the arm that matters — "the engine moved and the version did not" — cannot be staged in
 # this tree without leaving the merge bar red.
-KIT_REL="${KIT_REL:-tools/memory-tree}"
 set -u
 HERE="$(cd "$(dirname "$0")" && pwd)"
+# >>> derive_self_rel — canonical copy: kit-rel.sh in gov's lib dir (byte-identical; gated)
+derive_self_rel() {
+  local _dsr_p _dsr_rel=""
+  _dsr_p=$(cd "$1" 2>/dev/null && pwd) || return 1
+  while [ ! -e "$_dsr_p/.git" ]; do
+    [ "$(dirname "$_dsr_p")" = "$_dsr_p" ] && return 1
+    _dsr_rel="$(basename "$_dsr_p")${_dsr_rel:+/$_dsr_rel}"
+    _dsr_p=$(dirname "$_dsr_p")
+  done
+  printf '%s\n' "$_dsr_rel"
+}
+# <<< derive_self_rel
+KIT_REL=$(derive_self_rel "$HERE") || { echo "check-verdict-epoch.test: not inside a git repository"; exit 2; }
+# PFX is the install prefix WITH its trailing slash, derived from where this file sits and empty
+# at a root install: every fixture and host path below is spelled through it, never through a
+# literal prefix (TOOL-aRepatriatedFork-28).
+case "$KIT_REL" in */*) PFX="${KIT_REL%/*}/" ;; *) PFX="" ;; esac
+# TOOL-aRepatriatedFork-46: this kit's own directory NAME, which every fixture below mirrors.
+KIT_NAME="${KIT_REL##*/}"
 GATE="$HERE/check-verdict-epoch.sh"
 TMP=$(mktemp -d); trap 'rm -rf "$TMP"' EXIT
 fails=0
@@ -26,13 +44,13 @@ arm() { # label · want-rc · expected-substring · dir · [base]
 }
 
 engine() { # $1=dir $2=version $3=extra-body-line
-  mkdir -p "$1/tools/memory-tree"
+  mkdir -p "$1/${PFX}${KIT_NAME}"
   { printf '#!/usr/bin/env bash\n'
     printf 'KIT_MEMORY_TREE_VERSION=%s   # gov:kit memory-tree@%s — engine identity\n' "$2" "$2"
     printf '# a comment line that never changes behaviour\n'
     printf 'echo hygiene\n'
     [ -n "$3" ] && printf '%s\n' "$3"
-  } > "$1/tools/memory-tree/check-memory-hygiene.sh"
+  } > "$1/${PFX}${KIT_NAME}/check-memory-hygiene.sh"
 }
 
 commit_engine() { # $1=dir $2=version $3=extra-body-line $4=message
@@ -55,6 +73,8 @@ BASE_A=$(cd "$A" && git rev-parse HEAD)
 engine "$A" 1.5 "echo an extra behaviour-bearing line"
 ( cd "$A" && git add -A && git commit -qm change --no-verify ) >/dev/null
 arm 'an engine change with no bump FAILS' 1 'changes KIT_MEMORY_TREE_VERSION (still 1.5)' "$A" "$BASE_A"
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${fails:-0}" = 0 ] && echo "PASS (${probe_n:-1} assertions)" || echo "FAIL (${probe_n:-1} assertions)"; [ "${fails:-0}" = 0 ] && exit 0; exit 1; fi
 arm '...and the remedy names all three files' 1 'kit-dogfood-parity.test.sh --render' "$A" "$BASE_A"
 
 # ---- 1b. THE ENDPOINT HOLE. A bump ANYWHERE in the range used to satisfy this gate, so one early
@@ -125,7 +145,7 @@ arm 'the same change WITH a bump is clean' 0 'the version moved 1.5 -> 1.6' "$B"
 C=$(newrepo comment); engine "$C" 1.5 ""
 ( cd "$C" && git add -A && git commit -qm base --no-verify ) >/dev/null
 BASE_C=$(cd "$C" && git rev-parse HEAD)
-printf '# one more comment, and a blank line follows\n\n' >> "$C/tools/memory-tree/check-memory-hygiene.sh"
+printf '# one more comment, and a blank line follows\n\n' >> "$C/${PFX}${KIT_NAME}/check-memory-hygiene.sh"
 ( cd "$C" && git add -A && git commit -qm prose --no-verify ) >/dev/null
 arm 'a comment-only change needs no bump' 0 'no behaviour-bearing engine line moved' "$C" "$BASE_C"
 
@@ -133,10 +153,10 @@ arm 'a comment-only change needs no bump' 0 'no behaviour-bearing engine line mo
 D=$(newrepo indent); engine "$D" 1.5 ""
 ( cd "$D" && git add -A && git commit -qm base --no-verify ) >/dev/null
 BASE_D=$(cd "$D" && git rev-parse HEAD)
-printf '    # an indented comment\n' >> "$D/tools/memory-tree/check-memory-hygiene.sh"
+printf '    # an indented comment\n' >> "$D/${PFX}${KIT_NAME}/check-memory-hygiene.sh"
 ( cd "$D" && git add -A && git commit -qm indented --no-verify ) >/dev/null
 arm 'an indented comment is still a comment' 0 'no behaviour-bearing engine line moved' "$D" "$BASE_D"
-printf '    echo indented statement\n' >> "$D/tools/memory-tree/check-memory-hygiene.sh"
+printf '    echo indented statement\n' >> "$D/${PFX}${KIT_NAME}/check-memory-hygiene.sh"
 ( cd "$D" && git add -A && git commit -qm stmt --no-verify ) >/dev/null
 arm '...and an indented STATEMENT is not' 1 'changes KIT_MEMORY_TREE_VERSION (still 1.5)' "$D" "$BASE_D"
 
@@ -164,7 +184,7 @@ arm 'a bogus base is a named failure' 2 'is not a commit in this repo' "$A" dead
 # It cannot demand a specific clean REASON: which of the two holds depends on whether this branch
 # currently carries an engine change, and both are correct answers. The arms above pin each reason to
 # a fixture where only one of them can be right.
-arm 'the live tree passes, and says so as a clean verdict' 0 'clean —' "$HERE/../.."
+arm 'the live tree passes, and says so as a clean verdict' 0 'clean —' "$(git -C "$HERE" rev-parse --show-toplevel)"
 
 if [ "$fails" = 0 ]; then echo "PASS — check-verdict-epoch: all arms held"; exit 0; fi
 echo "FAIL — $fails arm(s) failed"

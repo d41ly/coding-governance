@@ -1,6 +1,6 @@
 # memory-recall — ask your decision corpus a question, get the records that answer it
 
-<!-- gov:kit memory-recall@1.20 -->
+<!-- gov:kit memory-recall@1.25 -->
 
 A project-agnostic kit that turns a memory-tree corpus into two derived FTS5 indexes — one document
 per anchored record, one per heading-bounded chunk — fuses them with reciprocal rank fusion, and
@@ -58,11 +58,11 @@ never falls back silently. Running this kit's `recall_conf.py` prints what each 
 ## Use
 
 ```bash
-python3 tools/memory-recall/query.py "why did the gate start refusing my push" \
+python3 <prefix>/memory-recall/query.py "why did the gate start refusing my push" \
     --terms "pre-push dirty tree porcelain untracked submodule refusal predicate gatepost"
-python3 tools/memory-recall/query.py --opened <rank> --qid <N>  # record which hit answered it
-python3 tools/memory-recall/query.py "<question>" --rebuild     # force a cache rebuild
-python3 tools/memory-recall/query.py --export --tag a           # aggregate the log, outside the tree
+python3 <prefix>/memory-recall/query.py --opened <rank> --qid <N>  # record which hit answered it
+python3 <prefix>/memory-recall/query.py "<question>" --rebuild     # force a cache rebuild
+python3 <prefix>/memory-recall/query.py --export --tag a           # aggregate the log, outside the tree
 ```
 
 `--terms` is **required**. Rewriting is the measured half of the retrieval gain upstream (records
@@ -113,17 +113,17 @@ is indistinguishable from one that was never built.
 
 1. Copy this directory to your repo root as `memory-recall/` and make sure `.memory-tree.conf`
    exists (the memory-tree kit owns it — this one refuses rather than creating it).
-2. `bash tools/memory-recall/adopt-memory-recall.sh --scaffold` renders the Skill from the conf into
+2. `bash <prefix>/memory-recall/adopt-memory-recall.sh --scaffold` renders the Skill from the conf into
    `.claude/skills/memory-recall/SKILL.md`. Add `--with-hook` only if you want the `recall-opened`
    PostToolUse hook; skipping it is a supported end state, not a gap. With `--with-hook`, finish
    the wiring:
-   `python3 settings-merge.py --fragment tools/memory-recall/recall-opened.fragment.json`.
+   `python3 settings-merge.py --fragment <prefix>/memory-recall/recall-opened.fragment.json`.
    A hook you keep OUTSIDE this directory is declared, not moved: an `[[own]]` row in
    `.governance/deploy.toml` implementing `memory-recall:recall-opened.js`, after which the
    fragment resolves to your copy in both `check-wiring.sh` and `settings-merge.py`.
 3. **Wire both legs into your local gate runner AND your CI config**, grep-guarded so a re-run does
    not duplicate them. Without this the skill-drift check silently never runs:
-   `python3 tools/memory-recall/selftest.py` and `bash tools/memory-recall/adopt-memory-recall.sh --check`.
+   `python3 <prefix>/memory-recall/selftest.py` and `bash <prefix>/memory-recall/adopt-memory-recall.sh --check`.
    The `--check` leg resolves its own interpreter by RUNNING each candidate — `RECALL_PY` first if
    set, then `GOV_PYTHON`, then `python3`, `python`, `py` — so a `python3`-only adopter needs no
    extra step, and a Windows box where the Store `python3` stub answers `command -v` and exits 9009

@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.48 -->
+<!-- gov:kit unattended@1.55 -->
 # Unattended runs — the verbs
 
 *This file is the second half of the binding contract; `UNATTENDED-PROTOCOL.md` is the first. Two
@@ -84,39 +84,30 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   format from the slug COUNT gives a caller two output shapes for one verb: a frame-reading caller
   handed a single-build corpus finds none of the lines it parses and reads the run as having graded
   NOTHING. Without the flag the one-slug form stays byte-identical to what it has always been.
-- `--status` — ONE line, opened by `unattended: <slug>`, with every field after it joined by ` · `
-  in the order this entry names them. The phase, the witness and the next unit print on every line:
-  `phase <phase>`, where a derived LANDED reads `LANDED (derived: <sha8> on <ref> at <tip8>)` and a
-  LANDING the derivation explains reads `LANDING (not on the remote: <reason>)`; `witness <sha>`,
-  the sha reading `NONE` on a record that names none, which the verb then refuses; and
-  `next <unit>`, the link label of the first non-terminal row in the generated units region, or
-  `(no non-terminal unit)`. Every other field is OPTIONAL and prints only under the condition named
-  beside it, so a record none of them applies to prints only the fields above. Between the witness
-  and `next`: `halt-code <code>` when the record carries one, then `spec-audit <date>` when it pins
-  one. After `next`, in order: `parked <n>` when owed parked rows exist; `noted <n>` when rows the
-  owner is told of but owes no answer to exist; `STALE briefs <n>` when a unit's latest recorded
-  brief no longer hashes the same, then `briefs gone <n>` when its file is gone; the resume tick's
-  `resume-tick <n> attempt(s), last <stamp>` when its sidecar for this slug holds a line; and
-  `orphans <n>` when the process ledger names one (`UNATTENDED-STOPS.md` §14, nothing killed). Then
-  the two verdicts, the optional fields that print on a pass as well as on trouble, each on exactly
-  the records whose `--resume` would run its check, because a report silent on a pass cannot be
-  told from a verb that never asked. The pinned-asks verdict prints on every record that pins
-  `asks`, a pass included, since `--resume` runs check 73 above every row of its matrix, and reads
-  `asks as pinned` or
-  `asks moved at HEAD, check 73 refuses a resume: pinned [<pin>] at HEAD [<now>]`. The
-  holder-worktree verdict follows it, printing when the record carries `lease-utc`, its phase is not
-  terminal and it is not a LANDING the landed log observed, which are the records on which
-  `--resume` reaches check 58, a pass included, and reads `worktree holds the run`,
-  `worktree not the run's, check 58 refuses a resume here: <where>`, or
-  `worktree unanswerable, the record names no run branch`. Both read through the predicates the
-  refusals use, so neither refuses anything here. LAST,
+- `--status` — one line: the phase, the first non-terminal unit, and the parked counts, then the
+  fields that print only when there is something to report — the resume tick's attempts,
+  `orphans <n>` from the process ledger (`UNATTENDED-STOPS.md` §14, nothing killed), and
   `keepalive <id> present|absent in the harness listing at <utc>` from the stop-guard's newest
-  sidecar line, whatever its phase, when the record names a keepalive id and that line exists. The
-  line stays ONE line: a field joins it or does not print, and the suite arms that.
+  sidecar line, whatever its phase, omitted when the record names no keepalive id or no line
+  exists. The line stays ONE line: a field joins it or does not print, and the suite arms that.
 - `--audit` — one line per unit whose dispatch rows at their newest anchor, taken together, are still
   open and whose spec is not terminal: how long the TREE has been idle (newest write, newest commit) and `PROGRESSING` or `STALLED` against `UNIT_STALL_BOUND`, a
   `STALLED` line followed by one remedy line. Read-only; the idle-wake runs it. It cannot see what
-  the unit is doing or whether a process is stuck — its figures are properties of the tree.
+  the unit is doing or whether a process is stuck — its figures are properties of the tree. After
+  the units it prints one line per open REGISTERED task: its heartbeat path, `last-beat <s>s ago`
+  or `none`, and `PROGRESSING` or `STALLED` against `TASK_STALL_BOUND`, a `STALLED` line again
+  followed by one remedy line — or `no heartbeat-bearing tasks registered`. A heartbeat that exists
+  and cannot be dated is check 51; one not written yet is graded from its registration.
+- `--register-task` — `--register-task <slug> --task <name> --heartbeat <absolute path>`, run by
+  the STARTER of a background task BEFORE it starts it: the main loop for an `Agent` or a background
+  leg, a brief's author for a unit's own long command. It appends one row to the per-slug sidecar
+  `tasks.<slug>.tsv` under `<git-dir>/unattended/`. A task beats by writing its heartbeat file; a
+  leg or a suite beats by its own output log growing, so that log can be the path. It refuses a
+  name or path carrying a tab or a newline, a relative path, a name still open, a missing run and a
+  finished one. NOTHING ENFORCES IT: a background task nobody registers stays invisible to `--audit`.
+- `--release-task` — `--release-task <slug> --task <name>`, when the task ends, so `--audit` stops
+  grading it. A name with no open registration refuses; a released name may register again, and
+  its newer row is the one graded.
 - `--liveness` — key: value lines and one verdict for an OUT-OF-SESSION reader: the phase, the
   lease, whether the recorded pid exists AND is the leased process (image and start time, not the
   number alone), seconds since anything moved, the last recorded stall, `TERMINAL`, `ELSEWHERE`,

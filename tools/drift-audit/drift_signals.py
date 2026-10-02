@@ -1,6 +1,6 @@
 """drift_signals.py — coding-governance's own drift-signal declarations (dogfooding the kit).
 
-gov:kit drift-audit@1.17
+gov:kit drift-audit@1.21
 
 Copied from drift_signals.template.py and filled for THIS repo. The corpus root and disciplines are
 NOT restated here — they come from `.memory-tree.conf`, which the memory-tree kit owns.
@@ -9,7 +9,15 @@ NOT restated here — they come from `.memory-tree.conf`, which the memory-tree 
 from __future__ import annotations
 
 import json
+import pathlib
 import re
+
+# THE TOOL ROOT, DERIVED (TOOL-aRepatriatedFork-29 S6): this file sits in `<tool root>/<kit>/`, and the
+# checkout root is the first directory above it holding a `.git` entry. Both globs below name the
+# kits through it, so gov's product is graded at whatever kit root it was checked out under.
+_HERE = pathlib.Path(__file__).resolve()
+_CHECKOUT = next((_p for _p in _HERE.parents if (_p / ".git").exists()), _HERE.parents[2])
+_TOOLS = _HERE.parent.parent.relative_to(_CHECKOUT).as_posix()
 
 # --------------------------------------------------------------------------------------------
 # PRODUCT_GLOBS — this repo's "product" is its kits, its skill engine and the playbook template.
@@ -18,7 +26,7 @@ import re
 # --------------------------------------------------------------------------------------------
 
 PRODUCT_GLOBS: list[str] = [
-    "tools",
+    _TOOLS,
     "skills",
     ".claude",
     # The kickoff manifest, by FILE path. `memory/` stays absent for the reason above; this one file
@@ -56,7 +64,7 @@ TRACE_CUTOFF: str = "2026-08-11"
 # house's own bookkeeping certify the bookkeeping — the exact hole the path restriction exists to
 # close. Today the narrowing changes no verdict; it is taken before it costs something, not after.
 TRACE_GLOBS: list[str] = [
-    "tools",
+    _TOOLS,
     "skills",
     "coding-governance-agents.template.md",
     "WIRE-INTO-PROJECT.md",
@@ -158,7 +166,9 @@ def _charter_mentions_every_leg(ctx) -> tuple[int, int]:
     and a permanently-red decoration. A leg the charter never names is the real defect: a session
     obeying the charter's "enumerate exhaustively" instruction under-reports its own coverage.
     """
-    legs = json.loads((ctx.root / "tools/gate-legs.json").read_text(encoding="utf-8"))
+    # The manifest sits in the tool root, this file's grandparent (TOOL-aRepatriatedFork-29 S6).
+    legs = json.loads((pathlib.Path(__file__).resolve().parent.parent / "gate-legs.json")
+                      .read_text(encoding="utf-8"))
     legs = legs if isinstance(legs, list) else legs.get("legs", legs)
     # MATCHED ON THE LEG'S ARGV SCRIPT PATH, not its display name. The display name is a label
     # somebody types twice; the script path is the identifier every charter bullet already cites, and
@@ -233,7 +243,7 @@ PINS: dict[str, int] = {
     # never blocks a merge; it is here so a non-zero count does not read "out of tolerance" from day
     # one. Drain it: each row is one README sentence to re-read against the spec revision beside it.
     "readme_mechanism_drift": 19,
-    # 7 — the number of legs in `tools/gate-legs.json` whose script path the charter's gate-suite
+    # 7 — the number of legs in `<prefix>/gate-legs.json` whose script path the charter's gate-suite
     # section does not cite, measured at 647bfd9. The old seed of 1 was a per-row boolean against a
     # one-row population, so `value > pin` needed 2 against a ceiling of 1 and the signal could not
     # fire at all. Its comment claimed "7 of 19" against a manifest that holds 37.
@@ -347,7 +357,9 @@ RATCHET_LOOKBACK = 14
 # tripped the ban on a kit file spelling paths. The rows need a repo-relative path because the
 # reader resolves it against the repo root, so this is the narrowest honest form: one name, used
 # four times, and adding a fifth row now costs nothing.
-_THIS_FILE = "tools/drift-audit/drift_signals.py"
+#
+# DERIVED from this file's own location (TOOL-aRepatriatedFork-29 S6); see `_TOOLS` at the top.
+_THIS_FILE = _HERE.relative_to(_CHECKOUT).as_posix()
 
 RATCHETS: list[dict] = [
     {"file": ".memory-tree.conf", "key": "ORPHAN_ID_PIN", "weakens": "up"},

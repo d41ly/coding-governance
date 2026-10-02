@@ -102,7 +102,7 @@ def resolve_root() -> pathlib.Path:
 
     Not `git rev-parse --show-toplevel`, for the reason `merge-rows.py` records: this module runs
     inside a commit-msg hook, where the shell is whatever git found, and a walk-up needs no process
-    at all. It is also correct at both install prefixes — `tools/memory-tree/` here and
+    at all. It is also correct at both install prefixes — `<prefix>/memory-tree/` here and
     `memory-tree/` in a repo that copy-installed the kit — with no env var and no second
     declaration. AN EMPTY DERIVATION REFUSES: a guessed root grades somebody else's corpus.
     """

@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.48 -->
+<!-- gov:kit unattended@1.55 -->
 # The unattended-run kit
 
 The binding contract is not here. It is `UNATTENDED-PROTOCOL.md` together with
@@ -229,7 +229,7 @@ that line is the bar never returning, which no hold fits.
 
 `TOOL-dDerivedDocket-27` widened the key table's `GATE_CMD` cell to carry the two keys above and
 funded the bytes by moving one RESTATEMENT and one ARGUMENT here. Both RULES stay in the table:
-`UNIT_STALL_BOUND` is OPTIONAL on `GATE_BOUND`'s terms, and `REVIEW_ROUNDS` also refuses a value at
+`UNIT_STALL_BOUND` and `TASK_STALL_BOUND` are OPTIONAL on `GATE_BOUND`'s terms, and `REVIEW_ROUNDS` also refuses a value at
 or above the runaway ceiling.
 
 **What `GATE_BOUND`'s terms are, for `UNIT_STALL_BOUND`.** The row keeps the pointer, and the sibling

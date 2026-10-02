@@ -32,7 +32,6 @@
 # that did is repaired and holds no row, because a repaired site is an absence and not an exception.
 # The drain is the same backlog row the paragraph above names, now larger and no more urgent.
 tools/check-agent-cap-restatement.sh	EOF	2	surfaced by the one-hop widening, TOOL-cMendedVintage-12
-tools/check-install-prefix.sh	EOF	1	surfaced by the one-hop widening, TOOL-cMendedVintage-12
 tools/check-microformats.sh	EOF	2	predates the gate
 tools/check-testsuite-counts.sh	EOF	1	surfaced by the one-hop widening, TOOL-cMendedVintage-12
 tools/check-wiring.sh	EOF	3	surfaced by the one-hop widening, TOOL-cMendedVintage-12

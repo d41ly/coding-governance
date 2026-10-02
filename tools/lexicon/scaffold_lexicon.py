@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """scaffold_lexicon.py — DERIVE a proposed `.lexicon.conf` from the adopting repo's own corpus.
 
-Called by `tools/lexicon/adopt-lexicon.sh --scaffold`; not a user-facing entry point.
+Called by `<prefix>/lexicon/adopt-lexicon.sh --scaffold`; not a user-facing entry point.
 
 WHAT IS DERIVED HERE IS MEMBERSHIP, NOT SPELLING. The corpus is asked one question per cluster —
 does any form of this concept have a live definition site — and the answer seeds the cluster's

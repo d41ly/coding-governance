@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Runnable check for gate-guard.js — the PreToolUse guard that refuses the flagged merge bar and
 # every self-test suite while the unattended run on the current branch is before VERIFYING.
-# Run: bash tools/unattended/gate-guard.test.sh   (exit 0 = all pass)
+# Run: bash <prefix>/unattended/gate-guard.test.sh   (exit 0 = all pass)
 #
 # WITHHELD FROM THE BAR AND FROM ADOPTERS, like every suite in this kit: its subject is the hook's
 # predicate and key, which move only when this file's sibling moves. `run-unattended-gates.sh`
@@ -22,17 +22,124 @@
 # and pass green on the ones where no run was live.
 set -u
 HERE="$(cd "$(dirname "$0")" && pwd)"
+# >>> derive_self_rel — canonical copy: kit-rel.sh in gov's lib dir (byte-identical; gated)
+derive_self_rel() {
+  local _dsr_p _dsr_rel=""
+  _dsr_p=$(cd "$1" 2>/dev/null && pwd) || return 1
+  while [ ! -e "$_dsr_p/.git" ]; do
+    [ "$(dirname "$_dsr_p")" = "$_dsr_p" ] && return 1
+    _dsr_rel="$(basename "$_dsr_p")${_dsr_rel:+/$_dsr_rel}"
+    _dsr_p=$(dirname "$_dsr_p")
+  done
+  printf '%s\n' "$_dsr_rel"
+}
+# <<< derive_self_rel
+KIT_REL=$(derive_self_rel "$HERE") || { echo "gate-guard.test: not inside a git repository"; exit 2; }
+# PFX is the install prefix WITH its trailing slash, derived from where this file sits and empty
+# at a root install: every fixture and host path below is spelled through it, never through a
+# literal prefix (TOOL-aRepatriatedFork-28).
+case "$KIT_REL" in */*) PFX="${KIT_REL%/*}/" ;; *) PFX="" ;; esac
 HOOK="$HERE/gate-guard.js"
 DRIVER="$HERE/unattended.sh"
 TMP=$(mktemp -d); trap 'rm -rf "$TMP"' EXIT
 pass=0; fail=0
 
-if [ -f "$HERE/../lib/resolve-python.sh" ]; then
-  . "$HERE/../lib/resolve-python.sh"
-  TESTPY=$(resolve_python) || { echo "gate-guard.test: no usable python"; exit 2; }
-else
-  TESTPY=python3   # gov:literal-python — last-resort fallback when ../lib/ is absent (adopter layout)
-fi
+# TOOL-aRepatriatedFork-46: a kit is named by the name its directory has in THIS install, never
+# as a literal segment: this suite's own from where it sits, a sibling's through the resolver,
+# which reads the install receipt first. The commands below are the ones a session would type in
+# this install, so they spell each kit by that NAME. The resolver is carried INLINE; it was sourced
+# from a probe of the library directory beside this kit, which ships nowhere.
+# >>> resolve_python — canonical copy: resolve-python.sh in gov's lib dir (byte-identical; gated)
+resolve_python() {
+  # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
+  # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
+  # the candidate and every consumer uses "$PY" as a single word (measured: exit 127).
+  _rp_tried=""
+  for _rp_c in "${1:-}" "${GOV_PYTHON:-}" python3 python py; do
+    [ -n "$_rp_c" ] || continue
+    _rp_tried="$_rp_tried $_rp_c"
+    if "$_rp_c" -c "import sys" >/dev/null 2>&1; then
+      printf '%s\n' "$_rp_c"
+      return 0
+    fi
+  done
+  {
+    echo "resolve_python: no usable python launcher. Each candidate was RUN with -c 'import sys' and"
+    echo "resolve_python: none exited 0 — being on PATH is not evidence (the Microsoft Store python3"
+    echo "resolve_python: stub answers \`command -v\` and exits 9009 without running anything)."
+    echo "resolve_python: tried:$_rp_tried"
+    if [ -n "${1:-}" ]; then
+      echo "resolve_python: the caller's override '$1' was tried FIRST and did not run."
+    fi
+    if [ -n "${GOV_PYTHON:-}" ]; then
+      echo "resolve_python: GOV_PYTHON is set to '$GOV_PYTHON' and did not run. An override that is"
+      echo "resolve_python: set and unusable is THIS failure, never a silent fall-through — the"
+      echo "resolve_python: operator believes they chose, and would not have."
+    fi
+  } >&2
+  return 1
+}
+# <<< resolve_python
+# The sibling-kit resolver (TOOL-aRepatriatedFork-2 S3), INLINED byte-identically from the
+# canonical copy named on its marker line and gated by the resolve-python self-test's parity
+# table. A shell consumer runs it with the python it already resolved, so the receipt rung is
+# read in Python and never parsed in bash. `resolve_kit_dir <python> <home> <anchor> <here>`
+# prints the kit directory REPO-RELATIVE, or the resolver's named refusal on stderr and exits 1.
+resolve_kit_dir() {
+  "$1" -c "$(cat <<'RKD'
+# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
+def resolve_kit_dir(home, anchor, here):
+    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
+
+    1. receipt — the `.governance/install.json` row whose `source` ends in <home>/<anchor> and
+       whose `path` exists inside this tree. The only record of a RENAMED kit dir: no probe finds
+       a memory-recall kit an adopter homed at `scripts/recall/`.
+    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
+    3. refuse — LookupError naming the three places looked; never a guessed prefix.
+    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
+    """
+    import json
+    import pathlib
+    here = pathlib.Path(here).absolute()  # never resolve(): a junction must not move it
+    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
+    receipt = root / ".governance" / "install.json"
+    try:
+        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("path"):
+            continue
+        if str(row.get("source") or "").split("/")[-2:] != [home, anchor]:
+            continue
+        hit = (root / str(row["path"])).absolute()
+        if hit.is_file() and root in hit.parents and ".." not in hit.parts:
+            return hit.parent
+    probes = (here / home, here.parent / home)
+    for cand in probes:
+        if (cand / anchor).is_file():
+            return cand
+    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
+        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
+# <<< resolve_kit_dir
+RKD
+)"'
+import sys
+try:
+    d = resolve_kit_dir(*sys.argv[1:4])
+except LookupError as e:
+    sys.exit(str(e))
+r = next((p for p in (d, *d.parents) if (p / ".git").exists()), d.anchor)
+print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
+}
+TESTPY=$(resolve_python) || { echo "gate-guard.test: no usable python"; exit 2; }
+KIT_NAME="${KIT_REL##*/}"
+RUN_GATES_DIR=$(resolve_kit_dir "$TESTPY" run-gates run-gates.sh "$HERE") || exit 2
+RUN_GATES="${RUN_GATES_DIR##*/}"
+GOVKIT_DIR=$(resolve_kit_dir "$TESTPY" govkit govkit.py "$HERE") || exit 2
+GOVKIT="${GOVKIT_DIR##*/}"
+MT_KIT_DIR=$(resolve_kit_dir "$TESTPY" memory-tree gotchas.py "$HERE") || exit 2
+MT_KIT="${MT_KIT_DIR##*/}"
 
 # The payload's `cwd` must be a path node resolves on this host: MSYS spells a scratch dir /tmp/x
 # where node wants C:/..., and a cwd node cannot walk keys nothing, which passes every deny arm for
@@ -81,11 +188,13 @@ run_raw() { # name expected_exit payload
 }
 
 B=$(build_fixture BUILDING)
-BAR='GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh'
-D4='bash tools/unattended/check-unattended.test.sh'
+BAR='GATE_SELFTESTS=1 bash '"${PFX}${RUN_GATES}/run-gates.sh"''
+D4='bash '"${PFX}${KIT_NAME}/check-unattended.test.sh"''
 
 # ---- fail-open: the hook must never be the reason a good command dies -----------------------------
 run_raw "empty stdin -> allow"        0 ''
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${fail:-0}" = 0 ] && echo "PASS (${pass:-1} assertions)" || echo "FAIL (${pass:-1} assertions)"; [ "${fail:-0}" = 0 ] && exit 0; exit 1; fi
 run_raw "non-JSON stdin -> allow"     0 'not json at all'
 run_raw "JSON null -> allow"          0 'null'
 run_raw "unrelated tool -> allow"     0 "{\"tool_name\":\"Read\",\"cwd\":\"$(resolve_native "$B")\",\"tool_input\":{\"command\":\"$D4\"}}"
@@ -99,31 +208,31 @@ case "$(cat "$TMP/err")" in *"memory/builds/fx/RUN.md"*) echo "ok   the deny nam
 case "$(cat "$TMP/err")" in *"before VERIFYING"*) echo "ok   the deny names the phase the bar waits for"; pass=$((pass+1)) ;; *) echo "FAIL the deny does not name VERIFYING"; fail=$((fail+1)) ;; esac
 
 # ---- AC2: eleven deny payloads, each naming its matched token ------------------------------------
-run "AC2 GATE_FULL=1 prefix -> deny"               2 "$B" 'GATE_FULL=1 bash tools/run-gates/run-gates.sh'; check_names "AC2 prefix" 'GATE_FULL=1'
-run "AC2 after export -> deny"                     2 "$B" 'export GATE_FULL=1; bash tools/run-gates/run-gates.sh'; check_names "AC2 export" 'GATE_FULL=1'
-run "AC2 behind env -> deny"                       2 "$B" 'env GATE_FULL=1 bash tools/run-gates/run-gates.sh'; check_names "AC2 env" 'GATE_FULL=1'
-run "AC2 behind a NAME=value word -> deny"         2 "$B" 'GATE_JOBS=1 GATE_FULL=1 bash tools/run-gates/run-gates.sh'; check_names "AC2 NAME=value" 'GATE_FULL=1'
-run "AC2 behind timeout 30 -> deny"                2 "$B" 'timeout 30 env GATE_FULL=1 bash tools/run-gates/run-gates.sh'; check_names "AC2 timeout" 'GATE_FULL=1'
-run "AC2 after && -> deny"                         2 "$B" 'cd /x && GATE_FULL=1 bash tools/run-gates/run-gates.sh'; check_names "AC2 &&" 'GATE_FULL=1'
-run "AC2 after then -> deny"                       2 "$B" 'if true; then GATE_FULL=1 bash tools/run-gates/run-gates.sh; fi'; check_names "AC2 then" 'GATE_FULL=1'
-run "AC2 D2 the self-test runner -> deny"          2 "$B" 'bash tools/run-gates/run-selftests.sh'; check_names "AC2 D2" 'tools/run-gates/run-selftests.sh'
-run "AC2 D3 this kit's runner -> deny"             2 "$B" 'bash tools/unattended/run-unattended-gates.sh'; check_names "AC2 D3" 'tools/unattended/run-unattended-gates.sh'
-run "AC2 D4 a suite -> deny"                       2 "$B" "$D4"; check_names "AC2 D4" 'tools/unattended/check-unattended.test.sh'
-run "AC2 D5 a suite inside bash -c quotes -> deny" 2 "$B" "bash -c 'timeout 5400 bash tools/unattended/unattended.test.sh'"; check_names "AC2 D5" 'tools/unattended/unattended.test.sh'
+run "AC2 GATE_FULL=1 prefix -> deny"               2 "$B" 'GATE_FULL=1 bash '"${PFX}${RUN_GATES}/run-gates.sh"''; check_names "AC2 prefix" 'GATE_FULL=1'
+run "AC2 after export -> deny"                     2 "$B" 'export GATE_FULL=1; bash '"${PFX}${RUN_GATES}/run-gates.sh"''; check_names "AC2 export" 'GATE_FULL=1'
+run "AC2 behind env -> deny"                       2 "$B" 'env GATE_FULL=1 bash '"${PFX}${RUN_GATES}/run-gates.sh"''; check_names "AC2 env" 'GATE_FULL=1'
+run "AC2 behind a NAME=value word -> deny"         2 "$B" 'GATE_JOBS=1 GATE_FULL=1 bash '"${PFX}${RUN_GATES}/run-gates.sh"''; check_names "AC2 NAME=value" 'GATE_FULL=1'
+run "AC2 behind timeout 30 -> deny"                2 "$B" 'timeout 30 env GATE_FULL=1 bash '"${PFX}${RUN_GATES}/run-gates.sh"''; check_names "AC2 timeout" 'GATE_FULL=1'
+run "AC2 after && -> deny"                         2 "$B" 'cd /x && GATE_FULL=1 bash '"${PFX}${RUN_GATES}/run-gates.sh"''; check_names "AC2 &&" 'GATE_FULL=1'
+run "AC2 after then -> deny"                       2 "$B" 'if true; then GATE_FULL=1 bash '"${PFX}${RUN_GATES}/run-gates.sh"'; fi'; check_names "AC2 then" 'GATE_FULL=1'
+run "AC2 D2 the self-test runner -> deny"          2 "$B" 'bash '"${PFX}${RUN_GATES}/run-selftests.sh"''; check_names "AC2 D2" ''"${PFX}${RUN_GATES}/run-selftests.sh"''
+run "AC2 D3 this kit's runner -> deny"             2 "$B" 'bash '"${PFX}${KIT_NAME}/run-unattended-gates.sh"''; check_names "AC2 D3" ''"${PFX}${KIT_NAME}/run-unattended-gates.sh"''
+run "AC2 D4 a suite -> deny"                       2 "$B" "$D4"; check_names "AC2 D4" ''"${PFX}${KIT_NAME}/check-unattended.test.sh"''
+run "AC2 D5 a suite inside bash -c quotes -> deny" 2 "$B" "bash -c 'timeout 5400 bash ${PFX}${KIT_NAME}/unattended.test.sh'"; check_names "AC2 D5" ''"${PFX}${KIT_NAME}/unattended.test.sh"''
 
 # ---- rev-4 shapes: the three prefixes the corpus measurement found hiding 38 runs -----------------
-run "time bash <suite> -> deny"                    2 "$B" 'time bash tools/x.test.sh 2>&1 | tail -3'; check_names "time" 'tools/x.test.sh'
-run "(time bash <suite>) -> deny"                  2 "$B" '(time bash tools/x.test.sh) > out 2>&1'
-run "nohup bash <suite> & -> deny"                 2 "$B" 'nohup bash tools/x.test.sh > out 2>&1 &'
-run "{ bash <suite>; } -> deny"                    2 "$B" 'cd x && { bash tools/x.test.sh > out; echo rc=$?; }'
-run "  near-miss: time bash <suite> --check -> allow" 0 "$B" 'time bash tools/x.test.sh --check'
+run "time bash <suite> -> deny"                    2 "$B" 'time bash '"${PFX}x.test.sh"' 2>&1 | tail -3'; check_names "time" ''"${PFX}x.test.sh"''
+run "(time bash <suite>) -> deny"                  2 "$B" '(time bash '"${PFX}x.test.sh"') > out 2>&1'
+run "nohup bash <suite> & -> deny"                 2 "$B" 'nohup bash '"${PFX}x.test.sh"' > out 2>&1 &'
+run "{ bash <suite>; } -> deny"                    2 "$B" 'cd x && { bash '"${PFX}x.test.sh"' > out; echo rc=$?; }'
+run "  near-miss: time bash <suite> --check -> allow" 0 "$B" 'time bash '"${PFX}x.test.sh"' --check'
 
 # ---- closing review F2: a whole-suite `selftest.py` FILE is a suite; a `--selftest` FLAG is not -----
 # Both readers of this build spelled "suite" as the `.test.sh` filename convention, and the manifest's
 # python whole-suite legs — govkit's at 3445 s — walked past both. RED-first on the shipped hook:
 # the first payload printed rc=0.
-run "F2 python <kit>/selftest.py -> deny"           2 "$B" 'python tools/govkit/selftest.py'; check_names "F2 selftest.py" 'tools/govkit/selftest.py'
-run "F2 a --selftest FLAG on another file -> allow"  0 "$B" 'python3 tools/memory-tree/gotchas.py --selftest'
+run "F2 python <kit>/selftest.py -> deny"           2 "$B" 'python '"${PFX}${GOVKIT}/selftest.py"''; check_names "F2 selftest.py" ''"${PFX}${GOVKIT}/selftest.py"''
+run "F2 a --selftest FLAG on another file -> allow"  0 "$B" 'python3 '"${PFX}${MT_KIT}/gotchas.py"' --selftest'
 # THE PARITY ARM, and the reason the rows above are not the last word: the suite population is the
 # manifest's `chunk = selftests` legs, EVERY one of them, DERIVED here rather than restated. Closing
 # round 2, R3: the F2 arm dropped the `--selftest` flag form by rule and silently, and the population
@@ -201,24 +310,24 @@ fi
 for ph in VERIFYING LANDING LANDED ABORTED; do
   F=$(build_fixture "$ph")
   run "AC3 $ph: D1 -> allow" 0 "$F" "$BAR"
-  run "AC3 $ph: D2 -> allow" 0 "$F" 'bash tools/run-gates/run-selftests.sh'
-  run "AC3 $ph: D3 -> allow" 0 "$F" 'bash tools/unattended/run-unattended-gates.sh'
+  run "AC3 $ph: D2 -> allow" 0 "$F" 'bash '"${PFX}${RUN_GATES}/run-selftests.sh"''
+  run "AC3 $ph: D3 -> allow" 0 "$F" 'bash '"${PFX}${KIT_NAME}/run-unattended-gates.sh"''
   run "AC3 $ph: D4 -> allow" 0 "$F" "$D4"
 done
 # ...and at BUILDING the forms the owner allows: the plain bar and the read-only verbs.
-run "AC3 BUILDING: the plain bar with GATE_JOBS=1 -> allow"  0 "$B" 'GATE_JOBS=1 bash tools/run-gates/run-gates.sh'
-run "AC3 BUILDING: D1's OFF spelling, the empty assignment -> allow" 0 "$B" 'GATE_FULL= bash tools/run-gates/run-gates.sh'
-run "AC3 BUILDING: GATE_FULL=\"\" quoted empty -> allow"     0 "$B" 'GATE_FULL="" bash tools/run-gates/run-gates.sh'
-run "AC3 BUILDING: run-selftests.sh --list -> allow"          0 "$B" 'bash tools/run-gates/run-selftests.sh --list'
-run "AC3 BUILDING: run-selftests.sh --check -> allow"         0 "$B" 'bash tools/run-gates/run-selftests.sh --check'
-run "AC3 BUILDING: run-selftests.sh --rank -> allow"          0 "$B" 'bash tools/run-gates/run-selftests.sh --rank'
-run "AC3 BUILDING: run-unattended-gates.sh --help -> allow"   0 "$B" 'bash tools/unattended/run-unattended-gates.sh --help'
-run "AC3 BUILDING: a suite --render -> allow"                 0 "$B" 'bash tools/memory-tree/kit-dogfood-parity.test.sh --render'
-run "AC3 BUILDING: a suite --check -> allow"                  0 "$B" 'bash tools/memory-tree/kit-dogfood-parity.test.sh --check'
+run "AC3 BUILDING: the plain bar with GATE_JOBS=1 -> allow"  0 "$B" 'GATE_JOBS=1 bash '"${PFX}${RUN_GATES}/run-gates.sh"''
+run "AC3 BUILDING: D1's OFF spelling, the empty assignment -> allow" 0 "$B" 'GATE_FULL= bash '"${PFX}${RUN_GATES}/run-gates.sh"''
+run "AC3 BUILDING: GATE_FULL=\"\" quoted empty -> allow"     0 "$B" 'GATE_FULL="" bash '"${PFX}${RUN_GATES}/run-gates.sh"''
+run "AC3 BUILDING: run-selftests.sh --list -> allow"          0 "$B" 'bash '"${PFX}${RUN_GATES}/run-selftests.sh"' --list'
+run "AC3 BUILDING: run-selftests.sh --check -> allow"         0 "$B" 'bash '"${PFX}${RUN_GATES}/run-selftests.sh"' --check'
+run "AC3 BUILDING: run-selftests.sh --rank -> allow"          0 "$B" 'bash '"${PFX}${RUN_GATES}/run-selftests.sh"' --rank'
+run "AC3 BUILDING: run-unattended-gates.sh --help -> allow"   0 "$B" 'bash '"${PFX}${KIT_NAME}/run-unattended-gates.sh"' --help'
+run "AC3 BUILDING: a suite --render -> allow"                 0 "$B" 'bash '"${PFX}${MT_KIT}/kit-dogfood-parity.test.sh"' --render'
+run "AC3 BUILDING: a suite --check -> allow"                  0 "$B" 'bash '"${PFX}${MT_KIT}/kit-dogfood-parity.test.sh"' --check'
 # rev-5: the no-exec syntax check. The wired hook denied this suite's own `bash -n` in the pass
 # that built it; 412 raw mentions of the shape in the corpus, every one a parse.
-run "AC3 BUILDING: bash -n <suite>, the syntax check -> allow" 0 "$B" 'bash -n tools/unattended/gate-guard.test.sh'
-run "  control: bash -x <suite> is still a run -> deny"       2 "$B" 'bash -x tools/unattended/gate-guard.test.sh'
+run "AC3 BUILDING: bash -n <suite>, the syntax check -> allow" 0 "$B" 'bash -n '"${PFX}${KIT_NAME}/gate-guard.test.sh"''
+run "  control: bash -x <suite> is still a run -> deny"       2 "$B" 'bash -x '"${PFX}${KIT_NAME}/gate-guard.test.sh"''
 run "  control: BUILDING still denies the bare suite"         2 "$B" "$D4"
 
 # ---- AC4: the key --------------------------------------------------------------------------------
@@ -302,7 +411,7 @@ case "$(cat "$TMP/err")" in *"BUILDING (memory/builds/gx/RUN.md)"*) echo "ok   t
 run "AC5 git commit -m quoting a suite name -> allow"          0 "$B" 'git commit -m "the unattended.test.sh arm for run-branch"'
 run "AC5 heredoc body spelling GATE_FULL=1 -> allow"           0 "$B" 'python - <<EOF
 import subprocess
-subprocess.run("GATE_FULL=1 bash tools/run-gates/run-gates.sh", shell=True)
+subprocess.run("GATE_FULL=1 bash '"${PFX}${RUN_GATES}/run-gates.sh"'", shell=True)
 EOF'
 # A heredoc body is content ONLY under a quoted delimiter (closing round 3, T1). Bash expands an
 # unquoted `<<EOF` body — `$( … )` and backticks included — before the consumer reads a line, so the
@@ -311,56 +420,56 @@ EOF'
 # suite, the `<<EOF` form printed SUITE-RAN and the `<<'EOF'` form did not. The hook at 67a11487
 # printed rc=0 on both deny payloads here; the quoted control is the allow that was right.
 run "R13 a backtick in a quoted string inside a QUOTED heredoc body -> allow" 0 "$B" "python - <<'EOF'
-x = \"a \`tools/x.test.sh\` mention\"
+x = \"a \`${PFX}x.test.sh\` mention\"
 EOF"
 run "T1 the same body under an UNQUOTED delimiter is a run -> deny" 2 "$B" 'python - <<EOF
-x = "a `tools/x.test.sh` mention"
-EOF'; check_names "T1 heredoc backtick" 'tools/x.test.sh'
+x = "a `'"${PFX}x.test.sh"'` mention"
+EOF'; check_names "T1 heredoc backtick" ''"${PFX}x.test.sh"''
 run "T1 cat <<EOF with a \$( ) suite in the body -> deny" 2 "$B" 'cat <<EOF
-$(bash tools/x.test.sh)
+$(bash '"${PFX}x.test.sh"')
 EOF'
-run "AC5 grep with a bare suite name argument -> allow"        0 "$B" 'grep -c gate-guard.test.sh tools/run-gates/selftest-budgets.txt'
-run "AC5 grep with a quoted suite name -> allow"               0 "$B" "grep -n 'check-unattended.test.sh' tools/unattended/kit.toml"
-run "AC5 echo quoting a brace-group run -> allow"              0 "$B" 'echo "{ bash tools/x.test.sh; }"'
-run "AC5 node reading the hook itself -> allow"                0 "$B" 'node tools/unattended/gate-guard.js'
-run "AC5 cat over this suite -> allow"                         0 "$B" 'cat tools/unattended/gate-guard.test.sh'
-run "AC5 --writes naming a suite behind the driver -> allow"   0 "$B" 'bash tools/unattended/unattended.sh --dispatch s --pass TOOL-s-1 --writes tools/unattended/check-unattended.test.sh'
+run "AC5 grep with a bare suite name argument -> allow"        0 "$B" 'grep -c gate-guard.test.sh '"${PFX}${RUN_GATES}/selftest-budgets.txt"''
+run "AC5 grep with a quoted suite name -> allow"               0 "$B" "grep -n 'check-unattended.test.sh' ${PFX}${KIT_NAME}/kit.toml"
+run "AC5 echo quoting a brace-group run -> allow"              0 "$B" 'echo "{ bash '"${PFX}x.test.sh"'; }"'
+run "AC5 node reading the hook itself -> allow"                0 "$B" 'node '"${PFX}${KIT_NAME}/gate-guard.js"''
+run "AC5 cat over this suite -> allow"                         0 "$B" 'cat '"${PFX}${KIT_NAME}/gate-guard.test.sh"''
+run "AC5 --writes naming a suite behind the driver -> allow"   0 "$B" 'bash '"${PFX}${KIT_NAME}/unattended.sh"' --dispatch s --pass TOOL-s-1 --writes '"${PFX}${KIT_NAME}/check-unattended.test.sh"''
 
 # ---- two shapes in one command are two indented lines --------------------------------------------
-run "flag and suite in one command -> deny"                    2 "$B" "$BAR && bash tools/unattended/unattended.test.sh"
+run "flag and suite in one command -> deny"                    2 "$B" "$BAR && bash ${PFX}${KIT_NAME}/unattended.test.sh"
 check_names "two shapes, first" 'GATE_SELFTESTS=1'
-check_names "two shapes, second" 'tools/unattended/unattended.test.sh'
+check_names "two shapes, second" ''"${PFX}${KIT_NAME}/unattended.test.sh"''
 case "$(head -1 "$TMP/err")" in *"the flagged merge bar and a self-test suite"*) echo "ok   the first line names both shapes in words"; pass=$((pass+1)) ;; *) echo "FAIL the first line does not name both shapes"; fail=$((fail+1)) ;; esac
 
 # ---- a quoted path still resolves; a pipe or a subshell is still a run --------------------------
-run "quoted suite path -> deny"                                2 "$B" 'bash "tools/unattended/unattended.test.sh"'
-run "suite piped into tail -> deny"                            2 "$B" 'bash tools/x.test.sh 2>&1 | tail -3'
-run "suite inside a subshell -> deny"                          2 "$B" '(cd /x; bash tools/x.test.sh)'
-run "suite inside a command substitution -> deny"              2 "$B" 'x=$(bash tools/x.test.sh)'
-run "bash -x <suite> -> deny"                                  2 "$B" 'bash -x tools/x.test.sh'
+run "quoted suite path -> deny"                                2 "$B" 'bash "'"${PFX}${KIT_NAME}/unattended.test.sh"'"'
+run "suite piped into tail -> deny"                            2 "$B" 'bash '"${PFX}x.test.sh"' 2>&1 | tail -3'
+run "suite inside a subshell -> deny"                          2 "$B" '(cd /x; bash '"${PFX}x.test.sh"')'
+run "suite inside a command substitution -> deny"              2 "$B" 'x=$(bash '"${PFX}x.test.sh"')'
+run "bash -x <suite> -> deny"                                  2 "$B" 'bash -x '"${PFX}x.test.sh"''
 
 # ---- closing review F7: three corpus RUN shapes the rev-5 view let through, each observed rc=0 first
 # A double-quoted `$( … )` was blanked as string content; `timeout -k 5 120` made `-k` the head;
 # `stdbuf` was not a prefix word. Each is a sidechain-corpus shape, and each is a run.
-run "F7 a suite inside a double-quoted \$( ) -> deny"          2 "$B" 'printf "rc=%s\n" "$(bash tools/memory-tree/kit-dogfood-parity.test.sh; echo $?)"'; check_names "F7 subst" 'tools/memory-tree/kit-dogfood-parity.test.sh'
-run "F7 timeout -k 5 120 bash <suite> -> deny"                 2 "$B" 'timeout -k 5 120 bash tools/unattended/unattended.test.sh > out 2>&1'
-run "F7 (stdbuf -oL -eL bash <suite>) & -> deny"               2 "$B" '(stdbuf -oL -eL bash tools/run-gates/run-gates.test.sh > out 2>&1) &'
+run "F7 a suite inside a double-quoted \$( ) -> deny"          2 "$B" 'printf "rc=%s\n" "$(bash '"${PFX}${MT_KIT}/kit-dogfood-parity.test.sh"'; echo $?)"'; check_names "F7 subst" ''"${PFX}${MT_KIT}/kit-dogfood-parity.test.sh"''
+run "F7 timeout -k 5 120 bash <suite> -> deny"                 2 "$B" 'timeout -k 5 120 bash '"${PFX}${KIT_NAME}/unattended.test.sh"' > out 2>&1'
+run "F7 (stdbuf -oL -eL bash <suite>) & -> deny"               2 "$B" '(stdbuf -oL -eL bash '"${PFX}${RUN_GATES}/run-gates.test.sh"' > out 2>&1) &'
 # ...and the fourth the re-run corpus walk surfaced: `time` by path, with its format option.
-run "F7 /usr/bin/time -f FMT bash <suite> -> deny"             2 "$B" "/usr/bin/time -f 'real %e' bash tools/x.test.sh > out 2>&1"
-run "  control: a single-quoted \$( ) stays content -> allow"  0 "$B" "echo '\$(bash tools/x.test.sh)'"
+run "F7 /usr/bin/time -f FMT bash <suite> -> deny"             2 "$B" "/usr/bin/time -f 'real %e' bash ${PFX}x.test.sh > out 2>&1"
+run "  control: a single-quoted \$( ) stays content -> allow"  0 "$B" "echo '\$(bash ${PFX}x.test.sh)'"
 
 # ---- closing round 2, R5 R6 R13: the F7 span is a COMMAND OF ITS OWN, not a kept run of the view.
 # Keeping the `$( … )` unblanked in the view read a quoted argument inside it as a command and the
 # string's tail after it as a segment: every allow arm below printed rc=2 on the hook at 4d177329,
 # and the two backtick denies printed rc=0 there. Now the body is scanned the way row D5 scans a
 # `bash -c` body, so the mentions stay content and both substitution spellings are runs.
-run "R5 a grep TARGET with a paren inside a quoted \$( ) -> allow"   0 "$B" "echo \"\$(grep -c 'foo(' tools/x.test.sh)\""
-run "R5 a printf ARGUMENT with a separator inside \$( ) -> allow"    0 "$B" "git commit -m \"\$(printf '%s' 'fix; bash tools/x.test.sh')\""
-run "R6 the string tail after a closed \$( ) -> allow"              0 "$B" 'echo "$(date) tools/x.test.sh"'
-run "R6 a launcher in the string tail after \$( ) -> allow"         0 "$B" 'printf "%s\n" "$(git log -1 --format=%h) bash tools/x.test.sh"'
-run "R6 a word after the closing quote of a \$( ) string -> allow"  0 "$B" 'echo "$(date)" bash tools/x.test.sh'
-run "R13 a backtick substitution inside double quotes -> deny"      2 "$B" 'printf "%s" "`bash tools/x.test.sh`"'; check_names "R13 backtick" 'tools/x.test.sh'
-run "R5 a quoted ) inside \$( ) does not close the span -> deny"    2 "$B" "echo \"\$(: ')'; bash tools/x.test.sh)\""
+run "R5 a grep TARGET with a paren inside a quoted \$( ) -> allow"   0 "$B" "echo \"\$(grep -c 'foo(' ${PFX}x.test.sh)\""
+run "R5 a printf ARGUMENT with a separator inside \$( ) -> allow"    0 "$B" "git commit -m \"\$(printf '%s' 'fix; bash ${PFX}x.test.sh')\""
+run "R6 the string tail after a closed \$( ) -> allow"              0 "$B" 'echo "$(date) '"${PFX}x.test.sh"'"'
+run "R6 a launcher in the string tail after \$( ) -> allow"         0 "$B" 'printf "%s\n" "$(git log -1 --format=%h) bash '"${PFX}x.test.sh"'"'
+run "R6 a word after the closing quote of a \$( ) string -> allow"  0 "$B" 'echo "$(date)" bash '"${PFX}x.test.sh"''
+run "R13 a backtick substitution inside double quotes -> deny"      2 "$B" 'printf "%s" "`bash '"${PFX}x.test.sh"'`"'; check_names "R13 backtick" ''"${PFX}x.test.sh"''
+run "R5 a quoted ) inside \$( ) does not close the span -> deny"    2 "$B" "echo \"\$(: ')'; bash ${PFX}x.test.sh)\""
 
 # ---- closing round 3, T4 T7 T8: the view, the token reader and the recursion, each one rule short.
 # T4: the view and readTokenAt paired the outer `"` with the first `"` INSIDE a `$( … )` span, so a
@@ -370,62 +479,62 @@ run "R5 a quoted ) inside \$( ) does not close the span -> deny"    2 "$B" "echo
 # inside double quotes, so `\"` outside any string opened a bogus one that swallowed the rest of the
 # line, suite included — rc=0 at 67a11487 on both. T8: the substitution recursion passed `depth + 1`
 # and spent row D5's one-deep cap, so a `bash -c` inside a quoted span was never opened — rc=0 there.
-run "T4 a double-quoted ARGUMENT inside a quoted \$( ) glued to an assignment -> allow" 0 "$B" 'msg="$(printf "%s" "run bash tools/x.test.sh next")"'
-run "T4 the same argument inside a backtick span glued to an assignment -> allow"     0 "$B" 'msg="`printf "%s" "run bash tools/x.test.sh next"`"'
-run "  control: a quoted \$( ) glued to an assignment that IS a run -> deny"           2 "$B" 'msg="$(bash tools/x.test.sh)"'
-run "T7 an escaped quote outside any string around a \$( ) suite -> deny"            2 "$B" 'echo \"$(bash tools/x.test.sh)\"'
-run "T7 escaped quotes around a commit message, then && bash <suite> -> deny"        2 "$B" 'git commit -m \"msg\" && bash tools/x.test.sh'; check_names "T7 escaped quotes" 'tools/x.test.sh'
-run "T8 a bash -c inside a quoted \$( ) is opened -> deny"                            2 "$B" "echo \"\$(bash -c 'bash tools/x.test.sh > out')\""; check_names "T8 nested -c" 'tools/x.test.sh'
+run "T4 a double-quoted ARGUMENT inside a quoted \$( ) glued to an assignment -> allow" 0 "$B" 'msg="$(printf "%s" "run bash '"${PFX}x.test.sh"' next")"'
+run "T4 the same argument inside a backtick span glued to an assignment -> allow"     0 "$B" 'msg="`printf "%s" "run bash '"${PFX}x.test.sh"' next"`"'
+run "  control: a quoted \$( ) glued to an assignment that IS a run -> deny"           2 "$B" 'msg="$(bash '"${PFX}x.test.sh"')"'
+run "T7 an escaped quote outside any string around a \$( ) suite -> deny"            2 "$B" 'echo \"$(bash '"${PFX}x.test.sh"')\"'
+run "T7 escaped quotes around a commit message, then && bash <suite> -> deny"        2 "$B" 'git commit -m \"msg\" && bash '"${PFX}x.test.sh"''; check_names "T7 escaped quotes" ''"${PFX}x.test.sh"''
+run "T8 a bash -c inside a quoted \$( ) is opened -> deny"                            2 "$B" "echo \"\$(bash -c 'bash ${PFX}x.test.sh > out')\""; check_names "T8 nested -c" ''"${PFX}x.test.sh"''
 
 # ---- PowerShell is the same act through the other shell ------------------------------------------
 run "PowerShell running a suite -> deny"                       2 "$B" "$D4" PowerShell
 # closing review F8: the PowerShell-NATIVE flag spelling. `NAME=value cmd` is not PowerShell syntax,
 # so the one spelling that runs the flagged bar under the second wired tool is `$env:NAME=value;`.
 # The shipped FLAG_RE anchored on the bare name and both `$env:` forms printed rc=0.
-run "F8 PowerShell \$env:GATE_SELFTESTS=1; bash <bar> -> deny" 2 "$B" '$env:GATE_SELFTESTS=1; bash tools/run-gates/run-gates.sh' PowerShell; check_names "F8 env" '[$]env:GATE_SELFTESTS=1'
-run "F8 PowerShell \$env:GATE_FULL=\"\"; bash <bar> -> allow"  0 "$B" '$env:GATE_FULL=""; bash tools/run-gates/run-gates.sh' PowerShell
+run "F8 PowerShell \$env:GATE_SELFTESTS=1; bash <bar> -> deny" 2 "$B" '$env:GATE_SELFTESTS=1; bash '"${PFX}${RUN_GATES}/run-gates.sh"'' PowerShell; check_names "F8 env" '[$]env:GATE_SELFTESTS=1'
+run "F8 PowerShell \$env:GATE_FULL=\"\"; bash <bar> -> allow"  0 "$B" '$env:GATE_FULL=""; bash '"${PFX}${RUN_GATES}/run-gates.sh"'' PowerShell
 # closing round 2, R4: F8 tested the ONE spelling its regex was written against. PowerShell drive
 # names are case-insensitive, `${env:NAME}` is the brace form and `$Env:NAME = value` is the
 # documented spelling; every deny below printed rc=0 on the hook at 4d177329, the spaced empty
 # control rc=0 there too, which is the one that must stay.
-run "R4 PowerShell \$Env:GATE_SELFTESTS=1; bash <bar> -> deny"     2 "$B" '$Env:GATE_SELFTESTS=1; bash tools/run-gates/run-gates.sh' PowerShell
-run "R4 PowerShell \$ENV:GATE_FULL=1; bash <bar> -> deny"          2 "$B" '$ENV:GATE_FULL=1; bash tools/run-gates/run-gates.sh' PowerShell
-run "R4 PowerShell \${env:GATE_FULL}=1; bash <bar> -> deny"        2 "$B" '${env:GATE_FULL}=1; bash tools/run-gates/run-gates.sh' PowerShell
-run "R4 PowerShell \$env:GATE_SELFTESTS = 1; bash <bar> -> deny"   2 "$B" '$env:GATE_SELFTESTS = 1; bash tools/run-gates/run-gates.sh' PowerShell; check_names "R4 spaced" '[$]env:GATE_SELFTESTS=1'
-run "R4 PowerShell \$Env:GATE_FULL = \"\"; bash <bar> -> allow"    0 "$B" '$Env:GATE_FULL = ""; bash tools/run-gates/run-gates.sh' PowerShell
+run "R4 PowerShell \$Env:GATE_SELFTESTS=1; bash <bar> -> deny"     2 "$B" '$Env:GATE_SELFTESTS=1; bash '"${PFX}${RUN_GATES}/run-gates.sh"'' PowerShell
+run "R4 PowerShell \$ENV:GATE_FULL=1; bash <bar> -> deny"          2 "$B" '$ENV:GATE_FULL=1; bash '"${PFX}${RUN_GATES}/run-gates.sh"'' PowerShell
+run "R4 PowerShell \${env:GATE_FULL}=1; bash <bar> -> deny"        2 "$B" '${env:GATE_FULL}=1; bash '"${PFX}${RUN_GATES}/run-gates.sh"'' PowerShell
+run "R4 PowerShell \$env:GATE_SELFTESTS = 1; bash <bar> -> deny"   2 "$B" '$env:GATE_SELFTESTS = 1; bash '"${PFX}${RUN_GATES}/run-gates.sh"'' PowerShell; check_names "R4 spaced" '[$]env:GATE_SELFTESTS=1'
+run "R4 PowerShell \$Env:GATE_FULL = \"\"; bash <bar> -> allow"    0 "$B" '$Env:GATE_FULL = ""; bash '"${PFX}${RUN_GATES}/run-gates.sh"'' PowerShell
 # closing round 3, T2: the FOURTH spacing. R4 read `NAME=1`, `NAME = 1` and `NAME =1`; `NAME= 1`
 # matched FLAG_RE with an empty value and was called the OFF spelling, which is bash's rule applied
 # to a token bash never assigns. pwsh assigns on it (`$Env:X= 1; $Env:X` prints 1) and has no
 # glued-empty OFF form at all (`$Env:X=;` is a parse error). rc=0 at 67a11487 on both denies; the
 # quoted-empty control was rc=0 there and stays so.
-run "T2 PowerShell \$Env:GATE_FULL= 1; bash <bar> -> deny"         2 "$B" '$Env:GATE_FULL= 1; bash tools/run-gates/run-gates.sh' PowerShell; check_names "T2 NAME= value" '[$]Env:GATE_FULL=1'
-run "T2 PowerShell \${env:GATE_FULL}= 1; bash <bar> -> deny"       2 "$B" '${env:GATE_FULL}= 1; bash tools/run-gates/run-gates.sh' PowerShell
-run "  control: \$Env:GATE_FULL= \"\"; bash <bar> stays OFF -> allow" 0 "$B" '$Env:GATE_FULL= ""; bash tools/run-gates/run-gates.sh' PowerShell
+run "T2 PowerShell \$Env:GATE_FULL= 1; bash <bar> -> deny"         2 "$B" '$Env:GATE_FULL= 1; bash '"${PFX}${RUN_GATES}/run-gates.sh"'' PowerShell; check_names "T2 NAME= value" '[$]Env:GATE_FULL=1'
+run "T2 PowerShell \${env:GATE_FULL}= 1; bash <bar> -> deny"       2 "$B" '${env:GATE_FULL}= 1; bash '"${PFX}${RUN_GATES}/run-gates.sh"'' PowerShell
+run "  control: \$Env:GATE_FULL= \"\"; bash <bar> stays OFF -> allow" 0 "$B" '$Env:GATE_FULL= ""; bash '"${PFX}${RUN_GATES}/run-gates.sh"'' PowerShell
 # closing round 3, T3: under PowerShell the backtick inside double quotes is the ESCAPE character.
 # The walker read every backtick as a substitution whatever the tool, so `$env:` written literally
 # and an embedded quote were false denies — the wired hook blocked a review probe's commit message
 # on this node. rc=2 at 67a11487 on both; the `$( … )` subexpression control stays a run.
 run "T3 PowerShell commit message with a backtick-escaped \$env: -> allow" 0 "$B" 'git commit -m "docs: the `$env:GATE_FULL=1 spelling"' PowerShell
-run "T3 PowerShell Write-Host with backtick-escaped quotes around a suite name -> allow" 0 "$B" 'Write-Host "see `"tools/x.test.sh`" for the arm"' PowerShell
-run "  control: the PowerShell \$( ) subexpression is still a run -> deny" 2 "$B" 'Write-Host "$(bash tools/x.test.sh)"' PowerShell
+run "T3 PowerShell Write-Host with backtick-escaped quotes around a suite name -> allow" 0 "$B" 'Write-Host "see `"'"${PFX}x.test.sh"'`" for the arm"' PowerShell
+run "  control: the PowerShell \$( ) subexpression is still a run -> deny" 2 "$B" 'Write-Host "$(bash '"${PFX}x.test.sh"')"' PowerShell
 run "out-of-scope tool name -> allow"                          0 "$B" "$BAR" Zsh
 
 # ---- closing round 2, R14 and R12: the two grammars that named the instance -----------------------
 # `timeout` skipped a value after `-k`/`-s` only, so `--kill-after 5 120 bash <suite>` made `120`
 # the head (rc=0 at 4d177329); `py`, the resolver's own third candidate, and a versioned `python3.x`
 # were not launchers (rc=0 there for both).
-run "R14 timeout --kill-after 5 120 bash <suite> -> deny"       2 "$B" 'timeout --kill-after 5 120 bash tools/x.test.sh'
-run "R14 timeout --signal TERM 120 bash <suite> -> deny"        2 "$B" 'timeout --signal TERM 120 bash tools/x.test.sh'
-run "R12 py <kit>/selftest.py -> deny"                          2 "$B" 'py tools/govkit/selftest.py'; check_names "R12 py" 'tools/govkit/selftest.py'
-run "R12 python3.12 <kit>/selftest.py -> deny"                  2 "$B" 'python3.12 tools/govkit/selftest.py'
+run "R14 timeout --kill-after 5 120 bash <suite> -> deny"       2 "$B" 'timeout --kill-after 5 120 bash '"${PFX}x.test.sh"''
+run "R14 timeout --signal TERM 120 bash <suite> -> deny"        2 "$B" 'timeout --signal TERM 120 bash '"${PFX}x.test.sh"''
+run "R12 py <kit>/selftest.py -> deny"                          2 "$B" 'py '"${PFX}${GOVKIT}/selftest.py"''; check_names "R12 py" ''"${PFX}${GOVKIT}/selftest.py"''
+run "R12 python3.12 <kit>/selftest.py -> deny"                  2 "$B" 'python3.12 '"${PFX}${GOVKIT}/selftest.py"''
 # closing round 3, T5 and T6: the same two grammars, one token later. `timeout` took a LITERAL
 # duration only, so the driver's own `run_bounded` spelling — `timeout -k 5s "$GATE_BOUND" …` — and
 # a decimal left `timeout` as the head (rc=0 at 67a11487 on both); `py -3`, the launcher's defining
 # option, and `-X utf8` made the option or its value the head (rc=0 there on both).
-run "T5 timeout \"\$GATE_BOUND\" bash <suite> -> deny"           2 "$B" 'timeout "$GATE_BOUND" bash tools/x.test.sh'; check_names "T5 expansion" 'tools/x.test.sh'
-run "T5 timeout 1.5 bash <suite> -> deny"                       2 "$B" 'timeout 1.5 bash tools/x.test.sh'
-run "T6 py -3 <kit>/selftest.py -> deny"                        2 "$B" 'py -3 tools/govkit/selftest.py'; check_names "T6 py -3" 'tools/govkit/selftest.py'
-run "T6 python -X utf8 <kit>/selftest.py -> deny"               2 "$B" 'python -X utf8 tools/govkit/selftest.py'
+run "T5 timeout \"\$GATE_BOUND\" bash <suite> -> deny"           2 "$B" 'timeout "$GATE_BOUND" bash '"${PFX}x.test.sh"''; check_names "T5 expansion" ''"${PFX}x.test.sh"''
+run "T5 timeout 1.5 bash <suite> -> deny"                       2 "$B" 'timeout 1.5 bash '"${PFX}x.test.sh"''
+run "T6 py -3 <kit>/selftest.py -> deny"                        2 "$B" 'py -3 '"${PFX}${GOVKIT}/selftest.py"''; check_names "T6 py -3" ''"${PFX}${GOVKIT}/selftest.py"''
+run "T6 python -X utf8 <kit>/selftest.py -> deny"               2 "$B" 'python -X utf8 '"${PFX}${GOVKIT}/selftest.py"''
 
 # ---- the PHASES_CORE parity arm: the restatement in the hook equals the driver's tail ------------
 # The kit's own checker reads PHASES_CORE only through the driver and opens no sibling .js, so its
@@ -437,7 +546,10 @@ else echo "FAIL PHASES_ALLOW [$got] != the driver's tail [$want] — a restateme
 
 # ---- the meta-arm: prove the liveness guard itself fires ------------------------------------------
 if [ "${GG_META:-}" != "1" ]; then
-  sed 's#^  payload=$("$TESTPY" -c .import json,sys; print(json.dumps({"tool_name":sys.argv\[1\].*#  payload=""#' "$0" > "$TMP/meta.sh"
+  # The copy runs from $TMP, outside every repository, so its HERE is pinned to this suite's own:
+  # derived from the copy's location it named no install and the copy exited before the guard ran.
+  sed -e 's#^  payload=$("$TESTPY" -c .import json,sys; print(json.dumps({"tool_name":sys.argv\[1\].*#  payload=""#' \
+      -e "s#^HERE=.*#HERE='$HERE'#" "$0" > "$TMP/meta.sh"
   if GG_META=1 bash "$TMP/meta.sh" 2>&1 | grep -q 'the payload builder produced nothing'; then
     echo "ok   the payload-builder liveness guard fires when the builder is stubbed"; pass=$((pass+1))
   else

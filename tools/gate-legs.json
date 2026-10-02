@@ -13,7 +13,7 @@
     "name": "template size <=48KiB",
     "argv": [
       "bash",
-      "tools/check-template-size.sh"
+      "{prefix}/check-template-size.sh"
     ],
     "chunk": "product",
     "subject": "repo",
@@ -23,7 +23,7 @@
     "name": "charter size",
     "argv": [
       "bash",
-      "tools/check-template-size.sh",
+      "{prefix}/check-template-size.sh",
       "AGENTS.md"
     ],
     "chunk": "product",
@@ -34,7 +34,7 @@
     "name": "micro-format definitions",
     "argv": [
       "bash",
-      "tools/check-microformats.sh"
+      "{prefix}/check-microformats.sh"
     ],
     "chunk": "product",
     "subject": "repo",
@@ -44,11 +44,11 @@
     "name": "micro-format gate selftest",
     "argv": [
       "bash",
-      "tools/check-microformats.test.sh"
+      "{prefix}/check-microformats.test.sh"
     ],
     "guard": [
-      "tools/check-microformats.sh",
-      "tools/check-microformats.test.sh"
+      "{prefix}/check-microformats.sh",
+      "{prefix}/check-microformats.test.sh"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -58,7 +58,7 @@
     "name": "line length",
     "argv": [
       "bash",
-      "tools/check-line-length.sh"
+      "{prefix}/check-line-length.sh"
     ],
     "chunk": "product",
     "subject": "repo",
@@ -68,11 +68,11 @@
     "name": "line-length gate selftest",
     "argv": [
       "bash",
-      "tools/check-line-length.test.sh"
+      "{prefix}/check-line-length.test.sh"
     ],
     "guard": [
-      "tools/check-line-length.sh",
-      "tools/check-line-length.test.sh"
+      "{prefix}/check-line-length.sh",
+      "{prefix}/check-line-length.test.sh"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -82,7 +82,7 @@
     "name": "playbook parity",
     "argv": [
       "bash",
-      "tools/check-playbook-parity.sh"
+      "{prefix}/check-playbook-parity.sh"
     ],
     "chunk": "product",
     "subject": "repo",
@@ -91,13 +91,13 @@
   {
     "name": "playbook parity selftest",
     "guard": [
-      "tools/check-playbook-parity.sh",
-      "tools/check-playbook-parity.test.sh",
-      "tools/playbook-kit-waivers.txt"
+      "{prefix}/check-playbook-parity.sh",
+      "{prefix}/check-playbook-parity.test.sh",
+      "{prefix}/playbook-kit-waivers.txt"
     ],
     "argv": [
       "bash",
-      "tools/check-playbook-parity.test.sh"
+      "{prefix}/check-playbook-parity.test.sh"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -107,7 +107,7 @@
     "name": "template size gate selftest",
     "argv": [
       "bash",
-      "tools/check-template-size.test.sh"
+      "{prefix}/check-template-size.test.sh"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -117,7 +117,7 @@
     "name": "build-method size",
     "argv": [
       "bash",
-      "tools/check-template-size.sh",
+      "{prefix}/check-template-size.sh",
       "memory/guides/BUILD-METHOD.md"
     ],
     "chunk": "product",
@@ -128,7 +128,7 @@
     "name": "unattended protocol size",
     "argv": [
       "bash",
-      "tools/check-template-size.sh",
+      "{prefix}/check-template-size.sh",
       "memory/guides/UNATTENDED-PROTOCOL.md"
     ],
     "chunk": "product",
@@ -139,7 +139,7 @@
     "name": "kickoff engine size <=18KiB",
     "argv": [
       "bash",
-      "tools/check-template-size.sh",
+      "{prefix}/check-template-size.sh",
       "skills/session-kickoff/SKILL.md"
     ],
     "chunk": "product",
@@ -150,7 +150,7 @@
     "name": "shell hygiene (a loop fed by a command substitution)",
     "argv": [
       "python3",
-      "tools/gate-lint/sh_hygiene.py",
+      "{prefix}/gate-lint/sh_hygiene.py",
       "memory/project/substitution-fed-loops.txt"
     ],
     "chunk": "product",
@@ -161,11 +161,11 @@
     "name": "shell-hygiene selftest",
     "argv": [
       "python3",
-      "tools/gate-lint/sh_hygiene.py",
+      "{prefix}/gate-lint/sh_hygiene.py",
       "--selftest"
     ],
     "guard": [
-      "tools/gate-lint/"
+      "{prefix}/gate-lint/"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -175,10 +175,10 @@
     "name": "encoding posture (text IO names its encoding)",
     "argv": [
       "python3",
-      "tools/gate-lint/encoding_posture.py",
+      "{prefix}/gate-lint/encoding_posture.py",
       "memory/project/encoding-posture-sites.txt",
       ".",
-      "tools",
+      "{prefix}",
       "skills"
     ],
     "chunk": "product",
@@ -189,7 +189,7 @@
     "name": "kit version markers",
     "argv": [
       "bash",
-      "tools/check-kit-versions.sh"
+      "{prefix}/check-kit-versions.sh"
     ],
     "chunk": "declarations",
     "subject": "repo",
@@ -199,7 +199,7 @@
     "name": "verdict epoch (kit version dates the engine)",
     "argv": [
       "bash",
-      "tools/memory-tree/check-verdict-epoch.sh"
+      "{prefix}/memory-tree/check-verdict-epoch.sh"
     ],
     "chunk": "declarations",
     "subject": "repo",
@@ -209,11 +209,11 @@
     "name": "verdict-epoch self-test",
     "argv": [
       "bash",
-      "tools/memory-tree/check-verdict-epoch.test.sh"
+      "{prefix}/memory-tree/check-verdict-epoch.test.sh"
     ],
     "guard": [
-      "tools/lib/",
-      "tools/memory-tree/"
+      "{prefix}/lib/",
+      "{prefix}/memory-tree/"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -223,7 +223,7 @@
     "name": "agent-instructions wiring",
     "argv": [
       "bash",
-      "tools/agent-instructions/adopt-agent-instructions.sh",
+      "{prefix}/agent-instructions/adopt-agent-instructions.sh",
       "--check",
       "--aliases",
       "claude"
@@ -240,7 +240,7 @@
     ],
     "guard": [
       "skills/session-kickoff/",
-      "tools/lib/"
+      "{prefix}/lib/"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -250,11 +250,11 @@
     "name": "python resolver (behaviour + inline parity + idiom ban)",
     "argv": [
       "bash",
-      "tools/lib/resolve-python.test.sh"
+      "{prefix}/lib/resolve-python.test.sh"
     ],
     "guard": [
-      "tools/",
-      "tools/lib/"
+      "{prefix}/",
+      "{prefix}/lib/"
     ],
     "chunk": "wiring",
     "subject": "kit",
@@ -264,11 +264,11 @@
     "name": "agent-cap self-test",
     "argv": [
       "bash",
-      "tools/hooks/agent-cap.test.sh"
+      "{prefix}/hooks/agent-cap.test.sh"
     ],
     "guard": [
-      "tools/hooks/",
-      "tools/lib/"
+      "{prefix}/hooks/",
+      "{prefix}/lib/"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -278,11 +278,11 @@
     "name": "scratch-guard self-test",
     "argv": [
       "bash",
-      "tools/hooks/scratch-guard.test.sh"
+      "{prefix}/hooks/scratch-guard.test.sh"
     ],
     "guard": [
-      "tools/hooks/",
-      "tools/lib/",
+      "{prefix}/hooks/",
+      "{prefix}/lib/",
       "skills/session-kickoff/"
     ],
     "chunk": "selftests",
@@ -293,11 +293,11 @@
     "name": "agent-instructions self-test",
     "argv": [
       "bash",
-      "tools/agent-instructions/adopt-agent-instructions.test.sh"
+      "{prefix}/agent-instructions/adopt-agent-instructions.test.sh"
     ],
     "guard": [
-      "tools/agent-instructions/",
-      "tools/lib/"
+      "{prefix}/agent-instructions/",
+      "{prefix}/lib/"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -307,11 +307,11 @@
     "name": "memory-hygiene self-test",
     "argv": [
       "bash",
-      "tools/memory-tree/check-memory-hygiene.test.sh"
+      "{prefix}/memory-tree/check-memory-hygiene.test.sh"
     ],
     "guard": [
-      "tools/lib/",
-      "tools/memory-tree/"
+      "{prefix}/lib/",
+      "{prefix}/memory-tree/"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -321,7 +321,7 @@
     "name": "row-driver view refusal",
     "argv": [
       "python3",
-      "tools/memory-tree/merge-rows.py",
+      "{prefix}/memory-tree/merge-rows.py",
       "--check"
     ],
     "chunk": "declarations",
@@ -332,12 +332,12 @@
     "name": "row-keyed merge driver replay",
     "argv": [
       "bash",
-      "tools/memory-tree/merge-rows.test.sh"
+      "{prefix}/memory-tree/merge-rows.test.sh"
     ],
     "guard": [
-      "tools/lib/",
-      "tools/memory-recall/",
-      "tools/memory-tree/"
+      "{prefix}/lib/",
+      "{prefix}/memory-recall/",
+      "{prefix}/memory-tree/"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -347,15 +347,15 @@
     "name": "kit/dogfood doc parity",
     "argv": [
       "bash",
-      "tools/memory-tree/kit-dogfood-parity.test.sh"
+      "{prefix}/memory-tree/kit-dogfood-parity.test.sh"
     ],
     "guard": [
       "memory/HYGIENE.md",
       "memory/TEMPLATE-SPEC.md",
       "memory/guides/BUILD-METHOD.md",
       "memory/guides/ANNOTATION-STYLE.md",
-      "tools/lib/",
-      "tools/memory-tree/",
+      "{prefix}/lib/",
+      "{prefix}/memory-tree/",
       ".memory-tree.conf"
     ],
     "chunk": "declarations",
@@ -366,7 +366,7 @@
     "name": "method carriers (every pointer declared)",
     "argv": [
       "bash",
-      "tools/memory-tree/check-method-carriers.sh"
+      "{prefix}/memory-tree/check-method-carriers.sh"
     ],
     "chunk": "declarations",
     "subject": "repo",
@@ -376,7 +376,7 @@
     "name": "method-carriers self-test",
     "argv": [
       "bash",
-      "tools/memory-tree/check-method-carriers.test.sh"
+      "{prefix}/memory-tree/check-method-carriers.test.sh"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -386,12 +386,12 @@
     "name": "build-index selftest",
     "argv": [
       "python3",
-      "tools/memory-tree/gen_build_index.py",
+      "{prefix}/memory-tree/gen_build_index.py",
       "--selftest"
     ],
     "guard": [
-      "tools/lib/",
-      "tools/memory-tree/"
+      "{prefix}/lib/",
+      "{prefix}/memory-tree/"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -401,7 +401,7 @@
     "name": "build README slot contract",
     "argv": [
       "python3",
-      "tools/memory-tree/gen_build_index.py",
+      "{prefix}/memory-tree/gen_build_index.py",
       "--check-format"
     ],
     "chunk": "records",
@@ -412,12 +412,12 @@
     "name": "corpus-ids selftest",
     "argv": [
       "python3",
-      "tools/memory-tree/corpus_ids.py",
+      "{prefix}/memory-tree/corpus_ids.py",
       "--selftest"
     ],
     "guard": [
-      "tools/lib/",
-      "tools/memory-tree/"
+      "{prefix}/lib/",
+      "{prefix}/memory-tree/"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -427,12 +427,12 @@
     "name": "gotchas selftest",
     "argv": [
       "python3",
-      "tools/memory-tree/gotchas.py",
+      "{prefix}/memory-tree/gotchas.py",
       "--selftest"
     ],
     "guard": [
-      "tools/lib/",
-      "tools/memory-tree/"
+      "{prefix}/lib/",
+      "{prefix}/memory-tree/"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -442,12 +442,12 @@
     "name": "row-grammar selftest",
     "argv": [
       "python3",
-      "tools/memory-tree/row_grammar.py",
+      "{prefix}/memory-tree/row_grammar.py",
       "--selftest"
     ],
     "guard": [
-      "tools/lib/",
-      "tools/memory-tree/"
+      "{prefix}/lib/",
+      "{prefix}/memory-tree/"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -457,12 +457,12 @@
     "name": "backlog migration selftest",
     "argv": [
       "python3",
-      "tools/memory-tree/migrate_backlog.py",
+      "{prefix}/memory-tree/migrate_backlog.py",
       "--selftest"
     ],
     "guard": [
-      "tools/lib/",
-      "tools/memory-tree/"
+      "{prefix}/lib/",
+      "{prefix}/memory-tree/"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -472,7 +472,7 @@
     "name": "harness arms (fail branches armed or pinned)",
     "argv": [
       "python3",
-      "tools/memory-tree/check-arms.py",
+      "{prefix}/memory-tree/check-arms.py",
       "--check"
     ],
     "chunk": "declarations",
@@ -483,12 +483,12 @@
     "name": "check-arms selftest",
     "argv": [
       "python3",
-      "tools/memory-tree/check-arms.py",
+      "{prefix}/memory-tree/check-arms.py",
       "--selftest"
     ],
     "guard": [
-      "tools/lib/",
-      "tools/memory-tree/"
+      "{prefix}/lib/",
+      "{prefix}/memory-tree/"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -502,7 +502,7 @@
     ],
     "guard": [
       ".githooks/",
-      "tools/lib/"
+      "{prefix}/lib/"
     ],
     "chunk": "selftests",
     "subject": "repo",
@@ -516,7 +516,7 @@
     ],
     "guard": [
       ".githooks/",
-      "tools/lib/"
+      "{prefix}/lib/"
     ],
     "chunk": "selftests",
     "subject": "repo",
@@ -530,8 +530,8 @@
     ],
     "guard": [
       ".githooks/",
-      "tools/runlog/",
-      "tools/run-gates/"
+      "{prefix}/runlog/",
+      "{prefix}/run-gates/"
     ],
     "chunk": "selftests",
     "subject": "repo",
@@ -554,12 +554,12 @@
     "name": "push-main self-test",
     "argv": [
       "bash",
-      "tools/push-main.test.sh"
+      "{prefix}/push-main.test.sh"
     ],
     "guard": [
       ".githooks/",
-      "tools/",
-      "tools/lib/"
+      "{prefix}/",
+      "{prefix}/lib/"
     ],
     "chunk": "selftests",
     "subject": "repo",
@@ -569,12 +569,12 @@
     "name": "check-wiring self-test",
     "argv": [
       "bash",
-      "tools/check-wiring.test.sh"
+      "{prefix}/check-wiring.test.sh"
     ],
     "guard": [
       ".claude/",
-      "tools/",
-      "tools/lib/"
+      "{prefix}/",
+      "{prefix}/lib/"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -584,12 +584,12 @@
     "name": "verifier fan-out self-test",
     "argv": [
       "bash",
-      "tools/workflows/check-verifier-fanout.test.sh"
+      "{prefix}/workflows/check-verifier-fanout.test.sh"
     ],
     "guard": [
-      "tools/hooks/",
-      "tools/lib/",
-      "tools/workflows/"
+      "{prefix}/hooks/",
+      "{prefix}/lib/",
+      "{prefix}/workflows/"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -599,7 +599,7 @@
     "name": "review-protocol parity (kit vs dogfood)",
     "argv": [
       "bash",
-      "tools/workflows/check-protocol-parity.test.sh"
+      "{prefix}/workflows/check-protocol-parity.test.sh"
     ],
     "chunk": "declarations",
     "subject": "repo",
@@ -609,7 +609,7 @@
     "name": "review-join ban (no ref-keyed join)",
     "argv": [
       "bash",
-      "tools/workflows/check-review-join.sh"
+      "{prefix}/workflows/check-review-join.sh"
     ],
     "chunk": "declarations",
     "subject": "repo",
@@ -619,7 +619,7 @@
     "name": "workflow script syntax",
     "argv": [
       "node",
-      "tools/workflows/check-workflow-syntax.js"
+      "{prefix}/workflows/check-workflow-syntax.js"
     ],
     "chunk": "wiring",
     "subject": "repo",
@@ -629,10 +629,10 @@
     "name": "tier2-review self-test",
     "argv": [
       "bash",
-      "tools/workflows/tier2-review.test.sh"
+      "{prefix}/workflows/tier2-review.test.sh"
     ],
     "guard": [
-      "tools/workflows/"
+      "{prefix}/workflows/"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -642,10 +642,10 @@
     "name": "unattended-build self-test",
     "argv": [
       "bash",
-      "tools/workflows/unattended-build.test.sh"
+      "{prefix}/workflows/unattended-build.test.sh"
     ],
     "guard": [
-      "tools/workflows/"
+      "{prefix}/workflows/"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -655,12 +655,12 @@
     "name": "review-join self-test",
     "argv": [
       "bash",
-      "tools/workflows/check-review-join.test.sh"
+      "{prefix}/workflows/check-review-join.test.sh"
     ],
     "guard": [
-      "tools/hooks/",
-      "tools/lib/",
-      "tools/workflows/"
+      "{prefix}/hooks/",
+      "{prefix}/lib/",
+      "{prefix}/workflows/"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -681,11 +681,11 @@
     "name": "pytest-guardrails self-test",
     "argv": [
       "bash",
-      "tools/pytest-parallel-guardrails/pytest-parallel-guardrails.test.sh"
+      "{prefix}/pytest-parallel-guardrails/pytest-parallel-guardrails.test.sh"
     ],
     "guard": [
-      "tools/lib/",
-      "tools/pytest-parallel-guardrails/"
+      "{prefix}/lib/",
+      "{prefix}/pytest-parallel-guardrails/"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -695,12 +695,12 @@
     "name": "codebase-map kit selftest",
     "argv": [
       "python3",
-      "tools/codebase-map/selftest.py"
+      "{prefix}/codebase-map/selftest.py"
     ],
     "guard": [
-      "tools/codebase-map/",
-      "tools/lib/",
-      "tools/lexicon/"
+      "{prefix}/codebase-map/",
+      "{prefix}/lib/",
+      "{prefix}/lexicon/"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -710,12 +710,12 @@
     "name": "codebase-map gate coverage",
     "argv": [
       "python3",
-      "tools/codebase-map/check_gate_coverage.py"
+      "{prefix}/codebase-map/check_gate_coverage.py"
     ],
     "chunk": "declarations",
     "subject": "repo",
     "guard": [
-      "tools/codebase-map/",
+      "{prefix}/codebase-map/",
       ".codebase-map.conf"
     ],
     "ceiling": 180
@@ -724,7 +724,7 @@
     "name": "codebase-map coverage + freshness",
     "argv": [
       "python3",
-      "tools/codebase-map/test_codebase_map.py"
+      "{prefix}/codebase-map/test_codebase_map.py"
     ],
     "chunk": "declarations",
     "subject": "repo",
@@ -734,11 +734,11 @@
     "name": "codebase-map adopter e2e",
     "argv": [
       "bash",
-      "tools/codebase-map/adopt-codebase-map.test.sh"
+      "{prefix}/codebase-map/adopt-codebase-map.test.sh"
     ],
     "guard": [
-      "tools/codebase-map/",
-      "tools/lib/"
+      "{prefix}/codebase-map/",
+      "{prefix}/lib/"
     ],
     "chunk": "e2e",
     "subject": "kit",
@@ -748,12 +748,12 @@
     "name": "settings-merge selftest",
     "argv": [
       "python3",
-      "tools/settings-merge.py",
+      "{prefix}/settings-merge.py",
       "--selftest"
     ],
     "guard": [
-      "tools/",
-      "tools/lib/"
+      "{prefix}/",
+      "{prefix}/lib/"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -763,11 +763,11 @@
     "name": "memory-recall kit selftest",
     "argv": [
       "python3",
-      "tools/memory-recall/selftest.py"
+      "{prefix}/memory-recall/selftest.py"
     ],
     "guard": [
-      "tools/lib/",
-      "tools/memory-recall/"
+      "{prefix}/lib/",
+      "{prefix}/memory-recall/"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -777,10 +777,10 @@
     "name": "recall floor",
     "argv": [
       "python3",
-      "tools/memory-recall/check-recall.py"
+      "{prefix}/memory-recall/check-recall.py"
     ],
     "guard": [
-      "tools/memory-recall/",
+      "{prefix}/memory-recall/",
       "memory/",
       ".memory-tree.conf"
     ],
@@ -792,12 +792,12 @@
     "name": "recall floor arms",
     "argv": [
       "python3",
-      "tools/memory-recall/test_recall_floor.py"
+      "{prefix}/memory-recall/test_recall_floor.py"
     ],
     "guard": [
-      "tools/memory-recall/",
+      "{prefix}/memory-recall/",
       "memory/",
-      "tools/govkit/"
+      "{prefix}/govkit/"
     ],
     "chunk": "selftests",
     "subject": "repo",
@@ -807,7 +807,7 @@
     "name": "memory-recall skill wiring",
     "argv": [
       "bash",
-      "tools/memory-recall/adopt-memory-recall.sh",
+      "{prefix}/memory-recall/adopt-memory-recall.sh",
       "--check"
     ],
     "chunk": "wiring",
@@ -818,11 +818,11 @@
     "name": "drift-audit selftest",
     "argv": [
       "python",
-      "tools/drift-audit/selftest.py"
+      "{prefix}/drift-audit/selftest.py"
     ],
     "guard": [
-      "tools/drift-audit/",
-      "tools/lib/"
+      "{prefix}/drift-audit/",
+      "{prefix}/lib/"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -832,7 +832,7 @@
     "name": "drift-audit wiring",
     "argv": [
       "bash",
-      "tools/drift-audit/adopt-drift-audit.sh",
+      "{prefix}/drift-audit/adopt-drift-audit.sh",
       "--check"
     ],
     "chunk": "wiring",
@@ -843,7 +843,7 @@
     "name": "process-monitor wiring",
     "argv": [
       "bash",
-      "tools/process-monitor/adopt-process-monitor.sh",
+      "{prefix}/process-monitor/adopt-process-monitor.sh",
       "--check"
     ],
     "chunk": "records",
@@ -854,11 +854,11 @@
     "name": "process-monitor census selftest",
     "argv": [
       "python",
-      "tools/process-monitor/selftest.py"
+      "{prefix}/process-monitor/selftest.py"
     ],
     "guard": [
-      "tools/process-monitor/census.py",
-      "tools/process-monitor/selftest.py"
+      "{prefix}/process-monitor/census.py",
+      "{prefix}/process-monitor/selftest.py"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -868,11 +868,11 @@
     "name": "process-monitor adopter selftest",
     "argv": [
       "bash",
-      "tools/process-monitor/adopt-process-monitor.test.sh"
+      "{prefix}/process-monitor/adopt-process-monitor.test.sh"
     ],
     "guard": [
-      "tools/process-monitor/adopt-process-monitor.sh",
-      "tools/process-monitor/adopt-process-monitor.test.sh"
+      "{prefix}/process-monitor/adopt-process-monitor.sh",
+      "{prefix}/process-monitor/adopt-process-monitor.test.sh"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -882,10 +882,10 @@
     "name": "runlog selftest",
     "argv": [
       "python",
-      "tools/runlog/selftest.py"
+      "{prefix}/runlog/selftest.py"
     ],
     "guard": [
-      "tools/runlog/"
+      "{prefix}/runlog/"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -895,7 +895,7 @@
     "name": "runlog record schema",
     "argv": [
       "python",
-      "tools/runlog/runlog.py",
+      "{prefix}/runlog/runlog.py",
       "check-records"
     ],
     "chunk": "declarations",
@@ -906,7 +906,7 @@
     "name": "runlog skill wiring",
     "argv": [
       "bash",
-      "tools/runlog/adopt-runlog.sh",
+      "{prefix}/runlog/adopt-runlog.sh",
       "--check"
     ],
     "chunk": "wiring",
@@ -917,12 +917,12 @@
     "name": "drift-audit records",
     "argv": [
       "python",
-      "tools/drift-audit/drift_report.py",
+      "{prefix}/drift-audit/drift_report.py",
       "--check"
     ],
     "signature": [
       "python",
-      "tools/drift-audit/drift_report.py",
+      "{prefix}/drift-audit/drift_report.py",
       "--offenders"
     ],
     "chunk": "declarations",
@@ -933,7 +933,7 @@
     "name": "unattended kit gate",
     "argv": [
       "bash",
-      "tools/unattended/check-unattended.sh"
+      "{prefix}/unattended/check-unattended.sh"
     ],
     "impure": "its verdict is a function of the REMOTE as well as of the tree: it runs `ls-remote` against the real origin to observe what the remote advertises, and fails closed when it cannot. Measured 2026-08-20: this is the only leg of the 86 whose network call reaches a real endpoint \u2014 the six other legs whose scripts name a network verb are self-tests that build their origin under `mktemp -d`.",
     "chunk": "declarations",
@@ -944,7 +944,7 @@
     "name": "pass-order history",
     "argv": [
       "bash",
-      "tools/unattended/check-pass-order.sh"
+      "{prefix}/unattended/check-pass-order.sh"
     ],
     "chunk": "declarations",
     "subject": "repo",
@@ -955,7 +955,7 @@
     "name": "brief-recorded",
     "argv": [
       "bash",
-      "tools/unattended/check-brief-recorded.sh"
+      "{prefix}/unattended/check-brief-recorded.sh"
     ],
     "chunk": "declarations",
     "subject": "repo",
@@ -966,7 +966,7 @@
     "name": "playbook validity gate",
     "argv": [
       "bash",
-      "tools/unattended/check-playbook.sh"
+      "{prefix}/unattended/check-playbook.sh"
     ],
     "chunk": "declarations",
     "subject": "repo",
@@ -976,7 +976,7 @@
     "name": "unattended skill wiring",
     "argv": [
       "bash",
-      "tools/unattended/adopt-unattended.sh",
+      "{prefix}/unattended/adopt-unattended.sh",
       "--check"
     ],
     "chunk": "wiring",
@@ -987,12 +987,12 @@
     "name": "run-gates canary",
     "argv": [
       "bash",
-      "tools/run-gates/run-gates.test.sh"
+      "{prefix}/run-gates/run-gates.test.sh"
     ],
     "guard": [
-      "tools/",
-      "tools/gate-legs.json",
-      "tools/lib/"
+      "{prefix}/",
+      "{prefix}/gate-legs.json",
+      "{prefix}/lib/"
     ],
     "chunk": "selftests",
     "subject": "repo",
@@ -1002,11 +1002,11 @@
     "name": "run-gates evidence",
     "argv": [
       "bash",
-      "tools/run-gates/run-gates.evidence.test.sh"
+      "{prefix}/run-gates/run-gates.evidence.test.sh"
     ],
     "guard": [
-      "tools/",
-      "tools/lib/"
+      "{prefix}/",
+      "{prefix}/lib/"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -1016,11 +1016,11 @@
     "name": "run-gates turnstile",
     "argv": [
       "bash",
-      "tools/run-gates/run-gates.turnstile.test.sh"
+      "{prefix}/run-gates/run-gates.turnstile.test.sh"
     ],
     "guard": [
-      "tools/run-gates/",
-      "tools/lib/"
+      "{prefix}/run-gates/",
+      "{prefix}/lib/"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -1030,25 +1030,38 @@
     "name": "run-gates gov canary",
     "argv": [
       "bash",
-      "tools/run-gates/run-gates.gov.test.sh"
+      "{prefix}/run-gates/run-gates.gov.test.sh"
     ],
     "guard": [
-      "tools/run-gates/",
-      "tools/gate-legs.json"
+      "{prefix}/run-gates/",
+      "{prefix}/gate-legs.json"
     ],
     "chunk": "selftests",
     "subject": "repo",
     "ceiling": 300
   },
   {
+    "name": "foreign-prefix parity (every self-test at three prefixes)",
+    "argv": [
+      "bash",
+      "{prefix}/run-gates/foreign-prefix.gov.test.sh"
+    ],
+    "guard": [
+      "{prefix}/"
+    ],
+    "chunk": "selftests",
+    "subject": "repo",
+    "ceiling": 7500
+  },
+  {
     "name": "run-gates run-log line",
     "argv": [
       "bash",
-      "tools/run-gates/run-gates.runlog.test.sh"
+      "{prefix}/run-gates/run-gates.runlog.test.sh"
     ],
     "guard": [
-      "tools/run-gates/",
-      "tools/runlog/"
+      "{prefix}/run-gates/",
+      "{prefix}/runlog/"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -1058,10 +1071,10 @@
     "name": "run-gates adopter e2e",
     "argv": [
       "bash",
-      "tools/run-gates/adopt-run-gates.test.sh"
+      "{prefix}/run-gates/adopt-run-gates.test.sh"
     ],
     "guard": [
-      "tools/run-gates/"
+      "{prefix}/run-gates/"
     ],
     "chunk": "e2e",
     "subject": "kit",
@@ -1071,7 +1084,7 @@
     "name": "run-gates wiring",
     "argv": [
       "bash",
-      "tools/run-gates/adopt-run-gates.sh",
+      "{prefix}/run-gates/adopt-run-gates.sh",
       "--check"
     ],
     "guard": [],
@@ -1083,10 +1096,10 @@
     "name": "profile-bar selftest",
     "argv": [
       "bash",
-      "tools/run-gates/profile_bar.test.sh"
+      "{prefix}/run-gates/profile_bar.test.sh"
     ],
     "guard": [
-      "tools/run-gates/"
+      "{prefix}/run-gates/"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -1096,11 +1109,11 @@
     "name": "install-prefix (shipped surface)",
     "argv": [
       "bash",
-      "tools/check-install-prefix.sh"
+      "{prefix}/check-install-prefix.sh"
     ],
     "signature": [
       "bash",
-      "tools/check-install-prefix.sh",
+      "{prefix}/check-install-prefix.sh",
       "--offenders"
     ],
     "chunk": "product",
@@ -1111,7 +1124,7 @@
     "name": "hook destinations (every declared hook path ships)",
     "argv": [
       "bash",
-      "tools/check-hook-destinations.sh"
+      "{prefix}/check-hook-destinations.sh"
     ],
     "chunk": "product",
     "subject": "repo",
@@ -1121,12 +1134,12 @@
     "name": "hook destinations self-test",
     "argv": [
       "bash",
-      "tools/check-hook-destinations.test.sh"
+      "{prefix}/check-hook-destinations.test.sh"
     ],
     "guard": [
-      "tools/check-hook-destinations.sh",
-      "tools/hooks/",
-      "tools/memory-recall/"
+      "{prefix}/check-hook-destinations.sh",
+      "{prefix}/hooks/",
+      "{prefix}/memory-recall/"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -1136,7 +1149,7 @@
     "name": "agent-cap restatement",
     "argv": [
       "bash",
-      "tools/check-agent-cap-restatement.sh"
+      "{prefix}/check-agent-cap-restatement.sh"
     ],
     "chunk": "product",
     "subject": "repo",
@@ -1146,7 +1159,7 @@
     "name": "agent-cap restatement self-test",
     "argv": [
       "bash",
-      "tools/check-agent-cap-restatement.test.sh"
+      "{prefix}/check-agent-cap-restatement.test.sh"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -1156,11 +1169,11 @@
     "name": "install-prefix self-test",
     "argv": [
       "bash",
-      "tools/check-install-prefix.test.sh"
+      "{prefix}/check-install-prefix.test.sh"
     ],
     "guard": [
-      "tools/",
-      "tools/lib/"
+      "{prefix}/",
+      "{prefix}/lib/"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -1170,7 +1183,7 @@
     "name": "dead-path carriers (deleted files still named)",
     "argv": [
       "bash",
-      "tools/check-dead-paths.sh"
+      "{prefix}/check-dead-paths.sh"
     ],
     "chunk": "declarations",
     "subject": "repo",
@@ -1180,10 +1193,10 @@
     "name": "dead-path carriers self-test",
     "argv": [
       "bash",
-      "tools/check-dead-paths.test.sh"
+      "{prefix}/check-dead-paths.test.sh"
     ],
     "guard": [
-      "tools/"
+      "{prefix}/"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -1193,7 +1206,7 @@
     "name": "govkit selfcheck",
     "argv": [
       "python",
-      "tools/govkit/govkit.py",
+      "{prefix}/govkit/govkit.py",
       "selfcheck"
     ],
     "chunk": "declarations",
@@ -1204,7 +1217,7 @@
     "name": "kit epoch (shipped bytes move, the version moves)",
     "argv": [
       "python",
-      "tools/govkit/govkit.py",
+      "{prefix}/govkit/govkit.py",
       "epoch"
     ],
     "chunk": "declarations",
@@ -1215,10 +1228,10 @@
     "name": "govkit selftest",
     "argv": [
       "python",
-      "tools/govkit/selftest.py"
+      "{prefix}/govkit/selftest.py"
     ],
     "guard": [
-      "tools/govkit/"
+      "{prefix}/govkit/"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -1228,15 +1241,15 @@
     "name": "lexicon naming predicates",
     "argv": [
       "python",
-      "tools/lexicon/lexicon.py"
+      "{prefix}/lexicon/lexicon.py"
     ],
     "signature": [
       "python",
-      "tools/lexicon/lexicon.py",
+      "{prefix}/lexicon/lexicon.py",
       "--offenders"
     ],
     "guard": [
-      "tools/",
+      "{prefix}/",
       "skills/session-kickoff/",
       ".githooks/",
       ".claude/",
@@ -1250,10 +1263,10 @@
     "name": "lexicon selftest",
     "argv": [
       "python",
-      "tools/lexicon/selftest.py"
+      "{prefix}/lexicon/selftest.py"
     ],
     "guard": [
-      "tools/lexicon/"
+      "{prefix}/lexicon/"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -1263,7 +1276,7 @@
     "name": "lexicon wiring",
     "argv": [
       "bash",
-      "tools/lexicon/adopt-lexicon.sh",
+      "{prefix}/lexicon/adopt-lexicon.sh",
       "--check"
     ],
     "guard": [],
@@ -1275,7 +1288,7 @@
     "name": "playbook placeholder catalogue",
     "argv": [
       "bash",
-      "tools/check-placeholders.sh"
+      "{prefix}/check-placeholders.sh"
     ],
     "chunk": "product",
     "subject": "repo",
@@ -1285,11 +1298,11 @@
     "name": "placeholder-catalogue self-test",
     "argv": [
       "bash",
-      "tools/check-placeholders.test.sh"
+      "{prefix}/check-placeholders.test.sh"
     ],
     "guard": [
-      "tools/check-placeholders.sh",
-      "tools/check-placeholders.test.sh"
+      "{prefix}/check-placeholders.sh",
+      "{prefix}/check-placeholders.test.sh"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -1299,11 +1312,11 @@
     "name": "memory hygiene",
     "argv": [
       "bash",
-      "tools/memory-tree/check-memory-hygiene.sh"
+      "{prefix}/memory-tree/check-memory-hygiene.sh"
     ],
     "signature": [
       "bash",
-      "tools/memory-tree/check-memory-hygiene.sh",
+      "{prefix}/memory-tree/check-memory-hygiene.sh",
       "--offenders"
     ],
     "chunk": "records",
@@ -1314,14 +1327,14 @@
     "name": "transition-audit arms",
     "argv": [
       "bash",
-      "tools/memory-tree/transition-audit.test.sh"
+      "{prefix}/memory-tree/transition-audit.test.sh"
     ],
     "guard": [
       ".githooks/",
-      "tools/check-wiring.sh",
-      "tools/lib/",
-      "tools/memory-recall/",
-      "tools/memory-tree/",
+      "{prefix}/check-wiring.sh",
+      "{prefix}/lib/",
+      "{prefix}/memory-recall/",
+      "{prefix}/memory-tree/",
       ".memory-tree.conf"
     ],
     "chunk": "declarations",
@@ -1336,10 +1349,10 @@
     ],
     "guard": [
       ".githooks/",
-      "tools/check-wiring.sh",
-      "tools/lib/",
-      "tools/memory-recall/",
-      "tools/memory-tree/",
+      "{prefix}/check-wiring.sh",
+      "{prefix}/lib/",
+      "{prefix}/memory-recall/",
+      "{prefix}/memory-tree/",
       ".memory-tree.conf",
       ".lexicon.conf"
     ],
@@ -1351,7 +1364,7 @@
     "name": "marker contracts",
     "argv": [
       "bash",
-      "tools/memory-tree/marker-contract.test.sh"
+      "{prefix}/memory-tree/marker-contract.test.sh"
     ],
     "chunk": "declarations",
     "subject": "repo",
@@ -1361,7 +1374,7 @@
     "name": "verifier fan-out",
     "argv": [
       "bash",
-      "tools/workflows/check-verifier-fanout.sh"
+      "{prefix}/workflows/check-verifier-fanout.sh"
     ],
     "chunk": "declarations",
     "subject": "repo",
@@ -1371,10 +1384,10 @@
     "name": "govkit refusal join",
     "argv": [
       "python",
-      "tools/govkit/refusal_join.py"
+      "{prefix}/govkit/refusal_join.py"
     ],
     "guard": [
-      "tools/govkit/"
+      "{prefix}/govkit/"
     ],
     "chunk": "declarations",
     "subject": "repo",
@@ -1384,7 +1397,7 @@
     "name": "govkit runbook parity",
     "argv": [
       "python",
-      "tools/govkit/check_runbook_parity.py"
+      "{prefix}/govkit/check_runbook_parity.py"
     ],
     "chunk": "declarations",
     "subject": "repo",
@@ -1394,13 +1407,13 @@
     "name": "govkit acceptance matrix",
     "argv": [
       "python",
-      "tools/govkit/matrix.py"
+      "{prefix}/govkit/matrix.py"
     ],
     "guard": [
-      "tools/govkit/",
-      "tools/playbook/",
-      "tools/check-microformats.sh",
-      "tools/check-line-length.sh",
+      "{prefix}/govkit/",
+      "{prefix}/playbook/",
+      "{prefix}/check-microformats.sh",
+      "{prefix}/check-line-length.sh",
       ".lexicon.conf"
     ],
     "chunk": "declarations",
@@ -1411,7 +1424,7 @@
     "name": "testsuite counts (every bar self-test prints one)",
     "argv": [
       "bash",
-      "tools/check-testsuite-counts.sh"
+      "{prefix}/check-testsuite-counts.sh"
     ],
     "chunk": "declarations",
     "subject": "repo",
@@ -1421,7 +1434,7 @@
     "name": "testsuite counts self-test",
     "argv": [
       "bash",
-      "tools/check-testsuite-counts.test.sh"
+      "{prefix}/check-testsuite-counts.test.sh"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -1431,7 +1444,7 @@
     "name": "playbook render wiring",
     "argv": [
       "bash",
-      "tools/playbook/adopt-playbook.sh",
+      "{prefix}/playbook/adopt-playbook.sh",
       "--target",
       ".",
       "--check"
@@ -1443,11 +1456,11 @@
   {
     "name": "playbook render selftest",
     "guard": [
-      "tools/playbook/"
+      "{prefix}/playbook/"
     ],
     "argv": [
       "bash",
-      "tools/playbook/adopt-playbook.sh",
+      "{prefix}/playbook/adopt-playbook.sh",
       "--selftest"
     ],
     "chunk": "selftests",
@@ -1458,7 +1471,7 @@
     "name": "spec tokens (a spec's own names resolve)",
     "argv": [
       "python",
-      "tools/check-spec-tokens.py"
+      "{prefix}/check-spec-tokens.py"
     ],
     "chunk": "declarations",
     "subject": "repo",
@@ -1468,7 +1481,7 @@
     "name": "kit placeholders (a declared token its adopter substitutes)",
     "argv": [
       "python",
-      "tools/check-kit-placeholders.py"
+      "{prefix}/check-kit-placeholders.py"
     ],
     "chunk": "declarations",
     "subject": "repo",
@@ -1478,7 +1491,7 @@
     "name": "leg ceilings clear their evidenced maximum",
     "argv": [
       "python",
-      "tools/run-gates/derive-ceilings.py",
+      "{prefix}/run-gates/derive-ceilings.py",
       "--check"
     ],
     "chunk": "declarations",
@@ -1489,7 +1502,7 @@
     "name": "every held leg is budgeted, every budget row resolves",
     "argv": [
       "bash",
-      "tools/run-gates/run-selftests.sh",
+      "{prefix}/run-gates/run-selftests.sh",
       "--check"
     ],
     "chunk": "declarations",
@@ -1500,7 +1513,7 @@
     "name": "receipt sync (installed files match the receipt)",
     "argv": [
       "python",
-      "tools/run-gates/check-receipt.py"
+      "{prefix}/run-gates/check-receipt.py"
     ],
     "guard": [],
     "chunk": "declarations",
@@ -1511,10 +1524,10 @@
     "name": "spec-tokens self-test",
     "argv": [
       "bash",
-      "tools/check-spec-tokens.test.sh"
+      "{prefix}/check-spec-tokens.test.sh"
     ],
     "guard": [
-      "tools/"
+      "{prefix}/"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -1524,10 +1537,10 @@
     "name": "kit-placeholders self-test",
     "argv": [
       "bash",
-      "tools/check-kit-placeholders.test.sh"
+      "{prefix}/check-kit-placeholders.test.sh"
     ],
     "guard": [
-      "tools/"
+      "{prefix}/"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -1537,11 +1550,11 @@
     "name": "selftest harness self-test",
     "argv": [
       "bash",
-      "tools/lib/lib-selftest.test.sh"
+      "{prefix}/lib/lib-selftest.test.sh"
     ],
     "guard": [
-      "tools/lib/lib-selftest.sh",
-      "tools/lib/lib-selftest.test.sh"
+      "{prefix}/lib/lib-selftest.sh",
+      "{prefix}/lib/lib-selftest.test.sh"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -1551,12 +1564,12 @@
     "name": "extract-arms self-test",
     "argv": [
       "bash",
-      "tools/lib/extract-arms.test.sh"
+      "{prefix}/lib/extract-arms.test.sh"
     ],
     "guard": [
-      "tools/lib/extract-arms.sh",
-      "tools/lib/extract-arms.test.sh",
-      "tools/lib/lib-selftest.sh"
+      "{prefix}/lib/extract-arms.sh",
+      "{prefix}/lib/extract-arms.test.sh",
+      "{prefix}/lib/lib-selftest.sh"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -1566,11 +1579,11 @@
     "name": "run-selftests self-test",
     "argv": [
       "bash",
-      "tools/run-gates/run-selftests.test.sh"
+      "{prefix}/run-gates/run-selftests.test.sh"
     ],
     "guard": [
-      "tools/run-gates/run-selftests.sh",
-      "tools/run-gates/run-selftests.test.sh"
+      "{prefix}/run-gates/run-selftests.sh",
+      "{prefix}/run-gates/run-selftests.test.sh"
     ],
     "chunk": "selftests",
     "subject": "kit",

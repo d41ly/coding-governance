@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """gen_build_index.py — the generated build index for a flat memory tree (memory-tree kit 1.5).
 
-    python tools/memory-tree/gen_build_index.py --check         # drift gate (writes nothing)
-    python tools/memory-tree/gen_build_index.py --write         # (re)render every artifact
-    python tools/memory-tree/gen_build_index.py --check-format  # the slot contract + heading canon
-    python tools/memory-tree/gen_build_index.py --survey        # the canon over every README, never fails
-    python tools/memory-tree/gen_build_index.py --selftest      # fixtures, in a temp dir
+    python <prefix>/memory-tree/gen_build_index.py --check         # drift gate (writes nothing)
+    python <prefix>/memory-tree/gen_build_index.py --write         # (re)render every artifact
+    python <prefix>/memory-tree/gen_build_index.py --check-format  # the slot contract + heading canon
+    python <prefix>/memory-tree/gen_build_index.py --survey        # the canon over every README, never fails
+    python <prefix>/memory-tree/gen_build_index.py --selftest      # fixtures, in a temp dir
 
 WHAT --check-format DOES NOT CHECK. It grades POSITION for every tracked build README and SHAPE — the
 closed heading canon — only for the ones the declared registry BINDS. It never grades what a slot
@@ -1862,7 +1862,7 @@ def slot_violations(readme_text: str, readme: str, canon: bool = False) -> list:
     # silently restoring the vacuous pass it exists to remove.
     #
     # THE DISCIPLINE IS THE DRIVER'S, not `_marker_index`'s. `region()` in
-    # tools/unattended/unattended.sh refuses unless there is exactly one open, exactly one close, and
+    # <prefix>/unattended/unattended.sh refuses unless there is exactly one open, exactly one close, and
     # the open comes first; `_marker_index` returns the FIRST match and has no notion of duplicates or
     # order. An assertion built on the helper would accept what the driver rejects, which is two
     # answers to one question in the two tools that both read this marker.
@@ -4386,7 +4386,7 @@ def cmd_selftest() -> int:
             lambda: str(all(("> " + line) in _probe.split("\n")
                             for line in backlog.render_relocation_recipe("KIT/HERE", "memory"))))
         arm("the view header spells no kit literal of its own", "False",
-            lambda: str("tools/memory-tree/" in _probe))  # gov:prefix-literal — the arm asserts this literal is ABSENT from the render, so it names it
+            lambda: str("%s/%s/" % (pathlib.Path(__file__).resolve().parent.parent.name, pathlib.Path(__file__).resolve().parent.name) in _probe))  # this install's own kit path, derived
         arm("an empty kit prefix REFUSES rather than rendering a command that cannot run",
             "empty derivation", lambda: backlog.render_relocation_recipe("", "memory"))
         arm("the view predicate's header SHAPE matches this install's own GEN_HEADER", "True",
@@ -4440,7 +4440,7 @@ def cmd_selftest() -> int:
                 # case that needs no second row to stage.
                 files[foo_rel] = _render_backlog_file("aFoo", [backlog.render_ask_row(
                     "EXMP-aFoo-2", "2026-09-01", "the second ask",
-                    clauses=(("seen", "`tools/x.py`:23"),))])
+                    clauses=(("seen", "`bin/x.py`:23"),))])
             elif code == 14:
                 cutoff = "2026-01-01"
                 files[foo_rel] = _render_backlog_file(
@@ -4677,13 +4677,13 @@ def cmd_selftest() -> int:
     # AC1 — the tail, read right to left, with the collision that makes a misread LOUD.
     _ac1_row = backlog.extract_row(backlog.render_ask_row(
         "EXMP-aFoo-3", "2026-09-15", "push-main.sh reports a gate RED as a network failure",
-        pointer="`tools/lander-granted.sh`",
-        clauses=(("seen", "`tools/lander-granted.sh`@7484d8d7:23"),
+        pointer="`bin/lander-granted.sh`",
+        clauses=(("seen", "`bin/lander-granted.sh`@7484d8d7:23"),
                  ("accept", "a RED bar prints GATE FAIL and exits non-zero"),
                  ("out", "retry policy"))), _g15)
     arm("the §4 example ask yields its three clauses, its pointer and its text",
-        "clauses=3 seen=['`tools/lander-granted.sh`@7484d8d7:23'] "
-        "pointer=`tools/lander-granted.sh` text=push-main.sh reports a gate RED as a network failure",
+        "clauses=3 seen=['`bin/lander-granted.sh`@7484d8d7:23'] "
+        "pointer=`bin/lander-granted.sh` text=push-main.sh reports a gate RED as a network failure",
         lambda: f"clauses={len(_ac1_row.extra['clauses'])} "
                 f"seen={backlog.read_clause_values(_ac1_row.extra['clauses'], 'seen')} "
                 f"pointer={_ac1_row.extra['pointer']} text={_ac1_row.why}")
@@ -4767,7 +4767,7 @@ def cmd_selftest() -> int:
         _ac2c = _build_env_tree(
             foo_asks=[backlog.render_ask_row(
                 "EXMP-aFoo-1", "2026-09-01", "granted",
-                clauses=(_SEEN_HERE, _ACCEPT, ("may", "`tools/lander-granted.sh`")))],
+                clauses=(_SEEN_HERE, _ACCEPT, ("may", "`bin/lander-granted.sh`")))],
             foo_rows=[backlog.render_scope_row("EXMP-aFoo-1", (("may", "none"),))])
         _c2c = _build_backlog_fixture(et, _ac2c)
         _rc, _so3, _se = _read_asks_run(et, _c2c, ["--tsv", "--all"])
@@ -4775,7 +4775,7 @@ def cmd_selftest() -> int:
         # only the grant passed over a field reading `<grant>,none` — measured, by staging the
         # break that stops absorbing `none` and watching this arm stay green.
         arm("a SCOPE row's `may none` is ABSORBED and leaves the ask's grant unchanged",
-            "grant=[`tools/lander-granted.sh`]",
+            "grant=[`bin/lander-granted.sh`]",
             lambda: "grant=[" + [x for x in _so3.split("\n")
                                  if x.startswith("ask\t")][0].split("\t")[9] + "]")
 
@@ -4783,7 +4783,7 @@ def cmd_selftest() -> int:
         _ac3 = _build_env_tree(
             foo_asks=[
                 backlog.render_ask_row("EXMP-aFoo-1", "2026-09-01", "a line that moves",
-                                       clauses=(("seen", "`tools/x.py`:23"),)),
+                                       clauses=(("seen", "`bin/x.py`:23"),)),
                 backlog.render_ask_row("EXMP-aFoo-2", "2026-09-01", "said twice",
                                        clauses=(("accept", "once"), ("accept", "and again"))),
             ],
@@ -4857,7 +4857,7 @@ def cmd_selftest() -> int:
             backlog.render_ask_row("EXMP-aFoo-8", "2026-09-01", "pointing at nothing",
                                    clauses=(_ACCEPT,), pointer="`memory/nope/gone.md`"),
             backlog.render_ask_row("EXMP-aFoo-9", "2026-09-01", "outside this repo, unbounded",
-                                   clauses=(("seen", "other:tools/x.py@abc1234"), _ACCEPT)),
+                                   clauses=(("seen", "other:bin/x.py@abc1234"), _ACCEPT)),
             backlog.render_ask_row("EXMP-aFoo-10", "2026-01-15", "pre-cutoff, located only",
                                    pointer="`memory/builds/aFoo/README.md`"),
             backlog.render_ask_row("EXMP-aFoo-11", "2026-01-15", "pre-cutoff, neither"),
@@ -5296,7 +5296,7 @@ def cmd_selftest() -> int:
             lambda: _read_refusal("zUngradedDocket", ["EXMP-aFoo-3", "-4"]))
         _sc_conf4 = _build_backlog_fixture(sc, _build_sc_tree(
             [_build_sc_ask(3, "granted", clauses=(_SEEN_HERE, _ACCEPT,
-                                                  ("may", "`tools/lander-granted.sh`")))]))
+                                                  ("may", "`bin/lander-granted.sh`")))]))
         run("git", "commit", "-q", "-m", "granted", "--no-verify", cwd=sc)
         _rc11, _out11 = _read_mode(cmd_new_build, sc, _sc_conf4,
                                    {"slug": "zGrantedDocket", "asks": ["EXMP-aFoo-3"]})

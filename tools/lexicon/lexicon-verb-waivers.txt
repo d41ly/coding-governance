@@ -2,7 +2,7 @@
 # One MATCHED TEXT per row, reason after whitespace. The pin is a TWO-SIDED EQUALITY: a count that
 # falls reds exactly as one that rises does, so a drain lands in the declaration or it is not landed.
 #
-# Keyed on the matched TEXT, not on <path>:<line>. install-prefix-waivers.txt keys on position, and
+# Keyed on the matched TEXT, not on <path>:<line>. The install-prefix gate's old registry keyed on position, and
 # any edit ABOVE a waived line unpins it — that reds a merge which touched nothing the waiver
 # guards, and it was hit on that gate's first real merge. A waiver whose text is gone reds as STALE,
 # so this file cannot quietly outlive what it excuses.

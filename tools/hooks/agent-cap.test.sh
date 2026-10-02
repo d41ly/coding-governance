@@ -5,17 +5,117 @@
 # Run from the kit directory: bash ./agent-cap.test.sh   (exit 0 = all pass)
 set -u
 HERE="$(cd "$(dirname "$0")" && pwd)"
+# >>> derive_self_rel — canonical copy: kit-rel.sh in gov's lib dir (byte-identical; gated)
+derive_self_rel() {
+  local _dsr_p _dsr_rel=""
+  _dsr_p=$(cd "$1" 2>/dev/null && pwd) || return 1
+  while [ ! -e "$_dsr_p/.git" ]; do
+    [ "$(dirname "$_dsr_p")" = "$_dsr_p" ] && return 1
+    _dsr_rel="$(basename "$_dsr_p")${_dsr_rel:+/$_dsr_rel}"
+    _dsr_p=$(dirname "$_dsr_p")
+  done
+  printf '%s\n' "$_dsr_rel"
+}
+# <<< derive_self_rel
+KIT_REL=$(derive_self_rel "$HERE") || { echo "agent-cap.test: not inside a git repository"; exit 2; }
+# PFX is the install prefix WITH its trailing slash, derived from where this file sits and empty
+# at a root install: every fixture and host path below is spelled through it, never through a
+# literal prefix (TOOL-aRepatriatedFork-28).
+case "$KIT_REL" in */*) PFX="${KIT_REL%/*}/" ;; *) PFX="" ;; esac
+# ROOTPFX is a ROOT install's prefix, empty by definition: a fixture that models a root install,
+# or a key relative to the tool root, is spelled through it rather than bare (TOOL-aRepatriatedFork-28 S2).
+ROOTPFX=""
 HOOK="$HERE/agent-cap.js"
 TMP=$(mktemp -d); trap 'rm -rf "$TMP"' EXIT
 pass=0; fail=0
 # The one resolver, not the retired `command -v python3 || python` idiom this repo banned — which the
 # ban could not see here, because it matches only `command -v`.
-if [ -f "$HERE/../lib/resolve-python.sh" ]; then
-  . "$HERE/../lib/resolve-python.sh"
-  TESTPY=$(resolve_python) || { echo "agent-cap.test: no usable python"; exit 2; }
-else
-  TESTPY=python3   # gov:literal-python — last-resort fallback when ../lib/ is absent (adopter layout)
-fi
+# TOOL-aRepatriatedFork-46: the resolver is carried INLINE. It was sourced from a probe of the
+# library directory beside this kit, which ships nowhere, with a bare launcher as the fallback.
+# >>> resolve_python — canonical copy: resolve-python.sh in gov's lib dir (byte-identical; gated)
+resolve_python() {
+  # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
+  # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
+  # the candidate and every consumer uses "$PY" as a single word (measured: exit 127).
+  _rp_tried=""
+  for _rp_c in "${1:-}" "${GOV_PYTHON:-}" python3 python py; do
+    [ -n "$_rp_c" ] || continue
+    _rp_tried="$_rp_tried $_rp_c"
+    if "$_rp_c" -c "import sys" >/dev/null 2>&1; then
+      printf '%s\n' "$_rp_c"
+      return 0
+    fi
+  done
+  {
+    echo "resolve_python: no usable python launcher. Each candidate was RUN with -c 'import sys' and"
+    echo "resolve_python: none exited 0 — being on PATH is not evidence (the Microsoft Store python3"
+    echo "resolve_python: stub answers \`command -v\` and exits 9009 without running anything)."
+    echo "resolve_python: tried:$_rp_tried"
+    if [ -n "${1:-}" ]; then
+      echo "resolve_python: the caller's override '$1' was tried FIRST and did not run."
+    fi
+    if [ -n "${GOV_PYTHON:-}" ]; then
+      echo "resolve_python: GOV_PYTHON is set to '$GOV_PYTHON' and did not run. An override that is"
+      echo "resolve_python: set and unusable is THIS failure, never a silent fall-through — the"
+      echo "resolve_python: operator believes they chose, and would not have."
+    fi
+  } >&2
+  return 1
+}
+# <<< resolve_python
+# The sibling-kit resolver (TOOL-aRepatriatedFork-2 S3), INLINED byte-identically from the
+# canonical copy named on its marker line and gated by the resolve-python self-test's parity
+# table. A shell consumer runs it with the python it already resolved, so the receipt rung is
+# read in Python and never parsed in bash. `resolve_kit_dir <python> <home> <anchor> <here>`
+# prints the kit directory REPO-RELATIVE, or the resolver's named refusal on stderr and exits 1.
+resolve_kit_dir() {
+  "$1" -c "$(cat <<'RKD'
+# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
+def resolve_kit_dir(home, anchor, here):
+    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
+
+    1. receipt — the `.governance/install.json` row whose `source` ends in <home>/<anchor> and
+       whose `path` exists inside this tree. The only record of a RENAMED kit dir: no probe finds
+       a memory-recall kit an adopter homed at `scripts/recall/`.
+    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
+    3. refuse — LookupError naming the three places looked; never a guessed prefix.
+    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
+    """
+    import json
+    import pathlib
+    here = pathlib.Path(here).absolute()  # never resolve(): a junction must not move it
+    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
+    receipt = root / ".governance" / "install.json"
+    try:
+        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("path"):
+            continue
+        if str(row.get("source") or "").split("/")[-2:] != [home, anchor]:
+            continue
+        hit = (root / str(row["path"])).absolute()
+        if hit.is_file() and root in hit.parents and ".." not in hit.parts:
+            return hit.parent
+    probes = (here / home, here.parent / home)
+    for cand in probes:
+        if (cand / anchor).is_file():
+            return cand
+    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
+        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
+# <<< resolve_kit_dir
+RKD
+)"'
+import sys
+try:
+    d = resolve_kit_dir(*sys.argv[1:4])
+except LookupError as e:
+    sys.exit(str(e))
+r = next((p for p in (d, *d.parents) if (p / ".git").exists()), d.anchor)
+print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
+}
+TESTPY=$(resolve_python) || { echo "agent-cap.test: no usable python"; exit 2; }
 check() { # name expected_exit json
   # FROM "$TMP", not from wherever the suite was launched (TOOL-aRepatriatedFork-7): a payload with no
   # `cwd` makes the hook read `.agent-cap.conf` at the caller's checkout root, so an adopter that
@@ -39,6 +139,8 @@ js() { # name expected_exit  (script on stdin)
 
 # ---- rule 1: concurrency ------------------------------------------------------------------------
 check "raw parallel(items.map) → deny" 2 '{"tool_name":"Workflow","tool_input":{"script":"const r = await parallel(D.map(d => () => agent(d.p)))"}}'
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${fail:-0}" = 0 ] && echo "PASS (${pass:-1} assertions)" || echo "FAIL (${pass:-1} assertions)"; [ "${fail:-0}" = 0 ] && exit 0; exit 1; fi
 check "raw pipeline(items,...) → deny" 2 '{"tool_name":"Workflow","tool_input":{"script":"const r = await pipeline(files, s1, s2)"}}'
 check "non-Workflow tool → allow" 0 '{"tool_name":"Bash","tool_input":{"command":"parallel(x.map(y))"}}'
 check "member .parallel( → allow" 0 '{"tool_name":"Workflow","tool_input":{"script":"queue.parallel(2); log(1)"}}'
@@ -235,7 +337,7 @@ const verdictByRef = new Map()
 EOF
 
 # Prose is NOT code. This is the narrowing the port deliberately took over the awk it replaced, and
-# it is load-bearing: `tools/workflows/tier2-review.js` carries a comment that necessarily spells the
+# it is load-bearing: `<prefix>/workflows/tier2-review.js` carries a comment that necessarily spells the
 # banned expression while documenting the retired join, and a whole-file-text ban reds on it.
 js "rule5: a comment documenting the join is prose" 0 <<'EOF'
 // never key the join on m[f.ref] = v again; use the integer id
@@ -651,7 +753,7 @@ js "rule2: a single synthesis agent → allow" 0 <<'EOF'
 const synth = await agent('synthesize the confirmed findings', { label: 'synth' })
 EOF
 # The synthesis stage builds its PROMPT with a .map over every finding. A proximity-based scan read
-# that as a fan-out and denied a one-agent call — measured on tools/workflows/tier2-review.js:290.
+# that as a fan-out and denied a one-agent call — measured on <prefix>/workflows/tier2-review.js:290.
 js "rule2: a synth prompt that quotes a .map → allow" 0 <<'EOF'
 const synth = await agent(
   'findings:\n' + allFindings.map((f) => f.claim).join('\n'),
@@ -672,7 +774,7 @@ check "scriptPath → clean file allowed" 0 "{\"tool_name\":\"Workflow\",\"tool_
 check "scriptPath → offending file denied" 2 "{\"tool_name\":\"Workflow\",\"tool_input\":{\"scriptPath\":\"$BAD\"}}"
 check "scriptPath → unreadable path refused, not waved through" 2 '{"tool_name":"Workflow","tool_input":{"scriptPath":"/no/such/workflow.js"}}'
 # A `name:` run supplies no source at all. It is ALLOWED here and covered by the merge-bar leg over
-# tools/workflows/ instead — declared, not papered over.
+# <prefix>/workflows/ instead — declared, not papered over.
 check "name-only run → allow (no source reaches the hook)" 0 '{"tool_name":"Workflow","tool_input":{"name":"tier2-review"}}'
 
 # ---- rule 0: a spec audit is OPT-IN, declared in the build README's front matter ----------------
@@ -768,7 +870,7 @@ check_spec_audit "rule0: kind [\"spec-audit\"] (an array) on the undeclared READ
 # of tier2-review.js that decides `isSpec` — asserting the two agree. An edit to either side reds
 # here until the other follows. The harness sits beside this kit in this repo; an adopter layout
 # without it gets an ANNOUNCED skip, never a silent green.
-T2R="$HERE/../workflows/tier2-review.js"
+T2R=""; _wf_dir=$(resolve_kit_dir "$TESTPY" workflows tier2-review.js "$HERE" 2>/dev/null) && T2R="$(git -C "$HERE" rev-parse --show-toplevel)/$_wf_dir/tier2-review.js"
 if [ -f "$T2R" ]; then
   kind_line=$(grep -m1 '^const kind = ' "$T2R")
   for k in '"spec-audit"' '["spec-audit"]' '"diff-review"' '"SPEC-AUDIT"' '{"k":"spec-audit"}' '7'; do
@@ -1152,13 +1254,13 @@ after=$(ls "$AGROOT" 2>/dev/null | grep -c .)
   || { echo "FAIL rule4: unkeyable payload (exit $rcn, dirs $before -> $after)"; fail=$((fail+1)); }
 
 # ---- the two copies ------------------------------------------------------------------------------
-# `.claude/hooks/agent-cap.js` is the WIRED copy and `tools/hooks/agent-cap.js` is the kit's. Nothing
+# `.claude/hooks/agent-cap.js` is the WIRED copy and `<prefix>/hooks/agent-cap.js` is the kit's. Nothing
 # gated them: check-wiring.sh asserts the hook is wired, never that the wired one is this one. A
 # stale wired copy enforces yesterday's rules while the kit documents today's.
 # The arm used to sit inside `if BOTH files exist`, so a DELETED wired copy satisfied it by absence —
 # the parity assertion's own failure mode. Inside the governance repo the pair is REQUIRED; in an
-# adopting tree with no tools/hooks/ the arm skips loudly instead of vanishing.
-# The kit copy is LOCATED, never assumed at one prefix. Gating on the literal `tools/hooks/` made
+# adopting tree with no <prefix>/hooks/ the arm skips loudly instead of vanishing.
+# The kit copy is LOCATED, never assumed at one prefix. Gating on the literal `<prefix>/hooks/` made
 # this arm disarm itself in every tree that installs the kit anywhere else: measured in a scratch
 # repo with the kit at `<root>/hooks/` and NO wired copy at all, this file reported "39 passed, 0
 # failed", exit 0. A stale wired hook enforcing yesterday's fan-out rules was undetectable there.
@@ -1167,7 +1269,7 @@ after=$(ls "$AGROOT" 2>/dev/null | grep -c .)
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null || true)
 KITJS=""
 if [ -n "$ROOT" ]; then
-  for c in "$ROOT/tools/hooks/agent-cap.js" "$ROOT/hooks/agent-cap.js"; do
+  for c in "$ROOT/$KIT_REL/agent-cap.js" "$ROOT/${KIT_REL##*/}/agent-cap.js"; do
     [ -f "$c" ] && { KITJS="$c"; break; }
   done
   # Last resort: ask git where it is, so a prefix nobody listed still arms the arm.
@@ -1175,8 +1277,8 @@ if [ -n "$ROOT" ]; then
     # The two globs sit in variables so the marked line carries no line continuation: a trailing
     # backslash would escape the space before a comment rather than the newline, and the resulting
     # break is valid shell that silently drops the rest of the command.
-    _g_prefixed='*/hooks/agent-cap.js'
-    _g_root='hooks/agent-cap.js'   # gov:root-fixture — a root install is half of what this searches
+    _g_prefixed="*/${KIT_REL##*/}/agent-cap.js"
+    _g_root="${ROOTPFX}${KIT_REL##*/}/agent-cap.js"   # a root install is half of what this searches
     rel=$(git -C "$ROOT" ls-files -- "$_g_prefixed" "$_g_root" 2>/dev/null \
           | grep -v '^\.claude/' | head -1)
     [ -n "$rel" ] && KITJS="$ROOT/$rel"
@@ -1217,7 +1319,7 @@ if [ -n "$KITJS" ]; then
     fi
   fi
 else
-  echo "FAIL the parity arm found NO copy of agent-cap.js anywhere (looked for tools/hooks/, hooks/, then any */hooks/ outside .claude/) — an arm with no subject cannot pass"
+  echo "FAIL the parity arm found NO copy of agent-cap.js anywhere (looked for ${PFX}hooks/, hooks/, then any */hooks/ outside .claude/) — an arm with no subject cannot pass"
   fail=$((fail+1))
 fi
 
@@ -1807,7 +1909,7 @@ else echo "FAIL print-cap: a payload on stdin (exit $got, want 2 naming 'must no
 # The three renderShipped* bodies must equal their counterparts in the BASE blob. Only the name line
 # differs. A tree where that blob does not resolve -- every adopter -- gets an announced SKIP.
 GOV_BASE_SHA=${GOV_BASE_SHA:-d65da7ab}
-# DERIVED, never spelled: a `tools/hooks/` literal is gov's own install prefix and resolves to
+# DERIVED, never spelled: a `<prefix>/hooks/` literal is gov's own install prefix and resolves to
 # nothing in a target that installed this kit elsewhere, which is what the shipped-surface ratchet
 # refuses. `git ls-files --full-name` answers where THIS hook actually lives in THIS tree.
 HOOKREL=$(git -C "$HERE" ls-files --full-name -- "$HOOK" 2>/dev/null | head -1)
@@ -1948,7 +2050,7 @@ for f in ratified:
 print("population %d scanned, %d denied at BASE, %d denial(s) lost, %d ratified" % (n, denied, len(lost), len(ratified)))
 sys.exit(1 if lost or denied == 0 or not ratified else 0)
 PYEOF
-  "$TESTPY" "$TMP/nr.py" "$TMP/base-hook.js" "$HOOK" "$HERE/../.." "$TMP/nrfix" > "$TMP/nr.out" 2>&1
+  "$TESTPY" "$TMP/nr.py" "$TMP/base-hook.js" "$HOOK" "$(git -C "$HERE" rev-parse --show-toplevel)" "$TMP/nrfix" > "$TMP/nr.out" 2>&1
   if [ $? = 0 ]; then
     echo "ok   no-regress: no denial lost against BASE ($(tail -1 "$TMP/nr.out"))"; pass=$((pass+1))
   else

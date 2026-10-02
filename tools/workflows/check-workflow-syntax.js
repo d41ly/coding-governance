@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 // check-workflow-syntax.js — parse every workflow script in the dialect its RUNTIME evaluates.
 //
-//   node tools/workflows/check-workflow-syntax.js            # every workflow script git can see
-//   node tools/workflows/check-workflow-syntax.js <file>...   # explicit files (used by the self-test)
+//   node <prefix>/workflows/check-workflow-syntax.js            # every workflow script git can see
+//   node <prefix>/workflows/check-workflow-syntax.js <file>...   # explicit files (used by the self-test)
 //
 // Exit 0 = every file parsed · 1 = at least one SyntaxError (printed with its file) · 2 = bad usage.
 //

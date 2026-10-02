@@ -56,7 +56,7 @@ def resolve_kit_dir(home, anchor, here):
     """
     import json
     import pathlib
-    here = pathlib.Path(here).resolve()
+    here = pathlib.Path(here).absolute()  # never resolve(): a junction must not move it
     root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
     receipt = root / ".governance" / "install.json"
     try:
@@ -68,8 +68,8 @@ def resolve_kit_dir(home, anchor, here):
             continue
         if str(row.get("source") or "").split("/")[-2:] != [home, anchor]:
             continue
-        hit = (root / str(row["path"])).resolve()
-        if hit.is_file() and root in hit.parents:
+        hit = (root / str(row["path"])).absolute()
+        if hit.is_file() and root in hit.parents and ".." not in hit.parts:
             return hit.parent
     probes = (here / home, here.parent / home)
     for cand in probes:
@@ -81,11 +81,16 @@ def resolve_kit_dir(home, anchor, here):
 
 # The grammar lives in the sibling kit, found by `resolve_kit_dir` (TOOL-aRepatriatedFork-2 S3): the
 # receipt first, which is the only record of a kit dir an adopter RENAMED, then the two probes. On a
-# miss it holds the last place probed, and the two readers below name it as "not installed".
+# miss it holds THIS kit's own directory, which carries no extract.py, so both readers below take
+# their not-installed branch, and GRAMMAR_WHERE carries the resolver's own account of where it looked.
+# TOOL-aRepatriatedFork-46: the miss used to name `<this kit's parent>/memory-recall`, a kit name typed
+# after a derived base, which is the class the carried-prefix ban counts.
 try:
     GRAMMAR_DIR = resolve_kit_dir("memory-recall", "extract.py", HERE)
-except LookupError:
-    GRAMMAR_DIR = HERE.parent / "memory-recall"  # gov:prefix-literal — the resolver missed; the last place probed, named by the not-installed message
+    GRAMMAR_WHERE = "%s/extract.py" % GRAMMAR_DIR.as_posix()
+except LookupError as _grammar_miss:
+    GRAMMAR_DIR = HERE
+    GRAMMAR_WHERE = "the kit's extract.py (%s)" % _grammar_miss
 
 # TOOL-dSpentCeiling-1 — the two keys this engine no longer reads. A conf that still declares one
 # is ANNOUNCED, never refused: the shipped example declared READ_PATH_CEILING blank, so refusing on
@@ -257,8 +262,8 @@ def _check_grammar_installed(why: str, cure_absent: str, cure_outdated: str):
     if not (GRAMMAR_DIR / "extract.py").is_file():
         raise Problem(
             "corpus_ids: %s, but the id grammar lives in the "
-            "memory-recall kit and %s/extract.py is not installed. %s"
-            % (why, GRAMMAR_DIR, cure_absent)
+            "memory-recall kit and %s is not installed. %s"
+            % (why, GRAMMAR_WHERE, cure_absent)
         )
     if str(GRAMMAR_DIR) not in sys.path:
         sys.path.insert(0, str(GRAMMAR_DIR))
@@ -391,7 +396,7 @@ def resolve_bash() -> str:
     A candidate is accepted only if it RUNS. Existing on disk is not evidence — that is the same
     mistake one interpreter over that the python side made with the Microsoft Store `python3` stub,
     which answers `command -v` and exits 9009 without executing anything (see
-    tools/lib/resolve-python.sh). An override that is SET and unusable is a named failure here too,
+    <prefix>/lib/resolve-python.sh). An override that is SET and unusable is a named failure here too,
     never a silent fall-through to something else.
     """
     def runs(cand: str) -> bool:
@@ -555,10 +560,10 @@ def walk(root: str, conf: dict) -> dict:
                 # top-level directory — the ordinary case. (2) It is not, but the token is the TAIL of
                 # a tracked path, which means it names a real file of this repo written at the WRONG
                 # PREFIX. Case 2 exists because case 1 alone made this check structurally blind to
-                # the failure it is most needed for: a kit installed at `tools/<kit>/` scaffolds
+                # the failure it is most needed for: a kit installed at `<prefix>/<kit>/` scaffolds
                 # documents citing `<kit>/…`, whose first segment is not a top-level directory, so
                 # every one of those citations was skipped before it could be judged. Measured on a
-                # `tools/` install: seven dead kit paths in a scaffolded `HYGIENE.md` and the gate
+                # `<prefix>/` install: seven dead kit paths in a scaffolded `HYGIENE.md` and the gate
                 # exited 0. A tail match is deliberately narrow — an unresolvable token that matches
                 # nothing tracked is still prose, not a finding.
                 if cited.split("/", 1)[0] + "/" not in _roots(tracked_set):
@@ -913,8 +918,8 @@ def print_defined_ids(root: str, conf: dict) -> int:
     the grammar's Problem exited 1, the append refused every body, and the commit deny's printed
     remedy re-ran the refusing append — a lockout (the aReplayedCard closing review, F1)."""
     if not (GRAMMAR_DIR / "extract.py").is_file():
-        print("corpus_ids: no id set — the id grammar lives in the memory-recall kit and %s/extract.py "
-              "is not installed; adopt that kit to check id citations" % GRAMMAR_DIR)
+        print("corpus_ids: no id set — the id grammar lives in the memory-recall kit and %s "
+              "is not installed; adopt that kit to check id citations" % GRAMMAR_WHERE)
         return 3
     for line in _render_defined_ids(root, conf):
         print(line)
@@ -970,7 +975,22 @@ def _walk_continues() -> set:
     return {n.lineno + off for n in ast.walk(tree) if isinstance(n, ast.Continue)}
 
 
+def derive_install_prefix() -> str:
+    """The install prefix WITH its trailing slash, derived from where this file sits and empty at a
+    root install. Every fixture and host path the self-test builds is spelled through it, never
+    through a literal prefix (TOOL-aRepatriatedFork-28)."""
+    import pathlib
+    here = pathlib.Path(__file__).resolve().parent
+    for anc in here.parents:
+        if (anc / ".git").exists():
+            rel = here.parent.relative_to(anc).as_posix()
+            return "" if rel == "." else rel + "/"
+    raise SystemExit(f"{pathlib.Path(__file__).name}: not inside a git repository, so there is no "
+                     "install prefix to derive")
+
+
 def cmd_selftest() -> int:
+    PFX = derive_install_prefix()   # TOOL-aRepatriatedFork-28
     fails = []
     # EVERY `continue` IN walk() MUST BE REACHED BY A FIXTURE. This is the one arm that could catch
     # the tautological shape filter deleted in TOOL-aBatchedTribunal-4: that branch was
@@ -1084,13 +1104,15 @@ def cmd_selftest() -> int:
         # ---- answers `hasattr(grammar_for)` and the outdated point is never reached — the arm would
         # ---- pass by exercising nothing.
         def _under_grammar_dir(d, fn):
-            saved_dir, saved_path = globals()["GRAMMAR_DIR"], list(sys.path)
+            # GRAMMAR_WHERE is swapped beside GRAMMAR_DIR: the refusal reads it (TOOL-aRepatriatedFork-46 S4).
+            saved_dir, saved_where = globals()["GRAMMAR_DIR"], globals()["GRAMMAR_WHERE"]
+            saved_path = list(sys.path)
             saved_mod = sys.modules.pop("extract", None)
-            globals()["GRAMMAR_DIR"] = d
+            globals()["GRAMMAR_DIR"], globals()["GRAMMAR_WHERE"] = d, "%s/extract.py" % d
             try:
                 return fn()
             finally:
-                globals()["GRAMMAR_DIR"] = saved_dir
+                globals()["GRAMMAR_DIR"], globals()["GRAMMAR_WHERE"] = saved_dir, saved_where
                 sys.path[:] = saved_path
                 sys.modules.pop("extract", None)
                 if saved_mod is not None:
@@ -1395,27 +1417,31 @@ def cmd_selftest() -> int:
         arm("...and is silent about a directory that resolves", "[nope]" if False else "",
             lambda: "" if not [l for l in checks(walk(tD, cD)) if "memory/builds/tOne" in l] else "FOUND")
 
-        # THE WRONG-PREFIX CASE, both halves. A kit installed at `tools/<kit>/` scaffolds documents
+        # THE WRONG-PREFIX CASE, both halves. A kit installed at `<prefix>/<kit>/` scaffolds documents
         # that cite `<kit>/…`, whose first segment is not a top-level directory. Before the tail rule
-        # those citations were skipped unjudged: measured on a real `tools/` install, seven dead kit
+        # those citations were skipped unjudged: measured on a real `<prefix>/` install, seven dead kit
         # paths in a scaffolded HYGIENE.md and the gate exited 0. `_scratch` puts nothing under
-        # `tools/`, so the fixture supplies the whole shape — a real file at a prefix, and a citation
+        # `<prefix>/`, so the fixture supplies the whole shape — a real file at a prefix, and a citation
         # of it written WITHOUT that prefix.
+        # The wrong citation is the ROOT-install spelling, built through a prefix variable set EMPTY.
+        root_pfx = ""
+        # At a root install PFX is empty, and the fixture still needs a prefixed shape to cite wrongly.
+        fx_pfx = PFX or "scripts/"
         tP = os.path.join(base, "prefix"); os.makedirs(tP)
         cP = _scratch(tP, extra={
-            "tools/memory-tree/check-memory-hygiene.sh": "#!/usr/bin/env bash\n",  # gov:prefix-literal — fixture-internal: the selftest builds this layout in its own scratch tree
-            "memory/HYGIENE.md": "sentinel\n\nRun `memory-tree/check-memory-hygiene.sh` to lint.\n",  # gov:root-fixture — the wrong-prefix citation check 15 is proved on; spelled correctly it proves nothing
+            f"{fx_pfx}{HERE.name}/check-memory-hygiene.sh": "#!/usr/bin/env bash\n",
+            "memory/HYGIENE.md": f"sentinel\n\nRun `{root_pfx}{HERE.name}/check-memory-hygiene.sh` to lint.\n",
         })
         cP["DEAD_PATH_PIN"] = "0"
         arm("check 15 catches a kit path written at the WRONG PREFIX",
-            "memory-tree/check-memory-hygiene.sh",  # gov:root-fixture — the substring the arm asserts, which is that same wrong-prefix citation
+            f"{root_pfx}{HERE.name}/check-memory-hygiene.sh",
             lambda: "\n".join(checks(walk(tP, cP))))
         # ...and the same citation spelled correctly is silent. Without this half the arm above would
         # also pass on a rule that reds every token whose first segment is not a top-level directory.
         tQ = os.path.join(base, "prefix-ok"); os.makedirs(tQ)
         cQ = _scratch(tQ, extra={
-            "tools/memory-tree/check-memory-hygiene.sh": "#!/usr/bin/env bash\n",  # gov:prefix-literal — fixture-internal: the selftest builds this layout in its own scratch tree
-            "memory/HYGIENE.md": "sentinel\n\nRun `tools/memory-tree/check-memory-hygiene.sh` to lint.\n",  # gov:prefix-literal — fixture-internal: the selftest builds this layout in its own scratch tree
+            f"{fx_pfx}{HERE.name}/check-memory-hygiene.sh": "#!/usr/bin/env bash\n",
+            "memory/HYGIENE.md": f"sentinel\n\nRun `{fx_pfx}{HERE.name}/check-memory-hygiene.sh` to lint.\n",
         })
         cQ["DEAD_PATH_PIN"] = "0"
         arm("...and the correctly-prefixed spelling of it is silent", None,

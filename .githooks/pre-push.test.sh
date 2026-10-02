@@ -2,10 +2,101 @@
 # pre-push.test.sh — drives a REAL git push through .githooks/pre-push in a throwaway scratch repo,
 # with the gate stubbed via GOV_GATE_CMD so the bar never actually runs. Proves the hook FIRES and
 # classifies correctly. Exit 0 = all cases ok.
-KIT_REL="${KIT_REL:-tools}"
 set -u
 SRC=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "pre-push.test: not a git repo"; exit 2; }
+# The kit root is the one the hook itself reads: GOV_KITROOT as `.githooks/gate-env.sh` declares it
+# (TOOL-aRepatriatedFork-28), never a literal prefix typed here.
+KIT_REL=$( . "$SRC/.githooks/gate-env.sh" >/dev/null 2>&1; printf '%s' "${GOV_KITROOT:-}" )
+[ -n "$KIT_REL" ] || { echo "pre-push.test: .githooks/gate-env.sh declares no GOV_KITROOT"; exit 2; }
 [ -f "$SRC/.githooks/pre-push" ] || { echo "pre-push.test: .githooks/pre-push missing"; exit 1; }
+# TOOL-aRepatriatedFork-46: the run-gates kit is named by the NAME its directory has under that kit
+# root, found through the resolver, which reads the install receipt first, never typed.
+# >>> resolve_python — canonical copy: resolve-python.sh in gov's lib dir (byte-identical; gated)
+resolve_python() {
+  # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
+  # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
+  # the candidate and every consumer uses "$PY" as a single word (measured: exit 127).
+  _rp_tried=""
+  for _rp_c in "${1:-}" "${GOV_PYTHON:-}" python3 python py; do
+    [ -n "$_rp_c" ] || continue
+    _rp_tried="$_rp_tried $_rp_c"
+    if "$_rp_c" -c "import sys" >/dev/null 2>&1; then
+      printf '%s\n' "$_rp_c"
+      return 0
+    fi
+  done
+  {
+    echo "resolve_python: no usable python launcher. Each candidate was RUN with -c 'import sys' and"
+    echo "resolve_python: none exited 0 — being on PATH is not evidence (the Microsoft Store python3"
+    echo "resolve_python: stub answers \`command -v\` and exits 9009 without running anything)."
+    echo "resolve_python: tried:$_rp_tried"
+    if [ -n "${1:-}" ]; then
+      echo "resolve_python: the caller's override '$1' was tried FIRST and did not run."
+    fi
+    if [ -n "${GOV_PYTHON:-}" ]; then
+      echo "resolve_python: GOV_PYTHON is set to '$GOV_PYTHON' and did not run. An override that is"
+      echo "resolve_python: set and unusable is THIS failure, never a silent fall-through — the"
+      echo "resolve_python: operator believes they chose, and would not have."
+    fi
+  } >&2
+  return 1
+}
+# <<< resolve_python
+# The sibling-kit resolver (TOOL-aRepatriatedFork-2 S3), INLINED byte-identically from the
+# canonical copy named on its marker line and gated by the resolve-python self-test's parity
+# table. A shell consumer runs it with the python it already resolved, so the receipt rung is
+# read in Python and never parsed in bash. `resolve_kit_dir <python> <home> <anchor> <here>`
+# prints the kit directory REPO-RELATIVE, or the resolver's named refusal on stderr and exits 1.
+resolve_kit_dir() {
+  "$1" -c "$(cat <<'RKD'
+# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
+def resolve_kit_dir(home, anchor, here):
+    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
+
+    1. receipt — the `.governance/install.json` row whose `source` ends in <home>/<anchor> and
+       whose `path` exists inside this tree. The only record of a RENAMED kit dir: no probe finds
+       a memory-recall kit an adopter homed at `scripts/recall/`.
+    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
+    3. refuse — LookupError naming the three places looked; never a guessed prefix.
+    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
+    """
+    import json
+    import pathlib
+    here = pathlib.Path(here).absolute()  # never resolve(): a junction must not move it
+    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
+    receipt = root / ".governance" / "install.json"
+    try:
+        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("path"):
+            continue
+        if str(row.get("source") or "").split("/")[-2:] != [home, anchor]:
+            continue
+        hit = (root / str(row["path"])).absolute()
+        if hit.is_file() and root in hit.parents and ".." not in hit.parts:
+            return hit.parent
+    probes = (here / home, here.parent / home)
+    for cand in probes:
+        if (cand / anchor).is_file():
+            return cand
+    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
+        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
+# <<< resolve_kit_dir
+RKD
+)"'
+import sys
+try:
+    d = resolve_kit_dir(*sys.argv[1:4])
+except LookupError as e:
+    sys.exit(str(e))
+r = next((p for p in (d, *d.parents) if (p / ".git").exists()), d.anchor)
+print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
+}
+_rkd_py=$(resolve_python) || { echo "pre-push.test: no usable python, so the run-gates kit cannot be resolved"; exit 2; }
+RUN_GATES_DIR=$(resolve_kit_dir "$_rkd_py" run-gates run-gates.sh "$SRC/$KIT_REL") || exit 2
+RUN_GATES="${RUN_GATES_DIR##*/}"
 
 tmp=$(mktemp -d) || exit 2
 trap 'rm -rf "$tmp"' EXIT
@@ -46,6 +137,8 @@ green="$tmp/green.sh"; printf '#!/usr/bin/env bash\nexit 0\n' > "$green"
 
 # case 1 — push to main with a RED gate → blocked (non-zero push).
 if GOV_GATE_CMD="bash $red" git push -q origin main >/dev/null 2>&1; then bad "1 red gate must block a main push"; else ok "1 red gate blocks a main push"; fi
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${fail:-0}" = 0 ] && echo "PASS (${probe_n:-1} assertions)" || echo "FAIL (${probe_n:-1} assertions)"; [ "${fail:-0}" = 0 ] && exit 0; exit 1; fi
 
 # case 2 — push to main with a GREEN gate → proceeds (the gate actually ran).
 if GOV_GATE_CMD="bash $green" git push -q origin main >/dev/null 2>&1; then ok "2 green gate lets a main push through"; else bad "2 green gate must let a main push through"; fi
@@ -166,9 +259,9 @@ stamp() {    # write a full-green record naming a sha, with a reproducible finge
   # is the shape of every record written before TOOL-dUnstalledConvoy-26 and is what AC4 grades.
   local sha=$1 st=${2-} gd; gd=$(git rev-parse --git-dir)
   local fp=""
-  [ -x $KIT_REL/run-gates/gate-fingerprint.sh ] && fp=$(bash $KIT_REL/run-gates/gate-fingerprint.sh "$sha" 2>/dev/null)
+  [ -x $KIT_REL/${RUN_GATES}/gate-fingerprint.sh ] && fp=$(bash $KIT_REL/${RUN_GATES}/gate-fingerprint.sh "$sha" 2>/dev/null)
   printf 'sha\t%s\nfingerprint\t%s\nmanifest_blob\t%s\nrun_id\ttest\n' \
-    "$sha" "$fp" "$(git hash-object -- tools/gate-legs.json 2>/dev/null)" > "$gd/gate-full-green"
+    "$sha" "$fp" "$(git hash-object -- gate-legs.json 2>/dev/null)" > "$gd/gate-full-green"
   [ -n "$st" ] && printf 'selftests\t%s\n' "$st" >> "$gd/gate-full-green"
   return 0
 }
@@ -219,8 +312,9 @@ fi
 stamp "$(git rev-parse HEAD)"
 case "$(decide)" in *"scoped gate"*) : ;; *) bad "13 precondition — could not get back to a scoped decision" ;; esac
 prev=$(git rev-parse HEAD)
-mkdir -p tools
-printf '%s\n' '[{"name":"x","argv":["bash","x.sh"]}]' > tools/gate-legs.json
+# AT THE ROOT, which the hook's ladder finds with no declaration (TOOL-aRepatriatedFork-24 S2). A
+# manifest under a prefix this fixture never declares is the refusal case the AC3 arm below grades.
+printf '%s\n' '[{"name":"x","argv":["bash","x.sh"]}]' > gate-legs.json
 git add -A >/dev/null 2>&1; git commit -qm "touch the manifest" >/dev/null 2>&1
 stamp "$prev"
 case "$(decide)" in
@@ -446,8 +540,9 @@ rm -rf "$wt" "$nr"
 # ============================================================================================
 # TOOL-dRetiredFork-11 — THE HOOK RESOLVES ITS OWN KIT ROOT.
 #
-# Everything above this line runs in a fixture that keeps its leg manifest at `tools/`, which is
-# where gov keeps it — so every arm above would pass unchanged with the prefix hardcoded, and did.
+# Everything above this line runs in a fixture that keeps its leg manifest at ONE fixed place — gov's
+# own prefix when this was written, the root since TOOL-aRepatriatedFork-24 — so every arm above
+# would pass unchanged with that place hardcoded, and did.
 # That is the shape of the defect: the suite could not tell a resolving hook from a hardcoded one,
 # because it only ever asked in the layout the hardcoding happened to match.
 #
@@ -494,13 +589,19 @@ pfx_fixture() {
   git config core.hooksPath "$d/hooks"
   mkdir -p "$pfx"
   printf '%s\n' '[{"name":"x","argv":["bash","a.sh"]}]' > "$pfx/gate-legs.json"
+  # THE ROOT IS DECLARED, as a copy-installed adopter declares it (TOOL-aRepatriatedFork-24 S2): no
+  # receipt and no root install, so the committed gate-env.sh is the rung that reaches it. `nowhere`
+  # declares nothing, because the AC3 arm grades a manifest the ladder does NOT reach.
+  if [ "$pfx" != nowhere ]; then
+    mkdir -p .githooks; printf 'GOV_KITROOT=%s\n' "$pfx" > .githooks/gate-env.sh
+  fi
   git add -A >/dev/null 2>&1; git commit -q -m init; git branch -M main
   git remote add origin "$d/remote.git"
   touch "$(git rev-parse --git-dir)/push-main-active"
   GOV_GATE_CMD="bash $green" git push -q origin main >/dev/null 2>&1
 }
 # A full-green record for a fixture at $1, naming sha $2. Deliberately NOT the `stamp` above: that
-# one spells `tools/` itself, which is the very assumption under test here.
+# one spells `<prefix>/` itself, which is the very assumption under test here.
 pfx_stamp() {
   local pfx=$1 sha=$2 blob=${3-} gd; gd=$(git rev-parse --git-dir)
   [ -n "$blob" ] || blob=$(git hash-object -- "$pfx/gate-legs.json" 2>/dev/null)
@@ -567,6 +668,196 @@ if GOV_GATE_CMD="bash $green" git push -q origin main >/dev/null 2>&1; then
   ok "AC3 a tree with no manifest ANYWHERE is left alone, so the refusal is not universal"
 else bad "AC3 the hook refused a tree that simply has no leg manifest"; fi
 
+# --- TOOL-aRepatriatedFork-24 AC3: the DEFAULT bar under `vendor/gov/`, a prefix the old probe
+# --- could never produce. `tools` or `scripts` were its only answers, so the bar named a runner that
+# --- does not exist. The kit and its runner are joined at run time, as the hook joins them.
+vg=vendor/gov; rgk=run-gates
+vgd="$tmp/vg"; mkdir -p "$vgd/hooks"; cp "$SRC/.githooks/pre-push" "$vgd/hooks/pre-push"
+git init -q --bare "$vgd/remote.git"; git init -q "$vgd/work"
+cd "$vgd/work" || exit 2
+git config user.email t@example.com; git config user.name t; git config core.autocrlf false
+git config core.hooksPath "$vgd/hooks"
+mkdir -p "${vg}/$rgk" .githooks
+# The stub writes the GREEN run record a real runner would: an exit 0 with no verdict is RED since
+# TOOL-dDerivedDocket-26, and this arm is about which runner is named, not about that rule.
+printf '%s\n' '#!/usr/bin/env bash' 'echo "VENDOR BAR RAN"'   'd="$(git rev-parse --git-dir)/gate-run/$GATE_RUN_ID"; mkdir -p "$d"; printf "verdict\tGREEN\n" > "$d/verdict"'   'exit 0' > "${vg}/$rgk/$rgk.sh"
+printf '%s\n' '[]' > "${vg}/gate-legs.json"
+printf 'GOV_KITROOT=%s\n' "$vg" > .githooks/gate-env.sh
+git add -A >/dev/null 2>&1; git commit -q -m init; git branch -M main
+git remote add origin "$vgd/remote.git"
+touch "$(git rev-parse --git-dir)/push-main-active"
+_out=$( ( unset GOV_GATE_CMD GOV_GATE_CMD_TEST; git push -q origin main 2>&1 ) ); _rc=$?
+case "$_rc|$_out" in
+  0\|*"bar: bash ${vg}/$rgk/$rgk.sh"*"VENDOR BAR RAN"*)
+    ok "AC3 (24) the default bar at ${vg}/ names that runner and runs it" ;;
+  *) bad "AC3 (24) the default bar did not name the ${vg}/ runner: rc=$_rc ${_out:-<no output>}" ;;
+esac
+git commit -q --allow-empty -m again
+printf '#!/usr/bin/env bash\necho "MODIFIED BAR RAN"; exit 0\n' > "${vg}/$rgk/$rgk.sh"
+_out=$( ( unset GOV_GATE_CMD GOV_GATE_CMD_TEST; git push -q origin main 2>&1 ) ); _rc=$?
+case "$_rc|$_out" in
+  0\|*|*"MODIFIED BAR RAN"*) bad "AC3 (24) a modified runner at ${vg}/ was run or passed: rc=$_rc $_out" ;;
+  *) ok "AC3 (24) a modified runner at ${vg}/ is refused before it runs" ;;
+esac
+git checkout -q -- "${vg}/$rgk/$rgk.sh"
+# ...and with NOTHING declared the same default bar is REFUSED by name (F1 (c)), never run as a
+# guessed path that reads as a red bar.
+git rm -q .githooks/gate-env.sh; git commit -q -m undeclare
+_out=$( ( unset GOV_GATE_CMD GOV_GATE_CMD_TEST; git push -q origin main 2>&1 ) ); _rc=$?
+case "$_rc|$_out" in
+  0\|*) bad "AC3 (24) an undeclared ${vg}/ root let the default-bar push through" ;;
+  *"leg manifest at '${vg}/gate-legs.json'"*"resolved its kit root nowhere"*)
+    ok "AC3 (24) an undeclared root with a tracked manifest refuses, naming every rung that missed" ;;
+  *) bad "AC3 (24) expected the manifest refusal naming the missed rungs, got: $_out" ;;
+esac
+git rm -q "${vg}/gate-legs.json"; git commit -q -m nomanifest
+_out=$( ( unset GOV_GATE_CMD GOV_GATE_CMD_TEST; git push -q origin main 2>&1 ) ); _rc=$?
+case "$_rc|$_out" in
+  0\|*) bad "AC3 (24) an unresolvable kit root let the default-bar push through" ;;
+  *"the default bar is this tree's kit runner, and the kit root resolved nowhere"*)
+    ok "AC3 (24) an unresolvable kit root refuses the default bar by name (F1 c)" ;;
+  *) bad "AC3 (24) expected the no-kit-root refusal, got: $_out" ;;
+esac
+
+# --- closing review round 1 B1 (TOOL-aRepatriatedFork-24): THE RECEIPT AND THE RUNNER IT NAMES ARE
+# --- VETTED AS gate-env.sh IS. The default bar is the runner the install receipt names, and neither
+# --- had to be tracked: an ignored receipt pointing at a runner under `.git/`, beside a planted
+# --- manifest, ran that runner over a RED tracked bar and landed, with `git status` empty. Each arm
+# --- stages that shape; the control proves a clean, tracked receipt still reaches its bar.
+b1="$tmp/b1"; mkdir -p "$b1/hooks"; cp "$SRC/.githooks/pre-push" "$b1/hooks/pre-push"
+git init -q --bare "$b1/remote.git"; git init -q "$b1/work"
+cd "$b1/work" || exit 2
+git config user.email t@example.com; git config user.name t; git config core.autocrlf false
+git config core.hooksPath "$b1/hooks"
+mkdir -p "$RUN_GATES"
+printf '#!/usr/bin/env bash\necho "TRACKED BAR RAN - RED"; exit 1\n' > "$RUN_GATES/$RUN_GATES.sh"
+printf '%s\n' '[]' > gate-legs.json
+git add -A >/dev/null 2>&1; git commit -q -m init; git branch -M main
+git remote add origin "$b1/remote.git"
+touch "$(git rev-parse --git-dir)/push-main-active"
+b1_gd=$(git rev-parse --git-dir)
+mkdir -p "$b1_gd/x/$RUN_GATES" .governance
+printf '#!/usr/bin/env bash\necho "PLANTED BAR RAN"; exit 0\n' > "$b1_gd/x/$RUN_GATES/$RUN_GATES.sh"
+printf '%s\n' '[]' > "$b1_gd/x/gate-legs.json"
+printf '.governance/\n' >> "$b1_gd/info/exclude"
+write_b1_receipt() { # <path the runner row records> -> the receipt, one key per line as the hook's reader expects
+  printf '{\n  "files": [\n    {\n      "path": "%s",\n      "source": "%s/%s.sh"\n    }\n  ]\n}\n' \
+    "$1" "$RUN_GATES" "$RUN_GATES" > .governance/install.json
+}
+run_b1_push() { git commit -q --allow-empty -m "b1 $RANDOM"; ( unset GOV_GATE_CMD GOV_GATE_CMD_TEST; git push -q origin main 2>&1 ); }
+read_b1_token() { cut -f1 "$b1_gd/pre-push-refusal" 2>/dev/null; }
+write_b1_receipt ".git/x/$RUN_GATES/$RUN_GATES.sh"
+[ -z "$(git status --porcelain)" ] || bad "B1 fixture — the planted receipt is visible to git status, so the arm below tests nothing hidden"
+_out=$(run_b1_push); _rc=$?
+case "$_rc|$_out|$(read_b1_token)" in
+  0\|*|*"PLANTED BAR RAN"*) bad "B1 an ignored receipt naming a runner under .git/ was followed: rc=$_rc $_out" ;;
+  *".governance/install.json"*"|bar-refused") ok "B1 an ignored install receipt is refused as bar-refused before its runner runs" ;;
+  *) bad "B1 expected the ignored receipt to be refused as bar-refused, got rc=$_rc: $_out | token '$(read_b1_token)'" ;;
+esac
+git add -f .governance/install.json; git commit -q -m "a tracked receipt naming an untracked runner"
+_out=$(run_b1_push); _rc=$?
+case "$_rc|$_out|$(read_b1_token)" in
+  0\|*|*"PLANTED BAR RAN"*) bad "B1 a tracked receipt naming an untracked runner was followed: rc=$_rc $_out" ;;
+  *"$RUN_GATES/$RUN_GATES.sh"*"|bar-refused") ok "B1 a tracked receipt naming an untracked runner is refused as bar-refused" ;;
+  *) bad "B1 expected the untracked runner to be refused as bar-refused, got rc=$_rc: $_out | token '$(read_b1_token)'" ;;
+esac
+write_b1_receipt "$RUN_GATES/$RUN_GATES.sh"
+git add -f .governance/install.json; git commit -q -m "a tracked receipt naming the tracked runner"
+_out=$(run_b1_push); _rc=$?
+case "$_rc|$_out|$(read_b1_token)" in
+  0\|*) bad "B1 control — the tracked RED runner let the push through: $_out" ;;
+  *"TRACKED BAR RAN - RED"*"|gate-red") ok "B1 control — a clean tracked receipt reaches its tracked runner, which refuses" ;;
+  *) bad "B1 control expected the tracked bar to run and refuse, got rc=$_rc: $_out | token '$(read_b1_token)'" ;;
+esac
+write_b1_receipt ".git/x/$RUN_GATES/$RUN_GATES.sh"
+_out=$(run_b1_push); _rc=$?
+case "$_rc|$_out|$(read_b1_token)" in
+  0\|*|*"PLANTED BAR RAN"*) bad "B1 a modified tracked receipt was followed: rc=$_rc $_out" ;;
+  *".governance/install.json"*"differs"*"|bar-refused") ok "B1 a tracked receipt whose working copy differs is refused as bar-refused" ;;
+  *) bad "B1 expected the modified receipt to be refused as bar-refused, got rc=$_rc: $_out | token '$(read_b1_token)'" ;;
+esac
+
+cd "$pfx_home" || exit 2
+
+# --- closing review round 2 H1 (TOOL-aRepatriatedFork-49): THE BAR'S MANIFEST AND PYTHON ARE THE
+# --- TRACKED ONES. B1 vetted the runner, and the runner still took its leg manifest from GATE_LEGS,
+# --- its python from GOV_PYTHON, reused a ledger row under GATE_REUSE, and read an IGNORED manifest
+# --- like a tracked one. Each route below landed a RED tracked bar on the ce8a78f5 hook. The fixture
+# --- runs a COPY OF THE REAL RUNNER, because a stub runner reads none of those knobs and would pass
+# --- every arm by never being asked. Each planted route writes a marker when it runs.
+h49="$tmp/h49"; h49_mark="$h49/mark"; mkdir -p "$h49/hooks" "$h49_mark"
+cp "$SRC/.githooks/pre-push" "$h49/hooks/pre-push"
+git init -q --bare "$h49/remote.git"; git init -q "$h49/work"
+cd "$h49/work" || exit 2
+git config user.email t@example.com; git config user.name t; git config core.autocrlf false
+git config core.hooksPath "$h49/hooks"
+mkdir -p "$RUN_GATES" fx
+cp "$SRC/$RUN_GATES_DIR/run-gates.sh" "$SRC/$RUN_GATES_DIR/gate-fingerprint.sh" \
+   "$SRC/$RUN_GATES_DIR/gate-profiles.txt" "$RUN_GATES/"
+printf 'import os, sys\nsys.exit(int(os.environ.get("H49_LEG_RC", "1")))\n' > fx/leg.py
+printf '%s\n' '[{"name": "red leg", "argv": ["python3", "fx/leg.py"]}]' > gate-legs.json
+git add -A >/dev/null 2>&1; git commit -q -m init; git branch -M main
+git remote add origin "$h49/remote.git"
+h49_gd=$(cd "$(git rev-parse --git-dir)" && pwd)
+touch "$h49_gd/push-main-active"
+run_h49_push() { # NAME=VALUE... -> the output of a default-bar push of HEAD; the record is cleared so every push runs FULL
+  ( unset GOV_GATE_CMD GOV_GATE_CMD_TEST; rm -f "$h49_gd/gate-full-green"
+    env GATE_PROFILE=minimal GATE_TURNSTILE=0 GATE_WALL=0 "$@" git push -q origin main 2>&1 )
+}
+read_h49_token() { cut -f1 "$h49_gd/pre-push-refusal" 2>/dev/null; }
+read_h49_mark() { [ -e "$h49_mark/$1" ] && echo MARK; }
+printf '[{"name": "planted", "argv": ["bash", "-c", "touch %s/legs"]}]\n' "$h49_mark" > "$h49/green.json"
+printf '#!/usr/bin/env bash\ncase "$*" in *fx/leg.py*) touch "%s/python"; exit 0 ;; esac\nexec %s "$@"\n' \
+  "$h49_mark" "$_rkd_py" > "$h49/fakepy"
+chmod +x "$h49/fakepy"
+
+git commit -q --allow-empty -m "h49 control"
+_out=$(run_h49_push); _rc=$?
+case "$_rc|$(read_h49_token)|$_out" in
+  0\|*) bad "H49 control — the tracked RED leg let the push through: $_out" ;;
+  *"|gate-red|"*"red leg"*) ok "H49 control — with nothing planted the tracked RED leg runs and refuses" ;;
+  *) bad "H49 control expected the tracked red leg to refuse as gate-red, got rc=$_rc token '$(read_h49_token)': $_out" ;;
+esac
+
+git commit -q --allow-empty -m "h49 GATE_LEGS"
+_out=$(run_h49_push GATE_LEGS="$h49/green.json"); _rc=$?
+case "$_rc|$(read_h49_token)|$(read_h49_mark legs)|$_out" in
+  0\|*|*\|MARK\|*) bad "H49 GATE_LEGS from the environment chose the manifest the bar ran: rc=$_rc $_out" ;;
+  *"|gate-red||"*GATE_LEGS*) ok "H49 GATE_LEGS is not honoured: the tracked manifest runs, and the push names the knob" ;;
+  *) bad "H49 expected GATE_LEGS to be ignored and named, with the push refused as gate-red, got rc=$_rc token '$(read_h49_token)': $_out" ;;
+esac
+
+git commit -q --allow-empty -m "h49 GOV_PYTHON"
+_out=$(run_h49_push GOV_PYTHON="$h49/fakepy"); _rc=$?
+case "$_rc|$(read_h49_token)|$(read_h49_mark python)" in
+  0\|*|*\|MARK) bad "H49 GOV_PYTHON from the environment chose the python the bar ran: rc=$_rc $_out" ;;
+  *"|gate-red|") ok "H49 GOV_PYTHON is not honoured: the red python leg runs under a resolved launcher" ;;
+  *) bad "H49 expected GOV_PYTHON to be dropped and the push refused as gate-red, got rc=$_rc token '$(read_h49_token)': $_out" ;;
+esac
+
+# A direct green run writes the ledger row; the push then runs over the SAME tree and base, so on the
+# old hook the row's key matched and the red leg was never executed.
+git commit -q --allow-empty -m "h49 GATE_REUSE"
+( unset GOV_GATE_CMD GOV_GATE_CMD_TEST
+  env GATE_PROFILE=minimal GATE_TURNSTILE=0 GATE_WALL=0 GATE_FULL=1 H49_LEG_RC=0 bash "$RUN_GATES/run-gates.sh" >/dev/null 2>&1 )
+_out=$(run_h49_push GATE_REUSE=1); _rc=$?
+case "$_rc|$(read_h49_token)" in
+  0\|*) bad "H49 GATE_REUSE from the environment reused a green row over the RED leg: $_out" ;;
+  *"|gate-red") ok "H49 GATE_REUSE is not honoured: the red leg executes and refuses" ;;
+  *) bad "H49 expected GATE_REUSE to be ignored and the push refused as gate-red, got rc=$_rc token '$(read_h49_token)': $_out" ;;
+esac
+
+# The IGNORED manifest: the repository tracks the runner and no manifest, and `git status` is empty.
+git rm -q --cached gate-legs.json; printf 'gate-legs.json\n' >> "$h49_gd/info/exclude"
+printf '[{"name": "planted", "argv": ["bash", "-c", "touch %s/ignored"]}]\n' "$h49_mark" > gate-legs.json
+git commit -q -m "h49 an ignored manifest"
+[ -z "$(git status --porcelain)" ] || bad "H49 fixture — the ignored manifest is visible to git status, so the arm below tests nothing hidden"
+_out=$(run_h49_push); _rc=$?
+case "$_rc|$(read_h49_token)|$(read_h49_mark ignored)|$_out" in
+  0\|*|*\|MARK\|*) bad "H49 an ignored gate-legs.json was read as the bar's manifest: rc=$_rc $_out" ;;
+  *"|bar-refused||"*gate-legs.json*) ok "H49 an ignored leg manifest is refused as bar-refused before the bar reads it" ;;
+  *) bad "H49 expected the ignored manifest to be refused as bar-refused, got rc=$_rc token '$(read_h49_token)': $_out" ;;
+esac
 # ---- TOOL-dDerivedDocket-24: THE INHERITED-RED POLICY, READ AT R ---------------------------------
 # A scratch repo whose `.githooks/gate-env.sh` at the pushed remote tip R declares the policy under
 # test, and a stub gate that writes the run record a real runner would: a RED verdict and one
@@ -593,6 +884,8 @@ build_ir_fixture() { # tag · gate-env body (printf %b) -> a pushed main whose R
   mkdir -p .githooks "$KIT_REL"
   printf '%s\n' '[{"name":"x","argv":["bash","a.sh"]}]' > "$KIT_REL/gate-legs.json"
   printf '%b' "$body" > .githooks/gate-env.sh
+  # The kit root, on the rung this hook reads it from when no receipt or root install names it.
+  printf 'GOV_KITROOT=%s\n' "$KIT_REL" >> .githooks/gate-env.sh
   git add -A >/dev/null 2>&1; git commit -q -m init; git branch -M main
   git remote add origin "$d/remote.git"
   touch "$(git rev-parse --git-dir)/push-main-active"
@@ -613,7 +906,7 @@ write_ir_stamp() { # sha · base · max_age -> a planted gate-inherited-green
 # AC1, the hook's half: R says park and the pushed branch commits `land` into its OWN copy. The policy
 # line reads park, and an inherited-only red is blocked. A reader of the working tree would land it.
 build_ir_fixture ac1 'INHERITED_RED=park\nINHERITED_RED_MAX_AGE=10\n' || bad "IR AC1 could not build its fixture"
-printf 'INHERITED_RED=land\nINHERITED_RED_MAX_AGE=10\n' > .githooks/gate-env.sh
+printf 'INHERITED_RED=land\nINHERITED_RED_MAX_AGE=10\nGOV_KITROOT=%s\n' "$KIT_REL" > .githooks/gate-env.sh
 git add -A >/dev/null 2>&1; git commit -q -m "the branch grants itself land" >/dev/null 2>&1
 _o=$(run_ir_push)
 case "$_o" in
@@ -723,9 +1016,11 @@ build_vr_fixture() { # tag -> a pushed main whose tree carries the stub runner; 
   cd "$d/work" || return 1
   git config user.email t@example.com; git config user.name t
   git config core.hooksPath "$d/hooks"
-  mkdir -p "$KIT_REL/run-gates"
+  mkdir -p "$KIT_REL/$RUN_GATES" .githooks
+  # The rung the hook reads the kit root from when no receipt and no root install name it.
+  printf 'GOV_KITROOT=%s\n' "$KIT_REL" > .githooks/gate-env.sh
   printf '%s\n' '[{"name":"x","argv":["bash","a.sh"]}]' > "$KIT_REL/gate-legs.json"
-  cat > "$KIT_REL/run-gates/run-gates.sh" <<'VRSTUB'
+  cat > "$KIT_REL/$RUN_GATES/run-gates.sh" <<'VRSTUB'
 #!/usr/bin/env bash
 [ -n "${VR_IDS:-}" ] && printf '%s\n' "$GATE_RUN_ID" >> "$VR_IDS"
 d="$(git rev-parse --git-dir)/gate-run/$GATE_RUN_ID"
@@ -787,7 +1082,7 @@ esac
 # itself, with no test escape, vets as `tracked` and earns the lander marker, so the record check has
 # to run for it exactly as for the default command. The stub runner above exits 0 and writes no record.
 git reset -q --hard origin/main
-run_vr_push VR_MODE=none GOV_GATE_CMD_TEST= GOV_GATE_CMD="bash $KIT_REL/run-gates/run-gates.sh"
+run_vr_push VR_MODE=none GOV_GATE_CMD_TEST= GOV_GATE_CMD="bash $KIT_REL/$RUN_GATES/run-gates.sh"
 case "$VR_RC|$VR_OUT" in
   1*"left no verdict in its run record"*) ok "VR F8 GOV_GATE_CMD naming the runner is still held to its run record: an exit 0 with none is blocked" ;;
   *) bad "VR F8 GOV_GATE_CMD naming the runner switched the record check off, got rc $VR_RC: $VR_OUT" ;;
@@ -795,7 +1090,7 @@ esac
 # ITS CONTROL: the same override over the runner's own GREEN record lands, so the arm above is the
 # record check and not a refusal of the override itself.
 git reset -q --hard origin/main
-run_vr_push VR_MODE=green GOV_GATE_CMD_TEST= GOV_GATE_CMD="bash $KIT_REL/run-gates/run-gates.sh"
+run_vr_push VR_MODE=green GOV_GATE_CMD_TEST= GOV_GATE_CMD="bash $KIT_REL/$RUN_GATES/run-gates.sh"
 [ "$VR_RC" = 0 ] && ok "VR F8 control: GOV_GATE_CMD naming the runner lands over the runner's own GREEN record" \
   || bad "VR F8 control: GOV_GATE_CMD naming the runner must land over a GREEN record, got rc $VR_RC: $VR_OUT"
 # AND THE ONE SANCTIONED SKIP: a declared GATE_CMD naming ANOTHER tracked script writes no record this
@@ -809,6 +1104,48 @@ case "$_r|$_o" in
   *) bad "VR F8 a declared GATE_CMD naming another script must land with its skip announced, got rc $_r: $_o" ;;
 esac
 cd "$pfx_home" || exit 2
+
+# THE CLASS (TOOL-aRepatriatedFork-49 S5): every GATE_/GOV_ name the runner reads through `$` is in
+# exactly one set — the names the hook clears before gate-env.sh runs, the names it clears before a
+# non-stub bar, or the inert set below, each of which the runner's own invariant keeps from turning a
+# leg into a PASS or a SKIP. A new knob reds here until someone decides which it is.
+#   GATE_BASE GATE_FULL GATE_RUN_ID — the hook sets each on the path where it matters; an inherited
+#     GATE_FULL only widens the run, and GATE_FULL=1 makes GATE_BASE irrelevant.
+#   GATE_SELFTESTS — adds legs, and predicate 8 forces a full bar for it.
+#   the rest — width, timeouts, the wall, the turnstile, reaping and the run log: a breach is RED.
+#   GATE_ATTRIBUTE GATE_INHERITED_RED GATE_INHERITED_RED_MAX_AGE — the hook clears the policy pair
+#     and sets all three from R itself (TOOL-dDerivedDocket-23, -24), and attribution is report-only.
+#   GATE_AMBIENT_TMP GATE_HOST_RATIO — assigned in the runner, from TMPDIR and as a source constant.
+BAR_INERT_KNOBS="GATE_AMBIENT_TMP GATE_ATTRIBUTE GATE_HOST_RATIO GATE_INHERITED_RED GATE_INHERITED_RED_MAX_AGE GATE_BASE GATE_CGROUP_ROOT GATE_CORES GATE_FULL GATE_JOBS GATE_PROFILE GATE_PROFILES GATE_RAM_MB GATE_REAP_BOUND GATE_RUN_ID GATE_RUN_KEEP GATE_SELFTESTS GATE_TURNSTILE GATE_TURNSTILE_HELD GATE_TURNSTILE_TICK GATE_TURNSTILE_TTL GATE_WALL GOV_RUNLOG"
+read_hook_const() { sed -n 's/^'"$1"'="\(.*\)"$/\1/p' "$SRC/.githooks/pre-push"; }
+check_knob_classes() { # <runner file> -> one line per unclassified, doubly classified or stale name; empty when clean
+  local knobs cleared scrubbed k n
+  knobs=" $(grep -oE '\$\{?(GATE|GOV)_[A-Z0-9_]+' "$1" | sed -E 's/^\$\{?//' | sort -u | tr '\n' ' ')"
+  cleared=$(read_hook_const ENV_DROPPED_KNOBS); scrubbed=$(read_hook_const BAR_SCRUBBED_KNOBS)
+  for k in $knobs; do
+    n=0
+    for s in "$cleared" "$scrubbed" "$BAR_INERT_KNOBS"; do case " $s " in *" $k "*) n=$((n + 1)) ;; esac; done
+    [ "$n" = 1 ] || echo "unclassified-or-twice $k ($n)"
+  done
+  for k in $scrubbed $BAR_INERT_KNOBS; do case "$knobs " in *" $k "*) ;; *) echo "stale $k" ;; esac; done
+}
+h49_n=$(grep -oE '\$\{?(GATE|GOV)_[A-Z0-9_]+' "$SRC/$RUN_GATES_DIR/run-gates.sh" | sed -E 's/^\$\{?//' | sort -u | grep -c .)
+_cls=$(check_knob_classes "$SRC/$RUN_GATES_DIR/run-gates.sh")
+if [ -z "$_cls" ] && [ "$h49_n" -ge 10 ] && grep -qE '\$\{?GATE_LEGS' "$SRC/$RUN_GATES_DIR/run-gates.sh"; then
+  ok "H49 class — every one of the runner's $h49_n GATE_/GOV_ knobs is classified exactly once"
+else
+  bad "H49 class — the runner's knobs ($h49_n) are not each classified exactly once: $(printf '%s' "$_cls" | tr '\n' ';')"
+fi
+{ cat "$SRC/$RUN_GATES_DIR/run-gates.sh"; printf ': "${GATE_PLANTED:-}"\n'; } > "$tmp/h49-runner-planted.sh"
+case "$(check_knob_classes "$tmp/h49-runner-planted.sh")" in
+  *"unclassified-or-twice GATE_PLANTED"*) ok "H49 class — a runner knob nobody classified reds by name" ;;
+  *) bad "H49 class — an unclassified GATE_PLANTED in a runner copy went unreported" ;;
+esac
+sed 's/GATE_LEGS/GATE_XLEGS/g' "$SRC/$RUN_GATES_DIR/run-gates.sh" > "$tmp/h49-runner-nolegs.sh"
+case "$(check_knob_classes "$tmp/h49-runner-nolegs.sh")" in
+  *"stale GATE_LEGS"*) ok "H49 class — a cleared name the runner no longer reads reds as stale" ;;
+  *) bad "H49 class — a stale GATE_LEGS member went unreported" ;;
+esac
 
 # ============================================================================================
 # TOOL-aRepatriatedFork-8 — THE CONTRACTS adopter ic's OWN HOOK CARRIED. A fresh fixture whose ONLY

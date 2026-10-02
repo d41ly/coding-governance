@@ -8,7 +8,7 @@
 # the LESSON kept here is the argued-in-place justification, not the summed budget.
 #
 # WHO WRITES THIS FILE: a person, deliberately. This is NOT the high-water record — that one is
-# `tools/template-size-highwater.txt`, which `--bump` WRITES as a side effect of measuring. Keeping
+# `<prefix>/template-size-highwater.txt`, which `--bump` WRITES as a side effect of measuring. Keeping
 # them apart is the point: a mode that can move a ceiling while recording a measurement would destroy
 # the ratchet's only real property, which is that raising a ceiling is a visible, deliberate act.
 #
@@ -29,7 +29,7 @@ coding-governance-agents.template.md	49152
 # --- the kickoff engine -------------------------------------------------------------------------
 # 18432 = 18 KiB. It has never moved. The engine rides the same gate as the template because the
 # script takes its subject as an argument; before this file existed, this number lived as a POSITIONAL
-# in tools/gate-legs.json, which is what made it invisible here and unjustified there.
+# in <prefix>/gate-legs.json, which is what made it invisible here and unjustified there.
 #
 # THE POSITIONAL WAS ALSO LOAD-BEARING, and this is why the declaration outranks the environment.
 # TOOL-aSiftedPlaybook-1 S1 established that raising the template's default cannot move the engine's
@@ -74,8 +74,8 @@ AGENTS.md	64512
 # to a spelling the gate cannot parse as bytes. Change both or neither.
 #
 # THE LEG IS `build-method size`, AND ITS IDENTITY LIVES HERE RATHER THAN IN THE DOCUMENT. The
-# subject is a RENDERED kit template: `tools/memory-tree/` ships BUILD-METHOD.template.md and ships
-# no size gate, so the leg is an `[[exempt_leg]]` in tools/govkit/registry.toml and reaches no
+# subject is a RENDERED kit template: `<prefix>/memory-tree/` ships BUILD-METHOD.template.md and ships
+# no size gate, so the leg is an `[[exempt_leg]]` in <prefix>/govkit/registry.toml and reaches no
 # adopter. The template used to name this leg in its own M1, which made every adopter render assert
 # a checker it does not receive — the `a directive names a route that does not run` class. That
 # sentence was dropped on 2026-09-06 (aHoistedPass closing review, F5) and the byte figure stayed,
@@ -102,7 +102,7 @@ memory/guides/BUILD-METHOD.md	30720
 # byte of growth is a line in THIS file's diff, which is a decision gov makes where it can be seen —
 # TOOL-dFoldedVerdict-7 asked for exactly that of the carriers it found sitting on their caps.
 #
-# THE LEG IS `unattended protocol size`, an `[[exempt_leg]]` in tools/govkit/registry.toml for
+# THE LEG IS `unattended protocol size`, an `[[exempt_leg]]` in <prefix>/govkit/registry.toml for
 # `build-method size`'s reason: the kit ships the template and no size gate. What an adopter gets
 # instead is the adopter's own announcement, which compares the render against its GUIDE_CAP_BYTES.
 # WHAT THIS DOES NOT COVER: the file's line count, which only the adopter's GUIDE_CAP_LINES reads.

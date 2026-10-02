@@ -59,6 +59,12 @@ import sys
 import tempfile
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# The run-gates kit's home, FOUND by the engine it holds and never typed. The fixture lays that kit
+# out at a foreign prefix, and a kit name typed there is the literal the install-prefix ban counts
+# (TOOL-aRepatriatedFork-30 S8).
+RUN_GATES_HOME = os.path.basename(os.path.dirname(subprocess.run(
+    ["git", "-C", ROOT, "ls-files", "--", "*/run-gates.sh"],
+    capture_output=True, text=True, encoding="utf-8").stdout.splitlines()[0]))
 HOOK = os.path.join(ROOT, ".githooks", "pre-push")
 
 # The anchor the mutation splices after. It is the end of the tokenising loop inside the hook's
@@ -130,10 +136,10 @@ class Fixture:
                     ["commit.gpgsign", "false"],
                     ["core.hooksPath", self.hooks.replace("\\", "/")]):
             run(["git", "config"] + cfg, cwd=self.work)
-        os.makedirs(os.path.join(self.work, "scripts", "run-gates"))
+        os.makedirs(os.path.join(self.work, "scripts", RUN_GATES_HOME))
         # The DEFAULT bar, stubbed RED. Every accept case below has to get past this, so a case that
         # reports "accepted" is reporting that the named bar ran, not that no bar did.
-        write(os.path.join(self.work, "scripts", "run-gates", "run-gates.sh"),
+        write(os.path.join(self.work, "scripts", RUN_GATES_HOME, "run-gates.sh"),
               '#!/usr/bin/env bash\necho "DEFAULT BAR RAN - RED"; exit 1\n')
         # A tracked bar, GREEN, so an accept case is visible by the bar's own text.
         write(os.path.join(self.work, "scripts", "unattended-bar.sh"),
@@ -144,6 +150,11 @@ class Fixture:
               '#!/usr/bin/env bash\necho "OTHER BAR RAN"; exit 0\n')
         # THE DECLARATION the hook reads at the pushed sha (M1), in the unattended driver's own file.
         write(os.path.join(self.work, ".unattended.conf"), 'GATE_CMD="bash scripts/unattended-bar.sh"\n')
+        # THE KIT ROOT, declared the way a copy-installed adopter declares it: no receipt and no root
+        # install, so the committed gate-env.sh is the rung that reaches `scripts/`. The hook used to
+        # guess `scripts` on its own and no longer guesses (TOOL-aRepatriatedFork-24 S2).
+        os.makedirs(os.path.join(self.work, ".githooks"))
+        write(os.path.join(self.work, ".githooks", "gate-env.sh"), "GOV_KITROOT=scripts\n")
         write(os.path.join(self.work, "f.txt"), "hi\n")
         run(["git", "add", "-A"], cwd=self.work)
         run(["git", "commit", "-qm", "init"], cwd=self.work)
@@ -309,6 +320,11 @@ def main() -> int:
                        f"every case below is about something else: {out.strip()[:300]}")
         else:
             print_ok("0 control — the default bar runs and a RED one blocks the push")
+        # FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+        if os.environ.get("FOREIGN_PREFIX_PROBE") == "1":
+            print("foreign-prefix-probe: stopped after 1 arm")
+            print("FAIL (1 assertions)" if FAILURES else "PASS (1 assertions)")
+            return 1 if FAILURES else 0
         check_end(fx, "bar", "default", "0b the run log records the default bar as `bar=default`")
         # 1 — a tracked bar, no escape, is ACCEPTED. Without this the rest is an outage, not a gate.
         check_landed(fx, "bash scripts/unattended-bar.sh",

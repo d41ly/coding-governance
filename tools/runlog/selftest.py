@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""selftest.py — the runlog kit's arms. gov:kit runlog@1.4
+"""selftest.py — the runlog kit's arms. gov:kit runlog@1.6
 
     python <this kit>/selftest.py
 
@@ -49,6 +49,63 @@ import time
 import types
 import uuid
 import weakref
+
+
+def derive_install_prefix() -> str:
+    """The install prefix WITH its trailing slash, derived from where this file sits and empty at a
+    root install. Every fixture and host path the self-test builds is spelled through it, never
+    through a literal prefix (TOOL-aRepatriatedFork-28)."""
+    import pathlib
+    here = pathlib.Path(__file__).resolve().parent
+    for anc in here.parents:
+        if (anc / ".git").exists():
+            rel = here.parent.relative_to(anc).as_posix()
+            return "" if rel == "." else rel + "/"
+    raise SystemExit(f"{pathlib.Path(__file__).name}: not inside a git repository, so there is no "
+                     "install prefix to derive")
+
+
+PFX = derive_install_prefix()
+
+
+# TOOL-aRepatriatedFork-46: a SIBLING kit's file is reached through the resolver, which reads the install
+# receipt first, never by typing that kit's name after the prefix.
+# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
+def resolve_kit_dir(home, anchor, here):
+    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
+
+    1. receipt — the `.governance/install.json` row whose `source` ends in <home>/<anchor> and
+       whose `path` exists inside this tree. The only record of a RENAMED kit dir: no probe finds
+       a memory-recall kit an adopter homed at `scripts/recall/`.
+    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
+    3. refuse — LookupError naming the three places looked; never a guessed prefix.
+    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
+    """
+    import json
+    import pathlib
+    here = pathlib.Path(here).absolute()  # never resolve(): a junction must not move it
+    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
+    receipt = root / ".governance" / "install.json"
+    try:
+        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("path"):
+            continue
+        if str(row.get("source") or "").split("/")[-2:] != [home, anchor]:
+            continue
+        hit = (root / str(row["path"])).absolute()
+        if hit.is_file() and root in hit.parents and ".." not in hit.parts:
+            return hit.parent
+    probes = (here / home, here.parent / home)
+    for cand in probes:
+        if (cand / anchor).is_file():
+            return cand
+    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
+        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
+# <<< resolve_kit_dir
+
 
 HERE = pathlib.Path(__file__).resolve().parent
 FIXTURES = HERE / "fixtures"
@@ -820,10 +877,12 @@ def read_bash_conf_values(paths):
 
 def read_engine_conf_reader():
     """The memory-tree engine's own conf reader, loaded from its source where it sits beside this kit,
-    else None. The literal below is this withheld arm's second carried path: the reader the kit's copy
-    is held to is its subject, not a reference that would reach an adopter."""
-    top = pathlib.Path(run_git(["rev-parse", "--show-toplevel"], HERE).stdout.strip() or ".")
-    src = top / "tools/memory-tree/corpus_ids.py"
+    else None. The memory-tree kit is found through the sibling-kit resolver, which reads the install
+    receipt first (TOOL-aRepatriatedFork-46), rather than by typing its name after the prefix."""
+    try:
+        src = resolve_kit_dir("memory-tree", "corpus_ids.py", HERE) / "corpus_ids.py"
+    except LookupError:
+        return None
     if not src.is_file():
         return None
     spec = importlib.util.spec_from_file_location("runlog_selftest_engine_conf", src)
@@ -1953,10 +2012,10 @@ def test_extract_edges():
           True)
     home, local, xdg = str(base / "h"), str(base / "l"), str(base / "x")
     cases = [
-        ({"LOCALAPPDATA": local}, "win32", pathlib.Path(local) / "runlog"),
-        ({"HOME": home}, "darwin", pathlib.Path(home) / "Library" / "Application Support" / "runlog"),
-        ({"HOME": home, "XDG_STATE_HOME": xdg}, "linux", pathlib.Path(xdg) / "runlog"),
-        ({"HOME": home}, "linux", pathlib.Path(home) / ".local" / "state" / "runlog"),
+        ({"LOCALAPPDATA": local}, "win32", pathlib.Path(local) / rx.STATE_DIR_NAME),
+        ({"HOME": home}, "darwin", pathlib.Path(home) / "Library" / "Application Support" / rx.STATE_DIR_NAME),
+        ({"HOME": home, "XDG_STATE_HOME": xdg}, "linux", pathlib.Path(xdg) / rx.STATE_DIR_NAME),
+        ({"HOME": home}, "linux", pathlib.Path(home) / ".local" / "state" / rx.STATE_DIR_NAME),
         ({"RUNLOG_STATE_DIR": str(base / "o"), "LOCALAPPDATA": local}, "win32", base / "o"),
     ]
     for env_in, plat, want in cases:
@@ -2122,7 +2181,7 @@ def build_spec_text(uid, title, status="SPECCED", marks=""):
 
 
 def build_base_files(slug=FX_SLUG, mr="memory", units=(FX_UNIT1,)):
-    files = {f"{mr}/builds/{slug}/README.md": f"---\nslug: {slug}\n---\n\n# {slug}\n", "tools/a.txt": "a\n"}
+    files = {f"{mr}/builds/{slug}/README.md": f"---\nslug: {slug}\n---\n\n# {slug}\n", f"{PFX}a.txt": "a\n"}
     for uid in units:
         files[f"{mr}/builds/{slug}/spec/2026-09-13-spec-{uid}.md"] = build_spec_text(uid, "a unit")
     return files
@@ -2335,7 +2394,7 @@ def build_landed_fixture():
     base = shas0[1]
     st = build_preflight_state(FX_SLUG, base, base, branch_ref="refs/heads/run")
     s1 = st
-    st = add_runstate_row(st, derive_minute(3), "dispatch", f"{base[:8]} {FX_UNIT1}", "tools/a.txt")
+    st = add_runstate_row(st, derive_minute(3), "dispatch", f"{base[:8]} {FX_UNIT1}", f"{PFX}a.txt")
     st = add_runstate_row(st, derive_minute(4), "brief", FX_UNIT1, "0123456789ab brief.md")
     s2 = st
     s3 = set_runstate_fact(set_runstate_fact(st, "phase", "BUILDING"), "witness", base)
@@ -2347,14 +2406,14 @@ def build_landed_fixture():
         {"t": derive_minute(5), "subject": f"records({FX_SLUG}): the dispatch and the brief",
          "ref": "refs/heads/run", "files": {rm: s2}},
         {"t": derive_minute(7), "subject": f"feat({FX_SLUG}): {FX_UNIT1} — the work",
-         "ref": "refs/heads/run", "files": {rm: s3, "tools/a.txt": "b\n"}},
+         "ref": "refs/heads/run", "files": {rm: s3, f"{PFX}a.txt": "b\n"}},
         {"t": derive_minute(15), "subject": f"fix({FX_SLUG}): {FX_UNIT1} — more of it",
-         "ref": "refs/heads/run", "files": {"tools/a.txt": "c\n"}},
+         "ref": "refs/heads/run", "files": {f"{PFX}a.txt": "c\n"}},
         {"t": derive_minute(22), "subject": f"records({FX_SLUG}): close OK, phase LANDING",
          "ref": "refs/heads/run", "files": {rm: s4}},
         # fast-import gives a merge its FIRST parent's tree, so the merged files are carried by hand.
         {"t": derive_minute(24), "subject": f"merge: {FX_UNIT1} — land it", "merge": [5],
-         "files": {rm: s4, "tools/a.txt": "c\n"}},
+         "files": {rm: s4, f"{PFX}a.txt": "c\n"}},
         {"t": derive_minute(28), "subject": f"records({FX_SLUG}): --landed", "files": {rm: s5}},
     ], repo=first)
     head_at_close, merge = shas[4], shas[6]
@@ -2454,12 +2513,12 @@ def test_model_ac1_ac16_rotation():
     repo, shas = build_history([
         {"t": derive_minute(5), "subject": f"records({FX_SLUG}): preflight", "files": {rm: run1}},
         {"t": derive_minute(10), "subject": f"feat({FX_SLUG}): {FX_UNIT1} — run one's work",
-         "files": {"tools/a.txt": "1\n"}},
+         "files": {f"{PFX}a.txt": "1\n"}},
         {"t": derive_minute(15), "subject": f"records({FX_SLUG}): --abort", "files": {rm: aborted}},
         {"t": derive_minute(20), "subject": f"records({FX_SLUG}): preflight, the finished record retired",
          "files": {arch: aborted, rm: run2}},
         {"t": derive_minute(25), "subject": f"feat({FX_SLUG}): {FX_UNIT1} — run two's work",
-         "files": {"tools/a.txt": "2\n"}},
+         "files": {f"{PFX}a.txt": "2\n"}},
         {"t": derive_minute(30), "subject": f"records({FX_SLUG}): phase BUILDING",
          "files": {rm: set_runstate_fact(run2, "phase", "BUILDING")}},
     ], repo=first)
@@ -2503,11 +2562,11 @@ def test_model_ac1_ac16_rotation():
     two_l = set_runstate_fact(set_runstate_fact(two, "phase", "LANDED"), "witness", base)
     repo, shas = build_history([
         {"t": derive_minute(5), "subject": f"records({FX_SLUG}): preflight", "files": {rm: one}},
-        {"t": derive_minute(8), "subject": f"feat({FX_SLUG}): {FX_UNIT1} — w", "files": {"tools/a.txt": "1\n"}},
+        {"t": derive_minute(8), "subject": f"feat({FX_SLUG}): {FX_UNIT1} — w", "files": {f"{PFX}a.txt": "1\n"}},
         {"t": derive_minute(12), "subject": f"records({FX_SLUG}): --landed", "files": {rm: one_l}},
         {"t": derive_minute(20), "subject": f"records({FX_SLUG}): preflight, rotated",
          "files": {arch: one_l, rm: two}},
-        {"t": derive_minute(24), "subject": f"feat({FX_SLUG}): {FX_UNIT1} — w2", "files": {"tools/a.txt": "2\n"}},
+        {"t": derive_minute(24), "subject": f"feat({FX_SLUG}): {FX_UNIT1} — w2", "files": {f"{PFX}a.txt": "2\n"}},
         {"t": derive_minute(29), "subject": f"records({FX_SLUG}): --landed", "files": {rm: two_l}},
         {"t": derive_minute(40), "subject": f"records({FX_SLUG}): a note that names the slug",
          "files": {f"memory/builds/{FX_SLUG}/README.md": "later\n"}},
@@ -2546,13 +2605,13 @@ def test_model_ac2_own_commits():
     st = build_preflight_state(FX_SLUG, base, base)
     repo, shas = build_history([
         {"t": derive_minute(2), "subject": f"records({FX_SLUG}): preflight", "files": {rm: st}},
-        {"t": derive_minute(4), "subject": f"feat: {FX_UNIT1} — ours", "files": {"tools/a.txt": "1\n"}},
-        {"t": derive_minute(5), "subject": f"feat: X-{FX_OTHER}-1 — theirs", "files": {"tools/b.txt": "1\n"}},
+        {"t": derive_minute(4), "subject": f"feat: {FX_UNIT1} — ours", "files": {f"{PFX}a.txt": "1\n"}},
+        {"t": derive_minute(5), "subject": f"feat: X-{FX_OTHER}-1 — theirs", "files": {f"{PFX}b.txt": "1\n"}},
         {"t": derive_minute(6), "subject": f"records({FX_SLUG}): phase BUILDING",
          "files": {rm: set_runstate_fact(st, "phase", "BUILDING")}},
         {"t": derive_minute(7), "subject": f"fix: X-{FX_OTHER}-2 mentions {FX_SLUG} but no unit of it",
-         "files": {"tools/b.txt": "2\n"}},
-        {"t": derive_minute(8), "subject": f"fix: {FX_UNIT2} — ours again", "files": {"tools/a.txt": "2\n"}},
+         "files": {f"{PFX}b.txt": "2\n"}},
+        {"t": derive_minute(8), "subject": f"fix: {FX_UNIT2} — ours again", "files": {f"{PFX}a.txt": "2\n"}},
     ], repo=first)
     model = build_model(repo)
     got = [(e["kind"], e.get("sha") if e["kind"] == "commit" else e.get("phase"))
@@ -2573,11 +2632,11 @@ def test_model_ac2_own_commits():
     repo, shas = build_history([
         {"t": derive_minute(2), "subject": f"records({FX_SLUG}): preflight", "files": {rm: st}},
         {"t": derive_minute(4), "subject": f"feat({FX_SLUG}): {FX_UNIT1} — unit one alone",
-         "files": {"tools/a.txt": "1\n"}},
+         "files": {f"{PFX}a.txt": "1\n"}},
         {"t": derive_minute(6), "subject": f"fold({FX_SLUG}): {FX_UNIT1}..2 — the whole set at once",
-         "files": {"tools/a.txt": "2\n"}},
+         "files": {f"{PFX}a.txt": "2\n"}},
         {"t": derive_minute(8), "subject": f"fix({FX_SLUG}): {FX_UNIT2} — unit two alone",
-         "files": {"tools/a.txt": "3\n"}},
+         "files": {f"{PFX}a.txt": "3\n"}},
     ], repo=first)
     model = build_model(repo)
     whole = next((c for c in model.own_commits if c["sha"] == shas[3]), {})
@@ -2638,7 +2697,7 @@ def test_model_ac3_ac11_ledger():
     repo, shas = build_history([
         {"t": derive_minute(2), "subject": f"records({FX_SLUG}): preflight", "files": {rm: pre}},
         {"t": derive_minute(15), "subject": f"feat({FX_SLUG}): {FX_UNIT1} — the work", "body": body,
-         "files": {"tools/a.txt": "1\n", "memory/DECISIONS.md": log_before + "\n".join(rows_new) + "\n"}},
+         "files": {f"{PFX}a.txt": "1\n", "memory/DECISIONS.md": log_before + "\n".join(rows_new) + "\n"}},
         {"t": derive_minute(18), "subject": f"fold({FX_SLUG}): {FX_UNIT1} — the fork, the ledger, the review",
          "files": {spec: build_spec_text(FX_UNIT1, "a unit", marks=agent_mark),
                    f"{bd}/build/2026-09-13-build-{FX_UNIT1}-1-acceptance-ledger.md": ledger,
@@ -2825,22 +2884,22 @@ def build_nonterminal_fixture():
     wrote the phase and no witness, and the own commits were merged into the default branch. A second
     branch holds the same run with NO own commit after its start."""
     rm = f"memory/builds/{FX_SLUG}/RUN.md"
-    first, s0 = build_history([{"t": derive_minute(-10), "subject": "older", "files": {"tools/o.txt": "o\n"}},
+    first, s0 = build_history([{"t": derive_minute(-10), "subject": "older", "files": {f"{PFX}o.txt": "o\n"}},
                                {"t": derive_minute(0), "subject": "base", "files": build_base_files()}])
     older, base = s0[1], s0[2]
     st = build_preflight_state(FX_SLUG, base, base, branch_ref="refs/heads/run")
-    st = add_runstate_row(st, derive_minute(3), "dispatch", f"{base[:8]} {FX_UNIT1}", "tools/a.txt")
+    st = add_runstate_row(st, derive_minute(3), "dispatch", f"{base[:8]} {FX_UNIT1}", f"{PFX}a.txt")
     st = add_runstate_row(st, derive_minute(4), "brief", FX_UNIT1, "0123456789ab brief.md")
     closed = set_runstate_fact(set_runstate_fact(st, "phase", "LANDING"), "keepalive-reaped", "yes")
     repo, shas = build_history([
         {"t": derive_minute(2), "subject": f"records({FX_SLUG}): preflight", "ref": "refs/heads/run",
          "files": {rm: st}},
         {"t": derive_minute(7), "subject": f"feat({FX_SLUG}): {FX_UNIT1} — work", "ref": "refs/heads/run",
-         "files": {"tools/a.txt": "b\n"}},
+         "files": {f"{PFX}a.txt": "b\n"}},
         {"t": derive_minute(12), "subject": f"records({FX_SLUG}): close OK, phase LANDING",
          "ref": "refs/heads/run", "files": {rm: closed}},
         {"t": derive_minute(14), "subject": f"merge: {FX_UNIT1} — land", "merge": [3],
-         "files": {rm: closed, "tools/a.txt": "b\n"}},
+         "files": {rm: closed, f"{PFX}a.txt": "b\n"}},
     ], repo=first)
     return {"repo": repo, "record": rm, "closed": closed, "older": older, "base": base,
             "shas": {"pre": shas[1], "work": shas[2], "close": shas[3], "merge": shas[4]}}
@@ -2967,7 +3026,7 @@ def build_killed_close_fixture(exit_):
     base = shas0[1]
     st = build_preflight_state(FX_SLUG, base, base, branch_ref="refs/heads/run")
     s1 = st
-    st = add_runstate_row(st, derive_minute(3), "dispatch", f"{base[:8]} {FX_UNIT1}", "tools/a.txt")
+    st = add_runstate_row(st, derive_minute(3), "dispatch", f"{base[:8]} {FX_UNIT1}", f"{PFX}a.txt")
     st = add_runstate_row(st, derive_minute(4), "brief", FX_UNIT1, "0123456789ab brief.md")
     s2 = st
     s3 = set_runstate_fact(set_runstate_fact(st, "phase", "BUILDING"), "witness", base)
@@ -2977,7 +3036,7 @@ def build_killed_close_fixture(exit_):
         {"t": derive_minute(5), "subject": f"records({FX_SLUG}): the dispatch and the brief",
          "ref": "refs/heads/run", "files": {rm: s2}},
         {"t": derive_minute(7), "subject": f"feat({FX_SLUG}): {FX_UNIT1} — the work",
-         "ref": "refs/heads/run", "files": {rm: s3, "tools/a.txt": "b\n"}},
+         "ref": "refs/heads/run", "files": {rm: s3, f"{PFX}a.txt": "b\n"}},
     ], repo=first)
     run_git(["-c", "core.autocrlf=false", "checkout", "-q", "run"], repo)
     after = "BUILDING" if exit_ == "unclean" else "LANDING"
@@ -3284,9 +3343,9 @@ def test_model_ac8_git_calls():
         st = build_preflight_state(FX_SLUG, s0[1], s0[1])
         commits = [{"t": derive_minute(1), "subject": f"records({FX_SLUG}): preflight", "files": {rm: st}}]
         for i in range(n):
-            st = add_runstate_row(st, derive_minute(2 + i), "dispatch", f"{s0[1][:8]} {FX_UNIT1}", "tools/a.txt")
+            st = add_runstate_row(st, derive_minute(2 + i), "dispatch", f"{s0[1][:8]} {FX_UNIT1}", f"{PFX}a.txt")
             commits.append({"t": derive_minute(2 + i), "subject": f"feat: {FX_UNIT1} — step {i}",
-                            "files": {"tools/a.txt": f"{i}\n", rm: st,
+                            "files": {f"{PFX}a.txt": f"{i}\n", rm: st,
                                       f"memory/DECISIONS.md": f"- X-{FX_SLUG}-{i} · row\n" * (i + 1)}})
         repo, _ = build_history(commits, repo=first)
         real = subprocess.Popen
@@ -3324,7 +3383,7 @@ def test_model_ac9_no_start():
         last = (set_runstate_fact(st, "phase", "LANDED") if terminal else set_runstate_fact(st, "phase", "BUILDING"))
         repo, shas = build_history([
             {"t": derive_minute(3), "subject": f"records({FX_SLUG}): preflight", "files": {rm: st}},
-            {"t": derive_minute(6), "subject": f"feat: {FX_UNIT1} — work", "files": {"tools/a.txt": "1\n"}},
+            {"t": derive_minute(6), "subject": f"feat: {FX_UNIT1} — work", "files": {f"{PFX}a.txt": "1\n"}},
             {"t": derive_minute(9), "subject": f"records({FX_SLUG}): the last record write", "files": {rm: last}},
             {"t": derive_minute(40), "subject": f"records({FX_SLUG}): a later note naming the slug",
              "files": {f"{mr}/builds/{FX_SLUG}/README.md": "x\n"}},
@@ -3394,8 +3453,8 @@ def build_gaps_fixture():
     t33 = t31 + 120
     repo, _ = build_history([
         {"t": t2, "subject": f"records({FX_SLUG}): preflight", "files": {rm: st}},
-        {"t": t17, "subject": f"feat: {FX_UNIT1} — after fifteen minutes", "files": {"tools/a.txt": "1\n"}},
-        {"t": t31, "subject": f"feat: {FX_UNIT1} — after fourteen", "files": {"tools/a.txt": "2\n"}},
+        {"t": t17, "subject": f"feat: {FX_UNIT1} — after fifteen minutes", "files": {f"{PFX}a.txt": "1\n"}},
+        {"t": t31, "subject": f"feat: {FX_UNIT1} — after fourteen", "files": {f"{PFX}a.txt": "2\n"}},
         {"t": t33, "subject": f"records({FX_SLUG}): phase BUILDING",
          "files": {rm: set_runstate_fact(st, "phase", "BUILDING")}},
     ], repo=first)
@@ -3432,7 +3491,7 @@ def test_model_ac13_ac14_positions_usage():
     st = build_preflight_state(FX_SLUG, s0[1], s0[1])
     repo, _ = build_history([
         {"t": derive_minute(5), "subject": f"records({FX_SLUG}): preflight", "files": {rm: st}},
-        {"t": derive_minute(8), "subject": f"feat: {FX_UNIT1} — work", "files": {"tools/a.txt": "1\n"}},
+        {"t": derive_minute(8), "subject": f"feat: {FX_UNIT1} — work", "files": {f"{PFX}a.txt": "1\n"}},
         {"t": derive_minute(10), "subject": f"records({FX_SLUG}): BUILDING",
          "files": {rm: set_runstate_fact(st, "phase", "BUILDING")}},
     ], repo=first)
@@ -3472,7 +3531,7 @@ def test_model_ac15_ac18_journal_join():
             files[f"memory/builds/{FX_SLUG}/{derive_archive_name(recs[-1])}"] = recs[-1]
         commits += [{"t": derive_minute(m), "subject": f"records({FX_SLUG}): preflight {i + 1}", "files": files},
                     {"t": derive_minute(m + 3), "subject": f"feat: {FX_UNIT1} — run {i + 1}",
-                     "files": {"tools/a.txt": f"{i}\n"}},
+                     "files": {f"{PFX}a.txt": f"{i}\n"}},
                     {"t": derive_minute(m + 6), "subject": f"records({FX_SLUG}): landed {i + 1}",
                      "files": {rm: done}}]
         recs.append(done)
@@ -3606,13 +3665,13 @@ def build_idle_fixture():
     first, s0 = build_history([{"t": derive_minute(0), "subject": "base", "files": build_base_files()}])
     base = s0[1]
     st = add_runstate_row(build_preflight_state(FX_SLUG, base, base), derive_time(1.5), "dispatch",
-                          f"{base[:8]} {FX_UNIT1}", "tools/a.txt")
+                          f"{base[:8]} {FX_UNIT1}", f"{PFX}a.txt")
     repo, _ = build_history([
         {"t": derive_minute(2), "subject": f"records({FX_SLUG}): preflight and the dispatch", "files": {rm: st}},
         {"t": derive_minute(38), "subject": f"feat({FX_SLUG}): {FX_UNIT1} — after twenty minutes of calls",
-         "files": {"tools/a.txt": "1\n"}},
+         "files": {f"{PFX}a.txt": "1\n"}},
         {"t": derive_minute(66), "subject": f"fix({FX_SLUG}): {FX_UNIT1} — after the bar",
-         "files": {"tools/a.txt": "2\n"}},
+         "files": {f"{PFX}a.txt": "2\n"}},
     ], repo=first)
     driver = (render_driver_lines(1, "--preflight", phase_to="RUNNING")
               + render_driver_lines(1.5, "--dispatch", phase_from="RUNNING", phase_to="RUNNING", unit=FX_UNIT1)
@@ -3777,7 +3836,7 @@ def build_live_fixture():
     first, s0 = build_history([{"t": derive_minute(0), "subject": "base", "files": build_base_files()}])
     base = s0[1]
     s1 = build_preflight_state(FX_SLUG, base, base, branch_ref="refs/heads/run")
-    s2 = add_runstate_row(add_runstate_row(s1, derive_minute(3), "dispatch", f"{base[:8]} {FX_UNIT1}", "tools/a.txt"),
+    s2 = add_runstate_row(add_runstate_row(s1, derive_minute(3), "dispatch", f"{base[:8]} {FX_UNIT1}", f"{PFX}a.txt"),
                           derive_minute(4), "brief", FX_UNIT1, "0123456789ab brief.md")
     s3 = set_runstate_fact(set_runstate_fact(s2, "phase", "BUILDING"), "witness", base)
     repo, shas = build_history([
@@ -3788,11 +3847,11 @@ def build_live_fixture():
         {"t": derive_minute(7), "subject": f"records({FX_SLUG}): phase BUILDING", "ref": "refs/heads/run",
          "files": {rm: s3}},
         {"t": derive_minute(27), "subject": f"feat({FX_SLUG}): {FX_UNIT1} — the work", "ref": "refs/heads/run",
-         "files": {"tools/a.txt": "b\n"}},
-        {"t": derive_minute(32), "subject": f"feat: X-{FX_OTHER}-1 — another build's", "files": {"tools/b.txt": "1\n"}},
+         "files": {f"{PFX}a.txt": "b\n"}},
+        {"t": derive_minute(32), "subject": f"feat: X-{FX_OTHER}-1 — another build's", "files": {f"{PFX}b.txt": "1\n"}},
         # fast-import gives a merge its FIRST parent's tree, so the merged file is carried by hand.
         {"t": derive_minute(33), "subject": f"merge: origin/main into the {FX_SLUG} branch", "ref": "refs/heads/run",
-         "merge": [5], "files": {"tools/b.txt": "1\n"}},
+         "merge": [5], "files": {f"{PFX}b.txt": "1\n"}},
     ], repo=first)
     # The model runs where the run does, on its branch, since its record reaches main only when it lands.
     run_git(["-c", "core.autocrlf=false", "checkout", "-q", "run"], repo)
@@ -3886,7 +3945,7 @@ def test_model_ac22_later_unit_commit():
     # A follow-up on the default branch naming a unit id of the build, as commits keep doing after a
     # build lands.
     _r, later = build_history([{"t": derive_minute(40), "subject": f"fix: {FX_UNIT1} — a later touch of it",
-                                "files": {"tools/a.txt": "d\n"}}], repo=repo)
+                                "files": {f"{PFX}a.txt": "d\n"}}], repo=repo)
     after = build_model(repo, journals=j)
     check("model AC22: a commit naming a unit id after the landing moves neither the own commits, the last "
           "own commit nor the merged flag",
@@ -3912,7 +3971,7 @@ def test_model_ac22_later_unit_commit():
         {"t": derive_minute(14.5), "subject": f"records({FX_SLUG}): the build index re-rendered",
          "files": {f"memory/builds/{FX_SLUG}/README.md": f"---\nslug: {FX_SLUG}\n---\n\n# {FX_SLUG}\n\nlanding\n"}},
         {"t": derive_minute(17), "subject": f"fix({FX_SLUG}): {FX_UNIT1} — after the push", "ref": "refs/heads/run",
-         "files": {"tools/a.txt": "e\n"}},
+         "files": {f"{PFX}a.txt": "e\n"}},
     ], repo=nt["repo"])
     pushes = (render_push_lines(15, more[1], wt=FX_WT_PRIMARY, pid=5151)
               + render_push_lines(10, nt["base"], wt=FX_WT_PRIMARY, pid=6262))
@@ -3990,7 +4049,7 @@ def test_model_ac23_window_bound():
         {"t": derive_minute(3), "subject": f"records({FX_SLUG}): preflight", "files": {rm: st}},
         {"t": derive_minute(6), "subject": f"records({FX_SLUG}): phase BUILDING",
          "files": {rm: set_runstate_fact(st, "phase", "BUILDING")}},
-        {"t": derive_minute(8), "subject": f"feat: {FX_UNIT1} — the work", "files": {"tools/a.txt": "1\n"}},
+        {"t": derive_minute(8), "subject": f"feat: {FX_UNIT1} — the work", "files": {f"{PFX}a.txt": "1\n"}},
         {"t": derive_minute(12), "subject": f"records({FX_SLUG}): --landed",
          "files": {rm: set_runstate_fact(st, "phase", "LANDED")}},
     ], repo=first)
@@ -4179,7 +4238,7 @@ def build_spec_mark_fixture(mark_minute, baseline=False):
     commits = [
         {"t": derive_minute(2), "subject": f"records({FX_SLUG}): preflight", "files": {rm: st}},
         {"t": derive_minute(7), "subject": f"feat({FX_SLUG}): {FX_UNIT1} — the work",
-         "files": {rm: s3, "tools/a.txt": "b\n"}},
+         "files": {rm: s3, f"{PFX}a.txt": "b\n"}},
         {"t": derive_minute(22), "subject": f"records({FX_SLUG}): close OK, phase LANDING",
          "files": {rm: s4}},
         {"t": derive_minute(28), "subject": f"records({FX_SLUG}): --landed", "files": {rm: s5}},
@@ -4261,11 +4320,13 @@ def test_zz_model_window_invariant():
 
 def test_model_driver_sets():
     """S4: the model's copies of the driver's parked-kind and owed sets, held to the driver's source in
-    both directions. The literal below is this withheld arm's one carried path; it runs where the
-    driver is present and announces its skip where it is not."""
-    top = pathlib.Path(run_git(["rev-parse", "--show-toplevel"], HERE).stdout.strip() or ".")
-    src = top / "tools/unattended/unattended.sh"
-    if not src.is_file():
+    both directions. The driver is found through the sibling-kit resolver (TOOL-aRepatriatedFork-46);
+    the arm runs where the driver is present and announces its skip where it is not."""
+    try:
+        src = resolve_kit_dir("unattended", "unattended.sh", HERE) / "unattended.sh"
+    except LookupError:
+        src = None
+    if src is None or not src.is_file():
         print("  SKIP model driver sets: the unattended driver is not beside this kit, so its sets "
               "cannot be compared here")
         return
@@ -4473,23 +4534,23 @@ def build_record_rotation(mr="memory"):
     first, s0 = build_history([{"t": derive_minute(0), "subject": "base", "files": files}])
     base = s0[1]
     pre1 = build_preflight_state(FX_SLUG, base, base)
-    run1 = add_runstate_row(pre1, derive_minute(6), "dispatch", f"{base[:8]} {FX_UNIT1}", "tools/a.txt")
+    run1 = add_runstate_row(pre1, derive_minute(6), "dispatch", f"{base[:8]} {FX_UNIT1}", f"{PFX}a.txt")
     aborted = add_runstate_row(set_runstate_fact(set_runstate_fact(run1, "phase", "ABORTED"), "witness", base),
                                derive_minute(15), "abort", "the fixture stops", "code 3")
     arch = f"{bd}/{derive_archive_name(aborted)}"
     pre2 = build_preflight_state(FX_SLUG, base, base, kid="k0000002")
-    run2 = add_runstate_row(pre2, derive_minute(22), "dispatch", f"{base[:8]} {FX_UNIT2}", "tools/a.txt")
+    run2 = add_runstate_row(pre2, derive_minute(22), "dispatch", f"{base[:8]} {FX_UNIT2}", f"{PFX}a.txt")
     repo, shas = build_history([
         {"t": derive_minute(5), "subject": f"records({FX_SLUG}): preflight", "files": {rm: pre1}},
         {"t": derive_minute(7), "subject": f"records({FX_SLUG}): the dispatch", "files": {rm: run1}},
         {"t": derive_minute(10), "subject": f"feat({FX_SLUG}): {FX_UNIT1} — run one's work",
-         "files": {"tools/a.txt": "1\n"}},
+         "files": {f"{PFX}a.txt": "1\n"}},
         {"t": derive_minute(15), "subject": f"records({FX_SLUG}): --abort", "files": {rm: aborted}},
         {"t": derive_minute(20), "subject": f"records({FX_SLUG}): preflight, the finished record retired",
          "files": {arch: aborted, rm: pre2}},
         {"t": derive_minute(23), "subject": f"records({FX_SLUG}): the dispatch", "files": {rm: run2}},
         {"t": derive_minute(25), "subject": f"feat({FX_SLUG}): {FX_UNIT2} — run two's work",
-         "files": {"tools/a.txt": "2\n"}},
+         "files": {f"{PFX}a.txt": "2\n"}},
         {"t": derive_minute(30), "subject": f"records({FX_SLUG}): phase BUILDING",
          "files": {rm: set_runstate_fact(run2, "phase", "BUILDING")}},
     ], repo=first)
@@ -4576,14 +4637,14 @@ def test_record_ac2_serves():
     base = s0[1]
     st = build_preflight_state(FX_SLUG, base, base)
     for m, uid in ((3, units[1]), (4, units[2]), (5, units[4]), (6, f"X-{FX_SLUG}-9")):
-        st = add_runstate_row(st, derive_minute(m), "dispatch", f"{base[:8]} {uid}", "tools/a.txt")
+        st = add_runstate_row(st, derive_minute(m), "dispatch", f"{base[:8]} {uid}", f"{PFX}a.txt")
     ub = build_preflight_state("xUnboundRun", base, base)
-    ub = add_runstate_row(ub, derive_minute(4), "dispatch", f"{base[:8]} X-xUnboundRun-9", "tools/a.txt")
+    ub = add_runstate_row(ub, derive_minute(4), "dispatch", f"{base[:8]} X-xUnboundRun-9", f"{PFX}a.txt")
     repo, shas = build_history([
         {"t": derive_minute(2), "subject": f"records({FX_SLUG}): preflight", "files": {rm: st}},
         {"t": derive_minute(3), "subject": "records(xUnboundRun): preflight",
          "files": {"memory/builds/xUnboundRun/RUN.md": ub}},
-        {"t": derive_minute(8), "subject": f"feat({FX_SLUG}): {units[1]} — work", "files": {"tools/a.txt": "1\n"}},
+        {"t": derive_minute(8), "subject": f"feat({FX_SLUG}): {units[1]} — work", "files": {f"{PFX}a.txt": "1\n"}},
     ], repo=first)
     model = build_model(repo)
     check("record AC2: the run serves the dispatched units a spec defines, and not the undefined one",
@@ -4600,7 +4661,7 @@ def test_record_ac2_serves():
     closed = {f"{bd}/spec/2026-09-13-spec-{uid}.md": build_spec_text(uid, "a unit", status="CLOSED")
               for uid in (units[0], units[3])}
     repo2, _ = build_history([{"t": derive_minute(9), "subject": f"feat({FX_SLUG}): {units[0]} — closed here",
-                               "files": dict(closed, **{"tools/a.txt": "2\n"})}], repo=repo)
+                               "files": dict(closed, **{f"{PFX}a.txt": "2\n"})}], repo=repo)
     model2 = build_model(repo2)
     check("record AC2: a unit closed and named by the run's own commit is served; one closed elsewhere is not",
           rl_record.render_serves(rl_record.derive_serves(model2)), f"X-{FX_SLUG}-1..3 X-{FX_SLUG}-5")
@@ -6647,7 +6708,7 @@ def build_source_fixture():
         {"t": derive_minute(2), "subject": f"records({FX_SLUG}): preflight",
          "files": {rm: build_preflight_state(FX_SLUG, base, base)}},
         {"t": derive_minute(26), "subject": f"feat({FX_SLUG}): {FX_UNIT1} — after the owner's turn",
-         "files": {"tools/a.txt": "1\n"}},
+         "files": {f"{PFX}a.txt": "1\n"}},
     ], repo=first)
     driver = (render_driver_lines(1, "--preflight", phase_to="RUNNING")
               + render_driver_lines(4, "--dispatch", phase_from="RUNNING", phase_to="RUNNING", unit=FX_UNIT1)
@@ -6683,11 +6744,11 @@ def build_discovered_fixture():
     first, s0 = build_history([{"t": derive_minute(0), "subject": "base", "files": build_base_files()}])
     base = s0[1]
     st = add_runstate_row(build_preflight_state(FX_SLUG, base, base), derive_minute(1.5), "dispatch",
-                          f"{base[:8]} {FX_UNIT1}", "tools/a.txt")
+                          f"{base[:8]} {FX_UNIT1}", f"{PFX}a.txt")
     repo, _ = build_history([
         {"t": derive_minute(2), "subject": f"records({FX_SLUG}): preflight and the dispatch", "files": {rm: st}},
         {"t": derive_minute(20), "subject": f"feat({FX_SLUG}): {FX_UNIT1} — the work",
-         "files": {"tools/a.txt": "1\n"}},
+         "files": {f"{PFX}a.txt": "1\n"}},
         {"t": derive_minute(30), "subject": f"records({FX_SLUG}): phase BUILDING",
          "files": {rm: set_runstate_fact(st, "phase", "BUILDING")}},
     ], repo=first)
@@ -7048,10 +7109,10 @@ def test_record_placement_windows():
         lag[name] = {k: facts[k] for k in PLACEMENT_LAG}
         # AC3: a commit of one other path, naming no unit, is no record commit at all.
         repo = st["fx"]["repo"]
-        (repo / "tools" / "a.txt").write_bytes(b"later\n")
+        (repo / PFX / "a.txt").write_bytes(b"later\n")
         add_fixture_commit(repo, derive_minute(40),
                            f"chore({FX_SLUG}): a later commit of one other path, naming no unit",
-                           ["tools/a.txt"])
+                           [f"{PFX}a.txt"])
         after = render_state(build_model(repo, journals=st["journals"]), st["journals"])
         check("record AC3: a later commit of another path moves none of the three lagging facts on "
               f"the {name} placement", {k: after[k] for k in PLACEMENT_LAG}, lag[name])
@@ -7063,10 +7124,10 @@ def test_record_placement_windows():
     # window reads no commit but the run's start and its record commits, so nothing of it can move.
     st = models["landed"]
     repo = st["fx"]["repo"]
-    (repo / "tools" / "a.txt").write_bytes(b"later still\n")
+    (repo / PFX / "a.txt").write_bytes(b"later still\n")
     add_fixture_commit(repo, derive_minute(45),
                        f"feat({FX_SLUG}): {FX_UNIT1} — a commit naming a unit past the terminal write",
-                       ["tools/a.txt"])
+                       [f"{PFX}a.txt"])
     after = render_state(build_model(repo, journals=st["journals"]), st["journals"])
     check("record AC3: a later commit naming a unit id on the default branch moves none of the three "
           "on the landed placement", {k: after[k] for k in PLACEMENT_LAG}, lag["landed"])
@@ -8237,6 +8298,12 @@ def test_skill_ac1_adopter():
     check("skill AC1: --scaffold exits 0 in a tree with the kit under a prefix no real layout uses",
           (fx["rc"], SKILL_REL in fx["out"]), (0, True))
     rendered = fx["text"]
+    # THE HEAD THE ADOPTER'S LINT REFUSES, read from the adopter rather than from this install: it is
+    # the published source layout's, a fact about where the template was authored, so it does not move
+    # with the prefix this suite runs at (TOOL-aRepatriatedFork-28, gate repair at VERIFYING).
+    _lint = re.search(r"\(([A-Za-z0-9_.-]+)\|memory\)/", (kit / "adopt-runlog.sh").read_text(encoding="utf-8"))
+    check("skill AC1: the adopter's template lint declares the source head it refuses", bool(_lint), True)
+    head = (_lint.group(1) if _lint else "") + "/"
     check("skill AC1: the rendered Skill is byte-identical to the template rendered here by plain "
           "replacement, a second operand the adopter does not produce",
           rendered, render_skill_copy(template.read_bytes().decode("utf-8"), SKILL_KIT_REL, SKILL_ROOT))
@@ -8244,13 +8311,13 @@ def test_skill_ac1_adopter():
           "rendered memory root",
           (f"python {SKILL_KIT_REL}/runlog.py model" in rendered,
            f"{SKILL_ROOT}/builds/<slug>/build/" in rendered), (True, True))
-    leftover = r"\{\{|\}\}|(?<![A-Za-z0-9_.-])(?:tools|memory)/"
-    check("skill AC1: no double brace survives the render, and no tools/ or memory/ segment, which "
+    leftover = r"\{\{|\}\}|(?<![A-Za-z0-9_.-])(?:" + re.escape(head[:-1]) + r"|memory)/"
+    check(f"skill AC1: no double brace survives the render, and no {head} or memory/ segment, which "
           "this tree spells nowhere, so either would have come from the template",
           re.findall(leftover, rendered), [])
     check("skill AC1: ...and that search finds each shape when one is planted, so its empty answer "
-          "above is a reading", re.findall(leftover, rendered + "see tools/a, memory/b, {{C}}\n"),
-          ["tools/", "memory/", "{{", "}}"])
+          "above is a reading", re.findall(leftover, rendered + f"see {head}a, memory/b, {{{{C}}}}\n"),
+          [f"{head}", "memory/", "{{", "}}"])
     rc, out = run_adopter(base, kit, "--check")
     check("skill AC1: --check exits 0 over the fresh render", (rc, "fresh render" in out), (0, True))
     if not skill.is_file():
@@ -8291,11 +8358,11 @@ def test_skill_ac1_adopter():
     run_staged("a CRLF working copy of an untouched Skill is not drift", 0, "fresh render",
                skill_text=rendered.replace("\n", "\r\n"))
     run_staged("an unrendered Skill reds --check and names the scaffold", 1, "--scaffold", drop=skill)
-    got = run_staged("a template spelling a literal tools/ path reds --check, naming the line", 1,
-                     "literal tools/ or memory/", template_text=tpl + "Run python tools/x-kit/cli.py.\n")
+    got = run_staged(f"a template spelling a literal {head} path reds --check, naming the line", 1,
+                     f"literal {head} or memory/", template_text=tpl + f"Run python {head}x-kit/cli.py.\n")
     check("skill AC1: ...and the refusal quotes the line it found",
-          f"{tpl.count(chr(10)) + 1}:Run python tools/x-kit/cli.py." in got, True)
-    run_staged("a template spelling a literal memory/ path reds --check", 1, "literal tools/ or memory/",
+          f"{tpl.count(chr(10)) + 1}:Run python {head}x-kit/cli.py." in got, True)
+    run_staged("a template spelling a literal memory/ path reds --check", 1, f"literal {head} or memory/",
                template_text=tpl + "The record is under memory/builds/x/build/.\n")
     run_staged("near miss: `.memory/`, `in-memory/` and `xtools/` are not literal segments, so "
                "--scaffold renders", 0, "rendered",
@@ -8512,6 +8579,11 @@ def main():
                       [s[:80] for s in EMITTED if DECOY["sid"] in s], [])
                 check(f"decoy: no file {name} left in its own scratch is named for or holds the "
                       "decoy's session", scan_named(SCRATCH[made_before:], DECOY["sid"]), [])
+                # FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+                if os.environ.get("FOREIGN_PREFIX_PROBE") == "1":
+                    print("foreign-prefix-probe: stopped after 1 arm")
+                    print("FAIL (1 assertions)" if FAIL else "PASS (1 assertions)")
+                    return 1 if FAIL else 0
     finally:
         for d in SCRATCH:
             shutil.rmtree(d, ignore_errors=True)

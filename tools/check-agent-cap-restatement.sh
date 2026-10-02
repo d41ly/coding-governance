@@ -6,7 +6,7 @@
 # executable first one, and this repo has ruled on that shape before: a kit version written in prose
 # rots between bumps. The digit is what rots; the pointer is what does not.
 #
-#   bash tools/check-agent-cap-restatement.sh [<waiver-registry>]
+#   bash <prefix>/check-agent-cap-restatement.sh [<waiver-registry>]
 #
 # The registry is a POSITIONAL, never an environment read. An env-settable registry path is a gate
 # neutralised with no diff and no committed evidence -- the exact channel this build RETIRED one
@@ -31,7 +31,7 @@
 #     timeout and byte budget in the corpus. These are found by a reader, not by this program; the
 #     ones the closing review found were fixed at the source rather than pattern-matched.
 #   * EXECUTABLE FILES ARE OUT OF SCOPE. A bound stated in a comment inside a harness is not seen.
-#     Also observed: `tools/workflows/tier2-review.js` says `<=5 concurrent` on one line and
+#     Also observed: `<prefix>/workflows/tier2-review.js` says `<=5 concurrent` on one line and
 #     `ONE <=6-wide wave` on another while its code fans at 5, and this gate cannot arbitrate that.
 #     Filed as TOOL-aDeclaredBound-6 and CLOSED by TOOL-dTieredTribunal-11, which deleted the
 #     DISAGREEING carrier - the `ONE <=6-wide wave` comment - and nothing else. `<=5` still stands in
@@ -41,7 +41,7 @@
 #     and this gate reads markdown only, so nothing would be watching. The example is kept because it
 #     is the clearest statement of what this gate cannot do, and its `<=6` half is dead. Widening to source is what took the false-positive rate to
 #     64% when it was measured, which is why the scope stops at markdown. The one carrier this cost
-#     the build was a REMEDY STRING inside `tools/hooks/agent-cap.js`; it was fixed by reading, and
+#     the build was a REMEDY STRING inside `<prefix>/hooks/agent-cap.js`; it was fixed by reading, and
 #     it is the standing argument for widening the population when someone has the budget.
 #
 # A BOUND WORD must be adjacent to the number. That is what separates an ASSERTION from a

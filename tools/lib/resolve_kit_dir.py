@@ -1,7 +1,7 @@
 """resolve_kit_dir — where a SIBLING kit sits in this install (TOOL-aRepatriatedFork-2 S3).
 
-The canonical copy. `tools/lib/` is gov-internal and ships nothing, so every consumer carries the
-block below INLINE, byte-identical, and `tools/lib/resolve-python.test.sh`'s parity table reds a copy
+The canonical copy. `<prefix>/lib/` is gov-internal and ships nothing, so every consumer carries the
+block below INLINE, byte-identical, and `<prefix>/lib/resolve-python.test.sh`'s parity table reds a copy
 that drifts. A Python consumer carries it at module level; a shell consumer carries it inside a
 quoted heredoc and runs it with the python it already resolved.
 
@@ -23,7 +23,7 @@ def resolve_kit_dir(home, anchor, here):
     """
     import json
     import pathlib
-    here = pathlib.Path(here).resolve()
+    here = pathlib.Path(here).absolute()  # never resolve(): a junction must not move it
     root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
     receipt = root / ".governance" / "install.json"
     try:
@@ -35,8 +35,8 @@ def resolve_kit_dir(home, anchor, here):
             continue
         if str(row.get("source") or "").split("/")[-2:] != [home, anchor]:
             continue
-        hit = (root / str(row["path"])).resolve()
-        if hit.is_file() and root in hit.parents:
+        hit = (root / str(row["path"])).absolute()
+        if hit.is_file() and root in hit.parents and ".." not in hit.parts:
             return hit.parent
     probes = (here / home, here.parent / home)
     for cand in probes:

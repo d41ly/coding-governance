@@ -3,7 +3,7 @@
 # `gen_build_index.py --bump`, which never touches build-readme-slot-limits.txt.
 #
 # Breaching a high-water PRINTS and does NOT change the exit code. Breaching the CEILING in the other
-# file fails the bar. Both halves are copied from `tools/check-template-size.sh`, which is a hard
+# file fails the bar. Both halves are copied from `<prefix>/check-template-size.sh`, which is a hard
 # declared ceiling PLUS an advisory ratchet — not, as a research pass in this build first reported, a
 # warn-only gate.
 #

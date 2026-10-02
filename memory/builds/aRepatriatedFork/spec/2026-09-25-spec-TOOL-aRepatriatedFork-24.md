@@ -1,12 +1,18 @@
 # TOOL-aRepatriatedFork-24 — no line that executes strands an adopter at another prefix
 
-**Status:** SPECCED · rev-3 · 2026-09-28 · node a · Tier-2 · base 2143b6d6 · streams tooling · order 9
+**Status:** CLOSED · rev-7 · 2026-10-01 · node a · Tier-2 · base 2143b6d6 · streams tooling · order 9
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-25-build-TOOL-aRepatriatedFork-23-prefix-census.md](../build/2026-09-25-build-TOOL-aRepatriatedFork-23-prefix-census.md) | research | TOOL-aRepatriatedFork-23 TOOL-aRepatriatedFork-25 TOOL-aRepatriatedFork-26 TOOL-aRepatriatedFork-27 TOOL-aRepatriatedFork-28 TOOL-aRepatriatedFork-29 TOOL-aRepatriatedFork-30 |
+| [2026-09-29-build-TOOL-aRepatriatedFork-24-1-acceptance-ledger.md](../build/2026-09-29-build-TOOL-aRepatriatedFork-24-1-acceptance-ledger.md) | journal | — |
+| [2026-09-30-build-TOOL-aRepatriatedFork-23-closing-fold-round1.md](../build/2026-09-30-build-TOOL-aRepatriatedFork-23-closing-fold-round1.md) | journal | TOOL-aRepatriatedFork-23 TOOL-aRepatriatedFork-29 TOOL-aRepatriatedFork-30 TOOL-aRepatriatedFork-46 |
+| [2026-10-01-build-TOOL-aRepatriatedFork-23-verifying-repair.md](../build/2026-10-01-build-TOOL-aRepatriatedFork-23-verifying-repair.md) | journal | TOOL-aRepatriatedFork-23 TOOL-aRepatriatedFork-2 TOOL-aRepatriatedFork-26 TOOL-aRepatriatedFork-28 TOOL-aRepatriatedFork-29 TOOL-aRepatriatedFork-30 TOOL-aRepatriatedFork-46 |
+| [2026-09-29-prompt-TOOL-aRepatriatedFork-24-build-brief.md](../prompts/2026-09-29-prompt-TOOL-aRepatriatedFork-24-build-brief.md) | journal | — |
+| [2026-09-30-review-TOOL-aRepatriatedFork-23-closing-diff-round1.md](../reviews/2026-09-30-review-TOOL-aRepatriatedFork-23-closing-diff-round1.md) | diff-review | TOOL-aRepatriatedFork-23 TOOL-aRepatriatedFork-25 TOOL-aRepatriatedFork-26 TOOL-aRepatriatedFork-27 TOOL-aRepatriatedFork-28 TOOL-aRepatriatedFork-29 TOOL-aRepatriatedFork-30 TOOL-aRepatriatedFork-44 TOOL-aRepatriatedFork-45 TOOL-aRepatriatedFork-46 TOOL-aRepatriatedFork-47 |
+| [2026-09-30-review-TOOL-aRepatriatedFork-23-closing-diff-round2.md](../reviews/2026-09-30-review-TOOL-aRepatriatedFork-23-closing-diff-round2.md) | diff-review | TOOL-aRepatriatedFork-23 TOOL-aRepatriatedFork-29 TOOL-aRepatriatedFork-30 TOOL-aRepatriatedFork-46 |
 
 <!-- /gen:spec-records -->
 
@@ -25,16 +31,57 @@ stamped at adopt time; none keeps a `tools`, `scripts` or root candidate list.
   the target's receipt, then `resolve_kit_dir`'s rung, then a `GOV_KITROOT` declared in
   `.githooks/gate-env.sh`. Their fixed candidate lists go, `scripts/manifest-check.sh` included.
   An underivable root is handled as §8 F1 resolves. Observed by AC1, AC2.
+  - **S1a (rev-3)** — The ladder is one function, `kit_gate <kit dir> <file> [home]`. Rung 1 is the
+    receipt row whose `source` ends in `<kit>/<file>`, the join `check-wiring.sh` already makes.
+    Rung 2 is `resolve_kit_dir`'s probe taken from the repo root: `<home>/<file>`, then
+    `<kit>/<file>` for a root install. `home` defaults to the kit dir. The kickoff leg names its
+    source home `skills/session-kickoff`, the rung `check-wiring.sh`'s card arm already takes,
+    because gov keeps no receipt and homes that kit outside any tool root. Rung 3 is
+    `<GOV_KITROOT>/<kit>/<file>`. `pre-commit` PARSES the one assignment out of `gate-env.sh`
+    rather than sourcing the file, since it does not vet that file the way `pre-push` does. Gov
+    declares `GOV_KITROOT=tools` there.
+  - **S1b (rev-3)** — The F1 skip is announced when the leg's own trigger holds: a staged
+    `memory/` path for hygiene, the staged template for template size. The kickoff leg has no
+    trigger in the hook, since its gate decides for itself, so its skip is announced on every
+    miss.
 - **S2** — `.githooks/pre-push:367-368` sets `GOV_KITROOT` from the same ladder. The `tools` default
   and the `scripts` fallback go, and so does the marker whose reason promised a derivation the code
   never did (census §5). Observed by AC3.
+  - **S2a (rev-3)** — The ladder runs AFTER `gate-env.sh` is sourced, with any inherited
+    `GOV_KITROOT` unset first, so only the vetted file can declare it. Rung 1 takes the receipt row
+    for the runner and uses its grandparent. Rung 2 finds a root install by the leg manifest or the
+    runner directory at the root. Every `$GOV_KITROOT/` join becomes `${KP}`, so a root install
+    resolves too.
+  - **S2b (rev-3)** — F1's refusal fires where a miss strands: the DEFAULT bar on a
+    default-branch push. It is `bar-refused`, and it comes after the bar class is recorded as
+    `default`. A declared `GOV_GATE_CMD` does not need the kit root to find its bar. A leg manifest
+    tracked where the ladder does not reach keeps the existing manifest refusal, which now also
+    covers a miss. The hook's own fixtures that lay kits at `scripts/` declare that root in a
+    committed `gate-env.sh`, and the one that tracks a manifest at `tools/` moves it to the root.
+  - **S2c (rev-4)** — The closing review's B1. The receipt rung made the default bar whatever
+    runner an untracked or modified `.governance/install.json` named, and nothing vetted that
+    runner either. On a default-branch push the hook now vets the receipt with the predicate it
+    already applies to `gate-env.sh`: tracked at the pushed sha, working copy hashing to that
+    blob. The default bar's resolved runner takes the same predicate. One function carries it for
+    all three files, and a failure is `bar-refused` before any forcing predicate reads the kit
+    root. A row under `.git/` names a path git cannot track, so it falls to the same refusal.
 - **S3** — `adopt-unattended.sh` stamps `LANDER`, `GATE_CMD`, `WIRING_CHECK` and
   `GENERATED_INDEXES` in the seeded `.unattended.conf` with the adopt-time kit root. This is the
   `MAP_DIFF_CMD` mechanism `adopt-codebase-map.sh:116-131` already uses. The example's four values
   become the tokens that stamping replaces. Observed by AC4.
+  - **S3a (rev-3)** — The tokens are `{{TOOL_ROOT}}` in `LANDER`, `GATE_CMD` and `WIRING_CHECK`,
+    and `{{MEMORY_TREE_DIR}}` for the generator in `GENERATED_INDEXES`. The adopter already probes
+    that directory, because an adopter may install the memory-tree kit flat in its tool root. The
+    adopter stamps a conf the operator copied that still carries a token, in render mode, and reads
+    the result back. `--check` refuses a conf that still carries one. It does not seed an absent
+    conf: that would change the `no-project-layer` outcome the descriptor declares, and the
+    example's own header already says to copy it.
 - **S4** — `unattended.sh`'s condition-3 overlap key compares a `GENERATED_INDEXES` generator by the
   path it resolves to, so a seeded value from an earlier adopt still keys, as §8 F2 resolves.
   Observed by AC5.
+  - **S4a (rev-3)** — A generator keys by BOTH its declared spelling and, when that names no file,
+    the one tracked file whose path ends in the declared `<dir>/<file>`. Keeping the declared key
+    means no refusal that fires today can stop firing.
 - **S5** — The three received suites that name their gate as `$ROOT/tools/…`
   (`check-microformats.test.sh:11`, `check-placeholders.test.sh:14`) or probe the memory-tree
   README at two fixed prefixes (`check-wiring.test.sh:823`) derive the path from `$HERE`.
@@ -46,10 +93,28 @@ stamped at adopt time; none keeps a `tools`, `scripts` or root candidate list.
 - **S7** — govkit's `foreign_kit_present` (`tools/govkit/govkit.py:5415`) probes the intake's own
   prefix instead of the pair `("tools", "")`. The `sentinel =` lines it reads become kit-relative:
   two kit descriptors and five `tools/govkit/entries/` descriptors. Observed by AC8.
+  - **S7b (rev-4)** — The closing review's M5. S7a dropped the old pair's `tools` probe, so a
+    hand-copied kit at gov's canonical prefix was not detected under an intake that declares
+    another prefix, and `apply` installed a second copy. The probe takes the union: the target's own
+    ctx, gov's canonical ctx from `canonical_ctx`, and the root.
+  - **S7a (rev-3)** — Each entry is probed at its own `target_context`: the intake's prefix, with
+    any per-entry override, and then at the root, which the old pair also covered. A `sentinel` is
+    relative to the entry's home, meaning the kit dir, or the prefix for a flat entry.
 - **S8** — The literal fallback rungs after a derived rung, at `tools/check-wiring.sh:496, 547, 770,
   780` and `skills/session-kickoff/manifest-check.sh:426`, give way to an announced skip when the
   derived rung misses. Their four waiver rows are struck in the same commit, because a stale row
   reds the arm. Observed by AC9.
+  - **S8a (rev-3)** — `manifest-check.sh`'s rung becomes the one tracked `corpus_ids.py`. No probe
+    reaches gov's copy: gov homes the checker under `skills/`, homes the reader under its tool root
+    and keeps no receipt. A miss is the checker's existing "id citations unchecked" note.
+    `check-wiring.test.sh` lays its recall fixture at the checker's own prefix. AC12 derives the
+    root-layout command from a copy of the checker installed at the root, because the mixed layout
+    the bare rungs served is now a named skip. The `.githooks/pre-commit:48` waiver row goes too,
+    since S1 removes its literal, so five rows go and not four.
+  **Readers:** by name: `check-install-prefix.sh` is the one reader of the waiver rows, and
+  `check-wiring.test.sh`'s recall arm and its AC12 are the only fixtures laid in the mixed layout
+  the bare rungs served. by value: NO VALUE READERS — a waiver row and a probe rung carry no value
+  another program consumes; the checker's own skip line is the only output that moves.
 - **S9** — The ledger rows for these files are lowered by `--write-ratchet`, and every kit moved
   takes its version bump in every carrier. Observed by AC10.
 
@@ -71,6 +136,8 @@ stamped at adopt time; none keeps a `tools`, `scripts` or root candidate list.
 - **hands-off** `TOOL-aRepatriatedFork-28` — the remaining fixture literals in the two test files
   S5 and S6 edit.
 - **hands-off** `TOOL-aRepatriatedFork-30` — a waiver registry four rows shorter.
+- **hands-off** `TOOL-aRepatriatedFork-49` — the default bar's remaining selection inputs: the leg
+  manifest its vetted runner reads, and the environment knobs that choose that manifest and its python.
 
 ## 4. Design
 
@@ -113,7 +180,10 @@ file, and every other literal in those files is its class owner's. The rule is w
 `tools/check-placeholders.test.sh` · `tools/check-wiring.test.sh` · `tools/check-wiring.sh` ·
 `tools/codebase-map/selftest.py` · `tools/govkit/govkit.py` · `tools/govkit/selftest.py` ·
 `skills/session-kickoff/manifest-check.sh` · `tools/install-prefix-waivers.txt` ·
-`tools/install-prefix-carried.txt` · the seven descriptors carrying a `sentinel =` line
+`tools/install-prefix-carried.txt` · the seven descriptors carrying a `sentinel =` line ·
+rev-3 adds `.githooks/pre-commit.test.sh` · `.githooks/pre-push.test.sh` ·
+`.githooks/pre_push_bar_selftest.py` · `tools/unattended/unattended.test.sh` ·
+`tools/unattended/adopt-unattended.test.sh`
 
 ### Alternatives rejected
 
@@ -174,6 +244,17 @@ file, and every other literal in those files is its class owner's. The rule is w
 - **AC10** — `bash tools/check-kit-versions.sh` exits 0, and `python tools/govkit/govkit.py epoch
   --base 2143b6d6` names no kit this unit moved.
   Red when: a moved kit's carrier was missed.
+- **AC11** — rev-4. In `.githooks/pre-push.test.sh`, a fixture whose tracked root runner exits 1
+  pushes the default bar three ways: with an ignored `.governance/install.json` naming a runner
+  under `.git/` beside a planted manifest, with that receipt tracked, and with a tracked receipt
+  naming the tracked runner and then modified. The first two and the last are refused as
+  `bar-refused` before the planted runner runs. The third reaches the tracked runner and is
+  refused as `gate-red`.
+  Red when: any push lands, or the planted runner prints. The `7de665e5` hook lands the first two.
+- **AC12** — rev-4. A `tools/govkit/selftest.py` arm runs `apply` against a target whose
+  `deploy.toml` declares `prefix = "scripts"` and which carries a foreign kit at gov's canonical
+  prefix. `foreign_kit_present` names it and `apply` refuses before writing a receipt.
+  Red when: the apply exits 0, which is the `7de665e5` behaviour.
 
 ## 7. Gates
 
@@ -183,6 +264,16 @@ New arm: `.githooks/pre-commit.test.sh` · a `vendor/gov/` fixture whose staged 
 `2143b6d6` hook skips · none
 
 New arm: `tools/govkit/selftest.py` · a foreign kit at `scripts/` the old probe misses · none
+
+New arm: `.githooks/pre-push.test.sh` · a `vendor/gov/` fixture whose default bar names the runner at that prefix, and refuses it modified · none
+
+New arm: `tools/unattended/unattended.test.sh` · a `GENERATED_INDEXES` generator spelled at a prefix the fixture does not have, still refusing its pairing · none
+
+New arm: `tools/unattended/adopt-unattended.test.sh` · a copied example conf stamped at the adopter's own tool root, and `--check` refusing an unstamped one · none
+
+New arm: `.githooks/pre-push.test.sh` · rev-4: an ignored receipt, a tracked receipt naming an untracked runner, and a modified receipt, each refused as bar-refused, beside a tracked-receipt control · none
+
+New arm: `tools/govkit/selftest.py` · rev-4: a foreign kit at gov's canonical prefix under a `scripts` intake · none
 
 ## 8. Open questions
 
@@ -206,9 +297,29 @@ New arm: `tools/govkit/selftest.py` · a foreign kit at `scripts/` the old probe
   prefixes are found and drained before `TOOL-aRepatriatedFork-18`'s held leg, and every one is
   drained. This unit takes the stranding sites first, as census §6 recommends.
 - rev-2 · 2026-09-25 · §8 resolved by the owner: every fork takes its recommendation.
-- rev-3 · 2026-09-28 · §7 · the merge of `dDerivedDocket` brings the legs `transition-audit arms`
-  and `straggler-guard arms`, whose guards name `tools/check-wiring.sh`, a path §4 touches; the leg line names
-  both. Nothing else moved.
+- rev-3 · 2026-09-29 · the unit pass, before code. Reading the code showed that several rev-2 lines
+  would break gov or its own suites, so each got a sub-item. S1a: the kickoff leg keeps its source
+  home as rung 2, because gov keeps no receipt. S2a/S2b: `pre-push` resolves after the vetted
+  `gate-env.sh`, and refuses only where the default bar is stranded, so a declared bar and the
+  hook's fixtures still reach their verdicts. S3a: the generator token is `{{MEMORY_TREE_DIR}}`,
+  because the memory-tree kit may sit flat, and the adopter stamps a copied conf rather than seeding
+  one. S4a: both keys are kept. S7a: the probe is per entry. S8a: the manifest checker gets a
+  tracked-reader rung, and a fifth waiver row goes. Five suites join the files touched.
+- rev-4 · 2026-09-30 · closing review round 1 fold: B1 — the default bar follows only a receipt
+  and a runner the repository tracks unmodified, vetted as `gate-env.sh` is (S2c, AC11).
+  closing review round 1 fold: M5 — the foreign-kit probe keeps gov's canonical prefix beside the
+  target's own and the root (S7b, AC12).
+- rev-5 · 2026-09-30 · §3 · closing review round 2: H1 is promoted to `TOOL-aRepatriatedFork-49`,
+  and §3 gains the hands-off edge that unit consumes. No scope or criterion of this unit moves.
+- rev-6 · 2026-10-01 · gate repair at VERIFYING, leg `placeholder-catalogue self-test`. S5 found the
+  gate beside its suite and dropped `ROOT` with the gate's prefix, but the survival arm reads the
+  charter template at the REPO root, which no install prefix moves. Under `set -u` the suite died on
+  an unbound variable before its first verdict. `ROOT` is restored for that one read; no criterion
+  moves.
+- rev-7 · 2026-10-01 · §7 · the reconcile with origin/main carries dDerivedDocket's own rev-3 of
+  this spec (2026-09-28): its merge brought the legs `transition-audit arms` and `straggler-guard
+  arms`, whose guards name the check-wiring gate, a path §4 touches; the leg line names both.
+  Nothing else moved.
 
 ## 10. Reuse audit
 

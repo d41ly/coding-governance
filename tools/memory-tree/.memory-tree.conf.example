@@ -392,5 +392,5 @@ BACKLOG_EXCERPT_CHARS=""
 # anything a filer wrote. That is stated rather than prevented — a tree may legitimately declare
 # one — so declare the SCRIPT, not the interpreter, unless you mean it.
 #
-#   PROBE_ALLOW="python3 tools/check-one-thing.py|git --version"
+#   PROBE_ALLOW="python3 <prefix>/check-one-thing.py|git --version"
 PROBE_ALLOW=""

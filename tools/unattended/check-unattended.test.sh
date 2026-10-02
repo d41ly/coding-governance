@@ -3,7 +3,7 @@
 # own failure text, and every RED arm paired with a GREEN control. Silence proves nothing on its
 # own: a check that was never reached is silent for the same reason a passing one is.
 #
-#   bash tools/unattended/check-unattended.test.sh    # "PASS (…assertions)" + exit 0 = good
+#   bash <prefix>/unattended/check-unattended.test.sh    # "PASS (…assertions)" + exit 0 = good
 #
 # ONE scratch repo, rebuilt to a pristine state between arms. The kit is COPIED in rather than run
 # from the source tree, because the leg resolves its own install prefix and the parity arm depends
@@ -36,7 +36,7 @@ KIT_REL=$(derive_self_rel "$HERE") || { echo "FAIL this suite is not inside a gi
 
 # ---- THE SHARD CONTRACT — ADOPTED, not reinvented (TOOL-aShardedFloor-3) -------------------------
 # The contract is TOOL-aShardedFloor-2's and its reasoning lives in the head of
-# tools/unattended/unattended.test.sh: one file and guarded contiguous regions rather than a
+# <prefix>/unattended/unattended.test.sh: one file and guarded contiguous regions rather than a
 # physical split (which `check-arms.py`'s one-gate-one-sibling map and the armed-branch pin refuse),
 # the flag PARSED rather than position-read, and the refusal before any scratch dir exists.
 #
@@ -620,6 +620,8 @@ if in_shard 1; then
 # ---- a leg that reds on everything arms every branch and checks nothing.
 out=$(run); rc=$?
 same "a conforming tree exits 0" "$rc" "0"
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${st:-0}" = 0 ] && echo "PASS (${n:-1} assertions)" || echo "FAIL (${n:-1} assertions)"; [ "${st:-0}" = 0 ] && exit 0; exit 1; fi
 same "a conforming tree prints nothing" "$(remove_announcements "$out")" ""
 
 # ---- check 1, all three branches: no conf, a key undeclared, and the driver's core sets unreadable.
@@ -1051,6 +1053,8 @@ if in_shard 2; then
 read_topo 2
 reset_tree; sed -i '/^phase: /d' memory/builds/tRun/RUN.md
 hit "$(run)" "a run-state file declares no phase, and a file with no phase is outside every check keyed on one"
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${st:-0}" = 0 ] && echo "PASS (${n:-1} assertions)" || echo "FAIL (${n:-1} assertions)"; [ "${st:-0}" = 0 ] && exit 0; exit 1; fi
 reset_tree; sed -i 's/^phase: RUNNING$/phase: MARINATING/' memory/builds/tRun/RUN.md
 out=$(run)
 hit "$out" "a run-state file declares a phase outside the effective vocabulary"
@@ -1431,6 +1435,8 @@ printf '\ndrifted line\n' >> memory/guides/UNATTENDED-VERBS.md
 out=$(GOV_UNATTENDED_REPORT=1 run)
 check_emitted "one half of the protocol pair is missing, and a parity check with one file is a check that cannot fail|the shipped verb carrier and this repo's installed copy have drifted, so the kit ships something other than what it runs on" "$out"  # set OBSERVED 2026-09-15 node a, direct run shard 3/8 at 72f54937 (aBatchedArm landing step 0)
 hit "$out" "one half of the protocol pair is missing, and a parity check with one file is a check that cannot fail"
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${st:-0}" = 0 ] && echo "PASS (${n:-1} assertions)" || echo "FAIL (${n:-1} assertions)"; [ "${st:-0}" = 0 ] && exit 0; exit 1; fi
 hit "$out" "the shipped verb carrier and this repo's installed copy have drifted, so the kit ships something other than what it runs on"
 hit "$out" "drifted line"
 reset_tree; rm -f $KIT_REL/VERBS.template.md
@@ -1740,6 +1746,8 @@ reset_tree
 reset_tree
 git update-ref "refs/replace/$(git rev-parse HEAD)" "$(git rev-parse HEAD^)"
 hit "$(run)" "a repo carrying an unattended run-state file also carries replace refs, and a replace ref rewrites what a sha MEANS for every read that is not pinned"
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${st:-0}" = 0 ] && echo "PASS (${n:-1} assertions)" || echo "FAIL (${n:-1} assertions)"; [ "${st:-0}" = 0 ] && exit 0; exit 1; fi
 reset_tree
 miss "$(run)" "also carries replace refs"
 gf="$(git rev-parse --git-common-dir)/info/grafts"
@@ -2218,13 +2226,14 @@ hit "$(GOV_UNATTENDED_REPORT=1 run)" "check 31 skipped for memory/guides/BUILD-M
 # branches S5 then F1 at a FOREIGN PREFIX, which is what says the verdict follows the named path's
 # own `dirname` rather than an install-prefix literal. TOOL_ROOT renders to the empty string at a
 # root install, so a literal would be wrong in an adopter tree in BOTH directions - failing a correct
-# route installed elsewhere, or skipping forever over a broken one. This prefix is not a kit path,
-# so spelling it here carries nothing an adopter would have to repath.
+# route installed elsewhere, or skipping forever over a broken one. The route's kit segment is the
+# derived one above, so the foreign path types no kit name (TOOL-aRepatriatedFork-30 S8).
+_c31_far="vendor/harness/${_c31_dir##*/}/unattended-unit.js"
 reset_tree
-_bm31 vendor/harness/workflows/unattended-unit.js
-hit "$(GOV_UNATTENDED_REPORT=1 run)" "check 31 skipped for vendor/harness/workflows/unattended-unit.js — the directory that would hold it is absent"
-mkdir -p vendor/harness/workflows
-hit "$(run)" "so the route's kit was taken and its route is broken: vendor/harness/workflows/unattended-unit.js"
+_bm31 "$_c31_far"
+hit "$(GOV_UNATTENDED_REPORT=1 run)" "check 31 skipped for $_c31_far — the directory that would hold it is absent"
+mkdir -p "$(dirname "$_c31_far")"
+hit "$(run)" "so the route's kit was taken and its route is broken: $_c31_far"
 
 # branch S1, the registry itself unreadable, so the section holding the route is unnamed. Reached by
 # EMPTYING the driver's core set rather than by `--only 28`: that flag leaves `$core` unset for the
@@ -2492,6 +2501,8 @@ if in_shard 5; then
 read_topo 5
 reset_tree
 same "the shipped protocol's two tables join clean" "$(remove_announcements "$(run)")" ""
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${st:-0}" = 0 ] && echo "PASS (${n:-1} assertions)" || echo "FAIL (${n:-1} assertions)"; [ "${st:-0}" = 0 ] && exit 0; exit 1; fi
 
 # D, driver -> protocol: a core phase the contract never publishes.
 reset_tree; pedit 's/`SPECCING` · //'   # mid-line: VERIFYING ends a line, so it has no trailing space to match
@@ -2782,6 +2793,8 @@ git commit -q --allow-empty -m unit-only --no-verify
 sed -i "s|^base: .*|base: $(git rev-parse HEAD)|" memory/builds/tRun/RUN.md
 git add -A >/dev/null
 hit "$(run)" "a run's recorded BASE is not on the branch the remote calls its default, so it came from the second anchor, while the build README there declares a mode whose discipline is that the folder already existed: mode"
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${st:-0}" = 0 ] && echo "PASS (${n:-1} assertions)" || echo "FAIL (${n:-1} assertions)"; [ "${st:-0}" = 0 ] && exit 0; exit 1; fi
 
 # ---- ...and the ADMITTED direction, which is the only thing separating this check from one that
 # ---- reds every branch-anchored run. Same base, same anchor, one declared mode different.
@@ -3042,6 +3055,8 @@ if in_shard 7; then
 read_topo 7
 reset_tree; mutate $KIT_REL/SKILL.template.md '/^## Which path$/,/^## Start a run$/s/| `recipe` |/| `slug` |/'
 hit "$(run)" "the driver declares an authorization mode that no routing row names, so a build may legally declare a mode the Skill never tells anyone how to start: recipe against"
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${st:-0}" = 0 ] && echo "PASS (${n:-1} assertions)" || echo "FAIL (${n:-1} assertions)"; [ "${st:-0}" = 0 ] && exit 0; exit 1; fi
 
 # ...and the reverse: a row for a mode the driver will refuse.
 reset_tree; mutate $KIT_REL/SKILL.template.md '/^## Which path$/,/^## Start a run$/s/| `recipe` |/| `sonnet` |/'
@@ -3264,6 +3279,8 @@ mutate $KIT_REL/unattended.sh 's@^export GIT_GRAFT_FILE=/dev/null@export GIT_GRA
 out=$(GOV_UNATTENDED_REPORT=1 run)
 check_emitted "the kit's own git wrapper is defined without the replace-ref pin, so every read routed through it is unpinned at once - and this kit routes its BASE-blob authorization read through it. Site follows|a sha is dereferenced without the replace-ref pin, so a replace ref this run may install at any moment substitutes the committed bytes the census grades - and the run then supplies the playbook it is measured against, on an item no waiver can move. Site and read follow" "$out"  # set OBSERVED 2026-09-15 node a, direct run shard 8/8 at 72f54937 (aBatchedArm landing step 0)
 hit "$out" "the kit's own git wrapper is defined without the replace-ref pin, so every read routed through it is unpinned at once - and this kit routes its BASE-blob authorization read through it. Site follows"
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${st:-0}" = 0 ] && echo "PASS (${n:-1} assertions)" || echo "FAIL (${n:-1} assertions)"; [ "${st:-0}" = 0 ] && exit 0; exit 1; fi
 hit "$out" "a sha is dereferenced without the replace-ref pin, so a replace ref this run may install at any moment substitutes the committed bytes the census grades - and the run then supplies the playbook it is measured against, on an item no waiver can move. Site and read follow"
 
 # ...and the same read with a trailing comment mentioning the WRAPPER, which is round 6's MEDIUM 2:
@@ -3399,6 +3416,26 @@ miss "$(run)" "check 24 FAILED"
 same "the already-WONTDO fixture carries the row the exemption reads" \
   "$(grep -c '| WONTDO |' memory/builds/tRos/README.md)" "1"
 
+# ---- A RE-RUN BUILD's ADD baseline is THIS run's, not the finished run's (TOOL-aRepatriatedFork-50).
+# ---- The run-state path keeps the first run's history, so a walk over all of it stopped at that run's
+# ---- first live commit and read every unit specced between the two runs as added mid-run. Measured on
+# ---- aRepatriatedFork at 6e7cb0df: 19 units closed before the second run's preflight redded check 24.
+# ---- The first run goes live with unit 1 and lands; unit 7 is specced; the second run pins a new BASE
+# ---- and goes live; unit 9 arrives with no row. Unit 9 is the liveness half: the arm still grades.
+seed_ros
+sed -i 's/^phase: .*$/phase: LANDED/' memory/builds/tRos/RUN.md
+git add -A && git commit -q -m "the first run landed" --no-verify
+add_u7
+git add -A && git commit -q -m "unit 7 specced between the runs" --no-verify
+sed -i "s/^base: .*$/base: $(git rev-parse HEAD)/; s/^phase: .*$/phase: RUNNING/" memory/builds/tRos/RUN.md
+git add -A && git commit -q -m "the second run's preflight" --no-verify
+awk -v r='| [ARCH-tRos-9 — added mid-run](spec/nine.md) | OPEN | rev-1 | 2026-08-01 |' -v e="$UEND" \
+  '$0==e{print r} {print}' memory/builds/tRos/README.md > /tmp/ros9.$$ && mv /tmp/ros9.$$ memory/builds/tRos/README.md
+git add -A && git commit -q -m "unit 9 added while the second run is live" --no-verify
+out=$(run)
+miss "$out" "so the scope moved with nothing on the record saying so: ARCH-tRos-7 in"
+hit "$out" "so the scope moved with nothing on the record saying so: ARCH-tRos-9 in"
+
 # ---- THE EMPTY BASELINE SKIPS rather than accusing, and the REPORT CHANNEL is what makes that
 # ---- visible. A skip nobody can see is indistinguishable from coverage; the default run stays silent.
 reset_tree
@@ -3426,6 +3463,40 @@ drow ARCH-tRun-1 "work/one.txt"
 mkdir -p work && printf 'a\n' > work/one.txt && printf 'b\n' > work/stray.txt
 git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
 hit "$(run)" "more dispatched passes committed outside the set they declared before dispatch than the shrink-only ceiling admits, and that declaration is the disjointness proof two concurrent passes rest on"
+
+# ---- GENERATED RENDERS (TOOL-aRepatriatedFork-55): a GENERATED_INDEXES index and a change confined to
+# ---- a gen region are the generator's writes, not the pass's; an authored line beside them is not.
+# a write a GENERATED_INDEXES index covers is not counted
+reset_tree
+printf '\nGENERATED_INDEXES="memory/LIVE.md:gen.py"\n' >> .unattended.conf
+git add -A && git commit -q -m "fixture: a generated index" --no-verify
+drow ARCH-tRun-1 "work/one.txt"
+mkdir -p work && printf 'a\n' > work/one.txt && printf 'live\n' >> memory/LIVE.md
+git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
+out=$(GOV_UNATTENDED_REPORT=1 bash "$SCRIPT" 2>&1)
+miss "$out" "check 23 FAILED"
+hit  "$out" "a generated render, the memory/LIVE.md index"
+# ...nor a change inside a README's gen regions, NESTED as the build README's are: the line between
+# the inner close and the outer close is still generated
+reset_tree
+printf '# r\n\nprose\n\n<!-- gen:index -->\n<!-- gen:units -->\nold\n<!-- /gen:units -->\nRecords: 1\n<!-- /gen:index -->\n' > memory/README.md
+git add -A && git commit -q -m "fixture: a README with a gen region" --no-verify
+drow ARCH-tRun-1 "work/one.txt"
+mkdir -p work && printf 'a\n' > work/one.txt && sed -i 's/^old$/new/; s/^Records: 1$/Records: 2/' memory/README.md
+git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
+out=$(GOV_UNATTENDED_REPORT=1 bash "$SCRIPT" 2>&1)
+miss "$out" "check 23 FAILED"
+hit  "$out" "a generated render, a change inside its gen regions only"
+# ...but an authored line of the same README is the pass's own write, and counts
+reset_tree
+printf '# r\n\nprose\n\n<!-- gen:index -->\n<!-- gen:units -->\nold\n<!-- /gen:units -->\nRecords: 1\n<!-- /gen:index -->\n' > memory/README.md
+git add -A && git commit -q -m "fixture: a README with a gen region" --no-verify
+drow ARCH-tRun-1 "work/one.txt"
+mkdir -p work && printf 'a\n' > work/one.txt && sed -i 's/^prose$/edited prose/' memory/README.md
+git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
+out=$(run)
+hit  "$out" "check 23 FAILED"
+hit  "$out" "wrote memory/README.md"
 
 # ---- ABSORB (TOOL-dDerivedDocket-24 S9, AC8). The pass declared one path; a commit of its own, whose
 # ---- subject is the absorb grammar and names no unit id, fixed an inherited red at another path. It
@@ -4499,7 +4570,10 @@ cp "$TMP/$KIT_REL/VERBS.template.md" "$ak/memory/guides/UNATTENDED-VERBS.md"
 cp "$TMP/$KIT_REL/ASKS.template.md" "$ak/$KIT_REL/"
 cp "$TMP/$KIT_REL/ASKS.template.md" "$ak/memory/guides/UNATTENDED-ASKS.md"
 # the recall kit's extractor and its conf reader, into a directory the declared RECALL_CLI names
-cp "$HERE/../memory-recall/extract.py" "$HERE/../memory-recall/recall_conf.py" "$ak/rk/"
+# FOUND by the file only that kit holds, never by a typed kit directory (the carried-prefix ban).
+_rk_rel=$(git -C "$HERE" ls-files --full-name -- ':(top)*recall_conf.py' | head -n 1)
+_rk_src="$(git -C "$HERE" rev-parse --show-toplevel)/${_rk_rel%/*}"
+cp "$_rk_src/extract.py" "$_rk_src/recall_conf.py" "$ak/rk/"
 n=$((n+1)); [ -f "$ak/rk/extract.py" ] || { echo "FAIL the ask block could not copy the recall kit's extractor, so every S3 arm below would grade a missing grammar"; st=1; }
 printf 'MEMORY_ROOT=memory\nFAMILIES="example:EXMP tooling:TOOL"\n' > "$ak/.memory-tree.conf"
 cat > "$ak/.unattended.conf" <<AKCONF
@@ -4966,10 +5040,10 @@ ma_init() { # name -> $ma_root/<name>, built to the shape above
     git remote add origin "$d.git" && git push -q origin main
     git checkout -q -b unit ) >/dev/null 2>&1
   ma_facts "$d" tRun RUNNING main "$(ma_base "$d")"; ma_commit "$d" facts
-  ma_grant "$d" tOther2 tools/run-granted.sh; ma_commit "$d" "run grants"
+  ma_grant "$d" tOther2 bin/run-granted.sh; ma_commit "$d" "run grants"
   ( cd "$d" && git commit -q --allow-empty -m "unit work" --no-verify )
   ( cd "$d" && git checkout -q main ) >/dev/null 2>&1
-  ma_grant "$d" tOther tools/owner-granted.sh; ma_commit "$d" "owner grants"
+  ma_grant "$d" tOther bin/owner-granted.sh; ma_commit "$d" "owner grants"
   ( cd "$d" && git push -q origin main && git checkout -q unit ) >/dev/null 2>&1
 }
 MA_RUN_RD="in memory/builds/tOther2/README.md, run memory/builds/tRun/RUN.md"
@@ -4990,8 +5064,8 @@ cp "$TMP/$KIT_REL/ASKS.template.md" "$ma0/$KIT_REL/"
 cp "$TMP/$KIT_REL/ASKS.template.md" "$ma0/memory/guides/UNATTENDED-ASKS.md"
 cp "$TMP/.unattended.conf" "$ma0/.unattended.conf"
 ma_readme "$ma0" tRun
-ma_readme "$ma0" tTick 'may: `tools/lander-granted.sh`'
-ma_readme "$ma0" tBare 'may: tools/lander-granted.sh'
+ma_readme "$ma0" tTick 'may: `bin/lander-granted.sh`'
+ma_readme "$ma0" tBare 'may: bin/lander-granted.sh'
 ma_readme "$ma0" tPrompt 'authorized-by: prompt'
 for ma_s in tRun tTick tBare tPrompt; do ma_run "$ma0" "$ma_s"; done
 sed -i 's/^mode: slug$/mode: prompt/' "$ma0/memory/builds/tPrompt/RUN.md"
@@ -5005,8 +5079,8 @@ sed -i 's/^may: none$/may: tools\/lander-granted.sh/' "$ma0/memory/builds/tTick/
 for ma_s in tRun tTick tBare tPrompt; do ma_facts "$ma0" "$ma_s" RUNNING unit main; done
 ma_commit "$ma0" facts
 MA0_PRISTINE=$(ma_sha "$ma0" HEAD)
-n=$((n+1)); { [ -n "$MA0_PRISTINE" ] && grep -q '^may: tools/lander-granted.sh$' "$ma0/memory/builds/tTick/RUN.md" \
-  && grep -q '^may: `tools/lander-granted.sh`$' "$ma0/memory/builds/tTick/README.md"; } \
+n=$((n+1)); { [ -n "$MA0_PRISTINE" ] && grep -q '^may: bin/lander-granted.sh$' "$ma0/memory/builds/tTick/RUN.md" \
+  && grep -q '^may: `bin/lander-granted.sh`$' "$ma0/memory/builds/tTick/README.md"; } \
   || { echo "FAIL the TOOL-dDerivedDocket-19 G0 fixture did not build its four records, so every arm below would grade a missing one"; st=1; }
 ma0_reset() { ( cd "$ma0" && git reset -q --hard "$MA0_PRISTINE" && git clean -qfd ); }
 
@@ -5021,15 +5095,15 @@ hit  "$out" "the ask-mandate second opinions (checks 19, 15 and 37) are VACUOUS 
 ma0_reset; sed -i 's/^may: none$/may: tools\/lander-granted.sh/' "$ma0/memory/builds/tRun/RUN.md"; ma_commit "$ma0" forged
 out=$(ma_leg "$ma0")
 hit "$out" "a run-state file pins a may: grant the build README at its own recorded BASE does not declare, so the authority the run says its owner committed is not the authority that README carries - pinned against declared follow: ["
-hit "$out" "pinned against declared follow: [tools/lander-granted.sh] against [none] in memory/builds/tRun/RUN.md"
+hit "$out" "pinned against declared follow: [bin/lander-granted.sh] against [none] in memory/builds/tRun/RUN.md"
 # ...and against BASE, never HEAD: the README edited on the run branch to match the fact still reds
-ma_grant "$ma0" tRun tools/lander-granted.sh; ma_commit "$ma0" "matched at head"
+ma_grant "$ma0" tRun bin/lander-granted.sh; ma_commit "$ma0" "matched at head"
 out=$(ma_leg "$ma0")
-hit "$out" "pinned against declared follow: [tools/lander-granted.sh] against [none] in memory/builds/tRun/RUN.md"
+hit "$out" "pinned against declared follow: [bin/lander-granted.sh] against [none] in memory/builds/tRun/RUN.md"
 # AC5: a `prompt` record carrying a grant reds by its mode, whatever its README says
 ma0_reset; sed -i 's/^may: none$/may: tools\/lander-granted.sh/' "$ma0/memory/builds/tPrompt/RUN.md"; ma_commit "$ma0" "prompt grant"
 out=$(ma_leg "$ma0")
-hit "$out" "a run-state file pins a may: grant while recording an authorization mode that resolves at the second anchor, so the grant could be one the run wrote for itself - ruling D12-j honours a grant only under slug: mode [prompt], may: [tools/lander-granted.sh] in memory/builds/tPrompt/RUN.md"
+hit "$out" "a run-state file pins a may: grant while recording an authorization mode that resolves at the second anchor, so the grant could be one the run wrote for itself - ruling D12-j honours a grant only under slug: mode [prompt], may: [bin/lander-granted.sh] in memory/builds/tPrompt/RUN.md"
 
 # ---- G1: A LIVE RECORD, AND AN IN-PLACE TERMINAL ONE, over unit 2's prepared merge T - first parent
 # ---- the advertised tip, which carries the owner's grant, second parent the run branch.
@@ -5083,7 +5157,7 @@ ma_init g4; ma4="$ma_root/g4"
 ( cd "$ma4" && git checkout -q main && git merge -q --no-ff --no-edit -m "land tRun" unit ) >/dev/null 2>&1
 ( git clone -q "$ma4.git" "$ma_root/g4-other" && cd "$ma_root/g4-other" \
     && git config user.email o@t.test && git config user.name o \
-    && sed -i '/^slug: tOther3$/a may: tools/other-node.sh' memory/builds/tOther3/README.md \
+    && sed -i '/^slug: tOther3$/a may: bin/other-node.sh' memory/builds/tOther3/README.md \
     && git commit -qam "other node grants" --no-verify && git push -q origin main ) >/dev/null 2>&1
 ( cd "$ma4" && git fetch -q origin && git merge -q --no-ff --no-edit -m "reconcile origin/main" origin/main ) >/dev/null 2>&1
 MA_M=$(ma_sha "$ma4" HEAD)
@@ -5723,7 +5797,7 @@ fi   # ---- end REGION 8 -------------------------------------------------------
 # ---- exemption loop; region 4 +2, check 36's scope liveness arm respelling all three fixture files
 # ---- and reading the report's count; region 8 +2, check 39's liveness arm staging its break with a
 # ---- `mutate` and the check-39 control's new `miss`. FLOOR_SHARD_1, _4 and _8 carry the same.
-FLOOR_ASSERTIONS=932
+FLOOR_ASSERTIONS=938
 # THE FLOOR IS MODE-SELECTED, or every shard leg reds forever against the unsharded floor. The
 # per-shard floors carry the SAME proportional discount the unsharded pin does rather than pinning
 # at 100 % of observation, which would red on the first arm anyone legitimately removes. The
@@ -5735,7 +5809,7 @@ FLOOR_SHARD_4=100
 FLOOR_SHARD_5=67
 FLOOR_SHARD_6=75
 FLOOR_SHARD_7=92
-FLOOR_SHARD_8=383
+FLOOR_SHARD_8=389
 case "$SH_I" in
   0) FLOOR=$FLOOR_ASSERTIONS; MODE="unsharded" ;;
   *) _fv="FLOOR_SHARD_$SH_I"; FLOOR=${!_fv}; MODE="shard $SH_I/$SHARD_ARITY" ;;

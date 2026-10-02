@@ -4,7 +4,7 @@
 #   1) a commit ON the default branch is allowed
 #   2) a commit parked OFF the default branch in the primary tree is refused
 #   3) --no-verify overrides the refusal
-# The throwaway repo has none of the gate-leg scripts (tools/…, skills/…), so those legs
+# The throwaway repo has none of the gate-leg scripts (<prefix>/…, skills/…), so those legs
 # self-skip and only the guard is exercised — except the codebase-map leg, whose arms follow the
 # guard's and plant a stand-in gate. Run: bash .githooks/pre-commit.test.sh  (exit 0 = pass)
 set -u
@@ -27,6 +27,8 @@ git config core.hooksPath hk
 export GOV_DEFAULT_BRANCH=main   # throwaway has no origin/HEAD — pin the default explicitly
 
 echo a > a; git add a; git commit -q -m first; ck "commit on default branch allowed" $? 0
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${fail:-0}" = 0 ] && echo "PASS (${pass:-1} assertions)" || echo "FAIL (${pass:-1} assertions)"; [ "${fail:-0}" = 0 ] && exit 0; exit 1; fi
 
 git checkout -q -b feature/x
 echo b > b; git add b; git commit -q -m second 2>/dev/null; ck "commit off default branch refused" $? 1
@@ -85,6 +87,56 @@ printf 'MAP_ROOT=map\nGATE_FILE=gate/moved.py\n' > .codebase-map.conf; git add .
 echo 'z = 3' > f.py; git add f.py
 out=$(git commit -q -m f 2>&1); ck "a GATE_FILE naming no file is refused, not skipped" $? 1
 printf '%s\n' "$out" | grep -q 'names no file'; ck "the refusal names the conf key" $? 0
+
+# ---- the kit-root ladder, TOOL-aRepatriatedFork-24 AC1/AC2 ---------------------------------------
+# The hygiene leg at three prefixes gov does not use, each reached by a DIFFERENT rung: `vendor/gov/`
+# by GOV_KITROOT in gate-env.sh, `scripts/` by an install receipt, the root by the probe. The stand-in
+# gate says where it ran from, so an arm can tell "ran from there" from "ran from somewhere". The kit
+# and its file are joined at run time, as the hook's own ladder joins them, so no fixture spells a
+# kit path. The leg is reached only when memory/ is staged, so every fixture stages a memory file.
+mt=memory-tree; hy=check-memory-hygiene.sh
+run_prefix_commit() { # <prefix, "" for the root> <rung: env|receipt|root|none> <hook> -> the commit's output
+  local pfx=$1 rung=$2 hook=$3 d="$tmp/pfx-$2" kd
+  rm -rf "$d"; mkdir -p "$d"
+  ( cd "$d" || exit 2
+    git init -q -b main; git config user.email t@example.com; git config user.name test
+    git config core.autocrlf false
+    mkdir hk; cp "$hook" hk/pre-commit; chmod +x hk/pre-commit; git config core.hooksPath hk
+    kd=${pfx:+$pfx/}$mt; mkdir -p "$kd" memory
+    printf '#!/usr/bin/env bash\necho "HYGIENE RAN from %s $*"\n' "$kd" > "$kd/$hy"
+    case "$rung" in
+      env) mkdir -p .githooks; printf 'GOV_KITROOT=%s\n' "$pfx" > .githooks/gate-env.sh ;;
+      receipt) mkdir -p .governance
+        printf '{\n  "files": [\n    {\n      "path": "%s",\n      "source": "gov/%s"\n    }\n  ]\n}\n' \
+          "$kd/$hy" "$mt/$hy" > .governance/install.json ;;
+    esac
+    git add -A; git commit -q --no-verify -m fixture
+    echo x > memory/note.md; git add memory/note.md
+    git commit -q -m note 2>&1 )
+}
+out=$(run_prefix_commit vendor/gov env "$HOOK"); rc=$?
+case "$out" in *"HYGIENE RAN from vendor/gov/$mt --staged"*) r=$rc ;; *) r=1 ;; esac
+ck "AC1 GOV_KITROOT in gate-env.sh reaches the hygiene gate under vendor/gov/" "$r" 0
+out=$(run_prefix_commit scripts receipt "$HOOK"); rc=$?
+case "$out" in *"HYGIENE RAN from scripts/$mt --staged"*) r=$rc ;; *) r=1 ;; esac
+ck "AC1 the install receipt reaches the hygiene gate under scripts/" "$r" 0
+out=$(run_prefix_commit "" root "$HOOK"); rc=$?
+case "$out" in *"HYGIENE RAN from $mt --staged"*) r=$rc ;; *) r=1 ;; esac
+ck "AC1 the root probe reaches the hygiene gate at a root install" "$r" 0
+# A MISS is an announced skip that still commits (F1 (c)), never a silent one.
+out=$(run_prefix_commit vendor/gov none "$HOOK"); rc=$?
+case "$out" in *"HYGIENE RAN"*) r=1 ;; *"memory-tree hygiene leg SKIPPED — no kit root"*) r=$rc ;; *) r=1 ;; esac
+ck "AC1 an unresolvable kit root is an announced skip, and the commit proceeds" "$r" 0
+# AC2, THE RED-FIRST CONTROL, against the hook as `2143b6d6` holds it: the same vendor/gov/ fixture
+# skips the leg silently and exits 0. Pinned to a sha, so landing this unit cannot turn the control
+# into the fixed hook. A repository that does not carry the sha SKIPS the control, out loud.
+if git -C "$repo_src" show 2143b6d6:.githooks/pre-commit > "$tmp/old-pre-commit" 2>/dev/null && [ -s "$tmp/old-pre-commit" ]; then
+  out=$(run_prefix_commit vendor/gov env "$tmp/old-pre-commit"); rc=$?
+  case "$out" in *"HYGIENE RAN"*) r=1 ;; *) r=$rc ;; esac
+  ck "AC2 red-first: the 2143b6d6 hook skips that leg silently and exits 0" "$r" 0
+else
+  echo "SKIP AC2 red-first control NOT RUN: 2143b6d6 is a coding-governance commit this repository does not carry"
+fi
 
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ]

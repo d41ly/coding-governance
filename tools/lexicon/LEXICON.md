@@ -1,4 +1,4 @@
-<!-- gov:kit lexicon@1.11 -->
+<!-- gov:kit lexicon@1.17 -->
 # LEXICON.md — how to write the table this gate reads
 
 The engine grades against `.lexicon.conf`. This file is how a human decides what goes in it. It is
@@ -38,7 +38,7 @@ declaration is delivered two ways, and neither of them is the gate.
 - **The rendered Skill.** `adopt-lexicon.sh --render` writes `.claude/skills/lexicon/SKILL.md` from
   the declaration, rows and negatives included, so an agent carries the table without opening the
   conf. Its own gate re-renders and byte-compares, so an edit nobody re-rendered reds.
-- **`python tools/lexicon/lexicon.py --suggest <name>`** answers ONE identifier from the declaration
+- **`python <prefix>/lexicon/lexicon.py --suggest <name>`** answers ONE identifier from the declaration
   FIRST and the kit's frozen canon SECOND, in that fixed precedence and from no corpus at all:
   whether its leading verb is declared, and if not, which row's NOT clause names it and what that
   row means — or, where no row names it, which cluster the canon holds it in. The suggestion keeps
@@ -78,7 +78,7 @@ your own corpus, delete what you did not mean, write the negative definitions yo
 stamp `ratified`.
 
 The seed cannot exceed the canon's cluster count, and is usually well under it — only a concept with
-a live definition site enters. That ceiling is `CLUSTERS` in `tools/lexicon/canon.py`; this sentence
+a live definition site enters. That ceiling is `CLUSTERS` in `<prefix>/lexicon/canon.py`; this sentence
 deliberately does not restate the number, because the sentence it replaced said "twenty-five verbs is
 the seed size" and the canon has never held twenty-five. If curation takes you past forty rows, the
 table is describing the code rather than constraining it.

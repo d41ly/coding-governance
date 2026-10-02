@@ -1,7 +1,7 @@
-# kit.toml — the micro-format definition gate, declared as data. Read by tools/govkit/.
+# kit.toml — the micro-format definition gate, declared as data. Read by <prefix>/govkit/.
 #
 # A FLAT entry, modelled on check-placeholders: the gate, its self-test and its subject are all
-# depth-1 paths under tools/, and selfcheck reds on any such path no entry claims.
+# depth-1 paths under <prefix>/, and selfcheck reds on any such path no entry claims.
 #
 # NOT conditional, since TOOL-aHonedRuleset-8. This gate grades a block inside the SHIPPED charter,
 # so it travels WITH the charter: it is in the declared default selection, and `requires = ["playbook"]`
@@ -14,7 +14,7 @@
 id = "check-microformats"
 scope = "repo"
 kind = "flat"
-home = "tools"
+home = "."
 requires = ["playbook"]
 # No constant: this gate versions with the CHARTER whose block it grades, not on its own clock. A
 # second version to keep in step would be a second thing to drift, and the grammar it enforces is

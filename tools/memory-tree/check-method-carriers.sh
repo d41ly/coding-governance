@@ -2,7 +2,7 @@
 # check-method-carriers.sh — every file that POINTS AT the build method is declared, and points
 # rather than copies. Exit 0 = clean · 1 = drift · 2 = misconfigured.
 #
-#   bash tools/memory-tree/check-method-carriers.sh
+#   bash <prefix>/memory-tree/check-method-carriers.sh
 #
 # WHY THIS EXISTS. The build method landed with four pointers, each a path and never a summary.
 # Nothing stopped a fifth being added tomorrow as a paraphrase, and this repo grew FOUR spellings of
@@ -115,7 +115,7 @@ EOF
 $(printf '%s' "$undeclared" | sed 's/^/    /')"
 
 # ---- 4: every declared row still HITS, in both directions. A stale row is the failure
-# ---- `install-prefix-waivers.txt` produced by keying on <path>:<line> — an edit ABOVE the line
+# ---- the install-prefix gate's old waiver registry produced by keying on <path>:<line> — an edit ABOVE the line
 # ---- unpinned it and the gate redded on a merge that touched nothing it guarded
 # ---- (TOOL-aSealedCaravan-1). This registry keys on PATH alone, so a row goes stale only when its
 # ---- file really stops pointing.

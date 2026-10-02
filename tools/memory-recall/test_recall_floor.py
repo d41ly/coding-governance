@@ -33,12 +33,32 @@ import subprocess
 import sys
 import tempfile
 
+
+def derive_install_prefix() -> str:
+    """The install prefix WITH its trailing slash, derived from where this file sits and empty at a
+    root install. Every fixture and host path the self-test builds is spelled through it, never
+    through a literal prefix (TOOL-aRepatriatedFork-28)."""
+    import pathlib
+    here = pathlib.Path(__file__).resolve().parent
+    for anc in here.parents:
+        if (anc / ".git").exists():
+            rel = here.parent.relative_to(anc).as_posix()
+            return "" if rel == "." else rel + "/"
+    raise SystemExit(f"{pathlib.Path(__file__).name}: not inside a git repository, so there is no "
+                     "install prefix to derive")
+
+
+PFX = derive_install_prefix()
+
+
 sys.dont_write_bytecode = True
 
 KIT = pathlib.Path(__file__).resolve().parent
 CHECK = KIT / "check-recall.py"
 FIXTURE = KIT / "recall-fixture.json"
-ROOT = KIT.parent.parent
+# The repository holding this kit, found by its `.git` entry: the grandparent is the root only at
+# a one-segment install prefix (TOOL-aRepatriatedFork-28, gate repair at VERIFYING).
+ROOT = next(p for p in KIT.parents if (p / ".git").exists())
 
 # BEFORE the deferred sibling import below, not after it. Written after, the insert is a no-op and
 # the import resolves only because CPython seeds sys.path[0] with the script's directory -- the exact
@@ -151,6 +171,11 @@ def test_baseline_green():
 # ------------------------------------------------------------------ the two single-direction arms
 
 
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+if os.environ.get("FOREIGN_PREFIX_PROBE") == "1":
+    print("foreign-prefix-probe: stopped after 1 arm")
+    print("FAIL (1 assertions)" if (any(c[0] == "FAIL" for c in _checks)) else "PASS (1 assertions)")
+    sys.exit(1 if (any(c[0] == "FAIL" for c in _checks)) else 0)
 @check("the FLOOR reds alone (per-id stays green)")
 def test_floor_reds_alone():
     # TOOL-aWrittenMethod-4 has three homes; removing only the DECISIONS.md one leaves the id
@@ -373,11 +398,13 @@ def test_kit_payload_withholds():
     """
     import tomllib  # noqa: PLC0415
 
-    sys.path.insert(0, str(ROOT / "tools" / "govkit"))
+    import extract as E  # noqa: PLC0415 — the kit's own copy of the sibling-kit resolver
+
+    sys.path.insert(0, str(E.resolve_kit_dir("govkit", "govkit.py", KIT)))
     import govkit as G  # noqa: PLC0415
 
     desc = tomllib.loads((KIT / "kit.toml").read_text(encoding="utf-8"))
-    home = "tools/memory-recall"
+    home = f"{PFX}memory-recall"
     ctx = {"kit": home, "relpath": "", "memory_root": "memory"}
     wild = [r for r in desc["files"] if r.get("include") == "**"][0]
     pool = {pathlib.PurePosixPath(p).name for p in G.resolve_rule_pool(ROOT, desc, wild, ctx, home)}

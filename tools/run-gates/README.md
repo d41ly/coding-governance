@@ -1,7 +1,7 @@
 # run-gates kit
 
-`gov:kit run-gates@1.15` — the marker a deployer greps; paired with `KIT_RUN_GATES_VERSION` in
-`run-gates.sh` and asserted EQUAL by `tools/check-kit-versions.sh`. Presence of a marker is not
+`gov:kit run-gates@1.22` — the marker a deployer greps; paired with `KIT_RUN_GATES_VERSION` in
+`run-gates.sh` and asserted EQUAL by `<prefix>/check-kit-versions.sh`. Presence of a marker is not
 agreement between a marker and a constant, and this repo has twice had a half-bumped pair pass a
 presence-only check.
 
@@ -100,14 +100,14 @@ push boundary cannot mistake a partial bar for a whole one.
 
 ## Why it became a kit
 
-It was a registry EXEMPTION, with two stated reasons that were both exact. It sourced `tools/lib/`,
+It was a registry EXEMPTION, with two stated reasons that were both exact. It sourced `<prefix>/lib/`,
 which is gov-internal and never travels; and with that path absent, `bash` sourcing a missing file
 under `set -u` continues, `resolve_python` is undefined, and the guard on the next line fires — the
 runner exited 2 having run ZERO legs. So `govkit apply` wired legs into a runner the target was
 assumed to already own, and a target that owned none received a merge bar that could not start.
 
 the aPacedTurnstile build's spec set under `memory/builds/aPacedTurnstile/spec/` cut that dependency by inlining the canonical resolver into every shipped
-file that had one, byte-identically, under the markers `tools/lib/resolve-python.test.sh` greps for
+file that had one, byte-identically, under the markers `<prefix>/lib/resolve-python.test.sh` greps for
 — so each copy enrols itself in the parity gate rather than needing a table row.
 
 ## The pieces

@@ -27,13 +27,13 @@ tools natively; the aliases below cover Claude, Gemini, and the legacy explicit 
 
 ```bash
 # install a filled instruction doc as AGENTS.md and wire Claude + Gemini + Copilot to it
-tools/agent-instructions/adopt-agent-instructions.sh --source my-instructions.md
+<prefix>/agent-instructions/adopt-agent-instructions.sh --source my-instructions.md
 
 # choose aliases and mode explicitly
-tools/agent-instructions/adopt-agent-instructions.sh --aliases "claude gemini copilot cursor windsurf" --mode symlink
+<prefix>/agent-instructions/adopt-agent-instructions.sh --aliases "claude gemini copilot cursor windsurf" --mode symlink
 
 # verify wiring (CI / pre-commit) — non-zero on drift
-tools/agent-instructions/adopt-agent-instructions.sh --check
+<prefix>/agent-instructions/adopt-agent-instructions.sh --check
 ```
 
 ## Modes (`--mode`)
@@ -56,6 +56,6 @@ user edit, so overwriting it demands the explicit flag).
 ## Deploying the governance playbook this way
 
 To make the governance playbook a project's agent instructions: fill
-`coding-governance-agents.template.md` with `bash tools/playbook/adopt-playbook.sh --target <repo>`,
+`coding-governance-agents.template.md` with `bash <prefix>/playbook/adopt-playbook.sh --target <repo>`,
 which reads the target's `deploy.toml`, then install the result as `AGENTS.md` with this tool. The
 charter is ONE file as of v3.0 — there is no companion to copy alongside. See `WIRE-INTO-PROJECT.md`.

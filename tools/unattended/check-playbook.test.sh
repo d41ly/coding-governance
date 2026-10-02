@@ -27,6 +27,14 @@ derive_self_rel() {
 }
 # <<< derive_self_rel
 KIT_REL=$(derive_self_rel "$HERE") || { echo "FAIL this suite is not inside a git repository"; exit 2; }
+# PFX is the install prefix WITH its trailing slash, derived from where this file sits and empty
+# at a root install: every fixture and host path below is spelled through it, never through a
+# literal prefix (TOOL-aRepatriatedFork-28).
+case "$KIT_REL" in */*) PFX="${KIT_REL%/*}/" ;; *) PFX="" ;; esac
+# TOOL-aRepatriatedFork-46: a kit is named by the name its directory has in THIS install, never
+# as a literal segment: this suite's own from where it sits, a sibling's through the resolver,
+# which reads the install receipt first. A fixture mirrors that layout by the resolved NAME.
+KIT_NAME="${KIT_REL##*/}"
 TMP=$(mktemp -d) || exit 2
 trap 'rm -rf "$TMP"' EXIT
 n=0; st=0
@@ -47,7 +55,7 @@ require_shape() { # value · glob · what-it-is
 }
 
 seed() { # dir
-  mkdir -p "$1/tools/unattended"
+  mkdir -p "$1/${PFX}unattended"
   # HERMETIC AGAINST THE MACHINE'S OWN GIT CONFIG, not only against the real tree. Round 5, MEDIUM 7:
   # the replace-ref arm below asserts a pinned read is unmoved, and a developer with
   # `core.useReplaceRefs=false` set globally would see that arm pass no matter what the leg does. A
@@ -55,17 +63,17 @@ seed() { # dir
   export GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_SYSTEM=/dev/null
   ( cd "$1" && git init -q -b main . && git config user.email t@t.test && git config user.name t \
       && git config core.autocrlf false )
-  cp "$HERE/check-playbook.sh" "$HERE/PLAYBOOK-TEMPLATE.template.md" "$1/tools/unattended/"
-  cp "$HERE/playbook.fixture.md" "$1/tools/unattended/"
+  cp "$HERE/check-playbook.sh" "$HERE/PLAYBOOK-TEMPLATE.template.md" "$1/${PFX}${KIT_NAME}/"
+  cp "$HERE/playbook.fixture.md" "$1/${PFX}${KIT_NAME}/"
   # The PIECES and their records. Without them the reader's population is empty in the scratch tree,
   # its five states are unreachable, and the arms below would each pass by finding nothing — which is
   # the defect this whole leg is about, reproduced inside its own test.
-  cp -r "$HERE/fixture-pieces" "$1/tools/unattended/"
-  cp -r "$HERE/fixture-records" "$1/tools/unattended/"
+  cp -r "$HERE/fixture-pieces" "$1/${PFX}${KIT_NAME}/"
+  cp -r "$HERE/fixture-records" "$1/${PFX}${KIT_NAME}/"
   # THE CONF, because check 10 reads BYPASS_BAN from it and a fixture without one exercises the SKIP
   # path while looking exactly like a clean scan. The playbook fixture already declares its `records`
   # root, so this is the last thing standing between the scan and a real population.
-  printf 'PLAYBOOK_GLOB="tools/unattended/*.md"\nBYPASS_BAN="--no-verify"\n' > "$1/.unattended.conf"
+  printf 'PLAYBOOK_GLOB="'"${PFX}${KIT_NAME}/"'*.md"\nBYPASS_BAN="--no-verify"\n' > "$1/.unattended.conf"
   ( cd "$1" && git add -A >/dev/null && git commit -qm seed )
 }
 
@@ -73,12 +81,14 @@ run() { ( cd "$W" && bash $KIT_REL/check-playbook.sh 2>&1 ); }
 rc()  { ( cd "$W" && bash $KIT_REL/check-playbook.sh >/dev/null 2>&1; echo $? ); }
 
 W="$TMP/w"; seed "$W"
-F="$W/tools/unattended/playbook.fixture.md"
+F="$W/${PFX}${KIT_NAME}/playbook.fixture.md"
 KEEP="$TMP/keep.md"; cp "$F" "$KEEP"
 
 # ---- the GREEN control, first and deliberately. Ten red arms with no green one are satisfied by a
 # ---- leg that reds on everything, and that leg looks exactly this armed.
 [ "$(rc)" = 0 ] && ok || bad "the shipped fixture does not pass its own leg"
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${st:-0}" = 0 ] && echo "PASS (${n:-1} assertions)" || echo "FAIL (${n:-1} assertions)"; [ "${st:-0}" = 0 ] && exit 0; exit 1; fi
 hitline=$(run | grep -c 'population 1 playbook' || true)
 [ "$hitline" = 1 ] && ok || bad "the leg did not report a population of exactly one over the seeded tree"
 
@@ -90,7 +100,7 @@ n=$((n+1))
 [ -z "$(ls -A "$W/memory/builds" 2>/dev/null)" ] \
   || bad "the scratch tree carries a build README, so 'graded with no README naming it' is not what the arm above observed"
 n=$((n+1))
-grep -qF -- "$W/tools/unattended/playbook.fixture.md" <<<"$(cd "$W" && git ls-files | sed "s|^|$W/|")" \
+grep -qF -- "$W/${PFX}${KIT_NAME}/playbook.fixture.md" <<<"$(cd "$W" && git ls-files | sed "s|^|$W/|")" \
   || bad "the fixture playbook is not tracked, and the leg reads git ls-files, so the population arm above passed over something else"
 
 # ---- AC6, the ATTENDED path: the record census is read with NO run-state file anywhere in the tree.
@@ -127,9 +137,9 @@ probe "untagged step"       4 's/`CHECK the canon is prose[^`]*`//' "a playbook 
 probe "unknown coverage"    6 's/^coverage .*/coverage      = "banana"/' "a playbook declares a coverage mode outside the closed set, and defaulting an unrecognised one would select a strictness nobody asked for - declared and playbook follow:"
 probe "coverage absent"     6 's/^coverage .*//' "a playbook declares no coverage mode for its leg registry, and a gate that quietly skips what it forgot looks exactly like coverage - declare resolvable, probe or dark; playbook:"
 probe "gate not declared"   6 's/GATE fixture-shape/GATE fixture-nowhere/' "a playbook tags a step with a gate leg its own registry does not declare, so the tag names an enforcement nothing resolves - leg and playbook follow:"
-probe "resolvable dead tgt" 6 's|fixture-shape = "tools/unattended/check-playbook.sh"|fixture-shape = "tools/unattended/gone.sh"|' "a playbook declares coverage resolvable and names a leg target that does not resolve in this tree, so the strictness it claims is one nothing can hold it to - target, leg and playbook follow:"
+probe "resolvable dead tgt" 6 's|fixture-shape = "'"${PFX}${KIT_NAME}/check-playbook.sh"'"|fixture-shape = "'"${PFX}${KIT_NAME}/gone.sh"'"|' "a playbook declares coverage resolvable and names a leg target that does not resolve in this tree, so the strictness it claims is one nothing can hold it to - target, leg and playbook follow:"
 probe "no step floor"       3 's/^step_floor.*//' "a playbook declares a step selector and no floor, so a selector that quietly matches nothing would report every step tagged over an empty selection; playbook"
-probe "resolvable dead cmd" 6 's|fixture-shape = "tools/unattended/check-playbook.sh"|fixture-shape = "definitely-not-on-path-xyz"|' "a playbook declares coverage resolvable and names a leg command that is not on PATH, so the strictness it claims is one nothing can hold it to - target, leg and playbook follow"
+probe "resolvable dead cmd" 6 's|fixture-shape = "'"${PFX}${KIT_NAME}/check-playbook.sh"'"|fixture-shape = "definitely-not-on-path-xyz"|' "a playbook declares coverage resolvable and names a leg command that is not on PATH, so the strictness it claims is one nothing can hold it to - target, leg and playbook follow"
 probe "canon section gone"  7 's/^## 8\. Set-scoped checks/## 8. Something Else Entirely/' "a playbook is missing a required canon section, and an absent section is indistinguishable from a forgotten one - a section that does not apply keeps its heading and carries a declared null; section and playbook follow:"
 
 # ---- check 1: the EMPTY POPULATION. The fixture leaves the tree entirely, which is the only way to
@@ -159,8 +169,8 @@ probe "grain, no records"   8 's|^records .*||' "a playbook declares a piece gra
 # ---- red would fail on every one of them. What distinguishes a working reader from a dead one is
 # ---- which column moved.
 cp "$KEEP" "$F"
-P1="$W/tools/unattended/fixture-pieces/one/piece.md"
-R1=$(ls "$W"/tools/unattended/fixture-records/*one*.md 2>/dev/null | head -1)
+P1="$W/${PFX}${KIT_NAME}/fixture-pieces/one/piece.md"
+R1=$(ls "$W"/${PFX}${KIT_NAME}/fixture-records/*one*.md 2>/dev/null | head -1)
 counts() { run | grep -oE 'pieces [0-9]+ · verified [0-9]+ · failed [0-9]+ · stale [0-9]+ · unrecorded [0-9]+ · unchecked [0-9]+' | head -1; }
 PKEEP="$TMP/p1.keep"; RKEEP="$TMP/r1.keep"
 if [ -n "$R1" ] && [ -f "$P1" ]; then
@@ -213,7 +223,7 @@ if [ -n "$R1" ] && [ -f "$P1" ]; then
 
   # THE LIVENESS ASSERTION. Every count above can be satisfied by a tree with no pieces, so the arm
   # that matters most is the one proving the reader SAYS SO instead of reporting a clean zero.
-  ( cd "$W" && sed -i 's|^grain .*|grain         = "tools/unattended/nowhere/*/piece.md"|' $KIT_REL/playbook.fixture.md )
+  ( cd "$W" && sed -i 's|^grain .*|grain         = "'"${PFX}${KIT_NAME}/nowhere/"'*/piece.md"|' $KIT_REL/playbook.fixture.md )
   run | grep -q 'DEAD PROBE' && ok || bad "a grain resolving no piece did not report a DEAD PROBE — a reader that enumerates zero and reports zero failures is indistinguishable from a clean run"
   [ "$(rc)" = 0 ] && ok || bad "the dead probe REDDED the leg; the reader classifies and never grades, and only --close blocks"
   cp "$KEEP" "$F"
@@ -379,7 +389,7 @@ grep -qF -- "bypass scan - " <<<"$(run)" \
 
 # AC1 — a PER-PIECE record carrying the flag.
 cp "$KEEP" "$F"
-PREC=$(cd "$W" && git ls-files 'tools/unattended/fixture-records/tools~*.md' | head -1)
+PREC=$(cd "$W" && git ls-files ''"${PFX}${KIT_NAME}/fixture-records/tools"'~*.md' | head -1)
 n=$((n+1))
 [ -n "$PREC" ] || bad "no per-piece record in the fixture, so the arm below would grade an empty population"
 printf '\nlanded with --no-verify\n' >> "$W/$PREC"
@@ -389,7 +399,7 @@ grep -qF -- "a tracked EVIDENCE RECORD names the declared bypass flag, and bypas
 ( cd "$W" && git checkout -q -- "$PREC" )
 
 # AC2 — a SET-scoped record carrying it, which is a different writer and a different path shape.
-SREC=$(cd "$W" && git ls-files 'tools/unattended/fixture-records/set-*.md' | head -1)
+SREC=$(cd "$W" && git ls-files ''"${PFX}${KIT_NAME}/fixture-records/set-"'*.md' | head -1)
 n=$((n+1))
 [ -n "$SREC" ] || bad "no set-scoped record in the fixture, so the arm below would grade an empty population"
 printf '\nlanded with --no-verify\n' >> "$W/$SREC"
@@ -399,7 +409,7 @@ grep -qF -- "a tracked EVIDENCE RECORD names the declared bypass flag, and bypas
 ( cd "$W" && git checkout -q -- "$SREC" )
 
 # AC4's other half — no declared flag, no scan, and the leg SAYS so rather than going quiet.
-( cd "$W" && printf 'PLAYBOOK_GLOB="tools/unattended/*.md"\n' > .unattended.conf )
+( cd "$W" && printf 'PLAYBOOK_GLOB="'"${PFX}${KIT_NAME}/"'*.md"\n' > .unattended.conf )
 out=$(run)
 n=$((n+1))
 grep -qF -- "bypass scan SKIPPED" <<<"$out" \
@@ -407,14 +417,14 @@ grep -qF -- "bypass scan SKIPPED" <<<"$out" \
 n=$((n+1))
 grep -qF -- "a tracked EVIDENCE RECORD names the declared bypass flag" <<<"$out" \
   && bad "the scan ran with no declared flag, which means it is matching something other than the declaration"
-( cd "$W" && printf 'PLAYBOOK_GLOB="tools/unattended/*.md"\nBYPASS_BAN="--no-verify"\n' > .unattended.conf )
+( cd "$W" && printf 'PLAYBOOK_GLOB="'"${PFX}${KIT_NAME}/"'*.md"\nBYPASS_BAN="--no-verify"\n' > .unattended.conf )
 
 # AC5 — SHARING, not liveness. The roots this scan reads must be the roots the census reads, and the
 # only way to assert that is to move the declaration and watch BOTH follow. A liveness arm would pass
 # over two independent derivations that happen to agree today.
 cp "$KEEP" "$F"
-sed -i 's|^records       = "tools/unattended/fixture-records"|records       = "tools/unattended/moved-records"|' "$F"
-( cd "$W" && git mv tools/unattended/fixture-records tools/unattended/moved-records >/dev/null 2>&1 )
+sed -i 's|^records       = "'"${PFX}${KIT_NAME}/fixture-records"'"|records       = "'"${PFX}${KIT_NAME}/moved-records"'"|' "$F"
+( cd "$W" && git mv ${PFX}${KIT_NAME}/fixture-records ${PFX}${KIT_NAME}/moved-records >/dev/null 2>&1 )
 out=$(run)
 n=$((n+1))
 grep -qE 'pieces [0-9]+ · verified' <<<"$out" \
@@ -422,7 +432,7 @@ grep -qE 'pieces [0-9]+ · verified' <<<"$out" \
 n=$((n+1))
 grep -qF -- "bypass scan - 0 tracked" <<<"$out" \
   && bad "the census followed the moved root and the bypass scan did not, so the two readers derive their roots separately - which is the second-copy defect this unit exists to avoid"
-( cd "$W" && git mv tools/unattended/moved-records tools/unattended/fixture-records >/dev/null 2>&1 )
+( cd "$W" && git mv ${PFX}${KIT_NAME}/moved-records ${PFX}${KIT_NAME}/fixture-records >/dev/null 2>&1 )
 cp "$KEEP" "$F"
 
 # ---- ROUND 9: THE LEGAL SHAPES. Every arm above this line stages a BREAK, and an arm set that only
@@ -436,14 +446,14 @@ BYPASS_BAN="--no-verify"
 out=$(run)
 n=$((n+1))
 grep -qF -- "could not be sourced" <<<"$out"   && bad "a key DELIBERATELY declared empty is read as a conf that never sourced - the kit's own shipped example declares eleven keys that way"
-( cd "$W" && printf 'PLAYBOOK_GLOB="tools/unattended/*.md"
+( cd "$W" && printf 'PLAYBOOK_GLOB="'"${PFX}${KIT_NAME}/"'*.md"
 BYPASS_BAN="--no-verify"
 [ 1 -eq 2 ]
 ' > .unattended.conf )
 out=$(run)
 n=$((n+1))
 grep -qF -- "could not be sourced" <<<"$out"   && bad "a conf whose last line is a false conditional returns non-zero having assigned everything, and is read as an abort"
-( cd "$W" && printf 'PLAYBOOK_GLOB="tools/unattended/*.md"
+( cd "$W" && printf 'PLAYBOOK_GLOB="'"${PFX}${KIT_NAME}/"'*.md"
 BYPASS_BAN="--no-verify"
 ' > .unattended.conf )
 
@@ -451,10 +461,10 @@ BYPASS_BAN="--no-verify"
 # ---- freshly authored one, not a defect. The arm below asserts the RED for a full grain; this one
 # ---- asserts the GREEN, and only the pair states the rule.
 cp "$KEEP" "$F"
-( cd "$W" && sed -e 's|^records       = .*|records       = "tools/unattended/empty-records"|'       -e 's|^grain         = .*|grain         = ""|' $KIT_REL/playbook.fixture.md > $KIT_REL/playbook.third.md    && mkdir -p tools/unattended/empty-records && git add -A >/dev/null 2>&1 )
+( cd "$W" && sed -e 's|^records       = .*|records       = "'"${PFX}${KIT_NAME}/empty-records"'"|'       -e 's|^grain         = .*|grain         = ""|' $KIT_REL/playbook.fixture.md > $KIT_REL/playbook.third.md    && mkdir -p ${PFX}${KIT_NAME}/empty-records && git add -A >/dev/null 2>&1 )
 n=$((n+1))
 grep -qF -- "NO readable record under its declared records root" <<<"$(run)"   && bad "a playbook whose grain enumerates nothing reds for having no evidence yet, which is the ordinary state of one nobody has run"
-( cd "$W" && git rm -q --cached -- $KIT_REL/playbook.third.md >/dev/null 2>&1; rm -f $KIT_REL/playbook.third.md; rmdir tools/unattended/empty-records 2>/dev/null )
+( cd "$W" && git rm -q --cached -- $KIT_REL/playbook.third.md >/dev/null 2>&1; rm -f $KIT_REL/playbook.third.md; rmdir ${PFX}${KIT_NAME}/empty-records 2>/dev/null )
 cp "$KEEP" "$F"
 
 # ---- ROUND 8's BLOCKERS, EACH WITH THE ARM THAT WOULD HAVE CAUGHT IT.
@@ -467,7 +477,7 @@ cp "$KEEP" "$F"
 for _abort in 'exit 0' 'return 0' 'FOO=$DEFINITELY_UNSET_THING'; do
   cp "$KEEP" "$F"
   printf '\nlanded with --no-verify\n' >> "$W/$PREC"
-  ( cd "$W" && printf '%s\nPLAYBOOK_GLOB="tools/unattended/*.md"\nBYPASS_BAN="--no-verify"\n' "$_abort" > .unattended.conf )
+  ( cd "$W" && printf '%s\nPLAYBOOK_GLOB="'"${PFX}${KIT_NAME}/"'*.md"\nBYPASS_BAN="--no-verify"\n' "$_abort" > .unattended.conf )
   out=$(run)
   n=$((n+1))
   grep -qF -- "the project conf could not be sourced, so the declared bypass flag resolves to the empty string and this leg would announce a skip it never verified - the corpus goes unread while the report says no flag is declared" <<<"$out" \
@@ -481,7 +491,7 @@ for _abort in 'exit 0' 'return 0' 'FOO=$DEFINITELY_UNSET_THING'; do
     && bad "the leg announces that no bypass flag is declared when the flag IS declared and the conf aborted: $_abort"
   ( cd "$W" && git checkout -q -- "$PREC" )
 done
-  ( cd "$W" && printf 'PLAYBOOK_GLOB="tools/unattended/*.md"\nBYPASS_BAN="--no-verify"\n' > .unattended.conf )
+  ( cd "$W" && printf 'PLAYBOOK_GLOB="'"${PFX}${KIT_NAME}/"'*.md"\nBYPASS_BAN="--no-verify"\n' > .unattended.conf )
 
 # BLOCKER 2 — the class fix closed word-splitting and left C-QUOTING. With the default
 # `core.quotePath`, `git ls-files` emits a non-ASCII name as a quoted, octal-escaped literal, so the
@@ -493,7 +503,7 @@ done
 # arm cannot exist on it - the `-z` is in `GITLS` for that case and is unexercised. Said out loud
 # because a skip that looks like coverage is the thing this suite is about.
 cp "$KEEP" "$F"
-UNIC="tools/unattended/fixture-records/tools~caf\xc3\xa9~x.md"
+UNIC="${PFX}${KIT_NAME}/fixture-records/tools~caf\xc3\xa9~x.md"
 ( cd "$W" && cp "$PREC" "$(printf '%b' "$UNIC")" && printf '\nlanded with --no-verify\n' >> "$(printf '%b' "$UNIC")" && git add -A >/dev/null 2>&1 )
 out=$(run)
 n=$((n+1))
@@ -513,9 +523,9 @@ cp "$KEEP" "$F"
 # ITS GRAIN STAYS FULL. Round 9's medium 5: an empty grain beside an empty root is the ordinary
 # state of a freshly authored playbook and is a note now, not a refusal. The defect is work with
 # no evidence, which is a full grain and an empty root - and that is what this arm stages.
-( cd "$W" && sed -e 's|^records       = .*|records       = "tools/unattended/empty-records"|' \
+( cd "$W" && sed -e 's|^records       = .*|records       = "'"${PFX}${KIT_NAME}/empty-records"'"|' \
       $KIT_REL/playbook.fixture.md > $KIT_REL/playbook.second.md \
-   && mkdir -p tools/unattended/empty-records && git add -A >/dev/null 2>&1 )
+   && mkdir -p ${PFX}${KIT_NAME}/empty-records && git add -A >/dev/null 2>&1 )
 out=$(run)
 n=$((n+1))
 grep -qF -- "a playbook enumerates pieces from its declared grain and NO readable record under its declared records root, with a bypass flag declared - so the readback is asserted over an empty population while the work it should cover exists" <<<"$out" \
@@ -524,9 +534,9 @@ grep -qF -- "a playbook enumerates pieces from its declared grain and NO readabl
 # the per-root note this same run prints, so grepping the whole output could not fail whatever
 # the refusal said - an assertion that cannot fail is not an assertion.
 n=$((n+1))
-grep -E "FAILED.*a playbook enumerates pieces from its de" <<<"$out" | grep -qF -- "tools/unattended/empty-records" \
+grep -E "FAILED.*a playbook enumerates pieces from its de" <<<"$out" | grep -qF -- "${PFX}${KIT_NAME}/empty-records" \
   || bad "the refusal does not name the root that contributed nothing, so a reader cannot tell which of them is empty"
-( cd "$W" && git rm -q --cached -- $KIT_REL/playbook.second.md >/dev/null 2>&1; rm -f $KIT_REL/playbook.second.md; rmdir tools/unattended/empty-records 2>/dev/null )
+( cd "$W" && git rm -q --cached -- $KIT_REL/playbook.second.md >/dev/null 2>&1; rm -f $KIT_REL/playbook.second.md; rmdir ${PFX}${KIT_NAME}/empty-records 2>/dev/null )
 cp "$KEEP" "$F"
 
 # ---- ROUND 7's THREE DEFECTS IN CHECK 10, each with the arm that would have caught it. All three
@@ -537,7 +547,7 @@ cp "$KEEP" "$F"
 # declared null. Blanking grain alone took the leg from RC=1 to RC=0 with the whole evidence corpus
 # unread. The arm blanks grain, leaves records, and requires the flag in a record to still red.
 cp "$KEEP" "$F"
-PREC=$(cd "$W" && git ls-files 'tools/unattended/fixture-records/tools~*.md' | head -1)
+PREC=$(cd "$W" && git ls-files ''"${PFX}${KIT_NAME}/fixture-records/tools"'~*.md' | head -1)
 printf '\nlanded with --no-verify\n' >> "$W/$PREC"
 sed -i 's|^grain         = .*|grain         = ""|' "$F"
 out=$(run)
@@ -554,37 +564,37 @@ cp "$KEEP" "$F"
 for _sp in "BYPASS_BAN='--no-verify'" 'BYPASS_BAN="--no-verify"   # the flag the lander bans'; do
   cp "$KEEP" "$F"
   printf '\nlanded with --no-verify\n' >> "$W/$PREC"
-  ( cd "$W" && printf 'PLAYBOOK_GLOB="tools/unattended/*.md"\n%s\n' "$_sp" > .unattended.conf )
+  ( cd "$W" && printf 'PLAYBOOK_GLOB="'"${PFX}${KIT_NAME}/"'*.md"\n%s\n' "$_sp" > .unattended.conf )
   n=$((n+1))
   grep -qF -- "a tracked EVIDENCE RECORD names the declared bypass flag" <<<"$(run)" \
     || bad "a legal shell spelling of BYPASS_BAN resolves to something no record can contain, and the leg says nothing: $_sp"
   ( cd "$W" && git checkout -q -- "$PREC" )
 done
-  ( cd "$W" && printf 'PLAYBOOK_GLOB="tools/unattended/*.md"\nBYPASS_BAN="--no-verify"\n' > .unattended.conf )
+  ( cd "$W" && printf 'PLAYBOOK_GLOB="'"${PFX}${KIT_NAME}/"'*.md"\nBYPASS_BAN="--no-verify"\n' > .unattended.conf )
 
 # BLOCKER 3's OTHER HALF — an unarmed predicate must RED rather than print a population count over a
 # literal nothing can match. A resolved value carrying whitespace is a reader that mis-parsed.
-( cd "$W" && printf 'PLAYBOOK_GLOB="tools/unattended/*.md"\nBYPASS_BAN="--no-verify   # trailing prose"\n' > .unattended.conf )
+( cd "$W" && printf 'PLAYBOOK_GLOB="'"${PFX}${KIT_NAME}/"'*.md"\nBYPASS_BAN="--no-verify   # trailing prose"\n' > .unattended.conf )
 n=$((n+1))
 grep -qF -- "the declared bypass flag resolves to a value carrying whitespace or a comment character, which no flag does - so this leg would grep the corpus for a literal no record can contain and then report that it read the corpus. Resolved value follows: [" <<<"$(run)" \
   || bad "a bypass flag resolving to a value with whitespace in it is accepted and greped for, which no record can ever match"
-  ( cd "$W" && printf 'PLAYBOOK_GLOB="tools/unattended/*.md"\nBYPASS_BAN="--no-verify"\n' > .unattended.conf )
+  ( cd "$W" && printf 'PLAYBOOK_GLOB="'"${PFX}${KIT_NAME}/"'*.md"\nBYPASS_BAN="--no-verify"\n' > .unattended.conf )
 
 # BLOCKER 2's TEETH — a declared flag over a declared root that enumerates NOTHING is a scan that
 # cannot move, and a note never reds. This empties the records root and requires a failure.
 cp "$KEEP" "$F"
-sed -i 's|^records       = .*|records       = "tools/unattended/empty-records"|' "$F"
-( cd "$W" && mkdir -p tools/unattended/empty-records && printf 'x\n' > tools/unattended/empty-records/.keep && git add -A >/dev/null 2>&1 )
+sed -i 's|^records       = .*|records       = "'"${PFX}${KIT_NAME}/empty-records"'"|' "$F"
+( cd "$W" && mkdir -p ${PFX}${KIT_NAME}/empty-records && printf 'x\n' > ${PFX}${KIT_NAME}/empty-records/.keep && git add -A >/dev/null 2>&1 )
 n=$((n+1))
 grep -qF -- "a playbook enumerates pieces from its declared grain and NO readable record under its declared records root, with a bypass flag declared - so the readback is asserted over an empty population while the work it should cover exists" <<<"$(run)" \
   || bad "a declared bypass flag over a declared records root holding no records reports a healthy zero instead of redding"
-( cd "$W" && git rm -q -r --cached tools/unattended/empty-records >/dev/null 2>&1; rm -rf tools/unattended/empty-records )
+( cd "$W" && git rm -q -r --cached ${PFX}${KIT_NAME}/empty-records >/dev/null 2>&1; rm -rf ${PFX}${KIT_NAME}/empty-records )
 cp "$KEEP" "$F"
 
 # A TRACKED RECORD THE WORKTREE DOES NOT HAVE. The counter that proves the scan reached the corpus
 # must not count a file nothing opened - the same defect as the word-split one below, one step earlier.
 cp "$KEEP" "$F"
-GHOST="tools/unattended/fixture-records/tools~ghost~x.md"
+GHOST="${PFX}${KIT_NAME}/fixture-records/tools~ghost~x.md"
 ( cd "$W" && printf 'piece: nope\n' > "$GHOST" && git add -- "$GHOST" >/dev/null 2>&1 && rm -f "$GHOST" )
 n=$((n+1))
 grep -qF -- "a tracked evidence record is not readable in this worktree, so the bypass scan cannot answer for it and counting it as read would inflate the number that proves the scan reached the corpus" <<<"$(run)" \
@@ -596,14 +606,14 @@ cp "$KEEP" "$F"
 # record into two names that do not exist: the flag went unread AND the liveness counter incremented
 # twice for it. The arm puts the flag in a record whose name has a space and requires the red.
 cp "$KEEP" "$F"
-SPACED="tools/unattended/fixture-records/tools~a b~c.md"
+SPACED="${PFX}${KIT_NAME}/fixture-records/tools~a b~c.md"
 ( cd "$W" && cp "$PREC" "$SPACED" && printf '\nlanded with --no-verify\n' >> "$SPACED" && git add -- "$SPACED" >/dev/null 2>&1 )
 out=$(run)
 n=$((n+1))
 grep -qF -- "a tracked EVIDENCE RECORD names the declared bypass flag" <<<"$out" \
   || bad "a record whose filename contains a space is never opened, so the flag in it is invisible while the scan reports a count that includes it"
 n=$((n+1))
-grep -qF -- "bypass scan - tools/unattended/fixture-records: 4 tracked evidence record(s) read" <<<"$out" \
+grep -qF -- "bypass scan - ${PFX}${KIT_NAME}/fixture-records: 4 tracked evidence record(s) read" <<<"$out" \
   || bad "the per-root count does not equal the tracked record count, so the number that proves the scan reached the corpus is not measuring the corpus"
 ( cd "$W" && git rm -q --cached -- "$SPACED" >/dev/null 2>&1; rm -f "$SPACED" )
 cp "$KEEP" "$F"
@@ -704,7 +714,7 @@ cp "$KEEP" "$F"
 # ---- GREEN CONTROL FIRST: the shipped fixture now carries a complete set record, so silence here is
 # ---- a reader finding nothing wrong rather than a reader that never ran. The three red arms below
 # ---- are what tell those apart.
-SR="$W/tools/unattended/fixture-records/set-dScriptedRepeat.md"
+SR="$W/${PFX}${KIT_NAME}/fixture-records/set-dScriptedRepeat.md"
 n=$((n+1)); [ -f "$SR" ] || bad "the fixture ships no set record, so every arm below would report a missing one and prove nothing about the reader"
 out=$(run)
 n=$((n+1)); grep -qF -- "no set record" <<<"$out" && bad "the complete fixture still reports a missing set record"
@@ -712,10 +722,10 @@ n=$((n+1)); grep -qF -- "set checks unrecorded" <<<"$out" && bad "the complete f
 
 # ...the record REMOVED. The playbook declares a set check, pieces exist, and nothing records whether
 # it ran — which is exactly the attended path's blind spot.
-( cd "$W" && git rm -q tools/unattended/fixture-records/set-dScriptedRepeat.md )
+( cd "$W" && git rm -q ${PFX}${KIT_NAME}/fixture-records/set-dScriptedRepeat.md )
 n=$((n+1)); grep -qF -- "no set record" <<<"$(run)" \
   || bad "removing the set record produced no report — the leg is not reading set records at all"
-( cd "$W" && git checkout -q HEAD -- tools/unattended/fixture-records/set-dScriptedRepeat.md 2>/dev/null || git reset -q HEAD -- tools/unattended/fixture-records/set-dScriptedRepeat.md )
+( cd "$W" && git checkout -q HEAD -- ${PFX}${KIT_NAME}/fixture-records/set-dScriptedRepeat.md 2>/dev/null || git reset -q HEAD -- ${PFX}${KIT_NAME}/fixture-records/set-dScriptedRepeat.md )
 
 # ...the record PRESENT but carrying no verdict for the DECLARED check. A record that merely exists is
 # the shape `set-checks-recorded` used to accept, one population up from the per-piece blocker.

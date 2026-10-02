@@ -2,7 +2,7 @@
 # check-testsuite-counts.sh — TOOL-cSettledDocket-5. Every self-test the BAR runs must print an
 # executed assertion count, in one agreed shape, against a shrink-only floor.
 #
-#   bash tools/check-testsuite-counts.sh    # silent + exit 0 = good
+#   bash <prefix>/check-testsuite-counts.sh    # silent + exit 0 = good
 #
 # WHY. `TOOL-cBriefedPilot-23` gave three suites a runtime count and a floor, after one of them had
 # printed a hardcoded `PASS (130 assertions)` for its whole life with no counter behind it. The floor
@@ -14,7 +14,7 @@
 # twenty-seven and there was no agreed shape for a leg to check. Per-suite editing has no end and no
 # ratchet: the twenty-eighth suite lands silent and nobody notices.
 #
-# THE POPULATION IS DERIVED from `tools/gate-legs.json`, never hand-kept. A hand-maintained second
+# THE POPULATION IS DERIVED from `<prefix>/gate-legs.json`, never hand-kept. A hand-maintained second
 # list is how `check-kit-versions.sh` grew a duplicate assertion that printed two messages for one
 # defect, and the manifest is already the single source for what the bar runs — `run-gates.test.sh`
 # treats it that way. A suite nobody runs has no count worth checking.
@@ -30,6 +30,18 @@ ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "testsuite-counts: n
 cd "$ROOT" || exit 2
 _self_pre=$(git -C "$_self_dir" rev-parse --show-prefix 2>/dev/null) || { echo "testsuite-counts: cannot derive this gate's own directory from '$_self_dir', so the manifest beside it cannot be found"; exit 2; }
 MANIFEST="${GATE_LEGS:-${_self_pre}gate-legs.json}"
+# The `{prefix}` resolution (TOOL-aRepatriatedFork-47), INLINED byte-identically from the
+# canonical copy named on its marker line and gated by the resolve-python self-test.
+# >>> resolve_prefix_sh -- canonical copy: kit-rel.sh in the gov lib dir (byte-identical; gated)
+resolve_prefix_sh() {
+  local _rps_s="$1"
+  case "${2:-}" in
+    ""|.) _rps_s=${_rps_s//"{prefix}/"/}; _rps_s=${_rps_s//"{prefix}"/.} ;;
+    *) _rps_s=${_rps_s//"{prefix}"/"$2"} ;;
+  esac
+  printf '%s\n' "$_rps_s"
+}
+# <<< resolve_prefix_sh
 WAIVERS=memory/project/testsuite-count-waivers.txt
 status=0
 fail() { echo "TESTSUITE-COUNTS FAILED — $1"; status=1; }
@@ -38,7 +50,10 @@ fail() { echo "TESTSUITE-COUNTS FAILED — $1"; status=1; }
 
 # Every `*.test.sh` the manifest names, deduplicated. Selected from the argv strings rather than by
 # globbing the tree, so the leg's population and the bar's are the same set by construction.
-suites=$(grep -oE '"[^"]*\.test\.sh"' "$MANIFEST" | tr -d '"' | sort -u)
+# A `{prefix}` token (gov's own manifest, TOOL-aRepatriatedFork-29 §8 F1) resolves to this gate's
+# own directory, which is the tool root the manifest sits in.
+suites=$(grep -oE '"[^"]*\.test\.sh"' "$MANIFEST" | tr -d '"' \
+  | while IFS= read -r _s; do resolve_prefix_sh "$_s" "${_self_pre%/}"; done | sort -u)
 if [ -z "$suites" ]; then
   fail "the gate manifest names no *.test.sh, so this leg would grade an empty population — the vacuous-selector shape it exists to prevent"
   exit "$status"
@@ -50,12 +65,12 @@ fi
 waived=""
 [ -f "$WAIVERS" ] && waived=$(grep -vE '^[[:space:]]*(#|$)' "$WAIVERS" || true)
 
-# THE HARNESS SPELLING, and why it is a second FORM rather than a loophole. `tools/lib/lib-selftest.sh`
+# THE HARNESS SPELLING, and why it is a second FORM rather than a loophole. gov's lib-dir `lib-selftest.sh`
 # suites do not print their own count and do not compare their own floor: `run_arms` does both, and it
 # REFUSES a suite that declared fewer arms than its pin before running one of them. The property this
 # leg asserts is unchanged — an executed count, a non-zero floor, and something that compares them —
 # but two of the three now live one file over. What makes that checkable rather than trusted is that
-# `tools/lib/lib-selftest.test.sh` arms the comparison directly: an arm asserts a suite below its
+# gov's lib-dir `lib-selftest.test.sh` arms the comparison directly: an arm asserts a suite below its
 # floor reds by name, and another asserts an unparseable floor REFUSES instead of defaulting to 0.
 #
 # All three clauses are required and each is anchored, for the reason the classic form's are: an
@@ -97,7 +112,7 @@ $f
   fi
   if compliant "$f" || check_harness_form "$f"; then
     # A STALE waiver reds. A row whose suite now complies silently widens the surface it was written
-    # to narrow — the same rule `install-prefix-waivers.txt` already carries.
+    # to narrow — the same rule the install-prefix gate's old waiver registry carried.
     [ "$is_waived" = 0 ] || fail "a testsuite-count waiver names a suite that now complies, so the list has stopped shrinking and the row hides nothing: $f in $WAIVERS"
   else
     if [ "$is_waived" = 0 ]; then

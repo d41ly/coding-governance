@@ -29,8 +29,8 @@
 # config only inside it, and never writes into the real tree. Execution order is a scheduling detail;
 # REPORTING is always manifest order, so the output is byte-stable whatever the width.
 set -u
-KIT_RUN_GATES_VERSION=1.15   # gov:kit run-gates@1.15
-# 1.14 -> 1.15: KITREL is asked of git when the prefix strip leaves it absolute, the MSYS mount
+KIT_RUN_GATES_VERSION=1.22   # gov:kit run-gates@1.22
+# 1.21 -> 1.22: KITREL is asked of git when the prefix strip leaves it absolute, the MSYS mount
 # spelling (`/tmp/x` beside git's `C:/…/Temp/x`) the `cd … && pwd` fold does not reach; with it the
 # attribution's KF3 matched nothing for a tree under `/tmp`. Absorbed by aSightedSkeptic.
 # 1.8 -> 1.9: both sides of the origin/main merge into dDerivedDocket shipped a 1.8 - theirs the
@@ -51,7 +51,7 @@ KIT_RUN_GATES_VERSION=1.15   # gov:kit run-gates@1.15
 # 1.1 case above no govkit floor withholds the table today. TOOL-aQuenchedHarness-1.
 # THIS SCRIPT'S OWN DIRECTORY, RESOLVED BEFORE THE `cd`. A relative `$0` is relative to the caller's
 # cwd, so deriving it after `cd "$ROOT"` resolves it against the repo root instead: invoked as
-# `bash ../tools/run-gates/run-gates.sh` from a subdirectory the kit dir collapsed to the root, the
+# `bash ../<prefix>/run-gates/run-gates.sh` from a subdirectory the kit dir collapsed to the root, the
 # manifest to `./gate-legs.json`, and the runner ran ZERO legs. Captured here, used below.
 KITDIR=$(cd "$(dirname "$0")" && pwd)
 # AN ABSOLUTE ARGV, BY RE-EXECUTING THROUGH THE PATH JUST RESOLVED (TOOL-dDerivedDocket-25 S4). The
@@ -72,14 +72,14 @@ case "$0" in
 esac
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "run-gates: not a git repo"; exit 2; }
 cd "$ROOT" || exit 2
-# The python-launcher resolver, INLINED byte-identically from tools/lib/resolve-python.sh. This
-# kit is deployable (the aPacedTurnstile build's spec set under `memory/builds/aPacedTurnstile/spec/`), and tools/lib/ is gov-internal and never travels:
+# The python-launcher resolver, INLINED byte-identically from resolve-python.sh in gov's lib dir. This
+# kit is deployable (the aPacedTurnstile build's spec set under `memory/builds/aPacedTurnstile/spec/`), and gov's lib dir is gov-internal and never travels:
 # sourcing it made this runner exit 2 with zero legs run in any tree that did not have it.
 # The resolver parity gate derives its copy population by grepping for the marker below, so this
 # copy enrols itself. Do not edit it here. (That gate's own script path is deliberately NOT
 # spelled in this file: the canary forbids a leg's script path appearing in the runner, and it
 # is right to — a comment naming one is one edit away from an inlined leg command.)
-# >>> resolve_python — canonical copy: tools/lib/resolve-python.sh (byte-identical; gated)
+# >>> resolve_python — canonical copy: resolve-python.sh in gov's lib dir (byte-identical; gated)
 resolve_python() {
   # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
   # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
@@ -131,7 +131,7 @@ def resolve_kit_dir(home, anchor, here):
     """
     import json
     import pathlib
-    here = pathlib.Path(here).resolve()
+    here = pathlib.Path(here).absolute()  # never resolve(): a junction must not move it
     root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
     receipt = root / ".governance" / "install.json"
     try:
@@ -143,8 +143,8 @@ def resolve_kit_dir(home, anchor, here):
             continue
         if str(row.get("source") or "").split("/")[-2:] != [home, anchor]:
             continue
-        hit = (root / str(row["path"])).resolve()
-        if hit.is_file() and root in hit.parents:
+        hit = (root / str(row["path"])).absolute()
+        if hit.is_file() and root in hit.parents and ".." not in hit.parts:
             return hit.parent
     probes = (here / home, here.parent / home)
     for cand in probes:
@@ -171,7 +171,7 @@ fails=0; n=0; skips=0; ondemands=0
 # re-runs the whole bar recursively and clobbers the live gate-last-summary.txt mid-run -- so the
 # evidence guarantee below had no way to be tested at all (TOOL-dNomadicAtlas-1).
 # The manifest is the kit dir's SIBLING, derived rather than spelled: this kit installs at
-# <prefix>/run-gates/ and a hardcoded "tools/gate-legs.json" resolves to nothing at any other
+# <prefix>/run-gates/ and a hardcoded path to gate-legs.json at gov's prefix resolves to nothing at any other
 # prefix. GATE_LEGS still outranks the derivation (the aPacedTurnstile build's spec set under `memory/builds/aPacedTurnstile/spec/` S3).
 # Both sides are normalised through the SAME `cd ... && pwd` chain before the strip. Under MSYS one
 # directory has two spellings — `git rev-parse --show-toplevel` answers `C:/...` and `pwd` answers
@@ -308,7 +308,7 @@ prof_die() { echo "run-gates: $*" >&2; exit 2; }
 num_ok() { case "$1" in ''|*[!0-9]*) return 1 ;; esac; [ ${#1} -le 15 ] || return 1; [ "$1" -gt 0 ]; }
 
 # Every source is RUN and its output validated, never probed for existence — being on PATH is not
-# evidence, the lesson tools/lib/resolve-python.sh records. Measured on node `a`: the three core
+# evidence, the lesson gov's lib-dir resolve-python.sh records. Measured on node `a`: the three core
 # sources all report 16, the page arithmetic and /proc/meminfo agree within 1 MB, and `sysctl` exits
 # 127, which is the case the chain must survive and does. CORE_SRC/RAM_SRC accumulate what was TRIED,
 # so the visibility line names the chain whether it answered on the first source or the third.
@@ -1660,6 +1660,23 @@ if not isinstance(data, list):
     sys.stderr.write("gate-legs.json is not a list\n"); sys.exit(3)
 durs = {}
 cache = sys.argv[2] if len(sys.argv) > 2 else ""   # argv[1] is the MANIFEST; the cache is argv[2]
+# argv[3] is the TOOL ROOT this runner derived from its own location. A manifest names its programs
+# and guards through the {prefix} token (TOOL-aRepatriatedFork-29, its spec section 8 F1), resolved
+# here ONCE, so every field below and every reader of these rows sees a repo-relative path. A
+# manifest carrying no token, which is what the deployer emits for an adopter, passes unchanged.
+troot = sys.argv[3] if len(sys.argv) > 3 else ""
+# >>> resolve_prefix_token -- canonical copy: resolve_prefix_token.py in the gov lib dir (byte-identical; gated)
+def resolve_prefix_token(spelled, troot):
+    """<spelled> with its {prefix} token resolved against the tool root <troot>.
+
+    An empty or "." root is a root install: the token drops with its slash, and a bare token
+    becomes ".". Any other root replaces the token. Text with no token passes unchanged.
+    """
+    spelled = str(spelled)
+    if not troot or troot == ".":
+        return spelled.replace("{prefix}/", "").replace("{prefix}", ".")
+    return spelled.replace("{prefix}", troot)
+# <<< resolve_prefix_token
 if cache and os.path.exists(cache):
     try:
         for line in open(cache, encoding="utf-8"):
@@ -1690,7 +1707,8 @@ rows = [" ".join(str(i) for i in order)]
 # the live hook installed here, so "what does it test" has two true answers and the failure question
 # has one. Those four legs are `repo`: a broken boundary in THIS repository cannot wait for somebody
 # to remember a variable. TOOL-dUnstalledConvoy-30.
-rows += [l["name"] + "\x1e" + ",".join(l.get("guard", [])) + "\x1e" + "\x1f".join(l["argv"])
+rows += [l["name"] + "\x1e" + ",".join(resolve_prefix_token(g, troot) for g in l.get("guard", []))
+         + "\x1e" + "\x1f".join(resolve_prefix_token(a, troot) for a in l["argv"])
          + "\x1e" + ("1" if l.get("impure") else "")
          + "\x1e" + str(l.get("chunk", "") or "")
          + "\x1e" + (l.get("subject") or "repo")
@@ -1712,7 +1730,7 @@ rows += [l["name"] + "\x1e" + ",".join(l.get("guard", [])) + "\x1e" + "\x1f".joi
                             if isinstance(l.get("signature"), list) else "")
          for l in data]
 sys.stdout.buffer.write(("\n".join(rows) + "\n").encode())   # LF bytes (Windows text stdout is CRLF); \x1e field sep is non-whitespace so an empty guard field is preserved (a tab would collapse)
-' "$LEGS_FILE" "$TIMINGS") || { echo "run-gates: cannot parse $LEGS_FILE"; exit 2; }
+' "$LEGS_FILE" "$TIMINGS" "$(dirname "$KITREL")") || { echo "run-gates: cannot parse $LEGS_FILE"; exit 2; }
 
 # Rows stay 1:1 with the manifest so the dispatch indices address the same legs the reader reports.
 # An empty name is the drop-sentinel: kept in the arrays to hold the index, never run and never counted.
@@ -2927,6 +2945,23 @@ except Exception:
     sys.exit(3)
 if not isinstance(data, list):
     sys.exit(3)
+# THE ROWS AT R RESOLVE THE {prefix} TOKEN AGAINST THE TOOL ROOT OF THIS RUNNER, exactly as the rows
+# at L do, or a manifest at R that spells its argv through the token never equals the resolved argv
+# at L and every red reads OWN by "its argv differs". A manifest at R that predates the token passes
+# unchanged. NOTE: this program is inside a single-quoted shell block, so it carries no apostrophe.
+troot = sys.argv[2] if len(sys.argv) > 2 else ""
+# >>> resolve_prefix_token -- canonical copy: resolve_prefix_token.py in the gov lib dir (byte-identical; gated)
+def resolve_prefix_token(spelled, troot):
+    """<spelled> with its {prefix} token resolved against the tool root <troot>.
+
+    An empty or "." root is a root install: the token drops with its slash, and a bare token
+    becomes ".". Any other root replaces the token. Text with no token passes unchanged.
+    """
+    spelled = str(spelled)
+    if not troot or troot == ".":
+        return spelled.replace("{prefix}/", "").replace("{prefix}", ".")
+    return spelled.replace("{prefix}", troot)
+# <<< resolve_prefix_token
 out = []
 for l in data:
     if not isinstance(l, dict) or not l.get("name"):
@@ -2934,10 +2969,10 @@ for l in data:
     ce = l.get("ceiling")
     ce = str(ce) if isinstance(ce, int) and not isinstance(ce, bool) and ce > 0 else ""
     sig = l.get("signature") if isinstance(l.get("signature"), list) else []
-    out.append(l["name"] + "\x1e" + "\x1f".join(str(a) for a in (l.get("argv") or []))
-               + "\x1e" + ce + "\x1e" + "\x1f".join(str(a) for a in sig))
+    out.append(l["name"] + "\x1e" + "\x1f".join(resolve_prefix_token(a, troot) for a in (l.get("argv") or []))
+               + "\x1e" + ce + "\x1e" + "\x1f".join(resolve_prefix_token(a, troot) for a in sig))
 sys.stdout.buffer.write(("\n".join(out) + "\n").encode())
-' "$ATMP/manifest-at-R" > "$ATTR_ROWS" 2>/dev/null || ATTR_ROWS_STATE=unparseable
+' "$ATMP/manifest-at-R" "$(dirname "$KITREL")" > "$ATTR_ROWS" 2>/dev/null || ATTR_ROWS_STATE=unparseable
     fi
     # The worktree lives under the git COMMON dir, made absolute, as the baseline runner places its own.
     gcd=$(git rev-parse --git-common-dir 2>/dev/null) || gcd=""

@@ -9,23 +9,140 @@
 # constants from silent deletion/malformation, not scaffolding for a speculative feature.
 #   Exit 0 = all present + consistent · 1 = a constant is missing/malformed or a marker drifted · 2 = not a repo.
 set -u
+_self_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" 2>/dev/null && pwd) || _self_dir=""  # before the cd: $0 may be relative
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
+# TOOL-aRepatriatedFork-29 S3 — THE CARRIERS ARE DECLARED, THE ROOT THEY SIT UNDER IS DERIVED. Every
+# row below names its carrier kit-relatively and joins it to `K`, the directory this gate sits in,
+# so gov's own version gate grades gov at whatever kit root it was checked out under. The population
+# stays a declaration: deriving it by glob would make a carrier that forgets its constant vanish from
+# its own check. `git -C <dir> rev-parse --show-prefix` and not a string strip, because a Windows
+# junction makes two spellings of one tree differ; an empty answer is the repo root, told apart from
+# a failure by git's exit status.
+if ! K=$(git -C "$_self_dir" rev-parse --show-prefix 2>/dev/null); then
+  echo "kit-versions: cannot derive this gate's own directory from '$_self_dir' — REFUSING rather than guessing the kit root"
+  exit 2
+fi
+# TOOL-aRepatriatedFork-46: EVERY CARRIER'S KIT IS RESOLVED, never typed. The rows below used to join
+# a kit's name to `K`, which is the class the carried-prefix ban counts: a kit homed under another
+# name, which the install receipt records, read as MISSING here. The sibling-kit resolver reads that
+# receipt first, then probes beside this gate and one level up. A kit it cannot find is spelled
+# `<no KIT kit>`, so its rows red as MISSING by name rather than disappearing from the check.
+# >>> resolve_python — canonical copy: resolve-python.sh in gov's lib dir (byte-identical; gated)
+resolve_python() {
+  # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
+  # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
+  # the candidate and every consumer uses "$PY" as a single word (measured: exit 127).
+  _rp_tried=""
+  for _rp_c in "${1:-}" "${GOV_PYTHON:-}" python3 python py; do
+    [ -n "$_rp_c" ] || continue
+    _rp_tried="$_rp_tried $_rp_c"
+    if "$_rp_c" -c "import sys" >/dev/null 2>&1; then
+      printf '%s\n' "$_rp_c"
+      return 0
+    fi
+  done
+  {
+    echo "resolve_python: no usable python launcher. Each candidate was RUN with -c 'import sys' and"
+    echo "resolve_python: none exited 0 — being on PATH is not evidence (the Microsoft Store python3"
+    echo "resolve_python: stub answers \`command -v\` and exits 9009 without running anything)."
+    echo "resolve_python: tried:$_rp_tried"
+    if [ -n "${1:-}" ]; then
+      echo "resolve_python: the caller's override '$1' was tried FIRST and did not run."
+    fi
+    if [ -n "${GOV_PYTHON:-}" ]; then
+      echo "resolve_python: GOV_PYTHON is set to '$GOV_PYTHON' and did not run. An override that is"
+      echo "resolve_python: set and unusable is THIS failure, never a silent fall-through — the"
+      echo "resolve_python: operator believes they chose, and would not have."
+    fi
+  } >&2
+  return 1
+}
+# <<< resolve_python
+# The sibling-kit resolver (TOOL-aRepatriatedFork-2 S3), INLINED byte-identically from the
+# canonical copy named on its marker line and gated by the resolve-python self-test's parity
+# table. A shell consumer runs it with the python it already resolved, so the receipt rung is
+# read in Python and never parsed in bash. `resolve_kit_dir <python> <home> <anchor> <here>`
+# prints the kit directory REPO-RELATIVE, or the resolver's named refusal on stderr and exits 1.
+resolve_kit_dir() {
+  "$1" -c "$(cat <<'RKD'
+# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
+def resolve_kit_dir(home, anchor, here):
+    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
+
+    1. receipt — the `.governance/install.json` row whose `source` ends in <home>/<anchor> and
+       whose `path` exists inside this tree. The only record of a RENAMED kit dir: no probe finds
+       a memory-recall kit an adopter homed at `scripts/recall/`.
+    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
+    3. refuse — LookupError naming the three places looked; never a guessed prefix.
+    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
+    """
+    import json
+    import pathlib
+    here = pathlib.Path(here).absolute()  # never resolve(): a junction must not move it
+    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
+    receipt = root / ".governance" / "install.json"
+    try:
+        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("path"):
+            continue
+        if str(row.get("source") or "").split("/")[-2:] != [home, anchor]:
+            continue
+        hit = (root / str(row["path"])).absolute()
+        if hit.is_file() and root in hit.parents and ".." not in hit.parts:
+            return hit.parent
+    probes = (here / home, here.parent / home)
+    for cand in probes:
+        if (cand / anchor).is_file():
+            return cand
+    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
+        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
+# <<< resolve_kit_dir
+RKD
+)"'
+import sys
+try:
+    d = resolve_kit_dir(*sys.argv[1:4])
+except LookupError as e:
+    sys.exit(str(e))
+r = next((p for p in (d, *d.parents) if (p / ".git").exists()), d.anchor)
+print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
+}
+KV_PY=$(resolve_python) || { echo "kit-versions: no usable python, so the carriers' kits cannot be resolved — REFUSING rather than guessing the kit root"; exit 2; }
+resolve_carrier_kit() { # <home> <anchor> -> the kit's repo-relative directory, or a name that resolves nowhere
+  resolve_kit_dir "$KV_PY" "$1" "$2" "$_self_dir" 2>/dev/null || printf '<no %s kit>\n' "$1"
+}
+MT_DIR=$(resolve_carrier_kit memory-tree check-memory-hygiene.sh)
+CM_DIR=$(resolve_carrier_kit codebase-map map_lib.py)
+HK_DIR=$(resolve_carrier_kit hooks agent-cap.js)
+WF_DIR=$(resolve_carrier_kit workflows tier2-review.js)
+RG_DIR=$(resolve_carrier_kit run-gates run-gates.sh)
+UN_DIR=$(resolve_carrier_kit unattended unattended.sh)
+MR_DIR=$(resolve_carrier_kit memory-recall recall_conf.py)
+DA_DIR=$(resolve_carrier_kit drift-audit drift_report.py)
+PG_DIR=$(resolve_carrier_kit pytest-parallel-guardrails crashprobe.py)
+GK_DIR=$(resolve_carrier_kit govkit govkit.py)
+LX_DIR=$(resolve_carrier_kit lexicon lexicon.py)
+checked=0
 fails=0
 V='[0-9]+\.[0-9]+'   # two-part X.Y; only monotone comparability matters to the deployer
 
 need() { # label · file · extended-regex
+  checked=$((checked+1))
   grep -qE "$3" "$2" 2>/dev/null || { echo "kit-versions: MISSING $1 in $2"; fails=$((fails+1)); }
 }
 
-need "KIT_MEMORY_TREE_VERSION"    tools/memory-tree/check-memory-hygiene.sh "^KIT_MEMORY_TREE_VERSION=$V([[:space:]]|\$)"
-need "KIT_CODEBASE_MAP_VERSION"   tools/codebase-map/map_lib.py             "^KIT_CODEBASE_MAP_VERSION = \"$V\""
-need "KIT_AGENT_CAP_VERSION"      tools/hooks/agent-cap.js                  "KIT_AGENT_CAP_VERSION = '$V'"
+need "KIT_MEMORY_TREE_VERSION"    ${MT_DIR}/check-memory-hygiene.sh "^KIT_MEMORY_TREE_VERSION=$V([[:space:]]|\$)"
+need "KIT_CODEBASE_MAP_VERSION"   ${CM_DIR}/map_lib.py             "^KIT_CODEBASE_MAP_VERSION = \"$V\""
+need "KIT_AGENT_CAP_VERSION"      ${HK_DIR}/agent-cap.js                  "KIT_AGENT_CAP_VERSION = '$V'"
 # The harness path, bound ONCE. It was spelled at three sites after TOOL-dRetiredFork-7 and the
 # install-prefix ratchet is shrink-only, so a literal per use is a regression an adopter pays
 # for: apply ships these bytes verbatim and a carried `tools/` path resolves to nothing at
 # another prefix.
-T2R="tools/workflows/tier2-review.js"
+T2R="${WF_DIR}/tier2-review.js"
 need "tier2-review meta.version"  "$T2R"                                   "version: '$V'"
 need "KIT_MANIFEST_VERSION"       skills/session-kickoff/manifest-check.sh  "^KIT_MANIFEST_VERSION=\"$V\""
 
@@ -73,9 +190,9 @@ fi
 # agent-cap: constant and marker sit on ONE line, which is why this pair was presence-checked only —
 # and a half-bumped pair therefore passed. Assert they agree like every other pair; "same line" is
 # not "same value", and the marker is what a deployer greps in an adopting tree.
-ac=$(grep -oE "KIT_AGENT_CAP_VERSION = '$V'" tools/hooks/agent-cap.js | head -1 | grep -oE "$V")
+ac=$(grep -oE "KIT_AGENT_CAP_VERSION = '$V'" ${HK_DIR}/agent-cap.js | head -1 | grep -oE "$V")
 if [ -z "$ac" ]; then
-  echo "kit-versions: KIT_AGENT_CAP_VERSION is unreadable in tools/hooks/agent-cap.js"
+  echo "kit-versions: KIT_AGENT_CAP_VERSION is unreadable in ${HK_DIR}/agent-cap.js"
   fails=$((fails+1))
 else
   # The population is DERIVED, and naming one file is exactly how a half-bumped pair passed here for
@@ -99,26 +216,26 @@ else
     fi
   done
 fi
-need "KIT_SETTINGS_MERGE_VERSION" tools/settings-merge.py                   "KIT_SETTINGS_MERGE_VERSION = \"$V\""
-need "KIT_RUN_GATES_VERSION"      tools/run-gates/run-gates.sh              "^KIT_RUN_GATES_VERSION=$V([[:space:]]|\$)"
+need "KIT_SETTINGS_MERGE_VERSION" ${K}settings-merge.py                   "KIT_SETTINGS_MERGE_VERSION = \"$V\""
+need "KIT_RUN_GATES_VERSION"      ${RG_DIR}/run-gates.sh              "^KIT_RUN_GATES_VERSION=$V([[:space:]]|\$)"
 
 # run-gates: the constant in the runner, the marker on that same line, and the marker in the kit
 # README a deployer greps. Asserted EQUAL rather than merely present, because this file has twice
 # recorded a half-bumped pair passing a presence-only check (agent-cap, settings-merge).
-rg=$(grep -oE "^KIT_RUN_GATES_VERSION=$V([[:space:]]|$)" tools/run-gates/run-gates.sh | head -1 | grep -oE "$V")
+rg=$(grep -oE "^KIT_RUN_GATES_VERSION=$V([[:space:]]|$)" ${RG_DIR}/run-gates.sh | head -1 | grep -oE "$V")
 if [ -z "$rg" ]; then
-  echo "kit-versions: KIT_RUN_GATES_VERSION is unreadable in tools/run-gates/run-gates.sh"
+  echo "kit-versions: KIT_RUN_GATES_VERSION is unreadable in ${RG_DIR}/run-gates.sh"
   fails=$((fails+1))
 else
-  grep -qE "gov:kit run-gates@$rg([^0-9.]|\$)" tools/run-gates/run-gates.sh     || { echo "kit-versions: run-gates.sh gov:kit marker != KIT_RUN_GATES_VERSION ($rg)"; fails=$((fails+1)); }
-  grep -qE "gov:kit run-gates@$rg([^0-9.]|\$)" tools/run-gates/README.md     || { echo "kit-versions: tools/run-gates/README.md gov:kit marker != KIT_RUN_GATES_VERSION ($rg) — the README is where a deployer reads a kit's version in an adopting tree"; fails=$((fails+1)); }
+  grep -qE "gov:kit run-gates@$rg([^0-9.]|\$)" ${RG_DIR}/run-gates.sh     || { echo "kit-versions: run-gates.sh gov:kit marker != KIT_RUN_GATES_VERSION ($rg)"; fails=$((fails+1)); }
+  grep -qE "gov:kit run-gates@$rg([^0-9.]|\$)" ${RG_DIR}/README.md     || { echo "kit-versions: ${RG_DIR}/README.md gov:kit marker != KIT_RUN_GATES_VERSION ($rg) — the README is where a deployer reads a kit's version in an adopting tree"; fails=$((fails+1)); }
 fi
 
 # settings-merge: constant plus the marker in its own module docstring, which is where a deployer
 # reads the version of a single-file kit. Presence-only left a half-bumped pair passing, same as
 # agent-cap's.
-sm=$(grep -oE "^KIT_SETTINGS_MERGE_VERSION = \"$V\"" tools/settings-merge.py | head -1 | grep -oE "$V")
-if [ -z "$sm" ] || [ "$(grep -cE "gov:kit settings-merge@$sm([^0-9.]|\$)" tools/settings-merge.py)" -lt 2 ]; then
+sm=$(grep -oE "^KIT_SETTINGS_MERGE_VERSION = \"$V\"" ${K}settings-merge.py | head -1 | grep -oE "$V")
+if [ -z "$sm" ] || [ "$(grep -cE "gov:kit settings-merge@$sm([^0-9.]|\$)" ${K}settings-merge.py)" -lt 2 ]; then
   echo "kit-versions: settings-merge.py gov:kit markers != KIT_SETTINGS_MERGE_VERSION (${sm:-unreadable})"
   fails=$((fails+1))
 fi
@@ -137,16 +254,16 @@ fi
 # The decoy fixtures in check-verdict-epoch.test.sh are excluded by construction rather than by a
 # special case: they are not `*.template.md`, so this glob never sees them.
 # (The token is mid-line, so a CRLF working tree is fine.)
-c=$(grep -oE "^KIT_MEMORY_TREE_VERSION=$V" tools/memory-tree/check-memory-hygiene.sh | head -1 | cut -d= -f2)
+c=$(grep -oE "^KIT_MEMORY_TREE_VERSION=$V" ${MT_DIR}/check-memory-hygiene.sh | head -1 | cut -d= -f2)
 if [ -z "$c" ]; then
   echo "kit-versions: KIT_MEMORY_TREE_VERSION is unreadable, so no marker can be compared against it"
   fails=$((fails+1))
 else
-  mt_templates=$(git ls-files 'tools/memory-tree/*.template.md' 2>/dev/null)
+  mt_templates=$(git ls-files "${MT_DIR}/*.template.md" 2>/dev/null)
   if [ -z "$mt_templates" ]; then
     # An empty population would make every assertion below vacuously true, which is the failure this
     # repo names `vacuous-selector-empty-population`. It is a refusal, not a pass.
-    echo "kit-versions: no tracked tools/memory-tree/*.template.md — the marker assertion would be vacuous"
+    echo "kit-versions: no tracked ${MT_DIR}/*.template.md — the marker assertion would be vacuous"
     fails=$((fails+1))
   fi
   for t in $mt_templates; do
@@ -171,12 +288,12 @@ fi
 # The two INLINE markers that share a line with each constant are paired too. Same line is NOT same
 # value: agent-cap's same-line pair is the recorded case where a half-bumped constant and marker
 # passed because nothing compared them to each other.
-uc=$(grep -oE "^KIT_UNATTENDED_VERSION=$V" tools/unattended/unattended.sh | head -1 | cut -d= -f2)
+uc=$(grep -oE "^KIT_UNATTENDED_VERSION=$V" ${UN_DIR}/unattended.sh | head -1 | cut -d= -f2)
 if [ -z "$uc" ]; then
   echo "kit-versions: KIT_UNATTENDED_VERSION is unreadable in unattended.sh, so no marker can be compared against it"
   fails=$((fails+1))
 else
-  for s in tools/unattended/unattended.sh tools/unattended/check-unattended.sh tools/unattended/check-pass-order.sh tools/unattended/check-brief-recorded.sh; do
+  for s in ${UN_DIR}/unattended.sh ${UN_DIR}/check-unattended.sh ${UN_DIR}/check-pass-order.sh ${UN_DIR}/check-brief-recorded.sh; do
     if ! grep -qE "^KIT_UNATTENDED_VERSION=$uc([^0-9.]|\$)" "$s"; then
       echo "kit-versions: $s KIT_UNATTENDED_VERSION != $uc — the driver and its leg disagree about which kit this is"
       fails=$((fails+1))
@@ -186,9 +303,9 @@ else
       fails=$((fails+1))
     fi
   done
-  un_templates=$(git ls-files 'tools/unattended/*.template.md' 2>/dev/null)
+  un_templates=$(git ls-files "${UN_DIR}/*.template.md" 2>/dev/null)
   if [ -z "$un_templates" ]; then
-    echo "kit-versions: no tracked tools/unattended/*.template.md — the marker assertion would be vacuous"
+    echo "kit-versions: no tracked ${UN_DIR}/*.template.md — the marker assertion would be vacuous"
     fails=$((fails+1))
   fi
   for t in $un_templates; do
@@ -202,53 +319,53 @@ else
   done
 fi
 
-need "KIT_UNATTENDED_VERSION"     tools/unattended/unattended.sh            "^KIT_UNATTENDED_VERSION=$V([[:space:]]|\$)"
+need "KIT_UNATTENDED_VERSION"     ${UN_DIR}/unattended.sh            "^KIT_UNATTENDED_VERSION=$V([[:space:]]|\$)"
 # The driver/leg constant pairing that used to sit here is SUBSUMED by the unattended block below,
 # which derives the same $uc from the same file and asserts the same regex against the same second
 # file — one defect, two messages, two increments, and two copies to keep in step. Deleted rather
 # than kept as a second opinion, because a re-implementation of an assertion is not one.
-need "KIT_MEMORY_RECALL_VERSION"  tools/memory-recall/recall_conf.py         "^KIT_MEMORY_RECALL_VERSION = \"$V\""
+need "KIT_MEMORY_RECALL_VERSION"  ${MR_DIR}/recall_conf.py         "^KIT_MEMORY_RECALL_VERSION = \"$V\""
 
 # memory-recall: constant in recall_conf.py, marker in the README the adopter keeps. Same pair
 # assertion as memory-tree — a stale marker makes the deployer read the wrong installed version.
-r=$(grep -oE "^KIT_MEMORY_RECALL_VERSION = \"$V\"" tools/memory-recall/recall_conf.py | head -1 | grep -oE "$V")
-if [ -z "$r" ] || ! grep -qE "gov:kit memory-recall@$r([^0-9.]|\$)" tools/memory-recall/README.md; then
+r=$(grep -oE "^KIT_MEMORY_RECALL_VERSION = \"$V\"" ${MR_DIR}/recall_conf.py | head -1 | grep -oE "$V")
+if [ -z "$r" ] || ! grep -qE "gov:kit memory-recall@$r([^0-9.]|\$)" ${MR_DIR}/README.md; then
   echo "kit-versions: memory-recall README marker != KIT_MEMORY_RECALL_VERSION (${r:-unreadable})"
   fails=$((fails+1))
 fi
 
-need "KIT_DRIFT_AUDIT_VERSION"    tools/drift-audit/drift_report.py          "^KIT_DRIFT_AUDIT_VERSION = \"$V\""
+need "KIT_DRIFT_AUDIT_VERSION"    ${DA_DIR}/drift_report.py          "^KIT_DRIFT_AUDIT_VERSION = \"$V\""
 
 # drift-audit: constant in drift_report.py, marker in the README the adopter keeps. Same pair
 # assertion as memory-tree/memory-recall — a stale marker makes the deployer read the wrong version.
-da=$(grep -oE "^KIT_DRIFT_AUDIT_VERSION = \"$V\"" tools/drift-audit/drift_report.py | head -1 | grep -oE "$V")
-if [ -z "$da" ] || ! grep -qE "gov:kit drift-audit@$da([^0-9.]|\$)" tools/drift-audit/README.md; then
+da=$(grep -oE "^KIT_DRIFT_AUDIT_VERSION = \"$V\"" ${DA_DIR}/drift_report.py | head -1 | grep -oE "$V")
+if [ -z "$da" ] || ! grep -qE "gov:kit drift-audit@$da([^0-9.]|\$)" ${DA_DIR}/README.md; then
   echo "kit-versions: drift-audit README marker != KIT_DRIFT_AUDIT_VERSION (${da:-unreadable})"
   fails=$((fails+1))
 fi
 
-need "drift-audit-code meta.version"  tools/workflows/drift-audit-code.js  "version: '$V'"
-need "drift-audit-state meta.version" tools/workflows/drift-audit-state.js "version: '$V'"
+need "drift-audit-code meta.version"  ${WF_DIR}/drift-audit-code.js  "version: '$V'"
+need "drift-audit-state meta.version" ${WF_DIR}/drift-audit-state.js "version: '$V'"
 
 # ...and each harness's meta.version agrees with the kit constant AND with its own gov:kit marker.
 # The harnesses ship the kit's `args` contract, so a contract narrowing that moves the engine version
 # and leaves a harness at the old one tells an adopter the wrong thing about the file they actually run.
 for h in code state; do
-  hv=$(grep -oE "version: '$V'" "tools/workflows/drift-audit-$h.js" | head -1 | grep -oE "$V")
+  hv=$(grep -oE "version: '$V'" "${WF_DIR}/drift-audit-$h.js" | head -1 | grep -oE "$V")
   if [ -z "$hv" ] || [ "$hv" != "$da" ]; then
     echo "kit-versions: drift-audit-$h.js meta.version (${hv:-unreadable}) != KIT_DRIFT_AUDIT_VERSION (${da:-unreadable})"
     fails=$((fails+1))
-  elif ! grep -qE "gov:kit drift-audit@$hv([^0-9.]|\$)" "tools/workflows/drift-audit-$h.js"; then
+  elif ! grep -qE "gov:kit drift-audit@$hv([^0-9.]|\$)" "${WF_DIR}/drift-audit-$h.js"; then
     echo "kit-versions: drift-audit-$h.js gov:kit marker != its own meta.version ($hv)"
     fails=$((fails+1))
   fi
 done
 
-need "KIT_PYTEST_GUARDRAILS_VERSION" tools/pytest-parallel-guardrails/crashprobe.py "^KIT_PYTEST_GUARDRAILS_VERSION = \"$V\""
-need "KIT_GOVKIT_VERSION"          tools/govkit/govkit.py                    "^KIT_GOVKIT_VERSION = \"$V\""
+need "KIT_PYTEST_GUARDRAILS_VERSION" ${PG_DIR}/crashprobe.py "^KIT_PYTEST_GUARDRAILS_VERSION = \"$V\""
+need "KIT_GOVKIT_VERSION"          ${GK_DIR}/govkit.py                    "^KIT_GOVKIT_VERSION = \"$V\""
 # The kit dir, bound ONCE for the same reason `T2R` above is: a literal per use is a regression an
 # adopter pays for, and the carried-prefix ban counts every one of them.
-LXD="tools/lexicon"
+LXD="$LX_DIR"
 need "KIT_LEXICON_VERSION"         "$LXD/lexicon.py"                         "^KIT_LEXICON_VERSION = \"$V\""
 
 # lexicon: the constant was PRESENCE-checked alone, which is how a bump to 1.2 shipped with all four
@@ -268,14 +385,14 @@ done
 # pytest-parallel-guardrails: the constant lives in crashprobe.py, but the probe is a
 # hunt-then-remove diagnostic — the DEPLOYER-side version signal is the gov:kit marker in each
 # artifact adopters KEEP. Assert the constant and every marker agree (memory-tree-pair style).
-g=$(tr -d '\r' < tools/pytest-parallel-guardrails/crashprobe.py | grep -oE "^KIT_PYTEST_GUARDRAILS_VERSION = \"$V\"" | head -1 | grep -oE "$V")
+g=$(tr -d '\r' < ${PG_DIR}/crashprobe.py | grep -oE "^KIT_PYTEST_GUARDRAILS_VERSION = \"$V\"" | head -1 | grep -oE "$V")
 for kept in README.md pyproject-snippet.toml aiosqlite-seam-conftest.py aiosqlite_worker_resilience.test-template.py; do
-  if [ -z "$g" ] || ! grep -qE "gov:kit pytest-parallel-guardrails@$g([^0-9.]|\$)" "tools/pytest-parallel-guardrails/$kept"; then
+  if [ -z "$g" ] || ! grep -qE "gov:kit pytest-parallel-guardrails@$g([^0-9.]|\$)" "${PG_DIR}/$kept"; then
     echo "kit-versions: pytest-parallel-guardrails marker in $kept != constant (${g:-unreadable})"
     fails=$((fails+1))
   fi
 done
 
-[ "$fails" = 0 ] && exit 0
+[ "$fails" = 0 ] && { echo "kit-versions: clean — $checked declared carrier(s) under ${K:-the repo root}"; exit 0; }
 echo "kit-versions: $fails problem(s)"
 exit 1

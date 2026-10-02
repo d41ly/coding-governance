@@ -8,7 +8,7 @@ kits, the hooks and the catalogues — not routes or screens. Every inventory be
 ADDABLE moving part of that product.
 
 ROOT RESOLUTION. Handled by the engine since the aRootedPrefix unit: map_lib walks up for
-`.codebase-map.conf` bounded by `.git`, so this repo's `tools/` install prefix needs nothing here.
+`.codebase-map.conf` bounded by `.git`, so this repo's install prefix needs nothing here.
 
 Rules honoured (each was a shipped bug once, per the derivation checklist):
 - Fail CLOSED. Every extractor raises MapError rather than returning fewer keys; an extractor that
@@ -34,21 +34,64 @@ import map_lib as m
 # since it follows a junction to the link target and would disagree with `map_lib.kit_dir()` about
 # the prefix stamped into byte-compared artifacts.
 ROOT = m.repo_root()
+# THE TOOL ROOT, derived (TOOL-aRepatriatedFork-29 S6): the parent of this kit's own directory, spelled
+# from ROOT the way every remedy in the kit spells it. Under a `CODEBASE_MAP_ROOT` pointed at a fixture
+# tree `kit_rel` falls back to the kit's bare name, and the tool root is then ROOT itself.
+TOOLS = ROOT / Path(m.kit_rel(ROOT)).parent
+
+
+# TOOL-aRepatriatedFork-46: a SIBLING kit is reached through the resolver, which reads the install
+# receipt first, never by joining that kit's name to the tool root.
+# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
+def resolve_kit_dir(home, anchor, here):
+    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
+
+    1. receipt — the `.governance/install.json` row whose `source` ends in <home>/<anchor> and
+       whose `path` exists inside this tree. The only record of a RENAMED kit dir: no probe finds
+       a memory-recall kit an adopter homed at `scripts/recall/`.
+    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
+    3. refuse — LookupError naming the three places looked; never a guessed prefix.
+    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
+    """
+    import json
+    import pathlib
+    here = pathlib.Path(here).absolute()  # never resolve(): a junction must not move it
+    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
+    receipt = root / ".governance" / "install.json"
+    try:
+        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("path"):
+            continue
+        if str(row.get("source") or "").split("/")[-2:] != [home, anchor]:
+            continue
+        hit = (root / str(row["path"])).absolute()
+        if hit.is_file() and root in hit.parents and ".." not in hit.parts:
+            return hit.parent
+    probes = (here / home, here.parent / home)
+    for cand in probes:
+        if (cand / anchor).is_file():
+            return cand
+    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
+        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
+# <<< resolve_kit_dir
 
 
 def _tool_kits() -> list[str]:
-    """Every kit directory directly under tools/.
+    """Every kit directory directly under the tool root.
 
-    Deliberately NOT README-gated: tools/hooks, tools/lib and tools/workflows carry no README and
+    Deliberately NOT README-gated: the hooks, lib and workflows dirs carry no README and
     are still kits. Gating on a README would have silently dropped three of ten, which is the
     green-by-absence class this file exists to avoid.
     """
-    base = ROOT / "tools"
+    base = TOOLS
     if not base.is_dir():
-        raise m.MapError("kits: tools/ is missing — the extractor is mis-rooted")
+        raise m.MapError(f"kits: {base.as_posix()} is missing — the extractor is mis-rooted")
     names = sorted(p.name for p in base.iterdir() if p.is_dir() and p.name != "__pycache__")
     if not names:
-        raise m.MapError("kits: no kit directories under tools/ — the extractor is mis-rooted")
+        raise m.MapError(f"kits: no kit directories under {base.as_posix()} — the extractor is mis-rooted")
     return names
 
 
@@ -69,7 +112,7 @@ def _git_hooks() -> list[str]:
 
 
 def _gate_legs(doc: object) -> object:
-    """Leg names from tools/gate-legs.json — the single source the runner reads.
+    """Leg names from <prefix>/gate-legs.json — the single source the runner reads.
 
     Raises through json_artifact_inventory on a malformed doc. A leg with no name is a MapError
     rather than a dropped key, because a nameless leg is exactly the one nobody would notice.
@@ -88,9 +131,9 @@ def _gate_legs(doc: object) -> object:
 
 EXTRACTORS: dict[str, object] = {
     # The merge bar itself. The runner single-sources its legs from this artifact and
-    # tools/run-gates/run-gates.test.sh forbids a hardcoded leg command, so the JSON IS the registry.
+    # <prefix>/run-gates/run-gates.test.sh forbids a hardcoded leg command, so the JSON IS the registry.
     "gate-legs": lambda: m.json_artifact_inventory(
-        ROOT / "tools" / "gate-legs.json", "gate-legs", _gate_legs
+        TOOLS / "gate-legs.json", "gate-legs", _gate_legs
     ),
     # The copy-in kits — the deployable product.
     "kits": _tool_kits,
@@ -98,7 +141,7 @@ EXTRACTORS: dict[str, object] = {
     "git-hooks": _git_hooks,
     # The multi-agent harnesses and the gates over them.
     "workflow-scripts": lambda: m.glob_inventory(
-        ROOT / "tools" / "workflows", "*.js", "workflow-scripts"
+        resolve_kit_dir("workflows", "tier2-review.js", TOOLS), "*.js", "workflow-scripts"
     ),
     # The skill ENGINE sources (machine-junctioned per node).
     "skill-engines": lambda: m.walk_dir_keys(
@@ -159,10 +202,10 @@ def _read_lexicon_verbs() -> list[str]:
     # and every leg that calls it, on account of an OPTIONAL kit. Fail to the empty inventory, which
     # is the same answer the absent-conf case gives and is what the dossier ratchet then reports.
     import sys as _sys
-    kit = str(ROOT / "tools" / "lexicon")
-    if kit not in _sys.path:
-        _sys.path.insert(0, kit)
     try:
+        kit = str(resolve_kit_dir("lexicon", "lexicon_conf.py", TOOLS))
+        if kit not in _sys.path:
+            _sys.path.insert(0, kit)
         from lexicon_conf import load_conf  # noqa: E402
         return sorted((load_conf(conf).get("VERBS") or {}).keys())
     except Exception:
@@ -192,10 +235,10 @@ def _live_py(layer: str) -> list[dict[str, str]]:
     a template still raises instead of being skipped. The exclusion is by the `.template.py`
     suffix, a kit-wide naming convention, not by a list of today's filenames.
     """
-    rows = m.python_symbols(ROOT / "tools", layer)
+    rows = m.python_symbols(TOOLS, layer)
     live = [r for r in rows if not r["file"].endswith(".template.py")]
     if not live:
-        raise m.MapError(f"{layer}: every python symbol under tools/ was filtered as a template")
+        raise m.MapError(f"{layer}: every python symbol under the tool root was filtered as a template")
     return live
 
 
@@ -212,8 +255,8 @@ def _build_js_layer(layer: str) -> list[dict[str, str]]:
     the layer, and it is the sentence that kept `TOOL-aNumeralWarden-4` open — `reuse_lookup.py`
     could not see `boundedK` or any other seam inside the kit's own hooks.
     """
-    rows = m.enumerate_exports(ROOT / "tools", layer, extensions=frozenset({".js"}))
-    rows += m.scan_js_definitions(ROOT / "tools", layer)
+    rows = m.enumerate_exports(TOOLS, layer, extensions=frozenset({".js"}))
+    rows += m.scan_js_definitions(TOOLS, layer)
     out, seen = [], set()
     for r in rows:
         key = (r["id"], r["file"])
@@ -253,7 +296,7 @@ def inventory_ids() -> tuple[str, ...]:
     if not EXTRACTORS:
         raise m.MapError(
             "map_extractors.EXTRACTORS is empty — declare this project's inventories "
-            "(see tools/codebase-map/INVENTORY-DERIVATION.md); an inventory-less map enforces nothing"
+            "(see <prefix>/codebase-map/INVENTORY-DERIVATION.md); an inventory-less map enforces nothing"
         )
     return tuple(EXTRACTORS)
 

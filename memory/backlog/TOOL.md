@@ -142,7 +142,6 @@ Cite ids, never line numbers.
 | [TOOL-aLexedStripper-4](../builds/aLexedStripper/BACKLOG.md) | OPEN | — | — | 2026-08-30 | STILL OPEN after TOOL-dMispairedQuote-1, which changed that function's… |
 | [TOOL-aLexedStripper-7](../builds/aLexedStripper/BACKLOG.md) | OPEN | — | — | 2026-08-30 | scan_js_definitions in tools/codebase-map/map_lib.py strips BLOCK… |
 | [TOOL-aLexedStripper-8](../builds/aLexedStripper/BACKLOG.md) | OPEN | — | — | 2026-08-30 | the codebase-map 1.3 and agent-cap 1.9 fixes land upstream, but an… |
-| [TOOL-aLoosenedCeiling-5](../builds/aLoosenedCeiling/BACKLOG.md) | OPEN | — | — | 2026-08-18 | tools/install-prefix-waivers.txt keys on <path>:<line>, so any… |
 | [TOOL-aMeteredTurnstile-2](../builds/aMeteredTurnstile/BACKLOG.md) | OPEN | — | — | 2026-08-20 | the bar LEAKS scratch git repos into TMPDIR and never sweeps them: 786… |
 | [TOOL-aMeteredTurnstile-3](../builds/aMeteredTurnstile/BACKLOG.md) | OPEN | — | — | 2026-08-20 | gate-timings.tsv evicts on the RUN, never on the manifest: the… |
 | [TOOL-aMeteredTurnstile-5](../builds/aMeteredTurnstile/BACKLOG.md) | OPEN | — | — | 2026-08-20 | longest-first dispatch pessimises time-to-first-signal by construction:… |
@@ -160,7 +159,6 @@ Cite ids, never line numbers.
 | [TOOL-aPooledSweep-6](../builds/aPooledSweep/BACKLOG.md) | OPEN | — | — | 2026-09-07 | THE PEAK-CONCURRENCY ARM DOES NOT DISCRIMINATE THE COMPARISON IT EXISTS… |
 | [TOOL-aPooledSweep-7](../builds/aPooledSweep/BACKLOG.md) | OPEN | — | — | 2026-09-07 | THE PORT PROGRAMME TOOL-aQuenchedHarness-6 OPENED IS SUPERSEDED FOR… |
 | [TOOL-aProbedToolkit-2](../builds/aProbedToolkit/BACKLOG.md) | OPEN | — | — | 2026-09-03 | A SKIP READS AS A PASS IN EVERY ADOPTER. check() at… |
-| [TOOL-aProbedToolkit-3](../builds/aProbedToolkit/BACKLOG.md) | OPEN | — | — | 2026-09-03 | TWO HARDCODED tools/ PREFIXES, ONE OF WHICH KILLS A WHOLE LEG AT EVERY… |
 | [TOOL-aProbedToolkit-4](../builds/aProbedToolkit/BACKLOG.md) | OPEN | — | — | 2026-09-03 | THE LEXICON RATCHET CAN ONLY LOOSEN, AND ITS REMEDY ANSWERS 1.5% OF… |
 | [TOOL-aProbedToolkit-5](../builds/aProbedToolkit/BACKLOG.md) | OPEN | — | — | 2026-09-03 | THE LEXICON PREDICATE GRADES A POPULATION THE TABLE WAS NEVER WRITTEN… |
 | [TOOL-aProbedToolkit-6](../builds/aProbedToolkit/BACKLOG.md) | OPEN | — | — | 2026-09-03 | THE LEXICON GATE CAN BE LEGALLY GREEN AT 5.2% COVERAGE, AND THE ONE… |
@@ -203,6 +201,7 @@ Cite ids, never line numbers.
 | [TOOL-aRepatriatedFork-34](../builds/aRepatriatedFork/BACKLOG.md) | OPEN | — | — | 2026-09-25 | candidate gov check from inCMS's retired check 28: an id that shipped… |
 | [TOOL-aRepatriatedFork-41](../builds/aRepatriatedFork/BACKLOG.md) | OPEN | — | — | 2026-09-28 | run-gates.turnstile.test.sh flakes on node a: 1 red in 3 solo runs at… |
 | [TOOL-aRepatriatedFork-43](../builds/aRepatriatedFork/BACKLOG.md) | OPEN | — | — | 2026-09-29 | govkit [[own]] cannot name a root_relative source: inCMS's… |
+| [TOOL-aRepatriatedFork-48](../builds/aRepatriatedFork/BACKLOG.md) | OPEN | — | — | 2026-09-30 | build_commit takes the first unit-naming commit touching a path outside… |
 | [TOOL-aReplayedCard-6](../builds/aReplayedCard/BACKLOG.md) | OPEN | — | — | 2026-09-14 | drift-audit's closed_specs_with_no_product_commit signal joins by build… |
 | [TOOL-aReplayedCard-7](../builds/aReplayedCard/BACKLOG.md) | OPEN | — | — | 2026-09-14 | manifest-check.sh --card --write spawns about ten git processes for its… |
 | [TOOL-aReplayedCard-8](../builds/aReplayedCard/BACKLOG.md) | OPEN | — | — | 2026-09-14 | WIRE-INTO-PROJECT.md §4 spells the kickoff-manifest format version… |
@@ -242,7 +241,6 @@ Cite ids, never line numbers.
 | [TOOL-aScouredKit-29](../builds/aScouredKit/BACKLOG.md) | OPEN | — | — | 2026-08-30 | tools/govkit/selftest.py's memory-recall leak arm is a SUBSTRING TEST… |
 | [TOOL-aScouredKit-33](../builds/aScouredKit/BACKLOG.md) | OPEN | — | — | 2026-08-30 | THE WAIVER PRODUCER STILL WORD-SPLITS while its consumers no longer do.… |
 | [TOOL-aScouredKit-34](../builds/aScouredKit/BACKLOG.md) | OPEN | — | — | 2026-08-30 | A MALFORMED DIRECTIVE SCOPE IS REPORTED AS THE RUN'S FAULT.… |
-| [TOOL-aSealedCaravan-1](../builds/aSealedCaravan/BACKLOG.md) | OPEN | — | — | 2026-08-11 | install-prefix-waivers.txt keys each waiver on <path>:<line>, so any… |
 | [TOOL-aSealedCaravan-2](../builds/aSealedCaravan/BACKLOG.md) | OPEN | — | — | 2026-08-11 | check-arms.py scans tracked *.sh only, so no Python write path is armed… |
 | [TOOL-aSealedCaravan-4](../builds/aSealedCaravan/BACKLOG.md) | OPEN | — | — | 2026-08-11 | the memory-tree renders are install-prefix-correct but NOT… |
 | [TOOL-aSiftedFork-1](../builds/aSiftedFork/BACKLOG.md) | OPEN | — | — | 2026-08-28 | THE AWK CHECK-23 COMMENT IS WRONG BY OMISSION about the change it is… |
@@ -386,8 +384,6 @@ Cite ids, never line numbers.
 | [TOOL-dNarrowedAnchor-3](../builds/dNarrowedAnchor/BACKLOG.md) | OPEN | — | — | 2026-08-25 | BUDGET_gate_selftest was DERIVED, never observed, and the derivation… |
 | [TOOL-dPolishedVitrine-3](../builds/dPolishedVitrine/BACKLOG.md) | OPEN | — | — | 2026-09-12 | tools/memory-recall/adopt-memory-recall.sh probes for the settings… |
 | [TOOL-dPolishedVitrine-4](../builds/dPolishedVitrine/BACKLOG.md) | OPEN | — | — | 2026-09-12 | derive_gate_runner in tools/playbook/render_playbook.py tries four… |
-| [TOOL-dPolishedVitrine-5](../builds/dPolishedVitrine/BACKLOG.md) | OPEN | — | — | 2026-09-12 | REMEDY AND USAGE STRINGS in shipped kit files still name tools/ paths.… |
-| [TOOL-dPolishedVitrine-6](../builds/dPolishedVitrine/BACKLOG.md) | OPEN | — | — | 2026-09-12 | tools/memory-tree/check-verdict-epoch.sh sets ENGINE= to a literal… |
 | [TOOL-dPolishedVitrine-7](../builds/dPolishedVitrine/BACKLOG.md) | OPEN | — | — | 2026-09-12 | tools/check-kit-placeholders.py EXEMPTS the review-harness kit because… |
 | [TOOL-dPolishedVitrine-8](../builds/dPolishedVitrine/BACKLOG.md) | OPEN | — | — | 2026-09-12 | THE BUILD HARNESS'S DRIVER PATH IS A CONVENTION, NOT A PROBE. It… |
 | [TOOL-dPolishedVitrine-9](../builds/dPolishedVitrine/BACKLOG.md) | OPEN | — | — | 2026-09-12 | tools/memory-tree/hygiene-parity.test.sh builds its arm-1 fixture the… |
@@ -411,7 +407,7 @@ Cite ids, never line numbers.
 | [TOOL-dRetiredFork-38](../builds/dRetiredFork/BACKLOG.md) | OPEN | — | — | 2026-09-03 | CONFIRMED by the closing Tier-2 review of dRetiredFork (5 lenses, 35… |
 | [TOOL-dRetiredFork-39](../builds/dRetiredFork/BACKLOG.md) | OPEN | — | — | 2026-09-03 | CONFIRMED by the closing Tier-2 review of dRetiredFork (5 lenses, 35… |
 | [TOOL-dRetiredFork-40](../builds/dRetiredFork/BACKLOG.md) | OPEN | — | — | 2026-09-03 | NINE LEG CEILINGS ARE AUTHORED IN MILLISECONDS AGAINST A FIELD THE… |
-| [TOOL-dScaffoldedMirror-4](../builds/dScaffoldedMirror/BACKLOG.md) | DEFERRED | — | TOOL-aLoosenedCeiling-5 | 2026-08-24 | PHASE 0, and a hard prerequisite for -9. Waiver hardening: re-key all… |
+| [TOOL-dScaffoldedMirror-4](../builds/dScaffoldedMirror/BACKLOG.md) | OPEN | — | — | 2026-08-24 | PHASE 0, and a hard prerequisite for -9. Waiver hardening: re-key all… |
 | [TOOL-dScaffoldedMirror-9](../builds/dScaffoldedMirror/BACKLOG.md) | DEFERRED | — | TOOL-dDerivedDocket-66 | 2026-08-24 | PHASE 4, blocked on -4 and -11. The grandfather set with a provenance… |
 | [TOOL-dScaffoldedMirror-11](../builds/dScaffoldedMirror/BACKLOG.md) | DEFERRED | — | TOOL-dDerivedDocket-66 | 2026-08-24 | PHASE 3, blocked on a kit-owned ^visit_[A-Z]/generic_visit exemption… |
 | [TOOL-dScaffoldedMirror-12](../builds/dScaffoldedMirror/BACKLOG.md) | DEFERRED | — | TOOL-dDerivedDocket-66 | 2026-08-24 | PHASE 5, RESEARCH, only on the owner's word. The consistency… |
@@ -436,7 +432,6 @@ Cite ids, never line numbers.
 | [TOOL-dTieredTribunal-22](../builds/dTieredTribunal/BACKLOG.md) | OPEN | — | — | 2026-08-27 | the uncounted filter(Boolean) predicate, the follow-up… |
 | [TOOL-dTieredTribunal-23](../builds/dTieredTribunal/BACKLOG.md) | OPEN | — | — | 2026-08-27 | the protocol gate arm TOOL-dTieredTribunal-13's F1 resolved to record… |
 | [TOOL-dTieredTribunal-24](../builds/dTieredTribunal/BACKLOG.md) | OPEN | — | — | 2026-08-27 | two mechanical arms for the amendment-leaves-its-other-half-standing… |
-| [TOOL-dTieredTribunal-27](../builds/dTieredTribunal/BACKLOG.md) | OPEN | — | — | 2026-08-27 | tools/check-install-prefix.sh --write-ratchet does not reach a FIXED… |
 | [TOOL-dUnstalledConvoy-14](../builds/dUnstalledConvoy/BACKLOG.md) | OPEN | — | — | 2026-08-20 | hygiene check 12 asserts the HEADER rev appears in section 9 and says… |
 | [TOOL-dUnstalledConvoy-15](../builds/dUnstalledConvoy/BACKLOG.md) | OPEN | — | — | 2026-08-20 | the bare-interpreter class survives outside govkit:… |
 | [TOOL-dUnstalledConvoy-16](../builds/dUnstalledConvoy/BACKLOG.md) | OPEN | — | — | 2026-08-20 | a correction to a claim held by SEVERAL carriers lands in one of them… |

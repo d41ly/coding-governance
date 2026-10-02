@@ -30,6 +30,7 @@ EVERY REFUSAL PRINTS ITS OWN MESSAGE AND IS COUNTED. Exit 0 clean, 1 findings, 2
 from __future__ import annotations
 
 import ast
+import functools
 import hashlib
 import io
 import json
@@ -96,23 +97,152 @@ class Refusal(RuntimeError):
 
 
 # ---------------------------------------------------------------------------- repo + git plumbing
+#: TOOL-aRepatriatedFork-29 S1 — this file's own directory. The registry sits beside it and the TOOL
+#: ROOT is its parent, so neither is spelled: gov runs at whatever kit root it was checked out under.
+GOVKIT_DIR = pathlib.Path(__file__).resolve().parent
+REGISTRY_NAME = "registry.toml"
+
+
 def repo_root() -> pathlib.Path:
     """The gov checkout this file lives in.
 
-    Walk UP for the registry rather than asking git. Two reasons, both measured in this repo. A
+    Walk UP for the checkout rather than asking git. Two reasons, both measured in this repo. A
     `git -C <dir> rev-parse --show-toplevel` returns <dir> itself when an absolute GIT_DIR is
     inherited — which is what git exports to a merge driver in a linked worktree, and it is exactly
     how the row-keyed merge driver was found to be inert here. And a fixed number of `parents[]` is
     correct only at one install prefix. The walk is correct at any prefix and inherits nothing.
+
+    TOOL-aRepatriatedFork-29 S1: the walk starts at the TOOL ROOT, this file's grandparent, and stops
+    at the first directory holding a `.git` entry — a file in a linked worktree, a directory in a
+    primary. The registry beside this file is required first; a tree with no `.git` above the tool
+    root answers with the tool root's parent, which is what the old one-segment walk returned.
     """
-    here = pathlib.Path(__file__).resolve()
-    for parent in here.parents:
-        if (parent / "tools" / "govkit" / "registry.toml").is_file():
+    here = GOVKIT_DIR / REGISTRY_NAME
+    if not here.is_file():
+        raise Refusal(
+            f"no {REGISTRY_NAME} beside {GOVKIT_DIR.as_posix()} — govkit reads its population from "
+            f"the registry and has no directory-listing fallback, by design"
+        )
+    tool_root = GOVKIT_DIR.parent
+    for parent in (tool_root, *tool_root.parents):
+        if (parent / ".git").exists():
             return parent
-    raise Refusal(
-        f"no tools/govkit/registry.toml above {here.as_posix()} — govkit reads its population from "
-        f"the registry and has no directory-listing fallback, by design"
-    )
+    return tool_root.parent
+
+
+@functools.lru_cache(maxsize=None)
+def derive_tool_root(root: pathlib.Path | str) -> str:
+    """TOOL-aRepatriatedFork-29 S1 — the repo-relative directory the kits sit under, for `root`.
+
+    For gov's own checkout that is this file's grandparent, relative to `root`, and `""` when the
+    kits sit at the repo root. For any other `root` — a scratch fixture a caller hands in — it is the
+    parent of the one directory under `root` holding a `<govkit>/registry.toml`, searched at depths
+    0 to 2. None found, or more than one, is a refusal: a guessed prefix is the shape that makes a
+    broken install look like a working one.
+    """
+    root = pathlib.Path(root).resolve()
+    own = GOVKIT_DIR.parent
+    if own == root or root in own.parents:
+        rel = own.relative_to(root).as_posix()
+        return "" if rel == "." else rel
+    found = sorted({p.parent.parent for pat in ("", "*/", "*/*/")
+                    for p in root.glob(f"{pat}{GOVKIT_DIR.name}/{REGISTRY_NAME}")})
+    if len(found) != 1:
+        raise Refusal(f"cannot derive the tool root under {root.as_posix()}: "
+                      f"{len(found)} {GOVKIT_DIR.name}/{REGISTRY_NAME} candidate(s) found")
+    rel = found[0].relative_to(root).as_posix()
+    return "" if rel == "." else rel
+
+
+# The `{prefix}` resolution (TOOL-aRepatriatedFork-47), INLINED byte-identically from the
+# canonical copy named on its marker line and gated by the resolve-python self-test.
+# >>> resolve_prefix_token -- canonical copy: resolve_prefix_token.py in the gov lib dir (byte-identical; gated)
+def resolve_prefix_token(spelled, troot):
+    """<spelled> with its {prefix} token resolved against the tool root <troot>.
+
+    An empty or "." root is a root install: the token drops with its slash, and a bare token
+    becomes ".". Any other root replaces the token. Text with no token passes unchanged.
+    """
+    spelled = str(spelled)
+    if not troot or troot == ".":
+        return spelled.replace("{prefix}/", "").replace("{prefix}", ".")
+    return spelled.replace("{prefix}", troot)
+# <<< resolve_prefix_token
+
+
+# The sibling-kit resolver (TOOL-aRepatriatedFork-2 S3), INLINED byte-identically from the canonical
+# copy named on its marker line and gated by the resolve-python self-test. Selfcheck 5b resolves the
+# version gate's carrier directories through it, as the gate itself does (closing review round 1 M3).
+# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
+def resolve_kit_dir(home, anchor, here):
+    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
+
+    1. receipt — the `.governance/install.json` row whose `source` ends in <home>/<anchor> and
+       whose `path` exists inside this tree. The only record of a RENAMED kit dir: no probe finds
+       a memory-recall kit an adopter homed at `scripts/recall/`.
+    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
+    3. refuse — LookupError naming the three places looked; never a guessed prefix.
+    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
+    """
+    import json
+    import pathlib
+    here = pathlib.Path(here).absolute()  # never resolve(): a junction must not move it
+    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
+    receipt = root / ".governance" / "install.json"
+    try:
+        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("path"):
+            continue
+        if str(row.get("source") or "").split("/")[-2:] != [home, anchor]:
+            continue
+        hit = (root / str(row["path"])).absolute()
+        if hit.is_file() and root in hit.parents and ".." not in hit.parts:
+            return hit.parent
+    probes = (here / home, here.parent / home)
+    for cand in probes:
+        if (cand / anchor).is_file():
+            return cand
+    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
+        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
+# <<< resolve_kit_dir
+
+
+def resolve_tool_path(root: pathlib.Path | str, *parts: str) -> pathlib.Path:
+    """`root` joined to its derived tool root and then to `parts` — a name spelled kit-relatively."""
+    tr = derive_tool_root(root)
+    return pathlib.Path(root).joinpath(*([tr] if tr else []), *parts)
+
+
+def derive_registry_path(root: pathlib.Path | str) -> pathlib.Path:
+    """The registry `root` declares its population in, at its derived tool root."""
+    return resolve_tool_path(root, GOVKIT_DIR.name, REGISTRY_NAME)
+
+
+def load_registry(root: pathlib.Path | str) -> dict:
+    """The registry, with every `{prefix}`-tokened path joined to `root`'s derived tool root ONCE.
+
+    TOOL-aRepatriatedFork-29 S1. The registry names its members through the token — a bare
+    `<kit>/<file>` is itself the literal the carried-prefix ban counts — so every reader downstream
+    receives the repo-relative spelling it always has: entry descriptors, exemption paths, surface
+    globs and gov-only pin patterns. `[[exempt_leg]]` rows name legs, not paths, and are untouched.
+    """
+    reg = load_toml(derive_registry_path(root))
+    tr = derive_tool_root(root)
+    for e in reg.get("entry", []) or []:
+        if isinstance(e.get("descriptor"), str):
+            e["descriptor"] = resolve_prefix_token(e["descriptor"], tr)
+    for key in ("exempt", "gov_only_pin"):
+        for x in reg.get(key, []) or []:
+            for f in ("path", "pattern"):
+                if isinstance(x.get(f), str):
+                    x[f] = resolve_prefix_token(x[f], tr)
+    surf = reg.get("surface") or {}
+    if isinstance(surf.get("globs"), list):
+        surf["globs"] = [resolve_prefix_token(g, tr) for g in surf["globs"]]
+    return reg
 
 
 def git(root: pathlib.Path, *args: str) -> str:
@@ -346,9 +476,13 @@ def canonical_ctx(eid: str) -> dict[str, str]:
     """A ctx for reasoning about a descriptor with no target in hand — `selfcheck`'s only need.
 
     EVERY OPT-IN COUNTS AS TAKEN here: this ctx answers what gov CAN ship, so the shipped surface,
-    the version epoch and every ban graded over it keep reading a file only some targets choose."""
-    return {"prefix": "tools", "kit_id": eid, "kit": f"tools/{eid}", "memory_root": "memory",
-            OPT_IN_ALL: "yes"}
+    the version epoch and every ban graded over it keep reading a file only some targets choose.
+
+    The prefix is gov's OWN tool root, derived (TOOL-aRepatriatedFork-29 S1): this ctx reasons about
+    gov's tree as it sits, so a `{prefix}` it resolves names a path that exists here."""
+    tr = derive_tool_root(repo_root())
+    return {"prefix": tr or ".", "kit_id": eid, "kit": f"{tr}/{eid}" if tr else eid,
+            "memory_root": "memory", OPT_IN_ALL: "yes"}
 
 
 #: The canonical ctx's marker that every `opt_in` rule lands. Reserved: `target_context` refuses a
@@ -638,7 +772,7 @@ def derive_marker_coupling(root: pathlib.Path,
     edges: dict[str, set[str]] = {}
     for eid, (d, _dp) in descs.items():
         for carrier in d.get("marker_carriers") or []:
-            path = carrier.replace("{prefix}", "tools")
+            path = resolve_prefix_token(carrier, derive_tool_root(root))
             for owner, pref in members.items():
                 if owner != eid and any(path == m or path.startswith(m.rstrip("/") + "/")
                                         for m in pref):
@@ -745,7 +879,7 @@ def resolve_bash() -> str:
     because govkit is COPY-INSTALLED as a standalone directory and cannot reach that module.
 
     A candidate is accepted only if it RUNS — existing on disk is not evidence, the same mistake
-    tools/lib/resolve-python.sh documents for the Microsoft Store python3 stub.
+    <prefix>/lib/resolve-python.sh documents for the Microsoft Store python3 stub.
 
     WHAT THIS DOES NOT DO: it does not make a target's own scripts portable, and it does not
     check the interpreter those scripts then pick. It fixes which SHELL runs them and nothing
@@ -916,7 +1050,7 @@ def demand_contained_dest(dest: str, where: str) -> str:
 # ---- into `bash -c` and `python -c` argv templates -- and was then applied to every `answers.*`
 # ---- and every `kit.<eid>.*` value as well. Those are not all paths. The playbook charter's
 # ---- placeholders are rendered into a MARKDOWN DOCUMENT, and a legitimate override for one carries
-# ---- spaces by nature: `gate_runner = "bash tools/run-gates/run-gates.sh"` is a command a reader
+# ---- spaces by nature: `gate_runner = "bash <prefix>/run-gates/run-gates.sh"` is a command a reader
 # ---- runs, `id_families = "PLAY KICK TOOL DEPL"` is a list.
 # ----
 # ---- MEASURED, AND IT WAS NOT HYPOTHETICAL. The single class red the `govkit acceptance matrix`
@@ -1365,8 +1499,7 @@ def scan_uncontained_writes(src: str) -> list[tuple[int, str, str]]:
 
 def selfcheck(root: pathlib.Path, write: bool = False) -> int:
     r = Report()
-    reg_path = root / "tools" / "govkit" / "registry.toml"
-    reg = load_toml(reg_path)
+    reg = load_registry(root)
 
     entries = reg.get("entry", [])
     exempts = reg.get("exempt", [])
@@ -1629,10 +1762,41 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
     # tautology: the two sides are authored independently, in different languages, by different
     # units. A disagreement is REPORTED rather than repaired; repairing gov's own version bookkeeping
     # is a stated non-goal of this unit and is filed as its own backlog row.
-    gate = root / "tools" / "check-kit-versions.sh"
+    gate = resolve_tool_path(root, "check-kit-versions.sh")
+    gate_name = gate.relative_to(root).as_posix()
     if gate.is_file():
         gate_txt = gate.read_text(encoding="utf-8", errors="replace")
-        gate_files = set(re.findall(r'^need\s+"[^"]*"\s+(\S+)', gate_txt, re.M))
+        # TOOL-aRepatriatedFork-29 S3: the gate names each carrier kit-relatively under `${K}`, the
+        # tool root it derives from its own location; joined here to the one this process derived.
+        _k = (derive_tool_root(root) + "/") if derive_tool_root(root) else ""
+        # THE GATE'S OWN CARRIER VARIABLES, resolved as the gate resolves them (closing review round 1
+        # M3, TOOL-aRepatriatedFork-46). A `need` line names its file under a directory the gate asks
+        # the sibling-kit resolver for, `MT_DIR=$(resolve_carrier_kit memory-tree ...)`, and a scrape
+        # that substituted `${K}` alone matched no registry file: every kit read as a pair of notes.
+        # Each resolver-fed variable is resolved here by the same resolver from the gate's own
+        # directory, then each plain alias (`T2R="${WF_DIR}/tier2-review.js"`) in source order.
+        _vars = {"K": _k}
+        for _name, _home, _anchor in re.findall(
+                r'^(\w+)=\$\(resolve_carrier_kit (\S+) (\S+)\)\s*$', gate_txt, re.M):
+            try:
+                _vars[_name] = resolve_kit_dir(_home, _anchor, gate.parent).relative_to(
+                    root.resolve()).as_posix()
+            except (LookupError, ValueError):
+                pass                           # left unresolved, so the need line below FAILS by name
+
+        def _resolve_vars(text: str) -> str:
+            return re.sub(r'\$\{?(\w+)\}?', lambda m: _vars.get(m.group(1), m.group(0)),
+                          text.strip('"'))
+        for _name, _val in re.findall(r'^(\w+)="?(\$[^"\s]*)"?\s*$', gate_txt, re.M):
+            _vars.setdefault(_name, _resolve_vars(_val))
+        gate_files = {_resolve_vars(f) for f in re.findall(r'^need\s+"[^"]*"\s+(\S+)', gate_txt, re.M)}
+        # A LIVENESS ASSERTION, not a note: a carrier still spelled through a variable names no file
+        # this check can compare, so a scrape that resolved nothing would otherwise read as twenty
+        # notes of drift and stay green.
+        for f in sorted(x for x in gate_files if "$" in x):
+            r.fail(f"{gate_name} asserts a constant in '{f}', a carrier this check could not "
+                   f"resolve — selfcheck 5b compares nothing for it")
+        gate_files = {x for x in gate_files if "$" not in x}
         reg_files: dict[str, str] = {}
         for eid, (d, _dpath) in descs.items():
             vf = d.get("version_from") or {}
@@ -1643,16 +1807,16 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
         for f, eid in sorted(reg_files.items()):
             if f not in gate_files:
                 r.note(f"entry '{eid}' declares a version constant in '{f}' that "
-                       f"tools/check-kit-versions.sh does not assert — reported, not repaired")
+                       f"{gate_name} does not assert — reported, not repaired")
         for f in sorted(gate_files - set(reg_files)):
-            r.note(f"tools/check-kit-versions.sh asserts a constant in '{f}' that no registry entry "
+            r.note(f"{gate_name} asserts a constant in '{f}' that no registry entry "
                    f"claims — reported, not repaired")
 
     # ---- 5c: DEPL-dGaugedVintage-4. EVERY `gov:kit <id>@<n>` MARKER AGREES WITH ITS ENTRY'S
     # ---- CONSTANT, over a DERIVED basis and a DECLARED cross-entry allowance.
     #
     # THE BASIS IS NAMED rather than left implicit, because the implicit answer is wrong here:
-    # `tools/workflows/kit.toml` is entry `review-harness` and claims BOTH drift-audit workflow
+    # `<prefix>/workflows/kit.toml` is entry `review-harness` and claims BOTH drift-audit workflow
     # harnesses through its own `**`, while those two files carry `gov:kit drift-audit@`. No
     # per-entry resolution can reach them. So a descriptor may declare `marker_carriers` — paths
     # outside its own claim that carry its marker — DECLARED, never inferred, so the exception is
@@ -1678,7 +1842,7 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
         # `{prefix}`-tokened, never a literal `tools/`: a descriptor ships to adopters and a
         # hardcoded prefix in one resolves to nothing in a target installed elsewhere. This is
         # the class `check-install-prefix.sh` grades, and it caught this line on the first bar.
-        allow = {c.replace("{prefix}", "tools") for c in (d.get("marker_carriers") or [])}
+        allow = {resolve_prefix_token(c, derive_tool_root(root)) for c in (d.get("marker_carriers") or [])}
         _claimed[eid] = allow | {
             f for f in _tracked_gov
             if not f.endswith(".test.sh")
@@ -1714,7 +1878,7 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
         if seen == 0:
             # DEPL-dGaugedVintage-5 S2/S3. A REFUSAL, not a note: an entry with a constant and no
             # marker is a kit a deployer cannot read a version out of in an adopting tree, which is
-            # what `tools/check-kit-versions.sh` calls the marker's whole job.
+            # what `<prefix>/check-kit-versions.sh` calls the marker's whole job.
             #
             # ONE exemption and it is DECLARED, never special-cased by id: `version_from.kind`.
             # `playbook` versions by a `governance-template: vN.N` marker rather than a `gov:kit`
@@ -1890,14 +2054,17 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
     #          TOOL-aWalkedCorpus-5 was filed on. Its population is DERIVED from the descriptors, so
     #          a root file no kit declares as its conf still falls into none and still reds here.
     root_confs = derive_root_confs(descs)
-    legs_path = root / "tools" / "gate-legs.json"
+    legs_path = resolve_tool_path(root, "gate-legs.json")
+    _legs_rel = legs_path.relative_to(root).as_posix()  # named in the messages below, never typed
     if legs_path.is_file():
-        kit_dirs = {f"tools/{e}/" for e in descs} | {"tools/"}
+        _tr = derive_tool_root(root)
+        kit_dirs = {f"{_tr}/{e}/" if _tr else f"{e}/" for e in descs} | ({f"{_tr}/"} if _tr else set())
         exempt_prefixes = {x.get("path", "").rstrip("/") + "/" for x in exempts if x.get("path")}
         verbatim = (".githooks/", ".claude/")
         renamed = ("skills/session-kickoff/",)
         for leg in json.loads(legs_path.read_text(encoding="utf-8")):
             for g in leg.get("guard", []) or []:
+                g = resolve_prefix_token(g, _tr)  # TOOL-aRepatriatedFork-29 §8 F1: the manifest's token
                 classes = []
                 if g.startswith("memory/"):
                     classes.append("memory-root-relative")
@@ -1962,7 +2129,7 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
                         r.fail(f"leg '{nm}' reads root conf {conf} (argv file {rel}) and its guard "
                                f"does not name it — a commit touching only {conf} then skips the "
                                f"leg whose verdict it moves. Add {conf} to that leg's guard in "
-                               f"tools/gate-legs.json, and in the descriptor row that declares it")
+                               f"{_legs_rel}, and in the descriptor row that declares it")
             if named:
                 readers += 1
             reach: dict[str, set[str]] = {}
@@ -1983,7 +2150,7 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
         # zero with NO declared conf is true — a tree with nothing this check could ever grade — and
         # a refusal there would red every fixture that is not about this check.
         if graded == 0 and root_confs:
-            r.fail(f"check 7c2 graded ZERO guarded bar legs in tools/gate-legs.json while the "
+            r.fail(f"check 7c2 graded ZERO guarded bar legs in {_legs_rel} while the "
                    f"registry declares {len(root_confs)} root conf(s) — a probe that grades nothing "
                    f"reads exactly like a corpus with nothing to fix. Either the manifest's "
                    f"`guard`, `subject` or `chunk` keys moved, or no bar leg carries a guard any "
@@ -2121,13 +2288,13 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
     #          they agree — the deployer's whole thesis, unapplied to the deployer. An exemption is
     #          the escape, on the same reason-and-staleness rule as the path exemptions, and S6
     #          refuses a leg that is BOTH claimed and exempted.
-    legs_path = root / "tools" / "gate-legs.json"
+    legs_path = resolve_tool_path(root, "gate-legs.json")
     if legs_path.is_file():
         _legs_json = json.loads(legs_path.read_text(encoding="utf-8"))
         manifest = {leg.get("name") for leg in _legs_json}
         manifest_subject = {leg.get("name"): leg.get("subject") for leg in _legs_json}
         # TOOL-aScouredKit-3. TWO fields decide whether a leg runs on an automatic bar, and
-        # tools/run-gates/run-gates.sh is the code that decides: it holds when
+        # <prefix>/run-gates/run-gates.sh is the code that decides: it holds when
         # `subject == kit OR chunk == selftests`. Pinning and counting the subject alone left six
         # legs — both run-gates canaries among them, which the runner itself calls the bar's own
         # liveness assertion — held off every bar while this file reported them running.
@@ -2144,7 +2311,7 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
                 claimed_legs[nm] = eid
                 if nm not in manifest:
                     r.fail(f"entry '{eid}' declares gate leg '{nm}', which is in no leg of "
-                           f"tools/gate-legs.json — a descriptor and the manifest are two spellings "
+                           f"<prefix>/gate-legs.json — a descriptor and the manifest are two spellings "
                            f"of one fact and this is the direction that deploys a leg a target's "
                            f"runner will never match")
                 else:
@@ -2160,7 +2327,7 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
                                f"that does not say whose subject it is cannot be held or run "
                                f"deliberately, and defaulting it here would hide the omission. "
                                f"The criterion is stated once, at the `subject` field declaration "
-                               f"in tools/run-gates/run-gates.sh: ask what a FAILURE of this leg "
+                               f"in <prefix>/run-gates/run-gates.sh: ask what a FAILURE of this leg "
                                f"MEANS, not what it tests")
                     elif d_sub not in ("kit", "repo"):
                         r.fail(f"entry '{eid}' declares gate leg '{nm}' with subject '{d_sub}', "
@@ -2178,12 +2345,12 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
                         # is green for good. The sibling exempt-leg path already refused exactly
                         # this; the two paths agree now.
                         r.fail(f"entry '{eid}' declares gate leg '{nm}' as subject '{d_sub}' and "
-                               f"tools/gate-legs.json declares none — every reader defaults a "
+                               f"<prefix>/gate-legs.json declares none — every reader defaults a "
                                f"missing key to 'repo', so an omission here is a silent "
                                f"disagreement that the subject pin will then make permanent")
                     elif d_sub != m_sub:
                         r.fail(f"entry '{eid}' declares gate leg '{nm}' as subject '{d_sub}' while "
-                               f"tools/gate-legs.json says '{m_sub}' — the descriptor and the "
+                               f"<prefix>/gate-legs.json says '{m_sub}' — the descriptor and the "
                                f"manifest disagree about whether this leg runs by default")
                 # AC1b: a name that travels. A digit inside a parenthetical is a COUNT, and a count
                 # in a leg name goes stale exactly where nobody is reading — in somebody else's repo.
@@ -2217,7 +2384,7 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
             # subject is written and where the runner reads it from.
             _x_sub = manifest_subject.get(nm)
             if _x_sub is None:
-                r.fail(f"exempt_leg '{nm}' is a leg in tools/gate-legs.json that declares no "
+                r.fail(f"exempt_leg '{nm}' is a leg in <prefix>/gate-legs.json that declares no "
                        f"`subject` — an exempted leg is reachable by no descriptor, so this is the "
                        f"only check that can see it, and a defaulted subject is a side of the bar "
                        f"nobody chose")
@@ -2246,7 +2413,10 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
         # covers the [[exempt_leg]] rows, which no descriptor claims and a descriptor-derived pin
         # would therefore leave free to move. The spec asked for the descriptors; this is the amended
         # answer and -29 rev-2 records why.
-        pin_path = root / "tools" / "govkit" / "subject-pins.tsv"
+        pin_path = resolve_tool_path(root, GOVKIT_DIR.name, "subject-pins.tsv")
+        pin_rel = pin_path.relative_to(root).as_posix()
+        legs_rel = resolve_tool_path(root, "gate-legs.json").relative_to(root).as_posix()
+        regen = f"python {pin_path.parent.relative_to(root).as_posix()}/govkit.py selfcheck --write"
         live = {nm: (manifest_subject.get(nm) or "repo") for nm in manifest if nm}
         live_chunk = {nm: (manifest_chunk.get(nm) or "") for nm in manifest if nm}
         bad_name = sorted(nm for nm in live if "\t" in nm)
@@ -2256,11 +2426,11 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
         body = "".join(f"{nm}\t{live[nm]}\t{live_chunk[nm]}\n"
                        for nm in sorted(live) if nm not in bad_name)
         header = (
-            "# subject-pins.tsv — GENERATED. Regenerate with `python tools/govkit/govkit.py "
+            "# subject-pins.tsv — GENERATED. Regenerate with `python <prefix>/govkit/govkit.py "
             "selfcheck --write`.\n"
             "#\n"
-            "# One row per gate leg in tools/gate-legs.json: <name>\\t<subject>\\t<chunk>. TWO fields\n"
-            "# decide whether a leg runs on an automatic bar, and tools/run-gates/run-gates.sh is the\n"
+            "# One row per gate leg in <prefix>/gate-legs.json: <name>\\t<subject>\\t<chunk>. TWO fields\n"
+            "# decide whether a leg runs on an automatic bar, and <prefix>/run-gates/run-gates.sh is the\n"
             "# code that decides: it HOLDS a leg when `subject == kit` OR `chunk == selftests`, and\n"
             "# runs it otherwise. Both are pinned here, because pinning one left the other free to\n"
             "# take a leg off every bar with nothing in a diff to see (TOOL-aScouredKit-3).\n"
@@ -2268,19 +2438,19 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
             "# THIS FILE GRADES CHANGE, NOT CORRECTNESS. It exists so a subject cannot move without\n"
             "# the move appearing in a diff. Whether any given value is RIGHT is a review judgement\n"
             "# — the criterion is stated once, at the `subject` field declaration in\n"
-            "# tools/run-gates/run-gates.sh: ask what a FAILURE of the leg MEANS.\n")
+            "# <prefix>/run-gates/run-gates.sh: ask what a FAILURE of the leg MEANS.\n")
         want = header + body
         if write:
             pin_path.parent.mkdir(parents=True, exist_ok=True)
             pin_path.write_text(want, encoding="utf-8", newline="\n")
-            subprocess.run(["git", "-C", str(root), "add", "--", "tools/govkit/subject-pins.tsv"],
+            subprocess.run(["git", "-C", str(root), "add", "--", pin_rel],
                            capture_output=True, check=False)
             print(f"govkit selfcheck — wrote {len(live)} subject pin(s) to "
-                  f"tools/govkit/subject-pins.tsv")
+                  f"{pin_rel}")
         elif not pin_path.is_file():
-            r.fail("tools/govkit/subject-pins.tsv is missing — the subject ratchet has no pin to "
+            r.fail(f"{pin_rel} is missing — the subject ratchet has no pin to "
                    "compare against, so every leg could leave the automatic bar unobserved. "
-                   "Regenerate with `python tools/govkit/govkit.py selfcheck --write`")
+                   f"Regenerate with `{regen}`")
         else:
             pinned: dict[str, str] = {}
             pinned_chunk: dict[str, str] = {}
@@ -2289,7 +2459,7 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
                     continue
                 nm, _tab, sv = ln.partition("\t")
                 if not _tab:
-                    r.fail(f"tools/govkit/subject-pins.tsv has a row with no tab: {ln!r}")
+                    r.fail(f"{pin_rel} has a row with no tab: {ln!r}")
                     continue
                 # A pre-TOOL-aScouredKit-3 row carries two fields; the chunk half is then EMPTY,
                 # which is also the legal value for a leg that declares no chunk. The two are
@@ -2299,13 +2469,13 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
                 pinned[nm] = sv.strip()
                 pinned_chunk[nm] = cv.strip()
             for nm in sorted(set(live) - set(pinned)):
-                r.fail(f"gate leg '{nm}' has no row in tools/govkit/subject-pins.tsv — a NEW leg "
+                r.fail(f"gate leg '{nm}' has no row in {pin_rel} — a NEW leg "
                        f"reds until its subject is on the record, because an unpinned leg is one "
                        f"whose side of the bar nobody chose. Regenerate with "
-                       f"`python tools/govkit/govkit.py selfcheck --write`")
+                       f"`{regen}`")
             for nm in sorted(set(pinned) - set(live)):
-                r.fail(f"tools/govkit/subject-pins.tsv pins '{nm}', which is in no leg of "
-                       f"tools/gate-legs.json — a stale pin row is a pin for nothing, and it hides "
+                r.fail(f"{pin_rel} pins '{nm}', which is in no leg of "
+                       f"{legs_rel} — a stale pin row is a pin for nothing, and it hides "
                        f"the next leg that arrives under that name")
             for nm in sorted(set(live) & set(pinned)):
                 if live[nm] != pinned[nm]:
@@ -2314,7 +2484,7 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
                              "ON to the automatic bar: it will run on every gate run")
                     r.fail(f"gate leg '{nm}' is subject '{live[nm]}' and pinned '{pinned[nm]}' — "
                            f"this moves the leg {moved}. If that is intended, move the pin in the "
-                           f"SAME commit with `python tools/govkit/govkit.py selfcheck --write`; "
+                           f"SAME commit with `{regen}`; "
                            f"this check grades the CHANGE and never whether the value is right")
                 if live_chunk[nm] != pinned_chunk[nm]:
                     moved = ("OFF the automatic bar: it will run only under GATE_SELFTESTS=1"
@@ -2325,7 +2495,7 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
                     r.fail(f"gate leg '{nm}' is chunk '{live_chunk[nm] or '(none)'}' and pinned "
                            f"'{pinned_chunk[nm] or '(none)'}' — this moves the leg {moved}. If that "
                            f"is intended, move the pin in the SAME commit with "
-                           f"`python tools/govkit/govkit.py selfcheck --write`; this check grades "
+                           f"`{regen}`; this check grades "
                            f"the CHANGE and never whether the value is right")
             # HELD is the RUNNER's predicate, not the subject alone — run-gates.sh holds on
             # `subject == kit OR chunk == selftests`. Counting subjects reported 40 where the bar
@@ -2664,7 +2834,7 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
                 if s in _held:
                     r.fail(f"entry '{eid}' gate leg '{leg.get('name')}' runs {s}, which its own "
                            f"`project-owned` rule withholds from every target — move the leg to an "
-                           f"`[[exempt_leg]]` row in tools/govkit/registry.toml")
+                           f"`[[exempt_leg]]` row in <prefix>/govkit/registry.toml")
     r.note(f"declared check: {len(descs)} entries, {len(_no_check)} silent · withheld-path legs: "
            f"{_legs_graded} descriptor leg(s) graded")
 
@@ -2876,7 +3046,7 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
     #          than silently ignored.
     #          DOES NOT CHECK: gov's own records, the deployer, or any file no descriptor ships; a
     #          name spelled across a line break; a brand no row declares.
-    _adopters = load_toml(root / "tools" / "govkit" / "adopters.toml").get("adopter", [])
+    _adopters = load_toml(resolve_tool_path(root, GOVKIT_DIR.name, "adopters.toml")).get("adopter", [])
     _akey: dict[str, str] = {}
     for _a in _adopters:
         _ns = [str(x).strip() for x in (_a.get("names") or []) if str(x).strip()]
@@ -2976,11 +3146,10 @@ def check_entry_producer(desc: dict) -> bool:
     """Does `apply` run anything for this entry that could produce a `rendered`/`generated` file?
 
     MEASURED, not assumed. CONFIGURE is `argv = d.get("adopt", {}).get("argv") or []` followed by
-    `if not argv: continue`, so an entry with an empty adopter runs NOTHING — and two entries
-    carrying a `rendered`/`generated` rule declare exactly that in writing: `review-harness`
-    ("the render is performed by the parity gate's own --render mode rather than by a separate
-    adopter") and `check-install-prefix` ("seeded empty rather than copied"). Previewing those two as
-    a side-effect would be the same over-promise this unit deletes, moved one mark over.
+    `if not argv: continue`, so an entry with an empty adopter runs NOTHING — and an entry carrying
+    a `rendered`/`generated` rule declares exactly that in writing: `review-harness` ("the render is
+    performed by the parity gate's own --render mode rather than by a separate adopter"). Previewing
+    it as a side-effect would be the same over-promise this unit deletes, moved one mark over.
 
     A `blocks_adopt` hole makes CONFIGURE skip too. No descriptor here declares one today, so that
     half is correct and unexercised by the shipped tree; `selftest.py` arms it with a FIXTURE, which
@@ -3459,7 +3628,7 @@ def write_gate_legs(verb: str, target: pathlib.Path, deploy: dict, gr: dict,
                 # deployer breaking a target's gate while installing something else.
                 # The floor is read from the TARGET's installed runner, not assumed.
                 row = {"name": nm, "argv": argv}
-                if check_target_reads_subject(target, deploy):
+                if check_target_reads_subject(target, deploy, descs):
                     row["subject"] = leg.get("subject") or "repo"
                 if guards:
                     row["guard"] = guards      # OMITTED, never `[]`, when everything dropped
@@ -3988,7 +4157,7 @@ def cmd_plan(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[str
              coverage: bool = False, emit_declines: bool = False,
              run_discharge: bool = False) -> int:
     r = Report()
-    reg = load_toml(root / "tools" / "govkit" / "registry.toml")
+    reg = load_registry(root)
     descs = read_descriptors(root, reg, r)
     deploy = load_deploy(target)
     selection = resolve_selection(reg, descs, mode, kits, deploy)
@@ -4237,7 +4406,7 @@ def cmd_check(root: pathlib.Path, target: pathlib.Path, run_discharge: bool = Fa
     from an adopter means "the adopter ran", never "the kit works".
     """
     r = Report()
-    reg = load_toml(root / "tools" / "govkit" / "registry.toml")
+    reg = load_registry(root)
     descs = read_descriptors(root, reg, r)
 
     receipt_path = target / ".governance" / "install.json"
@@ -4818,7 +4987,26 @@ def validate_gate_runner(deploy: dict, r: Report) -> dict:
 SUBJECT_FLOOR_RUN_GATES = (1, 1)
 
 
-def check_target_reads_subject(target: pathlib.Path, deploy: dict) -> bool:
+def derive_target_runner(target: pathlib.Path, deploy: dict,
+                         descs: dict[str, tuple[dict, str]] | None = None) -> pathlib.Path | None:
+    """The TARGET's run-gates runner, named through that entry's destination (TOOL-aRepatriatedFork-46).
+
+    The run-gates entry lands its engine at `{kit}/<relpath>`, and `target_context` resolves `{kit}`
+    from the target's own answers, a per-entry `prefix` or `kit` included. The probe used to join the
+    kit's name to the top-level prefix, which is the class the carried-prefix ban counts and which
+    missed a target that homed run-gates by a per-entry answer. None where gov declares no such entry.
+    """
+    if descs is None:
+        root = repo_root()
+        descs = read_descriptors(root, load_registry(root), Report())
+    got = descs.get("run-gates")
+    if not got:
+        return None
+    return target / target_context(target, deploy, "run-gates", got[0])["kit"] / "run-gates.sh"
+
+
+def check_target_reads_subject(target: pathlib.Path, deploy: dict,
+                               descs: dict[str, tuple[dict, str]] | None = None) -> bool:
     """Can this target's installed run-gates parse a `subject` key without redding its own canary?
 
     Read from the TARGET, never assumed and never taken from gov's own tree: the question is what
@@ -4827,9 +5015,8 @@ def check_target_reads_subject(target: pathlib.Path, deploy: dict) -> bool:
     BELOW the floor, because the direction that costs a feature is recoverable and the direction
     that reds somebody else's bar is not.
     """
-    prefix = (deploy.get("prefix") or "tools").strip("/")
-    runner = target / prefix / "run-gates" / "run-gates.sh"
-    if not runner.is_file():
+    runner = derive_target_runner(target, deploy, descs)
+    if runner is None or not runner.is_file():
         return True
     try:
         txt = runner.read_text(encoding="utf-8", errors="replace")
@@ -5551,7 +5738,7 @@ def index_read(target: pathlib.Path, paths: list[str]) -> tuple[dict[str, tuple[
     # and that is an ANSWER rather than a probe failure: such a path is definitionally absent
     # from THIS index. Raising on it turns a graded refusal into a hard abort and changes the
     # verb's exit code, which is exactly what the first cut of this unit did to the escape arm
-    # in `tools/govkit/selftest.py`: the rename-destination probe for a `prefix` that climbs out
+    # in `<prefix>/govkit/selftest.py`: the rename-destination probe for a `prefix` that climbs out
     # of the tree stopped reaching its own containment refusal.
     #
     # Filtered HERE so all callers inherit it, using the same resolve/relative_to idiom the
@@ -5642,7 +5829,7 @@ def gov_tree_mode(root: pathlib.Path, commit: str, path: str) -> str | None:
 
 
 def foreign_kit_present(target: pathlib.Path, descs: dict[str, tuple[dict, str]],
-                        receipt: dict | None) -> list[str]:
+                        receipt: dict | None, deploy: dict) -> list[str]:
     """Registry entries resolvable in the target that THIS target's receipt does not claim.
 
     The unqualified form of this predicate refuses every re-run the unit designs for: after the
@@ -5655,16 +5842,29 @@ def foreign_kit_present(target: pathlib.Path, descs: dict[str, tuple[dict, str]]
     for eid, (d, _p) in descs.items():
         if eid in claimed:
             continue
-        # Probe the entry's DECLARED destinations, at both the canonical and the root prefix. An
-        # earlier form guessed a kit-relative path from the entry id, which missed every FLAT entry
-        # — the ones with no kit directory at all — so a target already carrying one of those was
-        # not detected as kitted. Caught by this file's own arm.
+        # Probe the entry's DECLARED destinations, at the prefix THIS INTAKE declared and at the
+        # root. An earlier form guessed a kit-relative path from the entry id, which missed every
+        # FLAT entry — the ones with no kit directory at all — so a target already carrying one of
+        # those was not detected as kitted. Caught by this file's own arm.
+        #
+        # THE PREFIX IS THE TARGET'S, per entry (TOOL-aRepatriatedFork-24 S7). This probed gov's
+        # prefix and the root, so a foreign install at `scripts/`, where the intake itself puts
+        # kits, was not detected. `target_context` is the ctx `apply` resolves the entry's
+        # destinations with, so the probe asks where THIS install would write, per-entry overrides
+        # included. The root stays as the second ctx, which the old pair also covered.
+        #
+        # AND GOV'S CANONICAL PREFIX STAYS TOO (closing review round 1 M5, TOOL-aRepatriatedFork-24
+        # S7b). Replacing the old pair's `tools` with the target's own prefix traded one blindness
+        # for another: a hand-copied kit at gov's prefix under a `scripts` intake read as a clean
+        # target, and `apply` installed a second copy beside it. The probe is the UNION.
         probes: list[str] = []
         vf = d.get("version_from") or {}
         vf_name = pathlib.PurePosixPath(vf["file"]).name if vf.get("file") else None
-        for prefix in ("tools", ""):
-            ctx = {"prefix": prefix, "kit_id": eid,
-                   "kit": f"{prefix}/{eid}" if prefix else eid, "memory_root": "memory"}
+        own = target_context(target, deploy, eid, d)
+        canon = canonical_ctx(eid)
+        for ctx in (own, {**own, "prefix": canon["prefix"], "kit": canon["kit"]},
+                    {**own, "prefix": "", "kit": eid}):
+            prefix = ctx["prefix"]
             for rule in d.get("files", []):
                 # A `merged` destination is a file the TARGET owns and gov writes a region of, so its
                 # existing is the normal case and not evidence of a foreign kit. Probing it made the
@@ -5679,9 +5879,12 @@ def foreign_kit_present(target: pathlib.Path, descs: dict[str, tuple[dict, str]]
                     if vf_name is None or pathlib.PurePosixPath(resolved).name == vf_name:
                         probes.append(resolved)
             if vf_name:
-                probes.append(f"{prefix}/{eid}/{vf_name}" if prefix else f"{eid}/{vf_name}")
-        if d.get("sentinel"):
-            probes.append(d["sentinel"])
+                probes.append(f"{ctx['kit']}/{vf_name}")
+            # A `sentinel` is relative to the entry's HOME in the target: the kit dir, or the
+            # prefix for a flat entry, which has none. It used to be a path spelled at gov's prefix.
+            if d.get("sentinel"):
+                home = prefix if d.get("kind") == "flat" else ctx["kit"]
+                probes.append(f"{home}/{d['sentinel']}" if home else d["sentinel"])
         for pr in dict.fromkeys(probes):
             if pr and (target / pr).exists():
                 found.append(f"{eid} (at {pr})")
@@ -6182,7 +6385,7 @@ def cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[st
 def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[str],
                resume: bool) -> int:
     r = Report()
-    reg = load_toml(root / "tools" / "govkit" / "registry.toml")
+    reg = load_registry(root)
     descs = read_descriptors(root, reg, r)
     if r.problems:
         return r.emit()
@@ -6203,7 +6406,7 @@ def _cmd_apply(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
 
     # ---- AC8: refuse a FOREIGN kit before writing anything. A kit this target's own receipt claims
     # ---- is the authorized re-run and proceeds.
-    foreign = foreign_kit_present(target, descs, receipt)
+    foreign = foreign_kit_present(target, descs, receipt, deploy)
     if foreign and not resume:
         raise Refusal(
             "the target already carries " + ", ".join(sorted(foreign)) + " and this target's "
@@ -7171,7 +7374,7 @@ def derive_carry_map(pairs) -> tuple[dict[str, str], dict[str, str], list[tuple[
     down.
 
     THE LIFT IS ONE DIRNAME PAIR PER ROW. Stripping EQUAL TRAILING SEGMENTS was measured and is
-    wrong: it collapses `tools/unattended` into the bare gov directory `tools`, which then collides
+    wrong: it collapses `<prefix>/unattended` into the bare gov directory `tools`, which then collides
     with the hooks kit's `tools` and is dropped as ambiguous — taking the whole unattended kit's
     relocation with it. The comparison is the spec's, over a population this tree does not hold, and
     is cited rather than restated: DEPL-dCarriedReceipt-9 §4 measured both lifts against each other
@@ -7184,7 +7387,7 @@ def derive_carry_map(pairs) -> tuple[dict[str, str], dict[str, str], list[tuple[
     drop is indistinguishable from a target that relocated nothing.
 
     Needles emit in BOTH the `/` form and the `~` form, because gov flattens paths into fixture
-    filenames: `tools/unattended/check-playbook.test.sh` spells `tools~` while an adopter's own
+    filenames: `<prefix>/unattended/check-playbook.test.sh` spells `tools~` while an adopter's own
     fixture records are named `scripts~unattended~…`. The two forms COINCIDE for a directory with no
     slash and the map then holds one of them, so the needle count is not two per pair and is not
     written down anywhere — the caller prints what this returns.
@@ -7275,10 +7478,10 @@ def derive_carried(data: bytes, needles: dict[str, str]) -> bytes:
 
     A PROOF INSTRUMENT, NOT A WRITE-TIME TRANSFORM (§3). It is applied to gov's bytes to COMPARE
     them, never to produce bytes landed on the strength of the map alone. Measured on
-    `tools/unattended/adopt-unattended.test.sh` at ce5dca99, landing the rewritten form corrupts six
-    lines: four `bash tools/land.sh` occurrences at lines 34, 63, 83 and 91, which name no prefix at
+    `<prefix>/unattended/adopt-unattended.test.sh` at ce5dca99, landing the rewritten form corrupts six
+    lines: four `bash <prefix>/land.sh` occurrences at lines 34, 63, 83 and 91, which name no prefix at
     all, and lines 132-133, where the fixture builds a directory literally named
-    `my tools/unattended` and the bare needle turns it into `my scripts`. Under the proof gate that
+    `my <prefix>/unattended` and the bare needle turns it into `my scripts`. Under the proof gate that
     row simply matches no rung, and none of those six lines is ever written. The ONE bounded
     exception is the `missing` restore (S11), where the target holds no bytes to prove anything
     against and the alternative is writing gov's prefix into a target that does not use it.
@@ -7659,7 +7862,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     operator owns and gov does not, and the muscle-memory invocation must not be the destructive one.
     """
     r = Report()
-    reg = load_toml(root / "tools" / "govkit" / "registry.toml")
+    reg = load_registry(root)
     descs = read_descriptors(root, reg, r)
     if r.problems:
         return r.emit()
@@ -7984,7 +8187,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
               f"needle. Rows under it now resolve against their own destination instead "
               f"(DEPL-dGaugedVintage-11)")
         # S2 (DEPL-dRetiredFork-1). NAME THE ROWS, not only the directory. An operator reading
-        # "dropped tools/memory-tree" cannot tell which files that freezes; the answer is the rows
+        # "dropped <prefix>/memory-tree" cannot tell which files that freezes; the answer is the rows
         # whose source sits under it, and this run already holds them.
         _frozen = sorted(str(w.get("path")) for w in rows_all
                          if str(w.get("source", "")).rsplit("/", 1)[0] == _gd)
@@ -10822,7 +11025,7 @@ def _cmd_adopt(root: pathlib.Path, target: pathlib.Path, to_rev: str,
     invocation must not be the one that writes.
     """
     r = Report()
-    reg = load_toml(root / "tools" / "govkit" / "registry.toml")
+    reg = load_registry(root)
     descs = read_descriptors(root, reg, r)
     if r.problems:
         return r.emit()
@@ -11317,7 +11520,7 @@ def cmd_intake(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
     unattended re-run, and silently rewriting it would replace a decision the operator made.
     """
     r = Report()
-    reg = load_toml(root / "tools" / "govkit" / "registry.toml")
+    reg = load_registry(root)
     descs = read_descriptors(root, reg, r)
     if r.problems:
         return r.emit()
@@ -11426,17 +11629,46 @@ def cmd_intake(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[s
 def read_descriptors(root: pathlib.Path, reg: dict, r: Report) -> dict[str, tuple[dict, str]]:
     """Shared by every verb: the registry's entries, parsed. A missing one is a refusal, not a skip."""
     descs: dict[str, tuple[dict, str]] = {}
+    tr = derive_tool_root(root)
     for e in reg.get("entry", []):
         eid, dpath = e.get("id"), e.get("descriptor")
         if not eid or not dpath:
             r.fail(f"a registry entry is missing an id or a descriptor path: {e!r}")
             continue
+        dpath = resolve_prefix_token(dpath, tr)
         p = root / dpath
         if not p.is_file():
             r.fail(f"entry '{eid}' names a descriptor that does not exist: {dpath}")
             continue
-        descs[eid] = (load_toml(p), dpath)
+        descs[eid] = (resolve_descriptor_paths(load_toml(p), tr), dpath)
     return descs
+
+
+def resolve_descriptor_paths(desc: dict, tool_root: str) -> dict:
+    """TOOL-aRepatriatedFork-29 S1, §8 F2 — a descriptor's gov-side paths, joined to the tool root ONCE.
+
+    A descriptor spells its `home` kit-relatively (`.` for a flat entry, whose home IS the tool
+    root) and every other gov-side path — a `root_relative` include, a `claims` row, a
+    `marker_carriers` row — through the `{prefix}` token. This is the one seam that joins them, at
+    load, so every reader downstream keeps receiving the repo-relative spelling it always has.
+    Destination templates (`to`) are NOT touched: their `{prefix}` is the TARGET's, resolved later.
+    A descriptor declaring `home_root_relative = true` keeps its home as spelled: the one home that
+    sits outside the tool root, at a path no install prefix moves.
+    """
+    home = desc.get("home")
+    if isinstance(home, str) and not desc.get("home_root_relative"):
+        h = home.strip("/")
+        desc["home"] = tool_root if h in ("", ".") else (f"{tool_root}/{h}" if tool_root else h)
+    for rule in desc.get("files", []) or []:
+        if rule.get("root_relative"):
+            inc = rule.get("include")
+            if isinstance(inc, list):
+                rule["include"] = [resolve_prefix_token(s, tool_root) for s in inc]
+            elif isinstance(inc, str):
+                rule["include"] = resolve_prefix_token(inc, tool_root)
+        if isinstance(rule.get("claims"), list):
+            rule["claims"] = [resolve_prefix_token(c, tool_root) for c in rule["claims"]]
+    return desc
 
 
 def cmd_shipped(root: pathlib.Path) -> int:
@@ -11448,7 +11680,7 @@ def cmd_shipped(root: pathlib.Path) -> int:
     descriptor exits 1 and prints NO row: a reader must not grade a narrowed set as the whole one.
     """
     r = Report()
-    descs = read_descriptors(root, load_toml(root / "tools" / "govkit" / "registry.toml"), r)
+    descs = read_descriptors(root, load_registry(root), r)
     if r.problems:
         for p in r.problems:
             sys.stderr.write(f"govkit: {p}\n")
@@ -11496,14 +11728,14 @@ def cmd_epoch(root: pathlib.Path, base: str | None) -> int:
     An entry declaring no version is not graded: it prints an announced `skip` naming what moved.
 
     DOES NOT CHECK: that the bump is the RIGHT size, that every marker carrying the value moved with
-    it (`tools/check-kit-versions.sh` owns that), or files a descriptor withholds from its survivors.
+    it (`<prefix>/check-kit-versions.sh` owns that), or files a descriptor withholds from its survivors.
     Nor a move made inside a merge's own resolution, and a merge that brings a new value in counts
     as a bump for every move it contains: over a long branchy range that is lenient, and on the
     push-boundary range the base check above is what closes it.
     Exit 1 on any FAILED line or an unresolvable base, 2 on an unreadable registry, else 0.
     """
     r = Report()
-    descs = read_descriptors(root, load_toml(root / "tools" / "govkit" / "registry.toml"), r)
+    descs = read_descriptors(root, load_registry(root), r)
     if r.problems:
         for p in r.problems:
             sys.stderr.write(f"govkit: {p}\n")
@@ -11823,7 +12055,7 @@ def cmd_contribute(root: pathlib.Path, target: pathlib.Path) -> int:
         "gov_census", str(pathlib.Path(__file__).parent / "census.py"))
     if _sp is None or _sp.loader is None:
         raise Refusal("contribute consumes the census (F1, ratified) and cannot import "
-                      "tools/govkit/census.py. There is no second join to fall back to")
+                      "<prefix>/govkit/census.py. There is no second join to fall back to")
     _cen = importlib.util.module_from_spec(_sp)
     _sp.loader.exec_module(_cen)
 
@@ -11844,7 +12076,14 @@ def cmd_contribute(root: pathlib.Path, target: pathlib.Path) -> int:
         gov_paths = set(gov_head) | set(p for ps in gov_ever.values() for p in ps)
         reg = _cen.map_by_basename(
             target, gov_paths,
-            ["memory-tree", "memory-recall", "tools", "scripts", ".claude", ".githooks"])
+            [  # directory NAMES the adopter's tree is walked under, one per line: not path segments
+                "memory-tree",
+                "memory-recall",
+                "tools",
+                "scripts",
+                ".claude",
+                ".githooks",
+            ])
     rows = (reg or {}).get("rows") or []
     # S5 — THE LIVENESS ASSERTION. A zero map REFUSES rather than reporting that this adopter has
     # nothing to contribute. The two readings are indistinguishable in the output and opposite in
@@ -11908,7 +12147,7 @@ def cmd_contribute(root: pathlib.Path, target: pathlib.Path) -> int:
 
     buckets = {1: [], 2: [], 3: [], 4: []}
     # A RENDERED ROW IS NOT A CANDIDATE AND ITS DIFF IS NOT EVIDENCE OF ANYTHING. The adopter's
-    # `.claude/skills/unattended/SKILL.md` IS gov's `tools/unattended/SKILL.template.md` with that
+    # `.claude/skills/unattended/SKILL.md` IS gov's `<prefix>/unattended/SKILL.template.md` with that
     # target's own answers substituted in, so a line-diff between them measures the RENDER, not a
     # change. Classified naively they dominated the result: 29 of 31 NicoCares candidates came back
     # class 1 "gov defect" reporting 73 and 81 added lines, every one of them a filled placeholder.

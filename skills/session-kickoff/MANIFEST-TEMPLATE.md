@@ -6,7 +6,7 @@ last-audit: {{AUDIT_DATETIME}} @ {{AUDIT_SHA}}
 watch: {{WATCH_PATHSPECS}}
 verify-paths: {{VERIFY_PATHS}}
 last-body-change: {{BODY_CHANGE_SHA}}
-check-script: tools/manifest-check.sh
+check-script: <prefix>/manifest-check.sh
 registry: {{REGISTRY_PATH}}
 -->
 
@@ -84,7 +84,7 @@ instantiation, each kickoff re-audits it (Step 2b) and each closing unit writes 
 
 ```bash
 {{GATE_COMMANDS}}
-bash tools/manifest-check.sh          # manifest ratchet — standing line; path = check-script: above
+bash <prefix>/manifest-check.sh       # manifest ratchet — standing line; path = check-script: above
 ```
 
 ### Tier rule
@@ -148,6 +148,9 @@ with `grep -nE '\{\{[A-Z]'` — no placeholder may survive):*
 - `{{PLAYBOOK_PATH}}` — path to the instantiated governance charter — or "not adopted".
 - `{{AREA_1}}` `{{DOC_1}}` `{{ENTRYPOINTS_1}}` · `{{AREA_2}}` `{{DOC_2}}` `{{ENTRYPOINTS_2}}` —
   pointer-map rows; add/remove rows as needed.
+- `<prefix>` in `check-script:` and the standing gate line — the directory your copy of
+  `manifest-check.sh` sits in, empty for a root install. It is the one angle token here, so
+  the `{{` grep below does not see it: fill it by hand.
 - `{{GATE_COMMANDS}}` — the exact typecheck / lint / test / freshness commands, one per line. Keep
   the standing `manifest-check.sh` line beneath them (adjust its path when `check-script:` is
   non-default).

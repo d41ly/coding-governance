@@ -1,9 +1,9 @@
-# kit.toml — this entry, declared as data. Read by tools/govkit/. Contract: the deployer unit's spec under memory/builds/aSealedCaravan/spec/.
+# kit.toml — this entry, declared as data. Read by <prefix>/govkit/. Contract: the deployer unit's spec under memory/builds/aSealedCaravan/spec/.
 
 id = "check-wiring"
 scope = "repo"
 kind = "flat"
-home = "tools"
+home = "."
 version_from = { file = "check-wiring.sh", pattern = "^KIT_CHECK_WIRING_VERSION=" }
 requires = []
 
@@ -18,7 +18,7 @@ requires = []
 include = ["check-wiring.sh", "check-wiring.test.sh", "check-wiring.fragment.json"]
 role = "engine"
 to = "{prefix}/{relpath}"
-claims = ["tools/check-wiring.sh", "tools/check-wiring.test.sh", "tools/check-wiring.fragment.json"]
+claims = ["{prefix}/check-wiring.sh", "{prefix}/check-wiring.test.sh", "{prefix}/check-wiring.fragment.json"]
 
 [adopt]
 argv = []

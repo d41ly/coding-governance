@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # coding-governance pre-push: the authoritative merge bar. On a push to the default branch it runs the
-# FULL gate (tools/run-gates/run-gates.sh) once and BLOCKS the push if it reds. Other pushes are gated
+# FULL gate (<prefix>/run-gates/run-gates.sh) once and BLOCKS the push if it reds. Other pushes are gated
 # only by a branch bar the repository itself declares (GOV_BRANCH_GATE_CMD, see THE BRANCH BAR). Every
 # refusal leaves a machine verdict in the git dir (see THE REFUSAL CHANNEL), and every push this hook
 # sees, gated or not, leaves its lines in the run log (see THE RUN LOG).
@@ -358,23 +358,23 @@ write_refusal() { # token · one-line message -> the refusal file, and the run-l
 # whether the authoritative bar is owed at all. TOOL-aBoundedCeiling-7; adopter nc carries the fix by
 # hand as its carve-out 14/20.
 #
-# PROBED ON THE LEG MANIFEST, not on the run-gates directory. The manifest is what predicates 6 and 7
-# actually read, and the two are not interchangeable: this repo's own pre-push fixtures write a
-# `gate-legs.json` and never create a `run-gates/` directory at all, so a probe keyed on the
-# directory falls through and takes twenty arms with it. Measured, on the first cut of this change.
+# The fix above was a probe of `tools`, then `scripts`, so the root could only ever be one of those
+# two. At a root install or under `vendor/gov/`, the default bar named a runner that does not exist
+# (TOOL-aRepatriatedFork-24 S2). The root is now RESOLVED, below the `gate-env.sh` source, because
+# that file is one of the rungs. The environment's copy is dropped HERE, before that file runs, so
+# only the vetted file can declare it.
 #
-# `tools` FIRST, because it is this kit's default and gov's tree must resolve unchanged; the fallback
-# is only consulted when this tree shows no sign of `tools` at all. Adopter nc probes `scripts` first
-# for the mirror-image reason — the order is a default, never a rule.
-GOV_KITROOT=tools
-if [ ! -f "$top/tools/gate-legs.json" ] && [ ! -d "$top/tools/run-gates" ]; then  # gov:prefix-literal — probes gov's own layout first and falls back to the derived prefix below
-  if [ -f "$top/scripts/gate-legs.json" ] || [ -d "$top/scripts/run-gates" ]; then
-    GOV_KITROOT=scripts
-  fi
-fi
-# The kit's own runner, spelled ONCE: it is the default bar, the one undeclared value the bar check
-# accepts, and the path the default bar's verdict records.
-GATE_RUNNER=$GOV_KITROOT/run-gates/run-gates.sh
+# THE INTERPRETER IS DROPPED THE SAME WAY (closing review round 2 H1, TOOL-aRepatriatedFork-49). This
+# hook's own resolver, the runner's, and every python leg's take `GOV_PYTHON` first, and each kit's
+# published `<KIT>_PY` before that, so an exported one chose the program every python leg ran: a
+# planted interpreter exiting 0 landed a RED tracked bar with `git status` empty. `gate-env.sh` may
+# declare one again, and it is vetted before it runs; it must export it for the bar to see it.
+ENV_DROPPED_KNOBS="GOV_KITROOT GOV_PYTHON"
+ENV_CLEARED=""
+for _k in $ENV_DROPPED_KNOBS $(compgen -e); do
+  case "$_k" in GOV_KITROOT) ;; GOV_PYTHON|*_PY) [ -n "${!_k+x}" ] && ENV_CLEARED+=" $_k" ;; *) continue ;; esac
+  unset "$_k"
+done
 
 # $def decides which pushed ref gets gated, so whoever supplies $def decides whether the gate runs AT
 # ALL. GOV_DEFAULT_BRANCH used to outrank the observed default and was never checked for meaning, which
@@ -450,6 +450,191 @@ write_push_start
 trap 'write_push_end "$?"' EXIT
 # FROM HERE ON, every exit sets its decision and RUNLOG_CLEAN=1 immediately before it.
 
+# THE REPOSITORY'S OWN GATE POLICY, if it has one. This hook is shipped VERBATIM to every push-main
+# adopter, so anything decided IN it is decided FOR them; anything decided in a file they do not
+# receive is not. The mechanism travels, the choice does not. An adopter with no such file runs with
+# whatever their environment carries, which is the documented default. TOOL-dUnstalledConvoy-28.
+# SOURCED HERE, above the non-default exit, because the branch bar below is one of the things it may
+# declare (TOOL-aRepatriatedFork-8 S5); it used to be sourced just before the forcing predicates, and
+# nothing between the two positions read anything it may set. It is still below the default-branch
+# lookup, deliberately: see the comment there.
+#
+# VETTED AS THE BAR IS, BEFORE IT IS SOURCED (closing review round 1 H1). Whatever this file runs,
+# runs inside this hook, so it can set the test escape, name a bar, or simply `exit 0`. An untracked
+# copy, including one hidden by `.gitignore` or `.git/info/exclude`, which `git status` never
+# reports, was sourced like the reviewed one. It must be tracked at the pushed default-branch sha
+# (HEAD on any other push, which is the tree a branch bar runs from) and its working copy must hash
+# to that blob. A refusal is `bar-refused`, since this file is where a bar is declared.
+#
+# ONE PREDICATE for every file this hook trusts without a bar over it. The install receipt and the
+# runner it names take it too (closing review round 1 B1, TOOL-aRepatriatedFork-24 S2c), below.
+check_reviewed_file() { # <repo-relative path> <sha> <what this hook does with it> -> returns only when the working copy IS the blob tracked at <sha>
+  local _bl _wt
+  _bl=$(git rev-parse -q --verify "$2:$1" 2>/dev/null || true)
+  _wt=$(git hash-object -- "$top/$1" 2>/dev/null || true)
+  [ -n "$_bl" ] && [ "$_wt" = "$_bl" ] && return 0
+  why="pre-push: REFUSING - $1 $3, and it is not the blob tracked at ${2:0:8}"
+  echo "$why" >&2
+  echo "  (${_bl:+its working copy differs from it}${_bl:-no such path is tracked there, so this is an untracked, ignored or excluded copy})." >&2
+  echo "  A file this hook trusts has to be one the repository reviews. Commit it, or remove it." >&2
+  write_refusal bar-refused "$why"; RUNLOG_CLEAN=1; exit 1
+}
+_gate_env="$top/.githooks/gate-env.sh"
+if [ -f "$_gate_env" ]; then
+  _env_at=$main_local; [ -n "${_env_at//0/}" ] || _env_at=$(git rev-parse HEAD 2>/dev/null)
+  check_reviewed_file .githooks/gate-env.sh "$_env_at" "is sourced into this hook"
+  # shellcheck source=/dev/null
+  . "$_gate_env"
+fi
+
+# ---- THE KIT ROOT, RESOLVED — TOOL-aRepatriatedFork-24 S2 ----------------------------------------
+# The same ladder `.githooks/pre-commit` walks, and `check-wiring.sh` before both:
+#   1. the install receipt, `.governance/install.json`, whose row for the runner records where it
+#      landed; the root is that row's grandparent. It is the only record of a prefix nobody could guess.
+#   2. `resolve_kit_dir`'s probe, from the repo root: the leg manifest or the runner directory at the
+#      root is a root install. It is probed on the MANIFEST as well as the directory, because that is
+#      what predicates 6 and 7 read and this hook's own fixtures write one with no runner beside it.
+#   3. `GOV_KITROOT` as the vetted `gate-env.sh` above declared it, and never as the environment
+#      set it: that copy was unset before the file ran.
+# A MISS leaves KITROOT_FROM empty. Where a miss strands a push, the refusals further down say so: the
+# default bar has no runner to name, and a tracked manifest this ladder did not reach is still a
+# refusal. A declared bar does not need the root to find itself.
+_kr_declared=${GOV_KITROOT-}; _kr_bad=""
+GOV_KITROOT=""; KITROOT_FROM=""
+read_receipt_path() { # <kit dir, or ""> <file> -> the repo-relative path the install receipt records ("" if none)
+  [ -f "$top/.governance/install.json" ] || return 0
+  awk -v want="${1:+$1/}$2" '
+    function val(l) { sub(/^[^:]*:[[:space:]]*"/, "", l); sub(/".*$/, "", l); return l }
+    /^[[:space:]]*\{[[:space:]]*$/          { p = ""; s = ""; next }
+    /^[[:space:]]*"path"[[:space:]]*:/      { p = val($0); next }
+    /^[[:space:]]*"source"[[:space:]]*:/    { s = val($0); next }
+    /^[[:space:]]*\}[[:space:]]*,?[[:space:]]*$/ {
+      if (p != "" && (s == want || (length(s) > length(want) && substr(s, length(s) - length(want)) == "/" want)) \
+          && p !~ /^\// && p !~ /^[A-Za-z]:/ && p !~ /(^|\/)\.\.(\/|$)/) { print p; exit }
+      p = ""; s = ""
+    }' "$top/.governance/install.json" 2>/dev/null
+}
+_kr_row=$(read_receipt_path run-gates run-gates.sh)
+if [ -n "$_kr_row" ] && [ -f "$top/$_kr_row" ]; then
+  GOV_KITROOT=$(dirname -- "$(dirname -- "$_kr_row")"); [ "$GOV_KITROOT" = . ] && GOV_KITROOT=""
+  KITROOT_FROM="the install receipt's row for the runner"
+elif [ -f "$top/gate-legs.json" ] || [ -d "$top/run-gates" ]; then
+  KITROOT_FROM="a root install"
+elif [ -n "$_kr_declared" ]; then
+  case "${_kr_declared%/}" in
+    ''|/*|*..*|*[!A-Za-z0-9._/-]*) _kr_bad=$_kr_declared ;;
+    *) GOV_KITROOT=${_kr_declared%/}; KITROOT_FROM="GOV_KITROOT in .githooks/gate-env.sh" ;;
+  esac
+fi
+print_kitroot_miss() { # -> one line naming every rung that missed
+  printf 'no install-receipt row for the runner, no leg manifest or runner directory at the root, and %s' \
+    "${_kr_bad:+a GOV_KITROOT in .githooks/gate-env.sh that is not a relative path: '$_kr_bad'}${_kr_bad:-no GOV_KITROOT declared in .githooks/gate-env.sh}"
+}
+KP=${GOV_KITROOT:+$GOV_KITROOT/}   # the root as a path head: empty at a root install, never a bare '/'
+# The kit's own runner, spelled ONCE: it is the default bar, the one undeclared value the bar check
+# accepts, and the path the default bar's verdict records. EMPTY on a miss, so nothing downstream can
+# name a runner the ladder never found.
+# TOOL-aRepatriatedFork-46: the run-gates kit is FOUND, not named. Its directory used to be typed after
+# the kit root, which is the class the carried-prefix ban counts and which missed a kit the target
+# homed under another name. The sibling-kit resolver reads the install receipt first and then probes
+# the kit root the ladder above chose, so the three rungs agree; a runner it cannot find is a miss,
+# refused below with the resolver's own account, never a composed path that runs nothing.
+# >>> resolve_python — canonical copy: resolve-python.sh in gov's lib dir (byte-identical; gated)
+resolve_python() {
+  # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
+  # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
+  # the candidate and every consumer uses "$PY" as a single word (measured: exit 127).
+  _rp_tried=""
+  for _rp_c in "${1:-}" "${GOV_PYTHON:-}" python3 python py; do
+    [ -n "$_rp_c" ] || continue
+    _rp_tried="$_rp_tried $_rp_c"
+    if "$_rp_c" -c "import sys" >/dev/null 2>&1; then
+      printf '%s\n' "$_rp_c"
+      return 0
+    fi
+  done
+  {
+    echo "resolve_python: no usable python launcher. Each candidate was RUN with -c 'import sys' and"
+    echo "resolve_python: none exited 0 — being on PATH is not evidence (the Microsoft Store python3"
+    echo "resolve_python: stub answers \`command -v\` and exits 9009 without running anything)."
+    echo "resolve_python: tried:$_rp_tried"
+    if [ -n "${1:-}" ]; then
+      echo "resolve_python: the caller's override '$1' was tried FIRST and did not run."
+    fi
+    if [ -n "${GOV_PYTHON:-}" ]; then
+      echo "resolve_python: GOV_PYTHON is set to '$GOV_PYTHON' and did not run. An override that is"
+      echo "resolve_python: set and unusable is THIS failure, never a silent fall-through — the"
+      echo "resolve_python: operator believes they chose, and would not have."
+    fi
+  } >&2
+  return 1
+}
+# <<< resolve_python
+# The sibling-kit resolver (TOOL-aRepatriatedFork-2 S3), INLINED byte-identically from the
+# canonical copy named on its marker line and gated by the resolve-python self-test's parity
+# table. A shell consumer runs it with the python it already resolved, so the receipt rung is
+# read in Python and never parsed in bash. `resolve_kit_dir <python> <home> <anchor> <here>`
+# prints the kit directory REPO-RELATIVE, or the resolver's named refusal on stderr and exits 1.
+resolve_kit_dir() {
+  "$1" -c "$(cat <<'RKD'
+# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
+def resolve_kit_dir(home, anchor, here):
+    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
+
+    1. receipt — the `.governance/install.json` row whose `source` ends in <home>/<anchor> and
+       whose `path` exists inside this tree. The only record of a RENAMED kit dir: no probe finds
+       a memory-recall kit an adopter homed at `scripts/recall/`.
+    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
+    3. refuse — LookupError naming the three places looked; never a guessed prefix.
+    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
+    """
+    import json
+    import pathlib
+    here = pathlib.Path(here).absolute()  # never resolve(): a junction must not move it
+    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
+    receipt = root / ".governance" / "install.json"
+    try:
+        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("path"):
+            continue
+        if str(row.get("source") or "").split("/")[-2:] != [home, anchor]:
+            continue
+        hit = (root / str(row["path"])).absolute()
+        if hit.is_file() and root in hit.parents and ".." not in hit.parts:
+            return hit.parent
+    probes = (here / home, here.parent / home)
+    for cand in probes:
+        if (cand / anchor).is_file():
+            return cand
+    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
+        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
+# <<< resolve_kit_dir
+RKD
+)"'
+import sys
+try:
+    d = resolve_kit_dir(*sys.argv[1:4])
+except LookupError as e:
+    sys.exit(str(e))
+r = next((p for p in (d, *d.parents) if (p / ".git").exists()), d.anchor)
+print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
+}
+GATE_RUNNER=""; RUNNER_MISS=""
+if [ -n "$KITROOT_FROM" ]; then
+  if _rg_py=$(resolve_python 2>/dev/null); then
+    if _rg_dir=$(resolve_kit_dir "$_rg_py" run-gates run-gates.sh "$top/${GOV_KITROOT:-.}" 2>/dev/null); then
+      GATE_RUNNER=$_rg_dir/run-gates.sh
+    else
+      RUNNER_MISS=$(resolve_kit_dir "$_rg_py" run-gates run-gates.sh "$top/${GOV_KITROOT:-.}" 2>&1 >/dev/null)
+    fi
+  else
+    RUNNER_MISS="no usable python, so the sibling-kit resolver could not look for the run-gates kit"
+  fi
+fi
+
 # ---- the shards-to-builds STRAGGLER layer, PER PUSHED REF (TOOL-dDerivedDocket-13) ---------------
 # ABOVE the "nothing to gate" exits, and the placement is the whole of it: those exits fire on every
 # feature-branch push, so a block below them would never run for the refs this one is about.
@@ -476,25 +661,22 @@ trap 'write_push_end "$?"' EXIT
 _sg="$(cd "$(dirname "$0")" && pwd)/straggler-guard.sh"
 if [ -f "$_sg" ] && . "$_sg" && command -v init_straggler_guard >/dev/null 2>&1 &&
    init_straggler_guard; then
-  # The kit directory as a VALUE, and the kit ROOT from this hook's own probe above. The fallback is
-  # the hook directory's own tree: under an absolute `core.hooksPath` the hook that runs comes from
-  # another checkout, and that checkout is where a kit this tree lacks may still be.
-  _sg_kit=memory-tree
+  # The memory-tree kit is FOUND by the sibling-kit resolver above, from the kit root the ladder
+  # chose, never composed from a typed kit name (the carried-prefix ban, TOOL-aRepatriatedFork-46).
+  # The fallback is the hook directory's own tree: under an absolute `core.hooksPath` the hook that
+  # runs comes from another checkout, and that checkout is where a kit this tree lacks may still be.
+  # This block sits BELOW the kit-root ladder for that reason; it was written above the ladder's old
+  # position, where `GOV_KITROOT` is now still unset (reconcile of dDerivedDocket into aRepatriatedFork).
   _sg_hooktree=$(cd "$(dirname "$0")/.." && pwd)
   _sg_module=""
-  for _c in "$top/$GOV_KITROOT/$_sg_kit/transition_audit.py" \
-            "$_sg_hooktree/$GOV_KITROOT/$_sg_kit/transition_audit.py"; do
-    if [ -f "$_c" ]; then _sg_module="$_c"; break; fi
-  done
-  _sg_py=""
-  for _c in "$top/$GOV_KITROOT/lib/resolve-python.sh" \
-            "$_sg_hooktree/$GOV_KITROOT/lib/resolve-python.sh"; do
-    if [ -f "$_c" ]; then
-      # shellcheck source=/dev/null
-      . "$_c" && _sg_py=$(resolve_python 2>/dev/null || true)
-      break
-    fi
-  done
+  _sg_py=$(resolve_python 2>/dev/null || true)
+  if [ -n "$_sg_py" ]; then
+    for _sg_tree in "$top" "$_sg_hooktree"; do
+      if _sg_dir=$(resolve_kit_dir "$_sg_py" memory-tree transition_audit.py "$_sg_tree/${GOV_KITROOT:-.}" 2>/dev/null); then
+        _sg_module="$_sg_tree/$_sg_dir/transition_audit.py"; break
+      fi
+    done
+  fi
   while read -r _ _sha _ref _; do
     [ -n "$_ref" ] || continue
     [ "$_ref" = "refs/heads/$def" ] && continue
@@ -506,12 +688,12 @@ if [ -f "$_sg" ] && . "$_sg" && command -v init_straggler_guard >/dev/null 2>&1 
       print_recipe "  "
       continue
     fi
-    if [ -z "$_sg_module" ]; then
-      echo "pre-push: the transition audit did NOT run over $_ref — the memory-tree kit is installed neither under '$top' nor beside this hook, so the straggler question was not asked. Check 26 still binds at the merge bar."
-      continue
-    fi
     if [ -z "$_sg_py" ]; then
       echo "pre-push: the transition audit did NOT run over $_ref — no usable python launcher resolved, so the straggler question was not asked. Check 26 still binds at the merge bar."
+      continue
+    fi
+    if [ -z "$_sg_module" ]; then
+      echo "pre-push: the transition audit did NOT run over $_ref — the memory-tree kit is installed neither under '$top' nor beside this hook, so the straggler question was not asked. Check 26 still binds at the merge bar."
       continue
     fi
     _sg_out=$("$_sg_py" "$_sg_module" --at "$_sha" --expect-builds 2>&1); _sg_rc=$?
@@ -526,37 +708,6 @@ if [ -f "$_sg" ] && . "$_sg" && command -v init_straggler_guard >/dev/null 2>&1 
       RUNLOG_DECISION=refuse-straggler; RUNLOG_CLEAN=1; exit 1
     fi
   done <<< "$push_refs"
-fi
-
-# THE REPOSITORY'S OWN GATE POLICY, if it has one. This hook is shipped VERBATIM to every push-main
-# adopter, so anything decided IN it is decided FOR them; anything decided in a file they do not
-# receive is not. The mechanism travels, the choice does not. An adopter with no such file runs with
-# whatever their environment carries, which is the documented default. TOOL-dUnstalledConvoy-28.
-# SOURCED HERE, above the non-default exit, because the branch bar below is one of the things it may
-# declare (TOOL-aRepatriatedFork-8 S5); it used to be sourced just before the forcing predicates, and
-# nothing between the two positions read anything it may set. It is still below the default-branch
-# lookup, deliberately: see the comment there.
-#
-# VETTED AS THE BAR IS, BEFORE IT IS SOURCED (closing review round 1 H1). Whatever this file runs,
-# runs inside this hook, so it can set the test escape, name a bar, or simply `exit 0`. An untracked
-# copy, including one hidden by `.gitignore` or `.git/info/exclude`, which `git status` never
-# reports, was sourced like the reviewed one. It must be tracked at the pushed default-branch sha
-# (HEAD on any other push, which is the tree a branch bar runs from) and its working copy must hash
-# to that blob. A refusal is `bar-refused`, since this file is where a bar is declared.
-_gate_env="$top/.githooks/gate-env.sh"
-if [ -f "$_gate_env" ]; then
-  _env_at=$main_local; [ -n "${_env_at//0/}" ] || _env_at=$(git rev-parse HEAD 2>/dev/null)
-  _env_bl=$(git rev-parse -q --verify "$_env_at:.githooks/gate-env.sh" 2>/dev/null || true)
-  _env_wt=$(git hash-object -- "$_gate_env" 2>/dev/null || true)
-  if [ -z "$_env_bl" ] || [ "$_env_wt" != "$_env_bl" ]; then
-    why="pre-push: REFUSING - .githooks/gate-env.sh is sourced into this hook, and it is not the blob tracked at ${_env_at:0:8}"
-    echo "$why" >&2
-    echo "  (${_env_bl:+its working copy differs from it}${_env_bl:-no such path is tracked there, so this is an untracked, ignored or excluded copy})." >&2
-    echo "  A file this hook runs has to be one the repository reviews. Commit it, or remove it." >&2
-    write_refusal bar-refused "$why"; RUNLOG_CLEAN=1; exit 1
-  fi
-  # shellcheck source=/dev/null
-  . "$_gate_env"
 fi
 
 # ---- WHICH BAR RUNS, and has this repository ever seen it? — TOOL-aRepatriatedFork-5 ----------
@@ -584,6 +735,12 @@ fi
 # `BASH_ENV` runs an actor's own file inside this hook's interpreter before its first line; each needs
 # an act of its own, and the unattended protocol lists that class as open. What this closes is the
 # case where no such act is needed: the knob this hook documents, set to a four-letter word.
+# The bar still INHERITS every other variable (TOOL-aRepatriatedFork-49 names what it clears): `PATH`,
+# which chooses every launcher that is a bare word; the language runtimes' own variables, such as
+# `PYTHONPATH`, `PYTHONHOME` and `NODE_OPTIONS`, which can load code into any leg; and the leg-level
+# knobs an adopter's own legs read. Clearing the runtimes' variables would change the environment
+# every adopter's legs receive from a hook that ships verbatim, and `PATH` stays inherited either
+# way, so that class is open and is the owner's to decide.
 bar_class=""
 check_bar_command() { # knob name · command · sha its scripts must be tracked at · [declared] -> rc 0 with bar_class, bar_path and bar_blob, or rc 1 printed with its headline in `why`
   local knob=$1 cmd=$2 at=$3 _n=0
@@ -629,8 +786,8 @@ check_bar_command() { # knob name · command · sha its scripts must be tracked 
   _bar_decl=$cmd
   # THE ADVICE a refusal prints is a value this check ADMITS (closing review round 2 L2): the
   # declared GATE_CMD when there is one, else the kit's own runner. The self-test pushes it back.
-  _bar_ok="bash $GATE_RUNNER"
-  if [ "${4-}" = declared ] && [ "$cmd" != "bash $GATE_RUNNER" ]; then
+  _bar_ok="bash ${GATE_RUNNER:-<the kit runner, once the kit root resolves>}"
+  if [ "${4-}" = declared ] && { [ -z "$GATE_RUNNER" ] || [ "$cmd" != "bash $GATE_RUNNER" ]; }; then
     _bar_decl=$(unset GATE_CMD; eval "$(git show "$at:.unattended.conf" 2>/dev/null)" >/dev/null 2>&1 </dev/null; printf '%s' "${GATE_CMD-}")
     [ -n "$_bar_decl" ] && _bar_ok=$_bar_decl
   fi
@@ -748,15 +905,27 @@ fi
 [ -z "$main_local" ] && { RUNLOG_DECISION=skip-nondefault; RUNLOG_CLEAN=1; exit 0; }   # no push to the default branch → nothing to gate
 [ -z "${main_local//0/}" ] && { RUNLOG_DECISION=skip-delete; RUNLOG_CLEAN=1; exit 0; }   # all-zero local sha = a delete → nothing to gate
 
+# THE RECEIPT AND THE RUNNER IT NAMES, VETTED BEFORE ANYTHING READS THE KIT ROOT (closing review
+# round 1 B1, TOOL-aRepatriatedFork-24 S2c). The ladder above took the kit root, and the resolver the
+# runner, from `.governance/install.json`, and neither had to be tracked: an ignored receipt naming
+# a runner under `.git/`, beside a planted manifest, ran that runner over a RED tracked bar and
+# landed with `git status` empty. Here, and not beside the ladder, because only a default-branch
+# push reads what the ladder found; a feature push is not refused over a receipt it never uses.
+# The runner is vetted for the DEFAULT bar only: a declared bar is vetted by `check_bar_command`.
+[ -f "$top/.governance/install.json" ] \
+  && check_reviewed_file .governance/install.json "$main_local" "names this hook's kit root and its default bar"
+[ -z "${GOV_GATE_CMD:-}" ] && [ -n "$GATE_RUNNER" ] \
+  && check_reviewed_file "$GATE_RUNNER" "$main_local" "is the default bar this hook would run"
+
 # MOVED BELOW THE "NOTHING TO GATE" EXITS, and the move is the whole fix. This refusal used to
 # sit beside the kit-root probe, ABOVE every question about which ref is being pushed — so an
 # adopter installed at a third prefix (govkit accepts any, via `demand_safe_token`) had EVERY
 # push refused, feature branches included, on a hook whose own header says "Other pushes do
 # nothing". Reproduced by the closing review on a scratch remote: a `vendor/gov/` install
 # refused `git push origin feature` with a message about forcing predicates and a green earned
-# on a different leg set, neither of which applies to a push this hook never gates. There is no
-# escape hatch either — `GOV_KITROOT` is assigned, not defaulted from the environment — so such
-# an adopter had to hand-edit the hook or pass --no-verify on every branch push.
+# on a different leg set, neither of which applies to a push this hook never gates. There was no
+# escape hatch either, so such an adopter had to hand-edit the hook or pass --no-verify on every
+# branch push. The environment still cannot set `GOV_KITROOT`; the vetted `gate-env.sh` can.
 #
 # On a DEFAULT-BRANCH push the refusal is still exactly right, and that is where it now lives:
 # their bar genuinely cannot run, and saying so at the one boundary that reads the manifest is
@@ -766,12 +935,17 @@ fi
 # made the original failure silent: `git diff -- <unresolvable>` reports "no change here" and the
 # push sails through. A repo with no manifest anywhere is a different and legitimate case (a fresh
 # adopter, a project not using run-gates, this hook's own fixtures), and it is left alone.
-if [ ! -f "$top/$GOV_KITROOT/gate-legs.json" ]; then
+# A LADDER MISS is the same case from the other side: nothing resolved, so nothing can be read.
+if [ -z "$KITROOT_FROM" ] || [ ! -f "$top/${KP}gate-legs.json" ]; then
   _elsewhere=$(git ls-files --cached -- '*gate-legs.json' 2>/dev/null | head -1)
   if [ -n "$_elsewhere" ]; then
     why="pre-push: REFUSING — this tree tracks a leg manifest at '$_elsewhere', but this hook"
     echo "$why" >&2
-    echo "  resolved its kit root to '$GOV_KITROOT' and looked for '$GOV_KITROOT/gate-legs.json'." >&2
+    if [ -n "$KITROOT_FROM" ]; then
+      echo "  resolved its kit root to '${GOV_KITROOT:-the repo root}' from $KITROOT_FROM and looked for '${KP}gate-legs.json'." >&2
+    else
+      echo "  resolved its kit root nowhere: $(print_kitroot_miss)." >&2
+    fi
     echo "  Left alone, the two forcing predicates that read that path would match NOTHING and the" >&2
     echo "  push would be scoped against a green earned on a different leg set." >&2
     echo "  Deliberate override, as always: git push --no-verify" >&2
@@ -780,12 +954,12 @@ if [ ! -f "$top/$GOV_KITROOT/gate-legs.json" ]; then
 fi
 
 
-# TOOL-aLeasedGauntlet-1: a default-branch push must go through tools/push-main.sh, which reconciles
+# TOOL-aLeasedGauntlet-1: a default-branch push must go through <prefix>/push-main.sh, which reconciles
 # origin BEFORE this full gate so it never runs on a stale tree. The lander sets this marker; a raw
 # push lacks it and is refused (--no-verify bypasses). The kit hook has no code/docs split, so EVERY
 # unmarked default-branch push is refused.
 if [ ! -f "$(git rev-parse --git-dir)/push-main-active" ]; then
-  why="pre-push: refusing a raw push to $def — land via $GOV_KITROOT/push-main.sh (it reconciles before the gate), or --no-verify to bypass."
+  why="pre-push: refusing a raw push to $def — land via ${KP}push-main.sh (it reconciles before the gate), or --no-verify to bypass."
   echo "$why" >&2
   write_refusal raw-push "$why"; RUNLOG_CLEAN=1; exit 1
 fi
@@ -898,7 +1072,7 @@ read_policy_at() { # sha -> PP_POLICY (park|land), PP_MAX_AGE (set under land on
 }
 
 gd=$(git rev-parse --git-dir 2>/dev/null)
-kitfp="$top/$GOV_KITROOT/run-gates/gate-fingerprint.sh"
+kitfp=""; [ -n "$GATE_RUNNER" ] && kitfp="$top/${GATE_RUNNER%/*}/gate-fingerprint.sh"
 rec="$gd/gate-full-green"
 force=""; lag=0
 rec_sha=""; rec_fp=""; rec_blob=""; rec_st=""
@@ -954,14 +1128,14 @@ check_green_record() { # sha · fingerprint · manifest blob · selftests · lab
   fi
   # 6. the diff touches the LEG MANIFEST, so the scoping decision itself has changed. A guard added,
   #    widened or removed in this very push cannot be trusted to scope this very push.
-  if ! git diff --quiet "$r_sha" "$main_local" -- "$GOV_KITROOT/gate-legs.json" 2>/dev/null; then
+  if ! git diff --quiet "$r_sha" "$main_local" -- "${KP}gate-legs.json" 2>/dev/null; then
     force="the pushed diff touches the leg manifest, so the scoping rules themselves moved"; return 0
   fi
   # 7. the recorded manifest blob differs from the one this tree holds — the same concern as 6, from
   #    the record's side, and it catches an uncommitted or differently-resolved manifest that a diff
   #    between two commits cannot see.
   if [ -n "$r_blob" ]; then
-    now_blob=$(git hash-object -- "$GOV_KITROOT/gate-legs.json" 2>/dev/null)
+    now_blob=$(git hash-object -- "${KP}gate-legs.json" 2>/dev/null)
     if [ -n "$now_blob" ] && [ "$now_blob" != "$r_blob" ]; then
       force="the leg manifest differs from the one the recorded green was earned on"; return 0
     fi
@@ -1044,10 +1218,63 @@ if [ -n "${GOV_GATE_CMD:-}" ]; then
   fi
 else
   bar_path=$GATE_RUNNER
-  bar_blob=$(git rev-parse -q --verify "$main_local:$bar_path" 2>/dev/null || true)
+  [ -n "$bar_path" ] && bar_blob=$(git rev-parse -q --verify "$main_local:$bar_path" 2>/dev/null || true)
 fi
 RUNLOG_BAR=${RUNLOG_BAR:-default}   # set only once the value is vetted, so a refusal records no bar
 RUNLOG_BAR_PATH=$bar_path; RUNLOG_BAR_BLOB=$bar_blob
+
+# THE DEFAULT BAR WITH NO KIT ROOT — TOOL-aRepatriatedFork-24 S2, the owner's F1 (c). A commit hook
+# skips on a miss, because its legs are an early signal. This is the merge bar, so a push that cannot
+# find it and passes is the silent skip the unit exists to remove. It used to name the runner under
+# a guessed prefix and fail on "no such file", which reads as a red bar rather than as a hook that
+# never found one. Recorded as the default bar first, so the run log says
+# which bar was refused.
+if [ -z "${GOV_GATE_CMD:-}" ] && [ -z "$KITROOT_FROM" ]; then
+  why="pre-push: REFUSING — the default bar is this tree's kit runner, and the kit root resolved nowhere"
+  echo "$why" >&2
+  echo "  ($(print_kitroot_miss))." >&2
+  echo "  Declare GOV_KITROOT=<the directory holding the run-gates kit> in .githooks/gate-env.sh and" >&2
+  echo "  commit it, or name a bar with GOV_GATE_CMD. Deliberate override, as always: git push --no-verify" >&2
+  write_refusal bar-refused "$why"; RUNLOG_CLEAN=1; exit 1
+fi
+# ...and a kit root that resolved while the runner inside it did not (TOOL-aRepatriatedFork-46). The
+# refusal above keys on the root; this one keys on the runner, so neither miss reaches the bar line
+# with an empty runner to run.
+if [ -z "${GOV_GATE_CMD:-}" ] && [ -z "$GATE_RUNNER" ]; then
+  why="pre-push: REFUSING — the default bar is this tree's kit runner, and it resolved nowhere under the kit root"
+  echo "$why" >&2
+  echo "  (the kit root is '${GOV_KITROOT:-the repo root}', from $KITROOT_FROM; ${RUNNER_MISS:-no run-gates.sh found})." >&2
+  echo "  Install the run-gates kit there, or name a bar with GOV_GATE_CMD. Deliberate override, as always: git push --no-verify" >&2
+  write_refusal bar-refused "$why"; RUNLOG_CLEAN=1; exit 1
+fi
+
+# ---- WHAT THE BAR READS, NOT ONLY WHICH BAR — closing review round 2 H1, TOOL-aRepatriatedFork-49 ----
+# The runner takes its leg manifest from `GATE_LEGS` and reuses a proven-green ledger row under
+# `GATE_REUSE`, so either knob, exported, decided what a vetted runner checked: a manifest of one green
+# leg outside the tree landed a RED tracked bar. They are cleared for every bar not labelled STUB. The
+# label is the key, never `GOV_GATE_CMD_TEST` itself, which does not mark the DEFAULT bar and would
+# leave a planted manifest under a `default` label that earns the lander marker. A STUB keeps them,
+# because the hook's own fixtures drive a runner copy over a fixture manifest.
+# The manifest the runner then reads, the sibling of its kit directory, is vetted as the runner is:
+# an ignored one was read like a tracked one, and `git status` never reports it.
+# The three ARM SEAMS dDerivedDocket gave the runner (TOOL-dDerivedDocket-26 S6) join them at the
+# reconcile with aRepatriatedFork: `GATE_SPAWN_CMD` names what the host probe times, `GATE_SPAWN_FLOOR`
+# its floor file, `GATE_VERDICT_FAULT` a verdict write that fails. Each exists for the runner's own
+# suite, which drives it directly, so no bar this hook runs has any use for one.
+BAR_SCRUBBED_KNOBS="GATE_LEGS GATE_REUSE GATE_SPAWN_CMD GATE_SPAWN_FLOOR GATE_VERDICT_FAULT"
+if [ "$bar_class" != stub ]; then
+  for _k in $BAR_SCRUBBED_KNOBS; do
+    [ -n "${!_k+x}" ] && ENV_CLEARED+=" $_k"
+    unset "$_k"
+  done
+  if [ -n "$GATE_RUNNER" ]; then
+    _legs=${GATE_RUNNER%/*}
+    case "$_legs" in */*) _legs=${_legs%/*}/gate-legs.json ;; *) _legs=gate-legs.json ;; esac
+    [ -f "$top/$_legs" ] && check_reviewed_file "$_legs" "$main_local" "is the leg manifest the bar's runner reads"
+  fi
+fi
+[ -n "$ENV_CLEARED" ] \
+  && echo "pre-push: not honoured from the environment by this bar:$ENV_CLEARED" >&2
 
 # S3's refusal, measured above the forcing predicates and refused here, once the bar is vetted.
 if [ -n "$_tree_dirty" ]; then

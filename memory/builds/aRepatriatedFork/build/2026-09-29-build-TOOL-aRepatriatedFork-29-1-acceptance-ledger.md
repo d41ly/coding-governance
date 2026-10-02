@@ -1,0 +1,18 @@
+# TOOL-aRepatriatedFork-29 — acceptance ledger
+
+**Serves:** journal TOOL-aRepatriatedFork-29
+
+Written by the unit pass on node a, 2026-09-29. No merge bar, no self-test runner and no whole suite
+ran. Each criterion ran its direct check. The renamed tree is a scratch clone of this worktree with
+the change committed and then `git mv tools scripts` committed on top. The per-line scans ran the
+gate's own epoch-5 counter program, lifted from `check-install-prefix.sh` and called on each line.
+
+**Evidences:** TOOL-aRepatriatedFork-29
+- AC1 — in the renamed clone, `python scripts/govkit/govkit.py selfcheck` exits 0. Its 32 report lines equal the run at gov's prefix once `scripts/` reads `tools/`, including `surface 71 tracked path(s) · 27 entries · 22 exemption(s) · 0 unclaimed`. `govkit.py shipped` there prints 291 rows, and none of them names `tools/`
+- AC2 — a fixture adopter was installed by the deployer at `2143b6d6` with the memory-tree kit, 33 receipt rows. `update` from gov's prefix, with this change and without it, prints the same row statuses line for line; only the kit version it reports moves, 2.106 to 2.107. From the renamed clone every source reads as renamed, because the clone's own rename commit moved them. Four rendered-template rows there read `rename NOT taken` and withdrawn, since at the new root each source resolves to two destinations. A destination spelled `{prefix}/../../escape.md` in the renamed clone's descriptor is still refused by the containment guard, exit 2
+- AC3 — the runner's own manifest-parse program, lifted from `scripts/run-gates/run-gates.sh`, resolves all 118 legs in the renamed clone: 152 path-shaped argv and guard elements, 0 missing, none naming `tools/` and none left unresolved
+- AC4 — `bash scripts/check-kit-versions.sh` in the renamed clone exits 0 with `16 declared carrier(s) under scripts/`, the same count it prints under `tools/` in this worktree
+- AC5 — red-first control: at `2143b6d6` with `tools/` renamed to `scripts/`, the old `check-kit-versions.sh` exits 1 with 33 problems, the first `MISSING KIT_MEMORY_TREE_VERSION in tools/memory-tree/check-memory-hygiene.sh`
+- AC6 — `python tools/playbook/render_playbook.py --selftest` passes 22 arms. The new arm puts a runner under `vendor/gov/run-gates/` with no receipt and reads back that path, and a second candidate root yields no answer at all. Red-first: the same arm against the old fixed-candidate fallback read an empty answer and failed
+- AC7 — `bash tools/check-install-prefix.sh --write-ratchet` lowered the ban list from 147 rows to 90, and `bash tools/check-install-prefix.sh --list` then prints those 90. It removed 57 rows and lowered 4. The four that stay hold lines rev-3 §4 names for other owners: govkit's runner probe and two derived-base joins in `map_extractors.py`, which are `TOOL-aRepatriatedFork-46`'s; four text cells mirroring the frozen receipt fixture in `dead-path-waivers.txt`; and five selftest fixture strings in `render_playbook.py`, which are `TOOL-aRepatriatedFork-28`'s. The two render rows wait for `TOOL-aRepatriatedFork-30`'s population rule. The gate then exits 0
+- AC8 — `bash tools/check-kit-versions.sh` exits 0. In a clone with the change committed, `govkit.py epoch` is clean for every entry at both `--base f8fdd873` and `--base 2143b6d6`, after thirteen kits moved in every carrier: agent-cap 1.26, codebase-map 1.16, drift-audit 1.19, lexicon 1.14, memory-recall 1.23, memory-tree 2.107, playbook-render 1.14, process-monitor 0.11, pytest-parallel-guardrails 1.3, review-harness and tier2-review 1.18, run-gates 1.15, runlog 1.4 and unattended 1.44

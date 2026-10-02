@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # adopt-unattended.sh — install the unattended-run kit's project-facing surface.
 #
-#   tools/unattended/adopt-unattended.sh            # render .claude/skills/unattended/SKILL.md
-#   tools/unattended/adopt-unattended.sh --check    # verify the rendered Skill still matches the kit + conf
+#   <prefix>/unattended/adopt-unattended.sh            # render .claude/skills/unattended/SKILL.md
+#   <prefix>/unattended/adopt-unattended.sh --check    # verify the rendered Skill still matches the kit + conf
 #
 # Exit 0 = rendered / in sync · 1 = drift or a missing prerequisite · 2 = misconfigured.
 #
@@ -110,7 +110,7 @@ esac
 
 # THE TOOL ROOT, derived exactly as `adopt-memory-tree.sh` derives it, and for the same reason: the
 # Skill names the harness scripts, which live BESIDE this kit rather than inside it. Spelled as a
-# literal they were `tools/workflows/…` in every render, which resolves to nothing in a root install
+# literal they were gov's prefix plus `workflows/…` in every render, which resolves to nothing in a root install
 # and disagreed with the build-method carrier that already spelled the same two paths through this
 # placeholder. Two carriers, one route, two answers. Closing-review F6.
 TOOL_ROOT=${KIT_REL%/*}; [ "$TOOL_ROOT" = "$KIT_REL" ] && TOOL_ROOT=""   # "tools" at a prefix, "" at the root
@@ -220,6 +220,89 @@ esac
 # The override is asserted exactly as a probe answer is. It is an ENVIRONMENT variable and a
 # hand-install channel only: `--check` re-derives on every run, so a tree whose bar needs the
 # override has to export it for the gate as well.
+# >>> resolve_python — canonical copy: resolve-python.sh in gov's lib dir (byte-identical; gated)
+resolve_python() {
+  # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
+  # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
+  # the candidate and every consumer uses "$PY" as a single word (measured: exit 127).
+  _rp_tried=""
+  for _rp_c in "${1:-}" "${GOV_PYTHON:-}" python3 python py; do
+    [ -n "$_rp_c" ] || continue
+    _rp_tried="$_rp_tried $_rp_c"
+    if "$_rp_c" -c "import sys" >/dev/null 2>&1; then
+      printf '%s\n' "$_rp_c"
+      return 0
+    fi
+  done
+  {
+    echo "resolve_python: no usable python launcher. Each candidate was RUN with -c 'import sys' and"
+    echo "resolve_python: none exited 0 — being on PATH is not evidence (the Microsoft Store python3"
+    echo "resolve_python: stub answers \`command -v\` and exits 9009 without running anything)."
+    echo "resolve_python: tried:$_rp_tried"
+    if [ -n "${1:-}" ]; then
+      echo "resolve_python: the caller's override '$1' was tried FIRST and did not run."
+    fi
+    if [ -n "${GOV_PYTHON:-}" ]; then
+      echo "resolve_python: GOV_PYTHON is set to '$GOV_PYTHON' and did not run. An override that is"
+      echo "resolve_python: set and unusable is THIS failure, never a silent fall-through — the"
+      echo "resolve_python: operator believes they chose, and would not have."
+    fi
+  } >&2
+  return 1
+}
+# <<< resolve_python
+# The sibling-kit resolver (TOOL-aRepatriatedFork-2 S3), INLINED byte-identically from the
+# canonical copy named on its marker line and gated by the resolve-python self-test's parity
+# table. A shell consumer runs it with the python it already resolved, so the receipt rung is
+# read in Python and never parsed in bash. `resolve_kit_dir <python> <home> <anchor> <here>`
+# prints the kit directory REPO-RELATIVE, or the resolver's named refusal on stderr and exits 1.
+resolve_kit_dir() {
+  "$1" -c "$(cat <<'RKD'
+# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
+def resolve_kit_dir(home, anchor, here):
+    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
+
+    1. receipt — the `.governance/install.json` row whose `source` ends in <home>/<anchor> and
+       whose `path` exists inside this tree. The only record of a RENAMED kit dir: no probe finds
+       a memory-recall kit an adopter homed at `scripts/recall/`.
+    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
+    3. refuse — LookupError naming the three places looked; never a guessed prefix.
+    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
+    """
+    import json
+    import pathlib
+    here = pathlib.Path(here).absolute()  # never resolve(): a junction must not move it
+    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
+    receipt = root / ".governance" / "install.json"
+    try:
+        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("path"):
+            continue
+        if str(row.get("source") or "").split("/")[-2:] != [home, anchor]:
+            continue
+        hit = (root / str(row["path"])).absolute()
+        if hit.is_file() and root in hit.parents and ".." not in hit.parts:
+            return hit.parent
+    probes = (here / home, here.parent / home)
+    for cand in probes:
+        if (cand / anchor).is_file():
+            return cand
+    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
+        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
+# <<< resolve_kit_dir
+RKD
+)"'
+import sys
+try:
+    d = resolve_kit_dir(*sys.argv[1:4])
+except LookupError as e:
+    sys.exit(str(e))
+r = next((p for p in (d, *d.parents) if (p / ".git").exists()), d.anchor)
+print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
+}
 check_tracked() { git ls-files --error-unmatch -- ":(literal)$1" >/dev/null 2>&1; }
 MEMORY_TREE_DIR=""
 if [ -n "$_MTD_OVERRIDE" ]; then
@@ -237,17 +320,61 @@ if [ -n "$_MTD_OVERRIDE" ]; then
     exit 2
   fi
 else
-  for _c in "${TOOL_ROOT}memory-tree/gotchas.py" "${TOOL_ROOT}gotchas.py"; do
+  # TOOL-aRepatriatedFork-46: the memory-tree kit is found through the sibling-kit resolver, which
+  # reads the install receipt before it probes beside this kit, rather than by typing its name.
+  _mt_dir=""
+  _mt_py=$(resolve_python 2>/dev/null) && _mt_dir=$(resolve_kit_dir "$_mt_py" memory-tree gotchas.py "$KIT_DIR" 2>/dev/null)
+  for _c in ${_mt_dir:+"$_mt_dir/gotchas.py"} "${TOOL_ROOT}gotchas.py"; do
     if check_tracked "$_c"; then MEMORY_TREE_DIR=$(dirname "$_c"); break; fi
   done
   if [ -z "$MEMORY_TREE_DIR" ]; then
-    echo "unattended: cannot derive MEMORY_TREE_DIR — neither ${TOOL_ROOT}memory-tree/gotchas.py nor"
+    echo "unattended: cannot derive MEMORY_TREE_DIR — neither the memory-tree kit's gotchas.py (install receipt, or beside this kit) nor"
     echo "  ${TOOL_ROOT}gotchas.py is tracked in this repo. The Skill names the memory-tree kit's"
     echo "  bug-class checklist by path, and a guessed path is a command that runs nothing."
     echo "  If that kit is installed somewhere else, set MEMORY_TREE_DIR=<the directory holding"
     echo "  gotchas.py> and re-run. Nothing was written."
     exit 2
   fi
+fi
+
+# THE STAMP — TOOL-aRepatriatedFork-24 S3. The shipped example spells `{{TOOL_ROOT}}` in LANDER,
+# GATE_CMD and WIRING_CHECK, and `{{MEMORY_TREE_DIR}}` for the generator in GENERATED_INDEXES. It
+# used to spell the authoring repo's own paths, which resolved to nothing at any other prefix, and
+# the driver EXECUTES three of the four values while the fourth keys a refusal. This adopter knows
+# both values, derived above, so it writes them into the conf the operator copied, as the
+# codebase-map adopter stamps MAP_DIFF_CMD. Only a line of one of those four keys that still carries
+# a token is rewritten, so a conf the project already owns is never touched. NO `sed`, for the reason
+# that adopter gives: a replacement grammar turns a path into a different path. Nothing is claimed
+# until it is read back. `--check` NEVER writes: it refuses a conf that still carries a token, which
+# is a driver that would run a brace.
+STAMP_RE='^(LANDER|GATE_CMD|WIRING_CHECK|GENERATED_INDEXES)=.*[{][{](TOOL_ROOT|MEMORY_TREE_DIR)[}][}]'
+if _stamp=$(grep -nE "$STAMP_RE" "$CONF") && [ -n "$_stamp" ]; then
+  if [ "$MODE" = "--check" ]; then
+    echo "unattended: .unattended.conf still carries a path token this adopter stamps — run $0 to write this install's paths:"
+    printf '%s\n' "$_stamp" | tr -d '\r' | sed 's/^/    /'
+    exit 1
+  fi
+  case "$TOOL_ROOT$MEMORY_TREE_DIR" in
+    *[!A-Za-z0-9._/+@-]*)
+      echo "unattended: cannot stamp .unattended.conf — the tool root '$TOOL_ROOT' or MEMORY_TREE_DIR '$MEMORY_TREE_DIR'"
+      echo "  holds a character outside [A-Za-z0-9._/+@-], and the stamped values are shell commands."
+      exit 2 ;;
+  esac
+  while IFS= read -r _line || [ -n "$_line" ]; do
+    case "$_line" in
+      LANDER=*|GATE_CMD=*|WIRING_CHECK=*|GENERATED_INDEXES=*)
+        _line=${_line//\{\{TOOL_ROOT\}\}/"$TOOL_ROOT"}
+        _line=${_line//\{\{MEMORY_TREE_DIR\}\}/"$MEMORY_TREE_DIR"} ;;
+    esac
+    printf '%s\n' "$_line"
+  done < "$CONF" > "$CONF.new" && mv "$CONF.new" "$CONF" \
+    || { rm -f "$CONF.new"; echo "unattended: could not write the stamp into $CONF"; exit 1; }
+  if grep -qE "$STAMP_RE" "$CONF"; then
+    echo "unattended: the stamp did not land — .unattended.conf still carries a path token after the rewrite"; exit 1
+  fi
+  # The render below reads LANDER from memory, sourced before the stamp: the same substitution.
+  LANDER=${LANDER//\{\{TOOL_ROOT\}\}/"$TOOL_ROOT"}
+  echo "unattended: stamped this install's paths into .unattended.conf (tool root '${TOOL_ROOT:-the repo root}', memory-tree '$MEMORY_TREE_DIR')"
 fi
 
 SKILL_DIR="$ROOT/.claude/skills/unattended"

@@ -31,17 +31,21 @@ derive_self_rel() {
 }
 # <<< derive_self_rel
 KIT_REL=$(derive_self_rel "$HERE") || { echo "FAIL this suite is not inside a git repository"; exit 2; }
+# PFX is the install prefix WITH its trailing slash, derived from where this file sits and empty
+# at a root install: every fixture and host path below is spelled through it, never through a
+# literal prefix (TOOL-aRepatriatedFork-28).
+case "$KIT_REL" in */*) PFX="${KIT_REL%/*}/" ;; *) PFX="" ;; esac
 TMP=$(mktemp -d)
 trap 'rm -rf "$TMP"' EXIT
 # The resolver, INLINE. This kit is copy-installed as a standalone directory, so `../lib/` does not
-# exist in an adopting repo. The block below is byte-identical to tools/lib/resolve-python.sh and
-# tools/lib/resolve-python.test.sh reds if any copy drifts.
+# exist in an adopting repo. The block below is byte-identical to <prefix>/lib/resolve-python.sh and
+# <prefix>/lib/resolve-python.test.sh reds if any copy drifts.
 #
 # This file invoked `python3` BARE — the shape a ban keyed on `command -v` cannot see, which is how
 # it survived the V5 migration. On a python3-only host it happened to work; on a host where the
 # MS-Store stub answers for python3 it renders nothing and the young-tree arm below reds for a
 # reason that has nothing to do with hygiene.
-# >>> resolve_python — canonical copy: tools/lib/resolve-python.sh (byte-identical; gated)
+# >>> resolve_python — canonical copy: resolve-python.sh in gov's lib dir (byte-identical; gated)
 resolve_python() {
   # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
   # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
@@ -73,6 +77,64 @@ resolve_python() {
 }
 # <<< resolve_python
 _PY=$(resolve_python) || { echo "check-memory-hygiene.test: no usable python"; exit 2; }
+# TOOL-aRepatriatedFork-46: a kit is named by the name its directory has in THIS install, never
+# as a literal segment: this suite's own from where it sits, a sibling's through the resolver,
+# which reads the install receipt first. A fixture mirrors that layout by the resolved NAME.
+KIT="${KIT_REL##*/}"
+# The sibling-kit resolver (TOOL-aRepatriatedFork-2 S3), INLINED byte-identically from the
+# canonical copy named on its marker line and gated by the resolve-python self-test's parity
+# table. A shell consumer runs it with the python it already resolved, so the receipt rung is
+# read in Python and never parsed in bash. `resolve_kit_dir <python> <home> <anchor> <here>`
+# prints the kit directory REPO-RELATIVE, or the resolver's named refusal on stderr and exits 1.
+resolve_kit_dir() {
+  "$1" -c "$(cat <<'RKD'
+# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
+def resolve_kit_dir(home, anchor, here):
+    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
+
+    1. receipt — the `.governance/install.json` row whose `source` ends in <home>/<anchor> and
+       whose `path` exists inside this tree. The only record of a RENAMED kit dir: no probe finds
+       a memory-recall kit an adopter homed at `scripts/recall/`.
+    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
+    3. refuse — LookupError naming the three places looked; never a guessed prefix.
+    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
+    """
+    import json
+    import pathlib
+    here = pathlib.Path(here).absolute()  # never resolve(): a junction must not move it
+    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
+    receipt = root / ".governance" / "install.json"
+    try:
+        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("path"):
+            continue
+        if str(row.get("source") or "").split("/")[-2:] != [home, anchor]:
+            continue
+        hit = (root / str(row["path"])).absolute()
+        if hit.is_file() and root in hit.parents and ".." not in hit.parts:
+            return hit.parent
+    probes = (here / home, here.parent / home)
+    for cand in probes:
+        if (cand / anchor).is_file():
+            return cand
+    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
+        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
+# <<< resolve_kit_dir
+RKD
+)"'
+import sys
+try:
+    d = resolve_kit_dir(*sys.argv[1:4])
+except LookupError as e:
+    sys.exit(str(e))
+r = next((p for p in (d, *d.parents) if (p / ".git").exists()), d.anchor)
+print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
+}
+CODEBASE_MAP_DIR=$(resolve_kit_dir "$_PY" codebase-map reuse_lookup.py "$HERE") || exit 2
+CODEBASE_MAP="${CODEBASE_MAP_DIR##*/}"
 cd "$TMP" || exit 2
 git init -q . && git config user.email t@t.test && git config user.name t && git config core.autocrlf false
 # STREAMS_CUTOFF sits between the two fixture eras: the 2026-08-01 specs are grandfathered, the
@@ -461,7 +523,7 @@ no open-questions section at all
   > "$D/spec/2026-08-10-spec-tFixture-64.md"                                   # no such section -> must SAY SO, not pass
 # The witness sits on a CONTINUATION line. The accumulator that folds continuations into their
 # bullet had no fixture: deleting it left this harness unchanged while the real gate went red.
-wit | sed 's|- AC1 When run, `check-memory-hygiene.sh` passes.|- **AC1** When run, the gate named below passes:\n  `bash tools/memory-tree/check-memory-hygiene.sh`|' \
+wit | sed 's|- AC1 When run, `check-memory-hygiene.sh` passes.|- **AC1** When run, the gate named below passes:\n  `bash '"${PFX}${KIT}/check-memory-hygiene.sh"'`|' \
   > "$D/spec/2026-08-10-spec-tFixture-55.md"   # witness on a continuation -> silent
 # A hard-wrapped continuation that OPENS with a cross-reference to other ACs. The first selector
 # read this as a new bullet head: it closed the real bullet early and invented a phantom label, so
@@ -985,6 +1047,8 @@ before()  { local a b; n=$((n+1)); a=$(lineno "$1"); b=$(lineno "$2")
               || { echo "FAIL expected [$1] before [$2] (got '$a' vs '$b')"; st=1; }; }
 
 hit  'tFixture-3.md (missing/invalid'
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${st:-0}" = 0 ] && echo "PASS (${n:-1} assertions)" || echo "FAIL (${n:-1} assertions)"; [ "${st:-0}" = 0 ] && exit 0; exit 1; fi
 hit  'tFixture-4.md (## sections differ'
 hit  'tFixture-6.md (unfilled skeleton placeholder'
 hit  'tFixture-7.md (section with an empty body'
@@ -2928,7 +2992,7 @@ _fl=$(mktemp -d)
   # The second row RE-HOMES one sibling, as a `kit.codebase-map.prefix` override records it: only
   # per row. Closing review round 1 L4 — a top-level `prefix` read renders it at `scripts/` anyway.
   mkdir -p lib/cm; : > lib/cm/reuse_lookup.py
-  printf '{\n  "schema": 3,\n  "prefix": "scripts",\n  "files": [{"prefix": "decoy"}, {"path": "lib/cm/reuse_lookup.py", "source": "%s/codebase-map/reuse_lookup.py", "kit": "codebase-map"}]\n}\n' gov > .governance/install.json
+  printf '{\n  "schema": 3,\n  "prefix": "scripts",\n  "files": [{"prefix": "decoy"}, {"path": "lib/cm/reuse_lookup.py", "source": "%s/%s/reuse_lookup.py", "kit": "codebase-map"}]\n}\n' gov "$CODEBASE_MAP" > .governance/install.json
   printf 'MEMORY_ROOT=memory\nDISCIPLINES="arch"\nFAMILIES="arch:ARCH"\nREADINESS_ROWS="security|risks"\nINDEX_CAP_LINES="500"\nENTRY_CAP_UNIT="bytes"\n' > .memory-tree.conf
   printf '<!-- gov:kit memory-tree@0 -->\n' > memory/HYGIENE.md
   git add -A && git -c commit.gpgsign=false commit -q -m flat --no-verify
@@ -2943,7 +3007,7 @@ else
   echo "FAIL --render did not state the fixture's own INDEX_CAP_LINES=500 / ENTRY_CAP_UNIT=bytes, or still spells gov's INDEX_CAP_LINES=0"; st=1
 fi
 n=$((n+1))
-if grep -qF '`scripts/codebase-map/gen_map.py`' "$_fl/memory/TEMPLATE-SPEC.md" 2>/dev/null; then
+if grep -qF "\`scripts/${CODEBASE_MAP_DIR##*/}/gen_map.py\`" "$_fl/memory/TEMPLATE-SPEC.md" 2>/dev/null; then
   echo "ok   a flat install renders TOOL_ROOT from the receipt's prefix"
 else
   echo "FAIL a flat install with a receipt prefix of scripts did not render the codebase-map generator under scripts/ — TOOL_ROOT is still the empty parent"; st=1
@@ -2965,6 +3029,9 @@ _pbk=""
 for _c in "$HERE/playbook" "$(dirname "$HERE")/playbook"; do
   [ -f "$_c/render_playbook.py" ] && { _pbk=$_c; break; }
 done
+# The fixture's playbook kit takes the ENGINE's directory name, found above rather than typed: a
+# kit name typed under the fixture's literal prefix is what the install-prefix ban counts.
+_PB=${_pbk##*/}
 if [ -z "$_pbk" ]; then
   echo "skip adopter-declared paths: no playbook-render engine beside this kit, so its three arms are UNEXERCISED here"; n_skip=$((${n_skip:-0}+3))
 else
@@ -2972,11 +3039,11 @@ _ad=$(mktemp -d)
 (
   cd "$_ad" || exit 1
   git init -q .; git config user.email t@t.test; git config user.name t
-  mkdir -p scripts/playbook notes .governance
+  mkdir -p "scripts/$_PB" notes .governance
   cp "$HERE"/*.template.md "$HERE/adopt-memory-tree.sh" scripts/
-  cp "$_pbk/render_playbook.py" scripts/playbook/
-  printf '[[placeholder]]\nkey = "GATE_RUNNER"\nclass = "derived"\nprobe = "gate_runner"\n' > scripts/playbook/playbook.kit.toml
-  printf '[[entry]]\nid = "%s"\n\n' memory-tree kickoff-manifest review-harness unattended > scripts/playbook/registry.toml
+  cp "$_pbk/render_playbook.py" "scripts/$_PB/"
+  printf '[[placeholder]]\nkey = "GATE_RUNNER"\nclass = "derived"\nprobe = "gate_runner"\n' > "scripts/$_PB/playbook.kit.toml"
+  printf '[[entry]]\nid = "%s"\n\n' memory-tree kickoff-manifest review-harness unattended > "scripts/$_PB/registry.toml"
   printf 'gov_source = "../gov"\nkits = ["memory-tree", "kickoff-manifest"]\n\n[answers]\ngate_runner = "bash scripts/gate.sh"\nmanifest_path = ".claude/SESSION-KICKOFF.md"\nuser_skills = "~/.claude/skills"\n' > .governance/deploy.toml
   printf 'MEMORY_ROOT=notes\nDISCIPLINES="arch"\nFAMILIES="arch:ARCH"\nREADINESS_ROWS="security|risks"\n' > .memory-tree.conf
   printf '<!-- gov:kit memory-tree@0 -->\n' > notes/HYGIENE.md
@@ -2995,7 +3062,7 @@ else
   echo "FAIL --render put a gov path in an adopter's docs, or missed its declared bar, manifest, skill or memory root"; st=1
 fi
 # With no engine to answer, every placeholder states its phrase and no brace survives.
-( cd "$_ad" && rm -rf scripts/playbook && bash scripts/adopt-memory-tree.sh --render ) >/dev/null 2>&1
+( cd "$_ad" && rm -rf "scripts/$_PB" && bash scripts/adopt-memory-tree.sh --render ) >/dev/null 2>&1
 n=$((n+1))
 # shellcheck disable=SC2086
 if grep -qF 'the merge bar of this repo' "$_bm" 2>/dev/null && grep -qF 'The spec-token checker of the shipping repo' "$_ad/notes/TEMPLATE-SPEC.md" \
@@ -3006,9 +3073,9 @@ else
 fi
 # A selected kickoff kit with no manifest answer is a named refusal, and no doc moves.
 cp "$_bm" "$_ad/bm.before"
-( cd "$_ad" && mkdir -p scripts/playbook && cp "$_pbk/render_playbook.py" scripts/playbook/ \
-  && printf '[[placeholder]]\nkey = "GATE_RUNNER"\nclass = "derived"\nprobe = "gate_runner"\n' > scripts/playbook/playbook.kit.toml \
-  && printf '[[entry]]\nid = "%s"\n\n' memory-tree kickoff-manifest > scripts/playbook/registry.toml \
+( cd "$_ad" && mkdir -p "scripts/$_PB" && cp "$_pbk/render_playbook.py" "scripts/$_PB/" \
+  && printf '[[placeholder]]\nkey = "GATE_RUNNER"\nclass = "derived"\nprobe = "gate_runner"\n' > "scripts/$_PB/playbook.kit.toml" \
+  && printf '[[entry]]\nid = "%s"\n\n' memory-tree kickoff-manifest > "scripts/$_PB/registry.toml" \
   && sed -i '/^manifest_path/d' .governance/deploy.toml ) >/dev/null 2>&1
 o=$( cd "$_ad" && bash scripts/adopt-memory-tree.sh --render 2>&1 ); rc=$?
 n=$((n+1))
@@ -3029,11 +3096,11 @@ build_fixture_r3() {
   local d; d=$(mktemp -d)
   ( cd "$d" || exit 1
     git init -q .; git config user.email t@t.test; git config user.name t; git config core.autocrlf false
-    mkdir -p scripts/playbook notes .governance
+    mkdir -p "scripts/$_PB" notes .governance
     cp "$HERE"/*.template.md "$HERE/adopt-memory-tree.sh" scripts/
-    cp "$_pbk/render_playbook.py" scripts/playbook/
-    printf '[[placeholder]]\nkey = "GATE_RUNNER"\nclass = "derived"\nprobe = "gate_runner"\n\n[[placeholder]]\nkey = "MEMORY_ROOT"\nclass = "derived"\nprobe = "memory_root"\n' > scripts/playbook/playbook.kit.toml
-    printf '[[entry]]\nid = "%s"\n\n' memory-tree kickoff-manifest review-harness unattended > scripts/playbook/registry.toml
+    cp "$_pbk/render_playbook.py" "scripts/$_PB/"
+    printf '[[placeholder]]\nkey = "GATE_RUNNER"\nclass = "derived"\nprobe = "gate_runner"\n\n[[placeholder]]\nkey = "MEMORY_ROOT"\nclass = "derived"\nprobe = "memory_root"\n' > "scripts/$_PB/playbook.kit.toml"
+    printf '[[entry]]\nid = "%s"\n\n' memory-tree kickoff-manifest review-harness unattended > "scripts/$_PB/registry.toml"
     printf 'gov_source = "../gov"\nkits = ["memory-tree", "kickoff-manifest"]\n\n[answers]\ngate_runner = "bash scripts/gate.sh"\nmanifest_path = ".claude/SESSION-KICKOFF.md"\nuser_skills = "~/.claude/skills"\n' > .governance/deploy.toml
     printf 'MEMORY_ROOT=notes\nDISCIPLINES="arch"\nFAMILIES="arch:ARCH"\nREADINESS_ROWS="security|risks"\n' > .memory-tree.conf
     printf '<!-- gov:kit memory-tree@0 -->\n' > notes/HYGIENE.md
@@ -3053,7 +3120,7 @@ else
 fi
 rm -rf "$_d"
 # C2 — an engine below the floor is no engine: the phrases, one named line, no usage error.
-_d=$(build_fixture_r3); sed -i 's/^KIT_PLAYBOOK_RENDER_VERSION = "[0-9.]*"/KIT_PLAYBOOK_RENDER_VERSION = "1.10"/' "$_d/scripts/playbook/render_playbook.py"
+_d=$(build_fixture_r3); sed -i 's/^KIT_PLAYBOOK_RENDER_VERSION = "[0-9.]*"/KIT_PLAYBOOK_RENDER_VERSION = "1.10"/' "$_d/scripts/$_PB/render_playbook.py"
 o=$( cd "$_d" && bash scripts/adopt-memory-tree.sh --render 2>&1 ); rc=$?
 n=$((n+1))
 if [ "$rc" = 0 ] && grep -qF 'the merge bar of this repo' "$(derive_bm_r3 "$_d")" && printf '%s' "$o" | grep -qF 'is 1.10, below the 1.11' \
@@ -3136,7 +3203,7 @@ fi
 rm -rf "$_d"
 # C5, C7 — with no engine, the unattended phrase asserts no install state, and the spec template
 # names no gate-leg path for the shipping repo's checker.
-_d=$(build_fixture_r3); rm -rf "$_d/scripts/playbook"
+_d=$(build_fixture_r3); rm -rf "$_d/scripts/$_PB"
 o=$( cd "$_d" && bash scripts/adopt-memory-tree.sh --render 2>&1 ); rc=$?
 n=$((n+1))
 if [ "$rc" = 0 ] && grep -qF 'the unattended-run protocol of this repo' "$(derive_bm_r3 "$_d")" && ! grep -qF 'not installed here)' "$(derive_bm_r3 "$_d")" \

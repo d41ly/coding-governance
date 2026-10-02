@@ -7,6 +7,8 @@
 #   unattended.sh --phase <slug> <phase> --witness <sha>   # move the run, with its witness
 #   unattended.sh --status <slug>                          # one line: phase · witness · next unit
 #   unattended.sh --audit <slug>                           # one line per open dispatched unit: idle time, PROGRESSING|STALLED
+#   unattended.sh --register-task <slug> --task <name> --heartbeat <absolute path>   # BEFORE starting a background task
+#   unattended.sh --release-task <slug> --task <name>      # the task ended; --audit stops grading its heartbeat
 #   unattended.sh --liveness <slug>                        # key: value lines and ONE verdict, for an out-of-session reader
 #   unattended.sh --resume <slug> [--keepalive-id <id> [--replaces <id>]]    # the same line, plus the next action; with the id, the resume matrix decides who drives
 #   unattended.sh --close <slug> [--override <item> --reason <text>]
@@ -43,7 +45,7 @@
 # The generated region holds NO copy: the unit list is DERIVED from the build README's already-derived,
 # already-byte-compared slice. One derivation in the tree; this file is not a second one.
 set -u
-KIT_UNATTENDED_VERSION=1.48   # gov:kit unattended@1.48 — kit identity; set HERE, never from .unattended.conf
+KIT_UNATTENDED_VERSION=1.55   # gov:kit unattended@1.55 — kit identity; set HERE, never from .unattended.conf
 
 # ------------------------------------------------------------------------------ the dereference pin
 # A sha is a NAME, and turning a name into bytes or into ancestry happens in the run's own object
@@ -88,7 +90,7 @@ KIT_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
 # read wrong, it does not RUN; the usage text is rendered from the docstring above, which is the only
 # place a verb's arguments are spelled; and the two carriers in other files are joined to this one by
 # the gate leg, because no runtime derivation crosses a file boundary.
-VERBS_SLUG="--preflight --status --audit --liveness --resume --close --landed --abort --hold --park --propose --attest --record-piece --record-set --rescope --dispatch --review --brief"
+VERBS_SLUG="--preflight --status --audit --register-task --release-task --liveness --resume --close --landed --abort --hold --park --propose --attest --record-piece --record-set --rescope --dispatch --review --brief"
 # The verbs whose argument is POSITIONAL and which exit inside the parse loop. Separate because the
 # dispatch cannot treat them alike, and merged again for every reader, who does not care.
 VERBS_INLINE="--plan --phase --version"
@@ -321,7 +323,7 @@ derive_stream_verdict() { # bounded-call status -> one of three distinct strings
 # stub that answers `command -v` and exits 9009 without running anything. The block is
 # byte-identical to the canonical copy and its parity gate reds if it drifts; the driver suite
 # asserts the resolved variable is the only launcher spelling outside it.
-# >>> resolve_python — canonical copy: tools/lib/resolve-python.sh (byte-identical; gated)
+# >>> resolve_python — canonical copy: resolve-python.sh in gov's lib dir (byte-identical; gated)
 resolve_python() {
   # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
   # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
@@ -370,6 +372,9 @@ GATE_BOUND_DEFAULT=3600
 # 1800s: three keepalive cadences at this repo's ten-minute interval, so a `--audit` verdict of
 # STALLED is never one missed tick. The owner's figure, TOOL-aProbedUnit-3.
 UNIT_STALL_BOUND_DEFAULT=1800
+# 5400s: three of the thirty-minute beats the build briefs ask for, on the three-cadence rule the line
+# above records for its own figure, so one late beat never reads STALLED. TOOL-aRepatriatedFork-53.
+TASK_STALL_BOUND_DEFAULT=5400
 # 1 round: a spec-audit subject exits BOUNDED after its first blocked round (owner ruling
 # 2026-09-14, TOOL-aProbedUnit-6). ONE constant, interpolated into the NOTE the reader prints, so the
 # argument and the sentence cannot say two numbers — the closing review found them typed twice.
@@ -473,7 +478,7 @@ KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""; PHASES_EXTRA=""; DOD_EXTRA=""; DIRECTI
 HALT_CODES_EXTRA=""; HALT_FLOOR=""; LANDER_MARKER=""; RECALL_CLI=""; MAP_CLI=""; SPEC_TOKENS_CLI=""
 ASKS_CMD=""; HOLD_CODES_EXTRA=""; HOLD_FLOOR=""; LANDED_FACTS_CUTOFF=""; GATE_POLICY_FILE=""; PROCMON_CMD=""
 RESUME_SCHEDULE=""; RESUME_SCHEDULE_CREATE=""; RESUME_SCHEDULE_DELETE=""; RESUME_SCHEDULE_DELAY=""; RESUME_SCHEDULE_LIMIT=""
-GATE_BOUND=""; GATE_WALL=""; GATE_PROFILE_CMD=""; UNIT_STALL_BOUND=""; REVIEW_ROUNDS=""; RESUME_STALE_BOUND=""; RESUME_ATTEMPTS=""; RESUME_TURNS=""
+GATE_BOUND=""; GATE_WALL=""; GATE_PROFILE_CMD=""; UNIT_STALL_BOUND=""; TASK_STALL_BOUND=""; REVIEW_ROUNDS=""; RESUME_STALE_BOUND=""; RESUME_ATTEMPTS=""; RESUME_TURNS=""
 DISPOSITION_CUTOFF=""; SPEC_AUDIT_DEFAULT=""; RUNLOG_SESSION_VARS=""; RUNLOG_SWITCH=${GOV_RUNLOG:-}
 # TOOL-dLoggedFlight-2 - the run log's two inputs, on the init block's LAST line so the suite's
 # contiguous-block read still covers them (a comment inside the block ends it). RUNLOG_SESSION_VARS
@@ -587,6 +592,7 @@ read_bound_key RESUME_STALE_BOUND "$RESUME_STALE_BOUND_DEFAULT" seconds "a run r
 # supplying the item nobody typed.
 PK_ITEM=""; PK_STEP=""
 HALT_CODE=""
+TK_NAME=""; TK_BEAT=""
 # `--plan --paths` is an OUTPUT MODE on an existing verb, not a verb: check 26 joins every declared
 # verb to three carriers, so a new one would owe a header line, a VERBS entry and a Skill invocation
 # for a change that swaps one printf. Empty is the padded human table; `paths` is the TSV.
@@ -5833,6 +5839,9 @@ read_tree_clocks() {
 # verb "would rewrite" the record, and this verb rewrites nothing.
 print_audit() { # slug
   local slug="$1" rel ph now lastc lastw dead="" rows u iso g decl disp el wtxt verdict open=0 sp st
+  # THE TASK BOUND IS READ HERE AND NOT AT LOAD (TOOL-aRepatriatedFork-53 S6): this is the one verb
+  # that grades it, so its NOTE and its exit-2 refusal belong to this verb, before any line prints.
+  read_bound_key TASK_STALL_BOUND "$TASK_STALL_BOUND_DEFAULT" seconds "a registered task reads STALLED after the kit default of ${TASK_STALL_BOUND_DEFAULT}s with no heartbeat"
   check_slug "$slug" || return 1
   rel=$(runmd_of "$slug")
   [ -f "$rel" ] || { fail 51 "no run-state file, so there is no dispatched unit to audit for idleness: $rel"; return 1; }
@@ -5889,10 +5898,108 @@ print_audit() { # slug
     printf 'unattended-audit: %s · dispatched %s · elapsed %ss · last-write %s · last-commit %ss ago · %s\n' "$u" "$iso" "$el" "$wtxt" "$((now - lastc))" "$verdict"
     [ "$verdict" = STALLED ] && printf 'unattended-audit: remedy — stop the unit\047s task, then re-dispatch %s with a brief naming what stalled and that it is skipped\n' "$u"
   done <<<"$rows"
+  # THE SECOND POPULATION, the registered tasks, graded after the units and only when their probes
+  # all answered. A dead task probe joins the units' ONE refusal below rather than spelling a second.
+  if [ -z "$dead" ]; then
+    [ "$open" -gt 0 ] || echo "unattended-audit: no unit is dispatched and open"
+    print_task_audit "$slug" "$now"; dead=$TA_DEAD
+  fi
   if [ -n "$dead" ]; then
     fail 51 "the audit cannot measure idle time on this node, because a probe it needs answered nothing, so neither verdict is answerable and a zero from a dead probe would read as written-just-now: $dead"; return 1
   fi
-  [ "$open" -gt 0 ] || echo "unattended-audit: no unit is dispatched and open"
+  return 0
+}
+
+# THE TASK REGISTRY, TOOL-aRepatriatedFork-53. `--audit` above grades DISPATCHED units against the
+# tree's clocks, so a main-loop agent, a long gate leg or a suite started by hand was invisible to it:
+# on 2026-10-01 one waited eight hours and only the owner noticed. The STARTER of a background task
+# registers it first with an absolute heartbeat path, and `--audit` grades that file's mtime against
+# TASK_STALL_BOUND until `--release-task`. One per-slug sidecar under `resolve_sidecar_dir`, append-only:
+#
+#   <ISO>\tregister\t<name>\t<absolute heartbeat path>
+#   <ISO>\trelease\t<name>
+#
+# A task is OPEN when its newest row is a `register`; a released name may register again and its
+# newer row is the one graded. The awk program is ONE text read by all three functions below.
+#
+# WHAT THIS DOES NOT DO. It enforces nothing: a starter that never registers is still invisible
+# (spec F1). A beat proves only that something wrote the file, never that the work is useful. And it
+# stops nothing; the idle-wake acts on a STALLED line, through the process-monitor kit's reap.
+TASK_OPEN_AWK='{ sub(/\r$/, "") }
+  $2 == "register" { if (!($3 in seen)) { seen[$3] = 1; ord[++n] = $3 } o[$3] = 1; at[$3] = $1; hb[$3] = $4 }
+  $2 == "release"  { o[$3] = 0 }
+  END { for (i = 1; i <= n; i++) { k = ord[i]; if (o[k]) print k "\t" at[k] "\t" hb[k] } }'
+TA_DEAD=""
+print_task_audit() { # slug · now (epoch seconds) — sets TA_DEAD to the probe that answered nothing
+  local slug="$1" now="$2" dir reg rows name iso beat m since wtxt verdict n=0
+  TA_DEAD=""
+  dir=$(resolve_sidecar_dir) || dir=""
+  reg="$dir/tasks.$slug.tsv"
+  rows=""
+  if [ -n "$dir" ] && [ -e "$reg" ]; then
+    rows=$(awk -F'\t' "$TASK_OPEN_AWK" "$reg" 2>/dev/null) || { TA_DEAD="awk over the task registry $reg"; return 0; }
+  fi
+  while IFS=$'\t' read -r name iso beat; do
+    [ -n "$name" ] || continue
+    if [ -e "$beat" ]; then
+      m=$(stat -c %Y -- "$beat" 2>/dev/null) || m=""
+      case "$m" in ""|*[!0-9]*) TA_DEAD="stat -c %Y on the heartbeat of task $name, $beat"; break ;; esac
+      since=$m; wtxt="$((now - m))s ago"
+    else
+      # NO FILE YET reads `none` and is graded from the registration, so a task gets one bound to
+      # write its first beat and never reads PROGRESSING forever for having none.
+      since=$(date -u -d "$iso" +%s 2>/dev/null) || since=""
+      case "$since" in ""|*[!0-9]*) TA_DEAD="date -u -d on the registration time $iso of task $name"; break ;; esac
+      wtxt="none"
+    fi
+    n=$((n+1))
+    if [ $((now - since)) -gt "$TASK_STALL_BOUND" ]; then verdict=STALLED; else verdict=PROGRESSING; fi
+    printf 'unattended-audit: task %s · registered %s · heartbeat %s · last-beat %s · %s\n' "$name" "$iso" "$beat" "$wtxt" "$verdict"
+    [ "$verdict" = STALLED ] && printf 'unattended-audit: remedy — read the heartbeat of task %s, stop the task, record why with --park or a Decided: line, release it with --release-task, then re-run it bounded or leave it parked\n' "$name"
+  done < <(printf '%s\n' "$rows")
+  [ -n "$TA_DEAD" ] || [ "$n" -gt 0 ] || echo "unattended-audit: no heartbeat-bearing tasks registered"
+  return 0
+}
+
+write_task_register() { # slug · task name · heartbeat path
+  local slug="$1" name="$2" beat="$3" rel dir reg
+  check_slug "$slug" || return 1
+  rel=$(runmd_of "$slug")
+  [ -f "$rel" ] || { fail 88 "no run-state file, so there is no run to register a background task against: $rel"; return 1; }
+  [ -n "$name" ] || { fail 88 "--register-task requires --task, because a task with no name is a STALLED line nobody can act on"; return 1; }
+  [ -n "$beat" ] || { fail 88 "--register-task requires --heartbeat, because a task with no heartbeat file is the silent background work this registry exists to end"; return 1; }
+  case "$name$beat" in
+    *$'\t'*|*$'\n'*) fail 88 "a task name or heartbeat path carries a tab or a newline, and the registry is one tab-separated row per act, so it would forge a field or a row nothing registered"; return 1 ;;
+  esac
+  # ABSOLUTE, because the audit runs in the run's own worktree and a task may beat in another.
+  case "$beat" in
+    /*|[A-Za-z]:/*|[A-Za-z]:\\*) ;;
+    *) fail 88 "--register-task was given a relative --heartbeat path, and the audit reads it from the run's own worktree while the task may beat in another, so only an absolute path names one file from both: $beat"; return 1 ;;
+  esac
+  refuse_if_terminal "$rel" --register-task || return 1
+  dir=$(resolve_sidecar_dir) || dir=""
+  reg="$dir/tasks.$slug.tsv"
+  if [ -n "$dir" ] && [ -f "$reg" ] && awk -F'\t' "$TASK_OPEN_AWK" "$reg" 2>/dev/null | cut -f1 | grep -qxF -- "$name"; then
+    fail 88 "the task is registered and not yet released, and a second open row for one name would leave the audit grading whichever it read last; release it first: $name"; return 1
+  fi
+  { [ -n "$dir" ] && mkdir -p "$dir" && printf '%s\tregister\t%s\t%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$name" "$beat" >> "$reg"; } 2>/dev/null \
+    || { fail 88 "cannot append to the task registry, so the act is not recorded and the audit would not see it: $reg"; return 1; }
+  echo "unattended: task registered — $name · heartbeat $beat"
+  return 0
+}
+
+write_task_release() { # slug · task name
+  local slug="$1" name="$2" dir reg
+  check_slug "$slug" || return 1
+  [ -n "$name" ] || { fail 88 "--release-task requires --task, because a release naming nothing closes nothing"; return 1; }
+  dir=$(resolve_sidecar_dir) || dir=""
+  reg="$dir/tasks.$slug.tsv"
+  if ! { [ -n "$dir" ] && [ -f "$reg" ] && awk -F'\t' "$TASK_OPEN_AWK" "$reg" 2>/dev/null | cut -f1 | grep -qxF -- "$name"; }; then
+    fail 88 "the task has no open registration, so there is nothing to release, and a release row for it would record an act that never happened: $name"; return 1
+  fi
+  printf '%s\trelease\t%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$name" >> "$reg" 2>/dev/null \
+    || { fail 88 "cannot append to the task registry, so the act is not recorded and the audit would not see it: $reg"; return 1; }
+  echo "unattended: task released — $name"
   return 0
 }
 
@@ -6808,13 +6915,7 @@ print_gate_backstop() { # where the bound came from -> the line, from GB_SUM and
 # STAGED BY THIS ITEM, and committed by the step that closes the run. On the MET path, under
 # `LANDER_MODE=in-place`, `--close` commits them in its own records commit (`write_close_commit`),
 # and under `primary` they ride the records commit the close names as owed; on a path that prints a
-# `hold ·` line the Skill's Close sequence commits them before `--hold`. THE VIEWS ARE RENDERED AND
-# STAGED WITH THE ROWS (TOOL-dMendedRecall-2), by `write_ask_views`, once per call that filed at
-# least one ask: the memory-tree generator derives generated views from this file, and rows staged
-# without them left the index stale for the pre-commit's freshness check, which refused the close's
-# own records commit after the whole bar was paid. So whichever step commits the rows commits the
-# views too, and none of the three needs a render of its own, except after a miss the helper names:
-# a dirty input of the views, say, which it will not render over, and whose line carries the repair.
+# `hold ·` line the Skill's Close sequence commits them before `--hold`.
 # With `ASKS_CMD` blank the rows are PRINTED and nothing is written, so the auto-file cannot arm itself
 # before the project adopts the ask contract.
 read_leg_argv() { # run dir · R · leg name -> that leg's argv in R's manifest, space-joined; rc 1 unreadable
@@ -6882,119 +6983,6 @@ write_backlog_rows() { # BACKLOG.md path · slug · ask row · SEV row · KEEP r
   mv "$tmp" "$f"
 }
 
-# ---- THE VIEWS THE ROWS MAKE STALE, re-rendered and staged beside them. TOOL-dMendedRecall-2 S2-S4.
-# The memory-tree generator derives the family backlog view, the ledger shard and the build README's
-# generated regions from the rows `write_backlog_rows` writes, so rows staged alone leave those views
-# stale in the same index, and the pre-commit's freshness check then refuses the commit carrying
-# them: under `in-place` that is `write_close_commit`'s refusal 69, after the whole bar was paid.
-# The generator is the one THIS install holds, named by the library resolver the repair text already
-# uses, and it must be a FILE at the top of the tree being closed, where this driver runs. Run from a
-# kit outside that tree, the resolver answers a path relative to the kit's own repository, and the
-# file test is what keeps the render from writing anywhere but here.
-#
-# WHAT IS STAGED is the render's own delta and nothing else: a path carrying unstaged or untracked
-# changes AFTER the render that carried none BEFORE it. Under `primary` `--close` does not refuse a
-# dirty tree (under `in-place` refusal 62 does, before the bar), so a path the operator was already
-# editing is never swept into the records commit, and one the render changed too is NAMED as left
-# unstaged, because staging it would commit work the run did not do.
-# `GENERATED_INDEXES` is not the staging set: the build README's regions move too, outside it.
-#
-# AND NOTHING IS RENDERED OVER A DIRTY INPUT (TOOL-dMendedRecall-2 rev-3, the closing review's M1).
-# The delta rule guards the render's OUTPUT side only. The generator reads its inputs off the disk —
-# every tracked path under the memory root, and `.memory-tree.conf` whether tracked or not — so an
-# unstaged edit to one, a spec's status header say, feeds the render, and the views it moves were
-# clean before it: the delta rule staged them while the edit itself stayed unstaged. That commit
-# passed the pre-commit, whose freshness check renders from the same worktree, and was stale in
-# every checkout of it. So a dirty input stages NO view: the miss line names the inputs and the
-# repair, and the operator's records commit then meets the freshness check loudly. An UNTRACKED path
-# under the memory root is no input, because the generator lists its inputs with `git ls-files`.
-#
-# A MISS IS NAMED AND DOES NOT REFUSE. No generator, a path that is not a file here, a dirty input,
-# or a render that exits non-zero or is killed by its bound prints the miss line with the repair,
-# stages what a render that ran did move under the same rule, and returns 1; the caller's verdict is
-# unchanged. Rolling the rows back instead would drop the inherited leg's owner from the record. A
-# stage that git itself refuses, a held index lock say, is named on a line of its own and returns 1
-# too, because the success line would otherwise claim paths the index does not hold.
-write_ask_views() { # count of asks this call filed -> 0 rendered and staged, 1 on a named miss; one line each
-  local n=$1 gen="" py="" rc=0 why="" fix="" p h line paths="" left="" staged=1 dirty="" gd=""
-  local -a post=() stage=()
-  local -A h0=()
-  # ONE test for both halves of "resolves": the library resolver runs the inline `resolve_python`
-  # itself and answers nothing without it, so a separate interpreter branch after it would be an
-  # arm no state reaches. The interpreter is taken FIRST because the render needs it by name.
-  if ! py=$(resolve_python 2>/dev/null) || [ -z "$py" ] || ! gen=$(resolve_index_generator) || [ -z "$gen" ]; then
-    why="no memory-tree generator resolves beside this kit"
-  elif [ ! -f "$gen" ]; then
-    why="the generator the resolver names is not a file here: $gen"
-  else
-    # BEFORE: every path carrying unstaged or untracked changes, keyed to the bytes it carried then,
-    # and the ones among them the render would read as input. NUL-read both times, because a
-    # C-quoted path would name nothing to `add`. The two listings are disjoint by construction,
-    # tracked and untracked, so no path arrives twice. `--no-renames`, so a path the render moves
-    # away is listed by its own name and staged as the deletion it is, never folded into a
-    # destination (memory/gotchas/porcelain-diff-names-a-rename-by-its-destination.md).
-    while IFS= read -r -d '' p; do
-      h0[$p]=$(GIT hash-object -- "$p" 2>/dev/null) || h0[$p]=-
-      case "$p" in "$M"/*|.memory-tree.conf) dirty="$dirty${dirty:+ }$p" ;; esac
-    done < <(GIT diff --no-renames --name-only -z 2>/dev/null)
-    while IFS= read -r -d '' p; do
-      h0[$p]=$(GIT hash-object -- "$p" 2>/dev/null) || h0[$p]=-
-      [ "$p" != .memory-tree.conf ] || dirty="$dirty${dirty:+ }$p"
-    done < <(GIT ls-files --others --exclude-standard -z 2>/dev/null)
-    # THE GENERATOR'S OWN CODE is an input too (closing review round 2, L1): `--write` imports its
-    # sibling modules from the directory it lives in, so an unstaged edit there feeds the render as
-    # surely as one under the memory root does. Asked of git with that directory as the pathspec, so
-    # the names come back repo-relative whatever spelling the resolver used; a generator at the root
-    # names its own top-level modules only, never the whole tree.
-    gd=$(dirname -- "$gen")
-    [ "$gd" != . ] || gd=':(glob)*.py'
-    while IFS= read -r -d '' p; do
-      case " $dirty " in *" $p "*) ;; *) dirty="$dirty${dirty:+ }$p" ;; esac
-    done < <(GIT diff --no-renames --name-only -z -- "$gd" 2>/dev/null)
-    if [ -n "$dirty" ]; then
-      why="the views' inputs carry changes the index does not hold, and a render would stage views derived from them: $dirty"
-      fix="stage or discard those changes, then run "
-    fi
-  fi
-  if [ -n "$why" ]; then
-    echo "gates-green: the $n filed ask(s) are staged, but the generated views were not re-rendered: $why; until they are, a records commit meets a stale index — repair: $fix$(derive_index_repair)"
-    return 1
-  fi
-  # `-B`, because the render is a Python process and its imports would otherwise leave bytecode
-  # caches beside the kit: in a tree that does not ignore them they are new untracked paths, and the
-  # delta rule above would stage them into the records commit (observed over this unit's fixture).
-  run_bounded "$py" -B "$gen" --write; rc=$?
-  while IFS= read -r -d '' p; do post+=("$p"); done \
-    < <(GIT diff --no-renames --name-only -z 2>/dev/null; GIT ls-files --others --exclude-standard -z 2>/dev/null)
-  for p in "${post[@]}"; do
-    if [ -n "${h0[$p]+x}" ]; then
-      h=$(GIT hash-object -- "$p" 2>/dev/null) || h=-
-      [ "$h" = "${h0[$p]}" ] || left="$left${left:+ }$p"
-    else
-      stage+=("$p"); paths="$paths${paths:+ }$p"
-    fi
-  done
-  [ "${#stage[@]}" = 0 ] || GIT add -A -- "${stage[@]}" >/dev/null 2>&1 || staged=0
-  if [ "$rc" != 0 ]; then
-    echo "gates-green: the $n filed ask(s) are staged, but the generated views were not re-rendered: the generator exited $rc after ${RB_TOOK}s; until they are, a records commit meets a stale index — repair: $(derive_index_repair)"
-    [ -z "${RB_OUT:-}" ] || printf '%s\n' "$RB_OUT" | sed 's/^/    /'
-  fi
-  if [ "$staged" = 0 ]; then
-    echo "gates-green: the generated views for $n filed ask(s) were re-rendered, but git could not stage the ${#stage[@]} path(s) the render moved: $paths; until it does, a records commit meets a stale index — stage them by hand"
-    return 1
-  fi
-  [ "$rc" = 0 ] || return 1
-  if [ "${#stage[@]}" -gt 0 ]; then
-    line="gates-green: re-rendered the generated views for $n filed ask(s) and staged ${#stage[@]} path(s): $paths"
-  elif [ -n "$left" ]; then
-    line="gates-green: re-rendered the generated views for $n filed ask(s) and staged 0 path(s): none"
-  else
-    line="gates-green: re-rendered the generated views for $n filed ask(s); the render changed no path"
-  fi
-  echo "$line${left:+; left unstaged, dirty before the render: $left}"
-  return 0
-}
-
 read_ask_back() { # ask id · slug -> 0 when ASKS_CMD reads it back as ONE OPEN HIGH ask homed at slug; AB_WHY
   local id=$1 slug=$2 rc rows n
   AB_WHY=""
@@ -7018,7 +7006,7 @@ read_ask_back() { # ask id · slug -> 0 when ASKS_CMD reads it back as ONE OPEN 
 
 write_inherited_asks() { # slug · R · run dir
   local slug=$1 r=$2 d=$3 bl leg ver age own8 ownid cand reused fam seq id argv file tok a s k prior had restored
-  local r8=${2:0:8} today filed=0
+  local r8=${2:0:8} today
   bl="$M/builds/$slug/BACKLOG.md"
   today=$(date -u +%Y-%m-%d)
   [ -f "$d/attribution" ] || return 0
@@ -7089,7 +7077,6 @@ write_inherited_asks() { # slug · R · run dir
     mkdir -p "${bl%/*}" && write_backlog_rows "$bl" "$slug" "$a" "$s" "$k" && GIT add -- "$bl" 2>/dev/null
     if read_ask_back "$id" "$slug"; then
       echo "gates-green: filed ask $id for leg $leg red at $r8, staged in $bl"
-      filed=$((filed + 1))
     else
       # REMOVED, and the file put back exactly as it was: a row the parser cannot read back is a row
       # every later reader would read differently from this writer. A path that EXISTED before the
@@ -7109,13 +7096,6 @@ write_inherited_asks() { # slug · R · run dir
     fi
     [ -z "$prior" ] || rm -f -- "$prior"
   done < "$d/attribution"
-  # TOOL-dMendedRecall-2 S1 - THE VIEWS, once per call and only when this call FILED: a reused ask,
-  # the dark path, a leg it could not file and rows it rolled back move no view, so a call that
-  # files nothing prints exactly what it printed before the views were its job. A miss is named
-  # by the helper and changes nothing here: the item's verdict is the caller's, as it was.
-  [ "$filed" -gt 0 ] || return 0
-  write_ask_views "$filed" || :
-  return 0
 }
 
 # ---- S7: THE TWO ESCAPE ROUTES, BACKED BY THE ATTRIBUTION OR REFUSED.
@@ -8094,7 +8074,7 @@ $_bcnon"
       # give. It said `^## Verdict: CLEAN` matched zero of a 46-record corpus; RE-MEASURED
       # 2026-08-31 the corpus is 208 tracked review records with 170 carrying `^## Verdict`, made
       # mandatory forward of `REVIEW_VERDICT_CUTOFF` by memory hygiene check 22 and written by
-      # tools/workflows/tier2-review.js. The rule survives its own premise dying, for a better
+      # <prefix>/workflows/tier2-review.js. The rule survives its own premise dying, for a better
       # reason: this walk selects the FIRST matching record in ls-files order, a converged loop's
       # round-1 record legitimately reads BLOCKED and is never rewritten, so a verdict anchored here
       # reds honest landings. The DISPOSITION of a review loop is read from the --review rows
@@ -9315,7 +9295,7 @@ record_path_of() { # records-root · piece-path
 #
 #   * a leg named `.*` matched EVERY verdict row and deleted them all, silently erasing a recorded
 #     FAIL and flipping the piece back to verified on the next write;
-#   * a leg containing `/` — `tools/lint.sh`, an ordinary thing to call a leg — closed the address
+#   * a leg containing `/` — `scripts/lint.sh`, an ordinary thing to call a leg — closed the address
 #     early, so sed aborted while the `printf` that follows still ran, leaving TWO verdict rows for
 #     one leg on a record the reader then cannot decide either way.
 #
@@ -9941,9 +9921,25 @@ verb_dispatch() { # slug · unit · writes...
   if [ -z "$_sibothers" ]; then
     echo "unattended: dispatch — no sibling pass is open, so condition 1 is a proof over an empty set for $unit" >&2
   fi
+  # THE GENERATOR KEYS BY WHERE IT IS, as well as by how it is spelled (TOOL-aRepatriatedFork-24 S4,
+  # the owner's F2 (a)). A conf seeded before the adopter stamped paths names the AUTHORING repo's
+  # prefix, and it is adopter-owned after that first write. At any other prefix that spelling names no
+  # file, the real generator never matched it, and this refusal could not fire. When the declared path
+  # names nothing, the ONE tracked file ending in its `<dir>/<file>` keys too. The declared spelling
+  # still keys, so nothing that refused before can stop refusing; two tracked candidates key neither.
+  resolve_generator() { # declared generator -> its spelling, then the tracked file it resolves to when that differs
+    local _g _t _hit
+    _g=$(normpath "$1"); printf '%s\n' "$_g"
+    [ -e "$ROOT/$_g" ] && return 0
+    case "$_g" in */*) _t=${_g%/*}; _t="${_t##*/}/${_g##*/}" ;; *) return 0 ;; esac
+    _hit=$(git -C "$ROOT" ls-files -- "$_t" "*/$_t" 2>/dev/null)
+    case "$_hit" in *"
+"*|"") ;; *) printf '%s\n' "$_hit" ;; esac
+  }
   for pair in ${GENERATED_INDEXES:-}; do
     idx=${pair%%:*}; gen=${pair#*:}
     [ "$idx" = "$pair" ] && continue
+    gens=$(resolve_generator "$gen")
     # BOTH HALVES read our paths AND the siblings'. Searching for the index in our own declaration
     # only made the refusal order-dependent: the pass that declares the index first is clean, and the
     # sibling that later declares the generator never looks for the index anywhere but its own args.
@@ -9953,9 +9949,12 @@ verb_dispatch() { # slug · unit · writes...
         # OVERLAP on both halves. `covers` asks whether q sits under the generator, which misses a
         # declaration that CONTAINS the generator — the same one-way reading that let `--writes
         # memory` through the shared-records refusal, left behind at this one site.
-        if overlaps "$gen" "$q"; then
-          fail 49 "--dispatch declares a generated index together with its generator, which is the one pairing the build method's condition 3 forbids - the index alone is fine and refusing it was the reading that condition retracted: $idx with $gen"; return 1
-        fi
+        for g in $gens; do
+          if overlaps "$g" "$q"; then
+            _as=""; [ "$g" = "${gens%%$'\n'*}" ] || _as=" (declared as $gen)"
+            fail 49 "--dispatch declares a generated index together with its generator, which is the one pairing the build method's condition 3 forbids - the index alone is fine and refusing it was the reading that condition retracted: $idx with $g$_as"; return 1
+          fi
+        done
       done
     done
   done
@@ -10318,6 +10317,8 @@ refuse_waive_unless_preflight() { # verb
 while [ $# -gt 0 ]; do
   case "$1" in
     --pass)         PK_ITEM="${2:-}"; shift 2 || shift ;;
+    --task)         TK_NAME="${2:-}"; shift 2 || shift ;;
+    --heartbeat)    TK_BEAT="${2:-}"; shift 2 || shift ;;
     --writes)       DP_WRITES+=("${2:-}"); shift 2 || shift ;;
     --act)          RS_ACT="${2:-}"; shift 2 || shift ;;
     --successor)    RS_SUCC="${2:-}"; shift 2 || shift ;;
@@ -10433,6 +10434,8 @@ case "$VERB" in
   --preflight) verb_preflight "$SLUG" "$KID" ;;
   --status)    verb_status "$SLUG" ;;
   --audit)     print_audit "$SLUG" ;;
+  --register-task) write_task_register "$SLUG" "$TK_NAME" "$TK_BEAT" ;;
+  --release-task)  write_task_release "$SLUG" "$TK_NAME" ;;
   --liveness)  print_liveness "$SLUG" ;;
   --resume)    verb_resume "$SLUG" "$KID" ;;
   --close)     verb_close "$SLUG" ;;

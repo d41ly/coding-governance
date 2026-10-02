@@ -3,10 +3,10 @@
 # Contract: the deployer unit's spec under memory/builds/aSealedCaravan/spec/ (S2, S12, AC10).
 #
 # WHY THIS IS NOT A DIRECTORY LISTING. No listing equals the deployable set, and the ways it fails
-# are not symmetric. Some `tools/*` directories are not deployable (`tools/lib/`, the gate-runner
-# cluster). Some entries are not `tools/*` directories at all: the playbook is root files, the
-# kickoff ratchet lives under `skills/`, and several single-file gates sit directly under `tools/`.
-# One directory carries TWO entries, because `tools/workflows/` versions its files under two kit ids.
+# are not symmetric. Some `<prefix>/*` directories are not deployable (`<prefix>/lib/`, the gate-runner
+# cluster). Some entries are not `<prefix>/*` directories at all: the playbook is root files, the
+# kickoff ratchet lives under `skills/`, and several single-file gates sit directly under `<prefix>/`.
+# One directory carries TWO entries, because `<prefix>/workflows/` versions its files under two kit ids.
 # `map_extractors._tool_kits()`'s own docstring records the same lesson from the other side:
 # README-gating "would have silently dropped three of ten".
 #
@@ -20,11 +20,11 @@
 
 version = 1
 
-# The surface `selfcheck` quantifies over (spec S12). Depth-1 under tools/, everything under the
+# The surface `selfcheck` quantifies over (spec S12). Depth-1 under <prefix>/, everything under the
 # hook and kickoff trees, and the shipped root playbook files.
 [surface]
 globs = [
-  "tools/*",
+  "{prefix}/*",
   ".githooks/**",
   "skills/session-kickoff/**",
   "coding-governance-agents.template.md",
@@ -33,128 +33,137 @@ globs = [
 # The DEFAULT selection, declared here rather than in the engine. `--all` is DERIVED (every
 # non-conditional entry) and is deliberately not written down anywhere.
 [selection]
-default = ["playbook", "kickoff-manifest", "memory-tree", "codebase-map", "memory-recall", "run-gates",
-           "check-microformats"]
+# One id per line: these are entry ids, and a comma-joined run of quoted kit names reads to the
+# carried-prefix ban as a path assembled from quoted segments.
+default = [
+  "playbook",
+  "kickoff-manifest",
+  "memory-tree",
+  "codebase-map",
+  "memory-recall",
+  "run-gates",
+  "check-microformats",
+]
 
 # ---------------------------------------------------------------- entries: kits with a directory
 [[entry]]
 id = "check-line-length"
-descriptor = "tools/govkit/entries/check-line-length.kit.toml"
+descriptor = "{prefix}/govkit/entries/check-line-length.kit.toml"
 
 [[entry]]
 id = "check-microformats"
-descriptor = "tools/govkit/entries/check-microformats.kit.toml"
+descriptor = "{prefix}/govkit/entries/check-microformats.kit.toml"
 
 [[entry]]
 id = "playbook-render"
-descriptor = "tools/playbook/kit.toml"
+descriptor = "{prefix}/playbook/kit.toml"
 
 [[entry]]
 id = "memory-tree"
-descriptor = "tools/memory-tree/kit.toml"
+descriptor = "{prefix}/memory-tree/kit.toml"
 
 [[entry]]
 id = "codebase-map"
-descriptor = "tools/codebase-map/kit.toml"
+descriptor = "{prefix}/codebase-map/kit.toml"
 
 [[entry]]
 id = "memory-recall"
-descriptor = "tools/memory-recall/kit.toml"
+descriptor = "{prefix}/memory-recall/kit.toml"
 
 [[entry]]
 id = "run-gates"
-descriptor = "tools/run-gates/kit.toml"
+descriptor = "{prefix}/run-gates/kit.toml"
 
 [[entry]]
 id = "drift-audit"
-descriptor = "tools/drift-audit/kit.toml"
+descriptor = "{prefix}/drift-audit/kit.toml"
 
 [[entry]]
 id = "process-monitor"
-descriptor = "tools/process-monitor/kit.toml"
+descriptor = "{prefix}/process-monitor/kit.toml"
 
 [[entry]]
 id = "runlog"
-descriptor = "tools/runlog/kit.toml"
+descriptor = "{prefix}/runlog/kit.toml"
 
 [[entry]]
 id = "agent-instructions"
-descriptor = "tools/agent-instructions/kit.toml"
+descriptor = "{prefix}/agent-instructions/kit.toml"
 
 [[entry]]
 id = "unattended"
-descriptor = "tools/unattended/kit.toml"
+descriptor = "{prefix}/unattended/kit.toml"
 
 [[entry]]
 id = "pytest-parallel-guardrails"
-descriptor = "tools/pytest-parallel-guardrails/kit.toml"
+descriptor = "{prefix}/pytest-parallel-guardrails/kit.toml"
 
 [[entry]]
 id = "gate-lint"
-descriptor = "tools/gate-lint/kit.toml"
+descriptor = "{prefix}/gate-lint/kit.toml"
 
 [[entry]]
 id = "lexicon"
-descriptor = "tools/lexicon/kit.toml"
+descriptor = "{prefix}/lexicon/kit.toml"
 
 [[entry]]
 id = "check-placeholders"
-descriptor = "tools/govkit/entries/check-placeholders.kit.toml"
-why_split = "a FLAT entry for two depth-1 FILES under tools/, not a kit directory; `tools/*` is a depth-1 surface glob that includes files, so each one is its own unclaimed path"
+descriptor = "{prefix}/govkit/entries/check-placeholders.kit.toml"
+why_split = "a FLAT entry for two depth-1 FILES under <prefix>/, not a kit directory; `<prefix>/*` is a depth-1 surface glob that includes files, so each one is its own unclaimed path"
 
 [[entry]]
 id = "agent-cap"
-descriptor = "tools/hooks/kit.toml"
-why_split = "tools/hooks/ and tools/workflows/ are two kit ids with two version constants and two destinations; one inventory row could not carry them"
+descriptor = "{prefix}/hooks/kit.toml"
+why_split = "<prefix>/hooks/ and <prefix>/workflows/ are two kit ids with two version constants and two destinations; one inventory row could not carry them"
 
 [[entry]]
 id = "review-harness"
-descriptor = "tools/workflows/kit.toml"
+descriptor = "{prefix}/workflows/kit.toml"
 
 # ---------------------------------------------------------- entries with no kit directory of their own
 [[entry]]
 id = "playbook"
-descriptor = "tools/govkit/entries/playbook.kit.toml"
+descriptor = "{prefix}/govkit/entries/playbook.kit.toml"
 kind = "flat"
 
 [[entry]]
 id = "kickoff-manifest"
-descriptor = "tools/govkit/entries/kickoff-manifest.kit.toml"
+descriptor = "{prefix}/govkit/entries/kickoff-manifest.kit.toml"
 kind = "flat"
 
 [[entry]]
 id = "settings-merge"
-descriptor = "tools/govkit/entries/settings-merge.kit.toml"
+descriptor = "{prefix}/govkit/entries/settings-merge.kit.toml"
 kind = "flat"
 
 [[entry]]
 id = "check-testsuite-counts"
-descriptor = "tools/govkit/entries/check-testsuite-counts.kit.toml"
+descriptor = "{prefix}/govkit/entries/check-testsuite-counts.kit.toml"
 kind = "flat"
 
 [[entry]]
 id = "check-wiring"
-descriptor = "tools/govkit/entries/check-wiring.kit.toml"
+descriptor = "{prefix}/govkit/entries/check-wiring.kit.toml"
 kind = "flat"
 
 [[entry]]
 id = "push-main"
-descriptor = "tools/govkit/entries/push-main.kit.toml"
+descriptor = "{prefix}/govkit/entries/push-main.kit.toml"
 kind = "flat"
 
 [[entry]]
 id = "check-kit-versions"
-descriptor = "tools/govkit/entries/check-kit-versions.kit.toml"
+descriptor = "{prefix}/govkit/entries/check-kit-versions.kit.toml"
 kind = "flat"
 
 [[entry]]
 id = "check-agent-cap-restatement"
-descriptor = "tools/govkit/entries/check-agent-cap-restatement.kit.toml"
+descriptor = "{prefix}/govkit/entries/check-agent-cap-restatement.kit.toml"
 kind = "flat"
 
 [[entry]]
 id = "check-install-prefix"
-descriptor = "tools/govkit/entries/check-install-prefix.kit.toml"
+descriptor = "{prefix}/govkit/entries/check-install-prefix.kit.toml"
 kind = "flat"
 
 # ------------------------------------------------------------------------------------- exemptions
@@ -162,11 +171,11 @@ kind = "flat"
 # a stale exemption cannot quietly widen the surface.
 
 [[exempt]]
-path = "tools/line-length-limits.txt"
+path = "{prefix}/line-length-limits.txt"
 why = "gov's OWN declaration, deliberately not shipped. It names gov's two subjects, neither of which exists in an adopter tree, where a row naming an absent path is a stale red — so seeding it would red an adopter on install day. The target authors its own, and a subject with no row is graded at the 450 default."
 
 [[exempt]]
-path = "tools/lib"
+path = "{prefix}/lib"
 why = """
 Not a kit. It has no README, no version constant and no adopter, and it ships nothing: it is
 gov-internal. `resolve-python.sh` is the canon every inline copy in every kit is gated against. The gate-runner
@@ -179,28 +188,28 @@ kit-internal launcher.
 """
 
 [[exempt]]
-path = "tools/gate-legs.json"
+path = "{prefix}/gate-legs.json"
 why = "gov's own leg manifest. Gov-specific by construction; a target's leg list is emitted from the selected kits' [[gate_leg]] blocks, never copied."
 
 [[exempt]]
-path = "tools/check-template-size.sh"
+path = "{prefix}/check-template-size.sh"
 why = "gates gov's OWN product template, defaulting to the playbook at the repo root. Prescribed for copy nowhere in the runbook, and an adopter's instantiated playbook carries no size ceiling."
 
 [[exempt]]
-path = "tools/check-spec-tokens.py"
+path = "{prefix}/check-spec-tokens.py"
 why = """
-grades gov's OWN spec corpus against gov's OWN gate manifest. Its leg join reads tools/gate-legs.json,
+grades gov's OWN spec corpus against gov's OWN gate manifest. Its leg join reads <prefix>/gate-legs.json,
 which registry.toml already exempts as gov-specific by construction, and its waiver registry is seeded
 from THIS tree's measured hits. An adopter's specs are theirs and their manifest lives elsewhere;
 shipping this would red on install day for a population gov never measured. Prescribed for copy nowhere.
 """
 
 [[exempt]]
-path = "tools/check-spec-tokens.test.sh"
+path = "{prefix}/check-spec-tokens.test.sh"
 why = "the red/green self-test for the above, which is itself an exemption. Exemptions are exact-path, so the gate's row does not cover its sibling."
 
 [[exempt]]
-path = "tools/check-kit-placeholders.py"
+path = "{prefix}/check-kit-placeholders.py"
 why = """
 grades a kit-AUTHORING invariant, and an adopter does not author kit descriptors — they receive
 them copy-installed. The join is declared-placeholders subset-of substituted-by-that-kit's-own-adopter,
@@ -210,57 +219,57 @@ this whole build exists to stop manufacturing. Prescribed for copy nowhere in th
 """
 
 [[exempt]]
-path = "tools/check-kit-placeholders.test.sh"
+path = "{prefix}/check-kit-placeholders.test.sh"
 why = "the red/green self-test for the above, which is itself an exemption. Exemptions are exact-path, so the gate's row does not cover its sibling."
 
 [[exempt]]
-path = "tools/check-dead-paths.sh"
+path = "{prefix}/check-dead-paths.sh"
 why = """
-gates gov's OWN corpus against gov's OWN deletion history. The needle set is derived from `git log --diff-filter=D` over this repo, and the anti-vacuity guard is a FROZEN SENTINEL naming a basename this repo deleted at 5b00666 — in a target tree that name was never present, so the sentinel could not resolve and the leg would red on install day. That is the exact defect the closing review filed against three other new gates; shipping this one would repeat it. An adopter who wants the class authors their own sentinel from their own deletion history.
+gates gov's OWN corpus against gov's OWN deletion and rename history. The needle set is derived from `git log --diff-filter=D` over this repo, plus the source of every `--diff-filter=R` row outside memory/ (TOOL-aRepatriatedFork-45), and each half's anti-vacuity guard is a FROZEN SENTINEL naming a basename this repo deleted or renamed away at 5b00666 — in a target tree neither name was ever present, so neither sentinel could resolve and the leg would red on install day. That is the exact defect the closing review filed against three other new gates; shipping this one would repeat it. An adopter who wants the class authors their own sentinels from their own deletion and rename history.
 """
 
 [[exempt]]
-path = "tools/check-dead-paths.test.sh"
+path = "{prefix}/check-dead-paths.test.sh"
 why = "the red/green self-test for the above, which is itself exempt. Exemptions are exact-path, so the gate's row does not cover its sibling."
 
 [[exempt]]
-path = "tools/dead-path-waivers.txt"
+path = "{prefix}/dead-path-waivers.txt"
 why = "the shrink-only waiver registry the gate above CONSUMES. Its rows are gov paths and the TEXT of gov carrier lines, keyed by occurrence rather than by line number since TOOL-dHonouredPark-3; seeded from this repo's measured population, meaningless in any other tree."
 
 [[exempt]]
-path = "tools/check-playbook-parity.sh"
-why = "gates gov's OWN product playbook against gov's OWN tree — it derives the kit population from this repo's tools/ and compares values against the sources in this repo that own them. Prescribed for copy nowhere in the runbook; an adopter's instantiated playbook has no kit population to check."
+path = "{prefix}/check-playbook-parity.sh"
+why = "gates gov's OWN product playbook against gov's OWN tree — it derives the kit population from this repo's <prefix>/ and compares values against the sources in this repo that own them. Prescribed for copy nowhere in the runbook; an adopter's instantiated playbook has no kit population to check."
 
 [[exempt]]
-path = "tools/check-playbook-parity.test.sh"
+path = "{prefix}/check-playbook-parity.test.sh"
 why = "the red/green self-test for the above, which is itself exempt. Exemptions are exact-path, so the gate's row does not cover its sibling."
 
 [[exempt]]
-path = "tools/playbook-kit-waivers.txt"
-why = "the declared exemption list the playbook-parity gate READS: kit dirs deliberately not named in the shipped charter template. Gov-specific by construction — it enumerates gov's own tools/ population — and prescribed for copy nowhere in the runbook."
+path = "{prefix}/playbook-kit-waivers.txt"
+why = "the declared exemption list the playbook-parity gate READS: kit dirs deliberately not named in the shipped charter template. Gov-specific by construction — it enumerates gov's own <prefix>/ population — and prescribed for copy nowhere in the runbook."
 
 [[exempt]]
-path = "tools/check-template-size.test.sh"
+path = "{prefix}/check-template-size.test.sh"
 why = "gov's own red/green self-test for the template size gate, which is itself exempt: it gates gov's product template and is prescribed for copy nowhere in the runbook. Exemptions are exact-path, so the gate's row does not cover its sibling — the run-gates.sh / .test.sh / .evidence.test.sh trio is the precedent."
 
 [[exempt]]
-path = "tools/template-size-limits.txt"
+path = "{prefix}/template-size-limits.txt"
 why = "the DECLARED size ceilings for gov's own charter template, kickoff engine and rendered charter, read by check-template-size.sh, which is itself exempt for the same reason. An adopter's instantiated playbook carries no size ceiling and therefore no declaration of one."
 
 [[exempt]]
-path = "tools/template-size-highwater.txt"
+path = "{prefix}/template-size-highwater.txt"
 why = "the size gate's high-water record, keyed by measured file. Travels with check-template-size.sh, which is exempt for the same reason: it gates gov's own product template and is prescribed for copy nowhere. Exemptions are exact-path, so the gate's row does not cover this one."
 
 [[exempt]]
-path = "tools/check-hook-destinations.sh"
-why = "it resolves gov's own descriptors through `tools/govkit`, the deployer, which is a registry exemption itself and never travels into a target. An adopter has fragments and adopter scripts but no deployer, so this gate cannot run there at all. The protection it buys is therefore gov-side only, and that limit is the reason for this row rather than an oversight: gov is where the fragments and the descriptors are AUTHORED, so it is where a fragment naming an unshipped destination is created. TOOL-dRetiredFork-21."
+path = "{prefix}/check-hook-destinations.sh"
+why = "it resolves gov's own descriptors through `<prefix>/govkit`, the deployer, which is a registry exemption itself and never travels into a target. An adopter has fragments and adopter scripts but no deployer, so this gate cannot run there at all. The protection it buys is therefore gov-side only, and that limit is the reason for this row rather than an oversight: gov is where the fragments and the descriptors are AUTHORED, so it is where a fragment naming an unshipped destination is created. TOOL-dRetiredFork-21."
 
 [[exempt]]
-path = "tools/check-hook-destinations.test.sh"
+path = "{prefix}/check-hook-destinations.test.sh"
 why = "the arms for the gate above, exempt for the same reason: they drive a checker that cannot run in an adopter tree."
 
 [[exempt]]
-path = "tools/govkit"
+path = "{prefix}/govkit"
 why = "the deployer itself. It runs on the deployer machine and is never installed into a target, so it is an entry of nothing. Stated rather than omitted, because the surface assertion would otherwise red on it."
 
 [[exempt]]
@@ -289,7 +298,7 @@ why = "gov's own red/green arms for the two files above, which are themselves re
 
 [[exempt_leg]]
 name = "hook destinations (every declared hook path ships)"
-why = "it resolves gov's own descriptors through `tools/govkit`, the deployer, which is a registry exemption itself and never travels into a target. An adopter has fragments and adopter scripts but no deployer, so this gate cannot run there at all. The protection it buys is therefore gov-side only, and that limit is the reason for this row rather than an oversight: gov is where the fragments and the descriptors are AUTHORED, so it is where a fragment naming an unshipped destination is created. TOOL-dRetiredFork-21."
+why = "it resolves gov's own descriptors through `<prefix>/govkit`, the deployer, which is a registry exemption itself and never travels into a target. An adopter has fragments and adopter scripts but no deployer, so this gate cannot run there at all. The protection it buys is therefore gov-side only, and that limit is the reason for this row rather than an oversight: gov is where the fragments and the descriptors are AUTHORED, so it is where a fragment naming an unshipped destination is created. TOOL-dRetiredFork-21."
 
 [[exempt_leg]]
 name = "hook destinations self-test"
@@ -297,11 +306,11 @@ why = "the arms for that gate; no descriptor can claim a leg whose script no ado
 
 [[exempt_leg]]
 name = "kickoff engine size <=18KiB"
-why = "it measures THIS repo's own kickoff engine against a row in tools/template-size-limits.txt, through check-template-size.sh — which is itself a registry exemption rather than an entry file, for the reason its sibling `charter size` row states. The kickoff-manifest descriptor used to declare this as a gate_leg, so `apply` would have emitted an adopter a row running an engine gov never ships and recorded it in the receipt as coverage. DEPL-dCarriedReceipt-6 withdrew the leg and this row is where it went."
+why = "it measures THIS repo's own kickoff engine against a row in <prefix>/template-size-limits.txt, through check-template-size.sh — which is itself a registry exemption rather than an entry file, for the reason its sibling `charter size` row states. The kickoff-manifest descriptor used to declare this as a gate_leg, so `apply` would have emitted an adopter a row running an engine gov never ships and recorded it in the receipt as coverage. DEPL-dCarriedReceipt-6 withdrew the leg and this row is where it went."
 
 [[exempt_leg]]
 name = "build-method size"
-why = "it measures THIS repo's own rendered build method against a row in tools/template-size-limits.txt, through check-template-size.sh — which is itself a registry exemption rather than an entry file, for the reason its sibling `charter size` row states. The ASYMMETRY is the whole reason this is not a gate_leg in the memory-tree kit.toml: that kit ships BUILD-METHOD.template.md and ships no size gate, so declaring it there would make `apply` emit an adopter a row running an engine gov never ships — verbatim the defect DEPL-dCarriedReceipt-6 withdrew the kickoff row for."
+why = "it measures THIS repo's own rendered build method against a row in <prefix>/template-size-limits.txt, through check-template-size.sh — which is itself a registry exemption rather than an entry file, for the reason its sibling `charter size` row states. The ASYMMETRY is the whole reason this is not a gate_leg in the memory-tree kit.toml: that kit ships BUILD-METHOD.template.md and ships no size gate, so declaring it there would make `apply` emit an adopter a row running an engine gov never ships — verbatim the defect DEPL-dCarriedReceipt-6 withdrew the kickoff row for."
 
 [[exempt_leg]]
 name = "unattended protocol size"
@@ -309,7 +318,7 @@ why = "it measures THIS repo's own rendered unattended protocol against its row 
 
 [[exempt_leg]]
 name = "charter size"
-why = "it measures THIS repo's own rendered charter against a row in tools/template-size-limits.txt. The gate script is itself a registry exemption rather than an entry file, and the subject is a repo-root artifact no kit ships, so there is no descriptor for the leg to be claimed by."
+why = "it measures THIS repo's own rendered charter against a row in <prefix>/template-size-limits.txt. The gate script is itself a registry exemption rather than an entry file, and the subject is a repo-root artifact no kit ships, so there is no descriptor for the leg to be claimed by."
 
 [[exempt_leg]]
 name = "branch-guard self-test"
@@ -326,7 +335,7 @@ gov's own red/green proof of the shards-to-builds straggler layer. The script it
 [[exempt_leg]]
 name = "recall floor"
 why = """
-gov's own recall-quality floor. The question set it grades is keyed on gov record ids and the value it compares against was MEASURED on this corpus, so both are meaningless in an adopter's tree — a pin copied from another corpus is the class `memory/gotchas/pin-copied-from-another-corpus.md` names. `tools/memory-recall/kit.toml` withholds `check-recall.py` and `recall-fixture.json` from the payload with a `project-owned` rule, so an adopter never receives the program this leg runs. An adopter who wants a floor authors their own fixture and measures their own value; that adoption path is the parked half of `TOOL-aWalkedCorpus-3` section 8.
+gov's own recall-quality floor. The question set it grades is keyed on gov record ids and the value it compares against was MEASURED on this corpus, so both are meaningless in an adopter's tree — a pin copied from another corpus is the class `memory/gotchas/pin-copied-from-another-corpus.md` names. `<prefix>/memory-recall/kit.toml` withholds `check-recall.py` and `recall-fixture.json` from the payload with a `project-owned` rule, so an adopter never receives the program this leg runs. An adopter who wants a floor authors their own fixture and measures their own value; that adoption path is the parked half of `TOOL-aWalkedCorpus-3` section 8.
 """
 
 [[exempt_leg]]
@@ -385,13 +394,13 @@ gov's own red/green proof of the ratchet. The ratchet ITSELF is deployed and is 
 [[exempt_leg]]
 name = "python resolver (behaviour + inline parity + idiom ban)"
 why = """
-grades tools/lib/, the permanently exempt gov-internal directory, plus the inline copies every kit already carries. Nothing here travels, and the parity it asserts is asserted before the kits ship rather than after.
+grades <prefix>/lib/, the permanently exempt gov-internal directory, plus the inline copies every kit already carries. Nothing here travels, and the parity it asserts is asserted before the kits ship rather than after.
 """
 
 [[exempt_leg]]
 name = "run-gates gov canary"
 why = """
-the GOV-ONLY arms of the run-gates canary, gov-only for the reason the recall-floor pair above is: each arm is keyed on THIS repo's corpus — gov's declared chunk names, gov's network-calling leg names, a named gov leg's guard — so in any other tree they would red on absence rather than on behaviour. `tools/run-gates/kit.toml` withholds the file from the payload with a `project-owned` rule, so an adopter never receives the program this leg runs, and the harness REFUSES (exit 2) rather than passing when the manifest it is pointed at is not gov's. The SHIPPED canary keeps every assertion true in any tree and is claimed, as a [[gate_leg]] of the run-gates entry.
+the GOV-ONLY arms of the run-gates canary, gov-only for the reason the recall-floor pair above is: each arm is keyed on THIS repo's corpus — gov's declared chunk names, gov's network-calling leg names, a named gov leg's guard — so in any other tree they would red on absence rather than on behaviour. `<prefix>/run-gates/kit.toml` withholds the file from the payload with a `project-owned` rule, so an adopter never receives the program this leg runs, and the harness REFUSES (exit 2) rather than passing when the manifest it is pointed at is not gov's. The SHIPPED canary keeps every assertion true in any tree and is claimed, as a [[gate_leg]] of the run-gates entry.
 """
 
 [[exempt_leg]]
@@ -421,11 +430,11 @@ pattern = "*.sh"
 why = "every shell script in this repo, including ones no kit ships"
 
 [[gov_only_pin]]
-pattern = "tools/gate-legs.json"
+pattern = "{prefix}/gate-legs.json"
 why = "gov's own leg manifest, a registry exemption"
 
 [[gov_only_pin]]
-pattern = "tools/govkit/*"
+pattern = "{prefix}/govkit/*"
 why = "the deployer itself, which never travels"
 
 [[exempt_leg]]
@@ -455,7 +464,7 @@ gov's own red/green proof of the parity gate above; same reason.
 [[exempt_leg]]
 name = "kit placeholders (a declared token its adopter substitutes)"
 why = """
-grades a kit-AUTHORING invariant over gov's own tools/*/kit.toml and the adopter script each one names. An adopter RECEIVES descriptors copy-installed and does not author them, so the defect this catches — a declared placeholder its own adopter never substitutes, which ships an unresolved brace — is one gov emits and gov must catch. Catching it downstream is one release too late, and the adopter could only fix it by forking the descriptor, which is the fork class this build exists to stop manufacturing. The gate script is itself a registry exemption for the same reason.
+grades a kit-AUTHORING invariant over gov's own <prefix>/*/kit.toml and the adopter script each one names. An adopter RECEIVES descriptors copy-installed and does not author them, so the defect this catches — a declared placeholder its own adopter never substitutes, which ships an unresolved brace — is one gov emits and gov must catch. Catching it downstream is one release too late, and the adopter could only fix it by forking the descriptor, which is the fork class this build exists to stop manufacturing. The gate script is itself a registry exemption for the same reason.
 """
 
 [[exempt_leg]]
@@ -463,16 +472,20 @@ name = "kit-placeholders self-test"
 why = "the red/green arms for the leg above, gov-only for the same reason. Its fixtures build their own scratch trees and assert against gov's own predicate, so in an adopter tree they would grade a program that is not there."
 
 [[exempt_leg]]
+name = "foreign-prefix parity (every self-test at three prefixes)"
+why = "it runs `foreign-prefix.gov.test.sh`, which `<prefix>/run-gates/kit.toml` withholds with `role = \"project-owned\"` beside `run-gates.gov.test.sh`: it moves GOV's whole tool root in a scratch clone and grades gov's own declared self-test population there, so in any other tree it has no population to move. A held leg with a budget row, run once per build (TOOL-aRepatriatedFork-18 section 8 F3, TOOL-aRepatriatedFork-30 S1). NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`."
+
+[[exempt_leg]]
 name = "agent-instructions self-test"
-why = "it runs `adopt-agent-instructions.test.sh`, which `tools/agent-instructions/kit.toml` withholds with `role = \"project-owned\"`: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-3."
+why = "it runs `adopt-agent-instructions.test.sh`, which `<prefix>/agent-instructions/kit.toml` withholds with `role = \"project-owned\"`: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-3."
 
 [[exempt_leg]]
 name = "codebase-map kit selftest"
-why = "it runs `selftest.py`, which `tools/codebase-map/kit.toml` withholds with `role = \"project-owned\"`: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-3."
+why = "it runs `selftest.py`, which `<prefix>/codebase-map/kit.toml` withholds with `role = \"project-owned\"`: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-3."
 
 [[exempt_leg]]
 name = "codebase-map adopter e2e"
-why = "it runs `adopt-codebase-map.test.sh`, which `tools/codebase-map/kit.toml` withholds with `role = \"project-owned\"`: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-3."
+why = "it runs `adopt-codebase-map.test.sh`, which `<prefix>/codebase-map/kit.toml` withholds with `role = \"project-owned\"`: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-3."
 
 [[exempt_leg]]
 name = "process-monitor census selftest"
@@ -484,43 +497,43 @@ why = "it runs `adopt-process-monitor.test.sh`, which the process-monitor descri
 
 [[exempt_leg]]
 name = "drift-audit selftest"
-why = "it runs `selftest.py`, which `tools/drift-audit/kit.toml` withholds with `role = \"project-owned\"`: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-3."
+why = "it runs `selftest.py`, which `<prefix>/drift-audit/kit.toml` withholds with `role = \"project-owned\"`: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-3."
 
 [[exempt_leg]]
 name = "line-length gate selftest"
-why = "it runs `check-line-length.test.sh`, which `tools/govkit/entries/check-line-length.kit.toml` withheld with `role = \"project-owned\"` until TOOL-aRepatriatedFork-18 narrowed that to the LEG: the FILE now ships, because every adopter's check-arms reads it for its gate's arms, and this row is what keeps the leg gov's. Two reasons, and the second is the harder one: the suite stages a break into a copy of a checker beside it, so its subject is the checker (owner ruling 2026-08-23, applied to what SHIPS); AND since TOOL-aQuenchedHarness-6 ported it onto `tools/lib/lib-selftest.sh`, which is gov-internal and travels to nobody, a shipped copy would red on arrival with `build_fixture: command not found`. It stays a leg on GOV's bar. TOOL-aQuenchedHarness-6."
+why = "it runs `check-line-length.test.sh`, which `<prefix>/govkit/entries/check-line-length.kit.toml` withheld with `role = \"project-owned\"` until TOOL-aRepatriatedFork-18 narrowed that to the LEG: the FILE now ships, because every adopter's check-arms reads it for its gate's arms, and this row is what keeps the leg gov's. Two reasons, and the second is the harder one: the suite stages a break into a copy of a checker beside it, so its subject is the checker (owner ruling 2026-08-23, applied to what SHIPS); AND since TOOL-aQuenchedHarness-6 ported it onto `<prefix>/lib/lib-selftest.sh`, which is gov-internal and travels to nobody, a shipped copy would red on arrival with `build_fixture: command not found`. It stays a leg on GOV's bar. TOOL-aQuenchedHarness-6."
 
 [[exempt_leg]]
 name = "run-selftests self-test"
-why = "it runs `run-selftests.test.sh`, which `tools/run-gates/kit.toml` withholds with `role = \"project-owned\"`: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-6."
+why = "it runs `run-selftests.test.sh`, which `<prefix>/run-gates/kit.toml` withholds with `role = \"project-owned\"`: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-6."
 
 [[exempt_leg]]
 name = "scratch-guard self-test"
-why = "it runs `scratch-guard.test.sh`, which `tools/hooks/kit.toml` withholds with `role = \"project-owned\"`: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-3."
+why = "it runs `scratch-guard.test.sh`, which `<prefix>/hooks/kit.toml` withholds with `role = \"project-owned\"`: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-3."
 
 [[exempt_leg]]
 name = "agent-cap self-test"
-why = "it runs `agent-cap.test.sh`, which `tools/hooks/kit.toml` withholds with `role = \"project-owned\"`: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-3."
+why = "it runs `agent-cap.test.sh`, which `<prefix>/hooks/kit.toml` withholds with `role = \"project-owned\"`: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-3."
 
 [[exempt_leg]]
 name = "lexicon selftest"
-why = "it runs `selftest.py`, which `tools/lexicon/kit.toml` withholds with `role = \"project-owned\"`: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-3."
+why = "it runs `selftest.py`, which `<prefix>/lexicon/kit.toml` withholds with `role = \"project-owned\"`: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-3."
 
 [[exempt_leg]]
 name = "runlog selftest"
-why = "it runs `selftest.py`, which `tools/runlog/kit.toml` withholds with `role = \"project-owned\"` together with the `fixtures/` it reads: the suite's subject is the reader in that directory, so it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. TOOL-aQuenchedHarness-3."
+why = "it runs `selftest.py`, which `<prefix>/runlog/kit.toml` withholds with `role = \"project-owned\"` together with the `fixtures/` it reads: the suite's subject is the reader in that directory, so it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. TOOL-aQuenchedHarness-3."
 
 [[exempt_leg]]
 name = "memory-recall kit selftest"
-why = "it runs `selftest.py`, which `tools/memory-recall/kit.toml` withholds with `role = \"project-owned\"`: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-3."
+why = "it runs `selftest.py`, which `<prefix>/memory-recall/kit.toml` withholds with `role = \"project-owned\"`: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-3."
 
 [[exempt_leg]]
 name = "verdict-epoch self-test"
-why = "it runs `check-verdict-epoch.test.sh`, which `tools/memory-tree/kit.toml` withholds with `role = \"project-owned\"`: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-3."
+why = "it runs `check-verdict-epoch.test.sh`, which `<prefix>/memory-tree/kit.toml` withholds with `role = \"project-owned\"`: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-3."
 
 [[exempt_leg]]
 name = "memory-hygiene self-test"
-why = "it runs `check-memory-hygiene.test.sh`, which `tools/memory-tree/kit.toml` withheld with `role = \"project-owned\"` until TOOL-aRepatriatedFork-18 narrowed that to the LEG: the FILE now ships, because every adopter's check-arms reads it for its gate's arms, and this row is what keeps the leg gov's: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-3."
+why = "it runs `check-memory-hygiene.test.sh`, which `<prefix>/memory-tree/kit.toml` withheld with `role = \"project-owned\"` until TOOL-aRepatriatedFork-18 narrowed that to the LEG: the FILE now ships, because every adopter's check-arms reads it for its gate's arms, and this row is what keeps the leg gov's: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-3."
 
 [[exempt_leg]]
 name = "transition-audit arms"
@@ -532,75 +545,75 @@ why = "it runs `merge-rows.py --check`, which asserts THIS repo's `.gitattribute
 
 [[exempt_leg]]
 name = "row-keyed merge driver replay"
-why = "it runs `merge-rows.test.sh`, which `tools/memory-tree/kit.toml` withholds with `role = \"project-owned\"`: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-3."
+why = "it runs `merge-rows.test.sh`, which `<prefix>/memory-tree/kit.toml` withholds with `role = \"project-owned\"`: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-3."
 
 [[exempt_leg]]
 name = "method-carriers self-test"
-why = "it runs `check-method-carriers.test.sh`, which `tools/memory-tree/kit.toml` withheld with `role = \"project-owned\"` until TOOL-aRepatriatedFork-18 narrowed that to the LEG: the FILE now ships, because every adopter's check-arms reads it for its gate's arms, and this row is what keeps the leg gov's: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-3."
+why = "it runs `check-method-carriers.test.sh`, which `<prefix>/memory-tree/kit.toml` withheld with `role = \"project-owned\"` until TOOL-aRepatriatedFork-18 narrowed that to the LEG: the FILE now ships, because every adopter's check-arms reads it for its gate's arms, and this row is what keeps the leg gov's: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-3."
 
 [[exempt_leg]]
 name = "pytest-guardrails self-test"
-why = "it runs `pytest-parallel-guardrails.test.sh`, which `tools/pytest-parallel-guardrails/kit.toml` withholds with `role = \"project-owned\"`: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-3."
+why = "it runs `pytest-parallel-guardrails.test.sh`, which `<prefix>/pytest-parallel-guardrails/kit.toml` withholds with `role = \"project-owned\"`: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-3."
 
 [[exempt_leg]]
 name = "profile-bar selftest"
-why = "it runs `profile_bar.test.sh`, which `tools/run-gates/kit.toml` withholds with `role = \"project-owned\"`: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-3."
+why = "it runs `profile_bar.test.sh`, which `<prefix>/run-gates/kit.toml` withholds with `role = \"project-owned\"`: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-3."
 
 [[exempt_leg]]
 name = "run-gates turnstile"
-why = "it runs `run-gates.turnstile.test.sh`, which `tools/run-gates/kit.toml` withholds with `role = \"project-owned\"`: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-3."
+why = "it runs `run-gates.turnstile.test.sh`, which `<prefix>/run-gates/kit.toml` withholds with `role = \"project-owned\"`: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-3."
 
 [[exempt_leg]]
 name = "run-gates canary"
-why = "it runs `run-gates.test.sh`, which `tools/run-gates/kit.toml` withholds with `role = \"project-owned\"`: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-3."
+why = "it runs `run-gates.test.sh`, which `<prefix>/run-gates/kit.toml` withholds with `role = \"project-owned\"`: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-3."
 
 [[exempt_leg]]
 name = "run-gates evidence"
-why = "it runs `run-gates.evidence.test.sh`, which `tools/run-gates/kit.toml` withholds with `role = \"project-owned\"`: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-3."
+why = "it runs `run-gates.evidence.test.sh`, which `<prefix>/run-gates/kit.toml` withholds with `role = \"project-owned\"`: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-3."
 
 [[exempt_leg]]
 name = "run-gates adopter e2e"
-why = "it runs `adopt-run-gates.test.sh`, which `tools/run-gates/kit.toml` withholds with `role = \"project-owned\"`: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-3."
+why = "it runs `adopt-run-gates.test.sh`, which `<prefix>/run-gates/kit.toml` withholds with `role = \"project-owned\"`: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-3."
 
 [[exempt_leg]]
 name = "run-gates run-log line"
-why = "it runs `run-gates.runlog.test.sh`, which `tools/run-gates/kit.toml` withholds with `role = \"project-owned\"`: the suite drives a copy of the runner in that directory inside a scratch clone and reads the run-log line it writes, so its subject is the runner and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. TOOL-aQuenchedHarness-3, applied by TOOL-dLoggedFlight-3."
+why = "it runs `run-gates.runlog.test.sh`, which `<prefix>/run-gates/kit.toml` withholds with `role = \"project-owned\"`: the suite drives a copy of the runner in that directory inside a scratch clone and reads the run-log line it writes, so its subject is the runner and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. TOOL-aQuenchedHarness-3, applied by TOOL-dLoggedFlight-3."
 
 [[exempt_leg]]
 name = "pre-push run-log line"
-why = "it runs `.githooks/pre-push.runlog.test.sh`, which `tools/govkit/entries/push-main.kit.toml` withholds with `role = \"project-owned\"`: the suite drives a copy of the hook in a scratch clone and reads the run-log lines it writes, so its subject is the hook's writer and it has a job only when that source changes -- and none at all in a tree that receives the hook verbatim and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. The sibling `pre-push self-test` still ships, and changing that is not this row's. TOOL-aQuenchedHarness-3, applied by TOOL-dLoggedFlight-4."
+why = "it runs `.githooks/pre-push.runlog.test.sh`, which `<prefix>/govkit/entries/push-main.kit.toml` withholds with `role = \"project-owned\"`: the suite drives a copy of the hook in a scratch clone and reads the run-log lines it writes, so its subject is the hook's writer and it has a job only when that source changes -- and none at all in a tree that receives the hook verbatim and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. The sibling `pre-push self-test` still ships, and changing that is not this row's. TOOL-aQuenchedHarness-3, applied by TOOL-dLoggedFlight-4."
 
 [[exempt_leg]]
 name = "verifier fan-out self-test"
-why = "it runs `check-verifier-fanout.test.sh`, which `tools/workflows/kit.toml` withholds with `role = \"project-owned\"`: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-3."
+why = "it runs `check-verifier-fanout.test.sh`, which `<prefix>/workflows/kit.toml` withholds with `role = \"project-owned\"`: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-3."
 
 [[exempt_leg]]
 name = "tier2-review self-test"
-why = "it runs `tier2-review.test.sh`, which `tools/workflows/kit.toml` withholds with `role = \"project-owned\"`: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-3."
+why = "it runs `tier2-review.test.sh`, which `<prefix>/workflows/kit.toml` withholds with `role = \"project-owned\"`: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-3."
 
 [[exempt_leg]]
 name = "unattended-build self-test"
-why = "it runs `unattended-build.test.sh`, which `tools/workflows/kit.toml` withholds with `role = \"project-owned\"`: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-3."
+why = "it runs `unattended-build.test.sh`, which `<prefix>/workflows/kit.toml` withholds with `role = \"project-owned\"`: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-3."
 
 [[exempt_leg]]
 name = "review-join self-test"
-why = "it runs `check-review-join.test.sh`, which `tools/workflows/kit.toml` withholds with `role = \"project-owned\"`: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-3."
+why = "it runs `check-review-join.test.sh`, which `<prefix>/workflows/kit.toml` withholds with `role = \"project-owned\"`: the suite stages a break into a copy of a checker in that directory, so its subject is the checker and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. Owner ruling 2026-08-23, applied to what SHIPS. It stays a leg on GOV's bar and is held there like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer, and it also made every adopter apply exit 1 with one silenced-leg problem per suite. TOOL-aQuenchedHarness-3."
 
 [[exempt_leg]]
 name = "leg ceilings clear their evidenced maximum"
-why = "it grades GOV's ceilings against GOV's own recorded seconds, from `tools/run-gates/ceiling-evidence.txt` and `tools/run-gates/ceiling-margin.txt` -- both withheld with `role = \"project-owned\"` for the reason `tools/codebase-map/kit.toml` withholds `scen-adversarial.json`: a pin measured against one corpus and shipped into a tree that never measured it is either vacuous or permanently red. The TOOL ships and an adopter who wants the check runs `--write` on their own bar and declares their own headroom; what does not ship is this repo's numbers wearing their name. TOOL-aQuenchedHarness-2."
+why = "it grades GOV's ceilings against GOV's own recorded seconds, from `<prefix>/run-gates/ceiling-evidence.txt` and `<prefix>/run-gates/ceiling-margin.txt` -- both withheld with `role = \"project-owned\"` for the reason `<prefix>/codebase-map/kit.toml` withholds `scen-adversarial.json`: a pin measured against one corpus and shipped into a tree that never measured it is either vacuous or permanently red. The TOOL ships and an adopter who wants the check runs `--write` on their own bar and declares their own headroom; what does not ship is this repo's numbers wearing their name. TOOL-aQuenchedHarness-2."
 
 [[exempt_leg]]
 name = "every held leg is budgeted, every budget row resolves"
-why = "it asserts `tools/run-gates/selftest-budgets.txt` against GOV's own held legs, and that declaration is withheld with `role = \"project-owned\"` because its 55 rows name THIS repo's suites and carry readings taken on THIS node. An adopter receives the runner and seeds their own declaration; what they must not receive is a gate asserting a population they do not have, which would red on arrival and could only ever be silenced. Same disposition and same reason as `leg ceilings clear their evidenced maximum`. TOOL-aQuenchedHarness-4."
+why = "it asserts `<prefix>/run-gates/selftest-budgets.txt` against GOV's own held legs, and that declaration is withheld with `role = \"project-owned\"` because its 55 rows name THIS repo's suites and carry readings taken on THIS node. An adopter receives the runner and seeds their own declaration; what they must not receive is a gate asserting a population they do not have, which would red on arrival and could only ever be silenced. Same disposition and same reason as `leg ceilings clear their evidenced maximum`. TOOL-aQuenchedHarness-4."
 
 [[exempt_leg]]
 name = "extract-arms self-test"
-why = "its subject is `tools/lib/extract-arms.sh`, and `tools/lib/` is gov-internal by a standing registry exemption -- no kit carries it, so no descriptor can claim a leg over it. Held like every other self-test and run by `tools/run-gates/run-selftests.sh`. TOOL-aQuenchedHarness-6."
+why = "its subject is `<prefix>/lib/extract-arms.sh`, and `<prefix>/lib/` is gov-internal by a standing registry exemption -- no kit carries it, so no descriptor can claim a leg over it. Held like every other self-test and run by `<prefix>/run-gates/run-selftests.sh`. TOOL-aQuenchedHarness-6."
 
 [[exempt_leg]]
 name = "selftest harness self-test"
-why = "its subject is `tools/lib/lib-selftest.sh`, and `tools/lib/` is gov-internal by a standing registry exemption -- no kit carries it, so no descriptor can claim a leg over it. Held like every other self-test and run by `tools/run-gates/run-selftests.sh`. TOOL-aQuenchedHarness-5."
+why = "its subject is `<prefix>/lib/lib-selftest.sh`, and `<prefix>/lib/` is gov-internal by a standing registry exemption -- no kit carries it, so no descriptor can claim a leg over it. Held like every other self-test and run by `<prefix>/run-gates/run-selftests.sh`. TOOL-aQuenchedHarness-5."
 
 [[exempt_leg]]
 name = "encoding posture (text IO names its encoding)"

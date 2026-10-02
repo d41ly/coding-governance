@@ -7,11 +7,11 @@
 # did not move with it, and the high-water ratchet below is what prices growth now that the ceiling
 # is no longer doing it.
 #
-#   tools/check-template-size.sh            # gate the tracked template
-#   MAX_BYTES=49152 tools/check-template-size.sh <file>   # override target / limit
-#   tools/check-template-size.sh --bump [<file> [<limit> [<record> [<limits>]]]]  # re-record
+#   <prefix>/check-template-size.sh            # gate the tracked template
+#   MAX_BYTES=49152 <prefix>/check-template-size.sh <file>   # override target / limit
+#   <prefix>/check-template-size.sh --bump [<file> [<limit> [<record> [<limits>]]]]  # re-record
 #
-# The ceiling for each subject is DECLARED in tools/template-size-limits.txt with its history
+# The ceiling for each subject is DECLARED in <prefix>/template-size-limits.txt with its history
 # beside it; this script carries only a hard default for a subject that file does not name.
 #
 # Exit 0 = within budget (prints one line). Exit 1 = over budget. Exit 2 = file missing.
@@ -25,6 +25,9 @@
 # long as 4 existed, which is the checker-whose-record-does-not-describe-it class one level in.
 set -u
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || ROOT=.
+# The two sidecars sit BESIDE this gate, so their defaults are derived from its own directory
+# (TOOL-aRepatriatedFork-29 S3): gov runs at whatever kit root it was checked out under.
+_self_dir=$(cd "$(dirname "$0")" 2>/dev/null && pwd) || _self_dir="$ROOT"
 
 # Every exit path goes through fail(), which is what puts this gate into check-arms.py's
 # population: its FAIL_RE matches `fail <n> "…` and its branches() refuses a message with no
@@ -57,7 +60,7 @@ FILE=${1:-"$ROOT/coding-governance-agents.template.md"}
 # The DECLARED limits file, resolved the same three ways every other path here is — positional,
 # then environment, then the tracked default — so the self-test can point the gate at a scratch copy
 # instead of mutating a tracked file while `run-gates.sh` runs its legs CONCURRENTLY.
-LIMITS=${4:-${LIMITS:-"$ROOT/tools/template-size-limits.txt"}}
+LIMITS=${4:-${LIMITS:-"$_self_dir/template-size-limits.txt"}}
 
 # `key` is needed by BOTH the declared-limit lookup and the high-water lookup, so it is derived once
 # here rather than twice. Repo-RELATIVE, with both sides normalized through the same `cd && pwd`:
@@ -99,7 +102,7 @@ MAX_BYTES=${2:-${declared:-${MAX_BYTES:-49152}}}   # 48 KiB hard default, for a 
 # The high-water record, resolved the same three ways MAX_BYTES is — positional $3, then the
 # environment, then the tracked default — because a gate leg cannot set an environment variable and
 # the self-test must point the gate at a scratch copy without writing the tracked one.
-HIGHWATER=${3:-${HIGHWATER:-"$ROOT/tools/template-size-highwater.txt"}}
+HIGHWATER=${3:-${HIGHWATER:-"$_self_dir/template-size-highwater.txt"}}
 
 [ -f "$FILE" ] || { FAIL_CODE=2; fail 1 "the file to measure does not exist: $FILE"; }
 # Measure LF-NORMALIZED bytes (strip CR) so the gate is checkout-independent — a Windows autocrlf

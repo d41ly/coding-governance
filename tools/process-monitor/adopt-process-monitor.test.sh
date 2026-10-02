@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 # adopt-process-monitor.test.sh — the adopter's refusals, each staged and observed RED.
 #
-# gov:kit process-monitor@0.7
+# gov:kit process-monitor@0.11
 #
 # Every arm here stages a break into a SCRATCH copy of the conf and asserts the adopter refuses.
 # Nothing is asserted about the shipped tree except by the two arms that say so, because a suite
 # that only ever runs against a green tree is an assertion about nothing.
 #
-#   bash tools/process-monitor/adopt-process-monitor.test.sh
+#   bash <prefix>/process-monitor/adopt-process-monitor.test.sh
 #
 # Exit 0 = all arms passed · 1 = an arm failed.
 set -u
@@ -18,13 +18,44 @@ ROOT="$(cd "$KIT_DIR" && git rev-parse --show-toplevel)"
 # The kit's own prefix, DERIVED — a scratch adopter tree is built at it, and spelling it out
 # is exactly the literal the install-prefix ban refuses.
 KIT_REL="$(cd "$KIT_DIR" && git rev-parse --show-prefix)"; KIT_REL="${KIT_REL%/}"
-# The python the hook is pointed at, RESOLVED by running it when the shared resolver is present.
-if [ -f "$KIT_DIR/../lib/resolve-python.sh" ]; then
-  . "$KIT_DIR/../lib/resolve-python.sh"
-  TESTPY=$(resolve_python) || { echo "adopt-process-monitor.test: no usable python"; exit 2; }
-else
-  TESTPY=python   # gov:literal-python — last-resort fallback when ../lib/ is absent (adopter layout)
-fi
+# PFX is the install prefix WITH its trailing slash, derived from where this file sits and empty
+# at a root install: every fixture and host path below is spelled through it, never through a
+# literal prefix (TOOL-aRepatriatedFork-28).
+case "$KIT_REL" in */*) PFX="${KIT_REL%/*}/" ;; *) PFX="" ;; esac
+# The python the hook is pointed at, RESOLVED by running it. TOOL-aRepatriatedFork-46: the resolver
+# is carried INLINE; it was sourced from a probe of the library directory, which ships nowhere.
+# >>> resolve_python — canonical copy: resolve-python.sh in gov's lib dir (byte-identical; gated)
+resolve_python() {
+  # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
+  # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
+  # the candidate and every consumer uses "$PY" as a single word (measured: exit 127).
+  _rp_tried=""
+  for _rp_c in "${1:-}" "${GOV_PYTHON:-}" python3 python py; do
+    [ -n "$_rp_c" ] || continue
+    _rp_tried="$_rp_tried $_rp_c"
+    if "$_rp_c" -c "import sys" >/dev/null 2>&1; then
+      printf '%s\n' "$_rp_c"
+      return 0
+    fi
+  done
+  {
+    echo "resolve_python: no usable python launcher. Each candidate was RUN with -c 'import sys' and"
+    echo "resolve_python: none exited 0 — being on PATH is not evidence (the Microsoft Store python3"
+    echo "resolve_python: stub answers \`command -v\` and exits 9009 without running anything)."
+    echo "resolve_python: tried:$_rp_tried"
+    if [ -n "${1:-}" ]; then
+      echo "resolve_python: the caller's override '$1' was tried FIRST and did not run."
+    fi
+    if [ -n "${GOV_PYTHON:-}" ]; then
+      echo "resolve_python: GOV_PYTHON is set to '$GOV_PYTHON' and did not run. An override that is"
+      echo "resolve_python: set and unusable is THIS failure, never a silent fall-through — the"
+      echo "resolve_python: operator believes they chose, and would not have."
+    fi
+  } >&2
+  return 1
+}
+# <<< resolve_python
+TESTPY=$(resolve_python) || { echo "adopt-process-monitor.test: no usable python"; exit 2; }
 # The floor the merge bar's `check-testsuite-counts.sh` reads: a suite that prints no
 # executed count against a declared floor could strand a block of its arms past an exit and
 # still report success.
@@ -58,9 +89,9 @@ CONF
 # The scratch repo is a real git repo because the adopter derives its own path through git.
 run_against() {
   local conf_body="$1" repo="$WORK/r$RANDOM$RANDOM"
-  mkdir -p "$repo/tools/process-monitor" "$REALROOT"
+  mkdir -p "$repo/${PFX}process-monitor" "$REALROOT"
   git -C "$repo" init -q 2>/dev/null
-  cp "$ADOPT" "$repo/tools/process-monitor/"
+  cp "$ADOPT" "$repo/${PFX}process-monitor/"
   # THE ENGINE, and only where an arm asks for it. The line above copies the adopter ALONE, so the
   # delegation to the engine's own reader is never reached and an arm over that branch would pass
   # by finding nothing. `$KIT_REL` is derived, so no install prefix is spelled here.
@@ -82,6 +113,8 @@ echo "adopt-process-monitor: refusals"
 
 # --- the happy path, so every refusal below is a CONTRAST and not the only thing observed
 check_equal "test_valid_conf_is_accepted" "$(run_against "$(build_base_conf)")" 0
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${FAIL:-0}" = 0 ] && echo "PASS (${PASS:-1} assertions)" || echo "FAIL (${PASS:-1} assertions)"; [ "${FAIL:-0}" = 0 ] && exit 0; exit 1; fi
 
 # --- TOOL-aReplayedCard-2: the wiring count is PER EVENT. A file wired on PostToolUse alone — the
 # state every tree adopted before the SessionStart fragment existed — is refused naming the event
@@ -138,8 +171,8 @@ check_equal "test_non_numeric_throttle_refuses" \
 
 # --- AC3: an absent conf refuses, and --check REPAIRS NOTHING
 check_equal "test_absent_conf_refuses" "$(run_against "__ABSENT__")" 1
-_repo="$WORK/norepair"; mkdir -p "$_repo/tools/process-monitor"; git -C "$_repo" init -q 2>/dev/null
-cp "$ADOPT" "$_repo/tools/process-monitor/"
+_repo="$WORK/norepair"; mkdir -p "$_repo/${PFX}process-monitor"; git -C "$_repo" init -q 2>/dev/null
+cp "$ADOPT" "$_repo/${PFX}process-monitor/"
 ( cd "$_repo" && bash "$KIT_REL/adopt-process-monitor.sh" --check ) >/dev/null 2>&1 || true
 [ -f "$_repo/.process-monitor.conf" ] \
   && add_fail "test_check_refuses_without_repairing (a conf was created)" \

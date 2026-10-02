@@ -1,12 +1,18 @@
 # TOOL-aRepatriatedFork-29 — gov's own gates and declarations derive the prefix they name
 
-**Status:** SPECCED · rev-2 · 2026-09-25 · node a · Tier-2 · base 2143b6d6 · streams tooling · order 13
+**Status:** CLOSED · rev-6 · 2026-10-01 · node a · Tier-2 · base 2143b6d6 · streams tooling · order 13
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-09-25-build-TOOL-aRepatriatedFork-23-prefix-census.md](../build/2026-09-25-build-TOOL-aRepatriatedFork-23-prefix-census.md) | research | TOOL-aRepatriatedFork-23 TOOL-aRepatriatedFork-24 TOOL-aRepatriatedFork-25 TOOL-aRepatriatedFork-26 TOOL-aRepatriatedFork-27 TOOL-aRepatriatedFork-28 TOOL-aRepatriatedFork-30 |
+| [2026-09-29-build-TOOL-aRepatriatedFork-29-1-acceptance-ledger.md](../build/2026-09-29-build-TOOL-aRepatriatedFork-29-1-acceptance-ledger.md) | journal | — |
+| [2026-09-30-build-TOOL-aRepatriatedFork-23-closing-fold-round1.md](../build/2026-09-30-build-TOOL-aRepatriatedFork-23-closing-fold-round1.md) | journal | TOOL-aRepatriatedFork-23 TOOL-aRepatriatedFork-24 TOOL-aRepatriatedFork-30 TOOL-aRepatriatedFork-46 |
+| [2026-10-01-build-TOOL-aRepatriatedFork-23-verifying-repair.md](../build/2026-10-01-build-TOOL-aRepatriatedFork-23-verifying-repair.md) | journal | TOOL-aRepatriatedFork-23 TOOL-aRepatriatedFork-2 TOOL-aRepatriatedFork-24 TOOL-aRepatriatedFork-26 TOOL-aRepatriatedFork-28 TOOL-aRepatriatedFork-30 TOOL-aRepatriatedFork-46 |
+| [2026-09-29-prompt-TOOL-aRepatriatedFork-29-build-brief.md](../prompts/2026-09-29-prompt-TOOL-aRepatriatedFork-29-build-brief.md) | journal | — |
+| [2026-09-30-review-TOOL-aRepatriatedFork-23-closing-diff-round1.md](../reviews/2026-09-30-review-TOOL-aRepatriatedFork-23-closing-diff-round1.md) | diff-review | TOOL-aRepatriatedFork-23 TOOL-aRepatriatedFork-24 TOOL-aRepatriatedFork-25 TOOL-aRepatriatedFork-26 TOOL-aRepatriatedFork-27 TOOL-aRepatriatedFork-28 TOOL-aRepatriatedFork-30 TOOL-aRepatriatedFork-44 TOOL-aRepatriatedFork-45 TOOL-aRepatriatedFork-46 TOOL-aRepatriatedFork-47 |
+| [2026-09-30-review-TOOL-aRepatriatedFork-23-closing-diff-round2.md](../reviews/2026-09-30-review-TOOL-aRepatriatedFork-23-closing-diff-round2.md) | diff-review | TOOL-aRepatriatedFork-23 TOOL-aRepatriatedFork-24 TOOL-aRepatriatedFork-30 TOOL-aRepatriatedFork-46 |
 
 <!-- /gen:spec-records -->
 
@@ -46,6 +52,22 @@ every gov-side file, so gov itself runs at any kit root.
   shipped workflow templates are handled as §8 F3 resolves. Observed by AC7.
 - **S7** — The ledger rows for these files are lowered, and every kit moved takes its version bump in
   every carrier. Observed by AC8.
+- **S8 (rev-4)** — The closing review's round-1 fold of four readers S1 and S2's `{prefix}`
+  spelling left unmigrated.
+  - **S8a** — H2. The run-gates canary's arm 1b resolves each guard through the inlined
+    `resolve_prefix_token` block against the kit's parent before the tracked-path test. Observed by
+    AC9.
+  - **S8b** — M2. Its arm 2 resolves each leg path the same way before grepping the runner, and a
+    new assertion requires every path in that population to name a tracked path, so an arm whose
+    needles name nothing reds instead of reporting ok. The suite floor rises by one. Observed by
+    AC10.
+  - **S8c** — M1. `derive_gate_runner` reads the TOP-LEVEL `prefix` from the target's
+    `.governance/deploy.toml` when `[answers]` carries none, which is where `govkit intake` writes
+    it, so the flat `run-gates.sh` and `gate.sh` rungs are reachable again. Observed by AC11.
+  - **S8d** — L2. `make_adopter_receipt.py`'s `resolve_kit_homes` resolves each descriptor's token
+    against the revision's own tool root, joins a tokened descriptor's kit-relative home to it
+    unless the descriptor declares `home_root_relative`, and refuses a descriptor that reads empty.
+    Observed by AC12.
 
 ## 3. Non-goals (OUT)
 
@@ -93,6 +115,42 @@ This unit owns every literal in a gov-side file: a withheld file that is not a t
 descriptor resolves that is not a test, a kit descriptor, and the registry. A `sentinel =` line is
 `TOOL-aRepatriatedFork-24`'s. The rule is `TOOL-aRepatriatedFork-23` §8 F3's.
 
+### Rev-3 decisions, made by the unit pass before code
+
+Measured at `e3d91e32` with the gate's epoch-5 counter, run per line, because five drain units moved
+the tree after the census.
+
+- **The registry and the descriptors spell a gov-side path through the `{prefix}` token.** That
+  covers an entry's `descriptor`, an exemption's `path`, a surface glob, a gov-only pin's `pattern`,
+  a `root_relative` include and a `claims` row. S1 said "relative to the tool root", but the ban
+  counts a bare `<kit>/<file>` wherever it sits, so the kit-relative spelling is itself a literal.
+  The token is the one the descriptors already use for a destination. A `home` stays kit-relative,
+  as §8 F2 resolves, and a flat entry's home is `.`, the tool root itself.
+- **One home sits outside the tool root.** The kickoff entry's engine lives under `skills/`, which
+  machine-junction discovery fixes, so that descriptor carries `home_root_relative = true` and its
+  home keeps its repo-root spelling.
+- **govkit joins these paths once, at load.** `load_registry` and `resolve_descriptor_paths` join
+  every token and home to the root `derive_tool_root` derives, so each reader downstream keeps the
+  repo-relative spelling it always had. The tool root is govkit's grandparent, and the checkout root
+  is the first directory above it holding a `.git` entry.
+- **§8 F1 reaches every reader of the manifest's argv and guards, not the runner alone.** These are
+  `run-gates.sh`, `run-selftests.sh` with its budget and pooled-evidence sidecars,
+  `check-testsuite-counts.sh`, `check-spec-tokens.py` and govkit's guard-class arm. The runbook's
+  harness-migration program reads the registry and descriptors raw, so its reader learns the new
+  shape too. The literal registry path on its read line is `TOOL-aRepatriatedFork-46`'s.
+- **§8 F3's population rule is `TOOL-aRepatriatedFork-30`'s to build**, as the Edges hand-off says.
+  AC7's render clause is observed there, and the rows for `unattended-build.js` and
+  `drift-audit-state.js` stay until then.
+- **Lines left to their owners.** Three executing lines join a literal kit segment under a derived
+  base, and they belong to `TOOL-aRepatriatedFork-46`: govkit's runner probe, and the workflows and
+  lexicon joins in `map_extractors.py`. Four text cells in `dead-path-waivers.txt` must match lines of
+  the frozen adopter-receipt fixture byte for byte, so they drain only with that fixture, which is
+  `TOOL-aRepatriatedFork-28`'s. The same unit owns the selftest fixture strings in
+  `render_playbook.py` and the whole of `govkit/matrix.py`, the acceptance-matrix harness.
+- **The install-prefix gate's own predicate still reads gov's literal prefix**, in arm 3 and in the
+  counter. That is the definition of the class it bans, which is `TOOL-aRepatriatedFork-30`'s to
+  change. Only the kit-source test moved to `SELF_PREFIX`, as S3 says.
+
 ### Files touched (estimate)
 
 `tools/govkit/registry.toml` · `tools/govkit/govkit.py` · `tools/gate-legs.json` ·
@@ -103,7 +161,12 @@ descriptor resolves that is not a test, a kit descriptor, and the registry. A `s
 `tools/codebase-map/map_extractors.py` · `tools/codebase-map/scen-adversarial.json` ·
 `tools/drift-audit/drift_signals.py` · `tools/run-gates/selftest-budgets.txt` ·
 `tools/lib/pyrun.sh` · `tools/lib/extract-arms.sh` · every `kit.toml` descriptor under `tools/` ·
-`tools/install-prefix-carried.txt`
+`tools/install-prefix-carried.txt` · (rev-3) `tools/run-gates/run-selftests.sh` ·
+`tools/run-gates/selftest-pooled-evidence.txt` · `tools/run-gates/derive-ceilings.py` ·
+`tools/run-gates/ceiling-evidence.txt` · `tools/check-testsuite-counts.sh` ·
+`tools/codebase-map/rank_harness.py` · `tools/govkit/check_runbook_parity.py` ·
+`tools/govkit/refusal_join.py` · `tools/govkit/subject-pins.tsv` · `tools/dead-path-waivers.txt` ·
+`WIRE-INTO-PROJECT.md` · every carrier of the thirteen kit versions this unit moves
 
 ### Alternatives rejected
 
@@ -157,13 +220,33 @@ descriptor resolves that is not a test, a kit descriptor, and the registry. A `s
 - **AC8** — `bash tools/check-kit-versions.sh` exits 0, and `python tools/govkit/govkit.py epoch
   --base 2143b6d6` names no kit this unit moved.
   Red when: a moved kit's carrier was missed.
+- **AC9** — rev-4. A slice of `tools/run-gates/run-gates.test.sh` over arm 1b passes on the real
+  manifest, and fails naming the guard when a manifest copy passed as `GATE_LEGS` adds a guard
+  under the `{prefix}` token that names no tracked path.
+  Red when: the arm reports 114 bad guards on the real manifest, the `7de665e5` behaviour.
+- **AC10** — rev-4. The same slice over arm 2 passes, fails when a copy of `run-gates.sh` carrying a
+  resolved leg path is graded, and fails its new liveness assertion when the resolution is removed.
+  Red when: the arm stays green over unresolved `{prefix}/…` needles.
+- **AC11** — rev-4. A `render_playbook.py --selftest` arm renders `bash scripts/gate.sh`,
+  `bash scripts/run-gates.sh` and `bash tools/run-gates.sh` for targets whose `deploy.toml`
+  declares the prefix at its top level.
+  Red when: any renders empty, which `7de665e5` does for all three.
+- **AC12** — rev-4. A `tools/govkit/selftest.py` arm asserts `resolve_kit_homes` yields a home for
+  every registry entry at the pinned revision, each a directory that revision tracks files under.
+  Red when: the map is empty, as it is at `7de665e5`.
 
 ## 7. Gates
 
-`install-prefix (shipped surface)` · `install-prefix self-test` · `kit version markers` · `kit epoch (shipped bytes move, the version moves)` · `govkit selfcheck` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `govkit runbook parity` · `run-gates canary` · `run-gates gov canary` · `every held leg is budgeted, every budget row resolves` · `leg ceilings clear their evidenced maximum` · `dead-path carriers (deleted files still named)` · `spec tokens (a spec's own names resolve)` · `playbook parity` · `hook destinations (every declared hook path ships)` · `template size <=48KiB` · `kit placeholders (a declared token its adopter substitutes)` · `playbook render selftest` · `lexicon naming predicates` · `playbook parity selftest` · `codebase-map kit selftest` · `codebase-map gate coverage` · `codebase-map adopter e2e` · `recall floor arms` · `drift-audit selftest` · `hook destinations self-test` · `extract-arms self-test`
+`install-prefix (shipped surface)` · `install-prefix self-test` · `kit version markers` · `kit epoch (shipped bytes move, the version moves)` · `govkit selfcheck` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `govkit runbook parity` · `run-gates canary` · `run-gates gov canary` · `every held leg is budgeted, every budget row resolves` · `leg ceilings clear their evidenced maximum` · `dead-path carriers (deleted files still named)` · `spec tokens (a spec's own names resolve)` · `playbook parity` · `hook destinations (every declared hook path ships)` · `template size <=48KiB` · `kit placeholders (a declared token its adopter substitutes)` · `playbook render selftest` · `lexicon naming predicates` · `playbook parity selftest` · `codebase-map kit selftest` · `codebase-map gate coverage` · `codebase-map adopter e2e` · `recall floor arms` · `drift-audit selftest` · `hook destinations self-test` · `extract-arms self-test` · `run-selftests self-test`
 
 New arm: `tools/govkit/selftest.py` · a registry and descriptors at a `scripts/` root, which the
 `2143b6d6` resolver misreads · none
+
+New arm: `tools/run-gates/run-gates.test.sh` · rev-4: arm 2's population must name tracked paths · the floor rises by one
+
+New arm: `tools/playbook/render_playbook.py` · rev-4: flat runners under a top-level deploy prefix · none
+
+New arm: `tools/govkit/selftest.py` · rev-4: the fixture regenerator derives a tracked home for every registry entry · none
 
 ## 8. Open questions
 
@@ -202,6 +285,32 @@ New arm: `tools/govkit/selftest.py` · a registry and descriptors at a `scripts/
   listed the `corpus_ids.py` and `gotchas.py` fixtures here; census §1 classes them D, and they
   moved to `TOOL-aRepatriatedFork-28`, whose mechanism drains them.
 - rev-2 · 2026-09-25 · §8 resolved by the owner: every fork takes its recommendation.
+- rev-3 · 2026-09-29 · the unit pass, before code. §4 gains the decisions the build met: the
+  `{prefix}` spelling for every gov-side registry and descriptor path, since a kit-relative
+  `<kit>/<file>` is itself a counted literal; the one repo-root home and its declaring key; the load
+  seam; every argv and guard reader §8 F1 reaches; F3's rule left to `TOOL-aRepatriatedFork-30`;
+  and the lines left to other owners. The Files touched list gains what they reach.
+- rev-4 · 2026-09-30 · closing review round 1 fold: H2 — the canary's guard arm resolves the
+  `{prefix}` token before its tracked-path test (S8a, AC9). closing review round 1 fold: M2 — its
+  hardcoded-path arm resolves before grepping and asserts its needles are real paths (S8b, AC10).
+  closing review round 1 fold: M1 — the bar deriver reads the deploy prefix where intake writes it
+  (S8c, AC11). closing review round 1 fold: L2 — the fixture regenerator reads tokened
+  descriptors and joins kit-relative homes (S8d, AC12).
+- rev-5 · 2026-10-01 · gate repair at VERIFYING, legs `govkit selftest` and `run-gates run-log line`.
+  S1 moved the registry and descriptors to `{prefix}`-tokened, kit-relative spellings, and four
+  readers in govkit's selftest still read them raw. The `[gate_runner_seed]` arm joined an
+  unresolved `{prefix}` and crashed the suite, leaving every later arm unrun. The `[dBF]` and
+  integrity-count arms loaded check-wiring's descriptor without `resolve_descriptor_paths`, so every
+  source read `./<file>`. Arm 7e staged its break against the old one-line `default`, matched
+  nothing and staged nothing; it now asserts that its edit took. The leg-name arm pinned the
+  `tools/gate-legs.json` text the message no longer prints, and takes the new text. run-gates.sh's
+  manifest-parse line gained the kit-dir argument, and the run-log suite's EXITS table still named
+  the old line; its row takes the new text.
+- rev-6 · 2026-10-01 · S3: gate repair at VERIFYING, leg `foreign-prefix parity (every self-test at
+  three prefixes)`, row `kit-placeholders self-test`, red at `vendor/gov/`. For a fixture tree handed
+  in by `--root`, `check-kit-placeholders.py` searched for `kit.toml` one segment below a single
+  root only, so every fixture built at a two-segment prefix was refused as declaring nothing. It
+  searches one or two segments deep.
 
 ## 10. Reuse audit
 

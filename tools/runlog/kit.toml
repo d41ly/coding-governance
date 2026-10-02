@@ -1,8 +1,8 @@
-# kit.toml — this entry, declared as data. Read by tools/govkit/.
+# kit.toml — this entry, declared as data. Read by <prefix>/govkit/.
 # Contract: memory/builds/dLoggedFlight/spec/2026-09-13-spec-TOOL-dLoggedFlight-1.md
 
 id = "runlog"
-home = "tools/runlog"
+home = "runlog"
 scope = "repo"
 
 # Pinned at the reader module, which lands in the SAME unit as this descriptor, so the file the

@@ -5,7 +5,7 @@
 # thing. This runs a BEFORE and an AFTER copy of the engine over the same scratch corpora and asserts
 # their stdout and exit codes are byte-identical, in FULL and in --staged mode.
 #
-#   bash tools/memory-tree/hygiene-parity.test.sh <before-rev>    # e.g. a pre-change sha
+#   bash <prefix>/memory-tree/hygiene-parity.test.sh <before-rev>    # e.g. a pre-change sha
 #
 # NOT a gate leg, deliberately: it needs a before-revision to compare against, and that reference
 # rots the moment anything else edits the engine. The standing protection is
@@ -20,7 +20,7 @@
 # The floor below derives that epoch from KIT_MEMORY_TREE_VERSION, and that only works if the
 # constant is honest. It was not: the 1.5 engine changed check 5's selector, the §9 rev range and the
 # index set while the constant sat still, so the floor pointed before those changes and this harness
-# accepted a baseline it could not legally compare. `tools/memory-tree/check-verdict-epoch.sh` is
+# accepted a baseline it could not legally compare. `<prefix>/memory-tree/check-verdict-epoch.sh` is
 # now a merge-bar leg that reds when the engine's non-comment lines move and the constant does not.
 #
 # EXPECT A GAP AFTER A BUMP. Immediately after the bump commit C the only baseline at-or-after the
@@ -34,7 +34,20 @@
 # Two corpora, because either alone is blind:
 #   arm 1  the REAL tracked memory tree with violations injected — real ordering, real population
 #   arm 2  pathological SHAPES no committed file has — where the subtle divergences actually live
-KIT_REL="${KIT_REL:-tools/memory-tree}"
+HERE="$(cd "$(dirname "$0")" && pwd)"
+# >>> derive_self_rel — canonical copy: kit-rel.sh in gov's lib dir (byte-identical; gated)
+derive_self_rel() {
+  local _dsr_p _dsr_rel=""
+  _dsr_p=$(cd "$1" 2>/dev/null && pwd) || return 1
+  while [ ! -e "$_dsr_p/.git" ]; do
+    [ "$(dirname "$_dsr_p")" = "$_dsr_p" ] && return 1
+    _dsr_rel="$(basename "$_dsr_p")${_dsr_rel:+/$_dsr_rel}"
+    _dsr_p=$(dirname "$_dsr_p")
+  done
+  printf '%s\n' "$_dsr_rel"
+}
+# <<< derive_self_rel
+KIT_REL=$(derive_self_rel "$HERE") || { echo "hygiene-parity.test: not inside a git repository"; exit 2; }
 set -u
 ROOT=$(git rev-parse --show-toplevel) || exit 2
 cd "$ROOT" || exit 2

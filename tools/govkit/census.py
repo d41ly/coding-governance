@@ -18,7 +18,7 @@ was wrong about them within the same pass that wrote it, which is the rule this 
 
 GOV-INTERNAL, and deliberately neither a kit nor a bar leg: it reads repositories gov does not
 own, so it can never run in an adopter's tree and nothing on gov's bar can reach outside this
-repository. It is covered by registry.toml's existing `tools/govkit` exemption -- "the deployer
+repository. It is covered by registry.toml's existing `<prefix>/govkit` exemption -- "the deployer
 itself ... never installed into a target" -- which is exact-path against a depth-1 `tools/*`
 surface, so this file needs no row of its own and deliberately does not get one.
 

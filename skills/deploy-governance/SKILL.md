@@ -10,12 +10,13 @@ prescribes destinations for kits that have since moved, and following 66 imperat
 how a target ends up with kits in several homes and no record of what it took. The deployer reads the
 same facts as DATA, from a registry it asserts against the tree on every run.
 
-Everything below is `python tools/govkit/govkit.py <verb>`.
+Everything below is `python <gov>/<prefix>/govkit/govkit.py <verb>`, where `<gov>` is this checkout and
+`<prefix>` the directory it keeps its kits in.
 
 ## The order, and why it is this order
 
 ```bash
-python tools/govkit/govkit.py selfcheck
+python <gov>/<prefix>/govkit/govkit.py selfcheck
 ```
 
 First, always. It asserts gov's own house before you touch anybody else's: every registry entry has a
@@ -25,7 +26,7 @@ entry, a member of one entry, or an exemption with a reason. If this reds, stop 
 deploy from a tree that disagrees with itself.
 
 ```bash
-python tools/govkit/govkit.py intake --target <path> [--kits a,b | --all] [--answer key=value ...]
+python <gov>/<prefix>/govkit/govkit.py intake --target <path> [--kits a,b | --all] [--answer key=value ...]
 ```
 
 Writes `<target>/.governance/deploy.toml` ONCE. It refuses to invent an answer and names the ones it
@@ -36,7 +37,7 @@ silently would replace a decision the owner made with one the tool guessed.
 Commit that file. It is the thing that makes the next `apply` reproducible.
 
 ```bash
-python tools/govkit/govkit.py plan --target <path>
+python <gov>/<prefix>/govkit/govkit.py plan --target <path>
 ```
 
 Read-only. Lists every destination the install TOUCHES, one row per path, with its role, its mark and
@@ -51,7 +52,7 @@ notice a destination you did not expect, and the last cheap moment to notice one
 not getting.
 
 ```bash
-python tools/govkit/govkit.py apply --target <path>
+python <gov>/<prefix>/govkit/govkit.py apply --target <path>
 ```
 
 Lands kit content from the gov git INDEX at a recorded commit — never from the working tree, which is
@@ -77,7 +78,7 @@ be laundered into a provenance claim.
 review what it staged, then land it the way that target lands anything.
 
 ```bash
-python tools/govkit/govkit.py check --target <path>
+python <gov>/<prefix>/govkit/govkit.py check --target <path>
 ```
 
 Read-only. Reports each kit as not landed, landed but inert, or adopted, and RUNS every declared
@@ -85,7 +86,7 @@ hole's discharge probe. Exit 0 from an adopter means "the adopter ran", never "t
 `check` reds on an undischarged hole regardless of what any adopter exited with.
 
 ```bash
-python tools/govkit/govkit.py update --target <path> [--to <rev>] [--write] [--write-withdrawals]
+python <gov>/<prefix>/govkit/govkit.py update --target <path> [--to <rev>] [--write] [--write-withdrawals]
 ```
 
 Moves an installed target forward to a newer gov commit. **Read-only by default**, because this

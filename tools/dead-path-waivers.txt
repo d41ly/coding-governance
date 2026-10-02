@@ -46,15 +46,15 @@
 
 WIRE-INTO-PROJECT.md	1	carries `<MEMORY_ROOT>/project/IN-FLIGHT.md` (the pointer stub) plus `<MEMORY_ROOT>/project/in-flight/<tag>.md`	migration: names the old pointer stub an adopter still holds
 WIRE-INTO-PROJECT.md	1	`<MEMORY_ROOT>/archive/ledger/<tag>.md`, and fold `IN-FLIGHT.md`'s protocol prose into	migration: the step that folds that file's prose away
-tools/memory-tree/check-memory-hygiene.sh	1	# machinery it used to also hold — MEMORY.md, IN-FLIGHT.md, in-flight/, journal/, project/README.md —	the gate BANS these names; it cannot refuse what it may not spell
-tools/memory-tree/check-memory-hygiene.sh	1	#     STATUS.md was RETIRED by TOOL-aRuledFrontispiece-7: one existed across the whole corpus, it	retirement note for the STATUS.md check, naming what it retired
-tools/memory-tree/check-memory-hygiene.test.sh	1	for p in MEMORY.md IN-FLIGHT.md README.md in-flight journal; do	fixture creates the banned names to prove the refusal fires
-tools/memory-tree/check-memory-hygiene.test.sh	1	{ printf '# ARCH status\n'; i=1; while [ "$i" -le 800 ]; do printf -- '- r%d\n' "$i"; i=$((i+1)); done; } > memory/builds/tLong/STATUS.md	fixture builds an over-long STATUS.md for the size arm
-tools/memory-tree/check-memory-hygiene.test.sh	1	chit 6 'memory/builds/tLong/STATUS.md'	positive arm: check 6 hits the banned STATUS.md
-tools/memory-tree/check-memory-hygiene.test.sh	1	cnot 6 'memory/builds/tLong/STATUS.md'	negative arm: check 6 does NOT hit it once retired
-tools/govkit/fixtures/incms-2cff5855.receipt.json	1	"tools/lexicon/lexicon-layer-waivers.txt",	frozen adopter receipt: records what a real install WROTE, so editing it is falsification
-tools/govkit/fixtures/incms-2cff5855.receipt.json	1	"scripts/lexicon/lexicon-layer-waivers.txt"	frozen adopter receipt: records what a real install WROTE, so editing it is falsification
-tools/govkit/fixtures/incms-2cff5855.receipt.json	1	"path": "scripts/lexicon/lexicon-layer-waivers.txt",	frozen adopter receipt: records what a real install WROTE, so editing it is falsification
-tools/govkit/fixtures/incms-2cff5855.receipt.json	1	"source": "tools/lexicon/lexicon-layer-waivers.txt"	frozen adopter receipt: records what a real install WROTE, so editing it is falsification
-tools/govkit/matrix.py	1	+ "[[files]]" + NL + 'include = ["moved.template.txt"]' + NL	fixture literal: the arm WRITES this name into a scratch descriptor it builds, so no reader follows it to a deleted file
-tools/govkit/matrix.py	1	_aged_rr = {"kept.txt": ROLE_V2, "moved.txt": ROLE_V2, "moved.template.txt": "<<BODY>>" + NL}	fixture literal: the same scratch name, as the aged receipt the role-move arm grades
+{prefix}/memory-tree/check-memory-hygiene.sh	1	# machinery it used to also hold — MEMORY.md, IN-FLIGHT.md, in-flight/, journal/, project/README.md —	the gate BANS these names; it cannot refuse what it may not spell
+{prefix}/memory-tree/check-memory-hygiene.sh	1	#     STATUS.md was RETIRED by TOOL-aRuledFrontispiece-7: one existed across the whole corpus, it	retirement note for the STATUS.md check, naming what it retired
+{prefix}/memory-tree/check-memory-hygiene.test.sh	1	for p in MEMORY.md IN-FLIGHT.md README.md in-flight journal; do	fixture creates the banned names to prove the refusal fires
+{prefix}/memory-tree/check-memory-hygiene.test.sh	1	{ printf '# ARCH status\n'; i=1; while [ "$i" -le 800 ]; do printf -- '- r%d\n' "$i"; i=$((i+1)); done; } > memory/builds/tLong/STATUS.md	fixture builds an over-long STATUS.md for the size arm
+{prefix}/memory-tree/check-memory-hygiene.test.sh	1	chit 6 'memory/builds/tLong/STATUS.md'	positive arm: check 6 hits the banned STATUS.md
+{prefix}/memory-tree/check-memory-hygiene.test.sh	1	cnot 6 'memory/builds/tLong/STATUS.md'	negative arm: check 6 does NOT hit it once retired
+{prefix}/govkit/fixtures/adopter-ic-2cff5855.receipt.json	1	"{prefix}/lexicon/lexicon-layer-waivers.txt",	frozen adopter receipt: records what a real install WROTE, so editing it is falsification
+{prefix}/govkit/fixtures/adopter-ic-2cff5855.receipt.json	1	"{prefix}/lexicon/lexicon-layer-waivers.txt"	frozen adopter receipt: records what a real install WROTE, its adopter-side paths spelled through {prefix} since TOOL-aRepatriatedFork-30 and resolved to the recorded target root on read
+{prefix}/govkit/fixtures/adopter-ic-2cff5855.receipt.json	1	"path": "{prefix}/lexicon/lexicon-layer-waivers.txt",	frozen adopter receipt: records what a real install WROTE, its adopter-side paths spelled through {prefix} since TOOL-aRepatriatedFork-30 and resolved to the recorded target root on read
+{prefix}/govkit/fixtures/adopter-ic-2cff5855.receipt.json	1	"source": "{prefix}/lexicon/lexicon-layer-waivers.txt"	frozen adopter receipt: records what a real install WROTE, so editing it is falsification
+{prefix}/govkit/matrix.py	1	+ "[[files]]" + NL + 'include = ["moved.template.txt"]' + NL	fixture literal: the arm WRITES this name into a scratch descriptor it builds, so no reader follows it to a deleted file
+{prefix}/govkit/matrix.py	1	_aged_rr = {"kept.txt": ROLE_V2, "moved.txt": ROLE_V2, "moved.template.txt": "<<BODY>>" + NL}	fixture literal: the same scratch name, as the aged receipt the role-move arm grades

@@ -7,25 +7,25 @@
 # (`DECISIONS.md`, `backlog/*.md`). Git execs a `merge.<driver>.driver` command line itself and never
 # goes through a gate runner, so nothing can substitute a resolved launcher into it — the launcher
 # has to be resolved HERE. Naming one literally is the Microsoft-Store-stub failure the resolver
-# exists for, and the invocation ban in `tools/lib/resolve-python.test.sh` refuses it repo-wide.
+# exists for, and the invocation ban in gov's lib-dir `resolve-python.test.sh` refuses it repo-wide.
 #
-# WHY IT IS NOT `tools/lib/pyrun.sh`. That shim SOURCES the canonical resolver from a sibling, which
+# WHY IT IS NOT gov's lib-dir `pyrun.sh`. That shim SOURCES the canonical resolver from a sibling, which
 # only works inside the governance repo. A copy-installed kit is a standalone directory: `../lib/`
 # does not exist in an adopting repo, so an adopter wiring the driver named a shim they never
 # received. Git then execs a command that cannot start, and a driver that never starts never writes
 # `%A` — so git reports CONFLICT and leaves the path holding OURS-ONLY content with NO conflict
 # markers. Silent content loss on an append-only record. This file closes that by travelling INSIDE
 # the kit and carrying the resolver inline, which is the established rule for every copy-installed
-# kit file; `tools/lib/` remains gov-internal and ships nothing.
+# kit file; gov's lib dir remains gov-internal and ships nothing.
 #
 # NO `cd`. Git invokes a merge driver with the cwd at the top of the working tree and hands it
 # `%O %A %B` relative to that, so moving the cwd can only break paths that are already correct.
 set -u
 HERE="$(cd "$(dirname "$0")" && pwd)"
 # The resolver, INLINE. This kit is copy-installed as a standalone directory, so `../lib/` does not
-# exist in an adopting repo. The block below is byte-identical to tools/lib/resolve-python.sh and
-# tools/lib/resolve-python.test.sh reds if any copy drifts.
-# >>> resolve_python — canonical copy: tools/lib/resolve-python.sh (byte-identical; gated)
+# exist in an adopting repo. The block below is byte-identical to resolve-python.sh in gov's lib dir,
+# and that dir's resolve-python.test.sh reds if any copy drifts.
+# >>> resolve_python — canonical copy: resolve-python.sh in gov's lib dir (byte-identical; gated)
 resolve_python() {
   # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
   # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes

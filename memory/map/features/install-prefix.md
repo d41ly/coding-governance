@@ -13,13 +13,15 @@ gate-legs = [
   "install-prefix self-test",
   "dead-path carriers (deleted files still named)",
   "dead-path carriers self-test",
+  "foreign-prefix parity (every self-test at three prefixes)",
 ]
 kits = []
 git-hooks = []
 workflow-scripts = []
 skill-engines = []
 rendered-skills = []
-gotcha-classes = ["inline-marker-breaks-a-line-continuation.md"]
+gotcha-classes = ["inline-marker-breaks-a-line-continuation.md",
+  "a-spelling-change-strands-its-readers.md"]
 guides = []
 backlog-shards = []
 lexicon-verbs = []
@@ -27,8 +29,7 @@ lexicon-verbs = []
 globs = [
   "tools/check-install-prefix.sh",
   "tools/check-install-prefix.test.sh",
-  "tools/install-prefix-waivers.txt",
-  "tools/install-prefix-carried.txt",
+  "tools/run-gates/foreign-prefix.gov.test.sh",
   "tools/check-dead-paths.sh",
   "tools/check-dead-paths.test.sh",
   "tools/dead-path-waivers.txt",
@@ -54,16 +55,47 @@ exited 0 over it. The check designed to catch exactly that — dead repo-path ci
 structurally blind, because it classified a token as a repo path only when its first segment was a
 tracked top-level directory, and at a prefixed install a bare kit name is not one.
 
-**`--offenders` keys every hit, and the carried arm's failing files per literal.** One
-`<path><TAB><kind><TAB><spelling>` per unwaived arm-1 hit (`root`, `marker`), stale waiver
-(`stale-waiver`) and carried literal of a ROSE, UNRECORDED or SWAPPED file (`carried`, or one
-`carried-slack` for a fall), from ONE scan `carried_rows` now aggregates. Its exit is `--check`'s;
-`--check` stops at arm 1, this mode does not, so a later offender cannot hide. `TOOL-dDerivedDocket-23`.
+## A pure ban, since TOOL-aRepatriatedFork-30
 
-## What the predicate can see, and what the population is (epoch 3)
+ONE predicate, zero tolerance, a hit named by `<path>:<line>`, and no remedy but deriving the path.
+The ban list, the waiver registry, both line markers, `--write-ratchet`, `--rebaseline` and the
+predicate epoch are gone: each was an exemption a pass could grant itself, and the drain units
+before this one emptied the first three before they were deleted. The old arms 1 and 3 folded into
+the counter, which already saw every spelling either of them could.
 
-Both arms read ONE extension class, `sh py js md json toml txt tsv conf example`, recorded as a
-predicate epoch in the ban list's own header. The last four joined at epoch 3
+The population is every tracked file under the gate's tool root, `skills/`, `.githooks/`, every
+`*.template.*` and the runbook, LESS a render: a tracked file matching a `rendered` template the
+registry ships, whole, with each `{{TOKEN}}` read as one line of any text. That is
+`TOOL-aRepatriatedFork-29` §8 F3 (a), and it is structural — the template stays graded, so a literal
+reaches a render only through a graded file, and a hand edit that breaks the match puts the render
+back. It left out seven files on its first run: the four workflow harnesses gov runs, the fixture
+playbook and its two fixture records.
+
+A fixture that must lay itself out at a foreign prefix names each kit through a variable holding
+that kit's DERIVED directory name — the one spelling the counter cannot see, and the gate's header
+says so. The frozen inCMS receipt spells its adopter-side paths through `{prefix}` too, resolved by
+FIELD on read: gov's root for a `source`, the recorded `target_tool_root` for a `path`.
+
+`foreign-prefix parity` is the held leg that proves the drain by EXECUTION, which the ban cannot. It
+moves gov's whole tool root with `git mv` in a scratch clone to `scripts/`, `vendor/gov/` and the repo
+root, re-spells gov's own declarations by the old root's path head at each move, and runs every
+population row there with `FOREIGN_PREFIX_PROBE=1`, under which each suite stops after its first
+subject-touching arm (`TOOL-aRepatriatedFork-52`). Its baseline is the bar's own gate-run record,
+never a calibrate, and it stops at the first red prefix. Its red control is a suite reading its gate through a literal gov prefix;
+a literal prefix used only inside a suite's own scratch fixture is self-consistent and passes at
+every host prefix, measured, so that spelling stays the ban's to grade.
+
+**`--offenders` keys every hit** (`TOOL-dDerivedDocket-23`, carried onto the ban at the reconcile of
+origin/main into aRepatriatedFork). One `<path><TAB>ban<TAB><spelling>` per counted spelling, a
+repeat inside one file carrying `#<k>`, and nothing else on stdout; its exit is `--check`'s. The
+keys leave the counter in one write at its end, so a refusal or a dead counter leaves no key, which
+the bar's red attribution reads as a probe that could not answer. dDerivedDocket's `root`,
+`carried` and `runtime` kinds named the three arms the ban folded into its one counter.
+
+## What the predicate can see (epochs 3 to 6)
+
+The counter reads ONE extension class, `sh py js md json toml txt tsv conf example`. The last four
+joined at epoch 3
 (`TOOL-cWidenedNet-1`): every kit keeps its declaration sidecars as `.txt` or `.tsv` and ships a
 `.conf.example`, so those were the extensions the real literals used and the only ones neither arm
 could see — including, until that unit, the two lines in the gate's own body that resolved its
@@ -77,11 +109,15 @@ excused was their USAGE HEADERS, and six shipped files were telling an adopter t
 resolves to nothing in their tree. They are now graded when a descriptor says they ship, and the
 fixture exemption moved to the LINE, where the distinction actually lives.
 
-Two exemptions, and they are not interchangeable. `gov:root-fixture — <reason>` on the offending line
-is the live one; a marker with no reason is a refusal, because an exemption that costs eleven
-characters is the self-service form the ban arm already converted away from. The `<path>:<line>`
-waiver registry is frozen at its existing rows and takes no new ones — it keys on position, so an
-edit above a waived line unpins it and reds a merge that touched nothing it guarded.
+Epoch 6 (`TOOL-aRepatriatedFork-46`) fixed two places the ban misjudged its own class. A quoted kit
+segment after a quoted literal and a comma counts only inside an open path-join call, so a kit id
+passed as an argument, a list member or a JSON key is no path. And only the render and prose tokens
+drain a kit segment: a kit name typed after `${PFX}` or any other brace counts. The same unit drained
+every kit segment under a derived base, so what the ban list holds now is the literal-prefix fixture
+class `TOOL-aRepatriatedFork-30` owns.
+
+The two exemptions this section used to describe — a `<path>:<line>` waiver registry frozen at its
+rows and a per-line fixture marker — were deleted with the ban list by `TOOL-aRepatriatedFork-30`.
 
 ## The other half of the class — a path dead because it was DELETED
 
@@ -91,11 +127,10 @@ deleted. They are one class — a sentence nothing executes — and they are two
 populations are derived from different sources and neither derivation can see the other's defect.
 
 The two have DIVERGED in one respect since `TOOL-dHonouredPark-3`, deliberately.
-`tools/dead-path-waivers.txt` is keyed by the carrier line's TEXT plus an occurrence ordinal;
-`tools/install-prefix-waivers.txt` is still `<path>:<line>`. Line keying cost this repo two cycles in
-one build — any insertion above a carrier unpinned its row — and the owner ruled ONE file. The
-sibling moves when its own keying has actually failed, not by association, so a reader finding the
-two grammars different is looking at a decision rather than at drift.
+`tools/dead-path-waivers.txt` is keyed by the carrier line's TEXT plus an occurrence ordinal; the
+install-prefix gate's registry stayed `<path>:<line>` until `TOOL-aRepatriatedFork-30` deleted it.
+Line keying cost this repo two cycles in one build — any insertion above a carrier unpinned its row
+— and the owner ruled ONE file rather than moving the sibling by association.
 
 MEASURED, which is why the second gate exists. The v3.0 charter convergence deleted two companion
 files and ELEVEN carriers kept naming them: the repo's front door, the charter every session reads,
@@ -134,18 +169,15 @@ covered the day it lands rather than the day someone remembers to add it to a li
 
 ## Gaps
 
-- **The waiver registry is shrink-only but not zero.** Eleven rows today, in two classes: dual-
-  spelling probes that keep working for the adopters this repo does not retrofit, and the
-  codebase-map `REGEN_CMD` legacy preserved for a pre-1.1 gate file that is project-owned and never
-  overwritten. Both are deliberate; neither is permanent by right. It takes no NEW rows: the live
-  exemption is the per-line marker, for the keying reason the section above gives.
-- **The ban list holds 137 rows and is a floor, not a goal.** `DEPL-dCarriedReceipt-15` owns
-  draining it. Epoch 3 made 31 more occurrences visible without fixing any of them, which is what a
-  definitional widening is for and is the whole reason `--rebaseline` is guarded by an epoch rather
-  than available on demand.
+- **A path assembled from two variables is invisible**, and the foreign-prefix fixtures use exactly
+  that spelling on purpose. A kit name typed into such a variable by hand, rather than derived from
+  a resolved directory, is a literal the counter cannot see; the review of a fixture is what holds it.
 - **The extension class still ends somewhere.** `.yml`, `.ini` and `.cfg` are outside it because
   this tree contains no such file, and an alternative that matches nothing asserts nothing. The day
-  one lands, the class moves and the epoch is spent again.
+  one lands, the class widens, and its new hits are drained before the widening lands — there is no
+  re-baseline to absorb them.
+- **The render rule proves a file is a render for SOME token values, not which ones.** The owning
+  kit's parity leg re-renders with the real values.
 - **The gate polices what this repo SHIPS, not what a target INSTALLS.** A target that hand-edits a
   path back is not caught here. That belongs to the deployer's `check`, which reads target state and
   has a receipt to compare against.
@@ -154,12 +186,13 @@ covered the day it lands rather than the day someone remembers to add it to a li
 
 ## Reuse affordance
 
-seam: check-dead-paths.sh — reuse whenever a repo must forbid naming something it DELETED: derive
-the needle set from `git log --diff-filter=D`, subtract every basename the tree still carries, and
-anchor the derivation on a frozen sentinel so an empty needle set reds instead of reporting clean.
-Extend by widening the haystack; the sentinel is what stops it going quietly vacuous.
+seam: check-dead-paths.sh — reuse whenever a repo must forbid naming something it DELETED or
+renamed away: derive the needle set from `git log --diff-filter=D` plus the source of every
+`--diff-filter=R` row outside `memory/`, subtract every basename the tree still carries, and anchor
+each half on its own frozen sentinel so an empty read reds instead of reporting clean. Extend by
+widening the haystack; the sentinels are what stop it going quietly vacuous.
 
 seam: check-install-prefix.sh — reuse whenever a repo must forbid a SPELLED path in files it ships
 rather than in files it runs: derive the population from `git ls-files`, derive the alternation from
-the tree, and put deliberate exceptions in a tracked shrink-only registry that reds when a row
-outlives the spelling it excused. Extend by widening the population, never by relaxing the predicate.
+the tree, leave out only a file that matches its declared template whole, and grant no exception at
+all. Extend by widening the population, never by relaxing the predicate.

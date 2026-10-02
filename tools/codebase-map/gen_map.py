@@ -44,7 +44,7 @@ def _diff_cmd(conf: dict[str, str]) -> str:
     legitimately spell it `uv run python …` — but only when the `…/map_diff.py` it names actually
     resolves from the repo root. A truthy-but-stale value used to beat the prefix-correct fallback,
     and the documented adoption path (`cp` the example, THEN run the adopter) is exactly the path
-    that leaves the example's `codebase-map/map_diff.py` in place: measured at a `tools/`-prefixed
+    that leaves the example's root-spelled map_diff path in place: measured at a `tools/`-prefixed
     install, the scaffolded README shipped a digest command naming a file that does not exist. A
     path the kit prints must resolve, so an unresolvable one is treated as absent."""
     configured = (conf.get("MAP_DIFF_CMD") or "").strip()

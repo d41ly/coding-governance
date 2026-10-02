@@ -1,6 +1,6 @@
 {
   "_README": [
-    "The graded question set for tools/memory-recall/check-recall.py. Each question is one a session",
+    "The graded question set for <prefix>/memory-recall/check-recall.py. Each question is one a session",
     "would ask BEFORE knowing the record exists, and `expected_ids` are the records that answer it.",
     "",
     "PROVENANCE RULE: every question's answer was determined by a person writing a record that states",

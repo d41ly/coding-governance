@@ -2,8 +2,8 @@
 # kit-dogfood-parity.test.sh — the two documents this kit SHIPS, RENDERED for this install, must
 # equal the two documents this repo RUNS ON. Exit 0 = in parity · 1 = drift · 2 = misconfigured.
 #
-#   bash tools/memory-tree/kit-dogfood-parity.test.sh            # assert parity
-#   bash tools/memory-tree/kit-dogfood-parity.test.sh --render   # rewrite the live copies from the templates
+#   bash <prefix>/memory-tree/kit-dogfood-parity.test.sh            # assert parity
+#   bash <prefix>/memory-tree/kit-dogfood-parity.test.sh --render   # rewrite the live copies from the templates
 #
 # WHY THIS EXISTS. `HYGIENE.template.md` and `SPEC-TEMPLATE.template.md` are what an adopting repo
 # installs; `<MEMORY_ROOT>/HYGIENE.md` and `<MEMORY_ROOT>/TEMPLATE-SPEC.md` are this repo's own
@@ -18,8 +18,8 @@
 # and `adopt-memory-tree.sh` substitutes both when it scaffolds. This gate performs the SAME
 # substitution and diffs the result, so what it grades is exactly what an adopter receives.
 #
-# It used to strip a literal `tools/` from the live copy with an unanchored global `sed`, which was
-# wrong twice over: it also stripped every `tools/` that was not a kit path (a future `src/tools/x`
+# It used to strip a literal `<prefix>/` from the live copy with an unanchored global `sed`, which was
+# wrong twice over: it also stripped every `<prefix>/` that was not a kit path (a future `src/<prefix>/x`
 # would have been silently mangled and reported as parity), and it left the SHIPPED templates
 # spelling a root install — so a kit installed under a prefix scaffolded an adopter's own committed
 # rule set with kit paths that resolve to nothing in their tree. Hygiene check 15, which exists to
@@ -49,7 +49,7 @@ HERE="$(cd "$(dirname "$0")" && pwd)"
 # strip across those flavors silently yields an ABSOLUTE path — which then substitutes nothing,
 # reports the whole tree as drift, and prints a "fix" command containing a drive letter.
 ROOT_N="$(cd "$ROOT" && pwd)"
-KITREL=${HERE#"$ROOT_N"/}               # e.g. tools/memory-tree
+KITREL=${HERE#"$ROOT_N"/}               # e.g. <prefix>/memory-tree
 [ "$KITREL" = "$HERE" ] && { echo "kit-parity: cannot locate this kit inside the repo ($HERE vs $ROOT_N)"; exit 2; }
 TOOLROOT=${KITREL%/*}; [ "$TOOLROOT" = "$KITREL" ] && TOOLROOT=""
 # The receipt answers through `derive_kit_paths` below, per row, exactly as `adopt-memory-tree.sh`
@@ -62,8 +62,8 @@ PAIRS="$M/HYGIENE.md:$KITREL/HYGIENE.template.md $M/TEMPLATE-SPEC.md:$KITREL/SPE
 
 # NOT "byte-identical IN INTENT" any more, which is what the previous version of this comment
 # claimed while the two spellings sat in two files with two variable names and nothing comparing
-# them. The block below is now a marked INLINE COPY of `tools/lib/render-doc.sh`, gated byte for
-# byte by the parity table in `tools/lib/resolve-python.test.sh` — the same mechanism `resolve_python`
+# them. The block below is now a marked INLINE COPY of `<prefix>/lib/render-doc.sh`, gated byte for
+# byte by the parity table in `<prefix>/lib/resolve-python.test.sh` — the same mechanism `resolve_python`
 # already runs, one more row. DEPL-dCarriedReceipt-15 S6.
 #
 # The block reads `KIT_REL` and `TOOL_ROOT`, which is the canonical spelling; this file derives the
@@ -74,7 +74,7 @@ TOOL_ROOT="$TOOLROOT"
 # The render resolves every sibling path the templates cite for THIS install, so the dogfood copy
 # is graded against what `adopt-memory-tree.sh --render` would write here. Both blocks below are
 # marked inline copies, gated byte for byte by the same parity table as `render_doc`.
-# >>> resolve_python — canonical copy: tools/lib/resolve-python.sh (byte-identical; gated)
+# >>> resolve_python — canonical copy: resolve-python.sh in gov's lib dir (byte-identical; gated)
 resolve_python() {
   # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
   # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
@@ -142,7 +142,7 @@ def resolve_kit_dir(home, anchor, here):
     """
     import json
     import pathlib
-    here = pathlib.Path(here).resolve()
+    here = pathlib.Path(here).absolute()  # never resolve(): a junction must not move it
     root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
     receipt = root / ".governance" / "install.json"
     try:
@@ -154,8 +154,8 @@ def resolve_kit_dir(home, anchor, here):
             continue
         if str(row.get("source") or "").split("/")[-2:] != [home, anchor]:
             continue
-        hit = (root / str(row["path"])).resolve()
-        if hit.is_file() and root in hit.parents:
+        hit = (root / str(row["path"])).absolute()
+        if hit.is_file() and root in hit.parents and ".." not in hit.parts:
             return hit.parent
     probes = (here / home, here.parent / home)
     for cand in probes:
@@ -302,7 +302,7 @@ if pfx and pfx != ".":
 # <<< derive_kit_paths
 KIT_PATHS=$(derive_kit_paths "$PY" "$KITREL" "$KITREL"/*.template.md) || { echo "kit-parity: could not resolve the sibling paths the templates cite"; exit 2; }
 
-# >>> render_doc — canonical copy: tools/lib/render-doc.sh (byte-identical; gated)
+# >>> render_doc — canonical copy: render-doc.sh in gov's lib dir (byte-identical; gated)
 render_doc() {
   # No `sed`: a substituted value carrying `|` closes the s||| delimiter and `&` re-inserts the
   # whole match. Parameter substitution has neither, PROVIDED the replacement is quoted — bash

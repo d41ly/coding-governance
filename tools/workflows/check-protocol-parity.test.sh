@@ -2,12 +2,12 @@
 # check-protocol-parity.test.sh — every artifact this kit RENDERS must equal its template rendered
 # for this install. Exit 0 = in parity · 1 = drift · 2 = misconfigured.
 #
-#   bash tools/workflows/check-protocol-parity.test.sh            # assert parity
-#   bash tools/workflows/check-protocol-parity.test.sh --render    # (re)write every rendered copy
+#   bash <prefix>/workflows/check-protocol-parity.test.sh            # assert parity
+#   bash <prefix>/workflows/check-protocol-parity.test.sh --render    # (re)write every rendered copy
 #   ... --tracked-only    with either mode: SKIP, by name, a pair whose live copy is absent AND
 #                         untracked, so the run refreshes what this install holds and creates nothing
 #
-# WHY THIS KIT OWNS IT. `tools/memory-tree/kit-dogfood-parity.test.sh` does exactly this job for the
+# WHY THIS KIT OWNS IT. `<prefix>/memory-tree/kit-dogfood-parity.test.sh` does exactly this job for the
 # memory-tree kit's two documents, and the obvious move was to add a third pair to its list. That
 # would hardcode a WORKFLOWS-kit path into the MEMORY-TREE kit's shipped gate: an adopter who installs
 # memory-tree alone would get a gate demanding a file their tree has no reason to contain, and the
@@ -84,7 +84,7 @@ MEMORY_ROOT=memory
 [ -f .memory-tree.conf ] && . ./.memory-tree.conf
 M="$MEMORY_ROOT"
 TOOLROOT=${KITREL%/*}; [ "$TOOLROOT" = "$KITREL" ] && TOOLROOT=""
-[ -z "$TOOLROOT" ] || TOOLROOT="$TOOLROOT/"   # "tools/" at a prefix, "" at a root install
+[ -z "$TOOLROOT" ] || TOOLROOT="$TOOLROOT/"   # "<prefix>/" at a prefix, "" at a root install
 
 # The pairs: `<live copy>|<template>`, both repo-relative. The render of each template is the live
 # copy's ENTIRE expected content.
@@ -112,6 +112,89 @@ case "$FANOUT_CAP" in
 esac
 
 check_tracked() { git ls-files --error-unmatch -- ":(literal)$1" >/dev/null 2>&1; }
+# >>> resolve_python — canonical copy: resolve-python.sh in gov's lib dir (byte-identical; gated)
+resolve_python() {
+  # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
+  # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
+  # the candidate and every consumer uses "$PY" as a single word (measured: exit 127).
+  _rp_tried=""
+  for _rp_c in "${1:-}" "${GOV_PYTHON:-}" python3 python py; do
+    [ -n "$_rp_c" ] || continue
+    _rp_tried="$_rp_tried $_rp_c"
+    if "$_rp_c" -c "import sys" >/dev/null 2>&1; then
+      printf '%s\n' "$_rp_c"
+      return 0
+    fi
+  done
+  {
+    echo "resolve_python: no usable python launcher. Each candidate was RUN with -c 'import sys' and"
+    echo "resolve_python: none exited 0 — being on PATH is not evidence (the Microsoft Store python3"
+    echo "resolve_python: stub answers \`command -v\` and exits 9009 without running anything)."
+    echo "resolve_python: tried:$_rp_tried"
+    if [ -n "${1:-}" ]; then
+      echo "resolve_python: the caller's override '$1' was tried FIRST and did not run."
+    fi
+    if [ -n "${GOV_PYTHON:-}" ]; then
+      echo "resolve_python: GOV_PYTHON is set to '$GOV_PYTHON' and did not run. An override that is"
+      echo "resolve_python: set and unusable is THIS failure, never a silent fall-through — the"
+      echo "resolve_python: operator believes they chose, and would not have."
+    fi
+  } >&2
+  return 1
+}
+# <<< resolve_python
+# The sibling-kit resolver (TOOL-aRepatriatedFork-2 S3), INLINED byte-identically from the
+# canonical copy named on its marker line and gated by the resolve-python self-test's parity
+# table. A shell consumer runs it with the python it already resolved, so the receipt rung is
+# read in Python and never parsed in bash. `resolve_kit_dir <python> <home> <anchor> <here>`
+# prints the kit directory REPO-RELATIVE, or the resolver's named refusal on stderr and exits 1.
+resolve_kit_dir() {
+  "$1" -c "$(cat <<'RKD'
+# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
+def resolve_kit_dir(home, anchor, here):
+    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
+
+    1. receipt — the `.governance/install.json` row whose `source` ends in <home>/<anchor> and
+       whose `path` exists inside this tree. The only record of a RENAMED kit dir: no probe finds
+       a memory-recall kit an adopter homed at `scripts/recall/`.
+    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
+    3. refuse — LookupError naming the three places looked; never a guessed prefix.
+    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
+    """
+    import json
+    import pathlib
+    here = pathlib.Path(here).absolute()  # never resolve(): a junction must not move it
+    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
+    receipt = root / ".governance" / "install.json"
+    try:
+        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("path"):
+            continue
+        if str(row.get("source") or "").split("/")[-2:] != [home, anchor]:
+            continue
+        hit = (root / str(row["path"])).absolute()
+        if hit.is_file() and root in hit.parents and ".." not in hit.parts:
+            return hit.parent
+    probes = (here / home, here.parent / home)
+    for cand in probes:
+        if (cand / anchor).is_file():
+            return cand
+    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
+        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
+# <<< resolve_kit_dir
+RKD
+)"'
+import sys
+try:
+    d = resolve_kit_dir(*sys.argv[1:4])
+except LookupError as e:
+    sys.exit(str(e))
+r = next((p for p in (d, *d.parents) if (p / ".git").exists()), d.anchor)
+print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
+}
 
 # MEMORY_TREE_DIR — the probe, then what an unanswered probe costs. The OVERRIDE is an environment
 # variable and it is a HAND-INSTALL channel only: the gate leg runs this file with no environment of
@@ -138,10 +221,14 @@ if [ -n "${MEMORY_TREE_DIR:-}" ]; then
     exit 2
   fi
 else
-  for _c in "${TOOLROOT}memory-tree/gotchas.py" "${TOOLROOT}gotchas.py"; do
+  # TOOL-aRepatriatedFork-46: the memory-tree kit is found through the sibling-kit resolver, which
+  # reads the install receipt before it probes beside this kit, rather than by typing its name.
+  _mt_dir=""
+  _mt_py=$(resolve_python 2>/dev/null) && _mt_dir=$(resolve_kit_dir "$_mt_py" memory-tree gotchas.py "$HERE" 2>/dev/null)
+  for _c in ${_mt_dir:+"$_mt_dir/gotchas.py"} "${TOOLROOT}gotchas.py"; do
     if check_tracked "$_c"; then MTD=$(dirname "$_c"); break; fi
   done
-  [ -n "$MTD" ] || MTD_SKIP="neither ${TOOLROOT}memory-tree/gotchas.py nor ${TOOLROOT}gotchas.py is tracked in this repo"
+  [ -n "$MTD" ] || MTD_SKIP="neither the memory-tree kit's gotchas.py (through the install receipt, or beside this kit) nor ${TOOLROOT}gotchas.py is tracked in this repo"
 fi
 # AN UNSUPPORTED CHARACTER IS A REFUSAL. Both values land inside a single-quoted JS string in the
 # harness and inside a shell command an agent runs, so a quote ends the string early and a space

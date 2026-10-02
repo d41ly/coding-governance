@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # End-to-end for adopt-unattended.sh — GATED ON EFFECTS, not on exit codes.
 #
-#   bash tools/unattended/adopt-unattended.test.sh    # "PASS (…assertions)" + exit 0 = good
+#   bash <prefix>/unattended/adopt-unattended.test.sh    # "PASS (…assertions)" + exit 0 = good
 #
 # WHY EFFECTS. The adopter WRITES. An exit-code test passes on a script that refused correctly and
 # on one that wrote into the wrong tree and then exited 2 for an unrelated reason. The charter
@@ -21,14 +21,116 @@ set -u
 # changed and passes. Measured three times -- ARCH-dReadoptedConvoy-6, ARCH-aThriftySentry-1 and
 # ARCH-aBridledVintage-5 each cleared the same class by hand, and the last found NINE fresh sites
 # arriving in one kit pull. The default keeps gov identical; an adopter sets it once.
-KIT_REL="${KIT_REL:-tools/unattended}"
 HERE="$(cd "$(dirname "$0")" && pwd)"
-if [ -f "$HERE/../lib/resolve-python.sh" ]; then
-  . "$HERE/../lib/resolve-python.sh"
-  TESTPY=$(resolve_python) || { echo "adopt-unattended.test: no usable python"; exit 2; }
-else
-  TESTPY=python3   # gov:literal-python — last-resort fallback when ../lib/ is absent (adopter layout)
-fi
+# >>> derive_self_rel — canonical copy: kit-rel.sh in gov's lib dir (byte-identical; gated)
+derive_self_rel() {
+  local _dsr_p _dsr_rel=""
+  _dsr_p=$(cd "$1" 2>/dev/null && pwd) || return 1
+  while [ ! -e "$_dsr_p/.git" ]; do
+    [ "$(dirname "$_dsr_p")" = "$_dsr_p" ] && return 1
+    _dsr_rel="$(basename "$_dsr_p")${_dsr_rel:+/$_dsr_rel}"
+    _dsr_p=$(dirname "$_dsr_p")
+  done
+  printf '%s\n' "$_dsr_rel"
+}
+# <<< derive_self_rel
+KIT_REL=$(derive_self_rel "$HERE") || { echo "adopt-unattended.test: not inside a git repository"; exit 2; }
+# ROOTPFX is a ROOT install's prefix, empty by definition: a fixture that models a root install,
+# or a key relative to the tool root, is spelled through it rather than bare (TOOL-aRepatriatedFork-28 S2).
+ROOTPFX=""
+# TOOL-aRepatriatedFork-46: a kit is named by the name its directory has in THIS install, never
+# as a literal segment: this suite's own from where it sits, a sibling's through the resolver,
+# which reads the install receipt first. A fixture mirrors that layout by the resolved NAME.
+# The resolver is carried INLINE; it was sourced from a probe of the library directory beside
+# this kit, which ships nowhere.
+# >>> resolve_python — canonical copy: resolve-python.sh in gov's lib dir (byte-identical; gated)
+resolve_python() {
+  # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
+  # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
+  # the candidate and every consumer uses "$PY" as a single word (measured: exit 127).
+  _rp_tried=""
+  for _rp_c in "${1:-}" "${GOV_PYTHON:-}" python3 python py; do
+    [ -n "$_rp_c" ] || continue
+    _rp_tried="$_rp_tried $_rp_c"
+    if "$_rp_c" -c "import sys" >/dev/null 2>&1; then
+      printf '%s\n' "$_rp_c"
+      return 0
+    fi
+  done
+  {
+    echo "resolve_python: no usable python launcher. Each candidate was RUN with -c 'import sys' and"
+    echo "resolve_python: none exited 0 — being on PATH is not evidence (the Microsoft Store python3"
+    echo "resolve_python: stub answers \`command -v\` and exits 9009 without running anything)."
+    echo "resolve_python: tried:$_rp_tried"
+    if [ -n "${1:-}" ]; then
+      echo "resolve_python: the caller's override '$1' was tried FIRST and did not run."
+    fi
+    if [ -n "${GOV_PYTHON:-}" ]; then
+      echo "resolve_python: GOV_PYTHON is set to '$GOV_PYTHON' and did not run. An override that is"
+      echo "resolve_python: set and unusable is THIS failure, never a silent fall-through — the"
+      echo "resolve_python: operator believes they chose, and would not have."
+    fi
+  } >&2
+  return 1
+}
+# <<< resolve_python
+# The sibling-kit resolver (TOOL-aRepatriatedFork-2 S3), INLINED byte-identically from the
+# canonical copy named on its marker line and gated by the resolve-python self-test's parity
+# table. A shell consumer runs it with the python it already resolved, so the receipt rung is
+# read in Python and never parsed in bash. `resolve_kit_dir <python> <home> <anchor> <here>`
+# prints the kit directory REPO-RELATIVE, or the resolver's named refusal on stderr and exits 1.
+resolve_kit_dir() {
+  "$1" -c "$(cat <<'RKD'
+# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
+def resolve_kit_dir(home, anchor, here):
+    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
+
+    1. receipt — the `.governance/install.json` row whose `source` ends in <home>/<anchor> and
+       whose `path` exists inside this tree. The only record of a RENAMED kit dir: no probe finds
+       a memory-recall kit an adopter homed at `scripts/recall/`.
+    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
+    3. refuse — LookupError naming the three places looked; never a guessed prefix.
+    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
+    """
+    import json
+    import pathlib
+    here = pathlib.Path(here).absolute()  # never resolve(): a junction must not move it
+    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
+    receipt = root / ".governance" / "install.json"
+    try:
+        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("path"):
+            continue
+        if str(row.get("source") or "").split("/")[-2:] != [home, anchor]:
+            continue
+        hit = (root / str(row["path"])).absolute()
+        if hit.is_file() and root in hit.parents and ".." not in hit.parts:
+            return hit.parent
+    probes = (here / home, here.parent / home)
+    for cand in probes:
+        if (cand / anchor).is_file():
+            return cand
+    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
+        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
+# <<< resolve_kit_dir
+RKD
+)"'
+import sys
+try:
+    d = resolve_kit_dir(*sys.argv[1:4])
+except LookupError as e:
+    sys.exit(str(e))
+r = next((p for p in (d, *d.parents) if (p / ".git").exists()), d.anchor)
+print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
+}
+TESTPY=$(resolve_python) || { echo "adopt-unattended.test: no usable python"; exit 2; }
+MT_KIT_DIR=$(resolve_kit_dir "$TESTPY" memory-tree gotchas.py "$HERE") || exit 2
+MT_KIT="${MT_KIT_DIR##*/}"
+RUN_GATES_DIR=$(resolve_kit_dir "$TESTPY" run-gates run-gates.sh "$HERE") || exit 2
+RUN_GATES="${RUN_GATES_DIR##*/}"
 TMP=$(mktemp -d)
 trap 'rm -rf "$TMP"' EXIT
 st=0; n=0
@@ -48,8 +150,15 @@ seed() { # dir  -> a git repo carrying the kit, a conf, and a TRACKED memory-tre
   # The Skill's bug-class checklist names the memory-tree kit's `gotchas.py`, and the adopter PROBES
   # the tracked tree for it and refuses when it finds none. Seeded NESTED, the default layout; the
   # flat, absent and override arms below each move it deliberately.
-  mkdir -p "$1/${TR_T}memory-tree" && printf '# a stub checklist\n' > "$1/${TR_T}memory-tree/gotchas.py"
-  ( cd "$1" && git add -- "${TR_T}memory-tree/gotchas.py" )
+  # The memory-tree kit's name in THIS install. stall-recorder and stop-guard borrow this function
+  # by eval and never run the prologue that sets MT_KIT, so under `set -u` the seed died silently.
+  local _mt="${MT_KIT:-}"
+  if [ -z "$_mt" ]; then
+    _mt=$(resolve_kit_dir "$TESTPY" memory-tree gotchas.py "$HERE") || return 2
+    _mt=${_mt##*/}
+  fi
+  mkdir -p "$1/${TR_T}${_mt}" && printf '# a stub checklist\n' > "$1/${TR_T}${_mt}/gotchas.py"
+  ( cd "$1" && git add -- "${TR_T}${_mt}/gotchas.py" )
   # BOTH SIDES ADDED A FILE HERE: main the playbook template, this branch the kit library. A fixture
   # missing either materialises a kit that cannot run, so the union is the only correct resolution.
   # EVERY TEMPLATE THE KIT SHIPS, BY GLOB. This line named three and the adopter grew two more — the
@@ -85,7 +194,7 @@ seed() { # dir  -> a git repo carrying the kit, a conf, and a TRACKED memory-tre
   printf '}}\n' >> "$1/.claude/settings.json"
   cat > "$1/.unattended.conf" <<'EOF'
 MEMORY_ROOT=memory
-LANDER="bash tools/land.sh"
+LANDER="bash bin/land.sh"
 BYPASS_BAN="--no-verify"
 GATE_CMD="true"
 WIRING_CHECK="true"
@@ -128,6 +237,8 @@ unset GOV_SETTINGS_JSON
 A="$TMP/host"; seed "$A"
 out=$( cd "$A" && bash "$KIT_REL"/adopt-unattended.sh 2>&1 )
 present "$A/.claude/skills/unattended/SKILL.md" "arm 1 rendered the Skill"
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${st:-0}" = 0 ] && echo "PASS (${n:-1} assertions)" || echo "FAIL (${n:-1} assertions)"; [ "${st:-0}" = 0 ] && exit 0; exit 1; fi
 # check 10 of the gate compares the SHIPPED protocol against the installed copy and fails hard
 # when either half is missing, so before this the kit shipped a gate no adopter could satisfy.
 present "$A/memory/guides/UNATTENDED-PROTOCOL.md" "arm 1 installed the protocol's live half"
@@ -137,9 +248,9 @@ hit "$(cat "$A/memory/guides/UNATTENDED-PROTOCOL.md")" "The run is authorized by
 present "$A/memory/guides/PLAYBOOK-TEMPLATE.md" "arm 1 installed the playbook template"
 hit "$(cat "$A/memory/guides/PLAYBOOK-TEMPLATE.md")" "PROHIBITED OUTPUT unless it is a tracked"
 hit "$(cat "$A/.claude/skills/unattended/SKILL.md")" "TheCreateCall"
-hit "$(cat "$A/.claude/skills/unattended/SKILL.md")" "bash tools/land.sh"
+hit "$(cat "$A/.claude/skills/unattended/SKILL.md")" "bash bin/land.sh"
 hit "$(cat "$A/.claude/skills/unattended/SKILL.md")" "bash "$KIT_REL"/unattended.sh --preflight"
-hit "$(cat "$A/.claude/skills/unattended/SKILL.md")" "python ${TR_T}memory-tree/gotchas.py --for-diff HEAD~1..HEAD"
+hit "$(cat "$A/.claude/skills/unattended/SKILL.md")" "python ${TR_T}${MT_KIT}/gotchas.py --for-diff HEAD~1..HEAD"
 same "arm 1 left no placeholder" \
   "$(grep -cE '\{\{[A-Z_]+\}\}' "$A/.claude/skills/unattended/SKILL.md" || true)" "0"
 ( cd "$A" && bash "$KIT_REL"/adopt-unattended.sh --check >/dev/null 2>&1 )
@@ -264,7 +375,7 @@ H="$TMP/hostile"; seed "$H"
 # exists to catch. It did, on the first attempt at writing this arm.
 grep -v -e '^LANDER=' -e '^KEEPALIVE_INTERVAL=' "$H/.unattended.conf" > "$H/.conf.tmp"
 cat >> "$H/.conf.tmp" <<'HOSTILEEOF'
-LANDER="bash tools/land.sh | tee log & echo done \\ok"
+LANDER="bash bin/land.sh | tee log & echo done \\ok"
 KEEPALIVE_INTERVAL="every 10 min | offset 3 & then \\wait"
 HOSTILEEOF
 mv "$H/.conf.tmp" "$H/.unattended.conf"
@@ -272,7 +383,7 @@ out=$(cd "$H" && bash "$KIT_REL"/adopt-unattended.sh 2>&1); rc=$?
 same "a hostile conf still adopts" "$rc" "0"
 SK="$H/.claude/skills/unattended/SKILL.md"
 present "$SK" "the Skill is written for a hostile conf"
-hit "$(cat "$SK")" 'bash tools/land.sh | tee log & echo done \ok'
+hit "$(cat "$SK")" 'bash bin/land.sh | tee log & echo done \ok'
 hit "$(cat "$SK")" 'every 10 min | offset 3 & then \wait'
 # NEGATIVE control: a render that silently drops a substitution leaves the token standing, and would
 # otherwise satisfy every assertion above by writing nothing useful.
@@ -371,8 +482,8 @@ absent "$A/.claude/skills/unattended/SKILL.md" "arm 2 wrote into the KIT OWNER's
 # ---- commands in the rendered Skill, so this is not cosmetic: the render would emit a command that
 # ---- word-splits. Refusing beats emitting a Skill that misfires at the first verb.
 C="$TMP/spaced"; seed "$C"
-mkdir -p "$C/my tools" && cp -r "$C/$KIT_REL" "$C/my tools/unattended"
-out=$( cd "$C" && bash "$C/my tools/unattended/adopt-unattended.sh" 2>&1 ); rc=$?
+mkdir -p "$C/my kits" && cp -r "$C/$KIT_REL" "$C/my kits/${KIT_REL##*/}"
+out=$( cd "$C" && bash "$C/my kits/${KIT_REL##*/}/adopt-unattended.sh" 2>&1 ); rc=$?
 hit "$out" "the kit path contains whitespace and is interpolated into shell commands"
 same "arm 3 refuses" "$rc" "2"
 absent "$C/.claude/skills/unattended/SKILL.md" "arm 3 wrote despite refusing"
@@ -467,20 +578,22 @@ absent "$G/.claude/skills/unattended/SKILL.md" "arm 6 wrote despite a missing te
 # ---- so every flat adopter received a command naming a file their tree does not have, and the
 # ---- nested seed above passed by coincidence because it IS this repo's layout.
 H7="$TMP/flatmt"; seed "$H7"
-( cd "$H7" && git rm -q --cached -- "${TR_T}memory-tree/gotchas.py" ) && rm -rf "$H7/${TR_T}memory-tree"
+( cd "$H7" && git rm -q --cached -- "${TR_T}${MT_KIT}/gotchas.py" ) && rm -rf "$H7/${TR_T}memory-tree"
 printf '# a stub checklist\n' > "$H7/${TR_T}gotchas.py" && ( cd "$H7" && git add -- "${TR_T}gotchas.py" )
 out=$( cd "$H7" && bash "$KIT_REL"/adopt-unattended.sh 2>&1 ); rc=$?
 same "arm 7 a flat memory-tree adopts" "$rc" "0"
-hit "$(cat "$H7/.claude/skills/unattended/SKILL.md")" "python ${TR_T}gotchas.py --for-diff HEAD~1..HEAD"
+# At a root install the flat checklist's directory is `.`, which the adopter renders as `./`
+# (VERIFYING repair: an empty head left nothing to tell the flat render from a bare word).
+hit "$(cat "$H7/.claude/skills/unattended/SKILL.md")" "python ${TR_T:-./}gotchas.py --for-diff HEAD~1..HEAD"
 same "arm 7 the flat Skill names no nested checklist path" \
-  "$(grep -c "memory-tree/gotchas.py" "$H7/.claude/skills/unattended/SKILL.md" || true)" "0"  # gov:root-fixture — the nested spelling this arm asserts the flat render does NOT contain
+  "$(grep -c "${ROOTPFX}${MT_KIT}/gotchas.py" "$H7/.claude/skills/unattended/SKILL.md" || true)" "0"   # the nested spelling the flat render must NOT contain
 ( cd "$H7" && bash "$KIT_REL"/adopt-unattended.sh --check >/dev/null 2>&1 )
 same "arm 7 --check agrees with the flat render" "$?" "0"
 
 # ---- ARM 8: NO checklist script anywhere the probe looks. A REFUSAL naming the override, and no
 # ---- Skill: a guessed path renders a command that runs nothing and reads as a clean checklist.
 H8="$TMP/nomt"; seed "$H8"
-( cd "$H8" && git rm -q --cached -- "${TR_T}memory-tree/gotchas.py" ) && rm -rf "$H8/${TR_T}memory-tree"
+( cd "$H8" && git rm -q --cached -- "${TR_T}${MT_KIT}/gotchas.py" ) && rm -rf "$H8/${TR_T}memory-tree"
 out=$( cd "$H8" && bash "$KIT_REL"/adopt-unattended.sh 2>&1 ); rc=$?
 same "arm 8 no gotchas.py refuses at exit 2" "$rc" "2"
 hit "$out" "set MEMORY_TREE_DIR="
@@ -489,7 +602,7 @@ absent "$H8/.claude/skills/unattended/SKILL.md" "arm 8 wrote a Skill despite ref
 # ---- ARM 9: the OVERRIDE, both directions. Honoured when it names a TRACKED script, in both modes,
 # ---- because the gate leg re-derives on every run; refused when it names nothing git tracks.
 H9="$TMP/overridemt"; seed "$H9"
-( cd "$H9" && git rm -q --cached -- "${TR_T}memory-tree/gotchas.py" ) && rm -rf "$H9/${TR_T}memory-tree"
+( cd "$H9" && git rm -q --cached -- "${TR_T}${MT_KIT}/gotchas.py" ) && rm -rf "$H9/${TR_T}memory-tree"
 mkdir -p "$H9/vendor/mt" && printf '# a stub checklist\n' > "$H9/vendor/mt/gotchas.py" && ( cd "$H9" && git add -- vendor/mt/gotchas.py )
 out=$( cd "$H9" && MEMORY_TREE_DIR=vendor/mt bash "$KIT_REL"/adopt-unattended.sh 2>&1 ); rc=$?
 same "arm 9 the override adopts" "$rc" "0"
@@ -509,23 +622,40 @@ same "arm 9 a tracked override holding a space refuses at exit 2" "$rc" "2"
 hit "$out" "holds a character outside"
 absent "$H9c/.claude/skills/unattended/SKILL.md" "arm 9 wrote a Skill for an override holding a space"
 
-# ---- arm 10 (TOOL-dDerivedDocket-5): the DURABLE restart carrier, on with no carrier declared, and
+# ---- ARM 10 (TOOL-aRepatriatedFork-24 AC4): the shipped example, copied as its header says, is
+# ---- STAMPED with this install's own paths. It spelled the authoring repo's, which resolved to nothing
+# ---- at any other prefix. `--check` first, because it must refuse the unstamped conf and write nothing.
+S10="$TMP/stamp"; seed "$S10"; cp "$HERE/.unattended.conf.example" "$S10/.unattended.conf"
+out=$( cd "$S10" && bash "$KIT_REL"/adopt-unattended.sh --check 2>&1 ); rc=$?
+same "arm 10 --check refuses a conf still carrying a path token" "$rc" "1"
+hit "$out" "still carries a path token this adopter stamps"
+hit "$(grep -c '{{TOOL_ROOT}}' "$S10/.unattended.conf")" "3"
+( cd "$S10" && bash "$KIT_REL"/adopt-unattended.sh >/dev/null 2>&1 )
+same "arm 10 LANDER is stamped at this tool root" "$(grep '^LANDER=' "$S10/.unattended.conf")" "LANDER=\"bash ${TR_T}push-main.sh\""
+same "arm 10 GATE_CMD is stamped at this tool root" "$(grep '^GATE_CMD=' "$S10/.unattended.conf")" "GATE_CMD=\"bash ${TR_T}${RUN_GATES}/run-gates.sh\""
+same "arm 10 WIRING_CHECK is stamped at this tool root" "$(grep '^WIRING_CHECK=' "$S10/.unattended.conf")" "WIRING_CHECK=\"bash ${TR_T}check-wiring.sh --check\""
+same "arm 10 the generator is stamped at the probed memory-tree dir" \
+  "$(grep '^GENERATED_INDEXES=' "$S10/.unattended.conf")" \
+  "GENERATED_INDEXES=\"memory/LIVE.md:${TR_T}${MT_KIT}/gen_build_index.py memory/ledger:${TR_T}${MT_KIT}/gen_build_index.py\""
+same "arm 10 no path token survives the stamp" "$(grep -cE '[{][{](TOOL_ROOT|MEMORY_TREE_DIR)[}][}]' "$S10/.unattended.conf")" "0"
+
+# ---- arm 11 (TOOL-dDerivedDocket-5): the DURABLE restart carrier, on with no carrier declared, and
 # ---- off. The on-with-no-carrier case is the whole rollout: an adopter upgrading with an existing
 # ---- conf takes the kit default `on`, declares nothing, and has to meet a RED here rather than
 # ---- learn at its first hold that nothing will restart it.
 H10="$TMP/resume-on-nocarrier"; seed "$H10"
 sed -i '/^RESUME_SCHEDULE_CREATE=/d; /^RESUME_SCHEDULE_DELETE=/d' "$H10/.unattended.conf"
 out=$( cd "$H10" && bash "$KIT_REL"/adopt-unattended.sh 2>&1 ); rc=$?
-same "arm 10 an on conf with no carrier refuses to install a placeholder-carrying Skill" "$rc" "1"
+same "arm 11 an on conf with no carrier refuses to install a placeholder-carrying Skill" "$rc" "1"
 hit "$out" "{{RESUME_SCHEDULE_CREATE}}"
-absent "$H10/.claude/skills/unattended/SKILL.md" "arm 10 installed a Skill naming an unfilled carrier"
+absent "$H10/.claude/skills/unattended/SKILL.md" "arm 11 installed a Skill naming an unfilled carrier"
 # ...and the SAME conf under an already-installed Skill - the upgrade shape - reds under --check on
 # the render it just made, rather than on the absence of a file.
 mkdir -p "$H10/.claude/skills/unattended"
 sed -e 's/{{RESUME_SCHEDULE_CREATE}}/PreUpgradeCreate/g' -e 's/{{RESUME_SCHEDULE_DELETE}}/PreUpgradeDelete/g' \
     "$H10/$KIT_REL/SKILL.template.md" > "$H10/.claude/skills/unattended/SKILL.md"
 out=$( cd "$H10" && bash "$KIT_REL"/adopt-unattended.sh --check 2>&1 ); rc=$?
-same "arm 10 --check refuses on the placeholder in the render it just made" "$rc" "1"
+same "arm 11 --check refuses on the placeholder in the render it just made" "$rc" "1"
 hit "$out" "the render this check just made carries an unfilled placeholder"
 hit "$out" "{{RESUME_SCHEDULE_CREATE}}"
 # ---- ...and OFF renders one FIXED literal in place of both tool names, so a project that opted out
@@ -535,13 +665,13 @@ H10b="$TMP/resume-off"; seed "$H10b"
 sed -i '/^RESUME_SCHEDULE_CREATE=/d; /^RESUME_SCHEDULE_DELETE=/d; s/^RESUME_SCHEDULE=.*/RESUME_SCHEDULE="off"/' \
     "$H10b/.unattended.conf"
 ( cd "$H10b" && bash "$KIT_REL"/adopt-unattended.sh >/dev/null 2>&1 )
-present "$H10b/.claude/skills/unattended/SKILL.md" "arm 10 the off render was not installed"
+present "$H10b/.claude/skills/unattended/SKILL.md" "arm 11 the off render was not installed"
 ( cd "$H10b" && bash "$KIT_REL"/adopt-unattended.sh --check >/dev/null 2>&1 )
-same "arm 10 --check agrees with the off render" "$?" "0"
+same "arm 11 --check agrees with the off render" "$?" "0"
 n=$((n+1)); grep -qF 'not scheduled: RESUME_SCHEDULE is off' "$H10b/.claude/skills/unattended/SKILL.md" \
-  || { echo "FAIL arm 10 the off render carries no not-scheduled literal"; st=1; }
+  || { echo "FAIL arm 11 the off render carries no not-scheduled literal"; st=1; }
 n=$((n+1)); grep -qF 'RESUME_SCHEDULE_CREATE' "$H10b/.claude/skills/unattended/SKILL.md" \
-  && { echo "FAIL arm 10 the off render still names the carrier key"; st=1; }
+  && { echo "FAIL arm 11 the off render still names the carrier key"; st=1; }
 
 # FLOOR_ASSERTIONS — a shrink-only pin on the EXECUTED count, not on the written one. Authored from a
 # static count of the assertion sites in this file — `grep -cE '^\s*(same|hit|miss|absent|present) '`

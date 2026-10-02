@@ -12,8 +12,8 @@
 set -u
 # THE SUBJECT IS FOUND FROM THIS FILE'S OWN LOCATION (TOOL-aRepatriatedFork-8 S6). This suite ships
 # beside its lander to whatever prefix an adopter installs the kit at (`scripts/` at adopter ic), and it
-# used to spell `tools/` for both, so an adopter had to fork it to run it. KIT_REL is where the pair
-# sits relative to the root, as git reports it: `tools/` here, empty at a root install.
+# used to spell `<prefix>/` for both, so an adopter had to fork it to run it. KIT_REL is where the pair
+# sits relative to the root, as git reports it: `<prefix>/` here, empty at a root install.
 HERE=$(cd "$(dirname "$0")" && pwd)
 SRC=$(git -C "$HERE" rev-parse --show-toplevel 2>/dev/null) || { echo "not a git repo"; exit 2; }
 KIT_REL=$(git -C "$HERE" rev-parse --show-prefix 2>/dev/null)
@@ -72,6 +72,8 @@ read_refusal_token() { [ -s "$gitdir/pre-push-refusal" ] && cut -f1 < "$gitdir/p
 # 1 — hook refuses a raw default-branch push (no marker)
 git commit -q --allow-empty -m c1
 if git push -q origin main 2>/dev/null; then bad "1 raw push must be refused (no marker)"; else ok "1 raw push refused (no marker)"; fi
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${fail:-0}" = 0 ] && echo "PASS (${probe_n:-1} assertions)" || echo "FAIL (${probe_n:-1} assertions)"; [ "${fail:-0}" = 0 ] && exit 0; exit 1; fi
 # 1b — and records WHY as a machine token the lander reads, not as prose (TOOL-aRepatriatedFork-8 S2).
 [ "$(read_refusal_token)" = raw-push ] && ok "1b the refusal is recorded as the token raw-push" || bad "1b refusal token should be raw-push, got '$(read_refusal_token)'"
 

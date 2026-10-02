@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# check-template-size.test.sh — self-test for tools/check-template-size.sh.
+# check-template-size.test.sh — self-test for <prefix>/check-template-size.sh.
 #
-#   bash tools/check-template-size.test.sh
+#   bash <prefix>/check-template-size.test.sh
 #
 # Exit 0 = every arm held · 1 = an arm failed · 2 = the harness could not set up.
 #
@@ -24,12 +24,30 @@
 #    round-trip is green whatever the key is: unit 1 shipped machine-ABSOLUTE keys through a fully
 #    green gate on exactly that path.
 #  * Fixtures are batched into one scratch dir. Nothing writes into the real tree — in particular no
-#    arm may touch the tracked tools/template-size-highwater.txt.
+#    arm may touch the tracked <prefix>/template-size-highwater.txt.
 #  * PASS prints after the LAST arm.
 set -u
+HERE="$(cd "$(dirname "$0")" && pwd)"
+# >>> derive_self_rel — canonical copy: kit-rel.sh in gov's lib dir (byte-identical; gated)
+derive_self_rel() {
+  local _dsr_p _dsr_rel=""
+  _dsr_p=$(cd "$1" 2>/dev/null && pwd) || return 1
+  while [ ! -e "$_dsr_p/.git" ]; do
+    [ "$(dirname "$_dsr_p")" = "$_dsr_p" ] && return 1
+    _dsr_rel="$(basename "$_dsr_p")${_dsr_rel:+/$_dsr_rel}"
+    _dsr_p=$(dirname "$_dsr_p")
+  done
+  printf '%s\n' "$_dsr_rel"
+}
+# <<< derive_self_rel
+KIT_REL=$(derive_self_rel "$HERE") || { echo "check-template-size.test: not inside a git repository"; exit 2; }
+# PFX is the install prefix WITH its trailing slash, derived from where this file sits and empty
+# at a root install: every fixture and host path below is spelled through it, never through a
+# literal prefix (TOOL-aRepatriatedFork-28).
+PFX="${KIT_REL:+$KIT_REL/}"
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
-GATE="tools/check-template-size.sh"
+GATE="${PFX}check-template-size.sh"
 TEMPLATE="coding-governance-agents.template.md"
 fails=0
 TMP=$(mktemp -d) || exit 2
@@ -87,6 +105,8 @@ else
   say_fail "A0 the shipped ceiling is $EXPECT_LIMIT" \
     "the gate reports $LIMIT — the ceiling moved and no other arm in this file would notice"
 fi
+# FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
+if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${fails:-0}" = 0 ] && echo "PASS (${probe_n:-1} assertions)" || echo "FAIL (${probe_n:-1} assertions)"; [ "${fails:-0}" = 0 ] && exit 0; exit 1; fi
 
 # --- A14-A18 · the four-layer resolution, each arm pinning WHICH layer won -----------------------
 # Against a SCRATCH limits file via the 4th positional, never the tracked one: `run-gates.sh` runs
@@ -253,11 +273,11 @@ else
 fi
 
 # --- the tracked record was never touched --------------------------------------------------------------
-if git diff --quiet -- tools/template-size-highwater.txt 2>/dev/null; then
+if git diff --quiet -- ${PFX}template-size-highwater.txt 2>/dev/null; then
   say_ok "harness left the tracked high-water record unmodified"
 else
   say_fail "harness left the tracked high-water record unmodified" \
-    "tools/template-size-highwater.txt differs from the index — an arm wrote into the real tree"
+    "${PFX}template-size-highwater.txt differs from the index — an arm wrote into the real tree"
 fi
 
 if [ "$fails" -ne 0 ]; then

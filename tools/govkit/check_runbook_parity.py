@@ -35,7 +35,9 @@ except ModuleNotFoundError:  # pragma: no cover
     raise SystemExit(2)
 
 HERE = pathlib.Path(__file__).resolve().parent
-ROOT = HERE.parents[1]
+# The checkout root: the first directory above this file holding a `.git` entry, not a fixed
+# number of parents, which is right at one install prefix only (TOOL-aRepatriatedFork-29 S1).
+ROOT = next((p for p in HERE.parents if (p / ".git").exists()), HERE.parents[1])
 RUNBOOK = ROOT / "WIRE-INTO-PROJECT.md"
 ANCHOR = re.compile(r"<!--\s*govkit:entry\s+([a-z0-9-]+)\s*-->")
 
@@ -59,7 +61,7 @@ PROBLEM_PIN = 18
 
 
 def main() -> int:
-    reg = tomllib.loads((ROOT / "tools" / "govkit" / "registry.toml").read_text(encoding="utf-8"))
+    reg = tomllib.loads((HERE / "registry.toml").read_text(encoding="utf-8"))
     entries = {e["id"] for e in reg.get("entry", [])}
     exempt = {x.get("id") for x in reg.get("runbook_exempt", []) if x.get("id")}
     for x in reg.get("runbook_exempt", []):

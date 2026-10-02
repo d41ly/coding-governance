@@ -1,7 +1,7 @@
-# kit.toml — this entry, declared as data. Read by tools/govkit/. Contract: the deployer unit's spec under memory/builds/aSealedCaravan/spec/.
+# kit.toml — this entry, declared as data. Read by <prefix>/govkit/. Contract: the deployer unit's spec under memory/builds/aSealedCaravan/spec/.
 
 id = "agent-cap"
-home = "tools/hooks"
+home = "hooks"
 scope = "repo"
 version_from = { file = "agent-cap.js", pattern = "KIT_AGENT_CAP_VERSION = " }
 requires = ["settings-merge"]
@@ -32,7 +32,7 @@ role = "project-owned"
 
 # The descriptor travels with the kit, as it does for every entry whose include is `**`. Without
 # this rule it was the ONE file under a non-flat home that no rule claimed — invisible to the
-# surface predicate, which is depth-1 and sees only `tools/hooks`.
+# surface predicate, which is depth-1 and sees only `<prefix>/hooks`.
 [[files]]
 include = ["kit.toml"]
 role = "engine"

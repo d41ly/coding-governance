@@ -79,26 +79,75 @@ fi
 # .githooks/ per the runbook but installs its kits at another prefix got a pre-commit where all three
 # legs skipped and reported success. Finding nothing is a real skip; finding it somewhere else and
 # doing nothing is not.
-gate_at() { # $1... candidate paths, most-likely first
-  for c in "$@"; do [ -f "$c" ] && { echo "$c"; return 0; }; done
+#
+# THE LADDER — TOOL-aRepatriatedFork-24 S1. The fix above was a candidate LIST, gov's prefix then the
+# root, so `scripts/` or `vendor/gov/` still skipped every leg silently. Each gate is now resolved by
+# the ladder `.githooks/pre-push` walks, and `check-wiring.sh` before both:
+#   1. the install receipt: the `.governance/install.json` row whose source ends in <kit>/<file>, the
+#      only record of a prefix nobody could guess;
+#   2. `resolve_kit_dir`'s probe from the repo root: <home>/<file>, then <kit>/<file>, the root install;
+#   3. `GOV_KITROOT`, declared in `.githooks/gate-env.sh`: <GOV_KITROOT>/<kit>/<file>.
+# That file is READ for its one assignment and never sourced. This hook does not vet it the way
+# pre-push does, so running it here would run whatever an untracked copy says.
+# A MISS IS AN ANNOUNCED SKIP here (owner, F1 (c)): these legs are an early signal, and a commit hook
+# that blocked on an absent kit would stop ordinary work. The push boundary is where a miss refuses.
+kitroot_declared=""
+if [ -f .githooks/gate-env.sh ]; then
+  kitroot_declared=$(grep -E '^[[:space:]]*(export[[:space:]]+)?GOV_KITROOT=' .githooks/gate-env.sh | tail -n 1 |
+                     sed 's/^[^=]*=//; s/[[:space:]]*#.*$//' | tr -d "\"'\r")
+  kitroot_declared=${kitroot_declared%/}
+  case "$kitroot_declared" in /*|*..*|*[!A-Za-z0-9._/-]*) kitroot_declared="" ;; esac
+fi
+read_receipt_path() { # <kit dir, or ""> <file> -> the repo-relative path the install receipt records ("" if none)
+  [ -f .governance/install.json ] || return 0
+  awk -v want="${1:+$1/}$2" '
+    function val(l) { sub(/^[^:]*:[[:space:]]*"/, "", l); sub(/".*$/, "", l); return l }
+    /^[[:space:]]*\{[[:space:]]*$/          { p = ""; s = ""; next }
+    /^[[:space:]]*"path"[[:space:]]*:/      { p = val($0); next }
+    /^[[:space:]]*"source"[[:space:]]*:/    { s = val($0); next }
+    /^[[:space:]]*\}[[:space:]]*,?[[:space:]]*$/ {
+      if (p != "" && (s == want || (length(s) > length(want) && substr(s, length(s) - length(want)) == "/" want)) \
+          && p !~ /^\// && p !~ /^[A-Za-z]:/ && p !~ /(^|\/)\.\.(\/|$)/) { print p; exit }
+      p = ""; s = ""
+    }' .governance/install.json 2>/dev/null
+}
+resolve_kit_gate() { # <kit dir, or "" for a file at the tool root> <file> [home] -> the gate's path, or rc 1
+  local rel=${1:+$1/}$2 c
+  c=$(read_receipt_path "$1" "$2"); [ -n "$c" ] && [ -f "$c" ] && { echo "$c"; return 0; }
+  for c in ${3:+"$3/$2"} "$rel"; do [ -f "$c" ] && { echo "$c"; return 0; }; done
+  [ -n "$kitroot_declared" ] && [ -f "$kitroot_declared/$rel" ] && { echo "$kitroot_declared/$rel"; return 0; }
   return 1
+}
+print_kit_miss() { # <leg> <kit dir, or ""> <file> [home] -> the announced skip, naming every rung that missed
+  local rel=${2:+$2/}$3
+  echo "pre-commit: $1 leg SKIPPED — no kit root: no install-receipt row for $rel, no ${4:+$4/$3 or }$rel at the root, and ${kitroot_declared:+no $rel under GOV_KITROOT=$kitroot_declared}${kitroot_declared:-no GOV_KITROOT declared in .githooks/gate-env.sh}."
 }
 
 # memory-tree hygiene, staged leg — only when memory/ is touched
-if g=$(gate_at tools/memory-tree/check-memory-hygiene.sh memory-tree/check-memory-hygiene.sh) && # gov:root-fixture — dual-spelling probe: the hygiene leg locates its gate at either install prefix, and the ROOT form is the fallback an adopter this unit does not retrofit still needs
-   git diff --cached --name-only --diff-filter=ACMR -- 'memory/**' | grep -q .; then
-  bash "$g" --staged || rc=1
+if git diff --cached --name-only --diff-filter=ACMR -- 'memory/**' | grep -q .; then
+  if g=$(resolve_kit_gate memory-tree check-memory-hygiene.sh); then
+    bash "$g" --staged || rc=1
+  else
+    print_kit_miss "memory-tree hygiene" memory-tree check-memory-hygiene.sh
+  fi
 fi
 
-# kickoff-manifest ratchet, staged leg — only when a watched file is staged
-if g=$(gate_at tools/manifest-check.sh skills/session-kickoff/manifest-check.sh scripts/manifest-check.sh); then
+# kickoff-manifest ratchet, staged leg — its gate decides whether a watched file is staged, so its
+# skip has no trigger here to wait for. Rung 2 names the kit's SOURCE home, where gov keeps it with
+# no receipt; an adopter has it flat at its tool root, which rungs 1 and 3 reach.
+if g=$(resolve_kit_gate "" manifest-check.sh skills/session-kickoff); then
   bash "$g" --staged || rc=1
+else
+  print_kit_miss "kickoff-manifest" "" manifest-check.sh skills/session-kickoff
 fi
 
 # template size — only when the template is staged
-if g=$(gate_at tools/check-template-size.sh check-template-size.sh) &&
-   git diff --cached --name-only -- coding-governance-agents.template.md | grep -q .; then
-  bash "$g" || rc=1
+if git diff --cached --name-only -- coding-governance-agents.template.md | grep -q .; then
+  if g=$(resolve_kit_gate "" check-template-size.sh); then
+    bash "$g" || rc=1
+  else
+    print_kit_miss "template-size" "" check-template-size.sh
+  fi
 fi
 
 # codebase-map coverage + freshness — only when .codebase-map.conf exists and a staged path is a .py

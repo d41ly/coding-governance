@@ -29,6 +29,24 @@ import subprocess
 import sys
 import tempfile
 
+
+def derive_install_prefix() -> str:
+    """The install prefix WITH its trailing slash, derived from where this file sits and empty at a
+    root install. Every fixture and host path the self-test builds is spelled through it, never
+    through a literal prefix (TOOL-aRepatriatedFork-28)."""
+    import pathlib
+    here = pathlib.Path(__file__).resolve().parent
+    for anc in here.parents:
+        if (anc / ".git").exists():
+            rel = here.parent.relative_to(anc).as_posix()
+            return "" if rel == "." else rel + "/"
+    raise SystemExit(f"{pathlib.Path(__file__).name}: not inside a git repository, so there is no "
+                     "install prefix to derive")
+
+
+PFX = derive_install_prefix()
+
+
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 import govkit  # noqa: E402 — the deployer's OWN descriptor reader and token resolver. A second copy
                # here would be a second answer to "what argv does this leg actually get", which is
@@ -37,6 +55,8 @@ import govkit  # noqa: E402 — the deployer's OWN descriptor reader and token r
 HERE = pathlib.Path(__file__).resolve().parent
 ROOT = HERE.parent.parent
 GOVKIT = HERE / "govkit.py"
+# TOOL-aRepatriatedFork-46: this kit is named by the NAME its directory has in this install, never typed.
+KIT_NAMES = {"govkit": HERE.name}
 NL = chr(10)
 FAILURES: list[str] = []
 
@@ -64,7 +84,7 @@ SCRATCH_EXPECT = {
     "micro-format gate selftest": "PASS (",
     "line length": "NOT ADOPTED — no declaration at",
     # `line-length gate selftest` USED to be here and its removal is the point. The suite it runs is
-    # withheld from every target now: TOOL-aQuenchedHarness-6 ported it onto `tools/lib/lib-selftest.sh`,
+    # withheld from every target now: TOOL-aQuenchedHarness-6 ported it onto `<prefix>/lib/lib-selftest.sh`,
     # which is gov-internal and travels to nobody, so a shipped copy would red on arrival with
     # `build_fixture: command not found`. It is a leg on GOV's bar with an [[exempt_leg]] row, and
     # this table states what a SCRATCH INSTALL prints — a leg no install receives has no verdict to
@@ -97,7 +117,7 @@ def run(*args: str) -> subprocess.CompletedProcess:
     return subprocess.run([sys.executable, str(GOVKIT), *args], capture_output=True, text=True)
 
 
-DEPLOY = ('gov_source = "l"' + NL + 'prefix = "tools"' + NL + 'kits = ["check-wiring"]' + NL
+DEPLOY = ('gov_source = "l"' + NL + f'prefix = "{PFX[:-1]}"' + NL + 'kits = ["check-wiring"]' + NL
           + "[answers]" + NL + 'memory_root = "memory"' + NL)
 
 
@@ -148,7 +168,7 @@ def check_outcome_probes(tmp: pathlib.Path) -> None:
     """
     rep = govkit.Report()
     descs = govkit.read_descriptors(ROOT, govkit.load_toml(
-        ROOT / "tools" / "govkit" / "registry.toml"), rep)
+        ROOT / PFX / KIT_NAMES["govkit"] / "registry.toml"), rep)
     stops = [(eid, b) for eid, (d, _p) in sorted(descs.items())
              for b in d.get("outcome", []) if b.get("ok")]
     # THE LIVENESS ASSERTION. Quantifying over an empty set prints nothing but ok lines, and a probe
@@ -222,7 +242,7 @@ def check_outcome_probes(tmp: pathlib.Path) -> None:
 #: The fixture kit, in two vintages. The FIRST is what the target installs from; the SECOND is the
 #: same descriptor with one destination carved out as `project-owned`. Stated as data rather than
 #: built by a parameterised function so the difference between them is one visible block.
-ROLE_KIT = ('id = "demo"' + NL + 'home = "tools/demo"' + NL
+ROLE_KIT = ('id = "demo"' + NL + 'home = "demo"' + NL
             + "version_from = { none = \"fixture\" }" + NL + NL
             + "[check]" + NL + 'none = "a fixture kit"' + NL + NL
             # NAMED, never `**`. A `**` pool also lands the descriptor itself, and editing the
@@ -247,9 +267,9 @@ ROLE_KIT_MOVED = ROLE_KIT + (NL + "[[files]]" + NL + 'include = ["moved.txt", "g
 #: that stands back here is not protected, it is only ungraded, and this argv then puts its own bytes
 #: at the same path later in the same run. Python's own interpreter rather than a shell, so the
 #: fixture needs no shell on the host and no quoting dialect.
-REGEN_ARGV = ("import pathlib; pathlib.Path('tools/demo/moved.txt')"
+REGEN_ARGV = (f"import pathlib; pathlib.Path('{PFX}demo/moved.txt')"
               ".write_text('the regenerate output' + chr(10), newline=chr(10))")
-ROLE_KIT_RENDERED = ('id = "demo"' + NL + 'home = "tools/demo"' + NL
+ROLE_KIT_RENDERED = ('id = "demo"' + NL + 'home = "demo"' + NL
                      + "version_from = { none = \"fixture\" }" + NL + NL
                      + "[check]" + NL + 'none = "a fixture kit"' + NL + NL
                      + "[[files]]" + NL + 'include = ["kept.txt", "gone.txt"]' + NL
@@ -273,7 +293,7 @@ ROLE_V2 = "gov's second vintage" + NL
 
 
 def run_in_gov(g: pathlib.Path, *args: str) -> subprocess.CompletedProcess:
-    return subprocess.run([sys.executable, str(g / "tools" / "govkit" / "govkit.py"), *args],
+    return subprocess.run([sys.executable, str(g / PFX / KIT_NAMES["govkit"] / "govkit.py"), *args],
                           capture_output=True, text=True, env=ROLE_ENV)
 
 
@@ -303,18 +323,18 @@ def build_role_pair(tmp: pathlib.Path, tag: str, *, schema: int, edits: dict[str
     tree has it rather than whatever a later edit leaves behind.
     """
     g = tmp.resolve() / ("role-gov-" + tag)
-    (g / "tools" / "govkit").mkdir(parents=True, exist_ok=True)
-    (g / "tools" / "demo").mkdir(parents=True, exist_ok=True)
-    shutil.copy2(GOVKIT, g / "tools" / "govkit" / "govkit.py")
-    (g / "tools" / "govkit" / "registry.toml").write_text(
-        '[surface]' + NL + 'globs = ["tools/*"]' + NL + NL
+    (g / PFX / KIT_NAMES["govkit"]).mkdir(parents=True, exist_ok=True)
+    (g / PFX / "demo").mkdir(parents=True, exist_ok=True)
+    shutil.copy2(GOVKIT, g / PFX / KIT_NAMES["govkit"] / "govkit.py")
+    (g / PFX / KIT_NAMES["govkit"] / "registry.toml").write_text(
+        '[surface]' + NL + 'globs = ["{prefix}/*"]' + NL + NL
         + '[selection]' + NL + 'default = ["demo"]' + NL + NL
-        + '[[entry]]' + NL + 'id = "demo"' + NL + 'descriptor = "tools/demo/kit.toml"' + NL + NL
-        + '[[exempt]]' + NL + 'path = "tools/govkit"' + NL + 'why = "the deployer itself"' + NL,
+        + '[[entry]]' + NL + 'id = "demo"' + NL + 'descriptor = "{prefix}/demo/kit.toml"' + NL + NL
+        + '[[exempt]]' + NL + 'path = "{prefix}/govkit"' + NL + 'why = "the deployer itself"' + NL,
         encoding="utf-8", newline=NL)
-    (g / "tools" / "demo" / "kit.toml").write_text(ROLE_KIT, encoding="utf-8", newline=NL)
+    (g / PFX / "demo" / "kit.toml").write_text(ROLE_KIT, encoding="utf-8", newline=NL)
     for _n in ("kept.txt", "moved.txt", "gone.txt"):
-        (g / "tools" / "demo" / _n).write_text(ROLE_V1, encoding="utf-8", newline=NL)
+        (g / PFX / "demo" / _n).write_text(ROLE_V1, encoding="utf-8", newline=NL)
     git(g, "init", "-q", "-b", "main"); git(g, "config", "user.email", "t@e")
     git(g, "config", "user.name", "t"); git(g, "config", "core.autocrlf", "false")
     git(g, "add", "-A"); git(g, "commit", "-qm", "the vintage the target installs from")
@@ -324,7 +344,7 @@ def build_role_pair(tmp: pathlib.Path, tag: str, *, schema: int, edits: dict[str
     (t / "README.md").write_text("t" + NL, encoding="utf-8", newline=NL)
     (t / ".governance").mkdir(exist_ok=True)
     (t / ".governance" / "deploy.toml").write_text(
-        'gov_source = "local"' + NL + 'prefix = "tools"' + NL + 'kits = ["demo"]' + NL,
+        'gov_source = "local"' + NL + f'prefix = "{PFX[:-1]}"' + NL + 'kits = ["demo"]' + NL,
         encoding="utf-8", newline=NL)
     git(t, "init", "-q", "-b", "main"); git(t, "config", "user.email", "t@e")
     git(t, "config", "user.name", "t"); git(t, "config", "core.autocrlf", "false")
@@ -338,9 +358,9 @@ def build_role_pair(tmp: pathlib.Path, tag: str, *, schema: int, edits: dict[str
     # BASE, so an arm built on that alone stays green over the very restore it was written to stop.
     for _n, _body in edits.items():
         if _body is None:
-            (t / "tools" / "demo" / _n).unlink()
+            (t / PFX / "demo" / _n).unlink()
         else:
-            (t / "tools" / "demo" / _n).write_text(_body, encoding="utf-8", newline=NL)
+            (t / PFX / "demo" / _n).write_text(_body, encoding="utf-8", newline=NL)
     if edits:
         git(t, "add", "-A"); git(t, "commit", "-qm", "the adopter works on its own copies")
     rec = t / ".governance" / "install.json"
@@ -351,8 +371,8 @@ def build_role_pair(tmp: pathlib.Path, tag: str, *, schema: int, edits: dict[str
     # THE AGEING. The descriptor moves AFTER the receipt was written, which is the one ordering
     # that produces a disagreement at all.
     for _n, _body in aged_blobs.items():
-        (g / "tools" / "demo" / _n).write_text(_body, encoding="utf-8", newline=NL)
-    (g / "tools" / "demo" / "kit.toml").write_text(aged_kit, encoding="utf-8", newline=NL)
+        (g / PFX / "demo" / _n).write_text(_body, encoding="utf-8", newline=NL)
+    (g / PFX / "demo" / "kit.toml").write_text(aged_kit, encoding="utf-8", newline=NL)
     git(g, "add", "-A"); git(g, "commit", "-qm", "gov's descriptor moves under the receipt")
     return g, t
 
@@ -393,7 +413,7 @@ def check_role_move(tmp: pathlib.Path) -> None:
     rows = {w["path"]: w for w in json.loads(
         (t3 / ".governance" / "install.json").read_text(encoding="utf-8")).get("files", [])}
     check("role move: the aged receipt really records the moved destination as `engine`",
-          (rows.get("tools/demo/moved.txt") or {}).get("role") == "engine",
+          (rows.get(f"{PFX}demo/moved.txt") or {}).get("role") == "engine",
           str(sorted(rows)))
 
     up = run_in_gov(g3, "update", "--target", str(t3), "--write")
@@ -402,21 +422,21 @@ def check_role_move(tmp: pathlib.Path) -> None:
           up.returncode == 0, out[-400:])
     # AC2 — the moved row is REPORTED, naming both roles and the path.
     check("role move: the moved row reports `role-moved`, not the recorded role's disposition",
-          read_verdict(out, "tools/demo/moved.txt") == "role-moved", out[-800:])
+          read_verdict(out, f"{PFX}demo/moved.txt") == "role-moved", out[-800:])
     check("role move: ...and the line names the role it landed under AND the one gov declares now",
-          any(ln.rstrip().endswith(" tools/demo/moved.txt")
+          any(ln.rstrip().endswith(f" {PFX}demo/moved.txt")
               and "engine" in ln and "project-owned" in ln for ln in out.splitlines()),
           out[-800:])
     check("role move: ...and the bytes on disk are the adopter's, untouched",
-          (t3 / "tools" / "demo" / "moved.txt").read_text(encoding="utf-8") == OWN,
-          repr((t3 / "tools" / "demo" / "moved.txt").read_text(encoding="utf-8")))
+          (t3 / PFX / "demo" / "moved.txt").read_text(encoding="utf-8") == OWN,
+          repr((t3 / PFX / "demo" / "moved.txt").read_text(encoding="utf-8")))
     # THE RESTORE, which is the defect this whole unit exists to stop and the one an edited-in-place
     # row cannot reach. At BASE this path grades `missing` and gov writes its own bytes back over a
     # destination the adopter emptied on purpose.
     check("role move: the renamed-away destination also reports `role-moved`",
-          read_verdict(out, "tools/demo/gone.txt") == "role-moved", out[-800:])
+          read_verdict(out, f"{PFX}demo/gone.txt") == "role-moved", out[-800:])
     check("role move: ...and gov does NOT put its bytes back at a path the adopter emptied",
-          not (t3 / "tools" / "demo" / "gone.txt").exists(), "the file was restored")
+          not (t3 / PFX / "demo" / "gone.txt").exists(), "the file was restored")
     check("role move: ...and the run says what is now true rather than naming a disposition",
           # The remedy is `--accept-role-moves` since DEPL-aRepatriatedFork-17 S6 replaced `apply`.
           "NOTHING was written for them" in out and "--accept-role-moves" in out, out[-800:])
@@ -424,20 +444,20 @@ def check_role_move(tmp: pathlib.Path) -> None:
     after = {w["path"]: w for w in json.loads(
         (t3 / ".governance" / "install.json").read_text(encoding="utf-8")).get("files", [])}
     check("role move: the receipt row still records the role it landed under",
-          (after.get("tools/demo/moved.txt") or {}).get("role") == "engine",
-          str(after.get("tools/demo/moved.txt")))
+          (after.get(f"{PFX}demo/moved.txt") or {}).get("role") == "engine",
+          str(after.get(f"{PFX}demo/moved.txt")))
     check("role move: ...and the run counted NO change at all — the write tally reads zero",
           "wrote 0, moved 0, deleted 0" in out, out[-800:])
     # THE ROW ITSELF, field for field, rather than a word-absence over the whole run. The verdict
     # names are ordinary English and this run prints several sentences containing them, so an
     # absence assertion over the output would be graded by the wrong text.
     check("role move: ...and not one field of the moved row was rewritten",
-          after.get("tools/demo/moved.txt") == rows.get("tools/demo/moved.txt"),
-          "%r -> %r" % (rows.get("tools/demo/moved.txt"), after.get("tools/demo/moved.txt")))
+          after.get(f"{PFX}demo/moved.txt") == rows.get(f"{PFX}demo/moved.txt"),
+          "%r -> %r" % (rows.get(f"{PFX}demo/moved.txt"), after.get(f"{PFX}demo/moved.txt")))
     # AC1 — the CONTROL. A row whose descriptor still resolves the role it landed under is graded
     # exactly as before, which is what makes the branch above a new path and not a new default.
     check("role move CONTROL: a row whose role did NOT move reports `current` as it always did",
-          read_verdict(out, "tools/demo/kept.txt") == "current", out[-800:])
+          read_verdict(out, f"{PFX}demo/kept.txt") == "current", out[-800:])
 
     # AC4 — the schema-1 branch SURVIVES. Same disagreement, untrusted role, still a refusal.
     g1, t1 = build_role_pair(tmp, "s1", schema=1, aged_kit=ROLE_KIT_MOVED, aged_blobs={},
@@ -447,7 +467,7 @@ def check_role_move(tmp: pathlib.Path) -> None:
     check("role move: a schema-1 receipt carrying the same disagreement still REFUSES",
           "cannot be trusted about" in o1, o1[-800:])
     check("role move: ...and does NOT take the reporting path",
-          read_verdict(o1, "tools/demo/moved.txt") != "role-moved", o1[-800:])
+          read_verdict(o1, f"{PFX}demo/moved.txt") != "role-moved", o1[-800:])
 
     # ---- DEPL-cMendedVintage-27. THE OTHER DIRECTION, which the arms above cannot reach: the same
     # ---- aged schema-3 receipt, but gov's descriptor now serves that destination from its own
@@ -463,7 +483,7 @@ def check_role_move(tmp: pathlib.Path) -> None:
     check("role move to a rendered row: the run REFUSES rather than standing back",
           ur.returncode != 0, orr[-500:])
     check("role move to a rendered row: ...naming that path and the three-way conflict",
-          any("tools/demo/moved.txt" in ln and "diverged and the three-way conflicts" in ln
+          any(f"{PFX}demo/moved.txt" in ln and "diverged and the three-way conflicts" in ln
               for ln in orr.splitlines()), orr[-900:])
     # THE OPERATOR'S BYTES, IN THE GIT DIRECTORY AND NOT IN THE WORKTREE, and the distinction is the
     # measurement rather than a convenience. gov writes nothing for a conflicted row, so the index
@@ -471,18 +491,18 @@ def check_role_move(tmp: pathlib.Path) -> None:
     # puts its render at the same path. That overwrite is a standing ceiling, unchanged by this
     # unit and refused as a non-goal by it; what changed is that the run now NAMES the row, refuses,
     # and leaves an order, where before it exited 0 saying nothing.
-    _idx = git(tr, "show", ":tools/demo/moved.txt")
+    _idx = git(tr, "show", f":{PFX}demo/moved.txt")
     check("role move to a rendered row: ...and the adopter's bytes stand in the git directory",
           _idx.stdout == OWN, repr(_idx.stdout))
     _orders = sorted((tr / ".governance" / "outbox").glob("update-conflict-*.md"))
     check("role move to a rendered row: ...and one conflict order names the row",
-          len(_orders) == 1 and "tools/demo/moved.txt" in _orders[0].read_text(encoding="utf-8"),
+          len(_orders) == 1 and f"{PFX}demo/moved.txt" in _orders[0].read_text(encoding="utf-8"),
           str([o.name for o in _orders]))
     check("role move to a rendered row: CEILING — the worktree copy is the regenerate's, at BOTH "
           "vintages; this arm records a ceiling and grades no repair",
-          (tr / "tools" / "demo" / "moved.txt").read_text(encoding="utf-8")
+          (tr / PFX / "demo" / "moved.txt").read_text(encoding="utf-8")
           == "the regenerate output" + NL,
-          repr((tr / "tools" / "demo" / "moved.txt").read_text(encoding="utf-8")))
+          repr((tr / PFX / "demo" / "moved.txt").read_text(encoding="utf-8")))
 
     # DEPL-aRepatriatedFork-17 S6, closing review round 1 M2. THE SAME EDITED FIXTURE UNDER
     # `--accept-role-moves`. The flag's branch sat ABOVE the reconciliation this unit built, so for
@@ -496,12 +516,12 @@ def check_role_move(tmp: pathlib.Path) -> None:
     check("role move to a rendered row under --accept-role-moves: the run still REFUSES, naming "
           "the three-way conflict, and records no role",
           ua.returncode != 0 and "role-recorded" not in oa
-          and any("tools/demo/moved.txt" in ln and "diverged and the three-way conflicts" in ln
+          and any(f"{PFX}demo/moved.txt" in ln and "diverged and the three-way conflicts" in ln
                   for ln in oa.splitlines()), oa[-900:])
     check("role move to a rendered row under --accept-role-moves: ...and the adopter's bytes stand "
           "in the git directory",
-          git(ta, "show", ":tools/demo/moved.txt").stdout == OWN,
-          repr(git(ta, "show", ":tools/demo/moved.txt").stdout))
+          git(ta, "show", f":{PFX}demo/moved.txt").stdout == OWN,
+          repr(git(ta, "show", f":{PFX}demo/moved.txt").stdout))
 
     # AND THE SAME FIXTURE WITH NO LOCAL EDIT, which is the half the migration runbook's block 1
     # depends on: the row takes the RECORDED role's raw write and gov's bytes are staged for it.
@@ -510,8 +530,8 @@ def check_role_move(tmp: pathlib.Path) -> None:
     uc = run_in_gov(gc, "update", "--target", str(tc), "--write")
     oc = uc.stdout + uc.stderr
     check("role move to a rendered row, unedited: the row takes the recorded role's raw write",
-          read_verdict(oc, "tools/demo/moved.txt") == "stale", oc[-900:])
-    _idxc = git(tc, "show", ":tools/demo/moved.txt")
+          read_verdict(oc, f"{PFX}demo/moved.txt") == "stale", oc[-900:])
+    _idxc = git(tc, "show", f":{PFX}demo/moved.txt")
     check("role move to a rendered row, unedited: ...and the target's INDEX holds gov's bytes",
           _idxc.stdout == ROLE_V2, repr(_idxc.stdout))
     # THE MOVE IS STILL SAID, and said ONCE, OFF the row channel. A second row line would shadow the
@@ -520,10 +540,10 @@ def check_role_move(tmp: pathlib.Path) -> None:
     check("role move to a rendered row: exactly one printed line opens with two spaces and ends "
           "with that row's path",
           sum(1 for ln in oc.splitlines()
-              if ln.startswith("  ") and ln.rstrip().endswith(" tools/demo/moved.txt")) == 1,
+              if ln.startswith("  ") and ln.rstrip().endswith(f" {PFX}demo/moved.txt")) == 1,
           oc[-900:])
     check("role move to a rendered row: ...and a further line names both roles and the path",
-          any("engine" in ln and "rendered" in ln and "tools/demo/moved.txt" in ln
+          any("engine" in ln and "rendered" in ln and f"{PFX}demo/moved.txt" in ln
               and not ln.startswith("  ") for ln in oc.splitlines()), oc[-900:])
 
 
@@ -547,7 +567,7 @@ def main() -> int:
         check("empty repo: a receipt exists",
               (g / ".governance" / "install.json").is_file(), "")
         check("empty repo: the landed file is on disk, not merely recorded",
-              (g / "tools" / "check-wiring.sh").is_file(), "")
+              (g / PFX / "check-wiring.sh").is_file(), "")
 
         # SHAPE 2 — a repository with no Python of its own.
         # EXPECTED: the DEPLOYER runs on the deployer's interpreter regardless; the target having no
@@ -556,7 +576,7 @@ def main() -> int:
         g = shape(tmp, "nopython", lang="none")
         p = run("apply", "--target", str(g), "--kits", "check-wiring")
         check("no-python repo: the deployer runs on ITS OWN interpreter and lands anyway",
-              p.returncode == 0 and (g / "tools" / "check-wiring.sh").is_file(),
+              p.returncode == 0 and (g / PFX / "check-wiring.sh").is_file(),
               p.stdout + p.stderr)
 
         # SHAPE 3 — a repository whose pre-commit hook REFUSES.
@@ -591,23 +611,23 @@ def main() -> int:
         # and leaves NO receipt, because the refusal happens at the baseline, before any write.
         shapes += 1
         runner = ("import json, subprocess" + NL +
-                  "legs = json.load(open('tools/legs.json'))" + NL +
+                  f"legs = json.load(open('{PFX}legs.json'))" + NL +
                   "for l in legs:" + NL +
                   "    c = subprocess.run(l['argv'], capture_output=True).returncode" + NL +
                   "    print(('GATE ok    ' if c == 0 else 'GATE FAIL  ') + l['name'])" + NL)
         decl = (NL + "[gate_runner]" + NL + 'kind = "manifest"' + NL +
-                'file = "tools/legs.json"' + NL + 'grammar = "json-array"' + NL +
+                f'file = "{PFX}legs.json"' + NL + 'grammar = "json-array"' + NL +
                 'dedupe_key = "name"' + NL +
-                'command = ["%s", "tools/runner.py"]' % sys.executable.replace(chr(92), "/") + NL +
+                f'command = ["%s", "{PFX}runner.py"]' % sys.executable.replace(chr(92), "/") + NL +
                 'run_all_env = { GATE_FULL = "1" }' + NL +
                 'observed_ran = ["GATE ok    {name}"]' + NL +
                 'observed_failed = ["GATE FAIL  {name}"]' + NL)
 
         for policy_val, label in (("proceed", "default"), ("refuse", "refuse")):
             g = tmp / ("prered-" + policy_val)
-            (g / "tools").mkdir(parents=True, exist_ok=True)
-            (g / "tools" / "runner.py").write_text(runner, encoding="utf-8", newline=NL)
-            (g / "tools" / "legs.json").write_text(
+            (g / PFX).mkdir(parents=True, exist_ok=True)
+            (g / PFX / "runner.py").write_text(runner, encoding="utf-8", newline=NL)
+            (g / PFX / "legs.json").write_text(
                 json.dumps([{"name": "theirs", "argv": ["false"]}], indent=2) + NL,
                 encoding="utf-8", newline=NL)
             (g / ".governance").mkdir(exist_ok=True)
@@ -627,7 +647,7 @@ def main() -> int:
                 # arrives as an ordinary bar leg and the adopter runs the kit's self-test on every
                 # push, which is the whole defect the unit exists to remove.
                 _emitted = json.loads(
-                    (g / "tools" / "legs.json").read_text(encoding="utf-8"))
+                    (g / PFX / "legs.json").read_text(encoding="utf-8"))
                 _by = {l.get("name"): l for l in _emitted}
                 _wiring = _by.get("check-wiring self-test")
                 check("AC9: the emitted leg reached the target's manifest at all",
@@ -671,13 +691,13 @@ def main() -> int:
         # see, and the stub is only the override the engine already honours when it cannot. A hand
         # list here would go stale the first time the charter grew a placeholder — which is the
         # rot this file's own header refuses.
-        pdesc = govkit.load_toml(ROOT / "tools" / "govkit" / "entries" / "playbook.kit.toml")
+        pdesc = govkit.load_toml(ROOT / PFX / KIT_NAMES["govkit"] / "entries" / "playbook.kit.toml")
         ans = {r["key"].lower(): "stated for the scratch install"
                for r in pdesc.get("placeholder", [])}
         ans["playbook_path"] = "docs/PARALLEL.md"
         (g / ".governance").mkdir(exist_ok=True)
         (g / ".governance" / "deploy.toml").write_text(
-            'gov_source = "."' + NL + 'prefix = "tools"' + NL + "drop_blocks = []" + NL
+            'gov_source = "."' + NL + f'prefix = "{PFX[:-1]}"' + NL + "drop_blocks = []" + NL
             + "kits = [" + ", ".join('"%s"' % k for k in SCRATCH_KITS) + "]" + NL
             + "[answers]" + NL
             + NL.join('%s = "%s"' % (k, v) for k, v in sorted(ans.items())) + NL,
@@ -695,7 +715,7 @@ def main() -> int:
         deploy = govkit.load_toml(g / ".governance" / "deploy.toml")
         rep = govkit.Report()
         descs = govkit.read_descriptors(ROOT, govkit.load_toml(
-            ROOT / "tools" / "govkit" / "registry.toml"), rep)
+            ROOT / PFX / KIT_NAMES["govkit"] / "registry.toml"), rep)
         legs: list[tuple[str, list[str]]] = []
         for eid in SCRATCH_KITS:
             d, _dp = descs[eid]

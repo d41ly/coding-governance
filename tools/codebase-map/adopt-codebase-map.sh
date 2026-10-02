@@ -5,7 +5,7 @@
 #   <kit-dir>/adopt-codebase-map.sh --scaffold
 #
 # The kit dir's NAME is fixed (`codebase-map` — the gate template resolves the kit by it), but its
-# PREFIX under the repo root is free: `<root>/codebase-map/` and `<root>/tools/codebase-map/` are
+# PREFIX under the repo root is free: `<root>/codebase-map/` and `<root>/<prefix>/codebase-map/` are
 # both supported, matching map_lib.resolve_root. One segment, though — see the depth check below.
 #
 # Steps: conf (copy example if absent) -> extractors sanity -> python scaffold (map tree +
@@ -52,9 +52,9 @@ _CWD_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || true)"
   exit 1; }
 cd "$ROOT" || exit 2
 # The resolver, INLINE. This kit is copy-installed as a standalone directory, so `../lib/` does
-# not exist in an adopting repo. The block below is byte-identical to tools/lib/resolve-python.sh
-# and tools/lib/resolve-python.test.sh reds if any copy drifts.
-# >>> resolve_python — canonical copy: tools/lib/resolve-python.sh (byte-identical; gated)
+# not exist in an adopting repo. The block below is byte-identical to resolve-python.sh in gov's lib dir,
+# and that dir's resolve-python.test.sh reds if any copy drifts.
+# >>> resolve_python — canonical copy: resolve-python.sh in gov's lib dir (byte-identical; gated)
 resolve_python() {
   # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
   # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
@@ -152,7 +152,7 @@ fi
 . "$ROOT/.codebase-map.conf"
 # The stamp above only fires on the branch that CREATES the conf — but the kit README and
 # WIRE-INTO-PROJECT both tell the operator to `cp` the example first, so on the DOCUMENTED path that
-# branch never runs and the example's `codebase-map/map_diff.py` survives at a prefixed install.
+# branch never runs and the example's root-spelled map_diff path survives at a prefixed install.
 # Measured: adoption reached `Adopted.` at exit 0 and the scaffolded map README shipped a digest
 # command naming a file that does not exist. Validate the configured value on EVERY run: pull the
 # `…/map_diff.py` token out of it and re-stamp when it does not resolve from the root. A value that

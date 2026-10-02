@@ -89,10 +89,9 @@ at only one install prefix. The walk inherits nothing and is correct at any pref
   perform on every run rather than skipping them quietly. `adopt` is the BOOTSTRAP — it writes the
   receipt an already-installed tree never had by measuring that tree against gov's own history, and
   it is the only path onto the engine for a repo somebody vendored kits into by hand.
-- `tools/check-install-prefix.sh` — TWO arms over two populations and two prefixes: the ROOT
-  spelling over a glob-derived shipped surface, and the SHIPPING spelling inside the set the
-  descriptors declare shippable, ratcheted per file at `tools/install-prefix-carried.txt`. The
-  second is inert where the repo is not a kit source and says so rather than passing silently.
+- `tools/check-install-prefix.sh` — ONE pure ban since `TOOL-aRepatriatedFork-30`: any kit-path
+  spelling in the tracked shipped surface reds by `<path>:<line>`, with no ratchet, waiver or
+  marker to buy one back. Its dossier is `install-prefix.md`.
 - `tools/govkit/selftest.py` — every refusal and reported state, exercised in throwaway repos. Each
   arm asserts a specific MESSAGE or on-disk effect, never an exit code alone: an exit code shared by
   six unrelated outcomes is the ambiguity the descriptors' outcome probes exist to resolve.

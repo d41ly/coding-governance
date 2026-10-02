@@ -40,7 +40,7 @@ from datetime import datetime, timezone
 
 KITDIR = os.path.dirname(os.path.abspath(__file__))
 # The runner is this file's SIBLING, derived and never spelled: this kit installs at <prefix>/run-gates/
-# and a hardcoded "tools/run-gates/run-gates.sh" resolves to nothing at any other prefix.
+# and a hardcoded path to run-gates.sh at gov's prefix resolves to nothing at any other prefix.
 # Forward-SLASHED before it is ever handed to bash. A POSIX-emulation shell on Windows mangles a
 # backslash path, and os.path.join gives backslashes there. Measured: the runner exited 127 having
 # run zero legs.

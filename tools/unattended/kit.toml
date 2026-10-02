@@ -1,7 +1,7 @@
-# kit.toml — this entry, declared as data. Read by tools/govkit/. Contract: the deployer unit's spec under memory/builds/aSealedCaravan/spec/.
+# kit.toml — this entry, declared as data. Read by <prefix>/govkit/. Contract: the deployer unit's spec under memory/builds/aSealedCaravan/spec/.
 
 id = "unattended"
-home = "tools/unattended"
+home = "unattended"
 scope = "repo"
 version_from = { file = "unattended.sh", pattern = "^KIT_UNATTENDED_VERSION=" }
 # `settings-merge` since TOOL-aRepatriatedFork-11 (section 8 F2): this kit ships hook fragments and its
@@ -19,7 +19,7 @@ role = "engine"
 # the kit and never edits it. That is the 2026-08-23 owner ruling, applied to what SHIPS rather than
 # only to what runs.
 #
-# WITHHELD BY CLAIMING THE DESTINATION, the mechanism `tools/codebase-map/kit.toml` already uses and
+# WITHHELD BY CLAIMING THE DESTINATION, the mechanism `<prefix>/codebase-map/kit.toml` already uses and
 # explains: govkit has no `exclude` key, a `**` rule's pool drops only what another rule owns, and
 # `project-owned` is absent from LANDABLE_ROLES so `apply` never writes it.
 #
@@ -169,7 +169,7 @@ file = ".unattended.conf"
 owner = "unattended"
 required_keys_gate = ["LANDER", "BYPASS_BAN", "GATE_CMD", "WIRING_CHECK", "KEEPALIVE_CREATE", "KEEPALIVE_DELETE", "CORE_FLOOR", "DIRECTIVES_FLOOR"]
 required_keys_render = ["LANDER", "KEEPALIVE_CREATE", "KEEPALIVE_DELETE", "KEEPALIVE_INTERVAL"]
-optional_keys = ["MEMORY_ROOT", "KICKOFF_ENGINE", "KICKOFF_EXITS", "PHASES_EXTRA", "DOD_EXTRA", "DIRECTIVES_EXTRA", "ANCHOR_SCOPE", "AUTH_PARAM", "RECALL_CLI", "MAP_CLI", "SPEC_TOKENS_CLI", "UNIT_STALL_BOUND", "REVIEW_ROUNDS", "RESUME_SCHEDULE", "RESUME_SCHEDULE_CREATE", "RESUME_SCHEDULE_DELETE", "RESUME_SCHEDULE_DELAY", "RESUME_SCHEDULE_LIMIT", "RESUME_STALE_BOUND", "STOP_GUARD_BLOCKS", "RESUME_ATTEMPTS", "RESUME_TURNS"]
+optional_keys = ["MEMORY_ROOT", "KICKOFF_ENGINE", "KICKOFF_EXITS", "PHASES_EXTRA", "DOD_EXTRA", "DIRECTIVES_EXTRA", "ANCHOR_SCOPE", "AUTH_PARAM", "RECALL_CLI", "MAP_CLI", "SPEC_TOKENS_CLI", "UNIT_STALL_BOUND", "TASK_STALL_BOUND", "REVIEW_ROUNDS", "RESUME_SCHEDULE", "RESUME_SCHEDULE_CREATE", "RESUME_SCHEDULE_DELETE", "RESUME_SCHEDULE_DELAY", "RESUME_SCHEDULE_LIMIT", "RESUME_STALE_BOUND", "STOP_GUARD_BLOCKS", "RESUME_ATTEMPTS", "RESUME_TURNS"]
 defaults = { MEMORY_ROOT = "memory" }
 
 [adopt]
@@ -215,13 +215,13 @@ means = "render-failed-half-stamped"
 # memory/builds/dScriptedRepeat/build/2026-08-23-build-TOOL-dScriptedRepeat-5-bar-cost-measurement.md.
 #
 # THE COMPENSATING CHECK, because an exemption is not coverage (charter §7). Work touching
-# `tools/unattended/` is not done until ONE of two verdicts is in the landing report: parity GREEN
+# `<prefix>/unattended/` is not done until ONE of two verdicts is in the landing report: parity GREEN
 # from the pooled self-tests, or `--attribute` against the build's BASE reading `verdict clean` —
 # no NEW FAIL, no DEAD PROBE at L and no OVER BUDGET at L — with every suite reporting an INHERITED
 # FAIL or a DEAD PROBE at R named by a filed backlog record:
 #
-#     bash tools/unattended/run-unattended-gates.sh --pooled        # the self-tests through the bounded pool, parity graded
-#     bash tools/unattended/run-unattended-gates.sh --checks        # and the legs beside them, which take no mode
+#     bash <prefix>/unattended/run-unattended-gates.sh --pooled        # the self-tests through the bounded pool, parity graded
+#     bash <prefix>/unattended/run-unattended-gates.sh --checks        # and the legs beside them, which take no mode
 #
 # ...or, in place of the pooled line, the same runner with `--serial --attribute <BASE>`: the
 # self-tests one at a time, each run at this tree AND at BASE, attributed.
@@ -289,7 +289,7 @@ red_after_land = true
 
 # the structural group linter's self-test (TOOL-aBatchedArm-2). A KIT leg, held off the automatic
 # bar like every `subject = kit` row. This kit declares NO self-test as a leg: the arms-groups
-# linter had one, and the owner's 2026-08-23 ruling takes every `tools/unattended/*.test.sh` leg
+# linter had one, and the owner's 2026-08-23 ruling takes every `<prefix>/unattended/*.test.sh` leg
 # off the manifest without exception — which main's runlog-writer AC9 asserts. The linter's suite
 # runs through `run-unattended-gates.sh` with the rest, from its budget row.
 
