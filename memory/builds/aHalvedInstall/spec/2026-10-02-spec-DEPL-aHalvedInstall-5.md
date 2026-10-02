@@ -106,7 +106,7 @@ def _hold(kit, path):
 - **AC3** — When that occupied destination is named by a `[[decline]]` row, or its source already
   existed at the receipt's vintage, the sibling lands and no `HELD BACK` line names the kit.
   Red when: every landing refusal holds.
-- **AC4** — When the structural arm in `tools/govkit/selftest.py` reads the fenced region, it finds no
+- **AC4** — When the structural arm reads the fenced region of `tools/govkit/govkit.py`, it finds no
   unmarked site; with one `# hold-exempt:` comment staged away, it names that site.
   Red when: the arm counts sites outside the fence, or matches nothing.
 
