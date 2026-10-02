@@ -12,7 +12,7 @@ export const meta = {
   ],
 }
 
-// gov:kit drift-audit@1.21
+// gov:kit drift-audit@1.22
 // --- bounded fan-out (inlined; workflow scripts cannot import) ------------
 // The cap is on CONCURRENCY *and*, for the verify stage, on TOTAL agents. Concurrency is not a
 // budget: N findings fanned one-skeptic-each still spawn N agents, five at a time.

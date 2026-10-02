@@ -1103,4 +1103,4 @@ def main(argv: list[str]) -> int:
 if __name__ == '__main__':
     raise SystemExit(main(sys.argv[1:]))
 
-KIT_PLAYBOOK_RENDER_VERSION = "1.21"  # gov:kit playbook-render@1.21
+KIT_PLAYBOOK_RENDER_VERSION = "1.22"  # gov:kit playbook-render@1.22

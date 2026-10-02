@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # adopt-drift-audit.sh — wire the drift-audit kit into a project.
 #
-# gov:kit drift-audit@1.21
+# gov:kit drift-audit@1.22
 #
 # Run from anywhere INSIDE the target repo AFTER copying this kit dir in as `<prefix>/drift-audit/`.
 # The kit dir's NAME is load-bearing; the one-segment prefix is free and every path below is derived

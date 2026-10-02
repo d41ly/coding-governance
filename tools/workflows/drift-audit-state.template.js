@@ -12,7 +12,7 @@ export const meta = {
   ],
 }
 
-// gov:kit drift-audit@1.21
+// gov:kit drift-audit@1.22
 // --- bounded fan-out (inlined; workflow scripts cannot import) ------------
 // BOTH THE CONCURRENCY CAP AND THE VERIFIER TOTAL ARE BARE LITERALS, and neither is caller-settable.
 // The retired form bound each of them from an `<expr> || 5` fallback, which read as a constant to the
