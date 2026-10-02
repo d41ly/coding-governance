@@ -9,12 +9,20 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+hold-run: 
+hold-streak: 1 · at cdd5f518
+resume-owed: none · owner
+held-at: 2026-10-02T17:55:17Z
+hold-reason: All five units built and CLOSED, the closing review CONVERGED with its HIGH promoted to unit 5 and its folds built, govkit selftest 1732 ok 0 FAIL at b7ddaf0d. The close's bar at 8cdcc9ea redded five legs; four are repaired and re-run green. The fifth, check 23 at 2 undeclared writes against a shrink-only 0, needs the owner's ruling on the ceiling, parked with options beside a second park on unit 5's brief waiver.
+hold-until: owner
+hold-code: host-owner-action
+held-from: VERIFYING
 gates-run: unattended-179096159559588315679-1697 8cdcc9ea
 parked-surfaced: yes, 0 surfaced
 keepalive-reaped: yes
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: a3f46c284046d417ed21da11ce5e553a8b11b426
-phase: VERIFYING
+witness: cdd5f518279ccf71aed180073120c31b8c0cb74f
+phase: HELD
 branch-sha: cd90f7fa5c8cddf152e3a2a065f5df7ad64f355b
 branch-ref: refs/heads/branch/kit-bugs-keys-renderer-conflict-eddde0
 may: none
@@ -63,3 +71,5 @@ base: cd90f7fa5c8cddf152e3a2a065f5df7ad64f355b
 2026-10-02T17:54:24Z decision · item The close's bar reds the unattended kit gate at check 23: 2 undeclared writes against UNDECLARED_WRITE_CEILING 0 (shrink-only). Raise it to 2 for this landing, or not? · reason The two: d53b503a, a records commit whose subject 'build briefs for DEPL-aHalvedInstall-1..4' check 23 took as unit 1's pass, wrote briefs 2-4; c93d8685, unit 1's pass, wrote the hook-forced memory/map/generated/symbols.json its dispatch did not declare. Both are history, so no declaration can now precede them. Options seen: (a) raise the ceiling 0 -> 2 in .unattended.conf; once this run lands in place its record derives LANDED, check 23 excludes it, and the count falls back to 0, so lower it again in the landing's follow-up; (b) leave it and abort the landing. Refused because the ceiling is shrink-only by its own comment and raising it is the owner's call, as aSightedSkeptic's hold recorded. All other legs are repaired: brief-recorded and memory hygiene re-ran green at a82b7d29, encoding posture and install-prefix clean.
 
 2026-10-02T17:54:26Z decision · item Accept the brief-recorded waiver row for DEPL-aHalvedInstall-5? · reason Unit 5 was added by --rescope after the closing review and built inline at 1137a5af without a --brief row. History is append-only, so the run wrote a reconstructed brief (prompts/...-5-1-reconstructed-build-brief.md) and a waiver row in memory/project/brief-recorded-waiver.txt, on the precedent of TOOL-aRepatriatedFork-44. Options: keep the row, or delete it and accept the leg red. Refused to decide alone because the waiver registry is a standing exception the owner grants.
+
+2026-10-02T17:55:21Z hold · item host-owner-action · reason until owner · reaped 9f6995e9 · resume none(owner)
