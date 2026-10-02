@@ -29,7 +29,10 @@
 # config only inside it, and never writes into the real tree. Execution order is a scheduling detail;
 # REPORTING is always manifest order, so the output is byte-stable whatever the width.
 set -u
-KIT_RUN_GATES_VERSION=1.14   # gov:kit run-gates@1.14
+KIT_RUN_GATES_VERSION=1.15   # gov:kit run-gates@1.15
+# 1.14 -> 1.15: KITREL is asked of git when the prefix strip leaves it absolute, the MSYS mount
+# spelling (`/tmp/x` beside git's `C:/…/Temp/x`) the `cd … && pwd` fold does not reach; with it the
+# attribution's KF3 matched nothing for a tree under `/tmp`. Absorbed by aSightedSkeptic.
 # 1.8 -> 1.9: both sides of the origin/main merge into dDerivedDocket shipped a 1.8 - theirs the
 # run log below, ours red attribution (GATE_ATTRIBUTE, lib-attribute.sh and the manifest's eighth
 # field `signature`, TOOL-dDerivedDocket-23). 1.9 carries both, and neither moves a verdict.
@@ -176,6 +179,15 @@ fails=0; n=0; skips=0; ondemands=0
 # resolves to nothing. Never compare path strings across flavours.
 ROOTN=$(cd "$ROOT" && pwd)
 KITREL=${KITDIR#"$ROOTN"/}
+# AND A MOUNT IS A THIRD SPELLING THAT `cd … && pwd` DOES NOT FOLD. Under MSYS a tree reached through
+# `/tmp` stays `/tmp/x` while the same directory reached through git's `C:/…/Temp/x` answers
+# `/c/…/Temp/x`, so the strip above left KITREL ABSOLUTE and every comparison against git's
+# repo-relative paths (KF3 among them) matched nothing. Measured: the canary's AC5 fixture under
+# `mktemp -d` read INHERITED where it must read OWN. Git answers in ONE spelling, so ask it; the strip
+# stays as the fallback for a kit dir git cannot place.
+case "$KITREL" in
+  /*) _kr=$(cd "$KITDIR" && git rev-parse --show-prefix 2>/dev/null) && [ -n "$_kr" ] && KITREL=${_kr%/} ;;
+esac
 LEGS_FILE="${GATE_LEGS:-$(dirname "$KITREL")/gate-legs.json}"
 # THE ATTRIBUTION BASE IS THIS BAR'S AND NO LEG'S. Read once and removed from the environment, so a
 # leg that runs a bar of its own over a fixture — the canary does, many times — never inherits a base
