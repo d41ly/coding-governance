@@ -6,6 +6,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-02-build-TOOL-aSightedSkeptic-13-1-acceptance-ledger.md](../build/2026-10-02-build-TOOL-aSightedSkeptic-13-1-acceptance-ledger.md) | journal | — |
 | [2026-10-02-prompt-TOOL-aSightedSkeptic-13-1-spec-brief.md](../prompts/2026-10-02-prompt-TOOL-aSightedSkeptic-13-1-spec-brief.md) | journal | — |
 | [2026-10-02-prompt-TOOL-aSightedSkeptic-13-2-build-brief.md](../prompts/2026-10-02-prompt-TOOL-aSightedSkeptic-13-2-build-brief.md) | journal | — |
 
