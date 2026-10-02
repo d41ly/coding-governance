@@ -1384,7 +1384,7 @@ def check_halved_install_arms(gcopy: pathlib.Path, run_selfcheck) -> None:
           "_was = { command = [\"bash\", \"-c\", \"grep -qE '^DIRECTIVES_FLOOR=",
           "[aHI-2 AC7] 6b: a negated grep of a missing file",
           "hole 'directives-floor': its discharge probe exits 0 in an EMPTY directory")
-    pr = f"{PFX}playbook/kit.toml"
+    pr = f"{PFX}{KIT_NAMES['playbook']}/kit.toml"
     check_staged(pr, '[[regenerate]]\nargv = ["bash", "{prefix}/playbook/adopt-playbook.sh", "--target", "."]\n'
               'writes = ["AGENTS.md"]\n', "",
           "[aHI-3 AC6] 3b-iii: an adopter with its [[regenerate]] stripped",

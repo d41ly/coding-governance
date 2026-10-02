@@ -7,6 +7,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-02-build-DEPL-aHalvedInstall-5-1-acceptance-ledger.md](../build/2026-10-02-build-DEPL-aHalvedInstall-5-1-acceptance-ledger.md) | journal | — |
+| [2026-10-02-prompt-DEPL-aHalvedInstall-5-1-reconstructed-build-brief.md](../prompts/2026-10-02-prompt-DEPL-aHalvedInstall-5-1-reconstructed-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
 

@@ -1,6 +1,6 @@
 # DEPL-aHalvedInstall-4 — `update` installs a kit whole or not at all across a refused row
 
-**Status:** CLOSED · rev-3 · 2026-10-02 · node a · Tier-2 · base cd90f7fa · streams deployer · order 4
+**Status:** CLOSED · rev-4 · 2026-10-02 · node a · Tier-2 · base cd90f7fa · streams deployer · order 4
 
 <!-- gen:spec-records -->
 
@@ -57,7 +57,8 @@ back: none of the kit's writes from this run stand, its regenerate does not run,
 
 ### Edges
 
-none
+- **hands-off** `DEPL-aHalvedInstall-5` — the classification walk's and the landing loop's
+  refusals, which this unit's held set does not see; promoted from the closing review's round 1 H1.
 
 ## 4. Design
 
@@ -155,6 +156,8 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-02 · initial draft, from the owner's third observation and `_cmd_update` at base.
+- rev-4 · 2026-10-02 · §3 Edges · the hands-off to unit 5 that unit 5's consumes-from names; hygiene
+  check 12 joins the pair and redded the close's bar without it.
 - rev-3 · 2026-10-02 · S6 · AC7 · AC8 · folded round 1's M3, M6 and L1; AC5 now names all four files.
 - rev-2 · 2026-10-02 · build pass · §4 Data model · S5 · AC6 · the per-row count is compared at the
   top of the next iteration instead of moving the 350-line body into a local function, which would

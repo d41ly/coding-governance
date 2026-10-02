@@ -66,11 +66,11 @@ ids DEPL-aHalvedInstall-1 DEPL-aHalvedInstall-2 DEPL-aHalvedInstall-3 DEPL-aHalv
 | [DEPL-aHalvedInstall-1 — govkit reads each kit's declared required conf keys and names a gap](spec/2026-10-02-spec-DEPL-aHalvedInstall-1.md) | 1 | 2 | CLOSED | rev-3 | 2026-10-02 |
 | [DEPL-aHalvedInstall-2 — selfcheck refuses a hole discharge that exits 0 on an empty tree](spec/2026-10-02-spec-DEPL-aHalvedInstall-2.md) | 2 | 1 | CLOSED | rev-2 | 2026-10-02 |
 | [DEPL-aHalvedInstall-3 — every kit with an adopter decides whether `update` re-renders it](spec/2026-10-02-spec-DEPL-aHalvedInstall-3.md) | 3 | 1 | CLOSED | rev-3 | 2026-10-02 |
-| [DEPL-aHalvedInstall-4 — `update` installs a kit whole or not at all across a refused row](spec/2026-10-02-spec-DEPL-aHalvedInstall-4.md) | 4 | 2 | CLOSED | rev-3 | 2026-10-02 |
+| [DEPL-aHalvedInstall-4 — `update` installs a kit whole or not at all across a refused row](spec/2026-10-02-spec-DEPL-aHalvedInstall-4.md) | 4 | 2 | CLOSED | rev-4 | 2026-10-02 |
 | [DEPL-aHalvedInstall-5 — every row refusal in `update` decides whether it holds its kit back](spec/2026-10-02-spec-DEPL-aHalvedInstall-5.md) | 5 | 2 | CLOSED | rev-3 | 2026-10-02 |
 <!-- /gen:build-units -->
 
-Records: 11 bound to this build, across 4 record folder(s).
+Records: 12 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

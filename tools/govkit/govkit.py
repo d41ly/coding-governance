@@ -4447,7 +4447,8 @@ def run_probe_in_empty_dir(argv: list[str]) -> int | None:
     with tempfile.TemporaryDirectory(prefix="govkit-6b-") as empty:
         try:
             return subprocess.run(resolve_shell_argv(argv), cwd=empty, capture_output=True,
-                                  text=True, timeout=120).returncode
+                                  text=True, encoding="utf-8", errors="replace",
+                                  timeout=120).returncode
         except (OSError, subprocess.TimeoutExpired):
             return None
 

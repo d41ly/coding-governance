@@ -32,6 +32,12 @@ at `[-23]`, whose fixture carries an `attributes` row. At an adopter, that row i
 any selected kit pins line endings. Renamed to `_held_kits`. The unit's fixture kit now carries a pin,
 so the arms walk the pin block on every run.
 
+## Gate
+
+No gate for the class: whether two bindings of one name in a function mean the same thing is a
+judgement no scan makes. The instance is gated by the `[aHI-5]` arms in `tools/govkit/selftest.py`,
+whose fixture kit declares an `[[lf_pin]]`, so they walk the block that collided.
+
 ## Check
 
 - Before adding a local to a function longer than a few hundred lines, grep the WHOLE function for
