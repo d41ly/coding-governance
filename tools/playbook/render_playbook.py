@@ -378,8 +378,8 @@ def build_substitution(text: str, key: str, val: str) -> str:
 def write_region(charter_path: Path, body: str) -> None:
     """The write mode's ONE write: the region rebuilt around `body`, whatever the file held.
 
-    DEPL-aHalvedInstall-3 rev-3. govkit's `update` runs this kit's write mode as its `[[regenerate]]`,
-    so the mode must replace an existing region in place and leave the authored prose around it
+    DEPL-aHalvedInstall-3 rev-3. govkit's `update` runs this kit's write mode as its `[[regenerate]]`
+    unless GOVKIT_RERENDER=0 is exported, so the mode must replace an existing region in place and leave the authored prose around it
     alone. Factored out of `main` so the selftest's run-twice arm calls the code the adopter runs."""
     cur = charter_path.read_text(encoding='utf-8') if charter_path.is_file() else None
     charter_path.parent.mkdir(parents=True, exist_ok=True)
@@ -781,7 +781,8 @@ def run_selftest() -> int:
             failed += 1
             print(f'  arm FAIL a pipe in PROSE is left alone — got {body.strip()!r}')
 
-    # DEPL-aHalvedInstall-3 rev-3 (closing review M7). THE WRITE MODE IS `update`'s REGENERATE, so it
+    # DEPL-aHalvedInstall-3 rev-3 (closing review M7). THE WRITE MODE IS `update`'s REGENERATE (on
+    # unless GOVKIT_RERENDER=0 is exported), so it
     # must be idempotent over an adopted charter and must REPLACE the region on a changed body. A
     # regression to append, or to a no-op, would roll this kit back at every adopter again.
     with tempfile.TemporaryDirectory() as td:
