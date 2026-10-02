@@ -1,6 +1,6 @@
 # DEPL-aHalvedInstall-4 — `update` installs a kit whole or not at all across a refused row
 
-**Status:** OPEN · rev-1 · 2026-10-02 · node a · Tier-2 · base cd90f7fa · streams deployer · order 4
+**Status:** INPROGRESS · rev-2 · 2026-10-02 · node a · Tier-2 · base cd90f7fa · streams deployer · order 4
 
 <!-- gen:spec-records -->
 
@@ -37,8 +37,8 @@ back: none of the kit's writes from this run stand, its regenerate does not run,
   of a check transition. Observed by AC1, AC3 and AC4.
 - **S4** — Conflict orders and candidates are written exactly as before, one per refused row.
   Observed by AC5.
-- **S5** — govkit's version moves in every carrier `govkit epoch` names, unless DEPL-aHalvedInstall-1
-  already moved it in this build. Observed by AC6.
+- **S5** — Every kit whose shipped bytes this unit moves is bumped where `govkit epoch` names it;
+  govkit itself is not in that population (DEPL-aHalvedInstall-1 rev-2). Observed by AC6.
 
 ## 3. Non-goals (OUT)
 
@@ -73,8 +73,8 @@ for a in acted:
         _held.setdefault(a["row"]["kit"], []).append(a["row"]["path"])
 ```
 
-A `continue` inside the body skips a trailing statement, so the loop body moves into a local
-function called once per row, and the count is taken around the call.
+A `continue` inside the body skips a trailing statement, so the count for a row is compared at the
+TOP of the next iteration, and once more after the loop, rather than at the body's foot.
 
 ### Rollout
 
@@ -125,9 +125,9 @@ kit, restores its other rows, and fails as it already did.
 - **AC5** — When that run's `.governance/outbox` is read, the conflict order and its four candidate files for the
   conflicting row exist as before.
   Red when: the forced rollback deletes the outbox entries.
-- **AC6** — When `python tools/govkit/govkit.py epoch` runs at the pass's commit, it reports no
-  unbumped govkit move.
-  Red when: govkit's version is left.
+- **AC6** — When `python tools/govkit/govkit.py epoch` runs at the build's version commit, it prints
+  no `FAILED` line.
+  Red when: a kit whose shipped set moved keeps its version.
 
 ## 7. Gates
 
@@ -142,6 +142,10 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-02 · initial draft, from the owner's third observation and `_cmd_update` at base.
+- rev-2 · 2026-10-02 · build pass · §4 Data model · S5 · AC6 · the per-row count is compared at the
+  top of the next iteration instead of moving the 350-line body into a local function, which would
+  have rebound a dozen of its names; S5 and AC6 follow unit 1's rev-2, since `epoch` does not grade
+  govkit.
 
 ## 10. Reuse audit
 

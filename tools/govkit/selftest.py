@@ -1436,6 +1436,53 @@ def check_update_safety(tmp: pathlib.Path) -> None:
           _gm.read_conf_key_gaps(_cg_t, _cg_d) == [("A", "absent"), ("B", "placeholder")],
           str(_gm.read_conf_key_gaps(_cg_t, _cg_d)))
 
+    # ---- DEPL-aHalvedInstall-4 AC1-AC5. One update moves a kit's conf.sh (which the target edited,
+    # ---- so it conflicts), its plain.txt (clean) and its engine (re-rendered). The refused row holds
+    # ---- the whole kit back: the clean row is restored, the regenerate is declined, the order says
+    # ---- why — under `[check] none`, and again under a check that stays green throughout.
+    for _ht, _hchk in (("ha", '[check]\nnone = "fixture"\n'),
+                       ("hg", '[check]\nargv = ["bash", "{kit}/check.sh"]\n')):
+        kit_h = (SAFE_HEAD + 'version_from = { none = "fixture" }\n\n' + _hchk + '\n'
+                 '[[files]]\ninclude = "**"\nrole = "engine"\n\n'
+                 '[[files]]\ninclude = ["tpl.md"]\nrole = "rendered"\nto = "docs/out.md"\n\n'
+                 '[[regenerate]]\nargv = ["bash", "{kit}/gen.sh"]\n\n'
+                 '[adopt]\nargv = ["bash", "{kit}/gen.sh"]\nmutates_index = false\n')
+        g, _ha = build_gov17(_ht, kit_h, {"conf.sh": "mode=one\ntail\n", "plain.txt": "a\nb\n",
+                                          "eng.txt": "v1\n", "gen.sh": gen_cg, "check.sh": "exit 0\n",
+                                          "tpl.md": "tpl\n"})
+        t = build_target17(g, _ht)
+        (t / PFX / "demo" / "conf.sh").write_bytes(b"mode=target\ntail\n")
+        settle(t, "the adopter edits the mode line")
+        write_gov17(g, kit_h, {"conf.sh": "mode=gov\ntail\n", "plain.txt": "a\nb\nc\n",
+                               "eng.txt": "v2\n"}, "B")
+        p = run_gov17(g, "update", "--target", str(t), "--write")
+        _hp = f"{PFX}demo/plain.txt"
+        _ho = read_bytes17(t / ".governance" / "outbox" / "update-rollback-demo.md").decode("utf-8")
+        _hs = govkit_module().render_order_slug(f"{PFX}demo/conf.sh")
+        check(f"[aHI-4 {_ht}] LIVENESS the conf.sh three-way really conflicts",
+              "diverged and the three-way conflicts" in p.stdout, p.stdout[-1500:])
+        check(f"[aHI-4 {_ht} AC1/AC3] the clean sibling row is restored, bytes and receipt row, "
+              f"and the run says HELD BACK",
+              read_bytes17(t / PFX / "demo" / "plain.txt") == b"a\nb\n"
+              and read_row17(t, _hp).get("commit") == _ha
+              and f"HELD BACK demo: 1 row(s) refused ({PFX}demo/conf.sh)" in p.stdout,
+              p.stdout[-1800:] + str(read_row17(t, _hp)))
+        check(f"[aHI-4 {_ht} AC2] the held kit's regenerate is DECLINED, naming the refused row, "
+              f"and did not run",
+              f"DECLINED demo: a row of this kit was refused this run ({PFX}demo/conf.sh)" in p.stdout
+              and read_bytes17(t / "docs" / "out.md") == b"v1\n",
+              p.stdout[-1800:] + repr(read_bytes17(t / "docs" / "out.md")))
+        check(f"[aHI-4 {_ht} AC4] the rollback order names the refused row as the cause and the "
+              f"clean row as restored",
+              "was HELD BACK" in _ho and f"REFUSED {PFX}demo/conf.sh" in _ho
+              and f"restored  {_hp}" in _ho, _ho)
+        check(f"[aHI-4 {_ht} AC5] the conflict order and its candidate files are still written",
+              (t / ".governance" / "outbox" / f"update-conflict-{_hs}.md").is_file()
+              and (t / ".governance" / "outbox" / f"update-conflict-{_hs}" / "candidate").is_file(),
+              str(sorted(x.name for x in (t / ".governance" / "outbox").glob("*"))))
+        check(f"[aHI-4 {_ht}] ...and the run fails rather than re-stamping",
+              p.returncode == 1 and "NOT re-stamped" in p.stdout, p.stdout[-800:])
+
     # ---- S3, S4 — AC5, AC6, AC7. One conflicting engine file carrying a lone CR inside an awk
     # ---- program on its first line, and one engine file whose four lone CRs a target lost.
     conf_a = b"awk '{ gsub(\"\r\", \"\") }' \"$1\"\nmode=one\ntail\n"

@@ -9271,7 +9271,22 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
               + f"; no kit this receipt claims declares an lf_pin any more "
                 f"({len(pins_drop.get('patterns') or [])} pin(s) withdrawn)")
 
+    # DEPL-aHalvedInstall-4 S1. WHICH KITS A REFUSED ROW HOLDS BACK. A row this loop refuses — a
+    # three-way conflict, a rename that conflicts, a merge it cannot land, any of the `r.fail`s below —
+    # used to leave that row old while every sibling row of the same kit landed new, and the kit's
+    # regenerate then ran over the mixture: measured at an adopter as a new script calling an old
+    # sibling for a flag it did not have, under `[check] none`, so nothing rolled it back. A row
+    # REFUSED is one that added a finding; that is read as the problem count moving across the row,
+    # so every refusal in the body counts, including one added after this was written. The count is
+    # taken at the TOP of the next iteration, and once after the loop, because the body's `continue`s
+    # skip anything placed at its foot. A row with no kit — the synthesized attributes row — holds
+    # nothing back.
+    _held: dict[str, list[str]] = {}
+    _held_prev: tuple[str, str, int] | None = None
     for a in acted:
+        if _held_prev is not None and len(r.problems) > _held_prev[2] and _held_prev[0]:
+            _held.setdefault(_held_prev[0], []).append(_held_prev[1])
+        _held_prev = (str(a["row"].get("kit") or ""), str(a["row"].get("path")), len(r.problems))
         row, c, v = a["row"], a["c"], a["verdict"]
 
         # A receipt path is TARGET-SUPPLIED data. Joining it onto the target root and writing is a
@@ -9619,6 +9634,11 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                 row["commit"] = to_commit
                 row["version"] = _resolve_ver_at(row)
                 changed.append(row["path"])
+    if _held_prev is not None and len(r.problems) > _held_prev[2] and _held_prev[0]:
+        _held.setdefault(_held_prev[0], []).append(_held_prev[1])
+    for _eid_h, _paths_h in sorted(_held.items()):
+        print(f"govkit update — HELD BACK {_eid_h}: {len(_paths_h)} row(s) refused "
+              f"({', '.join(_paths_h)}), so none of this kit's writes from this run will stand")
 
     # NO `git add` OVER `changed`. S5 already staged every one of those paths from gov's own bytes;
     # re-adding them would re-CLEAN what the smudge filter just produced, and a filter pair that does
@@ -9979,6 +9999,17 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                 _rr_declined.append((_eid, "the target holds this kit INERT; running its adopter "
                                            "would flip a posture the target chose"))
                 continue
+            # DEPL-aHalvedInstall-4 S2. A HELD kit's engine is half old and half new right now, and the
+            # verify pass below puts the new half back. Its regenerate would run over that mixture —
+            # the observed failure — and write renders the rollback would then have to chase. NOT
+            # entered in `_rr_stale`: that set is the verify pass's declined-red exit, which leaves a
+            # kit's writes STANDING, and a held kit's writes must not stand.
+            if _eid in _held:
+                _rr_declined.append((_eid, f"a row of this kit was refused this run "
+                                           f"({', '.join(_held[_eid])}), so the kit is HELD BACK "
+                                           f"whole and its re-render would run over a half-landed "
+                                           f"engine"))
+                continue
             # S1 IS NOT BUILT, AND THE REASON IS A MEASUREMENT RATHER THAN A PREFERENCE. The
             # spec asks `update` to run the kit's `[adopt].argv`. Run against an adopted tree,
             # `memory-tree`'s adopter takes one of exactly two branches, and NEITHER re-renders:
@@ -10231,7 +10262,11 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
         # S8. THE SKIP ANNOUNCES ITSELF. A `[check] = { none = "…" }` and an argv carrying an
         # unresolved token both land here, and a check that could not run is not a pass — so it is
         # counted apart from verified rather than swelling it.
-        if now == "landed-unmeasured":
+        # DEPL-aHalvedInstall-4 S3. A HELD kit is rolled back WHATEVER its check says, so it skips
+        # both exits that leave writes standing — the unmeasured one, which every `[check] none` kit
+        # takes, and pre-existing red — and enters the restore below by its own condition.
+        _held_v = _held.get(eid)
+        if now == "landed-unmeasured" and not _held_v:
             n_unverified += 1
             print(f"govkit update — verify {eid}: {was} -> {now}{now_detail} · UNVERIFIED: nothing "
                   f"measured this kit's writes, which is not the same as measuring them green")
@@ -10239,7 +10274,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
 
         # S6. PRE-EXISTING RED, the only escape from the wedge. Its writes stand, nothing is rolled
         # back, and no `r.fail` — so the run completes and the receipt re-stamps.
-        if was == "landed-but-inert" and now == "landed-but-inert":
+        if was == "landed-but-inert" and now == "landed-but-inert" and not _held_v:
             n_preexisting += 1
             (outbox / f"update-preexisting-red-{eid}.md").write_text(
                 f"# {eid} was already red before this update\n\n"
@@ -10258,7 +10293,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             continue
 
         # S5. GREEN BEFORE, RED AFTER: this run broke it, and only this kit is undone.
-        if was == "adopted" and now == "landed-but-inert":
+        if _held_v or (was == "adopted" and now == "landed-but-inert"):
             # DEPL-cMendedVintage-1 S2. THE ARM NOW HAS TWO EXITS, and this is the first: a kit
             # whose check reds because of a RENDER STEP THIS RUN DECLINED is not a kit this run's
             # bytes broke. The old single exit ran the kit's own `[check]` — the program whose job
@@ -10276,7 +10311,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             # THE RUN STILL FAILS. What changes is that the writes STAND; the verdict does not go
             # green. Suppressing the `r.fail` here would convert a wedge into a silent data problem,
             # which is strictly worse than the wedge.
-            if eid in _rr_stale:
+            if eid in _rr_stale and not _held_v:
                 n_declined_red += 1
                 _why_dr = _rr_stale[eid]
                 # A DISTINCT FILENAME, modelled on the `update-preexisting-red-` writer above —
@@ -10563,12 +10598,19 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                         lst.remove(p)
 
             (outbox / f"update-rollback-{eid}.md").write_text(
-                f"# {eid} was rolled back — its own check reds on what this run wrote\n\n"
-                f"check  {check_argv_of(d, ctx_v) or '(the kit declares no argv)'}\n"
+                (f"# {eid} was HELD BACK — this run refused a row of it, so none of its writes "
+                 f"stand\n\n" if _held_v else
+                 f"# {eid} was rolled back — its own check reds on what this run wrote\n\n")
+                + f"check  {check_argv_of(d, ctx_v) or '(the kit declares no argv)'}\n"
                 f"{exits}\n"
                 f"vintage {base_commit} -> {to_commit}\n\n"
-                f"This kit's check PASSED before this run and FAILS after it, so this run is what "
-                f"broke it. Every path marked `restored` below — and ONLY those — was put back to "
+                + (f"This run REFUSED {', '.join(_held_v)} of this kit, so the kit could not land "
+                   f"whole: a kit half at the new vintage and half at the old one is the state this "
+                   f"rollback exists to prevent, whatever its check says ({exits}). Every path"
+                   if _held_v else
+                   f"This kit's check PASSED before this run and FAILS after it, so this run is what "
+                   f"broke it. Every path")
+                + f" marked `restored` below — and ONLY those — was put back to "
                 f"the index entry it had before the first byte moved, and its receipt row with it. "
                 f"Every path marked `removed` was one this run LANDED: it had no earlier state to "
                 f"return to, so it was deleted and the row this run minted for it was dropped. "
@@ -10620,14 +10662,22 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                           f"snapshot covered it, so the rollback could not return it\n"
                           for p in _rg_left)
                 + f"\nThe receipt is NOT re-stamped, so the next run re-classifies these rows from "
-                  f"the vintage they are actually at. Resolve by hand — most often the clean "
-                  f"three-way merge that produced this is plausible and wrong — then re-run "
-                  f"`update`.\n",
+                  f"the vintage they are actually at. "
+                + ("Resolve each refused row's conflict order under .governance/outbox/, then re-run "
+                   "`update`; the kit lands whole once no row of it is refused.\n" if _held_v else
+                   "Resolve by hand — most often the clean three-way merge that produced this is "
+                   "plausible and wrong — then re-run `update`.\n"),
                 encoding="utf-8", newline="\n")
-            print(f"govkit update — verify {eid}: {was} -> {now} · {exits} · ROLLED BACK · "
+            print(f"govkit update — verify {eid}: {was} -> {now} · {exits} · "
+                  + (f"HELD BACK ({', '.join(_held_v)} refused) · " if _held_v else "")
+                  + "ROLLED BACK · "
                   + (" ".join(restored + removed_landed)
                      if (restored or removed_landed) else "(no path restored)"))
-            r.fail(f"kit '{eid}' passed its own check before this run and fails it after: "
+            r.fail(f"kit '{eid}' was HELD BACK: this run refused {', '.join(_held_v)} of it, so "
+                   f"every write this run made for it was ROLLED BACK to its pre-run index entry "
+                   f"rather than leaving the kit half updated; an order was written under "
+                   f".governance/outbox/" if _held_v else
+                   f"kit '{eid}' passed its own check before this run and fails it after: "
                    f"{exits}. Its writes were ROLLED BACK to their pre-run index entries and an "
                    f"order was written under .governance/outbox/")
             continue
