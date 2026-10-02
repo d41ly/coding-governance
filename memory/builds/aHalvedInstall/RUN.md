@@ -10,8 +10,8 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 
 ## Run facts
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: cd90f7fa5c8cddf152e3a2a065f5df7ad64f355b
-phase: RUNNING
+witness: e9dfe2cd389f46075beee4f8c2fbe3d36ec93fdf
+phase: BUILDING
 branch-sha: cd90f7fa5c8cddf152e3a2a065f5df7ad64f355b
 branch-ref: refs/heads/branch/kit-bugs-keys-renderer-conflict-eddde0
 may: none
@@ -30,3 +30,13 @@ anchor-ref: refs/heads/main
 base: cd90f7fa5c8cddf152e3a2a065f5df7ad64f355b
 
 ## Parked
+
+2026-10-02T13:03:32Z brief · item DEPL-aHalvedInstall-1 · reason f3210ed86429 memory/builds/aHalvedInstall/prompts/2026-10-02-prompt-DEPL-aHalvedInstall-1-2-build-brief.md
+
+2026-10-02T13:03:35Z brief · item DEPL-aHalvedInstall-2 · reason e894c56a0276 memory/builds/aHalvedInstall/prompts/2026-10-02-prompt-DEPL-aHalvedInstall-2-2-build-brief.md
+
+2026-10-02T13:03:40Z brief · item DEPL-aHalvedInstall-3 · reason 7c40d4482404 memory/builds/aHalvedInstall/prompts/2026-10-02-prompt-DEPL-aHalvedInstall-3-2-build-brief.md
+
+2026-10-02T13:03:43Z brief · item DEPL-aHalvedInstall-4 · reason 36c9e6e8068e memory/builds/aHalvedInstall/prompts/2026-10-02-prompt-DEPL-aHalvedInstall-4-2-build-brief.md
+
+2026-10-02T13:03:51Z dispatch · item e9dfe2cd DEPL-aHalvedInstall-1 · reason tools/govkit/govkit.py tools/govkit/selftest.py tools/unattended/kit.toml memory/builds/aHalvedInstall/spec/2026-10-02-spec-DEPL-aHalvedInstall-1.md memory/LIVE.md
