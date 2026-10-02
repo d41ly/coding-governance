@@ -103,3 +103,5 @@ base: 9fdd0c18d5afac1744c226c3e8ea2716e6d49e30
 2026-10-02T06:56:19Z resume · item aSightedSkeptic · reason held · keepalive b122fb8b · manual
 
 2026-10-02T09:11:11Z rescope · item add TOOL-aSightedSkeptic-13 · reason Adopted by the owner's ruling (2026-10-02): check 23 of the unattended kit gate skips only records whose own phase field reads LANDED or ABORTED, so every in-place landing (whose file stays LANDING) is re-graded on every bar forever; check 7 already excludes a record as derived LANDED. Check 23 gains that same exclusion.
+
+2026-10-02T09:23:40Z brief · item TOOL-aSightedSkeptic-13 · reason d1957c311af7 memory/builds/aSightedSkeptic/prompts/2026-10-02-prompt-TOOL-aSightedSkeptic-13-2-build-brief.md
