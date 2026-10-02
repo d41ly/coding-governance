@@ -670,7 +670,7 @@
     "name": "review-replay selftest",
     "argv": [
       "python3",
-      "tools/workflows/review_replay.py",
+      "{prefix}/workflows/review_replay.py",
       "--selftest"
     ],
     "chunk": "selftests",

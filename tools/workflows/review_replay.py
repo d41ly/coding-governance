@@ -372,7 +372,7 @@ def run_selftest():
         ("window-edge", lambda: None if measure_recall(edge, [{"lens": "l", "ref": "r", "path": "src/e.py", "line": 30}], 10)["matched"]
             and not measure_recall(edge, [{"lens": "l", "ref": "r", "path": "src/e.py", "line": 31}], 10)["matched"]
             else "the window edge is off by one"),
-        ("path-suffix", lambda: None if check_same_file("pkg/lib/kit.toml", "kit.toml") and check_same_file("kit.toml", "pkg/lib/kit.toml")
+        ("path-suffix", lambda: None if check_same_file("pkg/sub/kit.toml", "kit.toml") and check_same_file("kit.toml", "pkg/sub/kit.toml")
             and not check_same_file("a/kit.toml", "b/kit.toml") and not check_same_file("pkg/akit.toml", "kit.toml")
             else "the path-suffix rule is wrong"),
         ("candidate-only", lambda: None if score and [c["ref"] for c in score["candidate_only"]] == ["mod/c.py:7"]
