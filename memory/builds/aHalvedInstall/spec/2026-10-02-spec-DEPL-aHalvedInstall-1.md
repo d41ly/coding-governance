@@ -1,6 +1,6 @@
 # DEPL-aHalvedInstall-1 — govkit reads each kit's declared required conf keys and names a gap
 
-**Status:** OPEN · rev-1 · 2026-10-02 · node a · Tier-2 · base cd90f7fa · streams deployer · order 1
+**Status:** INPROGRESS · rev-2 · 2026-10-02 · node a · Tier-2 · base cd90f7fa · streams deployer · order 1
 
 <!-- gen:spec-records -->
 
@@ -41,7 +41,8 @@ regenerate, and name every gap by key.
   from `optional_keys` to `conditional_keys`, because the adopter requires them unless
   `RESUME_SCHEDULE` is `off`, and that condition is the hole's to grade (DEPL-aHalvedInstall-2).
   NOT OBSERVED by an arm: a list move check 7 accepts and nothing else reads.
-- **S6** — govkit's version moves 1.12 to 1.13 in every carrier `govkit epoch` names. Observed by AC6.
+- **S6** — Every kit whose shipped bytes this unit moves is bumped where `govkit epoch` names it.
+  govkit itself is not in that population, and is not bumped here. Observed by AC6.
 
 ## 3. Non-goals (OUT)
 
@@ -130,9 +131,9 @@ named `check` finding where before it got the adopter's unnamed placeholder refu
 - **AC5** — When `check` runs over the existing hole fixtures, the `UNDISCHARGED` and `stood down`
   lines are byte-identical to base.
   Red when: `run_hole_probes` drops the stand-down branch.
-- **AC6** — When `python tools/govkit/govkit.py epoch` runs at the pass's commit, it reports no
-  unbumped govkit move.
-  Red when: `KIT_GOVKIT_VERSION` is left at 1.12.
+- **AC6** — When `python tools/govkit/govkit.py epoch` runs at the pass's commit, it prints no
+  `FAILED` line.
+  Red when: a kit whose shipped set the commit moves keeps its version.
 
 ## 7. Gates
 
@@ -147,6 +148,9 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-02 · initial draft, from the owner's first observation and govkit read at base.
+- rev-2 · 2026-10-02 · build pass · S6 · AC6 · `govkit epoch` does not grade govkit itself, and
+  `KIT_GOVKIT_VERSION` has stood at 1.12 across 66 commits to the file since `7bd70200`: it moves on
+  release, not per change. S6 now bumps only what `epoch` names.
 
 ## 10. Reuse audit
 

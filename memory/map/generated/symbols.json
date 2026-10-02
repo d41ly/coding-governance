@@ -5478,6 +5478,11 @@
       "file": "tools/check-spec-tokens.py"
     },
     {
+      "id": "read_conf_key_gaps",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "read_conf_mode",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
@@ -7841,6 +7846,11 @@
       "id": "run_grep",
       "kind": "function",
       "file": "tools/memory-recall/bench.py"
+    },
+    {
+      "id": "run_hole_probes",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
     },
     {
       "id": "run_in_gov",

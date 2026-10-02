@@ -1391,6 +1391,51 @@ def check_update_safety(tmp: pathlib.Path) -> None:
           p.returncode != 0 and "gen: REFUSED, the sibling it asks is too old" in line,
           (p.stdout + p.stderr)[-1500:])
 
+    # ---- DEPL-aHalvedInstall-1 AC1-AC4. A kit DECLARING a required render key and a hole. `update`
+    # ---- names both before its regenerate runs; `check` names the key by state; `defaults` exempts.
+    kit_cg = (SAFE_HEAD + 'version_from = { none = "fixture" }\n\n[check]\nnone = "fixture"\n\n'
+              '[config]\nfile = ".demo.conf"\nowner = "demo"\nrequired_keys_render = ["DEMO_KEY"]\n\n'
+              '[[hole]]\nid = "demo-hole"\nkind = "authoring"\nblocks_adopt = false\n'
+              'blocks_gate = false\nwhy = "the fixture hole, never discharged"\n'
+              'discharge = { command = ["bash", "-c", "exit 3"] }\n\n'
+              '[[files]]\ninclude = "**"\nrole = "engine"\n\n'
+              '[[files]]\ninclude = ["tpl.md"]\nrole = "rendered"\nto = "docs/out.md"\n\n'
+              '[[regenerate]]\nargv = ["bash", "{kit}/gen.sh"]\n\n'
+              '[adopt]\nargv = ["bash", "{kit}/gen.sh"]\nmutates_index = false\n')
+    gen_cg = 'd="$(dirname "$0")"\nmkdir -p docs\ncat "$d/eng.txt" > docs/out.md\n'
+    g, _a = build_gov17("cg", kit_cg, {"eng.txt": "v1\n", "gen.sh": gen_cg, "tpl.md": "tpl\n"})
+    t = build_target17(g, "cg")
+    write_gov17(g, kit_cg, {"eng.txt": "v2\n"}, "B")
+    p = run_gov17(g, "update", "--target", str(t), "--write")
+    _cg_out = p.stdout
+    _cg_gap = _cg_out.find("govkit update — CONF GAP demo: .demo.conf key DEMO_KEY is absent")
+    _cg_ran = _cg_out.find("ran demo:")
+    check("[aHI-1 AC4] update names an absent render key BEFORE the regenerate it would refuse",
+          0 <= _cg_gap < _cg_ran, _cg_out[-1500:])
+    check("[aHI-1 S3] ...and names the undischarged hole there too, with its reason",
+          "govkit update — HOLE demo: 'demo-hole' is undischarged (probe exit 3) — the fixture hole"
+          in _cg_out, _cg_out[-1500:])
+    check("[aHI-1 S3] ...and the regenerate still ran: the lines change no disposition",
+          read_bytes17(t / "docs" / "out.md") == b"v2\n", repr(read_bytes17(t / "docs" / "out.md")))
+    for _cg_val, _cg_want in ((None, "is ABSENT"), ('"<your-tool>"', "still the example's <...>"),
+                              ('"real"', None)):
+        if _cg_val is not None:
+            (t / ".demo.conf").write_text(f"DEMO_KEY={_cg_val}\n", encoding="utf-8", newline="\n")
+        p = run_gov17(g, "check", "--target", str(t))
+        _cg_hit = "conf .demo.conf: required key DEMO_KEY" in p.stdout
+        check(f"[aHI-1 AC1-AC2] check over DEMO_KEY={_cg_val} "
+              + (f"names it, '{_cg_want}'" if _cg_want else "names nothing"),
+              (_cg_hit and _cg_want in p.stdout) if _cg_want else not _cg_hit, p.stdout[-1500:])
+    _gm = govkit_module()
+    _cg_t = tmp / "cg-defaults"
+    _cg_t.mkdir()
+    _cg_d = {"config": {"file": ".x.conf", "required_keys_gate": ["A", "B"],
+                        "required_keys_render": ["B", "C"], "defaults": {"C": "c"}}}
+    (_cg_t / ".x.conf").write_text('export B="<b>"\n', encoding="utf-8", newline="\n")
+    check("[aHI-1 AC3] a defaulted key is never absent; both lists are read, once each",
+          _gm.read_conf_key_gaps(_cg_t, _cg_d) == [("A", "absent"), ("B", "placeholder")],
+          str(_gm.read_conf_key_gaps(_cg_t, _cg_d)))
+
     # ---- S3, S4 — AC5, AC6, AC7. One conflicting engine file carrying a lone CR inside an awk
     # ---- program on its first line, and one engine file whose four lone CRs a target lost.
     conf_a = b"awk '{ gsub(\"\r\", \"\") }' \"$1\"\nmode=one\ntail\n"

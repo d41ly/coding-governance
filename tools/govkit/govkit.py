@@ -4270,6 +4270,94 @@ def cmd_plan(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[str
 
 
 # ---------------------------------------------------------------------------------------- check
+#: One `KEY=VALUE` assignment line of a kit conf, `export` prefix admitted. DEPL-aHalvedInstall-1.
+CONF_KEY_RX = re.compile(r"^\s*(?:export\s+)?([A-Z][A-Z0-9_]*)=(.*)$")
+
+
+def read_conf_key_gaps(target: pathlib.Path, desc: dict,
+                       lists: tuple[str, ...] = ("required_keys_gate", "required_keys_render")
+                       ) -> list[tuple[str, str]]:
+    """Every key a kit's `[config]` DECLARES required and the target's conf does not carry.
+
+    DEPL-aHalvedInstall-1. The two lists were declared by every kit with a conf and read by nothing
+    in this file but check 7, as a name set — so a target conf missing a required key, or still
+    holding the example's `<...>` value, was silent here until the kit's own adopter refused it
+    mid-render. Returns `(key, state)` pairs, state `absent` or `placeholder`, in declaration order;
+    a key in `[config].defaults` is never absent, and a missing conf file makes every key absent.
+
+    WHAT IT DOES NOT CHECK. It asks whether a key is ASSIGNED and whether its value is the example's
+    angle-bracket shape — never whether the value is right, which is the kit's own check. It reads
+    the file and never sources it: the LAST assignment wins, as under `source`, one layer of quotes is
+    stripped, and an unquoted value keeps any trailing comment. The kit's own conf parser (the
+    memory-tree kit's `parse_conf_line`) sits across a kit edge this file does not import over. A
+    key required only under another key's value is a hole's question, not this one's."""
+    cfg = desc.get("config") or {}
+    rel = str(cfg.get("file") or "").strip()
+    if not rel:
+        return []
+    defaults = cfg.get("defaults") or {}
+    want = [k for k in dict.fromkeys(k for kl in lists for k in (cfg.get(kl) or []))
+            if k not in defaults]
+    if not want:
+        return []
+    p = target / rel
+    vals: dict[str, str] = {}
+    if p.is_file():
+        for ln in p.read_text(encoding="utf-8", errors="replace").splitlines():
+            m = CONF_KEY_RX.match(ln)
+            if m:
+                v = m.group(2).strip()
+                if len(v) >= 2 and v[0] == v[-1] and v[0] in "\"'":
+                    v = v[1:-1]
+                vals[m.group(1)] = v
+    gaps: list[tuple[str, str]] = []
+    for k in want:
+        if k not in vals:
+            gaps.append((k, "absent"))
+        elif vals[k].startswith("<") and vals[k].endswith(">"):
+            gaps.append((k, "placeholder"))
+    return gaps
+
+
+def run_hole_probes(eid: str, desc: dict, ctx: dict[str, str], target: pathlib.Path,
+                    selection: list[str], owned: "set | frozenset") -> list[tuple[str, str, str]]:
+    """Run one kit's `[[hole]]` discharge probes against `target`. ONE runner for two verbs.
+
+    DEPL-aHalvedInstall-1 S4. Lifted out of `check`, which was the only caller, so `update` can name an
+    undischarged hole BEFORE it runs a regenerate that is bound to refuse on it — the defect being a
+    hole `check` would have named and `update` stayed silent about. Returns one `(hole id, verdict,
+    detail)` per hole, verdict one of `no-probe`, `stood-down`, `needs-answer`, `no-launch`,
+    `undischarged` or `discharged`; each caller decides what a verdict costs it."""
+    out: list[tuple[str, str, str]] = []
+    for h in desc.get("hole", []):
+        hid = h.get("id")
+        cmd = (h.get("discharge") or {}).get("command")
+        if not cmd:
+            out.append((hid, "no-probe", ""))
+            continue
+        by = resolve_stand_down(h, selection, owned, (desc.get("home") or "").rstrip("/"))
+        if by:
+            out.append((hid, "stood-down", by))
+            continue
+        resolved = []
+        unresolved: list[str] = []
+        for a in cmd:
+            s, miss = resolve_tokens(a, ctx)
+            resolved.append(s)
+            unresolved += miss
+        if unresolved:
+            out.append((hid, "needs-answer", ", ".join(sorted(set(unresolved)))))
+            continue
+        try:
+            rc = subprocess.run(resolve_shell_argv(resolved), cwd=str(target), capture_output=True,
+                                text=True).returncode
+        except OSError as e:
+            out.append((hid, "no-launch", str(e)))
+            continue
+        out.append((hid, "undischarged" if rc != 0 else "discharged", str(rc)))
+    return out
+
+
 def run_kit_check(eid: str, desc: dict, ctx: dict[str, str], target: pathlib.Path,
                   r: "Report | None" = None) -> tuple[str, str, int | None]:
     """RUN one kit's own declared `[check]` and report the state it MEASURED (`-14` S1).
@@ -4668,36 +4756,29 @@ def cmd_check(root: pathlib.Path, target: pathlib.Path, run_discharge: bool = Fa
         state, detail, _rc = run_kit_check(eid, d, ctx, target, r)
         print(f"govkit check — {eid}: {state}{detail}")
 
-        for h in d.get("hole", []):
-            hid = h.get("id")
-            cmd = (h.get("discharge") or {}).get("command")
-            if not cmd:
+        # DEPL-aHalvedInstall-1 S2. The kit's DECLARED required keys, read against the target's conf.
+        _conf = (d.get("config") or {}).get("file")
+        for _k, _st in read_conf_key_gaps(target, d):
+            r.fail(f"kit '{eid}' conf {_conf}: required key {_k} is "
+                   + ("ABSENT" if _st == "absent" else "still the example's <...> placeholder")
+                   + " — the kit's [config] declares it required, so its adopter refuses or its "
+                     "gate reds without a value")
+
+        _whys = {h.get("id"): h.get("why", "") for h in d.get("hole", [])}
+        for hid, verdict, detail in run_hole_probes(eid, d, ctx, target, selection, _owned_src):
+            if verdict == "no-probe":
                 r.fail(f"kit '{eid}' hole '{hid}' has no discharge probe, so 'discharged' is "
                        f"undefined for it and this check cannot answer the question")
-                continue
-            by = resolve_stand_down(h, selection, _owned_src, (d.get("home") or "").rstrip("/"))
-            if by:
-                print(f"govkit check — {eid}: hole '{hid}' stood down — {by}")
-                continue
-            resolved = []
-            unresolved: list[str] = []
-            for a in cmd:
-                s, miss = resolve_tokens(a, ctx)
-                resolved.append(s)
-                unresolved += miss
-            if unresolved:
+            elif verdict == "stood-down":
+                print(f"govkit check — {eid}: hole '{hid}' stood down — {detail}")
+            elif verdict == "needs-answer":
                 r.fail(f"kit '{eid}' hole '{hid}' probe needs answer(s) "
-                       f"{', '.join(sorted(set(unresolved)))}, which the target descriptor lacks")
-                continue
-            try:
-                rc = subprocess.run(resolve_shell_argv(resolved), cwd=str(target), capture_output=True,
-                                    text=True).returncode
-            except OSError as e:
-                r.fail(f"kit '{eid}' hole '{hid}' probe could not run: {e}")
-                continue
-            if rc != 0:
-                r.fail(f"kit '{eid}' hole '{hid}' is UNDISCHARGED (probe exit {rc}) — "
-                       f"{h.get('why', '').splitlines()[0] if h.get('why') else 'no reason declared'}")
+                       f"{detail}, which the target descriptor lacks")
+            elif verdict == "no-launch":
+                r.fail(f"kit '{eid}' hole '{hid}' probe could not run: {detail}")
+            elif verdict == "undischarged":
+                r.fail(f"kit '{eid}' hole '{hid}' is UNDISCHARGED (probe exit {detail}) — "
+                       f"{_whys[hid].splitlines()[0] if _whys.get(hid) else 'no reason declared'}")
     return r.emit()
 
 
@@ -9853,6 +9934,22 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                 _rr_stale[_eid] = _why_rr
                 continue
             _ctx_rr = target_context(target, deploy, _eid, _d)
+            # DEPL-aHalvedInstall-1 S3. SAY WHAT THE RENDER IS ABOUT TO REFUSE ON, BEFORE IT RUNS.
+            # A declared render key the conf lacks, or a hole the target has not discharged, used to
+            # surface only as the adopter's own refusal below — an unfilled placeholder with no key
+            # named. These lines change NOTHING about the disposition: the argv still runs and its own
+            # outcome still decides, because declining it would land the templates over a stale render.
+            _cf_rr = (_d.get("config") or {}).get("file")
+            for _k, _st in read_conf_key_gaps(target, _d, ("required_keys_render",)):
+                print(f"govkit update — CONF GAP {_eid}: {_cf_rr} key {_k} is {_st}, and the kit "
+                      f"declares it required to render")
+            _own_rr = {f.get("source") for f in receipt.get("files") or []
+                       if f.get("role") == "adopter-owned"}
+            _hw_rr = {h.get("id"): h.get("why", "") for h in _d.get("hole", [])}
+            for _hid, _hv, _hd in run_hole_probes(_eid, _d, _ctx_rr, target, list(claimed), _own_rr):
+                if _hv == "undischarged":
+                    print(f"govkit update — HOLE {_eid}: '{_hid}' is undischarged (probe exit {_hd})"
+                          f" — {(_hw_rr.get(_hid) or 'no reason declared').splitlines()[0]}")
             # DEPL-aRepatriatedFork-17 S1. A ROLLBACK COVERS WHAT THE RE-RENDER WROTE. The argv
             # below writes outside `written_paths`, so a kit rolled back after it kept its renders.
             # Snapshotted HERE, before the first argv, from the kit's own `rendered`/`generated`
