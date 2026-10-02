@@ -9326,8 +9326,10 @@ out=$(run --close tRun)
 hit "$out" "the reap list this attestation is made over — keepalive k1 · no durable schedule: no hold of this run owed one"
 reset_tree
 
-# ---- AC15: the kit.toml conf-placeholder probe, RESOLVED from the descriptor rather than retyped,
-# ---- so it stages RED against a kit.toml whose alternation still names the keepalive keys alone.
+# ---- AC15: the kit.toml carrier-pair probe, RESOLVED from the descriptor rather than retyped. Since
+# ---- DEPL-aHalvedInstall-2 it is a PRESENCE test that SOURCES the conf: each of the pair must hold a
+# ---- real value unless RESUME_SCHEDULE is off, read as the adopter reads it. Every spelling below
+# ---- is one the adopter accepts or refuses, and the probe must agree with it on each.
 RS_PROBE=$(read_hole_probe "$HERE/kit.toml" keepalive-tool-names)
 n=$((n+1)); [ -n "$RS_PROBE" ] || { echo "FAIL AC15 the conf-placeholder hole declares no discharge command"; st=1; }
 RS_FIX="$TMP/rs-probe"; rm -rf "$RS_FIX"; mkdir -p "$RS_FIX"
@@ -9342,6 +9344,31 @@ sed -i -e 's|^RESUME_SCHEDULE_CREATE=.*|RESUME_SCHEDULE_CREATE="create_scheduled
        "$RS_FIX/.unattended.conf"
 ( cd "$RS_FIX" && bash -c "$RS_PROBE" ); rc=$?
 same "AC15 the same conf with both carrier keys filled discharges the hole" "$rc" "0"
+cp "$RS_FIX/.unattended.conf" "$RS_FIX/base.conf"; RS_BASE="$RS_FIX/base.conf"
+{ grep -vE '^RESUME_SCHEDULE_(CREATE|DELETE)=' "$RS_BASE"; } > "$RS_FIX/.unattended.conf"
+( cd "$RS_FIX" && bash -c "$RS_PROBE" ) >/dev/null 2>&1; rc=$?
+same "AC15 the pair deleted, the switch on" "$rc" "1"
+{ grep -vE '^RESUME_SCHEDULE(_CREATE|_DELETE)?=' "$RS_BASE"; echo 'RESUME_SCHEDULE="off"'; } > "$RS_FIX/.unattended.conf"
+( cd "$RS_FIX" && bash -c "$RS_PROBE" ) >/dev/null 2>&1; rc=$?
+same "AC15 the pair deleted, the switch off" "$rc" "0"
+{ grep -vE '^RESUME_SCHEDULE(_CREATE|_DELETE)?=' "$RS_BASE"; echo "RESUME_SCHEDULE='off'"; } > "$RS_FIX/.unattended.conf"
+( cd "$RS_FIX" && bash -c "$RS_PROBE" ) >/dev/null 2>&1; rc=$?
+same "AC15 the switch off single-quoted" "$rc" "0"
+{ grep -vE '^RESUME_SCHEDULE(_CREATE|_DELETE)?=' "$RS_BASE"; echo 'RESUME_SCHEDULE=off  # opt out'; } > "$RS_FIX/.unattended.conf"
+( cd "$RS_FIX" && bash -c "$RS_PROBE" ) >/dev/null 2>&1; rc=$?
+same "AC15 the switch off with a trailing comment" "$rc" "0"
+{ grep -vE '^RESUME_SCHEDULE(_CREATE|_DELETE)?=' "$RS_BASE"; echo 'RESUME_SCHEDULE=off'; echo 'RESUME_SCHEDULE=on'; } > "$RS_FIX/.unattended.conf"
+( cd "$RS_FIX" && bash -c "$RS_PROBE" ) >/dev/null 2>&1; rc=$?
+same "AC15 off, then reassigned on, with no pair" "$rc" "1"
+{ grep -vE '^RESUME_SCHEDULE_(CREATE|DELETE)=' "$RS_BASE"; echo 'export RESUME_SCHEDULE_CREATE=create_scheduled_task'; echo 'export RESUME_SCHEDULE_DELETE=delete_scheduled_task'; } > "$RS_FIX/.unattended.conf"
+( cd "$RS_FIX" && bash -c "$RS_PROBE" ) >/dev/null 2>&1; rc=$?
+same "AC15 the pair exported" "$rc" "0"
+{ grep -vE '^RESUME_SCHEDULE_CREATE=' "$RS_BASE"; echo 'RESUME_SCHEDULE_CREATE=""'; } > "$RS_FIX/.unattended.conf"
+( cd "$RS_FIX" && bash -c "$RS_PROBE" ) >/dev/null 2>&1; rc=$?
+same "AC15 one key empty" "$rc" "1"
+{ grep -vE '^RESUME_SCHEDULE_CREATE=' "$RS_BASE"; echo "RESUME_SCHEDULE_CREATE='<tool>'"; } > "$RS_FIX/.unattended.conf"
+( cd "$RS_FIX" && bash -c "$RS_PROBE" ) >/dev/null 2>&1; rc=$?
+same "AC15 one key a single-quoted placeholder" "$rc" "1"
 rm -rf "$RS_FIX"
 
 

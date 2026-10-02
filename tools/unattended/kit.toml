@@ -330,7 +330,11 @@ why = "RESUME_SCHEDULE_CREATE and RESUME_SCHEDULE_DELETE are required unless RES
 # target conf by itself (DEPL-aHalvedInstall-1), so asserting them here too would be two answers.
 # What stays is the CONDITIONAL pair, required unless RESUME_SCHEDULE is off -- a condition no key
 # list can carry. Each must be assigned a value that is neither empty nor angle-bracketed.
-discharge = { command = ["bash", "-c", "grep -qE '^RESUME_SCHEDULE=\"?off\"?[[:space:]]*$' .unattended.conf || for k in RESUME_SCHEDULE_CREATE RESUME_SCHEDULE_DELETE; do grep -qE '^'\"$k\"'=\"?[^<\"[:space:]]' .unattended.conf || exit 1; done"] }
+# It SOURCES the conf in a subshell, the three keys reset first, because the adopter sources it: a
+# grep of the first `^KEY=` line read `RESUME_SCHEDULE='off'`, a commented `off`, an `export` and a
+# later reassignment differently from the render (closing review M4). No backslash in the command:
+# unattended.test.sh reads it back with an awk that cannot unescape one.
+discharge = { command = ["bash", "-c", "test -f .unattended.conf && ( RESUME_SCHEDULE=; RESUME_SCHEDULE_CREATE=; RESUME_SCHEDULE_DELETE=; . ./.unattended.conf >/dev/null 2>&1; [ \"$RESUME_SCHEDULE\" = off ] || for v in \"$RESUME_SCHEDULE_CREATE\" \"$RESUME_SCHEDULE_DELETE\"; do w=${v//[[:space:]]/}; case $w in ''|'<'*'>') exit 1;; esac; done )"] }
 
 [[hole]]
 id = "directives-floor"
