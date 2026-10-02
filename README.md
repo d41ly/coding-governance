@@ -87,7 +87,7 @@ machines/sessions on the same repo.
   `tools/codebase-map/README.md` + `tools/codebase-map/INVENTORY-DERIVATION.md`. Operationalizes the playbook's §5/§6
   documentation-currency goals with machine enforcement.
 - **`tools/workflows/tier2-review.js`** — a ready, consolidated Tier-2 review harness (find → BATCHED
-  verify → synth): four finder lenses, at most five batched verifiers, one synthesis pass — 6–10
+  verify → synth): five finder lenses, at most five batched verifiers, one synthesis pass — 7–11
   agents over the run, all of them within the verify-stage and concurrency bounds, per the BINDING
   `memory/guides/REVIEW-PROTOCOL.md`. Run via `Workflow({scriptPath})`, parameterized
   by `args` (base SHA, repo, context). Passes the `agent-cap` guard by construction. Findings join to

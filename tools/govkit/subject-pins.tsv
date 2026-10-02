@@ -96,6 +96,7 @@ receipt sync (installed files match the receipt)	repo	declarations
 review-join ban (no ref-keyed join)	repo	declarations
 review-join self-test	kit	selftests
 review-protocol parity (kit vs dogfood)	repo	declarations
+review-replay selftest	kit	selftests
 row-driver view refusal	repo	declarations
 row-grammar selftest	kit	selftests
 row-keyed merge driver replay	kit	selftests

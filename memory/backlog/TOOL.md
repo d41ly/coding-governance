@@ -250,6 +250,7 @@ Cite ids, never line numbers.
 | [TOOL-aSiftedFork-5](../builds/aSiftedFork/BACKLOG.md) | OPEN | — | — | 2026-08-28 | THE VERDICT-EPOCH REMEDY NAMES THREE CARRIERS AND THE VERSION CHECKER… |
 | [TOOL-aSiftedFork-6](../builds/aSiftedFork/BACKLOG.md) | OPEN | — | — | 2026-08-28 | THE CANARY'S CLAMP ARMS USE timeout UNGUARDED, so a host that has none… |
 | [TOOL-aSiftedFork-7](../builds/aSiftedFork/BACKLOG.md) | OPEN | — | — | 2026-08-28 | THE RUN-GATES CANARY IS NON-DETERMINISTIC ON THIS HOST AND NAMES A… |
+| [TOOL-aSightedSkeptic-11](../builds/aSightedSkeptic/BACKLOG.md) | OPEN | HIGH | — | 2026-10-01 | inherited red: leg row-keyed merge driver replay red at ef1dcdb6,… |
 | [TOOL-aStagedLane-5](../builds/aStagedLane/BACKLOG.md) | OPEN | — | — | 2026-09-05 | THE INDEX-VERSUS-COMMIT SHAPE SURVIVES ONE FILE OVER.… |
 | [TOOL-aStandingWrit-2](../builds/aStandingWrit/BACKLOG.md) | OPEN | — | — | 2026-08-11 | SECURITY in landed code: the pinned BASE anchors on a remote-tracking… |
 | [TOOL-aStandingWrit-5](../builds/aStandingWrit/BACKLOG.md) | OPEN | — | — | 2026-08-11 | .githooks/pre-commit's branch guard fails CLOSED on a bogus… |
