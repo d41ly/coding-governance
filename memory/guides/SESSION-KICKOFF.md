@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.4 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-10-02T10:54:24+03:00 @ 43da5b5dfce2d1125d365695d83c2c9ad61d8ecf
+last-audit: 2026-10-02T10:56:35+03:00 @ 5372e1340827e783a80da62afab38d56d312982f
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/run-gates/run-selftests.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 5cb052dabf76732f9ed7ae3b5f8a31202e28ad6a
+last-body-change: 5372e1340827e783a80da62afab38d56d312982f
 check-script: skills/session-kickoff/manifest-check.sh
 registry: AGENTS.md
 -->
@@ -241,7 +241,7 @@ against the real tree) · `subprocess-resolves-a-different-shell.md` · `heredoc
 composes) · `inputs-inside-the-subjects-reach.md` (what SUPPLIES each of a check's inputs) ·
 `arm-literal-strands-on-message-edit.md` (editing a `fail` message strands its arm; the signature
 runs to the first interpolation, so lengthening a message always strands it and shortening never
-does — hit three times in one file in one session; also the whole-signature and positional facets) · `process-creation-is-the-suite-cost.md` ·
+does) · `process-creation-is-the-suite-cost.md` ·
 `trace-profile-measures-itself.md` · `fallback-fabricates-the-passing-value.md` ·
 `two-readers-of-one-config-one-re-derived.md` · `line-keyed-registry-reds-on-a-file-that-grew.md` (a waiver keyed `<path>:<line>`, and the sibling arm that is a BAN rather than a ratchet) · `naming-leg-grades-what-python-named.md` (nested helpers and dunders count, and arming follows `symbols.json`, so it only reds at the lander)
 · `row-driver-emits-a-plausible-file-with-rows-missing.md` · `worktree-crlf-outside-the-gated-population.md` · `settings-edit-takes-effect-mid-session.md` · `node-check-is-not-a-syntax-gate.md`
@@ -254,9 +254,9 @@ does — hit three times in one file in one session; also the whole-signature an
   CASE is the same file. Both give an arm that passes because its fixture was never there. `*.bak`
   is ignored on node `d`, on node `a` at NO scope (2026-09-04): run `git check-ignore -v` on YOURS.
 - The template is under a 48 KiB gate, and the gate also WARNS when the file grows past its
-  recorded high-water. Prefer dropping a conditional block, or trimming non-instructional prose, to
-  spending headroom; raising the ceiling is an owner decision, not an edit. Read the current
-  margin FROM `bash tools/check-template-size.sh`, never from prose — it moved twice in one day.
+  recorded high-water. Raising the
+  ceiling is an owner decision, not an edit. Read the current
+  margin FROM `bash tools/check-template-size.sh`, never from prose.
 - `git -C <dir> rev-parse --show-toplevel` returns `<dir>` ITSELF when an absolute `GIT_DIR` is
   inherited — what git exports to a merge driver in a LINKED WORKTREE. That made the row driver
   conflict every merge there until `repo_root()` walked up for the conf (`TOOL-aCollapsedScan-7`).
@@ -279,6 +279,7 @@ does — hit three times in one file in one session; also the whole-signature an
   — and `TMPDIR` IS empty on this node, so `$TMPDIR/x` is `/x` — any `/tmp` target, and root litter.
   Rules: `tools/hooks/README.md`. Write to the session scratchpad; a git clone goes under
   `%TEMP%/<short>` (MAX_PATH).
+- Node `a`: a `mktemp -d` fixture is `/tmp/x`, an MSYS mount git spells `C:/…/Temp/x`; compare through git, never as strings. A leaked `%TEMP%/.memory-tree.conf` reds every walk-up (`fixture-inherits-ambient-machine-state.md`).
 - A kit path a tool WRITES, RENDERS or PRINTS is DERIVED from that tool's own location, never spelled.
   A hardcoded prefix in a RENDERED artifact is the worst case: it lands a dead path in the adopter's
   committed tree and the byte-compare guarding that file agrees with it.
