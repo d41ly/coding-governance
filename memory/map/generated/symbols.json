@@ -1723,6 +1723,11 @@
       "file": "tools/codebase-map/selftest.py"
     },
     {
+      "id": "check_halved_install_arms",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
+    },
+    {
       "id": "check_hold_live",
       "kind": "function",
       "file": "tools/memory-tree/backlog.py"
@@ -10591,6 +10596,11 @@
       "id": "write_records",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "write_region",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
     },
     {
       "id": "write_relocation",

@@ -10206,6 +10206,19 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
         _fr_landed = set(changed) | set(renamed) | set(_landed_new)
         _fr_skip = read_inert_kits(deploy) | {str(f.get("kit")) for f in receipt.get("files") or []
                                               if f.get("kit") not in touched_kits}
+        # DEPL-aHalvedInstall-4 rev-3 (closing review M3). A HELD kit's fragments are not wired: the
+        # merge would write its half-landed command into settings.json, and a stale command it
+        # rewrites in place is not one `remove_wired_fragments` can take back. Said per fragment,
+        # because a skip that looks like nothing happened is the class this build closes. The line is
+        # read off the SAME set the merge is handed, so it cannot announce a skip the merge does not
+        # make; `run_fragment_merges` honouring that set is the fragment-wiring arm's own assertion.
+        _fr_skip |= set(_held)
+        for _fp in sorted(str(f.get("path")) for f in receipt.get("files") or []
+                          if f.get("kit") in _fr_skip and f.get("kit") in _held
+                          and f.get("path") in _fr_landed
+                          and str(f.get("path")).endswith(".fragment.json")):
+            print(f"govkit update — hooks: {_fp} landed UNWIRED — its kit is HELD BACK this run, "
+                  f"so wiring it would write a command the rollback then takes away")
         if _rerender_on:
             _wired_new = run_fragment_merges(target, receipt.get("files") or [], _fr_landed,
                                              _fr_skip, "update")
