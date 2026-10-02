@@ -161,3 +161,4 @@ memory/builds/aRepatriatedFork/README.md
 memory/builds/dHashedPrelude/README.md
 memory/builds/dAlignedCarrier/README.md
 memory/builds/dMendedRecall/README.md
+memory/builds/aSightedSkeptic/README.md

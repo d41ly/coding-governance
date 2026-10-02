@@ -21,7 +21,8 @@
 # own. TOOL-dUnstalledConvoy-6.
 #
 # TWO: check 7's EXCLUSION notice and its UNAVAILABLE sibling print on the DEFAULT channel, and the
-# contract line above is written to admit them. They are not skips. An exclusion is a positive
+# contract line above is written to admit them; so do check 23's `check 23 EXCLUDED` and
+# `check 23 exclusion UNAVAILABLE`, which share check 7's predicate (TOOL-aSightedSkeptic-13). They are not skips. An exclusion is a positive
 # finding that CHANGED THE VERDICT — a record the check stopped counting — and the reader of a green
 # run is entitled to know which one and on what evidence. Routing them through REPORT was the first
 # implementation and it made the exclusion invisible on every bar run, which is the check-quietly-
@@ -44,7 +45,7 @@
 # THE CORE SETS ARE READ FROM THE DRIVER, never restated here. A second spelling of `PHASES_CORE` one
 # file away from the thing that enforces it is the drift this leg exists to catch.
 set -u
-KIT_UNATTENDED_VERSION=1.55   # gov:kit unattended@1.55 — must match unattended.sh; check-kit-versions.sh pairs them
+KIT_UNATTENDED_VERSION=1.56   # gov:kit unattended@1.56 — must match unattended.sh; check-kit-versions.sh pairs them
 
 # ------------------------------------------------------------------------------ the dereference pin
 # Identical to the driver's, and for the identical reason: `git replace` rewrites what a sha MEANS for
@@ -423,6 +424,24 @@ check_adv_reaches() {  # rev -> 0 an ancestor of the advertised HEAD · 1 not
     return $?
   fi
   GIT merge-base --is-ancestor "$1" "${ADV_HEAD:-}" 2>/dev/null
+}
+# DERIVED LANDED, ONE PREDICATE FOR EVERY CHECK THAT EXCLUDES ON IT (TOOL-aSightedSkeptic-13). A
+# LANDING record whose landing commit - the one `read_landing_commit` FINDS, never a field the run
+# authors - is an ancestor of the advertised default-branch tip is a finished run. Checks 7 and 23
+# both ask it, and two inline copies of one question is how check 23 was left out of it.
+# CALLED AS A PLAIN COMMAND, never inside `$(...)`: a substitution discards both the global below
+# and the reach set `check_adv_reaches` warms, so every record would re-walk the advertised history.
+# MODE-INDEPENDENT, as check 7 and the driver's `read_derived_phase` are: ruling D12-i2 derives
+# LANDED from the remote, not from LANDER_MODE. Fails closed: 2 when no advertised tip resolves.
+DERIVED_LANDING_COMMIT=""
+check_derived_landed() { # run-state file -> 0 derived LANDED (sets DERIVED_LANDING_COMMIT) · 1 not · 2 UNAVAILABLE
+  DERIVED_LANDING_COMMIT=""
+  local _dl_c
+  [ "$(phase_of "$1")" = LANDING ] || return 1
+  _dl_c=$(read_landing_commit "$1" 2>/dev/null) || return 1
+  [ "${ADV_HEAD_OK:-0}" = 1 ] || return 2
+  check_adv_reaches "$_dl_c" || return 1
+  DERIVED_LANDING_COMMIT=$_dl_c
 }
 for k in LANDER BYPASS_BAN GATE_CMD WIRING_CHECK KEEPALIVE_CREATE KEEPALIVE_DELETE; do
   eval "v=\${$k}"
@@ -2648,18 +2667,17 @@ fi
 # ---- has not fetched leaves the record counted, with the reason reported. A check that silently
 # ---- stops excluding is indistinguishable from one that found nothing to exclude, which is this
 # ---- repo's own green-by-absence class.
-c7anchor="$ADV_HEAD"
-[ -n "$c7anchor" ] && { GIT rev-parse --verify --quiet "$c7anchor^{commit}" >/dev/null 2>&1 || c7anchor=""; }
+# ---- THE TEST ITSELF IS `check_derived_landed` (TOOL-aSightedSkeptic-13), shared with check 23.
+# ---- `ADV_HEAD_OK` answers what the retired local anchor re-asked: is the advertised tip in this clone.
 # ---- UNCONDITIONAL, not `report`. `report` is gated on REPORT=1, so routing either line through it
 # ---- would make the exclusion invisible on every default bar run — a check quietly deleted, which is
 # ---- the exact shape this exclusion must not have. Caught by verifying it rather than by reading it.
-if [ "$nlive" -gt 1 ] && [ -z "$c7anchor" ]; then
+if [ "$nlive" -gt 1 ] && [ "$ADV_HEAD_OK" != 1 ]; then
   printf 'unattended: check 7 exclusion UNAVAILABLE — no advertised default-branch tip resolves in this clone, so a LANDING record already on the remote cannot be told from a competing run; every non-terminal record is counted
 '
 fi
 c7keep=""; c7drop=""; c7n=0
 for c7f in $live; do
-  c7ph=$(phase_of "$c7f")
   # TOOL-dDerivedDocket-22 S9 - THE LANDING COMMIT, NOT THE WITNESS. The witness answers whether
   # the WORK is on the remote; the question is whether the RECORD is, because a run that pushed its
   # work before committing its LANDING record has a witness on the remote and a record nobody
@@ -2667,11 +2685,9 @@ for c7f in $live; do
   # `--status` read exactly this commit, and the leg and the driver agree about one record. It is a
   # commit this leg FOUND - the one that last wrote the record's committed bytes - so no field the
   # run authors can disarm it, which is what the witness's sha-shape clause used to guard against.
-  c7c=""
-  [ "$c7ph" = LANDING ] && c7c=$(read_landing_commit "$c7f" 2>/dev/null)
-  if [ -n "$c7c" ] && [ -n "$c7anchor" ] && GIT merge-base --is-ancestor "$c7c" "$c7anchor" 2>/dev/null; then
+  if check_derived_landed "$c7f"; then
     c7drop="$c7drop $c7f"
-    printf 'unattended: check 7 EXCLUDED %s — derived LANDED: its landing commit %s is an ancestor of the advertised default-branch tip %s, so the record the push carried is on the remote and it is a finished run rather than a second live one\n' "$c7f" "$c7c" "$c7anchor"
+    printf 'unattended: check 7 EXCLUDED %s — derived LANDED: its landing commit %s is an ancestor of the advertised default-branch tip %s, so the record the push carried is on the remote and it is a finished run rather than a second live one\n' "$c7f" "$DERIVED_LANDING_COMMIT" "$ADV_HEAD"
   else
     c7keep="$c7keep $c7f"; c7n=$((c7n+1))
   fi
@@ -3622,7 +3638,7 @@ check_generated_render() { # commit · path -> 0, printing what generated it, wh
   [ "$(printf '%s\n' "$_ga" | awk "$GEN_REGION_AWK")" = "$(printf '%s\n' "$_gb" | awk "$GEN_REGION_AWK")" ] || return 1
   printf 'a change inside its gen regions only'
 }
-ds_over=""; ds_over_n=0; ds_graded=0
+ds_over=""; ds_over_n=0; ds_graded=0; ds_unavail=0
 for f in $RUNS; do
   [ -f "$f" ] || continue
   case "$f" in *"/RUN.md") ;; *) continue ;; esac
@@ -3650,6 +3666,21 @@ for f in $RUNS; do
   if [ -z "$dsrows" ]; then
     report "check 23 skipped for $f — this run declared no concurrent dispatch, so there is no declaration to compare and a green verdict here would be coverage of nothing"
     continue
+  fi
+  # ---- DERIVED LANDED IS NOT GRADED (TOOL-aSightedSkeptic-13). An in-place landing leaves its record
+  # ---- at LANDING forever, so the recorded-phase skip above never fires for it and its landed,
+  # ---- append-only dispatch history counted against every later run's ceiling. Check 7's predicate,
+  # ---- asked here AFTER both skips: a record that was never graded stays silent, and under
+  # ---- LANDER_MODE=primary a landed record reads LANDED and never reaches it. Default channel, for
+  # ---- header exception TWO's reason: an exclusion changes the verdict.
+  check_derived_landed "$f"; ds_dl=$?
+  if [ "$ds_dl" = 0 ]; then
+    printf 'unattended: check 23 EXCLUDED %s — derived LANDED: its landing commit %s is an ancestor of the advertised default-branch tip %s, so its dispatch history is landed and append-only and is not graded against the ceiling\n' "$f" "$DERIVED_LANDING_COMMIT" "$ADV_HEAD"
+    continue
+  fi
+  if [ "$ds_dl" = 2 ] && [ "$ds_unavail" = 0 ]; then
+    ds_unavail=1
+    printf 'unattended: check 23 exclusion UNAVAILABLE — no advertised default-branch tip resolves in this clone, so a LANDING record already on the remote cannot be told from a live one; every LANDING record with dispatch rows is graded\n'
   fi
   while IFS= read -r dsrow; do
     [ -n "$dsrow" ] || continue

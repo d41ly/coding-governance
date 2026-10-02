@@ -69,6 +69,7 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [node-check-is-not-a-syntax-gate](node-check-is-not-a-syntax-gate.md) | class | 2 |  | node --check exits 0 on a file whose parse fails, because module auto-detection retries the parse and swallows the failure, so a gate built on it cannot go red |
 | [nt-against-a-missing-file-is-true](nt-against-a-missing-file-is-true.md) | class | 2 |  | a -nt b is TRUE when b does not exist, so a has-it-changed test against a stamp nobody wrote yet reports a change on the very first call |
 | [observation-before-the-last-fold-of-the-same-commit](observation-before-the-last-fold-of-the-same-commit.md) | class | 2 |  | an acceptance observation taken before the last fold of the same commit is an observation of nothing, because the tree it saw is one the commit never held |
+| [observed-by-claim-no-arm-discharges](observed-by-claim-no-arm-discharges.md) | class | 3 |  | a spec scope item says a behaviour is "Observed by ACn", the arm that criterion names never reads the surface the behaviour renders on, and a staged break of the behaviour leaves the suite green |
 | [one-value-field-records-a-mixed-outcome](one-value-field-records-a-mixed-outcome.md) | class | 1 |  | a per-subject field holding ONE value has to record an outcome that was mixed — take the value that DEMANDS something, never the one that demands nothing |
 | [pin-copied-from-another-corpus](pin-copied-from-another-corpus.md) | class | 2 |  | a threshold measured on one tree is vacuous or permanently red on another |
 | [pin-gated-checks-arm-nothing-without-a-pin](pin-gated-checks-arm-nothing-without-a-pin.md) | class | 5 |  | hygiene checks 13-15 alone are behind a declared pin, so a fixture conf without one arms nothing there and the checks report clean by never loading |
@@ -106,6 +107,6 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [witness-graded-against-a-fact-written-after-it](witness-graded-against-a-fact-written-after-it.md) | class | 2 |  | a sidecar line that outlives the lease it was written under is graded against the id the new lease replaced, so a dead incarnation's witness passes the check the live one owes |
 | [worktree-crlf-outside-the-gated-population](worktree-crlf-outside-the-gated-population.md) | class | 3 |  | a worktree checkout lands CRLF on eol-pinned files, no wiring gate sees it, and the reader that breaks is a consumer no gate byte-compares |
 
-91 record(s): 91 class, 0 note, 0 superseded · 6 universal · 0 unanchored
+92 record(s): 92 class, 0 note, 0 superseded · 6 universal · 0 unanchored
 
 <!-- END GENERATED -->
