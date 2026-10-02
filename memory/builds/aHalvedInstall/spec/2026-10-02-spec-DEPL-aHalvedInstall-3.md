@@ -1,6 +1,6 @@
 # DEPL-aHalvedInstall-3 — every kit with an adopter decides whether `update` re-renders it
 
-**Status:** OPEN · rev-1 · 2026-10-02 · node a · Tier-1 · base cd90f7fa · streams deployer · order 3
+**Status:** INPROGRESS · rev-2 · 2026-10-02 · node a · Tier-1 · base cd90f7fa · streams deployer · order 3
 
 <!-- gen:spec-records -->
 
@@ -93,8 +93,9 @@ re-runs for a landed fragment.
 - **AC1** — When `python tools/govkit/govkit.py selfcheck` runs, it names no `playbook-render`
   finding, and `tools/playbook/kit.toml` carries a `[[regenerate]]` block.
   Red when: the block is removed, which S2's arm reds.
-- **AC2** — When `bash tools/playbook/adopt-playbook.sh --target .` runs twice over an adopted
-  fixture, the second run leaves the charter byte-identical.
+- **AC2** — When `build_region` in `tools/playbook/render_playbook.py`, the write path's only
+  writer, is applied to its own output with the same rendered body, the result is byte-identical
+  and keeps the file's authored prose.
   Red when: the write path appends rather than replaces its region.
 - **AC3** — When selfcheck runs at base descriptors with the arm added, it names seven entries.
   Red when: the arm reads `[check]` rather than `[adopt]`, and names a different set.
@@ -118,6 +119,9 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-02 · initial draft, from the owner's second observation and the descriptors at base.
+- rev-2 · 2026-10-02 · build pass · AC2 · observed at `build_region` over the render selftest's own
+  fixture rather than by running the adopter twice: an adopted target needs every asked answer, and
+  the adopter's write mode is `build_region(cur, body)` and nothing else.
 
 ## 10. Reuse audit
 

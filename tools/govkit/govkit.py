@@ -1565,6 +1565,36 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
                    f"narrow re-render entrypoint; the adopter's `[adopt]` argv is NOT one, it "
                    f"no-ops or refuses on an already-adopted tree")
 
+    # ---- 3b-iii (DEPL-aHalvedInstall-3): A KIT WITH AN ADOPTER DECIDES WHETHER `update` RE-RUNS IT.
+    #          3b-ii's population is kits shipping a `rendered` ROW, and a kit can render without one:
+    #          `playbook-render`'s adopter writes the charter region from the engine's bytes and its
+    #          `[check]` compares that region with a fresh render, so every renderer change rolled it
+    #          back at every adopter while 3b-ii stayed green. Which adopters re-derive an artifact from
+    #          engine bytes is a fact only the kit's author knows, so the arm asks for it rather than
+    #          guessing: a descriptor with a non-empty `[adopt].argv` declares `[[regenerate]]` or a
+    #          non-blank `[adopt] why_no_regenerate`, the same declared-absence idiom as `[check] none`
+    #          and `why_no_adopter`. WHAT IT DOES NOT CHECK: that a stated reason is TRUE, or that a
+    #          declared argv re-renders anything — the reason is read by the reviewer of the descriptor,
+    #          and the argv by `update`'s outcome probes and the kit's own check.
+    _n_adopt = _n_regen = _n_why = 0
+    for eid, (d, _dpath) in sorted(descs.items()):
+        if not ((d.get("adopt") or {}).get("argv") or []):
+            continue
+        _n_adopt += 1
+        if d.get("regenerate"):
+            _n_regen += 1
+            continue
+        if str((d.get("adopt") or {}).get("why_no_regenerate") or "").strip():
+            _n_why += 1
+            continue
+        r.fail(f"entry '{eid}' declares an [adopt] argv and neither a [[regenerate]] block nor an "
+               f"[adopt] why_no_regenerate reason — if that adopter writes anything from engine "
+               f"bytes, every engine change leaves it one vintage stale at every adopter and the "
+               f"kit's own check rolls the update back. Declare the re-render, or say why there is "
+               f"nothing to re-render")
+    r.note(f"adopters: {_n_adopt} descriptor(s) declare one, {_n_regen} with [[regenerate]], "
+           f"{_n_why} with a stated why_no_regenerate")
+
     # ---- 3c: a `forked` rule declares BOTH of `FORK_RULE_KEYS`, and `direction` is drawn from the
     #          closed enum. DEPL-dCarriedReceipt-10 S5.
     #

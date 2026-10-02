@@ -79,6 +79,9 @@ to = "{prefix}/hooks/scratch-guard.fragment.json"
 # selected it. Found by the closing review of the build that deleted them.
 argv = ["python", "{prefix}/settings-merge.py"]
 mutates_index = false
+# DEPL-aHalvedInstall-3: why `update` never re-runs this adopter. A kit with an adopter declares
+# [[regenerate]] or this reason, and selfcheck refuses one declaring neither.
+why_no_regenerate = "the adopter merges hook fragments into .claude/settings.json, and update already re-runs that merge for every fragment it lands (its fragment-wiring step), so a second run here would merge the same rows twice"
 
 [check]
 # Declared absence, not silence: `check` reds on an entry that declares neither an argv nor a
