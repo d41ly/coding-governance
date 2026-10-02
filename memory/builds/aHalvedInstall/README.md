@@ -5,8 +5,7 @@ opened: 2026-10-02
 streams: deployer
 roster: DEPL
 authorized-by: prompt
-status: OPEN
-ids: DEPL-aHalvedInstall-1
+ids: DEPL-aHalvedInstall-1 DEPL-aHalvedInstall-2 DEPL-aHalvedInstall-3 DEPL-aHalvedInstall-4
 ---
 
 # aHalvedInstall — three kit-deploy defects, closed as classes
@@ -57,23 +56,33 @@ rolls back for a kit with no `[check]`. The owner's prompt is in `prompts/`.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 0 unit(s) · node a · opened 2026-10-02 · streams deployer
-ids DEPL-aHalvedInstall-1
+**Build status:** OPEN · 4 unit(s) · node a · opened 2026-10-02 · streams deployer
+ids DEPL-aHalvedInstall-1 DEPL-aHalvedInstall-2 DEPL-aHalvedInstall-3 DEPL-aHalvedInstall-4
 
 <!-- gen:build-units -->
-*No spec under this build carries a status header; the status above is declared in the front matter.*
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [DEPL-aHalvedInstall-1 — govkit reads each kit's declared required conf keys and names a gap](spec/2026-10-02-spec-DEPL-aHalvedInstall-1.md) | 1 | 2 | OPEN | rev-1 | 2026-10-02 |
+| [DEPL-aHalvedInstall-2 — selfcheck refuses a hole discharge that exits 0 on an empty tree](spec/2026-10-02-spec-DEPL-aHalvedInstall-2.md) | 2 | 1 | OPEN | rev-1 | 2026-10-02 |
+| [DEPL-aHalvedInstall-3 — every kit with an adopter decides whether `update` re-renders it](spec/2026-10-02-spec-DEPL-aHalvedInstall-3.md) | 3 | 1 | OPEN | rev-1 | 2026-10-02 |
+| [DEPL-aHalvedInstall-4 — `update` installs a kit whole or not at all across a refused row](spec/2026-10-02-spec-DEPL-aHalvedInstall-4.md) | 4 | 2 | OPEN | rev-1 | 2026-10-02 |
 <!-- /gen:build-units -->
 
-Records: 1 bound to this build, across 1 record folder(s).
+Records: 1 bound to this build, across 2 record folder(s).
 
-Ids no record names: none — every unit id is named by a record.
+Ids no record names: DEPL-aHalvedInstall-2 DEPL-aHalvedInstall-3 DEPL-aHalvedInstall-4.
 
-Ids no `spec-audit` record has ever named: none — every unit id has one.
+Ids no `spec-audit` record has ever named: DEPL-aHalvedInstall-1 DEPL-aHalvedInstall-2 DEPL-aHalvedInstall-3 DEPL-aHalvedInstall-4.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
 
-*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+| Step | Units | Parallel |
+|---|---|---|
+| 1 | `DEPL-aHalvedInstall-1` | no |
+| 2 | `DEPL-aHalvedInstall-2` | no |
+| 3 | `DEPL-aHalvedInstall-3` | no |
+| 4 | `DEPL-aHalvedInstall-4` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
