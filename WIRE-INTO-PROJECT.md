@@ -1209,7 +1209,10 @@ the writes stand, the receipt is not re-stamped, and its first sentence names th
 fix — a missing `[[regenerate]]` argv, or the `GOVKIT_RERENDER=0` that declined a step `update`
 otherwise runs by default. Its siblings are
 `update-rollback-<kit>.md`, where this run's writes really were reverted, and
-`update-preexisting-red-<kit>.md`, where the kit was red before the run started.
+`update-preexisting-red-<kit>.md`, where the kit was red before the run started. A rollback order
+headed `was HELD BACK` was written because a row of that kit was refused — most often a three-way
+conflict with its own `update-conflict-<slug>.md` order — and not because a check went red: a kit
+lands whole or not at all, whatever its check says. Resolve the conflict and re-run `update`.
 
 When the LAST kit declaring an `[[lf_pin]]` leaves a target — dropped from `kits`, or its descriptor
 retired the pin between vintages — `update` reports `pins-withdrawn` rather than `pins-moved`, and
@@ -1740,9 +1743,10 @@ re-measures EVERY row, not just this one.
 
 **Why step 1 stops on update's exit code, and not on the parity check.** When the three-way merge
 conflicts on a file, `update` leaves that row untouched at its old commit, writes an order under
-`.governance/outbox/` and exits 1, and the regenerate still runs, so the parity check alone passes.
-Carried on, block 3 would record the regenerated harness as current over an edit the merge could not
-place. Any STOP in block 1 leaves update's writes in the tree uncommitted, and `update` refuses to
+`.governance/outbox/` and exits 1. It also holds that row's whole kit back: every other write the
+run made for the kit is rolled back and its regenerate is declined (DEPL-aHalvedInstall-4), so the
+kit stays one vintage behind rather than landing half new. Carried on, block 3 would record the
+harness as current at a vintage the target does not hold. Any STOP in block 1 leaves update's writes in the tree uncommitted, and `update` refuses to
 run over dirty paths it claims. **So the remedy runs in one order.** Return the tree to HEAD with
 `git reset -q --hard HEAD` FIRST. Then resolve what update's order names, commit the resolution,
 and run block 1 again. The reset discards everything uncommitted, so a resolution made before it
