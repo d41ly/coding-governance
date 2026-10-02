@@ -1290,11 +1290,83 @@ SAFE_TAIL = ('[[files]]\ninclude = "**"\nrole = "engine"\n\n'
              '[adopt]\nargv = []\nmutates_index = false\n')
 
 
+def scan_hold_region(text: str):
+    """DEPL-aHalvedInstall-5 S5. Grade `_cmd_update`'s fenced refusal region: every `r.fail(` site
+    either sits in the write loop's counted span, calls `_add_held(` within the lines that follow it, or
+    carries a `# hold-exempt:` comment just above; every `_refused_new.append(` sits in the landing
+    span whose refusals are decided after it. Returns `(sites, unmarked, explicit)` as 1-based lines,
+    or None when a fence is missing, doubled or out of order — a region nobody can find holds nothing.
+    WHAT IT DOES NOT CHECK: that a `_add_held` call names the right kit, or that an exemption is true."""
+    lines = text.replace("\r\n", "\n").split("\n")
+
+    def read_marker(marker):
+        ix = [i for i, ln in enumerate(lines) if marker in ln]
+        return ix[0] if len(ix) == 1 else None
+    b, e = read_marker("# ---- HOLD REGION BEGIN"), read_marker("# ---- HOLD REGION END")
+    cb, ce = read_marker("# ---- HOLD BY COUNT BEGIN"), read_marker("# ---- HOLD BY COUNT END")
+    lb, le = read_marker("# ---- HOLD BY LANDING DECISION BEGIN"), read_marker("# ---- HOLD BY LANDING DECISION END")
+    if None in (b, e, cb, ce, lb, le) or not (b < cb < ce < lb < le < e):
+        return None
+    sites, bad, explicit = [], [], 0
+    for i in range(b + 1, e):
+        ln = lines[i]
+        if "r.fail(" not in ln and "_refused_new.append(" not in ln:
+            continue
+        sites.append(i + 1)
+        if "_refused_new.append(" in ln:
+            ok = lb < i < le
+        elif cb < i < ce:
+            ok = True
+        else:
+            # The hold must belong to THIS site: scan forward to its `continue` and stop at the next
+            # `r.fail(`, so a neighbouring site's `_add_held` never vouches for one that lost its own.
+            ok = False
+            for j in range(i, min(i + 8, e)):
+                if j > i and "r.fail(" in lines[j]:
+                    break
+                if "_add_held(" in lines[j]:
+                    ok, explicit = True, explicit + 1
+                    break
+                if lines[j].strip() == "continue":
+                    break
+            if not ok:
+                ok = any(x.strip().startswith("# hold-exempt:") for x in lines[max(b, i - 4):i])
+        if not ok:
+            bad.append(i + 1)
+    return sites, bad, explicit
+
+
+def check_hold_region() -> None:
+    """DEPL-aHalvedInstall-5 AC4 — the class gate for the half-installed kit: a refusal channel added
+    to `update` without deciding whether it holds its kit reds here, and the arm is observed red."""
+    text = GOVKIT.read_bytes().decode("utf-8")
+    got = scan_hold_region(text)
+    check("[aHI-5 AC4] LIVENESS the hold region's fences are found once each, in order",
+          got is not None, "a fence is missing, doubled or out of order")
+    if got is None:
+        return
+    sites, bad, explicit = got
+    check("[aHI-5 AC4] LIVENESS the region holds refusal sites, and some hold explicitly",
+          len(sites) >= 10 and explicit >= 4, f"{len(sites)} site(s), {explicit} explicit")
+    check("[aHI-5 AC4] every refusal site in the region decides whether it holds its kit",
+          not bad, f"unmarked at govkit.py line(s) {bad}")
+    # Each break is staged on a CODE line, found by its stripped shape, never by a literal the fence
+    # header's own prose also spells — the first cut of this arm matched that prose and staged nothing.
+    lines = text.replace("\r\n", "\n").split("\n")
+    for label, pick in (("an exemption", lambda s: s.startswith("# hold-exempt:")),
+                        ("a hold", lambda s: s.startswith("_add_held(row.get("))):
+        idx = next((i for i, ln in enumerate(lines) if pick(ln.strip())), None)
+        staged = "\n".join(ln for i, ln in enumerate(lines) if i != idx)
+        check(f"[aHI-5 AC4] ...and {label} staged away is named",
+              idx is not None and bool((scan_hold_region(staged) or ([], [], 0))[1]),
+              f"staged line {idx}")
+
+
 def check_halved_install_arms(gcopy: pathlib.Path, run_selfcheck) -> None:
     """DEPL-aHalvedInstall-1/2/3, closing review round 1 M1 and M5 — the three selfcheck arms that
     build added, each provoked in a COPY of gov and asserted green again on restore. Run by hand they
     were observed red once; committed here, an edit that makes one match nothing reds the suite."""
-    def stage(rel: str, old: str, new: str, label: str, want: str) -> None:
+    def check_staged(rel: str, old: str, new: str, label: str, want: str) -> None:
         f = gcopy / rel
         keep = f.read_text(encoding="utf-8")
         staged = keep.replace(old, new, 1)
@@ -1307,23 +1379,23 @@ def check_halved_install_arms(gcopy: pathlib.Path, run_selfcheck) -> None:
         check(f"{label} ...and is green again once restored", run_selfcheck(gcopy).returncode == 0, "")
 
     uk = f"{PFX}{KIT_NAMES['unattended']}/kit.toml"
-    stage(uk, "discharge = { command = [\"bash\", \"-c\", \"grep -qE '^DIRECTIVES_FLOOR=",
+    check_staged(uk, "discharge = { command = [\"bash\", \"-c\", \"grep -qE '^DIRECTIVES_FLOOR=",
           "discharge = { command = [\"bash\", \"-c\", \"! grep -q x missing.conf\"] }\n"
           "_was = { command = [\"bash\", \"-c\", \"grep -qE '^DIRECTIVES_FLOOR=",
           "[aHI-2 AC7] 6b: a negated grep of a missing file",
           "hole 'directives-floor': its discharge probe exits 0 in an EMPTY directory")
     pr = f"{PFX}playbook/kit.toml"
-    stage(pr, '[[regenerate]]\nargv = ["bash", "{prefix}/playbook/adopt-playbook.sh", "--target", "."]\n'
+    check_staged(pr, '[[regenerate]]\nargv = ["bash", "{prefix}/playbook/adopt-playbook.sh", "--target", "."]\n'
               'writes = ["AGENTS.md"]\n', "",
           "[aHI-3 AC6] 3b-iii: an adopter with its [[regenerate]] stripped",
           "entry 'playbook-render' declares an [adopt] argv and neither")
     rg = f"{PFX}{KIT_NAMES['run-gates']}/kit.toml"
     f_rg = (gcopy / rg).read_text(encoding="utf-8")
     _why = next(ln for ln in f_rg.split("\n") if ln.startswith("why_no_regenerate = "))
-    stage(rg, _why, 'why_no_regenerate = "   "', "[aHI-3 AC6] 3b-iii: a whitespace reason",
+    check_staged(rg, _why, 'why_no_regenerate = "   "', "[aHI-3 AC6] 3b-iii: a whitespace reason",
           "entry 'run-gates' declares an [adopt] argv and neither")
     da = f"{PFX}{KIT_NAMES['drift-audit']}/kit.toml"
-    stage(da, 'defaults = { MEMORY_ROOT = "memory" }\n', "",
+    check_staged(da, 'defaults = { MEMORY_ROOT = "memory" }\n', "",
           "[aHI-1 AC9] 3b-iv: a required key the adopter defaults",
           "entry 'drift-audit' declares MEMORY_ROOT required, and its adopter")
 
@@ -1547,6 +1619,66 @@ def check_update_safety(tmp: pathlib.Path) -> None:
               p.stdout[-1500:])
         check(f"[aHI-4 {_ht}] ...and the run fails rather than re-stamping",
               p.returncode == 1 and "NOT re-stamped" in p.stdout, p.stdout[-800:])
+
+    # ---- DEPL-aHalvedInstall-5 AC1-AC3. The two refusal channels unit 4's held set missed: the
+    # ---- classification walk (a receipt row whose role the dispatch refuses) and the landing loop (a
+    # ---- source new this vintage whose destination the target occupies) — each with a changed clean
+    # ---- sibling that must go back. And the two landing refusals that must NOT hold: a declined pair,
+    # ---- and a source the receipt's own vintage already shipped, which recurs on every run.
+    kit_h5 = (SAFE_HEAD + 'version_from = { none = "fixture" }\n\n[check]\nnone = "fixture"\n\n'
+              '[[files]]\ninclude = "**"\nrole = "engine"\n\n'
+              '[adopt]\nargv = []\nmutates_index = false\n')
+    _h5_new = f"{PFX}demo/new.sh"
+    _h5_own = b"the operator's own file at a path gov starts shipping\n"
+
+    def set_receipt5(t: pathlib.Path, fn) -> None:
+        rp = t / ".governance" / "install.json"
+        rec = json.loads(rp.read_text(encoding="utf-8"))
+        fn(rec)
+        rp.write_text(json.dumps(rec, indent=2) + "\n", encoding="utf-8", newline="\n")
+
+    for _h5t in ("h5r", "h5l", "h5d", "h5s"):
+        _h5a_files = {"plain.txt": "a\nb\n", "keep.txt": "k\n"}
+        if _h5t == "h5s":
+            _h5a_files["new.sh"] = "gov's at A\n"
+        g, _h5a = build_gov17(_h5t, kit_h5, _h5a_files)
+        t = build_target17(g, _h5t)
+        if _h5t == "h5r":
+            set_receipt5(t, lambda rec: [f.update(role="bogus") for f in rec["files"]
+                                          if f.get("path") == f"{PFX}demo/keep.txt"])
+        elif _h5t == "h5s":
+            set_receipt5(t, lambda rec: rec.update(files=[f for f in rec["files"]
+                                                           if f.get("path") != _h5_new]))
+        else:
+            (t / _h5_new).write_bytes(_h5_own)
+            if _h5t == "h5d":
+                with (t / ".governance" / "deploy.toml").open("a", encoding="utf-8", newline="\n") as fh:
+                    fh.write(f'\n[[decline]]\nkit = "demo"\ndest = "{_h5_new}"\n'
+                             f'why = "the operator keeps their own file here"\n')
+        settle(t, f"the {_h5t} precondition")
+        _h5b = {"plain.txt": "a\nb\nc\n"}
+        if _h5t in ("h5l", "h5d"):
+            _h5b["new.sh"] = "gov's new script\n"
+        write_gov17(g, kit_h5, _h5b, "B")
+        p = run_gov17(g, "update", "--target", str(t), "--write")
+        _h5p = read_bytes17(t / PFX / "demo" / "plain.txt")
+        if _h5t == "h5r":
+            check("[aHI-5 AC1] a classification refusal holds its kit: the clean sibling is restored",
+                  "carries role 'bogus'" in p.stdout and _h5p == b"a\nb\n"
+                  and f"HELD BACK demo: 1 row(s) refused ({PFX}demo/keep.txt)" in p.stdout,
+                  p.stdout[-1800:] + repr(_h5p))
+        elif _h5t == "h5l":
+            check("[aHI-5 AC2] a landing refusal of a NEW source holds its kit: the clean sibling is "
+                  "restored and the operator's file stands",
+                  f"HELD BACK demo: 1 row(s) refused ({_h5_new})" in p.stdout and _h5p == b"a\nb\n"
+                  and read_bytes17(t / _h5_new) == _h5_own, p.stdout[-1800:] + repr(_h5p))
+        else:
+            check(f"[aHI-5 AC3 {_h5t}] a "
+                  + ("declined" if _h5t == "h5d" else "standing (shipped at the receipt's vintage)")
+                  + " landing refusal holds nothing: the sibling lands",
+                  "HELD BACK demo" not in p.stdout and _h5p == b"a\nb\nc\n"
+                  and f"REFUSED {_h5_new}" in p.stdout,
+                  p.stdout[-1800:] + repr(_h5p))
 
     # ---- S3, S4 — AC5, AC6, AC7. One conflicting engine file carrying a lone CR inside an awk
     # ---- program on its first line, and one engine file whose four lone CRs a target lost.
@@ -1897,6 +2029,7 @@ def main() -> int:
         check_apply_owned(tmp / "ao")
         check_pytest_ini_probe(tmp / "pi")
         check_update_safety(tmp / "us")
+        check_hold_region()
 
         # ================= apply =================
         # `check-wiring` is the fixture kit on purpose: engine files, a flat destination, and NO
@@ -4314,7 +4447,7 @@ user_skills = "/tmp/gk-fake-skills"
                 'version_from = { none = "fixture" }\n\n'
                 '[check]\nnone = "a fixture kit"\n\n'
                 '[[files]]\ninclude = "**"\nrole = "engine"\n\n'
-                f'[adopt]\nargv = ["bash", "{{kit}}/adopt-demo.sh"]\nmutates_index = {mutates}\n\n'
+                f'[adopt]\nwhy_no_regenerate = "a fixture adopter"\nargv = ["bash", "{{kit}}/adopt-demo.sh"]\nmutates_index = {mutates}\n\n'
                 '[[gate_leg]]\nname = "demo"\nargv = ["true"]\nguard = []\nsubject = "repo"\n',
                 encoding="utf-8", newline="\n")
             # The adopter EXECUTES `git add`. A `git add` inside an echo would not count, which is
@@ -4393,7 +4526,7 @@ user_skills = "/tmp/gk-fake-skills"
                 'id = "demo"\nhome = "demo"\n'
                 'version_from = { none = "fixture" }\n\n'
                 '[[files]]\ninclude = ["demo-rendered.md"]\nrole = "rendered"\n\n'
-                '[adopt]\nargv = ["bash", "{kit}/adopt-demo.sh"]\nmutates_index = false\n\n'
+                '[adopt]\nwhy_no_regenerate = "a fixture adopter"\nargv = ["bash", "{kit}/adopt-demo.sh"]\nmutates_index = false\n\n'
                 '[[hole]]\nid = "demo-hole"\nkind = "authoring"\nblocks_adopt = true\n'
                 'blocks_gate = false\nwhy = "the fixture that arms the blocks_adopt branch"\n'
                 'discharge = { command = ["true"] }\n')
@@ -4442,7 +4575,7 @@ user_skills = "/tmp/gk-fake-skills"
                     '[check]\nnone = "a fixture kit"\n\n'
                     '[config]\nfile = ".lexicon.conf"\n\n'
                     '[[files]]\ninclude = "**"\nrole = "engine"\n\n'
-                    '[adopt]\nargv = ["bash", "{kit}/adopt-demo.sh"]\nmutates_index = true\n')
+                    '[adopt]\nwhy_no_regenerate = "a fixture adopter"\nargv = ["bash", "{kit}/adopt-demo.sh"]\nmutates_index = true\n')
             for nm, _argv, _guard, _chunk in legs:
                 body += (f'\n[[gate_leg]]\nname = "{nm}"\nargv = ["true"]\nguard = []\n'
                          f'subject = "repo"\n')
@@ -4607,7 +4740,7 @@ user_skills = "/tmp/gk-fake-skills"
                     'version_from = { none = "fixture" }\n\n'
                     '[check]\nnone = "a fixture kit"\n\n'
                     '[[files]]\ninclude = "**"\nrole = "engine"\n\n'
-                    '[adopt]\nargv = ["bash", "{kit}/adopt-demo.sh"]\nmutates_index = true\n\n'
+                    '[adopt]\nwhy_no_regenerate = "a fixture adopter"\nargv = ["bash", "{kit}/adopt-demo.sh"]\nmutates_index = true\n\n'
                     f'[[gate_leg]]\nname = "demo"\nargv = ["true"]\nguard = []\n'
                     f'subject = "{subject}"\n')
             if extra:
@@ -4728,7 +4861,7 @@ user_skills = "/tmp/gk-fake-skills"
                 'version_from = { none = "fixture" }\n\n'
                 '[check]\nnone = "a fixture kit"\n\n'
                 '[[files]]\ninclude = "**"\nrole = "engine"\n\n'
-                '[adopt]\nargv = ["bash", "{kit}/adopt-demo.sh"]\nmutates_index = true\n\n'
+                '[adopt]\nwhy_no_regenerate = "a fixture adopter"\nargv = ["bash", "{kit}/adopt-demo.sh"]\nmutates_index = true\n\n'
                 '[[gate_leg]]\nname = "demo"\n' + subject_line +
                 'argv = ["true"]\nguard = []\n' + extra,
                 encoding="utf-8", newline="\n")
@@ -5203,7 +5336,7 @@ user_skills = "/tmp/gk-fake-skills"
                         '[[files]]\ninclude = ["demo-rendered.md"]\nrole = "rendered"\n'
                         'to = "docs/demo.md"\n\n'
                         '[[files]]\ninclude = ["adopt-demo.sh", "kit.toml"]\nrole = "engine"\n\n'
-                        '[adopt]\nargv = ["bash", "{kit}/adopt-demo.sh"]\n'
+                        '[adopt]\nwhy_no_regenerate = "a fixture adopter"\nargv = ["bash", "{kit}/adopt-demo.sh"]\n'
                         'mutates_index = false\n')
             _rr_bad = run_in(build_scratch_gov_kit("rendered-no-regen", _rr_desc))
             check("AC1 a descriptor shipping a `rendered` row and declaring no [[regenerate]] REDS",
@@ -5260,7 +5393,7 @@ user_skills = "/tmp/gk-fake-skills"
                         '[[files]]\ninclude = ["demo-rendered.md"]\nrole = "seed"\n'
                         'to = "%s"\n\n'
                         '[[files]]\ninclude = ["adopt-demo.sh", "kit.toml"]\nrole = "engine"\n\n'
-                        '[adopt]\nargv = ["bash", "{kit}/adopt-demo.sh"]\n'
+                        '[adopt]\nwhy_no_regenerate = "a fixture adopter"\nargv = ["bash", "{kit}/adopt-demo.sh"]\n'
                         'mutates_index = false\n')
             _mv_hit = ("plans a file at 'memory/project/demo-registry.txt', under the reserved "
                        "'memory/project/' prefix")
@@ -8606,8 +8739,16 @@ user_skills = "/tmp/gk-fake-skills"
         check("[-11] ...and the receipt NOT re-stamped, so the next run re-attempts rather than forgetting",
               json.loads((_t11c / ".governance" / "install.json").read_text(
                   encoding="utf-8")).get("gov_commit") != gout(_g11c, "rev-parse", "HEAD").strip(), "")
-        check("[-11] LIVENESS the same run still moved the rows it COULD, so one bad row strands nothing",
-              (_t11c / PFX / "demo" / "renamed.txt").is_file(), _mvf.stdout[-1200:])
+        # DEPL-aHalvedInstall-4 REVERSES what this arm used to assert. It said the same run "still moved
+        # the rows it COULD, so one bad row strands nothing" -- and both rows are kit `demo`, so that was
+        # the half-installed kit the adopter observed. A refused row now holds its whole kit back: the
+        # rename that succeeded is performed and then rolled back with the rest of the kit.
+        check("[-11] LIVENESS the refused move holds its kit back, by name",
+              "HELD BACK demo" in _mvf.stdout and "ROLLED BACK" in _mvf.stdout, _mvf.stdout[-1500:])
+        check("[-11] ...and the rename that DID succeed went back with the kit, so it stands whole at "
+              "its old vintage rather than half moved",
+              (_t11c / PFX / "demo" / "moved.txt").is_file()
+              and not (_t11c / PFX / "demo" / "renamed.txt").is_file(), _mvf.stdout[-1200:])
 
         # ---- THE ESCAPING DESTINATION. The destination is composed from the TARGET's own answers, so a
         # ---- `prefix` that climbs out of the tree is target-supplied data reaching a write path — the
@@ -8820,7 +8961,7 @@ user_skills = "/tmp/gk-fake-skills"
                     + chk +
                     '\n[[files]]\ninclude = "**"\nrole = "engine"\n\n'
                     + extra +
-                    f"[adopt]\nargv = {adopt}\nmutates_index = false\n")
+                    f"[adopt]\nwhy_no_regenerate = \"a fixture adopter\"\nargv = {adopt}\nmutates_index = false\n")
 
         def build_verify_gov(tag: str, kits: dict) -> tuple[pathlib.Path, pathlib.Path]:
             """A scratch gov carrying one entry per requested kit, and the run LOG its checks write.

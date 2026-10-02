@@ -1,6 +1,6 @@
 # DEPL-aHalvedInstall-5 — every row refusal in `update` decides whether it holds its kit back
 
-**Status:** OPEN · rev-1 · 2026-10-02 · node a · Tier-2 · base cd90f7fa · streams deployer · order 5
+**Status:** INPROGRESS · rev-2 · 2026-10-02 · node a · Tier-2 · base cd90f7fa · streams deployer · order 5
 
 <!-- gen:spec-records -->
 
@@ -20,7 +20,7 @@ channel cannot reopen the class silently.
 
 ## 2. Scope (IN)
 
-- **S1** — One helper, `_hold(kit, path)`, local to `_cmd_update`, defined before the classification
+- **S1** — One helper, `_add_held(kit, path)`, local to `_cmd_update`, defined before the classification
   walk. The write loop's problem-count mechanism calls it, and so does every hold below. Observed by
   AC1, AC2 and AC4.
 - **S2** — The classification walk's four row refusals hold their row's kit: an unknown role, an
@@ -34,7 +34,7 @@ channel cannot reopen the class silently.
   Observed by AC2.
 - **S5** — The refusal region of `_cmd_update` is fenced by two marker comments. A selftest arm reads
   that region of `tools/govkit/govkit.py` and refuses any `r.fail(` or `_refused_new.append(` site
-  outside the write loop's own counted span that neither calls `_hold(` within the following lines nor
+  outside the write loop's own counted span that neither calls `_add_held(` within the following lines nor
   carries a `# hold-exempt:` comment stating why it does not split a kit. Observed by AC4.
 
 ## 3. Non-goals (OUT)
@@ -61,7 +61,7 @@ an adopter-occupied destination, which is why S3 is narrowed rather than holding
 
 ```python
 _held: dict[str, list[str]] = {}
-def _hold(kit, path):
+def _add_held(kit, path):
     if kit:
         _held.setdefault(kit, []).append(path)
 # landing loop: _refused_new_from[_dest] = (_eid, _src0)
@@ -98,11 +98,11 @@ def _hold(kit, path):
 - **AC1** — When `update --write` runs over a fixture whose receipt carries a row with a role the
   dispatch refuses, alongside a changed clean row of the same kit, the clean row's bytes are restored
   and the output carries `HELD BACK`.
-  Red when: the classification refusal does not call `_hold`.
+  Red when: the classification refusal does not call `_add_held`.
 - **AC2** — When the new vintage adds a source whose destination the target already occupies, outside
-  the receipt, and changes a sibling row, the sibling is restored and `HELD BACK` names the
-  destination after the landing loop's `REFUSED` line.
-  Red when: the landing refusal is not routed to `_hold`, or the print stays above the loop.
+  the receipt, and changes a sibling row, the sibling is restored, the operator's file stands and
+  `HELD BACK` names the destination.
+  Red when: the landing refusal is not routed to `_add_held`, or the print stays above the loop.
 - **AC3** — When that occupied destination is named by a `[[decline]]` row, or its source already
   existed at the receipt's vintage, the sibling lands and no `HELD BACK` line names the kit.
   Red when: every landing refusal holds.
@@ -124,6 +124,9 @@ none
 
 - rev-1 · 2026-10-02 · initial draft, promoted from the closing review's round 1 H1, carrying its
   skeptic's corrected fix.
+- rev-2 · 2026-10-02 · build pass · S1 · AC2 · the helper is `_add_held`, a declared verb (the lexicon
+  refused `hold`). The `REFUSED` lines print at the end of the run, below
+  the HELD BACK line, so AC2 no longer orders them; it asserts the operator's file stands instead.
 
 ## 10. Reuse audit
 

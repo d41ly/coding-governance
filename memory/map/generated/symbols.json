@@ -1733,6 +1733,11 @@
       "file": "tools/memory-tree/backlog.py"
     },
     {
+      "id": "check_hold_region",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
+    },
+    {
       "id": "check_id",
       "kind": "function",
       "file": "tools/memory-tree/backlog.py"
@@ -7888,6 +7893,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "run_probe_in_empty_dir",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "run_rm3",
       "kind": "function",
       "file": "tools/memory-recall/bench.py"
@@ -8121,6 +8131,11 @@
       "id": "scan_history",
       "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"
+    },
+    {
+      "id": "scan_hold_region",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
     },
     {
       "id": "scan_js_definitions",

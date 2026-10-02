@@ -1212,7 +1212,11 @@ otherwise runs by default. Its siblings are
 `update-preexisting-red-<kit>.md`, where the kit was red before the run started. A rollback order
 headed `was HELD BACK` was written because a row of that kit was refused — most often a three-way
 conflict with its own `update-conflict-<slug>.md` order — and not because a check went red: a kit
-lands whole or not at all, whatever its check says. Resolve the conflict and re-run `update`.
+lands whole or not at all, whatever its check says. Resolve the conflict and re-run `update`. Two
+other refusals hold a kit the same way (DEPL-aHalvedInstall-5): a receipt row `update` cannot
+classify, and a file gov starts shipping this vintage at a path your tree already occupies outside
+the receipt. Move your file, or declare a `[[decline]]` for that path; a path gov already shipped at
+your receipt's vintage is reported as `REFUSED` and holds nothing.
 
 When the LAST kit declaring an `[[lf_pin]]` leaves a target — dropped from `kits`, or its descriptor
 retired the pin between vintages — `update` reports `pins-withdrawn` rather than `pins-moved`, and

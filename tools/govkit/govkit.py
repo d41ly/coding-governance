@@ -2068,13 +2068,10 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
                 if _miss6:
                     _s6, _ = resolve_tokens(str(_a), {**_ctx6, **{m: m for m in _miss6}})
                 _argv6.append(_s6)
-            with tempfile.TemporaryDirectory(prefix="govkit-6b-") as _empty:
-                try:
-                    _rc6 = subprocess.run(resolve_shell_argv(_argv6), cwd=_empty, capture_output=True,
-                                          text=True, timeout=120).returncode
-                except (OSError, subprocess.TimeoutExpired):
-                    _vac_nolaunch += 1
-                    continue
+            _rc6 = run_probe_in_empty_dir(_argv6)
+            if _rc6 is None:
+                _vac_nolaunch += 1
+                continue
             _vac_ran += 1
             if _rc6 == 0:
                 _vac_bad += 1
@@ -3989,7 +3986,12 @@ DECLINE_EVIDENCE = ("taken_as", "consumed_into", "discharge")
 # is exactly what a coarser allowlist hid.
 SHELL_EXEC_SITES = {
     "run_kit_check": "target",       # `[check].argv` — gov's template, the TARGET's token values
-    "cmd_check": "target",           # `[[hole]].discharge.command` — same shape, same exposure
+    # DEPL-aHalvedInstall-1 S4: the hole loop left `cmd_check` for this helper, which `check` and
+    # `update` both call — the same probes, the same target tokens, the same exposure.
+    "run_hole_probes": "target",     # `[[hole]].discharge.command` — same shape, same exposure
+    # DEPL-aHalvedInstall-2. Selfcheck 6b runs GOV's own descriptors' probes, tokens resolved from
+    # `canonical_ctx` before the call, in a fresh empty directory: no target value reaches it.
+    "run_probe_in_empty_dir": "gov",
     "exempt_leg": "target",          # a hole probe re-run to decide a leg exemption — same shape
     "_cmd_apply": "target",          # the configure-step adopter argv — same shape, writing verb
     "read_gate_verdicts": "target",  # the target's own `[gate_runner].command` — apply-only, printed
@@ -4434,6 +4436,18 @@ def read_conf_key_gaps(target: pathlib.Path, desc: dict,
         elif vals[k].startswith("<") and vals[k].endswith(">"):
             gaps.append((k, "placeholder"))
     return gaps
+
+
+def run_probe_in_empty_dir(argv: list[str]) -> int | None:
+    """Run one ALREADY-RESOLVED probe argv in a fresh empty directory; its exit, or None when it
+    could not launch or ran past 120 s. Selfcheck 6b's only spawn (DEPL-aHalvedInstall-2), kept apart
+    so the site that runs gov's own probes never reaches a target's tokens."""
+    with tempfile.TemporaryDirectory(prefix="govkit-6b-") as empty:
+        try:
+            return subprocess.run(resolve_shell_argv(argv), cwd=empty, capture_output=True,
+                                  text=True, timeout=120).returncode
+        except (OSError, subprocess.TimeoutExpired):
+            return None
 
 
 def run_hole_probes(eid: str, desc: dict, ctx: dict[str, str], target: pathlib.Path,
@@ -8526,6 +8540,17 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     # below moves the call from "once per row of a schema-1 receipt" to "once per row of every
     # receipt". The resolution depends on the kit and on nothing else in the row, and a target with
     # ninety rows across a dozen kits would otherwise pay ninety glob expansions for twelve answers.
+    # ---- HOLD REGION BEGIN (DEPL-aHalvedInstall-5). Every row refusal from here to the END marker
+    # ---- DECIDES whether it holds its kit back, and a selftest arm grades that every one did: it
+    # ---- calls `_add_held`, sits in a span whose hold is generic (the write loop's problem count, the
+    # ---- landing loop's decision after it), or says `# hold-exempt:` and why it splits no kit.
+    # ---- Round 1 of this build's closing review found two channels unit 4 had not routed (H1).
+    _held: dict[str, list[str]] = {}
+
+    def _add_held(kit, path) -> None:
+        if kit:
+            _held.setdefault(str(kit), []).append(str(path))
+
     _role_res: dict[str, dict] = {}
     for row in rows_all:
         role = row.get("role", "engine")
@@ -8533,11 +8558,13 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
         if how is None:
             r.fail(f"receipt row '{row['path']}' carries role '{role}', which has no row in the "
                    f"update dispatch — refusing rather than classifying it from an absent field")
+            _add_held(row.get("kit"), row["path"])
             continue
         # Closing review round 1 M4. Never dispatched, so it reaches no write, no rename, no role
         # move and no `acted` entry; the refusal withholds the re-stamp until `adopt` agrees.
         if row["path"] in _owned_refusals:
             r.fail(_owned_refusals[row["path"]])
+            _add_held(row.get("kit"), row["path"])
             continue
         # DEPL-aRepatriatedFork-13 S2. ABOVE the re-resolution, deliberately: gov's descriptor
         # resolves this path as `engine`, and the role-move branch below would stand the row back as
@@ -8576,6 +8603,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                     r.fail(f"row '{row['path']}' is recorded as '{role}' and its descriptor now "
                            f"resolves it as '{now}' — refusing this row rather than acting on a "
                            f"role a schema-1 receipt cannot be trusted about")
+                    _add_held(row.get("kit"), row["path"])
                     continue
                 # DEPL-cMendedVintage-27 S1. STANDING BACK ONLY PROTECTS BYTES NOTHING ELSE IN THIS
                 # RUN TOUCHES, and whether anything does is a property of the NEW role's own
@@ -8668,6 +8696,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
         if how == "refuse":
             r.fail(f"row '{row['path']}' has role '{role}', which no unit has taught `update` to "
                    f"move yet — refusing by name rather than guessing")
+            _add_held(row.get("kit"), row["path"])
             continue
 
         # DEPL-dCarriedReceipt-2 S3. REPORT, never refuse: these roles have no writer yet, but a
@@ -8821,6 +8850,8 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                         f"{str(row.get('commit'))[:8]}, the target copy holds {_t_cr} · gov {_g_cr} "
                         f"· target {_t_cr}")
                 if write:
+                    # hold-exempt: the row still lands with the rest of its kit, so the kit is not
+                    # split; the finding names a loss, and withholding the re-stamp surfaces it.
                     r.fail(_lcr + " — a write over a copy that lost them makes the loss permanent")
                 else:
                     print(f"govkit update — {_lcr}")
@@ -9325,11 +9356,11 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     # taken at the TOP of the next iteration, and once after the loop, because the body's `continue`s
     # skip anything placed at its foot. A row with no kit — the synthesized attributes row — holds
     # nothing back.
-    _held: dict[str, list[str]] = {}
     _held_prev: tuple[str, str, int] | None = None
+    # ---- HOLD BY COUNT BEGIN — every refusal in this loop holds by the problem count, unmarked.
     for a in acted:
         if _held_prev is not None and len(r.problems) > _held_prev[2] and _held_prev[0]:
-            _held.setdefault(_held_prev[0], []).append(_held_prev[1])
+            _add_held(_held_prev[0], _held_prev[1])
         _held_prev = (str(a["row"].get("kit") or ""), str(a["row"].get("path")), len(r.problems))
         row, c, v = a["row"], a["c"], a["verdict"]
 
@@ -9679,10 +9710,8 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                 row["version"] = _resolve_ver_at(row)
                 changed.append(row["path"])
     if _held_prev is not None and len(r.problems) > _held_prev[2] and _held_prev[0]:
-        _held.setdefault(_held_prev[0], []).append(_held_prev[1])
-    for _eid_h, _paths_h in sorted(_held.items()):
-        print(f"govkit update — HELD BACK {_eid_h}: {len(_paths_h)} row(s) refused "
-              f"({', '.join(_paths_h)}), so none of this kit's writes from this run will stand")
+        _add_held(_held_prev[0], _held_prev[1])
+    # ---- HOLD BY COUNT END
 
     # NO `git add` OVER `changed`. S5 already staged every one of those paths from gov's own bytes;
     # re-adding them would re-CLEAN what the smudge filter just produced, and a filter pair that does
@@ -9757,6 +9786,11 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             _decided.update(_m.get(_new_src) or [])
     _landed_new: list[str] = []
     _refused_new: list[tuple[str, str]] = []
+    # DEPL-aHalvedInstall-5 S3. Which kit, and which gov source, each destination this loop CONSIDERS
+    # belongs to — recorded before any refusal can fire, so the decision after the loop covers every
+    # `_refused_new` entry without a branch at each of its eight sites.
+    _refused_from: dict[str, tuple[str, str]] = {}
+    # ---- HOLD BY LANDING DECISION BEGIN — refusals here are decided once, after the loop.
     # F4 — `--kits` BINDS THIS LOOP TOO. It narrows `rows_all` and does not touch `claimed`, so a
     # scoped run landed sources for kits the operator EXCLUDED — and because `rename_dests` is only
     # populated over the scoped walk, `_decided` was empty for those kits, so the block re-landed a
@@ -9797,6 +9831,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             _src0 = str(_row0.get("src") or "")
             if not _src0:
                 continue
+            _refused_from[_dest] = (_eid, _src0)
             # APPLY'S OWN FOUR SKIPS, and this block had NONE of them. `_cmd_apply` declines a row
             # with unresolved tokens, a machine-SCOPED row, a machine-scoped RULE and a LINK rule
             # before it writes anything; landing them here made `update` write what `apply`
@@ -9988,6 +10023,25 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             snap_rows.append({"kit": _eid, "row": receipt["files"][-1], "paths": [_dest],
                               "origin": "landed", "fields": {},
                               "index": {_dest: _idx_pre.get(_dest)}})
+    # ---- HOLD BY LANDING DECISION END
+    # DEPL-aHalvedInstall-5 S3. A landing refusal HOLDS its kit only when gov's source is NEW since the
+    # receipt's vintage and no `[[decline]]` names the pair. A refusal of a source that vintage already
+    # shipped — the target occupying a path for years, an optional token never answered — recurs on
+    # every run whatever moves, and holding on it would wedge the kit's updates for good; the closing
+    # review's skeptic refused exactly that form. WHAT THIS DOES NOT SEE: a source gov RENAMED into
+    # this destination reads as new, which holds conservatively and says so on the HELD BACK line.
+    _declined_pairs = {(str(_dr.get("kit")), str(_dr.get("dest")))
+                       for _dr in (deploy.get("decline") or []) if isinstance(_dr, dict)}
+    for _rd, _rw in _refused_new:
+        _rk, _rs = _refused_from.get(_rd, ("", ""))
+        if not _rk or (_rk, _rd) in _declined_pairs:
+            continue
+        if base_commit and _rs and blob_at(root, base_commit, _rs) is None:
+            _add_held(_rk, _rd)
+    # ---- HOLD REGION END
+    for _eid_h, _paths_h in sorted(_held.items()):
+        print(f"govkit update — HELD BACK {_eid_h}: {len(_paths_h)} row(s) refused "
+              f"({', '.join(_paths_h)}), so none of this kit's writes from this run will stand")
 
     # ======================= DEPL-dRetiredFork-3 S1 + S2 — RE-RENDER AND REGENERATE =============
     # BYTES LANDING IS NOT AN UPDATE FINISHING. `UPDATE_ROLE["rendered"]` is `"adopter"` but the
