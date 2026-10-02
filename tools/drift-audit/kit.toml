@@ -58,6 +58,9 @@ placeholders = ["KIT_DIR", "WORKFLOWS_DIR", "MEMORY_ROOT"]
 file = ".memory-tree.conf"
 owner = "memory-tree"
 required_keys_render = ["MEMORY_ROOT"]
+# The default this kit's adopter (`${MEMORY_ROOT:-memory}`) and `drift_report.py` already apply,
+# declared so govkit's required-key reader agrees with them (DEPL-aHalvedInstall-1 rev-3, review M1).
+defaults = { MEMORY_ROOT = "memory" }
 
 [adopt]
 argv = ["bash", "{kit}/adopt-drift-audit.sh"]

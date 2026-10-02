@@ -1418,7 +1418,7 @@ def check_update_safety(tmp: pathlib.Path) -> None:
     check("[aHI-1 S3] ...and the regenerate still ran: the lines change no disposition",
           read_bytes17(t / "docs" / "out.md") == b"v2\n", repr(read_bytes17(t / "docs" / "out.md")))
     for _cg_val, _cg_want in ((None, "is ABSENT"), ('"<your-tool>"', "still the example's <...>"),
-                              ('"real"', None)):
+                              ('""', "is EMPTY"), ("'  '", "is EMPTY"), ('"real"', None)):
         if _cg_val is not None:
             (t / ".demo.conf").write_text(f"DEMO_KEY={_cg_val}\n", encoding="utf-8", newline="\n")
         p = run_gov17(g, "check", "--target", str(t))
@@ -1426,6 +1426,20 @@ def check_update_safety(tmp: pathlib.Path) -> None:
         check(f"[aHI-1 AC1-AC2] check over DEMO_KEY={_cg_val} "
               + (f"names it, '{_cg_want}'" if _cg_want else "names nothing"),
               (_cg_hit and _cg_want in p.stdout) if _cg_want else not _cg_hit, p.stdout[-1500:])
+    # rev-3 AC8 (review M8): a conf that cannot be READ is a finding in both verbs, never a traceback.
+    # A directory at the conf path is unreadable on every platform this suite runs on.
+    (t / ".demo.conf").unlink()
+    (t / ".demo.conf").mkdir()
+    p = run_gov17(g, "check", "--target", str(t))
+    check("[aHI-1 AC8] check names an unreadable conf and does not raise",
+          "conf .demo.conf: unreadable:" in p.stdout and "Traceback" not in p.stdout + p.stderr,
+          (p.stdout + p.stderr)[-1200:])
+    write_gov17(g, kit_cg, {"eng.txt": "v3\n"}, "C")
+    p = run_gov17(g, "update", "--target", str(t), "--write")
+    check("[aHI-1 AC8] ...and update prints it as a CONF GAP and still reaches its verify pass",
+          "CONF GAP demo: .demo.conf is unreadable:" in p.stdout and "govkit update — verify" in p.stdout
+          and "Traceback" not in p.stdout + p.stderr, (p.stdout + p.stderr)[-1500:])
+    (t / ".demo.conf").rmdir()
     _gm = govkit_module()
     _cg_t = tmp / "cg-defaults"
     _cg_t.mkdir()

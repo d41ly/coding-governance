@@ -72,6 +72,10 @@ owner = "codebase-map"
 required_keys_gate = ["MAP_ROOT", "GATE_FILE"]
 required_keys_render = ["MAP_ROOT"]
 optional_keys = ["MAP_DIFF_CMD"]
+# The defaults `map_lib.load_conf` and the adopter already apply, declared so govkit's required-key
+# reader agrees with them; selfcheck refuses an adopter default the descriptor omits
+# (DEPL-aHalvedInstall-1 rev-3).
+defaults = { MAP_ROOT = "memory/map", GATE_FILE = "tests/test_codebase_map.py" }
 
 [adopt]
 argv = ["bash", "{kit}/adopt-codebase-map.sh", "--scaffold"]

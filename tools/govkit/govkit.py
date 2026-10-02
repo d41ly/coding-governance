@@ -1595,6 +1595,36 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
     r.note(f"adopters: {_n_adopt} descriptor(s) declare one, {_n_regen} with [[regenerate]], "
            f"{_n_why} with a stated why_no_regenerate")
 
+    # ---- 3b-iv (DEPL-aHalvedInstall-1 rev-3, closing review M1): A REQUIRED KEY THE KIT'S OWN ADOPTER
+    #          DEFAULTS IS NOT REQUIRED. `read_conf_key_gaps` enforces `required_keys_*` less
+    #          `[config].defaults`, so a key the adopter itself falls back on — `${KEY:-value}` with a
+    #          non-empty value — and the descriptor does not default makes govkit red a conf the kit
+    #          accepts: two answers to one question, found as drift-audit's MEMORY_ROOT and
+    #          codebase-map's MAP_ROOT and GATE_FILE. WHAT IT DOES NOT CHECK: a default applied in a
+    #          kit's Python engine rather than its shell adopter, or a `${KEY:=value}` assignment; it
+    #          reads `adopt-*.sh` beside the descriptor, which is where every shipped kit renders.
+    _n_def = 0
+    for eid, (d, _dpath) in sorted(descs.items()):
+        _cfg = d.get("config") or {}
+        if not _cfg.get("file"):
+            continue
+        _defs = _cfg.get("defaults") or {}
+        _req = [k for k in dict.fromkeys(list(_cfg.get("required_keys_gate") or [])
+                                         + list(_cfg.get("required_keys_render") or []))
+                if k not in _defs]
+        for _ad in sorted((root / _dpath).parent.glob("adopt-*.sh")):
+            if _ad.name.endswith(".test.sh"):
+                continue
+            _src = _ad.read_text(encoding="utf-8", errors="replace")
+            for _k in _req:
+                _n_def += 1
+                _m = re.search(r"\$\{" + re.escape(_k) + r":-([^}]+)\}", _src)
+                if _m:
+                    r.fail(f"entry '{eid}' declares {_k} required, and its adopter {_ad.name} "
+                           f"defaults it to '{_m.group(1)}' — govkit then reds a conf the kit "
+                           f"accepts. Declare it in [config].defaults, or stop defaulting it")
+    r.note(f"adopter defaults: {_n_def} required key/adopter pair(s) read")
+
     # ---- 3c: a `forked` rule declares BOTH of `FORK_RULE_KEYS`, and `direction` is drawn from the
     #          closed enum. DEPL-dCarriedReceipt-10 S5.
     #
@@ -4359,8 +4389,12 @@ def read_conf_key_gaps(target: pathlib.Path, desc: dict,
     DEPL-aHalvedInstall-1. The two lists were declared by every kit with a conf and read by nothing
     in this file but check 7, as a name set — so a target conf missing a required key, or still
     holding the example's `<...>` value, was silent here until the kit's own adopter refused it
-    mid-render. Returns `(key, state)` pairs, state `absent` or `placeholder`, in declaration order;
-    a key in `[config].defaults` is never absent, and a missing conf file makes every key absent.
+    mid-render. Returns `(key, state)` pairs, state `absent`, `empty` or `placeholder`, in declaration
+    order; a key in `[config].defaults` is never absent, and a missing conf file makes every key
+    absent. An assigned value that is empty or whitespace is `empty`, because every adopter reads
+    `${KEY:-}` and cannot tell it from absent (rev-3, review M2). A conf that exists and cannot be
+    read returns ONE pair, `(None, "unreadable: <error>")`, rather than raising: `update` reads it
+    after its writes, where a traceback would skip the rollback (rev-3, review M8).
 
     WHAT IT DOES NOT CHECK. It asks whether a key is ASSIGNED and whether its value is the example's
     angle-bracket shape — never whether the value is right, which is the kit's own check. It reads
@@ -4379,8 +4413,12 @@ def read_conf_key_gaps(target: pathlib.Path, desc: dict,
         return []
     p = target / rel
     vals: dict[str, str] = {}
-    if p.is_file():
-        for ln in p.read_text(encoding="utf-8", errors="replace").splitlines():
+    if p.exists():
+        try:
+            _text = p.read_text(encoding="utf-8", errors="replace")
+        except OSError as e:
+            return [(None, f"unreadable: {e.__class__.__name__}: {e}")]
+        for ln in _text.splitlines():
             m = CONF_KEY_RX.match(ln)
             if m:
                 v = m.group(2).strip()
@@ -4391,6 +4429,8 @@ def read_conf_key_gaps(target: pathlib.Path, desc: dict,
     for k in want:
         if k not in vals:
             gaps.append((k, "absent"))
+        elif not vals[k].strip():
+            gaps.append((k, "empty"))
         elif vals[k].startswith("<") and vals[k].endswith(">"):
             gaps.append((k, "placeholder"))
     return gaps
@@ -4836,8 +4876,12 @@ def cmd_check(root: pathlib.Path, target: pathlib.Path, run_discharge: bool = Fa
         # DEPL-aHalvedInstall-1 S2. The kit's DECLARED required keys, read against the target's conf.
         _conf = (d.get("config") or {}).get("file")
         for _k, _st in read_conf_key_gaps(target, d):
+            if _k is None:
+                r.fail(f"kit '{eid}' conf {_conf}: {_st} — its required keys cannot be read")
+                continue
             r.fail(f"kit '{eid}' conf {_conf}: required key {_k} is "
-                   + ("ABSENT" if _st == "absent" else "still the example's <...> placeholder")
+                   + {"absent": "ABSENT", "empty": "EMPTY, which every adopter reads as absent"}.get(
+                       _st, "still the example's <...> placeholder")
                    + " — the kit's [config] declares it required, so its adopter refuses or its "
                      "gate reds without a value")
 
@@ -10049,8 +10093,9 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             # outcome still decides, because declining it would land the templates over a stale render.
             _cf_rr = (_d.get("config") or {}).get("file")
             for _k, _st in read_conf_key_gaps(target, _d, ("required_keys_render",)):
-                print(f"govkit update — CONF GAP {_eid}: {_cf_rr} key {_k} is {_st}, and the kit "
-                      f"declares it required to render")
+                print(f"govkit update — CONF GAP {_eid}: {_cf_rr} "
+                      + (f"is {_st}" if _k is None else
+                         f"key {_k} is {_st}, and the kit declares it required to render"))
             _own_rr = {f.get("source") for f in receipt.get("files") or []
                        if f.get("role") == "adopter-owned"}
             _hw_rr = {h.get("id"): h.get("why", "") for h in _d.get("hole", [])}

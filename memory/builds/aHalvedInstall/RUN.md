@@ -52,3 +52,5 @@ base: cd90f7fa5c8cddf152e3a2a065f5df7ad64f355b
 2026-10-02T13:48:02Z review · item aHalvedInstall · reason verdict BLOCKED · blockers 0 · CONVERGED · disposition promote
 
 2026-10-02T13:49:25Z rescope · item add DEPL-aHalvedInstall-5 · reason closing review round 1 H1 (ids 1, 4), promoted at CONVERGED: the held set misses the classification walk's refusals and the landing loop's, so a kit can still land half its bytes
+
+2026-10-02T13:53:31Z dispatch · item 6dd9ceb7 DEPL-aHalvedInstall-1 · reason tools/govkit/govkit.py tools/govkit/selftest.py tools/drift-audit/kit.toml tools/codebase-map/kit.toml memory/builds/aHalvedInstall/spec/2026-10-02-spec-DEPL-aHalvedInstall-1.md memory/LIVE.md memory/ledger/2026-10.md memory/builds/aHalvedInstall/README.md memory/map/generated/symbols.json memory/map/generated/MAP.md
