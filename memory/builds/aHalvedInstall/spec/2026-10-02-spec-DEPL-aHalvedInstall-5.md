@@ -1,10 +1,12 @@
 # DEPL-aHalvedInstall-5 — every row refusal in `update` decides whether it holds its kit back
 
-**Status:** INPROGRESS · rev-2 · 2026-10-02 · node a · Tier-2 · base cd90f7fa · streams deployer · order 5
+**Status:** CLOSED · rev-2 · 2026-10-02 · node a · Tier-2 · base cd90f7fa · streams deployer · order 5
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-02-build-DEPL-aHalvedInstall-5-1-acceptance-ledger.md](../build/2026-10-02-build-DEPL-aHalvedInstall-5-1-acceptance-ledger.md) | journal | — |
 
 <!-- /gen:spec-records -->
 

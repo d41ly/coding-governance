@@ -1,6 +1,6 @@
 # DEPL-aHalvedInstall-1 — govkit reads each kit's declared required conf keys and names a gap
 
-**Status:** INPROGRESS · rev-3 · 2026-10-02 · node a · Tier-2 · base cd90f7fa · streams deployer · order 1
+**Status:** CLOSED · rev-3 · 2026-10-02 · node a · Tier-2 · base cd90f7fa · streams deployer · order 1
 
 <!-- gen:spec-records -->
 

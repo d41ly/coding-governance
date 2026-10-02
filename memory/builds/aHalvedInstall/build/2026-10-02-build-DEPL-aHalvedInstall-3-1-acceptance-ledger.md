@@ -14,3 +14,5 @@ the comment was reworded rather than the arm touched.
 - AC3 — `python tools/govkit/govkit.py selfcheck` — with the seven descriptors at base text it named agent-cap, agent-instructions, codebase-map, playbook-render, process-monitor, run-gates and settings-merge
 - AC4 — `python tools/govkit/govkit.py selfcheck` — every reason stated: exit 0; `why_no_regenerate = "   "` in run-gates: names run-gates
 - AC5 — `python tools/govkit/govkit.py epoch` — `--base cd90f7fa` prints no `FAILED` line at `1bfa4d01`
+- AC6 — `selfcheck` — `[aHI-3 AC6]` stages playbook-render's block away and a whitespace reason into run-gates; 3b-iii names each, and each is green again on restore
+- AC7 — `bash tools/playbook/adopt-playbook.sh --selftest` — 24 arms OK; with `write_region` staged to append, `1 of 24` fails, naming the run-twice arm (`f92c7452`)

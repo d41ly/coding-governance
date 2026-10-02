@@ -1,6 +1,6 @@
 # DEPL-aHalvedInstall-2 — selfcheck refuses a hole discharge that exits 0 on an empty tree
 
-**Status:** INPROGRESS · rev-2 · 2026-10-02 · node a · Tier-1 · base cd90f7fa · streams deployer · order 2
+**Status:** CLOSED · rev-2 · 2026-10-02 · node a · Tier-1 · base cd90f7fa · streams deployer · order 2
 
 <!-- gen:spec-records -->
 

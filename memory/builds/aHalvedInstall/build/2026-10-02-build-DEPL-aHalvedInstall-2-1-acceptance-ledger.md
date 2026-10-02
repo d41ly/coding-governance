@@ -14,3 +14,5 @@ with the awk reader `unattended.test.sh` uses for its AC15 arm.
 - AC3 — `RESUME_SCHEDULE_CREATE` — absent 1, placeholder 1, empty 1, both real 0, unquoted real 0, `RESUME_SCHEDULE="off"` with neither 0, no conf at all 1
 - AC4 — `test -f` — the playbook probe exits 1 with no charter file present
 - AC5 — `python tools/govkit/govkit.py epoch` — `--base cd90f7fa` prints no `FAILED` line at `1bfa4d01`
+- AC6 — `RESUME_SCHEDULE='off'` — the AC15 slice of `tools/unattended/unattended.test.sh` passes 11 arms; against the previous probe five go red: single-quoted off, commented off, off then on, exported pair, single-quoted placeholder (`f61384f8`)
+- AC7 — `selfcheck` — `[aHI-2 AC7]` in `check_halved_install_arms` stages a negated grep of a missing file into `directives-floor` and 6b names it; green again on restore

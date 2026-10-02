@@ -15,3 +15,5 @@ conflict-order controls stayed green.
 - AC4 — `update-rollback-demo.md` — carries `was HELD BACK`, `REFUSED` with the conflicting path, and `restored` with the clean one
 - AC5 — `.governance/outbox` — `update-conflict-<slug>.md` and its `candidate` file exist after the held run
 - AC6 — `python tools/govkit/govkit.py epoch` — `--base cd90f7fa` prints no `FAILED` line at `1bfa4d01`
+- AC7 — `hook.fragment.json` — `[aHI-4 ha|hg|hz AC7]`: named `landed UNWIRED — its kit is HELD BACK` at its old bytes; all three red with the held union staged away of `_fr_skip`. The merge honouring that set is the fragment-wiring arm's `a kit in the skip set is not wired`
+- AC8 — `zz-conf.sh` — the `hz` variant puts the refused row last; its AC1, AC2 and AC4 arms red with the compare after the write loop staged away, while `ha` and `hg` stay green (`8658fc59`)
