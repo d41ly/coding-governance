@@ -1,6 +1,6 @@
 # DEPL-aHalvedInstall-2 — selfcheck refuses a hole discharge that exits 0 on an empty tree
 
-**Status:** CLOSED · rev-1 · 2026-10-02 · node a · Tier-1 · base cd90f7fa · streams deployer · order 2
+**Status:** INPROGRESS · rev-2 · 2026-10-02 · node a · Tier-1 · base cd90f7fa · streams deployer · order 2
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-10-02-build-DEPL-aHalvedInstall-2-1-acceptance-ledger.md](../build/2026-10-02-build-DEPL-aHalvedInstall-2-1-acceptance-ledger.md) | journal | — |
 | [2026-10-02-prompt-DEPL-aHalvedInstall-2-2-build-brief.md](../prompts/2026-10-02-prompt-DEPL-aHalvedInstall-2-2-build-brief.md) | journal | — |
+| [2026-10-02-review-DEPL-aHalvedInstall-1-closing-diff-round1.md](../reviews/2026-10-02-review-DEPL-aHalvedInstall-1-closing-diff-round1.md) | diff-review | DEPL-aHalvedInstall-1 DEPL-aHalvedInstall-3 DEPL-aHalvedInstall-4 |
 
 <!-- /gen:spec-records -->
 
@@ -35,6 +36,12 @@ and fixes the two probes it reds.
   read by govkit's required-key reader. Observed by AC3.
 - **S3** — `playbook-placeholders` in `tools/govkit/entries/playbook.kit.toml` asserts the charter
   file exists before it refutes a placeholder in it. Observed by AC4.
+- **S5** — Round 1's folds. The keepalive probe SOURCES the conf in a subshell, its three keys reset
+  first, as the adopter does, so a single-quoted, commented, exported or later-reassigned value reads
+  the same in both (M4). The AC15 arm in `tools/unattended/unattended.test.sh` gains the absent,
+  `off`, empty and those four spellings, and its header describes the presence test (M9). A committed
+  negative arm in `tools/govkit/selftest.py` makes 6b name a probe that passes on an empty tree (M5).
+  Observed by AC6 and AC7.
 - **S4** — The version of every kit whose shipped bytes move is bumped where `govkit epoch` names it.
   Observed by AC5.
 
@@ -108,6 +115,14 @@ test -f "$1" && ! grep -qE '\{\{[A-Z]' "$1"
   unbumped move.
   Red when: a touched kit's version marker is left.
 
+- **AC6** — When the narrowed probe runs over `RESUME_SCHEDULE='off'`, over `RESUME_SCHEDULE=off  #
+  opt out`, and over an `export` spelling of both carrier keys, it exits 0; over `off` followed by
+  `on` with no pair, it exits 1.
+  Red when: the probe greps the first `^KEY=` line instead of sourcing.
+- **AC7** — When the selftest's gcopy block sets a hole discharge to a negated grep of a missing
+  file, `selfcheck` names that hole as exiting 0 on an empty directory.
+  Red when: the 6b comparison is inverted or runs in the gov checkout.
+
 ## 7. Gates
 
 `govkit selfcheck` · `kit epoch (shipped bytes move, the version moves)` · `govkit selftest` · `govkit refusal join` · `recall floor arms` · `govkit acceptance matrix`
@@ -121,6 +136,8 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-02 · initial draft, from the owner's first observation and the hole set at base.
+- rev-2 · 2026-10-02 · §4 Data model · S5 · AC6 · AC7 · folded round 1's M4, M5 and M9; the probe in
+  §4 is superseded by the sourcing form S5 states.
 
 ## 10. Reuse audit
 

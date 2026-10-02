@@ -1,6 +1,6 @@
 # DEPL-aHalvedInstall-1 — govkit reads each kit's declared required conf keys and names a gap
 
-**Status:** CLOSED · rev-2 · 2026-10-02 · node a · Tier-2 · base cd90f7fa · streams deployer · order 1
+**Status:** INPROGRESS · rev-3 · 2026-10-02 · node a · Tier-2 · base cd90f7fa · streams deployer · order 1
 
 <!-- gen:spec-records -->
 
@@ -9,6 +9,7 @@
 | [2026-10-02-build-DEPL-aHalvedInstall-1-1-acceptance-ledger.md](../build/2026-10-02-build-DEPL-aHalvedInstall-1-1-acceptance-ledger.md) | journal | — |
 | [2026-10-02-prompt-DEPL-aHalvedInstall-1-0-run-mandate.md](../prompts/2026-10-02-prompt-DEPL-aHalvedInstall-1-0-run-mandate.md) | journal | — |
 | [2026-10-02-prompt-DEPL-aHalvedInstall-1-2-build-brief.md](../prompts/2026-10-02-prompt-DEPL-aHalvedInstall-1-2-build-brief.md) | journal | — |
+| [2026-10-02-review-DEPL-aHalvedInstall-1-closing-diff-round1.md](../reviews/2026-10-02-review-DEPL-aHalvedInstall-1-closing-diff-round1.md) | diff-review | DEPL-aHalvedInstall-2 DEPL-aHalvedInstall-3 DEPL-aHalvedInstall-4 |
 
 <!-- /gen:spec-records -->
 
@@ -42,6 +43,12 @@ regenerate, and name every gap by key.
   from `optional_keys` to `conditional_keys`, because the adopter requires them unless
   `RESUME_SCHEDULE` is `off`, and that condition is the hole's to grade (DEPL-aHalvedInstall-2).
   NOT OBSERVED by an arm: a list move check 7 accepts and nothing else reads.
+- **S7** — Round 1's folds. An assigned value that is empty or whitespace-only is the state `empty`
+  and is reported as ABSENT is (M2). An unreadable conf is the state `unreadable` and a finding, never
+  a traceback, in both verbs (M8). drift-audit's `[config]` declares the `MEMORY_ROOT` default its
+  adopter and engine already apply, so the reader stops reporting a false gap (M1); and a selfcheck
+  arm refuses a required key a kit's own adopter defaults while its descriptor does not, so the
+  declaration and the adopter stay one answer. Observed by AC7, AC8 and AC9.
 - **S6** — Every kit whose shipped bytes this unit moves is bumped where `govkit epoch` names it.
   govkit itself is not in that population, and is not bumped here. Observed by AC6.
 
@@ -136,6 +143,16 @@ named `check` finding where before it got the adopter's unnamed placeholder refu
   `FAILED` line.
   Red when: a kit whose shipped set the commit moves keeps its version.
 
+- **AC7** — When `check` runs over a fixture conf holding `DEMO_KEY=""`, the output names the key
+  as empty.
+  Red when: an empty value is stored and passes as satisfied.
+- **AC8** — When the fixture's conf path is a directory, `check` names it `unreadable` and `update`
+  prints a `CONF GAP` line for it; neither raises.
+  Red when: `read_text` is unguarded.
+- **AC9** — When `python tools/govkit/govkit.py selfcheck` runs with drift-audit's `defaults` line
+  removed, it names drift-audit and `MEMORY_ROOT`; with it, nothing.
+  Red when: the arm does not read the adopter, so it cannot see the default.
+
 ## 7. Gates
 
 `govkit selfcheck` · `kit epoch (shipped bytes move, the version moves)` · `govkit selftest` · `govkit refusal join` · `recall floor arms` · `govkit acceptance matrix`
@@ -149,6 +166,7 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-02 · initial draft, from the owner's first observation and govkit read at base.
+- rev-3 · 2026-10-02 · S7 · AC7 · AC8 · AC9 · folded the closing review's round 1 M1, M2 and M8 (2026-10-02-review-DEPL-aHalvedInstall-1-closing-diff-round1.md).
 - rev-2 · 2026-10-02 · build pass · S6 · AC6 · `govkit epoch` does not grade govkit itself, and
   `KIT_GOVKIT_VERSION` has stood at 1.12 across 66 commits to the file since `7bd70200`: it moves on
   release, not per change. S6 now bumps only what `epoch` names.

@@ -5,7 +5,7 @@ opened: 2026-10-02
 streams: deployer
 roster: DEPL
 authorized-by: prompt
-ids: DEPL-aHalvedInstall-1 DEPL-aHalvedInstall-2 DEPL-aHalvedInstall-3 DEPL-aHalvedInstall-4
+ids: DEPL-aHalvedInstall-1 DEPL-aHalvedInstall-2 DEPL-aHalvedInstall-3 DEPL-aHalvedInstall-4 DEPL-aHalvedInstall-5
 ---
 
 # aHalvedInstall — three kit-deploy defects, closed as classes
@@ -52,27 +52,29 @@ rolls back for a kit with no `[check]`. The owner's prompt is in `prompts/`.
 | 2 | `DEPL-aHalvedInstall-2` | 1 | selfcheck refuses a hole discharge that exits 0 on an empty tree |
 | 3 | `DEPL-aHalvedInstall-3` | 1 | a kit with an adopter declares `[[regenerate]]` or a reason; playbook-render declares one |
 | 4 | `DEPL-aHalvedInstall-4` | 2 | `update` installs a kit whole or not at all across a refused row |
+| 5 | `DEPL-aHalvedInstall-5` | 2 | promoted from the closing review: every row refusal in `update` decides whether it holds its kit |
 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 4 unit(s) · node a · opened 2026-10-02 · streams deployer
-ids DEPL-aHalvedInstall-1 DEPL-aHalvedInstall-2 DEPL-aHalvedInstall-3 DEPL-aHalvedInstall-4
+**Build status:** INPROGRESS · 5 unit(s) · node a · opened 2026-10-02 · streams deployer
+ids DEPL-aHalvedInstall-1 DEPL-aHalvedInstall-2 DEPL-aHalvedInstall-3 DEPL-aHalvedInstall-4 DEPL-aHalvedInstall-5
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [DEPL-aHalvedInstall-1 — govkit reads each kit's declared required conf keys and names a gap](spec/2026-10-02-spec-DEPL-aHalvedInstall-1.md) | 1 | 2 | CLOSED | rev-2 | 2026-10-02 |
-| [DEPL-aHalvedInstall-2 — selfcheck refuses a hole discharge that exits 0 on an empty tree](spec/2026-10-02-spec-DEPL-aHalvedInstall-2.md) | 2 | 1 | CLOSED | rev-1 | 2026-10-02 |
-| [DEPL-aHalvedInstall-3 — every kit with an adopter decides whether `update` re-renders it](spec/2026-10-02-spec-DEPL-aHalvedInstall-3.md) | 3 | 1 | CLOSED | rev-2 | 2026-10-02 |
-| [DEPL-aHalvedInstall-4 — `update` installs a kit whole or not at all across a refused row](spec/2026-10-02-spec-DEPL-aHalvedInstall-4.md) | 4 | 2 | CLOSED | rev-2 | 2026-10-02 |
+| [DEPL-aHalvedInstall-1 — govkit reads each kit's declared required conf keys and names a gap](spec/2026-10-02-spec-DEPL-aHalvedInstall-1.md) | 1 | 2 | INPROGRESS | rev-3 | 2026-10-02 |
+| [DEPL-aHalvedInstall-2 — selfcheck refuses a hole discharge that exits 0 on an empty tree](spec/2026-10-02-spec-DEPL-aHalvedInstall-2.md) | 2 | 1 | INPROGRESS | rev-2 | 2026-10-02 |
+| [DEPL-aHalvedInstall-3 — every kit with an adopter decides whether `update` re-renders it](spec/2026-10-02-spec-DEPL-aHalvedInstall-3.md) | 3 | 1 | INPROGRESS | rev-3 | 2026-10-02 |
+| [DEPL-aHalvedInstall-4 — `update` installs a kit whole or not at all across a refused row](spec/2026-10-02-spec-DEPL-aHalvedInstall-4.md) | 4 | 2 | INPROGRESS | rev-3 | 2026-10-02 |
+| [DEPL-aHalvedInstall-5 — every row refusal in `update` decides whether it holds its kit back](spec/2026-10-02-spec-DEPL-aHalvedInstall-5.md) | 5 | 2 | OPEN | rev-1 | 2026-10-02 |
 <!-- /gen:build-units -->
 
-Records: 9 bound to this build, across 3 record folder(s).
+Records: 10 bound to this build, across 4 record folder(s).
 
-Ids no record names: none — every unit id is named by a record.
+Ids no record names: DEPL-aHalvedInstall-5.
 
-Ids no `spec-audit` record has ever named: DEPL-aHalvedInstall-1 DEPL-aHalvedInstall-2 DEPL-aHalvedInstall-3 DEPL-aHalvedInstall-4.
+Ids no `spec-audit` record has ever named: DEPL-aHalvedInstall-1 DEPL-aHalvedInstall-2 DEPL-aHalvedInstall-3 DEPL-aHalvedInstall-4 DEPL-aHalvedInstall-5.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -83,6 +85,7 @@ Ids no `spec-audit` record has ever named: DEPL-aHalvedInstall-1 DEPL-aHalvedIns
 | 2 | `DEPL-aHalvedInstall-2` | no |
 | 3 | `DEPL-aHalvedInstall-3` | no |
 | 4 | `DEPL-aHalvedInstall-4` | no |
+| 5 | `DEPL-aHalvedInstall-5` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

@@ -1,6 +1,6 @@
 # DEPL-aHalvedInstall-4 — `update` installs a kit whole or not at all across a refused row
 
-**Status:** CLOSED · rev-2 · 2026-10-02 · node a · Tier-2 · base cd90f7fa · streams deployer · order 4
+**Status:** INPROGRESS · rev-3 · 2026-10-02 · node a · Tier-2 · base cd90f7fa · streams deployer · order 4
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-10-02-build-DEPL-aHalvedInstall-4-1-acceptance-ledger.md](../build/2026-10-02-build-DEPL-aHalvedInstall-4-1-acceptance-ledger.md) | journal | — |
 | [2026-10-02-prompt-DEPL-aHalvedInstall-4-2-build-brief.md](../prompts/2026-10-02-prompt-DEPL-aHalvedInstall-4-2-build-brief.md) | journal | — |
+| [2026-10-02-review-DEPL-aHalvedInstall-1-closing-diff-round1.md](../reviews/2026-10-02-review-DEPL-aHalvedInstall-1-closing-diff-round1.md) | diff-review | DEPL-aHalvedInstall-1 DEPL-aHalvedInstall-2 DEPL-aHalvedInstall-3 |
 
 <!-- /gen:spec-records -->
 
@@ -38,6 +39,10 @@ back: none of the kit's writes from this run stand, its regenerate does not run,
   of a check transition. Observed by AC1, AC3 and AC4.
 - **S4** — Conflict orders and candidates are written exactly as before, one per refused row.
   Observed by AC5.
+- **S6** — Round 1's folds. The fragment-wiring step skips a held kit, like an inert one, and says so
+  (M3). The aHI-4 fixtures run with the refused row first AND last in the kit's acted rows, so the
+  compare after the loop is exercised (M6). AC5's arm asserts all four candidate files (L1).
+  Observed by AC5, AC7 and AC8.
 - **S5** — Every kit whose shipped bytes this unit moves is bumped where `govkit epoch` names it;
   govkit itself is not in that population (DEPL-aHalvedInstall-1 rev-2). Observed by AC6.
 
@@ -130,6 +135,13 @@ kit, restores its other rows, and fails as it already did.
   no `FAILED` line.
   Red when: a kit whose shipped set moved keeps its version.
 
+- **AC7** — When a held kit's update lands a changed hook fragment, `.claude/settings.json` is
+  byte-identical after the run and the output names the fragment as not wired, with the hold.
+  Red when: `_fr_skip` omits the held set.
+- **AC8** — When the conflicting row sorts after every other acted row of its kit, `HELD BACK`, the
+  declined regenerate and the restored clean row hold as in AC1 and AC2.
+  Red when: the compare after the write loop is deleted.
+
 ## 7. Gates
 
 `govkit selfcheck` · `kit epoch (shipped bytes move, the version moves)` · `govkit selftest` · `govkit refusal join` · `recall floor arms` · `govkit acceptance matrix`
@@ -143,6 +155,7 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-02 · initial draft, from the owner's third observation and `_cmd_update` at base.
+- rev-3 · 2026-10-02 · S6 · AC7 · AC8 · folded round 1's M3, M6 and L1; AC5 now names all four files.
 - rev-2 · 2026-10-02 · build pass · §4 Data model · S5 · AC6 · the per-row count is compared at the
   top of the next iteration instead of moving the 350-line body into a local function, which would
   have rebound a dozen of its names; S5 and AC6 follow unit 1's rev-2, since `epoch` does not grade

@@ -1,6 +1,6 @@
 # DEPL-aHalvedInstall-3 — every kit with an adopter decides whether `update` re-renders it
 
-**Status:** CLOSED · rev-2 · 2026-10-02 · node a · Tier-1 · base cd90f7fa · streams deployer · order 3
+**Status:** INPROGRESS · rev-3 · 2026-10-02 · node a · Tier-1 · base cd90f7fa · streams deployer · order 3
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-10-02-build-DEPL-aHalvedInstall-3-1-acceptance-ledger.md](../build/2026-10-02-build-DEPL-aHalvedInstall-3-1-acceptance-ledger.md) | journal | — |
 | [2026-10-02-prompt-DEPL-aHalvedInstall-3-2-build-brief.md](../prompts/2026-10-02-prompt-DEPL-aHalvedInstall-3-2-build-brief.md) | journal | — |
+| [2026-10-02-review-DEPL-aHalvedInstall-1-closing-diff-round1.md](../reviews/2026-10-02-review-DEPL-aHalvedInstall-1-closing-diff-round1.md) | diff-review | DEPL-aHalvedInstall-1 DEPL-aHalvedInstall-2 DEPL-aHalvedInstall-4 |
 
 <!-- /gen:spec-records -->
 
@@ -33,6 +34,11 @@ update never needs to re-run it.
 - **S3** — Each of the six descriptors the arm reds at base states its reason: `agent-instructions`,
   `codebase-map`, `agent-cap`, `process-monitor`, `run-gates` and `settings-merge`. Each reason is
   read from that adopter, not assumed. Observed by AC4.
+- **S5** — Round 1's folds. A committed negative arm in `tools/govkit/selftest.py` makes 3b-iii name
+  a descriptor stripped of its block, and one whose reason is blank (M5). The render selftest gains
+  an arm that runs the adopter's write mode twice over an adopted fixture: an unchanged body leaves
+  the charter byte-identical, a changed one replaces the region and keeps the authored prose (M7).
+  Observed by AC6 and AC7.
 - **S4** — The version of every kit whose shipped bytes move is bumped where `govkit epoch` names it.
   Observed by AC5.
 
@@ -107,6 +113,12 @@ re-runs for a landed fragment.
   unbumped move.
   Red when: a touched kit's version marker is left.
 
+- **AC6** — When the gcopy arm strips a descriptor's `[[regenerate]]`, `selfcheck` names it; with a
+  whitespace reason, it names it.
+  Red when: the arm reads a misspelled key and matches nothing.
+- **AC7** — When `bash tools/playbook/adopt-playbook.sh --selftest` runs, its run-twice arm passes.
+  Red when: the write mode appends rather than replaces the region.
+
 ## 7. Gates
 
 `govkit selfcheck` · `kit epoch (shipped bytes move, the version moves)` · `playbook render selftest` · `playbook render wiring` · `govkit selftest` · `govkit acceptance matrix` · `govkit refusal join` · `recall floor arms` · `agent-cap self-test` · `scratch-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `agent-instructions self-test` · `codebase-map kit selftest` · `codebase-map gate coverage` · `codebase-map adopter e2e`
@@ -120,6 +132,7 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-02 · initial draft, from the owner's second observation and the descriptors at base.
+- rev-3 · 2026-10-02 · S5 · AC6 · AC7 · folded round 1's M5 and M7.
 - rev-2 · 2026-10-02 · build pass · AC2 · observed at `build_region` over the render selftest's own
   fixture rather than by running the adopter twice: an adopted target needs every asked answer, and
   the adopter's write mode is `build_region(cur, body)` and nothing else.
