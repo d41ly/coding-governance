@@ -9,6 +9,8 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+asks-at-landing: TOOL-aSightedSkeptic-11=OPEN TOOL-aSightedSkeptic-12=CLOSED
+units-at-landing: TOOL-aSightedSkeptic-5 TOOL-aSightedSkeptic-1 TOOL-aSightedSkeptic-3 TOOL-aSightedSkeptic-4 TOOL-aSightedSkeptic-2 TOOL-aSightedSkeptic-6 TOOL-aSightedSkeptic-7 TOOL-aSightedSkeptic-8 TOOL-aSightedSkeptic-9 TOOL-aSightedSkeptic-10 TOOL-aSightedSkeptic-13
 hold-run: 
 hold-streak: 1 · at b3502290
 resume-owed: none · owner
@@ -17,12 +19,12 @@ hold-reason: All ten units built, closing review CONVERGED, the self-test 180/18
 hold-until: owner
 hold-code: host-owner-action
 held-from: VERIFYING
-gates-run: unattended-179092786196975023401-2052 4ffcca30
+gates-run: unattended-179093833313342215197-7726 4fae0685
 parked-surfaced: yes, 3 surfaced
 keepalive-reaped: yes
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: b4703eaf12007aaaa6274b1e071add31f64b2486
-phase: VERIFYING
+phase: LANDING
 branch-sha: 9fdd0c18d5afac1744c226c3e8ea2716e6d49e30
 branch-ref: refs/heads/run/aSightedSkeptic
 may: none
