@@ -1,11 +1,12 @@
 # DEPL-aHalvedInstall-4 — `update` installs a kit whole or not at all across a refused row
 
-**Status:** INPROGRESS · rev-2 · 2026-10-02 · node a · Tier-2 · base cd90f7fa · streams deployer · order 4
+**Status:** CLOSED · rev-2 · 2026-10-02 · node a · Tier-2 · base cd90f7fa · streams deployer · order 4
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-02-build-DEPL-aHalvedInstall-4-1-acceptance-ledger.md](../build/2026-10-02-build-DEPL-aHalvedInstall-4-1-acceptance-ledger.md) | journal | — |
 | [2026-10-02-prompt-DEPL-aHalvedInstall-4-2-build-brief.md](../prompts/2026-10-02-prompt-DEPL-aHalvedInstall-4-2-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->

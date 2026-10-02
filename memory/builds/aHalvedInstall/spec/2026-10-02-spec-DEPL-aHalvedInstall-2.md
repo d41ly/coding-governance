@@ -1,11 +1,12 @@
 # DEPL-aHalvedInstall-2 — selfcheck refuses a hole discharge that exits 0 on an empty tree
 
-**Status:** OPEN · rev-1 · 2026-10-02 · node a · Tier-1 · base cd90f7fa · streams deployer · order 2
+**Status:** CLOSED · rev-1 · 2026-10-02 · node a · Tier-1 · base cd90f7fa · streams deployer · order 2
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-02-build-DEPL-aHalvedInstall-2-1-acceptance-ledger.md](../build/2026-10-02-build-DEPL-aHalvedInstall-2-1-acceptance-ledger.md) | journal | — |
 | [2026-10-02-prompt-DEPL-aHalvedInstall-2-2-build-brief.md](../prompts/2026-10-02-prompt-DEPL-aHalvedInstall-2-2-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
