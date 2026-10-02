@@ -3871,6 +3871,59 @@ reset_tree
 miss "$(run)" "check 23 FAILED"
 reset_tree
 
+# ---- DERIVED LANDED IS NOT GRADED (TOOL-aSightedSkeptic-13): check 23 asks check 7's predicate, so an
+# ---- in-place landing whose record stays LANDING stops counting once its landing commit is on the
+# ---- advertised tip. Each arm is the stray-write fixture above, graded at the adopter's ceiling of 0,
+# ---- and asserts only check 23's own strings, because a LANDING record moves checks 7, 15 and 19 too.
+# A: pushed, so derived LANDED - excluded, naming the record and its landing commit
+reset_tree
+drow ARCH-tRun-1 "work/one.txt"
+mkdir -p work && printf 'a\n' > work/one.txt && printf 'c\n' > work/stray.txt
+git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
+sed -i 's/^phase: .*/phase: LANDING/' memory/builds/tRun/RUN.md
+git add -A && git commit -q -m "tRun lands" --no-verify
+git push -q -f origin HEAD:main
+out=$(run)
+hit  "$out" "check 23 EXCLUDED memory/builds/tRun/RUN.md — derived LANDED: its landing commit $(git rev-parse HEAD)"
+miss "$out" "check 23 FAILED"
+git push -q -f origin "$ANCHOR0":main
+# B (control): the same LANDING record, NOT pushed, is a live run and is graded
+reset_tree
+drow ARCH-tRun-1 "work/one.txt"
+mkdir -p work && printf 'a\n' > work/one.txt && printf 'c\n' > work/stray.txt
+git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
+sed -i 's/^phase: .*/phase: LANDING/' memory/builds/tRun/RUN.md
+git add -A && git commit -q -m "tRun lands" --no-verify
+out=$(run)
+hit  "$out" "check 23 FAILED"
+miss "$out" "check 23 EXCLUDED"
+# C: no advertised tip resolves - UNAVAILABLE once, and the record is graded rather than excluded
+reset_tree
+drow ARCH-tRun-1 "work/one.txt"
+mkdir -p work && printf 'a\n' > work/one.txt && printf 'c\n' > work/stray.txt
+git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
+sed -i 's/^phase: .*/phase: LANDING/' memory/builds/tRun/RUN.md
+git add -A && git commit -q -m "tRun lands" --no-verify
+git --git-dir="$ORIGIN" symbolic-ref HEAD refs/heads/nothing-here
+out=$(run)
+same "check 23 exclusion UNAVAILABLE prints once" "$(grep -c 'check 23 exclusion UNAVAILABLE' <<<"$out")" "1"
+hit  "$out" "UNATTENDED check 23 FAILED"
+git --git-dir="$ORIGIN" symbolic-ref HEAD refs/heads/main
+# D (control): a recorded LANDED record is still skipped by its phase before the predicate is asked
+reset_tree
+drow ARCH-tRun-1 "work/one.txt"
+mkdir -p work && printf 'a\n' > work/one.txt && printf 'c\n' > work/stray.txt
+git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
+sed -i 's/^phase: .*/phase: LANDED/' memory/builds/tRun/RUN.md
+git add -A && git commit -q -m "tRun landed" --no-verify
+git --git-dir="$ORIGIN" symbolic-ref HEAD refs/heads/nothing-here
+out=$(run)
+miss "$out" "check 23 EXCLUDED"
+miss "$out" "check 23 exclusion UNAVAILABLE"
+miss "$out" "UNATTENDED check 23 FAILED"
+git --git-dir="$ORIGIN" symbolic-ref HEAD refs/heads/main
+reset_tree
+
 # ---- check 15 (TOOL-dUnstalledConvoy-2): the ancestry half now branches on the RECORDED anchor kind.
 # ---- A `local` record is a claim about ONE clone — the protocol calls it a record of a merge rather
 # ---- than an observation of one — so a clone that never had that merge says so instead of redding.

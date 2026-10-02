@@ -1,6 +1,6 @@
 # TOOL-aSightedSkeptic-13 — check 23 stops grading a run that derived LANDED
 
-**Status:** SPECCED · rev-1 · 2026-10-02 · node a · Tier-2 · base 4e0057a7 · streams tooling · order 13 · ratified 2026-10-02
+**Status:** CLOSED · rev-2 · 2026-10-02 · node a · Tier-2 · base 4e0057a7 · streams tooling · order 13 · ratified 2026-10-02
 
 <!-- gen:spec-records -->
 
@@ -175,7 +175,7 @@ only check-23-specific strings, because a LANDING record also moves checks 7, 15
 | A | phase set to `LANDING`, committed, `git push -q -f origin HEAD:main`, restored to `$ANCHOR0` after | `check 23 EXCLUDED` with the record and `$(git rev-parse HEAD)`; no `check 23 FAILED` | the pre-change gate |
 | B | phase `LANDING`, committed, not pushed | `check 23 FAILED`; no `check 23 EXCLUDED` | a staged break returning 0 for any committed LANDING record |
 | C | phase `LANDING`, committed, origin's HEAD symref pointed at `refs/heads/nothing-here`, restored after | `check 23 exclusion UNAVAILABLE` exactly once; `check 23 FAILED` | the pre-change gate, and a break treating return 2 as excluded |
-| D | phase `LANDED`, committed, symref pointed at `refs/heads/nothing-here`, restored after | no `check 23 EXCLUDED`; no `check 23 exclusion UNAVAILABLE` | a break moving the predicate call above the LANDED-or-ABORTED skip |
+| D | phase `LANDED`, committed, symref pointed at `refs/heads/nothing-here`, restored after | no `check 23 EXCLUDED`; no `check 23 exclusion UNAVAILABLE`; no `UNATTENDED check 23 FAILED` | a break deleting check 23's `LANDED\|ABORTED` skip, so the recorded-LANDED record is graded |
 
 Arms B and D are CONTROLS. A control that is red against the pre-change gate would mean that gate
 was already wrong, so each is observed red against the staged break its row names instead. This is
@@ -257,16 +257,18 @@ kit docs and `memory/guides/SESSION-KICKOFF.md`) · `.claude/skills/unattended/S
   prints 1, and the output carries `check 23 FAILED`.
   Red when: run against the pre-change gate (no UNAVAILABLE line), or with check 23 treating return 2
   as excluded (no FAILED line).
-- **AC4** — When the slice runs arm D, the output carries neither `check 23 EXCLUDED` nor
-  `check 23 exclusion UNAVAILABLE`.
-  Red when: the `check_derived_landed` call is moved above the `LANDED|ABORTED` skip, so a recorded
-  LANDED record with no advertisement prints UNAVAILABLE.
+- **AC4** — When the slice runs arm D, the output carries none of `check 23 EXCLUDED`,
+  `check 23 exclusion UNAVAILABLE` and `UNATTENDED check 23 FAILED`.
+  Red when: check 23's `LANDED|ABORTED` skip is deleted, so the recorded-LANDED record is graded and
+  fails at the fixture's ceiling of 0.
 - **AC5** — When `grep -c 'check_derived_landed' tools/unattended/check-unattended.sh` runs it prints
   at least 3, `grep -n 'c7anchor' tools/unattended/check-unattended.sh` prints nothing, and the slice
   run of check 7's existing arm passes, asserting `check 7 EXCLUDED` with its unchanged text.
   Red when: `check_derived_landed` is staged to always return 1, which reds check 7's arm and proves
   check 7 reads the shared predicate.
-- **AC6** — When `bash tools/unattended/check-arms-groups.sh` runs over the edited suite it exits 0.
+- **AC6** — When `bash tools/unattended/check-arms-groups.sh` runs over the edited suite, its finding
+  count equals the count it prints over the parent's suite and no finding names a group inside the
+  new block. (rev-2: the linter exits 1 at base, 17 findings, none of them this unit's.)
   Red when: two new arms in one group carry an identical assertion text, or a capture is named other
   than `out`.
 - **AC7** — When `bash tools/unattended/check-unattended.sh --emit-ceiling` runs before the edit and
@@ -315,6 +317,12 @@ slice and the `unattended kit gate` leg at VERIFYING.
 - rev-1 · 2026-10-02 · initial draft, from the owner-adopted spec brief, the leg and the kit library
   read at base `4e0057a7`, and a read-only probe of which tracked LANDING records are on the
   advertised tip.
+- rev-2 · 2026-10-02 · build pass · arm D and AC4 re-aimed. The rev-1 break (the predicate call moved
+  above the `LANDED|ABORTED` skip) cannot red arm D: the predicate tests the phase first and returns 1
+  for a LANDED record before it reads the advertisement, so no UNAVAILABLE line is printed whichever
+  side of the skip it is called on. Arm D now also asserts no `UNATTENDED check 23 FAILED`, and its
+  break is the skip's deletion, which is the refactor the shared predicate invites. AC6 re-aimed from
+  "exits 0" to "no new finding": the linter already reds the parent's suite with 17 findings.
 
 ## 10. Reuse audit
 
