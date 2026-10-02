@@ -70,7 +70,7 @@ never measured. The owner's prompt and the list are in `prompts/`.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 10 unit(s) · node a · opened 2026-10-01 · streams tooling
+**Build status:** SPECCED · 11 unit(s) · node a · opened 2026-10-01 · streams tooling
 ids TOOL-aSightedSkeptic-1 TOOL-aSightedSkeptic-2 TOOL-aSightedSkeptic-3 TOOL-aSightedSkeptic-4 TOOL-aSightedSkeptic-5 TOOL-aSightedSkeptic-6 TOOL-aSightedSkeptic-7 TOOL-aSightedSkeptic-8 TOOL-aSightedSkeptic-9 TOOL-aSightedSkeptic-10 TOOL-aSightedSkeptic-11 TOOL-aSightedSkeptic-12
 ids TOOL-aSightedSkeptic-13
 
@@ -87,13 +87,14 @@ ids TOOL-aSightedSkeptic-13
 | [TOOL-aSightedSkeptic-8 — every finding keeps its lens, a findings ledger lands beside the report, and the confirmed set is returned](spec/2026-10-01-spec-TOOL-aSightedSkeptic-8.md) | 8 | 2 | CLOSED | rev-2 | 2026-10-01 |
 | [TOOL-aSightedSkeptic-9 — the replay benchmark: a review scored for recall against a past round](spec/2026-10-01-spec-TOOL-aSightedSkeptic-9.md) | 9 | 2 | CLOSED | rev-3 | 2026-10-01 |
 | [TOOL-aSightedSkeptic-10 — discharge the two Observed-by claims no arm reads, and record the class](spec/2026-10-01-spec-TOOL-aSightedSkeptic-10.md) | 10 | 2 | CLOSED | rev-1 | 2026-10-01 |
+| [TOOL-aSightedSkeptic-13 — check 23 stops grading a run that derived LANDED](spec/2026-10-02-spec-TOOL-aSightedSkeptic-13.md) | 13 | 2 | SPECCED | rev-1 | 2026-10-02 |
 <!-- /gen:build-units -->
 
 Records: 29 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-aSightedSkeptic-1 TOOL-aSightedSkeptic-10 TOOL-aSightedSkeptic-2 TOOL-aSightedSkeptic-3 TOOL-aSightedSkeptic-4 TOOL-aSightedSkeptic-5 TOOL-aSightedSkeptic-6 TOOL-aSightedSkeptic-7 TOOL-aSightedSkeptic-8 TOOL-aSightedSkeptic-9.
+Ids no `spec-audit` record has ever named: TOOL-aSightedSkeptic-1 TOOL-aSightedSkeptic-10 TOOL-aSightedSkeptic-2 TOOL-aSightedSkeptic-3 TOOL-aSightedSkeptic-4 TOOL-aSightedSkeptic-5 TOOL-aSightedSkeptic-6 TOOL-aSightedSkeptic-7 TOOL-aSightedSkeptic-8 TOOL-aSightedSkeptic-9 TOOL-aSightedSkeptic-13.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -110,6 +111,7 @@ Ids no `spec-audit` record has ever named: TOOL-aSightedSkeptic-1 TOOL-aSightedS
 | 8 | `TOOL-aSightedSkeptic-8` | no |
 | 9 | `TOOL-aSightedSkeptic-9` | no |
 | 10 | `TOOL-aSightedSkeptic-10` | no |
+| 13 | `TOOL-aSightedSkeptic-13` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
