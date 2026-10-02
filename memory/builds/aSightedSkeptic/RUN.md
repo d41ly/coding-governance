@@ -21,8 +21,8 @@ gates-run: unattended-179092786196975023401-2052 4ffcca30
 parked-surfaced: yes, 3 surfaced
 keepalive-reaped: yes
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 72d0fe5ff155180e34e0a3b7af133ac99a8cc4d0
-phase: BUILDING
+witness: b4703eaf12007aaaa6274b1e071add31f64b2486
+phase: VERIFYING
 branch-sha: 9fdd0c18d5afac1744c226c3e8ea2716e6d49e30
 branch-ref: refs/heads/run/aSightedSkeptic
 may: none
