@@ -16,7 +16,7 @@ AC1 and AC2 green, so each arm bites on the half of the rule it names.
 
 ## What the whole govkit selftest found after the slices passed
 
-Three runs of `python tools/govkit/selftest.py`, alone on a frozen worktree each time, against base
+Four runs of `python tools/govkit/selftest.py`, alone on a frozen worktree each time, against base
 `d53b503a`, where it was 1670 ok and 0 FAIL. The first, at `1bfa4d01`, redded 18 arms. They were
 eight scratch-gov fixtures with an adopter and no `why_no_regenerate`, the shell-exec site table,
 and the `[-11]` arm that asserted the half-move unit 4 forbids. The second, at `ffa6080d`, crashed
