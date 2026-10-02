@@ -1,6 +1,6 @@
 # DEPL-aHalvedInstall-5 — every row refusal in `update` decides whether it holds its kit back
 
-**Status:** CLOSED · rev-2 · 2026-10-02 · node a · Tier-2 · base cd90f7fa · streams deployer · order 5
+**Status:** CLOSED · rev-3 · 2026-10-02 · node a · Tier-2 · base cd90f7fa · streams deployer · order 5
 
 <!-- gen:spec-records -->
 
@@ -29,7 +29,8 @@ channel cannot reopen the class silently.
   adopter-owned refusal, a schema-1 role mismatch and a refuse-role. Observed by AC1.
 - **S3** — The landing loop records each refused destination's kit and source. After the loop, a
   refusal holds its kit when the source is NEW since the receipt's vintage — absent from gov's tree at
-  the receipt's `gov_commit` — and no `[[decline]]` names that kit and destination. A refusal of a
+  the receipt's `gov_commit` and present at the vintage the run moves to — and no `[[decline]]` names
+  that kit and destination. A refusal of a
   source the receipt's vintage already shipped is a standing state that recurs on every run, and
   holding on it would wedge the kit. Observed by AC2 and AC3.
 - **S4** — The HELD BACK lines print after the landing loop, so a kit held there is announced.
@@ -129,6 +130,9 @@ none
 - rev-2 · 2026-10-02 · build pass · S1 · AC2 · the helper is `_add_held`, a declared verb (the lexicon
   refused `hold`). The `REFUSED` lines print at the end of the run, below
   the HELD BACK line, so AC2 no longer orders them; it asserts the operator's file stands instead.
+- rev-3 · 2026-10-02 · build pass · S3 · NEW also requires the source at the run's `--to` vintage.
+  The landing loop resolves gov's current descriptor, so an update to an older vintage refuses
+  sources absent there; absent-at-base alone held those, and the whole suite's `[-8]` arms redded.
 
 ## 10. Reuse audit
 

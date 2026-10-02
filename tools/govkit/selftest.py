@@ -11440,7 +11440,9 @@ user_skills = "/tmp/gk-fake-skills"
         # ---- without landing in it.
         _D1_ANNOUNCED = {
             "decline_findings": "RUNNING a target-authored probe",
-            "cmd_check": None,           # prints per-hole verdicts, never the discharge argv
+            # DEPL-aHalvedInstall-1 S4 moved the hole loop out of `cmd_check` into this helper.
+            "run_hole_probes": None,     # check and update print per-hole verdicts, never the argv
+            "run_probe_in_empty_dir": None,  # selfcheck 6b counts exits; never prints an argv
             "run_kit_check": None,       # silent; the `[check].argv` is bounded by demand_safe_token
             "exempt_leg": None,          # silent; re-runs a hole probe to decide a leg exemption
             "_cmd_apply": None,          # announces that a baseline WILL run, not which argv

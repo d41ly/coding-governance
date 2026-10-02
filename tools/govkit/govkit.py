@@ -3990,8 +3990,10 @@ SHELL_EXEC_SITES = {
     # `update` both call — the same probes, the same target tokens, the same exposure.
     "run_hole_probes": "target",     # `[[hole]].discharge.command` — same shape, same exposure
     # DEPL-aHalvedInstall-2. Selfcheck 6b runs GOV's own descriptors' probes, tokens resolved from
-    # `canonical_ctx` before the call, in a fresh empty directory: no target value reaches it.
-    "run_probe_in_empty_dir": "gov",
+    # `canonical_ctx` before the call, in a fresh empty directory. Labelled `target` anyway: the
+    # suite's H1 derivation counts every `resolve_shell_argv` caller as resolving target values, and
+    # the conservative label is the one that cannot understate a site's exposure.
+    "run_probe_in_empty_dir": "target",
     "exempt_leg": "target",          # a hole probe re-run to decide a leg exemption — same shape
     "_cmd_apply": "target",          # the configure-step adopter argv — same shape, writing verb
     "read_gate_verdicts": "target",  # the target's own `[gate_runner].command` — apply-only, printed
@@ -10038,7 +10040,12 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
         _rk, _rs = _refused_from.get(_rd, ("", ""))
         if not _rk or (_rk, _rd) in _declined_pairs:
             continue
-        if base_commit and _rs and blob_at(root, base_commit, _rs) is None:
+        # NEW means PRESENT at the vintage this run moves to and ABSENT at the receipt's. The loop
+        # resolves gov's descriptor as it stands, so an `update --to` an older vintage meets sources
+        # that do not exist there at all — refused as unresolvable, and nothing that could land. The
+        # whole suite's [-8] arms found the first cut, which read absent-at-base alone, holding them.
+        if (base_commit and _rs and blob_at(root, base_commit, _rs) is None
+                and blob_at(root, to_commit, _rs) is not None):
             _add_held(_rk, _rd)
     # ---- HOLD REGION END
     for _eid_h, _paths_h in sorted(_held_kits.items()):
