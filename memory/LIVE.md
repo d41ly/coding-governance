@@ -19,6 +19,7 @@ terminal status. Nothing here is edited by hand.
 | [aTunedCompass](builds/aTunedCompass/README.md) | BLOCKED | a | 2026-09-04 | tooling | 11 |
 | [aWalkedCorpus](builds/aWalkedCorpus/README.md) | DEFERRED | a | 2026-08-16 | tooling | 10 |
 | [aWeighedCanon](builds/aWeighedCanon/README.md) | OPEN | a | 2026-09-04 | tooling | 2 |
+| [aWindowedPass](builds/aWindowedPass/README.md) | OPEN | a | 2026-10-04 | tooling | 1 |
 | [bConvergentLodestar](builds/bConvergentLodestar/README.md) | SPECCED | b | 2026-07-22 | tooling | 1 |
 | [dLandedVerdict](builds/dLandedVerdict/README.md) | INPROGRESS | d | 2026-08-19 | tooling | 2 |
 | [dNarrowedAnchor](builds/dNarrowedAnchor/README.md) | INPROGRESS | d | 2026-08-24 | tooling | 3 |
