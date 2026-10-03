@@ -7,6 +7,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-04-prompt-TOOL-aWindowedPass-1-0-run-mandate.md](../prompts/2026-10-04-prompt-TOOL-aWindowedPass-1-0-run-mandate.md) | journal | — |
+| [2026-10-04-prompt-TOOL-aWindowedPass-1-2-build-brief.md](../prompts/2026-10-04-prompt-TOOL-aWindowedPass-1-2-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
 

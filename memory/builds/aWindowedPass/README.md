@@ -71,9 +71,9 @@ ids TOOL-aWindowedPass-1 TOOL-aWindowedPass-2 TOOL-aWindowedPass-3 TOOL-aWindowe
 | [TOOL-aWindowedPass-3 — a commit-time step refuses an open pass's undeclared write, naming the re-declare](spec/2026-10-04-spec-TOOL-aWindowedPass-3.md) | 5 | 2 | OPEN | rev-1 | 2026-10-04 |
 <!-- /gen:build-units -->
 
-Records: 1 bound to this build, across 2 record folder(s).
+Records: 6 bound to this build, across 2 record folder(s).
 
-Ids no record names: TOOL-aWindowedPass-2 TOOL-aWindowedPass-3 TOOL-aWindowedPass-4 TOOL-aWindowedPass-5.
+Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: TOOL-aWindowedPass-1 TOOL-aWindowedPass-2 TOOL-aWindowedPass-3 TOOL-aWindowedPass-4 TOOL-aWindowedPass-5.
 <!-- /gen:build-index -->
