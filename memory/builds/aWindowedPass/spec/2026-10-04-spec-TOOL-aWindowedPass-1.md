@@ -1,6 +1,6 @@
 # TOOL-aWindowedPass-1 — check 23 counts only a pass whose window overlapped a sibling pass's
 
-**Status:** OPEN · rev-1 · 2026-10-04 · node a · Tier-2 · base 886b089d · streams tooling · order 3
+**Status:** INPROGRESS · rev-2 · 2026-10-04 · node a · Tier-2 · base 886b089d · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
@@ -21,14 +21,14 @@ the rest without counting them.
 
 ## 2. Scope (IN)
 
-- **S1** — A pass's WINDOW runs from its dispatch anchor to its pass commit, or to HEAD while it has
-  none. Two passes of different units OVERLAP when either one's anchor lies inside the other's window:
+- **S1** — A pass's WINDOW runs from its dispatch anchor to its pass commit, else to its unit's next
+  anchor, else to HEAD. Two passes of different units OVERLAP when either one's anchor lies inside the other's window:
   at or after its anchor, and not yet reached by its pass commit. Derived inside check 23 from the
   dispatch rows and the pass commits it already computes, positions taken from one topological walk
   of the run's range. Observed by AC1 and AC2.
 - **S2** — An undeclared write of a pass that overlapped is counted as today. One of a pass that did
-  not is printed as `check 23 SOLO <unit> in <run> wrote <paths> outside its declaration` and is not
-  counted. Observed by AC1, AC2 and AC3.
+  not is printed as `check 23 SOLO <unit> at <sha> wrote <paths> in <run> — outside its declaration…`,
+  the same per-instance text a counted write carries, and is not counted. Observed by AC1, AC2 and AC3.
 - **S3** — The check prints, per run, how many passes it graded and how many overlapped, so a run
   where everything was solo says so rather than reading as clean coverage. Observed by AC3.
 
@@ -47,8 +47,12 @@ the rest without counting them.
 The row loop keeps computing `dshit` and the undeclared set as now, but defers the count: each row's
 `(anchor, end, unit, undeclared paths)` is stored, and after the run's rows are read the overlap
 test runs once over them. Positions come from `git rev-list --topo-order --reverse <base>..HEAD`
-read once per run into a map; an anchor equal to the run's base sits at position 0. `end` is the
-pass commit's position, or infinity while the pass is open.
+read once per run, filtered to the anchors and ends the rows name; an anchor equal to the run's base
+sits at position 0. `end` is the pass commit's position, else the unit's next anchor's, else
+infinity. Windows are recorded for every row that resolves, graded or not: a pass that never
+committed was still running beside whatever was dispatched after it. A run whose base does not
+resolve cannot be placed, and every graded pass in it is counted, a single-unit run included — the
+verdict before this unit, announced on the report channel.
 
 ### Files touched (estimate)
 
@@ -73,7 +77,8 @@ pass commit's position, or infinity while the pass is open.
   anchor on a merged side branch is placed by the walk, which can only widen a window.
 - testing — fixtures for solo, overlapping and sequential-after-commit passes.
 - migration — none; landed and derived-LANDED records are excluded as before.
-- user docs — the protocol's check-23 sentence and the kit README.
+- user docs — the gate header's exception TWO admits the `SOLO` line and the per-run count. The
+  protocol's only check-23 text is the ceiling row, which `TOOL-aWindowedPass-5` retires.
 
 ## 6. Acceptance criteria
 
@@ -100,6 +105,12 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-04 · initial draft, from the owner's part (1) and check 23 at base.
+- rev-2 · 2026-10-04 · build pass · S1 · §4 · §5 · a window ends at the unit's next anchor when no
+  pass commit names it, which is the bound check 23 already grades by; an unresolvable base keeps the
+  old verdict, single-unit runs included, so a record nobody can place is never silently relaxed; the
+  docs line names the header, since the protocol row is unit 5's. The SOLO line reuses the counted
+  write's per-instance text, so one string names a stray write however it is graded; every suite arm
+  that asserts a COUNT now dispatches an overlapping sibling first.
 
 ## 10. Reuse audit
 

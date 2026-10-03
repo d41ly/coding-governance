@@ -22,7 +22,9 @@
 #
 # TWO: check 7's EXCLUSION notice and its UNAVAILABLE sibling print on the DEFAULT channel, and the
 # contract line above is written to admit them; so do check 23's `check 23 EXCLUDED` and
-# `check 23 exclusion UNAVAILABLE`, which share check 7's predicate (TOOL-aSightedSkeptic-13). They are not skips. An exclusion is a positive
+# `check 23 exclusion UNAVAILABLE`, which share check 7's predicate (TOOL-aSightedSkeptic-13), and
+# check 23's `check 23 SOLO` line with its run's graded-and-overlapped count, an undeclared write the
+# check found and did not count because its pass overlapped no sibling (TOOL-aWindowedPass-1). They are not skips. An exclusion is a positive
 # finding that CHANGED THE VERDICT — a record the check stopped counting — and the reader of a green
 # run is entitled to know which one and on what evidence. Routing them through REPORT was the first
 # implementation and it made the exclusion invisible on every bar run, which is the check-quietly-
@@ -3645,7 +3647,7 @@ ds_over=""; ds_over_n=0; ds_graded=0; ds_unavail=0
 for f in $RUNS; do
   [ -f "$f" ] || continue
   case "$f" in *"/RUN.md") ;; *) continue ;; esac
-  dsslug=${f%/RUN.md}; dsslug=${dsslug##*/}; ds_absorbed=""
+  dsslug=${f%/RUN.md}; dsslug=${dsslug##*/}; ds_absorbed=""; ds_win=""; ds_pend=""; ds_run_graded=0
   ph=$(fact_of "$f" phase); case "$ph" in LANDED|ABORTED) continue ;; esac
   # ONE ROW PER (anchor, unit), AND ITS PATHS ARE THE UNION OF EVERY ROW UNDER THAT KEY. The key
   # already carries the anchor, so rows at DIFFERENT anchors stay separate — they are different passes
@@ -3720,6 +3722,11 @@ for f in $RUNS; do
     dstop=$(next_anchor "$dsgrp" "$dsanchors")
     [ -n "$dstop" ] || dstop=HEAD
     dshit=$(pass_commit "$dsgrp" "$dsunit" "$f" "$dstop" || true)
+    # THE ROW'S WINDOW (TOOL-aWindowedPass-1 S1): its anchor to its pass commit, else to the unit's
+    # next anchor, else open. Recorded for EVERY row that reaches here, graded or not, because a pass
+    # that never committed was still running beside whatever was dispatched after it.
+    dsend=${dshit:-$dstop}; [ "$dsend" = HEAD ] && dsend=-
+    ds_win="$ds_win$dsgrp $dsend $dsunit"$'\n'
     # ABSORB commits inside this window, each reported ONCE per run however many windows hold it.
     while IFS=$'\t' read -r dsah dsas; do
       [ -n "$dsah" ] || continue
@@ -3786,7 +3793,7 @@ DSSIBS
     dsnl=$'\n'; dsbrief="$dsnl$(read_brief_paths "$dshit" "$dsunit" "$f")$dsnl"
     # THE SUBSET TEST. Declaring MORE than you use is conservative and fine; writing outside the
     # declaration is the defect.
-    ds_graded=$((ds_graded + 1))
+    ds_graded=$((ds_graded + 1)); ds_run_graded=$((ds_run_graded + 1))
     dsout=""
     for dsq in $(GIT diff-tree --no-commit-id --name-only -r "$dshit" 2>/dev/null | grep -v -x -F "$f"); do
       # EXACT membership, deliberately not `covers`: that is a containment test, and a row naming a
@@ -3808,19 +3815,77 @@ DSSIBS
       fi
       [ "$dsok" = 1 ] || dsout="$dsout $dsq"
     done
-    # THE FINDING NO LONGER PRINTS ITSELF ON STDOUT. It is COUNTED, and the ratchet below decides
-    # the verdict; the per-instance detail goes to the report channel, so a green run keeps this
-    # file's "exit 0 + no output = clean" contract true instead of quietly widening it.
-    if [ -n "$dsout" ]; then
-      ds_over_n=$((ds_over_n + 1))
-      ds_line="$dsunit at $dshit wrote$dsout in $f"
-      ds_over="$ds_over
-  $ds_line"
-      report "check 23 — a dispatched pass committed a path outside the set it declared before dispatch: $ds_line"
-    fi
+    # THE COUNT WAITS FOR EVERY WINDOW (TOOL-aWindowedPass-1). Whether this pass overlapped a
+    # sibling depends on rows read AFTER it, so the graded pass is parked and decided below.
+    ds_pend="$ds_pend$dsgrp $dshit $dsunit$dsout"$'\n'
   done <<DSROWS
 $dsrows
 DSROWS
+  [ -n "$ds_pend" ] || continue
+  # ---- OVERLAP (TOOL-aWindowedPass-1 S1/S2). A declaration is the disjointness proof for passes that
+  # ---- ran AT THE SAME TIME, so only a pass whose window overlapped a sibling unit's is counted: one
+  # ---- anchor lies at or after the other's anchor and before its end. Positions come from ONE
+  # ---- topological walk of the run's range; pairwise ancestry would be a spawn per pair.
+  # ---- WHAT THIS DOES NOT SEE: two runs are never compared, and a merge in the range makes the walk a
+  # ---- total order on a partial one, which can only widen a window. A run whose base does not resolve
+  # ---- cannot be placed, and then every graded pass counts as overlapped, the verdict before this unit
+  # ---- — even a single-unit run, so an unplaceable record is graded exactly as it was.
+  unset dspos; declare -A dspos=(); dsposok=0
+  dsbase=$(fact_of "$f" base)
+  if [ -z "$dsbase" ] || ! check_rev "$dsbase"; then
+    report "check 23 overlap unavailable for $f — its base '$dsbase' does not resolve, so no window can be placed and every graded pass is counted as overlapped"
+  elif [ "$(printf '%s' "$ds_win" | awk '{ print $3 }' | sort -u | wc -l)" -lt 2 ]; then
+    dsposok=2
+  else
+    dsposok=1
+    dskeys=$(printf '%s' "$ds_win" | awk '{ print substr($1, 1, 8); if ($2 != "-") print substr($2, 1, 8) }' | sort -u | tr '\n' ' ')
+    while read -r _k _p; do
+      [ -n "$_k" ] && dspos[$_k]=$_p
+    done < <(GIT rev-list --topo-order --reverse "$dsbase..HEAD" 2>/dev/null \
+             | awk -v want="$dskeys" 'BEGIN { n = split(want, w, " "); for (i = 1; i <= n; i++) need[w[i]] = 1 }
+                 { k = substr($0, 1, 8); if (k in need) print k, NR }')
+  fi
+  ds_run_over=0; ds_run_solo=0
+  while read -r dpa dpe dpu dpout; do
+    [ -n "$dpa" ] || continue
+    dsov=1
+    if [ "$dsposok" = 2 ]; then
+      dsov=0
+    elif [ "$dsposok" = 1 ]; then
+      dsov=0
+      dsa=${dspos[${dpa:0:8}]:-0}; dse=${dspos[${dpe:0:8}]:-999999999}
+      while read -r dwa dwe dwu; do
+        [ -n "$dwa" ] && [ "$dwu" != "$dpu" ] || continue
+        dsb=${dspos[${dwa:0:8}]:-0}
+        if [ "$dwe" = - ]; then dsg=999999999; else dsg=${dspos[${dwe:0:8}]:-999999999}; fi
+        if { [ "$dsa" -le "$dsb" ] && [ "$dsb" -lt "$dse" ]; } || { [ "$dsb" -le "$dsa" ] && [ "$dsa" -lt "$dsg" ]; }; then
+          dsov=1; break
+        fi
+      done <<DSWIN
+$ds_win
+DSWIN
+    fi
+    [ "$dsov" = 1 ] && ds_run_over=$((ds_run_over + 1))
+    [ -n "$dpout" ] || continue
+    ds_line="$dpu at $dpe wrote $dpout in $f"
+    if [ "$dsov" = 1 ]; then
+      # THE FINDING NO LONGER PRINTS ITSELF ON STDOUT. It is COUNTED, and the ratchet below decides
+      # the verdict; the per-instance detail goes to the report channel.
+      ds_over_n=$((ds_over_n + 1))
+      ds_over="$ds_over
+  $ds_line"
+      report "check 23 — a dispatched pass committed a path outside the set it declared before dispatch: $ds_line"
+    else
+      # DEFAULT CHANNEL, under the header's exception TWO: an uncounted write changed the verdict.
+      ds_run_solo=1
+      printf 'unattended: check 23 SOLO %s — outside its declaration, but its window overlapped no sibling pass, so the write collided with nothing and is reported, not counted\n' "$ds_line"
+    fi
+  done <<DSPEND
+$ds_pend
+DSPEND
+  # S3: a run where every pass was solo says so, rather than reading as coverage.
+  ds_run_line="check 23 $f — graded $ds_run_graded pass(es), $ds_run_over overlapped a sibling"
+  if [ "$ds_run_solo" = 1 ]; then printf 'unattended: %s\n' "$ds_run_line"; else report "$ds_run_line"; fi
 done
 
 # ---- 23's RATCHET (TOOL-cMendedVintage-14). The subset test above used to print one line per
