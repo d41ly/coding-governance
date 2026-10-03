@@ -1,11 +1,12 @@
 # TOOL-aWindowedPass-2 — a pass commit carries a `Pass:` trailer, and the legs attribute by it
 
-**Status:** INPROGRESS · rev-2 · 2026-10-04 · node a · Tier-2 · base 886b089d · streams tooling · order 2
+**Status:** CLOSED · rev-2 · 2026-10-04 · node a · Tier-2 · base 886b089d · streams tooling · order 2 · ratified 2026-10-04
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-04-build-TOOL-aWindowedPass-2-1-acceptance-ledger.md](../build/2026-10-04-build-TOOL-aWindowedPass-2-1-acceptance-ledger.md) | journal | — |
 | [2026-10-04-prompt-TOOL-aWindowedPass-2-2-build-brief.md](../prompts/2026-10-04-prompt-TOOL-aWindowedPass-2-2-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->

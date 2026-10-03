@@ -1,11 +1,12 @@
 # TOOL-aWindowedPass-5 — each run is graded against zero; the repo-global ceiling is retired
 
-**Status:** INPROGRESS · rev-2 · 2026-10-04 · node a · Tier-2 · base 886b089d · streams tooling · order 4
+**Status:** CLOSED · rev-2 · 2026-10-04 · node a · Tier-2 · base 886b089d · streams tooling · order 4 · ratified 2026-10-04
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-04-build-TOOL-aWindowedPass-5-1-acceptance-ledger.md](../build/2026-10-04-build-TOOL-aWindowedPass-5-1-acceptance-ledger.md) | journal | — |
 | [2026-10-04-prompt-TOOL-aWindowedPass-5-2-build-brief.md](../prompts/2026-10-04-prompt-TOOL-aWindowedPass-5-2-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->

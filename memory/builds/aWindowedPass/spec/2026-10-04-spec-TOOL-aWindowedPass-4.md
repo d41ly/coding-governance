@@ -1,11 +1,12 @@
 # TOOL-aWindowedPass-4 — kits declare their generated outputs, and the unattended kit reads them
 
-**Status:** OPEN · rev-1 · 2026-10-04 · node a · Tier-2 · base 886b089d · streams tooling · order 1
+**Status:** CLOSED · rev-1 · 2026-10-04 · node a · Tier-2 · base 886b089d · streams tooling · order 1 · ratified 2026-10-04
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-04-build-TOOL-aWindowedPass-4-1-acceptance-ledger.md](../build/2026-10-04-build-TOOL-aWindowedPass-4-1-acceptance-ledger.md) | journal | — |
 | [2026-10-04-prompt-TOOL-aWindowedPass-4-2-build-brief.md](../prompts/2026-10-04-prompt-TOOL-aWindowedPass-4-2-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->

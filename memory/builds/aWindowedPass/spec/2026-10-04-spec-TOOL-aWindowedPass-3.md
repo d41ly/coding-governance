@@ -1,11 +1,12 @@
 # TOOL-aWindowedPass-3 — a commit-time step refuses an open pass's undeclared write, naming the re-declare
 
-**Status:** INPROGRESS · rev-2 · 2026-10-04 · node a · Tier-2 · base 886b089d · streams tooling · order 5
+**Status:** CLOSED · rev-2 · 2026-10-04 · node a · Tier-2 · base 886b089d · streams tooling · order 5 · ratified 2026-10-04
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-04-build-TOOL-aWindowedPass-3-1-acceptance-ledger.md](../build/2026-10-04-build-TOOL-aWindowedPass-3-1-acceptance-ledger.md) | journal | — |
 | [2026-10-04-prompt-TOOL-aWindowedPass-3-2-build-brief.md](../prompts/2026-10-04-prompt-TOOL-aWindowedPass-3-2-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->

@@ -1,11 +1,12 @@
 # TOOL-aWindowedPass-1 — check 23 counts only a pass whose window overlapped a sibling pass's
 
-**Status:** INPROGRESS · rev-2 · 2026-10-04 · node a · Tier-2 · base 886b089d · streams tooling · order 3
+**Status:** CLOSED · rev-2 · 2026-10-04 · node a · Tier-2 · base 886b089d · streams tooling · order 3 · ratified 2026-10-04
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-04-build-TOOL-aWindowedPass-1-1-acceptance-ledger.md](../build/2026-10-04-build-TOOL-aWindowedPass-1-1-acceptance-ledger.md) | journal | — |
 | [2026-10-04-prompt-TOOL-aWindowedPass-1-0-run-mandate.md](../prompts/2026-10-04-prompt-TOOL-aWindowedPass-1-0-run-mandate.md) | journal | — |
 | [2026-10-04-prompt-TOOL-aWindowedPass-1-2-build-brief.md](../prompts/2026-10-04-prompt-TOOL-aWindowedPass-1-2-build-brief.md) | journal | — |
 
