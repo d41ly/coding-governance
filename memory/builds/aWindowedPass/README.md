@@ -5,8 +5,7 @@ opened: 2026-10-04
 streams: tooling
 roster: TOOL
 authorized-by: prompt
-status: OPEN
-ids: TOOL-aWindowedPass-1
+ids: TOOL-aWindowedPass-1 TOOL-aWindowedPass-2 TOOL-aWindowedPass-3 TOOL-aWindowedPass-4 TOOL-aWindowedPass-5
 ---
 
 # aWindowedPass — check 23 grades the disjointness it exists for, and nothing else
@@ -59,23 +58,35 @@ here and at adopters hold or abort. The owner's prompt is in `prompts/`.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 0 unit(s) · node a · opened 2026-10-04 · streams tooling
-ids TOOL-aWindowedPass-1
+**Build status:** OPEN · 5 unit(s) · node a · opened 2026-10-04 · streams tooling
+ids TOOL-aWindowedPass-1 TOOL-aWindowedPass-2 TOOL-aWindowedPass-3 TOOL-aWindowedPass-4 TOOL-aWindowedPass-5
 
 <!-- gen:build-units -->
-*No spec under this build carries a status header; the status above is declared in the front matter.*
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-aWindowedPass-4 — kits declare their generated outputs, and the unattended kit reads them](spec/2026-10-04-spec-TOOL-aWindowedPass-4.md) | 1 | 2 | OPEN | rev-1 | 2026-10-04 |
+| [TOOL-aWindowedPass-2 — a pass commit carries a `Pass:` trailer, and the legs attribute by it](spec/2026-10-04-spec-TOOL-aWindowedPass-2.md) | 2 | 2 | OPEN | rev-1 | 2026-10-04 |
+| [TOOL-aWindowedPass-1 — check 23 counts only a pass whose window overlapped a sibling pass's](spec/2026-10-04-spec-TOOL-aWindowedPass-1.md) | 3 | 2 | OPEN | rev-1 | 2026-10-04 |
+| [TOOL-aWindowedPass-5 — each run is graded against zero; the repo-global ceiling is retired](spec/2026-10-04-spec-TOOL-aWindowedPass-5.md) | 4 | 2 | OPEN | rev-1 | 2026-10-04 |
+| [TOOL-aWindowedPass-3 — a commit-time step refuses an open pass's undeclared write, naming the re-declare](spec/2026-10-04-spec-TOOL-aWindowedPass-3.md) | 5 | 2 | OPEN | rev-1 | 2026-10-04 |
 <!-- /gen:build-units -->
 
-Records: 1 bound to this build, across 1 record folder(s).
+Records: 1 bound to this build, across 2 record folder(s).
 
-Ids no record names: none — every unit id is named by a record.
+Ids no record names: TOOL-aWindowedPass-2 TOOL-aWindowedPass-3 TOOL-aWindowedPass-4 TOOL-aWindowedPass-5.
 
-Ids no `spec-audit` record has ever named: none — every unit id has one.
+Ids no `spec-audit` record has ever named: TOOL-aWindowedPass-1 TOOL-aWindowedPass-2 TOOL-aWindowedPass-3 TOOL-aWindowedPass-4 TOOL-aWindowedPass-5.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
 
-*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+| Step | Units | Parallel |
+|---|---|---|
+| 1 | `TOOL-aWindowedPass-4` | no |
+| 2 | `TOOL-aWindowedPass-2` | no |
+| 3 | `TOOL-aWindowedPass-1` | no |
+| 4 | `TOOL-aWindowedPass-5` | no |
+| 5 | `TOOL-aWindowedPass-3` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
