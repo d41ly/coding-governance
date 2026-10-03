@@ -11,7 +11,7 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 ## Run facts
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: 886b089dfd9c4bf98dc2024e21d7d9607f9b5cc0
-phase: RUNNING
+phase: BUILDING
 branch-sha: 886b089dfd9c4bf98dc2024e21d7d9607f9b5cc0
 branch-ref: refs/heads/branch/undeclared-write-windowed-pass
 may: none
@@ -30,3 +30,13 @@ anchor-ref: refs/heads/main
 base: 886b089dfd9c4bf98dc2024e21d7d9607f9b5cc0
 
 ## Parked
+
+2026-10-03T21:29:03Z brief · item TOOL-aWindowedPass-1 · reason 0c50a7ac8dcd memory/builds/aWindowedPass/prompts/2026-10-04-prompt-TOOL-aWindowedPass-1-2-build-brief.md
+
+2026-10-03T21:29:07Z brief · item TOOL-aWindowedPass-2 · reason 83a93b978927 memory/builds/aWindowedPass/prompts/2026-10-04-prompt-TOOL-aWindowedPass-2-2-build-brief.md
+
+2026-10-03T21:29:11Z brief · item TOOL-aWindowedPass-3 · reason 7f0dd8d46f9a memory/builds/aWindowedPass/prompts/2026-10-04-prompt-TOOL-aWindowedPass-3-2-build-brief.md
+
+2026-10-03T21:29:15Z brief · item TOOL-aWindowedPass-4 · reason 5fa84d02b7ec memory/builds/aWindowedPass/prompts/2026-10-04-prompt-TOOL-aWindowedPass-4-2-build-brief.md
+
+2026-10-03T21:29:19Z brief · item TOOL-aWindowedPass-5 · reason 36fa8d9cd2c1 memory/builds/aWindowedPass/prompts/2026-10-04-prompt-TOOL-aWindowedPass-5-2-build-brief.md
