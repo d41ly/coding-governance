@@ -682,6 +682,9 @@ definition, so the absence is a decision and not an oversight.
   a file is a contract the sibling reads, is a judgement no verb can make, and it says so rather than
   pretending. If a pass discovers it needs another file, re-declare with the WIDER set BEFORE the
   commit; narrowing is refused, because narrowing after the fact is how a write gets hidden.
+  **End the pass commit's message with a `Pass: <unit-id>` trailer**, and give a commit that names a
+  unit but is no pass `Pass: none`: the gate attributes a commit by its trailer and never by its
+  subject once one is present, which is what stops a records commit from being graded as a pass.
 - **Drive the build as ONE program, and know exactly what that buys.** The harness is
   `tools/workflows/unattended-build.js`, which runs SPEC, then — only when the build or its
   project declares the audit — AUDIT and DISPOSAL as ordered stages, and hands back the ordered roster on a

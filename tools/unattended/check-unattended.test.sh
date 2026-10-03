@@ -3669,6 +3669,37 @@ printf 'folded\n' > work/later.txt
 git add -A && git commit -q -m "ARCH-tRun-1 folds a review fix" --no-verify
 miss "$(run)" "check 23 FAILED"
 
+# ---- THE `Pass:` TRAILER ATTRIBUTES A COMMIT (TOOL-aWindowedPass-2). A records commit whose subject
+# ---- names the unit, ahead of the real pass, is no pass when it says `Pass: none`: the walk takes the
+# ---- commit whose trailer names the unit, and the records commit's out-of-set write is never graded.
+reset_tree
+drow ARCH-tRun-1 "work/one.txt"
+mkdir -p notes && printf 'r\n' > notes/records.md
+git add -A && git commit -q -m "records for ARCH-tRun-1..3" -m "Pass: none" --no-verify
+mkdir -p work && printf 'a\n' > work/one.txt
+git add -A && git commit -q -m "lane" -m "Pass: ARCH-tRun-1" --no-verify
+miss "$(run)" "check 23 FAILED"
+# ...and with NO trailer anywhere the subject still attributes, so a landed record keeps its verdict:
+# the records commit is taken as the pass and its out-of-set write is graded
+reset_tree
+drow ARCH-tRun-1 "work/one.txt"
+mkdir -p notes && printf 'r\n' > notes/records.md
+git add -A && git commit -q -m "records for ARCH-tRun-1..3" --no-verify
+mkdir -p work && printf 'a\n' > work/one.txt
+git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
+hit "$(GOV_UNATTENDED_REPORT=1 bash "$SCRIPT" 2>&1)" "ARCH-tRun-1 at"
+# ...and the build-commit pick reads the same attribution: a `Pass: none` commit naming the unit in
+# its subject is passed over for the commit whose trailer names it
+reset_tree
+_bc_base=$(git rev-parse HEAD)
+mkdir -p work && printf 'r\n' > work/rec.txt
+git add -A && git commit -q -m "ARCH-tRun-1 records" -m "Pass: none" --no-verify
+printf 'a\n' > work/one.txt
+git add -A && git commit -q -m "lane" -m "Pass: ARCH-tRun-1" --no-verify
+_bc_want=$(git rev-parse HEAD)
+_bc_got=$(cd "$TMP" && . "$TMP/$KIT_REL/lib-unattended.sh" && build_commit "$_bc_base..HEAD" ARCH-tRun-1 memory/builds/tRun "" "")
+same "build_commit takes the commit whose Pass: trailer names the unit" "$_bc_got" "$_bc_want"
+
 # ---- THE SKIPS ANNOUNCE. A run with no declaration would otherwise be green over nothing, and the
 # ---- default run must still print nothing.
 reset_tree

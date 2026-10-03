@@ -166,7 +166,9 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   that discovers it needs fewer paths than it declared says so, and both rows stand. M6 sanctions
   several pass kinds per unit, and a later row is read the same way whichever it is. What the verb
   REFUSES is overlap with a SIBLING pass still open, the disjointness question it exists for and the
-  one thing here that is unchanged; a unit's own rows are never siblings of each other. Before any of that it runs the DECLARED spec-token checker, `SPEC_TOKENS_CLI`, over the
+  one thing here that is unchanged; a unit's own rows are never siblings of each other. A pass's
+  COMMIT is the one whose `Pass: <unit-id>` trailer names it; a commit with no trailer falls back to
+  its subject, and `Pass: none` names no unit. Before any of that it runs the DECLARED spec-token checker, `SPEC_TOKENS_CLI`, over the
   live tree and refuses the dispatch when it exits non-zero: the checker's bar join grades LIVE specs,
   an unattended build closes each unit spec in its own build commit, and this verb is the one point
   that sees a spec before its unit builds. A blank or absent key is an ANNOUNCED skip on stdout,

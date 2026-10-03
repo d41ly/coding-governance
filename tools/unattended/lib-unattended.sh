@@ -723,12 +723,22 @@ pass_commit() {  # anchor · unit · run-state-path · [upper-bound, default HEA
   # `$(pass_commit … || true)`, so rc 2 reaches them as the same empty answer rc 1 does — the
   # difference is the stderr line, which is the only thing that makes a broken TMPDIR visible.
   _pf=$(mktemp) || { printf 'lib-unattended: pass_commit cannot create a scratch file, so it cannot say whether this pass committed\n' >&2; return 2; }
-  GIT log --reverse --format="%H%x09%s" "$_pa..$_pto" >"$_pf" 2>/dev/null || :
+  # THE `Pass:` TRAILER RIDES THE SAME WALK - TOOL-aWindowedPass-2. Attribution is PER COMMIT: a commit
+  # carrying any `Pass:` trailer is attributed by that trailer ALONE, so `Pass: none` attributes it to
+  # nothing and its subject is never read; a commit with no trailer keeps the subject match a landed
+  # record was graded by. Before this a records commit whose subject named a unit, or a range such as
+  # `-1..4`, was taken as that unit's pass.
+  GIT log --reverse --format="%H%x09%s%x1f%(trailers:key=Pass,valueonly,separator=%x20)" "$_pa..$_pto" >"$_pf" 2>/dev/null || :
   # It reads LINES rather than word-splitting because a subject holds spaces, and the possibly-empty
   # field is LAST for the reason memory/gotchas/empty-field-collapses-unless-it-is-last.md states.
   while IFS=$'\t' read -r _pc _psub; do
     [ -n "$_pc" ] || continue
-    id_in "$_psub" "$_pu" || continue
+    _ptr=${_psub#*$'\x1f'}; [ "$_ptr" = "$_psub" ] && _ptr=""; _psub=${_psub%%$'\x1f'*}
+    if [ -n "$_ptr" ]; then
+      case " $_ptr " in *" $_pu "*) ;; *) continue ;; esac
+    else
+      id_in "$_psub" "$_pu" || continue
+    fi
     _ptouch=$(GIT diff-tree --no-commit-id --name-only -r "$_pc" 2>/dev/null | grep -vxF -- "$_prel" || true)
     [ -n "$_ptouch" ] || continue
     # EXACT membership against the newline-wrapped set, deliberately not `covers`: a row naming a
@@ -776,6 +786,16 @@ pass_commit() {  # anchor · unit · run-state-path · [upper-bound, default HEA
 # in a shared shard or as an ask in the run's own build. `GENERATED_INDEXES` arrives as
 # `index:generator` pairs; the generator half is never excluded, because a commit touching the
 # GENERATOR is touching product code.
+# THE ATTRIBUTION TOKENS OF A COMMIT, one `<sha> <tokens>` line per commit - TOOL-aWindowedPass-2. The
+# build-commit pick and its callers' subject caches all read this, so a commit is attributed one way
+# everywhere: a commit carrying a `Pass:` trailer yields `PASSTRAILER <its ids>` and NOT its subject,
+# so `Pass: none` names no unit; one with no trailer yields its subject's tokens, as before. Tokens
+# are runs of `[A-Za-z0-9-]`, the shape a whole-token `case " $id "` match reads.
+log_attribution_tokens() { # git-log revision arguments -> one tokenised line per commit
+  GIT log --format='%H %s%x1f%(trailers:key=Pass,valueonly,separator=%x20)' "$@" 2>/dev/null \
+    | awk -F '\037' '{ if ($2 != "") { split($1, h, " "); print h[1] " PASSTRAILER " $2 } else print $1 }' \
+    | tr -c 'A-Za-z0-9\n-' ' '
+}
 build_commit() {  # rev-range · unit-id · build-dir · generated-indexes · shared-records · [cap] · [order]
   _bc_range=$1; _bc_id=$2; _bc_dir=$3; _bc_gen=$4; _bc_shared=$5
   _bc_cap=${6:-}
@@ -845,7 +865,7 @@ build_commit() {  # rev-range · unit-id · build-dir · generated-indexes · sh
     #
     # THE WHOLE-TOKEN MATCH is `memory/gotchas/id-matched-as-a-substring`: every id ending in a 1-up
     # sequence is a prefix of nine others, so an unanchored `TOOL-x-1` matches `TOOL-x-19`'s commit.
-    [ -n "$_bc_subj" ] || _bc_subj=" $(GIT log -1 --format=%s "$_bc_c" 2>/dev/null | tr -c 'A-Za-z0-9-' ' ') "
+    [ -n "$_bc_subj" ] || _bc_subj=" $(log_attribution_tokens -1 "$_bc_c" | cut -d' ' -f2-) "
     case "$_bc_subj" in *" $_bc_id "*) ;; *) continue ;; esac
     # Did it touch anything outside this build's own record surface?
     if GIT show --pretty=format: --name-only "$_bc_c" 2>/dev/null \

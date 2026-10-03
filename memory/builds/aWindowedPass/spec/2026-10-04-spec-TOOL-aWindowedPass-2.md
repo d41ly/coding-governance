@@ -1,6 +1,6 @@
 # TOOL-aWindowedPass-2 — a pass commit carries a `Pass:` trailer, and the legs attribute by it
 
-**Status:** OPEN · rev-1 · 2026-10-04 · node a · Tier-2 · base 886b089d · streams tooling · order 2
+**Status:** INPROGRESS · rev-2 · 2026-10-04 · node a · Tier-2 · base 886b089d · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -21,16 +21,17 @@ that is no pass.
 
 ## 2. Scope (IN)
 
-- **S1** — `read_pass_trailer` in `tools/unattended/lib-unattended.sh` returns a commit's `Pass:`
-  trailer values from one `git log --format=%(trailers:key=Pass,valueonly)` read. Observed by AC1.
-- **S2** — `pass_commit` and `build_commit` read the trailers of every commit in their walk. When any
-  commit in the walk carries a `Pass:` trailer, the walk is STRUCTURAL: the answer is the first
-  commit whose trailer names the unit exactly, and the subject is not read. When none does, the walk
-  is LEGACY and attributes by the subject as before, so a landed record keeps its verdict. Observed by
-  AC1, AC2 and AC3.
+- **S1** — `log_attribution_tokens` in `tools/unattended/lib-unattended.sh` prints one tokenised line
+  per commit from one `git log` read: `PASSTRAILER <ids>` for a commit carrying a `Pass:` trailer, its
+  subject's tokens otherwise. Both build-commit legs build their subject cache from it. Observed by
+  AC3.
+- **S2** — `pass_commit` and `build_commit` attribute PER COMMIT: a commit carrying any `Pass:`
+  trailer is attributed by that trailer alone, so `Pass: none` names no unit and its subject is never
+  read; a commit with no trailer is attributed by its subject as before, so a landed record keeps its
+  verdict. Observed by AC1, AC2 and AC3.
 - **S3** — `tools/workflows/unattended-unit.js` tells the child to end its pass commit with
-  `Pass: <unit-id>` in the trailer block, and the build harness's own brief text does too. Observed by
-  AC4.
+  `Pass: <unit-id>` in the trailer block, and `Pass: none` on a commit naming a unit that is no pass.
+  Observed by AC4.
 - **S4** — The Skill's dispatch bullet and the verb carrier's `--dispatch` entry state the trailer.
   Observed by AC4.
 
@@ -49,12 +50,12 @@ that is no pass.
 ### Data model
 
 ```bash
-read_pass_trailer() { GIT log -1 --format='%(trailers:key=Pass,valueonly,separator=%x20)' "$1"; }
+log_attribution_tokens HEAD   # <sha> PASSTRAILER TOOL-x-1   or   <sha> <subject tokens>
 ```
 
-In `pass_commit`, the existing `%H%x09%s` walk becomes `%H%x09%(trailers:key=Pass,valueonly,separator=%x2C)%x09%s`,
-so the trailer rides the same single spawn. A walk where any row's trailer field is non-empty is
-structural. `build_commit` gains the same field in its own walk.
+In `pass_commit`, the existing `%H%x09%s` walk appends `%x1f%(trailers:key=Pass,valueonly)`, so the
+trailer rides the same single spawn. `build_commit` reads the callers' cache, which
+`log_attribution_tokens` builds, and calls it for a single commit on a cache miss.
 
 ### Files touched (estimate)
 
@@ -62,8 +63,8 @@ structural. `build_commit` gains the same field in its own walk.
 - `tools/unattended/SKILL.template.md`
 - `tools/unattended/VERBS.template.md`
 - `tools/workflows/unattended-unit.js`
-- `tools/workflows/unattended-build.template.js`
-- `tools/workflows/unattended-build.js`
+- `tools/unattended/check-pass-order.sh`
+- `tools/unattended/check-brief-recorded.sh`
 
 ### Alternatives rejected
 
@@ -111,6 +112,10 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-04 · initial draft, from the owner's part (4) and `pass_commit` and `build_commit` at base.
+- rev-2 · 2026-10-04 · build pass · S1 · S2 · S3 · §4 · attribution is per COMMIT, not per walk: a
+  walk-wide switch would flip a landed build's verdict the moment a later trailered commit entered
+  its range, since `build_commit` walks to HEAD. The build harness carries no commit text of its own,
+  so only the unit harness changes; the two legs' caches move to the shared token producer.
 
 ## 10. Reuse audit
 
