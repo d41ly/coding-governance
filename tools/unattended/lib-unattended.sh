@@ -791,6 +791,19 @@ pass_commit() {  # anchor · unit · run-state-path · [upper-bound, default HEA
 # everywhere: a commit carrying a `Pass:` trailer yields `PASSTRAILER <its ids>` and NOT its subject,
 # so `Pass: none` names no unit; one with no trailer yields its subject's tokens, as before. Tokens
 # are runs of `[A-Za-z0-9-]`, the shape a whole-token `case " $id "` match reads.
+# ONE ANSWER TO "did this change touch only gen regions" (TOOL-aWindowedPass-3). Check 23 asks it of a
+# commit against its parent, `--check-commit` of the index against HEAD; two copies of the strip would
+# let the close forgive what the commit-time step refused. Regions NEST, the build README's unit table
+# inside its index, so the strip counts depth rather than toggling. WHAT THIS DOES NOT SEE: a hand edit
+# inside a gen region is not told from a render.
+GEN_REGION_AWK='{ sub(/\r$/, "") } /^<!-- gen:[^ ]+ -->/ { g++; next } /^<!-- \/gen:[^ ]+ -->/ { if (g > 0) g--; next } !g'
+check_gen_region_only() { # before object · after object -> 0 when both exist and differ only inside gen regions
+  local _ga _gb
+  _ga=$(GIT show "$1" 2>/dev/null) || return 1
+  _gb=$(GIT show "$2" 2>/dev/null) || return 1
+  [ "$(printf '%s\n' "$_ga" | awk "$GEN_REGION_AWK")" = "$(printf '%s\n' "$_gb" | awk "$GEN_REGION_AWK")" ]
+}
+
 log_attribution_tokens() { # git-log revision arguments -> one tokenised line per commit
   GIT log --format='%H %s%x1f%(trailers:key=Pass,valueonly,separator=%x20)' "$@" 2>/dev/null \
     | awk -F '\037' '{ if ($2 != "") { split($1, h, " "); print h[1] " PASSTRAILER " $2 } else print $1 }' \

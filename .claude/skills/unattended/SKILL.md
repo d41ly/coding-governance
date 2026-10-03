@@ -685,6 +685,9 @@ definition, so the absence is a decision and not an oversight.
   **End the pass commit's message with a `Pass: <unit-id>` trailer**, and give a commit that names a
   unit but is no pass `Pass: none`: the gate attributes a commit by its trailer and never by its
   subject once one is present, which is what stops a records commit from being graded as a pass.
+  Where the project's `commit-msg` hook runs `bash tools/unattended/unattended.sh --check-commit "$1"`, a
+  pass commit staging a path outside its declaration is REFUSED with the `--dispatch` that widens it:
+  run that command, then commit again. It is the one moment widening is still legal.
 - **Drive the build as ONE program, and know exactly what that buys.** The harness is
   `tools/workflows/unattended-build.js`, which runs SPEC, then — only when the build or its
   project declares the audit — AUDIT and DISPOSAL as ordered stages, and hands back the ordered roster on a

@@ -193,6 +193,14 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   leaves the gate inferring one from ids. It refuses a verdict or a disposition outside its closed
   set, a missing subject or count, a terminal exit carrying no disposition, `fold` at a terminal
   exit, a disposition on a `CONVERGING` round, and a round on a subject whose loop has already ended.
+- `--check-commit` — `--check-commit <message file>`, run by the `commit-msg` hook on EVERY commit.
+  It binds the run whose branch this worktree has checked out and is silent when there is none. A
+  `Pass: <unit-id>` trailer must name an open dispatched pass, and the staged paths, less the
+  run-state file, the unit's brief rows, the generated outputs and gen-region-only changes, must sit
+  inside that pass's declarations; otherwise it refuses, naming each path and printing the
+  `--dispatch` that widens the declaration while widening is still legal. No trailer on a subject
+  naming an open pass is refused too, asking for `Pass: <unit-id>` or `Pass: none`. It writes
+  nothing; a `--no-verify` commit skips it, and check 23 still grades that pass at the close.
 - `--version` — prints the kit's own version and exits, touching no record. It is here because it is
   DECLARED, and a declared verb nobody documents is one nobody uses to answer the question this kit
   cannot answer for them: which build of it they are talking to. It takes no slug and no run, so it

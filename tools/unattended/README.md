@@ -22,6 +22,14 @@ Run `adopt-unattended.sh` from this directory; `--check` verifies without writin
 Copied artifacts carry no placeholder, so rendering them would be a second spelling of `cat`. The
 rendered ones do carry placeholders, and for them a render is the only correct install.
 
+**One hook line is yours to wire, and no kit ships it.** Add
+`bash <kit>/unattended.sh --check-commit "$1"` to your own `commit-msg` hook, ahead of anything that
+exits early, and let exit 1 block the commit while any other exit lets it through. It refuses an
+open pass's commit that stages a path outside its declaration while `--dispatch` can still widen it
+(`TOOL-aWindowedPass-3`). This repo's `.githooks/commit-msg` is the reference; it is not shipped
+because a hook file is copied whole and would overwrite yours. Its limits: a `--no-verify` commit
+skips it, `Pass: none` is taken at its word, and check 23 grades both at the close.
+
 **Why the verb entries are not in the protocol.** The move was a BYTE decision and is recorded as
 one. That document had reached its cap EXACTLY, and a contract with no room left to state its next
 rule has stopped being amendable — which is a failure mode of the contract, not of whoever wrote the

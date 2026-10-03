@@ -1,6 +1,6 @@
 # TOOL-aWindowedPass-3 — a commit-time step refuses an open pass's undeclared write, naming the re-declare
 
-**Status:** OPEN · rev-1 · 2026-10-04 · node a · Tier-2 · base 886b089d · streams tooling · order 5
+**Status:** INPROGRESS · rev-2 · 2026-10-04 · node a · Tier-2 · base 886b089d · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
@@ -32,8 +32,10 @@ names an open pass, so attribution is structural from then on.
 - **S3** — With no `Pass:` trailer and a subject naming an open pass of the run, it exits 1 asking for
   `Pass: <unit>` or `Pass: none`. `Pass: none` always passes. Observed by AC4.
 - **S4** — `.githooks/commit-msg` runs the verb before its merge-only audit, resolving the kit path
-  as that hook resolves its own, and an absent kit is an announced skip. The unattended kit ships the
-  call as a `merged` block into `.githooks/commit-msg`, so an adopter inherits it. Observed by AC5.
+  as that hook resolves its own, and an absent kit is an announced skip. That hook is gov's own and
+  is not shipped (`TOOL-dDerivedDocket-9`, `tools/govkit/registry.toml`): the kit README gives the
+  adopter the one line to wire into its own carrier, naming this hook as the reference. Observed by
+  AC5.
 - **S5** — The verb carrier documents `--check-commit`, and the kit README states the hook's limits.
   Observed by AC5.
 
@@ -60,7 +62,8 @@ counts as generated, by the same comparison `check_generated_render` makes, here
 - `tools/unattended/unattended.test.sh`
 - `tools/unattended/VERBS.template.md`
 - `tools/unattended/README.md`
-- `tools/unattended/kit.toml`
+- `tools/unattended/lib-unattended.sh`
+- `tools/unattended/check-unattended.sh`
 - `.githooks/commit-msg`
 
 ### Alternatives rejected
@@ -78,7 +81,8 @@ counts as generated, by the same comparison `check_generated_render` makes, here
 - risks — a run that must commit through a hook-less clone loses the early catch; the close still
   grades it.
 - testing — fixtures for each branch of S1 to S3, and the hook wiring.
-- migration — the merged block lands on the next apply or update.
+- migration — an adopter wires the README's one line into its own `commit-msg`; until it does, check
+  23 at the close is the only grader, as before.
 - user docs — verb carrier entry and README limits.
 
 ## 6. Acceptance criteria
@@ -94,8 +98,8 @@ counts as generated, by the same comparison `check_generated_render` makes, here
 - **AC4** — When the subject names an open pass and no trailer is present, it exits 1 naming
   `Pass: none`; with `Pass: none`, it exits 0.
   Red when: the trailer requirement is not applied.
-- **AC5** — When `grep -c 'check-commit' .githooks/commit-msg` runs, it prints at least 1, and the
-  unattended kit's descriptor carries the merged block row.
+- **AC5** — When `grep -c 'check-commit' .githooks/commit-msg` runs, it prints at least 1, and
+  `grep -c 'check-commit' tools/unattended/README.md` prints at least 1.
   Red when: the hook does not call the verb.
 
 ## 7. Gates
@@ -111,6 +115,10 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-04 · initial draft, from the owner's part (2) and the hooks at base.
+- rev-2 · 2026-10-04 · build pass · S4 · AC5 · §4 · `.githooks/commit-msg` is gov-own and deliberately
+  unshipped, a recorded decision rev-1 missed: a hook file is copied whole and would overwrite an
+  adopter's own. The adopter gets a README line instead of a merged block. The gen-region comparison
+  moved into the kit library as `check_gen_region_only`, so check 23 and this verb share one answer.
 
 ## 10. Reuse audit
 

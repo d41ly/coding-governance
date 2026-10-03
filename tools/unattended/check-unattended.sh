@@ -3628,17 +3628,15 @@ check_absorb_subject() { # subject · slug -> 0 when it is an absorb subject for
 # ---- regions, which the build-index generator re-renders whenever a spec's status header moves. A
 # ---- blob missing on either side counts the path, so the skip fails closed.
 # ---- WHAT THIS DOES NOT SEE: a hand edit inside a gen region is not counted, because nothing here
-# ---- can tell it from a render. Regions NEST, the build README's unit table inside its index, so
-# ---- the strip counts depth rather than toggling.
-GEN_REGION_AWK='{ sub(/\r$/, "") } /^<!-- gen:[^ ]+ -->/ { g++; next } /^<!-- \/gen:[^ ]+ -->/ { if (g > 0) g--; next } !g'
+# ---- can tell it from a render. The gen-region comparison is the kit library's
+# ---- `check_gen_region_only`, which `--check-commit` asks of the index (TOOL-aWindowedPass-3), so the
+# ---- commit-time step and this check cannot forgive different changes.
 check_generated_render() { # commit · path -> 0, printing what generated it, when the write is a render
-  local _gi _ga _gb
+  local _gi
   for _gi in ${GENERATED_INDEXES:-}; do
     covers "${_gi%%:*}" "$2" && { printf 'the %s index' "${_gi%%:*}"; return 0; }
   done
-  _ga=$(GIT show "$1^:$2" 2>/dev/null) || return 1
-  _gb=$(GIT show "$1:$2" 2>/dev/null) || return 1
-  [ "$(printf '%s\n' "$_ga" | awk "$GEN_REGION_AWK")" = "$(printf '%s\n' "$_gb" | awk "$GEN_REGION_AWK")" ] || return 1
+  check_gen_region_only "$1^:$2" "$1:$2" || return 1
   printf 'a change inside its gen regions only'
 }
 ds_unavail=0
@@ -5335,7 +5333,8 @@ _lc_hits=${_lc_hits%$'\n'}
 # ---- a staged edit, and an arm whose failing case cannot be staged is an assertion about nothing.
 # print_liveness arrived with origin/main (aWokenSentinel); it reads the RECORDED phase because it
 # takes no network.
-PHASE_RECORDED_FNS="refuse_if_terminal archive_name_of verb_landed print_liveness"
+# verb_check_commit (TOOL-aWindowedPass-3) runs on every commit, and a hook takes no network either.
+PHASE_RECORDED_FNS="refuse_if_terminal archive_name_of verb_landed print_liveness verb_check_commit"
 # ---- LIVENESS: the classifier must RECOGNISE the readers' own reads. The two readers are the one
 # ---- place a read of the fact is certain to exist, so each must hold a line the read predicate
 # ---- matches, or the driver reads the fact in a spelling this check no longer sees and the routing

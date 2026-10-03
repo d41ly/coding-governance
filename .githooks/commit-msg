@@ -8,8 +8,8 @@
 # EVERY concluded merge, which is why the audit's commit-time carrier lives here and not in
 # `pre-commit`, where a clean merge would sail past it.
 #
-# WHAT IT DOES. With no `MERGE_HEAD` it exits 0 and prints nothing — an ordinary commit is not this
-# hook's business. With one, it hands the pending merge to the memory-tree kit's transition audit,
+# WHAT IT DOES. With no `MERGE_HEAD` the audit below is skipped — an ordinary commit is not ITS
+# business; the one step that grades an ordinary commit is the unattended one described below. With one, it hands the pending merge to the memory-tree kit's transition audit,
 # which parents it on HEAD and every `MERGE_HEAD` line and trees it on the INDEX, and refuses the
 # commit when a row change crosses the mode boundary with no `RELOCATED` provenance row.
 #
@@ -27,17 +27,33 @@
 # without a python launcher or without the kit, and in both cases it SAYS SO and lets the commit
 # through — a commit-time carrier that blocks work because an interpreter is missing gets disabled,
 # and the same audit binds again at the push boundary, where check 26 runs over the whole history.
+#
+# ONE QUESTION RUNS ON EVERY COMMIT, AHEAD OF THE MERGE-ONLY EXIT (TOOL-aWindowedPass-3): the
+# unattended kit's `--check-commit`, which refuses an open dispatched pass's commit that stages a path
+# its declaration does not cover, while `--dispatch` can still widen it. It answers silently when no
+# run is bound to this worktree's branch. Its refusal is the only thing here that blocks an ordinary
+# commit; an absent kit or conf skips it, and check 23 still grades the pass at the close.
 set -u
+
+top=$(git rev-parse --show-toplevel 2>/dev/null) || exit 0
+# The kits and the tool root, as VALUES. Assembled rather than spelled, for the reason the header
+# gives; the probe answers "where is it actually installed", which is the only correct answer at
+# both the `tools/` prefix this repo uses and the bare prefix a copy-install produces.
+tool_root=tools
+un_name=unattended
+for base in "$top/$tool_root/$un_name" "$top/$un_name"; do
+  if [ -f "$base/unattended.sh" ] && [ -f "$top/.unattended.conf" ]; then
+    bash "$base/unattended.sh" --check-commit "$1"; rc=$?
+    [ "$rc" = 1 ] && exit 1
+    [ "$rc" = 0 ] || echo "commit-msg: the unattended commit-time check could not run (exit $rc); check 23 still grades this commit at the close."
+    break
+  fi
+done
 
 git_dir=$(git rev-parse --git-dir 2>/dev/null) || exit 0
 [ -f "$git_dir/MERGE_HEAD" ] || exit 0
-top=$(git rev-parse --show-toplevel 2>/dev/null) || exit 0
 
-# The kit and the tool root, as VALUES. Assembled rather than spelled, for the reason the header
-# gives; the probe answers "where is it actually installed", which is the only correct answer at
-# both the `tools/` prefix this repo uses and the bare prefix a copy-install produces.
 kit_name=memory-tree
-tool_root=tools
 module=""
 for base in "$top/$tool_root/$kit_name" "$top/$kit_name"; do
   if [ -f "$base/transition_audit.py" ]; then module="$base/transition_audit.py"; break; fi

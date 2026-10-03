@@ -5739,6 +5739,46 @@ hit "$out" "--dispatch declares a path a sibling pass in the same group already 
 out=$(run --dispatch tRun --pass ARCH-tRun-2 --writes ${PFX}z.sh)
 hit "$out" "dispatch declared"
 
+# ---- --check-commit (TOOL-aWindowedPass-3): check 23 asked at COMMIT time, while the declaration can
+# ---- still be widened. The fixture run is bound to this worktree's branch by preflight's run-branch.
+build_specced_tree
+printf '\nGENERATED_INDEXES="memory/LIVE.md:gen.py"\n' >> .unattended.conf
+fixture   # COMMITTED, or preflight refuses the dirty tree and writes no run-branch to bind
+run --preflight tRun --keepalive-id k1 >/dev/null
+run --dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}a.sh >/dev/null
+git add -A >/dev/null && git commit -q -m "records: declare ARCH-tRun-1" --no-verify
+CCM=$(mktemp)
+[ -z "$PFX" ] || mkdir -p "$PFX"
+# AC2: the trailer names the pass and a staged path lies outside its declaration
+printf 'a\n' > ${PFX}a.sh; printf 'b\n' > ${PFX}stray.sh; git add -A >/dev/null
+printf 'ARCH-tRun-1 builds its lane\n\nPass: ARCH-tRun-1\n' > "$CCM"
+out=$(run --check-commit "$CCM"); rc=$?
+same "--check-commit refuses an undeclared staged path, exit code" "$rc" "1"
+hit  "$out" "pass ARCH-tRun-1 stages paths outside the set it declared before dispatch, and the declaration can still be widened because the pass has not committed: ${PFX}stray.sh"
+hit  "$out" "--dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}a.sh --writes ${PFX}stray.sh"
+# AC3: the run-state file and a declared generated output are not the pass's writes
+git rm -q --cached ${PFX}stray.sh; rm -f ${PFX}stray.sh
+printf 'live\n' >> memory/LIVE.md; printf '\n' >> memory/builds/tRun/RUN.md; git add -A >/dev/null
+out=$(run --check-commit "$CCM"); rc=$?
+same "--check-commit subtracts the run-state file and a generated output, exit code" "$rc" "0"
+miss "$out" "FAILED"
+# AC4: a subject naming the open pass with no trailer is refused; Pass: none passes
+printf 'ARCH-tRun-1 builds its lane\n' > "$CCM"
+out=$(run --check-commit "$CCM"); rc=$?
+same "--check-commit refuses a pass subject with no trailer, exit code" "$rc" "1"
+hit  "$out" "end the message with 'Pass: ARCH-tRun-1' when it is the pass, or 'Pass: none' when it is not"
+printf 'records: ARCH-tRun-1 brief\n\nPass: none\n' > "$CCM"
+out=$(run --check-commit "$CCM"); rc=$?
+same "--check-commit lets Pass: none through, exit code" "$rc" "0"
+# AC1: a branch no run names is no question at all: exit 0, nothing printed
+git checkout -q -b cc-unbound
+printf 'ARCH-tRun-1 builds its lane\n' > "$CCM"
+out=$(run --check-commit "$CCM"); rc=$?
+same "--check-commit with no run bound, exit code" "$rc" "0"
+same "--check-commit with no run bound prints nothing" "$out" ""
+git checkout -q unit; git branch -q -D cc-unbound
+rm -f "$CCM"
+
 # ---- CONDITION 3, FLAT HALF: the records the method names outright, plus the derived run-state file.
 build_specced_tree; run --preflight tRun --keepalive-id k1 >/dev/null
 hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes memory/DECISIONS.md)" "--dispatch declares a path overlapping a shared mutable record this project declares, and the build method names those outright rather than conditionally:"
