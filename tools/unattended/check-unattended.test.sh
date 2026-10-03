@@ -3476,6 +3476,18 @@ git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
 out=$(GOV_UNATTENDED_REPORT=1 bash "$SCRIPT" 2>&1)
 miss "$out" "check 23 FAILED"
 hit  "$out" "a generated render, the memory/LIVE.md index"
+# ...and a write a KIT's `[[generated]]` row declares is not counted, with no conf line at all: the
+# declaration lives with the generator (TOOL-aWindowedPass-4 AC3)
+reset_tree
+mkdir -p tools/genkit && printf 'x\n' > tools/genkit/gen.py
+printf '[[generated]]\npath = "{memory_root}/derived"\ngenerator = "gen.py"\nwhy = "a fixture generator"\n' > tools/genkit/kit.toml
+git add -A && git commit -q -m "fixture: a kit declaring a generated output" --no-verify
+drow ARCH-tRun-1 "work/one.txt"
+mkdir -p work memory/derived && printf 'a\n' > work/one.txt && printf 'd\n' > memory/derived/out.json
+git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
+out=$(GOV_UNATTENDED_REPORT=1 bash "$SCRIPT" 2>&1)
+miss "$out" "check 23 FAILED"
+hit  "$out" "a generated render, the memory/derived index"
 # ...nor a change inside a README's gen regions, NESTED as the build README's are: the line between
 # the inner close and the outer close is still generated
 reset_tree

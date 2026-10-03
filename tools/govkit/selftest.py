@@ -2637,6 +2637,22 @@ user_skills = "/tmp/gk-fake-skills"
               and "non-entries named: playbook-rendr" in rsd.stdout, rsd.stdout + rsd.stderr)
         pk.write_text(pkeep, encoding="utf-8")
 
+        # --- TOOL-aWindowedPass-4 AC5: check 6c, a `[[generated]]` row whose generator the kit does
+        #     not ship. Staged in the copy and restored, so the arm is observed red and green both.
+        gk = gcopy / PFX / KIT_NAMES["codebase-map"] / "kit.toml"
+        gkeep = gk.read_text(encoding="utf-8")
+        _g6c = gkeep.replace('generator = "gen_map.py"', 'generator = "gen_map_missing.py"', 1)
+        check("[aWP-4 AC5] LIVENESS the staged descriptor really names a missing generator",
+              _g6c != gkeep, "the replace matched nothing in the codebase-map descriptor")
+        gk.write_text(_g6c, encoding="utf-8")
+        r6c = _run_selfcheck(gcopy)
+        check("[aWP-4 AC5] selfcheck 6c names a [[generated]] row whose generator is not shipped",
+              r6c.returncode != 0 and "entry 'codebase-map' [[generated]] row" in r6c.stdout,
+              r6c.stdout[-1200:] + r6c.stderr[-300:])
+        gk.write_text(gkeep, encoding="utf-8")
+        check("[aWP-4 AC5] ...and is green again once the generator is restored",
+              _run_selfcheck(gcopy).returncode == 0, "")
+
         # --- DEPL-aRepatriatedFork-14 AC4: arm 7j2, an entry declaring no `[check]` table at all.
         tc = gcopy / PFX / KIT_NAMES["govkit"] / "entries" / "check-testsuite-counts.kit.toml"
         tkeep = tc.read_text(encoding="utf-8")

@@ -305,6 +305,9 @@ M="$MEMORY_ROOT"
 # The kit default of an undeclared SHARED_RECORDS, resolved by the same library call the driver makes,
 # so the two readers cannot disagree about a conf that leaves the key out.
 SHARED_RECORDS=$(resolve_shared_records "$SHARED_RECORDS" "$MEMORY_ROOT")
+# THE EFFECTIVE GENERATED OUTPUTS - TOOL-aWindowedPass-4: the kits' `[[generated]]` rows, then the
+# conf's additions, through the ONE resolver every reader of this key calls.
+GENERATED_INDEXES=$(resolve_generated_indexes "$ROOT" "$GENERATED_INDEXES" "$MEMORY_ROOT")
 
 # THE REPORT CHANNEL. Silent by default, so the contract above holds byte for byte and the three
 # green-control arms in the sibling test keep their meaning. A check that cannot compare says which

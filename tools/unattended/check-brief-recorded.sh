@@ -180,6 +180,9 @@ if [ "$_conf_ok" != 1 ]; then
   exit 2
 fi
 MEMORY_ROOT="${MEMORY_ROOT:-memory}"
+# THE EFFECTIVE GENERATED OUTPUTS - TOOL-aWindowedPass-4: the kits' `[[generated]]` rows, then the
+# conf's additions, through the ONE resolver every reader of this key calls.
+GENERATED_INDEXES=$(resolve_generated_indexes "$ROOT" "$GENERATED_INDEXES" "$MEMORY_ROOT")
 # THE PRE-ANCHOR CAP is pass-order's key and default, validated as that leg validates it: a value git
 # cannot parse would turn the built-before-its-run probe off while reporting nothing.
 PREANCHOR_CAP="${PASS_ORDER_PREANCHOR_CAP:-400}"

@@ -611,6 +611,9 @@ M="$MEMORY_ROOT"
 # resolution itself lives in the kit library since TOOL-dDerivedDocket-20, because the gate leg reads
 # the same key and a default spelled in two callers is two answers to one question.
 SHARED_RECORDS=$(resolve_shared_records "$SHARED_RECORDS" "$MEMORY_ROOT")
+# THE EFFECTIVE GENERATED OUTPUTS - TOOL-aWindowedPass-4: the kits' `[[generated]]` rows, then the
+# conf's additions, through the ONE resolver every reader of this key calls.
+GENERATED_INDEXES=$(resolve_generated_indexes "$ROOT" "$GENERATED_INDEXES" "$MEMORY_ROOT")
 # THE TWO CONDITION-3 KEYS MAY NOT NAME ONE PATH - TOOL-dDerivedDocket-20 S1. A path under both is
 # answered by whichever of condition 3's two rules `--dispatch` reaches first, and the declaration of
 # the other means nothing. Refused at LOAD, on `read_bound_key`'s pattern, because the first refusal

@@ -1978,6 +1978,27 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
             else:
                 r.note(f"contract {cid} ({eid}:{c.get('source')}): {len(cl)} clause(s)")
 
+    # ---- 6c (TOOL-aWindowedPass-4): A `[[generated]]` ROW NAMES A GENERATOR THE KIT SHIPS AND A PATH
+    #          THE UNATTENDED KIT CAN RESOLVE. The unattended kit reads these rows in a target to tell a
+    #          hook-forced regeneration from a pass's own write; a row naming a generator that is not in
+    #          the kit, or a path token its shell reader does not resolve, is a declaration nothing can
+    #          honour, and the reader skips it with a stderr line nobody reads on a green bar. WHAT THIS
+    #          DOES NOT CHECK: that the generator really writes the path.
+    _gen_tokens = {"memory_root", "map_root", "kit"}
+    _n_gen = 0
+    for eid, (d, _dpath) in sorted(descs.items()):
+        for _gr in d.get("generated", []) or []:
+            _n_gen += 1
+            _gp, _gg = str(_gr.get("path") or ""), str(_gr.get("generator") or "")
+            _gtok = set(re.findall(r"\{([a-z_]+)\}", _gp)) - _gen_tokens
+            _gsrc = (root / _dpath).parent / _gg if _gg else None
+            if not _gp or not _gg or _gtok or not (_gsrc and _gsrc.is_file()) \
+                    or not str(_gr.get("why") or "").strip():
+                r.fail(f"entry '{eid}' [[generated]] row {_gp or '(no path)'}: needs a path whose tokens "
+                       f"are {sorted(_gen_tokens)} (found {sorted(_gtok) or 'none extra'}), a generator "
+                       f"file beside the descriptor (got '{_gg}'), and a why")
+    r.note(f"generated outputs: {_n_gen} [[generated]] row(s) declared across the descriptors")
+
     # ---- 7: a requires_if condition names keys that resolve in the named kit's config lists, and
     #         names a kit that is a registry entry. PLAIN `requires` gets the same name arm, because
     #         check 7 is already the single place a dependency edge's kit NAME is graded and splitting

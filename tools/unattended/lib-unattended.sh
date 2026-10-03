@@ -510,6 +510,65 @@ resolve_shared_records() { # declared value · memory root -> the effective set
     printf '%s' "$1"
   fi
 }
+# THE GENERATED OUTPUTS, DECLARED BY THE KITS THAT GENERATE THEM - TOOL-aWindowedPass-4. Every reader
+# of `GENERATED_INDEXES` (check 23, check 38, `--dispatch`'s condition 3, and the build-commit pick in
+# the pass-order and brief-recorded legs) calls this at conf load, as they call
+# `resolve_shared_records`, so the effective set has ONE derivation. It reads the `[[generated]]`
+# tables of every `kit.toml` one directory beside this kit — the descriptors ship inside their kits,
+# so an adopter reads the same declarations gov does — resolves `{memory_root}`, `{map_root}` and
+# `{kit}`, and prints the `index:generator` pairs space-separated: the kits' rows first, then every
+# pair the conf adds, once each. Before this a hand-typed conf list named four of this repo's six
+# generated outputs and the shipped example two, so a hook-forced regeneration of the rest counted as
+# an undeclared write.
+#
+# WHAT IT DOES NOT CHECK: that a declared generator really writes the declared path — govkit selfcheck
+# grades the row's shape and that the generator ships, and no reader here runs a generator. A row whose
+# path holds another token is named on stderr and skipped, never guessed.
+resolve_generated_indexes() { # repo root · declared GENERATED_INDEXES · memory root -> the effective pairs
+  local _rg_root=$1 _rg_decl=$2 _rg_mem=$3 _rg_here _rg_kitrel _rg_tool _rg_map _rg_d _rg_krel _rg_rows
+  local _rg_out="" _rg_p _rg_g _rg_seen=" "
+  _rg_here=$(cd "$(dirname "${BASH_SOURCE[0]}")" 2>/dev/null && pwd) || _rg_here=""
+  _rg_kitrel=$(git -C "${_rg_here:-.}" rev-parse --show-prefix 2>/dev/null) || _rg_kitrel=""
+  _rg_kitrel=${_rg_kitrel%/}
+  case "$_rg_kitrel" in */*) _rg_tool=${_rg_kitrel%/*} ;; *) _rg_tool="" ;; esac
+  _rg_map=$(awk -F= '/^[[:space:]]*MAP_ROOT=/ { v = $2; gsub(/^[ "\047]+|[ "\047\r]+$/, "", v); print v }' \
+    "$_rg_root/.codebase-map.conf" 2>/dev/null | tail -n 1)
+  [ -n "$_rg_map" ] || _rg_map="memory/map"
+  # Both loops read SCRATCH FILES, never a pipe, a process substitution or a here-string over one:
+  # memory/gotchas/bounded-through-a-pipe-is-unbounded.md, and the shell-hygiene leg that bans it.
+  local _rg_lf _rg_rf
+  _rg_lf=$(mktemp) && _rg_rf=$(mktemp) || { printf 'lib-unattended: resolve_generated_indexes cannot create a scratch file, so only the conf pairs are read\n' >&2; printf '%s' "$_rg_decl"; return 0; }
+  git -C "$_rg_root" ls-files -- ":(glob)${_rg_tool:+$_rg_tool/}*/kit.toml" >"$_rg_lf" 2>/dev/null || :
+  while IFS= read -r _rg_d; do
+    [ -n "$_rg_d" ] || continue
+    _rg_krel=${_rg_d%/kit.toml}
+    awk '
+      function val(s) { sub(/^[^=]*=[ \t]*"/, "", s); sub(/".*$/, "", s); return s }
+      { sub(/\r$/, "") }
+      /^\[\[generated\]\][ \t]*$/ { if (p != "") print p "\t" g; t = 1; p = ""; g = ""; next }
+      /^\[/                       { if (t && p != "") print p "\t" g; t = 0; p = ""; g = ""; next }
+      t && /^path[ \t]*=/         { p = val($0) }
+      t && /^generator[ \t]*=/    { g = val($0) }
+      END { if (t && p != "") print p "\t" g }' "$_rg_root/$_rg_d" >"$_rg_rf" 2>/dev/null || :
+    while IFS=$'\t' read -r _rg_p _rg_g; do
+      [ -n "$_rg_p" ] && [ -n "$_rg_g" ] || continue
+      _rg_p=${_rg_p//\{memory_root\}/$_rg_mem}; _rg_p=${_rg_p//\{map_root\}/$_rg_map}
+      _rg_p=${_rg_p//\{kit\}/$_rg_krel}
+      case "$_rg_p" in
+        *"{"*|*"}"*) printf 'lib-unattended: %s declares a [[generated]] path with a token this reader cannot resolve, so it is skipped: %s\n' "$_rg_d" "$_rg_p" >&2; continue ;;
+      esac
+      _rg_p=$(normpath "$_rg_p"); _rg_g=$(normpath "$_rg_krel/$_rg_g")
+      case "$_rg_seen" in *" $_rg_p:$_rg_g "*) continue ;; esac
+      _rg_seen="$_rg_seen$_rg_p:$_rg_g "; _rg_out="$_rg_out $_rg_p:$_rg_g"
+    done <"$_rg_rf"
+  done <"$_rg_lf"
+  rm -f "$_rg_lf" "$_rg_rf"
+  for _rg_p in $_rg_decl; do
+    case "$_rg_seen" in *" $_rg_p "*) continue ;; esac
+    _rg_seen="$_rg_seen$_rg_p "; _rg_out="$_rg_out $_rg_p"
+  done
+  printf '%s' "${_rg_out# }"
+}
 # One `<shared record><TAB><index>` line per pair that overlaps, on `overlaps` — CONTAINMENT, in either
 # direction, never string equality: `memory` shared beside a `memory/LIVE.md` index is the same
 # contradiction as the two spelled alike, and so is the reverse nesting. Only the INDEX half of a

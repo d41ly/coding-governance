@@ -40,3 +40,5 @@ base: 886b089dfd9c4bf98dc2024e21d7d9607f9b5cc0
 2026-10-03T21:29:15Z brief · item TOOL-aWindowedPass-4 · reason 5fa84d02b7ec memory/builds/aWindowedPass/prompts/2026-10-04-prompt-TOOL-aWindowedPass-4-2-build-brief.md
 
 2026-10-03T21:29:19Z brief · item TOOL-aWindowedPass-5 · reason 36fa8d9cd2c1 memory/builds/aWindowedPass/prompts/2026-10-04-prompt-TOOL-aWindowedPass-5-2-build-brief.md
+
+2026-10-03T21:45:29Z dispatch · item b22c4ad7 TOOL-aWindowedPass-4 · reason tools/unattended/lib-unattended.sh tools/unattended/unattended.sh tools/unattended/check-unattended.sh tools/unattended/check-unattended.test.sh tools/unattended/check-pass-order.sh tools/unattended/check-brief-recorded.sh tools/unattended/.unattended.conf.example tools/unattended/PROTOCOL.template.md memory/guides/UNATTENDED-PROTOCOL.md tools/memory-tree/kit.toml tools/codebase-map/kit.toml tools/govkit/govkit.py tools/govkit/selftest.py .unattended.conf memory/builds/aWindowedPass/spec/2026-10-04-spec-TOOL-aWindowedPass-4.md memory/builds/aWindowedPass/README.md memory/guides/SESSION-KICKOFF.md

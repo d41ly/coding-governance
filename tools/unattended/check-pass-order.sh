@@ -122,6 +122,9 @@ if [ "$_conf_ok" != 1 ]; then
   exit 2
 fi
 MEMORY_ROOT="${MEMORY_ROOT:-memory}"
+# THE EFFECTIVE GENERATED OUTPUTS - TOOL-aWindowedPass-4: the kits' `[[generated]]` rows, then the
+# conf's additions, through the ONE resolver every reader of this key calls.
+GENERATED_INDEXES=$(resolve_generated_indexes "$ROOT" "$GENERATED_INDEXES" "$MEMORY_ROOT")
 
 # ------------------------------------------------------------------------------- THE CLASSIFIER
 # SLICED OUT OF THE DRIVER'S SHIPPED BYTES, never re-implemented. `plan_state` is the M2 classifier

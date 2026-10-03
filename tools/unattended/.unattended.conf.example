@@ -6,8 +6,9 @@
 # permanently red; this fleet tracks that as a named bug class. Every value below is either a
 # placeholder to replace or a number to MEASURE against your own tree.
 #
-# FOUR VALUES ARE STAMPED, not typed: LANDER, GATE_CMD, WIRING_CHECK and GENERATED_INDEXES carry a
-# brace-quoted path token that `adopt-unattended.sh` replaces with where THIS install keeps its kits,
+# THREE VALUES ARE STAMPED, not typed: LANDER, GATE_CMD and WIRING_CHECK carry a brace-quoted path
+# token that `adopt-unattended.sh` replaces with where THIS install keeps its kits (GENERATED_INDEXES
+# takes the same stamp when a project writes a token into its own additions),
 # the first time it renders, and `--check` refuses a conf that still carries one. A copy of the
 # authoring repo's own paths resolved to nothing at any other prefix (TOOL-aRepatriatedFork-24).
 #
@@ -378,8 +379,12 @@ LANDER_MARKER=""
 # declare a write under SHARED_RECORDS; a GENERATED_INDEXES entry is refused only TOGETHER WITH its
 # generator, because a generated index alone is what every ordinary pass touches. The run-state file
 # is derived, never declared. Blank is the empty set; absent takes the kit default.
+# GENERATED_INDEXES is an ADDITION, and blank is the ordinary value (TOOL-aWindowedPass-4): the kits
+# that own generators declare their outputs as `[[generated]]` rows in their `kit.toml`, and the gate,
+# the driver and both build-commit legs read those first. Add an `index:generator` pair here only for
+# a generator of this project's own.
 SHARED_RECORDS="memory/DECISIONS.md memory/backlog"
-GENERATED_INDEXES="memory/LIVE.md:{{MEMORY_TREE_DIR}}/gen_build_index.py memory/ledger:{{MEMORY_TREE_DIR}}/gen_build_index.py"
+GENERATED_INDEXES=""
 
 # The date from which a LANDED record must name its anchor kind (`remote` or `local`). A record whose
 # first commit predates it is read as `remote`, which is what every pre-existing record in fact is.
