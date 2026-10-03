@@ -1,6 +1,6 @@
 # TOOL-aWindowedPass-5 — each run is graded against zero; the repo-global ceiling is retired
 
-**Status:** OPEN · rev-1 · 2026-10-04 · node a · Tier-2 · base 886b089d · streams tooling · order 4
+**Status:** INPROGRESS · rev-2 · 2026-10-04 · node a · Tier-2 · base 886b089d · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
@@ -23,13 +23,14 @@ its own and retires the key.
 
 - **S1** — Check 23 FAILS when the run this tree drives — the record whose `run-branch` fact equals
   the current branch's ref — has a counted undeclared write. A counted write in any other live run is
-  printed as `check 23 OTHER RUN <run>: <n> counted, graded at its own close` and does not fail.
+  printed as `check 23 OTHER RUN <run>: <n> counted, graded at its own close - this tree drives <ref>`
+  and does not fail.
   Observed by AC1 and AC2.
 - **S2** — With no run bound to the current branch, every counted write is reported and none fails,
   and the check says which branch it looked for. Observed by AC2.
 - **S3** — `UNDECLARED_WRITE_CEILING` is RETIRED: a `RETIRED_CONF_KEYS` constant in
   `tools/unattended/check-unattended.sh` names it, check 22's join tolerates a retired key a project
-  still sets and prints that it is ignored and may be deleted, and the protocol's key table marks the
+  still sets and prints, on the report channel, that it is ignored and may be deleted, and the protocol's key table marks the
   row retired. This repo's conf and the shipped example drop the key. Observed by AC3.
   **Readers:**
   by name: `tools/unattended/check-unattended.sh`, `tools/unattended/check-unattended.test.sh`,
@@ -119,6 +120,10 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-04 · initial draft, from the owner's part (5) and check 23's ratchet at base.
+- rev-2 · 2026-10-04 · build pass · S1 · S3 · the OTHER RUN line names the ref this tree drives, which
+  is S2's "says which branch it looked for" in the same line rather than a second one; the retired
+  key's notice is on the report channel, since it changes no verdict; the retired key is filtered from
+  check 22's protocol half too, because the table row stays and the example no longer ships it.
 
 ## 10. Reuse audit
 

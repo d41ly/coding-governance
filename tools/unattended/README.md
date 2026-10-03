@@ -246,7 +246,6 @@ because the ceiling would fire first and the declared bound could never be reach
 ```
 adopt-unattended.sh --check      # the installed artifacts are in sync, the hook wired
 check-unattended.sh              # the kit gate
-check-unattended.sh --emit-ceiling  # MEASURES .unattended.conf's UNDECLARED_WRITE_CEILING for this tree
 check-playbook.sh                # playbook validity, including the fixture
 check-pass-order.sh              # refuses a unit built before it was specced
 check-brief-recorded.sh          # refuses a closed unit whose build commit records no brief

@@ -24,7 +24,8 @@
 # contract line above is written to admit them; so do check 23's `check 23 EXCLUDED` and
 # `check 23 exclusion UNAVAILABLE`, which share check 7's predicate (TOOL-aSightedSkeptic-13), and
 # check 23's `check 23 SOLO` line with its run's graded-and-overlapped count, an undeclared write the
-# check found and did not count because its pass overlapped no sibling (TOOL-aWindowedPass-1). They are not skips. An exclusion is a positive
+# check found and did not count because its pass overlapped no sibling (TOOL-aWindowedPass-1), and its
+# `check 23 OTHER RUN` line, counted writes of a run this tree does not drive (TOOL-aWindowedPass-5). They are not skips. An exclusion is a positive
 # finding that CHANGED THE VERDICT — a record the check stopped counting — and the reader of a green
 # run is entitled to know which one and on what evidence. Routing them through REPORT was the first
 # implementation and it made the exclusion invisible on every bar run, which is the check-quietly-
@@ -134,26 +135,16 @@ CONF="$ROOT/.unattended.conf"
 # ---- skip naming itself, on the report channel, off the check headers themselves (see the guard
 # ---- that follows the 28 region). The parser below sits between a bare argv sentinel pair so that
 # ---- check 26 can join every flag it accepts to an arm in this leg's own suite. TOOL-dDerivedDocket-30.
-SCOPE=""; EMIT_CEILING=0
+SCOPE=""
 # gov:argv-begin
 case "${1:-}" in
   "")            ;;
   --only)        [ "${2:-}" = 28 ] || { echo "check-unattended: --only takes 28 and nothing else; checks 1-27 share state and are one unit"; exit 2; }; SCOPE=only28 ;;
   --skip)        [ "${2:-}" = 28 ] || { echo "check-unattended: --skip takes 28 and nothing else; checks 1-27 share state and are one unit"; exit 2; }; SCOPE=skip28 ;;
-  --emit-ceiling) SCOPE=skip28; EMIT_CEILING=1 ;;
-  *)             echo "check-unattended: unknown argument '${1}'; this leg takes [--only 28], [--skip 28] or [--emit-ceiling]"; exit 2 ;;
+  --emit-ceiling) echo "check-unattended: --emit-ceiling is retired with UNDECLARED_WRITE_CEILING (TOOL-aWindowedPass-5): check 23 grades the run this branch drives against zero, so there is no pin left to measure"; exit 2 ;;
+  *)             echo "check-unattended: unknown argument '${1}'; this leg takes [--only 28] or [--skip 28]"; exit 2 ;;
 esac
 # gov:argv-end
-# ---- --emit-ceiling (TOOL-aRepatriatedFork-11 S5): MEASURE check 23's pin instead of grading it.
-# ---- Both adopters had measured UNDECLARED_WRITE_CEILING by running this leg at 0 and reading the
-# ---- failure. This runs the skip-28 scope with stdout discarded, so no check line reaches the caller,
-# ---- and prints the one conf line on the saved stdout right after check 23 counts. A run that never
-# ---- reaches that count exits 1 with nothing on stdout, and so does a count over an EMPTY graded
-# ---- population: a dead probe must not hand out a 0 (the EXIT trap is what catches the first case).
-if [ "$EMIT_CEILING" = 1 ]; then
-  exec 3>&1 1>/dev/null
-  trap 'echo "check-unattended: --emit-ceiling took no count, because the run stopped before check 23 graded anything; run the leg bare to see why" >&2; exit 1' EXIT
-fi
 
 status=0
 fail() { echo "UNATTENDED check $1 FAILED — $2"; status=1; }
@@ -200,7 +191,7 @@ DISPOSITION_CUTOFF=""
 # TOOL-dDerivedDocket-22 S10 - the date from which the landed fact-set arm grades a record.
 LANDED_FACTS_CUTOFF=""
 KICKOFF_ENGINE=""; KICKOFF_EXITS=""; DIRECTIVES_EXTRA=""; DIRECTIVES_FLOOR=""; DIRECTIVES_EXTRA_TABLE=""
-HALT_CODES_EXTRA=""; HALT_FLOOR=""; UNDECLARED_WRITE_CEILING=""
+HALT_CODES_EXTRA=""; HALT_FLOOR=""
 HOLD_CODES_EXTRA=""; HOLD_FLOOR=""
 RESUME_SCHEDULE=""; RESUME_SCHEDULE_CREATE=""; RESUME_SCHEDULE_DELETE=""
 RESUME_SCHEDULE_DELAY=""; RESUME_SCHEDULE_LIMIT=""
@@ -285,7 +276,7 @@ while IFS= read -r -d '' _ck; do
     MEMORY_ROOT|LANDER|LANDER_MODE|SELFTESTS_OWED_PATHS|BYPASS_BAN|GATE_CMD|WIRING_CHECK|KEEPALIVE_CREATE|KEEPALIVE_DELETE|\
     PHASES_EXTRA|DOD_EXTRA|CORE_FLOOR|LANDED_ANCHOR_CUTOFF|LANDED_FACTS_CUTOFF|DISPOSITION_CUTOFF|KICKOFF_ENGINE|\
     KICKOFF_EXITS|DIRECTIVES_EXTRA|DIRECTIVES_FLOOR|DIRECTIVES_EXTRA_TABLE|HALT_CODES_EXTRA|\
-    HALT_FLOOR|UNDECLARED_WRITE_CEILING|HOLD_CODES_EXTRA|HOLD_FLOOR|\
+    HALT_FLOOR|HOLD_CODES_EXTRA|HOLD_FLOOR|\
     RESUME_SCHEDULE|RESUME_SCHEDULE_CREATE|RESUME_SCHEDULE_DELETE|RESUME_SCHEDULE_DELAY|RESUME_SCHEDULE_LIMIT|\
     RECALL_CLI|ASKS_CMD|SHARED_RECORDS|GENERATED_INDEXES|GATE_BOUND|GATE_WALL|GATE_PROFILE_CMD|\
     UNITS_REGION_CUTOFF) eval "$_ck=\$_cv" ;;
@@ -2809,6 +2800,11 @@ fi
 # ---- key name in the table region, nothing more. A row whose prose is wrong is green here, and only
 # ---- a reader catches that.
 EXAMPLE_CONF="$HERE/.unattended.conf.example"
+# RETIRED KEYS: documented as retired, shipped by no example, and still TOLERATED in a project's conf,
+# which this leg no longer imports. Without the tolerance every adopter whose conf still sets one reds
+# here for a key this kit removed. Each is reported, so the line gets deleted rather than kept.
+RETIRED_CONF_KEYS="UNDECLARED_WRITE_CEILING"   # TOOL-aWindowedPass-5
+drop_retired_keys() { awk -v r=" $RETIRED_CONF_KEYS " 'index(r, " " $0 " ") == 0'; }
 # A MISSING EXAMPLE IS A REFUSAL, not a skip. Guarding the whole check on `[ -f ]` made it vanish
 # silently wherever the kit ships without its example - which is exactly where a documentation join
 # is worth most - and a check that says nothing is indistinguishable from a check that passed. The
@@ -2825,7 +2821,7 @@ elif [ -f "$LIVEDOC" ]; then
   # section 8, so a PROSE mention of a phase name - main's `LANDED` - entered the key set as a phantom
   # and red this leg on the merged tree. Neither parent had both the prose and the check. Reading the
   # key column keeps the `·`-joined KEEPALIVE_CREATE/KEEPALIVE_DELETE row, which yields both keys.
-  doc_keys=$(printf '%s\n' "$sec8" | awk -F'|' 'NF>2 {print $2}' | grep -oE '`[A-Z_]+`' | tr -d '`' | sort -u)
+  doc_keys=$(printf '%s\n' "$sec8" | awk -F'|' 'NF>2 {print $2}' | grep -oE '`[A-Z_]+`' | tr -d '`' | drop_retired_keys | sort -u)
   # THE KIT'S EXAMPLE CONF IS THE REVERSE POPULATION, not the adopting project's. A project declares
   # the keys it needs and leaves the optional ones out, so "documented but not declared here" is the
   # NORMAL state of any real conf - graded against one, this check red six keys on a conforming
@@ -2838,7 +2834,11 @@ elif [ -f "$LIVEDOC" ]; then
   # ...and the ADOPTING project may declare nothing the table does not carry. One direction only,
   # because an optional key it never sets is not a fault.
   if [ -f "$ROOT/.unattended.conf" ]; then
-    proj_extra=$(comm -23 <(grep -oE '^[A-Z_]+=' "$ROOT/.unattended.conf" | tr -d '=' | sort -u) <(printf '%s\n' "$doc_keys") | tr '\n' ' ')
+    proj_extra=$(comm -23 <(grep -oE '^[A-Z_]+=' "$ROOT/.unattended.conf" | tr -d '=' | drop_retired_keys | sort -u) <(printf '%s\n' "$doc_keys") | tr '\n' ' ')
+    for _rk in $RETIRED_CONF_KEYS; do
+      grep -q "^$_rk=" "$ROOT/.unattended.conf" \
+        && report "check 22 - $_rk is RETIRED (TOOL-aWindowedPass-5): this leg ignores it, and the line may be deleted from .unattended.conf"
+    done
   else
     proj_extra=""
   fi
@@ -3605,10 +3605,8 @@ done
 # ---- NOTHING: `brief-recorded` grades CLOSED units only, at the BUILD commit and not the pass
 # ---- commit, reads the LAST row per unit where this check takes the union, and proves only that the
 # ---- row's hash still names the blob at that path. Nothing asserts the path was a brief.
-# THE RATCHET'S THREE ACCUMULATORS (TOOL-cMendedVintage-14), declared where `set -u` can see them
-# before the loop that fills them. `ds_graded` is the LIVENESS half and counts rows that REACHED
-# the subset test, not rows that failed it: a hit count of zero is a clean tree, a GRADED count of
-# zero under a non-zero ceiling is a probe that died.
+# THE COUNTS ARE PER RUN since TOOL-aWindowedPass-5 retired the repo-global ceiling: each run's are
+# reset at the top of its loop, so only the exclusion notice's once-flag is declared here.
 # ---- ABSORB (TOOL-dDerivedDocket-24 S9, owner ruling D12-i5). A run may FIX a red it inherited,
 # ---- beyond its declared write set, in a commit of its own whose subject is exactly
 # ---- `absorb(<slug>): <leg> inherited at <R8>` and names NO unit id. Such a commit is classified
@@ -3643,11 +3641,14 @@ check_generated_render() { # commit · path -> 0, printing what generated it, wh
   [ "$(printf '%s\n' "$_ga" | awk "$GEN_REGION_AWK")" = "$(printf '%s\n' "$_gb" | awk "$GEN_REGION_AWK")" ] || return 1
   printf 'a change inside its gen regions only'
 }
-ds_over=""; ds_over_n=0; ds_graded=0; ds_unavail=0
+ds_unavail=0
+# THE RUN THIS TREE DRIVES (TOOL-aWindowedPass-5): the record whose run branch is the branch checked
+# out here. A detached HEAD binds none. Read once; every record below is compared against it.
+DS_HEAD_REF=$(GIT symbolic-ref -q HEAD 2>/dev/null || true)
 for f in $RUNS; do
   [ -f "$f" ] || continue
   case "$f" in *"/RUN.md") ;; *) continue ;; esac
-  dsslug=${f%/RUN.md}; dsslug=${dsslug##*/}; ds_absorbed=""; ds_win=""; ds_pend=""; ds_run_graded=0
+  dsslug=${f%/RUN.md}; dsslug=${dsslug##*/}; ds_absorbed=""; ds_win=""; ds_pend=""; ds_run_graded=0; ds_over=""; ds_over_n=0
   ph=$(fact_of "$f" phase); case "$ph" in LANDED|ABORTED) continue ;; esac
   # ONE ROW PER (anchor, unit), AND ITS PATHS ARE THE UNION OF EVERY ROW UNDER THAT KEY. The key
   # already carries the anchor, so rows at DIFFERENT anchors stay separate — they are different passes
@@ -3793,7 +3794,7 @@ DSSIBS
     dsnl=$'\n'; dsbrief="$dsnl$(read_brief_paths "$dshit" "$dsunit" "$f")$dsnl"
     # THE SUBSET TEST. Declaring MORE than you use is conservative and fine; writing outside the
     # declaration is the defect.
-    ds_graded=$((ds_graded + 1)); ds_run_graded=$((ds_run_graded + 1))
+    ds_run_graded=$((ds_run_graded + 1))
     dsout=""
     for dsq in $(GIT diff-tree --no-commit-id --name-only -r "$dshit" 2>/dev/null | grep -v -x -F "$f"); do
       # EXACT membership, deliberately not `covers`: that is a containment test, and a row naming a
@@ -3886,56 +3887,20 @@ DSPEND
   # S3: a run where every pass was solo says so, rather than reading as coverage.
   ds_run_line="check 23 $f — graded $ds_run_graded pass(es), $ds_run_over overlapped a sibling"
   if [ "$ds_run_solo" = 1 ]; then printf 'unattended: %s\n' "$ds_run_line"; else report "$ds_run_line"; fi
-done
-
-# ---- 23's RATCHET (TOOL-cMendedVintage-14). The subset test above used to print one line per
-# ---- offending pass and leave the exit status alone, which is a REPORT wearing a gate's number. The
-# ---- declaration was therefore enforced in one direction only: declaring too much wedges the run,
-# ---- declaring too little was a line nobody had to read. It was reported honestly by a builder and
-# ---- no verb, hook or gate raised it.
-# ----
-# ---- SHRINK-ONLY RATHER THAN A PLAIN REFUSAL, and the reason is the tree rather than taste. The
-# ---- instances live in landed history, which is append-only, so a refusal reds builds nobody is
-# ---- going to re-declare. The count may FALL and never RISE. The pin is declared in
-# ---- `.unattended.conf` beside this kit's other shrink-only pins, and undeclared or malformed is a
-# ---- refusal there for their reason too: a pin that quietly defaults is a pin nobody set. An
-# ---- adopter's ceiling is 0 and its whole ratchet is the first sentence of this paragraph.
-# ----
-# ---- WHAT THIS DOES NOT CHECK, because a gate's own header owes its gaps:
-# ----   - A FALL IS NOT A FAILURE HERE, where the carried-prefix ratchet this repo already runs reds
-# ----     on one and tells you to re-stamp. That population is a file listing; THIS one is derived
-# ----     from history REACHABILITY, and a clone that cannot resolve a group anchor legitimately
-# ----     grades fewer rows and takes the skip branches above. Redding on a fall would be a false red
-# ----     on that clone rather than a finding. The fall is announced on the report channel instead
-# ----     and the pin is lowered by hand, which means a ceiling nobody lowers stays slack.
-# ----   - A SWAP IS INVISIBLE. One instance repaired and one introduced holds the count, and only the
-# ----     per-instance report lines show it. The pin is a count, not a row set.
-# ----   - NOTHING HERE MAKES THE DECLARATION HONEST. The limitation this check's own header states is
-# ----     unchanged: both artifacts are the run's, so a run may still declare the wider set up front.
-# ----   - THE OTHER TWO check-23 FINDINGS ARE STILL BARE PRINTS. The dodged-join and ambiguous-
-# ----     attribution branches keep the shape this ruling took off the subset test, deliberately:
-# ----     the ruling named this message and this one only.
-if [ -z "$UNDECLARED_WRITE_CEILING" ]; then
-  fail 23 "UNDECLARED_WRITE_CEILING is undeclared in .unattended.conf, and with no ceiling a pass that wrote outside its declared set is reported and never graded - which is the state this ratchet exists to end"
-elif ! printf '%s' "$UNDECLARED_WRITE_CEILING" | grep -qE '^[0-9]+$'; then
-  fail 23 "UNDECLARED_WRITE_CEILING is not a single integer, so the shrink-only comparison below would be a string test wearing a numeric name: $UNDECLARED_WRITE_CEILING"
-elif [ "$UNDECLARED_WRITE_CEILING" -gt 0 ] && [ "$ds_graded" = 0 ]; then
-  fail 23 "the declared ceiling on undeclared writes is above zero while NO dispatched pass was graded at all, so the comparison below would report a reassuring zero for a probe that died rather than for a tree that is clean: $UNDECLARED_WRITE_CEILING against a graded population of $ds_graded"
-elif [ "$ds_over_n" -gt "$UNDECLARED_WRITE_CEILING" ]; then
-  fail 23 "more dispatched passes committed outside the set they declared before dispatch than the shrink-only ceiling admits, and that declaration is the disjointness proof two concurrent passes rest on: $ds_over_n against $UNDECLARED_WRITE_CEILING$ds_over"
-elif [ "$ds_over_n" -lt "$UNDECLARED_WRITE_CEILING" ]; then
-  report "check 23 - the undeclared-write count sits BELOW its ceiling, $ds_over_n against $UNDECLARED_WRITE_CEILING. Lower the pin in .unattended.conf and say in the commit message what closed; a ceiling nobody lowers stops being a ratchet"
-fi
-if [ "$EMIT_CEILING" = 1 ]; then
-  trap - EXIT
-  if [ "$ds_graded" = 0 ]; then
-    echo "check-unattended: --emit-ceiling graded NO dispatched pass in this tree, so a count here would be a 0 from a probe that saw nothing; the gate accepts 0 over an empty population, so declare that by hand if this tree has never dispatched" >&2
-    exit 1
+  # ---- EACH RUN AGAINST ZERO, ON ITS OWN (TOOL-aWindowedPass-5). A repo-global shrink-only ceiling let
+  # ---- one run's committed, unrepairable history hold or abort another run's landing. Only the run
+  # ---- this tree drives can fail here, and its close is where that binds; any other live run's
+  # ---- counted writes are printed, because they changed the verdict a ceiling once gave.
+  # ---- WHAT THIS DOES NOT CHECK: a run nobody drives from a checkout is never failed by this check,
+  # ---- on the bar or anywhere else, until a tree on its branch runs the leg.
+  [ "$ds_over_n" -gt 0 ] || continue
+  dsrb=$(fact_of "$f" run-branch); [ -n "$dsrb" ] || dsrb=$(fact_of "$f" branch-ref)
+  if [ -n "$DS_HEAD_REF" ] && [ "$dsrb" = "$DS_HEAD_REF" ]; then
+    fail 23 "a pass of the run this branch drives committed outside the set it declared before dispatch while its window overlapped a sibling pass, and that declaration is the disjointness proof two concurrent passes rest on: $ds_over_n in $f$ds_over"
+  else
+    printf 'unattended: check 23 OTHER RUN %s: %s counted, graded at its own close - this tree drives %s\n' "$f" "$ds_over_n" "${DS_HEAD_REF:-a detached HEAD, which binds no run}"
   fi
-  echo "check-unattended: --emit-ceiling graded $ds_graded dispatched passes and found $ds_over_n that wrote outside their declaration:${ds_over:- none}" >&2
-  printf 'UNDECLARED_WRITE_CEILING="%s"\n' "$ds_over_n" >&3
-  exit 0
-fi
+done
 
 # ---- 21 (TOOL-aBoundedVerdict-11 S5): every tracked build README carries EXACTLY ONE well-formed
 # ---- `gen:build-units` pair. The driver reads its unit list from that region for four questions -
