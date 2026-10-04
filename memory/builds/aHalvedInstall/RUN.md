@@ -21,20 +21,20 @@ gates-run: unattended-179096159559588315679-1697 8cdcc9ea
 parked-surfaced: yes, 0 surfaced
 keepalive-reaped: yes
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: cdd5f518279ccf71aed180073120c31b8c0cb74f
-phase: HELD
+witness: a62384803ad2355b03addf16f73ae2f4b6b86ce4
+phase: VERIFYING
 branch-sha: cd90f7fa5c8cddf152e3a2a065f5df7ad64f355b
 branch-ref: refs/heads/branch/kit-bugs-keys-renderer-conflict-eddde0
 may: none
 mode: prompt
 run-branch: refs/heads/branch/kit-bugs-keys-renderer-conflict-eddde0
 anchor-kind: run-branch
-lease-utc: 2026-10-02T12:51:47Z
+lease-utc: 2026-10-04T10:37:35Z
 pid-image: claude.exe
 host: compeeto-agent
 pid: 19276
 session: 81a68c77-3260-4c90-95a0-32da7860d03f
-keepalive: 9f6995e9
+keepalive: e3bc6814
 anchor-url: https://github.com/d41ly/coding-governance.git
 anchor-sha: a587e82dc6180a9a720560e1633995e47734803a
 anchor-ref: refs/heads/main
@@ -73,3 +73,5 @@ base: cd90f7fa5c8cddf152e3a2a065f5df7ad64f355b
 2026-10-02T17:54:26Z decision · item Accept the brief-recorded waiver row for DEPL-aHalvedInstall-5? · reason Unit 5 was added by --rescope after the closing review and built inline at 1137a5af without a --brief row. History is append-only, so the run wrote a reconstructed brief (prompts/...-5-1-reconstructed-build-brief.md) and a waiver row in memory/project/brief-recorded-waiver.txt, on the precedent of TOOL-aRepatriatedFork-44. Options: keep the row, or delete it and accept the leg red. Refused to decide alone because the waiver registry is a standing exception the owner grants.
 
 2026-10-02T17:55:21Z hold · item host-owner-action · reason until owner · reaped 9f6995e9 · resume none(owner)
+
+2026-10-04T10:37:36Z resume · item aHalvedInstall · reason held · keepalive e3bc6814 · manual
