@@ -36,7 +36,10 @@ kind = "authoring"
 blocks_adopt = false
 blocks_gate = false
 why = "nothing in a target observes the placeholders — no leg reads the deployed charter. The probe names the ONE file this entry ships, at {playbook_path}. History, kept because it is the reason this hole is armed at all rather than a reason to widen it back: when the charter deployed as two files, a probe naming only the main one was MEASURED going false-green while the companion sat unfilled. The second file is gone as of v3.0; a probe that names it again would be checking a path no target has."
-discharge = { command = ["bash", "-c", "! grep -qE '\\{\\{[A-Z]' \"$1\"", "--", "{playbook_path}"] }
+# PRESENCE FIRST (DEPL-aHalvedInstall-2). The bare `! grep` exited 0 with no charter on disk at all,
+# because grep exits 2 on a missing file and `!` turns that into a pass; selfcheck 6b now runs every
+# probe in an empty directory and refuses one that passes there.
+discharge = { command = ["bash", "-c", "test -f \"$1\" && ! grep -qE '\\{\\{[A-Z]' \"$1\"", "--", "{playbook_path}"] }
 # In RENDER mode `{playbook_path}` is the TEMPLATE, which always carries placeholders, so this probe
 # reds forever there (measured at both adopters, 2026-09-23). The render's own `--check` reports a
 # surviving placeholder, so the hole stands down when `playbook-render` is selected. In COPY mode it

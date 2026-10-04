@@ -5702,6 +5702,60 @@ out=$(run --review tRun --subject B2 --verdict BLOCKED --blockers 3 --dispositio
 hit "$out" "--review exits BOUNDED with 3 blocker(s) standing, and the severity rule promotes every blocker, so fold cannot be this exit's disposition"
 same "a refused fold at a bounded exit wrote nothing" "$(grep -c 'review · item B2 · reason' memory/builds/tRun/RUN.md)" "0"
 reset_tree
+
+# ---- TOOL-aBatchedMinors-2: THE CLOSING REVIEW PROMOTES EVERY FINDING, and its exit COUNTS them. The
+# ---- owner ruled on 2026-10-04 that a closing diff review's mediums and lows are promoted too,
+# ---- batched into one unit or two, so the slug subject's terminal round records the highs and
+# ---- minors that stood and check 2 can demand a unit for each. Against the base driver every refusal
+# ---- below is absent: the flags were unknown, and a converged closing round recorded with nothing.
+# ---- The fixture carries its own converged closing round for tRun, for the close arms; each block
+# ---- below drops it first, or every round here meets "already carries a terminal review round".
+bcopen; sed -i '/review · item tRun · /d' memory/builds/tRun/RUN.md
+hit "$(run --review tRun --subject tRun --verdict CLEAN --blockers 0 --highs x --minors 0)" "--review requires --highs as a plain integer, the count of CONFIRMED HIGH findings standing at the closing review's exit"
+hit "$(run --review tRun --subject tRun --verdict CLEAN --blockers 0 --highs 0 --minors -1)" "--review requires --minors as a plain integer, the count of CONFIRMED MEDIUM and LOW findings standing at the closing review's exit"
+# ...a spec subject takes no count: its mediums and lows are folded into the spec under review
+hit "$(run --review tRun --subject S9 --verdict BLOCKED --blockers 0 --minors 2)" "--highs and --minors are the closing diff review's counts, and this subject is not the build slug: a spec audit's mediums and lows are FOLDED into the spec under review, so a count here would be read by the gate as owing units nobody owes"
+same "a refused spec-subject count wrote no row (closing review round 1, L6)" "$(grep -c 'review · item S9 · reason' memory/builds/tRun/RUN.md)" "0"
+# ...one integer for two readers (round 1, L1): bash reads a leading zero as octal, so `08` used to
+# abort the driver and `010` computed 8 while check 2 read 10; a ten-digit value wraps nothing now
+hit "$(run --review tRun --subject tRun --verdict CLEAN --blockers 0 --highs 08 --minors 0)" "--review requires --highs as a decimal of at most nine digits with no leading zero, because bash arithmetic reads a leading zero as octal and check 2 reads the row as decimal"
+hit "$(run --review tRun --subject tRun --verdict CLEAN --blockers 0 --highs 0 --minors 010)" "--review requires --minors as a decimal of at most nine digits with no leading zero"
+hit "$(run --review tRun --subject tRun --verdict CLEAN --blockers 1234567890 --highs 0 --minors 0)" "--review requires --blockers as a decimal of at most nine digits with no leading zero"
+# ...the closing exit must count, must promote what stood, never folds, and never promotes nothing
+hit "$(run --review tRun --subject tRun --verdict "CLEAN WITH FIXES" --blockers 0)" "--review exits CONVERGED on the closing diff review and requires --highs and --minors, the CONFIRMED HIGH and MEDIUM-plus-LOW findings standing at the exit, because every one of them is promoted and a row that does not count them cannot be graded"
+# ...EITHER count missing is the refusal, not only both (round 1, M2): a guard regressed to an AND
+# would write `minors  · disposition promote`, a row check 2 cannot read a floor from
+hit "$(run --review tRun --subject tRun --verdict "CLEAN WITH FIXES" --blockers 0 --highs 1 --disposition promote)" "--review exits CONVERGED on the closing diff review and requires --highs and --minors"
+hit "$(run --review tRun --subject tRun --verdict "CLEAN WITH FIXES" --blockers 0 --minors 1 --disposition promote)" "--review exits CONVERGED on the closing diff review and requires --highs and --minors"
+hit "$(run --review tRun --subject tRun --verdict "CLEAN WITH FIXES" --blockers 0 --highs 0 --minors 3)" "--review exits CONVERGED on the closing diff review with 0 blocker(s), 0 high(s) and 3 minor(s) standing, and requires --disposition promote, because every confirmed finding there is promoted"
+hit "$(run --review tRun --subject tRun --verdict "CLEAN WITH FIXES" --blockers 0 --highs 0 --minors 3 --disposition fold)" "--review exits CONVERGED on the closing diff review, which folds nothing: every confirmed finding is promoted, the MEDIUMs and LOWs batched into one unit or two"
+hit "$(run --review tRun --subject tRun --verdict CLEAN --blockers 0 --highs 0 --minors 0 --disposition promote)" "--review exits CONVERGED on the closing diff review with nothing standing, so --disposition promote promotes nothing"
+same "a refused closing round wrote nothing" "$(grep -c 'review · item tRun · reason' memory/builds/tRun/RUN.md)" "0"
+out=$(run --review tRun --subject tRun --verdict "CLEAN WITH FIXES" --blockers 0 --highs 1 --minors 4 --disposition promote)
+hit "$out" "CONVERGED · highs 1 · minors 4 · disposition promote"
+hit "$out" "this exit owes at least 2 new unit(s)"
+hit "$out" "the MEDIUMs and LOWs batched into one unit, two only across disjoint write sets"
+same "the counts sit before the disposition, the field check 2 reads last" "$(grep -c 'review · item tRun · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 1 · minors 4 · disposition promote$' memory/builds/tRun/RUN.md)" "1"
+reset_tree
+# ...a count on a non-terminal closing round is a claim about an exit that has not happened, and a
+# NON-CONVERGENT closing exit owes its blockers too: 2 + 1 + 0 = 3.
+bcopen; sed -i '/review · item tRun · /d' memory/builds/tRun/RUN.md
+hit "$(run --review tRun --subject tRun --verdict BLOCKED --blockers 2 --highs 0 --minors 0)" "--review names --highs or --minors on a closing round that is not a terminal exit, and a count of what stands at the exit is a claim about an exit that has not happened yet: state"
+run --review tRun --subject tRun --verdict BLOCKED --blockers 2 >/dev/null
+# ...the state gate's fold refusal names the closing rule there, not "legal at CONVERGED" (round 1, L3)
+out=$(run --review tRun --subject tRun --verdict BLOCKED --blockers 2 --highs 1 --minors 0 --disposition fold)
+hit "$out" "--review exits NON-CONVERGENT on the closing diff review, which folds nothing: every confirmed finding is promoted, the MEDIUMs and LOWs batched into one unit or two"
+miss "$out" "fold is legal only at CONVERGED"
+out=$(run --review tRun --subject tRun --verdict BLOCKED --blockers 2 --highs 1 --minors 0 --disposition promote)
+hit "$out" "NON-CONVERGENT · highs 1 · minors 0 · disposition promote"
+hit "$out" "this exit owes at least 3 new unit(s)"
+reset_tree
+# ...and a closing exit standing on nothing records its zeros and no disposition.
+bcopen; sed -i '/review · item tRun · /d' memory/builds/tRun/RUN.md
+out=$(run --review tRun --subject tRun --verdict CLEAN --blockers 0 --highs 0 --minors 0)
+hit "$out" "CONVERGED · highs 0 · minors 0 — the loop is done for this subject"
+same "a zero-standing closing exit records no disposition" "$(grep -c 'review · item tRun · reason verdict CLEAN · blockers 0 · CONVERGED · highs 0 · minors 0$' memory/builds/tRun/RUN.md)" "1"
+reset_tree
 # ---- The arms below are REGION TWO's, and they sit before its closing `fi`. Both sides of this
 # ---- merge edited this seam: main sharded the suite into two regions with mode-selected floors,
 # ---- while this branch appended new `--rescope` and `--dispatch` arms to the end of the file.
@@ -5738,6 +5792,202 @@ hit "$out" "--dispatch declares a path a sibling pass in the same group already 
 # ...and a genuinely disjoint sibling is ACCEPTED.
 out=$(run --dispatch tRun --pass ARCH-tRun-2 --writes ${PFX}z.sh)
 hit "$out" "dispatch declared"
+
+# ---- read_conf_value AGREES WITH THE KITS THAT OWN THE CONFS (closing review r2, M6, L3, L5). It reads
+# ---- `MAP_ROOT` for the codebase map and a `when` key such as `BACKLOG_MODE` for memory-tree, without
+# ---- sourcing either conf, so one spelling table is fed to it and to each owner's own parser. Absent
+# ---- and blank are compared as the consumer sees them: an absent `MAP_ROOT` is the kit default, and
+# ---- `BACKLOG_MODE` matters only as equal to `builds` or not.
+_rcv_root=$(git -C "$HERE" rev-parse --show-toplevel)
+_rcv_cm="$_rcv_root/$(resolve_kit_dir "$_rkd_py" codebase-map map_lib.py "$HERE")"
+_rcv_mt="$_rcv_root/$MT_KIT_DIR"
+_rcv_d=$(mktemp -d)
+_rcv_n=0
+for _rcv_f in 'K=v' 'K="v"' "K='v'" 'export K=v' 'K=v # c' 'K="v" # c' 'K=' 'K=""' '  K=v' 'K=v\r' '# K=v' 'K= v' 'K=v\nK=w'; do
+  # MAP_ROOT against map_lib.load_conf, the absent case resolving to the kit default on both sides
+  printf "${_rcv_f//K/MAP_ROOT}\n" | sed 's/\bv\b/docs\/map/; s/\bw\b/docs\/other/' > "$_rcv_d/.codebase-map.conf"
+  _rcv_sh=$(read_conf_value "$_rcv_d/.codebase-map.conf" MAP_ROOT) || _rcv_sh=memory/map
+  _rcv_py=$("$_rkd_py" -c "import sys, pathlib; sys.path.insert(0, sys.argv[1]); import map_lib; print(map_lib.load_conf(pathlib.Path(sys.argv[2]))['MAP_ROOT'])" "$_rcv_cm" "$_rcv_d" 2>&1 | tr -d '\r')
+  same "read_conf_value reads MAP_ROOT as map_lib does: $_rcv_f" "$_rcv_sh" "$_rcv_py"
+  # BACKLOG_MODE against tree_lib.parse_conf, compared as the `when` test reads it: equal to builds or not
+  printf "${_rcv_f//K/BACKLOG_MODE}\n" | sed 's/\bv\b/builds/; s/\bw\b/shards/' > "$_rcv_d/.memory-tree.conf"
+  _rcv_sh=$(read_conf_value "$_rcv_d/.memory-tree.conf" BACKLOG_MODE) || _rcv_sh=""
+  _rcv_py=$("$_rkd_py" -c "import sys, pathlib; sys.path.insert(0, sys.argv[1]); import tree_lib; print(tree_lib.parse_conf(pathlib.Path(sys.argv[2]).read_text(encoding='utf-8'), {}).get('BACKLOG_MODE', ''))" "$_rcv_mt" "$_rcv_d/.memory-tree.conf" 2>&1 | tr -d '\r')
+  same "read_conf_value reads BACKLOG_MODE=builds as tree_lib does: $_rcv_f" "$([ "$_rcv_sh" = builds ] && echo y || echo n)" "$([ "$_rcv_py" = builds ] && echo y || echo n)"
+  _rcv_n=$((_rcv_n + 1))
+done
+same "the read_conf_value parity table graded every spelling" "$_rcv_n" "13"
+# L5: a BLANK MAP_ROOT is kept, so `{map_root}/generated` resolves to `generated`, as map_lib writes it
+printf 'MAP_ROOT=""\n' > "$_rcv_d/.codebase-map.conf"
+same "read_conf_value keeps a blank MAP_ROOT rather than defaulting it" "$(read_conf_value "$_rcv_d/.codebase-map.conf" MAP_ROOT; echo "rc=$?")" "
+rc=0"
+rm -rf "$_rcv_d"
+
+# ---- --check-commit (TOOL-aWindowedPass-3): check 23 asked at COMMIT time, while the declaration can
+# ---- still be widened. The fixture run is bound to this worktree's branch by preflight's run-branch.
+build_specced_tree
+printf '\nGENERATED_INDEXES="memory/LIVE.md:gen.py"\n' >> .unattended.conf
+fixture   # COMMITTED, or preflight refuses the dirty tree and writes no run-branch to bind
+run --preflight tRun --keepalive-id k1 >/dev/null
+run --dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}a.sh >/dev/null
+git add -A >/dev/null && git commit -q -m "records: declare ARCH-tRun-1" --no-verify
+CCM=$(mktemp)
+[ -z "$PFX" ] || mkdir -p "$PFX"
+# AC2: the trailer names the pass and a staged path lies outside its declaration
+printf 'a\n' > ${PFX}a.sh; printf 'b\n' > ${PFX}stray.sh; git add -A >/dev/null
+printf 'ARCH-tRun-1 builds its lane\n\nPass: ARCH-tRun-1\n' > "$CCM"
+out=$(run --check-commit "$CCM"); rc=$?
+same "--check-commit refuses an undeclared staged path, exit code" "$rc" "1"
+hit  "$out" "pass ARCH-tRun-1 stages paths outside the set it declared before dispatch, and the declaration can still be widened because the pass has not committed: ${PFX}stray.sh"
+hit  "$out" "--dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}a.sh --writes ${PFX}stray.sh"
+# AC3: the run-state file and a declared generated output are not the pass's writes
+git rm -q --cached ${PFX}stray.sh; rm -f ${PFX}stray.sh
+# a REAL run-state line: a bare trailing newline is already forgiven by the gen-region compare, so it
+# could not show the run-state subtraction doing anything (closing review r1, M10)
+printf 'live\n' >> memory/LIVE.md; printf 'note: staged by the run\n' >> memory/builds/tRun/RUN.md; git add -A >/dev/null
+out=$(run --check-commit "$CCM"); rc=$?
+same "--check-commit subtracts the run-state file and a generated output, exit code" "$rc" "0"
+miss "$out" "FAILED"
+# AC4: a subject naming the open pass with no trailer is refused; Pass: none passes
+printf 'ARCH-tRun-1 builds its lane\n' > "$CCM"
+out=$(run --check-commit "$CCM"); rc=$?
+same "--check-commit refuses a pass subject with no trailer, exit code" "$rc" "1"
+hit  "$out" "end the message with 'Pass: ARCH-tRun-1' when it is the pass, or 'Pass: none' when it is not"
+hit  "$out" ", and the message carries no Pass: trailer, so check 23 would take it for that pass's commit; end the message with 'Pass"
+# a trailer naming a unit with no open dispatched pass names nothing it may write
+printf 'ARCH-tRun-2 builds its lane\n\nPass: ARCH-tRun-2\n' > "$CCM"
+out=$(run --check-commit "$CCM"); rc=$?
+same "--check-commit refuses a trailer naming an undispatched unit, exit code" "$rc" "1"
+hit  "$out" ", so nothing declared what this commit may write; declare it first: bash"
+# ...and a message file that is not there is refused before anything is read
+out=$(run --check-commit "$CCM.absent"); rc=$?
+same "--check-commit refuses a missing message file, exit code" "$rc" "1"
+hit  "$out" "--check-commit was given no readable commit message file"
+printf 'records: ARCH-tRun-1 brief\n\nPass: none\n' > "$CCM"
+out=$(run --check-commit "$CCM"); rc=$?
+same "--check-commit lets Pass: none through, exit code" "$rc" "0"
+# AC1: a branch no run names is no question at all: exit 0, nothing printed
+git checkout -q -b cc-unbound
+printf 'ARCH-tRun-1 builds its lane\n' > "$CCM"
+out=$(run --check-commit "$CCM"); rc=$?
+same "--check-commit with no run bound, exit code" "$rc" "0"
+same "--check-commit with no run bound prints nothing" "$out" ""
+git checkout -q unit; git branch -q -D cc-unbound
+rm -f "$CCM"
+
+# ---- --check-commit, closing review r1: the shapes round 1 found graded differently at commit time
+# ---- and at the close, and the subtractions and the hook that had no arm. One setup per arm group:
+# ---- a bound run, ARCH-tRun-1 dispatched open on `a.sh`, and three committed files the arms move.
+build_check_commit_fixture() {
+  build_specced_tree
+  printf '\nGENERATED_INDEXES="memory/LIVE.md:gen.py"\n' >> .unattended.conf
+  [ -z "$PFX" ] || mkdir -p "$PFX"
+  printf 'o\n' > ${PFX}old.sh
+  printf '# r\n\nprose\n\n<!-- gen:units -->\nold\n<!-- /gen:units -->\n' > memory/README.md
+  fixture
+  run --preflight tRun --keepalive-id k1 >/dev/null
+  run --dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}a.sh >/dev/null
+  git add -A >/dev/null && git commit -q -m "records: declare ARCH-tRun-1" --no-verify
+}
+CCM=$(mktemp)
+build_check_commit_fixture
+# M1: a staged rename out of an undeclared path is graded by BOTH halves, as check 23 grades it
+git mv ${PFX}old.sh ${PFX}a.sh
+printf 'ARCH-tRun-1 builds its lane\n\nPass: ARCH-tRun-1\n' > "$CCM"
+out=$(run --check-commit "$CCM"); rc=$?
+same "--check-commit grades the source of a staged rename, exit code" "$rc" "1"
+hit  "$out" "${PFX}old.sh"
+git reset -q --hard
+# M2: a lower-case trailer key is still the trailer, so the stray write is graded
+printf 'b\n' > ${PFX}stray.sh; git add -A >/dev/null
+printf 'ARCH-tRun-1 builds its lane\n\npass: ARCH-tRun-1\n' > "$CCM"
+out=$(run --check-commit "$CCM"); rc=$?
+same "--check-commit reads a lower-case Pass key, exit code" "$rc" "1"
+hit  "$out" "pass ARCH-tRun-1 stages paths outside the set it declared before dispatch"
+# ...and a subject wrapped onto a second line still names the open pass
+printf 'lane work, continued\nfor ARCH-tRun-1 here\n' > "$CCM"
+out=$(run --check-commit "$CCM"); rc=$?
+same "--check-commit reads a wrapped subject as the close does, exit code" "$rc" "1"
+hit  "$out" "end the message with 'Pass: ARCH-tRun-1' when it is the pass"
+# L2: a `none` beside an id attributes the commit to nothing, as pass_commit now reads it
+printf 'records\n\nPass: none\nPass: ARCH-tRun-1\n' > "$CCM"
+out=$(run --check-commit "$CCM"); rc=$?
+same "--check-commit takes Pass: none beside an id as none, exit code" "$rc" "0"
+git reset -q --hard; rm -f ${PFX}stray.sh
+# closing review r2, M4: a non-ASCII staged path is named as written, never C-quoted
+printf 'n\n' > "${PFX}café.sh"; git add -A >/dev/null
+printf 'ARCH-tRun-1 builds its lane\n\nPass: ARCH-tRun-1\n' > "$CCM"
+out=$(run --check-commit "$CCM"); rc=$?
+same "--check-commit names a non-ASCII stray path, exit code" "$rc" "1"
+hit  "$out" "${PFX}café.sh"
+miss "$out" "\"${PFX}caf"   # git's C-quoted form; the %q of the printed command is a separate, valid spelling
+git reset -q --hard; rm -f "${PFX}café.sh"
+# closing review r2, L2: the printed repair quotes a path holding a shell metacharacter
+printf 'b\n' > "${PFX}stray(1).sh"; git add -A >/dev/null
+out=$(run --check-commit "$CCM"); rc=$?
+hit  "$out" "--writes ${PFX}stray\\(1\\).sh"
+git reset -q --hard; rm -f "${PFX}stray(1).sh"
+# closing review r2, M5: a CRLF message whose BODY names the open pass and whose subject does not
+printf 'lane work\r\n\r\nmentions ARCH-tRun-1 in the body\r\n' > "$CCM"
+out=$(run --check-commit "$CCM"); rc=$?
+same "--check-commit reads a CRLF message's subject paragraph alone, exit code" "$rc" "0"
+# L4 + M10: the brief rows, a gen-region-only change and a REAL run-state line are all subtracted
+BRIEFP=memory/builds/tRun/prompts/2026-08-21-prompt-ARCH-tRun-1-1-build-brief.md
+mkdir -p memory/builds/tRun/prompts && printf '# brief\n' > "$BRIEFP"
+printf '2026-08-21T00:00:01Z brief · item ARCH-tRun-1 · reason %s %s\n' \
+  "$(git hash-object "$BRIEFP" | cut -c1-12)" "$BRIEFP" >> memory/builds/tRun/RUN.md
+sed -i 's/^old$/new/' memory/README.md
+printf 'a\n' > ${PFX}a.sh; git add -A >/dev/null
+printf 'ARCH-tRun-1 builds its lane\n\nPass: ARCH-tRun-1\n' > "$CCM"
+out=$(run --check-commit "$CCM"); rc=$?
+same "--check-commit subtracts a brief, a gen-region change and a run-state line, exit code" "$rc" "0"
+# ...and the authored-line control: the same README edited outside its gen region is the pass's write
+sed -i 's/^prose$/edited prose/' memory/README.md; git add -A >/dev/null
+out=$(run --check-commit "$CCM"); rc=$?
+same "--check-commit counts an authored README line, exit code" "$rc" "1"
+hit  "$out" "memory/README.md"
+git reset -q --hard
+# M4: amending the pass commit with its trailer is not refused as a closed pass
+printf 'a\n' > ${PFX}a.sh; git add -A >/dev/null
+git commit -q -m "ARCH-tRun-1 builds its lane" -m "Pass: ARCH-tRun-1" --no-verify
+out=$(run --check-commit "$CCM"); rc=$?
+same "--check-commit lets the pass commit be amended, exit code" "$rc" "0"
+# TOOL-aWindowedPass-6 AC2: a records commit after the pass, naming it with no trailer, owes none
+printf 'records for ARCH-tRun-1\n' > "$CCM"
+out=$(run --check-commit "$CCM"); rc=$?
+same "--check-commit asks no trailer of a records commit after the pass, exit code" "$rc" "0"
+# TOOL-aWindowedPass-6 AC1: an amend staging an undeclared path is refused as a COMMITTED pass, with
+# no --dispatch widening: that widening would anchor at the commit the amend replaces
+printf 'b\n' > ${PFX}stray.sh; git add -A >/dev/null
+printf 'ARCH-tRun-1 builds its lane\n\nPass: ARCH-tRun-1\n' > "$CCM"
+out=$(run --check-commit "$CCM"); rc=$?
+same "--check-commit refuses an amend that widens a committed pass, exit code" "$rc" "1"
+hit  "$out" ". An amend cannot widen a committed pass: unstage those paths, or commit them as a new commit after a fresh --dispatch for them"
+miss "$out" "--dispatch tRun"
+git reset -q --hard; rm -f ${PFX}stray.sh
+# M5: THE HOOK, run as git runs it - before its merge-only exit, blocking on 1 alone
+build_check_commit_fixture
+REAL_ROOT=${HERE%/"$KIT_REL"}
+printf 'b\n' > ${PFX}stray.sh; git add -A >/dev/null
+printf 'ARCH-tRun-1 builds its lane\n\nPass: ARCH-tRun-1\n' > "$CCM"
+# the hook finds the kit inside the tree it runs in; the fixture runs the real driver from outside it
+_cckit=""; [ -e "./$KIT_REL/unattended.sh" ] || { mkdir -p "./$KIT_REL" && cp "$HERE"/*.sh "./$KIT_REL/"; _cckit=1; }
+out=$(bash "$REAL_ROOT/.githooks/commit-msg" "$CCM" 2>&1); rc=$?
+same "the commit-msg hook blocks an undeclared staged path with no MERGE_HEAD, exit code" "$rc" "1"
+hit  "$out" "pass ARCH-tRun-1 stages paths outside the set it declared before dispatch"
+git checkout -q -b cc-hook-unbound
+out=$(bash "$REAL_ROOT/.githooks/commit-msg" "$CCM" 2>&1); rc=$?
+same "the commit-msg hook lets a commit through when no run is bound, exit code" "$rc" "0"
+git checkout -q unit; git branch -q -D cc-hook-unbound
+# closing review r2, L4: a conf with no kit beside it is announced, and the commit goes through
+[ -z "$_cckit" ] || rm -rf "./$KIT_REL"
+if [ -n "$_cckit" ]; then
+  out=$(bash "$REAL_ROOT/.githooks/commit-msg" "$CCM" 2>&1); rc=$?
+  same "the commit-msg hook lets a commit through when the kit is absent, exit code" "$rc" "0"
+  hit  "$out" "the commit-time check did NOT run"
+fi
+git reset -q --hard
+rm -f "$CCM"
 
 # ---- CONDITION 3, FLAT HALF: the records the method names outright, plus the derived run-state file.
 build_specced_tree; run --preflight tRun --keepalive-id k1 >/dev/null
@@ -9653,7 +9903,7 @@ printf '**Serves:** diff-review ARCH-tRun-1
 
 # closing diff review of %s
 ' "$ip_f"   > "$ip_dir/memory/builds/tRun/reviews/2026-08-01-review-ARCH-tRun-1-diff.md"
-iprun --review tRun --subject tRun --verdict "CLEAN WITH FIXES" --blockers 0 >/dev/null
+iprun --review tRun --subject tRun --verdict "CLEAN WITH FIXES" --blockers 0 --highs 0 --minors 0 >/dev/null
 ipgit add -A >/dev/null && ipgit commit -q -m "fixture: the closing review round" --no-verify
 ip_old=$(ipgit rev-parse HEAD)
 ipgit fetch -q origin main; ipgit checkout -q --detach origin/main
@@ -9897,8 +10147,10 @@ out=$(run --close tRun)
 hit "$out" "the reap list this attestation is made over — keepalive k1 · no durable schedule: no hold of this run owed one"
 reset_tree
 
-# ---- AC15: the kit.toml conf-placeholder probe, RESOLVED from the descriptor rather than retyped,
-# ---- so it stages RED against a kit.toml whose alternation still names the keepalive keys alone.
+# ---- AC15: the kit.toml carrier-pair probe, RESOLVED from the descriptor rather than retyped. Since
+# ---- DEPL-aHalvedInstall-2 it is a PRESENCE test that SOURCES the conf: each of the pair must hold a
+# ---- real value unless RESUME_SCHEDULE is off, read as the adopter reads it. Every spelling below
+# ---- is one the adopter accepts or refuses, and the probe must agree with it on each.
 RS_PROBE=$(read_hole_probe "$HERE/kit.toml" keepalive-tool-names)
 n=$((n+1)); [ -n "$RS_PROBE" ] || { echo "FAIL AC15 the conf-placeholder hole declares no discharge command"; st=1; }
 RS_FIX="$TMP/rs-probe"; rm -rf "$RS_FIX"; mkdir -p "$RS_FIX"
@@ -9913,6 +10165,31 @@ sed -i -e 's|^RESUME_SCHEDULE_CREATE=.*|RESUME_SCHEDULE_CREATE="create_scheduled
        "$RS_FIX/.unattended.conf"
 ( cd "$RS_FIX" && bash -c "$RS_PROBE" ); rc=$?
 same "AC15 the same conf with both carrier keys filled discharges the hole" "$rc" "0"
+cp "$RS_FIX/.unattended.conf" "$RS_FIX/base.conf"; RS_BASE="$RS_FIX/base.conf"
+{ grep -vE '^RESUME_SCHEDULE_(CREATE|DELETE)=' "$RS_BASE"; } > "$RS_FIX/.unattended.conf"
+( cd "$RS_FIX" && bash -c "$RS_PROBE" ) >/dev/null 2>&1; rc=$?
+same "AC15 the pair deleted, the switch on" "$rc" "1"
+{ grep -vE '^RESUME_SCHEDULE(_CREATE|_DELETE)?=' "$RS_BASE"; echo 'RESUME_SCHEDULE="off"'; } > "$RS_FIX/.unattended.conf"
+( cd "$RS_FIX" && bash -c "$RS_PROBE" ) >/dev/null 2>&1; rc=$?
+same "AC15 the pair deleted, the switch off" "$rc" "0"
+{ grep -vE '^RESUME_SCHEDULE(_CREATE|_DELETE)?=' "$RS_BASE"; echo "RESUME_SCHEDULE='off'"; } > "$RS_FIX/.unattended.conf"
+( cd "$RS_FIX" && bash -c "$RS_PROBE" ) >/dev/null 2>&1; rc=$?
+same "AC15 the switch off single-quoted" "$rc" "0"
+{ grep -vE '^RESUME_SCHEDULE(_CREATE|_DELETE)?=' "$RS_BASE"; echo 'RESUME_SCHEDULE=off  # opt out'; } > "$RS_FIX/.unattended.conf"
+( cd "$RS_FIX" && bash -c "$RS_PROBE" ) >/dev/null 2>&1; rc=$?
+same "AC15 the switch off with a trailing comment" "$rc" "0"
+{ grep -vE '^RESUME_SCHEDULE(_CREATE|_DELETE)?=' "$RS_BASE"; echo 'RESUME_SCHEDULE=off'; echo 'RESUME_SCHEDULE=on'; } > "$RS_FIX/.unattended.conf"
+( cd "$RS_FIX" && bash -c "$RS_PROBE" ) >/dev/null 2>&1; rc=$?
+same "AC15 off, then reassigned on, with no pair" "$rc" "1"
+{ grep -vE '^RESUME_SCHEDULE_(CREATE|DELETE)=' "$RS_BASE"; echo 'export RESUME_SCHEDULE_CREATE=create_scheduled_task'; echo 'export RESUME_SCHEDULE_DELETE=delete_scheduled_task'; } > "$RS_FIX/.unattended.conf"
+( cd "$RS_FIX" && bash -c "$RS_PROBE" ) >/dev/null 2>&1; rc=$?
+same "AC15 the pair exported" "$rc" "0"
+{ grep -vE '^RESUME_SCHEDULE_CREATE=' "$RS_BASE"; echo 'RESUME_SCHEDULE_CREATE=""'; } > "$RS_FIX/.unattended.conf"
+( cd "$RS_FIX" && bash -c "$RS_PROBE" ) >/dev/null 2>&1; rc=$?
+same "AC15 one key empty" "$rc" "1"
+{ grep -vE '^RESUME_SCHEDULE_CREATE=' "$RS_BASE"; echo "RESUME_SCHEDULE_CREATE='<tool>'"; } > "$RS_FIX/.unattended.conf"
+( cd "$RS_FIX" && bash -c "$RS_PROBE" ) >/dev/null 2>&1; rc=$?
+same "AC15 one key a single-quoted placeholder" "$rc" "1"
 rm -rf "$RS_FIX"
 
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """selftest.py — the drift-audit kit's own falsifiability test.
 
-gov:kit drift-audit@1.22
+gov:kit drift-audit@1.23
 
     python <kit>/selftest.py
 

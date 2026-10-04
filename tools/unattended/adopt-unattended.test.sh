@@ -634,9 +634,10 @@ hit "$(grep -c '{{TOOL_ROOT}}' "$S10/.unattended.conf")" "3"
 same "arm 10 LANDER is stamped at this tool root" "$(grep '^LANDER=' "$S10/.unattended.conf")" "LANDER=\"bash ${TR_T}push-main.sh\""
 same "arm 10 GATE_CMD is stamped at this tool root" "$(grep '^GATE_CMD=' "$S10/.unattended.conf")" "GATE_CMD=\"bash ${TR_T}${RUN_GATES}/run-gates.sh\""
 same "arm 10 WIRING_CHECK is stamped at this tool root" "$(grep '^WIRING_CHECK=' "$S10/.unattended.conf")" "WIRING_CHECK=\"bash ${TR_T}check-wiring.sh --check\""
-same "arm 10 the generator is stamped at the probed memory-tree dir" \
-  "$(grep '^GENERATED_INDEXES=' "$S10/.unattended.conf")" \
-  "GENERATED_INDEXES=\"memory/LIVE.md:${TR_T}${MT_KIT}/gen_build_index.py memory/ledger:${TR_T}${MT_KIT}/gen_build_index.py\""
+# The example no longer carries generator pairs to stamp: the kits DECLARE their generated outputs in
+# `[[generated]]` rows, and the conf key only adds to them (TOOL-aWindowedPass-4 S4), so it ships blank.
+same "arm 10 GENERATED_INDEXES ships blank, the kits declaring the generated outputs" \
+  "$(grep '^GENERATED_INDEXES=' "$S10/.unattended.conf")" "GENERATED_INDEXES=\"\""
 same "arm 10 no path token survives the stamp" "$(grep -cE '[{][{](TOOL_ROOT|MEMORY_TREE_DIR)[}][}]' "$S10/.unattended.conf")" "0"
 
 # ---- arm 11 (TOOL-dDerivedDocket-5): the DURABLE restart carrier, on with no carrier declared, and

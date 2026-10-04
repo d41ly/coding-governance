@@ -22,9 +22,12 @@
 #
 # TWO: check 7's EXCLUSION notice and its UNAVAILABLE sibling print on the DEFAULT channel, and the
 # contract line above is written to admit them; so do check 23's `check 23 EXCLUDED` and
-# `check 23 exclusion UNAVAILABLE`, which share check 7's predicate (TOOL-aSightedSkeptic-13), and check 23's
-# `check 23 fleet` line, which reports the whole fleet's undeclared-write count and never fails the leg
-# (TOOL-dUnstuckLanding-17). They are not skips. An exclusion is a positive
+# `check 23 exclusion UNAVAILABLE`, which share check 7's predicate (TOOL-aSightedSkeptic-13), and
+# check 23's `check 23 SOLO` line with its run's graded-and-overlapped count, an undeclared write the
+# check found and did not count because its pass overlapped no sibling (TOOL-aWindowedPass-1), its
+# `check 23 OTHER RUN` and `check 23 UNBOUND` lines, counted writes of a run this tree does not drive
+# (TOOL-aWindowedPass-5), and its `check 23 fleet` line, which reports the whole fleet's
+# undeclared-write count and never fails the leg (TOOL-dUnstuckLanding-17). They are not skips. An exclusion is a positive
 # finding that CHANGED THE VERDICT — a record the check stopped counting — and the reader of a green
 # run is entitled to know which one and on what evidence. Routing them through REPORT was the first
 # implementation and it made the exclusion invisible on every bar run, which is the check-quietly-
@@ -47,7 +50,7 @@
 # THE CORE SETS ARE READ FROM THE DRIVER, never restated here. A second spelling of `PHASES_CORE` one
 # file away from the thing that enforces it is the drift this leg exists to catch.
 set -u
-KIT_UNATTENDED_VERSION=1.57   # gov:kit unattended@1.57 — must match unattended.sh; check-kit-versions.sh pairs them
+KIT_UNATTENDED_VERSION=1.62   # gov:kit unattended@1.62 — must match unattended.sh; check-kit-versions.sh pairs them
 
 # ------------------------------------------------------------------------------ the dereference pin
 # Identical to the driver's, and for the identical reason: `git replace` rewrites what a sha MEANS for
@@ -140,7 +143,7 @@ case "${1:-}" in
   "")            ;;
   --only)        [ "${2:-}" = 28 ] || { echo "check-unattended: --only takes 28 and nothing else; checks 1-27 share state and are one unit"; exit 2; }; SCOPE=only28 ;;
   --skip)        [ "${2:-}" = 28 ] || { echo "check-unattended: --skip takes 28 and nothing else; checks 1-27 share state and are one unit"; exit 2; }; SCOPE=skip28 ;;
-  --emit-ceiling) echo "check-unattended: --emit-ceiling is retired (TOOL-dUnstuckLanding-17): check 23 grades each run record against a declared per-build budget, which is a policy and not a measurement, and the fleet's count now appears on the 'check 23 fleet' line every run prints"; exit 2 ;;
+  --emit-ceiling) echo "check-unattended: --emit-ceiling is retired with UNDECLARED_WRITE_CEILING (TOOL-aWindowedPass-5) and refused (TOOL-dUnstuckLanding-17): check 23 grades the run this branch drives against a declared per-build budget, which is a policy and not a measurement, so there is no pin left to measure, and the fleet's count now appears on the 'check 23 fleet' line every run prints"; exit 2 ;;
   *)             echo "check-unattended: unknown argument '${1}'; this leg takes [--only 28] or [--skip 28]"; exit 2 ;;
 esac
 # gov:argv-end
@@ -303,6 +306,9 @@ M="$MEMORY_ROOT"
 # The kit default of an undeclared SHARED_RECORDS, resolved by the same library call the driver makes,
 # so the two readers cannot disagree about a conf that leaves the key out.
 SHARED_RECORDS=$(resolve_shared_records "$SHARED_RECORDS" "$MEMORY_ROOT")
+# THE EFFECTIVE GENERATED OUTPUTS - TOOL-aWindowedPass-4: the kits' `[[generated]]` rows, then the
+# conf's additions, through the ONE resolver every reader of this key calls.
+GENERATED_INDEXES=$(resolve_generated_indexes "$ROOT" "$GENERATED_INDEXES" "$MEMORY_ROOT")
 
 # THE REPORT CHANNEL. Silent by default, so the contract above holds byte for byte and the three
 # green-control arms in the sibling test keep their meaning. A check that cannot compare says which
@@ -312,6 +318,9 @@ SHARED_RECORDS=$(resolve_shared_records "$SHARED_RECORDS" "$MEMORY_ROOT")
 # through it and a helper defined inside the guard does not exist on that path.
 REPORT=${GOV_UNATTENDED_REPORT:-0}
 report() { [ "$REPORT" = 1 ] && printf 'unattended-report: %s\n' "$1"; return 0; }
+# THE EFFECTIVE GENERATED SET, said once (closing review r1, L6): it is derived from every kit's
+# descriptor, so the one place a reader can see which outputs checks 23 and 38 forgive is this line.
+report "GENERATED_INDEXES resolved to: ${GENERATED_INDEXES:-nothing} - the kits' [[generated]] rows first, then the conf's additions"
 
 if [ "$SCOPE" != only28 ]; then
 
@@ -715,12 +724,23 @@ else
         n[it]++
         b = -1
         if (match(rs, /blockers [0-9]+/)) b = substr(rs, RSTART + 9, RLENGTH - 9) + 0
+        # THE CLOSING REVIEW COUNTS (TOOL-aBatchedMinors-3). `--review` writes `highs <n> · minors <n>`
+        # on the build-slug subject terminal round only, and BOTH or neither: a row carrying both
+        # is a closing-review exit whose every confirmed finding is promoted, and it owes one unit per
+        # blocker and high plus one for the minors batch. A row carrying neither - every spec-audit
+        # row, every closing row written before the counts existed - keeps the floor of one.
+        # NOT CHECKED: that the minors went into at most two units, or that a promoted unit
+        # mechanism closes its finding - the region records ids, never which finding an id closes.
+        hi = -1; mi = -1
+        if (match(rs, / · highs [0-9]+/)) { hi = substr(rs, RSTART, RLENGTH); sub(/^.* /, "", hi); hi += 0 }
+        if (match(rs, / · minors [0-9]+/)) { mi = substr(rs, RSTART, RLENGTH); sub(/^.* /, "", mi); mi += 0 }
+        cnt = (hi >= 0 && mi >= 0)
         if (it in last && b >= last[it]) flat[it] = flat[it] + 1; else flat[it] = 0
         last[it] = b
         if (rs ~ /CONVERGED|NON-CONVERGENT|CEILING|BOUNDED/) term[it] = 1
         nf = split(rs, fld, " · ")
         if (rs ~ /NON-CONVERGENT|CEILING|BOUNDED/) {
-          needs[it] = 1; bl[it] = b
+          needs[it] = 1; bl[it] = b; hc[it] = cnt; hh[it] = hi; mm[it] = mi
           disp[it] = (nf > 0 && fld[nf] ~ /^disposition /) ? substr(fld[nf], length("disposition ") + 1) : ""
         }
         # A CONVERGED ROW CARRYING A DISPOSITION IS READ TOO (closing review of aProbedUnit, cluster
@@ -730,12 +750,18 @@ else
         # proxy predates the field and never read a converged row, and a converged subject is not
         # one that "EXITED without converging".
         else if (rs ~ /CONVERGED/ && graded == 1 && nf > 0 && fld[nf] ~ /^disposition /) {
-          needs[it] = 1; bl[it] = b
+          needs[it] = 1; bl[it] = b; hc[it] = cnt; hh[it] = hi; mm[it] = mi
           disp[it] = substr(fld[nf], length("disposition ") + 1)
+        }
+        # ...and a converged CLOSING row standing on a high or a minor with NO disposition owes one:
+        # the closing review promotes every finding, so it reaches the no-disposition refusal below
+        # rather than reading as the ordinary converged round that demands nothing.
+        else if (rs ~ /CONVERGED/ && graded == 1 && cnt && hi + mi > 0) {
+          needs[it] = 1; bl[it] = b; hc[it] = cnt; hh[it] = hi; mm[it] = mi; disp[it] = ""
         }
       }
       END {
-        nneed = 0; nomiss = ""; illegal = ""; foldbad = ""
+        nneed = 0; nsubj = 0; nomiss = ""; illegal = ""; foldbad = ""; closefold = ""
         for (it in n) {
           if (n[it] > ceil)
             printf "\n  %s (subject %s: %d review rounds against a runaway ceiling of %d, so the loop ran past its own backstop)", f, it, n[it], ceil
@@ -745,7 +771,12 @@ else
             if (graded != 1) nneed++
             else if (disp[it] == "") nomiss = nomiss " " it
             else if (index(disps, "|" disp[it] "|") == 0) illegal = illegal " " it "=" disp[it]
-            else if (disp[it] == "promote") nneed++
+            else if (disp[it] == "promote") {
+              nsubj++
+              owe = hc[it] ? bl[it] + hh[it] + (mm[it] > 0 ? 1 : 0) : 1
+              nneed += (owe > 0 ? owe : 1)
+            }
+            else if (hc[it] && foldgraded == 1) closefold = closefold " " it
             else if (bl[it] > 0 && foldgraded == 1) foldbad = foldbad " " it "=" bl[it]
             # a subject recording `fold` beside ZERO blockers demands NOTHING, which is the entire
             # point of reading the field instead of inferring an answer from ids; beside a non-zero
@@ -759,13 +790,15 @@ else
             printf "\n  %s (exited subject(s)%s record NO disposition while this record is graded against DISPOSITION_CUTOFF, so which of fold or promote the run took cannot be read - and with nothing to read this clause would demand nothing and pass by finding nothing)", f, nomiss
           if (illegal != "")
             printf "\n  %s (exited subject(s)%s carry a disposition outside the closed set %s - the driver validates the flag at write time, so an illegal value reached this record by HAND, and reading it as absent would name the wrong cause)", f, illegal, substr(disps, 2, length(disps) - 2)
+          if (closefold != "")
+            printf "\n  %s (closing-review subject(s)%s record disposition fold on a row carrying highs and minors, and the closing diff review folds nothing: every confirmed finding is promoted, the MEDIUMs and LOWs batched into one unit or two)", f, closefold
           if (foldbad != "")
             printf "\n  %s (exited subject(s)%s record disposition fold beside a NON-ZERO blocker count in a record first-committed on or after FOLD_CUTOFF, after which the driver refuses this at write time, and the severity rule promotes every blocker, so a fold there is a blocker left standing under a field that says nothing was)", f, foldbad
           if (nneed > 0) {
             if (readable != 1)
-              printf "\n  %s (%d subject(s) EXITED recording disposition promote and the roster at this run BASE cannot be read, so whether a blocker was promoted CANNOT BE OBSERVED - a check that cannot look says so rather than passing)", f, nneed
+              printf "\n  %s (%d subject(s) EXITED recording disposition promote and the roster at this run BASE cannot be read, so whether a blocker was promoted CANNOT BE OBSERVED - a check that cannot look says so rather than passing)", f, nsubj
             else if (newids + 0 < nneed)
-              printf "\n  %s (%d subject(s) EXITED recording disposition promote and the generated units region gained only %d non-WONTDO unit id(s) this run BASE lacked, so at least one promoted blocker or high has no unit. A subject recording disposition fold beside zero blockers demands nothing here)", f, nneed, newids + 0
+              printf "\n  %s (%d subject(s) EXITED recording disposition promote and the generated units region gained only %d non-WONTDO unit id(s) this run BASE lacked, against a floor of %d - one per subject, or on a closing-review row carrying counts one per blocker and high plus one for its minors - so at least one promoted finding has no unit. A subject recording disposition fold beside zero blockers demands nothing here)", f, nsubj, newids + 0, nneed
           }
         }
         else {
@@ -2885,6 +2918,11 @@ fi
 # ---- key name in the table region, nothing more. A row whose prose is wrong is green here, and only
 # ---- a reader catches that.
 EXAMPLE_CONF="$HERE/.unattended.conf.example"
+# RETIRED KEYS: documented as retired, shipped by no example, and still TOLERATED in a project's conf,
+# which this leg no longer imports. Without the tolerance every adopter whose conf still sets one reds
+# here for a key this kit removed. Each is reported, so the line gets deleted rather than kept.
+RETIRED_CONF_KEYS="UNDECLARED_WRITE_CEILING"   # TOOL-aWindowedPass-5
+remove_retired_keys() { awk -v r=" $RETIRED_CONF_KEYS " 'index(r, " " $0 " ") == 0'; }
 # A MISSING EXAMPLE IS A REFUSAL, not a skip. Guarding the whole check on `[ -f ]` made it vanish
 # silently wherever the kit ships without its example - which is exactly where a documentation join
 # is worth most - and a check that says nothing is indistinguishable from a check that passed. The
@@ -2901,7 +2939,7 @@ elif [ -f "$LIVEDOC" ]; then
   # section 8, so a PROSE mention of a phase name - main's `LANDED` - entered the key set as a phantom
   # and red this leg on the merged tree. Neither parent had both the prose and the check. Reading the
   # key column keeps the `·`-joined KEEPALIVE_CREATE/KEEPALIVE_DELETE row, which yields both keys.
-  doc_keys=$(printf '%s\n' "$sec8" | awk -F'|' 'NF>2 {print $2}' | grep -oE '`[A-Z_]+`' | tr -d '`' | sort -u)
+  doc_keys=$(printf '%s\n' "$sec8" | awk -F'|' 'NF>2 {print $2}' | grep -oE '`[A-Z_]+`' | tr -d '`' | remove_retired_keys | sort -u)
   # THE KIT'S EXAMPLE CONF IS THE REVERSE POPULATION, not the adopting project's. A project declares
   # the keys it needs and leaves the optional ones out, so "documented but not declared here" is the
   # NORMAL state of any real conf - graded against one, this check red six keys on a conforming
@@ -2914,7 +2952,11 @@ elif [ -f "$LIVEDOC" ]; then
   # ...and the ADOPTING project may declare nothing the table does not carry. One direction only,
   # because an optional key it never sets is not a fault.
   if [ -f "$ROOT/.unattended.conf" ]; then
-    proj_extra=$(comm -23 <(grep -oE '^[A-Z_]+=' "$ROOT/.unattended.conf" | tr -d '=' | sort -u) <(printf '%s\n' "$doc_keys") | tr '\n' ' ')
+    proj_extra=$(comm -23 <(grep -oE '^[A-Z_]+=' "$ROOT/.unattended.conf" | tr -d '=' | remove_retired_keys | sort -u) <(printf '%s\n' "$doc_keys") | tr '\n' ' ')
+    for _rk in $RETIRED_CONF_KEYS; do
+      grep -q "^$_rk=" "$ROOT/.unattended.conf" \
+        && report "check 22 - $_rk is RETIRED (TOOL-aWindowedPass-5): this join ignores it, and check 23 refuses it by name until the line is deleted from .unattended.conf, naming UNDECLARED_WRITE_BUDGET, which replaced it (TOOL-dUnstuckLanding-17)"
+    done
   else
     proj_extra=""
   fi
@@ -3681,10 +3723,12 @@ done
 # ---- NOTHING: `brief-recorded` grades CLOSED units only, at the BUILD commit and not the pass
 # ---- commit, reads the LAST row per unit where this check takes the union, and proves only that the
 # ---- row's hash still names the blob at that path. Nothing asserts the path was a brief.
-# THE BUDGET'S ACCUMULATORS (TOOL-cMendedVintage-14, per build since TOOL-dUnstuckLanding-17), declared
-# where `set -u` can see them before the loop that fills them. `ds_graded` is the LIVENESS half and
-# counts rows that REACHED the subset test, not rows that failed it: a hit count of zero is a clean
-# tree, a GRADED count of zero under a non-zero budget is a probe that died.
+# THE FLEET'S ACCUMULATORS (TOOL-cMendedVintage-14, per build since TOOL-dUnstuckLanding-17), declared
+# where `set -u` can see them before the loop that fills them. The VERDICT's counts are PER RUN since
+# TOOL-aWindowedPass-5 retired the repo-global ceiling: each run's are reset at the top of its loop.
+# `ds_graded` is the LIVENESS half and counts rows that REACHED the subset test, not rows that failed
+# it: a hit count of zero is a clean tree, a GRADED count of zero under a non-zero budget is a probe
+# that died.
 # ---- ABSORB (TOOL-dDerivedDocket-24 S9, owner ruling D12-i5). A run may FIX a red it inherited,
 # ---- beyond its declared write set, in a commit of its own whose subject is exactly
 # ---- `absorb(<slug>): <leg> inherited at <R8>` and names NO unit id. Such a commit is classified
@@ -3706,25 +3750,27 @@ check_absorb_subject() { # subject · slug -> 0 when it is an absorb subject for
 # ---- regions, which the build-index generator re-renders whenever a spec's status header moves. A
 # ---- blob missing on either side counts the path, so the skip fails closed.
 # ---- WHAT THIS DOES NOT SEE: a hand edit inside a gen region is not counted, because nothing here
-# ---- can tell it from a render. Regions NEST, the build README's unit table inside its index, so
-# ---- the strip counts depth rather than toggling.
-GEN_REGION_AWK='{ sub(/\r$/, "") } /^<!-- gen:[^ ]+ -->/ { g++; next } /^<!-- \/gen:[^ ]+ -->/ { if (g > 0) g--; next } !g'
+# ---- can tell it from a render. The gen-region comparison is the kit library's
+# ---- `check_gen_region_only`, which `--check-commit` asks of the index (TOOL-aWindowedPass-3), so the
+# ---- commit-time step and this check cannot forgive different changes.
 check_generated_render() { # commit · path -> 0, printing what generated it, when the write is a render
-  local _gi _ga _gb
+  local _gi
   for _gi in ${GENERATED_INDEXES:-}; do
     covers "${_gi%%:*}" "$2" && { printf 'the %s index' "${_gi%%:*}"; return 0; }
   done
-  _ga=$(GIT show "$1^:$2" 2>/dev/null) || return 1
-  _gb=$(GIT show "$1:$2" 2>/dev/null) || return 1
-  [ "$(printf '%s\n' "$_ga" | awk "$GEN_REGION_AWK")" = "$(printf '%s\n' "$_gb" | awk "$GEN_REGION_AWK")" ] || return 1
+  check_gen_region_only "$1^:$2" "$1:$2" || return 1
   printf 'a change inside its gen regions only'
 }
-ds_over=""; ds_over_n=0; ds_graded=0; ds_unavail=0; ds_records=0; ds_fleet_over=""
-# ---- THE BUDGET IS READ BEFORE THE LOOP (TOOL-dUnstuckLanding-17 S7/S8), because each record is judged
-# ---- against it as the loop leaves that record. MANDATORY, in the shape its sibling pins take:
-# ---- undeclared or not a single integer is a refusal, never a defaulted value. The RETIRED key is
-# ---- refused BY NAME off the leg's own text scan of declared names, so it is never imported and an
-# ---- adopter who upgrades without moving it is told which key replaced it.
+ds_fleet_n=0; ds_graded=0; ds_unavail=0; ds_records=0; ds_fleet_over=""
+# THE RUN THIS TREE DRIVES (TOOL-aWindowedPass-5): the record whose run branch is the branch checked
+# out here. A detached HEAD binds none. Read once; every record below is compared against it.
+DS_HEAD_REF=$(GIT symbolic-ref -q HEAD 2>/dev/null || true)
+# ---- THE BUDGET IS READ BEFORE THE LOOP (TOOL-dUnstuckLanding-17 S7/S8), because the run this tree
+# ---- drives is judged against it as the loop leaves that record. MANDATORY, in the shape its sibling
+# ---- pins take: undeclared or not a single integer is a refusal, never a defaulted value. The RETIRED
+# ---- key is refused BY NAME off the leg's own text scan of declared names, so it is never imported and
+# ---- an adopter who upgrades without moving it is told which key replaced it. Check 22 tolerates the
+# ---- same key as retired (TOOL-aWindowedPass-5), so the key-table join does not red on it as well.
 ds_budget_ok=0
 _c23_retired=UNDECLARED_WRITE_CEILING
 if printf '%s\n' "$_conf_names" | grep -qx -- "$_c23_retired"; then
@@ -3738,11 +3784,11 @@ else
   ds_budget_ok=1
 fi
 # ---- THE RANGE (TOOL-dUnstuckLanding-17 S5). When the advertised tip resolves and HEAD carries commits
-# ---- it lacks, a pass whose pass commit is already on that tip is still COUNTED on the fleet line and
-# ---- is NOT graded against its record's budget: it was graded when it landed, and re-grading landed
-# ---- history reds every later closing run on work it did not do. This leg's own observation of the
-# ---- remote, `ADV_HEAD`, is what decides it; it does not call the history legs' library reader.
-# ---- Otherwise WHOLE mode grades every pass, as the leg always did, and the fleet line says why.
+# ---- it lacks, a counted pass whose pass commit is already on that tip is still COUNTED on the fleet
+# ---- line and is NOT graded against its run's budget: it was graded when it landed, and re-grading
+# ---- landed history reds every later closing run on work it did not do. This leg's own observation of
+# ---- the remote, `ADV_HEAD`, is what decides it; it does not call the history legs' library reader.
+# ---- Otherwise WHOLE mode grades every counted pass, as the leg always did, and the fleet line says why.
 ds_range=whole; ds_head=$(GIT rev-parse HEAD 2>/dev/null)
 if [ "${ADV_HEAD_OK:-0}" != 1 ]; then
   ds_field="range whole (the tip did not resolve: no advertised default-branch tip is in this clone)"
@@ -3758,7 +3804,7 @@ fi
 for f in $RUNS; do
   [ -f "$f" ] || continue
   case "$f" in *"/RUN.md") ;; *) continue ;; esac
-  dsslug=${f%/RUN.md}; dsslug=${dsslug##*/}; ds_absorbed=""
+  dsslug=${f%/RUN.md}; dsslug=${dsslug##*/}; ds_absorbed=""; ds_win=""; ds_pend=""; ds_run_graded=0; ds_over=""; ds_over_n=0
   ph=$(fact_of "$f" phase); case "$ph" in LANDED|ABORTED) continue ;; esac
   # ONE ROW PER (anchor, unit), AND ITS PATHS ARE THE UNION OF EVERY ROW UNDER THAT KEY. The key
   # already carries the anchor, so rows at DIFFERENT anchors stay separate — they are different passes
@@ -3836,6 +3882,11 @@ for f in $RUNS; do
     dstop=$(next_anchor "$dsgrp" "$dsanchors")
     [ -n "$dstop" ] || dstop=HEAD
     dshit=$(pass_commit "$dsgrp" "$dsunit" "$f" "$dstop" || true)
+    # THE ROW'S WINDOW (TOOL-aWindowedPass-1 S1): its anchor to its pass commit, else to the unit's
+    # next anchor, else open. Recorded for EVERY row that reaches here, graded or not, because a pass
+    # that never committed was still running beside whatever was dispatched after it.
+    dsend=${dshit:-$dstop}; [ "$dsend" = HEAD ] && dsend=-
+    ds_win="$ds_win$dsgrp $dsend $dsunit"$'\n'
     # ABSORB commits inside this window, each reported ONCE per run however many windows hold it.
     while IFS=$'\t' read -r dsah dsas; do
       [ -n "$dsah" ] || continue
@@ -3877,7 +3928,13 @@ for f in $RUNS; do
     # LOOP-INVARIANT, HOISTED. `$dshit` does not change inside this loop, so reading its
     # subject once per SIBLING was a git spawn per sibling to answer the same question.
     # TOOL-aQuenchedHarness-7.
-    dshitsub=$(GIT log -1 --format=%s "$dshit" 2>/dev/null)
+    # A TRAILERED commit is attributed by its trailer alone, so its ambiguity is read from the trailer
+    # too (closing review r1, M3): a subject that merely MENTIONS a sibling skipped the subset test.
+    dshitsub=$(GIT log -1 --format='%s%x1f%(trailers:key=Pass,valueonly,separator=%x20)' "$dshit" 2>/dev/null)
+    case "$dshitsub" in
+      *$'\x1f') dshitsub=${dshitsub%$'\x1f'} ;;
+      *) dshitsub=${dshitsub#*$'\x1f'}; dshitsub=${dshitsub//[^A-Za-z0-9-]/ } ;;
+    esac
     while IFS= read -r dssib; do
       [ -n "$dssib" ] || continue
       dssitem=${dssib#* dispatch · item }; dssitem=${dssitem%% · reason *}
@@ -3902,9 +3959,11 @@ DSSIBS
     dsnl=$'\n'; dsbrief="$dsnl$(read_brief_paths "$dshit" "$dsunit" "$f")$dsnl"
     # THE SUBSET TEST. Declaring MORE than you use is conservative and fine; writing outside the
     # declaration is the defect.
-    ds_graded=$((ds_graded + 1))
+    ds_run_graded=$((ds_run_graded + 1)); ds_graded=$((ds_graded + 1))
     dsout=""
-    for dsq in $(GIT diff-tree --no-commit-id --name-only -r "$dshit" 2>/dev/null | grep -v -x -F "$f"); do
+    # NOT C-QUOTED, as `--check-commit` lists the same paths (closing review r2, M4): a quoted non-ASCII
+    # path is covered by no declaration, so the two readers would disagree about it.
+    for dsq in $(GIT -c core.quotePath=false diff-tree --no-commit-id --name-only -r "$dshit" 2>/dev/null | grep -v -x -F "$f"); do
       # EXACT membership, deliberately not `covers`: that is a containment test, and a row naming a
       # directory would then hide everything under it.
       case "$dsbrief" in *"$dsnl$dsq$dsnl"*)
@@ -3924,53 +3983,133 @@ DSSIBS
       fi
       [ "$dsok" = 1 ] || dsout="$dsout $dsq"
     done
-    # THE FINDING NO LONGER PRINTS ITSELF ON STDOUT. It is COUNTED, and the ratchet below decides
-    # the verdict; the per-instance detail goes to the report channel, so a green run keeps this
-    # file's "exit 0 + no output = clean" contract true instead of quietly widening it.
-    if [ -n "$dsout" ]; then
-      ds_over_n=$((ds_over_n + 1)); ds_rec_all=$((ds_rec_all + 1))
-      ds_line="$dsunit at $dshit wrote$dsout in $f"
+    # THE COUNT WAITS FOR EVERY WINDOW (TOOL-aWindowedPass-1). Whether this pass overlapped a
+    # sibling depends on rows read AFTER it, so the graded pass is parked and decided below.
+    ds_pend="$ds_pend$dsgrp $dshit $dsunit$dsout"$'\n'
+  done <<DSROWS
+$dsrows
+DSROWS
+  [ -n "$ds_pend" ] || continue
+  # ---- OVERLAP (TOOL-aWindowedPass-1 S1/S2). A declaration is the disjointness proof for passes that
+  # ---- ran AT THE SAME TIME, so only a pass whose window overlapped a sibling unit's is counted: one
+  # ---- anchor lies at or after the other's anchor and before its end. Positions come from ONE
+  # ---- topological walk of the run's range; pairwise ancestry would be a spawn per pair.
+  # ---- WHAT THIS DOES NOT SEE: two runs are never compared, and a merge in the range makes the walk a
+  # ---- total order on a partial one, which can only widen a window. A run whose base does not resolve
+  # ---- cannot be placed, and then every graded pass counts as overlapped, the verdict before this unit
+  # ---- — even a single-unit run, so an unplaceable record is graded exactly as it was.
+  unset dspos; declare -A dspos=(); dsposok=0
+  dsbase=$(fact_of "$f" base)
+  if [ -z "$dsbase" ] || ! check_rev "$dsbase"; then
+    report "check 23 overlap unavailable for $f — its base '$dsbase' does not resolve, so no window can be placed and every graded pass is counted as overlapped"
+  elif [ "$(printf '%s' "$ds_win" | awk '{ print $3 }' | sort -u | wc -l)" -lt 2 ]; then
+    dsposok=2
+  else
+    dsposok=1
+    dskeys=$(printf '%s' "$ds_win" | awk '{ print substr($1, 1, 8); if ($2 != "-") print substr($2, 1, 8) }' | sort -u | tr '\n' ' ')
+    while read -r _k _p; do
+      [ -n "$_k" ] && dspos[$_k]=$_p
+    done < <(GIT rev-list --topo-order --reverse "$dsbase..HEAD" 2>/dev/null \
+             | awk -v want="$dskeys" 'BEGIN { n = split(want, w, " "); for (i = 1; i <= n; i++) need[w[i]] = 1 }
+                 { k = substr($0, 1, 8); if (k in need) print k, NR }')
+  fi
+  ds_run_over=0; ds_run_solo=0
+  while read -r dpa dpe dpu dpout; do
+    [ -n "$dpa" ] || continue
+    dsov=1
+    if [ "$dsposok" = 2 ]; then
+      dsov=0
+    elif [ "$dsposok" = 1 ]; then
+      dsov=0
+      dsa=${dspos[${dpa:0:8}]:-0}; dse=${dspos[${dpe:0:8}]:-999999999}
+      while read -r dwa dwe dwu; do
+        [ -n "$dwa" ] && [ "$dwu" != "$dpu" ] || continue
+        dsb=${dspos[${dwa:0:8}]:-0}
+        if [ "$dwe" = - ]; then dsg=999999999; else dsg=${dspos[${dwe:0:8}]:-999999999}; fi
+        if { [ "$dsa" -le "$dsb" ] && [ "$dsb" -lt "$dse" ]; } || { [ "$dsb" -le "$dsa" ] && [ "$dsa" -lt "$dsg" ]; }; then
+          dsov=1; break
+        fi
+      done <<DSWIN
+$ds_win
+DSWIN
+    fi
+    [ "$dsov" = 1 ] && ds_run_over=$((ds_run_over + 1))
+    [ -n "$dpout" ] || continue
+    ds_line="$dpu at $dpe wrote $dpout in $f"
+    if [ "$dsov" = 1 ]; then
+      # THE FINDING NO LONGER PRINTS ITSELF ON STDOUT. It is COUNTED, and the budget below decides
+      # the verdict; the per-instance detail goes to the report channel.
+      ds_over_n=$((ds_over_n + 1)); ds_rec_all=$((ds_rec_all + 1)); ds_fleet_n=$((ds_fleet_n + 1))
       ds_over="$ds_over
   $ds_line"
       report "check 23 — a dispatched pass committed a path outside the set it declared before dispatch: $ds_line"
       # A PLAIN COMMAND, never `$(...)`: the reach set `check_adv_reaches` warms dies with a subshell.
-      if [ "$ds_range" = range ] && check_adv_reaches "$dshit"; then
+      if [ "$ds_range" = range ] && check_adv_reaches "$dpe"; then
         :
       else
         ds_rec_n=$((ds_rec_n + 1))
         ds_rec_lines="$ds_rec_lines
   $ds_line"
       fi
+    else
+      # DEFAULT CHANNEL, under the header's exception TWO: an uncounted write changed the verdict.
+      ds_run_solo=1
+      printf 'unattended: check 23 SOLO %s — outside its declaration, but its window overlapped no sibling pass, so the write collided with nothing and is reported, not counted\n' "$ds_line"
     fi
-  done <<DSROWS
-$dsrows
-DSROWS
+  done <<DSPEND
+$ds_pend
+DSPEND
+  # S3: a run where every pass was solo says so, rather than reading as coverage.
+  ds_run_line="check 23 $f — graded $ds_run_graded pass(es), $ds_run_over overlapped a sibling"
+  if [ "$ds_run_solo" = 1 ]; then printf 'unattended: %s\n' "$ds_run_line"; else report "$ds_run_line"; fi
+  # THE FLEET LINE'S `over` FIELD (TOOL-dUnstuckLanding-17 S6): every counted write, on the tip or not.
   [ "$ds_rec_all" -gt 0 ] && [ "$ds_budget_ok" = 1 ] && [ "$ds_rec_all" -gt "$UNDECLARED_WRITE_BUDGET" ] \
     && ds_fleet_over="$ds_fleet_over $dsslug=$ds_rec_all"
-  if [ "$ds_budget_ok" = 1 ] && [ "$ds_rec_n" -gt "$UNDECLARED_WRITE_BUDGET" ]; then
-    fail 23 "a run record holds more dispatched passes that committed outside the set they declared before dispatch than its per-build budget admits, and that declaration is the disjointness proof two concurrent passes rest on: $f carries $ds_rec_n against a budget of $UNDECLARED_WRITE_BUDGET$ds_rec_lines"
+  # ---- EACH RUN AGAINST ITS OWN BUDGET (TOOL-aWindowedPass-5, TOOL-dUnstuckLanding-17). A repo-global
+  # ---- shrink-only ceiling let one run's committed, unrepairable history hold or abort another run's
+  # ---- landing. Only the run this tree drives can fail here, and its close is where that binds: it
+  # ---- fails when its counted writes NOT already on the advertised tip exceed `UNDECLARED_WRITE_BUDGET`,
+  # ---- which is 0 unless a project declares otherwise. Any other live run's counted writes are
+  # ---- printed, because they changed the verdict a ceiling once gave.
+  # ---- WHAT THIS DOES NOT CHECK: a run nobody drives from a checkout is never failed by this check,
+  # ---- on the bar or anywhere else, until a tree on its branch runs the leg.
+  [ "$ds_over_n" -gt 0 ] || continue
+  dsrb=$(fact_of "$f" run-branch); [ -n "$dsrb" ] || dsrb=$(fact_of "$f" branch-ref)
+  if [ -z "$dsrb" ]; then
+    # A RECORD NAMING NO RUN BRANCH (a detached preflight) matches no checkout, its own close included,
+    # so "graded at its own close" would be false for it (closing review r1, M6). Said distinctly.
+    printf 'unattended: check 23 UNBOUND %s: %s counted - the record names no run branch, so no checkout binds it and no leg can fail it\n' "$f" "$ds_over_n"
+  elif [ -n "$DS_HEAD_REF" ] && [ "$dsrb" = "$DS_HEAD_REF" ]; then
+    if [ "$ds_budget_ok" = 1 ] && [ "$ds_rec_n" -gt "$UNDECLARED_WRITE_BUDGET" ]; then
+      fail 23 "a pass of the run this branch drives committed outside the set it declared before dispatch while its window overlapped a sibling pass, and that declaration is the disjointness proof two concurrent passes rest on: $ds_rec_n in $f against a per-build budget of $UNDECLARED_WRITE_BUDGET$ds_rec_lines"
+    else
+      report "check 23 $f - $ds_over_n counted, $ds_rec_n graded against a per-build budget of ${UNDECLARED_WRITE_BUDGET:-undeclared}: the run this branch drives is within it, or its counted passes are already on the advertised tip"
+    fi
+  else
+    printf 'unattended: check 23 OTHER RUN %s: %s counted, graded at its own close - this tree drives %s\n' "$f" "$ds_over_n" "${DS_HEAD_REF:-a detached HEAD, which binds no run}"
   fi
 done
 
-# ---- 23's BUDGET (TOOL-cMendedVintage-14, made per build by TOOL-dUnstuckLanding-17). The subset test
-# ---- above used to print one line per offending pass and leave the exit status alone, which is a
-# ---- REPORT wearing a gate's number. The declaration was therefore enforced in one direction only:
-# ---- declaring too much wedges the run, declaring too little was a line nobody had to read.
+# ---- 23's BUDGET (TOOL-cMendedVintage-14, made per build by TOOL-dUnstuckLanding-17, and per DRIVEN RUN
+# ---- by TOOL-aWindowedPass-5). The subset test above used to print one line per offending pass and
+# ---- leave the exit status alone, which is a REPORT wearing a gate's number. The declaration was
+# ---- therefore enforced in one direction only: declaring too much wedges the run, declaring too
+# ---- little was a line nobody had to read.
 # ----
 # ---- A PER-BUILD BUDGET, NOT A FLEET CEILING. The count used to be summed over every live record and
 # ---- compared against one shrink-only pin, so another build's rows could fill the ceiling and red a
 # ---- closing run that wrote nothing outside its declaration; in the adopters that class stopped more
-# ---- closes than any other. Each record is now judged against `UNDECLARED_WRITE_BUDGET` as the loop
-# ---- leaves it, above, and the fleet total is REPORTED on the line below and never fails the leg. A
-# ---- budget is a policy and not a measurement, so it has no shrink-only comparison and no "lower
-# ---- the pin" report: an adopter's budget is 0 and means what it says.
+# ---- closes than any other. The run this tree drives is judged against `UNDECLARED_WRITE_BUDGET` as
+# ---- the loop leaves it, above, and the fleet total is REPORTED on the line below and never fails the
+# ---- leg. A budget is a policy and not a measurement, so it has no shrink-only comparison and no
+# ---- "lower the pin" report: an adopter's budget is 0 and means what it says.
 # ----
 # ---- WHAT THIS DOES NOT CHECK, because a gate's own header owes its gaps:
 # ----   - THE FLEET TOTAL BINDS NOWHERE. This leg prints it and the drift report's `fleet_over_budget`
 # ----     signal lists the builds over budget, report-only; no bar, CI job or hook fails on it.
 # ----   - A PUSHED PASS IN RANGE MODE IS NOT RE-GRADED. Its pass commit is on the advertised tip, so it
-# ----     was graded when it landed; WHOLE mode, which remote CI runs because its HEAD is the tip,
-# ----     still grades it.
+# ----     was graded when it landed. WHOLE mode grades it, and fails it only for the run the checkout
+# ----     drives; remote CI on the default branch drives none, so there it is printed, never failed.
 # ----   - NOTHING HERE MAKES THE DECLARATION HONEST. Both artifacts are the run's, so a run may still
 # ----     declare the wider set up front, as this check's own header states.
 # ----   - THE OTHER TWO check-23 FINDINGS ARE STILL BARE PRINTS. The dodged-join and ambiguous-
@@ -3982,12 +4121,13 @@ fi
 # THE FLEET LINE (S6), on the default channel under header exception TWO, whenever the walked population
 # holds a record with dispatch rows. One contract between two kits: the drift report's
 # `measure_fleet_over_budget` anchors on its head and reads its `over` and `at` fields by their word.
+# It counts only COUNTED writes: a SOLO write (TOOL-aWindowedPass-1) is reported and never counted.
 if [ "$ds_records" -gt 0 ]; then
   if [ "$ds_budget_ok" = 1 ]; then ds_bfield="budget $UNDECLARED_WRITE_BUDGET per build"; ds_ofield="over ${ds_fleet_over# }"
   else ds_bfield="budget ${UNDECLARED_WRITE_BUDGET:-undeclared} per build"; ds_ofield="over unjudged"; fi
   [ "$ds_ofield" = "over " ] && ds_ofield="over none"
   printf 'unattended: check 23 fleet — %s undeclared write(s) over %s graded pass(es) in %s record(s) · %s · %s · %s · at %s\n' \
-    "$ds_over_n" "$ds_graded" "$ds_records" "$ds_bfield" "$ds_ofield" "$ds_field" "${ds_head:0:8}"
+    "$ds_fleet_n" "$ds_graded" "$ds_records" "$ds_bfield" "$ds_ofield" "$ds_field" "${ds_head:0:8}"
 fi
 
 # ---- 21 (TOOL-aBoundedVerdict-11 S5): every tracked build README carries EXACTLY ONE well-formed
@@ -5423,7 +5563,8 @@ _lc_hits=${_lc_hits%$'\n'}
 # ---- a staged edit, and an arm whose failing case cannot be staged is an assertion about nothing.
 # print_liveness arrived with origin/main (aWokenSentinel); it reads the RECORDED phase because it
 # takes no network.
-PHASE_RECORDED_FNS="refuse_if_terminal archive_name_of verb_landed print_liveness run_settle"
+# check_commit_message (TOOL-aWindowedPass-3) runs on every commit, and a hook takes no network either.
+PHASE_RECORDED_FNS="refuse_if_terminal archive_name_of verb_landed print_liveness run_settle check_commit_message"
 # ---- LIVENESS: the classifier must RECOGNISE the readers' own reads. The two readers are the one
 # ---- place a read of the fact is certain to exist, so each must hold a line the read predicate
 # ---- matches, or the driver reads the fact in a spelling this check no longer sees and the routing

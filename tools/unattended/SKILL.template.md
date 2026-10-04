@@ -2,7 +2,7 @@
 name: unattended
 description: Start, resume, or close a run that will merge and push with NO owner turn between start and finish. Use when the owner wants a committed build carried to landing unattended, when a previous unattended run needs resuming after compaction or process death, or when one needs closing. Do NOT use for ordinary work where the explicit ask before a merge and a push still applies — that is the default, and this skill is the narrow exception to it.
 ---
-<!-- gov:kit unattended@1.57 -->
+<!-- gov:kit unattended@1.62 -->
 
 # Unattended runs
 
@@ -682,6 +682,12 @@ definition, so the absence is a decision and not an oversight.
   a file is a contract the sibling reads, is a judgement no verb can make, and it says so rather than
   pretending. If a pass discovers it needs another file, re-declare with the WIDER set BEFORE the
   commit; narrowing is refused, because narrowing after the fact is how a write gets hidden.
+  **End the pass commit's message with a `Pass: <unit-id>` trailer**, and give a commit that names a
+  unit but is no pass `Pass: none`: the gate attributes a commit by its trailer and never by its
+  subject once one is present, which is what stops a records commit from being graded as a pass.
+  Where the project's `commit-msg` hook runs `bash {{KIT_DIR}}/unattended.sh --check-commit "$1"`, a
+  pass commit staging a path outside its declaration is REFUSED with the `--dispatch` that widens it:
+  run that command, then commit again. It is the one moment widening is still legal.
 - **Drive the build as ONE program, and know exactly what that buys.** The harness is
   `{{TOOL_ROOT}}workflows/unattended-build.js`, which runs SPEC, then — only when the build or its
   project declares the audit — AUDIT and DISPOSAL as ordered stages, and hands back the ordered roster on a
@@ -792,16 +798,20 @@ confirmed-blocker count for THIS round, as a plain integer.
 It answers with one of five states, and the state is what you act on:
 
 - **CONVERGING** — this round's count is strictly smaller than the round before. Fold and go again.
+  On the closing diff review the fold fixes its BLOCKERS only; the highs, mediums and lows carry to
+  the exit, where they are counted and promoted (the build method's M8).
 - **CONVERGED** — zero blockers. The loop is done for that subject, and its confirmed highs,
   mediums and lows are still disposed, by the severity rule the next bullet states. Where a HIGH
-  stood, record `--disposition promote` on that round — ACCEPTED there, never required — so the
-  merge bar demands the unit the high became instead of reading the promotion as nothing; with
-  nothing above MEDIUM the row needs no field.
+  stood on a SPEC subject, record `--disposition promote` on that round — ACCEPTED there, never
+  required — so the merge bar demands the unit the high became instead of reading the promotion as
+  nothing; with nothing above MEDIUM the row needs no field. The closing diff review's converged
+  round is different, and the paragraph after this list states how.
 - **NON-CONVERGENT** — the count did not shrink. **The loop STOPS**, and every CONFIRMED finding is
   DISPOSED BY SEVERITY — and that holds at `CONVERGED` too. A BLOCKER or HIGH is PROMOTED: it
   becomes a UNIT whose mechanism CLOSES the finding, specced at its tier, audited as a SPEC, built,
-  closed. A MEDIUM or LOW is FOLDED into the spec it belongs to, as a `rev-N` bump with its §9 line.
-  Never parked, never waived, never RETIRED, and never re-reviewed. Both terminate.
+  closed. On a SPEC subject a MEDIUM or LOW is FOLDED into the spec it belongs to, as a `rev-N`
+  bump with its §9 line; the closing diff review promotes those too, as the paragraph after this
+  list states. Never parked, never waived, never RETIRED, and never re-reviewed. Both terminate.
   **`never RETIRED` is in that list because it is the cheapest exit and the one the enumeration used
   to leave open**: a promoted unit flipped to `WONTDO` satisfies the leg's promotion count, which
   reads new ids, and `build-complete`, which reads only that no row is non-terminal. **Nor is it
@@ -833,6 +843,24 @@ It answers with one of five states, and the state is what you act on:
 - **CEILING** — the runaway backstop fired, which means the convergence predicate did not terminate.
   That is a defect in the predicate, not a routine outcome. The run promotes and lands anyway, and you
   record it in the build README, because a fact that lives only in a transcript is a fact nobody reads.
+
+**The closing diff review promotes EVERY confirmed finding, and its exit COUNTS them.** Owner
+ruling of 2026-10-04: a BLOCKER or HIGH becomes a unit of its own, and the MEDIUMs and LOWs are
+batched into ONE unit whose spec names every one of them — TWO only when they split into two
+disjoint write sets by the build method's M6 clauses, so the halves build concurrently. Never one
+unit per minor, and never a fold. Each unit is a `--rescope --act add`, specced, built and closed
+like any promotion. The terminal round on the build slug therefore carries two counts, REQUIRED
+there and refused on any other round or subject:
+
+```bash
+bash {{KIT_DIR}}/unattended.sh --review <slug> --subject <slug> --verdict <verdict> --blockers <N> --highs <H> --minors <M> --disposition promote
+```
+
+Derive both from the harness returns, never by reading the report: per round, `<H>` adds that
+round's `highs` and `<M>` adds `confirmed - blockers - highs`, summed over every round of the loop,
+because a closing fold fixes blockers only, per the CONVERGING bullet above. The verb then requires `promote`
+whenever anything stood and refuses it when nothing did, and the merge bar demands one new unit per
+standing blocker and high plus one for the minors.
 
 Strictly smaller, not merely different: a sequence that oscillates 2, 1, 2 satisfies "the count
 changed" forever. A subject whose loop already ended does not take another round.

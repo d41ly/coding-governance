@@ -74,6 +74,11 @@ sync and still tells the agent to invoke a placeholder's name. The comparison no
 endings first — this fleet runs `core.autocrlf=true`, and a charter with no `eol` attribute holds
 CRLF in the worktree against an LF blob.
 
+Because that comparison is against a FRESH render, a new renderer makes the old region drift. The
+descriptor therefore declares a `[[regenerate]]` block, the adopter's own write mode, and govkit's
+`update` runs it after landing a new engine unless GOVKIT_RERENDER=0 is exported
+(DEPL-aHalvedInstall-3). Without it every renderer change rolled this kit back at every adopter.
+
 ## The region reader is this kit's own
 
 The memory-tree kit's region helper raises when no marker pair is present, so it serves neither the

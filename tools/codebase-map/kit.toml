@@ -72,10 +72,17 @@ owner = "codebase-map"
 required_keys_gate = ["MAP_ROOT", "GATE_FILE"]
 required_keys_render = ["MAP_ROOT"]
 optional_keys = ["MAP_DIFF_CMD"]
+# The defaults `map_lib.load_conf` and the adopter already apply, declared so govkit's required-key
+# reader agrees with them; selfcheck refuses an adopter default the descriptor omits
+# (DEPL-aHalvedInstall-1 rev-3).
+defaults = { MAP_ROOT = "memory/map", GATE_FILE = "tests/test_codebase_map.py" }
 
 [adopt]
 argv = ["bash", "{kit}/adopt-codebase-map.sh", "--scaffold"]
 mutates_index = false
+# DEPL-aHalvedInstall-3: why `update` never re-runs this adopter. A kit with an adopter declares
+# [[regenerate]] or this reason, and selfcheck refuses one declaring neither.
+why_no_regenerate = "--scaffold seeds the project conf and the gate file once and leaves an adopted tree alone; nothing it writes is re-derived from engine bytes, and the gate reads the shipped engine directly"
 
 [[outcome]]
 code = 1
@@ -133,3 +140,12 @@ guard = ["{kit}/", ".codebase-map.conf"]
 [[lf_pin]]
 pattern = ".codebase-map.conf"
 why = "a sourced conf: a CR reaches the shell as part of the value"
+
+# ---------------------------------------------------------------- the GENERATED OUTPUTS this kit writes
+# TOOL-aWindowedPass-4. The map's generated artifacts, rewritten by `gen_map.py --write` whenever a
+# symbol moves; the pre-commit gate refuses a commit that leaves them stale, so every pass touching
+# code also writes them. The unattended kit reads this row in place of a hand-typed conf list.
+[[generated]]
+path = "{map_root}/generated"
+generator = "gen_map.py"
+why = "symbols.json, inventories.json and MAP.md, regenerated from the tree on every code change"

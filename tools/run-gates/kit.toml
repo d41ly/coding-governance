@@ -91,6 +91,9 @@ role = "project-owned"
 [adopt]
 argv = ["bash", "{kit}/adopt-run-gates.sh"]
 mutates_index = false
+# DEPL-aHalvedInstall-3: why `update` never re-runs this adopter. A kit with an adopter declares
+# [[regenerate]] or this reason, and selfcheck refuses one declaring neither.
+why_no_regenerate = "the adopter writes nothing; the [gate_runner] declaration its check joins against is emitted by govkit itself from [gate_runner_seed], on apply and on update"
 
 [check]
 argv = ["bash", "{kit}/adopt-run-gates.sh", "--check"]

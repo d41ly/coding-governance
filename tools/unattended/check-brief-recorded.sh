@@ -110,7 +110,7 @@
 # post-run subset joined it rather than moving the increment, which would change what the sibling's
 # identically named count means.
 set -u
-KIT_UNATTENDED_VERSION=1.57   # gov:kit unattended@1.57 — must match unattended.sh; check-kit-versions.sh pairs them
+KIT_UNATTENDED_VERSION=1.62   # gov:kit unattended@1.62 — must match unattended.sh; check-kit-versions.sh pairs them
 
 # The dereference pin, identical to this kit's other readers and for the identical reason: a graft
 # file rewrites the commit GRAPH, so every ancestry answer below could be honest about a sha and
@@ -183,6 +183,9 @@ if [ "$_conf_ok" != 1 ]; then
   exit 2
 fi
 MEMORY_ROOT="${MEMORY_ROOT:-memory}"
+# THE EFFECTIVE GENERATED OUTPUTS - TOOL-aWindowedPass-4: the kits' `[[generated]]` rows, then the
+# conf's additions, through the ONE resolver every reader of this key calls.
+GENERATED_INDEXES=$(resolve_generated_indexes "$ROOT" "$GENERATED_INDEXES" "$MEMORY_ROOT")
 # THE PRE-ANCHOR CAP is pass-order's key and default, validated as that leg validates it: a value git
 # cannot parse would turn the built-before-its-run probe off while reporting nothing.
 PREANCHOR_CAP="${PASS_ORDER_PREANCHOR_CAP:-400}"
@@ -300,7 +303,7 @@ esac
 declare -A _SUBJ=()
 while IFS= read -r _cl; do
   _SUBJ[${_cl%% *}]=" ${_cl#* } "
-done < <(GIT log --format='%H %s' HEAD 2>/dev/null | tr -c 'A-Za-z0-9\n-' ' ')
+done < <(read_attribution_tokens HEAD)
 _n_hist=$(GIT rev-list --count HEAD 2>/dev/null)
 case "$_n_hist" in ''|*[!0-9]*) _n_hist=-1 ;; esac
 if [ "${#_SUBJ[@]}" -ne "$_n_hist" ]; then

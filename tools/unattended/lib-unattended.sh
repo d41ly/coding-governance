@@ -594,6 +594,22 @@ is_repo_root() {
 # readers of one config, one of them re-deriving it (memory/gotchas/two-readers-of-one-config-one-re-derived.md).
 # The sentinel itself, spelled ONCE. Both callers initialise the key to it before the conf is read,
 # and a second spelling in either would be a sentinel this comparison never recognises.
+# THE VALUE BASH SOURCING WOULD ASSIGN, read without sourcing (closing review r1, M8): `map_lib.load_conf`
+# tolerates an `export ` prefix, an inline comment and CRLF, and a reader re-deriving the same key more
+# strictly is two answers to one question. Whitespace right after `=` is an empty value, a quoted value
+# ends at its matching quote, an unquoted one at the first whitespace, and the last assignment wins.
+read_conf_value() { # conf file · key -> its value; exit 1 when the file or the key is absent, so a BLANK value is told from none
+  awk -v k="$2" '
+    { sub(/\r$/, ""); s = $0; sub(/^[ \t]+/, "", s); sub(/^export[ \t]+/, "", s)
+      if (index(s, k "=") != 1) next
+      v = substr(s, length(k) + 2)
+      if (v ~ /^[ \t]/) v = ""
+      else if (v ~ /^"/)    { v = substr(v, 2); i = index(v, "\"");   if (i) v = substr(v, 1, i - 1) }
+      else if (v ~ /^\047/) { v = substr(v, 2); i = index(v, "\047"); if (i) v = substr(v, 1, i - 1) }
+      else sub(/[ \t].*$/, "", v)
+      out = v; got = 1 }
+    END { if (got) print out; else exit 1 }' "$1" 2>/dev/null
+}
 SHARED_RECORDS_UNDECLARED="__kit-default__"
 resolve_shared_records() { # declared value · memory root -> the effective set
   if [ "$1" = "$SHARED_RECORDS_UNDECLARED" ]; then
@@ -601,6 +617,76 @@ resolve_shared_records() { # declared value · memory root -> the effective set
   else
     printf '%s' "$1"
   fi
+}
+# THE GENERATED OUTPUTS, DECLARED BY THE KITS THAT GENERATE THEM - TOOL-aWindowedPass-4. Every reader
+# of `GENERATED_INDEXES` (check 23, check 38, `--dispatch`'s condition 3, and the build-commit pick in
+# the pass-order and brief-recorded legs) calls this at conf load, as they call
+# `resolve_shared_records`, so the effective set has ONE derivation. It reads the `[[generated]]`
+# tables of every `kit.toml` one directory beside this kit — the descriptors ship inside their kits,
+# so an adopter reads the same declarations gov does — resolves `{memory_root}`, `{map_root}` and
+# `{kit}`, and prints the `index:generator` pairs space-separated: the kits' rows first, then every
+# pair the conf adds, once each. Before this a hand-typed conf list named four of this repo's six
+# generated outputs and the shipped example two, so a hook-forced regeneration of the rest counted as
+# an undeclared write.
+#
+# A ROW MAY CARRY `when = "<conf file>:<KEY>=<value>"` (closing review r1, B1): it applies only when
+# that conf, at the repo root, assigns KEY exactly that value. memory-tree's backlog rows carry one,
+# because the backlog is GENERATED only under `BACKLOG_MODE=builds`; under the default it is authored,
+# is correctly a shared record, and an unconditional row refused every adopter's conf at load.
+#
+# WHAT IT DOES NOT CHECK: that a declared generator really writes the declared path — govkit selfcheck
+# grades the row's shape and that the generator ships, and no reader here runs a generator. A row whose
+# path holds another token is named on stderr and skipped, never guessed.
+resolve_generated_indexes() { # repo root · declared GENERATED_INDEXES · memory root -> the effective pairs
+  local _rg_root=$1 _rg_decl=$2 _rg_mem=$3 _rg_here _rg_kitrel _rg_tool _rg_map _rg_d _rg_krel _rg_rows
+  local _rg_out="" _rg_p _rg_g _rg_w _rg_kv _rg_seen=" "
+  _rg_here=$(cd "$(dirname "${BASH_SOURCE[0]}")" 2>/dev/null && pwd) || _rg_here=""
+  _rg_kitrel=$(git -C "${_rg_here:-.}" rev-parse --show-prefix 2>/dev/null) || _rg_kitrel=""
+  _rg_kitrel=${_rg_kitrel%/}
+  case "$_rg_kitrel" in */*) _rg_tool=${_rg_kitrel%/*} ;; *) _rg_tool="" ;; esac
+  # ABSENT takes the kit default; present and BLANK is kept, as `map_lib.load_conf` keeps it, and then
+  # `{map_root}/` resolves to nothing rather than to an absolute `/` (closing review r2, L5).
+  _rg_map=$(read_conf_value "$_rg_root/.codebase-map.conf" MAP_ROOT) || _rg_map="memory/map"
+  # Both loops read SCRATCH FILES, never a pipe, a process substitution or a here-string over one:
+  # memory/gotchas/bounded-through-a-pipe-is-unbounded.md, and the shell-hygiene leg that bans it.
+  local _rg_lf _rg_rf
+  _rg_lf=$(mktemp) && _rg_rf=$(mktemp) || { printf 'lib-unattended: resolve_generated_indexes cannot create a scratch file, so only the conf pairs are read\n' >&2; printf '%s' "$_rg_decl"; return 0; }
+  git -C "$_rg_root" ls-files -- ":(glob)${_rg_tool:+$_rg_tool/}*/kit.toml" >"$_rg_lf" 2>/dev/null || :
+  while IFS= read -r _rg_d; do
+    [ -n "$_rg_d" ] || continue
+    _rg_krel=${_rg_d%/kit.toml}
+    awk '
+      function val(s) { sub(/^[^=]*=[ \t]*"/, "", s); sub(/".*$/, "", s); return s }
+      { sub(/\r$/, "") }
+      /^\[\[generated\]\][ \t]*$/ { if (p != "") print p "\t" g "\t" w; t = 1; p = ""; g = ""; w = ""; next }
+      /^\[/                       { if (t && p != "") print p "\t" g "\t" w; t = 0; p = ""; g = ""; w = ""; next }
+      t && /^path[ \t]*=/         { p = val($0) }
+      t && /^generator[ \t]*=/    { g = val($0) }
+      t && /^when[ \t]*=/         { w = val($0) }
+      END { if (t && p != "") print p "\t" g "\t" w }' "$_rg_root/$_rg_d" >"$_rg_rf" 2>/dev/null || :
+    while IFS=$'\t' read -r _rg_p _rg_g _rg_w; do
+      [ -n "$_rg_p" ] && [ -n "$_rg_g" ] || continue
+      if [ -n "$_rg_w" ]; then
+        _rg_kv=${_rg_w#*:}
+        [ "$(read_conf_value "$_rg_root/${_rg_w%%:*}" "${_rg_kv%%=*}")" = "${_rg_kv#*=}" ] || continue
+      fi
+      [ -n "$_rg_map" ] || _rg_p=${_rg_p//\{map_root\}\//}
+      _rg_p=${_rg_p//\{memory_root\}/$_rg_mem}; _rg_p=${_rg_p//\{map_root\}/$_rg_map}
+      _rg_p=${_rg_p//\{kit\}/$_rg_krel}
+      case "$_rg_p" in
+        *"{"*|*"}"*) printf 'lib-unattended: %s declares a [[generated]] path with a token this reader cannot resolve, so it is skipped: %s\n' "$_rg_d" "$_rg_p" >&2; continue ;;
+      esac
+      _rg_p=$(normpath "$_rg_p"); _rg_g=$(normpath "$_rg_krel/$_rg_g")
+      case "$_rg_seen" in *" $_rg_p:$_rg_g "*) continue ;; esac
+      _rg_seen="$_rg_seen$_rg_p:$_rg_g "; _rg_out="$_rg_out $_rg_p:$_rg_g"
+    done <"$_rg_rf"
+  done <"$_rg_lf"
+  rm -f "$_rg_lf" "$_rg_rf"
+  for _rg_p in $_rg_decl; do
+    case "$_rg_seen" in *" $_rg_p "*) continue ;; esac
+    _rg_seen="$_rg_seen$_rg_p "; _rg_out="$_rg_out $_rg_p"
+  done
+  printf '%s' "${_rg_out# }"
 }
 # One `<shared record><TAB><index>` line per pair that overlaps, on `overlaps` — CONTAINMENT, in either
 # direction, never string equality: `memory` shared beside a `memory/LIVE.md` index is the same
@@ -756,12 +842,26 @@ pass_commit() {  # anchor · unit · run-state-path · [upper-bound, default HEA
   # `$(pass_commit … || true)`, so rc 2 reaches them as the same empty answer rc 1 does — the
   # difference is the stderr line, which is the only thing that makes a broken TMPDIR visible.
   _pf=$(mktemp) || { printf 'lib-unattended: pass_commit cannot create a scratch file, so it cannot say whether this pass committed\n' >&2; return 2; }
-  GIT log --reverse --format="%H%x09%s" "$_pa..$_pto" >"$_pf" 2>/dev/null || :
+  # THE `Pass:` TRAILER RIDES THE SAME WALK - TOOL-aWindowedPass-2. Attribution is PER COMMIT: a commit
+  # carrying any `Pass:` trailer is attributed by that trailer ALONE, so `Pass: none` attributes it to
+  # nothing and its subject is never read; a commit with no trailer keeps the subject match a landed
+  # record was graded by. Before this a records commit whose subject named a unit, or a range such as
+  # `-1..4`, was taken as that unit's pass.
+  GIT log --reverse --format="%H%x09%s%x1f%(trailers:key=Pass,valueonly,separator=%x20)" "$_pa..$_pto" >"$_pf" 2>/dev/null || :
   # It reads LINES rather than word-splitting because a subject holds spaces, and the possibly-empty
   # field is LAST for the reason memory/gotchas/empty-field-collapses-unless-it-is-last.md states.
   while IFS=$'\t' read -r _pc _psub; do
     [ -n "$_pc" ] || continue
-    id_in "$_psub" "$_pu" || continue
+    _ptr=${_psub#*$'\x1f'}; [ "$_ptr" = "$_psub" ] && _ptr=""; _psub=${_psub%%$'\x1f'*}
+    if [ -n "$_ptr" ]; then
+      # ONE TOKEN RULE for every trailer reader (closing review r1, M2/L2): ids split on any character
+      # an id cannot hold, so `A, B` names both, and a `none` anywhere attributes the commit to nothing.
+      _ptr=" ${_ptr//[^A-Za-z0-9-]/ } "
+      case "$_ptr" in *" none "*) continue ;; esac
+      case "$_ptr" in *" $_pu "*) ;; *) continue ;; esac
+    else
+      id_in "$_psub" "$_pu" || continue
+    fi
     _ptouch=$(GIT diff-tree --no-commit-id --name-only -r "$_pc" 2>/dev/null | grep -vxF -- "$_prel" || true)
     [ -n "$_ptouch" ] || continue
     # EXACT membership against the newline-wrapped set, deliberately not `covers`: a row naming a
@@ -778,6 +878,32 @@ pass_commit() {  # anchor · unit · run-state-path · [upper-bound, default HEA
   done <"$_pf"
   rm -f "$_pf"
   return 1
+}
+
+# ONE ANSWER TO "did this change touch only gen regions" (TOOL-aWindowedPass-3). Check 23 asks it of a
+# commit against its parent, `--check-commit` of the index against HEAD; two copies of the strip would
+# let the close forgive what the commit-time step refused. Regions NEST, the build README's unit table
+# inside its index, so the strip counts depth rather than toggling. WHAT THIS DOES NOT SEE: a hand edit
+# inside a gen region is not told from a render.
+GEN_REGION_AWK='{ sub(/\r$/, "") } /^<!-- gen:[^ ]+ -->/ { g++; next } /^<!-- \/gen:[^ ]+ -->/ { if (g > 0) g--; next } !g'
+check_gen_region_only() { # before object · after object -> 0 when both exist and differ only inside gen regions
+  local _ga _gb
+  _ga=$(GIT show "$1" 2>/dev/null) || return 1
+  _gb=$(GIT show "$2" 2>/dev/null) || return 1
+  [ "$(printf '%s\n' "$_ga" | awk "$GEN_REGION_AWK")" = "$(printf '%s\n' "$_gb" | awk "$GEN_REGION_AWK")" ]
+}
+
+# THE ATTRIBUTION TOKENS OF A COMMIT, one `<sha> <tokens>` line per commit - TOOL-aWindowedPass-2. The
+# build-commit pick and its callers' subject caches all read this, so a commit is attributed one way
+# everywhere: a commit carrying a `Pass:` trailer yields `PASSTRAILER <its ids>` and NOT its subject,
+# so `Pass: none` names no unit; one with no trailer yields its subject's tokens, as before. Tokens
+# are runs of `[A-Za-z0-9-]`, the shape a whole-token `case " $id "` match reads.
+read_attribution_tokens() { # git-log revision arguments -> one tokenised line per commit
+  GIT log --format='%H %s%x1f%(trailers:key=Pass,valueonly,separator=%x20)' "$@" 2>/dev/null \
+    | awk -F '\037' '{ if ($2 != "") { split($1, h, " "); t = $2; gsub(/[^A-Za-z0-9-]/, " ", t)
+                                        if ((" " t " ") ~ / none /) t = ""; print h[1] " PASSTRAILER " t }
+                       else print $1 }' \
+    | tr -c 'A-Za-z0-9\n-' ' '
 }
 
 # ------------------------------------------------------------- which commit BUILT this unit, once
@@ -878,7 +1004,7 @@ build_commit() {  # rev-range · unit-id · build-dir · generated-indexes · sh
     #
     # THE WHOLE-TOKEN MATCH is `memory/gotchas/id-matched-as-a-substring`: every id ending in a 1-up
     # sequence is a prefix of nine others, so an unanchored `TOOL-x-1` matches `TOOL-x-19`'s commit.
-    [ -n "$_bc_subj" ] || _bc_subj=" $(GIT log -1 --format=%s "$_bc_c" 2>/dev/null | tr -c 'A-Za-z0-9-' ' ') "
+    [ -n "$_bc_subj" ] || _bc_subj=" $(read_attribution_tokens -1 "$_bc_c" | cut -d' ' -f2-) "
     case "$_bc_subj" in *" $_bc_id "*) ;; *) continue ;; esac
     # Did it touch anything outside this build's own record surface?
     if GIT show --pretty=format: --name-only "$_bc_c" 2>/dev/null \

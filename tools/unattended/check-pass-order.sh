@@ -38,7 +38,7 @@
 # below. `--preview` grades the live tree and prints violations without setting exit status, which is
 # how a candidate predicate gets run over the real tree before it is wired.
 set -u
-KIT_UNATTENDED_VERSION=1.57   # gov:kit unattended@1.57 — must match unattended.sh; check-kit-versions.sh pairs them
+KIT_UNATTENDED_VERSION=1.62   # gov:kit unattended@1.62 — must match unattended.sh; check-kit-versions.sh pairs them
 
 # The dereference pin, identical to this kit's other two readers and for the identical reason: a graft
 # file rewrites the commit GRAPH, so every ancestry answer below could be honest about a sha and wrong
@@ -125,6 +125,9 @@ if [ "$_conf_ok" != 1 ]; then
   exit 2
 fi
 MEMORY_ROOT="${MEMORY_ROOT:-memory}"
+# THE EFFECTIVE GENERATED OUTPUTS - TOOL-aWindowedPass-4: the kits' `[[generated]]` rows, then the
+# conf's additions, through the ONE resolver every reader of this key calls.
+GENERATED_INDEXES=$(resolve_generated_indexes "$ROOT" "$GENERATED_INDEXES" "$MEMORY_ROOT")
 
 # ------------------------------------------------------------------------------- THE CLASSIFIER
 # SLICED OUT OF THE DRIVER'S SHIPPED BYTES, never re-implemented. `plan_state` is the M2 classifier
@@ -272,7 +275,7 @@ esac
 declare -A _SUBJ=()
 while IFS= read -r _cl; do
   _SUBJ[${_cl%% *}]=" ${_cl#* } "
-done < <(GIT log --format='%H %s' HEAD 2>/dev/null | tr -c 'A-Za-z0-9\n-' ' ')
+done < <(read_attribution_tokens HEAD)
 _n_hist=$(GIT rev-list --count HEAD 2>/dev/null)
 case "$_n_hist" in ''|*[!0-9]*) _n_hist=-1 ;; esac
 if [ "${#_SUBJ[@]}" -ne "$_n_hist" ]; then

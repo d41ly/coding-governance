@@ -18,7 +18,7 @@
 #   unattended.sh --rescope <slug> --act <retire|supersede|add|defer> --item <id> [--successor <id>] --reason <text>
 #   unattended.sh --dispatch <slug> --pass <id> --writes <path> [--writes <path> ...]
 #   unattended.sh --brief <slug> --unit <id> --path <file>  # record WHAT a build pass was handed
-#   unattended.sh --review <slug> --subject <id> --verdict <v> --blockers <N> [--disposition fold|promote]
+#   unattended.sh --review <slug> --subject <id> --verdict <v> --blockers <N> [--highs <N> --minors <N>] [--disposition fold|promote]
 #   unattended.sh --abort <slug> --reason <text>           # end it, with the reason on the record
 #   unattended.sh --hold <slug> --code <c> --until <cond> --reason <text> --reaped <id>|--keepalive-unreachable <node> [--pending-run <runId>]
 #   unattended.sh --handoff <slug> --code owner-landing|owner-decision --reason <text> --reaped <id>|--keepalive-unreachable <node>   # HELD for an owner to land or decide
@@ -27,6 +27,7 @@
 #   unattended.sh --attest <slug> --item <item> [--value <text>]  # the agent-checked DoD items
 #   unattended.sh --record-piece <slug> --path <p> --leg <n> --verdict <PASS|FAIL|NA> [--records-root <dir> [--playbook-sha <sha>] [--run <id>]]
 #   unattended.sh --record-set <slug> --leg <n> --verdict <PASS|FAIL|NA> [--records-root <dir> [--run <id>] [--set <hashes>]]
+#   unattended.sh --check-commit <message file>                    # from commit-msg: refuse an open pass's undeclared staged path
 #   unattended.sh --version                                        # the kit version, then exit
 #
 # Exit 0 = the verb succeeded · 1 = a refusal, named · 2 = misconfigured (not a repo, no conf).
@@ -47,7 +48,7 @@
 # The generated region holds NO copy: the unit list is DERIVED from the build README's already-derived,
 # already-byte-compared slice. One derivation in the tree; this file is not a second one.
 set -u
-KIT_UNATTENDED_VERSION=1.57   # gov:kit unattended@1.57 — kit identity; set HERE, never from .unattended.conf
+KIT_UNATTENDED_VERSION=1.62   # gov:kit unattended@1.62 — kit identity; set HERE, never from .unattended.conf
 
 # ------------------------------------------------------------------------------ the dereference pin
 # A sha is a NAME, and turning a name into bytes or into ancestry happens in the run's own object
@@ -95,7 +96,7 @@ KIT_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
 VERBS_SLUG="--preflight --status --audit --register-task --release-task --liveness --resume --close --landed --abort --hold --handoff --settle --park --propose --attest --record-piece --record-set --rescope --dispatch --review --brief"
 # The verbs whose argument is POSITIONAL and which exit inside the parse loop. Separate because the
 # dispatch cannot treat them alike, and merged again for every reader, who does not care.
-VERBS_INLINE="--plan --phase --version"
+VERBS_INLINE="--plan --phase --check-commit --version"
 verbs_all()   { printf '%s %s' "$VERBS_SLUG" "$VERBS_INLINE"; }
 is_slug_verb(){ case " $VERBS_SLUG " in *" $1 "*) return 0 ;; esac; return 1; }
 verb_list() { # -> "--a, --b and --c", for a human reading a refusal
@@ -610,7 +611,7 @@ PLAN_PATHS=""
 # beside the unit rows; the UNDECIDED `next:` input is derived either way, because that is an
 # input to the rung ladder rather than a property of this output mode.
 PLAN_ASKS=""
-RV_SUBJECT=""; RV_BLOCKERS=""; RV_DISPOSITION=""
+RV_SUBJECT=""; RV_BLOCKERS=""; RV_DISPOSITION=""; RV_HIGHS=""; RV_MINORS=""
 M="$MEMORY_ROOT"
 # SHARED_RECORDS's DEFAULT IS RESOLVED HERE, not in the block above, because it is expressed in terms
 # of MEMORY_ROOT and the conf is what sets that. Computed before the source it baked in this kit's own
@@ -620,6 +621,9 @@ M="$MEMORY_ROOT"
 # resolution itself lives in the kit library since TOOL-dDerivedDocket-20, because the gate leg reads
 # the same key and a default spelled in two callers is two answers to one question.
 SHARED_RECORDS=$(resolve_shared_records "$SHARED_RECORDS" "$MEMORY_ROOT")
+# THE EFFECTIVE GENERATED OUTPUTS - TOOL-aWindowedPass-4: the kits' `[[generated]]` rows, then the
+# conf's additions, through the ONE resolver every reader of this key calls.
+GENERATED_INDEXES=$(resolve_generated_indexes "$ROOT" "$GENERATED_INDEXES" "$MEMORY_ROOT")
 # THE TWO CONDITION-3 KEYS MAY NOT NAME ONE PATH - TOOL-dDerivedDocket-20 S1. A path under both is
 # answered by whichever of condition 3's two rules `--dispatch` reaches first, and the declaration of
 # the other means nothing. Refused at LOAD, on `read_bound_key`'s pattern, because the first refusal
@@ -10064,11 +10068,12 @@ review_exit_note() { # disposition -> the sentence
   case "$1" in
     fold)    printf '%s' "every MEDIUM and LOW confirmed at this exit was FOLDED into the specs it belongs to, which is the recorded disposition; the severity rule never folds a BLOCKER or HIGH, so this value is legal only at CONVERGED, where none stood. Not parked, not waived" ;;
     promote) printf '%s' "every BLOCKER and HIGH confirmed at this exit is PROMOTED to a unit of this build, specced at its tier and built, and a MEDIUM or LOW is folded. Not parked, not waived, not re-reviewed" ;;
+    closing) printf '%s' "every finding confirmed at this exit is PROMOTED to a unit of this build: one per BLOCKER and HIGH, and the MEDIUMs and LOWs batched into one unit, two only across disjoint write sets. Not folded, not parked, not waived, not re-reviewed" ;;
     *)       printf '%s' "NO DISPOSITION WAS RECORDED, which the state gate should have refused before this line could print" ;;
   esac
 }
-verb_review() { # slug · subject · verdict · blockers · disposition
-  local slug="$1" subj="$2" verdict="$3" blockers="$4" disposition="${5:-}" rel prior state note disp bound
+verb_review() { # slug · subject · verdict · blockers · disposition · highs · minors
+  local slug="$1" subj="$2" verdict="$3" blockers="$4" disposition="${5:-}" highs="${6:-}" minors="${7:-}" rel prior state note disp bound counts owe exitnote
   check_slug "$slug" || return 1
   rel=$(runmd_of "$slug")
   [ -f "$rel" ] || { fail 37 "no run-state file, so there is no run to record a review round against: $rel"; return 1; }
@@ -10081,6 +10086,32 @@ verb_review() { # slug · subject · verdict · blockers · disposition
   case "$blockers" in
     ""|*[!0-9]*) fail 37 "--review requires --blockers as a plain integer, because the predicate compares this round's count against the previous one and cannot compare prose"; return 1 ;;
   esac
+  # THE CLOSING REVIEW'S COUNTS (TOOL-aBatchedMinors-2). The owner ruled on 2026-10-04 that every
+  # finding the closing diff review confirms is PROMOTED — one unit per BLOCKER and HIGH, the MEDIUMs
+  # and LOWs batched into one unit or two — and a row recording only the blocker count could not say
+  # what else stood. Both counts are the closing review's: its subject IS the build slug, the equality
+  # the bound below makes. A spec audit's minors are folded into the spec under review, which is
+  # their fix, so a count on a spec subject would be read by check 2 as owing units nobody owes.
+  case "$highs" in
+    ""|*[!0-9]*) [ -z "$highs" ] || { fail 37 "--review requires --highs as a plain integer, the count of CONFIRMED HIGH findings standing at the closing review's exit: $highs"; return 1; } ;;
+  esac
+  case "$minors" in
+    ""|*[!0-9]*) [ -z "$minors" ] || { fail 37 "--review requires --minors as a plain integer, the count of CONFIRMED MEDIUM and LOW findings standing at the closing review's exit: $minors"; return 1; } ;;
+  esac
+  # ONE INTEGER FOR TWO READERS (closing review round 1, L1). The counts reach bash arithmetic below,
+  # which reads a leading zero as OCTAL (`08` aborts the driver, `010` is 8) and wraps past 2^63,
+  # while check 2's awk reads the same row field as decimal. A canonical decimal of at most nine
+  # digits is the one spelling both read alike, so anything else is refused before either does.
+  for _rv_n in "blockers $blockers" "highs $highs" "minors $minors"; do
+    _rv_flag=${_rv_n%% *}
+    case "${_rv_n#* }" in
+      0[0-9]*|??????????*) fail 37 "--review requires --$_rv_flag as a decimal of at most nine digits with no leading zero, because bash arithmetic reads a leading zero as octal and check 2 reads the row as decimal: ${_rv_n#* }"; return 1 ;;
+    esac
+  done
+  if [ "$subj" != "$slug" ] && [ -n "$highs$minors" ]; then
+    fail 37 "--highs and --minors are the closing diff review's counts, and this subject is not the build slug: a spec audit's mediums and lows are FOLDED into the spec under review, so a count here would be read by the gate as owing units nobody owes: $subj"
+    return 1
+  fi
   # THE CLOSED SET, checked HERE and not below with the state gate. S3a decides the order and the
   # consequence is testable: `--disposition nonsense` on a CONVERGING round produces THIS refusal and
   # not the state one, so an arm cannot pass against either. The refusal renders the constant rather
@@ -10152,8 +10183,9 @@ verb_review() { # slug · subject · verdict · blockers · disposition
   # NON-CONVERGENT, CEILING or BOUNDED exit stands on at least one BLOCKER, and the severity rule
   # promotes every blocker: `fold` cannot be that exit's disposition, and accepting it wrote
   # `blockers 3 · disposition fold`, a row the gate read as demanding nothing. At CONVERGED the same
-  # rule disposes the HIGHS that stood at zero blockers, so a disposition is ACCEPTED there and
-  # never required — a converged round with nothing above MEDIUM needs no field.
+  # rule disposes the HIGHS that stood at zero blockers, so on a SPEC subject a disposition is
+  # ACCEPTED there and never required — a converged round with nothing above MEDIUM needs no field.
+  # The closing diff review's converged round is decided by its counts, in the block below.
   case "$state" in
     NON-CONVERGENT|CEILING|BOUNDED)
       if [ -z "$disposition" ]; then
@@ -10161,7 +10193,13 @@ verb_review() { # slug · subject · verdict · blockers · disposition
         return 1
       fi
       if [ "$disposition" = fold ]; then
-        fail 37 "--review exits $state with $blockers blocker(s) standing, and the severity rule promotes every blocker, so fold cannot be this exit's disposition; fold is legal only at CONVERGED, where nothing above MEDIUM stood"
+        # ...and on the closing diff review fold is legal at NO exit (closing review round 1, L3), so
+        # the sentence pointing at CONVERGED would send the operator to a refusal.
+        if [ "$subj" = "$slug" ]; then
+          fail 37 "--review exits $state on the closing diff review, which folds nothing: every confirmed finding is promoted, the MEDIUMs and LOWs batched into one unit or two"
+        else
+          fail 37 "--review exits $state with $blockers blocker(s) standing, and the severity rule promotes every blocker, so fold cannot be this exit's disposition; fold is legal only at CONVERGED, where nothing above MEDIUM stood"
+        fi
         return 1
       fi ;;
     CONVERGED) ;;
@@ -10171,6 +10209,39 @@ verb_review() { # slug · subject · verdict · blockers · disposition
         return 1
       fi ;;
   esac
+  # THE CLOSING EXIT PROMOTES EVERY STANDING FINDING (TOOL-aBatchedMinors-2). Spelled after the state
+  # gate above, which has already refused fold and an absent value beside a standing blocker, so the
+  # refusals below are the ones only the counts can decide: a converged closing round standing on a
+  # high or a minor, and a promotion of nothing.
+  counts=""; owe=0
+  if [ "$subj" = "$slug" ]; then
+    case "$state" in
+      CONVERGED|NON-CONVERGENT|CEILING)
+        if [ -z "$highs" ] || [ -z "$minors" ]; then
+          fail 37 "--review exits $state on the closing diff review and requires --highs and --minors, the CONFIRMED HIGH and MEDIUM-plus-LOW findings standing at the exit, because every one of them is promoted and a row that does not count them cannot be graded"
+          return 1
+        fi
+        if [ "$disposition" = fold ]; then
+          fail 37 "--review exits $state on the closing diff review, which folds nothing: every confirmed finding is promoted, the MEDIUMs and LOWs batched into one unit or two"
+          return 1
+        fi
+        owe=$(( blockers + highs + (minors > 0 ? 1 : 0) ))
+        if [ "$owe" -gt 0 ] && [ "$disposition" != promote ]; then
+          fail 37 "--review exits $state on the closing diff review with $blockers blocker(s), $highs high(s) and $minors minor(s) standing, and requires --disposition promote, because every confirmed finding there is promoted"
+          return 1
+        fi
+        if [ "$owe" -eq 0 ] && [ -n "$disposition" ]; then
+          fail 37 "--review exits $state on the closing diff review with nothing standing, so --disposition $disposition promotes nothing, and the gate would read the row as owing a unit"
+          return 1
+        fi
+        counts=" · highs $highs · minors $minors" ;;
+      *)
+        if [ -n "$highs$minors" ]; then
+          fail 37 "--review names --highs or --minors on a closing round that is not a terminal exit, and a count of what stands at the exit is a claim about an exit that has not happened yet: state $state"
+          return 1
+        fi ;;
+    esac
+  fi
   note=""
   case "$state" in
     CONVERGED|NON-CONVERGENT) note=" · $state" ;;
@@ -10181,17 +10252,20 @@ verb_review() { # slug · subject · verdict · blockers · disposition
   # the count. No new field, no new grammar, no new authored fact: an append-only history of rounds is
   # what a park KIND is for, and the sibling unit takes the FACT route for a per-run singleton instead.
   disp=""; [ -n "$disposition" ] && disp=" · disposition $disposition"
-  park "$rel" review "$subj" "verdict $verdict · blockers $blockers$note$disp" || return 1
+  # THE COUNTS SIT BEFORE THE DISPOSITION: check 2 reads the disposition as the LAST ` · ` field.
+  park "$rel" review "$subj" "verdict $verdict · blockers $blockers$note$counts$disp" || return 1
   stage_or_fail "$rel" || return 1
+  exitnote=$(review_exit_note "$disposition")
+  [ -n "$counts" ] && [ "$disposition" = promote ] && exitnote="$(review_exit_note closing); this exit owes at least $owe new unit(s), one per blocker and high plus one for the minors when any stood"
   case "$state" in
     CONVERGED)      if [ -n "$disposition" ]; then
-                      echo "unattended: review $subj · round $(( $(printf '%s' "$prior" | wc -w) + 1 )) · $verdict · blockers 0 · CONVERGED · disposition $disposition — the loop is done for this subject, and $(review_exit_note "$disposition")"
+                      echo "unattended: review $subj · round $(( $(printf '%s' "$prior" | wc -w) + 1 )) · $verdict · blockers 0 · CONVERGED$counts · disposition $disposition — the loop is done for this subject, and $exitnote"
                     else
-                      echo "unattended: review $subj · round $(( $(printf '%s' "$prior" | wc -w) + 1 )) · $verdict · blockers 0 · CONVERGED — the loop is done for this subject"
+                      echo "unattended: review $subj · round $(( $(printf '%s' "$prior" | wc -w) + 1 )) · $verdict · blockers 0 · CONVERGED$counts — the loop is done for this subject"
                     fi ;;
-    NON-CONVERGENT) echo "unattended: review $subj · round $(( $(printf '%s' "$prior" | wc -w) + 1 )) · $verdict · blockers $blockers · NON-CONVERGENT · disposition $disposition — the count did not shrink, so the loop STOPS here and $(review_exit_note "$disposition")" ;;
-    CEILING)        echo "unattended: review $subj · round $(( $(printf '%s' "$prior" | wc -w) + 1 )) · $verdict · blockers $blockers · CEILING · disposition $disposition — the runaway backstop fired at $RUNAWAY_CEILING rounds and THE CONVERGENCE PREDICATE DID NOT TERMINATE, which is a defect in the predicate rather than a routine outcome. The run lands anyway and $(review_exit_note "$disposition"); record this in the build README, because a fact that lives only in a transcript is a fact nobody reads" ;;
-    BOUNDED)        echo "unattended: review $subj · round $(( $(printf '%s' "$prior" | wc -w) + 1 )) · $verdict · blockers $blockers · BOUNDED · disposition $disposition — the declared round bound of $REVIEW_ROUNDS is reached, so the loop STOPS here and every CONFIRMED finding is DISPOSED BY SEVERITY: $(review_exit_note "$disposition")" ;;
+    NON-CONVERGENT) echo "unattended: review $subj · round $(( $(printf '%s' "$prior" | wc -w) + 1 )) · $verdict · blockers $blockers · NON-CONVERGENT$counts · disposition $disposition — the count did not shrink, so the loop STOPS here and $exitnote" ;;
+    CEILING)        echo "unattended: review $subj · round $(( $(printf '%s' "$prior" | wc -w) + 1 )) · $verdict · blockers $blockers · CEILING$counts · disposition $disposition — the runaway backstop fired at $RUNAWAY_CEILING rounds and THE CONVERGENCE PREDICATE DID NOT TERMINATE, which is a defect in the predicate rather than a routine outcome. The run lands anyway and $exitnote; record this in the build README, because a fact that lives only in a transcript is a fact nobody reads" ;;
+    BOUNDED)        echo "unattended: review $subj · round $(( $(printf '%s' "$prior" | wc -w) + 1 )) · $verdict · blockers $blockers · BOUNDED$counts · disposition $disposition — the declared round bound of $REVIEW_ROUNDS is reached, so the loop STOPS here and every CONFIRMED finding is DISPOSED BY SEVERITY: $exitnote" ;;
     *)              if [ -z "${prior//[[:space:]]/}" ]; then
                       echo "unattended: review $subj · round 1 · $verdict · blockers $blockers · CONVERGING — the first round for a subject has no predecessor to shrink against, so the loop arms"
                     else
@@ -10806,6 +10880,120 @@ CPOROWS
     for _wp in $_wrote; do overlaps "$_dp" "$_wp" && { _hit=1; break 2; }; done
   done
   [ -n "$_hit" ] && return 1
+  return 0
+}
+
+# --check-commit (TOOL-aWindowedPass-3): CHECK 23 AT THE ONE MOMENT ITS FINDING IS STILL REPAIRABLE.
+# A pass may widen its declaration with `--dispatch` until it commits and never after, so a close that
+# finds an undeclared write hours later can only count it. Run from the `commit-msg` hook, this reads
+# the message the commit is about to carry and the INDEX it is about to record, and refuses an open
+# pass's commit that stages a path its declarations do not cover, printing the `--dispatch` that
+# widens them. The run is the one whose branch THIS worktree has checked out (`resolve_holder_worktree`);
+# no such run is no question, exit 0 and silent. Beside code 49, not under a new one: it is the
+# declaration's own question, asked before the commit instead of after.
+# The subtractions are check 23's own: the run-state file, the unit's brief rows (`read_brief_paths`
+# over the index, which is what an empty commit argument reads), the effective generated outputs, and
+# a change confined to gen regions (`check_gen_region_only`, HEAD against the index).
+# WHAT IT DOES NOT CHECK: a `--no-verify` commit never reaches it, and `Pass: none` is taken at its
+# word. Check 23 still grades both at the close.
+check_commit_message() { # commit message file
+  local msg="$1" f rel="" ref slug trl subj rows r d o u decl st p q ok uncov uncovl briefs cmd kd head
+  [ -f "$msg" ] || { fail 49 "--check-commit was given no readable commit message file: ${msg:-(none)}"; return 1; }
+  # It runs on EVERY commit, so the candidates are narrowed by one grep for this branch's ref before
+  # the holder predicate, which reads the record's facts, confirms each.
+  ref=$(GIT symbolic-ref -q HEAD 2>/dev/null) || return 0
+  for f in $(GIT ls-files -- ":(glob)$M/builds/*/RUN.md" 2>/dev/null | xargs -r grep -lF -- ": $ref" 2>/dev/null); do
+    # RECORDED, not derived: this runs on every commit and derives nothing over the network.
+    case "$(read_recorded_phase "$f")" in LANDED|ABORTED) continue ;; esac
+    resolve_holder_worktree "$f" && { rel=$f; break; }
+  done
+  [ -n "$rel" ] || return 0
+  slug=${rel%/RUN.md}; slug=${slug##*/}
+  # READ AS THE CLOSE READS THEM (closing review r1, M2/L2): `%(trailers:key=Pass)` matches the key in
+  # any case, ids split on any character an id cannot hold, a `none` anywhere attributes the commit to
+  # nothing, and `%s` is the first PARAGRAPH joined, not its first line.
+  trl=$(git interpret-trailers --parse <"$msg" 2>/dev/null | sed -n 's/^[Pp][Aa][Ss][Ss]: *//p' | tr '\n' ' ')
+  trl=${trl//[^A-Za-z0-9-]/ }
+  # CR STRIPPED FIRST: the hook reads the editor's file before git's cleanup, and a CRLF blank line is
+  # `\r`, which is not blank to awk, so the paragraph never ended (closing review r2, M5). One awk and no
+  # `grep` stage: MSYS grep strips CR on its own, which hid this on one node and not on another.
+  subj=$(awk '{ sub(/\r$/, "") } /^#/ { next } NF { p = 1 } p && !NF { exit } p { printf "%s ", $0 }' "$msg")
+  # ONE LINE PER OPEN ROW, `<unit> <declared paths>`, through the predicate `--dispatch` and `--audit`
+  # already share, so this verb cannot call a pass open that they call closed. A row it calls closed
+  # BECAUSE ITS PASS COMMIT IS HEAD is kept apart (`O` rows): that is `git commit --amend` on the pass
+  # commit, whose HEAD is the commit being replaced (closing review r1, M4). Only a trailer naming the
+  # unit reopens it, so a records commit after a pass is never asked for a trailer it does not owe.
+  head=$(GIT rev-parse -q --verify HEAD 2>/dev/null)
+  rows=$(grep -F -- " dispatch · item " "$rel" 2>/dev/null | while IFS= read -r r; do
+      [ -n "$r" ] || continue
+      d=${r#* dispatch · item }; d=${d%% · reason *}
+      if check_pass_open "${d%% *}" "${d#* }" "$rel" "${r#* · reason }"; then
+        printf 'o %s %s\n' "${d#* }" "${r#* · reason }"
+      elif [ -n "$head" ] && [ "$(pass_commit "${d%% *}" "${d#* }" "$rel" || true)" = "$head" ]; then
+        printf 'O %s %s\n' "${d#* }" "${r#* · reason }"
+      fi
+    done)
+  case " $trl " in *" none "*) return 0 ;; esac
+  # EVERY LOOP BELOW READS A SCRATCH FILE, `CC_TMP`, never a heredoc over command output: such a loop
+  # reads until EOF, and the shell-hygiene leg bans it. The dispatch arm creates and removes the file.
+  if [ -z "${trl// /}" ]; then
+    printf '%s\n' "$rows" > "$CC_TMP"
+    while read -r o u decl; do
+      [ "$o" = o ] || continue
+      id_in "$subj" "$u" || continue
+      fail 49 "--check-commit: this commit's subject names $u, an open dispatched pass of $slug, and the message carries no Pass: trailer, so check 23 would take it for that pass's commit; end the message with 'Pass: $u' when it is the pass, or 'Pass: none' when it is not"
+      return 1
+    done < "$CC_TMP"
+    return 0
+  fi
+  # NO RENAME DETECTION (closing review r1, M1): porcelain `diff` lists a staged rename by its
+  # destination alone, where check 23's `diff-tree` lists the deleted source too.
+  # ...and NOT C-QUOTED: by default a non-ASCII path prints as `"docs/caf\303\251.md"`, which no
+  # declaration covers and no printed repair can name (closing review r2, M4).
+  st=$(git -c core.quotePath=false diff --cached --no-renames --name-only -z 2>/dev/null | tr '\0' '\n')
+  # Repo-relative from git itself: KIT_DIR is the shell's spelling and ROOT is git's, and on MSYS the
+  # two differ by drive form, so stripping one from the other leaves an absolute path in the command.
+  kd=$(git -C "$KIT_DIR" rev-parse --show-prefix 2>/dev/null); kd=${kd%/}; [ -n "$kd" ] || kd=$KIT_DIR
+  for u in $trl; do
+    decl=$(printf '%s\n' "$rows" | awk -v u="$u" '$2 == u { $1 = ""; $2 = ""; print }' | tr '\n' ' ')
+    if [ -z "${decl// /}" ]; then
+      fail 49 "--check-commit: the Pass: trailer names $u, which has no open dispatched pass in $slug, so nothing declared what this commit may write; declare it first: bash $kd/unattended.sh --dispatch $slug --pass $u --writes <path>"
+      return 1
+    fi
+    briefs=$'\n'"$(read_brief_paths "" "$u" "$rel")"$'\n'
+    uncov=""; uncovl=""
+    printf '%s\n' "$st" > "$CC_TMP"
+    while IFS= read -r p; do
+      [ -n "$p" ] || continue
+      [ "$p" = "$rel" ] && continue
+      case "$briefs" in *$'\n'"$p"$'\n'*) continue ;; esac
+      ok=0
+      for q in $decl; do covers "$q" "$p" && { ok=1; break; }; done
+      for q in ${GENERATED_INDEXES:-}; do [ "$ok" = 1 ] && break; covers "${q%%:*}" "$p" && ok=1; done
+      [ "$ok" = 1 ] && continue
+      check_gen_region_only "HEAD:$p" ":$p" && continue
+      uncov="$uncov $p"; uncovl="$uncovl$p"$'\n'
+    done < "$CC_TMP"
+    # A UNIT WHOSE ROWS ARE ALL REOPENED (`O`) HAS COMMITTED: HEAD is its pass commit and this is an amend
+    # of it (TOOL-aWindowedPass-6). A widening `--dispatch` would anchor at the commit the amend
+    # replaces, a row check 23 never grades, so no widening is offered - only the repairs it honours.
+    if [ -n "$uncov" ] && [ -z "$(printf '%s\n' "$rows" | awk -v u="$u" '$1 == "o" && $2 == u { print "y"; exit }')" ]; then
+      fail 49 "--check-commit: pass $u has committed - HEAD is its pass commit, so this is an amend - and it stages paths outside the set it declared before dispatch:$uncov. An amend cannot widen a committed pass: unstage those paths, or commit them as a new commit after a fresh --dispatch for them"
+      return 1
+    fi
+    if [ -n "$uncov" ]; then
+      # SHELL-QUOTED, so the printed command runs as the argv it names (closing review r1, L1).
+      printf -v cmd 'bash %q --dispatch %q --pass %q' "$kd/unattended.sh" "$slug" "$u"
+      # ONE PATH PER LINE, never word-split or globbed: a staged `app/[id]/x` must not expand to a file it
+      # happens to match (closing review r2, L2). The recorded declaration holds no glob character.
+      { printf '%s\n' $decl; printf '%s' "$uncovl"; } | awk 'NF && !s[$0]++' > "$CC_TMP"
+      while IFS= read -r q; do
+        [ -n "$q" ] && printf -v cmd '%s --writes %q' "$cmd" "$q"
+      done < "$CC_TMP"
+      fail 49 "--check-commit: pass $u stages paths outside the set it declared before dispatch, and the declaration can still be widened because the pass has not committed:$uncov — widen it, then commit again: $cmd"
+      return 1
+    fi
+  done
   return 0
 }
 
@@ -11481,6 +11669,8 @@ while [ $# -gt 0 ]; do
     --subject)      RV_SUBJECT="${2:-}"; shift 2 || shift ;;
     --blockers)     RV_BLOCKERS="${2:-}"; shift 2 || shift ;;
     --disposition)  RV_DISPOSITION="${2:-}"; shift 2 || shift ;;
+    --highs)        RV_HIGHS="${2:-}"; shift 2 || shift ;;
+    --minors)       RV_MINORS="${2:-}"; shift 2 || shift ;;
     --plan)         shift; refuse_waive_unless_preflight --plan || { RUNLOG_CLEAN=1; exit 1; }
                     # SEVERAL SLUGS IN ONE PROCESS, and the single-slug form is byte-identical to
                     # what it always was — the framing below only appears when more than one slug is
@@ -11530,6 +11720,9 @@ while [ $# -gt 0 ]; do
                     [ "${1:-}" = "--witness" ] && { shift; PH_WIT=${1:-}; }
                     refuse_waive_unless_preflight --phase || { RUNLOG_CLEAN=1; exit 1; }
                     verb_phase "$PH_SLUG" "$PH_WANT" "$PH_WIT"; _rl_rc=$?; RUNLOG_CLEAN=1; exit "$_rl_rc" ;;
+    --check-commit) shift
+                    CC_TMP=$(mktemp) || { echo "unattended: --check-commit cannot create a scratch file, so it graded nothing"; RUNLOG_CLEAN=1; exit 2; }
+                    check_commit_message "${1:-}"; _rl_rc=$?; rm -f "$CC_TMP"; RUNLOG_CLEAN=1; exit "$_rl_rc" ;;
     --version)      echo "unattended $KIT_UNATTENDED_VERSION"; RUNLOG_CLEAN=1; exit 0 ;;
     # THE SET IS THE DISPATCH. A slug-taking verb is recognised by membership in VERBS_SLUG rather
     # than by an alternation typed here, so the declaration is load-bearing: a verb absent from it
@@ -11569,7 +11762,7 @@ case "$VERB" in
   --park)    verb_park "$SLUG" "$PK_ITEM" "$REASON" ;;
   --propose)   verb_propose "$SLUG" "$PK_ITEM" "$PK_STEP" "$REASON" ;;
   --brief)     verb_brief "$SLUG" "$BR_UNIT" "$RP_PATH" ;;
-  --review)    verb_review "$SLUG" "$RV_SUBJECT" "$VERDICT" "$RV_BLOCKERS" "$RV_DISPOSITION" ;;
+  --review)    verb_review "$SLUG" "$RV_SUBJECT" "$VERDICT" "$RV_BLOCKERS" "$RV_DISPOSITION" "$RV_HIGHS" "$RV_MINORS" ;;
   --attest)    verb_attest "$SLUG" "$PK_ITEM" "$AT_VALUE" ;;
   --record-piece) verb_record_piece "$SLUG" "$RP_PATH" "$RP_LEG" "$VERDICT" ;;
   --record-set)   verb_record_set "$SLUG" "$RP_LEG" "$VERDICT" ;;

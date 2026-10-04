@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.57 -->
+<!-- gov:kit unattended@1.62 -->
 # Unattended runs — the protocol
 
 *Two legs byte-compare this file against the template it ships from. **They compare the two copies to
@@ -482,7 +482,8 @@ In the repo-root `.unattended.conf`. Blank or absent turns the corresponding ass
 | `HALT_FLOOR` | the shrink-only SIZE of the kit's core halt-code set. MANDATORY, for the reason `CORE_FLOOR` is |
 | `HOLD_CODES_EXTRA` | project hold codes, appended to the core set |
 | `HOLD_FLOOR` | the shrink-only SIZE of the kit's core hold-code set. MANDATORY, for the reason `CORE_FLOOR` is |
-| `UNDECLARED_WRITE_BUDGET` | the per-build BUDGET on dispatched passes that committed outside the set they declared before dispatch: check 23 fails a run record over it. MANDATORY: undeclared or malformed is a refusal, for the reason `CORE_FLOOR` is. A pass whose commit is on the advertised tip, while the run has commits that tip lacks, is not graded again. The fleet total is printed on a `check 23 fleet` line and fails nothing |
+| `UNDECLARED_WRITE_BUDGET` | the per-build BUDGET on COUNTED writes, by a dispatched pass that overlapped a sibling's window, outside the set it declared: check 23 fails the run this branch drives over it. MANDATORY: undeclared or malformed is a refusal, for the reason `CORE_FLOOR` is. A pass whose commit is on the advertised tip, while the run has commits that tip lacks, is not graded again. Other runs, and the fleet total on a `check 23 fleet` line, are printed and fail nothing |
+| `UNDECLARED_WRITE_CEILING` | RETIRED (`TOOL-aWindowedPass-5`), replaced by `UNDECLARED_WRITE_BUDGET`: check 22 reports a conf that still sets it, check 23 refuses it by name, and `--emit-ceiling` exits 2 |
 | `LANDER_MARKER` | a bare NAME, resolved by the lander and by `--landed` against `git rev-parse --git-common-dir` — never a tree-relative path, which names a different file in each half and is unwritable in a linked worktree. BLANK asks for no observation |
 | `DIRECTIVES_EXTRA_TABLE` | a repo-relative file carrying Skill-shaped rows for whatever `DIRECTIVES_EXTRA` declares. Undeclared is the empty set |
 | `PASS_ORDER_CUTOFF` | the date from which a CLOSED unit whose BUILD COMMIT predates a conforming spec reds the `pass-order history` leg. Graded on the README's `opened:` date. BLANK turns the term OFF and the leg announces it |
@@ -499,7 +500,7 @@ In the repo-root `.unattended.conf`. Blank or absent turns the corresponding ass
 | `PROCMON_CMD` | the reaper, called `<cmd> --kill-msys <pid>` once per recorded orphan. OPTIONAL: blank turns reaping off, announced. `UNATTENDED-STOPS.md` |
 | `RESUME_SCHEDULE` · `RESUME_SCHEDULE_CREATE` · `RESUME_SCHEDULE_DELETE` · `RESUME_SCHEDULE_DELAY` · `RESUME_SCHEDULE_LIMIT` | the durable restart a hold owes. `UNATTENDED-STOPS.md` |
 | `SHARED_RECORDS` | the records a concurrently dispatched pass may never declare a write under. Blank is the empty set. No path may sit under both keys |
-| `GENERATED_INDEXES` | `index:generator` pairs. An index ALONE is fine; only the index TOGETHER WITH its generator is refused. Blank turns that half off |
+| `GENERATED_INDEXES` | `index:generator` pairs ADDED to the `[[generated]]` rows the kits declare. An index ALONE is fine; only the index TOGETHER WITH its generator is refused |
 | `LANDED_ANCHOR_CUTOFF` | the date from which a `LANDED` record must name its anchor kind. A record whose first commit predates it is read as `remote`; blank or absent grandfathers every record |
 | `LANDED_FACTS_CUTOFF` | from this date a landed record carries its verb's facts. Blank is off |
 | `HANDOFF_CUTOFF` | from this date `ABORTED` means DISCARD, §3. Blank is off |
