@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-4 — the govkit acceptance matrix reads its children as UTF-8 on every host
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · order 4
+**Status:** CLOSED · rev-1 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
