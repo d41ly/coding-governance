@@ -2684,7 +2684,7 @@ def test_model_ac3_ac11_ledger():
                           (8, "rescope", f"add X-xFixtureRun-4"), (9, "proposal", "an amendment"),
                           (10, "dispatch", f"{base[:8]} {FX_UNIT1}"), (11, "brief", FX_UNIT1),
                           (12, "review", "a-subject"), (13, "handoff", "owner-landing"),
-                          (19, "abort", "the stop")):
+                          (14, "rescope", f"defer {FX_UNIT2}"), (19, "abort", "the stop")):
         st = add_runstate_row(st, derive_minute(m), kind, item, "a reason", step="3" if kind == "proposal" else None)
     st = set_runstate_fact(set_runstate_fact(st, "phase", "ABORTED"), "witness", base)
     ledger = (f"# Acceptance ledger\n\n**Serves:** journal {FX_UNIT1}\n\n- AC1 — `cmd` — observed.\n"
@@ -2710,8 +2710,8 @@ def test_model_ac3_ac11_ledger():
     led = model.ledger
     want = {s: 0 for s in rl_model.LEDGER_SOURCES}
     want.update({"decision": 1, "abort": 1, "override": 1, "waiver": 1, "handoff": 1, "rescope-retire": 1,
-                 "rescope-supersede": 1, "review": 1, "trailer": 2, "spec-mark": 2, "decision-log": 7,
-                 "ledger": 1})
+                 "rescope-supersede": 1, "rescope-defer": 1, "review": 1, "trailer": 2, "spec-mark": 2,
+                 "decision-log": 7, "ledger": 1})
     check("model AC11: the per-source counts equal the fixture's", led["counts"], want)
     check("model AC11: every source of LEDGER_SOURCES has a fixture entry, and every entry's source is "
           "a member", sorted({e["source"] for e in led["entries"]}), sorted(rl_model.LEDGER_SOURCES))
@@ -2721,12 +2721,13 @@ def test_model_ac3_ac11_ledger():
                all(re.fullmatch(r"[^:]+\.md:[0-9]+|[0-9a-f]{40}|[^:]+\.md", e["ref"]) for e in led["entries"]),
                str([e["ref"] for e in led["entries"]])[:300])
     parked = [e for e in led["entries"] if e["source"] in ("decision", "abort", "override", "waiver",
-                                                            "handoff", "rescope-retire", "rescope-supersede")]
+                                                            "handoff", "rescope-retire", "rescope-supersede",
+                                                            "rescope-defer")]
     check("model AC11: each parked entry's ref is its record and line",
           sorted(e["ref"] for e in parked),
           sorted(f"{rm}:{r['line']}" for r in model.record_rows
                  if r["kind"] in ("decision", "abort", "override", "waiver", "handoff")
-                 or (r["kind"] == "rescope" and r["item"].split()[0] in ("retire", "supersede"))))
+                 or (r["kind"] == "rescope" and r["item"].split()[0] in ("retire", "supersede", "defer"))))
     check("model AC3: both trailers, with the sha of the commit carrying them",
           [(e["value"], e["ref"]) for e in led["entries"] if e["source"] == "trailer"],
           [("ran one leg — the push runs the bar", shas[2]), ("kept the name — the lexicon allows it", shas[2])])

@@ -1,11 +1,12 @@
 # TOOL-dUnstuckLanding-18 — the close-decision table, and a build that lands with its rest carried forward
 
-**Status:** INPROGRESS · rev-1 · 2026-10-04 · node d · Tier-2 · base 98926870 · streams tooling · order 6 · closes TOOL-dUnstuckLanding-8 · ratified 2026-10-04
+**Status:** CLOSED · rev-2 · 2026-10-04 · node d · Tier-2 · base 98926870 · streams tooling · order 6 · closes TOOL-dUnstuckLanding-8 · ratified 2026-10-04
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-04-build-TOOL-dUnstuckLanding-18-1-acceptance-ledger.md](../build/2026-10-04-build-TOOL-dUnstuckLanding-18-1-acceptance-ledger.md) | journal | — |
 | [2026-10-04-prompt-TOOL-dUnstuckLanding-13-build-brief.md](../prompts/2026-10-04-prompt-TOOL-dUnstuckLanding-13-build-brief.md) | journal | TOOL-dUnstuckLanding-13 TOOL-dUnstuckLanding-14 TOOL-dUnstuckLanding-15 TOOL-dUnstuckLanding-16 TOOL-dUnstuckLanding-17 TOOL-dUnstuckLanding-19 TOOL-dUnstuckLanding-20 |
 | [2026-10-04-prompt-TOOL-dUnstuckLanding-13-spec-brief.md](../prompts/2026-10-04-prompt-TOOL-dUnstuckLanding-13-spec-brief.md) | journal | TOOL-dUnstuckLanding-13 TOOL-dUnstuckLanding-14 TOOL-dUnstuckLanding-15 TOOL-dUnstuckLanding-16 TOOL-dUnstuckLanding-17 TOOL-dUnstuckLanding-19 TOOL-dUnstuckLanding-20 |
 
@@ -77,6 +78,13 @@ the close, a park is never an abort. Owner ruling `TOOL-dUnstuckLanding-23` supe
   in `memory/DECISIONS.md`, and this unit writes no row there. Observed by AC10.
 - **S9 — the kickoff manifest is re-stamped**, because `memory/guides/BUILD-METHOD.md` is in its
   `watch:` list. Observed by AC12.
+- **S10 — the two mirrors of the owed acts.** `tools/drift-audit/drift_report.py` and
+  `tools/runlog/model.py` each spell the driver's `PARK_ACTS_OWED`, and each kit's self-test holds
+  its copy to the driver both ways. Both gain `defer`. The runlog ledger sources gain
+  `rescope-defer` after `rescope-supersede`, so the owed kinds and acts still lead that tuple, and
+  the runlog ledger fixture and the drift-audit run-record fixture each gain one defer row. Two
+  existing driver-suite arms move with the code they pin: the `--act` refusal names four acts, and
+  the driver now calls `baseline_units` from two sites. Observed by AC13.
 
 ## 3. Non-goals (OUT)
 
@@ -177,6 +185,10 @@ who cannot tell which condition failed reaches for `--override`.
 - `tools/memory-tree/BUILD-METHOD.template.md`
 - `memory/guides/BUILD-METHOD.md`
 - `memory/guides/SESSION-KICKOFF.md`
+- `tools/drift-audit/drift_report.py`
+- `tools/drift-audit/selftest.py`
+- `tools/runlog/model.py`
+- `tools/runlog/selftest.py`
 
 ### Alternatives rejected
 
@@ -265,10 +277,15 @@ Each was rejected by a test, and §8 carries the fork it decided.
 - **AC12** — When `git diff HEAD~1 HEAD -- memory/guides/SESSION-KICKOFF.md` runs at the pass's
   commit, it shows the `last-audit:` line moved.
   Red when: `memory/guides/BUILD-METHOD.md` moved in the commit and the stamp did not.
+- **AC13** — When `PARK_ACTS_OWED` is read from the driver, `tools/runlog/model.py` and
+  `tools/drift-audit/drift_report.py` each spell the same three acts, and runlog's leading
+  `LEDGER_SOURCES` are the driver's owed kinds plus `rescope-defer` and the other owed acts.
+  Red when: a mirror is left at two acts, so its kit's parity arm reds at the close.
+  figure: three acts is DERIVED from the driver at observation time.
 
 ## 7. Gates
 
-`unattended kit gate` · `unattended protocol size` · `unattended skill wiring` · `check-wiring self-test` · `recall floor` · `recall floor arms` · `build-method size` · `kit/dogfood doc parity` · `method carriers (every pointer declared)` · `harness arms (fail branches armed or pinned)` · `kickoff-manifest ratchet` · `lexicon naming predicates` · `spec tokens (a spec's own names resolve)` · `memory hygiene`
+`unattended kit gate` · `unattended protocol size` · `unattended skill wiring` · `check-wiring self-test` · `recall floor` · `recall floor arms` · `build-method size` · `kit/dogfood doc parity` · `method carriers (every pointer declared)` · `harness arms (fail branches armed or pinned)` · `kickoff-manifest ratchet` · `lexicon naming predicates` · `spec tokens (a spec's own names resolve)` · `memory hygiene` · `drift-audit selftest` · `runlog selftest` · `runlog record schema` · `pre-push run-log line` · `run-gates run-log line`
 
 New arm: tools/unattended/unattended.test.sh · the carry-forward block: met, the edge, the three ask cases, an added unit, a missing defer row, and `--rescope --act defer` with and without `--successor` · none
 
@@ -303,6 +320,11 @@ once, under `TOOL-dUnstuckLanding-24`.
 
 - rev-1 · 2026-10-04 · initial draft, from the spec brief, design §5 at rev-2, review items M5 and
   M14, and the driver, the kit gate, the kit library and the four carriers read at base `98926870`.
+- rev-2 · 2026-10-04 · the build pass found an interface S4 did not name: drift-audit and runlog
+  each mirror `PARK_ACTS_OWED` and hold it to the driver both ways, so `defer` added to the driver
+  alone reds two self-tests at the close. S10 adds both mirrors, the runlog ledger source, one
+  fixture row in each kit, and the two driver-suite arms that pin what S4 changes; §4 lists the four
+  files and §7 the legs they guard, and AC13 observes the mirrors. No rev-1 criterion moved.
 
 ## 10. Reuse audit
 

@@ -2766,6 +2766,8 @@ def test_nonterminal_merged_runs(tmp: pathlib.Path) -> None:
 
     add_counted("tRetire", "retired-unit", [P("rescope", "retire TOOL-tRun-1")])
     add_counted("tSupersede", "retired-unit", [P("rescope", "supersede TOOL-tRun-2 -> TOOL-tRun-3")])
+    # `defer` joined the owed acts in TOOL-dUnstuckLanding-18: declared scope set aside, like the two above.
+    add_counted("tDefer", "retired-unit", [P("rescope", "defer TOOL-tRun-5")])
     add_counted("tRescopeAdd", "other", [P("rescope", "add TOOL-tRun-4")])
     # The act is the item's FIRST word. A reader matching `retire` anywhere in the item reads this one
     # as a retirement.

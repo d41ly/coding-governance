@@ -108,3 +108,11 @@ base: 0c16a66b53c9fd809ca198b612a23c62132edcc0
 2026-10-04T12:58:29Z brief · item TOOL-dUnstuckLanding-17 · reason cd089f69a73f memory/builds/dUnstuckLanding/prompts/2026-10-04-prompt-TOOL-dUnstuckLanding-13-build-brief.md
 
 2026-10-04T13:15:38Z dispatch · item e6e55d5a TOOL-dUnstuckLanding-17 · reason memory/backlog/TOOL.md
+
+2026-10-04T13:22:13Z dispatch · item f8afa61b TOOL-dUnstuckLanding-18 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/lib-unattended.sh tools/unattended/check-unattended.sh tools/unattended/STOPS.template.md tools/unattended/PROTOCOL.template.md tools/unattended/VERBS.template.md tools/unattended/SKILL.template.md memory/guides/UNATTENDED-STOPS.md memory/guides/UNATTENDED-PROTOCOL.md memory/guides/UNATTENDED-VERBS.md .claude/skills/unattended/SKILL.md tools/memory-tree/BUILD-METHOD.template.md memory/guides/BUILD-METHOD.md memory/guides/SESSION-KICKOFF.md memory/builds/dUnstuckLanding/spec/2026-10-04-spec-TOOL-dUnstuckLanding-18.md memory/builds/dUnstuckLanding/build/2026-10-04-build-TOOL-dUnstuckLanding-18-1-acceptance-ledger.md memory/builds/dUnstuckLanding/README.md memory/LIVE.md memory/ledger/2026-10.md memory/map/generated/MAP.md memory/map/generated/inventories.json memory/map/generated/symbols.json
+
+2026-10-04T13:22:14Z brief · item TOOL-dUnstuckLanding-18 · reason cd089f69a73f memory/builds/dUnstuckLanding/prompts/2026-10-04-prompt-TOOL-dUnstuckLanding-13-build-brief.md
+
+2026-10-04T13:42:45Z dispatch · item f8afa61b TOOL-dUnstuckLanding-18 · reason tools/runlog/model.py tools/runlog/selftest.py tools/drift-audit/drift_report.py tools/drift-audit/selftest.py
+
+2026-10-04T13:44:00Z dispatch · item f8afa61b TOOL-dUnstuckLanding-18 · reason memory/backlog/TOOL.md

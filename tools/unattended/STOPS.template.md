@@ -591,3 +591,41 @@ ledger is removed — or KEPT, naming each live pid, while a recorded process is
 
 **What it cannot see**: a process the agent starts in its own shell, such as a suite at `VERIFYING`.
 The driver did not start it, so it is not recorded and never reaped here.
+
+## 15. The close-decision table
+
+*`TOOL-dUnstuckLanding-18`, by owner ruling `TOOL-dUnstuckLanding-23`, which supersedes D8 as
+`build-complete` applies it. The hand-off codes are §2's.*
+
+**At the close a park is never an abort.** A decision a run reaches at the close is recorded and
+then takes the exit this table names. The rows are CLOSED: each is one decision KIND the closing-time
+census found, with its exit and the record that exit writes.
+
+| Decision kind | Exit | Record |
+|---|---|---|
+| land a partial build | LAND, when `build-complete`'s carry-forward term meets; otherwise HAND OFF `owner-decision` | one `rescope · item defer` row per carried unit |
+| move a shrink-only pin | none owed: the kit's history legs grade only the run's own range, so they no longer ask it; a pin the run's own diff must move is HAND OFF `owner-decision` | the decision park row |
+| act on another run's record | no act: concurrent runs are permitted, and a landed record derives its terminal (§12) | none |
+| publish another session's commits | does not arise under `in-place`; under `primary`, HAND OFF `owner-landing` | the handoff row |
+| land in a dependency order across repositories | HAND OFF `owner-landing`, the recipe naming each repository in order | the handoff row |
+| choose a fix where every option touches a carrier | HAND OFF `owner-decision` | the decision park row |
+| a question the default branch already answered | observe the advertised tip first, and take the exit the answer selects; unanswered, HAND OFF `owner-decision` | the park row |
+
+**A kind this table does not list is a HAND OFF under `owner-decision`**, because the work is sound
+and only a turn is missing. **ABORT is reserved for work that must not land as it stands** — the
+halt codes, never a decision the owner could take in one read.
+
+**The carry-forward term.** `build-complete`'s fifth term carries a non-terminal unit forward, and
+prints one `carried forward` line naming it and its ask, only when ALL FIVE hold, checked in this
+order and each unmet one named with its unit:
+
+1. its spec status is `DEFERRED`;
+2. the roster this run started with carries it, so a unit the run added — a promoted finding, an
+   adopted discovery — is never carried;
+3. the run-state file carries its `rescope · item defer <unit>` row, written by
+   `--rescope <slug> --act defer` and owed to the owner at the wrap-up;
+4. its spec header `closes` or `advances` an ask this build's own `BACKLOG.md` files under this
+   build's slug, and `ASKS_CMD` reads that ask neither CLOSED nor WONTDO — a blank `ASKS_CMD` is
+   unmet, naming the missing contract;
+5. no CLOSED unit's spec declares a `consumes-from` edge onto it, because a closed half that needs
+   the open half is not landable, and that build is a HAND OFF instead.

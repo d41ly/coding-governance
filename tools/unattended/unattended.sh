@@ -15,7 +15,7 @@
 #   unattended.sh --landed <slug>                          # after the push: observe, then mark LANDED
 #   unattended.sh --park <slug> --item <text> --reason <text>   # park a decision MID-RUN
 #   unattended.sh --propose <slug> --item <text> --step <s> --reason <text>  # amend a playbook LATER
-#   unattended.sh --rescope <slug> --act <retire|supersede|add> --item <id> [--successor <id>] --reason <text>
+#   unattended.sh --rescope <slug> --act <retire|supersede|add|defer> --item <id> [--successor <id>] --reason <text>
 #   unattended.sh --dispatch <slug> --pass <id> --writes <path> [--writes <path> ...]
 #   unattended.sh --brief <slug> --unit <id> --path <file>  # record WHAT a build pass was handed
 #   unattended.sh --review <slug> --subject <id> --verdict <v> --blockers <N> [--disposition fold|promote]
@@ -702,7 +702,11 @@ PARK_KINDS_OWED="decision abort override waiver handoff"
 # the owner must ANSWER, not about whether they must be TOLD. M3 delegates a build's scope
 # RESOLUTION; it does not delegate scope ABANDONMENT. The mechanism that lets a run GROW its build
 # was silently shrinking it too, and `add` stays history for exactly the original reason.
-PARK_ACTS_OWED="retire supersede"
+#
+# TOOL-dUnstuckLanding-18 S4 - `defer` is OWED for the same reason: a unit set aside against an open
+# ask lets `build-complete` land the build without it, and declared scope the owner is never told
+# was set aside is abandonment with a better name. The two sibling kits' mirrors move with it.
+PARK_ACTS_OWED="retire supersede defer"
 # The Definition-of-Done items an override may NOT buy. A DECLARED set rather than a name hardcoded
 # into a case arm: it WAS one name, and the second arrived as an acceptance criterion this build had
 # ratified and never implemented — found by writing the arms the item never had.
@@ -3458,6 +3462,124 @@ asks_filed_by() { # BACKLOG.md text · slug -> every ask id this build filed und
     [ "$(ask_home_of "$_id")" = "$2" ] || continue
     printf '%s\n' "$_id"
   done
+}
+
+# ============================== TOOL-dUnstuckLanding-18 S2 — THE CARRY-FORWARD TERM ===============
+# `build-complete`'s fifth term, for the rows it hands over: every non-terminal unit row of the
+# build, each already known DEFERRED. Owner ruling TOOL-dUnstuckLanding-23 lands a build's CLOSED
+# units when the rest are set aside against open asks, and the stop contract's close-decision table
+# names this as the `land a partial build` row. A unit is carried forward only when ALL FIVE hold:
+#   1. its status is DEFERRED - decided by the caller, re-asserted here so this cannot carry an OPEN row;
+#   2. the roster this run started with carries it (`baseline_units`, falling back to the pinned
+#      `base:`), so a unit the run ADDED - a promoted finding, an adopted discovery - never lands
+#      deferred, which M4's severity rule forbids;
+#   3. the run-state file carries its `rescope · item defer <unit>` row, owed through PARK_ACTS_OWED,
+#      so the owner's one read is told the scope was set aside;
+#   4. its spec header `closes` or `advances` an ask this build's own BACKLOG.md at HEAD files under
+#      this build's slug, and the ask witness reads that ask neither CLOSED nor WONTDO - the join
+#      `asks-disposed` already reads, and no second one;
+#   5. no CLOSED unit's spec declares a `consumes-from` edge onto it, because a closed half that needs
+#      the open half is not landable and is a HAND OFF instead.
+# Checked per unit in that order, each returning early with its own message. ONE witness call per
+# close: conditions 1-3 and the filing half of 4 run for every unit first, then the status half of 4
+# and condition 5. Everything unreadable leaves the term UNMET with the reason - nothing reads as met.
+#
+# WHAT IT DOES NOT CHECK: that the ask's derived status is DEFERRED rather than merely OPEN. Any
+# status but CLOSED or WONTDO is an open question the unit can wait on, and `asks-disposed` grades
+# the ask's own disposition one item later.
+BC_CARRIED=""
+check_carry_forward() { # slug · run-state file · unit rows · non-terminal rows -> 0 and BC_CARRIED, or 1 and DOD_OUT
+  local _cf_slug="$1" _cf_rel="$2" _cf_rows="$3" _cf_non="$4"
+  local _cf_ids _cf_id _cf_base _cf_baserc=0 _cf_rev _cf_filed _cf_sp _cf_asks _cf_a _cf_st _cf_open
+  local _cf_union="" _cf_c _cf_csp _cf_closed
+  local -A _cf_cand=()
+  BC_CARRIED=""
+  # 1 - re-asserted. The caller filters on the same row shape; a caller that stops filtering must
+  # not turn this into a way to carry an OPEN or INPROGRESS unit.
+  if [ -n "$(printf '%s\n' "$_cf_non" | grep -vE '\| DEFERRED \|' | grep -v '^$' || true)" ]; then
+    DOD_OUT="the carry-forward term was handed a unit that is not DEFERRED, and only a DEFERRED unit can be carried forward: $(printf '%s\n' "$_cf_non" | grep -vE '\| DEFERRED \|' | row_ids_of | tr '\n' ' ')"
+    return 1
+  fi
+  _cf_ids=$(printf '%s\n' "$_cf_non" | row_ids_of)
+  if ! load_spec_facts $(GIT ls-files -- "$M/builds/$_cf_slug/spec/*.md" 2>/dev/null) >/dev/null 2>&1; then
+    DOD_OUT="the spec-fact reader refused over this build's specs, so no DEFERRED unit's ask or edges could be read and none can be carried forward: $M/builds/$_cf_slug/spec/"
+    return 1
+  fi
+  _cf_base=$(baseline_units "$_cf_rel" "$(readme_of "$_cf_slug")" "${UNITS_REGION_CUTOFF:-}" "$(fact "$_cf_rel" base)") || _cf_baserc=1
+  _cf_rev=$(GIT rev-parse HEAD 2>/dev/null)
+  _cf_filed=" $(asks_filed_by "$(backlog_blob_of "$_cf_slug" "$_cf_rev")" "$_cf_slug" | tr '\n' ' ')"
+  for _cf_id in $_cf_ids; do
+    # 2 - the roster this run started with.
+    if [ "$_cf_baserc" != 0 ]; then
+      DOD_OUT="a DEFERRED unit can be carried forward only when the roster this run started with carries it, and that roster cannot be read, so $_cf_id cannot be: $_cf_base"
+      return 1
+    fi
+    if ! id_in "$_cf_base" "$_cf_id"; then
+      DOD_OUT="a DEFERRED unit was added during this run - the roster this run started with does not carry it - so it cannot be carried forward; a unit the run added is finished or retired, never deferred past the close: $_cf_id"
+      return 1
+    fi
+    # 3 - the declared deferral.
+    if ! grep -E '^[0-9][0-9-]*T[0-9:]*Z rescope · item defer ' "$_cf_rel" 2>/dev/null | grep -qF -- " item defer $_cf_id · "; then
+      DOD_OUT="a DEFERRED unit has no \`rescope · item defer\` row in the run-state file, so the deferral was never declared where the wrap-up surfaces it; record it with --rescope $_cf_slug --act defer --item $_cf_id --reason \"<why>\": $_cf_id"
+      return 1
+    fi
+    # 4, the filing half - the spec's ask verbs, joined to this build's own filings at HEAD.
+    _cf_sp="${SPEC_PATH[$_cf_id]:-}"
+    if [ -z "$_cf_sp" ] || [ ! -r "$_cf_sp" ]; then
+      DOD_OUT="a DEFERRED unit has no readable spec, so the ask it is set aside against cannot be read: $_cf_id"
+      return 1
+    fi
+    _cf_asks=$( { spec_ask_verbs "$_cf_sp" closes; spec_ask_verbs "$_cf_sp" advances; } | sort -u | tr '\n' ' ')
+    if [ -z "${_cf_asks// /}" ]; then
+      DOD_OUT="a DEFERRED unit's spec header names no ask with closes or advances, so nothing records the open question its scope was set aside for: $_cf_id"
+      return 1
+    fi
+    _cf_cand[$_cf_id]=""
+    for _cf_a in $_cf_asks; do
+      case "$_cf_filed" in *" $_cf_a "*) _cf_cand[$_cf_id]="${_cf_cand[$_cf_id]} $_cf_a" ;; esac
+    done
+    if [ -z "${_cf_cand[$_cf_id]}" ]; then
+      DOD_OUT="a DEFERRED unit's spec names no ask this build's BACKLOG.md at HEAD files under this build's own slug, so it is set aside against a question this build never raised: $_cf_id names ${_cf_asks% }"
+      return 1
+    fi
+    _cf_union="$_cf_union${_cf_cand[$_cf_id]}"
+  done
+  # 4, the status half - ONE witness call over every candidate, deduplicated.
+  if [ -z "${ASKS_CMD:-}" ]; then
+    DOD_OUT="a DEFERRED unit is carried forward only against an ask the witness reads open, and this project declares no ASKS_CMD, so the ask contract that would say so is missing: $(printf '%s ' $_cf_ids)"
+    return 1
+  fi
+  if ! run_ask_witness "$_cf_slug" "$_cf_rev" $(printf '%s\n' $_cf_union | sort -u); then
+    DOD_OUT="the ask witness did not answer for the asks the DEFERRED units are set aside against, so whether any is still open cannot be read: $AW_WHY"
+    return 1
+  fi
+  _cf_closed=$(printf '%s\n' "$_cf_rows" | grep -E '\| CLOSED \|' | row_ids_of)
+  for _cf_id in $_cf_ids; do
+    _cf_open=""
+    for _cf_a in ${_cf_cand[$_cf_id]}; do
+      _cf_st=$(ask_field "$_cf_a" status)
+      case "$_cf_st" in CLOSED|WONTDO) ;; *) _cf_open="$_cf_a"; break ;; esac
+    done
+    if [ -z "$_cf_open" ]; then
+      DOD_OUT="a DEFERRED unit's every filed ask reads CLOSED or WONTDO, so none is still open for the unit to be carried forward against: $_cf_id against${_cf_cand[$_cf_id]}"
+      return 1
+    fi
+    # 5 - no CLOSED unit consumes from it.
+    for _cf_c in $_cf_closed; do
+      _cf_csp="${SPEC_PATH[$_cf_c]:-}"
+      if [ -z "$_cf_csp" ] || [ ! -r "$_cf_csp" ]; then
+        DOD_OUT="a CLOSED unit has no readable spec, so whether it consumes from a DEFERRED unit cannot be read and the build cannot land partial: $_cf_c, beside $_cf_id"
+        return 1
+      fi
+      if read_consumes_from "$_cf_csp" | grep -qxF -- "$_cf_id"; then
+        DOD_OUT="a CLOSED unit declares a consumes-from edge onto a DEFERRED unit, so the closed half needs the half that is not landing and the build cannot land partial; that is a HAND OFF under owner-decision: $_cf_c consumes-from $_cf_id"
+        return 1
+      fi
+    done
+    BC_CARRIED="${BC_CARRIED:+$BC_CARRIED
+}carried forward — $_cf_id, DEFERRED against the open ask $_cf_open"
+  done
+  return 0
 }
 # A STATUS row, whole. `ask_disposition_of` above returns the VERB alone, and three of the six verbs
 # carry a slot the verb does not say — `CLOSED · <id> · by <sha>`, `BLOCKED · <id> · on <id>`,
@@ -8466,7 +8588,10 @@ dod_met() { # slug · run-state file · item · checker
       fi
       return 0 ;;
     build-complete)
-      # The owner's "merge and push only when the entire build is fully done", given a checker.
+      # The owner's "merge and push only when the entire build is fully done", given a checker -
+      # SUPERSEDED as this item applies it by owner ruling TOOL-dUnstuckLanding-23: "a build lands its
+      # CLOSED units when every other unit is DEFERRED with an open ask it filed and no CLOSED unit
+      # consumes-from one". Term 5's carry-forward half is that ruling; the rest of the rule stands.
       # SIX terms, ALL required. Terms 1-2 guard the roster itself; term 3 is the only one that can
       # see a planned unit nobody specced, because the generated region is rendered from the specs
       # that EXIST; and term 4 is here because term 5 is VACUOUSLY TRUE over an empty selection -
@@ -8521,10 +8646,22 @@ dod_met() { # slug · run-state file · item · checker
         return 1
       fi
       _bcnon=$(nonterminal_units "$(readme_of "$slug")")
+      # ---- TERM 5, and its CARRY-FORWARD half (TOOL-dUnstuckLanding-18 S2). A non-terminal row that
+      # ---- is not DEFERRED reds exactly as it always did, every such row named. A DEFERRED row is
+      # ---- carried forward only through five conditions, checked per unit in the spec's order, each
+      # ---- returning early with its own message: a reader who cannot tell which one failed reaches
+      # ---- for `--override`, which is the move this half exists to make unnecessary.
+      local _bccarry=""
       if [ -n "$_bcnon" ]; then
-        DOD_OUT="a unit of this build is not terminal, so the build is not done; each row below is a unit whose status is neither CLOSED nor WONTDO:
-$_bcnon"
-        return 1
+        local _bcopen
+        _bcopen=$(printf '%s\n' "$_bcnon" | grep -vE '\| DEFERRED \|' || true)
+        if [ -n "$_bcopen" ]; then
+          DOD_OUT="a unit of this build is not terminal, so the build is not done; each row below is a unit whose status is neither CLOSED nor WONTDO, nor DEFERRED for the close-decision table's carry-forward:
+$_bcopen"
+          return 1
+        fi
+        check_carry_forward "$slug" "$rel" "$_bcrows" "$_bcnon" || return 1
+        _bccarry=$BC_CARRIED
       fi
       # ---- TERM 6: a CLOSED unit whose spec grades THIN. `plan_state` already computes this - it is
       # ---- the kit's own predicate for "too thin to build against" - and `verb_plan` overwrote the
@@ -8545,7 +8682,8 @@ $_bcnon"
       # ---- BLANK or absent turns the term off entirely, which is announced rather than silent.
       local _bcthin="" _bcid _bcsp _bcdate
       if [ -z "${SPEC_THIN_CUTOFF:-}" ]; then
-        DOD_OUT="note — the project declares no SPEC_THIN_CUTOFF, so the THIN term is OFF and a CLOSED unit whose spec states no acceptance criterion is not refused here"
+        DOD_OUT="${_bccarry:+$_bccarry
+}note — the project declares no SPEC_THIN_CUTOFF, so the THIN term is OFF and a CLOSED unit whose spec states no acceptance criterion is not refused here"
         return 0
       fi
       # EVERY SKIP IS ANNOUNCED. Three of them are reachable — a spec `load_spec_facts` could not
@@ -8575,8 +8713,10 @@ $_bcnon"
         DOD_OUT="a unit is CLOSED against a spec the kit's own predicate grades THIN — its scope, its acceptance criteria or its gates section is empty or names nothing observable, so nothing ever stated what done meant for it:$_bcthin"
         return 1
       fi
-      [ -z "$_bcskip" ] && return 0
-      DOD_OUT="the THIN term passed, and it did NOT grade every CLOSED unit — each entry below was skipped and why:$_bcskip"
+      # The carried-forward lines ride every MET return, so a partial landing is never silent.
+      [ -z "$_bcskip" ] && { DOD_OUT="$_bccarry"; return 0; }
+      DOD_OUT="${_bccarry:+$_bccarry
+}the THIN term passed, and it did NOT grade every CLOSED unit — each entry below was skipped and why:$_bcskip"
       return 0 ;;
     closing-review-recorded)
       # A tracked review record under this build NAMES the base the run pinned once. The join is the
@@ -10050,9 +10190,9 @@ verb_rescope() { # slug · act · unit · successor · reason
   # would let a typo select an amendment nobody asked for, which is the shape ANCHOR_SCOPE's own
   # value guard exists to avoid.
   case "$act" in
-    retire|supersede|add) ;;
+    retire|supersede|add|defer) ;;
     *) local _bad=${act:-(none)}
-       fail 48 "--rescope --act takes one of retire, supersede or add, and a value outside that closed set may not select one by default: $_bad"; return 1 ;;
+       fail 48 "--rescope --act takes one of retire, supersede, add or defer, and a value outside that closed set may not select one by default: $_bad"; return 1 ;;
   esac
   [ -n "$reason" ] || { fail 48 "--rescope requires --reason, because an amendment recording no reason is indistinguishable from one nobody meant - the same argument --park and --waive already make: $act"; return 1; }
   shaped=$(printf '%s\n' "$unit" | _ids_of)
@@ -10065,6 +10205,9 @@ verb_rescope() { # slug · act · unit · successor · reason
                shaped=$(printf '%s\n' "$succ" | _ids_of)
                [ "$shaped" = "$succ" ] || { fail 48 "--rescope --successor is not id-shaped by the driver's own spelling: $succ"; return 1; } ;;
     add)       [ -z "$succ" ] || { fail 48 "--rescope --act add refuses --successor, because an addition names no unit it replaces: $succ"; return 1; } ;;
+    # TOOL-dUnstuckLanding-18 S4 - a deferral sets a unit aside against an open ask; nothing follows
+    # it inside this build, so a successor would describe a relation the row does not have.
+    defer)     [ -z "$succ" ] || { fail 48 "--rescope --act defer refuses --successor, because a deferral names no unit that follows it: $succ"; return 1; } ;;
   esac
   # ALL THREE of --park's field refusals, inherited rather than re-derived. park() appends ONE line
   # and the leg parses the region line-wise, so a newline forges a row nothing wrote; an item
@@ -10106,6 +10249,13 @@ RESCOPED
           fail 48 "a rescope names a unit the build README's generated units region does not carry and this build's folder does not file as a \`unit\` ask either, and a run cannot retire what its roster never held: $unit"; return 1
         fi
         echo "unattended: the retired id is a \`unit\` ask of this build's own folder and carries no generated unit row — the roster half design section 19.4 adds"
+      fi ;;
+    defer)
+      # TOOL-dUnstuckLanding-18 S4 - ONLY A ROSTER UNIT. A deferral is what `build-complete`'s
+      # carry-forward term reads beside a DEFERRED spec status, so it must name a unit the generated
+      # region carries; a `unit` ask with no spec has no status to be DEFERRED and nothing to carry.
+      if ! printf '%s\n' "$ids" | grep -qxF -- "$unit"; then
+        fail 48 "a rescope defers a unit the build README's generated units region does not carry, and only a unit of the roster can be set aside against an open ask: $unit"; return 1
       fi ;;
     add)
       # TOOL-dDerivedDocket-16 S10 - AN ADD MAY NOT NAME A FILED ASK THAT IS NOT A UNIT. The two

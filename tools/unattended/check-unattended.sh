@@ -897,7 +897,9 @@ if [ -n "$PARK_KINDS_OWED" ]; then
   # to what it was, the split's whole purpose reverts, and every gate and every criterion stays green.
   # A typo like `supercede` is exactly that, and is what this arm exists to catch.
   if [ -n "$PARK_ACTS_OWED" ]; then
-    pa_case=$(grep -oE '^[[:space:]]*retire\|supersede\|add\)' "$DRIVER" | head -1)
+    # The FOUR-act alternation since TOOL-dUnstuckLanding-18 added `defer`: a probe still spelling the
+    # three-act one matches nothing in the driver and refuses below, which is how this line was found.
+    pa_case=$(grep -oE '^[[:space:]]*retire\|supersede\|add\|defer\)' "$DRIVER" | head -1)
     if [ -z "$pa_case" ]; then
       fail 2 "the driver declares owed rescope ACTS but this leg cannot find the closed act alternation --rescope validates against, so the act axis would be graded against nothing: $DRIVER"
     else

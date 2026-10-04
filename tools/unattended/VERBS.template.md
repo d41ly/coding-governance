@@ -171,9 +171,11 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   id prints `keepalive-reaped: checked`; no sidecar, or no recorded id, prints `unchecked` with the
   reason and lands. It parses nothing beyond a substring test for the id, and it does not check that
   the id was ever this run's job.
-- `--rescope` — records an AMENDMENT to the build's own scope: `--act retire|supersede|add`, the unit
-  as `--item`, an optional `--successor`, and a reason. M3 delegates that scope and M2 names the three
-  acts; this verb is the record. It RECORDS rather than acts: a row derived from the change it just
+- `--rescope` — records an AMENDMENT to the build's own scope: `--act retire|supersede|add|defer`, the
+  unit as `--item`, an optional `--successor`, and a reason. M3 delegates that scope and M2 names the
+  first three acts; this verb is the record. `defer` sets a roster unit aside against an open ask so
+  `build-complete` can carry it forward (`UNATTENDED-STOPS.md` §15); it refuses `--successor`, and like
+  `retire` and `supersede` it is owed to the owner at the wrap-up. It RECORDS rather than acts: a row derived from the change it just
   made is a summary, and a check comparing the two confirms the driver instead of
   checking it. Nothing forces the call to precede the edit, so the row is a declaration in shape
   rather than in enforced ordering: the pair catches an amendment made with NO record, never a

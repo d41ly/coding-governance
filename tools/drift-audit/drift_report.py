@@ -2115,7 +2115,9 @@ _RUN_PARK_KINDS = frozenset({"decision", "abort", "override", "waiver", "proposa
 # HELD). Neither is owed, so a record whose last row is one reads `other`. `handoff` joined both sets
 # in TOOL-dUnstuckLanding-13: its row is the landing recipe the owner is shown, so it is owed.
 _RUN_PARK_KINDS_OWED = frozenset({"decision", "abort", "override", "waiver", "handoff"})
-_RUN_PARK_ACTS_OWED = frozenset({"retire", "supersede"})
+# `defer` joined the owed acts in TOOL-dUnstuckLanding-18, so a record whose last row defers a unit
+# reads `retired-unit` beside a retirement: both set declared scope aside.
+_RUN_PARK_ACTS_OWED = frozenset({"retire", "supersede", "defer"})
 # A parked row as the driver's `park` appends it: `<utc> <kind> · item <item>[ · step <n>] · reason
 # <why>`, the timestamp in the shape the driver's own counters grep for. The act of a `rescope` row is
 # the FIRST word of its item and only the first, so an addition whose second word happens to be

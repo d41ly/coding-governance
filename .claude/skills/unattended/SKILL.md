@@ -175,7 +175,7 @@ It schedules no idle-wake, and the section above does not bind it: there is an o
    result — either one absent is a refusal, not only both. A waived run's spec §10 should still NAME the waiver — that is one of the things the gate
    accepts as a finding, so naming it is also how the spec lands. **`land-once-done`** — waiving it
    does not remove the Definition-of-Done item that observes completeness; that still owes an
-   override at close.
+   override at close unless every unfinished unit is carried forward (`UNATTENDED-STOPS.md` §15).
 1. **The build folder IS the authorization, and what makes it one is the ANCHOR it resolves at.** A
    `memory/builds/<slug>/README.md` that resolves at the anchor this project declares is the
    whole precondition. **This project's anchor scope is `published`.**
@@ -217,7 +217,7 @@ It schedules no idle-wake, and the section above does not bind it: there is an o
 
    Say what the waiver costs, for the two handles that have a consequence: `reuse-first` surfaces at
    close through the `reuse-probed` item and still owes its spec §10 a named waiver, and
-   `land-once-done` still owes an override at close.
+   `land-once-done` still owes an override at close unless every unfinished unit is carried forward.
 
    **From the next command onward there is nobody to ask.** The driver enforces that rather than
    trusting it — `--waive` is accepted by `--preflight` alone, and only while no run-state file
@@ -726,7 +726,8 @@ definition, so the absence is a decision and not an oversight.
   **Nothing refuses the next dispatch for you**, and that is the honest statement rather than a
   caveat: the order gate treats an earlier unit's declaration row as dispatched, so a row the verb
   itself wrote un-blocks the step. The one thing that refuses an early stop is `build-complete` at
-  `--close`, and its escape is a recorded `--override build-complete`.
+  `--close`, and its escapes are a unit carried forward against an open ask or a recorded
+  `--override build-complete`.
 - **Run the bug-class checklist after every commit, and act on it before the next pass begins.** It
   is the one per-pass quality act on CODE, the build method mandates it per pass and again over the
   whole range on every closing round, and until now no carrier this kit ships even named it:
@@ -803,7 +804,10 @@ It answers with one of five states, and the state is what you act on:
   Never parked, never waived, never RETIRED, and never re-reviewed. Both terminate.
   **`never RETIRED` is in that list because it is the cheapest exit and the one the enumeration used
   to leave open**: a promoted unit flipped to `WONTDO` satisfies the leg's promotion count, which
-  reads new ids, and `build-complete`, which reads only that no row is non-terminal.
+  reads new ids, and `build-complete`, which reads only that no row is non-terminal. **Nor is it
+  ever DEFERRED to be carried forward**: that would meet the promotion count and `build-complete` at
+  once, so `build-complete` carries only a unit the roster held when the run started, and a promoted
+  unit flipped to `DEFERRED` stays unfinished.
   **Record it**, with `--disposition promote` on the round that exits: `promote` is the ONLY value a
   terminal exit can record, because every exit that is not `CONVERGED` carries at least one BLOCKER
   and the rule promotes every one of them, so `fold` at an exit with blockers is REFUSED rather than
@@ -929,6 +933,21 @@ bash tools/unattended/unattended.sh --phase <slug> VERIFYING --witness $(git rev
 ```bash
 bash tools/unattended/unattended.sh --close <slug>
 ```
+
+**A unit you cannot finish is carried forward, not overridden.** At the close a park is never an
+abort: take the exit the close-decision table in `UNATTENDED-STOPS.md` §15 names. For a partial
+build that is the carry-forward term. A unit of the roster the run started with, waiting on an open
+ask this build filed, gets spec status `DEFERRED` with `closes` or `advances` naming that ask, and
+the defer act on the record:
+
+```bash
+bash tools/unattended/unattended.sh --rescope <slug> --act defer --item <unit-id> --reason "<why it waits>"
+```
+
+`build-complete` then meets and prints one `carried forward` line per unit. It stays unmet, naming
+the unit and the condition, when the unit was added during the run, its ask is not open, or a
+CLOSED unit declares `consumes-from` onto it; that last build is a `--handoff` under
+`owner-decision`, never an override.
 
 **Under `LANDER_MODE` set to `in-place`, the prepare comes between them.** The close's bar grades what HEAD carries, so
 the landing merge has to exist before it runs. Without it the bar grades this branch and never the

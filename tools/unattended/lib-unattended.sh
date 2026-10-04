@@ -252,6 +252,35 @@ read_fork_cutoff() { # conf file -> the cutoff on stdout, blank when off; rc 2 w
     }' "$1"
 }
 
+# ------------------------------------------------------------- a spec's consumes-from edges, as TEXT
+# TOOL-dUnstuckLanding-18 S3. `build-complete`'s carry-forward term asks whether a CLOSED unit
+# declares a `consumes-from` edge onto a unit that is not landing, and the edge grammar is the memory
+# kit's (TEMPLATE-SPEC §3 `### Edges`), parsed there by the hygiene engine. This kit installs without
+# that checker, so this is a deliberate RE-PARSE of the same lines, read as text the way
+# `read_fork_cutoff` above reads that kit's conf: the bullet head `**consumes-from**` inside a
+# `### Edges` block under the `## <n>. Non-goals` section, and its FIRST backticked token when that
+# token is id-shaped. The `external` form names no unit and is skipped by construction, because it
+# carries no backticked id in the payload slot.
+#
+# WHAT IT DOES NOT CHECK: that the id is a unit of the same build, or that the block is well-formed.
+# Both are the hygiene engine's findings; a malformed block that engine reds reads here as fewer edges,
+# which is the direction that blocks nothing — so the engine is the guard and this is the reader.
+read_consumes_from() { # spec file -> the unit ids its §3 Edges block consumes from, one per line
+  [ -r "$1" ] || return 0
+  awk '
+    { sub(/\r$/, "") }
+    /^## / { in3 = ($0 ~ /^## [0-9]+[.] Non-goals/); ined = 0; next }
+    !in3 { next }
+    /^### / { ined = ($0 ~ /^### Edges[ \t]*$/); next }
+    !ined { next }
+    /^(-|\*)[ \t]*\*\*consumes-from\*\*[ \t]/ {
+      t = $0; sub(/^[^*]*\*\*[^*]*\*\*[ \t]*/, "", t)
+      if (t !~ /^`/) next
+      sub(/^`/, "", t); sub(/`.*$/, "", t)
+      if (t ~ /^[A-Z]+-[A-Za-z0-9]+-[0-9]+$/) print t
+    }' "$1"
+}
+
 # ------------------------------------------------------------------------ the gate profile, once
 # TOOL-dDerivedDocket-27 S2, S3 and S6. The runner prints its resolved profile as TAB-separated
 # key/value lines, and two readers need three of those keys: the driver bounds its bar by `wall`

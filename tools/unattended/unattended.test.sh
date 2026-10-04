@@ -6709,8 +6709,10 @@ hit "$out" "amendment recorded — add ARCH-tRun-2"
 # came to answer differently in the first place.
 same "baseline_units is defined exactly once, in the shared library" \
   "$(grep -c '^baseline_units()' "$HERE/lib-unattended.sh")" "1"
+# TWO driver call sites since TOOL-dUnstuckLanding-18: `--rescope`'s add arm and `build-complete`'s
+# carry-forward term, which asks the same "was it in the roster this run started with" question.
 same "the driver calls it rather than deciding the same question its own way" \
-  "$(grep -v '^[[:space:]]*#' "$HERE/unattended.sh" | grep -c 'baseline_units ')" "1"
+  "$(grep -v '^[[:space:]]*#' "$HERE/unattended.sh" | grep -c 'baseline_units ')" "2"
 same "and so does the checker" \
   "$(grep -v '^[[:space:]]*#' "$HERE/check-unattended.sh" | grep -c 'baseline_units ')" "1"
 same "and neither defines its own" \
@@ -6718,7 +6720,7 @@ same "and neither defines its own" \
 reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
 
 out=$(run --rescope tRun --act sideways --item ARCH-tRun-1 --reason r)
-hit "$out" "--rescope --act takes one of retire, supersede or add, and a value outside that closed set may not select one by default:"
+hit "$out" "--rescope --act takes one of retire, supersede, add or defer, and a value outside that closed set may not select one by default:"
 
 out=$(run --rescope tRun --act retire --item ARCH-tRun-1)
 hit "$out" "--rescope requires --reason, because an amendment recording no reason is indistinguishable from one nobody meant - the same argument --park and --waive already make:"
@@ -12621,6 +12623,149 @@ fi
 
 cd "$TMP" || exit 2
 rm -rf "$gw_dir" "$gw_oroot" "$gw_out"
+
+# ============== TOOL-dUnstuckLanding-18 — the carry-forward term, and `--rescope --act defer` ========
+# A build of two units on MAIN: ARCH-tCarry-1 CLOSED, and ARCH-tCarry-2 DEFERRED with its spec closing
+# EXMP-tCarry-5, which the build's own BACKLOG.md files under its own slug beside a KEEP row. Every arm
+# preflights that tree and breaks exactly ONE of the term's five conditions; the MET arm runs FIRST, so
+# no refusal below is measuring the fixture rather than the subject. In the shared repository, after
+# `askconf`'s stub exists, because condition 4 reads the ask witness and nothing else.
+cfbacklog() { # ask id -> this build's own BACKLOG.md, filing it with a KEEP row
+  printf '# tCarry — asks\n\n## Asks\n- %s · filed 2026-09-10 · the deferred scope · seen `memory/builds/tCarry/BACKLOG.md` · accept done\n\n## Dispositions\n- KEEP · %s · the deferred unit waits on it\n' \
+    "$1" "$1" > memory/builds/tCarry/BACKLOG.md
+}
+cfspec1() { # the CLOSED unit's spec, with the given Edges body
+  printf '# ARCH-tCarry-1 the unit\n\n**Status:** CLOSED · rev-1 · 2026-08-01 · node a · Tier-1 · base 00000000 · streams architecture\n\n## 3. Non-goals\n\n### Edges\n\n%s\n' \
+    "$1" > memory/builds/tCarry/spec/one.md
+}
+cfspec2() { # the DEFERRED unit's spec, with the given header tail
+  printf '# ARCH-tCarry-2 the deferred unit\n\n**Status:** DEFERRED · rev-1 · 2026-08-01 · node a · Tier-1 · base 00000000 · streams architecture · %s\n' \
+    "$1" > memory/builds/tCarry/spec/two.md
+}
+CF_ROWS='| Unit | Status | Rev | Last change |
+|---|---|---|---|
+| [ARCH-tCarry-1 — the unit](spec/one.md) | CLOSED | rev-1 | 2026-08-01 |
+| [ARCH-tCarry-2 — the deferred unit](spec/two.md) | DEFERRED | rev-1 | 2026-08-01 |'
+cfsetup() {
+  reset_tree; git checkout -qf main; git clean -qfd
+  readme tCarry
+  setunits tCarry "$CF_ROWS"
+  roster tCarry "1. ARCH-tCarry-1 — the unit
+2. ARCH-tCarry-2 — the deferred unit"
+  mkdir -p memory/builds/tCarry/spec memory/builds/tCarry/reviews
+  cfspec1 'none'
+  cfspec2 'closes EXMP-tCarry-5'
+  printf '**Serves:** spec-audit ARCH-tCarry-1 ARCH-tCarry-2\n\n# the audit\n' > memory/builds/tCarry/reviews/audit.md
+  cfbacklog EXMP-tCarry-5
+  git add -A >/dev/null && git commit -q -m cf-fixture --no-verify && git push -q -f origin main
+  git checkout -qf unit && git merge -q --no-edit main >/dev/null 2>&1
+  CFP=$(git rev-parse HEAD); CFMAIN=$(git rev-parse main)
+}
+cfreset() { git checkout -qf unit >/dev/null 2>&1; git reset -q --hard "$CFP"; git clean -qfd
+            git branch -qf main "$CFMAIN"; git push -q -f origin "$CFMAIN":main
+            mkconf; askconf; git add -A >/dev/null; git commit -q -m cfconf --no-verify
+            askmode ok; askrows ''; }
+cfcommit() { git add -A >/dev/null; git commit -q -m cf-edit --no-verify; }
+cfopen() { cfreset; run --preflight tCarry --keepalive-id KC-1 >/dev/null; cfcommit; }
+cfdefer() { run --rescope tCarry --act defer --item ARCH-tCarry-2 --reason "the owner takes it in the next build"; }
+CF_UNMET="a machine-checked DoD item is unmet, so --close blocks: build-complete"
+cfsetup
+
+# ---- AC1 and AC6 — MET. The defer act writes ONE row and exits 0, and the close then meets
+# ---- `build-complete` with no override, printing the carried unit and its ask.
+cfopen
+out=$(cfdefer); rc=$?
+same "AC6 --rescope --act defer exits 0" "$rc" "0"
+hit  "$out" "amendment recorded — defer ARCH-tCarry-2"
+same "AC6 --rescope --act defer writes ONE defer row" \
+  "$(grep -c ' rescope · item defer ARCH-tCarry-2 · reason the owner takes it in the next build$' memory/builds/tCarry/RUN.md)" "1"
+cfcommit
+out=$(run --close tCarry)
+hit  "$out" "carried forward — ARCH-tCarry-2, DEFERRED against the open ask EXMP-tCarry-5"
+miss "$out" "$CF_UNMET"
+# ...and the two edge forms that name no CLOSED-onto-DEFERRED dependency leave it met: an `external`
+# precondition and a `hands-off` onto the deferred unit.
+cfspec1 '- **consumes-from** external — a precondition this build does not build.
+- **hands-off** `ARCH-tCarry-2` — the rest, which waits on the ask.'
+cfcommit
+out=$(run --close tCarry)
+hit  "$out" "carried forward — ARCH-tCarry-2"
+miss "$out" "$CF_UNMET"
+
+# ---- AC6 — the refusals, by number: a successor, and a unit the roster does not carry.
+out=$(run --rescope tCarry --act defer --item ARCH-tCarry-2 --successor ARCH-tCarry-1 --reason r)
+hit  "$out" "UNATTENDED check 48 FAILED — --rescope --act defer refuses --successor, because a deferral names no unit that follows it: ARCH-tCarry-1"
+out=$(run --rescope tCarry --act defer --item ARCH-tCarry-9 --reason r)
+hit  "$out" "UNATTENDED check 48 FAILED — a rescope defers a unit the build README's generated units region does not carry, and only a unit of the roster can be set aside against an open ask: ARCH-tCarry-9"
+# ...the act is owed, and the gate leg's act-axis probe spells the FOUR-act alternation the driver's
+# closed case carries, or that probe matches nothing and check 2 refuses on the shipped tree.
+same "AC6 PARK_ACTS_OWED carries defer" "$(grep -cE '^PARK_ACTS_OWED="([a-z]+ )*defer( [a-z]+)*"$' "$HERE/unattended.sh")" "1"
+same "AC6 the driver's closed act case carries defer" "$(grep -cE '^[[:space:]]*retire\|supersede\|add\|defer\)' "$HERE/unattended.sh")" "1"
+same "AC6 the leg's act-axis probe spells the four-act alternation" \
+  "$(grep -cF "grep -oE '^[[:space:]]*retire\|supersede\|add\|defer\)'" "$HERE/check-unattended.sh")" "1"
+
+# ---- AC2 — a CLOSED unit declares `consumes-from` onto the DEFERRED one: unmet, naming both and the edge.
+cfopen; cfdefer >/dev/null
+cfspec1 '- **consumes-from** `ARCH-tCarry-2` — the half it needs.'
+cfcommit
+out=$(run --close tCarry)
+hit  "$out" "$CF_UNMET"
+hit  "$out" "a CLOSED unit declares a consumes-from edge onto a DEFERRED unit, so the closed half needs the half that is not landing and the build cannot land partial; that is a HAND OFF under owner-decision: ARCH-tCarry-1 consumes-from ARCH-tCarry-2"
+miss "$out" "carried forward —"
+
+# ---- AC3 — the ask, three ways and the missing contract: absent from this build's BACKLOG.md,
+# ---- derived CLOSED by the witness, filed under ANOTHER build's slug, and a blank ASKS_CMD.
+cfopen; cfdefer >/dev/null
+printf '# tCarry — asks\n\n## Asks\n\n## Dispositions\n' > memory/builds/tCarry/BACKLOG.md
+cfcommit
+out=$(run --close tCarry)
+hit  "$out" "$CF_UNMET"
+hit  "$out" "a DEFERRED unit's spec names no ask this build's BACKLOG.md at HEAD files under this build's own slug, so it is set aside against a question this build never raised: ARCH-tCarry-2 names EXMP-tCarry-5"
+cfopen; cfdefer >/dev/null; cfcommit
+askrows 'EXMP-tCarry-5\tCLOSED\t-\ttCarry\t-\tyes\t-\t-\t-\t-\n'
+out=$(run --close tCarry)
+hit  "$out" "$CF_UNMET"
+hit  "$out" "a DEFERRED unit's every filed ask reads CLOSED or WONTDO, so none is still open for the unit to be carried forward against: ARCH-tCarry-2 against EXMP-tCarry-5"
+askrows ''
+cfopen; cfdefer >/dev/null
+cfspec2 'closes EXMP-tOther-5'
+cfbacklog EXMP-tOther-5
+cfcommit
+out=$(run --close tCarry)
+hit  "$out" "$CF_UNMET"
+hit  "$out" "a DEFERRED unit's spec names no ask this build's BACKLOG.md at HEAD files under this build's own slug, so it is set aside against a question this build never raised: ARCH-tCarry-2 names EXMP-tOther-5"
+cfopen; cfdefer >/dev/null
+mkconf; cfcommit
+out=$(run --close tCarry)
+hit  "$out" "$CF_UNMET"
+hit  "$out" "a DEFERRED unit is carried forward only against an ask the witness reads open, and this project declares no ASKS_CMD, so the ask contract that would say so is missing: ARCH-tCarry-2"
+
+# ---- AC4 — a unit the run ADDED is never carried forward. The roster at BASE holds unit 1 alone, on
+# ---- MAIN, because preflight's check 20 refuses a scope narrowed since BASE; unit 2 enters after the
+# ---- run went live, through `--rescope --act add`, and is then deferred. `cfreset` restores MAIN.
+cfreset
+git checkout -qf main
+setunits tCarry '| Unit | Status | Rev | Last change |
+|---|---|---|---|
+| [ARCH-tCarry-1 — the unit](spec/one.md) | CLOSED | rev-1 | 2026-08-01 |'
+git add -A >/dev/null && git commit -q -m cf-base-one-unit --no-verify && git push -q -f origin main
+git checkout -qf unit && git merge -q --no-edit main >/dev/null 2>&1
+run --preflight tCarry --keepalive-id KC-1 >/dev/null; cfcommit
+setunits tCarry "$CF_ROWS"
+cfcommit
+out=$(run --rescope tCarry --act add --item ARCH-tCarry-2 --reason "the owner asked for it after the run went live")
+hit  "$out" "LATE record — ARCH-tCarry-2 entered the roster after this run went live"
+cfdefer >/dev/null; cfcommit
+out=$(run --close tCarry)
+hit  "$out" "$CF_UNMET"
+hit  "$out" "a DEFERRED unit was added during this run - the roster this run started with does not carry it - so it cannot be carried forward; a unit the run added is finished or retired, never deferred past the close: ARCH-tCarry-2"
+
+# ---- AC5 — no defer row on the record: unmet, naming the missing row and the act that writes it.
+cfopen
+out=$(run --close tCarry)
+hit  "$out" "$CF_UNMET"
+hit  "$out" "a DEFERRED unit has no \`rescope · item defer\` row in the run-state file, so the deferral was never declared where the wrap-up surfaces it; record it with --rescope tCarry --act defer --item ARCH-tCarry-2"
+reset_tree
 fi   # ---- end REGION TWO ----------------------------------------------------------------------
 
 # FLOOR_ASSERTIONS — TOOL-cBriefedPilot-23. A shrink-only pin on the EXECUTED count. This build
