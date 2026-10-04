@@ -215,3 +215,14 @@ record `...-1-0-run-mandate.md` first: it carries the owner's four answers, whic
   catalog and the dated measurement history in the merge-bar section, which moves to a guide. `[B#28] [B#39]`.
 - **80** (PLAY) — an experiment's instrument and result rows are committed to its build folder, never
   left under `%TEMP%`; the vague-brief arm is filed as a HIGH ask that gates the charter's §1. `[B#19] [B#22]`.
+
+**Added by the run** (splits recorded at speccing)
+- **81** — split from 22: the month shards render Build, Node and Opened only. Specced by the run.
+- **82** — split from 34 at its F2: each recall query-log row carries the worktree's HEAD sha, so the
+  commit after a query is found by ancestry after the worktree is gone. A change to the served query
+  path in `tools/memory-recall/query.py`; unit 34 reports the unattributed count and reads this field
+  once it exists. Read unit 34's spec first.
+- **83** — split from 37 at its F1: the unattended close prints the dossiers its BASE..HEAD range
+  touched and did not refresh, by calling unit 37's `map_diff.py --stale-dossiers` range mode.
+  Report-only. A close block in `tools/unattended/unattended.sh`; units 49 and 66 are sibling close
+  blocks. Read unit 37's spec first.

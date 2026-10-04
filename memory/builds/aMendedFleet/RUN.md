@@ -42,3 +42,9 @@ base: 7af5f564641d231f8b78f6b183dde1b6bf53111d
 2026-10-04T17:56:28Z decision · item Run the /goal spike in an interactive session, and retire the idle-wake machinery if it holds · reason Options: spike /goal attended and delete idle-wake plus register/release-task if it covers the silent-background case; or keep the machinery. Refused: in -p sessions /goal delivers check-ins only at turn end, so only an interactive owner session can measure it. Report [B#42], roadmap item 24.
 
 2026-10-04T18:40:36Z rescope · item add TOOL-aMendedFleet-81 · reason split from TOOL-aMendedFleet-22 at its F1: the shard renderer and the merge attribute share no file and are two mechanisms, and this build's rule is one per spec
+
+2026-10-04T19:01:23Z rescope · item retire TOOL-aMendedFleet-30 · reason the live aGraftedHelix build owns supersession labels in recall as its unit 4 (SPECCED rev-2, ratified 2026-10-04); a second copy here would conflict with it at landing
+
+2026-10-04T19:01:37Z rescope · item add TOOL-aMendedFleet-82 · reason split from TOOL-aMendedFleet-34 at its F2: the HEAD field changes the served query path, a second mechanism
+
+2026-10-04T19:01:40Z rescope · item add TOOL-aMendedFleet-83 · reason split from TOOL-aMendedFleet-37 at its F1: the close block lives in the unattended kit with its own conf declaration

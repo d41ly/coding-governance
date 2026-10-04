@@ -164,8 +164,8 @@ Cite ids, never line numbers.
 | [TOOL-aProbedToolkit-6](../builds/aProbedToolkit/BACKLOG.md) | OPEN | — | — | 2026-09-03 | THE LEXICON GATE CAN BE LEGALLY GREEN AT 5.2% COVERAGE, AND THE ONE… |
 | [TOOL-aProbedToolkit-7](../builds/aProbedToolkit/BACKLOG.md) | OPEN | — | — | 2026-09-03 | AN EMPTIED SYMBOL TIER IS INVISIBLE ON EVERY codebase-map LEG. Both the… |
 | [TOOL-aProbedToolkit-8](../builds/aProbedToolkit/BACKLOG.md) | OPEN | — | — | 2026-09-03 | THE MAP'S COVERAGE NUMBER MEASURES THE WRONG POPULATION AND THE… |
-| [TOOL-aProbedToolkit-9](../builds/aProbedToolkit/BACKLOG.md) | OPEN | — | — | 2026-09-03 | reuse_lookup.py HAS NO OUTPUT BUDGET. One query in incms returns 35334… |
-| [TOOL-aProbedToolkit-10](../builds/aProbedToolkit/BACKLOG.md) | OPEN | — | — | 2026-09-03 | THE RECALL FLOOR GRADES A CONFIGURATION THE CLI DOES NOT SHIP.… |
+| [TOOL-aProbedToolkit-9](../builds/aProbedToolkit/BACKLOG.md) | SPECCED | — | TOOL-aMendedFleet-36 | 2026-09-03 | reuse_lookup.py HAS NO OUTPUT BUDGET. One query in incms returns 35334… |
+| [TOOL-aProbedToolkit-10](../builds/aProbedToolkit/BACKLOG.md) | SPECCED | — | TOOL-aMendedFleet-28 | 2026-09-03 | THE RECALL FLOOR GRADES A CONFIGURATION THE CLI DOES NOT SHIP.… |
 | [TOOL-aProbedToolkit-11](../builds/aProbedToolkit/BACKLOG.md) | OPEN | — | — | 2026-09-03 | TWO RECALL DIAGNOSTICS ARE ZERO-PREDICATES, SO EACH IS SILENT IN THE… |
 | [TOOL-aProbedToolkit-12](../builds/aProbedToolkit/BACKLOG.md) | OPEN | — | — | 2026-09-03 | A memory-tree VERSION BUMP IS A CORPUS MIGRATION NOBODY HAS COSTED, AND… |
 | [TOOL-aProbedToolkit-13](../builds/aProbedToolkit/BACKLOG.md) | OPEN | — | — | 2026-09-03 | TWO OF THE FOUR KITS SHIP NO WIRING --check, AND THEY ARE THE TWO WHOSE… |
@@ -228,7 +228,7 @@ Cite ids, never line numbers.
 | [TOOL-aScannedThrottle-11](../builds/aScannedThrottle/BACKLOG.md) | OPEN | — | — | 2026-08-21 | LEFT-SHIFT, three classes both review rounds named UNGATEABLE, for the… |
 | [TOOL-aScouredKit-10](../builds/aScouredKit/BACKLOG.md) | OPEN | — | — | 2026-08-30 | THE LEG-HOLD PREDICATE IS NOW WRITTEN TWICE AND NOTHING ASSERTS THE… |
 | [TOOL-aScouredKit-16](../builds/aScouredKit/BACKLOG.md) | OPEN | — | — | 2026-08-30 | THE SEAM RANKING IS 63% NOISE AND TWO SHIPPED CONSUMERS ACT ON IT.… |
-| [TOOL-aScouredKit-17](../builds/aScouredKit/BACKLOG.md) | OPEN | — | — | 2026-08-30 | dead_exports: 412 in tools/codebase-map/map_diff.py is 100% false… |
+| [TOOL-aScouredKit-17](../builds/aScouredKit/BACKLOG.md) | SPECCED | — | TOOL-aMendedFleet-38 | 2026-08-30 | dead_exports: 412 in tools/codebase-map/map_diff.py is 100% false… |
 | [TOOL-aScouredKit-18](../builds/aScouredKit/BACKLOG.md) | OPEN | — | — | 2026-08-30 | tools/govkit/govkit.py's read_descriptors is load_toml and nothing else… |
 | [TOOL-aScouredKit-19](../builds/aScouredKit/BACKLOG.md) | OPEN | — | — | 2026-08-30 | FIVE PYTHON READERS RE-PARSE .memory-tree.conf WITH A NAIVE… |
 | [TOOL-aScouredKit-21](../builds/aScouredKit/BACKLOG.md) | OPEN | — | — | 2026-08-30 | tools/check-testsuite-counts.sh hardcodes MANIFEST=tools/gate-legs.json… |
@@ -289,9 +289,9 @@ Cite ids, never line numbers.
 | [TOOL-aWalkedCorpus-10](../builds/aWalkedCorpus/BACKLOG.md) | OPEN | — | — | 2026-08-18 | codebase-map's seeded-extractors-or-crashed outcome stays unmarked… |
 | [TOOL-aWeighedCompass-4](../builds/aWeighedCompass/BACKLOG.md) | OPEN | — | — | 2026-09-04 | THE RECALL FIXTURE CARRIES NO TERMS, SO EVERY PUBLISHED CHUNK NUMBER… |
 | [TOOL-aWeighedCompass-7](../builds/aWeighedCompass/BACKLOG.md) | OPEN | — | — | 2026-09-04 | THE REUSE PROBE RANKS ON NAME STEMS, AT PRECISION 0.056. Graded against… |
-| [TOOL-aWeighedCompass-8](../builds/aWeighedCompass/BACKLOG.md) | OPEN | — | — | 2026-09-04 | SHELL IS DARK TO THE SYMBOL INDEX AND SHELL IS MOST OF THE GATE… |
+| [TOOL-aWeighedCompass-8](../builds/aWeighedCompass/BACKLOG.md) | SPECCED | — | TOOL-aMendedFleet-35 | 2026-09-04 | SHELL IS DARK TO THE SYMBOL INDEX AND SHELL IS MOST OF THE GATE… |
 | [TOOL-aWeighedCompass-9](../builds/aWeighedCompass/BACKLOG.md) | OPEN | — | — | 2026-09-04 | 211 OF 889 CITED IDS (23.7%) HAVE NO RECORD OF THEIR OWN. From… |
-| [TOOL-aWeighedCompass-11](../builds/aWeighedCompass/BACKLOG.md) | OPEN | — | — | 2026-09-04 | THE opened SIGNAL IS TOO THIN TO GRADE RETRIEVAL WITH. recall-opened.js… |
+| [TOOL-aWeighedCompass-11](../builds/aWeighedCompass/BACKLOG.md) | SPECCED | — | TOOL-aMendedFleet-34 | 2026-09-04 | THE opened SIGNAL IS TOO THIN TO GRADE RETRIEVAL WITH. recall-opened.js… |
 | [TOOL-aWeighedCompass-13](../builds/aWeighedCompass/BACKLOG.md) | OPEN | — | — | 2026-09-04 | THE SYMBOL INDEX EXCLUDES EVERY PRIVATE HELPER.… |
 | [TOOL-aWeighedCompass-16](../builds/aWeighedCompass/BACKLOG.md) | OPEN | — | — | 2026-09-04 | THE RECALL FLOOR GRADES A CONFIGURATION NO SESSION INVOKES.… |
 | [TOOL-aWeighedCompass-18](../builds/aWeighedCompass/BACKLOG.md) | OPEN | — | — | 2026-09-04 | THE FIXTURE SATURATES, SO IT CANNOT PRICE THE CHUNK HALF AT ALL.… |

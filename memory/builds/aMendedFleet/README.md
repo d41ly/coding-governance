@@ -5,7 +5,7 @@ opened: 2026-10-04
 streams: tooling+kickoff+playbook
 roster: TOOL+KICK+PLAY
 authorized-by: prompt
-ids: TOOL-aMendedFleet-1 TOOL-aMendedFleet-2 TOOL-aMendedFleet-3 TOOL-aMendedFleet-4 TOOL-aMendedFleet-5 TOOL-aMendedFleet-6 TOOL-aMendedFleet-7 TOOL-aMendedFleet-8 TOOL-aMendedFleet-9 TOOL-aMendedFleet-10 TOOL-aMendedFleet-11 TOOL-aMendedFleet-12 TOOL-aMendedFleet-13 TOOL-aMendedFleet-14 TOOL-aMendedFleet-15 TOOL-aMendedFleet-16 TOOL-aMendedFleet-17 TOOL-aMendedFleet-18 TOOL-aMendedFleet-19 TOOL-aMendedFleet-20 TOOL-aMendedFleet-21 TOOL-aMendedFleet-22 TOOL-aMendedFleet-23 TOOL-aMendedFleet-24 TOOL-aMendedFleet-54 TOOL-aMendedFleet-81
+ids: TOOL-aMendedFleet-1 TOOL-aMendedFleet-2 TOOL-aMendedFleet-3 TOOL-aMendedFleet-4 TOOL-aMendedFleet-5 TOOL-aMendedFleet-6 TOOL-aMendedFleet-7 TOOL-aMendedFleet-8 TOOL-aMendedFleet-9 TOOL-aMendedFleet-10 TOOL-aMendedFleet-11 TOOL-aMendedFleet-12 TOOL-aMendedFleet-13 TOOL-aMendedFleet-14 TOOL-aMendedFleet-15 TOOL-aMendedFleet-16 TOOL-aMendedFleet-17 TOOL-aMendedFleet-18 TOOL-aMendedFleet-19 TOOL-aMendedFleet-20 TOOL-aMendedFleet-21 TOOL-aMendedFleet-22 TOOL-aMendedFleet-23 TOOL-aMendedFleet-24 TOOL-aMendedFleet-25 TOOL-aMendedFleet-26 TOOL-aMendedFleet-27 TOOL-aMendedFleet-28 TOOL-aMendedFleet-29 TOOL-aMendedFleet-30 TOOL-aMendedFleet-31 TOOL-aMendedFleet-32 TOOL-aMendedFleet-33 TOOL-aMendedFleet-34 TOOL-aMendedFleet-35 TOOL-aMendedFleet-36 TOOL-aMendedFleet-37 TOOL-aMendedFleet-38 TOOL-aMendedFleet-54 TOOL-aMendedFleet-81 TOOL-aMendedFleet-82 TOOL-aMendedFleet-83
 ---
 
 # aMendedFleet — the 2026-10-04 governance review, every point built as its own unit
@@ -132,13 +132,16 @@ and every red leg fixed. The prompt, the owner's four answers and the report are
 | 79 | `PLAY-aMendedFleet-1` | 2 | the `AGENTS.md` wrapper loses its duplicate registry, repeated catalog and dated history |
 | 80 | `PLAY-aMendedFleet-2` | 1 | an experiment's instrument and result rows are committed to its build folder |
 | 81 | `TOOL-aMendedFleet-81` | 1 | the month shards carry only Build, Node and Opened, so the frozen claim holds |
+| 82 | `TOOL-aMendedFleet-82` | 1 | each recall query-log row carries the worktree HEAD, so a later commit is found by ancestry |
+| 83 | `TOOL-aMendedFleet-83` | 1 | the unattended close lists the dossiers its range touched and did not refresh |
 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 25 unit(s) · node a · opened 2026-10-04 · streams tooling+kickoff+playbook
+**Build status:** SPECCED · 39 unit(s) · node a · opened 2026-10-04 · streams tooling+kickoff+playbook
 ids TOOL-aMendedFleet-1 TOOL-aMendedFleet-2 TOOL-aMendedFleet-3 TOOL-aMendedFleet-4 TOOL-aMendedFleet-5 TOOL-aMendedFleet-6 TOOL-aMendedFleet-7 TOOL-aMendedFleet-8 TOOL-aMendedFleet-9 TOOL-aMendedFleet-10 TOOL-aMendedFleet-11 TOOL-aMendedFleet-12 TOOL-aMendedFleet-13 TOOL-aMendedFleet-14
-ids TOOL-aMendedFleet-15 TOOL-aMendedFleet-16 TOOL-aMendedFleet-17 TOOL-aMendedFleet-18 TOOL-aMendedFleet-19 TOOL-aMendedFleet-20 TOOL-aMendedFleet-21 TOOL-aMendedFleet-22 TOOL-aMendedFleet-23 TOOL-aMendedFleet-24 TOOL-aMendedFleet-54 TOOL-aMendedFleet-81
+ids TOOL-aMendedFleet-15 TOOL-aMendedFleet-16 TOOL-aMendedFleet-17 TOOL-aMendedFleet-18 TOOL-aMendedFleet-19 TOOL-aMendedFleet-20 TOOL-aMendedFleet-21 TOOL-aMendedFleet-22 TOOL-aMendedFleet-23 TOOL-aMendedFleet-24 TOOL-aMendedFleet-25 TOOL-aMendedFleet-26 TOOL-aMendedFleet-27 TOOL-aMendedFleet-28
+ids TOOL-aMendedFleet-29 TOOL-aMendedFleet-30 TOOL-aMendedFleet-31 TOOL-aMendedFleet-32 TOOL-aMendedFleet-33 TOOL-aMendedFleet-34 TOOL-aMendedFleet-35 TOOL-aMendedFleet-36 TOOL-aMendedFleet-37 TOOL-aMendedFleet-38 TOOL-aMendedFleet-54 TOOL-aMendedFleet-81 TOOL-aMendedFleet-82 TOOL-aMendedFleet-83
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -167,16 +170,32 @@ ids TOOL-aMendedFleet-15 TOOL-aMendedFleet-16 TOOL-aMendedFleet-17 TOOL-aMendedF
 | [TOOL-aMendedFleet-22 — the generated views merge by taking one side](spec/2026-10-04-spec-TOOL-aMendedFleet-22.md) | 22 | 1 | SPECCED | rev-2 | 2026-10-04 |
 | [TOOL-aMendedFleet-23 — check 19 reports the gotcha anchors that select no tracked path](spec/2026-10-04-spec-TOOL-aMendedFleet-23.md) | 23 | 1 | SPECCED | rev-1 | 2026-10-04 |
 | [TOOL-aMendedFleet-24 — dead repo paths in live build READMEs are reported, and the decision log's dead pointer is repaired](spec/2026-10-04-spec-TOOL-aMendedFleet-24.md) | 24 | 1 | SPECCED | rev-1 | 2026-10-04 |
+| [TOOL-aMendedFleet-25 — live specs carry a declared byte ceiling, and a spec already over it is held at its recorded high-water](spec/2026-10-04-spec-TOOL-aMendedFleet-25.md) | 25 | 2 | SPECCED | rev-1 | 2026-10-04 |
+| [TOOL-aMendedFleet-26 — a `missing:` citation form names an id that has no record, with its own count](spec/2026-10-04-spec-TOOL-aMendedFleet-26.md) | 26 | 1 | SPECCED | rev-1 | 2026-10-04 |
+| [TOOL-aMendedFleet-27 — recall excludes archived versioned snapshots by a declared pattern, and an arm proves a live line answers instead](spec/2026-10-04-spec-TOOL-aMendedFleet-27.md) | 27 | 1 | SPECCED | rev-1 | 2026-10-04 |
+| [TOOL-aMendedFleet-28 — the recall floor grades the served path, terms plus fusion](spec/2026-10-04-spec-TOOL-aMendedFleet-28.md) | 28 | 2 | SPECCED | rev-1 | 2026-10-04 |
+| [TOOL-aMendedFleet-29 — a recall gold set harvested from spec §10 probes, de-contaminated, graded at hit@10](spec/2026-10-04-spec-TOOL-aMendedFleet-29.md) | 29 | 2 | SPECCED | rev-1 | 2026-10-04 |
+| [TOOL-aMendedFleet-30 — superseded records are labelled in recall output](spec/2026-10-04-spec-TOOL-aMendedFleet-30.md) | 30 | 1 | WONTDO | rev-2 | 2026-10-04 |
+| [TOOL-aMendedFleet-31 — recall output keeps every hit and prints snippets only for the head](spec/2026-10-04-spec-TOOL-aMendedFleet-31.md) | 31 | 2 | SPECCED | rev-1 | 2026-10-04 |
+| [TOOL-aMendedFleet-32 — recall cache eviction removes deleted worktrees first and orders the rest by last query](spec/2026-10-04-spec-TOOL-aMendedFleet-32.md) | 32 | 2 | SPECCED | rev-1 | 2026-10-04 |
+| [TOOL-aMendedFleet-33 — the recall README and Skill stop typing corpus figures, and a miss re-queries before grep](spec/2026-10-04-spec-TOOL-aMendedFleet-33.md) | 33 | 1 | SPECCED | rev-1 | 2026-10-04 |
+| [TOOL-aMendedFleet-34 — recall measures offline whether an answer was used, from the query log and the worktree's next commit](spec/2026-10-04-spec-TOOL-aMendedFleet-34.md) | 34 | 1 | SPECCED | rev-1 | 2026-10-04 |
+| [TOOL-aMendedFleet-35 — the map's symbol tier reads shell definitions through the lexicon's tokenizer](spec/2026-10-04-spec-TOOL-aMendedFleet-35.md) | 35 | 2 | SPECCED | rev-1 | 2026-10-04 |
+| [TOOL-aMendedFleet-36 — `reuse_lookup.py` prints within a byte budget and names what it cut](spec/2026-10-04-spec-TOOL-aMendedFleet-36.md) | 36 | 1 | SPECCED | rev-1 | 2026-10-04 |
+| [TOOL-aMendedFleet-37 — dossier freshness is derived from git, and drift-audit reports the dossiers older than their paths](spec/2026-10-04-spec-TOOL-aMendedFleet-37.md) | 37 | 2 | SPECCED | rev-1 | 2026-10-04 |
+| [TOOL-aMendedFleet-38 — `map_diff --converge`, its sink and its prescriptions are deleted](spec/2026-10-04-spec-TOOL-aMendedFleet-38.md) | 38 | 1 | SPECCED | rev-1 | 2026-10-04 |
 | [TOOL-aMendedFleet-81 — the month shards carry only what never changes after their month](spec/2026-10-04-spec-TOOL-aMendedFleet-81.md) | 81 | 1 | SPECCED | rev-1 | 2026-10-04 |
 <!-- /gen:build-units -->
 
 Records: 4 bound to this build, across 2 record folder(s).
 
 Ids no record names: TOOL-aMendedFleet-10 TOOL-aMendedFleet-11 TOOL-aMendedFleet-12 TOOL-aMendedFleet-13 TOOL-aMendedFleet-14 TOOL-aMendedFleet-15 TOOL-aMendedFleet-16 TOOL-aMendedFleet-17 TOOL-aMendedFleet-18 TOOL-aMendedFleet-19 TOOL-aMendedFleet-2 TOOL-aMendedFleet-20 TOOL-aMendedFleet-21
-TOOL-aMendedFleet-22 TOOL-aMendedFleet-23 TOOL-aMendedFleet-24 TOOL-aMendedFleet-3 TOOL-aMendedFleet-4 TOOL-aMendedFleet-5 TOOL-aMendedFleet-6 TOOL-aMendedFleet-7 TOOL-aMendedFleet-8 TOOL-aMendedFleet-81 TOOL-aMendedFleet-9.
+TOOL-aMendedFleet-22 TOOL-aMendedFleet-23 TOOL-aMendedFleet-24 TOOL-aMendedFleet-25 TOOL-aMendedFleet-26 TOOL-aMendedFleet-27 TOOL-aMendedFleet-28 TOOL-aMendedFleet-29 TOOL-aMendedFleet-3 TOOL-aMendedFleet-30 TOOL-aMendedFleet-31 TOOL-aMendedFleet-32 TOOL-aMendedFleet-33 TOOL-aMendedFleet-34
+TOOL-aMendedFleet-35 TOOL-aMendedFleet-36 TOOL-aMendedFleet-37 TOOL-aMendedFleet-38 TOOL-aMendedFleet-4 TOOL-aMendedFleet-5 TOOL-aMendedFleet-6 TOOL-aMendedFleet-7 TOOL-aMendedFleet-8 TOOL-aMendedFleet-81 TOOL-aMendedFleet-9.
 
 Ids no `spec-audit` record has ever named: TOOL-aMendedFleet-1 TOOL-aMendedFleet-10 TOOL-aMendedFleet-11 TOOL-aMendedFleet-12 TOOL-aMendedFleet-13 TOOL-aMendedFleet-14 TOOL-aMendedFleet-15 TOOL-aMendedFleet-16 TOOL-aMendedFleet-17 TOOL-aMendedFleet-18 TOOL-aMendedFleet-19 TOOL-aMendedFleet-2
-TOOL-aMendedFleet-20 TOOL-aMendedFleet-21 TOOL-aMendedFleet-22 TOOL-aMendedFleet-23 TOOL-aMendedFleet-24 TOOL-aMendedFleet-3 TOOL-aMendedFleet-4 TOOL-aMendedFleet-5 TOOL-aMendedFleet-6 TOOL-aMendedFleet-7 TOOL-aMendedFleet-8 TOOL-aMendedFleet-81 TOOL-aMendedFleet-9.
+TOOL-aMendedFleet-20 TOOL-aMendedFleet-21 TOOL-aMendedFleet-22 TOOL-aMendedFleet-23 TOOL-aMendedFleet-24 TOOL-aMendedFleet-25 TOOL-aMendedFleet-26 TOOL-aMendedFleet-27 TOOL-aMendedFleet-28 TOOL-aMendedFleet-29 TOOL-aMendedFleet-3 TOOL-aMendedFleet-30 TOOL-aMendedFleet-31 TOOL-aMendedFleet-32
+TOOL-aMendedFleet-33 TOOL-aMendedFleet-34 TOOL-aMendedFleet-35 TOOL-aMendedFleet-36 TOOL-aMendedFleet-37 TOOL-aMendedFleet-38 TOOL-aMendedFleet-4 TOOL-aMendedFleet-5 TOOL-aMendedFleet-6 TOOL-aMendedFleet-7 TOOL-aMendedFleet-8 TOOL-aMendedFleet-81 TOOL-aMendedFleet-9.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -207,6 +226,20 @@ TOOL-aMendedFleet-20 TOOL-aMendedFleet-21 TOOL-aMendedFleet-22 TOOL-aMendedFleet
 | 22 | `TOOL-aMendedFleet-22` | no |
 | 23 | `TOOL-aMendedFleet-23` | no |
 | 24 | `TOOL-aMendedFleet-24` | no |
+| 25 | `TOOL-aMendedFleet-25` | no |
+| 26 | `TOOL-aMendedFleet-26` | no |
+| 27 | `TOOL-aMendedFleet-27` | no |
+| 28 | `TOOL-aMendedFleet-28` | no |
+| 29 | `TOOL-aMendedFleet-29` | no |
+| 30 | `TOOL-aMendedFleet-30` | no |
+| 31 | `TOOL-aMendedFleet-31` | no |
+| 32 | `TOOL-aMendedFleet-32` | no |
+| 33 | `TOOL-aMendedFleet-33` | no |
+| 34 | `TOOL-aMendedFleet-34` | no |
+| 35 | `TOOL-aMendedFleet-35` | no |
+| 36 | `TOOL-aMendedFleet-36` | no |
+| 37 | `TOOL-aMendedFleet-37` | no |
+| 38 | `TOOL-aMendedFleet-38` | no |
 | 81 | `TOOL-aMendedFleet-81` | no |
 <!-- /gen:build-order -->
 
