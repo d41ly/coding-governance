@@ -10,6 +10,7 @@
 | [2026-10-04-prompt-TOOL-aMendedFleet-1-1-source-report.md](../prompts/2026-10-04-prompt-TOOL-aMendedFleet-1-1-source-report.md) | journal | — |
 | [2026-10-04-prompt-TOOL-aMendedFleet-1-2-source-synthesis.md](../prompts/2026-10-04-prompt-TOOL-aMendedFleet-1-2-source-synthesis.md) | journal | — |
 | [2026-10-04-prompt-TOOL-aMendedFleet-1-3-spec-brief.md](../prompts/2026-10-04-prompt-TOOL-aMendedFleet-1-3-spec-brief.md) | journal | — |
+| [2026-10-04-prompt-TOOL-aMendedFleet-1-4-build-brief.md](../prompts/2026-10-04-prompt-TOOL-aMendedFleet-1-4-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
