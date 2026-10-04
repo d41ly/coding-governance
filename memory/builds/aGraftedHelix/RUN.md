@@ -45,3 +45,5 @@ base: 5266d22eba31cdbf15425773d245cd23d7b9cdf5
 2026-10-04T17:15:26Z rescope · item add TOOL-aGraftedHelix-13 · reason spec-audit round 1 id 20 HIGH: the hygiene engine's dispatch of check 28 is observed only by a grep that a comment satisfies; repairs TOOL-aGraftedHelix-6
 
 2026-10-04T17:15:30Z rescope · item add TOOL-aGraftedHelix-14 · reason spec-audit round 1 id 27 HIGH: the hygiene engine's dispatch of check 27 is observed only by a grep that a comment satisfies; repairs TOOL-aGraftedHelix-9
+
+2026-10-04T17:36:04Z rescope · item add TOOL-aGraftedHelix-15 · reason discovery while driving the harness: a build whose specs the SPEC stage authors always meets the AUDIT stage's empty-subject refusal on the first call (the specs are uncommitted), and the documented re-invoke under resumeFromRunId replays the resolver's cached empty answer; observed twice on wf_7b67cf1d-995 (the second failure in 20 ms); the route completed only with caller-pinned subjects

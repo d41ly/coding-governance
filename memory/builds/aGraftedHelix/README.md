@@ -6,7 +6,7 @@ streams: tooling+kickoff
 roster: TOOL
 authorized-by: prompt
 spec-audit: 2026-10-04
-ids: TOOL-aGraftedHelix-1 TOOL-aGraftedHelix-2 TOOL-aGraftedHelix-3 TOOL-aGraftedHelix-4 TOOL-aGraftedHelix-5 TOOL-aGraftedHelix-6 TOOL-aGraftedHelix-7 TOOL-aGraftedHelix-8 TOOL-aGraftedHelix-9 TOOL-aGraftedHelix-10 TOOL-aGraftedHelix-11 TOOL-aGraftedHelix-12 TOOL-aGraftedHelix-13 TOOL-aGraftedHelix-14
+ids: TOOL-aGraftedHelix-1 TOOL-aGraftedHelix-2 TOOL-aGraftedHelix-3 TOOL-aGraftedHelix-4 TOOL-aGraftedHelix-5 TOOL-aGraftedHelix-6 TOOL-aGraftedHelix-7 TOOL-aGraftedHelix-8 TOOL-aGraftedHelix-9 TOOL-aGraftedHelix-10 TOOL-aGraftedHelix-11 TOOL-aGraftedHelix-12 TOOL-aGraftedHelix-13 TOOL-aGraftedHelix-14 TOOL-aGraftedHelix-15
 ---
 
 # aGraftedHelix — six helixir mechanisms, grafted onto the kits that own their surface
@@ -69,13 +69,14 @@ self-heals go unreported. The owner's prompt and the review are in `prompts/`.
 | 12 | `TOOL-aGraftedHelix-12` | 1 | PROMOTED: every cell of the claim write table and every write `--beat` declines is observed |
 | 13 | `TOOL-aGraftedHelix-13` | 1 | PROMOTED: an engine arm observes check 28 red the leg and print its summary on a green run |
 | 14 | `TOOL-aGraftedHelix-14` | 1 | PROMOTED: an engine arm observes check 27 red the leg and print its summary on a green run |
+| 15 | `TOOL-aGraftedHelix-15` | 1 | ADOPTED: the build harness completes SPEC then AUDIT in one call on a build whose specs it authors, and its refusal names a remedy that survives a resume |
 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
 **Build status:** SPECCED · 14 unit(s) · node a · opened 2026-10-04 · streams tooling+kickoff
 ids TOOL-aGraftedHelix-1 TOOL-aGraftedHelix-2 TOOL-aGraftedHelix-3 TOOL-aGraftedHelix-4 TOOL-aGraftedHelix-5 TOOL-aGraftedHelix-6 TOOL-aGraftedHelix-7 TOOL-aGraftedHelix-8 TOOL-aGraftedHelix-9 TOOL-aGraftedHelix-10 TOOL-aGraftedHelix-11 TOOL-aGraftedHelix-12 TOOL-aGraftedHelix-13
-ids TOOL-aGraftedHelix-14
+ids TOOL-aGraftedHelix-14 TOOL-aGraftedHelix-15
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -96,7 +97,7 @@ ids TOOL-aGraftedHelix-14
 | [TOOL-aGraftedHelix-8 — every automatic self-heal appends one line to a health log the orientation card counts](spec/2026-10-04-spec-TOOL-aGraftedHelix-8.md) | 9 | 1 | SPECCED | rev-2 | 2026-10-04 |
 <!-- /gen:build-units -->
 
-Records: 3 bound to this build, across 3 record folder(s).
+Records: 4 bound to this build, across 3 record folder(s).
 
 Ids no record names: TOOL-aGraftedHelix-10 TOOL-aGraftedHelix-11 TOOL-aGraftedHelix-12 TOOL-aGraftedHelix-13 TOOL-aGraftedHelix-14.
 
