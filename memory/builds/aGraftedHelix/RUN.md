@@ -10,8 +10,8 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 
 ## Run facts
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: db009f97bc4fea5c7a42471547f117948270abcb
-phase: SPECCING
+witness: b3a5e2ecf798e53857c882e695883fb59ecda8d9
+phase: REVIEWING
 branch-sha: 5266d22eba31cdbf15425773d245cd23d7b9cdf5
 branch-ref: refs/heads/branch/helixir-review-gov-adoption-ce32e1
 spec-audit: 2026-10-04
