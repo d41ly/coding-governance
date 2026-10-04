@@ -1,6 +1,6 @@
 # TOOL-dUnstuckLanding-13 — `--handoff`: a run whose work is sound, but which an owner must land or decide, ends HELD instead of ABORTED
 
-**Status:** CLOSED · rev-2 · 2026-10-04 · node d · Tier-2 · base 98926870 · streams tooling · order 1 · closes TOOL-dUnstuckLanding-3
+**Status:** CLOSED · rev-3 · 2026-10-04 · node d · Tier-2 · base 98926870 · streams tooling · order 1 · closes TOOL-dUnstuckLanding-3
 
 <!-- gen:spec-records -->
 
@@ -83,9 +83,10 @@ and points at `--handoff` on the four halt codes that the census found hand-off-
   `SKILL.template.md` gains a section, "If it is done but you may not land it — hand it off", placed
   before "If it cannot finish". The renders under `memory/guides/` and the installed Skill are
   re-copied by `bash tools/unattended/adopt-unattended.sh` in the same pass. The protocol render
-  has 103 bytes of headroom under its declared cap at BASE, so the two protocol additions are
-  paid for by trimming history prose in the same section, and the render's net growth stays
-  inside that headroom. Observed by AC12, AC13.
+  has 103 bytes of headroom under its declared cap at BASE, so the protocol's additions, the
+  §3 sentence, the §8 row and `handoff` in §2's parked-kind and surfaced lists, are paid for by
+  trimming history prose in §2 and §3, and the render's net growth stays inside that headroom.
+  Observed by AC12, AC13.
 - **S13 — the two mirrors of the parked-kind sets.** Two sibling kits spell the driver's
   `PARK_KINDS` and `PARK_KINDS_OWED` because a kit reads no sibling kit at run time, and each
   self-test holds its copy to the driver in both directions. `handoff` joins
@@ -239,6 +240,7 @@ grep each refusal's own text instead.
 - `tools/drift-audit/drift_report.py`
 - `tools/runlog/model.py`
 - `tools/runlog/selftest.py`
+- `tools/drift-audit/selftest.py`
 
 ### Rollout
 
@@ -403,6 +405,10 @@ New arm: tools/unattended/check-unattended.test.sh · the AC11 dropped hold code
   mirrors, the runlog fixture row and AC15, and §4 lists the three files. S11 also records that
   the protocol's 103-byte headroom is met by trimming history prose in §3. No acceptance
   criterion of rev-1 moved.
+- rev-3 · 2026-10-04 · the bug-class checklist over the build commit selected
+  amendment-leaves-its-other-half-standing: protocol §2 listed the parked kinds and the surfaced
+  set without `handoff`. S11 now names that edit and the §2 trim that pays for it, and the
+  drift-audit run-record fixture gains a `handoff` owed row beside the owed kinds it carried.
 
 ## 10. Reuse audit
 

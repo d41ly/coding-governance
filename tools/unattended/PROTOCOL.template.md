@@ -175,16 +175,15 @@ belonging here:
 3. **Parked entries**, whose kinds `park()`'s own kind argument discriminates: a parked DECISION —
    the question, the options seen, and the reason the run refused, because a bare "parked" is
    indistinguishable from "forgotten" — an ABORT reason, a DoD OVERRIDE, an owner directive WAIVER
-   (§10), a PROPOSAL, a RESCOPE amendment, a DISPATCH write-set declaration, a REVIEW round and a
-   BRIEF. Each names its writer: `--park`, `--abort`, `--close --override`, `--preflight --waive`,
-   `--propose`, `--rescope`, `--dispatch`, `--review` and `--brief`. DECISION had no writer for as
-   long as this contract has instructed a run to park one, so the instruction could not be obeyed —
-   a rule with no route is a rule nobody follows, and a build had to hit it to notice.
+   (§10), a PROPOSAL, a RESCOPE amendment, a DISPATCH write-set declaration, a REVIEW round, a
+   BRIEF and a HANDOFF recipe. Each names its writer: `--park`, `--abort`, `--close --override`,
+   `--preflight --waive`, `--propose`, `--rescope`, `--dispatch`, `--review`, `--brief` and
+   `--handoff`. A kind with no writer is an instruction no run can obey.
 
    **Every kind belongs to one of two CLASSES, and the classes are not the kinds.** A `surfaced` kind
-   the owner must be shown; a `history` kind they need not adjudicate. DECISION, ABORT, OVERRIDE and
-   WAIVER are `surfaced`, the waiver included, since §10's waiver entry reaches the owner through the
-   same wrap-up.
+   the owner must be shown; a `history` kind they need not adjudicate. DECISION, ABORT, OVERRIDE,
+   HANDOFF and WAIVER are `surfaced`, the waiver included, since §10's waiver entry reaches the owner
+   through the same wrap-up, and the hand-off because its recipe is what the owner runs.
    Membership is declared on TWO AXES, both the driver's. The KIND axis is `PARK_KINDS_OWED`. The ACT
    axis is `PARK_ACTS_OWED`, naming the `rescope` acts the owner is owed — `retire` and `supersede`,
    because M3 delegates a build's scope RESOLUTION and not its ABANDONMENT, while `add` stays history

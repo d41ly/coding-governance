@@ -2716,7 +2716,7 @@ def test_nonterminal_merged_runs(tmp: pathlib.Path) -> None:
     # The act is the item's FIRST word. A reader matching `retire` anywhere in the item reads this one
     # as a retirement.
     add_counted("tSecondWord", "other", [P("rescope", "add retire")])
-    for kind in ("decision", "abort", "override", "waiver"):
+    for kind in ("decision", "abort", "override", "waiver", "handoff"):
         add_counted("tOwed" + kind.capitalize(), "surfaced-park", [P(kind, "a question refused")])
     add_counted("tNoRows", "no-rows")
     for kind in ("review", "dispatch", "brief", "proposal"):
