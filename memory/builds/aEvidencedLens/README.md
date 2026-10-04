@@ -77,7 +77,7 @@ ids TOOL-aEvidencedLens-14
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aEvidencedLens-1 — the spec-audit lens catalogue: five lenses aimed at the measured classes, the harness its one source](spec/2026-10-05-spec-TOOL-aEvidencedLens-1.md) | 1 | 2 | SPECCED | rev-2 | 2026-10-05 |
+| [TOOL-aEvidencedLens-1 — the spec-audit lens catalogue: five lenses aimed at the measured classes, the harness its one source](spec/2026-10-05-spec-TOOL-aEvidencedLens-1.md) | 1 | 2 | CLOSED | rev-2 | 2026-10-05 |
 | [TOOL-aEvidencedLens-2 — spec lenses probe read-only, and every spec finding carries its evidence](spec/2026-10-05-spec-TOOL-aEvidencedLens-2.md) | 2 | 2 | SPECCED | rev-2 | 2026-10-05 |
 | [TOOL-aEvidencedLens-3 — the spec skeptic confirms by the rubric, re-runs the evidence, and refutes duplicates and by-design](spec/2026-10-05-spec-TOOL-aEvidencedLens-3.md) | 3 | 2 | SPECCED | rev-2 | 2026-10-05 |
 | [TOOL-aEvidencedLens-12 — the spec skeptic line carries a finding's evidence through a line-break-only fold, so a pipe survives](spec/2026-10-05-spec-TOOL-aEvidencedLens-12.md) | 4 | 2 | SPECCED | rev-1 | 2026-10-05 |

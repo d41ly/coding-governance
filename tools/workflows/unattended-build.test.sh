@@ -743,7 +743,8 @@ has    "V5 attended: the main return carries the stage's counts" "$o" '"promoted
 MT_T2="$HERE/tier2-review.js"
 MT_ARGS='{"repo":"/tmp/r","kind":"spec-audit","subjects":[{"path":"s1","blob":"abc1234"}],"round":1,"reviewDir":"r/"}'
 # `build_merged_returns <items-json|absent> [judged] [shape-json]`: four lenses of twelve findings each
-# are ids 1-48; the skeptic double judges ids 1 to `judged` (default 48), confirming the thirteen below
+# are ids 1-48, and the fifth spec lens, `failure-envelope` (TOOL-aEvidencedLens-1), returns none, so
+# every measured id range and merge keeps its place; the skeptic double judges ids 1 to `judged` (default 48), confirming the thirteen below
 # and refuting the rest, so an id above `judged` comes back UNVERIFIED; the synthesis double returns
 # the given items, or no `items` key at all for `absent`. `shape` replaces the measured audit the
 # double replays: `confirmed` ids, `lenses` as label prefix to finding count in the order the double
@@ -757,7 +758,7 @@ build_merged_returns() {
   node -e '
     const shape = process.argv[3] ? JSON.parse(process.argv[3]) : {
       confirmed: [1, 4, 7, 9, 11, 14, 16, 20, 22, 26, 30, 33, 40],
-      lenses: { "find:": 12 }, typed: [1, 5], summary: "13 confirmed in 10 items" }
+      lenses: { "find:failure-envelope": 0, "find:": 12 }, typed: [1, 5], summary: "13 confirmed in 10 items" }
     const confirmed = new Set(shape.confirmed)
     const finding = { file: "s1", where: "section 2", severity: "high", claim: "c", impact: "i", fix: "f" }
     const verdicts = Array.from({ length: Number(process.argv[2]) }, (_, i) =>
@@ -845,8 +846,8 @@ has    "MT ...and the harness disposes the unverified population" "$o" "disposal
 # blockers 2 and highs 3, so the guard demanded 11 folds where only 6 raw findings sit at MEDIUM or
 # LOW, and no honest disposal passed, by raw id (10 and 6) or by item (5 and 4). The arms below replay
 # that record's own merges, B1 (38, 29), B2 (39, 30), H1 (1, 20, 43), H3 (40, 31), M1 (25, 9) and
-# M2 (41, 6), with H2, M3 and L1 one id each. One lens returns 10 findings and three return 12.
-MT20_SHAPE='{"confirmed":[1,2,6,9,10,16,20,25,29,30,31,38,39,40,41,43],"lenses":{"find:underspecification":10,"find:":12},"typed":[2,3],"summary":"16 confirmed in 9 items"}'
+# M2 (41, 6), with H2, M3 and L1 one id each. One lens returns 10 findings, three return 12, and the fifth, `failure-envelope`, none.
+MT20_SHAPE='{"confirmed":[1,2,6,9,10,16,20,25,29,30,31,38,39,40,41,43],"lenses":{"find:coherence":10,"find:failure-envelope":0,"find:":12},"typed":[2,3],"summary":"16 confirmed in 9 items"}'
 MT20_MERGED='[{"severity":"BLOCKER","ids":[38,29]},{"severity":"BLOCKER","ids":[39,30]},{"severity":"HIGH","ids":[1,20,43]},{"severity":"HIGH","ids":[2]},{"severity":"HIGH","ids":[40,31]},{"severity":"MEDIUM","ids":[25,9]},{"severity":"MEDIUM","ids":[41,6]},{"severity":"MEDIUM","ids":[16]},{"severity":"LOW","ids":[10]}]'
 # Every promoted unit is PLACED (TOOL-cMendedVintage-19), as MT_DISPOSE is: this double predates that
 # rule, and without a placement the accepted disposal never prints and no roster is handed out.

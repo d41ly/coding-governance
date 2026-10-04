@@ -1,6 +1,6 @@
 # TOOL-aEvidencedLens-1 — the spec-audit lens catalogue: five lenses aimed at the measured classes, the harness its one source
 
-**Status:** SPECCED · rev-2 · 2026-10-05 · node a · Tier-2 · base 028b5cac · streams tooling · order 1
+**Status:** CLOSED · rev-2 · 2026-10-05 · node a · Tier-2 · base 028b5cac · streams tooling · order 1
 
 <!-- gen:spec-records -->
 

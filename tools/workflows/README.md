@@ -133,8 +133,11 @@ acceptance criterion, so diagnostics that would change them live behind the flag
 A diff review fans out over five finder lenses, in this order: `security`, `correctness`, `seams`,
 `verification` and `intent`. Since 1.17 `verification` asks whether every changed behaviour has a
 check that can fail, and `intent` whether the diff does what its commit messages and specs say; the
-old `regressions` lens is retired. A spec audit keeps its four lenses. Five is also the most the
-agent-cap hook admits on that receiver, so the set cannot grow a sixth.
+old `regressions` lens is retired. A spec audit runs five lenses of its own, in this order:
+`coherence`, `grounding`, `reuse`, `blast-radius` and `failure-envelope` (TOOL-aEvidencedLens-1).
+`SPEC_LENSES` in the harness is that catalogue's one source; the method and the memory-tree README
+point at it. Five is also the most the agent-cap hook admits on that receiver, so neither set can
+grow a sixth.
 
 `lensNotes` appends a project addendum to one lens's brief, and to no other prompt:
 

@@ -7,7 +7,7 @@ export const meta = {
     'Consolidated, concurrency-capped (≤5) Tier-2 adversarial review, ≤5 verify agents TOTAL: find → batched-verify → synth, joined on an ORCHESTRATOR-ASSIGNED INTEGER id. Replaces the big-fan-out review that trips the server rate limiter. Project-agnostic — parameterize via `args`.',
   phases: [
     { title: 'Resume', detail: 'one probe reads the key directory; a lens or batch whose file carries the key is reused' },
-    { title: 'Find', detail: '5 finder lenses (3 on a light run), one wave, ≤5 concurrent' },
+    { title: 'Find', detail: '5 finder lenses on either kind (3 on a light diff run), one wave, ≤5 concurrent' },
     { title: 'Verify', detail: 'skeptics refute findings in ≤5 BATCHES — agent count fixed' },
     { title: 'Synthesize', detail: 'one pass → report file' },
   ],
@@ -456,28 +456,35 @@ const DIFF_LENSES = [
 // skip happens inside the Find thunk, so the receiver the agent-cap hook sizes keeps its shape.
 const LIGHT_LENSES = ['correctness', 'seams', 'verification']
 
-// TOOL-dTieredTribunal-11 S2 - the M4 spec-audit catalogue, COPIED from <prefix>/memory-tree/README.md
-// rather than re-invented, so the method and the engine cannot drift into two answers.
+// TOOL-aEvidencedLens-1 - this array IS the M4 spec-audit catalogue, its one source. The method and
+// the memory-tree README point here rather than list lens names, so there is no second copy to drift.
+// Five lenses aimed at the measured escape classes; `coherence` keeps the first slot so a fixture
+// keyed on the first lens keeps its ids.
 const SPEC_LENSES = [
   {
-    key: 'underspecification',
+    key: 'coherence',
     brief:
-      'Underspecification: which section-2 item has no section-6 criterion, and which section-6 criterion names no observation that could fail.',
+      'Coherence: does the spec set agree with itself, and can its acceptance decide anything? Report a section-2 item no section-6 criterion observes; a criterion whose observation cannot FAIL on today\'s tree, because it is already green before the unit is built; a criterion that cannot PASS on a correct build, because it demands what the design does not produce or a figure the build cannot reach; section 2 against section 3; section 4 Design against section 7 Gates; and, across the subjects and the sibling context, the four axes scope, interface, ordering and acceptance: a name, path or key spelled two ways, a unit depending on one ordered after it, two units claiming one file or one landing slot, and an overview acceptance no unit\'s criteria imply.',
   },
   {
-    key: 'contradiction',
+    key: 'grounding',
     brief:
-      'Contradiction: section 2 against section 3; a sub-spec against the main spec on the four axes scope, interface, ordering and acceptance; section 4 Design against section 7 Gates.',
+      'Grounding: is every claim sections 4 and 10 make about the world TRUE where the subjects stand? Check each claim about existing code, a tool\'s flags or output, a record, a count, a platform behaviour or a cost against the source, never against the spec. Hunt the traps this platform sets: MSYS argument and path rewriting, drive-letter and backslash paths, CRLF in a working copy and a text-mode read that drops a CR, and a stated wall-clock goal nobody timed. A claim marked UNVERIFIED is a finding only where the design rests on it.',
   },
   {
-    key: 'unstated-assumption',
+    key: 'reuse',
     brief:
-      'Unstated assumption: what must be true of existing code for section 4 to work that section 4 never says and section 10 never checked.',
+      'Reuse: functionality is reused and extended, never rebuilt. Report a design that builds what already exists, such as a function, a checker, a gate leg, a driver verb or a record shape, instead of extending it; a section-10 seam that is cited but is not the one section 4 extends, or that does not exist; and a question a decision record or an ask already decided, decided asks included. Probe before you claim: the codebase-map kit\'s reuse_lookup.py with a behaviour phrase, the memory-recall kit\'s query.py with a plain-English question and 8-14 --terms in this corpus\'s own jargon, and grep, because the lookup cannot see every layer and prints the ones it skipped. Locate each tool with git ls-files; where one is absent, say so in the finding and use grep. Read the asks through the memory-tree kit\'s gen_build_index.py --asks --json --all, falling back to the backlog shards when its mode field says shards. THE BAR: a reuse finding names the existing seam or record by path or id AND quotes the spec text that duplicates or contradicts it. That a related record exists is not a finding.',
   },
   {
-    key: 'prior-art',
+    key: 'blast-radius',
     brief:
-      'Prior art: has a record already decided this? That is the recall probe — search the decision logs and the build records, and read the asks, decided ones included, through `gen_build_index.py --asks --json --all`, falling back to the backlog shards when its `mode` field says `shards`, before accepting a design as new.',
+      'Blast radius: what does this change trip that the spec does not list? For every name, value or rule the spec renames, retires or changes, grep the name AND the value, and report each consumer, carrier, test arm or document the spec does not name. Join section 4\'s files-touched list against the gate-leg manifest (gate-legs.json, where the project keeps one) and report a guarded leg section 7 omits; report a declared size or time budget the change will cross; and report the repo\'s own machinery the spec forgets: version carriers, codebase-map keys, record and filename rules, a --dispatch write set, and a render an adopter regenerates.',
+  },
+  {
+    key: 'failure-envelope',
+    brief:
+      'Failure envelope: what will the built thing meet that the spec never says it handles? Report the input classes the design is silent on (empty, malformed, multi-line, unterminated, huge, concurrent), signals, partial failure and a dead dependency; a security or write surface section 5 did not price; and a spec that names one INSTANCE where the class was meant, such as one file of two or one caller of three. A spec is built as a ceiling: in this kit\'s own trial (aBlindedTrial, report section 4.3), when a spec named the class for one input file and not the other, the builder handled exactly the file it named.',
   },
 ]
 
@@ -606,7 +613,8 @@ else log('WARNING: `checklist` was supplied with no item — no lens sweeps the 
 // whole aSightedSkeptic build (its shared invariant 5); a later change to a prompt, a schema or the
 // lens set moves this literal again. It rides the print rather than the key's string, so the probe
 // prompt's hand-spelled directory follows without a second edit.
-const REVIEW_SHAPE = 'lenses5-r1'
+// TOOL-aEvidencedLens-1 S3 - r2, ONE bump for the whole aEvidencedLens build (its shared invariant 5).
+const REVIEW_SHAPE = 'lenses5-r2'
 // TOOL-aSightedSkeptic-3 S5 - `specs` is interpolated by renderIntent(), so it joins the print too.
 // TOOL-aSightedSkeptic-4 S7 - so does the PARSED checklist: a CRLF string and its LF twin are one key,
 // and a lens swept under one checklist is never reused under another.
