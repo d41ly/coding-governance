@@ -104,7 +104,8 @@ what another one admits.
 
 | what the policy file says at R | reads | age bound |
 |---|---|---|
-| no file at R, or no policy file named | `land`, the kit default | none |
+| no policy file named, or no conf at R | the hook's `.githooks/gate-env.sh` at R, read by the rows below | as that file declares |
+| that hook file absent too, or a named file absent at R | `land`, the kit default | none |
 | `INHERITED_RED` absent or blank | `land`, the kit default | the declared bound, if positive |
 | `INHERITED_RED=land` | `land` | the declared bound, if positive |
 | `INHERITED_RED=park` | `park` | the declared bound, if positive, for the ask's owner |
@@ -287,7 +288,7 @@ New arm: tools/memory-tree/gen_build_index.py `--selftest` · AC7's BLOCKER and 
 
 - rev-1 · 2026-10-04 · initial draft, from design §3 at rev-2, ask 6, review items H2, H3, H5, M1 and
   M15, and ruling `TOOL-dUnstuckLanding-22`.
-- rev-2 · 2026-10-04 · S3 AC10 · folded implementation review round 1 M7 (ids 6, 14) and M12
+- rev-2 · 2026-10-04 · S3 §4 AC10 · folded implementation review round 1 M7 (ids 6, 14) and M12
   (id 18): a conf naming no policy file reads the pre-push hook's own `.githooks/gate-env.sh` at R
   before the kit default, so the driver no longer reads land where the hook refuses the push; AC10
   arms each branch the ruling flipped, in the driver suite and the hook's suite.
