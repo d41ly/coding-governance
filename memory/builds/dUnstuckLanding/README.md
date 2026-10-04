@@ -4,7 +4,7 @@ node: d
 opened: 2026-10-04
 streams: tooling
 roster: TOOL
-ids: TOOL-dUnstuckLanding-1 TOOL-dUnstuckLanding-2 TOOL-dUnstuckLanding-3 TOOL-dUnstuckLanding-4 TOOL-dUnstuckLanding-5 TOOL-dUnstuckLanding-6 TOOL-dUnstuckLanding-7 TOOL-dUnstuckLanding-8 TOOL-dUnstuckLanding-9 TOOL-dUnstuckLanding-10 TOOL-dUnstuckLanding-11
+ids: TOOL-dUnstuckLanding-1 TOOL-dUnstuckLanding-2 TOOL-dUnstuckLanding-3 TOOL-dUnstuckLanding-4 TOOL-dUnstuckLanding-5 TOOL-dUnstuckLanding-6 TOOL-dUnstuckLanding-7 TOOL-dUnstuckLanding-8 TOOL-dUnstuckLanding-9 TOOL-dUnstuckLanding-10 TOOL-dUnstuckLanding-11 TOOL-dUnstuckLanding-12
 authorized-by: prompt
 ---
 
@@ -51,24 +51,26 @@ prompt is recorded verbatim under `prompts/`.
 |---|---|---|---|
 | 1 | `TOOL-dUnstuckLanding-1` | 1 | the closing-time failure census across gov, inCMS and NicoCares |
 | 2 | `TOOL-dUnstuckLanding-2` | 1 | the design: unattended closes through inherited reds and closing decisions, plus attended-landing verbs |
+| 3 | `TOOL-dUnstuckLanding-12` | 1 | design rev-2: the closing review's five HIGH findings closed (promoted) |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 2 unit(s) · node d · opened 2026-10-04 · streams tooling
-ids TOOL-dUnstuckLanding-1 TOOL-dUnstuckLanding-2 TOOL-dUnstuckLanding-3 TOOL-dUnstuckLanding-4 TOOL-dUnstuckLanding-5 TOOL-dUnstuckLanding-6 TOOL-dUnstuckLanding-7 TOOL-dUnstuckLanding-8 TOOL-dUnstuckLanding-9 TOOL-dUnstuckLanding-10 TOOL-dUnstuckLanding-11
+**Build status:** INPROGRESS · 3 unit(s) · node d · opened 2026-10-04 · streams tooling
+ids TOOL-dUnstuckLanding-1 TOOL-dUnstuckLanding-2 TOOL-dUnstuckLanding-3 TOOL-dUnstuckLanding-4 TOOL-dUnstuckLanding-5 TOOL-dUnstuckLanding-6 TOOL-dUnstuckLanding-7 TOOL-dUnstuckLanding-8 TOOL-dUnstuckLanding-9 TOOL-dUnstuckLanding-10 TOOL-dUnstuckLanding-11 TOOL-dUnstuckLanding-12
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-dUnstuckLanding-1 — the closing-time failure census across gov, inCMS and NicoCares](spec/2026-10-04-spec-TOOL-dUnstuckLanding-1.md) | 1 | 1 | CLOSED | rev-1 | 2026-10-04 |
 | [TOOL-dUnstuckLanding-2 — the design: unattended closes through inherited reds and closing decisions, plus attended-landing verbs](spec/2026-10-04-spec-TOOL-dUnstuckLanding-2.md) | 2 | 1 | CLOSED | rev-1 | 2026-10-04 |
+| [TOOL-dUnstuckLanding-12 — design rev-2: the closing review's five HIGH findings closed](spec/2026-10-04-spec-TOOL-dUnstuckLanding-12.md) | 3 | 1 | INPROGRESS | rev-1 | 2026-10-04 |
 <!-- /gen:build-units -->
 
-Records: 7 bound to this build, across 3 record folder(s).
+Records: 8 bound to this build, across 4 record folder(s).
 
-Ids no record names: none — every unit id is named by a record.
+Ids no record names: TOOL-dUnstuckLanding-12.
 
-Ids no `spec-audit` record has ever named: TOOL-dUnstuckLanding-1 TOOL-dUnstuckLanding-2.
+Ids no `spec-audit` record has ever named: TOOL-dUnstuckLanding-1 TOOL-dUnstuckLanding-12 TOOL-dUnstuckLanding-2.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -77,6 +79,7 @@ Ids no `spec-audit` record has ever named: TOOL-dUnstuckLanding-1 TOOL-dUnstuckL
 |---|---|---|
 | 1 | `TOOL-dUnstuckLanding-1` | no |
 | 2 | `TOOL-dUnstuckLanding-2` | no |
+| 3 | `TOOL-dUnstuckLanding-12` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

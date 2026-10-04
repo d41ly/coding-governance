@@ -34,3 +34,7 @@ base: 0c16a66b53c9fd809ca198b612a23c62132edcc0
 2026-10-04T08:58:35Z brief · item TOOL-dUnstuckLanding-1 · reason 35135466c91b memory/builds/dUnstuckLanding/prompts/2026-10-04-prompt-TOOL-dUnstuckLanding-1-build-brief.md
 
 2026-10-04T09:07:01Z brief · item TOOL-dUnstuckLanding-2 · reason d7d06997c9d4 memory/builds/dUnstuckLanding/prompts/2026-10-04-prompt-TOOL-dUnstuckLanding-2-build-brief.md
+
+2026-10-04T09:25:49Z review · item dUnstuckLanding · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · disposition promote
+
+2026-10-04T09:25:55Z rescope · item add TOOL-dUnstuckLanding-12 · reason closing review round 1 CONVERGED with five HIGH items (H1-H5); the severity rule promotes them to one unit whose mechanism closes them: design rev-2 for the witness predicate, the aged-leg escalation home, the run-gates stamp predicate, the HELD-to-LANDED carriers, and ABSORB after the ask moves
