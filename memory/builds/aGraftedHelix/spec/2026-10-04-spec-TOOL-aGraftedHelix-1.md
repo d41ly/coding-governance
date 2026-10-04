@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-1 — the driver claims a run on the remote as a compare-and-swap ref, and refuses a live foreign claim
 
-**Status:** SPECCED · rev-6 · 2026-10-05 · node a · Tier-2 · base 5266d22e · streams tooling · order 1 · advances TOOL-aReapedTicket-5 · ratified 2026-10-04
+**Status:** SPECCED · rev-7 · 2026-10-05 · node a · Tier-2 · base 5266d22e · streams tooling · order 1 · advances TOOL-aReapedTicket-5 · ratified 2026-10-04
 
 <!-- gen:spec-records -->
 
@@ -63,7 +63,9 @@ does not hold its claim cannot close.
   with check 91 when the claim cannot be read, before any DoD item is graded. `--dispatch` refuses
   with check 90 the same way and writes no row. Observed by AC10 and AC19.
 - **S9** — Status writes. `--hold` writes `held`, `--landed` writes `landed` and `--abort` writes
-  `aborted`, each after its own `stage_or_fail` succeeds. A claim this call may not write, or a
+  `aborted`, each after its own `stage_or_fail` succeeds; under `LANDER_MODE=in-place`, where
+  `--landed` stages nothing and only observes, it writes `landed` once that observation is written.
+  A claim this call may not write, or a
   write that does not complete, is announced on one line and never fails the verb; the local record
   is the truth and the claim ages to `stale`. A terminal claim stays on the remote for the next run
   of the slug to take over. Observed by AC9 and AC20.
@@ -652,6 +654,10 @@ once, through the kit's own runner, at VERIFYING.
   claim commit's fixed identity and the order the rows are tested in. AC15's write moves to a bare
   repository on node `a`, because finding 38 makes a real-remote write through the driver
   uncompletable on this node until unit 10 lands.
+- rev-7 · 2026-10-05 · §2 · S9 · the in-place `--landed`, which stages nothing, writes `landed`
+  after its landing observation; S9 said only "after its own `stage_or_fail`", and this repository
+  lands in place, so every landed run's claim would otherwise have aged to `stale` and been
+  announced at every later `--preflight`.
 
 ## 10. Reuse audit
 
