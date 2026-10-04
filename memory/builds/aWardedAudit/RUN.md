@@ -10,7 +10,7 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 
 ## Run facts
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: aa14e5eb1b1ced1e79a7e9fb22a8149e54bc78ab
+witness: c47342a382331cfb92adeb065608aa9da82f69c9
 phase: BUILDING
 branch-sha: 856ad8a6856225bfe0d610d9a530b8fe852192b8
 branch-ref: refs/heads/branch/unattended-spec-review-owner-b471cf
@@ -62,3 +62,5 @@ base: 856ad8a6856225bfe0d610d9a530b8fe852192b8
 2026-10-04T22:47:30Z brief · item TOOL-aWardedAudit-6 · reason 964068ab7fb7 memory/builds/aWardedAudit/prompts/2026-10-05-prompt-TOOL-aWardedAudit-6-1-build-brief.md
 
 2026-10-04T22:47:42Z dispatch · item aa14e5eb TOOL-aWardedAudit-5 · reason tools/unattended/check-unattended.sh tools/unattended/check-unattended.test.sh memory/builds/aWardedAudit/spec/2026-10-05-spec-TOOL-aWardedAudit-5.md
+
+2026-10-04T23:04:11Z dispatch · item c47342a3 TOOL-aWardedAudit-6 · reason tools/hooks/agent-cap.js tools/hooks/agent-cap.test.sh tools/hooks/README.md tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/SKILL.template.md .claude/skills/unattended/SKILL.md tools/unattended/PROTOCOL.template.md memory/guides/UNATTENDED-PROTOCOL.md tools/memory-tree/BUILD-METHOD.template.md memory/guides/BUILD-METHOD.md memory/guides/SESSION-KICKOFF.md memory/builds/aWardedAudit/spec/2026-10-05-spec-TOOL-aWardedAudit-6.md
