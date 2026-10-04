@@ -81,7 +81,9 @@ ck(true, 'the prelude extraction is live (' + (stop - metaEnd - 1) + ' lines, al
 // ---- one arm ----------------------------------------------------------------------------------
 const BLOB = 'abc1234'
 const SHA = 'a'.repeat(40)
-const base = { repo: '/tmp/r', reviewDir: 'memory/reviews', unitIds: ['TOOL-x-1'], base: SHA, head: SHA }
+// `scratch` rides every arm (TOOL-aEvidencedLens-2 S7): a spec audit refuses without it, and a diff
+// review never reads it, so carrying it here reds no arm and leaves every proceeding spec arm proceeding.
+const base = { repo: '/tmp/r', reviewDir: 'memory/reviews', unitIds: ['TOOL-x-1'], base: SHA, head: SHA, scratch: '/tmp/s' }
 function arm(name, extra, want) {
   let threw = null
   try {
@@ -158,6 +160,36 @@ armIntensity('intensity: absent proceeds', {}, 'full')
 armIntensity('intensity: light on a spec audit is refused', Object.assign({ intensity: 'light' }, GOOD_SPEC), 'refused')
 armIntensity('intensity: full on a spec audit proceeds', Object.assign({ intensity: 'full' }, GOOD_SPEC), 'full')
 
+// ---- TOOL-aEvidencedLens-2 AC3 — `scratch`, required on a spec audit and refused by shape ---------
+// The proceeding arms read the RESOLVED value back, so none passes over a prelude that never reads
+// `scratch`: on the base render the read throws `scratch is not defined`, a harness fault. A refusal
+// must START `tier2-review:` and name `scratch`, so an unrelated throw cannot satisfy one.
+function armScratch(name, extra, want) {
+  let got = null
+  let threw = null
+  try {
+    got = new Function('args', 'log', 'parallel', 'agent', 'phase', body + '\nreturn scratch')(Object.assign({}, base, extra), () => {}, null, null, null)
+  } catch (e) { threw = e.message }
+  if (threw && /has already been declared|is not defined|Unexpected|Invalid or unexpected/.test(threw)) {
+    console.log('HARNESS-BROKEN ' + name + ' -> ' + threw)
+    fail++
+    return
+  }
+  ck(want === 'refused' ? !!threw && threw.indexOf('tier2-review:') === 0 && threw.indexOf('`scratch`') !== -1 : !threw && got === want,
+    name + (threw ? ' (threw: ' + threw + ')' : ' (resolved ' + JSON.stringify(got) + ')'))
+}
+armScratch('spec scratch: absent is refused', Object.assign({ scratch: undefined }, GOOD_SPEC), 'refused')
+armScratch('spec scratch: a relative path is refused', Object.assign({ scratch: 'tmp/s' }, GOOD_SPEC), 'refused')
+armScratch('spec scratch: a multi-line value is refused', Object.assign({ scratch: '/tmp/s\nX' }, GOOD_SPEC), 'refused')
+armScratch('spec scratch: equal to repo is refused', Object.assign({ scratch: '/tmp/r' }, GOOD_SPEC), 'refused')
+armScratch('spec scratch: repo with a trailing slash is refused', Object.assign({ scratch: '/tmp/r/' }, GOOD_SPEC), 'refused')
+armScratch('spec scratch: under repo is refused', Object.assign({ scratch: '/tmp/r/sub' }, GOOD_SPEC), 'refused')
+armScratch('spec scratch: under repo by case and backslash is refused', Object.assign({ repo: 'c:/r', scratch: 'C:\\R\\x' }, GOOD_SPEC), 'refused')
+armScratch('spec scratch: an absolute path outside repo proceeds', GOOD_SPEC, '/tmp/s')
+armScratch('spec scratch: a sibling sharing the repo prefix proceeds', Object.assign({ scratch: '/tmp/rs' }, GOOD_SPEC), '/tmp/rs')
+armScratch('spec scratch: a Windows path proceeds, folded to forward slashes', Object.assign({ scratch: 'C:\\t\\s' }, GOOD_SPEC), 'C:/t/s')
+armScratch('spec scratch: a diff review never reads it', { scratch: 7 }, '')
+
 // ---- D9 — the `args` header must carry every field the file reads --------------------------------
 // BUILD-METHOD M4 sends a reader to that block for the spec-audit spelling, and it named neither
 // `kind` nor `subjects` when the rule was written to point at it. An omitted `kind` DEFAULTS rather
@@ -217,7 +249,7 @@ async function runReview(args, stubs, source) {
 const B = 'b'.repeat(40)
 const H = 'c'.repeat(40)
 const DIFF = { repo: '/tmp/r', base: B, head: H, round: 1, context: 'ctx', reviewDir: 'memory/reviews' }
-const SPEC = { repo: '/tmp/r', kind: 'spec-audit', round: 1, context: 'ctx', subjects: [{ path: 's.md', blob: 'abc1234' }] }
+const SPEC = { repo: '/tmp/r', kind: 'spec-audit', round: 1, context: 'ctx', subjects: [{ path: 's.md', blob: 'abc1234' }], scratch: '/tmp/s' }
 const buildProbe = (finds, verifies, base, head) => ({ commonDir: '/cd', base: base || B, head: head || H, finds: finds || [], verifies: verifies || [] })
 // One finding per lens, so five lenses make five ids and five batches of one: verify:ids-1-1 .. 5-5.
 const buildLensReturn = (label) => {
@@ -282,6 +314,27 @@ async function runWholeScriptArms() {
     ck(sf.length === 5 && sf.every((t) => t.schema && t.schema.required.indexOf('path') !== -1 && extractItemRequired(t).indexOf('where') !== -1 &&
       t.prompt.indexOf('/review-lenses/' + rs.result.key + '/find-' + t.label.slice(5) + '.json') !== -1),
       'AC1 the spec finding schema lists path in required, and every spec lens prompt names its file')
+    // ---- TOOL-aEvidencedLens-2 AC1/AC4 — the probe policy and the evidence field, spec kind only.
+    ck(sf.length === 5 && sf.every((t) => {
+      const at = t.prompt.indexOf('PROBE POLICY')
+      return at !== -1 && t.prompt.indexOf('PROBE POLICY', at + 1) === -1 && at > t.prompt.indexOf('LENS: ') && t.prompt.indexOf('LENS: ') !== -1 &&
+        ['scratch directory /tmp/s.', '120 seconds', 'DURABILITY', '--selftest'].every((w) => t.prompt.indexOf(w, at) !== -1)
+    }) && rs.trace.filter((t) => t.label === 'synth').length === 1 && rs.trace.filter((t) => t.label === 'synth').every((t) => t.prompt.indexOf('PROBE POLICY') === -1),
+      'the probe policy sits once under LENS: in every spec find: prompt, naming the scratch, the bound, the DURABILITY exception and --selftest, and not in synth')
+    const df = r.trace.filter((t) => t.label.indexOf('find:') === 0)
+    ck(sf.length === 5 && sf.every((t) => extractItemRequired(t).indexOf('evidence') !== -1 && t.prompt.indexOf('impact,fix,evidence}]') !== -1) &&
+      df.length === 5 && df.every((t) => extractItemRequired(t).indexOf('evidence') === -1 && t.prompt.indexOf('PROBE POLICY') === -1),
+      'the spec finding schema requires evidence and its return line names it; the diff schema and prompts carry neither')
+    // AC6 - the rules are in the print and `scratch` is not.
+    const rs2 = await runReview(Object.assign({}, SPEC, { scratch: '/tmp/s2' }), ALL_OK)
+    const ruleRe = /'Time a stated wall-clock goal once, when one run of it is bounded\.'/
+    const ruled = whole.replace(ruleRe, "'Time a stated wall-clock goal twice.'")
+    const rs3 = await runReview(SPEC, ALL_OK, ruled)
+    ck(!rs2.threw && rs2.result.key === rs.result.key && ruleRe.test(whole) && ruled !== whole && !rs3.threw && rs3.result.key !== rs.result.key,
+      'the review key moves with a PROBE_RULES edit and not with scratch')
+    const rw = await runReview(Object.assign({}, SPEC, { scratch: 'C:\\t\\s' }), ALL_OK)
+    ck(!rw.threw && rw.trace.filter((t) => t.label.indexOf('find:') === 0).every((t) => t.prompt.indexOf('PROBE POLICY — repository /tmp/r, scratch directory C:/t/s.') !== -1) &&
+      rw.trace.some((t) => t.label.indexOf('find:') === 0), 'a Windows scratch reaches the PROBE POLICY line folded to C:/t/s')
   }
 
   // ---- AC4: a DEAD probe reuses nothing, dispatches every lens and says so.
@@ -1235,7 +1288,10 @@ printf '%s\n' "$out"
 # apart from no verdict (1) and an all-uncertain note (1).
 # RAISED 180 -> 182 by TOOL-aEvidencedLens-1: 2 assertions, counted off the block — the retired spec
 # key refused by lensNotes (1) and the five spec lenses in catalogue order (1).
-FLOOR_ASSERTIONS=182
+# RAISED 182 -> 197 by TOOL-aEvidencedLens-2: 15 assertions, counted off the block — eleven prelude
+# `spec scratch:` arms (11), the probe policy under LENS: (1), the evidence field on the spec kind only
+# (1), the print moving with the rules and not with scratch (1) and the folded Windows scratch (1).
+FLOOR_ASSERTIONS=197
 executed=$(printf '%s\n' "$out" | sed -n 's/^---- \([0-9][0-9]*\) passed.*/\1/p' | tail -1)
 if [ -z "$executed" ]; then
   echo "FAIL the runner printed no assertion count at all — it died before its summary line"

@@ -741,7 +741,7 @@ has    "V5 attended: the main return carries the stage's counts" "$o" '"promoted
 # new one demands. One fixture therefore runs against either revision — observed RED on every arm
 # below against the unchanged render and callee, GREEN after.
 MT_T2="$HERE/tier2-review.js"
-MT_ARGS='{"repo":"/tmp/r","kind":"spec-audit","subjects":[{"path":"s1","blob":"abc1234"}],"round":1,"reviewDir":"r/"}'
+MT_ARGS='{"repo":"/tmp/r","kind":"spec-audit","subjects":[{"path":"s1","blob":"abc1234"}],"round":1,"reviewDir":"r/","scratch":"/tmp/s"}'
 # `build_merged_returns <items-json|absent> [judged] [shape-json]`: four lenses of twelve findings each
 # are ids 1-48, and the fifth spec lens, `failure-envelope` (TOOL-aEvidencedLens-1), returns none, so
 # every measured id range and merge keeps its place; the skeptic double judges ids 1 to `judged` (default 48), confirming the thirteen below

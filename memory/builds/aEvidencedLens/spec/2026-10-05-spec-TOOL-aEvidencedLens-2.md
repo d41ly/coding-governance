@@ -1,6 +1,6 @@
 # TOOL-aEvidencedLens-2 — spec lenses probe read-only, and every spec finding carries its evidence
 
-**Status:** SPECCED · rev-2 · 2026-10-05 · node a · Tier-2 · base 028b5cac · streams tooling · order 2
+**Status:** CLOSED · rev-2 · 2026-10-05 · node a · Tier-2 · base 028b5cac · streams tooling · order 2
 
 <!-- gen:spec-records -->
 

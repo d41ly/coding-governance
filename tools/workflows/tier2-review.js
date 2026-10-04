@@ -77,6 +77,9 @@ function buildKeyedSchema(schema, extra) {
 //   reviewDir: "where synth writes the report (repo-relative)",
 //   kind: "diff-review" | "spec-audit",   // DEFAULTS to "diff-review" when absent
 //   subjects: [{ path, blob }],           // spec-audit ONLY; blob is 7-40 hex, per subject
+//   scratch: "<absolute session scratchpad>", // spec-audit ONLY and REQUIRED there: where a probing lens
+//                                         // writes its temporary files; refused if relative, multi-line
+//                                         // or equal to or under `repo`; a diff review never reads it
 //   round: <integer>,                     // inferred as 2 when priorFindings arrive without one
 //   priorFindings: [ ... ],               // a previous round's confirmed set
 //   specs: ["<repo-relative path>", ...], // intent documents: a diff review's statement of intent, a spec audit's
@@ -221,6 +224,29 @@ if (isSpec) {
     log('WARNING: ' + why)
   }
 }
+// TOOL-aEvidencedLens-2 S4 - `scratch`, the one place a PROBING spec lens may write. REQUIRED on the
+// spec kind (spec F1: a lens briefed to probe with no scratch has nowhere legal to write, and owner
+// ruling TOOL-aProbedUnit-10 makes it required on every harness agent), refused by the build harness's
+// own SHAPE test (TOOL-aProbedUnit-4), plus two refusals of its own (spec F2): a control character,
+// because the value reaches a prompt line and a newline would start a forged one (the `specs` rule's L1
+// precedent below), and a path equal to or under an absolute `repo`, because a lens writing there writes
+// the tree. That comparison folds slashes, case and a trailing slash, so it errs toward refusing; an 8.3
+// short name or a link aliasing `repo` is not seen. The diff kind never reads `a.scratch`.
+const scratchRule = 'an ABSOLUTE path (a leading / or a drive letter and a separator) with no control character, not equal to or under `repo`'
+if (isSpec && (typeof a.scratch !== 'string' || !/^(\/|[A-Za-z]:[\\/])/.test(a.scratch)))
+  throw new Error('tier2-review: a spec-audit needs `scratch`, ' + scratchRule + '. Got ' + JSON.stringify(a.scratch) +
+    '. Refusing to default it: a probing lens with no scratch directory has nowhere legal to write.')
+if (isSpec && /[\x00-\x1f]/.test(a.scratch))
+  throw new Error('tier2-review: `scratch` must be ' + scratchRule + '. Got ' + JSON.stringify(a.scratch) +
+    ', which carries a control character; it reaches a prompt line, where a newline would start a forged one.')
+const scratchFold = isSpec ? a.scratch.replace(/\\/g, '/').toLowerCase().replace(/\/+$/, '') : ''
+const repoFold = String(repo).replace(/\\/g, '/').toLowerCase().replace(/\/+$/, '')
+if (isSpec && /^(\/|[A-Za-z]:[\\/])/.test(String(repo)) && (scratchFold === repoFold || scratchFold.indexOf(repoFold + '/') === 0))
+  throw new Error('tier2-review: `scratch` must be ' + scratchRule + '. Got ' + JSON.stringify(a.scratch) + ' beside `repo` ' +
+    JSON.stringify(repo) + '; a lens writing its temporary files there writes the tree the read-only rule exists to protect.')
+// Folded to forward slashes ONCE, here, as the build harness folds its own; never lowercased, so the
+// prompt names the directory the caller spelled.
+const scratch = isSpec ? a.scratch.replace(/\\/g, '/') : ''
 // TOOL-aSightedSkeptic-3 S1/S3 - `specs`, the intent documents the caller names. Validated here,
 // before the base-shape ladder and the first agent, so a bad value refuses in milliseconds. A path
 // reaches a prompt as text an agent then reads, so anything that could point a reviewer outside the
@@ -385,6 +411,27 @@ const SEVERITY_RUBRIC =
   `low: ${isSpec ? 'the design, built as written, would differ only cosmetically or in a comment' : 'cosmetic, or a comment'}, with no effect on behaviour. ` +
   `A grade follows the consequence, never the confidence or how alarming the defect looks.`
 
+// TOOL-aEvidencedLens-2 S2 - the PROBE POLICY, spec-kind data. A spec lens may now establish a claim
+// from anywhere in the tree, read-only: about two in five of the defects that got past the audit needed
+// a command run, a consumer grepped or a goal timed (measured 2026-10-05, session study). The rules
+// interpolate NOTHING, so they join the input print; the block's header line carries `scratch`, which
+// changes every session and therefore does not (a resumed run must reuse its lens files). The one write
+// the READ-ONLY rule excepts is the DURABILITY file the same prompt demands two lines later.
+const PROBE_RULES = [
+  'Establish every claim with a read-only command, and record the command and what it printed.',
+  'Run each section-6 criterion\'s own command or check when it is read-only and bounded, and record what it printed: a criterion already green before the unit is built cannot fail.',
+  'Grep the consumers of every name, value or path the spec renames, retires or changes.',
+  'Time a stated wall-clock goal once, when one run of it is bounded.',
+  'READ-ONLY: write nothing under the repository, with ONE exception, the DURABILITY file this prompt names. Never run a command that writes the tree or the index: no --write, --render, --fix or --in-place, no git add, commit, checkout, switch, reset, restore, stash, merge, rebase, clone or worktree, and no redirect into the repository. Read another revision with git show <rev>:<path>.',
+  'Every temporary file goes under the scratch directory named above, spelled absolute; never $TMPDIR, $TMP, $TEMP, /tmp or a bare mktemp.',
+  'Bound every command at 120 seconds. Never run a merge bar, a *.test.sh suite or a self-test runner, a --selftest flag included.',
+  'A probe that needs a write, such as a staged break, or one of the runs banned above, is DESCRIBED in the finding\'s fix as the probe the build must run. It is never performed.',
+]
+// Built once, after `scratch` is validated; '' on the diff kind, whose prompts stay byte-identical.
+const probeBlock = isSpec
+  ? `PROBE POLICY — repository ${repo}, scratch directory ${scratch}.\n- ` + PROBE_RULES.join('\n- ') + `\n`
+  : ''
+
 // S3 - the spec kind's schema. `where` replaces `line` and is REQUIRED, so the address obligation is
 // machine-enforced on both kinds rather than relaxed on one.
 const SPEC_FINDING_SCHEMA = {
@@ -398,7 +445,8 @@ const SPEC_FINDING_SCHEMA = {
       type: 'array',
       items: {
         type: 'object',
-        required: ['file', 'where', 'severity', 'claim', 'impact', 'fix'],
+        // TOOL-aEvidencedLens-2 S3 - `evidence` is REQUIRED: what a skeptic re-runs to check the claim.
+        required: ['file', 'where', 'severity', 'claim', 'impact', 'fix', 'evidence'],
         properties: {
           file: { type: 'string' },
           where: { type: 'string' },
@@ -406,6 +454,7 @@ const SPEC_FINDING_SCHEMA = {
           claim: { type: 'string' },
           impact: { type: 'string' },
           fix: { type: 'string' },
+          evidence: { type: 'string' },
         },
       },
     },
@@ -619,7 +668,9 @@ const REVIEW_SHAPE = 'lenses5-r2'
 // TOOL-aSightedSkeptic-4 S7 - so does the PARSED checklist: a CRLF string and its LF twin are one key,
 // and a lens swept under one checklist is never reused under another.
 // TOOL-aSightedSkeptic-7 S8 - and so does `intensity`: a light run and a full run never share a lens file.
-const inputPrint = deriveFnv1a(renderCanonical({ shape: REVIEW_SHAPE, context: context, byDesign: byDesign, priorFindings: priorFindings, lensNotes: lensNotes, specs: SPECS, checklist: checklist, intensity: intensity }))
+// TOOL-aEvidencedLens-2 S5 - and, on the spec kind only, PROBE_RULES, spread so the diff print object is
+// unchanged. `scratch` is a location, not content, and stays out: a resumed run has a new scratchpad.
+const inputPrint = deriveFnv1a(renderCanonical({ shape: REVIEW_SHAPE, context: context, byDesign: byDesign, priorFindings: priorFindings, lensNotes: lensNotes, specs: SPECS, checklist: checklist, intensity: intensity, ...(isSpec ? { probeRules: PROBE_RULES } : {}) }))
 const specSubject = isSpec
   ? deriveFnv1a(subjects.map((x) => (x && typeof x === 'object' ? `${x.path}@${x.blob}` : String(x))).join('\n'))
   : ''
@@ -777,13 +828,15 @@ const finderResults = await boundedParallel(
           `and review the file as it now stands. Then Read the file WHOLE.\n\n`
         : `You are the ${L.key} reviewer. Review ONLY the diff named under SUBJECT above (run \`${diffCmd}\`, then Read/Grep the touched files + their immediate callers).\n\n`) +
         `LENS: ${L.brief}\n` +
+        // TOOL-aEvidencedLens-2 S2 - the probe policy directly under the brief; '' on the diff kind.
+        probeBlock +
         // TOOL-aSightedSkeptic-5 S5 - this lens's note and no other's, directly under its brief.
         (notedLenses.indexOf(L.key) !== -1 ? `PROJECT NOTE FOR THIS LENS (from the caller's lensNotes): ${lensNotes[L.key]}\n` : '') +
         // TOOL-aSightedSkeptic-4 S3 - this lens's checklist share, and no other's.
         checklistBlock[L.key] +
         `\n` +
         (isSpec
-          ? `Emit CONCRETE findings only — each needs file, where, severity (blocker|high|medium|low), with "where" being the section address, e.g. "section 2 S5", a one-line claim, the impact, and a proposed fix. A spec finding is often the ABSENCE of a line, so address it by section. No speculation, no style nits, nothing outside the spec set. If nothing real, return findings: [].\n`
+          ? `Emit CONCRETE findings only — each needs file, where, severity (blocker|high|medium|low), with "where" being the section address, e.g. "section 2 S5", a one-line claim, the impact, a proposed fix, and evidence: the command you ran and what it printed, or read: <path>:<line> for a finding that rests on reading alone. A spec finding is often the ABSENCE of a line, so address it by section. Every finding is ABOUT the spec set; its evidence may come from anywhere in ${repo} at HEAD. No speculation, no style nits. If nothing real, return findings: [].\n`
           : `Emit CONCRETE findings only — each needs file, line, severity (blocker|high|medium|low), a one-line claim, the impact, and a proposed fix. No speculation, no style nits, nothing outside the diff. If nothing real, return findings: [].\n`) +
         // TOOL-aSightedSkeptic-6 S2 - the rubric beside the instruction that asks for a severity.
         SEVERITY_RUBRIC + `\n` +
@@ -791,7 +844,7 @@ const finderResults = await boundedParallel(
         // every structured return with it; a file on disk survives, and the next run's probe reuses it.
         `\nDURABILITY — BEFORE you return, whatever you found, Write the exact JSON object you are about to return, plus one more field "key":"${reviewKey}", to ${keyDir}/find-${L.key}.json, creating the directory if it is missing.${keyDirHow} Set path to that file's absolute, forward-slash path.\n` +
         (isSpec
-          ? `Return JSON {lens:"${L.key}", path, findings:[{file,where,severity,claim,impact,fix}]}.`
+          ? `Return JSON {lens:"${L.key}", path, findings:[{file,where,severity,claim,impact,fix,evidence}]}.`
           : `Return JSON {lens:"${L.key}", path, findings:[{file,line,severity,claim,impact,fix}]}.`),
         { label: `find:${L.key}`, phase: 'Find', schema: isSpec ? SPEC_FINDING_SCHEMA : FINDING_SCHEMA },
       ),
