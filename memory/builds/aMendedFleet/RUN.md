@@ -116,3 +116,25 @@ base: 7af5f564641d231f8b78f6b183dde1b6bf53111d
 2026-10-04T21:54:28Z dispatch · item a3f63d19 TOOL-aMendedFleet-6 · reason tools/lexicon/lexicon_conf.py tools/lexicon/selftest.py memory/builds/aMendedFleet/spec/2026-10-04-spec-TOOL-aMendedFleet-6.md memory/LIVE.md memory/builds/aMendedFleet/README.md
 
 2026-10-04T21:55:42Z brief · item TOOL-aMendedFleet-7 · reason ca9f6d277d8a memory/builds/aMendedFleet/prompts/2026-10-04-prompt-TOOL-aMendedFleet-1-4-build-brief.md
+
+2026-10-04T21:57:41Z dispatch · item b566f345 TOOL-aMendedFleet-7 · reason memory/builds/aMendedFleet/build/2026-10-04-build-TOOL-aMendedFleet-7-1-held-red-census.md memory/builds/aMendedFleet/README.md memory/builds/aMendedFleet/spec/2026-10-04-spec-TOOL-aMendedFleet-7.md
+
+2026-10-04T22:08:42Z rescope · item add TOOL-aMendedFleet-97 · reason held-red census cause C1 (TOOL-aMendedFleet-7): Python stdio follows the hosted runner's cp1252 code page, so a child's em dash reaches a UTF-8 reader as 0x97 and a printed check mark cannot encode; nine held suites
+
+2026-10-04T22:08:45Z rescope · item add TOOL-aMendedFleet-98 · reason held-red census cause C2 (TOOL-aMendedFleet-7): a Python suite spawns bare bash, which Windows resolves to the System32 WSL launcher before Git-Bash on PATH; lexicon selftest
+
+2026-10-04T22:08:48Z rescope · item add TOOL-aMendedFleet-99 · reason held-red census cause C3 (TOOL-aMendedFleet-7): the held job runs from actions/checkout on D: while the bar job clones to the primary-tree path; manifest-check and process-monitor adopter
+
+2026-10-04T22:08:50Z rescope · item add TOOL-aMendedFleet-100 · reason held-red census cause C4 (TOOL-aMendedFleet-7): a check-unattended fixture commits in a bare origin with no identity and the runner has no global git identity; gate shard 2/8
+
+2026-10-04T22:09:00Z rescope · item add TOOL-aMendedFleet-101 · reason held-red census cause C5 (TOOL-aMendedFleet-7): the G0 fixture's sed lines still write tools/lander-granted.sh where its greps expect bin/lander-granted.sh; gate shard 8/8
+
+2026-10-04T22:09:03Z rescope · item add TOOL-aMendedFleet-102 · reason held-red census cause C6 (TOOL-aMendedFleet-7): the inline resolve_kit_dir blocks in backlog.py and transition_audit.py drifted from tools/lib/resolve_kit_dir.py; python resolver
+
+2026-10-04T22:09:06Z rescope · item add TOOL-aMendedFleet-103 · reason held-red census cause C7 (TOOL-aMendedFleet-7): corpus_ids.py reads GRAMMAR_WHERE through globals() and the hygiene suite's python-parity arm does not exempt it; memory-hygiene self-test
+
+2026-10-04T22:09:09Z rescope · item add TOOL-aMendedFleet-104 · reason held-red census cause C8 (TOOL-aMendedFleet-7): review_replay.py --selftest neither prints the foreign-prefix probe marker nor is declared a whole run; foreign-prefix parity
+
+2026-10-04T22:09:12Z rescope · item add TOOL-aMendedFleet-105 · reason held-red census cause C9 (TOOL-aMendedFleet-7): the census live-tree arm's kill is refused Permission denied on the runner in two of three runs with no tree change between; process-monitor census
+
+2026-10-04T22:12:03Z dispatch · item b566f345 TOOL-aMendedFleet-7 · reason memory/builds/aMendedFleet/build/2026-10-04-build-TOOL-aMendedFleet-7-1-held-red-census.md memory/builds/aMendedFleet/README.md memory/builds/aMendedFleet/spec/2026-10-04-spec-TOOL-aMendedFleet-7.md memory/LIVE.md memory/ledger/2026-10.md

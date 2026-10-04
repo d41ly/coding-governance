@@ -1,10 +1,12 @@
 # TOOL-aMendedFleet-7 — a census of the daily held job's red suites by root cause, adding one unit per cause
 
-**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · order 7
+**Status:** CLOSED · rev-3 · 2026-10-05 · node a · Tier-1 · base 7af5f564 · streams tooling · order 7
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-04-build-TOOL-aMendedFleet-7-1-held-red-census.md](../build/2026-10-04-build-TOOL-aMendedFleet-7-1-held-red-census.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
@@ -34,15 +36,21 @@ this build already owns. It writes no product code: each cause is built by the u
   stale fixture, a date-relative arm, an inline copy that drifted), `lost` (code a merge dropped) or
   `derived` (the suite reds only because it runs another suite that is red, and its cause is that
   suite's). A suite that cannot be classified from its log and a source read is a row whose cause is
-  `UNRESOLVED` with the reason, never a guess. Observed by AC2.
+  `UNRESOLVED` with the reason, never a guess. A suite whose log shows more than one mechanism
+  carries one cause id per mechanism, each with its own class, so a second cause is never hidden
+  behind the first. Observed by AC2.
 - **S4** — The CAUSE table: one row per `C<n>`, naming the mechanism in one sentence, every suite it
   explains, and its DISPOSITION — either an EXISTING unit of this build whose write set already
   contains the fix (units 1, 4, 5 and 6 are the candidates the brief names), or a NEW unit. A cause
   is attributed to an existing unit only when that unit's spec names the file the fix lands in; a
-  cause that merely resembles one is a new unit. Observed by AC3.
+  cause that merely resembles one is a new unit. A third disposition, `GREEN-SINCE <run id>`, holds
+  only for a cause every one of whose suites passed in the NEWEST census run: it names the commit
+  between the two runs' head shas that cleared it where the history names one, and it adds no unit,
+  because a unit for a suite already green has no failing case to observe. Observed by AC3.
 - **S5** — Each NEW cause is added to the build with
   `bash tools/unattended/unattended.sh --rescope aMendedFleet --act add --item <id> --reason <text>`,
-  one call per cause, and a row in the build README's authored Units table naming the id, its tier
+  one call per cause whose reason opens `held-red census cause C<n>`, and a row in the build
+  README's authored Units table naming the id, its tier
   and its one-sentence mechanism. The id is the TOOL family's next free sequence at the time of the
   call, derived from the roster and never typed ahead of it. Observed by AC3 and AC4.
 - **S6** — The census journal is committed under this build's `build/` folder with the binding line
@@ -155,7 +163,7 @@ re-derives, never a substitute for it.
   suite table, every suite row carries a cause id `C<n>` or `UNRESOLVED` with a reason, a class from
   S3's closed set, and a first failing line quoted from its job log.
   Red when: a row carries no cause, a class outside the set, or an evidence cell that is empty.
-- **AC3** — When `grep -c " rescope · item add TOOL-aMendedFleet-" memory/builds/aMendedFleet/RUN.md`
+- **AC3** — When `grep -c " rescope · item add TOOL-aMendedFleet-[0-9]* · reason held-red census cause " memory/builds/aMendedFleet/RUN.md`
   runs after the pass, it equals the number of cause rows the journal disposes as NEW, and every cause
   row disposed to an existing unit names a file that unit's spec lists under its files touched.
   Red when: a new cause has no unit, or a unit was added for a cause the journal does not list.
@@ -193,6 +201,12 @@ The census writes records only. The journal path trips the two recall-floor guar
 - rev-2 · 2026-10-04 · §3 · the Edges handed off to units 1 and 4, both ordered before this one, so
   nothing could be left to them; S4 reads their specs, and those of units 5 and 6, which is a
   consumption. The edges now say so and name all four candidates S4 lists.
+- rev-3 · 2026-10-05 · S3, S4 · the census found causes S4's two dispositions could not hold: three
+  suites red in the older runs passed in the newest with a clearing commit between, and two suites
+  each show two mechanisms. S4 gains `GREEN-SINCE`, which adds no unit, and S3 lets a row carry one
+  cause per mechanism. AC3's grep counted every add the run had recorded, fourteen of them before
+  this unit, so it could never equal the census's count; it now selects the adds whose reason opens
+  `held-red census cause`, the prefix S5's calls write.
 
 ## 10. Reuse audit
 
