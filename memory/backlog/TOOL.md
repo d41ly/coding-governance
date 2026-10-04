@@ -444,3 +444,5 @@ Cite ids, never line numbers.
 | [TOOL-dUnstalledConvoy-36](../builds/dUnstalledConvoy/BACKLOG.md) | OPEN | — | — | 2026-08-24 | refusal_join.py's JOIN half has never executed. Its docstring promises… |
 | [TOOL-dUnstalledConvoy-37](../builds/dUnstalledConvoy/BACKLOG.md) | OPEN | — | — | 2026-08-24 | core.hooksPath is repo-global and absolute, so in this multi-worktree… |
 | [TOOL-dUnstalledConvoy-38](../builds/dUnstalledConvoy/BACKLOG.md) | OPEN | — | — | 2026-08-24 | --landed's check 34 compares the lander marker against the run's own… |
+| [TOOL-dUnstuckLanding-11](../builds/dUnstuckLanding/BACKLOG.md) | OPEN | HIGH | — | 2026-10-04 | carry the kit that ships asks 3 to 10 into inCMS and NicoCares through… |
+| [TOOL-dUnstuckLanding-26](../builds/dUnstuckLanding/BACKLOG.md) | OPEN | HIGH | — | 2026-10-04 | a gate for a merge whose resolution drops one side's hunks: for each… |

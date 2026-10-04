@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.4 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-10-04T19:52:28+03:00 @ adaea26441a3628bf9701b061693f0d8cad4552e
+last-audit: 2026-10-05T00:16:20+03:00 @ fb3808a3c95968949e8cbb9bdb173897cb3b608d
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/run-gates/run-selftests.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 30c5cb34aba27c0cc71a03c95817a32844a0e37d
+last-body-change: 5ec23c24562eb50a3464aef0be2ac16b9da8303e
 check-script: skills/session-kickoff/manifest-check.sh
 registry: AGENTS.md
 -->
@@ -51,9 +51,9 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   BUILD-METHOD's, both changed under `TOOL-dUnstalledConvoy`, and both invert what a session would
   otherwise assume: M2/M3 give a run delegated authority to retire, supersede or add units inside the
   build's stated goal rather than stalling on a spec that turned out wrong, and M6's parallel default
-  now binds delegated passes only. Conditions and bounds are M3's and M6's. What
-  is NOT in force is the VERIFICATION: `--dispatch` records a pass's declared write set and the
-  comparison only REPORTS (`TOOL-dUnstalledConvoy-23`). Declare them anyway; green is not a proof.
+  now binds delegated passes only. Conditions and bounds are M3's and M6's. Check 23 counts only a
+  pass that overlapped a sibling and fails only the branch's own run, over `UNDECLARED_WRITE_BUDGET`;
+  `--check-commit` refuses an undeclared staged path (`TOOL-aWindowedPass-1`, `-3`, `-5`).
 
 - **Every session start writes an ORIENTATION CARD** at `<git-common-dir>/orientation/<session_id>.md`
   (`manifest-check.sh --card --write`, wired as a SessionStart hook; `--card --replay` re-injects it
