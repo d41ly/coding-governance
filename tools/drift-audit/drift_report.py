@@ -2372,6 +2372,105 @@ def measure_legs_retried_after_timeout(ctx) -> dict:
     }
 
 
+# --------------------------------------------------------------------------------------------
+# Signal - consecutive red runs of the remote CI workflow on the default branch (TOOL-aMendedFleet-8)
+#
+# Every other signal reads the local clone, so a remote CI that has failed for a week was invisible
+# to the one report that exists to say the record no longer matches reality. This reads the newest
+# runs through `gh` and counts the leading reds over COMPLETED runs: `failure`, `timed_out` and
+# `startup_failure` extend the streak, `success` ends it, and every other conclusion, or a run still
+# in flight, carries no verdict and is passed over and listed. A cancelled run therefore cannot fake
+# a green.
+#
+# REPORT-ONLY, and NOT ASKED in two cases: the project layer declares no `REMOTE_CI_WORKFLOW`, or
+# the run is `--check` / `--offenders`, so the merge bar's leg never makes a network call for a value
+# it does not grade. LIVENESS is a `gh` answer holding at least one verdict-bearing run; `gh` absent,
+# failing, timing out, unparseable or empty is DEAD PROBE, never a reassuring 0.
+#
+# WHAT IT DOES NOT CHECK: why a run failed, or which job inside it. The detail names the run ids, and
+# `gh run view <id>` answers the rest. A window that is all red reports its own length with `capped`
+# set: the streak is AT LEAST that, and may be longer than the window shows.
+REMOTE_CI_RUN_LIMIT = 30
+REMOTE_CI_TIMEOUT_S = 20
+_CI_RED = frozenset({"failure", "timed_out", "startup_failure"})
+_CI_GREEN = frozenset({"success"})
+
+
+def read_remote_ci_runs(root: pathlib.Path, workflow: str, branch: str):
+    """`(rows, None)` from `gh run list`, newest first, or `(None, <why>)` when it could not answer."""
+    argv = ["gh", "run", "list", "--workflow", workflow, "--branch", branch,
+            "--limit", str(REMOTE_CI_RUN_LIMIT),
+            "--json", "databaseId,status,conclusion,event,createdAt,headSha"]
+    try:
+        out = subprocess.run(argv, cwd=str(root), capture_output=True, text=True, encoding="utf-8",
+                             errors="replace", timeout=REMOTE_CI_TIMEOUT_S)
+    except FileNotFoundError:
+        return None, "`gh` is not on PATH"
+    except subprocess.TimeoutExpired:
+        return None, f"`gh run list` did not answer within {REMOTE_CI_TIMEOUT_S} s"
+    if out.returncode != 0:
+        first = (out.stderr.strip().splitlines() or ["(no stderr)"])[0]
+        return None, f"`gh run list` exited {out.returncode}: {first}"
+    try:
+        rows = json.loads(out.stdout)
+    except ValueError:
+        return None, "`gh run list` printed output that is not JSON"
+    if not isinstance(rows, list) or not all(isinstance(x, dict) for x in rows):
+        return None, "`gh run list` printed JSON that is not a list of runs"
+    return rows, None
+
+
+def measure_red_streak(rows: list) -> dict:
+    """The leading red streak over verdict-bearing runs, newest first, overall and per event.
+
+    `streak` is None when no run carries a verdict, which the caller reports DEAD. `capped` is true
+    when every verdict-bearing run in the window is red, so the true streak may be longer."""
+    verdicts, passed_over = [], []
+    for x in rows:
+        c = (x.get("conclusion") or "") if x.get("status") == "completed" else ""
+        if c in _CI_RED or c in _CI_GREEN:
+            verdicts.append((x, c in _CI_RED))
+        else:
+            passed_over.append({"run": x.get("databaseId"), "status": x.get("status"),
+                                "conclusion": x.get("conclusion") or "", "event": x.get("event")})
+    streak = next((i for i, (_, red) in enumerate(verdicts) if not red), len(verdicts))
+    by_event = {}
+    for ev in ("push", "schedule"):
+        reds = [red for x, red in verdicts if x.get("event") == ev]
+        by_event[ev] = next((i for i, red in enumerate(reds) if not red), len(reds))
+    newest_red = next((x.get("databaseId") for x, red in verdicts if red), None)
+    newest_green = next((x.get("databaseId") for x, red in verdicts if not red), None)
+    return {"streak": streak if verdicts else None, "examined": len(verdicts),
+            "capped": bool(verdicts) and streak == len(verdicts), "by_event": by_event,
+            "newest_red": newest_red, "newest_green": newest_green, "passed_over": passed_over}
+
+
+def build_remote_ci_red_streak(ctx) -> dict:
+    """Consecutive failed runs of the declared remote CI workflow on the default branch."""
+    name = "remote_ci_red_streak"
+    workflow = getattr(ctx, "remote_ci_workflow", "")
+    if not workflow:
+        return _build_not_asked(name, "the project layer declares no REMOTE_CI_WORKFLOW, so there is no "
+                                      "remote CI to read")
+    if getattr(ctx, "offline", False):
+        return _build_not_asked(name, "skipped under --check and --offenders: the merge bar's leg makes "
+                                      "no network call for a value it does not grade")
+    branch = re.sub(r"^refs/(?:remotes/[^/]+|heads)/", "", ctx.git.base_ref)
+    rows, why = read_remote_ci_runs(ctx.root, workflow, branch)
+    m = measure_red_streak(rows or [])
+    if why is None and m["streak"] is None:
+        why = f"`gh run list` returned {len(rows)} run(s) of {workflow} on {branch} and none carries a verdict"
+    live = why is None
+    if not live:
+        return {"signal": name, "value": 0, "of": 0, "tolerance": 0, "gateable": False,
+                "live": live, "detail": [{"note": f"DEAD PROBE — {why}"}]}
+    summary = {"workflow": workflow, "branch": branch, "newest_red": m["newest_red"],
+               "newest_green": m["newest_green"] if m["newest_green"] is not None else "none in window",
+               "capped": m["capped"], "by_event": m["by_event"], "passed_over": len(m["passed_over"])}
+    return {"signal": name, "value": m["streak"], "of": m["examined"], "tolerance": 0,
+            "gateable": False, "live": live, "detail": [summary, *m["passed_over"]]}
+
+
 SIGNALS = [build_lexicon_marginal_offense_rate,
            signal_ledger, signal_spec_status, signal_shrink_only, signal_handkept,
            signal_dangling_pointers, signal_closed_specs_untraceable,
@@ -2383,7 +2482,8 @@ SIGNALS = [build_lexicon_marginal_offense_rate,
            build_source_cited_ids_with_no_record,
            build_backlog_stragglers,
            build_nonterminal_merged_runs,
-           measure_legs_retried_after_timeout]
+           measure_legs_retried_after_timeout,
+           build_remote_ci_red_streak]
 
 
 # --------------------------------------------------------------------------------------------
@@ -2419,6 +2519,11 @@ class Ctx:
         # — which declares neither name — keeps working instead of tripping a required-attribute
         # refusal, and visibly gets the old unnarrowed behaviour until they fill it.
         self.evidence_globs = list(getattr(proj, "EVIDENCE_GLOBS", None) or proj.PRODUCT_GLOBS)
+        # TOOL-aMendedFleet-8. The remote CI workflow file the red-streak signal reads; BLANK or
+        # undeclared is NOT ASKED. `offline` is set by `main` under --check / --offenders, so the
+        # merge bar's leg never spawns `gh`.
+        self.remote_ci_workflow = (getattr(proj, "REMOTE_CI_WORKFLOW", "") or "").strip()
+        self.offline = False
         fams = _read_families(conf)
         self.own_id_re = _build_own_id_re(root, fams)
         # ONE accessor for both projections, so the citation scan and the definition scan
@@ -2609,6 +2714,7 @@ def main(argv: list[str] | None = None) -> int:
         return 2
     base_at = base_sha.stdout.strip()[:8]
     ctx = Ctx(root, conf, proj, base_ref)
+    ctx.offline = bool(args.check or args.offenders)
     out = [s(ctx) for s in SIGNALS]
     for s in out:
         s["pin"] = ctx.pins.get(s["signal"], s["tolerance"])
@@ -2649,7 +2755,10 @@ def main(argv: list[str] | None = None) -> int:
         print(f"# {'signal':<48} {'value':>7} {'of':>6}  status")
         for s in out:
             if s.get("not_asked"):
-                status = "not asked — this repo does not adopt what the signal reads"
+                # The record's own note where it carries one: a NOT ASKED that is a mode skip is not
+                # a repo that "does not adopt" what the signal reads (TOOL-aMendedFleet-8 S5).
+                note = next((d.get("note") for d in s["detail"][:1] if isinstance(d, dict)), None)
+                status = f"not asked — {note or 'this repo does not adopt what the signal reads'}"
             elif not s["live"]:
                 status = ("empty by declaration — nothing to measure here yet"
                           if s["signal"] in set(getattr(ctx.proj, "DECLARED_EMPTY", ()) or ())

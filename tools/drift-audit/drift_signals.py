@@ -384,3 +384,7 @@ RATCHETS: list[dict] = [
 ]
 
 CHARTER = "AGENTS.md"
+
+# The remote CI workflow `remote_ci_red_streak` reads through `gh` (TOOL-aMendedFleet-8). Report-only
+# and NOT ASKED under --check, so the merge bar stays offline; no pin, so any red streak reads over.
+REMOTE_CI_WORKFLOW = "remote-ci.yml"

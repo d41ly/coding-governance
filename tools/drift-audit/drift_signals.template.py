@@ -139,6 +139,14 @@ PINS: dict[str, int] = {
 # CHARTER = "AGENTS.md"
 
 # --------------------------------------------------------------------------------------------
+# REMOTE_CI_WORKFLOW — optional. The workflow file (e.g. "ci.yml") whose runs on the default branch
+# `remote_ci_red_streak` reads through an authenticated `gh`. BLANK is NOT ASKED: a repo with no
+# remote CI reads neither a clean 0 nor a dead probe. Report-only, and never asked under --check.
+# --------------------------------------------------------------------------------------------
+
+REMOTE_CI_WORKFLOW: str = ""
+
+# --------------------------------------------------------------------------------------------
 # DECLARED_EMPTY — signals whose population is empty ON PURPOSE. `--check` reds a gateable signal
 # that has gone DEAD, because a blind instrument reporting 0 is the failure this kit exists to
 # refuse; a signal you have deliberately not populated yet is not blind, and belongs here.

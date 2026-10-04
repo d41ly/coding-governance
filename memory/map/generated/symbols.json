@@ -1028,6 +1028,11 @@
       "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
+      "id": "build_remote_ci_red_streak",
+      "kind": "function",
+      "file": "tools/drift-audit/drift_report.py"
+    },
+    {
       "id": "build_replaced_line",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
@@ -4568,6 +4573,11 @@
       "file": "tools/workflows/review_replay.py"
     },
     {
+      "id": "measure_red_streak",
+      "kind": "function",
+      "file": "tools/drift-audit/drift_report.py"
+    },
+    {
       "id": "measure_row_classes",
       "kind": "function",
       "file": "tools/memory-tree/merge-rows.py"
@@ -5921,6 +5931,11 @@
       "id": "read_registry",
       "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"
+    },
+    {
+      "id": "read_remote_ci_runs",
+      "kind": "function",
+      "file": "tools/drift-audit/drift_report.py"
     },
     {
       "id": "read_rev",
@@ -10016,6 +10031,11 @@
       "id": "test_remedy_paths_are_real",
       "kind": "function",
       "file": "tools/codebase-map/selftest.py"
+    },
+    {
+      "id": "test_remote_ci_red_streak",
+      "kind": "function",
+      "file": "tools/drift-audit/selftest.py"
     },
     {
       "id": "test_renders_round_trip_and_determinism",

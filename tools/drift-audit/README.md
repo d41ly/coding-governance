@@ -99,7 +99,7 @@ Then, in order:
 |---|---|---|
 | `drift_report.py` | kit | the engine: the signal implementations, `--json`, `--check` |
 | `drift_signals.template.py` | kit | the project layer's starting point |
-| `drift_signals.py` | **project** | `PRODUCT_GLOBS`, `SHRINK_ONLY`, `HANDKEPT`, `PINS`, `RATCHETS`, optional `CHARTER`, `TRACE_CUTOFF`, `TRACE_GLOBS`, `TRACE_WAIVER`, `RATCHET_LOOKBACK` |
+| `drift_signals.py` | **project** | `PRODUCT_GLOBS`, `SHRINK_ONLY`, `HANDKEPT`, `PINS`, `RATCHETS`, optional `CHARTER`, `TRACE_CUTOFF`, `TRACE_GLOBS`, `TRACE_WAIVER`, `RATCHET_LOOKBACK`, `REMOTE_CI_WORKFLOW` |
 | `SKILL.template.md` | kit | rendered to `.claude/skills/drift-audit/SKILL.md` by the adopt script |
 | `adopt-drift-audit.sh` | kit | adopt + the `--check` sync arm for the merge bar |
 | `selftest.py` | kit | the kit's own falsifiability test |
@@ -127,6 +127,7 @@ Tier 2 needs the two workflow scripts from `<prefix>/workflows/drift-audit-{code
 | `asks_disposed_overrides` | how often did a run buy the `asks-disposed` Definition-of-Done item with an override? | no |
 | `run_records_nonterminal_but_merged` | does a run record still read live after its work reached the default branch? | no |
 | `legs_retried_after_timeout` | how many legs did the merge bar retry, once and alone, after their own ceiling fired, over the run records this git dir still holds? | no |
+| `remote_ci_red_streak` | how many consecutive completed runs of the declared remote CI workflow on the default branch failed, newest first? Read through `gh`; DEAD PROBE when `gh` cannot answer, not asked under `--check` or with no workflow declared. | no |
 
 **Every signal carries a `live` field.** A signal whose population is empty prints `DEAD PROBE`
 instead of a clean `0`. This is the kit's central rule and it is not decoration: the upstream repo's

@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-8 — drift-audit reports `remote_ci_red_streak`
 
-**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · order 8
+**Status:** CLOSED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · order 8
 
 <!-- gen:spec-records -->
 

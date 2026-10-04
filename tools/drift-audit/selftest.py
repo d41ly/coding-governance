@@ -93,7 +93,8 @@ EXECUTED: list[str] = []
 # on a run where no arm skipped; it rises by hand when arms land and never falls to absorb a missing
 # one. A run with a SKIP does not compare it, and says so, because a skipped arm's checks are absent
 # for a reason the floor cannot see.
-CHECK_FLOOR = 277
+CHECK_FLOOR = 284
+# 277 -> 284, TOOL-aMendedFleet-8: the seven checks of `test_remote_ci_red_streak`.
 # 261 -> 267, TOOL-dDerivedDocket-26: the six checks of `test_legs_retried_after_timeout`.
 # 267 -> 277, TOOL-dDerivedDocket-34: the five checks of the retired dGV-13 signal leave, one
 # retirement check and the fourteen of `test_backlog_ask_signals` arrive.
@@ -2590,6 +2591,55 @@ def test_legs_retried_after_timeout(tmp: pathlib.Path) -> None:
           dead["live"] is False, f"live={dead['live']} value={dead['value']}")
 
 
+def _build_ci_rows(*conclusions) -> list:
+    """Completed `push` runs, newest first, one per conclusion, as `gh run list --json` returns them."""
+    return [{"databaseId": i, "status": "completed", "conclusion": c, "event": "push"}
+            for i, c in enumerate(conclusions)]
+
+
+def test_remote_ci_red_streak(tmp: pathlib.Path) -> None:
+    """TOOL-aMendedFleet-8: the streak rules over canned rows, and the three non-live states.
+
+    The reader is pointed at a host no remote matches, so `gh` refuses (or is absent): either way the
+    signal must say DEAD PROBE, never a calm 0. No network answer is asserted here."""
+    import types
+    print("remote CI red streak (streak rules over canned rows; not asked, dead)")
+    sys.path.insert(0, str(KIT))
+    import drift_report as dr
+
+    m = dr.measure_red_streak(_build_ci_rows("failure", "cancelled", "failure", "success"))
+    check("a cancelled run neither ends nor extends the streak",
+          m["streak"] == 2 and len(m["passed_over"]) == 1, f"got {m['streak']}")
+    m = dr.measure_red_streak(_build_ci_rows("success", "failure"))
+    check("a newest green reads 0", m["streak"] == 0 and not m["capped"], f"got {m}")
+    m = dr.measure_red_streak(_build_ci_rows("failure", "timed_out", "startup_failure"))
+    check("an all-red window reports its length, capped", m["streak"] == 3 and m["capped"], f"got {m}")
+    m = dr.measure_red_streak(_build_ci_rows("cancelled", "skipped") + [{"databaseId": 9, "status": "in_progress"}])
+    check("no verdict-bearing run reports no streak", m["streak"] is None, f"got {m}")
+
+    r = make_repo(tmp, name="remoteci")
+    ctx = types.SimpleNamespace(root=r, git=dr.Git(r, "refs/remotes/origin/main"), pins={},
+                                remote_ci_workflow="", offline=False)
+    check("no declared workflow is NOT ASKED",
+          dr.build_remote_ci_red_streak(ctx).get("not_asked") is True)
+    ctx.remote_ci_workflow, ctx.offline = "ci.yml", True
+    check("--check / --offenders is NOT ASKED and spawns nothing",
+          dr.build_remote_ci_red_streak(ctx).get("not_asked") is True)
+    ctx.offline = False
+    old = os.environ.get("GH_HOST")
+    os.environ["GH_HOST"] = "nonexistent.invalid"
+    try:
+        got = dr.build_remote_ci_red_streak(ctx)
+    finally:
+        if old is None:
+            os.environ.pop("GH_HOST", None)
+        else:
+            os.environ["GH_HOST"] = old
+    check("an unreachable remote is DEAD PROBE, not a calm 0",
+          got["live"] is False and not got.get("not_asked")
+          and got["detail"][0]["note"].startswith("DEAD PROBE"), f"got {got}")
+
+
 # ---------------------------------------------------------------------------------------------
 # TOOL-dLoggedFlight-13 — run records left non-terminal after their build merged
 # ---------------------------------------------------------------------------------------------
@@ -2938,6 +2988,7 @@ def main() -> int:
         test_backlog_ask_signals(tmp)
         test_asks_disposed_overrides(tmp)
         test_legs_retried_after_timeout(tmp)
+        test_remote_ci_red_streak(tmp)
         test_backlog_stragglers(tmp)
         test_readme_mechanism_drift(tmp)
         test_declared_empty(tmp)
