@@ -11,27 +11,27 @@ Rendered from the run model by the runlog kit's `record` command. Every value be
 - start: dc0cf1f91311246b155ad0ed9ca74c887061741b
 - phase: VERIFYING
 - terminal: no
-- window: 2026-10-04T15:32:41Z to 2026-10-04T16:59:02Z
+- window: 2026-10-04T15:32:41Z to 2026-10-04T17:00:32Z
 - window opened by: git
 - window closed by: last-activity
-- duration: 5181s
+- duration: 5271s
 - own commits: 8
 - last own commit: 75a935fb01a97f62e26c71215eb01b5dc33ec9fc
 - merged: no
 - units served: 4
 - sources present: 7 of 7
 - owner turns: launch 1 · pre-run 0 · in-window 0 · post-close 0
-- usage main: requests 127 · in 256 · out 100990 · cache-read 40724471 · cache-write 208697
+- usage main: requests 134 · in 270 · out 103633 · cache-read 43648927 · cache-write 213968
 - usage agent: requests 0 · in 0 · out 0 · cache-read 0 · cache-write 0
 - usage workflow: requests 179 · in 358 · out 144407 · cache-read 21679188 · cache-write 1202187
-- attributed calls: 285 of 311
+- attributed calls: 286 of 318
 - values withheld: 0
-- commitment: sha256 e5782c947a319a5c21550062b0076724b3aee7488a01e675787c6fd004e677a9 · lines 48
+- commitment: sha256 a93dbfda22904adae1c8034b8d82195490f6cd3237ab5ba812bea68b84a15805 · lines 57
 
 ## Timeline
 
 - events: 23 · shown 23 · elided 0
-- withheld rows: verb 23 · push 1 · push-refused 0 · gate 0 · compact 0 · limit 0 · idle 0 · workflow 1
+- withheld rows: verb 27 · push 1 · push-refused 0 · gate 1 · compact 0 · limit 0 · idle 0 · workflow 1
 
 | UTC | source | event | value | phase | rc | more |
 |---|---|---|---|---|---|---|
@@ -96,7 +96,7 @@ Rendered from the run model by the runlog kit's `record` command. Every value be
 
 | # | source | ref | verdict |
 |---|---|---|---|
-| 1 | rescope-retire | memory/builds/aBatchedMinors/RUN.md:34 | - |
+| 1 | rescope-retire | memory/builds/aBatchedMinors/RUN.md:36 | - |
 | 2 | review | memory/builds/aBatchedMinors/reviews/2026-10-04-review-TOOL-aBatchedMinors-2-closing-diff-round1.md:15 | CLEAN WITH FIXES |
 | 3 | trailer | 01b0603b568e | - |
 | 4 | trailer | 01b0603b568e | - |
@@ -128,12 +128,20 @@ Rendered from the run model by the runlog kit's `record` command. Every value be
 | 4 | brief-before-build | TOOL-aBatchedMinors-6 | MET |
 | 5 | phases-walked | - | UNJUDGEABLE |
 | 6 | green-at-close | - | UNJUDGEABLE |
-| 7 | keepalive-reaped | - | UNJUDGEABLE |
+| 7 | keepalive-reaped | - | MET |
 | 8 | review-exited | - | MET |
 
 ## Anomalies
 
-- anomalies: 0 · shown 0 · aggregated no
+- anomalies: 5 · shown 5 · aggregated no
+
+| # | kind | subclass |
+|---|---|---|
+| 1 | out-of-band-edit | - |
+| 2 | out-of-band-edit | - |
+| 3 | out-of-band-edit | - |
+| 4 | destructive-git | - |
+| 5 | destructive-git | - |
 
 ## Coverage
 
@@ -146,8 +154,8 @@ Rendered from the run model by the runlog kit's `record` command. Every value be
 | # | source | state | lines | bad |
 |---|---|---|---|---|
 | 1 | run-state | present | - | - |
-| 2 | driver | present | 46 | 0 |
-| 3 | gates | present | 0 | 0 |
+| 2 | driver | present | 54 | 0 |
+| 3 | gates | present | 1 | 0 |
 | 4 | pushes | present | 1 | 0 |
 | 5 | git | present | - | - |
 | 6 | transcripts | present | - | - |
@@ -157,8 +165,8 @@ Rendered from the run model by the runlog kit's `record` command. Every value be
 
 ```json
 {"schema":1,"sections":{
-"Summary":{"facts":{"run-state":"memory/builds/aBatchedMinors/RUN.md","run":"1 of 1","start":"dc0cf1f91311246b155ad0ed9ca74c887061741b","phase":"VERIFYING","terminal":"no","window":"2026-10-04T15:32:41Z to 2026-10-04T16:59:02Z","window opened by":"git","window closed by":"last-activity","duration":"5181s","own commits":"8","last own commit":"75a935fb01a97f62e26c71215eb01b5dc33ec9fc","merged":"no","units served":"4","sources present":"7 of 7","owner turns":"launch 1 · pre-run 0 · in-window 0 · post-close 0","usage main":"requests 127 · in 256 · out 100990 · cache-read 40724471 · cache-write 208697","usage agent":"requests 0 · in 0 · out 0 · cache-read 0 · cache-write 0","usage workflow":"requests 179 · in 358 · out 144407 · cache-read 21679188 · cache-write 1202187","attributed calls":"285 of 311","values withheld":"0","commitment":"sha256 e5782c947a319a5c21550062b0076724b3aee7488a01e675787c6fd004e677a9 · lines 48"},"tables":[]},
-"Timeline":{"facts":{"events":"23 · shown 23 · elided 0","withheld rows":"verb 23 · push 1 · push-refused 0 · gate 0 · compact 0 · limit 0 · idle 0 · workflow 1"},"tables":[{"name":"events","header":["UTC","source","event","value","phase","rc","more"],"rows":[
+"Summary":{"facts":{"run-state":"memory/builds/aBatchedMinors/RUN.md","run":"1 of 1","start":"dc0cf1f91311246b155ad0ed9ca74c887061741b","phase":"VERIFYING","terminal":"no","window":"2026-10-04T15:32:41Z to 2026-10-04T17:00:32Z","window opened by":"git","window closed by":"last-activity","duration":"5271s","own commits":"8","last own commit":"75a935fb01a97f62e26c71215eb01b5dc33ec9fc","merged":"no","units served":"4","sources present":"7 of 7","owner turns":"launch 1 · pre-run 0 · in-window 0 · post-close 0","usage main":"requests 134 · in 270 · out 103633 · cache-read 43648927 · cache-write 213968","usage agent":"requests 0 · in 0 · out 0 · cache-read 0 · cache-write 0","usage workflow":"requests 179 · in 358 · out 144407 · cache-read 21679188 · cache-write 1202187","attributed calls":"286 of 318","values withheld":"0","commitment":"sha256 a93dbfda22904adae1c8034b8d82195490f6cd3237ab5ba812bea68b84a15805 · lines 57"},"tables":[]},
+"Timeline":{"facts":{"events":"23 · shown 23 · elided 0","withheld rows":"verb 27 · push 1 · push-refused 0 · gate 1 · compact 0 · limit 0 · idle 0 · workflow 1"},"tables":[{"name":"events","header":["UTC","source","event","value","phase","rc","more"],"rows":[
 ["2026-10-04T15:32:41Z","run-state","phase","5ba0fc4fcdab","RUNNING","-","-"],
 ["2026-10-04T15:37:23Z","git","commit","01b0603b568e","-","-","TOOL-aBatchedMinors-1 TOOL-aBatchedMinors-2 TOOL-aBatchedMinors-3 TOOL-aBatchedMinors-4"],
 ["2026-10-04T15:37:23Z","run-state","phase","dc0cf1f91311","SPECCING","-","-"],
@@ -201,7 +209,7 @@ Rendered from the run model by the runlog kit's `record` command. Every value be
 ["10","decision-log","0"],
 ["11","ledger","0"]]},
 {"name":"entries","header":["#","source","ref","verdict"],"rows":[
-["1","rescope-retire","memory/builds/aBatchedMinors/RUN.md:34","-"],
+["1","rescope-retire","memory/builds/aBatchedMinors/RUN.md:36","-"],
 ["2","review","memory/builds/aBatchedMinors/reviews/2026-10-04-review-TOOL-aBatchedMinors-2-closing-diff-round1.md:15","CLEAN WITH FIXES"],
 ["3","trailer","01b0603b568e","-"],
 ["4","trailer","01b0603b568e","-"],
@@ -225,13 +233,18 @@ Rendered from the run model by the runlog kit's `record` command. Every value be
 ["4","brief-before-build","TOOL-aBatchedMinors-6","MET"],
 ["5","phases-walked","-","UNJUDGEABLE"],
 ["6","green-at-close","-","UNJUDGEABLE"],
-["7","keepalive-reaped","-","UNJUDGEABLE"],
+["7","keepalive-reaped","-","MET"],
 ["8","review-exited","-","MET"]]}]},
-"Anomalies":{"facts":{"anomalies":"0 · shown 0 · aggregated no"},"tables":[]},
+"Anomalies":{"facts":{"anomalies":"5 · shown 5 · aggregated no"},"tables":[{"name":"anomalies","header":["#","kind","subclass"],"rows":[
+["1","out-of-band-edit","-"],
+["2","out-of-band-edit","-"],
+["3","out-of-band-edit","-"],
+["4","destructive-git","-"],
+["5","destructive-git","-"]]}]},
 "Coverage":{"facts":{"journal starts":"1 joined of 1 record-creating","unjoined starts":"0","sessions":"1 named · 1 extracted","idle gaps":"judged yes · near an owner turn 0","anomaly kinds":"judged 12 of 12"},"tables":[{"name":"sources","header":["#","source","state","lines","bad"],"rows":[
 ["1","run-state","present","-","-"],
-["2","driver","present","46","0"],
-["3","gates","present","0","0"],
+["2","driver","present","54","0"],
+["3","gates","present","1","0"],
 ["4","pushes","present","1","0"],
 ["5","git","present","-","-"],
 ["6","transcripts","present","-","-"],
