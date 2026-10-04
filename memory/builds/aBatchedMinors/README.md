@@ -5,8 +5,7 @@ opened: 2026-10-04
 streams: tooling
 roster: TOOL
 authorized-by: prompt
-status: OPEN
-ids: TOOL-aBatchedMinors-1
+ids: TOOL-aBatchedMinors-1 TOOL-aBatchedMinors-2 TOOL-aBatchedMinors-3 TOOL-aBatchedMinors-4
 ---
 
 # aBatchedMinors — every closing-review finding becomes a unit, minors batched
@@ -37,8 +36,9 @@ mediums and lows grouped into one or two units. The prompt is in `prompts/`.
 - Reuse first: `verb_review`'s state gate, check 2's needs clause, the harness's per-raw tally.
 - Every new refusal or gate clause is observed RED on a staged break before it lands.
 - No spec audit: none is owed, and the closing diff review is the specs' first review.
-- Classified at kickoff (M2): all four units MISSING. Authored and built inline, in order: units 2
-  and 3 share a row grammar, and unit 4 documents what 1 to 3 built.
+- Classified at kickoff (M2): all four MISSING; unit 1 retired at speccing (WONTDO, the harness already
+  returns its count). Units 2 to 4 authored and built inline, in order: units 2
+  and 3 share a row grammar, and unit 4 documents what 2 and 3 built.
 
 ## Parked decisions
 
@@ -56,23 +56,33 @@ mediums and lows grouped into one or two units. The prompt is in `prompts/`.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 0 unit(s) · node a · opened 2026-10-04 · streams tooling
-ids TOOL-aBatchedMinors-1
+**Build status:** OPEN · 4 unit(s) · node a · opened 2026-10-04 · streams tooling
+ids TOOL-aBatchedMinors-1 TOOL-aBatchedMinors-2 TOOL-aBatchedMinors-3 TOOL-aBatchedMinors-4
 
 <!-- gen:build-units -->
-*No spec under this build carries a status header; the status above is declared in the front matter.*
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-aBatchedMinors-1 — RETIRED: a `minors` count the review harness already returns](spec/2026-10-04-spec-TOOL-aBatchedMinors-1.md) | 1 | 1 | WONTDO | rev-1 | 2026-10-04 |
+| [TOOL-aBatchedMinors-2 — the closing review's exit records its standing findings and promotes them all](spec/2026-10-04-spec-TOOL-aBatchedMinors-2.md) | 2 | 2 | OPEN | rev-1 | 2026-10-04 |
+| [TOOL-aBatchedMinors-3 — check 2 demands one unit per blocker and high, plus one for the minors](spec/2026-10-04-spec-TOOL-aBatchedMinors-3.md) | 3 | 2 | OPEN | rev-1 | 2026-10-04 |
+| [TOOL-aBatchedMinors-4 — the method, the Skill and the verbs entry state the batched-promotion rule](spec/2026-10-04-spec-TOOL-aBatchedMinors-4.md) | 4 | 1 | OPEN | rev-1 | 2026-10-04 |
 <!-- /gen:build-units -->
 
-Records: 1 bound to this build, across 1 record folder(s).
+Records: 1 bound to this build, across 2 record folder(s).
 
-Ids no record names: none — every unit id is named by a record.
+Ids no record names: TOOL-aBatchedMinors-2 TOOL-aBatchedMinors-3 TOOL-aBatchedMinors-4.
 
-Ids no `spec-audit` record has ever named: none — every unit id has one.
+Ids no `spec-audit` record has ever named: TOOL-aBatchedMinors-1 TOOL-aBatchedMinors-2 TOOL-aBatchedMinors-3 TOOL-aBatchedMinors-4.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
 
-*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+| Step | Units | Parallel |
+|---|---|---|
+| 1 | `TOOL-aBatchedMinors-1` | no |
+| 2 | `TOOL-aBatchedMinors-2` | no |
+| 3 | `TOOL-aBatchedMinors-3` | no |
+| 4 | `TOOL-aBatchedMinors-4` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

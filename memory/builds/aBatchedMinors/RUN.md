@@ -10,8 +10,8 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 
 ## Run facts
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 5ba0fc4fcdab79eeeb7f75a97a48102bb10bfefa
-phase: RUNNING
+witness: dc0cf1f91311246b155ad0ed9ca74c887061741b
+phase: SPECCING
 branch-sha: 5ba0fc4fcdab79eeeb7f75a97a48102bb10bfefa
 branch-ref: refs/heads/branch/unattended-closing-review-promotion-227ff0
 may: none
@@ -30,3 +30,5 @@ anchor-ref: refs/heads/main
 base: 5ba0fc4fcdab79eeeb7f75a97a48102bb10bfefa
 
 ## Parked
+
+2026-10-04T15:36:50Z rescope · item retire TOOL-aBatchedMinors-1 · reason speccing found the harness return already determines the count: blockers and highs are integers only when every confirmed id sits in one severity, so MEDIUM+LOW = confirmed - blockers - highs exactly, the arithmetic unattended-build.js already uses; a minors key would be a second answer to one question
