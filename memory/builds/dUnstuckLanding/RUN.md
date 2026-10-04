@@ -12,20 +12,20 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 parked-surfaced: yes, 3 surfaced
 keepalive-reaped: yes
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 3b93b1a159a67dc01417c38b97aee5f5bae694f2
-phase: VERIFYING
+witness: 2e18522aade74cef4392e27aa67a0265c9836243
+phase: BUILDING
 branch-sha: 0c16a66b53c9fd809ca198b612a23c62132edcc0
 branch-ref: refs/heads/branch/unattended-build-closing-f90fd9
 may: none
 mode: prompt
 run-branch: refs/heads/branch/unattended-build-closing-f90fd9
 anchor-kind: run-branch
-lease-utc: 2026-10-04T08:51:57Z
+lease-utc: 2026-10-04T09:47:59Z
 pid-image: claude.exe
 host: compeeto
 pid: 5164
 session: 564117a5-ca8d-4f79-bbd3-b35058d54c66
-keepalive: 7a6b790d
+keepalive: cf4f4ce8
 anchor-url: https://github.com/d41ly/coding-governance
 anchor-sha: a587e82dc6180a9a720560e1633995e47734803a
 anchor-ref: refs/heads/main
@@ -48,3 +48,19 @@ base: 0c16a66b53c9fd809ca198b612a23c62132edcc0
 2026-10-04T09:37:47Z decision · item Ratify or decline the reversal in ask TOOL-dUnstuckLanding-8: build-complete meets on a carry-forward partial landing (DEFERRED units with open asks and no consumes-from edge), superseding D8 as it applies to build-complete · reason Options: ratify (cBriefedPilot-shaped builds land their closed units), keep D8 (partial builds still abort or override), or ratify only for dark-landed units. Refused because it reverses the owner's merge-only-when-fully-done rule and edits governance carriers (M3 veto 2); evidence is design section 5
 
 2026-10-04T09:37:48Z decision · item Scaffold the implementation build(s) for asks TOOL-dUnstuckLanding-3 to -11, in the order design section Order gives (3 then 4 and 5, then 8; 6, 7 and 9 independent; 10 after 3; 11 last) · reason Options: one build carrying 3-10 and a separate deployer build for 11 (recommended, because 11 writes into foreign repos), one build per section, or a subset first (3, 4 and 5 fix the ABORTED-forever complaint alone). Refused because a run may not write the README that authorizes its own mandate (UNATTENDED-ASKS section 1); the owner lands it
+
+2026-10-04T09:48:49Z rescope · item add TOOL-dUnstuckLanding-13 · reason owner ruling TOOL-dUnstuckLanding-21: build ask TOOL-dUnstuckLanding-3
+
+2026-10-04T09:48:50Z rescope · item add TOOL-dUnstuckLanding-14 · reason owner ruling TOOL-dUnstuckLanding-21: build ask TOOL-dUnstuckLanding-4
+
+2026-10-04T09:48:51Z rescope · item add TOOL-dUnstuckLanding-15 · reason owner ruling TOOL-dUnstuckLanding-21: build ask TOOL-dUnstuckLanding-5
+
+2026-10-04T09:48:52Z rescope · item add TOOL-dUnstuckLanding-16 · reason owner ruling TOOL-dUnstuckLanding-21: build ask TOOL-dUnstuckLanding-6
+
+2026-10-04T09:48:53Z rescope · item add TOOL-dUnstuckLanding-17 · reason owner ruling TOOL-dUnstuckLanding-21: build ask TOOL-dUnstuckLanding-7
+
+2026-10-04T09:48:55Z rescope · item add TOOL-dUnstuckLanding-18 · reason owner ruling TOOL-dUnstuckLanding-21: build ask TOOL-dUnstuckLanding-8
+
+2026-10-04T09:48:56Z rescope · item add TOOL-dUnstuckLanding-19 · reason owner ruling TOOL-dUnstuckLanding-21: build ask TOOL-dUnstuckLanding-9
+
+2026-10-04T09:48:57Z rescope · item add TOOL-dUnstuckLanding-20 · reason owner ruling TOOL-dUnstuckLanding-21: build ask TOOL-dUnstuckLanding-10

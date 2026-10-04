@@ -4,7 +4,7 @@ node: d
 opened: 2026-10-04
 streams: tooling
 roster: TOOL
-ids: TOOL-dUnstuckLanding-1 TOOL-dUnstuckLanding-2 TOOL-dUnstuckLanding-3 TOOL-dUnstuckLanding-4 TOOL-dUnstuckLanding-5 TOOL-dUnstuckLanding-6 TOOL-dUnstuckLanding-7 TOOL-dUnstuckLanding-8 TOOL-dUnstuckLanding-9 TOOL-dUnstuckLanding-10 TOOL-dUnstuckLanding-11 TOOL-dUnstuckLanding-12
+ids: TOOL-dUnstuckLanding-1 TOOL-dUnstuckLanding-2 TOOL-dUnstuckLanding-3 TOOL-dUnstuckLanding-4 TOOL-dUnstuckLanding-5 TOOL-dUnstuckLanding-6 TOOL-dUnstuckLanding-7 TOOL-dUnstuckLanding-8 TOOL-dUnstuckLanding-9 TOOL-dUnstuckLanding-10 TOOL-dUnstuckLanding-11 TOOL-dUnstuckLanding-12 TOOL-dUnstuckLanding-13 TOOL-dUnstuckLanding-14 TOOL-dUnstuckLanding-15 TOOL-dUnstuckLanding-16 TOOL-dUnstuckLanding-17 TOOL-dUnstuckLanding-18 TOOL-dUnstuckLanding-19 TOOL-dUnstuckLanding-20 TOOL-dUnstuckLanding-21 TOOL-dUnstuckLanding-22 TOOL-dUnstuckLanding-23 TOOL-dUnstuckLanding-24
 authorized-by: prompt
 ---
 
@@ -24,7 +24,8 @@ prompt is recorded verbatim under `prompts/`.
 - A census of closing-time failures across this repo, inCMS and NicoCares, each one cited.
 - A design that lets a run close unattended through an inherited red and a closing decision.
 - A separate, truthful record shape for a run that was interrupted and then landed attended.
-- Implementation asks a later run can take, each with a `seen` locator and an `accept` clause.
+- The kit mechanisms for asks 3 to 10, built and landed: `--handoff`, `--settle`, and inherited
+  reds that land at any age, among them.
 
 ## Detriments if this is not built
 
@@ -34,14 +35,16 @@ prompt is recorded verbatim under `prompts/`.
 
 ## Build-level rules
 
-- **Research and design only.** The prompt asks to "research and design"; no kit file changes in
-  this build. Each mechanism the design chooses is filed as an ask in this build's `BACKLOG.md`
-  with its `SEV` and `KEEP` rows, so that a later run can take it.
+- **The build also BUILDS asks 3 to 10** (owner, 2026-10-04, `TOOL-dUnstuckLanding-21`). The run
+  had read "research and design" as design only. Ask 11 stays filed, for a deployer build. The
+  rulings `-22` and `-23` ratify the reversals of D12-i4 and D8; `-24` runs the kit self-tests once,
+  at the close.
+- Units 13 to 20 close asks 3 to 10 in order. They are `Tier-2` shipped-kit edits, built one at a
+  time, because nearly all of them write `tools/unattended/unattended.sh`.
 - Classified at kickoff (M2): both units MISSING. Unit 1 is the census and unit 2 the design,
   sequenced 1 then 2, because the design is only as good as the evidence under it.
 - The census reads the other two repositories and never writes to them.
-- `Tier-1` per unit, because both units write only memory-tree records. The closing diff review is
-  still owed, under the `diff-reviewed` directive.
+- Units 1, 2 and 12 are `Tier-1`, because they write only records.
 - Closing review round 1 converged: 0 blockers, 5 HIGH, 17 MEDIUM, 7 LOW. Its HIGHs became
   `TOOL-dUnstuckLanding-12`, and its other findings folded into rev-2 of specs 1 and 2. H1 is
   left-shifted as a new gotcha class, `liveness-negative-from-another-population`. The rest map onto
@@ -57,11 +60,20 @@ prompt is recorded verbatim under `prompts/`.
 | 1 | `TOOL-dUnstuckLanding-1` | 1 | the closing-time failure census across gov, inCMS and NicoCares |
 | 2 | `TOOL-dUnstuckLanding-2` | 1 | the design: unattended closes through inherited reds and closing decisions, plus attended-landing verbs |
 | 3 | `TOOL-dUnstuckLanding-12` | 1 | design rev-2: the closing review's five HIGH findings closed (promoted) |
+| 4 | `TOOL-dUnstuckLanding-13` | 2 | `--handoff`: HELD under `owner-landing` or `owner-decision`, with recipe, landing facts and a fail-83 guard (ask 3) |
+| 5 | `TOOL-dUnstuckLanding-14` | 2 | the attended terminal: HELD-handoff derives LANDED; `--settle` writes it, and `work-landed-at` on ABORTED (ask 4) |
+| 6 | `TOOL-dUnstuckLanding-15` | 2 | drift-audit signals `aborted_work_landed` and `discarded_work_landed` (ask 5) |
+| 7 | `TOOL-dUnstuckLanding-16` | 2 | an INHERITED red lands at any age; the age bound becomes a BLOCKER escalation; kit default `land` (ask 6) |
+| 8 | `TOOL-dUnstuckLanding-17` | 2 | history legs grade the run's own range; fleet counters a per-build budget, with `fleet_over_budget` (ask 7) |
+| 9 | `TOOL-dUnstuckLanding-18` | 2 | the close-decision table and the carry-forward `build-complete` (ask 8) |
+| 10 | `TOOL-dUnstuckLanding-19` | 2 | refresh before a verdict: `refreshed-at` on park, handoff, abort and primary close (ask 9) |
+| 11 | `TOOL-dUnstuckLanding-20` | 2 | `LANDING_NODES`: a run on a non-landing node hands off by design (ask 10) |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
 **Build status:** CLOSED · 3 unit(s) · node d · opened 2026-10-04 · streams tooling
 ids TOOL-dUnstuckLanding-1 TOOL-dUnstuckLanding-2 TOOL-dUnstuckLanding-3 TOOL-dUnstuckLanding-4 TOOL-dUnstuckLanding-5 TOOL-dUnstuckLanding-6 TOOL-dUnstuckLanding-7 TOOL-dUnstuckLanding-8 TOOL-dUnstuckLanding-9 TOOL-dUnstuckLanding-10 TOOL-dUnstuckLanding-11 TOOL-dUnstuckLanding-12
+ids TOOL-dUnstuckLanding-13 TOOL-dUnstuckLanding-14 TOOL-dUnstuckLanding-15 TOOL-dUnstuckLanding-16 TOOL-dUnstuckLanding-17 TOOL-dUnstuckLanding-18 TOOL-dUnstuckLanding-19 TOOL-dUnstuckLanding-20 TOOL-dUnstuckLanding-21 TOOL-dUnstuckLanding-22 TOOL-dUnstuckLanding-23 TOOL-dUnstuckLanding-24
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |

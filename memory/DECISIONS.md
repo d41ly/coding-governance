@@ -129,6 +129,10 @@
 - TOOL-dDerivedDocket-73 · OWNER RULING (2026-09-30), narrowing TOOL-dDerivedDocket-24: AGENTS.md's merge-bar sentence points at the inherited-red policy, the template's section 7 line stays (true under the kit default park), and the protocol's gates-green text owes the same pointer
 - TOOL-dDerivedDocket-75 · OWNER RULING (2026-09-30): check-wiring keeps writing the relative `.githooks`. Straggler hooks are best-effort in a linked worktree, whose pre-rebase warning goes quiet; check 26 and CI are the guarantee. Reopens when TOOL-aWeldedTribunal-10 lands
 - TOOL-dDerivedDocket-76 · OWNER RULING (2026-09-29): the unattended kit's own suites were not run for dDerivedDocket's landing, and 'land it' is no ask to run them. D12-h and D12-i8 lapsed unexercised; the kit's compensating check is owed to remote CI's held job
+- TOOL-dUnstuckLanding-21 · OWNER RULING (2026-10-04): dUnstuckLanding BUILDS asks TOOL-dUnstuckLanding-3 to -10 in gov, not design only; ask -11, carrying the kit to inCMS and NicoCares, stays filed for a separate deployer build. Detail `builds/dUnstuckLanding/`.
+- TOOL-dUnstuckLanding-22 · OWNER RULING (2026-10-04), superseding part of TOOL-dDerivedDocket-24 (D12-i4): an INHERITED red lands at any age; the age bound escalates the per-leg ask to BLOCKER; kit default INHERITED_RED becomes land. ABSORB unchanged.
+- TOOL-dUnstuckLanding-23 · OWNER RULING (2026-10-04), superseding D8 as `build-complete` applies it: a build lands its CLOSED units when every other unit is DEFERRED with an open ask it filed and no CLOSED unit consumes-from one.
+- TOOL-dUnstuckLanding-24 · OWNER RULING (2026-10-04): dUnstuckLanding's close runs the kit self-tests once (`GATE_FULL=1 GATE_SELFTESTS=1`), as the kit Definition of Done asks; unit passes still run no suite. A per-build exception to the standing rule of 2026-08-23.
 
 ## DEPL — deployer
 
