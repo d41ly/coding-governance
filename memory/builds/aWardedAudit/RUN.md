@@ -10,8 +10,8 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 
 ## Run facts
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: f70bd40f1d81bca28834f1178097c9f2e1c80222
-phase: REVIEWING
+witness: aa14e5eb1b1ced1e79a7e9fb22a8149e54bc78ab
+phase: BUILDING
 branch-sha: 856ad8a6856225bfe0d610d9a530b8fe852192b8
 branch-ref: refs/heads/branch/unattended-spec-review-owner-b471cf
 may: none
@@ -56,3 +56,9 @@ base: 856ad8a6856225bfe0d610d9a530b8fe852192b8
 2026-10-04T22:45:55Z decision · item A prompt-mode run can no longer be opted into the spec audit by the owner's own prompt wording: should the owner get a per-build route for prompt runs? · reason Options seen: (a) as built, the owner opts in through SPEC_AUDIT_DEFAULT on the default branch or a slug-mode README the owner lands; (b) an invocation-line --spec-audit confirmed at the one owner turn and recorded as a surfaced row, as --waive is; (c) a UserPromptSubmit hook that records the owner's typed prompt for preflight to read. Refused: (b) is the run's own claim that the owner asked, the shape this ruling closes; (c) adds a hook and a public surface, an owner turn by veto 2.
 
 2026-10-04T22:45:57Z decision · item aEvidencedLens (branch spec-review-improvements-f59dad, live) carries a prompt-mode spec-audit: line its owner asked for in its prompt; once it merges a default branch carrying check 89, its --close refuses at authorization-reachable, which takes no override. What should happen to it? · reason Options seen: land aEvidencedLens before this build; the owner lands its README as a slug-mode folder on the default branch; abort and re-run it after declaring SPEC_AUDIT_DEFAULT; or grandfather it by name. Refused: it is another run's build and a grandfather list written by this run is a run landing an opt-in, which unit 5 refuses.
+
+2026-10-04T22:47:27Z brief · item TOOL-aWardedAudit-5 · reason 6adc39e09fe2 memory/builds/aWardedAudit/prompts/2026-10-05-prompt-TOOL-aWardedAudit-5-1-build-brief.md
+
+2026-10-04T22:47:30Z brief · item TOOL-aWardedAudit-6 · reason 964068ab7fb7 memory/builds/aWardedAudit/prompts/2026-10-05-prompt-TOOL-aWardedAudit-6-1-build-brief.md
+
+2026-10-04T22:47:42Z dispatch · item aa14e5eb TOOL-aWardedAudit-5 · reason tools/unattended/check-unattended.sh tools/unattended/check-unattended.test.sh memory/builds/aWardedAudit/spec/2026-10-05-spec-TOOL-aWardedAudit-5.md

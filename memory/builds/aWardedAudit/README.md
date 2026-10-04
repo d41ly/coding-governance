@@ -70,9 +70,9 @@ ids TOOL-aWardedAudit-1 TOOL-aWardedAudit-2 TOOL-aWardedAudit-3 TOOL-aWardedAudi
 | [TOOL-aWardedAudit-6 — the closing review's batched minors, round 1](spec/2026-10-05-spec-TOOL-aWardedAudit-6.md) | 6 | 2 | OPEN | rev-1 | 2026-10-05 |
 <!-- /gen:build-units -->
 
-Records: 5 bound to this build, across 3 record folder(s).
+Records: 7 bound to this build, across 3 record folder(s).
 
-Ids no record names: TOOL-aWardedAudit-5 TOOL-aWardedAudit-6.
+Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: TOOL-aWardedAudit-1 TOOL-aWardedAudit-2 TOOL-aWardedAudit-3 TOOL-aWardedAudit-5 TOOL-aWardedAudit-6.
 <!-- /gen:build-index -->
