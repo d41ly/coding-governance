@@ -4,7 +4,7 @@ node: d
 opened: 2026-10-04
 streams: tooling
 roster: TOOL
-ids: TOOL-dUnstuckLanding-1 TOOL-dUnstuckLanding-2 TOOL-dUnstuckLanding-3 TOOL-dUnstuckLanding-4 TOOL-dUnstuckLanding-5 TOOL-dUnstuckLanding-6 TOOL-dUnstuckLanding-7 TOOL-dUnstuckLanding-8 TOOL-dUnstuckLanding-9 TOOL-dUnstuckLanding-10 TOOL-dUnstuckLanding-11 TOOL-dUnstuckLanding-12 TOOL-dUnstuckLanding-13 TOOL-dUnstuckLanding-14 TOOL-dUnstuckLanding-15 TOOL-dUnstuckLanding-16 TOOL-dUnstuckLanding-17 TOOL-dUnstuckLanding-18 TOOL-dUnstuckLanding-19 TOOL-dUnstuckLanding-20 TOOL-dUnstuckLanding-21 TOOL-dUnstuckLanding-22 TOOL-dUnstuckLanding-23 TOOL-dUnstuckLanding-24 TOOL-dUnstuckLanding-25 TOOL-dUnstuckLanding-26
+ids: TOOL-dUnstuckLanding-1 TOOL-dUnstuckLanding-2 TOOL-dUnstuckLanding-3 TOOL-dUnstuckLanding-4 TOOL-dUnstuckLanding-5 TOOL-dUnstuckLanding-6 TOOL-dUnstuckLanding-7 TOOL-dUnstuckLanding-8 TOOL-dUnstuckLanding-9 TOOL-dUnstuckLanding-10 TOOL-dUnstuckLanding-11 TOOL-dUnstuckLanding-12 TOOL-dUnstuckLanding-13 TOOL-dUnstuckLanding-14 TOOL-dUnstuckLanding-15 TOOL-dUnstuckLanding-16 TOOL-dUnstuckLanding-17 TOOL-dUnstuckLanding-18 TOOL-dUnstuckLanding-19 TOOL-dUnstuckLanding-20 TOOL-dUnstuckLanding-21 TOOL-dUnstuckLanding-22 TOOL-dUnstuckLanding-23 TOOL-dUnstuckLanding-24 TOOL-dUnstuckLanding-25 TOOL-dUnstuckLanding-26 TOOL-dUnstuckLanding-27
 authorized-by: prompt
 ---
 
@@ -69,13 +69,14 @@ prompt is recorded verbatim under `prompts/`.
 | 10 | `TOOL-dUnstuckLanding-19` | 2 | refresh before a verdict: `refreshed-at` on park, handoff, abort and primary close (ask 9) |
 | 11 | `TOOL-dUnstuckLanding-20` | 2 | `LANDING_NODES`: a run on a non-landing node hands off by design (ask 10) |
 | 12 | `TOOL-dUnstuckLanding-25` | 2 | restore TOOL-dMendedRecall-2 and -3, dropped by the merge `01c22e15` (discovery adopted) |
+| 13 | `TOOL-dUnstuckLanding-27` | 2 | the implementation review's three HIGH findings closed (promoted) |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 12 unit(s) · node d · opened 2026-10-04 · streams tooling
+**Build status:** INPROGRESS · 13 unit(s) · node d · opened 2026-10-04 · streams tooling
 ids TOOL-dUnstuckLanding-1 TOOL-dUnstuckLanding-2 TOOL-dUnstuckLanding-3 TOOL-dUnstuckLanding-4 TOOL-dUnstuckLanding-5 TOOL-dUnstuckLanding-6 TOOL-dUnstuckLanding-7 TOOL-dUnstuckLanding-8 TOOL-dUnstuckLanding-9 TOOL-dUnstuckLanding-10 TOOL-dUnstuckLanding-11 TOOL-dUnstuckLanding-12
 ids TOOL-dUnstuckLanding-13 TOOL-dUnstuckLanding-14 TOOL-dUnstuckLanding-15 TOOL-dUnstuckLanding-16 TOOL-dUnstuckLanding-17 TOOL-dUnstuckLanding-18 TOOL-dUnstuckLanding-19 TOOL-dUnstuckLanding-20 TOOL-dUnstuckLanding-21 TOOL-dUnstuckLanding-22 TOOL-dUnstuckLanding-23 TOOL-dUnstuckLanding-24
-ids TOOL-dUnstuckLanding-25 TOOL-dUnstuckLanding-26
+ids TOOL-dUnstuckLanding-25 TOOL-dUnstuckLanding-26 TOOL-dUnstuckLanding-27
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -92,14 +93,15 @@ ids TOOL-dUnstuckLanding-25 TOOL-dUnstuckLanding-26
 | [TOOL-dUnstuckLanding-19 — refresh before a verdict: one helper, the `refreshed-at` fact](spec/2026-10-04-spec-TOOL-dUnstuckLanding-19.md) | 7 | 2 | CLOSED | rev-2 | 2026-10-04 |
 | [TOOL-dUnstuckLanding-20 — `LANDING_NODES`: landing capability declared, resolved from machine and user, and a planned hand-off](spec/2026-10-04-spec-TOOL-dUnstuckLanding-20.md) | 8 | 2 | CLOSED | rev-2 | 2026-10-04 |
 | [TOOL-dUnstuckLanding-25 — restore the two dMendedRecall units a merge resolution dropped](spec/2026-10-04-spec-TOOL-dUnstuckLanding-25.md) | — | 2 | CLOSED | rev-1 | 2026-10-04 |
+| [TOOL-dUnstuckLanding-27 — the implementation review's three HIGH findings closed](spec/2026-10-04-spec-TOOL-dUnstuckLanding-27.md) | — | 2 | INPROGRESS | rev-1 | 2026-10-04 |
 <!-- /gen:build-units -->
 
-Records: 22 bound to this build, across 4 record folder(s).
+Records: 23 bound to this build, across 4 record folder(s).
 
-Ids no record names: none — every unit id is named by a record.
+Ids no record names: TOOL-dUnstuckLanding-27.
 
 Ids no `spec-audit` record has ever named: TOOL-dUnstuckLanding-1 TOOL-dUnstuckLanding-12 TOOL-dUnstuckLanding-13 TOOL-dUnstuckLanding-14 TOOL-dUnstuckLanding-15 TOOL-dUnstuckLanding-16 TOOL-dUnstuckLanding-17 TOOL-dUnstuckLanding-18 TOOL-dUnstuckLanding-19 TOOL-dUnstuckLanding-2
-TOOL-dUnstuckLanding-20 TOOL-dUnstuckLanding-25.
+TOOL-dUnstuckLanding-20 TOOL-dUnstuckLanding-25 TOOL-dUnstuckLanding-27.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -115,7 +117,7 @@ TOOL-dUnstuckLanding-20 TOOL-dUnstuckLanding-25.
 | 7 | `TOOL-dUnstuckLanding-19` | no |
 | 8 | `TOOL-dUnstuckLanding-20` | no |
 
-Unordered: `TOOL-dUnstuckLanding-25`.
+Unordered: `TOOL-dUnstuckLanding-25`, `TOOL-dUnstuckLanding-27`.
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

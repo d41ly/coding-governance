@@ -7,6 +7,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-04-build-TOOL-dUnstuckLanding-25-1-acceptance-ledger.md](../build/2026-10-04-build-TOOL-dUnstuckLanding-25-1-acceptance-ledger.md) | journal | — |
+| [2026-10-04-review-TOOL-dUnstuckLanding-13-implementation-diff-round1.md](../reviews/2026-10-04-review-TOOL-dUnstuckLanding-13-implementation-diff-round1.md) | diff-review | TOOL-dUnstuckLanding-13 TOOL-dUnstuckLanding-14 TOOL-dUnstuckLanding-15 TOOL-dUnstuckLanding-16 TOOL-dUnstuckLanding-17 TOOL-dUnstuckLanding-18 TOOL-dUnstuckLanding-19 TOOL-dUnstuckLanding-20 |
 
 <!-- /gen:spec-records -->
 
