@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-1 — the driver claims a run on the remote as a compare-and-swap ref, and refuses a live foreign claim
 
-**Status:** SPECCED · rev-5 · 2026-10-04 · node a · Tier-2 · base 5266d22e · streams tooling · order 1 · advances TOOL-aReapedTicket-5 · ratified 2026-10-04
+**Status:** SPECCED · rev-6 · 2026-10-05 · node a · Tier-2 · base 5266d22e · streams tooling · order 1 · advances TOOL-aReapedTicket-5 · ratified 2026-10-04
 
 <!-- gen:spec-records -->
 
@@ -84,10 +84,13 @@ does not hold its claim cannot close.
 - **S13** — The contract documents, edited only where the shipped text would otherwise be false:
   the `--preflight`, `--resume`, `--close`, `--dispatch`, `--hold`, `--landed` and `--abort`
   entries of `tools/unattended/VERBS.template.md` plus new `--claims` and `--beat` entries; §7 and
-  the holder row of §8 in `tools/unattended/STOPS.template.md`; and the holder sentence of the
-  tick text in `tools/unattended/SKILL.template.md`. The comment above `check_single_live` stops
-  stating a count of the driver's verbs. The guides and the Skill are re-rendered by
-  `tools/unattended/adopt-unattended.sh` in the same commit. Observed by AC13.
+  the holder row of §8 in `tools/unattended/STOPS.template.md`; the holder sentence of the
+  tick text in `tools/unattended/SKILL.template.md`, which also gains one invocation of each new
+  verb; and one row for `RUN_CLAIMS` in the §8 key table of `tools/unattended/PROTOCOL.template.md`,
+  because the kit gate's check 22 joins every key the shipped example conf declares to that table,
+  and a declared key with no row is the false contract that check exists to refuse. The comment
+  above `check_single_live` stops stating a count of the driver's verbs. The guides and the Skill
+  are re-rendered by `tools/unattended/adopt-unattended.sh` in the same commit. Observed by AC13.
 - **S14** — Every kit whose shipped bytes move is bumped once after the last move; the kickoff
   manifest re-stamps its `last-audit` because `.unattended.conf` is on its watch list; the
   unattended-stops dossier gains the claim paragraph. Observed by AC14.
@@ -95,7 +98,9 @@ does not hold its claim cannot close.
   the unit's acceptance ledger. Observed by AC15.
 - **S16** — Claims land dark. `RUN_CLAIMS` is a closed `on`/`off` switch in `.unattended.conf`.
   Blank or absent reads `off`, with one `unattended: NOTE` line naming the key; any other value is
-  refused by name, as `RESUME_SCHEDULE`'s is. Off, no verb reads, writes or refuses on a claim:
+  refused by name, as `RESUME_SCHEDULE`'s is. The NOTE is printed by `--preflight`, the verb that
+  starts a run, and by no other verb, so a verb that never touches a claim prints nothing new.
+  Off, no verb reads, writes or refuses on a claim:
   `--preflight`, `--resume`, `--dispatch`, `--close` and the status writes behave as at base, and
   `--beat` prints a `skipped:` line naming the switch. `--claims` stays the remote reader either
   way. This repository's `.unattended.conf` declares `RUN_CLAIMS="on"`, and the shipped
@@ -216,10 +221,21 @@ age it should have given reads `unknown` rather than shifting onto the next clai
 fetch of an empty namespace answered in 0.67 s with exit 0, so "no claim" is a successful read and
 never a failure.
 
-**The remote.** `resolve_claim_remote` prints the push URL of the clone's one remote and refuses
-through check 24's existing message otherwise; `observe_anchor`'s own remote count calls it, so the
-predicate is spelled once. Reads and writes both use that URL, so they reach the endpoint the
-landing push goes to.
+**The remote.** `resolve_claim_remote` sets `CR_NAME` and `CR_URL`, the name and the push URL of
+the clone's one remote, and refuses through check 24's existing message otherwise; `observe_anchor`'s
+own remote count calls it, so the predicate is spelled once. It SETS rather than prints because
+check 24 is a `fail`, and a `fail` inside a command substitution would be captured as the URL with
+its status lost. Reads and writes both use that URL, so they reach the endpoint the landing push
+goes to.
+
+**The claim commit's identity.** `write_claim` gives `git commit-tree` a fixed author and committer,
+`gov-claim <gov-claim@invalid>`, so a clone with no configured identity can still write a claim and
+the claim publishes no address the run's commits do not already carry.
+
+**Which row a claim reads as.** The identity rows are tested first: none, then `mine`, then `same
+session`, and only a foreign claim is read by its verdict. A claim of this run's own lease whose beat
+the date call could not age is therefore `mine` with an UNKNOWN age, which is due, so a malformed
+claim of another slug cannot wedge a holder that the one date call aged as `unknown` beside it.
 
 ### Verdicts
 
@@ -334,11 +350,13 @@ ask is what lets this repository turn it on.
 - `tools/unattended/VERBS.template.md`
 - `tools/unattended/STOPS.template.md`
 - `tools/unattended/SKILL.template.md`
+- `tools/unattended/PROTOCOL.template.md`, the §8 key table only
 - `tools/unattended/.unattended.conf.example`
 - `tools/unattended/unattended.test.sh`
 - `tools/unattended/resume-tick.test.sh`
 - `memory/guides/UNATTENDED-VERBS.md`
 - `memory/guides/UNATTENDED-STOPS.md`
+- `memory/guides/UNATTENDED-PROTOCOL.md`
 - `.claude/skills/unattended/SKILL.md`
 - `.unattended.conf`
 - `memory/guides/SESSION-KICKOFF.md`
@@ -482,12 +500,14 @@ the empty tree and pushed to `refs/gov/runs/<slug>`.
 - **AC14** — When `bash tools/check-kit-versions.sh` runs, it exits 0, and
   `python tools/govkit/govkit.py epoch --base 5266d22e` names no unattended carrier left behind.
   Red when: a carrier of the unattended version kept the old one.
-- **AC15** — When one `--claims` read and one claim write run against the real remote on node `a`,
-  their wall times are recorded in the unit's acceptance ledger beside the bash process count.
+- **AC15** — When one `--claims` read runs against the real remote on node `a`, and one claim write
+  runs against a bare repository on node `a`, their wall times are recorded in the unit's acceptance
+  ledger beside the bash process count. The write is not taken against the real remote in this pass:
+  on node `a` the tracked pre-push hook refuses a push to a URL while `GOV_DEFAULT_BRANCH` is unset
+  (round-1 audit finding 38), so a real-remote write through the driver cannot complete until
+  `TOOL-aGraftedHelix-10` lands, and that unit observes the write through the hook.
   Red when: either figure is absent from the ledger.
   figure: PINNED at the build pass, with the date and node.
-  permission: a write to the real remote is a claim push, which the owner's prompt ruled needs no
-  ask (the run mandate under `prompts/`).
 - **AC16** — When the remote holds a claim whose `beat-utc` is stamp-shaped but invalid,
   `2026-02-30T00:00:00Z`, sorting before a fresh `live` claim, `--claims` prints every claim whose
   beat went through that `date -u -f -` call with verdict `unknown` and age `-`. This is a separate
@@ -622,6 +642,16 @@ once, through the kit's own runner, at VERIFYING.
   findings 6, 12, 2, 7 and 1 of the round-1 spec audit of units 20 to 22, which makes
   `check_claim_writable` read the `prior-session` set itself on the holder and status-write columns.
   No cell, scope item or criterion of this unit moves.
+- rev-6 · 2026-10-05 · §2 §4 §6 · S13 S16 · AC15 · the build pass's divergences, made in the spec
+  before the code. S13 adds the `RUN_CLAIMS` row to the protocol's §8 key table, which the kit
+  gate's check 22 requires of every key the example conf declares; the spec named three templates
+  and missed that join. S16 places the NOTE on `--preflight` alone. §4 "The remote" makes
+  `resolve_claim_remote` set `CR_NAME` and `CR_URL` rather than print, because check 24 is a `fail`
+  and a command substitution would capture it as the URL and drop its status; `TOOL-aGraftedHelix-10`
+  S1 reads "prints two TAB-separated fields" and takes the name from `CR_NAME` instead. §4 gains the
+  claim commit's fixed identity and the order the rows are tested in. AC15's write moves to a bare
+  repository on node `a`, because finding 38 makes a real-remote write through the driver
+  uncompletable on this node until unit 10 lands.
 
 ## 10. Reuse audit
 
