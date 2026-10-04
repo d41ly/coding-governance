@@ -98,3 +98,5 @@ base: 7af5f564641d231f8b78f6b183dde1b6bf53111d
 2026-10-04T21:37:53Z dispatch · item 703dae10 TOOL-aMendedFleet-4 · reason tools/govkit/matrix.py memory/builds/aMendedFleet/spec/2026-10-04-spec-TOOL-aMendedFleet-4.md
 
 2026-10-04T21:40:27Z dispatch · item 703dae10 TOOL-aMendedFleet-4 · reason tools/govkit/matrix.py memory/builds/aMendedFleet/spec/2026-10-04-spec-TOOL-aMendedFleet-4.md memory/builds/aMendedFleet/README.md
+
+2026-10-04T21:41:49Z dispatch · item 91a09113 TOOL-aMendedFleet-4 · reason tools/govkit/matrix.py memory/builds/aMendedFleet/spec/2026-10-04-spec-TOOL-aMendedFleet-4.md memory/builds/aMendedFleet/README.md memory/project/encoding-posture-sites.txt
