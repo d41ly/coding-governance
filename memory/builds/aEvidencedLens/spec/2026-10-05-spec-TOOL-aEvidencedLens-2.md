@@ -1,6 +1,6 @@
 # TOOL-aEvidencedLens-2 — spec lenses probe read-only, and every spec finding carries its evidence
 
-**Status:** SPECCED · rev-1 · 2026-10-05 · node a · Tier-2 · base 028b5cac · streams tooling · order 2
+**Status:** SPECCED · rev-2 · 2026-10-05 · node a · Tier-2 · base 028b5cac · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-10-05-prompt-TOOL-aEvidencedLens-1-1-spec-brief.md](../prompts/2026-10-05-prompt-TOOL-aEvidencedLens-1-1-spec-brief.md) | journal | TOOL-aEvidencedLens-1 TOOL-aEvidencedLens-3 TOOL-aEvidencedLens-4 TOOL-aEvidencedLens-5 TOOL-aEvidencedLens-6 TOOL-aEvidencedLens-7 TOOL-aEvidencedLens-8 TOOL-aEvidencedLens-9 TOOL-aEvidencedLens-10 TOOL-aEvidencedLens-11 |
 | [2026-10-05-prompt-TOOL-aEvidencedLens-2-2-build-brief.md](../prompts/2026-10-05-prompt-TOOL-aEvidencedLens-2-2-build-brief.md) | journal | — |
+| [2026-10-05-review-TOOL-aEvidencedLens-1-spec-audit-round1.md](../reviews/2026-10-05-review-TOOL-aEvidencedLens-1-spec-audit-round1.md) | spec-audit | TOOL-aEvidencedLens-1 TOOL-aEvidencedLens-3 TOOL-aEvidencedLens-4 TOOL-aEvidencedLens-5 TOOL-aEvidencedLens-6 TOOL-aEvidencedLens-7 TOOL-aEvidencedLens-8 TOOL-aEvidencedLens-9 TOOL-aEvidencedLens-10 TOOL-aEvidencedLens-11 |
 
 <!-- /gen:spec-records -->
 
@@ -47,7 +48,7 @@ finding carry the evidence it rests on, so a skeptic can re-run it.
 - **S7** — The fixtures that run a spec audit carry `scratch`: the prelude `base` object and the
   whole-script `SPEC` object in `tools/workflows/tier2-review.test.sh`, and `MT_ARGS` in
   `tools/workflows/unattended-build.test.sh`. New prelude arms pin each refusal of S4 and its passing
-  case, and `FLOOR_ASSERTIONS` rises by their number. Observed by AC8.
+  case, and `FLOOR_ASSERTIONS` rises by the assertions they add. Observed by AC8 and AC11.
 - **S8** — `memory/map/features/review-harnesses.md` stops saying `tier2-review.js` tells its agents
   nothing about temporary files; it says a spec audit hands its lenses `scratch` and a diff review
   still does not. Observed by AC9.
@@ -71,8 +72,11 @@ finding carry the evidence it rests on, so a skeptic can re-run it.
   one `REVIEW_SHAPE` bump this unit relies on rather than repeats.
 - **hands-off** `TOOL-aEvidencedLens-3` — the skeptic re-runs each finding's `evidence` under the
   same read-only policy.
-- **hands-off** `TOOL-aEvidencedLens-5` — the build harness's Audit stage passes its own `scratch`;
-  until it does, that stage's spec audit is refused.
+- **hands-off** `TOOL-aEvidencedLens-5` — the build harness's Audit stage passes its own `scratch`,
+  and its prelude applies this unit's two extra refusals so it never accepts a value this harness
+  refuses; until it does, that stage's spec audit is refused.
+- **hands-off** `TOOL-aEvidencedLens-11` — the method's sentence that spec lenses probe read-only,
+  scratch only, every command bounded, which states this unit's policy in M4.
 - **hands-off** external — `TOOL-aProbedUnit-16`, the ask that every review harness hand its agents a
   scratch root, stays open for the diff kind and the two drift-audit harnesses. This unit discharges
   its spec-audit half only, so the header carries no `advances` verb across builds.
@@ -230,7 +234,8 @@ The stub run is `tools/workflows/tier2-review.js` evaluated as an AsyncFunction 
 - **AC1** — When the stub run evaluates `tools/workflows/tier2-review.js` over spec-audit args
   carrying `scratch: '/tmp/s'`, each of the five `find:` prompts carries `PROBE POLICY` exactly once,
   after its `LENS:` line, naming `/tmp/s`, `120 seconds`, `DURABILITY` and `--selftest`, and no
-  `verify:` or `synth` prompt carries it.
+  `synth` prompt carries it. Whether a `verify:` prompt carries it is `TOOL-aEvidencedLens-3`'s,
+  whose S5 places the same bytes there, so this criterion asserts nothing about `verify:`.
   Red when: the block is absent, duplicated, or placed above the brief.
 - **AC2** — When the stub run evaluates the pass-start render and the new render over the same diff
   args, at round 1 with `checklist` and `specs` and at round 2 with `priorFindings`, every `find:`,
@@ -240,10 +245,13 @@ The stub run is `tools/workflows/tier2-review.js` evaluated as an AsyncFunction 
   fixture: the pass-start render is `tools/workflows/tier2-review.js` as `git show` prints it at the
   sha the pass recorded before its first edit, saved to the scratchpad.
 - **AC3** — When the prelude run evaluates spec-audit args with `scratch` absent, `'tmp/s'`,
-  `'/tmp/s\nX'`, `'/tmp/r'` and `'/tmp/r/sub'` beside `repo: '/tmp/r'`, each throws a message
-  starting `tier2-review:` and naming `scratch`, and no agent is traced; `'/tmp/s'` and `'C:\\t\\s'`
-  proceed; a diff review handed `scratch: 7` proceeds.
-  Red when: an absent `scratch` proceeds on a spec audit.
+  `'/tmp/s\nX'`, `'/tmp/r'`, `'/tmp/r/'` and `'/tmp/r/sub'` beside `repo: '/tmp/r'`, and
+  `'C:\\R\\x'` beside `repo: 'c:/r'`, each throws a message starting `tier2-review:` and naming
+  `scratch`, and no agent is traced; `'/tmp/s'`, the sibling `'/tmp/rs'` beside `repo: '/tmp/r'`,
+  and `'C:\\t\\s'` proceed, and the run handed `'C:\\t\\s'` carries `C:/t/s` on its `PROBE POLICY`
+  line; a diff review handed `scratch: 7` proceeds.
+  Red when: an absent `scratch` proceeds on a spec audit, a bare prefix test refuses `/tmp/rs`, or a
+  missing case fold admits `C:/R/x` under `c:/r`.
 - **AC4** — When the stub run's spec `find:` schema is read, its finding item's `required` lists
   `evidence`, the diff `find:` schema's does not, and the spec finder prompt's return line names
   `evidence`.
@@ -275,13 +283,21 @@ The stub run is `tools/workflows/tier2-review.js` evaluated as an AsyncFunction 
   prints no key naming a file this unit touched.
   Red when: the render was hand-edited, or a rule spells a kit path.
   figure: the cap is DERIVED from the hook at observation time.
+- **AC11** — When `grep -c "spec scratch:" tools/workflows/tier2-review.test.sh` runs it prints at
+  least 10, one arm per refusal and passing case AC3 names, where the pre-pass file prints 0, and
+  `grep -o 'FLOOR_ASSERTIONS=[0-9]*' tools/workflows/tier2-review.test.sh` reads its pre-pass value
+  plus the number of assertions the pass's new arms add. Both figures are written in the pass's
+  commit message.
+  Red when: the refusals ship with no arm, or the floor did not move by the assertions added.
+  figure: DERIVED at observation time from the pre-pass file and the pass's own diff.
+  permission: a pass runs no suite; the arms are read at the main loop's VERIFYING run.
 
 ## 7. Gates
 
 `tier2-review self-test` · `unattended-build self-test` · `verifier fan-out self-test` · `review-join self-test` · `review-protocol parity (kit vs dogfood)` · `install-prefix (shipped surface)` · `workflow script syntax` · `recall floor` · `recall floor arms` · `spec tokens (a spec's own names resolve)`
 
-New arm: tools/workflows/tier2-review.test.sh · a spec audit with `scratch` absent, relative, multi-line and inside `repo`, against the base prelude that reads no `scratch` · `FLOOR_ASSERTIONS` raised by the arms added
-New arm: tools/workflows/tier2-review.test.sh · the spec finding schema requires `evidence`, against the base schema · `FLOOR_ASSERTIONS` raised by one
+New arm: tools/workflows/tier2-review.test.sh · `spec scratch:` one arm per AC3 case, the refusals of an absent, relative, multi-line, equal, trailing-slash, nested and case-folded Windows `scratch` beside the passing plain, sibling and Windows cases, against the base prelude that reads no `scratch` · `FLOOR_ASSERTIONS` raised by the assertions added
+New arm: tools/workflows/tier2-review.test.sh · the spec finding schema requires `evidence`, against the base schema · `FLOOR_ASSERTIONS` raised by the assertions added
 
 ## 8. Open questions
 
@@ -301,6 +317,13 @@ New arm: tools/workflows/tier2-review.test.sh · the spec finding schema require
 
 - rev-1 · 2026-10-05 · initial draft, from the template, its render, both self-tests and the build
   harness's `scratch` refusal at HEAD.
+- rev-2 · 2026-10-05 · §3 §7 S7 AC1 AC3 AC11 · round-1 spec audit fold. The §3 hands-off to
+  `TOOL-aEvidencedLens-5` now names the refusal contract it mirrors, for that unit's id 40 fold, and
+  §3 gains the hands-off to `TOOL-aEvidencedLens-11` that mirrors that unit's existing consumes-from. Id 7 (MEDIUM): AC11 counts
+  the `spec scratch:` arms against the pre-pass file and checks the floor equality. Id 8 (MEDIUM):
+  AC3 adds the sibling `/tmp/rs`, a trailing-slash value, a case-folded Windows pair and the folded
+  value on the `PROBE POLICY` line. Id 27 (MEDIUM): AC1 no longer asserts the block is absent from
+  `verify:`, which `TOOL-aEvidencedLens-3` S5 fills after this unit.
 
 ## 10. Reuse audit
 

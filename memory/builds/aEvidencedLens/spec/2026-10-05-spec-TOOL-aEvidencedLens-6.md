@@ -1,6 +1,6 @@
 # TOOL-aEvidencedLens-6 — the review returns a per-lens yield over defect clusters, unique defects counted
 
-**Status:** SPECCED · rev-1 · 2026-10-05 · node a · Tier-2 · base 028b5cac · streams tooling · order 5
+**Status:** SPECCED · rev-2 · 2026-10-05 · node a · Tier-2 · base 028b5cac · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-10-05-prompt-TOOL-aEvidencedLens-1-1-spec-brief.md](../prompts/2026-10-05-prompt-TOOL-aEvidencedLens-1-1-spec-brief.md) | journal | TOOL-aEvidencedLens-1 TOOL-aEvidencedLens-2 TOOL-aEvidencedLens-3 TOOL-aEvidencedLens-4 TOOL-aEvidencedLens-5 TOOL-aEvidencedLens-7 TOOL-aEvidencedLens-8 TOOL-aEvidencedLens-9 TOOL-aEvidencedLens-10 TOOL-aEvidencedLens-11 |
 | [2026-10-05-prompt-TOOL-aEvidencedLens-6-2-build-brief.md](../prompts/2026-10-05-prompt-TOOL-aEvidencedLens-6-2-build-brief.md) | journal | — |
+| [2026-10-05-review-TOOL-aEvidencedLens-1-spec-audit-round1.md](../reviews/2026-10-05-review-TOOL-aEvidencedLens-1-spec-audit-round1.md) | spec-audit | TOOL-aEvidencedLens-1 TOOL-aEvidencedLens-2 TOOL-aEvidencedLens-3 TOOL-aEvidencedLens-4 TOOL-aEvidencedLens-5 TOOL-aEvidencedLens-7 TOOL-aEvidencedLens-8 TOOL-aEvidencedLens-9 TOOL-aEvidencedLens-10 TOOL-aEvidencedLens-11 |
 
 <!-- /gen:spec-records -->
 
@@ -42,7 +43,7 @@ and scores each lens on the DEFECTS it found and the ones only it found, not on 
   The two exits before the verify stage carry rows whose counts are what exists there (a dead lens a
   row with `returned: false` and zeros); every path past the verify stage carries the ledger-derived
   counts. Observed by AC4 and AC5.
-- **S6** — The four counts known before the synthesis, `raw` to `precision` with `returned`, reach the
+- **S6** — The counts known before the synthesis, `raw` to `precision`, with `returned`, reach the
   synthesis prompt as a VERBATIM block rendered by `renderLensYield(rows)`, a markdown table the
   synthesis is told to copy into the report directly after its review-shape sentence. `defects` and
   `unique` are derived after the synthesis returns, so they are returned and logged and never in the
@@ -75,7 +76,9 @@ and scores each lens on the DEFECTS it found and the ones only it found, not on 
 
 ### Edges
 
-none
+- **hands-off** `TOOL-aEvidencedLens-13` — the cumulative observation that no diff-kind probe, lens
+  or skeptic prompt moved from BASE through this unit, compared with the review key masked; AC7 here
+  observes only this pass's own step.
 
 ## 4. Design
 
@@ -195,22 +198,26 @@ give each of the five diff lenses one finding.
   ledger counts and `null` for `defects` and `unique`; when one lens double returns `null`, the
   deferred return carries that lens's row with `returned` `false`.
   Red when: a dead synthesis or a dead lens drops `lensYield` or drops the dead lens's row.
-- **AC5** — When every lens double returns no finding, and separately when every verdict is
-  `refuted`, each return carries `lensYield` with one row per running lens.
-  Red when: an early exit returns no `lensYield` key.
+- **AC5** — When every lens double returns no finding, separately when every verdict is `refuted`,
+  and separately when every lens double returns `null`, each return carries `lensYield` with one row
+  per running lens; in the all-dead run every row reads `returned` `false` with zero counts.
+  Red when: an early exit, the every-lens-dead exit included, returns no `lensYield` key.
 - **AC6** — When the stub runs the spec kind with `SPEC` args, carrying the `scratch` that
   `TOOL-aEvidencedLens-2` makes required there, the `synth` prompt carries the marker
   lines and one table row per running lens with its `precision`, and the run log carries one
   `lens yield:` line per lens naming `defects` and `unique`.
   Red when: the block or a log line is missing for a lens that ran.
 - **AC7** — When the diff-kind `find:` and `verify:` prompts of one stub run are compared against the
-  same stub run of the render at the pass's base, every one is byte-identical, and the return's `key`
-  is identical.
+  same stub run of the pass-start render, every one is byte-identical, and the return's `key` is
+  identical.
   Red when: a lens or skeptic prompt moved, or the review key moved.
-  fixture: the base render is read with `git show <base>:tools/workflows/tier2-review.js` into the
-  scratch directory.
+  fixture: the pass-start render is the `git show` of `tools/workflows/tier2-review.js` at HEAD taken
+  before the pass edits anything, saved to the scratch directory. The comparison is to this unit's
+  predecessor and not to BASE, because `TOOL-aEvidencedLens-1` moved the review key every
+  DURABILITY line carries, so a BASE render differs on a correct build.
 - **AC8** — When `grep -n lensYield tools/workflows/README.md` runs, it prints the field's line naming
-  `defects`, `unique` and the `null` rule.
+  `defects`, `unique` and the `null` rule, and `grep -c 'carries three fields' tools/workflows/README.md`
+  prints 0.
   Red when: the README still says every return carries three fields.
 - **AC9** — When the stub runs the diff kind with `intensity: 'light'`, `lensYield` carries a row for
   each running lens and none for a skipped one.
@@ -220,10 +227,10 @@ give each of the five diff lenses one finding.
 
 `tier2-review self-test` · `unattended-build self-test` · `review-join self-test` · `verifier fan-out self-test` · `review-protocol parity (kit vs dogfood)` · `workflow script syntax` · `spec tokens (a spec's own names resolve)`
 
-New arm: tools/workflows/tier2-review.test.sh · a synthesis placing all five ids in one item, which a raw-finding `unique` credits five times · none
-New arm: tools/workflows/tier2-review.test.sh · a tally fault, under which a guessed split reads as data · none
-New arm: tools/workflows/tier2-review.test.sh · a dead lens and a dead synthesis, each of which a missing row would hide · none
-New arm: tools/workflows/tier2-review.test.sh · the two early exits returning no `lensYield` key · none
+New arm: tools/workflows/tier2-review.test.sh · a synthesis placing all five ids in one item, which a raw-finding `unique` credits five times · `FLOOR_ASSERTIONS` raised by the assertions added
+New arm: tools/workflows/tier2-review.test.sh · a tally fault, under which a guessed split reads as data · `FLOOR_ASSERTIONS` raised by the assertions added
+New arm: tools/workflows/tier2-review.test.sh · a dead lens and a dead synthesis, each of which a missing row would hide · `FLOOR_ASSERTIONS` raised by the assertions added
+New arm: tools/workflows/tier2-review.test.sh · every return site, the no-finding, every-refuted and every-lens-dead exits included, returning no `lensYield` key · `FLOOR_ASSERTIONS` raised by the assertions added
 
 ## 8. Open questions
 
@@ -240,6 +247,13 @@ New arm: tools/workflows/tier2-review.test.sh · the two early exits returning n
 
 - rev-1 · 2026-10-05 · initial draft, from the spec brief's unit 6 and the template read at
   `028b5cac`.
+- rev-2 · 2026-10-05 · §3 §7 §10 S6 AC5 AC7 AC8 · round-1 spec audit fold. Id 1 (MEDIUM): AC7's
+  fixture is the pass-start render, and the criterion says why BASE is excluded. Id 11 (MEDIUM): AC5
+  adds the every-lens-dead exit. Id 12 (LOW): AC8 asserts the "carries three fields" sentence is
+  gone. Id 30 (LOW, its unit-6 half): §7's arms raise `FLOOR_ASSERTIONS` by the assertions added.
+  Id 35 (LOW): S6 no longer calls six counts four. Id 49 (LOW): §10 cites `TOOL-aWeldedTribunal-4`
+  as the built precedent. §3 gains the hands-off edge to `TOOL-aEvidencedLens-13`, the unit the
+  same defect's HIGH, id 25, was promoted to.
 
 ## 10. Reuse audit
 
@@ -251,7 +265,8 @@ and unique defects per lens"` returned no per-lens seam (its JavaScript hits wer
 such as `deriveReviewKey`), and `grep -rn -i "lensYield\|per-lens"` over `tools/` found only
 `review_replay.py`'s candidate-side per-lens line, which scores recall against a past record and is
 not a per-run yield. The recall query's hits were `TOOL-aSightedSkeptic-8`, whose §3 deferred exactly
-this derivation, and `TOOL-dTieredTribunal-16`, which put the run counters into the synthesis prompt
-and is the precedent S6 follows.
+this derivation, and `TOOL-dTieredTribunal-16`, the open ask for run counters in the synthesis
+prompt. The built precedent S6 follows is `TOOL-aWeldedTribunal-4`, which shipped the RUN INTEGRITY
+block (`tools/workflows/tier2-review.template.js:1164`) that answered that ask.
 
 Recall terms used: `python tools/memory-recall/query.py "is there a per-lens precision or yield measure of review lenses" --terms "lens precision yield confirmed refuted unique defect synthesis items ledger appendix tier2-review spec-audit"`

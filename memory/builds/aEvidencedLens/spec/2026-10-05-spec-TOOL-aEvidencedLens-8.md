@@ -1,6 +1,6 @@
 # TOOL-aEvidencedLens-8 — the build harness promotes spec-audit minors, batched, and records the counts
 
-**Status:** SPECCED · rev-1 · 2026-10-05 · node a · Tier-2 · base 028b5cac · streams tooling · order 7 · ratified 2026-10-05
+**Status:** SPECCED · rev-2 · 2026-10-05 · node a · Tier-2 · base 028b5cac · streams tooling · order 7 · ratified 2026-10-05
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-10-05-prompt-TOOL-aEvidencedLens-1-1-spec-brief.md](../prompts/2026-10-05-prompt-TOOL-aEvidencedLens-1-1-spec-brief.md) | journal | TOOL-aEvidencedLens-1 TOOL-aEvidencedLens-2 TOOL-aEvidencedLens-3 TOOL-aEvidencedLens-4 TOOL-aEvidencedLens-5 TOOL-aEvidencedLens-6 TOOL-aEvidencedLens-7 TOOL-aEvidencedLens-9 TOOL-aEvidencedLens-10 TOOL-aEvidencedLens-11 |
 | [2026-10-05-prompt-TOOL-aEvidencedLens-8-2-build-brief.md](../prompts/2026-10-05-prompt-TOOL-aEvidencedLens-8-2-build-brief.md) | journal | — |
+| [2026-10-05-review-TOOL-aEvidencedLens-1-spec-audit-round1.md](../reviews/2026-10-05-review-TOOL-aEvidencedLens-1-spec-audit-round1.md) | spec-audit | TOOL-aEvidencedLens-1 TOOL-aEvidencedLens-2 TOOL-aEvidencedLens-3 TOOL-aEvidencedLens-4 TOOL-aEvidencedLens-5 TOOL-aEvidencedLens-6 TOOL-aEvidencedLens-7 TOOL-aEvidencedLens-9 TOOL-aEvidencedLens-10 TOOL-aEvidencedLens-11 |
 
 <!-- /gen:spec-records -->
 
@@ -32,7 +33,10 @@ a spec subject's terminal exit, so the driver accepts the harness's record and c
   prompt says a finding is not an ask, so it is named in scope and never through the `closes` verb,
   which joins a spec to a `BACKLOG.md` ask. The batch's placement `repairs` names the one unit every
   minor in it lands on, or `none` when they land on several. The prompt says `folded` is returned
-  as 0. Observed by AC1.
+  as 0. The prompt carries these four sentences verbatim, so a criterion can read each:
+  "never through the `closes` verb"; "`repairs` names the one unit every minor in the batch lands
+  on, or `none`"; "names every finding by report id in its §1"; and "return `folded` as 0".
+  Observed by AC1.
 - **S2** — The disposal guard refuses a non-zero `folded`, by name: a spec audit's MEDIUM and LOW
   are promoted, never folded, owner 2026-10-05. `folded` stays in `DISPOSAL_SCHEMA`, so the
   reconciliation `promoted + folded + refuted + standing === outstanding` keeps its shape. Observed
@@ -96,6 +100,8 @@ a spec subject's terminal exit, so the driver accepts the harness's record and c
 - A kit version bump. The main loop bumps once at the close (shared invariant 7).
 - The audit stage's inputs (`context`, `specs`, `checklist`, `scratch`, `prevBlob`). Those are
   `TOOL-aEvidencedLens-5`'s, in the same file, landed before this unit by order.
+- A bound on how many audit generations a chain of promotions may spend. It sets the owner's audit
+  cost and is parked for the owner (§8 F3); this unit neither adds one nor moves M4's precision rule.
 
 ### Edges
 
@@ -185,8 +191,16 @@ Attended mode records nothing with the driver, as today. S1 to S3 still bind it.
 
 - security — N/A: no new write path. The stage already runs `--rescope` and writes specs; it now
   writes one or two batch specs where it wrote rev bumps.
-- perf / scale — The batch caps new units at two for the minors. Promotion chains are bounded by M4's
-  precision rule; `TOOL-aWokenSentinel-30` measured the cascade this rule feeds.
+- perf / scale — The batch caps new units at two for the minors per round. The governing bound on a
+  chain of promotions is BUILD-METHOD M4's precision rule, `TOOL-dLoggedFlight-34`, closed by
+  `TOOL-dGatedProse-4`: a promoting round whose precision falls below the review protocol's floor
+  ends the chain. `TOOL-aWokenSentinel-30` is an OPEN ask that measured the cascade NOT converging.
+  This unit makes nearly every terminal spec round with a standing MEDIUM or LOW promote a batch
+  unit, and M4 audits each as a fresh subject; `TOOL-aEvidencedLens-3` confirms at any rubric
+  severity, which RAISES the precision that must fall for the chain to end. Both effects lengthen a
+  chain, so this unit does not call the chain bounded. Whether a minors batch closes under M4's
+  recorded override instead of a fresh audit, or a generation cap applies, is parked for the owner
+  (§8 F3).
 - error / empty / loading states — Zero findings keeps the skip path. Zero confirmed with promoted
   UNVERIFIED findings records `--minors` above zero, so `promote` is never paired with zero standing.
 - observability — The `disposal: done` log line keeps `folded`, which now always reads 0.
@@ -205,9 +219,12 @@ directory and run there, never by running the suite. Inputs use that file's `UNI
 `review_out <blockers> <confirmed> <highs> <unverified>` and `rec <token>` doubles.
 
 - **AC1** — When the stub runs with `review_out 0 3 1` and `rec CONVERGED`, the traced
-  `prompt:dispose:` line contains `PROMOTE every MEDIUM and every LOW`, `never one unit per minor`
-  and `disjoint write sets`, and does not contain `FOLD every MEDIUM`.
-  Red when: the prompt still tells the stage to fold a MEDIUM or LOW.
+  `prompt:dispose:` line contains `PROMOTE every MEDIUM and every LOW`, `never one unit per minor`,
+  `disjoint write sets`, and each of S1's four verbatim sentences, read by the markers
+  ``never through the `closes` verb``, `names the one unit every minor in the batch lands on`,
+  `names every finding by report id in its §1` and ``return `folded` as 0``; the same run over the
+  base render's prompt contains none of those four; and it does not contain `FOLD every MEDIUM`.
+  Red when: the prompt still tells the stage to fold a MEDIUM or LOW, or drops a clause S1 names.
 - **AC2** — When the dispose double returns `"promoted":2,"folded":1` with two `promotedIds` over
   `review_out 0 3 1`, the trace logs `disposal: NOT done` with `never folded` and the RESULT carries
   `"roster":[]`.
@@ -239,8 +256,8 @@ directory and run there, never by running the suite. Inputs use that file's `UNI
   `nextAction` still says `FOLD the confirmed findings` and also says the in-loop fold is not the
   exit's disposition.
   Red when: the boundary sentence is missing, or the in-loop fold instruction was removed.
-- **AC9** — When `grep -niE 'MEDIUM or LOW (is|still) fold|FOLD every MEDIUM|mustFold'` runs over
-  `tools/workflows/unattended-build.template.js`, it prints nothing.
+- **AC9** — When `grep -niE 'MEDIUM or LOW (is|still) fold|FOLD every MEDIUM|mustFold|AT LEAST the confirmed rest|folded or named standing'`
+  runs over `tools/workflows/unattended-build.template.js`, it prints nothing.
   Red when: a comment or prompt still states the fold disposition.
 - **AC10** — When `node tools/workflows/check-workflow-syntax.js` runs after the render, it exits 0.
   When `grep -c 'unitCeiling' tools/workflows/unattended-build.template.js tools/workflows/unattended-build.js`
@@ -257,11 +274,11 @@ directory and run there, never by running the suite. Inputs use that file's `UNI
 
 `unattended-build self-test` · `tier2-review self-test` · `review-join self-test` · `verifier fan-out self-test` · `review-protocol parity (kit vs dogfood)` · `workflow script syntax` · `spec tokens (a spec's own names resolve)`
 
-New arm: tools/workflows/unattended-build.test.sh · a dispose double with `folded` 1 · none
-New arm: tools/workflows/unattended-build.test.sh · one unit for one high and two minors · none
-New arm: tools/workflows/unattended-build.test.sh · five units for five minors · none
-New arm: tools/workflows/unattended-build.test.sh · the zero-blocker record command without counts · none
-New arm: tools/workflows/unattended-build.test.sh · a retry text omitting `--highs` · none
+New arm: tools/workflows/unattended-build.test.sh · a dispose double with `folded` 1 · `FLOOR_ASSERTIONS` raised by the assertions added
+New arm: tools/workflows/unattended-build.test.sh · one unit for one high and two minors · `FLOOR_ASSERTIONS` raised by the assertions added
+New arm: tools/workflows/unattended-build.test.sh · five units for five minors · `FLOOR_ASSERTIONS` raised by the assertions added
+New arm: tools/workflows/unattended-build.test.sh · the zero-blocker record command without counts · `FLOOR_ASSERTIONS` raised by the assertions added
+New arm: tools/workflows/unattended-build.test.sh · a retry text omitting `--highs` · `FLOOR_ASSERTIONS` raised by the assertions added
 
 ## 8. Open questions
 
@@ -281,10 +298,26 @@ New arm: tools/workflows/unattended-build.test.sh · a retry text omitting `--hi
   fixed; (c) split `promoted` by severity in `DISPOSAL_SCHEMA`, which widens the schema for no
   stronger check. Recommendation: (a).
   RESOLVED (agent, 2026-10-05, delegated): (a), S5.
+- **F3 — Does this unit bound how many audit generations a chain of promotions may spend?** The
+  round-1 spec audit's finding 45 named two options: (a) close a spec-audit minors batch unit under
+  M4's recorded `specs-audited` override rather than auditing it as a fresh subject; (b) park the
+  generation bound for the owner. Option (a) rewrites M4, a governance carrier, and sets how much
+  audit the owner pays per build, so M3's veto 2 removes it and no delegated resolver remains.
+  RESOLVED (agent, 2026-10-05, delegated): neither is built here. This unit's scope stops at
+  promoting the minors and recording the counts; the generation bound is parked for the owner in
+  the run-state file as a `decision` row naming both options and the veto, and §5 states the
+  interaction meanwhile.
 
 ## 9. Revision log
 
 - rev-1 · 2026-10-05 · initial draft.
+- rev-2 · 2026-10-05 · §3 §5 §7 §8 S1 AC1 AC9 · round-1 spec audit fold. Id 14 (MEDIUM): S1 pins
+  four verbatim sentences and AC1 reads each, absent from the base prompt. Id 45 (MEDIUM): §5 cites
+  `TOOL-aWokenSentinel-30` as open and `TOOL-dLoggedFlight-34` with `TOOL-dGatedProse-4` as the
+  governing ruling, states the interaction with `TOOL-aEvidencedLens-3`, and no longer calls the
+  chain bounded; the generation bound is §8 F3, parked for the owner as option (b). Id 16 (LOW):
+  AC9's alternation adds the reconciliation comment's two phrases. Id 30 (LOW, its unit-8 half):
+  §7's arms raise `FLOOR_ASSERTIONS` by the assertions added.
 
 ## 10. Reuse audit
 

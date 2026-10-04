@@ -9,6 +9,7 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+refreshed-at: fd82e883102c570ea66f4f3244a92c70f7c19083 · park · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: 4d0d646882857930e7602e1d7531552e914aa995
 phase: REVIEWING
@@ -31,3 +32,11 @@ anchor-ref: refs/heads/main
 base: 3640cf580d9df31e5cbe74be89024dd5a40e9f85
 
 ## Parked
+
+2026-10-04T23:27:25Z rescope · item add TOOL-aEvidencedLens-12 · reason spec-audit round 1 (reviews/2026-10-05-review-TOOL-aEvidencedLens-1-spec-audit-round1.md) id 36 HIGH: unit 3 folds skeptic evidence through renderCell, which escapes every pipe, so a pipe-bearing evidence command reaches the skeptic altered and a true finding can be refuted; repairs TOOL-aEvidencedLens-3
+
+2026-10-04T23:27:40Z rescope · item add TOOL-aEvidencedLens-13 · reason spec-audit round 1 (reviews/2026-10-05-review-TOOL-aEvidencedLens-1-spec-audit-round1.md) id 25 HIGH: unit 6 AC7 compares diff-kind prompts against an unbound base that predates unit 1's REVIEW_SHAPE move, so it is red on a correct build and invites undoing that move; repairs TOOL-aEvidencedLens-6
+
+2026-10-04T23:27:46Z rescope · item add TOOL-aEvidencedLens-14 · reason spec-audit round 1 (reviews/2026-10-05-review-TOOL-aEvidencedLens-1-spec-audit-round1.md) id 37 HIGH: unit 9's round scan walks a terminal record's exclusions only on a grant-scan hit, so an owner REVIEW_ROUNDS raise merged into the run before its witness reds an archived record on every bar; repairs TOOL-aEvidencedLens-9
+
+2026-10-04T23:32:23Z decision · item spec-audit promotion chain generation bound (round-1 spec audit finding 45, TOOL-aEvidencedLens-8 section 8 F3) · reason question: does a chain of spec-audit promotions need a bound beyond M4's precision rule, now that unit 8 promotes a minors batch on nearly every terminal round and unit 3 confirms at any severity, which raises the precision that must fall to end a chain (TOOL-aWokenSentinel-30 measured the cascade not converging); options: (a) close a spec-audit minors batch unit under M4's recorded specs-audited override instead of auditing it as a fresh subject, (b) leave M4 as it is and let the owner set a generation cap; refused because (a) rewrites M4, a governance carrier, and sets the owner's audit cost, which M3 veto 2 reserves to the owner

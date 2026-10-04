@@ -1,6 +1,6 @@
 # TOOL-aEvidencedLens-3 — the spec skeptic confirms by the rubric, re-runs the evidence, and refutes duplicates and by-design
 
-**Status:** SPECCED · rev-1 · 2026-10-05 · node a · Tier-2 · base 3640cf58 · streams tooling · order 3 · ratified 2026-10-05
+**Status:** SPECCED · rev-2 · 2026-10-05 · node a · Tier-2 · base 028b5cac · streams tooling · order 3 · ratified 2026-10-05
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-10-05-prompt-TOOL-aEvidencedLens-1-1-spec-brief.md](../prompts/2026-10-05-prompt-TOOL-aEvidencedLens-1-1-spec-brief.md) | journal | TOOL-aEvidencedLens-1 TOOL-aEvidencedLens-2 TOOL-aEvidencedLens-4 TOOL-aEvidencedLens-5 TOOL-aEvidencedLens-6 TOOL-aEvidencedLens-7 TOOL-aEvidencedLens-8 TOOL-aEvidencedLens-9 TOOL-aEvidencedLens-10 TOOL-aEvidencedLens-11 |
 | [2026-10-05-prompt-TOOL-aEvidencedLens-3-2-build-brief.md](../prompts/2026-10-05-prompt-TOOL-aEvidencedLens-3-2-build-brief.md) | journal | — |
+| [2026-10-05-review-TOOL-aEvidencedLens-1-spec-audit-round1.md](../reviews/2026-10-05-review-TOOL-aEvidencedLens-1-spec-audit-round1.md) | spec-audit | TOOL-aEvidencedLens-1 TOOL-aEvidencedLens-2 TOOL-aEvidencedLens-4 TOOL-aEvidencedLens-5 TOOL-aEvidencedLens-6 TOOL-aEvidencedLens-7 TOOL-aEvidencedLens-8 TOOL-aEvidencedLens-9 TOOL-aEvidencedLens-10 TOOL-aEvidencedLens-11 |
 
 <!-- /gen:spec-records -->
 
@@ -38,7 +39,7 @@ judged by RE-RUNNING the evidence unit 2 makes every spec finding carry.
   "Does not reproduce" means the observation contradicts the claim. A probe the skeptic could not run
   inside its bound falls to the existing default by the finder's grade, never to a refutation by
   itself. Absent evidence means the skeptic probes for itself and never confirms on the finder's word.
-  Observed by AC2.
+  Observed by AC1 and AC2.
 - **S4** — A claim about code or a record is checked against that code or record, not against the
   spec's description of it. Stated in the S1 sentence. Observed by AC1.
 - **S5** — The spec-kind verify prompt carries the PROBE POLICY block unit 2 renders under each
@@ -48,7 +49,8 @@ judged by RE-RUNNING the evidence unit 2 makes every spec finding carry.
   only, after the existing join. When `<n>` is the finding's own id, is not in the same batch, or is
   not CONFIRMED, the refutation is ORPHANED: the finding is demoted to UNVERIFIED exactly as a
   contradicted one is, its ledger reason reads `duplicate of an unconfirmed id`, a `WARNING:` line
-  names the ids, and the spec-kind RUN INTEGRITY block counts them (§8 F2). Observed by AC4.
+  names the ids, and the spec-kind RUN INTEGRITY block counts them (§8 F2). The scan does not run on
+  the diff kind, whose duplicate refutation names no surviving id. Observed by AC4 and AC5.
 - **S7** — The diff kind is untouched: its finder, skeptic and synthesis prompts, and its probe
   prompt, are byte-identical before and after this unit (shared invariant 2). Observed by AC5.
 - **S8** — The tier2-review self-test gains the arms of §7's `New arm:` line, written and not run
@@ -78,14 +80,15 @@ judged by RE-RUNNING the evidence unit 2 makes every spec finding carry.
 ### Edges
 
 - **consumes-from** `TOOL-aEvidencedLens-2` — the REQUIRED `evidence` string on every spec finding and the PROBE POLICY block, both of which this unit hands to the skeptic; without them S3 re-runs nothing and S5 has no block to copy.
+- **hands-off** `TOOL-aEvidencedLens-12` — the fold that carries `evidence` onto the skeptic line. S3 folds it through `renderCell`, which also escapes every `|`, so a pipe-bearing command reaches the skeptic altered; that unit replaces the fold with a line-break-only one (round-1 spec audit, id 36, HIGH).
 
 ## 4. Design
 
 ### Evidence
 
-Read at `b3950dc7` on 2026-10-05; `tools/workflows/tier2-review.template.js` there differs from BASE
-`3640cf58` only in its version line (`git diff 3640cf58 HEAD -- tools/workflows/tier2-review.template.js`).
-Line numbers are PINNED to that read and move as units 1 and 2 land first; the identifiers do not.
+Read at `b3950dc7` on 2026-10-05, whose `tools/` tree equals BASE `028b5cac`:
+`git diff --stat 028b5cac b3950dc7 -- tools/` prints nothing. Line numbers are PINNED to that read
+and move as units 1 and 2 land first; the identifiers do not.
 
 - The spec skeptic sentence (`:889`) confirms "real, and it makes the spec unbuildable or wrong" and
   refutes three cases, none of them a duplicate or by-design. The diff sentence (`:890`) refutes
@@ -124,7 +127,8 @@ reproduce; (4) BY DESIGN, a case the BY DESIGN block covers; (5) a DUPLICATE, op
 `duplicate of prior <ref>` for a prior round's original; (6) a PREFERENCE that names no defect the
 rubric grades, not even a low.
 Evidence that reads `-` was not recorded: probe the claim yourself and never confirm on the finder's
-word. A probe you could not run inside its bound is a finding you cannot establish, not a refutation.
+word. A probe you could not run inside its bound is a finding you cannot establish; apply the
+default by the finder's grade, and never call it evidence that does not reproduce.
 ```
 
 ### Data flow
@@ -192,7 +196,10 @@ VERIFYING, beside their reading against the pre-pass render.
 - observability — the orphan `WARNING:` line, the ledger reason, and the RUN INTEGRITY count.
 - risks — confirming at any grade raises the LOW count, and under `TOOL-aEvidencedLens-7` and
   `TOOL-aEvidencedLens-8` every spec-audit LOW is promoted into the minors batch. Refutation case (6)
-  is what keeps a pure preference out of that batch.
+  is what keeps a pure preference out of that batch. Confirming at any severity also RAISES the
+  precision a round reports, and BUILD-METHOD M4 ends a chain of promotions only when a promoting
+  round's precision falls below the review protocol's floor, so this unit makes that bound slower to
+  reach. `TOOL-aEvidencedLens-8` §5 states the interaction and where the generation bound was parked.
 - testing — the arms of S8 over stub agents.
 - migration — none: no schema or input changes, and REVIEW_SHAPE is already moved by unit 1.
 - user docs — N/A: no `args` field is added and no carrier states the skeptic sentence.
@@ -206,8 +213,9 @@ VERIFYING, beside their reading against the pre-pass render.
 - **AC1** — When `node u3-check.js tools/workflows/tier2-review.js` runs a spec-kind review
   over stub agents, every `verify:` prompt carries `AT ANY RUBRIC SEVERITY`, each of `NON-GOAL`,
   `ALREADY SAYS`, `FALSE ON RE-PROBE`, `BY DESIGN`, `duplicate of id=`, `duplicate of prior` and
-  `PREFERENCE`, and the sentence about a claim on code or a record; none carries
-  `unbuildable or wrong`.
+  `PREFERENCE`, `could not run inside its bound` and `apply the default by the finder's grade`, and
+  the sentence about a claim on code or a record; none carries `unbuildable or wrong` and none
+  carries `not a refutation`.
   Red when: any marker is absent, or the old confirmation test survives in the spec prompt.
 - **AC2** — When the same driver hands a spec finding whose `evidence` is `cmd: grep -c x a.md -> 0`,
   a second whose evidence spans two lines, and a third with none, each `verify:` line carries
@@ -234,9 +242,11 @@ VERIFYING, beside their reading against the pre-pass render.
   runs the same diff-kind args over both renders, every `resume:probe`, `find:`, `verify:` and
   `synth` prompt is byte-identical between them; `node tools/workflows/check-workflow-syntax.js tools/workflows/tier2-review.js`,
   `bash tools/workflows/check-verifier-fanout.sh` and `bash tools/workflows/check-review-join.sh`
-  each exit 0.
-  Red when: any diff-kind prompt differs, or the edit broke the parse, the fan-out grammar or the id
-  join.
+  each exit 0. A second diff-kind run over both renders, whose skeptic stubs answer id 1 `refuted`
+  and id 2 `refuted` with reason `duplicate of id=1` in one batch, returns the same `refuted` and
+  `unverified` counts and the same ledger rows from both renders, and logs no orphan `WARNING:` line.
+  Red when: any diff-kind prompt differs, the orphan scan demotes a diff-kind duplicate, or the edit
+  broke the parse, the fan-out grammar or the id join.
   fixture: `pre-u3.js` is the `git show` of `tools/workflows/tier2-review.js` at HEAD taken before the
   pass edits anything; the comparison is to this unit's predecessor and not to BASE, because
   `TOOL-aEvidencedLens-1` moved the review key that every DURABILITY line carries.
@@ -279,6 +289,13 @@ version bump at the close; that is shared invariant 7, not a defect of this unit
 
 - rev-1 · 2026-10-05 · initial draft, from the build's shared spec brief, unit 3, and the harness
   template read at `b3950dc7`.
+- rev-2 · 2026-10-05 · §3 §4 §5 S3 S6 AC1 AC5 · round-1 spec audit fold. Id 9 (MEDIUM): S6 says the
+  orphan scan stays off the diff kind and AC5 runs a diff-kind duplicate refutation over both
+  renders. Ids 10 and 31 (MEDIUM): the sentence's last line now applies the grade default instead of
+  saying "not a refutation", and AC1 carries its two markers. Id 34 (LOW): base 3640cf58 becomes
+  028b5cac, with §4 Evidence restated against it. Id 45 (MEDIUM, its unit-3 half): §5 says
+  confirming at any severity slows M4's precision bound. §3 gains the hands-off edge to
+  `TOOL-aEvidencedLens-12`, the unit id 36 (HIGH) was promoted to.
 
 ## 10. Reuse audit
 

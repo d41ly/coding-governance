@@ -1,6 +1,6 @@
 # TOOL-aEvidencedLens-11 — the method, the memory-tree README, the Skill, the verbs entry and a decision record state what units 1 to 9 built
 
-**Status:** SPECCED · rev-1 · 2026-10-05 · node a · Tier-1 · base 028b5cac · streams tooling · order 8
+**Status:** SPECCED · rev-2 · 2026-10-05 · node a · Tier-1 · base 028b5cac · streams tooling · order 8
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-10-05-prompt-TOOL-aEvidencedLens-1-1-spec-brief.md](../prompts/2026-10-05-prompt-TOOL-aEvidencedLens-1-1-spec-brief.md) | journal | TOOL-aEvidencedLens-1 TOOL-aEvidencedLens-2 TOOL-aEvidencedLens-3 TOOL-aEvidencedLens-4 TOOL-aEvidencedLens-5 TOOL-aEvidencedLens-6 TOOL-aEvidencedLens-7 TOOL-aEvidencedLens-8 TOOL-aEvidencedLens-9 TOOL-aEvidencedLens-10 |
 | [2026-10-05-prompt-TOOL-aEvidencedLens-11-2-build-brief.md](../prompts/2026-10-05-prompt-TOOL-aEvidencedLens-11-2-build-brief.md) | journal | — |
+| [2026-10-05-review-TOOL-aEvidencedLens-1-spec-audit-round1.md](../reviews/2026-10-05-review-TOOL-aEvidencedLens-1-spec-audit-round1.md) | spec-audit | TOOL-aEvidencedLens-1 TOOL-aEvidencedLens-2 TOOL-aEvidencedLens-3 TOOL-aEvidencedLens-4 TOOL-aEvidencedLens-5 TOOL-aEvidencedLens-6 TOOL-aEvidencedLens-7 TOOL-aEvidencedLens-8 TOOL-aEvidencedLens-9 TOOL-aEvidencedLens-10 |
 
 <!-- /gen:spec-records -->
 
@@ -32,11 +33,14 @@ more. That scope is the owner's mandate (shared invariant 11).
   - The catalogue sentence points at `SPEC_LENSES` in `{{TOOL_ROOT}}workflows/tier2-review.js` and
     lists no lens name.
   - One sentence says lenses probe read-only: no write under the repository, temporary files only
-    in the run's scratch, every command bounded, and no merge bar or suite inside a lens.
+    in the run's scratch, every command bounded, and no merge bar or suite inside a lens. It
+    spells `read-only` and `scratch`.
   - The "Fold fixes into the spec, then STOP" sentence says a round that is not an exit folds its
     fixes and re-invokes, and the exit disposes what stands, so the fold is never read as the
-    exit's disposition.
+    exit's disposition. It spells the words "a round that is not an exit".
   - M2's decompose sentence says "a review's minors batch" where it says "the closing review's".
+  - M4's chain-of-promotions sentence, the precision bound, is unchanged. The generation bound
+    `TOOL-aEvidencedLens-8` §8 F3 parked for the owner is not stated in any carrier.
   - Deletions come first. The rendered file is no larger than at BASE.
 - **S2** — `tools/memory-tree/README.md`'s section "M4 — the spec-audit lens catalogue" keeps its
   heading, and its body becomes one sentence pointing at `SPEC_LENSES` in
@@ -49,16 +53,19 @@ more. That scope is the owner's mandate (shared invariant 11).
     records `--highs` and `--minors`, and `promote` whenever anything stood.
   - The `CONVERGING` bullet says a spec subject's fold fixes what that round confirmed, and only the
     exit promotes, as `TOOL-aEvidencedLens-8` §8 F1 resolved.
-  - The counts paragraph says the counts bind every terminal round, spec subjects included. On a
-    spec subject the build harness records them itself. Recorded by hand, they are that exit
-    round's `highs` and `confirmed - blockers - highs`, with no summing, because a spec round's fold
-    fixes everything that round confirmed.
+  - The counts paragraph says the counts bind every terminal round, spec subjects included, and
+    stops saying "refused on any other round or subject". On a spec subject the build harness records them
+    itself. Recorded by hand, they are that exit round's `highs`, and its
+    `confirmed - blockers - highs` plus every UNVERIFIED finding the disposal promoted, as
+    `TOOL-aEvidencedLens-8` S5 and S6 count them, with no summing across rounds, because a spec
+    round's fold fixes everything that round confirmed.
 - **S4** — `tools/unattended/VERBS.template.md`'s `--review` entry, re-rendered into
   `memory/guides/UNATTENDED-VERBS.md` by the same adopter, states the flags as
   `TOOL-aEvidencedLens-7` built them. `--highs` and `--minors` bind a spec subject's terminal exit
   too. `fold` is refused at every terminal exit, and survives only as the reading of a row written
-  before unit 7. The sentence calling a spec subject's `promote` "ACCEPTED, never required" and the
-  clause refusing either count on a spec subject go. The refusal wording is copied from unit 7's
+  before unit 7. The sentence calling a spec subject's `promote` "ACCEPTED, never required", the
+  clause refusing either count on a spec subject, and the clause saying `fold` is a row "which the
+  driver reaches only at `CONVERGED`" go. The refusal wording is copied from unit 7's
   driver as built, never paraphrased from its spec. Observed by AC4.
 - **S5** — `memory/DECISIONS.md` gains one row recording the owner's answer of 2026-10-05. It
   supersedes the fold half of `TOOL-aProbedUnit-9`, whose one-round default stands, and never edits
@@ -175,16 +182,22 @@ Under 300 bytes, the cap every row of the file meets. The id is the main loop's 
 - **AC2** — When `grep -c 'FOLDED into its spec'` runs over `tools/memory-tree/BUILD-METHOD.template.md`
   and `memory/guides/BUILD-METHOD.md`, both print 0. When `grep -c 'SPEC_LENSES'` runs over the same
   two files, both print the same non-zero count. When `grep -cE 'underspecification|unstated assumption'`
-  runs over both, both print 0.
-  Red when: the template was edited and not re-rendered, or a lens name or the fold survives.
+  runs over both, both print 0. Over `memory/guides/BUILD-METHOD.md`, M4 carries `read-only` and
+  `scratch` in one sentence, `grep -c 'a round that is not an exit'` prints 1,
+  `grep -c "a review's minors batch"` prints 1, and `grep -c "the closing review's minors batch"`
+  prints 0.
+  Red when: the template was edited and not re-rendered, a lens name or the fold survives, or a
+  bullet of S1 was deleted without its replacement.
 - **AC3** — When `grep -nE 'underspecification|unstated assumption|prior art' tools/memory-tree/README.md`
   runs, it prints nothing, and `grep -c 'SPEC_LENSES' tools/memory-tree/README.md` prints at least 1.
   Red when: the README keeps a second copy of the catalogue.
 - **AC4** — When `bash tools/unattended/adopt-unattended.sh --check` runs, it prints `in sync`. When
-  `grep -nE 'FOLDED into the spec it belongs to|ACCEPTED there, never|is ACCEPTED, never required|refuses either count on a spec subject'`
+  `grep -nE 'FOLDED into the spec it belongs to|ACCEPTED there, never|is ACCEPTED, never required|refuses either count on a spec subject|refused on any other round or subject|reaches only at .CONVERGED.'`
   runs over `tools/unattended/SKILL.template.md`, `.claude/skills/unattended/SKILL.md`,
-  `tools/unattended/VERBS.template.md` and `memory/guides/UNATTENDED-VERBS.md`, it prints nothing.
-  Red when: a carrier still tells a spec subject to fold, or calls its `promote` optional.
+  `tools/unattended/VERBS.template.md` and `memory/guides/UNATTENDED-VERBS.md`, it prints nothing,
+  and the Skill's `CONVERGING` bullet names the spec subject's fold.
+  Red when: a carrier still tells a spec subject to fold, calls its `promote` optional, refuses its
+  counts, or scopes the in-loop fold to the closing diff review only.
 - **AC5** — When `git diff 028b5cac -- memory/DECISIONS.md` runs after the records commit, it shows
   exactly one added line and no removed line. That line names `TOOL-aProbedUnit-9`, carries
   `2026-10-05` and is at most 300 bytes.
@@ -205,6 +218,13 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-05 · initial draft.
+- rev-2 · 2026-10-05 · S1 S3 S4 AC2 AC4 · round-1 spec audit fold. Id 22 (MEDIUM): AC2 observes the
+  read-only sentence, the not-an-exit fold sentence and M2's minors-batch wording. Id 23 (MEDIUM):
+  S3 and S4 name the counts-refused clause and the `CONVERGED`-only fold clause, and AC4's
+  alternation and its `CONVERGING` assertion read them. Id 29 (MEDIUM): S3's hand-recorded minors
+  term adds every UNVERIFIED finding the disposal promoted, as unit 8 counts it. Id 45 (MEDIUM, its
+  unit-11 half): S1 keeps M4's chain sentence unchanged, consistent with unit 8 §8 F3 parking the
+  generation bound.
 
 ## 10. Reuse audit
 

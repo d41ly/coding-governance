@@ -1,6 +1,6 @@
 # TOOL-aEvidencedLens-7 — `--review` takes highs and minors on a spec subject's exit and requires `promote` when any stood
 
-**Status:** SPECCED · rev-1 · 2026-10-05 · node a · Tier-2 · base 028b5cac · streams tooling · order 6
+**Status:** SPECCED · rev-2 · 2026-10-05 · node a · Tier-2 · base 028b5cac · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-10-05-prompt-TOOL-aEvidencedLens-1-1-spec-brief.md](../prompts/2026-10-05-prompt-TOOL-aEvidencedLens-1-1-spec-brief.md) | journal | TOOL-aEvidencedLens-1 TOOL-aEvidencedLens-2 TOOL-aEvidencedLens-3 TOOL-aEvidencedLens-4 TOOL-aEvidencedLens-5 TOOL-aEvidencedLens-6 TOOL-aEvidencedLens-8 TOOL-aEvidencedLens-9 TOOL-aEvidencedLens-10 TOOL-aEvidencedLens-11 |
 | [2026-10-05-prompt-TOOL-aEvidencedLens-7-2-build-brief.md](../prompts/2026-10-05-prompt-TOOL-aEvidencedLens-7-2-build-brief.md) | journal | — |
+| [2026-10-05-review-TOOL-aEvidencedLens-1-spec-audit-round1.md](../reviews/2026-10-05-review-TOOL-aEvidencedLens-1-spec-audit-round1.md) | spec-audit | TOOL-aEvidencedLens-1 TOOL-aEvidencedLens-2 TOOL-aEvidencedLens-3 TOOL-aEvidencedLens-4 TOOL-aEvidencedLens-5 TOOL-aEvidencedLens-6 TOOL-aEvidencedLens-8 TOOL-aEvidencedLens-9 TOOL-aEvidencedLens-10 TOOL-aEvidencedLens-11 |
 
 <!-- /gen:spec-records -->
 
@@ -52,9 +53,15 @@ stood and a row that stood on anything must promote it.
 - **S7** — `REVIEW_DISPOSITIONS` keeps `fold`. Rows written before this unit carry it, check 2's
   closed-set clause reads it, and the leg's suite mutates the set. The verb refuses it at write time
   by state, not by membership. Observed by AC4.
-- **S8** — Rows written before this unit, with no counts, keep today's reading, with no cutoff. The
-  verb reads a prior row's blocker count only (`review_counts`), so an old row is never re-graded
-  here, and check 2 already owes the floor of one on a counted-less row. Observed by AC8.
+- **S8** — Rows written before this unit, with no counts, keep today's reading. The verb reads a prior
+  row's blocker count only (`review_counts`), so an old row is never re-graded here. The rule S2 and
+  S3 enforce at write time gets its own dated cutoff, because check 2 grades `fold` only on a counted
+  row or beside a non-zero blocker count, so a countless terminal spec row carrying `fold` would
+  still pass the bar after this unit. The driver declares `SPEC_COUNTS_CUTOFF`, a quoted ISO date, beside
+  `FOLD_CUTOFF`, by the same idiom: strictly past the newest record any branch can still write under
+  the old contract, which the builder derives from the newest spec-subject `review` row on any branch
+  it can see and records in the commit message. Its comment says what it dates and that check 2
+  reads it; the reading is `TOOL-aEvidencedLens-9`'s. Observed by AC8 and AC9.
 - **S9** — Check 2 of `tools/unattended/check-unattended.sh` is NOT edited here. It reads a row's
   counts by their presence and never by its subject, so a counted spec row already owes one unit per
   blocker and high plus one for the minors (§4 Evidence, measured). Its prose calling a counted row a
@@ -73,7 +80,8 @@ stood and a row that stood on anything must promote it.
   `--review` verbs entry. `TOOL-aEvidencedLens-11` owns them.
 - The usage header's `[--disposition fold|promote]` spelling. It names the closed set, which keeps
   `fold` (S7); check 26 grades the flag, not its values.
-- A cutoff for old rows (S8).
+- Grading history with the cutoff. This unit declares `SPEC_COUNTS_CUTOFF` (S8); check 2's reading of
+  it is `TOOL-aEvidencedLens-9`'s, the unit holding that file this order (§3 Edges).
 - `REVIEW_ROUNDS` and its default. The owner's; `TOOL-aEvidencedLens-9` guards the key.
 - A kit version bump. The main loop bumps once at the close (shared invariant 7).
 
@@ -82,7 +90,9 @@ stood and a row that stood on anything must promote it.
 - **hands-off** `TOOL-aEvidencedLens-8` — the two count flags this unit makes legal and required at a
   spec subject's terminal exit, which the harness's round record must then pass.
 - **hands-off** `TOOL-aEvidencedLens-9` — check 2's comment and its two messages that call a row
-  carrying counts a closing-review row, which after this unit a spec subject's row is too.
+  carrying counts a closing-review row, which after this unit a spec subject's row is too; and check
+  2's reading of `SPEC_COUNTS_CUTOFF`, refusing on a row first-committed on or after it a terminal
+  spec-subject row that carries no counts or records `fold`.
 - **hands-off** `TOOL-aEvidencedLens-11` — the Skill's spec-subject review invocation, the verbs entry
   and the method's M4, which still say a spec audit's mediums and lows fold.
 
@@ -199,15 +209,22 @@ named. Each refusal is first observed against the driver at the pass's base, rea
   echo names a floor of 3 units and the batched sentence.
   Red when: the counts follow the disposition, or the echo prints the sentence saying a MEDIUM or LOW
   is folded.
-- **AC7** — When `grep -nE "FOLDED into the spec|a MEDIUM or LOW is folded|minors are folded" tools/unattended/unattended.sh`
+- **AC7** — When `grep -nE "FOLDED into the spec|a MEDIUM or LOW is folded|minors are folded|reachable from ONE exit, CONVERGED|ACCEPTED there and never required" tools/unattended/unattended.sh`
   runs, it prints nothing.
-  Red when: a message or comment still states the spec-audit fold.
+  Red when: a message or comment still states the spec-audit fold, the two comments at
+  `review_exit_note` and in `verb_review` included.
 - **AC8** — When the slug subject's existing closing-review rounds of AC2 to AC6 of
   `TOOL-aBatchedMinors-2` are replayed in the fixture, every refusal and row is byte-identical to the
   base driver's; and the row AC6 writes, run through check 2's awk program extracted as §4 Evidence
   did, prints a floor of 3 at `newids=2`.
   Red when: a closing-review sentence moved, or check 2 does not owe the counted spec row's units.
   cost: the fixture rebuild per arm is a few seconds each.
+- **AC9** — When `grep -nE '^SPEC_COUNTS_CUTOFF="[0-9]{4}-[0-9]{2}-[0-9]{2}"$' tools/unattended/unattended.sh`
+  runs it prints one line, sitting after the `FOLD_CUTOFF=` line, and its date is strictly later
+  than the newest `review · item` row naming a spec subject in any `memory/builds/*/RUN.md` reachable
+  from the pass's HEAD, a figure the commit message records.
+  Red when: the constant is absent, malformed, or dated on or before a record the old contract wrote.
+  figure: DERIVED at observation time from the run-state files at the pass's HEAD.
 
 ## 7. Gates
 
@@ -232,6 +249,10 @@ New arm: tools/unattended/unattended.test.sh · `fold` at a converged spec exit,
 
 - rev-1 · 2026-10-05 · initial draft, from the spec brief's unit 7, the owner's 2026-10-05 answer and
   `verb_review` read at `028b5cac`.
+- rev-2 · 2026-10-05 · §3 S8 AC7 AC9 · round-1 spec audit fold. Id 46 (MEDIUM): the "no cutoff"
+  non-goal is replaced by `SPEC_COUNTS_CUTOFF`, declared here beside `FOLD_CUTOFF` and observed by
+  AC9, and the §3 hands-off to `TOOL-aEvidencedLens-9` now carries check 2's reading of it. Id 13
+  (LOW): AC7's alternation adds the two stale comments at `review_exit_note` and in `verb_review`.
 
 ## 10. Reuse audit
 

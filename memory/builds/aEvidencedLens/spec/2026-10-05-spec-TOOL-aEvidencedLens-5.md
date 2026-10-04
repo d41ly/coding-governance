@@ -1,6 +1,6 @@
 # TOOL-aEvidencedLens-5 — the build harness hands the audit its context, sibling specs, checklist and prior findings
 
-**Status:** SPECCED · rev-1 · 2026-10-05 · node a · Tier-2 · base 028b5cac · streams tooling · order 6
+**Status:** SPECCED · rev-2 · 2026-10-05 · node a · Tier-2 · base 028b5cac · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-10-05-prompt-TOOL-aEvidencedLens-1-1-spec-brief.md](../prompts/2026-10-05-prompt-TOOL-aEvidencedLens-1-1-spec-brief.md) | journal | TOOL-aEvidencedLens-1 TOOL-aEvidencedLens-2 TOOL-aEvidencedLens-3 TOOL-aEvidencedLens-4 TOOL-aEvidencedLens-6 TOOL-aEvidencedLens-7 TOOL-aEvidencedLens-8 TOOL-aEvidencedLens-9 TOOL-aEvidencedLens-10 TOOL-aEvidencedLens-11 |
 | [2026-10-05-prompt-TOOL-aEvidencedLens-5-2-build-brief.md](../prompts/2026-10-05-prompt-TOOL-aEvidencedLens-5-2-build-brief.md) | journal | — |
+| [2026-10-05-review-TOOL-aEvidencedLens-1-spec-audit-round1.md](../reviews/2026-10-05-review-TOOL-aEvidencedLens-1-spec-audit-round1.md) | spec-audit | TOOL-aEvidencedLens-1 TOOL-aEvidencedLens-2 TOOL-aEvidencedLens-3 TOOL-aEvidencedLens-4 TOOL-aEvidencedLens-6 TOOL-aEvidencedLens-7 TOOL-aEvidencedLens-8 TOOL-aEvidencedLens-9 TOOL-aEvidencedLens-10 TOOL-aEvidencedLens-11 |
 
 <!-- /gen:spec-records -->
 
@@ -24,19 +25,30 @@ one it could not produce.
 ## 2. Scope (IN)
 
 - **S1** — `context`: a string naming `memory/builds/<slug>/README.md` and the run mandate under
-  `memory/builds/<slug>/prompts/` (the file whose name carries `run-mandate`; under a run with no
-  prompt the README is the mandate), told to the lenses as the two documents to read FIRST. Observed by
-  AC1.
+  the harness's `briefDir` const (the file whose name carries `run-mandate`; under a run with no
+  prompt the README is the mandate), told to the lenses as the two documents to read FIRST. The
+  mandate directory is composed from `briefDir`, never re-spelled, so a caller passing another
+  `briefDir` sends the lenses where the mandate is. Observed by AC1.
 - **S2** — `specs`: `memory/TEMPLATE-SPEC.md` first, the format the method says lenses are primed with,
-  then every `units[].specPath` of this build that is NOT a subject this round, in roster order, each
-  once. A round auditing the whole set therefore passes the format alone. Observed by AC1.
+  then every `units[].specPath` of this build that is a non-empty string and is NOT a subject this
+  round, in roster order, each once. The non-empty filter runs BEFORE the subject exclusion, because
+  the harness carries an empty `specPath` for every unit its spec stage just authored, and the callee
+  refuses an empty `specs` member before any lens. A round auditing the whole set therefore passes the
+  format alone. Observed by AC1 and AC9.
 - **S3** — `checklist`: the resolver agent, which already runs `git` per subject, also reads each
   resolved subject's `### Files touched (estimate)` backticked paths, unions them, and runs
   `python {{MEMORY_TREE_DIR}}/gotchas.py --for-paths <paths>` in `repo` under a stated timeout. It
   returns the stdout as `checklist` and the paths as `checklistPaths`, or `checklistError` naming why
-  none was produced: no path declared, a non-zero exit, or the timeout. The command is a new constant
-  carrying the kit path as a render token, as `CHECKLIST` already does. Observed by AC2.
-- **S4** — `scratch`: the harness's own folded `scratch` arg, passed through. Observed by AC1.
+  none was produced: no path declared, a non-zero exit, the timeout, or a stdout carrying no line that
+  starts `- `, which `gotchas.py` prints with exit 0 when no class is selected and which the callee's
+  `parseChecklist` refuses. The last reads `no bug class selected`. The command is a new constant
+  carrying the kit path as a render token, as `CHECKLIST` already does. Observed by AC2 and AC3.
+- **S4** — `scratch`: the harness's own folded `scratch` arg, passed through. The harness's own
+  `scratch` validation also applies the callee's two extra refusals, a control character and a value
+  equal to or under `repo` after the same fold, lowercasing and trailing-slash drop
+  `TOOL-aEvidencedLens-2` §4 "The argument" states, throwing `unattended-build: …` naming `scratch`
+  before any stage. A scratch the callee would refuse therefore dies at this harness's prelude and not
+  after the spec stage and the resolver have spent their work. Observed by AC1 and AC10.
 - **S5** — Fold inputs, two new args. `prevSubjects` is an array of `{path, blob}` with a 7 to 40 hex
   blob; `priorFindings` is an array of objects. On a FOLD re-invoke, a callee round above 1, each
   subject whose path matches a `prevSubjects` entry carries `prevBlob` set to that entry's blob, and
@@ -47,14 +59,20 @@ one it could not produce.
   is 1, a fresh generation with no previous round, throws naming that. Observed by AC6.
 - **S7** — The CONVERGING return carries `prevSubjects`, the `{path, blob}` set this round pinned, and
   `priorFindings`, the callee's `confirmedFindings`, and its `nextAction` names both as the args to
-  copy back beside `round` and `subjectRound`. Observed by AC7.
+  copy back beside `round` and `subjectRound`. When the callee returned no `confirmedFindings` array,
+  `priorFindings` is OMITTED from the return rather than carried as `[]`, so a copied-back value never
+  reaches the next invoke as an empty one. Observed by AC7.
 - **S8** — Every input the harness could not produce is ANNOUNCED with a `log('WARNING: …')` line and
   never passed as an empty value: no checklist (with the resolver's reason, or because a caller-pinned
-  `subjects` skipped the resolver); a fold re-invoke without `prevSubjects` or `priorFindings`, which
-  the callee then runs as a degraded fold review; a callee return with no `confirmedFindings` array on
-  the CONVERGING path. Observed by AC3, AC5 and AC7.
+  `subjects` skipped the resolver); a fold re-invoke without `prevSubjects`, which the callee runs as a
+  whole-file review of each subject; a fold re-invoke without `priorFindings`, which the callee runs
+  with no prior findings and says so; a fold re-invoke without both, which the callee runs as a
+  degraded fold review, the wording `TOOL-aEvidencedLens-4` S3 uses; a callee return with no
+  `confirmedFindings` array on the CONVERGING path. Each WARNING names the field it lacks. Observed by
+  AC3, AC5 and AC7.
 - **S9** — The `args` header block documents `prevSubjects` and `priorFindings`, and the meta `Audit`
-  phase detail names the inputs the stage passes. Observed by AC8.
+  phase detail names the inputs the stage passes: `context`, `specs`, `checklist` and `scratch`.
+  Observed by AC8.
 - **S10** — `tools/workflows/unattended-build.test.sh` gains arms for S1 to S8 and keeps the arm
   pinning the stripped `{path, blob}` subject shape, which a round-1 audit still meets. NOT OBSERVED
   inside the pass, because shared invariant 9 keeps suites out of passes; §7 declares the arms.
@@ -76,7 +94,8 @@ one it could not produce.
 ### Edges
 
 - **consumes-from** `TOOL-aEvidencedLens-2` — the review harness's `scratch` arg, REQUIRED on a spec
-  audit after that unit; without this unit the build harness's audit is refused there.
+  audit after that unit, and its two extra refusals, which S4 applies at this harness's prelude too;
+  without this unit the build harness's audit is refused there.
 - **consumes-from** `TOOL-aEvidencedLens-4` — a spec subject's `prevBlob`, which the review harness
   validates and reads at a fold round; without it S5's field is an unread key.
 
@@ -101,11 +120,22 @@ Read at base `028b5cac`, which is `origin/main` at preflight; the run branch's l
 - `python tools/memory-tree/gotchas.py --for-paths tools/workflows/unattended-build.template.js` printed
   a `#`-prefixed preamble and nine `- [ ] <class>` items with continuation lines and exited 0,
   measured 2026-10-05; `parseChecklist` reads the `#` lines as preamble and each `- ` line as an item.
+- `gotchas.py`'s `cmd_for_paths` also exits 0 after printing only its `#` header lines when no class
+  is selected, and `parseChecklist` (`tools/workflows/tier2-review.template.js:266-268`) THROWS on a
+  non-blank string with no line starting `- `. This repo's universal classes hide the case; an
+  adopter meets it. S3 routes it to `checklistError`.
+- The harness's own `scratch` refusal (`:218-225`) is by shape only, while the callee after
+  `TOOL-aEvidencedLens-2` also refuses a control character and a value equal to or under `repo`.
 - The CONVERGING return at `:1124` carries `subjectRound` and `auditIds` back for the caller to copy,
   and its `nextAction` at `:1150` names them. That is the precedent S7 follows.
 - The review harness returns `confirmedFindings` in the shape `priorFindings` reads, on every exit
   (`tools/workflows/tier2-review.template.js:1051`).
-- `units[].specPath` arrives from `--plan`, repo-relative.
+- `units[].specPath` arrives from `--plan`, repo-relative, and IS EMPTY for every unit the spec
+  stage just authored (`tools/workflows/unattended-build.template.js:1534`; `:1572` carries
+  `u.specPath || ''`). The callee refuses an empty or non-string `specs` member before any lens
+  (`tools/workflows/tier2-review.template.js:235-240`), so S2 filters it.
+- `briefDir` is a const, `a.briefDir || 'memory/builds/' + slug + '/prompts'` (`:230`), already
+  handed to `renderRoster`; S1 composes `context` from it.
 
 ### Data model
 
@@ -114,8 +144,8 @@ Read at base `028b5cac`, which is `origin/main` at preflight; the run branch's l
 { kind: 'spec-audit', repo, round: roundNo - subjectRound + 1, reviewDir, scratch,
   subjects: [{ path, blob, prevBlob? }],                 // prevBlob only on a fold re-invoke
   context: 'Build <slug>: read memory/builds/<slug>/README.md and the run mandate under ' +
-           'memory/builds/<slug>/prompts/ FIRST …',
-  specs: ['memory/TEMPLATE-SPEC.md', /* sibling specPaths not in subjects */],
+           briefDir + '/ FIRST …',
+  specs: ['memory/TEMPLATE-SPEC.md', /* non-empty sibling specPaths not in subjects */],
   checklist?: '<gotchas.py --for-paths stdout>',        // absent, and announced, when none
   priorFindings?: [ /* the previous round's confirmedFindings */ ] }
 ```
@@ -186,9 +216,12 @@ under the run's scratch directory and run there, never by running the suite. Inp
   `prompt:audit:subjects:` line names `gotchas.py --for-paths` and `Files touched (estimate)`.
   Red when: the resolver is not asked for the checklist, or its answer does not reach the callee.
 - **AC3** — When that double returns `checklistError` instead, the trace logs a `WARNING` naming it
-  and the `wargs:` line carries no `checklist` key; when `subjects` is supplied, the trace logs a
-  `WARNING` saying no resolver ran.
-  Red when: an absent checklist is passed as `""` or goes unannounced.
+  and the `wargs:` line carries no `checklist` key; when the double returns a `checklist` holding
+  only two `#` header lines, the trace logs a `WARNING` naming `no bug class selected` and the
+  `wargs:` line carries no `checklist` key; when `subjects` is supplied, the trace logs a `WARNING`
+  saying no resolver ran.
+  Red when: an absent checklist is passed as `""`, a header-only checklist reaches the callee, or
+  either goes unannounced.
 - **AC4** — When the stub runs round 3, `subjectRound` 2, with
   `"prevSubjects":[{"path":"s1","blob":"1234abc"}]` and a one-entry `priorFindings`, the `wargs:` line
   carries `{"path":"s1","blob":"abc1234","prevBlob":"1234abc"}`, `s2` with no `prevBlob`, and the
@@ -196,8 +229,11 @@ under the run's scratch directory and run there, never by running the suite. Inp
   Red when: the previous pin does not reach its subject, or reaches the wrong one.
 - **AC5** — When the stub runs round 3, `subjectRound` 2, with neither fold arg, it does not throw,
   logs a `WARNING` naming a degraded fold review, and the `wargs:` line carries no `prevBlob` and no
-  `priorFindings`.
-  Red when: the fold re-invoke throws, or runs silently undegraded.
+  `priorFindings`. With `prevSubjects` given and `priorFindings` absent, it logs a `WARNING` naming
+  `priorFindings` and not a degraded fold review; with `priorFindings` given and `prevSubjects`
+  absent, it logs a `WARNING` naming `prevSubjects` and a whole-file review of each subject.
+  Red when: the fold re-invoke throws, runs silently undegraded, or a one-missing case is announced
+  as degraded or not at all.
 - **AC6** — When `prevSubjects` carries `{"path":"s1","blob":"xyz"}`, the stub THROWS naming
   `prevSubjects` and the 7 to 40 hex rule; when `priorFindings` is a string, it throws naming
   `priorFindings`; when either is given at round 1, it throws naming the fresh generation; and in each
@@ -207,22 +243,32 @@ under the run's scratch directory and run there, never by running the suite. Inp
   double carrying a one-entry `confirmedFindings`, the RESULT carries `prevSubjects` equal to the
   pinned `{path, blob}` set and `priorFindings` equal to that entry, and `nextAction` names
   `prevSubjects` and `priorFindings`; with the double's `confirmedFindings` absent, the trace logs a
-  `WARNING` and the RESULT carries `"priorFindings":[]`.
-  Red when: the hand-back is missing, or a missing callee field is silent.
+  `WARNING` naming `confirmedFindings` and the RESULT carries no `priorFindings` key.
+  Red when: the hand-back is missing, a missing callee field is silent, or it is handed back as `[]`.
 - **AC8** — When `node tools/workflows/check-workflow-syntax.js` runs after the render it exits 0;
   `grep -c "gotchas.py --for-paths" tools/workflows/unattended-build.js` prints a non-zero count with
-  no `{{` left on that line; and `grep -n "prevSubjects" tools/workflows/unattended-build.template.js`
-  shows the field in the `args` header block.
-  Red when: the render was not regenerated, the token survived, or the header omits a field the file
-  reads.
+  no `{{` left on that line; `grep -n "prevSubjects"` and `grep -n "priorFindings"` over
+  `tools/workflows/unattended-build.template.js` each show the field in the `args` header block; and
+  the meta `Audit` phase detail names `context`, `specs`, `checklist` and `scratch`.
+  Red when: the render was not regenerated, the token survived, the header omits a field the file
+  reads, or the phase detail omits an input the stage passes.
+- **AC9** — When the stub runs `UNITS` at round 1 with unit `s3`'s `specPath` set to `""` and a
+  fourth unit whose `specPath` is absent, the `wargs:` line carries
+  `"specs":["memory/TEMPLATE-SPEC.md"]` and a `workflow:` line, and no `THROW` line.
+  Red when: an empty `specPath` reaches `specs` and the callee would refuse the audit.
+- **AC10** — When the stub runs with `scratch` set to `'/tmp/s\nX'`, to `'/tmp/r/sub'` beside
+  `repo: '/tmp/r'`, or to `'C:\\R\\x'` beside `repo: 'c:/r'`, each THROWS a message starting
+  `unattended-build:` and naming `scratch`, and the trace holds no `workflow:` line and no spec-stage
+  agent; `'/tmp/rs'` beside `repo: '/tmp/r'` proceeds.
+  Red when: a scratch the callee refuses passes this harness's prelude.
 
 ## 7. Gates
 
 `unattended-build self-test` · `tier2-review self-test` · `review-join self-test` · `verifier fan-out self-test` · `review-protocol parity (kit vs dogfood)` · `workflow script syntax` · `spec tokens (a spec's own names resolve)`
 
-New arm: tools/workflows/unattended-build.test.sh · the base harness, whose audit call carries no `context`, `specs`, `checklist` or `scratch` · none
-New arm: tools/workflows/unattended-build.test.sh · a fold re-invoke with `prevSubjects`, which the base harness ignores · none
-New arm: tools/workflows/unattended-build.test.sh · a malformed `prevSubjects`, which the base harness passes through unread · none
+New arm: tools/workflows/unattended-build.test.sh · the base harness, whose audit call carries no `context`, `specs`, `checklist` or `scratch`, and passes an empty `specPath` and a header-only checklist through · `FLOOR_ASSERTIONS` raised by the assertions added
+New arm: tools/workflows/unattended-build.test.sh · a fold re-invoke with `prevSubjects`, which the base harness ignores · `FLOOR_ASSERTIONS` raised by the assertions added
+New arm: tools/workflows/unattended-build.test.sh · a malformed `prevSubjects`, which the base harness passes through unread, and a scratch under `repo`, which it accepts · `FLOOR_ASSERTIONS` raised by the assertions added
 
 ## 8. Open questions
 
@@ -240,6 +286,15 @@ New arm: tools/workflows/unattended-build.test.sh · a malformed `prevSubjects`,
 
 - rev-1 · 2026-10-05 · initial draft, from the spec brief's unit 5 and both templates read at
   `028b5cac`.
+- rev-2 · 2026-10-05 · §3 §4 §7 S1 S2 S3 S4 S7 S8 S9 AC3 AC5 AC7 AC8 AC9 AC10 · round-1 spec audit
+  fold. Id 38 (MEDIUM): S2 filters an empty `specPath` before the subject exclusion, and AC9
+  observes it. Id 39 (MEDIUM): S3 routes a header-only checklist to `checklistError`, and AC3
+  observes it. Id 40 (MEDIUM): S4 applies the callee's two extra `scratch` refusals at this
+  harness's prelude, AC10 observes them, and the §3 edge to `TOOL-aEvidencedLens-2` names that
+  contract. Id 24 (LOW): AC5 adds the one-missing cases and AC8 the `priorFindings` header line and
+  the phase detail's four inputs. Id 32 (LOW): S8 names each one-missing case as unit 4 S3 grades it.
+  Id 33 (LOW): S7 and AC7 omit `priorFindings` instead of returning `[]`. Id 43 (LOW): S1 composes
+  `context` from `briefDir`. Id 30 (LOW, its unit-5 half): §7's arms raise `FLOOR_ASSERTIONS`.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-aEvidencedLens-1 — the spec-audit lens catalogue: five lenses aimed at the measured classes, the harness its one source
 
-**Status:** SPECCED · rev-1 · 2026-10-05 · node a · Tier-2 · base 028b5cac · streams tooling · order 1
+**Status:** SPECCED · rev-2 · 2026-10-05 · node a · Tier-2 · base 028b5cac · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -9,6 +9,7 @@
 | [2026-10-05-prompt-TOOL-aEvidencedLens-1-0-run-mandate.md](../prompts/2026-10-05-prompt-TOOL-aEvidencedLens-1-0-run-mandate.md) | journal | — |
 | [2026-10-05-prompt-TOOL-aEvidencedLens-1-1-spec-brief.md](../prompts/2026-10-05-prompt-TOOL-aEvidencedLens-1-1-spec-brief.md) | journal | TOOL-aEvidencedLens-2 TOOL-aEvidencedLens-3 TOOL-aEvidencedLens-4 TOOL-aEvidencedLens-5 TOOL-aEvidencedLens-6 TOOL-aEvidencedLens-7 TOOL-aEvidencedLens-8 TOOL-aEvidencedLens-9 TOOL-aEvidencedLens-10 TOOL-aEvidencedLens-11 |
 | [2026-10-05-prompt-TOOL-aEvidencedLens-1-2-build-brief.md](../prompts/2026-10-05-prompt-TOOL-aEvidencedLens-1-2-build-brief.md) | journal | — |
+| [2026-10-05-review-TOOL-aEvidencedLens-1-spec-audit-round1.md](../reviews/2026-10-05-review-TOOL-aEvidencedLens-1-spec-audit-round1.md) | spec-audit | TOOL-aEvidencedLens-2 TOOL-aEvidencedLens-3 TOOL-aEvidencedLens-4 TOOL-aEvidencedLens-5 TOOL-aEvidencedLens-6 TOOL-aEvidencedLens-7 TOOL-aEvidencedLens-8 TOOL-aEvidencedLens-9 TOOL-aEvidencedLens-10 TOOL-aEvidencedLens-11 |
 
 <!-- /gen:spec-records -->
 
@@ -49,7 +50,7 @@ harness the one source of the catalogue.
 - **S6** — The self-test arms that pin the four old keys, the spec-kind lens count or the id ranges a
   four-lens spec fan produced are re-keyed in `tools/workflows/tier2-review.test.sh` and
   `tools/workflows/unattended-build.test.sh`, and the first file's `FLOOR_ASSERTIONS` rises by the
-  number of arms added. Observed by AC8.
+  number of assertions the added arms carry. Observed by AC8 and AC10.
 - **S7** — The template and its render `tools/workflows/tier2-review.js` land in the same commit, the
   render regenerated, never hand-edited. Observed by AC9.
 
@@ -71,6 +72,9 @@ harness the one source of the catalogue.
   commands legally; until it lands, the finding line still says "nothing outside the spec set".
 - **hands-off** `TOOL-aEvidencedLens-11` — the memory-tree README M4 list and BUILD-METHOD M4's
   catalogue sentence become pointers at this unit's `SPEC_LENSES`.
+- **hands-off** `TOOL-aEvidencedLens-13` — the `REVIEW_SHAPE` move of S3, which changes the review
+  key every DURABILITY line carries; that unit's criterion that a comparison against BASE reds on a
+  correct build rests on this move.
 
 ## 4. Design
 
@@ -248,7 +252,7 @@ The stub run below is `tools/workflows/tier2-review.js` evaluated as an AsyncFun
   file this unit touched.
   Red when: a staged break spells the reuse tool as a kit path in the `reuse` brief, which this
   checker counts under rule 3.
-- **AC8** — When `grep -c -E "underspecification|unstated-assumption|'prior-art'" tools/workflows/tier2-review.test.sh tools/workflows/unattended-build.test.sh`
+- **AC8** — When `grep -c -E "underspecification|unstated-assumption|'prior-art'|find:prior-art" tools/workflows/tier2-review.test.sh tools/workflows/unattended-build.test.sh`
   runs it prints 0 for both files, and the stub run of the callee over `MT_ARGS` with the new
   `MT20_SHAPE` lens map returns `"raw":46` and over the new default map returns `"raw":48`.
   Red when: a fixture still keys a retired lens, or the fifth lens adds twelve findings to a measured
@@ -259,13 +263,20 @@ The stub run below is `tools/workflows/tier2-review.js` evaluated as an AsyncFun
   `tools/workflows/tier2-review.js` byte for byte.
   Red when: the render was hand-edited or not regenerated.
   figure: the cap is DERIVED from the hook at observation time.
+- **AC10** — When `grep -c "spec catalogue:" tools/workflows/tier2-review.test.sh` runs it prints at
+  least 2, one per §7 `New arm:` line, where the pre-pass file prints 0, and
+  `grep -o 'FLOOR_ASSERTIONS=[0-9]*' tools/workflows/tier2-review.test.sh` reads its pre-pass value
+  plus the number of assertions those arms add. Both figures are written in the pass's commit message.
+  Red when: an arm of §7 is missing, or the floor did not move by the assertions added.
+  figure: DERIVED at observation time from the pre-pass file and the pass's own diff.
+  permission: a pass runs no suite; the arms are read at the main loop's VERIFYING run.
 
 ## 7. Gates
 
 `tier2-review self-test` · `unattended-build self-test` · `verifier fan-out self-test` · `review-join self-test` · `review-protocol parity (kit vs dogfood)` · `install-prefix (shipped surface)` · `workflow script syntax` · `spec tokens (a spec's own names resolve)`
 
-New arm: tools/workflows/tier2-review.test.sh · the retired spec key on a spec audit, refused by `lensNotes`, against the base render that accepts it · `FLOOR_ASSERTIONS` raised by one
-New arm: tools/workflows/tier2-review.test.sh · five spec-kind `find:` labels in catalogue order, against the base render's four · `FLOOR_ASSERTIONS` raised by one
+New arm: tools/workflows/tier2-review.test.sh · `spec catalogue:` the retired spec key on a spec audit, refused by `lensNotes`, against the base render that accepts it · `FLOOR_ASSERTIONS` raised by the assertions it adds
+New arm: tools/workflows/tier2-review.test.sh · `spec catalogue:` five spec-kind `find:` labels in catalogue order, against the base render's four · `FLOOR_ASSERTIONS` raised by the assertions it adds
 
 ## 8. Open questions
 
@@ -278,6 +289,12 @@ New arm: tools/workflows/tier2-review.test.sh · five spec-kind `find:` labels i
 ## 9. Revision log
 
 - rev-1 · 2026-10-05 · initial draft, from the template, its render and both self-tests at HEAD.
+- rev-2 · 2026-10-05 · §3 §7 §10 S6 AC8 AC10 · round-1 spec audit fold. Id 5 (MEDIUM): AC10
+  observes the `spec catalogue:` arms against the pre-pass file and the floor equality, both figures
+  in the commit message. Id 6 (LOW): AC8's alternation adds `find:prior-art`, which the quoted form
+  could not see. Id 48 (LOW): §10 names `TOOL-dUnstalledConvoy-16` and dTieredTribunal's parked P3.
+  Id 30 (LOW, its unit-1 half): S6 and §7 raise the floor by assertions added, not by arms. §3 gains
+  the hands-off edge to `TOOL-aEvidencedLens-13`, the unit id 25 (HIGH) was promoted to.
 
 ## 10. Reuse audit
 
@@ -290,6 +307,10 @@ were name-stem matches such as `parse_spec_h1` and `checkSpecAuditDeclared`, and
 `unscanned layers: .sh`. Recall returned `TOOL-aSightedSkeptic-5`, the `TOOL-dTieredTribunal-7`
 ruling that one engine drives a spec audit, and BUILD-METHOD M4's catalogue sentence. The
 `TOOL-dTieredTribunal-11` S2 comment chose README-to-harness copying; this unit reverses the
-direction, and §4 "Alternatives rejected" says why.
+direction, and §4 "Alternatives rejected" says why. That spec names the README and harness pair as
+an open instance of the multi-carrier class `TOOL-dUnstalledConvoy-16`, whose fix it leaves to
+dTieredTribunal's parked P3, a parity leg across the carriers. This unit closes that one instance a
+different way, by removing the second carrier rather than gating the pair, so the ask's instance
+list can drop it at the close; the class and P3 stay open for the other instances.
 
 Recall terms used: spec-audit lens catalogue SPEC_LENSES prior-art underspecification contradiction unstated-assumption tier2-review finder brief REVIEW_SHAPE lensNotes

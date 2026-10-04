@@ -1,6 +1,6 @@
 # TOOL-aEvidencedLens-4 — a spec fold round reads its diff, and a moved subject is graded, not fixed at BLOCKER
 
-**Status:** SPECCED · rev-1 · 2026-10-05 · node a · Tier-2 · base 3640cf58 · streams tooling · order 4 · ratified 2026-10-05
+**Status:** SPECCED · rev-2 · 2026-10-05 · node a · Tier-2 · base 028b5cac · streams tooling · order 4 · ratified 2026-10-05
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-10-05-prompt-TOOL-aEvidencedLens-1-1-spec-brief.md](../prompts/2026-10-05-prompt-TOOL-aEvidencedLens-1-1-spec-brief.md) | journal | TOOL-aEvidencedLens-1 TOOL-aEvidencedLens-2 TOOL-aEvidencedLens-3 TOOL-aEvidencedLens-5 TOOL-aEvidencedLens-6 TOOL-aEvidencedLens-7 TOOL-aEvidencedLens-8 TOOL-aEvidencedLens-9 TOOL-aEvidencedLens-10 TOOL-aEvidencedLens-11 |
 | [2026-10-05-prompt-TOOL-aEvidencedLens-4-2-build-brief.md](../prompts/2026-10-05-prompt-TOOL-aEvidencedLens-4-2-build-brief.md) | journal | — |
+| [2026-10-05-review-TOOL-aEvidencedLens-1-spec-audit-round1.md](../reviews/2026-10-05-review-TOOL-aEvidencedLens-1-spec-audit-round1.md) | spec-audit | TOOL-aEvidencedLens-1 TOOL-aEvidencedLens-2 TOOL-aEvidencedLens-3 TOOL-aEvidencedLens-5 TOOL-aEvidencedLens-6 TOOL-aEvidencedLens-7 TOOL-aEvidencedLens-8 TOOL-aEvidencedLens-9 TOOL-aEvidencedLens-10 TOOL-aEvidencedLens-11 |
 
 <!-- /gen:spec-records -->
 
@@ -38,22 +39,24 @@ that the run-integrity block names and the lenses grade on its consequence.
   `prevBlob` on any subject AND no `priorFindings`, the REVIEW ROUND line reads as a DEGRADED fold
   review that names both absences, and a `WARNING:` line says the same before the first agent. With
   some subjects lacking `prevBlob`, a `WARNING:` line names those paths. The prior-findings line, at
-  round > 1 with none, reads `none supplied for this round-<n> review`. Observed by AC3.
+  round > 1 with none, reads `none supplied for this round-<n> review`. Observed by AC2 and AC3.
 - **S4** — The spec kind's resume probe gains one step: run `git -C <repo> hash-object <path>` for
   each subject and return `blobs`, one `{path, now}` per subject, `now` empty when the command fails.
   The probe reports and judges nothing; the HARNESS compares, and a subject is MOVED when `now` is 40
   hex and does not begin with the pinned `blob`. A subject with no usable `now` is UNCHECKED. The
   `blobs` field is optional in the probe schema, so a probe that omits it reads as every subject
-  unchecked, never as none moved (§8 F2). Observed by AC4.
+  unchecked, never as none moved (§8 F2): a live probe returning a valid object with no `blobs` key
+  is not read through `(probe.blobs || [])` as zero moves. Observed by AC4.
 - **S5** — The acquire sentence stops hard-coding a BLOCKER. A lens still runs `git hash-object` on
   each subject; on a mismatch it reviews the file as it now stands, reads the moved text with
-  `git -C <repo> cat-file -p <blob> | diff -u - <path>` as unreviewed fold text, and reports a defect
+  `git -C <repo> diff <blob> -- <path>`, which anchors every path at `repo` and compares under git's
+  own filters, as unreviewed fold text, and reports a defect
   IN that text as a finding graded by the SEVERITY RUBRIC. The move itself is not a finding. A moved
   subject's SUBJECT line in the brief carries `MOVED since pinned, now <now>`. Observed by AC4.
 - **S6** — The spec kind's RUN INTEGRITY block names every moved subject with its pinned and current
   blob, every unchecked subject, or `move check: the resume probe died` when it did; and at round > 1
   states how many subjects carried `prevBlob`, and DEGRADED when S3's condition holds. A `WARNING:`
-  line names each moved subject before the first lens. Observed by AC4, AC3.
+  line names each moved subject before the first lens. Observed by AC2, AC3 and AC4.
 - **S7** — `prevBlob` joins `inputPrint` as `prevBlobs`, one value per subject in subject order,
   `null` where absent, and only when at least one spec subject carries one. A run carrying none, the
   diff kind included, keeps its print and so its key. `REVIEW_SHAPE` does not move (shared invariant
@@ -77,8 +80,8 @@ that the run-integrity block names and the lenses grade on its consequence.
   args after a subject moved can reuse a lens file that read the earlier text. The move is announced
   by S6 on that run; the reuse itself is the resume probe's existing contract and is not changed here.
 - The skeptic sentence (`TOOL-aEvidencedLens-3`) and the probe policy (`TOOL-aEvidencedLens-2`), both
-  in force before this unit by order. The fold diff and `cat-file` commands are read-only and write
-  nothing, scratch included.
+  in force before this unit by order. The fold diff and moved-text diff commands are read-only and
+  write nothing, scratch included.
 - The kit version (shared invariant 7) and any governance carrier (shared invariant 11).
 
 ### Edges
@@ -89,9 +92,9 @@ that the run-integrity block names and the lenses grade on its consequence.
 
 ### Evidence
 
-Read at `b3950dc7` on 2026-10-05; `tools/workflows/tier2-review.template.js` there differs from BASE
-`3640cf58` only in its version line. Line numbers are PINNED to that read and move as units 1, 2 and
-3 land first; the identifiers do not.
+Read at `b3950dc7` on 2026-10-05, whose `tools/` tree equals BASE `028b5cac`:
+`git diff --stat 028b5cac b3950dc7 -- tools/` prints nothing. Line numbers are PINNED to that read
+and move as units 1, 2 and 3 land first; the identifiers do not.
 
 - The REVIEW ROUND line (`:737`) prints `this is a FOLD review. Aim at the text the previous round's
   fixes introduced` at any spec round > 1, and the prior line (`:747`) prints `none - this is a
@@ -183,8 +186,8 @@ against it. The arms of S9 run once at VERIFYING.
 
 ## 5. Production-readiness checklist
 
-- security — the new commands are `git diff`, `git hash-object` without `-w`, and `git cat-file`
-  piped to `diff`; none writes under `repo`. `prevBlob` reaches a prompt only after `PINNED_SHA`
+- security — the new commands are `git diff` and `git hash-object` without `-w`; none writes under
+  `repo`. `prevBlob` reaches a prompt only after `PINNED_SHA`
   admits it, so it cannot carry a space or a control character.
 - perf / scale — one `hash-object` per subject in the probe, and one diff per subject per lens.
 - error / empty / loading states — a malformed or round-1 `prevBlob` throws before any agent; an
@@ -215,12 +218,13 @@ against it. The arms of S9 run once at VERIFYING.
   `prevBlob` that differs from its blob, one carrying its own blob as `prevBlob`, and one carrying
   none, with one prior finding, every `find:` and `verify:` prompt carries `FOLD DIFF`, the line
   `git -C /tmp/r diff <prevBlob> <blob>` for the first, `unchanged since the previous round` for the
-  second, and `no prevBlob was supplied` for the third; a `WARNING:` log line names the third path.
-  Red when: a line is absent or attached to the wrong subject.
+  second, and `no prevBlob was supplied` for the third; a `WARNING:` log line names the third path;
+  and the `synth` prompt's RUN INTEGRITY block says `2 of 3` subjects carried `prevBlob`.
+  Red when: a line is absent or attached to the wrong subject, or the count is absent or wrong.
 - **AC3** — When the driver runs a spec review at round 2 with no `prevBlob` and no `priorFindings`,
-  no prompt carries `first-round review`, every `find:` prompt carries `DEGRADED fold review`, a
-  `WARNING:` line says so before the first `find:` agent, and the `synth` prompt's RUN INTEGRITY block
-  says DEGRADED. The same run at round 1 carries `first-round review` and no `DEGRADED`, and in its
+  no prompt carries `first-round review`, every `find:` prompt carries `DEGRADED fold review` and
+  `none supplied for this round-2 review`, a `WARNING:` line says so before the first `find:` agent,
+  and the `synth` prompt's RUN INTEGRITY block says DEGRADED. The same run at round 1 carries `first-round review` and no `DEGRADED`, and in its
   `find:` prompts the text from `REVIEW ROUND:` through the `PRIOR ROUND'S FINDINGS` line is
   byte-identical to the same slice under `pre-u4.js` with the same args.
   Red when: the round-2 brief still says first-round, the degradation is silent, or round 1 moved.
@@ -228,9 +232,14 @@ against it. The arms of S9 run once at VERIFYING.
   the pinned blob for one subject and an empty `now` for another, a `WARNING:` line names the moved
   path with both hashes, each `find:` prompt's SUBJECT line for it carries `MOVED since pinned`, and
   the `synth` RUN INTEGRITY block names the moved and the unchecked subject; when the probe stub
-  returns null, RUN INTEGRITY says `the resume probe died`. No prompt in any of these runs carries
-  `as a BLOCKER finding`, and every spec `find:` prompt carries `diff -u - ` and `SEVERITY RUBRIC`.
-  Red when: a move is silent, a dead probe reads as no move, or the fixed BLOCKER survives.
+  returns null, RUN INTEGRITY says `the resume probe died`; when the probe stub returns a valid
+  object carrying no `blobs` key, RUN INTEGRITY names every subject as unchecked and does not say
+  `the resume probe died`. No prompt in any of these runs carries `as a BLOCKER finding` or
+  `diff -u - `, and every spec `find:` prompt carries `diff <blob> -- <path>` and `SEVERITY RUBRIC`.
+  The traced spec-kind `resume:probe` prompt carries `hash-object` and each subject path, and its
+  schema lists `blobs` among its properties and not in `required`.
+  Red when: a move is silent, a dead probe or an absent `blobs` key reads as no move, the probe is
+  never asked for the hashes, or the fixed BLOCKER survives.
 - **AC5** — When the driver runs two round-2 spec reviews identical except for one subject's
   `prevBlob`, their returned `key` values differ; the same diff-kind args, and the same round-1 spec
   args carrying no `prevBlob`, return the same `key` over `pre-u4.js` and the new render.
@@ -284,6 +293,12 @@ version bump at the close (shared invariant 7).
 
 - rev-1 · 2026-10-05 · initial draft, from the build's shared spec brief, unit 4, and the harness
   template read at `b3950dc7`.
+- rev-2 · 2026-10-05 · §3 §4 §5 S3 S4 S5 S6 AC2 AC3 AC4 · round-1 spec audit fold. Id 2 (MEDIUM): AC4
+  reads the spec `resume:probe` prompt for `hash-object` and the probe schema for an optional
+  `blobs`. Id 3 (MEDIUM): S4 and AC4 cover a live probe object with no `blobs` key. Id 4 (LOW): AC3
+  asserts the `none supplied for this round-2 review` line and AC2 the `2 of 3` count. Id 44 (LOW):
+  S5's moved-text read is `git -C <repo> diff <blob> -- <path>`, not a cwd-dependent pipe. Id 34
+  (LOW, its unit-4 half): base 3640cf58 becomes 028b5cac, with §4 Evidence restated against it.
 
 ## 10. Reuse audit
 
