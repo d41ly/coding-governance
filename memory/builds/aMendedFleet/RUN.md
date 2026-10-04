@@ -10,8 +10,8 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 
 ## Run facts
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: af449c0bb7023be7ebc6e1abfccec4a25d831b90
-phase: SPECCING
+witness: 0c1b078160d534884082f13029fd4ba86de23846
+phase: BUILDING
 branch-sha: 7af5f564641d231f8b78f6b183dde1b6bf53111d
 branch-ref: refs/heads/branch/coding-governance-review-1460c9
 may: none
@@ -78,3 +78,5 @@ base: 7af5f564641d231f8b78f6b183dde1b6bf53111d
 2026-10-04T20:15:16Z rescope · item add KICK-aMendedFleet-4 · reason split from KICK-aMendedFleet-2 at its F1: the stale-CLI note is a second card line with its own reader
 
 2026-10-04T20:15:19Z rescope · item add PLAY-aMendedFleet-4 · reason split from PLAY-aMendedFleet-1 at its F1: the registry dedup is a separate edit from the wrapper trim
+
+2026-10-04T20:58:20Z brief · item TOOL-aMendedFleet-1 · reason ca9f6d277d8a memory/builds/aMendedFleet/prompts/2026-10-04-prompt-TOOL-aMendedFleet-1-4-build-brief.md
