@@ -74,7 +74,7 @@ self-heals go unreported. The owner's prompt and the review are in `prompts/`.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 14 unit(s) · node a · opened 2026-10-04 · streams tooling+kickoff
+**Build status:** SPECCED · 15 unit(s) · node a · opened 2026-10-04 · streams tooling+kickoff
 ids TOOL-aGraftedHelix-1 TOOL-aGraftedHelix-2 TOOL-aGraftedHelix-3 TOOL-aGraftedHelix-4 TOOL-aGraftedHelix-5 TOOL-aGraftedHelix-6 TOOL-aGraftedHelix-7 TOOL-aGraftedHelix-8 TOOL-aGraftedHelix-9 TOOL-aGraftedHelix-10 TOOL-aGraftedHelix-11 TOOL-aGraftedHelix-12 TOOL-aGraftedHelix-13
 ids TOOL-aGraftedHelix-14 TOOL-aGraftedHelix-15
 
@@ -95,13 +95,14 @@ ids TOOL-aGraftedHelix-14 TOOL-aGraftedHelix-15
 | [TOOL-aGraftedHelix-5 — each leg reading is stamped faithful or contended by a foreign-load census, and only faithful readings argue a ceiling](spec/2026-10-04-spec-TOOL-aGraftedHelix-5.md) | 7 | 2 | SPECCED | rev-2 | 2026-10-04 |
 | [TOOL-aGraftedHelix-7 — the gate runner stops dispatching legs above a declared memory fraction and records the pause](spec/2026-10-04-spec-TOOL-aGraftedHelix-7.md) | 8 | 2 | SPECCED | rev-2 | 2026-10-04 |
 | [TOOL-aGraftedHelix-8 — every automatic self-heal appends one line to a health log the orientation card counts](spec/2026-10-04-spec-TOOL-aGraftedHelix-8.md) | 9 | 1 | SPECCED | rev-2 | 2026-10-04 |
+| [TOOL-aGraftedHelix-15 — the build harness commits the specs its writers authored before AUDIT pins them, and its commit-first refusals name a remedy a resume cannot replay](spec/2026-10-04-spec-TOOL-aGraftedHelix-15.md) | 10 | 1 | SPECCED | rev-1 | 2026-10-04 |
 <!-- /gen:build-units -->
 
-Records: 4 bound to this build, across 3 record folder(s).
+Records: 5 bound to this build, across 3 record folder(s).
 
-Ids no record names: TOOL-aGraftedHelix-10 TOOL-aGraftedHelix-11 TOOL-aGraftedHelix-12 TOOL-aGraftedHelix-13 TOOL-aGraftedHelix-14.
+Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-aGraftedHelix-10 TOOL-aGraftedHelix-11 TOOL-aGraftedHelix-12 TOOL-aGraftedHelix-13 TOOL-aGraftedHelix-14.
+Ids no `spec-audit` record has ever named: TOOL-aGraftedHelix-10 TOOL-aGraftedHelix-11 TOOL-aGraftedHelix-12 TOOL-aGraftedHelix-13 TOOL-aGraftedHelix-14 TOOL-aGraftedHelix-15.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -117,6 +118,7 @@ Ids no `spec-audit` record has ever named: TOOL-aGraftedHelix-10 TOOL-aGraftedHe
 | 7 | `TOOL-aGraftedHelix-13`, `TOOL-aGraftedHelix-5` | yes |
 | 8 | `TOOL-aGraftedHelix-7` | no |
 | 9 | `TOOL-aGraftedHelix-8` | no |
+| 10 | `TOOL-aGraftedHelix-15` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
