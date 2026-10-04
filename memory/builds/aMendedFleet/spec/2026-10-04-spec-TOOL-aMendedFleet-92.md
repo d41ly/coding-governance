@@ -244,11 +244,10 @@ New arm: `tools/drift-audit/selftest.py` · node d's `test_fleet_over_budget`: n
   record against zero, the parser ignores the field, and a reader of a green bar learns the rule
   from it.
   RESOLVED (agent, 2026-10-04, delegated): `budget 0 per run`, per S1.
-
-- **F4 — Does the fleet reader keep node d's single git dir, or read every git dir of the clone?**
+- **F4** — Does the fleet reader keep node d's single git dir, or read every git dir of the clone?
   Options: keep node d's bytes and state that a fresh linked worktree reads DEAD; reuse unit 59's
   `read_git_dirs`, as its sibling `legs_retried_after_timeout` does, and give up byte identity there.
-  RESOLVED (main loop, 2026-10-04, delegated, M3 most feature-rich): reuse `read_git_dirs`.
+  RESOLVED (agent, 2026-10-04, delegated): reuse `read_git_dirs`, the most feature-rich option (M3).
 
 ## 9. Revision log
 

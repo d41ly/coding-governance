@@ -164,7 +164,7 @@ and every red leg fixed. The prompt, the owner's four answers and the report are
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 97 unit(s) · node a · opened 2026-10-04 · streams tooling+kickoff+playbook
+**Build status:** SPECCED · 106 unit(s) · node a · opened 2026-10-04 · streams tooling+kickoff+playbook
 ids KICK-aMendedFleet-1 KICK-aMendedFleet-2 KICK-aMendedFleet-3 KICK-aMendedFleet-4 PLAY-aMendedFleet-1 PLAY-aMendedFleet-2 PLAY-aMendedFleet-3 PLAY-aMendedFleet-4 TOOL-aMendedFleet-1 TOOL-aMendedFleet-2 TOOL-aMendedFleet-3 TOOL-aMendedFleet-4 TOOL-aMendedFleet-5 TOOL-aMendedFleet-6
 ids TOOL-aMendedFleet-7 TOOL-aMendedFleet-8 TOOL-aMendedFleet-9 TOOL-aMendedFleet-10 TOOL-aMendedFleet-11 TOOL-aMendedFleet-12 TOOL-aMendedFleet-13 TOOL-aMendedFleet-14 TOOL-aMendedFleet-15 TOOL-aMendedFleet-16 TOOL-aMendedFleet-17 TOOL-aMendedFleet-18 TOOL-aMendedFleet-19 TOOL-aMendedFleet-20
 ids TOOL-aMendedFleet-21 TOOL-aMendedFleet-22 TOOL-aMendedFleet-23 TOOL-aMendedFleet-24 TOOL-aMendedFleet-25 TOOL-aMendedFleet-26 TOOL-aMendedFleet-27 TOOL-aMendedFleet-28 TOOL-aMendedFleet-29 TOOL-aMendedFleet-30 TOOL-aMendedFleet-31 TOOL-aMendedFleet-32 TOOL-aMendedFleet-33 TOOL-aMendedFleet-34
@@ -274,6 +274,15 @@ ids TOOL-aMendedFleet-96 TOOL-aMendedFleet-97 TOOL-aMendedFleet-98 TOOL-aMendedF
 | [TOOL-aMendedFleet-94 — the wrapper's product-only prose loads from a path-scoped rule when a session opens a product file](spec/2026-10-04-spec-TOOL-aMendedFleet-94.md) | 95 | 2 | SPECCED | rev-2 | 2026-10-04 |
 | [KICK-aMendedFleet-4 — the orientation card notes a PATH CLI older than the running session](spec/2026-10-04-spec-KICK-aMendedFleet-4.md) | 96 | 1 | SPECCED | rev-2 | 2026-10-04 |
 | [PLAY-aMendedFleet-4 — the `AGENTS.md` wrapper carries one node registry](spec/2026-10-04-spec-PLAY-aMendedFleet-4.md) | 97 | 1 | SPECCED | rev-2 | 2026-10-04 |
+| [TOOL-aMendedFleet-97 — held-red C1: the kits' Python stdio is UTF-8 on a host whose code page is cp1252](spec/2026-10-05-spec-TOOL-aMendedFleet-97.md) | 98 | 1 | SPECCED | rev-1 | 2026-10-05 |
+| [TOOL-aMendedFleet-98 — held-red C2: a Python suite's `bash` resolves to Git-Bash, never the System32 WSL launcher](spec/2026-10-05-spec-TOOL-aMendedFleet-98.md) | 99 | 1 | SPECCED | rev-1 | 2026-10-05 |
+| [TOOL-aMendedFleet-99 — the held job runs its suites from the tree path the bar job uses](spec/2026-10-05-spec-TOOL-aMendedFleet-99.md) | 100 | 1 | SPECCED | rev-1 | 2026-10-05 |
+| [TOOL-aMendedFleet-100 — the shard 2/8 fixture's bare origin commits under its own git identity](spec/2026-10-05-spec-TOOL-aMendedFleet-100.md) | 101 | 1 | SPECCED | rev-1 | 2026-10-05 |
+| [TOOL-aMendedFleet-101 — the G0 grant fixture writes the `may:` path its own assertions read](spec/2026-10-05-spec-TOOL-aMendedFleet-101.md) | 102 | 1 | SPECCED | rev-1 | 2026-10-05 |
+| [TOOL-aMendedFleet-102 — the two drifted inline `resolve_kit_dir` copies match their canonical source](spec/2026-10-05-spec-TOOL-aMendedFleet-102.md) | 103 | 1 | SPECCED | rev-1 | 2026-10-05 |
+| [TOOL-aMendedFleet-103 — the hygiene suite's python-parity arm exempts `GRAMMAR_WHERE` beside `GRAMMAR_DIR`](spec/2026-10-05-spec-TOOL-aMendedFleet-103.md) | 104 | 1 | SPECCED | rev-1 | 2026-10-05 |
+| [TOOL-aMendedFleet-104 — the foreign-prefix leg declares `review-replay selftest` a whole run](spec/2026-10-05-spec-TOOL-aMendedFleet-104.md) | 105 | 1 | SPECCED | rev-1 | 2026-10-05 |
+| [TOOL-aMendedFleet-105 — the reaper's verification settles, so a member dying as it is signalled is not a survivor](spec/2026-10-05-spec-TOOL-aMendedFleet-105.md) | 106 | 1 | SPECCED | rev-1 | 2026-10-05 |
 <!-- /gen:build-units -->
 
 Records: 10 bound to this build, across 3 record folder(s).
@@ -284,7 +293,8 @@ TOOL-aMendedFleet-29 TOOL-aMendedFleet-30 TOOL-aMendedFleet-31 TOOL-aMendedFleet
 TOOL-aMendedFleet-42 TOOL-aMendedFleet-43 TOOL-aMendedFleet-44 TOOL-aMendedFleet-45 TOOL-aMendedFleet-46 TOOL-aMendedFleet-47 TOOL-aMendedFleet-48 TOOL-aMendedFleet-49 TOOL-aMendedFleet-5 TOOL-aMendedFleet-50 TOOL-aMendedFleet-51 TOOL-aMendedFleet-52 TOOL-aMendedFleet-53 TOOL-aMendedFleet-54
 TOOL-aMendedFleet-55 TOOL-aMendedFleet-56 TOOL-aMendedFleet-57 TOOL-aMendedFleet-58 TOOL-aMendedFleet-59 TOOL-aMendedFleet-6 TOOL-aMendedFleet-60 TOOL-aMendedFleet-61 TOOL-aMendedFleet-62 TOOL-aMendedFleet-63 TOOL-aMendedFleet-64 TOOL-aMendedFleet-65 TOOL-aMendedFleet-66 TOOL-aMendedFleet-67
 TOOL-aMendedFleet-68 TOOL-aMendedFleet-69 TOOL-aMendedFleet-70 TOOL-aMendedFleet-71 TOOL-aMendedFleet-72 TOOL-aMendedFleet-73 TOOL-aMendedFleet-74 TOOL-aMendedFleet-75 TOOL-aMendedFleet-8 TOOL-aMendedFleet-81 TOOL-aMendedFleet-82 TOOL-aMendedFleet-83 TOOL-aMendedFleet-84 TOOL-aMendedFleet-85
-TOOL-aMendedFleet-86 TOOL-aMendedFleet-87 TOOL-aMendedFleet-88 TOOL-aMendedFleet-89 TOOL-aMendedFleet-9 TOOL-aMendedFleet-90 TOOL-aMendedFleet-91 TOOL-aMendedFleet-92 TOOL-aMendedFleet-93 TOOL-aMendedFleet-94.
+TOOL-aMendedFleet-86 TOOL-aMendedFleet-87 TOOL-aMendedFleet-88 TOOL-aMendedFleet-89 TOOL-aMendedFleet-9 TOOL-aMendedFleet-90 TOOL-aMendedFleet-91 TOOL-aMendedFleet-92 TOOL-aMendedFleet-93 TOOL-aMendedFleet-94 TOOL-aMendedFleet-100 TOOL-aMendedFleet-101 TOOL-aMendedFleet-102 TOOL-aMendedFleet-103
+TOOL-aMendedFleet-104 TOOL-aMendedFleet-105 TOOL-aMendedFleet-97 TOOL-aMendedFleet-98 TOOL-aMendedFleet-99.
 
 Ids no `spec-audit` record has ever named: KICK-aMendedFleet-1 KICK-aMendedFleet-2 KICK-aMendedFleet-3 KICK-aMendedFleet-4 PLAY-aMendedFleet-1 PLAY-aMendedFleet-2 PLAY-aMendedFleet-3 PLAY-aMendedFleet-4 TOOL-aMendedFleet-1 TOOL-aMendedFleet-10 TOOL-aMendedFleet-11 TOOL-aMendedFleet-12
 TOOL-aMendedFleet-13 TOOL-aMendedFleet-14 TOOL-aMendedFleet-15 TOOL-aMendedFleet-16 TOOL-aMendedFleet-17 TOOL-aMendedFleet-18 TOOL-aMendedFleet-19 TOOL-aMendedFleet-2 TOOL-aMendedFleet-20 TOOL-aMendedFleet-21 TOOL-aMendedFleet-22 TOOL-aMendedFleet-23 TOOL-aMendedFleet-24 TOOL-aMendedFleet-25
@@ -293,7 +303,7 @@ TOOL-aMendedFleet-39 TOOL-aMendedFleet-4 TOOL-aMendedFleet-40 TOOL-aMendedFleet-
 TOOL-aMendedFleet-51 TOOL-aMendedFleet-52 TOOL-aMendedFleet-53 TOOL-aMendedFleet-54 TOOL-aMendedFleet-55 TOOL-aMendedFleet-56 TOOL-aMendedFleet-57 TOOL-aMendedFleet-58 TOOL-aMendedFleet-59 TOOL-aMendedFleet-6 TOOL-aMendedFleet-60 TOOL-aMendedFleet-61 TOOL-aMendedFleet-62 TOOL-aMendedFleet-63
 TOOL-aMendedFleet-64 TOOL-aMendedFleet-65 TOOL-aMendedFleet-66 TOOL-aMendedFleet-67 TOOL-aMendedFleet-68 TOOL-aMendedFleet-69 TOOL-aMendedFleet-7 TOOL-aMendedFleet-70 TOOL-aMendedFleet-71 TOOL-aMendedFleet-72 TOOL-aMendedFleet-73 TOOL-aMendedFleet-74 TOOL-aMendedFleet-75 TOOL-aMendedFleet-8
 TOOL-aMendedFleet-81 TOOL-aMendedFleet-82 TOOL-aMendedFleet-83 TOOL-aMendedFleet-84 TOOL-aMendedFleet-85 TOOL-aMendedFleet-86 TOOL-aMendedFleet-87 TOOL-aMendedFleet-88 TOOL-aMendedFleet-89 TOOL-aMendedFleet-9 TOOL-aMendedFleet-90 TOOL-aMendedFleet-91 TOOL-aMendedFleet-92 TOOL-aMendedFleet-93
-TOOL-aMendedFleet-94.
+TOOL-aMendedFleet-94 TOOL-aMendedFleet-100 TOOL-aMendedFleet-101 TOOL-aMendedFleet-102 TOOL-aMendedFleet-103 TOOL-aMendedFleet-104 TOOL-aMendedFleet-105 TOOL-aMendedFleet-97 TOOL-aMendedFleet-98 TOOL-aMendedFleet-99.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -397,6 +407,15 @@ TOOL-aMendedFleet-94.
 | 95 | `TOOL-aMendedFleet-94` | no |
 | 96 | `KICK-aMendedFleet-4` | no |
 | 97 | `PLAY-aMendedFleet-4` | no |
+| 98 | `TOOL-aMendedFleet-97` | no |
+| 99 | `TOOL-aMendedFleet-98` | no |
+| 100 | `TOOL-aMendedFleet-99` | no |
+| 101 | `TOOL-aMendedFleet-100` | no |
+| 102 | `TOOL-aMendedFleet-101` | no |
+| 103 | `TOOL-aMendedFleet-102` | no |
+| 104 | `TOOL-aMendedFleet-103` | no |
+| 105 | `TOOL-aMendedFleet-104` | no |
+| 106 | `TOOL-aMendedFleet-105` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
