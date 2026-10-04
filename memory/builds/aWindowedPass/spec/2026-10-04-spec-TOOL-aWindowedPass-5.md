@@ -9,6 +9,7 @@
 | [2026-10-04-build-TOOL-aWindowedPass-5-1-acceptance-ledger.md](../build/2026-10-04-build-TOOL-aWindowedPass-5-1-acceptance-ledger.md) | journal | — |
 | [2026-10-04-prompt-TOOL-aWindowedPass-5-2-build-brief.md](../prompts/2026-10-04-prompt-TOOL-aWindowedPass-5-2-build-brief.md) | journal | — |
 | [2026-10-04-review-TOOL-aWindowedPass-1-2-3-4-5-closing-diff-round1.md](../reviews/2026-10-04-review-TOOL-aWindowedPass-1-2-3-4-5-closing-diff-round1.md) | diff-review | TOOL-aWindowedPass-1 TOOL-aWindowedPass-2 TOOL-aWindowedPass-3 TOOL-aWindowedPass-4 |
+| [2026-10-04-review-TOOL-aWindowedPass-1-2-3-4-5-closing-diff-round2.md](../reviews/2026-10-04-review-TOOL-aWindowedPass-1-2-3-4-5-closing-diff-round2.md) | diff-review | TOOL-aWindowedPass-1 TOOL-aWindowedPass-2 TOOL-aWindowedPass-3 TOOL-aWindowedPass-4 |
 
 <!-- /gen:spec-records -->
 

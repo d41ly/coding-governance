@@ -52,3 +52,7 @@ base: 886b089dfd9c4bf98dc2024e21d7d9607f9b5cc0
 2026-10-03T23:14:11Z dispatch · item 7ab7ae53 TOOL-aWindowedPass-3 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/lib-unattended.sh tools/unattended/check-unattended.sh tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md tools/unattended/README.md tools/unattended/SKILL.template.md .claude/skills/unattended/SKILL.md .githooks/commit-msg memory/builds/aWindowedPass/spec/2026-10-04-spec-TOOL-aWindowedPass-3.md memory/builds/aWindowedPass/README.md
 
 2026-10-03T23:52:34Z review · item aWindowedPass · reason verdict BLOCKED · blockers 3
+
+2026-10-04T01:21:20Z review · item aWindowedPass · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · disposition promote
+
+2026-10-04T01:21:32Z rescope · item add TOOL-aWindowedPass-6 · reason closing review round 2 HIGH (id 8) with its MEDIUM twin (id 4): an amend of a pass commit is told to widen with --dispatch, which check 23 does not honour; promoted per the severity rule

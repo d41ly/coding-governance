@@ -5,7 +5,7 @@ opened: 2026-10-04
 streams: tooling
 roster: TOOL
 authorized-by: prompt
-ids: TOOL-aWindowedPass-1 TOOL-aWindowedPass-2 TOOL-aWindowedPass-3 TOOL-aWindowedPass-4 TOOL-aWindowedPass-5
+ids: TOOL-aWindowedPass-1 TOOL-aWindowedPass-2 TOOL-aWindowedPass-3 TOOL-aWindowedPass-4 TOOL-aWindowedPass-5 TOOL-aWindowedPass-6
 ---
 
 # aWindowedPass — check 23 grades the disjointness it exists for, and nothing else
@@ -54,12 +54,13 @@ here and at adopters hold or abort. The owner's prompt is in `prompts/`.
 | 3 | `TOOL-aWindowedPass-3` | 2 | a pre-commit step refuses an undeclared write of an open pass, naming the re-declare |
 | 4 | `TOOL-aWindowedPass-4` | 2 | kits declare their generated outputs, and check 23 and `--dispatch` read the declarations |
 | 5 | `TOOL-aWindowedPass-5` | 2 | each run is graded against zero; the repo-global ceiling is retired |
+| 6 | `TOOL-aWindowedPass-6` | 2 | an amend of a committed pass is refused without a widening the close would not honour |
 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 5 unit(s) · node a · opened 2026-10-04 · streams tooling
-ids TOOL-aWindowedPass-1 TOOL-aWindowedPass-2 TOOL-aWindowedPass-3 TOOL-aWindowedPass-4 TOOL-aWindowedPass-5
+**Build status:** OPEN · 6 unit(s) · node a · opened 2026-10-04 · streams tooling
+ids TOOL-aWindowedPass-1 TOOL-aWindowedPass-2 TOOL-aWindowedPass-3 TOOL-aWindowedPass-4 TOOL-aWindowedPass-5 TOOL-aWindowedPass-6
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -69,13 +70,14 @@ ids TOOL-aWindowedPass-1 TOOL-aWindowedPass-2 TOOL-aWindowedPass-3 TOOL-aWindowe
 | [TOOL-aWindowedPass-1 — check 23 counts only a pass whose window overlapped a sibling pass's](spec/2026-10-04-spec-TOOL-aWindowedPass-1.md) | 3 | 2 | CLOSED | rev-3 | 2026-10-04 |
 | [TOOL-aWindowedPass-5 — each run is graded against zero; the repo-global ceiling is retired](spec/2026-10-04-spec-TOOL-aWindowedPass-5.md) | 4 | 2 | CLOSED | rev-3 | 2026-10-04 |
 | [TOOL-aWindowedPass-3 — a commit-time step refuses an open pass's undeclared write, naming the re-declare](spec/2026-10-04-spec-TOOL-aWindowedPass-3.md) | 5 | 2 | CLOSED | rev-3 | 2026-10-04 |
+| [TOOL-aWindowedPass-6 — an amend of a committed pass is refused without a widening the close would not honour](spec/2026-10-04-spec-TOOL-aWindowedPass-6.md) | 6 | 2 | OPEN | rev-1 | 2026-10-04 |
 <!-- /gen:build-units -->
 
-Records: 12 bound to this build, across 4 record folder(s).
+Records: 14 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-aWindowedPass-1 TOOL-aWindowedPass-2 TOOL-aWindowedPass-3 TOOL-aWindowedPass-4 TOOL-aWindowedPass-5.
+Ids no `spec-audit` record has ever named: TOOL-aWindowedPass-1 TOOL-aWindowedPass-2 TOOL-aWindowedPass-3 TOOL-aWindowedPass-4 TOOL-aWindowedPass-5 TOOL-aWindowedPass-6.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -87,6 +89,7 @@ Ids no `spec-audit` record has ever named: TOOL-aWindowedPass-1 TOOL-aWindowedPa
 | 3 | `TOOL-aWindowedPass-1` | no |
 | 4 | `TOOL-aWindowedPass-5` | no |
 | 5 | `TOOL-aWindowedPass-3` | no |
+| 6 | `TOOL-aWindowedPass-6` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
