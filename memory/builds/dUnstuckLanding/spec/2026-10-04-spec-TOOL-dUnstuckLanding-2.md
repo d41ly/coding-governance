@@ -6,6 +6,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-04-build-TOOL-dUnstuckLanding-1-census.md](../build/2026-10-04-build-TOOL-dUnstuckLanding-1-census.md) | research | TOOL-dUnstuckLanding-1 |
 | [2026-10-04-prompt-TOOL-dUnstuckLanding-1-0-run-mandate.md](../prompts/2026-10-04-prompt-TOOL-dUnstuckLanding-1-0-run-mandate.md) | journal | TOOL-dUnstuckLanding-1 |
 
 <!-- /gen:spec-records -->

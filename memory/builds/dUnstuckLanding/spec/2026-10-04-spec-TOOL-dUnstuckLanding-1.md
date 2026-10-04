@@ -1,12 +1,15 @@
 # TOOL-dUnstuckLanding-1 — the closing-time failure census across gov, inCMS and NicoCares
 
-**Status:** INPROGRESS · rev-1 · 2026-10-04 · node d · Tier-1 · base a587e82d · streams tooling · order 1
+**Status:** CLOSED · rev-1 · 2026-10-04 · node d · Tier-1 · base a587e82d · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-04-build-TOOL-dUnstuckLanding-1-1-acceptance-ledger.md](../build/2026-10-04-build-TOOL-dUnstuckLanding-1-1-acceptance-ledger.md) | journal | — |
+| [2026-10-04-build-TOOL-dUnstuckLanding-1-census.md](../build/2026-10-04-build-TOOL-dUnstuckLanding-1-census.md) | research | TOOL-dUnstuckLanding-2 |
 | [2026-10-04-prompt-TOOL-dUnstuckLanding-1-0-run-mandate.md](../prompts/2026-10-04-prompt-TOOL-dUnstuckLanding-1-0-run-mandate.md) | journal | TOOL-dUnstuckLanding-2 |
+| [2026-10-04-prompt-TOOL-dUnstuckLanding-1-build-brief.md](../prompts/2026-10-04-prompt-TOOL-dUnstuckLanding-1-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
 

@@ -10,8 +10,8 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 
 ## Run facts
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 0c16a66b53c9fd809ca198b612a23c62132edcc0
-phase: RUNNING
+witness: 2e793a3bc6b7762083020a4812687af9e3513a05
+phase: RESEARCHING
 branch-sha: 0c16a66b53c9fd809ca198b612a23c62132edcc0
 branch-ref: refs/heads/branch/unattended-build-closing-f90fd9
 may: none
@@ -30,3 +30,5 @@ anchor-ref: refs/heads/main
 base: 0c16a66b53c9fd809ca198b612a23c62132edcc0
 
 ## Parked
+
+2026-10-04T08:58:35Z brief · item TOOL-dUnstuckLanding-1 · reason 35135466c91b memory/builds/dUnstuckLanding/prompts/2026-10-04-prompt-TOOL-dUnstuckLanding-1-build-brief.md
