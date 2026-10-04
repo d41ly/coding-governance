@@ -1,11 +1,12 @@
 # TOOL-dUnstuckLanding-19 — refresh before a verdict: one helper, the `refreshed-at` fact
 
-**Status:** INPROGRESS · rev-1 · 2026-10-04 · node d · Tier-2 · base 98926870 · streams tooling · order 7 · closes TOOL-dUnstuckLanding-9
+**Status:** CLOSED · rev-2 · 2026-10-04 · node d · Tier-2 · base 98926870 · streams tooling · order 7 · closes TOOL-dUnstuckLanding-9
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-04-build-TOOL-dUnstuckLanding-19-1-acceptance-ledger.md](../build/2026-10-04-build-TOOL-dUnstuckLanding-19-1-acceptance-ledger.md) | journal | — |
 | [2026-10-04-prompt-TOOL-dUnstuckLanding-13-build-brief.md](../prompts/2026-10-04-prompt-TOOL-dUnstuckLanding-13-build-brief.md) | journal | TOOL-dUnstuckLanding-13 TOOL-dUnstuckLanding-14 TOOL-dUnstuckLanding-15 TOOL-dUnstuckLanding-16 TOOL-dUnstuckLanding-17 TOOL-dUnstuckLanding-18 TOOL-dUnstuckLanding-20 |
 | [2026-10-04-prompt-TOOL-dUnstuckLanding-13-spec-brief.md](../prompts/2026-10-04-prompt-TOOL-dUnstuckLanding-13-spec-brief.md) | journal | TOOL-dUnstuckLanding-13 TOOL-dUnstuckLanding-14 TOOL-dUnstuckLanding-15 TOOL-dUnstuckLanding-16 TOOL-dUnstuckLanding-17 TOOL-dUnstuckLanding-18 TOOL-dUnstuckLanding-20 |
 
@@ -21,8 +22,8 @@ a stale verdict is visible in the record instead of to the next person who trips
 
 ## 2. Scope (IN)
 
-- **S1 — the helper.** One function in `tools/unattended/unattended.sh`, named `refresh_tip` at
-  build time unless the lexicon gate refuses the verb (then the name `--suggest` returns). It takes
+- **S1 — the helper.** One function in `tools/unattended/unattended.sh`, named `derive_refreshed_at`,
+  because the lexicon's closed verb table holds no `refresh` and `--suggest` returned no name. It takes
   the run-state file, the slug and the calling verb's name. It never calls `fail`, never writes, and
   never touches the global `status`. It sets one global, the fact value, for the caller to write.
   Observed by AC1, AC2, AC5, AC6, AC8.
@@ -114,7 +115,7 @@ helper.
 ### Inventory
 
 - The helper function (S1). Its name is graded by the lexicon gate's shell cell; ask
-  `python3 tools/lexicon/lexicon.py --suggest refresh_tip --as <cell>` before writing it.
+  `python3 tools/lexicon/lexicon.py --suggest <name> --as sh.function` before writing it.
 - The fact key `refreshed-at`.
 - No new `fail` branch, so no arm or unarmed-branches row is owed for one.
 
@@ -196,7 +197,7 @@ startup reads; the builder adds what it refuses on.
 - **AC7** — When `--close fx` runs under `LANDER_MODE=in-place` in a copy of F whose DoD has an
   unmet item, stdout carries no `refresh —` line.
   Red when: the in-place close prints one.
-- **AC8** — When `awk '/^refresh_tip\(\)/,/^}/' tools/unattended/unattended.sh` slices the helper,
+- **AC8** — When `awk '/^derive_refreshed_at\(\)/,/^}/' tools/unattended/unattended.sh` slices the helper,
   a `grep -cE '^[[:space:]]*(fail [0-9]|set_fact |park )'` over the slice prints `0`.
   Red when: the helper calls `fail`, writes a fact, or parks.
 - **AC9** — When `grep -n 'refreshed-at' tools/unattended/PROTOCOL.template.md tools/unattended/VERBS.template.md`
@@ -234,6 +235,12 @@ New arm: tools/unattended/unattended.test.sh · an in-place close over the same 
 ## 9. Revision log
 
 - rev-1 · 2026-10-04 · initial draft, from design section 6 at rev-2 and ask `TOOL-dUnstuckLanding-9`.
+- rev-2 · 2026-10-04 · at build. The helper's name: the lexicon refused the verb refresh and its
+  suggest offered none, so S1 and AC8 name `derive_refreshed_at`, which sets a derived value and
+  prints. Two edges the flow did not state: a record with no Run facts section prints one line and
+  records no fact, since `set_fact` would refuse there and the verb must not stop; and a tip taken
+  from an anchor this process observed is object-tested here, since the quiet observer skips that
+  test for a reused anchor. Status CLOSED.
 
 ## 10. Reuse audit
 

@@ -12766,6 +12766,127 @@ out=$(run --close tCarry)
 hit  "$out" "$CF_UNMET"
 hit  "$out" "a DEFERRED unit has no \`rescope · item defer\` row in the run-state file, so the deferral was never declared where the wrap-up surfaces it; record it with --rescope tCarry --act defer --item ARCH-tCarry-2"
 reset_tree
+
+# ============================ TOOL-dUnstuckLanding-19 — refresh before a verdict, `refreshed-at` ====
+# ---- SELF-CONTAINED, for the settle block's reason: every arm moves the remote's main three commits
+# ---- past the run's HEAD from a second clone, one touching the build README, one the path the
+# ---- record's one `dispatch` row declares, one neither, so two of three touch. A fresh scratch repo
+# ---- per arm, `primary` landing, both attested items recorded; `build_rx_fixture no` leaves the
+# ---- three commits unfetched, so the tip is advertised and absent here. The suffix keeps each arm's
+# ---- commits distinct from every earlier arm's, so an unfetched tip is never present by accident.
+rx_root=$(mktemp -d); rx_seq=0
+run_rx() { ( cd "$rx_root/repo" && env -u GATE_SELFTESTS GOV_DEFAULT_BRANCH=main bash "$SCRIPT" "$@" 2>&1 ); }
+run_rx_git() { git -C "$rx_root/repo" "$@"; }
+read_rx_fact() { sed -n "s/^$1: //p" "$rx_root/repo/memory/builds/tRx/RUN.md" | head -1; }
+build_rx_fixture() { # fetch: yes|no -> RX_TIP, the remote's main after the three commits
+  rx_seq=$((rx_seq + 1))
+  rm -rf "$rx_root/repo" "$rx_root/origin.git" "$rx_root/other"; mkdir -p "$rx_root/repo"
+  git init -q --bare "$rx_root/origin.git"
+  git --git-dir="$rx_root/origin.git" symbolic-ref HEAD refs/heads/main
+  (
+    cd "$rx_root/repo" || exit 2
+    git init -q -b main . && git config user.email t@t.test && git config user.name t \
+      && git config core.autocrlf false
+    git remote add origin "$rx_root/origin.git"
+    mkdir -p memory/guides memory/builds/tRx work
+    printf '# build method\n' > memory/guides/BUILD-METHOD.md
+    printf 'MEMORY_ROOT=memory\nUNITS_REGION_CUTOFF="2026-08-19"\nLANDER="echo land"\nLANDER_MODE="primary"\nSELFTESTS_OWED_PATHS=""\nBYPASS_BAN="--no-verify"\nGATE_CMD="true"\nGATE_BOUND="600"\nGATE_WALL="21600"\nUNIT_STALL_BOUND="1800"\nREVIEW_ROUNDS="7"\nWIRING_CHECK="true"\nKEEPALIVE_CREATE="CronCreate"\nKEEPALIVE_DELETE="CronDelete"\nRESUME_SCHEDULE="on"\nRESUME_SCHEDULE_CREATE="TheScheduleCreate"\nRESUME_SCHEDULE_DELETE="TheScheduleDelete"\nRESUME_SCHEDULE_DELAY="1800"\nRESUME_SCHEDULE_LIMIT="6"\nPHASES_EXTRA=""\nDOD_EXTRA=""\n' > .unattended.conf
+    printf -- '---\nslug: tRx\nnode: a\nopened: 2026-08-01\nstreams: architecture\nroster: ARCH\nids: ARCH-tRx-1\n---\n\n# tRx\n\n<!-- gen:build-index -->\n**Build status:** OPEN · 1 unit(s)\n\n<!-- gen:build-units -->\n| Unit | Status | Rev | Last change |\n|---|---|---|---|\n| [ARCH-tRx-1 — the unit](spec/one.md) | OPEN | rev-1 | 2026-08-01 |\n<!-- /gen:build-units -->\n<!-- /gen:build-index -->\n' > memory/builds/tRx/README.md
+    printf 'a\n' > work/a.txt; printf 'o\n' > other.txt
+    printf '# tRx — run state\n\n<!-- run:generated -->\n<!-- /run:generated -->\n\n## Mandate\n<!-- run:mandate -->\nThe owner authorizes build tRx to merge to main and to push.\n<!-- /run:mandate -->\n\n## Run facts\n\n## Parked\n' \
+      > memory/builds/tRx/RUN.md
+    git add -A && git commit -q -m base --no-verify && git push -q origin main
+    git checkout -q -b unit && git commit -q --allow-empty -m "unit work" --no-verify
+  ) >/dev/null 2>&1
+  run_rx --preflight tRx --keepalive-id k1 >/dev/null
+  printf '\n2026-10-04T00:00:00Z dispatch · item 00000000 ARCH-tRx-1 · reason work/a.txt\n' >> "$rx_root/repo/memory/builds/tRx/RUN.md"
+  run_rx --attest tRx --item keepalive-reaped >/dev/null
+  run_rx --attest tRx --item parked-decisions-surfaced >/dev/null
+  run_rx_git add -A >/dev/null && run_rx_git commit -q -m "records(tRx)" --no-verify
+  git clone -q "$rx_root/origin.git" "$rx_root/other" >/dev/null 2>&1
+  (
+    cd "$rx_root/other" && git config user.email t@t.test && git config user.name t
+    printf 'x\n' >> memory/builds/tRx/README.md && git commit -qam "rx README $rx_seq" --no-verify
+    printf 'b\n' >> work/a.txt && git commit -qam "rx work/a.txt $rx_seq" --no-verify
+    printf 'p\n' >> other.txt && git commit -qam "rx other.txt $rx_seq" --no-verify
+    git push -q origin main
+  ) >/dev/null 2>&1
+  RX_TIP=$(git --git-dir="$rx_root/origin.git" rev-parse main)
+  [ "$1" = no ] || run_rx_git fetch -q origin main
+}
+RX_R=memory/builds/tRx/RUN.md
+
+# ---- AC1: a park lists the README and the declared-write commits, not the third, and records the
+# ---- tip; a repeat of the same park is the no-op it was and refreshes nothing.
+build_rx_fixture yes
+out=$(run_rx --park tRx --item q1 --reason r1)
+hit  "$out" "unattended: refresh — refs/heads/main at ${RX_TIP:0:8} · 2 of 3 commits since BASE"
+hit  "$out" "rx README 1"
+hit  "$out" "rx work/a.txt 1"
+miss "$out" "rx other.txt 1"
+same "TOOL-dUnstuckLanding-19 AC1 the park records the tip" "$(read_rx_fact refreshed-at)" "$RX_TIP · park · 2 touching"
+before=$(run_rx_git hash-object "$RX_R")
+out=$(run_rx --park tRx --item q1 --reason r1)
+miss "$out" "unattended: refresh —"
+same "TOOL-dUnstuckLanding-19 AC1 a repeated park wrote nothing" "$(run_rx_git hash-object "$RX_R")" "$before"
+
+# ---- AC3: the hand-off, after that park is committed, lists and records under its own verb.
+run_rx_git add -A >/dev/null && run_rx_git commit -q -m "records(tRx): park" --no-verify
+out=$(run_rx --handoff tRx --code owner-decision --reason r3 --reaped k1)
+hit  "$out" "phase HELD · code owner-decision · until owner"
+hit  "$out" "2 of 3 commits since BASE"
+same "TOOL-dUnstuckLanding-19 AC3 the hand-off records the tip" "$(read_rx_fact refreshed-at)" "$RX_TIP · handoff · 2 touching"
+
+# ---- AC2: the abort, with both attested items met, records the tip beside ABORTED.
+build_rx_fixture yes
+out=$(run_rx --abort tRx --code external-prerequisite --reason r2)
+hit  "$out" "2 of 3 commits since BASE"
+hit  "$out" "rx work/a.txt 2"
+same "TOOL-dUnstuckLanding-19 AC2 the abort records the tip" "$(read_rx_fact refreshed-at)" "$RX_TIP · abort · 2 touching"
+same "TOOL-dUnstuckLanding-19 AC2 the abort still aborts" "$(read_rx_fact phase)" "ABORTED"
+
+# ---- AC4: a primary close lists before the Definition of Done, and a REFUSING one writes no fact;
+# ---- the met close writes it beside LANDING.
+build_rx_fixture yes
+sed -i '/^parked-surfaced: /d' "$rx_root/repo/$RX_R"
+run_rx_git commit -qam "records(tRx): unattested" --no-verify
+before=$(run_rx_git hash-object "$RX_R")
+out=$(run_rx --close tRx)
+hit  "$out" "unattended: refresh — refs/heads/main at ${RX_TIP:0:8} · 2 of 3 commits since BASE"
+same "TOOL-dUnstuckLanding-19 AC4 the refresh prints before the unmet item" \
+  "$(printf '%s\n' "$out" | awk '/unattended: refresh —/ && !r { r = NR } /an agent-attested DoD item is unmet/ && !u { u = NR } END { print (r && u && r < u) ? "before" : "not before" }')" "before"
+same "TOOL-dUnstuckLanding-19 AC4 a refusing close wrote no fact" "$(run_rx_git hash-object "$RX_R")" "$before"
+build_rx_fixture yes
+out=$(run_rx --close tRx --override closing-review-recorded --reason "fixture build records no review" --override build-complete --reason "fixture build is one OPEN unit by construction")
+hit  "$out" "close OK"
+same "TOOL-dUnstuckLanding-19 AC4 the met close records the tip" "$(read_rx_fact refreshed-at)" "$RX_TIP · close · 2 touching"
+same "TOOL-dUnstuckLanding-19 AC4 beside LANDING" "$(read_rx_fact phase)" "LANDING"
+
+# ---- AC5: an unreachable remote is announced, never refused, and replaces an older tip.
+build_rx_fixture yes
+run_rx --park tRx --item q0 --reason r0 >/dev/null
+run_rx_git remote set-url origin "$rx_root/nope.git"
+out=$(run_rx --park tRx --item q5 --reason r5); rc=$?
+same "TOOL-dUnstuckLanding-19 AC5 the park over an unanswered remote exits 0" "$rc" "0"
+hit  "$out" "unattended: refresh — the advertised tip was NOT observed, so this verdict stands on BASE"
+hit  "$out" "decision parked — q5"
+same "TOOL-dUnstuckLanding-19 AC5 the fact reads unobserved" "$(read_rx_fact refreshed-at)" "unobserved · park"
+
+# ---- AC6: an advertised tip this clone lacks is `unlisted`, never unobserved and never zero.
+build_rx_fixture no
+out=$(run_rx --park tRx --item q6 --reason r6)
+hit  "$out" "a tip this clone does not have, so the commits past BASE"
+same "TOOL-dUnstuckLanding-19 AC6 the fact reads unlisted" "$(read_rx_fact refreshed-at)" "$RX_TIP · park · unlisted"
+
+# ---- AC7: under in-place nothing refreshes.
+build_rx_fixture yes
+sed -i 's/^LANDER_MODE=.*/LANDER_MODE="in-place"/' "$rx_root/repo/.unattended.conf"
+sed -i '/^parked-surfaced: /d' "$rx_root/repo/$RX_R"
+run_rx_git commit -qam "records(tRx): in-place" --no-verify
+out=$(run_rx --close tRx)
+miss "$out" "unattended: refresh —"
+hit  "$out" "an agent-attested DoD item is unmet"
+rm -rf "$rx_root"
 fi   # ---- end REGION TWO ----------------------------------------------------------------------
 
 # FLOOR_ASSERTIONS — TOOL-cBriefedPilot-23. A shrink-only pin on the EXECUTED count. This build

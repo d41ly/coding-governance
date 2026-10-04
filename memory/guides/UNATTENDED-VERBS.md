@@ -31,7 +31,10 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   what a gate reads. The run then carries on with the units that do not depend on that fork. Only
   when EVERY remaining unit depends on it does the run halt, with the fork-unresolvable code — a run
   that can still make progress on something else is not stuck, and stopping early spends an owner
-  turn that was not needed.
+  turn that was not needed. A park that is not a no-op REFRESHES first: it lists the commits on the
+  advertised tip in neither BASE nor HEAD that touch the build's README or a declared write, and
+  records `refreshed-at` — the tip and the count, `unlisted` for a tip this clone lacks, or
+  `unobserved` — never refusing and never fetching.
 - `--brief` — records WHAT a build pass was handed: the unit, and the hash of a TRACKED brief file,
   through `park()` as a `history` kind. `--status` reads it, grading each unit's LATEST row.
 - `--propose` — writes a PROPOSAL: an amendment a run would make to the playbook it is following,
@@ -152,7 +155,8 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   of `LANDING`, and it runs BEFORE the landing it authorises, so it cannot observe one. Its bar is
   bounded by the pinned backstop, and `gates-green` names each other way a bar ends as what it is: a
   TREE MOVED exit is run once more, and a HOST exit or a kill before the bar acquired the repository
-  prints a `hold ·` line rather than reading as a red leg.
+  prints a `hold ·` line rather than reading as a red leg. Under `primary` it prints `--park`'s
+  refresh before the DoD and records `refreshed-at` only with a met DoD's writes.
 - `--landed` — an OBSERVATION rather than a claim, guarded on the RECORDED phase. It accepts a record
   only at `LANDING` and re-observes the anchor. Under `primary` it is the one writer of `LANDED` and
   refuses unless HEAD is an ancestor of the tip the remote advertises; where `LANDER_MARKER` is
@@ -248,7 +252,8 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   `handoff` row the owner is shown, and `units-at-landing` and `asks-at-landing` as `--close` writes
   them. `owner-landing` is refused over a bar that is not GREEN unless every red leg reads INHERITED;
   `owner-decision` requires a parked decision row. The contract is `UNATTENDED-STOPS.md` §2 and §4.
-  The recipe's last command is `--settle`, through this kit's own repo-relative path.
+  The recipe's last command is `--settle`, through this kit's own repo-relative path. After its
+  last refusal it makes `--park`'s refresh and records `refreshed-at` with its writes.
 - `--settle` — writes what git proves onto a slug's live record. `--settle <slug>`. A hand-off its
   owner landed, which every deriving reader already reads `LANDED (attended)`, becomes `phase:
   LANDED` with `landed-by: attended` and `landed-derived`. An `ABORTED` record first committed before
@@ -266,3 +271,4 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   phase said a run stopped and never said why. From `HANDOFF_CUTOFF` an `ABORTED` record means
   DISCARD, and an abort naming a hand-off-shaped halt code, on a record first
   committed on or after it prints a notice naming `--handoff`, then aborts as asked; it never refuses.
+  With both attested items met it makes `--park`'s refresh and records `refreshed-at` beside the phase.

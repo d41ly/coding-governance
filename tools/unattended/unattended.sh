@@ -1253,6 +1253,64 @@ read_advertised_tip() { # -> 0 with ADVQ_REF and ADVQ_SHA, or non-zero with ADVQ
   ADVQ_RC=0
   return 0
 }
+# TOOL-dUnstuckLanding-19 - REFRESH BEFORE A VERDICT. A run that parks, aborts, hands off or closes
+# under `primary` takes its verdict against the BASE it pinned, and main may have overtaken it: the
+# census found three such verdicts. This prints the commits on the tip the remote ADVERTISES that are
+# in neither BASE nor HEAD and touch this build's README or a path a `dispatch` row declared, and
+# sets RF_FACT to the `refreshed-at` value for the CALLER to write with its own writes, so a refusing
+# verb still writes nothing. It never calls `fail`, never writes, never touches the global `status`,
+# and changes no ref: a tip this clone lacks reads `unlisted`, never fetched. The observation is
+# `read_advertised_tip`, once per process, so a caller that already observed pays no second wait.
+# Literal pathspecs, so a declared path carries no pathspec magic. CALLED AS A PLAIN COMMAND, never in
+# `$(...)`, for `read_derived_phase`'s reason: a subshell discards the global.
+RF_FACT=""
+derive_refreshed_at() { # run-state file · slug · verb -> prints the listing, sets RF_FACT
+  local _rf_f="$1" _rf_slug="$2" _rf_verb="$3" _rf_base _rf_tip _rf_ref _rf_p _rf_n _rf_m _rf_rows _rf_k
+  local -a _rf_paths=()
+  RF_FACT=""
+  if ! grep -q '^## Run facts' "$_rf_f" 2>/dev/null; then
+    echo "unattended: refresh — the record carries no Run facts section, so this verdict records no refreshed-at fact"
+    return 0
+  fi
+  _rf_base=$(fact "$_rf_f" base)
+  case "$_rf_base" in
+    ""|*[!0-9a-f]*)
+      echo "unattended: refresh — the record carries no base fact naming a sha, so this verdict cannot be refreshed against BASE"
+      RF_FACT="unobserved · $_rf_verb"; return 0 ;;
+  esac
+  if ! read_advertised_tip; then
+    if [ -n "$ADVQ_REF" ] && [ -n "$ADVQ_SHA" ]; then
+      echo "unattended: refresh — the remote advertises $ADVQ_REF at ${ADVQ_SHA:0:8}, a tip this clone does not have, so the commits past BASE ${_rf_base:0:8} are not listed and nothing was fetched"
+      RF_FACT="$ADVQ_SHA · $_rf_verb · unlisted"; return 0
+    fi
+    echo "unattended: refresh — the advertised tip was NOT observed, so this verdict stands on BASE ${_rf_base:0:8} alone: $ADVQ_WHY"
+    RF_FACT="unobserved · $_rf_verb"; return 0
+  fi
+  _rf_tip="$ADVQ_SHA"; _rf_ref="$ADVQ_REF"
+  # An anchor this process observed is taken without the object test the quiet observer makes, so
+  # the test is made here: a tip or a BASE this clone lacks cannot be walked.
+  if ! GIT rev-parse --verify --quiet "$_rf_tip^{commit}" >/dev/null 2>&1 \
+     || ! GIT rev-parse --verify --quiet "$_rf_base^{commit}" >/dev/null 2>&1; then
+    echo "unattended: refresh — the remote advertises $_rf_ref at ${_rf_tip:0:8}, and this clone lacks it or BASE ${_rf_base:0:8}, so the commits past BASE are not listed and nothing was fetched"
+    RF_FACT="$_rf_tip · $_rf_verb · unlisted"; return 0
+  fi
+  while IFS= read -r _rf_p; do
+    [ -n "$_rf_p" ] && _rf_paths+=("$_rf_p")
+  done <<RFSET
+$( { readme_of "$_rf_slug"; echo; grep -F ' dispatch · item ' "$_rf_f" 2>/dev/null | sed 's/.* · reason //' | tr ' ' '\n'; } | awk 'NF && !s[$0]++')
+RFSET
+  _rf_m=$(GIT rev-list --count "$_rf_tip" --not "$_rf_base" HEAD 2>/dev/null) || _rf_m="?"
+  _rf_n=$(GIT --literal-pathspecs rev-list --count "$_rf_tip" --not "$_rf_base" HEAD -- "${_rf_paths[@]}" 2>/dev/null) || _rf_n="?"
+  _rf_rows=$(GIT --literal-pathspecs log -n 10 --format='%h %s' "$_rf_tip" --not "$_rf_base" HEAD -- "${_rf_paths[@]}" 2>/dev/null)
+  echo "unattended: refresh — $_rf_ref at ${_rf_tip:0:8} · $_rf_n of $_rf_m commits since BASE ${_rf_base:0:8} touch this build's README or declared writes"
+  [ -z "$_rf_rows" ] || printf '%s\n' "$_rf_rows" | sed 's/^/    /'
+  case "$_rf_n" in
+    ''|*[!0-9]*) ;;
+    *) _rf_k=$((_rf_n - 10)); [ "$_rf_k" -le 0 ] || echo "    … and $_rf_k more" ;;
+  esac
+  RF_FACT="$_rf_tip · $_rf_verb · $_rf_n touching"
+  return 0
+}
 read_recorded_phase() { # run-state file -> the phase fact, exactly as written
   fact "$1" phase
 }
@@ -4932,10 +4990,13 @@ verb_abort() { # slug · reason · code
       return 1
     fi
   done
+  # TOOL-dUnstuckLanding-19 S5 - every refusal is above, and the fact rides the abort's own writes.
+  derive_refreshed_at "$rel" "$slug" abort
   head=$(GIT rev-parse HEAD)
   set_fact "$rel" phase ABORTED || return 1
   remove_procs_ledger "$slug"
   set_fact "$rel" witness "$head" || return 1
+  if [ -n "$RF_FACT" ]; then set_fact "$rel" refreshed-at "$RF_FACT" || return 1; fi
   # AN AUTHORED FACT, not a substring of the reason. A reader is a field read rather than a parse, and
   # three readers want it by key. It is a per-run SINGLETON written by a terminal verb, which is the
   # same shape the roster-at-landing fact already has — the in-tree precedent, not an argument by
@@ -5194,6 +5255,9 @@ run_hold() { # slug · code · until · reason · reaped · unreachable · pendi
     fail 84 "a process this slug's driver started is still alive, and a hold now would leave a HELD record with its own work in flight; let it finish, or reap it, then hold again: $inflight"
     return 1
   fi
+  # TOOL-dUnstuckLanding-19 S5 - a hand-off refreshes after its last refusal; a plain hold never does.
+  RF_FACT=""
+  if [ -n "$HO_ACTIVE" ]; then derive_refreshed_at "$rel" "$slug" handoff; fi
   # ---- nothing above this line wrote anything but the process ledger's prune -----------------------
   set_fact "$rel" phase HELD || return 1
   set_fact "$rel" witness "$head" || return 1
@@ -5218,6 +5282,7 @@ run_hold() { # slug · code · until · reason · reaped · unreachable · pendi
   if [ -n "$HO_ACTIVE" ]; then
     set_fact "$rel" units-at-landing "$HO_UNITS" || return 1
     if [ -n "$HO_ASKS" ]; then set_fact "$rel" asks-at-landing "$HO_ASKS" || return 1; fi
+    if [ -n "$RF_FACT" ]; then set_fact "$rel" refreshed-at "$RF_FACT" || return 1; fi
     park "$rel" handoff "$code" "$HO_RECIPE" || return 1
   fi
   # HISTORY-CLASS, in park()'s own row grammar so `--status` counts it as noted rather than owed and
@@ -7991,7 +8056,16 @@ verb_close() { # slug   (override pairs arrive in OV_ITEMS / OV_REASONS)
   # stated cause and no forward move. `|| true` alone is the form --landed and --preflight already use:
   # the refusals are not fatal to --close, which is why they were suppressed rather than returned on,
   # and that reasoning was always about the STATUS and never about the message.
-  observe_anchor || true
+  # TOOL-dUnstuckLanding-19 S5 - under `primary` the refresh lists here, before the Definition of Done,
+  # so a refusing close still shows it; the fact is written only with the close's writes below. An
+  # anchor that refused marks the quiet observer done with that refusal, so no second bounded wait.
+  # Under `in-place`, `--prepare` already merged the tip, and nothing refreshes.
+  RF_FACT=""
+  if ! observe_anchor && [ "$LANDER_MODE" = primary ]; then
+    ADVQ_DONE=1; ADVQ_RC=1; ADVQ_REF=""; ADVQ_SHA=""
+    ADVQ_WHY="the anchor observation above refused, and a second bounded wait would answer the same"
+  fi
+  if [ "$LANDER_MODE" = primary ]; then derive_refreshed_at "$rel" "$slug" close; fi
   # Validate EVERY pair before any of them is acted on. The three messages below are byte-unchanged
   # from the single-override form, so their arms stay valid and no per-check ordinal moves.
   while [ "$i" -lt "$n" ]; do
@@ -8132,6 +8206,7 @@ verb_close() { # slug   (override pairs arrive in OV_ITEMS / OV_REASONS)
   # TOOL-dDerivedDocket-24 - THE BAR'S FACTS, with the close's other writes and after the carry check.
   if [ -n "$GG_RUN_FACT" ]; then set_fact "$rel" gates-run "$GG_RUN_FACT" || return 1; fi
   if [ -n "$GG_INH_FACT" ]; then set_fact "$rel" gates-inherited "$GG_INH_FACT" || return 1; fi
+  if [ -n "$RF_FACT" ]; then set_fact "$rel" refreshed-at "$RF_FACT" || return 1; fi
   i=0
   while [ "$i" -lt "$n" ]; do
     ov=${OV_ITEMS[$i]}
@@ -9800,6 +9875,9 @@ verb_park() { # slug · item · reason
   done <<PARKED
 $(grep -F -- ' decision · item ' "$rel" 2>/dev/null | sed 's/^[^ ]* //')
 PARKED
+  # TOOL-dUnstuckLanding-19 S5 - after the no-op above, so a re-park writes and refreshes nothing.
+  derive_refreshed_at "$rel" "$slug" park
+  if [ -n "$RF_FACT" ]; then set_fact "$rel" refreshed-at "$RF_FACT" || return 1; fi
   park "$rel" decision "$item" "$reason" || return 1
   stage_or_fail "$rel" || return 1
   echo "unattended: decision parked — $item"

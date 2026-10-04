@@ -229,6 +229,7 @@ belonging here:
     where underivable: which node holds the run, which image held the pid, and since when — so a
     foreign tick stands off, a recycled pid reads dead, and `--landed` grades no stop line older
     than the lease.
+17. **The refresh**, `refreshed-at`: the tip a verdict verb last saw past BASE, or `unobserved`.
 
 Facts 10, 11 and 12 are ABSENT on a run that never reached the condition each records; the
 "nothing else" clause bounds what may appear, not what must. Fact 9 is always written, fact 13
