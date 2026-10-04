@@ -1,10 +1,12 @@
-# TOOL-aGraftedHelix-23 — the `prior-session` fact is the set of sessions an incomplete holder write may have left the claim under, read by `check_claim_writable` itself and emptied by the next holder write that lands
+# TOOL-aGraftedHelix-23 — the `prior-session` fact is the set of sessions an incomplete holder write may have left the claim under, read by `check_claim_writable` itself and emptied by the next `--resume` holder-row claim write that lands
 
-**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-2 · base 5266d22e · streams tooling · order 5
+**Status:** SPECCED · rev-3 · 2026-10-04 · node a · Tier-2 · base 5266d22e · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-04-review-TOOL-aGraftedHelix-23-spec-audit-round1.md](../reviews/2026-10-04-review-TOOL-aGraftedHelix-23-spec-audit-round1.md) | spec-audit | — |
 
 <!-- /gen:spec-records -->
 
@@ -25,8 +27,8 @@ spec audit of units 20 to 22 confirmed five HIGH findings on that fact. Each end
 - Finding 1: the widening is driven only at `--resume`, and no spec says where
   `check_claim_writable` gets the fact, so a build that supplies it from one caller passes.
 
-This unit makes the fact a set that only grows until a holder write lands. It spells the cleared
-state as the empty value, which no recorded session can be. It moves the read into
+This unit makes the fact a set that only grows until a `--resume` holder-row claim write lands. It
+spells the cleared state as the empty value, which no recorded session can be. It moves the read into
 `check_claim_writable`, so no caller can omit it, and it drives every sequence the audit named. It
 closes findings 6, 12, 2, 7 and 1 (all HIGH) of the round-1 spec audit of units 20 to 22.
 
@@ -35,14 +37,20 @@ closes findings 6, 12, 2, 7 and 1 (all HIGH) of the round-1 spec audit of units 
 - **S1** — `prior-session` holds a SET: zero or more session values, separated by one space, in the
   order they were added, none twice. The empty value and a missing line are both the empty set, the
   one cleared state. `absent` is a legal member and compares literally, as unit 1 §4 compares two
-  absent sessions. This supersedes unit 20 S2's and S3's reading of `absent` as the cleared state.
-  Observed by AC1 and AC3.
-- **S2** — On a `--resume` holder-row call whose claim CAS did not complete, or whose claim could not
-  be read, the row ADDS to the set, before its `stage_or_fail`: the record's `session` fact as it
-  stood before the call, and, when the claim read succeeded, the claim's `session` field. A value
-  already present is not added again, and every member stays in the set until S3 empties it. This
-  replaces unit 20 S2's "written only while it reads `absent` or is missing". Observed by AC1 and
-  AC2.
+  absent sessions. This supersedes unit 20 S2's and S3's reading of `absent` as the cleared state,
+  and unit 20 S8's "when that is not `absent`" guard at the restart row, where an `absent` member
+  counts like any other. Observed by AC1, AC3 and AC5.
+- **S2** — On a `--resume` holder-row call whose `write_lease` is due, and whose claim CAS did not
+  complete or whose claim could not be read, the row ADDS to the set: the record's `session` fact as
+  it stood before the call, and, when the claim read found a claim, that claim's `session` field. An
+  empty pre-call session and a `none` claim read add nothing. A value already present is not added
+  again, and every member stays in the set until S3 empties it. The add is staged by the
+  `stage_or_fail` already inside the `write_lease`-due branch (`tools/unattended/unattended.sh:6597`
+  to `:6600`), so it needs no staging point of its own. On a call whose `write_lease` is not due the
+  row adds nothing: the pre-call session is the current one, and a claim that passed `mine` carries
+  it or an existing member. This replaces unit 20 S2's "written only while it reads `absent` or is
+  missing". The add's place relative to `write_lease` is `TOOL-aGraftedHelix-24`'s (§3). Observed by
+  AC1 and AC2.
 - **S3** — The next `--resume` holder-row claim write that lands empties the set by writing the fact
   with an empty value, only when the set is non-empty, and then runs `stage_or_fail` on the record
   itself. A lost race does not change the set. No other writer writes or empties the fact, as unit 20
@@ -58,7 +66,8 @@ closes findings 6, 12, 2, 7 and 1 (all HIGH) of the round-1 spec audit of units 
   NOT OBSERVED by a criterion here: the read's place inside the function is what reaches them.
 - **S5** — The take-over column's restart widening, unit 20 S8, tests membership in the set: at the
   restart row, a claim whose `keepalive` equals the record's before the call and whose `session` is
-  any member reads `same session`. Observed by AC5.
+  any member reads `same session`. Any member means every position in the set, not only the first,
+  and an `absent` member counts like any other (S1). Observed by AC5.
 - **S6** — Every comment, and every line of the stops guide `tools/unattended/STOPS.template.md`
   with its render, that unit 20's build writes about what `prior-session` holds says it holds a set,
   that the empty value is the cleared state, and that the `--resume` holder row is its one writer.
@@ -85,8 +94,11 @@ closes findings 6, 12, 2, 7 and 1 (all HIGH) of the round-1 spec audit of units 
   could not be read, which §4's sequence d drives.
 - **Removing the line to clear it.** That needs a new line-removing writer beside `set_fact`. The
   empty value reuses `set_fact` and the `hold-unpushed` precedent, and `fact` reads both alike.
-- **Bounding the set.** A member is added only by a holder call whose push did not complete, and
-  the first holder write that lands empties the set, so it grows only across one outage.
+- **Bounding the set.** A member is added only by a `--resume` holder-row call whose `write_lease`
+  is due and whose push did not complete, at most two per call and deduplicated by session. The
+  members stay until the next `--resume` holder-row claim write that lands, whatever other holder
+  writes land in between, so sequence a grows the set across a landed `--beat`. Every member is a
+  session this run has held, so the set is bounded by the sessions the run has had.
 - **The `--replaces` block, `--preflight`, and every take-over other than the restart row.** They
   stay as unit 20 has them.
 
@@ -100,6 +112,11 @@ closes findings 6, 12, 2, 7 and 1 (all HIGH) of the round-1 spec audit of units 
   status-write columns, the `--beat` and `--hold` verbs, the tick fixture whose `--liveness` reads
   `LIVE`, and the lost-race `git` shim; without them there is no decision to move the read into and
   no site to drive.
+- **hands-off** `TOOL-aGraftedHelix-24` — the add's place ahead of `write_lease`, with an arm that
+  interrupts `write_lease` after its `session` line; the session every criterion call that is not
+  `--resume` runs under, so AC1's `--beat` and `--dispatch` and AC4's `--hold` reach the widening;
+  and AC5's sequence-d leg started short of d's closing call (findings 11, 6 and 1 of the round-1
+  audit of this unit).
 
 ## 4. Design
 
@@ -111,7 +128,9 @@ closes findings 6, 12, 2, 7 and 1 (all HIGH) of the round-1 spec audit of units 
 - `hold-unpushed` is cleared by `set_fact` with an empty value, only when it is non-empty (`:6369`).
   S3 reuses that shape.
 - `write_lease` records `${sid:-absent}` (`:5563`), so a recorded session is never empty, and the
-  empty value lies outside the session value space.
+  empty value lies outside the session value space. A record with no `lease-utc` still reaches the
+  holder row's write branch (`:6597`), whose message prints its session as `${os:-none}` (`:6601`),
+  so a pre-call session can be empty; S2 adds nothing for it.
 - The holder row's `write_lease` is due on a changed pid as well as a changed session (`:6597`), so a
   process restart under an unchanged session is a second incomplete call with the same pre-call
   session.
@@ -123,11 +142,16 @@ closes findings 6, 12, 2, 7 and 1 (all HIGH) of the round-1 spec audit of units 
 
 | outcome | the set afterwards |
 |---|---|
-| CAS landed | empty, written only when it was non-empty |
-| CAS lost | unchanged, and the call is check 90 |
-| CAS not completed, the claim read | the set, plus the pre-call record session, plus the claim's session, each once |
-| the claim unreadable | the set, plus the pre-call record session, once |
-| no claim write due | unchanged |
+| a claim write that lands, `write_lease` due or not | empty, written only when it was non-empty |
+| a lost race | unchanged, and the call is check 90 |
+| `write_lease` due, CAS not completed, a claim read | the set, plus the pre-call record session, plus the claim's session, each once |
+| `write_lease` due, CAS not completed, a `none` claim read | the set, plus the pre-call record session, once |
+| `write_lease` due, the claim unreadable | the set, plus the pre-call record session, once |
+| `write_lease` not due, and no claim write lands | unchanged, and nothing is written |
+
+The rows are exclusive: the first two are decided by the claim write's outcome, the next three
+need `write_lease` due, and the last needs it not due. An empty pre-call session adds nothing in any
+row.
 
 ### The sequences
 
@@ -175,7 +199,8 @@ shape. No lexicon cell and no codebase-map key is minted.
 - security — No new surface. Every member is a session id the run branch already publishes in the
   record's `session` line, and the widening still requires this run's own keepalive.
 - perf / scale — One membership test per decision, in-process. The set grows by at most two values
-  per incomplete call and empties on the first landed holder write.
+  per incomplete `--resume` call whose `write_lease` is due, and empties on the next `--resume`
+  holder-row claim write that lands.
 - error / empty / loading states — §4 "The set across one `--resume` holder-row call".
 - observability — The record's `prior-session` line lists every session the published claim may
   still carry.
@@ -186,7 +211,8 @@ shape. No lexicon cell and no codebase-map key is minted.
   1's `git` shim on `PATH`, never by a sleep.
 - migration — A record unit 20's build wrote with `prior-session: absent`, its cleared spelling,
   reads here as the one-member set `absent`. That widens `mine` only to a claim under this run's own
-  keepalive and session `absent`, and the next holder write that lands empties it.
+  keepalive and session `absent`, and the next `--resume` holder-row claim write that lands empties
+  it.
 - user docs — The stops guide, through S6, wherever unit 20's build says what the fact holds,
   re-rendered in the same commit.
 
@@ -201,8 +227,8 @@ it. The claim is read with `git ls-remote <bare> refs/gov/runs/<slug>` and `git 
 the set with the driver's `fact` over the run-state file. After every call, `git diff --name-only`
 names no run-state file.
 
-- **AC1** — When sequences a, b, c and d of §4 run, the set reads `s1 s2` before each closing `s3`
-  call, and each closing call exits 0, prints no `UNATTENDED check 90 FAILED`, leaves a claim naming
+- **AC1** — When sequences a, b, c and d of §4 run, the run-state file carries the line
+  `prior-session: s1 s2` byte for byte before each closing `s3` call, and each closing call exits 0, prints no `UNATTENDED check 90 FAILED`, leaves a claim naming
   `session: s3`, and leaves `fact` printing nothing for `prior-session`. In a, `--beat <slug>` runs
   over unit 1's tick fixture, whose run `--liveness` reads `LIVE` on this host, and prints
   `unattended: beat — <slug> · renewed`. In b, `--dispatch <slug> --pass <a unit id of the fixture
@@ -215,9 +241,13 @@ names no run-state file.
   nothing for `prior-session`. Over the fixture as it starts, whose record carries no
   `prior-session` line, with the run-state file committed and the claim re-seeded at a `beat-utc`
   older than a quarter of `RESUME_STALE_BOUND`, an `s1` call with no shim moves the claim ref and
-  leaves `git status --porcelain` empty.
+  leaves `git status --porcelain` empty. Over a fresh copy of that committed state and aged beat, an
+  `s1` call under the recorded `CLAUDE_PID`, so its `write_lease` is not due, with the claim push
+  exiting 124, exits 0, leaves `git status --porcelain` empty, and leaves the run-state file with no
+  `prior-session` line.
   Red when: the second incomplete call loses `s1` from the set, which a build writing the pre-call
-  session unconditionally does, or a landed holder write over a record without the fact writes it.
+  session unconditionally does, or a landed holder write over a record without the fact writes it,
+  or an incomplete renewal whose `write_lease` is not due adds to the set.
 - **AC3** — When the fixture's record and claim both name session `absent`, written with
   `CLAUDE_CODE_SESSION_ID` unset, an `s2` holder call that exits 124 exits 0 and leaves the set
   reading `absent`. A closing `s2` call exits 0, prints no `UNATTENDED check 90 FAILED`, leaves a
@@ -227,15 +257,31 @@ names no run-state file.
 - **AC4** — When one `s2` holder call exits 124 and a `--dispatch` follows under `s2` with no shim,
   the dispatch exits 0, prints no `UNATTENDED check 90 FAILED`, and leaves a claim naming
   `session: s2`. In a second copy of the fixture, whose branch tip is pushed, the same incomplete
-  call is followed by `--hold <slug> --code <a declared hold code> --until owner --reason <text>
-  --reaped <the recorded keepalive>` with no shim. It prints no `unattended: claim not written` line
-  and leaves a claim whose `status` reads `held`. In both copies the set still reads `s1`.
+  call leaves the run-state file staged. That file is then committed and the run branch pushed with
+  no shim. The push does not touch `refs/gov/runs/<slug>`, so the claim still names `session: s1`
+  and the set still reads `s1`, and both are asserted. The commit and the push are there to satisfy
+  `--hold`'s clean-tree and published-tip refusals, which `TOOL-dDerivedDocket-61` S8 records as
+  deliberate for `--hold`, so the record is never exempted from them instead. Then
+  `--hold <slug> --code <a declared hold code> --until owner --reason <text>
+  --reaped <the recorded keepalive>` runs with no shim. It prints no `unattended: claim not written`
+  line and leaves a claim whose `status` reads `held`. In both copies the set still reads `s1`.
   Red when: the widening reaches only the `--resume` row, so `--dispatch` answers check 90 or
-  `--hold` announces instead of writing.
+  `--hold` announces instead of writing; or `--hold` ends in `UNATTENDED check 2 FAILED`, which is
+  its setup leaving the record uncommitted, not the widening.
 - **AC5** — When sequence d of §4 runs and the next call is under `s3` with `CLAUDE_PID` changed, a
   new `--keepalive-id` and the remote restored, it takes the run over, prints no
   `UNATTENDED check 89 FAILED`, and leaves a claim naming the new keepalive and `session: s3`.
-  Red when: the restart widening compares the whole value of the set with the claim's session.
+  When sequence c of §4 runs up to, but not including, its closing call, the set reads `s1 s2` and
+  the claim names `session: s2`, the set's second member, and both are asserted before the next
+  call. That call, under `s3` with `CLAUDE_PID` changed, a new `--keepalive-id` and the remote
+  restored, takes the run over, prints no `UNATTENDED check 89 FAILED`, and leaves a claim naming
+  the new keepalive and `session: s3`. With the fixture leased under `CLAUDE_CODE_SESSION_ID` unset,
+  so record and claim both name session `absent`, an `s2` holder call whose claim push exits 124
+  leaves the set reading `absent`. An `s2` call with `CLAUDE_PID` changed and a new
+  `--keepalive-id` then takes the run over, prints no `UNATTENDED check 89 FAILED`, and leaves a
+  claim naming the new keepalive and `session: s2`.
+  Red when: the restart widening compares the whole value of the set with the claim's session,
+  compares its first member only, or skips an `absent` member, so a restart answers check 89.
 - **AC6** — When `bash tools/check-kit-versions.sh` runs at the pass's commit it exits 0, and
   `python tools/govkit/govkit.py epoch --base <the pass's parent sha>` names no unattended carrier
   left behind.
@@ -245,7 +291,7 @@ names no run-state file.
 
 `unattended kit gate` · `unattended skill wiring` · `recall floor` · `recall floor arms` · `kit version markers` · `kit epoch (shipped bytes move, the version moves)` · `harness arms (fail branches armed or pinned)` · `lexicon naming predicates` · `install-prefix (shipped surface)` · `line length` · `shell hygiene (a loop fed by a command substitution)` · `spec tokens (a spec's own names resolve)`
 
-New arm: tools/unattended/unattended.test.sh · sequences a, b and c of section 4, each ending in a closing s3 call with no check 90; stage unit 20's absent-only write rule · the suite's floor rises by its new arm count
+New arm: tools/unattended/unattended.test.sh · sequences a, b and c of section 4, each ending in a closing s3 call with no check 90; stage unit 20's absent-only write rule, and separately --beat and --dispatch emptying the set when their claim write lands, observed red by the set reading s1 after them · the suite's floor rises by its new arm count
 
 New arm: tools/unattended/unattended.test.sh · sequence d, two unreachable pushes, ending in a closing s3 call with no check 90; stage the set written as the read claim's session alone · the suite's floor rises by its new arm count
 
@@ -253,9 +299,15 @@ New arm: tools/unattended/unattended.test.sh · sequences e and f, two incomplet
 
 New arm: tools/unattended/unattended.test.sh · an absent session leased, then an s2 call that exits 124, then a closing s2 call with no check 90; stage the reader treating absent as no fact · the suite's floor rises by its new arm count
 
-New arm: tools/unattended/unattended.test.sh · after one incomplete s2 call, --dispatch writes and --hold writes held with no announce; stage the set supplied to check_claim_writable from the --resume row only · the suite's floor rises by its new arm count
+New arm: tools/unattended/unattended.test.sh · AC2's two renewal legs, a landed renewal over a record without the fact and an incomplete renewal with no write_lease due, each leaving git status --porcelain empty; stage the clear written whether or not the set is non-empty, and separately S2's add unscoped from write_lease due · the suite's floor rises by its new arm count
+
+New arm: tools/unattended/unattended.test.sh · after one incomplete s2 call, --dispatch writes, and over a second copy whose staged record is committed and pushed in build_hold_fixture's shape (unattended.test.sh:2826-2830), --hold writes held with no announce; stage the set supplied to check_claim_writable from the --resume row only · the suite's floor rises by its new arm count
 
 New arm: tools/unattended/unattended.test.sh · after sequence d, the s3 restart under a new keepalive takes over with no check 89; stage the restart widening comparing the whole value · the suite's floor rises by its new arm count
+
+New arm: tools/unattended/unattended.test.sh · sequence c short of its closing call, the set s1 s2 and the claim s2 asserted, then the s3 restart under a new keepalive takes over with no check 89; stage the restart widening comparing the first member only · the suite's floor rises by its new arm count
+
+New arm: tools/unattended/unattended.test.sh · an absent session leased, an s2 call whose claim push exits 124, then the s2 restart under a new keepalive takes over with no check 89; stage the restart widening skipping an absent member · the suite's floor rises by its new arm count
 
 The unattended suites are not on the bar (`tools/unattended/README.md`). A pass runs its criteria
 directly, and the main loop runs the suite once at VERIFYING.
@@ -274,6 +326,21 @@ none
   `retirement-inventory-misses-readers-by-value` and `a-folded-field-leaves-its-row-shape-docs-behind`.
   S4 names the sites its criteria drive and the four they do not; S7 rewrites unit 20's arms that
   assert the fact's old value; S6 reaches the stops guide; AC2 observes S3's "only when non-empty".
+- rev-3 · 2026-10-04 · title §1 §2 §3 §4 §5 §6 §7 · S1 S2 S5 · AC1 AC2 AC4 AC5 · folded the round-1
+  spec audit of this unit. Findings 2, 7 and 12 (MEDIUM): S2's add is confined to calls whose
+  `write_lease` is due and is staged by that branch's `stage_or_fail`, §4's set table is made
+  exclusive, and AC2 gains an incomplete-renewal leg with its arm. Findings 3 and 16 (MEDIUM): S1
+  supersedes unit 20 S8's "when that is not `absent`" guard, S5 names every position and an `absent`
+  member, and AC5 gains a sequence-c leg and an `absent`-lease leg, each with its arm. Finding 10
+  (MEDIUM): the a/b/c arm stages `--beat` and `--dispatch` emptying the set, and AC2's renewal legs
+  get an arm staging the clear written whether or not the set is non-empty. Finding 15 (MEDIUM):
+  AC4's `--hold` leg commits and pushes the staged record first, citing `TOOL-dDerivedDocket-61` S8,
+  and its arm takes `build_hold_fixture`'s shape. Finding 9 (LOW): the title, §1, §3 "Bounding the
+  set" and §5 name the `--resume` holder-row claim write as the one that empties the set, and the
+  bound is restated. Finding 14 (LOW): S2 adds nothing for an empty pre-call session or a `none`
+  claim read, §4 Evidence names the empty case, and AC1 asserts the line's one-space form. Findings
+  11, 6 and 1 (HIGH) are promoted to `TOOL-aGraftedHelix-24`: §3 gains its hands-off, and S2 points
+  at it.
 
 ## 10. Reuse audit
 

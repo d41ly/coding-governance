@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-20 — the holder row's claim CAS runs before its `write_lease` under one stamp, and a CAS that does not land leaves a `prior-session` fact the `mine` test accepts
 
-**Status:** SPECCED · rev-4 · 2026-10-04 · node a · Tier-2 · base 5266d22e · streams tooling · order 4
+**Status:** SPECCED · rev-5 · 2026-10-04 · node a · Tier-2 · base 5266d22e · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
@@ -117,6 +117,10 @@ does not land. It closes finding 9 (HIGH) of the round-1 spec audit of units 16 
   a legal member, the empty value the cleared state, and the read inside `check_claim_writable` for
   every holder and status-write site, with the interleaved sequences that drive it (findings 6, 12,
   2, 7 and 1 of the round-1 audit of units 20 to 22).
+- **hands-off** `TOOL-aGraftedHelix-24` — the `prior-session` row of §4 "The order": the add to the
+  set runs ahead of `write_lease`, once this order's claim read and CAS have decided it, so an
+  interruption inside `write_lease` cannot leave the claim under a session no member names (finding
+  11 of the round-1 audit of `TOOL-aGraftedHelix-23`).
 
 ## 4. Design
 
@@ -152,6 +156,7 @@ does not land. It closes finding 9 (HIGH) of the round-1 spec audit of units 16 
 | `prior-session` | the CAS outcome | set or cleared per the table below |
 | `stage_or_fail` | nothing | the index, when `write_lease` ran or the fact was written |
 
+`TOOL-aGraftedHelix-24` moves the `prior-session` add ahead of `write_lease` (§3).
 The fact write precedes `stage_or_fail`, so a call that writes it leaves no unstaged record. A
 clear on a call whose `write_lease` is not due runs its own `stage_or_fail`, and a fact that is
 missing or reads `absent` is not written at all, so a renewal over a record without it still writes
@@ -316,6 +321,9 @@ none
   selected `fixture-passes-by-finding-nothing`. AC3's renewal leg ran a call with nothing due, so a
   build clearing the fact on every landed write passed it; the leg now re-seeds an aged beat so the
   renewal lands, asserts the claim ref moves, and the first call asserts no `prior-session` line.
+- rev-5 · 2026-10-04 · §3 §4 · §3 gains the hands-off to `TOOL-aGraftedHelix-24`, promoted from
+  finding 11 (HIGH) of the round-1 spec audit of `TOOL-aGraftedHelix-23`, and §4 "The order" points
+  at it for the add's place ahead of `write_lease`.
 
 ## 10. Reuse audit
 
