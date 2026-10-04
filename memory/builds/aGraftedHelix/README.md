@@ -43,7 +43,9 @@ self-heals go unreported. The owner's prompt and the review are in `prompts/`.
   the recall index, hygiene checks, `check-wiring.sh`, the orientation card.
 - Every new arm is observed RED on a staged break before it lands, and its header says what it does
   not check.
-- Spec audit declared (`spec-audit:` above), one round, then disposal by severity.
+- Spec audit: declared by the run, not the owner. Owner ruling 2026-10-05: the chain stops after
+  round 7; unit 26 is built un-audited, `specs-audited` closes under an override citing this
+  ruling, and every further finding is the closing review's.
 - Discoveries are adopted into this build, never filed as asks (prompt record).
 - Passes run sequentially: one worktree, one git index, and the harness dispatches in order.
 

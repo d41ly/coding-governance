@@ -79,3 +79,7 @@ base: 5266d22eba31cdbf15425773d245cd23d7b9cdf5
 2026-10-04T21:39:13Z review · item aGraftedHelix-spec-set-r6 · reason verdict CLEAN · blockers 0 · CONVERGED · disposition promote
 
 2026-10-04T22:04:47Z rescope · item add TOOL-aGraftedHelix-26 · reason spec-audit of unit 25 round 1 id 5 HIGH, id 8 HIGH and id 6 HIGH: the add's return 1 never reaches the --resume exit because only fail sets status, so AC1's exit assertion reds a correct build, and AC1 drives only the CAS-incomplete one of the add's two triggers; repairs TOOL-aGraftedHelix-25
+
+2026-10-04T22:18:59Z review · item aGraftedHelix-spec-set-r7 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · disposition promote
+
+2026-10-04T22:19:36Z decision · item Build a check-arms.py class gate that discovers a delegated dispatch block setting status=1 with no fail call (checks 24, 27, 28 share the shape), the second discovery signature ask TOOL-aDeferredBar-8 names? · reason options: build it in this run, or keep the documented check (unit 13's presence-probe gotcha); refused: a gate is its own mechanism, the finding was MEDIUM (folded, never promoted), and it would red check 24's block, which no unit here touches; owner ruling 2026-10-05 leaves further findings to the closing review
