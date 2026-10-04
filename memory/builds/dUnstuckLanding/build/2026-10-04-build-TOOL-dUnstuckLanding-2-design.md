@@ -129,15 +129,38 @@ Both join `HOLD_CODES_CORE`, and `HOLD_FLOOR` moves from 5 to 7.
   derivation computes:
   - a handed record becomes `phase: LANDED`, with `landed-by: attended` and `landed-derived:
     <commit> <tip>`;
-  - an ABORTED record keeps its phase and gains one fact, `work-landed-at: <witness> <tip>`, checked
-    by ancestry.
+  - an ABORTED record keeps its phase and gains one fact, `work-landed-at: <witness> <tip>`, decided
+    by the CONTENT predicate below, never by ancestry alone.
 
 **Test.**
 
-- **Is the predicate sound?** `git merge-base --is-ancestor <witness> <remote tip>` was run over
-  every ABORTED record in the three repositories (census, AC2). It read ON for all 30, and it read
-  OFF on two known-unmerged stamps, nc `a7e0eb03` and inCMS `eafbff4f4`. So it separates landed from
-  not-landed in the corpus, and it can produce a negative.
+- **Is witness ancestry a sound predicate? No, for an ABORTED record. (rev-2, H1)** The probe
+  `git merge-base --is-ancestor <witness> <remote tip>` read ON for all 30 ABORTED records in the
+  three repositories. For a record read FROM the tip, that is structural.
+  - **Why it is structural.** `verb_abort` writes `witness` = HEAD of the tree that runs it
+    (`unattended.sh:4746-4749`), and the record's own commit sits on top of that HEAD. So any ABORTED
+    record that reached the tip has its witness on the tip.
+  - **Why the negative proved nothing.** The two OFF readings rev-1 cited, nc `a7e0eb03` and inCMS
+    `eafbff4f4`, are LANDING stamps. They are not members of the population the probe acts on.
+  - **Worse shapes.** A witness equal to BASE (an abort before the first commit) is on every later
+    tip. A witness from another tree is foreign work: gov `dTieredTribunal`'s `ee0e7547` is
+    `aBoundedCeiling`'s commit.
+
+  So ancestry measures "the RECORD reached the default branch". The census's evidence that the WORK
+  landed is the per-run merge after each abort, and not this probe.
+- **The predicate that replaces it: the CONTENT predicate.** An ABORTED record's work landed when
+  all three of these hold:
+  - **(i) The witness is a real tip of the run's own work.** The witness is not an ancestor of the
+    record's `base`, and `base..witness` contains at least one commit attributable to the run: one
+    naming its slug in the subject, or touching `memory/builds/<slug>/`.
+  - **(ii) Every attributable commit is an ancestor of the tip.**
+  - **(iii) No commit on the tip's first-parent line since the landing reverts one of them.** That is
+    a `This reverts commit <sha>` trailer naming one.
+
+  When (i) cannot be decided — `base` is missing, or the history is unreadable — the predicate refuses
+  with a number and does not guess. Its negative arms come from the population it acts on: a fixture
+  record whose witness equals its base, one whose witness is a foreign tree's commit, and one whose
+  work was merged and then reverted. Each must read OFF.
 - **(a) fails twice.**
   - **Immutability.** A terminal written over a terminal is what `refuse_if_terminal` (fail 26)
     exists to stop. nc's `23be1536` refused exactly that, because LANDED over ABORTED "would
@@ -148,14 +171,16 @@ Both join `HOLD_CODES_CORE`, and `HOLD_FLOOR` moves from 5 to 7.
   would keep saying `HELD` or `ABORTED` forever. The contradiction stays in the file the owner reads.
 - **(c) passes both tests.** The phase still answers "how did the run end", and the fact answers
   "where did its work go". The writer is a derivation made durable, which is what `--preflight`'s
-  rotation already does for a derived-`LANDED` record (§12). (c) also needs no post-push commit in
-  either lander mode. The handed record already rode the landing push, and the settle commit is a
-  records commit like any other.
+  rotation already does for a derived-`LANDED` record (§12).
 
 **Pick — (c).** Three parts:
 
 - **(c1) `read_derived_phase` extends to `HELD` under a hand-off code.** The extension is the same
-  landing-commit-by-content rule §12 uses. It does not extend to any other hold code: a paused run
+  landing-commit-by-content rule §12 uses. That rule's reader, `read_landing_commit`
+  (`lib-unattended.sh:1066-1072`), returns nothing unless HEAD's copy reads LANDING, so it must
+  admit a HELD record under a hand-off code as well. For a handed record, ancestry IS the right
+  test, unlike an ABORTED one: the hand-off commit is the run's last act on its own branch, and a
+  landing that carries it carries the work it hands off. It does not extend to any other hold code: a paused run
   whose branch somebody merged has not been handed off, and deriving a terminal under a live lease
   would kill the run with fail 26. `--status` and `--liveness` print the derived reading. The gate
   leg's check-7 exclusion and its fact-set arm accept it, with `landed-by: attended` added to the
@@ -168,16 +193,25 @@ Both join `HOLD_CODES_CORE`, and `HOLD_FLOOR` moves from 5 to 7.
   - **A narrow exception to fail 26.** For an ABORTED record, the one fact is the only write fail 26
     admits. The exception is stated in protocol §3 beside "A run that is already terminal cannot be
     moved at all", because a rule with an unstated exception is two answers to one question.
-- **(c3) A drift-audit signal, `aborted_work_landed`.** It lists every ABORTED record whose witness
-  is on the advertised tip and that carries no `work-landed-at`. It is a liveness-asserted probe: it
-  is fed a known-unmerged sha and must report OFF. On the census corpus it would list 28 records
-  today, and 0 after one `--settle` pass per repository.
+- **(c3) A drift-audit signal, `aborted_work_landed`.** It lists every ABORTED record that the
+  content predicate reads ON and that carries no `work-landed-at`. Its liveness comes from the same
+  three fixture records (c2)'s arms use, each of which must read OFF. It is never fed a free-standing
+  sha. Its count today is not claimed here, because rev-1's 28 counted records that reached main, not
+  work that landed.
 
 **What it owes.**
 
-- `unattended.sh`: `read_derived_phase`, the `--settle` verb, and the fact-set arm.
-- `STOPS.template.md`: §12.
-- `PROTOCOL.template.md`: §3's exception.
+- `unattended.sh`: `read_derived_phase`, the `--settle` verb, and the fact-set arm. Also
+  `--preflight`'s order: it derives and rotates a terminal (`:5080-5081`) BEFORE its HELD refusal
+  (`:5141-5142`), so a handed record that derives LANDED must rotate with every fact the rotation's
+  fail 81 requires (`:5127`).
+- `lib-unattended.sh`: `read_landing_commit`, so that it admits a HELD record under a hand-off code.
+- `STOPS.template.md`:
+  - §1, whose "Only `--landed` and `--abort` still write a terminal" and whose
+    `--preflight`-over-HELD refusal both change;
+  - §8, a resume-matrix row for a handed record that derives LANDED;
+  - §12.
+- `PROTOCOL.template.md`: §3, both the exception and the "write the two ends" sentence.
 - `VERBS.template.md`: an entry for `--settle`.
 - `tools/drift-audit/drift_report.py`: the signal.
 - `check-unattended.sh`: check 7, check 15 and the fact-set arm.
@@ -218,10 +252,13 @@ census answers it in eight mechanisms. Two findings narrow the design.
 - **(a) Keep the policy, and raise or remove the bound per repository.** This is the status quo
   dial.
 - **(b) Land every INHERITED red, aged or not, and make the age an ESCALATION.** At the bound, the
-  ask auto-filed for the leg (`UNATTENDED-STOPS.md` §13) is raised to `BLOCKER`. It is filed — or
-  reused — in the BACKLOG of the build whose landing the bisection names, not in the closing
-  build's, and `memory/LIVE.md` lists "main red on <leg> for <n> landings". The kit default becomes
-  `land`.
+  ask auto-filed for the leg (`UNATTENDED-STOPS.md` §13) is raised to `BLOCKER`. It stays in the
+  CLOSING build's BACKLOG, where §13 files it today, and it is reused by the next closing run that
+  meets the same leg at the same R. `memory/LIVE.md` lists "main red on <leg> since R~<n>". The kit
+  default becomes `land`. (rev-2, H2 and H5) Rev-1 filed the ask in the INTRODUCING build's backlog.
+  An aged leg never has an introducer: `derive_age` returns `aged` before any bisection
+  (`run-gates.sh:2876-2879`), and the driver then files it as "introduced by an unknown landing".
+  Filing into another build would also be a write into another run's folder.
 - **(c) Widen ABSORB.** Let a run raise a shrink-only pin, or move a cutoff, when its own diff did
   not move the counter.
 
@@ -237,20 +274,28 @@ census answers it in eight mechanisms. Two findings narrow the design.
 - **(b) lands every K1a instance whose attribution is INHERITED.** Gov `dAlignedCarrier` already
   landed that way. It lands none whose attribution is OWN, MIXED or CONTENDED: gov `aReapedSpinner`
   (8 of 13 legs own) and `aSightedSkeptic` (comparator rule) still stop, correctly. And the pressure
-  the bound meant to put on the owner arrives as a BLOCKER ask on the build that broke main, instead
-  of as a held run that did not.
-- **Duplicate fixes go away.** `94a41505` records two nodes fixing the same two legs. Filing one ask
-  per (leg, introducing landing) in the introducing build stops that.
+  the bound meant to put on the owner arrives as a BLOCKER ask and a LIVE line, instead of as a held
+  run that did not break main.
+- **An age-unproven leg lands too.** Under (b) the age decides only the escalation, never the
+  landing. A leg whose age probe cannot answer lands, and is not escalated, since nothing proves it
+  aged.
 
 **Pick — (b).** This REVERSES part of owner ruling D12-i4 (`TOOL-dDerivedDocket-24`): the kit
-default `park` and the bound as a stop. It keeps D12-i5, ABSORB, unchanged. The ask states the
-reversal. Under the reversed policy, `park` remains a declarable value for a repository that wants
+default `park` and the bound as a stop. It keeps D12-i5, ABSORB, unchanged. That stays true in fact,
+because the per-leg ask stays in the closing build, where ABSORB's fourth condition already looks for
+it. The ask states the reversal. Under the reversed policy, `park` remains a declarable value for a repository that wants
 it.
 
 **What it owes.**
 
 - `unattended.sh`: `read_gate_policy`'s default, the decision table, and the ask-filing site.
-- `.githooks/pre-push`: the policy read at R.
+- `tools/run-gates/run-gates.sh`: the `ATTR_LANDABLE` predicate, which today counts only legs with a
+  numeric age into `land_n` (`:3026-3036`, `:3051`), so an aged or age-unproven leg never sets it. The
+  inherited-green stamp is written only under it (`:3375`). The comment at `:2785-2788` says aged is
+  something "no policy lands". Without this edit, `gates-green` would meet, `--close` would write
+  LANDING, and the pre-push hook would refuse the push: a new stranded-LANDING path made by the fix.
+- `.githooks/pre-push`: the policy read at R, and its admission of a red push only from the
+  inherited-green stamp.
 - `STOPS.template.md`: §13.
 - `memory/DECISIONS.md`: a superseding row for `TOOL-dDerivedDocket-24`.
 - `gen_build_index.py`: the LIVE line.

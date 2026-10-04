@@ -445,9 +445,9 @@ Cite ids, never line numbers.
 | [TOOL-dUnstalledConvoy-37](../builds/dUnstalledConvoy/BACKLOG.md) | OPEN | — | — | 2026-08-24 | core.hooksPath is repo-global and absolute, so in this multi-worktree… |
 | [TOOL-dUnstalledConvoy-38](../builds/dUnstalledConvoy/BACKLOG.md) | OPEN | — | — | 2026-08-24 | --landed's check 34 compares the lander marker against the run's own… |
 | [TOOL-dUnstuckLanding-3](../builds/dUnstuckLanding/BACKLOG.md) | OPEN | HIGH | — | 2026-10-04 | a --handoff verb so that a run whose work is sound, but which an owner… |
-| [TOOL-dUnstuckLanding-4](../builds/dUnstuckLanding/BACKLOG.md) | OPEN | HIGH | — | 2026-10-04 | the attended terminal: read_derived_phase derives LANDED (attended) for… |
+| [TOOL-dUnstuckLanding-4](../builds/dUnstuckLanding/BACKLOG.md) | OPEN | HIGH | — | 2026-10-04 | the attended terminal and its writer. read_derived_phase and… |
 | [TOOL-dUnstuckLanding-5](../builds/dUnstuckLanding/BACKLOG.md) | OPEN | MED | — | 2026-10-04 | a drift-audit signal, aborted_work_landed, listing every ABORTED record… |
-| [TOOL-dUnstuckLanding-6](../builds/dUnstuckLanding/BACKLOG.md) | OPEN | HIGH | — | 2026-10-04 | an INHERITED red lands whatever its age, and the age bound becomes an… |
+| [TOOL-dUnstuckLanding-6](../builds/dUnstuckLanding/BACKLOG.md) | OPEN | HIGH | — | 2026-10-04 | an INHERITED red lands whatever its age, and the age becomes an… |
 | [TOOL-dUnstuckLanding-7](../builds/dUnstuckLanding/BACKLOG.md) | OPEN | HIGH | — | 2026-10-04 | the history-anchored legs (brief-recorded, check 23 and pass-order)… |
 | [TOOL-dUnstuckLanding-8](../builds/dUnstuckLanding/BACKLOG.md) | OPEN | HIGH | — | 2026-10-04 | a closed close-decision table in the protocol, mapping each recurring… |
 | [TOOL-dUnstuckLanding-9](../builds/dUnstuckLanding/BACKLOG.md) | OPEN | MED | — | 2026-10-04 | refresh before a verdict: --park, --handoff, --abort, and --close under… |

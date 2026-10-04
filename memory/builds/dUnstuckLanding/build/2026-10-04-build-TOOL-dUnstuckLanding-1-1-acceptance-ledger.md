@@ -4,7 +4,7 @@
 
 The census was assembled from three read-only historian passes, one per repository. Their reports
 sat in the session scratchpad and are not tracked. The orchestrator then re-ran the two
-observations the design rests on: the witness-ancestry probe over every ABORTED record in all three
+observations the design rests on: the merge-after-abort read over every ABORTED record in all three
 repositories, and the driver line reads. No gate leg was run in this pass.
 
 **Evidences:** TOOL-dUnstuckLanding-1
@@ -12,11 +12,13 @@ repositories, and the driver line reads. No gate leg was run in this pass.
   sub-section for each of gov, nc and inCMS. Every gov row carries an abort sha or a landing sha in
   its evidence cell. The nc and inCMS sub-sections cite their landing commits and abort commits by
   sha.
-- AC2 — `git log origin/main` — `git merge-base --is-ancestor <witness> <remote tip>` was run for
-  every ABORTED record: 8 in gov, 13 in nc (one of them retired) and 9 in inCMS (one of them
-  retired). All 30 read ON, and the merge each `git log <tip> --merges --grep=<slug>` found follows
-  its abort commit. The probe is live: nc `a7e0eb03` and inCMS `eafbff4f4`, both known unmerged,
-  read OFF.
+- AC2 — `git log origin/main` — for every ABORTED record (8 in gov, 13 in nc with one retired, and
+  9 in inCMS with one retired), `git log <tip> --merges --grep=<slug>` found a merge naming the slug for
+  29 of the 30. The 30th is nc `dBarredPostern`, whose work the historian traced to `23be1536`, a
+  merge of another branch. The landed-later cells agree with those landings. One gov row was wrong at rev-1:
+  aMeteredTurnstile's work merged at `3214f393`, before its abort, and it is corrected. The witness
+  ancestry probe, which also read ON for all 30, is structural for a record read from the tip, so it
+  is not evidence for this criterion (closing review H1).
 - AC3 — `## Failure classes` — K1 to K6 each state per-repo counts, cite two or more instances, and
   name a root cause. K1's root causes are its five sub-shapes. K2's root cause is BUILD-METHOD M3's
   park rule. K3's is `refuse_if_terminal`. K4 to K6 each carry a **Root cause** line.

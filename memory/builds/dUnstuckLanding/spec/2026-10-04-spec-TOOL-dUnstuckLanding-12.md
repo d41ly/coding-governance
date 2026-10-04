@@ -1,10 +1,13 @@
 # TOOL-dUnstuckLanding-12 — design rev-2: the closing review's five HIGH findings closed
 
-**Status:** INPROGRESS · rev-1 · 2026-10-04 · node d · Tier-1 · base a587e82d · streams tooling · order 3
+**Status:** CLOSED · rev-1 · 2026-10-04 · node d · Tier-1 · base a587e82d · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-04-build-TOOL-dUnstuckLanding-12-1-acceptance-ledger.md](../build/2026-10-04-build-TOOL-dUnstuckLanding-12-1-acceptance-ledger.md) | journal | — |
+| [2026-10-04-prompt-TOOL-dUnstuckLanding-12-build-brief.md](../prompts/2026-10-04-prompt-TOOL-dUnstuckLanding-12-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
 

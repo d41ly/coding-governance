@@ -31,14 +31,20 @@ this date.
 - **The records still say ABORTED.** 28 run-state files read `phase: ABORTED` today: 8 in gov,
   12 in nc and 8 in inCMS.
 
-**The landing is derivable for all of them.**
+**What shows the work landed is the merge, not the witness.**
 
-- **The probe.** For each record, ask whether its witness is an ancestor of the remote's default
-  tip, using `git merge-base --is-ancestor`.
-- **The result.** All 28 records read ON. So do the two retired records that have successors
-  (nc `dCandidLodestar`, inCMS `aRisingCultivar`).
-- **Liveness.** The probe was asserted live on two known-unmerged stamps, and both read OFF: nc
-  `a7e0eb03` and inCMS `eafbff4f4`.
+- **The evidence.** The historian passes found, for each abort, the merge carrying the build's work
+  and its position after the abort commit. The per-repo sections cite those merges.
+- **Why the witness says nothing (rev-2, closing review H1).** Asking whether each record's
+  witness is an ancestor of the remote tip reads ON for all 28 records, and for the two retired
+  records with successors. But that is STRUCTURAL for a record read from the tip.
+  - **Why it is structural.** `verb_abort` writes `witness` = HEAD of the tree that runs it
+    (`unattended.sh:4746-4749`), and the record's own commit descends from it.
+  - **Why the OFF readings prove nothing.** The two OFF readings rev-1 offered as liveness, nc
+    `a7e0eb03` and inCMS `eafbff4f4`, are LANDING stamps and not ABORTED records.
+
+  So the probe measures that the RECORD reached main. It does not measure that the WORK landed, and
+  the design does not rest on it.
 
 The same records carry the owner's two named causes:
 
@@ -76,7 +82,7 @@ Six of inCMS's nine aborts do so in so many words (`history-incms` §a.1).
 | `cBriefedPilot` | `fork-unresolvable` | close: would not judge whether 16 of 22 units was a landable build; bar 54/54 green | attended merge `d523861f` | abort `9ad35319` |
 | `dClosedLexicon` | `fork-unresolvable` | mid-build: P3 non-convergent | attended merge `c48ccdaa` | abort `63ea7f5c` |
 | `aWalkedCorpus` | `gate-red-out-of-scope` | lander: origin/main red on two legs | attended `31d08316` | abort `ae9aac36` |
-| `aMeteredTurnstile` | `gate-red-out-of-scope` | lander: host process creation 25x slower | `6e73562c` | abort `4fe1f659` |
+| `aMeteredTurnstile` | `gate-red-out-of-scope` | lander: host process creation 25x slower | work merged `3214f393`, two minutes BEFORE the abort; `6e73562c` carried only the record | abort `4fe1f659` |
 | `dScriptedRepeat` | `scope-approval-needed` | close: `build-complete` blocked on two owner forks | `0aa49bc3` | abort `c2b3576b` |
 | `dMispairedQuote` | `gate-red-out-of-scope` | close: 85/86, kit check 2 on its own fold | `f0eb3239`, same day | abort `a22834c0` |
 | `aHoistedPass` | `repo-state-out-of-mandate` | lander: diverged primary main, two bars killed at 3604 s and 3602 s | `8a36ff4e` | abort `36a90178` |
@@ -101,7 +107,8 @@ The remaining seven gov aborts:
 - **The lone exception.** `dCandidLodestar`'s retired record has a LANDED successor run. Nothing
   else changed state.
 - **The landings were quick.** Every merge followed its abort by 18 minutes to about 41 hours.
-- **Every witness is on `origin/main`**, per the probe above.
+- **Each was carried by a merge after its abort.** The merges are cited in the run table below. The
+  witness probe reads ON here too, and that says only that the records reached main.
 - **Node b produced five of them.** Node `b` produced 4 aborts, plus `bGildedVestibule`, which is
   stuck at LANDING. nc's `CLAUDE.md:59` limits unattended landing to nodes `a` and `d`, and nothing
   at `--preflight` refuses a node-`b` run.
