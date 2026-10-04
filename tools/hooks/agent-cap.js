@@ -1884,15 +1884,29 @@ function checkSpecAuditDeclared(data) {
     if (typeof a === 'string') {
       try { a = JSON.parse(a) } catch { return null }
     }
-    if (!a || typeof a !== 'object' || Array.isArray(a) || String(a.kind) !== 'spec-audit') return null
+    if (!a || typeof a !== 'object' || Array.isArray(a)) return null
+    // TOOL-aWardedAudit-2 S4 — THE BUILD HARNESS'S `specAudit` IS THE SAME ACT ONE CALL EARLIER. The
+    // harness runs its audit through a `workflow()` call inside its own script, a runtime call no
+    // hook sees, so the only tool call there is to judge is the one carrying `specAudit`. It is placed
+    // by the harness's own default, `memory/builds/<slug>/reviews`, when `reviewDir` is absent, and a
+    // `slug` that is not one path segment cannot be placed. Presence is the test, whatever the value.
+    const harness = a.specAudit !== undefined
+    if (String(a.kind) !== 'spec-audit' && !harness) return null
     if (typeof a.repo !== 'string' || a.repo === '') {
       return renderDeny(`a spec-audit Workflow call whose \`repo\` is not a non-empty string cannot be placed, so it cannot be admitted.`)
     }
-    const parts = String(a.reviewDir === undefined || a.reviewDir === null ? '' : a.reviewDir)
+    let rdir = a.reviewDir
+    if (harness && (rdir === undefined || rdir === null)) {
+      if (typeof a.slug !== 'string' || !/^[A-Za-z0-9_-]+$/.test(a.slug)) {
+        return renderDeny(`a Workflow call carrying \`specAudit\` whose \`slug\` (${JSON.stringify(a.slug)}) is not one path segment, and which names no \`reviewDir\`, cannot be placed, so it cannot be admitted.`)
+      }
+      rdir = 'memory/builds/' + a.slug + '/reviews'
+    }
+    const parts = String(rdir === undefined || rdir === null ? '' : rdir)
       .replace(/\\/g, '/').replace(/\/+$/, '').split('/')
     const dir = parts.slice(0, -1) // reviewDir's parent: the build folder
     if (dir.length < 2 || dir[dir.length - 2] !== 'builds' || dir[dir.length - 1] === '' || parts.indexOf('..') !== -1) {
-      return renderDeny(`a spec-audit Workflow call whose \`reviewDir\` (${JSON.stringify(a.reviewDir)}) is not directly under a \`builds/<slug>/\` folder, or climbs through \`..\`, cannot be placed, so it cannot be admitted.`)
+      return renderDeny(`a spec-audit Workflow call whose \`reviewDir\` (${JSON.stringify(rdir)}) is not directly under a \`builds/<slug>/\` folder, or climbs through \`..\`, cannot be placed, so it cannot be admitted.`)
     }
     if (Array.isArray(a.subjects)) {
       const stray = a.subjects.find((s) => extractBuildSlug(s && s.path) !== dir[dir.length - 1])
@@ -1931,7 +1945,12 @@ function checkSpecAuditDeclared(data) {
       const phase = (/^phase:[ \t]*(\S+)[ \t]*\r?$/m.exec(rbytes) || [])[1] || ''
       if (phase !== 'LANDED' && phase !== 'ABORTED') {
         const f = (/^spec-audit:[ \t]*(\S+)[ \t]*\r?$/m.exec(rbytes) || [])[1] || ''
-        if (/^\d{4}-\d{2}-\d{2}$/.test(f)) return null
+        // The harness's `specAudit` must BE the pinned date: a different date is a declaration the
+        // preflight never read, which is the self-opt-in again with a fact standing beside it.
+        if (/^\d{4}-\d{2}-\d{2}$/.test(f) && (!harness || a.specAudit === f)) return null
+        if (/^\d{4}-\d{2}-\d{2}$/.test(f)) {
+          return renderDeny(`${runmd} pins \`spec-audit: ${f}\`, and this call passes \`specAudit\` ${JSON.stringify(a.specAudit)}; the harness takes the pinned date or nothing.`)
+        }
         return renderDeny(`${runmd} is a live unattended run (phase ${phase || '(none)'}) that pins no dated \`spec-audit:\` fact, so its preflight found no owner opt-in, and a key or default written into the worktree since is the run's own.`)
       }
     }

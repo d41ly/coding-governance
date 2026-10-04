@@ -1023,6 +1023,24 @@ check_spec_audit "rule0/aWardedAudit: LANDED run-state file, slug README key →
 rm -f "$SARUN"
 printf -- '---\nslug: tSA\n---\n' > "$SAREADME"
 
+# ---- TOOL-aWardedAudit-2 S4 — the BUILD HARNESS's `specAudit` is judged by the same predicate: its
+# ---- nested audit is a runtime `workflow()` call no hook sees, so this is the one tool call there is.
+# ---- The base hook admitted every one of these, because it judged `kind` alone.
+SAH="{\"repo\":\"$SAJ\",\"slug\":\"tSA\",\"specAudit\":\"2026-10-05\"}"
+printf -- '---\nslug: tSA\nspec-audit: 2026-10-05\n---\n' > "$SAREADME"
+printf '# run\n\n## Run facts\n\nphase: BUILDING\n' > "$SARUN"
+check_spec_audit "rule0/aWardedAudit: harness specAudit, live run pinning no fact → deny" 2 "builds/tSA/RUN.md;;live unattended run" "$SAH"
+printf '# run\n\n## Run facts\n\nphase: BUILDING\nspec-audit: 2026-10-05\n' > "$SARUN"
+check_spec_audit "rule0/aWardedAudit: harness specAudit equal to the pinned fact → allow" 0 "" "$SAH"
+printf '# run\n\n## Run facts\n\nphase: BUILDING\nspec-audit: 2026-09-01\n' > "$SARUN"
+check_spec_audit "rule0/aWardedAudit: harness specAudit differing from the pinned fact → deny" 2 "pins \`spec-audit: 2026-09-01\`;;the pinned date or nothing" "$SAH"
+check_spec_audit "rule0/aWardedAudit: harness specAudit with an unplaceable slug → deny" 2 "is not one path segment" \
+  "{\"repo\":\"$SAJ\",\"slug\":\"../x\",\"specAudit\":\"2026-10-05\"}"
+check_spec_audit "rule0/aWardedAudit: harness call with no specAudit → not this rule's business" 0 "" \
+  "{\"repo\":\"$SAJ\",\"slug\":\"tSA\"}"
+rm -f "$SARUN"
+printf -- '---\nslug: tSA\n---\n' > "$SAREADME"
+
 # ---- rule 3: the hook READS THE BOUND ------------------------------------------------------------
 # EVERY ARM HERE ASSERTS ITS OWN MESSAGE, never the exit code. All three rules exit 2, so an arm
 # keyed on 2 passes when a completely different branch fires — which is how the retired `cap-5` arm
