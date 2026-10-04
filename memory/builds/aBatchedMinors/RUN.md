@@ -52,3 +52,5 @@ base: 5ba0fc4fcdab79eeeb7f75a97a48102bb10bfefa
 2026-10-04T16:33:48Z rescope · item add TOOL-aBatchedMinors-6 · reason closing review round 1 promoted all 14 confirmed minors (3 MEDIUM, 11 LOW; items M1 M2 L1-L7) into ONE batched unit under the rule this build ships; one, not two, because the build is driven inline and a second unit buys no concurrency
 
 2026-10-04T16:35:31Z brief · item TOOL-aBatchedMinors-6 · reason f9bf89853b34 memory/builds/aBatchedMinors/prompts/2026-10-04-prompt-TOOL-aBatchedMinors-6-1-build-brief.md
+
+2026-10-04T16:36:17Z dispatch · item adaea264 TOOL-aBatchedMinors-6 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/check-unattended.test.sh tools/unattended/SKILL.template.md .claude/skills/unattended/SKILL.md tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md tools/memory-tree/BUILD-METHOD.template.md memory/guides/BUILD-METHOD.md memory/builds/aBatchedMinors/spec/2026-10-04-spec-TOOL-aBatchedMinors-6.md memory/builds/aBatchedMinors/README.md memory/LIVE.md memory/ledger/2026-10.md memory/guides/SESSION-KICKOFF.md tools/template-size-highwater.txt

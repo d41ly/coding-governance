@@ -8992,6 +8992,15 @@ verb_review() { # slug · subject · verdict · blockers · disposition · highs
   case "$minors" in
     ""|*[!0-9]*) [ -z "$minors" ] || { fail 37 "--review requires --minors as a plain integer, the count of CONFIRMED MEDIUM and LOW findings standing at the closing review's exit: $minors"; return 1; } ;;
   esac
+  # ONE INTEGER FOR TWO READERS (closing review round 1, L1). The counts reach bash arithmetic below,
+  # which reads a leading zero as OCTAL (`08` aborts the driver, `010` is 8) and wraps past 2^63,
+  # while check 2's awk reads the same row field as decimal. A canonical decimal of at most nine
+  # digits is the one spelling both read alike, so anything else is refused before either does.
+  for _rv_n in "blockers $blockers" "highs $highs" "minors $minors"; do
+    case "${_rv_n#* }" in
+      0[0-9]*|??????????*) fail 37 "--review requires --${_rv_n%% *} as a decimal of at most nine digits with no leading zero, because bash arithmetic reads a leading zero as octal and check 2 reads the row as decimal: ${_rv_n#* }"; return 1 ;;
+    esac
+  done
   if [ "$subj" != "$slug" ] && [ -n "$highs$minors" ]; then
     fail 37 "--highs and --minors are the closing diff review's counts, and this subject is not the build slug: a spec audit's mediums and lows are FOLDED into the spec under review, so a count here would be read by the gate as owing units nobody owes: $subj"
     return 1
@@ -9067,8 +9076,9 @@ verb_review() { # slug · subject · verdict · blockers · disposition · highs
   # NON-CONVERGENT, CEILING or BOUNDED exit stands on at least one BLOCKER, and the severity rule
   # promotes every blocker: `fold` cannot be that exit's disposition, and accepting it wrote
   # `blockers 3 · disposition fold`, a row the gate read as demanding nothing. At CONVERGED the same
-  # rule disposes the HIGHS that stood at zero blockers, so a disposition is ACCEPTED there and
-  # never required — a converged round with nothing above MEDIUM needs no field.
+  # rule disposes the HIGHS that stood at zero blockers, so on a SPEC subject a disposition is
+  # ACCEPTED there and never required — a converged round with nothing above MEDIUM needs no field.
+  # The closing diff review's converged round is decided by its counts, in the block below.
   case "$state" in
     NON-CONVERGENT|CEILING|BOUNDED)
       if [ -z "$disposition" ]; then
@@ -9076,7 +9086,13 @@ verb_review() { # slug · subject · verdict · blockers · disposition · highs
         return 1
       fi
       if [ "$disposition" = fold ]; then
-        fail 37 "--review exits $state with $blockers blocker(s) standing, and the severity rule promotes every blocker, so fold cannot be this exit's disposition; fold is legal only at CONVERGED, where nothing above MEDIUM stood"
+        # ...and on the closing diff review fold is legal at NO exit (closing review round 1, L3), so
+        # the sentence pointing at CONVERGED would send the operator to a refusal.
+        if [ "$subj" = "$slug" ]; then
+          fail 37 "--review exits $state on the closing diff review, which folds nothing: every confirmed finding is promoted, the MEDIUMs and LOWs batched into one unit or two"
+        else
+          fail 37 "--review exits $state with $blockers blocker(s) standing, and the severity rule promotes every blocker, so fold cannot be this exit's disposition; fold is legal only at CONVERGED, where nothing above MEDIUM stood"
+        fi
         return 1
       fi ;;
     CONVERGED) ;;

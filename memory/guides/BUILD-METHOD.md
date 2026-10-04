@@ -31,7 +31,7 @@ closed forks.
 
 ## M2 — The spec set — decompose, detect, classify, act
 
-**Decompose first**, before anything is classified: **one mechanism per spec.** A separate document, gate, adopter
+**Decompose first**, before anything is classified: **one mechanism per spec**, the closing review's minors batch (M4) excepted. A separate document, gate, adopter
 or generated artifact is a separate unit with its own id and spec. Two mechanisms in one spec make a "unit built"
 pass unreviewable — the closing diff cannot tell which half a finding lands on.
 Grouping asks into one unit is written ONLY as that unit's `closes` list.
@@ -242,14 +242,14 @@ Bug classes FIRST — the M6 checklist over `<BASE>..HEAD`, ALWAYS that full ran
 fold REINTRODUCES stays selected even where the fold's own files would not select it, and the probe costs seconds.
 Its output is a lens brief, not a report filed after. Then ONE adversarial review, which is `diff-reviewed` — round 1 from the run's pinned
 BASE (an immutable sha, never a moving ref) to the tip; round N>1 from round N-1's RECORDED TIP, so it reads the
-FOLD that round introduced instead of re-reading fixes, and passes that round's confirmed set as `priorFindings`.
+FOLD that round introduced instead of re-reading fixes, and passes the blockers that fold fixed as `priorFindings`.
 The harness refuses a base that is not a sha once the round is above 1. Per-pass reviews do not substitute: they
 re-scan overlapping code and never see the seam between two passes.
 
 ```
 Workflow { scriptPath: 'tools/workflows/tier2-review.js',
            args: { repo: '<abs repo path>', base: '<sha: BASE at round 1, round N-1's tip after>',
-                   head: 'HEAD', round: <n>, priorFindings: [<round N-1's confirmed set>],
+                   head: 'HEAD', round: <n>, priorFindings: [<round N-1's fixed blockers>],
                    reviewDir: 'memory/builds/<slug>/reviews' } }
 ```
 
@@ -259,7 +259,7 @@ recording grammar before the next gate run**, or check 5 reds on a free-named fi
 `diff-review`, not a `spec-audit`: give it `**Serves:** diff-review <every id in the diff>` and do not let it stand
 in for the per-spec pass M4 owns — the two answer different questions and only one of them is about a design.
 
-Fix every blocker, then re-review the FIX, not the diff again. A blocker unfixable inside the mandate's scope is a
+Fix every blocker, and ONLY blockers: highs, mediums and lows carry to the exit, where M4 promotes them. Then re-review the FIX, not the diff again. A blocker unfixable inside the mandate's scope is a
 park, not a waiver, and its unit does not close. Left-shift every confirmed finding — a regression gate, or a
 `memory/gotchas/` class when the class cannot be gated; a finding fixed and not left-shifted returns.
 

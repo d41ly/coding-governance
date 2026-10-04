@@ -186,8 +186,8 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   Skill's exit bullet states promotes every blocker, so `--disposition promote` is REQUIRED there and
   `fold` beside a standing blocker is REFUSED rather than written. `fold` survives as the reading of
   a record that exited with nothing above MEDIUM, which the driver reaches only at `CONVERGED` with
-  no high, and that row needs no field. On `CONVERGED` an optional `--disposition promote` is
-  ACCEPTED, never required, for the round whose highs stood: it is the value that demands new unit
+  no high, and that row needs no field. On a SPEC subject's `CONVERGED` an optional
+  `--disposition promote` is ACCEPTED, never required, for the round whose highs stood: it is the value that demands new unit
   ids, and a mixed exit takes the value that demands something, so the gate counts the unit a high
   became instead of reading the promotion as nothing. A record naming no value where one is owed
   leaves the gate inferring one from ids. It refuses a verdict or a disposition outside its closed

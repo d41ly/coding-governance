@@ -5715,8 +5715,18 @@ hit "$(run --review tRun --subject tRun --verdict CLEAN --blockers 0 --highs x -
 hit "$(run --review tRun --subject tRun --verdict CLEAN --blockers 0 --highs 0 --minors -1)" "--review requires --minors as a plain integer, the count of CONFIRMED MEDIUM and LOW findings standing at the closing review's exit"
 # ...a spec subject takes no count: its mediums and lows are folded into the spec under review
 hit "$(run --review tRun --subject S9 --verdict BLOCKED --blockers 0 --minors 2)" "--highs and --minors are the closing diff review's counts, and this subject is not the build slug"
+same "a refused spec-subject count wrote no row (closing review round 1, L6)" "$(grep -c 'review · item S9 · reason' memory/builds/tRun/RUN.md)" "0"
+# ...one integer for two readers (round 1, L1): bash reads a leading zero as octal, so `08` used to
+# abort the driver and `010` computed 8 while check 2 read 10; a ten-digit value wraps nothing now
+hit "$(run --review tRun --subject tRun --verdict CLEAN --blockers 0 --highs 08 --minors 0)" "--review requires --highs as a decimal of at most nine digits with no leading zero"
+hit "$(run --review tRun --subject tRun --verdict CLEAN --blockers 0 --highs 0 --minors 010)" "--review requires --minors as a decimal of at most nine digits with no leading zero"
+hit "$(run --review tRun --subject tRun --verdict CLEAN --blockers 1234567890 --highs 0 --minors 0)" "--review requires --blockers as a decimal of at most nine digits with no leading zero"
 # ...the closing exit must count, must promote what stood, never folds, and never promotes nothing
 hit "$(run --review tRun --subject tRun --verdict "CLEAN WITH FIXES" --blockers 0)" "--review exits CONVERGED on the closing diff review and requires --highs and --minors"
+# ...EITHER count missing is the refusal, not only both (round 1, M2): a guard regressed to an AND
+# would write `minors  · disposition promote`, a row check 2 cannot read a floor from
+hit "$(run --review tRun --subject tRun --verdict "CLEAN WITH FIXES" --blockers 0 --highs 1 --disposition promote)" "--review exits CONVERGED on the closing diff review and requires --highs and --minors"
+hit "$(run --review tRun --subject tRun --verdict "CLEAN WITH FIXES" --blockers 0 --minors 1 --disposition promote)" "--review exits CONVERGED on the closing diff review and requires --highs and --minors"
 hit "$(run --review tRun --subject tRun --verdict "CLEAN WITH FIXES" --blockers 0 --highs 0 --minors 3)" "--review exits CONVERGED on the closing diff review with 0 blocker(s), 0 high(s) and 3 minor(s) standing, and requires --disposition promote"
 hit "$(run --review tRun --subject tRun --verdict "CLEAN WITH FIXES" --blockers 0 --highs 0 --minors 3 --disposition fold)" "--review exits CONVERGED on the closing diff review, which folds nothing"
 hit "$(run --review tRun --subject tRun --verdict CLEAN --blockers 0 --highs 0 --minors 0 --disposition promote)" "--review exits CONVERGED on the closing diff review with nothing standing, so --disposition promote promotes nothing"
@@ -5732,6 +5742,10 @@ reset_tree
 bcopen; sed -i '/review · item tRun · /d' memory/builds/tRun/RUN.md
 hit "$(run --review tRun --subject tRun --verdict BLOCKED --blockers 2 --highs 0 --minors 0)" "--review names --highs or --minors on a closing round that is not a terminal exit"
 run --review tRun --subject tRun --verdict BLOCKED --blockers 2 >/dev/null
+# ...the state gate's fold refusal names the closing rule there, not "legal at CONVERGED" (round 1, L3)
+out=$(run --review tRun --subject tRun --verdict BLOCKED --blockers 2 --highs 1 --minors 0 --disposition fold)
+hit "$out" "--review exits NON-CONVERGENT on the closing diff review, which folds nothing"
+miss "$out" "fold is legal only at CONVERGED"
 out=$(run --review tRun --subject tRun --verdict BLOCKED --blockers 2 --highs 1 --minors 0 --disposition promote)
 hit "$out" "NON-CONVERGENT · highs 1 · minors 0 · disposition promote"
 hit "$out" "this exit owes at least 3 new unit(s)"

@@ -1,6 +1,6 @@
 # TOOL-aBatchedMinors-6 — the closing review's batched minors, round 1
 
-**Status:** OPEN · rev-1 · 2026-10-04 · node a · Tier-2 · base 5ba0fc4f · streams tooling · order 6
+**Status:** CLOSED · rev-1 · 2026-10-04 · node a · Tier-2 · base 5ba0fc4f · streams tooling · order 6
 
 <!-- gen:spec-records -->
 

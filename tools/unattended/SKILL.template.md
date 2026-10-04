@@ -797,6 +797,8 @@ confirmed-blocker count for THIS round, as a plain integer.
 It answers with one of five states, and the state is what you act on:
 
 - **CONVERGING** — this round's count is strictly smaller than the round before. Fold and go again.
+  On the closing diff review the fold fixes its BLOCKERS only; the highs, mediums and lows carry to
+  the exit, where they are counted and promoted (the build method's M8).
 - **CONVERGED** — zero blockers. The loop is done for that subject, and its confirmed highs,
   mediums and lows are still disposed, by the severity rule the next bullet states. Where a HIGH
   stood on a SPEC subject, record `--disposition promote` on that round — ACCEPTED there, never
@@ -852,7 +854,7 @@ bash {{KIT_DIR}}/unattended.sh --review <slug> --subject <slug> --verdict <verdi
 
 Derive both from the harness returns, never by reading the report: per round, `<H>` adds that
 round's `highs` and `<M>` adds `confirmed - blockers - highs`, summed over every round of the loop,
-because the fixes between rounds close blockers and nothing else. The verb then requires `promote`
+because a closing fold fixes blockers only, per the CONVERGING bullet above. The verb then requires `promote`
 whenever anything stood and refuses it when nothing did, and the merge bar demands one new unit per
 standing blocker and high plus one for the minors.
 

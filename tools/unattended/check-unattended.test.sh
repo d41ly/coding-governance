@@ -1276,7 +1276,10 @@ miss "$(run)" "check 2 FAILED"
 D_THREE='| TOOL-tDisp-1 | CLOSED |\n| TOOL-tDisp-2 | CLOSED |\n| TOOL-tDisp-3 | CLOSED |\n'
 reset_tree; dispconf 2000-01-01
 mkdisp "$D_ONE" "$D_TWO" '2026-08-20T01:00:00Z review · item tDisp · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 1 · minors 3 · disposition promote\n'
-hit "$(run)" "gained only 1 non-WONTDO unit id(s) this run BASE lacked, against a floor of 2"
+out=$(run)
+hit "$out" "gained only 1 non-WONTDO unit id(s) this run BASE lacked, against a floor of 2"
+# ...the leading count is SUBJECTS, the floor is UNITS: one subject owing two (round 1, L6 id 11)
+hit "$out" "1 subject(s) EXITED recording disposition promote and the generated units region gained only 1"
 reset_tree; dispconf 2000-01-01
 mkdisp "$D_ONE" "$D_THREE" '2026-08-20T01:00:00Z review · item tDisp · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 1 · minors 3 · disposition promote\n'
 miss "$(run)" "check 2 FAILED"
@@ -1300,10 +1303,22 @@ hit "$(run)" "record NO disposition while this record is graded against DISPOSIT
 reset_tree; dispconf 2000-01-01
 mkdisp "$D_ONE" "$D_ONE" '2026-08-20T01:00:00Z review · item tDisp · reason verdict CLEAN · blockers 0 · CONVERGED · highs 0 · minors 0\n'
 miss "$(run)" "check 2 FAILED"
-# ...and the closing review folds nothing, at the fold cutoff and after it
+# ...and the closing review folds nothing, at the fold cutoff and after it (round 1, L7: both dates armed)
 reset_tree; dispconf 2000-01-01
 DISPDATE="2026-09-15T00:00:00 +0000" mkdisp "$D_ONE" "$D_ONE" '2026-08-20T01:00:00Z review · item tDisp · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 0 · minors 2 · disposition fold\n'
 hit "$(run)" "record disposition fold on a row carrying highs and minors, and the closing diff review folds nothing"
+reset_tree; dispconf 2000-01-01
+DISPDATE="2026-10-04T00:00:00 +0000" mkdisp "$D_ONE" "$D_ONE" '2026-08-20T01:00:00Z review · item tDisp · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 0 · minors 2 · disposition fold\n'
+hit "$(run)" "record disposition fold on a row carrying highs and minors, and the closing diff review folds nothing"
+# ...and the floors SUM across subjects in one record (round 1, L6 id 9): 1 (a spec subject without
+# counts) + 2 (a closing row, one high plus the minors) = 3, so a per-subject maximum would pass two
+reset_tree; dispconf 2000-01-01
+mkdisp "$D_ONE" "$D_THREE" '2026-08-20T01:00:00Z review · item S1 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT · disposition promote\n\n2026-08-20T02:00:00Z review · item tDisp · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 1 · minors 1 · disposition promote\n'
+hit "$(run)" "2 subject(s) EXITED recording disposition promote and the generated units region gained only 2 non-WONTDO unit id(s) this run BASE lacked, against a floor of 3"
+D_FOUR='| TOOL-tDisp-1 | CLOSED |\n| TOOL-tDisp-2 | CLOSED |\n| TOOL-tDisp-3 | CLOSED |\n| TOOL-tDisp-4 | CLOSED |\n'
+reset_tree; dispconf 2000-01-01
+mkdisp "$D_ONE" "$D_FOUR" '2026-08-20T01:00:00Z review · item S1 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT · disposition promote\n\n2026-08-20T02:00:00Z review · item tDisp · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 1 · minors 1 · disposition promote\n'
+miss "$(run)" "check 2 FAILED"
 
 # ---- TOOL-aProbedUnit-6: BOUNDED is a terminal exit that OWES a disposition and, on promote, an
 # ---- id, exactly as NON-CONVERGENT does. At base the first fixture printed NOTHING: the `needs`

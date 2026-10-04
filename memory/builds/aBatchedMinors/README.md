@@ -22,7 +22,7 @@ mediums and lows grouped into one or two units. The prompt is in `prompts/`.
 - A closing review's MEDIUM and LOW findings are built as units, not left as spec prose.
 - The driver refuses a closing-review exit that records standing findings with no promotion.
 - The merge bar demands one unit per blocker and high, plus one for the minors batch.
-- The review harness returns the minor count the record needs, so nobody counts by hand.
+- The exit's counts derive from the review harness's own tally, so nobody parses a report.
 
 ## Detriments if this is not built
 
@@ -57,7 +57,7 @@ mediums and lows grouped into one or two units. The prompt is in `prompts/`.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 5 unit(s) · node a · opened 2026-10-04 · streams tooling
+**Build status:** CLOSED · 5 unit(s) · node a · opened 2026-10-04 · streams tooling
 ids TOOL-aBatchedMinors-1 TOOL-aBatchedMinors-2 TOOL-aBatchedMinors-3 TOOL-aBatchedMinors-4 TOOL-aBatchedMinors-5 TOOL-aBatchedMinors-6
 
 <!-- gen:build-units -->
@@ -67,7 +67,7 @@ ids TOOL-aBatchedMinors-1 TOOL-aBatchedMinors-2 TOOL-aBatchedMinors-3 TOOL-aBatc
 | [TOOL-aBatchedMinors-2 — the closing review's exit records its standing findings and promotes them all](spec/2026-10-04-spec-TOOL-aBatchedMinors-2.md) | 2 | 2 | CLOSED | rev-2 | 2026-10-04 |
 | [TOOL-aBatchedMinors-3 — check 2 demands one unit per blocker and high, plus one for the minors](spec/2026-10-04-spec-TOOL-aBatchedMinors-3.md) | 3 | 2 | CLOSED | rev-1 | 2026-10-04 |
 | [TOOL-aBatchedMinors-4 — the method, the Skill and the verbs entry state the batched-promotion rule](spec/2026-10-04-spec-TOOL-aBatchedMinors-4.md) | 4 | 1 | CLOSED | rev-2 | 2026-10-04 |
-| [TOOL-aBatchedMinors-6 — the closing review's batched minors, round 1](spec/2026-10-04-spec-TOOL-aBatchedMinors-6.md) | 6 | 2 | OPEN | rev-1 | 2026-10-04 |
+| [TOOL-aBatchedMinors-6 — the closing review's batched minors, round 1](spec/2026-10-04-spec-TOOL-aBatchedMinors-6.md) | 6 | 2 | CLOSED | rev-1 | 2026-10-04 |
 <!-- /gen:build-units -->
 
 Records: 6 bound to this build, across 3 record folder(s).
