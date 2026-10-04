@@ -1563,14 +1563,18 @@ check_work_landed() { # record file · advertised tip -> 0 landed · 1 not · 2 
     || { WL_WHY="the range ${_wl_b:0:8}..${_wl_w:0:8} cannot be read"; return 2; }
   _wl_own=$(GIT log --format=%H "$_wl_b..$_wl_w" -- "$_wl_d/" 2>/dev/null) \
     || { WL_WHY="the range ${_wl_b:0:8}..${_wl_w:0:8} cannot be read"; return 2; }
-  while IFS= read -r _wl_c; do
+  # The rows are split into an array, and NOT read by a loop fed by a here-string: the shell-hygiene
+  # leg refuses a loop whose redirect holds a substitution's output (`_wl_all` above).
+  local -a _wl_rows=()
+  mapfile -t _wl_rows <<< "$_wl_all"
+  for _wl_c in "${_wl_rows[@]}"; do
     [ -n "$_wl_c" ] || continue
     case "$_wl_own" in
       *"${_wl_c%% *}"*) ;;
       *) [[ " ${_wl_c#* } " =~ [^A-Za-z0-9]"$_wl_s"[^A-Za-z0-9] ]] || continue ;;
     esac
     _wl_x="$_wl_x ${_wl_c%% *}"; _wl_n=$((_wl_n + 1))
-  done <<< "$_wl_all"
+  done
   if [ "$_wl_n" = 0 ]; then
     WL_WHY="no commit in ${_wl_b:0:8}..${_wl_w:0:8} names $_wl_s in its subject or touches $_wl_d/, so its witness is not this run's work"
     return 1

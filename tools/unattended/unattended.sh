@@ -1302,11 +1302,9 @@ derive_refreshed_at() { # run-state file · slug · verb -> prints the listing, 
     echo "unattended: refresh — the remote advertises $_rf_ref at ${_rf_tip:0:8}, and this clone lacks it or BASE ${_rf_base:0:8}, so the commits past BASE are not listed and nothing was fetched"
     RF_FACT="$_rf_tip · $_rf_verb · unlisted"; return 0
   fi
-  while IFS= read -r _rf_p; do
-    [ -n "$_rf_p" ] && _rf_paths+=("$_rf_p")
-  done <<RFSET
-$( { readme_of "$_rf_slug"; echo; grep -F ' dispatch · item ' "$_rf_f" 2>/dev/null | sed 's/.* · reason //' | tr ' ' '\n'; } | awk 'NF && !s[$0]++')
-RFSET
+  # NOT A LOOP FED BY A REDIRECT HOLDING A SUBSTITUTION (the shell-hygiene leg): `mapfile` over a
+  # process substitution reads to its writer's end, and `awk` drops empty lines and repeats.
+  mapfile -t _rf_paths < <( { readme_of "$_rf_slug"; echo; grep -F ' dispatch · item ' "$_rf_f" 2>/dev/null | sed 's/.* · reason //' | tr ' ' '\n'; } | awk 'NF && !s[$0]++')
   _rf_m=$(GIT rev-list --count "$_rf_tip" --not "$_rf_base" HEAD 2>/dev/null) || _rf_m="?"
   _rf_n=$(GIT --literal-pathspecs rev-list --count "$_rf_tip" --not "$_rf_base" HEAD -- "${_rf_paths[@]}" 2>/dev/null) || _rf_n="?"
   _rf_rows=$(GIT --literal-pathspecs log -n 10 --format='%h %s' "$_rf_tip" --not "$_rf_base" HEAD -- "${_rf_paths[@]}" 2>/dev/null)
