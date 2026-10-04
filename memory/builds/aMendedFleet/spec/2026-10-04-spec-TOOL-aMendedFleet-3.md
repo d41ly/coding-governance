@@ -198,8 +198,8 @@ this unit adds rather than adding its own.
   python and no kit each print a skip line; an octopus or base-less merge is named as skipped.
 - observability — the summary line prints every count and the seconds; the refusal token and the
   run-log decision name the class.
-- risks — a name defined twice in a tree masks a loss of one copy; the masked count is printed, and
-  the S6 header names the case. A false red costs one `superseded:` line or one restore commit.
+- risks — a same-named definition at a path the carrying parent did not define it in masks a loss;
+  the masked count is printed, and the S6 header names the case. A false red costs one `superseded:` line or one restore commit.
 - testing — one arm each in the lexicon suite, the pre-push suite and the push-main suite, on the
   fixture §6 describes; each observed RED against the base hook or lander first.
 - migration — none: the check grades only merges a push carries.
@@ -289,7 +289,7 @@ New arm: tools/push-main.test.sh · --prepare over a branch carrying that merge,
   `tools/lexicon/selftest.py` with this one, so the line now names the shared files. S7 and §7: the
   three Python definitions move `memory/map/generated/symbols.json`, which the build's other
   Python-adding units declare with the coverage leg and this spec omitted.
-- rev-4 · 2026-10-05 · build · S2, §4's rule and §8 F2: `masked` and `restored` clear a name only at
+- rev-4 · 2026-10-05 · build · S2, §4's rule, §5's risks line and §8 F2: `masked` and `restored` clear a name only at
   a path the carrying parent did not define it in, or at the lost path itself for `restored`. Built
   as rev-3 said, AC1 exited 0 with `masked=1`: the driver suite's stub `write_ask_views()` in
   `tools/unattended/unattended.test.sh`, present at the second parent and at the merge, masked the
