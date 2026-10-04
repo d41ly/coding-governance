@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-25 — the `prior-session` add's own failure returns the holder row before `write_lease`, observed by a criterion that fails the add itself
 
-**Status:** SPECCED · rev-3 · 2026-10-04 · node a · Tier-2 · base 5266d22e · streams tooling · order 7
+**Status:** SPECCED · rev-4 · 2026-10-04 · node a · Tier-2 · base 5266d22e · streams tooling · order 7
 
 <!-- gen:spec-records -->
 
@@ -42,10 +42,10 @@ closes finding 11 (HIGH) of the round-1 spec audit of unit 24.
   drives the unreadable one with a leg of its own (§3). The `mv` half is NOT OBSERVED by a criterion
   here, because both halves reach the row through the same return.
   - **Readers:** by name: `tools/unattended/unattended.sh` holds the holder row whose add takes the
-    return, and `tools/unattended/unattended.test.sh` holds the arm that drives it. by value: none
-    at this unit. The dispatcher discards the verb's return and the process exits with `status`,
-    which only `fail` sets (§4 Evidence), so a failed add exits 0 here, as a failed `write_lease`
-    fact does at `:6599`. The row's return stops the row; what callers of `--resume` read is
+    return, and `tools/unattended/unattended.test.sh` holds the arm that drives it. by value: NO
+    VALUE READERS at this unit: the process exit is 0 with or without the rule, because the
+    dispatcher discards the verb's return and only `fail` sets `status` (§4 Evidence), as a failed
+    `write_lease` fact also exits 0 at `:6599`. What callers of `--resume` read on a failed add is
     `TOOL-aGraftedHelix-26`'s (§3).
 - **S2** — `tools/unattended/unattended.test.sh` gains the arm §7 names. NOT OBSERVED by a criterion
   here: the suite is the main loop's to run at VERIFYING, and the arm's red on its staged break is
@@ -200,6 +200,9 @@ none
   as re-keyed here, not consumed. Findings 5, 8 and 6 (all HIGH) are promoted to
   `TOOL-aGraftedHelix-26`: §3 gains its hands-off, §4 Evidence states why the row's return reaches
   no exit, and S1's by-value readers line and the failed-add non-goal point at it.
+- rev-4 · 2026-10-04 · §2 · S1 · from the bug-class checklist over the promoting commit, which
+  selected `retirement-inventory-misses-readers-by-value`. S1's by-value readers line spells the
+  NO VALUE READERS answer the grammar names and says why: the exit is 0 with or without the rule.
 
 ## 10. Reuse audit
 

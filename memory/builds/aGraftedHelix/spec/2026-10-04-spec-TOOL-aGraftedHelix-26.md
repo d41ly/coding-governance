@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-26 — a failed `prior-session` add or `write_lease` fact fails the call through check 17, and both of the add's triggers reach one guarded call site, each observed
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-2 · base 5266d22e · streams tooling · order 8
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-2 · base 5266d22e · streams tooling · order 8
 
 <!-- gen:spec-records -->
 
@@ -182,7 +182,7 @@ No new fact, function, check, conf key or file. Two `fail 17` messages are added
 
 - security — No new surface. Two refusals print a line and set the exit on failures the row already
   could not survive; S4 removes a push.
-- perf / scale — None added; S4 saves one bounded push on an unreachable call.
+- perf / scale — None added; S4 spends no push on a call whose claim read did not answer.
 - error / empty / loading states — §4 "The rule".
 - observability — The check-17 line names the fact and the file, and the exit is 1, so the tick, the
   idle-wake and the session each see the failure.
@@ -256,6 +256,10 @@ none
   five callers at base `5266d22e`, and against units 1, 20, 23, 24 and 25 as specced. S4 pins the
   question the audit left open, whether the row attempts a CAS on an unreadable claim, from unit 1
   S3's lease.
+- rev-2 · 2026-10-04 · §5 · from the bug-class checklist over the promoting commit, which selected
+  `two-answers-to-one-question`. §5 perf no longer says S4 saves a push, which presumed a build that
+  pushes on an unreadable claim; it says what S4 spends. Unit 23's sequence-d arm, which said
+  "two unreachable pushes", is corrected in its own spec.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-23 — the `prior-session` fact is the set of sessions an incomplete holder write may have left the claim under, read by `check_claim_writable` itself and emptied by the next `--resume` holder-row claim write that lands
 
-**Status:** SPECCED · rev-4 · 2026-10-04 · node a · Tier-2 · base 5266d22e · streams tooling · order 5
+**Status:** SPECCED · rev-5 · 2026-10-04 · node a · Tier-2 · base 5266d22e · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
@@ -297,7 +297,7 @@ names no run-state file.
 
 New arm: tools/unattended/unattended.test.sh · sequences a, b and c of section 4, each ending in a closing s3 call with no check 90; stage unit 20's absent-only write rule, and separately --beat and --dispatch emptying the set when their claim write lands, observed red by the set reading s1 after them · the suite's floor rises by its new arm count
 
-New arm: tools/unattended/unattended.test.sh · sequence d, two unreachable pushes, ending in a closing s3 call with no check 90; stage the set written as the read claim's session alone · the suite's floor rises by its new arm count
+New arm: tools/unattended/unattended.test.sh · sequence d, two calls with the remote unreachable, ending in a closing s3 call with no check 90; stage the set written as the read claim's session alone · the suite's floor rises by its new arm count
 
 New arm: tools/unattended/unattended.test.sh · sequences e and f, two incomplete calls in a row, ending in a closing call with no check 90; stage the fact written with the pre-call session unconditionally · the suite's floor rises by its new arm count
 
@@ -349,6 +349,10 @@ none
   which selected `fixture-passes-by-finding-nothing` and `observed-by-claim-no-arm-discharges`.
   AC2's incomplete-renewal leg asserts unit 1's announce line, so a call that never pushed cannot
   pass it; S2's empty-value rule is labelled NOT OBSERVED, since no sequence reaches it.
+- rev-5 · 2026-10-04 · §7 · from the bug-class checklist over the commit promoting
+  `TOOL-aGraftedHelix-26`, which selected `two-answers-to-one-question`. The sequence-d arm said
+  "two unreachable pushes", and that unit's S4 pins that a call whose claim read did not answer
+  pushes no claim; the arm now says two calls with the remote unreachable.
 
 ## 10. Reuse audit
 
