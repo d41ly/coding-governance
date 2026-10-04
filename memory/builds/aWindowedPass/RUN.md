@@ -58,3 +58,5 @@ base: 886b089dfd9c4bf98dc2024e21d7d9607f9b5cc0
 2026-10-04T01:21:32Z rescope · item add TOOL-aWindowedPass-6 · reason closing review round 2 HIGH (id 8) with its MEDIUM twin (id 4): an amend of a pass commit is told to widen with --dispatch, which check 23 does not honour; promoted per the severity rule
 
 2026-10-04T01:23:59Z brief · item TOOL-aWindowedPass-6 · reason 72b04b82c47a memory/builds/aWindowedPass/prompts/2026-10-04-prompt-TOOL-aWindowedPass-6-2-build-brief.md
+
+2026-10-04T01:25:22Z dispatch · item b84dd231 TOOL-aWindowedPass-6 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md memory/builds/aWindowedPass/spec/2026-10-04-spec-TOOL-aWindowedPass-6.md memory/builds/aWindowedPass/README.md

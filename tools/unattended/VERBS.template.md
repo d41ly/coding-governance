@@ -200,7 +200,9 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   inside that pass's declarations; otherwise it refuses, naming each path and printing the
   `--dispatch` that widens the declaration while widening is still legal. No trailer on a subject
   naming an open pass is refused too, asking for `Pass: <unit-id>` or `Pass: none`. It writes
-  nothing; a `--no-verify` commit skips it, and check 23 still grades that pass at the close.
+  nothing; a `--no-verify` commit skips it, and check 23 still grades that pass at the close. An
+  AMEND of a pass commit is graded too, but an undeclared path in it is refused with no widening:
+  a `--dispatch` would anchor at the commit the amend replaces, which check 23 never grades.
 - `--version` — prints the kit's own version and exits, touching no record. It is here because it is
   DECLARED, and a declared verb nobody documents is one nobody uses to answer the question this kit
   cannot answer for them: which build of it they are talking to. It takes no slug and no run, so it

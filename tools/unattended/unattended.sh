@@ -9777,6 +9777,13 @@ CCROWS
     done <<CCST
 $st
 CCST
+    # A UNIT WHOSE ROWS ARE ALL REOPENED (`O`) HAS COMMITTED: HEAD is its pass commit and this is an amend
+    # of it (TOOL-aWindowedPass-6). A widening `--dispatch` would anchor at the commit the amend
+    # replaces, a row check 23 never grades, so no widening is offered - only the repairs it honours.
+    if [ -n "$uncov" ] && [ -z "$(printf '%s\n' "$rows" | awk -v u="$u" '$1 == "o" && $2 == u { print "y"; exit }')" ]; then
+      fail 49 "--check-commit: pass $u has committed - HEAD is its pass commit, so this is an amend - and it stages paths outside the set it declared before dispatch:$uncov. An amend cannot widen a committed pass: unstage those paths, or commit them as a new commit after a fresh --dispatch for them"
+      return 1
+    fi
     if [ -n "$uncov" ]; then
       # SHELL-QUOTED, so the printed command runs as the argv it names (closing review r1, L1).
       printf -v cmd 'bash %q --dispatch %q --pass %q' "$kd/unattended.sh" "$slug" "$u"

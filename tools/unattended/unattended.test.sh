@@ -5841,6 +5841,19 @@ printf 'a\n' > ${PFX}a.sh; git add -A >/dev/null
 git commit -q -m "ARCH-tRun-1 builds its lane" -m "Pass: ARCH-tRun-1" --no-verify
 out=$(run --check-commit "$CCM"); rc=$?
 same "--check-commit lets the pass commit be amended, exit code" "$rc" "0"
+# TOOL-aWindowedPass-6 AC2: a records commit after the pass, naming it with no trailer, owes none
+printf 'records for ARCH-tRun-1\n' > "$CCM"
+out=$(run --check-commit "$CCM"); rc=$?
+same "--check-commit asks no trailer of a records commit after the pass, exit code" "$rc" "0"
+# TOOL-aWindowedPass-6 AC1: an amend staging an undeclared path is refused as a COMMITTED pass, with
+# no --dispatch widening: that widening would anchor at the commit the amend replaces
+printf 'b\n' > ${PFX}stray.sh; git add -A >/dev/null
+printf 'ARCH-tRun-1 builds its lane\n\nPass: ARCH-tRun-1\n' > "$CCM"
+out=$(run --check-commit "$CCM"); rc=$?
+same "--check-commit refuses an amend that widens a committed pass, exit code" "$rc" "1"
+hit  "$out" "An amend cannot widen a committed pass"
+miss "$out" "--dispatch tRun"
+git reset -q --hard; rm -f ${PFX}stray.sh
 # M5: THE HOOK, run as git runs it - before its merge-only exit, blocking on 1 alone
 cc_setup
 REAL_ROOT=${HERE%/"$KIT_REL"}
