@@ -5739,6 +5739,192 @@ hit "$out" "--dispatch declares a path a sibling pass in the same group already 
 out=$(run --dispatch tRun --pass ARCH-tRun-2 --writes ${PFX}z.sh)
 hit "$out" "dispatch declared"
 
+# ---- read_conf_value AGREES WITH THE KITS THAT OWN THE CONFS (closing review r2, M6, L3, L5). It reads
+# ---- `MAP_ROOT` for the codebase map and a `when` key such as `BACKLOG_MODE` for memory-tree, without
+# ---- sourcing either conf, so one spelling table is fed to it and to each owner's own parser. Absent
+# ---- and blank are compared as the consumer sees them: an absent `MAP_ROOT` is the kit default, and
+# ---- `BACKLOG_MODE` matters only as equal to `builds` or not.
+_rcv_root=$(git -C "$HERE" rev-parse --show-toplevel)
+_rcv_cm="$_rcv_root/$(resolve_kit_dir "$_rkd_py" codebase-map map_lib.py "$HERE")"
+_rcv_mt="$_rcv_root/$MT_KIT_DIR"
+_rcv_d=$(mktemp -d)
+_rcv_n=0
+for _rcv_f in 'K=v' 'K="v"' "K='v'" 'export K=v' 'K=v # c' 'K="v" # c' 'K=' 'K=""' '  K=v' 'K=v\r' '# K=v' 'K= v' 'K=v\nK=w'; do
+  # MAP_ROOT against map_lib.load_conf, the absent case resolving to the kit default on both sides
+  printf "${_rcv_f//K/MAP_ROOT}\n" | sed 's/\bv\b/docs\/map/; s/\bw\b/docs\/other/' > "$_rcv_d/.codebase-map.conf"
+  _rcv_sh=$(read_conf_value "$_rcv_d/.codebase-map.conf" MAP_ROOT) || _rcv_sh=memory/map
+  _rcv_py=$("$_rkd_py" -c "import sys, pathlib; sys.path.insert(0, sys.argv[1]); import map_lib; print(map_lib.load_conf(pathlib.Path(sys.argv[2]))['MAP_ROOT'])" "$_rcv_cm" "$_rcv_d" 2>&1 | tr -d '\r')
+  same "read_conf_value reads MAP_ROOT as map_lib does: $_rcv_f" "$_rcv_sh" "$_rcv_py"
+  # BACKLOG_MODE against tree_lib.parse_conf, compared as the `when` test reads it: equal to builds or not
+  printf "${_rcv_f//K/BACKLOG_MODE}\n" | sed 's/\bv\b/builds/; s/\bw\b/shards/' > "$_rcv_d/.memory-tree.conf"
+  _rcv_sh=$(read_conf_value "$_rcv_d/.memory-tree.conf" BACKLOG_MODE) || _rcv_sh=""
+  _rcv_py=$("$_rkd_py" -c "import sys, pathlib; sys.path.insert(0, sys.argv[1]); import tree_lib; print(tree_lib.parse_conf(pathlib.Path(sys.argv[2]).read_text(encoding='utf-8'), {}).get('BACKLOG_MODE', ''))" "$_rcv_mt" "$_rcv_d/.memory-tree.conf" 2>&1 | tr -d '\r')
+  same "read_conf_value reads BACKLOG_MODE=builds as tree_lib does: $_rcv_f" "$([ "$_rcv_sh" = builds ] && echo y || echo n)" "$([ "$_rcv_py" = builds ] && echo y || echo n)"
+  _rcv_n=$((_rcv_n + 1))
+done
+same "the read_conf_value parity table graded every spelling" "$_rcv_n" "13"
+# L5: a BLANK MAP_ROOT is kept, so `{map_root}/generated` resolves to `generated`, as map_lib writes it
+printf 'MAP_ROOT=""\n' > "$_rcv_d/.codebase-map.conf"
+same "read_conf_value keeps a blank MAP_ROOT rather than defaulting it" "$(read_conf_value "$_rcv_d/.codebase-map.conf" MAP_ROOT; echo "rc=$?")" "
+rc=0"
+rm -rf "$_rcv_d"
+
+# ---- --check-commit (TOOL-aWindowedPass-3): check 23 asked at COMMIT time, while the declaration can
+# ---- still be widened. The fixture run is bound to this worktree's branch by preflight's run-branch.
+build_specced_tree
+printf '\nGENERATED_INDEXES="memory/LIVE.md:gen.py"\n' >> .unattended.conf
+fixture   # COMMITTED, or preflight refuses the dirty tree and writes no run-branch to bind
+run --preflight tRun --keepalive-id k1 >/dev/null
+run --dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}a.sh >/dev/null
+git add -A >/dev/null && git commit -q -m "records: declare ARCH-tRun-1" --no-verify
+CCM=$(mktemp)
+[ -z "$PFX" ] || mkdir -p "$PFX"
+# AC2: the trailer names the pass and a staged path lies outside its declaration
+printf 'a\n' > ${PFX}a.sh; printf 'b\n' > ${PFX}stray.sh; git add -A >/dev/null
+printf 'ARCH-tRun-1 builds its lane\n\nPass: ARCH-tRun-1\n' > "$CCM"
+out=$(run --check-commit "$CCM"); rc=$?
+same "--check-commit refuses an undeclared staged path, exit code" "$rc" "1"
+hit  "$out" "pass ARCH-tRun-1 stages paths outside the set it declared before dispatch, and the declaration can still be widened because the pass has not committed: ${PFX}stray.sh"
+hit  "$out" "--dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}a.sh --writes ${PFX}stray.sh"
+# AC3: the run-state file and a declared generated output are not the pass's writes
+git rm -q --cached ${PFX}stray.sh; rm -f ${PFX}stray.sh
+# a REAL run-state line: a bare trailing newline is already forgiven by the gen-region compare, so it
+# could not show the run-state subtraction doing anything (closing review r1, M10)
+printf 'live\n' >> memory/LIVE.md; printf 'note: staged by the run\n' >> memory/builds/tRun/RUN.md; git add -A >/dev/null
+out=$(run --check-commit "$CCM"); rc=$?
+same "--check-commit subtracts the run-state file and a generated output, exit code" "$rc" "0"
+miss "$out" "FAILED"
+# AC4: a subject naming the open pass with no trailer is refused; Pass: none passes
+printf 'ARCH-tRun-1 builds its lane\n' > "$CCM"
+out=$(run --check-commit "$CCM"); rc=$?
+same "--check-commit refuses a pass subject with no trailer, exit code" "$rc" "1"
+hit  "$out" "end the message with 'Pass: ARCH-tRun-1' when it is the pass, or 'Pass: none' when it is not"
+printf 'records: ARCH-tRun-1 brief\n\nPass: none\n' > "$CCM"
+out=$(run --check-commit "$CCM"); rc=$?
+same "--check-commit lets Pass: none through, exit code" "$rc" "0"
+# AC1: a branch no run names is no question at all: exit 0, nothing printed
+git checkout -q -b cc-unbound
+printf 'ARCH-tRun-1 builds its lane\n' > "$CCM"
+out=$(run --check-commit "$CCM"); rc=$?
+same "--check-commit with no run bound, exit code" "$rc" "0"
+same "--check-commit with no run bound prints nothing" "$out" ""
+git checkout -q unit; git branch -q -D cc-unbound
+rm -f "$CCM"
+
+# ---- --check-commit, closing review r1: the shapes round 1 found graded differently at commit time
+# ---- and at the close, and the subtractions and the hook that had no arm. One setup per arm group:
+# ---- a bound run, ARCH-tRun-1 dispatched open on `a.sh`, and three committed files the arms move.
+cc_setup() {
+  build_specced_tree
+  printf '\nGENERATED_INDEXES="memory/LIVE.md:gen.py"\n' >> .unattended.conf
+  [ -z "$PFX" ] || mkdir -p "$PFX"
+  printf 'o\n' > ${PFX}old.sh
+  printf '# r\n\nprose\n\n<!-- gen:units -->\nold\n<!-- /gen:units -->\n' > memory/README.md
+  fixture
+  run --preflight tRun --keepalive-id k1 >/dev/null
+  run --dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}a.sh >/dev/null
+  git add -A >/dev/null && git commit -q -m "records: declare ARCH-tRun-1" --no-verify
+}
+CCM=$(mktemp)
+cc_setup
+# M1: a staged rename out of an undeclared path is graded by BOTH halves, as check 23 grades it
+git mv ${PFX}old.sh ${PFX}a.sh
+printf 'ARCH-tRun-1 builds its lane\n\nPass: ARCH-tRun-1\n' > "$CCM"
+out=$(run --check-commit "$CCM"); rc=$?
+same "--check-commit grades the source of a staged rename, exit code" "$rc" "1"
+hit  "$out" "${PFX}old.sh"
+git reset -q --hard
+# M2: a lower-case trailer key is still the trailer, so the stray write is graded
+printf 'b\n' > ${PFX}stray.sh; git add -A >/dev/null
+printf 'ARCH-tRun-1 builds its lane\n\npass: ARCH-tRun-1\n' > "$CCM"
+out=$(run --check-commit "$CCM"); rc=$?
+same "--check-commit reads a lower-case Pass key, exit code" "$rc" "1"
+hit  "$out" "pass ARCH-tRun-1 stages paths outside the set it declared before dispatch"
+# ...and a subject wrapped onto a second line still names the open pass
+printf 'lane work, continued\nfor ARCH-tRun-1 here\n' > "$CCM"
+out=$(run --check-commit "$CCM"); rc=$?
+same "--check-commit reads a wrapped subject as the close does, exit code" "$rc" "1"
+hit  "$out" "end the message with 'Pass: ARCH-tRun-1' when it is the pass"
+# L2: a `none` beside an id attributes the commit to nothing, as pass_commit now reads it
+printf 'records\n\nPass: none\nPass: ARCH-tRun-1\n' > "$CCM"
+out=$(run --check-commit "$CCM"); rc=$?
+same "--check-commit takes Pass: none beside an id as none, exit code" "$rc" "0"
+git reset -q --hard; rm -f ${PFX}stray.sh
+# closing review r2, M4: a non-ASCII staged path is named as written, never C-quoted
+printf 'n\n' > "${PFX}café.sh"; git add -A >/dev/null
+printf 'ARCH-tRun-1 builds its lane\n\nPass: ARCH-tRun-1\n' > "$CCM"
+out=$(run --check-commit "$CCM"); rc=$?
+same "--check-commit names a non-ASCII stray path, exit code" "$rc" "1"
+hit  "$out" "${PFX}café.sh"
+miss "$out" "\"${PFX}caf"   # git's C-quoted form; the %q of the printed command is a separate, valid spelling
+git reset -q --hard; rm -f "${PFX}café.sh"
+# closing review r2, L2: the printed repair quotes a path holding a shell metacharacter
+printf 'b\n' > "${PFX}stray(1).sh"; git add -A >/dev/null
+out=$(run --check-commit "$CCM"); rc=$?
+hit  "$out" "--writes ${PFX}stray\\(1\\).sh"
+git reset -q --hard; rm -f "${PFX}stray(1).sh"
+# closing review r2, M5: a CRLF message whose BODY names the open pass and whose subject does not
+printf 'lane work\r\n\r\nmentions ARCH-tRun-1 in the body\r\n' > "$CCM"
+out=$(run --check-commit "$CCM"); rc=$?
+same "--check-commit reads a CRLF message's subject paragraph alone, exit code" "$rc" "0"
+# L4 + M10: the brief rows, a gen-region-only change and a REAL run-state line are all subtracted
+BRIEFP=memory/builds/tRun/prompts/2026-08-21-prompt-ARCH-tRun-1-1-build-brief.md
+mkdir -p memory/builds/tRun/prompts && printf '# brief\n' > "$BRIEFP"
+printf '2026-08-21T00:00:01Z brief · item ARCH-tRun-1 · reason %s %s\n' \
+  "$(git hash-object "$BRIEFP" | cut -c1-12)" "$BRIEFP" >> memory/builds/tRun/RUN.md
+sed -i 's/^old$/new/' memory/README.md
+printf 'a\n' > ${PFX}a.sh; git add -A >/dev/null
+printf 'ARCH-tRun-1 builds its lane\n\nPass: ARCH-tRun-1\n' > "$CCM"
+out=$(run --check-commit "$CCM"); rc=$?
+same "--check-commit subtracts a brief, a gen-region change and a run-state line, exit code" "$rc" "0"
+# ...and the authored-line control: the same README edited outside its gen region is the pass's write
+sed -i 's/^prose$/edited prose/' memory/README.md; git add -A >/dev/null
+out=$(run --check-commit "$CCM"); rc=$?
+same "--check-commit counts an authored README line, exit code" "$rc" "1"
+hit  "$out" "memory/README.md"
+git reset -q --hard
+# M4: amending the pass commit with its trailer is not refused as a closed pass
+printf 'a\n' > ${PFX}a.sh; git add -A >/dev/null
+git commit -q -m "ARCH-tRun-1 builds its lane" -m "Pass: ARCH-tRun-1" --no-verify
+out=$(run --check-commit "$CCM"); rc=$?
+same "--check-commit lets the pass commit be amended, exit code" "$rc" "0"
+# TOOL-aWindowedPass-6 AC2: a records commit after the pass, naming it with no trailer, owes none
+printf 'records for ARCH-tRun-1\n' > "$CCM"
+out=$(run --check-commit "$CCM"); rc=$?
+same "--check-commit asks no trailer of a records commit after the pass, exit code" "$rc" "0"
+# TOOL-aWindowedPass-6 AC1: an amend staging an undeclared path is refused as a COMMITTED pass, with
+# no --dispatch widening: that widening would anchor at the commit the amend replaces
+printf 'b\n' > ${PFX}stray.sh; git add -A >/dev/null
+printf 'ARCH-tRun-1 builds its lane\n\nPass: ARCH-tRun-1\n' > "$CCM"
+out=$(run --check-commit "$CCM"); rc=$?
+same "--check-commit refuses an amend that widens a committed pass, exit code" "$rc" "1"
+hit  "$out" "An amend cannot widen a committed pass"
+miss "$out" "--dispatch tRun"
+git reset -q --hard; rm -f ${PFX}stray.sh
+# M5: THE HOOK, run as git runs it - before its merge-only exit, blocking on 1 alone
+cc_setup
+REAL_ROOT=${HERE%/"$KIT_REL"}
+printf 'b\n' > ${PFX}stray.sh; git add -A >/dev/null
+printf 'ARCH-tRun-1 builds its lane\n\nPass: ARCH-tRun-1\n' > "$CCM"
+# the hook finds the kit inside the tree it runs in; the fixture runs the real driver from outside it
+_cckit=""; [ -e "./$KIT_REL/unattended.sh" ] || { mkdir -p "./$KIT_REL" && cp "$HERE"/*.sh "./$KIT_REL/"; _cckit=1; }
+out=$(bash "$REAL_ROOT/.githooks/commit-msg" "$CCM" 2>&1); rc=$?
+same "the commit-msg hook blocks an undeclared staged path with no MERGE_HEAD, exit code" "$rc" "1"
+hit  "$out" "pass ARCH-tRun-1 stages paths outside the set it declared before dispatch"
+git checkout -q -b cc-hook-unbound
+out=$(bash "$REAL_ROOT/.githooks/commit-msg" "$CCM" 2>&1); rc=$?
+same "the commit-msg hook lets a commit through when no run is bound, exit code" "$rc" "0"
+git checkout -q unit; git branch -q -D cc-hook-unbound
+# closing review r2, L4: a conf with no kit beside it is announced, and the commit goes through
+[ -z "$_cckit" ] || rm -rf "./$KIT_REL"
+if [ -n "$_cckit" ]; then
+  out=$(bash "$REAL_ROOT/.githooks/commit-msg" "$CCM" 2>&1); rc=$?
+  same "the commit-msg hook lets a commit through when the kit is absent, exit code" "$rc" "0"
+  hit  "$out" "the commit-time check did NOT run"
+fi
+git reset -q --hard
+rm -f "$CCM"
+
 # ---- CONDITION 3, FLAT HALF: the records the method names outright, plus the derived run-state file.
 build_specced_tree; run --preflight tRun --keepalive-id k1 >/dev/null
 hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes memory/DECISIONS.md)" "--dispatch declares a path overlapping a shared mutable record this project declares, and the build method names those outright rather than conditionally:"

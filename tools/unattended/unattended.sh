@@ -25,6 +25,7 @@
 #   unattended.sh --attest <slug> --item <item> [--value <text>]  # the agent-checked DoD items
 #   unattended.sh --record-piece <slug> --path <p> --leg <n> --verdict <PASS|FAIL|NA> [--records-root <dir> [--playbook-sha <sha>] [--run <id>]]
 #   unattended.sh --record-set <slug> --leg <n> --verdict <PASS|FAIL|NA> [--records-root <dir> [--run <id>] [--set <hashes>]]
+#   unattended.sh --check-commit <message file>                    # from commit-msg: refuse an open pass's undeclared staged path
 #   unattended.sh --version                                        # the kit version, then exit
 #
 # Exit 0 = the verb succeeded · 1 = a refusal, named · 2 = misconfigured (not a repo, no conf).
@@ -45,7 +46,7 @@
 # The generated region holds NO copy: the unit list is DERIVED from the build README's already-derived,
 # already-byte-compared slice. One derivation in the tree; this file is not a second one.
 set -u
-KIT_UNATTENDED_VERSION=1.56   # gov:kit unattended@1.56 — kit identity; set HERE, never from .unattended.conf
+KIT_UNATTENDED_VERSION=1.58   # gov:kit unattended@1.58 — kit identity; set HERE, never from .unattended.conf
 
 # ------------------------------------------------------------------------------ the dereference pin
 # A sha is a NAME, and turning a name into bytes or into ancestry happens in the run's own object
@@ -93,7 +94,7 @@ KIT_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
 VERBS_SLUG="--preflight --status --audit --register-task --release-task --liveness --resume --close --landed --abort --hold --park --propose --attest --record-piece --record-set --rescope --dispatch --review --brief"
 # The verbs whose argument is POSITIONAL and which exit inside the parse loop. Separate because the
 # dispatch cannot treat them alike, and merged again for every reader, who does not care.
-VERBS_INLINE="--plan --phase --version"
+VERBS_INLINE="--plan --phase --check-commit --version"
 verbs_all()   { printf '%s %s' "$VERBS_SLUG" "$VERBS_INLINE"; }
 is_slug_verb(){ case " $VERBS_SLUG " in *" $1 "*) return 0 ;; esac; return 1; }
 verb_list() { # -> "--a, --b and --c", for a human reading a refusal
@@ -611,6 +612,9 @@ M="$MEMORY_ROOT"
 # resolution itself lives in the kit library since TOOL-dDerivedDocket-20, because the gate leg reads
 # the same key and a default spelled in two callers is two answers to one question.
 SHARED_RECORDS=$(resolve_shared_records "$SHARED_RECORDS" "$MEMORY_ROOT")
+# THE EFFECTIVE GENERATED OUTPUTS - TOOL-aWindowedPass-4: the kits' `[[generated]]` rows, then the
+# conf's additions, through the ONE resolver every reader of this key calls.
+GENERATED_INDEXES=$(resolve_generated_indexes "$ROOT" "$GENERATED_INDEXES" "$MEMORY_ROOT")
 # THE TWO CONDITION-3 KEYS MAY NOT NAME ONE PATH - TOOL-dDerivedDocket-20 S1. A path under both is
 # answered by whichever of condition 3's two rules `--dispatch` reaches first, and the declaration of
 # the other means nothing. Refused at LOAD, on `read_bound_key`'s pattern, because the first refusal
@@ -9687,6 +9691,121 @@ CPOROWS
   return 0
 }
 
+# --check-commit (TOOL-aWindowedPass-3): CHECK 23 AT THE ONE MOMENT ITS FINDING IS STILL REPAIRABLE.
+# A pass may widen its declaration with `--dispatch` until it commits and never after, so a close that
+# finds an undeclared write hours later can only count it. Run from the `commit-msg` hook, this reads
+# the message the commit is about to carry and the INDEX it is about to record, and refuses an open
+# pass's commit that stages a path its declarations do not cover, printing the `--dispatch` that
+# widens them. The run is the one whose branch THIS worktree has checked out (`resolve_holder_worktree`);
+# no such run is no question, exit 0 and silent. Beside code 49, not under a new one: it is the
+# declaration's own question, asked before the commit instead of after.
+# The subtractions are check 23's own: the run-state file, the unit's brief rows (`read_brief_paths`
+# over the index, which is what an empty commit argument reads), the effective generated outputs, and
+# a change confined to gen regions (`check_gen_region_only`, HEAD against the index).
+# WHAT IT DOES NOT CHECK: a `--no-verify` commit never reaches it, and `Pass: none` is taken at its
+# word. Check 23 still grades both at the close.
+verb_check_commit() { # commit message file
+  local msg="$1" f rel="" ref slug trl subj rows r d o u decl st p q ok uncov uncovl briefs cmd kd head
+  [ -f "$msg" ] || { fail 49 "--check-commit was given no readable commit message file: ${msg:-(none)}"; return 1; }
+  # It runs on EVERY commit, so the candidates are narrowed by one grep for this branch's ref before
+  # the holder predicate, which reads the record's facts, confirms each.
+  ref=$(GIT symbolic-ref -q HEAD 2>/dev/null) || return 0
+  for f in $(GIT ls-files -- ":(glob)$M/builds/*/RUN.md" 2>/dev/null | xargs -r grep -lF -- ": $ref" 2>/dev/null); do
+    # RECORDED, not derived: this runs on every commit and derives nothing over the network.
+    case "$(read_recorded_phase "$f")" in LANDED|ABORTED) continue ;; esac
+    resolve_holder_worktree "$f" && { rel=$f; break; }
+  done
+  [ -n "$rel" ] || return 0
+  slug=${rel%/RUN.md}; slug=${slug##*/}
+  # READ AS THE CLOSE READS THEM (closing review r1, M2/L2): `%(trailers:key=Pass)` matches the key in
+  # any case, ids split on any character an id cannot hold, a `none` anywhere attributes the commit to
+  # nothing, and `%s` is the first PARAGRAPH joined, not its first line.
+  trl=$(git interpret-trailers --parse <"$msg" 2>/dev/null | sed -n 's/^[Pp][Aa][Ss][Ss]: *//p' | tr '\n' ' ')
+  trl=${trl//[^A-Za-z0-9-]/ }
+  # CR STRIPPED FIRST: the hook reads the editor's file before git's cleanup, and a CRLF blank line is
+  # `\r`, which is not blank to awk, so the paragraph never ended (closing review r2, M5). One awk and no
+  # `grep` stage: MSYS grep strips CR on its own, which hid this on one node and not on another.
+  subj=$(awk '{ sub(/\r$/, "") } /^#/ { next } NF { p = 1 } p && !NF { exit } p { printf "%s ", $0 }' "$msg")
+  # ONE LINE PER OPEN ROW, `<unit> <declared paths>`, through the predicate `--dispatch` and `--audit`
+  # already share, so this verb cannot call a pass open that they call closed. A row it calls closed
+  # BECAUSE ITS PASS COMMIT IS HEAD is kept apart (`O` rows): that is `git commit --amend` on the pass
+  # commit, whose HEAD is the commit being replaced (closing review r1, M4). Only a trailer naming the
+  # unit reopens it, so a records commit after a pass is never asked for a trailer it does not owe.
+  head=$(GIT rev-parse -q --verify HEAD 2>/dev/null)
+  rows=$(grep -F -- " dispatch · item " "$rel" 2>/dev/null | while IFS= read -r r; do
+      [ -n "$r" ] || continue
+      d=${r#* dispatch · item }; d=${d%% · reason *}
+      if check_pass_open "${d%% *}" "${d#* }" "$rel" "${r#* · reason }"; then
+        printf 'o %s %s\n' "${d#* }" "${r#* · reason }"
+      elif [ -n "$head" ] && [ "$(pass_commit "${d%% *}" "${d#* }" "$rel" || true)" = "$head" ]; then
+        printf 'O %s %s\n' "${d#* }" "${r#* · reason }"
+      fi
+    done)
+  case " $trl " in *" none "*) return 0 ;; esac
+  if [ -z "${trl// /}" ]; then
+    while read -r o u decl; do
+      [ "$o" = o ] || continue
+      id_in "$subj" "$u" || continue
+      fail 49 "--check-commit: this commit's subject names $u, an open dispatched pass of $slug, and the message carries no Pass: trailer, so check 23 would take it for that pass's commit; end the message with 'Pass: $u' when it is the pass, or 'Pass: none' when it is not"
+      return 1
+    done <<CCROWS
+$rows
+CCROWS
+    return 0
+  fi
+  # NO RENAME DETECTION (closing review r1, M1): porcelain `diff` lists a staged rename by its
+  # destination alone, where check 23's `diff-tree` lists the deleted source too.
+  # ...and NOT C-QUOTED: by default a non-ASCII path prints as `"docs/caf\303\251.md"`, which no
+  # declaration covers and no printed repair can name (closing review r2, M4).
+  st=$(git -c core.quotePath=false diff --cached --no-renames --name-only -z 2>/dev/null | tr '\0' '\n')
+  # Repo-relative from git itself: KIT_DIR is the shell's spelling and ROOT is git's, and on MSYS the
+  # two differ by drive form, so stripping one from the other leaves an absolute path in the command.
+  kd=$(git -C "$KIT_DIR" rev-parse --show-prefix 2>/dev/null); kd=${kd%/}; [ -n "$kd" ] || kd=$KIT_DIR
+  for u in $trl; do
+    decl=$(printf '%s\n' "$rows" | awk -v u="$u" '$2 == u { $1 = ""; $2 = ""; print }' | tr '\n' ' ')
+    if [ -z "${decl// /}" ]; then
+      fail 49 "--check-commit: the Pass: trailer names $u, which has no open dispatched pass in $slug, so nothing declared what this commit may write; declare it first: bash $kd/unattended.sh --dispatch $slug --pass $u --writes <path>"
+      return 1
+    fi
+    briefs=$'\n'"$(read_brief_paths "" "$u" "$rel")"$'\n'
+    uncov=""; uncovl=""
+    while IFS= read -r p; do
+      [ -n "$p" ] || continue
+      [ "$p" = "$rel" ] && continue
+      case "$briefs" in *$'\n'"$p"$'\n'*) continue ;; esac
+      ok=0
+      for q in $decl; do covers "$q" "$p" && { ok=1; break; }; done
+      for q in ${GENERATED_INDEXES:-}; do [ "$ok" = 1 ] && break; covers "${q%%:*}" "$p" && ok=1; done
+      [ "$ok" = 1 ] && continue
+      check_gen_region_only "HEAD:$p" ":$p" && continue
+      uncov="$uncov $p"; uncovl="$uncovl$p"$'\n'
+    done <<CCST
+$st
+CCST
+    # A UNIT WHOSE ROWS ARE ALL REOPENED (`O`) HAS COMMITTED: HEAD is its pass commit and this is an amend
+    # of it (TOOL-aWindowedPass-6). A widening `--dispatch` would anchor at the commit the amend
+    # replaces, a row check 23 never grades, so no widening is offered - only the repairs it honours.
+    if [ -n "$uncov" ] && [ -z "$(printf '%s\n' "$rows" | awk -v u="$u" '$1 == "o" && $2 == u { print "y"; exit }')" ]; then
+      fail 49 "--check-commit: pass $u has committed - HEAD is its pass commit, so this is an amend - and it stages paths outside the set it declared before dispatch:$uncov. An amend cannot widen a committed pass: unstage those paths, or commit them as a new commit after a fresh --dispatch for them"
+      return 1
+    fi
+    if [ -n "$uncov" ]; then
+      # SHELL-QUOTED, so the printed command runs as the argv it names (closing review r1, L1).
+      printf -v cmd 'bash %q --dispatch %q --pass %q' "$kd/unattended.sh" "$slug" "$u"
+      # ONE PATH PER LINE, never word-split or globbed: a staged `app/[id]/x` must not expand to a file it
+      # happens to match (closing review r2, L2). The recorded declaration holds no glob character.
+      while IFS= read -r q; do
+        [ -n "$q" ] && printf -v cmd '%s --writes %q' "$cmd" "$q"
+      done <<CCQ
+$( { printf '%s\n' $decl; printf '%s' "$uncovl"; } | awk 'NF && !s[$0]++')
+CCQ
+      fail 49 "--check-commit: pass $u stages paths outside the set it declared before dispatch, and the declaration can still be widened because the pass has not committed:$uncov — widen it, then commit again: $cmd"
+      return 1
+    fi
+  done
+  return 0
+}
+
 verb_dispatch() { # slug · unit · writes...
   local slug="$1" unit="$2"; shift 2
   local rel shaped grp p q sib sibpaths want cur curpaths gen idx pair
@@ -10408,6 +10527,7 @@ while [ $# -gt 0 ]; do
                     [ "${1:-}" = "--witness" ] && { shift; PH_WIT=${1:-}; }
                     refuse_waive_unless_preflight --phase || { RUNLOG_CLEAN=1; exit 1; }
                     verb_phase "$PH_SLUG" "$PH_WANT" "$PH_WIT"; _rl_rc=$?; RUNLOG_CLEAN=1; exit "$_rl_rc" ;;
+    --check-commit) shift; verb_check_commit "${1:-}"; _rl_rc=$?; RUNLOG_CLEAN=1; exit "$_rl_rc" ;;
     --version)      echo "unattended $KIT_UNATTENDED_VERSION"; RUNLOG_CLEAN=1; exit 0 ;;
     # THE SET IS THE DISPATCH. A slug-taking verb is recognised by membership in VERBS_SLUG rather
     # than by an alternation typed here, so the declaration is load-bearing: a verb absent from it

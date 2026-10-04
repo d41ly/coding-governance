@@ -133,3 +133,12 @@ guard = ["{kit}/", ".codebase-map.conf"]
 [[lf_pin]]
 pattern = ".codebase-map.conf"
 why = "a sourced conf: a CR reaches the shell as part of the value"
+
+# ---------------------------------------------------------------- the GENERATED OUTPUTS this kit writes
+# TOOL-aWindowedPass-4. The map's generated artifacts, rewritten by `gen_map.py --write` whenever a
+# symbol moves; the pre-commit gate refuses a commit that leaves them stale, so every pass touching
+# code also writes them. The unattended kit reads this row in place of a hand-typed conf list.
+[[generated]]
+path = "{map_root}/generated"
+generator = "gen_map.py"
+why = "symbols.json, inventories.json and MAP.md, regenerated from the tree on every code change"

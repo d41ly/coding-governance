@@ -2,7 +2,7 @@
 name: unattended
 description: Start, resume, or close a run that will merge and push with NO owner turn between start and finish. Use when the owner wants a committed build carried to landing unattended, when a previous unattended run needs resuming after compaction or process death, or when one needs closing. Do NOT use for ordinary work where the explicit ask before a merge and a push still applies — that is the default, and this skill is the narrow exception to it.
 ---
-<!-- gov:kit unattended@1.56 -->
+<!-- gov:kit unattended@1.58 -->
 
 # Unattended runs
 
@@ -682,6 +682,12 @@ definition, so the absence is a decision and not an oversight.
   a file is a contract the sibling reads, is a judgement no verb can make, and it says so rather than
   pretending. If a pass discovers it needs another file, re-declare with the WIDER set BEFORE the
   commit; narrowing is refused, because narrowing after the fact is how a write gets hidden.
+  **End the pass commit's message with a `Pass: <unit-id>` trailer**, and give a commit that names a
+  unit but is no pass `Pass: none`: the gate attributes a commit by its trailer and never by its
+  subject once one is present, which is what stops a records commit from being graded as a pass.
+  Where the project's `commit-msg` hook runs `bash {{KIT_DIR}}/unattended.sh --check-commit "$1"`, a
+  pass commit staging a path outside its declaration is REFUSED with the `--dispatch` that widens it:
+  run that command, then commit again. It is the one moment widening is still legal.
 - **Drive the build as ONE program, and know exactly what that buys.** The harness is
   `{{TOOL_ROOT}}workflows/unattended-build.js`, which runs SPEC, then — only when the build or its
   project declares the audit — AUDIT and DISPOSAL as ordered stages, and hands back the ordered roster on a
