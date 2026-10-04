@@ -73,3 +73,5 @@ base: 5266d22eba31cdbf15425773d245cd23d7b9cdf5
 2026-10-04T20:57:58Z rescope · item add TOOL-aGraftedHelix-24 · reason spec-audit of unit 23 round 1 id 11 HIGH, id 6 HIGH and id 1 HIGH: unit 23 adds to the prior-session set after write_lease has moved the record's session, so an interrupted call leaves the claim under a session no member names, and its restart and --hold criteria run where the same-session row answers before the widening they certify is reached; repairs TOOL-aGraftedHelix-23
 
 2026-10-04T21:05:46Z review · item aGraftedHelix-spec-set-r5 · reason verdict CLEAN · blockers 0 · CONVERGED · disposition promote
+
+2026-10-04T21:33:35Z rescope · item add TOOL-aGraftedHelix-25 · reason spec-audit of unit 24 round 1 id 11 HIGH: unit 24 moves the prior-session add ahead of write_lease but states no rule for the add's own failure, so a build that continues into write_lease after a failed add leaves the claim under a session no member names and the next call answers check 90; repairs TOOL-aGraftedHelix-24
