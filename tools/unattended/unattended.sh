@@ -1176,8 +1176,9 @@ fact() { # run-state file · key
 # own commit (`read_landing_commit`, in the kit library, shared with the gate leg) is an ancestor of
 # the tip the remote ADVERTISES reads LANDED, with the evidence in DP_LANDING, DP_AREF and DP_TIP.
 # Anything short of that leaves LANDING and says why in DP_REASON. The remote is observed ONLY for a
-# LANDING record, so every other record stays offline, and only through `read_advertised_tip`,
-# which returns a code and never calls `fail` - no caller inherits the observation's refusal.
+# LANDING record and a HELD hand-off (below), so every other record stays offline, and only through
+# `read_advertised_tip`, which returns a code and never calls `fail` - no caller inherits the
+# observation's refusal.
 #
 # TOOL-dUnstuckLanding-14 S2 - A HAND-OFF AN OWNER LANDED IS LANDED TOO. A HELD record under a
 # hand-off code whose own commit is on the advertised tip reads LANDED with DP_BY=attended; the
@@ -6468,7 +6469,7 @@ resolve_holder_worktree() { # run-state file -> 0 holds, 1 not here, 2 no run br
 #   last-move-source · transcript · last-stall · stale · verdict · stale-bound · holder-ref
 #
 # `state` is `terminal`, `finished-unstamped`, `held` or `live`, and a LANDING the node's landed log
-# names reads `terminal`. `last-move` is the seconds since the NEWEST of `derive_last_move`'s
+# names reads `terminal`, as does a hand-off its owner landed (`derive_liveness`). `last-move` is the seconds since the NEWEST of `derive_last_move`'s
 # signals: the last commit, the newest dirty or untracked write, the newest gate log under
 # `<git-dir>/gate-logs/`, the `gate-queue-heartbeat` a bar waiting in the gate runner's turnstile
 # rewrites beside them on every tick, the session transcript when its path derives, and the newest

@@ -1913,8 +1913,10 @@ while IFS= read -r f; do
   # ---- silence a later signal - reds. It also reds the fact on an ABORTED record first committed on
   # ---- or after HANDOFF_CUTOFF, which meant discard, and an `abandoned` marker standing without it.
   # ----
-  # ---- WHAT IT DOES NOT CHECK: that the run's work was RIGHT, only that it landed and stayed; nor a
-  # ---- record this clone cannot judge: no advertised tip is REPORTED as a skip, never a red.
+  # ---- WHAT IT DOES NOT CHECK: that the run's work was RIGHT, only that it landed and stayed; that
+  # ---- `base` and `witness` are the values the run's own verbs wrote, since both are the record's own
+  # ---- facts and a hand edit of all three moves together; nor a record this clone cannot judge: no
+  # ---- advertised tip is REPORTED as a skip, never a red.
   wla=$(fact_of "$f" work-landed-at)
   if [ -n "$wla" ]; then
     if [ "${ADV_HEAD_OK:-0}" != 1 ]; then
