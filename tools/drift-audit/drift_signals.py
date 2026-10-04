@@ -326,7 +326,8 @@ PINS: dict[str, int] = {
     # by `--settle` on each listed slug and a commit of what that staged, and is lowered as it does.
     # Its sibling `discarded_work_landed` carries no pin: no ABORTED record here is dated on or after
     # HANDOFF_CUTOFF yet, so it reads DEAD, and a pin over a population that does not exist is a guess.
-    "aborted_work_landed": 8,
+    # Drained 8 -> 0 by `--settle` on all eight slugs (aec85436), 2026-10-05.
+    "aborted_work_landed": 0,
 }
 
 # --------------------------------------------------------------------------------------------
