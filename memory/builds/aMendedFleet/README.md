@@ -5,8 +5,7 @@ opened: 2026-10-04
 streams: tooling+kickoff+playbook
 roster: TOOL+KICK+PLAY
 authorized-by: prompt
-status: OPEN
-ids: TOOL-aMendedFleet-1
+ids: TOOL-aMendedFleet-1 TOOL-aMendedFleet-2 TOOL-aMendedFleet-3 TOOL-aMendedFleet-4 TOOL-aMendedFleet-5 TOOL-aMendedFleet-6 TOOL-aMendedFleet-7 TOOL-aMendedFleet-8 TOOL-aMendedFleet-9 TOOL-aMendedFleet-10 TOOL-aMendedFleet-11
 ---
 
 # aMendedFleet — the 2026-10-04 governance review, every point built as its own unit
@@ -136,23 +135,45 @@ and every red leg fixed. The prompt, the owner's four answers and the report are
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 0 unit(s) · node a · opened 2026-10-04 · streams tooling+kickoff+playbook
-ids TOOL-aMendedFleet-1
+**Build status:** SPECCED · 10 unit(s) · node a · opened 2026-10-04 · streams tooling+kickoff+playbook
+ids TOOL-aMendedFleet-1 TOOL-aMendedFleet-2 TOOL-aMendedFleet-3 TOOL-aMendedFleet-4 TOOL-aMendedFleet-5 TOOL-aMendedFleet-6 TOOL-aMendedFleet-7 TOOL-aMendedFleet-8 TOOL-aMendedFleet-9 TOOL-aMendedFleet-10 TOOL-aMendedFleet-11
 
 <!-- gen:build-units -->
-*No spec under this build carries a status header; the status above is declared in the front matter.*
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-aMendedFleet-1 — restore the views helper and the `--status` entry merge 01c22e155 lost](spec/2026-10-04-spec-TOOL-aMendedFleet-1.md) | 1 | 1 | SPECCED | rev-1 | 2026-10-04 |
+| [TOOL-aMendedFleet-2 — a definition-level census of every merge since 2026-09-01](spec/2026-10-04-spec-TOOL-aMendedFleet-2.md) | 2 | 1 | SPECCED | rev-1 | 2026-10-04 |
+| [TOOL-aMendedFleet-3 — the lander refuses a merge that loses a definition a parent carried](spec/2026-10-04-spec-TOOL-aMendedFleet-3.md) | 3 | 2 | SPECCED | rev-1 | 2026-10-04 |
+| [TOOL-aMendedFleet-4 — the govkit acceptance matrix reads its children as UTF-8 on every host](spec/2026-10-04-spec-TOOL-aMendedFleet-4.md) | 4 | 1 | SPECCED | rev-1 | 2026-10-04 |
+| [TOOL-aMendedFleet-5 — `transition-audit arms` passes on the hosted runner: the audit writes UTF-8](spec/2026-10-04-spec-TOOL-aMendedFleet-5.md) | 5 | 1 | SPECCED | rev-1 | 2026-10-04 |
+| [TOOL-aMendedFleet-6 — `lexicon wiring` passes on the hosted runner: the conf reader writes UTF-8](spec/2026-10-04-spec-TOOL-aMendedFleet-6.md) | 6 | 1 | SPECCED | rev-1 | 2026-10-04 |
+| [TOOL-aMendedFleet-7 — a census of the daily held job's red suites by root cause, adding one unit per cause](spec/2026-10-04-spec-TOOL-aMendedFleet-7.md) | 7 | 1 | SPECCED | rev-1 | 2026-10-04 |
+| [TOOL-aMendedFleet-8 — drift-audit reports `remote_ci_red_streak`](spec/2026-10-04-spec-TOOL-aMendedFleet-8.md) | 8 | 1 | SPECCED | rev-1 | 2026-10-04 |
+| [TOOL-aMendedFleet-9 — the daily held job's red suites reach the inherited-red HIGH auto-file](spec/2026-10-04-spec-TOOL-aMendedFleet-9.md) | 9 | 2 | SPECCED | rev-1 | 2026-10-04 |
+| [TOOL-aMendedFleet-10 — `--asks` rows carry the pointer and a 160-byte summary, and `--path` ranks and caps them](spec/2026-10-04-spec-TOOL-aMendedFleet-10.md) | 10 | 2 | SPECCED | rev-1 | 2026-10-04 |
 <!-- /gen:build-units -->
 
-Records: 4 bound to this build, across 1 record folder(s).
+Records: 4 bound to this build, across 2 record folder(s).
 
-Ids no record names: none — every unit id is named by a record.
+Ids no record names: TOOL-aMendedFleet-10 TOOL-aMendedFleet-2 TOOL-aMendedFleet-3 TOOL-aMendedFleet-4 TOOL-aMendedFleet-5 TOOL-aMendedFleet-6 TOOL-aMendedFleet-7 TOOL-aMendedFleet-8 TOOL-aMendedFleet-9.
 
-Ids no `spec-audit` record has ever named: none — every unit id has one.
+Ids no `spec-audit` record has ever named: TOOL-aMendedFleet-1 TOOL-aMendedFleet-10 TOOL-aMendedFleet-2 TOOL-aMendedFleet-3 TOOL-aMendedFleet-4 TOOL-aMendedFleet-5 TOOL-aMendedFleet-6 TOOL-aMendedFleet-7 TOOL-aMendedFleet-8 TOOL-aMendedFleet-9.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
 
-*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+| Step | Units | Parallel |
+|---|---|---|
+| 1 | `TOOL-aMendedFleet-1` | no |
+| 2 | `TOOL-aMendedFleet-2` | no |
+| 3 | `TOOL-aMendedFleet-3` | no |
+| 4 | `TOOL-aMendedFleet-4` | no |
+| 5 | `TOOL-aMendedFleet-5` | no |
+| 6 | `TOOL-aMendedFleet-6` | no |
+| 7 | `TOOL-aMendedFleet-7` | no |
+| 8 | `TOOL-aMendedFleet-8` | no |
+| 9 | `TOOL-aMendedFleet-9` | no |
+| 10 | `TOOL-aMendedFleet-10` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
