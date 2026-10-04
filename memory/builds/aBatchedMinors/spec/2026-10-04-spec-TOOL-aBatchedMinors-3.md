@@ -6,6 +6,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-04-build-TOOL-aBatchedMinors-2-runlog-dc0cf1f9.md](../build/2026-10-04-build-TOOL-aBatchedMinors-2-runlog-dc0cf1f9.md) | journal | TOOL-aBatchedMinors-2 TOOL-aBatchedMinors-4 TOOL-aBatchedMinors-6 |
 | [2026-10-04-prompt-TOOL-aBatchedMinors-3-1-build-brief.md](../prompts/2026-10-04-prompt-TOOL-aBatchedMinors-3-1-build-brief.md) | journal | — |
 | [2026-10-04-review-TOOL-aBatchedMinors-2-closing-diff-round1.md](../reviews/2026-10-04-review-TOOL-aBatchedMinors-2-closing-diff-round1.md) | diff-review | TOOL-aBatchedMinors-1 TOOL-aBatchedMinors-2 TOOL-aBatchedMinors-4 |
 
