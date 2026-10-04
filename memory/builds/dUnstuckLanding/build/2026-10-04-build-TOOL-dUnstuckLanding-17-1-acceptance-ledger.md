@@ -39,6 +39,8 @@ function, 9 of 9. The whole suites and the gate legs are owed to the close.
 - AC9 — `fleet_over_budget` — over a clone at `%TEMP%/ul17d` it read `live` false with no run
   record. With `gate-run/fx/0.out` carrying `over aFixture=2` it read value 1, `gateable` false and
   detail `aFixture 2`. With the file deleted it read `live` false again.
+- AC9 — amended rev-3 — a fleet line reading `over unjudged` reads `live` false and names it, where
+  it read a live 0; section 9's rev-3 line logs it.
 - AC10 — `tools/drift-audit/drift_report.py` — `grep -c 'check 23 fleet — '` printed 1 for the leg
   and 2 for the engine.
 - AC11 — `impure` — the staged `tools/gate-legs.json` diff adds an `impure` key to `pass-order

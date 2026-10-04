@@ -1,6 +1,6 @@
 # TOOL-dUnstuckLanding-17 — the history legs grade the run's own range, and check 23 a per-build budget
 
-**Status:** CLOSED · rev-2 · 2026-10-04 · node d · Tier-2 · base 98926870 · streams tooling · order 5 · closes TOOL-dUnstuckLanding-7 · ratified 2026-10-04
+**Status:** CLOSED · rev-3 · 2026-10-04 · node d · Tier-2 · base 98926870 · streams tooling · order 5 · closes TOOL-dUnstuckLanding-7 · ratified 2026-10-04
 
 <!-- gen:spec-records -->
 
@@ -100,7 +100,8 @@ report-only drift-audit signal, `fleet_over_budget`, that lists the builds over 
   is the number of builds over budget, its `of` is the record count the line states, and its detail
   lists each build with its count and the line's `at` sha, noting when HEAD has moved past it. It is
   REPORT-ONLY. It reads NOT ASKED where the repo carries no `.unattended.conf`, and DEAD PROBE where it
-  does and no run record carries a fleet line. Its row joins the signal table in
+  does and no run record carries a fleet line, or where the newest line's `over` field holds anything
+  but `none` or `<slug>=<n>` tokens, as `over unjudged` does when no budget is declared. Its row joins the signal table in
   `tools/drift-audit/README.md`. Observed by AC9 and AC10.
 - **S11 — the two history legs declare `impure`.** Their verdict now depends on the remote, so their
   entries in `tools/gate-legs.json` carry an `impure` reason, which keeps the runner from reusing a
@@ -305,8 +306,8 @@ Each was rejected by a test, and §8 carries the fork it decided.
 - **AC9** — When `python tools/drift-audit/drift_report.py --json` runs in a scratch clone at
   `%TEMP%/ul17d` whose git dir holds no run record, `fleet_over_budget` reads `live` false. After a
   scratch file `<git-dir>/gate-run/fx/0.out` carrying one fleet line with `over aFixture=2` is
-  written, it reads value 1, `gateable` false, and its detail names `aFixture`. Deleting the file
-  returns it to `live` false.
+  written, it reads value 1, `gateable` false, and its detail names `aFixture`. The same file
+  reading `over unjudged` reads `live` false, naming it. Deleting the file returns it to `live` false.
   Red when: the signal reports `live` true with value 0 after the file is deleted.
   cost: about 30 s per report run.
 - **AC10** — When `grep -c 'check 23 fleet — '` runs over `tools/unattended/check-unattended.sh`
@@ -380,6 +381,9 @@ once, under `TOOL-dUnstuckLanding-24`.
   spelling of S2's rule both history legs call. AC4 grades two passes of one live record rather than
   two records, because a second live record in the kit-gate fixture moves checks the arm does not
   assert; the `check_adv_reaches` exclusion it observes is the same.
+- rev-3 · 2026-10-04 · S10 AC9 · folded implementation review round 1 M10 and L7 (ids 15, 19, 29):
+  `_parse_fleet_line` returns an `over` field holding anything but `none` or `<slug>=<n>` as
+  unjudged, and `measure_fleet_over_budget` reads it DEAD naming it, never a live zero.
 
 ## 10. Reuse audit
 

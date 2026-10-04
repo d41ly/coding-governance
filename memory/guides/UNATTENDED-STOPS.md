@@ -190,6 +190,7 @@ announced, and declines the take-over.
 
 | Record | Caller and clock | `--resume` |
 |---|---|---|
+| carrying `abandoned` | any, ahead of the `--scheduled` refusals | refuses 106, writing nothing, naming `--preflight`, which starts the next run on the record under the id it is handed and drops `abandoned` and `work-landed-at` |
 | recorded terminal | any | nothing to resume; with an id, check 26 |
 | HELD under a hand-off code, derived `LANDED (attended)` | any | nothing to resume, naming `--settle`; writes nothing, never the take-over or the re-bind |
 | LANDING derived LANDED, not observed | an id, on a branch where that landing's `--landed` does not run, the record naming a branch fact | nothing to resume, naming the record's run branch; writes nothing |
@@ -446,7 +447,7 @@ first committed before `HANDOFF_CUTOFF` — a blank cutoff refuses every one —
 `work-landed-at: <witness> <tip>`, the only write a terminal record admits. Over a working record
 whose `--liveness` verdict is `STALE` or `UNBOUND` it writes `work-landed-at` and `abandoned: <utc>`
 under the current phase; `--preflight`'s announcement and the leg's check 7 report exclude a record
-carrying `abandoned`. It refuses, numbered and before any write, a HELD record under another code, a
+carrying `abandoned`, and `--resume` refuses it (§8). It refuses, numbered and before any write, a HELD record under another code, a
 `LANDING` or `LANDED` record, a record differing from HEAD's copy beyond its lease lines, a live
 lease, an unanswered remote and an undecidable predicate; it STAGES the record and never commits,
 so the settle commit rides the next landing from that tree or a batched owner pass. A live `RUN.md`
@@ -457,9 +458,12 @@ commits the record on top of its witness, so every record read from the tip has 
 Landed is all three: the witness is not an ancestor of the record's `base` and `base..witness` holds a
 commit naming the slug in its subject or touching its build folder; every such commit is on the tip;
 and no commit on the tip's first-parent line since the witness carries `This reverts commit` naming
-one. A missing or unresolvable `base` is undecidable. `--settle` and check 15 ask the one library
-predicate, and check 15 reds a `work-landed-at` it does not uphold, one on an `ABORTED` record not
-predating `HANDOFF_CUTOFF`, and an `abandoned` standing without it.
+one, or naming a merge that brought one onto the tip. A missing or unresolvable `base` is
+undecidable. `--settle` and check 15 ask the one library predicate. Check 15 grades `work-landed-at`
+at the tip it records: it reds one that does not name the witness, whose tip is not on the advertised
+tip, or whose work the predicate does not read landed there, and REPORTS a later revert, since no verb
+rewrites the record. It reds one on an `ABORTED` record not predating `HANDOFF_CUTOFF`, and an
+`abandoned` standing without it.
 
 **Under `in-place`, `--landed` is an OBSERVATION.** It writes nothing to the tree, prints the
 derivation, and logs it, per landing commit, to `landed.<slug>.log` under the git common dir, so no

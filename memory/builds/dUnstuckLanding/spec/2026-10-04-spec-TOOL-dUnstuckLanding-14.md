@@ -1,6 +1,6 @@
 # TOOL-dUnstuckLanding-14 — the attended terminal: a handed record derives LANDED, `--settle` writes it, and a landed ABORTED record gains `work-landed-at`
 
-**Status:** CLOSED · rev-2 · 2026-10-04 · node d · Tier-2 · base 98926870 · streams tooling · order 2 · closes TOOL-dUnstuckLanding-4
+**Status:** CLOSED · rev-3 · 2026-10-04 · node d · Tier-2 · base 98926870 · streams tooling · order 2 · closes TOOL-dUnstuckLanding-4
 
 <!-- gen:spec-records -->
 
@@ -51,8 +51,9 @@ not merely present.
     attributable commit, one whose subject names the slug or that touches `memory/builds/<slug>/`;
   - every attributable commit is an ancestor of the tip;
   - no commit on the tip's first-parent line since the landing, `git rev-list --first-parent <tip>
-    ^<witness>`, carries a `This reverts commit <sha>` line naming one of them. That is the design
-    record's clause (iii) as written, and `TOOL-dUnstuckLanding-15` reads the same line.
+    ^<witness>`, carries a `This reverts commit <sha>` line naming one of them, or naming a merge
+    that brought one of them onto the tip, which is the `git revert -m 1` of a `--no-ff` landing. That
+    is the design record's clause (iii), and `TOOL-dUnstuckLanding-15` reads the same line.
 
   A missing `base`, a `base` or `witness` this clone cannot resolve, or an unreadable range is
   undecidable, never a guess. It is shared by `--settle` and check 15, so the writer and the grader
@@ -83,10 +84,15 @@ not merely present.
   deriving reader reads the record correctly before that commit lands. Observed by AC1.
 - **S7 — the abandoned marker is read.** `--preflight`'s concurrent-run announcement excludes a
   record carrying `abandoned`, printing why, and the leg's check 7 report does the same, so the two
-  count one population. Observed by AC6.
+  count one population. `--resume` refuses such a record with a number before any write, naming
+  `--preflight`, which starts the next run on it under the keepalive it is handed and drops
+  `abandoned` and `work-landed-at`. Observed by AC6.
 - **S8 — check 15, upheld rather than present.** For every record, live or archived, carrying
-  `work-landed-at`, the leg runs `check_work_landed` against the advertised tip and reds when it does
-  not read landed, when the record is ABORTED and first committed on or after `HANDOFF_CUTOFF`, or
+  `work-landed-at`, the leg runs the library's `check_work_landed_fact`, which grades the fact AT THE
+  TIP IT RECORDS. It reds when the fact's first field is not the record's witness, when its tip is not
+  an ancestor of the advertised tip, or when `check_work_landed` does not read the work landed at that
+  tip; a revert the advertised tip carries since is REPORTED, never a red, because no verb rewrites the
+  record. It also reds when the record is ABORTED and first committed on or after `HANDOFF_CUTOFF`, or
   when `abandoned` stands without `work-landed-at`. An unanswered remote is reported as a skip, as
   check 15's `landed-derived` arm already does. The fact-set arm gains a population, `attended`: a
   recorded LANDED carrying `landed-by: attended` owes `units-at-landing`, `landed-derived` and
@@ -283,7 +289,9 @@ run that pass.
   another build's commit, one whose work was merged and then reverted on the default branch, and one
   whose work was merged and kept, then the first three are each refused with the not-landed text
   and the fourth gains `work-landed-at:` naming its witness and the tip. With the fourth record's
-  `base` fact removed, it is refused with the undecidable text.
+  `base` fact removed, it is refused with the undecidable text. Two more records are refused with the
+  not-landed text: one whose work landed as a `--no-ff` merge that `git revert -m 1` backed out, and
+  one whose work was never merged.
   Red when: any of the first three gains the fact, or the fourth does not, which would mean the
   predicate cannot read ON or cannot read OFF over the population it acts on.
 - **AC5** — When the fourth AC4 record is graded under a `HANDOFF_CUTOFF` earlier than its first
@@ -293,13 +301,18 @@ run that pass.
 - **AC6** — When a fixture record at `BUILDING` with no lease facts, whose `--liveness` verdict is
   `UNBOUND`, carries work the predicate reads landed, `--settle` writes `work-landed-at` and
   `abandoned:` and leaves `phase: BUILDING`; a `--preflight` of another fixture slug then prints the
-  record as EXCLUDED rather than counting it. With a fresh lease making the verdict `LIVE`, the
-  settle is refused.
+  record as EXCLUDED rather than counting it, and `--resume` over the settled record is refused with
+  a number, naming `--preflight` and writing nothing. A `--preflight` under a new keepalive over a
+  record settled that way drops `abandoned` and `work-landed-at` and records the new keepalive. With a
+  fresh lease making the verdict `LIVE`, the settle is refused.
   Red when: a terminal is written, the marker is not read, or a live run is settled.
 - **AC7** — When the fourth AC4 record is edited by hand to carry `work-landed-at:` while its work is
   reverted on the tip, `bash tools/unattended/check-unattended.sh --skip 28` prints a check 15
   failure naming `work-landed-at` and the file; restored to the settled bytes, it prints none. A
-  fixture record carrying `abandoned:` with no `work-landed-at:` also reds.
+  fixture record carrying `abandoned:` with no `work-landed-at:` also reds. So does a fact naming a
+  commit that is not the record's witness, one whose recorded tip the advertised tip does not carry,
+  and one over work a `git revert -m 1` of its landing merge backed out or that never merged. A revert
+  landing on the default branch after a correct settle prints a report line and no check 15 failure.
   Red when: the hand-written fact is accepted on presence alone (review item M3).
   cost: one scoped leg run per arm over a small fixture.
 - **AC8** — When the fixture's origin URL is pointed at a path that does not exist, `--settle` over
@@ -377,6 +390,12 @@ New arm: tools/unattended/check-unattended.test.sh · the AC7 hand-written fact 
   otherwise meet the difference refusal; a recorded `LANDED` carrying `landed-by: attended` reads as
   settled rather than as the LANDED refusal. The protocol's §3 exception is paid for by trimming one
   history clause in §9, leaving 52 bytes of its cap for units 16 and 18.
+- rev-3 · 2026-10-04 · S4 S7 S8 AC4 AC6 AC7 · folded implementation review round 1 M4 (ids 2, 27),
+  M8 (id 9), M9 (id 11), M11 (id 17) and L6 (id 28): clause (iii) also reads a `git revert -m 1` of
+  the landing merge; `--resume` refuses a record carrying `abandoned` at 106 and `--preflight` starts
+  the next run on it, dropping both facts; check 15 grades `work-landed-at` through the library's new
+  `check_work_landed_fact` at the tip the fact records, requiring its witness and a tip on the
+  advertised tip, and reports a later revert; AC4 gains the merge-reverted and never-merged records.
 
 ## 10. Reuse audit
 

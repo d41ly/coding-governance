@@ -26,8 +26,12 @@ and nothing in it is attributable. The selftest suite and the gate legs are owed
   `landed`, counted once. An upheld fact moved it to `settled`; a fact naming another witness left it
   counted; the fact on the foreign record read `fact-not-upheld`; rotated, it read `landed (archived)`
   and the value fell to 0.
+- AC3 — amended rev-2 — `_AWL_WANT` gains `tMergeRev`, `tUnmerged` and `tOffRef`, reading
+  `not-landed (iii)`, `(ii)` and `(ii)`, uncounted; section 9's rev-2 line logs it.
 - AC4 — `aborted_work_landed` — read against the `unreverted` ref, the tip before the revert, the
   merged-then-reverted record read `landed` and the value rose from 1 to 2.
+- AC4 — amended rev-2 — against `unreverted` the merge-reverted record reads `landed` too and the
+  value is 3; section 9's rev-2 line logs it.
 - AC5 — `discarded_work_landed` — the record first committed after the fixture's cutoff counted there
   and not in `aborted_work_landed`, and an upheld fact did not clear it. With the cutoff blank it read
   LEGACY, counted in `aborted_work_landed` with the note naming the blank key, and
@@ -35,6 +39,8 @@ and nothing in it is attributable. The selftest suite and the gate legs are owed
 - AC6 — `_WORK_LANDED_CONTROLS` — four landed fact sets read both signals DEAD, the note naming
   `witness-equals-base`; the positive control pointed at reverted work read both DEAD naming
   `merged-not-reverted`; the shipped controls restored read live.
+- AC6 — amended rev-2 — `_WORK_LANDED_CONTROLS` holds five, the fifth the never-merged run, and the
+  positive control's swap keeps it; section 9's rev-2 line logs it.
 - AC7 — `.unattended.conf` — a fixture with neither it nor a run record read both NOT ASKED; with it
   committed and only a LANDED record, both read DEAD naming the empty ABORTED population.
 - AC8 — `test_work_landed_matches_the_driver` — the library was sourced from the path derived from
@@ -42,6 +48,9 @@ and nothing in it is attributable. The selftest suite and the gate legs are owed
   read the same verdict and date in both, the archive dated 2026-01-10 by its first add and the live
   `RUN.md` floored at 2026-01-20. A verdict flipped by hand read unequal, and the floor turned off
   in the engine redded the arm.
+- AC8 — amended rev-2 — `test_work_landed_matches_the_driver` drops its hand-flipped control and
+  holds the engine's upheld reading to `check_work_landed_fact` over two facts; section 9's rev-2
+  line logs it.
 - AC9 — `read_aborted_verdicts` — three ABORTED records cost ten git calls and six cost sixteen: four
   shared and two per record; fifty unrelated commits on the base ref moved neither count.
 - AC10 — `grep -c "_work_landed" tools/drift-audit/README.md` — it counted 2, one row per signal, and

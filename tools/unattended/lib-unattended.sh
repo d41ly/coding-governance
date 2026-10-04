@@ -1382,7 +1382,7 @@ read_missing_landed_facts() { # record file · landed|derived|landing|attended -
 #         ATTRIBUTABLE to the run: its subject names the slug as a word, or it touches the build folder;
 #   (ii)  every attributable commit is an ancestor of the tip;
 #   (iii) no commit on the tip's first-parent line since the witness carries a `This reverts commit
-#         <sha>` line naming one of them.
+#         <sha>` line naming one of them, or naming a merge that brought one of them onto the tip.
 #
 # 0 landed · 1 not landed · 2 UNDECIDABLE, the reason in WL_WHY either way. A missing `base`, a
 # `base`, `witness` or tip this clone cannot resolve, or a range git will not walk is undecidable,
@@ -1392,6 +1392,7 @@ read_missing_landed_facts() { # record file · landed|derived|landing|attended -
 WL_WHY=""
 check_work_landed() { # record file · advertised tip -> 0 landed · 1 not · 2 undecidable; WL_WHY
   local _wl_f="${1:-}" _wl_t="${2:-}" _wl_b _wl_w _wl_d _wl_s _wl_all _wl_own _wl_c _wl_x="" _wl_n=0 _wl_log _wl_rv
+  local _wl_p1 _wl_p2 _wl_a
   WL_WHY=""
   _wl_b=$({ extract_run_facts < "$_wl_f"; } 2>/dev/null | sed -n 's/^base: *//p' | head -1 | tr -d '\r')
   _wl_w=$({ extract_run_facts < "$_wl_f"; } 2>/dev/null | sed -n 's/^witness: *//p' | head -1 | tr -d '\r')
@@ -1434,8 +1435,66 @@ check_work_landed() { # record file · advertised tip -> 0 landed · 1 not · 2 
     case "$_wl_x" in *" $_wl_c"*)
       WL_WHY="a commit on the tip's first-parent line reverts its commit ${_wl_c:0:8}"; return 1 ;;
     esac
+    # A LANDING IS A --no-ff MERGE, and its usual back-out is `git revert -m 1 <merge>`, whose line
+    # names the MERGE and none of the run's own commits (implementation review round 1, M4). A named
+    # merge reverts the run when it brought an attributable commit in: on its second parent's side
+    # and not already on its first.
+    _wl_p1=$(GIT rev-parse --verify --quiet "$_wl_c^1^{commit}" 2>/dev/null) || continue
+    _wl_p2=$(GIT rev-parse --verify --quiet "$_wl_c^2^{commit}" 2>/dev/null) || continue
+    for _wl_a in $_wl_x; do
+      if GIT merge-base --is-ancestor "$_wl_a" "$_wl_p2" 2>/dev/null \
+         && ! GIT merge-base --is-ancestor "$_wl_a" "$_wl_p1" 2>/dev/null; then
+        WL_WHY="a commit on the tip's first-parent line reverts the merge ${_wl_c:0:8}, which brought its commit ${_wl_a:0:8} onto the tip"
+        return 1
+      fi
+    done
   done
   WL_WHY="$_wl_n commit(s) of its own in ${_wl_b:0:8}..${_wl_w:0:8}, every one on the tip ${_wl_t:0:8} and none reverted"
+  return 0
+}
+
+# IS A RECORD'S `work-landed-at: <witness> <tip>` UPHELD - the leg's check 15, and the drift kit's
+# parity arm holding its own `upheld` reading to this one (implementation review round 1, L6). The
+# fact is graded AT THE TIP IT RECORDS, never at today's (M9): `--settle` wrote it after reading the
+# work landed there, and a revert landing later is a fact about the default branch, not about that
+# write, which no verb could clear. Upheld is all three: its first field is the record's witness; its
+# tip resolves and is an ancestor of <advertised tip>, so it names a landing the default branch
+# carries; and `check_work_landed` reads the work landed at that tip.
+#
+# 0 upheld · 1 not upheld · 2 undecidable, the reason in WL_WHY. On 0, WLF_NOW is EMPTY, or the
+# reason the predicate no longer reads the work landed at <advertised tip> - the report line a later
+# revert becomes. CALLED AS A PLAIN COMMAND, for WL_WHY's reason.
+#
+# WHAT IT DOES NOT CHECK: the record's phase or its date against HANDOFF_CUTOFF, which check 15
+# grades beside it; nor that the recorded tip was the one advertised when `--settle` ran.
+WLF_NOW=""
+check_work_landed_fact() { # record file · advertised tip -> 0 upheld · 1 not · 2 undecidable; WL_WHY, WLF_NOW
+  local _wf_f="${1:-}" _wf_adv="${2:-}" _wf_v _wf_n _wf_t="" _wf_wit _wf_full _wf_rc
+  WLF_NOW=""; WL_WHY=""
+  _wf_v=$({ extract_run_facts < "$_wf_f"; } 2>/dev/null | sed -n 's/^work-landed-at: *//p' | head -1 | tr -d '\r')
+  _wf_wit=$({ extract_run_facts < "$_wf_f"; } 2>/dev/null | sed -n 's/^witness: *//p' | head -1 | tr -d '\r')
+  _wf_n=${_wf_v%% *}
+  case "$_wf_v" in *" "*) _wf_t=${_wf_v#* }; _wf_t=${_wf_t%% *} ;; esac
+  if [ -z "$_wf_n" ] || [ "$_wf_n" != "$_wf_wit" ]; then
+    _wf_full=$(GIT rev-parse --verify --quiet "${_wf_wit:-none}^{commit}" 2>/dev/null)
+    if [ -z "$_wf_n" ] || [ "$_wf_n" != "$_wf_full" ]; then
+      WL_WHY="its work-landed-at names ${_wf_n:0:8} and its witness is ${_wf_wit:0:8}, so the fact is not about this run's own work"
+      [ -n "$_wf_n" ] || WL_WHY="its work-landed-at names no commit, so the fact is not about this run's own work"
+      return 1
+    fi
+  fi
+  GIT rev-parse --verify --quiet "${_wf_adv:-none}^{commit}" >/dev/null 2>&1 \
+    || { WL_WHY="the advertised tip ${_wf_adv:-none} does not resolve in this clone"; return 2; }
+  if ! GIT rev-parse --verify --quiet "${_wf_t:-none}^{commit}" >/dev/null 2>&1 \
+     || ! GIT merge-base --is-ancestor "$_wf_t" "$_wf_adv" 2>/dev/null; then
+    WL_WHY="the tip its work-landed-at records, ${_wf_t:0:8}, is not on the advertised tip ${_wf_adv:0:8}, so it names no landing the default branch carries"
+    [ -n "$_wf_t" ] || WL_WHY="its work-landed-at records no tip, so it names no landing the default branch carries"
+    return 1
+  fi
+  check_work_landed "$_wf_f" "$_wf_t"; _wf_rc=$?
+  [ "$_wf_rc" = 0 ] || return "$_wf_rc"
+  check_work_landed "$_wf_f" "$_wf_adv" || WLF_NOW="$WL_WHY"
+  WL_WHY="its witness ${_wf_n:0:8} reads landed at the tip the fact records, ${_wf_t:0:8}"
   return 0
 }
 

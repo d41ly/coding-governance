@@ -146,7 +146,8 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
 - `--resume` — re-enters the run from the run-state file; must agree with `--status`. With
   `--keepalive-id <id>` it applies the resume matrix: the holder's own id writes nothing, while a
   take-over, `--replaces`, the holder's restarted process and a pushed landing not yet observed
-  re-record keepalive, session and pid and stage the record; refused on a recorded terminal.
+  re-record keepalive, session and pid and stage the record; refused on a recorded terminal, and on
+  a record `--settle` marked `abandoned`, whose next run `--preflight` starts.
   `--scheduled <held-at>` marks it as the restart a DURABLE schedule issued. It refuses, numbered
   and before any write, unless the exact hold that schedule was filed for is still the record's
   state, and on success the take-over runs unchanged, still requires the session's own

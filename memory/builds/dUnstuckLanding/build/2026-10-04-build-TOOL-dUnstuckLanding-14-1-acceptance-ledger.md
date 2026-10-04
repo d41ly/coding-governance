@@ -30,15 +30,24 @@ close.
   each refused with fail 102 and its own reason, blob unchanged; the kept record gained
   `work-landed-at:` naming its witness and the tip and stayed ABORTED; with its base removed and
   committed it was refused with fail 103 naming the missing base.
+- AC4 — amended rev-3 — `--settle` over two more records, a `--no-ff` landing backed out by
+  `git revert -m 1` and a run never merged, is refused with the not-landed text naming the merge and
+  `is not on the tip`; section 9's rev-3 line logs it.
 - AC5 — `HANDOFF_CUTOFF` — with `HANDOFF_CUTOFF` at 2000-01-01 the kept record was refused with fail
   98 saying it meant discard; blank, fail 97 named the key; the record's blob was unchanged.
 - AC6 — `UNBOUND` — the BUILDING record with no lease read `verdict: UNBOUND`; `--settle` wrote
   `work-landed-at` and `abandoned` and kept `phase: BUILDING`; a `--preflight` of tRun then printed
   it EXCLUDED as abandoned and not as a counted run. With a fresh lease the settle printed fail 101
   saying LIVE and wrote nothing.
+- AC6 — amended rev-3 — `--resume` over the settled record refuses at 106 naming `--preflight`, and a
+  `--preflight` under a new keepalive drops `abandoned` and `work-landed-at`; section 9's rev-3 line
+  logs it.
 - AC7 — `abandoned:` — the leg redded check 15 naming `work-landed-at`, the revert and
   `memory/builds/tArevert/RUN.md` for a hand-written fact on reverted work, redded none on the kept
   record's settled bytes, and redded a record carrying `abandoned:` with no `work-landed-at`.
+- AC7 — amended rev-3 — `check_work_landed_fact` grades the fact at the tip it records: a wrong
+  witness, a tip off the advertised tip, a merge-reverted and a never-merged record red, and a later
+  revert is reported; section 9's rev-3 line logs it.
 - AC8 — `tip was not observed` — with the fixture origin's URL pointed at a missing path, `--settle`
   printed fail 99 saying the tip was not observed, and the record's blob was unchanged.
 - AC9 — `KA-3` — `--resume tRun --keepalive-id KA-3` over the unsettled landed hand-off printed

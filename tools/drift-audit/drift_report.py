@@ -2353,8 +2353,8 @@ def build_nonterminal_merged_runs(ctx) -> dict:
 # verdict and every first-commit date here to it, in both directions. The dating rule is ported the
 # same way from the library's `read_first_commit_date`.
 #
-# LIVENESS is drawn from the population the predicate acts on: four record-shaped CONTROL fact sets,
-# three that must read not-landed and one that must read landed, are run first on every report. Any
+# LIVENESS is drawn from the population the predicate acts on: five record-shaped CONTROL fact sets,
+# four that must read not-landed and one that must read landed, are run first on every report. Any
 # other reading is a predicate that cannot say no, or cannot say yes, and both signals read DEAD
 # naming the control. A signal is live only over a non-empty dated population as well.
 #
@@ -2363,10 +2363,18 @@ def build_nonterminal_merged_runs(ctx) -> dict:
 #
 # WHAT IT DOES NOT SEE. The revert clause reads the base ref's FIRST-PARENT line only, so a revert
 # landed on a side branch and merged in is not seen and its work reads landed - the library's
-# clause, carried here unchanged. Attribution by path reads `--name-only`, which lists no path for a
-# merge commit, so a merge that alone touches the build folder is not attributable here where the
-# library's path-limited log may keep it. The base ref is the remote-tracking ref, never a fresh
-# `ls-remote`, so a stale clone judges against what it last fetched, and the header prints that ref.
+# clause, carried here unchanged. A revert naming a MERGE counts where that merge brought an
+# attributable commit in, as the library's does (implementation review round 1, M4). Attribution by
+# path reads `--name-only`, which lists no path for a merge commit, so a merge that alone touches the
+# build folder is not attributable here where the library's path-limited log may keep it. The base
+# ref is the remote-tracking ref, never a fresh `ls-remote`, so a stale clone judges against what it
+# last fetched, and the header prints that ref. A record whose base is OFF the base ref's graph is
+# placed by one `merge-base --is-ancestor`, as the library places every one (L4).
+#
+# UPHELD is read at the base ref, where the leg's check 15 grades `work-landed-at` at the tip the fact
+# records (M9): both require the fact to name the record's witness and its tip to be on the base ref
+# (L6), but a revert landing after a settle shows here as `fact-not-upheld` while check 15 only
+# reports it. The self-test holds the two readings equal over records nothing reverted since.
 # --------------------------------------------------------------------------------------------
 
 _AWL_NAME = "aborted_work_landed"
@@ -2389,8 +2397,11 @@ _WORK_LANDED_CONTROLS = (
     ("merged-not-reverted", {"witness_is_base_ancestor": False, "attributable": (_WL_CONTROL_SHA,),
                              "on_base_ref": (_WL_CONTROL_SHA,), "reverted": (),
                              "why_unjudgeable": ""}),
+    # Implementation review round 1, M11: the never-merged run, the one shape only clause (ii) decides.
+    ("unmerged", {"witness_is_base_ancestor": False, "attributable": (_WL_CONTROL_SHA,),
+                  "on_base_ref": (), "reverted": (), "why_unjudgeable": ""}),
 )
-_WORK_LANDED_CONTROL_WANT = ("not-landed", "not-landed", "not-landed", "landed")
+_WORK_LANDED_CONTROL_WANT = ("not-landed", "not-landed", "not-landed", "landed", "not-landed")
 
 
 def check_work_landed(facts: dict) -> tuple:
@@ -2463,7 +2474,8 @@ def read_aborted_verdicts(ctx) -> dict:
     `ls-tree`, one held-open `cat-file --batch`, one `rev-list --parents` and one first-parent revert
     `log` of the base ref, shared; per record a `--follow` dating walk and, where clause (i) needs it,
     one `log` of `base..witness`; one more per archived sibling of a live `RUN.md`; and a
-    `merge-base --is-ancestor` only for a revert naming an attributable commit off the base ref's graph.
+    `merge-base --is-ancestor` only for a revert naming an attributable commit off the base ref's graph,
+    or for a base off it.
     """
     cached = getattr(ctx, "_aborted_verdicts", None)
     if cached is not None:
@@ -2534,7 +2546,9 @@ def read_aborted_verdicts(ctx) -> dict:
             if rec["phase"] == "ABORTED":
                 aborted.append((path, rec))
         for _path, rec in aborted:
-            for key in ("witness", "base"):
+            wla_bits = rec["work-landed-at"].split()
+            rec["wla-tip"] = wla_bits[1] if len(wla_bits) > 1 else ""
+            for key in ("witness", "base", "wla-tip"):
                 val = rec[key]
                 # One object name per batch LINE: a value carrying whitespace is not one, and is
                 # left unresolved rather than sent.
@@ -2603,10 +2617,9 @@ def read_aborted_verdicts(ctx) -> dict:
             facts["why_unjudgeable"] = f"its base {b_in} does not resolve in this clone"
         elif w is None:
             facts["why_unjudgeable"] = f"its witness {w_in or 'none'} does not resolve in this clone"
-        elif b not in parents:
-            facts["why_unjudgeable"] = (f"its base {b[:8]} is not on {base_ref}, so one rev-list cannot "
-                                        "place its witness against it")
-        elif w == b or (w in parents and _check_run_ancestor(parents, w, b)):
+        elif w == b or (w in parents and b in parents and _check_run_ancestor(parents, w, b)) \
+                or (b not in parents and ctx.git.run("merge-base", "--is-ancestor", w, b).returncode == 0):
+            # A base off the base ref's graph is placed by ONE call, as the library places it (L4).
             facts["witness_is_base_ancestor"] = True
         else:
             span = ctx.git.run("log", "--format=%x1e%H%x1f%s", "--name-only", f"{b}..{w}", "--")
@@ -2625,6 +2638,16 @@ def read_aborted_verdicts(ctx) -> dict:
                 for rc, named in reverts:
                     named_own = [c for c in own if c.startswith(named)]
                     if not named_own:
+                        # A `git revert -m 1 <merge>` names the MERGE: it reverts the run where that
+                        # merge brought an attributable commit in, on its second parent's side and not
+                        # already on its first (M4). The library's test, on the base ref's graph.
+                        merge = named if named in parents else next(
+                            (k for k in parents if k.startswith(named)), "")
+                        sides = parents.get(merge, ())
+                        if len(sides) >= 2:
+                            named_own = [c for c in own if _check_run_ancestor(parents, c, sides[1])
+                                         and not _check_run_ancestor(parents, c, sides[0])]
+                    if not named_own:
                         continue
                     # The library walks `<tip> ^<witness>`, so a revert the witness already contains
                     # is not one. Placed on the graph where it can be, by one call where it cannot.
@@ -2641,7 +2664,10 @@ def read_aborted_verdicts(ctx) -> dict:
 
         wla = rec["work-landed-at"]
         named = wla.split()[0] if wla.split() else ""
-        upheld = bool(named) and named in (w_in, w) and verdict == "landed"
+        # The fact names the record's witness and a tip the base ref carries (L6), and the work reads
+        # landed - at the base ref here, at the recorded tip in check 15 (see the head of this section).
+        upheld = (bool(named) and named in (w_in, w) and resolved.get(rec["wla-tip"]) in parents
+                  and verdict == "landed")
         counts = ""
         if verdict == "unjudgeable":
             shown = f"unjudgeable — {clause}"
@@ -2656,7 +2682,7 @@ def read_aborted_verdicts(ctx) -> dict:
             shown = "fact-not-upheld" if wla else f"not-landed ({clause})"
         got["rows"].append({
             "path": path, "legacy": legacy, "verdict": verdict, "date": date, "counts": counts,
-            "unjudgeable": verdict == "unjudgeable",
+            "unjudgeable": verdict == "unjudgeable", "wla": bool(wla), "upheld": upheld,
             "row": (f"{path} {rec['halt-code'] or '-'} {(w_in or '-')[:8]} {date or '-'} "
                     f"{'legacy' if legacy else 'post-cutoff'} {shown}"),
         })
@@ -2798,7 +2824,12 @@ _FLEET_HEAD = "unattended: check 23 fleet — "
 
 
 def _parse_fleet_line(line: str):
-    """The fleet line's `over` pairs, its record count and its `at` sha, or None when it does not parse."""
+    """The fleet line's `over` pairs, its record count and its `at` sha, or None when it does not parse.
+
+    An `over` field holding anything but `none` or `<slug>=<n>` tokens - `unjudged` is what check 23
+    prints when the budget is undeclared or malformed - parses with `over` None and `unjudged` naming
+    it, so no reader can take it for zero builds over.
+    """
     if not line.startswith(_FLEET_HEAD):
         return None
     fields = line[len(_FLEET_HEAD):].rstrip("\r\n").split(" · ")
@@ -2806,20 +2837,33 @@ def _parse_fleet_line(line: str):
                  fields[0])
     if not m:
         return None
-    over, at = None, None
+    over, at, unjudged = None, None, ""
     for fld in fields[1:]:
         word, _, rest = fld.partition(" ")
         if word == "over":
             over = []
-            for tok in rest.split():
+            toks = rest.split()
+            if toks == ["none"]:
+                continue
+            for tok in toks:
                 slug, eq, n = tok.partition("=")
-                if eq and slug and n.isdigit():
-                    over.append((slug, int(n)))
+                if not (eq and slug and n.isdigit()):
+                    # `over unjudged`, or any token that is neither `none` nor `<slug>=<n>`: check 23
+                    # judged no budget, so the line carries no count (implementation review round 1,
+                    # M10). The caller reads this as unjudgeable, never as zero builds over.
+                    over = None
+                    unjudged = rest.strip()
+                    break
+                over.append((slug, int(n)))
+            if over is None:
+                break
         elif word == "at":
             at = rest.strip()
+    if unjudged:
+        return {"over": None, "records": int(m.group(3)), "at": at or "", "unjudged": unjudged}
     if over is None or not at:
         return None
-    return {"over": over, "records": int(m.group(3)), "at": at}
+    return {"over": over, "records": int(m.group(3)), "at": at, "unjudged": ""}
 
 
 def measure_fleet_over_budget(ctx) -> dict:
@@ -2866,6 +2910,12 @@ def measure_fleet_over_budget(ctx) -> dict:
                                         f"the git dir's {_RUN_RECORD_DIR}/ carries a check 23 fleet line"
                                         + (f"; {len(unparsed)} carried one that does not parse" if unparsed else ""))
     run_id, got = found
+    if got.get("unjudged"):
+        return _build_run_dead(name, got["records"], f"DEAD PROBE — the newest fleet line, in run record "
+                                                     f"{run_id}, reads `over {got['unjudged']}`: check 23 "
+                                                     "judged no per-build budget, which it does when "
+                                                     "UNDECLARED_WRITE_BUDGET is undeclared or not an "
+                                                     "integer, so no count of builds over it exists")
     head = ctx.git.run("rev-parse", "HEAD")
     head8 = head.stdout.strip()[:8] if head.returncode == 0 else ""
     moved = bool(head8) and not head8.startswith(got["at"][:8])

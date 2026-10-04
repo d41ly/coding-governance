@@ -93,7 +93,7 @@ EXECUTED: list[str] = []
 # on a run where no arm skipped; it rises by hand when arms land and never falls to absorb a missing
 # one. A run with a SKIP does not compare it, and says so, because a skipped arm's checks are absent
 # for a reason the floor cannot see.
-CHECK_FLOOR = 333
+CHECK_FLOOR = 344
 # 261 -> 267, TOOL-dDerivedDocket-26: the six checks of `test_legs_retried_after_timeout`.
 # 267 -> 277, TOOL-dDerivedDocket-34: the five checks of the retired dGV-13 signal leave, one
 # retirement check and the fourteen of `test_backlog_ask_signals` arrive.
@@ -101,6 +101,11 @@ CHECK_FLOOR = 333
 # thirteen of `test_work_landed_matches_the_driver`.
 # 324 -> 333, TOOL-dUnstuckLanding-17: the nine checks of `test_fleet_over_budget`, COUNTED off the arm
 # rather than measured, because the unit pass runs no suite; the close's run re-reads it.
+# 333 -> 344, implementation review round 1, fold pass A, COUNTED the same way: L3's tautological
+# parity control leaves (-1); three fixture records add three `_AWL_WANT` readings and three parity
+# rows (+6); AC4's merge-revert row (+1); L6's two-reader arm, two checks and one per fact (+4); and
+# M10's unjudged fleet line (+1), net +11. L6 reaches its four only where the library's bash runs,
+# as the parity arm already does, and a run without it skips and does not compare the floor.
 
 
 def check(label: str, cond: bool, detail: str = "") -> None:
@@ -2637,6 +2642,15 @@ def test_fleet_over_budget(tmp: pathlib.Path) -> None:
                    encoding="utf-8", newline="\n")
     got = report(r)[_FLEET_SIG]
     check("`over none` reads 0 and stays LIVE", got["value"] == 0 and got["live"] is True, f"got {got}")
+    # Implementation review round 1, M10: check 23 prints `over unjudged` when no budget is declared,
+    # and that is a fleet nobody judged, never zero builds over it.
+    out.write_text("unattended: check 23 fleet — 3 undeclared write(s) over 9 graded pass(es) in 4 record(s) "
+                   "· budget undeclared per build · over unjudged · range whole (x) · at " + head8 + "\n",
+                   encoding="utf-8", newline="\n")
+    got = report(r)[_FLEET_SIG]
+    check("`over unjudged` reads DEAD, never a live 0 (M10)",
+          got["live"] is False and not got.get("not_asked") and "over unjudged" in str(got["detail"]),
+          f"got {got}")
     out.unlink()
     got = report(r)[_FLEET_SIG]
     check("deleting the record returns it to DEAD, not a live 0",
@@ -2955,9 +2969,13 @@ _AWL_SIG = "aborted_work_landed"
 _DWL_SIG = "discarded_work_landed"
 _AWL_CUTOFF = "2026-02-01"
 # What each fixture record must read, with a dated cutoff and the base ref `main`: the four AC3 shapes,
-# an archive and a floored live record that are both negative, and one post-cutoff positive.
+# an archive and a floored live record that are both negative, and one post-cutoff positive. The
+# implementation review's round 1 added three: a run whose --no-ff landing merge `git revert -m 1`
+# backed out (M4), a run never merged (M11, the one shape only clause (ii) decides), and a run based
+# off the base ref's graph, which the engine places as the library does (L4).
 _AWL_WANT = {"tEqBase": "not-landed (i)", "tForeign": "not-landed (i)", "tReverted": "not-landed (iii)",
-             "tPos": "landed", "tArch": "not-landed (i)", "tFloor": "not-landed (i)", "tLate": "landed"}
+             "tPos": "landed", "tArch": "not-landed (i)", "tFloor": "not-landed (i)", "tLate": "landed",
+             "tMergeRev": "not-landed (iii)", "tUnmerged": "not-landed (ii)", "tOffRef": "not-landed (ii)"}
 
 
 def _run_dated(r: pathlib.Path, day: str, *cmd: str) -> subprocess.CompletedProcess:
@@ -2971,8 +2989,9 @@ def _build_aborted_fixture(tmp: pathlib.Path, name: str):
     """A fixture repo holding one ABORTED record per shape the content predicate decides.
 
     Every commit is dated, so each record's first commit falls where the arm needs it against
-    `_AWL_CUTOFF`. `unreverted` is a ref at the tip before tReverted's revert, which is how AC4 reads
-    the same records with that revert removed. Returns `(repo, shas)`, the shas keyed by role.
+    `_AWL_CUTOFF`. `unreverted` is a ref at the tip before tReverted's revert and tMergeRev's merge
+    revert, which is how AC4 reads the same records with both removed. Returns `(repo, shas)`, the shas
+    keyed by role.
     """
     NL = chr(10)
     B = f"{FIXTURE_MEMORY_ROOT}/builds"
@@ -3005,9 +3024,25 @@ def _build_aborted_fixture(tmp: pathlib.Path, name: str):
     shas["rev"] = add_merged_work("2026-01-05", "tReverted", "src/rev.txt", "feat(tReverted): the work")
     # Attributable by PATH alone: its subject does not name the slug.
     shas["late"] = add_merged_work("2026-01-06", "tLate", f"{B}/tLate/notes.md", "feat: the late work")
+    shas["mrev"] = add_merged_work("2026-01-07", "tMergeRev", "src/mrev.txt", "feat(tMergeRev): the work")
+    shas["mrev_merge"] = run(["git", "rev-parse", "main"], r).stdout.strip()
+    # Never merged: its run branch keeps the one commit, and main never takes it.
+    shas["gone_base"] = shas["mrev_merge"]
+    run(["git", "checkout", "-q", "-b", "wtUnmerged"], r)
+    (r / "src" / "gone.txt").write_text("gone" + NL, encoding="utf-8", newline=NL)
+    shas["gone"] = run_commit("2026-01-07", "feat(tUnmerged): the work")
+    # Based OFF main's graph: a side line from the root that main never takes, and the run cut from it.
+    run(["git", "checkout", "-q", "-b", "wside", shas["root"]], r)
+    (r / "src" / "side.txt").write_text("side" + NL, encoding="utf-8", newline=NL)
+    shas["side"] = run_commit("2026-01-07", "chore: side work")
+    (r / "src" / "off.txt").write_text("off" + NL, encoding="utf-8", newline=NL)
+    shas["off"] = run_commit("2026-01-07", "feat(tOffRef): the work")
+    run(["git", "checkout", "-q", "main"], r)
     run(["git", "branch", "unreverted", "main"], r)
     out = _run_dated(r, "2026-01-08", "revert", "--no-edit", shas["rev"][1])
     assert out.returncode == 0, f"fixture revert failed: {out.stderr.strip()[:200]}"
+    out = _run_dated(r, "2026-01-08", "revert", "-m", "1", "--no-edit", shas["mrev_merge"])
+    assert out.returncode == 0, f"fixture merge revert failed: {out.stderr.strip()[:200]}"
 
     root = shas["root"]
 
@@ -3019,6 +3054,9 @@ def _build_aborted_fixture(tmp: pathlib.Path, name: str):
     write_aborted("tForeign", root, shas["foreign"])
     write_aborted("tReverted", *shas["rev"])
     write_aborted("tPos", *shas["pos"])
+    write_aborted("tMergeRev", *shas["mrev"])
+    write_aborted("tUnmerged", shas["gone_base"], shas["gone"])
+    write_aborted("tOffRef", shas["side"], shas["off"])
     write_aborted("tArch", root, root)
     _write_run_record(r, f"{B}/tFloor/RUN.md", {"phase": "LANDED", "witness": root, "base": root})
     run_commit("2026-01-10", "records: the legacy run records")
@@ -3079,7 +3117,7 @@ def test_aborted_work_landed(tmp: pathlib.Path) -> None:
     for slug, want in sorted(_AWL_WANT.items()):
         check(f"aborted work: {slug} reads {want}", rows.get(slug) == want, f"got {rows.get(slug)!r}")
     check("aborted work: live over the legacy population, the archive included in `of`",
-          awl["live"] is True and awl["of"] == 6, f"live={awl['live']} of={awl['of']} {awl['detail']}")
+          awl["live"] is True and awl["of"] == 9, f"live={awl['live']} of={awl['of']} {awl['detail']}")
     check("aborted work: only the legacy positive is counted", awl["value"] == 1, f"{awl['detail']}")
     check("aborted work: the post-cutoff positive counts in discarded and not in aborted",
           dwl["live"] is True and dwl["value"] == 1 and dwl["of"] == 1
@@ -3092,8 +3130,10 @@ def test_aborted_work_landed(tmp: pathlib.Path) -> None:
     # ---- AC4, the same records with the revert removed: the revert clause is what decided tReverted.
     awl4, _d, rows4 = _read_aborted_rows(dr, r, "unreverted")
     check("aborted work: with its revert removed, the merged-then-reverted record is listed",
-          rows4.get("tReverted") == "landed" and awl4["value"] == 2,
+          rows4.get("tReverted") == "landed" and awl4["value"] == 3,
           f"got {rows4.get('tReverted')!r} value {awl4['value']}")
+    check("aborted work: with its merge's revert removed, the merge-reverted record is listed (M4)",
+          rows4.get("tMergeRev") == "landed", f"got {rows4.get('tMergeRev')!r}")
 
     # ---- AC2, through the CLI: both registered, both non-zero, and `--check` still exits 0.
     rep = report(r)
@@ -3155,7 +3195,7 @@ def test_aborted_work_landed(tmp: pathlib.Path) -> None:
                                and s["detail"][0].startswith("DEAD PROBE")
                                and saved[0][0] in s["detail"][0] for s in (awl6, dwl6)), f"{awl6} {dwl6}")
         reverted = dict(saved[3][1], reverted=saved[3][1]["on_base_ref"])
-        dr._WORK_LANDED_CONTROLS = saved[:3] + ((saved[3][0], reverted),)
+        dr._WORK_LANDED_CONTROLS = saved[:3] + ((saved[3][0], reverted),) + saved[4:]
         awl6, dwl6, _r = _read_aborted_rows(dr, r)
         check("aborted work: a positive control pointed at reverted work reads both DEAD, naming it",
               all(s["live"] is False and saved[3][0] in s["detail"][0] for s in (awl6, dwl6)),
@@ -3259,7 +3299,7 @@ def test_work_landed_matches_the_driver(tmp: pathlib.Path) -> None:
     if shell is None:
         skip("work-landed parity with the driver", "no bash that runs the kit library here")
         return
-    r, _shas = _build_aborted_fixture(tmp, "abortedparity")
+    r, shas = _build_aborted_fixture(tmp, "abortedparity")
     tip = run(["git", "rev-parse", "main"], r).stdout.strip()
     got = dr.read_aborted_verdicts(_build_run_ctx(dr, r))
     mine = {row["path"]: ({"landed": "0", "not-landed": "1"}.get(row["verdict"], "2"), row["date"])
@@ -3287,11 +3327,42 @@ def test_work_landed_matches_the_driver(tmp: pathlib.Path) -> None:
           mine.get(arch, ("", ""))[1] == "2026-01-10" == theirs.get(arch, ("", ""))[1], f"{arch}")
     check("parity: a live RUN.md is floored at its archived sibling",
           mine.get(floor, ("", ""))[1] == "2026-01-20" == theirs.get(floor, ("", ""))[1], f"{floor}")
-    # THE CONTROL: an engine verdict flipped by hand reads unequal, so the comparison discriminates.
-    pos = next((p for p in mine if "/tPos/" in p), "")
-    flipped = ("1" if mine.get(pos, ("0",))[0] == "0" else "0", mine.get(pos, ("", ""))[1])
-    check("parity: control — an engine verdict flipped by hand reads unequal",
-          bool(pos) and flipped != theirs.get(pos), f"{pos} {theirs.get(pos)}")
+    # No hand-flipped "control" here (implementation review round 1, L3): a flipped copy of the
+    # engine's own verdict differs from the library's exactly when the per-record checks above have
+    # already redded, so it could not fail on its own. The premise check above, a landed and a
+    # not-landed record both present, is what shows the comparison is not over a constant.
+
+    # ---- L6: ONE fixture fed to both graders of `work-landed-at`. tPos's fact names its witness and the
+    # tip; tLate's names another run's commit. The engine's `upheld` reading and the library's
+    # `check_work_landed_fact`, which the leg's check 15 calls, must agree on each.
+    B = f"{FIXTURE_MEMORY_ROOT}/builds"
+    facts = {"phase": "ABORTED", "halt-code": "fork-unresolvable"}
+    _write_run_record(r, f"{B}/tPos/RUN.md", dict(facts, witness=shas["pos"][1], base=shas["pos"][0],
+                                                  **{"work-landed-at": f"{shas['pos'][1]} {tip}"}))
+    _write_run_record(r, f"{B}/tLate/RUN.md", dict(facts, witness=shas["late"][1], base=shas["late"][0],
+                                                   **{"work-landed-at": f"{shas['foreign']} {tip}"}),
+                      [_build_park_row("review", f"late row {i}") for i in range(20)])
+    _run_dated(r, "2026-03-10", "add", "-A")
+    _run_dated(r, "2026-03-10", "commit", "-q", "-m", "records: two facts, one upheld", "--no-verify")
+    tip = run(["git", "rev-parse", "main"], r).stdout.strip()
+    got = dr.read_aborted_verdicts(_build_run_ctx(dr, r))
+    held = {row["path"]: row["upheld"] for row in got["rows"] if row.get("wla")}
+    script = ('set +o posix 2>/dev/null; . "$1" || exit 9; t=$2; shift 2; for p in "$@"; do '
+              'check_work_landed_fact "$p" "$t"; printf "%s|%s\\n" "$p" "$?"; done')
+    out = run([shell, "-c", script, "parity", lib.as_posix(), tip, *sorted(held)], r)
+    graded = {}
+    for line in out.stdout.split("\n"):
+        bits = line.strip().split("|")
+        if len(bits) == 2:
+            graded[bits[0]] = bits[1] == "0"
+    check("parity: both graders read the same work-landed-at facts (L6)",
+          len(held) == 2 and set(graded) == set(held),
+          f"engine {sorted(held)} library {sorted(graded)} stderr={out.stderr.strip()[:200]}")
+    check("parity: the facts hold one upheld and one not (the premise)",
+          set(held.values()) == {True, False}, f"{held}")
+    for path in sorted(held):
+        check(f"parity: {path.split('/')[2]} work-landed-at reads the same upheld verdict in both",
+              held[path] == graded.get(path), f"engine {held[path]} library {graded.get(path)}")
 
 
 def test_version_carriers_agree(tmp: pathlib.Path) -> None:

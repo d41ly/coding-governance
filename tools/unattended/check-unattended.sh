@@ -1910,18 +1910,28 @@ while IFS= read -r f; do
   # ---- silence a later signal - reds. It also reds the fact on an ABORTED record first committed on
   # ---- or after HANDOFF_CUTOFF, which meant discard, and an `abandoned` marker standing without it.
   # ----
-  # ---- WHAT IT DOES NOT CHECK: that the run's work was RIGHT, only that it landed and stayed; that
-  # ---- `base` and `witness` are the values the run's own verbs wrote, since both are the record's own
-  # ---- facts and a hand edit of all three moves together; nor a record this clone cannot judge: no
-  # ---- advertised tip is REPORTED as a skip, never a red.
+  # ---- GRADED AT THE TIP THE FACT RECORDS (implementation review round 1, M9), through the library's
+  # ---- `check_work_landed_fact`, which the drift kit's parity arm runs too (L6): the fact must name
+  # ---- the record's witness, its tip must be on the advertised tip, and the work must read landed
+  # ---- THERE. A revert landing after a correct settle is a report line, never a red no verb clears.
+  # ----
+  # ---- WHAT IT DOES NOT CHECK: that the run's work was RIGHT, only that it landed where the fact says;
+  # ---- that it STAYED, which is reported and never graded; that `base` and `witness` are the values
+  # ---- the run's own verbs wrote, since both are the record's own facts and a hand edit of all three
+  # ---- moves together; nor a record this clone cannot judge: no advertised tip is REPORTED as a
+  # ---- skip, never a red.
   wla=$(fact_of "$f" work-landed-at)
   if [ -n "$wla" ]; then
     if [ "${ADV_HEAD_OK:-0}" != 1 ]; then
       report "check 15 did not grade work-landed-at in $f - no advertised default-branch tip resolves in this clone, so the content predicate has no tip to read"
     else
-      check_work_landed "$f" "$ADV_HEAD"; wla_rc=$?
-      [ "$wla_rc" = 0 ] \
-        || fail 15 "a record claims work-landed-at and the content predicate does not read its work landed on the advertised tip, so the fact is not one --settle could have written: $WL_WHY in $f"
+      check_work_landed_fact "$f" "$ADV_HEAD"; wla_rc=$?
+      if [ "$wla_rc" != 0 ]; then
+        fail 15 "a record claims work-landed-at and the content predicate does not uphold it at the tip the fact records, so the fact is not one --settle could have written: $WL_WHY in $f"
+      elif [ -n "$WLF_NOW" ]; then
+        wla_t=${wla#* }
+        report "check 15 upheld work-landed-at in $f at the tip it records, ${wla_t:0:8}, and the content predicate no longer reads that work landed on the advertised tip ${ADV_HEAD:0:8}, so a later change on the default branch undid it; reported and never a red, because no verb rewrites the record: $WLF_NOW"
+      fi
     fi
     if [ "$ph" = ABORTED ]; then
       case "$HANDOFF_CUTOFF" in

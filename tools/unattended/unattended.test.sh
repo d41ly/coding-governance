@@ -8422,9 +8422,12 @@ write_su_record() { # slug · phase · witness
   printf '# %s — run state\n\n<!-- run:generated -->\n<!-- /run:generated -->\n\n## Run facts\nphase: %s\nwitness: %s\nbase: %s\nhalt-code: fork-unresolvable\n\n## Parked\n' \
     "$1" "$2" "$3" "$su_base" > "$su_dir/memory/builds/$1/RUN.md"
 }
-# THE CONTENT PREDICATE'S POPULATION, landed: four ABORTED records and one BUILDING one, each based at
+# THE CONTENT PREDICATE'S POPULATION, landed: six ABORTED records and one BUILDING one, each based at
 # BASE. tAbase's witness IS its base; tAforeign's is another build's commit; tArevert's work landed and
-# was reverted on the first-parent line; tAkept's and tAwork's landed and stayed. SU_REC is the tip.
+# was reverted on the first-parent line; tAkept's and tAwork's landed and stayed. Implementation
+# review round 1: tAmerge's landed as a --no-ff merge that `git revert -m 1` backed out (M4), and
+# tAgone's never merged at all, which only clause (ii) decides (M11). SU_M_tAmerge is that merge and
+# SU_REC is the tip.
 write_su_aborted() {
   local s
   init_su_fixture
@@ -8433,13 +8436,25 @@ write_su_aborted() {
     run_su_git add -A >/dev/null && run_su_git commit -q -m "work($s): the change" --no-verify
     eval "SU_W_$s=\$(run_su_git rev-parse HEAD)"
   done
+  for s in tAmerge tAgone; do
+    run_su_git checkout -q -B "w$s"
+    mkdir -p "$su_dir/memory/builds/$s"; printf '%s\n' "$s" > "$su_dir/memory/builds/$s/work.txt"
+    run_su_git add -A >/dev/null && run_su_git commit -q -m "work($s): the change" --no-verify
+    eval "SU_W_$s=\$(run_su_git rev-parse HEAD)"
+    run_su_git checkout -q unit
+  done
+  run_su_git -c core.hooksPath=/dev/null merge -q --no-ff --no-edit -m "land the tAmerge run" wtAmerge >/dev/null 2>&1
+  SU_M_tAmerge=$(run_su_git rev-parse HEAD)
   write_su_record tAkept ABORTED "$SU_W_tAkept"
   write_su_record tAbase ABORTED "$su_base"
   write_su_record tAforeign ABORTED "$SU_W_tOther"
   write_su_record tArevert ABORTED "$SU_W_tArevert"
+  write_su_record tAmerge ABORTED "$SU_W_tAmerge"
+  write_su_record tAgone ABORTED "$SU_W_tAgone"
   write_su_record tAwork BUILDING "$SU_W_tAwork"
-  run_su_git add -A >/dev/null && run_su_git commit -q -m "records: the five runs" --no-verify
+  run_su_git add -A >/dev/null && run_su_git commit -q -m "records: the seven runs" --no-verify
   run_su_git -c core.hooksPath=/dev/null revert --no-edit "$SU_W_tArevert" >/dev/null 2>&1
+  run_su_git -c core.hooksPath=/dev/null revert -m 1 --no-edit "$SU_M_tAmerge" >/dev/null 2>&1
   run_su_git push -q -f origin HEAD:main
   SU_REC=$(run_su_git rev-parse HEAD)
 }
@@ -8560,7 +8575,7 @@ hit "$(run_su --settle tRun)" "--settle does not write over a recorded LANDING: 
 # ---- work merged and kept gains `work-landed-at: <witness> <tip>`. With its base removed it is
 # ---- undecidable, and refused as such.
 write_su_aborted
-for su_s in tAbase tAforeign tArevert; do
+for su_s in tAbase tAforeign tArevert tAmerge tAgone; do
   su_b=$(read_su_sum "memory/builds/$su_s/RUN.md")
   out=$(run_su --settle "$su_s")
   hit "$out" "the content predicate reads this run's work NOT landed on refs/heads/main at ${SU_REC:0:8}, so there is no landing to record; nothing was written - "
@@ -8569,6 +8584,8 @@ for su_s in tAbase tAforeign tArevert; do
     tAbase)    hit "$out" "its witness ${su_base:0:8} is its base ${su_base:0:8} or an ancestor of it, so the run committed nothing of its own" ;;
     tAforeign) hit "$out" "names tAforeign in its subject or touches memory/builds/tAforeign/, so its witness is not this run's work" ;;
     tArevert)  hit "$out" "a commit on the tip's first-parent line reverts its commit ${SU_W_tArevert:0:8}" ;;
+    tAmerge)   hit "$out" "a commit on the tip's first-parent line reverts the merge ${SU_M_tAmerge:0:8}, which brought its commit ${SU_W_tAmerge:0:8} onto the tip" ;;
+    tAgone)    hit "$out" "its commit ${SU_W_tAgone:0:8} is not on the tip ${SU_REC:0:8}" ;;
   esac
 done
 out=$(run_su --settle tAkept)
@@ -8605,6 +8622,14 @@ run_su_git commit -q -m "records(tAwork): settle the run record" --no-verify
 out=$(run_su --preflight tRun --keepalive-id k1)
 hit  "$out" "unattended: EXCLUDED memory/builds/tAwork/RUN.md from the live-run count — abandoned at"
 miss "$out" "memory/builds/tAwork/RUN.md · phase BUILDING"
+# ---- Implementation review round 1, M8: a settled record is not revived. `--resume` refuses it at
+# ---- 106, above the matrix, writing nothing and naming --preflight. RED against the driver before the
+# ---- refusal, whose take-over row resumed it under the `abandoned` the counts drop it for.
+su_b=$(read_su_sum memory/builds/tAwork/RUN.md); su_st=$(run_su_git status --porcelain)
+out=$(run_su --resume tAwork --keepalive-id k2)
+hit  "$out" "this record carries abandoned: --settle found its lease dead and its work landed, so the run it names is over, and resuming it would drive a run the live-run counts no longer see; nothing was written - start the next run on this slug with --preflight tAwork --keepalive-id <id>, which drops abandoned and work-landed-at: abandoned at "
+same "M8 the refused resume wrote nothing" "$(read_su_sum memory/builds/tAwork/RUN.md)" "$su_b"
+same "M8 the refused resume left the tree as it found it" "$(run_su_git status --porcelain)" "$su_st"
 write_su_aborted
 add_facts "$su_dir/memory/builds/tAwork/RUN.md" "$(printf 'keepalive: k1\nsession: fixture-session\nlease-utc: %s' "$(date -u +%Y-%m-%dT%H:%M:%SZ)")"
 run_su_git commit -qam "records(tAwork): a fresh lease" --no-verify
@@ -8636,6 +8661,34 @@ out=$(run_su --settle tAwork)
 hit  "$out" "unattended: settled memory/builds/tAwork/RUN.md as abandoned at phase BUILDING with its work landed - work-landed-at $SU_W_tAwork $SU_REC · abandoned "
 miss "$out" "--settle reads a leased working record whose session is absent"
 
+# ---- Implementation review round 1, M8, the route fail 106 names: a run interrupted with its work on
+# ---- the tip and its lease long dead is settled `abandoned`; `--resume` refuses it, and `--preflight`
+# ---- under a NEW keepalive starts the next run on the record, dropping `abandoned` and
+# ---- `work-landed-at` and printing that it did. RED, the preflight half, against the driver before
+# ---- the route: fail 82 refused the new keepalive and pointed back at --resume.
+init_su_fixture
+run_su --preflight tRun --keepalive-id k1 >/dev/null
+run_su_git add -A >/dev/null && run_su_git commit -q -m "records(tRun): preflight" --no-verify
+printf 'w\n' > "$su_dir/memory/builds/tRun/work.txt"
+run_su_git add -A >/dev/null && run_su_git commit -q -m "work(tRun): the change" --no-verify
+su_w=$(run_su_git rev-parse HEAD)
+sed -i "s/^witness: .*/witness: $su_w/; s/^session: .*/session: absent/; s/^pid: .*/pid: absent/; s/^lease-utc: .*/lease-utc: 2000-01-01T00:00:00Z/" "$su_dir/$SU_R"
+GIT_AUTHOR_DATE="2000-01-01T00:00:00Z" GIT_COMMITTER_DATE="2000-01-01T00:00:00Z" \
+  run_su_git commit -qam "records(tRun): an old lease with no session" --no-verify
+run_su_git push -q -f origin HEAD:main
+su_gd=$(run_su_git rev-parse --absolute-git-dir); rm -rf "$su_gd/gate-logs" "$su_gd/gate-queue-heartbeat"
+out=$(run_su --settle tRun)
+hit  "$out" "unattended: settled memory/builds/tRun/RUN.md as abandoned at phase RUNNING with its work landed - work-landed-at $su_w "
+run_su_git commit -q -m "records(tRun): settle the run record" --no-verify
+hit  "$(run_su --resume tRun --keepalive-id k2)" "nothing was written - start the next run on this slug with --preflight tRun --keepalive-id <id>"
+out=$(run_su --preflight tRun --keepalive-id k2)
+hit  "$out" "unattended: preflight — the record carried abandoned at "
+hit  "$out" "so this preflight starts the next run on it and drops abandoned and work-landed-at"
+miss "$out" "UNATTENDED check 82"
+same "M8 the next run dropped abandoned" "$(read_su_fact "$SU_R" abandoned)" ""
+same "M8 the next run dropped work-landed-at" "$(read_su_fact "$SU_R" work-landed-at)" ""
+same "M8 the next run holds the new keepalive" "$(read_su_fact "$SU_R" keepalive)" "k2"
+
 # ---- AC7: the leg UPHOLDS work-landed-at. Written by hand onto the reverted record it reds, naming
 # ---- the fact and the file; the settled bytes of the kept record red nothing; an `abandoned` marker
 # ---- standing alone reds.
@@ -8645,7 +8698,7 @@ add_facts "$su_dir/memory/builds/tArevert/RUN.md" "work-landed-at: $SU_W_tArever
 add_facts "$su_dir/memory/builds/tAbase/RUN.md" "abandoned: 2026-10-04T00:00:00Z"
 run_su_git add -A >/dev/null
 out=$(run_su_leg)
-hit  "$out" "a record claims work-landed-at and the content predicate does not read its work landed on the advertised tip, so the fact is not one --settle could have written: a commit on the tip's first-parent line reverts its commit ${SU_W_tArevert:0:8} in memory/builds/tArevert/RUN.md"
+hit  "$out" "a record claims work-landed-at and the content predicate does not uphold it at the tip the fact records, so the fact is not one --settle could have written: a commit on the tip's first-parent line reverts its commit ${SU_W_tArevert:0:8} in memory/builds/tArevert/RUN.md"
 same "AC7 the settled bytes of the kept record red nothing" \
   "$(printf '%s\n' "$out" | grep -F 'a record claims work-landed-at' | grep -c 'memory/builds/tAkept/' || true)" "0"
 hit  "$out" "a record carries abandoned with no work-landed-at, and --settle writes the two together"

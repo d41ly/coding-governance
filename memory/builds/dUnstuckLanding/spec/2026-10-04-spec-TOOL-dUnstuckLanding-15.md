@@ -1,6 +1,6 @@
 # TOOL-dUnstuckLanding-15 — drift-audit reports ABORTED run records whose work landed anyway
 
-**Status:** CLOSED · rev-1 · 2026-10-04 · node d · Tier-2 · base 98926870 · streams tooling · order 3 · closes TOOL-dUnstuckLanding-5
+**Status:** CLOSED · rev-2 · 2026-10-04 · node d · Tier-2 · base 98926870 · streams tooling · order 3 · closes TOOL-dUnstuckLanding-5
 
 <!-- gen:spec-records -->
 
@@ -40,13 +40,17 @@ zero.
   `base..witness` holds at least one commit attributable to the run, by its slug in the subject or by a
   path under its own build folder; (ii) every attributable commit is an ancestor of the base ref;
   (iii) no commit in `rev-list --first-parent <base ref> ^<witness>` carries a
-  `This reverts commit <sha>` line naming one of them. The verdict is `landed`, or `not-landed` naming
+  `This reverts commit <sha>` line naming one of them, or naming a merge that brought one of them
+  onto the base ref. A record whose `base` is off the base ref's graph is placed against its witness
+  by one `merge-base --is-ancestor`, as the library places it, rather than read unjudgeable. The verdict is `landed`, or `not-landed` naming
   the first clause that failed, or `unjudgeable` with a reason wherever unit 14's function returns
   undecidable. The pure verdict half is a Python function of gathered facts, also named
   `check_work_landed`, so it can be run over controls with no git call. Observed by AC3, AC4 and AC8.
 - **S3 — two signals over one read.** `aborted_work_landed` counts LIVE LEGACY records, each a build's
   `RUN.md`, whose verdict is `landed` and which carry no upheld `work-landed-at`. A fact is UPHELD when
-  its first field names the record's own witness and the predicate reads `landed` today. A rotated
+  its first field names the record's own witness, its recorded tip is on the base ref, and the
+  predicate reads `landed` today. The leg's check 15 grades the same fact at the tip it records, so a
+  revert landing after a settle reads `fact-not-upheld` here and is only reported there. A rotated
   archive is listed with its verdict and is not counted, because `--settle` never edits an archive
   (unit 14's F1), and a count no verb can lower would never reach zero. `discarded_work_landed` counts
   POST-CUTOFF records, live and archived, whose verdict is `landed`, whatever facts they carry, because
@@ -54,11 +58,11 @@ zero.
   per report and both builders take its result. Observed by AC3, AC5 and AC11.
 - **S4 — report-only.** Both signals carry `gateable: False`, so `--check` and `--offenders` never red
   on them. Observed by AC2.
-- **S5 — liveness from the population.** A module constant holds four CONTROL fact sets, each shaped
+- **S5 — liveness from the population.** A module constant holds five CONTROL fact sets, each shaped
   like a member of the ABORTED population: a witness equal to its base, a foreign witness whose
-  `base..witness` holds no attributable commit, attributable work merged and then reverted, and
-  attributable work merged and not reverted. Every report runs the verdict half over them first. The
-  first three must read `not-landed` and the fourth `landed`. Any other reading makes both signals
+  `base..witness` holds no attributable commit, attributable work merged and then reverted,
+  attributable work merged and not reverted, and attributable work never merged. Every report runs
+  the verdict half over them first. The fourth must read `landed` and the others `not-landed`. Any other reading makes both signals
   DEAD, with a note naming the control. A signal is live only when its dated population is non-empty
   and every control reads as stated. A repo with no tracked run record and no `.unattended.conf` reads
   NOT ASKED. A blank `HANDOFF_CUTOFF` reads every ABORTED record as LEGACY, and `discarded_work_landed`
@@ -86,8 +90,10 @@ zero.
 - **S9 — parity with the driver.** A self-test arm sources the unattended kit's library where it is
   present, by the path the arm derives from its own kit directory, as `test_park_sets_match_the_driver`
   already does. Over the same fixture records, the library's content predicate and its first-commit
-  dating must agree with this engine's in both directions. Where the library is absent, the arm prints
-  its skip. Observed by AC8.
+  dating must agree with this engine's in both directions, and over records carrying
+  `work-landed-at` the engine's upheld reading must agree with the library's
+  `check_work_landed_fact`, the one check 15 calls. Where the library is absent, the arm prints its
+  skip. Observed by AC8.
 
 ## 3. Non-goals (OUT)
 
@@ -226,10 +232,12 @@ empty scratch directory, then read the module's `FAILS` list. No criterion runs 
   `work-landed-at` to the positive moves it to `settled`. A `work-landed-at` naming another witness
   leaves it counted. The same fact on a negative record reads `fact-not-upheld` and is not counted.
   The positive record, rotated to an archive name, reads `landed (archived)` and is not counted.
+  Three more LEGACY records read `not-landed` and are not counted: a run whose `--no-ff` landing merge
+  `git revert -m 1` backed out, a run never merged, and a run based off the base ref's graph.
   Red when: a negative shape is counted, a fact that names the wrong witness clears a record, or an
   archive is counted where no verb can clear it.
 - **AC4** — When the same arm rebuilds the merged-then-reverted record with its revert commit removed,
-  `aborted_work_landed` lists it.
+  `aborted_work_landed` lists it, and lists the merge-reverted record with its merge's revert removed.
   Red when: the record stays uncounted, which would mean the revert clause never decided it.
 - **AC5** — When the arm dates a positive record on or after the fixture's `HANDOFF_CUTOFF`, it is
   counted in `discarded_work_landed` and not in `aborted_work_landed`. An upheld `work-landed-at` on it
@@ -239,8 +247,8 @@ empty scratch directory, then read the module's `FAILS` list. No criterion runs 
   Red when: a post-cutoff record is cleared by a fact, or a blank key reads a clean zero.
   fixture: `.unattended.conf` carrying `HANDOFF_CUTOFF`, and records whose first commits fall on both
   sides of it.
-- **AC6** — When the arm replaces `_WORK_LANDED_CONTROLS` with four fact sets that each describe landed
-  work, both signals read DEAD and the note names the first control that misread. Pointing the positive
+- **AC6** — When the arm replaces `_WORK_LANDED_CONTROLS` with as many fact sets, each describing
+  landed work, both signals read DEAD and the note names the first control that misread. Pointing the positive
   control at reverted work does the same.
   Red when: a control set that cannot read negative, or cannot read positive, leaves either signal
   live.
@@ -251,7 +259,9 @@ empty scratch directory, then read the module's `FAILS` list. No criterion runs 
   is present, it sources that file and runs `check_work_landed` and `read_first_commit_date` over AC3's
   and AC5's fixture records, the base ref standing for the tip. Every verdict and every date equals this engine's. A rotated
   archive is dated by its first add and not by the rotation, and a live `RUN.md` is floored at its
-  archived sibling. Where the library is absent, the arm prints its skip.
+  archived sibling. Over two records carrying `work-landed-at`, one naming its witness and one naming
+  another commit, the engine's upheld reading equals `check_work_landed_fact`'s. The arm carries no
+  hand-flipped control. Where the library is absent, the arm prints its skip.
   Red when: one fixture reads differently in the two implementations and the arm stays green.
   fixture: `check_work_landed`, which unit 14 ships in the library.
 - **AC9** — When the arm counts git subprocesses during `read_aborted_verdicts` over fixtures of three
@@ -307,6 +317,12 @@ New arm: `tools/drift-audit/selftest.py` `test_work_landed_matches_the_driver` �
 ## 9. Revision log
 
 - rev-1 · 2026-10-04 · initial draft, from design §2 (c3) at rev-2 and ask 5.
+- rev-2 · 2026-10-04 · S2 S3 S5 S9 AC3 AC4 AC6 AC8 · folded implementation review round 1 M4 (ids 2,
+  27), M11 (id 17), L4 (id 24), L6 (id 28) and L3 (id 23): the revert clause reads a merge revert; a
+  base off the base ref is placed by one call as the library places it; a fifth control, the
+  never-merged run; three fixture records pin all three; upheld also requires the recorded tip on the
+  base ref, and the parity arm holds it to the library's `check_work_landed_fact`; the tautological
+  parity control leaves.
 
 ## 10. Reuse audit
 

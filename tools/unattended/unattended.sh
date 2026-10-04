@@ -5644,7 +5644,10 @@ verb_preflight() { # slug · keepalive-id
   # A RECORD BEING RETIRED is not a re-preflight: its keepalive names the finished run's job, and
   # comparing it with this run's id refused every rotation made under a new one (TOOL-dDerivedDocket-22).
   _pf_ka=$(fact "$rel" keepalive)
-  if [ "$rotate" != 1 ] && [ -n "$_pf_ka" ] && [ -n "$kid" ] && [ "$_pf_ka" != "$kid" ]; then
+  # A RECORD --settle ENDED AS abandoned is not a re-preflight either (implementation review round 1,
+  # M8): its keepalive names the dead run's job, and --resume refuses it at 106 pointing here.
+  if [ "$rotate" != 1 ] && [ -n "$_pf_ka" ] && [ -n "$kid" ] && [ "$_pf_ka" != "$kid" ] \
+     && [ -z "$(fact "$rel" abandoned)" ]; then
     fail 82 "this run already records a keepalive and a re-preflight does not re-pin one, because that id names the job whose reaping the close attests; a session taking this slug over says so through the verb whose matrix decides whether it holds it: --resume"
   fi
   [ -n "$kid" ] || fail 8 "no --keepalive-id was supplied — scheduling is the AGENT's half of the split and only the agent can do it; the driver records the id it is handed"
@@ -5812,7 +5815,8 @@ verb_preflight() { # slug · keepalive-id
   # The refusal above admits a re-preflight only under the id already recorded, and the RECORDED id
   # is what goes to `write_lease` (TOOL-aWokenSentinel-1), so the keepalive is still written once;
   # the session, pid, host, image and lease-utc beside it are the lease's own and are taken afresh.
-  _pf_ka=$(fact "$rel" keepalive); [ -n "$_pf_ka" ] || _pf_ka="$kid"
+  # A record --settle ended as `abandoned` records the dead run's id, and this run's is the one handed.
+  _pf_ka=$(fact "$rel" keepalive); { [ -n "$_pf_ka" ] && [ -z "$(fact "$rel" abandoned)" ]; } || _pf_ka="$kid"
   write_lease "$rel" "$_pf_ka" || return 1
   # TOOL-dUnstuckLanding-20 S4 - THE LANDING NODE, written afresh like the lease because it describes
   # the node holding the run. A hand-off node starts normally and says so from its first record; no
@@ -5885,6 +5889,15 @@ verb_preflight() { # slug · keepalive-id
   if [ -n "$BREF" ] && [ -z "$(fact "$rel" branch-ref)" ]; then
     set_fact "$rel" branch-ref "$BREF" || return 1
     set_fact "$rel" branch-sha "$BSHA" || return 1
+  fi
+  # M8 - THE NEXT RUN ON A SETTLED RECORD. `abandoned` and `work-landed-at` describe the run --settle
+  # ended, so this one, which the live-run counts must see and whose witness moves, drops both;
+  # section-scoped, as the gate-backstop removal below is.
+  _pf_ab=$(fact "$rel" abandoned)
+  if [ -n "$_pf_ab" ]; then
+    _pf_abt=$(mktemp) && awk '/^## /{ sec = (index($0, "## Run facts") == 1) } !(sec && (/^abandoned: / || /^work-landed-at: /))' "$rel" > "$_pf_abt" \
+      && mv -f "$_pf_abt" "$rel" || { rm -f "${_pf_abt:-}"; return 1; }
+    echo "unattended: preflight — the record carried abandoned at $_pf_ab, written by --settle over a dead lease, so this preflight starts the next run on it and drops abandoned and work-landed-at"
   fi
   # ONLY when the file carries no phase yet. Preflight used to rewrite this unconditionally, so a
   # resumed run that had reached BUILDING was silently moved back to RUNNING by the verb it is told
@@ -7030,6 +7043,15 @@ verb_resume() { # slug
   [ -f "$rel" ] || { fail 10 "no run-state file, so there is no run to resume: $rel"; return 1; }
   read_derived_phase "$rel"; p="$DP_PHASE"
   [ -n "$p" ] || { fail 10 "the run-state file declares no phase, and a run with no phase is not resumable: $rel"; return 1; }
+  # TOOL-dUnstuckLanding-14, implementation review round 1 M8 - A SETTLED RUN IS NOT REVIVED. `--settle`
+  # writes `abandoned` only over a dead lease whose work landed, and both live counts drop the record
+  # for it; a take-over here would drive a run those counts no longer see, under a `work-landed-at`
+  # check 15 reds once its witness moves. Above the matrix and before any write, so no row reaches
+  # it; the verb that starts a run on this slug is --preflight, which drops both facts.
+  if [ -n "$(fact "$rel" abandoned)" ]; then
+    fail 106 "this record carries abandoned: --settle found its lease dead and its work landed, so the run it names is over, and resuming it would drive a run the live-run counts no longer see; nothing was written - start the next run on this slug with --preflight $slug --keepalive-id <id>, which drops abandoned and work-landed-at: abandoned at $(fact "$rel" abandoned)"
+    return 1
+  fi
   # TOOL-dDerivedDocket-16 S4 - PROPERTY P6, ABOVE THE MATRIX. Several rows below return without ever
   # reaching the authorization block — the holder resuming under its own id is the common one — so a
   # check placed there would fire on a take-over and never on the resume an agent actually runs after

@@ -5503,22 +5503,61 @@ git push -q -f origin "$ANCHOR0":main
 # ---- line, and its hand-written fact reds naming the fact and the file. A cutoff the record does not
 # ---- predate reds the fact as discard, and a blank one reds it as undatable. An `abandoned` marker
 # ---- standing alone reds, and check 7 excludes the record carrying it, as --preflight does.
+# ---- Implementation review round 1, fold pass A: each fact names the tip it was written at, and is
+# ---- graded THERE (M9). tMerge's work landed as a --no-ff merge that `git revert -m 1` backed out
+# ---- (M4); tGone's never merged, which only clause (ii) decides (M11); tWrong's fact names a commit
+# ---- that is not its witness (L6); tOffTip's names a tip the default branch does not carry. Each
+# ---- reds through the library's `check_work_landed_fact`, the one the drift parity arm runs too.
 reset_tree
 printf 'HANDOFF_CUTOFF="2099-01-01"\n' >> .unattended.conf
-for lg_s in tKept tRev; do
+# Its own commit, so the revert of tKept's work below cannot take the cutoff with it.
+git add -A >/dev/null && write_lg_commit "chore: date the hand-off cutoff"
+for lg_s in tKept tRev tWrong tOffTip; do
   mkdir -p "memory/builds/$lg_s"; printf '%s\n' "$lg_s" > "memory/builds/$lg_s/work.txt"
   git add -A >/dev/null && write_lg_commit "work($lg_s): the change"
   eval "lg_w_$lg_s=\$(git rev-parse HEAD)"
 done
 git -c core.hooksPath=/dev/null revert --no-edit "$lg_w_tRev" >/dev/null 2>&1
-write_lg_record tKept ABORTED "$lg_w_tKept" "halt-code: fork-unresolvable\nwork-landed-at: $lg_w_tKept tip\n"
-write_lg_record tRev ABORTED "$lg_w_tRev" "halt-code: fork-unresolvable\nwork-landed-at: $lg_w_tRev tip\n"
-git add -A >/dev/null && write_lg_commit "records: two aborted runs"
+lg_b=$(git symbolic-ref --short HEAD)
+git checkout -q -b lg-merge
+mkdir -p memory/builds/tMerge; printf 'tMerge\n' > memory/builds/tMerge/work.txt
+git add -A >/dev/null && write_lg_commit "work(tMerge): the change"
+lg_w_tMerge=$(git rev-parse HEAD)
+git checkout -q "$lg_b"
+git -c core.hooksPath=/dev/null merge -q --no-ff --no-edit -m "land the tMerge run" lg-merge >/dev/null 2>&1
+lg_m_tMerge=$(git rev-parse HEAD)
+git -c core.hooksPath=/dev/null revert -m 1 --no-edit "$lg_m_tMerge" >/dev/null 2>&1
+git checkout -q -b lg-gone
+mkdir -p memory/builds/tGone; printf 'tGone\n' > memory/builds/tGone/work.txt
+git add -A >/dev/null && write_lg_commit "work(tGone): the change"
+lg_w_tGone=$(git rev-parse HEAD)
+git checkout -q "$lg_b"
+lg_tip=$(git rev-parse HEAD)
+write_lg_record tKept ABORTED "$lg_w_tKept" "halt-code: fork-unresolvable\nwork-landed-at: $lg_w_tKept $lg_tip\n"
+write_lg_record tRev ABORTED "$lg_w_tRev" "halt-code: fork-unresolvable\nwork-landed-at: $lg_w_tRev $lg_tip\n"
+write_lg_record tMerge ABORTED "$lg_w_tMerge" "halt-code: fork-unresolvable\nwork-landed-at: $lg_w_tMerge $lg_tip\n"
+write_lg_record tGone ABORTED "$lg_w_tGone" "halt-code: fork-unresolvable\nwork-landed-at: $lg_w_tGone $lg_tip\n"
+write_lg_record tWrong ABORTED "$lg_w_tWrong" "halt-code: fork-unresolvable\nwork-landed-at: $lg_w_tKept $lg_tip\n"
+write_lg_record tOffTip ABORTED "$lg_w_tOffTip" "halt-code: fork-unresolvable\nwork-landed-at: $lg_w_tOffTip $lg_w_tGone\n"
+git add -A >/dev/null && write_lg_commit "records: six aborted runs"
 git push -q -f origin HEAD:main
 out=$(run_lg_leg)
-hit  "$out" "a record claims work-landed-at and the content predicate does not read its work landed on the advertised tip, so the fact is not one --settle could have written: a commit on the tip's first-parent line reverts its commit ${lg_w_tRev:0:8} in memory/builds/tRev/RUN.md"
+hit  "$out" "a record claims work-landed-at and the content predicate does not uphold it at the tip the fact records, so the fact is not one --settle could have written: a commit on the tip's first-parent line reverts its commit ${lg_w_tRev:0:8} in memory/builds/tRev/RUN.md"
 same "AC7 the kept record's fact is upheld" \
   "$(printf '%s\n' "$out" | grep -F 'a record claims work-landed-at' | grep -c 'memory/builds/tKept/' || true)" "0"
+hit  "$out" "a commit on the tip's first-parent line reverts the merge ${lg_m_tMerge:0:8}, which brought its commit ${lg_w_tMerge:0:8} onto the tip in memory/builds/tMerge/RUN.md"
+hit  "$out" "its commit ${lg_w_tGone:0:8} is not on the tip ${lg_tip:0:8} in memory/builds/tGone/RUN.md"
+hit  "$out" "its work-landed-at names ${lg_w_tKept:0:8} and its witness is ${lg_w_tWrong:0:8}, so the fact is not about this run's own work in memory/builds/tWrong/RUN.md"
+hit  "$out" "the tip its work-landed-at records, ${lg_w_tGone:0:8}, is not on the advertised tip "
+hit  "$out" ", so it names no landing the default branch carries in memory/builds/tOffTip/RUN.md"
+# ---- M9: a revert landing AFTER a correct settle is a report line, never a red on every later bar.
+git -c core.hooksPath=/dev/null revert --no-edit "$lg_w_tKept" >/dev/null 2>&1
+git push -q -f origin HEAD:main
+out=$(run_lg_leg)
+same "AC7 a later revert leaves the kept record's fact upheld" \
+  "$(printf '%s\n' "$out" | grep -F 'a record claims work-landed-at' | grep -c 'memory/builds/tKept/' || true)" "0"
+hit  "$out" "unattended-report: check 15 upheld work-landed-at in memory/builds/tKept/RUN.md at the tip it records, ${lg_tip:0:8}, and the content predicate no longer reads that work landed on the advertised tip "
+hit  "$out" "reported and never a red, because no verb rewrites the record: a commit on the tip's first-parent line reverts its commit ${lg_w_tKept:0:8}"
 sed -i 's/^HANDOFF_CUTOFF=.*/HANDOFF_CUTOFF="2000-01-01"/' .unattended.conf
 out=$(run_lg_leg)
 hit  "$out" "an ABORTED record first committed on or after HANDOFF_CUTOFF claims work-landed-at, and from that date ABORTED means discard, so no verb writes that its work landed: "
