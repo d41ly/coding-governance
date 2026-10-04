@@ -42,3 +42,5 @@ base: 856ad8a6856225bfe0d610d9a530b8fe852192b8
 2026-10-04T22:19:00Z brief · item TOOL-aWardedAudit-3 · reason 656c9c2cbddd memory/builds/aWardedAudit/prompts/2026-10-05-prompt-TOOL-aWardedAudit-3-1-build-brief.md
 
 2026-10-04T22:21:13Z dispatch · item 0268517d TOOL-aWardedAudit-2 · reason tools/hooks/agent-cap.js tools/hooks/agent-cap.test.sh memory/builds/aWardedAudit/spec/2026-10-05-spec-TOOL-aWardedAudit-2.md
+
+2026-10-04T22:24:10Z dispatch · item f28ff537 TOOL-aWardedAudit-3 · reason tools/memory-tree/BUILD-METHOD.template.md memory/guides/BUILD-METHOD.md tools/unattended/SKILL.template.md .claude/skills/unattended/SKILL.md tools/unattended/PROTOCOL.template.md memory/guides/UNATTENDED-PROTOCOL.md tools/unattended/.unattended.conf.example .unattended.conf tools/hooks/README.md memory/builds/aWardedAudit/spec/2026-10-05-spec-TOOL-aWardedAudit-3.md
