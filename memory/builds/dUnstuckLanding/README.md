@@ -80,7 +80,7 @@ ids TOOL-dUnstuckLanding-13 TOOL-dUnstuckLanding-14 TOOL-dUnstuckLanding-15 TOOL
 |---|---|---|---|---|---|
 | [TOOL-dUnstuckLanding-1 — the closing-time failure census across gov, inCMS and NicoCares](spec/2026-10-04-spec-TOOL-dUnstuckLanding-1.md) | 1 | 1 | CLOSED | rev-2 | 2026-10-04 |
 | [TOOL-dUnstuckLanding-13 — `--handoff`: a run whose work is sound, but which an owner must land or decide, ends HELD instead of ABORTED](spec/2026-10-04-spec-TOOL-dUnstuckLanding-13.md) | 1 | 2 | CLOSED | rev-3 | 2026-10-04 |
-| [TOOL-dUnstuckLanding-14 — the attended terminal: a handed record derives LANDED, `--settle` writes it, and a landed ABORTED record gains `work-landed-at`](spec/2026-10-04-spec-TOOL-dUnstuckLanding-14.md) | 2 | 2 | INPROGRESS | rev-1 | 2026-10-04 |
+| [TOOL-dUnstuckLanding-14 — the attended terminal: a handed record derives LANDED, `--settle` writes it, and a landed ABORTED record gains `work-landed-at`](spec/2026-10-04-spec-TOOL-dUnstuckLanding-14.md) | 2 | 2 | CLOSED | rev-2 | 2026-10-04 |
 | [TOOL-dUnstuckLanding-2 — the design: unattended closes through inherited reds and closing decisions, plus attended-landing verbs](spec/2026-10-04-spec-TOOL-dUnstuckLanding-2.md) | 2 | 1 | CLOSED | rev-2 | 2026-10-04 |
 | [TOOL-dUnstuckLanding-12 — design rev-2: the closing review's five HIGH findings closed](spec/2026-10-04-spec-TOOL-dUnstuckLanding-12.md) | 3 | 1 | CLOSED | rev-1 | 2026-10-04 |
 | [TOOL-dUnstuckLanding-15 — drift-audit reports ABORTED run records whose work landed anyway](spec/2026-10-04-spec-TOOL-dUnstuckLanding-15.md) | 3 | 2 | INPROGRESS | rev-1 | 2026-10-04 |
@@ -91,7 +91,7 @@ ids TOOL-dUnstuckLanding-13 TOOL-dUnstuckLanding-14 TOOL-dUnstuckLanding-15 TOOL
 | [TOOL-dUnstuckLanding-20 — `LANDING_NODES`: landing capability declared, resolved from machine and user, and a planned hand-off](spec/2026-10-04-spec-TOOL-dUnstuckLanding-20.md) | 8 | 2 | INPROGRESS | rev-1 | 2026-10-04 |
 <!-- /gen:build-units -->
 
-Records: 14 bound to this build, across 4 record folder(s).
+Records: 15 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

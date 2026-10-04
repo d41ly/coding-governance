@@ -436,12 +436,19 @@ check_adv_reaches() {  # rev -> 0 an ancestor of the advertised HEAD · 1 not
 # and the reach set `check_adv_reaches` warms, so every record would re-walk the advertised history.
 # MODE-INDEPENDENT, as check 7 and the driver's `read_derived_phase` are: ruling D12-i2 derives
 # LANDED from the remote, not from LANDER_MODE. Fails closed: 2 when no advertised tip resolves.
+# TOOL-dUnstuckLanding-14 S3 - A HELD RECORD UNDER A HAND-OFF CODE is admitted too, through the
+# library's hand-off argument and the driver's own code list, so check 7's exclusion and check 23's
+# share the driver's attended reading. A HELD record under any other code never derives.
 DERIVED_LANDING_COMMIT=""
 check_derived_landed() { # run-state file -> 0 derived LANDED (sets DERIVED_LANDING_COMMIT) · 1 not · 2 UNAVAILABLE
   DERIVED_LANDING_COMMIT=""
-  local _dl_c
-  [ "$(phase_of "$1")" = LANDING ] || return 1
-  _dl_c=$(read_landing_commit "$1" 2>/dev/null) || return 1
+  local _dl_c _dl_hl=""
+  case "$(phase_of "$1")" in
+    LANDING) ;;
+    HELD) case " $HOLD_CODES_HANDOFF " in *" $(fact_of "$1" hold-code) "*) _dl_hl="$HOLD_CODES_HANDOFF" ;; *) return 1 ;; esac ;;
+    *) return 1 ;;
+  esac
+  _dl_c=$(read_landing_commit "$1" "$_dl_hl" 2>/dev/null) || return 1
   [ "${ADV_HEAD_OK:-0}" = 1 ] || return 2
   check_adv_reaches "$_dl_c" || return 1
   DERIVED_LANDING_COMMIT=$_dl_c
@@ -529,6 +536,9 @@ HALT_CODES_CORE=$(core_of HALT_CODES_CORE)
 # The HOLD vocabulary, read for the reason the halt one is: a set the driver validates against and
 # nothing grades is a vocabulary with a floor nobody enforces.
 HOLD_CODES_CORE=$(core_of HOLD_CODES_CORE)
+# TOOL-dUnstuckLanding-14 S1 - the two hand-off codes, read from the driver for the same reason, so
+# the leg's derived-LANDED predicate admits exactly the HELD records the driver's does.
+HOLD_CODES_HANDOFF=$(core_of HOLD_CODES_HANDOFF)
 HALT_CODES="$HALT_CODES_CORE $HALT_CODES_EXTRA"
 
 # ---- TOOL-dDerivedDocket-18 — the driver's UNQUOTED numeric constants. `core_of` above matches
@@ -1774,7 +1784,7 @@ scan_foreign_anchors() { # build folder · slug -> 0 and ASK_ANCHORS, or 1 and A
 # ---- string compared against a date grades every record or none and nobody can tell which. A BLANK
 # ---- one turns the arm off and says so on the report channel, where this leg announces every case
 # ---- it could not reach, so a disabled arm never reads as one that found nothing.
-LFC_ON=0; LFC_MODE=${LANDER_MODE:-primary}; lfc_n_landed=0; lfc_n_derived=0; lfc_n_landing=0
+LFC_ON=0; LFC_MODE=${LANDER_MODE:-primary}; lfc_n_landed=0; lfc_n_derived=0; lfc_n_landing=0; lfc_n_attended=0
 if [ -n "$LANDED_FACTS_CUTOFF" ]; then
   case "$LANDED_FACTS_CUTOFF" in
     [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]) LFC_ON=1 ;;
@@ -1870,7 +1880,10 @@ while IFS= read -r f; do
   if [ "$LFC_ON" = 1 ]; then
     lfc_pop=""
     case "$ph" in
-      LANDED) if { extract_run_facts < "$f"; } 2>/dev/null | grep -q '^landed-derived:'; then lfc_pop=derived; else lfc_pop=landed; fi ;;
+      # TOOL-dUnstuckLanding-14 S8 - a landed hand-off, settled or rotated, carries `landed-by:
+      # attended` and is graded as its own population, which owes that fact too.
+      LANDED) if [ "$(fact_of "$f" landed-by)" = attended ]; then lfc_pop=attended
+              elif { extract_run_facts < "$f"; } 2>/dev/null | grep -q '^landed-derived:'; then lfc_pop=derived; else lfc_pop=landed; fi ;;
       LANDING)
         if lfc_c=$(read_landing_commit "$f"); then
           if [ "$LFC_MODE" = in-place ]; then
@@ -1886,11 +1899,43 @@ while IFS= read -r f; do
         landed) lfc_n_landed=$((lfc_n_landed + 1)) ;;
         derived) lfc_n_derived=$((lfc_n_derived + 1)) ;;
         landing) lfc_n_landing=$((lfc_n_landing + 1)) ;;
+        attended) lfc_n_attended=$((lfc_n_attended + 1)) ;;
       esac
       lfc_miss=$(read_missing_landed_facts "$f" "$lfc_pop")
       [ -z "$lfc_miss" ] \
         || fail 15 "a landed record first committed on or after LANDED_FACTS_CUTOFF is missing a fact its landing verb writes, so what that landing covered cannot be read from the record it left, and no verb adds a fact to a record once it is terminal or pushed - population $lfc_pop, missing [$lfc_miss] in $f"
     fi
+  fi
+
+  # ---- 15, WORK-LANDED-AT IS UPHELD, NOT MERELY PRESENT - TOOL-dUnstuckLanding-14 S8. `--settle`
+  # ---- writes it only where the library's content predicate reads the run's work landed on the
+  # ---- advertised tip, and this asks the SAME predicate again, so a hand-written fact - planted to
+  # ---- silence a later signal - reds. It also reds the fact on an ABORTED record first committed on
+  # ---- or after HANDOFF_CUTOFF, which meant discard, and an `abandoned` marker standing without it.
+  # ----
+  # ---- WHAT IT DOES NOT CHECK: that the run's work was RIGHT, only that it landed and stayed; nor a
+  # ---- record this clone cannot judge: no advertised tip is REPORTED as a skip, never a red.
+  wla=$(fact_of "$f" work-landed-at)
+  if [ -n "$wla" ]; then
+    if [ "${ADV_HEAD_OK:-0}" != 1 ]; then
+      report "check 15 did not grade work-landed-at in $f - no advertised default-branch tip resolves in this clone, so the content predicate has no tip to read"
+    else
+      check_work_landed "$f" "$ADV_HEAD"; wla_rc=$?
+      [ "$wla_rc" = 0 ] \
+        || fail 15 "a record claims work-landed-at and the content predicate does not read its work landed on the advertised tip, so the fact is not one --settle could have written: $WL_WHY in $f"
+    fi
+    if [ "$ph" = ABORTED ]; then
+      case "$HANDOFF_CUTOFF" in
+        [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9])
+          wla_d=$(read_first_commit_date "$f")
+          if [ -z "$wla_d" ] || ! [[ "$wla_d" < "$HANDOFF_CUTOFF" ]]; then
+            fail 15 "an ABORTED record first committed on or after HANDOFF_CUTOFF claims work-landed-at, and from that date ABORTED means discard, so no verb writes that its work landed: ${wla_d:-never} against $HANDOFF_CUTOFF in $f"
+          fi ;;
+        *) fail 15 "an ABORTED record claims work-landed-at and HANDOFF_CUTOFF is not a date, so whether it predates the day ABORTED came to mean discard cannot be read, and --settle refuses every such record: ${HANDOFF_CUTOFF:-blank} in $f" ;;
+      esac
+    fi
+  elif [ -n "$(fact_of "$f" abandoned)" ]; then
+    fail 15 "a record carries abandoned with no work-landed-at, and --settle writes the two together, so the marker that takes it out of the live-run count stands on no proof that its work landed: $f"
   fi
 
   # ---- 8: the generated region holds NO COPY of the unit list. It is DERIVED from the build README
@@ -2617,10 +2662,10 @@ EOF
 # ---- says so: in gov's own in-place mode no record says LANDED until a rotation, so an arm grading
 # ---- recorded LANDED alone would pass on nothing, and the count is what shows which one it graded.
 if [ "$LFC_ON" = 1 ]; then
-  lfc_tot=$((lfc_n_landed + lfc_n_derived + lfc_n_landing))
+  lfc_tot=$((lfc_n_landed + lfc_n_derived + lfc_n_landing + lfc_n_attended))
   lfc_zero=""
   [ "$lfc_tot" = 0 ] && lfc_zero=" - a count of 0, so this arm graded nothing on this tree and its green is coverage of an empty population"
-  report "the landed fact-set arm of check 15 graded, at LANDED_FACTS_CUTOFF $LANDED_FACTS_CUTOFF under LANDER_MODE $LFC_MODE: recorded LANDED $lfc_n_landed · rotated derived LANDED $lfc_n_derived · committed LANDING $lfc_n_landing$lfc_zero"
+  report "the landed fact-set arm of check 15 graded, at LANDED_FACTS_CUTOFF $LANDED_FACTS_CUTOFF under LANDER_MODE $LFC_MODE: recorded LANDED $lfc_n_landed · rotated derived LANDED $lfc_n_derived · committed LANDING $lfc_n_landing · attended LANDED $lfc_n_attended$lfc_zero"
 fi
 if [ "$asks_n" = 0 ]; then
   report "the ask-mandate second opinions (checks 19, 15 and 37) are VACUOUS on this tree: 0 run-state records pin an asks: fact, so every arm examined nothing and a green verdict here is coverage of an empty population"
@@ -2691,6 +2736,12 @@ for c7f in $live; do
   if check_derived_landed "$c7f"; then
     c7drop="$c7drop $c7f"
     printf 'unattended: check 7 EXCLUDED %s — derived LANDED: its landing commit %s is an ancestor of the advertised default-branch tip %s, so the record the push carried is on the remote and it is a finished run rather than a second live one\n' "$c7f" "$DERIVED_LANDING_COMMIT" "$ADV_HEAD"
+  elif [ -n "$(fact_of "$c7f" abandoned)" ]; then
+    # TOOL-dUnstuckLanding-14 S7 - `--settle` wrote `abandoned` over a dead lease whose work landed,
+    # and `--preflight`'s announcement excludes the same marker, so the two count one population.
+    # Whether the marker is UPHELD is check 15's question, not this report's.
+    c7drop="$c7drop $c7f"
+    printf 'unattended: check 7 EXCLUDED %s — abandoned at %s: --settle found its lease dead and its work landed at %s, so no session drives it\n' "$c7f" "$(fact_of "$c7f" abandoned)" "$(fact_of "$c7f" work-landed-at)"
   else
     c7keep="$c7keep $c7f"; c7n=$((c7n+1))
   fi
@@ -5305,7 +5356,7 @@ _lc_hits=${_lc_hits%$'\n'}
 # ---- a staged edit, and an arm whose failing case cannot be staged is an assertion about nothing.
 # print_liveness arrived with origin/main (aWokenSentinel); it reads the RECORDED phase because it
 # takes no network.
-PHASE_RECORDED_FNS="refuse_if_terminal archive_name_of verb_landed print_liveness"
+PHASE_RECORDED_FNS="refuse_if_terminal archive_name_of verb_landed print_liveness run_settle"
 # ---- LIVENESS: the classifier must RECOGNISE the readers' own reads. The two readers are the one
 # ---- place a read of the fact is certain to exist, so each must hold a line the read predicate
 # ---- matches, or the driver reads the fact in a spelling this check no longer sees and the routing

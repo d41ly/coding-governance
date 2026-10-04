@@ -1062,11 +1062,21 @@ check_lease_only_diff() { # run-state file -> 0 when it differs from HEAD in lea
 # the six lease-fact lines of a record the push already carried. Committing it would move HEAD off
 # the pushed tip, so it stays a working-copy difference, and a difference confined to those six lines
 # is read as none. Every other byte, the phase line among them, must still match.
-read_landing_commit() { # run-state file -> the commit that carries it at LANDING, or status 1
-  local _lc_f="${1:-}" _lc_ph _lc_c
+#
+# TOOL-dUnstuckLanding-14 S1 - THE OPTIONAL SECOND ARGUMENT is the hand-off code list, and with it
+# HEAD's copy may also read `phase: HELD` under a `hold-code` in that list: the hand-off commit is
+# the run's last act on its own branch, so a landing that carries it carries the work it hands off.
+# Both callers pass the driver's own constant, so the list is spelled once. Without the argument
+# nothing changes: a HELD copy is no landing.
+read_landing_commit() { # run-state file · [hand-off codes] -> the commit that carries it, or status 1
+  local _lc_f="${1:-}" _lc_ph _lc_c _lc_hc
   [ -n "$_lc_f" ] || return 1
   check_lease_only_diff "$_lc_f" || return 1
   _lc_ph=$(GIT show "HEAD:$_lc_f" 2>/dev/null | extract_run_facts | sed -n 's/^phase: *//p' | head -1 | tr -d '\r')
+  if [ "$_lc_ph" = HELD ] && [ -n "${2:-}" ]; then
+    _lc_hc=$(GIT show "HEAD:$_lc_f" 2>/dev/null | extract_run_facts | sed -n 's/^hold-code: *//p' | head -1 | tr -d '\r')
+    case " $2 " in *" $_lc_hc "*) [ -n "$_lc_hc" ] && _lc_ph=LANDING ;; esac
+  fi
   [ "$_lc_ph" = LANDING ] || return 1
   _lc_c=$(GIT log -1 --format=%H HEAD -- "$_lc_f" 2>/dev/null)
   [ -n "$_lc_c" ] || return 1
@@ -1145,22 +1155,92 @@ check_landed_facts_due() { # record path · cutoff -> 0 graded · 1 grandfathere
 #   derived  a recorded LANDED carrying `landed-derived`, which only the rotation writes - the roster
 #            the close froze, and the derivation itself
 #   landing  a committed LANDING under in-place landing - the roster `--close` froze beside the phase
+#   attended a recorded LANDED carrying `landed-by: attended` - a hand-off an owner landed, written by
+#            `--settle` or the rotation: the hand-off's roster, the derivation, and who landed it
+#            (TOOL-dUnstuckLanding-14 S8)
 #
 # `asks-at-landing` is not here: the freeze-presence arm grades it, and one fact graded by two arms
 # is two answers to one question. PRESENCE of the key line is the test; a value is a record's own.
 # Prints the missing keys, space-separated, and nothing when the set is complete.
-read_missing_landed_facts() { # record file · landed|derived|landing -> the missing keys
+read_missing_landed_facts() { # record file · landed|derived|landing|attended -> the missing keys
   local _mf_f="${1:-}" _mf_k _mf_want _mf_out=""
   case "${2:-}" in
     landed)  _mf_want="landed-anchor units-at-landing unpushed-at-landing" ;;
     derived) _mf_want="units-at-landing landed-derived" ;;
     landing) _mf_want="units-at-landing" ;;
+    attended) _mf_want="units-at-landing landed-derived landed-by" ;;
     *) return 2 ;;
   esac
   for _mf_k in $_mf_want; do
     { extract_run_facts < "$_mf_f"; } 2>/dev/null | grep -q "^$_mf_k:" || _mf_out="$_mf_out${_mf_out:+ }$_mf_k"
   done
   printf '%s' "$_mf_out"
+}
+
+# TOOL-dUnstuckLanding-14 S4 - DID THIS RUN'S WORK LAND, decided by CONTENT and never by witness
+# ancestry. `--abort` writes `witness` = HEAD and commits the record on top of it, so every record
+# read from the tip has its witness on the tip by construction, and a witness equal to `base`, or
+# taken from another tree's commit, is on every later tip too (review item H1). Landed is all three:
+#
+#   (i)   the witness is not an ancestor of `base`, and `base..witness` holds at least one commit
+#         ATTRIBUTABLE to the run: its subject names the slug as a word, or it touches the build folder;
+#   (ii)  every attributable commit is an ancestor of the tip;
+#   (iii) no commit on the tip's first-parent line since the witness carries a `This reverts commit
+#         <sha>` line naming one of them.
+#
+# 0 landed · 1 not landed · 2 UNDECIDABLE, the reason in WL_WHY either way. A missing `base`, a
+# `base`, `witness` or tip this clone cannot resolve, or a range git will not walk is undecidable,
+# never a guess. Two callers, `--settle` and the leg's check 15, so the writer and the grader cannot
+# disagree about one record. The slug and folder come from the record's path, `<builds>/<slug>/RUN*.md`.
+# CALLED AS A PLAIN COMMAND: WL_WHY is a global, and a substitution would discard it.
+WL_WHY=""
+check_work_landed() { # record file · advertised tip -> 0 landed · 1 not · 2 undecidable; WL_WHY
+  local _wl_f="${1:-}" _wl_t="${2:-}" _wl_b _wl_w _wl_d _wl_s _wl_all _wl_own _wl_c _wl_x="" _wl_n=0 _wl_log _wl_rv
+  WL_WHY=""
+  _wl_b=$({ extract_run_facts < "$_wl_f"; } 2>/dev/null | sed -n 's/^base: *//p' | head -1 | tr -d '\r')
+  _wl_w=$({ extract_run_facts < "$_wl_f"; } 2>/dev/null | sed -n 's/^witness: *//p' | head -1 | tr -d '\r')
+  [ -n "$_wl_b" ] || { WL_WHY="the record carries no base fact, so the run's own range cannot be opened"; return 2; }
+  GIT rev-parse --verify --quiet "$_wl_b^{commit}" >/dev/null 2>&1 \
+    || { WL_WHY="its base $_wl_b does not resolve in this clone"; return 2; }
+  GIT rev-parse --verify --quiet "${_wl_w:-none}^{commit}" >/dev/null 2>&1 \
+    || { WL_WHY="its witness ${_wl_w:-none} does not resolve in this clone"; return 2; }
+  GIT rev-parse --verify --quiet "${_wl_t:-none}^{commit}" >/dev/null 2>&1 \
+    || { WL_WHY="the tip ${_wl_t:-none} does not resolve in this clone"; return 2; }
+  if GIT merge-base --is-ancestor "$_wl_w" "$_wl_b" 2>/dev/null; then
+    WL_WHY="its witness ${_wl_w:0:8} is its base ${_wl_b:0:8} or an ancestor of it, so the run committed nothing of its own"
+    return 1
+  fi
+  _wl_d=${_wl_f%/*}; _wl_s=${_wl_d##*/}
+  _wl_all=$(GIT log --format='%H %s' "$_wl_b..$_wl_w" 2>/dev/null) \
+    || { WL_WHY="the range ${_wl_b:0:8}..${_wl_w:0:8} cannot be read"; return 2; }
+  _wl_own=$(GIT log --format=%H "$_wl_b..$_wl_w" -- "$_wl_d/" 2>/dev/null) \
+    || { WL_WHY="the range ${_wl_b:0:8}..${_wl_w:0:8} cannot be read"; return 2; }
+  while IFS= read -r _wl_c; do
+    [ -n "$_wl_c" ] || continue
+    case "$_wl_own" in
+      *"${_wl_c%% *}"*) ;;
+      *) [[ " ${_wl_c#* } " =~ [^A-Za-z0-9]"$_wl_s"[^A-Za-z0-9] ]] || continue ;;
+    esac
+    _wl_x="$_wl_x ${_wl_c%% *}"; _wl_n=$((_wl_n + 1))
+  done <<< "$_wl_all"
+  if [ "$_wl_n" = 0 ]; then
+    WL_WHY="no commit in ${_wl_b:0:8}..${_wl_w:0:8} names $_wl_s in its subject or touches $_wl_d/, so its witness is not this run's work"
+    return 1
+  fi
+  for _wl_c in $_wl_x; do
+    GIT merge-base --is-ancestor "$_wl_c" "$_wl_t" 2>/dev/null \
+      || { WL_WHY="its commit ${_wl_c:0:8} is not on the tip ${_wl_t:0:8}"; return 1; }
+  done
+  _wl_log=$(GIT log --first-parent --format=%B "$_wl_t" "^$_wl_w" 2>/dev/null) \
+    || { WL_WHY="the tip's first-parent line since ${_wl_w:0:8} cannot be read"; return 2; }
+  _wl_rv=$(printf '%s\n' "$_wl_log" | sed -n 's/.*This reverts commit \([0-9a-f]\{7,40\}\).*/\1/p')
+  for _wl_c in $_wl_rv; do
+    case "$_wl_x" in *" $_wl_c"*)
+      WL_WHY="a commit on the tip's first-parent line reverts its commit ${_wl_c:0:8}"; return 1 ;;
+    esac
+  done
+  WL_WHY="$_wl_n commit(s) of its own in ${_wl_b:0:8}..${_wl_w:0:8}, every one on the tip ${_wl_t:0:8} and none reverted"
+  return 0
 }
 
 # THE NEXT ANCHOR for a unit after <anchor>, or empty when this is the unit's last row. Chosen by

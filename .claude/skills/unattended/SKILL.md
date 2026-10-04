@@ -1269,6 +1269,18 @@ nothing is filed. It writes the landing recipe as a `handoff` row and prints it;
 what the owner runs, so put nothing in the reason that it already says. Commit the staged record
 and push the branch, then stop.
 
+The recipe ends by settling the record. Once the owner has landed the work, every reader already
+reads the run `LANDED (attended)`; this writes it, and you run it yourself when you find a landed
+hand-off still recorded HELD:
+
+```bash
+bash tools/unattended/unattended.sh --settle <slug>
+```
+
+It stages the record and never commits it, so the settle commit rides the next landing from that
+tree. The same verb records where an older `ABORTED` run's work landed, and marks a run whose lease
+died after its work landed as `abandoned`; it refuses anything git does not prove.
+
 ## If it cannot finish
 
 ```bash

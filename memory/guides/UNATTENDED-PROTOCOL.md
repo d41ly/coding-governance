@@ -320,10 +320,11 @@ one does not buy. A tag or workflow id there is unjudgeable, and a terminal clai
 most — it is the last thing written and nothing re-examines it.
 
 **Terminal is reached by a verb that evaluates what the phase claims, or DERIVED (§6), and never by a phase move.**
-`--phase` writes the positions between; `--landed` and `--abort` write the two ends. `LANDING` is
-close-only for the same reason: it is the record that the Definition-of-Done set was evaluated, so a
-phase move into it would be that claim without the evaluation, and `--landed` accepts a record only
-at `LANDING`. A run that is already terminal cannot be moved at all.
+`--phase` writes the positions between; `--landed`, `--abort` and `--settle` write the two ends.
+`LANDING` is close-only for the same reason: it is the record that the Definition-of-Done set was
+evaluated, so a phase move into it would be that claim without the evaluation, and `--landed`
+accepts a record only at `LANDING`. A run that is already terminal cannot be moved at all, save
+`--settle` adding `work-landed-at` to a legacy `ABORTED` record.
 
 **Concurrent runs are PERMITTED; a run is never refused because another build is live.** The driver
 ANNOUNCES them at `--preflight`; the leg persists its report to its `gate-logs/` entry, which a GREEN
@@ -531,7 +532,7 @@ name happens in the subject's own object store.
 This kit therefore makes an unauthorized landing require a visibly deliberate act, and records which
 act was taken. It does not prevent one.
 
-**What it closes.** Two one-command offline forgeries that used to pass every check silently: a
+**What it closes.** Two one-command offline forgeries: a
 rewritten remote-tracking ref, and a default-branch name supplied through the environment. Both are
 now inert rather than detected — neither value is read at all. An untracked run-state file left
 under a worktree: the resume tick reads leases from the index alone. Two more are neutralised for

@@ -222,6 +222,16 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   `handoff` row the owner is shown, and `units-at-landing` and `asks-at-landing` as `--close` writes
   them. `owner-landing` is refused over a bar that is not GREEN unless every red leg reads INHERITED;
   `owner-decision` requires a parked decision row. The contract is `UNATTENDED-STOPS.md` §2 and §4.
+  The recipe's last command is `--settle`, through this kit's own repo-relative path.
+- `--settle` — writes what git proves onto a slug's live record. `--settle <slug>`. A hand-off its
+  owner landed, which every deriving reader already reads `LANDED (attended)`, becomes `phase:
+  LANDED` with `landed-by: attended` and `landed-derived`. An `ABORTED` record first committed before
+  `HANDOFF_CUTOFF`, and a working record whose `--liveness` verdict is `STALE` or `UNBOUND`, gain
+  `work-landed-at: <witness> <tip>` when the content predicate reads the run's own commits on the
+  advertised tip and none reverted; the working one gains `abandoned` too and keeps its phase. It
+  refuses, numbered and before any write, everything else, an unanswered remote and an undecidable
+  predicate; a settled record is said so, with nothing written. It STAGES and never commits. The
+  contract is `UNATTENDED-STOPS.md` §12.
 - `--abort` — the sole producer of `ABORTED`. It requires a recorded reason, a HALT CODE from the
   effective vocabulary, and both agent-attested items, and no machine item: an aborted run landed
   nothing, so the machine items assert obligations it does not have, while the idle-wake is still

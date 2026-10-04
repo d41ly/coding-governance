@@ -1,11 +1,12 @@
 # TOOL-dUnstuckLanding-14 — the attended terminal: a handed record derives LANDED, `--settle` writes it, and a landed ABORTED record gains `work-landed-at`
 
-**Status:** INPROGRESS · rev-1 · 2026-10-04 · node d · Tier-2 · base 98926870 · streams tooling · order 2 · closes TOOL-dUnstuckLanding-4
+**Status:** CLOSED · rev-2 · 2026-10-04 · node d · Tier-2 · base 98926870 · streams tooling · order 2 · closes TOOL-dUnstuckLanding-4
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-04-build-TOOL-dUnstuckLanding-14-1-acceptance-ledger.md](../build/2026-10-04-build-TOOL-dUnstuckLanding-14-1-acceptance-ledger.md) | journal | — |
 | [2026-10-04-prompt-TOOL-dUnstuckLanding-13-build-brief.md](../prompts/2026-10-04-prompt-TOOL-dUnstuckLanding-13-build-brief.md) | journal | TOOL-dUnstuckLanding-13 TOOL-dUnstuckLanding-15 TOOL-dUnstuckLanding-16 TOOL-dUnstuckLanding-17 TOOL-dUnstuckLanding-18 TOOL-dUnstuckLanding-19 TOOL-dUnstuckLanding-20 |
 | [2026-10-04-prompt-TOOL-dUnstuckLanding-13-spec-brief.md](../prompts/2026-10-04-prompt-TOOL-dUnstuckLanding-13-spec-brief.md) | journal | TOOL-dUnstuckLanding-13 TOOL-dUnstuckLanding-15 TOOL-dUnstuckLanding-16 TOOL-dUnstuckLanding-17 TOOL-dUnstuckLanding-18 TOOL-dUnstuckLanding-19 TOOL-dUnstuckLanding-20 |
 
@@ -90,9 +91,9 @@ not merely present.
   recorded LANDED carrying `landed-by: attended` owes `units-at-landing`, `landed-derived` and
   `landed-by`, through `read_missing_landed_facts`. Observed by AC1, AC7.
 - **S9 — the recipe's last line.** The `handoff` row the hand-off writes gains a final
-  ` && <kit>/unattended.sh --settle <slug>`, the kit path derived from the driver's own `KIT_DIR`
-  relative to the repo root, and `--handoff` prints the same line as its settle hint. Observed by
-  AC10.
+  ` && bash <kit>/unattended.sh --settle <slug>`, the kit path derived from the driver's own
+  `KIT_DIR` relative to the top of the repository holding the kit, and `--handoff` prints the same
+  line as its settle hint. Observed by AC10.
 - **S10 — the carriers.** `STOPS.template.md` §1, whose "Only `--landed` and `--abort` still write a
   terminal" gains `--settle` and whose `--preflight`-over-HELD refusal gains the handed-and-landed
   exception; §8, a resume-matrix row for that record; and §12, the derivation, the predicate, the
@@ -185,8 +186,10 @@ verdict without printing it. `print_liveness` calls it and prints exactly what i
 
 ### Ordering inside `run_settle`
 
-Every refusal comes before the first write, in this order: the slug and the record; the record's
-own difference from HEAD; the recorded phase and the branch it selects; the advertised tip, through
+Every refusal comes before the first write, in this order: the slug and the record; the
+already-settled test, which writes nothing and so may answer first, since a settle is staged and a
+re-run meets a record differing from HEAD by exactly what it wrote; the record's own difference
+from HEAD; the recorded phase and the branch it selects; the advertised tip, through
 `read_advertised_tip`, refused when unanswered; the branch's own test, which is the derivation, the
 cutoff and predicate, or the liveness verdict and predicate. Then the facts are written with
 `set_fact`, the record is staged with `stage_or_fail`, and the owed commit is printed.
@@ -365,6 +368,14 @@ New arm: tools/unattended/check-unattended.test.sh · the AC7 hand-written fact 
 - rev-1 · 2026-10-04 · initial draft, from ask TOOL-dUnstuckLanding-4, the design record's §2 (c1)
   and (c2) at rev-2, review items H1, H4, M2, M3, M6, M13 and M16, and the spec brief for units 13
   to 20.
+- rev-2 · 2026-10-04 · the build pass settled three details the design left open, none moving an
+  acceptance criterion. S9's settle command is spelled `bash <kit>/unattended.sh`, as the Skill and
+  the lander invoke scripts, and its path is the kit's own prefix in the repository holding it,
+  which a fixture running the source kit reads as the kit's prefix too. The ordering puts the
+  already-settled test first, because a staged settle differs from HEAD's copy and a re-run would
+  otherwise meet the difference refusal; a recorded `LANDED` carrying `landed-by: attended` reads as
+  settled rather than as the LANDED refusal. The protocol's §3 exception is paid for by trimming one
+  history clause in §9, leaving 52 bytes of its cap for units 16 and 18.
 
 ## 10. Reuse audit
 

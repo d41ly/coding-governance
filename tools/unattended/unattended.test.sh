@@ -8313,6 +8313,322 @@ fi   # ---- region two continues below: one compound block past about 3000 comma
      # ---- bash 5.3 on Cygwin (exit 139), so the region is cut into blocks at top-level seams
 if in_shard 2; then
 
+# ======================================== TOOL-dUnstuckLanding-14 — the attended terminal, `--settle` ====
+# ---- SELF-CONTAINED, in its own scratch repository with its own bare origin, for the derived-terminal
+# ---- block's reason: every arm here pushes to the remote, and doing that in the shared fixture would
+# ---- move the anchor under every later arm. `primary` landing with `echo land` as the lander, both
+# ---- cutoffs declared so the fact-set arm grades and an ABORTED record can be dated. The hand-off is
+# ---- the real verb over a seeded GREEN bar, as unit 13's arms run it; the ABORTED records are written
+# ---- by hand, because what is under test is how `--settle` and the leg READ them.
+su_dir=$(mktemp -d); su_oroot=$(mktemp -d); su_origin="$su_oroot/origin.git"; su_out=$(mktemp -d)
+(
+  cd "$su_dir" || exit 2
+  git init -q -b main . && git config user.email t@t.test && git config user.name t \
+    && git config core.autocrlf false
+  git init -q --bare "$su_origin"
+  git --git-dir="$su_origin" config user.email t@t.test
+  git --git-dir="$su_origin" config user.name t
+  git --git-dir="$su_origin" symbolic-ref HEAD refs/heads/main
+  git remote add origin "$su_origin"
+  mkdir -p memory/guides memory/builds/tRun memory/builds/tOther
+  printf '# build method\n' > memory/guides/BUILD-METHOD.md
+  cat > .unattended.conf <<'SUC'
+MEMORY_ROOT=memory
+UNITS_REGION_CUTOFF="2026-08-19"
+LANDER="echo land"
+LANDER_MODE="primary"
+SELFTESTS_OWED_PATHS=""
+BYPASS_BAN="--no-verify"
+GATE_CMD="true"
+GATE_BOUND="600"
+GATE_WALL="21600"
+UNIT_STALL_BOUND="1800"
+REVIEW_ROUNDS="7"
+WIRING_CHECK="true"
+KEEPALIVE_CREATE="CronCreate"
+KEEPALIVE_DELETE="CronDelete"
+RESUME_SCHEDULE="on"
+RESUME_SCHEDULE_CREATE="TheScheduleCreate"
+RESUME_SCHEDULE_DELETE="TheScheduleDelete"
+RESUME_SCHEDULE_DELAY="1800"
+RESUME_SCHEDULE_LIMIT="6"
+LANDED_FACTS_CUTOFF="2000-01-01"
+HANDOFF_CUTOFF="2099-01-01"
+PHASES_EXTRA=""
+DOD_EXTRA=""
+SUC
+  for su_s in tRun tOther; do
+    cat > "memory/builds/$su_s/README.md" <<SUR
+---
+slug: $su_s
+node: a
+opened: 2026-08-01
+streams: architecture
+roster: ARCH
+ids: ARCH-$su_s-1
+---
+
+# $su_s
+
+<!-- gen:build-index -->
+**Build status:** OPEN · 1 unit(s)
+
+<!-- gen:build-units -->
+| Unit | Status | Rev | Last change |
+|---|---|---|---|
+| [ARCH-$su_s-1 — the unit](spec/one.md) | OPEN | rev-1 | 2026-08-01 |
+<!-- /gen:build-units -->
+<!-- /gen:build-index -->
+SUR
+  done
+  printf '# tRun — run state\n\n<!-- run:generated -->\n<!-- /run:generated -->\n\n## Mandate\n<!-- run:mandate -->\nThe owner authorizes build tRun to merge to main and to push.\n<!-- /run:mandate -->\n\n## Run facts\n\n## Parked\n' \
+    > memory/builds/tRun/RUN.md
+  git add -A >/dev/null && git commit -q -m base --no-verify
+  git push -q origin main
+  git checkout -q -b unit
+  git commit -q --allow-empty -m "unit work" --no-verify
+) >/dev/null 2>&1
+su_unit=$(git -C "$su_dir" rev-parse unit)
+su_base=$(git -C "$su_dir" rev-parse main)
+SU_R=memory/builds/tRun/RUN.md
+run_su() { ( cd "$su_dir" && env -u GATE_SELFTESTS GOV_DEFAULT_BRANCH=main bash "$SCRIPT" "$@" 2>&1 ); }
+run_su_git() { git -C "$su_dir" "$@"; }
+run_su_leg() { ( cd "$su_dir" && GOV_UNATTENDED_REPORT=1 bash "$HERE/check-unattended.sh" --skip 28 2>&1 ); }
+read_su_sum() { run_su_git hash-object "${1:-$SU_R}"; }
+read_su_fact() { sed -n "s/^$2: //p" "$su_dir/$1" | head -1; }
+init_su_fixture() {
+  run_su_git checkout -qf --detach "$su_unit" 2>/dev/null
+  run_su_git branch -qf unit "$su_unit"; run_su_git checkout -qf unit
+  run_su_git reset -q --hard "$su_unit"; run_su_git clean -qfd
+  run_su_git remote set-url origin "$su_origin"
+  run_su_git update-ref refs/heads/main "$su_base"; run_su_git push -q -f origin "$su_base":main; run_su_git fetch -q origin main
+}
+# A PREFLIGHTED, COMMITTED record handed off under <code> over a GREEN bar, the hand-off itself
+# committed as the run's last act on its branch: SU_C is the commit carrying the HELD record.
+write_su_handoff() { # code -> SU_C
+  init_su_fixture
+  run_su --preflight tRun --keepalive-id k1 >/dev/null
+  run_su_git add -A >/dev/null && run_su_git commit -q -m "records(tRun): preflight" --no-verify
+  ( cd "$su_dir" && seed_handoff_bar GREEN ) >/dev/null 2>&1
+  run_su --handoff tRun --code "$1" --reason "the owner lands it" --reaped k1 > "$su_out/handoff.out"
+  run_su_git add -A >/dev/null && run_su_git commit -q -m "records(tRun): hand-off" --no-verify
+  SU_C=$(run_su_git rev-parse HEAD)
+}
+# A run record written by hand under `## Run facts`, based at the fixture's BASE.
+write_su_record() { # slug · phase · witness
+  mkdir -p "$su_dir/memory/builds/$1"
+  printf '# %s — run state\n\n<!-- run:generated -->\n<!-- /run:generated -->\n\n## Run facts\nphase: %s\nwitness: %s\nbase: %s\nhalt-code: fork-unresolvable\n\n## Parked\n' \
+    "$1" "$2" "$3" "$su_base" > "$su_dir/memory/builds/$1/RUN.md"
+}
+# THE CONTENT PREDICATE'S POPULATION, landed: four ABORTED records and one BUILDING one, each based at
+# BASE. tAbase's witness IS its base; tAforeign's is another build's commit; tArevert's work landed and
+# was reverted on the first-parent line; tAkept's and tAwork's landed and stayed. SU_REC is the tip.
+write_su_aborted() {
+  local s
+  init_su_fixture
+  for s in tAkept tOther tArevert tAwork; do
+    mkdir -p "$su_dir/memory/builds/$s"; printf '%s\n' "$s" > "$su_dir/memory/builds/$s/work.txt"
+    run_su_git add -A >/dev/null && run_su_git commit -q -m "work($s): the change" --no-verify
+    eval "SU_W_$s=\$(run_su_git rev-parse HEAD)"
+  done
+  write_su_record tAkept ABORTED "$SU_W_tAkept"
+  write_su_record tAbase ABORTED "$su_base"
+  write_su_record tAforeign ABORTED "$SU_W_tOther"
+  write_su_record tArevert ABORTED "$SU_W_tArevert"
+  write_su_record tAwork BUILDING "$SU_W_tAwork"
+  run_su_git add -A >/dev/null && run_su_git commit -q -m "records: the five runs" --no-verify
+  run_su_git -c core.hooksPath=/dev/null revert --no-edit "$SU_W_tArevert" >/dev/null 2>&1
+  run_su_git push -q -f origin HEAD:main
+  SU_REC=$(run_su_git rev-parse HEAD)
+}
+
+# ---- AC1: a hand-off its owner merged reads `LANDED (attended)` to --status and `terminal` to
+# ---- --liveness; --settle writes the terminal, stages it and leaves HEAD where it was; the leg counts
+# ---- it in the `attended` population and reds nothing on it. A second settle writes nothing.
+write_su_handoff owner-landing
+run_su_git push -q origin HEAD:main
+hit "$(run_su --status tRun)" "phase LANDED (attended)"
+out=$(run_su --liveness tRun)
+hit "$out" "state: terminal"
+hit "$out" "verdict: TERMINAL"
+su_h=$(run_su_git rev-parse HEAD)
+out=$(run_su --settle tRun)
+hit "$out" "unattended: settled memory/builds/tRun/RUN.md as a landed hand-off - phase LANDED · landed-by attended · landed-derived ${SU_C:0:8} ${SU_C:0:8}"
+hit "$out" "unattended: STAGED, not committed - the settle commit is owed, and it rides the next landing from this tree or a batched owner pass"
+same "AC1 the settle wrote LANDED" "$(read_su_fact "$SU_R" phase)" "LANDED"
+same "AC1 the settle wrote who landed it" "$(read_su_fact "$SU_R" landed-by)" "attended"
+same "AC1 the settle wrote the derivation" "$(read_su_fact "$SU_R" landed-derived)" "$SU_C $SU_C"
+same "AC1 the settle wrote the landing commit as the witness" "$(read_su_fact "$SU_R" witness)" "$SU_C"
+same "AC1 the settle staged the record" "$(run_su_git diff --cached --name-only)" "$SU_R"
+same "AC1 the settle left HEAD unmoved" "$(run_su_git rev-parse HEAD)" "$su_h"
+out=$(run_su_leg)
+hit "$out" "attended LANDED 1"
+same "AC1 the leg reds no check 15 on the settled record" \
+  "$(printf '%s\n' "$out" | grep -F "$SU_R" | grep -c 'UNATTENDED check 15 FAILED' || true)" "0"
+su_b=$(read_su_sum)
+hit "$(run_su --settle tRun)" "unattended: already settled - memory/builds/tRun/RUN.md reads LANDED; nothing was written"
+same "AC1 a second settle wrote nothing" "$(read_su_sum)" "$su_b"
+
+# ---- AC9: --resume over the landed hand-off, before it is settled, has nothing to resume, names
+# ---- --settle and writes nothing - never the HELD take-over row and never the LANDING re-bind.
+write_su_handoff owner-landing
+run_su_git push -q origin HEAD:main
+su_b=$(read_su_sum)
+out=$(run_su --resume tRun --keepalive-id KA-3)
+hit "$out" "unattended: nothing to resume — this hand-off was landed by its owner: its record's commit ${SU_C:0:8} is on refs/heads/main at ${SU_C:0:8}, so write that durably with --settle tRun; nothing was written"
+same "AC9 the resume wrote nothing" "$(read_su_sum)" "$su_b"
+same "AC9 the resume left the tree clean" "$(run_su_git status --porcelain)" ""
+
+# ---- AC3: --preflight retires the landed hand-off as RUN.LANDED., before it is settled and after,
+# ---- and the archive carries every fact the attended population owes; neither fail 81 nor fail 82.
+for su_case in unsettled settled; do
+  write_su_handoff owner-landing
+  run_su_git push -q origin HEAD:main
+  if [ "$su_case" = settled ]; then
+    run_su --settle tRun >/dev/null
+    run_su_git commit -q -m "records(tRun): settle the run record" --no-verify
+  fi
+  out=$(run_su --preflight tRun --keepalive-id KA-2)
+  hit  "$out" "preflight OK"
+  miss "$out" "UNATTENDED check 81"
+  miss "$out" "UNATTENDED check 82"
+  su_a=$(run_su_git ls-files 'memory/builds/tRun/RUN.LANDED.*.md' | head -1)
+  n=$((n+1)); [ -n "$su_a" ] || { echo "FAIL AC3 the $su_case hand-off left no RUN.LANDED. archive"; st=1; }
+  su_shown=$(run_su_git show ":$su_a" 2>/dev/null)
+  hit "$su_shown" "landed-by: attended"
+  hit "$su_shown" "units-at-landing: ARCH-tRun-1"
+  hit "$su_shown" "landed-derived: $SU_C "
+done
+
+# ---- AC2: a hold under any other code, merged the same way, stays HELD and is refused naming its
+# ---- code, with the record byte-unchanged (review item M13).
+init_su_fixture
+run_su --preflight tRun --keepalive-id k1 >/dev/null
+run_su_git add -A >/dev/null && run_su_git commit -q -m "records(tRun): preflight" --no-verify
+run_su --hold tRun --code inherited-red --until "probe gate" --reason "x leg red, INHERITED" --reaped k1 >/dev/null
+run_su_git add -A >/dev/null && run_su_git commit -q -m "records(tRun): hold" --no-verify
+run_su_git push -q origin HEAD:main
+out=$(run_su --status tRun)
+hit  "$out" "phase HELD"
+miss "$out" "LANDED (attended)"
+su_b=$(read_su_sum)
+out=$(run_su --settle tRun)
+hit "$out" "--settle settles a HELD record only under a hand-off code, because any other hold is a paused run its owner did not land, and settling it would end it; nothing was written. The hold code is: inherited-red"
+same "AC2 the refused settle wrote nothing" "$(read_su_sum)" "$su_b"
+
+# ---- AC8: an unanswered remote refuses before any write.
+write_su_handoff owner-landing
+run_su_git push -q origin HEAD:main
+run_su_git remote set-url origin "$su_oroot/nope.git"
+su_b=$(read_su_sum)
+out=$(run_su --settle tRun)
+hit "$out" "--settle writes only what the tip the remote advertises proves, and that tip was not observed, so nothing here can be proven and nothing was written"
+same "AC8 the unobserved tip wrote nothing" "$(read_su_sum)" "$su_b"
+
+# ---- AC10: the hand-off's recipe ends by settling the record, through the kit's own path relative to
+# ---- the repository holding it, and the verb prints the same command as its hint.
+write_su_handoff owner-landing
+su_row=$(grep ' handoff · item ' "$su_dir/$SU_R")
+hit  "$su_row" "&& bash $KIT_REL/unattended.sh --settle tRun"
+same "AC10 the recipe ends with the settle" "${su_row##* --settle }" "tRun"
+same "AC10 the settle path is derived and repo-relative" \
+  "$(printf '%s\n' "$su_row" | sed -n 's/.* && bash \(.*\)unattended\.sh --settle tRun$/\1/p')" "$KIT_REL/"
+hit  "$(cat "$su_out/handoff.out")" "unattended: once an owner has landed it, the record is settled by the recipe's last command - bash $KIT_REL/unattended.sh --settle tRun"
+
+# ---- The settle's own refusals: no record; a record differing from HEAD; a recorded LANDING; and a
+# ---- hand-off nobody has landed yet. Each writes nothing.
+hit "$(run_su --settle tNoSuchBuild)" "no run-state file, so there is no run to settle"
+write_su_handoff owner-landing
+add_facts "$su_dir/$SU_R" "note: an edit nobody committed"
+su_b=$(read_su_sum)
+hit "$(run_su --settle tRun)" "--settle writes only onto the record HEAD carries, and this one is uncommitted or differs from HEAD's copy in more than its lease lines, so what it would settle is not what any landing carried; commit or discard the difference first"
+same "a settle over an uncommitted edit wrote nothing" "$(read_su_sum)" "$su_b"
+run_su_git checkout -q -- "$SU_R"
+su_b=$(read_su_sum)
+hit "$(run_su --settle tRun)" "this hand-off does not derive LANDED: its owner has not landed it on the advertised tip, so there is nothing to settle yet; nothing was written - its landing commit ${SU_C:0:8} is not on refs/heads/main at ${su_base:0:8}"
+same "a settle over an unlanded hand-off wrote nothing" "$(read_su_sum)" "$su_b"
+init_su_fixture
+run_su --preflight tRun --keepalive-id k1 >/dev/null
+sed -i 's/^phase: .*/phase: LANDING/' "$su_dir/$SU_R"
+run_su_git add -A >/dev/null && run_su_git commit -q -m "records(tRun): close" --no-verify
+hit "$(run_su --settle tRun)" "--settle does not write over a recorded LANDING: a LANDING is completed by --landed, and a derived LANDED is written and retired by the next --preflight of its slug; nothing was written"
+
+# ---- AC4: the content predicate over the population it acts on. A witness equal to its base, a
+# ---- witness from another build, and work merged then reverted each read NOT landed and gain nothing;
+# ---- work merged and kept gains `work-landed-at: <witness> <tip>`. With its base removed it is
+# ---- undecidable, and refused as such.
+write_su_aborted
+for su_s in tAbase tAforeign tArevert; do
+  su_b=$(read_su_sum "memory/builds/$su_s/RUN.md")
+  out=$(run_su --settle "$su_s")
+  hit "$out" "the content predicate reads this run's work NOT landed on refs/heads/main at ${SU_REC:0:8}, so there is no landing to record; nothing was written - "
+  same "AC4 $su_s gained nothing" "$(read_su_sum "memory/builds/$su_s/RUN.md")" "$su_b"
+  case "$su_s" in
+    tAbase)    hit "$out" "its witness ${su_base:0:8} is its base ${su_base:0:8} or an ancestor of it, so the run committed nothing of its own" ;;
+    tAforeign) hit "$out" "names tAforeign in its subject or touches memory/builds/tAforeign/, so its witness is not this run's work" ;;
+    tArevert)  hit "$out" "a commit on the tip's first-parent line reverts its commit ${SU_W_tArevert:0:8}" ;;
+  esac
+done
+out=$(run_su --settle tAkept)
+hit  "$out" "unattended: settled memory/builds/tAkept/RUN.md as ABORTED with its work landed - work-landed-at $SU_W_tAkept $SU_REC"
+same "AC4 the kept record keeps its phase" "$(read_su_fact memory/builds/tAkept/RUN.md phase)" "ABORTED"
+same "AC4 the kept record names its witness and the tip" "$(read_su_fact memory/builds/tAkept/RUN.md work-landed-at)" "$SU_W_tAkept $SU_REC"
+run_su_git reset -q --hard "$SU_REC"
+sed -i '/^base: /d' "$su_dir/memory/builds/tAkept/RUN.md"
+run_su_git commit -qam "records(tAkept): lose the base" --no-verify
+out=$(run_su --settle tAkept)
+hit "$out" "the content predicate cannot decide whether this run's work landed, and --settle never guesses; nothing was written - the record carries no base fact"
+
+# ---- AC5: a cutoff EARLIER than the record's first commit means it meant discard; a blank one
+# ---- refuses every ABORTED settle naming the key. Neither writes (review item M2).
+write_su_aborted
+sed -i 's/^HANDOFF_CUTOFF=.*/HANDOFF_CUTOFF="2000-01-01"/' "$su_dir/.unattended.conf"
+su_b=$(read_su_sum memory/builds/tAkept/RUN.md)
+su_d=$(git -C "$su_dir" log -1 --format=%cs -- memory/builds/tAkept/RUN.md)
+hit "$(run_su --settle tAkept)" "this ABORTED record meant discard: it was first committed $su_d, on or after HANDOFF_CUTOFF 2000-01-01, so its work was ended as not to land, and no verb writes that it landed; nothing was written: memory/builds/tAkept/RUN.md"
+sed -i 's/^HANDOFF_CUTOFF=.*/HANDOFF_CUTOFF=""/' "$su_dir/.unattended.conf"
+hit "$(run_su --settle tAkept)" "--settle adds work-landed-at to an ABORTED record only when it predates HANDOFF_CUTOFF, the day ABORTED came to mean discard, and this project declares no such date, so no ABORTED record can be dated against it; declare HANDOFF_CUTOFF in the conf: blank"
+same "AC5 neither refused settle wrote" "$(read_su_sum memory/builds/tAkept/RUN.md)" "$su_b"
+
+# ---- AC6: a working record with no lease reads UNBOUND; --settle writes `work-landed-at` and
+# ---- `abandoned` under BUILDING, and a --preflight of another slug EXCLUDES it rather than counting
+# ---- it. A fresh lease reads LIVE, and the same settle is refused.
+write_su_aborted
+hit "$(run_su --liveness tAwork)" "verdict: UNBOUND"
+out=$(run_su --settle tAwork)
+hit  "$out" "unattended: settled memory/builds/tAwork/RUN.md as abandoned at phase BUILDING with its work landed - work-landed-at $SU_W_tAwork $SU_REC · abandoned "
+same "AC6 the abandoned record keeps its phase" "$(read_su_fact memory/builds/tAwork/RUN.md phase)" "BUILDING"
+n=$((n+1)); [ -n "$(read_su_fact memory/builds/tAwork/RUN.md abandoned)" ] || { echo "FAIL AC6 no abandoned fact was written"; st=1; }
+run_su_git commit -q -m "records(tAwork): settle the run record" --no-verify
+out=$(run_su --preflight tRun --keepalive-id k1)
+hit  "$out" "unattended: EXCLUDED memory/builds/tAwork/RUN.md from the live-run count — abandoned at"
+miss "$out" "memory/builds/tAwork/RUN.md · phase BUILDING"
+write_su_aborted
+add_facts "$su_dir/memory/builds/tAwork/RUN.md" "$(printf 'keepalive: k1\nsession: fixture-session\nlease-utc: %s' "$(date -u +%Y-%m-%dT%H:%M:%SZ)")"
+run_su_git commit -qam "records(tAwork): a fresh lease" --no-verify
+su_b=$(read_su_sum memory/builds/tAwork/RUN.md)
+hit "$(run_su --settle tAwork)" "--settle reads a working record as abandoned only when --liveness says STALE or UNBOUND, and it says LIVE, so a session may still drive it and settling it would end a live run; nothing was written"
+same "AC6 the live record was not settled" "$(read_su_sum memory/builds/tAwork/RUN.md)" "$su_b"
+
+# ---- AC7: the leg UPHOLDS work-landed-at. Written by hand onto the reverted record it reds, naming
+# ---- the fact and the file; the settled bytes of the kept record red nothing; an `abandoned` marker
+# ---- standing alone reds.
+write_su_aborted
+run_su --settle tAkept >/dev/null
+add_facts "$su_dir/memory/builds/tArevert/RUN.md" "work-landed-at: $SU_W_tArevert $SU_REC"
+add_facts "$su_dir/memory/builds/tAbase/RUN.md" "abandoned: 2026-10-04T00:00:00Z"
+run_su_git add -A >/dev/null
+out=$(run_su_leg)
+hit  "$out" "a record claims work-landed-at and the content predicate does not read its work landed on the advertised tip, so the fact is not one --settle could have written: a commit on the tip's first-parent line reverts its commit ${SU_W_tArevert:0:8} in memory/builds/tArevert/RUN.md"
+same "AC7 the settled bytes of the kept record red nothing" \
+  "$(printf '%s\n' "$out" | grep -F 'a record claims work-landed-at' | grep -c 'memory/builds/tAkept/' || true)" "0"
+hit  "$out" "a record carries abandoned with no work-landed-at, and --settle writes the two together"
+rm -rf "$su_dir" "$su_oroot" "$su_out"
+
+fi   # ---- region two continues below: one compound block past about 3000 commands segfaults
+     # ---- bash 5.3 on Cygwin (exit 139), so the region is cut into blocks at top-level seams
+if in_shard 2; then
+
 # ---- AC5: `--liveness` over an aged HELD record reads `state: held` and `verdict: HELD`, never the
 # ---- STALE the resume tick acts on, and prints every key it printed before, in the same order.
 build_hold_fixture

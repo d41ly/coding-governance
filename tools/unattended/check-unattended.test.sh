@@ -4093,7 +4093,7 @@ hit "$out" "calls read_recorded_phase() inside verb_resume(), which the allow-li
 # ---- phase silently widens the very set it was written to narrow, so the join runs both ways.
 reset_tree
 mkdir -p $KIT_REL && cp "$HERE/unattended.sh" "$HERE/lib-unattended.sh" $KIT_REL/
-mutate $KIT_REL/check-unattended.sh 's|^PHASE_RECORDED_FNS=.*|PHASE_RECORDED_FNS="refuse_if_terminal archive_name_of verb_landed print_liveness ghostfn"|'
+mutate $KIT_REL/check-unattended.sh 's|^PHASE_RECORDED_FNS=.*|PHASE_RECORDED_FNS="refuse_if_terminal archive_name_of verb_landed print_liveness run_settle ghostfn"|'
 out=$(run)
 hit "$out" "the allow-list names ghostfn(), which no longer calls read_recorded_phase()"
 
@@ -5362,7 +5362,7 @@ out=$(run_lg_leg)
 hit "$out" "the landed fact-set arm of check 15 is OFF - LANDED_FACTS_CUTOFF is blank or undeclared"
 printf 'LANDED_FACTS_CUTOFF="2026-06-01"\n' >> .unattended.conf
 out=$(run_lg_leg)
-hit "$out" "recorded LANDED 0 · rotated derived LANDED 0 · committed LANDING 0 - a count of 0, so this arm graded nothing on this tree"
+hit "$out" "recorded LANDED 0 · rotated derived LANDED 0 · committed LANDING 0 · attended LANDED 0 - a count of 0, so this arm graded nothing on this tree"
 write_lg_record tFacts LANDED "$ANCHOR0" "landed-anchor: remote\nunpushed-at-landing: 0\n"
 git add -A >/dev/null && write_lg_commit "a landed record with no roster"
 out=$(run_lg_leg)
@@ -5428,6 +5428,70 @@ git push -q -f origin HEAD:main
 out=$(run_lg_leg)
 miss "$out" "population landing, missing [units-at-landing] in memory/builds/tRun/RUN.md"
 hit  "$out" "check 15 did not grade the landed facts of memory/builds/tRun/RUN.md - it is a committed LANDING the remote already carries, so it derives LANDED, and under primary landing the verb that writes those facts has not run yet: --landed tRun"
+git push -q -f origin "$ANCHOR0":main
+
+# ---- TOOL-dUnstuckLanding-14 AC1, the leg's half: a settled hand-off is counted in the `attended`
+# ---- population, which owes `landed-by` beside the derived facts, and reds naming a missing one.
+reset_tree
+printf 'LANDED_FACTS_CUTOFF="2026-06-01"\n' >> .unattended.conf
+write_lg_record tAtt LANDED "$ANCHOR0" "landed-derived: $ANCHOR0 $ANCHOR0\nunits-at-landing: ARCH-tAtt-1\nlanded-by: attended\n"
+git add -A >/dev/null && write_lg_commit "records(tAtt): settle the run record"
+out=$(run_lg_leg)
+hit  "$out" "committed LANDING 0 · attended LANDED 1"
+miss "$out" "population attended, missing"
+sed -i '/^units-at-landing: /d' memory/builds/tAtt/RUN.md
+git add -A >/dev/null
+out=$(run_lg_leg)
+hit  "$out" "population attended, missing [units-at-landing] in memory/builds/tAtt/RUN.md"
+
+# ---- TOOL-dUnstuckLanding-14 S3: a HELD record under a hand-off code whose own commit is on the
+# ---- advertised tip is EXCLUDED by check 7 as derived LANDED; under any other hold code it counts.
+reset_tree
+write_lg_record tHand HELD "$ANCHOR0" "hold-code: owner-landing\n"
+git add -A >/dev/null && write_lg_commit "records(tHand): hand-off"
+git push -q -f origin HEAD:main
+out=$(run)
+hit  "$out" "check 7 EXCLUDED memory/builds/tHand/RUN.md — derived LANDED: its landing commit $(git rev-parse HEAD)"
+sed -i 's/^hold-code: .*/hold-code: inherited-red/' memory/builds/tHand/RUN.md
+git add -A >/dev/null && write_lg_commit "records(tHand): a plain hold"
+git push -q -f origin HEAD:main
+out=$(run)
+miss "$out" "check 7 EXCLUDED memory/builds/tHand/RUN.md"
+git push -q -f origin "$ANCHOR0":main
+
+# ---- TOOL-dUnstuckLanding-14 AC7: work-landed-at is UPHELD by the content predicate, not graded on
+# ---- presence. tKept's work landed and stayed; tRev's landed and was reverted on the first-parent
+# ---- line, and its hand-written fact reds naming the fact and the file. A cutoff the record does not
+# ---- predate reds the fact as discard, and a blank one reds it as undatable. An `abandoned` marker
+# ---- standing alone reds, and check 7 excludes the record carrying it, as --preflight does.
+reset_tree
+printf 'HANDOFF_CUTOFF="2099-01-01"\n' >> .unattended.conf
+for lg_s in tKept tRev; do
+  mkdir -p "memory/builds/$lg_s"; printf '%s\n' "$lg_s" > "memory/builds/$lg_s/work.txt"
+  git add -A >/dev/null && write_lg_commit "work($lg_s): the change"
+  eval "lg_w_$lg_s=\$(git rev-parse HEAD)"
+done
+git -c core.hooksPath=/dev/null revert --no-edit "$lg_w_tRev" >/dev/null 2>&1
+write_lg_record tKept ABORTED "$lg_w_tKept" "halt-code: fork-unresolvable\nwork-landed-at: $lg_w_tKept tip\n"
+write_lg_record tRev ABORTED "$lg_w_tRev" "halt-code: fork-unresolvable\nwork-landed-at: $lg_w_tRev tip\n"
+git add -A >/dev/null && write_lg_commit "records: two aborted runs"
+git push -q -f origin HEAD:main
+out=$(run_lg_leg)
+hit  "$out" "a record claims work-landed-at and the content predicate does not read its work landed on the advertised tip, so the fact is not one --settle could have written: a commit on the tip's first-parent line reverts its commit ${lg_w_tRev:0:8} in memory/builds/tRev/RUN.md"
+same "AC7 the kept record's fact is upheld" \
+  "$(printf '%s\n' "$out" | grep -F 'a record claims work-landed-at' | grep -c 'memory/builds/tKept/' || true)" "0"
+sed -i 's/^HANDOFF_CUTOFF=.*/HANDOFF_CUTOFF="2000-01-01"/' .unattended.conf
+out=$(run_lg_leg)
+hit  "$out" "an ABORTED record first committed on or after HANDOFF_CUTOFF claims work-landed-at, and from that date ABORTED means discard, so no verb writes that its work landed: "
+hit  "$out" "against 2000-01-01 in memory/builds/tKept/RUN.md"
+sed -i 's/^HANDOFF_CUTOFF=.*/HANDOFF_CUTOFF=""/' .unattended.conf
+out=$(run_lg_leg)
+hit  "$out" "an ABORTED record claims work-landed-at and HANDOFF_CUTOFF is not a date, so whether it predates the day ABORTED came to mean discard cannot be read, and --settle refuses every such record: blank in memory/builds/tKept/RUN.md"
+write_lg_record tAban RUNNING "$ANCHOR0" "abandoned: 2026-10-04T00:00:00Z\n"
+git add -A >/dev/null
+out=$(run_lg_leg)
+hit  "$out" "a record carries abandoned with no work-landed-at, and --settle writes the two together, so the marker that takes it out of the live-run count stands on no proof that its work landed: memory/builds/tAban/RUN.md"
+hit  "$out" "check 7 EXCLUDED memory/builds/tAban/RUN.md — abandoned at 2026-10-04T00:00:00Z"
 git push -q -f origin "$ANCHOR0":main
 
 # ---- THE DATING SELF-SCAN: a first-commit DATE read with --diff-filter=A and no --follow anywhere in

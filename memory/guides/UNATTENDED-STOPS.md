@@ -30,11 +30,13 @@ Three consequences, and each of them is a refusal in the driver rather than a co
   none of them — a pause nothing can evaluate and `--resume` cannot release.
 - `--preflight` over a HELD record refuses, naming `--resume`. The re-preflight the protocol
   sanctions after a compaction is for a run that is WORKING; a paused one has a release condition to
-  test, an authorization to re-verify and a lease to take.
+  test, an authorization to re-verify and a lease to take. The one exception is a hand-off its owner
+  landed: it derives `LANDED (attended)` (§12), so `--preflight` retires it rather than refusing.
 
-Only `--landed` and `--abort` still write a terminal, and both go through the working phase a resume
-returns the run to. A `LANDING` record the remote carries reads `LANDED` without either, and the next
-`--preflight` of its slug writes that before it retires the record (§12).
+`--landed`, `--abort` and `--settle` write a terminal. The first two go through the working phase a
+resume returns the run to; `--settle` writes one only over a hand-off its owner landed (§12). A
+`LANDING` record the remote carries reads `LANDED` without any of them, and the next `--preflight` of
+its slug writes that before it retires the record (§12).
 
 ## 2. The codes
 
@@ -189,6 +191,7 @@ announced, and declines the take-over.
 | Record | Caller and clock | `--resume` |
 |---|---|---|
 | recorded terminal | any | nothing to resume; with an id, check 26 |
+| HELD under a hand-off code, derived `LANDED (attended)` | any | nothing to resume, naming `--settle`; writes nothing, never the take-over or the re-bind |
 | LANDING derived LANDED, not observed | an id, on a branch where that landing's `--landed` does not run, the record naming a branch fact | nothing to resume, naming the record's run branch; writes nothing |
 | LANDING derived LANDED, not observed | an id | RE-BIND: `write_lease`, staged, never committed, whatever the clock or session; a record naming neither branch fact re-binds anywhere, announced as not scoped |
 | LANDING derived LANDED, not observed | no id | nothing to resume |
@@ -424,8 +427,39 @@ verb, `--resume`, `--audit` and `--preflight`'s rotation test derive; so do the 
 exclusion, its fact-set arm and its cross-run grant arm. The committed live index does NOT: it is
 freshness-gated, and the remote tip moves while the index does not. `--landed`'s own guard reads the
 RECORDED phase, because its postcondition is the terminal. The remote is observed only for a
-`LANDING` record, quietly; an unanswered remote, or a tip this clone lacks, leaves `LANDING` and
-`--status` prints the reason.
+`LANDING` record or a HELD one under a hand-off code, quietly; an unanswered remote, or a tip this
+clone lacks, leaves the recorded phase and `--status` prints the reason for a `LANDING`.
+
+**A hand-off its owner landed reads `LANDED (attended)`.** A HELD record under `owner-landing` or
+`owner-decision` whose own commit — found by the same content rule, HEAD's copy reading HELD under a
+hand-off code — is on the advertised tip derives `LANDED` everywhere a reader derives, and `--status`
+prints `LANDED (attended)`. The hand-off commit is the run's last act on its branch, so a landing that
+carries it carries the work. A HELD record under any other code never derives and never observes the
+remote: a paused run whose branch somebody merged was not handed off, and a terminal derived under a
+live lease would end it through check 26. `--liveness` takes no network: it tests the same commit
+against the ref its `finished-unstamped` test resolves, and reads `terminal`. `--resume` writes
+nothing and names `--settle`; `--preflight` retires it, its copy gaining `landed-by: attended`.
+
+**`--settle <slug>` writes what git proves.** Over a landed hand-off it writes `phase: LANDED`, the
+landing commit as `witness`, `landed-derived` and `landed-by: attended`. Over an `ABORTED` record
+first committed before `HANDOFF_CUTOFF` — a blank cutoff refuses every one — it writes one fact,
+`work-landed-at: <witness> <tip>`, the only write a terminal record admits. Over a working record
+whose `--liveness` verdict is `STALE` or `UNBOUND` it writes `work-landed-at` and `abandoned: <utc>`
+under the current phase; `--preflight`'s announcement and the leg's check 7 report exclude a record
+carrying `abandoned`. It refuses, numbered and before any write, a HELD record under another code, a
+`LANDING` or `LANDED` record, a record differing from HEAD's copy beyond its lease lines, a live
+lease, an unanswered remote and an undecidable predicate; it STAGES the record and never commits,
+so the settle commit rides the next landing from that tree or a batched owner pass. A live `RUN.md`
+only: an archived record is immutable.
+
+**Where an `ABORTED` run's work went is decided by CONTENT, never by witness ancestry.** `--abort`
+commits the record on top of its witness, so every record read from the tip has its witness there.
+Landed is all three: the witness is not an ancestor of the record's `base` and `base..witness` holds a
+commit naming the slug in its subject or touching its build folder; every such commit is on the tip;
+and no commit on the tip's first-parent line since the witness carries `This reverts commit` naming
+one. A missing or unresolvable `base` is undecidable. `--settle` and check 15 ask the one library
+predicate, and check 15 reds a `work-landed-at` it does not uphold, one on an `ABORTED` record not
+predating `HANDOFF_CUTOFF`, and an `abandoned` standing without it.
 
 **Under `in-place`, `--landed` is an OBSERVATION.** It writes nothing to the tree, prints the
 derivation, and logs it, per landing commit, to `landed.<slug>.log` under the git common dir, so no
@@ -450,7 +484,8 @@ evidence and tests the commit it names against the advertised tip.
 
 **The fact-set arm, graded by `LANDER_MODE` from `LANDED_FACTS_CUTOFF`.** A recorded `LANDED` that
 `--landed` wrote carries `landed-anchor`, `units-at-landing` and `unpushed-at-landing`; a rotated
-derived one carries `units-at-landing` and `landed-derived`; under `in-place` a committed `LANDING`
+derived one carries `units-at-landing` and `landed-derived`; an `attended` one, carrying
+`landed-by: attended`, carries those and `landed-by`; under `in-place` a committed `LANDING`
 carries `units-at-landing`. Under `primary`, a committed `LANDING` the remote already carries is
 REPORTED naming `--landed` and never graded, since that is the verb that completes it. Each record is
 dated by its FIRST commit read with `--follow`, floored at a rotated folder's newest archive, so a

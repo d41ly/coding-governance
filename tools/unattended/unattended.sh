@@ -22,6 +22,7 @@
 #   unattended.sh --abort <slug> --reason <text>           # end it, with the reason on the record
 #   unattended.sh --hold <slug> --code <c> --until <cond> --reason <text> --reaped <id>|--keepalive-unreachable <node> [--pending-run <runId>]
 #   unattended.sh --handoff <slug> --code owner-landing|owner-decision --reason <text> --reaped <id>|--keepalive-unreachable <node>   # HELD for an owner to land or decide
+#   unattended.sh --settle <slug>                          # write what git proves: a landed hand-off LANDED, or where an ended run's work landed
 #   unattended.sh --resume <slug> --scheduled <held-at> --keepalive-id <id>   # the restart a durable schedule files
 #   unattended.sh --attest <slug> --item <item> [--value <text>]  # the agent-checked DoD items
 #   unattended.sh --record-piece <slug> --path <p> --leg <n> --verdict <PASS|FAIL|NA> [--records-root <dir> [--playbook-sha <sha>] [--run <id>]]
@@ -91,7 +92,7 @@ KIT_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
 # read wrong, it does not RUN; the usage text is rendered from the docstring above, which is the only
 # place a verb's arguments are spelled; and the two carriers in other files are joined to this one by
 # the gate leg, because no runtime derivation crosses a file boundary.
-VERBS_SLUG="--preflight --status --audit --register-task --release-task --liveness --resume --close --landed --abort --hold --handoff --park --propose --attest --record-piece --record-set --rescope --dispatch --review --brief"
+VERBS_SLUG="--preflight --status --audit --register-task --release-task --liveness --resume --close --landed --abort --hold --handoff --settle --park --propose --attest --record-piece --record-set --rescope --dispatch --review --brief"
 # The verbs whose argument is POSITIONAL and which exit inside the parse loop. Separate because the
 # dispatch cannot treat them alike, and merged again for every reader, who does not care.
 VERBS_INLINE="--plan --phase --version"
@@ -1177,15 +1178,27 @@ fact() { # run-state file · key
 # Anything short of that leaves LANDING and says why in DP_REASON. The remote is observed ONLY for a
 # LANDING record, so every other record stays offline, and only through `read_advertised_tip`,
 # which returns a code and never calls `fail` - no caller inherits the observation's refusal.
-DP_PHASE=""; DP_REASON=""; DP_LANDING=""; DP_AREF=""; DP_TIP=""
+#
+# TOOL-dUnstuckLanding-14 S2 - A HAND-OFF AN OWNER LANDED IS LANDED TOO. A HELD record under a
+# hand-off code whose own commit is on the advertised tip reads LANDED with DP_BY=attended; the
+# commit is found by the same content rule, through `read_landing_commit`'s hand-off argument. A
+# HELD record under any other code is never derived and never observes the remote: a paused run
+# whose branch somebody merged has not been handed off, and a terminal derived under a live lease
+# would end it through fail 26 (review item M13).
+DP_PHASE=""; DP_REASON=""; DP_LANDING=""; DP_AREF=""; DP_TIP=""; DP_BY=""
 read_derived_phase() { # run-state file -> sets DP_PHASE (the effective phase) and DP_REASON
-  DP_PHASE=""; DP_REASON=""; DP_LANDING=""; DP_AREF=""; DP_TIP=""
+  local _dp_hl=""
+  DP_PHASE=""; DP_REASON=""; DP_LANDING=""; DP_AREF=""; DP_TIP=""; DP_BY=""
   [ -n "${1:-}" ] || return 0
   DP_PHASE=$(fact "$1" phase)
-  [ "$DP_PHASE" = LANDING ] || return 0
-  DP_LANDING=$(read_landing_commit "$1") || DP_LANDING=""
+  case "$DP_PHASE" in
+    LANDING) ;;
+    HELD) check_handoff_code "$(fact "$1" hold-code)" || return 0; _dp_hl="$HOLD_CODES_HANDOFF" ;;
+    *) return 0 ;;
+  esac
+  DP_LANDING=$(read_landing_commit "$1" "$_dp_hl") || DP_LANDING=""
   if [ -z "$DP_LANDING" ]; then
-    DP_REASON="the LANDING record is not committed as it stands, so no commit carries it to any remote"
+    DP_REASON="the $DP_PHASE record is not committed as it stands, so no commit carries it to any remote"
     return 0
   fi
   if ! read_advertised_tip; then
@@ -1193,6 +1206,7 @@ read_derived_phase() { # run-state file -> sets DP_PHASE (the effective phase) a
     return 0
   fi
   if GIT merge-base --is-ancestor "$DP_LANDING" "$ADVQ_SHA" 2>/dev/null; then
+    [ "$DP_PHASE" = HELD ] && DP_BY=attended
     DP_PHASE=LANDED; DP_AREF="$ADVQ_REF"; DP_TIP="$ADVQ_SHA"
   else
     DP_REASON="its landing commit ${DP_LANDING:0:8} is not on $ADVQ_REF at ${ADVQ_SHA:0:8}"
@@ -2254,6 +2268,13 @@ check_single_live() {
       continue
     fi
     is_terminal "$p" && continue
+    # TOOL-dUnstuckLanding-14 S7 - AN ABANDONED RECORD IS NOT A LIVE RUN. `--settle` writes
+    # `abandoned` only over a dead lease whose work the content predicate read landed, and the leg's
+    # check 7 report excludes the same marker, so the two count one population.
+    if [ -n "$(fact "$f" abandoned)" ]; then
+      printf 'unattended: EXCLUDED %s from the live-run count — abandoned at %s: --settle found its lease dead and its work landed at %s, so no session drives it\n' "$f" "$(fact "$f" abandoned)" "$(fact "$f" work-landed-at)"
+      continue
+    fi
     n=$((n + 1)); live="$live $f"
   done
   # THE THRESHOLD IS THE ANNOUNCEMENT'S, and the two must never drift apart. This guard used to read
@@ -5135,17 +5156,27 @@ HO_ACTIVE=""; HO_UNITS=""; HO_ASKS=""; HO_RECIPE=""
 # under `in-place` the lander prepares and lands from the run's own worktree; under `primary` the
 # run branch is merged `--no-ff` into the primary tree's default branch and the lander pushes it.
 # No machine path is written, because the line lands in a tracked record that other nodes read.
+#
+# TOOL-dUnstuckLanding-14 S9 - THE LAST COMMAND SETTLES THE RECORD, so the landing an owner runs also
+# writes what git then proves. Its path is this kit's own directory relative to the top of the
+# repository holding it, derived from KIT_DIR and never spelled, because the line is read on other
+# nodes; a kit outside any repository is named by the script alone.
+read_settle_command() { # slug -> the settle command an owner runs after the landing
+  local _sc_p
+  _sc_p=$(GIT -C "$KIT_DIR" rev-parse --show-prefix 2>/dev/null) || _sc_p=""
+  printf 'bash %sunattended.sh --settle %s' "$_sc_p" "$1"
+}
 render_handoff_recipe() { # slug · run-state file -> the recipe on stdout; 1 when no lander or no branch
   local slug=$1 rel=$2 br
   [ -n "$LANDER" ] || return 1
   if [ "$LANDER_MODE" = in-place ]; then
-    printf 'in the run worktree: %s --prepare --slug %s && %s --land --slug %s' "$LANDER" "$slug" "$LANDER" "$slug"
+    printf 'in the run worktree: %s --prepare --slug %s && %s --land --slug %s && %s' "$LANDER" "$slug" "$LANDER" "$slug" "$(read_settle_command "$slug")"
     return 0
   fi
   br=$(fact "$rel" run-branch); br=${br#refs/heads/}
   [ -n "$br" ] || br=$(GIT symbolic-ref -q --short HEAD 2>/dev/null)
   [ -n "$br" ] || return 1
-  printf 'in the primary tree: git merge --no-ff %s && %s' "$br" "$LANDER"
+  printf 'in the primary tree: git merge --no-ff %s && %s && %s' "$br" "$LANDER" "$(read_settle_command "$slug")"
 }
 
 run_handoff() { # slug · code · reason · reaped · unreachable
@@ -5183,6 +5214,127 @@ run_handoff() { # slug · code · reason · reaped · unreachable
   HO_ACTIVE=""; HO_UNITS=""; HO_ASKS=""; HO_RECIPE=""
   [ "$rc" = 0 ] || return "$rc"
   echo "unattended: hand-off recipe, written as the handoff row - $recipe"
+  echo "unattended: once an owner has landed it, the record is settled by the recipe's last command - $(read_settle_command "$slug")"
+  return 0
+}
+
+# ------------------------------------------------------------------------------------ the settle
+# TOOL-dUnstuckLanding-14 S5 and S6 - `--settle` WRITES WHAT GIT PROVES, and nothing else. Three
+# branches, selected by the RECORDED phase, and a fourth that writes nothing:
+#
+#   handed     HELD under a hand-off code, deriving LANDED: phase LANDED, witness the landing commit,
+#              `landed-derived` and `landed-by: attended`; `units-at-landing` is the hand-off's
+#   legacy     ABORTED, first committed before HANDOFF_CUTOFF, whose work the content predicate reads
+#              landed: `work-landed-at: <witness> <tip>` and nothing else - the one write a terminal
+#              record admits (protocol section 3)
+#   lease-dead any other non-terminal phase whose `--liveness` verdict is STALE or UNBOUND and whose
+#              work reads landed: `work-landed-at` and `abandoned: <utc>` under the CURRENT phase
+#   settled    the fact this branch would write is already there: said so, exit 0
+#
+# EVERY REFUSAL PRECEDES THE FIRST WRITE, in the spec's order, after the settled test, which writes
+# nothing: the record and its difference from HEAD, the recorded phase and the branch it selects, the advertised tip, then the branch's own test.
+# The record is STAGED and never committed: a settle is a records commit made after the work landed,
+# so it rides the next landing from this tree or a batched owner pass, and every deriving reader
+# reads the record correctly before then. A live record only: an archive is immutable.
+run_settle() { # slug
+  local slug="$1" rel ph br hc cut first wla t8
+  check_slug "$slug" || return 1
+  rel=$(runmd_of "$slug")
+  [ -f "$rel" ] || { fail 10 "no run-state file, so there is no run to settle: $rel"; return 1; }
+  ph=$(read_recorded_phase "$rel")
+  # ALREADY SETTLED FIRST, because it writes nothing whatever else holds: a settle is staged and
+  # committed later, so the record a re-run meets differs from HEAD's copy by exactly what it wrote.
+  wla=$(fact "$rel" work-landed-at)
+  if { [ "$ph" = LANDED ] && [ "$(fact "$rel" landed-by)" = attended ]; } \
+     || { [ "$ph" = ABORTED ] && [ -n "$wla" ]; } \
+     || { ! is_terminal "$ph" && [ "$ph" != HELD ] && [ -n "$wla" ] && [ -n "$(fact "$rel" abandoned)" ]; }; then
+    echo "unattended: already settled - $rel reads $ph${wla:+, work-landed-at $wla}; nothing was written"
+    return 0
+  fi
+  if ! GIT cat-file -e "HEAD:$rel" 2>/dev/null || ! check_lease_only_diff "$rel"; then
+    fail 94 "--settle writes only onto the record HEAD carries, and this one is uncommitted or differs from HEAD's copy in more than its lease lines, so what it would settle is not what any landing carried; commit or discard the difference first: $rel"
+    return 1
+  fi
+  case "$ph" in
+    LANDING|LANDED)
+      fail 95 "--settle does not write over a recorded $ph: a LANDING is completed by --landed, and a derived LANDED is written and retired by the next --preflight of its slug; nothing was written: $rel"
+      return 1 ;;
+    HELD)
+      hc=$(fact "$rel" hold-code)
+      if ! check_handoff_code "$hc"; then
+        fail 96 "--settle settles a HELD record only under a hand-off code, because any other hold is a paused run its owner did not land, and settling it would end it; nothing was written. The hold code is: ${hc:-none}"
+        return 1
+      fi
+      br=handed ;;
+    ABORTED)
+      cut="$HANDOFF_CUTOFF"
+      case "$cut" in
+        [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]) ;;
+        *) fail 97 "--settle adds work-landed-at to an ABORTED record only when it predates HANDOFF_CUTOFF, the day ABORTED came to mean discard, and this project declares no such date, so no ABORTED record can be dated against it; declare HANDOFF_CUTOFF in the conf: ${cut:-blank}"
+           return 1 ;;
+      esac
+      first=$(read_first_commit_date "$rel")
+      if [ -z "$first" ] || ! [[ "$first" < "$cut" ]]; then
+        fail 98 "this ABORTED record meant discard: it was first committed ${first:-never}, on or after HANDOFF_CUTOFF $cut, so its work was ended as not to land, and no verb writes that it landed; nothing was written: $rel"
+        return 1
+      fi
+      br=legacy ;;
+    *)
+      # The core terminals are the two arms above and PHASES_TERMINAL takes no extension, so every
+      # phase reaching here is a working one.
+      br=lease-dead ;;
+  esac
+  if ! read_advertised_tip; then
+    fail 99 "--settle writes only what the tip the remote advertises proves, and that tip was not observed, so nothing here can be proven and nothing was written: $ADVQ_WHY"
+    return 1
+  fi
+  case "$br" in
+    handed)
+      read_derived_phase "$rel"
+      if [ "$DP_BY" != attended ]; then
+        fail 100 "this hand-off does not derive LANDED: its owner has not landed it on the advertised tip, so there is nothing to settle yet; nothing was written - ${DP_REASON:-no landing commit}"
+        return 1
+      fi ;;
+    *)
+      if [ "$br" = lease-dead ]; then
+        # A DEAD PROBE IS NOT A DEAD LEASE: no verdict is "unknown", never STALE, so it refuses too.
+        derive_liveness "$slug" "$rel" "$ph" || LV_VERDICT="nothing, because a probe it needs answered nothing ($LV_DEAD)"
+        case "$LV_VERDICT" in
+          STALE|UNBOUND) ;;
+          *) fail 101 "--settle reads a working record as abandoned only when --liveness says STALE or UNBOUND, and it says $LV_VERDICT, so a session may still drive it and settling it would end a live run; nothing was written: $rel"
+             return 1 ;;
+        esac
+      fi
+      check_work_landed "$rel" "$ADVQ_SHA"
+      case "$?" in
+        0) ;;
+        1) t8=${ADVQ_SHA:0:8}
+           fail 102 "the content predicate reads this run's work NOT landed on $ADVQ_REF at $t8, so there is no landing to record; nothing was written - $WL_WHY"
+           return 1 ;;
+        *) fail 103 "the content predicate cannot decide whether this run's work landed, and --settle never guesses; nothing was written - $WL_WHY"
+           return 1 ;;
+      esac ;;
+  esac
+  # ---- nothing above this line wrote anything -------------------------------------------------------
+  case "$br" in
+    handed)
+      set_fact "$rel" phase LANDED || return 1
+      set_fact "$rel" witness "$DP_LANDING" || return 1
+      set_fact "$rel" landed-derived "$DP_LANDING $DP_TIP" || return 1
+      set_fact "$rel" landed-by attended || return 1 ;;
+    legacy)
+      set_fact "$rel" work-landed-at "$(fact "$rel" witness) $ADVQ_SHA" || return 1 ;;
+    lease-dead)
+      set_fact "$rel" work-landed-at "$(fact "$rel" witness) $ADVQ_SHA" || return 1
+      set_fact "$rel" abandoned "$(read_utc_now)" || return 1 ;;
+  esac
+  stage_or_fail "$rel" || return 1
+  case "$br" in
+    handed) echo "unattended: settled $rel as a landed hand-off - phase LANDED · landed-by attended · landed-derived ${DP_LANDING:0:8} ${DP_TIP:0:8}" ;;
+    legacy) echo "unattended: settled $rel as ABORTED with its work landed - work-landed-at $(fact "$rel" work-landed-at)" ;;
+    *) echo "unattended: settled $rel as abandoned at phase $ph with its work landed - work-landed-at $(fact "$rel" work-landed-at) · abandoned $(fact "$rel" abandoned)" ;;
+  esac
+  echo "unattended: STAGED, not committed - the settle commit is owed, and it rides the next landing from this tree or a batched owner pass: git commit -m \"records($slug): settle the run record\" -- $rel"
   return 0
 }
 
@@ -5223,7 +5375,8 @@ verb_preflight() { # slug · keepalive-id
     if [ -n "$DP_LANDING" ]; then
       PF_LCOPY=$(_pf_sd=$(resolve_sidecar_dir) && mktemp "${_pf_sd%/unattended}/unattended-rotation.XXXXXX" 2>/dev/null) \
         && cp "$rel" "$PF_LCOPY" && set_fact "$PF_LCOPY" phase LANDED && set_fact "$PF_LCOPY" witness "$DP_LANDING" \
-        && set_fact "$PF_LCOPY" landed-derived "$DP_LANDING $DP_TIP" && src="$PF_LCOPY" \
+        && set_fact "$PF_LCOPY" landed-derived "$DP_LANDING $DP_TIP" \
+        && { [ "$DP_BY" != attended ] || set_fact "$PF_LCOPY" landed-by attended; } && src="$PF_LCOPY" \
         || { [ -z "$PF_LCOPY" ] || rm -f "$PF_LCOPY"; PF_LCOPY=""; src=""; }
     fi
     arch=$(archive_name_of "$rel" "$src") || { fail 27 "cannot derive an archive name for the finished record, so there is nothing safe to retire it to and the run does not start: $rel"; return 1; }
@@ -5249,7 +5402,10 @@ verb_preflight() { # slug · keepalive-id
     # that arm requires is refused here with nothing moved. The predicate and the dating are the
     # kit library's, shared with the leg, so the two cannot disagree about one record.
     if [ -n "$PF_LCOPY" ] && check_landed_facts_due "$rel" "$LANDED_FACTS_CUTOFF"; then
-      _pf_miss=$(read_missing_landed_facts "$PF_LCOPY" derived)
+      # TOOL-dUnstuckLanding-14 S3 - a landed hand-off is graded as the `attended` population, so
+      # its copy carries `landed-by: attended` beside the facts every derived rotation writes.
+      if [ "$DP_BY" = attended ]; then _pf_miss=$(read_missing_landed_facts "$PF_LCOPY" attended)
+      else _pf_miss=$(read_missing_landed_facts "$PF_LCOPY" derived); fi
       if [ -n "$_pf_miss" ]; then
         rm -f "$PF_LCOPY"
         if [ "$LANDER_MODE" = in-place ]; then
@@ -5712,7 +5868,11 @@ verb_status() { # slug
   # LANDING carries its reason. A bare LANDED here would be indistinguishable from one `--landed`
   # wrote, and a bare LANDING from a record nobody has pushed.
   pshow="$p"
-  if [ "$p" = LANDED ] && [ -n "$DP_LANDING" ]; then
+  # TOOL-dUnstuckLanding-14 S2 - a hand-off an owner landed reads `LANDED (attended)`, derived or
+  # settled, so the reader can tell it from a landing the run made itself.
+  if [ "$p" = LANDED ] && { [ "$DP_BY" = attended ] || [ "$(fact "$rel" landed-by)" = attended ]; }; then
+    pshow="LANDED (attended)"
+  elif [ "$p" = LANDED ] && [ -n "$DP_LANDING" ]; then
     pshow="LANDED (derived: ${DP_LANDING:0:8} on $DP_AREF at ${DP_TIP:0:8})"
   elif [ "$p" = LANDING ] && [ -n "$DP_REASON" ]; then
     pshow="LANDING (not on the remote: $DP_REASON)"
@@ -6331,14 +6491,40 @@ resolve_holder_worktree() { # run-state file -> 0 holds, 1 not here, 2 no run br
 # because a zero from it would read as moved-just-now — the reassuring-zero class `--audit` refuses
 # the same way.
 print_liveness() { # slug
-  local slug="$1" rel ph state d dref w sid pid kid alive newest src dead sidecar f tp last stale verdict lc hw
+  local slug="$1" rel ph
   check_slug "$slug" || return 1
   rel=$(runmd_of "$slug")
   [ -f "$rel" ] || { fail 52 "no run-state file, so there is no run whose liveness can be graded: $rel"; return 1; }
   # The RECORDED phase, through its reader (the gate leg's phase-reader routing check): this verb
   # takes no network, and the derived reader asks the remote for its tip, while the OFFLINE half of
-  # that derivation is `finished-unstamped` below.
+  # that derivation is `finished-unstamped` and the landed hand-off below.
   ph=$(read_recorded_phase "$rel"); [ -n "$ph" ] || ph=absent
+  if ! derive_liveness "$slug" "$rel" "$ph"; then
+    fail 52 "the liveness cannot be measured on this node, because a probe it needs answered nothing, so no verdict is answerable and a zero from a dead probe would read as moved-just-now: $LV_DEAD"; return 1
+  fi
+  # `stale-bound` after the verdict: the number `stale` was graded against, printed so the
+  # resume tick bounds its in-flight skip by THIS reader's bound instead of reading the key itself
+  # — a second reader would be a second copy of its default (closing review round 2, defect D).
+  # `holder-ref` LAST, the fifteenth key: the branch ELSEWHERE was keyed on, so the tick names it
+  # and skips a record naming none without a second spelling of the key.
+  printf 'phase: %s\nstate: %s\ndefault-branch: %s\nsession: %s\npid: %s\nkeepalive: %s\npid-alive: %s\nlast-move: %s\nlast-move-source: %s\ntranscript: %s\nlast-stall: %s\nstale: %s\nverdict: %s\nstale-bound: %s\nholder-ref: %s\n' \
+    "$ph" "$LV_STATE" "$LV_DREF" "$LV_SID" "$LV_PID" "$LV_KID" "$LV_ALIVE" "$LV_MOVE" "$LV_SRC" "${LV_TP:-absent}" "$LV_LAST" "$LV_STALE" "$LV_VERDICT" "$RESUME_STALE_BOUND" "${HW_REF:-absent}"
+  return 0
+}
+
+# TOOL-dUnstuckLanding-14 - THE VERDICT HALF OF `--liveness`, factored out so `--settle` reads the
+# verdict without printing it; `print_liveness` prints exactly what it printed before. Status 1 is a
+# dead probe, named in LV_DEAD, and no verdict is set. Globals, so no caller runs it in a substitution.
+#
+# S2 - A LANDED HAND-OFF IS TERMINAL, offline. A HELD record under a hand-off code whose landing
+# commit (`read_landing_commit` with the hand-off codes) is an ancestor of the ref the
+# `finished-unstamped` test already resolves reads `terminal`: the out-of-session reader agrees with
+# `--status` without the network round-trip its contract forbids. A fetch it has not seen reads HELD.
+LV_STATE=""; LV_DREF=""; LV_SID=""; LV_PID=""; LV_KID=""; LV_ALIVE=""; LV_MOVE=""; LV_SRC=""; LV_TP=""
+LV_LAST=""; LV_STALE=""; LV_VERDICT=""; LV_DEAD=""
+derive_liveness() { # slug · run-state file · recorded phase -> 0 with LV_*, 1 with LV_DEAD
+  local slug="$1" rel="$2" ph="$3" state d dref w sid pid kid alive newest src dead sidecar f tp last stale verdict lc hw
+  LV_STATE=""; LV_VERDICT=""; LV_DEAD=""
   # THE REF THE ANCESTRY TEST USES, resolved whether or not the test runs, so a skipped test is
   # announced as `unresolved` rather than read as `live`. The remote-tracking ref when it exists,
   # the local branch otherwise; `default_branch` reads GOV_DEFAULT_BRANCH then origin/HEAD.
@@ -6358,6 +6544,10 @@ print_liveness() { # slug
   if is_terminal "$ph"; then
     state=terminal
   elif [ -n "$lc" ] && read_landed_observation "$slug" "$lc"; then
+    state=terminal
+  elif [ "$ph" = HELD ] && [ "$dref" != unresolved ] && check_handoff_code "$(fact "$rel" hold-code)" \
+       && lc=$(read_landing_commit "$rel" "$HOLD_CODES_HANDOFF" 2>/dev/null) \
+       && GIT merge-base --is-ancestor "$lc" "$dref" 2>/dev/null; then
     state=terminal
   elif [ "$ph" = HELD ]; then
     state=held
@@ -6394,9 +6584,7 @@ print_liveness() { # slug
   # verdict printed over it would be a guess an actor that kills then acts on.
   hw=0; resolve_holder_worktree "$rel" || hw=$?
   if [ "$hw" = 1 ] && [ "$HW_HEAD" = unreadable ] && [ -z "$dead" ]; then dead="git symbolic-ref -q HEAD"; fi
-  if [ -n "$dead" ]; then
-    fail 52 "the liveness cannot be measured on this node, because a probe it needs answered nothing, so no verdict is answerable and a zero from a dead probe would read as moved-just-now: $dead"; return 1
-  fi
+  if [ -n "$dead" ]; then LV_DEAD="$dead"; return 1; fi
   # THE LAST RECORDED STALL, verbatim and uninterpreted: the stall-recorder writes the file and this
   # verb reads its last line. Absent or empty is `none`, a value and not a refusal.
   last=none; f="$sidecar/stall.$slug.log"
@@ -6412,13 +6600,9 @@ print_liveness() { # slug
   elif [ "$sid" = absent ]; then verdict=UNBOUND
   elif [ "$stale" = yes ]; then verdict=STALE
   else verdict=LIVE; fi
-  # `stale-bound` after the verdict: the number `stale` was graded against, printed so the
-  # resume tick bounds its in-flight skip by THIS reader's bound instead of reading the key itself
-  # — a second reader would be a second copy of its default (closing review round 2, defect D).
-  # `holder-ref` LAST, the fifteenth key: the branch ELSEWHERE was keyed on, so the tick names it
-  # and skips a record naming none without a second spelling of the key.
-  printf 'phase: %s\nstate: %s\ndefault-branch: %s\nsession: %s\npid: %s\nkeepalive: %s\npid-alive: %s\nlast-move: %s\nlast-move-source: %s\ntranscript: %s\nlast-stall: %s\nstale: %s\nverdict: %s\nstale-bound: %s\nholder-ref: %s\n' \
-    "$ph" "$state" "$dref" "$sid" "$pid" "$kid" "$alive" "$((TC_NOW - newest))" "$src" "${tp:-absent}" "$last" "$stale" "$verdict" "$RESUME_STALE_BOUND" "${HW_REF:-absent}"
+  LV_STATE="$state"; LV_DREF="$dref"; LV_SID="$sid"; LV_PID="$pid"; LV_KID="$kid"; LV_ALIVE="$alive"
+  LV_MOVE="$((TC_NOW - newest))"; LV_SRC="$src"; LV_TP="$tp"; LV_LAST="$last"; LV_STALE="$stale"
+  LV_VERDICT="$verdict"
   return 0
 }
 
@@ -6634,6 +6818,15 @@ verb_resume() { # slug
   # already carries reads LANDED by derivation and takes the row below.
   if [ -n "$KID" ]; then refuse_if_terminal "$rel" --resume --recorded || return 1; fi
   if is_terminal "$p"; then
+    # TOOL-dUnstuckLanding-14 S3 - A HAND-OFF AN OWNER LANDED HAS NOTHING TO RESUME, and it is
+    # never the re-bind below, which is a pushed LANDING's: its recorded HELD would otherwise take
+    # the HELD take-over row. The verb that writes what git proves is named; nothing is written.
+    if [ "$DP_BY" = attended ]; then
+      ok="${DP_LANDING:0:8} is on $DP_AREF at ${DP_TIP:0:8}"
+      verb_status "$slug" || true
+      echo "unattended: nothing to resume — this hand-off was landed by its owner: its record's commit $ok, so write that durably with --settle $slug; nothing was written"
+      return 0
+    fi
     # TOOL-dDerivedDocket-61 S8 - A PUSHED LANDING `--landed` HAS NOT YET OBSERVED IS RE-BOUND. Past
     # the recorded refusal above, a derived terminal carrying a landing commit can only be a recorded
     # LANDING read LANDED, so no second phase read is needed. `fail 55` sends a session the record
@@ -10612,7 +10805,8 @@ case "$VERB" in
   --abort)     verb_abort "$SLUG" "$REASON" "$HALT_CODE" ;;
   --hold)      run_hold "$SLUG" "$HALT_CODE" "$HOLD_UNTIL" "$REASON" "$HOLD_REAPED" "$HOLD_UNREACH" "$HOLD_RUN" ;;
   --handoff)   run_handoff "$SLUG" "$HALT_CODE" "$REASON" "$HOLD_REAPED" "$HOLD_UNREACH" ;;
-  --park)     verb_park "$SLUG" "$PK_ITEM" "$REASON" ;;
+  --settle)    run_settle "$SLUG" ;;
+  --park)    verb_park "$SLUG" "$PK_ITEM" "$REASON" ;;
   --propose)   verb_propose "$SLUG" "$PK_ITEM" "$PK_STEP" "$REASON" ;;
   --brief)     verb_brief "$SLUG" "$BR_UNIT" "$RP_PATH" ;;
   --review)    verb_review "$SLUG" "$RV_SUBJECT" "$VERDICT" "$RV_BLOCKERS" "$RV_DISPOSITION" ;;
