@@ -1,6 +1,6 @@
 # TOOL-aWindowedPass-1 — check 23 counts only a pass whose window overlapped a sibling pass's
 
-**Status:** CLOSED · rev-3 · 2026-10-04 · node a · Tier-2 · base 886b089d · streams tooling · order 3 · ratified 2026-10-04
+**Status:** CLOSED · rev-4 · 2026-10-04 · node a · Tier-2 · base 886b089d · streams tooling · order 3 · ratified 2026-10-04
 
 <!-- gen:spec-records -->
 
@@ -117,6 +117,8 @@ none
 - rev-3 · 2026-10-04 · closing review r1 · S1 · §6 · H1 · M7 · every negative check-23 arm now dispatches beside a bound
   sibling, and a self-scan arm reds one that dispatches unbound, since the solo rule had made eight
   of them unable to fail; the unresolvable-base fallback has an arm of its own.
+- rev-4 · 2026-10-04 · closing review r2 · §6 · M3 · L1 · the H1 self-scan counts the negative arms it graded and
+  reds on zero or an unread file, observed red by rewording its region anchor.
 
 ## 10. Reuse audit
 

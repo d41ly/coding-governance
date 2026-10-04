@@ -46,7 +46,7 @@
 # The generated region holds NO copy: the unit list is DERIVED from the build README's already-derived,
 # already-byte-compared slice. One derivation in the tree; this file is not a second one.
 set -u
-KIT_UNATTENDED_VERSION=1.57   # gov:kit unattended@1.57 — kit identity; set HERE, never from .unattended.conf
+KIT_UNATTENDED_VERSION=1.58   # gov:kit unattended@1.58 — kit identity; set HERE, never from .unattended.conf
 
 # ------------------------------------------------------------------------------ the dereference pin
 # A sha is a NAME, and turning a name into bytes or into ancestry happens in the run's own object
@@ -9705,7 +9705,7 @@ CPOROWS
 # WHAT IT DOES NOT CHECK: a `--no-verify` commit never reaches it, and `Pass: none` is taken at its
 # word. Check 23 still grades both at the close.
 verb_check_commit() { # commit message file
-  local msg="$1" f rel="" ref slug trl subj rows r d o u decl st p q ok uncov briefs cmd kd head
+  local msg="$1" f rel="" ref slug trl subj rows r d o u decl st p q ok uncov uncovl briefs cmd kd head
   [ -f "$msg" ] || { fail 49 "--check-commit was given no readable commit message file: ${msg:-(none)}"; return 1; }
   # It runs on EVERY commit, so the candidates are narrowed by one grep for this branch's ref before
   # the holder predicate, which reads the record's facts, confirms each.
@@ -9722,7 +9722,10 @@ verb_check_commit() { # commit message file
   # nothing, and `%s` is the first PARAGRAPH joined, not its first line.
   trl=$(git interpret-trailers --parse <"$msg" 2>/dev/null | sed -n 's/^[Pp][Aa][Ss][Ss]: *//p' | tr '\n' ' ')
   trl=${trl//[^A-Za-z0-9-]/ }
-  subj=$(grep -v '^#' "$msg" | awk 'NF { p = 1 } p && !NF { exit } p { printf "%s ", $0 }')
+  # CR STRIPPED FIRST: the hook reads the editor's file before git's cleanup, and a CRLF blank line is
+  # `\r`, which is not blank to awk, so the paragraph never ended (closing review r2, M5). One awk and no
+  # `grep` stage: MSYS grep strips CR on its own, which hid this on one node and not on another.
+  subj=$(awk '{ sub(/\r$/, "") } /^#/ { next } NF { p = 1 } p && !NF { exit } p { printf "%s ", $0 }' "$msg")
   # ONE LINE PER OPEN ROW, `<unit> <declared paths>`, through the predicate `--dispatch` and `--audit`
   # already share, so this verb cannot call a pass open that they call closed. A row it calls closed
   # BECAUSE ITS PASS COMMIT IS HEAD is kept apart (`O` rows): that is `git commit --amend` on the pass
@@ -9752,7 +9755,9 @@ CCROWS
   fi
   # NO RENAME DETECTION (closing review r1, M1): porcelain `diff` lists a staged rename by its
   # destination alone, where check 23's `diff-tree` lists the deleted source too.
-  st=$(git diff --cached --no-renames --name-only 2>/dev/null)
+  # ...and NOT C-QUOTED: by default a non-ASCII path prints as `"docs/caf\303\251.md"`, which no
+  # declaration covers and no printed repair can name (closing review r2, M4).
+  st=$(git -c core.quotePath=false diff --cached --no-renames --name-only -z 2>/dev/null | tr '\0' '\n')
   # Repo-relative from git itself: KIT_DIR is the shell's spelling and ROOT is git's, and on MSYS the
   # two differ by drive form, so stripping one from the other leaves an absolute path in the command.
   kd=$(git -C "$KIT_DIR" rev-parse --show-prefix 2>/dev/null); kd=${kd%/}; [ -n "$kd" ] || kd=$KIT_DIR
@@ -9763,7 +9768,7 @@ CCROWS
       return 1
     fi
     briefs=$'\n'"$(read_brief_paths "" "$u" "$rel")"$'\n'
-    uncov=""
+    uncov=""; uncovl=""
     while IFS= read -r p; do
       [ -n "$p" ] || continue
       [ "$p" = "$rel" ] && continue
@@ -9773,7 +9778,7 @@ CCROWS
       for q in ${GENERATED_INDEXES:-}; do [ "$ok" = 1 ] && break; covers "${q%%:*}" "$p" && ok=1; done
       [ "$ok" = 1 ] && continue
       check_gen_region_only "HEAD:$p" ":$p" && continue
-      uncov="$uncov $p"
+      uncov="$uncov $p"; uncovl="$uncovl$p"$'\n'
     done <<CCST
 $st
 CCST
@@ -9787,7 +9792,13 @@ CCST
     if [ -n "$uncov" ]; then
       # SHELL-QUOTED, so the printed command runs as the argv it names (closing review r1, L1).
       printf -v cmd 'bash %q --dispatch %q --pass %q' "$kd/unattended.sh" "$slug" "$u"
-      for q in $(printf '%s\n' $decl $uncov | awk '!s[$0]++'); do printf -v cmd '%s --writes %q' "$cmd" "$q"; done
+      # ONE PATH PER LINE, never word-split or globbed: a staged `app/[id]/x` must not expand to a file it
+      # happens to match (closing review r2, L2). The recorded declaration holds no glob character.
+      while IFS= read -r q; do
+        [ -n "$q" ] && printf -v cmd '%s --writes %q' "$cmd" "$q"
+      done <<CCQ
+$( { printf '%s\n' $decl; printf '%s' "$uncovl"; } | awk 'NF && !s[$0]++')
+CCQ
       fail 49 "--check-commit: pass $u stages paths outside the set it declared before dispatch, and the declaration can still be widened because the pass has not committed:$uncov — widen it, then commit again: $cmd"
       return 1
     fi

@@ -3768,6 +3768,16 @@ git add -A && git commit -q -m "lane" -m "Pass: ARCH-tRun-1" --no-verify
 _bc_want=$(git rev-parse HEAD)
 _bc_got=$(cd "$TMP" && . "$TMP/$KIT_REL/lib-unattended.sh" && build_commit "$_bc_base..HEAD" ARCH-tRun-1 memory/builds/tRun "" "")
 same "build_commit takes the commit whose Pass: trailer names the unit" "$_bc_got" "$_bc_want"
+# ...and a `none` BESIDE the unit's id attributes that commit to nothing here too (closing review r2, M8)
+reset_tree
+_bc_base=$(git rev-parse HEAD)
+mkdir -p work && printf 'r\n' > work/rec.txt
+git add -A && git commit -q -m "lane prep" -m "$(printf 'Pass: none\nPass: ARCH-tRun-1')" --no-verify
+printf 'a\n' > work/one.txt
+git add -A && git commit -q -m "lane" -m "Pass: ARCH-tRun-1" --no-verify
+_bc_want=$(git rev-parse HEAD)
+_bc_got=$(cd "$TMP" && . "$TMP/$KIT_REL/lib-unattended.sh" && build_commit "$_bc_base..HEAD" ARCH-tRun-1 memory/builds/tRun "" "")
+same "build_commit passes over a commit whose trailer pairs none with the unit" "$_bc_got" "$_bc_want"
 
 # ---- THE SKIPS ANNOUNCE. A run with no declaration would otherwise be green over nothing, and the
 # ---- default run must still print nothing.
@@ -4065,8 +4075,13 @@ _h1=$(awk '/^# ---- check 23 \(TOOL-dUnstalledConvoy-10\)/ { on = 1 } /^# ---- A
   on && /^reset_tree/ { live = ($0 ~ /bindrun/); disp = 0 }
   on && /^(odrow|bindrun)/ { live = 1 }
   on && /^(drow|drows|gdrows|odrow) / { disp = 1 }
-  on && /^miss .*"(UNATTENDED )?check 23 FAILED"/ { if (disp && !live) print NR }' "$HERE/${0##*/}")
-same "every negative check-23 arm that dispatches runs bound, so its miss can fail" "$_h1" ""
+  on && /^miss .*"(UNATTENDED )?check 23 FAILED"/ { n++; if (disp && !live) print NR }
+  END { print "graded=" n + 0 }' "$HERE/${0##*/}"); _h1rc=$?
+# LIVENESS (closing review r2, M3): a scan that read nothing - its anchor reworded, its file unread -
+# printed an empty list and passed. It must have read the file and graded at least one negative arm.
+same "the H1 self-scan read this suite, exit code" "$_h1rc" "0"
+same "the H1 self-scan graded at least one negative check-23 arm" "$(printf '%s\n' "$_h1" | sed -n 's/^graded=//p' | awk '{ print ($1 > 0) ? "yes" : "no" }')" "yes"
+same "every negative check-23 arm that dispatches runs bound, so its miss can fail" "$(printf '%s\n' "$_h1" | grep -v '^graded=')" ""
 
 # ---- check 15 (TOOL-dUnstalledConvoy-2): the ancestry half now branches on the RECORDED anchor kind.
 # ---- A `local` record is a claim about ONE clone — the protocol calls it a record of a merge rather

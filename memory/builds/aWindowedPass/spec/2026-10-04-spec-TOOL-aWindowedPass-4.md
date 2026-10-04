@@ -1,6 +1,6 @@
 # TOOL-aWindowedPass-4 — kits declare their generated outputs, and the unattended kit reads them
 
-**Status:** CLOSED · rev-2 · 2026-10-04 · node a · Tier-2 · base 886b089d · streams tooling · order 1 · ratified 2026-10-04
+**Status:** CLOSED · rev-3 · 2026-10-04 · node a · Tier-2 · base 886b089d · streams tooling · order 1 · ratified 2026-10-04
 
 <!-- gen:spec-records -->
 
@@ -27,8 +27,9 @@ their `kit.toml`, and gives the unattended kit ONE resolver that every reader ca
 - **S1** — memory-tree's `kit.toml` declares `[[generated]]` rows for `{memory_root}/LIVE.md`,
   `{memory_root}/ledger` and `{memory_root}/backlog` (generator `gen_build_index.py`),
   `{memory_root}/backlog` (generator `backlog.py`) and `{memory_root}/gotchas/INDEX.md` (generator
-  `gotchas.py`); codebase-map's declares `{map_root}/generated` (generator `gen_map.py`). Observed by
-  AC1.
+  `gotchas.py`); codebase-map's declares `{map_root}/generated` (generator `gen_map.py`). The two
+  backlog rows carry `when = ".memory-tree.conf:BACKLOG_MODE=builds"`: the backlog is generated only
+  in that mode, and authored and a shared record otherwise. Observed by AC1.
 - **S2** — `resolve_generated_indexes` in `tools/unattended/lib-unattended.sh` reads every
   `<tool root>/*/kit.toml` beside the unattended kit, resolves `{memory_root}`, `{map_root}` and
   `{kit}`, and prints the effective `index:generator` pairs: the declared rows, then the conf's
@@ -40,8 +41,9 @@ their `kit.toml`, and gives the unattended kit ONE resolver that every reader ca
 - **S4** — `GENERATED_INDEXES` becomes optional and additive: this repo's `.unattended.conf` and the
   shipped example declare it blank, and the adopter stops stamping it. Observed by AC4.
 - **S5** — govkit selfcheck refuses a `[[generated]]` row whose generator is not a file the kit
-  ships, or whose path names a token other than `{memory_root}`, `{map_root}` or `{kit}`. Observed by
-  AC5.
+  ships, whose path leaves any brace once `{memory_root}`, `{map_root}` and `{kit}` are removed, whose
+  `when` is not `<conf>:<KEY>=<value>`, or whose rows the shell reader does not read exactly as tomllib
+  does. Observed by AC5.
 
 ## 3. Non-goals (OUT)
 
@@ -63,10 +65,13 @@ generator = "gen_build_index.py"
 why = "rendered from every build's front matter on every spec status move"
 ```
 
-The resolver parses the three keys with awk, line by line inside a `[[generated]]` table, the same
-constrained TOML subset the kit's other readers parse. `{memory_root}` comes from the unattended
-conf's `MEMORY_ROOT`, `{map_root}` from `.codebase-map.conf`'s `MAP_ROOT` (default `memory/map`, the
-default `map_lib.load_conf` applies), and `{kit}` from the descriptor's directory.
+The resolver parses four keys with awk, line by line inside a `[[generated]]` table: `path`,
+`generator`, `why` and the optional `when`, each at column 0 as a double-quoted string, which is the
+subset selfcheck 6c holds it to. `{memory_root}` comes from the unattended conf's `MEMORY_ROOT`,
+`{map_root}` from `.codebase-map.conf`'s `MAP_ROOT` (default `memory/map` only when the key is
+absent; a blank value is kept, as `map_lib.load_conf` keeps it), and `{kit}` from the descriptor's
+directory. A row with `when = "<conf>:<KEY>=<value>"` applies only when that conf, at the repo root,
+assigns KEY exactly that value, read by `read_conf_value` as bash sourcing would.
 
 ### Files touched (estimate)
 
@@ -134,6 +139,11 @@ none
   unconditional rows refused every adopter's conf at load; `read_conf_value` reads `MAP_ROOT` and a
   `when` key as bash sourcing would; selfcheck 6c grades a path as the reader resolves it and a
   `when`'s shape; the effective set is reported without per-pair sources.
+- rev-3 · 2026-10-04 · closing review r2 · S1 · S5 · §4 · §5 · M2 · M6 · M7 · M10 · L3 · L5 · selfcheck 6c also refuses
+  rows the shell reader does not read exactly as tomllib, and a `when` not shaped `<conf>:<KEY>=<value>`,
+  each observed red; `read_conf_value` has a parity arm against `map_lib` and `tree_lib` over one
+  spelling table, and keeps a blank `MAP_ROOT`; S1, S5 and §4 name `when` and the four keys, and the
+  unattended kit README documents the row shape.
 
 ## 10. Reuse audit
 

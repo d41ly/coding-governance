@@ -1,11 +1,12 @@
 # TOOL-aWindowedPass-6 — an amend of a committed pass is refused without a widening the close would not honour
 
-**Status:** OPEN · rev-1 · 2026-10-04 · node a · Tier-2 · base 886b089d · streams tooling · order 6
+**Status:** CLOSED · rev-1 · 2026-10-04 · node a · Tier-2 · base 886b089d · streams tooling · order 6 · ratified 2026-10-04
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-04-build-TOOL-aWindowedPass-6-1-acceptance-ledger.md](../build/2026-10-04-build-TOOL-aWindowedPass-6-1-acceptance-ledger.md) | journal | — |
 | [2026-10-04-prompt-TOOL-aWindowedPass-6-2-build-brief.md](../prompts/2026-10-04-prompt-TOOL-aWindowedPass-6-2-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->

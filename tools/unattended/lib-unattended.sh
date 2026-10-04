@@ -506,7 +506,7 @@ is_repo_root() {
 # tolerates an `export ` prefix, an inline comment and CRLF, and a reader re-deriving the same key more
 # strictly is two answers to one question. Whitespace right after `=` is an empty value, a quoted value
 # ends at its matching quote, an unquoted one at the first whitespace, and the last assignment wins.
-read_conf_value() { # conf file · key -> its value, or nothing when the file or the key is absent
+read_conf_value() { # conf file · key -> its value; exit 1 when the file or the key is absent, so a BLANK value is told from none
   awk -v k="$2" '
     { sub(/\r$/, ""); s = $0; sub(/^[ \t]+/, "", s); sub(/^export[ \t]+/, "", s)
       if (index(s, k "=") != 1) next
@@ -516,7 +516,7 @@ read_conf_value() { # conf file · key -> its value, or nothing when the file or
       else if (v ~ /^\047/) { v = substr(v, 2); i = index(v, "\047"); if (i) v = substr(v, 1, i - 1) }
       else sub(/[ \t].*$/, "", v)
       out = v; got = 1 }
-    END { if (got) print out }' "$1" 2>/dev/null || :
+    END { if (got) print out; else exit 1 }' "$1" 2>/dev/null
 }
 SHARED_RECORDS_UNDECLARED="__kit-default__"
 resolve_shared_records() { # declared value · memory root -> the effective set
@@ -552,8 +552,9 @@ resolve_generated_indexes() { # repo root · declared GENERATED_INDEXES · memor
   _rg_kitrel=$(git -C "${_rg_here:-.}" rev-parse --show-prefix 2>/dev/null) || _rg_kitrel=""
   _rg_kitrel=${_rg_kitrel%/}
   case "$_rg_kitrel" in */*) _rg_tool=${_rg_kitrel%/*} ;; *) _rg_tool="" ;; esac
-  _rg_map=$(read_conf_value "$_rg_root/.codebase-map.conf" MAP_ROOT)
-  [ -n "$_rg_map" ] || _rg_map="memory/map"
+  # ABSENT takes the kit default; present and BLANK is kept, as `map_lib.load_conf` keeps it, and then
+  # `{map_root}/` resolves to nothing rather than to an absolute `/` (closing review r2, L5).
+  _rg_map=$(read_conf_value "$_rg_root/.codebase-map.conf" MAP_ROOT) || _rg_map="memory/map"
   # Both loops read SCRATCH FILES, never a pipe, a process substitution or a here-string over one:
   # memory/gotchas/bounded-through-a-pipe-is-unbounded.md, and the shell-hygiene leg that bans it.
   local _rg_lf _rg_rf
@@ -577,6 +578,7 @@ resolve_generated_indexes() { # repo root · declared GENERATED_INDEXES · memor
         _rg_kv=${_rg_w#*:}
         [ "$(read_conf_value "$_rg_root/${_rg_w%%:*}" "${_rg_kv%%=*}")" = "${_rg_kv#*=}" ] || continue
       fi
+      [ -n "$_rg_map" ] || _rg_p=${_rg_p//\{map_root\}\//}
       _rg_p=${_rg_p//\{memory_root\}/$_rg_mem}; _rg_p=${_rg_p//\{map_root\}/$_rg_map}
       _rg_p=${_rg_p//\{kit\}/$_rg_krel}
       case "$_rg_p" in

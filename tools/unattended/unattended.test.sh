@@ -5739,6 +5739,36 @@ hit "$out" "--dispatch declares a path a sibling pass in the same group already 
 out=$(run --dispatch tRun --pass ARCH-tRun-2 --writes ${PFX}z.sh)
 hit "$out" "dispatch declared"
 
+# ---- read_conf_value AGREES WITH THE KITS THAT OWN THE CONFS (closing review r2, M6, L3, L5). It reads
+# ---- `MAP_ROOT` for the codebase map and a `when` key such as `BACKLOG_MODE` for memory-tree, without
+# ---- sourcing either conf, so one spelling table is fed to it and to each owner's own parser. Absent
+# ---- and blank are compared as the consumer sees them: an absent `MAP_ROOT` is the kit default, and
+# ---- `BACKLOG_MODE` matters only as equal to `builds` or not.
+_rcv_root=$(git -C "$HERE" rev-parse --show-toplevel)
+_rcv_cm="$_rcv_root/$(resolve_kit_dir "$_rkd_py" codebase-map map_lib.py "$HERE")"
+_rcv_mt="$_rcv_root/$MT_KIT_DIR"
+_rcv_d=$(mktemp -d)
+_rcv_n=0
+for _rcv_f in 'K=v' 'K="v"' "K='v'" 'export K=v' 'K=v # c' 'K="v" # c' 'K=' 'K=""' '  K=v' 'K=v\r' '# K=v' 'K= v' 'K=v\nK=w'; do
+  # MAP_ROOT against map_lib.load_conf, the absent case resolving to the kit default on both sides
+  printf "${_rcv_f//K/MAP_ROOT}\n" | sed 's/\bv\b/docs\/map/; s/\bw\b/docs\/other/' > "$_rcv_d/.codebase-map.conf"
+  _rcv_sh=$(read_conf_value "$_rcv_d/.codebase-map.conf" MAP_ROOT) || _rcv_sh=memory/map
+  _rcv_py=$("$_rkd_py" -c "import sys, pathlib; sys.path.insert(0, sys.argv[1]); import map_lib; print(map_lib.load_conf(pathlib.Path(sys.argv[2]))['MAP_ROOT'])" "$_rcv_cm" "$_rcv_d" 2>&1 | tr -d '\r')
+  same "read_conf_value reads MAP_ROOT as map_lib does: $_rcv_f" "$_rcv_sh" "$_rcv_py"
+  # BACKLOG_MODE against tree_lib.parse_conf, compared as the `when` test reads it: equal to builds or not
+  printf "${_rcv_f//K/BACKLOG_MODE}\n" | sed 's/\bv\b/builds/; s/\bw\b/shards/' > "$_rcv_d/.memory-tree.conf"
+  _rcv_sh=$(read_conf_value "$_rcv_d/.memory-tree.conf" BACKLOG_MODE) || _rcv_sh=""
+  _rcv_py=$("$_rkd_py" -c "import sys, pathlib; sys.path.insert(0, sys.argv[1]); import tree_lib; print(tree_lib.parse_conf(pathlib.Path(sys.argv[2]).read_text(encoding='utf-8'), {}).get('BACKLOG_MODE', ''))" "$_rcv_mt" "$_rcv_d/.memory-tree.conf" 2>&1 | tr -d '\r')
+  same "read_conf_value reads BACKLOG_MODE=builds as tree_lib does: $_rcv_f" "$([ "$_rcv_sh" = builds ] && echo y || echo n)" "$([ "$_rcv_py" = builds ] && echo y || echo n)"
+  _rcv_n=$((_rcv_n + 1))
+done
+same "the read_conf_value parity table graded every spelling" "$_rcv_n" "13"
+# L5: a BLANK MAP_ROOT is kept, so `{map_root}/generated` resolves to `generated`, as map_lib writes it
+printf 'MAP_ROOT=""\n' > "$_rcv_d/.codebase-map.conf"
+same "read_conf_value keeps a blank MAP_ROOT rather than defaulting it" "$(read_conf_value "$_rcv_d/.codebase-map.conf" MAP_ROOT; echo "rc=$?")" "
+rc=0"
+rm -rf "$_rcv_d"
+
 # ---- --check-commit (TOOL-aWindowedPass-3): check 23 asked at COMMIT time, while the declaration can
 # ---- still be widened. The fixture run is bound to this worktree's branch by preflight's run-branch.
 build_specced_tree
@@ -5820,6 +5850,23 @@ printf 'records\n\nPass: none\nPass: ARCH-tRun-1\n' > "$CCM"
 out=$(run --check-commit "$CCM"); rc=$?
 same "--check-commit takes Pass: none beside an id as none, exit code" "$rc" "0"
 git reset -q --hard; rm -f ${PFX}stray.sh
+# closing review r2, M4: a non-ASCII staged path is named as written, never C-quoted
+printf 'n\n' > "${PFX}café.sh"; git add -A >/dev/null
+printf 'ARCH-tRun-1 builds its lane\n\nPass: ARCH-tRun-1\n' > "$CCM"
+out=$(run --check-commit "$CCM"); rc=$?
+same "--check-commit names a non-ASCII stray path, exit code" "$rc" "1"
+hit  "$out" "${PFX}café.sh"
+miss "$out" "\"${PFX}caf"   # git's C-quoted form; the %q of the printed command is a separate, valid spelling
+git reset -q --hard; rm -f "${PFX}café.sh"
+# closing review r2, L2: the printed repair quotes a path holding a shell metacharacter
+printf 'b\n' > "${PFX}stray(1).sh"; git add -A >/dev/null
+out=$(run --check-commit "$CCM"); rc=$?
+hit  "$out" "--writes ${PFX}stray\\(1\\).sh"
+git reset -q --hard; rm -f "${PFX}stray(1).sh"
+# closing review r2, M5: a CRLF message whose BODY names the open pass and whose subject does not
+printf 'lane work\r\n\r\nmentions ARCH-tRun-1 in the body\r\n' > "$CCM"
+out=$(run --check-commit "$CCM"); rc=$?
+same "--check-commit reads a CRLF message's subject paragraph alone, exit code" "$rc" "0"
 # L4 + M10: the brief rows, a gen-region-only change and a REAL run-state line are all subtracted
 BRIEFP=memory/builds/tRun/prompts/2026-08-21-prompt-ARCH-tRun-1-1-build-brief.md
 mkdir -p memory/builds/tRun/prompts && printf '# brief\n' > "$BRIEFP"
@@ -5868,7 +5915,14 @@ git checkout -q -b cc-hook-unbound
 out=$(bash "$REAL_ROOT/.githooks/commit-msg" "$CCM" 2>&1); rc=$?
 same "the commit-msg hook lets a commit through when no run is bound, exit code" "$rc" "0"
 git checkout -q unit; git branch -q -D cc-hook-unbound
-[ -z "$_cckit" ] || rm -rf "./$KIT_REL"; git reset -q --hard
+# closing review r2, L4: a conf with no kit beside it is announced, and the commit goes through
+[ -z "$_cckit" ] || rm -rf "./$KIT_REL"
+if [ -n "$_cckit" ]; then
+  out=$(bash "$REAL_ROOT/.githooks/commit-msg" "$CCM" 2>&1); rc=$?
+  same "the commit-msg hook lets a commit through when the kit is absent, exit code" "$rc" "0"
+  hit  "$out" "the commit-time check did NOT run"
+fi
+git reset -q --hard
 rm -f "$CCM"
 
 # ---- CONDITION 3, FLAT HALF: the records the method names outright, plus the derived run-state file.

@@ -2663,6 +2663,26 @@ user_skills = "/tmp/gk-fake-skills"
               r6t.returncode != 0 and "entry 'codebase-map' [[generated]] row" in r6t.stdout,
               r6t.stdout[-1200:] + r6t.stderr[-300:])
         gk.write_text(gkeep, encoding="utf-8")
+        # closing review r2, M2 and M7: a row tomllib reads but the shell reader mangles or drops, and a
+        # `when` the reader cannot evaluate, are each refused, on memory-tree's conditional rows.
+        mk = gcopy / PFX / KIT_NAMES["memory-tree"] / "kit.toml"
+        mkeep = mk.read_text(encoding="utf-8")
+        for _lbl, _old, _new, _want in (
+                ("single-quoted when", 'when = ".memory-tree.conf:BACKLOG_MODE=builds"',
+                 "when = '.memory-tree.conf:BACKLOG_MODE=builds'", "rows read by the unattended kit's shell reader"),
+                ("indented key", 'generator = "gotchas.py"', '  generator = "gotchas.py"',
+                 "rows read by the unattended kit's shell reader"),
+                ("when with no conf part", 'when = ".memory-tree.conf:BACKLOG_MODE=builds"',
+                 'when = "BACKLOG_MODE=builds"', "a when shaped <conf>:<KEY>=<value>")):
+            _m6 = mkeep.replace(_old, _new)
+            check(f"[aWP r2] LIVENESS the staged memory-tree descriptor really carries a {_lbl}",
+                  _m6 != mkeep, "the replace matched nothing in the memory-tree descriptor")
+            mk.write_text(_m6, encoding="utf-8")
+            r6m = _run_selfcheck(gcopy)
+            check(f"[aWP r2] selfcheck 6c refuses a [[generated]] row with a {_lbl}",
+                  r6m.returncode != 0 and "entry 'memory-tree' [[generated]] row" in r6m.stdout
+                  and _want in r6m.stdout, r6m.stdout[-1200:] + r6m.stderr[-300:])
+            mk.write_text(mkeep, encoding="utf-8")
 
         # --- DEPL-aRepatriatedFork-14 AC4: arm 7j2, an entry declaring no `[check]` table at all.
         tc = gcopy / PFX / KIT_NAMES["govkit"] / "entries" / "check-testsuite-counts.kit.toml"

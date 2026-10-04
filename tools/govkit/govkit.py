@@ -1988,9 +1988,40 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
     #          The path is graded AS THE READER RESOLVES IT (closing review r1, M9): the three tokens are
     #          removed and any brace left is a row the reader skips, whatever its case or balance. A
     #          `when` is `<conf file>:<KEY>=<value>`, the one shape the reader evaluates.
+    #          AND THE ROWS THEMSELVES ARE THE ONES THE SHELL READER SEES (closing review r2, M2). The reader
+    #          is a column-0, double-quote-only awk in `resolve_generated_indexes`; a single-quoted or
+    #          indented value parses in tomllib and is mangled or dropped there, so its rows - ported line
+    #          for line below - must equal tomllib's, or the row is graded on values no reader uses.
+    def _read_shell_generated_rows(text):
+        rows, on, cur = [], False, None
+
+        def _read_quoted_value(s):
+            s = re.sub(r'^[^=]*=[ \t]*"', "", s, count=1)
+            return re.sub(r'".*$', "", s, count=1)
+        for line in text.split("\n"):
+            line = line[:-1] if line.endswith("\r") else line
+            if re.match(r"^\[\[generated\]\][ \t]*$", line) or line.startswith("["):
+                if on and cur["p"]:
+                    rows.append((cur["p"], cur["g"], cur["w"]))
+                on = bool(re.match(r"^\[\[generated\]\][ \t]*$", line))
+                cur = {"p": "", "g": "", "w": ""}
+                continue
+            for key, k in (("path", "p"), ("generator", "g"), ("when", "w")):
+                if on and re.match(rf"^{key}[ \t]*=", line):
+                    cur[k] = _read_quoted_value(line)
+        if on and cur["p"]:
+            rows.append((cur["p"], cur["g"], cur["w"]))
+        return rows
     _gen_tokens = {"memory_root", "map_root", "kit"}
     _n_gen = 0
     for eid, (d, _dpath) in sorted(descs.items()):
+        _gtoml = [(str(_r.get("path") or ""), str(_r.get("generator") or ""), str(_r.get("when") or ""))
+                  for _r in d.get("generated", []) or [] if _r.get("path")]
+        _gshell = _read_shell_generated_rows((root / _dpath).read_text(encoding="utf-8")) if _gtoml else []
+        if _gtoml != _gshell:
+            r.fail(f"entry '{eid}' [[generated]] rows read by the unattended kit's shell reader differ from "
+                   f"tomllib's - write each key at column 0 as a double-quoted string: shell {_gshell} "
+                   f"vs tomllib {_gtoml}")
         for _gr in d.get("generated", []) or []:
             _n_gen += 1
             _gp, _gg = str(_gr.get("path") or ""), str(_gr.get("generator") or "")

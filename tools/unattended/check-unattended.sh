@@ -48,7 +48,7 @@
 # THE CORE SETS ARE READ FROM THE DRIVER, never restated here. A second spelling of `PHASES_CORE` one
 # file away from the thing that enforces it is the drift this leg exists to catch.
 set -u
-KIT_UNATTENDED_VERSION=1.57   # gov:kit unattended@1.57 — must match unattended.sh; check-kit-versions.sh pairs them
+KIT_UNATTENDED_VERSION=1.58   # gov:kit unattended@1.58 — must match unattended.sh; check-kit-versions.sh pairs them
 
 # ------------------------------------------------------------------------------ the dereference pin
 # Identical to the driver's, and for the identical reason: `git replace` rewrites what a sha MEANS for
@@ -3803,7 +3803,9 @@ DSSIBS
     # declaration is the defect.
     ds_run_graded=$((ds_run_graded + 1))
     dsout=""
-    for dsq in $(GIT diff-tree --no-commit-id --name-only -r "$dshit" 2>/dev/null | grep -v -x -F "$f"); do
+    # NOT C-QUOTED, as `--check-commit` lists the same paths (closing review r2, M4): a quoted non-ASCII
+    # path is covered by no declaration, so the two readers would disagree about it.
+    for dsq in $(GIT -c core.quotePath=false diff-tree --no-commit-id --name-only -r "$dshit" 2>/dev/null | grep -v -x -F "$f"); do
       # EXACT membership, deliberately not `covers`: that is a containment test, and a row naming a
       # directory would then hide everything under it.
       case "$dsbrief" in *"$dsnl$dsq$dsnl"*)

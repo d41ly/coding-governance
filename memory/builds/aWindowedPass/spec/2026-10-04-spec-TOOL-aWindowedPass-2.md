@@ -1,6 +1,6 @@
 # TOOL-aWindowedPass-2 — a pass commit carries a `Pass:` trailer, and the legs attribute by it
 
-**Status:** CLOSED · rev-3 · 2026-10-04 · node a · Tier-2 · base 886b089d · streams tooling · order 2 · ratified 2026-10-04
+**Status:** CLOSED · rev-4 · 2026-10-04 · node a · Tier-2 · base 886b089d · streams tooling · order 2 · ratified 2026-10-04
 
 <!-- gen:spec-records -->
 
@@ -123,6 +123,8 @@ none
   any non-id character and a `none` anywhere attributes the commit to nothing; check 23's ambiguity
   test reads a trailered commit's trailer, not its subject; §5 struck the per-walk announcement and
   attribution line, which the per-commit design never needed.
+- rev-4 · 2026-10-04 · closing review r2 · S1 · M8 · `log_attribution_tokens`'s `none` rule has a `build_commit` arm,
+  observed red with the rule removed.
 
 ## 10. Reuse audit
 

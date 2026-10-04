@@ -59,21 +59,21 @@ here and at adopters hold or abort. The owner's prompt is in `prompts/`.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 6 unit(s) · node a · opened 2026-10-04 · streams tooling
+**Build status:** CLOSED · 6 unit(s) · node a · opened 2026-10-04 · streams tooling
 ids TOOL-aWindowedPass-1 TOOL-aWindowedPass-2 TOOL-aWindowedPass-3 TOOL-aWindowedPass-4 TOOL-aWindowedPass-5 TOOL-aWindowedPass-6
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aWindowedPass-4 — kits declare their generated outputs, and the unattended kit reads them](spec/2026-10-04-spec-TOOL-aWindowedPass-4.md) | 1 | 2 | CLOSED | rev-2 | 2026-10-04 |
-| [TOOL-aWindowedPass-2 — a pass commit carries a `Pass:` trailer, and the legs attribute by it](spec/2026-10-04-spec-TOOL-aWindowedPass-2.md) | 2 | 2 | CLOSED | rev-3 | 2026-10-04 |
-| [TOOL-aWindowedPass-1 — check 23 counts only a pass whose window overlapped a sibling pass's](spec/2026-10-04-spec-TOOL-aWindowedPass-1.md) | 3 | 2 | CLOSED | rev-3 | 2026-10-04 |
+| [TOOL-aWindowedPass-4 — kits declare their generated outputs, and the unattended kit reads them](spec/2026-10-04-spec-TOOL-aWindowedPass-4.md) | 1 | 2 | CLOSED | rev-3 | 2026-10-04 |
+| [TOOL-aWindowedPass-2 — a pass commit carries a `Pass:` trailer, and the legs attribute by it](spec/2026-10-04-spec-TOOL-aWindowedPass-2.md) | 2 | 2 | CLOSED | rev-4 | 2026-10-04 |
+| [TOOL-aWindowedPass-1 — check 23 counts only a pass whose window overlapped a sibling pass's](spec/2026-10-04-spec-TOOL-aWindowedPass-1.md) | 3 | 2 | CLOSED | rev-4 | 2026-10-04 |
 | [TOOL-aWindowedPass-5 — each run is graded against zero; the repo-global ceiling is retired](spec/2026-10-04-spec-TOOL-aWindowedPass-5.md) | 4 | 2 | CLOSED | rev-3 | 2026-10-04 |
-| [TOOL-aWindowedPass-3 — a commit-time step refuses an open pass's undeclared write, naming the re-declare](spec/2026-10-04-spec-TOOL-aWindowedPass-3.md) | 5 | 2 | CLOSED | rev-3 | 2026-10-04 |
-| [TOOL-aWindowedPass-6 — an amend of a committed pass is refused without a widening the close would not honour](spec/2026-10-04-spec-TOOL-aWindowedPass-6.md) | 6 | 2 | OPEN | rev-1 | 2026-10-04 |
+| [TOOL-aWindowedPass-3 — a commit-time step refuses an open pass's undeclared write, naming the re-declare](spec/2026-10-04-spec-TOOL-aWindowedPass-3.md) | 5 | 2 | CLOSED | rev-4 | 2026-10-04 |
+| [TOOL-aWindowedPass-6 — an amend of a committed pass is refused without a widening the close would not honour](spec/2026-10-04-spec-TOOL-aWindowedPass-6.md) | 6 | 2 | CLOSED | rev-1 | 2026-10-04 |
 <!-- /gen:build-units -->
 
-Records: 14 bound to this build, across 4 record folder(s).
+Records: 15 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.57 -->
+<!-- gov:kit unattended@1.58 -->
 # The unattended-run kit
 
 The binding contract is not here. It is `UNATTENDED-PROTOCOL.md` together with
@@ -21,6 +21,14 @@ Run `adopt-unattended.sh` from this directory; `--check` verifies without writin
 
 Copied artifacts carry no placeholder, so rendering them would be a second spelling of `cat`. The
 rendered ones do carry placeholders, and for them a render is the only correct install.
+
+**A kit declares the outputs its generators write, and check 23 reads the declarations.** Each is a
+`[[generated]]` table in the kit's `kit.toml`, every key at column 0 as a double-quoted string:
+`path` (tokens `{memory_root}`, `{map_root}` and `{kit}` only), `generator` (a file beside the
+descriptor), `why`, and an optional `when = "<conf>:<KEY>=<value>"` that applies the row only when
+that repo-root conf assigns exactly that value. govkit selfcheck refuses any other shape, because
+the shell reader would mangle or drop it. `GENERATED_INDEXES` in `.unattended.conf` only ADDS pairs
+to these (`TOOL-aWindowedPass-4`).
 
 **One hook line is yours to wire, and no kit ships it.** Add
 `bash <kit>/unattended.sh --check-commit "$1"` to your own `commit-msg` hook, ahead of anything that

@@ -1,6 +1,6 @@
 # TOOL-aWindowedPass-3 — a commit-time step refuses an open pass's undeclared write, naming the re-declare
 
-**Status:** CLOSED · rev-3 · 2026-10-04 · node a · Tier-2 · base 886b089d · streams tooling · order 5 · ratified 2026-10-04
+**Status:** CLOSED · rev-4 · 2026-10-04 · node a · Tier-2 · base 886b089d · streams tooling · order 5 · ratified 2026-10-04
 
 <!-- gen:spec-records -->
 
@@ -127,6 +127,11 @@ none
   the close reads them; amending a pass commit reopens its row for a trailered commit; the suggested
   command is shell-quoted; the hook announces a conf with no kit, and an arm runs the hook itself;
   the run-state, brief and gen-region subtractions each have an arm.
+- rev-4 · 2026-10-04 · closing review r2 · S2 · S3 · §6 · M4 · M5 · L2 · L4 · staged paths are read NUL-delimited, so
+  a non-ASCII path is never C-quoted, and check 23's diff-tree reads them alike; the subject reader
+  strips CR in one awk with no grep stage; the printed repair is built one path per line with no
+  word split or glob; the hook's no-kit notice has an arm. The CRLF arm cannot be observed red on
+  node a, where MSYS awk and grep both drop CR in text-mode reads: an announced gap, not coverage.
 
 ## 10. Reuse audit
 
