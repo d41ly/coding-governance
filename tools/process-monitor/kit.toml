@@ -64,6 +64,9 @@ required_keys_render = []
 [adopt]
 argv = ["bash", "{kit}/adopt-process-monitor.sh"]
 mutates_index = false
+# DEPL-aHalvedInstall-3: why `update` never re-runs this adopter. A kit with an adopter declares
+# [[regenerate]] or this reason, and selfcheck refuses one declaring neither.
+why_no_regenerate = "the adopter grades the project's declaration and writes nothing: it creates no conf and wires no settings, so there is no artifact to go a vintage stale"
 
 [check]
 argv = ["bash", "{kit}/adopt-process-monitor.sh", "--check"]

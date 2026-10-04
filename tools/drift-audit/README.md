@@ -1,6 +1,6 @@
 # drift-audit kit
 
-`gov:kit drift-audit@1.21` — the marker a deployer greps; paired with `KIT_DRIFT_AUDIT_VERSION` in
+`gov:kit drift-audit@1.22` — the marker a deployer greps; paired with `KIT_DRIFT_AUDIT_VERSION` in
 `drift_report.py` and asserted equal by `<prefix>/check-kit-versions.sh`, which also holds each Tier-2
 harness's own `meta.version` to the same number.
 

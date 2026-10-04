@@ -29,7 +29,7 @@
 # config only inside it, and never writes into the real tree. Execution order is a scheduling detail;
 # REPORTING is always manifest order, so the output is byte-stable whatever the width.
 set -u
-KIT_RUN_GATES_VERSION=1.22   # gov:kit run-gates@1.22
+KIT_RUN_GATES_VERSION=1.23   # gov:kit run-gates@1.23
 # 1.21 -> 1.22: KITREL is asked of git when the prefix strip leaves it absolute, the MSYS mount
 # spelling (`/tmp/x` beside git's `C:/…/Temp/x`) the `cd … && pwd` fold does not reach; with it the
 # attribution's KF3 matched nothing for a tree under `/tmp`. Absorbed by aSightedSkeptic.

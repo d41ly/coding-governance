@@ -43,6 +43,17 @@ to = "{prefix}/playbook/registry.toml"
 argv = ["bash", "{prefix}/playbook/adopt-playbook.sh", "--target", "."]
 mutates_index = false
 
+# THE RE-RENDER an update runs by default; GOVKIT_RERENDER=0 declines it. DEPL-aHalvedInstall-3.
+# The adopter writes the charter region FROM THE ENGINE'S BYTES and `[check]` compares that region with
+# a fresh render, so without this block every renderer change landed, the region went one vintage
+# stale, the check redded and `update` rolled the kit back (GOVKIT_RERENDER on or off: there was no
+# block to run) -- at every adopter, on every renderer change. This kit ships no `rendered` ROW,
+# which is why the 3b-ii arm never asked it for one. The argv is the adopter's own write mode, which re-renders the gov:playbook region whatever it held.
+# `writes` names the default charter so a rollback restores it.
+[[regenerate]]
+argv = ["bash", "{prefix}/playbook/adopt-playbook.sh", "--target", "."]
+writes = ["AGENTS.md"]
+
 [check]
 argv = ["bash", "{prefix}/playbook/adopt-playbook.sh", "--target", ".", "--check"]
 

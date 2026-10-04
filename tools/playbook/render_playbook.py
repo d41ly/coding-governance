@@ -375,6 +375,17 @@ def build_substitution(text: str, key: str, val: str) -> str:
 
 
 # --------------------------------------------------------------------------- the region reader
+def write_region(charter_path: Path, body: str) -> None:
+    """The write mode's ONE write: the region rebuilt around `body`, whatever the file held.
+
+    DEPL-aHalvedInstall-3 rev-3. govkit's `update` runs this kit's write mode as its `[[regenerate]]`
+    unless GOVKIT_RERENDER=0 is exported, so the mode must replace an existing region in place and leave the authored prose around it
+    alone. Factored out of `main` so the selftest's run-twice arm calls the code the adopter runs."""
+    cur = charter_path.read_text(encoding='utf-8') if charter_path.is_file() else None
+    charter_path.parent.mkdir(parents=True, exist_ok=True)
+    charter_path.write_text(build_region(cur, body), encoding='utf-8', newline='\n')
+
+
 def build_region(charter: str | None, body: str) -> str:
     """Write `body` between the region markers. THREE states, and this reader serves all of them.
 
@@ -770,6 +781,30 @@ def run_selftest() -> int:
             failed += 1
             print(f'  arm FAIL a pipe in PROSE is left alone — got {body.strip()!r}')
 
+    # DEPL-aHalvedInstall-3 rev-3 (closing review M7). THE WRITE MODE IS `update`'s REGENERATE (on
+    # unless GOVKIT_RERENDER=0 is exported), so it
+    # must be idempotent over an adopted charter and must REPLACE the region on a changed body. A
+    # regression to append, or to a no-op, would roll this kit back at every adopter again.
+    with tempfile.TemporaryDirectory() as td:
+        eng, tgt = _write_fixture(Path(td), ok_kits, ok_var)
+        body, _ = render(eng, Path(td), tgt)
+        ch = tgt / 'ADOPTED.md'
+        ch.write_text('# authored head\n\nkept prose\n', encoding='utf-8')
+        write_region(ch, body)
+        once = ch.read_bytes()
+        write_region(ch, body)
+        twice = ch.read_bytes()
+        write_region(ch, body + 'a changed line\n')
+        changed = ch.read_text(encoding='utf-8')
+        ok = (once == twice and b'kept prose' in twice and 'a changed line' in changed
+              and changed.count(body.strip().splitlines()[0]) == 1 and 'kept prose' in changed)
+        if ok:
+            passed += 1
+        else:
+            failed += 1
+            print(f'  arm FAIL the write mode re-run is idempotent and replaces its region — '
+                  f'same={once == twice} changed={changed!r}')
+
     # DEPL-aRepatriatedFork-1. Each case is a whole fixture: a descriptor, a template and the
     # deploy.toml tail below `kits`, so an arm states exactly the input it is about.
     def arm_fixture(name: str, desc: str, tpl: str, deploy: str, want: str | None = None,
@@ -1058,9 +1093,7 @@ def main(argv: list[str]) -> int:
         print(f'render-playbook: REFUSED — placeholders survived the render: '
               f'{", ".join(sorted(set(survived)))}', file=sys.stderr)
         return 1
-    cur = charter_path.read_text(encoding='utf-8') if charter_path.is_file() else None
-    charter_path.parent.mkdir(parents=True, exist_ok=True)
-    charter_path.write_text(build_region(cur, body), encoding='utf-8', newline='\n')
+    write_region(charter_path, body)
     for n in notes:
         print(f'  {n}')
     print(f'render-playbook — wrote the gov:playbook region into {charter_path.as_posix()}')
@@ -1070,4 +1103,4 @@ def main(argv: list[str]) -> int:
 if __name__ == '__main__':
     raise SystemExit(main(sys.argv[1:]))
 
-KIT_PLAYBOOK_RENDER_VERSION = "1.20"  # gov:kit playbook-render@1.20
+KIT_PLAYBOOK_RENDER_VERSION = "1.22"  # gov:kit playbook-render@1.22

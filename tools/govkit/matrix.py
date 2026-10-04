@@ -498,11 +498,15 @@ def check_role_move(tmp: pathlib.Path) -> None:
     check("role move to a rendered row: ...and one conflict order names the row",
           len(_orders) == 1 and f"{PFX}demo/moved.txt" in _orders[0].read_text(encoding="utf-8"),
           str([o.name for o in _orders]))
-    check("role move to a rendered row: CEILING — the worktree copy is the regenerate's, at BOTH "
-          "vintages; this arm records a ceiling and grades no repair",
-          (tr / PFX / "demo" / "moved.txt").read_text(encoding="utf-8")
-          == "the regenerate output" + NL,
-          repr((tr / PFX / "demo" / "moved.txt").read_text(encoding="utf-8")))
+    # THE CEILING THIS ARM USED TO RECORD IS CLOSED by DEPL-aHalvedInstall-4. A refused row now
+    # holds its whole kit back, and a held kit's regenerate is DECLINED, so the render no longer
+    # lands over the edit the merge could not place: the operator's bytes stand in the worktree as
+    # well as the index, and the run names the hold.
+    check("role move to a rendered row: the refused row HOLDS the kit back, so its regenerate is "
+          "declined and the worktree copy keeps the adopter's bytes",
+          (tr / PFX / "demo" / "moved.txt").read_text(encoding="utf-8") == OWN
+          and "HELD BACK demo" in orr and "DECLINED demo: a row of this kit was refused" in orr,
+          repr((tr / PFX / "demo" / "moved.txt").read_text(encoding="utf-8")) + orr[-900:])
 
     # DEPL-aRepatriatedFork-17 S6, closing review round 1 M2. THE SAME EDITED FIXTURE UNDER
     # `--accept-role-moves`. The flag's branch sat ABOVE the reconciliation this unit built, so for

@@ -1565,6 +1565,66 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
                    f"narrow re-render entrypoint; the adopter's `[adopt]` argv is NOT one, it "
                    f"no-ops or refuses on an already-adopted tree")
 
+    # ---- 3b-iii (DEPL-aHalvedInstall-3): A KIT WITH AN ADOPTER DECIDES WHETHER `update` RE-RUNS IT.
+    #          3b-ii's population is kits shipping a `rendered` ROW, and a kit can render without one:
+    #          `playbook-render`'s adopter writes the charter region from the engine's bytes and its
+    #          `[check]` compares that region with a fresh render, so every renderer change rolled it
+    #          back at every adopter while 3b-ii stayed green. Which adopters re-derive an artifact from
+    #          engine bytes is a fact only the kit's author knows, so the arm asks for it rather than
+    #          guessing: a descriptor with a non-empty `[adopt].argv` declares `[[regenerate]]` or a
+    #          non-blank `[adopt] why_no_regenerate`, the same declared-absence idiom as `[check] none`
+    #          and `why_no_adopter`. WHAT IT DOES NOT CHECK: that a stated reason is TRUE, or that a
+    #          declared argv re-renders anything — the reason is read by the reviewer of the descriptor,
+    #          and the argv by `update`'s outcome probes and the kit's own check.
+    _n_adopt = _n_regen = _n_why = 0
+    for eid, (d, _dpath) in sorted(descs.items()):
+        if not ((d.get("adopt") or {}).get("argv") or []):
+            continue
+        _n_adopt += 1
+        if d.get("regenerate"):
+            _n_regen += 1
+            continue
+        if str((d.get("adopt") or {}).get("why_no_regenerate") or "").strip():
+            _n_why += 1
+            continue
+        r.fail(f"entry '{eid}' declares an [adopt] argv and neither a [[regenerate]] block nor an "
+               f"[adopt] why_no_regenerate reason — if that adopter writes anything from engine "
+               f"bytes, every engine change leaves it one vintage stale at every adopter and the "
+               f"kit's own check rolls the update back. Declare the re-render, or say why there is "
+               f"nothing to re-render")
+    r.note(f"adopters: {_n_adopt} descriptor(s) declare one, {_n_regen} with [[regenerate]], "
+           f"{_n_why} with a stated why_no_regenerate")
+
+    # ---- 3b-iv (DEPL-aHalvedInstall-1 rev-3, closing review M1): A REQUIRED KEY THE KIT'S OWN ADOPTER
+    #          DEFAULTS IS NOT REQUIRED. `read_conf_key_gaps` enforces `required_keys_*` less
+    #          `[config].defaults`, so a key the adopter itself falls back on — `${KEY:-value}` with a
+    #          non-empty value — and the descriptor does not default makes govkit red a conf the kit
+    #          accepts: two answers to one question, found as drift-audit's MEMORY_ROOT and
+    #          codebase-map's MAP_ROOT and GATE_FILE. WHAT IT DOES NOT CHECK: a default applied in a
+    #          kit's Python engine rather than its shell adopter, or a `${KEY:=value}` assignment; it
+    #          reads `adopt-*.sh` beside the descriptor, which is where every shipped kit renders.
+    _n_def = 0
+    for eid, (d, _dpath) in sorted(descs.items()):
+        _cfg = d.get("config") or {}
+        if not _cfg.get("file"):
+            continue
+        _defs = _cfg.get("defaults") or {}
+        _req = [k for k in dict.fromkeys(list(_cfg.get("required_keys_gate") or [])
+                                         + list(_cfg.get("required_keys_render") or []))
+                if k not in _defs]
+        for _ad in sorted((root / _dpath).parent.glob("adopt-*.sh")):
+            if _ad.name.endswith(".test.sh"):
+                continue
+            _src = _ad.read_text(encoding="utf-8", errors="replace")
+            for _k in _req:
+                _n_def += 1
+                _m = re.search(r"\$\{" + re.escape(_k) + r":-([^}]+)\}", _src)
+                if _m:
+                    r.fail(f"entry '{eid}' declares {_k} required, and its adopter {_ad.name} "
+                           f"defaults it to '{_m.group(1)}' — govkit then reds a conf the kit "
+                           f"accepts. Declare it in [config].defaults, or stop defaulting it")
+    r.note(f"adopter defaults: {_n_def} required key/adopter pair(s) read")
+
     # ---- 3c: a `forked` rule declares BOTH of `FORK_RULE_KEYS`, and `direction` is drawn from the
     #          closed enum. DEPL-dCarriedReceipt-10 S5.
     #
@@ -1978,6 +2038,49 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
             else:
                 r.note(f"contract {cid} ({eid}:{c.get('source')}): {len(cl)} clause(s)")
 
+    # ---- 6b (DEPL-aHalvedInstall-2): EVERY HOLE PROBE IS RUN ON AN EMPTY TREE, AND MUST NOT PASS THERE.
+    #          A probe written as a refutation -- `! grep <bad value> <file>` -- exits 0 when the file
+    #          or the key is not there at all, so it reports DISCHARGED for exactly the target it was
+    #          written to catch. Two shipped holes had that shape, `keepalive-tool-names` and
+    #          `playbook-placeholders`, and the first let an adopter with no RESUME_SCHEDULE pair at all
+    #          through until its render refused. The class is any shape that passes on absence -- a
+    #          negated grep, an `|| true`, a loop over an empty glob -- so the arm RUNS each probe
+    #          rather than reading its text: an empty directory holds nothing to be discharged, and a
+    #          probe that exits 0 there has no liveness.
+    #
+    #          Tokens resolve through `canonical_ctx`, all of them relative, and a token that context
+    #          lacks -- a target answer such as `{playbook_path}` -- resolves to its own name, which
+    #          names nothing in an empty directory. WHAT THIS DOES NOT CHECK: that a probe goes red on
+    #          the specific bad value its hole names, only that it does not go green on nothing; and a
+    #          probe that cannot LAUNCH is counted apart and never refused, because it did not report
+    #          discharged. There is no waiver: no hole whose honest answer is "discharged when absent"
+    #          exists to write one for.
+    _vac_ran = _vac_bad = _vac_nolaunch = 0
+    for eid, (d, _dpath) in sorted(descs.items()):
+        for h in d.get("hole", []):
+            _cmd = (h.get("discharge") or {}).get("command")
+            if not isinstance(_cmd, list) or not _cmd:
+                continue
+            _ctx6 = dict(canonical_ctx(eid))
+            _argv6 = []
+            for _a in _cmd:
+                _s6, _miss6 = resolve_tokens(str(_a), _ctx6)
+                if _miss6:
+                    _s6, _ = resolve_tokens(str(_a), {**_ctx6, **{m: m for m in _miss6}})
+                _argv6.append(_s6)
+            _rc6 = run_probe_in_empty_dir(_argv6)
+            if _rc6 is None:
+                _vac_nolaunch += 1
+                continue
+            _vac_ran += 1
+            if _rc6 == 0:
+                _vac_bad += 1
+                r.fail(f"entry '{eid}' hole '{h.get('id')}': its discharge probe exits 0 in an EMPTY "
+                       f"directory, so it reports the hole discharged where there is nothing to "
+                       f"discharge it — assert the subject is PRESENT before refuting a bad value in "
+                       f"it: {' '.join(str(x) for x in _cmd)[:240]}")
+    r.note(f"hole probes on an empty tree: {_vac_ran} ran, {_vac_bad} exited 0, "
+           f"{_vac_nolaunch} could not launch")
     # ---- 6c (TOOL-aWindowedPass-4): A `[[generated]]` ROW NAMES A GENERATOR THE KIT SHIPS AND A PATH
     #          THE UNATTENDED KIT CAN RESOLVE. The unattended kit reads these rows in a target to tell a
     #          hook-forced regeneration from a pass's own write; a row naming a generator that is not in
@@ -3941,7 +4044,14 @@ DECLINE_EVIDENCE = ("taken_as", "consumed_into", "discharge")
 # is exactly what a coarser allowlist hid.
 SHELL_EXEC_SITES = {
     "run_kit_check": "target",       # `[check].argv` — gov's template, the TARGET's token values
-    "cmd_check": "target",           # `[[hole]].discharge.command` — same shape, same exposure
+    # DEPL-aHalvedInstall-1 S4: the hole loop left `cmd_check` for this helper, which `check` and
+    # `update` both call — the same probes, the same target tokens, the same exposure.
+    "run_hole_probes": "target",     # `[[hole]].discharge.command` — same shape, same exposure
+    # DEPL-aHalvedInstall-2. Selfcheck 6b runs GOV's own descriptors' probes, tokens resolved from
+    # `canonical_ctx` before the call, in a fresh empty directory. Labelled `target` anyway: the
+    # suite's H1 derivation counts every `resolve_shell_argv` caller as resolving target values, and
+    # the conservative label is the one that cannot understate a site's exposure.
+    "run_probe_in_empty_dir": "target",
     "exempt_leg": "target",          # a hole probe re-run to decide a leg exemption — same shape
     "_cmd_apply": "target",          # the configure-step adopter argv — same shape, writing verb
     "read_gate_verdicts": "target",  # the target's own `[gate_runner].command` — apply-only, printed
@@ -4329,6 +4439,117 @@ def cmd_plan(root: pathlib.Path, target: pathlib.Path, mode: str, kits: list[str
 
 
 # ---------------------------------------------------------------------------------------- check
+#: One `KEY=VALUE` assignment line of a kit conf, `export` prefix admitted. DEPL-aHalvedInstall-1.
+CONF_KEY_RX = re.compile(r"^\s*(?:export\s+)?([A-Z][A-Z0-9_]*)=(.*)$")
+
+
+def read_conf_key_gaps(target: pathlib.Path, desc: dict,
+                       lists: tuple[str, ...] = ("required_keys_gate", "required_keys_render")
+                       ) -> list[tuple[str, str]]:
+    """Every key a kit's `[config]` DECLARES required and the target's conf does not carry.
+
+    DEPL-aHalvedInstall-1. The two lists were declared by every kit with a conf and read by nothing
+    in this file but check 7, as a name set — so a target conf missing a required key, or still
+    holding the example's `<...>` value, was silent here until the kit's own adopter refused it
+    mid-render. Returns `(key, state)` pairs, state `absent`, `empty` or `placeholder`, in declaration
+    order; a key in `[config].defaults` is never absent, and a missing conf file makes every key
+    absent. An assigned value that is empty or whitespace is `empty`, because every adopter reads
+    `${KEY:-}` and cannot tell it from absent (rev-3, review M2). A conf that exists and cannot be
+    read returns ONE pair, `(None, "unreadable: <error>")`, rather than raising: `update` reads it
+    after its writes, where a traceback would skip the rollback (rev-3, review M8).
+
+    WHAT IT DOES NOT CHECK. It asks whether a key is ASSIGNED and whether its value is the example's
+    angle-bracket shape — never whether the value is right, which is the kit's own check. It reads
+    the file and never sources it: the LAST assignment wins, as under `source`, one layer of quotes is
+    stripped, and an unquoted value keeps any trailing comment. The kit's own conf parser (the
+    memory-tree kit's `parse_conf_line`) sits across a kit edge this file does not import over. A
+    key required only under another key's value is a hole's question, not this one's."""
+    cfg = desc.get("config") or {}
+    rel = str(cfg.get("file") or "").strip()
+    if not rel:
+        return []
+    defaults = cfg.get("defaults") or {}
+    want = [k for k in dict.fromkeys(k for kl in lists for k in (cfg.get(kl) or []))
+            if k not in defaults]
+    if not want:
+        return []
+    p = target / rel
+    vals: dict[str, str] = {}
+    if p.exists():
+        try:
+            _text = p.read_text(encoding="utf-8", errors="replace")
+        except OSError as e:
+            return [(None, f"unreadable: {e.__class__.__name__}: {e}")]
+        for ln in _text.splitlines():
+            m = CONF_KEY_RX.match(ln)
+            if m:
+                v = m.group(2).strip()
+                if len(v) >= 2 and v[0] == v[-1] and v[0] in "\"'":
+                    v = v[1:-1]
+                vals[m.group(1)] = v
+    gaps: list[tuple[str, str]] = []
+    for k in want:
+        if k not in vals:
+            gaps.append((k, "absent"))
+        elif not vals[k].strip():
+            gaps.append((k, "empty"))
+        elif vals[k].startswith("<") and vals[k].endswith(">"):
+            gaps.append((k, "placeholder"))
+    return gaps
+
+
+def run_probe_in_empty_dir(argv: list[str]) -> int | None:
+    """Run one ALREADY-RESOLVED probe argv in a fresh empty directory; its exit, or None when it
+    could not launch or ran past 120 s. Selfcheck 6b's only spawn (DEPL-aHalvedInstall-2), kept apart
+    so the site that runs gov's own probes never reaches a target's tokens."""
+    with tempfile.TemporaryDirectory(prefix="govkit-6b-") as empty:
+        try:
+            return subprocess.run(resolve_shell_argv(argv), cwd=empty, capture_output=True,
+                                  text=True, encoding="utf-8", errors="replace",
+                                  timeout=120).returncode
+        except (OSError, subprocess.TimeoutExpired):
+            return None
+
+
+def run_hole_probes(eid: str, desc: dict, ctx: dict[str, str], target: pathlib.Path,
+                    selection: list[str], owned: "set | frozenset") -> list[tuple[str, str, str]]:
+    """Run one kit's `[[hole]]` discharge probes against `target`. ONE runner for two verbs.
+
+    DEPL-aHalvedInstall-1 S4. Lifted out of `check`, which was the only caller, so `update` can name an
+    undischarged hole BEFORE it runs a regenerate that is bound to refuse on it — the defect being a
+    hole `check` would have named and `update` stayed silent about. Returns one `(hole id, verdict,
+    detail)` per hole, verdict one of `no-probe`, `stood-down`, `needs-answer`, `no-launch`,
+    `undischarged` or `discharged`; each caller decides what a verdict costs it."""
+    out: list[tuple[str, str, str]] = []
+    for h in desc.get("hole", []):
+        hid = h.get("id")
+        cmd = (h.get("discharge") or {}).get("command")
+        if not cmd:
+            out.append((hid, "no-probe", ""))
+            continue
+        by = resolve_stand_down(h, selection, owned, (desc.get("home") or "").rstrip("/"))
+        if by:
+            out.append((hid, "stood-down", by))
+            continue
+        resolved = []
+        unresolved: list[str] = []
+        for a in cmd:
+            s, miss = resolve_tokens(a, ctx)
+            resolved.append(s)
+            unresolved += miss
+        if unresolved:
+            out.append((hid, "needs-answer", ", ".join(sorted(set(unresolved)))))
+            continue
+        try:
+            rc = subprocess.run(resolve_shell_argv(resolved), cwd=str(target), capture_output=True,
+                                text=True).returncode
+        except OSError as e:
+            out.append((hid, "no-launch", str(e)))
+            continue
+        out.append((hid, "undischarged" if rc != 0 else "discharged", str(rc)))
+    return out
+
+
 def run_kit_check(eid: str, desc: dict, ctx: dict[str, str], target: pathlib.Path,
                   r: "Report | None" = None) -> tuple[str, str, int | None]:
     """RUN one kit's own declared `[check]` and report the state it MEASURED (`-14` S1).
@@ -4727,36 +4948,33 @@ def cmd_check(root: pathlib.Path, target: pathlib.Path, run_discharge: bool = Fa
         state, detail, _rc = run_kit_check(eid, d, ctx, target, r)
         print(f"govkit check — {eid}: {state}{detail}")
 
-        for h in d.get("hole", []):
-            hid = h.get("id")
-            cmd = (h.get("discharge") or {}).get("command")
-            if not cmd:
+        # DEPL-aHalvedInstall-1 S2. The kit's DECLARED required keys, read against the target's conf.
+        _conf = (d.get("config") or {}).get("file")
+        for _k, _st in read_conf_key_gaps(target, d):
+            if _k is None:
+                r.fail(f"kit '{eid}' conf {_conf}: {_st} — its required keys cannot be read")
+                continue
+            r.fail(f"kit '{eid}' conf {_conf}: required key {_k} is "
+                   + {"absent": "ABSENT", "empty": "EMPTY, which every adopter reads as absent"}.get(
+                       _st, "still the example's <...> placeholder")
+                   + " — the kit's [config] declares it required, so its adopter refuses or its "
+                     "gate reds without a value")
+
+        _whys = {h.get("id"): h.get("why", "") for h in d.get("hole", [])}
+        for hid, verdict, detail in run_hole_probes(eid, d, ctx, target, selection, _owned_src):
+            if verdict == "no-probe":
                 r.fail(f"kit '{eid}' hole '{hid}' has no discharge probe, so 'discharged' is "
                        f"undefined for it and this check cannot answer the question")
-                continue
-            by = resolve_stand_down(h, selection, _owned_src, (d.get("home") or "").rstrip("/"))
-            if by:
-                print(f"govkit check — {eid}: hole '{hid}' stood down — {by}")
-                continue
-            resolved = []
-            unresolved: list[str] = []
-            for a in cmd:
-                s, miss = resolve_tokens(a, ctx)
-                resolved.append(s)
-                unresolved += miss
-            if unresolved:
+            elif verdict == "stood-down":
+                print(f"govkit check — {eid}: hole '{hid}' stood down — {detail}")
+            elif verdict == "needs-answer":
                 r.fail(f"kit '{eid}' hole '{hid}' probe needs answer(s) "
-                       f"{', '.join(sorted(set(unresolved)))}, which the target descriptor lacks")
-                continue
-            try:
-                rc = subprocess.run(resolve_shell_argv(resolved), cwd=str(target), capture_output=True,
-                                    text=True).returncode
-            except OSError as e:
-                r.fail(f"kit '{eid}' hole '{hid}' probe could not run: {e}")
-                continue
-            if rc != 0:
-                r.fail(f"kit '{eid}' hole '{hid}' is UNDISCHARGED (probe exit {rc}) — "
-                       f"{h.get('why', '').splitlines()[0] if h.get('why') else 'no reason declared'}")
+                       f"{detail}, which the target descriptor lacks")
+            elif verdict == "no-launch":
+                r.fail(f"kit '{eid}' hole '{hid}' probe could not run: {detail}")
+            elif verdict == "undischarged":
+                r.fail(f"kit '{eid}' hole '{hid}' is UNDISCHARGED (probe exit {detail}) — "
+                       f"{_whys[hid].splitlines()[0] if _whys.get(hid) else 'no reason declared'}")
     return r.emit()
 
 
@@ -8383,6 +8601,19 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
     # below moves the call from "once per row of a schema-1 receipt" to "once per row of every
     # receipt". The resolution depends on the kit and on nothing else in the row, and a target with
     # ninety rows across a dozen kits would otherwise pay ninety glob expansions for twelve answers.
+    # ---- HOLD REGION BEGIN (DEPL-aHalvedInstall-5). Every row refusal from here to the END marker
+    # ---- DECIDES whether it holds its kit back, and a selftest arm grades that every one did: it
+    # ---- calls `_add_held`, sits in a span whose hold is generic (the write loop's problem count, the
+    # ---- landing loop's decision after it), or says `# hold-exempt:` and why it splits no kit.
+    # ---- Round 1 of this build's closing review found two channels unit 4 had not routed (H1).
+    # NOT `_held`: the lf-pin block below binds that name to a string, and the collision crashed
+    # `update` at every target with an `attributes` row (found by the whole govkit selftest).
+    _held_kits: dict[str, list[str]] = {}
+
+    def _add_held(kit, path) -> None:
+        if kit:
+            _held_kits.setdefault(str(kit), []).append(str(path))
+
     _role_res: dict[str, dict] = {}
     for row in rows_all:
         role = row.get("role", "engine")
@@ -8390,11 +8621,13 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
         if how is None:
             r.fail(f"receipt row '{row['path']}' carries role '{role}', which has no row in the "
                    f"update dispatch — refusing rather than classifying it from an absent field")
+            _add_held(row.get("kit"), row["path"])
             continue
         # Closing review round 1 M4. Never dispatched, so it reaches no write, no rename, no role
         # move and no `acted` entry; the refusal withholds the re-stamp until `adopt` agrees.
         if row["path"] in _owned_refusals:
             r.fail(_owned_refusals[row["path"]])
+            _add_held(row.get("kit"), row["path"])
             continue
         # DEPL-aRepatriatedFork-13 S2. ABOVE the re-resolution, deliberately: gov's descriptor
         # resolves this path as `engine`, and the role-move branch below would stand the row back as
@@ -8433,6 +8666,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                     r.fail(f"row '{row['path']}' is recorded as '{role}' and its descriptor now "
                            f"resolves it as '{now}' — refusing this row rather than acting on a "
                            f"role a schema-1 receipt cannot be trusted about")
+                    _add_held(row.get("kit"), row["path"])
                     continue
                 # DEPL-cMendedVintage-27 S1. STANDING BACK ONLY PROTECTS BYTES NOTHING ELSE IN THIS
                 # RUN TOUCHES, and whether anything does is a property of the NEW role's own
@@ -8525,6 +8759,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
         if how == "refuse":
             r.fail(f"row '{row['path']}' has role '{role}', which no unit has taught `update` to "
                    f"move yet — refusing by name rather than guessing")
+            _add_held(row.get("kit"), row["path"])
             continue
 
         # DEPL-dCarriedReceipt-2 S3. REPORT, never refuse: these roles have no writer yet, but a
@@ -8678,6 +8913,8 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                         f"{str(row.get('commit'))[:8]}, the target copy holds {_t_cr} · gov {_g_cr} "
                         f"· target {_t_cr}")
                 if write:
+                    # hold-exempt: the row still lands with the rest of its kit, so the kit is not
+                    # split; the finding names a loss, and withholding the re-stamp surfaces it.
                     r.fail(_lcr + " — a write over a copy that lost them makes the loss permanent")
                 else:
                     print(f"govkit update — {_lcr}")
@@ -9172,7 +9409,22 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
               + f"; no kit this receipt claims declares an lf_pin any more "
                 f"({len(pins_drop.get('patterns') or [])} pin(s) withdrawn)")
 
+    # DEPL-aHalvedInstall-4 S1. WHICH KITS A REFUSED ROW HOLDS BACK. A row this loop refuses — a
+    # three-way conflict, a rename that conflicts, a merge it cannot land, any of the `r.fail`s below —
+    # used to leave that row old while every sibling row of the same kit landed new, and the kit's
+    # regenerate then ran over the mixture: measured at an adopter as a new script calling an old
+    # sibling for a flag it did not have, under `[check] none`, so nothing rolled it back. A row
+    # REFUSED is one that added a finding; that is read as the problem count moving across the row,
+    # so every refusal in the body counts, including one added after this was written. The count is
+    # taken at the TOP of the next iteration, and once after the loop, because the body's `continue`s
+    # skip anything placed at its foot. A row with no kit — the synthesized attributes row — holds
+    # nothing back.
+    _held_prev: tuple[str, str, int] | None = None
+    # ---- HOLD BY COUNT BEGIN — every refusal in this loop holds by the problem count, unmarked.
     for a in acted:
+        if _held_prev is not None and len(r.problems) > _held_prev[2] and _held_prev[0]:
+            _add_held(_held_prev[0], _held_prev[1])
+        _held_prev = (str(a["row"].get("kit") or ""), str(a["row"].get("path")), len(r.problems))
         row, c, v = a["row"], a["c"], a["verdict"]
 
         # A receipt path is TARGET-SUPPLIED data. Joining it onto the target root and writing is a
@@ -9520,6 +9772,9 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                 row["commit"] = to_commit
                 row["version"] = _resolve_ver_at(row)
                 changed.append(row["path"])
+    if _held_prev is not None and len(r.problems) > _held_prev[2] and _held_prev[0]:
+        _add_held(_held_prev[0], _held_prev[1])
+    # ---- HOLD BY COUNT END
 
     # NO `git add` OVER `changed`. S5 already staged every one of those paths from gov's own bytes;
     # re-adding them would re-CLEAN what the smudge filter just produced, and a filter pair that does
@@ -9594,6 +9849,11 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             _decided.update(_m.get(_new_src) or [])
     _landed_new: list[str] = []
     _refused_new: list[tuple[str, str]] = []
+    # DEPL-aHalvedInstall-5 S3. Which kit, and which gov source, each destination this loop CONSIDERS
+    # belongs to — recorded before any refusal can fire, so the decision after the loop covers every
+    # `_refused_new` entry without a branch at each of its eight sites.
+    _refused_from: dict[str, tuple[str, str]] = {}
+    # ---- HOLD BY LANDING DECISION BEGIN — refusals here are decided once, after the loop.
     # F4 — `--kits` BINDS THIS LOOP TOO. It narrows `rows_all` and does not touch `claimed`, so a
     # scoped run landed sources for kits the operator EXCLUDED — and because `rename_dests` is only
     # populated over the scoped walk, `_decided` was empty for those kits, so the block re-landed a
@@ -9634,6 +9894,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             _src0 = str(_row0.get("src") or "")
             if not _src0:
                 continue
+            _refused_from[_dest] = (_eid, _src0)
             # APPLY'S OWN FOUR SKIPS, and this block had NONE of them. `_cmd_apply` declines a row
             # with unresolved tokens, a machine-SCOPED row, a machine-scoped RULE and a LINK rule
             # before it writes anything; landing them here made `update` write what `apply`
@@ -9825,6 +10086,30 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             snap_rows.append({"kit": _eid, "row": receipt["files"][-1], "paths": [_dest],
                               "origin": "landed", "fields": {},
                               "index": {_dest: _idx_pre.get(_dest)}})
+    # ---- HOLD BY LANDING DECISION END
+    # DEPL-aHalvedInstall-5 S3. A landing refusal HOLDS its kit only when gov's source is NEW since the
+    # receipt's vintage and no `[[decline]]` names the pair. A refusal of a source that vintage already
+    # shipped — the target occupying a path for years, an optional token never answered — recurs on
+    # every run whatever moves, and holding on it would wedge the kit's updates for good; the closing
+    # review's skeptic refused exactly that form. WHAT THIS DOES NOT SEE: a source gov RENAMED into
+    # this destination reads as new, which holds conservatively and says so on the HELD BACK line.
+    _declined_pairs = {(str(_dr.get("kit")), str(_dr.get("dest")))
+                       for _dr in (deploy.get("decline") or []) if isinstance(_dr, dict)}
+    for _rd, _rw in _refused_new:
+        _rk, _rs = _refused_from.get(_rd, ("", ""))
+        if not _rk or (_rk, _rd) in _declined_pairs:
+            continue
+        # NEW means PRESENT at the vintage this run moves to and ABSENT at the receipt's. The loop
+        # resolves gov's descriptor as it stands, so an `update --to` an older vintage meets sources
+        # that do not exist there at all — refused as unresolvable, and nothing that could land. The
+        # whole suite's [-8] arms found the first cut, which read absent-at-base alone, holding them.
+        if (base_commit and _rs and blob_at(root, base_commit, _rs) is None
+                and blob_at(root, to_commit, _rs) is not None):
+            _add_held(_rk, _rd)
+    # ---- HOLD REGION END
+    for _eid_h, _paths_h in sorted(_held_kits.items()):
+        print(f"govkit update — HELD BACK {_eid_h}: {len(_paths_h)} row(s) refused "
+              f"({', '.join(_paths_h)}), so none of this kit's writes from this run will stand")
 
     # ======================= DEPL-dRetiredFork-3 S1 + S2 — RE-RENDER AND REGENERATE =============
     # BYTES LANDING IS NOT AN UPDATE FINISHING. `UPDATE_ROLE["rendered"]` is `"adopter"` but the
@@ -9880,6 +10165,17 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                 _rr_declined.append((_eid, "the target holds this kit INERT; running its adopter "
                                            "would flip a posture the target chose"))
                 continue
+            # DEPL-aHalvedInstall-4 S2. A HELD kit's engine is half old and half new right now, and the
+            # verify pass below puts the new half back. Its regenerate would run over that mixture —
+            # the observed failure — and write renders the rollback would then have to chase. NOT
+            # entered in `_rr_stale`: that set is the verify pass's declined-red exit, which leaves a
+            # kit's writes STANDING, and a held kit's writes must not stand.
+            if _eid in _held_kits:
+                _rr_declined.append((_eid, f"a row of this kit was refused this run "
+                                           f"({', '.join(_held_kits[_eid])}), so the kit is HELD BACK "
+                                           f"whole and its re-render would run over a half-landed "
+                                           f"engine"))
+                continue
             # S1 IS NOT BUILT, AND THE REASON IS A MEASUREMENT RATHER THAN A PREFERENCE. The
             # spec asks `update` to run the kit's `[adopt].argv`. Run against an adopted tree,
             # `memory-tree`'s adopter takes one of exactly two branches, and NEITHER re-renders:
@@ -9912,6 +10208,23 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                 _rr_stale[_eid] = _why_rr
                 continue
             _ctx_rr = target_context(target, deploy, _eid, _d)
+            # DEPL-aHalvedInstall-1 S3. SAY WHAT THE RENDER IS ABOUT TO REFUSE ON, BEFORE IT RUNS.
+            # A declared render key the conf lacks, or a hole the target has not discharged, used to
+            # surface only as the adopter's own refusal below — an unfilled placeholder with no key
+            # named. These lines change NOTHING about the disposition: the argv still runs and its own
+            # outcome still decides, because declining it would land the templates over a stale render.
+            _cf_rr = (_d.get("config") or {}).get("file")
+            for _k, _st in read_conf_key_gaps(target, _d, ("required_keys_render",)):
+                print(f"govkit update — CONF GAP {_eid}: {_cf_rr} "
+                      + (f"is {_st}" if _k is None else
+                         f"key {_k} is {_st}, and the kit declares it required to render"))
+            _own_rr = {f.get("source") for f in receipt.get("files") or []
+                       if f.get("role") == "adopter-owned"}
+            _hw_rr = {h.get("id"): h.get("why", "") for h in _d.get("hole", [])}
+            for _hid, _hv, _hd in run_hole_probes(_eid, _d, _ctx_rr, target, list(claimed), _own_rr):
+                if _hv == "undischarged":
+                    print(f"govkit update — HOLE {_eid}: '{_hid}' is undischarged (probe exit {_hd})"
+                          f" — {(_hw_rr.get(_hid) or 'no reason declared').splitlines()[0]}")
             # DEPL-aRepatriatedFork-17 S1. A ROLLBACK COVERS WHAT THE RE-RENDER WROTE. The argv
             # below writes outside `written_paths`, so a kit rolled back after it kept its renders.
             # Snapshotted HERE, before the first argv, from the kit's own `rendered`/`generated`
@@ -10015,6 +10328,19 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
         _fr_landed = set(changed) | set(renamed) | set(_landed_new)
         _fr_skip = read_inert_kits(deploy) | {str(f.get("kit")) for f in receipt.get("files") or []
                                               if f.get("kit") not in touched_kits}
+        # DEPL-aHalvedInstall-4 rev-3 (closing review M3). A HELD kit's fragments are not wired: the
+        # merge would write its half-landed command into settings.json, and a stale command it
+        # rewrites in place is not one `remove_wired_fragments` can take back. Said per fragment,
+        # because a skip that looks like nothing happened is the class this build closes. The line is
+        # read off the SAME set the merge is handed, so it cannot announce a skip the merge does not
+        # make; `run_fragment_merges` honouring that set is the fragment-wiring arm's own assertion.
+        _fr_skip |= set(_held_kits)
+        for _fp in sorted(str(f.get("path")) for f in receipt.get("files") or []
+                          if f.get("kit") in _fr_skip and f.get("kit") in _held_kits
+                          and f.get("path") in _fr_landed
+                          and str(f.get("path")).endswith(".fragment.json")):
+            print(f"govkit update — hooks: {_fp} landed UNWIRED — its kit is HELD BACK this run, "
+                  f"so wiring it would write a command the rollback then takes away")
         if _rerender_on:
             _wired_new = run_fragment_merges(target, receipt.get("files") or [], _fr_landed,
                                              _fr_skip, "update")
@@ -10116,7 +10442,11 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
         # S8. THE SKIP ANNOUNCES ITSELF. A `[check] = { none = "…" }` and an argv carrying an
         # unresolved token both land here, and a check that could not run is not a pass — so it is
         # counted apart from verified rather than swelling it.
-        if now == "landed-unmeasured":
+        # DEPL-aHalvedInstall-4 S3. A HELD kit is rolled back WHATEVER its check says, so it skips
+        # both exits that leave writes standing — the unmeasured one, which every `[check] none` kit
+        # takes, and pre-existing red — and enters the restore below by its own condition.
+        _held_v = _held_kits.get(eid)
+        if now == "landed-unmeasured" and not _held_v:
             n_unverified += 1
             print(f"govkit update — verify {eid}: {was} -> {now}{now_detail} · UNVERIFIED: nothing "
                   f"measured this kit's writes, which is not the same as measuring them green")
@@ -10124,7 +10454,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
 
         # S6. PRE-EXISTING RED, the only escape from the wedge. Its writes stand, nothing is rolled
         # back, and no `r.fail` — so the run completes and the receipt re-stamps.
-        if was == "landed-but-inert" and now == "landed-but-inert":
+        if was == "landed-but-inert" and now == "landed-but-inert" and not _held_v:
             n_preexisting += 1
             (outbox / f"update-preexisting-red-{eid}.md").write_text(
                 f"# {eid} was already red before this update\n\n"
@@ -10143,7 +10473,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             continue
 
         # S5. GREEN BEFORE, RED AFTER: this run broke it, and only this kit is undone.
-        if was == "adopted" and now == "landed-but-inert":
+        if _held_v or (was == "adopted" and now == "landed-but-inert"):
             # DEPL-cMendedVintage-1 S2. THE ARM NOW HAS TWO EXITS, and this is the first: a kit
             # whose check reds because of a RENDER STEP THIS RUN DECLINED is not a kit this run's
             # bytes broke. The old single exit ran the kit's own `[check]` — the program whose job
@@ -10161,7 +10491,7 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
             # THE RUN STILL FAILS. What changes is that the writes STAND; the verdict does not go
             # green. Suppressing the `r.fail` here would convert a wedge into a silent data problem,
             # which is strictly worse than the wedge.
-            if eid in _rr_stale:
+            if eid in _rr_stale and not _held_v:
                 n_declined_red += 1
                 _why_dr = _rr_stale[eid]
                 # A DISTINCT FILENAME, modelled on the `update-preexisting-red-` writer above —
@@ -10448,12 +10778,19 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                         lst.remove(p)
 
             (outbox / f"update-rollback-{eid}.md").write_text(
-                f"# {eid} was rolled back — its own check reds on what this run wrote\n\n"
-                f"check  {check_argv_of(d, ctx_v) or '(the kit declares no argv)'}\n"
+                (f"# {eid} was HELD BACK — this run refused a row of it, so none of its writes "
+                 f"stand\n\n" if _held_v else
+                 f"# {eid} was rolled back — its own check reds on what this run wrote\n\n")
+                + f"check  {check_argv_of(d, ctx_v) or '(the kit declares no argv)'}\n"
                 f"{exits}\n"
                 f"vintage {base_commit} -> {to_commit}\n\n"
-                f"This kit's check PASSED before this run and FAILS after it, so this run is what "
-                f"broke it. Every path marked `restored` below — and ONLY those — was put back to "
+                + (f"This run REFUSED {', '.join(_held_v)} of this kit, so the kit could not land "
+                   f"whole: a kit half at the new vintage and half at the old one is the state this "
+                   f"rollback exists to prevent, whatever its check says ({exits}). Every path"
+                   if _held_v else
+                   f"This kit's check PASSED before this run and FAILS after it, so this run is what "
+                   f"broke it. Every path")
+                + f" marked `restored` below — and ONLY those — was put back to "
                 f"the index entry it had before the first byte moved, and its receipt row with it. "
                 f"Every path marked `removed` was one this run LANDED: it had no earlier state to "
                 f"return to, so it was deleted and the row this run minted for it was dropped. "
@@ -10505,14 +10842,22 @@ def _cmd_update(root: pathlib.Path, target: pathlib.Path, to_rev: str, write: bo
                           f"snapshot covered it, so the rollback could not return it\n"
                           for p in _rg_left)
                 + f"\nThe receipt is NOT re-stamped, so the next run re-classifies these rows from "
-                  f"the vintage they are actually at. Resolve by hand — most often the clean "
-                  f"three-way merge that produced this is plausible and wrong — then re-run "
-                  f"`update`.\n",
+                  f"the vintage they are actually at. "
+                + ("Resolve each refused row's conflict order under .governance/outbox/, then re-run "
+                   "`update`; the kit lands whole once no row of it is refused.\n" if _held_v else
+                   "Resolve by hand — most often the clean three-way merge that produced this is "
+                   "plausible and wrong — then re-run `update`.\n"),
                 encoding="utf-8", newline="\n")
-            print(f"govkit update — verify {eid}: {was} -> {now} · {exits} · ROLLED BACK · "
+            print(f"govkit update — verify {eid}: {was} -> {now} · {exits} · "
+                  + (f"HELD BACK ({', '.join(_held_v)} refused) · " if _held_v else "")
+                  + "ROLLED BACK · "
                   + (" ".join(restored + removed_landed)
                      if (restored or removed_landed) else "(no path restored)"))
-            r.fail(f"kit '{eid}' passed its own check before this run and fails it after: "
+            r.fail(f"kit '{eid}' was HELD BACK: this run refused {', '.join(_held_v)} of it, so "
+                   f"every write this run made for it was ROLLED BACK to its pre-run index entry "
+                   f"rather than leaving the kit half updated; an order was written under "
+                   f".governance/outbox/" if _held_v else
+                   f"kit '{eid}' passed its own check before this run and fails it after: "
                    f"{exits}. Its writes were ROLLED BACK to their pre-run index entries and an "
                    f"order was written under .governance/outbox/")
             continue

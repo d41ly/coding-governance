@@ -36,6 +36,9 @@ role = "project-owned"
 [adopt]
 argv = ["bash", "{kit}/adopt-agent-instructions.sh"]
 mutates_index = false
+# DEPL-aHalvedInstall-3: why `update` never re-runs this adopter. A kit with an adopter declares
+# [[regenerate]] or this reason, and selfcheck refuses one declaring neither.
+why_no_regenerate = "the adopter writes alias wiring to AGENTS.md (an @AGENTS.md import, a symlink or a synced copy), whose shape no engine byte renders; and in copy mode a re-run refuses on drift without --force, so it cannot serve as an unattended re-render. A wiring-format change ships with its own migration"
 
 [check]
 argv = ["bash", "{kit}/adopt-agent-instructions.sh", "--check"]
