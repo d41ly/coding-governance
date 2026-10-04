@@ -481,7 +481,7 @@ HALT_CODES_EXTRA=""; HALT_FLOOR=""; LANDER_MARKER=""; RECALL_CLI=""; MAP_CLI="";
 ASKS_CMD=""; HOLD_CODES_EXTRA=""; HOLD_FLOOR=""; LANDED_FACTS_CUTOFF=""; GATE_POLICY_FILE=""; PROCMON_CMD=""; HANDOFF_CUTOFF=""
 RESUME_SCHEDULE=""; RESUME_SCHEDULE_CREATE=""; RESUME_SCHEDULE_DELETE=""; RESUME_SCHEDULE_DELAY=""; RESUME_SCHEDULE_LIMIT=""
 GATE_BOUND=""; GATE_WALL=""; GATE_PROFILE_CMD=""; UNIT_STALL_BOUND=""; TASK_STALL_BOUND=""; REVIEW_ROUNDS=""; RESUME_STALE_BOUND=""; RESUME_ATTEMPTS=""; RESUME_TURNS=""
-DISPOSITION_CUTOFF=""; SPEC_AUDIT_DEFAULT=""; RUNLOG_SESSION_VARS=""; RUNLOG_SWITCH=${GOV_RUNLOG:-}
+DISPOSITION_CUTOFF=""; SPEC_AUDIT_DEFAULT=""; LANDING_NODES=""; RUNLOG_SESSION_VARS=""; RUNLOG_SWITCH=${GOV_RUNLOG:-}
 # TOOL-dLoggedFlight-2 - the run log's two inputs, on the init block's LAST line so the suite's
 # contiguous-block read still covers them (a comment inside the block ends it). RUNLOG_SESSION_VARS
 # is a declared key and defaults here like its neighbours. GOV_RUNLOG is the ENVIRONMENT's switch, so
@@ -517,6 +517,10 @@ DISPOSITION_CUTOFF=""; SPEC_AUDIT_DEFAULT=""; RUNLOG_SESSION_VARS=""; RUNLOG_SWI
 #   * HANDOFF_CUTOFF (TOOL-dUnstuckLanding-13 S8) - the date from which `ABORTED` means DISCARD:
 #     an `--abort` naming a hand-off-shaped halt code, on a record first committed on or after it,
 #     prints a notice naming `--handoff`. Blank turns the notice off, announced. It never refuses.
+#   * LANDING_NODES (TOOL-dUnstuckLanding-20 S3) - which nodes may land, as `<tag>=<machine>/<user>`
+#     pairs. Defaulted for SPEC_AUDIT_DEFAULT's reason, and like it the value this source binds
+#     decides nothing: `resolve_landing_node` re-reads the key from the conf blob at the pinned BASE,
+#     because a run that added its own node to the working copy would grant itself a landing.
 # shellcheck disable=SC1090
 . "$CONF"
 
@@ -5795,6 +5799,12 @@ verb_preflight() { # slug · keepalive-id
   # the session, pid, host, image and lease-utc beside it are the lease's own and are taken afresh.
   _pf_ka=$(fact "$rel" keepalive); [ -n "$_pf_ka" ] || _pf_ka="$kid"
   write_lease "$rel" "$_pf_ka" || return 1
+  # TOOL-dUnstuckLanding-20 S4 - THE LANDING NODE, written afresh like the lease because it describes
+  # the node holding the run. A hand-off node starts normally and says so from its first record; no
+  # preflight refuses on it. Undeclared writes no fact.
+  resolve_landing_node "$rel"
+  print_landing_line
+  if [ "$LN_STATE" != undeclared ]; then set_fact "$rel" landing "$LN_STATE" || return 1; fi
   # S4: which anchor authorized this run, and — when it was the second one — the observation it
   # rested on. EVIDENCE, exactly like anchor-ref/sha/url: written so a party off this machine can
   # re-derive the pin, and never read back as an input by this kit. `trusted_base` deliberately does
@@ -6042,6 +6052,58 @@ write_lease() { # run-state file · keepalive-id
   set_fact "$rel" lease-utc "$(date -u +%Y-%m-%dT%H:%M:%SZ)" || return 1
   [ -z "$gone" ] || printf 'unattended: NOTE - this harness exposes no %s, so no out-of-session resumer can find this run; the lease records absent and the hooks and the tick report it UNBOUND rather than guess.\n' "$gone" >&2
   return 0
+}
+
+# TOOL-dUnstuckLanding-20 S3 - WHICH NODE MAY LAND, resolved from the machine and the user and never
+# from a path, against the `LANDING_NODES` the project conf declares AT THE PINNED BASE. Read the
+# `SPEC_AUDIT_DEFAULT` way in check_authorization, and for its reason: the working copy is a file the
+# run commits itself, so a run that added its own node there would grant itself a landing nobody
+# declared. The blob is evaluated in a subshell with the key blanked first, and the sentinel printed
+# from inside the eval'd text proves it was read to the end; the two newlines of glue are that read's.
+#
+# NEVER FAILS, and every doubt resolves to `handoff`, the safe direction: a blob that does not
+# evaluate to the end, a machine or user nothing answers for, no matching pair. No `base` fact or no
+# conf blob at BASE is `undeclared`, today's behaviour; such a record cannot pass
+# `authorization-reachable`, so it never reaches a landing. Blank is `undeclared` too (F3).
+#
+# WHAT IT DOES NOT BUY: the machine and user come from the environment the run inherits, so a run set
+# on it can spoof both. That is protocol section 9's limit for any check under the run's own uid, and
+# it buys only the landing every run could make before this key existed.
+LN_STATE=""; LN_TAG=""; LN_WHY=""
+resolve_landing_node() { # run-state file -> LN_STATE undeclared|lander|handoff, LN_TAG and LN_WHY
+  local rel=$1 base cf v m u bad
+  LN_STATE=undeclared; LN_TAG=""; LN_WHY=""
+  base=$(fact "$rel" base)
+  if [ -z "$base" ] || ! cf=$(GIT show "$base:.unattended.conf" 2>/dev/null); then
+    LN_WHY="no project conf at the pinned BASE"; return 0
+  fi
+  v=$( LANDING_NODES=""; exec 3>&1
+       eval "$cf"$'\n\n''printf "OK %s" "${LANDING_NODES:-}" >&3' >/dev/null 2>&1 )
+  case "$v" in
+    "OK "*) v=${v#OK } ;;
+    *) LN_STATE=handoff
+       LN_WHY="the project conf at the pinned BASE could not be evaluated to the end, so which nodes may land is unknown and is not read as absent"
+       return 0 ;;
+  esac
+  if [ -z "${v//[[:space:]]/}" ]; then LN_WHY="the project conf at the pinned BASE declares no LANDING_NODES"; return 0; fi
+  m=$(read_host_name) || m=""; u=$(read_user_name) || u=""
+  if [ -z "$m" ] || [ -z "$u" ]; then
+    LN_STATE=handoff
+    LN_WHY="this node's machine or user cannot be read, machine ${m:-unread} and user ${u:-unread}"
+    return 0
+  fi
+  if LN_TAG=$(resolve_landing_tag "$v" "$m" "$u"); then LN_STATE=lander; return 0; fi
+  LN_TAG=""; LN_STATE=handoff
+  bad=$(scan_landing_nodes "$v" | tr '\n' ' ' | sed 's/ $//')
+  LN_WHY="$m/$u is not a node LANDING_NODES at the pinned BASE declares able to land${bad:+, and these tokens are malformed or declared twice: $bad}"
+  return 0
+}
+print_landing_line() { # -> the one line naming what resolve_landing_node decided
+  case "$LN_STATE" in
+    lander) echo "unattended: landing — lander · node $LN_TAG" ;;
+    handoff) echo "unattended: landing — handoff · $LN_WHY · this run ends at --handoff --code owner-landing" ;;
+    *) echo "unattended: landing — undeclared · every node may land" ;;
+  esac
 }
 
 verb_status() { # slug
@@ -8017,7 +8079,7 @@ write_close_commit() { # slug · run-state file
 }
 
 verb_close() { # slug   (override pairs arrive in OV_ITEMS / OV_REASONS)
-  local slug="$1" rel item ck unmet=0 i=0 n ov reason _why
+  local slug="$1" rel item ck unmet=0 i=0 n ov reason _why _lnrec _lnwant
   n=${#OV_ITEMS[@]}
   GG_RUN_FACT=""; GG_INH_FACT=""
   check_slug "$slug" || return 1
@@ -8039,6 +8101,22 @@ verb_close() { # slug   (override pairs arrive in OV_ITEMS / OV_REASONS)
   read_derived_phase "$rel"
   if [ "$DP_PHASE" = HELD ]; then
     fail 82 "the run is HELD, so the Definition-of-Done set would be evaluated against a run that stopped part-way for a cause outside itself; --resume it first, and close it when the work it paused in the middle of is done"
+    return 1
+  fi
+  # TOOL-dUnstuckLanding-20 S5 - THIS NODE'S OWN ANSWER DECIDES, resolved again here: a run resumed
+  # on another node carries the first node's `landing` fact, and trusting it would land from a node
+  # nobody declared. A disagreement is printed. On a hand-off node an override is a free refusal,
+  # before the anchor round-trip: this close lands nothing, so an override would park a waiver of an
+  # obligation the run never meets, and a later close on a listed node would park it twice (F5).
+  resolve_landing_node "$rel"
+  _lnrec=$(fact "$rel" landing); _lnwant=$LN_STATE
+  [ "$_lnwant" != undeclared ] || _lnwant=""
+  if [ "$LN_STATE" != undeclared ] || [ -n "$_lnrec" ]; then print_landing_line; fi
+  if [ "$_lnrec" != "$_lnwant" ]; then
+    echo "unattended: landing — this close resolves ${LN_STATE}${LN_TAG:+ · node $LN_TAG} and the record reads landing: ${_lnrec:-none}; the close's own answer decides"
+  fi
+  if [ "$LN_STATE" = handoff ] && [ "$n" -gt 0 ]; then
+    fail 104 "--close on a node LANDING_NODES does not declare able to land takes no --override, because this close lands nothing and an override would record a waiver for a landing the run never makes; park a decision with --park, or end the run with --handoff --code owner-landing once the Definition of Done is met: $LN_WHY"
     return 1
   fi
   # The SAME observation preflight made, made again here rather than read back from the record the
@@ -8188,6 +8266,18 @@ verb_close() { # slug   (override pairs arrive in OV_ITEMS / OV_REASONS)
     fi
   done
   [ "$unmet" = 0 ] || return 1
+  # TOOL-dUnstuckLanding-20 S5 - A MET DoD ON A HAND-OFF NODE WRITES THE BAR'S FACTS AND REFUSES (F2).
+  # The facts first, because `--handoff --code owner-landing` reads `gates-run` through the
+  # attribution guard and refuses with none, so a close that refused before the bar would leave the
+  # one exit this designs unreachable. Nothing else is written: no carry check, no roster at landing,
+  # no phase and no close commit, because this node lands nothing.
+  if [ "$LN_STATE" = handoff ]; then
+    if [ -n "$GG_RUN_FACT" ]; then set_fact "$rel" gates-run "$GG_RUN_FACT" || return 1; fi
+    if [ -n "$GG_INH_FACT" ]; then set_fact "$rel" gates-inherited "$GG_INH_FACT" || return 1; fi
+    stage_or_fail "$rel" || return 1
+    fail 105 "every declared Definition-of-Done item is met and this node may not land, so the bar's facts are written and staged and no phase is; commit the record, reap the keepalive, and end the run with --handoff $slug --code owner-landing --reason <text> --reaped <id>: $LN_WHY"
+    return 1
+  fi
   # TOOL-dDerivedDocket-3 S4 - AFTER the Definition of Done evaluates and BEFORE any write. The
   # override parks below are writes, so a carry refusal placed after them would leave a record
   # carrying overrides for a landing that cannot happen. Under `primary` this does not run at all.

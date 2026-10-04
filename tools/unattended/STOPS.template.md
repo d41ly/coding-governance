@@ -608,6 +608,7 @@ census found, with its exit and the record that exit writes.
 | act on another run's record | no act: concurrent runs are permitted, and a landed record derives its terminal (§12) | none |
 | publish another session's commits | does not arise under `in-place`; under `primary`, HAND OFF `owner-landing` | the handoff row |
 | land in a dependency order across repositories | HAND OFF `owner-landing`, the recipe naming each repository in order | the handoff row |
+| land from a node `LANDING_NODES` does not declare able to land | HAND OFF `owner-landing`, after the close records the bar | the handoff row |
 | choose a fix where every option touches a carrier | HAND OFF `owner-decision` | the decision park row |
 | a question the default branch already answered | observe the advertised tip first, and take the exit the answer selects; unanswered, HAND OFF `owner-decision` | the park row |
 

@@ -1,11 +1,12 @@
 # TOOL-dUnstuckLanding-20 — `LANDING_NODES`: landing capability declared, resolved from machine and user, and a planned hand-off
 
-**Status:** INPROGRESS · rev-1 · 2026-10-04 · node d · Tier-2 · base 98926870 · streams tooling · order 8 · closes TOOL-dUnstuckLanding-10
+**Status:** CLOSED · rev-2 · 2026-10-04 · node d · Tier-2 · base 98926870 · streams tooling · order 8 · closes TOOL-dUnstuckLanding-10
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-04-build-TOOL-dUnstuckLanding-20-1-acceptance-ledger.md](../build/2026-10-04-build-TOOL-dUnstuckLanding-20-1-acceptance-ledger.md) | journal | — |
 | [2026-10-04-prompt-TOOL-dUnstuckLanding-13-build-brief.md](../prompts/2026-10-04-prompt-TOOL-dUnstuckLanding-13-build-brief.md) | journal | TOOL-dUnstuckLanding-13 TOOL-dUnstuckLanding-14 TOOL-dUnstuckLanding-15 TOOL-dUnstuckLanding-16 TOOL-dUnstuckLanding-17 TOOL-dUnstuckLanding-18 TOOL-dUnstuckLanding-19 |
 | [2026-10-04-prompt-TOOL-dUnstuckLanding-13-spec-brief.md](../prompts/2026-10-04-prompt-TOOL-dUnstuckLanding-13-spec-brief.md) | journal | TOOL-dUnstuckLanding-13 TOOL-dUnstuckLanding-14 TOOL-dUnstuckLanding-15 TOOL-dUnstuckLanding-16 TOOL-dUnstuckLanding-17 TOOL-dUnstuckLanding-18 TOOL-dUnstuckLanding-19 |
 
@@ -27,10 +28,10 @@ with no override.
   lowercased; it returns 1 when none answers. Observed by AC1, AC3.
 - **S2 — the grammar, once.** Two library functions the driver and the gate leg both call, so the
   pair grammar has one spelling:
-  - `match_landing_node <nodes> <machine> <user>` prints the tag of the one well-formed pair whose
+  - `resolve_landing_tag <nodes> <machine> <user>` prints the tag of the one well-formed pair whose
     machine and user equal the given ones, compared lowercased, and returns 0. It returns 1 on no
     match, on an empty machine or user, and when two pairs with different tags match.
-  - `landing_nodes_malformed <nodes>` prints each token that is not `<tag>=<machine>/<user>`, with
+  - `scan_landing_nodes <nodes>` prints each token that is not `<tag>=<machine>/<user>`, with
     `<tag>` one lowercase letter and neither half empty or carrying `/`, plus each tag or
     machine/user pair declared twice. It prints nothing for a well-formed or blank value.
 
@@ -61,7 +62,7 @@ with no override.
   A `lander` or `undeclared` close is unchanged. Observed by AC7, AC8, AC10.
 - **S6 — the gate leg.** `tools/unattended/check-unattended.sh` initialises `LANDING_NODES=""`,
   admits it in the import allow-list, and adds one numbered check that reds when
-  `landing_nodes_malformed` prints anything for the project conf's value, naming each token.
+  `scan_landing_nodes` prints anything for the project conf's value, naming each token.
   Observed by AC4, AC11.
 - **S7 — the carriers.**
   - `tools/unattended/.unattended.conf.example` declares `LANDING_NODES=""` with its grammar.
@@ -71,9 +72,10 @@ with no override.
   - Both renders under `memory/guides/` are re-copied in the same pass.
 
   Observed by AC11, AC12.
-- **S8 — the close-decision row.** The close-decision table `TOOL-dUnstuckLanding-18` adds to the
-  protocol gains one row, in that table's own grammar: a node not declared able to land maps to
-  HAND OFF under `owner-landing`. Observed by AC12.
+- **S8 — the close-decision row.** The close-decision table `TOOL-dUnstuckLanding-18` added to the
+  stop contract, `tools/unattended/STOPS.template.md` §15 and its render
+  `memory/guides/UNATTENDED-STOPS.md`, gains one row, in that table's own grammar: a node not
+  declared able to land maps to HAND OFF under `owner-landing`. Observed by AC12.
 
 ## 3. Non-goals (OUT)
 
@@ -116,7 +118,7 @@ and `USER` is unset.
 2. The blob does not evaluate to its sentinel → `handoff`, "unknown is not absent".
 3. The key is blank → `undeclared`.
 4. `read_host_name` or `read_user_name` answers nothing → `handoff`.
-5. `match_landing_node` returns a tag → `lander`. Otherwise → `handoff`, naming the machine/user it
+5. `resolve_landing_tag` returns a tag → `lander`. Otherwise → `handoff`, naming the machine/user it
    resolved and any malformed tokens.
 
 Step 1 keeps a record with no BASE on today's path; such a record cannot pass
@@ -140,7 +142,7 @@ before it returns (`tools/unattended/unattended.sh:7645-7659`).
 
 ### Inventory
 
-- Library functions `read_user_name`, `match_landing_node` and `landing_nodes_malformed`; driver
+- Library functions `read_user_name`, `resolve_landing_tag` and `scan_landing_nodes`; driver
   function `resolve_landing_node`; globals `LN_STATE`, `LN_TAG` and `LN_WHY`. Each name is graded by
   the lexicon gate's shell cell, so ask `--suggest` for each before writing it.
 - Conf key `LANDING_NODES`. Fact key `landing`.
@@ -156,8 +158,10 @@ before it returns (`tools/unattended/unattended.sh:7645-7659`).
 - `tools/unattended/.unattended.conf.example`
 - `tools/unattended/PROTOCOL.template.md`
 - `tools/unattended/VERBS.template.md`
+- `tools/unattended/STOPS.template.md`
 - `memory/guides/UNATTENDED-PROTOCOL.md`
 - `memory/guides/UNATTENDED-VERBS.md`
+- `memory/guides/UNATTENDED-STOPS.md`
 - `tools/unattended/unattended.test.sh`
 - `tools/unattended/check-unattended.test.sh`
 
@@ -194,17 +198,17 @@ before it returns (`tools/unattended/unattended.sh:7645-7659`).
 
 ## 6. Acceptance criteria
 
-- **AC1** — When `bash -c '. tools/unattended/lib-unattended.sh && match_landing_node "a=desk-a/daily-agent d=compeeto/d41ly" COMPEETO D41LY'`
+- **AC1** — When `bash -c '. tools/unattended/lib-unattended.sh && resolve_landing_tag "a=desk-a/daily-agent d=compeeto/d41ly" COMPEETO D41LY'`
   runs, it prints `d` and exits 0.
   Red when: case differs between the inputs and the pair and the match fails, or it prints `a`.
-- **AC2** — When the same `match_landing_node` call is given `desktop-3j1o6cd agent5`, an empty
+- **AC2** — When the same `resolve_landing_tag` call is given `desktop-3j1o6cd agent5`, an empty
   machine, or a value carrying both `d=compeeto/d41ly` and `b=compeeto/d41ly`, it prints nothing and
   exits 1 each time.
   Red when: an unlisted node, an unreadable one, or an ambiguous match resolves to a tag.
 - **AC3** — When `bash -c '. tools/unattended/lib-unattended.sh && USERNAME=Agent5 read_user_name'`
   runs it prints `agent5`, and with `USERNAME` unset it prints what `id -un` prints, lowercased.
   Red when: the reader keeps the case, or returns nothing while `id -un` answers.
-- **AC4** — When `landing_nodes_malformed "d=compeeto a=/x bb=m/u c=m/u/v d=m2/u2"` runs after
+- **AC4** — When `scan_landing_nodes "d=compeeto a=/x bb=m/u c=m/u/v d=m2/u2"` runs after
   sourcing the library, it prints `d=compeeto`, `a=/x`, `bb=m/u`, `c=m/u/v` and the doubled tag `d`,
   and over `"a=m/u d=compeeto/d41ly"` or `""` it prints nothing.
   Red when: a malformed token or a doubled tag goes unprinted, or a well-formed value prints.
@@ -243,12 +247,12 @@ before it returns (`tools/unattended/unattended.sh:7645-7659`).
 - **AC11** — When `grep -n 'LANDING_NODES' tools/unattended/.unattended.conf.example tools/unattended/PROTOCOL.template.md tools/unattended/check-unattended.sh`
   runs, it shows the example declaration, a §8 table row, the leg's initialiser, an allow-list
   entry between the `gov:conf-allow-begin` and `gov:conf-allow-end` sentinels, and the new check
-  calling `landing_nodes_malformed`.
+  calling `scan_landing_nodes`.
   Red when: any of the five is missing, which check 22's join would also report.
   `cost:` observing the leg end to end costs a full leg run; the bar at the close is where that is
   paid, and this criterion does not run it.
-- **AC12** — When `grep -n 'landing' tools/unattended/PROTOCOL.template.md tools/unattended/VERBS.template.md`
-  runs, PROTOCOL §2 lists the `landing` fact, §6 carries the hand-off-node sentence, the
+- **AC12** — When `grep -n 'landing' tools/unattended/PROTOCOL.template.md tools/unattended/VERBS.template.md tools/unattended/STOPS.template.md`
+  runs, PROTOCOL §2 lists the `landing` fact, §6 carries the hand-off-node sentence, the STOPS §15
   close-decision table carries the hand-off row, VERBS' `--preflight` and `--close` entries mention
   it, and `cmp` of each template against its `memory/guides/UNATTENDED-*.md` render reports no
   difference.
@@ -293,6 +297,16 @@ New arm: tools/unattended/check-unattended.test.sh · a fixture conf declaring a
 
 - rev-1 · 2026-10-04 · initial draft, from design section 7 at rev-2, review item M9, and ask
   `TOOL-dUnstuckLanding-10`.
+- rev-2 · 2026-10-04 · at build. Two names and one location. The lexicon holds no `match` verb and
+  no `landing` verb, so the library functions are `resolve_landing_tag` and `scan_landing_nodes`;
+  S2, S6, §4 and AC1, AC2, AC4 and AC11 now spell them so. The close-decision table unit 18 added
+  lives in the stop contract's §15, not in PROTOCOL, so S8 targets `STOPS.template.md` and its
+  render, the files-touched list names both, and AC12's grep reads STOPS too. The protocol had 49
+  bytes under its cap, so the fact, the §6 sentence and the §8 row were paid for by cutting four
+  pieces of history prose, no rule: §2's account of the generated region's earlier byte-compared
+  design, the records-current cell's "this cell once described" sentence, §4 `landed-via-lander`'s
+  note on the removed bypass-flag grep, and §7's note that nothing changed in the move to VERBS.
+  The driver's new fail numbers are 104 and 105 and the leg's new check is 49.
 
 ## 10. Reuse audit
 

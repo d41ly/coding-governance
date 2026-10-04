@@ -22,7 +22,9 @@
 # root the driver and the resume tick both read; `read_bound_key`, the one reader of a bound conf
 # key both of them call; `read_fork_cutoff`, the one TEXT read of the memory kit's FORK_ITEM_CUTOFF
 # the driver and the pass-order leg share; `read_host_name`, `read_pid_image` and `check_pid_alive`, the one reading
-# of "which node, which process" the lease writer and both pid probes share; `parse_gate_profile` and
+# of "which node, which process" the lease writer and both pid probes share; `read_user_name`,
+# `resolve_landing_tag` and `scan_landing_nodes`, the one reading of which node may land, the driver
+# and the gate leg both ask; `parse_gate_profile` and
 # `check_gate_wall`, the one reading of the gate runner's profile the driver and the leg both ask; the
 # anchored id tests; path containment; "has this pass committed yet"; and `read_advertised_head` with
 # `read_history_range`, the one observation of the remote's tip and the one range rule the two history
@@ -373,6 +375,59 @@ read_host_name() { # -> the node's name, lowercased, or nothing
   [ -n "$h" ] || h=$(hostname 2>/dev/null) || h=""
   [ -n "$h" ] || return 1
   printf '%s\n' "$h" | tr '[:upper:]' '[:lower:]'
+}
+
+# THE USER, in `read_host_name`'s shape (TOOL-dUnstuckLanding-20 S1): `USERNAME` where Windows sets
+# it, else `id -un`, else `USER`, LOWERCASED, because a landing pair compares the machine and the user
+# together and the two sources disagree on case for one account. Empty when none answers.
+read_user_name() { # -> the user's name, lowercased, or nothing
+  local u="${USERNAME:-}"
+  [ -n "$u" ] || u=$(id -un 2>/dev/null) || u=""
+  [ -n "$u" ] || u="${USER:-}"
+  [ -n "$u" ] || return 1
+  printf '%s\n' "$u" | tr '[:upper:]' '[:lower:]'
+}
+
+# THE LANDING-NODE GRAMMAR, ONE SPELLING (TOOL-dUnstuckLanding-20 S2). `LANDING_NODES` is a list of
+# `<tag>=<machine>/<user>` pairs, the tag one lowercase letter and neither half empty or carrying a
+# `/`. The driver resolves the node holding a run through the first function and the gate leg grades
+# the declaration through the second, so the two readers cannot disagree about which token is a pair.
+# Every field compares LOWERCASED, for `read_host_name`'s reason. A node is a machine AND a user,
+# never a path: the charter's node registry forbids a path, because roots can be identical.
+resolve_landing_tag() { # nodes · machine · user -> the one matching pair's tag; 1 on none, an empty input, or two tags
+  local - nodes m u tok tag mu hit=""
+  set -f
+  nodes=$(printf '%s' "$1" | tr '[:upper:]' '[:lower:]')
+  m=$(printf '%s' "$2" | tr '[:upper:]' '[:lower:]'); u=$(printf '%s' "$3" | tr '[:upper:]' '[:lower:]')
+  [ -n "$m" ] && [ -n "$u" ] || return 1
+  for tok in $nodes; do
+    case "$tok" in [a-z]=?*/?*) ;; *) continue ;; esac
+    tag=${tok%%=*}; mu=${tok#*=}
+    case "$mu" in */*/*) continue ;; esac
+    [ "$mu" = "$m/$u" ] || continue
+    if [ -n "$hit" ] && [ "$hit" != "$tag" ]; then return 1; fi
+    hit=$tag
+  done
+  [ -n "$hit" ] || return 1
+  printf '%s\n' "$hit"
+}
+scan_landing_nodes() { # nodes -> each malformed token, then each tag or machine/user declared twice; nothing when well-formed or blank
+  # A malformed token whose tag is still readable claims that tag, so `d=compeeto d=m/u` names `d` as
+  # declared twice as well as `d=compeeto` as malformed: either fix leaves one pair per tag.
+  local - tok mu seen_t=" " seen_p=" "
+  set -f
+  for tok in $(printf '%s' "$1" | tr '[:upper:]' '[:lower:]'); do
+    case "$tok" in
+      [a-z]=*) case "$seen_t" in *" ${tok%%=*} "*) printf '%s\n' "${tok%%=*}" ;; *) seen_t="$seen_t${tok%%=*} " ;; esac ;;
+    esac
+    mu=${tok#*=}
+    case "$tok" in
+      [a-z]=?*/?*) case "$mu" in */*/*) printf '%s\n' "$tok"; continue ;; esac ;;
+      *) printf '%s\n' "$tok"; continue ;;
+    esac
+    case "$seen_p" in *" $mu "*) printf '%s\n' "$mu" ;; *) seen_p="$seen_p$mu " ;; esac
+  done
+  return 0
 }
 
 # THE IMAGE HOLDING A PID. Prints the image name and returns 0 when a process holds the pid; 1 when

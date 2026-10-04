@@ -20,7 +20,8 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   config, and the run's first act must not be the mode whose past over-firing this protocol cites.
   Where the project declares `GATE_PROFILE_CMD` it pins the bar's backstop, the runner's wall plus
   its queue bound plus a margin, as the `gate-backstop` fact, and it refuses a wall below the
-  largest leg ceiling that profile reports.
+  largest leg ceiling that profile reports. It resolves this node against `LANDING_NODES` at BASE,
+  prints `landing — lander`, `handoff` or `undeclared`, and records the first two as `landing`.
 - `--phase` — writes a phase and its witness. Without it the vocabulary is decorative: only
   `--preflight` and `--close` ever wrote one, so every member between them entered the file only by
   hand-editing an artifact this kit calls generated.
@@ -156,7 +157,9 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   bounded by the pinned backstop, and `gates-green` names each other way a bar ends as what it is: a
   TREE MOVED exit is run once more, and a HOST exit or a kill before the bar acquired the repository
   prints a `hold ·` line rather than reading as a red leg. Under `primary` it prints `--park`'s
-  refresh before the DoD and records `refreshed-at` only with a met DoD's writes.
+  refresh before the DoD and records `refreshed-at` only with a met DoD's writes. It resolves its own
+  node again, and on a `landing` hand-off node it refuses any override up front and, with the DoD
+  met, writes the bar's facts and refuses, naming `--handoff <slug> --code owner-landing`.
 - `--landed` — an OBSERVATION rather than a claim, guarded on the RECORDED phase. It accepts a record
   only at `LANDING` and re-observes the anchor. Under `primary` it is the one writer of `LANDED` and
   refuses unless HEAD is an ancestor of the tip the remote advertises; where `LANDER_MARKER` is

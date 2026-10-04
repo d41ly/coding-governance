@@ -404,6 +404,15 @@ LANDED_FACTS_CUTOFF=""
 # write under the old meaning, which is usually the day after you adopt the hand-off.
 HANDOFF_CUTOFF=""
 
+# Which nodes may LAND a run, as space-separated `<tag>=<machine>/<user>` pairs: the tag one
+# lowercase letter, the machine as COMPUTERNAME or hostname names it and the user as USERNAME or
+# `id -un` does, all compared lowercased, e.g. "a=desk-a/alice b=build-02/ci". Never a path,
+# because roots can be identical across machines. Read at the run's pinned BASE, so a run cannot add
+# its own node. A run on any other node starts normally, records `landing: handoff`, and ends at
+# --handoff --code owner-landing with no override. The gate leg reds a malformed or doubled token.
+# Blank or absent: every node may land, announced at --preflight.
+LANDING_NODES=""
+
 # TOOL-dBriefedPass-3 — the date from which a CLOSED unit whose BUILD COMMIT predates a conforming
 # spec for it blocks the bar. Graded on the build README's `opened:` date, the same idiom
 # UNITS_REGION_CUTOFF and SPEC_THIN_CUTOFF use and for the same reason: a build that landed before

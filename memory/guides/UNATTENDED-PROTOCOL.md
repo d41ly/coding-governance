@@ -136,13 +136,6 @@ without it — found by writing the arms that item had never had.
 DERIVED from the build README on every read, never copied here, and the gate asserts the region holds
 no copy.
 
-This inverted an earlier design where the region WAS a copy the gate byte-compared against its
-source. That equality was unmaintainable: folding a review bumps a spec rev, which moves the build
-index, which makes the copy stale — and the region's only writer was `--preflight`, which refuses
-once a run is live. The refusal told the reader to "re-run the driver", naming a path no verb walks,
-so a run that hit it could only hand-edit an artifact this document calls generated. Deriving removes
-the class instead of adding a verb to service it: one fact, one home.
-
 ### A build gets more than one run by ROTATING the finished one
 
 A record that has reached a terminal phase is not something to move, re-open or re-pin, and every
@@ -230,6 +223,8 @@ belonging here:
     foreign tick stands off, a recycled pid reads dead, and `--landed` grades no stop line older
     than the lease.
 17. **The refresh**, `refreshed-at`: the tip a verdict verb last saw past BASE, or `unobserved`.
+18. **The landing node**, `landing: lander` or `handoff`, resolved by `--preflight` from
+    `LANDING_NODES` (§8) at BASE and written afresh like the lease; absent when undeclared.
 
 Facts 10, 11 and 12 are ABSENT on a run that never reached the condition each records; the
 "nothing else" clause bounds what may appear, not what must. Fact 9 is always written, fact 13
@@ -342,9 +337,9 @@ something no machine could have checked:
 | Item | Checked by | Asserts |
 |---|---|---|
 | `gates-green` | machine | the project's full merge bar ran on the tip being landed, and its verdict is one the inherited-red policy of `UNATTENDED-STOPS.md` §13 lands |
-| `records-current` | machine | the run-state file's GENERATED region is EMPTY — the unit list is derived from the build README on every read, so "current" is the absence of a second copy rather than a comparison between two — AND both marker pairs are well-formed, the run-state file's own and the build README's. Well-formedness is read from the region reader's EXIT STATUS, not from empty output: a malformed pair prints nothing and exits non-zero, so testing emptiness alone scores a broken pair as SATISFIED, passing loudest when the file is least readable. This cell once described a fresh-render comparison against unit status headers the driver never reads, which made an ordinary spec rev bump block the close with no reachable repair |
+| `records-current` | machine | the run-state file's GENERATED region is EMPTY — the unit list is derived from the build README on every read, so "current" is the absence of a second copy rather than a comparison between two — AND both marker pairs are well-formed, the run-state file's own and the build README's. Well-formedness is read from the region reader's EXIT STATUS, not from empty output: a malformed pair prints nothing and exits non-zero, so testing emptiness alone scores a broken pair as SATISFIED, passing loudest when the file is least readable |
 | `authorization-reachable` | machine | the build README is reachable from the pinned BASE, parses as build front matter, and names this build |
-| `landed-via-lander` | machine, PRE-LANDING | a lander is DECLARED, and that is the whole predicate: the bypass-flag grep it carried duplicated leg check 11 and is gone. It runs inside `--close`, BEFORE the landing it names, so it cannot observe the push nor fail for anything the run did. The observation lives in `--landed`, the only verb after it |
+| `landed-via-lander` | machine, PRE-LANDING | a lander is DECLARED, and that is the whole predicate. It runs inside `--close`, BEFORE the landing it names, so it cannot observe the push nor fail for anything the run did. The observation lives in `--landed`, the only verb after it |
 | `build-complete` | machine | the build's authored roster names no unit that is unspecced or unfinished. SIX terms, all required; the generated region must be NON-empty, because "no unit row is non-terminal" is vacuously true over no rows at all. A unit carried forward under the stop contract's close-decision table is not unfinished |
 | `closing-review-recorded` | machine | a TRACKED review record under this build carries a `diff-review` binding line AND names a commit between the pinned BASE and HEAD, decided by git ancestry rather than by a substring. The RANGE is what admits a fold-scoped round, whose base is a descendant of BASE; the KIND is what stops a spec audit standing in for a closing review. It measures TWO things and neither is a judgement about the review's content: that a review of what shipped exists and is bound to THIS run, and that the run's own `--review` loop for the build slug reached a declared exit, with `CONVERGED` implying zero blockers. A review record is a document; a loop that never ended is a run that stopped reviewing, and only the second is readable |
 | `pieces-complete` | machine | this run produced the number of pieces its build README asked for at the pinned BASE, each joined to a record by content hash and each recording a PASS for every declared per-piece leg. SCOPED to recipe-mode runs: term zero meets it and announces the skip for any other mode, because `--close` evaluates this set for every run and an item only one mode can satisfy would block the rest of the fleet |
@@ -429,6 +424,8 @@ onto the advertised tip, `--close` grading THAT merge under `GATE_FULL=1` and co
 `--land`, `--landed`; a reconcile never routes through the local default branch.
 `LANDED` is also DERIVED (D12-i2) from a pushed `LANDING` commit.
 `UNATTENDED-STOPS.md` carries the rest.
+**A node `LANDING_NODES` does not declare lands nothing**: its `--close` refuses an override, writes
+a met bar's facts and names `--handoff --code owner-landing`. The close's own node decides.
 
 `landed-via-lander` is the machine-checked DoD item for this, and the gate greps the close path for
 a bypass flag in both directions: the lander must be present, the flag must be absent.
@@ -445,8 +442,7 @@ distinction that matters most.
 
 The verb entries live in `UNATTENDED-VERBS.md`, installed beside this file from the kit's
 `VERBS.template.md` and byte-compared against it by the same leg that compares this pair. Read them
-there. Nothing about any verb changed in the move, and section 4's attested-item paragraph moved
-into `--attest` the same way. The stop contract is `UNATTENDED-STOPS.md`, installed and compared the
+there. The stop contract is `UNATTENDED-STOPS.md`, installed and compared the
 same way.
 
 ## 8. What a project declares
@@ -506,6 +502,7 @@ In the repo-root `.unattended.conf`. Blank or absent turns the corresponding ass
 | `LANDED_ANCHOR_CUTOFF` | the date from which a `LANDED` record must name its anchor kind. A record whose first commit predates it is read as `remote`; blank or absent grandfathers every record |
 | `LANDED_FACTS_CUTOFF` | from this date a landed record carries its verb's facts. Blank is off |
 | `HANDOFF_CUTOFF` | from this date `ABORTED` means DISCARD, §3. Blank is off |
+| `LANDING_NODES` | `<tag>=<machine>/<user>` pairs that may land, read at BASE; any other node hands off. Blank: every node, announced. §6 |
 | `DISPOSITION_CUTOFF` | the date from which a review exit's RECORDED disposition is read instead of inferred from new unit ids. Graded on the run-state record's own first-commit date; a record before it keeps the id-delta proxy, EXCEPT one with no first-commit date at all — a staged, in-flight record is graded whatever the cutoff says, being the one case that can still record a disposition. Blank or absent grandfathers every record and the leg says so on stdout, because a silently disabled clause reads exactly like a clause finding nothing wrong |
 | `RUNLOG_SESSION_VARS` | the environment variable NAMES, space-separated and eight at most, whose values each run-log START records as `sess.<NAME>=` (§2); a value outside `[A-Za-z0-9_.:-]{1,128}` is written empty and flagged. OPTIONAL: blank records none |
 

@@ -5830,7 +5830,18 @@ printf 'c48probe() {\n  %s "$rel" witness x || return 1\n  %s "$rel" || return 1
 mutate $KIT_REL/lib-unattended.sh "\$r $TMPBIN_PARENT/c48.fn"
 miss "$(run)" "UNATTENDED check 48 FAILED"
 reset_tree
-fi   # ---- end REGION 8 ------------------------------------------------------------------------
+
+# ==== TOOL-dUnstuckLanding-20: CHECK 49, a LANDING_NODES token that is not a <tag>=<machine>/<user>
+# ---- pair, or a tag declared twice, reds naming each; a malformed token claims its tag, so `d` is the
+# ---- doubled one here. The well-formed value beside it stays silent, so the red is not a ban on the key.
+printf 'LANDING_NODES="d=compeeto a=m/u d=m2/u2"\n' >> .unattended.conf
+out=$(run)
+hit  "$out" "LANDING_NODES declares a token that is not a <tag>=<machine>/<user> pair, or a tag or machine/user declared twice, and a malformed token never matches, so that node hands off on every run with nothing else red: d=compeeto d"
+reset_tree
+printf 'LANDING_NODES="a=m/u d=compeeto/d41ly"\n' >> .unattended.conf
+miss "$(run)" "UNATTENDED check 49 FAILED"
+reset_tree
+fi   # ---- end REGION 8------------------------------------------------------------------------
 
 # ---- RE-MEASURED AT THE dUnstalledConvoy MERGE, 2026-08-21, node d. Both sides of that merge
 # ---- touched these constants and they disagreed about what a floor is for, so the reconciliation is

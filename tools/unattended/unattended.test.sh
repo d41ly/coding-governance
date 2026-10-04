@@ -12887,6 +12887,130 @@ out=$(run_rx --close tRx)
 miss "$out" "unattended: refresh —"
 hit  "$out" "an agent-attested DoD item is unmet"
 rm -rf "$rx_root"
+# ========================== TOOL-dUnstuckLanding-20 — `LANDING_NODES`, the landing node and its hand-off ====
+# ---- SELF-CONTAINED, for the refresh block's reason: a fresh scratch repo per arm, `primary` landing,
+# ---- a build whose one unit is CLOSED with its roster, and a conf whose BASE copy declares the pairs
+# ---- below. The node is the ENVIRONMENT the driver inherits, `COMPUTERNAME` and `USERNAME`, so node
+# ---- `b` here is a machine and user the value does not list and node `d` one it does. The bar is a
+# ---- tracked stub that writes a GREEN run record under the pinned run id, so the hand-off's
+# ---- attribution guard has the record a real runner leaves. `write_ln_dod_records` commits the attestations,
+# ---- the CONVERGED round and the closing review BEFORE the close, so the bar runs on a clean tree and
+# ---- the record commit is all that separates HEAD from the bar's head.
+ln_root=$(mktemp -d)
+LN_VALUE='a=desk-a/daily-agent d=compeeto/d41ly'
+LN_NB="COMPUTERNAME=desktop-3j1o6cd USERNAME=agent5"
+LN_ND="COMPUTERNAME=compeeto USERNAME=d41ly"
+LN_R=memory/builds/tLn/RUN.md
+run_ln() { local _e=$1; shift; ( cd "$ln_root/repo" && env -u GATE_SELFTESTS GOV_DEFAULT_BRANCH=main $_e bash "$SCRIPT" "$@" 2>&1 ); }
+run_ln_git() { git -C "$ln_root/repo" "$@"; }
+read_ln_fact() { sed -n "s/^$1: //p" "$ln_root/repo/$LN_R" | head -1; }
+build_ln_fixture() { # LANDING_NODES at BASE, `-` for undeclared · the run's own committed value, `-` for BASE's
+  rm -rf "$ln_root/repo" "$ln_root/origin.git"; mkdir -p "$ln_root/repo"
+  git init -q --bare "$ln_root/origin.git"
+  git --git-dir="$ln_root/origin.git" symbolic-ref HEAD refs/heads/main
+  (
+    cd "$ln_root/repo" || exit 2
+    git init -q -b main . && git config user.email t@t.test && git config user.name t \
+      && git config core.autocrlf false
+    git remote add origin "$ln_root/origin.git"
+    mkdir -p memory/guides memory/builds/tLn/spec memory/builds/tLn/reviews
+    printf '# build method\n' > memory/guides/BUILD-METHOD.md
+    printf '%s\n' 'd="$(git rev-parse --git-dir)/gate-run/$GATE_RUN_ID"; mkdir -p "$d"' \
+      'printf "head\t%s\ntree_clean\tyes\n" "$(git rev-parse HEAD)" > "$d/header"' \
+      'printf "verdict\tGREEN\ntree_moved\tno\n" > "$d/verdict"' > bar.sh
+    printf 'MEMORY_ROOT=memory\nUNITS_REGION_CUTOFF="2026-08-19"\nLANDER="echo land"\nLANDER_MODE="primary"\nBYPASS_BAN="--no-verify"\nGATE_CMD="bash bar.sh"\nGATE_BOUND="600"\nGATE_WALL="21600"\nUNIT_STALL_BOUND="1800"\nREVIEW_ROUNDS="7"\nRESUME_STALE_BOUND="5400"\nWIRING_CHECK="true"\nKEEPALIVE_CREATE="CronCreate"\nKEEPALIVE_DELETE="CronDelete"\nRESUME_SCHEDULE="on"\nRESUME_SCHEDULE_CREATE="TheScheduleCreate"\nRESUME_SCHEDULE_DELETE="TheScheduleDelete"\nRESUME_SCHEDULE_DELAY="1800"\nRESUME_SCHEDULE_LIMIT="6"\nPHASES_EXTRA=""\nDOD_EXTRA=""\n' > .unattended.conf
+    [ "$1" = - ] || printf 'LANDING_NODES="%s"\n' "$1" >> .unattended.conf
+    printf -- '---\nslug: tLn\nnode: a\nopened: 2026-08-01\nstreams: architecture\nroster: ARCH\nids: ARCH-tLn-1\n---\n\n# tLn\n\n<!-- gen:build-index -->\n**Build status:** CLOSED · 1 unit(s)\n\n<!-- gen:build-units -->\n| Unit | Status | Rev | Last change |\n|---|---|---|---|\n| [ARCH-tLn-1 — the unit](spec/one.md) | CLOSED | rev-1 | 2026-08-01 |\n<!-- /gen:build-units -->\n<!-- /gen:build-index -->\n\n<!-- roster:units -->\n1. ARCH-tLn-1 — the unit\n<!-- /roster:units -->\n' > memory/builds/tLn/README.md
+    printf '# ARCH-tLn-1 the unit\n\n**Status:** CLOSED · rev-1 · 2026-08-01 · node a · Tier-1 · base 00000000 · streams architecture\n' > memory/builds/tLn/spec/one.md
+    printf '# tLn — run state\n\n<!-- run:generated -->\n<!-- /run:generated -->\n\n## Mandate\n<!-- run:mandate -->\nThe owner authorizes build tLn to merge to main and to push.\n<!-- /run:mandate -->\n\n## Run facts\n\n## Parked\n' \
+      > memory/builds/tLn/RUN.md
+    git add -A && git commit -q -m base --no-verify && git push -q origin main
+    git checkout -q -b unit && git commit -q --allow-empty -m "unit work" --no-verify
+    if [ "$2" != - ]; then
+      sed -i '/^LANDING_NODES=/d' .unattended.conf; printf 'LANDING_NODES="%s"\n' "$2" >> .unattended.conf
+      git commit -qam "the run adds its own node" --no-verify
+    fi
+  ) >/dev/null 2>&1
+}
+run_ln_preflight() { run_ln "$1" --preflight tLn --keepalive-id k1 >/dev/null
+                 run_ln_git add -A >/dev/null && run_ln_git commit -q -m "records(tLn): preflight" --no-verify; }
+write_ln_dod_records() { # node environment
+  run_ln "$1" --attest tLn --item keepalive-reaped >/dev/null
+  run_ln "$1" --attest tLn --item parked-decisions-surfaced >/dev/null
+  printf '2026-08-31T00:00:00Z review · item tLn · reason verdict CLEAN · blockers 0 · CONVERGED\n' >> "$ln_root/repo/$LN_R"
+  printf '**Serves:** diff-review ARCH-tLn-1\n\n# closing review\n\nrange %s...HEAD\n' \
+    "$(run_ln_git rev-parse --short "$(read_ln_fact base)")" > "$ln_root/repo/memory/builds/tLn/reviews/r1.md"
+  run_ln_git add -A >/dev/null && run_ln_git commit -q -m "records(tLn): attested and reviewed" --no-verify
+}
+
+# ---- AC5: an unlisted node's preflight starts normally and records handoff naming itself; a listed
+# ---- node's records lander with its tag.
+build_ln_fixture "$LN_VALUE" -
+out=$(run_ln "$LN_NB" --preflight tLn --keepalive-id k1)
+hit  "$out" "unattended: landing — handoff · desktop-3j1o6cd/agent5 is not a node LANDING_NODES at the pinned BASE declares able to land · this run ends at --handoff --code owner-landing"
+hit  "$out" "preflight OK"
+same "TOOL-dUnstuckLanding-20 AC5 an unlisted node records handoff" "$(read_ln_fact landing)" "handoff"
+build_ln_fixture "$LN_VALUE" -
+out=$(run_ln "$LN_ND" --preflight tLn --keepalive-id k1)
+hit  "$out" "unattended: landing — lander · node d"
+same "TOOL-dUnstuckLanding-20 AC5 a listed node records lander" "$(read_ln_fact landing)" "lander"
+
+# ---- AC6: the working copy decides nothing - undeclared at BASE stays undeclared and writes no fact
+# ---- although the run's own commit declares node b, and a BASE value the run widened still hands off.
+build_ln_fixture - "b=desktop-3j1o6cd/agent5"
+out=$(run_ln "$LN_NB" --preflight tLn --keepalive-id k1)
+hit  "$out" "unattended: landing — undeclared · every node may land"
+same "TOOL-dUnstuckLanding-20 AC6 undeclared at BASE writes no landing fact" "$(grep -c '^landing: ' "$ln_root/repo/$LN_R" || true)" "0"
+build_ln_fixture "$LN_VALUE" "$LN_VALUE b=desktop-3j1o6cd/agent5"
+out=$(run_ln "$LN_NB" --preflight tLn --keepalive-id k1)
+hit  "$out" "unattended: landing — handoff · desktop-3j1o6cd/agent5 is not a node"
+same "TOOL-dUnstuckLanding-20 AC6 the run's own widening grants nothing" "$(read_ln_fact landing)" "handoff"
+
+# ---- AC7: an override on a hand-off node is a free refusal, before the anchor is observed, and the
+# ---- record is unchanged.
+build_ln_fixture "$LN_VALUE" -
+run_ln_preflight "$LN_NB"
+out=$(run_ln "$LN_NB" --close tLn --override build-complete --reason r)
+hit  "$out" "--close on a node LANDING_NODES does not declare able to land takes no --override, because this close lands nothing and an override would record a waiver for a landing the run never makes; park a decision with --park, or end the run with --handoff --code owner-landing once the Definition of Done is met: desktop-3j1o6cd/agent5 is not a node"
+miss "$out" "observing the anchor"
+same "TOOL-dUnstuckLanding-20 AC7 the refused override left the tree clean" "$(run_ln_git status --porcelain)" ""
+
+# ---- AC8: a met close on a hand-off node writes and stages the bar's fact, refuses naming the exact
+# ---- hand-off, and writes no LANDING; the hand-off it names then completes.
+build_ln_fixture "$LN_VALUE" -
+run_ln_preflight "$LN_NB"; write_ln_dod_records "$LN_NB"
+out=$(run_ln "$LN_NB" --close tLn); rc=$?
+hit  "$out" "every declared Definition-of-Done item is met and this node may not land, so the bar's facts are written and staged and no phase is; commit the record, reap the keepalive, and end the run with --handoff tLn --code owner-landing --reason <text> --reaped <id>: desktop-3j1o6cd/agent5 is not a node"
+same "TOOL-dUnstuckLanding-20 AC8 the refusing close exits non-zero" "$rc" "1"
+n=$((n+1)); [ -n "$(read_ln_fact gates-run)" ] || { echo "FAIL TOOL-dUnstuckLanding-20 AC8 the refusing close wrote no gates-run fact"; st=1; }
+same "TOOL-dUnstuckLanding-20 AC8 no LANDING was written" "$(grep -c '^phase: LANDING' "$ln_root/repo/$LN_R" || true)" "0"
+same "TOOL-dUnstuckLanding-20 AC8 only the record is staged" "$(run_ln_git diff --cached --name-only)" "$LN_R"
+run_ln_git commit -q -m "records(tLn): the bar's facts" --no-verify
+out=$(run_ln "$LN_NB" --handoff tLn --code owner-landing --reason "an owner lands it" --reaped k1)
+hit  "$out" "phase HELD · code owner-landing · until owner"
+same "TOOL-dUnstuckLanding-20 AC8 the named hand-off completes" "$(read_ln_fact phase)" "HELD"
+
+# ---- AC9: a lander preflight does not let an unlisted node's close land; the disagreement is printed.
+build_ln_fixture "$LN_VALUE" -
+run_ln_preflight "$LN_ND"; write_ln_dod_records "$LN_ND"
+out=$(run_ln "$LN_NB" --close tLn)
+hit  "$out" "unattended: landing — this close resolves handoff and the record reads landing: lander; the close's own answer decides"
+hit  "$out" "and end the run with --handoff tLn --code owner-landing"
+same "TOOL-dUnstuckLanding-20 AC9 the recorded lander did not land node b" "$(grep -c '^phase: LANDING' "$ln_root/repo/$LN_R" || true)" "0"
+
+# ---- AC10: a listed node's close is today's close, and so is one in a project that declares nothing.
+build_ln_fixture "$LN_VALUE" -
+run_ln_preflight "$LN_ND"; write_ln_dod_records "$LN_ND"
+out=$(run_ln "$LN_ND" --close tLn)
+hit  "$out" "close OK"
+same "TOOL-dUnstuckLanding-20 AC10 a listed node writes LANDING" "$(read_ln_fact phase)" "LANDING"
+build_ln_fixture - -
+run_ln_preflight "$LN_NB"; write_ln_dod_records "$LN_NB"
+out=$(run_ln "$LN_NB" --close tLn)
+hit  "$out" "close OK"
+miss "$out" "unattended: landing —"
+same "TOOL-dUnstuckLanding-20 AC10 an undeclared project closes as today" "$(read_ln_fact phase)" "LANDING"
+rm -rf "$ln_root"
 fi   # ---- end REGION TWO ----------------------------------------------------------------------
 
 # FLOOR_ASSERTIONS — TOOL-cBriefedPilot-23. A shrink-only pin on the EXECUTED count. This build

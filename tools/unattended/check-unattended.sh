@@ -192,6 +192,9 @@ LANDED_FACTS_CUTOFF=""
 # TOOL-dUnstuckLanding-13 S8 - the date from which ABORTED means DISCARD. Initialised and admitted
 # here so a project's declared value reaches the readers that split ABORTED records on it.
 HANDOFF_CUTOFF=""
+# TOOL-dUnstuckLanding-20 S6 - which nodes may land, graded by check 49 through the library function
+# the driver resolves a node with, so the two readers cannot disagree about which token is a pair.
+LANDING_NODES=""
 KICKOFF_ENGINE=""; KICKOFF_EXITS=""; DIRECTIVES_EXTRA=""; DIRECTIVES_FLOOR=""; DIRECTIVES_EXTRA_TABLE=""
 HALT_CODES_EXTRA=""; HALT_FLOOR=""; UNDECLARED_WRITE_BUDGET=""
 HOLD_CODES_EXTRA=""; HOLD_FLOOR=""
@@ -281,7 +284,7 @@ while IFS= read -r -d '' _ck; do
     HALT_FLOOR|UNDECLARED_WRITE_BUDGET|HOLD_CODES_EXTRA|HOLD_FLOOR|\
     RESUME_SCHEDULE|RESUME_SCHEDULE_CREATE|RESUME_SCHEDULE_DELETE|RESUME_SCHEDULE_DELAY|RESUME_SCHEDULE_LIMIT|\
     RECALL_CLI|ASKS_CMD|SHARED_RECORDS|GENERATED_INDEXES|GATE_BOUND|GATE_WALL|GATE_PROFILE_CMD|\
-    UNITS_REGION_CUTOFF) eval "$_ck=\$_cv" ;;
+    UNITS_REGION_CUTOFF|LANDING_NODES) eval "$_ck=\$_cv" ;;
     # gov:conf-allow-end
   esac
 done < <( . "$CONF" >/dev/null 2>&1 || exit 9
@@ -5760,6 +5763,26 @@ else
     report "check 48 graded ${_c48_n%% *} function(s) in ${#_c48_files[@]} shell file(s) of this kit, ${_c48_n#* } of them staging a run-state file"
   fi
   [ -z "$_c48_hits" ] || fail 48 "a function in a shipped shell file of this kit writes a run-state fact after its last staging of that same file, so the index holds the file as it was before that write and the write stays unstaged: a commit of what the verb staged records half of it and leaves the tree dirty; stage after the last write. matches: $_c48_hits"
+fi
+
+# ---- check 49 - EVERY LANDING_NODES TOKEN IS A PAIR, AND NO TAG OR NODE IS DECLARED TWICE.
+# ---- TOOL-dUnstuckLanding-20 S6 (F4). The driver resolves the node holding a run against this key at
+# ---- the pinned BASE, and a malformed token never matches, so a typo makes that node hand off on every
+# ---- run with nothing red. Graded through `scan_landing_nodes`, the library function the driver's own
+# ---- reason line calls, so the leg and the driver read one grammar.
+# ----
+# ---- What this does NOT check: that a pair names a REAL node, or the node the owner meant, or that the
+# ---- tags agree with the charter's node registry. It reads the conf at HEAD, which is the BASE of the
+# ---- next run and not of any run already pinned.
+if [ -z "${LANDING_NODES//[[:space:]]/}" ]; then
+  report "check 49 did not grade LANDING_NODES - the project conf declares none, so every node may land"
+else
+  _c49_bad=$(scan_landing_nodes "$LANDING_NODES" | tr '\n' ' ' | sed 's/ $//')
+  if [ -n "$_c49_bad" ]; then
+    fail 49 "LANDING_NODES declares a token that is not a <tag>=<machine>/<user> pair, or a tag or machine/user declared twice, and a malformed token never matches, so that node hands off on every run with nothing else red: $_c49_bad"
+  else
+    report "check 49 graded LANDING_NODES: $(set -f; set -- $LANDING_NODES; echo $#) pair(s), each well-formed and none declared twice"
+  fi
 fi
 
 fi   # ---- end of the checks `--only 28` skips
