@@ -31,3 +31,5 @@ anchor-ref: refs/heads/main
 base: 5266d22eba31cdbf15425773d245cd23d7b9cdf5
 
 ## Parked
+
+2026-10-04T15:45:33Z rescope · item add TOOL-aGraftedHelix-9 · reason M2 decompose: unit 6 named two mechanisms, an exact content-key check (memory-tree) and a near-match relation check (recall index); one mechanism per spec splits them

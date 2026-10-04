@@ -2,12 +2,12 @@
 slug: aGraftedHelix
 node: a
 opened: 2026-10-04
-streams: tooling
+streams: tooling+kickoff
 roster: TOOL
 authorized-by: prompt
 spec-audit: 2026-10-04
 status: OPEN
-ids: TOOL-aGraftedHelix-1
+ids: TOOL-aGraftedHelix-1 TOOL-aGraftedHelix-9
 ---
 
 # aGraftedHelix — six helixir mechanisms, grafted onto the kits that own their surface
@@ -61,15 +61,16 @@ self-heals go unreported. The owner's prompt and the review are in `prompts/`.
 | 3 | `TOOL-aGraftedHelix-3` | 2 | a declared invariants registry that the review harness reads as its default by-design list, every row's path and id gated |
 | 4 | `TOOL-aGraftedHelix-4` | 1 | recall rows carry supersession status: demoted, tagged with the superseding id, under an evidence-not-instruction banner |
 | 5 | `TOOL-aGraftedHelix-5` | 2 | each leg reading is stamped faithful or contended by a foreign-load census, and only faithful readings argue a ceiling |
-| 6 | `TOOL-aGraftedHelix-6` | 2 | a content-key gate reds a duplicate decision row or gotcha, and a near match must declare its relation |
+| 6 | `TOOL-aGraftedHelix-6` | 2 | a content-key check reds a decision row or gotcha whose normalized text duplicates another |
 | 7 | `TOOL-aGraftedHelix-7` | 2 | the gate runner stops dispatching legs above a declared memory fraction and records the pause |
 | 8 | `TOOL-aGraftedHelix-8` | 1 | every automatic self-heal appends to one health log the orientation card surfaces |
+| 9 | `TOOL-aGraftedHelix-9` | 2 | a newly added decision row or gotcha that recall ranks as a near match must declare its relation to it |
 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 0 unit(s) · node a · opened 2026-10-04 · streams tooling
-ids TOOL-aGraftedHelix-1
+**Build status:** OPEN · 0 unit(s) · node a · opened 2026-10-04 · streams tooling+kickoff
+ids TOOL-aGraftedHelix-1 TOOL-aGraftedHelix-9
 
 <!-- gen:build-units -->
 *No spec under this build carries a status header; the status above is declared in the front matter.*
