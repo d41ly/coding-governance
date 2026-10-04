@@ -1,6 +1,6 @@
 # TOOL-dUnstuckLanding-17 — the history legs grade the run's own range, and check 23 a per-build budget
 
-**Status:** CLOSED · rev-4 · 2026-10-04 · node d · Tier-2 · base 98926870 · streams tooling · order 5 · closes TOOL-dUnstuckLanding-7 · ratified 2026-10-04
+**Status:** CLOSED · rev-5 · 2026-10-04 · node d · Tier-2 · base 98926870 · streams tooling · order 5 · closes TOOL-dUnstuckLanding-7 · ratified 2026-10-04
 
 <!-- gen:spec-records -->
 
@@ -61,8 +61,11 @@ report-only drift-audit signal, `fleet_over_budget`, that lists the builds over 
 - **S5 — check 23 in RANGE mode, against a per-build budget.** In
   `tools/unattended/check-unattended.sh`, a dispatched pass whose pass commit is an ancestor of the
   advertised tip is not graded against the budget, through the leg's existing `check_adv_reaches`.
-  The over-declared passes that remain are counted PER RUN RECORD, and a record whose count exceeds
-  `UNDECLARED_WRITE_BUDGET` fails check 23 naming that record and its passes. RANGE mode reads the
+  The over-declared passes that remain are counted PER RUN RECORD. Since rev-5, only the run this
+  branch drives FAILS check 23 when its count exceeds `UNDECLARED_WRITE_BUDGET`, naming its passes.
+  Another run's count is reported, never failed. Only a pass whose window overlapped a sibling's is
+  counted; a solo write prints `check 23 SOLO`. Both rules are `TOOL-aWindowedPass-5`'s, reconciled
+  in the merge `5ec23c24`. RANGE mode reads the
   leg's existing `ADV_HEAD` and `ADV_HEAD_OK`; this leg does not call S1's reader. Observed by AC4.
 - **S6 — the fleet line.** Check 23 still walks its whole population exactly as today, and prints one
   line on the default channel whenever that population holds at least one record with dispatch rows:
@@ -396,6 +399,10 @@ once, under `TOOL-dUnstuckLanding-24`.
   suite arms every refusal, each RED against a library copy with that refusal removed. M1 (id 26),
   the intent lens's duplicate of H1, is closed by `TOOL-dUnstuckLanding-27`, whose pre-anchor
   exemption probe carries no range exclusion.
+- rev-5 · 2026-10-04 · S5 · the reconcile merge `5ec23c24` combined check 23 with
+  `TOOL-aWindowedPass-5`, which landed on the default branch while this build was open. Only the run
+  this branch drives can fail, and only window-overlapping passes are counted. This unit's budget, its
+  RANGE skip, its fleet line and its liveness branch are kept. S5 now says what the merged leg does.
 
 ## 10. Reuse audit
 
