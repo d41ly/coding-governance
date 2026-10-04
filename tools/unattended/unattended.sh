@@ -5434,7 +5434,7 @@ run_handoff() { # slug · code · reason · reaped · unreachable
 # so it rides the next landing from this tree or a batched owner pass, and every deriving reader
 # reads the record correctly before then. A live record only: an archive is immutable.
 run_settle() { # slug
-  local slug="$1" rel ph br hc cut first wla t8
+  local slug="$1" rel ph br hc cut first wla t8 st_lease
   check_slug "$slug" || return 1
   rel=$(runmd_of "$slug")
   [ -f "$rel" ] || { fail 10 "no run-state file, so there is no run to settle: $rel"; return 1; }
@@ -5504,8 +5504,9 @@ run_settle() { # slug
         case "$LV_VERDICT" in
           STALE) ;;
           UNBOUND)
-            if [ -n "$(fact "$rel" lease-utc)" ] && { [ "$LV_STALE" != yes ] || [ "$LV_ALIVE" = yes ]; }; then
-              fail 101 "--settle reads a leased working record whose session is absent as abandoned only when its last move is stale and its pid is not alive, and the lease written at $(fact "$rel" lease-utc) reads stale $LV_STALE and pid-alive $LV_ALIVE, so a session may still hold it and settling it would end a live run; nothing was written: $rel"
+            st_lease=$(fact "$rel" lease-utc)
+            if [ -n "$st_lease" ] && { [ "$LV_STALE" != yes ] || [ "$LV_ALIVE" = yes ]; }; then
+              fail 101 "--settle reads a leased working record whose session is absent as abandoned only when its last move is stale and its pid is not alive, and the lease written at $st_lease reads stale $LV_STALE and pid-alive $LV_ALIVE, so a session may still hold it and settling it would end a live run; nothing was written: $rel"
               return 1
             fi ;;
           *) fail 101 "--settle reads a working record as abandoned only when --liveness says STALE or UNBOUND, and it says $LV_VERDICT, so a session may still drive it and settling it would end a live run; nothing was written: $rel"
