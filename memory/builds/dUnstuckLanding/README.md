@@ -71,7 +71,7 @@ ids TOOL-dUnstuckLanding-1 TOOL-dUnstuckLanding-2 TOOL-dUnstuckLanding-3 TOOL-dU
 | [TOOL-dUnstuckLanding-12 — design rev-2: the closing review's five HIGH findings closed](spec/2026-10-04-spec-TOOL-dUnstuckLanding-12.md) | 3 | 1 | CLOSED | rev-1 | 2026-10-04 |
 <!-- /gen:build-units -->
 
-Records: 10 bound to this build, across 4 record folder(s).
+Records: 11 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

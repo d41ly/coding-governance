@@ -6,6 +6,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-04-build-TOOL-dUnstuckLanding-1-runlog-2e793a3b.md](../build/2026-10-04-build-TOOL-dUnstuckLanding-1-runlog-2e793a3b.md) | journal | TOOL-dUnstuckLanding-1 TOOL-dUnstuckLanding-2 |
 | [2026-10-04-build-TOOL-dUnstuckLanding-12-1-acceptance-ledger.md](../build/2026-10-04-build-TOOL-dUnstuckLanding-12-1-acceptance-ledger.md) | journal | — |
 | [2026-10-04-prompt-TOOL-dUnstuckLanding-12-build-brief.md](../prompts/2026-10-04-prompt-TOOL-dUnstuckLanding-12-build-brief.md) | journal | — |
 

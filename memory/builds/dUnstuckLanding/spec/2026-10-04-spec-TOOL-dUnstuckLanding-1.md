@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-10-04-build-TOOL-dUnstuckLanding-1-1-acceptance-ledger.md](../build/2026-10-04-build-TOOL-dUnstuckLanding-1-1-acceptance-ledger.md) | journal | — |
 | [2026-10-04-build-TOOL-dUnstuckLanding-1-census.md](../build/2026-10-04-build-TOOL-dUnstuckLanding-1-census.md) | research | TOOL-dUnstuckLanding-2 |
+| [2026-10-04-build-TOOL-dUnstuckLanding-1-runlog-2e793a3b.md](../build/2026-10-04-build-TOOL-dUnstuckLanding-1-runlog-2e793a3b.md) | journal | TOOL-dUnstuckLanding-2 TOOL-dUnstuckLanding-12 |
 | [2026-10-04-prompt-TOOL-dUnstuckLanding-1-0-run-mandate.md](../prompts/2026-10-04-prompt-TOOL-dUnstuckLanding-1-0-run-mandate.md) | journal | TOOL-dUnstuckLanding-2 |
 | [2026-10-04-prompt-TOOL-dUnstuckLanding-1-build-brief.md](../prompts/2026-10-04-prompt-TOOL-dUnstuckLanding-1-build-brief.md) | journal | — |
 | [2026-10-04-review-TOOL-dUnstuckLanding-1-2-closing-diff-round1.md](../reviews/2026-10-04-review-TOOL-dUnstuckLanding-1-2-closing-diff-round1.md) | diff-review | TOOL-dUnstuckLanding-2 |
