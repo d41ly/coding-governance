@@ -9,12 +9,13 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
-gates-run: unattended-179110434245561225182-439 75041243
+units-at-landing: TOOL-aWindowedPass-4 TOOL-aWindowedPass-2 TOOL-aWindowedPass-1 TOOL-aWindowedPass-5 TOOL-aWindowedPass-3 TOOL-aWindowedPass-6
+gates-run: unattended-179110704964377017782-720 85e332af
 parked-surfaced: yes, 0 surfaced
 keepalive-reaped: yes
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: b6001c4a0f49c792d9ae124d79b7e287e15e118b
-phase: VERIFYING
+phase: LANDING
 branch-sha: 886b089dfd9c4bf98dc2024e21d7d9607f9b5cc0
 branch-ref: refs/heads/branch/undeclared-write-windowed-pass
 may: none
