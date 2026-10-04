@@ -93,6 +93,9 @@
 #     HEAD still carries. A run that forges one AND keeps it, or commits a retired record to carry it,
 #     leaves that record at HEAD, where the kit gate grades it - check 15 judges a LANDED witness. This
 #     leg buys the trace, not the verdict.
+#   - in RANGE mode, a unit whose build commit is already on the tip the remote advertises
+#     (TOOL-dUnstuckLanding-17). It was graded when it landed, and WHOLE mode, which remote CI runs
+#     after every landing because its HEAD is the tip, still grades it. The summary names the mode.
 #   - A UNIT WITH AN EARLIER COMMIT NAMING IT, behind the run's base, is NOT GRADED even if its
 #     real build is in the run (TOOL-aRepatriatedFork-56). Its line names both commits.
 #   - WHETHER A WAIVER ROW WAS DESERVED. The registry below grades only that each waived unit is
@@ -306,7 +309,16 @@ if [ "${#_SUBJ[@]}" -ne "$_n_hist" ]; then
 fi
 
 graded=0; skipped_cutoff=0; nobase=0; unbuilt=0; postrun=0; unborne=0; regraded=0; prebuilt=0
-violations=""; announced=""
+violations=""; announced=""; inrange_ids=""; not_judged=0
+
+# ------------------------------------------------------------------------------- THE RUN'S RANGE
+# TOOL-dUnstuckLanding-17 S2/S4, the sibling `pass-order` leg's rule through the same library call. When
+# the tip the REMOTE advertises resolves and HEAD carries commits it lacks, every `build_commit` walk
+# that takes a RANGE below also takes `^<tip>`, so a unit built on the tip is never graded again and
+# lands in `unbuilt-in-range`. The single-commit `<sha>^!` probe is unchanged: it reads a commit the
+# ranged search already selected. Otherwise the leg grades the whole history as it always did, and
+# the summary line names the mode and why. A tip that does not resolve widens, never narrows.
+read_history_range "$DRIVER"
 
 # ------------------------------------------------------------------------- THE WAIVER REGISTRY
 # TOOL-aRepatriatedFork-51. The sibling `pass-order` leg's registry, ported with its two properties
@@ -381,8 +393,9 @@ for readme in $(GIT ls-tree -r --name-only HEAD -- "$MEMORY_ROOT/builds" 2>/dev/
     # own selection rather than a second copy of it. A copy would be two answers to one question, and
     # this half is the one that has already been wrong twice: its exclusion set made a CONFORMING run
     # unlandable, twice over. The default window is the in-range `--reverse` walk.
-    build_c=$(build_commit "$base..HEAD" "$id" "$bdir" "$GENERATED_INDEXES" "$SHARED_RECORDS")
+    build_c=$(build_commit "$base..HEAD $HR_EXCL" "$id" "$bdir" "$GENERATED_INDEXES" "$SHARED_RECORDS")
     if [ -z "$build_c" ]; then unbuilt=$((unbuilt+1)); continue; fi
+    inrange_ids="$inrange_ids $id"
 
     # TERM 1 - the run-state blob AT THAT COMMIT carries a row for this unit. Matched on the whole
     # field including both separators, which makes the id a whole token by construction: without the
@@ -459,7 +472,7 @@ brief-recorded: GRADED ANYWAY — $id was BUILT at $(GIT rev-parse --short "$bui
       # commit behind the base, so a later repair naming it is the earliest in-range match. Asked
       # through pass-order's own pre-anchor probe, newest first and capped; TRUNCATED answers
       # nothing, and the unit is graded.
-      _pre=$(build_commit "$base" "$id" "$bdir" "$GENERATED_INDEXES" "$SHARED_RECORDS" "$PREANCHOR_CAP" "")
+      _pre=$(build_commit "$base $HR_EXCL" "$id" "$bdir" "$GENERATED_INDEXES" "$SHARED_RECORDS" "$PREANCHOR_CAP" "")
       if [ -n "$_pre" ] && [ "$_pre" != TRUNCATED ]; then
         prebuilt=$((prebuilt+1))
         announced="$announced
@@ -532,17 +545,24 @@ done
 # are worth a reader's eye whether or not the unit also carries a brief. The third is graded at a later
 # commit than the one `build_commit` picked, and it is counted because each is a pick the library got
 # wrong, which the sibling leg still trusts.
-echo "brief-recorded: graded $graded closed unit(s) · $skipped_cutoff build(s) skipped by the $BRIEF_RECORDED_CUTOFF cutoff · $nobase build(s) with no pinned run BASE · $unbuilt unit(s) unbuilt-in-range · $postrun unit(s) built after their run finished, not graded · $unborne unit(s) built under a finished claim HEAD does not bear out, graded · $regraded unit(s) whose earliest commit fell after their run finished and a later one inside a live run, graded at the later · $prebuilt unit(s) built before their run, not graded"
+# IN RANGE MODE A WAIVER ROW NAMING A UNIT OUTSIDE THE RANGE IS NOT JUDGED, the sibling leg's rule
+# (TOOL-dUnstuckLanding-17 rev-2): that unit's build commit is on the advertised tip, so this run never
+# graded it and cannot say whether the row still describes a violation. Counted, never silent.
+stale=""
+for _w in $waived_ids; do
+  case " $waived_seen " in *" $_w "*) continue ;; esac
+  if [ "$HR_MODE" = range ]; then
+    case " $inrange_ids " in *" $_w "*) ;; *) not_judged=$((not_judged+1)); continue ;; esac
+  fi
+  stale="$stale $_w"
+done
+echo "brief-recorded: graded $graded closed unit(s) · $skipped_cutoff build(s) skipped by the $BRIEF_RECORDED_CUTOFF cutoff · $nobase build(s) with no pinned run BASE · $unbuilt unit(s) unbuilt-in-range · $postrun unit(s) built after their run finished, not graded · $unborne unit(s) built under a finished claim HEAD does not bear out, graded · $regraded unit(s) whose earliest commit fell after their run finished and a later one inside a live run, graded at the later · $prebuilt unit(s) built before their run, not graded · $HR_FIELD · $not_judged waivers not judged"
 echo "brief-recorded: the record surface excluded from build-commit selection was: <build folder> $(printf '%s ' $GENERATED_INDEXES $SHARED_RECORDS)"
 if [ -n "$announced" ]; then
   printf '%s\n' "${announced#?}"
 fi
 echo "brief-recorded: $waived_n violation(s) waived by $WAIVER_FILE:${waived_seen:- none}"
 
-stale=""
-for _w in $waived_ids; do
-  case " $waived_seen " in *" $_w "*) ;; *) stale="$stale $_w" ;; esac
-done
 rc=0
 if [ -n "$violations" ]; then
   echo "brief-recorded FAILED — a CLOSED unit's build commit records no usable brief:$violations"

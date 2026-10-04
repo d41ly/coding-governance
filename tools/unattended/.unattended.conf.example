@@ -354,17 +354,18 @@ HALT_FLOOR="7"
 HOLD_CODES_EXTRA=""
 HOLD_FLOOR="7"
 
-# The UNDECLARED-WRITE CEILING. A concurrently dispatched pass declares its write set before it
-# starts, and that declaration is the disjointness proof two passes rest on. Check 23 compares the
-# declaration against what the pass actually committed and grades the COUNT against this pin, which
-# is shrink-only: it may fall and never rise. Undeclared or malformed is a refusal, not a defaulted
-# value, for the reason the floor above gives.
+# The UNDECLARED-WRITE BUDGET, per build. A concurrently dispatched pass declares its write set
+# before it starts, and that declaration is the disjointness proof two passes rest on. Check 23
+# compares the declaration against what the pass actually committed and fails a RUN RECORD whose
+# passes wrote outside their declarations more times than this budget admits. Undeclared or
+# malformed is a refusal, not a defaulted value, for the reason the floor above gives.
 #
 # 0 is the value a repo adopting this kit wants, and it means what it says: a pass that writes
-# outside its declaration reds the bar. Raise it ONLY to grandfather instances that already exist in
-# append-only history, MEASURED over your own tree rather than guessed, with the date and the reason
-# written here beside it - then lower it as they close.
-UNDECLARED_WRITE_CEILING="0"
+# outside its declaration reds its own build's close. Other builds' records never count against it:
+# their total is printed on a `check 23 fleet` line that never fails a run, and the drift report's
+# `fleet_over_budget` signal lists the builds over budget. When the remote's tip resolves and the
+# run has commits it lacks, a pass already on that tip is not graded again.
+UNDECLARED_WRITE_BUDGET="0"
 
 # The LANDER MARKER. A BARE NAME, resolved by the lander AND by `--landed` against
 # `git rev-parse --git-common-dir` — never a tree-relative path, which names a different file in

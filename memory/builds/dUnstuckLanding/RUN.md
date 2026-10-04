@@ -102,3 +102,9 @@ base: 0c16a66b53c9fd809ca198b612a23c62132edcc0
 2026-10-04T12:46:18Z dispatch · item c99236c2 TOOL-dUnstuckLanding-25 · reason tools/unattended/unattended.sh tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md memory/builds/dUnstuckLanding/spec/2026-10-04-spec-TOOL-dUnstuckLanding-25.md memory/builds/dUnstuckLanding/build/2026-10-04-build-TOOL-dUnstuckLanding-25-1-acceptance-ledger.md
 
 2026-10-04T12:46:22Z brief · item TOOL-dUnstuckLanding-25 · reason cd089f69a73f memory/builds/dUnstuckLanding/prompts/2026-10-04-prompt-TOOL-dUnstuckLanding-13-build-brief.md
+
+2026-10-04T12:58:25Z dispatch · item e6e55d5a TOOL-dUnstuckLanding-17 · reason tools/unattended/lib-unattended.sh tools/unattended/check-pass-order.sh tools/unattended/check-pass-order.test.sh tools/unattended/check-brief-recorded.sh tools/unattended/check-brief-recorded.test.sh tools/unattended/check-unattended.sh tools/unattended/check-unattended.test.sh tools/unattended/cross-component.test.sh tools/unattended/.unattended.conf.example tools/unattended/PROTOCOL.template.md tools/unattended/README.md memory/guides/UNATTENDED-PROTOCOL.md .unattended.conf tools/drift-audit/drift_report.py tools/drift-audit/selftest.py tools/drift-audit/README.md tools/gate-legs.json memory/guides/SESSION-KICKOFF.md memory/builds/dUnstuckLanding/spec/2026-10-04-spec-TOOL-dUnstuckLanding-17.md memory/builds/dUnstuckLanding/build/2026-10-04-build-TOOL-dUnstuckLanding-17-1-acceptance-ledger.md memory/builds/dUnstuckLanding/README.md memory/LIVE.md memory/ledger/2026-10.md memory/map/generated/MAP.md memory/map/generated/inventories.json memory/map/generated/symbols.json
+
+2026-10-04T12:58:29Z brief · item TOOL-dUnstuckLanding-17 · reason cd089f69a73f memory/builds/dUnstuckLanding/prompts/2026-10-04-prompt-TOOL-dUnstuckLanding-13-build-brief.md
+
+2026-10-04T13:15:38Z dispatch · item e6e55d5a TOOL-dUnstuckLanding-17 · reason memory/backlog/TOOL.md

@@ -4503,6 +4503,11 @@
       "file": "tools/runlog/model.py"
     },
     {
+      "id": "measure_fleet_over_budget",
+      "kind": "function",
+      "file": "tools/drift-audit/drift_report.py"
+    },
+    {
       "id": "measure_git_calls",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -9216,6 +9221,11 @@
       "id": "test_fan_in_subtracts_every_definer",
       "kind": "function",
       "file": "tools/codebase-map/selftest.py"
+    },
+    {
+      "id": "test_fleet_over_budget",
+      "kind": "function",
+      "file": "tools/drift-audit/selftest.py"
     },
     {
       "id": "test_floor_reds_alone",

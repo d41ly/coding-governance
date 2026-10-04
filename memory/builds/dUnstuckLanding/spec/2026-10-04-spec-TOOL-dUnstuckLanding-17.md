@@ -1,11 +1,12 @@
 # TOOL-dUnstuckLanding-17 — the history legs grade the run's own range, and check 23 a per-build budget
 
-**Status:** INPROGRESS · rev-1 · 2026-10-04 · node d · Tier-2 · base 98926870 · streams tooling · order 5 · closes TOOL-dUnstuckLanding-7 · ratified 2026-10-04
+**Status:** CLOSED · rev-2 · 2026-10-04 · node d · Tier-2 · base 98926870 · streams tooling · order 5 · closes TOOL-dUnstuckLanding-7 · ratified 2026-10-04
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-04-build-TOOL-dUnstuckLanding-17-1-acceptance-ledger.md](../build/2026-10-04-build-TOOL-dUnstuckLanding-17-1-acceptance-ledger.md) | journal | — |
 | [2026-10-04-prompt-TOOL-dUnstuckLanding-13-build-brief.md](../prompts/2026-10-04-prompt-TOOL-dUnstuckLanding-13-build-brief.md) | journal | TOOL-dUnstuckLanding-13 TOOL-dUnstuckLanding-14 TOOL-dUnstuckLanding-15 TOOL-dUnstuckLanding-16 TOOL-dUnstuckLanding-18 TOOL-dUnstuckLanding-19 TOOL-dUnstuckLanding-20 |
 | [2026-10-04-prompt-TOOL-dUnstuckLanding-13-spec-brief.md](../prompts/2026-10-04-prompt-TOOL-dUnstuckLanding-13-spec-brief.md) | journal | TOOL-dUnstuckLanding-13 TOOL-dUnstuckLanding-14 TOOL-dUnstuckLanding-15 TOOL-dUnstuckLanding-16 TOOL-dUnstuckLanding-18 TOOL-dUnstuckLanding-19 TOOL-dUnstuckLanding-20 |
 
@@ -31,7 +32,9 @@ report-only drift-audit signal, `fleet_over_budget`, that lists the builds over 
   `ADVH_WHY` set. It refuses, with the reason, when the clone has no remote or more than one, when a
   constant does not read, when the bound fires, when the remote advertises no HEAD, and when the
   advertised object is not in this clone. It never reads a local ref and never an environment
-  variable. Observed by AC1.
+  variable. Beside it, `read_history_range` applies S2's rule once for both legs: it calls the reader
+  and sets `HR_MODE`, `HR_EXCL` (the `^<tip>` token, empty in WHOLE mode) and `HR_FIELD`, the summary
+  field. Observed by AC1.
 - **S2 — the range rule, the same in all three legs.** A leg is in RANGE mode when the advertised
   tip resolves and HEAD carries at least one commit the tip does not. Every commit walk it makes then
   excludes the tip's history. Otherwise it is in WHOLE mode and grades exactly what it grades today.
@@ -47,7 +50,9 @@ report-only drift-audit signal, `fleet_over_budget`, that lists the builds over 
 - **S4 — `brief-recorded` in RANGE mode.** In `tools/unattended/check-brief-recorded.sh`, every
   `build_commit` call that takes a range takes `^<tip>` as well. The single-commit `<sha>^!` probes
   are unchanged, because they read a commit the ranged search already selected. The summary line
-  gains the same `range` field. Observed by AC3.
+  gains the same `range` field. S3's waiver rule applies here too: in RANGE mode a waiver row naming a
+  unit outside the range is not judged stale and is counted on a `waivers not judged` field. Observed
+  by AC3.
 - **S5 — check 23 in RANGE mode, against a per-build budget.** In
   `tools/unattended/check-unattended.sh`, a dispatched pass whose pass commit is an ancestor of the
   advertised tip is not graded against the budget, through the leg's existing `check_adv_reaches`.
@@ -172,6 +177,8 @@ detail, never a count. The values above are illustrative.
 |---|---|---|
 | `read_advertised_head` | shell function | `sh.function`; `python tools/lexicon/lexicon.py --suggest read_advertised_head --as sh.function` answered OK |
 | `ADVH_SHA`, `ADVH_WHY` | shell globals | not graded |
+| `read_history_range` | shell function | `sh.function`; the lexicon answered OK |
+| `HR_MODE`, `HR_EXCL`, `HR_FIELD` | shell globals | not graded |
 | `measure_fleet_over_budget` | python function | `py.function`; the lexicon answered OK |
 | `fleet_over_budget` | drift signal name | none |
 | `UNDECLARED_WRITE_BUDGET` | conf key | none |
@@ -269,10 +276,9 @@ Each was rejected by a test, and §8 carries the fork it decided.
   CLOSED unit with no row exits 1 naming that unit only.
   Red when: the `^<tip>` token is staged out of the call at `check-brief-recorded.sh:384`.
 - **AC4** — When a scratch slice of the kit-gate suite runs the new check 23 arm, a fixture whose
-  pushed live record carries one undeclared write, and whose unpushed run carries a clean pass,
-  prints a `check 23 fleet` line reading `1 undeclared write(s)` and no `check 23 FAILED`. Adding an
-  undeclared write to the unpushed run's pass prints `check 23 FAILED` naming the unpushed record and
-  not the pushed one.
+  live record carries one pushed pass with an undeclared write and one unpushed clean pass prints a
+  `check 23 fleet` line reading `1 undeclared write(s)` and no `check 23 FAILED`. Adding an undeclared
+  write to the unpushed pass prints `check 23 FAILED` naming the unpushed pass and not the pushed one.
   Red when: the `check_adv_reaches` test is staged out of the budget count, so the pushed write reds
   the first run.
 - **AC5** — When the AC2 fixture's origin HEAD symref is pointed at `refs/heads/nothing-here`, the
@@ -322,8 +328,8 @@ Each was rejected by a test, and §8 carries the fork it decided.
 
 `unattended kit gate` · `pass-order history` · `brief-recorded` · `unattended protocol size` · `unattended skill wiring` · `drift-audit records` · `drift-audit wiring` · `drift-audit selftest` · `run-gates canary` · `run-gates gov canary` · `harness arms (fail branches armed or pinned)` · `kickoff-manifest ratchet` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `spec tokens (a spec's own names resolve)` · `memory hygiene`
 
-New arm: tools/unattended/check-pass-order.test.sh · a pushed built-before-specced unit beside a clean unpushed run, then a second unpushed violation; and the unresolved-tip WHOLE arm · none
-New arm: tools/unattended/check-brief-recorded.test.sh · a pushed CLOSED unit with no brief row beside a clean unpushed run, then an unpushed one · none
+New arm: tools/unattended/check-pass-order.test.sh · a pushed built-before-specced unit beside a clean unpushed run, then a second unpushed violation; the unresolved-tip and nothing-unpushed WHOLE arms; a waiver row naming the pushed unit, not judged · none
+New arm: tools/unattended/check-brief-recorded.test.sh · a pushed CLOSED unit with no brief row beside a clean unpushed run, then an unpushed one; the unresolved-tip WHOLE arm; a waiver row naming the pushed unit, not judged · none
 New arm: tools/unattended/check-unattended.test.sh · a pushed live record with an undeclared write beside a clean unpushed pass, then an unpushed undeclared write; the retired ceiling key; the budget's three refusals replacing the ceiling's; `--emit-ceiling`'s refusal · none
 New arm: tools/drift-audit/selftest.py · `test_fleet_over_budget`, a fixture run record carrying a fleet line, then none · CHECK_FLOOR rises by the arm's checks
 
@@ -367,6 +373,12 @@ once, under `TOOL-dUnstuckLanding-24`.
 - rev-1 · 2026-10-04 · initial draft, from the spec brief, design §4 at rev-2 and review items M7 and
   M10, with the three legs, the kit library, the driver's tip reader and the drift engine read at
   base `98926870`.
+- rev-2 · 2026-10-04 · the builder, before the code. S4 gains S3's waiver rule: gov's own
+  `brief-recorded` registry waives two units already on the default branch, so RANGE mode would have
+  judged both rows stale and redded every closing run. S1 names `read_history_range`, the one
+  spelling of S2's rule both history legs call. AC4 grades two passes of one live record rather than
+  two records, because a second live record in the kit-gate fixture moves checks the arm does not
+  assert; the `check_adv_reaches` exclusion it observes is the same.
 
 ## 10. Reuse audit
 

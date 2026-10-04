@@ -22,7 +22,9 @@
 #
 # TWO: check 7's EXCLUSION notice and its UNAVAILABLE sibling print on the DEFAULT channel, and the
 # contract line above is written to admit them; so do check 23's `check 23 EXCLUDED` and
-# `check 23 exclusion UNAVAILABLE`, which share check 7's predicate (TOOL-aSightedSkeptic-13). They are not skips. An exclusion is a positive
+# `check 23 exclusion UNAVAILABLE`, which share check 7's predicate (TOOL-aSightedSkeptic-13), and check 23's
+# `check 23 fleet` line, which reports the whole fleet's undeclared-write count and never fails the leg
+# (TOOL-dUnstuckLanding-17). They are not skips. An exclusion is a positive
 # finding that CHANGED THE VERDICT — a record the check stopped counting — and the reader of a green
 # run is entitled to know which one and on what evidence. Routing them through REPORT was the first
 # implementation and it made the exclusion invisible on every bar run, which is the check-quietly-
@@ -132,26 +134,16 @@ CONF="$ROOT/.unattended.conf"
 # ---- skip naming itself, on the report channel, off the check headers themselves (see the guard
 # ---- that follows the 28 region). The parser below sits between a bare argv sentinel pair so that
 # ---- check 26 can join every flag it accepts to an arm in this leg's own suite. TOOL-dDerivedDocket-30.
-SCOPE=""; EMIT_CEILING=0
+SCOPE=""
 # gov:argv-begin
 case "${1:-}" in
   "")            ;;
   --only)        [ "${2:-}" = 28 ] || { echo "check-unattended: --only takes 28 and nothing else; checks 1-27 share state and are one unit"; exit 2; }; SCOPE=only28 ;;
   --skip)        [ "${2:-}" = 28 ] || { echo "check-unattended: --skip takes 28 and nothing else; checks 1-27 share state and are one unit"; exit 2; }; SCOPE=skip28 ;;
-  --emit-ceiling) SCOPE=skip28; EMIT_CEILING=1 ;;
-  *)             echo "check-unattended: unknown argument '${1}'; this leg takes [--only 28], [--skip 28] or [--emit-ceiling]"; exit 2 ;;
+  --emit-ceiling) echo "check-unattended: --emit-ceiling is retired (TOOL-dUnstuckLanding-17): check 23 grades each run record against a declared per-build budget, which is a policy and not a measurement, and the fleet's count now appears on the 'check 23 fleet' line every run prints"; exit 2 ;;
+  *)             echo "check-unattended: unknown argument '${1}'; this leg takes [--only 28] or [--skip 28]"; exit 2 ;;
 esac
 # gov:argv-end
-# ---- --emit-ceiling (TOOL-aRepatriatedFork-11 S5): MEASURE check 23's pin instead of grading it.
-# ---- Both adopters had measured UNDECLARED_WRITE_CEILING by running this leg at 0 and reading the
-# ---- failure. This runs the skip-28 scope with stdout discarded, so no check line reaches the caller,
-# ---- and prints the one conf line on the saved stdout right after check 23 counts. A run that never
-# ---- reaches that count exits 1 with nothing on stdout, and so does a count over an EMPTY graded
-# ---- population: a dead probe must not hand out a 0 (the EXIT trap is what catches the first case).
-if [ "$EMIT_CEILING" = 1 ]; then
-  exec 3>&1 1>/dev/null
-  trap 'echo "check-unattended: --emit-ceiling took no count, because the run stopped before check 23 graded anything; run the leg bare to see why" >&2; exit 1' EXIT
-fi
 
 status=0
 fail() { echo "UNATTENDED check $1 FAILED — $2"; status=1; }
@@ -201,7 +193,7 @@ LANDED_FACTS_CUTOFF=""
 # here so a project's declared value reaches the readers that split ABORTED records on it.
 HANDOFF_CUTOFF=""
 KICKOFF_ENGINE=""; KICKOFF_EXITS=""; DIRECTIVES_EXTRA=""; DIRECTIVES_FLOOR=""; DIRECTIVES_EXTRA_TABLE=""
-HALT_CODES_EXTRA=""; HALT_FLOOR=""; UNDECLARED_WRITE_CEILING=""
+HALT_CODES_EXTRA=""; HALT_FLOOR=""; UNDECLARED_WRITE_BUDGET=""
 HOLD_CODES_EXTRA=""; HOLD_FLOOR=""
 RESUME_SCHEDULE=""; RESUME_SCHEDULE_CREATE=""; RESUME_SCHEDULE_DELETE=""
 RESUME_SCHEDULE_DELAY=""; RESUME_SCHEDULE_LIMIT=""
@@ -286,7 +278,7 @@ while IFS= read -r -d '' _ck; do
     MEMORY_ROOT|LANDER|LANDER_MODE|SELFTESTS_OWED_PATHS|BYPASS_BAN|GATE_CMD|WIRING_CHECK|KEEPALIVE_CREATE|KEEPALIVE_DELETE|\
     PHASES_EXTRA|DOD_EXTRA|CORE_FLOOR|LANDED_ANCHOR_CUTOFF|LANDED_FACTS_CUTOFF|HANDOFF_CUTOFF|DISPOSITION_CUTOFF|KICKOFF_ENGINE|\
     KICKOFF_EXITS|DIRECTIVES_EXTRA|DIRECTIVES_FLOOR|DIRECTIVES_EXTRA_TABLE|HALT_CODES_EXTRA|\
-    HALT_FLOOR|UNDECLARED_WRITE_CEILING|HOLD_CODES_EXTRA|HOLD_FLOOR|\
+    HALT_FLOOR|UNDECLARED_WRITE_BUDGET|HOLD_CODES_EXTRA|HOLD_FLOOR|\
     RESUME_SCHEDULE|RESUME_SCHEDULE_CREATE|RESUME_SCHEDULE_DELETE|RESUME_SCHEDULE_DELAY|RESUME_SCHEDULE_LIMIT|\
     RECALL_CLI|ASKS_CMD|SHARED_RECORDS|GENERATED_INDEXES|GATE_BOUND|GATE_WALL|GATE_PROFILE_CMD|\
     UNITS_REGION_CUTOFF) eval "$_ck=\$_cv" ;;
@@ -3656,10 +3648,10 @@ done
 # ---- NOTHING: `brief-recorded` grades CLOSED units only, at the BUILD commit and not the pass
 # ---- commit, reads the LAST row per unit where this check takes the union, and proves only that the
 # ---- row's hash still names the blob at that path. Nothing asserts the path was a brief.
-# THE RATCHET'S THREE ACCUMULATORS (TOOL-cMendedVintage-14), declared where `set -u` can see them
-# before the loop that fills them. `ds_graded` is the LIVENESS half and counts rows that REACHED
-# the subset test, not rows that failed it: a hit count of zero is a clean tree, a GRADED count of
-# zero under a non-zero ceiling is a probe that died.
+# THE BUDGET'S ACCUMULATORS (TOOL-cMendedVintage-14, per build since TOOL-dUnstuckLanding-17), declared
+# where `set -u` can see them before the loop that fills them. `ds_graded` is the LIVENESS half and
+# counts rows that REACHED the subset test, not rows that failed it: a hit count of zero is a clean
+# tree, a GRADED count of zero under a non-zero budget is a probe that died.
 # ---- ABSORB (TOOL-dDerivedDocket-24 S9, owner ruling D12-i5). A run may FIX a red it inherited,
 # ---- beyond its declared write set, in a commit of its own whose subject is exactly
 # ---- `absorb(<slug>): <leg> inherited at <R8>` and names NO unit id. Such a commit is classified
@@ -3694,7 +3686,42 @@ check_generated_render() { # commit · path -> 0, printing what generated it, wh
   [ "$(printf '%s\n' "$_ga" | awk "$GEN_REGION_AWK")" = "$(printf '%s\n' "$_gb" | awk "$GEN_REGION_AWK")" ] || return 1
   printf 'a change inside its gen regions only'
 }
-ds_over=""; ds_over_n=0; ds_graded=0; ds_unavail=0
+ds_over=""; ds_over_n=0; ds_graded=0; ds_unavail=0; ds_records=0; ds_fleet_over=""
+# ---- THE BUDGET IS READ BEFORE THE LOOP (TOOL-dUnstuckLanding-17 S7/S8), because each record is judged
+# ---- against it as the loop leaves that record. MANDATORY, in the shape its sibling pins take:
+# ---- undeclared or not a single integer is a refusal, never a defaulted value. The RETIRED key is
+# ---- refused BY NAME off the leg's own text scan of declared names, so it is never imported and an
+# ---- adopter who upgrades without moving it is told which key replaced it.
+ds_budget_ok=0
+_c23_retired=UNDECLARED_WRITE_CEILING
+if printf '%s\n' "$_conf_names" | grep -qx -- "$_c23_retired"; then
+  fail 23 "$_c23_retired is retired: check 23 grades each run record against a per-build budget now, so declare UNDECLARED_WRITE_BUDGET in .unattended.conf and delete the old key, which nothing reads any more: $CONF"
+fi
+if [ -z "$UNDECLARED_WRITE_BUDGET" ]; then
+  fail 23 "UNDECLARED_WRITE_BUDGET is undeclared in .unattended.conf, and with no budget a pass that wrote outside its declared set is reported and never graded - which is the state this check exists to end"
+elif ! printf '%s' "$UNDECLARED_WRITE_BUDGET" | grep -qE '^[0-9]+$'; then
+  fail 23 "UNDECLARED_WRITE_BUDGET is not a single integer, so the per-build comparison below would be a string test wearing a numeric name: $UNDECLARED_WRITE_BUDGET"
+else
+  ds_budget_ok=1
+fi
+# ---- THE RANGE (TOOL-dUnstuckLanding-17 S5). When the advertised tip resolves and HEAD carries commits
+# ---- it lacks, a pass whose pass commit is already on that tip is still COUNTED on the fleet line and
+# ---- is NOT graded against its record's budget: it was graded when it landed, and re-grading landed
+# ---- history reds every later closing run on work it did not do. This leg's own observation of the
+# ---- remote, `ADV_HEAD`, is what decides it; it does not call the history legs' library reader.
+# ---- Otherwise WHOLE mode grades every pass, as the leg always did, and the fleet line says why.
+ds_range=whole; ds_head=$(GIT rev-parse HEAD 2>/dev/null)
+if [ "${ADV_HEAD_OK:-0}" != 1 ]; then
+  ds_field="range whole (the tip did not resolve: no advertised default-branch tip is in this clone)"
+else
+  ds_ahead=$(GIT rev-list --count "$ADV_HEAD..HEAD" 2>/dev/null)
+  case "$ds_ahead" in ''|*[!0-9]*) ds_ahead=0 ;; esac
+  if [ "$ds_ahead" -gt 0 ]; then
+    ds_range=range; ds_field="range ${ADV_HEAD:0:8}..${ds_head:0:8}"
+  else
+    ds_field="range whole (HEAD carries nothing the tip ${ADV_HEAD:0:8} lacks)"
+  fi
+fi
 for f in $RUNS; do
   [ -f "$f" ] || continue
   case "$f" in *"/RUN.md") ;; *) continue ;; esac
@@ -3725,19 +3752,22 @@ for f in $RUNS; do
   fi
   # ---- DERIVED LANDED IS NOT GRADED (TOOL-aSightedSkeptic-13). An in-place landing leaves its record
   # ---- at LANDING forever, so the recorded-phase skip above never fires for it and its landed,
-  # ---- append-only dispatch history counted against every later run's ceiling. Check 7's predicate,
+  # ---- append-only dispatch history counted against every later run's verdict. Check 7's predicate,
   # ---- asked here AFTER both skips: a record that was never graded stays silent, and under
   # ---- LANDER_MODE=primary a landed record reads LANDED and never reaches it. Default channel, for
   # ---- header exception TWO's reason: an exclusion changes the verdict.
   check_derived_landed "$f"; ds_dl=$?
   if [ "$ds_dl" = 0 ]; then
-    printf 'unattended: check 23 EXCLUDED %s — derived LANDED: its landing commit %s is an ancestor of the advertised default-branch tip %s, so its dispatch history is landed and append-only and is not graded against the ceiling\n' "$f" "$DERIVED_LANDING_COMMIT" "$ADV_HEAD"
+    printf 'unattended: check 23 EXCLUDED %s — derived LANDED: its landing commit %s is an ancestor of the advertised default-branch tip %s, so its dispatch history is landed and append-only and is not graded against the budget\n' "$f" "$DERIVED_LANDING_COMMIT" "$ADV_HEAD"
     continue
   fi
   if [ "$ds_dl" = 2 ] && [ "$ds_unavail" = 0 ]; then
     ds_unavail=1
     printf 'unattended: check 23 exclusion UNAVAILABLE — no advertised default-branch tip resolves in this clone, so a LANDING record already on the remote cannot be told from a live one; every LANDING record with dispatch rows is graded\n'
   fi
+  # THIS RECORD'S TWO COUNTS: every over-declared pass, for the fleet line, and the ones the budget
+  # grades, which in RANGE mode leaves out a pass whose pass commit is on the advertised tip.
+  ds_records=$((ds_records + 1)); ds_rec_all=0; ds_rec_n=0; ds_rec_lines=""
   while IFS= read -r dsrow; do
     [ -n "$dsrow" ] || continue
     dsitem=${dsrow#* dispatch · item }; dsitem=${dsitem%% · reason *}
@@ -3865,64 +3895,66 @@ DSSIBS
     # the verdict; the per-instance detail goes to the report channel, so a green run keeps this
     # file's "exit 0 + no output = clean" contract true instead of quietly widening it.
     if [ -n "$dsout" ]; then
-      ds_over_n=$((ds_over_n + 1))
+      ds_over_n=$((ds_over_n + 1)); ds_rec_all=$((ds_rec_all + 1))
       ds_line="$dsunit at $dshit wrote$dsout in $f"
       ds_over="$ds_over
   $ds_line"
       report "check 23 — a dispatched pass committed a path outside the set it declared before dispatch: $ds_line"
+      # A PLAIN COMMAND, never `$(...)`: the reach set `check_adv_reaches` warms dies with a subshell.
+      if [ "$ds_range" = range ] && check_adv_reaches "$dshit"; then
+        :
+      else
+        ds_rec_n=$((ds_rec_n + 1))
+        ds_rec_lines="$ds_rec_lines
+  $ds_line"
+      fi
     fi
   done <<DSROWS
 $dsrows
 DSROWS
+  [ "$ds_rec_all" -gt 0 ] && [ "$ds_budget_ok" = 1 ] && [ "$ds_rec_all" -gt "$UNDECLARED_WRITE_BUDGET" ] \
+    && ds_fleet_over="$ds_fleet_over $dsslug=$ds_rec_all"
+  if [ "$ds_budget_ok" = 1 ] && [ "$ds_rec_n" -gt "$UNDECLARED_WRITE_BUDGET" ]; then
+    fail 23 "a run record holds more dispatched passes that committed outside the set they declared before dispatch than its per-build budget admits, and that declaration is the disjointness proof two concurrent passes rest on: $f carries $ds_rec_n against a budget of $UNDECLARED_WRITE_BUDGET$ds_rec_lines"
+  fi
 done
 
-# ---- 23's RATCHET (TOOL-cMendedVintage-14). The subset test above used to print one line per
-# ---- offending pass and leave the exit status alone, which is a REPORT wearing a gate's number. The
-# ---- declaration was therefore enforced in one direction only: declaring too much wedges the run,
-# ---- declaring too little was a line nobody had to read. It was reported honestly by a builder and
-# ---- no verb, hook or gate raised it.
+# ---- 23's BUDGET (TOOL-cMendedVintage-14, made per build by TOOL-dUnstuckLanding-17). The subset test
+# ---- above used to print one line per offending pass and leave the exit status alone, which is a
+# ---- REPORT wearing a gate's number. The declaration was therefore enforced in one direction only:
+# ---- declaring too much wedges the run, declaring too little was a line nobody had to read.
 # ----
-# ---- SHRINK-ONLY RATHER THAN A PLAIN REFUSAL, and the reason is the tree rather than taste. The
-# ---- instances live in landed history, which is append-only, so a refusal reds builds nobody is
-# ---- going to re-declare. The count may FALL and never RISE. The pin is declared in
-# ---- `.unattended.conf` beside this kit's other shrink-only pins, and undeclared or malformed is a
-# ---- refusal there for their reason too: a pin that quietly defaults is a pin nobody set. An
-# ---- adopter's ceiling is 0 and its whole ratchet is the first sentence of this paragraph.
+# ---- A PER-BUILD BUDGET, NOT A FLEET CEILING. The count used to be summed over every live record and
+# ---- compared against one shrink-only pin, so another build's rows could fill the ceiling and red a
+# ---- closing run that wrote nothing outside its declaration; in the adopters that class stopped more
+# ---- closes than any other. Each record is now judged against `UNDECLARED_WRITE_BUDGET` as the loop
+# ---- leaves it, above, and the fleet total is REPORTED on the line below and never fails the leg. A
+# ---- budget is a policy and not a measurement, so it has no shrink-only comparison and no "lower
+# ---- the pin" report: an adopter's budget is 0 and means what it says.
 # ----
 # ---- WHAT THIS DOES NOT CHECK, because a gate's own header owes its gaps:
-# ----   - A FALL IS NOT A FAILURE HERE, where the carried-prefix ratchet this repo already runs reds
-# ----     on one and tells you to re-stamp. That population is a file listing; THIS one is derived
-# ----     from history REACHABILITY, and a clone that cannot resolve a group anchor legitimately
-# ----     grades fewer rows and takes the skip branches above. Redding on a fall would be a false red
-# ----     on that clone rather than a finding. The fall is announced on the report channel instead
-# ----     and the pin is lowered by hand, which means a ceiling nobody lowers stays slack.
-# ----   - A SWAP IS INVISIBLE. One instance repaired and one introduced holds the count, and only the
-# ----     per-instance report lines show it. The pin is a count, not a row set.
-# ----   - NOTHING HERE MAKES THE DECLARATION HONEST. The limitation this check's own header states is
-# ----     unchanged: both artifacts are the run's, so a run may still declare the wider set up front.
+# ----   - THE FLEET TOTAL BINDS NOWHERE. This leg prints it and the drift report's `fleet_over_budget`
+# ----     signal lists the builds over budget, report-only; no bar, CI job or hook fails on it.
+# ----   - A PUSHED PASS IN RANGE MODE IS NOT RE-GRADED. Its pass commit is on the advertised tip, so it
+# ----     was graded when it landed; WHOLE mode, which remote CI runs because its HEAD is the tip,
+# ----     still grades it.
+# ----   - NOTHING HERE MAKES THE DECLARATION HONEST. Both artifacts are the run's, so a run may still
+# ----     declare the wider set up front, as this check's own header states.
 # ----   - THE OTHER TWO check-23 FINDINGS ARE STILL BARE PRINTS. The dodged-join and ambiguous-
-# ----     attribution branches keep the shape this ruling took off the subset test, deliberately:
-# ----     the ruling named this message and this one only.
-if [ -z "$UNDECLARED_WRITE_CEILING" ]; then
-  fail 23 "UNDECLARED_WRITE_CEILING is undeclared in .unattended.conf, and with no ceiling a pass that wrote outside its declared set is reported and never graded - which is the state this ratchet exists to end"
-elif ! printf '%s' "$UNDECLARED_WRITE_CEILING" | grep -qE '^[0-9]+$'; then
-  fail 23 "UNDECLARED_WRITE_CEILING is not a single integer, so the shrink-only comparison below would be a string test wearing a numeric name: $UNDECLARED_WRITE_CEILING"
-elif [ "$UNDECLARED_WRITE_CEILING" -gt 0 ] && [ "$ds_graded" = 0 ]; then
-  fail 23 "the declared ceiling on undeclared writes is above zero while NO dispatched pass was graded at all, so the comparison below would report a reassuring zero for a probe that died rather than for a tree that is clean: $UNDECLARED_WRITE_CEILING against a graded population of $ds_graded"
-elif [ "$ds_over_n" -gt "$UNDECLARED_WRITE_CEILING" ]; then
-  fail 23 "more dispatched passes committed outside the set they declared before dispatch than the shrink-only ceiling admits, and that declaration is the disjointness proof two concurrent passes rest on: $ds_over_n against $UNDECLARED_WRITE_CEILING$ds_over"
-elif [ "$ds_over_n" -lt "$UNDECLARED_WRITE_CEILING" ]; then
-  report "check 23 - the undeclared-write count sits BELOW its ceiling, $ds_over_n against $UNDECLARED_WRITE_CEILING. Lower the pin in .unattended.conf and say in the commit message what closed; a ceiling nobody lowers stops being a ratchet"
+# ----     attribution branches keep the shape the ruling took off the subset test, deliberately.
+# THE LIVENESS HALF: a budget above zero over a fleet that graded no pass at all is a probe that died.
+if [ "$ds_budget_ok" = 1 ] && [ "$UNDECLARED_WRITE_BUDGET" -gt 0 ] && [ "$ds_graded" = 0 ]; then
+  fail 23 "the declared budget on undeclared writes is above zero while NO dispatched pass was graded at all, so every per-build comparison above would report a reassuring zero for a probe that died rather than for a tree that is clean: $UNDECLARED_WRITE_BUDGET against a graded population of $ds_graded"
 fi
-if [ "$EMIT_CEILING" = 1 ]; then
-  trap - EXIT
-  if [ "$ds_graded" = 0 ]; then
-    echo "check-unattended: --emit-ceiling graded NO dispatched pass in this tree, so a count here would be a 0 from a probe that saw nothing; the gate accepts 0 over an empty population, so declare that by hand if this tree has never dispatched" >&2
-    exit 1
-  fi
-  echo "check-unattended: --emit-ceiling graded $ds_graded dispatched passes and found $ds_over_n that wrote outside their declaration:${ds_over:- none}" >&2
-  printf 'UNDECLARED_WRITE_CEILING="%s"\n' "$ds_over_n" >&3
-  exit 0
+# THE FLEET LINE (S6), on the default channel under header exception TWO, whenever the walked population
+# holds a record with dispatch rows. One contract between two kits: the drift report's
+# `measure_fleet_over_budget` anchors on its head and reads its `over` and `at` fields by their word.
+if [ "$ds_records" -gt 0 ]; then
+  if [ "$ds_budget_ok" = 1 ]; then ds_bfield="budget $UNDECLARED_WRITE_BUDGET per build"; ds_ofield="over ${ds_fleet_over# }"
+  else ds_bfield="budget ${UNDECLARED_WRITE_BUDGET:-undeclared} per build"; ds_ofield="over unjudged"; fi
+  [ "$ds_ofield" = "over " ] && ds_ofield="over none"
+  printf 'unattended: check 23 fleet — %s undeclared write(s) over %s graded pass(es) in %s record(s) · %s · %s · %s · at %s\n' \
+    "$ds_over_n" "$ds_graded" "$ds_records" "$ds_bfield" "$ds_ofield" "$ds_field" "${ds_head:0:8}"
 fi
 
 # ---- 21 (TOOL-aBoundedVerdict-11 S5): every tracked build README carries EXACTLY ONE well-formed
