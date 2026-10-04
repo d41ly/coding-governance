@@ -1268,6 +1268,43 @@ reset_tree; dispconf 2000-01-01
 mkdisp "$D_ONE" "$D_TWO" '2026-08-20T01:00:00Z review · item S1 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT · disposition promote\n'
 miss "$(run)" "check 2 FAILED"
 
+# ---- TOOL-aBatchedMinors-3: A CLOSING-REVIEW ROW CARRYING COUNTS OWES ONE UNIT PER BLOCKER AND HIGH,
+# ---- PLUS ONE FOR ITS MINORS. The owner ruled on 2026-10-04 that the closing diff review promotes
+# ---- every finding, the mediums and lows batched into one unit or two, and `--review` now writes
+# ---- `highs <n> · minors <n>` on that exit. Against the base reader every red arm below passes on
+# ---- one new id, because the floor was one per subject whatever stood.
+D_THREE='| TOOL-tDisp-1 | CLOSED |\n| TOOL-tDisp-2 | CLOSED |\n| TOOL-tDisp-3 | CLOSED |\n'
+reset_tree; dispconf 2000-01-01
+mkdisp "$D_ONE" "$D_TWO" '2026-08-20T01:00:00Z review · item tDisp · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 1 · minors 3 · disposition promote\n'
+hit "$(run)" "gained only 1 non-WONTDO unit id(s) this run BASE lacked, against a floor of 2"
+reset_tree; dispconf 2000-01-01
+mkdisp "$D_ONE" "$D_THREE" '2026-08-20T01:00:00Z review · item tDisp · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 1 · minors 3 · disposition promote\n'
+miss "$(run)" "check 2 FAILED"
+# ...the minors add nothing when none stood: two highs owe two units, not three
+reset_tree; dispconf 2000-01-01
+mkdisp "$D_ONE" "$D_TWO" '2026-08-20T01:00:00Z review · item tDisp · reason verdict BLOCKED · blockers 0 · CONVERGED · highs 2 · minors 0 · disposition promote\n'
+hit "$(run)" "against a floor of 2"
+reset_tree; dispconf 2000-01-01
+mkdisp "$D_ONE" "$D_THREE" '2026-08-20T01:00:00Z review · item tDisp · reason verdict BLOCKED · blockers 0 · CONVERGED · highs 2 · minors 0 · disposition promote\n'
+miss "$(run)" "check 2 FAILED"
+# ...a closing exit that did not converge owes its standing blockers too: 2 + 1 + 1 = 4
+reset_tree; dispconf 2000-01-01
+mkdisp "$D_ONE" "$D_THREE" '2026-08-20T01:00:00Z review · item tDisp · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT · highs 1 · minors 5 · disposition promote\n'
+hit "$(run)" "gained only 2 non-WONTDO unit id(s) this run BASE lacked, against a floor of 4"
+# ...a converged closing row standing on minors with NO disposition is not the ordinary converged
+# round: it owes a promotion and reaches the no-disposition refusal
+reset_tree; dispconf 2000-01-01
+mkdisp "$D_ONE" "$D_ONE" '2026-08-20T01:00:00Z review · item tDisp · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 0 · minors 2\n'
+hit "$(run)" "record NO disposition while this record is graded against DISPOSITION_CUTOFF"
+# ...its green control: a closing exit standing on nothing records zeros and owes nothing
+reset_tree; dispconf 2000-01-01
+mkdisp "$D_ONE" "$D_ONE" '2026-08-20T01:00:00Z review · item tDisp · reason verdict CLEAN · blockers 0 · CONVERGED · highs 0 · minors 0\n'
+miss "$(run)" "check 2 FAILED"
+# ...and the closing review folds nothing, at the fold cutoff and after it
+reset_tree; dispconf 2000-01-01
+DISPDATE="2026-09-15T00:00:00 +0000" mkdisp "$D_ONE" "$D_ONE" '2026-08-20T01:00:00Z review · item tDisp · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 0 · minors 2 · disposition fold\n'
+hit "$(run)" "record disposition fold on a row carrying highs and minors, and the closing diff review folds nothing"
+
 # ---- TOOL-aProbedUnit-6: BOUNDED is a terminal exit that OWES a disposition and, on promote, an
 # ---- id, exactly as NON-CONVERGENT does. At base the first fixture printed NOTHING: the `needs`
 # ---- regex did not know the token, so a bounded promote owed nothing and the exit was green by

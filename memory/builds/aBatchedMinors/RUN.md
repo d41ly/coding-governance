@@ -40,3 +40,5 @@ base: 5ba0fc4fcdab79eeeb7f75a97a48102bb10bfefa
 2026-10-04T15:37:58Z brief · item TOOL-aBatchedMinors-4 · reason 7cdfd7ea7b00 memory/builds/aBatchedMinors/prompts/2026-10-04-prompt-TOOL-aBatchedMinors-4-1-build-brief.md
 
 2026-10-04T15:38:49Z dispatch · item 60bd9c0e TOOL-aBatchedMinors-2 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh memory/builds/aBatchedMinors/spec/2026-10-04-spec-TOOL-aBatchedMinors-2.md memory/LIVE.md memory/ledger/2026-10.md memory/builds/aBatchedMinors/README.md
+
+2026-10-04T15:55:09Z dispatch · item 131537ae TOOL-aBatchedMinors-3 · reason tools/unattended/check-unattended.sh tools/unattended/check-unattended.test.sh memory/builds/aBatchedMinors/spec/2026-10-04-spec-TOOL-aBatchedMinors-3.md memory/LIVE.md memory/ledger/2026-10.md memory/builds/aBatchedMinors/README.md

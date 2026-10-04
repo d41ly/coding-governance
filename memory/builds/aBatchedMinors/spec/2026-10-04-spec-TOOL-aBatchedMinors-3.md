@@ -1,6 +1,6 @@
 # TOOL-aBatchedMinors-3 — check 2 demands one unit per blocker and high, plus one for the minors
 
-**Status:** OPEN · rev-1 · 2026-10-04 · node a · Tier-2 · base 5ba0fc4f · streams tooling · order 3
+**Status:** CLOSED · rev-1 · 2026-10-04 · node a · Tier-2 · base 5ba0fc4f · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
