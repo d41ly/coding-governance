@@ -1,11 +1,12 @@
 # TOOL-aMendedFleet-1 — restore the views helper and the `--status` entry merge 01c22e155 lost
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · order 1
+**Status:** CLOSED · rev-1 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-04-build-TOOL-aMendedFleet-1-1-acceptance-ledger.md](../build/2026-10-04-build-TOOL-aMendedFleet-1-1-acceptance-ledger.md) | journal | — |
 | [2026-10-04-prompt-TOOL-aMendedFleet-1-0-run-mandate.md](../prompts/2026-10-04-prompt-TOOL-aMendedFleet-1-0-run-mandate.md) | journal | — |
 | [2026-10-04-prompt-TOOL-aMendedFleet-1-1-source-report.md](../prompts/2026-10-04-prompt-TOOL-aMendedFleet-1-1-source-report.md) | journal | — |
 | [2026-10-04-prompt-TOOL-aMendedFleet-1-2-source-synthesis.md](../prompts/2026-10-04-prompt-TOOL-aMendedFleet-1-2-source-synthesis.md) | journal | — |

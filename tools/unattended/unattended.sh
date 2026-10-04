@@ -6919,7 +6919,13 @@ print_gate_backstop() { # where the bound came from -> the line, from GB_SUM and
 # STAGED BY THIS ITEM, and committed by the step that closes the run. On the MET path, under
 # `LANDER_MODE=in-place`, `--close` commits them in its own records commit (`write_close_commit`),
 # and under `primary` they ride the records commit the close names as owed; on a path that prints a
-# `hold ·` line the Skill's Close sequence commits them before `--hold`.
+# `hold ·` line the Skill's Close sequence commits them before `--hold`. THE VIEWS ARE RENDERED AND
+# STAGED WITH THE ROWS (TOOL-dMendedRecall-2), by `write_ask_views`, once per call that filed at
+# least one ask: the memory-tree generator derives generated views from this file, and rows staged
+# without them left the index stale for the pre-commit's freshness check, which refused the close's
+# own records commit after the whole bar was paid. So whichever step commits the rows commits the
+# views too, and none of the three needs a render of its own, except after a miss the helper names:
+# a dirty input of the views, say, which it will not render over, and whose line carries the repair.
 # With `ASKS_CMD` blank the rows are PRINTED and nothing is written, so the auto-file cannot arm itself
 # before the project adopts the ask contract.
 read_leg_argv() { # run dir · R · leg name -> that leg's argv in R's manifest, space-joined; rc 1 unreadable
@@ -6987,6 +6993,119 @@ write_backlog_rows() { # BACKLOG.md path · slug · ask row · SEV row · KEEP r
   mv "$tmp" "$f"
 }
 
+# ---- THE VIEWS THE ROWS MAKE STALE, re-rendered and staged beside them. TOOL-dMendedRecall-2 S2-S4.
+# The memory-tree generator derives the family backlog view, the ledger shard and the build README's
+# generated regions from the rows `write_backlog_rows` writes, so rows staged alone leave those views
+# stale in the same index, and the pre-commit's freshness check then refuses the commit carrying
+# them: under `in-place` that is `write_close_commit`'s refusal 69, after the whole bar was paid.
+# The generator is the one THIS install holds, named by the library resolver the repair text already
+# uses, and it must be a FILE at the top of the tree being closed, where this driver runs. Run from a
+# kit outside that tree, the resolver answers a path relative to the kit's own repository, and the
+# file test is what keeps the render from writing anywhere but here.
+#
+# WHAT IS STAGED is the render's own delta and nothing else: a path carrying unstaged or untracked
+# changes AFTER the render that carried none BEFORE it. Under `primary` `--close` does not refuse a
+# dirty tree (under `in-place` refusal 62 does, before the bar), so a path the operator was already
+# editing is never swept into the records commit, and one the render changed too is NAMED as left
+# unstaged, because staging it would commit work the run did not do.
+# `GENERATED_INDEXES` is not the staging set: the build README's regions move too, outside it.
+#
+# AND NOTHING IS RENDERED OVER A DIRTY INPUT (TOOL-dMendedRecall-2 rev-3, the closing review's M1).
+# The delta rule guards the render's OUTPUT side only. The generator reads its inputs off the disk —
+# every tracked path under the memory root, and `.memory-tree.conf` whether tracked or not — so an
+# unstaged edit to one, a spec's status header say, feeds the render, and the views it moves were
+# clean before it: the delta rule staged them while the edit itself stayed unstaged. That commit
+# passed the pre-commit, whose freshness check renders from the same worktree, and was stale in
+# every checkout of it. So a dirty input stages NO view: the miss line names the inputs and the
+# repair, and the operator's records commit then meets the freshness check loudly. An UNTRACKED path
+# under the memory root is no input, because the generator lists its inputs with `git ls-files`.
+#
+# A MISS IS NAMED AND DOES NOT REFUSE. No generator, a path that is not a file here, a dirty input,
+# or a render that exits non-zero or is killed by its bound prints the miss line with the repair,
+# stages what a render that ran did move under the same rule, and returns 1; the caller's verdict is
+# unchanged. Rolling the rows back instead would drop the inherited leg's owner from the record. A
+# stage that git itself refuses, a held index lock say, is named on a line of its own and returns 1
+# too, because the success line would otherwise claim paths the index does not hold.
+write_ask_views() { # count of asks this call filed -> 0 rendered and staged, 1 on a named miss; one line each
+  local n=$1 gen="" py="" rc=0 why="" fix="" p h line paths="" left="" staged=1 dirty="" gd=""
+  local -a post=() stage=()
+  local -A h0=()
+  # ONE test for both halves of "resolves": the library resolver runs the inline `resolve_python`
+  # itself and answers nothing without it, so a separate interpreter branch after it would be an
+  # arm no state reaches. The interpreter is taken FIRST because the render needs it by name.
+  if ! py=$(resolve_python 2>/dev/null) || [ -z "$py" ] || ! gen=$(resolve_index_generator) || [ -z "$gen" ]; then
+    why="no memory-tree generator resolves beside this kit"
+  elif [ ! -f "$gen" ]; then
+    why="the generator the resolver names is not a file here: $gen"
+  else
+    # BEFORE: every path carrying unstaged or untracked changes, keyed to the bytes it carried then,
+    # and the ones among them the render would read as input. NUL-read both times, because a
+    # C-quoted path would name nothing to `add`. The two listings are disjoint by construction,
+    # tracked and untracked, so no path arrives twice. `--no-renames`, so a path the render moves
+    # away is listed by its own name and staged as the deletion it is, never folded into a
+    # destination (memory/gotchas/porcelain-diff-names-a-rename-by-its-destination.md).
+    while IFS= read -r -d '' p; do
+      h0[$p]=$(GIT hash-object -- "$p" 2>/dev/null) || h0[$p]=-
+      case "$p" in "$M"/*|.memory-tree.conf) dirty="$dirty${dirty:+ }$p" ;; esac
+    done < <(GIT diff --no-renames --name-only -z 2>/dev/null)
+    while IFS= read -r -d '' p; do
+      h0[$p]=$(GIT hash-object -- "$p" 2>/dev/null) || h0[$p]=-
+      [ "$p" != .memory-tree.conf ] || dirty="$dirty${dirty:+ }$p"
+    done < <(GIT ls-files --others --exclude-standard -z 2>/dev/null)
+    # THE GENERATOR'S OWN CODE is an input too (closing review round 2, L1): `--write` imports its
+    # sibling modules from the directory it lives in, so an unstaged edit there feeds the render as
+    # surely as one under the memory root does. Asked of git with that directory as the pathspec, so
+    # the names come back repo-relative whatever spelling the resolver used; a generator at the root
+    # names its own top-level modules only, never the whole tree.
+    gd=$(dirname -- "$gen")
+    [ "$gd" != . ] || gd=':(glob)*.py'
+    while IFS= read -r -d '' p; do
+      case " $dirty " in *" $p "*) ;; *) dirty="$dirty${dirty:+ }$p" ;; esac
+    done < <(GIT diff --no-renames --name-only -z -- "$gd" 2>/dev/null)
+    if [ -n "$dirty" ]; then
+      why="the views' inputs carry changes the index does not hold, and a render would stage views derived from them: $dirty"
+      fix="stage or discard those changes, then run "
+    fi
+  fi
+  if [ -n "$why" ]; then
+    echo "gates-green: the $n filed ask(s) are staged, but the generated views were not re-rendered: $why; until they are, a records commit meets a stale index — repair: $fix$(derive_index_repair)"
+    return 1
+  fi
+  # `-B`, because the render is a Python process and its imports would otherwise leave bytecode
+  # caches beside the kit: in a tree that does not ignore them they are new untracked paths, and the
+  # delta rule above would stage them into the records commit (observed over this unit's fixture).
+  run_bounded "$py" -B "$gen" --write; rc=$?
+  while IFS= read -r -d '' p; do post+=("$p"); done \
+    < <(GIT diff --no-renames --name-only -z 2>/dev/null; GIT ls-files --others --exclude-standard -z 2>/dev/null)
+  for p in "${post[@]}"; do
+    if [ -n "${h0[$p]+x}" ]; then
+      h=$(GIT hash-object -- "$p" 2>/dev/null) || h=-
+      [ "$h" = "${h0[$p]}" ] || left="$left${left:+ }$p"
+    else
+      stage+=("$p"); paths="$paths${paths:+ }$p"
+    fi
+  done
+  [ "${#stage[@]}" = 0 ] || GIT add -A -- "${stage[@]}" >/dev/null 2>&1 || staged=0
+  if [ "$rc" != 0 ]; then
+    echo "gates-green: the $n filed ask(s) are staged, but the generated views were not re-rendered: the generator exited $rc after ${RB_TOOK}s; until they are, a records commit meets a stale index — repair: $(derive_index_repair)"
+    [ -z "${RB_OUT:-}" ] || printf '%s\n' "$RB_OUT" | sed 's/^/    /'
+  fi
+  if [ "$staged" = 0 ]; then
+    echo "gates-green: the generated views for $n filed ask(s) were re-rendered, but git could not stage the ${#stage[@]} path(s) the render moved: $paths; until it does, a records commit meets a stale index — stage them by hand"
+    return 1
+  fi
+  [ "$rc" = 0 ] || return 1
+  if [ "${#stage[@]}" -gt 0 ]; then
+    line="gates-green: re-rendered the generated views for $n filed ask(s) and staged ${#stage[@]} path(s): $paths"
+  elif [ -n "$left" ]; then
+    line="gates-green: re-rendered the generated views for $n filed ask(s) and staged 0 path(s): none"
+  else
+    line="gates-green: re-rendered the generated views for $n filed ask(s); the render changed no path"
+  fi
+  echo "$line${left:+; left unstaged, dirty before the render: $left}"
+  return 0
+}
+
 read_ask_back() { # ask id · slug -> 0 when ASKS_CMD reads it back as ONE OPEN HIGH ask homed at slug; AB_WHY
   local id=$1 slug=$2 rc rows n
   AB_WHY=""
@@ -7010,7 +7129,7 @@ read_ask_back() { # ask id · slug -> 0 when ASKS_CMD reads it back as ONE OPEN 
 
 write_inherited_asks() { # slug · R · run dir
   local slug=$1 r=$2 d=$3 bl leg ver age own8 ownid cand reused fam seq id argv file tok a s k prior had restored
-  local r8=${2:0:8} today
+  local r8=${2:0:8} today filed=0
   bl="$M/builds/$slug/BACKLOG.md"
   today=$(date -u +%Y-%m-%d)
   [ -f "$d/attribution" ] || return 0
@@ -7081,6 +7200,7 @@ write_inherited_asks() { # slug · R · run dir
     mkdir -p "${bl%/*}" && write_backlog_rows "$bl" "$slug" "$a" "$s" "$k" && GIT add -- "$bl" 2>/dev/null
     if read_ask_back "$id" "$slug"; then
       echo "gates-green: filed ask $id for leg $leg red at $r8, staged in $bl"
+      filed=$((filed + 1))
     else
       # REMOVED, and the file put back exactly as it was: a row the parser cannot read back is a row
       # every later reader would read differently from this writer. A path that EXISTED before the
@@ -7100,6 +7220,13 @@ write_inherited_asks() { # slug · R · run dir
     fi
     [ -z "$prior" ] || rm -f -- "$prior"
   done < "$d/attribution"
+  # TOOL-dMendedRecall-2 S1 - THE VIEWS, once per call and only when this call FILED: a reused ask,
+  # the dark path, a leg it could not file and rows it rolled back move no view, so a call that
+  # files nothing prints exactly what it printed before the views were its job. A miss is named
+  # by the helper and changes nothing here: the item's verdict is the caller's, as it was.
+  [ "$filed" -gt 0 ] || return 0
+  write_ask_views "$filed" || :
+  return 0
 }
 
 # ---- S7: THE TWO ESCAPE ROUTES, BACKED BY THE ATTRIBUTION OR REFUSED.

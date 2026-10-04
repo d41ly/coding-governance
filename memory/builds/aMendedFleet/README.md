@@ -167,7 +167,7 @@ ids TOOL-aMendedFleet-82 TOOL-aMendedFleet-83 TOOL-aMendedFleet-84 TOOL-aMendedF
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-aMendedFleet-1 — restore the views helper and the `--status` entry merge 01c22e155 lost](spec/2026-10-04-spec-TOOL-aMendedFleet-1.md) | 1 | 1 | SPECCED | rev-1 | 2026-10-04 |
+| [TOOL-aMendedFleet-1 — restore the views helper and the `--status` entry merge 01c22e155 lost](spec/2026-10-04-spec-TOOL-aMendedFleet-1.md) | 1 | 1 | CLOSED | rev-1 | 2026-10-04 |
 | [TOOL-aMendedFleet-2 — a definition-level census of every merge since 2026-09-01](spec/2026-10-04-spec-TOOL-aMendedFleet-2.md) | 2 | 1 | SPECCED | rev-1 | 2026-10-04 |
 | [TOOL-aMendedFleet-3 — the lander refuses a merge that loses a definition a parent carried](spec/2026-10-04-spec-TOOL-aMendedFleet-3.md) | 3 | 2 | SPECCED | rev-3 | 2026-10-04 |
 | [TOOL-aMendedFleet-4 — the govkit acceptance matrix reads its children as UTF-8 on every host](spec/2026-10-04-spec-TOOL-aMendedFleet-4.md) | 4 | 1 | SPECCED | rev-1 | 2026-10-04 |
@@ -266,7 +266,7 @@ ids TOOL-aMendedFleet-82 TOOL-aMendedFleet-83 TOOL-aMendedFleet-84 TOOL-aMendedF
 | [PLAY-aMendedFleet-4 — the `AGENTS.md` wrapper carries one node registry](spec/2026-10-04-spec-PLAY-aMendedFleet-4.md) | 97 | 1 | SPECCED | rev-2 | 2026-10-04 |
 <!-- /gen:build-units -->
 
-Records: 5 bound to this build, across 2 record folder(s).
+Records: 6 bound to this build, across 3 record folder(s).
 
 Ids no record names: KICK-aMendedFleet-1 KICK-aMendedFleet-2 KICK-aMendedFleet-3 KICK-aMendedFleet-4 PLAY-aMendedFleet-1 PLAY-aMendedFleet-2 PLAY-aMendedFleet-3 PLAY-aMendedFleet-4 TOOL-aMendedFleet-10 TOOL-aMendedFleet-11 TOOL-aMendedFleet-12 TOOL-aMendedFleet-13 TOOL-aMendedFleet-14
 TOOL-aMendedFleet-15 TOOL-aMendedFleet-16 TOOL-aMendedFleet-17 TOOL-aMendedFleet-18 TOOL-aMendedFleet-19 TOOL-aMendedFleet-2 TOOL-aMendedFleet-20 TOOL-aMendedFleet-21 TOOL-aMendedFleet-22 TOOL-aMendedFleet-23 TOOL-aMendedFleet-24 TOOL-aMendedFleet-25 TOOL-aMendedFleet-26 TOOL-aMendedFleet-27
