@@ -7,6 +7,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-05-prompt-TOOL-aWardedAudit-1-0-run-mandate.md](../prompts/2026-10-05-prompt-TOOL-aWardedAudit-1-0-run-mandate.md) | journal | — |
+| [2026-10-05-prompt-TOOL-aWardedAudit-1-1-build-brief.md](../prompts/2026-10-05-prompt-TOOL-aWardedAudit-1-1-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
 

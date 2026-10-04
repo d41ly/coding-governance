@@ -63,9 +63,9 @@ ids TOOL-aWardedAudit-1 TOOL-aWardedAudit-2 TOOL-aWardedAudit-3 TOOL-aWardedAudi
 | [TOOL-aWardedAudit-3 — the carriers state that only the owner opts a build into the spec audit](spec/2026-10-05-spec-TOOL-aWardedAudit-3.md) | 3 | 1 | OPEN | rev-1 | 2026-10-05 |
 <!-- /gen:build-units -->
 
-Records: 1 bound to this build, across 2 record folder(s).
+Records: 4 bound to this build, across 2 record folder(s).
 
-Ids no record names: TOOL-aWardedAudit-2 TOOL-aWardedAudit-3.
+Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: TOOL-aWardedAudit-1 TOOL-aWardedAudit-2 TOOL-aWardedAudit-3.
 <!-- /gen:build-index -->
