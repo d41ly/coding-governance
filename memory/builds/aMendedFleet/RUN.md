@@ -40,3 +40,5 @@ base: 7af5f564641d231f8b78f6b183dde1b6bf53111d
 2026-10-04T17:56:25Z decision · item Label about 30 closing-review findings by hand so review precision is calibrated against a human · reason Options: the owner spends about an hour labelling, scored through tools/workflows/review_replay.py; or skip calibration. Refused: the labels ARE the owner's judgement; a run supplying them would grade itself. Report [B#44], roadmap item 19.
 
 2026-10-04T17:56:28Z decision · item Run the /goal spike in an interactive session, and retire the idle-wake machinery if it holds · reason Options: spike /goal attended and delete idle-wake plus register/release-task if it covers the silent-background case; or keep the machinery. Refused: in -p sessions /goal delivers check-ins only at turn end, so only an interactive owner session can measure it. Report [B#42], roadmap item 24.
+
+2026-10-04T18:40:36Z rescope · item add TOOL-aMendedFleet-81 · reason split from TOOL-aMendedFleet-22 at its F1: the shard renderer and the merge attribute share no file and are two mechanisms, and this build's rule is one per spec
