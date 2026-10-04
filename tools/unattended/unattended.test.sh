@@ -5702,6 +5702,60 @@ out=$(run --review tRun --subject B2 --verdict BLOCKED --blockers 3 --dispositio
 hit "$out" "--review exits BOUNDED with 3 blocker(s) standing, and the severity rule promotes every blocker, so fold cannot be this exit's disposition"
 same "a refused fold at a bounded exit wrote nothing" "$(grep -c 'review · item B2 · reason' memory/builds/tRun/RUN.md)" "0"
 reset_tree
+
+# ---- TOOL-aBatchedMinors-2: THE CLOSING REVIEW PROMOTES EVERY FINDING, and its exit COUNTS them. The
+# ---- owner ruled on 2026-10-04 that a closing diff review's mediums and lows are promoted too,
+# ---- batched into one unit or two, so the slug subject's terminal round records the highs and
+# ---- minors that stood and check 2 can demand a unit for each. Against the base driver every refusal
+# ---- below is absent: the flags were unknown, and a converged closing round recorded with nothing.
+# ---- The fixture carries its own converged closing round for tRun, for the close arms; each block
+# ---- below drops it first, or every round here meets "already carries a terminal review round".
+bcopen; sed -i '/review · item tRun · /d' memory/builds/tRun/RUN.md
+hit "$(run --review tRun --subject tRun --verdict CLEAN --blockers 0 --highs x --minors 0)" "--review requires --highs as a plain integer, the count of CONFIRMED HIGH findings standing at the closing review's exit"
+hit "$(run --review tRun --subject tRun --verdict CLEAN --blockers 0 --highs 0 --minors -1)" "--review requires --minors as a plain integer, the count of CONFIRMED MEDIUM and LOW findings standing at the closing review's exit"
+# ...a spec subject takes no count: its mediums and lows are folded into the spec under review
+hit "$(run --review tRun --subject S9 --verdict BLOCKED --blockers 0 --minors 2)" "--highs and --minors are the closing diff review's counts, and this subject is not the build slug: a spec audit's mediums and lows are FOLDED into the spec under review, so a count here would be read by the gate as owing units nobody owes"
+same "a refused spec-subject count wrote no row (closing review round 1, L6)" "$(grep -c 'review · item S9 · reason' memory/builds/tRun/RUN.md)" "0"
+# ...one integer for two readers (round 1, L1): bash reads a leading zero as octal, so `08` used to
+# abort the driver and `010` computed 8 while check 2 read 10; a ten-digit value wraps nothing now
+hit "$(run --review tRun --subject tRun --verdict CLEAN --blockers 0 --highs 08 --minors 0)" "--review requires --highs as a decimal of at most nine digits with no leading zero, because bash arithmetic reads a leading zero as octal and check 2 reads the row as decimal"
+hit "$(run --review tRun --subject tRun --verdict CLEAN --blockers 0 --highs 0 --minors 010)" "--review requires --minors as a decimal of at most nine digits with no leading zero"
+hit "$(run --review tRun --subject tRun --verdict CLEAN --blockers 1234567890 --highs 0 --minors 0)" "--review requires --blockers as a decimal of at most nine digits with no leading zero"
+# ...the closing exit must count, must promote what stood, never folds, and never promotes nothing
+hit "$(run --review tRun --subject tRun --verdict "CLEAN WITH FIXES" --blockers 0)" "--review exits CONVERGED on the closing diff review and requires --highs and --minors, the CONFIRMED HIGH and MEDIUM-plus-LOW findings standing at the exit, because every one of them is promoted and a row that does not count them cannot be graded"
+# ...EITHER count missing is the refusal, not only both (round 1, M2): a guard regressed to an AND
+# would write `minors  · disposition promote`, a row check 2 cannot read a floor from
+hit "$(run --review tRun --subject tRun --verdict "CLEAN WITH FIXES" --blockers 0 --highs 1 --disposition promote)" "--review exits CONVERGED on the closing diff review and requires --highs and --minors"
+hit "$(run --review tRun --subject tRun --verdict "CLEAN WITH FIXES" --blockers 0 --minors 1 --disposition promote)" "--review exits CONVERGED on the closing diff review and requires --highs and --minors"
+hit "$(run --review tRun --subject tRun --verdict "CLEAN WITH FIXES" --blockers 0 --highs 0 --minors 3)" "--review exits CONVERGED on the closing diff review with 0 blocker(s), 0 high(s) and 3 minor(s) standing, and requires --disposition promote, because every confirmed finding there is promoted"
+hit "$(run --review tRun --subject tRun --verdict "CLEAN WITH FIXES" --blockers 0 --highs 0 --minors 3 --disposition fold)" "--review exits CONVERGED on the closing diff review, which folds nothing: every confirmed finding is promoted, the MEDIUMs and LOWs batched into one unit or two"
+hit "$(run --review tRun --subject tRun --verdict CLEAN --blockers 0 --highs 0 --minors 0 --disposition promote)" "--review exits CONVERGED on the closing diff review with nothing standing, so --disposition promote promotes nothing"
+same "a refused closing round wrote nothing" "$(grep -c 'review · item tRun · reason' memory/builds/tRun/RUN.md)" "0"
+out=$(run --review tRun --subject tRun --verdict "CLEAN WITH FIXES" --blockers 0 --highs 1 --minors 4 --disposition promote)
+hit "$out" "CONVERGED · highs 1 · minors 4 · disposition promote"
+hit "$out" "this exit owes at least 2 new unit(s)"
+hit "$out" "the MEDIUMs and LOWs batched into one unit, two only across disjoint write sets"
+same "the counts sit before the disposition, the field check 2 reads last" "$(grep -c 'review · item tRun · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 1 · minors 4 · disposition promote$' memory/builds/tRun/RUN.md)" "1"
+reset_tree
+# ...a count on a non-terminal closing round is a claim about an exit that has not happened, and a
+# NON-CONVERGENT closing exit owes its blockers too: 2 + 1 + 0 = 3.
+bcopen; sed -i '/review · item tRun · /d' memory/builds/tRun/RUN.md
+hit "$(run --review tRun --subject tRun --verdict BLOCKED --blockers 2 --highs 0 --minors 0)" "--review names --highs or --minors on a closing round that is not a terminal exit, and a count of what stands at the exit is a claim about an exit that has not happened yet: state"
+run --review tRun --subject tRun --verdict BLOCKED --blockers 2 >/dev/null
+# ...the state gate's fold refusal names the closing rule there, not "legal at CONVERGED" (round 1, L3)
+out=$(run --review tRun --subject tRun --verdict BLOCKED --blockers 2 --highs 1 --minors 0 --disposition fold)
+hit "$out" "--review exits NON-CONVERGENT on the closing diff review, which folds nothing: every confirmed finding is promoted, the MEDIUMs and LOWs batched into one unit or two"
+miss "$out" "fold is legal only at CONVERGED"
+out=$(run --review tRun --subject tRun --verdict BLOCKED --blockers 2 --highs 1 --minors 0 --disposition promote)
+hit "$out" "NON-CONVERGENT · highs 1 · minors 0 · disposition promote"
+hit "$out" "this exit owes at least 3 new unit(s)"
+reset_tree
+# ...and a closing exit standing on nothing records its zeros and no disposition.
+bcopen; sed -i '/review · item tRun · /d' memory/builds/tRun/RUN.md
+out=$(run --review tRun --subject tRun --verdict CLEAN --blockers 0 --highs 0 --minors 0)
+hit "$out" "CONVERGED · highs 0 · minors 0 — the loop is done for this subject"
+same "a zero-standing closing exit records no disposition" "$(grep -c 'review · item tRun · reason verdict CLEAN · blockers 0 · CONVERGED · highs 0 · minors 0$' memory/builds/tRun/RUN.md)" "1"
+reset_tree
 # ---- The arms below are REGION TWO's, and they sit before its closing `fi`. Both sides of this
 # ---- merge edited this seam: main sharded the suite into two regions with mode-selected floors,
 # ---- while this branch appended new `--rescope` and `--dispatch` arms to the end of the file.
@@ -9278,7 +9332,7 @@ printf '**Serves:** diff-review ARCH-tRun-1
 
 # closing diff review of %s
 ' "$ip_f"   > "$ip_dir/memory/builds/tRun/reviews/2026-08-01-review-ARCH-tRun-1-diff.md"
-iprun --review tRun --subject tRun --verdict "CLEAN WITH FIXES" --blockers 0 >/dev/null
+iprun --review tRun --subject tRun --verdict "CLEAN WITH FIXES" --blockers 0 --highs 0 --minors 0 >/dev/null
 ipgit add -A >/dev/null && ipgit commit -q -m "fixture: the closing review round" --no-verify
 ip_old=$(ipgit rev-parse HEAD)
 ipgit fetch -q origin main; ipgit checkout -q --detach origin/main

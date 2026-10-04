@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.118 -->
+<!-- gov:kit memory-tree@2.119 -->
 # The build method — how a multi-pass build runs
 
 ## M1 — What this is
@@ -31,7 +31,7 @@ closed forks.
 
 ## M2 — The spec set — decompose, detect, classify, act
 
-**Decompose first**, before anything is classified: **one mechanism per spec.** A separate document, gate, adopter
+**Decompose first**, before anything is classified: **one mechanism per spec**, the closing review's minors batch (M4) excepted. A separate document, gate, adopter
 or generated artifact is a separate unit with its own id and spec. Two mechanisms in one spec make a "unit built"
 pass unreviewable — the closing diff cannot tell which half a finding lands on.
 Grouping asks into one unit is written ONLY as that unit's `closes` list.
@@ -138,7 +138,7 @@ derives from it. **Carry the binding line** check 21 requires —
 Grammar: `{{MEMORY_ROOT}}/HYGIENE.md`, "Record bindings". **Fold fixes into the spec** (rev bump + §9 line), then **STOP** once
 a synthesis pass calls the design clean.
 
-**A BLOCKED verdict has a disposition.** A SPEC subject takes `REVIEW_ROUNDS` rounds (protocol §8) and exits BOUNDED; the DIFF review converges: a round re-arms only on a count STRICTLY SMALLER than the round before, never merely "changed" (2, 1, 2 satisfies that forever). **At the exit every CONFIRMED finding is DISPOSED BY SEVERITY, on CONVERGED too**: a BLOCKER or HIGH is PROMOTED to a unit whose mechanism closes it, audited as a SPEC; a MEDIUM or LOW is FOLDED into its spec as a rev-N bump with a §9 line; never parked, waived, retired or re-reviewed. Both terminate. **Folding a round's own fixes does not re-arm the loop** — the fold is what the next round measures. **The CHAIN of promotions is bounded by PRECISION.** Each takes a FRESH subject, so `REVIEW_ROUNDS` re-arms per subject and bounds no chain of them. A PROMOTING round whose precision, which its own record states, falls below the review protocol's floor ENDS the chain: its promotions are built from their specs as written, and where `specs-audited` is owed they close under a recorded override of it, because the run CLOSES units no audit names.
+**A BLOCKED verdict has a disposition.** A SPEC subject takes `REVIEW_ROUNDS` rounds (protocol §8) and exits BOUNDED; the DIFF review converges: a round re-arms only on a count STRICTLY SMALLER than the round before, never merely "changed" (2, 1, 2 satisfies that forever). **At the exit every CONFIRMED finding is DISPOSED BY SEVERITY, on CONVERGED too**: a BLOCKER or HIGH is PROMOTED to a unit whose mechanism closes it, audited as a SPEC; on a SPEC subject a MEDIUM or LOW is FOLDED into its spec as a rev-N bump with a §9 line; never parked, waived, retired or re-reviewed. Both terminate. **The closing DIFF review folds nothing** (owner, 2026-10-04): its MEDIUMs and LOWs are PROMOTED too, batched into ONE unit naming them all — TWO only when they split into two disjoint write sets by M6, so both build concurrently; never one per minor. That batch is the one unit M2's one-mechanism rule admits; its exit records the counts the unattended verbs name. **Folding a round's own fixes does not re-arm the loop** — the fold is what the next round measures. **The CHAIN of promotions is bounded by PRECISION.** Each takes a FRESH subject, so `REVIEW_ROUNDS` re-arms per subject and bounds no chain of them. A PROMOTING round whose precision, which its own record states, falls below the review protocol's floor ENDS the chain: its promotions are built from their specs as written, and where `specs-audited` is owed they close under a recorded override of it, because the run CLOSES units no audit names.
 
 **CONVERGED is terminal for its subject, rev bumps included**: a blocker confirmed on it afterwards — in the
 fold text, say — takes the severity rule's disposition and never another round; `--review`
@@ -242,14 +242,14 @@ Bug classes FIRST — the M6 checklist over `<BASE>..HEAD`, ALWAYS that full ran
 fold REINTRODUCES stays selected even where the fold's own files would not select it, and the probe costs seconds.
 Its output is a lens brief, not a report filed after. Then ONE adversarial review, which is `diff-reviewed` — round 1 from the run's pinned
 BASE (an immutable sha, never a moving ref) to the tip; round N>1 from round N-1's RECORDED TIP, so it reads the
-FOLD that round introduced instead of re-reading fixes, and passes that round's confirmed set as `priorFindings`.
+FOLD that round introduced instead of re-reading fixes, and passes the blockers that fold fixed as `priorFindings`.
 The harness refuses a base that is not a sha once the round is above 1. Per-pass reviews do not substitute: they
 re-scan overlapping code and never see the seam between two passes.
 
 ```
 Workflow { scriptPath: '{{TOOL_ROOT}}workflows/tier2-review.js',
            args: { repo: '<abs repo path>', base: '<sha: BASE at round 1, round N-1's tip after>',
-                   head: 'HEAD', round: <n>, priorFindings: [<round N-1's confirmed set>],
+                   head: 'HEAD', round: <n>, priorFindings: [<round N-1's fixed blockers>],
                    reviewDir: '{{MEMORY_ROOT}}/builds/<slug>/reviews' } }
 ```
 
@@ -259,7 +259,7 @@ recording grammar before the next gate run**, or check 5 reds on a free-named fi
 `diff-review`, not a `spec-audit`: give it `**Serves:** diff-review <every id in the diff>` and do not let it stand
 in for the per-spec pass M4 owns — the two answer different questions and only one of them is about a design.
 
-Fix every blocker, then re-review the FIX, not the diff again. A blocker unfixable inside the mandate's scope is a
+Fix every blocker, and ONLY blockers: highs, mediums and lows carry to the exit, where M4 promotes them. Then re-review the FIX, not the diff again. A blocker unfixable inside the mandate's scope is a
 park, not a waiver, and its unit does not close. Left-shift every confirmed finding — a regression gate, or a
 `{{MEMORY_ROOT}}/gotchas/` class when the class cannot be gated; a finding fixed and not left-shifted returns.
 

@@ -48,7 +48,7 @@
 # THE CORE SETS ARE READ FROM THE DRIVER, never restated here. A second spelling of `PHASES_CORE` one
 # file away from the thing that enforces it is the drift this leg exists to catch.
 set -u
-KIT_UNATTENDED_VERSION=1.60   # gov:kit unattended@1.60 — must match unattended.sh; check-kit-versions.sh pairs them
+KIT_UNATTENDED_VERSION=1.61   # gov:kit unattended@1.61 — must match unattended.sh; check-kit-versions.sh pairs them
 
 # ------------------------------------------------------------------------------ the dereference pin
 # Identical to the driver's, and for the identical reason: `git replace` rewrites what a sha MEANS for
@@ -706,12 +706,23 @@ else
         n[it]++
         b = -1
         if (match(rs, /blockers [0-9]+/)) b = substr(rs, RSTART + 9, RLENGTH - 9) + 0
+        # THE CLOSING REVIEW COUNTS (TOOL-aBatchedMinors-3). `--review` writes `highs <n> · minors <n>`
+        # on the build-slug subject terminal round only, and BOTH or neither: a row carrying both
+        # is a closing-review exit whose every confirmed finding is promoted, and it owes one unit per
+        # blocker and high plus one for the minors batch. A row carrying neither - every spec-audit
+        # row, every closing row written before the counts existed - keeps the floor of one.
+        # NOT CHECKED: that the minors went into at most two units, or that a promoted unit
+        # mechanism closes its finding - the region records ids, never which finding an id closes.
+        hi = -1; mi = -1
+        if (match(rs, / · highs [0-9]+/)) { hi = substr(rs, RSTART, RLENGTH); sub(/^.* /, "", hi); hi += 0 }
+        if (match(rs, / · minors [0-9]+/)) { mi = substr(rs, RSTART, RLENGTH); sub(/^.* /, "", mi); mi += 0 }
+        cnt = (hi >= 0 && mi >= 0)
         if (it in last && b >= last[it]) flat[it] = flat[it] + 1; else flat[it] = 0
         last[it] = b
         if (rs ~ /CONVERGED|NON-CONVERGENT|CEILING|BOUNDED/) term[it] = 1
         nf = split(rs, fld, " · ")
         if (rs ~ /NON-CONVERGENT|CEILING|BOUNDED/) {
-          needs[it] = 1; bl[it] = b
+          needs[it] = 1; bl[it] = b; hc[it] = cnt; hh[it] = hi; mm[it] = mi
           disp[it] = (nf > 0 && fld[nf] ~ /^disposition /) ? substr(fld[nf], length("disposition ") + 1) : ""
         }
         # A CONVERGED ROW CARRYING A DISPOSITION IS READ TOO (closing review of aProbedUnit, cluster
@@ -721,12 +732,18 @@ else
         # proxy predates the field and never read a converged row, and a converged subject is not
         # one that "EXITED without converging".
         else if (rs ~ /CONVERGED/ && graded == 1 && nf > 0 && fld[nf] ~ /^disposition /) {
-          needs[it] = 1; bl[it] = b
+          needs[it] = 1; bl[it] = b; hc[it] = cnt; hh[it] = hi; mm[it] = mi
           disp[it] = substr(fld[nf], length("disposition ") + 1)
+        }
+        # ...and a converged CLOSING row standing on a high or a minor with NO disposition owes one:
+        # the closing review promotes every finding, so it reaches the no-disposition refusal below
+        # rather than reading as the ordinary converged round that demands nothing.
+        else if (rs ~ /CONVERGED/ && graded == 1 && cnt && hi + mi > 0) {
+          needs[it] = 1; bl[it] = b; hc[it] = cnt; hh[it] = hi; mm[it] = mi; disp[it] = ""
         }
       }
       END {
-        nneed = 0; nomiss = ""; illegal = ""; foldbad = ""
+        nneed = 0; nsubj = 0; nomiss = ""; illegal = ""; foldbad = ""; closefold = ""
         for (it in n) {
           if (n[it] > ceil)
             printf "\n  %s (subject %s: %d review rounds against a runaway ceiling of %d, so the loop ran past its own backstop)", f, it, n[it], ceil
@@ -736,7 +753,12 @@ else
             if (graded != 1) nneed++
             else if (disp[it] == "") nomiss = nomiss " " it
             else if (index(disps, "|" disp[it] "|") == 0) illegal = illegal " " it "=" disp[it]
-            else if (disp[it] == "promote") nneed++
+            else if (disp[it] == "promote") {
+              nsubj++
+              owe = hc[it] ? bl[it] + hh[it] + (mm[it] > 0 ? 1 : 0) : 1
+              nneed += (owe > 0 ? owe : 1)
+            }
+            else if (hc[it] && foldgraded == 1) closefold = closefold " " it
             else if (bl[it] > 0 && foldgraded == 1) foldbad = foldbad " " it "=" bl[it]
             # a subject recording `fold` beside ZERO blockers demands NOTHING, which is the entire
             # point of reading the field instead of inferring an answer from ids; beside a non-zero
@@ -750,13 +772,15 @@ else
             printf "\n  %s (exited subject(s)%s record NO disposition while this record is graded against DISPOSITION_CUTOFF, so which of fold or promote the run took cannot be read - and with nothing to read this clause would demand nothing and pass by finding nothing)", f, nomiss
           if (illegal != "")
             printf "\n  %s (exited subject(s)%s carry a disposition outside the closed set %s - the driver validates the flag at write time, so an illegal value reached this record by HAND, and reading it as absent would name the wrong cause)", f, illegal, substr(disps, 2, length(disps) - 2)
+          if (closefold != "")
+            printf "\n  %s (closing-review subject(s)%s record disposition fold on a row carrying highs and minors, and the closing diff review folds nothing: every confirmed finding is promoted, the MEDIUMs and LOWs batched into one unit or two)", f, closefold
           if (foldbad != "")
             printf "\n  %s (exited subject(s)%s record disposition fold beside a NON-ZERO blocker count in a record first-committed on or after FOLD_CUTOFF, after which the driver refuses this at write time, and the severity rule promotes every blocker, so a fold there is a blocker left standing under a field that says nothing was)", f, foldbad
           if (nneed > 0) {
             if (readable != 1)
-              printf "\n  %s (%d subject(s) EXITED recording disposition promote and the roster at this run BASE cannot be read, so whether a blocker was promoted CANNOT BE OBSERVED - a check that cannot look says so rather than passing)", f, nneed
+              printf "\n  %s (%d subject(s) EXITED recording disposition promote and the roster at this run BASE cannot be read, so whether a blocker was promoted CANNOT BE OBSERVED - a check that cannot look says so rather than passing)", f, nsubj
             else if (newids + 0 < nneed)
-              printf "\n  %s (%d subject(s) EXITED recording disposition promote and the generated units region gained only %d non-WONTDO unit id(s) this run BASE lacked, so at least one promoted blocker or high has no unit. A subject recording disposition fold beside zero blockers demands nothing here)", f, nneed, newids + 0
+              printf "\n  %s (%d subject(s) EXITED recording disposition promote and the generated units region gained only %d non-WONTDO unit id(s) this run BASE lacked, against a floor of %d - one per subject, or on a closing-review row carrying counts one per blocker and high plus one for its minors - so at least one promoted finding has no unit. A subject recording disposition fold beside zero blockers demands nothing here)", f, nsubj, newids + 0, nneed
           }
         }
         else {
