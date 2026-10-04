@@ -676,5 +676,125 @@ o=$(cd "$T" && bash "$LEG" 2>&1)
 hasnt "R2: a COMPLETE walk of a cap-deep window is not called truncated" "$o" "1 probe(s) truncated"
 rm -rf "$T"
 
+# ---- RANGE MODE (TOOL-dUnstuckLanding-17 S2/S3, AC2 and AC5). A violation already on the tip the remote
+# ---- advertises was graded when it landed, so a closing run grades only what it adds. The fixture is
+# ---- a clone of a bare origin whose tip carries ARCH-tRange-1 BUILT BEFORE ITS SPEC, and the unpushed
+# ---- run adds ARCH-tRange-2, specced first. `write_range_spec <n>` writes a conforming spec for unit n.
+seed_range_fixture() { # -> prints the fixture root; the clone is <root>/work, its origin <root>/origin.git
+  local T
+  T=$(mktemp -d) || exit 2
+  ( cd "$T" || exit 2
+    git init -q --bare origin.git
+    git --git-dir=origin.git symbolic-ref HEAD refs/heads/main
+    git init -q work && cd work || exit 2
+    git config user.email t@t; git config user.name t; git config commit.gpgsign false
+    git checkout -q -b main
+    mkdir -p ${PFX}${KIT_NAME} memory/builds/tRange/spec
+    cp "$KIT/lib-unattended.sh" "$KIT/unattended.sh" "$KIT/check-pass-order.sh" ${PFX}${KIT_NAME}/
+    printf 'MEMORY_ROOT=memory\nPASS_ORDER_CUTOFF="2026-01-01"\nSHARED_RECORDS="memory/DECISIONS.md memory/backlog"\n' > .unattended.conf
+    { printf -- '---\nslug: tRange\nnode: t\nopened: 2026-06-01\nstreams: tooling\nroster: ARCH\nids: ARCH-tRange-1\n---\n# tRange\n'
+      printf '<!-- gen:build-index -->\n<!-- gen:build-units -->\n| Unit | Order | Tier | Status | Rev | Last change |\n|---|---|---|---|---|---|\n'
+      for u in 1 2 3; do printf '| [ARCH-tRange-%s — unit](spec/s%s.md) | %s | 2 | CLOSED | rev-1 | 2026-06-01 |\n' "$u" "$u" "$u"; done
+      printf '<!-- /gen:build-units -->\n<!-- /gen:build-index -->\n'; } > memory/builds/tRange/README.md
+    git add -A >/dev/null; git commit -q -m "fixture base" --no-verify
+    printf 'one\n' > ${PFX}p1.sh; git add -A >/dev/null; git commit -q -m "ARCH-tRange-1: build the thing" --no-verify
+    write_range_spec 1; git add -A >/dev/null; git commit -q -m "spec ARCH-tRange-1 written afterwards" --no-verify
+    git remote add origin ../origin.git; git push -q origin main
+    write_range_spec 2; git add -A >/dev/null; git commit -q -m "spec ARCH-tRange-2 authored" --no-verify
+    printf 'two\n' > ${PFX}p2.sh; git add -A >/dev/null; git commit -q -m "ARCH-tRange-2: build the thing" --no-verify
+  ) >/dev/null 2>&1
+  printf '%s' "$T"
+}
+write_range_spec() { # unit number -> a conforming CLOSED spec for it
+  printf '# ARCH-tRange-%s — the unit\n\n**Status:** CLOSED · rev-1 · 2026-06-02 · node t · Tier-2 · base 0123abcd\n\n## 2. Scope (IN)\n\n- S1 a real scope item.\n\n## 6. Acceptance criteria\n\n- AC1 something observable.\n\n## 7. Gates\n\n- a gate.\n\n## 8. Open questions\n\nnone\n' "$1" > memory/builds/tRange/spec/s$1.md
+}
+T=$(seed_range_fixture)
+RG_TIP=$(git -C "$T/work" rev-parse origin/main)
+o=$(cd "$T/work" && bash "$LEG" 2>&1); rc=$?
+same  "range: a violation on the advertised tip is not re-graded, exit code" "$rc" "0"
+has   "range: the summary names the mode and the tip" "$o" "range ${RG_TIP:0:8}.."
+hasnt "range: the pushed unit is not named" "$o" "ARCH-tRange-1 —"
+# ...a second, UNPUSHED, built-before-specced unit is graded and named, and the pushed one still is not
+( cd "$T/work" && printf 'three\n' > ${PFX}p3.sh && git add -A >/dev/null && git commit -q -m "ARCH-tRange-3: build the thing" --no-verify \
+  && write_range_spec 3 && git add -A >/dev/null && git commit -q -m "spec ARCH-tRange-3 written afterwards" --no-verify ) >/dev/null 2>&1
+o=$(cd "$T/work" && bash "$LEG" 2>&1); rc=$?
+same  "range: an unpushed violation reds, exit code" "$rc" "1"
+has   "range: the unpushed violation is named" "$o" "ARCH-tRange-3 — BUILT at"
+hasnt "range: the pushed violation is still not named" "$o" "ARCH-tRange-1 — BUILT at"
+# AC5 - an UNRESOLVED tip widens to the whole history and never narrows to nothing: the pushed unit reds
+git --git-dir="$T/origin.git" symbolic-ref HEAD refs/heads/nothing-here
+o=$(cd "$T/work" && bash "$LEG" 2>&1); rc=$?
+same  "range unresolved: WHOLE mode reds the pushed unit, exit code" "$rc" "1"
+has   "range unresolved: the summary says WHOLE and why" "$o" "range whole (the tip did not resolve: "
+has   "range unresolved: the pushed unit is graded as it always was" "$o" "ARCH-tRange-1 — BUILT at"
+# ...and HEAD reset to the tip is WHOLE too, for the other reason
+git --git-dir="$T/origin.git" symbolic-ref HEAD refs/heads/main
+( cd "$T/work" && git reset -q --hard "$RG_TIP" ) >/dev/null 2>&1
+o=$(cd "$T/work" && bash "$LEG" 2>&1); rc=$?
+same  "range nothing-unpushed: WHOLE mode, exit code" "$rc" "1"
+has   "range nothing-unpushed: the summary says WHOLE and why" "$o" "range whole (HEAD carries nothing the tip ${RG_TIP:0:8} lacks)"
+rm -rf "$T"
+# ...a WAIVER ROW naming the pushed unit is NOT JUDGED stale in RANGE mode, and is counted
+T=$(seed_range_fixture)
+( cd "$T/work" && git reset -q --hard origin/main && mkdir -p memory/project \
+  && printf 'ARCH-tRange-1\tbuilt before its spec, landed as-is\n' > memory/project/pass-order-waiver.txt \
+  && git add -A >/dev/null && git commit -q -m "waive ARCH-tRange-1" --no-verify && git push -q origin main \
+  && write_range_spec 2 && git add -A >/dev/null && git commit -q -m "spec ARCH-tRange-2 authored" --no-verify \
+  && printf 'two\n' > ${PFX}p2.sh && git add -A >/dev/null && git commit -q -m "ARCH-tRange-2: build the thing" --no-verify ) >/dev/null 2>&1
+o=$(cd "$T/work" && bash "$LEG" 2>&1); rc=$?
+same  "range waiver: a row naming a pushed unit is not judged stale, exit code" "$rc" "0"
+has   "range waiver: the row is counted as not judged" "$o" "1 waivers not judged"
+rm -rf "$T"
+
+# ---- closing review round 1 M13 (id 20): EVERY refusal of the tip observation widens to WHOLE and
+# ---- grades the pushed unit, not only the no-HEAD one above. Each arm was RED against a library copy
+# ---- with its own refusal removed. M6 (id 4): a fetch URL that differs from the push URL, and a tip
+# ---- that differs from the push's own ref line, are refusals too.
+check_range_whole() { # arm label · the reason's leading text -> WHOLE named with it, and the pushed unit graded
+  o=$(cd "$T/work" && bash "$LEG" 2>&1); rc=$?
+  same  "range $1: WHOLE mode reds the pushed unit, exit code" "$rc" "1"
+  has   "range $1: the summary names the reason" "$o" "range whole (the tip did not resolve: $2"
+  has   "range $1: the pushed unit is graded" "$o" "ARCH-tRange-1 — BUILT at"
+}
+T=$(seed_range_fixture)
+sed -i 's/^REMOTE_BOUND=".*"$/REMOTE_BOUND="0"/' "$T/work/${PFX}${KIT_NAME}/unattended.sh"
+check_range_whole "zero bound" "the driver's REMOTE_BOUND is not a positive integer a bound can use"
+rm -rf "$T"
+T=$(seed_range_fixture)
+sed -i 's/^REMOTE_BOUND=".*"$/REMOTE_BOUND="ten"/' "$T/work/${PFX}${KIT_NAME}/unattended.sh"
+check_range_whole "non-integer bound" "the driver's REMOTE_BOUND does not read as a single integer"
+rm -rf "$T"
+T=$(seed_range_fixture)
+git -C "$T/work" remote add second ../origin.git
+check_range_whole "two remotes" "this clone declares 2 remotes"
+rm -rf "$T"
+T=$(seed_range_fixture)
+( git clone -q "$T/origin.git" "$T/other" && cd "$T/other" && git config user.email t@t && git config user.name t \
+  && git commit -q --allow-empty -m "a landing this clone never fetched" --no-verify && git push -q origin main ) >/dev/null 2>&1
+check_range_whole "unheld tip" "the remote origin advertises"
+rm -rf "$T"
+T=$(seed_range_fixture)
+mkdir -p "$T/bin"; printf '#!/bin/sh\nexit 1\n' > "$T/bin/timeout"; chmod +x "$T/bin/timeout"
+RG_BIN=$(cd "$T/bin" && pwd)   # the POSIX spelling: a drive-letter colon would split PATH
+o=$(cd "$T/work" && PATH="$RG_BIN:$PATH" bash "$LEG" 2>&1); rc=$?
+same  "range no timeout: WHOLE mode reds the pushed unit, exit code" "$rc" "1"
+has   "range no timeout: the summary names the reason" "$o" "range whole (the tip did not resolve: this node has no working 'timeout -k'"
+rm -rf "$T"
+T=$(seed_range_fixture)
+( cd "$T" && git clone -q --bare origin.git seed.git ) >/dev/null 2>&1
+git -C "$T/work" remote set-url --push origin ../origin.git
+git -C "$T/work" remote set-url origin ../seed.git
+check_range_whole "fetch URL is not the push URL" "the remote origin is read from ../seed.git and pushed to ../origin.git"
+rm -rf "$T"
+T=$(seed_range_fixture)
+RG_TIP=$(git -C "$T/work" rev-parse origin/main)
+o=$(cd "$T/work" && GATE_PUSH_BASE=0000000000000000000000000000000000000000 bash "$LEG" 2>&1); rc=$?
+same  "range push line disagrees: WHOLE mode reds the pushed unit, exit code" "$rc" "1"
+has   "range push line disagrees: the summary names the reason" "$o" "range whole (the tip did not resolve: the remote advertises ${RG_TIP:0:8} and the push's own ref line names 00000000"
+o=$(cd "$T/work" && GATE_PUSH_BASE=$RG_TIP bash "$LEG" 2>&1); rc=$?
+same  "range push line agrees: RANGE mode, exit code" "$rc" "0"
+has   "range push line agrees: the summary names the mode and the tip" "$o" "range ${RG_TIP:0:8}.."
+rm -rf "$T"
+
 echo "--- $n arms, exit $st"
 exit $st

@@ -121,7 +121,11 @@ fail=0
 # than written as a literal. A hardcoded count is the recorded failure this leg exists for.
 # 132, not 134: arms 1c/1d/1e SKIP on a host with no runnable `timeout -k`, so the floor is the
 # skipped-host count. A floor set to the lucky-host figure reds every box without coreutils.
-FLOOR_ASSERTIONS=273
+FLOOR_ASSERTIONS=278
+# RAISED 273 -> 278 by TOOL-dUnstuckLanding-16: section 7's five new assertions (AC1's attr line and
+# stamp, AC2's unbounded stamp, its OWN attr line and absent stamp), while the flipped AC17
+# and F1 assertions keep their count. None is host-conditional.
+# COUNTED off the section's own calls; this pass runs no suite.
 # RAISED 272 -> 273 by the reconcile of origin/main into aRepatriatedFork: that build's one
 # `{prefix}` assertion (TOOL-aRepatriatedFork-29, bf7c4ab7, 149 -> 150 on its side) joins the
 # dDerivedDocket arms counted below.
@@ -2156,16 +2160,23 @@ n=$((n+1))
 # `GATE_INHERITED_RED_MAX_AGE=10` a red that arrived inside the window reads INHERITED with its age and
 # the landing that introduced it, the record's row carries the three age columns before the reason,
 # and under `land` the inherited-green stamp names R, the bound and the leg while no full green is
-# written. The same leg red already at R~10 reads `aged`, and no inherited-green stamp is written.
-build_age_fixture() { # dir · the landing (1..12) the red arrives in -> sets AGE_R
-  local d=$1 at=$2 i
+# written. The same leg red already at R~10 reads `aged`, and since TOOL-dUnstuckLanding-16 it is
+# STAMPED too: the age escalates the ask and no longer decides the landing (ruling
+# TOOL-dUnstuckLanding-22). A third argument adds a second leg, green at R and red at L — OWN.
+build_age_fixture() { # dir · the landing (1..12) the red arrives in · [own] -> sets AGE_R
+  local d=$1 at=$2 own=${3:-} i
   mkdir -p "$d/$KIT_REL" "$d/fx" "$d/data"
   cp "$KITDIR/run-gates.sh" "$KITDIR/lib-attribute.sh" "$KITDIR/gate-profiles.txt" "$d/$KIT_REL/" 2>/dev/null
   cp "$KITDIR/gate-fingerprint.sh" "$d/$KIT_REL/" 2>/dev/null || true
   ( cd "$d" && git init -q -b main . && git config user.email a@t.invalid && git config user.name a \
       && git config core.autocrlf false ) >/dev/null 2>&1
   printf '#!/usr/bin/env bash\nif [ -s data/red.txt ]; then cat data/red.txt; exit 1; fi\nexit 0\n' > "$d/fx/r.sh"
-  printf '[\n  {"name": "aged leg", "argv": ["bash", "fx/r.sh"]}\n]\n' > "$d/$ATL"
+  if [ -n "$own" ]; then
+    printf '#!/usr/bin/env bash\nif [ -s data/own.txt ]; then cat data/own.txt; exit 1; fi\nexit 0\n' > "$d/fx/o.sh"
+    printf '[\n  {"name": "aged leg", "argv": ["bash", "fx/r.sh"]},\n  {"name": "own leg", "argv": ["bash", "fx/o.sh"]}\n]\n' > "$d/$ATL"
+  else
+    printf '[\n  {"name": "aged leg", "argv": ["bash", "fx/r.sh"]}\n]\n' > "$d/$ATL"
+  fi
   : > "$d/data/red.txt"
   ( cd "$d" && git add -A && git commit -qm "landing 0" ) >/dev/null 2>&1
   for i in 1 2 3 4 5 6 7 8 9 10 11 12; do
@@ -2175,6 +2186,7 @@ build_age_fixture() { # dir · the landing (1..12) the red arrives in -> sets AG
   done
   AGE_R=$(git -C "$d" rev-parse HEAD)
   printf 'L\n' > "$d/data/l.txt"
+  [ -n "$own" ] && printf 'FAIL mine\n' > "$d/data/own.txt"
   ( cd "$d" && git add -A && git commit -qm "L, past R" ) >/dev/null 2>&1
 }
 AG="$AT/ag"; build_age_fixture "$AG" 4
@@ -2201,9 +2213,40 @@ AH="$AT/ah"; build_age_fixture "$AH" 1
 ahout=$(run_attr_bar "$AH" GATE_ATTRIBUTE="$AGE_R" GATE_INHERITED_RED=land GATE_INHERITED_RED_MAX_AGE=10)
 check_attr_line "$ahout" "aged leg" "INHERITED · offenders 1 · at ${AGE_R:0:8} · aged at R~10" \
   "AC3 a red already present at R~10 reads aged"
+# FLIPPED by TOOL-dUnstuckLanding-16 from TOOL-dDerivedDocket-24's AC17, which asserted NO stamp: an
+# aged INHERITED leg now lands, so the stamp is written and names the leg and the bound.
 n=$((n+1))
-[ ! -f "$AH/.git/gate-inherited-green" ] \
-  || { echo "canary: attribution — AC17 an aged leg still wrote gate-inherited-green, so a red past the bound would land"; fail=1; }
+{ [ -f "$AH/.git/gate-inherited-green" ] \
+    && [ "$(awk -F'\t' '$1=="max_age"{print $2}' "$AH/.git/gate-inherited-green")" = 10 ] \
+    && [ "$(awk -F'\t' '$1=="legs"{print $2}' "$AH/.git/gate-inherited-green")" = "aged leg" ]; } \
+  || { echo "canary: attribution — TOOL-dUnstuckLanding-16 an aged INHERITED leg under land wrote no gate-inherited-green naming the leg and the bound"; fail=1; }
+# TOOL-dUnstuckLanding-16 AC1 — red at R and at R~2 with the same offender, under a bound of 2: the
+# row reads `aged`, and the stamp is written naming that leg with `max_age` 2.
+rm -f "$AH/.git/gate-inherited-green"
+ah2out=$(run_attr_bar "$AH" GATE_ATTRIBUTE="$AGE_R" GATE_INHERITED_RED=land GATE_INHERITED_RED_MAX_AGE=2)
+check_attr_line "$ah2out" "aged leg" "INHERITED · offenders 1 · at ${AGE_R:0:8} · aged at R~2" \
+  "TOOL-dUnstuckLanding-16 AC1 a red already present at R~2 reads aged"
+n=$((n+1))
+{ [ -f "$AH/.git/gate-inherited-green" ] \
+    && [ "$(awk -F'\t' '$1=="base"{print $2}' "$AH/.git/gate-inherited-green")" = "$AGE_R" ] \
+    && [ "$(awk -F'\t' '$1=="max_age"{print $2}' "$AH/.git/gate-inherited-green")" = 2 ] \
+    && [ "$(awk -F'\t' '$1=="legs"{print $2}' "$AH/.git/gate-inherited-green")" = "aged leg" ]; } \
+  || { echo "canary: attribution — TOOL-dUnstuckLanding-16 AC1 an aged leg under a bound of 2 wrote no gate-inherited-green naming R, max_age 2 and the leg"; fail=1; }
+# AC2's first clause — no bound handed: the stamp is still written, with an EMPTY `max_age`.
+rm -f "$AH/.git/gate-inherited-green"
+ah3out=$(run_attr_bar "$AH" GATE_ATTRIBUTE="$AGE_R" GATE_INHERITED_RED=land)
+n=$((n+1))
+{ [ -f "$AH/.git/gate-inherited-green" ] \
+    && [ "$(awk -F'\t' '$1=="max_age"{print "<" $2 ">"}' "$AH/.git/gate-inherited-green")" = "<>" ] \
+    && [ "$(awk -F'\t' '$1=="legs"{print $2}' "$AH/.git/gate-inherited-green")" = "aged leg" ]; } \
+  || { echo "canary: attribution — TOOL-dUnstuckLanding-16 AC2 an INHERITED red with no age bound wrote no gate-inherited-green with an empty max_age"; printf '%s\n' "$ah3out" | grep -E '^(GATE attr|run-gates: inherited)' | sed 's/^/    /'; fail=1; }
+# AC2's last clause — a second leg reads OWN: nothing is stamped, at any age.
+AO="$AT/ao"; build_age_fixture "$AO" 1 own
+aoout=$(run_attr_bar "$AO" GATE_ATTRIBUTE="$AGE_R" GATE_INHERITED_RED=land GATE_INHERITED_RED_MAX_AGE=2)
+check_attr_line "$aoout" "own leg" "OWN" "TOOL-dUnstuckLanding-16 AC2 a leg green at R and red at L reads OWN"
+n=$((n+1))
+[ ! -f "$AO/.git/gate-inherited-green" ] \
+  || { echo "canary: attribution — TOOL-dUnstuckLanding-16 AC2 a bar with an OWN leg wrote gate-inherited-green, so a red of the run's own would land"; fail=1; }
 # THE CLOSING DIFF REVIEW'S F1 — NO-SIGNATURE LEGS WHOSE TEXT MOVED INSIDE THE WINDOW. The age probe
 # used to answer rc 1, the green code, for any probe red with output not byte-identical to L's, so
 # the bisection walked toward R and named the landing that CHANGED the text as the owner: an old red
@@ -2254,9 +2297,12 @@ _amrec=$(ls -1d "$AM"/.git/gate-run/*/ 2>/dev/null | tail -1)
 awk -F'\t' '$1 == "moved count" { seen = 1; if ($6 != "-" || $9 !~ /declares no signature/) bad = 1 }
     END { exit (bad || !seen) }' "${_amrec}attribution" 2>/dev/null \
   || { echo "canary: attribution — F1 the row for a moved count line carries an age, or a reason not naming the missing signature"; grep '^moved count' "${_amrec}attribution" 2>/dev/null | sed 's/^/    /'; fail=1; }
+# FLIPPED by TOOL-dUnstuckLanding-16 (AC2's middle clause): every leg here reads INHERITED — one
+# aged, one unproven, one numeric — so the stamp is written and names all three. Before ruling
+# TOOL-dUnstuckLanding-22 an aged or unproven leg blocked it.
 n=$((n+1))
-[ ! -f "$AM/.git/gate-inherited-green" ] \
-  || { echo "canary: attribution — F1 a bar whose moved-text legs cannot all be aged wrote gate-inherited-green, so an old red would land"; fail=1; }
+[ "$(awk -F'\t' '$1=="legs"{print $2}' "$AM/.git/gate-inherited-green" 2>/dev/null)" = "moved superset,moved count,moved inside" ] \
+  || { echo "canary: attribution — TOOL-dUnstuckLanding-16 AC2 a bar whose legs all read INHERITED, an unproven one among them, wrote no gate-inherited-green naming the three"; fail=1; }
 # THE SAME REVIEW'S F5, THIS RUNNER'S INSTANCE OF ITS CLASS. A signal arm runs `cleanup` and exits,
 # and that exit runs `cleanup` again from the EXIT trap: the worktree the first entry removed failed
 # to remove on the second, and the bar printed an orphan line naming a path already gone. The leg's

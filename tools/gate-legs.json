@@ -946,6 +946,7 @@
       "bash",
       "{prefix}/unattended/check-pass-order.sh"
     ],
+    "impure": "its verdict is a function of the REMOTE as well as of the tree: it runs one bounded `ls-remote` to learn the tip the remote advertises and grades only the commits HEAD carries past it (TOOL-dUnstuckLanding-17), so a verdict cached before the remote moved must not be reused.",
     "chunk": "declarations",
     "subject": "repo",
     "guard": [],
@@ -957,6 +958,7 @@
       "bash",
       "{prefix}/unattended/check-brief-recorded.sh"
     ],
+    "impure": "its verdict is a function of the REMOTE as well as of the tree: it runs one bounded `ls-remote` to learn the tip the remote advertises and grades only the commits HEAD carries past it (TOOL-dUnstuckLanding-17), so a verdict cached before the remote moved must not be reused.",
     "chunk": "declarations",
     "subject": "repo",
     "guard": [],

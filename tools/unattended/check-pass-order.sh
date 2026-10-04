@@ -22,6 +22,9 @@
 #   - whether a build pass was DISPATCHED. That is a different join over the same range.
 #   - anything about a unit that is not CLOSED. An OPEN unit legitimately has no build commit yet, so
 #     grading one would red mid-build on every run including the one that must land it.
+#   - in RANGE mode, a unit whose build commit is already on the tip the remote advertises
+#     (TOOL-dUnstuckLanding-17). It was graded when it landed, and WHOLE mode, which remote CI runs
+#     after every landing because its HEAD is the tip, still grades it. The summary names the mode.
 #   - whether the WAIVER REGISTRY's rows deserve their waivers. It grades that each waived unit is
 #     still a violation (a stale row REDS) and never why the waiver was granted.
 #   - whether a build's COMMITTED `opened:` is honest. EVERY read in this file now comes from the
@@ -35,7 +38,7 @@
 # below. `--preview` grades the live tree and prints violations without setting exit status, which is
 # how a candidate predicate gets run over the real tree before it is wired.
 set -u
-KIT_UNATTENDED_VERSION=1.63   # gov:kit unattended@1.63 — must match unattended.sh; check-kit-versions.sh pairs them
+KIT_UNATTENDED_VERSION=1.64   # gov:kit unattended@1.64 — must match unattended.sh; check-kit-versions.sh pairs them
 
 # The dereference pin, identical to this kit's other two readers and for the identical reason: a graft
 # file rewrites the commit GRAPH, so every ancestry answer below could be honest about a sha and wrong
@@ -281,7 +284,19 @@ if [ "${#_SUBJ[@]}" -ne "$_n_hist" ]; then
 fi
 
 graded=0; skipped_cutoff=0; norun_graded=0; unbuilt=0; preanchor_hits=0; waived_n=0; truncated=0
-violations=""; waived_seen=""; previews=""
+violations=""; waived_seen=""; previews=""; inrange_ids=""; not_judged=0
+
+# ------------------------------------------------------------------------------- THE RUN'S RANGE
+# TOOL-dUnstuckLanding-17 S2/S3. A violation already on the default branch was graded when it landed,
+# or landed past a bypass the charter names, and re-grading it on every later closing run stopped more
+# closes in the adopters than any other class. So when the tip the REMOTE advertises resolves and HEAD
+# carries commits it lacks, both `build_commit` walks below exclude that tip's history (`^<tip>`), and
+# a unit whose build commit is on the tip lands in `unbuilt-in-range`. Otherwise the leg grades the
+# whole history exactly as it always did, and the summary line says which mode ran and why: a tip
+# that does not resolve WIDENS to the whole history and never narrows to nothing, because an empty
+# range is a probe reading zero. The observation is the kit library's, bounded by the driver's own
+# constants, and never a local ref or an environment variable the graded run controls.
+read_history_range "$DRIVER"
 PS_DIR=$(mktemp -d) || { echo "pass-order: cannot make a scratch directory for the historical spec blobs, so no unit could be classified"; exit 2; }
 trap 'rm -rf "$PS_DIR"' EXIT
 
@@ -380,7 +395,7 @@ $1" ;;
     }
     # THE IN-RANGE WINDOW, which is `build_commit`'s default: unbounded, `--reverse`, so the
     # EARLIEST qualifying commit wins.
-    build_c=$(build_commit "${base:+$base..}HEAD" "$id" "$bdir" "$GENERATED_INDEXES" "$SHARED_RECORDS")
+    build_c=$(build_commit "${base:+$base..}HEAD $HR_EXCL" "$id" "$bdir" "$GENERATED_INDEXES" "$SHARED_RECORDS")
     if [ -z "$build_c" ]; then
       # S2c - THE PRE-ANCHOR PROBE, and it runs ONLY for the derived-range population. A commit that
       # writes product code for a unit touches nothing under the build folder, so it sits STRICTLY
@@ -397,11 +412,11 @@ $1" ;;
       # S2d - BOUNDED BY CONSTRUCTION, because the miss rate over the widened population could not be
       # measured before this landed. A probe that gives up is COUNTED, never reported as a miss.
       if [ "$norun" = 1 ] && [ -n "$base" ]; then
-        pre_c=$(build_commit "$base" "$id" "$bdir" "$GENERATED_INDEXES" "$SHARED_RECORDS" "$PREANCHOR_CAP" "")
+        pre_c=$(build_commit "$base $HR_EXCL" "$id" "$bdir" "$GENERATED_INDEXES" "$SHARED_RECORDS" "$PREANCHOR_CAP" "")
         if [ "$pre_c" = TRUNCATED ]; then
           truncated=$((truncated+1))
         elif [ -n "$pre_c" ]; then
-          preanchor_hits=$((preanchor_hits+1))
+          preanchor_hits=$((preanchor_hits+1)); inrange_ids="$inrange_ids $id"
           # ROUTED THROUGH `_report` like every other violation. This path duplicated the waiver
           # bookkeeping inline, beside a helper whose own comment says it exists so that a future
           # violation class cannot be added on a path that forgets to consult the registry — and then
@@ -413,6 +428,7 @@ $1" ;;
       unbuilt=$((unbuilt+1)); continue
     fi
 
+    inrange_ids="$inrange_ids $id"
     # STEP 2 - at the build commit's FIRST PARENT, a tracked spec under this build must carry the id
     # in a conforming status header and must not grade MISSING or THIN. The first parent and not the
     # BASE: the build method REQUIRES a run to author a missing spec, so a BASE-anchored test would
@@ -496,15 +512,22 @@ done
 # zero: S1 grades those builds and S2b routes an unusable base to the folder anchor, so every path
 # that once incremented it is closed. A field that can only ever print 0 is a dead probe whatever
 # value it shows, and this file's own doctrine is that a probe which cannot move says so.
-echo "pass-order: graded $graded closed unit(s) · $skipped_cutoff build(s) skipped by the $PASS_ORDER_CUTOFF cutoff · $norun_graded build(s) graded with no run-state file · $unbuilt unit(s) unbuilt-in-range · $preanchor_hits pre-anchor violation(s) · $waived_n waived by $WAIVER_FILE · $truncated probe(s) truncated at the $PREANCHOR_CAP-commit cap"
-echo "pass-order: the record surface excluded from build-commit selection was: <build folder> $(printf '%s ' $GENERATED_INDEXES $SHARED_RECORDS)"
-
 # A STALE WAIVER REDS. A row naming a unit this leg no longer reports has outlived its reason, and an
 # exemption nobody re-checks silently widens the surface it was written to narrow.
+# IN RANGE MODE A ROW NAMING A UNIT OUTSIDE THE RANGE IS NOT JUDGED (TOOL-dUnstuckLanding-17 S3). That
+# unit's build commit is on the advertised tip, so this run never graded it and cannot say whether
+# its waiver still describes a violation; calling the row stale would red every closing run on a
+# registry it did not write. It is COUNTED on the summary line instead. WHOLE mode judges as before.
 stale=""
 for _w in $waived_ids; do
-  case " $waived_seen " in *" $_w "*) ;; *) stale="$stale $_w" ;; esac
+  case " $waived_seen " in *" $_w "*) continue ;; esac
+  if [ "$HR_MODE" = range ]; then
+    case " $inrange_ids " in *" $_w "*) ;; *) not_judged=$((not_judged+1)); continue ;; esac
+  fi
+  stale="$stale $_w"
 done
+echo "pass-order: graded $graded closed unit(s) · $skipped_cutoff build(s) skipped by the $PASS_ORDER_CUTOFF cutoff · $norun_graded build(s) graded with no run-state file · $unbuilt unit(s) unbuilt-in-range · $preanchor_hits pre-anchor violation(s) · $waived_n waived by $WAIVER_FILE · $truncated probe(s) truncated at the $PREANCHOR_CAP-commit cap · $HR_FIELD · $not_judged waivers not judged"
+echo "pass-order: the record surface excluded from build-commit selection was: <build folder> $(printf '%s ' $GENERATED_INDEXES $SHARED_RECORDS)"
 
 if [ "$PREVIEW" = 1 ]; then
   echo "pass-order --preview: every violation the predicate finds, waived or not:${previews:-

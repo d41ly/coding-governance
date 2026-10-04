@@ -33,6 +33,7 @@ README slice named by the same marker grammar; never hand-edit it.
 <!-- /run:generated -->
 
 ## Run facts
+work-landed-at: 74892ce4a885dbe121b1a43bb80ab085594e33b6 028b5cac6504b37b99d83180b65bf211deb972b6
 halt-code: fork-unresolvable
 witness: 74892ce4a885dbe121b1a43bb80ab085594e33b6
 phase: ABORTED

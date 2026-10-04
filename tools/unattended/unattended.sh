@@ -15,12 +15,14 @@
 #   unattended.sh --landed <slug>                          # after the push: observe, then mark LANDED
 #   unattended.sh --park <slug> --item <text> --reason <text>   # park a decision MID-RUN
 #   unattended.sh --propose <slug> --item <text> --step <s> --reason <text>  # amend a playbook LATER
-#   unattended.sh --rescope <slug> --act <retire|supersede|add> --item <id> [--successor <id>] --reason <text>
+#   unattended.sh --rescope <slug> --act <retire|supersede|add|defer> --item <id> [--successor <id>] --reason <text>
 #   unattended.sh --dispatch <slug> --pass <id> --writes <path> [--writes <path> ...]
 #   unattended.sh --brief <slug> --unit <id> --path <file>  # record WHAT a build pass was handed
 #   unattended.sh --review <slug> --subject <id> --verdict <v> --blockers <N> [--highs <N> --minors <N>] [--disposition fold|promote]
 #   unattended.sh --abort <slug> --reason <text>           # end it, with the reason on the record
 #   unattended.sh --hold <slug> --code <c> --until <cond> --reason <text> --reaped <id>|--keepalive-unreachable <node> [--pending-run <runId>]
+#   unattended.sh --handoff <slug> --code owner-landing|owner-decision --reason <text> --reaped <id>|--keepalive-unreachable <node>   # HELD for an owner to land or decide
+#   unattended.sh --settle <slug>                          # write what git proves: a landed hand-off LANDED, or where an ended run's work landed
 #   unattended.sh --resume <slug> --scheduled <held-at> --keepalive-id <id>   # the restart a durable schedule files
 #   unattended.sh --attest <slug> --item <item> [--value <text>]  # the agent-checked DoD items
 #   unattended.sh --record-piece <slug> --path <p> --leg <n> --verdict <PASS|FAIL|NA> [--records-root <dir> [--playbook-sha <sha>] [--run <id>]]
@@ -46,7 +48,7 @@
 # The generated region holds NO copy: the unit list is DERIVED from the build README's already-derived,
 # already-byte-compared slice. One derivation in the tree; this file is not a second one.
 set -u
-KIT_UNATTENDED_VERSION=1.63   # gov:kit unattended@1.63 — kit identity; set HERE, never from .unattended.conf
+KIT_UNATTENDED_VERSION=1.64   # gov:kit unattended@1.64 — kit identity; set HERE, never from .unattended.conf
 
 # ------------------------------------------------------------------------------ the dereference pin
 # A sha is a NAME, and turning a name into bytes or into ancestry happens in the run's own object
@@ -91,7 +93,7 @@ KIT_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
 # read wrong, it does not RUN; the usage text is rendered from the docstring above, which is the only
 # place a verb's arguments are spelled; and the two carriers in other files are joined to this one by
 # the gate leg, because no runtime derivation crosses a file boundary.
-VERBS_SLUG="--preflight --status --audit --register-task --release-task --liveness --resume --close --landed --abort --hold --park --propose --attest --record-piece --record-set --rescope --dispatch --review --brief"
+VERBS_SLUG="--preflight --status --audit --register-task --release-task --liveness --resume --close --landed --abort --hold --handoff --settle --park --propose --attest --record-piece --record-set --rescope --dispatch --review --brief"
 # The verbs whose argument is POSITIONAL and which exit inside the parse loop. Separate because the
 # dispatch cannot treat them alike, and merged again for every reader, who does not care.
 VERBS_INLINE="--plan --phase --check-commit --version"
@@ -477,10 +479,10 @@ CONF="$ROOT/.unattended.conf"
 MEMORY_ROOT=memory; LANDER=""; LANDER_MODE=""; SELFTESTS_OWED_PATHS=""; BYPASS_BAN=""; GATE_CMD=""; WIRING_CHECK=""
 KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""; PHASES_EXTRA=""; DOD_EXTRA=""; DIRECTIVES_EXTRA=""; ANCHOR_SCOPE=""; UNITS_REGION_CUTOFF=""; SHARED_RECORDS="$SHARED_RECORDS_UNDECLARED"; GENERATED_INDEXES=""; SPEC_THIN_CUTOFF=""
 HALT_CODES_EXTRA=""; HALT_FLOOR=""; LANDER_MARKER=""; RECALL_CLI=""; MAP_CLI=""; SPEC_TOKENS_CLI=""
-ASKS_CMD=""; HOLD_CODES_EXTRA=""; HOLD_FLOOR=""; LANDED_FACTS_CUTOFF=""; GATE_POLICY_FILE=""; PROCMON_CMD=""
+ASKS_CMD=""; HOLD_CODES_EXTRA=""; HOLD_FLOOR=""; LANDED_FACTS_CUTOFF=""; GATE_POLICY_FILE=""; PROCMON_CMD=""; HANDOFF_CUTOFF=""
 RESUME_SCHEDULE=""; RESUME_SCHEDULE_CREATE=""; RESUME_SCHEDULE_DELETE=""; RESUME_SCHEDULE_DELAY=""; RESUME_SCHEDULE_LIMIT=""
 GATE_BOUND=""; GATE_WALL=""; GATE_PROFILE_CMD=""; UNIT_STALL_BOUND=""; TASK_STALL_BOUND=""; REVIEW_ROUNDS=""; RESUME_STALE_BOUND=""; RESUME_ATTEMPTS=""; RESUME_TURNS=""
-DISPOSITION_CUTOFF=""; SPEC_AUDIT_DEFAULT=""; RUNLOG_SESSION_VARS=""; RUNLOG_SWITCH=${GOV_RUNLOG:-}
+DISPOSITION_CUTOFF=""; SPEC_AUDIT_DEFAULT=""; LANDING_NODES=""; RUNLOG_SESSION_VARS=""; RUNLOG_SWITCH=${GOV_RUNLOG:-}
 # TOOL-dLoggedFlight-2 - the run log's two inputs, on the init block's LAST line so the suite's
 # contiguous-block read still covers them (a comment inside the block ends it). RUNLOG_SESSION_VARS
 # is a declared key and defaults here like its neighbours. GOV_RUNLOG is the ENVIRONMENT's switch, so
@@ -513,6 +515,13 @@ DISPOSITION_CUTOFF=""; SPEC_AUDIT_DEFAULT=""; RUNLOG_SESSION_VARS=""; RUNLOG_SWI
 #     whole-run wall, read below through `read_bound_key` with an empty default, and the command that
 #     prints the runner's resolved profile. Blank wall: the profile's wall stays in force. Blank
 #     profile command: the bar has no backstop and stays bounded at GATE_BOUND. Both announced.
+#   * HANDOFF_CUTOFF (TOOL-dUnstuckLanding-13 S8) - the date from which `ABORTED` means DISCARD:
+#     an `--abort` naming a hand-off-shaped halt code, on a record first committed on or after it,
+#     prints a notice naming `--handoff`. Blank turns the notice off, announced. It never refuses.
+#   * LANDING_NODES (TOOL-dUnstuckLanding-20 S3) - which nodes may land, as `<tag>=<machine>/<user>`
+#     pairs. Defaulted for SPEC_AUDIT_DEFAULT's reason, and like it the value this source binds
+#     decides nothing: `resolve_landing_node` re-reads the key from the conf blob at the pinned BASE,
+#     because a run that added its own node to the working copy would grant itself a landing.
 # shellcheck disable=SC1090
 . "$CONF"
 
@@ -670,7 +679,7 @@ DOD_CORE="gates-green:machine records-current:machine authorization-reachable:ma
 # reader parses BY kind, so it is a row nothing counts and nothing surfaces. It became a declaration
 # when a fifth kind arrived and found the alternation that recognises a row typed into `verb_status`
 # - one spelling of a vocabulary that two files read.
-PARK_KINDS="decision abort override waiver proposal rescope dispatch review brief hold resume"
+PARK_KINDS="decision abort override waiver proposal rescope dispatch review brief hold resume handoff"
 # The BUILD-ORDER verb, in the two shapes `gen_build_index.py` declares. CONFORMING requires the
 # value to be anchored on both sides; LOOSE is anything wearing the verb's name that is not.
 ORDER_OK_RE='·[[:space:]]*order[[:space:]]+[0-9]+[[:space:]]*(·|$)'
@@ -684,7 +693,11 @@ ORDER_LOOSE_RE='·[[:space:]]*order[[:space:]]+[^[:space:]]+'
 # NOT the only declaration of membership any more: `PARK_ACTS_OWED` below is the ACT axis, and a
 # reader who takes this set for the whole taxonomy gets the double-count `history_exclude_re` exists
 # to prevent.
-PARK_KINDS_OWED="decision abort override waiver"
+# TOOL-dUnstuckLanding-13 S7 - `handoff` is OWED although it asks no question: its row is the
+# landing recipe a person runs, and a hand-off whose recipe the owner is never shown is a HELD run
+# nobody lands. Two sibling kits spell this set and the one above it, each held to this line both
+# ways by its own self-test, so a member moves there in the same commit.
+PARK_KINDS_OWED="decision abort override waiver handoff"
 # The ACTS of the `rescope` kind the owner is owed an ANSWER to. A SECOND constant rather than a
 # `kind:act` member grammar inside the set above, and the reason is a measured refusal rather than a
 # preference: check 2's dead-member loop in the gate leg greps this driver for `park "$rel" <member> `
@@ -697,7 +710,11 @@ PARK_KINDS_OWED="decision abort override waiver"
 # the owner must ANSWER, not about whether they must be TOLD. M3 delegates a build's scope
 # RESOLUTION; it does not delegate scope ABANDONMENT. The mechanism that lets a run GROW its build
 # was silently shrinking it too, and `add` stays history for exactly the original reason.
-PARK_ACTS_OWED="retire supersede"
+#
+# TOOL-dUnstuckLanding-18 S4 - `defer` is OWED for the same reason: a unit set aside against an open
+# ask lets `build-complete` land the build without it, and declared scope the owner is never told
+# was set aside is abandonment with a better name. The two sibling kits' mirrors move with it.
+PARK_ACTS_OWED="retire supersede defer"
 # The Definition-of-Done items an override may NOT buy. A DECLARED set rather than a name hardcoded
 # into a case arm: it WAS one name, and the second arrived as an acceptance criterion this build had
 # ratified and never implemented — found by writing the arms the item never had.
@@ -822,7 +839,19 @@ HALT_CODES_CORE="runaway-ceiling-unclean fork-unresolvable scope-approval-needed
 # names a stop the run cannot fix and did not cause; none of them ends the run. A project extends
 # through HOLD_CODES_EXTRA and deletes nothing, which HOLD_FLOOR pins the way HALT_FLOOR pins the
 # halt set.
-HOLD_CODES_CORE="host-degraded platform-limit platform-unavailable host-owner-action inherited-red"
+HOLD_CODES_CORE="host-degraded platform-limit platform-unavailable host-owner-action inherited-red owner-landing owner-decision"
+# TOOL-dUnstuckLanding-13 S2 - THE TWO HAND-OFF CODES, and `--handoff` is their ONLY producer. A run
+# whose work is sound and which an owner must land, or decide first, ends HELD under one of them
+# with the landing recipe and the landing facts beside it; `--hold` refuses both, because a HELD
+# record under a hand-off code written without the guard, the recipe and the facts is a hand-off
+# nothing can land or settle. Members of the core set as well, so the release-condition and
+# vocabulary checks `--hold` makes apply to them unchanged.
+HOLD_CODES_HANDOFF="owner-landing owner-decision"
+# S9 - the halt codes the dUnstuckLanding census found HAND-OFF-SHAPED: most aborts carried one, and
+# their work reached the default branch anyway. An `--abort` naming one prints a notice naming
+# `--handoff` from HANDOFF_CUTOFF on, and aborts exactly as before; the verb cannot know the work is
+# sound, the run does.
+HALT_CODES_HANDOFF="external-prerequisite gate-red-out-of-scope scope-approval-needed repo-state-out-of-mandate"
 DIRECTIVES_CORE="minimal-prose:M10 sub-specced:M2 forks-resolved:M3 specs-reviewed:M4 reuse-first:M5 parallel-when-disjoint:M6 passes-committed:M6 diff-reviewed:M8 land-once-done:M8 conflicts-reconciled:M8 wrap-up-derived:M9 researched:M12 solution-tested:M12 pieces-recorded:M9:recipe playbook-followed:M7:recipe discoveries-adopted:M10 passes-harnessed:M6"
 
 # the AUTHORIZATION MODE set, published as a constant so it is spelled
@@ -926,6 +955,7 @@ is_halt_code() { case " $(halt_codes) " in *" $1 "*) return 0;; esac; return 1; 
 # The EFFECTIVE hold vocabulary, the same shape as the halt one above it.
 read_hold_codes() { printf '%s %s\n' "$HOLD_CODES_CORE" "$HOLD_CODES_EXTRA"; }
 check_hold_code() { case " $(read_hold_codes) " in *" $1 "*) return 0;; esac; return 1; }
+check_handoff_code() { case " $HOLD_CODES_HANDOFF " in *" $1 "*) return 0;; esac; return 1; }
 # THE RELEASE-CONDITION GRAMMAR, closed and validated at `--hold` rather than at `--resume`. An
 # unvalidated condition is free text wearing a field name, and the auto-resume unit computes a
 # fire instant from it: a condition nothing parsed would reach that computation as prose.
@@ -1158,17 +1188,30 @@ fact() { # run-state file · key
 # own commit (`read_landing_commit`, in the kit library, shared with the gate leg) is an ancestor of
 # the tip the remote ADVERTISES reads LANDED, with the evidence in DP_LANDING, DP_AREF and DP_TIP.
 # Anything short of that leaves LANDING and says why in DP_REASON. The remote is observed ONLY for a
-# LANDING record, so every other record stays offline, and only through `read_advertised_tip`,
-# which returns a code and never calls `fail` - no caller inherits the observation's refusal.
-DP_PHASE=""; DP_REASON=""; DP_LANDING=""; DP_AREF=""; DP_TIP=""
+# LANDING record and a HELD hand-off (below), so every other record stays offline, and only through
+# `read_advertised_tip`, which returns a code and never calls `fail` - no caller inherits the
+# observation's refusal.
+#
+# TOOL-dUnstuckLanding-14 S2 - A HAND-OFF AN OWNER LANDED IS LANDED TOO. A HELD record under a
+# hand-off code whose own commit is on the advertised tip reads LANDED with DP_BY=attended; the
+# commit is found by the same content rule, through `read_landing_commit`'s hand-off argument. A
+# HELD record under any other code is never derived and never observes the remote: a paused run
+# whose branch somebody merged has not been handed off, and a terminal derived under a live lease
+# would end it through fail 26 (review item M13).
+DP_PHASE=""; DP_REASON=""; DP_LANDING=""; DP_AREF=""; DP_TIP=""; DP_BY=""
 read_derived_phase() { # run-state file -> sets DP_PHASE (the effective phase) and DP_REASON
-  DP_PHASE=""; DP_REASON=""; DP_LANDING=""; DP_AREF=""; DP_TIP=""
+  local _dp_hl=""
+  DP_PHASE=""; DP_REASON=""; DP_LANDING=""; DP_AREF=""; DP_TIP=""; DP_BY=""
   [ -n "${1:-}" ] || return 0
   DP_PHASE=$(fact "$1" phase)
-  [ "$DP_PHASE" = LANDING ] || return 0
-  DP_LANDING=$(read_landing_commit "$1") || DP_LANDING=""
+  case "$DP_PHASE" in
+    LANDING) ;;
+    HELD) check_handoff_code "$(fact "$1" hold-code)" || return 0; _dp_hl="$HOLD_CODES_HANDOFF" ;;
+    *) return 0 ;;
+  esac
+  DP_LANDING=$(read_landing_commit "$1" "$_dp_hl") || DP_LANDING=""
   if [ -z "$DP_LANDING" ]; then
-    DP_REASON="the LANDING record is not committed as it stands, so no commit carries it to any remote"
+    DP_REASON="the $DP_PHASE record is not committed as it stands, so no commit carries it to any remote"
     return 0
   fi
   if ! read_advertised_tip; then
@@ -1176,6 +1219,7 @@ read_derived_phase() { # run-state file -> sets DP_PHASE (the effective phase) a
     return 0
   fi
   if GIT merge-base --is-ancestor "$DP_LANDING" "$ADVQ_SHA" 2>/dev/null; then
+    [ "$DP_PHASE" = HELD ] && DP_BY=attended
     DP_PHASE=LANDED; DP_AREF="$ADVQ_REF"; DP_TIP="$ADVQ_SHA"
   else
     DP_REASON="its landing commit ${DP_LANDING:0:8} is not on $ADVQ_REF at ${ADVQ_SHA:0:8}"
@@ -1215,6 +1259,62 @@ read_advertised_tip() { # -> 0 with ADVQ_REF and ADVQ_SHA, or non-zero with ADVQ
     ADVQ_WHY="the remote advertises $ADVQ_REF at ${ADVQ_SHA:0:8}, a tip this clone does not have; fetch and read again"; return 1
   fi
   ADVQ_RC=0
+  return 0
+}
+# TOOL-dUnstuckLanding-19 - REFRESH BEFORE A VERDICT. A run that parks, aborts, hands off or closes
+# under `primary` takes its verdict against the BASE it pinned, and main may have overtaken it: the
+# census found three such verdicts. This prints the commits on the tip the remote ADVERTISES that are
+# in neither BASE nor HEAD and touch this build's README or a path a `dispatch` row declared, and
+# sets RF_FACT to the `refreshed-at` value for the CALLER to write with its own writes, so a refusing
+# verb still writes nothing. It never calls `fail`, never writes, never touches the global `status`,
+# and changes no ref: a tip this clone lacks reads `unlisted`, never fetched. The observation is
+# `read_advertised_tip`, once per process, so a caller that already observed pays no second wait.
+# Literal pathspecs, so a declared path carries no pathspec magic. CALLED AS A PLAIN COMMAND, never in
+# `$(...)`, for `read_derived_phase`'s reason: a subshell discards the global.
+RF_FACT=""
+derive_refreshed_at() { # run-state file · slug · verb -> prints the listing, sets RF_FACT
+  local _rf_f="$1" _rf_slug="$2" _rf_verb="$3" _rf_base _rf_tip _rf_ref _rf_p _rf_n _rf_m _rf_rows _rf_k
+  local -a _rf_paths=()
+  RF_FACT=""
+  if ! grep -q '^## Run facts' "$_rf_f" 2>/dev/null; then
+    echo "unattended: refresh — the record carries no Run facts section, so this verdict records no refreshed-at fact"
+    return 0
+  fi
+  _rf_base=$(fact "$_rf_f" base)
+  case "$_rf_base" in
+    ""|*[!0-9a-f]*)
+      echo "unattended: refresh — the record carries no base fact naming a sha, so this verdict cannot be refreshed against BASE"
+      RF_FACT="unobserved · $_rf_verb"; return 0 ;;
+  esac
+  if ! read_advertised_tip; then
+    if [ -n "$ADVQ_REF" ] && [ -n "$ADVQ_SHA" ]; then
+      echo "unattended: refresh — the remote advertises $ADVQ_REF at ${ADVQ_SHA:0:8}, a tip this clone does not have, so the commits past BASE ${_rf_base:0:8} are not listed and nothing was fetched"
+      RF_FACT="$ADVQ_SHA · $_rf_verb · unlisted"; return 0
+    fi
+    echo "unattended: refresh — the advertised tip was NOT observed, so this verdict stands on BASE ${_rf_base:0:8} alone: $ADVQ_WHY"
+    RF_FACT="unobserved · $_rf_verb"; return 0
+  fi
+  _rf_tip="$ADVQ_SHA"; _rf_ref="$ADVQ_REF"
+  # An anchor this process observed is taken without the object test the quiet observer makes, so
+  # the test is made here: a tip or a BASE this clone lacks cannot be walked.
+  if ! GIT rev-parse --verify --quiet "$_rf_tip^{commit}" >/dev/null 2>&1 \
+     || ! GIT rev-parse --verify --quiet "$_rf_base^{commit}" >/dev/null 2>&1; then
+    echo "unattended: refresh — the remote advertises $_rf_ref at ${_rf_tip:0:8}, and this clone lacks it or BASE ${_rf_base:0:8}, so the commits past BASE are not listed and nothing was fetched"
+    RF_FACT="$_rf_tip · $_rf_verb · unlisted"; return 0
+  fi
+  # NOT A LOOP FED BY A REDIRECT HOLDING A SUBSTITUTION (the shell-hygiene leg): `mapfile` over a
+  # process substitution reads to its writer's end, and `awk` drops empty lines and repeats.
+  mapfile -t _rf_paths < <( { readme_of "$_rf_slug"; echo; grep -F ' dispatch · item ' "$_rf_f" 2>/dev/null | sed 's/.* · reason //' | tr ' ' '\n'; } | awk 'NF && !s[$0]++')
+  _rf_m=$(GIT rev-list --count "$_rf_tip" --not "$_rf_base" HEAD 2>/dev/null) || _rf_m="?"
+  _rf_n=$(GIT --literal-pathspecs rev-list --count "$_rf_tip" --not "$_rf_base" HEAD -- "${_rf_paths[@]}" 2>/dev/null) || _rf_n="?"
+  _rf_rows=$(GIT --literal-pathspecs log -n 10 --format='%h %s' "$_rf_tip" --not "$_rf_base" HEAD -- "${_rf_paths[@]}" 2>/dev/null)
+  echo "unattended: refresh — $_rf_ref at ${_rf_tip:0:8} · $_rf_n of $_rf_m commits since BASE ${_rf_base:0:8} touch this build's README or declared writes"
+  [ -z "$_rf_rows" ] || printf '%s\n' "$_rf_rows" | sed 's/^/    /'
+  case "$_rf_n" in
+    ''|*[!0-9]*) ;;
+    *) _rf_k=$((_rf_n - 10)); [ "$_rf_k" -le 0 ] || echo "    … and $_rf_k more" ;;
+  esac
+  RF_FACT="$_rf_tip · $_rf_verb · $_rf_n touching"
   return 0
 }
 read_recorded_phase() { # run-state file -> the phase fact, exactly as written
@@ -1814,6 +1914,12 @@ GG_HARD=""
 # landing over an inherited-only red rests on. Written after the carry check, so a refusal there
 # still writes nothing; `verb_close` clears both on entry.
 GG_RUN_FACT=""; GG_INH_FACT=""
+# TOOL-dUnstuckLanding-27 S3 - THE PATHS THE BAR'S OWN CLOSE STEP STAGED beside the run-state file:
+# the build's BACKLOG.md `write_inherited_asks` filed into and the views `write_ask_views` reported
+# staging. Written by `write_gates_staged` as `path@blob` lines into THE BAR'S OWN RUN RECORD,
+# `staged` beside its attribution, never into the run-state file (implementation review round 2, M2
+# and L1), and read by `check_bar_tied`'s record-only mode.
+WI_STAGED=""; AV_STAGED=""; BT_NOTED=""
 trusted_base() { # run-state file [· allow-degenerate]  ->  sets TB
   local fresh rc rec head rec0 _tb_rd _tb_alt
   TB=""
@@ -2237,6 +2343,13 @@ check_single_live() {
       continue
     fi
     is_terminal "$p" && continue
+    # TOOL-dUnstuckLanding-14 S7 - AN ABANDONED RECORD IS NOT A LIVE RUN. `--settle` writes
+    # `abandoned` only over a dead lease whose work the content predicate read landed, and the leg's
+    # check 7 report excludes the same marker, so the two count one population.
+    if [ -n "$(fact "$f" abandoned)" ]; then
+      printf 'unattended: EXCLUDED %s from the live-run count — abandoned at %s: --settle found its lease dead and its work landed at %s, so no session drives it\n' "$f" "$(fact "$f" abandoned)" "$(fact "$f" work-landed-at)"
+      continue
+    fi
     n=$((n + 1)); live="$live $f"
   done
   # THE THRESHOLD IS THE ANNOUNCEMENT'S, and the two must never drift apart. This guard used to read
@@ -3443,6 +3556,124 @@ asks_filed_by() { # BACKLOG.md text · slug -> every ask id this build filed und
     [ "$(ask_home_of "$_id")" = "$2" ] || continue
     printf '%s\n' "$_id"
   done
+}
+
+# ============================== TOOL-dUnstuckLanding-18 S2 — THE CARRY-FORWARD TERM ===============
+# `build-complete`'s fifth term, for the rows it hands over: every non-terminal unit row of the
+# build, each already known DEFERRED. Owner ruling TOOL-dUnstuckLanding-23 lands a build's CLOSED
+# units when the rest are set aside against open asks, and the stop contract's close-decision table
+# names this as the `land a partial build` row. A unit is carried forward only when ALL FIVE hold:
+#   1. its status is DEFERRED - decided by the caller, re-asserted here so this cannot carry an OPEN row;
+#   2. the roster this run started with carries it (`baseline_units`, falling back to the pinned
+#      `base:`), so a unit the run ADDED - a promoted finding, an adopted discovery - never lands
+#      deferred, which M4's severity rule forbids;
+#   3. the run-state file carries its `rescope · item defer <unit>` row, owed through PARK_ACTS_OWED,
+#      so the owner's one read is told the scope was set aside;
+#   4. its spec header `closes` or `advances` an ask this build's own BACKLOG.md at HEAD files under
+#      this build's slug, and the ask witness reads that ask neither CLOSED nor WONTDO - the join
+#      `asks-disposed` already reads, and no second one;
+#   5. no CLOSED unit's spec declares a `consumes-from` edge onto it, because a closed half that needs
+#      the open half is not landable and is a HAND OFF instead.
+# Checked per unit in that order, each returning early with its own message. ONE witness call per
+# close: conditions 1-3 and the filing half of 4 run for every unit first, then the status half of 4
+# and condition 5. Everything unreadable leaves the term UNMET with the reason - nothing reads as met.
+#
+# WHAT IT DOES NOT CHECK: that the ask's derived status is DEFERRED rather than merely OPEN. Any
+# status but CLOSED or WONTDO is an open question the unit can wait on, and `asks-disposed` grades
+# the ask's own disposition one item later.
+BC_CARRIED=""
+check_carry_forward() { # slug · run-state file · unit rows · non-terminal rows -> 0 and BC_CARRIED, or 1 and DOD_OUT
+  local _cf_slug="$1" _cf_rel="$2" _cf_rows="$3" _cf_non="$4"
+  local _cf_ids _cf_id _cf_base _cf_baserc=0 _cf_rev _cf_filed _cf_sp _cf_asks _cf_a _cf_st _cf_open
+  local _cf_union="" _cf_c _cf_csp _cf_closed
+  local -A _cf_cand=()
+  BC_CARRIED=""
+  # 1 - re-asserted. The caller filters on the same row shape; a caller that stops filtering must
+  # not turn this into a way to carry an OPEN or INPROGRESS unit.
+  if [ -n "$(printf '%s\n' "$_cf_non" | grep -vE '\| DEFERRED \|' | grep -v '^$' || true)" ]; then
+    DOD_OUT="the carry-forward term was handed a unit that is not DEFERRED, and only a DEFERRED unit can be carried forward: $(printf '%s\n' "$_cf_non" | grep -vE '\| DEFERRED \|' | row_ids_of | tr '\n' ' ')"
+    return 1
+  fi
+  _cf_ids=$(printf '%s\n' "$_cf_non" | row_ids_of)
+  if ! load_spec_facts $(GIT ls-files -- "$M/builds/$_cf_slug/spec/*.md" 2>/dev/null) >/dev/null 2>&1; then
+    DOD_OUT="the spec-fact reader refused over this build's specs, so no DEFERRED unit's ask or edges could be read and none can be carried forward: $M/builds/$_cf_slug/spec/"
+    return 1
+  fi
+  _cf_base=$(baseline_units "$_cf_rel" "$(readme_of "$_cf_slug")" "${UNITS_REGION_CUTOFF:-}" "$(fact "$_cf_rel" base)") || _cf_baserc=1
+  _cf_rev=$(GIT rev-parse HEAD 2>/dev/null)
+  _cf_filed=" $(asks_filed_by "$(backlog_blob_of "$_cf_slug" "$_cf_rev")" "$_cf_slug" | tr '\n' ' ')"
+  for _cf_id in $_cf_ids; do
+    # 2 - the roster this run started with.
+    if [ "$_cf_baserc" != 0 ]; then
+      DOD_OUT="a DEFERRED unit can be carried forward only when the roster this run started with carries it, and that roster cannot be read, so $_cf_id cannot be: $_cf_base"
+      return 1
+    fi
+    if ! id_in "$_cf_base" "$_cf_id"; then
+      DOD_OUT="a DEFERRED unit was added during this run - the roster this run started with does not carry it - so it cannot be carried forward; a unit the run added is finished or retired, never deferred past the close: $_cf_id"
+      return 1
+    fi
+    # 3 - the declared deferral.
+    if ! grep -E '^[0-9][0-9-]*T[0-9:]*Z rescope · item defer ' "$_cf_rel" 2>/dev/null | grep -qF -- " item defer $_cf_id · "; then
+      DOD_OUT="a DEFERRED unit has no \`rescope · item defer\` row in the run-state file, so the deferral was never declared where the wrap-up surfaces it; record it with --rescope $_cf_slug --act defer --item $_cf_id --reason \"<why>\": $_cf_id"
+      return 1
+    fi
+    # 4, the filing half - the spec's ask verbs, joined to this build's own filings at HEAD.
+    _cf_sp="${SPEC_PATH[$_cf_id]:-}"
+    if [ -z "$_cf_sp" ] || [ ! -r "$_cf_sp" ]; then
+      DOD_OUT="a DEFERRED unit has no readable spec, so the ask it is set aside against cannot be read: $_cf_id"
+      return 1
+    fi
+    _cf_asks=$( { spec_ask_verbs "$_cf_sp" closes; spec_ask_verbs "$_cf_sp" advances; } | sort -u | tr '\n' ' ')
+    if [ -z "${_cf_asks// /}" ]; then
+      DOD_OUT="a DEFERRED unit's spec header names no ask with closes or advances, so nothing records the open question its scope was set aside for: $_cf_id"
+      return 1
+    fi
+    _cf_cand[$_cf_id]=""
+    for _cf_a in $_cf_asks; do
+      case "$_cf_filed" in *" $_cf_a "*) _cf_cand[$_cf_id]="${_cf_cand[$_cf_id]} $_cf_a" ;; esac
+    done
+    if [ -z "${_cf_cand[$_cf_id]}" ]; then
+      DOD_OUT="a DEFERRED unit's spec names no ask this build's BACKLOG.md at HEAD files under this build's own slug, so it is set aside against a question this build never raised: $_cf_id names ${_cf_asks% }"
+      return 1
+    fi
+    _cf_union="$_cf_union${_cf_cand[$_cf_id]}"
+  done
+  # 4, the status half - ONE witness call over every candidate, deduplicated.
+  if [ -z "${ASKS_CMD:-}" ]; then
+    DOD_OUT="a DEFERRED unit is carried forward only against an ask the witness reads open, and this project declares no ASKS_CMD, so the ask contract that would say so is missing: $(printf '%s ' $_cf_ids)"
+    return 1
+  fi
+  if ! run_ask_witness "$_cf_slug" "$_cf_rev" $(printf '%s\n' $_cf_union | sort -u); then
+    DOD_OUT="the ask witness did not answer for the asks the DEFERRED units are set aside against, so whether any is still open cannot be read: $AW_WHY"
+    return 1
+  fi
+  _cf_closed=$(printf '%s\n' "$_cf_rows" | grep -E '\| CLOSED \|' | row_ids_of)
+  for _cf_id in $_cf_ids; do
+    _cf_open=""
+    for _cf_a in ${_cf_cand[$_cf_id]}; do
+      _cf_st=$(ask_field "$_cf_a" status)
+      case "$_cf_st" in CLOSED|WONTDO) ;; *) _cf_open="$_cf_a"; break ;; esac
+    done
+    if [ -z "$_cf_open" ]; then
+      DOD_OUT="a DEFERRED unit's every filed ask reads CLOSED or WONTDO, so none is still open for the unit to be carried forward against: $_cf_id against${_cf_cand[$_cf_id]}"
+      return 1
+    fi
+    # 5 - no CLOSED unit consumes from it.
+    for _cf_c in $_cf_closed; do
+      _cf_csp="${SPEC_PATH[$_cf_c]:-}"
+      if [ -z "$_cf_csp" ] || [ ! -r "$_cf_csp" ]; then
+        DOD_OUT="a CLOSED unit has no readable spec, so whether it consumes from a DEFERRED unit cannot be read and the build cannot land partial: $_cf_c, beside $_cf_id"
+        return 1
+      fi
+      if read_consumes_from "$_cf_csp" | grep -qxF -- "$_cf_id"; then
+        DOD_OUT="a CLOSED unit declares a consumes-from edge onto a DEFERRED unit, so the closed half needs the half that is not landing and the build cannot land partial; that is a HAND OFF under owner-decision: $_cf_c consumes-from $_cf_id"
+        return 1
+      fi
+    done
+    BC_CARRIED="${BC_CARRIED:+$BC_CARRIED
+}carried forward — $_cf_id, DEFERRED against the open ask $_cf_open"
+  done
+  return 0
 }
 # A STATUS row, whole. `ask_disposition_of` above returns the VERB alone, and three of the six verbs
 # carry a slot the verb does not say — `CLOSED · <id> · by <sha>`, `BLOCKED · <id> · on <id>`,
@@ -4696,6 +4927,27 @@ WTS
 #     and the build method derives the owner's only turn from those entries. The circularity
 #     objection - that the wrap-up has not happened yet - is identical at --close, where the same
 #     attestation is demanded before the same wrap-up, and it was accepted there.
+# TOOL-dUnstuckLanding-13 S9 and F5 - THE HAND-OFF NOTICE ON AN ABORT. From HANDOFF_CUTOFF an
+# `ABORTED` record means DISCARD, and an abort naming one of the HALT_CODES_HANDOFF codes is the shape
+# the census found landing anyway, so it is told the other exit exists. Dated by the RECORD's first
+# commit, not by today: the cutoff dates what a record MEANS, and a legacy record graded as legacy
+# must not be told it meant discard. A record with no committed history yet is new, so it is told.
+# A blank cutoff turns the notice off and SAYS so; a malformed one does the same, naming the value.
+print_abort_notice() { # run-state file · halt code -> prints, never refuses
+  local d
+  case " $HALT_CODES_HANDOFF " in *" $2 "*) ;; *) return 0 ;; esac
+  case "$HANDOFF_CUTOFF" in
+    "") echo "unattended: NOTE - this project declares no HANDOFF_CUTOFF, so this abort is not dated against the day ABORTED came to mean discard and no hand-off notice is printed; declare one in $CONF to turn it on" >&2
+        return 0 ;;
+    [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]) ;;
+    *) echo "unattended: NOTE - HANDOFF_CUTOFF is not a YYYY-MM-DD date, so no record can be dated against it and no hand-off notice is printed: $HANDOFF_CUTOFF" >&2
+       return 0 ;;
+  esac
+  d=$(read_first_commit_date "$1")
+  if [ -n "$d" ] && [[ "$d" < "$HANDOFF_CUTOFF" ]]; then return 0; fi
+  echo "unattended: NOTICE - from HANDOFF_CUTOFF an ABORTED record means DISCARD, its work must not land as it stands. This code is hand-off-shaped: if the work is sound and only an owner may land it or decide first, end the run with --handoff --code owner-landing or owner-decision instead. This abort proceeds as asked: $2"
+}
+
 verb_abort() { # slug · reason · code
   local slug="$1" reason="$2" code="$3" rel head item ck key
   check_slug "$slug" || return 1
@@ -4752,6 +5004,9 @@ verb_abort() { # slug · reason · code
   if [ "$code" = gate-red-out-of-scope ]; then
     check_inherited_override "$rel" "--abort --code gate-red-out-of-scope" || return 1
   fi
+  # TOOL-dUnstuckLanding-13 S9 - a NOTICE, never a refusal: printed for a hand-off-shaped code and
+  # the abort then proceeds exactly as before, because this verb cannot know the work is sound.
+  print_abort_notice "$rel" "$code"
   # BOTH agent-attested items, read back from the record exactly as --close reads them. This is an
   # ATTESTATION and not a machine verdict, and the message says so wherever it reports - counting an
   # attestation as a verdict is what makes an override look like a check that failed.
@@ -4771,10 +5026,13 @@ verb_abort() { # slug · reason · code
       return 1
     fi
   done
+  # TOOL-dUnstuckLanding-19 S5 - every refusal is above, and the fact rides the abort's own writes.
+  derive_refreshed_at "$rel" "$slug" abort
   head=$(GIT rev-parse HEAD)
   set_fact "$rel" phase ABORTED || return 1
   remove_procs_ledger "$slug"
   set_fact "$rel" witness "$head" || return 1
+  if [ -n "$RF_FACT" ]; then set_fact "$rel" refreshed-at "$RF_FACT" || return 1; fi
   # AN AUTHORED FACT, not a substring of the reason. A reader is a field read rather than a parse, and
   # three readers want it by key. It is a per-run SINGLETON written by a terminal verb, which is the
   # same shape the roster-at-landing fact already has — the in-tree precedent, not an argument by
@@ -4886,6 +5144,13 @@ run_hold() { # slug · code · until · reason · reaped · unreachable · pendi
   fi
   if ! check_hold_code "$code"; then
     fail 55 "--hold names a hold code that is not in the effective vocabulary, and the hold codes are a SECOND vocabulary beside the halt codes rather than an extension of them; declare it in HOLD_CODES_EXTRA or use one of these: $legal"
+    return 1
+  fi
+  # TOOL-dUnstuckLanding-13 S2 - A HAND-OFF CODE HAS ONE PRODUCER. `--handoff` sets HO_ACTIVE for the
+  # length of its one call into this function and clears it on every return, so a `--hold` reaches
+  # this branch and a hand-off does not. Before any write, with the other argument refusals.
+  if [ -z "$HO_ACTIVE" ] && check_handoff_code "$code"; then
+    fail 89 "--hold names a hand-off code, and those are written by --handoff alone: a HELD record under one carries the landing recipe and the landing facts, and a hold written without them is a hand-off nothing can land or settle; end the run with --handoff instead: $code"
     return 1
   fi
   if [ -z "$until" ]; then
@@ -5026,6 +5291,9 @@ run_hold() { # slug · code · until · reason · reaped · unreachable · pendi
     fail 84 "a process this slug's driver started is still alive, and a hold now would leave a HELD record with its own work in flight; let it finish, or reap it, then hold again: $inflight"
     return 1
   fi
+  # TOOL-dUnstuckLanding-19 S5 - a hand-off refreshes after its last refusal; a plain hold never does.
+  RF_FACT=""
+  if [ -n "$HO_ACTIVE" ]; then derive_refreshed_at "$rel" "$slug" handoff; fi
   # ---- nothing above this line wrote anything but the process ledger's prune -----------------------
   set_fact "$rel" phase HELD || return 1
   set_fact "$rel" witness "$head" || return 1
@@ -5043,6 +5311,16 @@ run_hold() { # slug · code · until · reason · reaped · unreachable · pendi
   if [ -n "$unpushed" ]; then set_fact "$rel" hold-unpushed "$unpushed" || return 1; fi
   # WRITTEN ON EVERY HOLD, empty without the flag, so no later hold inherits an earlier stop's run.
   set_fact "$rel" hold-run "$pendrun" || return 1
+  # TOOL-dUnstuckLanding-13 S6 and S7 - THE HAND-OFF'S WRITES, in this same block and after every
+  # refusal, so a refused hand-off writes nothing. `--handoff` derived all three values before it
+  # called in, and `--hold` leaves HO_ACTIVE empty, so no plain hold ever writes them. The roster is
+  # `--close`'s in-place spelling, and the freeze line appears only where the freeze is non-empty.
+  if [ -n "$HO_ACTIVE" ]; then
+    set_fact "$rel" units-at-landing "$HO_UNITS" || return 1
+    if [ -n "$HO_ASKS" ]; then set_fact "$rel" asks-at-landing "$HO_ASKS" || return 1; fi
+    if [ -n "$RF_FACT" ]; then set_fact "$rel" refreshed-at "$RF_FACT" || return 1; fi
+    park "$rel" handoff "$code" "$HO_RECIPE" || return 1
+  fi
   # HISTORY-CLASS, in park()'s own row grammar so `--status` counts it as noted rather than owed and
   # check 27 can join the kind against the declared vocabulary. The free-text reason is NOT repeated
   # here: it has a fact of its own, which is the only place --status quotes it from.
@@ -5081,8 +5359,228 @@ run_hold() { # slug · code · until · reason · reaped · unreachable · pendi
   return 0
 }
 
+# ---------------------------------------------------------------------------------- the hand-off
+# TOOL-dUnstuckLanding-13 - THE EXIT FOR "DONE, BUT AN OWNER MUST LAND IT OR DECIDE FIRST". A run in
+# that state had one honest-looking verb, `--abort`, and the census behind this unit found the work of
+# nearly every such abort on the default branch anyway: the terminal said discarded while git said
+# landed. `--handoff` ends it HELD instead, under `owner-landing` or `owner-decision`, with the recipe
+# a person runs to land it and the landing facts a landed record needs.
+#
+# IT IS `--hold` WITH THREE THINGS ADDED, and routes through `run_hold` so every refusal a hold makes
+# holds here unchanged - a finished or already-HELD record, a dirty tree, an unpublished tip under
+# `ANCHOR_SCOPE=published`, an unreaped keepalive, a live process. The release condition is fixed at
+# `owner`, so a hand-off owes no durable restart by construction. What it adds, each refused before
+# any write: the attribution guard on `owner-landing`, a parked decision under `owner-decision`, and
+# the roster, the ask freeze and the recipe, derived here and written inside `run_hold`'s one write
+# block through the HO_ globals, which are set for that one call and cleared on every return.
+HO_ACTIVE=""; HO_UNITS=""; HO_ASKS=""; HO_RECIPE=""
+
+# THE RECIPE, rendered from declared conf values and validated record facts and NEVER from the
+# free-text reason. One line, the commands joined with ` && `, prefixed by the tree they run in:
+# under `in-place` the lander prepares and lands from the run's own worktree; under `primary` the
+# run branch is merged `--no-ff` into the primary tree's default branch and the lander pushes it.
+# No machine path is written, because the line lands in a tracked record that other nodes read.
+#
+# TOOL-dUnstuckLanding-14 S9 - THE LAST COMMAND SETTLES THE RECORD, so the landing an owner runs also
+# writes what git then proves. Its path is this kit's own directory relative to the top of the
+# repository holding it, derived from KIT_DIR and never spelled, because the line is read on other
+# nodes; a kit outside any repository is named by the script alone.
+read_settle_command() { # slug -> the settle command an owner runs after the landing
+  local _sc_p
+  _sc_p=$(GIT -C "$KIT_DIR" rev-parse --show-prefix 2>/dev/null) || _sc_p=""
+  printf 'bash %sunattended.sh --settle %s' "$_sc_p" "$1"
+}
+render_handoff_recipe() { # slug · run-state file -> the recipe on stdout; 1 when no lander or no branch
+  local slug=$1 rel=$2 br
+  [ -n "$LANDER" ] || return 1
+  if [ "$LANDER_MODE" = in-place ]; then
+    printf 'in the run worktree: %s --prepare --slug %s && %s --land --slug %s && %s' "$LANDER" "$slug" "$LANDER" "$slug" "$(read_settle_command "$slug")"
+    return 0
+  fi
+  br=$(fact "$rel" run-branch); br=${br#refs/heads/}
+  [ -n "$br" ] || br=$(GIT symbolic-ref -q --short HEAD 2>/dev/null)
+  [ -n "$br" ] || return 1
+  printf 'in the primary tree: git merge --no-ff %s && %s && %s' "$br" "$LANDER" "$(read_settle_command "$slug")"
+}
+
+run_handoff() { # slug · code · reason · reaped · unreachable
+  local slug="$1" code="$2" reason="$3" reaped="$4" unreach="$5" rel units recipe rc
+  check_slug "$slug" || return 1
+  rel=$(runmd_of "$slug")
+  [ -f "$rel" ] || { fail 10 "no run-state file, so there is no run to hand off: $rel"; return 1; }
+  refuse_if_terminal "$rel" --handoff || return 1
+  if [ -z "$code" ] || ! check_handoff_code "$code"; then
+    fail 90 "--handoff takes --code owner-landing or --code owner-decision and no other: owner-landing when only the landing remains, owner-decision when a parked decision stands first, and any other stop is a --hold or an --abort: ${code:-none}"
+    return 1
+  fi
+  # S5 - a decision hand-off hands the owner a QUESTION, and the question is a parked decision row.
+  if [ "$code" = owner-decision ] && ! grep -qE '^[0-9][0-9-]*T[0-9:]*Z decision · item ' "$rel" 2>/dev/null; then
+    fail 91 "--handoff --code owner-decision requires a parked decision row in the record, because that row is the question the owner is handed, and a decision hand-off with none is a stop with no question in it; park it first with --park: $rel"
+    return 1
+  fi
+  # S3 - owner-decision is NOT guarded: it is the exit for an OWN red that needs a decision.
+  if [ "$code" = owner-landing ]; then
+    check_handoff_bar "$rel" || return 1
+  fi
+  # S6 - the roster in `--close`'s in-place spelling, and the freeze at HEAD, both BEFORE any write.
+  units=$(unit_rows "$(readme_of "$slug")" \
+            | sed -e 's/^| \[//' -e 's/ —.*//' | tr '\n' ' ' | sed 's/ $//')
+  if ! derive_ask_freeze "$slug" "$(GIT rev-parse HEAD 2>/dev/null)"; then
+    fail 92 "this run's asks cannot be read at HEAD, so the hand-off would freeze no answer to the question the run was authorized by, and the record an owner lands would carry none; nothing was written: $AW_WHY"
+    return 1
+  fi
+  if ! recipe=$(render_handoff_recipe "$slug" "$rel"); then
+    fail 93 "the hand-off recipe would name no lander or no branch to merge, and a recipe missing either is not one an owner can run; declare LANDER in the conf, or hand off from the run's own branch; the lander reads: [$LANDER]"
+    return 1
+  fi
+  HO_ACTIVE=1; HO_UNITS=$units; HO_ASKS=$AD_FREEZE; HO_RECIPE=$recipe
+  run_hold "$slug" "$code" owner "$reason" "$reaped" "$unreach" ""; rc=$?
+  HO_ACTIVE=""; HO_UNITS=""; HO_ASKS=""; HO_RECIPE=""
+  [ "$rc" = 0 ] || return "$rc"
+  echo "unattended: hand-off recipe, written as the handoff row - $recipe"
+  echo "unattended: once an owner has landed it, the record is settled by the recipe's last command - $(read_settle_command "$slug")"
+  return 0
+}
+
+# ------------------------------------------------------------------------------------ the settle
+# TOOL-dUnstuckLanding-14 S5 and S6 - `--settle` WRITES WHAT GIT PROVES, and nothing else. Three
+# branches, selected by the RECORDED phase, and a fourth that writes nothing:
+#
+#   handed     HELD under a hand-off code, deriving LANDED: phase LANDED, witness the landing commit,
+#              `landed-derived` and `landed-by: attended`; `units-at-landing` is the hand-off's
+#   legacy     ABORTED, first committed before HANDOFF_CUTOFF, whose work the content predicate reads
+#              landed: `work-landed-at: <witness> <tip>` and nothing else - the one write a terminal
+#              record admits (protocol section 3)
+#   lease-dead any other non-terminal phase whose `--liveness` verdict is STALE or UNBOUND and whose
+#              work reads landed: `work-landed-at` and `abandoned: <utc>` under the CURRENT phase
+#   settled    the fact this branch would write is already there: said so, exit 0
+#
+# EVERY REFUSAL PRECEDES THE FIRST WRITE, in the spec's order, after the settled test, which writes
+# nothing: the record and its difference from HEAD, the recorded phase and the branch it selects, the advertised tip, then the branch's own test.
+# The record is STAGED and never committed: a settle is a records commit made after the work landed,
+# so it rides the next landing from this tree or a batched owner pass, and every deriving reader
+# reads the record correctly before then. A live record only: an archive is immutable.
+run_settle() { # slug
+  local slug="$1" rel ph br hc cut first wla t8 st_lease
+  check_slug "$slug" || return 1
+  rel=$(runmd_of "$slug")
+  [ -f "$rel" ] || { fail 10 "no run-state file, so there is no run to settle: $rel"; return 1; }
+  ph=$(read_recorded_phase "$rel")
+  # ALREADY SETTLED FIRST, because it writes nothing whatever else holds: a settle is staged and
+  # committed later, so the record a re-run meets differs from HEAD's copy by exactly what it wrote.
+  wla=$(fact "$rel" work-landed-at)
+  if { [ "$ph" = LANDED ] && [ "$(fact "$rel" landed-by)" = attended ]; } \
+     || { [ "$ph" = ABORTED ] && [ -n "$wla" ]; } \
+     || { ! is_terminal "$ph" && [ "$ph" != HELD ] && [ -n "$wla" ] && [ -n "$(fact "$rel" abandoned)" ]; }; then
+    echo "unattended: already settled - $rel reads $ph${wla:+, work-landed-at $wla}; nothing was written"
+    return 0
+  fi
+  if ! GIT cat-file -e "HEAD:$rel" 2>/dev/null || ! check_lease_only_diff "$rel"; then
+    fail 94 "--settle writes only onto the record HEAD carries, and this one is uncommitted or differs from HEAD's copy in more than its lease lines, so what it would settle is not what any landing carried; commit or discard the difference first: $rel"
+    return 1
+  fi
+  case "$ph" in
+    LANDING|LANDED)
+      fail 95 "--settle does not write over a recorded $ph: a LANDING is completed by --landed, and a derived LANDED is written and retired by the next --preflight of its slug; nothing was written: $rel"
+      return 1 ;;
+    HELD)
+      hc=$(fact "$rel" hold-code)
+      if ! check_handoff_code "$hc"; then
+        fail 96 "--settle settles a HELD record only under a hand-off code, because any other hold is a paused run its owner did not land, and settling it would end it; nothing was written. The hold code is: ${hc:-none}"
+        return 1
+      fi
+      br=handed ;;
+    ABORTED)
+      cut="$HANDOFF_CUTOFF"
+      case "$cut" in
+        [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]) ;;
+        *) fail 97 "--settle adds work-landed-at to an ABORTED record only when it predates HANDOFF_CUTOFF, the day ABORTED came to mean discard, and this project declares no such date, so no ABORTED record can be dated against it; declare HANDOFF_CUTOFF in the conf: ${cut:-blank}"
+           return 1 ;;
+      esac
+      first=$(read_first_commit_date "$rel")
+      if [ -z "$first" ] || ! [[ "$first" < "$cut" ]]; then
+        fail 98 "this ABORTED record meant discard: it was first committed ${first:-never}, on or after HANDOFF_CUTOFF $cut, so its work was ended as not to land, and no verb writes that it landed; nothing was written: $rel"
+        return 1
+      fi
+      br=legacy ;;
+    *)
+      # The core terminals are the two arms above and PHASES_TERMINAL takes no extension, so every
+      # phase reaching here is a working one.
+      br=lease-dead ;;
+  esac
+  if ! read_advertised_tip; then
+    fail 99 "--settle writes only what the tip the remote advertises proves, and that tip was not observed, so nothing here can be proven and nothing was written: $ADVQ_WHY"
+    return 1
+  fi
+  case "$br" in
+    handed)
+      read_derived_phase "$rel"
+      if [ "$DP_BY" != attended ]; then
+        fail 100 "this hand-off does not derive LANDED: its owner has not landed it on the advertised tip, so there is nothing to settle yet; nothing was written - ${DP_REASON:-no landing commit}"
+        return 1
+      fi ;;
+    *)
+      if [ "$br" = lease-dead ]; then
+        # A DEAD PROBE IS NOT A DEAD LEASE: no verdict is "unknown", never STALE, so it refuses too.
+        derive_liveness "$slug" "$rel" "$ph" || LV_VERDICT="nothing, because a probe it needs answered nothing ($LV_DEAD)"
+        # UNBOUND IS AN UNANSWERED PROBE, NEVER A VERDICT (TOOL-dUnstuckLanding-27 S2). It reads
+        # `session` absent, which is spec 14's legacy record that predates the lease AND any lease
+        # written under a harness exporting no session id. Only the first is admitted on UNBOUND
+        # alone: a record carrying `lease-utc` is admitted only when its last move is also stale and
+        # its holder's pid is not alive, so a fresh run on such a harness is never settled.
+        case "$LV_VERDICT" in
+          STALE) ;;
+          UNBOUND)
+            st_lease=$(fact "$rel" lease-utc)
+            if [ -n "$st_lease" ] && { [ "$LV_STALE" != yes ] || [ "$LV_ALIVE" = yes ]; }; then
+              fail 101 "--settle reads a leased working record whose session is absent as abandoned only when its last move is stale and its pid is not alive, and the lease written at $st_lease reads stale $LV_STALE and pid-alive $LV_ALIVE, so a session may still hold it and settling it would end a live run; nothing was written: $rel"
+              return 1
+            fi ;;
+          *) fail 101 "--settle reads a working record as abandoned only when --liveness says STALE or UNBOUND, and it says $LV_VERDICT, so a session may still drive it and settling it would end a live run; nothing was written: $rel"
+             return 1 ;;
+        esac
+      fi
+      check_work_landed "$rel" "$ADVQ_SHA"
+      case "$?" in
+        0) ;;
+        1) t8=${ADVQ_SHA:0:8}
+           fail 102 "the content predicate reads this run's work NOT landed on $ADVQ_REF at $t8, so there is no landing to record; nothing was written - $WL_WHY"
+           return 1 ;;
+        *) fail 103 "the content predicate cannot decide whether this run's work landed, and --settle never guesses; nothing was written - $WL_WHY"
+           return 1 ;;
+      esac ;;
+  esac
+  # ---- nothing above this line wrote anything -------------------------------------------------------
+  case "$br" in
+    handed)
+      set_fact "$rel" phase LANDED || return 1
+      set_fact "$rel" witness "$DP_LANDING" || return 1
+      set_fact "$rel" landed-derived "$DP_LANDING $DP_TIP" || return 1
+      set_fact "$rel" landed-by attended || return 1 ;;
+    legacy)
+      set_fact "$rel" work-landed-at "$(fact "$rel" witness) $ADVQ_SHA" || return 1 ;;
+    lease-dead)
+      set_fact "$rel" work-landed-at "$(fact "$rel" witness) $ADVQ_SHA" || return 1
+      set_fact "$rel" abandoned "$(read_utc_now)" || return 1 ;;
+  esac
+  stage_or_fail "$rel" || return 1
+  case "$br" in
+    handed) echo "unattended: settled $rel as a landed hand-off - phase LANDED · landed-by attended · landed-derived ${DP_LANDING:0:8} ${DP_TIP:0:8}" ;;
+    legacy) echo "unattended: settled $rel as ABORTED with its work landed - work-landed-at $(fact "$rel" work-landed-at)" ;;
+    *) echo "unattended: settled $rel as abandoned at phase $ph with its work landed - work-landed-at $(fact "$rel" work-landed-at) · abandoned $(fact "$rel" abandoned)" ;;
+  esac
+  echo "unattended: STAGED, not committed - the settle commit is owed, and it rides the next landing from this tree or a batched owner pass: git commit -m \"records($slug): settle the run record\" -- $rel"
+  return 0
+}
+
+# A RECORD --settle ENDED: `abandoned` beside `work-landed-at`, the pair it writes together over a dead
+# lease whose work the content predicate read landed. `--preflight` retires it like a terminal one.
+check_settled_abandoned() { # run-state file -> 0 when it carries both
+  [ -n "$(fact "$1" abandoned)" ] && [ -n "$(fact "$1" work-landed-at)" ]
+}
+
 verb_preflight() { # slug · keepalive-id
-  local slug="$1" kid="$2" rel base src payload tmp arch="" rotate=0 _pf_ka _pf_miss _pf_fix _pf_gbt=""
+  local slug="$1" kid="$2" rel base src payload tmp arch="" rotate=0 _pf_ka _pf_miss _pf_fix _pf_gbt="" _pf_ab=""
   # TOOL-dDerivedDocket-16 S6 - THE IDS TEST RUNS FIRST, before `check_slug` and before any anchor
   # work, because it needs no tree. `check_slug`'s own grammar ADMITS an id - letters, digits and
   # dashes, opening on a letter - so an id reached the folder lookup and was refused with a message
@@ -5106,7 +5604,16 @@ verb_preflight() { # slug · keepalive-id
   # the gate, print "the run-state file is unchanged" over a tree where the record had already been
   # renamed away from the path every reader globs, and return 1.
   read_derived_phase "$rel"
-  if [ -f "$rel" ] && is_terminal "$DP_PHASE"; then
+  # A RECORD --settle ENDED AS `abandoned` IS FINISHED FOR ROTATION too (implementation review round
+  # 2, M3, superseding round 1's M8 strip). `--settle` writes the marker only after the content
+  # predicate read the dead run's work LANDED, so the next run is new work and is owed a fresh record:
+  # continued in place it inherited the dead run's phase, its `--attest` facts - a met
+  # `keepalive-reaped` among them - its review rows and its bar facts, and the settle evidence was
+  # deleted rather than archived. Keyed on BOTH facts, the pair `--settle` writes together.
+  if [ -f "$rel" ] && ! is_terminal "$DP_PHASE" && check_settled_abandoned "$rel"; then
+    _pf_ab=$(fact "$rel" abandoned)
+  fi
+  if [ -f "$rel" ] && { is_terminal "$DP_PHASE" || [ -n "$_pf_ab" ]; }; then
     # TOOL-dDerivedDocket-22 S4 - A DERIVED-LANDED RECORD IS WRITTEN LANDED BEFORE IT IS RETIRED
     # (KF15), so the archive says what the derivation found rather than LANDING under a terminal
     # name, and check 4 keeps reading a retired record by its own bytes. The edit is made to a
@@ -5118,7 +5625,8 @@ verb_preflight() { # slug · keepalive-id
     if [ -n "$DP_LANDING" ]; then
       PF_LCOPY=$(_pf_sd=$(resolve_sidecar_dir) && mktemp "${_pf_sd%/unattended}/unattended-rotation.XXXXXX" 2>/dev/null) \
         && cp "$rel" "$PF_LCOPY" && set_fact "$PF_LCOPY" phase LANDED && set_fact "$PF_LCOPY" witness "$DP_LANDING" \
-        && set_fact "$PF_LCOPY" landed-derived "$DP_LANDING $DP_TIP" && src="$PF_LCOPY" \
+        && set_fact "$PF_LCOPY" landed-derived "$DP_LANDING $DP_TIP" \
+        && { [ "$DP_BY" != attended ] || set_fact "$PF_LCOPY" landed-by attended; } && src="$PF_LCOPY" \
         || { [ -z "$PF_LCOPY" ] || rm -f "$PF_LCOPY"; PF_LCOPY=""; src=""; }
     fi
     arch=$(archive_name_of "$rel" "$src") || { fail 27 "cannot derive an archive name for the finished record, so there is nothing safe to retire it to and the run does not start: $rel"; return 1; }
@@ -5144,7 +5652,10 @@ verb_preflight() { # slug · keepalive-id
     # that arm requires is refused here with nothing moved. The predicate and the dating are the
     # kit library's, shared with the leg, so the two cannot disagree about one record.
     if [ -n "$PF_LCOPY" ] && check_landed_facts_due "$rel" "$LANDED_FACTS_CUTOFF"; then
-      _pf_miss=$(read_missing_landed_facts "$PF_LCOPY" derived)
+      # TOOL-dUnstuckLanding-14 S3 - a landed hand-off is graded as the `attended` population, so
+      # its copy carries `landed-by: attended` beside the facts every derived rotation writes.
+      if [ "$DP_BY" = attended ]; then _pf_miss=$(read_missing_landed_facts "$PF_LCOPY" attended)
+      else _pf_miss=$(read_missing_landed_facts "$PF_LCOPY" derived); fi
       if [ -n "$_pf_miss" ]; then
         rm -f "$PF_LCOPY"
         if [ "$LANDER_MODE" = in-place ]; then
@@ -5176,6 +5687,7 @@ verb_preflight() { # slug · keepalive-id
   # A RECORD BEING RETIRED is not a re-preflight: its keepalive names the finished run's job, and
   # comparing it with this run's id refused every rotation made under a new one (TOOL-dDerivedDocket-22).
   _pf_ka=$(fact "$rel" keepalive)
+  # A RECORD --settle ENDED AS abandoned is rotated above, so its keepalive is never compared either.
   if [ "$rotate" != 1 ] && [ -n "$_pf_ka" ] && [ -n "$kid" ] && [ "$_pf_ka" != "$kid" ]; then
     fail 82 "this run already records a keepalive and a re-preflight does not re-pin one, because that id names the job whose reaping the close attests; a session taking this slug over says so through the verb whose matrix decides whether it holds it: --resume"
   fi
@@ -5287,6 +5799,7 @@ verb_preflight() { # slug · keepalive-id
       return 1
     fi
     echo "unattended: retired the finished record — $rel -> $arch"
+    [ -z "$_pf_ab" ] || echo "unattended: preflight — the record carried abandoned at $_pf_ab, written by --settle over a dead lease whose work landed, so it is retired like a finished one and this run starts on a fresh record"
   fi
 
   # The unit list is DERIVED at read time, never copied here. A copy has to be refreshed by
@@ -5346,6 +5859,13 @@ verb_preflight() { # slug · keepalive-id
   # the session, pid, host, image and lease-utc beside it are the lease's own and are taken afresh.
   _pf_ka=$(fact "$rel" keepalive); [ -n "$_pf_ka" ] || _pf_ka="$kid"
   write_lease "$rel" "$_pf_ka" || return 1
+  # TOOL-dUnstuckLanding-20 S4 - THE LANDING NODE, written afresh like the lease because it describes
+  # the node holding the run. A hand-off node starts normally and says so from its first record; no
+  # preflight refuses on it. Undeclared writes no fact. Read at BASE and at the tip the anchor
+  # observation above saw advertised (implementation review round 2, M1).
+  resolve_landing_node "$rel" "${ASHA:-}"
+  print_landing_line
+  if [ "$LN_STATE" != undeclared ]; then set_fact "$rel" landing "$LN_STATE" || return 1; fi
   # S4: which anchor authorized this run, and — when it was the second one — the observation it
   # rested on. EVIDENCE, exactly like anchor-ref/sha/url: written so a party off this machine can
   # re-derive the pin, and never read back as an input by this kit. `trusted_base` deliberately does
@@ -5597,6 +6117,182 @@ write_lease() { # run-state file · keepalive-id
   return 0
 }
 
+# TOOL-dUnstuckLanding-20 S3 - WHICH NODE MAY LAND, resolved from the machine and the user and never
+# from a path, against the `LANDING_NODES` the project conf declares AT THE PINNED BASE. Read the
+# `SPEC_AUDIT_DEFAULT` way in check_authorization, and for its reason: the working copy is a file the
+# run commits itself, so a run that added its own node there would grant itself a landing nobody
+# declared. The blob is evaluated in a subshell with the key blanked first, and the sentinel printed
+# from inside the eval'd text proves it was read to the end; the two newlines of glue are that read's.
+#
+# NEVER FAILS, and every doubt resolves to `handoff`, the safe direction: a blob that does not
+# evaluate to the end, a machine or user nothing answers for, no matching pair. No `base` fact or no
+# conf blob at BASE is `undeclared`, today's behaviour; such a record cannot pass
+# `authorization-reachable`, so it never reaches a landing. Blank is `undeclared` too (F3).
+#
+# THE PINNED BASE IS THE ONE THIS RUN FIRST COMMITTED (closing review round 1, M5 and L8). The `base`
+# fact is a working-copy line and trusted_base admits any PUBLISHED ancestor of the derived merge-base,
+# so a run that moved it to an older commit whose conf predates LANDING_NODES read `undeclared` and
+# skipped both hand-off refusals. `read_pinned_base` takes the base from this run's first committed
+# blob carrying one; a working copy that differs from it or carries none, or a base that does not
+# resolve, is `handoff`. NOT the derived merge-base: under carry-forward landing it can carry a conf
+# the run landed itself. Still read before the anchor round-trip, so the F5 refusal precedes that.
+#
+# AND AT THE ADVERTISED TIP R (implementation review round 2, M1 and L2). The window that finds the
+# first committed blob is keyed on commits the run writes, so the read at BASE alone was a read at a
+# base the run could still choose. Handed R, the tip `observe_anchor` saw the remote advertise, this
+# reads `LANDING_NODES` there too, and the answer is `lander` only when BOTH confs list this node and
+# `undeclared` only when NEITHER declares the key, R's conf absent or blank; every other pair is
+# `handoff`. `--close` hands R in after the anchor round-trip and before the landing decision, and
+# still reads BASE alone before it, for F5; `--preflight` hands R in, the anchor observed above it.
+#
+# WHAT IT DOES NOT BUY: the machine and user come from the environment the run inherits, so a run set
+# on it can spoof both. That is protocol section 9's limit for any check under the run's own uid, and
+# it buys only the landing every run could make before this key existed. R is the remote's and not
+# the run's, so a run cannot grant itself a node there; what it can still choose is a BASE whose conf
+# lists no node at all, which then reads `handoff` beside a declaring R and never `undeclared`. A
+# record with no committed blob carrying a base - the honest window between a preflight and its first
+# records commit - is read at the working copy, the window leg check 17 is silent over too, and a run
+# that commits a rotation-shaped add beside a moved base re-anchors that window: the narrowing below
+# makes it a deliberate forgery, the environment spoof's class, and the read at R is what binds.
+LN_STATE=""; LN_TAG=""; LN_WHY=""
+resolve_landing_node() { # run-state file · [R, the advertised tip] -> LN_STATE undeclared|lander|handoff, LN_TAG and LN_WHY
+  local rel=$1 r=${2:-} base rc pst ptag pwhy qst
+  LN_STATE=undeclared; LN_TAG=""; LN_WHY=""
+  base=$(fact "$rel" base)
+  read_pinned_base "$rel"; rc=$?
+  if [ "$rc" = 2 ]; then
+    LN_STATE=handoff; LN_WHY=$RPB_WHY
+    return 0
+  fi
+  if [ "$rc" = 0 ] && [ "$base" != "$RPB_BASE" ]; then
+    LN_STATE=handoff
+    LN_WHY="the record's base fact reads ${base:-nothing} and this run first committed it as $RPB_BASE, so which conf decides the landing is in doubt and is not read as undeclared"
+    return 0
+  fi
+  if [ -n "$base" ] && ! GIT rev-parse --verify --quiet "$base^{commit}" >/dev/null 2>&1; then
+    LN_STATE=handoff
+    LN_WHY="the pinned BASE $base does not resolve to a commit here, so which nodes may land cannot be read and is not read as absent"
+    return 0
+  fi
+  resolve_landing_at "$base" "the pinned BASE"
+  [ -n "$r" ] || return 0
+  pst=$LN_STATE; ptag=$LN_TAG; pwhy=$LN_WHY
+  if [ "$pst" = handoff ]; then return 0; fi
+  resolve_landing_at "$r" "the advertised tip ${r:0:8}"
+  qst=$LN_STATE
+  if [ "$pst" = "$qst" ]; then
+    if [ "$pst" = lander ]; then LN_TAG=$ptag; else LN_WHY=$pwhy; fi
+    return 0
+  fi
+  LN_STATE=handoff; LN_TAG=""
+  [ "$qst" = handoff ] || LN_WHY="LANDING_NODES reads $pst at the pinned BASE and $qst at the advertised tip ${r:0:8}, and a landing needs both to list this node or neither to declare the key"
+  return 0
+}
+# THE ANSWER ONE CONF GIVES, for resolve_landing_node: `LANDING_NODES` evaluated from the project
+# conf blob at <commit>, named <where> in every reason. No commit or no conf there is `undeclared`.
+resolve_landing_at() { # commit · where -> LN_STATE, LN_TAG and LN_WHY for that commit's conf
+  local c=$1 where=$2 cf v m u bad
+  LN_STATE=undeclared; LN_TAG=""; LN_WHY=""
+  if [ -z "$c" ] || ! cf=$(GIT show "$c:.unattended.conf" 2>/dev/null); then
+    LN_WHY="no project conf at $where"; return 0
+  fi
+  v=$( LANDING_NODES=""; exec 3>&1
+       eval "$cf"$'\n\n''printf "OK %s" "${LANDING_NODES:-}" >&3' >/dev/null 2>&1 )
+  case "$v" in
+    "OK "*) v=${v#OK } ;;
+    *) LN_STATE=handoff
+       LN_WHY="the project conf at $where could not be evaluated to the end, so which nodes may land is unknown and is not read as absent"
+       return 0 ;;
+  esac
+  if [ -z "${v//[[:space:]]/}" ]; then LN_WHY="the project conf at $where declares no LANDING_NODES"; return 0; fi
+  m=$(read_host_name) || m=""; u=$(read_user_name) || u=""
+  if [ -z "$m" ] || [ -z "$u" ]; then
+    LN_STATE=handoff
+    LN_WHY="this node's machine or user cannot be read, machine ${m:-unread} and user ${u:-unread}"
+    return 0
+  fi
+  if LN_TAG=$(resolve_landing_tag "$v" "$m" "$u"); then LN_STATE=lander; return 0; fi
+  LN_TAG=""; LN_STATE=handoff
+  bad=$(scan_landing_nodes "$v" | tr '\n' ' ' | sed 's/ $//')
+  LN_WHY="$m/$u is not a node LANDING_NODES at $where declares able to land${bad:+, and these tokens are malformed or declared twice: $bad}"
+  return 0
+}
+# THE BASE THIS RUN FIRST COMMITTED, for resolve_landing_node. The window is this run's: commits from
+# the newest one that ADDED an archived `RUN.*.md` beside the record, where the last rotation landed,
+# or the whole history when the build was never rotated. Oldest first, the first blob whose
+# `## Run facts` section carries a base answers. Status 1 when none does, and while an HONEST rotation
+# sits STAGED and uncommitted, because then this run has committed no blob of its own yet.
+#
+# ONLY AN HONEST ROTATION OPENS THE WINDOW (implementation review round 2, M1 and L2): the newest add
+# must be `check_honest_rotation`'s shape, and a staged add is honest only while HEAD's committed
+# record is the finished one it retires. Anything else is status 2, a doubt, with RPB_WHY: a decoy
+# archive committed beside a moved base would otherwise make the moved base the window's first blob.
+RPB_BASE=""; RPB_WHY=""
+read_pinned_base() { # run-state file -> 0 with RPB_BASE · 1 when no committed blob carries one · 2 in doubt, with RPB_WHY
+  local rel=$1 dir rot c l sec b staged
+  RPB_BASE=""; RPB_WHY=""
+  dir=${rel%/RUN.md}
+  staged=$(GIT diff --cached --name-only --diff-filter=A -- "$dir/RUN.*.md" 2>/dev/null | head -1)
+  if [ -n "$staged" ]; then
+    check_retired_blob "HEAD:$rel" && return 1
+    RPB_WHY="an archive beside the run-state file is staged, $staged, while the record HEAD carries is not a finished one being retired, so which run's base decides the landing is in doubt"
+    return 2
+  fi
+  rot=$(GIT log -1 --diff-filter=A --format=%H -- "$dir/RUN.*.md" 2>/dev/null)
+  if [ -n "$rot" ] && ! check_honest_rotation "$rot" "$rel"; then
+    RPB_WHY="the newest commit adding an archive beside the run-state file, ${rot:0:8}, is not a rotation of a finished record, so which run's base decides the landing is in doubt"
+    return 2
+  fi
+  for c in $(GIT log --reverse --format=%H HEAD ${rot:+--not "$rot^@"} -- "$rel" 2>/dev/null); do
+    b=""; sec=0
+    while IFS= read -r l || [ -n "$l" ]; do
+      l=${l%$'\r'}
+      case "$l" in
+        "## Run facts"*) sec=1; continue ;;
+        "## "*) sec=0; continue ;;
+      esac
+      [ "$sec" = 1 ] || continue
+      case "$l" in base:*) b=${l#base:}; while [ "${b# }" != "$b" ]; do b=${b# }; done; break ;; esac
+    done < <(GIT show "$c:$rel" 2>/dev/null)
+    if [ -n "$b" ]; then RPB_BASE=$b; return 0; fi
+  done
+  return 1
+}
+# AN HONEST ROTATION: <commit> adds only archives named `RUN.<PHASE>.<8 hex>.md`, each hex the prefix
+# of the blob it adds, and its parent's committed record is one `--preflight` retires.
+check_honest_rotation() { # commit · run-state file -> 0 when it is one
+  local c=$1 rel=$2 dir p n=0 blob
+  dir=${rel%/RUN.md}
+  while IFS= read -r p; do
+    [ -n "$p" ] || continue
+    n=$((n + 1))
+    [[ "${p##*/}" =~ ^RUN\.[A-Z]+\.([0-9a-f]{8})\.md$ ]] || return 1
+    blob=$(GIT rev-parse -q --verify "$c:$p" 2>/dev/null) || return 1
+    [ "${blob:0:8}" = "${BASH_REMATCH[1]}" ] || return 1
+  done < <(GIT diff-tree --root --no-commit-id --no-renames -r --diff-filter=A --name-only "$c" -- "$dir/RUN.*.md" 2>/dev/null)
+  [ "$n" -gt 0 ] && check_retired_blob "$c^:$rel"
+}
+# A RECORD `--preflight` RETIRES, read from a committed blob: a terminal phase; a LANDING or a HELD
+# hand-off, each retired once it derives LANDED, its archive then reading LANDED; or `abandoned`
+# beside `work-landed-at`. A shape, not a derivation: the derivation needs the tip it was made at.
+check_retired_blob() { # rev:path -> 0 when that blob is one
+  local ph
+  ph=$(read_blob_fact "$1" phase)
+  [ -n "$ph" ] || return 1
+  if is_terminal "$ph" || [ "$ph" = LANDING ] || [ "$ph" = HELD ]; then return 0; fi
+  [ -n "$(read_blob_fact "$1" abandoned)" ] && [ -n "$(read_blob_fact "$1" work-landed-at)" ]
+}
+read_blob_fact() { # rev:path · key -> that key's value in the blob's Run facts section
+  GIT show "$1" 2>/dev/null | extract_run_facts | K="$2:" awk 'index($0, ENVIRON["K"]) == 1 { v = substr($0, length(ENVIRON["K"]) + 1); sub(/\r$/, "", v); sub(/^ +/, "", v); print v; exit }'
+}
+print_landing_line() { # -> the one line naming what resolve_landing_node decided
+  case "$LN_STATE" in
+    lander) echo "unattended: landing — lander · node $LN_TAG" ;;
+    handoff) echo "unattended: landing — handoff · $LN_WHY · this run ends at --handoff --code owner-landing" ;;
+    *) echo "unattended: landing — undeclared · every node may land" ;;
+  esac
+}
+
 verb_status() { # slug
   local slug="$1" rel p w unit nparked parked unowed nnoted
   local _age _lrc _hcode _huntil _hsince _hfrom _hreason _hunp _wit8 _bar pshow _hrun
@@ -5609,7 +6305,11 @@ verb_status() { # slug
   # LANDING carries its reason. A bare LANDED here would be indistinguishable from one `--landed`
   # wrote, and a bare LANDING from a record nobody has pushed.
   pshow="$p"
-  if [ "$p" = LANDED ] && [ -n "$DP_LANDING" ]; then
+  # TOOL-dUnstuckLanding-14 S2 - a hand-off an owner landed reads `LANDED (attended)`, derived or
+  # settled, so the reader can tell it from a landing the run made itself.
+  if [ "$p" = LANDED ] && { [ "$DP_BY" = attended ] || [ "$(fact "$rel" landed-by)" = attended ]; }; then
+    pshow="LANDED (attended)"
+  elif [ "$p" = LANDED ] && [ -n "$DP_LANDING" ]; then
     pshow="LANDED (derived: ${DP_LANDING:0:8} on $DP_AREF at ${DP_TIP:0:8})"
   elif [ "$p" = LANDING ] && [ -n "$DP_REASON" ]; then
     pshow="LANDING (not on the remote: $DP_REASON)"
@@ -6205,7 +6905,7 @@ resolve_holder_worktree() { # run-state file -> 0 holds, 1 not here, 2 no run br
 #   last-move-source · transcript · last-stall · stale · verdict · stale-bound · holder-ref
 #
 # `state` is `terminal`, `finished-unstamped`, `held` or `live`, and a LANDING the node's landed log
-# names reads `terminal`. `last-move` is the seconds since the NEWEST of `derive_last_move`'s
+# names reads `terminal`, as does a hand-off its owner landed (`derive_liveness`). `last-move` is the seconds since the NEWEST of `derive_last_move`'s
 # signals: the last commit, the newest dirty or untracked write, the newest gate log under
 # `<git-dir>/gate-logs/`, the `gate-queue-heartbeat` a bar waiting in the gate runner's turnstile
 # rewrites beside them on every tick, the session transcript when its path derives, and the newest
@@ -6228,14 +6928,40 @@ resolve_holder_worktree() { # run-state file -> 0 holds, 1 not here, 2 no run br
 # because a zero from it would read as moved-just-now — the reassuring-zero class `--audit` refuses
 # the same way.
 print_liveness() { # slug
-  local slug="$1" rel ph state d dref w sid pid kid alive newest src dead sidecar f tp last stale verdict lc hw
+  local slug="$1" rel ph
   check_slug "$slug" || return 1
   rel=$(runmd_of "$slug")
   [ -f "$rel" ] || { fail 52 "no run-state file, so there is no run whose liveness can be graded: $rel"; return 1; }
   # The RECORDED phase, through its reader (the gate leg's phase-reader routing check): this verb
   # takes no network, and the derived reader asks the remote for its tip, while the OFFLINE half of
-  # that derivation is `finished-unstamped` below.
+  # that derivation is `finished-unstamped` and the landed hand-off below.
   ph=$(read_recorded_phase "$rel"); [ -n "$ph" ] || ph=absent
+  if ! derive_liveness "$slug" "$rel" "$ph"; then
+    fail 52 "the liveness cannot be measured on this node, because a probe it needs answered nothing, so no verdict is answerable and a zero from a dead probe would read as moved-just-now: $LV_DEAD"; return 1
+  fi
+  # `stale-bound` after the verdict: the number `stale` was graded against, printed so the
+  # resume tick bounds its in-flight skip by THIS reader's bound instead of reading the key itself
+  # — a second reader would be a second copy of its default (closing review round 2, defect D).
+  # `holder-ref` LAST, the fifteenth key: the branch ELSEWHERE was keyed on, so the tick names it
+  # and skips a record naming none without a second spelling of the key.
+  printf 'phase: %s\nstate: %s\ndefault-branch: %s\nsession: %s\npid: %s\nkeepalive: %s\npid-alive: %s\nlast-move: %s\nlast-move-source: %s\ntranscript: %s\nlast-stall: %s\nstale: %s\nverdict: %s\nstale-bound: %s\nholder-ref: %s\n' \
+    "$ph" "$LV_STATE" "$LV_DREF" "$LV_SID" "$LV_PID" "$LV_KID" "$LV_ALIVE" "$LV_MOVE" "$LV_SRC" "${LV_TP:-absent}" "$LV_LAST" "$LV_STALE" "$LV_VERDICT" "$RESUME_STALE_BOUND" "${HW_REF:-absent}"
+  return 0
+}
+
+# TOOL-dUnstuckLanding-14 - THE VERDICT HALF OF `--liveness`, factored out so `--settle` reads the
+# verdict without printing it; `print_liveness` prints exactly what it printed before. Status 1 is a
+# dead probe, named in LV_DEAD, and no verdict is set. Globals, so no caller runs it in a substitution.
+#
+# S2 - A LANDED HAND-OFF IS TERMINAL, offline. A HELD record under a hand-off code whose landing
+# commit (`read_landing_commit` with the hand-off codes) is an ancestor of the ref the
+# `finished-unstamped` test already resolves reads `terminal`: the out-of-session reader agrees with
+# `--status` without the network round-trip its contract forbids. A fetch it has not seen reads HELD.
+LV_STATE=""; LV_DREF=""; LV_SID=""; LV_PID=""; LV_KID=""; LV_ALIVE=""; LV_MOVE=""; LV_SRC=""; LV_TP=""
+LV_LAST=""; LV_STALE=""; LV_VERDICT=""; LV_DEAD=""
+derive_liveness() { # slug · run-state file · recorded phase -> 0 with LV_*, 1 with LV_DEAD
+  local slug="$1" rel="$2" ph="$3" state d dref w sid pid kid alive newest src dead sidecar f tp last stale verdict lc hw
+  LV_STATE=""; LV_VERDICT=""; LV_DEAD=""
   # THE REF THE ANCESTRY TEST USES, resolved whether or not the test runs, so a skipped test is
   # announced as `unresolved` rather than read as `live`. The remote-tracking ref when it exists,
   # the local branch otherwise; `default_branch` reads GOV_DEFAULT_BRANCH then origin/HEAD.
@@ -6255,6 +6981,10 @@ print_liveness() { # slug
   if is_terminal "$ph"; then
     state=terminal
   elif [ -n "$lc" ] && read_landed_observation "$slug" "$lc"; then
+    state=terminal
+  elif [ "$ph" = HELD ] && [ "$dref" != unresolved ] && check_handoff_code "$(fact "$rel" hold-code)" \
+       && lc=$(read_landing_commit "$rel" "$HOLD_CODES_HANDOFF" 2>/dev/null) \
+       && GIT merge-base --is-ancestor "$lc" "$dref" 2>/dev/null; then
     state=terminal
   elif [ "$ph" = HELD ]; then
     state=held
@@ -6291,9 +7021,7 @@ print_liveness() { # slug
   # verdict printed over it would be a guess an actor that kills then acts on.
   hw=0; resolve_holder_worktree "$rel" || hw=$?
   if [ "$hw" = 1 ] && [ "$HW_HEAD" = unreadable ] && [ -z "$dead" ]; then dead="git symbolic-ref -q HEAD"; fi
-  if [ -n "$dead" ]; then
-    fail 52 "the liveness cannot be measured on this node, because a probe it needs answered nothing, so no verdict is answerable and a zero from a dead probe would read as moved-just-now: $dead"; return 1
-  fi
+  if [ -n "$dead" ]; then LV_DEAD="$dead"; return 1; fi
   # THE LAST RECORDED STALL, verbatim and uninterpreted: the stall-recorder writes the file and this
   # verb reads its last line. Absent or empty is `none`, a value and not a refusal.
   last=none; f="$sidecar/stall.$slug.log"
@@ -6309,13 +7037,9 @@ print_liveness() { # slug
   elif [ "$sid" = absent ]; then verdict=UNBOUND
   elif [ "$stale" = yes ]; then verdict=STALE
   else verdict=LIVE; fi
-  # `stale-bound` after the verdict: the number `stale` was graded against, printed so the
-  # resume tick bounds its in-flight skip by THIS reader's bound instead of reading the key itself
-  # — a second reader would be a second copy of its default (closing review round 2, defect D).
-  # `holder-ref` LAST, the fifteenth key: the branch ELSEWHERE was keyed on, so the tick names it
-  # and skips a record naming none without a second spelling of the key.
-  printf 'phase: %s\nstate: %s\ndefault-branch: %s\nsession: %s\npid: %s\nkeepalive: %s\npid-alive: %s\nlast-move: %s\nlast-move-source: %s\ntranscript: %s\nlast-stall: %s\nstale: %s\nverdict: %s\nstale-bound: %s\nholder-ref: %s\n' \
-    "$ph" "$state" "$dref" "$sid" "$pid" "$kid" "$alive" "$((TC_NOW - newest))" "$src" "${tp:-absent}" "$last" "$stale" "$verdict" "$RESUME_STALE_BOUND" "${HW_REF:-absent}"
+  LV_STATE="$state"; LV_DREF="$dref"; LV_SID="$sid"; LV_PID="$pid"; LV_KID="$kid"; LV_ALIVE="$alive"
+  LV_MOVE="$((TC_NOW - newest))"; LV_SRC="$src"; LV_TP="$tp"; LV_LAST="$last"; LV_STALE="$stale"
+  LV_VERDICT="$verdict"
   return 0
 }
 
@@ -6478,6 +7202,15 @@ verb_resume() { # slug
   [ -f "$rel" ] || { fail 10 "no run-state file, so there is no run to resume: $rel"; return 1; }
   read_derived_phase "$rel"; p="$DP_PHASE"
   [ -n "$p" ] || { fail 10 "the run-state file declares no phase, and a run with no phase is not resumable: $rel"; return 1; }
+  # TOOL-dUnstuckLanding-14, implementation review round 1 M8 - A SETTLED RUN IS NOT REVIVED. `--settle`
+  # writes `abandoned` only over a dead lease whose work landed, and both live counts drop the record
+  # for it; a take-over here would drive a run those counts no longer see, under a `work-landed-at`
+  # check 15 reds once its witness moves. Above the matrix and before any write, so no row reaches
+  # it; the verb that starts a run on this slug is --preflight, which retires the record.
+  if [ -n "$(fact "$rel" abandoned)" ]; then
+    fail 106 "this record carries abandoned: --settle found its lease dead and its work landed, so the run it names is over, and resuming it would drive a run the live-run counts no longer see; nothing was written - start the next run on this slug with --preflight $slug --keepalive-id <id>, which retires this record to its archive and starts on a fresh one: abandoned at $(fact "$rel" abandoned)"
+    return 1
+  fi
   # TOOL-dDerivedDocket-16 S4 - PROPERTY P6, ABOVE THE MATRIX. Several rows below return without ever
   # reaching the authorization block — the holder resuming under its own id is the common one — so a
   # check placed there would fire on a take-over and never on the resume an agent actually runs after
@@ -6531,6 +7264,15 @@ verb_resume() { # slug
   # already carries reads LANDED by derivation and takes the row below.
   if [ -n "$KID" ]; then refuse_if_terminal "$rel" --resume --recorded || return 1; fi
   if is_terminal "$p"; then
+    # TOOL-dUnstuckLanding-14 S3 - A HAND-OFF AN OWNER LANDED HAS NOTHING TO RESUME, and it is
+    # never the re-bind below, which is a pushed LANDING's: its recorded HELD would otherwise take
+    # the HELD take-over row. The verb that writes what git proves is named; nothing is written.
+    if [ "$DP_BY" = attended ]; then
+      ok="${DP_LANDING:0:8} is on $DP_AREF at ${DP_TIP:0:8}"
+      verb_status "$slug" || true
+      echo "unattended: nothing to resume — this hand-off was landed by its owner: its record's commit $ok, so write that durably with --settle $slug; nothing was written"
+      return 0
+    fi
     # TOOL-dDerivedDocket-61 S8 - A PUSHED LANDING `--landed` HAS NOT YET OBSERVED IS RE-BOUND. Past
     # the recorded refusal above, a derived terminal carrying a landing commit can only be a recorded
     # LANDING read LANDED, so no second phase read is needed. `fail 55` sends a session the record
@@ -6742,9 +7484,13 @@ verb_resume() { # slug
 # pair of quotes stripped. A run that commits `land` into its own copy therefore enables nothing, and
 # a run that re-points the conf key moves nothing until a gated push has landed it.
 #
-# BLANK IS `park`, AND IT SAYS SO. Absent, blank or malformed reads `park`, and so does `land` with no
-# positive age bound beside it; every one of those is announced on the policy line, because the
-# difference between the two readings is whether an inherited red lands.
+# BLANK IS `land`, THE KIT DEFAULT, AND IT SAYS SO (ruling TOOL-dUnstuckLanding-22, superseding that
+# part of TOOL-dDerivedDocket-24's D12-i4; built by TOOL-dUnstuckLanding-16). No policy file named and
+# no hook file at R, a named one absent at R, and an absent or blank `INHERITED_RED` all read `land`, and `land` with no positive
+# bound reads `land` with no bound. A value outside `park land` still reads `park`, because a typo must
+# never land a red, and so does a path that leaves the tree and a missing R, where nothing can read
+# INHERITED. Every reading is announced on the policy line. THE AGE DECIDES ESCALATION ONLY: an
+# INHERITED red lands under `land` at any age, and an aged leg's ask is filed BLOCKER, not HIGH.
 #
 # WHAT THIS DOES NOT DECIDE: whether a red is inherited. That is the runner's attribution, read here
 # from the run record of a bar whose id this driver pinned, and never re-derived.
@@ -6771,43 +7517,61 @@ read_policy_key() { # file text · key -> the LAST `<key>=` line's value, cleane
 }
 
 GP_POLICY=park; GP_MAX_AGE=""; GP_WHY=""
+# A CONF NAMING NO POLICY FILE READS THE PRE-PUSH HOOK'S OWN (closing review round 1, M7 and M12). The
+# hook reads `$top/.githooks/gate-env.sh` at R on every gated push whatever the conf says, so when the
+# conf is absent at R or its GATE_POLICY_FILE is blank, the driver reads that same file at the same R
+# before it defaults to land. Defaulting first made the two readers disagree in the direction that
+# strands a run: the driver read land and wrote LANDING, and the hook read park and refused the push.
+# The path is spelled as the hook derives it; a named file is still the conf's, read as before.
 read_gate_policy() { # R -> GP_POLICY (park|land), GP_MAX_AGE (a positive integer, or empty) and GP_WHY
-  local r=$1 conf path blob pol age
+  local r=$1 conf path blob pol age bnd via="" hook=".githooks/gate-env.sh"
   GP_POLICY=park; GP_MAX_AGE=""; GP_WHY=""
   if [ -z "$r" ]; then
     GP_WHY="no advertised tip was observed, so there is no R to read a gate policy at"; return 0
   fi
   # THE CONF'S OWN NAME, derived from the path this driver sourced, so the file is spelled once.
   if ! conf=$(GIT show "$r:${CONF##*/}" 2>/dev/null); then
-    GP_WHY="the project conf is absent at ${r:0:8}, so no gate policy is adopted there"; return 0
+    via="the project conf is absent at ${r:0:8}, so no policy file is named"
+  else
+    path=$(read_policy_key "$conf" GATE_POLICY_FILE)
+    [ -n "$path" ] || via="GATE_POLICY_FILE is blank or absent in the conf at ${r:0:8}"
   fi
-  path=$(read_policy_key "$conf" GATE_POLICY_FILE)
-  if [ -z "$path" ]; then
-    GP_WHY="GATE_POLICY_FILE is blank or absent in the conf at ${r:0:8}, so no gate policy is adopted"; return 0
-  fi
-  case "$path" in
-    /*|[A-Za-z]:*|..|../*|*/..|*/../*)
-      GP_WHY="GATE_POLICY_FILE at ${r:0:8} is not a repo-relative path inside the tree: $path"; return 0 ;;
-  esac
-  if ! blob=$(GIT show "$r:$path" 2>/dev/null); then
-    GP_WHY="GATE_POLICY_FILE names $path, which is absent at ${r:0:8}"; return 0
+  if [ -n "$via" ]; then
+    path=$hook
+    if ! blob=$(GIT show "$r:$path" 2>/dev/null); then
+      GP_POLICY=land
+      GP_WHY="$via, and the pre-push hook's own $path is absent there too, so the kit default land applies, with no age bound"; return 0
+    fi
+  else
+    case "$path" in
+      /*|[A-Za-z]:*|..|../*|*/..|*/../*)
+        GP_WHY="GATE_POLICY_FILE at ${r:0:8} is not a repo-relative path inside the tree, which reads park: $path"; return 0 ;;
+    esac
+    if ! blob=$(GIT show "$r:$path" 2>/dev/null); then
+      GP_POLICY=land
+      GP_WHY="GATE_POLICY_FILE names $path, which is absent at ${r:0:8}, so the kit default land applies, with no age bound"; return 0
+    fi
   fi
   pol=$(read_policy_key "$blob" INHERITED_RED)
   age=$(read_policy_key "$blob" INHERITED_RED_MAX_AGE)
   case "$age" in ''|0*|*[!0-9]*) age="" ;; esac
+  if [ -n "$age" ]; then bnd="an age bound of $age first-parent landings"; else bnd="no age bound"; fi
+  # THE BOUND TRAVELS UNDER EITHER POLICY when one is declared: the runner ages and owns each
+  # INHERITED leg with it, and the auto-filed ask names that owner and is escalated BLOCKER when the
+  # leg reads aged. Nothing lands or holds on it.
   case "$pol" in
-    land) if [ -n "$age" ]; then
-            GP_POLICY=land; GP_MAX_AGE=$age
+    land) GP_POLICY=land; GP_MAX_AGE=$age
+          if [ -n "$age" ]; then
             GP_WHY="INHERITED_RED=land with an age bound of $age first-parent landings, read from $path at ${r:0:8}"
           else
-            GP_WHY="INHERITED_RED=land with no positive INHERITED_RED_MAX_AGE beside it in $path at ${r:0:8}, which reads park"
+            GP_WHY="INHERITED_RED=land with no positive INHERITED_RED_MAX_AGE beside it in $path at ${r:0:8}, so no leg is aged and nothing is escalated"
           fi ;;
-    # UNDER `park` THE BOUND STILL TRAVELS when one is declared: the runner ages and owns each
-    # INHERITED leg with it, and the auto-filed ask names that owner. Nothing lands on it.
     park) GP_MAX_AGE=$age; GP_WHY="INHERITED_RED=park, read from $path at ${r:0:8}" ;;
-    '')   GP_WHY="$path at ${r:0:8} declares no INHERITED_RED" ;;
-    *)    GP_WHY="INHERITED_RED is '$pol' in $path at ${r:0:8}, outside 'park land'" ;;
+    '')   GP_POLICY=land; GP_MAX_AGE=$age
+          GP_WHY="$path at ${r:0:8} declares no INHERITED_RED, so the kit default land applies, with $bnd" ;;
+    *)    GP_WHY="INHERITED_RED is '$pol' in $path at ${r:0:8}, outside 'park land', which reads park" ;;
   esac
+  [ -z "$via" ] || GP_WHY="$GP_WHY; $via, so the file the pre-push hook reads decides"
 }
 
 # THE RECORD OF ONE BAR, read by the decision table `gates-green` applies to a red exit. The first
@@ -6815,19 +7579,20 @@ read_gate_policy() { # R -> GP_POLICY (park|land), GP_MAX_AGE (a positive intege
 #
 #   the verdict reads tree_moved yes                  moved   UNMET, naming the move
 #   no usable record (see below)                      none    UNMET exactly as before this unit
-#   every red INHERITED, none aged, policy land       land    MET, a gates-inherited fact
-#   every red INHERITED, policy park or any aged      hold    UNMET, the hold line
-#   any OWN, MIXED, DEAD PROBE or CONTENDED           other   UNMET, the attribution lines
+#   every red INHERITED, at any age, policy land       land    MET, a gates-inherited fact
+#   every red INHERITED, policy park                   hold    UNMET, the hold line
+#   any OWN, MIXED, DEAD PROBE or CONTENDED            other   UNMET, the attribution lines
 #
 # A USABLE RECORD is a RED verdict with no wall breach and `tree_moved no`, beside an attribution
 # with one row per failed leg. A wall that fired left the legs it killed out of the attribution, so a
-# partial record is not an all-INHERITED one. An UNPROVEN age reads as aged: it never lands. "Any
-# aged" is read inside the all-INHERITED rows, so a run's own red always reaches the attribution
-# lines rather than a hold that no resume can clear.
-GR_STATE=none; GR_LEGS=""; GR_WHY=""
-read_gates_record() { # run dir · policy -> GR_STATE, GR_LEGS (the red legs, comma-joined) and GR_WHY
-  local d=$1 pol=$2 v tm fl wb n=0 inh=0 aged=0 leg ver age
-  GR_STATE=none; GR_LEGS=""; GR_WHY=""
+# partial record is not an all-INHERITED one. THE AGE DECIDES NO ROW (TOOL-dUnstuckLanding-16 S3): an
+# aged leg, and one whose age is unproven, land under `land` like any other. GR_AGED names the legs
+# whose age reads `aged` — never an unproven one, since nothing proves it aged — for the BLOCKER
+# escalation and the MET line.
+GR_STATE=none; GR_LEGS=""; GR_WHY=""; GR_AGED=""
+read_gates_record() { # run dir · policy -> GR_STATE, GR_LEGS and GR_AGED (comma-joined) and GR_WHY
+  local d=$1 pol=$2 v tm fl wb n=0 inh=0 leg ver age
+  GR_STATE=none; GR_LEGS=""; GR_WHY=""; GR_AGED=""
   if [ -z "$d" ] || [ ! -f "$d/verdict" ]; then
     GR_WHY="the bar left no run record under the id this driver pinned"; return 0
   fi
@@ -6848,7 +7613,7 @@ read_gates_record() { # run dir · policy -> GR_STATE, GR_LEGS (the red legs, co
     n=$((n + 1)); GR_LEGS="$GR_LEGS${GR_LEGS:+,}$leg"
     [ "$ver" = INHERITED ] || continue
     inh=$((inh + 1))
-    case "$age" in ''|-|*[!0-9]*) aged=$((aged + 1)) ;; esac
+    [ "$age" = aged ] && GR_AGED="$GR_AGED${GR_AGED:+,}$leg"
   done < "$d/attribution"
   if [ "$n" = 0 ] || [ "$n" != "${fl:-}" ]; then
     GR_WHY="the attribution names $n red leg(s) and the verdict counts ${fl:-none} failed"; return 0
@@ -6856,9 +7621,8 @@ read_gates_record() { # run dir · policy -> GR_STATE, GR_LEGS (the red legs, co
   if [ "$inh" != "$n" ]; then
     GR_STATE=other; GR_WHY="a red leg reads OWN, MIXED, DEAD PROBE or CONTENDED, so this red is the run's to fix"; return 0
   fi
-  if [ "$pol" = land ] && [ "$aged" = 0 ]; then GR_STATE=land; return 0; fi
+  if [ "$pol" = land ]; then GR_STATE=land; return 0; fi
   GR_STATE=hold
-  [ "$aged" -gt 0 ] && GR_WHY="$aged INHERITED leg(s) read aged or unproven past the age bound, which never lands"
   return 0
 }
 
@@ -6933,19 +7697,34 @@ print_gate_backstop() { # where the bound came from -> the line, from GB_SUM and
 # and a KEEP row, in the grammar the memory-tree kit's parser reads. This driver is shell and has no
 # declared route to that kit's Python renderers, so it writes the rows in their grammar and has the
 # parser, reached through `ASKS_CMD` in call shape 1 with no `--at` (the rows are staged and exist at
-# no rev), read each new id back. One `ask` row, status OPEN, SEV HIGH and this slug as its home is
-# the only acceptance; anything else REMOVES the rows and prints the witness, so a grammar drift
-# between this writer and that parser is caught at write time rather than by the next reader.
+# no rev), read each new id back. One `ask` row, status OPEN, the SEV this item owes and this slug as
+# its home is the only acceptance; anything else REMOVES the rows and prints the witness, so a grammar
+# drift between this writer and that parser is caught at write time rather than by the next reader.
+#
+# THE SEV IS THE AGE'S ESCALATION (TOOL-dUnstuckLanding-16 S4, ruling TOOL-dUnstuckLanding-22). A leg
+# whose age reads `aged` — red already at R~n under the declared bound n — is filed BLOCKER, with a
+# text naming the bound; every other INHERITED leg, an unproven age included, is filed HIGH. The ask
+# stays in the CLOSING build's backlog either way, where ABSORB's fourth condition reads it.
 #
 # REUSED BEFORE IT IS FILED. An ask this build already filed for the SAME leg red at the SAME R, read
-# back OPEN, is named and nothing is written: each resume of a held run reruns this item over the same
-# inherited red, and a second HIGH ask per hold is noise an owner has to dispose of. The match needs R
-# as well as the leg, because the ask's `seen` locator and `run` command pin R.
+# back OPEN at the SEV now owed, is named and nothing is written: each resume of a held run reruns this
+# item over the same inherited red, and a second ask per hold is noise an owner has to dispose of. The
+# match needs R as well as the leg, because the ask's `seen` locator and `run` command pin R. An ask
+# read back at ANOTHER severity is not reused (the unit's F3): a BLOCKER that should exist is never
+# hidden behind a HIGH, and the duplicate is visible.
 #
 # STAGED BY THIS ITEM, and committed by the step that closes the run. On the MET path, under
 # `LANDER_MODE=in-place`, `--close` commits them in its own records commit (`write_close_commit`),
 # and under `primary` they ride the records commit the close names as owed; on a path that prints a
-# `hold ·` line the Skill's Close sequence commits them before `--hold`.
+# `hold ·` line the Skill's Close sequence commits them before `--hold`. THE VIEWS ARE RENDERED AND
+# STAGED WITH THE ROWS (TOOL-dMendedRecall-2), by `write_ask_views`, once per call that filed at
+# least one ask: the memory-tree generator derives generated views from this file, and rows staged
+# without them left the index stale for the pre-commit's freshness check, which refused the close's
+# own records commit after the whole bar was paid. So whichever step commits the rows commits the
+# views too, and none of the three needs a render of its own, except after a miss the helper names:
+# a dirty input of the views, say, which it will not render over, and whose line carries the repair.
+# A BLOCKER filed for an aged leg (TOOL-dUnstuckLanding-16) counts as filed exactly as a HIGH does,
+# and a reused ask at the SEV owed counts as nothing, so neither ruling moves the views' trigger.
 # With `ASKS_CMD` blank the rows are PRINTED and nothing is written, so the auto-file cannot arm itself
 # before the project adopts the ask contract.
 read_leg_argv() { # run dir · R · leg name -> that leg's argv in R's manifest, space-joined; rc 1 unreadable
@@ -7013,8 +7792,126 @@ write_backlog_rows() { # BACKLOG.md path · slug · ask row · SEV row · KEEP r
   mv "$tmp" "$f"
 }
 
-read_ask_back() { # ask id · slug -> 0 when ASKS_CMD reads it back as ONE OPEN HIGH ask homed at slug; AB_WHY
-  local id=$1 slug=$2 rc rows n
+# ---- THE VIEWS THE ROWS MAKE STALE, re-rendered and staged beside them. TOOL-dMendedRecall-2 S2-S4.
+# The memory-tree generator derives the family backlog view, the ledger shard and the build README's
+# generated regions from the rows `write_backlog_rows` writes, so rows staged alone leave those views
+# stale in the same index, and the pre-commit's freshness check then refuses the commit carrying
+# them: under `in-place` that is `write_close_commit`'s refusal 69, after the whole bar was paid.
+# The generator is the one THIS install holds, named by the library resolver the repair text already
+# uses, and it must be a FILE at the top of the tree being closed, where this driver runs. Run from a
+# kit outside that tree, the resolver answers a path relative to the kit's own repository, and the
+# file test is what keeps the render from writing anywhere but here.
+#
+# WHAT IS STAGED is the render's own delta and nothing else: a path carrying unstaged or untracked
+# changes AFTER the render that carried none BEFORE it. Under `primary` `--close` does not refuse a
+# dirty tree (under `in-place` refusal 62 does, before the bar), so a path the operator was already
+# editing is never swept into the records commit, and one the render changed too is NAMED as left
+# unstaged, because staging it would commit work the run did not do.
+# `GENERATED_INDEXES` is not the staging set: the build README's regions move too, outside it.
+#
+# AND NOTHING IS RENDERED OVER A DIRTY INPUT (TOOL-dMendedRecall-2 rev-3, the closing review's M1).
+# The delta rule guards the render's OUTPUT side only. The generator reads its inputs off the disk —
+# every tracked path under the memory root, and `.memory-tree.conf` whether tracked or not — so an
+# unstaged edit to one, a spec's status header say, feeds the render, and the views it moves were
+# clean before it: the delta rule staged them while the edit itself stayed unstaged. That commit
+# passed the pre-commit, whose freshness check renders from the same worktree, and was stale in
+# every checkout of it. So a dirty input stages NO view: the miss line names the inputs and the
+# repair, and the operator's records commit then meets the freshness check loudly. An UNTRACKED path
+# under the memory root is no input, because the generator lists its inputs with `git ls-files`.
+#
+# A MISS IS NAMED AND DOES NOT REFUSE. No generator, a path that is not a file here, a dirty input,
+# or a render that exits non-zero or is killed by its bound prints the miss line with the repair,
+# stages what a render that ran did move under the same rule, and returns 1; the caller's verdict is
+# unchanged. Rolling the rows back instead would drop the inherited leg's owner from the record. A
+# stage that git itself refuses, a held index lock say, is named on a line of its own and returns 1
+# too, because the success line would otherwise claim paths the index does not hold.
+write_ask_views() { # count of asks this call filed -> 0 rendered and staged, 1 on a named miss; one line each
+  local n=$1 gen="" py="" rc=0 why="" fix="" p h line paths="" left="" staged=1 dirty="" gd=""
+  local -a post=() stage=()
+  local -A h0=()
+  AV_STAGED=""
+  # ONE test for both halves of "resolves": the library resolver runs the inline `resolve_python`
+  # itself and answers nothing without it, so a separate interpreter branch after it would be an
+  # arm no state reaches. The interpreter is taken FIRST because the render needs it by name.
+  if ! py=$(resolve_python 2>/dev/null) || [ -z "$py" ] || ! gen=$(resolve_index_generator) || [ -z "$gen" ]; then
+    why="no memory-tree generator resolves beside this kit"
+  elif [ ! -f "$gen" ]; then
+    why="the generator the resolver names is not a file here: $gen"
+  else
+    # BEFORE: every path carrying unstaged or untracked changes, keyed to the bytes it carried then,
+    # and the ones among them the render would read as input. NUL-read both times, because a
+    # C-quoted path would name nothing to `add`. The two listings are disjoint by construction,
+    # tracked and untracked, so no path arrives twice. `--no-renames`, so a path the render moves
+    # away is listed by its own name and staged as the deletion it is, never folded into a
+    # destination (memory/gotchas/porcelain-diff-names-a-rename-by-its-destination.md).
+    while IFS= read -r -d '' p; do
+      h0[$p]=$(GIT hash-object -- "$p" 2>/dev/null) || h0[$p]=-
+      case "$p" in "$M"/*|.memory-tree.conf) dirty="$dirty${dirty:+ }$p" ;; esac
+    done < <(GIT diff --no-renames --name-only -z 2>/dev/null)
+    while IFS= read -r -d '' p; do
+      h0[$p]=$(GIT hash-object -- "$p" 2>/dev/null) || h0[$p]=-
+      [ "$p" != .memory-tree.conf ] || dirty="$dirty${dirty:+ }$p"
+    done < <(GIT ls-files --others --exclude-standard -z 2>/dev/null)
+    # THE GENERATOR'S OWN CODE is an input too (closing review round 2, L1): `--write` imports its
+    # sibling modules from the directory it lives in, so an unstaged edit there feeds the render as
+    # surely as one under the memory root does. Asked of git with that directory as the pathspec, so
+    # the names come back repo-relative whatever spelling the resolver used; a generator at the root
+    # names its own top-level modules only, never the whole tree.
+    gd=$(dirname -- "$gen")
+    [ "$gd" != . ] || gd=':(glob)*.py'
+    while IFS= read -r -d '' p; do
+      case " $dirty " in *" $p "*) ;; *) dirty="$dirty${dirty:+ }$p" ;; esac
+    done < <(GIT diff --no-renames --name-only -z -- "$gd" 2>/dev/null)
+    if [ -n "$dirty" ]; then
+      why="the views' inputs carry changes the index does not hold, and a render would stage views derived from them: $dirty"
+      fix="stage or discard those changes, then run "
+    fi
+  fi
+  if [ -n "$why" ]; then
+    echo "gates-green: the $n filed ask(s) are staged, but the generated views were not re-rendered: $why; until they are, a records commit meets a stale index — repair: $fix$(derive_index_repair)"
+    return 1
+  fi
+  # `-B`, because the render is a Python process and its imports would otherwise leave bytecode
+  # caches beside the kit: in a tree that does not ignore them they are new untracked paths, and the
+  # delta rule above would stage them into the records commit (observed over this unit's fixture).
+  run_bounded "$py" -B "$gen" --write; rc=$?
+  while IFS= read -r -d '' p; do post+=("$p"); done \
+    < <(GIT diff --no-renames --name-only -z 2>/dev/null; GIT ls-files --others --exclude-standard -z 2>/dev/null)
+  for p in "${post[@]}"; do
+    if [ -n "${h0[$p]+x}" ]; then
+      h=$(GIT hash-object -- "$p" 2>/dev/null) || h=-
+      [ "$h" = "${h0[$p]}" ] || left="$left${left:+ }$p"
+    else
+      stage+=("$p"); paths="$paths${paths:+ }$p"
+    fi
+  done
+  [ "${#stage[@]}" = 0 ] || GIT add -A -- "${stage[@]}" >/dev/null 2>&1 || staged=0
+  # RECORDED THE MOMENT THE STAGE SUCCEEDS, whatever the render's verdict (implementation review
+  # round 2, M4 and L3): a generator that wrote views and then exited non-zero left them staged and
+  # unrecorded, so the bar tie did not exclude them and the hand-off fail 105 prescribes failed 83.
+  [ "$staged" = 0 ] || [ "${#stage[@]}" = 0 ] || AV_STAGED=$paths
+  if [ "$rc" != 0 ]; then
+    echo "gates-green: the $n filed ask(s) are staged, but the generated views were not re-rendered: the generator exited $rc after ${RB_TOOK}s; until they are, a records commit meets a stale index — repair: $(derive_index_repair)"
+    [ -z "${RB_OUT:-}" ] || printf '%s\n' "$RB_OUT" | sed 's/^/    /'
+  fi
+  if [ "$staged" = 0 ]; then
+    echo "gates-green: the generated views for $n filed ask(s) were re-rendered, but git could not stage the ${#stage[@]} path(s) the render moved: $paths; until it does, a records commit meets a stale index — stage them by hand"
+    return 1
+  fi
+  [ "$rc" = 0 ] || return 1
+  if [ "${#stage[@]}" -gt 0 ]; then
+    line="gates-green: re-rendered the generated views for $n filed ask(s) and staged ${#stage[@]} path(s): $paths"
+  elif [ -n "$left" ]; then
+    line="gates-green: re-rendered the generated views for $n filed ask(s) and staged 0 path(s): none"
+  else
+    line="gates-green: re-rendered the generated views for $n filed ask(s); the render changed no path"
+  fi
+  echo "$line${left:+; left unstaged, dirty before the render: $left}"
+  return 0
+}
+
+read_ask_back() { # ask id · slug · SEV -> 0 when ASKS_CMD reads it back as ONE OPEN ask of that SEV homed at slug; AB_WHY
+  local id=$1 slug=$2 sev=$3 rc rows n
   AB_WHY=""
   run_bounded $ASKS_CMD --tsv --ready "$id" --target "$slug"; rc=$?
   if [ -z "$RB_STDOUT" ]; then AB_WHY=$(derive_stream_verdict "$rc"); return 1; fi
@@ -7028,7 +7925,7 @@ read_ask_back() { # ask id · slug -> 0 when ASKS_CMD reads it back as ONE OPEN 
   n=$(printf '%s\n' "$rows" | awk 'NF' | wc -l | tr -d ' ')
   if [ "$n" != 1 ]; then AB_WHY="the declared ask generator returned $n row(s) for $id, and one is the only answer"; return 1; fi
   case "$rows" in
-    "$id	OPEN	$slug	HIGH") return 0 ;;
+    "$id	OPEN	$slug	$sev") return 0 ;;
   esac
   AB_WHY="the declared ask generator read $id back as: $rows"
   return 1
@@ -7036,18 +7933,21 @@ read_ask_back() { # ask id · slug -> 0 when ASKS_CMD reads it back as ONE OPEN 
 
 write_inherited_asks() { # slug · R · run dir
   local slug=$1 r=$2 d=$3 bl leg ver age own8 ownid cand reused fam seq id argv file tok a s k prior had restored
-  local r8=${2:0:8} today
+  local r8=${2:0:8} today sev filed=0
+  WI_STAGED=""
   bl="$M/builds/$slug/BACKLOG.md"
   today=$(date -u +%Y-%m-%d)
   [ -f "$d/attribution" ] || return 0
   while IFS=$'\t' read -r leg ver _ _ _ age own8 ownid _; do
     [ "$ver" = INHERITED ] || continue
-    # REUSE FIRST, over this build's own filings for the same leg AND the same R.
+    # THE SEV OWED: BLOCKER for an aged leg, HIGH for every other one, an unproven age included.
+    sev=HIGH; [ "$age" = aged ] && sev=BLOCKER
+    # REUSE FIRST, over this build's own filings for the same leg AND the same R, at the SEV owed.
     reused=""
     if [ -f "$bl" ] && [ -n "${ASKS_CMD:-}" ]; then
       while IFS= read -r cand; do
         [ -n "$cand" ] || continue
-        if read_ask_back "$cand" "$slug"; then
+        if read_ask_back "$cand" "$slug" "$sev"; then
           echo "gates-green: ask $cand already OPEN for leg $leg at $r8 · reused"; reused=1; break
         fi
       done < <(grep -F -- "inherited red: leg $leg red at $r8," "$bl" 2>/dev/null \
@@ -7075,12 +7975,18 @@ write_inherited_asks() { # slug · R · run dir
     [ -n "$file" ] || file=${argv%% *}
     seq=$(derive_ask_seq "$fam" "$slug")
     id="$fam-$slug-$seq"
-    if [ "$own8" != - ] && [ -n "$own8" ]; then
+    if [ "$sev" = BLOCKER ]; then
+      a="- $id · filed $today · inherited red: leg $leg red at $r8, older than the ${GP_MAX_AGE:-declared}-landing age bound · seen \`$file\`@$r8 run \`$argv\` · accept the leg is green at the default branch's tip"
+    elif [ "$own8" != - ] && [ -n "$own8" ]; then
       a="- $id · filed $today · inherited red: leg $leg red at $r8, introduced by $own8 · seen \`$file\`@$r8 run \`$argv\` · accept the leg is green at the default branch's tip → $own8"
     else
       a="- $id · filed $today · inherited red: leg $leg red at $r8, introduced by an unknown landing · seen \`$file\`@$r8 run \`$argv\` · accept the leg is green at the default branch's tip"
     fi
-    s="- SEV · $id · HIGH · a merge-bar leg is red on the default branch"
+    if [ "$sev" = BLOCKER ]; then
+      s="- SEV · $id · BLOCKER · a merge-bar leg is red on the default branch, older than the age bound"
+    else
+      s="- SEV · $id · HIGH · a merge-bar leg is red on the default branch"
+    fi
     k="- KEEP · $id · filed by an unattended run for the owning build; outside this build's goal"
     if [ -z "${ASKS_CMD:-}" ]; then
       echo "gates-green: ASKS_CMD is blank, so the auto-file is DARK and writes nothing; it would have filed, in $bl:"
@@ -7105,8 +8011,10 @@ write_inherited_asks() { # slug · R · run dir
       fi
     fi
     mkdir -p "${bl%/*}" && write_backlog_rows "$bl" "$slug" "$a" "$s" "$k" && GIT add -- "$bl" 2>/dev/null
-    if read_ask_back "$id" "$slug"; then
-      echo "gates-green: filed ask $id for leg $leg red at $r8, staged in $bl"
+    if read_ask_back "$id" "$slug" "$sev"; then
+      echo "gates-green: filed ask $id for leg $leg red at $r8, $sev, staged in $bl"
+      filed=$((filed + 1))
+      case " $WI_STAGED " in *" $bl "*) ;; *) WI_STAGED="$WI_STAGED${WI_STAGED:+ }$bl" ;; esac
     else
       # REMOVED, and the file put back exactly as it was: a row the parser cannot read back is a row
       # every later reader would read differently from this writer. A path that EXISTED before the
@@ -7117,15 +8025,23 @@ write_inherited_asks() { # slug · R · run dir
         if cp -- "$prior" "$bl"; then GIT add -- "$bl" 2>/dev/null; else restored=0; fi
       else GIT rm -q --cached -f -- "$bl" >/dev/null 2>&1; rm -f -- "$bl"; fi
       if [ "$restored" = 1 ]; then
-        echo "gates-green: the rows for leg $leg were REMOVED — the declared ask generator did not read $id back as one OPEN HIGH ask homed at $slug: $AB_WHY"
+        echo "gates-green: the rows for leg $leg were REMOVED — the declared ask generator did not read $id back as one OPEN $sev ask homed at $slug: $AB_WHY"
       else
-        echo "gates-green: the rows for leg $leg could NOT be removed — $bl was not put back from its backup, which is KEPT at $prior; restore it by hand before committing. The declared ask generator did not read $id back as one OPEN HIGH ask homed at $slug: $AB_WHY"
+        echo "gates-green: the rows for leg $leg could NOT be removed — $bl was not put back from its backup, which is KEPT at $prior; restore it by hand before committing. The declared ask generator did not read $id back as one OPEN $sev ask homed at $slug: $AB_WHY"
         prior=""
       fi
       [ -z "${RB_OUT:-}" ] || printf '%s\n' "$RB_OUT" | sed 's/^/    /'
     fi
     [ -z "$prior" ] || rm -f -- "$prior"
   done < "$d/attribution"
+  # TOOL-dMendedRecall-2 S1 - THE VIEWS, once per call and only when this call FILED: a reused ask,
+  # the dark path, a leg it could not file and rows it rolled back move no view, so a call that
+  # files nothing prints exactly what it printed before the views were its job. A miss is named
+  # by the helper and changes nothing here: the item's verdict is the caller's, as it was.
+  [ "$filed" -gt 0 ] || return 0
+  write_ask_views "$filed" || :
+  [ -z "$AV_STAGED" ] || WI_STAGED="$WI_STAGED $AV_STAGED"
+  return 0
 }
 
 # ---- S7: THE TWO ESCAPE ROUTES, BACKED BY THE ATTRIBUTION OR REFUSED.
@@ -7142,8 +8058,8 @@ write_inherited_asks() { # slug · R · run dir
 # uid, so a run set on forging them can plant an all-INHERITED record and point the fact at it. What
 # this closes is the SENTENCE — "not mine", asserted with nothing behind it — and what remains is a
 # forgery, the limit protocol section 9 states for every check that runs beside the thing it grades.
-check_inherited_override() { # run-state file · the verb as the refusal names it -> 0 when admitted
-  local rel=$1 verb=$2 f id gd head d hh htc tm why="" n=0 leg ver
+check_inherited_override() { # run-state file · the verb as the refusal names it · [record-only] -> 0 when admitted
+  local rel=$1 verb=$2 tie=${3:-} f id gd head d hh htc tm why="" n=0 leg ver
   f=$(fact "$rel" gates-run); id=${f%% *}
   # The git dir comes off the sidecar root's ONE derivation in the library (check 32), never a
   # second spelling of it here.
@@ -7157,7 +8073,7 @@ check_inherited_override() { # run-state file · the verb as the refusal names i
     hh=$(awk -F'\t' '$1=="head"{print $2; exit}' "$d/header" 2>/dev/null)
     htc=$(awk -F'\t' '$1=="tree_clean"{print $2; exit}' "$d/header" 2>/dev/null)
     tm=$(awk -F'\t' '$1=="tree_moved"{print $2; exit}' "$d/verdict" 2>/dev/null)
-    if [ "$hh" != "$head" ]; then
+    if ! check_bar_tied "$hh" "$head" "$rel" "$tie" "$d"; then
       why="the bar it names ran at ${hh:0:8} and HEAD is now ${head:0:8}, so its record describes another commit"
     elif [ "$htc" != yes ]; then
       why="the bar it names ran on a tree whose header reads tree_clean ${htc:-none}, so its record may grade edits HEAD does not carry"
@@ -7177,6 +8093,111 @@ check_inherited_override() { # run-state file · the verb as the refusal names i
   [ -z "$why" ] && return 0
   fail 83 "$verb is refused unless the attribution record of the last gates-green bar reads every red leg INHERITED on the tree being closed, so gates-green must run on HEAD first; the condition that failed: $why"
   return 1
+}
+
+# TOOL-dUnstuckLanding-13 S4 - IS THE BAR TIED TO THIS TREE. Equal heads always are. `record-only`
+# also admits a bar head that differs from HEAD in the run-state file ALONE, and only `--handoff`
+# passes it: `gates-green` writes and stages its `gates-run` fact, and `--hold`'s clean-tree refusal
+# then makes the run commit that record before it may hold, which moves HEAD off the bar's head by
+# exactly the run's own record. `--close` and `--abort` pass nothing and keep the strict equality.
+# A bar head this clone cannot resolve makes the diff fail, which reads as untied.
+#
+# TOOL-dUnstuckLanding-27 S3 - THE RECORD IS NOT ALL THE CLOSE STAGES. Over an inherited-only red
+# under `land`, `write_inherited_asks` also stages the build's BACKLOG.md and `write_ask_views` the
+# views it re-rendered, so excluding the record alone refused the very hand-off fail 105 prescribes.
+# The set is read from THE BAR'S OWN RUN RECORD, `staged` beside its attribution, never from the
+# run-state file (implementation review round 2, M2 and L1): a fact there was one line a run could
+# edit after the bar, naming a spec or the whole memory root. Each line is `path@blob`, the blob the
+# close STAGED, `-` for a staged deletion. A path is excluded only while HEAD's blob for it is still
+# that one, so a view the close staged and prose then edited after the bar unties the bar. It is
+# excluded only when it names a FILE at the bar head or at HEAD, so a directory, a wildcard spelled
+# literally or a path absent at both ends excludes nothing and is named on a NOTE line; a view the
+# render deleted, present at the bar head only, is still excluded. An entry outside the memory root
+# is not one the close stages, and neither is one carrying a `..` segment, which leaves the root
+# while spelling it: each is named and never excluded. Each exclusion is a LITERAL pathspec. A bar
+# whose record names no set excludes the run-state file alone, which is the behaviour before the set
+# existed, and says so once per process.
+#
+# WHAT IT DOES NOT BUY: the set is written by this driver under the run's own uid into a directory
+# the run can write, the residual `check_inherited_override` states for the attribution beside it. A
+# run set on forging it can name a path and the blob HEAD carries; what this closes is the
+# run-state line any edit could widen, and a stale or directory entry from an honest close.
+check_bar_tied() { # bar head · HEAD · run-state file · [record-only] · [the bar's run record dir] -> 0 when the bar graded this tree
+  local e p b t1 t2 cur
+  local -a ex=()
+  [ "$1" = "$2" ] && return 0
+  [ -n "$1" ] && [ "${4:-}" = record-only ] || return 1
+  ex=(":(exclude)$3")
+  if [ -z "${5:-}" ] || [ ! -f "$5/staged" ]; then
+    if [ -z "$BT_NOTED" ]; then
+      BT_NOTED=1
+      echo "unattended: NOTE - the bar's run record names no staged set, so the bar tie excludes the run-state file alone: $3"
+    fi
+  else
+    while IFS= read -r e || [ -n "$e" ]; do
+      e=${e%$'\r'}; [ -n "$e" ] || continue
+      p=${e%@*}; b=${e##*@}
+      case "/$p/" in
+        */../*) echo "unattended: NOTE - the bar's staged set names a path with a .. segment, which no close stages, so the bar tie does not exclude it: $p"; continue ;;
+        "/$M"/*) ;;
+        *) echo "unattended: NOTE - the bar's staged set names a path outside the memory root, which no close stages, so the bar tie does not exclude it: $p"; continue ;;
+      esac
+      [ "$p" != "$3" ] || continue
+      t1=$(GIT cat-file -t "$1:$p" 2>/dev/null); t2=$(GIT cat-file -t "$2:$p" 2>/dev/null)
+      if [ "$t1" != blob ] && [ "$t2" != blob ]; then
+        echo "unattended: NOTE - the bar's staged set names no file at the bar head or at HEAD, so the bar tie does not exclude it: $p"
+        continue
+      fi
+      cur=-
+      [ -z "$t2" ] || cur=$(GIT rev-parse -q --verify "$2:$p" 2>/dev/null) || cur=unreadable
+      if [ "$cur" != "$b" ]; then
+        echo "unattended: NOTE - the bar's staged set names a path whose blob at HEAD is not the one the close staged, so the bar tie does not exclude it: $p"
+        continue
+      fi
+      ex+=(":(exclude,literal)$p")
+    done < "$5/staged"
+  fi
+  GIT diff --quiet "$1" "$2" -- . "${ex[@]}" 2>/dev/null
+}
+
+# TOOL-dUnstuckLanding-27 S3 - THE STAGED SET, written into the bar's own run record when gates-green
+# reads its bar MET over an inherited-only red: one `path@blob` line per path the close staged, the
+# blob the index holds for it now, `-` where it holds a deletion. A bar that staged nothing writes no
+# file, and every bar has a run record of its own, so a later bar never inherits an older set.
+write_gates_staged() { # the bar's run record dir · paths staged beside the record, or empty
+  local p b
+  local -a ps=()
+  [ -n "$2" ] && [ -d "$1" ] || return 0
+  # `read -a`, never `for p in $2`: an unquoted expansion GLOBS against the working tree.
+  read -r -a ps <<<"$2"
+  for p in "${ps[@]}"; do
+    b=$(GIT rev-parse -q --verify ":$p" 2>/dev/null) || b=-
+    printf '%s@%s\n' "$p" "$b"
+  done > "$1/staged"
+}
+
+# TOOL-dUnstuckLanding-13 S3 - THE ATTRIBUTION GUARD ON `owner-landing`. "Only the landing remains"
+# is a claim about the bar, so it is backed by the bar's own record: a GREEN verdict tied to this
+# tree is admitted here, and anything else - a red, an untied or dirty bar, no bar at all - goes to
+# `check_inherited_override`, whose fail 83 admits only an all-INHERITED red. An OWN red is the
+# run's to fix, or to hand off as `owner-decision` with the decision parked, never a finished
+# landing waiting for an owner. WHAT IT DOES NOT BUY is what that function's header states: the run
+# writes both records under its own uid.
+check_handoff_bar() { # run-state file -> 0 when owner-landing is admitted; 1 after fail 83
+  local rel=$1 f id gd d head v hh htc tm
+  f=$(fact "$rel" gates-run); id=${f%% *}
+  gd=$(resolve_sidecar_dir) && gd=${gd%/unattended} || gd=""
+  head=$(GIT rev-parse HEAD 2>/dev/null); d="$gd/gate-run/$id"
+  if [ -n "$f" ] && [ -n "$gd" ] && [ -f "$d/header" ] && [ -f "$d/verdict" ]; then
+    v=$(awk -F'\t' '$1=="verdict"{print $2; exit}' "$d/verdict" 2>/dev/null)
+    hh=$(awk -F'\t' '$1=="head"{print $2; exit}' "$d/header" 2>/dev/null)
+    htc=$(awk -F'\t' '$1=="tree_clean"{print $2; exit}' "$d/header" 2>/dev/null)
+    tm=$(awk -F'\t' '$1=="tree_moved"{print $2; exit}' "$d/verdict" 2>/dev/null)
+    if [ "$v" = GREEN ] && [ "$htc" = yes ] && [ "$tm" = no ] && check_bar_tied "$hh" "$head" "$rel" record-only "$d"; then
+      return 0
+    fi
+  fi
+  check_inherited_override "$rel" "--handoff --code owner-landing" record-only
 }
 
 # TOOL-cBriefedPilot-1 - EVERY accumulated override is validated, skipped and parked, not just the
@@ -7342,8 +8363,16 @@ write_close_commit() { # slug · run-state file
   return 0
 }
 
+# TOOL-dUnstuckLanding-20 S5 - AN OVERRIDE ON A HAND-OFF NODE IS A FREE REFUSAL (F5), asked of the
+# answer `resolve_landing_node` last gave: before the anchor round-trip, and again after it reads R.
+check_handoff_override() { # override count -> 0 when none is refused; 1 after fail 104
+  [ "$LN_STATE" = handoff ] && [ "$1" -gt 0 ] || return 0
+  fail 104 "--close on a node LANDING_NODES does not declare able to land takes no --override, because this close lands nothing and an override would record a waiver for a landing the run never makes; park a decision with --park, or end the run with --handoff --code owner-landing once the Definition of Done is met: $LN_WHY"
+  return 1
+}
+
 verb_close() { # slug   (override pairs arrive in OV_ITEMS / OV_REASONS)
-  local slug="$1" rel item ck unmet=0 i=0 n ov reason _why
+  local slug="$1" rel item ck unmet=0 i=0 n ov reason _why _lnrec _lnwant
   n=${#OV_ITEMS[@]}
   GG_RUN_FACT=""; GG_INH_FACT=""
   check_slug "$slug" || return 1
@@ -7367,6 +8396,19 @@ verb_close() { # slug   (override pairs arrive in OV_ITEMS / OV_REASONS)
     fail 82 "the run is HELD, so the Definition-of-Done set would be evaluated against a run that stopped part-way for a cause outside itself; --resume it first, and close it when the work it paused in the middle of is done"
     return 1
   fi
+  # TOOL-dUnstuckLanding-20 S5 - THIS NODE'S OWN ANSWER DECIDES, resolved again here: a run resumed
+  # on another node carries the first node's `landing` fact, and trusting it would land from a node
+  # nobody declared. A disagreement is printed. On a hand-off node an override is a free refusal,
+  # before the anchor round-trip: this close lands nothing, so an override would park a waiver of an
+  # obligation the run never meets, and a later close on a listed node would park it twice (F5).
+  resolve_landing_node "$rel"
+  _lnrec=$(fact "$rel" landing); _lnwant=$LN_STATE
+  [ "$_lnwant" != undeclared ] || _lnwant=""
+  if [ "$LN_STATE" != undeclared ] || [ -n "$_lnrec" ]; then print_landing_line; fi
+  if [ "$_lnrec" != "$_lnwant" ]; then
+    echo "unattended: landing — this close resolves ${LN_STATE}${LN_TAG:+ · node $LN_TAG} and the record reads landing: ${_lnrec:-none}; the close's own answer decides"
+  fi
+  check_handoff_override "$n" || return 1
   # The SAME observation preflight made, made again here rather than read back from the record the
   # run wrote. Its refusals are not fatal to --close: authorization-reachable simply cannot be met without
   # an anchor, which is the honest outcome and is not overridable.
@@ -7382,7 +8424,26 @@ verb_close() { # slug   (override pairs arrive in OV_ITEMS / OV_REASONS)
   # stated cause and no forward move. `|| true` alone is the form --landed and --preflight already use:
   # the refusals are not fatal to --close, which is why they were suppressed rather than returned on,
   # and that reasoning was always about the STATUS and never about the message.
-  observe_anchor || true
+  # TOOL-dUnstuckLanding-19 S5 - under `primary` the refresh lists here, before the Definition of Done,
+  # so a refusing close still shows it; the fact is written only with the close's writes below. An
+  # anchor that refused marks the quiet observer done with that refusal, so no second bounded wait.
+  # Under `in-place`, `--prepare` already merged the tip, and nothing refreshes.
+  RF_FACT=""
+  if ! observe_anchor && [ "$LANDER_MODE" = primary ]; then
+    ADVQ_DONE=1; ADVQ_RC=1; ADVQ_REF=""; ADVQ_SHA=""
+    ADVQ_WHY="the anchor observation above refused, and a second bounded wait would answer the same"
+  fi
+  if [ "$LANDER_MODE" = primary ]; then derive_refreshed_at "$rel" "$slug" close; fi
+  # THE LANDING NODE AGAIN, NOW AT R TOO (implementation review round 2, M1): after the anchor
+  # round-trip and before any landing decision, so the read above still refused an override early.
+  # A changed answer is printed, and an override it now meets is the same free refusal. No anchor
+  # observed leaves the BASE answer, because authorization-reachable cannot be met without one.
+  if [ -n "${ASHA:-}" ]; then
+    _lnwant=$LN_STATE
+    resolve_landing_node "$rel" "$ASHA"
+    [ "$LN_STATE" = "$_lnwant" ] || print_landing_line
+    check_handoff_override "$n" || return 1
+  fi
   # Validate EVERY pair before any of them is acted on. The three messages below are byte-unchanged
   # from the single-override form, so their arms stay valid and no per-check ordinal moves.
   while [ "$i" -lt "$n" ]; do
@@ -7505,6 +8566,20 @@ verb_close() { # slug   (override pairs arrive in OV_ITEMS / OV_REASONS)
     fi
   done
   [ "$unmet" = 0 ] || return 1
+  # TOOL-dUnstuckLanding-20 S5 - A MET DoD ON A HAND-OFF NODE WRITES THE BAR'S FACTS AND REFUSES (F2).
+  # The facts first, because `--handoff --code owner-landing` reads `gates-run` through the
+  # attribution guard and refuses with none, so a close that refused before the bar would leave the
+  # one exit this designs unreachable. Nothing else is written: no carry check, no roster at landing,
+  # no phase and no close commit, because this node lands nothing.
+  if [ "$LN_STATE" = handoff ]; then
+    if [ -n "$GG_RUN_FACT" ]; then
+      set_fact "$rel" gates-run "$GG_RUN_FACT" || return 1
+    fi
+    if [ -n "$GG_INH_FACT" ]; then set_fact "$rel" gates-inherited "$GG_INH_FACT" || return 1; fi
+    stage_or_fail "$rel" || return 1
+    fail 105 "every declared Definition-of-Done item is met and this node may not land, so the bar's facts are written and staged and no phase is; commit the record, reap the keepalive, and end the run with --handoff $slug --code owner-landing --reason <text> --reaped <id>: $LN_WHY"
+    return 1
+  fi
   # TOOL-dDerivedDocket-3 S4 - AFTER the Definition of Done evaluates and BEFORE any write. The
   # override parks below are writes, so a carry refusal placed after them would leave a record
   # carrying overrides for a landing that cannot happen. Under `primary` this does not run at all.
@@ -7521,8 +8596,11 @@ verb_close() { # slug   (override pairs arrive in OV_ITEMS / OV_REASONS)
     fi
   fi
   # TOOL-dDerivedDocket-24 - THE BAR'S FACTS, with the close's other writes and after the carry check.
-  if [ -n "$GG_RUN_FACT" ]; then set_fact "$rel" gates-run "$GG_RUN_FACT" || return 1; fi
+  if [ -n "$GG_RUN_FACT" ]; then
+    set_fact "$rel" gates-run "$GG_RUN_FACT" || return 1
+  fi
   if [ -n "$GG_INH_FACT" ]; then set_fact "$rel" gates-inherited "$GG_INH_FACT" || return 1; fi
+  if [ -n "$RF_FACT" ]; then set_fact "$rel" refreshed-at "$RF_FACT" || return 1; fi
   i=0
   while [ "$i" -lt "$n" ]; do
     ov=${OV_ITEMS[$i]}
@@ -7595,7 +8673,7 @@ dod_met() { # slug · run-state file · item · checker
       # fixed that call site and did not grep for this one.
       DOD_OUT=""
       [ -n "$GATE_CMD" ] || return 1
-      local _grc _gr _gid _ggd _gh _gdir _gout _hold _gtry=0 _gbs=0 _gbound
+      local _grc _gr _gid _ggd _gh _gdir _gout _hold _gesc _gtry=0 _gbs=0 _gbound
       local -a _genv
       # TOOL-dDerivedDocket-24 S6 - THE BAR IS ATTRIBUTED AGAINST R AND HANDED THE POLICY READ AT R.
       # R is the tip `observe_anchor` saw the remote ADVERTISE, never local main or any other local
@@ -7729,10 +8807,10 @@ dod_met() { # slug · run-state file · item · checker
           fi ;;
         1)
           # TOOL-dDerivedDocket-24 S6 - THE DECISION TABLE over this bar's own record;
-          # `read_gates_record` states it, first matching row wins. Every red leg INHERITED within
-          # its age under `land` is MET; the same under `park`, or with an age past the bound, is
-          # UNMET and prints the hold line the Skill acts on; anything else is UNMET with the
-          # attribution lines exactly as before that unit.
+          # `read_gates_record` states it, first matching row wins. Every red leg INHERITED, at any
+          # age, under `land` is MET (TOOL-dUnstuckLanding-16); the same under `park` is UNMET and
+          # prints the hold line the Skill acts on; anything else is UNMET with the attribution lines
+          # exactly as before that unit. The MET line names the aged legs, whose asks are BLOCKER.
           read_gates_record "$_gdir" "$GP_POLICY"
           case "$GR_STATE" in
             moved)
@@ -7743,7 +8821,15 @@ dod_met() { # slug · run-state file · item · checker
               if [ "$GR_STATE" = land ]; then
                 GG_RUN_FACT="$_gid ${_gh:0:8}"
                 GG_INH_FACT="${_gr:0:8} $GR_LEGS"
-                DOD_OUT="gates-green MET over an inherited-only red under INHERITED_RED=land: $GR_LEGS red at ${_gr:0:8}, every one INHERITED within the ${GP_MAX_AGE}-landing age bound"
+                write_gates_staged "$_gdir" "$WI_STAGED"
+                if [ -z "$GP_MAX_AGE" ]; then
+                  _gesc="no age bound is declared, so no leg is aged and nothing is escalated"
+                elif [ -n "$GR_AGED" ]; then
+                  _gesc="aged past the ${GP_MAX_AGE}-landing age bound, so each ask is BLOCKER: $GR_AGED"
+                else
+                  _gesc="none aged past the ${GP_MAX_AGE}-landing age bound"
+                fi
+                DOD_OUT="gates-green MET over an inherited-only red under INHERITED_RED=land: $GR_LEGS red at ${_gr:0:8}, every one INHERITED; $_gesc"
                 return 0
               fi
               if [ "$GR_STATE" = hold ]; then
@@ -7972,7 +9058,10 @@ dod_met() { # slug · run-state file · item · checker
       fi
       return 0 ;;
     build-complete)
-      # The owner's "merge and push only when the entire build is fully done", given a checker.
+      # The owner's "merge and push only when the entire build is fully done", given a checker -
+      # SUPERSEDED as this item applies it by owner ruling TOOL-dUnstuckLanding-23: "a build lands its
+      # CLOSED units when every other unit is DEFERRED with an open ask it filed and no CLOSED unit
+      # consumes-from one". Term 5's carry-forward half is that ruling; the rest of the rule stands.
       # SIX terms, ALL required. Terms 1-2 guard the roster itself; term 3 is the only one that can
       # see a planned unit nobody specced, because the generated region is rendered from the specs
       # that EXIST; and term 4 is here because term 5 is VACUOUSLY TRUE over an empty selection -
@@ -8027,10 +9116,22 @@ dod_met() { # slug · run-state file · item · checker
         return 1
       fi
       _bcnon=$(nonterminal_units "$(readme_of "$slug")")
+      # ---- TERM 5, and its CARRY-FORWARD half (TOOL-dUnstuckLanding-18 S2). A non-terminal row that
+      # ---- is not DEFERRED reds exactly as it always did, every such row named. A DEFERRED row is
+      # ---- carried forward only through five conditions, checked per unit in the spec's order, each
+      # ---- returning early with its own message: a reader who cannot tell which one failed reaches
+      # ---- for `--override`, which is the move this half exists to make unnecessary.
+      local _bccarry=""
       if [ -n "$_bcnon" ]; then
-        DOD_OUT="a unit of this build is not terminal, so the build is not done; each row below is a unit whose status is neither CLOSED nor WONTDO:
-$_bcnon"
-        return 1
+        local _bcopen
+        _bcopen=$(printf '%s\n' "$_bcnon" | grep -vE '\| DEFERRED \|' || true)
+        if [ -n "$_bcopen" ]; then
+          DOD_OUT="a unit of this build is not terminal, so the build is not done; each row below is a unit whose status is neither CLOSED nor WONTDO, nor DEFERRED for the close-decision table's carry-forward:
+$_bcopen"
+          return 1
+        fi
+        check_carry_forward "$slug" "$rel" "$_bcrows" "$_bcnon" || return 1
+        _bccarry=$BC_CARRIED
       fi
       # ---- TERM 6: a CLOSED unit whose spec grades THIN. `plan_state` already computes this - it is
       # ---- the kit's own predicate for "too thin to build against" - and `verb_plan` overwrote the
@@ -8051,7 +9152,8 @@ $_bcnon"
       # ---- BLANK or absent turns the term off entirely, which is announced rather than silent.
       local _bcthin="" _bcid _bcsp _bcdate
       if [ -z "${SPEC_THIN_CUTOFF:-}" ]; then
-        DOD_OUT="note — the project declares no SPEC_THIN_CUTOFF, so the THIN term is OFF and a CLOSED unit whose spec states no acceptance criterion is not refused here"
+        DOD_OUT="${_bccarry:+$_bccarry
+}note — the project declares no SPEC_THIN_CUTOFF, so the THIN term is OFF and a CLOSED unit whose spec states no acceptance criterion is not refused here"
         return 0
       fi
       # EVERY SKIP IS ANNOUNCED. Three of them are reachable — a spec `load_spec_facts` could not
@@ -8081,8 +9183,10 @@ $_bcnon"
         DOD_OUT="a unit is CLOSED against a spec the kit's own predicate grades THIN — its scope, its acceptance criteria or its gates section is empty or names nothing observable, so nothing ever stated what done meant for it:$_bcthin"
         return 1
       fi
-      [ -z "$_bcskip" ] && return 0
-      DOD_OUT="the THIN term passed, and it did NOT grade every CLOSED unit — each entry below was skipped and why:$_bcskip"
+      # The carried-forward lines ride every MET return, so a partial landing is never silent.
+      [ -z "$_bcskip" ] && { DOD_OUT="$_bccarry"; return 0; }
+      DOD_OUT="${_bccarry:+$_bccarry
+}the THIN term passed, and it did NOT grade every CLOSED unit — each entry below was skipped and why:$_bcskip"
       return 0 ;;
     closing-review-recorded)
       # A tracked review record under this build NAMES the base the run pinned once. The join is the
@@ -9236,7 +10340,13 @@ verb_park() { # slug · item · reason
   done <<PARKED
 $(grep -F -- ' decision · item ' "$rel" 2>/dev/null | sed 's/^[^ ]* //')
 PARKED
+  # TOOL-dUnstuckLanding-19 S5 - after the no-op above, so a re-park writes and refreshes nothing.
+  # The fact is written only AFTER park() appended (closing review round 1, L1): park() refuses a
+  # carriage return this verb's own line-feed test cannot see, and a fact written first survived that
+  # refusal, so a verb that refused had still written. The listing prints first either way.
+  derive_refreshed_at "$rel" "$slug" park
   park "$rel" decision "$item" "$reason" || return 1
+  if [ -n "$RF_FACT" ]; then set_fact "$rel" refreshed-at "$RF_FACT" || return 1; fi
   stage_or_fail "$rel" || return 1
   echo "unattended: decision parked — $item"
   return 0
@@ -9626,9 +10736,9 @@ verb_rescope() { # slug · act · unit · successor · reason
   # would let a typo select an amendment nobody asked for, which is the shape ANCHOR_SCOPE's own
   # value guard exists to avoid.
   case "$act" in
-    retire|supersede|add) ;;
+    retire|supersede|add|defer) ;;
     *) local _bad=${act:-(none)}
-       fail 48 "--rescope --act takes one of retire, supersede or add, and a value outside that closed set may not select one by default: $_bad"; return 1 ;;
+       fail 48 "--rescope --act takes one of retire, supersede, add or defer, and a value outside that closed set may not select one by default: $_bad"; return 1 ;;
   esac
   [ -n "$reason" ] || { fail 48 "--rescope requires --reason, because an amendment recording no reason is indistinguishable from one nobody meant - the same argument --park and --waive already make: $act"; return 1; }
   shaped=$(printf '%s\n' "$unit" | _ids_of)
@@ -9641,6 +10751,9 @@ verb_rescope() { # slug · act · unit · successor · reason
                shaped=$(printf '%s\n' "$succ" | _ids_of)
                [ "$shaped" = "$succ" ] || { fail 48 "--rescope --successor is not id-shaped by the driver's own spelling: $succ"; return 1; } ;;
     add)       [ -z "$succ" ] || { fail 48 "--rescope --act add refuses --successor, because an addition names no unit it replaces: $succ"; return 1; } ;;
+    # TOOL-dUnstuckLanding-18 S4 - a deferral sets a unit aside against an open ask; nothing follows
+    # it inside this build, so a successor would describe a relation the row does not have.
+    defer)     [ -z "$succ" ] || { fail 48 "--rescope --act defer refuses --successor, because a deferral names no unit that follows it: $succ"; return 1; } ;;
   esac
   # ALL THREE of --park's field refusals, inherited rather than re-derived. park() appends ONE line
   # and the leg parses the region line-wise, so a newline forges a row nothing wrote; an item
@@ -9682,6 +10795,13 @@ RESCOPED
           fail 48 "a rescope names a unit the build README's generated units region does not carry and this build's folder does not file as a \`unit\` ask either, and a run cannot retire what its roster never held: $unit"; return 1
         fi
         echo "unattended: the retired id is a \`unit\` ask of this build's own folder and carries no generated unit row — the roster half design section 19.4 adds"
+      fi ;;
+    defer)
+      # TOOL-dUnstuckLanding-18 S4 - ONLY A ROSTER UNIT. A deferral is what `build-complete`'s
+      # carry-forward term reads beside a DEFERRED spec status, so it must name a unit the generated
+      # region carries; a `unit` ask with no spec has no status to be DEFERRED and nothing to carry.
+      if ! printf '%s\n' "$ids" | grep -qxF -- "$unit"; then
+        fail 48 "a rescope defers a unit the build README's generated units region does not carry, and only a unit of the roster can be set aside against an open ask: $unit"; return 1
       fi ;;
     add)
       # TOOL-dDerivedDocket-16 S10 - AN ADD MAY NOT NAME A FILED ASK THAT IS NOT A UNIT. The two
@@ -10661,7 +11781,9 @@ case "$VERB" in
   --landed)    verb_landed "$SLUG" ;;
   --abort)     verb_abort "$SLUG" "$REASON" "$HALT_CODE" ;;
   --hold)      run_hold "$SLUG" "$HALT_CODE" "$HOLD_UNTIL" "$REASON" "$HOLD_REAPED" "$HOLD_UNREACH" "$HOLD_RUN" ;;
-  --park)      verb_park "$SLUG" "$PK_ITEM" "$REASON" ;;
+  --handoff)   run_handoff "$SLUG" "$HALT_CODE" "$REASON" "$HOLD_REAPED" "$HOLD_UNREACH" ;;
+  --settle)    run_settle "$SLUG" ;;
+  --park)    verb_park "$SLUG" "$PK_ITEM" "$REASON" ;;
   --propose)   verb_propose "$SLUG" "$PK_ITEM" "$PK_STEP" "$REASON" ;;
   --brief)     verb_brief "$SLUG" "$BR_UNIT" "$RP_PATH" ;;
   --review)    verb_review "$SLUG" "$RV_SUBJECT" "$VERDICT" "$RV_BLOCKERS" "$RV_DISPOSITION" "$RV_HIGHS" "$RV_MINORS" ;;

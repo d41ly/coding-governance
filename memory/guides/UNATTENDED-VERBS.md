@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.63 -->
+<!-- gov:kit unattended@1.64 -->
 # Unattended runs — the verbs
 
 *This file is the second half of the binding contract; `UNATTENDED-PROTOCOL.md` is the first. Two
@@ -20,7 +20,10 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   config, and the run's first act must not be the mode whose past over-firing this protocol cites.
   Where the project declares `GATE_PROFILE_CMD` it pins the bar's backstop, the runner's wall plus
   its queue bound plus a margin, as the `gate-backstop` fact, and it refuses a wall below the
-  largest leg ceiling that profile reports.
+  largest leg ceiling that profile reports. It resolves this node against `LANDING_NODES` at BASE
+  and at the advertised tip, lander only where both list it and undeclared only where neither
+  declares the key, prints `landing — lander`, `handoff` or `undeclared`, and records the first two
+  as `landing`. A record `--settle` marked `abandoned` it retires like a finished one.
 - `--phase` — writes a phase and its witness. Without it the vocabulary is decorative: only
   `--preflight` and `--close` ever wrote one, so every member between them entered the file only by
   hand-editing an artifact this kit calls generated.
@@ -31,7 +34,10 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   what a gate reads. The run then carries on with the units that do not depend on that fork. Only
   when EVERY remaining unit depends on it does the run halt, with the fork-unresolvable code — a run
   that can still make progress on something else is not stuck, and stopping early spends an owner
-  turn that was not needed.
+  turn that was not needed. A park that is not a no-op REFRESHES first: it lists the commits on the
+  advertised tip in neither BASE nor HEAD that touch the build's README or a declared write, and
+  records `refreshed-at` — the tip and the count, `unlisted` for a tip this clone lacks, or
+  `unobserved` — never refusing and never fetching.
 - `--brief` — records WHAT a build pass was handed: the unit, and the hash of a TRACKED brief file,
   through `park()` as a `history` kind. `--status` reads it, grading each unit's LATEST row.
 - `--propose` — writes a PROPOSAL: an amendment a run would make to the playbook it is following,
@@ -84,12 +90,36 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   format from the slug COUNT gives a caller two output shapes for one verb: a frame-reading caller
   handed a single-build corpus finds none of the lines it parses and reads the run as having graded
   NOTHING. Without the flag the one-slug form stays byte-identical to what it has always been.
-- `--status` — one line: the phase, the first non-terminal unit, and the parked counts, then the
-  fields that print only when there is something to report — the resume tick's attempts,
-  `orphans <n>` from the process ledger (`UNATTENDED-STOPS.md` §14, nothing killed), and
+- `--status` — ONE line, opened by `unattended: <slug>`, with every field after it joined by ` · `
+  in the order this entry names them. The phase, the witness and the next unit print on every line:
+  `phase <phase>`, where a LANDED an owner's hand-off made, derived or settled, reads
+  `LANDED (attended)`, any other derived LANDED reads `LANDED (derived: <sha8> on <ref> at <tip8>)`,
+  and a LANDING the derivation explains reads `LANDING (not on the remote: <reason>)`;
+  `witness <sha>`, the sha reading `NONE` on a record that names none, which the verb then refuses;
+  and `next <unit>`, the link label of the first non-terminal row in the generated units region, or
+  `(no non-terminal unit)`. Every other field is OPTIONAL and prints only under the condition named
+  beside it, so a record none of them applies to prints only the fields above. Between the witness
+  and `next`: `halt-code <code>` when the record carries one, then `spec-audit <date>` when it pins
+  one. After `next`, in order: `parked <n>` when owed parked rows exist; `noted <n>` when rows the
+  owner is told of but owes no answer to exist; `STALE briefs <n>` when a unit's latest recorded
+  brief no longer hashes the same, then `briefs gone <n>` when its file is gone; the resume tick's
+  `resume-tick <n> attempt(s), last <stamp>` when its sidecar for this slug holds a line; and
+  `orphans <n>` when the process ledger names one (`UNATTENDED-STOPS.md` §14, nothing killed). Then
+  the two verdicts, the optional fields that print on a pass as well as on trouble, each on exactly
+  the records whose `--resume` would run its check, because a report silent on a pass cannot be
+  told from a verb that never asked. The pinned-asks verdict prints on every record that pins
+  `asks`, a pass included, since `--resume` runs check 73 above every row of its matrix, and reads
+  `asks as pinned` or
+  `asks moved at HEAD, check 73 refuses a resume: pinned [<pin>] at HEAD [<now>]`. The
+  holder-worktree verdict follows it, printing when the record carries `lease-utc`, its phase is not
+  terminal and it is not a LANDING the landed log observed, which are the records on which
+  `--resume` reaches check 58, a pass included, and reads `worktree holds the run`,
+  `worktree not the run's, check 58 refuses a resume here: <where>`, or
+  `worktree unanswerable, the record names no run branch`. Both read through the predicates the
+  refusals use, so neither refuses anything here. LAST,
   `keepalive <id> present|absent in the harness listing at <utc>` from the stop-guard's newest
-  sidecar line, whatever its phase, omitted when the record names no keepalive id or no line
-  exists. The line stays ONE line: a field joins it or does not print, and the suite arms that.
+  sidecar line, whatever its phase, when the record names a keepalive id and that line exists. The
+  line stays ONE line: a field joins it or does not print, and the suite arms that.
 - `--audit` — one line per unit whose dispatch rows at their newest anchor, taken together, are still
   open and whose spec is not terminal: how long the TREE has been idle (newest write, newest commit) and `PROGRESSING` or `STALLED` against `UNIT_STALL_BOUND`, a
   `STALLED` line followed by one remedy line. Read-only; the idle-wake runs it. It cannot see what
@@ -118,7 +148,8 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
 - `--resume` — re-enters the run from the run-state file; must agree with `--status`. With
   `--keepalive-id <id>` it applies the resume matrix: the holder's own id writes nothing, while a
   take-over, `--replaces`, the holder's restarted process and a pushed landing not yet observed
-  re-record keepalive, session and pid and stage the record; refused on a recorded terminal.
+  re-record keepalive, session and pid and stage the record; refused on a recorded terminal, and on
+  a record `--settle` marked `abandoned`, whose next run `--preflight` starts.
   `--scheduled <held-at>` marks it as the restart a DURABLE schedule issued. It refuses, numbered
   and before any write, unless the exact hold that schedule was filed for is still the record's
   state, and on success the take-over runs unchanged, still requires the session's own
@@ -128,7 +159,11 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   of `LANDING`, and it runs BEFORE the landing it authorises, so it cannot observe one. Its bar is
   bounded by the pinned backstop, and `gates-green` names each other way a bar ends as what it is: a
   TREE MOVED exit is run once more, and a HOST exit or a kill before the bar acquired the repository
-  prints a `hold ·` line rather than reading as a red leg.
+  prints a `hold ·` line rather than reading as a red leg. Under `primary` it prints `--park`'s
+  refresh before the DoD and records `refreshed-at` only with a met DoD's writes. It resolves its own
+  node again, at BASE before the anchor round-trip and at the advertised tip after it, and on a
+  `landing` hand-off node it refuses any override and, with the DoD
+  met, writes the bar's facts and refuses, naming `--handoff <slug> --code owner-landing`.
 - `--landed` — an OBSERVATION rather than a claim, guarded on the RECORDED phase. It accepts a record
   only at `LANDING` and re-observes the anchor. Under `primary` it is the one writer of `LANDED` and
   refuses unless HEAD is an ancestor of the tip the remote advertises; where `LANDER_MARKER` is
@@ -147,9 +182,11 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   id prints `keepalive-reaped: checked`; no sidecar, or no recorded id, prints `unchecked` with the
   reason and lands. It parses nothing beyond a substring test for the id, and it does not check that
   the id was ever this run's job.
-- `--rescope` — records an AMENDMENT to the build's own scope: `--act retire|supersede|add`, the unit
-  as `--item`, an optional `--successor`, and a reason. M3 delegates that scope and M2 names the three
-  acts; this verb is the record. It RECORDS rather than acts: a row derived from the change it just
+- `--rescope` — records an AMENDMENT to the build's own scope: `--act retire|supersede|add|defer`, the
+  unit as `--item`, an optional `--successor`, and a reason. M3 delegates that scope and M2 names the
+  first three acts; this verb is the record. `defer` sets a roster unit aside against an open ask so
+  `build-complete` can carry it forward (`UNATTENDED-STOPS.md` §15); it refuses `--successor`, and like
+  `retire` and `supersede` it is owed to the owner at the wrap-up. It RECORDS rather than acts: a row derived from the change it just
   made is a summary, and a check comparing the two confirms the driver instead of
   checking it. Nothing forces the call to precede the edit, so the row is a declaration in shape
   rather than in enforced ordering: the pair catches an amendment made with NO record, never a
@@ -235,9 +272,31 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   recorded as `hold-run`, rewritten EMPTY by a hold without it, printed on the HELD checkpoint and
   named by a take-over's relaunch line, and a value outside 1 to 64 letters, digits, `_` and `-` is
   refused with the rest. The contract is `UNATTENDED-STOPS.md`.
+- `--handoff` — the exit for a run whose work is sound and which an owner must land, or decide
+  first. `--handoff <slug> --code owner-landing|owner-decision --reason <text>` plus exactly one of
+  `--reaped <id>` and `--keepalive-unreachable <node>`. It is `--hold` with the condition fixed at
+  `owner`, so every refusal a hold makes applies and no durable restart is owed, and it is the only
+  producer of the two hand-off codes, which `--hold` refuses. It adds the landing recipe as a
+  `handoff` row the owner is shown, and `units-at-landing` and `asks-at-landing` as `--close` writes
+  them. `owner-landing` is refused over a bar that is not GREEN unless every red leg reads INHERITED;
+  `owner-decision` requires a parked decision row. The contract is `UNATTENDED-STOPS.md` §2 and §4.
+  The recipe's last command is `--settle`, through this kit's own repo-relative path. After its
+  last refusal it makes `--park`'s refresh and records `refreshed-at` with its writes.
+- `--settle` — writes what git proves onto a slug's live record. `--settle <slug>`. A hand-off its
+  owner landed, which every deriving reader already reads `LANDED (attended)`, becomes `phase:
+  LANDED` with `landed-by: attended` and `landed-derived`. An `ABORTED` record first committed before
+  `HANDOFF_CUTOFF`, and a working record whose `--liveness` verdict is `STALE` or `UNBOUND`, gain
+  `work-landed-at: <witness> <tip>` when the content predicate reads the run's own commits on the
+  advertised tip and none reverted; the working one gains `abandoned` too and keeps its phase. It
+  refuses, numbered and before any write, everything else, an unanswered remote and an undecidable
+  predicate; a settled record is said so, with nothing written. It STAGES and never commits. The
+  contract is `UNATTENDED-STOPS.md` §12.
 - `--abort` — the sole producer of `ABORTED`. It requires a recorded reason, a HALT CODE from the
   effective vocabulary, and both agent-attested items, and no machine item: an aborted run landed
   nothing, so the machine items assert obligations it does not have, while the idle-wake is still
   orphaned and the parked decisions still unseen. The code is validated before it is recorded and the
   refusal names the legal set; it is the twelfth authored fact, and it exists because one terminal
-  phase said a run stopped and never said why.
+  phase said a run stopped and never said why. From `HANDOFF_CUTOFF` an `ABORTED` record means
+  DISCARD, and an abort naming a hand-off-shaped halt code, on a record first
+  committed on or after it prints a notice naming `--handoff`, then aborts as asked; it never refuses.
+  With both attested items met it makes `--park`'s refresh and records `refreshed-at` beside the phase.

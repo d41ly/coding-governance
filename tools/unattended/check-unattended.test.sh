@@ -242,6 +242,7 @@ RESUME_SCHEDULE_DELETE="TheScheduleDelete"
 # and therefore the same announcement on every bar. Whether it should fire there is dFoldedVerdict's
 # question, not this fixture's, and it is untouched.
 DISPOSITION_CUTOFF="2099-01-01"
+UNDECLARED_WRITE_BUDGET="${UWB_OVERRIDE:-0}"
 EOF
 }
 
@@ -3993,17 +3994,22 @@ mkdir -p work && printf 'a\n' > work/one.txt
 git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
 hit "$(run_skip_leg)" "wrote $BRIEF in memory/builds/tRun/RUN.md"
 
-# ---- EACH RUN AGAINST ZERO, ON ITS OWN (TOOL-aWindowedPass-5). The run this branch drives fails on
-# ---- ONE counted write; the same record read from a detached HEAD binds no run and is only printed.
-# AC1: the bound run's one counted write fails the leg, naming the run
+# ---- EACH RUN AGAINST ITS OWN BUDGET (TOOL-aWindowedPass-5, TOOL-dUnstuckLanding-17). The run this
+# ---- branch drives fails when its counted writes exceed its per-build budget, 0 here, so ONE counted
+# ---- write fails it; the same record read from a detached HEAD binds no run and is only printed. This
+# ---- arm used to assert the opposite - spec 23 S1 / AC9 pinned "reports without failing" - and that
+# ---- pin is SUPERSEDED rather than deleted quietly.
+# AC1: the bound run's one counted write fails the leg, naming the run and its budget
 reset_tree
 write_overlapping_dispatch ARCH-tRun-1 "work/one.txt"
 mkdir -p work && printf 'a\n' > work/one.txt && printf 'c\n' > work/stray.txt
 git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
 out=$(run); rc=$?
 same "check 23 fails the bound run on one counted write, exit code" "$rc" "1"
-hit  "$out" "a pass of the run this branch drives committed outside the set it declared before dispatch while its window overlapped a sibling pass, and that declaration is the disjointness proof two concurrent passes rest on: 1 in memory/builds/tRun/RUN.md"
+hit  "$out" "a pass of the run this branch drives committed outside the set it declared before dispatch while its window overlapped a sibling pass, and that declaration is the disjointness proof two concurrent passes rest on: 1 in memory/builds/tRun/RUN.md against a per-build budget of 0"
 hit  "$out" "wrote work/stray.txt in memory/builds/tRun/RUN.md"
+# ...and the fleet line is printed beside the failure, naming the build over budget (S6)
+hit  "$out" "unattended: check 23 fleet — 1 undeclared write(s) over 1 graded pass(es) in 1 record(s) · budget 0 per build · over tRun=1 · range "
 # AC2: the same tree from a detached HEAD: reported OTHER RUN, and check 23 does not fail
 _c23br=$(git symbolic-ref -q --short HEAD)
 git checkout -q --detach
@@ -4011,12 +4017,55 @@ out=$(run)
 hit  "$out" "check 23 OTHER RUN memory/builds/tRun/RUN.md: 1 counted, graded at its own close - this tree drives a detached HEAD"
 miss "$out" "UNATTENDED check 23 FAILED"
 git checkout -q "$_c23br"
-# AC3: a conf still setting the retired key passes check 22 and is reported as retired
+
+# ---- ...AND THE BUDGET IS A BUDGET. Same fixture, one instance, a budget of 1: check 23 is clean.
+# ---- Without this control the arm above is satisfied by a check that reds on everything. It asserts
+# ---- check 23's own strings and not the leg's exit code, because the overlapping fixture's sibling
+# ---- pass never commits and no arm asserts the other checks clean on it.
+mutate .unattended.conf 's/^UNDECLARED_WRITE_BUDGET=.*/UNDECLARED_WRITE_BUDGET="1"/'
+out=$(run)
+miss "$out" "check 23 FAILED"
+# ...the fleet line names no build over a budget the record does not exceed
+hit  "$out" "· budget 1 per build · over none · "
+# ...and the per-instance detail survives on the report channel, so a green run has not gone dark.
+hit "$(GOV_UNATTENDED_REPORT=1 bash "$SCRIPT" 2>&1)" "wrote work/stray.txt in memory/builds/tRun/RUN.md"
+reset_tree
+
+# ---- THE BUDGET IS MANDATORY, in the shape its siblings already take: undeclared or malformed is
+# ---- a refusal and never a defaulted value.
+reset_tree
+mutate .unattended.conf 's/^UNDECLARED_WRITE_BUDGET=.*/UNDECLARED_WRITE_BUDGET=""/'
+hit "$(run)" "UNDECLARED_WRITE_BUDGET is undeclared in .unattended.conf, and with no budget a pass that wrote outside its declared set is reported and never graded - which is the state this check exists to end"
+mutate .unattended.conf 's/^UNDECLARED_WRITE_BUDGET=.*/UNDECLARED_WRITE_BUDGET="several"/'
+hit "$(run)" "UNDECLARED_WRITE_BUDGET is not a single integer, so the per-build comparison below would be a string test wearing a numeric name"
+reset_tree
+
+# ---- THE RETIRED KEY IS REFUSED BY NAME (S8), off the leg's text scan of declared names, so an
+# ---- adopter who upgrades without moving it is told which key replaced it. Staged out, the old key
+# ---- is silently ignored and the leg passes.
+reset_tree
+printf '\nUNDECLARED_WRITE_CEILING="0"\n' >> .unattended.conf
+out=$(run)
+hit "$out" " is retired: check 23 grades each run record against a per-build budget now, so declare UNDECLARED_WRITE_BUDGET in .unattended.conf and delete the old key, which nothing reads any more"
+# AC3 (TOOL-aWindowedPass-5): a conf still setting the retired key passes check 22 and is reported as
+# retired there; check 23's refusal above is the one that names the replacement.
 reset_tree
 printf '\nUNDECLARED_WRITE_CEILING="5"\n' >> .unattended.conf
 out=$(GOV_UNATTENDED_REPORT=1 bash "$SCRIPT" 2>&1)
 miss "$out" "check 22 FAILED"
 hit  "$out" "check 22 - UNDECLARED_WRITE_CEILING is RETIRED (TOOL-aWindowedPass-5)"
+reset_tree
+
+# ---- THE LIVENESS HALF. A budget above zero says instances may exist; grading NO dispatched pass at
+# ---- all and then reporting zero of them is a probe that died, not a tree that is clean. The
+# ---- fixture declares no dispatch, so the loop above takes its skip branch and grades nothing.
+reset_tree
+mutate .unattended.conf 's/^UNDECLARED_WRITE_BUDGET=.*/UNDECLARED_WRITE_BUDGET="1"/'
+hit "$(run)" "the declared budget on undeclared writes is above zero while NO dispatched pass was graded at all, so every per-build comparison above would report a reassuring zero for a probe that died rather than for a tree that is clean"
+# ...and the control: at a budget of 0 the same tree is clean, so the arm above is not just
+# asserting that an undeclared-dispatch fixture reds.
+reset_tree
+miss "$(run)" "check 23 FAILED"
 # AC4: the measuring flag is retired with the key
 reset_tree
 out=$(bash "$SCRIPT" --emit-ceiling 2>&1); rc=$?
@@ -4044,6 +4093,48 @@ out=$(GOV_UNATTENDED_REPORT=1 bash "$SCRIPT" 2>&1)
 hit  "$out" "UNATTENDED check 23 FAILED"
 hit  "$out" "check 23 overlap unavailable for memory/builds/tRun/RUN.md"
 miss "$out" "check 23 SOLO"
+reset_tree
+
+# ---- RANGE MODE (TOOL-dUnstuckLanding-17 S5, AC4). A pass whose pass commit is already on the tip the
+# ---- remote advertises was graded when it landed; it stays COUNTED on the fleet line and is not
+# ---- graded against its record's budget again. Pass 1 writes outside its declaration and is pushed;
+# ---- pass 2 is clean and unpushed: no FAILED. Then pass 2 writes outside too: FAILED naming pass 2
+# ---- and never pass 1. Red when the `check_adv_reaches` test is staged out of the budget count.
+reset_tree
+write_overlapping_dispatch ARCH-tRun-1 "work/one.txt"
+mkdir -p work && printf 'a\n' > work/one.txt && printf 'c\n' > work/stray.txt
+git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
+RG_TIP=$(git rev-parse HEAD)
+git push -q -f origin HEAD:main
+drow ARCH-tRun-2 "work/two.txt"
+printf 'b\n' > work/two.txt
+git add -A && git commit -q -m "ARCH-tRun-2 builds its lane" --no-verify
+RG_HEAD=$(git rev-parse HEAD)
+out=$(run)
+hit  "$out" "unattended: check 23 fleet — 1 undeclared write(s) over 2 graded pass(es) in 1 record(s) · budget 0 per build · over tRun=1 · range ${RG_TIP:0:8}..${RG_HEAD:0:8} · at ${RG_HEAD:0:8}"
+miss "$out" "check 23 FAILED"
+# ...the unpushed pass writing outside its declaration is graded, and the pushed one is not named
+reset_tree
+write_overlapping_dispatch ARCH-tRun-1 "work/one.txt"
+mkdir -p work && printf 'a\n' > work/one.txt && printf 'c\n' > work/stray.txt
+git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
+git push -q -f origin HEAD:main
+drow ARCH-tRun-2 "work/two.txt"
+printf 'b\n' > work/two.txt && printf 'd\n' > work/stray2.txt
+git add -A && git commit -q -m "ARCH-tRun-2 builds its lane" --no-verify
+out=$(run)
+hit  "$out" "a pass of the run this branch drives committed outside the set it declared before dispatch while its window overlapped a sibling pass, and that declaration is the disjointness proof two concurrent passes rest on: 1 in memory/builds/tRun/RUN.md against a per-build budget of 0"
+hit  "$out" "ARCH-tRun-2 at $(git rev-parse HEAD) wrote work/stray2.txt"
+rg_fail=$(grep -F 'check 23 FAILED' <<<"$out" || true)
+miss "$rg_fail" "ARCH-tRun-1 at"
+hit  "$out" "check 23 fleet — 2 undeclared write(s) over 2 graded pass(es) in 1 record(s) · budget 0 per build · over tRun=2 · range "
+# ...and WHOLE mode, when no advertised tip resolves, grades the pushed pass as the leg always did
+git --git-dir="$ORIGIN" symbolic-ref HEAD refs/heads/nothing-here
+out=$(run)
+hit  "$out" "· range whole (the tip did not resolve: "
+hit  "$out" "2 in memory/builds/tRun/RUN.md against a per-build budget of 0"
+git --git-dir="$ORIGIN" symbolic-ref HEAD refs/heads/main
+git push -q -f origin "$ANCHOR0":main
 reset_tree
 
 # ---- DERIVED LANDED IS NOT GRADED (TOOL-aSightedSkeptic-13): check 23 asks check 7's predicate, so an
@@ -4242,6 +4333,15 @@ reset_tree
 printf '_x=$(GIT ls-files "$M/builds/*/spec/*.md")\n' >> $KIT_REL/unattended.sh
 miss "$(run)" "names a file at a build root through a pathspec without the :(glob) magic"
 
+# ---- --emit-ceiling is RETIRED (TOOL-dUnstuckLanding-17 S9, AC8): a budget is declared, not measured,
+# ---- so the flag refuses with exit 2 before any check runs and names the fleet line, where the count
+# ---- now appears. Red when the branch still runs checks rather than exiting at once.
+reset_tree
+out=$(bash "$SCRIPT" --emit-ceiling 2>&1); rc=$?
+same "--emit-ceiling is refused, exit code" "$rc" "2"
+hit  "$out" "refused (TOOL-dUnstuckLanding-17): check 23 grades the run this branch drives against a declared per-build budget, which is a policy and not a measurement, so there is no pin left to measure, and the fleet's count now appears on the 'check 23 fleet' line every run prints"
+miss "$out" "UNATTENDED check"
+reset_tree
 
 # RAISED 200 -> 243, then to 251 by TOOL-dUnstalledConvoy-2 by TOOL-dUnstalledConvoy-10. A floor well below the executed count is not a floor,
 # it is a number: the sibling suite carried a sixty-arm slack and hid FIFTY stranded arms behind it in
@@ -4291,7 +4391,7 @@ hit "$out" "calls read_recorded_phase() inside verb_resume(), which the allow-li
 # ---- phase silently widens the very set it was written to narrow, so the join runs both ways.
 reset_tree
 mkdir -p $KIT_REL && cp "$HERE/unattended.sh" "$HERE/lib-unattended.sh" $KIT_REL/
-mutate $KIT_REL/check-unattended.sh 's|^PHASE_RECORDED_FNS=.*|PHASE_RECORDED_FNS="refuse_if_terminal archive_name_of verb_landed print_liveness ghostfn"|'
+mutate $KIT_REL/check-unattended.sh 's|^PHASE_RECORDED_FNS=.*|PHASE_RECORDED_FNS="refuse_if_terminal archive_name_of verb_landed print_liveness run_settle ghostfn"|'
 out=$(run)
 hit "$out" "the allow-list names ghostfn(), which no longer calls read_recorded_phase()"
 
@@ -4315,9 +4415,18 @@ hit "$out" "the kit's CORE phase vocabulary has shrunk below its floor"
 # ---- CHECK 2's HOLD_FLOOR: deleting a hold code a sibling unit routes to reds the shrink-only pin.
 reset_tree
 mkdir -p $KIT_REL && cp "$HERE/unattended.sh" "$HERE/lib-unattended.sh" $KIT_REL/
-mutate $KIT_REL/unattended.sh 's/ inherited-red"$/"/'
+mutate $KIT_REL/unattended.sh 's/ inherited-red / /'
 out=$(run)
 hit "$out" "the kit's CORE hold vocabulary has shrunk below its floor, and deleting a member is a silent, reason-free override of every record and every sibling unit that routes to it"
+
+# ---- TOOL-dUnstuckLanding-13 AC11: the floor guards the two HAND-OFF codes too. The fixture's floor is
+# ---- derived from the shipped driver, so it reads 7 with them in; dropping `owner-decision` alone
+# ---- reds the pin naming both counts.
+reset_tree
+mkdir -p $KIT_REL && cp "$HERE/unattended.sh" "$HERE/lib-unattended.sh" $KIT_REL/
+mutate $KIT_REL/unattended.sh 's/ owner-decision"$/"/'
+out=$(run)
+hit "$out" "the kit's CORE hold vocabulary has shrunk below its floor, and deleting a member is a silent, reason-free override of every record and every sibling unit that routes to it: 6 against 7"
 
 # ---- ...and its two conf branches, which behave exactly as HALT_FLOOR's do: undeclared and
 # ---- malformed are both REFUSALS, because a pin that quietly defaults is a pin nobody set.
@@ -4366,6 +4475,19 @@ mkdir -p $KIT_REL && cp "$HERE/unattended.sh" "$HERE/lib-unattended.sh" $KIT_REL
 mutate $KIT_REL/unattended.sh 's/^HOLD_CODES_CORE=.*/HOLD_CODES_CORE=""/'
 out=$(run)
 hit "$out" "the driver declares no HOLD_CODES_CORE vocabulary, so the hold verb would validate against an empty set and record a pause under any word at all"
+
+# ---- TOOL-dUnstuckLanding-14 S1, closing review round 1 L5 (id 25): the HAND-OFF codes the leg reads
+# ---- for its derived-LANDED predicate are guarded as the hold codes are. A renamed constant reads
+# ---- empty, and a member outside the hold vocabulary is a hold no verb could record.
+reset_tree
+mkdir -p $KIT_REL && cp "$HERE/unattended.sh" "$HERE/lib-unattended.sh" $KIT_REL/
+mutate $KIT_REL/unattended.sh 's/^HOLD_CODES_HANDOFF=/HOLD_CODES_HANDED=/'
+hit "$(run)" "the driver declares no readable HOLD_CODES_HANDOFF, so this leg would derive LANDED for no handed record while the driver derives it for each"
+reset_tree
+mkdir -p $KIT_REL && cp "$HERE/unattended.sh" "$HERE/lib-unattended.sh" $KIT_REL/
+mutate $KIT_REL/unattended.sh 's/^HOLD_CODES_HANDOFF="owner-landing /HOLD_CODES_HANDOFF="owner-landed /'
+hit "$(run)" "a hand-off code is not a member of the driver's HOLD_CODES_CORE, so a record could carry a hand-off the hold vocabulary refuses: owner-landed"
+reset_tree
 
 # ---- ...and check 39's own liveness refusal. A read predicate that matches nothing classifies
 # ---- nothing, and grading no read is how a structural arm passes by finding nothing. Staged by
@@ -5576,7 +5698,7 @@ out=$(run_lg_leg)
 hit "$out" "the landed fact-set arm of check 15 is OFF - LANDED_FACTS_CUTOFF is blank or undeclared"
 printf 'LANDED_FACTS_CUTOFF="2026-06-01"\n' >> .unattended.conf
 out=$(run_lg_leg)
-hit "$out" "recorded LANDED 0 · rotated derived LANDED 0 · committed LANDING 0 - a count of 0, so this arm graded nothing on this tree"
+hit "$out" "recorded LANDED 0 · rotated derived LANDED 0 · committed LANDING 0 · attended LANDED 0 - a count of 0, so this arm graded nothing on this tree"
 write_lg_record tFacts LANDED "$ANCHOR0" "landed-anchor: remote\nunpushed-at-landing: 0\n"
 git add -A >/dev/null && write_lg_commit "a landed record with no roster"
 out=$(run_lg_leg)
@@ -5644,6 +5766,122 @@ miss "$out" "population landing, missing [units-at-landing] in memory/builds/tRu
 hit  "$out" "check 15 did not grade the landed facts of memory/builds/tRun/RUN.md - it is a committed LANDING the remote already carries, so it derives LANDED, and under primary landing the verb that writes those facts has not run yet: --landed tRun"
 git push -q -f origin "$ANCHOR0":main
 
+# ---- TOOL-dUnstuckLanding-14 AC1, the leg's half: a settled hand-off is counted in the `attended`
+# ---- population, which owes `landed-by` beside the derived facts, and reds naming a missing one.
+reset_tree
+printf 'LANDED_FACTS_CUTOFF="2026-06-01"\n' >> .unattended.conf
+write_lg_record tAtt LANDED "$ANCHOR0" "landed-derived: $ANCHOR0 $ANCHOR0\nunits-at-landing: ARCH-tAtt-1\nlanded-by: attended\n"
+git add -A >/dev/null && write_lg_commit "records(tAtt): settle the run record"
+out=$(run_lg_leg)
+hit  "$out" "committed LANDING 0 · attended LANDED 1"
+miss "$out" "population attended, missing"
+sed -i '/^units-at-landing: /d' memory/builds/tAtt/RUN.md
+git add -A >/dev/null
+out=$(run_lg_leg)
+hit  "$out" "population attended, missing [units-at-landing] in memory/builds/tAtt/RUN.md"
+
+# ---- TOOL-dUnstuckLanding-14 S3: a HELD record under a hand-off code whose own commit is on the
+# ---- advertised tip is EXCLUDED by check 7 as derived LANDED; under any other hold code it counts.
+reset_tree
+write_lg_record tHand HELD "$ANCHOR0" "hold-code: owner-landing\n"
+git add -A >/dev/null && write_lg_commit "records(tHand): hand-off"
+git push -q -f origin HEAD:main
+out=$(run)
+hit  "$out" "check 7 EXCLUDED memory/builds/tHand/RUN.md — derived LANDED: its landing commit $(git rev-parse HEAD)"
+sed -i 's/^hold-code: .*/hold-code: inherited-red/' memory/builds/tHand/RUN.md
+git add -A >/dev/null && write_lg_commit "records(tHand): a plain hold"
+git push -q -f origin HEAD:main
+out=$(run)
+miss "$out" "check 7 EXCLUDED memory/builds/tHand/RUN.md"
+git push -q -f origin "$ANCHOR0":main
+
+# ---- TOOL-dUnstuckLanding-14 AC7: work-landed-at is UPHELD by the content predicate, not graded on
+# ---- presence. tKept's work landed and stayed; tRev's landed and was reverted on the first-parent
+# ---- line, and its hand-written fact reds naming the fact and the file. A cutoff the record does not
+# ---- predate reds the fact as discard, and a blank one reds it as undatable. An `abandoned` marker
+# ---- standing alone reds, and check 7 excludes the record carrying it, as --preflight does.
+# ---- Implementation review round 1, fold pass A: each fact names the tip it was written at, and is
+# ---- graded THERE (M9). tMerge's work landed as a --no-ff merge that `git revert -m 1` backed out
+# ---- (M4); tGone's never merged, which only clause (ii) decides (M11); tWrong's fact names a commit
+# ---- that is not its witness (L6); tOffTip's names a tip the default branch does not carry. Each
+# ---- reds through the library's `check_work_landed_fact`, the one the drift parity arm runs too.
+reset_tree
+printf 'HANDOFF_CUTOFF="2099-01-01"\n' >> .unattended.conf
+# Its own commit, so the revert of tKept's work below cannot take the cutoff with it.
+git add -A >/dev/null && write_lg_commit "chore: date the hand-off cutoff"
+for lg_s in tKept tRev tWrong tOffTip; do
+  mkdir -p "memory/builds/$lg_s"; printf '%s\n' "$lg_s" > "memory/builds/$lg_s/work.txt"
+  git add -A >/dev/null && write_lg_commit "work($lg_s): the change"
+  eval "lg_w_$lg_s=\$(git rev-parse HEAD)"
+done
+git -c core.hooksPath=/dev/null revert --no-edit "$lg_w_tRev" >/dev/null 2>&1
+lg_b=$(git symbolic-ref --short HEAD)
+git checkout -q -b lg-merge
+mkdir -p memory/builds/tMerge; printf 'tMerge\n' > memory/builds/tMerge/work.txt
+git add -A >/dev/null && write_lg_commit "work(tMerge): the change"
+lg_w_tMerge=$(git rev-parse HEAD)
+git checkout -q "$lg_b"
+git -c core.hooksPath=/dev/null merge -q --no-ff --no-edit -m "land the tMerge run" lg-merge >/dev/null 2>&1
+lg_m_tMerge=$(git rev-parse HEAD)
+git -c core.hooksPath=/dev/null revert -m 1 --no-edit "$lg_m_tMerge" >/dev/null 2>&1
+git checkout -q -b lg-gone
+mkdir -p memory/builds/tGone; printf 'tGone\n' > memory/builds/tGone/work.txt
+git add -A >/dev/null && write_lg_commit "work(tGone): the change"
+lg_w_tGone=$(git rev-parse HEAD)
+git checkout -q "$lg_b"
+lg_tip=$(git rev-parse HEAD)
+write_lg_record tKept ABORTED "$lg_w_tKept" "halt-code: fork-unresolvable\nwork-landed-at: $lg_w_tKept $lg_tip\n"
+write_lg_record tRev ABORTED "$lg_w_tRev" "halt-code: fork-unresolvable\nwork-landed-at: $lg_w_tRev $lg_tip\n"
+write_lg_record tMerge ABORTED "$lg_w_tMerge" "halt-code: fork-unresolvable\nwork-landed-at: $lg_w_tMerge $lg_tip\n"
+write_lg_record tGone ABORTED "$lg_w_tGone" "halt-code: fork-unresolvable\nwork-landed-at: $lg_w_tGone $lg_tip\n"
+write_lg_record tWrong ABORTED "$lg_w_tWrong" "halt-code: fork-unresolvable\nwork-landed-at: $lg_w_tKept $lg_tip\n"
+write_lg_record tOffTip ABORTED "$lg_w_tOffTip" "halt-code: fork-unresolvable\nwork-landed-at: $lg_w_tOffTip $lg_w_tGone\n"
+git add -A >/dev/null && write_lg_commit "records: six aborted runs"
+git push -q -f origin HEAD:main
+out=$(run_lg_leg)
+hit  "$out" "a record claims work-landed-at and the content predicate does not uphold it at the tip the fact records, so the fact is not one --settle could have written: a commit on the tip's first-parent line reverts its commit ${lg_w_tRev:0:8} in memory/builds/tRev/RUN.md"
+same "AC7 the kept record's fact is upheld" \
+  "$(printf '%s\n' "$out" | grep -F 'a record claims work-landed-at' | grep -c 'memory/builds/tKept/' || true)" "0"
+hit  "$out" "a commit on the tip's first-parent line reverts the merge ${lg_m_tMerge:0:8}, which brought its commit ${lg_w_tMerge:0:8} onto the tip in memory/builds/tMerge/RUN.md"
+hit  "$out" "its commit ${lg_w_tGone:0:8} is not on the tip ${lg_tip:0:8} in memory/builds/tGone/RUN.md"
+hit  "$out" "its work-landed-at names ${lg_w_tKept:0:8} and its witness is ${lg_w_tWrong:0:8}, so the fact is not about this run's own work in memory/builds/tWrong/RUN.md"
+hit  "$out" "the tip its work-landed-at records, ${lg_w_tGone:0:8}, is not on the advertised tip "
+hit  "$out" ", so it names no landing the default branch carries in memory/builds/tOffTip/RUN.md"
+# ---- M9: a revert landing AFTER a correct settle is a report line, never a red on every later bar.
+git -c core.hooksPath=/dev/null revert --no-edit "$lg_w_tKept" >/dev/null 2>&1
+git push -q -f origin HEAD:main
+out=$(run_lg_leg)
+same "AC7 a later revert leaves the kept record's fact upheld" \
+  "$(printf '%s\n' "$out" | grep -F 'a record claims work-landed-at' | grep -c 'memory/builds/tKept/' || true)" "0"
+hit  "$out" "unattended-report: check 15 upheld work-landed-at in memory/builds/tKept/RUN.md at the tip it records, ${lg_tip:0:8}, and the content predicate no longer reads that work landed on the advertised tip "
+hit  "$out" "reported and never a red, because no verb rewrites the record: a commit on the tip's first-parent line reverts its commit ${lg_w_tKept:0:8}"
+# ---- Implementation review round 2, L8 (id 29): a tip whose first-parent line cannot be READ is not a
+# ---- revert anybody observed. A git double fails `log --first-parent` over the advertised tip alone,
+# ---- so the fact still reads upheld at the tip it records and is reported as not re-judged, never as
+# ---- undone. RED against the reader that folded the undecidable status into WLF_NOW.
+c15_adv=$(git ls-remote origin HEAD | cut -f1)
+c15_git=$(command -v git)
+mkdir -p "$TMPBIN"
+printf '#!/bin/sh\ncase " $* " in *" --first-parent "*" %s "*) exit 128 ;; esac\nexec "%s" "$@"\n' "$c15_adv" "$c15_git" > "$TMPBIN/git"
+chmod +x "$TMPBIN/git"
+out=$(PATH="$TMPBIN:$PATH" run_lg_leg)
+rm -f "$TMPBIN/git"
+hit  "$out" "unattended-report: check 15 upheld work-landed-at in memory/builds/tKept/RUN.md at the tip it records, ${lg_tip:0:8}, and it was not re-judged at the advertised tip ${c15_adv:0:8}: the tip's first-parent line since ${lg_w_tKept:0:8} cannot be read"
+miss "$out" "check 15 upheld work-landed-at in memory/builds/tKept/RUN.md at the tip it records, ${lg_tip:0:8}, and the content predicate no longer reads that work landed"
+sed -i 's/^HANDOFF_CUTOFF=.*/HANDOFF_CUTOFF="2000-01-01"/' .unattended.conf
+out=$(run_lg_leg)
+hit  "$out" "an ABORTED record first committed on or after HANDOFF_CUTOFF claims work-landed-at, and from that date ABORTED means discard, so no verb writes that its work landed: "
+hit  "$out" "against 2000-01-01 in memory/builds/tKept/RUN.md"
+sed -i 's/^HANDOFF_CUTOFF=.*/HANDOFF_CUTOFF=""/' .unattended.conf
+out=$(run_lg_leg)
+hit  "$out" "an ABORTED record claims work-landed-at and HANDOFF_CUTOFF is not a date, so whether it predates the day ABORTED came to mean discard cannot be read, and --settle refuses every such record: blank in memory/builds/tKept/RUN.md"
+write_lg_record tAban RUNNING "$ANCHOR0" "abandoned: 2026-10-04T00:00:00Z\n"
+git add -A >/dev/null
+out=$(run_lg_leg)
+hit  "$out" "a record carries abandoned with no work-landed-at, and --settle writes the two together, so the marker that takes it out of the live-run count stands on no proof that its work landed: memory/builds/tAban/RUN.md"
+hit  "$out" "check 7 EXCLUDED memory/builds/tAban/RUN.md — abandoned at 2026-10-04T00:00:00Z"
+git push -q -f origin "$ANCHOR0":main
+
 # ---- THE DATING SELF-SCAN: a first-commit DATE read with --diff-filter=A and no --follow anywhere in
 # ---- the kit's shell reds, naming the file and line; the same read with --follow does not.
 # The flag rides a variable so no single line of THIS suite spells the offending read: check 15 scans
@@ -5696,6 +5934,19 @@ miss "$out" "UNATTENDED check 26 FAILED"
 reset_tree
 mutate $KIT_REL/check-unattended.sh 's/RECALL_CLI|ASKS_CMD|/RECALL_CLI|/'
 hit "$(run_skip_leg)" "a key the shipped example declares and this leg initialises is missing from the import allow-list, so a project that declares it keeps the initialised default and every gate stays green: ASKS_CMD"
+# ---- TOOL-dUnstuckLanding-13 AC9: HANDOFF_CUTOFF is joined by check 22 in both of its halves. Its
+# ---- protocol row removed reds the key table; its allow-list entry removed reds the import join; with
+# ---- all three in place neither line names it.
+reset_tree
+mutate memory/guides/UNATTENDED-PROTOCOL.md '/^| `HANDOFF_CUTOFF` |/d'
+hit "$(run_skip_leg)" "undocumented in the protocol: HANDOFF_CUTOFF"
+reset_tree
+mutate $KIT_REL/check-unattended.sh 's/|HANDOFF_CUTOFF|/|/'
+hit "$(run_skip_leg)" "a key the shipped example declares and this leg initialises is missing from the import allow-list, so a project that declares it keeps the initialised default and every gate stays green: HANDOFF_CUTOFF"
+reset_tree
+out=$(run_skip_leg)
+miss "$out" "undocumented in the protocol: HANDOFF_CUTOFF"
+miss "$out" "every gate stays green: HANDOFF_CUTOFF"
 reset_tree
 mutate $KIT_REL/check-unattended.sh '/^    # gov:conf-allow-end$/d'
 hit "$(run_skip_leg)" "the import allow-list is not exactly one bare gov:conf-allow-begin and gov:conf-allow-end pair enclosing at least one key, so the join that reads it would subtract nothing or everything and report green over a real mismatch"
@@ -5928,7 +6179,51 @@ printf 'c48probe() {\n  %s "$rel" witness x || return 1\n  %s "$rel" || return 1
 mutate $KIT_REL/lib-unattended.sh "\$r $TMPBIN_PARENT/c48.fn"
 miss "$(run)" "UNATTENDED check 48 FAILED"
 reset_tree
-fi   # ---- end REGION 8 ------------------------------------------------------------------------
+
+# ==== TOOL-dUnstuckLanding-20: CHECK 49, a LANDING_NODES token that is not a <tag>=<machine>/<user>
+# ---- pair, or a tag declared twice, reds naming each; a malformed token claims its tag, so `d` is the
+# ---- doubled one here. The well-formed value beside it stays silent, so the red is not a ban on the key.
+printf 'LANDING_NODES="d=compeeto a=m/u d=m2/u2"\n' >> .unattended.conf
+out=$(run)
+hit  "$out" "LANDING_NODES declares a token that is not a <tag>=<machine>/<user> pair, or a tag or machine/user declared twice, and a malformed token never matches, so that node hands off on every run with nothing else red: d=compeeto d"
+reset_tree
+printf 'LANDING_NODES="a=m/u d=compeeto/d41ly"\n' >> .unattended.conf
+miss "$(run)" "UNATTENDED check 49 FAILED"
+reset_tree
+# ---- closing review round 1 M14 (id 21): one machine/user under two tags, and a pair with a third
+# ---- field, each red by name; RED against a staged scan that skipped each. L2 (id 22): a `%20`-escaped
+# ---- user is a well-formed pair, so the escape the driver decodes is not a malformed token here.
+printf 'LANDING_NODES="a=m/u b=m/u"\n' >> .unattended.conf
+hit  "$(run)" "so that node hands off on every run with nothing else red: m/u"
+reset_tree
+printf 'LANDING_NODES="a=m/u/x"\n' >> .unattended.conf
+hit  "$(run)" "so that node hands off on every run with nothing else red: a=m/u/x"
+reset_tree
+printf 'LANDING_NODES="a=desk/john%%20smith"\n' >> .unattended.conf
+miss "$(run)" "UNATTENDED check 49 FAILED"
+reset_tree
+
+# ==== Implementation review round 2, hunt item 3: CHECK 50, the driver's inherited-red policy path
+# ---- against the pre-push hook's `_gate_env` derivation. A hook spelling another file reds, and so
+# ---- does a driver that moved its own; the two spelling one path stay silent, and a tree tracking no
+# ---- hook says it compared nothing. RED against the leg before the check, which read neither.
+out=$(GOV_UNATTENDED_REPORT=1 run)
+hit  "$out" "unattended-report: check 50 did not compare the inherited-red policy path - this tree tracks no .githooks/pre-push, so no hook reads one beside the driver"
+mkdir -p .githooks
+printf '#!/usr/bin/env bash\n_gate_env="$top/.githooks/gate-env.sh"\n' > .githooks/pre-push
+git add .githooks/pre-push
+out=$(GOV_UNATTENDED_REPORT=1 run)
+miss "$out" "UNATTENDED check 50 FAILED"
+hit  "$out" "unattended-report: check 50 compared the inherited-red policy path the driver and the pre-push hook read: .githooks/gate-env.sh"
+printf '#!/usr/bin/env bash\n_gate_env="$top/.githooks/policy-env.sh"\n' > .githooks/pre-push
+git add .githooks/pre-push
+hit  "$(run)" "the driver's inherited-red policy path is not the pre-push hook's, so on a conf naming no policy file the two readers of one policy read two files, and a red the driver lands is one the hook refuses to push: hook .githooks/policy-env.sh, driver .githooks/gate-env.sh"
+printf '#!/usr/bin/env bash\n_gate_env="$top/.githooks/gate-env.sh"\n' > .githooks/pre-push
+git add .githooks/pre-push
+mutate $KIT_REL/unattended.sh 's|hook="\.githooks/gate-env\.sh"|hook=".githooks/moved-env.sh"|'
+hit  "$(run)" "a red the driver lands is one the hook refuses to push: hook .githooks/gate-env.sh, driver .githooks/moved-env.sh"
+reset_tree
+fi   # ---- end REGION 8------------------------------------------------------------------------
 
 # ---- RE-MEASURED AT THE dUnstalledConvoy MERGE, 2026-08-21, node d. Both sides of that merge
 # ---- touched these constants and they disagreed about what a floor is for, so the reconciliation is

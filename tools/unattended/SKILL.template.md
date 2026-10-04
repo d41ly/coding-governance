@@ -2,7 +2,7 @@
 name: unattended
 description: Start, resume, or close a run that will merge and push with NO owner turn between start and finish. Use when the owner wants a committed build carried to landing unattended, when a previous unattended run needs resuming after compaction or process death, or when one needs closing. Do NOT use for ordinary work where the explicit ask before a merge and a push still applies — that is the default, and this skill is the narrow exception to it.
 ---
-<!-- gov:kit unattended@1.63 -->
+<!-- gov:kit unattended@1.64 -->
 
 # Unattended runs
 
@@ -175,7 +175,7 @@ It schedules no idle-wake, and the section above does not bind it: there is an o
    result — either one absent is a refusal, not only both. A waived run's spec §10 should still NAME the waiver — that is one of the things the gate
    accepts as a finding, so naming it is also how the spec lands. **`land-once-done`** — waiving it
    does not remove the Definition-of-Done item that observes completeness; that still owes an
-   override at close.
+   override at close unless every unfinished unit is carried forward (`UNATTENDED-STOPS.md` §15).
 1. **The build folder IS the authorization, and what makes it one is the ANCHOR it resolves at.** A
    `{{MEMORY_ROOT}}/builds/<slug>/README.md` that resolves at the anchor this project declares is the
    whole precondition. **This project's anchor scope is `{{ANCHOR_SCOPE}}`.**
@@ -217,7 +217,7 @@ It schedules no idle-wake, and the section above does not bind it: there is an o
 
    Say what the waiver costs, for the two handles that have a consequence: `reuse-first` surfaces at
    close through the `reuse-probed` item and still owes its spec §10 a named waiver, and
-   `land-once-done` still owes an override at close.
+   `land-once-done` still owes an override at close unless every unfinished unit is carried forward.
 
    **From the next command onward there is nobody to ask.** The driver enforces that rather than
    trusting it — `--waive` is accepted by `--preflight` alone, and only while no run-state file
@@ -737,7 +737,8 @@ definition, so the absence is a decision and not an oversight.
   **Nothing refuses the next dispatch for you**, and that is the honest statement rather than a
   caveat: the order gate treats an earlier unit's declaration row as dispatched, so a row the verb
   itself wrote un-blocks the step. The one thing that refuses an early stop is `build-complete` at
-  `--close`, and its escape is a recorded `--override build-complete`.
+  `--close`, and its escapes are a unit carried forward against an open ask or a recorded
+  `--override build-complete`.
 - **Run the bug-class checklist after every commit, and act on it before the next pass begins.** It
   is the one per-pass quality act on CODE, the build method mandates it per pass and again over the
   whole range on every closing round, and until now no carrier this kit ships even named it:
@@ -818,7 +819,10 @@ It answers with one of five states, and the state is what you act on:
   list states. Never parked, never waived, never RETIRED, and never re-reviewed. Both terminate.
   **`never RETIRED` is in that list because it is the cheapest exit and the one the enumeration used
   to leave open**: a promoted unit flipped to `WONTDO` satisfies the leg's promotion count, which
-  reads new ids, and `build-complete`, which reads only that no row is non-terminal.
+  reads new ids, and `build-complete`, which reads only that no row is non-terminal. **Nor is it
+  ever DEFERRED to be carried forward**: that would meet the promotion count and `build-complete` at
+  once, so `build-complete` carries only a unit the roster held when the run started, and a promoted
+  unit flipped to `DEFERRED` stays unfinished.
   **Record it**, with `--disposition promote` on the round that exits: `promote` is the ONLY value a
   terminal exit can record, because every exit that is not `CONVERGED` carries at least one BLOCKER
   and the rule promotes every one of them, so `fold` at an exit with blockers is REFUSED rather than
@@ -963,6 +967,21 @@ bash {{KIT_DIR}}/unattended.sh --phase <slug> VERIFYING --witness $(git rev-pars
 bash {{KIT_DIR}}/unattended.sh --close <slug>
 ```
 
+**A unit you cannot finish is carried forward, not overridden.** At the close a park is never an
+abort: take the exit the close-decision table in `UNATTENDED-STOPS.md` §15 names. For a partial
+build that is the carry-forward term. A unit of the roster the run started with, waiting on an open
+ask this build filed, gets spec status `DEFERRED` with `closes` or `advances` naming that ask, and
+the defer act on the record:
+
+```bash
+bash {{KIT_DIR}}/unattended.sh --rescope <slug> --act defer --item <unit-id> --reason "<why it waits>"
+```
+
+`build-complete` then meets and prints one `carried forward` line per unit. It stays unmet, naming
+the unit and the condition, when the unit was added during the run, its ask is not open, or a
+CLOSED unit declares `consumes-from` onto it; that last build is a `--handoff` under
+`owner-decision`, never an override.
+
 **Under `LANDER_MODE` set to `in-place`, the prepare comes between them.** The close's bar grades what HEAD carries, so
 the landing merge has to exist before it runs. Without it the bar grades this branch and never the
 merge the push publishes, and a branch that is green alone can still land red onto a tip the remote
@@ -1064,9 +1083,9 @@ MOVED is unmet, naming the move, and prints no hold, because something writing t
 is yours to find.
 
 **A red the bar reads as INHERITED is not yours to override.** `gates-green` reads the inherited-red
-policy at the tip the remote advertises and attributes the red there. Under `land` an inherited-only
-red within its age bound is met. Under `park`, or past the bound, the item prints the hold for an
-inherited red, a line of the shape
+policy at the tip the remote advertises and attributes the red there. Under `land`, the kit default,
+an inherited-only red is met at any age, and a leg older than the age bound has its ask filed
+BLOCKER. Under a declared `park` the item prints the hold for an inherited red, a line of the shape
 `hold · inherited-red · until probe gate · <legs> red at <R8>, INHERITED; INHERITED_RED=<policy>`.
 `--override gates-green` and
 `--abort --code gate-red-out-of-scope` are both refused unless that bar's record reads every red leg
@@ -1275,6 +1294,44 @@ and stop. Otherwise, in this order:
 The carrier is the one your project declares, and it must be DURABLE: a filed task outlives the
 session that filed it. The keepalive's scheduler is not it — that store is session-scoped, and the
 kit gate reds a conf that names it here.
+
+## If it is done but you may not land it — hand it off
+
+```bash
+bash {{KIT_DIR}}/unattended.sh --handoff <slug> --code owner-landing|owner-decision \
+  --reason "<why an owner has to take it from here>" --reaped <the keepalive id you just deleted>
+```
+
+**Use this, not `--abort`, when the work is sound and the one step left is the owner's** — the
+landing itself, from a node that may not land or onto an order only the owner sets, or a decision
+the mandate does not delegate. `ABORTED` means DISCARD: the work must not land as it stands. A run
+whose work then lands anyway leaves a record that contradicts git for good.
+
+Pick the code by what the owner owes:
+
+- `owner-landing` — nothing to decide; only the landing remains. It is refused unless the last bar
+  the record names reads GREEN on this tree, or every red leg reads INHERITED: an OWN red is yours
+  to fix, or to hand off as a decision.
+- `owner-decision` — one parked decision stands first. Park it with `--park` before you hand off;
+  the verb refuses a decision hand-off whose record holds no decision row.
+
+It is a hold with the release condition fixed at `owner`, so everything `--hold` asks of you applies:
+commit everything, push the branch, reap the keepalive and name it. No durable restart is owed and
+nothing is filed. It writes the landing recipe as a `handoff` row and prints it; that one line is
+what the owner runs, so put nothing in the reason that it already says. Commit the staged record
+and push the branch, then stop.
+
+The recipe ends by settling the record. Once the owner has landed the work, every reader already
+reads the run `LANDED (attended)`; this writes it, and you run it yourself when you find a landed
+hand-off still recorded HELD:
+
+```bash
+bash {{KIT_DIR}}/unattended.sh --settle <slug>
+```
+
+It stages the record and never commits it, so the settle commit rides the next landing from that
+tree. The same verb records where an older `ABORTED` run's work landed, and marks a run whose lease
+died after its work landed as `abandoned`; it refuses anything git does not prove.
 
 ## If it cannot finish
 

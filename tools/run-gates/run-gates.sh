@@ -29,7 +29,7 @@
 # config only inside it, and never writes into the real tree. Execution order is a scheduling detail;
 # REPORTING is always manifest order, so the output is byte-stable whatever the width.
 set -u
-KIT_RUN_GATES_VERSION=1.23   # gov:kit run-gates@1.23
+KIT_RUN_GATES_VERSION=1.24   # gov:kit run-gates@1.24
 # 1.21 -> 1.22: KITREL is asked of git when the prefix strip leaves it absolute, the MSYS mount
 # spelling (`/tmp/x` beside git's `C:/…/Temp/x`) the `cd … && pwd` fold does not reach; with it the
 # attribution's KF3 matched nothing for a tree under `/tmp`. Absorbed by aSightedSkeptic.
@@ -2784,15 +2784,18 @@ derive_attribution() {
 # ---- AGE AND OWNER, for an INHERITED leg only. TOOL-dDerivedDocket-24 --------------------------
 # An INHERITED red is one the landing base already carries, and that alone never says for how long.
 # Under `GATE_INHERITED_RED_MAX_AGE=<n>` each INHERITED leg is run once more at R~n, R's n-th
-# first-parent ancestor: red there with every offender L carries is `aged`, which no policy lands
-# over. Otherwise the red arrived inside (R~n, R], and a bisection of that first-parent window finds
+# first-parent ancestor: red there with every offender L carries is `aged`. The age decides the
+# ESCALATION only, never the landing (TOOL-dUnstuckLanding-22, superseding that part of
+# TOOL-dDerivedDocket-24): an aged INHERITED leg lands under `land` like any other, and the driver
+# files its ask at BLOCKER instead of HIGH. Otherwise the red arrived inside (R~n, R], and a bisection of that first-parent window finds
 # the first landing whose run carries L's offenders — its sha8, and the first id its subject carries,
 # name the OWNER. With n = 10 that is at most five more runs of one leg, on a red bar only.
 #
 # THE SAME COMPARISON RULE 5 MADE AT R, run from R's own row in the SAME scratch worktree checked out
 # at each probe, so the normaliser that strips that worktree's path still strips it. A probe that
 # cannot answer — the wall, a ceiling, a checkout that fails, an output that normalises to nothing —
-# leaves the age UNPROVEN (`-`), which reads as not landable: the safe direction.
+# leaves the age UNPROVEN (`-`). An unproven age still lands under `land` and is never escalated,
+# because nothing proves it aged.
 #
 # WITHOUT A SIGNATURE the probe reads red there only when every non-blank line of L's output is in
 # the probe's, and red with any other output is one more probe that cannot answer: text is not an
@@ -3030,9 +3033,12 @@ sys.stdout.buffer.write(("\n".join(out) + "\n").encode())
                    aged) tail="$tail · aged at R~$ATTR_MAX_AGE" ;;
                    -)    [ -n "$A_AGE_NOTE" ] && tail="$tail · age unproven" ;;
                    *)    tail="$tail · age $A_AGE · owner $A_OWN8"
-                         [ "$A_OWNID" != - ] && tail="$tail $A_OWNID"
-                         land_n=$((land_n + 1)); ATTR_LAND_LEGS="$ATTR_LAND_LEGS${ATTR_LAND_LEGS:+,}${names[$i]}" ;;
-                 esac ;;
+                         [ "$A_OWNID" != - ] && tail="$tail $A_OWNID" ;;
+                 esac
+                 # EVERY INHERITED LEG COUNTS, whatever its age reads — a number, `aged`, or `-` for
+                 # unproven or not asked (TOOL-dUnstuckLanding-16 S1). The age escalates the ask; it
+                 # no longer decides whether the leg lands.
+                 land_n=$((land_n + 1)); ATTR_LAND_LEGS="$ATTR_LAND_LEGS${ATTR_LAND_LEGS:+,}${names[$i]}" ;;
       MIXED)     tail="MIXED · inherited $A_I · own $A_O · at $ATTR_R8" ;;
       *)         tail="$A_V · $A_WHY" ;;
     esac
@@ -3046,8 +3052,8 @@ sys.stdout.buffer.write(("\n".join(out) + "\n").encode())
         "$(printf '%s%s' "$A_WHY" "${A_AGE_NOTE:+; $A_AGE_NOTE}" | tr '\t\n\r' '   ')" >> "$rec" 2>/dev/null || true
     fi
   done
-  # LANDABLE, for the inherited-green stamp alone: every red leg INHERITED with a proven age inside
-  # the bound. The stamp's other preconditions are the full green's, read where it is written.
+  # LANDABLE, for the inherited-green stamp alone: every red leg reads INHERITED, at any age. The
+  # stamp's other preconditions are the full green's, read where it is written.
   [ "$m" -gt 0 ] && [ "$land_n" = "$m" ] && ATTR_LANDABLE=1
   summary="attributed $nattr of $m red legs against $ATTR_R8"
   [ "$dead" -gt 0 ] && summary="$summary · DEAD PROBE $dead"
@@ -3365,14 +3371,15 @@ fi
 # block never touches that file. It is written under EVERY precondition of the full green except
 # "failed nothing" — skipped nothing, reused nothing, no wall, an unmoved tree that was clean when the
 # run started — plus three of its own: the caller exported `land`, at least one leg failed, and every
-# failed leg read INHERITED with an age proven inside the bound. It records R and the bound it was
-# written under, because the pre-push hook trusts it only where the remote sha it receives equals
-# `base` and the bound it reads at that sha equals `max_age`.
+# failed leg read INHERITED, at any age (TOOL-dUnstuckLanding-16 S1; it required a proven age inside
+# the bound until ruling TOOL-dUnstuckLanding-22). No age bound is required either. It records R and
+# the bound it was written under, empty when none was handed, because the pre-push hook trusts it only
+# where the remote sha it receives equals `base` and the bound it reads at that sha equals `max_age`.
 #
 # WHAT IT DOES NOT CHECK: the policy itself. `land` here is whatever the caller exported; the hook
 # reads the policy at R before it reads this file, so a stamp written under a caller's own `land`
 # selects nothing at a boundary whose R says `park`.
-if [ -n "$gd" ] && [ "$ATTR_POLICY" = land ] && [ -n "$ATTR_MAX_AGE" ] && [ "$ATTR_LANDABLE" = 1 ] \
+if [ -n "$gd" ] && [ "$ATTR_POLICY" = land ] && [ "$ATTR_LANDABLE" = 1 ] \
    && [ "$fails" -gt 0 ] && [ "$skips" = 0 ] && [ "$reuses" = 0 ] && [ ! -f "$WORK/wall.breach" ] \
    && [ "$tree_moved" = no ] && [ "$TREE_CLEAN" = yes ] && [ -n "$FPRINT_START" ] && [ -n "${ATTR_RSHA:-}" ]; then
   {
@@ -3387,7 +3394,7 @@ if [ -n "$gd" ] && [ "$ATTR_POLICY" = land ] && [ -n "$ATTR_MAX_AGE" ] && [ "$AT
     printf 'stamped\t%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
   } > "$gd/gate-inherited-green.tmp" 2>/dev/null \
     && mv -f "$gd/gate-inherited-green.tmp" "$gd/gate-inherited-green" 2>/dev/null || true
-  echo "run-gates: inherited-green stamp written — every red leg is INHERITED within the ${ATTR_MAX_AGE}-landing bound at ${ATTR_RSHA:0:8}: $ATTR_LAND_LEGS"
+  echo "run-gates: inherited-green stamp written — every red leg is INHERITED at ${ATTR_RSHA:0:8}${ATTR_MAX_AGE:+, aged against the ${ATTR_MAX_AGE}-landing bound}: $ATTR_LAND_LEGS"
 fi
 
 # THE SWEEP runs AFTER the verdict is written and NEVER before the first leg dispatches. Both

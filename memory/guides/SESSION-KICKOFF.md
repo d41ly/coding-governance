@@ -2,7 +2,7 @@
 
 <!-- kickoff-manifest: v1.4 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-10-05T02:11:32+03:00 @ 369fabcd7b13f8cb7ac0161b8c4e8d46c01d7a07
+last-audit: 2026-10-05T02:14:56+03:00 @ 67853dd918416a38e0130140911a8a3042f9771f
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/run-gates/run-selftests.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
 last-body-change: 3716c19f05e670b9c36f929f43ff7021b62c1d50
@@ -51,9 +51,9 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   BUILD-METHOD's, both changed under `TOOL-dUnstalledConvoy`, and both invert what a session would
   otherwise assume: M2/M3 give a run delegated authority to retire, supersede or add units inside the
   build's stated goal rather than stalling on a spec that turned out wrong, and M6's parallel default
-  now binds delegated passes only. Conditions and bounds are M3's and M6's. What
-  is NOT in force is the VERIFICATION: `--dispatch` records a pass's declared write set and the
-  comparison only REPORTS (`TOOL-dUnstalledConvoy-23`). Declare them anyway; green is not a proof.
+  now binds delegated passes only. Conditions and bounds are M3's and M6's. Check 23 counts only a
+  pass that overlapped a sibling and fails only the branch's own run, over `UNDECLARED_WRITE_BUDGET`;
+  `--check-commit` refuses an undeclared staged path (`TOOL-aWindowedPass-1`, `-3`, `-5`).
 
 - **Every session start writes an ORIENTATION CARD** at `<git-common-dir>/orientation/<session_id>.md`
   (`manifest-check.sh --card --write`, wired as a SessionStart hook; `--card --replay` re-injects it
@@ -127,8 +127,8 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   declares nothing, and a spec with no Gates heading is not joined. `TOOL-aBlindedTrial-8`.
 
 - **The pre-code spec audit is owed where the OWNER declares it: a `slug` README's `spec-audit: <date>`
-  OR `.unattended.conf`'s `SPEC_AUDIT_DEFAULT` at the default-branch side; a run never declares either.
-  Under neither, none is owed; kickoff asks the owner at READY.**
+  OR `.unattended.conf`'s `SPEC_AUDIT_DEFAULT` on the default branch; a run never declares either.
+  Under neither, none is owed; kickoff asks at READY.**
   `TOOL-aBlindedTrial-6`, `-7`, `TOOL-aWardedAudit-4`, `KICK-aBlindedTrial-1`.
 
 - **Before starting work inside a kit, check whether another node is already rewriting it.**

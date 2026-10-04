@@ -7020,8 +7020,10 @@ hit "$out" "amendment recorded — add ARCH-tRun-2"
 # came to answer differently in the first place.
 same "baseline_units is defined exactly once, in the shared library" \
   "$(grep -c '^baseline_units()' "$HERE/lib-unattended.sh")" "1"
+# TWO driver call sites since TOOL-dUnstuckLanding-18: `--rescope`'s add arm and `build-complete`'s
+# carry-forward term, which asks the same "was it in the roster this run started with" question.
 same "the driver calls it rather than deciding the same question its own way" \
-  "$(grep -v '^[[:space:]]*#' "$HERE/unattended.sh" | grep -c 'baseline_units ')" "1"
+  "$(grep -v '^[[:space:]]*#' "$HERE/unattended.sh" | grep -c 'baseline_units ')" "2"
 same "and so does the checker" \
   "$(grep -v '^[[:space:]]*#' "$HERE/check-unattended.sh" | grep -c 'baseline_units ')" "1"
 same "and neither defines its own" \
@@ -7029,7 +7031,7 @@ same "and neither defines its own" \
 reset_tree; run --preflight tRun --keepalive-id k1 >/dev/null
 
 out=$(run --rescope tRun --act sideways --item ARCH-tRun-1 --reason r)
-hit "$out" "--rescope --act takes one of retire, supersede or add, and a value outside that closed set may not select one by default:"
+hit "$out" "--rescope --act takes one of retire, supersede, add or defer, and a value outside that closed set may not select one by default:"
 
 out=$(run --rescope tRun --act retire --item ARCH-tRun-1)
 hit "$out" "--rescope requires --reason, because an amendment recording no reason is indistinguishable from one nobody meant - the same argument --park and --waive already make:"
@@ -8473,6 +8475,575 @@ case "$(uname -s)" in
   *) DD_PID=$$ ;;
 esac
 n=$((n+1)); [ -n "$DD_PID" ] || { echo "FAIL fixture: no pid for this shell, so the two-process arm would probe an empty value"; st=1; }
+
+fi   # ---- region two continues below: one compound block past about 3000 commands segfaults
+     # ---- bash 5.3 on Cygwin (exit 139), so the region is cut into blocks at top-level seams
+if in_shard 2; then
+
+# ========================================================== TOOL-dUnstuckLanding-13 — `--handoff` ====
+# A run whose work is sound and which an owner must land, or decide first, ends HELD under a hand-off
+# code with the landing recipe and the landing facts beside it. Every arm builds on the hold fixture,
+# whose lease is k1 and whose conf reads LANDER_MODE primary and LANDER `echo land`.
+#
+# THE BAR IS SEEDED THE WAY THE CLOSE LEAVES IT: a run record under the git dir whose header names the
+# HEAD it ran at, the `gates-run` fact naming it, and then the commit of that fact, because a hold
+# refuses a dirty tree. HEAD therefore differs from the bar's head in the run-state file alone, which
+# is the tie S4 admits for a hand-off and nothing else. A conf edit an arm needs is committed BEFORE the
+# seed, or the bar's head would differ from HEAD in the conf too and the guard would refuse first.
+seed_handoff_bar() { # verdict · attribution verdict of leg x, or empty for no attribution record
+  local d id; id="ho-$RANDOM$RANDOM"; d="$(git rev-parse --git-dir)/gate-run/$id"; mkdir -p "$d"
+  printf 'head\t%s\ntree_clean\tyes\n' "$(git rev-parse HEAD)" > "$d/header"
+  printf 'verdict\t%s\ntree_moved\tno\n' "$1" > "$d/verdict"
+  [ -z "${2:-}" ] || printf 'x\t%s\t1\t0\t-\t3\t-\t-\tplanted\n' "$2" > "$d/attribution"
+  sed -i '/^gates-run: /d' memory/builds/tRun/RUN.md
+  add_facts memory/builds/tRun/RUN.md "$(printf 'gates-run: %s %s' "$id" "$(git rev-parse --short=8 HEAD)")"
+  git add -A >/dev/null && git commit -q -m "records: the bar's gates-run fact" --no-verify
+}
+read_handoff_row() { grep ' handoff · item ' memory/builds/tRun/RUN.md; }
+read_run_fact() { sed -n "s/^$1: //p" memory/builds/tRun/RUN.md | head -1; }
+
+# ---- AC1: under in-place, over a GREEN bar, the hand-off writes HELD, the two hand-off facts, the
+# ---- roster and ONE handoff row carrying the recipe and never the free-text reason.
+build_hold_fixture
+sed -i 's/^LANDER_MODE=.*/LANDER_MODE="in-place"/' .unattended.conf; fixture
+seed_handoff_bar GREEN
+out=$(run --handoff tRun --code owner-landing --reason "the owner lands onto the order" --reaped k1)
+hit  "$out" "phase HELD · code owner-landing · until owner"
+hit  "$out" "unattended: hand-off recipe, written as the handoff row - in the run worktree: echo land --prepare --slug tRun && echo land --land --slug tRun"
+same "AC1 the phase" "$(read_run_fact phase)" "HELD"
+same "AC1 the hold code" "$(read_run_fact hold-code)" "owner-landing"
+same "AC1 the release condition" "$(read_run_fact hold-until)" "owner"
+same "AC1 no durable restart is owed" "$(read_run_fact resume-owed)" "none · owner"
+same "AC1 the roster, in --close's in-place spelling" "$(read_run_fact units-at-landing)" "ARCH-tRun-1"
+same "AC1 exactly one handoff row" "$(read_handoff_row | grep -c ' handoff · item owner-landing · reason ')" "1"
+hit  "$(read_handoff_row)" "--prepare --slug tRun"
+hit  "$(read_handoff_row)" "--land --slug tRun"
+miss "$(read_handoff_row)" "the owner lands onto the order"
+same "AC1 no ask contract here, so no freeze line" "$(grep -c '^asks-at-landing: ' memory/builds/tRun/RUN.md || true)" "0"
+
+# ---- AC2: every refusal --hold makes holds here unchanged and writes nothing - a dirty tree, and a
+# ---- record already HELD by an earlier hand-off.
+build_hold_fixture; seed_handoff_bar GREEN; printf 'scratch\n' > untracked.txt; before=$(sum)
+out=$(run --handoff tRun --code owner-landing --reason r --reaped k1)
+hit  "$out" "the working tree is dirty, so the pinned BASE would name a state that is not what runs"
+same "AC2 a hand-off over a dirty tree wrote nothing" "$(sum)" "$before"
+rm -f untracked.txt
+build_hold_fixture; seed_handoff_bar GREEN
+run --handoff tRun --code owner-landing --reason r --reaped k1 >/dev/null; fixture
+before=$(sum)
+out=$(run --handoff tRun --code owner-landing --reason r --reaped k1)
+hit  "$out" "the run is already HELD, and a second hold overwrites held-from with HELD"
+same "AC2 a hand-off over a HELD record wrote nothing" "$(sum)" "$before"
+
+# ---- AC3: --hold refuses both hand-off codes before any write, naming --handoff.
+build_hold_fixture; before=$(sum)
+for _hc in owner-landing owner-decision; do
+  out=$(run --hold tRun --code "$_hc" --until owner --reason r --reaped k1)
+  hit  "$out" "--hold names a hand-off code, and those are written by --handoff alone: a HELD record under one carries the landing recipe and the landing facts, and a hold written without them is a hand-off nothing can land or settle; end the run with --handoff instead"
+  same "AC3 --hold over $_hc wrote nothing" "$(sum)" "$before"
+done
+# ...and --handoff refuses every other code, a hold code included, and a missing one.
+out=$(run --handoff tRun --code platform-limit --reason r --reaped k1)
+hit  "$out" "--handoff takes --code owner-landing or --code owner-decision and no other: owner-landing when only the landing remains, owner-decision when a parked decision stands first, and any other stop is a --hold or an --abort: platform-limit"
+out=$(run --handoff tRun --reason r --reaped k1)
+hit  "$out" "--handoff takes --code owner-landing or --code owner-decision and no other"
+hit  "$out" "an --abort: none"
+same "AC3 a refused code wrote nothing" "$(sum)" "$before"
+out=$(run --handoff tNoSuchBuild --code owner-landing --reason r --reaped k1)
+hit  "$out" "no run-state file, so there is no run to hand off"
+
+# ---- AC4: the attribution guard. An OWN red is refused through fail 83 naming the leg; an
+# ---- all-INHERITED red is admitted; a record naming no bar is refused through fail 83's own branch.
+build_hold_fixture; seed_handoff_bar RED OWN; before=$(sum)
+out=$(run --handoff tRun --code owner-landing --reason r --reaped k1)
+hit  "$out" "--handoff --code owner-landing is refused unless the attribution record of the last gates-green bar reads every red leg INHERITED on the tree being closed, so gates-green must run on HEAD first; the condition that failed: its attribution reads x OWN"
+same "AC4 an OWN red wrote nothing" "$(sum)" "$before"
+build_hold_fixture; seed_handoff_bar RED INHERITED
+hit  "$(run --handoff tRun --code owner-landing --reason r --reaped k1)" "phase HELD · code owner-landing"
+build_hold_fixture; before=$(sum)
+out=$(run --handoff tRun --code owner-landing --reason r --reaped k1)
+hit  "$out" "the condition that failed: no gates-run fact in this record names a bar"
+same "AC4 a record naming no bar wrote nothing" "$(sum)" "$before"
+
+# ---- AC5: the tie admits a HEAD that moved by the run-state file alone and nothing wider, and the
+# ---- relaxation reaches --handoff only: the same records-only tree still refuses --close's override
+# ---- and the out-of-scope --abort with `ran at`.
+build_hold_fixture; seed_handoff_bar GREEN
+printf 'other\n' > other.txt; fixture; before=$(sum)
+out=$(run --handoff tRun --code owner-landing --reason r --reaped k1)
+hit  "$out" "the condition that failed: the bar it names ran at"
+same "AC5 a HEAD that moved past the record wrote nothing" "$(sum)" "$before"
+build_hold_fixture; seed_handoff_bar RED INHERITED
+out=$(run --close tRun --override gates-green --reason r)
+hit  "$out" "--close --override gates-green is refused unless the attribution record of the last gates-green bar reads every red leg INHERITED on the tree being closed, so gates-green must run on HEAD first; the condition that failed: the bar it names ran at"
+out=$(run --abort tRun --code gate-red-out-of-scope --reason r)
+hit  "$out" "--abort --code gate-red-out-of-scope is refused unless the attribution record of the last gates-green bar reads every red leg INHERITED on the tree being closed, so gates-green must run on HEAD first; the condition that failed: the bar it names ran at"
+
+# ---- AC6 and AC8: owner-decision needs a parked decision and is NOT guarded, so it is admitted over
+# ---- an OWN red once one is parked; under primary the recipe merges the run branch and names LANDER.
+build_hold_fixture; seed_handoff_bar RED OWN; before=$(sum)
+out=$(run --handoff tRun --code owner-decision --reason r --reaped k1)
+hit  "$out" "--handoff --code owner-decision requires a parked decision row in the record, because that row is the question the owner is handed, and a decision hand-off with none is a stop with no question in it; park it first with --park"
+same "AC6 a decision hand-off with no decision wrote nothing" "$(sum)" "$before"
+run --park tRun --item "which order lands it" --reason "options seen: a first or b first; refused: the order is the owner's" >/dev/null; fixture
+out=$(run --handoff tRun --code owner-decision --reason r --reaped k1)
+hit  "$out" "phase HELD · code owner-decision · until owner"
+hit  "$(read_handoff_row)" "handoff · item owner-decision · reason in the primary tree: git merge --no-ff unit && echo land"
+miss "$(read_handoff_row)" "--prepare"
+# ...and a blank LANDER under primary names no lander, so it is refused before any write.
+build_hold_fixture
+sed -i 's/^LANDER=.*/LANDER=""/' .unattended.conf; fixture
+seed_handoff_bar GREEN; before=$(sum)
+out=$(run --handoff tRun --code owner-landing --reason r --reaped k1)
+hit  "$out" "the hand-off recipe would name no lander or no branch to merge, and a recipe missing either is not one an owner can run; declare LANDER in the conf, or hand off from the run's own branch; the lander reads: []"
+same "AC8 a blank lander wrote nothing" "$(sum)" "$before"
+
+# ---- AC10: the --abort notice. A record first committed after a dated cutoff, aborted with a
+# ---- hand-off-shaped code, prints it and still aborts; a later cutoff, a blank one, a malformed one
+# ---- and a code outside the set print none, and none of the five is refused.
+for _ho_case in "2026-01-01 external-prerequisite yes" "2099-01-01 external-prerequisite no" \
+                "blank external-prerequisite no" "soon external-prerequisite no" "2026-01-01 fork-unresolvable no"; do
+  read -r _ho_cut _ho_code _ho_want <<<"$_ho_case"
+  build_hold_fixture
+  case "$_ho_cut" in blank) ;; *) printf 'HANDOFF_CUTOFF="%s"\n' "$_ho_cut" >> .unattended.conf; fixture ;; esac
+  run --attest tRun --item keepalive-reaped >/dev/null
+  run --attest tRun --item parked-decisions-surfaced >/dev/null
+  fixture
+  out=$(run --abort tRun --code "$_ho_code" --reason "nothing left to try")
+  hit  "$out" "phase ABORTED"
+  if [ "$_ho_want" = yes ]; then
+    hit  "$out" "unattended: NOTICE - from HANDOFF_CUTOFF an ABORTED record means DISCARD, its work must not land as it stands. This code is hand-off-shaped: if the work is sound and only an owner may land it or decide first, end the run with --handoff --code owner-landing or owner-decision instead. This abort proceeds as asked: $_ho_code"
+  else
+    miss "$out" "unattended: NOTICE - from HANDOFF_CUTOFF an ABORTED record means DISCARD"
+  fi
+  case "$_ho_cut" in
+    blank) hit "$out" "unattended: NOTE - this project declares no HANDOFF_CUTOFF, so this abort is not dated against the day ABORTED came to mean discard and no hand-off notice is printed" ;;
+    soon)  hit "$out" "unattended: NOTE - HANDOFF_CUTOFF is not a YYYY-MM-DD date, so no record can be dated against it and no hand-off notice is printed: soon" ;;
+  esac
+done
+
+fi   # ---- region two continues below: one compound block past about 3000 commands segfaults
+     # ---- bash 5.3 on Cygwin (exit 139), so the region is cut into blocks at top-level seams
+if in_shard 2; then
+
+# ======================================== TOOL-dUnstuckLanding-14 — the attended terminal, `--settle` ====
+# ---- SELF-CONTAINED, in its own scratch repository with its own bare origin, for the derived-terminal
+# ---- block's reason: every arm here pushes to the remote, and doing that in the shared fixture would
+# ---- move the anchor under every later arm. `primary` landing with `echo land` as the lander, both
+# ---- cutoffs declared so the fact-set arm grades and an ABORTED record can be dated. The hand-off is
+# ---- the real verb over a seeded GREEN bar, as unit 13's arms run it; the ABORTED records are written
+# ---- by hand, because what is under test is how `--settle` and the leg READ them.
+su_dir=$(mktemp -d); su_oroot=$(mktemp -d); su_origin="$su_oroot/origin.git"; su_out=$(mktemp -d)
+(
+  cd "$su_dir" || exit 2
+  git init -q -b main . && git config user.email t@t.test && git config user.name t \
+    && git config core.autocrlf false
+  git init -q --bare "$su_origin"
+  git --git-dir="$su_origin" config user.email t@t.test
+  git --git-dir="$su_origin" config user.name t
+  git --git-dir="$su_origin" symbolic-ref HEAD refs/heads/main
+  git remote add origin "$su_origin"
+  mkdir -p memory/guides memory/builds/tRun memory/builds/tOther
+  printf '# build method\n' > memory/guides/BUILD-METHOD.md
+  cat > .unattended.conf <<'SUC'
+MEMORY_ROOT=memory
+UNITS_REGION_CUTOFF="2026-08-19"
+LANDER="echo land"
+LANDER_MODE="primary"
+SELFTESTS_OWED_PATHS=""
+BYPASS_BAN="--no-verify"
+GATE_CMD="true"
+GATE_BOUND="600"
+GATE_WALL="21600"
+UNIT_STALL_BOUND="1800"
+REVIEW_ROUNDS="7"
+WIRING_CHECK="true"
+KEEPALIVE_CREATE="CronCreate"
+KEEPALIVE_DELETE="CronDelete"
+RESUME_SCHEDULE="on"
+RESUME_SCHEDULE_CREATE="TheScheduleCreate"
+RESUME_SCHEDULE_DELETE="TheScheduleDelete"
+RESUME_SCHEDULE_DELAY="1800"
+RESUME_SCHEDULE_LIMIT="6"
+LANDED_FACTS_CUTOFF="2000-01-01"
+HANDOFF_CUTOFF="2099-01-01"
+PHASES_EXTRA=""
+DOD_EXTRA=""
+SUC
+  for su_s in tRun tOther; do
+    cat > "memory/builds/$su_s/README.md" <<SUR
+---
+slug: $su_s
+node: a
+opened: 2026-08-01
+streams: architecture
+roster: ARCH
+ids: ARCH-$su_s-1
+---
+
+# $su_s
+
+<!-- gen:build-index -->
+**Build status:** OPEN · 1 unit(s)
+
+<!-- gen:build-units -->
+| Unit | Status | Rev | Last change |
+|---|---|---|---|
+| [ARCH-$su_s-1 — the unit](spec/one.md) | OPEN | rev-1 | 2026-08-01 |
+<!-- /gen:build-units -->
+<!-- /gen:build-index -->
+SUR
+  done
+  printf '# tRun — run state\n\n<!-- run:generated -->\n<!-- /run:generated -->\n\n## Mandate\n<!-- run:mandate -->\nThe owner authorizes build tRun to merge to main and to push.\n<!-- /run:mandate -->\n\n## Run facts\n\n## Parked\n' \
+    > memory/builds/tRun/RUN.md
+  git add -A >/dev/null && git commit -q -m base --no-verify
+  git push -q origin main
+  git checkout -q -b unit
+  git commit -q --allow-empty -m "unit work" --no-verify
+) >/dev/null 2>&1
+su_unit=$(git -C "$su_dir" rev-parse unit)
+su_base=$(git -C "$su_dir" rev-parse main)
+SU_R=memory/builds/tRun/RUN.md
+run_su() { ( cd "$su_dir" && env -u GATE_SELFTESTS GOV_DEFAULT_BRANCH=main bash "$SCRIPT" "$@" 2>&1 ); }
+run_su_git() { git -C "$su_dir" "$@"; }
+run_su_leg() { ( cd "$su_dir" && GOV_UNATTENDED_REPORT=1 bash "$HERE/check-unattended.sh" --skip 28 2>&1 ); }
+read_su_sum() { run_su_git hash-object "${1:-$SU_R}"; }
+read_su_fact() { sed -n "s/^$2: //p" "$su_dir/$1" | head -1; }
+init_su_fixture() {
+  run_su_git checkout -qf --detach "$su_unit" 2>/dev/null
+  run_su_git branch -qf unit "$su_unit"; run_su_git checkout -qf unit
+  run_su_git reset -q --hard "$su_unit"; run_su_git clean -qfd
+  run_su_git remote set-url origin "$su_origin"
+  run_su_git update-ref refs/heads/main "$su_base"; run_su_git push -q -f origin "$su_base":main; run_su_git fetch -q origin main
+}
+# A PREFLIGHTED, COMMITTED record handed off under <code> over a GREEN bar, the hand-off itself
+# committed as the run's last act on its branch: SU_C is the commit carrying the HELD record.
+write_su_handoff() { # code -> SU_C
+  init_su_fixture
+  run_su --preflight tRun --keepalive-id k1 >/dev/null
+  run_su_git add -A >/dev/null && run_su_git commit -q -m "records(tRun): preflight" --no-verify
+  ( cd "$su_dir" && seed_handoff_bar GREEN ) >/dev/null 2>&1
+  run_su --handoff tRun --code "$1" --reason "the owner lands it" --reaped k1 > "$su_out/handoff.out"
+  run_su_git add -A >/dev/null && run_su_git commit -q -m "records(tRun): hand-off" --no-verify
+  SU_C=$(run_su_git rev-parse HEAD)
+}
+# A run record written by hand under `## Run facts`, based at the fixture's BASE.
+write_su_record() { # slug · phase · witness
+  mkdir -p "$su_dir/memory/builds/$1"
+  printf '# %s — run state\n\n<!-- run:generated -->\n<!-- /run:generated -->\n\n## Run facts\nphase: %s\nwitness: %s\nbase: %s\nhalt-code: fork-unresolvable\n\n## Parked\n' \
+    "$1" "$2" "$3" "$su_base" > "$su_dir/memory/builds/$1/RUN.md"
+}
+# THE CONTENT PREDICATE'S POPULATION, landed: six ABORTED records and one BUILDING one, each based at
+# BASE. tAbase's witness IS its base; tAforeign's is another build's commit; tArevert's work landed and
+# was reverted on the first-parent line; tAkept's and tAwork's landed and stayed. Implementation
+# review round 1: tAmerge's landed as a --no-ff merge that `git revert -m 1` backed out (M4), and
+# tAgone's never merged at all, which only clause (ii) decides (M11). SU_M_tAmerge is that merge and
+# SU_REC is the tip.
+write_su_aborted() {
+  local s
+  init_su_fixture
+  for s in tAkept tOther tArevert tAwork; do
+    mkdir -p "$su_dir/memory/builds/$s"; printf '%s\n' "$s" > "$su_dir/memory/builds/$s/work.txt"
+    run_su_git add -A >/dev/null && run_su_git commit -q -m "work($s): the change" --no-verify
+    eval "SU_W_$s=\$(run_su_git rev-parse HEAD)"
+  done
+  for s in tAmerge tAgone; do
+    run_su_git checkout -q -B "w$s"
+    mkdir -p "$su_dir/memory/builds/$s"; printf '%s\n' "$s" > "$su_dir/memory/builds/$s/work.txt"
+    run_su_git add -A >/dev/null && run_su_git commit -q -m "work($s): the change" --no-verify
+    eval "SU_W_$s=\$(run_su_git rev-parse HEAD)"
+    run_su_git checkout -q unit
+  done
+  run_su_git -c core.hooksPath=/dev/null merge -q --no-ff --no-edit -m "land the tAmerge run" wtAmerge >/dev/null 2>&1
+  SU_M_tAmerge=$(run_su_git rev-parse HEAD)
+  write_su_record tAkept ABORTED "$SU_W_tAkept"
+  write_su_record tAbase ABORTED "$su_base"
+  write_su_record tAforeign ABORTED "$SU_W_tOther"
+  write_su_record tArevert ABORTED "$SU_W_tArevert"
+  write_su_record tAmerge ABORTED "$SU_W_tAmerge"
+  write_su_record tAgone ABORTED "$SU_W_tAgone"
+  write_su_record tAwork BUILDING "$SU_W_tAwork"
+  run_su_git add -A >/dev/null && run_su_git commit -q -m "records: the seven runs" --no-verify
+  run_su_git -c core.hooksPath=/dev/null revert --no-edit "$SU_W_tArevert" >/dev/null 2>&1
+  run_su_git -c core.hooksPath=/dev/null revert -m 1 --no-edit "$SU_M_tAmerge" >/dev/null 2>&1
+  run_su_git push -q -f origin HEAD:main
+  SU_REC=$(run_su_git rev-parse HEAD)
+}
+
+# ---- AC1: a hand-off its owner merged reads `LANDED (attended)` to --status and `terminal` to
+# ---- --liveness; --settle writes the terminal, stages it and leaves HEAD where it was; the leg counts
+# ---- it in the `attended` population and reds nothing on it. A second settle writes nothing.
+write_su_handoff owner-landing
+run_su_git push -q origin HEAD:main
+hit "$(run_su --status tRun)" "phase LANDED (attended)"
+out=$(run_su --liveness tRun)
+hit "$out" "state: terminal"
+hit "$out" "verdict: TERMINAL"
+su_h=$(run_su_git rev-parse HEAD)
+out=$(run_su --settle tRun)
+hit "$out" "unattended: settled memory/builds/tRun/RUN.md as a landed hand-off - phase LANDED · landed-by attended · landed-derived ${SU_C:0:8} ${SU_C:0:8}"
+hit "$out" "unattended: STAGED, not committed - the settle commit is owed, and it rides the next landing from this tree or a batched owner pass"
+same "AC1 the settle wrote LANDED" "$(read_su_fact "$SU_R" phase)" "LANDED"
+same "AC1 the settle wrote who landed it" "$(read_su_fact "$SU_R" landed-by)" "attended"
+same "AC1 the settle wrote the derivation" "$(read_su_fact "$SU_R" landed-derived)" "$SU_C $SU_C"
+same "AC1 the settle wrote the landing commit as the witness" "$(read_su_fact "$SU_R" witness)" "$SU_C"
+same "AC1 the settle staged the record" "$(run_su_git diff --cached --name-only)" "$SU_R"
+same "AC1 the settle left HEAD unmoved" "$(run_su_git rev-parse HEAD)" "$su_h"
+out=$(run_su_leg)
+hit "$out" "attended LANDED 1"
+same "AC1 the leg reds no check 15 on the settled record" \
+  "$(printf '%s\n' "$out" | grep -F "$SU_R" | grep -c 'UNATTENDED check 15 FAILED' || true)" "0"
+su_b=$(read_su_sum)
+hit "$(run_su --settle tRun)" "unattended: already settled - memory/builds/tRun/RUN.md reads LANDED; nothing was written"
+same "AC1 a second settle wrote nothing" "$(read_su_sum)" "$su_b"
+
+# ---- AC9: --resume over the landed hand-off, before it is settled, has nothing to resume, names
+# ---- --settle and writes nothing - never the HELD take-over row and never the LANDING re-bind.
+write_su_handoff owner-landing
+run_su_git push -q origin HEAD:main
+su_b=$(read_su_sum)
+out=$(run_su --resume tRun --keepalive-id KA-3)
+hit "$out" "unattended: nothing to resume — this hand-off was landed by its owner: its record's commit ${SU_C:0:8} is on refs/heads/main at ${SU_C:0:8}, so write that durably with --settle tRun; nothing was written"
+same "AC9 the resume wrote nothing" "$(read_su_sum)" "$su_b"
+same "AC9 the resume left the tree clean" "$(run_su_git status --porcelain)" ""
+
+# ---- AC3: --preflight retires the landed hand-off as RUN.LANDED., before it is settled and after,
+# ---- and the archive carries every fact the attended population owes; neither fail 81 nor fail 82.
+for su_case in unsettled settled; do
+  write_su_handoff owner-landing
+  run_su_git push -q origin HEAD:main
+  if [ "$su_case" = settled ]; then
+    run_su --settle tRun >/dev/null
+    run_su_git commit -q -m "records(tRun): settle the run record" --no-verify
+  fi
+  out=$(run_su --preflight tRun --keepalive-id KA-2)
+  hit  "$out" "preflight OK"
+  miss "$out" "UNATTENDED check 81"
+  miss "$out" "UNATTENDED check 82"
+  su_a=$(run_su_git ls-files 'memory/builds/tRun/RUN.LANDED.*.md' | head -1)
+  n=$((n+1)); [ -n "$su_a" ] || { echo "FAIL AC3 the $su_case hand-off left no RUN.LANDED. archive"; st=1; }
+  su_shown=$(run_su_git show ":$su_a" 2>/dev/null)
+  hit "$su_shown" "landed-by: attended"
+  hit "$su_shown" "units-at-landing: ARCH-tRun-1"
+  hit "$su_shown" "landed-derived: $SU_C "
+done
+
+# ---- AC2: a hold under any other code, merged the same way, stays HELD and is refused naming its
+# ---- code, with the record byte-unchanged (review item M13).
+init_su_fixture
+run_su --preflight tRun --keepalive-id k1 >/dev/null
+run_su_git add -A >/dev/null && run_su_git commit -q -m "records(tRun): preflight" --no-verify
+run_su --hold tRun --code inherited-red --until "probe gate" --reason "x leg red, INHERITED" --reaped k1 >/dev/null
+run_su_git add -A >/dev/null && run_su_git commit -q -m "records(tRun): hold" --no-verify
+run_su_git push -q origin HEAD:main
+out=$(run_su --status tRun)
+hit  "$out" "phase HELD"
+miss "$out" "LANDED (attended)"
+su_b=$(read_su_sum)
+out=$(run_su --settle tRun)
+hit "$out" "--settle settles a HELD record only under a hand-off code, because any other hold is a paused run its owner did not land, and settling it would end it; nothing was written. The hold code is: inherited-red"
+same "AC2 the refused settle wrote nothing" "$(read_su_sum)" "$su_b"
+
+# ---- AC8: an unanswered remote refuses before any write.
+write_su_handoff owner-landing
+run_su_git push -q origin HEAD:main
+run_su_git remote set-url origin "$su_oroot/nope.git"
+su_b=$(read_su_sum)
+out=$(run_su --settle tRun)
+hit "$out" "--settle writes only what the tip the remote advertises proves, and that tip was not observed, so nothing here can be proven and nothing was written"
+same "AC8 the unobserved tip wrote nothing" "$(read_su_sum)" "$su_b"
+
+# ---- AC10: the hand-off's recipe ends by settling the record, through the kit's own path relative to
+# ---- the repository holding it, and the verb prints the same command as its hint.
+write_su_handoff owner-landing
+su_row=$(grep ' handoff · item ' "$su_dir/$SU_R")
+hit  "$su_row" "&& bash $KIT_REL/unattended.sh --settle tRun"
+same "AC10 the recipe ends with the settle" "${su_row##* --settle }" "tRun"
+same "AC10 the settle path is derived and repo-relative" \
+  "$(printf '%s\n' "$su_row" | sed -n 's/.* && bash \(.*\)unattended\.sh --settle tRun$/\1/p')" "$KIT_REL/"
+hit  "$(cat "$su_out/handoff.out")" "unattended: once an owner has landed it, the record is settled by the recipe's last command - bash $KIT_REL/unattended.sh --settle tRun"
+
+# ---- The settle's own refusals: no record; a record differing from HEAD; a recorded LANDING; and a
+# ---- hand-off nobody has landed yet. Each writes nothing.
+hit "$(run_su --settle tNoSuchBuild)" "no run-state file, so there is no run to settle"
+write_su_handoff owner-landing
+add_facts "$su_dir/$SU_R" "note: an edit nobody committed"
+su_b=$(read_su_sum)
+hit "$(run_su --settle tRun)" "--settle writes only onto the record HEAD carries, and this one is uncommitted or differs from HEAD's copy in more than its lease lines, so what it would settle is not what any landing carried; commit or discard the difference first"
+same "a settle over an uncommitted edit wrote nothing" "$(read_su_sum)" "$su_b"
+run_su_git checkout -q -- "$SU_R"
+su_b=$(read_su_sum)
+hit "$(run_su --settle tRun)" "this hand-off does not derive LANDED: its owner has not landed it on the advertised tip, so there is nothing to settle yet; nothing was written - its landing commit ${SU_C:0:8} is not on refs/heads/main at ${su_base:0:8}"
+same "a settle over an unlanded hand-off wrote nothing" "$(read_su_sum)" "$su_b"
+init_su_fixture
+run_su --preflight tRun --keepalive-id k1 >/dev/null
+sed -i 's/^phase: .*/phase: LANDING/' "$su_dir/$SU_R"
+run_su_git add -A >/dev/null && run_su_git commit -q -m "records(tRun): close" --no-verify
+hit "$(run_su --settle tRun)" "--settle does not write over a recorded LANDING: a LANDING is completed by --landed, and a derived LANDED is written and retired by the next --preflight of its slug; nothing was written"
+
+# ---- AC4: the content predicate over the population it acts on. A witness equal to its base, a
+# ---- witness from another build, and work merged then reverted each read NOT landed and gain nothing;
+# ---- work merged and kept gains `work-landed-at: <witness> <tip>`. With its base removed it is
+# ---- undecidable, and refused as such.
+write_su_aborted
+for su_s in tAbase tAforeign tArevert tAmerge tAgone; do
+  su_b=$(read_su_sum "memory/builds/$su_s/RUN.md")
+  out=$(run_su --settle "$su_s")
+  hit "$out" "the content predicate reads this run's work NOT landed on refs/heads/main at ${SU_REC:0:8}, so there is no landing to record; nothing was written - "
+  same "AC4 $su_s gained nothing" "$(read_su_sum "memory/builds/$su_s/RUN.md")" "$su_b"
+  case "$su_s" in
+    tAbase)    hit "$out" "its witness ${su_base:0:8} is its base ${su_base:0:8} or an ancestor of it, so the run committed nothing of its own" ;;
+    tAforeign) hit "$out" "names tAforeign in its subject or touches memory/builds/tAforeign/, so its witness is not this run's work" ;;
+    tArevert)  hit "$out" "a commit on the tip's first-parent line reverts its commit ${SU_W_tArevert:0:8}" ;;
+    tAmerge)   hit "$out" "a commit on the tip's first-parent line reverts the merge ${SU_M_tAmerge:0:8}, which brought its commit ${SU_W_tAmerge:0:8} onto the tip" ;;
+    tAgone)    hit "$out" "its commit ${SU_W_tAgone:0:8} is not on the tip ${SU_REC:0:8}" ;;
+  esac
+done
+out=$(run_su --settle tAkept)
+hit  "$out" "unattended: settled memory/builds/tAkept/RUN.md as ABORTED with its work landed - work-landed-at $SU_W_tAkept $SU_REC"
+same "AC4 the kept record keeps its phase" "$(read_su_fact memory/builds/tAkept/RUN.md phase)" "ABORTED"
+same "AC4 the kept record names its witness and the tip" "$(read_su_fact memory/builds/tAkept/RUN.md work-landed-at)" "$SU_W_tAkept $SU_REC"
+run_su_git reset -q --hard "$SU_REC"
+sed -i '/^base: /d' "$su_dir/memory/builds/tAkept/RUN.md"
+run_su_git commit -qam "records(tAkept): lose the base" --no-verify
+out=$(run_su --settle tAkept)
+hit "$out" "the content predicate cannot decide whether this run's work landed, and --settle never guesses; nothing was written - the record carries no base fact"
+
+# ---- AC5: a cutoff EARLIER than the record's first commit means it meant discard; a blank one
+# ---- refuses every ABORTED settle naming the key. Neither writes (review item M2).
+write_su_aborted
+sed -i 's/^HANDOFF_CUTOFF=.*/HANDOFF_CUTOFF="2000-01-01"/' "$su_dir/.unattended.conf"
+su_b=$(read_su_sum memory/builds/tAkept/RUN.md)
+su_d=$(git -C "$su_dir" log -1 --format=%cs -- memory/builds/tAkept/RUN.md)
+hit "$(run_su --settle tAkept)" "this ABORTED record meant discard: it was first committed $su_d, on or after HANDOFF_CUTOFF 2000-01-01, so its work was ended as not to land, and no verb writes that it landed; nothing was written: memory/builds/tAkept/RUN.md"
+sed -i 's/^HANDOFF_CUTOFF=.*/HANDOFF_CUTOFF=""/' "$su_dir/.unattended.conf"
+hit "$(run_su --settle tAkept)" "--settle adds work-landed-at to an ABORTED record only when it predates HANDOFF_CUTOFF, the day ABORTED came to mean discard, and this project declares no such date, so no ABORTED record can be dated against it; declare HANDOFF_CUTOFF in the conf: blank"
+same "AC5 neither refused settle wrote" "$(read_su_sum memory/builds/tAkept/RUN.md)" "$su_b"
+
+# ---- AC6: a working record with no lease reads UNBOUND; --settle writes `work-landed-at` and
+# ---- `abandoned` under BUILDING, and a --preflight of another slug EXCLUDES it rather than counting
+# ---- it. A fresh lease reads LIVE, and the same settle is refused.
+write_su_aborted
+hit "$(run_su --liveness tAwork)" "verdict: UNBOUND"
+out=$(run_su --settle tAwork)
+hit  "$out" "unattended: settled memory/builds/tAwork/RUN.md as abandoned at phase BUILDING with its work landed - work-landed-at $SU_W_tAwork $SU_REC · abandoned "
+same "AC6 the abandoned record keeps its phase" "$(read_su_fact memory/builds/tAwork/RUN.md phase)" "BUILDING"
+n=$((n+1)); [ -n "$(read_su_fact memory/builds/tAwork/RUN.md abandoned)" ] || { echo "FAIL AC6 no abandoned fact was written"; st=1; }
+run_su_git commit -q -m "records(tAwork): settle the run record" --no-verify
+out=$(run_su --preflight tRun --keepalive-id k1)
+hit  "$out" "unattended: EXCLUDED memory/builds/tAwork/RUN.md from the live-run count — abandoned at"
+miss "$out" "memory/builds/tAwork/RUN.md · phase BUILDING"
+# ---- Implementation review round 1, M8: a settled record is not revived. `--resume` refuses it at
+# ---- 106, above the matrix, writing nothing and naming --preflight. RED against the driver before the
+# ---- refusal, whose take-over row resumed it under the `abandoned` the counts drop it for.
+su_b=$(read_su_sum memory/builds/tAwork/RUN.md); su_st=$(run_su_git status --porcelain)
+out=$(run_su --resume tAwork --keepalive-id k2)
+hit  "$out" "this record carries abandoned: --settle found its lease dead and its work landed, so the run it names is over, and resuming it would drive a run the live-run counts no longer see; nothing was written - start the next run on this slug with --preflight tAwork --keepalive-id <id>, which retires this record to its archive and starts on a fresh one: abandoned at "
+same "M8 the refused resume wrote nothing" "$(read_su_sum memory/builds/tAwork/RUN.md)" "$su_b"
+same "M8 the refused resume left the tree as it found it" "$(run_su_git status --porcelain)" "$su_st"
+write_su_aborted
+add_facts "$su_dir/memory/builds/tAwork/RUN.md" "$(printf 'keepalive: k1\nsession: fixture-session\nlease-utc: %s' "$(date -u +%Y-%m-%dT%H:%M:%SZ)")"
+run_su_git commit -qam "records(tAwork): a fresh lease" --no-verify
+su_b=$(read_su_sum memory/builds/tAwork/RUN.md)
+hit "$(run_su --settle tAwork)" "--settle reads a working record as abandoned only when --liveness says STALE or UNBOUND, and it says LIVE, so a session may still drive it and settling it would end a live run; nothing was written"
+same "AC6 the live record was not settled" "$(read_su_sum memory/builds/tAwork/RUN.md)" "$su_b"
+
+# ---- TOOL-dUnstuckLanding-27 S2, AC2 and AC3: UNBOUND is an unanswered probe, never a verdict. The
+# ---- lease `write_lease` records under a harness exporting no session id reads `session: absent`, so
+# ---- a LEASED record whose last move is seconds old reads UNBOUND and is refused naming the lease;
+# ---- the same leased record aged past the bound with no live pid settles. AC3, the legacy record
+# ---- with no `lease-utc` fact settling on UNBOUND alone, is AC6's first arm above, unchanged. RED,
+# ---- the first, against the admit that took UNBOUND whole: it wrote `abandoned` over a live run.
+write_su_aborted
+add_facts "$su_dir/memory/builds/tAwork/RUN.md" "$(printf 'keepalive: k1\nsession: absent\npid: absent\nlease-utc: %s' "$(date -u +%Y-%m-%dT%H:%M:%SZ)")"
+run_su_git commit -qam "records(tAwork): a lease with no session" --no-verify
+hit "$(run_su --liveness tAwork)" "verdict: UNBOUND"
+su_b=$(read_su_sum memory/builds/tAwork/RUN.md)
+out=$(run_su --settle tAwork)
+hit  "$out" "--settle reads a leased working record whose session is absent as abandoned only when its last move is stale and its pid is not alive, and the lease written at "
+hit  "$out" " reads stale no and pid-alive "
+same "TOOL-dUnstuckLanding-27 AC2 the fresh leased record was not settled" "$(read_su_sum memory/builds/tAwork/RUN.md)" "$su_b"
+write_su_aborted
+add_facts "$su_dir/memory/builds/tAwork/RUN.md" "$(printf 'keepalive: k1\nsession: absent\npid: absent\nlease-utc: 2000-01-01T00:00:00Z')"
+GIT_AUTHOR_DATE="2000-01-01T00:00:00Z" GIT_COMMITTER_DATE="2000-01-01T00:00:00Z" \
+  run_su_git commit -qam "records(tAwork): an old lease with no session" --no-verify
+su_gd=$(run_su_git rev-parse --absolute-git-dir); rm -rf "$su_gd/gate-logs" "$su_gd/gate-queue-heartbeat"
+out=$(run_su --settle tAwork)
+hit  "$out" "unattended: settled memory/builds/tAwork/RUN.md as abandoned at phase BUILDING with its work landed - work-landed-at $SU_W_tAwork $SU_REC · abandoned "
+miss "$out" "--settle reads a leased working record whose session is absent"
+
+# ---- Implementation review round 2, M6 and L4 (ids 23, 14): the `pid-alive yes` half of S2's refusal.
+# ---- A leased, session-absent record whose last move is stale and whose pid is a LIVE process, leased
+# ---- after that process started, is refused at 101 naming both readings, and the record is unchanged.
+# ---- RED with the `|| [ "$LV_ALIVE" = yes ]` clause deleted: the stale lease alone settled it.
+write_su_aborted
+sleep 300 & su_sleep=$!
+case "$(uname -s)" in
+  MINGW*|MSYS*|CYGWIN*) su_wpid=$(ps -p "$su_sleep" | awk -v p="$su_sleep" 'NR>1 && $1==p {print $4}') ;;
+  *) su_wpid=$su_sleep ;;
+esac
+n=$((n+1)); [ -n "$su_wpid" ] || { echo "FAIL fixture: no pid for the background sleep, so the live-pid arm would probe an empty value and prove nothing"; st=1; }
+add_facts "$su_dir/memory/builds/tAwork/RUN.md" "$(printf 'keepalive: k1\nsession: absent\npid: %s\npid-image: absent\nlease-utc: %s' "$su_wpid" "$(date -u +%Y-%m-%dT%H:%M:%SZ)")"
+GIT_AUTHOR_DATE="2000-01-01T00:00:00Z" GIT_COMMITTER_DATE="2000-01-01T00:00:00Z" \
+  run_su_git commit -qam "records(tAwork): a live pid with no session" --no-verify
+touch -d 2000-01-01 "$su_dir/memory/builds/tAwork/RUN.md"
+su_gd=$(run_su_git rev-parse --absolute-git-dir); rm -rf "$su_gd/gate-logs" "$su_gd/gate-queue-heartbeat"
+su_b=$(read_su_sum memory/builds/tAwork/RUN.md)
+out=$(run_su --settle tAwork)
+hit  "$out" " reads stale yes and pid-alive yes, so a session may still hold it and settling it would end a live run; nothing was written"
+same "TOOL-dUnstuckLanding-27 L4 the stale lease with a live pid was not settled" "$(read_su_sum memory/builds/tAwork/RUN.md)" "$su_b"
+kill "$su_sleep" 2>/dev/null; wait "$su_sleep" 2>/dev/null
+
+# ---- Implementation review round 1, M8, the route fail 106 names, and round 2, M3 (id 10): a run
+# ---- interrupted at VERIFYING, its keepalive already attested reaped, its work on the tip and its lease
+# ---- long dead, is settled `abandoned`; `--resume` refuses it, and `--preflight` under a NEW keepalive
+# ---- RETIRES the record like a finished one and starts on a fresh one. RED against round 1's in-place
+# ---- strip, which kept the dead run's phase and its met `keepalive-reaped` on the next run's record.
+init_su_fixture
+run_su --preflight tRun --keepalive-id k1 >/dev/null
+run_su_git add -A >/dev/null && run_su_git commit -q -m "records(tRun): preflight" --no-verify
+printf 'w\n' > "$su_dir/memory/builds/tRun/work.txt"
+run_su_git add -A >/dev/null && run_su_git commit -q -m "work(tRun): the change" --no-verify
+su_w=$(run_su_git rev-parse HEAD)
+run_su --attest tRun --item keepalive-reaped >/dev/null
+same "M3 the dead run attested its reap" "$(read_su_fact "$SU_R" keepalive-reaped)" "yes"
+sed -i "s/^phase: .*/phase: VERIFYING/; s/^witness: .*/witness: $su_w/; s/^session: .*/session: absent/; s/^pid: .*/pid: absent/; s/^lease-utc: .*/lease-utc: 2000-01-01T00:00:00Z/" "$su_dir/$SU_R"
+GIT_AUTHOR_DATE="2000-01-01T00:00:00Z" GIT_COMMITTER_DATE="2000-01-01T00:00:00Z" \
+  run_su_git commit -qam "records(tRun): an old lease with no session" --no-verify
+run_su_git push -q -f origin HEAD:main
+su_gd=$(run_su_git rev-parse --absolute-git-dir); rm -rf "$su_gd/gate-logs" "$su_gd/gate-queue-heartbeat"
+out=$(run_su --settle tRun)
+hit  "$out" "unattended: settled memory/builds/tRun/RUN.md as abandoned at phase VERIFYING with its work landed - work-landed-at $su_w "
+run_su_git commit -q -m "records(tRun): settle the run record" --no-verify
+hit  "$(run_su --resume tRun --keepalive-id k2)" "nothing was written - start the next run on this slug with --preflight tRun --keepalive-id <id>, which retires this record to its archive and starts on a fresh one: abandoned at "
+out=$(run_su --preflight tRun --keepalive-id k2)
+hit  "$out" "unattended: retired the finished record — $SU_R -> memory/builds/tRun/RUN.VERIFYING."
+hit  "$out" "unattended: preflight — the record carried abandoned at "
+hit  "$out" "so it is retired like a finished one and this run starts on a fresh record"
+miss "$out" "UNATTENDED check 82"
+su_arch=$(cd "$su_dir" && ls memory/builds/tRun/RUN.VERIFYING.*.md 2>/dev/null)
+n=$((n+1)); [ -n "$su_arch" ] && [ -n "$(read_su_fact "$su_arch" abandoned)" ] \
+  || { echo "FAIL M3 the settled record was not archived with its abandoned evidence: ${su_arch:-none}"; st=1; }
+same "M3 the next run starts at a fresh phase" "$(read_su_fact "$SU_R" phase)" "RUNNING"
+same "M3 the next run carries no keepalive-reaped" "$(read_su_fact "$SU_R" keepalive-reaped)" ""
+same "M8 the next run carries no abandoned" "$(read_su_fact "$SU_R" abandoned)" ""
+same "M8 the next run carries no work-landed-at" "$(read_su_fact "$SU_R" work-landed-at)" ""
+same "M8 the next run holds the new keepalive" "$(read_su_fact "$SU_R" keepalive)" "k2"
+
+# ---- AC7: the leg UPHOLDS work-landed-at. Written by hand onto the reverted record it reds, naming
+# ---- the fact and the file; the settled bytes of the kept record red nothing; an `abandoned` marker
+# ---- standing alone reds.
+write_su_aborted
+run_su --settle tAkept >/dev/null
+add_facts "$su_dir/memory/builds/tArevert/RUN.md" "work-landed-at: $SU_W_tArevert $SU_REC"
+add_facts "$su_dir/memory/builds/tAbase/RUN.md" "abandoned: 2026-10-04T00:00:00Z"
+run_su_git add -A >/dev/null
+out=$(run_su_leg)
+hit  "$out" "a record claims work-landed-at and the content predicate does not uphold it at the tip the fact records, so the fact is not one --settle could have written: a commit on the tip's first-parent line reverts its commit ${SU_W_tArevert:0:8} in memory/builds/tArevert/RUN.md"
+same "AC7 the settled bytes of the kept record red nothing" \
+  "$(printf '%s\n' "$out" | grep -F 'a record claims work-landed-at' | grep -c 'memory/builds/tAkept/' || true)" "0"
+hit  "$out" "a record carries abandoned with no work-landed-at, and --settle writes the two together"
+rm -rf "$su_dir" "$su_oroot" "$su_out"
 
 fi   # ---- region two continues below: one compound block past about 3000 commands segfaults
      # ---- bash 5.3 on Cygwin (exit 139), so the region is cut into blocks at top-level seams
@@ -10644,6 +11215,29 @@ same "...and wrote no freeze line" \
 askmode ok
 dispreset
 
+# ---- TOOL-dUnstuckLanding-13 AC7: the hand-off freezes the asks exactly as the landing verbs do, over
+# ---- the same self-filed fixture the AC15 arm above lands, and a witness that cannot answer refuses
+# ---- it before any write. `owner-decision` with a parked decision, so no bar has to be seeded here.
+printf '# tDispF — asks\n\n## Asks\n- EXMP-tDispF-1 · filed 2026-09-10 · this build raised it · seen `memory/builds/tDispF/BACKLOG.md` · accept done\n\n## Dispositions\n' \
+  > memory/builds/tDispF/BACKLOG.md
+askrows 'EXMP-tDispF-1\tCLOSED\t-\ttDispF\tLOW\tyes\t-\t-\t-\t-\n'
+git add -A >/dev/null; git commit -q -m hofreeze --no-verify
+run --preflight tDispF --keepalive-id KD-1 >/dev/null
+run --park tDispF --item "which order lands it" --reason "options seen: a or b; refused: the order is the owner's" >/dev/null
+git add -A >/dev/null; git commit -q -m hopark --no-verify
+askmode silent; before=$(git hash-object memory/builds/tDispF/RUN.md)
+out=$(run --handoff tDispF --code owner-decision --reason r --reaped KD-1)
+hit  "$out" "this run's asks cannot be read at HEAD, so the hand-off would freeze no answer to the question the run was authorized by, and the record an owner lands would carry none; nothing was written"
+hit  "$out" "DEAD PROBE - the declared command wrote nothing to either stream"
+same "AC7 a failed freeze wrote nothing" "$(git hash-object memory/builds/tDispF/RUN.md)" "$before"
+askmode ok
+out=$(run --handoff tDispF --code owner-decision --reason r --reaped KD-1)
+hit  "$out" "phase HELD · code owner-decision · until owner"
+same "AC7 the hand-off freezes what the landing verbs freeze over this fixture" \
+  "$(sed -n 's/^asks-at-landing: //p' memory/builds/tDispF/RUN.md)" "EXMP-tDispF-1=CLOSED"
+askrows ''
+dispreset
+
 # ========================================================== TOOL-dDerivedDocket-19 — THE GRANT ====
 # A `may:` line is honoured from ONE place, a `slug`-mode README at the default-branch anchor, and
 # everything else about it is a refusal. Every README lives on MAIN for the reason the mandate's do:
@@ -11329,7 +11923,7 @@ IH_PARK='INHERITED_RED=park\nINHERITED_RED_MAX_AGE=10\n'
 build_ih_policy "$IH_LAND"
 out=$(run_ih --close tRun $IHOVR)
 hit  "$out" "gates-green — the inherited-red policy reads land: INHERITED_RED=land with an age bound of 10 first-parent landings, read from .githooks/gate-env.sh at ${IH_R:0:8}"
-hit  "$out" "gates-green MET over an inherited-only red under INHERITED_RED=land: x leg red at ${IH_R:0:8}, every one INHERITED within the 10-landing age bound"
+hit  "$out" "gates-green MET over an inherited-only red under INHERITED_RED=land: x leg red at ${IH_R:0:8}, every one INHERITED; none aged past the 10-landing age bound"
 miss "$out" "a machine-checked DoD item is unmet, so --close blocks: gates-green"
 hit  "$(read_ih_facts)" "gates-inherited: ${IH_R:0:8} x leg"
 hit  "$(read_ih_facts)" "gates-run: unattended-"
@@ -11363,16 +11957,115 @@ out=$(run_ih --close tRun $IHOVR)
 same "AC18 GATE_ATTRIBUTE is the advertised tip, never local main" "$(grep '^GATE_ATTRIBUTE=' "$ih_out/barenv.txt")" "GATE_ATTRIBUTE=$IH_R"
 hit  "$out" "hold · inherited-red · until probe gate · x leg red at ${IH_R:0:8}, INHERITED; INHERITED_RED=park"
 
-# AC17: under land an aged row parks as the hold, and land beside a blank, zero or non-numeric bound
-# reads park, announced.
+# AC17, FLIPPED by TOOL-dUnstuckLanding-16 (ruling TOOL-dUnstuckLanding-22): under land an aged row is
+# MET and names itself aged, with no hold line; land beside a blank, zero or non-numeric bound reads
+# land with NO bound, announced, and is MET saying nothing is escalated.
 build_ih_policy "$IH_LAND"
 out=$(IH_AGE=aged run_ih --close tRun $IHOVR)
-hit  "$out" "hold · inherited-red · until probe gate · x leg red at ${IH_R:0:8}, INHERITED; INHERITED_RED=land"
-hit  "$out" "1 INHERITED leg(s) read aged or unproven past the age bound, which never lands"
+hit  "$out" "gates-green MET over an inherited-only red under INHERITED_RED=land: x leg red at ${IH_R:0:8}, every one INHERITED; aged past the 10-landing age bound, so each ask is BLOCKER: x leg"
+miss "$out" "hold · "
 for _b in "" 0 ten; do
   build_ih_policy "INHERITED_RED=land\nINHERITED_RED_MAX_AGE=$_b\n"
   out=$(run_ih --close tRun $IHOVR)
-  hit "$out" "gates-green — the inherited-red policy reads park: INHERITED_RED=land with no positive INHERITED_RED_MAX_AGE beside it in .githooks/gate-env.sh at ${IH_R:0:8}, which reads park"
+  hit "$out" "gates-green — the inherited-red policy reads land: INHERITED_RED=land with no positive INHERITED_RED_MAX_AGE beside it in .githooks/gate-env.sh at ${IH_R:0:8}, so no leg is aged and nothing is escalated"
+  hit "$out" "every one INHERITED; no age bound is declared, so no leg is aged and nothing is escalated"
+done
+
+# ---- closing review round 1 M12 (id 18): the branches TOOL-dUnstuckLanding-16 flipped from park to
+# ---- land, each with its own reason and the item MET. And M7 (ids 6, 14): a conf naming no policy
+# ---- file reads the file the pre-push hook reads, at R, before the kit default; so a hook file saying
+# ---- park holds here exactly as it refuses the push, where the driver used to read land and strand
+# ---- the run at LANDING. `set_ih_tip` moves R by one commit made on main and pushed, and
+# ---- `remove_ih_tip` drops that commit again, so the next fixture is built on the main it expects.
+set_ih_tip() { # a shell command run on main -> R re-pinned to the commit it makes
+  run_ih_repo checkout -q main; IH_PREV=$(run_ih_repo rev-parse main)
+  ( cd "$ih_dir" && eval "$1" ) >/dev/null 2>&1
+  run_ih_repo add -A >/dev/null; run_ih_repo commit -q -m "R moves" --no-verify
+  run_ih_repo push -q -f origin main; IH_R=$(run_ih_repo rev-parse main)
+  run_ih_repo checkout -q unit
+}
+remove_ih_tip() { # -> main and the remote back at the commit before set_ih_tip's
+  run_ih_repo reset -q --hard; run_ih_repo clean -qfd; run_ih_repo checkout -q main
+  run_ih_repo reset -q --hard "$IH_PREV"; run_ih_repo push -q -f origin main; run_ih_repo checkout -q unit
+}
+build_ih_policy "$IH_LAND"
+set_ih_tip "git rm -q .unattended.conf .githooks/gate-env.sh"
+out=$(run_ih --close tRun $IHOVR)
+hit  "$out" "gates-green — the inherited-red policy reads land: the project conf is absent at ${IH_R:0:8}, so no policy file is named, and the pre-push hook's own .githooks/gate-env.sh is absent there too, so the kit default land applies, with no age bound"
+hit  "$out" "gates-green MET over an inherited-only red under INHERITED_RED=land"
+remove_ih_tip
+build_ih_policy "$IH_LAND"
+set_ih_tip "sed -i 's/^GATE_POLICY_FILE=.*/GATE_POLICY_FILE=\"\"/' .unattended.conf && git rm -q .githooks/gate-env.sh"
+out=$(run_ih --close tRun $IHOVR)
+hit  "$out" "gates-green — the inherited-red policy reads land: GATE_POLICY_FILE is blank or absent in the conf at ${IH_R:0:8}, and the pre-push hook's own .githooks/gate-env.sh is absent there too, so the kit default land applies, with no age bound"
+hit  "$out" "gates-green MET over an inherited-only red under INHERITED_RED=land"
+remove_ih_tip
+build_ih_policy "$IH_PARK"
+set_ih_tip "sed -i 's|^GATE_POLICY_FILE=.*|GATE_POLICY_FILE=\"fx/none.sh\"|' .unattended.conf"
+out=$(run_ih --close tRun $IHOVR)
+hit  "$out" "gates-green — the inherited-red policy reads land: GATE_POLICY_FILE names fx/none.sh, which is absent at ${IH_R:0:8}, so the kit default land applies, with no age bound"
+hit  "$out" "gates-green MET over an inherited-only red under INHERITED_RED=land"
+remove_ih_tip
+build_ih_policy "$IH_PARK"
+set_ih_tip "sed -i 's/^GATE_POLICY_FILE=.*/GATE_POLICY_FILE=\"\"/' .unattended.conf"
+out=$(run_ih --close tRun $IHOVR)
+hit  "$out" "gates-green — the inherited-red policy reads park: INHERITED_RED=park, read from .githooks/gate-env.sh at ${IH_R:0:8}; GATE_POLICY_FILE is blank or absent in the conf at ${IH_R:0:8}, so the file the pre-push hook reads decides"
+hit  "$out" "hold · inherited-red · until probe gate · x leg red at ${IH_R:0:8}, INHERITED; INHERITED_RED=park"
+miss "$out" "gates-green MET over an inherited-only red"
+remove_ih_tip
+
+# TOOL-dUnstuckLanding-16 AC4: INHERITED_RED undeclared at R, a bound of 2 and one aged INHERITED leg,
+# the witness armed. The policy reads the kit default land, the item is MET with a gates-inherited
+# fact, and the build's own BACKLOG gains one ask whose SEV reads BLOCKER, read back through ASKS_CMD.
+# Nothing outside the build's folder is staged. RED against the filer this replaced, which files HIGH
+# and so is REMOVED by a witness reading BLOCKER, and against the table that held an aged leg.
+IH_UNDECL='INHERITED_RED_MAX_AGE=2\n'
+build_ih_policy "$IH_UNDECL"; write_ih_asks
+out=$(IH_AGE=aged IH_ASK_SEV=BLOCKER run_ih --close tRun $IHOVR)
+hit  "$out" "gates-green — the inherited-red policy reads land: .githooks/gate-env.sh at ${IH_R:0:8} declares no INHERITED_RED, so the kit default land applies, with an age bound of 2 first-parent landings"
+hit  "$out" "gates-green MET over an inherited-only red under INHERITED_RED=land: x leg red at ${IH_R:0:8}, every one INHERITED; aged past the 2-landing age bound, so each ask is BLOCKER: x leg"
+hit  "$out" "gates-green: filed ask ARCH-tRun-2 for leg x leg red at ${IH_R:0:8}, BLOCKER, staged in memory/builds/tRun/BACKLOG.md"
+miss "$out" "a machine-checked DoD item is unmet, so --close blocks: gates-green"
+hit  "$(read_ih_facts)" "gates-inherited: ${IH_R:0:8} x leg"
+hit  "$(cat "$ih_dir/memory/builds/tRun/BACKLOG.md")" "· inherited red: leg x leg red at ${IH_R:0:8}, older than the 2-landing age bound · seen \`fx/x.sh\`@${IH_R:0:8} run \`bash fx/x.sh\`"
+hit  "$(cat "$ih_dir/memory/builds/tRun/BACKLOG.md")" "- SEV · ARCH-tRun-2 · BLOCKER · "
+hit  "$(tail -1 "$ih_out/asks-calls.txt")" "--tsv --ready ARCH-tRun-2 --target tRun"
+same "TOOL-dUnstuckLanding-16 AC4 nothing outside the build's folder is staged" \
+  "$(run_ih_repo diff --cached --name-only | grep -v '^memory/builds/tRun/')" ""
+
+# AC5: an age under the bound, and an unproven age, are MET with the ask filed HIGH — never escalated.
+for _a in 1 -; do
+  build_ih_policy "$IH_UNDECL"; write_ih_asks
+  out=$(IH_AGE="$_a" run_ih --close tRun $IHOVR)
+  hit  "$out" "gates-green MET over an inherited-only red under INHERITED_RED=land: x leg red at ${IH_R:0:8}, every one INHERITED; none aged past the 2-landing age bound"
+  hit  "$out" "gates-green: filed ask ARCH-tRun-2 for leg x leg red at ${IH_R:0:8}, HIGH, staged in memory/builds/tRun/BACKLOG.md"
+  hit  "$(cat "$ih_dir/memory/builds/tRun/BACKLOG.md")" "- SEV · ARCH-tRun-2 · HIGH · a merge-bar leg is red on the default branch"
+  miss "$(cat "$ih_dir/memory/builds/tRun/BACKLOG.md")" "older than the"
+done
+
+# AC6: gates-green twice over the same aged leg at the same R files ONE BLOCKER — the second reads the
+# first back OPEN at BLOCKER and reuses it. Under park, so the item can run again on the same run;
+# the SEV follows the age under either policy. An ask read back at another SEV is NOT reused (F3).
+build_ih_policy "INHERITED_RED=park\nINHERITED_RED_MAX_AGE=2\n"; write_ih_asks
+out=$(IH_AGE=aged IH_ASK_SEV=BLOCKER run_ih --close tRun $IHOVR)
+hit  "$out" "gates-green: filed ask ARCH-tRun-2 for leg x leg red at ${IH_R:0:8}, BLOCKER"
+hit  "$out" "hold · inherited-red · until probe gate · x leg red at ${IH_R:0:8}, INHERITED; INHERITED_RED=park"
+run_ih_repo add -A >/dev/null; run_ih_repo commit -q -m "records: the BLOCKER ask" --no-verify
+out=$(IH_AGE=aged IH_ASK_SEV=BLOCKER run_ih --close tRun $IHOVR)
+hit  "$out" "gates-green: ask ARCH-tRun-2 already OPEN for leg x leg at ${IH_R:0:8} · reused"
+same "TOOL-dUnstuckLanding-16 AC6 the reuse staged no BACKLOG row" "$(run_ih_repo diff --cached --name-only -- memory/builds/tRun/BACKLOG.md)" ""
+same "TOOL-dUnstuckLanding-16 AC6 one BLOCKER for the leg at R" "$(grep -c '^- SEV · ARCH-tRun-[0-9]* · BLOCKER · ' "$ih_dir/memory/builds/tRun/BACKLOG.md")" "1"
+out=$(IH_AGE=aged IH_ASK_SEV=HIGH run_ih --close tRun $IHOVR)
+miss "$out" "already OPEN for leg x leg"
+# ...and a second leg reading OWN beside the aged one, under land: UNMET with the attribution lines and
+# no hold line — a red of the run's own never lands, at any age of its neighbour.
+for _v in OWN MIXED; do
+  build_ih_policy "$IH_UNDECL"
+  out=$(IH_AGE=aged IH_SECOND="$_v" run_ih --close tRun $IHOVR)
+  hit  "$out" "a machine-checked DoD item is unmet, so --close blocks: gates-green"
+  hit  "$out" "GATE attr  y leg  $_v · stub"
+  miss "$out" "gates-green MET over an inherited-only red"
+  miss "$out" "hold · "
 done
 
 # AC15: the same inherited-only record on a bar whose verdict reads tree_moved yes is UNMET, naming it.
@@ -11446,7 +12139,7 @@ hit  "$out" "phase ABORTED"
 build_ih_policy "$IH_LAND"; write_ih_asks
 out=$(run_ih --close tRun $IHOVR)
 hit  "$out" "gates-green MET over an inherited-only red under INHERITED_RED=land"
-hit  "$out" "gates-green: filed ask ARCH-tRun-2 for leg x leg red at ${IH_R:0:8}, staged in memory/builds/tRun/BACKLOG.md"
+hit  "$out" "gates-green: filed ask ARCH-tRun-2 for leg x leg red at ${IH_R:0:8}, HIGH, staged in memory/builds/tRun/BACKLOG.md"
 hit  "$(run_ih_repo diff --cached -- memory/builds/tRun/BACKLOG.md)" "+- ARCH-tRun-2 · filed "
 hit  "$(cat "$ih_dir/memory/builds/tRun/BACKLOG.md")" " · seen \`fx/x.sh\`@${IH_R:0:8} run \`bash fx/x.sh\` · accept the leg is green at the default branch's tip"
 hit  "$(cat "$ih_dir/memory/builds/tRun/BACKLOG.md")" "- SEV · ARCH-tRun-2 · HIGH · a merge-bar leg is red on the default branch"
@@ -12418,6 +13111,708 @@ fi
 
 cd "$TMP" || exit 2
 rm -rf "$gw_dir" "$gw_oroot" "$gw_out"
+
+# ============== TOOL-dUnstuckLanding-18 — the carry-forward term, and `--rescope --act defer` ========
+# A build of two units on MAIN: ARCH-tCarry-1 CLOSED, and ARCH-tCarry-2 DEFERRED with its spec closing
+# EXMP-tCarry-5, which the build's own BACKLOG.md files under its own slug beside a KEEP row. Every arm
+# preflights that tree and breaks exactly ONE of the term's five conditions; the MET arm runs FIRST, so
+# no refusal below is measuring the fixture rather than the subject. In the shared repository, after
+# `askconf`'s stub exists, because condition 4 reads the ask witness and nothing else.
+write_cf_backlog() { # ask id -> this build's own BACKLOG.md, filing it with a KEEP row
+  printf '# tCarry — asks\n\n## Asks\n- %s · filed 2026-09-10 · the deferred scope · seen `memory/builds/tCarry/BACKLOG.md` · accept done\n\n## Dispositions\n- KEEP · %s · the deferred unit waits on it\n' \
+    "$1" "$1" > memory/builds/tCarry/BACKLOG.md
+}
+write_cf_closed_spec() { # the CLOSED unit's spec, with the given Edges body
+  printf '# ARCH-tCarry-1 the unit\n\n**Status:** CLOSED · rev-1 · 2026-08-01 · node a · Tier-1 · base 00000000 · streams architecture\n\n## 3. Non-goals\n\n### Edges\n\n%s\n' \
+    "$1" > memory/builds/tCarry/spec/one.md
+}
+write_cf_deferred_spec() { # the DEFERRED unit's spec, with the given header tail
+  printf '# ARCH-tCarry-2 the deferred unit\n\n**Status:** DEFERRED · rev-1 · 2026-08-01 · node a · Tier-1 · base 00000000 · streams architecture · %s\n' \
+    "$1" > memory/builds/tCarry/spec/two.md
+}
+CF_ROWS='| Unit | Status | Rev | Last change |
+|---|---|---|---|
+| [ARCH-tCarry-1 — the unit](spec/one.md) | CLOSED | rev-1 | 2026-08-01 |
+| [ARCH-tCarry-2 — the deferred unit](spec/two.md) | DEFERRED | rev-1 | 2026-08-01 |'
+seed_cf_fixture() {
+  reset_tree; git checkout -qf main; git clean -qfd
+  readme tCarry
+  setunits tCarry "$CF_ROWS"
+  roster tCarry "1. ARCH-tCarry-1 — the unit
+2. ARCH-tCarry-2 — the deferred unit"
+  mkdir -p memory/builds/tCarry/spec memory/builds/tCarry/reviews
+  write_cf_closed_spec 'none'
+  write_cf_deferred_spec 'closes EXMP-tCarry-5'
+  printf '**Serves:** spec-audit ARCH-tCarry-1 ARCH-tCarry-2\n\n# the audit\n' > memory/builds/tCarry/reviews/audit.md
+  write_cf_backlog EXMP-tCarry-5
+  git add -A >/dev/null && git commit -q -m cf-fixture --no-verify && git push -q -f origin main
+  git checkout -qf unit && git merge -q --no-edit main >/dev/null 2>&1
+  CFP=$(git rev-parse HEAD); CFMAIN=$(git rev-parse main)
+}
+set_cf_tree() { git checkout -qf unit >/dev/null 2>&1; git reset -q --hard "$CFP"; git clean -qfd
+            git branch -qf main "$CFMAIN"; git push -q -f origin "$CFMAIN":main
+            mkconf; askconf; git add -A >/dev/null; git commit -q -m cfconf --no-verify
+            askmode ok; askrows ''; }
+write_cf_commit() { git add -A >/dev/null; git commit -q -m cf-edit --no-verify; }
+run_cf_preflight() { set_cf_tree; run --preflight tCarry --keepalive-id KC-1 >/dev/null; write_cf_commit; }
+run_cf_defer() { run --rescope tCarry --act defer --item ARCH-tCarry-2 --reason "the owner takes it in the next build"; }
+CF_UNMET="a machine-checked DoD item is unmet, so --close blocks: build-complete"
+seed_cf_fixture
+
+# ---- AC1 and AC6 — MET. The defer act writes ONE row and exits 0, and the close then meets
+# ---- `build-complete` with no override, printing the carried unit and its ask.
+run_cf_preflight
+out=$(run_cf_defer); rc=$?
+same "AC6 --rescope --act defer exits 0" "$rc" "0"
+hit  "$out" "amendment recorded — defer ARCH-tCarry-2"
+same "AC6 --rescope --act defer writes ONE defer row" \
+  "$(grep -c ' rescope · item defer ARCH-tCarry-2 · reason the owner takes it in the next build$' memory/builds/tCarry/RUN.md)" "1"
+write_cf_commit
+out=$(run --close tCarry)
+hit  "$out" "carried forward — ARCH-tCarry-2, DEFERRED against the open ask EXMP-tCarry-5"
+miss "$out" "$CF_UNMET"
+# ...and the two edge forms that name no CLOSED-onto-DEFERRED dependency leave it met: an `external`
+# precondition and a `hands-off` onto the deferred unit.
+write_cf_closed_spec '- **consumes-from** external — a precondition this build does not build.
+- **hands-off** `ARCH-tCarry-2` — the rest, which waits on the ask.'
+write_cf_commit
+out=$(run --close tCarry)
+hit  "$out" "carried forward — ARCH-tCarry-2"
+miss "$out" "$CF_UNMET"
+
+# ---- AC6 — the refusals, by number: a successor, and a unit the roster does not carry.
+out=$(run --rescope tCarry --act defer --item ARCH-tCarry-2 --successor ARCH-tCarry-1 --reason r)
+hit  "$out" "UNATTENDED check 48 FAILED — --rescope --act defer refuses --successor, because a deferral names no unit that follows it: ARCH-tCarry-1"
+out=$(run --rescope tCarry --act defer --item ARCH-tCarry-9 --reason r)
+hit  "$out" "UNATTENDED check 48 FAILED — a rescope defers a unit the build README's generated units region does not carry, and only a unit of the roster can be set aside against an open ask: ARCH-tCarry-9"
+# ...the act is owed, and the gate leg's act-axis probe spells the FOUR-act alternation the driver's
+# closed case carries, or that probe matches nothing and check 2 refuses on the shipped tree.
+same "AC6 PARK_ACTS_OWED carries defer" "$(grep -cE '^PARK_ACTS_OWED="([a-z]+ )*defer( [a-z]+)*"$' "$HERE/unattended.sh")" "1"
+same "AC6 the driver's closed act case carries defer" "$(grep -cE '^[[:space:]]*retire\|supersede\|add\|defer\)' "$HERE/unattended.sh")" "1"
+same "AC6 the leg's act-axis probe spells the four-act alternation" \
+  "$(grep -cF "grep -oE '^[[:space:]]*retire\|supersede\|add\|defer\)'" "$HERE/check-unattended.sh")" "1"
+
+# ---- AC2 — a CLOSED unit declares `consumes-from` onto the DEFERRED one: unmet, naming both and the edge.
+run_cf_preflight; run_cf_defer >/dev/null
+write_cf_closed_spec '- **consumes-from** `ARCH-tCarry-2` — the half it needs.'
+write_cf_commit
+out=$(run --close tCarry)
+hit  "$out" "$CF_UNMET"
+hit  "$out" "a CLOSED unit declares a consumes-from edge onto a DEFERRED unit, so the closed half needs the half that is not landing and the build cannot land partial; that is a HAND OFF under owner-decision: ARCH-tCarry-1 consumes-from ARCH-tCarry-2"
+miss "$out" "carried forward —"
+
+# ---- AC3 — the ask, three ways and the missing contract: absent from this build's BACKLOG.md,
+# ---- derived CLOSED by the witness, filed under ANOTHER build's slug, and a blank ASKS_CMD.
+run_cf_preflight; run_cf_defer >/dev/null
+printf '# tCarry — asks\n\n## Asks\n\n## Dispositions\n' > memory/builds/tCarry/BACKLOG.md
+write_cf_commit
+out=$(run --close tCarry)
+hit  "$out" "$CF_UNMET"
+hit  "$out" "a DEFERRED unit's spec names no ask this build's BACKLOG.md at HEAD files under this build's own slug, so it is set aside against a question this build never raised: ARCH-tCarry-2 names EXMP-tCarry-5"
+run_cf_preflight; run_cf_defer >/dev/null; write_cf_commit
+askrows 'EXMP-tCarry-5\tCLOSED\t-\ttCarry\t-\tyes\t-\t-\t-\t-\n'
+out=$(run --close tCarry)
+hit  "$out" "$CF_UNMET"
+hit  "$out" "a DEFERRED unit's every filed ask reads CLOSED or WONTDO, so none is still open for the unit to be carried forward against: ARCH-tCarry-2 against EXMP-tCarry-5"
+askrows ''
+run_cf_preflight; run_cf_defer >/dev/null
+write_cf_deferred_spec 'closes EXMP-tOther-5'
+write_cf_backlog EXMP-tOther-5
+write_cf_commit
+out=$(run --close tCarry)
+hit  "$out" "$CF_UNMET"
+hit  "$out" "a DEFERRED unit's spec names no ask this build's BACKLOG.md at HEAD files under this build's own slug, so it is set aside against a question this build never raised: ARCH-tCarry-2 names EXMP-tOther-5"
+run_cf_preflight; run_cf_defer >/dev/null
+mkconf; write_cf_commit
+out=$(run --close tCarry)
+hit  "$out" "$CF_UNMET"
+hit  "$out" "a DEFERRED unit is carried forward only against an ask the witness reads open, and this project declares no ASKS_CMD, so the ask contract that would say so is missing: ARCH-tCarry-2"
+
+# ---- AC4 — a unit the run ADDED is never carried forward. The roster at BASE holds unit 1 alone, on
+# ---- MAIN, because preflight's check 20 refuses a scope narrowed since BASE; unit 2 enters after the
+# ---- run went live, through `--rescope --act add`, and is then deferred. `set_cf_tree` restores MAIN.
+set_cf_tree
+git checkout -qf main
+setunits tCarry '| Unit | Status | Rev | Last change |
+|---|---|---|---|
+| [ARCH-tCarry-1 — the unit](spec/one.md) | CLOSED | rev-1 | 2026-08-01 |'
+git add -A >/dev/null && git commit -q -m cf-base-one-unit --no-verify && git push -q -f origin main
+git checkout -qf unit && git merge -q --no-edit main >/dev/null 2>&1
+run --preflight tCarry --keepalive-id KC-1 >/dev/null; write_cf_commit
+setunits tCarry "$CF_ROWS"
+write_cf_commit
+out=$(run --rescope tCarry --act add --item ARCH-tCarry-2 --reason "the owner asked for it after the run went live")
+hit  "$out" "LATE record — ARCH-tCarry-2 entered the roster after this run went live"
+run_cf_defer >/dev/null; write_cf_commit
+out=$(run --close tCarry)
+hit  "$out" "$CF_UNMET"
+hit  "$out" "a DEFERRED unit was added during this run - the roster this run started with does not carry it - so it cannot be carried forward; a unit the run added is finished or retired, never deferred past the close: ARCH-tCarry-2"
+
+# ---- AC5 — no defer row on the record: unmet, naming the missing row and the act that writes it.
+run_cf_preflight
+out=$(run --close tCarry)
+hit  "$out" "$CF_UNMET"
+hit  "$out" "a DEFERRED unit has no \`rescope · item defer\` row in the run-state file, so the deferral was never declared where the wrap-up surfaces it; record it with --rescope tCarry --act defer --item ARCH-tCarry-2"
+reset_tree
+
+# ============================ TOOL-dUnstuckLanding-19 — refresh before a verdict, `refreshed-at` ====
+# ---- SELF-CONTAINED, for the settle block's reason: every arm moves the remote's main three commits
+# ---- past the run's HEAD from a second clone, one touching the build README, one the path the
+# ---- record's one `dispatch` row declares, one neither, so two of three touch. A fresh scratch repo
+# ---- per arm, `primary` landing, both attested items recorded; `build_rx_fixture no` leaves the
+# ---- three commits unfetched, so the tip is advertised and absent here. The suffix keeps each arm's
+# ---- commits distinct from every earlier arm's, so an unfetched tip is never present by accident.
+rx_root=$(mktemp -d); rx_seq=0
+run_rx() { ( cd "$rx_root/repo" && env -u GATE_SELFTESTS GOV_DEFAULT_BRANCH=main bash "$SCRIPT" "$@" 2>&1 ); }
+run_rx_git() { git -C "$rx_root/repo" "$@"; }
+read_rx_fact() { sed -n "s/^$1: //p" "$rx_root/repo/memory/builds/tRx/RUN.md" | head -1; }
+build_rx_fixture() { # fetch: yes|no -> RX_TIP, the remote's main after the three commits
+  rx_seq=$((rx_seq + 1))
+  rm -rf "$rx_root/repo" "$rx_root/origin.git" "$rx_root/other"; mkdir -p "$rx_root/repo"
+  git init -q --bare "$rx_root/origin.git"
+  git --git-dir="$rx_root/origin.git" symbolic-ref HEAD refs/heads/main
+  (
+    cd "$rx_root/repo" || exit 2
+    git init -q -b main . && git config user.email t@t.test && git config user.name t \
+      && git config core.autocrlf false
+    git remote add origin "$rx_root/origin.git"
+    mkdir -p memory/guides memory/builds/tRx work
+    printf '# build method\n' > memory/guides/BUILD-METHOD.md
+    printf 'MEMORY_ROOT=memory\nUNITS_REGION_CUTOFF="2026-08-19"\nLANDER="echo land"\nLANDER_MODE="primary"\nSELFTESTS_OWED_PATHS=""\nBYPASS_BAN="--no-verify"\nGATE_CMD="true"\nGATE_BOUND="600"\nGATE_WALL="21600"\nUNIT_STALL_BOUND="1800"\nREVIEW_ROUNDS="7"\nWIRING_CHECK="true"\nKEEPALIVE_CREATE="CronCreate"\nKEEPALIVE_DELETE="CronDelete"\nRESUME_SCHEDULE="on"\nRESUME_SCHEDULE_CREATE="TheScheduleCreate"\nRESUME_SCHEDULE_DELETE="TheScheduleDelete"\nRESUME_SCHEDULE_DELAY="1800"\nRESUME_SCHEDULE_LIMIT="6"\nPHASES_EXTRA=""\nDOD_EXTRA=""\n' > .unattended.conf
+    printf -- '---\nslug: tRx\nnode: a\nopened: 2026-08-01\nstreams: architecture\nroster: ARCH\nids: ARCH-tRx-1\n---\n\n# tRx\n\n<!-- gen:build-index -->\n**Build status:** OPEN · 1 unit(s)\n\n<!-- gen:build-units -->\n| Unit | Status | Rev | Last change |\n|---|---|---|---|\n| [ARCH-tRx-1 — the unit](spec/one.md) | OPEN | rev-1 | 2026-08-01 |\n<!-- /gen:build-units -->\n<!-- /gen:build-index -->\n' > memory/builds/tRx/README.md
+    printf 'a\n' > work/a.txt; printf 'o\n' > other.txt
+    printf '# tRx — run state\n\n<!-- run:generated -->\n<!-- /run:generated -->\n\n## Mandate\n<!-- run:mandate -->\nThe owner authorizes build tRx to merge to main and to push.\n<!-- /run:mandate -->\n\n## Run facts\n\n## Parked\n' \
+      > memory/builds/tRx/RUN.md
+    git add -A && git commit -q -m base --no-verify && git push -q origin main
+    git checkout -q -b unit && git commit -q --allow-empty -m "unit work" --no-verify
+  ) >/dev/null 2>&1
+  run_rx --preflight tRx --keepalive-id k1 >/dev/null
+  printf '\n2026-10-04T00:00:00Z dispatch · item 00000000 ARCH-tRx-1 · reason work/a.txt\n' >> "$rx_root/repo/memory/builds/tRx/RUN.md"
+  run_rx --attest tRx --item keepalive-reaped >/dev/null
+  run_rx --attest tRx --item parked-decisions-surfaced >/dev/null
+  run_rx_git add -A >/dev/null && run_rx_git commit -q -m "records(tRx)" --no-verify
+  git clone -q "$rx_root/origin.git" "$rx_root/other" >/dev/null 2>&1
+  (
+    cd "$rx_root/other" && git config user.email t@t.test && git config user.name t
+    printf 'x\n' >> memory/builds/tRx/README.md && git commit -qam "rx README $rx_seq" --no-verify
+    printf 'b\n' >> work/a.txt && git commit -qam "rx work/a.txt $rx_seq" --no-verify
+    printf 'p\n' >> other.txt && git commit -qam "rx other.txt $rx_seq" --no-verify
+    git push -q origin main
+  ) >/dev/null 2>&1
+  RX_TIP=$(git --git-dir="$rx_root/origin.git" rev-parse main)
+  [ "$1" = no ] || run_rx_git fetch -q origin main
+}
+RX_R=memory/builds/tRx/RUN.md
+
+# ---- AC1: a park lists the README and the declared-write commits, not the third, and records the
+# ---- tip; a repeat of the same park is the no-op it was and refreshes nothing.
+build_rx_fixture yes
+out=$(run_rx --park tRx --item q1 --reason r1)
+hit  "$out" "unattended: refresh — refs/heads/main at ${RX_TIP:0:8} · 2 of 3 commits since BASE"
+hit  "$out" "rx README 1"
+hit  "$out" "rx work/a.txt 1"
+miss "$out" "rx other.txt 1"
+same "TOOL-dUnstuckLanding-19 AC1 the park records the tip" "$(read_rx_fact refreshed-at)" "$RX_TIP · park · 2 touching"
+before=$(run_rx_git hash-object "$RX_R")
+out=$(run_rx --park tRx --item q1 --reason r1)
+miss "$out" "unattended: refresh —"
+same "TOOL-dUnstuckLanding-19 AC1 a repeated park wrote nothing" "$(run_rx_git hash-object "$RX_R")" "$before"
+
+# ---- AC3: the hand-off, after that park is committed, lists and records under its own verb.
+run_rx_git add -A >/dev/null && run_rx_git commit -q -m "records(tRx): park" --no-verify
+out=$(run_rx --handoff tRx --code owner-decision --reason r3 --reaped k1)
+hit  "$out" "phase HELD · code owner-decision · until owner"
+hit  "$out" "2 of 3 commits since BASE"
+same "TOOL-dUnstuckLanding-19 AC3 the hand-off records the tip" "$(read_rx_fact refreshed-at)" "$RX_TIP · handoff · 2 touching"
+
+# ---- AC2: the abort, with both attested items met, records the tip beside ABORTED.
+build_rx_fixture yes
+out=$(run_rx --abort tRx --code external-prerequisite --reason r2)
+hit  "$out" "2 of 3 commits since BASE"
+hit  "$out" "rx work/a.txt 2"
+same "TOOL-dUnstuckLanding-19 AC2 the abort records the tip" "$(read_rx_fact refreshed-at)" "$RX_TIP · abort · 2 touching"
+same "TOOL-dUnstuckLanding-19 AC2 the abort still aborts" "$(read_rx_fact phase)" "ABORTED"
+
+# ---- AC4: a primary close lists before the Definition of Done, and a REFUSING one writes no fact;
+# ---- the met close writes it beside LANDING.
+build_rx_fixture yes
+sed -i '/^parked-surfaced: /d' "$rx_root/repo/$RX_R"
+run_rx_git commit -qam "records(tRx): unattested" --no-verify
+before=$(run_rx_git hash-object "$RX_R")
+out=$(run_rx --close tRx)
+hit  "$out" "unattended: refresh — refs/heads/main at ${RX_TIP:0:8} · 2 of 3 commits since BASE"
+same "TOOL-dUnstuckLanding-19 AC4 the refresh prints before the unmet item" \
+  "$(printf '%s\n' "$out" | awk '/unattended: refresh —/ && !r { r = NR } /an agent-attested DoD item is unmet/ && !u { u = NR } END { print (r && u && r < u) ? "before" : "not before" }')" "before"
+same "TOOL-dUnstuckLanding-19 AC4 a refusing close wrote no fact" "$(run_rx_git hash-object "$RX_R")" "$before"
+build_rx_fixture yes
+out=$(run_rx --close tRx --override closing-review-recorded --reason "fixture build records no review" --override build-complete --reason "fixture build is one OPEN unit by construction")
+hit  "$out" "close OK"
+same "TOOL-dUnstuckLanding-19 AC4 the met close records the tip" "$(read_rx_fact refreshed-at)" "$RX_TIP · close · 2 touching"
+same "TOOL-dUnstuckLanding-19 AC4 beside LANDING" "$(read_rx_fact phase)" "LANDING"
+
+# ---- AC5: an unreachable remote is announced, never refused, and replaces an older tip.
+build_rx_fixture yes
+run_rx --park tRx --item q0 --reason r0 >/dev/null
+run_rx_git remote set-url origin "$rx_root/nope.git"
+out=$(run_rx --park tRx --item q5 --reason r5); rc=$?
+same "TOOL-dUnstuckLanding-19 AC5 the park over an unanswered remote exits 0" "$rc" "0"
+hit  "$out" "unattended: refresh — the advertised tip was NOT observed, so this verdict stands on BASE"
+hit  "$out" "decision parked — q5"
+same "TOOL-dUnstuckLanding-19 AC5 the fact reads unobserved" "$(read_rx_fact refreshed-at)" "unobserved · park"
+
+# ---- AC6: an advertised tip this clone lacks is `unlisted`, never unobserved and never zero.
+build_rx_fixture no
+out=$(run_rx --park tRx --item q6 --reason r6)
+hit  "$out" "a tip this clone does not have, so the commits past BASE"
+same "TOOL-dUnstuckLanding-19 AC6 the fact reads unlisted" "$(read_rx_fact refreshed-at)" "$RX_TIP · park · unlisted"
+
+# ---- AC7: under in-place nothing refreshes.
+build_rx_fixture yes
+sed -i 's/^LANDER_MODE=.*/LANDER_MODE="in-place"/' "$rx_root/repo/.unattended.conf"
+sed -i '/^parked-surfaced: /d' "$rx_root/repo/$RX_R"
+run_rx_git commit -qam "records(tRx): in-place" --no-verify
+out=$(run_rx --close tRx)
+miss "$out" "unattended: refresh —"
+hit  "$out" "an agent-attested DoD item is unmet"
+
+# ---- closing review round 1 L1 (id 12): a --park that park() refuses for a carriage return in its
+# ---- reason writes NOTHING, `refreshed-at` included, so the committed record is still HEAD's.
+build_rx_fixture yes
+_rx_cr=$'why\rrun-branch: refs/heads/other'
+out=$(run_rx --park tRx --item qcr --reason "$_rx_cr"); rc=$?
+same "TOOL-dUnstuckLanding-19 L1 the carriage-return park refuses" "$rc" "1"
+hit  "$out" "a parked entry contains a newline or a carriage return"
+same "TOOL-dUnstuckLanding-19 L1 the refused park left the record at HEAD" "$(run_rx_git status --porcelain -- "$RX_R")" ""
+rm -rf "$rx_root"
+# ========================== TOOL-dUnstuckLanding-20 — `LANDING_NODES`, the landing node and its hand-off ====
+# ---- SELF-CONTAINED, for the refresh block's reason: a fresh scratch repo per arm, `primary` landing,
+# ---- a build whose one unit is CLOSED with its roster, and a conf whose BASE copy declares the pairs
+# ---- below. The node is the ENVIRONMENT the driver inherits, `COMPUTERNAME` and `USERNAME`, so node
+# ---- `b` here is a machine and user the value does not list and node `d` one it does. The bar is a
+# ---- tracked stub that writes a GREEN run record under the pinned run id, so the hand-off's
+# ---- attribution guard has the record a real runner leaves. `write_ln_dod_records` commits the attestations,
+# ---- the CONVERGED round and the closing review BEFORE the close, so the bar runs on a clean tree and
+# ---- the record commit is all that separates HEAD from the bar's head.
+ln_root=$(mktemp -d)
+LN_VALUE='a=desk-a/daily-agent d=compeeto/d41ly'
+LN_NB="COMPUTERNAME=desktop-3j1o6cd USERNAME=agent5"
+LN_ND="COMPUTERNAME=compeeto USERNAME=d41ly"
+LN_R=memory/builds/tLn/RUN.md
+run_ln() { local _e=$1; shift; ( cd "$ln_root/repo" && env -u GATE_SELFTESTS GOV_DEFAULT_BRANCH=main $_e bash "$SCRIPT" "$@" 2>&1 ); }
+run_ln_git() { git -C "$ln_root/repo" "$@"; }
+read_ln_fact() { sed -n "s/^$1: //p" "$ln_root/repo/$LN_R" | head -1; }
+build_ln_fixture() { # LANDING_NODES at BASE, `-` for undeclared · the run's own committed value, `-` for BASE's · [older]
+  # `older` publishes one commit BELOW BASE carrying the same tree without LANDING_NODES (M5 and L8).
+  rm -rf "$ln_root/repo" "$ln_root/origin.git"; mkdir -p "$ln_root/repo"
+  git init -q --bare "$ln_root/origin.git"
+  git --git-dir="$ln_root/origin.git" symbolic-ref HEAD refs/heads/main
+  (
+    cd "$ln_root/repo" || exit 2
+    git init -q -b main . && git config user.email t@t.test && git config user.name t \
+      && git config core.autocrlf false
+    git remote add origin "$ln_root/origin.git"
+    mkdir -p memory/guides memory/builds/tLn/spec memory/builds/tLn/reviews
+    printf '# build method\n' > memory/guides/BUILD-METHOD.md
+    printf '%s\n' 'd="$(git rev-parse --git-dir)/gate-run/$GATE_RUN_ID"; mkdir -p "$d"' \
+      'printf "head\t%s\ntree_clean\tyes\n" "$(git rev-parse HEAD)" > "$d/header"' \
+      'printf "verdict\tGREEN\ntree_moved\tno\n" > "$d/verdict"' > bar.sh
+    printf 'MEMORY_ROOT=memory\nUNITS_REGION_CUTOFF="2026-08-19"\nLANDER="echo land"\nLANDER_MODE="primary"\nBYPASS_BAN="--no-verify"\nGATE_CMD="bash bar.sh"\nGATE_BOUND="600"\nGATE_WALL="21600"\nUNIT_STALL_BOUND="1800"\nREVIEW_ROUNDS="7"\nRESUME_STALE_BOUND="5400"\nWIRING_CHECK="true"\nKEEPALIVE_CREATE="CronCreate"\nKEEPALIVE_DELETE="CronDelete"\nRESUME_SCHEDULE="on"\nRESUME_SCHEDULE_CREATE="TheScheduleCreate"\nRESUME_SCHEDULE_DELETE="TheScheduleDelete"\nRESUME_SCHEDULE_DELAY="1800"\nRESUME_SCHEDULE_LIMIT="6"\nPHASES_EXTRA=""\nDOD_EXTRA=""\n' > .unattended.conf
+    [ "$1" = - ] || [ "${3:-}" = older ] || printf 'LANDING_NODES="%s"\n' "$1" >> .unattended.conf
+    printf -- '---\nslug: tLn\nnode: a\nopened: 2026-08-01\nstreams: architecture\nroster: ARCH\nids: ARCH-tLn-1\n---\n\n# tLn\n\n<!-- gen:build-index -->\n**Build status:** CLOSED · 1 unit(s)\n\n<!-- gen:build-units -->\n| Unit | Status | Rev | Last change |\n|---|---|---|---|\n| [ARCH-tLn-1 — the unit](spec/one.md) | CLOSED | rev-1 | 2026-08-01 |\n<!-- /gen:build-units -->\n<!-- /gen:build-index -->\n\n<!-- roster:units -->\n1. ARCH-tLn-1 — the unit\n<!-- /roster:units -->\n' > memory/builds/tLn/README.md
+    printf '# ARCH-tLn-1 the unit\n\n**Status:** CLOSED · rev-1 · 2026-08-01 · node a · Tier-1 · base 00000000 · streams architecture\n' > memory/builds/tLn/spec/one.md
+    printf '# tLn — run state\n\n<!-- run:generated -->\n<!-- /run:generated -->\n\n## Mandate\n<!-- run:mandate -->\nThe owner authorizes build tLn to merge to main and to push.\n<!-- /run:mandate -->\n\n## Run facts\n\n## Parked\n' \
+      > memory/builds/tLn/RUN.md
+    if [ "${3:-}" = older ]; then
+      git add -A && git commit -q -m "older, before LANDING_NODES" --no-verify
+      printf 'LANDING_NODES="%s"\n' "$1" >> .unattended.conf
+    fi
+    git add -A && git commit -q -m base --no-verify && git push -q origin main
+    git checkout -q -b unit && git commit -q --allow-empty -m "unit work" --no-verify
+    if [ "$2" != - ]; then
+      sed -i '/^LANDING_NODES=/d' .unattended.conf; printf 'LANDING_NODES="%s"\n' "$2" >> .unattended.conf
+      git commit -qam "the run adds its own node" --no-verify
+    fi
+  ) >/dev/null 2>&1
+}
+run_ln_preflight() { run_ln "$1" --preflight tLn --keepalive-id k1 >/dev/null
+                 run_ln_git add -A >/dev/null && run_ln_git commit -q -m "records(tLn): preflight" --no-verify; }
+write_ln_dod_records() { # node environment
+  run_ln "$1" --attest tLn --item keepalive-reaped >/dev/null
+  run_ln "$1" --attest tLn --item parked-decisions-surfaced >/dev/null
+  printf '2026-08-31T00:00:00Z review · item tLn · reason verdict CLEAN · blockers 0 · CONVERGED\n' >> "$ln_root/repo/$LN_R"
+  printf '**Serves:** diff-review ARCH-tLn-1\n\n# closing review\n\nrange %s...HEAD\n' \
+    "$(run_ln_git rev-parse --short "$(read_ln_fact base)")" > "$ln_root/repo/memory/builds/tLn/reviews/r1.md"
+  run_ln_git add -A >/dev/null && run_ln_git commit -q -m "records(tLn): attested and reviewed" --no-verify
+}
+
+# ---- AC5: an unlisted node's preflight starts normally and records handoff naming itself; a listed
+# ---- node's records lander with its tag.
+build_ln_fixture "$LN_VALUE" -
+out=$(run_ln "$LN_NB" --preflight tLn --keepalive-id k1)
+hit  "$out" "unattended: landing — handoff · desktop-3j1o6cd/agent5 is not a node LANDING_NODES at the pinned BASE declares able to land · this run ends at --handoff --code owner-landing"
+hit  "$out" "preflight OK"
+same "TOOL-dUnstuckLanding-20 AC5 an unlisted node records handoff" "$(read_ln_fact landing)" "handoff"
+build_ln_fixture "$LN_VALUE" -
+out=$(run_ln "$LN_ND" --preflight tLn --keepalive-id k1)
+hit  "$out" "unattended: landing — lander · node d"
+same "TOOL-dUnstuckLanding-20 AC5 a listed node records lander" "$(read_ln_fact landing)" "lander"
+
+# ---- AC6: the working copy decides nothing - undeclared at BASE stays undeclared and writes no fact
+# ---- although the run's own commit declares node b, and a BASE value the run widened still hands off.
+build_ln_fixture - "b=desktop-3j1o6cd/agent5"
+out=$(run_ln "$LN_NB" --preflight tLn --keepalive-id k1)
+hit  "$out" "unattended: landing — undeclared · every node may land"
+same "TOOL-dUnstuckLanding-20 AC6 undeclared at BASE writes no landing fact" "$(grep -c '^landing: ' "$ln_root/repo/$LN_R" || true)" "0"
+build_ln_fixture "$LN_VALUE" "$LN_VALUE b=desktop-3j1o6cd/agent5"
+out=$(run_ln "$LN_NB" --preflight tLn --keepalive-id k1)
+hit  "$out" "unattended: landing — handoff · desktop-3j1o6cd/agent5 is not a node"
+same "TOOL-dUnstuckLanding-20 AC6 the run's own widening grants nothing" "$(read_ln_fact landing)" "handoff"
+
+# ---- AC7: an override on a hand-off node is a free refusal, before the anchor is observed, and the
+# ---- record is unchanged.
+build_ln_fixture "$LN_VALUE" -
+run_ln_preflight "$LN_NB"
+out=$(run_ln "$LN_NB" --close tLn --override build-complete --reason r)
+hit  "$out" "--close on a node LANDING_NODES does not declare able to land takes no --override, because this close lands nothing and an override would record a waiver for a landing the run never makes; park a decision with --park, or end the run with --handoff --code owner-landing once the Definition of Done is met: desktop-3j1o6cd/agent5 is not a node"
+miss "$out" "observing the anchor"
+same "TOOL-dUnstuckLanding-20 AC7 the refused override left the tree clean" "$(run_ln_git status --porcelain)" ""
+
+# ---- AC8: a met close on a hand-off node writes and stages the bar's fact, refuses naming the exact
+# ---- hand-off, and writes no LANDING; the hand-off it names then completes.
+build_ln_fixture "$LN_VALUE" -
+run_ln_preflight "$LN_NB"; write_ln_dod_records "$LN_NB"
+out=$(run_ln "$LN_NB" --close tLn); rc=$?
+hit  "$out" "every declared Definition-of-Done item is met and this node may not land, so the bar's facts are written and staged and no phase is; commit the record, reap the keepalive, and end the run with --handoff tLn --code owner-landing --reason <text> --reaped <id>: desktop-3j1o6cd/agent5 is not a node"
+same "TOOL-dUnstuckLanding-20 AC8 the refusing close exits non-zero" "$rc" "1"
+n=$((n+1)); [ -n "$(read_ln_fact gates-run)" ] || { echo "FAIL TOOL-dUnstuckLanding-20 AC8 the refusing close wrote no gates-run fact"; st=1; }
+same "TOOL-dUnstuckLanding-20 AC8 no LANDING was written" "$(grep -c '^phase: LANDING' "$ln_root/repo/$LN_R" || true)" "0"
+same "TOOL-dUnstuckLanding-20 AC8 only the record is staged" "$(run_ln_git diff --cached --name-only)" "$LN_R"
+run_ln_git commit -q -m "records(tLn): the bar's facts" --no-verify
+out=$(run_ln "$LN_NB" --handoff tLn --code owner-landing --reason "an owner lands it" --reaped k1)
+hit  "$out" "phase HELD · code owner-landing · until owner"
+same "TOOL-dUnstuckLanding-20 AC8 the named hand-off completes" "$(read_ln_fact phase)" "HELD"
+
+# ---- AC9: a lander preflight does not let an unlisted node's close land; the disagreement is printed.
+build_ln_fixture "$LN_VALUE" -
+run_ln_preflight "$LN_ND"; write_ln_dod_records "$LN_ND"
+out=$(run_ln "$LN_NB" --close tLn)
+hit  "$out" "unattended: landing — this close resolves handoff and the record reads landing: lander; the close's own answer decides"
+hit  "$out" "and end the run with --handoff tLn --code owner-landing"
+same "TOOL-dUnstuckLanding-20 AC9 the recorded lander did not land node b" "$(grep -c '^phase: LANDING' "$ln_root/repo/$LN_R" || true)" "0"
+
+# ---- AC10: a listed node's close is today's close, and so is one in a project that declares nothing.
+build_ln_fixture "$LN_VALUE" -
+run_ln_preflight "$LN_ND"; write_ln_dod_records "$LN_ND"
+out=$(run_ln "$LN_ND" --close tLn)
+hit  "$out" "close OK"
+same "TOOL-dUnstuckLanding-20 AC10 a listed node writes LANDING" "$(read_ln_fact phase)" "LANDING"
+build_ln_fixture - -
+run_ln_preflight "$LN_NB"; write_ln_dod_records "$LN_NB"
+out=$(run_ln "$LN_NB" --close tLn)
+hit  "$out" "close OK"
+miss "$out" "unattended: landing —"
+same "TOOL-dUnstuckLanding-20 AC10 an undeclared project closes as today" "$(read_ln_fact phase)" "LANDING"
+
+# ---- closing review round 1 M5 and L8 (ids 3, 30): the base a landing is read at is the one this run
+# ---- FIRST COMMITTED. Moved in the working copy to an older PUBLISHED commit whose conf predates
+# ---- LANDING_NODES, an unlisted node read `undeclared` and closed to LANDING. It now hands off.
+build_ln_fixture "$LN_VALUE" - older
+run_ln_preflight "$LN_NB"
+LN_OLD=$(run_ln_git rev-parse main~1)
+sed -i "s/^base: .*/base: $LN_OLD/" "$ln_root/repo/$LN_R"
+run_ln_git commit -qam "records(tLn): the base moved" --no-verify
+write_ln_dod_records "$LN_NB"
+out=$(run_ln "$LN_NB" --close tLn)
+hit  "$out" "unattended: landing — handoff · the record's base fact reads $LN_OLD and this run first committed it as"
+same "TOOL-dUnstuckLanding-20 M5 a moved base did not land an unlisted node" "$(grep -c '^phase: LANDING' "$ln_root/repo/$LN_R" || true)" "0"
+# ...and a pinned BASE that does not resolve is a doubt too, never `undeclared`
+build_ln_fixture "$LN_VALUE" -
+run_ln "$LN_ND" --preflight tLn --keepalive-id k1 >/dev/null
+sed -i "s/^base: .*/base: deadbeefdeadbeefdeadbeefdeadbeefdeadbeef/" "$ln_root/repo/$LN_R"
+out=$(run_ln "$LN_ND" --close tLn)
+hit  "$out" "unattended: landing — handoff · the pinned BASE deadbeefdeadbeefdeadbeefdeadbeefdeadbeef does not resolve to a commit here"
+
+# ---- Implementation review round 2, M1 and L2 (ids 2, 27, 9): the landing node over a FORGED window.
+# ---- One commit adding a decoy archive beside a base moved to an older published commit, whose conf
+# ---- predates LANDING_NODES, made that commit the window's first blob, so pin equalled base and node
+# ---- `b` closed to LANDING. A rotation opens the window only when it is honest, so it hands off.
+build_ln_fixture "$LN_VALUE" - older
+run_ln_preflight "$LN_NB"
+LN_OLD=$(run_ln_git rev-parse main~1)
+cp "$ln_root/repo/$LN_R" "$ln_root/repo/memory/builds/tLn/RUN.ABORTED.deadbeef.md"
+sed -i "s/^base: .*/base: $LN_OLD/" "$ln_root/repo/$LN_R"
+run_ln_git add -A >/dev/null && run_ln_git commit -q -m "records(tLn): a decoy archive and a moved base" --no-verify
+ln_decoy=$(run_ln_git rev-parse --short=8 HEAD)
+write_ln_dod_records "$LN_NB"
+out=$(run_ln "$LN_NB" --close tLn)
+hit  "$out" "unattended: landing — handoff · the newest commit adding an archive beside the run-state file, $ln_decoy, is not a rotation of a finished record, so which run's base decides the landing is in doubt"
+same "TOOL-dUnstuckLanding-20 M1 a decoy archive did not land an unlisted node" "$(grep -c '^phase: LANDING' "$ln_root/repo/$LN_R" || true)" "0"
+# ...and an archive STAGED at the close beside a live record is a doubt too, never the working copy.
+build_ln_fixture "$LN_VALUE" -
+run_ln_preflight "$LN_ND"; write_ln_dod_records "$LN_ND"
+cp "$ln_root/repo/$LN_R" "$ln_root/repo/memory/builds/tLn/RUN.ABORTED.deadbeef.md"
+run_ln_git add memory/builds/tLn/RUN.ABORTED.deadbeef.md
+out=$(run_ln "$LN_ND" --close tLn)
+hit  "$out" "unattended: landing — handoff · an archive beside the run-state file is staged, memory/builds/tLn/RUN.ABORTED.deadbeef.md, while the record HEAD carries is not a finished one being retired"
+miss "$out" "unattended: landing — lander"
+# ---- M1 (id 27): LANDING_NODES is read at the advertised tip R too. The pinned BASE lists node d, R no
+# ---- longer does, so the close resolves lander before the anchor round-trip and handoff after it.
+build_ln_fixture "$LN_VALUE" -
+run_ln_preflight "$LN_ND"; write_ln_dod_records "$LN_ND"
+( cd "$ln_root/repo" && git checkout -q main && sed -i 's/^LANDING_NODES=.*/LANDING_NODES="a=desk-a\/daily-agent"/' .unattended.conf \
+  && git commit -qam "node d may no longer land" --no-verify && git push -q origin main && git checkout -q unit ) >/dev/null 2>&1
+ln_r=$(run_ln_git rev-parse --short=8 origin/main)
+out=$(run_ln "$LN_ND" --close tLn)
+hit  "$out" "unattended: landing — lander · node d"
+hit  "$out" "unattended: landing — handoff · compeeto/d41ly is not a node LANDING_NODES at the advertised tip $ln_r declares able to land"
+same "TOOL-dUnstuckLanding-20 M1 a node R no longer lists did not land" "$(grep -c '^phase: LANDING' "$ln_root/repo/$LN_R" || true)" "0"
+
+# ---- M5 (id 22): the rotation window, armed. Run one ends ABORTED at BASE B1, main moves to B2, and
+# ---- run two rotates the record at its preflight - the honest rotating preflight reads the working
+# ---- copy - commits the rotation, and closes. Its first committed blob is run two's, so pin equals
+# ---- base: `lander` on a declared conf, LANDING with no hand-off on an undeclared one. RED with the
+# ---- window's `--not` clause removed, which read run one's first base, and with the staged guard
+# ---- reading every staged rotation as a doubt.
+run_ln_rotation() { # node environment -> run one aborted at B1, run two preflighted at B2 and its rotation committed
+  run_ln_preflight "$1"
+  sed -i 's/^phase: .*/phase: ABORTED/' "$ln_root/repo/$LN_R"
+  run_ln_git commit -qam "records(tLn): run one aborted" --no-verify
+  ( cd "$ln_root/repo" && git checkout -q main && git commit -q --allow-empty -m "main moves" --no-verify \
+    && git push -q origin main && git checkout -q unit && git merge -q --no-ff --no-edit -m "take main" main ) >/dev/null 2>&1
+  LN_ROT_OUT=$(run_ln "$1" --preflight tLn --keepalive-id k2)
+  run_ln_git add -A >/dev/null && run_ln_git commit -q -m "records(tLn): preflight, rotating run one" --no-verify
+}
+build_ln_fixture "$LN_VALUE" -
+run_ln_rotation "$LN_ND"
+hit  "$LN_ROT_OUT" "unattended: retired the finished record — $LN_R -> memory/builds/tLn/RUN.ABORTED."
+hit  "$LN_ROT_OUT" "unattended: landing — lander · node d"
+same "TOOL-dUnstuckLanding-20 M5 run two pinned the moved base" "$(read_ln_fact base)" "$(run_ln_git rev-parse main)"
+write_ln_dod_records "$LN_ND"
+out=$(run_ln "$LN_ND" --close tLn)
+hit  "$out" "unattended: landing — lander · node d"
+miss "$out" "unattended: landing — handoff"
+same "TOOL-dUnstuckLanding-20 M5 a re-run on a declared conf lands" "$(read_ln_fact phase)" "LANDING"
+build_ln_fixture - -
+run_ln_rotation "$LN_NB"
+write_ln_dod_records "$LN_NB"
+out=$(run_ln "$LN_NB" --close tLn)
+miss "$out" "unattended: landing — handoff"
+same "TOOL-dUnstuckLanding-20 M5 a re-run on an undeclared conf lands" "$(read_ln_fact phase)" "LANDING"
+
+# ---- closing review round 1 M14 (id 21): every DOUBT resolves to handoff, never to `undeclared`. A
+# ---- BASE conf that does not evaluate to the end; a machine nothing answers for; one machine and user
+# ---- declared under two tags. Each was RED against a staged mutation routing its branch to undeclared.
+# The BASE conf stops only when LANDING_NODES is BLANK on entry, which is how this reader evaluates it;
+# check 55 reads the same blob with the working copy's value set, and the run's branch drops the line,
+# so the driver's own source and that read both reach the end and the preflight runs.
+build_ln_fixture "$LN_VALUE" -
+( cd "$ln_root/repo" && git checkout -q main && sed -i '1i [ -n "${LANDING_NODES-}" ] || exit 0' .unattended.conf \
+  && git commit -qam "a conf that stops when its key is blank" --no-verify && git push -q origin main \
+  && git checkout -q unit && git reset -q --hard main && sed -i '1d' .unattended.conf \
+  && git commit -qam "the run drops the line" --no-verify ) >/dev/null 2>&1
+out=$(run_ln "$LN_ND" --preflight tLn --keepalive-id k1)
+hit  "$out" "unattended: landing — handoff · the project conf at the pinned BASE could not be evaluated to the end"
+same "TOOL-dUnstuckLanding-20 M14 an unevaluable BASE conf records handoff" "$(read_ln_fact landing)" "handoff"
+build_ln_fixture "$LN_VALUE" -
+mkdir -p "$ln_root/bin"; printf '#!/bin/sh\nexit 1\n' > "$ln_root/bin/hostname"; chmod +x "$ln_root/bin/hostname"
+_lnbin=$(cd "$ln_root/bin" && pwd)   # the POSIX spelling: a drive-letter colon would split PATH
+out=$( cd "$ln_root/repo" && env -u GATE_SELFTESTS GOV_DEFAULT_BRANCH=main COMPUTERNAME= USERNAME=d41ly PATH="$_lnbin:$PATH" bash "$SCRIPT" --preflight tLn --keepalive-id k1 2>&1 )
+hit  "$out" "unattended: landing — handoff · this node's machine or user cannot be read, machine unread and user d41ly"
+same "TOOL-dUnstuckLanding-20 M14 an unreadable machine records handoff" "$(read_ln_fact landing)" "handoff"
+build_ln_fixture "a=compeeto/d41ly d=compeeto/d41ly" -
+out=$(run_ln "$LN_ND" --preflight tLn --keepalive-id k1)
+hit  "$out" "unattended: landing — handoff · compeeto/d41ly is not a node LANDING_NODES at the pinned BASE declares able to land, and these tokens are malformed or declared twice: compeeto/d41ly"
+same "TOOL-dUnstuckLanding-20 M14 one pair under two tags records handoff" "$(read_ln_fact landing)" "handoff"
+
+# ---- closing review round 1 L2 (id 22): a user name holding a SPACE is declared with `%20`, decoded
+# ---- before the pair is compared; the value is word-split, so a literal space can never be declared.
+build_ln_fixture "a=desk-a/daily-agent d=compeeto/john%20smith" -
+out=$( cd "$ln_root/repo" && env -u GATE_SELFTESTS GOV_DEFAULT_BRANCH=main COMPUTERNAME=compeeto "USERNAME=John Smith" bash "$SCRIPT" --preflight tLn --keepalive-id k1 2>&1 )
+hit  "$out" "unattended: landing — lander · node d"
+same "TOOL-dUnstuckLanding-20 L2 a %20-escaped user lands" "$(read_ln_fact landing)" "lander"
+
+# ---- TOOL-dUnstuckLanding-27 S3, AC4 and AC5: a REAL inherited-red close on a hand-off node, never a
+# ---- seeded bar record, because the defect lived in what the real producer stages beyond the record.
+# ---- The bar is a stub writing an all-INHERITED red record with its attribution; the leg's argv sits in
+# ---- the manifest at the advertised tip; ASKS_CMD reads a filed ask back OPEN. So gates-green is MET
+# ---- under the kit default land, files one ask into the build's BACKLOG.md and stages it beside the
+# ---- record, and the close fails 105. The operator commits what it staged, and the hand-off it names
+# ---- is ADMITTED because the bar's run record names exactly that set. RED against the tie that
+# ---- excluded the record alone: fail 83, `the bar it names ran at`. AC5: a spec under the build folder
+# ---- edited after the bar is outside the recorded set, so the same hand-off still fails 83.
+# ---- Implementation review round 2, M2 and L1: the set is `path@blob` lines in the bar's own run
+# ---- record, `staged`, never a run-state fact. `[fail|delete]` adds a stub generator at the path the
+# ---- resolver names: `fail` writes a view and exits 1 (M4), `delete` removes a tracked view (L1).
+build_ln_inherited() { # [fail|delete] -> a hand-off node's run, preflighted and attested, whose bar reds INHERITED
+  build_ln_fixture "$LN_VALUE" -
+  (
+    cd "$ln_root/repo" || exit 2
+    git checkout -q main
+    mkdir -p bin "$TOOL_REL"
+    printf '[\n  {"name": "x leg", "argv": ["bash", "fx/x.sh"]}\n]\n' > "$TOOL_REL/gate-legs.json"
+    printf '%s\n' 'd="$(git rev-parse --git-dir)/gate-run/$GATE_RUN_ID"; mkdir -p "$d"' \
+      "m='$TOOL_REL/gate-legs.json'" \
+      'printf "head\t%s\ntree_clean\tyes\nmanifest\t%s\n" "$(git rev-parse HEAD)" "$m" > "$d/header"' \
+      'printf "verdict\tRED\nfailed\t1\ntree_moved\tno\n" > "$d/verdict"' \
+      'printf "x leg\tINHERITED\t1\t0\t%s\t3\t0badc0de\t-\tstub\n" "${GATE_ATTRIBUTE:--}" > "$d/attribution"' \
+      'echo "GATE FAIL  x leg  (exit 1)"' 'exit 1' > bar.sh
+    cat > bin/asks.sh <<'LNA'
+#!/usr/bin/env bash
+ids=""
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --ready) shift; while [ $# -gt 0 ] && [ "${1#--}" = "$1" ]; do ids="$ids $1"; shift; done; continue ;;
+  esac
+  shift
+done
+c=0
+for id in $ids; do
+  h=${id#*-}; h=${h%-*}
+  printf 'ask\t%s\tOPEN\t-\t%s\tHIGH\t-\t-\t-\t-\t-\n' "$id" "$h"; c=$((c + 1))
+done
+printf 'examined\t%s\n' "$c"
+LNA
+    printf 'ASKS_CMD="bash bin/asks.sh"\n' >> .unattended.conf
+    case "${1:-}" in
+      fail) mkdir -p "$MT_KIT_DIR"
+            printf 'import pathlib, sys\npathlib.Path("memory/LIVE.md").write_text("views\\n")\nsys.exit(1)\n' > "$MT_KIT_DIR/gen_build_index.py" ;;
+      delete) mkdir -p "$MT_KIT_DIR"; printf 'an old view\n' > memory/OLD.md
+              printf 'import os\nos.remove("memory/OLD.md")\n' > "$MT_KIT_DIR/gen_build_index.py" ;;
+    esac
+    git add -A && git commit -q -m "an inherited red, its manifest and the ask generator" --no-verify
+    git push -q origin main
+    git checkout -q -B unit main && git commit -q --allow-empty -m "unit work" --no-verify
+  ) >/dev/null 2>&1
+  run_ln_preflight "$LN_NB"; write_ln_dod_records "$LN_NB"
+}
+resolve_ln_staged() { # -> the staged-set file of the bar the record's gates-run fact names
+  local _f; _f=$(read_ln_fact gates-run)
+  printf '%s/gate-run/%s/staged' "$(run_ln_git rev-parse --absolute-git-dir)" "${_f%% *}"
+}
+build_ln_inherited
+out=$(run_ln "$LN_NB" --close tLn)
+hit  "$out" "gates-green: filed ask ARCH-tLn-2 for leg x leg red at "
+hit  "$out" "every declared Definition-of-Done item is met and this node may not land, so the bar's facts are written and staged and no phase is"
+ln_set=$(cat "$(resolve_ln_staged)" 2>/dev/null)
+same "TOOL-dUnstuckLanding-27 AC4 the bar's record pins the staged BACKLOG.md at its staged blob" \
+  "$ln_set" "memory/builds/tLn/BACKLOG.md@$(run_ln_git rev-parse :memory/builds/tLn/BACKLOG.md)"
+same "TOOL-dUnstuckLanding-27 AC4 every staged path but the record is in the recorded set" \
+  "$(run_ln_git diff --cached --name-only | while IFS= read -r p; do [ "$p" = "$LN_R" ] && continue; case "$ln_set" in *"$p@"*) ;; *) echo "$p" ;; esac; done)" ""
+same "TOOL-dUnstuckLanding-27 M2 the record carries no gates-staged fact" "$(read_ln_fact gates-staged)" ""
+run_ln_git commit -q -m "records(tLn): the bar's facts and the filed ask" --no-verify
+ln_ok=$(run_ln_git rev-parse HEAD)
+out=$(run_ln "$LN_NB" --handoff tLn --code owner-landing --reason "an owner lands it" --reaped k1)
+hit  "$out" "phase HELD · code owner-landing · until owner"
+miss "$out" "the condition that failed: the bar it names ran at"
+same "TOOL-dUnstuckLanding-27 AC4 the hand-off after an inherited-red close completes" "$(read_ln_fact phase)" "HELD"
+# ---- AC5, and M2's forged entries over it: the spec edit after the bar unties it, and so does every
+# ---- forged line beside the honest one. A directory, the memory root or the build folder, names no
+# ---- FILE at either end; the spec path forged into a `gates-staged:` run-state line is read by
+# ---- nothing. Each RED against the round-1 tie, which read the run-state line and excluded a prefix.
+build_ln_inherited
+run_ln "$LN_NB" --close tLn >/dev/null
+printf '\nedited after the bar\n' >> "$ln_root/repo/memory/builds/tLn/spec/one.md"
+run_ln_git add -A >/dev/null && run_ln_git commit -q -m "records(tLn): the bar's facts, and a spec edit" --no-verify
+ln_sf=$(resolve_ln_staged); cp "$ln_sf" "$ln_sf.honest"
+out=$(run_ln "$LN_NB" --handoff tLn --code owner-landing --reason "an owner lands it" --reaped k1)
+hit  "$out" "--handoff --code owner-landing is refused unless the attribution record of the last gates-green bar reads every red leg INHERITED on the tree being closed, so gates-green must run on HEAD first; the condition that failed: the bar it names ran at"
+miss "$out" "phase HELD"
+for ln_e in memory memory/builds/tLn; do
+  { cat "$ln_sf.honest"; printf '%s@-\n' "$ln_e"; } > "$ln_sf"
+  out=$(run_ln "$LN_NB" --handoff tLn --code owner-landing --reason "an owner lands it" --reaped k1)
+  hit  "$out" "the condition that failed: the bar it names ran at"
+  hit  "$out" "unattended: NOTE - the bar's staged set names no file at the bar head or at HEAD, so the bar tie does not exclude it: $ln_e"
+  miss "$out" "phase HELD"
+done
+cp "$ln_sf.honest" "$ln_sf"
+sed -i '/^gates-staged: /d' "$ln_root/repo/$LN_R"
+add_facts "$ln_root/repo/$LN_R" "gates-staged: $LN_R memory/builds/tLn/BACKLOG.md memory/builds/tLn/spec/one.md"
+run_ln_git commit -qam "records(tLn): a spec forged into a run-state line" --no-verify
+out=$(run_ln "$LN_NB" --handoff tLn --code owner-landing --reason "an owner lands it" --reaped k1)
+hit  "$out" "the condition that failed: the bar it names ran at"
+miss "$out" "phase HELD"
+# ---- L7: a WILDCARD alone, then a `..` segment alone, each beside the honest line, so the forged entry
+# ---- is the only path outside the honest set; the spec edit stays. The round-1 arm's sed dropped the
+# ---- honest BACKLOG.md line too, so it untied whatever happened to the entry it claimed to test.
+build_ln_inherited
+run_ln "$LN_NB" --close tLn >/dev/null
+printf '\nedited after the bar\n' >> "$ln_root/repo/memory/builds/tLn/spec/one.md"
+run_ln_git add -A >/dev/null && run_ln_git commit -q -m "records(tLn): the bar's facts, and a spec edit" --no-verify
+ln_sf=$(resolve_ln_staged); cp "$ln_sf" "$ln_sf.honest"
+ln_spec=$(run_ln_git rev-parse HEAD:memory/builds/tLn/spec/one.md)
+{ cat "$ln_sf.honest"; printf 'memory/builds/tLn/*@%s\n' "$ln_spec"; } > "$ln_sf"
+out=$(run_ln "$LN_NB" --handoff tLn --code owner-landing --reason "an owner lands it" --reaped k1)
+hit  "$out" "the condition that failed: the bar it names ran at"
+hit  "$out" "unattended: NOTE - the bar's staged set names no file at the bar head or at HEAD, so the bar tie does not exclude it: memory/builds/tLn/*"
+miss "$out" "phase HELD"
+{ cat "$ln_sf.honest"; printf 'memory/builds/tLn/../tLn/spec/one.md@%s\n' "$ln_spec"; } > "$ln_sf"
+out=$(run_ln "$LN_NB" --handoff tLn --code owner-landing --reason "an owner lands it" --reaped k1)
+hit  "$out" "the condition that failed: the bar it names ran at"
+hit  "$out" "unattended: NOTE - the bar's staged set names a path with a .. segment, which no close stages, so the bar tie does not exclude it: memory/builds/tLn/../tLn/spec/one.md"
+miss "$out" "phase HELD"
+# ---- L6 (a): an entry OUTSIDE the memory root is named and not excluded, even at HEAD's own blob. RED
+# ---- against a tie that collapsed that branch into an exclusion.
+build_ln_inherited
+run_ln "$LN_NB" --close tLn >/dev/null
+printf ' \n' >> "$ln_root/repo/$TOOL_REL/gate-legs.json"
+run_ln_git add -A >/dev/null && run_ln_git commit -q -m "records(tLn): the bar's facts, and a manifest edit" --no-verify
+printf '%s@%s\n' "$TOOL_REL/gate-legs.json" "$(run_ln_git rev-parse "HEAD:$TOOL_REL/gate-legs.json")" >> "$(resolve_ln_staged)"
+out=$(run_ln "$LN_NB" --handoff tLn --code owner-landing --reason "an owner lands it" --reaped k1)
+hit  "$out" "unattended: NOTE - the bar's staged set names a path outside the memory root, which no close stages, so the bar tie does not exclude it: $TOOL_REL/gate-legs.json"
+hit  "$out" "the condition that failed: the bar it names ran at"
+miss "$out" "phase HELD"
+# ---- M2: a view the close staged honestly and prose then edited after the bar is no longer the blob
+# ---- the close staged, so it unties the bar. RED against an exclusion by path alone.
+build_ln_inherited
+run_ln "$LN_NB" --close tLn >/dev/null
+run_ln_git commit -q -m "records(tLn): the bar's facts and the filed ask" --no-verify
+printf 'edited after the bar\n' >> "$ln_root/repo/memory/builds/tLn/BACKLOG.md"
+run_ln_git commit -qam "records(tLn): the backlog edited after the bar" --no-verify
+out=$(run_ln "$LN_NB" --handoff tLn --code owner-landing --reason "an owner lands it" --reaped k1)
+hit  "$out" "unattended: NOTE - the bar's staged set names a path whose blob at HEAD is not the one the close staged, so the bar tie does not exclude it: memory/builds/tLn/BACKLOG.md"
+hit  "$out" "the condition that failed: the bar it names ran at"
+miss "$out" "phase HELD"
+# ---- M4 and L3: a generator that writes a view and then exits 1 leaves it staged, and the set records
+# ---- it, so the hand-off fail 105 prescribes is admitted. RED against the writer that recorded the
+# ---- views only on a render that exited 0: fail 83, `the bar it names ran at`.
+build_ln_inherited fail
+out=$(run_ln "$LN_NB" --close tLn)
+hit  "$out" "gates-green: the 1 filed ask(s) are staged, but the generated views were not re-rendered: the generator exited 1 after "
+hit  "$(cat "$(resolve_ln_staged)" 2>/dev/null)" "memory/LIVE.md@$(run_ln_git rev-parse :memory/LIVE.md)"
+run_ln_git commit -q -m "records(tLn): the bar's facts, the ask and the view" --no-verify
+out=$(run_ln "$LN_NB" --handoff tLn --code owner-landing --reason "an owner lands it" --reaped k1)
+hit  "$out" "phase HELD · code owner-landing · until owner"
+miss "$out" "the condition that failed: the bar it names ran at"
+# ---- L1 (id 7): a view the render DELETED is present at the bar head only, and is still excluded.
+build_ln_inherited delete
+out=$(run_ln "$LN_NB" --close tLn)
+hit  "$(cat "$(resolve_ln_staged)" 2>/dev/null)" "memory/OLD.md@-"
+run_ln_git commit -q -m "records(tLn): the bar's facts, the ask and a deleted view" --no-verify
+out=$(run_ln "$LN_NB" --handoff tLn --code owner-landing --reason "an owner lands it" --reaped k1)
+hit  "$out" "phase HELD · code owner-landing · until owner"
+# ---- L6 (b): every bar has a run record of its own, so an UNMET bar after a MET close names a record
+# ---- that carries no staged set, and no run-state line carries one either. RED against the round-1
+# ---- writer, which rewrote a `gates-staged` run-state fact to the record alone on that path.
+build_ln_inherited
+run_ln "$LN_NB" --close tLn >/dev/null
+run_ln_git commit -q -m "records(tLn): the bar's facts and the filed ask" --no-verify
+sed -i 's/INHERITED/OWN/' "$ln_root/repo/bar.sh"
+run_ln_git commit -qam "the red is the run's own" --no-verify
+run_ln "$LN_NB" --close tLn >/dev/null
+same "TOOL-dUnstuckLanding-27 L6 an UNMET bar's record carries no staged set" "$([ -f "$(resolve_ln_staged)" ] && echo present || echo absent)" "absent"
+same "TOOL-dUnstuckLanding-27 L6 no run-state line carries a staged set" "$(read_ln_fact gates-staged)" ""
+# ---- L6 (c): a bar whose record names no staged set announces the record-alone fallback ONCE per
+# ---- process, though the hand-off ties twice, the GREEN check and then the attribution's. RED against
+# ---- a tie that announced on every call.
+build_ln_fixture "$LN_VALUE" -
+run_ln_preflight "$LN_NB"; write_ln_dod_records "$LN_NB"
+run_ln "$LN_NB" --close tLn >/dev/null
+printf '\nedited after the bar\n' >> "$ln_root/repo/memory/builds/tLn/spec/one.md"
+run_ln_git add -A >/dev/null && run_ln_git commit -q -m "records(tLn): the bar's facts, and a spec edit" --no-verify
+out=$(run_ln "$LN_NB" --handoff tLn --code owner-landing --reason "an owner lands it" --reaped k1)
+same "TOOL-dUnstuckLanding-27 L6 the record-alone fallback is announced once" \
+  "$(printf '%s\n' "$out" | grep -c "unattended: NOTE - the bar's run record names no staged set, so the bar tie excludes the run-state file alone: $LN_R" || true)" "1"
+rm -rf "$ln_root"
 fi   # ---- end REGION TWO ----------------------------------------------------------------------
 
 # FLOOR_ASSERTIONS — TOOL-cBriefedPilot-23. A shrink-only pin on the EXECUTED count. This build
