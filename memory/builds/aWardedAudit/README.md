@@ -5,7 +5,7 @@ opened: 2026-10-05
 streams: tooling
 roster: TOOL
 authorized-by: prompt
-ids: TOOL-aWardedAudit-1 TOOL-aWardedAudit-2 TOOL-aWardedAudit-3 TOOL-aWardedAudit-4
+ids: TOOL-aWardedAudit-1 TOOL-aWardedAudit-2 TOOL-aWardedAudit-3 TOOL-aWardedAudit-4 TOOL-aWardedAudit-5 TOOL-aWardedAudit-6
 ---
 
 # aWardedAudit — only the owner can opt a build into the spec audit
@@ -39,7 +39,10 @@ before any code. The owner rules that only the owner opts in. The prompt is in `
 
 ## Parked decisions
 
-- None yet.
+- P1 — the owner's per-build opt-in for a prompt-mode run: as built, only `SPEC_AUDIT_DEFAULT` or a
+  slug README the owner lands. An invocation flag or a prompt-recording hook was refused.
+- P2 — `aEvidencedLens`, live on another branch, carries a prompt-mode `spec-audit:` line its owner
+  asked for; after it merges check 89, its close refuses. Land it first, or re-home its opt-in.
 
 <!-- roster:units -->
 
@@ -48,12 +51,14 @@ before any code. The owner rules that only the owner opts in. The prompt is in `
 | 1 | `TOOL-aWardedAudit-1` | 2 | the driver refuses `spec-audit:` under a second-anchor mode and reads the project default at the default-branch side |
 | 2 | `TOOL-aWardedAudit-2` | 2 | the fan-out hook's rule 0 denies a non-slug README key and, in a live run, admits only on the driver's pinned fact |
 | 3 | `TOOL-aWardedAudit-3` | 1 | the method, Skill, protocol, conf and hook docs state the owner-only rule, and a decision records it |
+| 5 | `TOOL-aWardedAudit-5` | 2 | promoted from the closing review's H1: check 19 refuses a run commit writing `spec-audit:` or `SPEC_AUDIT_DEFAULT` |
+| 6 | `TOOL-aWardedAudit-6` | 2 | promoted from the closing review: round 1's four mediums and seven lows, batched |
 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 3 unit(s) · node a · opened 2026-10-05 · streams tooling
-ids TOOL-aWardedAudit-1 TOOL-aWardedAudit-2 TOOL-aWardedAudit-3 TOOL-aWardedAudit-4
+**Build status:** OPEN · 5 unit(s) · node a · opened 2026-10-05 · streams tooling
+ids TOOL-aWardedAudit-1 TOOL-aWardedAudit-2 TOOL-aWardedAudit-3 TOOL-aWardedAudit-4 TOOL-aWardedAudit-5 TOOL-aWardedAudit-6
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -61,13 +66,15 @@ ids TOOL-aWardedAudit-1 TOOL-aWardedAudit-2 TOOL-aWardedAudit-3 TOOL-aWardedAudi
 | [TOOL-aWardedAudit-1 — the driver honours a spec-audit opt-in only from the owner's side](spec/2026-10-05-spec-TOOL-aWardedAudit-1.md) | 1 | 2 | CLOSED | rev-1 | 2026-10-05 |
 | [TOOL-aWardedAudit-2 — the fan-out hook admits a spec audit only on an owner opt-in](spec/2026-10-05-spec-TOOL-aWardedAudit-2.md) | 2 | 2 | CLOSED | rev-2 | 2026-10-05 |
 | [TOOL-aWardedAudit-3 — the carriers state that only the owner opts a build into the spec audit](spec/2026-10-05-spec-TOOL-aWardedAudit-3.md) | 3 | 1 | CLOSED | rev-1 | 2026-10-05 |
+| [TOOL-aWardedAudit-5 — the bar refuses a run commit that writes a spec-audit opt-in](spec/2026-10-05-spec-TOOL-aWardedAudit-5.md) | 5 | 2 | OPEN | rev-1 | 2026-10-05 |
+| [TOOL-aWardedAudit-6 — the closing review's batched minors, round 1](spec/2026-10-05-spec-TOOL-aWardedAudit-6.md) | 6 | 2 | OPEN | rev-1 | 2026-10-05 |
 <!-- /gen:build-units -->
 
-Records: 4 bound to this build, across 2 record folder(s).
+Records: 5 bound to this build, across 3 record folder(s).
 
-Ids no record names: none — every unit id is named by a record.
+Ids no record names: TOOL-aWardedAudit-5 TOOL-aWardedAudit-6.
 
-Ids no `spec-audit` record has ever named: TOOL-aWardedAudit-1 TOOL-aWardedAudit-2 TOOL-aWardedAudit-3.
+Ids no `spec-audit` record has ever named: TOOL-aWardedAudit-1 TOOL-aWardedAudit-2 TOOL-aWardedAudit-3 TOOL-aWardedAudit-5 TOOL-aWardedAudit-6.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -77,6 +84,8 @@ Ids no `spec-audit` record has ever named: TOOL-aWardedAudit-1 TOOL-aWardedAudit
 | 1 | `TOOL-aWardedAudit-1` | no |
 | 2 | `TOOL-aWardedAudit-2` | no |
 | 3 | `TOOL-aWardedAudit-3` | no |
+| 5 | `TOOL-aWardedAudit-5` | no |
+| 6 | `TOOL-aWardedAudit-6` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

@@ -7,6 +7,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-05-prompt-TOOL-aWardedAudit-3-1-build-brief.md](../prompts/2026-10-05-prompt-TOOL-aWardedAudit-3-1-build-brief.md) | journal | — |
+| [2026-10-05-review-TOOL-aWardedAudit-1-closing-diff-round1.md](../reviews/2026-10-05-review-TOOL-aWardedAudit-1-closing-diff-round1.md) | diff-review | TOOL-aWardedAudit-1 TOOL-aWardedAudit-2 |
 
 <!-- /gen:spec-records -->
 
