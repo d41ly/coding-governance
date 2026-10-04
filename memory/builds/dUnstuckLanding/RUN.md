@@ -9,11 +9,14 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+asks-at-landing: TOOL-dUnstuckLanding-3=CLOSED TOOL-dUnstuckLanding-4=CLOSED TOOL-dUnstuckLanding-5=CLOSED TOOL-dUnstuckLanding-6=CLOSED TOOL-dUnstuckLanding-7=CLOSED TOOL-dUnstuckLanding-8=CLOSED TOOL-dUnstuckLanding-9=CLOSED TOOL-dUnstuckLanding-10=CLOSED TOOL-dUnstuckLanding-11=OPEN TOOL-dUnstuckLanding-26=OPEN
+units-at-landing: TOOL-dUnstuckLanding-1 TOOL-dUnstuckLanding-13 TOOL-dUnstuckLanding-14 TOOL-dUnstuckLanding-2 TOOL-dUnstuckLanding-12 TOOL-dUnstuckLanding-15 TOOL-dUnstuckLanding-16 TOOL-dUnstuckLanding-17 TOOL-dUnstuckLanding-18 TOOL-dUnstuckLanding-19 TOOL-dUnstuckLanding-20 TOOL-dUnstuckLanding-25 TOOL-dUnstuckLanding-27
+gates-run: unattended-179114861601742528832-756 d35b3ccc
 parked-surfaced: yes, 3 surfaced
 keepalive-reaped: yes
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: 66c6d675f15a3178a04622fddc597b14e7308697
-phase: VERIFYING
+phase: LANDING
 branch-sha: 0c16a66b53c9fd809ca198b612a23c62132edcc0
 branch-ref: refs/heads/branch/unattended-build-closing-f90fd9
 may: none
