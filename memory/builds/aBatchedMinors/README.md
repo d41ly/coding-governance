@@ -5,7 +5,7 @@ opened: 2026-10-04
 streams: tooling
 roster: TOOL
 authorized-by: prompt
-ids: TOOL-aBatchedMinors-1 TOOL-aBatchedMinors-2 TOOL-aBatchedMinors-3 TOOL-aBatchedMinors-4 TOOL-aBatchedMinors-5
+ids: TOOL-aBatchedMinors-1 TOOL-aBatchedMinors-2 TOOL-aBatchedMinors-3 TOOL-aBatchedMinors-4 TOOL-aBatchedMinors-5 TOOL-aBatchedMinors-6
 ---
 
 # aBatchedMinors — every closing-review finding becomes a unit, minors batched
@@ -52,12 +52,13 @@ mediums and lows grouped into one or two units. The prompt is in `prompts/`.
 | 2 | `TOOL-aBatchedMinors-2` | 2 | `--review` takes `--highs` and `--minors` on the closing review's exit and requires `promote` when any stood |
 | 3 | `TOOL-aBatchedMinors-3` | 2 | check 2 demands blockers + highs + one unit for the minors from a closing-review exit row |
 | 4 | `TOOL-aBatchedMinors-4` | 1 | the method, the Skill, the verbs entry and a decision record state the batched-promotion rule |
+| 6 | `TOOL-aBatchedMinors-6` | 2 | promoted from the closing review: round 1's three mediums and eleven lows, batched |
 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 4 unit(s) · node a · opened 2026-10-04 · streams tooling
-ids TOOL-aBatchedMinors-1 TOOL-aBatchedMinors-2 TOOL-aBatchedMinors-3 TOOL-aBatchedMinors-4 TOOL-aBatchedMinors-5
+**Build status:** OPEN · 5 unit(s) · node a · opened 2026-10-04 · streams tooling
+ids TOOL-aBatchedMinors-1 TOOL-aBatchedMinors-2 TOOL-aBatchedMinors-3 TOOL-aBatchedMinors-4 TOOL-aBatchedMinors-5 TOOL-aBatchedMinors-6
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -66,13 +67,14 @@ ids TOOL-aBatchedMinors-1 TOOL-aBatchedMinors-2 TOOL-aBatchedMinors-3 TOOL-aBatc
 | [TOOL-aBatchedMinors-2 — the closing review's exit records its standing findings and promotes them all](spec/2026-10-04-spec-TOOL-aBatchedMinors-2.md) | 2 | 2 | CLOSED | rev-2 | 2026-10-04 |
 | [TOOL-aBatchedMinors-3 — check 2 demands one unit per blocker and high, plus one for the minors](spec/2026-10-04-spec-TOOL-aBatchedMinors-3.md) | 3 | 2 | CLOSED | rev-1 | 2026-10-04 |
 | [TOOL-aBatchedMinors-4 — the method, the Skill and the verbs entry state the batched-promotion rule](spec/2026-10-04-spec-TOOL-aBatchedMinors-4.md) | 4 | 1 | CLOSED | rev-2 | 2026-10-04 |
+| [TOOL-aBatchedMinors-6 — the closing review's batched minors, round 1](spec/2026-10-04-spec-TOOL-aBatchedMinors-6.md) | 6 | 2 | OPEN | rev-1 | 2026-10-04 |
 <!-- /gen:build-units -->
 
-Records: 4 bound to this build, across 2 record folder(s).
+Records: 5 bound to this build, across 3 record folder(s).
 
-Ids no record names: none — every unit id is named by a record.
+Ids no record names: TOOL-aBatchedMinors-6.
 
-Ids no `spec-audit` record has ever named: TOOL-aBatchedMinors-1 TOOL-aBatchedMinors-2 TOOL-aBatchedMinors-3 TOOL-aBatchedMinors-4.
+Ids no `spec-audit` record has ever named: TOOL-aBatchedMinors-1 TOOL-aBatchedMinors-2 TOOL-aBatchedMinors-3 TOOL-aBatchedMinors-4 TOOL-aBatchedMinors-6.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -83,6 +85,7 @@ Ids no `spec-audit` record has ever named: TOOL-aBatchedMinors-1 TOOL-aBatchedMi
 | 2 | `TOOL-aBatchedMinors-2` | no |
 | 3 | `TOOL-aBatchedMinors-3` | no |
 | 4 | `TOOL-aBatchedMinors-4` | no |
+| 6 | `TOOL-aBatchedMinors-6` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

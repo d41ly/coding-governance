@@ -7,6 +7,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-04-prompt-TOOL-aBatchedMinors-1-0-run-mandate.md](../prompts/2026-10-04-prompt-TOOL-aBatchedMinors-1-0-run-mandate.md) | journal | — |
+| [2026-10-04-review-TOOL-aBatchedMinors-2-closing-diff-round1.md](../reviews/2026-10-04-review-TOOL-aBatchedMinors-2-closing-diff-round1.md) | diff-review | TOOL-aBatchedMinors-2 TOOL-aBatchedMinors-3 TOOL-aBatchedMinors-4 |
 
 <!-- /gen:spec-records -->
 
