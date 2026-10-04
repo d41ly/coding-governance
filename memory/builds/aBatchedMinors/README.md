@@ -5,7 +5,7 @@ opened: 2026-10-04
 streams: tooling
 roster: TOOL
 authorized-by: prompt
-ids: TOOL-aBatchedMinors-1 TOOL-aBatchedMinors-2 TOOL-aBatchedMinors-3 TOOL-aBatchedMinors-4
+ids: TOOL-aBatchedMinors-1 TOOL-aBatchedMinors-2 TOOL-aBatchedMinors-3 TOOL-aBatchedMinors-4 TOOL-aBatchedMinors-5
 ---
 
 # aBatchedMinors — every closing-review finding becomes a unit, minors batched
@@ -57,7 +57,7 @@ mediums and lows grouped into one or two units. The prompt is in `prompts/`.
 
 <!-- gen:build-index -->
 **Build status:** CLOSED · 4 unit(s) · node a · opened 2026-10-04 · streams tooling
-ids TOOL-aBatchedMinors-1 TOOL-aBatchedMinors-2 TOOL-aBatchedMinors-3 TOOL-aBatchedMinors-4
+ids TOOL-aBatchedMinors-1 TOOL-aBatchedMinors-2 TOOL-aBatchedMinors-3 TOOL-aBatchedMinors-4 TOOL-aBatchedMinors-5
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
