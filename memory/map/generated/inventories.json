@@ -232,6 +232,7 @@
       "ledger-token-wrapped-across-a-line-joins-nothing.md",
       "line-count-reads-empty-capture-as-one.md",
       "line-keyed-registry-reds-on-a-file-that-grew.md",
+      "liveness-negative-from-another-population.md",
       "merge-keeps-both-sides-of-one-derivation.md",
       "msys-grep-counts-cr-on-every-line.md",
       "naming-leg-grades-what-python-named.md",

@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.119 -->
+<!-- gov:kit memory-tree@2.121 -->
 # The build method — how a multi-pass build runs
 
 ## M1 — What this is
@@ -93,7 +93,8 @@ Vetoes 2 and 3 are owner turns, **and that COLLAPSES onto the park rule rather t
 only surviving option trips one of them, no resolver the mandate delegates exists, so the fork is parked exactly as
 if nothing had survived. A veto is not a licence to take the vetoed option, and "owner turn" three lines above the
 park sentence has been read as though it were. Tie-break: fewer open questions, then reuse of a seam M5 found.
-**No survivors → park**, never the least-bad option.
+**No survivors → park**, never the least-bad option. At the close a park is never an abort: record it, then take
+the exit named by the close-decision table {{UNATTENDED_PROTOCOL}} points at.
 
 **A FACT-QUESTION is a fork a stated PROBE decides — the one kind a run may resolve without an owner.** Mark it
 with the `FACT-QUESTION · ` prefix the §8 readers recognise; legal only when the spec names the probe, the
@@ -267,7 +268,7 @@ park, not a waiver, and its unit does not close. Left-shift every confirmed find
 
 **Landing** — `land-once-done` and `conflicts-reconciled` between them: merge and push
 authorization, the lander, the bypass ban, additive reconciliation of a shared record, and when a
-build may land at all. Both are template §1 Landing and
+build may land at all, a partial landing that carries its deferred units forward included. Both are template §1 Landing and
 {{UNATTENDED_PROTOCOL}}; neither is restated here.
 
 ## M9 — The wrap-up — a derivation, not a recollection

@@ -1,6 +1,6 @@
 """drift_signals.py — coding-governance's own drift-signal declarations (dogfooding the kit).
 
-gov:kit drift-audit@1.22
+gov:kit drift-audit@1.23
 
 Copied from drift_signals.template.py and filled for THIS repo. The corpus root and disciplines are
 NOT restated here — they come from `.memory-tree.conf`, which the memory-tree kit owns.
@@ -320,6 +320,13 @@ PINS: dict[str, int] = {
     # `over pin` once it rises. The records are not named here, for the reason the non-terminal-specs
     # pin above gives: read the signal's own `detail`.
     "run_records_nonterminal_but_merged": 5,
+    # MEASURED at the unit that added the signal, TOOL-dUnstuckLanding-15, against origin/main: live
+    # LEGACY ABORTED records whose work the content predicate reads landed and which carry no upheld
+    # `work-landed-at`. Report-only with no RATCHETS row, for the reason the pin above gives; it drains
+    # by `--settle` on each listed slug and a commit of what that staged, and is lowered as it does.
+    # Its sibling `discarded_work_landed` carries no pin: no ABORTED record here is dated on or after
+    # HANDOFF_CUTOFF yet, so it reads DEAD, and a pin over a population that does not exist is a guess.
+    "aborted_work_landed": 8,
 }
 
 # --------------------------------------------------------------------------------------------
