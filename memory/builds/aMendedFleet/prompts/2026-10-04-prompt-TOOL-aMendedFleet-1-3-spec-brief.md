@@ -240,3 +240,10 @@ record `...-1-0-run-mandate.md` first: it carries the owner's four answers, whic
 - **95** (`TOOL-aMendedFleet-94`) — split from 74 at its F1: path-scoped rules, ordered after units 67, 68, 79 and 93; unit 74 keeps the pre-build checklist.
 - **96** (`KICK-aMendedFleet-4`) — split from 77 (KICK-2) at its F1: the card compares PATH `claude --version` with the running session's version as unit 61 reads it.
 - **97** (`PLAY-aMendedFleet-4`) — split from 79 (PLAY-1) at its F1: deduplicate the second node registry in the `AGENTS.md` wrapper; unit 79 keeps the table byte-identical.
+- **97 to 105** — added by unit 7's held-red census, one unit per ROOT CAUSE (C1 to C9). The census
+  journal `memory/builds/aMendedFleet/build/2026-10-04-build-TOOL-aMendedFleet-7-1-held-red-census.md`
+  is the source of every point: its cause row names the suites, the failing lines from the CI logs,
+  and host versus tree. The daily held job runs on the hosted runner (`gh run view` the census's run
+  ids for the logs); a host cause is fixed in the code or the workflow so the suite passes there, never
+  by skipping it. Each spec's acceptance observes the fix locally on a staged break, and names the
+  first scheduled run after landing as the remote observation.
