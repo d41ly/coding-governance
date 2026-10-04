@@ -7911,11 +7911,13 @@ check_inherited_override() { # run-state file · the verb as the refusal names i
 # views it re-rendered, so excluding the record alone refused the very hand-off fail 105 prescribes.
 # The exclusion is EXACTLY the recorded `gates-staged` set, never the whole build folder: a spec
 # edited under that folder after the bar still unties it. An entry outside the memory root is not one
-# the close stages, so it is never excluded. A record naming no set excludes the run-state file
-# alone, which is the behaviour before the fact existed, and says so.
+# the close stages, so it is never excluded, and neither is one carrying a `..` segment, which leaves
+# the root while spelling it. Each entry is a LITERAL pathspec, so a wildcard names itself and never
+# the folder around it. A record naming no set excludes the run-state file alone, which is the
+# behaviour before the fact existed, and says so.
 check_bar_tied() { # bar head · HEAD · run-state file · [record-only] -> 0 when the bar graded this tree
   local p set
-  local -a ex=()
+  local -a ex=() ps=()
   [ "$1" = "$2" ] && return 0
   [ -n "$1" ] && [ "${4:-}" = record-only ] || return 1
   ex=(":(exclude)$3")
@@ -7924,9 +7926,13 @@ check_bar_tied() { # bar head · HEAD · run-state file · [record-only] -> 0 wh
     BT_NOTED=1
     echo "unattended: NOTE - the record names no gates-staged set, so the bar tie excludes the run-state file alone: $3"
   fi
-  for p in $set; do
-    case "$p" in
-      "$M"/*) [ "$p" = "$3" ] || ex+=(":(exclude)$p") ;;
+  # `read -a`, never `for p in $set`: an unquoted expansion GLOBS, so an entry spelling a wildcard
+  # would expand against the working tree into the very folder it must not name.
+  read -r -a ps <<<"$set"
+  for p in "${ps[@]}"; do
+    case "/$p/" in
+      */../*) echo "unattended: NOTE - gates-staged names a path with a .. segment, which no close stages, so the bar tie does not exclude it: $p" ;;
+      "/$M"/*) [ "$p" = "$3" ] || ex+=(":(exclude,literal)$p") ;;
       *) echo "unattended: NOTE - gates-staged names a path outside the memory root, which no close stages, so the bar tie does not exclude it: $p" ;;
     esac
   done

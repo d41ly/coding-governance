@@ -13101,6 +13101,14 @@ run_ln_git add -A >/dev/null && run_ln_git commit -q -m "records(tLn): the bar's
 out=$(run_ln "$LN_NB" --handoff tLn --code owner-landing --reason "an owner lands it" --reaped k1)
 hit  "$out" "--handoff --code owner-landing is refused unless the attribution record of the last gates-green bar reads every red leg INHERITED on the tree being closed, so gates-green must run on HEAD first; the condition that failed: the bar it names ran at"
 miss "$out" "phase HELD"
+# ...and a set naming the folder by a WILDCARD or by a `..` segment excludes nothing it spells, so the
+# spec edit still unties the bar. RED against a tie that handed each entry to git as a glob pathspec.
+sed -i "s|^gates-staged: .*|gates-staged: $LN_R memory/builds/tLn/* memory/builds/tLn/../tLn/spec/one.md|" "$ln_root/repo/$LN_R"
+run_ln_git commit -qam "records(tLn): a forged staged set" --no-verify
+out=$(run_ln "$LN_NB" --handoff tLn --code owner-landing --reason "an owner lands it" --reaped k1)
+hit  "$out" "the condition that failed: the bar it names ran at"
+hit  "$out" "unattended: NOTE - gates-staged names a path with a .. segment, which no close stages, so the bar tie does not exclude it: memory/builds/tLn/../tLn/spec/one.md"
+miss "$out" "phase HELD"
 rm -rf "$ln_root"
 fi   # ---- end REGION TWO ----------------------------------------------------------------------
 

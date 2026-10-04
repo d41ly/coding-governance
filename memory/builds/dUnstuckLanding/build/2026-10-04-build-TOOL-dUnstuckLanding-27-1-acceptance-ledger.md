@@ -37,4 +37,7 @@ red. The suites themselves are owed to the close.
   The code at the unit's start failed 83 with `the bar it names ran at`.
 - AC5 — `--handoff --code owner-landing` — the same close, followed by an edit to the build's
   `spec/one.md` committed with the staged records, made the same hand-off fail 83 with `the bar it names ran at`, and no HELD
-  phase was written. The mutation that excluded the whole build folder admitted it.
+  phase was written. The mutation that excluded the whole build folder admitted it. A forged set
+  naming the folder by a wildcard and by a `..` segment still failed 83. The first commit of this
+  unit admitted it, because its tie globbed the set in the shell and handed git a glob pathspec, and
+  each of the two hardenings is load-bearing on its own.
