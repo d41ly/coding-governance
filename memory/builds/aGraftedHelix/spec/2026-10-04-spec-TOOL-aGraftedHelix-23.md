@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-23 — the `prior-session` fact is the set of sessions an incomplete holder write may have left the claim under, read by `check_claim_writable` itself and emptied by the next `--resume` holder-row claim write that lands
 
-**Status:** SPECCED · rev-3 · 2026-10-04 · node a · Tier-2 · base 5266d22e · streams tooling · order 5
+**Status:** SPECCED · rev-4 · 2026-10-04 · node a · Tier-2 · base 5266d22e · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
@@ -50,7 +50,9 @@ closes findings 6, 12, 2, 7 and 1 (all HIGH) of the round-1 spec audit of units 
   row adds nothing: the pre-call session is the current one, and a claim that passed `mine` carries
   it or an existing member. This replaces unit 20 S2's "written only while it reads `absent` or is
   missing". The add's place relative to `write_lease` is `TOOL-aGraftedHelix-24`'s (§3). Observed by
-  AC1 and AC2.
+  AC1 and AC2, except the empty-value rule, which is NOT OBSERVED: no sequence reaches an empty
+  pre-call session or a `none` claim read, the consequence is cosmetic, and AC1's byte-form
+  assertion observes the stored form the rule protects.
 - **S3** — The next `--resume` holder-row claim write that lands empties the set by writing the fact
   with an empty value, only when the set is non-empty, and then runs `stage_or_fail` on the record
   itself. A lost race does not change the set. No other writer writes or empties the fact, as unit 20
@@ -243,8 +245,10 @@ names no run-state file.
   older than a quarter of `RESUME_STALE_BOUND`, an `s1` call with no shim moves the claim ref and
   leaves `git status --porcelain` empty. Over a fresh copy of that committed state and aged beat, an
   `s1` call under the recorded `CLAUDE_PID`, so its `write_lease` is not due, with the claim push
-  exiting 124, exits 0, leaves `git status --porcelain` empty, and leaves the run-state file with no
-  `prior-session` line.
+  exiting 124, prints unit 1's announce line for a holder claim write that did not land, exits 0,
+  leaves `git status --porcelain` empty, and leaves the run-state file with no `prior-session` line.
+  The announce line is the leg's witness that the renewal's push ran; a call that wrote no claim
+  proves nothing about the add and reds this criterion.
   Red when: the second incomplete call loses `s1` from the set, which a build writing the pre-call
   session unconditionally does, or a landed holder write over a record without the fact writes it,
   or an incomplete renewal whose `write_lease` is not due adds to the set.
@@ -341,6 +345,10 @@ none
   claim read, §4 Evidence names the empty case, and AC1 asserts the line's one-space form. Findings
   11, 6 and 1 (HIGH) are promoted to `TOOL-aGraftedHelix-24`: §3 gains its hands-off, and S2 points
   at it.
+- rev-4 · 2026-10-04 · §2 §6 · S2 · AC2 · from the bug-class checklist over the promoting commit,
+  which selected `fixture-passes-by-finding-nothing` and `observed-by-claim-no-arm-discharges`.
+  AC2's incomplete-renewal leg asserts unit 1's announce line, so a call that never pushed cannot
+  pass it; S2's empty-value rule is labelled NOT OBSERVED, since no sequence reaches it.
 
 ## 10. Reuse audit
 

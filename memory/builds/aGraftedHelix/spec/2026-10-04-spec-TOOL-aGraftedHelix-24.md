@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-24 — the `prior-session` add runs before `write_lease` moves the record's session, and the criteria that certify the set's readers start from the state and the session they need
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-2 · base 5266d22e · streams tooling · order 6
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-2 · base 5266d22e · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
@@ -177,7 +177,9 @@ push exit 124. The claim is read with `git ls-remote <bare> refs/gov/runs/<slug>
 - **AC1** — When an `s2` holder call runs with the claim push exiting 124 and a `mktemp` shim on
   `PATH` that forwards to the real `mktemp` until the run-state file's `session:` line reads `s2`,
   then exits 1 once, the call exits non-zero and the run-state file reads `session: s2` and
-  `prior-session: s1`. A second `s2` call with no shim exits 0, prints no
+  `prior-session: s1`, with its `lease-utc` line still at its pre-call value. That unmoved stamp is
+  the arm's witness that the shim stopped `write_lease` after its `session` line; a call that ran
+  `write_lease` whole proves nothing about the order and reds this criterion. A second `s2` call with no shim exits 0, prints no
   `UNATTENDED check 90 FAILED`, leaves a claim naming `session: s2`, leaves `fact` printing nothing
   for `prior-session`, and leaves `git diff --name-only` naming no run-state file.
   Red when: the add runs after `write_lease`, so the interrupted call leaves no `s1` in the set and
@@ -227,6 +229,9 @@ none
 - rev-1 · 2026-10-04 · initial draft, promoted from findings 11, 6 and 1 (all HIGH) of the round-1
   spec audit of unit 23, grounded against `write_lease`, `set_fact`, the holder row, `run_hold` and
   the restart row at base `5266d22e`, and against units 20 and 23 as specced.
+- rev-2 · 2026-10-04 · §6 · AC1 · from the bug-class checklist over the promoting commit, which
+  selected `fixture-passes-by-finding-nothing`. AC1 asserts the interrupted call leaves `lease-utc`
+  at its pre-call value, so a shim that never fires cannot pass the criterion.
 
 ## 10. Reuse audit
 
