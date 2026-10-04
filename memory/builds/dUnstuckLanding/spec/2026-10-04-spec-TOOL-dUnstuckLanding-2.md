@@ -1,13 +1,16 @@
 # TOOL-dUnstuckLanding-2 — the design: unattended closes through inherited reds and closing decisions, plus attended-landing verbs
 
-**Status:** INPROGRESS · rev-1 · 2026-10-04 · node d · Tier-1 · base a587e82d · streams tooling · order 2
+**Status:** CLOSED · rev-1 · 2026-10-04 · node d · Tier-1 · base a587e82d · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-04-build-TOOL-dUnstuckLanding-1-census.md](../build/2026-10-04-build-TOOL-dUnstuckLanding-1-census.md) | research | TOOL-dUnstuckLanding-1 |
+| [2026-10-04-build-TOOL-dUnstuckLanding-2-1-acceptance-ledger.md](../build/2026-10-04-build-TOOL-dUnstuckLanding-2-1-acceptance-ledger.md) | journal | — |
+| [2026-10-04-build-TOOL-dUnstuckLanding-2-design.md](../build/2026-10-04-build-TOOL-dUnstuckLanding-2-design.md) | research | — |
 | [2026-10-04-prompt-TOOL-dUnstuckLanding-1-0-run-mandate.md](../prompts/2026-10-04-prompt-TOOL-dUnstuckLanding-1-0-run-mandate.md) | journal | TOOL-dUnstuckLanding-1 |
+| [2026-10-04-prompt-TOOL-dUnstuckLanding-2-build-brief.md](../prompts/2026-10-04-prompt-TOOL-dUnstuckLanding-2-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
