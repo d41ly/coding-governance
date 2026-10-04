@@ -92,3 +92,5 @@ base: 7af5f564641d231f8b78f6b183dde1b6bf53111d
 2026-10-04T21:18:15Z brief · item TOOL-aMendedFleet-3 · reason ca9f6d277d8a memory/builds/aMendedFleet/prompts/2026-10-04-prompt-TOOL-aMendedFleet-1-4-build-brief.md
 
 2026-10-04T21:21:45Z dispatch · item bbcae380 TOOL-aMendedFleet-3 · reason tools/lexicon/lexicon.py tools/lexicon/selftest.py tools/lexicon/README.md .githooks/pre-push .githooks/pre-push.test.sh .githooks/pre-push.runlog.test.sh tools/push-main.sh tools/push-main.test.sh memory/map/generated/symbols.json memory/builds/aMendedFleet/spec/2026-10-04-spec-TOOL-aMendedFleet-3.md memory/builds/aMendedFleet/build/2026-10-04-build-TOOL-aMendedFleet-3-1-acceptance-ledger.md memory/builds/aMendedFleet/README.md memory/LIVE.md
+
+2026-10-04T21:36:27Z brief · item TOOL-aMendedFleet-4 · reason ca9f6d277d8a memory/builds/aMendedFleet/prompts/2026-10-04-prompt-TOOL-aMendedFleet-1-4-build-brief.md
