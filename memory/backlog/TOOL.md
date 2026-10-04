@@ -173,7 +173,7 @@ Cite ids, never line numbers.
 | [TOOL-aProbedToolkit-15](../builds/aProbedToolkit/BACKLOG.md) | SPECCED | — | TOOL-aMendedFleet-39 | 2026-09-03 | THE CHARTER OVERSELLS WHAT THE MAP GUARANTEES, AND THE OVERCLAIM SHIPS.… |
 | [TOOL-aProbedToolkit-16](../builds/aProbedToolkit/BACKLOG.md) | OPEN | — | — | 2026-09-03 | memory-recall's HEADLINE CLAIM IS UNPROVEN BY THE ONLY PARTY THAT… |
 | [TOOL-aProbedToolkit-17](../builds/aProbedToolkit/BACKLOG.md) | OPEN | — | — | 2026-09-03 | THE CHARTER MANDATES file:line AND THE HYGIENE GATE REFUSES IT, SO THE… |
-| [TOOL-aProbedToolkit-18](../builds/aProbedToolkit/BACKLOG.md) | OPEN | — | — | 2026-09-03 | closed_specs_with_no_product_commit CANNOT EXPRESS A UNIT WHOSE… |
+| [TOOL-aProbedToolkit-18](../builds/aProbedToolkit/BACKLOG.md) | SPECCED | — | TOOL-aMendedFleet-91 | 2026-09-03 | closed_specs_with_no_product_commit CANNOT EXPRESS A UNIT WHOSE… |
 | [TOOL-aProbedUnit-12](../builds/aProbedUnit/BACKLOG.md) | OPEN | — | — | 2026-09-14 | a CLEAN spec-audit round writes NO spec-audit record (tier2-review.js… |
 | [TOOL-aProbedUnit-13](../builds/aProbedUnit/BACKLOG.md) | OPEN | — | — | 2026-09-14 | --dispatch refuses a later unit's memory/LIVE.md declaration: a prior… |
 | [TOOL-aProbedUnit-14](../builds/aProbedUnit/BACKLOG.md) | OPEN | — | — | 2026-09-14 | unattended.test.sh is red at base: four brief: arms expect the newline,… |
@@ -202,7 +202,7 @@ Cite ids, never line numbers.
 | [TOOL-aRepatriatedFork-41](../builds/aRepatriatedFork/BACKLOG.md) | OPEN | — | — | 2026-09-28 | run-gates.turnstile.test.sh flakes on node a: 1 red in 3 solo runs at… |
 | [TOOL-aRepatriatedFork-43](../builds/aRepatriatedFork/BACKLOG.md) | OPEN | — | — | 2026-09-29 | govkit [[own]] cannot name a root_relative source: inCMS's… |
 | [TOOL-aRepatriatedFork-48](../builds/aRepatriatedFork/BACKLOG.md) | OPEN | — | — | 2026-09-30 | build_commit takes the first unit-naming commit touching a path outside… |
-| [TOOL-aReplayedCard-6](../builds/aReplayedCard/BACKLOG.md) | OPEN | — | — | 2026-09-14 | drift-audit's closed_specs_with_no_product_commit signal joins by build… |
+| [TOOL-aReplayedCard-6](../builds/aReplayedCard/BACKLOG.md) | SPECCED | — | TOOL-aMendedFleet-91 | 2026-09-14 | drift-audit's closed_specs_with_no_product_commit signal joins by build… |
 | [TOOL-aReplayedCard-7](../builds/aReplayedCard/BACKLOG.md) | OPEN | — | — | 2026-09-14 | manifest-check.sh --card --write spawns about ten git processes for its… |
 | [TOOL-aReplayedCard-8](../builds/aReplayedCard/BACKLOG.md) | OPEN | — | — | 2026-09-14 | WIRE-INTO-PROJECT.md §4 spells the kickoff-manifest format version… |
 | [TOOL-aReplayedCard-9](../builds/aReplayedCard/BACKLOG.md) | OPEN | — | — | 2026-09-14 | run the eight-arm stage-2 matrix with… |
