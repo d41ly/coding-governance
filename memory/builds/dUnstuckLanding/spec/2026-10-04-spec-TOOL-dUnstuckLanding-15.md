@@ -81,7 +81,9 @@ zero.
   more per archived sibling, for the floor. A revert line naming an attributable commit is excluded
   when it is an ancestor of the witness, read from the parent graph when the witness is on the base
   ref and by one `merge-base --is-ancestor` otherwise. That call happens only for such a revert, so it
-  is zero in the common case. Nothing scales with the length of history. Observed by AC9.
+  is zero in the common case; one more places a record whose `base` is off the base ref's graph. A
+  revert naming a merge is read from the parent graph and costs nothing. Nothing scales with the
+  length of history. Observed by AC9.
 - **S8 — the project layer and the docs.** Gov's `tools/drift-audit/drift_signals.py` pins
   `aborted_work_landed` at the value AC1 measures, so the table reads `ok` at that value. The kit's
   `tools/drift-audit/drift_signals.template.py` carries both names as commented example pins, with the
@@ -317,7 +319,7 @@ New arm: `tools/drift-audit/selftest.py` `test_work_landed_matches_the_driver` �
 ## 9. Revision log
 
 - rev-1 · 2026-10-04 · initial draft, from design §2 (c3) at rev-2 and ask 5.
-- rev-2 · 2026-10-04 · S2 S3 S5 S9 AC3 AC4 AC6 AC8 · folded implementation review round 1 M4 (ids 2,
+- rev-2 · 2026-10-04 · S2 S3 S5 S7 S9 AC3 AC4 AC6 AC8 · folded implementation review round 1 M4 (ids 2,
   27), M11 (id 17), L4 (id 24), L6 (id 28) and L3 (id 23): the revert clause reads a merge revert; a
   base off the base ref is placed by one call as the library places it; a fifth control, the
   never-merged run; three fixture records pin all three; upheld also requires the recorded tip on the
