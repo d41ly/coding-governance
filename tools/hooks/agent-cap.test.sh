@@ -994,6 +994,35 @@ rm -f "$SACONF"
 check_spec_audit "rule0/U7: conf removed, README without the key → deny (no conf is no default)" 2 "TOOL-aBlindedTrial-6;;spec-audit:" \
   "{\"kind\":\"spec-audit\",\"repo\":\"$SAJ\",\"reviewDir\":\"memory/builds/tSA/reviews\"}"
 
+# ---- TOOL-aWardedAudit-2 — the opt-in is the OWNER's. Each deny below was observed admitting
+# ---- against the base hook first: it read the worktree key whoever wrote it.
+SARUN="$SAREPO/memory/builds/tSA/RUN.md"
+# AC3 — no run-state file, a prompt-mode README carrying a dated key → deny naming the mode.
+printf -- '---\nslug: tSA\nauthorized-by: prompt\nspec-audit: 2026-10-05\n---\n' > "$SAREADME"
+check_spec_audit "rule0/aWardedAudit: prompt README with a dated key → deny naming the mode" 2 "authorized-by: prompt;;admits nothing;;TOOL-aWardedAudit-4" \
+  "{\"kind\":\"spec-audit\",\"repo\":\"$SAJ\",\"reviewDir\":\"memory/builds/tSA/reviews\"}"
+# AC1 — a live run that pinned no fact, beside a slug README carrying a dated key → deny naming RUN.md.
+printf -- '---\nslug: tSA\nspec-audit: 2026-10-05\n---\n' > "$SAREADME"
+printf '# run\n\n## Run facts\n\nphase: BUILDING\nslug: tSA\n' > "$SARUN"
+check_spec_audit "rule0/aWardedAudit: live run with no spec-audit fact, worktree key → deny" 2 "builds/tSA/RUN.md;;live unattended run;;phase BUILDING" \
+  "{\"kind\":\"spec-audit\",\"repo\":\"$SAJ\",\"reviewDir\":\"memory/builds/tSA/reviews\"}"
+# AC2 — the same live run pinning a dated fact, beside a README with NO key → allow.
+printf -- '---\nslug: tSA\n---\n' > "$SAREADME"
+printf '# run\n\n## Run facts\n\nphase: BUILDING\nspec-audit: 2026-10-05\n' > "$SARUN"
+check_spec_audit "rule0/aWardedAudit: live run pinning a dated fact → allow" 0 "" \
+  "{\"kind\":\"spec-audit\",\"repo\":\"$SAJ\",\"reviewDir\":\"memory/builds/tSA/reviews\"}"
+# ...and a non-date fact is no fact: deny.
+printf '# run\n\n## Run facts\n\nphase: BUILDING\nspec-audit: yes\n' > "$SARUN"
+check_spec_audit "rule0/aWardedAudit: live run pinning a non-date fact → deny" 2 "live unattended run" \
+  "{\"kind\":\"spec-audit\",\"repo\":\"$SAJ\",\"reviewDir\":\"memory/builds/tSA/reviews\"}"
+# AC4 — a FINISHED run's file decides nothing: a LANDED record beside a slug README's dated key → allow.
+printf -- '---\nslug: tSA\nspec-audit: 2026-10-05\n---\n' > "$SAREADME"
+printf '# run\n\n## Run facts\n\nphase: LANDED\n' > "$SARUN"
+check_spec_audit "rule0/aWardedAudit: LANDED run-state file, slug README key → allow" 0 "" \
+  "{\"kind\":\"spec-audit\",\"repo\":\"$SAJ\",\"reviewDir\":\"memory/builds/tSA/reviews\"}"
+rm -f "$SARUN"
+printf -- '---\nslug: tSA\n---\n' > "$SAREADME"
+
 # ---- rule 3: the hook READS THE BOUND ------------------------------------------------------------
 # EVERY ARM HERE ASSERTS ITS OWN MESSAGE, never the exit code. All three rules exit 2, so an arm
 # keyed on 2 passes when a completely different branch fires — which is how the retired `cap-5` arm

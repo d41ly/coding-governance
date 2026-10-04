@@ -1874,7 +1874,9 @@ function checkSpecAuditDeclared(data) {
     `README's FRONT MATTER carries \`spec-audit: <YYYY-MM-DD>\` (the owner's date; a value that is ` +
     `not a date, or the key inside the body, reads as absent), or the project's .unattended.conf ` +
     `declares \`SPEC_AUDIT_DEFAULT="<YYYY-MM-DD>"\` for every build whose README declares no key ` +
-    `(TOOL-aBlindedTrial-7). This rule reads the Workflow call's ` +
+    `(TOOL-aBlindedTrial-7). The opt-in is the OWNER's (TOOL-aWardedAudit-4): never a key in an ` +
+    `\`authorized-by: prompt\` or \`recipe\` README, which the run writes itself, and in a live ` +
+    `unattended run only the \`spec-audit:\` fact its preflight pinned. This rule reads the Workflow call's ` +
     `structured args only, never the script text.\n`
   let readme = '(unplaced)'
   try {
@@ -1913,6 +1915,33 @@ function checkSpecAuditDeclared(data) {
     const bytes = require('fs').readFileSync(readme, 'utf8')
     const { readFrontMatterKey } = require(path.join(__dirname, 'scratch-guard.js'))
     const v = readFrontMatterKey(bytes, 'spec-audit')
+    // TOOL-aWardedAudit-2 S1 — A LIVE UNATTENDED RUN IS DECIDED BY ITS RUN-STATE FACT, never by the
+    // worktree. The driver's preflight pinned `spec-audit:` from the owner's side (a slug README at
+    // BASE, or the default at the default-branch side), and a key or default the run writes into its
+    // worktree afterwards is the self-opt-in that ruling refuses. `RUN.md` beside the README, with a
+    // `phase:` fact that is not LANDED or ABORTED, is a live run; ENOENT is an attended session and
+    // falls through; any other read failure is a deny, on the fail-closed rule above. Column-1 fact
+    // lines only, the driver's own shape: a parked row opens with a timestamp and never matches.
+    const runmd = path.join(root, ...dir, 'RUN.md').split(path.sep).join('/')
+    let rbytes = null
+    try { rbytes = require('fs').readFileSync(runmd, 'utf8') } catch (e) {
+      if (!e || e.code !== 'ENOENT') return renderDeny(`${runmd} could not be read for its \`phase:\` and \`spec-audit:\` facts (${(e && e.code) || (e && e.message) || e}), and a run-state file this hook cannot read is not one it may approve from.`)
+    }
+    if (rbytes !== null) {
+      const phase = (/^phase:[ \t]*(\S+)[ \t]*\r?$/m.exec(rbytes) || [])[1] || ''
+      if (phase !== 'LANDED' && phase !== 'ABORTED') {
+        const f = (/^spec-audit:[ \t]*(\S+)[ \t]*\r?$/m.exec(rbytes) || [])[1] || ''
+        if (/^\d{4}-\d{2}-\d{2}$/.test(f)) return null
+        return renderDeny(`${runmd} is a live unattended run (phase ${phase || '(none)'}) that pins no dated \`spec-audit:\` fact, so its preflight found no owner opt-in, and a key or default written into the worktree since is the run's own.`)
+      }
+    }
+    // TOOL-aWardedAudit-2 S2 — a README the run writes itself admits nothing by its own key: the
+    // driver refuses the same line at check 89, so admitting it here would spend an audit the run
+    // can never record. Presence is the test, a non-date included, so the deny names the cause.
+    const mode = readFrontMatterKey(bytes, 'authorized-by')
+    if (v !== null && mode !== null && mode !== 'slug') {
+      return renderDeny(`${readme} declares \`spec-audit: ${v}\` under \`authorized-by: ${mode}\`, a README the run writes itself, so the key admits nothing.`)
+    }
     if (v !== null && /^\d{4}-\d{2}-\d{2}$/.test(v)) return null
     if (v === null) {
       // README silent: the project default, from the WORKTREE conf. ENOENT is no default; any other

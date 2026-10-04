@@ -1,6 +1,6 @@
 # TOOL-aWardedAudit-2 — the fan-out hook admits a spec audit only on an owner opt-in
 
-**Status:** OPEN · rev-1 · 2026-10-05 · node a · Tier-2 · base 35438ba0 · streams tooling · order 2
+**Status:** CLOSED · rev-1 · 2026-10-05 · node a · Tier-2 · base 35438ba0 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
