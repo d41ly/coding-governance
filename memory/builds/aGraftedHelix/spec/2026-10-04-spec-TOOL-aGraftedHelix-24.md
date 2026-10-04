@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-24 — the `prior-session` add runs before `write_lease` moves the record's session, and the criteria that certify the set's readers start from the state and the session they need
 
-**Status:** SPECCED · rev-3 · 2026-10-04 · node a · Tier-2 · base 5266d22e · streams tooling · order 6
+**Status:** SPECCED · rev-4 · 2026-10-04 · node a · Tier-2 · base 5266d22e · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
@@ -86,7 +86,8 @@ of the round-1 spec audit of unit 23.
   `write_lease` returns before its `stage_or_fail` (`:6599`).
 - **Writing the set and the lease in one atomic write.** `set_fact` rewrites one key per call
   through `mktemp` and `mv`, and a combined writer is a new function beside it. Ordering the add
-  first closes the window without one.
+  first, with `TOOL-aGraftedHelix-25`'s rule that its own failure stops the row, closes the window
+  without one.
 - **The restart legs unit 23 AC5 already starts short of a closing call.** Its rev-3 legs after
   sequence c and over an `absent` lease state their own preconditions; this unit corrects the
   sequence-d leg's starting point only, and S2's session rule also reaches the `--beat` inside the
@@ -122,7 +123,7 @@ of the round-1 spec audit of unit 23.
   harness's session and pid, so the next call's `write_lease` is not due (`:6597`). That call
   reaches the claim through the `mine` test alone, which is what makes the set's content decide it.
 - An unreachable remote leaves the claim unreadable, and the holder path keeps working offline (unit
-  1 §4 "Call sites"), so the add's second trigger reaches the add with no CAS attempted.
+  1 §4 "Call sites"), so a call on the add's second trigger reaches the add with no claim written.
 - `run_hold` (`:4837`) never calls `check_keepalive_reaped`, so `--hold` binds to no lease session
   and its claim verdict is decided by the environment's session against the claim's.
 - The restart row holds when the recorded session equals the environment's and the recorded pid
@@ -290,6 +291,11 @@ none
   restores unit 20's two staging qualifiers and points at unit 20 §4, and §5 risks follows. Finding
   15 (LOW): the fourth arm's floor field counts the assertions it adds. Finding 11 (HIGH) is
   promoted to `TOOL-aGraftedHelix-25`: §3 gains its hands-off, and S1 and §4 point at it.
+- rev-4 · 2026-10-04 · §3 §4 · from the bug-class checklist over the promoting commit, which
+  selected `amendment-leaves-its-other-half-standing` and `fold-text-is-unreviewed-surface`. §3's
+  atomic-write non-goal names `TOOL-aGraftedHelix-25`'s failure rule as half of what closes the
+  window, and §4 Evidence's unreadable-claim bullet claims no claim written rather than no CAS
+  attempted, which no source states.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-25 — the `prior-session` add's own failure returns the holder row before `write_lease`, observed by a criterion that fails the add itself
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-2 · base 5266d22e · streams tooling · order 7
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-2 · base 5266d22e · streams tooling · order 7
 
 <!-- gen:spec-records -->
 
@@ -76,11 +76,10 @@ closes finding 11 (HIGH) of the round-1 spec audit of unit 24.
 - Unit 1 §4 "Call sites" gives the holder row's not-completed CAS "announce, continue", so the
   announce line is printed at the CAS outcome, which unit 24 §4 "The order" places ahead of the add.
 
-### The add row, with its failure rule
+### The add row's failure rule
 
-| step | reads | writes | on failure |
-|---|---|---|---|
-| the add, when `write_lease` is due and the CAS did not complete or the claim was unreadable | the CAS outcome, the claim read, the record's `session` before the call | `prior-session` | the row returns 1, and nothing after it runs |
+Unit 24 §4 "The order" owns the add row, its trigger and its place. This unit adds one thing to
+it: when the add's `set_fact` returns non-zero, the row returns 1, and no step after the add runs.
 
 ### What a failed add leaves, on an `s2` call whose CAS did not complete
 
@@ -175,6 +174,9 @@ none
 - rev-1 · 2026-10-04 · initial draft, promoted from finding 11 (HIGH) of the round-1 spec audit of
   unit 24, grounded against `set_fact`, `write_lease` and the holder row at base `5266d22e`, and
   against units 1, 23 and 24 as specced.
+- rev-2 · 2026-10-04 · §4 · from the bug-class checklist over the promoting commit, which selected
+  `two-answers-to-one-question`. §4 no longer restates unit 24's add row as a table of its own; it
+  points at that row and states only the failure rule it adds.
 
 ## 10. Reuse audit
 
