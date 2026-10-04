@@ -6,7 +6,6 @@ streams: tooling
 roster: TOOL
 authorized-by: prompt
 spec-audit: 2026-10-05
-status: OPEN
 ids: TOOL-aEvidencedLens-1 TOOL-aEvidencedLens-2 TOOL-aEvidencedLens-3 TOOL-aEvidencedLens-4 TOOL-aEvidencedLens-5 TOOL-aEvidencedLens-6 TOOL-aEvidencedLens-7 TOOL-aEvidencedLens-8 TOOL-aEvidencedLens-9 TOOL-aEvidencedLens-10 TOOL-aEvidencedLens-11
 ---
 
@@ -68,23 +67,44 @@ evidence no lens was allowed to gather. The owner's prompt and the one answered 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 0 unit(s) · node a · opened 2026-10-05 · streams tooling
+**Build status:** SPECCED · 11 unit(s) · node a · opened 2026-10-05 · streams tooling
 ids TOOL-aEvidencedLens-1 TOOL-aEvidencedLens-2 TOOL-aEvidencedLens-3 TOOL-aEvidencedLens-4 TOOL-aEvidencedLens-5 TOOL-aEvidencedLens-6 TOOL-aEvidencedLens-7 TOOL-aEvidencedLens-8 TOOL-aEvidencedLens-9 TOOL-aEvidencedLens-10 TOOL-aEvidencedLens-11
 
 <!-- gen:build-units -->
-*No spec under this build carries a status header; the status above is declared in the front matter.*
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-aEvidencedLens-1 — the spec-audit lens catalogue: five lenses aimed at the measured classes, the harness its one source](spec/2026-10-05-spec-TOOL-aEvidencedLens-1.md) | 1 | 2 | SPECCED | rev-1 | 2026-10-05 |
+| [TOOL-aEvidencedLens-2 — spec lenses probe read-only, and every spec finding carries its evidence](spec/2026-10-05-spec-TOOL-aEvidencedLens-2.md) | 2 | 2 | SPECCED | rev-1 | 2026-10-05 |
+| [TOOL-aEvidencedLens-3 — the spec skeptic confirms by the rubric, re-runs the evidence, and refutes duplicates and by-design](spec/2026-10-05-spec-TOOL-aEvidencedLens-3.md) | 3 | 2 | SPECCED | rev-1 | 2026-10-05 |
+| [TOOL-aEvidencedLens-4 — a spec fold round reads its diff, and a moved subject is graded, not fixed at BLOCKER](spec/2026-10-05-spec-TOOL-aEvidencedLens-4.md) | 4 | 2 | SPECCED | rev-1 | 2026-10-05 |
+| [TOOL-aEvidencedLens-6 — the review returns a per-lens yield over defect clusters, unique defects counted](spec/2026-10-05-spec-TOOL-aEvidencedLens-6.md) | 5 | 2 | SPECCED | rev-1 | 2026-10-05 |
+| [TOOL-aEvidencedLens-10 — `review_replay.py` scores a spec-audit report against a past one by file and section](spec/2026-10-05-spec-TOOL-aEvidencedLens-10.md) | 6 | 1 | SPECCED | rev-1 | 2026-10-05 |
+| [TOOL-aEvidencedLens-5 — the build harness hands the audit its context, sibling specs, checklist and prior findings](spec/2026-10-05-spec-TOOL-aEvidencedLens-5.md) | 6 | 2 | SPECCED | rev-1 | 2026-10-05 |
+| [TOOL-aEvidencedLens-7 — `--review` takes highs and minors on a spec subject's exit and requires `promote` when any stood](spec/2026-10-05-spec-TOOL-aEvidencedLens-7.md) | 6 | 2 | SPECCED | rev-1 | 2026-10-05 |
+| [TOOL-aEvidencedLens-9 — the bar refuses a run commit that changes `REVIEW_ROUNDS`](spec/2026-10-05-spec-TOOL-aEvidencedLens-9.md) | 6 | 2 | SPECCED | rev-1 | 2026-10-05 |
+| [TOOL-aEvidencedLens-8 — the build harness promotes spec-audit minors, batched, and records the counts](spec/2026-10-05-spec-TOOL-aEvidencedLens-8.md) | 7 | 2 | SPECCED | rev-1 | 2026-10-05 |
+| [TOOL-aEvidencedLens-11 — the method, the memory-tree README, the Skill, the verbs entry and a decision record state what units 1 to 9 built](spec/2026-10-05-spec-TOOL-aEvidencedLens-11.md) | 8 | 1 | SPECCED | rev-1 | 2026-10-05 |
 <!-- /gen:build-units -->
 
-Records: 2 bound to this build, across 1 record folder(s).
+Records: 13 bound to this build, across 2 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: none — every unit id has one.
+Ids no `spec-audit` record has ever named: TOOL-aEvidencedLens-1 TOOL-aEvidencedLens-10 TOOL-aEvidencedLens-11 TOOL-aEvidencedLens-2 TOOL-aEvidencedLens-3 TOOL-aEvidencedLens-4 TOOL-aEvidencedLens-5 TOOL-aEvidencedLens-6 TOOL-aEvidencedLens-7 TOOL-aEvidencedLens-8 TOOL-aEvidencedLens-9.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
 
-*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+| Step | Units | Parallel |
+|---|---|---|
+| 1 | `TOOL-aEvidencedLens-1` | no |
+| 2 | `TOOL-aEvidencedLens-2` | no |
+| 3 | `TOOL-aEvidencedLens-3` | no |
+| 4 | `TOOL-aEvidencedLens-4` | no |
+| 5 | `TOOL-aEvidencedLens-6` | no |
+| 6 | `TOOL-aEvidencedLens-10`, `TOOL-aEvidencedLens-5`, `TOOL-aEvidencedLens-7`, `TOOL-aEvidencedLens-9` | yes |
+| 7 | `TOOL-aEvidencedLens-8` | no |
+| 8 | `TOOL-aEvidencedLens-11` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

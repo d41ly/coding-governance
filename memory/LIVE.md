@@ -9,7 +9,7 @@ terminal status. Nothing here is edited by hand.
 | [aBatchedLintel](builds/aBatchedLintel/README.md) | INPROGRESS | a | 2026-08-03 | tooling | 2 |
 | [aDeclaredBound](builds/aDeclaredBound/README.md) | OPEN | a | 2026-08-18 | tooling | 6 |
 | [aDeployScout](builds/aDeployScout/README.md) | SPECCED | a | 2026-07-12 | deployer | 1 |
-| [aEvidencedLens](builds/aEvidencedLens/README.md) | OPEN | a | 2026-10-05 | tooling | 11 |
+| [aEvidencedLens](builds/aEvidencedLens/README.md) | SPECCED | a | 2026-10-05 | tooling | 11 |
 | [aFerriedDossier](builds/aFerriedDossier/README.md) | OPEN | a | 2026-08-16 | deployer | 3 |
 | [aGradedDoorway](builds/aGradedDoorway/README.md) | INPROGRESS | a | 2026-08-28 | tooling | 10 |
 | [aMendedLedger](builds/aMendedLedger/README.md) | SPECCED | a | 2026-08-09 | tooling+playbook | 9 |
