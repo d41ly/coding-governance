@@ -11,8 +11,8 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 ## Run facts
 refreshed-at: fd82e883102c570ea66f4f3244a92c70f7c19083 · park · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 4d0d646882857930e7602e1d7531552e914aa995
-phase: REVIEWING
+witness: 7f714a32abc6bf6004fd7e3ff49f64d70916a919
+phase: BUILDING
 branch-sha: 3640cf580d9df31e5cbe74be89024dd5a40e9f85
 branch-ref: refs/heads/branch/spec-review-improvements-f59dad
 spec-audit: 2026-10-05
@@ -42,3 +42,7 @@ base: 3640cf580d9df31e5cbe74be89024dd5a40e9f85
 2026-10-04T23:32:23Z decision · item spec-audit promotion chain generation bound (round-1 spec audit finding 45, TOOL-aEvidencedLens-8 section 8 F3) · reason question: does a chain of spec-audit promotions need a bound beyond M4's precision rule, now that unit 8 promotes a minors batch on nearly every terminal round and unit 3 confirms at any severity, which raises the precision that must fall to end a chain (TOOL-aWokenSentinel-30 measured the cascade not converging); options: (a) close a spec-audit minors batch unit under M4's recorded specs-audited override instead of auditing it as a fresh subject, (b) leave M4 as it is and let the owner set a generation cap; refused because (a) rewrites M4, a governance carrier, and sets the owner's audit cost, which M3 veto 2 reserves to the owner
 
 2026-10-04T23:37:07Z review · item aEvidencedLens-spec-set-r1 · reason verdict CLEAN · blockers 0 · CONVERGED · disposition promote
+
+2026-10-04T23:39:15Z dispatch · item 7f714a32 TOOL-aEvidencedLens-1 · reason tools/workflows/tier2-review.template.js tools/workflows/tier2-review.js tools/workflows/tier2-review.test.sh tools/workflows/unattended-build.test.sh tools/workflows/README.md memory/builds/aEvidencedLens/spec/2026-10-05-spec-TOOL-aEvidencedLens-1.md
+
+2026-10-04T23:39:21Z brief · item TOOL-aEvidencedLens-1 · reason 06fc74268f80 memory/builds/aEvidencedLens/prompts/2026-10-05-prompt-TOOL-aEvidencedLens-1-2-build-brief.md
