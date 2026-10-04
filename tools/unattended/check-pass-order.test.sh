@@ -679,8 +679,8 @@ rm -rf "$T"
 # ---- RANGE MODE (TOOL-dUnstuckLanding-17 S2/S3, AC2 and AC5). A violation already on the tip the remote
 # ---- advertises was graded when it landed, so a closing run grades only what it adds. The fixture is
 # ---- a clone of a bare origin whose tip carries ARCH-tRange-1 BUILT BEFORE ITS SPEC, and the unpushed
-# ---- run adds ARCH-tRange-2, specced first. `rg_spec <n>` writes a conforming spec for unit n.
-mkrange() { # -> prints the fixture root; the clone is <root>/work, its origin <root>/origin.git
+# ---- run adds ARCH-tRange-2, specced first. `write_range_spec <n>` writes a conforming spec for unit n.
+seed_range_fixture() { # -> prints the fixture root; the clone is <root>/work, its origin <root>/origin.git
   local T
   T=$(mktemp -d) || exit 2
   ( cd "$T" || exit 2
@@ -698,17 +698,17 @@ mkrange() { # -> prints the fixture root; the clone is <root>/work, its origin <
       printf '<!-- /gen:build-units -->\n<!-- /gen:build-index -->\n'; } > memory/builds/tRange/README.md
     git add -A >/dev/null; git commit -q -m "fixture base" --no-verify
     printf 'one\n' > ${PFX}p1.sh; git add -A >/dev/null; git commit -q -m "ARCH-tRange-1: build the thing" --no-verify
-    rg_spec 1; git add -A >/dev/null; git commit -q -m "spec ARCH-tRange-1 written afterwards" --no-verify
+    write_range_spec 1; git add -A >/dev/null; git commit -q -m "spec ARCH-tRange-1 written afterwards" --no-verify
     git remote add origin ../origin.git; git push -q origin main
-    rg_spec 2; git add -A >/dev/null; git commit -q -m "spec ARCH-tRange-2 authored" --no-verify
+    write_range_spec 2; git add -A >/dev/null; git commit -q -m "spec ARCH-tRange-2 authored" --no-verify
     printf 'two\n' > ${PFX}p2.sh; git add -A >/dev/null; git commit -q -m "ARCH-tRange-2: build the thing" --no-verify
   ) >/dev/null 2>&1
   printf '%s' "$T"
 }
-rg_spec() { # unit number -> a conforming CLOSED spec for it
+write_range_spec() { # unit number -> a conforming CLOSED spec for it
   printf '# ARCH-tRange-%s — the unit\n\n**Status:** CLOSED · rev-1 · 2026-06-02 · node t · Tier-2 · base 0123abcd\n\n## 2. Scope (IN)\n\n- S1 a real scope item.\n\n## 6. Acceptance criteria\n\n- AC1 something observable.\n\n## 7. Gates\n\n- a gate.\n\n## 8. Open questions\n\nnone\n' "$1" > memory/builds/tRange/spec/s$1.md
 }
-T=$(mkrange)
+T=$(seed_range_fixture)
 RG_TIP=$(git -C "$T/work" rev-parse origin/main)
 o=$(cd "$T/work" && bash "$LEG" 2>&1); rc=$?
 same  "range: a violation on the advertised tip is not re-graded, exit code" "$rc" "0"
@@ -716,7 +716,7 @@ has   "range: the summary names the mode and the tip" "$o" "range ${RG_TIP:0:8}.
 hasnt "range: the pushed unit is not named" "$o" "ARCH-tRange-1 —"
 # ...a second, UNPUSHED, built-before-specced unit is graded and named, and the pushed one still is not
 ( cd "$T/work" && printf 'three\n' > ${PFX}p3.sh && git add -A >/dev/null && git commit -q -m "ARCH-tRange-3: build the thing" --no-verify \
-  && rg_spec 3 && git add -A >/dev/null && git commit -q -m "spec ARCH-tRange-3 written afterwards" --no-verify ) >/dev/null 2>&1
+  && write_range_spec 3 && git add -A >/dev/null && git commit -q -m "spec ARCH-tRange-3 written afterwards" --no-verify ) >/dev/null 2>&1
 o=$(cd "$T/work" && bash "$LEG" 2>&1); rc=$?
 same  "range: an unpushed violation reds, exit code" "$rc" "1"
 has   "range: the unpushed violation is named" "$o" "ARCH-tRange-3 — BUILT at"
@@ -735,11 +735,11 @@ same  "range nothing-unpushed: WHOLE mode, exit code" "$rc" "1"
 has   "range nothing-unpushed: the summary says WHOLE and why" "$o" "range whole (HEAD carries nothing the tip ${RG_TIP:0:8} lacks)"
 rm -rf "$T"
 # ...a WAIVER ROW naming the pushed unit is NOT JUDGED stale in RANGE mode, and is counted
-T=$(mkrange)
+T=$(seed_range_fixture)
 ( cd "$T/work" && git reset -q --hard origin/main && mkdir -p memory/project \
   && printf 'ARCH-tRange-1\tbuilt before its spec, landed as-is\n' > memory/project/pass-order-waiver.txt \
   && git add -A >/dev/null && git commit -q -m "waive ARCH-tRange-1" --no-verify && git push -q origin main \
-  && rg_spec 2 && git add -A >/dev/null && git commit -q -m "spec ARCH-tRange-2 authored" --no-verify \
+  && write_range_spec 2 && git add -A >/dev/null && git commit -q -m "spec ARCH-tRange-2 authored" --no-verify \
   && printf 'two\n' > ${PFX}p2.sh && git add -A >/dev/null && git commit -q -m "ARCH-tRange-2: build the thing" --no-verify ) >/dev/null 2>&1
 o=$(cd "$T/work" && bash "$LEG" 2>&1); rc=$?
 same  "range waiver: a row naming a pushed unit is not judged stale, exit code" "$rc" "0"
