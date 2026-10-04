@@ -183,7 +183,7 @@ ids TOOL-aMendedFleet-96 TOOL-aMendedFleet-97 TOOL-aMendedFleet-98 TOOL-aMendedF
 | [TOOL-aMendedFleet-4 — the govkit acceptance matrix reads its children as UTF-8 on every host](spec/2026-10-04-spec-TOOL-aMendedFleet-4.md) | 4 | 1 | CLOSED | rev-1 | 2026-10-04 |
 | [TOOL-aMendedFleet-5 — `transition-audit arms` passes on the hosted runner: the audit writes UTF-8](spec/2026-10-04-spec-TOOL-aMendedFleet-5.md) | 5 | 1 | CLOSED | rev-1 | 2026-10-04 |
 | [TOOL-aMendedFleet-6 — `lexicon wiring` passes on the hosted runner: the conf reader writes UTF-8](spec/2026-10-04-spec-TOOL-aMendedFleet-6.md) | 6 | 1 | CLOSED | rev-1 | 2026-10-04 |
-| [TOOL-aMendedFleet-7 — a census of the daily held job's red suites by root cause, adding one unit per cause](spec/2026-10-04-spec-TOOL-aMendedFleet-7.md) | 7 | 1 | CLOSED | rev-3 | 2026-10-05 |
+| [TOOL-aMendedFleet-7 — a census of the daily held job's red suites by root cause, adding one unit per cause](spec/2026-10-04-spec-TOOL-aMendedFleet-7.md) | 7 | 1 | CLOSED | rev-4 | 2026-10-05 |
 | [TOOL-aMendedFleet-8 — drift-audit reports `remote_ci_red_streak`](spec/2026-10-04-spec-TOOL-aMendedFleet-8.md) | 8 | 1 | SPECCED | rev-2 | 2026-10-04 |
 | [TOOL-aMendedFleet-9 — the daily held job's red suites reach the inherited-red HIGH auto-file](spec/2026-10-04-spec-TOOL-aMendedFleet-9.md) | 9 | 2 | SPECCED | rev-2 | 2026-10-04 |
 | [TOOL-aMendedFleet-10 — `--asks` rows carry the pointer and a 160-byte summary, and `--path` ranks and caps them](spec/2026-10-04-spec-TOOL-aMendedFleet-10.md) | 10 | 2 | SPECCED | rev-2 | 2026-10-04 |

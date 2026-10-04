@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-7 — a census of the daily held job's red suites by root cause, adding one unit per cause
 
-**Status:** CLOSED · rev-3 · 2026-10-05 · node a · Tier-1 · base 7af5f564 · streams tooling · order 7
+**Status:** CLOSED · rev-4 · 2026-10-05 · node a · Tier-1 · base 7af5f564 · streams tooling · order 7
 
 <!-- gen:spec-records -->
 
@@ -165,8 +165,11 @@ re-derives, never a substitute for it.
   Red when: a row carries no cause, a class outside the set, or an evidence cell that is empty.
 - **AC3** — When `grep -c " rescope · item add TOOL-aMendedFleet-[0-9]* · reason held-red census cause " memory/builds/aMendedFleet/RUN.md`
   runs after the pass, it equals the number of cause rows the journal disposes as NEW, and every cause
-  row disposed to an existing unit names a file that unit's spec lists under its files touched.
-  Red when: a new cause has no unit, or a unit was added for a cause the journal does not list.
+  row disposed to an existing unit names a file that unit's spec lists under its files touched, and
+  every cause row disposed `GREEN-SINCE` names a run in whose column of the suite table every suite
+  that cause explains is marked passed.
+  Red when: a new cause has no unit, a unit was added for a cause the journal does not list, or a
+  cause is called green in a run where one of its suites was red.
 - **AC4** — When `git grep -n -F -e <id> -- memory/builds/aMendedFleet/README.md` runs for each id
   the rescope rows of AC3 add, it hits a row inside the authored Units table between the roster
   markers.
@@ -207,6 +210,9 @@ The census writes records only. The journal path trips the two recall-floor guar
   cause per mechanism. AC3's grep counted every add the run had recorded, fourteen of them before
   this unit, so it could never equal the census's count; it now selects the adds whose reason opens
   `held-red census cause`, the prefix S5's calls write.
+- rev-4 · 2026-10-05 · AC3 · S4 said GREEN-SINCE was observed by AC3, and AC3 read no green
+  disposition, so a cause could be called green in a run where its suite was red and every arm
+  passed. AC3 now grades each GREEN-SINCE row against the suite table's run columns.
 
 ## 10. Reuse audit
 
