@@ -89,14 +89,16 @@ CONFORMANCE_STATES = ("MET", "UNMET", "UNJUDGEABLE")
 COVERAGE_STATES = ("present", "absent", "partial", "dead", "not-local", "stale")
 OWNER_POSITIONS = ("launch", "pre-run", "in-window", "post-close")
 SOURCE_NAMES = ("run-state", "driver", "gates", "pushes", "git", "transcripts", "build-folder")
-LEDGER_SOURCES = ("decision", "abort", "override", "waiver", "rescope-retire", "rescope-supersede",
-                  "review", "trailer", "spec-mark", "decision-log", "ledger")
+LEDGER_SOURCES = ("decision", "abort", "override", "waiver", "handoff", "rescope-retire",
+                  "rescope-supersede", "review", "trailer", "spec-mark", "decision-log", "ledger")
 # THE DRIVER'S OWN SETS, COPIED, because a kit reads no sibling kit at run time. A replicated policy
 # value is held to the file that owns it: the withheld self-test extracts these from the driver's
 # source where that file is present, compares both directions, and announces its skip where it is not.
 PARK_KINDS = ("decision", "abort", "override", "waiver", "proposal", "rescope", "dispatch", "review",
-              "brief", "hold", "resume")
-PARK_KINDS_OWED = ("decision", "abort", "override", "waiver")
+              "brief", "hold", "resume", "handoff")
+# `handoff` joined both in TOOL-dUnstuckLanding-13: its row is the landing recipe the owner is shown,
+# so it is owed, and it sits in LEDGER_SOURCES after `waiver` so the owed kinds still lead that tuple.
+PARK_KINDS_OWED = ("decision", "abort", "override", "waiver", "handoff")
 PARK_ACTS_OWED = ("retire", "supersede")
 PHASES_TERMINAL = ("LANDED", "ABORTED")
 # The phases at and past the close. An item whose evidence exists only once a run has closed is

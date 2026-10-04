@@ -8167,6 +8167,152 @@ fi   # ---- region two continues below: one compound block past about 3000 comma
      # ---- bash 5.3 on Cygwin (exit 139), so the region is cut into blocks at top-level seams
 if in_shard 2; then
 
+# ========================================================== TOOL-dUnstuckLanding-13 — `--handoff` ====
+# A run whose work is sound and which an owner must land, or decide first, ends HELD under a hand-off
+# code with the landing recipe and the landing facts beside it. Every arm builds on the hold fixture,
+# whose lease is k1 and whose conf reads LANDER_MODE primary and LANDER `echo land`.
+#
+# THE BAR IS SEEDED THE WAY THE CLOSE LEAVES IT: a run record under the git dir whose header names the
+# HEAD it ran at, the `gates-run` fact naming it, and then the commit of that fact, because a hold
+# refuses a dirty tree. HEAD therefore differs from the bar's head in the run-state file alone, which
+# is the tie S4 admits for a hand-off and nothing else. A conf edit an arm needs is committed BEFORE the
+# seed, or the bar's head would differ from HEAD in the conf too and the guard would refuse first.
+seed_handoff_bar() { # verdict · attribution verdict of leg x, or empty for no attribution record
+  local d id; id="ho-$RANDOM$RANDOM"; d="$(git rev-parse --git-dir)/gate-run/$id"; mkdir -p "$d"
+  printf 'head\t%s\ntree_clean\tyes\n' "$(git rev-parse HEAD)" > "$d/header"
+  printf 'verdict\t%s\ntree_moved\tno\n' "$1" > "$d/verdict"
+  [ -z "${2:-}" ] || printf 'x\t%s\t1\t0\t-\t3\t-\t-\tplanted\n' "$2" > "$d/attribution"
+  sed -i '/^gates-run: /d' memory/builds/tRun/RUN.md
+  add_facts memory/builds/tRun/RUN.md "$(printf 'gates-run: %s %s' "$id" "$(git rev-parse --short=8 HEAD)")"
+  git add -A >/dev/null && git commit -q -m "records: the bar's gates-run fact" --no-verify
+}
+read_handoff_row() { grep ' handoff · item ' memory/builds/tRun/RUN.md; }
+read_run_fact() { sed -n "s/^$1: //p" memory/builds/tRun/RUN.md | head -1; }
+
+# ---- AC1: under in-place, over a GREEN bar, the hand-off writes HELD, the two hand-off facts, the
+# ---- roster and ONE handoff row carrying the recipe and never the free-text reason.
+build_hold_fixture
+sed -i 's/^LANDER_MODE=.*/LANDER_MODE="in-place"/' .unattended.conf; fixture
+seed_handoff_bar GREEN
+out=$(run --handoff tRun --code owner-landing --reason "the owner lands onto the order" --reaped k1)
+hit  "$out" "phase HELD · code owner-landing · until owner"
+hit  "$out" "unattended: hand-off recipe, written as the handoff row - in the run worktree: echo land --prepare --slug tRun && echo land --land --slug tRun"
+same "AC1 the phase" "$(read_run_fact phase)" "HELD"
+same "AC1 the hold code" "$(read_run_fact hold-code)" "owner-landing"
+same "AC1 the release condition" "$(read_run_fact hold-until)" "owner"
+same "AC1 no durable restart is owed" "$(read_run_fact resume-owed)" "none · owner"
+same "AC1 the roster, in --close's in-place spelling" "$(read_run_fact units-at-landing)" "ARCH-tRun-1"
+same "AC1 exactly one handoff row" "$(read_handoff_row | grep -c ' handoff · item owner-landing · reason ')" "1"
+hit  "$(read_handoff_row)" "--prepare --slug tRun"
+hit  "$(read_handoff_row)" "--land --slug tRun"
+miss "$(read_handoff_row)" "the owner lands onto the order"
+same "AC1 no ask contract here, so no freeze line" "$(grep -c '^asks-at-landing: ' memory/builds/tRun/RUN.md || true)" "0"
+
+# ---- AC2: every refusal --hold makes holds here unchanged and writes nothing - a dirty tree, and a
+# ---- record already HELD by an earlier hand-off.
+build_hold_fixture; seed_handoff_bar GREEN; printf 'scratch\n' > untracked.txt; before=$(sum)
+out=$(run --handoff tRun --code owner-landing --reason r --reaped k1)
+hit  "$out" "the working tree is dirty, so the pinned BASE would name a state that is not what runs"
+same "AC2 a hand-off over a dirty tree wrote nothing" "$(sum)" "$before"
+rm -f untracked.txt
+build_hold_fixture; seed_handoff_bar GREEN
+run --handoff tRun --code owner-landing --reason r --reaped k1 >/dev/null; fixture
+before=$(sum)
+out=$(run --handoff tRun --code owner-landing --reason r --reaped k1)
+hit  "$out" "the run is already HELD, and a second hold overwrites held-from with HELD"
+same "AC2 a hand-off over a HELD record wrote nothing" "$(sum)" "$before"
+
+# ---- AC3: --hold refuses both hand-off codes before any write, naming --handoff.
+build_hold_fixture; before=$(sum)
+for _hc in owner-landing owner-decision; do
+  out=$(run --hold tRun --code "$_hc" --until owner --reason r --reaped k1)
+  hit  "$out" "--hold names a hand-off code, and those are written by --handoff alone: a HELD record under one carries the landing recipe and the landing facts, and a hold written without them is a hand-off nothing can land or settle; end the run with --handoff instead"
+  same "AC3 --hold over $_hc wrote nothing" "$(sum)" "$before"
+done
+# ...and --handoff refuses every other code, a hold code included, and a missing one.
+out=$(run --handoff tRun --code platform-limit --reason r --reaped k1)
+hit  "$out" "--handoff takes --code owner-landing or --code owner-decision and no other: owner-landing when only the landing remains, owner-decision when a parked decision stands first, and any other stop is a --hold or an --abort: platform-limit"
+out=$(run --handoff tRun --reason r --reaped k1)
+hit  "$out" "--handoff takes --code owner-landing or --code owner-decision and no other"
+hit  "$out" "an --abort: none"
+same "AC3 a refused code wrote nothing" "$(sum)" "$before"
+out=$(run --handoff tNoSuchBuild --code owner-landing --reason r --reaped k1)
+hit  "$out" "no run-state file, so there is no run to hand off"
+
+# ---- AC4: the attribution guard. An OWN red is refused through fail 83 naming the leg; an
+# ---- all-INHERITED red is admitted; a record naming no bar is refused through fail 83's own branch.
+build_hold_fixture; seed_handoff_bar RED OWN; before=$(sum)
+out=$(run --handoff tRun --code owner-landing --reason r --reaped k1)
+hit  "$out" "--handoff --code owner-landing is refused unless the attribution record of the last gates-green bar reads every red leg INHERITED on the tree being closed, so gates-green must run on HEAD first; the condition that failed: its attribution reads x OWN"
+same "AC4 an OWN red wrote nothing" "$(sum)" "$before"
+build_hold_fixture; seed_handoff_bar RED INHERITED
+hit  "$(run --handoff tRun --code owner-landing --reason r --reaped k1)" "phase HELD · code owner-landing"
+build_hold_fixture; before=$(sum)
+out=$(run --handoff tRun --code owner-landing --reason r --reaped k1)
+hit  "$out" "the condition that failed: no gates-run fact in this record names a bar"
+same "AC4 a record naming no bar wrote nothing" "$(sum)" "$before"
+
+# ---- AC5: the tie admits a HEAD that moved by the run-state file alone and nothing wider, and the
+# ---- relaxation reaches --handoff only: the same records-only tree still refuses --close's override
+# ---- and the out-of-scope --abort with `ran at`.
+build_hold_fixture; seed_handoff_bar GREEN
+printf 'other\n' > other.txt; fixture; before=$(sum)
+out=$(run --handoff tRun --code owner-landing --reason r --reaped k1)
+hit  "$out" "the condition that failed: the bar it names ran at"
+same "AC5 a HEAD that moved past the record wrote nothing" "$(sum)" "$before"
+build_hold_fixture; seed_handoff_bar RED INHERITED
+out=$(run --close tRun --override gates-green --reason r)
+hit  "$out" "--close --override gates-green is refused unless the attribution record of the last gates-green bar reads every red leg INHERITED on the tree being closed, so gates-green must run on HEAD first; the condition that failed: the bar it names ran at"
+out=$(run --abort tRun --code gate-red-out-of-scope --reason r)
+hit  "$out" "--abort --code gate-red-out-of-scope is refused unless the attribution record of the last gates-green bar reads every red leg INHERITED on the tree being closed, so gates-green must run on HEAD first; the condition that failed: the bar it names ran at"
+
+# ---- AC6 and AC8: owner-decision needs a parked decision and is NOT guarded, so it is admitted over
+# ---- an OWN red once one is parked; under primary the recipe merges the run branch and names LANDER.
+build_hold_fixture; seed_handoff_bar RED OWN; before=$(sum)
+out=$(run --handoff tRun --code owner-decision --reason r --reaped k1)
+hit  "$out" "--handoff --code owner-decision requires a parked decision row in the record, because that row is the question the owner is handed, and a decision hand-off with none is a stop with no question in it; park it first with --park"
+same "AC6 a decision hand-off with no decision wrote nothing" "$(sum)" "$before"
+run --park tRun --item "which order lands it" --reason "options seen: a first or b first; refused: the order is the owner's" >/dev/null; fixture
+out=$(run --handoff tRun --code owner-decision --reason r --reaped k1)
+hit  "$out" "phase HELD · code owner-decision · until owner"
+hit  "$(read_handoff_row)" "handoff · item owner-decision · reason in the primary tree: git merge --no-ff unit && echo land"
+miss "$(read_handoff_row)" "--prepare"
+# ...and a blank LANDER under primary names no lander, so it is refused before any write.
+build_hold_fixture
+sed -i 's/^LANDER=.*/LANDER=""/' .unattended.conf; fixture
+seed_handoff_bar GREEN; before=$(sum)
+out=$(run --handoff tRun --code owner-landing --reason r --reaped k1)
+hit  "$out" "the hand-off recipe would name no lander or no branch to merge, and a recipe missing either is not one an owner can run; declare LANDER in the conf, or hand off from the run's own branch; the lander reads: []"
+same "AC8 a blank lander wrote nothing" "$(sum)" "$before"
+
+# ---- AC10: the --abort notice. A record first committed after a dated cutoff, aborted with a
+# ---- hand-off-shaped code, prints it and still aborts; a later cutoff, a blank one, a malformed one
+# ---- and a code outside the set print none, and none of the five is refused.
+for _ho_case in "2026-01-01 external-prerequisite yes" "2099-01-01 external-prerequisite no" \
+                "blank external-prerequisite no" "soon external-prerequisite no" "2026-01-01 fork-unresolvable no"; do
+  read -r _ho_cut _ho_code _ho_want <<<"$_ho_case"
+  build_hold_fixture
+  case "$_ho_cut" in blank) ;; *) printf 'HANDOFF_CUTOFF="%s"\n' "$_ho_cut" >> .unattended.conf; fixture ;; esac
+  run --attest tRun --item keepalive-reaped >/dev/null
+  run --attest tRun --item parked-decisions-surfaced >/dev/null
+  fixture
+  out=$(run --abort tRun --code "$_ho_code" --reason "nothing left to try")
+  hit  "$out" "phase ABORTED"
+  if [ "$_ho_want" = yes ]; then
+    hit  "$out" "unattended: NOTICE - from HANDOFF_CUTOFF an ABORTED record means DISCARD, its work must not land as it stands. This code is hand-off-shaped: if the work is sound and only an owner may land it or decide first, end the run with --handoff --code owner-landing or owner-decision instead. This abort proceeds as asked: $_ho_code"
+  else
+    miss "$out" "unattended: NOTICE - from HANDOFF_CUTOFF an ABORTED record means DISCARD"
+  fi
+  case "$_ho_cut" in
+    blank) hit "$out" "unattended: NOTE - this project declares no HANDOFF_CUTOFF, so this abort is not dated against the day ABORTED came to mean discard and no hand-off notice is printed" ;;
+    soon)  hit "$out" "unattended: NOTE - HANDOFF_CUTOFF is not a YYYY-MM-DD date, so no record can be dated against it and no hand-off notice is printed: soon" ;;
+  esac
+done
+
+fi   # ---- region two continues below: one compound block past about 3000 commands segfaults
+     # ---- bash 5.3 on Cygwin (exit 139), so the region is cut into blocks at top-level seams
+if in_shard 2; then
+
 # ---- AC5: `--liveness` over an aged HELD record reads `state: held` and `verdict: HELD`, never the
 # ---- STALE the resume tick acts on, and prints every key it printed before, in the same order.
 build_hold_fixture
@@ -10304,6 +10450,29 @@ same "the refused landing left the phase NON-TERMINAL" \
 same "...and wrote no freeze line" \
   "$(grep -c '^asks-at-landing: ' memory/builds/tDispF/RUN.md || true)" "0"
 askmode ok
+dispreset
+
+# ---- TOOL-dUnstuckLanding-13 AC7: the hand-off freezes the asks exactly as the landing verbs do, over
+# ---- the same self-filed fixture the AC15 arm above lands, and a witness that cannot answer refuses
+# ---- it before any write. `owner-decision` with a parked decision, so no bar has to be seeded here.
+printf '# tDispF — asks\n\n## Asks\n- EXMP-tDispF-1 · filed 2026-09-10 · this build raised it · seen `memory/builds/tDispF/BACKLOG.md` · accept done\n\n## Dispositions\n' \
+  > memory/builds/tDispF/BACKLOG.md
+askrows 'EXMP-tDispF-1\tCLOSED\t-\ttDispF\tLOW\tyes\t-\t-\t-\t-\n'
+git add -A >/dev/null; git commit -q -m hofreeze --no-verify
+run --preflight tDispF --keepalive-id KD-1 >/dev/null
+run --park tDispF --item "which order lands it" --reason "options seen: a or b; refused: the order is the owner's" >/dev/null
+git add -A >/dev/null; git commit -q -m hopark --no-verify
+askmode silent; before=$(git hash-object memory/builds/tDispF/RUN.md)
+out=$(run --handoff tDispF --code owner-decision --reason r --reaped KD-1)
+hit  "$out" "this run's asks cannot be read at HEAD, so the hand-off would freeze no answer to the question the run was authorized by, and the record an owner lands would carry none; nothing was written"
+hit  "$out" "DEAD PROBE - the declared command wrote nothing to either stream"
+same "AC7 a failed freeze wrote nothing" "$(git hash-object memory/builds/tDispF/RUN.md)" "$before"
+askmode ok
+out=$(run --handoff tDispF --code owner-decision --reason r --reaped KD-1)
+hit  "$out" "phase HELD · code owner-decision · until owner"
+same "AC7 the hand-off freezes what the landing verbs freeze over this fixture" \
+  "$(sed -n 's/^asks-at-landing: //p' memory/builds/tDispF/RUN.md)" "EXMP-tDispF-1=CLOSED"
+askrows ''
 dispreset
 
 # ========================================================== TOOL-dDerivedDocket-19 — THE GRANT ====

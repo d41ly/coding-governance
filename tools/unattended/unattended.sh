@@ -21,6 +21,7 @@
 #   unattended.sh --review <slug> --subject <id> --verdict <v> --blockers <N> [--disposition fold|promote]
 #   unattended.sh --abort <slug> --reason <text>           # end it, with the reason on the record
 #   unattended.sh --hold <slug> --code <c> --until <cond> --reason <text> --reaped <id>|--keepalive-unreachable <node> [--pending-run <runId>]
+#   unattended.sh --handoff <slug> --code owner-landing|owner-decision --reason <text> --reaped <id>|--keepalive-unreachable <node>   # HELD for an owner to land or decide
 #   unattended.sh --resume <slug> --scheduled <held-at> --keepalive-id <id>   # the restart a durable schedule files
 #   unattended.sh --attest <slug> --item <item> [--value <text>]  # the agent-checked DoD items
 #   unattended.sh --record-piece <slug> --path <p> --leg <n> --verdict <PASS|FAIL|NA> [--records-root <dir> [--playbook-sha <sha>] [--run <id>]]
@@ -90,7 +91,7 @@ KIT_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
 # read wrong, it does not RUN; the usage text is rendered from the docstring above, which is the only
 # place a verb's arguments are spelled; and the two carriers in other files are joined to this one by
 # the gate leg, because no runtime derivation crosses a file boundary.
-VERBS_SLUG="--preflight --status --audit --register-task --release-task --liveness --resume --close --landed --abort --hold --park --propose --attest --record-piece --record-set --rescope --dispatch --review --brief"
+VERBS_SLUG="--preflight --status --audit --register-task --release-task --liveness --resume --close --landed --abort --hold --handoff --park --propose --attest --record-piece --record-set --rescope --dispatch --review --brief"
 # The verbs whose argument is POSITIONAL and which exit inside the parse loop. Separate because the
 # dispatch cannot treat them alike, and merged again for every reader, who does not care.
 VERBS_INLINE="--plan --phase --version"
@@ -476,7 +477,7 @@ CONF="$ROOT/.unattended.conf"
 MEMORY_ROOT=memory; LANDER=""; LANDER_MODE=""; SELFTESTS_OWED_PATHS=""; BYPASS_BAN=""; GATE_CMD=""; WIRING_CHECK=""
 KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""; PHASES_EXTRA=""; DOD_EXTRA=""; DIRECTIVES_EXTRA=""; ANCHOR_SCOPE=""; UNITS_REGION_CUTOFF=""; SHARED_RECORDS="$SHARED_RECORDS_UNDECLARED"; GENERATED_INDEXES=""; SPEC_THIN_CUTOFF=""
 HALT_CODES_EXTRA=""; HALT_FLOOR=""; LANDER_MARKER=""; RECALL_CLI=""; MAP_CLI=""; SPEC_TOKENS_CLI=""
-ASKS_CMD=""; HOLD_CODES_EXTRA=""; HOLD_FLOOR=""; LANDED_FACTS_CUTOFF=""; GATE_POLICY_FILE=""; PROCMON_CMD=""
+ASKS_CMD=""; HOLD_CODES_EXTRA=""; HOLD_FLOOR=""; LANDED_FACTS_CUTOFF=""; GATE_POLICY_FILE=""; PROCMON_CMD=""; HANDOFF_CUTOFF=""
 RESUME_SCHEDULE=""; RESUME_SCHEDULE_CREATE=""; RESUME_SCHEDULE_DELETE=""; RESUME_SCHEDULE_DELAY=""; RESUME_SCHEDULE_LIMIT=""
 GATE_BOUND=""; GATE_WALL=""; GATE_PROFILE_CMD=""; UNIT_STALL_BOUND=""; TASK_STALL_BOUND=""; REVIEW_ROUNDS=""; RESUME_STALE_BOUND=""; RESUME_ATTEMPTS=""; RESUME_TURNS=""
 DISPOSITION_CUTOFF=""; SPEC_AUDIT_DEFAULT=""; RUNLOG_SESSION_VARS=""; RUNLOG_SWITCH=${GOV_RUNLOG:-}
@@ -512,6 +513,9 @@ DISPOSITION_CUTOFF=""; SPEC_AUDIT_DEFAULT=""; RUNLOG_SESSION_VARS=""; RUNLOG_SWI
 #     whole-run wall, read below through `read_bound_key` with an empty default, and the command that
 #     prints the runner's resolved profile. Blank wall: the profile's wall stays in force. Blank
 #     profile command: the bar has no backstop and stays bounded at GATE_BOUND. Both announced.
+#   * HANDOFF_CUTOFF (TOOL-dUnstuckLanding-13 S8) - the date from which `ABORTED` means DISCARD:
+#     an `--abort` naming a hand-off-shaped halt code, on a record first committed on or after it,
+#     prints a notice naming `--handoff`. Blank turns the notice off, announced. It never refuses.
 # shellcheck disable=SC1090
 . "$CONF"
 
@@ -666,7 +670,7 @@ DOD_CORE="gates-green:machine records-current:machine authorization-reachable:ma
 # reader parses BY kind, so it is a row nothing counts and nothing surfaces. It became a declaration
 # when a fifth kind arrived and found the alternation that recognises a row typed into `verb_status`
 # - one spelling of a vocabulary that two files read.
-PARK_KINDS="decision abort override waiver proposal rescope dispatch review brief hold resume"
+PARK_KINDS="decision abort override waiver proposal rescope dispatch review brief hold resume handoff"
 # The BUILD-ORDER verb, in the two shapes `gen_build_index.py` declares. CONFORMING requires the
 # value to be anchored on both sides; LOOSE is anything wearing the verb's name that is not.
 ORDER_OK_RE='·[[:space:]]*order[[:space:]]+[0-9]+[[:space:]]*(·|$)'
@@ -680,7 +684,11 @@ ORDER_LOOSE_RE='·[[:space:]]*order[[:space:]]+[^[:space:]]+'
 # NOT the only declaration of membership any more: `PARK_ACTS_OWED` below is the ACT axis, and a
 # reader who takes this set for the whole taxonomy gets the double-count `history_exclude_re` exists
 # to prevent.
-PARK_KINDS_OWED="decision abort override waiver"
+# TOOL-dUnstuckLanding-13 S7 - `handoff` is OWED although it asks no question: its row is the
+# landing recipe a person runs, and a hand-off whose recipe the owner is never shown is a HELD run
+# nobody lands. Two sibling kits spell this set and the one above it, each held to this line both
+# ways by its own self-test, so a member moves there in the same commit.
+PARK_KINDS_OWED="decision abort override waiver handoff"
 # The ACTS of the `rescope` kind the owner is owed an ANSWER to. A SECOND constant rather than a
 # `kind:act` member grammar inside the set above, and the reason is a measured refusal rather than a
 # preference: check 2's dead-member loop in the gate leg greps this driver for `park "$rel" <member> `
@@ -818,7 +826,19 @@ HALT_CODES_CORE="runaway-ceiling-unclean fork-unresolvable scope-approval-needed
 # names a stop the run cannot fix and did not cause; none of them ends the run. A project extends
 # through HOLD_CODES_EXTRA and deletes nothing, which HOLD_FLOOR pins the way HALT_FLOOR pins the
 # halt set.
-HOLD_CODES_CORE="host-degraded platform-limit platform-unavailable host-owner-action inherited-red"
+HOLD_CODES_CORE="host-degraded platform-limit platform-unavailable host-owner-action inherited-red owner-landing owner-decision"
+# TOOL-dUnstuckLanding-13 S2 - THE TWO HAND-OFF CODES, and `--handoff` is their ONLY producer. A run
+# whose work is sound and which an owner must land, or decide first, ends HELD under one of them
+# with the landing recipe and the landing facts beside it; `--hold` refuses both, because a HELD
+# record under a hand-off code written without the guard, the recipe and the facts is a hand-off
+# nothing can land or settle. Members of the core set as well, so the release-condition and
+# vocabulary checks `--hold` makes apply to them unchanged.
+HOLD_CODES_HANDOFF="owner-landing owner-decision"
+# S9 - the halt codes the dUnstuckLanding census found HAND-OFF-SHAPED: most aborts carried one, and
+# their work reached the default branch anyway. An `--abort` naming one prints a notice naming
+# `--handoff` from HANDOFF_CUTOFF on, and aborts exactly as before; the verb cannot know the work is
+# sound, the run does.
+HALT_CODES_HANDOFF="external-prerequisite gate-red-out-of-scope scope-approval-needed repo-state-out-of-mandate"
 DIRECTIVES_CORE="minimal-prose:M10 sub-specced:M2 forks-resolved:M3 specs-reviewed:M4 reuse-first:M5 parallel-when-disjoint:M6 passes-committed:M6 diff-reviewed:M8 land-once-done:M8 conflicts-reconciled:M8 wrap-up-derived:M9 researched:M12 solution-tested:M12 pieces-recorded:M9:recipe playbook-followed:M7:recipe discoveries-adopted:M10 passes-harnessed:M6"
 
 # the AUTHORIZATION MODE set, published as a constant so it is spelled
@@ -922,6 +942,7 @@ is_halt_code() { case " $(halt_codes) " in *" $1 "*) return 0;; esac; return 1; 
 # The EFFECTIVE hold vocabulary, the same shape as the halt one above it.
 read_hold_codes() { printf '%s %s\n' "$HOLD_CODES_CORE" "$HOLD_CODES_EXTRA"; }
 check_hold_code() { case " $(read_hold_codes) " in *" $1 "*) return 0;; esac; return 1; }
+check_handoff_code() { case " $HOLD_CODES_HANDOFF " in *" $1 "*) return 0;; esac; return 1; }
 # THE RELEASE-CONDITION GRAMMAR, closed and validated at `--hold` rather than at `--resume`. An
 # unvalidated condition is free text wearing a field name, and the auto-resume unit computes a
 # fire instant from it: a condition nothing parsed would reach that computation as prose.
@@ -4668,6 +4689,27 @@ WTS
 #     and the build method derives the owner's only turn from those entries. The circularity
 #     objection - that the wrap-up has not happened yet - is identical at --close, where the same
 #     attestation is demanded before the same wrap-up, and it was accepted there.
+# TOOL-dUnstuckLanding-13 S9 and F5 - THE HAND-OFF NOTICE ON AN ABORT. From HANDOFF_CUTOFF an
+# `ABORTED` record means DISCARD, and an abort naming one of the HALT_CODES_HANDOFF codes is the shape
+# the census found landing anyway, so it is told the other exit exists. Dated by the RECORD's first
+# commit, not by today: the cutoff dates what a record MEANS, and a legacy record graded as legacy
+# must not be told it meant discard. A record with no committed history yet is new, so it is told.
+# A blank cutoff turns the notice off and SAYS so; a malformed one does the same, naming the value.
+print_abort_notice() { # run-state file · halt code -> prints, never refuses
+  local d
+  case " $HALT_CODES_HANDOFF " in *" $2 "*) ;; *) return 0 ;; esac
+  case "$HANDOFF_CUTOFF" in
+    "") echo "unattended: NOTE - this project declares no HANDOFF_CUTOFF, so this abort is not dated against the day ABORTED came to mean discard and no hand-off notice is printed; declare one in $CONF to turn it on" >&2
+        return 0 ;;
+    [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]) ;;
+    *) echo "unattended: NOTE - HANDOFF_CUTOFF is not a YYYY-MM-DD date, so no record can be dated against it and no hand-off notice is printed: $HANDOFF_CUTOFF" >&2
+       return 0 ;;
+  esac
+  d=$(read_first_commit_date "$1")
+  if [ -n "$d" ] && [[ "$d" < "$HANDOFF_CUTOFF" ]]; then return 0; fi
+  echo "unattended: NOTICE - from HANDOFF_CUTOFF an ABORTED record means DISCARD, its work must not land as it stands. This code is hand-off-shaped: if the work is sound and only an owner may land it or decide first, end the run with --handoff --code owner-landing or owner-decision instead. This abort proceeds as asked: $2"
+}
+
 verb_abort() { # slug · reason · code
   local slug="$1" reason="$2" code="$3" rel head item ck key
   check_slug "$slug" || return 1
@@ -4724,6 +4766,9 @@ verb_abort() { # slug · reason · code
   if [ "$code" = gate-red-out-of-scope ]; then
     check_inherited_override "$rel" "--abort --code gate-red-out-of-scope" || return 1
   fi
+  # TOOL-dUnstuckLanding-13 S9 - a NOTICE, never a refusal: printed for a hand-off-shaped code and
+  # the abort then proceeds exactly as before, because this verb cannot know the work is sound.
+  print_abort_notice "$rel" "$code"
   # BOTH agent-attested items, read back from the record exactly as --close reads them. This is an
   # ATTESTATION and not a machine verdict, and the message says so wherever it reports - counting an
   # attestation as a verdict is what makes an override look like a check that failed.
@@ -4858,6 +4903,13 @@ run_hold() { # slug · code · until · reason · reaped · unreachable · pendi
   fi
   if ! check_hold_code "$code"; then
     fail 55 "--hold names a hold code that is not in the effective vocabulary, and the hold codes are a SECOND vocabulary beside the halt codes rather than an extension of them; declare it in HOLD_CODES_EXTRA or use one of these: $legal"
+    return 1
+  fi
+  # TOOL-dUnstuckLanding-13 S2 - A HAND-OFF CODE HAS ONE PRODUCER. `--handoff` sets HO_ACTIVE for the
+  # length of its one call into this function and clears it on every return, so a `--hold` reaches
+  # this branch and a hand-off does not. Before any write, with the other argument refusals.
+  if [ -z "$HO_ACTIVE" ] && check_handoff_code "$code"; then
+    fail 89 "--hold names a hand-off code, and those are written by --handoff alone: a HELD record under one carries the landing recipe and the landing facts, and a hold written without them is a hand-off nothing can land or settle; end the run with --handoff instead: $code"
     return 1
   fi
   if [ -z "$until" ]; then
@@ -5015,6 +5067,15 @@ run_hold() { # slug · code · until · reason · reaped · unreachable · pendi
   if [ -n "$unpushed" ]; then set_fact "$rel" hold-unpushed "$unpushed" || return 1; fi
   # WRITTEN ON EVERY HOLD, empty without the flag, so no later hold inherits an earlier stop's run.
   set_fact "$rel" hold-run "$pendrun" || return 1
+  # TOOL-dUnstuckLanding-13 S6 and S7 - THE HAND-OFF'S WRITES, in this same block and after every
+  # refusal, so a refused hand-off writes nothing. `--handoff` derived all three values before it
+  # called in, and `--hold` leaves HO_ACTIVE empty, so no plain hold ever writes them. The roster is
+  # `--close`'s in-place spelling, and the freeze line appears only where the freeze is non-empty.
+  if [ -n "$HO_ACTIVE" ]; then
+    set_fact "$rel" units-at-landing "$HO_UNITS" || return 1
+    if [ -n "$HO_ASKS" ]; then set_fact "$rel" asks-at-landing "$HO_ASKS" || return 1; fi
+    park "$rel" handoff "$code" "$HO_RECIPE" || return 1
+  fi
   # HISTORY-CLASS, in park()'s own row grammar so `--status` counts it as noted rather than owed and
   # check 27 can join the kind against the declared vocabulary. The free-text reason is NOT repeated
   # here: it has a fact of its own, which is the only place --status quotes it from.
@@ -5050,6 +5111,78 @@ run_hold() { # slug · code · until · reason · reaped · unreachable · pendi
   printf 'Load the unattended skill and follow its Resume section with: --resume %s --scheduled %s --keepalive-id <the id of the keepalive you schedule first>.\n' "$slug" "$heldat"
   printf 'If the driver refuses or prints still held, delete the keepalive you scheduled for this resume, list your scheduler'"'"'s jobs to confirm it is gone, leave the scheduled task named %s in place because a later hold may have filed it, and stop.\n' "$rsname"
   echo "unattended: delete $rsname with the declared delete tool FIRST and go on when no task has it, then file it — a fired one-shot can still hold the name"
+  return 0
+}
+
+# ---------------------------------------------------------------------------------- the hand-off
+# TOOL-dUnstuckLanding-13 - THE EXIT FOR "DONE, BUT AN OWNER MUST LAND IT OR DECIDE FIRST". A run in
+# that state had one honest-looking verb, `--abort`, and the census behind this unit found the work of
+# nearly every such abort on the default branch anyway: the terminal said discarded while git said
+# landed. `--handoff` ends it HELD instead, under `owner-landing` or `owner-decision`, with the recipe
+# a person runs to land it and the landing facts a landed record needs.
+#
+# IT IS `--hold` WITH THREE THINGS ADDED, and routes through `run_hold` so every refusal a hold makes
+# holds here unchanged - a finished or already-HELD record, a dirty tree, an unpublished tip under
+# `ANCHOR_SCOPE=published`, an unreaped keepalive, a live process. The release condition is fixed at
+# `owner`, so a hand-off owes no durable restart by construction. What it adds, each refused before
+# any write: the attribution guard on `owner-landing`, a parked decision under `owner-decision`, and
+# the roster, the ask freeze and the recipe, derived here and written inside `run_hold`'s one write
+# block through the HO_ globals, which are set for that one call and cleared on every return.
+HO_ACTIVE=""; HO_UNITS=""; HO_ASKS=""; HO_RECIPE=""
+
+# THE RECIPE, rendered from declared conf values and validated record facts and NEVER from the
+# free-text reason. One line, the commands joined with ` && `, prefixed by the tree they run in:
+# under `in-place` the lander prepares and lands from the run's own worktree; under `primary` the
+# run branch is merged `--no-ff` into the primary tree's default branch and the lander pushes it.
+# No machine path is written, because the line lands in a tracked record that other nodes read.
+render_handoff_recipe() { # slug · run-state file -> the recipe on stdout; 1 when no lander or no branch
+  local slug=$1 rel=$2 br
+  [ -n "$LANDER" ] || return 1
+  if [ "$LANDER_MODE" = in-place ]; then
+    printf 'in the run worktree: %s --prepare --slug %s && %s --land --slug %s' "$LANDER" "$slug" "$LANDER" "$slug"
+    return 0
+  fi
+  br=$(fact "$rel" run-branch); br=${br#refs/heads/}
+  [ -n "$br" ] || br=$(GIT symbolic-ref -q --short HEAD 2>/dev/null)
+  [ -n "$br" ] || return 1
+  printf 'in the primary tree: git merge --no-ff %s && %s' "$br" "$LANDER"
+}
+
+run_handoff() { # slug · code · reason · reaped · unreachable
+  local slug="$1" code="$2" reason="$3" reaped="$4" unreach="$5" rel units recipe rc
+  check_slug "$slug" || return 1
+  rel=$(runmd_of "$slug")
+  [ -f "$rel" ] || { fail 10 "no run-state file, so there is no run to hand off: $rel"; return 1; }
+  refuse_if_terminal "$rel" --handoff || return 1
+  if [ -z "$code" ] || ! check_handoff_code "$code"; then
+    fail 90 "--handoff takes --code owner-landing or --code owner-decision and no other: owner-landing when only the landing remains, owner-decision when a parked decision stands first, and any other stop is a --hold or an --abort: ${code:-none}"
+    return 1
+  fi
+  # S5 - a decision hand-off hands the owner a QUESTION, and the question is a parked decision row.
+  if [ "$code" = owner-decision ] && ! grep -qE '^[0-9][0-9-]*T[0-9:]*Z decision · item ' "$rel" 2>/dev/null; then
+    fail 91 "--handoff --code owner-decision requires a parked decision row in the record, because that row is the question the owner is handed, and a decision hand-off with none is a stop with no question in it; park it first with --park: $rel"
+    return 1
+  fi
+  # S3 - owner-decision is NOT guarded: it is the exit for an OWN red that needs a decision.
+  if [ "$code" = owner-landing ]; then
+    check_handoff_bar "$rel" || return 1
+  fi
+  # S6 - the roster in `--close`'s in-place spelling, and the freeze at HEAD, both BEFORE any write.
+  units=$(unit_rows "$(readme_of "$slug")" \
+            | sed -e 's/^| \[//' -e 's/ —.*//' | tr '\n' ' ' | sed 's/ $//')
+  if ! derive_ask_freeze "$slug" "$(GIT rev-parse HEAD 2>/dev/null)"; then
+    fail 92 "this run's asks cannot be read at HEAD, so the hand-off would freeze no answer to the question the run was authorized by, and the record an owner lands would carry none; nothing was written: $AW_WHY"
+    return 1
+  fi
+  if ! recipe=$(render_handoff_recipe "$slug" "$rel"); then
+    fail 93 "the hand-off recipe would name no lander or no branch to merge, and a recipe missing either is not one an owner can run; declare LANDER in the conf, or hand off from the run's own branch; the lander reads: [$LANDER]"
+    return 1
+  fi
+  HO_ACTIVE=1; HO_UNITS=$units; HO_ASKS=$AD_FREEZE; HO_RECIPE=$recipe
+  run_hold "$slug" "$code" owner "$reason" "$reaped" "$unreach" ""; rc=$?
+  HO_ACTIVE=""; HO_UNITS=""; HO_ASKS=""; HO_RECIPE=""
+  [ "$rc" = 0 ] || return "$rc"
+  echo "unattended: hand-off recipe, written as the handoff row - $recipe"
   return 0
 }
 
@@ -7112,8 +7245,8 @@ write_inherited_asks() { # slug · R · run dir
 # uid, so a run set on forging them can plant an all-INHERITED record and point the fact at it. What
 # this closes is the SENTENCE — "not mine", asserted with nothing behind it — and what remains is a
 # forgery, the limit protocol section 9 states for every check that runs beside the thing it grades.
-check_inherited_override() { # run-state file · the verb as the refusal names it -> 0 when admitted
-  local rel=$1 verb=$2 f id gd head d hh htc tm why="" n=0 leg ver
+check_inherited_override() { # run-state file · the verb as the refusal names it · [record-only] -> 0 when admitted
+  local rel=$1 verb=$2 tie=${3:-} f id gd head d hh htc tm why="" n=0 leg ver
   f=$(fact "$rel" gates-run); id=${f%% *}
   # The git dir comes off the sidecar root's ONE derivation in the library (check 32), never a
   # second spelling of it here.
@@ -7127,7 +7260,7 @@ check_inherited_override() { # run-state file · the verb as the refusal names i
     hh=$(awk -F'\t' '$1=="head"{print $2; exit}' "$d/header" 2>/dev/null)
     htc=$(awk -F'\t' '$1=="tree_clean"{print $2; exit}' "$d/header" 2>/dev/null)
     tm=$(awk -F'\t' '$1=="tree_moved"{print $2; exit}' "$d/verdict" 2>/dev/null)
-    if [ "$hh" != "$head" ]; then
+    if ! check_bar_tied "$hh" "$head" "$rel" "$tie"; then
       why="the bar it names ran at ${hh:0:8} and HEAD is now ${head:0:8}, so its record describes another commit"
     elif [ "$htc" != yes ]; then
       why="the bar it names ran on a tree whose header reads tree_clean ${htc:-none}, so its record may grade edits HEAD does not carry"
@@ -7147,6 +7280,42 @@ check_inherited_override() { # run-state file · the verb as the refusal names i
   [ -z "$why" ] && return 0
   fail 83 "$verb is refused unless the attribution record of the last gates-green bar reads every red leg INHERITED on the tree being closed, so gates-green must run on HEAD first; the condition that failed: $why"
   return 1
+}
+
+# TOOL-dUnstuckLanding-13 S4 - IS THE BAR TIED TO THIS TREE. Equal heads always are. `record-only`
+# also admits a bar head that differs from HEAD in the run-state file ALONE, and only `--handoff`
+# passes it: `gates-green` writes and stages its `gates-run` fact, and `--hold`'s clean-tree refusal
+# then makes the run commit that record before it may hold, which moves HEAD off the bar's head by
+# exactly the run's own record. `--close` and `--abort` pass nothing and keep the strict equality.
+# A bar head this clone cannot resolve makes the diff fail, which reads as untied.
+check_bar_tied() { # bar head · HEAD · run-state file · [record-only] -> 0 when the bar graded this tree
+  [ "$1" = "$2" ] && return 0
+  [ -n "$1" ] && [ "${4:-}" = record-only ] || return 1
+  GIT diff --quiet "$1" "$2" -- . ":(exclude)$3" 2>/dev/null
+}
+
+# TOOL-dUnstuckLanding-13 S3 - THE ATTRIBUTION GUARD ON `owner-landing`. "Only the landing remains"
+# is a claim about the bar, so it is backed by the bar's own record: a GREEN verdict tied to this
+# tree is admitted here, and anything else - a red, an untied or dirty bar, no bar at all - goes to
+# `check_inherited_override`, whose fail 83 admits only an all-INHERITED red. An OWN red is the
+# run's to fix, or to hand off as `owner-decision` with the decision parked, never a finished
+# landing waiting for an owner. WHAT IT DOES NOT BUY is what that function's header states: the run
+# writes both records under its own uid.
+check_handoff_bar() { # run-state file -> 0 when owner-landing is admitted; 1 after fail 83
+  local rel=$1 f id gd d head v hh htc tm
+  f=$(fact "$rel" gates-run); id=${f%% *}
+  gd=$(resolve_sidecar_dir) && gd=${gd%/unattended} || gd=""
+  head=$(GIT rev-parse HEAD 2>/dev/null); d="$gd/gate-run/$id"
+  if [ -n "$f" ] && [ -n "$gd" ] && [ -f "$d/header" ] && [ -f "$d/verdict" ]; then
+    v=$(awk -F'\t' '$1=="verdict"{print $2; exit}' "$d/verdict" 2>/dev/null)
+    hh=$(awk -F'\t' '$1=="head"{print $2; exit}' "$d/header" 2>/dev/null)
+    htc=$(awk -F'\t' '$1=="tree_clean"{print $2; exit}' "$d/header" 2>/dev/null)
+    tm=$(awk -F'\t' '$1=="tree_moved"{print $2; exit}' "$d/verdict" 2>/dev/null)
+    if [ "$v" = GREEN ] && [ "$htc" = yes ] && [ "$tm" = no ] && check_bar_tied "$hh" "$head" "$rel" record-only; then
+      return 0
+    fi
+  fi
+  check_inherited_override "$rel" "--handoff --code owner-landing" record-only
 }
 
 # TOOL-cBriefedPilot-1 - EVERY accumulated override is validated, skipped and parked, not just the
@@ -10442,7 +10611,8 @@ case "$VERB" in
   --landed)    verb_landed "$SLUG" ;;
   --abort)     verb_abort "$SLUG" "$REASON" "$HALT_CODE" ;;
   --hold)      run_hold "$SLUG" "$HALT_CODE" "$HOLD_UNTIL" "$REASON" "$HOLD_REAPED" "$HOLD_UNREACH" "$HOLD_RUN" ;;
-  --park)      verb_park "$SLUG" "$PK_ITEM" "$REASON" ;;
+  --handoff)   run_handoff "$SLUG" "$HALT_CODE" "$REASON" "$HOLD_REAPED" "$HOLD_UNREACH" ;;
+  --park)     verb_park "$SLUG" "$PK_ITEM" "$REASON" ;;
   --propose)   verb_propose "$SLUG" "$PK_ITEM" "$PK_STEP" "$REASON" ;;
   --brief)     verb_brief "$SLUG" "$BR_UNIT" "$RP_PATH" ;;
   --review)    verb_review "$SLUG" "$RV_SUBJECT" "$VERDICT" "$RV_BLOCKERS" "$RV_DISPOSITION" ;;

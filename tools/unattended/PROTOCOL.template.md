@@ -296,7 +296,8 @@ does name — the commit boundary and the regrounding points stay exactly where 
 between named passes — because the core set is shrink-only and deleting a member lowers the floor.
 
 `HELD` is the non-terminal stop; `UNATTENDED-STOPS.md` is its contract.
-`LANDED` and `ABORTED` are terminal. `LANDING` is the state a slot-status vocabulary cannot express
+`LANDED` and `ABORTED` are terminal; from `HANDOFF_CUTOFF`, `ABORTED` means DISCARD, and done work
+an owner must land ends `HELD` by `--handoff`. `LANDING` is the state a slot-status vocabulary cannot express
 — built and reviewed, not yet merged — and it is why the run-state file is deliberately outside the
 status-vocabulary check.
 
@@ -327,8 +328,7 @@ at `LANDING`. A run that is already terminal cannot be moved at all.
 
 **Concurrent runs are PERMITTED; a run is never refused because another build is live.** The driver
 ANNOUNCES them at `--preflight`; the leg persists its report to its `gate-logs/` entry, which a GREEN
-bar does not echo. Neither fails on the count. It replaced an at-most-one-live-run rule grounded on
-"the run" being ill-defined otherwise — nothing keys on it, because every verb is slug-addressed.
+bar does not echo. Neither fails on the count: every verb is slug-addressed.
 
 **A build folder still carries at most one live record** — one `RUN.md`, and the leg refuses an
 ARCHIVED record in a non-terminal phase. That is now the only check grading a phase for it.
@@ -504,6 +504,7 @@ In the repo-root `.unattended.conf`. Blank or absent turns the corresponding ass
 | `GENERATED_INDEXES` | `index:generator` pairs. An index ALONE is fine; only the index TOGETHER WITH its generator is refused. Blank turns that half off |
 | `LANDED_ANCHOR_CUTOFF` | the date from which a `LANDED` record must name its anchor kind. A record whose first commit predates it is read as `remote`; blank or absent grandfathers every record |
 | `LANDED_FACTS_CUTOFF` | from this date a landed record carries its verb's facts. Blank is off |
+| `HANDOFF_CUTOFF` | from this date `ABORTED` means DISCARD, §3. Blank is off |
 | `DISPOSITION_CUTOFF` | the date from which a review exit's RECORDED disposition is read instead of inferred from new unit ids. Graded on the run-state record's own first-commit date; a record before it keeps the id-delta proxy, EXCEPT one with no first-commit date at all — a staged, in-flight record is graded whatever the cutoff says, being the one case that can still record a disposition. Blank or absent grandfathers every record and the leg says so on stdout, because a silently disabled clause reads exactly like a clause finding nothing wrong |
 | `RUNLOG_SESSION_VARS` | the environment variable NAMES, space-separated and eight at most, whose values each run-log START records as `sess.<NAME>=` (§2); a value outside `[A-Za-z0-9_.:-]{1,128}` is written empty and flagged. OPTIONAL: blank records none |
 

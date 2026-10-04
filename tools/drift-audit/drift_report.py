@@ -2101,10 +2101,11 @@ def build_backlog_stragglers(ctx) -> dict:
 # holds each set here to its source in both directions.
 _RUN_PHASES_TERMINAL = frozenset({"LANDED", "ABORTED"})
 _RUN_PARK_KINDS = frozenset({"decision", "abort", "override", "waiver", "proposal", "rescope",
-                             "dispatch", "review", "brief", "hold", "resume"})
+                             "dispatch", "review", "brief", "hold", "resume", "handoff"})
 # `hold` and `resume` joined the driver's PARK_KINDS in TOOL-dDerivedDocket-5 (auto-resume from
-# HELD). Neither is owed, so a record whose last row is one reads `other`.
-_RUN_PARK_KINDS_OWED = frozenset({"decision", "abort", "override", "waiver"})
+# HELD). Neither is owed, so a record whose last row is one reads `other`. `handoff` joined both sets
+# in TOOL-dUnstuckLanding-13: its row is the landing recipe the owner is shown, so it is owed.
+_RUN_PARK_KINDS_OWED = frozenset({"decision", "abort", "override", "waiver", "handoff"})
 _RUN_PARK_ACTS_OWED = frozenset({"retire", "supersede"})
 # A parked row as the driver's `park` appends it: `<utc> <kind> · item <item>[ · step <n>] · reason
 # <why>`, the timestamp in the shape the driver's own counters grep for. The act of a `rescope` row is

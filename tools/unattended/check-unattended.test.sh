@@ -4117,9 +4117,18 @@ hit "$out" "the kit's CORE phase vocabulary has shrunk below its floor"
 # ---- CHECK 2's HOLD_FLOOR: deleting a hold code a sibling unit routes to reds the shrink-only pin.
 reset_tree
 mkdir -p $KIT_REL && cp "$HERE/unattended.sh" "$HERE/lib-unattended.sh" $KIT_REL/
-mutate $KIT_REL/unattended.sh 's/ inherited-red"$/"/'
+mutate $KIT_REL/unattended.sh 's/ inherited-red / /'
 out=$(run)
 hit "$out" "the kit's CORE hold vocabulary has shrunk below its floor, and deleting a member is a silent, reason-free override of every record and every sibling unit that routes to it"
+
+# ---- TOOL-dUnstuckLanding-13 AC11: the floor guards the two HAND-OFF codes too. The fixture's floor is
+# ---- derived from the shipped driver, so it reads 7 with them in; dropping `owner-decision` alone
+# ---- reds the pin naming both counts.
+reset_tree
+mkdir -p $KIT_REL && cp "$HERE/unattended.sh" "$HERE/lib-unattended.sh" $KIT_REL/
+mutate $KIT_REL/unattended.sh 's/ owner-decision"$/"/'
+out=$(run)
+hit "$out" "the kit's CORE hold vocabulary has shrunk below its floor, and deleting a member is a silent, reason-free override of every record and every sibling unit that routes to it: 6 against 7"
 
 # ---- ...and its two conf branches, which behave exactly as HALT_FLOOR's do: undeclared and
 # ---- malformed are both REFUSALS, because a pin that quietly defaults is a pin nobody set.
@@ -5473,6 +5482,19 @@ miss "$out" "UNATTENDED check 26 FAILED"
 reset_tree
 mutate $KIT_REL/check-unattended.sh 's/RECALL_CLI|ASKS_CMD|/RECALL_CLI|/'
 hit "$(run_skip_leg)" "a key the shipped example declares and this leg initialises is missing from the import allow-list, so a project that declares it keeps the initialised default and every gate stays green: ASKS_CMD"
+# ---- TOOL-dUnstuckLanding-13 AC9: HANDOFF_CUTOFF is joined by check 22 in both of its halves. Its
+# ---- protocol row removed reds the key table; its allow-list entry removed reds the import join; with
+# ---- all three in place neither line names it.
+reset_tree
+mutate memory/guides/UNATTENDED-PROTOCOL.md '/^| `HANDOFF_CUTOFF` |/d'
+hit "$(run_skip_leg)" "undocumented in the protocol: HANDOFF_CUTOFF"
+reset_tree
+mutate $KIT_REL/check-unattended.sh 's/|HANDOFF_CUTOFF|/|/'
+hit "$(run_skip_leg)" "a key the shipped example declares and this leg initialises is missing from the import allow-list, so a project that declares it keeps the initialised default and every gate stays green: HANDOFF_CUTOFF"
+reset_tree
+out=$(run_skip_leg)
+miss "$out" "undocumented in the protocol: HANDOFF_CUTOFF"
+miss "$out" "every gate stays green: HANDOFF_CUTOFF"
 reset_tree
 mutate $KIT_REL/check-unattended.sh '/^    # gov:conf-allow-end$/d'
 hit "$(run_skip_leg)" "the import allow-list is not exactly one bare gov:conf-allow-begin and gov:conf-allow-end pair enclosing at least one key, so the join that reads it would subtract nothing or everything and report green over a real mismatch"

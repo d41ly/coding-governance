@@ -214,9 +214,19 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   recorded as `hold-run`, rewritten EMPTY by a hold without it, printed on the HELD checkpoint and
   named by a take-over's relaunch line, and a value outside 1 to 64 letters, digits, `_` and `-` is
   refused with the rest. The contract is `UNATTENDED-STOPS.md`.
+- `--handoff` — the exit for a run whose work is sound and which an owner must land, or decide
+  first. `--handoff <slug> --code owner-landing|owner-decision --reason <text>` plus exactly one of
+  `--reaped <id>` and `--keepalive-unreachable <node>`. It is `--hold` with the condition fixed at
+  `owner`, so every refusal a hold makes applies and no durable restart is owed, and it is the only
+  producer of the two hand-off codes, which `--hold` refuses. It adds the landing recipe as a
+  `handoff` row the owner is shown, and `units-at-landing` and `asks-at-landing` as `--close` writes
+  them. `owner-landing` is refused over a bar that is not GREEN unless every red leg reads INHERITED;
+  `owner-decision` requires a parked decision row. The contract is `UNATTENDED-STOPS.md` §2 and §4.
 - `--abort` — the sole producer of `ABORTED`. It requires a recorded reason, a HALT CODE from the
   effective vocabulary, and both agent-attested items, and no machine item: an aborted run landed
   nothing, so the machine items assert obligations it does not have, while the idle-wake is still
   orphaned and the parked decisions still unseen. The code is validated before it is recorded and the
   refusal names the legal set; it is the twelfth authored fact, and it exists because one terminal
-  phase said a run stopped and never said why.
+  phase said a run stopped and never said why. From `HANDOFF_CUTOFF` an `ABORTED` record means
+  DISCARD, and an abort naming a hand-off-shaped halt code, on a record first
+  committed on or after it prints a notice naming `--handoff`, then aborts as asked; it never refuses.

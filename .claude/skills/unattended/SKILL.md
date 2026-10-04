@@ -1243,6 +1243,32 @@ The carrier is the one your project declares, and it must be DURABLE: a filed ta
 session that filed it. The keepalive's scheduler is not it — that store is session-scoped, and the
 kit gate reds a conf that names it here.
 
+## If it is done but you may not land it — hand it off
+
+```bash
+bash tools/unattended/unattended.sh --handoff <slug> --code owner-landing|owner-decision \
+  --reason "<why an owner has to take it from here>" --reaped <the keepalive id you just deleted>
+```
+
+**Use this, not `--abort`, when the work is sound and the one step left is the owner's** — the
+landing itself, from a node that may not land or onto an order only the owner sets, or a decision
+the mandate does not delegate. `ABORTED` means DISCARD: the work must not land as it stands. A run
+whose work then lands anyway leaves a record that contradicts git for good.
+
+Pick the code by what the owner owes:
+
+- `owner-landing` — nothing to decide; only the landing remains. It is refused unless the last bar
+  the record names reads GREEN on this tree, or every red leg reads INHERITED: an OWN red is yours
+  to fix, or to hand off as a decision.
+- `owner-decision` — one parked decision stands first. Park it with `--park` before you hand off;
+  the verb refuses a decision hand-off whose record holds no decision row.
+
+It is a hold with the release condition fixed at `owner`, so everything `--hold` asks of you applies:
+commit everything, push the branch, reap the keepalive and name it. No durable restart is owed and
+nothing is filed. It writes the landing recipe as a `handoff` row and prints it; that one line is
+what the owner runs, so put nothing in the reason that it already says. Commit the staged record
+and push the branch, then stop.
+
 ## If it cannot finish
 
 ```bash

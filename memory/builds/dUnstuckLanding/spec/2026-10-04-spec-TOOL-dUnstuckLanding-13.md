@@ -1,11 +1,12 @@
 # TOOL-dUnstuckLanding-13 — `--handoff`: a run whose work is sound, but which an owner must land or decide, ends HELD instead of ABORTED
 
-**Status:** INPROGRESS · rev-1 · 2026-10-04 · node d · Tier-2 · base 98926870 · streams tooling · order 1 · closes TOOL-dUnstuckLanding-3
+**Status:** CLOSED · rev-2 · 2026-10-04 · node d · Tier-2 · base 98926870 · streams tooling · order 1 · closes TOOL-dUnstuckLanding-3
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-04-build-TOOL-dUnstuckLanding-13-1-acceptance-ledger.md](../build/2026-10-04-build-TOOL-dUnstuckLanding-13-1-acceptance-ledger.md) | journal | — |
 | [2026-10-04-prompt-TOOL-dUnstuckLanding-13-build-brief.md](../prompts/2026-10-04-prompt-TOOL-dUnstuckLanding-13-build-brief.md) | journal | TOOL-dUnstuckLanding-14 TOOL-dUnstuckLanding-15 TOOL-dUnstuckLanding-16 TOOL-dUnstuckLanding-17 TOOL-dUnstuckLanding-18 TOOL-dUnstuckLanding-19 TOOL-dUnstuckLanding-20 |
 | [2026-10-04-prompt-TOOL-dUnstuckLanding-13-spec-brief.md](../prompts/2026-10-04-prompt-TOOL-dUnstuckLanding-13-spec-brief.md) | journal | TOOL-dUnstuckLanding-14 TOOL-dUnstuckLanding-15 TOOL-dUnstuckLanding-16 TOOL-dUnstuckLanding-17 TOOL-dUnstuckLanding-18 TOOL-dUnstuckLanding-19 TOOL-dUnstuckLanding-20 |
 
@@ -81,7 +82,21 @@ and points at `--handoff` on the four halt codes that the census found hand-off-
   the sentence that `ABORTED` means DISCARD from `HANDOFF_CUTOFF`, and §8 the key row.
   `SKILL.template.md` gains a section, "If it is done but you may not land it — hand it off", placed
   before "If it cannot finish". The renders under `memory/guides/` and the installed Skill are
-  re-copied by `bash tools/unattended/adopt-unattended.sh` in the same pass. Observed by AC12, AC13.
+  re-copied by `bash tools/unattended/adopt-unattended.sh` in the same pass. The protocol render
+  has 103 bytes of headroom under its declared cap at BASE, so the two protocol additions are
+  paid for by trimming history prose in the same section, and the render's net growth stays
+  inside that headroom. Observed by AC12, AC13.
+- **S13 — the two mirrors of the parked-kind sets.** Two sibling kits spell the driver's
+  `PARK_KINDS` and `PARK_KINDS_OWED` because a kit reads no sibling kit at run time, and each
+  self-test holds its copy to the driver in both directions. `handoff` joins
+  `_RUN_PARK_KINDS` and `_RUN_PARK_KINDS_OWED` in `tools/drift-audit/drift_report.py`, and
+  `PARK_KINDS`, `PARK_KINDS_OWED` and `LEDGER_SOURCES` in `tools/runlog/model.py`, where it sits
+  after `waiver` so the owed kinds still lead that tuple. In `tools/runlog/selftest.py` the
+  parity arm reads the owed-kinds-and-acts count off the driver instead of a typed six, and the
+  ledger fixture parks one `handoff` row, so its "every source has an entry" check keeps a
+  population. A committed run record stays valid: its ledger tables are graded by membership,
+  and its excluded-rows template is unchanged because `handoff` is owed. Both kit versions move
+  at VERIFYING, with the unattended one. Observed by AC15.
 - **S12 — the arms.** Every new numbered branch gets an arm in the driver's sibling suite asserting
   a literal slice of its own text, so the harness meta-gate reads it armed. Observed by AC14.
 
@@ -221,6 +236,9 @@ grep each refusal's own text instead.
 - `memory/guides/UNATTENDED-VERBS.md`
 - `.claude/skills/unattended/SKILL.md`
 - `.unattended.conf`
+- `tools/drift-audit/drift_report.py`
+- `tools/runlog/model.py`
+- `tools/runlog/selftest.py`
 
 ### Rollout
 
@@ -329,10 +347,16 @@ The example ships it blank, so an adopter's notice is off until that adopter dat
   every new numbered branch of `tools/unattended/unattended.sh` reads armed, and none is added to
   `tools/unattended/unarmed-branches.txt` or `memory/project/unarmed-branches.txt`.
   Red when: a new branch reads unarmed or pinned.
+- **AC15** — When the driver's `PARK_KINDS` and `PARK_KINDS_OWED` lines are read and compared, as
+  sets, with `_RUN_PARK_KINDS` and `_RUN_PARK_KINDS_OWED` imported from the drift-audit engine and
+  with `PARK_KINDS` and `PARK_KINDS_OWED` imported from the runlog model, each pair is equal and
+  each holds `handoff`; and the runlog model's `LEDGER_SOURCES` opens with the owed kinds then the
+  two `rescope-` acts.
+  Red when: either mirror lacks `handoff`, which the two self-tests red at the close.
 
 ## 7. Gates
 
-`unattended kit gate` · `unattended skill wiring` · `unattended protocol size` · `harness arms (fail branches armed or pinned)` · `install-prefix (shipped surface)` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `check-wiring self-test` · `recall floor` · `recall floor arms` · `lexicon naming predicates`
+`unattended kit gate` · `unattended skill wiring` · `unattended protocol size` · `harness arms (fail branches armed or pinned)` · `install-prefix (shipped surface)` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `check-wiring self-test` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `drift-audit selftest` · `runlog selftest` · `runlog record schema` · `pre-push run-log line` · `run-gates run-log line` · `kit epoch (shipped bytes move, the version moves)`
 
 New arm: tools/unattended/unattended.test.sh · the AC1 to AC10 fixtures, each staging its refusal or its notice · the suite's own arm count moves by the arms added
 New arm: tools/unattended/check-unattended.test.sh · the AC11 dropped hold code against a floor of 7 · none
@@ -373,6 +397,12 @@ New arm: tools/unattended/check-unattended.test.sh · the AC11 dropped hold code
 
 - rev-1 · 2026-10-04 · initial draft, from ask TOOL-dUnstuckLanding-3, the design record's §1 at
   rev-2, review items M4, M6 and M11, and the spec brief for units 13 to 20.
+- rev-2 · 2026-10-04 · the build pass found an interface S7 did not name: `drift_report.py`
+  and the runlog model each spell the driver's parked-kind sets and hold them to it both ways,
+  so a `handoff` kind added to the driver alone reds two self-tests at the close. S13 adds both
+  mirrors, the runlog fixture row and AC15, and §4 lists the three files. S11 also records that
+  the protocol's 103-byte headroom is met by trimming history prose in §3. No acceptance
+  criterion of rev-1 moved.
 
 ## 10. Reuse audit
 

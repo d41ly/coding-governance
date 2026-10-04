@@ -40,10 +40,20 @@ returns the run to. A `LANDING` record the remote carries reads `LANDED` without
 
 Kit-owned core, extended by `HOLD_CODES_EXTRA` and pinned shrink-only by `HOLD_FLOOR`:
 
-`host-degraded` · `platform-limit` · `platform-unavailable` · `host-owner-action` · `inherited-red`
+`host-degraded` · `platform-limit` · `platform-unavailable` · `host-owner-action` · `inherited-red` ·
+`owner-landing` · `owner-decision`
 
 These are a SECOND vocabulary beside the halt codes and never an extension of them. A halt code ends
 a run and a hold code pauses one, and a single list would let a pause be recorded as an ending.
+
+**`owner-landing` and `owner-decision` are the HAND-OFF codes, and `--handoff` is their only
+producer.** A run whose work is sound and which an owner must land, or decide first, ends HELD under
+one of them rather than `ABORTED`, which from `HANDOFF_CUTOFF` means DISCARD. `owner-landing` says
+only the landing remains; `owner-decision` says a parked decision stands first. `--handoff` writes
+the landing recipe as a `handoff` row in the parked region, `units-at-landing`, and
+`asks-at-landing` wherever the freeze is non-empty, and prints the recipe after its HELD line. A
+`--hold` naming either code is refused, because a hold written without the guard, the recipe and the
+facts is a hand-off nothing can land or settle.
 
 ## 3. The release conditions
 
@@ -86,6 +96,19 @@ that is not what the tree holds — and the take-over would re-verify a mandate 
 5. Under `ANCHOR_SCOPE=published`, the branch tip must be on its remote.
 6. An optional `--pending-run <runId>` must be 1 to 64 letters, digits, `_` and `-`. It becomes a fact
    and a checkpoint line, and a separator or a newline inside it would forge a second of either.
+7. The code may not be a hand-off code; `--handoff` writes those.
+
+`--handoff` routes through these same refusals with the condition fixed at `owner`, and adds three
+of its own, each before any write:
+
+- **The attribution guard, on `owner-landing`.** The bar the record's `gates-run` fact names must
+  read GREEN, on a clean tree that did not move, at HEAD or at a commit differing from HEAD in the
+  run-state file alone; otherwise every red leg must read INHERITED, the refusal an override of
+  `gates-green` meets at `--close`. An OWN red is the run's to fix, or to hand off as
+  `owner-decision`.
+- **A parked decision, under `owner-decision`.** The row is the question the owner is handed.
+- **The landing facts and the recipe.** A freeze that cannot be derived refuses, and so does a
+  recipe naming no lander or no branch.
 
 ### The unpublished-tip exception
 
@@ -269,6 +292,10 @@ available.
 *A run that ends HELD used to resume only when somebody typed `--resume`, so a usage limit that
 resets at 03:00 cost the whole night. This section is the contract for the restart `--hold` files
 instead. The protocol's section 5 points here and states none of it.*
+
+A hand-off owes no durable restart. `--handoff` holds with the condition `owner`, so its
+`resume-owed` reads `none · owner` and nothing is filed: the way out is the owner's landing or
+decision, never a scheduled resume.
 
 ### The five keys
 
