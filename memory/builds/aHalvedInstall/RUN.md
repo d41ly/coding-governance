@@ -18,7 +18,7 @@ hold-until: owner
 hold-code: host-owner-action
 held-from: VERIFYING
 gates-run: unattended-179096159559588315679-1697 8cdcc9ea
-parked-surfaced: yes, 0 surfaced
+parked-surfaced: yes, 2 surfaced
 keepalive-reaped: yes
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: a62384803ad2355b03addf16f73ae2f4b6b86ce4
