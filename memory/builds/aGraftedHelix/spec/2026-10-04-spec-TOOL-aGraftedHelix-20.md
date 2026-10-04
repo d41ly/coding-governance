@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-20 — the holder row's claim CAS runs before its `write_lease` under one stamp, and a CAS that does not land leaves a `prior-session` fact the `mine` test accepts
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-2 · base 5266d22e · streams tooling · order 4
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-2 · base 5266d22e · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
@@ -43,15 +43,19 @@ does not land. It closes finding 9 (HIGH) of the round-1 spec audit of units 16 
   columns of unit 1's table; `--preflight` and a take-over compare with the values they are about to
   record and are unchanged. Observed by AC2.
 - **S4** — `check_lease_only_diff` in `tools/unattended/lib-unattended.sh` admits `prior-session`
-  as a lease-fact line, because it is written beside `write_lease`'s six. The lease section of
-  `tools/unattended/STOPS.template.md` names it, re-rendered into `memory/guides/UNATTENDED-STOPS.md`
-  in the same commit. Observed by AC4.
+  as a lease-fact line, because it is written beside `write_lease`'s six. Observed by AC4.
 - **S5** — `tools/unattended/unattended.test.sh` gains three arms over unit 18's changed-session
   arm: the claim push made to exit 124, the remote unreachable, and the lost race, each on the `s2`
   call. NOT OBSERVED by a criterion here: the suite is the main loop's to run at VERIFYING, and each
   arm's red on a staged break is observed there (§7).
 - **S6** — The unattended kit version moves once after this unit's last move, in every carrier
   `tools/check-kit-versions.sh` pairs. Observed by AC5.
+- **S7** — Every other place that lists or counts the lease's lines names `prior-session` as one
+  of them: the lease section and the landing paragraph of `tools/unattended/STOPS.template.md`,
+  re-rendered into `memory/guides/UNATTENDED-STOPS.md` in the same commit, and the comments that
+  list or count the six in `tools/unattended/unattended.sh` and `tools/unattended/lib-unattended.sh`
+  (§4 Evidence). NOT OBSERVED by a criterion here: these are prose and comments, and AC4 observes
+  the one reader that decides a verdict.
 
 ## 3. Non-goals (OUT)
 
@@ -102,6 +106,10 @@ does not land. It closes finding 9 (HIGH) of the round-1 spec audit of units 16 
   difference confined to the six lines `write_lease` writes, and `read_landing_commit` relies on it
   for a re-bind of a pushed landing. A seventh fact written beside them would read as a non-lease
   difference without S4.
+- The six are also listed or counted in prose S7 names: `tools/unattended/STOPS.template.md:147`
+  and `:193`, `tools/unattended/lib-unattended.sh:1168` and `:1188`, and
+  `tools/unattended/unattended.sh:1227`, `:1970` and `:4425`. Predicate:
+  `git grep -nE "six lease|lease-fact lines|pid-image. and .lease-utc" -- tools ':!*.test.sh'`.
 - The claim carries no pid, so a pid-only change still moves `lease-utc`, and the claim follows the
   record's stamp (unit 18 §3). Whenever `write_lease` is due, a claim write is due too.
 
@@ -227,6 +235,10 @@ none
 - rev-1 · 2026-10-04 · initial draft, promoted from finding 9 of the round-1 spec audit of units 16
   to 19, grounded against `write_lease`, the holder row and `check_lease_only_diff` at base
   `5266d22e`, and against units 1, 11 and 18 as specced.
+- rev-2 · 2026-10-04 · §2 §4 · S4 S7 · from the bug-class checklist over the promoting commit, which
+  selected `observed-by-claim-no-arm-discharges` and `a-folded-field-leaves-its-row-shape-docs-behind`.
+  S4 claimed AC4 observed the stops guide, which AC4 never reads; the guide moves to S7, NOT
+  OBSERVED, with every comment that lists or counts the six lease lines, found by the §4 predicate.
 
 ## 10. Reuse audit
 
