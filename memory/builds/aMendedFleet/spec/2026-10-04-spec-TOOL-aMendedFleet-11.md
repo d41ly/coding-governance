@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-11 — the review protocol and the review harness point reviewers at the filtered asks call
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 11
+**Status:** CLOSED · rev-1 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 11
 
 <!-- gen:spec-records -->
 

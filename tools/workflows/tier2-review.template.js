@@ -477,7 +477,7 @@ const SPEC_LENSES = [
   {
     key: 'prior-art',
     brief:
-      'Prior art: has a record already decided this? That is the recall probe — search the decision logs and the build records, and read the asks, decided ones included, through `gen_build_index.py --asks --json --all`, falling back to the backlog shards when its `mode` field says `shards`, before accepting a design as new.',
+      'Prior art: has a record already decided this? That is the recall probe — search the decision logs and the build records, and read the asks, decided ones included, through `gen_build_index.py --asks --json --all --path <every path the spec\'s Files touched estimate names>`, falling back to the backlog shards when its `mode` field says `shards`, before accepting a design as new.',
   },
 ]
 

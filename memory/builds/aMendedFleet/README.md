@@ -187,7 +187,7 @@ ids TOOL-aMendedFleet-96 TOOL-aMendedFleet-97 TOOL-aMendedFleet-98 TOOL-aMendedF
 | [TOOL-aMendedFleet-8 — drift-audit reports `remote_ci_red_streak`](spec/2026-10-04-spec-TOOL-aMendedFleet-8.md) | 8 | 1 | CLOSED | rev-2 | 2026-10-04 |
 | [TOOL-aMendedFleet-9 — the daily held job's red suites reach the inherited-red HIGH auto-file](spec/2026-10-04-spec-TOOL-aMendedFleet-9.md) | 9 | 2 | CLOSED | rev-3 | 2026-10-05 |
 | [TOOL-aMendedFleet-10 — `--asks` rows carry the pointer and a 160-byte summary, and `--path` ranks and caps them](spec/2026-10-04-spec-TOOL-aMendedFleet-10.md) | 10 | 2 | CLOSED | rev-3 | 2026-10-05 |
-| [TOOL-aMendedFleet-11 — the review protocol and the review harness point reviewers at the filtered asks call](spec/2026-10-04-spec-TOOL-aMendedFleet-11.md) | 11 | 1 | SPECCED | rev-1 | 2026-10-04 |
+| [TOOL-aMendedFleet-11 — the review protocol and the review harness point reviewers at the filtered asks call](spec/2026-10-04-spec-TOOL-aMendedFleet-11.md) | 11 | 1 | CLOSED | rev-1 | 2026-10-04 |
 | [TOOL-aMendedFleet-12 — LIVE.md carries each build's last record date and splits ACTIVE from DORMANT](spec/2026-10-04-spec-TOOL-aMendedFleet-12.md) | 12 | 2 | SPECCED | rev-2 | 2026-10-04 |
 | [TOOL-aMendedFleet-13 — LIVE.md counts each build's landed-unclosed units from drift-audit's own join](spec/2026-10-04-spec-TOOL-aMendedFleet-13.md) | 13 | 2 | SPECCED | rev-2 | 2026-10-04 |
 | [TOOL-aMendedFleet-14 — bulk backlog triage: aged unlabelled asks deferred on one triage ask, and five fixed-but-OPEN asks disposed](spec/2026-10-04-spec-TOOL-aMendedFleet-14.md) | 14 | 1 | SPECCED | rev-1 | 2026-10-04 |
