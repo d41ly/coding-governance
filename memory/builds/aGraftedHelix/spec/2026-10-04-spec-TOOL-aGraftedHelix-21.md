@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-21 — the spec commit block's delta loop lists untracked paths as its record does, compares paths, and refuses when its record is unset
 
-**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 5266d22e · streams tooling · order 12
+**Status:** SPECCED · rev-3 · 2026-10-04 · node a · Tier-1 · base 5266d22e · streams tooling · order 12
 
 <!-- gen:spec-records -->
 
@@ -41,18 +41,20 @@ audit of units 16 to 19.
   non-zero naming the record, having staged and rendered nothing. The LATE guard sits before step
   5's loop: unset there, the block exits non-zero naming the record AND the cleanup it leaves owed,
   which is to restore every unstaged path under the memory root other than the spec paths and then
-  unstage the spec paths. Either refusal stops the block before its commit, and unit 16 S3's prose
-  returns `committed: false` with that output. Observed by AC1 and AC2.
+  unstage the spec paths with `git reset -q -- <spec paths>`, never `git rm --cached`, which refuses
+  an index blob that differs from both `HEAD` and the working copy. Either refusal stops the block
+  before its commit, and unit 16 S3's prose returns `committed: false` with that output. Observed by
+  AC1 and AC2.
 - **S4** — Unit 16's real-git arm in `tools/workflows/unattended-build.test.sh` plants a third
   foreign path, an untracked file inside an untracked directory, and asserts
   `git ls-tree -r --name-only HEAD` lists no path under that directory. This SUPERSEDES unit 16 §4
   "The arm"'s row "`git status --porcelain` lists exactly the two foreign paths, unchanged" by name:
   `git status --porcelain --untracked-files=all` lists exactly the three foreign paths, unchanged,
   because plain porcelain collapses the untracked directory to a third `?? foreign/` line. A second
-  arm runs the extracted block twice more, once per guard, with §6 AC2's two stimuli and its
-  assertions. A third arm moves unit 16's foreign tracked modified file from ` M` to ` D` between
-  step 4 and step 5, and asserts that change stays out of `HEAD`. NOT OBSERVED by a criterion here: the suite is a kit
-  self-test the main loop runs once at the close (§7).
+  and a third arm run the extracted block once per guard, with §6 AC2's two stimuli and its
+  assertions. A fourth arm moves unit 16's foreign tracked modified file from ` M` to ` D` between
+  step 4 and step 5, and asserts that change stays out of `HEAD`. NOT OBSERVED by a criterion here:
+  the suite is a kit self-test the main loop runs once at the close (§7).
 - **S5** — The review-harness kit version and the harness's own `unattended-build@` engine identity
   each move once, after this unit's last move. Observed by AC3.
 
@@ -118,7 +120,7 @@ lists exactly these three paths, unchanged.
 ### Inventory
 
 No new function, constant or file. The prompt's text changes, and the suite gains one fixture path
-and one arm.
+and the four arms §7 names.
 
 ### Files touched (estimate)
 
@@ -210,6 +212,10 @@ none
   unit 16's exactly-two listing row by name, with `--untracked-files=all` and three paths. Findings
   10 and 15: S3 tests the record twice, right after step 1 and before step 5's loop, the late
   refusal names the cleanup, and AC2 and §7 give each guard its own stimulus and staged break.
+- rev-3 · 2026-10-04 · §2 §4 · S3 S4 · from the bug-class checklist over the promoting commit, which
+  selected `amendment-leaves-its-other-half-standing` and `git-rm-cached-refuses-a-diverged-index-blob`.
+  §4 Inventory and S4 counted one arm where §7 names four, and S3's cleanup unstages the spec paths
+  with `git reset`, since a staged new spec's blob differs from both `HEAD` and the working copy.
 
 ## 10. Reuse audit
 

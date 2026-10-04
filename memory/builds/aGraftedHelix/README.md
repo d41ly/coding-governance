@@ -104,10 +104,10 @@ ids TOOL-aGraftedHelix-14 TOOL-aGraftedHelix-15 TOOL-aGraftedHelix-16 TOOL-aGraf
 | [TOOL-aGraftedHelix-18 — the holder row decides `mine` before its `write_lease` and copies the claim's identity after it](spec/2026-10-04-spec-TOOL-aGraftedHelix-18.md) | 3 | 2 | SPECCED | rev-2 | 2026-10-04 |
 | [TOOL-aGraftedHelix-19 — the claim write table's rows and modes are driver constants the decision refuses outside of, and the per-cell arm derives its cells from them](spec/2026-10-04-spec-TOOL-aGraftedHelix-19.md) | 3 | 1 | SPECCED | rev-2 | 2026-10-04 |
 | [TOOL-aGraftedHelix-3 — invariant records in the bug-class catalogue become the review's by-design list](spec/2026-10-04-spec-TOOL-aGraftedHelix-3.md) | 3 | 2 | SPECCED | rev-2 | 2026-10-04 |
-| [TOOL-aGraftedHelix-20 — the holder row's claim CAS runs before its `write_lease` under one stamp, and a CAS that does not land leaves a `prior-session` fact the `mine` test accepts](spec/2026-10-04-spec-TOOL-aGraftedHelix-20.md) | 4 | 2 | SPECCED | rev-3 | 2026-10-04 |
+| [TOOL-aGraftedHelix-20 — the holder row's claim CAS runs before its `write_lease` under one stamp, and a CAS that does not land leaves a `prior-session` fact the `mine` test accepts](spec/2026-10-04-spec-TOOL-aGraftedHelix-20.md) | 4 | 2 | SPECCED | rev-4 | 2026-10-04 |
 | [TOOL-aGraftedHelix-22 — the claim write decision refuses a derived claim-read class outside `CLAIM_READS`, observed by a criterion and kept by a standing arm](spec/2026-10-04-spec-TOOL-aGraftedHelix-22.md) | 4 | 1 | SPECCED | rev-2 | 2026-10-04 |
 | [TOOL-aGraftedHelix-4 — recall labels a superseded record and ranks it under its successor](spec/2026-10-04-spec-TOOL-aGraftedHelix-4.md) | 4 | 1 | SPECCED | rev-2 | 2026-10-04 |
-| [TOOL-aGraftedHelix-23 — the `prior-session` fact is the set of sessions an incomplete holder write may have left the claim under, read by `check_claim_writable` itself and emptied by the next holder write that lands](spec/2026-10-04-spec-TOOL-aGraftedHelix-23.md) | 5 | 2 | SPECCED | rev-1 | 2026-10-04 |
+| [TOOL-aGraftedHelix-23 — the `prior-session` fact is the set of sessions an incomplete holder write may have left the claim under, read by `check_claim_writable` itself and emptied by the next holder write that lands](spec/2026-10-04-spec-TOOL-aGraftedHelix-23.md) | 5 | 2 | SPECCED | rev-2 | 2026-10-04 |
 | [TOOL-aGraftedHelix-9 — a newly added decision row or gotcha that ranks as a near match must name its relation](spec/2026-10-04-spec-TOOL-aGraftedHelix-9.md) | 5 | 2 | SPECCED | rev-2 | 2026-10-04 |
 | [TOOL-aGraftedHelix-14 — an engine arm observes hygiene check 27 red the leg, and print its summary on a green run](spec/2026-10-04-spec-TOOL-aGraftedHelix-14.md) | 6 | 1 | SPECCED | rev-2 | 2026-10-04 |
 | [TOOL-aGraftedHelix-6 — a decision row or gotcha whose normalized text another record already holds reds](spec/2026-10-04-spec-TOOL-aGraftedHelix-6.md) | 6 | 2 | SPECCED | rev-3 | 2026-10-04 |
@@ -118,7 +118,7 @@ ids TOOL-aGraftedHelix-14 TOOL-aGraftedHelix-15 TOOL-aGraftedHelix-16 TOOL-aGraf
 | [TOOL-aGraftedHelix-8 — every automatic self-heal appends one line to a health log the orientation card counts](spec/2026-10-04-spec-TOOL-aGraftedHelix-8.md) | 9 | 1 | SPECCED | rev-2 | 2026-10-04 |
 | [TOOL-aGraftedHelix-15 — the build harness commits the specs its writers authored before AUDIT pins them, and its commit-first refusals name a remedy a resume cannot replay](spec/2026-10-04-spec-TOOL-aGraftedHelix-15.md) | 10 | 1 | SPECCED | rev-2 | 2026-10-04 |
 | [TOOL-aGraftedHelix-16 — the spec commit stage re-stages the authored specs after the generator renders them, and a real-git arm runs the prompt's own git block](spec/2026-10-04-spec-TOOL-aGraftedHelix-16.md) | 11 | 1 | SPECCED | rev-2 | 2026-10-04 |
-| [TOOL-aGraftedHelix-21 — the spec commit block's delta loop lists untracked paths as its record does, compares paths, and refuses when its record is unset](spec/2026-10-04-spec-TOOL-aGraftedHelix-21.md) | 12 | 1 | SPECCED | rev-2 | 2026-10-04 |
+| [TOOL-aGraftedHelix-21 — the spec commit block's delta loop lists untracked paths as its record does, compares paths, and refuses when its record is unset](spec/2026-10-04-spec-TOOL-aGraftedHelix-21.md) | 12 | 1 | SPECCED | rev-3 | 2026-10-04 |
 <!-- /gen:build-units -->
 
 Records: 8 bound to this build, across 3 record folder(s).

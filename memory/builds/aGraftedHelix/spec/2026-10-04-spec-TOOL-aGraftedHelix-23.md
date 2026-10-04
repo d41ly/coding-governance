@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-23 — the `prior-session` fact is the set of sessions an incomplete holder write may have left the claim under, read by `check_claim_writable` itself and emptied by the next holder write that lands
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-2 · base 5266d22e · streams tooling · order 5
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-2 · base 5266d22e · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
@@ -36,7 +36,7 @@ closes findings 6, 12, 2, 7 and 1 (all HIGH) of the round-1 spec audit of units 
   order they were added, none twice. The empty value and a missing line are both the empty set, the
   one cleared state. `absent` is a legal member and compares literally, as unit 1 §4 compares two
   absent sessions. This supersedes unit 20 S2's and S3's reading of `absent` as the cleared state.
-  Observed by AC3.
+  Observed by AC1 and AC3.
 - **S2** — On a `--resume` holder-row call whose claim CAS did not complete, or whose claim could not
   be read, the row ADDS to the set, before its `stage_or_fail`: the record's `session` fact as it
   stood before the call, and, when the claim read succeeded, the claim's `session` field. A value
@@ -53,17 +53,23 @@ closes findings 6, 12, 2, 7 and 1 (all HIGH) of the round-1 spec audit of units 
   passes the fact in. A claim whose `keepalive` equals the record's and whose `session` is any member
   reads `mine`. Every holder site of unit 1's call-site table, `--resume`, `--dispatch`, `--close`
   and `--beat`, and every status-write site, the LANDING re-bind, `--hold`, `--landed` and
-  `--abort`, therefore gets the widening by construction. Observed by AC4.
+  `--abort`, therefore gets the widening by construction. Observed by AC1 and AC4, which drive
+  `--beat`, `--dispatch` and `--hold`. `--close`, `--landed`, `--abort` and the LANDING re-bind are
+  NOT OBSERVED by a criterion here: the read's place inside the function is what reaches them.
 - **S5** — The take-over column's restart widening, unit 20 S8, tests membership in the set: at the
   restart row, a claim whose `keepalive` equals the record's before the call and whose `session` is
   any member reads `same session`. Observed by AC5.
-- **S6** — Every comment unit 20's build writes that says what `prior-session` holds says it holds a
-  set, that the empty value is the cleared state, and that the `--resume` holder row is its one
-  writer. NOT OBSERVED by a criterion here: these are comments, and AC1 to AC5 observe the readers
+- **S6** — Every comment, and every line of the stops guide `tools/unattended/STOPS.template.md`
+  with its render, that unit 20's build writes about what `prior-session` holds says it holds a set,
+  that the empty value is the cleared state, and that the `--resume` holder row is its one writer.
+  NOT OBSERVED by a criterion here: these are prose and comments, and AC1 to AC5 observe the readers
   that decide a verdict.
 - **S7** — `tools/unattended/unattended.test.sh` gains the arms §7 names, over unit 20's fixture and
-  arms. NOT OBSERVED by a criterion here: the suite is the main loop's to run at VERIFYING, and each
-  arm's red on a staged break is observed there (§7).
+  arms, and every assertion unit 20's arms make on the fact's value follows S1: a `prior-session`
+  reading `absent` after a landing becomes `fact` printing nothing, and one reading `s1` becomes a
+  set holding `s1`. This supersedes unit 20 AC2's "leaves `prior-session: absent`" and its §5
+  migration line's "reads `absent`" by name. NOT OBSERVED by a criterion here: the suite is the main
+  loop's to run at VERIFYING, and each arm's red on a staged break is observed there (§7).
 - **S8** — The unattended kit version moves once after this unit's last move, in every carrier
   `tools/check-kit-versions.sh` pairs. Observed by AC6.
 
@@ -150,6 +156,8 @@ shape. No lexicon cell and no codebase-map key is minted.
 
 - `tools/unattended/unattended.sh`
 - `tools/unattended/unattended.test.sh`
+- `tools/unattended/STOPS.template.md`, where unit 20's build describes the fact's value
+- `memory/guides/UNATTENDED-STOPS.md`, by the render
 - every other carrier of the unattended version marker, which `tools/check-kit-versions.sh`
   enumerates
 
@@ -179,8 +187,8 @@ shape. No lexicon cell and no codebase-map key is minted.
 - migration — A record unit 20's build wrote with `prior-session: absent`, its cleared spelling,
   reads here as the one-member set `absent`. That widens `mine` only to a claim under this run's own
   keepalive and session `absent`, and the next holder write that lands empties it.
-- user docs — N/A: the stops guide lists `prior-session` as a lease line through unit 20 S7, and
-  says nothing of its value.
+- user docs — The stops guide, through S6, wherever unit 20's build says what the fact holds,
+  re-rendered in the same commit.
 
 ## 6. Acceptance criteria
 
@@ -204,9 +212,12 @@ names no run-state file.
 - **AC2** — When sequences e and f of §4 run, the set reads `s1 s2` after the second incomplete
   call. The closing call, under `s2` for e and `s3` for f, exits 0, prints no
   `UNATTENDED check 90 FAILED`, leaves a claim naming that session, and leaves `fact` printing
-  nothing for `prior-session`.
-  Red when: the second incomplete call drops `s1` from the set, which a build writing the pre-call
-  session unconditionally does.
+  nothing for `prior-session`. Over the fixture as it starts, whose record carries no
+  `prior-session` line, with the run-state file committed and the claim re-seeded at a `beat-utc`
+  older than a quarter of `RESUME_STALE_BOUND`, an `s1` call with no shim moves the claim ref and
+  leaves `git status --porcelain` empty.
+  Red when: the second incomplete call loses `s1` from the set, which a build writing the pre-call
+  session unconditionally does, or a landed holder write over a record without the fact writes it.
 - **AC3** — When the fixture's record and claim both name session `absent`, written with
   `CLAUDE_CODE_SESSION_ID` unset, an `s2` holder call that exits 124 exits 0 and leaves the set
   reading `absent`. A closing `s2` call exits 0, prints no `UNATTENDED check 90 FAILED`, leaves a
@@ -258,6 +269,11 @@ none
 - rev-1 · 2026-10-04 · initial draft, promoted from findings 6, 12, 2, 7 and 1 of the round-1 spec
   audit of units 20 to 22, grounded against `fact`, `set_fact`, `write_lease`, the holder row and
   the `hold-unpushed` clear at base `5266d22e`, and against units 1 and 20 as specced.
+- rev-2 · 2026-10-04 · §2 §4 §5 §6 · S1 S4 S6 S7 · AC2 · from the bug-class checklist over the
+  promoting commit, which selected `observed-by-claim-no-arm-discharges`,
+  `retirement-inventory-misses-readers-by-value` and `a-folded-field-leaves-its-row-shape-docs-behind`.
+  S4 names the sites its criteria drive and the four they do not; S7 rewrites unit 20's arms that
+  assert the fact's old value; S6 reaches the stops guide; AC2 observes S3's "only when non-empty".
 
 ## 10. Reuse audit
 

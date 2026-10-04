@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-20 — the holder row's claim CAS runs before its `write_lease` under one stamp, and a CAS that does not land leaves a `prior-session` fact the `mine` test accepts
 
-**Status:** SPECCED · rev-3 · 2026-10-04 · node a · Tier-2 · base 5266d22e · streams tooling · order 4
+**Status:** SPECCED · rev-4 · 2026-10-04 · node a · Tier-2 · base 5266d22e · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
@@ -241,15 +241,16 @@ with `CLAUDE_CODE_SESSION_ID` set to `s2`.
   Red when: the second call refuses its own claim with check 90, or a call leaves the record
   unstaged.
 - **AC3** — When the call runs with no shim but a `date` shim on `PATH`, and the push lands, the
-  claim's `lease-utc` equals the record's `lease-utc` byte for byte, and the record's
-  `prior-session` is missing or reads `absent`. The shim forwards every invocation to the real
+  claim's `lease-utc` equals the record's `lease-utc` byte for byte, and the record carries no
+  `prior-session` line. The shim forwards every invocation to the real
   `date` unchanged, except one asking for the `+%Y-%m-%dT%H:%M:%SZ` format, which it answers with
   the real UTC time advanced by one more second for each such request so far, counted in a file
-  under the fixture. With the run-state file then committed in the fixture, a second `s2` call with
-  no shim, whose `write_lease` and claim renewal are both not due, leaves `git status --porcelain`
-  empty.
+  under the fixture. With the run-state file then committed in the fixture and the claim re-seeded
+  at a `beat-utc` older than a quarter of `RESUME_STALE_BOUND`, a second `s2` call with no shim,
+  whose `write_lease` is not due and whose claim renewal is, moves the claim ref and leaves
+  `git status --porcelain` empty.
   Red when: the claim and the record carry stamps read from two clocks, which the shim makes differ
-  on every such build, or a renewal over a record without the fact writes it.
+  on every such build, or a landed holder write over a record without the fact writes it.
 - **AC4** — When `check_lease_only_diff`, sourced from `tools/unattended/lib-unattended.sh`, runs in
   a scratch repository whose committed run-state file differs from its working copy only by an added
   `prior-session: s1` line, it returns 0. With a `phase:` line changed as well, it returns 1.
@@ -311,6 +312,10 @@ none
   widens the take-over column's `same session` test at the restart row only, observed by AC6 with
   two arms. Findings 6, 12, 2, 7 and 1 are promoted to `TOOL-aGraftedHelix-23`: §3 gains its
   hands-off and a non-goal, and S2 and S3 point at it.
+- rev-4 · 2026-10-04 · §6 · AC3 · from the bug-class checklist over the promoting commit, which
+  selected `fixture-passes-by-finding-nothing`. AC3's renewal leg ran a call with nothing due, so a
+  build clearing the fact on every landed write passed it; the leg now re-seeds an aged beat so the
+  renewal lands, asserts the claim ref moves, and the first call asserts no `prior-session` line.
 
 ## 10. Reuse audit
 
