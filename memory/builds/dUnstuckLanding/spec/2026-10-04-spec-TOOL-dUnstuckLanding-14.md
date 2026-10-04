@@ -1,6 +1,6 @@
 # TOOL-dUnstuckLanding-14 — the attended terminal: a handed record derives LANDED, `--settle` writes it, and a landed ABORTED record gains `work-landed-at`
 
-**Status:** CLOSED · rev-3 · 2026-10-04 · node d · Tier-2 · base 98926870 · streams tooling · order 2 · closes TOOL-dUnstuckLanding-4
+**Status:** CLOSED · rev-4 · 2026-10-04 · node d · Tier-2 · base 98926870 · streams tooling · order 2 · closes TOOL-dUnstuckLanding-4
 
 <!-- gen:spec-records -->
 
@@ -32,7 +32,10 @@ not merely present.
   With it, HEAD's copy may also read `phase: HELD` with a `hold-code` in that list, and the answer is
   the commit that last changed the path, exactly as for `LANDING`. Without it the function is
   byte-unchanged in behaviour. The driver passes `$HOLD_CODES_HANDOFF`, and the leg passes the same
-  constant read from the driver by `core_of`, so the list is spelled once. Observed by AC1, AC2.
+  constant read from the driver by `core_of`, so the list is spelled once. The leg refuses at check 2
+  when that read is empty or names a code outside `HOLD_CODES_CORE`, as it already refuses an empty
+  hold vocabulary, so its derived-LANDED predicate cannot silently stop admitting the records the
+  driver's admits. Observed by AC1, AC2.
 - **S2 — the derivation.** `read_derived_phase` derives `LANDED` for a HELD record whose `hold-code`
   is a hand-off code and whose landing commit is an ancestor of the advertised tip, and sets a new
   global, `DP_BY=attended`. A HELD record under any other code is never derived and never observes
@@ -396,6 +399,11 @@ New arm: tools/unattended/check-unattended.test.sh · the AC7 hand-written fact 
   the next run on it, dropping both facts; check 15 grades `work-landed-at` through the library's new
   `check_work_landed_fact` at the tip the fact records, requiring its witness and a tip on the
   advertised tip, and reports a later revert; AC4 gains the merge-reverted and never-merged records.
+- rev-4 · 2026-10-04 · S1 · folded implementation review round 1 L5 (id 25): the leg guards
+  `HOLD_CODES_HANDOFF` as non-empty and a subset of `HOLD_CODES_CORE`, two check-2 refusals placed
+  below the pinned check-2 ordinals, each armed. M2 (id 1), the security lens's duplicate of H2, is
+  closed by `TOOL-dUnstuckLanding-27`, whose settle admits an UNBOUND lease only on a record that
+  predates the lease facts or reads stale and not alive.
 
 ## 10. Reuse audit
 

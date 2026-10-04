@@ -746,5 +746,55 @@ same  "range waiver: a row naming a pushed unit is not judged stale, exit code" 
 has   "range waiver: the row is counted as not judged" "$o" "1 waivers not judged"
 rm -rf "$T"
 
+# ---- closing review round 1 M13 (id 20): EVERY refusal of the tip observation widens to WHOLE and
+# ---- grades the pushed unit, not only the no-HEAD one above. Each arm was RED against a library copy
+# ---- with its own refusal removed. M6 (id 4): a fetch URL that differs from the push URL, and a tip
+# ---- that differs from the push's own ref line, are refusals too.
+check_range_whole() { # arm label · the reason's leading text -> WHOLE named with it, and the pushed unit graded
+  o=$(cd "$T/work" && bash "$LEG" 2>&1); rc=$?
+  same  "range $1: WHOLE mode reds the pushed unit, exit code" "$rc" "1"
+  has   "range $1: the summary names the reason" "$o" "range whole (the tip did not resolve: $2"
+  has   "range $1: the pushed unit is graded" "$o" "ARCH-tRange-1 — BUILT at"
+}
+T=$(seed_range_fixture)
+sed -i 's/^REMOTE_BOUND=".*"$/REMOTE_BOUND="0"/' "$T/work/${PFX}${KIT_NAME}/unattended.sh"
+check_range_whole "zero bound" "the driver's REMOTE_BOUND is not a positive integer a bound can use"
+rm -rf "$T"
+T=$(seed_range_fixture)
+sed -i 's/^REMOTE_BOUND=".*"$/REMOTE_BOUND="ten"/' "$T/work/${PFX}${KIT_NAME}/unattended.sh"
+check_range_whole "non-integer bound" "the driver's REMOTE_BOUND does not read as a single integer"
+rm -rf "$T"
+T=$(seed_range_fixture)
+git -C "$T/work" remote add second ../origin.git
+check_range_whole "two remotes" "this clone declares 2 remotes"
+rm -rf "$T"
+T=$(seed_range_fixture)
+( git clone -q "$T/origin.git" "$T/other" && cd "$T/other" && git config user.email t@t && git config user.name t \
+  && git commit -q --allow-empty -m "a landing this clone never fetched" --no-verify && git push -q origin main ) >/dev/null 2>&1
+check_range_whole "unheld tip" "the remote origin advertises"
+rm -rf "$T"
+T=$(seed_range_fixture)
+mkdir -p "$T/bin"; printf '#!/bin/sh\nexit 1\n' > "$T/bin/timeout"; chmod +x "$T/bin/timeout"
+RG_BIN=$(cd "$T/bin" && pwd)   # the POSIX spelling: a drive-letter colon would split PATH
+o=$(cd "$T/work" && PATH="$RG_BIN:$PATH" bash "$LEG" 2>&1); rc=$?
+same  "range no timeout: WHOLE mode reds the pushed unit, exit code" "$rc" "1"
+has   "range no timeout: the summary names the reason" "$o" "range whole (the tip did not resolve: this node has no working 'timeout -k'"
+rm -rf "$T"
+T=$(seed_range_fixture)
+( cd "$T" && git clone -q --bare origin.git seed.git ) >/dev/null 2>&1
+git -C "$T/work" remote set-url --push origin ../origin.git
+git -C "$T/work" remote set-url origin ../seed.git
+check_range_whole "fetch URL is not the push URL" "the remote origin is read from ../seed.git and pushed to ../origin.git"
+rm -rf "$T"
+T=$(seed_range_fixture)
+RG_TIP=$(git -C "$T/work" rev-parse origin/main)
+o=$(cd "$T/work" && GATE_PUSH_BASE=0000000000000000000000000000000000000000 bash "$LEG" 2>&1); rc=$?
+same  "range push line disagrees: WHOLE mode reds the pushed unit, exit code" "$rc" "1"
+has   "range push line disagrees: the summary names the reason" "$o" "range whole (the tip did not resolve: the remote advertises ${RG_TIP:0:8} and the push's own ref line names 00000000"
+o=$(cd "$T/work" && GATE_PUSH_BASE=$RG_TIP bash "$LEG" 2>&1); rc=$?
+same  "range push line agrees: RANGE mode, exit code" "$rc" "0"
+has   "range push line agrees: the summary names the mode and the tip" "$o" "range ${RG_TIP:0:8}.."
+rm -rf "$T"
+
 echo "--- $n arms, exit $st"
 exit $st

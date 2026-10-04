@@ -11603,6 +11603,49 @@ for _b in "" 0 ten; do
   hit "$out" "every one INHERITED; no age bound is declared, so no leg is aged and nothing is escalated"
 done
 
+# ---- closing review round 1 M12 (id 18): the branches TOOL-dUnstuckLanding-16 flipped from park to
+# ---- land, each with its own reason and the item MET. And M7 (ids 6, 14): a conf naming no policy
+# ---- file reads the file the pre-push hook reads, at R, before the kit default; so a hook file saying
+# ---- park holds here exactly as it refuses the push, where the driver used to read land and strand
+# ---- the run at LANDING. `set_ih_tip` moves R by one commit made on main and pushed, and
+# ---- `remove_ih_tip` drops that commit again, so the next fixture is built on the main it expects.
+set_ih_tip() { # a shell command run on main -> R re-pinned to the commit it makes
+  run_ih_repo checkout -q main; IH_PREV=$(run_ih_repo rev-parse main)
+  ( cd "$ih_dir" && eval "$1" ) >/dev/null 2>&1
+  run_ih_repo add -A >/dev/null; run_ih_repo commit -q -m "R moves" --no-verify
+  run_ih_repo push -q -f origin main; IH_R=$(run_ih_repo rev-parse main)
+  run_ih_repo checkout -q unit
+}
+remove_ih_tip() { # -> main and the remote back at the commit before set_ih_tip's
+  run_ih_repo reset -q --hard; run_ih_repo clean -qfd; run_ih_repo checkout -q main
+  run_ih_repo reset -q --hard "$IH_PREV"; run_ih_repo push -q -f origin main; run_ih_repo checkout -q unit
+}
+build_ih_policy "$IH_LAND"
+set_ih_tip "git rm -q .unattended.conf .githooks/gate-env.sh"
+out=$(run_ih --close tRun $IHOVR)
+hit  "$out" "gates-green — the inherited-red policy reads land: the project conf is absent at ${IH_R:0:8}, so no policy file is named, and the pre-push hook's own .githooks/gate-env.sh is absent there too, so the kit default land applies, with no age bound"
+hit  "$out" "gates-green MET over an inherited-only red under INHERITED_RED=land"
+remove_ih_tip
+build_ih_policy "$IH_LAND"
+set_ih_tip "sed -i 's/^GATE_POLICY_FILE=.*/GATE_POLICY_FILE=\"\"/' .unattended.conf && git rm -q .githooks/gate-env.sh"
+out=$(run_ih --close tRun $IHOVR)
+hit  "$out" "gates-green — the inherited-red policy reads land: GATE_POLICY_FILE is blank or absent in the conf at ${IH_R:0:8}, and the pre-push hook's own .githooks/gate-env.sh is absent there too, so the kit default land applies, with no age bound"
+hit  "$out" "gates-green MET over an inherited-only red under INHERITED_RED=land"
+remove_ih_tip
+build_ih_policy "$IH_PARK"
+set_ih_tip "sed -i 's|^GATE_POLICY_FILE=.*|GATE_POLICY_FILE=\"fx/none.sh\"|' .unattended.conf"
+out=$(run_ih --close tRun $IHOVR)
+hit  "$out" "gates-green — the inherited-red policy reads land: GATE_POLICY_FILE names fx/none.sh, which is absent at ${IH_R:0:8}, so the kit default land applies, with no age bound"
+hit  "$out" "gates-green MET over an inherited-only red under INHERITED_RED=land"
+remove_ih_tip
+build_ih_policy "$IH_PARK"
+set_ih_tip "sed -i 's/^GATE_POLICY_FILE=.*/GATE_POLICY_FILE=\"\"/' .unattended.conf"
+out=$(run_ih --close tRun $IHOVR)
+hit  "$out" "gates-green — the inherited-red policy reads park: INHERITED_RED=park, read from .githooks/gate-env.sh at ${IH_R:0:8}; GATE_POLICY_FILE is blank or absent in the conf at ${IH_R:0:8}, so the file the pre-push hook reads decides"
+hit  "$out" "hold · inherited-red · until probe gate · x leg red at ${IH_R:0:8}, INHERITED; INHERITED_RED=park"
+miss "$out" "gates-green MET over an inherited-only red"
+remove_ih_tip
+
 # TOOL-dUnstuckLanding-16 AC4: INHERITED_RED undeclared at R, a bound of 2 and one aged INHERITED leg,
 # the witness armed. The policy reads the kit default land, the item is MET with a gates-inherited
 # fact, and the build's own BACKLOG gains one ask whose SEV reads BLOCKER, read back through ASKS_CMD.
@@ -12963,6 +13006,15 @@ run_rx_git commit -qam "records(tRx): in-place" --no-verify
 out=$(run_rx --close tRx)
 miss "$out" "unattended: refresh —"
 hit  "$out" "an agent-attested DoD item is unmet"
+
+# ---- closing review round 1 L1 (id 12): a --park that park() refuses for a carriage return in its
+# ---- reason writes NOTHING, `refreshed-at` included, so the committed record is still HEAD's.
+build_rx_fixture yes
+_rx_cr=$'why\rrun-branch: refs/heads/other'
+out=$(run_rx --park tRx --item qcr --reason "$_rx_cr"); rc=$?
+same "TOOL-dUnstuckLanding-19 L1 the carriage-return park refuses" "$rc" "1"
+hit  "$out" "a parked entry contains a newline or a carriage return"
+same "TOOL-dUnstuckLanding-19 L1 the refused park left the record at HEAD" "$(run_rx_git status --porcelain -- "$RX_R")" ""
 rm -rf "$rx_root"
 # ========================== TOOL-dUnstuckLanding-20 — `LANDING_NODES`, the landing node and its hand-off ====
 # ---- SELF-CONTAINED, for the refresh block's reason: a fresh scratch repo per arm, `primary` landing,
@@ -12981,7 +13033,8 @@ LN_R=memory/builds/tLn/RUN.md
 run_ln() { local _e=$1; shift; ( cd "$ln_root/repo" && env -u GATE_SELFTESTS GOV_DEFAULT_BRANCH=main $_e bash "$SCRIPT" "$@" 2>&1 ); }
 run_ln_git() { git -C "$ln_root/repo" "$@"; }
 read_ln_fact() { sed -n "s/^$1: //p" "$ln_root/repo/$LN_R" | head -1; }
-build_ln_fixture() { # LANDING_NODES at BASE, `-` for undeclared · the run's own committed value, `-` for BASE's
+build_ln_fixture() { # LANDING_NODES at BASE, `-` for undeclared · the run's own committed value, `-` for BASE's · [older]
+  # `older` publishes one commit BELOW BASE carrying the same tree without LANDING_NODES (M5 and L8).
   rm -rf "$ln_root/repo" "$ln_root/origin.git"; mkdir -p "$ln_root/repo"
   git init -q --bare "$ln_root/origin.git"
   git --git-dir="$ln_root/origin.git" symbolic-ref HEAD refs/heads/main
@@ -12996,11 +13049,15 @@ build_ln_fixture() { # LANDING_NODES at BASE, `-` for undeclared · the run's ow
       'printf "head\t%s\ntree_clean\tyes\n" "$(git rev-parse HEAD)" > "$d/header"' \
       'printf "verdict\tGREEN\ntree_moved\tno\n" > "$d/verdict"' > bar.sh
     printf 'MEMORY_ROOT=memory\nUNITS_REGION_CUTOFF="2026-08-19"\nLANDER="echo land"\nLANDER_MODE="primary"\nBYPASS_BAN="--no-verify"\nGATE_CMD="bash bar.sh"\nGATE_BOUND="600"\nGATE_WALL="21600"\nUNIT_STALL_BOUND="1800"\nREVIEW_ROUNDS="7"\nRESUME_STALE_BOUND="5400"\nWIRING_CHECK="true"\nKEEPALIVE_CREATE="CronCreate"\nKEEPALIVE_DELETE="CronDelete"\nRESUME_SCHEDULE="on"\nRESUME_SCHEDULE_CREATE="TheScheduleCreate"\nRESUME_SCHEDULE_DELETE="TheScheduleDelete"\nRESUME_SCHEDULE_DELAY="1800"\nRESUME_SCHEDULE_LIMIT="6"\nPHASES_EXTRA=""\nDOD_EXTRA=""\n' > .unattended.conf
-    [ "$1" = - ] || printf 'LANDING_NODES="%s"\n' "$1" >> .unattended.conf
+    [ "$1" = - ] || [ "${3:-}" = older ] || printf 'LANDING_NODES="%s"\n' "$1" >> .unattended.conf
     printf -- '---\nslug: tLn\nnode: a\nopened: 2026-08-01\nstreams: architecture\nroster: ARCH\nids: ARCH-tLn-1\n---\n\n# tLn\n\n<!-- gen:build-index -->\n**Build status:** CLOSED · 1 unit(s)\n\n<!-- gen:build-units -->\n| Unit | Status | Rev | Last change |\n|---|---|---|---|\n| [ARCH-tLn-1 — the unit](spec/one.md) | CLOSED | rev-1 | 2026-08-01 |\n<!-- /gen:build-units -->\n<!-- /gen:build-index -->\n\n<!-- roster:units -->\n1. ARCH-tLn-1 — the unit\n<!-- /roster:units -->\n' > memory/builds/tLn/README.md
     printf '# ARCH-tLn-1 the unit\n\n**Status:** CLOSED · rev-1 · 2026-08-01 · node a · Tier-1 · base 00000000 · streams architecture\n' > memory/builds/tLn/spec/one.md
     printf '# tLn — run state\n\n<!-- run:generated -->\n<!-- /run:generated -->\n\n## Mandate\n<!-- run:mandate -->\nThe owner authorizes build tLn to merge to main and to push.\n<!-- /run:mandate -->\n\n## Run facts\n\n## Parked\n' \
       > memory/builds/tLn/RUN.md
+    if [ "${3:-}" = older ]; then
+      git add -A && git commit -q -m "older, before LANDING_NODES" --no-verify
+      printf 'LANDING_NODES="%s"\n' "$1" >> .unattended.conf
+    fi
     git add -A && git commit -q -m base --no-verify && git push -q origin main
     git checkout -q -b unit && git commit -q --allow-empty -m "unit work" --no-verify
     if [ "$2" != - ]; then
@@ -13087,6 +13144,57 @@ out=$(run_ln "$LN_NB" --close tLn)
 hit  "$out" "close OK"
 miss "$out" "unattended: landing —"
 same "TOOL-dUnstuckLanding-20 AC10 an undeclared project closes as today" "$(read_ln_fact phase)" "LANDING"
+
+# ---- closing review round 1 M5 and L8 (ids 3, 30): the base a landing is read at is the one this run
+# ---- FIRST COMMITTED. Moved in the working copy to an older PUBLISHED commit whose conf predates
+# ---- LANDING_NODES, an unlisted node read `undeclared` and closed to LANDING. It now hands off.
+build_ln_fixture "$LN_VALUE" - older
+run_ln_preflight "$LN_NB"
+LN_OLD=$(run_ln_git rev-parse main~1)
+sed -i "s/^base: .*/base: $LN_OLD/" "$ln_root/repo/$LN_R"
+run_ln_git commit -qam "records(tLn): the base moved" --no-verify
+write_ln_dod_records "$LN_NB"
+out=$(run_ln "$LN_NB" --close tLn)
+hit  "$out" "unattended: landing — handoff · the record's base fact reads $LN_OLD and this run first committed it as"
+same "TOOL-dUnstuckLanding-20 M5 a moved base did not land an unlisted node" "$(grep -c '^phase: LANDING' "$ln_root/repo/$LN_R" || true)" "0"
+# ...and a pinned BASE that does not resolve is a doubt too, never `undeclared`
+build_ln_fixture "$LN_VALUE" -
+run_ln "$LN_ND" --preflight tLn --keepalive-id k1 >/dev/null
+sed -i "s/^base: .*/base: deadbeefdeadbeefdeadbeefdeadbeefdeadbeef/" "$ln_root/repo/$LN_R"
+out=$(run_ln "$LN_ND" --close tLn)
+hit  "$out" "unattended: landing — handoff · the pinned BASE deadbeefdeadbeefdeadbeefdeadbeefdeadbeef does not resolve to a commit here"
+
+# ---- closing review round 1 M14 (id 21): every DOUBT resolves to handoff, never to `undeclared`. A
+# ---- BASE conf that does not evaluate to the end; a machine nothing answers for; one machine and user
+# ---- declared under two tags. Each was RED against a staged mutation routing its branch to undeclared.
+# The BASE conf stops only when LANDING_NODES is BLANK on entry, which is how this reader evaluates it;
+# check 55 reads the same blob with the working copy's value set, and the run's branch drops the line,
+# so the driver's own source and that read both reach the end and the preflight runs.
+build_ln_fixture "$LN_VALUE" -
+( cd "$ln_root/repo" && git checkout -q main && sed -i '1i [ -n "${LANDING_NODES-}" ] || exit 0' .unattended.conf \
+  && git commit -qam "a conf that stops when its key is blank" --no-verify && git push -q origin main \
+  && git checkout -q unit && git reset -q --hard main && sed -i '1d' .unattended.conf \
+  && git commit -qam "the run drops the line" --no-verify ) >/dev/null 2>&1
+out=$(run_ln "$LN_ND" --preflight tLn --keepalive-id k1)
+hit  "$out" "unattended: landing — handoff · the project conf at the pinned BASE could not be evaluated to the end"
+same "TOOL-dUnstuckLanding-20 M14 an unevaluable BASE conf records handoff" "$(read_ln_fact landing)" "handoff"
+build_ln_fixture "$LN_VALUE" -
+mkdir -p "$ln_root/bin"; printf '#!/bin/sh\nexit 1\n' > "$ln_root/bin/hostname"; chmod +x "$ln_root/bin/hostname"
+_lnbin=$(cd "$ln_root/bin" && pwd)   # the POSIX spelling: a drive-letter colon would split PATH
+out=$( cd "$ln_root/repo" && env -u GATE_SELFTESTS GOV_DEFAULT_BRANCH=main COMPUTERNAME= USERNAME=d41ly PATH="$_lnbin:$PATH" bash "$SCRIPT" --preflight tLn --keepalive-id k1 2>&1 )
+hit  "$out" "unattended: landing — handoff · this node's machine or user cannot be read, machine unread and user d41ly"
+same "TOOL-dUnstuckLanding-20 M14 an unreadable machine records handoff" "$(read_ln_fact landing)" "handoff"
+build_ln_fixture "a=compeeto/d41ly d=compeeto/d41ly" -
+out=$(run_ln "$LN_ND" --preflight tLn --keepalive-id k1)
+hit  "$out" "unattended: landing — handoff · compeeto/d41ly is not a node LANDING_NODES at the pinned BASE declares able to land, and these tokens are malformed or declared twice: compeeto/d41ly"
+same "TOOL-dUnstuckLanding-20 M14 one pair under two tags records handoff" "$(read_ln_fact landing)" "handoff"
+
+# ---- closing review round 1 L2 (id 22): a user name holding a SPACE is declared with `%20`, decoded
+# ---- before the pair is compared; the value is word-split, so a literal space can never be declared.
+build_ln_fixture "a=desk-a/daily-agent d=compeeto/john%20smith" -
+out=$( cd "$ln_root/repo" && env -u GATE_SELFTESTS GOV_DEFAULT_BRANCH=main COMPUTERNAME=compeeto "USERNAME=John Smith" bash "$SCRIPT" --preflight tLn --keepalive-id k1 2>&1 )
+hit  "$out" "unattended: landing — lander · node d"
+same "TOOL-dUnstuckLanding-20 L2 a %20-escaped user lands" "$(read_ln_fact landing)" "lander"
 
 # ---- TOOL-dUnstuckLanding-27 S3, AC4 and AC5: a REAL inherited-red close on a hand-off node, never a
 # ---- seeded bar record, because the defect lived in what the real producer stages beyond the record.

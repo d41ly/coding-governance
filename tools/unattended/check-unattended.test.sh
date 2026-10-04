@@ -4217,6 +4217,19 @@ mutate $KIT_REL/unattended.sh 's/^HOLD_CODES_CORE=.*/HOLD_CODES_CORE=""/'
 out=$(run)
 hit "$out" "the driver declares no HOLD_CODES_CORE vocabulary, so the hold verb would validate against an empty set and record a pause under any word at all"
 
+# ---- TOOL-dUnstuckLanding-14 S1, closing review round 1 L5 (id 25): the HAND-OFF codes the leg reads
+# ---- for its derived-LANDED predicate are guarded as the hold codes are. A renamed constant reads
+# ---- empty, and a member outside the hold vocabulary is a hold no verb could record.
+reset_tree
+mkdir -p $KIT_REL && cp "$HERE/unattended.sh" "$HERE/lib-unattended.sh" $KIT_REL/
+mutate $KIT_REL/unattended.sh 's/^HOLD_CODES_HANDOFF=/HOLD_CODES_HANDED=/'
+hit "$(run)" "the driver declares no readable HOLD_CODES_HANDOFF, so this leg would derive LANDED for no handed record while the driver derives it for each"
+reset_tree
+mkdir -p $KIT_REL && cp "$HERE/unattended.sh" "$HERE/lib-unattended.sh" $KIT_REL/
+mutate $KIT_REL/unattended.sh 's/^HOLD_CODES_HANDOFF="owner-landing /HOLD_CODES_HANDOFF="owner-landed /'
+hit "$(run)" "a hand-off code is not a member of the driver's HOLD_CODES_CORE, so a record could carry a hand-off the hold vocabulary refuses: owner-landed"
+reset_tree
+
 # ---- ...and check 39's own liveness refusal. A read predicate that matches nothing classifies
 # ---- nothing, and grading no read is how a structural arm passes by finding nothing. Staged by
 # ---- quoting the key in ONE reader's own read, `fact "$1" "phase"`: the same read to bash, a
@@ -5878,6 +5891,18 @@ out=$(run)
 hit  "$out" "LANDING_NODES declares a token that is not a <tag>=<machine>/<user> pair, or a tag or machine/user declared twice, and a malformed token never matches, so that node hands off on every run with nothing else red: d=compeeto d"
 reset_tree
 printf 'LANDING_NODES="a=m/u d=compeeto/d41ly"\n' >> .unattended.conf
+miss "$(run)" "UNATTENDED check 49 FAILED"
+reset_tree
+# ---- closing review round 1 M14 (id 21): one machine/user under two tags, and a pair with a third
+# ---- field, each red by name; RED against a staged scan that skipped each. L2 (id 22): a `%20`-escaped
+# ---- user is a well-formed pair, so the escape the driver decodes is not a malformed token here.
+printf 'LANDING_NODES="a=m/u b=m/u"\n' >> .unattended.conf
+hit  "$(run)" "so that node hands off on every run with nothing else red: m/u"
+reset_tree
+printf 'LANDING_NODES="a=m/u/x"\n' >> .unattended.conf
+hit  "$(run)" "so that node hands off on every run with nothing else red: a=m/u/x"
+reset_tree
+printf 'LANDING_NODES="a=desk/john%%20smith"\n' >> .unattended.conf
 miss "$(run)" "UNATTENDED check 49 FAILED"
 reset_tree
 fi   # ---- end REGION 8------------------------------------------------------------------------

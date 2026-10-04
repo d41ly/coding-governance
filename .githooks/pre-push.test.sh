@@ -993,6 +993,22 @@ for _p in park lnad; do
   esac
 done
 
+# Closing review round 1 M12 (id 18), the hook's flipped branch: R carries NO .githooks/gate-env.sh,
+# so the policy reads the kit default land, naming the absence, and an inherited-only red lands. The
+# branch restores its own copy, which the hook sources and never reads a policy from. RED against a
+# hook whose absent branch read park, staged in a scratch copy and restored.
+build_ir_fixture m12 'INHERITED_RED_MAX_AGE=2\n' || bad "IR M12 could not build its fixture"
+git rm -q .githooks/gate-env.sh >/dev/null 2>&1; git commit -q -m "R carries no gate-env" >/dev/null 2>&1
+git push -q --no-verify origin main >/dev/null 2>&1; IR_R=$(git rev-parse HEAD)
+mkdir -p .githooks; printf 'INHERITED_RED_MAX_AGE=2\nGOV_KITROOT=%s\n' "$KIT_REL" > .githooks/gate-env.sh
+git add -A >/dev/null 2>&1; git commit -q -m "the branch restores its own copy" >/dev/null 2>&1
+_o=$(run_ir_push)
+case "$_o" in
+  *"inherited-red policy at ${IR_R:0:8} reads land — .githooks/gate-env.sh is absent at ${IR_R:0:8}, so the kit default land applies"*"red on inherited legs only — landing under INHERITED_RED=land: x"*"rc=0")
+    ok "IR M12 a gate-env absent at R reads the kit default land and an inherited red lands" ;;
+  *) bad "IR M12 a gate-env absent at R must read the kit default land and land, got: $_o" ;;
+esac
+
 # AC4: an inherited green whose base IS the remote sha selects the scoped gate and names itself; once
 # the remote moves past that base, the same stamp forces FULL.
 build_ir_fixture ac4 'INHERITED_RED=land\nINHERITED_RED_MAX_AGE=10\n' || bad "IR AC4 could not build its fixture"

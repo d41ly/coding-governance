@@ -39,3 +39,9 @@ generator, one per filter. The whole suites and the gate legs are owed to the cl
   and no line calls `park` the default.
 - AC9 — `grep -c "TOOL-dUnstuckLanding-22" memory/DECISIONS.md` — it printed 1, and that row
   supersedes part of `TOOL-dDerivedDocket-24` by id. This unit wrote no second row.
+- AC10 — `.githooks/gate-env.sh` — rev-2, by the driver suite's policy block run alone on a
+  throwaway repo: a blank `GATE_POLICY_FILE` beside a hook file declaring park read park from it and
+  printed the hold line, where the code before the fold read land and was MET; the conf absent at R,
+  the key blank, and a named file absent at R each read land naming that branch and were MET. The
+  hook suite's new arm, whose R carries no `.githooks/gate-env.sh`, read land naming the absence and
+  landed; it was RED against a hook copy whose absent branch read park.

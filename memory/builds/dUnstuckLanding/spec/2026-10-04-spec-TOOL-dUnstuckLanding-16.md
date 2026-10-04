@@ -1,6 +1,6 @@
 # TOOL-dUnstuckLanding-16 — an INHERITED red lands at any age, and the age escalates its ask
 
-**Status:** CLOSED · rev-1 · 2026-10-04 · node d · Tier-2 · base 98926870 · streams tooling · order 4 · closes TOOL-dUnstuckLanding-6
+**Status:** CLOSED · rev-2 · 2026-10-04 · node d · Tier-2 · base 98926870 · streams tooling · order 4 · closes TOOL-dUnstuckLanding-6
 
 <!-- gen:spec-records -->
 
@@ -41,8 +41,10 @@ what another one admits.
   remote sha, and its `max_age` must equal the bound read at that sha, both possibly empty. Observed
   by AC3.
 - **S3 — the driver's policy and decision table.** In `tools/unattended/unattended.sh`,
-  `read_gate_policy` takes S2's reading table, and a blank or absent `GATE_POLICY_FILE` reads the kit
-  default `land`, announced. `read_gates_record` returns `land` when every red leg reads INHERITED
+  `read_gate_policy` takes S2's reading table. A blank or absent `GATE_POLICY_FILE`, or a project
+  conf absent at R, reads the file the pre-push hook reads, `.githooks/gate-env.sh` at R, before it
+  falls to the kit default `land`, announced, so the driver and the hook cannot read one policy two
+  ways; where that file is absent too, the reading is `land`, naming both absences. `read_gates_record` returns `land` when every red leg reads INHERITED
   under `land`, at any age, and `hold` under `park`. It also returns the aged legs, comma-joined, for
   S4. The MET line under `land` names the aged legs instead of claiming every leg sits inside the
   bound. Observed by AC4 and AC6.
@@ -238,6 +240,13 @@ the existing `TOOL-dDerivedDocket-24` arms already build. No criterion runs a su
 - **AC9** — When `grep -c "TOOL-dUnstuckLanding-22" memory/DECISIONS.md` runs, it prints at least 1,
   and that row names `TOOL-dDerivedDocket-24`.
   Red when: the superseding row is absent.
+- **AC10** — When `gates-green` runs over a fixture whose conf at R has a blank `GATE_POLICY_FILE` and
+  whose `.githooks/gate-env.sh` at R declares `INHERITED_RED=park`, the policy line reads park from that
+  file and the hold line prints. With the conf absent at R, or `GATE_POLICY_FILE` blank, and no hook
+  file at R, or with `GATE_POLICY_FILE` naming a file absent at R, the item is MET and the policy line
+  names that branch. A push through `.githooks/pre-push` whose R carries no `.githooks/gate-env.sh`
+  reads `land`, naming the absence, and lands an inherited-only red.
+  Red when: the driver reads land where the hook reads park, or a flipped branch holds.
 
 ## 7. Gates
 
@@ -278,6 +287,10 @@ New arm: tools/memory-tree/gen_build_index.py `--selftest` · AC7's BLOCKER and 
 
 - rev-1 · 2026-10-04 · initial draft, from design §3 at rev-2, ask 6, review items H2, H3, H5, M1 and
   M15, and ruling `TOOL-dUnstuckLanding-22`.
+- rev-2 · 2026-10-04 · S3 AC10 · folded implementation review round 1 M7 (ids 6, 14) and M12
+  (id 18): a conf naming no policy file reads the pre-push hook's own `.githooks/gate-env.sh` at R
+  before the kit default, so the driver no longer reads land where the hook refuses the push; AC10
+  arms each branch the ruling flipped, in the driver suite and the hook's suite.
 
 ## 10. Reuse audit
 

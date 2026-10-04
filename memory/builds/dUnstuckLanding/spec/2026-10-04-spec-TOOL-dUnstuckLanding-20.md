@@ -1,6 +1,6 @@
 # TOOL-dUnstuckLanding-20 — `LANDING_NODES`: landing capability declared, resolved from machine and user, and a planned hand-off
 
-**Status:** CLOSED · rev-2 · 2026-10-04 · node d · Tier-2 · base 98926870 · streams tooling · order 8 · closes TOOL-dUnstuckLanding-10
+**Status:** CLOSED · rev-3 · 2026-10-04 · node d · Tier-2 · base 98926870 · streams tooling · order 8 · closes TOOL-dUnstuckLanding-10
 
 <!-- gen:spec-records -->
 
@@ -31,7 +31,9 @@ with no override.
   pair grammar has one spelling:
   - `resolve_landing_tag <nodes> <machine> <user>` prints the tag of the one well-formed pair whose
     machine and user equal the given ones, compared lowercased, and returns 0. It returns 1 on no
-    match, on an empty machine or user, and when two pairs with different tags match.
+    match, on an empty machine or user, and when two pairs with different tags match. A pair's
+    `%20` decodes to a space before the compare, because the value is word-split and a user name
+    can hold one. `scan_landing_nodes` compares raw tokens, which decode alike exactly when equal.
   - `scan_landing_nodes <nodes>` prints each token that is not `<tag>=<machine>/<user>`, with
     `<tag>` one lowercase letter and neither half empty or carrying `/`, plus each tag or
     machine/user pair declared twice. It prints nothing for a well-formed or blank value.
@@ -39,7 +41,11 @@ with no override.
   The library header's "WHAT IT HOLDS" sentence names the three. Observed by AC1, AC2, AC3, AC4.
 - **S3 — the read at BASE.** `resolve_landing_node` in `tools/unattended/unattended.sh` reads
   `LANDING_NODES` from `.unattended.conf` at the pinned BASE, by the evaluate-to-a-sentinel read
-  `check_authorization` already uses for `SPEC_AUDIT_DEFAULT`, never from the working copy. It sets
+  `check_authorization` already uses for `SPEC_AUDIT_DEFAULT`, never from the working copy. The pinned
+  BASE is the one this run's first committed record blob carries, read by `read_pinned_base` over the
+  record's history since its last rotation; a working-copy `base` fact that differs from it or is
+  missing, or a BASE that does not resolve, is `handoff`. With no committed blob carrying a base, the
+  window between a preflight and its first records commit, the working copy's fact is read. It sets
   `LN_STATE` to `undeclared`, `lander` or `handoff`, with `LN_TAG` and `LN_WHY`. It never calls
   `fail`. Undeclared or blank at BASE is `undeclared`, today's behaviour. A blob that does not
   evaluate to the end, an unreadable machine or user, or no matching pair, is `handoff`, the safe
@@ -115,14 +121,16 @@ and `USER` is unset.
 
 ### Resolution order
 
-1. No `base` fact, or no `.unattended.conf` blob at BASE → `undeclared`.
-2. The blob does not evaluate to its sentinel → `handoff`, "unknown is not absent".
-3. The key is blank → `undeclared`.
-4. `read_host_name` or `read_user_name` answers nothing → `handoff`.
-5. `resolve_landing_tag` returns a tag → `lander`. Otherwise → `handoff`, naming the machine/user it
+1. The run's first committed blob pins a base the working copy's `base` fact differs from or lacks,
+   or the base does not resolve → `handoff`.
+2. No `base` fact, or no `.unattended.conf` blob at BASE → `undeclared`.
+3. The blob does not evaluate to its sentinel → `handoff`, "unknown is not absent".
+4. The key is blank → `undeclared`.
+5. `read_host_name` or `read_user_name` answers nothing → `handoff`.
+6. `resolve_landing_tag` returns a tag → `lander`. Otherwise → `handoff`, naming the machine/user it
    resolved and any malformed tokens.
 
-Step 1 keeps a record with no BASE on today's path; such a record cannot pass
+Step 2 keeps a record with no BASE on today's path; such a record cannot pass
 `authorization-reachable` anyway, so it never reaches a landing.
 
 ### Why BASE and not the working copy
@@ -144,7 +152,7 @@ before it returns (`tools/unattended/unattended.sh:7645-7659`).
 ### Inventory
 
 - Library functions `read_user_name`, `resolve_landing_tag` and `scan_landing_nodes`; driver
-  function `resolve_landing_node`; globals `LN_STATE`, `LN_TAG` and `LN_WHY`. Each name is graded by
+  functions `resolve_landing_node` and `read_pinned_base`; globals `LN_STATE`, `LN_TAG` and `LN_WHY`. Each name is graded by
   the lexicon gate's shell cell, so ask `--suggest` for each before writing it.
 - Conf key `LANDING_NODES`. Fact key `landing`.
 - Two new driver `fail` branches in `--close`, and one new leg check. Each takes an arm in its
@@ -200,8 +208,10 @@ before it returns (`tools/unattended/unattended.sh:7645-7659`).
 ## 6. Acceptance criteria
 
 - **AC1** — When `bash -c '. tools/unattended/lib-unattended.sh && resolve_landing_tag "a=desk-a/daily-agent d=compeeto/d41ly" COMPEETO D41LY'`
-  runs, it prints `d` and exits 0.
-  Red when: case differs between the inputs and the pair and the match fails, or it prints `a`.
+  runs, it prints `d` and exits 0. Over `d=compeeto/john%20smith` with the user `John Smith` it
+  prints `d` too.
+  Red when: case differs between the inputs and the pair and the match fails, or it prints `a`, or
+  the escaped pair does not match.
 - **AC2** — When the same `resolve_landing_tag` call is given `desktop-3j1o6cd agent5`, an empty
   machine, or a value carrying both `d=compeeto/d41ly` and `b=compeeto/d41ly`, it prints nothing and
   exits 1 each time.
@@ -211,13 +221,17 @@ before it returns (`tools/unattended/unattended.sh:7645-7659`).
   Red when: the reader keeps the case, or returns nothing while `id -un` answers.
 - **AC4** — When `scan_landing_nodes "d=compeeto a=/x bb=m/u c=m/u/v d=m2/u2"` runs after
   sourcing the library, it prints `d=compeeto`, `a=/x`, `bb=m/u`, `c=m/u/v` and the doubled tag `d`,
-  and over `"a=m/u d=compeeto/d41ly"` or `""` it prints nothing.
+  and over `"a=m/u d=compeeto/d41ly"` or `""` it prints nothing. Over `"a=m/u b=m/u"` it prints the
+  doubled pair `m/u`.
   Red when: a malformed token or a doubled tag goes unprinted, or a well-formed value prints.
 - **AC5** — When `COMPUTERNAME=desktop-3j1o6cd USERNAME=agent5 bash tools/unattended/unattended.sh --preflight fx --keepalive-id k1`
   runs in fixture G, stdout carries `landing — handoff` naming `desktop-3j1o6cd/agent5`, and
   `RUN.md` reads `landing: handoff`. With the environment naming `compeeto/d41ly`, the line reads
-  `landing — lander · node d` and the fact reads `landing: lander`.
-  Red when: an unlisted node records `lander`, or a listed node records `handoff`.
+  `landing — lander · node d` and the fact reads `landing: lander`. A listed node whose BASE conf
+  does not evaluate to its end, a machine nothing answers for, and one pair declared under two tags
+  each record `landing: handoff`.
+  Red when: an unlisted node records `lander`, or a listed node records `handoff`, or a doubt
+  resolves to anything but `handoff`.
   `fixture:` G is a bare origin and a clone carrying this tree's kit, a build `fx` authorized at the
   anchor, and an `.unattended.conf` at BASE declaring `LANDING_NODES="a=desk-a/daily-agent d=compeeto/d41ly"`.
   The tree holds none today; build it under `%TEMP%/ln20` from the recipe the driver suite's
@@ -225,8 +239,11 @@ before it returns (`tools/unattended/unattended.sh:7645-7659`).
 - **AC6** — When G's BASE conf declares no `LANDING_NODES` and the working copy declares
   `LANDING_NODES="b=desktop-3j1o6cd/agent5"`, the node-`b` preflight of AC5 prints
   `landing — undeclared` and writes no `landing` fact. When BASE declares the AC5 value and the
-  working copy adds node `b`, the node-`b` preflight still prints `handoff`.
-  Red when: the working copy's value decides anything.
+  working copy adds node `b`, the node-`b` preflight still prints `handoff`. When the committed
+  record's `base` fact is moved to an older published commit whose conf declares no
+  `LANDING_NODES`, a node-`b` `--close` prints `landing — handoff` naming both bases and writes no
+  LANDING.
+  Red when: the working copy's value decides anything, the base fact included.
 - **AC7** — When a node-`b` `--close fx --override build-complete --reason r` runs in G after
   preflight, it is refused by an `UNATTENDED check <n> FAILED` line naming `--park` and
   `--handoff`, stdout carries no `observing the anchor` line, and `git status --porcelain` shows
@@ -308,6 +325,13 @@ New arm: tools/unattended/check-unattended.test.sh · a fixture conf declaring a
   design, the records-current cell's "this cell once described" sentence, §4 `landed-via-lander`'s
   note on the removed bypass-flag grep, and §7's note that nothing changed in the move to VERBS.
   The driver's new fail numbers are 104 and 105 and the leg's new check is 49.
+- rev-3 · 2026-10-04 · S2 S3 §4 AC1 AC4 AC5 AC6 · folded implementation review round 1 M5 and L8
+  (ids 3, 30), M14 (id 21) and L2 (id 22). The landing node is read at the base this run's first
+  committed record blob carries, through `read_pinned_base`, and a moved, missing or unresolvable
+  base fact is `handoff`, not the derived merge-base, which under carry-forward can carry the run's
+  own conf, and still before the anchor round-trip. `%20` spells a space in a pair. The doubt
+  branches and check 49's doubled pair and third field gained arms, each RED against a staged
+  mutation routing the doubt elsewhere.
 
 ## 10. Reuse audit
 

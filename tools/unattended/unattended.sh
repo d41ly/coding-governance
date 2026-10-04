@@ -6094,14 +6094,35 @@ write_lease() { # run-state file · keepalive-id
 # conf blob at BASE is `undeclared`, today's behaviour; such a record cannot pass
 # `authorization-reachable`, so it never reaches a landing. Blank is `undeclared` too (F3).
 #
+# THE PINNED BASE IS THE ONE THIS RUN FIRST COMMITTED (closing review round 1, M5 and L8). The `base`
+# fact is a working-copy line and trusted_base admits any PUBLISHED ancestor of the derived merge-base,
+# so a run that moved it to an older commit whose conf predates LANDING_NODES read `undeclared` and
+# skipped both hand-off refusals. `read_pinned_base` takes the base from this run's first committed
+# blob carrying one; a working copy that differs from it or carries none, or a base that does not
+# resolve, is `handoff`. NOT the derived merge-base: under carry-forward landing it can carry a conf
+# the run landed itself. Still read before the anchor round-trip, so the F5 refusal precedes that.
+#
 # WHAT IT DOES NOT BUY: the machine and user come from the environment the run inherits, so a run set
 # on it can spoof both. That is protocol section 9's limit for any check under the run's own uid, and
-# it buys only the landing every run could make before this key existed.
+# it buys only the landing every run could make before this key existed. The first committed blob is
+# also the run's own commit, so a base forged BEFORE the record's first commit is not caught; and a
+# record with no committed blob carrying a base - the honest window between a preflight and its first
+# records commit - is read at the working copy, the window leg check 17 is silent over too.
 LN_STATE=""; LN_TAG=""; LN_WHY=""
 resolve_landing_node() { # run-state file -> LN_STATE undeclared|lander|handoff, LN_TAG and LN_WHY
-  local rel=$1 base cf v m u bad
+  local rel=$1 base pin cf v m u bad
   LN_STATE=undeclared; LN_TAG=""; LN_WHY=""
   base=$(fact "$rel" base)
+  if pin=$(read_pinned_base "$rel") && [ "$base" != "$pin" ]; then
+    LN_STATE=handoff
+    LN_WHY="the record's base fact reads ${base:-nothing} and this run first committed it as $pin, so which conf decides the landing is in doubt and is not read as undeclared"
+    return 0
+  fi
+  if [ -n "$base" ] && ! GIT rev-parse --verify --quiet "$base^{commit}" >/dev/null 2>&1; then
+    LN_STATE=handoff
+    LN_WHY="the pinned BASE $base does not resolve to a commit here, so which nodes may land cannot be read and is not read as absent"
+    return 0
+  fi
   if [ -z "$base" ] || ! cf=$(GIT show "$base:.unattended.conf" 2>/dev/null); then
     LN_WHY="no project conf at the pinned BASE"; return 0
   fi
@@ -6125,6 +6146,31 @@ resolve_landing_node() { # run-state file -> LN_STATE undeclared|lander|handoff,
   bad=$(scan_landing_nodes "$v" | tr '\n' ' ' | sed 's/ $//')
   LN_WHY="$m/$u is not a node LANDING_NODES at the pinned BASE declares able to land${bad:+, and these tokens are malformed or declared twice: $bad}"
   return 0
+}
+# THE BASE THIS RUN FIRST COMMITTED, for resolve_landing_node. The window is this run's: commits from
+# the newest one that ADDED an archived `RUN.*.md` beside the record, where the last rotation landed,
+# or the whole history when the build was never rotated. Oldest first, the first blob whose
+# `## Run facts` section carries a base answers. Status 1 when none does, and while a rotation sits
+# STAGED and uncommitted, because then this run has committed no blob of its own yet.
+read_pinned_base() { # run-state file -> the base its run's first committed blob carries; 1 when none
+  local rel=$1 dir rot c l sec b
+  dir=${rel%/RUN.md}
+  [ -z "$(GIT diff --cached --name-only --diff-filter=A -- "$dir/RUN.*.md" 2>/dev/null)" ] || return 1
+  rot=$(GIT log -1 --diff-filter=A --format=%H -- "$dir/RUN.*.md" 2>/dev/null)
+  for c in $(GIT log --reverse --format=%H HEAD ${rot:+--not "$rot^@"} -- "$rel" 2>/dev/null); do
+    b=""; sec=0
+    while IFS= read -r l || [ -n "$l" ]; do
+      l=${l%$'\r'}
+      case "$l" in
+        "## Run facts"*) sec=1; continue ;;
+        "## "*) sec=0; continue ;;
+      esac
+      [ "$sec" = 1 ] || continue
+      case "$l" in base:*) b=${l#base:}; while [ "${b# }" != "$b" ]; do b=${b# }; done; break ;; esac
+    done < <(GIT show "$c:$rel" 2>/dev/null)
+    if [ -n "$b" ]; then printf '%s\n' "$b"; return 0; fi
+  done
+  return 1
 }
 print_landing_line() { # -> the one line naming what resolve_landing_node decided
   case "$LN_STATE" in
@@ -7326,8 +7372,8 @@ verb_resume() { # slug
 # a run that re-points the conf key moves nothing until a gated push has landed it.
 #
 # BLANK IS `land`, THE KIT DEFAULT, AND IT SAYS SO (ruling TOOL-dUnstuckLanding-22, superseding that
-# part of TOOL-dDerivedDocket-24's D12-i4; built by TOOL-dUnstuckLanding-16). No policy file named,
-# one absent at R, and an absent or blank `INHERITED_RED` all read `land`, and `land` with no positive
+# part of TOOL-dDerivedDocket-24's D12-i4; built by TOOL-dUnstuckLanding-16). No policy file named and
+# no hook file at R, a named one absent at R, and an absent or blank `INHERITED_RED` all read `land`, and `land` with no positive
 # bound reads `land` with no bound. A value outside `park land` still reads `park`, because a typo must
 # never land a red, and so does a path that leaves the tree and a missing R, where nothing can read
 # INHERITED. Every reading is announced on the policy line. THE AGE DECIDES ESCALATION ONLY: an
@@ -7358,29 +7404,40 @@ read_policy_key() { # file text · key -> the LAST `<key>=` line's value, cleane
 }
 
 GP_POLICY=park; GP_MAX_AGE=""; GP_WHY=""
+# A CONF NAMING NO POLICY FILE READS THE PRE-PUSH HOOK'S OWN (closing review round 1, M7 and M12). The
+# hook reads `$top/.githooks/gate-env.sh` at R on every gated push whatever the conf says, so when the
+# conf is absent at R or its GATE_POLICY_FILE is blank, the driver reads that same file at the same R
+# before it defaults to land. Defaulting first made the two readers disagree in the direction that
+# strands a run: the driver read land and wrote LANDING, and the hook read park and refused the push.
+# The path is spelled as the hook derives it; a named file is still the conf's, read as before.
 read_gate_policy() { # R -> GP_POLICY (park|land), GP_MAX_AGE (a positive integer, or empty) and GP_WHY
-  local r=$1 conf path blob pol age bnd
+  local r=$1 conf path blob pol age bnd via="" hook=".githooks/gate-env.sh"
   GP_POLICY=park; GP_MAX_AGE=""; GP_WHY=""
   if [ -z "$r" ]; then
     GP_WHY="no advertised tip was observed, so there is no R to read a gate policy at"; return 0
   fi
   # THE CONF'S OWN NAME, derived from the path this driver sourced, so the file is spelled once.
   if ! conf=$(GIT show "$r:${CONF##*/}" 2>/dev/null); then
-    GP_POLICY=land
-    GP_WHY="the project conf is absent at ${r:0:8}, so no policy file is named and the kit default land applies, with no age bound"; return 0
+    via="the project conf is absent at ${r:0:8}, so no policy file is named"
+  else
+    path=$(read_policy_key "$conf" GATE_POLICY_FILE)
+    [ -n "$path" ] || via="GATE_POLICY_FILE is blank or absent in the conf at ${r:0:8}"
   fi
-  path=$(read_policy_key "$conf" GATE_POLICY_FILE)
-  if [ -z "$path" ]; then
-    GP_POLICY=land
-    GP_WHY="GATE_POLICY_FILE is blank or absent in the conf at ${r:0:8}, so the kit default land applies, with no age bound"; return 0
-  fi
-  case "$path" in
-    /*|[A-Za-z]:*|..|../*|*/..|*/../*)
-      GP_WHY="GATE_POLICY_FILE at ${r:0:8} is not a repo-relative path inside the tree, which reads park: $path"; return 0 ;;
-  esac
-  if ! blob=$(GIT show "$r:$path" 2>/dev/null); then
-    GP_POLICY=land
-    GP_WHY="GATE_POLICY_FILE names $path, which is absent at ${r:0:8}, so the kit default land applies, with no age bound"; return 0
+  if [ -n "$via" ]; then
+    path=$hook
+    if ! blob=$(GIT show "$r:$path" 2>/dev/null); then
+      GP_POLICY=land
+      GP_WHY="$via, and the pre-push hook's own $path is absent there too, so the kit default land applies, with no age bound"; return 0
+    fi
+  else
+    case "$path" in
+      /*|[A-Za-z]:*|..|../*|*/..|*/../*)
+        GP_WHY="GATE_POLICY_FILE at ${r:0:8} is not a repo-relative path inside the tree, which reads park: $path"; return 0 ;;
+    esac
+    if ! blob=$(GIT show "$r:$path" 2>/dev/null); then
+      GP_POLICY=land
+      GP_WHY="GATE_POLICY_FILE names $path, which is absent at ${r:0:8}, so the kit default land applies, with no age bound"; return 0
+    fi
   fi
   pol=$(read_policy_key "$blob" INHERITED_RED)
   age=$(read_policy_key "$blob" INHERITED_RED_MAX_AGE)
@@ -7401,6 +7458,7 @@ read_gate_policy() { # R -> GP_POLICY (park|land), GP_MAX_AGE (a positive intege
           GP_WHY="$path at ${r:0:8} declares no INHERITED_RED, so the kit default land applies, with $bnd" ;;
     *)    GP_WHY="INHERITED_RED is '$pol' in $path at ${r:0:8}, outside 'park land', which reads park" ;;
   esac
+  [ -z "$via" ] || GP_WHY="$GP_WHY; $via, so the file the pre-push hook reads decides"
 }
 
 # THE RECORD OF ONE BAR, read by the decision table `gates-green` applies to a red exit. The first
@@ -10053,9 +10111,12 @@ verb_park() { # slug · item · reason
 $(grep -F -- ' decision · item ' "$rel" 2>/dev/null | sed 's/^[^ ]* //')
 PARKED
   # TOOL-dUnstuckLanding-19 S5 - after the no-op above, so a re-park writes and refreshes nothing.
+  # The fact is written only AFTER park() appended (closing review round 1, L1): park() refuses a
+  # carriage return this verb's own line-feed test cannot see, and a fact written first survived that
+  # refusal, so a verb that refused had still written. The listing prints first either way.
   derive_refreshed_at "$rel" "$slug" park
-  if [ -n "$RF_FACT" ]; then set_fact "$rel" refreshed-at "$RF_FACT" || return 1; fi
   park "$rel" decision "$item" "$reason" || return 1
+  if [ -n "$RF_FACT" ]; then set_fact "$rel" refreshed-at "$RF_FACT" || return 1; fi
   stage_or_fail "$rel" || return 1
   echo "unattended: decision parked — $item"
   return 0

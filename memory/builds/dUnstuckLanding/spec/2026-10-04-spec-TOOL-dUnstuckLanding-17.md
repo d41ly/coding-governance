@@ -1,6 +1,6 @@
 # TOOL-dUnstuckLanding-17 — the history legs grade the run's own range, and check 23 a per-build budget
 
-**Status:** CLOSED · rev-3 · 2026-10-04 · node d · Tier-2 · base 98926870 · streams tooling · order 5 · closes TOOL-dUnstuckLanding-7 · ratified 2026-10-04
+**Status:** CLOSED · rev-4 · 2026-10-04 · node d · Tier-2 · base 98926870 · streams tooling · order 5 · closes TOOL-dUnstuckLanding-7 · ratified 2026-10-04
 
 <!-- gen:spec-records -->
 
@@ -31,9 +31,11 @@ report-only drift-audit signal, `fleet_over_budget`, that lists the builds over 
   kit gate's `core_of` does, and runs ONE bounded `ls-remote --symref --exit-code <remote> HEAD`
   through the library's pinned `GIT` options. It returns 0 with the global `ADVH_SHA` set, or 1 with
   `ADVH_WHY` set. It refuses, with the reason, when the clone has no remote or more than one, when a
-  constant does not read, when the bound fires, when the remote advertises no HEAD, and when the
-  advertised object is not in this clone. It never reads a local ref and never an environment
-  variable. Beside it, `read_history_range` applies S2's rule once for both legs: it calls the reader
+  constant does not read, when `ls-remote --get-url` differs from `remote get-url --push`, when the
+  bound fires, when the remote advertises no HEAD, when `GATE_PUSH_BASE` is set and names another
+  sha, and when the advertised object is not in this clone. It never reads a local ref, and the one
+  environment variable it reads, the one the pre-push hook writes from git's own ref line, can only
+  refuse a tip and never supplies one. Beside it, `read_history_range` applies S2's rule once for both legs: it calls the reader
   and sets `HR_MODE`, `HR_EXCL` (the `^<tip>` token, empty in WHOLE mode) and `HR_FIELD`, the summary
   field. Observed by AC1.
 - **S2 — the range rule, the same in all three legs.** A leg is in RANGE mode when the advertised
@@ -260,7 +262,9 @@ Each was rejected by a test, and §8 carries the fork it decided.
   `%TEMP%/ul17a` with a bare origin and calls `read_advertised_head` with the driver's path, it
   returns 0 and `ADVH_SHA` equals the HEAD sha `git ls-remote origin HEAD` prints. After a second
   clone pushes a new commit to that origin, a second call in a fresh shell returns the new sha. With
-  the remote removed it returns 1 and `ADVH_WHY` names the missing remote.
+  the remote removed it returns 1 and `ADVH_WHY` names the missing remote. With the fetch URL pointed
+  at another bare clone while the push URL stays, and with `GATE_PUSH_BASE` naming another sha, it
+  returns 1 naming the split, and each history leg reads `range whole` with that reason.
   Red when: the helper reads `refs/remotes/origin/HEAD`, which is stale after the second clone's
   push, so the second call returns the old sha.
   fixture: built under `%TEMP%`, never the scratchpad, because a clone under the scratchpad path
@@ -384,6 +388,12 @@ once, under `TOOL-dUnstuckLanding-24`.
 - rev-3 · 2026-10-04 · S10 AC9 · folded implementation review round 1 M10 and L7 (ids 15, 19, 29):
   `_parse_fleet_line` returns an `over` field holding anything but `none` or `<slug>=<n>` as
   unjudged, and `measure_fleet_over_budget` reads it DEAD naming it, never a live zero.
+- rev-4 · 2026-10-04 · S1 AC1 · folded implementation review round 1 M6 (id 4) and M13 (id 20):
+  `read_advertised_head` refuses a fetch URL that is not the push URL and a tip `GATE_PUSH_BASE`
+  contradicts, both widening to WHOLE, and its header states the relay residual; the pass-order
+  suite arms every refusal, each RED against a library copy with that refusal removed. M1 (id 26),
+  the intent lens's duplicate of H1, is closed by `TOOL-dUnstuckLanding-27`, whose pre-anchor
+  exemption probe carries no range exclusion.
 
 ## 10. Reuse audit
 

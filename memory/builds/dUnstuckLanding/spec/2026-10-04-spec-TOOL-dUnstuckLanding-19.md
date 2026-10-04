@@ -1,6 +1,6 @@
 # TOOL-dUnstuckLanding-19 — refresh before a verdict: one helper, the `refreshed-at` fact
 
-**Status:** CLOSED · rev-2 · 2026-10-04 · node d · Tier-2 · base 98926870 · streams tooling · order 7 · closes TOOL-dUnstuckLanding-9
+**Status:** CLOSED · rev-3 · 2026-10-04 · node d · Tier-2 · base 98926870 · streams tooling · order 7 · closes TOOL-dUnstuckLanding-9
 
 <!-- gen:spec-records -->
 
@@ -43,7 +43,8 @@ a stale verdict is visible in the record instead of to the next person who trips
   AC1, AC5, AC6.
 - **S5 — the four call sites.**
   - `--park`, after its idempotent no-op check and before `park`. An idempotent re-park writes
-    nothing and does not refresh.
+    nothing and does not refresh. The fact is written only after `park` appended, so a reason
+    `park` refuses, a carriage return this verb's own line-feed test cannot see, writes nothing.
   - `--abort`, after both attested items read met and before the phase write.
   - `--handoff`, the verb `TOOL-dUnstuckLanding-13` ships, after its last refusal and before its
     first write.
@@ -171,7 +172,8 @@ startup reads; the builder adds what it refuses on.
 - **AC1** — When `bash tools/unattended/unattended.sh --park fx --item q1 --reason r1` runs in F,
   stdout carries a `refresh —` line reading `2 of 3 commits`, lists the README commit and the
   work/a.txt commit, and does not list the other.txt commit. `RUN.md` then reads
-  `refreshed-at: <origin main sha> · park · 2 touching`.
+  `refreshed-at: <origin main sha> · park · 2 touching`. A park whose reason carries a carriage
+  return is refused, and `RUN.md` still equals HEAD's.
   Red when: the listing omits either touching commit, lists other.txt's, or the fact is absent.
 - **AC2** — When `--abort fx --code external-prerequisite --reason r2` runs in a fresh copy of F,
   stdout carries the same two rows and `RUN.md` reads `refreshed-at: <sha> · abort · 2 touching`
@@ -242,6 +244,9 @@ New arm: tools/unattended/unattended.test.sh · an in-place close over the same 
   records no fact, since `set_fact` would refuse there and the verb must not stop; and a tip taken
   from an anchor this process observed is object-tested here, since the quiet observer skips that
   test for a reused anchor. Status CLOSED.
+- rev-3 · 2026-10-04 · S5 AC1 · folded implementation review round 1 L1 (id 12): `--park` writes
+  `refreshed-at` only after `park` appended, so the carriage-return refusal `park` makes leaves the
+  record as committed, and AC1 asserts it.
 
 ## 10. Reuse audit
 

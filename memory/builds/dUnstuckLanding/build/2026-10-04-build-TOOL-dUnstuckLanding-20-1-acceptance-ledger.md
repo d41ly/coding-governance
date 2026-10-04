@@ -44,3 +44,8 @@ and dropped the override refusal made it red on exactly AC6's widening arm and A
 - AC12 — `tools/unattended/STOPS.template.md` — the grep showed fact 18, the §6 hand-off-node
   sentence, the §15 hand-off row and both VERBS entries, and `cmp` of each template against its
   render after `adopt-unattended.sh` reported no difference.
+- AC1 — amended rev-3 — a `%20`-escaped user matches its spaced name; section 9's rev-3 line logs it.
+- AC4 — amended rev-3 — a machine/user pair under two tags prints that pair.
+- AC5 — amended rev-3 — an unevaluable BASE conf, an unreadable machine and one pair under two tags
+  each record `landing: handoff`.
+- AC6 — amended rev-3 — a base fact moved to an older published commit reads `handoff` at `--close`.

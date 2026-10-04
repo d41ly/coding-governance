@@ -36,3 +36,5 @@ on exactly the other.txt row. The driver suite itself is owed to the close.
 - AC9 — `cmp` — PROTOCOL section 2 carries fact 17, each of the four VERBS entries names
   `refreshed-at`, and `cmp` of each template against its render after `adopt-unattended.sh` reported
   no difference.
+- AC1 — amended rev-3 — a park whose reason carries a carriage return is refused and leaves the
+  record equal to HEAD's; section 9's rev-3 line logs it.

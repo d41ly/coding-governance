@@ -49,3 +49,5 @@ function, 9 of 9. The whole suites and the gate legs are owed to the close.
   its parent, and `cmp` against the template exits 0.
 - AC13 — `last-audit:` — the manifest's stamp moved in the commit, beside `.unattended.conf` and
   `tools/gate-legs.json`.
+- AC1 — amended rev-4 — a fetch URL that is not the push URL, and a `GATE_PUSH_BASE` naming another
+  sha, each refuse naming the split; section 9's rev-4 line logs it.

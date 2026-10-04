@@ -509,9 +509,11 @@ answer reads `age unproven` and is never escalated: a leg with no `signature` wh
 WITHOUT every non-blank line of this run's output is one, since text cannot tell a fixed offender
 from a moved count line; red carrying all of them is `aged`. **The age decides the escalation, never
 the landing.** The policy is the pair of keys in the file `GATE_POLICY_FILE` names, both read at R
-and parsed, never sourced. The kit default is `land`: a blank `GATE_POLICY_FILE`, a policy file
-absent at R, and an absent or blank `INHERITED_RED` all read it, and `land` with no positive bound
-reads `land` with no bound. A value outside `park land` reads `park`. The item announces which.
+and parsed, never sourced. A blank `GATE_POLICY_FILE`, or a conf absent at R, reads the file the
+pre-push hook reads, `.githooks/gate-env.sh` at R, so the two readers cannot disagree. The kit
+default is `land`: that file absent too, a named policy file absent at R, and an absent or blank
+`INHERITED_RED` all read it, and `land` with no positive bound reads `land` with no bound. A value
+outside `park land` reads `park`. The item announces which.
 
 - **`land`, every red INHERITED at any age, on a bar whose verdict reads `tree_moved no`:** MET, and
   the record gains `gates-inherited: <R8> <legs>`; the MET line names the legs read `aged`. The

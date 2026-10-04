@@ -918,6 +918,21 @@ if [ -n "$PARK_KINDS_OWED" ]; then
 else
   fail 2 "the driver declares no PARK_KINDS_OWED taxonomy, so the surfaced count and the parked-decisions Definition-of-Done item both range over a set this leg cannot read: $DRIVER"
 fi
+# ---- THE HAND-OFF CODES, guarded as the hold codes are (TOOL-dUnstuckLanding-14 S1; closing review
+# ---- round 1, L5). `core_of` reads a renamed or missing constant as empty, and an empty set made
+# ---- check_derived_landed refuse every HELD record while the driver, reading its own constant, still
+# ---- derived LANDED for each: two readers of one phase disagreeing with nothing red. A member outside
+# ---- HOLD_CODES_CORE is a hand-off the hold vocabulary itself would refuse. Placed BELOW the pinned
+# ---- check-2 ordinals in the central unarmed-branches file, so none of them moves.
+if [ -z "$HOLD_CODES_HANDOFF" ]; then
+  fail 2 "the driver declares no readable HOLD_CODES_HANDOFF, so this leg would derive LANDED for no handed record while the driver derives it for each: $DRIVER"
+else
+  ho_bad=""
+  for ho in $HOLD_CODES_HANDOFF; do
+    case " $HOLD_CODES_CORE " in *" $ho "*) ;; *) ho_bad="$ho_bad $ho" ;; esac
+  done
+  [ -z "$ho_bad" ] || fail 2 "a hand-off code is not a member of the driver's HOLD_CODES_CORE, so a record could carry a hand-off the hold vocabulary refuses:$ho_bad"
+fi
 
 # ---------------------------------------------------------------------- 2 + 3: the core-set floors
 # WHY A COUNT AND NOT A MEMBERSHIP LIST. The first cut asserted "every CORE member is present in the

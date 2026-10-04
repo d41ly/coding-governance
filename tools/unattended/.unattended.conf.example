@@ -206,8 +206,10 @@ SPEC_TOKENS_CLI=""
 # `INHERITED_RED_MAX_AGE=<n>` from, when the bar is red only on legs the landing base already carries.
 # Both this key and the file it names are read AS COMMITTED AT the tip the remote advertises and are
 # PARSED, never sourced, so a run cannot grant itself a landing by editing either. BLANK names no
-# policy file, so the kit default `land` applies with no age bound, announced: every inherited red
-# lands, and nothing is escalated (ruling TOOL-dUnstuckLanding-22). Declare `park` in the file to hold.
+# policy file, so the pre-push hook's own .githooks/gate-env.sh is read at that tip instead, exactly
+# as the hook reads it; where that is absent too, the kit default `land` applies with no age bound,
+# announced: every inherited red lands, and nothing is escalated (ruling TOOL-dUnstuckLanding-22).
+# Declare `park` in the file to hold.
 GATE_POLICY_FILE=""
 
 # OPTIONAL, the same shape again, and the one key an ASK-DRIVEN run needs. The generator the driver
@@ -406,9 +408,10 @@ HANDOFF_CUTOFF=""
 
 # Which nodes may LAND a run, as space-separated `<tag>=<machine>/<user>` pairs: the tag one
 # lowercase letter, the machine as COMPUTERNAME or hostname names it and the user as USERNAME or
-# `id -un` does, all compared lowercased, e.g. "a=desk-a/alice b=build-02/ci". Never a path,
-# because roots can be identical across machines. Read at the run's pinned BASE, so a run cannot add
-# its own node. A run on any other node starts normally, records `landing: handoff`, and ends at
+# `id -un` does, all compared lowercased, e.g. "a=desk-a/alice b=build-02/ci". A space in a name is
+# written %20, as in "c=desk-c/john%20smith". Never a path, because roots can be identical across
+# machines. Read at the BASE the run's record was first committed with, so a run cannot add its own
+# node, and a moved base fact reads handoff. A run on any other node starts normally, records `landing: handoff`, and ends at
 # --handoff --code owner-landing with no override. The gate leg reds a malformed or doubled token.
 # Blank or absent: every node may land, announced at --preflight.
 LANDING_NODES=""

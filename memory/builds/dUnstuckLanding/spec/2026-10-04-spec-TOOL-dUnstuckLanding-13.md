@@ -1,6 +1,6 @@
 # TOOL-dUnstuckLanding-13 — `--handoff`: a run whose work is sound, but which an owner must land or decide, ends HELD instead of ABORTED
 
-**Status:** CLOSED · rev-3 · 2026-10-04 · node d · Tier-2 · base 98926870 · streams tooling · order 1 · closes TOOL-dUnstuckLanding-3
+**Status:** CLOSED · rev-4 · 2026-10-04 · node d · Tier-2 · base 98926870 · streams tooling · order 1 · closes TOOL-dUnstuckLanding-3
 
 <!-- gen:spec-records -->
 
@@ -410,6 +410,9 @@ New arm: tools/unattended/check-unattended.test.sh · the AC11 dropped hold code
   amendment-leaves-its-other-half-standing: protocol §2 listed the parked kinds and the surfaced
   set without `handoff`. S11 now names that edit and the §2 trim that pays for it, and the
   drift-audit run-record fixture gains a `handoff` owed row beside the owed kinds it carried.
+- rev-4 · 2026-10-04 · §9 · implementation review round 1 M3 (id 10), the correctness lens's
+  duplicate of H3, is closed by `TOOL-dUnstuckLanding-27`, whose record-only tie excludes exactly
+  the paths the bar's own close step staged. No scope, design or criterion of this unit moved.
 
 ## 10. Reuse audit
 

@@ -394,8 +394,14 @@ read_user_name() { # -> the user's name, lowercased, or nothing
 # the declaration through the second, so the two readers cannot disagree about which token is a pair.
 # Every field compares LOWERCASED, for `read_host_name`'s reason. A node is a machine AND a user,
 # never a path: the charter's node registry forbids a path, because roots can be identical.
+#
+# `%20` SPELLS A SPACE (closing review round 1, L2). The value is word-split, so `a=desk/john smith`
+# was two tokens, and a Windows account named `john smith` could never be declared. The pair is decoded
+# before it is compared. `scan_landing_nodes` compares the RAW tokens: a token can hold no literal
+# space, so two raw spellings decode alike exactly when they are equal, and its duplicate test stays
+# exact without decoding into the space its own seen-list splits on.
 resolve_landing_tag() { # nodes · machine · user -> the one matching pair's tag; 1 on none, an empty input, or two tags
-  local - nodes m u tok tag mu hit=""
+  local - nodes m u tok tag mu hit="" esc='%20'
   set -f
   nodes=$(printf '%s' "$1" | tr '[:upper:]' '[:lower:]')
   m=$(printf '%s' "$2" | tr '[:upper:]' '[:lower:]'); u=$(printf '%s' "$3" | tr '[:upper:]' '[:lower:]')
@@ -404,6 +410,7 @@ resolve_landing_tag() { # nodes · machine · user -> the one matching pair's ta
     case "$tok" in [a-z]=?*/?*) ;; *) continue ;; esac
     tag=${tok%%=*}; mu=${tok#*=}
     case "$mu" in */*/*) continue ;; esac
+    mu=${mu//"$esc"/ }
     [ "$mu" = "$m/$u" ] || continue
     if [ -n "$hit" ] && [ "$hit" != "$tag" ]; then return 1; fi
     hit=$tag
@@ -918,9 +925,10 @@ read_run_commits() {  # endpoint · base · exclusion-tip…
 # ------------------------------------------------- the advertised tip, for the two history legs
 # TOOL-dUnstuckLanding-17 S1. `pass-order history` and `brief-recorded` grade only the commits the
 # closing run adds on top of the tip the REMOTE advertises, and this is the one place either learns
-# that tip. ONE bounded `ls-remote --symref --exit-code <remote> HEAD`, and nothing else is read: never
-# a local ref, never `refs/remotes/<remote>/HEAD`, never an environment variable. Every one of those is
-# a value the graded run controls, and a range the run names is a range the run can empty.
+# that tip. ONE bounded `ls-remote --symref --exit-code <remote> HEAD`, and nothing else names the tip:
+# never a local ref, never `refs/remotes/<remote>/HEAD`, never an environment variable. Every one of
+# those is a value the graded run controls, and a range the run names is a range the run can empty.
+# The one variable read, GATE_PUSH_BASE, can only refuse the tip, never supply one (M6 below).
 #
 # THE BOUNDS ARE THE DRIVER'S, READ AS DATA. `REMOTE_BOUND`, `REMOTE_CONNECT_BOUND` and
 # `REMOTE_LOWSPEED_BYTES` are file constants in the driver; this reads their quoted values out of the
@@ -930,15 +938,25 @@ read_run_commits() {  # endpoint · base · exclusion-tip…
 #
 # EVERY FAILURE IS A RETURN OF 1 WITH THE REASON IN `ADVH_WHY`, and the caller widens to grading the
 # WHOLE history, never to an empty range. An unanswered observation that narrowed the range would be a
-# probe reading zero. The six refusals: no remote or more than one, a constant that does not read, no
-# working `timeout -k` (the bound would be inert), the bound firing, a remote advertising no HEAD, and
-# an advertised object this clone does not hold.
+# probe reading zero. The refusals: no remote or more than one, a constant that does not read, a fetch
+# URL that is not the push URL, no working `timeout -k` (the bound would be inert), the bound firing, a
+# remote advertising no HEAD, a tip the push's own ref line contradicts, and an advertised object this
+# clone does not hold.
+#
+# THE FETCH URL MUST BE THE PUSH URL, and in pre-push the tip must be GATE_PUSH_BASE (closing review
+# round 1, M6). `ls-remote` follows `remote.<name>.url` and `insteadOf`, so a run pointing the fetch URL
+# at a seeded copy advertising an older tip narrowed both legs while its push went to the real remote.
+# The driver's anchor observation refuses that split at fail 25; this reader now widens on it. The
+# pre-push hook writes GATE_PUSH_BASE from git's own ref line, the push connection's answer, so a tip
+# disagreeing with it is refused. Both tests can only WIDEN: an equal pair narrows nothing it did not.
 #
 # WHAT THIS DOES NOT DO: share the kit gate's observation or the driver's `read_advertised_tip`. Three
-# bounded observations of one advertisement is a known residual, stated in the unit's spec.
+# bounded observations of one advertisement is a known residual, stated in the unit's spec. Nor does it
+# defeat a run that points BOTH URLs at one seeded relay, outside pre-push, where nothing ties the tip
+# to the push: both are config the run writes, protocol section 9's limit for a check under its uid.
 ADVH_SHA=""; ADVH_WHY=""
 read_advertised_head() { # driver path -> 0 with ADVH_SHA set · 1 with ADVH_WHY set
-  local _ah_drv=${1:-} _ah_k _ah_l _ah_v _ah_b="" _ah_cb="" _ah_lb="" _ah_rems _ah_n _ah_rem _ah_f _ah_rc _ah_sha
+  local _ah_drv=${1:-} _ah_k _ah_l _ah_v _ah_b="" _ah_cb="" _ah_lb="" _ah_rems _ah_n _ah_rem _ah_fu _ah_pu _ah_f _ah_rc _ah_sha
   ADVH_SHA=""; ADVH_WHY=""
   if [ -z "$_ah_drv" ] || [ ! -f "$_ah_drv" ]; then
     ADVH_WHY="the driver that holds the remote bounds is not readable: ${_ah_drv:-<none given>}"; return 1
@@ -970,6 +988,10 @@ read_advertised_head() { # driver path -> 0 with ADVH_SHA set · 1 with ADVH_WHY
     1) _ah_rem=$_ah_rems ;;
     *) ADVH_WHY="this clone declares $_ah_n remotes, and which one the landing reaches is not this reader's to guess"; return 1 ;;
   esac
+  _ah_fu=$(GIT ls-remote --get-url "$_ah_rem" 2>/dev/null); _ah_pu=$(GIT remote get-url --push "$_ah_rem" 2>/dev/null)
+  if [ -z "$_ah_fu" ] || [ "$_ah_fu" != "$_ah_pu" ]; then
+    ADVH_WHY="the remote $_ah_rem is read from ${_ah_fu:-nothing} and pushed to ${_ah_pu:-nothing}, so a tip read from the first is not the one a push lands on"; return 1
+  fi
   if ! timeout -k 1s 10 true >/dev/null 2>&1; then
     ADVH_WHY="this node has no working 'timeout -k', so the remote observation cannot be bounded"; return 1
   fi
@@ -995,6 +1017,9 @@ read_advertised_head() { # driver path -> 0 with ADVH_SHA set · 1 with ADVH_WHY
   esac
   if [ -z "$_ah_sha" ]; then
     ADVH_WHY="the remote $_ah_rem answered and advertised no HEAD, so it names no default-branch tip"; return 1
+  fi
+  if [ -n "${GATE_PUSH_BASE:-}" ] && [ "$_ah_sha" != "$GATE_PUSH_BASE" ]; then
+    ADVH_WHY="the remote advertises ${_ah_sha:0:8} and the push's own ref line names ${GATE_PUSH_BASE:0:8} as the default branch it moves, so the two observations disagree"; return 1
   fi
   if ! GIT rev-parse --verify --quiet "$_ah_sha^{commit}" >/dev/null 2>&1; then
     ADVH_WHY="the remote $_ah_rem advertises ${_ah_sha:0:8}, a tip this clone does not hold; fetch and read again"; return 1
