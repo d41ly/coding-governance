@@ -247,7 +247,7 @@ Keep units small: one stream/owner, no cross-stream contract change, reviewable 
   descriptor each, asserted against the tracked surface in both directions — a new moving part reds
   until a declaration claims it, and an exemption naming a path that no longer exists reds too,
   because a stale one silently widens the surface it was written to narrow.
-- Keep the automated suite green at the push boundary: `bash tools/run-gates/run-gates.sh — the legs are single-sourced from tools/gate-legs.json; read that, never a list typed elsewhere` (typecheck/compile · lint · test · generated-artifact freshness · structural invariants). Gates are the quality floor; reviews cover only what gates can't.
+- Keep the automated suite green at the push boundary, or red only on legs the inherited-red policy lands (`memory/guides/UNATTENDED-STOPS.md` §13): `bash tools/run-gates/run-gates.sh — the legs are single-sourced from tools/gate-legs.json; read that, never a list typed elsewhere` (typecheck/compile · lint · test · generated-artifact freshness · structural invariants). Gates are the quality floor; reviews cover only what gates can't.
 - Wire the suite into remote CI as machine-required checks (`.github/workflows/remote-ci.yml`) — convention is not enforcement.
 - Provide one command that runs the whole local bar with legs concurrent, wall ≈ longest leg: `bash tools/run-gates/run-gates.sh`.
 - A slow leg may have a sanctioned faster local variant — document the equivalence explicitly (which local run satisfies which CI leg), so local verification is fast AND unambiguous.

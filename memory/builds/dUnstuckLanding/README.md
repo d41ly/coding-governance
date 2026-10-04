@@ -4,7 +4,7 @@ node: d
 opened: 2026-10-04
 streams: tooling
 roster: TOOL
-ids: TOOL-dUnstuckLanding-1 TOOL-dUnstuckLanding-2 TOOL-dUnstuckLanding-3 TOOL-dUnstuckLanding-4 TOOL-dUnstuckLanding-5 TOOL-dUnstuckLanding-6 TOOL-dUnstuckLanding-7 TOOL-dUnstuckLanding-8 TOOL-dUnstuckLanding-9 TOOL-dUnstuckLanding-10 TOOL-dUnstuckLanding-11 TOOL-dUnstuckLanding-12 TOOL-dUnstuckLanding-13 TOOL-dUnstuckLanding-14 TOOL-dUnstuckLanding-15 TOOL-dUnstuckLanding-16 TOOL-dUnstuckLanding-17 TOOL-dUnstuckLanding-18 TOOL-dUnstuckLanding-19 TOOL-dUnstuckLanding-20 TOOL-dUnstuckLanding-21 TOOL-dUnstuckLanding-22 TOOL-dUnstuckLanding-23 TOOL-dUnstuckLanding-24 TOOL-dUnstuckLanding-25 TOOL-dUnstuckLanding-26 TOOL-dUnstuckLanding-27
+ids: TOOL-dUnstuckLanding-1 TOOL-dUnstuckLanding-2 TOOL-dUnstuckLanding-3 TOOL-dUnstuckLanding-4 TOOL-dUnstuckLanding-5 TOOL-dUnstuckLanding-6 TOOL-dUnstuckLanding-7 TOOL-dUnstuckLanding-8 TOOL-dUnstuckLanding-9 TOOL-dUnstuckLanding-10 TOOL-dUnstuckLanding-11 TOOL-dUnstuckLanding-12 TOOL-dUnstuckLanding-13 TOOL-dUnstuckLanding-14 TOOL-dUnstuckLanding-15 TOOL-dUnstuckLanding-16 TOOL-dUnstuckLanding-17 TOOL-dUnstuckLanding-18 TOOL-dUnstuckLanding-19 TOOL-dUnstuckLanding-20 TOOL-dUnstuckLanding-21 TOOL-dUnstuckLanding-22 TOOL-dUnstuckLanding-23 TOOL-dUnstuckLanding-24 TOOL-dUnstuckLanding-25 TOOL-dUnstuckLanding-26 TOOL-dUnstuckLanding-27 TOOL-dUnstuckLanding-28
 authorized-by: prompt
 ---
 
@@ -76,7 +76,7 @@ prompt is recorded verbatim under `prompts/`.
 **Build status:** CLOSED · 13 unit(s) · node d · opened 2026-10-04 · streams tooling
 ids TOOL-dUnstuckLanding-1 TOOL-dUnstuckLanding-2 TOOL-dUnstuckLanding-3 TOOL-dUnstuckLanding-4 TOOL-dUnstuckLanding-5 TOOL-dUnstuckLanding-6 TOOL-dUnstuckLanding-7 TOOL-dUnstuckLanding-8 TOOL-dUnstuckLanding-9 TOOL-dUnstuckLanding-10 TOOL-dUnstuckLanding-11 TOOL-dUnstuckLanding-12
 ids TOOL-dUnstuckLanding-13 TOOL-dUnstuckLanding-14 TOOL-dUnstuckLanding-15 TOOL-dUnstuckLanding-16 TOOL-dUnstuckLanding-17 TOOL-dUnstuckLanding-18 TOOL-dUnstuckLanding-19 TOOL-dUnstuckLanding-20 TOOL-dUnstuckLanding-21 TOOL-dUnstuckLanding-22 TOOL-dUnstuckLanding-23 TOOL-dUnstuckLanding-24
-ids TOOL-dUnstuckLanding-25 TOOL-dUnstuckLanding-26 TOOL-dUnstuckLanding-27
+ids TOOL-dUnstuckLanding-25 TOOL-dUnstuckLanding-26 TOOL-dUnstuckLanding-27 TOOL-dUnstuckLanding-28
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
