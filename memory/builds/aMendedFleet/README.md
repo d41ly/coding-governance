@@ -172,7 +172,7 @@ ids TOOL-aMendedFleet-96
 | [TOOL-aMendedFleet-2 — a definition-level census of every merge since 2026-09-01](spec/2026-10-04-spec-TOOL-aMendedFleet-2.md) | 2 | 1 | CLOSED | rev-1 | 2026-10-04 |
 | [TOOL-aMendedFleet-3 — the lander refuses a merge that loses a definition a parent carried](spec/2026-10-04-spec-TOOL-aMendedFleet-3.md) | 3 | 2 | CLOSED | rev-4 | 2026-10-05 |
 | [TOOL-aMendedFleet-4 — the govkit acceptance matrix reads its children as UTF-8 on every host](spec/2026-10-04-spec-TOOL-aMendedFleet-4.md) | 4 | 1 | CLOSED | rev-1 | 2026-10-04 |
-| [TOOL-aMendedFleet-5 — `transition-audit arms` passes on the hosted runner: the audit writes UTF-8](spec/2026-10-04-spec-TOOL-aMendedFleet-5.md) | 5 | 1 | SPECCED | rev-1 | 2026-10-04 |
+| [TOOL-aMendedFleet-5 — `transition-audit arms` passes on the hosted runner: the audit writes UTF-8](spec/2026-10-04-spec-TOOL-aMendedFleet-5.md) | 5 | 1 | CLOSED | rev-1 | 2026-10-04 |
 | [TOOL-aMendedFleet-6 — `lexicon wiring` passes on the hosted runner: the conf reader writes UTF-8](spec/2026-10-04-spec-TOOL-aMendedFleet-6.md) | 6 | 1 | SPECCED | rev-1 | 2026-10-04 |
 | [TOOL-aMendedFleet-7 — a census of the daily held job's red suites by root cause, adding one unit per cause](spec/2026-10-04-spec-TOOL-aMendedFleet-7.md) | 7 | 1 | SPECCED | rev-2 | 2026-10-04 |
 | [TOOL-aMendedFleet-8 — drift-audit reports `remote_ci_red_streak`](spec/2026-10-04-spec-TOOL-aMendedFleet-8.md) | 8 | 1 | SPECCED | rev-2 | 2026-10-04 |

@@ -1051,4 +1051,7 @@ def main(argv: list) -> int:
 
 
 if __name__ == "__main__":
+    # Its `·` separators reach a consumer as UTF-8 on every host, not the ANSI code page a Windows
+    # stdout takes outside UTF-8 mode. Here and not at import, so an importer keeps its own stdout.
+    sys.stdout.reconfigure(encoding="utf-8")
     sys.exit(main(sys.argv[1:]))

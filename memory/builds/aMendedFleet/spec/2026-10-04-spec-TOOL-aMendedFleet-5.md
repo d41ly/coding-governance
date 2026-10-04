@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-5 — `transition-audit arms` passes on the hosted runner: the audit writes UTF-8
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · order 5
+**Status:** CLOSED · rev-1 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
