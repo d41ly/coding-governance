@@ -27,12 +27,13 @@ and dropped the override refusal made it red on exactly AC6's widening arm and A
 - AC6 — `LANDING_NODES` — undeclared at BASE with node `b` committed by the run, the preflight
   printed `landing — undeclared` and wrote no `landing` line; with the BASE value widened by the
   run's own commit, node `b` still recorded `handoff`.
-- AC7 — `--override build-complete` — node `b`'s override close printed `UNATTENDED check 104
-  FAILED` naming `--park` and `--handoff`, printed no `observing the anchor` line, and
+- AC7 — `--override build-complete` — node `b`'s override close printed the check 104 refusal
+  naming `--park` and `--handoff`, printed no `observing the anchor` line, and
   `git status --porcelain` printed nothing.
-- AC8 — `--close fx` — node `b`'s met close exited 1 with check 105 naming `--handoff tLn --code
-  owner-landing`, wrote `gates-run`, staged only the record, and held no `phase: LANDING` line;
-  after the record was committed, that `--handoff` completed and the record read `phase: HELD`.
+- AC8 — `--close fx` — node `b`'s met close exited 1 with check 105 naming
+  `--handoff tLn --code owner-landing`, wrote `gates-run`, staged only the record, and held no
+  `phase: LANDING` line; after the record was committed, that `--handoff` completed and the record
+  read `phase: HELD`.
 - AC9 — `the close runs as node` — after a node-`d` preflight recorded `landing: lander`, node `b`'s
   close printed the disagreement line and check 105, and wrote no LANDING.
 - AC10 — `phase: LANDING` — node `d`'s met close printed `close OK` and wrote `phase: LANDING`, and

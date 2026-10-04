@@ -69,7 +69,7 @@ with no override.
   - PROTOCOL §8 gains its key row, §2 gains the `landing` fact as the next numbered authored fact,
     and §6 gains one sentence on the hand-off node.
   - VERBS gains one sentence each on `--preflight` and `--close`.
-  - Both renders under `memory/guides/` are re-copied in the same pass.
+  - Every render under `memory/guides/` is re-copied in the same pass.
 
   Observed by AC11, AC12.
 - **S8 — the close-decision row.** The close-decision table `TOOL-dUnstuckLanding-18` added to the
@@ -301,9 +301,9 @@ New arm: tools/unattended/check-unattended.test.sh · a fixture conf declaring a
   no `landing` verb, so the library functions are `resolve_landing_tag` and `scan_landing_nodes`;
   S2, S6, §4 and AC1, AC2, AC4 and AC11 now spell them so. The close-decision table unit 18 added
   lives in the stop contract's §15, not in PROTOCOL, so S8 targets `STOPS.template.md` and its
-  render, the files-touched list names both, and AC12's grep reads STOPS too. The protocol had 49
-  bytes under its cap, so the fact, the §6 sentence and the §8 row were paid for by cutting four
-  pieces of history prose, no rule: §2's account of the generated region's earlier byte-compared
+  render, the files-touched list names both, S7 says every render is re-copied rather than both,
+  and AC12's grep reads STOPS too. The protocol had 49 bytes under its cap, so the fact, the §6
+  sentence and the §8 row were paid for by cutting four pieces of history prose, no rule: §2's account of the generated region's earlier byte-compared
   design, the records-current cell's "this cell once described" sentence, §4 `landed-via-lander`'s
   note on the removed bypass-flag grep, and §7's note that nothing changed in the move to VERBS.
   The driver's new fail numbers are 104 and 105 and the leg's new check is 49.
