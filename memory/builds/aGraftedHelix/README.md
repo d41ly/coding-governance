@@ -6,8 +6,7 @@ streams: tooling+kickoff
 roster: TOOL
 authorized-by: prompt
 spec-audit: 2026-10-04
-status: OPEN
-ids: TOOL-aGraftedHelix-1 TOOL-aGraftedHelix-9
+ids: TOOL-aGraftedHelix-1 TOOL-aGraftedHelix-2 TOOL-aGraftedHelix-3 TOOL-aGraftedHelix-4 TOOL-aGraftedHelix-5 TOOL-aGraftedHelix-6 TOOL-aGraftedHelix-7 TOOL-aGraftedHelix-8 TOOL-aGraftedHelix-9
 ---
 
 # aGraftedHelix — six helixir mechanisms, grafted onto the kits that own their surface
@@ -69,23 +68,43 @@ self-heals go unreported. The owner's prompt and the review are in `prompts/`.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 0 unit(s) · node a · opened 2026-10-04 · streams tooling+kickoff
-ids TOOL-aGraftedHelix-1 TOOL-aGraftedHelix-9
+**Build status:** SPECCED · 9 unit(s) · node a · opened 2026-10-04 · streams tooling+kickoff
+ids TOOL-aGraftedHelix-1 TOOL-aGraftedHelix-2 TOOL-aGraftedHelix-3 TOOL-aGraftedHelix-4 TOOL-aGraftedHelix-5 TOOL-aGraftedHelix-6 TOOL-aGraftedHelix-7 TOOL-aGraftedHelix-8 TOOL-aGraftedHelix-9
 
 <!-- gen:build-units -->
-*No spec under this build carries a status header; the status above is declared in the front matter.*
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-aGraftedHelix-1 — the driver claims a run on the remote as a compare-and-swap ref, and refuses a live foreign claim](spec/2026-10-04-spec-TOOL-aGraftedHelix-1.md) | 1 | 2 | SPECCED | rev-1 | 2026-10-04 |
+| [TOOL-aGraftedHelix-2 — the orientation card lists the remote run claims under a two-clock rule](spec/2026-10-04-spec-TOOL-aGraftedHelix-2.md) | 2 | 1 | SPECCED | rev-1 | 2026-10-04 |
+| [TOOL-aGraftedHelix-3 — invariant records in the bug-class catalogue become the review's by-design list](spec/2026-10-04-spec-TOOL-aGraftedHelix-3.md) | 3 | 2 | SPECCED | rev-1 | 2026-10-04 |
+| [TOOL-aGraftedHelix-4 — recall labels a superseded record and ranks it under its successor](spec/2026-10-04-spec-TOOL-aGraftedHelix-4.md) | 4 | 1 | SPECCED | rev-1 | 2026-10-04 |
+| [TOOL-aGraftedHelix-9 — a newly added decision row or gotcha that ranks as a near match must name its relation](spec/2026-10-04-spec-TOOL-aGraftedHelix-9.md) | 5 | 2 | SPECCED | rev-1 | 2026-10-04 |
+| [TOOL-aGraftedHelix-6 — a decision row or gotcha whose normalized text another record already holds reds](spec/2026-10-04-spec-TOOL-aGraftedHelix-6.md) | 6 | 2 | SPECCED | rev-1 | 2026-10-04 |
+| [TOOL-aGraftedHelix-5 — each leg reading is stamped faithful or contended by a foreign-load census, and only faithful readings argue a ceiling](spec/2026-10-04-spec-TOOL-aGraftedHelix-5.md) | 7 | 2 | SPECCED | rev-1 | 2026-10-04 |
+| [TOOL-aGraftedHelix-7 — the gate runner stops dispatching legs above a declared memory fraction and records the pause](spec/2026-10-04-spec-TOOL-aGraftedHelix-7.md) | 8 | 2 | SPECCED | rev-1 | 2026-10-04 |
+| [TOOL-aGraftedHelix-8 — every automatic self-heal appends one line to a health log the orientation card counts](spec/2026-10-04-spec-TOOL-aGraftedHelix-8.md) | 9 | 1 | SPECCED | rev-1 | 2026-10-04 |
 <!-- /gen:build-units -->
 
-Records: 2 bound to this build, across 1 record folder(s).
+Records: 2 bound to this build, across 2 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: none — every unit id has one.
+Ids no `spec-audit` record has ever named: TOOL-aGraftedHelix-1 TOOL-aGraftedHelix-2 TOOL-aGraftedHelix-3 TOOL-aGraftedHelix-4 TOOL-aGraftedHelix-5 TOOL-aGraftedHelix-6 TOOL-aGraftedHelix-7 TOOL-aGraftedHelix-8 TOOL-aGraftedHelix-9.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
 
-*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+| Step | Units | Parallel |
+|---|---|---|
+| 1 | `TOOL-aGraftedHelix-1` | no |
+| 2 | `TOOL-aGraftedHelix-2` | no |
+| 3 | `TOOL-aGraftedHelix-3` | no |
+| 4 | `TOOL-aGraftedHelix-4` | no |
+| 5 | `TOOL-aGraftedHelix-9` | no |
+| 6 | `TOOL-aGraftedHelix-6` | no |
+| 7 | `TOOL-aGraftedHelix-5` | no |
+| 8 | `TOOL-aGraftedHelix-7` | no |
+| 9 | `TOOL-aGraftedHelix-8` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
