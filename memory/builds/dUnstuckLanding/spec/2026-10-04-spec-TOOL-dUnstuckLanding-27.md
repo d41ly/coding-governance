@@ -1,10 +1,12 @@
 # TOOL-dUnstuckLanding-27 — the implementation review's three HIGH findings closed
 
-**Status:** INPROGRESS · rev-1 · 2026-10-04 · node d · Tier-2 · base 98926870 · streams tooling
+**Status:** CLOSED · rev-2 · 2026-10-04 · node d · Tier-2 · base 98926870 · streams tooling
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-04-build-TOOL-dUnstuckLanding-27-1-acceptance-ledger.md](../build/2026-10-04-build-TOOL-dUnstuckLanding-27-1-acceptance-ledger.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
@@ -73,6 +75,16 @@ MET path that writes `gates-run`, and `check_bar_tied` reads it. A new fact owes
 list. The protocol has about 470 bytes of room. If the fact does not fit, pay for it with history
 prose only, as unit 20 did.
 
+Three details the build settled (rev-2):
+
+- **No stale set.** Gates-green also writes `gates-run` on an UNMET bar. There, a record that already
+  carries `gates-staged` has it rewritten to the record alone, so a later bar never inherits an older
+  close's set. A record that never carried the fact gains none.
+- **The memory root bounds the set.** `check_bar_tied` excludes only entries under the memory root,
+  because the close stages nothing else. Any other entry is named on a NOTE line and not excluded.
+- **The fallback is announced.** With no fact, the tie prints one NOTE line, once per process, saying
+  it excludes the run-state file alone.
+
 ### Files touched (estimate)
 
 - `tools/unattended/check-brief-recorded.sh`
@@ -126,6 +138,9 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-04 · initial draft, promoted from the implementation review's round-1 HIGH items.
+- rev-2 · 2026-10-04 · built; §4 records three details the build settled: the UNMET path rewrites a stale
+  `gates-staged` to the record alone, the tie excludes only entries under the memory root, and the
+  fallback prints one NOTE line.
 
 ## 10. Reuse audit
 

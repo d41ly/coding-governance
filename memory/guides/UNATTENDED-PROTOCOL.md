@@ -225,6 +225,9 @@ belonging here:
 17. **The refresh**, `refreshed-at`: the tip a verdict verb last saw past BASE, or `unobserved`.
 18. **The landing node**, `landing: lander` or `handoff`, resolved by `--preflight` from
     `LANDING_NODES` (§8) at BASE and written afresh like the lease; absent when undeclared.
+19. **The bar's staged set**, `gates-staged`, written beside `gates-run`: the record, the build's
+    `BACKLOG.md` and the views gates-green staged. `--handoff`'s bar tie excludes exactly these;
+    absent, the record alone.
 
 Facts 10, 11 and 12 are ABSENT on a run that never reached the condition each records; the
 "nothing else" clause bounds what may appear, not what must. Fact 9 is always written, fact 13

@@ -8612,6 +8612,30 @@ su_b=$(read_su_sum memory/builds/tAwork/RUN.md)
 hit "$(run_su --settle tAwork)" "--settle reads a working record as abandoned only when --liveness says STALE or UNBOUND, and it says LIVE, so a session may still drive it and settling it would end a live run; nothing was written"
 same "AC6 the live record was not settled" "$(read_su_sum memory/builds/tAwork/RUN.md)" "$su_b"
 
+# ---- TOOL-dUnstuckLanding-27 S2, AC2 and AC3: UNBOUND is an unanswered probe, never a verdict. The
+# ---- lease `write_lease` records under a harness exporting no session id reads `session: absent`, so
+# ---- a LEASED record whose last move is seconds old reads UNBOUND and is refused naming the lease;
+# ---- the same leased record aged past the bound with no live pid settles. AC3, the legacy record
+# ---- with no `lease-utc` fact settling on UNBOUND alone, is AC6's first arm above, unchanged. RED,
+# ---- the first, against the admit that took UNBOUND whole: it wrote `abandoned` over a live run.
+write_su_aborted
+add_facts "$su_dir/memory/builds/tAwork/RUN.md" "$(printf 'keepalive: k1\nsession: absent\npid: absent\nlease-utc: %s' "$(date -u +%Y-%m-%dT%H:%M:%SZ)")"
+run_su_git commit -qam "records(tAwork): a lease with no session" --no-verify
+hit "$(run_su --liveness tAwork)" "verdict: UNBOUND"
+su_b=$(read_su_sum memory/builds/tAwork/RUN.md)
+out=$(run_su --settle tAwork)
+hit  "$out" "--settle reads a leased working record whose session is absent as abandoned only when its last move is stale and its pid is not alive, and the lease written at "
+hit  "$out" " reads stale no and pid-alive "
+same "TOOL-dUnstuckLanding-27 AC2 the fresh leased record was not settled" "$(read_su_sum memory/builds/tAwork/RUN.md)" "$su_b"
+write_su_aborted
+add_facts "$su_dir/memory/builds/tAwork/RUN.md" "$(printf 'keepalive: k1\nsession: absent\npid: absent\nlease-utc: 2000-01-01T00:00:00Z')"
+GIT_AUTHOR_DATE="2000-01-01T00:00:00Z" GIT_COMMITTER_DATE="2000-01-01T00:00:00Z" \
+  run_su_git commit -qam "records(tAwork): an old lease with no session" --no-verify
+su_gd=$(run_su_git rev-parse --absolute-git-dir); rm -rf "$su_gd/gate-logs" "$su_gd/gate-queue-heartbeat"
+out=$(run_su --settle tAwork)
+hit  "$out" "unattended: settled memory/builds/tAwork/RUN.md as abandoned at phase BUILDING with its work landed - work-landed-at $SU_W_tAwork $SU_REC · abandoned "
+miss "$out" "--settle reads a leased working record whose session is absent"
+
 # ---- AC7: the leg UPHOLDS work-landed-at. Written by hand onto the reverted record it reds, naming
 # ---- the fact and the file; the settled bytes of the kept record red nothing; an `abandoned` marker
 # ---- standing alone reds.
@@ -13010,6 +13034,73 @@ out=$(run_ln "$LN_NB" --close tLn)
 hit  "$out" "close OK"
 miss "$out" "unattended: landing —"
 same "TOOL-dUnstuckLanding-20 AC10 an undeclared project closes as today" "$(read_ln_fact phase)" "LANDING"
+
+# ---- TOOL-dUnstuckLanding-27 S3, AC4 and AC5: a REAL inherited-red close on a hand-off node, never a
+# ---- seeded bar record, because the defect lived in what the real producer stages beyond the record.
+# ---- The bar is a stub writing an all-INHERITED red record with its attribution; the leg's argv sits in
+# ---- the manifest at the advertised tip; ASKS_CMD reads a filed ask back OPEN. So gates-green is MET
+# ---- under the kit default land, files one ask into the build's BACKLOG.md and stages it beside the
+# ---- record, and the close fails 105. The operator commits what it staged, and the hand-off it names
+# ---- is ADMITTED because `gates-staged` names exactly that set. RED against the tie that excluded the
+# ---- record alone: fail 83, `the bar it names ran at`. AC5: a spec under the build folder edited after
+# ---- the bar is outside the recorded set, so the same hand-off still fails 83.
+build_ln_inherited() { # -> a hand-off node's run, preflighted and attested, whose bar reds INHERITED
+  build_ln_fixture "$LN_VALUE" -
+  (
+    cd "$ln_root/repo" || exit 2
+    git checkout -q main
+    mkdir -p bin "$TOOL_REL"
+    printf '[\n  {"name": "x leg", "argv": ["bash", "fx/x.sh"]}\n]\n' > "$TOOL_REL/gate-legs.json"
+    printf '%s\n' 'd="$(git rev-parse --git-dir)/gate-run/$GATE_RUN_ID"; mkdir -p "$d"' \
+      "m='$TOOL_REL/gate-legs.json'" \
+      'printf "head\t%s\ntree_clean\tyes\nmanifest\t%s\n" "$(git rev-parse HEAD)" "$m" > "$d/header"' \
+      'printf "verdict\tRED\nfailed\t1\ntree_moved\tno\n" > "$d/verdict"' \
+      'printf "x leg\tINHERITED\t1\t0\t%s\t3\t0badc0de\t-\tstub\n" "${GATE_ATTRIBUTE:--}" > "$d/attribution"' \
+      'echo "GATE FAIL  x leg  (exit 1)"' 'exit 1' > bar.sh
+    cat > bin/asks.sh <<'LNA'
+#!/usr/bin/env bash
+ids=""
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --ready) shift; while [ $# -gt 0 ] && [ "${1#--}" = "$1" ]; do ids="$ids $1"; shift; done; continue ;;
+  esac
+  shift
+done
+c=0
+for id in $ids; do
+  h=${id#*-}; h=${h%-*}
+  printf 'ask\t%s\tOPEN\t-\t%s\tHIGH\t-\t-\t-\t-\t-\n' "$id" "$h"; c=$((c + 1))
+done
+printf 'examined\t%s\n' "$c"
+LNA
+    printf 'ASKS_CMD="bash bin/asks.sh"\n' >> .unattended.conf
+    git add -A && git commit -q -m "an inherited red, its manifest and the ask generator" --no-verify
+    git push -q origin main
+    git checkout -q -B unit main && git commit -q --allow-empty -m "unit work" --no-verify
+  ) >/dev/null 2>&1
+  run_ln_preflight "$LN_NB"; write_ln_dod_records "$LN_NB"
+}
+build_ln_inherited
+out=$(run_ln "$LN_NB" --close tLn)
+hit  "$out" "gates-green: filed ask ARCH-tLn-2 for leg x leg red at "
+hit  "$out" "every declared Definition-of-Done item is met and this node may not land, so the bar's facts are written and staged and no phase is"
+ln_set=$(read_ln_fact gates-staged)
+same "TOOL-dUnstuckLanding-27 AC4 the staged set opens with the record" "${ln_set%% *}" "$LN_R"
+hit  "$ln_set" " memory/builds/tLn/BACKLOG.md"
+same "TOOL-dUnstuckLanding-27 AC4 every staged path is in the recorded set" \
+  "$(run_ln_git diff --cached --name-only | while IFS= read -r p; do case " $ln_set " in *" $p "*) ;; *) echo "$p" ;; esac; done)" ""
+run_ln_git commit -q -m "records(tLn): the bar's facts and the filed ask" --no-verify
+out=$(run_ln "$LN_NB" --handoff tLn --code owner-landing --reason "an owner lands it" --reaped k1)
+hit  "$out" "phase HELD · code owner-landing · until owner"
+miss "$out" "the condition that failed: the bar it names ran at"
+same "TOOL-dUnstuckLanding-27 AC4 the hand-off after an inherited-red close completes" "$(read_ln_fact phase)" "HELD"
+build_ln_inherited
+run_ln "$LN_NB" --close tLn >/dev/null
+printf '\nedited after the bar\n' >> "$ln_root/repo/memory/builds/tLn/spec/one.md"
+run_ln_git add -A >/dev/null && run_ln_git commit -q -m "records(tLn): the bar's facts, and a spec edit" --no-verify
+out=$(run_ln "$LN_NB" --handoff tLn --code owner-landing --reason "an owner lands it" --reaped k1)
+hit  "$out" "--handoff --code owner-landing is refused unless the attribution record of the last gates-green bar reads every red leg INHERITED on the tree being closed, so gates-green must run on HEAD first; the condition that failed: the bar it names ran at"
+miss "$out" "phase HELD"
 rm -rf "$ln_root"
 fi   # ---- end REGION TWO ----------------------------------------------------------------------
 

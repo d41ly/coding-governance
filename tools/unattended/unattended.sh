@@ -1912,6 +1912,11 @@ GG_HARD=""
 # landing over an inherited-only red rests on. Written after the carry check, so a refusal there
 # still writes nothing; `verb_close` clears both on entry.
 GG_RUN_FACT=""; GG_INH_FACT=""
+# TOOL-dUnstuckLanding-27 S3 - THE PATHS THE BAR'S OWN CLOSE STEP STAGED beside the run-state file:
+# the build's BACKLOG.md `write_inherited_asks` filed into and the views `write_ask_views` reported
+# staging. Written as the `gates-staged` fact beside `gates-run`, and read by `check_bar_tied`'s
+# record-only mode, which excludes exactly that set. `verb_close` clears it with the two above.
+GG_STAGED_FACT=""; WI_STAGED=""; AV_STAGED=""; BT_NOTED=""
 trusted_base() { # run-state file [· allow-degenerate]  ->  sets TB
   local fresh rc rec head rec0 _tb_rd _tb_alt
   TB=""
@@ -5491,8 +5496,18 @@ run_settle() { # slug
       if [ "$br" = lease-dead ]; then
         # A DEAD PROBE IS NOT A DEAD LEASE: no verdict is "unknown", never STALE, so it refuses too.
         derive_liveness "$slug" "$rel" "$ph" || LV_VERDICT="nothing, because a probe it needs answered nothing ($LV_DEAD)"
+        # UNBOUND IS AN UNANSWERED PROBE, NEVER A VERDICT (TOOL-dUnstuckLanding-27 S2). It reads
+        # `session` absent, which is spec 14's legacy record that predates the lease AND any lease
+        # written under a harness exporting no session id. Only the first is admitted on UNBOUND
+        # alone: a record carrying `lease-utc` is admitted only when its last move is also stale and
+        # its holder's pid is not alive, so a fresh run on such a harness is never settled.
         case "$LV_VERDICT" in
-          STALE|UNBOUND) ;;
+          STALE) ;;
+          UNBOUND)
+            if [ -n "$(fact "$rel" lease-utc)" ] && { [ "$LV_STALE" != yes ] || [ "$LV_ALIVE" = yes ]; }; then
+              fail 101 "--settle reads a leased working record whose session is absent as abandoned only when its last move is stale and its pid is not alive, and the lease written at $(fact "$rel" lease-utc) reads stale $LV_STALE and pid-alive $LV_ALIVE, so a session may still hold it and settling it would end a live run; nothing was written: $rel"
+              return 1
+            fi ;;
           *) fail 101 "--settle reads a working record as abandoned only when --liveness says STALE or UNBOUND, and it says $LV_VERDICT, so a session may still drive it and settling it would end a live run; nothing was written: $rel"
              return 1 ;;
         esac
@@ -7621,6 +7636,7 @@ write_ask_views() { # count of asks this call filed -> 0 rendered and staged, 1 
   local n=$1 gen="" py="" rc=0 why="" fix="" p h line paths="" left="" staged=1 dirty="" gd=""
   local -a post=() stage=()
   local -A h0=()
+  AV_STAGED=""
   # ONE test for both halves of "resolves": the library resolver runs the inline `resolve_python`
   # itself and answers nothing without it, so a separate interpreter branch after it would be an
   # arm no state reaches. The interpreter is taken FIRST because the render needs it by name.
@@ -7687,6 +7703,7 @@ write_ask_views() { # count of asks this call filed -> 0 rendered and staged, 1 
   fi
   [ "$rc" = 0 ] || return 1
   if [ "${#stage[@]}" -gt 0 ]; then
+    AV_STAGED=$paths
     line="gates-green: re-rendered the generated views for $n filed ask(s) and staged ${#stage[@]} path(s): $paths"
   elif [ -n "$left" ]; then
     line="gates-green: re-rendered the generated views for $n filed ask(s) and staged 0 path(s): none"
@@ -7721,6 +7738,7 @@ read_ask_back() { # ask id · slug · SEV -> 0 when ASKS_CMD reads it back as ON
 write_inherited_asks() { # slug · R · run dir
   local slug=$1 r=$2 d=$3 bl leg ver age own8 ownid cand reused fam seq id argv file tok a s k prior had restored
   local r8=${2:0:8} today sev filed=0
+  WI_STAGED=""
   bl="$M/builds/$slug/BACKLOG.md"
   today=$(date -u +%Y-%m-%d)
   [ -f "$d/attribution" ] || return 0
@@ -7800,6 +7818,7 @@ write_inherited_asks() { # slug · R · run dir
     if read_ask_back "$id" "$slug" "$sev"; then
       echo "gates-green: filed ask $id for leg $leg red at $r8, $sev, staged in $bl"
       filed=$((filed + 1))
+      case " $WI_STAGED " in *" $bl "*) ;; *) WI_STAGED="$WI_STAGED${WI_STAGED:+ }$bl" ;; esac
     else
       # REMOVED, and the file put back exactly as it was: a row the parser cannot read back is a row
       # every later reader would read differently from this writer. A path that EXISTED before the
@@ -7825,6 +7844,7 @@ write_inherited_asks() { # slug · R · run dir
   # by the helper and changes nothing here: the item's verdict is the caller's, as it was.
   [ "$filed" -gt 0 ] || return 0
   write_ask_views "$filed" || :
+  [ -z "$AV_STAGED" ] || WI_STAGED="$WI_STAGED $AV_STAGED"
   return 0
 }
 
@@ -7885,10 +7905,42 @@ check_inherited_override() { # run-state file · the verb as the refusal names i
 # then makes the run commit that record before it may hold, which moves HEAD off the bar's head by
 # exactly the run's own record. `--close` and `--abort` pass nothing and keep the strict equality.
 # A bar head this clone cannot resolve makes the diff fail, which reads as untied.
+#
+# TOOL-dUnstuckLanding-27 S3 - THE RECORD IS NOT ALL THE CLOSE STAGES. Over an inherited-only red
+# under `land`, `write_inherited_asks` also stages the build's BACKLOG.md and `write_ask_views` the
+# views it re-rendered, so excluding the record alone refused the very hand-off fail 105 prescribes.
+# The exclusion is EXACTLY the recorded `gates-staged` set, never the whole build folder: a spec
+# edited under that folder after the bar still unties it. An entry outside the memory root is not one
+# the close stages, so it is never excluded. A record naming no set excludes the run-state file
+# alone, which is the behaviour before the fact existed, and says so.
 check_bar_tied() { # bar head · HEAD · run-state file · [record-only] -> 0 when the bar graded this tree
+  local p set
+  local -a ex=()
   [ "$1" = "$2" ] && return 0
   [ -n "$1" ] && [ "${4:-}" = record-only ] || return 1
-  GIT diff --quiet "$1" "$2" -- . ":(exclude)$3" 2>/dev/null
+  ex=(":(exclude)$3")
+  set=$(fact "$3" gates-staged)
+  if [ -z "$set" ] && [ -z "$BT_NOTED" ]; then
+    BT_NOTED=1
+    echo "unattended: NOTE - the record names no gates-staged set, so the bar tie excludes the run-state file alone: $3"
+  fi
+  for p in $set; do
+    case "$p" in
+      "$M"/*) [ "$p" = "$3" ] || ex+=(":(exclude)$p") ;;
+      *) echo "unattended: NOTE - gates-staged names a path outside the memory root, which no close stages, so the bar tie does not exclude it: $p" ;;
+    esac
+  done
+  GIT diff --quiet "$1" "$2" -- . "${ex[@]}" 2>/dev/null
+}
+
+# TOOL-dUnstuckLanding-27 S3 - THE `gates-staged` FACT, written wherever gates-green writes
+# `gates-run`. A set beyond the record is written with the record first; an empty one rewrites an
+# earlier fact to the record alone, so a later bar never inherits an older close's set, and writes
+# nothing on a record that never carried the fact.
+write_gates_staged() { # run-state file · paths staged beside the record, or empty
+  if [ -n "$2" ]; then set_fact "$1" gates-staged "$1 $2"
+  elif [ -n "$(fact "$1" gates-staged)" ]; then set_fact "$1" gates-staged "$1"
+  fi
 }
 
 # TOOL-dUnstuckLanding-13 S3 - THE ATTRIBUTION GUARD ON `owner-landing`. "Only the landing remains"
@@ -8081,7 +8133,7 @@ write_close_commit() { # slug · run-state file
 verb_close() { # slug   (override pairs arrive in OV_ITEMS / OV_REASONS)
   local slug="$1" rel item ck unmet=0 i=0 n ov reason _why _lnrec _lnwant
   n=${#OV_ITEMS[@]}
-  GG_RUN_FACT=""; GG_INH_FACT=""
+  GG_RUN_FACT=""; GG_INH_FACT=""; GG_STAGED_FACT=""
   check_slug "$slug" || return 1
   # THE FREE REFUSALS COME FIRST, and the ordering is the point rather than tidiness. This function
   # used to open with a network round-trip and only then discover that the record was already
@@ -8272,7 +8324,10 @@ verb_close() { # slug   (override pairs arrive in OV_ITEMS / OV_REASONS)
   # one exit this designs unreachable. Nothing else is written: no carry check, no roster at landing,
   # no phase and no close commit, because this node lands nothing.
   if [ "$LN_STATE" = handoff ]; then
-    if [ -n "$GG_RUN_FACT" ]; then set_fact "$rel" gates-run "$GG_RUN_FACT" || return 1; fi
+    if [ -n "$GG_RUN_FACT" ]; then
+      set_fact "$rel" gates-run "$GG_RUN_FACT" || return 1
+      write_gates_staged "$rel" "$GG_STAGED_FACT" || return 1
+    fi
     if [ -n "$GG_INH_FACT" ]; then set_fact "$rel" gates-inherited "$GG_INH_FACT" || return 1; fi
     stage_or_fail "$rel" || return 1
     fail 105 "every declared Definition-of-Done item is met and this node may not land, so the bar's facts are written and staged and no phase is; commit the record, reap the keepalive, and end the run with --handoff $slug --code owner-landing --reason <text> --reaped <id>: $LN_WHY"
@@ -8294,7 +8349,10 @@ verb_close() { # slug   (override pairs arrive in OV_ITEMS / OV_REASONS)
     fi
   fi
   # TOOL-dDerivedDocket-24 - THE BAR'S FACTS, with the close's other writes and after the carry check.
-  if [ -n "$GG_RUN_FACT" ]; then set_fact "$rel" gates-run "$GG_RUN_FACT" || return 1; fi
+  if [ -n "$GG_RUN_FACT" ]; then
+    set_fact "$rel" gates-run "$GG_RUN_FACT" || return 1
+    write_gates_staged "$rel" "$GG_STAGED_FACT" || return 1
+  fi
   if [ -n "$GG_INH_FACT" ]; then set_fact "$rel" gates-inherited "$GG_INH_FACT" || return 1; fi
   if [ -n "$RF_FACT" ]; then set_fact "$rel" refreshed-at "$RF_FACT" || return 1; fi
   i=0
@@ -8459,7 +8517,7 @@ dod_met() { # slug · run-state file · item · checker
         DOD_OUT=""; return 0
       fi
       if { [ -n "$_gdir" ] && [ -d "$_gdir" ]; } || [ -n "$(fact "$rel" gates-run)" ]; then
-        set_fact "$rel" gates-run "$GG_RUN_FACT" && stage_or_fail "$rel"
+        set_fact "$rel" gates-run "$GG_RUN_FACT" && write_gates_staged "$rel" "" && stage_or_fail "$rel"
       fi
       GG_RUN_FACT=""
       DOD_OUT=$RB_OUT
@@ -8517,6 +8575,7 @@ dod_met() { # slug · run-state file · item · checker
               if [ "$GR_STATE" = land ]; then
                 GG_RUN_FACT="$_gid ${_gh:0:8}"
                 GG_INH_FACT="${_gr:0:8} $GR_LEGS"
+                GG_STAGED_FACT="$WI_STAGED"
                 if [ -z "$GP_MAX_AGE" ]; then
                   _gesc="no age bound is declared, so no leg is aged and nothing is escalated"
                 elif [ -n "$GR_AGED" ]; then

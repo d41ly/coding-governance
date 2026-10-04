@@ -472,7 +472,12 @@ brief-recorded: GRADED ANYWAY — $id was BUILT at $(GIT rev-parse --short "$bui
       # commit behind the base, so a later repair naming it is the earliest in-range match. Asked
       # through pass-order's own pre-anchor probe, newest first and capped; TRUNCATED answers
       # nothing, and the unit is graded.
-      _pre=$(build_commit "$base $HR_EXCL" "$id" "$bdir" "$GENERATED_INDEXES" "$SHARED_RECORDS" "$PREANCHOR_CAP" "")
+      # NO `$HR_EXCL` HERE, in either mode (TOOL-dUnstuckLanding-27 S1). This probe EXEMPTS, it does
+      # not detect: it looks BEHIND the base, and everything behind the base is on the advertised tip
+      # by construction, so `^<tip>` emptied it in RANGE mode and redded every repair of a unit an
+      # earlier landed run built. Narrowing an exemption widens what fails. The in-range walk above
+      # keeps the token; pass-order's pre-anchor probe keeps it too, because that one detects.
+      _pre=$(build_commit "$base" "$id" "$bdir" "$GENERATED_INDEXES" "$SHARED_RECORDS" "$PREANCHOR_CAP" "")
       if [ -n "$_pre" ] && [ "$_pre" != TRUNCATED ]; then
         prebuilt=$((prebuilt+1))
         announced="$announced
