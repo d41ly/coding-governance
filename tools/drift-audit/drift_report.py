@@ -136,8 +136,17 @@ def load_conf(root: pathlib.Path) -> dict[str, str]:
             f"{CONF_NAME} not found at {root}. It is owned by the memory-tree kit; adopt that first.\n"
             "Minimum stub:\n  MEMORY_ROOT=memory\n  DISCIPLINES=\"...\"\n"
         )
+    return parse_conf_text(p.read_text(encoding="utf-8", errors="replace"))
+
+
+def parse_conf_text(text: str) -> dict[str, str]:
+    """The body of `load_conf` with the file read lifted out, so a conf read from a BLOB is parsed by
+    the same lines as one read from the working tree. TOOL-dUnstuckLanding-15 reads
+    `.unattended.conf` as committed at HEAD through it, and `load_conf` calls it too, so
+    `test_conf_parser_matches_bash` keeps grading the one parser both callers use. The grammar, and
+    its one deliberate divergence from bash, is `load_conf`'s docstring."""
     conf: dict[str, str] = {}
-    for raw in p.read_text(encoding="utf-8", errors="replace").splitlines():
+    for raw in text.splitlines():
         line = raw.strip().lstrip("﻿")
         if not line or line.startswith("#") or "=" not in line:
             continue
@@ -2122,18 +2131,20 @@ _RUN_REFUSED_NOTE = ("note — a refused landing is not recorded in tracked byte
 
 
 def _parse_run_record(text: str) -> dict:
-    """The three facts and the last parked row of one run-state file.
+    """The facts and the last parked row of one run-state file.
 
     Read the way the driver's `fact` reads them: the FIRST line starting `<key>:`, one trailing CR
     dropped, leading blanks trimmed. Split on LF alone, because `splitlines` also breaks on a lone CR
-    and on form feeds, and either would end a row early inside a reason field.
+    and on form feeds, and either would end a row early inside a reason field. `halt-code` and
+    `work-landed-at` joined the three in TOOL-dUnstuckLanding-15, for the ABORTED signals below; an
+    absent one reads as the empty string, as the other three do.
     """
     facts: dict = {}
     last = None
     for line in text.split("\n"):
         if line.endswith("\r"):
             line = line[:-1]
-        for key in ("phase", "witness", "base"):
+        for key in ("phase", "witness", "base", "halt-code", "work-landed-at"):
             if key not in facts and line.startswith(key + ":"):
                 facts[key] = line[len(key) + 1:].lstrip(" ")
         row = _RUN_ROW.match(line)
@@ -2142,7 +2153,8 @@ def _parse_run_record(text: str) -> dict:
         if row and row.group(1) in _RUN_PARK_KINDS:
             last = (row.group(1), row.group(2))
     return {"phase": facts.get("phase", ""), "witness": facts.get("witness", ""),
-            "base": facts.get("base", ""), "last": last}
+            "base": facts.get("base", ""), "halt-code": facts.get("halt-code", ""),
+            "work-landed-at": facts.get("work-landed-at", ""), "last": last}
 
 
 def _derive_run_subclass(last) -> str:
@@ -2322,6 +2334,392 @@ def build_nonterminal_merged_runs(ctx) -> dict:
 
 
 # --------------------------------------------------------------------------------------------
+# Signals - ABORTED run records whose work landed anyway (TOOL-dUnstuckLanding-15)
+#
+# The unattended kit's `--settle` writes `work-landed-at` onto a LEGACY ABORTED record - first
+# committed before the project's HANDOFF_CUTOFF - whose work the content predicate reads landed.
+# `aborted_work_landed` counts the LIVE legacy records still waiting for that write.
+# `discarded_work_landed` counts the POST-CUTOFF records, live or archived, whose work landed
+# although from that date ABORTED means discard; no verb clears that class, so it is counted whatever
+# facts the record carries. A rotated legacy archive is LISTED with its verdict and counted in
+# neither, because `--settle` never edits an archive and a count no verb can lower never reaches 0.
+#
+# THE PREDICATE IS THE KIT LIBRARY'S `check_work_landed`, consumed and never redefined: its three
+# clauses, with this report's base ref standing for the tip the remote advertises. It is SPELLED here,
+# as a pure function of gathered facts, because this kit is copy-installed and runs where the
+# unattended kit does not; the self-test sources that library wherever it is present and holds every
+# verdict and every first-commit date here to it, in both directions. The dating rule is ported the
+# same way from the library's `read_first_commit_date`.
+#
+# LIVENESS is drawn from the population the predicate acts on: four record-shaped CONTROL fact sets,
+# three that must read not-landed and one that must read landed, are run first on every report. Any
+# other reading is a predicate that cannot say no, or cannot say yes, and both signals read DEAD
+# naming the control. A signal is live only over a non-empty dated population as well.
+#
+# REPORT ONLY, both. A post-cutoff landed discard has no clearing verb, so a gate on it would be a
+# permanent red, and a legacy record's work can land late through nobody's fault.
+#
+# WHAT IT DOES NOT SEE. The revert clause reads the base ref's FIRST-PARENT line only, so a revert
+# landed on a side branch and merged in is not seen and its work reads landed - the library's
+# clause, carried here unchanged. Attribution by path reads `--name-only`, which lists no path for a
+# merge commit, so a merge that alone touches the build folder is not attributable here where the
+# library's path-limited log may keep it. The base ref is the remote-tracking ref, never a fresh
+# `ls-remote`, so a stale clone judges against what it last fetched, and the header prints that ref.
+# --------------------------------------------------------------------------------------------
+
+_AWL_NAME = "aborted_work_landed"
+_DWL_NAME = "discarded_work_landed"
+_WL_DATE = re.compile(r"^[0-9]{4}-[0-9]{2}-[0-9]{2}$")
+# One revert per LINE, the last on it, which is what the library's greedy `sed` extracts.
+_WL_REVERT = re.compile(r"This reverts commit ([0-9a-f]{7,40})")
+_WL_CONTROL_SHA = "c0" * 20
+# Record-shaped, never a free-standing sha: each is the fact set a real ABORTED record of that shape
+# gathers. POSITIONAL against _WORK_LANDED_CONTROL_WANT, so replacing the facts cannot also replace
+# what they must read.
+_WORK_LANDED_CONTROLS = (
+    ("witness-equals-base", {"witness_is_base_ancestor": True, "attributable": (), "on_base_ref": (),
+                             "reverted": (), "why_unjudgeable": ""}),
+    ("foreign-witness", {"witness_is_base_ancestor": False, "attributable": (), "on_base_ref": (),
+                         "reverted": (), "why_unjudgeable": ""}),
+    ("merged-then-reverted", {"witness_is_base_ancestor": False, "attributable": (_WL_CONTROL_SHA,),
+                              "on_base_ref": (_WL_CONTROL_SHA,), "reverted": (_WL_CONTROL_SHA,),
+                              "why_unjudgeable": ""}),
+    ("merged-not-reverted", {"witness_is_base_ancestor": False, "attributable": (_WL_CONTROL_SHA,),
+                             "on_base_ref": (_WL_CONTROL_SHA,), "reverted": (),
+                             "why_unjudgeable": ""}),
+)
+_WORK_LANDED_CONTROL_WANT = ("not-landed", "not-landed", "not-landed", "landed")
+
+
+def check_work_landed(facts: dict) -> tuple:
+    """`(verdict, clause-or-reason)` from one record's gathered facts, and nothing else - no git call.
+
+    The kit library's `check_work_landed`, clause for clause: `unjudgeable` with the reason wherever
+    the library returns undecidable; `not-landed` naming the first clause that failed - (i) the
+    witness is the base or behind it, or nothing in `base..witness` is attributable to the run; (ii)
+    an attributable commit is not on the base ref; (iii) a first-parent revert names one - and
+    `landed` with an empty second field otherwise.
+    """
+    why = facts.get("why_unjudgeable") or ""
+    if why:
+        return "unjudgeable", why
+    if facts.get("witness_is_base_ancestor"):
+        return "not-landed", "i"
+    own = set(facts.get("attributable") or ())
+    if not own:
+        return "not-landed", "i"
+    if own - set(facts.get("on_base_ref") or ()):
+        return "not-landed", "ii"
+    if own & set(facts.get("reverted") or ()):
+        return "not-landed", "iii"
+    return "landed", ""
+
+
+def _check_work_landed_controls() -> str:
+    """The first control that misreads, as a DEAD note, or "" when every control reads as stated."""
+    controls = tuple(_WORK_LANDED_CONTROLS)
+    if len(controls) != len(_WORK_LANDED_CONTROL_WANT):
+        return (f"DEAD PROBE — {len(controls)} work-landed controls are declared and "
+                f"{len(_WORK_LANDED_CONTROL_WANT)} readings are wanted, so no control can be judged")
+    for (label, facts), want in zip(controls, _WORK_LANDED_CONTROL_WANT):
+        got = check_work_landed(facts)[0]
+        if got != want:
+            return (f"DEAD PROBE — the control {label} reads {got} and must read {want}, so the content "
+                    f"predicate cannot say {'no' if want != 'landed' else 'yes'} and no verdict below "
+                    "means anything")
+    return ""
+
+
+def read_first_commit_date(ctx, path: str, siblings=()) -> str:
+    """YYYY-MM-DD the record's own run began, or "" where the path has no committed history.
+
+    The kit library's `read_first_commit_date`, ported: the OLDEST add along `--follow`, so a rotation
+    does not re-date an archive; for a live `RUN.md`, floored at the newest FIRST TOUCH of an archived
+    sibling in its folder, because the rotation recorded that path `M` and its tenancy began there.
+    The caller passes the siblings for a live record and none for an archive.
+    """
+    out = ctx.git.run("log", "--follow", "--diff-filter=A", "--format=%cs", "--", path)
+    days = [d.strip() for d in out.stdout.split("\n") if d.strip()] if out.returncode == 0 else []
+    date = days[-1] if days else ""
+    floor = ""
+    for sib in siblings:
+        touch = ctx.git.run("log", "--full-history", "--format=%cs", "--", sib)
+        seen = [d.strip() for d in touch.stdout.split("\n") if d.strip()] if touch.returncode == 0 else []
+        if seen and (not floor or seen[-1] > floor):
+            floor = seen[-1]
+    if floor and (not date or floor > date):
+        date = floor
+    return date
+
+
+def read_aborted_verdicts(ctx) -> dict:
+    """Every tracked ABORTED record at HEAD, dated, judged and classified - read ONCE per report.
+
+    Returns `{"not_asked", "dead", "of", "cutoff", "rows"}`: a NOT ASKED reason, or a DEAD note, or
+    the rows, one per ABORTED record, each carrying its rendered detail line, its dating class and the
+    signal it counts in. Cached on the context, so both builders cost one read. The git calls: one
+    `ls-tree`, one held-open `cat-file --batch`, one `rev-list --parents` and one first-parent revert
+    `log` of the base ref, shared; per record a `--follow` dating walk and, where clause (i) needs it,
+    one `log` of `base..witness`; one more per archived sibling of a live `RUN.md`; and a
+    `merge-base --is-ancestor` only for a revert naming an attributable commit off the base ref's graph.
+    """
+    cached = getattr(ctx, "_aborted_verdicts", None)
+    if cached is not None:
+        return cached
+    got = {"not_asked": "", "dead": "", "of": 0, "cutoff": "", "rows": []}
+    try:
+        ctx._aborted_verdicts = got
+    except AttributeError:
+        pass
+
+    note = _check_work_landed_controls()
+    if note:
+        got["dead"] = note
+        return got
+
+    builds = f"{ctx.memory_root}/builds/"
+    conf_name = ".unattended.conf"
+    listing = ctx.git.run("ls-tree", "-r", "-z", "HEAD", "--", builds, conf_name)
+    if listing.returncode != 0:
+        got["dead"] = "DEAD PROBE — `git ls-tree HEAD` failed, so no run record was read"
+        return got
+    shape = re.compile("^" + re.escape(builds) + r"[^/]+/RUN(?:\.[^/]+)?\.md$")
+    records, conf_blob = [], None
+    for entry in listing.stdout.split("\0"):
+        meta, _, path = entry.partition("\t")
+        bits = meta.split()
+        if len(bits) < 3 or bits[1] != "blob":
+            continue
+        if path == conf_name:
+            conf_blob = bits[2]
+        elif shape.match(path):
+            records.append((path, bits[2]))
+    if not records and conf_blob is None:
+        got["not_asked"] = ("no tracked run-state file and no .unattended.conf at HEAD; the unattended "
+                            "kit is not adopted")
+        return got
+
+    try:
+        proc = subprocess.Popen(["git", "-C", str(ctx.root), "cat-file", "--batch"],
+                                stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                                stderr=subprocess.DEVNULL)
+    except OSError:
+        got["dead"] = "DEAD PROBE — `git cat-file --batch` did not start"
+        return got
+
+    def read_object(spec: str):
+        proc.stdin.write(spec.encode("utf-8") + b"\n")
+        proc.stdin.flush()
+        head = proc.stdout.readline().split()
+        if len(head) != 3:
+            return None, b""                  # `<spec> missing` or `<spec> ambiguous`
+        body = proc.stdout.read(int(head[2]))
+        proc.stdout.read(1)                   # the LF cat-file writes after every object
+        return head[0].decode("ascii", errors="replace"), body
+
+    conf, aborted, resolved = {}, [], {}
+    try:
+        if conf_blob is not None:
+            sha, body = read_object(conf_blob)
+            if sha is None:
+                raise ValueError(conf_name)
+            conf = parse_conf_text(body.decode("utf-8", errors="replace"))
+        for path, blob in records:
+            sha, body = read_object(blob)
+            if sha is None:
+                raise ValueError(path)
+            rec = _parse_run_record(body.decode("utf-8", errors="replace"))
+            if rec["phase"] == "ABORTED":
+                aborted.append((path, rec))
+        for _path, rec in aborted:
+            for key in ("witness", "base"):
+                val = rec[key]
+                # One object name per batch LINE: a value carrying whitespace is not one, and is
+                # left unresolved rather than sent.
+                if val and not re.search(r"\s", val) and val not in resolved:
+                    resolved[val] = read_object(val + "^{commit}")[0]
+        proc.stdin.close()
+        proc.stdout.close()
+        proc.wait()
+    except (OSError, ValueError):
+        proc.kill()
+        proc.wait()
+        got["dead"] = "DEAD PROBE — `git cat-file --batch` stopped answering before every record was read"
+        return got
+
+    got["of"] = len(aborted)
+    got["cutoff"] = (conf.get("HANDOFF_CUTOFF") or "").strip()
+    if not aborted:
+        got["dead"] = ("DEAD PROBE — no tracked run-state file reads phase ABORTED, so the population "
+                       "both signals count from is empty")
+        return got
+
+    base_ref = ctx.git.base_ref
+    walk = ctx.git.run("rev-list", "--parents", base_ref, "--")
+    if walk.returncode != 0 or not walk.stdout.strip():
+        got["dead"] = (f"DEAD PROBE — `git rev-list {base_ref}` returned nothing, so no witness could "
+                       "be placed")
+        return got
+    parents: dict = {}
+    for line in walk.stdout.split("\n"):
+        shas = line.split()
+        if shas:
+            parents[shas[0]] = shas[1:]
+    revlog = ctx.git.run("log", "--first-parent", "--grep=This reverts commit",
+                         "--format=%x1e%H%n%B", base_ref, "--")
+    if revlog.returncode != 0:
+        got["dead"] = (f"DEAD PROBE — the first-parent revert `log` of {base_ref} failed, so clause "
+                       "(iii) cannot be read")
+        return got
+    reverts = []                              # (the reverting commit, the sha its line names)
+    for chunk in revlog.stdout.split("\x1e")[1:]:
+        sha, _, body = chunk.partition("\n")
+        for line in body.split("\n"):
+            hits = _WL_REVERT.findall(line)
+            if hits:
+                reverts.append((sha.strip(), hits[-1]))
+
+    cutoff = got["cutoff"]
+    dated = bool(_WL_DATE.match(cutoff))
+    for path, rec in aborted:
+        folder, _, leaf = path.rpartition("/")
+        slug = folder.rpartition("/")[2]
+        archived = leaf != "RUN.md"
+        sibs = () if archived else tuple(p for p, _ in records
+                                         if p.rpartition("/")[0] == folder and p != path)
+        date = read_first_commit_date(ctx, path, sibs)
+        # The library's test, `[ -z "$first" ] || ! [[ "$first" < "$cut" ]]`: undated is post-cutoff.
+        legacy = (not dated) or (bool(date) and date < cutoff)
+
+        facts = {"witness_is_base_ancestor": False, "attributable": (), "on_base_ref": (),
+                 "reverted": (), "why_unjudgeable": ""}
+        b_in, w_in = rec["base"], rec["witness"]
+        b, w = resolved.get(b_in), resolved.get(w_in)
+        if not b_in:
+            facts["why_unjudgeable"] = "the record carries no base fact, so the run's own range cannot be opened"
+        elif b is None:
+            facts["why_unjudgeable"] = f"its base {b_in} does not resolve in this clone"
+        elif w is None:
+            facts["why_unjudgeable"] = f"its witness {w_in or 'none'} does not resolve in this clone"
+        elif b not in parents:
+            facts["why_unjudgeable"] = (f"its base {b[:8]} is not on {base_ref}, so one rev-list cannot "
+                                        "place its witness against it")
+        elif w == b or (w in parents and _check_run_ancestor(parents, w, b)):
+            facts["witness_is_base_ancestor"] = True
+        else:
+            span = ctx.git.run("log", "--format=%x1e%H%x1f%s", "--name-only", f"{b}..{w}", "--")
+            if span.returncode != 0:
+                facts["why_unjudgeable"] = f"the range {b[:8]}..{w[:8]} cannot be read"
+            else:
+                word = re.compile(r"(?<![A-Za-z0-9])" + re.escape(slug) + r"(?![A-Za-z0-9])")
+                own = []
+                for chunk in span.stdout.split("\x1e")[1:]:
+                    head, _, rest = chunk.partition("\n")
+                    sha, _, subject = head.partition("\x1f")
+                    touched = [p for p in rest.split("\n") if p.strip()]
+                    if word.search(subject) or any(p.startswith(folder + "/") for p in touched):
+                        own.append(sha.strip())
+                hit = set()
+                for rc, named in reverts:
+                    named_own = [c for c in own if c.startswith(named)]
+                    if not named_own:
+                        continue
+                    # The library walks `<tip> ^<witness>`, so a revert the witness already contains
+                    # is not one. Placed on the graph where it can be, by one call where it cannot.
+                    if w in parents:
+                        behind = _check_run_ancestor(parents, rc, w)
+                    else:
+                        behind = ctx.git.run("merge-base", "--is-ancestor", rc, w).returncode == 0
+                    if not behind:
+                        hit.update(named_own)
+                facts.update(attributable=tuple(own),
+                             on_base_ref=tuple(c for c in own if c in parents),
+                             reverted=tuple(sorted(hit)))
+        verdict, clause = check_work_landed(facts)
+
+        wla = rec["work-landed-at"]
+        named = wla.split()[0] if wla.split() else ""
+        upheld = bool(named) and named in (w_in, w) and verdict == "landed"
+        counts = ""
+        if verdict == "unjudgeable":
+            shown = f"unjudgeable — {clause}"
+        elif verdict == "landed" and not legacy:
+            shown, counts = "landed", _DWL_NAME
+        elif verdict == "landed" and archived:
+            shown = "landed (archived)"
+        elif verdict == "landed":
+            shown, counts = ("settled", "") if upheld else ("landed", _AWL_NAME)
+        else:
+            # Check 15 of the unattended leg grades this fact; shown here, never counted.
+            shown = "fact-not-upheld" if wla else f"not-landed ({clause})"
+        got["rows"].append({
+            "path": path, "legacy": legacy, "verdict": verdict, "date": date, "counts": counts,
+            "unjudgeable": verdict == "unjudgeable",
+            "row": (f"{path} {rec['halt-code'] or '-'} {(w_in or '-')[:8]} {date or '-'} "
+                    f"{'legacy' if legacy else 'post-cutoff'} {shown}"),
+        })
+    return got
+
+
+def _build_aborted_signal(name: str, rows: list, notes=()) -> dict:
+    """One ABORTED signal over its dated population, which the caller has already found non-empty."""
+    return {
+        "signal": name,
+        "value": sum(1 for r in rows if r["counts"] == name),
+        "of": len(rows),
+        "tolerance": 0,
+        # REPORT ONLY - see the head of this section. `--check` never reads a report-only signal.
+        "gateable": False,
+        # LIVE over the population the value is drawn from: the controls read as stated before any
+        # row was gathered, and an empty dated population returned DEAD before this was reached.
+        "live": bool(rows),
+        "unjudgeable": sum(1 for r in rows if r["unjudgeable"]),
+        "detail": [r["row"] for r in rows] + list(notes),
+    }
+
+
+# NAMED `build_`, for the reason spelled above build_live_backlog_rows.
+def build_aborted_work_landed(ctx) -> dict:
+    """LIVE legacy ABORTED records whose work landed and which carry no upheld `work-landed-at`."""
+    got = read_aborted_verdicts(ctx)
+    if got["not_asked"]:
+        return _build_not_asked(_AWL_NAME, got["not_asked"])
+    if got["dead"]:
+        return _build_run_dead(_AWL_NAME, got["of"], got["dead"])
+    rows = [r for r in got["rows"] if r["legacy"]]
+    if not rows:
+        return _build_run_dead(_AWL_NAME, got["of"], "DEAD PROBE — every ABORTED record is dated on or "
+                                                     "after HANDOFF_CUTOFF, so no LEGACY record exists "
+                                                     "to count from")
+    notes = ()
+    if not _WL_DATE.match(got["cutoff"]):
+        notes = (f"note — HANDOFF_CUTOFF is {'blank' if not got['cutoff'] else 'not a date: ' + got['cutoff']}"
+                 " in .unattended.conf at HEAD, so every ABORTED record reads LEGACY, and --settle "
+                 "refuses every ABORTED record until the key is dated",)
+    return _build_aborted_signal(_AWL_NAME, rows, notes)
+
+
+def build_discarded_work_landed(ctx) -> dict:
+    """POST-CUTOFF ABORTED records, live or archived, whose work landed although ABORTED meant discard."""
+    got = read_aborted_verdicts(ctx)
+    if got["not_asked"]:
+        return _build_not_asked(_DWL_NAME, got["not_asked"])
+    if got["dead"]:
+        return _build_run_dead(_DWL_NAME, got["of"], got["dead"])
+    if not _WL_DATE.match(got["cutoff"]):
+        return _build_not_asked(_DWL_NAME, f"HANDOFF_CUTOFF is "
+                                f"{'blank' if not got['cutoff'] else 'not a date: ' + got['cutoff']} in "
+                                ".unattended.conf at HEAD, so no ABORTED record is dated after the day "
+                                "ABORTED came to mean discard")
+    rows = [r for r in got["rows"] if not r["legacy"]]
+    if not rows:
+        return _build_run_dead(_DWL_NAME, got["of"], "DEAD PROBE — no ABORTED record is dated on or after "
+                                                     f"HANDOFF_CUTOFF {got['cutoff']}, so the population "
+                                                     "this counts from is empty")
+    return _build_aborted_signal(_DWL_NAME, rows)
+
+
+# --------------------------------------------------------------------------------------------
 # Signal - legs the merge bar retried after a timeout (TOOL-dDerivedDocket-26 S7)
 #
 # The gate runner retries, once and alone, a leg whose own ceiling fired, and counts a pass on that
@@ -2384,6 +2782,7 @@ SIGNALS = [build_lexicon_marginal_offense_rate,
            build_source_cited_ids_with_no_record,
            build_backlog_stragglers,
            build_nonterminal_merged_runs,
+           build_aborted_work_landed, build_discarded_work_landed,
            measure_legs_retried_after_timeout]
 
 

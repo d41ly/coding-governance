@@ -126,6 +126,8 @@ Tier 2 needs the two workflow scripts from `<prefix>/workflows/drift-audit-{code
 | `backlog_stragglers` | does a ref still carry backlog row changes unaccounted against the default branch? | no |
 | `asks_disposed_overrides` | how often did a run buy the `asks-disposed` Definition-of-Done item with an override? | no |
 | `run_records_nonterminal_but_merged` | does a run record still read live after its work reached the default branch? | no |
+| `aborted_work_landed` | does a live ABORTED record dated before `HANDOFF_CUTOFF` have work the content predicate reads landed, with no upheld `work-landed-at`? Cleared by the unattended kit's `--settle`; an archive is listed and not counted. | no |
+| `discarded_work_landed` | did the work of an ABORTED record dated on or after `HANDOFF_CUTOFF`, when ABORTED means discard, land anyway? No verb clears it. Not asked while the key is blank. | no |
 | `legs_retried_after_timeout` | how many legs did the merge bar retry, once and alone, after their own ceiling fired, over the run records this git dir still holds? | no |
 
 **Every signal carries a `live` field.** A signal whose population is empty prints `DEAD PROBE`

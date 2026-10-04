@@ -528,6 +528,11 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "build_aborted_work_landed",
+      "kind": "function",
+      "file": "tools/drift-audit/drift_report.py"
+    },
+    {
       "id": "build_aggregate",
       "kind": "function",
       "file": "tools/runlog/record.py"
@@ -681,6 +686,11 @@
       "id": "build_diff_lines",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "build_discarded_work_landed",
+      "kind": "function",
+      "file": "tools/drift-audit/drift_report.py"
     },
     {
       "id": "build_discovered_fixture",
@@ -2121,6 +2131,11 @@
       "id": "check_window_invariant",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "check_work_landed",
+      "kind": "function",
+      "file": "tools/drift-audit/drift_report.py"
     },
     {
       "id": "check_worksheets_fresh",
@@ -4793,6 +4808,11 @@
       "file": "tools/memory-tree/tree_lib.py"
     },
     {
+      "id": "parse_conf_text",
+      "kind": "function",
+      "file": "tools/drift-audit/drift_report.py"
+    },
+    {
       "id": "parse_cpu_clock",
       "kind": "function",
       "file": "tools/process-monitor/census.py"
@@ -5313,6 +5333,11 @@
       "file": "tools/unattended/gate-guard.js"
     },
     {
+      "id": "read_aborted_verdicts",
+      "kind": "function",
+      "file": "tools/drift-audit/drift_report.py"
+    },
+    {
       "id": "read_agree_field",
       "kind": "function",
       "file": "tools/lexicon/selftest.py"
@@ -5576,6 +5601,11 @@
       "id": "read_filed_days",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "read_first_commit_date",
+      "kind": "function",
+      "file": "tools/drift-audit/drift_report.py"
     },
     {
       "id": "read_fixture",
@@ -7113,6 +7143,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "resolve_bash_shell",
+      "kind": "function",
+      "file": "tools/drift-audit/selftest.py"
+    },
+    {
       "id": "resolve_cache_dir",
       "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"
@@ -8581,6 +8616,11 @@
       "id": "test_a_real_path_inside_a_dash_c_body_does_admit",
       "kind": "function",
       "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "test_aborted_work_landed",
+      "kind": "function",
+      "file": "tools/drift-audit/selftest.py"
     },
     {
       "id": "test_absent_fixture_reds",
@@ -10361,6 +10401,11 @@
       "id": "test_window_ac1_ac4_git_only_bounds",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "test_work_landed_matches_the_driver",
+      "kind": "function",
+      "file": "tools/drift-audit/selftest.py"
     },
     {
       "id": "test_worker_survives_post_to_closed_loop_and_connection_stays_usable",

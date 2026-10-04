@@ -93,10 +93,12 @@ EXECUTED: list[str] = []
 # on a run where no arm skipped; it rises by hand when arms land and never falls to absorb a missing
 # one. A run with a SKIP does not compare it, and says so, because a skipped arm's checks are absent
 # for a reason the floor cannot see.
-CHECK_FLOOR = 277
+CHECK_FLOOR = 324
 # 261 -> 267, TOOL-dDerivedDocket-26: the six checks of `test_legs_retried_after_timeout`.
 # 267 -> 277, TOOL-dDerivedDocket-34: the five checks of the retired dGV-13 signal leave, one
 # retirement check and the fourteen of `test_backlog_ask_signals` arrive.
+# 277 -> 324, TOOL-dUnstuckLanding-15: the thirty-four checks of `test_aborted_work_landed` and the
+# thirteen of `test_work_landed_matches_the_driver`.
 
 
 def check(label: str, cond: bool, detail: str = "") -> None:
@@ -2628,10 +2630,11 @@ def _build_run_ctx(dr, r: pathlib.Path, base_ref: str = "main"):
                                  pins={})
 
 
-def _measure_git_calls(dr, r: pathlib.Path) -> int:
+def _measure_git_calls(dr, r: pathlib.Path, subject=None) -> int:
     """How many git processes ONE call of the signal starts. Counted at the report module's own
     `subprocess` binding, which both `Git.run` and the held-open batch resolve at call time, so no
-    other code in this process is touched and the binding is restored whatever happens."""
+    other code in this process is touched and the binding is restored whatever happens. `subject` is
+    the function called over a fresh context, the non-terminal signal where none is named."""
     import types
     real = dr.subprocess
     calls: list = []
@@ -2650,7 +2653,7 @@ def _measure_git_calls(dr, r: pathlib.Path) -> int:
     proxy.run, proxy.Popen = run_counted, run_piped_counted
     dr.subprocess = proxy
     try:
-        dr.build_nonterminal_merged_runs(_build_run_ctx(dr, r))
+        (subject or dr.build_nonterminal_merged_runs)(_build_run_ctx(dr, r))
     finally:
         dr.subprocess = real
     return len(calls)
@@ -2891,6 +2894,353 @@ def test_park_sets_match_the_driver(tmp: pathlib.Path) -> None:
           "heartbeat" in grown - set(dr._RUN_PARK_KINDS_OWED), f"extracted {sorted(grown)}")
 
 
+# ---------------------------------------------------------------------------------------------
+# TOOL-dUnstuckLanding-15 — ABORTED run records whose work landed anyway
+# ---------------------------------------------------------------------------------------------
+
+_AWL_SIG = "aborted_work_landed"
+_DWL_SIG = "discarded_work_landed"
+_AWL_CUTOFF = "2026-02-01"
+# What each fixture record must read, with a dated cutoff and the base ref `main`: the four AC3 shapes,
+# an archive and a floored live record that are both negative, and one post-cutoff positive.
+_AWL_WANT = {"tEqBase": "not-landed (i)", "tForeign": "not-landed (i)", "tReverted": "not-landed (iii)",
+             "tPos": "landed", "tArch": "not-landed (i)", "tFloor": "not-landed (i)", "tLate": "landed"}
+
+
+def _run_dated(r: pathlib.Path, day: str, *cmd: str) -> subprocess.CompletedProcess:
+    """One git command whose commit, where it makes one, is dated `day` as author AND committer: the
+    dating rule reads `%cs`, the committer's day, so a fixture that set the author alone dates nothing."""
+    stamp = f"{day}T12:00:00+0000"
+    return run(["git", *cmd], r, env={"GIT_AUTHOR_DATE": stamp, "GIT_COMMITTER_DATE": stamp})
+
+
+def _build_aborted_fixture(tmp: pathlib.Path, name: str):
+    """A fixture repo holding one ABORTED record per shape the content predicate decides.
+
+    Every commit is dated, so each record's first commit falls where the arm needs it against
+    `_AWL_CUTOFF`. `unreverted` is a ref at the tip before tReverted's revert, which is how AC4 reads
+    the same records with that revert removed. Returns `(repo, shas)`, the shas keyed by role.
+    """
+    NL = chr(10)
+    B = f"{FIXTURE_MEMORY_ROOT}/builds"
+    r = make_repo(tmp, name=name)
+    shas: dict = {}
+
+    def run_commit(day: str, msg: str) -> str:
+        _run_dated(r, day, "add", "-A")
+        out = _run_dated(r, day, "commit", "-q", "-m", msg, "--no-verify")
+        assert out.returncode == 0, f"fixture commit {msg!r} failed: {out.stderr.strip()[:200]}"
+        return run(["git", "rev-parse", "HEAD"], r).stdout.strip()
+
+    def add_merged_work(day: str, slug: str, path: str, msg: str) -> tuple:
+        """`(base, witness)`: a run branch cut from main, one commit on it, merged --no-ff."""
+        base = run(["git", "rev-parse", "main"], r).stdout.strip()
+        run(["git", "checkout", "-q", "-b", "w" + slug], r)
+        (r / path).parent.mkdir(parents=True, exist_ok=True)
+        (r / path).write_text(slug + NL, encoding="utf-8", newline=NL)
+        witness = run_commit(day, msg)
+        run(["git", "checkout", "-q", "main"], r)
+        out = _run_dated(r, day, "merge", "-q", "--no-ff", "-m", f"merge the {slug} run", "w" + slug)
+        assert out.returncode == 0, f"fixture merge of {slug} failed: {out.stderr.strip()[:200]}"
+        return base, witness
+
+    (r / ".unattended.conf").write_text(f'HANDOFF_CUTOFF="{_AWL_CUTOFF}"' + NL, encoding="utf-8", newline=NL)
+    shas["root"] = run_commit("2026-01-02", "chore: adopt the unattended kit")
+    (r / "src" / "other.txt").write_text("other" + NL, encoding="utf-8", newline=NL)
+    shas["foreign"] = run_commit("2026-01-03", "chore: unrelated work")
+    shas["pos"] = add_merged_work("2026-01-04", "tPos", "src/pos.txt", "feat(tPos): the work")
+    shas["rev"] = add_merged_work("2026-01-05", "tReverted", "src/rev.txt", "feat(tReverted): the work")
+    # Attributable by PATH alone: its subject does not name the slug.
+    shas["late"] = add_merged_work("2026-01-06", "tLate", f"{B}/tLate/notes.md", "feat: the late work")
+    run(["git", "branch", "unreverted", "main"], r)
+    out = _run_dated(r, "2026-01-08", "revert", "--no-edit", shas["rev"][1])
+    assert out.returncode == 0, f"fixture revert failed: {out.stderr.strip()[:200]}"
+
+    root = shas["root"]
+
+    def write_aborted(slug: str, base: str, witness: str, rows=()) -> str:
+        facts = {"phase": "ABORTED", "witness": witness, "base": base, "halt-code": "fork-unresolvable"}
+        return _write_run_record(r, f"{B}/{slug}/RUN.md", facts, rows)
+
+    write_aborted("tEqBase", root, root)
+    write_aborted("tForeign", root, shas["foreign"])
+    write_aborted("tReverted", *shas["rev"])
+    write_aborted("tPos", *shas["pos"])
+    write_aborted("tArch", root, root)
+    _write_run_record(r, f"{B}/tFloor/RUN.md", {"phase": "LANDED", "witness": root, "base": root})
+    run_commit("2026-01-10", "records: the legacy run records")
+    # tArch rotates to an archive name and must still date to its first add; tFloor's earlier run
+    # rotates out and a new run takes RUN.md, whose tenancy begins at the rotation.
+    run(["git", "mv", f"{B}/tArch/RUN.md", f"{B}/tArch/RUN.ABORTED.0123abcd.md"], r)
+    run(["git", "mv", f"{B}/tFloor/RUN.md", f"{B}/tFloor/RUN.LANDED.abcd1234.md"], r)
+    write_aborted("tFloor", root, root)
+    run_commit("2026-01-20", "records: rotate two run records")
+    # Rows of its own, so it shares under half its lines with any older record. `--follow` follows
+    # COPIES from unmodified files, so a record this small and this alike would date to a sibling's
+    # add - the library's stated limit, which errs toward grandfathering, and both readers share it.
+    write_aborted("tLate", *shas["late"], rows=[_build_park_row("review", f"late row {i}") for i in range(20)])
+    run_commit("2026-03-01", "records: the post-cutoff run record")
+    return r, shas
+
+
+def _read_aborted_rows(dr, r: pathlib.Path, base_ref: str = "main") -> tuple:
+    """`(aborted signal, discarded signal, {slug: verdict field})` over one fresh context."""
+    ctx = _build_run_ctx(dr, r, base_ref)
+    awl, dwl = dr.build_aborted_work_landed(ctx), dr.build_discarded_work_landed(ctx)
+    rows = {}
+    for d in awl["detail"] + dwl["detail"]:
+        if not isinstance(d, str) or d.startswith(("note", "DEAD")):
+            continue                          # a NOT ASKED detail is a dict, a note or DEAD a string
+        bits = d.split(" ", 5)
+        rows[bits[0].split("/")[2]] = bits[5] if len(bits) > 5 else ""
+    return awl, dwl, rows
+
+
+def test_aborted_work_landed(tmp: pathlib.Path) -> None:
+    """TOOL-dUnstuckLanding-15 AC2 to AC7 and AC9: each negative shape, the revert removed, the facts
+    that do and do not clear a record, an archive, a post-cutoff record, a blank cutoff, misread
+    controls, both empty states, and the call count. Ancestry is git's own answer throughout: every
+    witness and base is a real commit in a fixture repo."""
+    print("ABORTED run records whose work landed anyway")
+    sys.path.insert(0, str(KIT))
+    import drift_report as dr
+
+    NL = chr(10)
+    B = f"{FIXTURE_MEMORY_ROOT}/builds"
+    r, shas = _build_aborted_fixture(tmp, "abortedwork")
+    tip = run(["git", "rev-parse", "main"], r).stdout.strip()
+
+    def run_commit(day: str, msg: str) -> None:
+        _run_dated(r, day, "add", "-A")
+        _run_dated(r, day, "commit", "-q", "-m", msg, "--no-verify")
+
+    def write_record(slug: str, base: str, witness: str, wla: str = "") -> None:
+        facts = {"phase": "ABORTED", "witness": witness, "base": base, "halt-code": "fork-unresolvable"}
+        if wla:
+            facts["work-landed-at"] = wla
+        _write_run_record(r, f"{B}/{slug}/RUN.md", facts)
+
+    # ---- AC3 and AC5, the shapes as built. Each verdict field is asserted whole, so a record read as
+    # the wrong clause is caught as surely as one read the wrong way.
+    awl, dwl, rows = _read_aborted_rows(dr, r)
+    for slug, want in sorted(_AWL_WANT.items()):
+        check(f"aborted work: {slug} reads {want}", rows.get(slug) == want, f"got {rows.get(slug)!r}")
+    check("aborted work: live over the legacy population, the archive included in `of`",
+          awl["live"] is True and awl["of"] == 6, f"live={awl['live']} of={awl['of']} {awl['detail']}")
+    check("aborted work: only the legacy positive is counted", awl["value"] == 1, f"{awl['detail']}")
+    check("aborted work: the post-cutoff positive counts in discarded and not in aborted",
+          dwl["live"] is True and dwl["value"] == 1 and dwl["of"] == 1
+          and not any("/tLate/" in d for d in awl["detail"]), f"{dwl} {awl['detail']}")
+    row = next((d for d in awl["detail"] if "/tFloor/RUN.md " in d), "")
+    check("aborted work: a row is <record> <halt-code> <witness8> <date> <class> <verdict>",
+          row == f"{B}/tFloor/RUN.md fork-unresolvable {shas['root'][:8]} 2026-01-20 legacy not-landed (i)",
+          f"got {row!r}")
+
+    # ---- AC4, the same records with the revert removed: the revert clause is what decided tReverted.
+    awl4, _d, rows4 = _read_aborted_rows(dr, r, "unreverted")
+    check("aborted work: with its revert removed, the merged-then-reverted record is listed",
+          rows4.get("tReverted") == "landed" and awl4["value"] == 2,
+          f"got {rows4.get('tReverted')!r} value {awl4['value']}")
+
+    # ---- AC2, through the CLI: both registered, both non-zero, and `--check` still exits 0.
+    rep = report(r)
+    check("aborted work: the report registers both signals, both non-zero and report-only",
+          all(rep.get(n, {}).get("value", 0) > 0 and rep.get(n, {}).get("gateable") is False
+              for n in (_AWL_SIG, _DWL_SIG)), f"{[rep.get(n) for n in (_AWL_SIG, _DWL_SIG)]}")
+    chk = run([sys.executable, REPORT_REL, "--check"], r)
+    check("aborted work: --check exits 0 with both signals over their pins",
+          chk.returncode == 0, f"rc={chk.returncode} stderr={chk.stderr.strip()[:200]}")
+
+    # ---- AC5, a blank cutoff: the post-cutoff record turns LEGACY and is counted, with the note, and
+    # the discarded signal is NOT ASKED rather than a clean zero. Restored after.
+    (r / ".unattended.conf").write_text('HANDOFF_CUTOFF=""' + NL, encoding="utf-8", newline=NL)
+    run_commit("2026-03-02", "chore: blank the cutoff")
+    awl5, dwl5, rows5 = _read_aborted_rows(dr, r)
+    check("aborted work: a blank cutoff reads the post-cutoff record LEGACY and counts it",
+          rows5.get("tLate") == "landed" and awl5["value"] == 2, f"{awl5['detail']}")
+    check("aborted work: a blank cutoff carries the note naming the blank key",
+          any(d.startswith("note") and "HANDOFF_CUTOFF is blank" in d for d in awl5["detail"]),
+          f"{awl5['detail']}")
+    check("aborted work: a blank cutoff reads discarded NOT ASKED, never a clean zero",
+          dwl5.get("not_asked") is True and "HANDOFF_CUTOFF is blank" in str(dwl5["detail"]), f"{dwl5}")
+    (r / ".unattended.conf").write_text(f'HANDOFF_CUTOFF="{_AWL_CUTOFF}"' + NL, encoding="utf-8", newline=NL)
+    run_commit("2026-03-03", "chore: date the cutoff again")
+
+    # ---- AC3 and AC5, the facts. An upheld fact clears a legacy record and never a post-cutoff one.
+    write_record("tPos", *shas["pos"], wla=f"{shas['pos'][1]} {tip}")
+    write_record("tLate", *shas["late"], wla=f"{shas['late'][1]} {tip}")
+    run_commit("2026-03-04", "records: settle tPos and tLate")
+    awl, dwl, rows = _read_aborted_rows(dr, r)
+    check("aborted work: an upheld work-landed-at moves the legacy positive to settled",
+          rows.get("tPos") == "settled" and awl["value"] == 0, f"{awl['detail']}")
+    check("aborted work: an upheld work-landed-at does not clear a post-cutoff record",
+          rows.get("tLate") == "landed" and dwl["value"] == 1, f"{dwl['detail']}")
+    # A fact naming another witness is not this record's, so it clears nothing.
+    write_record("tPos", *shas["pos"], wla=f"{shas['foreign']} {tip}")
+    write_record("tForeign", shas["root"], shas["foreign"], wla=f"{shas['foreign']} {tip}")
+    run_commit("2026-03-05", "records: two facts that prove nothing")
+    awl, _d, rows = _read_aborted_rows(dr, r)
+    check("aborted work: a work-landed-at naming another witness leaves the record counted",
+          rows.get("tPos") == "landed" and awl["value"] == 1, f"{awl['detail']}")
+    check("aborted work: the fact on a negative record reads fact-not-upheld and is not counted",
+          rows.get("tForeign") == "fact-not-upheld", f"got {rows.get('tForeign')!r}")
+    # An archive no verb can edit is listed with its verdict and counted nowhere.
+    run(["git", "mv", f"{B}/tPos/RUN.md", f"{B}/tPos/RUN.ABORTED.0123abcd.md"], r)
+    run_commit("2026-03-06", "records: rotate tPos")
+    awl, _d, rows = _read_aborted_rows(dr, r)
+    check("aborted work: the positive rotated to an archive reads landed (archived), uncounted",
+          rows.get("tPos") == "landed (archived)" and awl["value"] == 0, f"{awl['detail']}")
+
+    # ---- AC6, controls that cannot say no, and a positive control that cannot say yes.
+    saved = dr._WORK_LANDED_CONTROLS
+    try:
+        landed = dict(saved[3][1])
+        dr._WORK_LANDED_CONTROLS = tuple((label, dict(landed)) for label, _f in saved)
+        awl6, dwl6, _r = _read_aborted_rows(dr, r)
+        check("aborted work: controls that all describe landed work read both signals DEAD, naming "
+              "the first", all(s["live"] is False and not s.get("not_asked")
+                               and s["detail"][0].startswith("DEAD PROBE")
+                               and saved[0][0] in s["detail"][0] for s in (awl6, dwl6)), f"{awl6} {dwl6}")
+        reverted = dict(saved[3][1], reverted=saved[3][1]["on_base_ref"])
+        dr._WORK_LANDED_CONTROLS = saved[:3] + ((saved[3][0], reverted),)
+        awl6, dwl6, _r = _read_aborted_rows(dr, r)
+        check("aborted work: a positive control pointed at reverted work reads both DEAD, naming it",
+              all(s["live"] is False and saved[3][0] in s["detail"][0] for s in (awl6, dwl6)),
+              f"{awl6} {dwl6}")
+    finally:
+        dr._WORK_LANDED_CONTROLS = saved
+    awl, _d, _r = _read_aborted_rows(dr, r)
+    check("aborted work: the shipped controls restored read live again", awl["live"] is True, f"{awl}")
+
+    # ---- AC7, the two empty states. Neither prints a clean zero.
+    e = make_repo(tmp, name="abortedempty")
+    for sig in (dr.build_aborted_work_landed(_build_run_ctx(dr, e)),
+                dr.build_discarded_work_landed(_build_run_ctx(dr, e))):
+        check(f"aborted work: {sig['signal']} with no record and no conf reads NOT ASKED",
+              sig.get("not_asked") is True and sig["live"] is False, f"{sig}")
+    (e / ".unattended.conf").write_text(f'HANDOFF_CUTOFF="{_AWL_CUTOFF}"' + NL, encoding="utf-8", newline=NL)
+    _write_run_record(e, f"{B}/tDone/RUN.md", {"phase": "LANDED", "witness": "0" * 40, "base": "0" * 40})
+    run(["git", "add", "-A"], e)
+    run(["git", "commit", "-q", "-m", "chore: the kit with no ABORTED record", "--no-verify"], e)
+    for sig in (dr.build_aborted_work_landed(_build_run_ctx(dr, e)),
+                dr.build_discarded_work_landed(_build_run_ctx(dr, e))):
+        check(f"aborted work: {sig['signal']} with the conf and no ABORTED record reads DEAD, naming "
+              "the empty population", sig["live"] is False and not sig.get("not_asked")
+              and "reads phase ABORTED" in str(sig["detail"]), f"{sig}")
+
+    # ---- AC9, the call count: four shared calls and two per record, whatever the history's length.
+    small = tmp / "abortedcalls"
+    small.mkdir()
+    run(["git", "init", "-q", "-b", "main"], small)
+    run(["git", "config", "user.email", "selftest@example.com"], small)
+    run(["git", "config", "user.name", "selftest"], small)
+    (small / "seed.txt").write_text("seed" + NL, encoding="utf-8", newline=NL)
+    run(["git", "add", "-A"], small)
+    run(["git", "commit", "-q", "-m", "seed", "--no-verify"], small)
+    per_record = 2
+    seen = {}
+    for lo, hi in ((0, 3), (3, 6)):
+        for i in range(lo, hi):
+            (small / f"work{i}.txt").write_text(f"{i}" + NL, encoding="utf-8", newline=NL)
+            run(["git", "add", "-A"], small)
+            run(["git", "commit", "-q", "-m", f"feat(tCall{i}): the work", "--no-verify"], small)
+            wit = run(["git", "rev-parse", "HEAD"], small).stdout.strip()
+            bas = run(["git", "rev-parse", "HEAD~1"], small).stdout.strip()
+            _write_run_record(small, f"{B}/tCall{i}/RUN.md", {"phase": "ABORTED", "witness": wit, "base": bas})
+        run(["git", "add", "-A"], small)
+        run(["git", "commit", "-q", "-m", f"{hi} records", "--no-verify"], small)
+        landed = dr.build_aborted_work_landed(_build_run_ctx(dr, small))
+        check(f"aborted work: {hi} records are all read and counted (the premise)",
+              landed["value"] == hi and landed["of"] == hi, f"{landed}")
+        seen[hi] = _measure_git_calls(dr, small, dr.read_aborted_verdicts)
+    check("aborted work: three more records cost three times the per-record constant",
+          seen[6] - seen[3] == 3 * per_record, f"{seen}")
+    check("aborted work: the shared calls are four", seen[3] - 3 * per_record == 4, f"{seen}")
+    for i in range(50):
+        (small / "noise.txt").write_text(f"{i}" + NL, encoding="utf-8", newline=NL)
+        run(["git", "add", "-A"], small)
+        run(["git", "commit", "-q", "-m", f"chore: noise {i}", "--no-verify"], small)
+    check("aborted work: fifty unrelated commits on the base ref move no count",
+          _measure_git_calls(dr, small, dr.read_aborted_verdicts) == seen[6], f"{seen}")
+
+
+def resolve_bash_shell(probe_dir: pathlib.Path) -> str | None:
+    """A shell that runs the kit library as bash runs it: `[[ ]]` and process substitution, both of
+    which the library uses. `sh` on MSYS is bash in POSIX mode, so the probe leaves that mode first."""
+    marker = probe_dir / ".bashprobe"
+    marker.write_text("PROBE=works\n", encoding="utf-8", newline="\n")
+    probe = ('set +o posix 2>/dev/null; . ./.bashprobe; y=$(cat < <(printf %s "$PROBE")); '
+             '[[ "$y" == works ]] && printf %s "$y"')
+    try:
+        for cand in ("bash", "sh", "/usr/bin/bash", "/bin/bash"):
+            try:
+                out = subprocess.run([cand, "-c", probe], cwd=str(probe_dir), capture_output=True,
+                                     text=True, encoding="utf-8", errors="replace")
+            except (OSError, FileNotFoundError):
+                continue
+            if out.returncode == 0 and out.stdout.strip() == "works":
+                return cand
+        return None
+    finally:
+        marker.unlink(missing_ok=True)
+
+
+def test_work_landed_matches_the_driver(tmp: pathlib.Path) -> None:
+    """TOOL-dUnstuckLanding-15 AC8: the engine's content predicate and first-commit dating, held to the
+    unattended kit library's own `check_work_landed` and `read_first_commit_date` over the same fixture
+    records, the base ref standing for the tip. Both directions: a record either reads differently in
+    is a red here, whichever side moved. The library is reached by a path derived from this kit's own
+    directory, as the driver-set arm above reaches the driver."""
+    print("content predicate and dating vs the unattended kit library")
+    sys.path.insert(0, str(KIT))
+    import drift_report as dr
+
+    try:
+        lib = resolve_kit_dir("unattended", "lib-unattended.sh", KIT) / "lib-unattended.sh"
+    except LookupError:
+        lib = None
+    if lib is None or not lib.exists():
+        skip("work-landed parity with the driver", "no unattended kit library beside this kit")
+        return
+    shell = resolve_bash_shell(tmp)
+    if shell is None:
+        skip("work-landed parity with the driver", "no bash that runs the kit library here")
+        return
+    r, _shas = _build_aborted_fixture(tmp, "abortedparity")
+    tip = run(["git", "rev-parse", "main"], r).stdout.strip()
+    got = dr.read_aborted_verdicts(_build_run_ctx(dr, r))
+    mine = {row["path"]: ({"landed": "0", "not-landed": "1"}.get(row["verdict"], "2"), row["date"])
+            for row in got["rows"]}
+    check("parity: the engine read every fixture record", len(mine) == len(_AWL_WANT), f"{sorted(mine)}")
+    script = ('set +o posix 2>/dev/null; . "$1" || exit 9; t=$2; shift 2; for p in "$@"; do '
+              'check_work_landed "$p" "$t"; rc=$?; d=$(read_first_commit_date "$p"); '
+              'printf "%s|%s|%s\\n" "$p" "$rc" "$d"; done')
+    out = run([shell, "-c", script, "parity", lib.as_posix(), tip, *sorted(mine)], r)
+    theirs = {}
+    for line in out.stdout.split("\n"):
+        bits = line.strip().split("|")
+        if len(bits) == 3:
+            theirs[bits[0]] = (bits[1], bits[2])
+    check("parity: the library answered for every record", set(theirs) == set(mine),
+          f"rc={out.returncode} stderr={out.stderr.strip()[:200]} got {sorted(theirs)}")
+    check("parity: the fixture holds a landed and a not-landed record (the premise)",
+          {"0", "1"} <= {v[0] for v in mine.values()}, f"{mine}")
+    for path in sorted(mine):
+        check(f"parity: {path.split('/')[2]} {path.rpartition('/')[2]} reads the same verdict and date "
+              "in both", mine[path] == theirs.get(path), f"engine {mine[path]} library {theirs.get(path)}")
+    arch = next((p for p in mine if "/tArch/" in p), "")
+    floor = next((p for p in mine if "/tFloor/RUN.md" in p), "")
+    check("parity: a rotated archive is dated by its first add, not by the rotation",
+          mine.get(arch, ("", ""))[1] == "2026-01-10" == theirs.get(arch, ("", ""))[1], f"{arch}")
+    check("parity: a live RUN.md is floored at its archived sibling",
+          mine.get(floor, ("", ""))[1] == "2026-01-20" == theirs.get(floor, ("", ""))[1], f"{floor}")
+    # THE CONTROL: an engine verdict flipped by hand reads unequal, so the comparison discriminates.
+    pos = next((p for p in mine if "/tPos/" in p), "")
+    flipped = ("1" if mine.get(pos, ("0",))[0] == "0" else "0", mine.get(pos, ("", ""))[1])
+    check("parity: control — an engine verdict flipped by hand reads unequal",
+          bool(pos) and flipped != theirs.get(pos), f"{pos} {theirs.get(pos)}")
+
+
 def test_version_carriers_agree(tmp: pathlib.Path) -> None:
     """TOOL-dLoggedFlight-13 S6: every carrier of this kit's version agrees with the engine's constant.
 
@@ -2953,6 +3303,8 @@ def main() -> int:
         test_evidence_globs_exclude_test_templates(tmp)
         test_nonterminal_merged_runs(tmp)
         test_park_sets_match_the_driver(tmp)
+        test_aborted_work_landed(tmp)
+        test_work_landed_matches_the_driver(tmp)
         test_version_carriers_agree(tmp)
     print()
     if SKIPS:

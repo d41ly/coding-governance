@@ -129,6 +129,10 @@ PINS: dict[str, int] = {
     #   Left at 0 every non-empty count reads "out of tolerance", which is how a reader learns
     #   to skip the line. The kit cannot ship a number for it: the value is your corpus’s, and a
     #   guessed pin is the one thing this block forbids.
+    # "aborted_work_landed": 0,     # REPORT-ONLY: seed it at what your first report MEASURES; it
+    #   drains as `--settle` writes `work-landed-at` onto each listed record.
+    # "discarded_work_landed": 0,   # REPORT-ONLY: seed it at what your first report MEASURES; no
+    #   verb clears it, so a pin there records the value rather than a drain target.
 }
 
 # --------------------------------------------------------------------------------------------
