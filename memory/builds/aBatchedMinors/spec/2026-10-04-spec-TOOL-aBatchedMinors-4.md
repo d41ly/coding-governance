@@ -1,6 +1,6 @@
 # TOOL-aBatchedMinors-4 — the method, the Skill and the verbs entry state the batched-promotion rule
 
-**Status:** OPEN · rev-1 · 2026-10-04 · node a · Tier-1 · base 5ba0fc4f · streams tooling · order 4
+**Status:** CLOSED · rev-2 · 2026-10-04 · node a · Tier-1 · base 5ba0fc4f · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
@@ -33,10 +33,12 @@ records the owner's ruling as a decision, and bumps the kits whose shipped bytes
   Observed by AC3.
 - **S3** — `tools/unattended/VERBS.template.md`'s `--review` entry names `--highs` and `--minors`,
   where they are required and refused, and the unit floor. Rendered into
-  `memory/guides/UNATTENDED-VERBS.md`, and the usage line in `tools/unattended/unattended.sh`'s header
-  names both flags. Observed by AC3.
+  `memory/guides/UNATTENDED-VERBS.md`. The driver's usage header line moved to
+  `TOOL-aBatchedMinors-2` at its rev-2. Observed by AC3.
 - **S4** — `memory/DECISIONS.md` gains the owner's ruling, minted in this build's TOOL family,
-  superseding the closing-review half of the 2026-09-14 severity ruling. Observed by AC4.
+  superseding the closing-review half of the 2026-09-14 severity ruling. The decision log is a shared
+  mutable record no dispatched pass may declare, so the row lands in a records commit of its own.
+  Observed by AC4.
 - **S5** — Every kit whose shipped bytes moved in this build is bumped once, after the last move, in
   every carrier `govkit epoch` names. Observed by AC5.
 
@@ -103,6 +105,8 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-04 · initial draft.
+- rev-2 · 2026-10-04 · S3 · S4 · building found the usage header is check 26's, so unit 2 took it,
+  and `--dispatch` refuses `memory/DECISIONS.md` as a shared record, so the row rides a records commit.
 
 ## 10. Reuse audit
 

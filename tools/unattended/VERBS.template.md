@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.60 -->
+<!-- gov:kit unattended@1.61 -->
 # Unattended runs — the verbs
 
 *This file is the second half of the binding contract; `UNATTENDED-PROTOCOL.md` is the first. Two
@@ -193,6 +193,15 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   leaves the gate inferring one from ids. It refuses a verdict or a disposition outside its closed
   set, a missing subject or count, a terminal exit carrying no disposition, `fold` at a terminal
   exit, a disposition on a `CONVERGING` round, and a round on a subject whose loop has already ended.
+  **The closing diff review — the build-slug subject — counts what stood.** Owner ruling of
+  2026-10-04: every finding it confirms is promoted, one unit per BLOCKER and HIGH and the MEDIUMs
+  and LOWs batched into one unit, two only across disjoint write sets. Its terminal round therefore
+  REQUIRES `--highs <n>` and `--minors <n>`, the confirmed HIGH and MEDIUM-plus-LOW findings standing
+  at the exit, and writes them before the disposition: `blockers <b> · <EXIT> · highs <h> · minors
+  <m>[ · disposition promote]`. It requires `promote` when anything stood, refuses `fold` outright,
+  refuses `promote` when nothing stood, and refuses either count on a spec subject or a non-terminal
+  round. Check 2 reads a row carrying both counts as owing `blockers + highs`, plus one for the
+  minors when any stood, new non-WONTDO unit ids; every other row keeps the floor of one.
 - `--check-commit` — `--check-commit <message file>`, run by the `commit-msg` hook on EVERY commit.
   It binds the run whose branch this worktree has checked out and is silent when there is none. A
   `Pass: <unit-id>` trailer must name an open dispatched pass, and the staged paths, less the
