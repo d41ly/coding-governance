@@ -9,6 +9,7 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+units-at-landing: DEPL-aHalvedInstall-1 DEPL-aHalvedInstall-2 DEPL-aHalvedInstall-3 DEPL-aHalvedInstall-4 DEPL-aHalvedInstall-5
 hold-run: 
 hold-streak: 1 · at cdd5f518
 resume-owed: none · owner
@@ -17,12 +18,12 @@ hold-reason: All five units built and CLOSED, the closing review CONVERGED with 
 hold-until: owner
 hold-code: host-owner-action
 held-from: VERIFYING
-gates-run: unattended-179111102680888830290-1778 4fb11898
+gates-run: unattended-179111241867760211837-45649 531db8c0
 parked-surfaced: yes, 2 surfaced
 keepalive-reaped: yes
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: a62384803ad2355b03addf16f73ae2f4b6b86ce4
-phase: VERIFYING
+phase: LANDING
 branch-sha: cd90f7fa5c8cddf152e3a2a065f5df7ad64f355b
 branch-ref: refs/heads/branch/kit-bugs-keys-renderer-conflict-eddde0
 may: none
