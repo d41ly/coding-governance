@@ -17,7 +17,8 @@ Hygiene check 20 reds an id held twice inside one row document, and nothing reds
 held twice: two nodes that record one decision under two ids, or one gotcha under two file names,
 pass every leg and leave the corpus with two answers to one question. This unit adds hygiene check
 28 to the memory-tree kit: one normalized content key per decision row and per gotcha body, and a
-red when records of different identity hold one key. It is the exact half of helixir's
+red when a record added since the mainline merge-base holds a key a record of another identity
+also holds. It is the exact half of helixir's
 write-time duplicate check; the near half is `TOOL-aGraftedHelix-9`.
 
 ## 2. Scope (IN)
@@ -218,8 +219,8 @@ is to reword or drop THAT record; a landed row is never edited or removed.
   Red when: it reds on this tree, or its graded count is 0.
   figure: DERIVED at observation; it read 354 at base `5266d22e` and grows with every record.
 - **AC6** — When a scratch clone of this tree copies `memory/gotchas/two-answers-to-one-question.md`
-  to a second name in the same folder, `row_grammar.py --check-content` there exits 1 naming both
-  paths.
+  to a second name in the same folder and commits the copy, `row_grammar.py --check-content` there
+  exits 1 naming both paths, the copy being the added holder.
   Red when: the copy passes.
   fixture: the clone goes under a short `%TEMP%` directory, never inside the worktree.
 - **AC7** — When `grep -n 'CONTENT_CHECK = 28' tools/memory-tree/row_grammar.py` and
@@ -277,9 +278,9 @@ New arm: `tools/memory-tree/row_grammar.py --selftest` · fixture trees holding 
 
 - rev-1 · 2026-10-04 · initial draft from the aGraftedHelix spec brief, with the duplicate census
   measured on node `a` at base `5266d22e`.
-- rev-2 · 2026-10-04 · §3 §4 §5 §6 §7 §8 · S3 S5 S6 · AC3 AC9 AC10 AC11 AC12 · folded the round-1
-  spec audit's findings on this unit: 48 (landed duplicates are counted and never reported, S3, §3,
-  §4 Rollout, §8 F2, AC10); 21 (AC3's same-id pair sits across a snapshot rotation); 22 (AC11, the
+- rev-2 · 2026-10-04 · §1 §3 §4 §5 §6 §7 §8 · S3 S5 S6 · AC3 AC6 AC9 AC10 AC11 AC12 · folded the
+  round-1 spec audit's findings on this unit: 48 (landed duplicates are counted and never reported,
+  §1, S3, §3, §4 Rollout, §8 F2, AC10, and AC6's copy committed so it is the added holder); 21 (AC3's same-id pair sits across a snapshot rotation); 22 (AC11, the
   empty-key branch and three holders); 36 (§7 states that the pass runs the module's `--selftest` as
   its direct check); and 37 (`memory/guides/BUILD-METHOD.md` line 1 listed, §8 F1 citing unit 3's
   ruling, AC12). §3 Edges extends the consumes-from to unit 9's base and gains the hands-off to the
