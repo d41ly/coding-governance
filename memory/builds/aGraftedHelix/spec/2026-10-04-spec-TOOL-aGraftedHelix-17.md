@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-17 — check 27's engine arm asserts its branch run prints no check 28 line, observed once check 28 exists
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-1 · base 5266d22e · streams tooling · order 7
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 5266d22e · streams tooling · order 7
 
 <!-- gen:spec-records -->
 
@@ -29,7 +29,8 @@ round-1 spec audit of units 10 to 15.
   observation of check 27's `status=1`, and the `check 27:` line. Observed by AC1.
 - **S2** — The arm's failure message names which half failed: a `check 28:` line present means the
   fixture's branch row is a content duplicate of its base row, and the exit belongs to check 28.
-  Observed by AC1.
+  NOT OBSERVED by a criterion here: it is the arm's message text, which only the suite prints, and
+  the close reads it when the arm's staged break reds (§7).
 - **S3** — The memory-tree kit version moves once after this unit's last move if its shipped bytes
   moved, in every carrier `tools/check-kit-versions.sh` pairs. Observed by AC2.
 
@@ -120,6 +121,9 @@ none
 
 - rev-1 · 2026-10-04 · initial draft, promoted from finding 16 of the round-1 spec audit of units 10
   to 15.
+- rev-2 · 2026-10-04 · S2 · relabelled NOT OBSERVED: the bug-class checklist over the promoting
+  commit selected `observed-by-claim-no-arm-discharges`, and AC1 runs the engine, never the arm
+  whose message S2 states.
 
 ## 10. Reuse audit
 

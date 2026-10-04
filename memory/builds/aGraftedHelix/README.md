@@ -105,7 +105,7 @@ ids TOOL-aGraftedHelix-14 TOOL-aGraftedHelix-15 TOOL-aGraftedHelix-16 TOOL-aGraf
 | [TOOL-aGraftedHelix-14 — an engine arm observes hygiene check 27 red the leg, and print its summary on a green run](spec/2026-10-04-spec-TOOL-aGraftedHelix-14.md) | 6 | 1 | SPECCED | rev-2 | 2026-10-04 |
 | [TOOL-aGraftedHelix-6 — a decision row or gotcha whose normalized text another record already holds reds](spec/2026-10-04-spec-TOOL-aGraftedHelix-6.md) | 6 | 2 | SPECCED | rev-3 | 2026-10-04 |
 | [TOOL-aGraftedHelix-13 — an engine arm observes hygiene check 28 red the leg, and print its summary on a green run](spec/2026-10-04-spec-TOOL-aGraftedHelix-13.md) | 7 | 1 | SPECCED | rev-2 | 2026-10-04 |
-| [TOOL-aGraftedHelix-17 — check 27's engine arm asserts its branch run prints no check 28 line, observed once check 28 exists](spec/2026-10-04-spec-TOOL-aGraftedHelix-17.md) | 7 | 1 | SPECCED | rev-1 | 2026-10-04 |
+| [TOOL-aGraftedHelix-17 — check 27's engine arm asserts its branch run prints no check 28 line, observed once check 28 exists](spec/2026-10-04-spec-TOOL-aGraftedHelix-17.md) | 7 | 1 | SPECCED | rev-2 | 2026-10-04 |
 | [TOOL-aGraftedHelix-5 — each leg reading is stamped faithful or contended by a foreign-load census, and only faithful readings argue a ceiling](spec/2026-10-04-spec-TOOL-aGraftedHelix-5.md) | 7 | 2 | SPECCED | rev-2 | 2026-10-04 |
 | [TOOL-aGraftedHelix-7 — the gate runner stops dispatching legs above a declared memory fraction and records the pause](spec/2026-10-04-spec-TOOL-aGraftedHelix-7.md) | 8 | 2 | SPECCED | rev-2 | 2026-10-04 |
 | [TOOL-aGraftedHelix-8 — every automatic self-heal appends one line to a health log the orientation card counts](spec/2026-10-04-spec-TOOL-aGraftedHelix-8.md) | 9 | 1 | SPECCED | rev-2 | 2026-10-04 |
