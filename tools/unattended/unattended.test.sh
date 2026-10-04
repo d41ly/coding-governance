@@ -3715,6 +3715,22 @@ same "the owner's default pins its date" "$(sed -n 's/^spec-audit: //p' memory/b
 git checkout -qf main; git reset -q --hard "$_aw_main0"; git push -q -f origin main
 git checkout -qf unit
 
+# ---- TOOL-aWardedAudit-6 S4: a record whose BASE README carries a prompt-mode `spec-audit:` line - the
+# ---- state a run preflighted under a driver before check 89 is left in - reads NOT GRADABLE at the
+# ---- close. No preflight can write that record now, so it is borrowed: a sibling README with no key
+# ---- in the same BASE commit is preflighted, and its record is re-keyed to the README that has one.
+reset_tree; readme tBr; mutate memory/builds/tBr/README.md '/^slug: tBr$/a authorized-by: prompt\nspec-audit: 2026-10-05'
+readme tBr2; mutate memory/builds/tBr2/README.md '/^slug: tBr2$/a authorized-by: prompt'
+scope published; git add -A >/dev/null && git commit -q -m br --no-verify
+git push -q -f origin unit 2>/dev/null
+run --preflight tBr2 --keepalive-id k1 >/dev/null
+sed 's/tBr2/tBr/g' memory/builds/tBr2/RUN.md > memory/builds/tBr/RUN.md
+git add -A >/dev/null && git commit -q -m "a record borrowed from a pre-89 preflight" --no-verify
+out=$(run --close tBr)
+hit  "$out" "the build README declares spec-audit: under an authorization mode that resolves at the second anchor"
+hit  "$out" "specs-audited — not gradable"
+miss "$out" "specs-audited — not owed"
+
 # ---- 50: THE SECOND ANCHOR IS ADMISSIBLE PER MODE. Four arms, because a refusal needs a companion
 # ---- saying it refused the right thing and a companion saying it did not refuse everything.
 # ----
@@ -7524,7 +7540,7 @@ rm -f memory/builds/tRun/reviews/a4.md
 bcopen; crfix
 mutate memory/builds/tRun/RUN.md '/^spec-audit: /d'; git add -A >/dev/null
 out=$(run --close tRun $bcov)
-hit "$out" "the spec-audit fact in the run-state file and the spec-audit: key in the build README, or the SPEC_AUDIT_DEFAULT the project conf declares, at the pinned BASE disagree on whether this build opted in, and the recorded fact is written by the run so the BASE derivation decides - at BASE: 2026-09-20; recorded: (none)"
+hit "$out" "the spec-audit fact in the run-state file and the spec-audit: key in the build README at the pinned BASE, or the SPEC_AUDIT_DEFAULT the project conf declares at its default-branch side, disagree on whether this build opted in, and the recorded fact is written by the run so the BASE derivation decides - at BASE: 2026-09-20; recorded: (none)"
 hit "$out" "so --close blocks: specs-audited"
 miss "$out" "declares no spec-audit: key"
 miss "$out" "close OK"
@@ -7653,7 +7669,7 @@ miss "$out" "specs-audited"
 init_sa_run; crfix
 mutate memory/builds/tRun/RUN.md '/^spec-audit: /d'; git add -A >/dev/null
 out=$(run --close tRun $bcov)
-hit "$out" "or the SPEC_AUDIT_DEFAULT the project conf declares, at the pinned BASE disagree on whether this build opted in, and the recorded fact is written by the run so the BASE derivation decides - at BASE: 2026-09-21; recorded: (none)"
+hit "$out" "or the SPEC_AUDIT_DEFAULT the project conf declares at its default-branch side, disagree on whether this build opted in, and the recorded fact is written by the run so the BASE derivation decides - at BASE: 2026-09-21; recorded: (none)"
 miss "$out" "close OK"
 
 # ---- closing review of units 7/8, round 2, R2 — a REFUSED read leaves the grader NOT GRADABLE. The
@@ -7669,7 +7685,7 @@ git checkout -qf main; printf 'return 0\n' >> .unattended.conf
 git add -A >/dev/null; git commit -q -m sa-base-dies-after-preflight --no-verify; git push -q -f origin main
 git checkout -qf unit; git merge -q --no-edit main >/dev/null 2>&1
 out=$(run --close tRun $bcov)
-hit "$out" "the project conf at the pinned BASE could not be evaluated to the end"
+hit "$out" "the project conf at the default-branch side of the pinned BASE could not be evaluated to the end"
 hit "$out" "specs-audited — not gradable: the spec-audit source at BASE was not derived in this shell (authorization-reachable is unmet above: an unreachable anchor, a missing README, or a refused spec-audit:/SPEC_AUDIT_DEFAULT read)"
 miss "$out" "at BASE: (none)"
 miss "$out" "specs-audited — not owed"
@@ -7709,7 +7725,7 @@ mkconf true true "" 3600 "" 1800 7 5400 later
 git add -A >/dev/null && git commit -q -m sa-default-malformed --no-verify && git push -q -f origin main
 git checkout -qf unit && git merge -q --no-edit main >/dev/null 2>&1
 out=$(run --preflight tRun --keepalive-id KA-1234)
-hit "$out" "the project conf at the pinned BASE declares SPEC_AUDIT_DEFAULT with a value that is not a YYYY-MM-DD date, and a project-wide opt-in is a dated declaration or not at all - declared: later"
+hit "$out" "the project conf at the default-branch side of the pinned BASE declares SPEC_AUDIT_DEFAULT with a value that is not a YYYY-MM-DD date, and a project-wide opt-in is a dated declaration or not at all - declared: later"
 miss "$out" "not owed (opt-in)"
 miss "$out" "preflight OK"
 git checkout -qf main; git reset -q --hard "$_sa_main0"; git push -q -f origin main
@@ -7756,7 +7772,7 @@ init_sa_base_ending_early() {   # $1 = the line added to a dated conf at BASE, a
 for _sa_shape in 'return 0|0' 'exit 0|1' 'X="$UNSET_IN_THIS_FIXTURE"|1' '^if|1'; do
   init_sa_base_ending_early "${_sa_shape%|*}" "${_sa_shape#*|}"
   out=$(run --preflight tRun --keepalive-id KA-1234)
-  hit "$out" "the project conf at the pinned BASE could not be evaluated to the end, so whether it declares SPEC_AUDIT_DEFAULT is unknown and is not read as absent - a return, an exit, an unbound reference or a syntax error in the blob ends the read before the key is seen"
+  hit "$out" "the project conf at the default-branch side of the pinned BASE could not be evaluated to the end, so whether it declares SPEC_AUDIT_DEFAULT is unknown and is not read as absent - a return, an exit, an unbound reference or a syntax error in the blob ends the read before the key is seen"
   miss "$out" "not owed (opt-in)"
   miss "$out" "opted in by project default"
   miss "$out" "preflight OK"

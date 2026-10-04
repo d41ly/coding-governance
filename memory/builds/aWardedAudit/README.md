@@ -57,7 +57,7 @@ before any code. The owner rules that only the owner opts in. The prompt is in `
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 5 unit(s) · node a · opened 2026-10-05 · streams tooling
+**Build status:** CLOSED · 5 unit(s) · node a · opened 2026-10-05 · streams tooling
 ids TOOL-aWardedAudit-1 TOOL-aWardedAudit-2 TOOL-aWardedAudit-3 TOOL-aWardedAudit-4 TOOL-aWardedAudit-5 TOOL-aWardedAudit-6
 
 <!-- gen:build-units -->
@@ -67,7 +67,7 @@ ids TOOL-aWardedAudit-1 TOOL-aWardedAudit-2 TOOL-aWardedAudit-3 TOOL-aWardedAudi
 | [TOOL-aWardedAudit-2 — the fan-out hook admits a spec audit only on an owner opt-in](spec/2026-10-05-spec-TOOL-aWardedAudit-2.md) | 2 | 2 | CLOSED | rev-2 | 2026-10-05 |
 | [TOOL-aWardedAudit-3 — the carriers state that only the owner opts a build into the spec audit](spec/2026-10-05-spec-TOOL-aWardedAudit-3.md) | 3 | 1 | CLOSED | rev-1 | 2026-10-05 |
 | [TOOL-aWardedAudit-5 — the bar refuses a run commit that writes a spec-audit opt-in](spec/2026-10-05-spec-TOOL-aWardedAudit-5.md) | 5 | 2 | CLOSED | rev-1 | 2026-10-05 |
-| [TOOL-aWardedAudit-6 — the closing review's batched minors, round 1](spec/2026-10-05-spec-TOOL-aWardedAudit-6.md) | 6 | 2 | OPEN | rev-1 | 2026-10-05 |
+| [TOOL-aWardedAudit-6 — the closing review's batched minors, round 1](spec/2026-10-05-spec-TOOL-aWardedAudit-6.md) | 6 | 2 | CLOSED | rev-1 | 2026-10-05 |
 <!-- /gen:build-units -->
 
 Records: 7 bound to this build, across 3 record folder(s).

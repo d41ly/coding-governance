@@ -244,8 +244,8 @@ It schedules no idle-wake, and the section above does not bind it: there is an o
    declares no key and the project's `.unattended.conf` at BASE declares that date
    (`TOOL-aBlindedTrial-7`; the README key wins whatever it says), or
    `unattended: spec-audit — not owed (opt-in)` when neither does. The pre-code audit is OPT-IN per
-   build (owner ruling of 2026-09-20, `TOOL-aBlindedTrial-6`); both keys are read at BASE, so a
-   working-copy edit opts nothing in or out, and a value that is not a date is a refusal.
+   build (owner ruling of 2026-09-20, `TOOL-aBlindedTrial-6`); the README key is read at BASE and the
+   project default at the default-branch side of it, so a working-copy edit opts nothing in or out, and a value that is not a date is a refusal.
    **The opt-in is the OWNER's, never yours** (`TOOL-aWardedAudit-4`). Do not write `spec-audit:`
    into a README you author: preflight refuses it under `authorized-by: prompt` or `recipe`
    (check 89), and reads a project default only from the default branch. The `not owed` line names

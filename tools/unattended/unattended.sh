@@ -2378,13 +2378,13 @@ check_authorization() { # slug · base
             eval "$_cf"$'\n\n''printf "OK %s" "${SPEC_AUDIT_DEFAULT:-}" >&3' >/dev/null 2>&1 )
     case "$_sad" in
       "OK "*) _sad=${_sad#OK } ;;
-      *) fail 55 "the project conf at the pinned BASE could not be evaluated to the end, so whether it declares SPEC_AUDIT_DEFAULT is unknown and is not read as absent - a return, an exit, an unbound reference or a syntax error in the blob ends the read before the key is seen"
+      *) fail 55 "the project conf at the default-branch side of the pinned BASE could not be evaluated to the end, so whether it declares SPEC_AUDIT_DEFAULT is unknown and is not read as absent - a return, an exit, an unbound reference or a syntax error in the blob ends the read before the key is seen"
          return 1 ;;
     esac
     case "$_sad" in
       "") ;;
       [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]) AUTH_SPEC_AUDIT="$_sad"; AUTH_SPEC_AUDIT_FROM=project ;;
-      *) fail 54 "the project conf at the pinned BASE declares SPEC_AUDIT_DEFAULT with a value that is not a YYYY-MM-DD date, and a project-wide opt-in is a dated declaration or not at all - declared: $_sad"
+      *) fail 54 "the project conf at the default-branch side of the pinned BASE declares SPEC_AUDIT_DEFAULT with a value that is not a YYYY-MM-DD date, and a project-wide opt-in is a dated declaration or not at all - declared: $_sad"
          return 1 ;;
     esac
   fi
@@ -8262,11 +8262,11 @@ $_bcnon"
       fi
       _sa_fact=$(fact "$rel" spec-audit)
       if [ "${AUTH_SPEC_AUDIT:+1}" != "${_sa_fact:+1}" ]; then
-        fail 53 "the spec-audit fact in the run-state file and the spec-audit: key in the build README, or the SPEC_AUDIT_DEFAULT the project conf declares, at the pinned BASE disagree on whether this build opted in, and the recorded fact is written by the run so the BASE derivation decides - at BASE: ${AUTH_SPEC_AUDIT:-(none)}; recorded: ${_sa_fact:-(none)}"
+        fail 53 "the spec-audit fact in the run-state file and the spec-audit: key in the build README at the pinned BASE, or the SPEC_AUDIT_DEFAULT the project conf declares at its default-branch side, disagree on whether this build opted in, and the recorded fact is written by the run so the BASE derivation decides - at BASE: ${AUTH_SPEC_AUDIT:-(none)}; recorded: ${_sa_fact:-(none)}"
         return 1
       fi
       if [ -z "${AUTH_SPEC_AUDIT:-}" ]; then
-        DOD_OUT="specs-audited — not owed: the spec audit is opt-in, the build README at BASE declares no spec-audit: key and the project conf at BASE declares no SPEC_AUDIT_DEFAULT, so this build owes no pre-code audit evidence (TOOL-aBlindedTrial-6)"
+        DOD_OUT="specs-audited — not owed: the spec audit is opt-in, the build README at BASE declares no spec-audit: key and the project conf at the default-branch side of BASE declares no SPEC_AUDIT_DEFAULT, so this build owes no pre-code audit evidence (TOOL-aBlindedTrial-6)"
         return 0
       fi
       if ! _sa_rows=$(unit_rows "$(readme_of "$slug")"); then
