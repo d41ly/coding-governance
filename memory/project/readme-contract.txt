@@ -165,3 +165,4 @@ memory/builds/aSightedSkeptic/README.md
 memory/builds/aHalvedInstall/README.md
 memory/builds/aWindowedPass/README.md
 memory/builds/aBatchedMinors/README.md
+memory/builds/aEvidencedLens/README.md
