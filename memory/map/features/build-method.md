@@ -15,6 +15,7 @@ workflow-scripts = []
 skill-engines = []
 rendered-skills = []
 gotcha-classes = ["fold-text-is-unreviewed-surface.md", "amendment-leaves-its-other-half-standing.md",
+  "a-folded-field-leaves-its-row-shape-docs-behind.md",
   "one-value-field-records-a-mixed-outcome.md", "criterion-asserts-what-its-own-command-cannot-show.md",
   "observation-before-the-last-fold-of-the-same-commit.md",
   "hand-named-gate-list-green-while-the-bar-reds.md"]

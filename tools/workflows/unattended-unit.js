@@ -183,7 +183,10 @@ const PROMPT =
   'with what it was for, and never re-run it or wait on it. Never wait on a command with no bound. A ' +
   'backgrounded command is awaited through the harness\'s completion notification, never by a ' +
   'polling loop.\n' +
-  'Commit with the unit id in the subject. IN THAT SAME COMMIT, set this unit\'s spec status header ' +
+  'Commit with the unit id in the subject and END THE MESSAGE WITH A `Pass: <unit-id>` TRAILER LINE ' +
+  'naming this unit, in the trailer block beside Co-Authored-By: the gate attributes a pass commit by ' +
+  'that trailer, and the commit-msg hook refuses a commit naming an open pass without one. A commit ' +
+  'that is no pass but names this unit carries `Pass: none`. IN THAT SAME COMMIT, set this unit\'s spec status header ' +
   'to CLOSED — or to WONTDO with a reason. That header is the only fact the driver\'s --plan verb ' +
   'reads to decide a unit is finished, so a unit built without it leaves the run\'s own loop counter ' +
   'naming this unit again, forever.\n' +

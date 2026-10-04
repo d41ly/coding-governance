@@ -163,3 +163,4 @@ memory/builds/dAlignedCarrier/README.md
 memory/builds/dMendedRecall/README.md
 memory/builds/aSightedSkeptic/README.md
 memory/builds/aHalvedInstall/README.md
+memory/builds/aWindowedPass/README.md

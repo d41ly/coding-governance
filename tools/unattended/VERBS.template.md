@@ -166,7 +166,9 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   that discovers it needs fewer paths than it declared says so, and both rows stand. M6 sanctions
   several pass kinds per unit, and a later row is read the same way whichever it is. What the verb
   REFUSES is overlap with a SIBLING pass still open, the disjointness question it exists for and the
-  one thing here that is unchanged; a unit's own rows are never siblings of each other. Before any of that it runs the DECLARED spec-token checker, `SPEC_TOKENS_CLI`, over the
+  one thing here that is unchanged; a unit's own rows are never siblings of each other. A pass's
+  COMMIT is the one whose `Pass: <unit-id>` trailer names it; a commit with no trailer falls back to
+  its subject, and `Pass: none` names no unit. Before any of that it runs the DECLARED spec-token checker, `SPEC_TOKENS_CLI`, over the
   live tree and refuses the dispatch when it exits non-zero: the checker's bar join grades LIVE specs,
   an unattended build closes each unit spec in its own build commit, and this verb is the one point
   that sees a spec before its unit builds. A blank or absent key is an ANNOUNCED skip on stdout,
@@ -191,6 +193,16 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   leaves the gate inferring one from ids. It refuses a verdict or a disposition outside its closed
   set, a missing subject or count, a terminal exit carrying no disposition, `fold` at a terminal
   exit, a disposition on a `CONVERGING` round, and a round on a subject whose loop has already ended.
+- `--check-commit` — `--check-commit <message file>`, run by the `commit-msg` hook on EVERY commit.
+  It binds the run whose branch this worktree has checked out and is silent when there is none. A
+  `Pass: <unit-id>` trailer must name an open dispatched pass, and the staged paths, less the
+  run-state file, the unit's brief rows, the generated outputs and gen-region-only changes, must sit
+  inside that pass's declarations; otherwise it refuses, naming each path and printing the
+  `--dispatch` that widens the declaration while widening is still legal. No trailer on a subject
+  naming an open pass is refused too, asking for `Pass: <unit-id>` or `Pass: none`. It writes
+  nothing; a `--no-verify` commit skips it, and check 23 still grades that pass at the close. An
+  AMEND of a pass commit is graded too, but an undeclared path in it is refused with no widening:
+  a `--dispatch` would anchor at the commit the amend replaces, which check 23 never grades.
 - `--version` — prints the kit's own version and exits, touching no record. It is here because it is
   DECLARED, and a declared verb nobody documents is one nobody uses to answer the question this kit
   cannot answer for them: which build of it they are talking to. It takes no slug and no run, so it

@@ -2081,6 +2081,64 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
                        f"it: {' '.join(str(x) for x in _cmd)[:240]}")
     r.note(f"hole probes on an empty tree: {_vac_ran} ran, {_vac_bad} exited 0, "
            f"{_vac_nolaunch} could not launch")
+    # ---- 6c (TOOL-aWindowedPass-4): A `[[generated]]` ROW NAMES A GENERATOR THE KIT SHIPS AND A PATH
+    #          THE UNATTENDED KIT CAN RESOLVE. The unattended kit reads these rows in a target to tell a
+    #          hook-forced regeneration from a pass's own write; a row naming a generator that is not in
+    #          the kit, or a path token its shell reader does not resolve, is a declaration nothing can
+    #          honour, and the reader skips it with a stderr line nobody reads on a green bar. WHAT THIS
+    #          DOES NOT CHECK: that the generator really writes the path, or that a `when` row's conf key
+    #          exists in its kit.
+    #          The path is graded AS THE READER RESOLVES IT (closing review r1, M9): the three tokens are
+    #          removed and any brace left is a row the reader skips, whatever its case or balance. A
+    #          `when` is `<conf file>:<KEY>=<value>`, the one shape the reader evaluates.
+    #          AND THE ROWS THEMSELVES ARE THE ONES THE SHELL READER SEES (closing review r2, M2). The reader
+    #          is a column-0, double-quote-only awk in `resolve_generated_indexes`; a single-quoted or
+    #          indented value parses in tomllib and is mangled or dropped there, so its rows - ported line
+    #          for line below - must equal tomllib's, or the row is graded on values no reader uses.
+    def _read_shell_generated_rows(text):
+        rows, on, cur = [], False, None
+
+        def _read_quoted_value(s):
+            s = re.sub(r'^[^=]*=[ \t]*"', "", s, count=1)
+            return re.sub(r'".*$', "", s, count=1)
+        for line in text.split("\n"):
+            line = line[:-1] if line.endswith("\r") else line
+            if re.match(r"^\[\[generated\]\][ \t]*$", line) or line.startswith("["):
+                if on and cur["p"]:
+                    rows.append((cur["p"], cur["g"], cur["w"]))
+                on = bool(re.match(r"^\[\[generated\]\][ \t]*$", line))
+                cur = {"p": "", "g": "", "w": ""}
+                continue
+            for key, k in (("path", "p"), ("generator", "g"), ("when", "w")):
+                if on and re.match(rf"^{key}[ \t]*=", line):
+                    cur[k] = _read_quoted_value(line)
+        if on and cur["p"]:
+            rows.append((cur["p"], cur["g"], cur["w"]))
+        return rows
+    _gen_tokens = {"memory_root", "map_root", "kit"}
+    _n_gen = 0
+    for eid, (d, _dpath) in sorted(descs.items()):
+        _gtoml = [(str(_r.get("path") or ""), str(_r.get("generator") or ""), str(_r.get("when") or ""))
+                  for _r in d.get("generated", []) or [] if _r.get("path")]
+        _gshell = _read_shell_generated_rows((root / _dpath).read_text(encoding="utf-8")) if _gtoml else []
+        if _gtoml != _gshell:
+            r.fail(f"entry '{eid}' [[generated]] rows read by the unattended kit's shell reader differ from "
+                   f"tomllib's - write each key at column 0 as a double-quoted string: shell {_gshell} "
+                   f"vs tomllib {_gtoml}")
+        for _gr in d.get("generated", []) or []:
+            _n_gen += 1
+            _gp, _gg = str(_gr.get("path") or ""), str(_gr.get("generator") or "")
+            _gleft = re.sub(r"\{(memory_root|map_root|kit)\}", "", _gp)
+            _gw = _gr.get("when")
+            _gwbad = _gw is not None and not re.fullmatch(r"[^:\s]+:[A-Z_][A-Z0-9_]*=\S+", str(_gw))
+            _gsrc = (root / _dpath).parent / _gg if _gg else None
+            if not _gp or not _gg or "{" in _gleft or "}" in _gleft or _gwbad \
+                    or not (_gsrc and _gsrc.is_file()) or not str(_gr.get("why") or "").strip():
+                r.fail(f"entry '{eid}' [[generated]] row {_gp or '(no path)'}: needs a path whose only "
+                       f"tokens are {sorted(_gen_tokens)} (left after them: '{_gleft}'), a generator "
+                       f"file beside the descriptor (got '{_gg}'), a when shaped <conf>:<KEY>=<value> "
+                       f"if any (got {_gw!r}), and a why")
+    r.note(f"generated outputs: {_n_gen} [[generated]] row(s) declared across the descriptors")
 
     # ---- 7: a requires_if condition names keys that resolve in the named kit's config lists, and
     #         names a kit that is a registry entry. PLAIN `requires` gets the same name arm, because
