@@ -1,6 +1,6 @@
 # TOOL-aWardedAudit-3 — the carriers state that only the owner opts a build into the spec audit
 
-**Status:** OPEN · rev-1 · 2026-10-05 · node a · Tier-1 · base 35438ba0 · streams tooling · order 3
+**Status:** CLOSED · rev-1 · 2026-10-05 · node a · Tier-1 · base 35438ba0 · streams tooling · order 3
 
 <!-- gen:spec-records -->
 

@@ -245,9 +245,12 @@ It schedules no idle-wake, and the section above does not bind it: there is an o
    (`TOOL-aBlindedTrial-7`; the README key wins whatever it says), or
    `unattended: spec-audit — not owed (opt-in)` when neither does. The pre-code audit is OPT-IN per
    build (owner ruling of 2026-09-20, `TOOL-aBlindedTrial-6`); both keys are read at BASE, so a
-   working-copy edit opts nothing in or out, and a value that is not a date is a refusal. The `not owed`
-   line carries a recommendation when the build has two or more units or a spec grades FORKED —
-   that is where the audit earned its cost in the trial. Keep the line: the harness call needs it.
+   working-copy edit opts nothing in or out, and a value that is not a date is a refusal.
+   **The opt-in is the OWNER's, never yours** (`TOOL-aWardedAudit-4`). Do not write `spec-audit:`
+   into a README you author: preflight refuses it under `authorized-by: prompt` or `recipe`
+   (check 89), and reads a project default only from the default branch. The `not owed` line names
+   the owner's cue, two or more units or a FORKED spec: carry it to the wrap-up and decide nothing.
+   Keep the line: the harness call needs it.
    After a compaction, `--status` carries the same fact as `· spec-audit <date>`.
 
 4. **If this project ships `/session-kickoff`, invoke it now — after preflight, never before.**
@@ -367,7 +370,8 @@ rather than a claim in a transcript nobody reads.
 3. **Write the build folder.** `{{MEMORY_ROOT}}/builds/<slug>/README.md`. **Front matter needs ALL
    SIX required keys** — `slug`, `node`, `opened`, `streams`, `roster`, `ids` — plus
    **`authorized-by: prompt`**, the key recording which discipline bound this run, which the merge
-   bar re-derives from this same file. **And the body needs the generated-region marker pair**,
+   bar re-derives from this same file. **No `spec-audit:` key**: under this mode it is refused at
+   check 89, because a run may not opt itself into the audit. **And the body needs the generated-region marker pair**,
    `<!-- gen:build-index -->` and its close, or preflight refuses at step 5 with *the build README's
    generated markers are malformed*: the unit list is DERIVED from that region, so an unpaired marker
    is not something the driver guesses around. Every one of these is checked AFTER the push, where
@@ -694,7 +698,8 @@ definition, so the absence is a decision and not an oversight.
   terminal `--review` verdict, or at SPEC completion when the audit is off by declaration. **Pass
   `specAudit: <date>` when the preflight line read `opted in by README spec-audit: <date>` or
   `opted in by project default SPEC_AUDIT_DEFAULT: <date>`**, and
-  omit it when it read `not owed (opt-in)`; the harness owns the OFF branch and logs it. Each unit is
+  omit it when it read `not owed (opt-in)`; the harness owns the OFF branch and logs it. The fan-out
+  hook compares the value with the run's pinned `spec-audit` fact and refuses any other. Each unit is
   then built by
   `{{TOOL_ROOT}}workflows/unattended-unit.js`, one unit per call, holding that unit's brief and spec and
   nothing else. **Every call is made by `scriptPath` and never by `name`** — the fan-out guard's

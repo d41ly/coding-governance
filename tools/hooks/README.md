@@ -149,7 +149,12 @@ hand narrowing passes green (the aReplayedCard closing review, F12).
   `<args.repo>/.unattended.conf` — the worktree copy, last assignment wins, both quote styles and a
   trailing `# comment` read as the shell would — and a date admits, a non-date denies by name, a
   missing file or a blank is no default. The README key wins whatever it says, so a malformed key
-  never falls back to the default. TWO LIMITS, stated
+  never falls back to the default. THE OPT-IN IS THE OWNER'S (`TOOL-aWardedAudit-4`): a README
+  declaring `authorized-by:` other than `slug` admits nothing by its own key, since the run writes
+  that README; beside a live run-state file (`RUN.md` whose `phase:` is not LANDED or ABORTED) only
+  its pinned `spec-audit:` fact admits, and the worktree is not read. A call whose `args` carry
+  `specAudit` — the build harness, whose nested audit no hook sees — is judged the same way, placed
+  by the harness's own `memory/builds/<slug>/reviews` default, and in a live run must equal the fact. TWO LIMITS, stated
   rather than implied. The `workflow()` a running harness calls from INSIDE its script is a runtime
   call and not a tool call, so the programmatic route is the unattended driver's to refuse
   (`TOOL-aBlindedTrial-3`); and this hook reads the WORKTREE README and conf while that driver reads

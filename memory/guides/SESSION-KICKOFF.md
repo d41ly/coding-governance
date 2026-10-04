@@ -2,7 +2,7 @@
 
 <!-- kickoff-manifest: v1.4 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-10-04T19:52:28+03:00 @ adaea26441a3628bf9701b061693f0d8cad4552e
+last-audit: 2026-10-05T01:26:08+03:00 @ 72900b7a904188009ee0fba3a520d9e76f3a2797
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/run-gates/run-selftests.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
 last-body-change: 30c5cb34aba27c0cc71a03c95817a32844a0e37d
@@ -126,9 +126,10 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   floor is excluded and printed with its count, a one-segment root such as `tools/` under the sub-head
   declares nothing, and a spec with no Gates heading is not joined. `TOOL-aBlindedTrial-8`.
 
-- **The pre-code spec audit is owed where the build README's `spec-audit: <date>` OR `.unattended.conf`'s
-  `SPEC_AUDIT_DEFAULT` (read at BASE, the README winning) declares it; under neither, nothing is owed
-  and the kickoff engine asks the owner once at READY.** `TOOL-aBlindedTrial-6`, `-7`, `KICK-aBlindedTrial-1`.
+- **The pre-code spec audit is owed where the OWNER declares it: a `slug` README's `spec-audit: <date>`
+  OR `.unattended.conf`'s `SPEC_AUDIT_DEFAULT` at the default-branch side; a run never declares either.
+  Under neither, none is owed; kickoff asks the owner at READY.**
+  `TOOL-aBlindedTrial-6`, `-7`, `TOOL-aWardedAudit-4`, `KICK-aBlindedTrial-1`.
 
 - **Before starting work inside a kit, check whether another node is already rewriting it.**
   `git log origin/main --oneline -20 -- tools/<kit>/` answers it in one second. Hit twice:
