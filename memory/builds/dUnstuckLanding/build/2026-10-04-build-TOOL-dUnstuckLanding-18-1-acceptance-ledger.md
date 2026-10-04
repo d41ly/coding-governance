@@ -35,7 +35,7 @@ drift-audit and runlog self-tests among them, and the gate legs are owed to the 
   and `cmp` of the template against the render exited 0.
 - AC8 — `never an abort` — the M3 slice grep printed 1, and the render measures 27645 of 30720 bytes.
 - AC9 — `build-complete` — the §4 row names a unit carried forward under the stop contract's table;
-  the render measures 65521 of the declared 65692 bytes, and `cmp` exited 0.
+  the render measures 65546 of the declared 65692 bytes after the rev-3 fold, and `cmp` exited 0.
 - AC10 — `TOOL-dUnstuckLanding-23` — the driver grep prints the comment line above `build-complete`
   quoting the ruling, and `memory/DECISIONS.md` line 134 is the ruling row superseding D8.
 - AC11 — `carried forward` — 6 lines in the Skill template and 6 in the regenerated Skill.

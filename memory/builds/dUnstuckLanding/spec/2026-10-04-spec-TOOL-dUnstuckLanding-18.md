@@ -1,6 +1,6 @@
 # TOOL-dUnstuckLanding-18 — the close-decision table, and a build that lands with its rest carried forward
 
-**Status:** CLOSED · rev-2 · 2026-10-04 · node d · Tier-2 · base 98926870 · streams tooling · order 6 · closes TOOL-dUnstuckLanding-8 · ratified 2026-10-04
+**Status:** CLOSED · rev-3 · 2026-10-04 · node d · Tier-2 · base 98926870 · streams tooling · order 6 · closes TOOL-dUnstuckLanding-8 · ratified 2026-10-04
 
 <!-- gen:spec-records -->
 
@@ -57,8 +57,9 @@ the close, a park is never an abort. Owner ruling `TOOL-dUnstuckLanding-23` supe
   alternation, is widened to the four-act one, or that probe refuses. The usage line at the driver's
   head and the `--rescope` entry in `VERBS.template.md` name the new act. Observed by AC6.
 - **S5 — the protocol row.** PROTOCOL §4's `build-complete` row says that a unit carried forward
-  under the stop contract's close-decision table is not unfinished. The render is re-copied, and it
-  stays within its declared size cap. Observed by AC9.
+  under the stop contract's close-decision table is not unfinished, and §9's sentence on a run that
+  stops early names the recorded deferral beside the recorded `--override` as its escapes. The render
+  is re-copied, and it stays within its declared size cap. Observed by AC9.
 - **S6 — the M3 sentence.** `tools/memory-tree/BUILD-METHOD.template.md` M3 gains one sentence
   beside "No survivors → park". It says that at the close a park is never an abort: the run records
   the park and takes the exit the unattended-run protocol's close-decision table names. M8's Landing
@@ -325,6 +326,10 @@ once, under `TOOL-dUnstuckLanding-24`.
   alone reds two self-tests at the close. S10 adds both mirrors, the runlog ledger source, one
   fixture row in each kit, and the two driver-suite arms that pin what S4 changes; §4 lists the four
   files and §7 the legs they guard, and AC13 observes the mirrors. No rev-1 criterion moved.
+- rev-3 · 2026-10-04 · the bug-class checklist over the build commit selected
+  amendment-leaves-its-other-half-standing: protocol §9 still said a run stopping early with units
+  unbuilt has one escape, the recorded `--override`. S5 now also names that sentence, which gains
+  the recorded deferral beside it.
 
 ## 10. Reuse audit
 

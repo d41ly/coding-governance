@@ -562,8 +562,8 @@ And a run that rewrites the harness child's prompt between dispatches: the fan-o
 feeds the burst and join rules alone, so a second `agent()` carrying any prompt admits. And a run
 that never calls `--dispatch` or `--brief`: both are acts a run performs, not gates it meets, and
 the history legs grade only what a CLOSED unit's build commit carries. And a run that stops early
-with units unbuilt, since completeness rests on `build-complete` at `--close` alone and its escape
-is a recorded `--override`.
+with units unbuilt, since completeness rests on `build-complete` at `--close` alone and its escapes
+are a recorded `--override` or a recorded deferral.
 
 **What actually binds.** None of those levers travels with a push. The same leg, re-run in a clone
 the run never touched by a party the run cannot execute code as — a required status check, or a
