@@ -91,7 +91,7 @@ ids TOOL-dUnstuckLanding-13 TOOL-dUnstuckLanding-14 TOOL-dUnstuckLanding-15 TOOL
 | [TOOL-dUnstuckLanding-20 — `LANDING_NODES`: landing capability declared, resolved from machine and user, and a planned hand-off](spec/2026-10-04-spec-TOOL-dUnstuckLanding-20.md) | 8 | 2 | INPROGRESS | rev-1 | 2026-10-04 |
 <!-- /gen:build-units -->
 
-Records: 12 bound to this build, across 4 record folder(s).
+Records: 13 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
