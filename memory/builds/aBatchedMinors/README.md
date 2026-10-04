@@ -70,9 +70,9 @@ ids TOOL-aBatchedMinors-1 TOOL-aBatchedMinors-2 TOOL-aBatchedMinors-3 TOOL-aBatc
 | [TOOL-aBatchedMinors-6 — the closing review's batched minors, round 1](spec/2026-10-04-spec-TOOL-aBatchedMinors-6.md) | 6 | 2 | OPEN | rev-1 | 2026-10-04 |
 <!-- /gen:build-units -->
 
-Records: 5 bound to this build, across 3 record folder(s).
+Records: 6 bound to this build, across 3 record folder(s).
 
-Ids no record names: TOOL-aBatchedMinors-6.
+Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: TOOL-aBatchedMinors-1 TOOL-aBatchedMinors-2 TOOL-aBatchedMinors-3 TOOL-aBatchedMinors-4 TOOL-aBatchedMinors-6.
 <!-- /gen:build-index -->

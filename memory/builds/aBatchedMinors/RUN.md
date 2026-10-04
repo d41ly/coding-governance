@@ -10,8 +10,8 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 
 ## Run facts
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 92847e1858b69ff1d48dadedd85cb4b9c4c338f2
-phase: REVIEWING
+witness: a8571c6420f1fa45f1b431fc131af294609daea5
+phase: BUILDING
 branch-sha: 5ba0fc4fcdab79eeeb7f75a97a48102bb10bfefa
 branch-ref: refs/heads/branch/unattended-closing-review-promotion-227ff0
 may: none
@@ -50,3 +50,5 @@ base: 5ba0fc4fcdab79eeeb7f75a97a48102bb10bfefa
 2026-10-04T16:33:46Z review · item aBatchedMinors · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 0 · minors 14 · disposition promote
 
 2026-10-04T16:33:48Z rescope · item add TOOL-aBatchedMinors-6 · reason closing review round 1 promoted all 14 confirmed minors (3 MEDIUM, 11 LOW; items M1 M2 L1-L7) into ONE batched unit under the rule this build ships; one, not two, because the build is driven inline and a second unit buys no concurrency
+
+2026-10-04T16:35:31Z brief · item TOOL-aBatchedMinors-6 · reason f9bf89853b34 memory/builds/aBatchedMinors/prompts/2026-10-04-prompt-TOOL-aBatchedMinors-6-1-build-brief.md
