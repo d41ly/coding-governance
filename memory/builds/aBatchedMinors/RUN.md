@@ -32,3 +32,9 @@ base: 5ba0fc4fcdab79eeeb7f75a97a48102bb10bfefa
 ## Parked
 
 2026-10-04T15:36:50Z rescope · item retire TOOL-aBatchedMinors-1 · reason speccing found the harness return already determines the count: blockers and highs are integers only when every confirmed id sits in one severity, so MEDIUM+LOW = confirmed - blockers - highs exactly, the arithmetic unattended-build.js already uses; a minors key would be a second answer to one question
+
+2026-10-04T15:37:52Z brief · item TOOL-aBatchedMinors-2 · reason f28c9e08ab1d memory/builds/aBatchedMinors/prompts/2026-10-04-prompt-TOOL-aBatchedMinors-2-1-build-brief.md
+
+2026-10-04T15:37:55Z brief · item TOOL-aBatchedMinors-3 · reason cce2874fc3d6 memory/builds/aBatchedMinors/prompts/2026-10-04-prompt-TOOL-aBatchedMinors-3-1-build-brief.md
+
+2026-10-04T15:37:58Z brief · item TOOL-aBatchedMinors-4 · reason 7cdfd7ea7b00 memory/builds/aBatchedMinors/prompts/2026-10-04-prompt-TOOL-aBatchedMinors-4-1-build-brief.md

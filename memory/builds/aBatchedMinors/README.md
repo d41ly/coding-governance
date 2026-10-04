@@ -68,9 +68,9 @@ ids TOOL-aBatchedMinors-1 TOOL-aBatchedMinors-2 TOOL-aBatchedMinors-3 TOOL-aBatc
 | [TOOL-aBatchedMinors-4 — the method, the Skill and the verbs entry state the batched-promotion rule](spec/2026-10-04-spec-TOOL-aBatchedMinors-4.md) | 4 | 1 | OPEN | rev-1 | 2026-10-04 |
 <!-- /gen:build-units -->
 
-Records: 1 bound to this build, across 2 record folder(s).
+Records: 4 bound to this build, across 2 record folder(s).
 
-Ids no record names: TOOL-aBatchedMinors-2 TOOL-aBatchedMinors-3 TOOL-aBatchedMinors-4.
+Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: TOOL-aBatchedMinors-1 TOOL-aBatchedMinors-2 TOOL-aBatchedMinors-3 TOOL-aBatchedMinors-4.
 <!-- /gen:build-index -->
