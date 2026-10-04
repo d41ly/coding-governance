@@ -1,6 +1,6 @@
 # TOOL-aWardedAudit-2 — the fan-out hook admits a spec audit only on an owner opt-in
 
-**Status:** CLOSED · rev-1 · 2026-10-05 · node a · Tier-2 · base 35438ba0 · streams tooling · order 2
+**Status:** CLOSED · rev-2 · 2026-10-05 · node a · Tier-2 · base 35438ba0 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -26,6 +26,11 @@ driver now refuses. This unit makes the hook agree with the driver before any au
   than `slug` admits nothing by its own `spec-audit:` key; the deny names the mode. The worktree
   conf default still admits on that path, as it does today. Observed by AC3 and AC4.
 - **S3** — Every existing rule 0 arm keeps its verdict. Observed by AC5.
+- **S4** — A Workflow call whose args carry `specAudit` is judged by the same predicate as a
+  `kind: spec-audit` one: the build harness runs its audit through a runtime `workflow()` call no
+  hook sees, so the call carrying `specAudit` is the only one to judge. It is placed by the
+  harness's own `reviewDir` default when none is passed, and in a live run the value must equal
+  the pinned fact. Observed by AC6 and AC7.
 
 ## 3. Non-goals (OUT)
 
@@ -93,6 +98,12 @@ column-1 fact lines under `## Run facts`.
 - **AC5** — When rule 0 judges a slug README carrying `spec-audit: 2026-09-20` beside no run-state
   file, it admits, as at base.
   Red when: a rule 0 verdict at base moved.
+- **AC6** — When a harness call passes `specAudit: 2026-10-05` beside a live run-state file pinning
+  no fact, rule 0 denies naming the run-state file; pinning `2026-10-05`, it admits.
+  Red when: the base hook admits, because it judged `kind` alone.
+- **AC7** — When the pinned fact is `2026-09-01` and the call passes `2026-10-05`, rule 0 denies
+  naming both dates.
+  Red when: any dated fact admits any `specAudit`.
 
 ## 7. Gates
 
@@ -107,6 +118,9 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-05 · initial draft, from rule 0 at base and `TOOL-aWardedAudit-1`.
+- rev-2 · 2026-10-05 · S4 · AC6 · AC7 · building found the build harness's `specAudit` argument is a
+  second self-opt-in route rule 0 never judged: the hooks README says its nested audit is a runtime
+  call, so the S1 predicate alone left the main unattended path open.
 
 ## 10. Reuse audit
 
