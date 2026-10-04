@@ -1,6 +1,6 @@
 # TOOL-aWindowedPass-6 — an amend of a committed pass is refused without a widening the close would not honour
 
-**Status:** CLOSED · rev-1 · 2026-10-04 · node a · Tier-2 · base 886b089d · streams tooling · order 6 · ratified 2026-10-04
+**Status:** CLOSED · rev-2 · 2026-10-04 · node a · Tier-2 · base 886b089d · streams tooling · order 6 · ratified 2026-10-04
 
 <!-- gen:spec-records -->
 
@@ -89,12 +89,14 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-04 · initial draft, promoted from closing review round 2 ids 8 and 4.
+- rev-2 · 2026-10-04 · close · §4 · S1 · the verb's function is renamed `check_commit_message`, since the lexicon leg
+  declares no `verb` verb; behaviour unchanged.
 
 ## 10. Reuse audit
 
 `python tools/codebase-map/reuse_lookup.py "refuse amending a committed pass commit that adds an undeclared path"`
 ranked unrelated symbol definitions and printed that `.sh` layers have no extractor. Extended by hand:
-`verb_check_commit`'s own `o`/`O` row tags and its open-pass refusal, which this unit splits by tag.
+`check_commit_message`'s own `o`/`O` row tags and its open-pass refusal, which this unit splits by tag.
 
 Recall terms used: check 23 undeclared write ceiling dispatch declaration disjointness concurrent pass generated index shrink-only ratchet
 

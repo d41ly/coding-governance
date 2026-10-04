@@ -806,7 +806,7 @@ check_gen_region_only() { # before object · after object -> 0 when both exist a
 # everywhere: a commit carrying a `Pass:` trailer yields `PASSTRAILER <its ids>` and NOT its subject,
 # so `Pass: none` names no unit; one with no trailer yields its subject's tokens, as before. Tokens
 # are runs of `[A-Za-z0-9-]`, the shape a whole-token `case " $id "` match reads.
-log_attribution_tokens() { # git-log revision arguments -> one tokenised line per commit
+read_attribution_tokens() { # git-log revision arguments -> one tokenised line per commit
   GIT log --format='%H %s%x1f%(trailers:key=Pass,valueonly,separator=%x20)' "$@" 2>/dev/null \
     | awk -F '\037' '{ if ($2 != "") { split($1, h, " "); t = $2; gsub(/[^A-Za-z0-9-]/, " ", t)
                                         if ((" " t " ") ~ / none /) t = ""; print h[1] " PASSTRAILER " t }
@@ -912,7 +912,7 @@ build_commit() {  # rev-range · unit-id · build-dir · generated-indexes · sh
     #
     # THE WHOLE-TOKEN MATCH is `memory/gotchas/id-matched-as-a-substring`: every id ending in a 1-up
     # sequence is a prefix of nine others, so an unanchored `TOOL-x-1` matches `TOOL-x-19`'s commit.
-    [ -n "$_bc_subj" ] || _bc_subj=" $(log_attribution_tokens -1 "$_bc_c" | cut -d' ' -f2-) "
+    [ -n "$_bc_subj" ] || _bc_subj=" $(read_attribution_tokens -1 "$_bc_c" | cut -d' ' -f2-) "
     case "$_bc_subj" in *" $_bc_id "*) ;; *) continue ;; esac
     # Did it touch anything outside this build's own record surface?
     if GIT show --pretty=format: --name-only "$_bc_c" 2>/dev/null \

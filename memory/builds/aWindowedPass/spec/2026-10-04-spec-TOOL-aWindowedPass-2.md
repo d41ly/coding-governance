@@ -1,6 +1,6 @@
 # TOOL-aWindowedPass-2 — a pass commit carries a `Pass:` trailer, and the legs attribute by it
 
-**Status:** CLOSED · rev-4 · 2026-10-04 · node a · Tier-2 · base 886b089d · streams tooling · order 2 · ratified 2026-10-04
+**Status:** CLOSED · rev-5 · 2026-10-04 · node a · Tier-2 · base 886b089d · streams tooling · order 2 · ratified 2026-10-04
 
 <!-- gen:spec-records -->
 
@@ -24,7 +24,7 @@ that is no pass.
 
 ## 2. Scope (IN)
 
-- **S1** — `log_attribution_tokens` in `tools/unattended/lib-unattended.sh` prints one tokenised line
+- **S1** — `read_attribution_tokens` in `tools/unattended/lib-unattended.sh` prints one tokenised line
   per commit from one `git log` read: `PASSTRAILER <ids>` for a commit carrying a `Pass:` trailer, its
   subject's tokens otherwise. Both build-commit legs build their subject cache from it. Observed by
   AC3.
@@ -53,12 +53,12 @@ that is no pass.
 ### Data model
 
 ```bash
-log_attribution_tokens HEAD   # <sha> PASSTRAILER TOOL-x-1   or   <sha> <subject tokens>
+read_attribution_tokens HEAD   # <sha> PASSTRAILER TOOL-x-1   or   <sha> <subject tokens>
 ```
 
 In `pass_commit`, the existing `%H%x09%s` walk appends `%x1f%(trailers:key=Pass,valueonly)`, so the
 trailer rides the same single spawn. `build_commit` reads the callers' cache, which
-`log_attribution_tokens` builds, and calls it for a single commit on a cache miss.
+`read_attribution_tokens` builds, and calls it for a single commit on a cache miss.
 
 ### Files touched (estimate)
 
@@ -123,8 +123,10 @@ none
   any non-id character and a `none` anywhere attributes the commit to nothing; check 23's ambiguity
   test reads a trailered commit's trailer, not its subject; §5 struck the per-walk announcement and
   attribution line, which the per-commit design never needed.
-- rev-4 · 2026-10-04 · closing review r2 · S1 · M8 · `log_attribution_tokens`'s `none` rule has a `build_commit` arm,
+- rev-4 · 2026-10-04 · closing review r2 · S1 · M8 · `read_attribution_tokens`'s `none` rule has a `build_commit` arm,
   observed red with the rule removed.
+- rev-5 · 2026-10-04 · close · §4 · S1 · the token producer is renamed `read_attribution_tokens`, since the lexicon
+  leg declares `read` and not `log`; behaviour unchanged.
 
 ## 10. Reuse audit
 

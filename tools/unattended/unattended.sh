@@ -46,7 +46,7 @@
 # The generated region holds NO copy: the unit list is DERIVED from the build README's already-derived,
 # already-byte-compared slice. One derivation in the tree; this file is not a second one.
 set -u
-KIT_UNATTENDED_VERSION=1.58   # gov:kit unattended@1.58 — kit identity; set HERE, never from .unattended.conf
+KIT_UNATTENDED_VERSION=1.59   # gov:kit unattended@1.59 — kit identity; set HERE, never from .unattended.conf
 
 # ------------------------------------------------------------------------------ the dereference pin
 # A sha is a NAME, and turning a name into bytes or into ancestry happens in the run's own object
@@ -9704,7 +9704,7 @@ CPOROWS
 # a change confined to gen regions (`check_gen_region_only`, HEAD against the index).
 # WHAT IT DOES NOT CHECK: a `--no-verify` commit never reaches it, and `Pass: none` is taken at its
 # word. Check 23 still grades both at the close.
-verb_check_commit() { # commit message file
+check_commit_message() { # commit message file
   local msg="$1" f rel="" ref slug trl subj rows r d o u decl st p q ok uncov uncovl briefs cmd kd head
   [ -f "$msg" ] || { fail 49 "--check-commit was given no readable commit message file: ${msg:-(none)}"; return 1; }
   # It runs on EVERY commit, so the candidates are narrowed by one grep for this branch's ref before
@@ -9742,15 +9742,16 @@ verb_check_commit() { # commit message file
       fi
     done)
   case " $trl " in *" none "*) return 0 ;; esac
+  # EVERY LOOP BELOW READS A SCRATCH FILE, `CC_TMP`, never a heredoc over command output: such a loop
+  # reads until EOF, and the shell-hygiene leg bans it. The dispatch arm creates and removes the file.
   if [ -z "${trl// /}" ]; then
+    printf '%s\n' "$rows" > "$CC_TMP"
     while read -r o u decl; do
       [ "$o" = o ] || continue
       id_in "$subj" "$u" || continue
       fail 49 "--check-commit: this commit's subject names $u, an open dispatched pass of $slug, and the message carries no Pass: trailer, so check 23 would take it for that pass's commit; end the message with 'Pass: $u' when it is the pass, or 'Pass: none' when it is not"
       return 1
-    done <<CCROWS
-$rows
-CCROWS
+    done < "$CC_TMP"
     return 0
   fi
   # NO RENAME DETECTION (closing review r1, M1): porcelain `diff` lists a staged rename by its
@@ -9769,6 +9770,7 @@ CCROWS
     fi
     briefs=$'\n'"$(read_brief_paths "" "$u" "$rel")"$'\n'
     uncov=""; uncovl=""
+    printf '%s\n' "$st" > "$CC_TMP"
     while IFS= read -r p; do
       [ -n "$p" ] || continue
       [ "$p" = "$rel" ] && continue
@@ -9779,9 +9781,7 @@ CCROWS
       [ "$ok" = 1 ] && continue
       check_gen_region_only "HEAD:$p" ":$p" && continue
       uncov="$uncov $p"; uncovl="$uncovl$p"$'\n'
-    done <<CCST
-$st
-CCST
+    done < "$CC_TMP"
     # A UNIT WHOSE ROWS ARE ALL REOPENED (`O`) HAS COMMITTED: HEAD is its pass commit and this is an amend
     # of it (TOOL-aWindowedPass-6). A widening `--dispatch` would anchor at the commit the amend
     # replaces, a row check 23 never grades, so no widening is offered - only the repairs it honours.
@@ -9794,11 +9794,10 @@ CCST
       printf -v cmd 'bash %q --dispatch %q --pass %q' "$kd/unattended.sh" "$slug" "$u"
       # ONE PATH PER LINE, never word-split or globbed: a staged `app/[id]/x` must not expand to a file it
       # happens to match (closing review r2, L2). The recorded declaration holds no glob character.
+      { printf '%s\n' $decl; printf '%s' "$uncovl"; } | awk 'NF && !s[$0]++' > "$CC_TMP"
       while IFS= read -r q; do
         [ -n "$q" ] && printf -v cmd '%s --writes %q' "$cmd" "$q"
-      done <<CCQ
-$( { printf '%s\n' $decl; printf '%s' "$uncovl"; } | awk 'NF && !s[$0]++')
-CCQ
+      done < "$CC_TMP"
       fail 49 "--check-commit: pass $u stages paths outside the set it declared before dispatch, and the declaration can still be widened because the pass has not committed:$uncov — widen it, then commit again: $cmd"
       return 1
     fi
@@ -10527,7 +10526,9 @@ while [ $# -gt 0 ]; do
                     [ "${1:-}" = "--witness" ] && { shift; PH_WIT=${1:-}; }
                     refuse_waive_unless_preflight --phase || { RUNLOG_CLEAN=1; exit 1; }
                     verb_phase "$PH_SLUG" "$PH_WANT" "$PH_WIT"; _rl_rc=$?; RUNLOG_CLEAN=1; exit "$_rl_rc" ;;
-    --check-commit) shift; verb_check_commit "${1:-}"; _rl_rc=$?; RUNLOG_CLEAN=1; exit "$_rl_rc" ;;
+    --check-commit) shift
+                    CC_TMP=$(mktemp) || { echo "unattended: --check-commit cannot create a scratch file, so it graded nothing"; RUNLOG_CLEAN=1; exit 2; }
+                    check_commit_message "${1:-}"; _rl_rc=$?; rm -f "$CC_TMP"; RUNLOG_CLEAN=1; exit "$_rl_rc" ;;
     --version)      echo "unattended $KIT_UNATTENDED_VERSION"; RUNLOG_CLEAN=1; exit 0 ;;
     # THE SET IS THE DISPATCH. A slug-taking verb is recognised by membership in VERBS_SLUG rather
     # than by an alternation typed here, so the declaration is load-bearing: a verb absent from it

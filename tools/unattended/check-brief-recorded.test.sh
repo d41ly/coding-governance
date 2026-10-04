@@ -506,11 +506,11 @@ cp "$KIT/check-brief-recorded.sh" "$KIT/lib-unattended.sh" "$KIT/unattended.sh" 
 # leg exited 0 and this arm asserted a refusal that had no reason to happen. `head -n -1` drops the
 # last line whatever the length, which is also the sharper test: off-by-one is the realistic way a
 # cache reads short, and it must refuse just as loudly as an empty one.
-# THE FEED IS THE SEAM NOW (TOOL-aWindowedPass-2): the cache reads `log_attribution_tokens HEAD`, and
+# THE FEED IS THE SEAM NOW (TOOL-aWindowedPass-2): the cache reads `read_attribution_tokens HEAD`, and
 # the `| tr -c` this arm used to cut sits in the library, so editing the leg for it matched nothing and
 # the arm asserted a refusal that could not happen. The edit is asserted as well as its effect.
-sed -i 's#done < <(log_attribution_tokens HEAD)#done < <(log_attribution_tokens HEAD | head -n -1)#' "$D/$(basename "$LEG")"
-n=$((n+1)); grep -q 'log_attribution_tokens HEAD | head -n -1' "$D/$(basename "$LEG")" \
+sed -i 's#done < <(read_attribution_tokens HEAD)#done < <(read_attribution_tokens HEAD | head -n -1)#' "$D/$(basename "$LEG")"
+n=$((n+1)); grep -q 'read_attribution_tokens HEAD | head -n -1' "$D/$(basename "$LEG")" \
   || { echo "FAIL fixture no-op: the subject-cache feed was not truncated, so the refusal below has no cause"; st=1; }
 # THE GUARD ASSERTS THE EFFECT, not the edit. Checking that the text was inserted is what let the
 # no-op through: the pipeline was patched and changed nothing. Two commits are what make a

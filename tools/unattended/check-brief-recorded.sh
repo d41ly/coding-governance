@@ -107,7 +107,7 @@
 # post-run subset joined it rather than moving the increment, which would change what the sibling's
 # identically named count means.
 set -u
-KIT_UNATTENDED_VERSION=1.58   # gov:kit unattended@1.58 — must match unattended.sh; check-kit-versions.sh pairs them
+KIT_UNATTENDED_VERSION=1.59   # gov:kit unattended@1.59 — must match unattended.sh; check-kit-versions.sh pairs them
 
 # The dereference pin, identical to this kit's other readers and for the identical reason: a graft
 # file rewrites the commit GRAPH, so every ancestry answer below could be honest about a sha and
@@ -300,7 +300,7 @@ esac
 declare -A _SUBJ=()
 while IFS= read -r _cl; do
   _SUBJ[${_cl%% *}]=" ${_cl#* } "
-done < <(log_attribution_tokens HEAD)
+done < <(read_attribution_tokens HEAD)
 _n_hist=$(GIT rev-list --count HEAD 2>/dev/null)
 case "$_n_hist" in ''|*[!0-9]*) _n_hist=-1 ;; esac
 if [ "${#_SUBJ[@]}" -ne "$_n_hist" ]; then

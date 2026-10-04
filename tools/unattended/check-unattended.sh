@@ -48,7 +48,7 @@
 # THE CORE SETS ARE READ FROM THE DRIVER, never restated here. A second spelling of `PHASES_CORE` one
 # file away from the thing that enforces it is the drift this leg exists to catch.
 set -u
-KIT_UNATTENDED_VERSION=1.58   # gov:kit unattended@1.58 — must match unattended.sh; check-kit-versions.sh pairs them
+KIT_UNATTENDED_VERSION=1.59   # gov:kit unattended@1.59 — must match unattended.sh; check-kit-versions.sh pairs them
 
 # ------------------------------------------------------------------------------ the dereference pin
 # Identical to the driver's, and for the identical reason: `git replace` rewrites what a sha MEANS for
@@ -2807,7 +2807,7 @@ EXAMPLE_CONF="$HERE/.unattended.conf.example"
 # which this leg no longer imports. Without the tolerance every adopter whose conf still sets one reds
 # here for a key this kit removed. Each is reported, so the line gets deleted rather than kept.
 RETIRED_CONF_KEYS="UNDECLARED_WRITE_CEILING"   # TOOL-aWindowedPass-5
-drop_retired_keys() { awk -v r=" $RETIRED_CONF_KEYS " 'index(r, " " $0 " ") == 0'; }
+remove_retired_keys() { awk -v r=" $RETIRED_CONF_KEYS " 'index(r, " " $0 " ") == 0'; }
 # A MISSING EXAMPLE IS A REFUSAL, not a skip. Guarding the whole check on `[ -f ]` made it vanish
 # silently wherever the kit ships without its example - which is exactly where a documentation join
 # is worth most - and a check that says nothing is indistinguishable from a check that passed. The
@@ -2824,7 +2824,7 @@ elif [ -f "$LIVEDOC" ]; then
   # section 8, so a PROSE mention of a phase name - main's `LANDED` - entered the key set as a phantom
   # and red this leg on the merged tree. Neither parent had both the prose and the check. Reading the
   # key column keeps the `·`-joined KEEPALIVE_CREATE/KEEPALIVE_DELETE row, which yields both keys.
-  doc_keys=$(printf '%s\n' "$sec8" | awk -F'|' 'NF>2 {print $2}' | grep -oE '`[A-Z_]+`' | tr -d '`' | drop_retired_keys | sort -u)
+  doc_keys=$(printf '%s\n' "$sec8" | awk -F'|' 'NF>2 {print $2}' | grep -oE '`[A-Z_]+`' | tr -d '`' | remove_retired_keys | sort -u)
   # THE KIT'S EXAMPLE CONF IS THE REVERSE POPULATION, not the adopting project's. A project declares
   # the keys it needs and leaves the optional ones out, so "documented but not declared here" is the
   # NORMAL state of any real conf - graded against one, this check red six keys on a conforming
@@ -2837,7 +2837,7 @@ elif [ -f "$LIVEDOC" ]; then
   # ...and the ADOPTING project may declare nothing the table does not carry. One direction only,
   # because an optional key it never sets is not a fault.
   if [ -f "$ROOT/.unattended.conf" ]; then
-    proj_extra=$(comm -23 <(grep -oE '^[A-Z_]+=' "$ROOT/.unattended.conf" | tr -d '=' | drop_retired_keys | sort -u) <(printf '%s\n' "$doc_keys") | tr '\n' ' ')
+    proj_extra=$(comm -23 <(grep -oE '^[A-Z_]+=' "$ROOT/.unattended.conf" | tr -d '=' | remove_retired_keys | sort -u) <(printf '%s\n' "$doc_keys") | tr '\n' ' ')
     for _rk in $RETIRED_CONF_KEYS; do
       grep -q "^$_rk=" "$ROOT/.unattended.conf" \
         && report "check 22 - $_rk is RETIRED (TOOL-aWindowedPass-5): this leg ignores it, and the line may be deleted from .unattended.conf"
@@ -5348,8 +5348,8 @@ _lc_hits=${_lc_hits%$'\n'}
 # ---- a staged edit, and an arm whose failing case cannot be staged is an assertion about nothing.
 # print_liveness arrived with origin/main (aWokenSentinel); it reads the RECORDED phase because it
 # takes no network.
-# verb_check_commit (TOOL-aWindowedPass-3) runs on every commit, and a hook takes no network either.
-PHASE_RECORDED_FNS="refuse_if_terminal archive_name_of verb_landed print_liveness verb_check_commit"
+# check_commit_message (TOOL-aWindowedPass-3) runs on every commit, and a hook takes no network either.
+PHASE_RECORDED_FNS="refuse_if_terminal archive_name_of verb_landed print_liveness check_commit_message"
 # ---- LIVENESS: the classifier must RECOGNISE the readers' own reads. The two readers are the one
 # ---- place a read of the fact is certain to exist, so each must hold a line the read predicate
 # ---- matches, or the driver reads the fact in a spelling this check no longer sees and the routing

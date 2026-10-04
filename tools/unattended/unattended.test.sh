@@ -5799,6 +5799,16 @@ printf 'ARCH-tRun-1 builds its lane\n' > "$CCM"
 out=$(run --check-commit "$CCM"); rc=$?
 same "--check-commit refuses a pass subject with no trailer, exit code" "$rc" "1"
 hit  "$out" "end the message with 'Pass: ARCH-tRun-1' when it is the pass, or 'Pass: none' when it is not"
+hit  "$out" ", and the message carries no Pass: trailer, so check 23 would take it for that pass's commit; end the message with 'Pass"
+# a trailer naming a unit with no open dispatched pass names nothing it may write
+printf 'ARCH-tRun-2 builds its lane\n\nPass: ARCH-tRun-2\n' > "$CCM"
+out=$(run --check-commit "$CCM"); rc=$?
+same "--check-commit refuses a trailer naming an undispatched unit, exit code" "$rc" "1"
+hit  "$out" ", so nothing declared what this commit may write; declare it first: bash"
+# ...and a message file that is not there is refused before anything is read
+out=$(run --check-commit "$CCM.absent"); rc=$?
+same "--check-commit refuses a missing message file, exit code" "$rc" "1"
+hit  "$out" "--check-commit was given no readable commit message file"
 printf 'records: ARCH-tRun-1 brief\n\nPass: none\n' > "$CCM"
 out=$(run --check-commit "$CCM"); rc=$?
 same "--check-commit lets Pass: none through, exit code" "$rc" "0"
@@ -5814,7 +5824,7 @@ rm -f "$CCM"
 # ---- --check-commit, closing review r1: the shapes round 1 found graded differently at commit time
 # ---- and at the close, and the subtractions and the hook that had no arm. One setup per arm group:
 # ---- a bound run, ARCH-tRun-1 dispatched open on `a.sh`, and three committed files the arms move.
-cc_setup() {
+build_check_commit_fixture() {
   build_specced_tree
   printf '\nGENERATED_INDEXES="memory/LIVE.md:gen.py"\n' >> .unattended.conf
   [ -z "$PFX" ] || mkdir -p "$PFX"
@@ -5826,7 +5836,7 @@ cc_setup() {
   git add -A >/dev/null && git commit -q -m "records: declare ARCH-tRun-1" --no-verify
 }
 CCM=$(mktemp)
-cc_setup
+build_check_commit_fixture
 # M1: a staged rename out of an undeclared path is graded by BOTH halves, as check 23 grades it
 git mv ${PFX}old.sh ${PFX}a.sh
 printf 'ARCH-tRun-1 builds its lane\n\nPass: ARCH-tRun-1\n' > "$CCM"
@@ -5898,11 +5908,11 @@ printf 'b\n' > ${PFX}stray.sh; git add -A >/dev/null
 printf 'ARCH-tRun-1 builds its lane\n\nPass: ARCH-tRun-1\n' > "$CCM"
 out=$(run --check-commit "$CCM"); rc=$?
 same "--check-commit refuses an amend that widens a committed pass, exit code" "$rc" "1"
-hit  "$out" "An amend cannot widen a committed pass"
+hit  "$out" ". An amend cannot widen a committed pass: unstage those paths, or commit them as a new commit after a fresh --dispatch for them"
 miss "$out" "--dispatch tRun"
 git reset -q --hard; rm -f ${PFX}stray.sh
 # M5: THE HOOK, run as git runs it - before its merge-only exit, blocking on 1 alone
-cc_setup
+build_check_commit_fixture
 REAL_ROOT=${HERE%/"$KIT_REL"}
 printf 'b\n' > ${PFX}stray.sh; git add -A >/dev/null
 printf 'ARCH-tRun-1 builds its lane\n\nPass: ARCH-tRun-1\n' > "$CCM"

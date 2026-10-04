@@ -554,12 +554,12 @@ drow() {               # unit · declared paths — a dispatch row at the CURREN
     "$(git rev-parse --short=8 HEAD)" "$1" "$2" >> memory/builds/tRun/RUN.md
   git add -A && git commit -q -m "declare $1" --no-verify
 }
-bindrun() {            # names the checked-out branch as tRun's run branch, so check 23 FAILS this run
+write_run_branch() {            # names the checked-out branch as tRun's run branch, so check 23 FAILS this run
   grep -q '^run-branch: ' memory/builds/tRun/RUN.md \
     || sed -i "/^## Run facts$/a run-branch: $(git symbolic-ref -q HEAD)" memory/builds/tRun/RUN.md
 }
-odrow() {              # unit · declared paths — drow, then a SIBLING that never commits, so the
-  bindrun              # unit's window overlaps one and check 23 COUNTS its undeclared writes
+write_overlapping_dispatch() {              # unit · declared paths — drow, then a SIBLING that never commits, so the
+  write_run_branch              # unit's window overlaps one and check 23 COUNTS its undeclared writes
   drow "$1" "$2"
   drow ARCH-tRun-9 "work/nine.txt"
 }
@@ -3462,14 +3462,14 @@ reset_tree
 
 # a pass that commits INSIDE its declared set is clean
 reset_tree
-odrow ARCH-tRun-1 "work/one.txt"
+write_overlapping_dispatch ARCH-tRun-1 "work/one.txt"
 mkdir -p work && printf 'a\n' > work/one.txt
 git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
 miss "$(run)" "check 23 FAILED"
 
 # ...and a pass that commits OUTSIDE it is the disjointness proof failing where it can be checked
 reset_tree
-odrow ARCH-tRun-1 "work/one.txt"
+write_overlapping_dispatch ARCH-tRun-1 "work/one.txt"
 mkdir -p work && printf 'a\n' > work/one.txt && printf 'b\n' > work/stray.txt
 git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
 hit "$(run)" "a pass of the run this branch drives committed outside the set it declared before dispatch while its window overlapped a sibling pass, and that declaration is the disjointness proof two concurrent passes rest on"
@@ -3480,7 +3480,7 @@ hit "$(run)" "a pass of the run this branch drives committed outside the set it 
 reset_tree
 printf '\nGENERATED_INDEXES="memory/LIVE.md:gen.py"\n' >> .unattended.conf
 git add -A && git commit -q -m "fixture: a generated index" --no-verify
-odrow ARCH-tRun-1 "work/one.txt"
+write_overlapping_dispatch ARCH-tRun-1 "work/one.txt"
 mkdir -p work && printf 'a\n' > work/one.txt && printf 'live\n' >> memory/LIVE.md
 git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
 out=$(GOV_UNATTENDED_REPORT=1 bash "$SCRIPT" 2>&1)
@@ -3492,7 +3492,7 @@ reset_tree
 mkdir -p tools/genkit && printf 'x\n' > tools/genkit/gen.py
 printf '[[generated]]\npath = "{memory_root}/derived"\ngenerator = "gen.py"\nwhy = "a fixture generator"\n' > tools/genkit/kit.toml
 git add -A && git commit -q -m "fixture: a kit declaring a generated output" --no-verify
-odrow ARCH-tRun-1 "work/one.txt"
+write_overlapping_dispatch ARCH-tRun-1 "work/one.txt"
 mkdir -p work memory/derived && printf 'a\n' > work/one.txt && printf 'd\n' > memory/derived/out.json
 git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
 out=$(GOV_UNATTENDED_REPORT=1 bash "$SCRIPT" 2>&1)
@@ -3504,27 +3504,29 @@ hit  "$out" "memory/derived:"
 # Gov's own conf hid an unconditional backlog row: it had dropped the backlog from SHARED_RECORDS,
 # while the kit default and the example still name it, so every adopter's conf was refused at load.
 # A scratch tree holding every real descriptor and the shipped confs is what an adopter loads.
+# The scratch tree mirrors THIS install's layout, derived from where the suite sits, never spelled.
 _b1=$(mktemp -d); git -C "$_b1" init -q
+_b1tr=$(dirname -- "$KIT_REL"); [ "$_b1tr" = . ] && _b1tr="" || _b1tr="$_b1tr/"
 for _b1k in "$HERE"/../*/kit.toml; do
-  _b1d=${_b1k%/kit.toml}; _b1d=${_b1d##*/}; mkdir -p "$_b1/tools/$_b1d"; cp "$_b1k" "$_b1/tools/$_b1d/"
+  _b1d=${_b1k%/kit.toml}; _b1d=${_b1d##*/}; mkdir -p "$_b1/$_b1tr$_b1d"; cp "$_b1k" "$_b1/$_b1tr$_b1d/"
 done
-cp "$HERE/lib-unattended.sh" "$_b1/tools/unattended/"; git -C "$_b1" add -A >/dev/null 2>&1
+cp "$HERE/lib-unattended.sh" "$_b1/$KIT_REL/"; git -C "$_b1" add -A >/dev/null 2>&1
 _b1sr=$(sed -n 's/^SHARED_RECORDS="\(.*\)"$/\1/p' "$HERE/.unattended.conf.example")
 same "the example's SHARED_RECORDS was read, so the scan below grades something" "$(printf '%s' "$_b1sr" | grep -c backlog)" "1"
-b1scan() { ( cd "$_b1" && . tools/unattended/lib-unattended.sh \
+read_scan_overlaps() { ( cd "$_b1" && . "./$KIT_REL/lib-unattended.sh" \
   && scan_shared_index_overlaps "$(resolve_shared_records "$1" memory)" "$(resolve_generated_indexes "$_b1" "" memory)" ); }
-same "the kit-default SHARED_RECORDS overlaps no kit's real [[generated]] row" "$(b1scan __kit-default__)" ""
-same "the example's SHARED_RECORDS overlaps no kit's real [[generated]] row" "$(b1scan "$_b1sr")" ""
+same "the kit-default SHARED_RECORDS overlaps no kit's real [[generated]] row" "$(read_scan_overlaps __kit-default__)" ""
+same "the example's SHARED_RECORDS overlaps no kit's real [[generated]] row" "$(read_scan_overlaps "$_b1sr")" ""
 # the control: under BACKLOG_MODE=builds the backlog rows apply, so the same scan does see them
 printf 'BACKLOG_MODE="builds"\n' > "$_b1/.memory-tree.conf"
-hit "$(b1scan __kit-default__)" "memory/backlog"
+hit "$(read_scan_overlaps __kit-default__)" "memory/backlog"
 rm -rf "$_b1"
 # ...nor a change inside a README's gen regions, NESTED as the build README's are: the line between
 # the inner close and the outer close is still generated
 reset_tree
 printf '# r\n\nprose\n\n<!-- gen:index -->\n<!-- gen:units -->\nold\n<!-- /gen:units -->\nRecords: 1\n<!-- /gen:index -->\n' > memory/README.md
 git add -A && git commit -q -m "fixture: a README with a gen region" --no-verify
-odrow ARCH-tRun-1 "work/one.txt"
+write_overlapping_dispatch ARCH-tRun-1 "work/one.txt"
 mkdir -p work && printf 'a\n' > work/one.txt && sed -i 's/^old$/new/; s/^Records: 1$/Records: 2/' memory/README.md
 git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
 out=$(GOV_UNATTENDED_REPORT=1 bash "$SCRIPT" 2>&1)
@@ -3534,7 +3536,7 @@ hit  "$out" "a generated render, a change inside its gen regions only"
 reset_tree
 printf '# r\n\nprose\n\n<!-- gen:index -->\n<!-- gen:units -->\nold\n<!-- /gen:units -->\nRecords: 1\n<!-- /gen:index -->\n' > memory/README.md
 git add -A && git commit -q -m "fixture: a README with a gen region" --no-verify
-odrow ARCH-tRun-1 "work/one.txt"
+write_overlapping_dispatch ARCH-tRun-1 "work/one.txt"
 mkdir -p work && printf 'a\n' > work/one.txt && sed -i 's/^prose$/edited prose/' memory/README.md
 git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
 out=$(run)
@@ -3542,10 +3544,10 @@ hit  "$out" "check 23 FAILED"
 hit  "$out" "wrote memory/README.md"
 
 # ---- OVERLAP (TOOL-aWindowedPass-1). Only a pass whose window overlapped a sibling's is counted,
-# ---- which is why every counting arm in this file dispatches through `odrow`.
+# ---- which is why every counting arm in this file dispatches through `write_overlapping_dispatch`.
 # AC1: one pass, alone, wrote outside its declaration: reported SOLO and not counted. BOUND, so the
 # miss below is live: a counted write in the bound run would fail the leg.
-reset_tree; bindrun
+reset_tree; write_run_branch
 drow ARCH-tRun-1 "work/one.txt"
 mkdir -p work && printf 'a\n' > work/one.txt && printf 'b\n' > work/stray.txt
 git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
@@ -3554,7 +3556,7 @@ hit  "$out" "check 23 SOLO ARCH-tRun-1 at "
 hit  "$out" "wrote work/stray.txt in memory/builds/tRun/RUN.md — outside its declaration, but its window overlapped no sibling pass"
 miss "$out" "check 23 FAILED"
 # AC2: a sibling dispatched at a LATER anchor, before the first pass committed: the windows overlap
-reset_tree; bindrun
+reset_tree; write_run_branch
 drow ARCH-tRun-1 "work/one.txt"
 drow ARCH-tRun-2 "work/two.txt"
 mkdir -p work && printf 'a\n' > work/one.txt && printf 'b\n' > work/stray.txt
@@ -3565,7 +3567,7 @@ out=$(run)
 hit  "$out" "check 23 FAILED"
 miss "$out" "check 23 SOLO"
 # AC3: the sibling dispatched AFTER the first committed: sequential, so the stray write is SOLO
-reset_tree; bindrun
+reset_tree; write_run_branch
 drow ARCH-tRun-1 "work/one.txt"
 mkdir -p work && printf 'a\n' > work/one.txt && printf 'b\n' > work/stray.txt
 git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
@@ -3583,7 +3585,7 @@ miss "$out" "check 23 FAILED"
 # ---- under a subject that also names the unit: that commit IS the pass commit, and the path is an
 # ---- undeclared write whatever the subject starts with.
 reset_tree
-odrow ARCH-tRun-1 "work/one.txt"
+write_overlapping_dispatch ARCH-tRun-1 "work/one.txt"
 mkdir -p work && printf 'a\n' > work/one.txt
 git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
 mkdir -p fix && printf 'f\n' > fix/leg.txt
@@ -3595,7 +3597,7 @@ miss "$out" "check 23 FAILED"
 miss "$out" "the only join this check has was dodged"
 # ...and an absorb commit moving a DECLARED path while no commit names the pass is not a dodged join.
 reset_tree
-odrow ARCH-tRun-1 "work/one.txt"
+write_overlapping_dispatch ARCH-tRun-1 "work/one.txt"
 mkdir -p work && printf 'a\n' > work/one.txt
 git add -A && git commit -q -m "absorb(tRun): memory hygiene inherited at 0123abcd" --no-verify
 out=$(GOV_UNATTENDED_REPORT=1 bash "$SCRIPT" 2>&1)
@@ -3604,7 +3606,7 @@ miss "$out" "the only join this check has was dodged"
 miss "$out" "check 23 FAILED"
 # CONTROL: the same paths with a unit id in the subject are the pass commit, graded and anomalous.
 reset_tree
-odrow ARCH-tRun-1 "work/one.txt"
+write_overlapping_dispatch ARCH-tRun-1 "work/one.txt"
 mkdir -p work fix && printf 'a\n' > work/one.txt && printf 'f\n' > fix/leg.txt
 git add -A && git commit -q -m "absorb(tRun): memory hygiene inherited at 0123abcd ARCH-tRun-1" --no-verify
 out=$(GOV_UNATTENDED_REPORT=1 bash "$SCRIPT" 2>&1)
@@ -3620,7 +3622,7 @@ hit  "$out" "a pass of the run this branch drives committed outside the set it d
 
 # A: the sanctioned repair. Widened at its own anchor, commits inside the widened set.
 reset_tree
-bindrun
+write_run_branch
 drows ARCH-tRun-1 "work/one.txt" "work/one.txt work/two.txt"
 drow ARCH-tRun-9 "work/nine.txt"
 mkdir -p work && printf 'a\n' > work/one.txt && printf 'b\n' > work/two.txt
@@ -3630,7 +3632,7 @@ miss "$(run)" "check 23 FAILED"
 # B: ...and the superseding row is still GRADED. Without this arm the fix above is indistinguishable
 # from switching the check off for any pass that ever re-declared, which is a larger hole.
 reset_tree
-bindrun
+write_run_branch
 drows ARCH-tRun-1 "work/one.txt" "work/one.txt work/two.txt"
 drow ARCH-tRun-9 "work/nine.txt"
 mkdir -p work && printf 'a\n' > work/one.txt && printf 'c\n' > work/stray.txt
@@ -3641,7 +3643,7 @@ hit "$(run)" "a pass of the run this branch drives committed outside the set it 
 # The finding must survive: a declaration cannot be rewritten to cover a write already made. The
 # first repair folded on the unit alone with no ordering constraint, and this case went GREEN.
 reset_tree
-odrow ARCH-tRun-1 "work/one.txt"
+write_overlapping_dispatch ARCH-tRun-1 "work/one.txt"
 mkdir -p work && printf 'a\n' > work/one.txt && printf 'c\n' > work/stray.txt
 git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
 drow ARCH-tRun-1 "work/one.txt work/stray.txt"
@@ -3651,7 +3653,7 @@ hit "$(run)" "a pass of the run this branch drives committed outside the set it 
 # once per kind. Each row governs its own pass. Folding them together graded pass one's commit
 # against pass two's declaration and redded a correct run.
 reset_tree
-odrow ARCH-tRun-1 "work/spec.txt"
+write_overlapping_dispatch ARCH-tRun-1 "work/spec.txt"
 mkdir -p work && printf 's\n' > work/spec.txt
 git add -A && git commit -q -m "ARCH-tRun-1 authors its spec" --no-verify
 drow ARCH-tRun-1 "work/build.txt"
@@ -3662,7 +3664,7 @@ miss "$(run)" "check 23 FAILED"
 # E: ...and the SECOND pass is graded too. The fold left it unlooked-at entirely, so a stray write in
 # pass two exited 0 — the same fixture as D with one extra file, and the difference is the point.
 reset_tree
-odrow ARCH-tRun-1 "work/spec.txt"
+write_overlapping_dispatch ARCH-tRun-1 "work/spec.txt"
 mkdir -p work && printf 's\n' > work/spec.txt
 git add -A && git commit -q -m "ARCH-tRun-1 authors its spec" --no-verify
 drow ARCH-tRun-1 "work/build.txt"
@@ -3676,7 +3678,7 @@ hit "$(run)" "a pass of the run this branch drives committed outside the set it 
 # the anchoring left the whole suite green. `ARCH-tRun-1` is a prefix of `ARCH-tRun-10`, so under an
 # unanchored `case ... in *"$dssunit"*` the `-10` commit reads as naming `-1` too and a correct run is
 # refused for ambiguous attribution.
-reset_tree; bindrun
+reset_tree; write_run_branch
 gdrows ARCH-tRun-1 "work/one.txt" ARCH-tRun-10 "work/ten.txt"
 mkdir -p work && printf 'b\n' > work/ten.txt
 git add -A && git commit -q -m "ARCH-tRun-10 builds its lane" --no-verify
@@ -3693,7 +3695,7 @@ hit "$(run)" "unattended: check 23 — one commit names two passes of the same d
 
 # ...declaring MORE than you use is conservative and fine
 reset_tree
-odrow ARCH-tRun-1 "work/one.txt work/two.txt"
+write_overlapping_dispatch ARCH-tRun-1 "work/one.txt work/two.txt"
 mkdir -p work && printf 'a\n' > work/one.txt
 git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
 miss "$(run)" "check 23 FAILED"
@@ -3701,7 +3703,7 @@ miss "$(run)" "check 23 FAILED"
 # ---- THE NO-COMMIT CASE IS SPLIT. A pass that produced no change commits nothing and that is legal;
 # ---- the same silence with the declared paths MOVED is the join being dodged.
 reset_tree
-odrow ARCH-tRun-1 "work/one.txt"
+write_overlapping_dispatch ARCH-tRun-1 "work/one.txt"
 out=$(GOV_UNATTENDED_REPORT=1 bash "$SCRIPT" 2>&1)
 hit "$out" "no commit names this pass and none of its declared paths moved, which is a pass that produced no change"
 miss "$(run)" "check 23 FAILED"
@@ -3733,7 +3735,7 @@ hit "$(run)" "unattended: check 23 — one commit names two passes of the same d
 # ---- its group by construction, and grading it would red an ordinary sequential fold with no
 # ---- in-band repair — which is the defect this rule was rewritten to avoid.
 reset_tree
-odrow ARCH-tRun-1 "work/one.txt"
+write_overlapping_dispatch ARCH-tRun-1 "work/one.txt"
 mkdir -p work && printf 'a\n' > work/one.txt
 git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
 printf 'folded\n' > work/later.txt
@@ -3744,7 +3746,7 @@ miss "$(run)" "check 23 FAILED"
 # ---- names the unit, ahead of the real pass, is no pass when it says `Pass: none`: the walk takes the
 # ---- commit whose trailer names the unit, and the records commit's out-of-set write is never graded.
 reset_tree
-odrow ARCH-tRun-1 "work/one.txt"
+write_overlapping_dispatch ARCH-tRun-1 "work/one.txt"
 mkdir -p notes && printf 'r\n' > notes/records.md
 git add -A && git commit -q -m "records for ARCH-tRun-1..3" -m "Pass: none" --no-verify
 mkdir -p work && printf 'a\n' > work/one.txt
@@ -3805,14 +3807,14 @@ reset_tree
 # ---- driver no longer can — the driver normalises before parking, so only a hand-written row
 # ---- reaches this. That is exactly why the arm has to be here rather than driver-side.
 reset_tree
-odrow ARCH-tRun-1 "work/sub/"
+write_overlapping_dispatch ARCH-tRun-1 "work/sub/"
 mkdir -p work/sub && printf 'a\n' > work/sub/x.txt
 git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
 miss "$(run)" "check 23 FAILED"
 # ...and the positive control on the same shape, so the arm cannot pass by the check being silent:
 # a commit genuinely outside the declared lane still reports.
 reset_tree
-odrow ARCH-tRun-1 "work/sub/"
+write_overlapping_dispatch ARCH-tRun-1 "work/sub/"
 mkdir -p work/sub && printf 'a\n' > work/sub/x.txt && printf 'b\n' > work/elsewhere.txt
 git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
 hit "$(run)" "a pass of the run this branch drives committed outside the set it declared before dispatch while its window overlapped a sibling pass, and that declaration is the disjointness proof two concurrent passes rest on"
@@ -3832,7 +3834,7 @@ BRIEF=memory/builds/tRun/prompts/2026-08-21-prompt-ARCH-tRun-1-1-build-brief.md
 # A: the brief is in the pass commit and its row names it — silent by default, announced on the
 # report channel, which is the positive artifact that the exclusion branch ran on that path.
 reset_tree
-odrow ARCH-tRun-1 "work/one.txt"
+write_overlapping_dispatch ARCH-tRun-1 "work/one.txt"
 mkdir -p work memory/builds/tRun/prompts && printf 'a\n' > work/one.txt && printf '# brief\n' > "$BRIEF"
 printf '2026-08-21T00:00:01Z brief · item ARCH-tRun-1 · reason %s %s\n' \
   "$(git hash-object "$BRIEF" | cut -c1-12)" "$BRIEF" >> memory/builds/tRun/RUN.md
@@ -3871,7 +3873,7 @@ git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
 hit "$(run)" "memory/builds/tRun/prompts/other.md"
 # E: SPELLING. A row naming the brief as `./memory/...` is the same path once normalised.
 reset_tree
-odrow ARCH-tRun-1 "work/one.txt"
+write_overlapping_dispatch ARCH-tRun-1 "work/one.txt"
 mkdir -p work memory/builds/tRun/prompts && printf 'a\n' > work/one.txt && printf '# brief\n' > "$BRIEF"
 printf '2026-08-21T00:00:01Z brief · item ARCH-tRun-1 · reason %s ./%s\n' \
   "$(git hash-object "$BRIEF" | cut -c1-12)" "$BRIEF" >> memory/builds/tRun/RUN.md
@@ -3943,7 +3945,7 @@ hit "$(run_skip_leg)" "wrote $BRIEF in memory/builds/tRun/RUN.md"
 # ---- ONE counted write; the same record read from a detached HEAD binds no run and is only printed.
 # AC1: the bound run's one counted write fails the leg, naming the run
 reset_tree
-odrow ARCH-tRun-1 "work/one.txt"
+write_overlapping_dispatch ARCH-tRun-1 "work/one.txt"
 mkdir -p work && printf 'a\n' > work/one.txt && printf 'c\n' > work/stray.txt
 git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
 out=$(run); rc=$?
@@ -3981,7 +3983,7 @@ miss "$out" "check 23 OTHER RUN"
 reset_tree
 # closing review r1, M7: a base that does not resolve places no window, so even a lone bound pass is
 # COUNTED - the verdict before overlap counting - and the leg says why
-bindrun; sed -i 's/^base: .*/base: 0000000000000000000000000000000000000000/' memory/builds/tRun/RUN.md
+write_run_branch; sed -i 's/^base: .*/base: 0000000000000000000000000000000000000000/' memory/builds/tRun/RUN.md
 git add -A && git commit -q -m "fixture: an unresolvable base" --no-verify
 drow ARCH-tRun-1 "work/one.txt"
 mkdir -p work && printf 'a\n' > work/one.txt && printf 'c\n' > work/stray.txt
@@ -3998,7 +4000,7 @@ reset_tree
 # ---- and asserts only check 23's own strings, because a LANDING record moves checks 7, 15 and 19 too.
 # A: pushed, so derived LANDED - excluded, naming the record and its landing commit
 reset_tree
-odrow ARCH-tRun-1 "work/one.txt"
+write_overlapping_dispatch ARCH-tRun-1 "work/one.txt"
 mkdir -p work && printf 'a\n' > work/one.txt && printf 'c\n' > work/stray.txt
 git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
 sed -i 's/^phase: .*/phase: LANDING/' memory/builds/tRun/RUN.md
@@ -4010,7 +4012,7 @@ miss "$out" "check 23 FAILED"
 git push -q -f origin "$ANCHOR0":main
 # B (control): the same LANDING record, NOT pushed, is a live run and is graded
 reset_tree
-odrow ARCH-tRun-1 "work/one.txt"
+write_overlapping_dispatch ARCH-tRun-1 "work/one.txt"
 mkdir -p work && printf 'a\n' > work/one.txt && printf 'c\n' > work/stray.txt
 git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
 sed -i 's/^phase: .*/phase: LANDING/' memory/builds/tRun/RUN.md
@@ -4020,7 +4022,7 @@ hit  "$out" "check 23 FAILED"
 miss "$out" "check 23 EXCLUDED"
 # C: no advertised tip resolves - UNAVAILABLE once, and the record is graded rather than excluded
 reset_tree
-odrow ARCH-tRun-1 "work/one.txt"
+write_overlapping_dispatch ARCH-tRun-1 "work/one.txt"
 mkdir -p work && printf 'a\n' > work/one.txt && printf 'c\n' > work/stray.txt
 git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
 sed -i 's/^phase: .*/phase: LANDING/' memory/builds/tRun/RUN.md
@@ -4032,7 +4034,7 @@ hit  "$out" "UNATTENDED check 23 FAILED"
 git --git-dir="$ORIGIN" symbolic-ref HEAD refs/heads/main
 # D (control): a recorded LANDED record is still skipped by its phase before the predicate is asked
 reset_tree
-odrow ARCH-tRun-1 "work/one.txt"
+write_overlapping_dispatch ARCH-tRun-1 "work/one.txt"
 mkdir -p work && printf 'a\n' > work/one.txt && printf 'c\n' > work/stray.txt
 git add -A && git commit -q -m "ARCH-tRun-1 builds its lane" --no-verify
 sed -i 's/^phase: .*/phase: LANDED/' memory/builds/tRun/RUN.md
@@ -4047,7 +4049,7 @@ reset_tree
 
 # ---- THE TRAILER, READ ONE WAY EVERYWHERE (closing review r1, M3 and L2).
 # M3: a trailered pass commit whose SUBJECT mentions a sibling is still that pass's alone, and graded
-reset_tree; bindrun
+reset_tree; write_run_branch
 gdrows ARCH-tRun-1 "work/one.txt" ARCH-tRun-2 "work/two.txt"
 mkdir -p work && printf 'a\n' > work/one.txt && printf 'c\n' > work/stray.txt
 git add -A && git commit -q -m "ARCH-tRun-1 builds its lane beside ARCH-tRun-2" -m "Pass: ARCH-tRun-1" --no-verify
@@ -4055,13 +4057,13 @@ out=$(run)
 hit  "$out" "UNATTENDED check 23 FAILED"
 miss "$out" "one commit names two passes"
 # L2: a comma-joined trailer names each of its ids, so the pass is attributed and graded
-reset_tree; bindrun
+reset_tree; write_run_branch
 gdrows ARCH-tRun-1 "work/one.txt" ARCH-tRun-2 "work/two.txt"
 mkdir -p work && printf 'a\n' > work/one.txt && printf 'c\n' > work/stray.txt
 git add -A && git commit -q -m "lane" -m "Pass: ARCH-tRun-1, ARCH-tRun-9" --no-verify
 hit  "$(run)" "UNATTENDED check 23 FAILED"
 # ...and `none` beside an id names nothing, so the commit is no pass and its declared path moved unnamed
-reset_tree; bindrun
+reset_tree; write_run_branch
 gdrows ARCH-tRun-1 "work/one.txt" ARCH-tRun-2 "work/two.txt"
 mkdir -p work && printf 'a\n' > work/one.txt
 git add -A && git commit -q -m "lane" -m "$(printf 'Pass: none\nPass: ARCH-tRun-1')" --no-verify
@@ -4071,12 +4073,12 @@ miss "$out" "UNATTENDED check 23 FAILED"
 
 # ---- A NEGATIVE CHECK-23 ARM MUST BE ABLE TO FAIL (closing review r1, H1). Check 23 counts a write only
 # ---- beside an overlapping sibling and fails only the bound run, so an arm dispatching one unit with no
-# ---- `bindrun` stays green whatever the code does: eight arms were vacuous that way, one of them the
+# ---- `write_run_branch` stays green whatever the code does: eight arms were vacuous that way, one of them the
 # ---- only holder of `pass_commit`'s trailer branch. Graded over this file's own check-23 region.
 _h1=$(awk '/^# ---- check 23 \(TOOL-dUnstalledConvoy-10\)/ { on = 1 } /^# ---- A NEGATIVE CHECK-23 ARM/ { on = 0 }
-  on && /^reset_tree/ { live = ($0 ~ /bindrun/); disp = 0 }
-  on && /^(odrow|bindrun)/ { live = 1 }
-  on && /^(drow|drows|gdrows|odrow) / { disp = 1 }
+  on && /^reset_tree/ { live = ($0 ~ /write_run_branch/); disp = 0 }
+  on && /^(write_overlapping_dispatch|write_run_branch)/ { live = 1 }
+  on && /^(drow|drows|gdrows|write_overlapping_dispatch) / { disp = 1 }
   on && /^miss .*"(UNATTENDED )?check 23 FAILED"/ { n++; if (disp && !live) print NR }
   END { print "graded=" n + 0 }' "$HERE/${0##*/}"); _h1rc=$?
 # LIVENESS (closing review r2, M3): a scan that read nothing - its anchor reworded, its file unread -
