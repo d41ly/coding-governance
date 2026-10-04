@@ -449,3 +449,4 @@ Cite ids, never line numbers.
 | [TOOL-dUnstuckLanding-9](../builds/dUnstuckLanding/BACKLOG.md) | INPROGRESS | MED | TOOL-dUnstuckLanding-19 | 2026-10-04 | refresh before a verdict: one shared helper, called by --park,… |
 | [TOOL-dUnstuckLanding-10](../builds/dUnstuckLanding/BACKLOG.md) | INPROGRESS | MED | TOOL-dUnstuckLanding-20 | 2026-10-04 | landing capability is declared, as LANDING_NODES pairs of… |
 | [TOOL-dUnstuckLanding-11](../builds/dUnstuckLanding/BACKLOG.md) | OPEN | HIGH | — | 2026-10-04 | carry the kit that ships asks 3 to 10 into inCMS and NicoCares through… |
+| [TOOL-dUnstuckLanding-26](../builds/dUnstuckLanding/BACKLOG.md) | OPEN | HIGH | — | 2026-10-04 | a gate for a merge whose resolution drops one side's hunks: for each… |
