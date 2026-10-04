@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-20 — the holder row's claim CAS runs before its `write_lease` under one stamp, and a CAS that does not land leaves a `prior-session` fact the `mine` test accepts
 
-**Status:** SPECCED · rev-5 · 2026-10-04 · node a · Tier-2 · base 5266d22e · streams tooling · order 4
+**Status:** SPECCED · rev-6 · 2026-10-04 · node a · Tier-2 · base 5266d22e · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
@@ -33,7 +33,8 @@ does not land. It closes finding 9 (HIGH) of the round-1 spec audit of units 16 
   is about to record (`session` from `CLAUDE_CODE_SESSION_ID`, `host` from `read_host_name`, the
   unchanged `keepalive`, and the stamp as `lease-utc`), and only then calls `write_lease` with that
   stamp as its third argument. A LOST race is check 90 with the run-state file's bytes and the index
-  untouched. Observed by AC1 and AC3.
+  untouched. On a claim read that did not answer, the CAS is `TOOL-aGraftedHelix-26`'s (§3).
+  Observed by AC1 and AC3.
 - **S2** — When the CAS does not complete, or the claim could not be read, the row still runs
   `write_lease`, and records a lease fact `prior-session` holding the record's `session` fact from
   before the call. The fact is written only while it reads `absent` or is missing, so a second call
@@ -121,6 +122,9 @@ does not land. It closes finding 9 (HIGH) of the round-1 spec audit of units 16 
   set runs ahead of `write_lease`, once this order's claim read and CAS have decided it, so an
   interruption inside `write_lease` cannot leave the claim under a session no member names (finding
   11 of the round-1 audit of `TOOL-aGraftedHelix-23`).
+- **hands-off** `TOOL-aGraftedHelix-26` — the CAS step on a claim read that did not answer: the row
+  pushes no claim, because a `write_claim` CAS leases against the sha the read observed and an empty
+  one asserts a create (finding 6 of the round-1 audit of `TOOL-aGraftedHelix-25`).
 
 ## 4. Design
 
@@ -324,6 +328,9 @@ none
 - rev-5 · 2026-10-04 · §3 §4 · §3 gains the hands-off to `TOOL-aGraftedHelix-24`, promoted from
   finding 11 (HIGH) of the round-1 spec audit of `TOOL-aGraftedHelix-23`, and §4 "The order" points
   at it for the add's place ahead of `write_lease`.
+- rev-6 · 2026-10-04 · §2 §3 · S1 · §3 gains the hands-off to `TOOL-aGraftedHelix-26`, promoted from
+  finding 6 (HIGH) of the round-1 spec audit of `TOOL-aGraftedHelix-25`, and S1 points at it for the
+  CAS on a claim read that did not answer, which no unit stated.
 
 ## 10. Reuse audit
 

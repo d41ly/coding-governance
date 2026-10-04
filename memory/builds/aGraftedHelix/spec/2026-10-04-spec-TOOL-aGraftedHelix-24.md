@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-24 — the `prior-session` add runs before `write_lease` moves the record's session, and the criteria that certify the set's readers start from the state and the session they need
 
-**Status:** SPECCED · rev-4 · 2026-10-04 · node a · Tier-2 · base 5266d22e · streams tooling · order 6
+**Status:** SPECCED · rev-5 · 2026-10-04 · node a · Tier-2 · base 5266d22e · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
@@ -40,7 +40,9 @@ of the round-1 spec audit of unit 23.
   of the add's two triggers: a CAS that did not complete, and a claim that could not be read. Both
   are known by then, because unit 20 S1 runs the claim read and the CAS ahead of `write_lease`. The
   `stage_or_fail` already inside the `write_lease`-due branch stages the add with the lease lines.
-  The add's own failure rule is `TOOL-aGraftedHelix-25`'s (§3). This supersedes unit 23 S2's "before
+  The add's own failure rule is `TOOL-aGraftedHelix-25`'s, and the exit status of a failed add or
+  lease fact and the add's one call site for both triggers are `TOOL-aGraftedHelix-26`'s (§3). This
+  supersedes unit 23 S2's "before
   its `stage_or_fail`" and the `prior-session` row of unit 20 §4 "The order", which follows
   `write_lease`. Observed by AC1, one leg per trigger.
   The clear keeps its place after `write_lease`. An interruption before the clear leaves members the
@@ -108,6 +110,10 @@ of the round-1 spec audit of unit 23.
   add's `set_fact` returns the holder row before `write_lease`, with a criterion leg whose shim
   fails the add itself and an arm staging the dropped return (finding 11 of the round-1 audit of
   this unit).
+- **hands-off** `TOOL-aGraftedHelix-26` — the exit status of AC1's interrupted calls: a failed
+  `set_fact` inside `write_lease` calls `fail 17` before `write_lease` returns, so the call exits 1,
+  which no build of this unit can produce because the dispatcher discards the verb's return
+  (findings 5 and 8 of the round-1 audit of `TOOL-aGraftedHelix-25`).
 
 ## 4. Design
 
@@ -214,18 +220,19 @@ push exit 124; "unreachable" is unit 23's, the bare repository renamed away for 
 
 - **AC1** — When an `s2` holder call runs with the claim push exiting 124 and a `mktemp` shim on
   `PATH` that forwards to the real `mktemp` until the run-state file's `session:` line reads `s2`,
-  then exits 1 once, the call exits non-zero and the run-state file reads `session: s2` and
-  `prior-session: s1`, with its `lease-utc` line still at its pre-call value. That unmoved stamp is
+  then exits 1 once, the run-state file reads `session: s2` and `prior-session: s1`, with its
+  `lease-utc` line still at its pre-call value. That unmoved stamp is
   the arm's witness that the shim stopped `write_lease` after its `session` line; a call that ran
   `write_lease` whole proves nothing about the order and reds this criterion. A second `s2` call
   with no shim exits 0, prints no `UNATTENDED check 90 FAILED`, leaves a claim naming
   `session: s2`, leaves `fact` printing nothing for `prior-session`, and leaves
   `git diff --name-only` naming no run-state file. Over a fresh copy of the fixture, an `s2` holder
-  call with the remote unreachable and the same shim exits non-zero and leaves `session: s2`,
-  `prior-session: s1` and `lease-utc` unmoved, as above. A second `s2` call with the remote still
+  call with the remote unreachable and the same shim leaves `session: s2`, `prior-session: s1` and
+  `lease-utc` unmoved, as above. A second `s2` call with the remote still
   unreachable and no shim exits 0, prints no `UNATTENDED check 90 FAILED`, and leaves the set
   reading `s1`. A third `s2` call with no shim and the remote restored makes the second call's
-  assertions of the first leg.
+  assertions of the first leg. The exit status of the two interrupted calls is not asserted here:
+  the dispatcher discards the verb's return, and `TOOL-aGraftedHelix-26` AC2 asserts it.
   Red when: the add runs after `write_lease` on either trigger, so the interrupted call leaves no
   `s1` in the set and the next call that reads the claim answers check 90.
 - **AC2** — When unit 23's sequences a and c run with their `--beat` under `CLAUDE_CODE_SESSION_ID`
@@ -296,6 +303,11 @@ none
   atomic-write non-goal names `TOOL-aGraftedHelix-25`'s failure rule as half of what closes the
   window, and §4 Evidence's unreadable-claim bullet claims no claim written rather than no CAS
   attempted, which no source states.
+- rev-5 · 2026-10-04 · §2 §3 §6 · S1 · AC1 · §3 gains the hands-off to `TOOL-aGraftedHelix-26`,
+  promoted from findings 5, 8 and 6 (all HIGH) of the round-1 spec audit of `TOOL-aGraftedHelix-25`,
+  and S1 points at it. AC1's two interrupted calls no longer assert "exits non-zero": that audit's
+  H1 found the holder row's `|| return 1` never reaches the process exit, so no build of this unit
+  could pass it, and `TOOL-aGraftedHelix-26` AC2 asserts the exit as 1. The record assertions stay.
 
 ## 10. Reuse audit
 

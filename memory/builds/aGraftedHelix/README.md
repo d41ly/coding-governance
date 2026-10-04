@@ -6,7 +6,7 @@ streams: tooling+kickoff
 roster: TOOL
 authorized-by: prompt
 spec-audit: 2026-10-04
-ids: TOOL-aGraftedHelix-1 TOOL-aGraftedHelix-2 TOOL-aGraftedHelix-3 TOOL-aGraftedHelix-4 TOOL-aGraftedHelix-5 TOOL-aGraftedHelix-6 TOOL-aGraftedHelix-7 TOOL-aGraftedHelix-8 TOOL-aGraftedHelix-9 TOOL-aGraftedHelix-10 TOOL-aGraftedHelix-11 TOOL-aGraftedHelix-12 TOOL-aGraftedHelix-13 TOOL-aGraftedHelix-14 TOOL-aGraftedHelix-15 TOOL-aGraftedHelix-16 TOOL-aGraftedHelix-17 TOOL-aGraftedHelix-18 TOOL-aGraftedHelix-19 TOOL-aGraftedHelix-20 TOOL-aGraftedHelix-21 TOOL-aGraftedHelix-22 TOOL-aGraftedHelix-23 TOOL-aGraftedHelix-24 TOOL-aGraftedHelix-25
+ids: TOOL-aGraftedHelix-1 TOOL-aGraftedHelix-2 TOOL-aGraftedHelix-3 TOOL-aGraftedHelix-4 TOOL-aGraftedHelix-5 TOOL-aGraftedHelix-6 TOOL-aGraftedHelix-7 TOOL-aGraftedHelix-8 TOOL-aGraftedHelix-9 TOOL-aGraftedHelix-10 TOOL-aGraftedHelix-11 TOOL-aGraftedHelix-12 TOOL-aGraftedHelix-13 TOOL-aGraftedHelix-14 TOOL-aGraftedHelix-15 TOOL-aGraftedHelix-16 TOOL-aGraftedHelix-17 TOOL-aGraftedHelix-18 TOOL-aGraftedHelix-19 TOOL-aGraftedHelix-20 TOOL-aGraftedHelix-21 TOOL-aGraftedHelix-22 TOOL-aGraftedHelix-23 TOOL-aGraftedHelix-24 TOOL-aGraftedHelix-25 TOOL-aGraftedHelix-26
 ---
 
 # aGraftedHelix — six helixir mechanisms, grafted onto the kits that own their surface
@@ -87,13 +87,14 @@ self-heals go unreported. The owner's prompt and the review are in `prompts/`.
 | 23 | `TOOL-aGraftedHelix-23` | 2 | PROMOTED: the `prior-session` fact is the set of sessions an incomplete holder write may have left the claim under, read by `check_claim_writable` itself and emptied by the next `--resume` holder-row claim write that lands |
 | 24 | `TOOL-aGraftedHelix-24` | 2 | PROMOTED: the `prior-session` add runs before `write_lease` moves the record's session, and the restart and status-write criteria start from the state and the session they certify |
 | 25 | `TOOL-aGraftedHelix-25` | 2 | PROMOTED: the `prior-session` add's own failure returns the holder row before `write_lease`, observed by a criterion that fails the add itself |
+| 26 | `TOOL-aGraftedHelix-26` | 2 | PROMOTED: a failed `prior-session` add or `write_lease` fact fails the call through check 17, and both of the add's triggers reach one guarded call site, each observed |
 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 25 unit(s) · node a · opened 2026-10-04 · streams tooling+kickoff
+**Build status:** SPECCED · 26 unit(s) · node a · opened 2026-10-04 · streams tooling+kickoff
 ids TOOL-aGraftedHelix-1 TOOL-aGraftedHelix-2 TOOL-aGraftedHelix-3 TOOL-aGraftedHelix-4 TOOL-aGraftedHelix-5 TOOL-aGraftedHelix-6 TOOL-aGraftedHelix-7 TOOL-aGraftedHelix-8 TOOL-aGraftedHelix-9 TOOL-aGraftedHelix-10 TOOL-aGraftedHelix-11 TOOL-aGraftedHelix-12 TOOL-aGraftedHelix-13
-ids TOOL-aGraftedHelix-14 TOOL-aGraftedHelix-15 TOOL-aGraftedHelix-16 TOOL-aGraftedHelix-17 TOOL-aGraftedHelix-18 TOOL-aGraftedHelix-19 TOOL-aGraftedHelix-20 TOOL-aGraftedHelix-21 TOOL-aGraftedHelix-22 TOOL-aGraftedHelix-23 TOOL-aGraftedHelix-24 TOOL-aGraftedHelix-25
+ids TOOL-aGraftedHelix-14 TOOL-aGraftedHelix-15 TOOL-aGraftedHelix-16 TOOL-aGraftedHelix-17 TOOL-aGraftedHelix-18 TOOL-aGraftedHelix-19 TOOL-aGraftedHelix-20 TOOL-aGraftedHelix-21 TOOL-aGraftedHelix-22 TOOL-aGraftedHelix-23 TOOL-aGraftedHelix-24 TOOL-aGraftedHelix-25 TOOL-aGraftedHelix-26
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -106,18 +107,19 @@ ids TOOL-aGraftedHelix-14 TOOL-aGraftedHelix-15 TOOL-aGraftedHelix-16 TOOL-aGraf
 | [TOOL-aGraftedHelix-18 — the holder row decides `mine` before its `write_lease` and copies the claim's identity after it](spec/2026-10-04-spec-TOOL-aGraftedHelix-18.md) | 3 | 2 | SPECCED | rev-2 | 2026-10-04 |
 | [TOOL-aGraftedHelix-19 — the claim write table's rows and modes are driver constants the decision refuses outside of, and the per-cell arm derives its cells from them](spec/2026-10-04-spec-TOOL-aGraftedHelix-19.md) | 3 | 1 | SPECCED | rev-2 | 2026-10-04 |
 | [TOOL-aGraftedHelix-3 — invariant records in the bug-class catalogue become the review's by-design list](spec/2026-10-04-spec-TOOL-aGraftedHelix-3.md) | 3 | 2 | SPECCED | rev-2 | 2026-10-04 |
-| [TOOL-aGraftedHelix-20 — the holder row's claim CAS runs before its `write_lease` under one stamp, and a CAS that does not land leaves a `prior-session` fact the `mine` test accepts](spec/2026-10-04-spec-TOOL-aGraftedHelix-20.md) | 4 | 2 | SPECCED | rev-5 | 2026-10-04 |
+| [TOOL-aGraftedHelix-20 — the holder row's claim CAS runs before its `write_lease` under one stamp, and a CAS that does not land leaves a `prior-session` fact the `mine` test accepts](spec/2026-10-04-spec-TOOL-aGraftedHelix-20.md) | 4 | 2 | SPECCED | rev-6 | 2026-10-04 |
 | [TOOL-aGraftedHelix-22 — the claim write decision refuses a derived claim-read class outside `CLAIM_READS`, observed by a criterion and kept by a standing arm](spec/2026-10-04-spec-TOOL-aGraftedHelix-22.md) | 4 | 1 | SPECCED | rev-2 | 2026-10-04 |
 | [TOOL-aGraftedHelix-4 — recall labels a superseded record and ranks it under its successor](spec/2026-10-04-spec-TOOL-aGraftedHelix-4.md) | 4 | 1 | SPECCED | rev-2 | 2026-10-04 |
 | [TOOL-aGraftedHelix-23 — the `prior-session` fact is the set of sessions an incomplete holder write may have left the claim under, read by `check_claim_writable` itself and emptied by the next `--resume` holder-row claim write that lands](spec/2026-10-04-spec-TOOL-aGraftedHelix-23.md) | 5 | 2 | SPECCED | rev-4 | 2026-10-04 |
 | [TOOL-aGraftedHelix-9 — a newly added decision row or gotcha that ranks as a near match must name its relation](spec/2026-10-04-spec-TOOL-aGraftedHelix-9.md) | 5 | 2 | SPECCED | rev-2 | 2026-10-04 |
 | [TOOL-aGraftedHelix-14 — an engine arm observes hygiene check 27 red the leg, and print its summary on a green run](spec/2026-10-04-spec-TOOL-aGraftedHelix-14.md) | 6 | 1 | SPECCED | rev-2 | 2026-10-04 |
-| [TOOL-aGraftedHelix-24 — the `prior-session` add runs before `write_lease` moves the record's session, and the criteria that certify the set's readers start from the state and the session they need](spec/2026-10-04-spec-TOOL-aGraftedHelix-24.md) | 6 | 2 | SPECCED | rev-4 | 2026-10-04 |
+| [TOOL-aGraftedHelix-24 — the `prior-session` add runs before `write_lease` moves the record's session, and the criteria that certify the set's readers start from the state and the session they need](spec/2026-10-04-spec-TOOL-aGraftedHelix-24.md) | 6 | 2 | SPECCED | rev-5 | 2026-10-04 |
 | [TOOL-aGraftedHelix-6 — a decision row or gotcha whose normalized text another record already holds reds](spec/2026-10-04-spec-TOOL-aGraftedHelix-6.md) | 6 | 2 | SPECCED | rev-3 | 2026-10-04 |
 | [TOOL-aGraftedHelix-13 — an engine arm observes hygiene check 28 red the leg, and print its summary on a green run](spec/2026-10-04-spec-TOOL-aGraftedHelix-13.md) | 7 | 1 | SPECCED | rev-2 | 2026-10-04 |
 | [TOOL-aGraftedHelix-17 — check 27's engine arm asserts its branch run prints no check 28 line, observed once check 28 exists](spec/2026-10-04-spec-TOOL-aGraftedHelix-17.md) | 7 | 1 | SPECCED | rev-3 | 2026-10-04 |
-| [TOOL-aGraftedHelix-25 — the `prior-session` add's own failure returns the holder row before `write_lease`, observed by a criterion that fails the add itself](spec/2026-10-04-spec-TOOL-aGraftedHelix-25.md) | 7 | 2 | SPECCED | rev-2 | 2026-10-04 |
+| [TOOL-aGraftedHelix-25 — the `prior-session` add's own failure returns the holder row before `write_lease`, observed by a criterion that fails the add itself](spec/2026-10-04-spec-TOOL-aGraftedHelix-25.md) | 7 | 2 | SPECCED | rev-3 | 2026-10-04 |
 | [TOOL-aGraftedHelix-5 — each leg reading is stamped faithful or contended by a foreign-load census, and only faithful readings argue a ceiling](spec/2026-10-04-spec-TOOL-aGraftedHelix-5.md) | 7 | 2 | SPECCED | rev-2 | 2026-10-04 |
+| [TOOL-aGraftedHelix-26 — a failed `prior-session` add or `write_lease` fact fails the call through check 17, and both of the add's triggers reach one guarded call site, each observed](spec/2026-10-04-spec-TOOL-aGraftedHelix-26.md) | 8 | 2 | SPECCED | rev-1 | 2026-10-04 |
 | [TOOL-aGraftedHelix-7 — the gate runner stops dispatching legs above a declared memory fraction and records the pause](spec/2026-10-04-spec-TOOL-aGraftedHelix-7.md) | 8 | 2 | SPECCED | rev-2 | 2026-10-04 |
 | [TOOL-aGraftedHelix-8 — every automatic self-heal appends one line to a health log the orientation card counts](spec/2026-10-04-spec-TOOL-aGraftedHelix-8.md) | 9 | 1 | SPECCED | rev-2 | 2026-10-04 |
 | [TOOL-aGraftedHelix-15 — the build harness commits the specs its writers authored before AUDIT pins them, and its commit-first refusals name a remedy a resume cannot replay](spec/2026-10-04-spec-TOOL-aGraftedHelix-15.md) | 10 | 1 | SPECCED | rev-2 | 2026-10-04 |
@@ -125,11 +127,11 @@ ids TOOL-aGraftedHelix-14 TOOL-aGraftedHelix-15 TOOL-aGraftedHelix-16 TOOL-aGraf
 | [TOOL-aGraftedHelix-21 — the spec commit block's delta loop lists untracked paths as its record does, compares paths, and refuses when its record is unset](spec/2026-10-04-spec-TOOL-aGraftedHelix-21.md) | 12 | 1 | SPECCED | rev-3 | 2026-10-04 |
 <!-- /gen:build-units -->
 
-Records: 10 bound to this build, across 3 record folder(s).
+Records: 11 bound to this build, across 3 record folder(s).
 
-Ids no record names: TOOL-aGraftedHelix-25.
+Ids no record names: TOOL-aGraftedHelix-26.
 
-Ids no `spec-audit` record has ever named: TOOL-aGraftedHelix-25.
+Ids no `spec-audit` record has ever named: TOOL-aGraftedHelix-26.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -143,7 +145,7 @@ Ids no `spec-audit` record has ever named: TOOL-aGraftedHelix-25.
 | 5 | `TOOL-aGraftedHelix-23`, `TOOL-aGraftedHelix-9` | yes |
 | 6 | `TOOL-aGraftedHelix-14`, `TOOL-aGraftedHelix-24`, `TOOL-aGraftedHelix-6` | yes |
 | 7 | `TOOL-aGraftedHelix-13`, `TOOL-aGraftedHelix-17`, `TOOL-aGraftedHelix-25`, `TOOL-aGraftedHelix-5` | yes |
-| 8 | `TOOL-aGraftedHelix-7` | no |
+| 8 | `TOOL-aGraftedHelix-26`, `TOOL-aGraftedHelix-7` | yes |
 | 9 | `TOOL-aGraftedHelix-8` | no |
 | 10 | `TOOL-aGraftedHelix-15` | no |
 | 11 | `TOOL-aGraftedHelix-16` | no |

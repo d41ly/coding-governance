@@ -1,10 +1,12 @@
 # TOOL-aGraftedHelix-25 — the `prior-session` add's own failure returns the holder row before `write_lease`, observed by a criterion that fails the add itself
 
-**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-2 · base 5266d22e · streams tooling · order 7
+**Status:** SPECCED · rev-3 · 2026-10-04 · node a · Tier-2 · base 5266d22e · streams tooling · order 7
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-05-review-TOOL-aGraftedHelix-25-spec-audit-round1.md](../reviews/2026-10-05-review-TOOL-aGraftedHelix-25-spec-audit-round1.md) | spec-audit | — |
 
 <!-- /gen:spec-records -->
 
@@ -28,19 +30,23 @@ closes finding 11 (HIGH) of the round-1 spec audit of unit 24.
 
 ## 2. Scope (IN)
 
-- **S1** — On a `--resume` holder-row call, a non-zero return from the add's `set_fact` returns the
-  holder row 1 at once: before `write_lease`'s first `set_fact`, before `stage_or_fail`, and before
-  the row's `lease recorded` line. The add is written `|| return 1`, the shape each of
+- **S1** — On a `--resume` holder-row call, on either of the add's two triggers, a CAS that did not
+  complete and a claim that could not be read, a non-zero return from the add's `set_fact` returns
+  the holder row 1 at once: before `write_lease`'s first `set_fact`, before `stage_or_fail`, and
+  before the row's `lease recorded` line. The add is written `|| return 1`, the shape each of
   `write_lease`'s own facts takes (`tools/unattended/unattended.sh:5559` to `:5569`). `mv` is
   `set_fact`'s last command, so the one return covers a failed `mv` as well as a failed `mktemp`.
   The add's place is unit 24's; this adds its failure rule to unit 24 §4 "The order"'s add row.
-  Observed by AC1, which drives the `mktemp` half; the `mv` half is NOT OBSERVED by a criterion
+  Observed by AC1 on the first trigger, which drives the `mktemp` half. The second trigger is NOT
+  OBSERVED by a criterion here: `TOOL-aGraftedHelix-26` gives both triggers one call site and
+  drives the unreadable one with a leg of its own (§3). The `mv` half is NOT OBSERVED by a criterion
   here, because both halves reach the row through the same return.
   - **Readers:** by name: `tools/unattended/unattended.sh` holds the holder row whose add takes the
-    return, and `tools/unattended/unattended.test.sh` holds the arm that drives it. by value: every
-    caller of `--resume` reads the row's exit status, and a failed add now gives it 1 where a build
-    with no rule gave 0. None changes, because the same row already returns 1 when `write_lease`
-    fails (`:6599`).
+    return, and `tools/unattended/unattended.test.sh` holds the arm that drives it. by value: none
+    at this unit. The dispatcher discards the verb's return and the process exits with `status`,
+    which only `fail` sets (§4 Evidence), so a failed add exits 0 here, as a failed `write_lease`
+    fact does at `:6599`. The row's return stops the row; what callers of `--resume` read is
+    `TOOL-aGraftedHelix-26`'s (§3).
 - **S2** — `tools/unattended/unattended.test.sh` gains the arm §7 names. NOT OBSERVED by a criterion
   here: the suite is the main loop's to run at VERIFYING, and the arm's red on its staged break is
   observed there (§7).
@@ -52,8 +58,9 @@ closes finding 11 (HIGH) of the round-1 spec audit of unit 24.
 - **The clear's own failure.** A failed clear after a landed CAS leaves members the claim no longer
   carries, the safe direction unit 24 S1 states, and the next `--resume` holder-row claim write that
   lands writes it again (unit 23 S3).
-- **A new message for the failed add.** `set_fact`, `mktemp` or `mv` names the failure on stderr, as
-  each does for a failed `write_lease` fact, and the row's exit status is what its callers read.
+- **The failed add's message and exit status.** Here `set_fact`, `mktemp` or `mv` names the failure
+  on stderr, and the exit is not this unit's to set, because the dispatcher discards the verb's
+  return. Both are `TOOL-aGraftedHelix-26`'s (§3).
 - **Every other `set_fact` caller.** Base chains some with `&&` and no return (`:7662`), and their
   writes protect nothing that precedes them. This unit is the one protecting write the holder row
   places ahead of the write it protects.
@@ -61,8 +68,12 @@ closes finding 11 (HIGH) of the round-1 spec audit of unit 24.
 ### Edges
 
 - **consumes-from** `TOOL-aGraftedHelix-24` — the add's place ahead of `write_lease`, AC1's fixture
-  and its `mktemp` shim, and the interruption arm; without the add ahead of `write_lease` there is
-  no protecting write whose failure could stop the row before it.
+  and the interruption arm; the `mktemp` shim is re-keyed here on the `git` shim's 124 marker (§6).
+  Without the add ahead of `write_lease` there is no protecting write whose failure could stop the
+  row before it.
+- **hands-off** `TOOL-aGraftedHelix-26` — `fail 17` beside the add's `return 1`, so a failed add
+  exits the call 1; the add's one call site for both triggers; and the unreadable trigger's leg
+  (findings 5, 8 and 6 of the round-1 audit of this unit).
 
 ## 4. Design
 
@@ -75,13 +86,16 @@ closes finding 11 (HIGH) of the round-1 spec audit of unit 24.
   holder row returns when `write_lease` fails (`:6599`), before its `stage_or_fail`.
 - Unit 1 §4 "Call sites" gives the holder row's not-completed CAS "announce, continue", so the
   announce line is printed at the CAS outcome, which unit 24 §4 "The order" places ahead of the add.
+- The dispatcher runs `verb_resume` and discards its return (`:10561`), the script ends with
+  `exit "$status"` (`:10576`), and only `fail` sets `status` (`:637`). `set_fact`'s `mktemp` and
+  `mv` branches call no `fail`, so the row's return reaches no caller's exit.
 
 ### The add row's failure rule
 
 Unit 24 §4 "The order" owns the add row, its trigger and its place. This unit adds one thing to
 it: when the add's `set_fact` returns non-zero, the row returns 1, and no step after the add runs.
 
-### What a failed add leaves, on an `s2` call whose CAS did not complete
+### What a failed add leaves, on an `s2` call whose CAS did not complete or whose claim was unreadable
 
 | record `session` | set | claim | `lease-utc` | the next `s2` call |
 |---|---|---|---|---|
@@ -140,15 +154,16 @@ under the session named, with `CLAUDE_PID` unchanged from the fixture's. The cla
 `fact` over the run-state file.
 
 - **AC1** — When an `s2` holder call runs with the claim push exiting 124 and that `mktemp` shim,
-  it prints unit 1's announce line for a holder claim write that did not land, exits non-zero, and
-  leaves the run-state file reading `session: s1`, `fact` printing nothing for `prior-session`, and
+  it prints unit 1's announce line for a holder claim write that did not land and leaves the
+  run-state file reading `session: s1`, `fact` printing nothing for `prior-session`, and
   `lease-utc` at its pre-call value. The announce line and the empty set together are the leg's
   witness that the shim failed the add itself: a shim that fires inside the CAS step's outcome
   either stops the row before the announce or lets the add run and write `s1`, and one that fires
   after the add leaves `s1` in the set, so each reds this criterion. A second `s2` call with no shim
   exits 0, prints no `UNATTENDED check 90 FAILED`, leaves a claim naming `session: s2`, leaves
   `fact` printing nothing for `prior-session`, and leaves `git diff --name-only` naming no run-state
-  file.
+  file. The first call's exit status is not asserted here: the dispatcher discards the verb's
+  return (§4 Evidence), and `TOOL-aGraftedHelix-26` AC1 asserts it as exactly 1.
   Red when: the add's failure does not stop the row, so `write_lease` moves the record to `s2` with
   no `s1` in the set and the second call answers check 90.
 - **AC2** — When `bash tools/check-kit-versions.sh` runs at the pass's commit it exits 0, and
@@ -177,6 +192,14 @@ none
 - rev-2 · 2026-10-04 · §4 · from the bug-class checklist over the promoting commit, which selected
   `two-answers-to-one-question`. §4 no longer restates unit 24's add row as a table of its own; it
   points at that row and states only the failure rule it adds.
+- rev-3 · 2026-10-04 · §2 §3 §4 §6 · S1 · AC1 · folded the round-1 spec audit of this unit. Findings
+  1 and 10 (MEDIUM): S1 names both of the add's triggers and labels the unreadable one NOT OBSERVED
+  here, pointing at `TOOL-aGraftedHelix-26`, whose leg drives it, and §4's table heading names the
+  unreadable call. Finding 3 (LOW): AC1 no longer asserts "exits non-zero"; its exit is the
+  promoted unit's to assert as exactly 1. Finding 7 (LOW): the Edges entry names the `mktemp` shim
+  as re-keyed here, not consumed. Findings 5, 8 and 6 (all HIGH) are promoted to
+  `TOOL-aGraftedHelix-26`: §3 gains its hands-off, §4 Evidence states why the row's return reaches
+  no exit, and S1's by-value readers line and the failed-add non-goal point at it.
 
 ## 10. Reuse audit
 
