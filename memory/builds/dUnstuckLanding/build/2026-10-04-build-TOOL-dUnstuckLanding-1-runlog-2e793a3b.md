@@ -11,27 +11,27 @@ Rendered from the run model by the runlog kit's `record` command. Every value be
 - start: 2e793a3bc6b7762083020a4812687af9e3513a05
 - phase: VERIFYING
 - terminal: no
-- window: 2026-10-04T08:52:38Z to 2026-10-04T09:38:52Z
+- window: 2026-10-04T08:52:38Z to 2026-10-04T09:40:16Z
 - window opened by: git
 - window closed by: last-activity
-- duration: 2774s
+- duration: 2858s
 - own commits: 4
 - last own commit: 28b23d7a7773afb13fe062ef8bba25b17ed06c68
 - merged: no
 - units served: 3
 - sources present: 7 of 7
 - owner turns: launch 1 · pre-run 0 · in-window 0 · post-close 0
-- usage main: requests 90 · in 182 · out 137367 · cache-read 32849789 · cache-write 262119
+- usage main: requests 94 · in 190 · out 139200 · cache-read 34808507 · cache-write 264811
 - usage agent: requests 5 · in 10 · out 4695 · cache-read 1022123 · cache-write 23147
 - usage workflow: requests 261 · in 522 · out 311022 · cache-read 34946769 · cache-write 1612241
-- attributed calls: 387 of 390
+- attributed calls: 392 of 395
 - values withheld: 0
-- commitment: sha256 ef956260411d90b167e2a167315fb2c7ccd858a9c120b58c93c97e115bc82888 · lines 36
+- commitment: sha256 def3cb164c7d4393e80e56096acf45e77249c8ef2bde638911e7f03ec6ed8ae1 · lines 42
 
 ## Timeline
 
 - events: 12 · shown 12 · elided 0
-- withheld rows: verb 17 · push 1 · push-refused 0 · gate 0 · compact 0 · limit 0 · idle 0 · workflow 1
+- withheld rows: verb 19 · push 2 · push-refused 0 · gate 0 · compact 0 · limit 0 · idle 0 · workflow 1
 
 | UTC | source | event | value | phase | rc | more |
 |---|---|---|---|---|---|---|
@@ -83,9 +83,9 @@ Rendered from the run model by the runlog kit's `record` command. Every value be
 
 | # | source | ref | verdict |
 |---|---|---|---|
-| 1 | decision | memory/builds/dUnstuckLanding/RUN.md:44 | - |
-| 2 | decision | memory/builds/dUnstuckLanding/RUN.md:46 | - |
-| 3 | decision | memory/builds/dUnstuckLanding/RUN.md:48 | - |
+| 1 | decision | memory/builds/dUnstuckLanding/RUN.md:46 | - |
+| 2 | decision | memory/builds/dUnstuckLanding/RUN.md:48 | - |
+| 3 | decision | memory/builds/dUnstuckLanding/RUN.md:50 | - |
 | 4 | review | memory/builds/dUnstuckLanding/reviews/2026-10-04-review-TOOL-dUnstuckLanding-1-2-closing-diff-round1.md:9 | CLEAN WITH FIXES |
 | 5 | trailer | ac7e375fa3df | - |
 | 6 | trailer | 04ebf84abd13 | - |
@@ -107,12 +107,17 @@ Rendered from the run model by the runlog kit's `record` command. Every value be
 | 1 | brief-before-build | - | UNJUDGEABLE |
 | 2 | phases-walked | - | UNJUDGEABLE |
 | 3 | green-at-close | - | UNJUDGEABLE |
-| 4 | keepalive-reaped | - | UNJUDGEABLE |
+| 4 | keepalive-reaped | - | MET |
 | 5 | review-exited | - | MET |
 
 ## Anomalies
 
-- anomalies: 0 · shown 0 · aggregated no
+- anomalies: 2 · shown 2 · aggregated no
+
+| # | kind | subclass |
+|---|---|---|
+| 1 | out-of-band-edit | - |
+| 2 | destructive-git | - |
 
 ## Coverage
 
@@ -125,9 +130,9 @@ Rendered from the run model by the runlog kit's `record` command. Every value be
 | # | source | state | lines | bad |
 |---|---|---|---|---|
 | 1 | run-state | present | - | - |
-| 2 | driver | present | 34 | 0 |
+| 2 | driver | present | 38 | 0 |
 | 3 | gates | present | 0 | 0 |
-| 4 | pushes | present | 1 | 0 |
+| 4 | pushes | present | 2 | 0 |
 | 5 | git | present | - | - |
 | 6 | transcripts | present | - | - |
 | 7 | build-folder | present | - | - |
@@ -136,8 +141,8 @@ Rendered from the run model by the runlog kit's `record` command. Every value be
 
 ```json
 {"schema":1,"sections":{
-"Summary":{"facts":{"run-state":"memory/builds/dUnstuckLanding/RUN.md","run":"1 of 1","start":"2e793a3bc6b7762083020a4812687af9e3513a05","phase":"VERIFYING","terminal":"no","window":"2026-10-04T08:52:38Z to 2026-10-04T09:38:52Z","window opened by":"git","window closed by":"last-activity","duration":"2774s","own commits":"4","last own commit":"28b23d7a7773afb13fe062ef8bba25b17ed06c68","merged":"no","units served":"3","sources present":"7 of 7","owner turns":"launch 1 · pre-run 0 · in-window 0 · post-close 0","usage main":"requests 90 · in 182 · out 137367 · cache-read 32849789 · cache-write 262119","usage agent":"requests 5 · in 10 · out 4695 · cache-read 1022123 · cache-write 23147","usage workflow":"requests 261 · in 522 · out 311022 · cache-read 34946769 · cache-write 1612241","attributed calls":"387 of 390","values withheld":"0","commitment":"sha256 ef956260411d90b167e2a167315fb2c7ccd858a9c120b58c93c97e115bc82888 · lines 36"},"tables":[]},
-"Timeline":{"facts":{"events":"12 · shown 12 · elided 0","withheld rows":"verb 17 · push 1 · push-refused 0 · gate 0 · compact 0 · limit 0 · idle 0 · workflow 1"},"tables":[{"name":"events","header":["UTC","source","event","value","phase","rc","more"],"rows":[
+"Summary":{"facts":{"run-state":"memory/builds/dUnstuckLanding/RUN.md","run":"1 of 1","start":"2e793a3bc6b7762083020a4812687af9e3513a05","phase":"VERIFYING","terminal":"no","window":"2026-10-04T08:52:38Z to 2026-10-04T09:40:16Z","window opened by":"git","window closed by":"last-activity","duration":"2858s","own commits":"4","last own commit":"28b23d7a7773afb13fe062ef8bba25b17ed06c68","merged":"no","units served":"3","sources present":"7 of 7","owner turns":"launch 1 · pre-run 0 · in-window 0 · post-close 0","usage main":"requests 94 · in 190 · out 139200 · cache-read 34808507 · cache-write 264811","usage agent":"requests 5 · in 10 · out 4695 · cache-read 1022123 · cache-write 23147","usage workflow":"requests 261 · in 522 · out 311022 · cache-read 34946769 · cache-write 1612241","attributed calls":"392 of 395","values withheld":"0","commitment":"sha256 def3cb164c7d4393e80e56096acf45e77249c8ef2bde638911e7f03ec6ed8ae1 · lines 42"},"tables":[]},
+"Timeline":{"facts":{"events":"12 · shown 12 · elided 0","withheld rows":"verb 19 · push 2 · push-refused 0 · gate 0 · compact 0 · limit 0 · idle 0 · workflow 1"},"tables":[{"name":"events","header":["UTC","source","event","value","phase","rc","more"],"rows":[
 ["2026-10-04T08:52:38Z","run-state","phase","0c16a66b53c9","RUNNING","-","-"],
 ["2026-10-04T08:58:35Z","run-state","brief","TOOL-dUnstuckLanding-1","-","-","-"],
 ["2026-10-04T08:59:10Z","git","commit","ac7e375fa3df","-","-","TOOL-dUnstuckLanding-1"],
@@ -167,9 +172,9 @@ Rendered from the run model by the runlog kit's `record` command. Every value be
 ["10","decision-log","0"],
 ["11","ledger","0"]]},
 {"name":"entries","header":["#","source","ref","verdict"],"rows":[
-["1","decision","memory/builds/dUnstuckLanding/RUN.md:44","-"],
-["2","decision","memory/builds/dUnstuckLanding/RUN.md:46","-"],
-["3","decision","memory/builds/dUnstuckLanding/RUN.md:48","-"],
+["1","decision","memory/builds/dUnstuckLanding/RUN.md:46","-"],
+["2","decision","memory/builds/dUnstuckLanding/RUN.md:48","-"],
+["3","decision","memory/builds/dUnstuckLanding/RUN.md:50","-"],
 ["4","review","memory/builds/dUnstuckLanding/reviews/2026-10-04-review-TOOL-dUnstuckLanding-1-2-closing-diff-round1.md:9","CLEAN WITH FIXES"],
 ["5","trailer","ac7e375fa3df","-"],
 ["6","trailer","04ebf84abd13","-"],
@@ -183,14 +188,16 @@ Rendered from the run model by the runlog kit's `record` command. Every value be
 ["1","brief-before-build","-","UNJUDGEABLE"],
 ["2","phases-walked","-","UNJUDGEABLE"],
 ["3","green-at-close","-","UNJUDGEABLE"],
-["4","keepalive-reaped","-","UNJUDGEABLE"],
+["4","keepalive-reaped","-","MET"],
 ["5","review-exited","-","MET"]]}]},
-"Anomalies":{"facts":{"anomalies":"0 · shown 0 · aggregated no"},"tables":[]},
+"Anomalies":{"facts":{"anomalies":"2 · shown 2 · aggregated no"},"tables":[{"name":"anomalies","header":["#","kind","subclass"],"rows":[
+["1","out-of-band-edit","-"],
+["2","destructive-git","-"]]}]},
 "Coverage":{"facts":{"journal starts":"1 joined of 1 record-creating","unjoined starts":"0","sessions":"1 named · 1 extracted","idle gaps":"judged yes · near an owner turn 0","anomaly kinds":"judged 12 of 12"},"tables":[{"name":"sources","header":["#","source","state","lines","bad"],"rows":[
 ["1","run-state","present","-","-"],
-["2","driver","present","34","0"],
+["2","driver","present","38","0"],
 ["3","gates","present","0","0"],
-["4","pushes","present","1","0"],
+["4","pushes","present","2","0"],
 ["5","git","present","-","-"],
 ["6","transcripts","present","-","-"],
 ["7","build-folder","present","-","-"]]}]}}}
