@@ -1,11 +1,12 @@
 # TOOL-aBatchedMinors-2 — the closing review's exit records its standing findings and promotes them all
 
-**Status:** CLOSED · rev-2 · 2026-10-04 · node a · Tier-2 · base 5ba0fc4f · streams tooling · order 2
+**Status:** CLOSED · rev-3 · 2026-10-04 · node a · Tier-2 · base 5ba0fc4f · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-04-build-TOOL-aBatchedMinors-2-1-acceptance-ledger.md](../build/2026-10-04-build-TOOL-aBatchedMinors-2-1-acceptance-ledger.md) | journal | — |
 | [2026-10-04-build-TOOL-aBatchedMinors-2-runlog-dc0cf1f9.md](../build/2026-10-04-build-TOOL-aBatchedMinors-2-runlog-dc0cf1f9.md) | journal | TOOL-aBatchedMinors-3 TOOL-aBatchedMinors-4 TOOL-aBatchedMinors-6 |
 | [2026-10-04-prompt-TOOL-aBatchedMinors-2-1-build-brief.md](../prompts/2026-10-04-prompt-TOOL-aBatchedMinors-2-1-build-brief.md) | journal | — |
 | [2026-10-04-review-TOOL-aBatchedMinors-2-closing-diff-round1.md](../reviews/2026-10-04-review-TOOL-aBatchedMinors-2-closing-diff-round1.md) | diff-review | TOOL-aBatchedMinors-1 TOOL-aBatchedMinors-3 TOOL-aBatchedMinors-4 |
@@ -55,6 +56,7 @@ terminal round SAY what stood, and refuses one that stood on anything without pr
 
 ### Edges
 
+- **hands-off** `TOOL-aBatchedMinors-6` — the closing review's batched minors harden this unit.
 - **hands-off** `TOOL-aBatchedMinors-3` — the row grammar S4 writes is the one check 2 reads.
 
 ## 4. Design
@@ -147,6 +149,8 @@ none
 - rev-1 · 2026-10-04 · initial draft, from the owner's ruling and `verb_review` at base.
 - rev-2 · 2026-10-04 · S6 · AC8 · building found check 26 reds an undocumented flag, so the usage
   header line moves here from `TOOL-aBatchedMinors-4`, which owns the same file's prose no further.
+- rev-3 · 2026-10-04 · §3 Edges · the hands-off to `TOOL-aBatchedMinors-6`, which consumes this unit; the
+  close's hygiene check 12 found the edge one-sided.
 
 ## 10. Reuse audit
 

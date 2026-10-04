@@ -8997,8 +8997,9 @@ verb_review() { # slug · subject · verdict · blockers · disposition · highs
   # while check 2's awk reads the same row field as decimal. A canonical decimal of at most nine
   # digits is the one spelling both read alike, so anything else is refused before either does.
   for _rv_n in "blockers $blockers" "highs $highs" "minors $minors"; do
+    _rv_flag=${_rv_n%% *}
     case "${_rv_n#* }" in
-      0[0-9]*|??????????*) fail 37 "--review requires --${_rv_n%% *} as a decimal of at most nine digits with no leading zero, because bash arithmetic reads a leading zero as octal and check 2 reads the row as decimal: ${_rv_n#* }"; return 1 ;;
+      0[0-9]*|??????????*) fail 37 "--review requires --$_rv_flag as a decimal of at most nine digits with no leading zero, because bash arithmetic reads a leading zero as octal and check 2 reads the row as decimal: ${_rv_n#* }"; return 1 ;;
     esac
   done
   if [ "$subj" != "$slug" ] && [ -n "$highs$minors" ]; then

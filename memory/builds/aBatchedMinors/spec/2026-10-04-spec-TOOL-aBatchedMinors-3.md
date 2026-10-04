@@ -1,12 +1,13 @@
 # TOOL-aBatchedMinors-3 — check 2 demands one unit per blocker and high, plus one for the minors
 
-**Status:** CLOSED · rev-1 · 2026-10-04 · node a · Tier-2 · base 5ba0fc4f · streams tooling · order 3
+**Status:** CLOSED · rev-2 · 2026-10-04 · node a · Tier-2 · base 5ba0fc4f · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-04-build-TOOL-aBatchedMinors-2-runlog-dc0cf1f9.md](../build/2026-10-04-build-TOOL-aBatchedMinors-2-runlog-dc0cf1f9.md) | journal | TOOL-aBatchedMinors-2 TOOL-aBatchedMinors-4 TOOL-aBatchedMinors-6 |
+| [2026-10-04-build-TOOL-aBatchedMinors-3-1-acceptance-ledger.md](../build/2026-10-04-build-TOOL-aBatchedMinors-3-1-acceptance-ledger.md) | journal | — |
 | [2026-10-04-prompt-TOOL-aBatchedMinors-3-1-build-brief.md](../prompts/2026-10-04-prompt-TOOL-aBatchedMinors-3-1-build-brief.md) | journal | — |
 | [2026-10-04-review-TOOL-aBatchedMinors-2-closing-diff-round1.md](../reviews/2026-10-04-review-TOOL-aBatchedMinors-2-closing-diff-round1.md) | diff-review | TOOL-aBatchedMinors-1 TOOL-aBatchedMinors-2 TOOL-aBatchedMinors-4 |
 
@@ -45,6 +46,7 @@ what the ruling owes: one unit per standing blocker and high, plus one for the m
 
 ### Edges
 
+- **hands-off** `TOOL-aBatchedMinors-6` — the closing review's batched minors harden this unit.
 - **consumes-from** `TOOL-aBatchedMinors-2` — the row grammar.
 
 ## 4. Design
@@ -119,6 +121,8 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-04 · initial draft, from check 2 at base.
+- rev-2 · 2026-10-04 · §3 Edges · the hands-off to `TOOL-aBatchedMinors-6`, which consumes this unit; the
+  close's hygiene check 12 found the edge one-sided.
 
 ## 10. Reuse audit
 

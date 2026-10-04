@@ -64,13 +64,13 @@ ids TOOL-aBatchedMinors-1 TOOL-aBatchedMinors-2 TOOL-aBatchedMinors-3 TOOL-aBatc
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-aBatchedMinors-1 — RETIRED: a `minors` count the review harness already returns](spec/2026-10-04-spec-TOOL-aBatchedMinors-1.md) | 1 | 1 | WONTDO | rev-1 | 2026-10-04 |
-| [TOOL-aBatchedMinors-2 — the closing review's exit records its standing findings and promotes them all](spec/2026-10-04-spec-TOOL-aBatchedMinors-2.md) | 2 | 2 | CLOSED | rev-2 | 2026-10-04 |
-| [TOOL-aBatchedMinors-3 — check 2 demands one unit per blocker and high, plus one for the minors](spec/2026-10-04-spec-TOOL-aBatchedMinors-3.md) | 3 | 2 | CLOSED | rev-1 | 2026-10-04 |
+| [TOOL-aBatchedMinors-2 — the closing review's exit records its standing findings and promotes them all](spec/2026-10-04-spec-TOOL-aBatchedMinors-2.md) | 2 | 2 | CLOSED | rev-3 | 2026-10-04 |
+| [TOOL-aBatchedMinors-3 — check 2 demands one unit per blocker and high, plus one for the minors](spec/2026-10-04-spec-TOOL-aBatchedMinors-3.md) | 3 | 2 | CLOSED | rev-2 | 2026-10-04 |
 | [TOOL-aBatchedMinors-4 — the method, the Skill and the verbs entry state the batched-promotion rule](spec/2026-10-04-spec-TOOL-aBatchedMinors-4.md) | 4 | 1 | CLOSED | rev-2 | 2026-10-04 |
 | [TOOL-aBatchedMinors-6 — the closing review's batched minors, round 1](spec/2026-10-04-spec-TOOL-aBatchedMinors-6.md) | 6 | 2 | CLOSED | rev-1 | 2026-10-04 |
 <!-- /gen:build-units -->
 
-Records: 7 bound to this build, across 4 record folder(s).
+Records: 10 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
