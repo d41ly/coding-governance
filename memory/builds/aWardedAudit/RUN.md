@@ -10,7 +10,7 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 
 ## Run facts
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 030cb510e2784ea90ea126aa0610f609de20330b
+witness: 1872bdfe527f44612d54391547ea7fe3239cb50c
 phase: BUILDING
 branch-sha: 856ad8a6856225bfe0d610d9a530b8fe852192b8
 branch-ref: refs/heads/branch/unattended-spec-review-owner-b471cf
@@ -34,3 +34,7 @@ base: 856ad8a6856225bfe0d610d9a530b8fe852192b8
 2026-10-04T22:10:59Z brief · item TOOL-aWardedAudit-1 · reason 9c69bc9dbf8b memory/builds/aWardedAudit/prompts/2026-10-05-prompt-TOOL-aWardedAudit-1-1-build-brief.md
 
 2026-10-04T22:11:06Z dispatch · item 030cb510 TOOL-aWardedAudit-1 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh memory/builds/aWardedAudit/spec/2026-10-05-spec-TOOL-aWardedAudit-1.md
+
+2026-10-04T22:16:18Z brief · item TOOL-aWardedAudit-2 · reason 80afbd99671e memory/builds/aWardedAudit/prompts/2026-10-05-prompt-TOOL-aWardedAudit-2-1-build-brief.md
+
+2026-10-04T22:16:26Z dispatch · item 1872bdfe TOOL-aWardedAudit-2 · reason tools/hooks/agent-cap.js tools/hooks/agent-cap.test.sh memory/builds/aWardedAudit/spec/2026-10-05-spec-TOOL-aWardedAudit-2.md
