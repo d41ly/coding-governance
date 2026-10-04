@@ -865,9 +865,14 @@ read_advertised_head() { # driver path -> 0 with ADVH_SHA set · 1 with ADVH_WHY
       _ah_l=${_ah_l%$'\r'}
       case "$_ah_l" in "$_ah_k=\""*'"') _ah_v=${_ah_l#"$_ah_k=\""}; _ah_v=${_ah_v%\"}; break ;; esac
     done < "$_ah_drv"
+    # A POSITIVE integer, not merely digits: `timeout 0` DISABLES the bound, and the driver is a
+    # tracked file the graded run can commit, so a zero is the unbounded observation by another name.
     case "$_ah_v" in
       ''|*[!0-9]*) ADVH_WHY="the driver's $_ah_k does not read as a single integer, so the remote observation would run unbounded: $_ah_drv"; return 1 ;;
     esac
+    if [ "${#_ah_v}" -gt 9 ] || [ "$_ah_v" -le 0 ]; then
+      ADVH_WHY="the driver's $_ah_k is not a positive integer a bound can use, and a zero bound is no bound: $_ah_drv"; return 1
+    fi
     case "$_ah_k" in
       REMOTE_BOUND) _ah_b=$_ah_v ;;
       REMOTE_CONNECT_BOUND) _ah_cb=$_ah_v ;;
