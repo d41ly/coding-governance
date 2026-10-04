@@ -2332,14 +2332,49 @@ ASK_STATUS_TOKENS = STATUS_TOKENS + (backlog.UNRESOLVED,)
 ASK_ID_RE = re.compile(r"^[A-Za-z][A-Za-z0-9]*-[A-Za-z0-9]+-\d+$")
 ASK_USAGE = ("usage: gen_build_index.py --asks [FAMILY|ID] [--all] [--status <token>] "
              "[--build <slug>] [--json|--tsv] [--ready [IDLIST]] [--target <slug>] "
-             "[--live-builds <slug>…] [--at <rev>] [--probe <id>]")
+             "[--live-builds <slug>…] [--at <rev>] [--probe <id>] "
+             "[--path <path>… [--limit <n>]]")
 #: The options that take a LIST of bare words rather than one value. Their list ends at the next
 #: `--option` or at the end of argv, and NOT at the first token starting with `-`: an IDLIST
 #: continuation is spelled `-4`, so a one-dash stop would silently truncate every mandate that
 #: used the continuation form — the fix-F2 narrowing, reintroduced by the argument parser.
-ASK_LIST_OPTIONS = {"--ready": "ready", "--live-builds": "live_builds"}
+ASK_LIST_OPTIONS = {"--ready": "ready", "--live-builds": "live_builds", "--path": "path"}
 ASK_VALUE_OPTIONS = {"--status": "status", "--build": "build", "--target": "target",
-                     "--at": "at", "--probe": "probe"}
+                     "--at": "at", "--probe": "probe", "--limit": "limit"}
+#: The `summary` field's cap, in encoded UTF-8 bytes with the ellipsis inside it.
+ASK_SUMMARY_BYTES = 160
+#: How many rows `--path` keeps when no `--limit` is given. `--limit 0` lifts the cap.
+ASK_PATH_LIMIT = 20
+#: The options `--path` refuses beside it (S5): each reads a population `--path` would silently
+#: shrink — `--tsv` and its READY options grade a mandate, and an id or a probe names one ask.
+ASK_PATH_CONFLICTS = ("tsv", "ready", "target", "live_builds", "probe")
+_ASK_PATH_LINE_RE = re.compile(r":\d+$")
+
+
+def resolve_ask_path(value: str) -> str:
+    """One locator or `--path` value in the form both sides are compared in: a backslash folded to
+    a slash, a trailing `:<line>`, a leading `./` and a trailing `/` dropped."""
+    out = _ASK_PATH_LINE_RE.sub("", value.strip().replace("\\", "/"))
+    while out.startswith("./"):
+        out = out[2:]
+    return out.rstrip("/")
+
+
+def check_ask_path(locators, paths, memory_root: str) -> bool:
+    """True when one locator is one of `paths`, or a whole-segment directory of one, or under one.
+
+    A locator relative to the memory root matches as if prefixed by it, because the records write
+    `builds/<slug>/…` as often as `memory/builds/<slug>/…`. Strings only: nothing is opened.
+    """
+    for raw in locators:
+        loc = resolve_ask_path(raw)
+        if not loc:
+            continue
+        for cand in (loc, f"{memory_root}/{loc}"):
+            for path in paths:
+                if cand == path or cand.startswith(path + "/") or path.startswith(cand + "/"):
+                    return True
+    return False
 
 
 def read_asks_args(argv: list) -> dict:
@@ -2350,7 +2385,8 @@ def read_asks_args(argv: list) -> dict:
     how a filter silently becomes a grading input.
     """
     out = {"pick": "", "all": False, "status": "", "build": "", "json": False, "tsv": False,
-           "ready": None, "target": "", "live_builds": None, "at": "", "probe": ""}
+           "ready": None, "target": "", "live_builds": None, "at": "", "probe": "",
+           "path": None, "limit": ""}
     rest = list(argv)
     while rest:
         token = rest.pop(0)
@@ -2380,6 +2416,30 @@ def read_asks_args(argv: list) -> dict:
         raise Problem("--asks: --json and --tsv are two projections of one answer, and a run that "
                       "printed both would put a JSON object in a consumer's TAB stream. "
                       f"{ASK_USAGE}")
+    if out["path"] is None:
+        if out["limit"]:
+            raise Problem(f"--asks: --limit caps what --path matched, and no --path was given. "
+                          f"{ASK_USAGE}")
+        return out
+    for key in ASK_PATH_CONFLICTS:
+        if out[key] not in ("", None, False):
+            raise Problem(f"--asks: --path and --{key.replace('_', '-')} cannot be combined: "
+                          f"--path ranks and caps the rows, which would shrink what that option "
+                          f"reads. {ASK_USAGE}")
+    if ASK_ID_RE.match(out["pick"]):
+        raise Problem(f"--asks: --path and an id pick `{out['pick']}` cannot be combined: an id "
+                      f"names one ask already. {ASK_USAGE}")
+    if out["limit"] and not out["limit"].isdigit():
+        raise Problem(f"--asks: --limit takes a non-negative integer, and was given "
+                      f"`{out['limit']}`. {ASK_USAGE}")
+    paths = []
+    for value in out["path"]:
+        folded = value.replace("\\", "/")
+        if folded.startswith("/") or re.match(r"^[A-Za-z]:", folded) or ".." in folded.split("/"):
+            raise Problem(f"--asks: --path `{value}` is absolute or climbs out with `..`; give a "
+                          f"repo-relative path. {ASK_USAGE}")
+        paths.append(resolve_ask_path(value))
+    out["path"] = paths
     return out
 
 
@@ -2389,8 +2449,13 @@ def build_ask_row(ask, fold, evidence: dict) -> dict:
     The switch-over's drift signals read `closing`, `declining`, `live_specs` and `sev` by name, and
     the agent carriers read the rest. Renaming one is a breaking change to a consumer this file
     cannot see, which is why they are listed in the spec and asserted by an arm.
+
+    `pointer` and `summary` were ADDED by TOOL-aMendedFleet-10, so a reader of one row no longer
+    has to open the BACKLOG.md it names; every consumer reads by name, so the addition moves none.
     """
     return {
+        "pointer": ask.pointer,
+        "summary": backlog.render_summary_cell(ask.text, ASK_SUMMARY_BYTES, by_bytes=True),
         "id": ask.id,
         "home": ask.slug,
         "file": ask.path,
@@ -2926,10 +2991,27 @@ def cmd_asks(root: str, conf: dict, args: dict) -> int:
         if args["status"] and row["status"] != args["status"]:
             continue
         picked.append((ask, row))
+    envelope: dict = {}
+    if args["path"] is not None:
+        # RANKED AND CAPPED ONLY HERE (§8 F1): the unfiltered modes keep the view's order. Two
+        # stable sorts over the id order: newest filing first, then severity on top of that.
+        merged = backlog.derive_clauses(corpus)
+        picked = [(ask, row) for ask, row in picked
+                  if check_ask_path(backlog.derive_ask_locators(ask, merged.get(ask.id, {}))[0],
+                                    args["path"], conf["MEMORY_ROOT"])]
+        picked.sort(key=lambda pair: pair[1]["filed"], reverse=True)
+        ranks = backlog.SEVERITIES + (backlog.UNLABELLED,)
+        picked.sort(key=lambda pair: ranks.index(pair[1]["sev"]) if pair[1]["sev"] in ranks
+                    else len(ranks))
+        limit = int(args["limit"]) if args["limit"] else ASK_PATH_LIMIT
+        matched = len(picked)
+        if limit:
+            picked = picked[:limit]
+        envelope = {"paths": args["path"], "matched": matched, "cut": matched - len(picked)}
     if args["json"]:
-        print(json.dumps({"mode": reading.get("mode", ""),
-                          "examined": len(corpus.files),
-                          "asks": [row for _ask, row in picked]}, indent=2, sort_keys=True))
+        print(json.dumps(dict(envelope, mode=reading.get("mode", ""),
+                              examined=len(corpus.files),
+                              asks=[row for _ask, row in picked]), indent=2, sort_keys=True))
         return 0
     # THE READY MODES. Asked for by `--tsv` or by any of the three options that only READY reads;
     # asked for by none of them, this mode is byte-identical to what the view unit shipped.
@@ -2943,6 +3025,9 @@ def cmd_asks(root: str, conf: dict, args: dict) -> int:
         print(render_ask_detail(*picked[0], backlog.derive_clauses(corpus).get(pick, {})))
         return 0
     print(render_asks_table(picked, reading.get("excerpt", backlog.EXCERPT_DEFAULT)))
+    if envelope:
+        print(f"{envelope['cut']} of {envelope['matched']} matched cut by the limit; "
+              f"rerun with --limit 0 to see every one")
     return 0
 
 
@@ -4733,6 +4818,51 @@ def cmd_selftest() -> int:
                     _render_backlog_spec("EXMP-aBar-80", tail=bar_tail),
                 "memory/builds/aBar/BACKLOG.md": _render_backlog_file("aBar", bar_asks, bar_rows),
             }
+
+        # TOOL-aMendedFleet-10 AC4 and AC2 — `--path` over five asks, and the byte-measured
+        # summary. Three reach `tools/x/run.sh` (a DIRECTORY pointer, a pinned `seen`, a `matching`
+        # `seen`); the fourth points relative to the memory root; the fifth is the near-miss whose
+        # `tools/xx/` would match a character prefix and must not match a whole-segment one.
+        _pf_long = "a" * 155 + "—" * 81 + "bb"
+        _pf_files = _build_env_tree(
+            foo_asks=[
+                backlog.render_ask_row("EXMP-aFoo-1", "2026-09-01", "dir pointer", pointer="`tools/x/`"),
+                backlog.render_ask_row("EXMP-aFoo-2", "2026-09-02", "pinned seen",
+                                       clauses=(("seen", "`tools/x/run.sh`@abc1234:7"),)),
+                backlog.render_ask_row("EXMP-aFoo-3", "2026-09-03", _pf_long,
+                                       clauses=(("seen", "`tools/x/run.sh` matching `foo`"),)),
+                backlog.render_ask_row("EXMP-aFoo-4", "2026-09-04", "rooted pointer",
+                                       pointer="builds/aFoo/README.md"),
+                backlog.render_ask_row("EXMP-aFoo-5", "2026-09-05", "the near miss",
+                                       pointer="tools/y/other.sh",
+                                       clauses=(("seen", "`tools/xx/run.sh`@abc1234"),))],
+            foo_rows=[backlog.render_sev_row("EXMP-aFoo-1", "MED", "m"),
+                      backlog.render_sev_row("EXMP-aFoo-2", "HIGH", "h"),
+                      backlog.render_sev_row("EXMP-aFoo-4", "BLOCKER", "b"),
+                      backlog.render_sev_row("EXMP-aFoo-5", "HIGH", "h")])
+        _cpf = _build_backlog_fixture(et, _pf_files)
+        _rc, _sopf, _se = _read_asks_run(et, _cpf, ["--json", "--path", "tools\\x\\run.sh:12"])
+        arm("--path returns exactly the three reaching asks, HIGH then MED then unlabelled",
+            "rc=0 ids=['EXMP-aFoo-2', 'EXMP-aFoo-1', 'EXMP-aFoo-3'] paths=['tools/x/run.sh'] "
+            "matched=3 cut=0",
+            lambda: f"rc={_rc} ids={[r['id'] for r in json.loads(_sopf)['asks']]} "
+                    f"paths={json.loads(_sopf)['paths']} matched={json.loads(_sopf)['matched']} "
+                    f"cut={json.loads(_sopf)['cut']}")
+        _rc, _sopf4, _se = _read_asks_run(et, _cpf, ["--json", "--path", "memory/builds/aFoo/README.md"])
+        arm("a pointer relative to the memory root is matched by its rooted path",
+            "ids=['EXMP-aFoo-4']", lambda: f"ids={[r['id'] for r in json.loads(_sopf4)['asks']]}")
+        _rc, _sopfl, _se = _read_asks_run(et, _cpf, ["--json", "--path", "tools/x", "--limit", "1"])
+        arm("--limit caps the ranked rows and `cut` counts what it removed",
+            "ids=['EXMP-aFoo-2'] matched=3 cut=2",
+            lambda: f"ids={[r['id'] for r in json.loads(_sopfl)['asks']]} "
+                    f"matched={json.loads(_sopfl)['matched']} cut={json.loads(_sopfl)['cut']}")
+        _pf_sum = [r for r in json.loads(_sopf)["asks"] if r["id"] == "EXMP-aFoo-3"][0]["summary"]
+        arm("a 400-byte text's summary is cut in BYTES, on a whole character, ellipsis inside 160",
+            "bytes=158 ends=True text=400",
+            lambda: f"bytes={len(_pf_sum.encode('utf-8'))} ends={_pf_sum == 'a' * 155 + '…'} "
+                    f"text={len(_pf_long.encode('utf-8'))}")
+        arm("every row carries its pointer", "`tools/x/`",
+            lambda: [r for r in json.loads(_sopf)["asks"] if r["id"] == "EXMP-aFoo-1"][0]["pointer"])
 
         # AC1's second half — the misread `out` value REACHES `--check` as V13, on the real tree.
         _c1 = _build_backlog_fixture(et, _build_env_tree(foo_asks=[_ac1_collide]))

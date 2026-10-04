@@ -1,10 +1,12 @@
 # TOOL-aMendedFleet-10 — `--asks` rows carry the pointer and a 160-byte summary, and `--path` ranks and caps them
 
-**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 10
+**Status:** CLOSED · rev-3 · 2026-10-05 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 10
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-04-build-TOOL-aMendedFleet-10-1-acceptance-ledger.md](../build/2026-10-04-build-TOOL-aMendedFleet-10-1-acceptance-ledger.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
@@ -109,6 +111,9 @@ The envelope under `--path`, beside today's `mode`, `examined` and `asks`:
   whether any locator is external out. R4 calls it instead of its inline walk, so the filter and the
   grade read one locator set.
 - A `by_bytes` keyword on `render_summary_cell`, default false, so the view's cell is unchanged.
+- `resolve_ask_path` and `check_ask_path` in `gen_build_index.py`: the one normaliser both sides
+  of S3's comparison pass through, and the match itself; and `ASK_PATH_CONFLICTS`, the options S5
+  refuses beside `--path`.
 
 Every name above is graded by the lexicon leg like any other definition; a name it refuses is
 replaced with its `--suggest` answer at build time, and this list is amended with a rev bump.
@@ -209,6 +214,8 @@ New arm: tools/memory-tree/gen_build_index.py --selftest · a five-ask fixture f
 - rev-2 · 2026-10-04 · §2 S7 · §4 · §7 · M2 cross-read: the definitions this unit adds
   move `memory/map/generated/symbols.json`, which `TOOL-aMendedFleet-82` and the build's other
   code units regenerate and declare; this spec omitted the write, its Files touched row and the leg.
+- rev-3 · 2026-10-05 · §4 Inventory · the build added two helpers and one constant the inventory
+  did not list, so S3's normalisation and match are written once rather than inline twice.
 
 ## 10. Reuse audit
 

@@ -298,7 +298,12 @@ probe: ask text is written by whoever filed it.
 `--asks <FAMILY>` narrows it to one family, and `--asks <ID>` prints one ask's detail, terminal or
 not. `--all` adds the terminal asks. `--json` prints one object, `mode`, `examined` and `asks`, for a
 program: under `shards` its `mode` reads `shards` and its asks are empty by design, so a reader
-falls back to the authored shards. `--tsv` prints the READY grades as TAB rows. `--status <token>`,
+falls back to the authored shards. Every JSON row carries the ask's `pointer` tail and a `summary`
+of its text, at most 160 bytes of UTF-8. `--path <path>…` keeps the asks whose pointer or merged
+`seen` locator is one of those paths or a directory on either side of one, ranks them by severity
+then newest filing, and caps them at `--limit <n>` (default 20, 0 lifts it); the JSON object then
+adds `paths`, `matched` and `cut`, and `--path` refuses an id, `--probe`, `--tsv` and the READY options.
+`--tsv` prints the READY grades as TAB rows. `--status <token>`,
 `--build <slug>`, `--ready [IDLIST]`, `--target <slug>`, `--live-builds <slug>…`, `--at <rev>` and
 `--probe <id>` qualify `--asks` and never run alone; `--at` reads the records and the conf at that
 revision. `--new-build <slug> --asks <IDLIST>` scaffolds the build README an owner lands: it prints
