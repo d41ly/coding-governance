@@ -2281,7 +2281,7 @@ check_single_live() {
 # and a run that lands a NEW build README authorizes the next run. All five are enumerated in
 # memory/guides/UNATTENDED-PROTOCOL.md; the fifth is parked as P1 in the build README.
 check_authorization() { # slug · base
-  local slug="$1" base="$2" rel blob fmslug _fm _pb _mg _sa_shown _cf _sad
+  local slug="$1" base="$2" rel blob fmslug _fm _pb _mg _sa_shown _cf _sad _cb
   rel=$(readme_of "$slug")
   # NO GUARD HERE FOR AN EMPTY BASE, deliberately, and the reason is unchanged from the function this
   # replaces: an empty one makes the line below read `git show ":path"` - the git INDEX, i.e. bytes
@@ -2361,8 +2361,19 @@ check_authorization() { # slug · base
   # printf, whose argument had already expanded from the blanked variable, so a declared default
   # read as `OK ` and therefore as absent. The continuation consumes the first newline; the
   # sentinel starts its own line. A non-date is fail 54 on fail 52's reasoning, one file over.
+  #
+  # TOOL-aWardedAudit-1 S2 - READ AT THE DEFAULT-BRANCH SIDE. On the second anchor BASE is a tip
+  # this run pushed, so a conf read there returns a default the run could have committed itself -
+  # the self-opt-in the owner ruled out. The merge-base of the observed default-branch tip and BASE
+  # is the newest commit of the owner's branch this run sits on; on the first anchor BASE already is
+  # that commit and is read unchanged. A merge-base that cannot be computed reads as NO default: the
+  # owner's side was not observed, and an opt-in nobody can place on it is not the owner's.
+  _cb="$base"
+  if [ "$ANCHOR_KIND" = run-branch ]; then
+    _cb=$(GIT merge-base "$ASHA" "$base" 2>/dev/null) || _cb=""
+  fi
   if [ -z "$AUTH_SPEC_AUDIT" ] && ! printf '%s\n' "$_fm" | grep -q '^spec-audit=' \
-     && _cf=$(GIT show "$base:.unattended.conf" 2>/dev/null); then
+     && [ -n "$_cb" ] && _cf=$(GIT show "$_cb:.unattended.conf" 2>/dev/null); then
     _sad=$( SPEC_AUDIT_DEFAULT=""; exec 3>&1
             eval "$_cf"$'\n\n''printf "OK %s" "${SPEC_AUDIT_DEFAULT:-}" >&3' >/dev/null 2>&1 )
     case "$_sad" in
@@ -2427,6 +2438,19 @@ check_authorization() { # slug · base
   # exactly as the `recipe` branch below reads a freshly-parsed AUTH_MODE.
   if [ "$ANCHOR_KIND" = run-branch ] && ! is_second_anchor_mode "$AUTH_MODE"; then
     fail 50 "the BASE came from the second anchor - a tip this run pushed - while the build README declares a mode whose discipline is that the folder already existed, so the run authorized itself with a declaration that says it did not: mode $AUTH_MODE, admissible on this anchor are $SECOND_ANCHOR_MODES; land the build folder on the default branch, or declare the discipline the run is actually under"
+    return 1
+  fi
+  # TOOL-aWardedAudit-1 S1 - THE SPEC-AUDIT OPT-IN IS THE OWNER'S, read as rulings D12-a and D12-j
+  # read `asks:` and `may:` below. A `prompt` or `recipe` README resolves at the second anchor, a tip
+  # this run pushed, so a `spec-audit:` line in it is one the run could have written: two runs opted
+  # themselves into multi-hour audits exactly that way, one following this driver's own
+  # recommendation line. Refused rather than ignored, for check 78's reason: ignoring leaves the
+  # attempt invisible in every record. Presence is the test, as check 52's is - a bare key is the
+  # same attempt. AUTH_SPEC_AUDIT_DERIVED is cleared so the specs-audited grader reads NOT GRADABLE
+  # rather than grading a source this refusal just declined.
+  if [ "$AUTH_MODE" != slug ] && printf '%s\n' "$_fm" | grep -q '^spec-audit='; then
+    AUTH_SPEC_AUDIT_DERIVED=""
+    fail 89 "the build README declares spec-audit: under an authorization mode that resolves at the second anchor, so the run could have written its own opt-in - only the owner opts a build into the pre-code spec audit, by a spec-audit: line in a slug-mode README landed on the default branch or a SPEC_AUDIT_DEFAULT there: mode $AUTH_MODE; delete the line, and leave the opt-in to the owner"
     return 1
   fi
   # the declaration seam, evaluated where the MODE exists and nowhere else.
@@ -5487,7 +5511,9 @@ print_spec_audit_line() { # slug · run-state file
     [ "$(plan_state "$_sp" "$FORK_CUTOFF")" = FORKED ] || continue
     why="${why:+$why, }a spec grading FORKED"; break
   done
-  echo "unattended: spec-audit — not owed (opt-in)${why:+; recommend spec-audit: <YYYY-MM-DD> in the build README front matter before the first pass: $why}"
+  # TOOL-aWardedAudit-1 S3 - the clause is addressed to the OWNER. Its first wording told the run
+  # to write the key, and a run did; the opt-in is the owner's, so the run carries it to the wrap-up.
+  echo "unattended: spec-audit — not owed (opt-in)${why:+; the opt-in belongs to the owner alone and this run never declares it - name it in the wrap-up for the owner: $why}"
   return 0
 }
 

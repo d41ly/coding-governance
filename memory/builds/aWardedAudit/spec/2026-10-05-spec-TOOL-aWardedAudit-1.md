@@ -1,6 +1,6 @@
 # TOOL-aWardedAudit-1 — the driver honours a spec-audit opt-in only from the owner's side
 
-**Status:** OPEN · rev-1 · 2026-10-05 · node a · Tier-2 · base 35438ba0 · streams tooling · order 1
+**Status:** CLOSED · rev-1 · 2026-10-05 · node a · Tier-2 · base 35438ba0 · streams tooling · order 1
 
 <!-- gen:spec-records -->
 

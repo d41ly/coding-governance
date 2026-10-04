@@ -3670,6 +3670,51 @@ hit "$(cat memory/builds/tBr/RUN.md)" "anchor-kind: run-branch"
 hit "$(cat memory/builds/tBr/RUN.md)" "branch-ref: refs/heads/unit"
 hit "$(cat memory/builds/tBr/RUN.md)" "mode: prompt"
 
+# ---- TOOL-aWardedAudit-1 — THE SPEC-AUDIT OPT-IN IS THE OWNER'S. A prompt or recipe README is one
+# ---- the run writes, and on this anchor BASE is the tip it pushed, so both the README key and the
+# ---- conf default read there can be the run's own. Each arm below was observed RED against the
+# ---- base driver first: it opted the run in by README, and then by project default.
+# ---- AC1: a prompt README carrying the key is refused at check 89 and creates no run-state file.
+reset_tree; readme tBr; mutate memory/builds/tBr/README.md '/^slug: tBr$/a authorized-by: prompt\nspec-audit: 2026-10-05'
+scope published; git add -A >/dev/null && git commit -q -m br --no-verify
+git push -q -f origin unit 2>/dev/null
+out=$(run --preflight tBr --keepalive-id k1)
+hit "$out" "the build README declares spec-audit: under an authorization mode that resolves at the second anchor, so the run could have written its own opt-in - only the owner opts a build into the pre-code spec audit, by a spec-audit: line in a slug-mode README landed on the default branch or a SPEC_AUDIT_DEFAULT there: mode prompt"
+miss "$out" "opted in by README"
+same "check 89 created no run-state file" "$([ -f memory/builds/tBr/RUN.md ] && echo yes || echo no)" "no"
+# ---- AC2: `recipe` is refused by the same check, BEFORE the missing-playbook refusal it also earns.
+reset_tree; readme tBr; mutate memory/builds/tBr/README.md '/^slug: tBr$/a authorized-by: recipe\nspec-audit: 2026-10-05'
+scope published; git add -A >/dev/null && git commit -q -m br --no-verify
+git push -q -f origin unit 2>/dev/null
+out=$(run --preflight tBr --keepalive-id k1)
+hit "$out" "so the run could have written its own opt-in - only the owner opts a build into the pre-code spec audit, by a spec-audit: line in a slug-mode README landed on the default branch or a SPEC_AUDIT_DEFAULT there: mode recipe"
+miss "$out" "a recipe-mode build README declares no playbook"
+# ---- AC3: a project default committed only on the run's PUSHED branch opts nothing in.
+reset_tree; readme tBr; mutate memory/builds/tBr/README.md '/^slug: tBr$/a authorized-by: prompt'
+scope published; printf 'SPEC_AUDIT_DEFAULT="2026-09-21"\n' >> .unattended.conf
+git add -A >/dev/null && git commit -q -m br --no-verify
+git push -q -f origin unit 2>/dev/null
+out=$(run --preflight tBr --keepalive-id k1)
+hit "$out" "preflight OK"
+hit "$out" "unattended: spec-audit — not owed (opt-in)"
+miss "$out" "opted in by project default"
+same "a default on the run's own branch pins no fact" "$(sed -n 's/^spec-audit: //p' memory/builds/tBr/RUN.md)" ""
+# ---- AC4: the SAME default landed on the default branch is the owner's, and opts the run in.
+_aw_main0=$(git rev-parse main)
+reset_tree; git checkout -qf main
+printf 'SPEC_AUDIT_DEFAULT="2026-09-21"\n' >> .unattended.conf
+git add -A >/dev/null && git commit -q -m aw-owner-default --no-verify && git push -q -f origin main
+git checkout -qf unit && git merge -q --no-edit main >/dev/null 2>&1
+readme tBr; mutate memory/builds/tBr/README.md '/^slug: tBr$/a authorized-by: prompt'
+scope published; git add -A >/dev/null && git commit -q -m br --no-verify
+git push -q -f origin unit 2>/dev/null
+out=$(run --preflight tBr --keepalive-id k1)
+hit "$out" "unattended: spec-audit — opted in by project default SPEC_AUDIT_DEFAULT: 2026-09-21"
+hit "$(cat memory/builds/tBr/RUN.md)" "anchor-kind: run-branch"
+same "the owner's default pins its date" "$(sed -n 's/^spec-audit: //p' memory/builds/tBr/RUN.md)" "2026-09-21"
+git checkout -qf main; git reset -q --hard "$_aw_main0"; git push -q -f origin main
+git checkout -qf unit
+
 # ---- 50: THE SECOND ANCHOR IS ADMISSIBLE PER MODE. Four arms, because a refusal needs a companion
 # ---- saying it refused the right thing and a companion saying it did not refuse everything.
 # ----
@@ -7519,7 +7564,7 @@ setunits tRun '| [ARCH-tRun-1 — the unit](spec/one.md) | CLOSED | rev-1 | 2026
 | [ARCH-tRun-2 — the second](spec/two.md) | OPEN | rev-1 | 2026-08-01 |'
 git add -A >/dev/null; git commit -q -m "two units" --no-verify
 out=$(run --preflight tRun --keepalive-id KA-1234)
-hit "$out" "not owed (opt-in); recommend spec-audit: <YYYY-MM-DD> in the build README front matter before the first pass: 2 units in the generated region"
+hit "$out" "not owed (opt-in); the opt-in belongs to the owner alone and this run never declares it - name it in the wrap-up for the owner: 2 units in the generated region"
 
 # ---- ...and ONE unit whose tracked spec grades FORKED: the same clause, by the other trigger.
 bcreset
@@ -7527,7 +7572,7 @@ printf '# ARCH-tRun-1 the unit\n\n**Status:** CLOSED · rev-1 · 2026-08-01 · n
   > memory/builds/tRun/spec/one.md
 git add -A >/dev/null; git commit -q -m "forked spec" --no-verify
 out=$(run --preflight tRun --keepalive-id KA-1234)
-hit "$out" "recommend spec-audit: <YYYY-MM-DD> in the build README front matter before the first pass: a spec grading FORKED"
+hit "$out" "the opt-in belongs to the owner alone and this run never declares it - name it in the wrap-up for the owner: a spec grading FORKED"
 
 # ---- AC1's red half: a key committed on the RUN BRANCH only is not at BASE, so it pins NOTHING.
 bcreset
