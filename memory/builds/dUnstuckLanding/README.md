@@ -71,7 +71,7 @@ prompt is recorded verbatim under `prompts/`.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 3 unit(s) · node d · opened 2026-10-04 · streams tooling
+**Build status:** INPROGRESS · 11 unit(s) · node d · opened 2026-10-04 · streams tooling
 ids TOOL-dUnstuckLanding-1 TOOL-dUnstuckLanding-2 TOOL-dUnstuckLanding-3 TOOL-dUnstuckLanding-4 TOOL-dUnstuckLanding-5 TOOL-dUnstuckLanding-6 TOOL-dUnstuckLanding-7 TOOL-dUnstuckLanding-8 TOOL-dUnstuckLanding-9 TOOL-dUnstuckLanding-10 TOOL-dUnstuckLanding-11 TOOL-dUnstuckLanding-12
 ids TOOL-dUnstuckLanding-13 TOOL-dUnstuckLanding-14 TOOL-dUnstuckLanding-15 TOOL-dUnstuckLanding-16 TOOL-dUnstuckLanding-17 TOOL-dUnstuckLanding-18 TOOL-dUnstuckLanding-19 TOOL-dUnstuckLanding-20 TOOL-dUnstuckLanding-21 TOOL-dUnstuckLanding-22 TOOL-dUnstuckLanding-23 TOOL-dUnstuckLanding-24
 
@@ -79,24 +79,38 @@ ids TOOL-dUnstuckLanding-13 TOOL-dUnstuckLanding-14 TOOL-dUnstuckLanding-15 TOOL
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-dUnstuckLanding-1 — the closing-time failure census across gov, inCMS and NicoCares](spec/2026-10-04-spec-TOOL-dUnstuckLanding-1.md) | 1 | 1 | CLOSED | rev-2 | 2026-10-04 |
+| [TOOL-dUnstuckLanding-13 — `--handoff`: a run whose work is sound, but which an owner must land or decide, ends HELD instead of ABORTED](spec/2026-10-04-spec-TOOL-dUnstuckLanding-13.md) | 1 | 2 | INPROGRESS | rev-1 | 2026-10-04 |
+| [TOOL-dUnstuckLanding-14 — the attended terminal: a handed record derives LANDED, `--settle` writes it, and a landed ABORTED record gains `work-landed-at`](spec/2026-10-04-spec-TOOL-dUnstuckLanding-14.md) | 2 | 2 | INPROGRESS | rev-1 | 2026-10-04 |
 | [TOOL-dUnstuckLanding-2 — the design: unattended closes through inherited reds and closing decisions, plus attended-landing verbs](spec/2026-10-04-spec-TOOL-dUnstuckLanding-2.md) | 2 | 1 | CLOSED | rev-2 | 2026-10-04 |
 | [TOOL-dUnstuckLanding-12 — design rev-2: the closing review's five HIGH findings closed](spec/2026-10-04-spec-TOOL-dUnstuckLanding-12.md) | 3 | 1 | CLOSED | rev-1 | 2026-10-04 |
+| [TOOL-dUnstuckLanding-15 — drift-audit reports ABORTED run records whose work landed anyway](spec/2026-10-04-spec-TOOL-dUnstuckLanding-15.md) | 3 | 2 | INPROGRESS | rev-1 | 2026-10-04 |
+| [TOOL-dUnstuckLanding-16 — an INHERITED red lands at any age, and the age escalates its ask](spec/2026-10-04-spec-TOOL-dUnstuckLanding-16.md) | 4 | 2 | INPROGRESS | rev-1 | 2026-10-04 |
+| [TOOL-dUnstuckLanding-17 — the history legs grade the run's own range, and check 23 a per-build budget](spec/2026-10-04-spec-TOOL-dUnstuckLanding-17.md) | 5 | 2 | INPROGRESS | rev-1 | 2026-10-04 |
+| [TOOL-dUnstuckLanding-18 — the close-decision table, and a build that lands with its rest carried forward](spec/2026-10-04-spec-TOOL-dUnstuckLanding-18.md) | 6 | 2 | INPROGRESS | rev-1 | 2026-10-04 |
+| [TOOL-dUnstuckLanding-19 — refresh before a verdict: one helper, the `refreshed-at` fact](spec/2026-10-04-spec-TOOL-dUnstuckLanding-19.md) | 7 | 2 | INPROGRESS | rev-1 | 2026-10-04 |
+| [TOOL-dUnstuckLanding-20 — `LANDING_NODES`: landing capability declared, resolved from machine and user, and a planned hand-off](spec/2026-10-04-spec-TOOL-dUnstuckLanding-20.md) | 8 | 2 | INPROGRESS | rev-1 | 2026-10-04 |
 <!-- /gen:build-units -->
 
 Records: 12 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-dUnstuckLanding-1 TOOL-dUnstuckLanding-12 TOOL-dUnstuckLanding-2.
+Ids no `spec-audit` record has ever named: TOOL-dUnstuckLanding-1 TOOL-dUnstuckLanding-12 TOOL-dUnstuckLanding-13 TOOL-dUnstuckLanding-14 TOOL-dUnstuckLanding-15 TOOL-dUnstuckLanding-16 TOOL-dUnstuckLanding-17 TOOL-dUnstuckLanding-18 TOOL-dUnstuckLanding-19 TOOL-dUnstuckLanding-2
+TOOL-dUnstuckLanding-20.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
 
 | Step | Units | Parallel |
 |---|---|---|
-| 1 | `TOOL-dUnstuckLanding-1` | no |
-| 2 | `TOOL-dUnstuckLanding-2` | no |
-| 3 | `TOOL-dUnstuckLanding-12` | no |
+| 1 | `TOOL-dUnstuckLanding-1`, `TOOL-dUnstuckLanding-13` | yes |
+| 2 | `TOOL-dUnstuckLanding-14`, `TOOL-dUnstuckLanding-2` | yes |
+| 3 | `TOOL-dUnstuckLanding-12`, `TOOL-dUnstuckLanding-15` | yes |
+| 4 | `TOOL-dUnstuckLanding-16` | no |
+| 5 | `TOOL-dUnstuckLanding-17` | no |
+| 6 | `TOOL-dUnstuckLanding-18` | no |
+| 7 | `TOOL-dUnstuckLanding-19` | no |
+| 8 | `TOOL-dUnstuckLanding-20` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

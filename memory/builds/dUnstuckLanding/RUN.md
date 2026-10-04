@@ -12,8 +12,8 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 parked-surfaced: yes, 3 surfaced
 keepalive-reaped: yes
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 2e18522aade74cef4392e27aa67a0265c9836243
-phase: BUILDING
+witness: 0a66eacb1d016e918ef8b965f7c096e2ccaf8e7b
+phase: SPECCING
 branch-sha: 0c16a66b53c9fd809ca198b612a23c62132edcc0
 branch-ref: refs/heads/branch/unattended-build-closing-f90fd9
 may: none
