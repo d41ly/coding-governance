@@ -1,6 +1,6 @@
 # TOOL-aBatchedMinors-2 — the closing review's exit records its standing findings and promotes them all
 
-**Status:** OPEN · rev-1 · 2026-10-04 · node a · Tier-2 · base 5ba0fc4f · streams tooling · order 2
+**Status:** CLOSED · rev-2 · 2026-10-04 · node a · Tier-2 · base 5ba0fc4f · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -37,6 +37,8 @@ terminal round SAY what stood, and refuses one that stood on anything without pr
   `verdict <v> · blockers <b> · <EXIT> · highs <h> · minors <m>[ · disposition promote]`. The echo
   names the unit floor the exit owes: one per blocker and high, plus one for the minors when any
   stood. Observed by AC6.
+- **S6** — The driver's usage header names both flags on the `--review` line, because check 26 reds a
+  parsed flag no header line documents. Observed by AC8.
 - **S5** — The spec-audit path is byte-for-byte unchanged: a non-slug subject's rows, refusals and
   echoes do not move. Observed by AC7.
 
@@ -125,6 +127,8 @@ equality `verb_review` already makes to choose the round bound.
 - **AC7** — When the existing `--review` arms that grade spec subjects run unchanged against the
   new driver, they pass.
   Red when: a spec-subject refusal or echo moved.
+- **AC8** — When `bash tools/unattended/check-unattended.sh` runs, check 26 names no undocumented flag.
+  Red when: the parser takes `--highs` and `--minors` and the header line does not.
 
 ## 7. Gates
 
@@ -139,6 +143,8 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-04 · initial draft, from the owner's ruling and `verb_review` at base.
+- rev-2 · 2026-10-04 · S6 · AC8 · building found check 26 reds an undocumented flag, so the usage
+  header line moves here from `TOOL-aBatchedMinors-4`, which owns the same file's prose no further.
 
 ## 10. Reuse audit
 
