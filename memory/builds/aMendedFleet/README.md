@@ -5,7 +5,7 @@ opened: 2026-10-04
 streams: tooling+kickoff+playbook
 roster: TOOL+KICK+PLAY
 authorized-by: prompt
-ids: TOOL-aMendedFleet-1 TOOL-aMendedFleet-2 TOOL-aMendedFleet-3 TOOL-aMendedFleet-4 TOOL-aMendedFleet-5 TOOL-aMendedFleet-6 TOOL-aMendedFleet-7 TOOL-aMendedFleet-8 TOOL-aMendedFleet-9 TOOL-aMendedFleet-10 TOOL-aMendedFleet-11 TOOL-aMendedFleet-12 TOOL-aMendedFleet-13 TOOL-aMendedFleet-14 TOOL-aMendedFleet-15 TOOL-aMendedFleet-16 TOOL-aMendedFleet-17 TOOL-aMendedFleet-18 TOOL-aMendedFleet-19 TOOL-aMendedFleet-20 TOOL-aMendedFleet-21 TOOL-aMendedFleet-22 TOOL-aMendedFleet-23 TOOL-aMendedFleet-24 TOOL-aMendedFleet-25 TOOL-aMendedFleet-26 TOOL-aMendedFleet-27 TOOL-aMendedFleet-28 TOOL-aMendedFleet-29 TOOL-aMendedFleet-30 TOOL-aMendedFleet-31 TOOL-aMendedFleet-32 TOOL-aMendedFleet-33 TOOL-aMendedFleet-34 TOOL-aMendedFleet-35 TOOL-aMendedFleet-36 TOOL-aMendedFleet-37 TOOL-aMendedFleet-38 TOOL-aMendedFleet-54 TOOL-aMendedFleet-81 TOOL-aMendedFleet-82 TOOL-aMendedFleet-83
+ids: TOOL-aMendedFleet-1 TOOL-aMendedFleet-2 TOOL-aMendedFleet-3 TOOL-aMendedFleet-4 TOOL-aMendedFleet-5 TOOL-aMendedFleet-6 TOOL-aMendedFleet-7 TOOL-aMendedFleet-8 TOOL-aMendedFleet-9 TOOL-aMendedFleet-10 TOOL-aMendedFleet-11 TOOL-aMendedFleet-12 TOOL-aMendedFleet-13 TOOL-aMendedFleet-14 TOOL-aMendedFleet-15 TOOL-aMendedFleet-16 TOOL-aMendedFleet-17 TOOL-aMendedFleet-18 TOOL-aMendedFleet-19 TOOL-aMendedFleet-20 TOOL-aMendedFleet-21 TOOL-aMendedFleet-22 TOOL-aMendedFleet-23 TOOL-aMendedFleet-24 TOOL-aMendedFleet-25 TOOL-aMendedFleet-26 TOOL-aMendedFleet-27 TOOL-aMendedFleet-28 TOOL-aMendedFleet-29 TOOL-aMendedFleet-30 TOOL-aMendedFleet-31 TOOL-aMendedFleet-32 TOOL-aMendedFleet-33 TOOL-aMendedFleet-34 TOOL-aMendedFleet-35 TOOL-aMendedFleet-36 TOOL-aMendedFleet-37 TOOL-aMendedFleet-38 TOOL-aMendedFleet-39 TOOL-aMendedFleet-40 TOOL-aMendedFleet-41 TOOL-aMendedFleet-42 TOOL-aMendedFleet-43 TOOL-aMendedFleet-44 TOOL-aMendedFleet-45 TOOL-aMendedFleet-46 TOOL-aMendedFleet-47 TOOL-aMendedFleet-48 TOOL-aMendedFleet-49 TOOL-aMendedFleet-50 TOOL-aMendedFleet-51 TOOL-aMendedFleet-52 TOOL-aMendedFleet-54 TOOL-aMendedFleet-81 TOOL-aMendedFleet-82 TOOL-aMendedFleet-83 TOOL-aMendedFleet-84 TOOL-aMendedFleet-85 TOOL-aMendedFleet-86 TOOL-aMendedFleet-87 TOOL-aMendedFleet-88 TOOL-aMendedFleet-89 TOOL-aMendedFleet-90
 ---
 
 # aMendedFleet — the 2026-10-04 governance review, every point built as its own unit
@@ -134,14 +134,23 @@ and every red leg fixed. The prompt, the owner's four answers and the report are
 | 81 | `TOOL-aMendedFleet-81` | 1 | the month shards carry only Build, Node and Opened, so the frozen claim holds |
 | 82 | `TOOL-aMendedFleet-82` | 1 | each recall query-log row carries the worktree HEAD, so a later commit is found by ancestry |
 | 83 | `TOOL-aMendedFleet-83` | 1 | the unattended close lists the dossiers its range touched and did not refresh |
+| 84 | `TOOL-aMendedFleet-84` | 1 | a build README's generated regions stay inside the README cap at any roster size |
+| 85 | `TOOL-aMendedFleet-85` | 1 | the template stops overclaiming what the codebase map covers |
+| 86 | `TOOL-aMendedFleet-86` | 1 | the map digest reports code coverage apart from record coverage |
+| 87 | `TOOL-aMendedFleet-87` | 1 | a query joins gate legs to the paths they guard |
+| 88 | `TOOL-aMendedFleet-88` | 1 | `map_imports.py` is deleted, having no consumer |
+| 89 | `TOOL-aMendedFleet-89` | 1 | measured history moves out of the dossiers near the byte cap |
+| 90 | `TOOL-aMendedFleet-90` | 1 | a report-only drift signal DEAD for N readings is retired or filed |
 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 39 unit(s) · node a · opened 2026-10-04 · streams tooling+kickoff+playbook
+**Build status:** SPECCED · 55 unit(s) · node a · opened 2026-10-04 · streams tooling+kickoff+playbook
 ids TOOL-aMendedFleet-1 TOOL-aMendedFleet-2 TOOL-aMendedFleet-3 TOOL-aMendedFleet-4 TOOL-aMendedFleet-5 TOOL-aMendedFleet-6 TOOL-aMendedFleet-7 TOOL-aMendedFleet-8 TOOL-aMendedFleet-9 TOOL-aMendedFleet-10 TOOL-aMendedFleet-11 TOOL-aMendedFleet-12 TOOL-aMendedFleet-13 TOOL-aMendedFleet-14
 ids TOOL-aMendedFleet-15 TOOL-aMendedFleet-16 TOOL-aMendedFleet-17 TOOL-aMendedFleet-18 TOOL-aMendedFleet-19 TOOL-aMendedFleet-20 TOOL-aMendedFleet-21 TOOL-aMendedFleet-22 TOOL-aMendedFleet-23 TOOL-aMendedFleet-24 TOOL-aMendedFleet-25 TOOL-aMendedFleet-26 TOOL-aMendedFleet-27 TOOL-aMendedFleet-28
-ids TOOL-aMendedFleet-29 TOOL-aMendedFleet-30 TOOL-aMendedFleet-31 TOOL-aMendedFleet-32 TOOL-aMendedFleet-33 TOOL-aMendedFleet-34 TOOL-aMendedFleet-35 TOOL-aMendedFleet-36 TOOL-aMendedFleet-37 TOOL-aMendedFleet-38 TOOL-aMendedFleet-54 TOOL-aMendedFleet-81 TOOL-aMendedFleet-82 TOOL-aMendedFleet-83
+ids TOOL-aMendedFleet-29 TOOL-aMendedFleet-30 TOOL-aMendedFleet-31 TOOL-aMendedFleet-32 TOOL-aMendedFleet-33 TOOL-aMendedFleet-34 TOOL-aMendedFleet-35 TOOL-aMendedFleet-36 TOOL-aMendedFleet-37 TOOL-aMendedFleet-38 TOOL-aMendedFleet-39 TOOL-aMendedFleet-40 TOOL-aMendedFleet-41 TOOL-aMendedFleet-42
+ids TOOL-aMendedFleet-43 TOOL-aMendedFleet-44 TOOL-aMendedFleet-45 TOOL-aMendedFleet-46 TOOL-aMendedFleet-47 TOOL-aMendedFleet-48 TOOL-aMendedFleet-49 TOOL-aMendedFleet-50 TOOL-aMendedFleet-51 TOOL-aMendedFleet-52 TOOL-aMendedFleet-54 TOOL-aMendedFleet-81 TOOL-aMendedFleet-82 TOOL-aMendedFleet-83
+ids TOOL-aMendedFleet-84 TOOL-aMendedFleet-85 TOOL-aMendedFleet-86 TOOL-aMendedFleet-87 TOOL-aMendedFleet-88 TOOL-aMendedFleet-89 TOOL-aMendedFleet-90
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -184,18 +193,37 @@ ids TOOL-aMendedFleet-29 TOOL-aMendedFleet-30 TOOL-aMendedFleet-31 TOOL-aMendedF
 | [TOOL-aMendedFleet-36 — `reuse_lookup.py` prints within a byte budget and names what it cut](spec/2026-10-04-spec-TOOL-aMendedFleet-36.md) | 36 | 1 | SPECCED | rev-1 | 2026-10-04 |
 | [TOOL-aMendedFleet-37 — dossier freshness is derived from git, and drift-audit reports the dossiers older than their paths](spec/2026-10-04-spec-TOOL-aMendedFleet-37.md) | 37 | 2 | SPECCED | rev-1 | 2026-10-04 |
 | [TOOL-aMendedFleet-38 — `map_diff --converge`, its sink and its prescriptions are deleted](spec/2026-10-04-spec-TOOL-aMendedFleet-38.md) | 38 | 1 | SPECCED | rev-1 | 2026-10-04 |
+| [TOOL-aMendedFleet-39 — a harness-hooks inventory, and `git-hooks` holds real hook names only](spec/2026-10-04-spec-TOOL-aMendedFleet-39.md) | 39 | 2 | SPECCED | rev-1 | 2026-10-04 |
+| [TOOL-aMendedFleet-40 — the coverage gate refuses a `baseline.toml` that gained a key against its base](spec/2026-10-04-spec-TOOL-aMendedFleet-40.md) | 40 | 1 | SPECCED | rev-1 | 2026-10-04 |
+| [TOOL-aMendedFleet-41 — `replay-phrases.py --floor` grades a frozen phrase population against recorded floors](spec/2026-10-04-spec-TOOL-aMendedFleet-41.md) | 41 | 1 | SPECCED | rev-1 | 2026-10-04 |
+| [TOOL-aMendedFleet-42 — the reuse probe counts canonical-copy install sites beside fan-in](spec/2026-10-04-spec-TOOL-aMendedFleet-42.md) | 42 | 1 | SPECCED | rev-1 | 2026-10-04 |
+| [TOOL-aMendedFleet-43 — the map renders a card of at most 1 KB per feature from its dossier's toml fence](spec/2026-10-04-spec-TOOL-aMendedFleet-43.md) | 43 | 1 | SPECCED | rev-1 | 2026-10-04 |
+| [TOOL-aMendedFleet-44 — the map gate refuses a present-tense count of an inventory population in dossier prose](spec/2026-10-04-spec-TOOL-aMendedFleet-44.md) | 44 | 1 | SPECCED | rev-1 | 2026-10-04 |
+| [TOOL-aMendedFleet-45 — reviewers' by-design list comes from one source, the invariant records](spec/2026-10-04-spec-TOOL-aMendedFleet-45.md) | 45 | 1 | WONTDO | rev-2 | 2026-10-04 |
+| [TOOL-aMendedFleet-46 — the replay harness measures which shortlist quantity predicts a reuse miss, before any miss signal ships](spec/2026-10-04-spec-TOOL-aMendedFleet-46.md) | 46 | 1 | SPECCED | rev-1 | 2026-10-04 |
+| [TOOL-aMendedFleet-47 — `run_records_nonterminal_but_merged` honours derived LANDED, and the unused-verb pin drops to 0](spec/2026-10-04-spec-TOOL-aMendedFleet-47.md) | 47 | 1 | SPECCED | rev-1 | 2026-10-04 |
+| [TOOL-aMendedFleet-48 — drift readings append to a node-local history file](spec/2026-10-04-spec-TOOL-aMendedFleet-48.md) | 48 | 2 | SPECCED | rev-1 | 2026-10-04 |
+| [TOOL-aMendedFleet-49 — the unattended close prints the BASE..HEAD drift delta](spec/2026-10-04-spec-TOOL-aMendedFleet-49.md) | 49 | 1 | SPECCED | rev-1 | 2026-10-04 |
+| [TOOL-aMendedFleet-50 — a monthly escape-ratio report, outside the seconds tier](spec/2026-10-04-spec-TOOL-aMendedFleet-50.md) | 50 | 2 | SPECCED | rev-1 | 2026-10-04 |
+| [TOOL-aMendedFleet-51 — report-only drift signals over a pin nobody drains print pinless, and `readme_mechanism_drift` reads live builds only](spec/2026-10-04-spec-TOOL-aMendedFleet-51.md) | 51 | 1 | SPECCED | rev-1 | 2026-10-04 |
+| [TOOL-aMendedFleet-52 — the hand-kept signal compares the drift README's signal names against the names the engine reports](spec/2026-10-04-spec-TOOL-aMendedFleet-52.md) | 52 | 1 | SPECCED | rev-1 | 2026-10-04 |
 | [TOOL-aMendedFleet-81 — the month shards carry only what never changes after their month](spec/2026-10-04-spec-TOOL-aMendedFleet-81.md) | 81 | 1 | SPECCED | rev-1 | 2026-10-04 |
+| [TOOL-aMendedFleet-82 — each recall query row carries the worktree's HEAD, so `--used` attributes a query after its worktree is gone](spec/2026-10-04-spec-TOOL-aMendedFleet-82.md) | 82 | 1 | SPECCED | rev-1 | 2026-10-04 |
+| [TOOL-aMendedFleet-83 — the unattended close sequence lists the dossiers its range touched and did not refresh](spec/2026-10-04-spec-TOOL-aMendedFleet-83.md) | 83 | 1 | SPECCED | rev-1 | 2026-10-04 |
 <!-- /gen:build-units -->
 
 Records: 4 bound to this build, across 2 record folder(s).
 
 Ids no record names: TOOL-aMendedFleet-10 TOOL-aMendedFleet-11 TOOL-aMendedFleet-12 TOOL-aMendedFleet-13 TOOL-aMendedFleet-14 TOOL-aMendedFleet-15 TOOL-aMendedFleet-16 TOOL-aMendedFleet-17 TOOL-aMendedFleet-18 TOOL-aMendedFleet-19 TOOL-aMendedFleet-2 TOOL-aMendedFleet-20 TOOL-aMendedFleet-21
 TOOL-aMendedFleet-22 TOOL-aMendedFleet-23 TOOL-aMendedFleet-24 TOOL-aMendedFleet-25 TOOL-aMendedFleet-26 TOOL-aMendedFleet-27 TOOL-aMendedFleet-28 TOOL-aMendedFleet-29 TOOL-aMendedFleet-3 TOOL-aMendedFleet-30 TOOL-aMendedFleet-31 TOOL-aMendedFleet-32 TOOL-aMendedFleet-33 TOOL-aMendedFleet-34
-TOOL-aMendedFleet-35 TOOL-aMendedFleet-36 TOOL-aMendedFleet-37 TOOL-aMendedFleet-38 TOOL-aMendedFleet-4 TOOL-aMendedFleet-5 TOOL-aMendedFleet-6 TOOL-aMendedFleet-7 TOOL-aMendedFleet-8 TOOL-aMendedFleet-81 TOOL-aMendedFleet-9.
+TOOL-aMendedFleet-35 TOOL-aMendedFleet-36 TOOL-aMendedFleet-37 TOOL-aMendedFleet-38 TOOL-aMendedFleet-39 TOOL-aMendedFleet-4 TOOL-aMendedFleet-40 TOOL-aMendedFleet-41 TOOL-aMendedFleet-42 TOOL-aMendedFleet-43 TOOL-aMendedFleet-44 TOOL-aMendedFleet-45 TOOL-aMendedFleet-46 TOOL-aMendedFleet-47
+TOOL-aMendedFleet-48 TOOL-aMendedFleet-49 TOOL-aMendedFleet-5 TOOL-aMendedFleet-50 TOOL-aMendedFleet-51 TOOL-aMendedFleet-52 TOOL-aMendedFleet-6 TOOL-aMendedFleet-7 TOOL-aMendedFleet-8 TOOL-aMendedFleet-81 TOOL-aMendedFleet-82 TOOL-aMendedFleet-83 TOOL-aMendedFleet-9.
 
 Ids no `spec-audit` record has ever named: TOOL-aMendedFleet-1 TOOL-aMendedFleet-10 TOOL-aMendedFleet-11 TOOL-aMendedFleet-12 TOOL-aMendedFleet-13 TOOL-aMendedFleet-14 TOOL-aMendedFleet-15 TOOL-aMendedFleet-16 TOOL-aMendedFleet-17 TOOL-aMendedFleet-18 TOOL-aMendedFleet-19 TOOL-aMendedFleet-2
 TOOL-aMendedFleet-20 TOOL-aMendedFleet-21 TOOL-aMendedFleet-22 TOOL-aMendedFleet-23 TOOL-aMendedFleet-24 TOOL-aMendedFleet-25 TOOL-aMendedFleet-26 TOOL-aMendedFleet-27 TOOL-aMendedFleet-28 TOOL-aMendedFleet-29 TOOL-aMendedFleet-3 TOOL-aMendedFleet-30 TOOL-aMendedFleet-31 TOOL-aMendedFleet-32
-TOOL-aMendedFleet-33 TOOL-aMendedFleet-34 TOOL-aMendedFleet-35 TOOL-aMendedFleet-36 TOOL-aMendedFleet-37 TOOL-aMendedFleet-38 TOOL-aMendedFleet-4 TOOL-aMendedFleet-5 TOOL-aMendedFleet-6 TOOL-aMendedFleet-7 TOOL-aMendedFleet-8 TOOL-aMendedFleet-81 TOOL-aMendedFleet-9.
+TOOL-aMendedFleet-33 TOOL-aMendedFleet-34 TOOL-aMendedFleet-35 TOOL-aMendedFleet-36 TOOL-aMendedFleet-37 TOOL-aMendedFleet-38 TOOL-aMendedFleet-39 TOOL-aMendedFleet-4 TOOL-aMendedFleet-40 TOOL-aMendedFleet-41 TOOL-aMendedFleet-42 TOOL-aMendedFleet-43 TOOL-aMendedFleet-44 TOOL-aMendedFleet-45
+TOOL-aMendedFleet-46 TOOL-aMendedFleet-47 TOOL-aMendedFleet-48 TOOL-aMendedFleet-49 TOOL-aMendedFleet-5 TOOL-aMendedFleet-50 TOOL-aMendedFleet-51 TOOL-aMendedFleet-52 TOOL-aMendedFleet-6 TOOL-aMendedFleet-7 TOOL-aMendedFleet-8 TOOL-aMendedFleet-81 TOOL-aMendedFleet-82 TOOL-aMendedFleet-83
+TOOL-aMendedFleet-9.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -240,7 +268,23 @@ TOOL-aMendedFleet-33 TOOL-aMendedFleet-34 TOOL-aMendedFleet-35 TOOL-aMendedFleet
 | 36 | `TOOL-aMendedFleet-36` | no |
 | 37 | `TOOL-aMendedFleet-37` | no |
 | 38 | `TOOL-aMendedFleet-38` | no |
+| 39 | `TOOL-aMendedFleet-39` | no |
+| 40 | `TOOL-aMendedFleet-40` | no |
+| 41 | `TOOL-aMendedFleet-41` | no |
+| 42 | `TOOL-aMendedFleet-42` | no |
+| 43 | `TOOL-aMendedFleet-43` | no |
+| 44 | `TOOL-aMendedFleet-44` | no |
+| 45 | `TOOL-aMendedFleet-45` | no |
+| 46 | `TOOL-aMendedFleet-46` | no |
+| 47 | `TOOL-aMendedFleet-47` | no |
+| 48 | `TOOL-aMendedFleet-48` | no |
+| 49 | `TOOL-aMendedFleet-49` | no |
+| 50 | `TOOL-aMendedFleet-50` | no |
+| 51 | `TOOL-aMendedFleet-51` | no |
+| 52 | `TOOL-aMendedFleet-52` | no |
 | 81 | `TOOL-aMendedFleet-81` | no |
+| 82 | `TOOL-aMendedFleet-82` | no |
+| 83 | `TOOL-aMendedFleet-83` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

@@ -226,3 +226,10 @@ record `...-1-0-run-mandate.md` first: it carries the owner's four answers, whic
   touched and did not refresh, by calling unit 37's `map_diff.py --stale-dossiers` range mode.
   Report-only. A close block in `tools/unattended/unattended.sh`; units 49 and 66 are sibling close
   blocks. Read unit 37's spec first.
+- **84** — DISCOVERED at speccing, adopted under protocol section 11: this build's 83-unit roster pushes its README's generated build-index and build-order regions past check 6's 25600 B cap (measured 14626 B of index at 55 specs). A renderer-shaped overflow. Fix the RENDERER (or how check 6 prices generated regions) so a build of any size fits, and drain the `memory/project/curation-debt.txt` row this build added for its own README. Measure before choosing; nothing measured may get worse.
+- **85** — split from 39 at its F1: the charter/template sentence overselling the map (half of `TOOL-aProbedToolkit-15`). A governance-carrier edit; the owner granted the full diet.
+- **86** — split from 39 at its F1: `map_diff.py`'s digest coverage figure mixes code and records (`TOOL-aProbedToolkit-8`). Unit 40 owns the baseline shrink assert.
+- **87** — split from 42 at its F1: the legs-to-paths join, a new query over `tools/gate-legs.json` guards.
+- **88** — split from 42 at its F1: no tracked file imports it except the kit selftest, whose parity arm now skips. Deletion is the recommendation; re-verify consumers first.
+- **89** — split from 43 at its F1: edit the prose of the seven dossiers near the 20480 B cap and decide where measured history lives. Unit 43 renders cards from the fences and never reads prose.
+- **90** — split from 51 at its F1: the DEAD-for-N rule, after unit 48's history file exists.

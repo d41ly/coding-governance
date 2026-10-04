@@ -48,3 +48,19 @@ base: 7af5f564641d231f8b78f6b183dde1b6bf53111d
 2026-10-04T19:01:37Z rescope · item add TOOL-aMendedFleet-82 · reason split from TOOL-aMendedFleet-34 at its F2: the HEAD field changes the served query path, a second mechanism
 
 2026-10-04T19:01:40Z rescope · item add TOOL-aMendedFleet-83 · reason split from TOOL-aMendedFleet-37 at its F1: the close block lives in the unattended kit with its own conf declaration
+
+2026-10-04T19:26:57Z rescope · item add TOOL-aMendedFleet-84 · reason discovered at speccing: an 83-unit roster's generated README regions pass check 6's cap; adopted under protocol section 11 — the build cannot land without it
+
+2026-10-04T19:26:59Z rescope · item add TOOL-aMendedFleet-85 · reason split from TOOL-aMendedFleet-39 at its F1: a second mechanism in another file
+
+2026-10-04T19:27:02Z rescope · item add TOOL-aMendedFleet-86 · reason split from TOOL-aMendedFleet-39 at its F1: a second mechanism in another file
+
+2026-10-04T19:27:04Z rescope · item add TOOL-aMendedFleet-87 · reason split from TOOL-aMendedFleet-42 at its F1: a second mechanism with its own readers
+
+2026-10-04T19:27:07Z rescope · item add TOOL-aMendedFleet-88 · reason split from TOOL-aMendedFleet-42 at its F1: a second mechanism with its own readers
+
+2026-10-04T19:27:10Z rescope · item add TOOL-aMendedFleet-89 · reason split from TOOL-aMendedFleet-43 at its F1: dossier prose edits, disjoint from the card renderer
+
+2026-10-04T19:27:12Z rescope · item add TOOL-aMendedFleet-90 · reason split from TOOL-aMendedFleet-51 at its F1: the DEAD-for-N rule needs unit 48's history
+
+2026-10-04T19:27:23Z rescope · item retire TOOL-aMendedFleet-45 · reason the live aGraftedHelix build owns the invariants registry as reviewers' default by-design source (its unit 3, ratified 2026-10-04); the report itself says make it the one source and drop a second pipeline

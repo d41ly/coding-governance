@@ -104,7 +104,7 @@ Cite ids, never line numbers.
 | [TOOL-aHoistedPass-27](../builds/aHoistedPass/BACKLOG.md) | OPEN | — | — | 2026-09-05 | the per-run agent TOTAL stays unbounded and unreadable: guardAgentSpawn… |
 | [TOOL-aHoistedPass-28](../builds/aHoistedPass/BACKLOG.md) | OPEN | — | — | 2026-09-05 | THE BUILD-METHOD BUDGET'S LINE AXIS STAYS UNGATED. build-method size… |
 | [TOOL-aHoistedPass-29](../builds/aHoistedPass/BACKLOG.md) | OPEN | — | — | 2026-09-05 | a later raise of the byte cap is caught by NOTHING: the drift-audit… |
-| [TOOL-aHoistedPass-30](../builds/aHoistedPass/BACKLOG.md) | OPEN | — | — | 2026-09-05 | THE MAP BASELINE'S SHRINK-ONLY RULE IS A CONVENTION, NOT A CONSTRAINT —… |
+| [TOOL-aHoistedPass-30](../builds/aHoistedPass/BACKLOG.md) | SPECCED | — | TOOL-aMendedFleet-40 | 2026-09-05 | THE MAP BASELINE'S SHRINK-ONLY RULE IS A CONVENTION, NOT A CONSTRAINT —… |
 | [TOOL-aHoistedPass-31](../builds/aHoistedPass/BACKLOG.md) | OPEN | — | — | 2026-09-05 | A FORGOTTEN KIT-VERSION BUMP REDS NOTHING, and under ruling D1 that… |
 | [TOOL-aHoistedPass-32](../builds/aHoistedPass/BACKLOG.md) | OPEN | — | — | 2026-09-05 | FIVE tools/ CARRIERS STATE THE SUPERSEDED parallelism route: none, none… |
 | [TOOL-aHoistedPass-33](../builds/aHoistedPass/BACKLOG.md) | OPEN | — | — | 2026-09-05 | THE gov:kit unattended-build@1.0 MARKER ON LINE 3 OF THAT HARNESS'S OWN… |
@@ -163,14 +163,14 @@ Cite ids, never line numbers.
 | [TOOL-aProbedToolkit-5](../builds/aProbedToolkit/BACKLOG.md) | OPEN | — | — | 2026-09-03 | THE LEXICON PREDICATE GRADES A POPULATION THE TABLE WAS NEVER WRITTEN… |
 | [TOOL-aProbedToolkit-6](../builds/aProbedToolkit/BACKLOG.md) | OPEN | — | — | 2026-09-03 | THE LEXICON GATE CAN BE LEGALLY GREEN AT 5.2% COVERAGE, AND THE ONE… |
 | [TOOL-aProbedToolkit-7](../builds/aProbedToolkit/BACKLOG.md) | OPEN | — | — | 2026-09-03 | AN EMPTIED SYMBOL TIER IS INVISIBLE ON EVERY codebase-map LEG. Both the… |
-| [TOOL-aProbedToolkit-8](../builds/aProbedToolkit/BACKLOG.md) | OPEN | — | — | 2026-09-03 | THE MAP'S COVERAGE NUMBER MEASURES THE WRONG POPULATION AND THE… |
+| [TOOL-aProbedToolkit-8](../builds/aProbedToolkit/BACKLOG.md) | SPECCED | — | TOOL-aMendedFleet-40 | 2026-09-03 | THE MAP'S COVERAGE NUMBER MEASURES THE WRONG POPULATION AND THE… |
 | [TOOL-aProbedToolkit-9](../builds/aProbedToolkit/BACKLOG.md) | SPECCED | — | TOOL-aMendedFleet-36 | 2026-09-03 | reuse_lookup.py HAS NO OUTPUT BUDGET. One query in incms returns 35334… |
 | [TOOL-aProbedToolkit-10](../builds/aProbedToolkit/BACKLOG.md) | SPECCED | — | TOOL-aMendedFleet-28 | 2026-09-03 | THE RECALL FLOOR GRADES A CONFIGURATION THE CLI DOES NOT SHIP.… |
 | [TOOL-aProbedToolkit-11](../builds/aProbedToolkit/BACKLOG.md) | OPEN | — | — | 2026-09-03 | TWO RECALL DIAGNOSTICS ARE ZERO-PREDICATES, SO EACH IS SILENT IN THE… |
 | [TOOL-aProbedToolkit-12](../builds/aProbedToolkit/BACKLOG.md) | OPEN | — | — | 2026-09-03 | A memory-tree VERSION BUMP IS A CORPUS MIGRATION NOBODY HAS COSTED, AND… |
 | [TOOL-aProbedToolkit-13](../builds/aProbedToolkit/BACKLOG.md) | OPEN | — | — | 2026-09-03 | TWO OF THE FOUR KITS SHIP NO WIRING --check, AND THEY ARE THE TWO WHOSE… |
 | [TOOL-aProbedToolkit-14](../builds/aProbedToolkit/BACKLOG.md) | OPEN | — | — | 2026-09-03 | TWO KIT READMEs STATE A DERIVED NUMBER THAT HAS DRIFTED.… |
-| [TOOL-aProbedToolkit-15](../builds/aProbedToolkit/BACKLOG.md) | OPEN | — | — | 2026-09-03 | THE CHARTER OVERSELLS WHAT THE MAP GUARANTEES, AND THE OVERCLAIM SHIPS.… |
+| [TOOL-aProbedToolkit-15](../builds/aProbedToolkit/BACKLOG.md) | SPECCED | — | TOOL-aMendedFleet-39 | 2026-09-03 | THE CHARTER OVERSELLS WHAT THE MAP GUARANTEES, AND THE OVERCLAIM SHIPS.… |
 | [TOOL-aProbedToolkit-16](../builds/aProbedToolkit/BACKLOG.md) | OPEN | — | — | 2026-09-03 | memory-recall's HEADLINE CLAIM IS UNPROVEN BY THE ONLY PARTY THAT… |
 | [TOOL-aProbedToolkit-17](../builds/aProbedToolkit/BACKLOG.md) | OPEN | — | — | 2026-09-03 | THE CHARTER MANDATES file:line AND THE HYGIENE GATE REFUSES IT, SO THE… |
 | [TOOL-aProbedToolkit-18](../builds/aProbedToolkit/BACKLOG.md) | OPEN | — | — | 2026-09-03 | closed_specs_with_no_product_commit CANNOT EXPRESS A UNIT WHOSE… |

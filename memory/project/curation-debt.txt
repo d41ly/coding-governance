@@ -32,6 +32,11 @@ memory/builds/aBoundedVerdict/README.md
 # memory/builds/cBriefedPilot/README.md - 27895 B against the same cap, down from 32023 B. Authored
 # prose again; same disposition as the row above.
 memory/builds/cBriefedPilot/README.md
+# memory/builds/aMendedFleet/README.md - RENDERER-SHAPED, the kind this registry drains rather than
+# keeps: an 83-unit roster's generated build-index and build-order regions alone pass the 25600 cap
+# (measured 2026-10-04: 14626 B of index at 55 specs, projected about 22 KB at 83). Unit 84 of that build
+# fixes the renderer and drains this row in the same build; a row left behind would red as stale.
+memory/builds/aMendedFleet/README.md
 # memory/builds/aUnmannedHelm/README.md - ONE authored line at 419 chars against the 350 tier. The
 # file is 12158 B and comfortably inside the byte cap, so this row buys exactly one line.
 # BLAST RADIUS: listing it silences checks 6 AND 7 on the whole file to waive that single line. That
