@@ -7,7 +7,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-04-build-TOOL-dUnstuckLanding-1-census.md](../build/2026-10-04-build-TOOL-dUnstuckLanding-1-census.md) | research | TOOL-dUnstuckLanding-1 |
-| [2026-10-04-build-TOOL-dUnstuckLanding-1-runlog-2e793a3b.md](../build/2026-10-04-build-TOOL-dUnstuckLanding-1-runlog-2e793a3b.md) | journal | TOOL-dUnstuckLanding-1 TOOL-dUnstuckLanding-12 |
+| [2026-10-04-build-TOOL-dUnstuckLanding-1-runlog-2e793a3b.md](../build/2026-10-04-build-TOOL-dUnstuckLanding-1-runlog-2e793a3b.md) | journal | TOOL-dUnstuckLanding-1 TOOL-dUnstuckLanding-12 TOOL-dUnstuckLanding-13 TOOL-dUnstuckLanding-14 TOOL-dUnstuckLanding-15 TOOL-dUnstuckLanding-16 TOOL-dUnstuckLanding-17 TOOL-dUnstuckLanding-18 TOOL-dUnstuckLanding-19 TOOL-dUnstuckLanding-20 TOOL-dUnstuckLanding-25 TOOL-dUnstuckLanding-27 |
 | [2026-10-04-build-TOOL-dUnstuckLanding-2-1-acceptance-ledger.md](../build/2026-10-04-build-TOOL-dUnstuckLanding-2-1-acceptance-ledger.md) | journal | — |
 | [2026-10-04-build-TOOL-dUnstuckLanding-2-design.md](../build/2026-10-04-build-TOOL-dUnstuckLanding-2-design.md) | research | — |
 | [2026-10-04-prompt-TOOL-dUnstuckLanding-1-0-run-mandate.md](../prompts/2026-10-04-prompt-TOOL-dUnstuckLanding-1-0-run-mandate.md) | journal | TOOL-dUnstuckLanding-1 |
