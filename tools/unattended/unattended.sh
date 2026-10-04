@@ -9705,7 +9705,7 @@ CPOROWS
 # WHAT IT DOES NOT CHECK: a `--no-verify` commit never reaches it, and `Pass: none` is taken at its
 # word. Check 23 still grades both at the close.
 verb_check_commit() { # commit message file
-  local msg="$1" f rel="" ref slug trl subj rows r d u decl st p q ok uncov briefs cmd kd
+  local msg="$1" f rel="" ref slug trl subj rows r d o u decl st p q ok uncov briefs cmd kd head
   [ -f "$msg" ] || { fail 49 "--check-commit was given no readable commit message file: ${msg:-(none)}"; return 1; }
   # It runs on EVERY commit, so the candidates are narrowed by one grep for this branch's ref before
   # the holder predicate, which reads the record's facts, confirms each.
@@ -9717,20 +9717,31 @@ verb_check_commit() { # commit message file
   done
   [ -n "$rel" ] || return 0
   slug=${rel%/RUN.md}; slug=${slug##*/}
-  trl=$(git interpret-trailers --parse <"$msg" 2>/dev/null | sed -n 's/^Pass: *//p' | tr '\n' ' ')
-  subj=$(grep -v '^#' "$msg" | sed -n '/[^[:space:]]/{p;q}')
+  # READ AS THE CLOSE READS THEM (closing review r1, M2/L2): `%(trailers:key=Pass)` matches the key in
+  # any case, ids split on any character an id cannot hold, a `none` anywhere attributes the commit to
+  # nothing, and `%s` is the first PARAGRAPH joined, not its first line.
+  trl=$(git interpret-trailers --parse <"$msg" 2>/dev/null | sed -n 's/^[Pp][Aa][Ss][Ss]: *//p' | tr '\n' ' ')
+  trl=${trl//[^A-Za-z0-9-]/ }
+  subj=$(grep -v '^#' "$msg" | awk 'NF { p = 1 } p && !NF { exit } p { printf "%s ", $0 }')
   # ONE LINE PER OPEN ROW, `<unit> <declared paths>`, through the predicate `--dispatch` and `--audit`
-  # already share, so this verb cannot call a pass open that they call closed.
+  # already share, so this verb cannot call a pass open that they call closed. A row it calls closed
+  # BECAUSE ITS PASS COMMIT IS HEAD is kept apart (`O` rows): that is `git commit --amend` on the pass
+  # commit, whose HEAD is the commit being replaced (closing review r1, M4). Only a trailer naming the
+  # unit reopens it, so a records commit after a pass is never asked for a trailer it does not owe.
+  head=$(GIT rev-parse -q --verify HEAD 2>/dev/null)
   rows=$(grep -F -- " dispatch · item " "$rel" 2>/dev/null | while IFS= read -r r; do
       [ -n "$r" ] || continue
       d=${r#* dispatch · item }; d=${d%% · reason *}
-      check_pass_open "${d%% *}" "${d#* }" "$rel" "${r#* · reason }" || continue
-      printf '%s %s\n' "${d#* }" "${r#* · reason }"
+      if check_pass_open "${d%% *}" "${d#* }" "$rel" "${r#* · reason }"; then
+        printf 'o %s %s\n' "${d#* }" "${r#* · reason }"
+      elif [ -n "$head" ] && [ "$(pass_commit "${d%% *}" "${d#* }" "$rel" || true)" = "$head" ]; then
+        printf 'O %s %s\n' "${d#* }" "${r#* · reason }"
+      fi
     done)
   case " $trl " in *" none "*) return 0 ;; esac
   if [ -z "${trl// /}" ]; then
-    while read -r u decl; do
-      [ -n "$u" ] || continue
+    while read -r o u decl; do
+      [ "$o" = o ] || continue
       id_in "$subj" "$u" || continue
       fail 49 "--check-commit: this commit's subject names $u, an open dispatched pass of $slug, and the message carries no Pass: trailer, so check 23 would take it for that pass's commit; end the message with 'Pass: $u' when it is the pass, or 'Pass: none' when it is not"
       return 1
@@ -9739,19 +9750,22 @@ $rows
 CCROWS
     return 0
   fi
-  st=$(git diff --cached --name-only 2>/dev/null)
+  # NO RENAME DETECTION (closing review r1, M1): porcelain `diff` lists a staged rename by its
+  # destination alone, where check 23's `diff-tree` lists the deleted source too.
+  st=$(git diff --cached --no-renames --name-only 2>/dev/null)
   # Repo-relative from git itself: KIT_DIR is the shell's spelling and ROOT is git's, and on MSYS the
   # two differ by drive form, so stripping one from the other leaves an absolute path in the command.
   kd=$(git -C "$KIT_DIR" rev-parse --show-prefix 2>/dev/null); kd=${kd%/}; [ -n "$kd" ] || kd=$KIT_DIR
   for u in $trl; do
-    decl=$(printf '%s\n' "$rows" | awk -v u="$u" '$1 == u { $1 = ""; print }' | tr '\n' ' ')
+    decl=$(printf '%s\n' "$rows" | awk -v u="$u" '$2 == u { $1 = ""; $2 = ""; print }' | tr '\n' ' ')
     if [ -z "${decl// /}" ]; then
       fail 49 "--check-commit: the Pass: trailer names $u, which has no open dispatched pass in $slug, so nothing declared what this commit may write; declare it first: bash $kd/unattended.sh --dispatch $slug --pass $u --writes <path>"
       return 1
     fi
     briefs=$'\n'"$(read_brief_paths "" "$u" "$rel")"$'\n'
     uncov=""
-    for p in $st; do
+    while IFS= read -r p; do
+      [ -n "$p" ] || continue
       [ "$p" = "$rel" ] && continue
       case "$briefs" in *$'\n'"$p"$'\n'*) continue ;; esac
       ok=0
@@ -9760,10 +9774,13 @@ CCROWS
       [ "$ok" = 1 ] && continue
       check_gen_region_only "HEAD:$p" ":$p" && continue
       uncov="$uncov $p"
-    done
+    done <<CCST
+$st
+CCST
     if [ -n "$uncov" ]; then
-      cmd="bash $kd/unattended.sh --dispatch $slug --pass $u"
-      for q in $(printf '%s\n' $decl $uncov | awk '!s[$0]++'); do cmd="$cmd --writes $q"; done
+      # SHELL-QUOTED, so the printed command runs as the argv it names (closing review r1, L1).
+      printf -v cmd 'bash %q --dispatch %q --pass %q' "$kd/unattended.sh" "$slug" "$u"
+      for q in $(printf '%s\n' $decl $uncov | awk '!s[$0]++'); do printf -v cmd '%s --writes %q' "$cmd" "$q"; done
       fail 49 "--check-commit: pass $u stages paths outside the set it declared before dispatch, and the declaration can still be widened because the pass has not committed:$uncov — widen it, then commit again: $cmd"
       return 1
     fi

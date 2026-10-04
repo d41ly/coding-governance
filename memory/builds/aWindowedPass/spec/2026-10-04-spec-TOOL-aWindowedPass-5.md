@@ -1,6 +1,6 @@
 # TOOL-aWindowedPass-5 — each run is graded against zero; the repo-global ceiling is retired
 
-**Status:** CLOSED · rev-2 · 2026-10-04 · node a · Tier-2 · base 886b089d · streams tooling · order 4 · ratified 2026-10-04
+**Status:** CLOSED · rev-3 · 2026-10-04 · node a · Tier-2 · base 886b089d · streams tooling · order 4 · ratified 2026-10-04
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-10-04-build-TOOL-aWindowedPass-5-1-acceptance-ledger.md](../build/2026-10-04-build-TOOL-aWindowedPass-5-1-acceptance-ledger.md) | journal | — |
 | [2026-10-04-prompt-TOOL-aWindowedPass-5-2-build-brief.md](../prompts/2026-10-04-prompt-TOOL-aWindowedPass-5-2-build-brief.md) | journal | — |
+| [2026-10-04-review-TOOL-aWindowedPass-1-2-3-4-5-closing-diff-round1.md](../reviews/2026-10-04-review-TOOL-aWindowedPass-1-2-3-4-5-closing-diff-round1.md) | diff-review | TOOL-aWindowedPass-1 TOOL-aWindowedPass-2 TOOL-aWindowedPass-3 TOOL-aWindowedPass-4 |
 
 <!-- /gen:spec-records -->
 
@@ -125,6 +126,8 @@ none
   is S2's "says which branch it looked for" in the same line rather than a second one; the retired
   key's notice is on the report channel, since it changes no verdict; the retired key is filtered from
   check 22's protocol half too, because the table row stays and the example no longer ships it.
+- rev-3 · 2026-10-04 · closing review r1 · S1 · M6 · a record naming no run branch prints `check 23 UNBOUND` instead of
+  claiming a close that would grade it; no checkout binds it.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-aWindowedPass-1 — check 23 counts only a pass whose window overlapped a sibling pass's
 
-**Status:** CLOSED · rev-2 · 2026-10-04 · node a · Tier-2 · base 886b089d · streams tooling · order 3 · ratified 2026-10-04
+**Status:** CLOSED · rev-3 · 2026-10-04 · node a · Tier-2 · base 886b089d · streams tooling · order 3 · ratified 2026-10-04
 
 <!-- gen:spec-records -->
 
@@ -9,6 +9,7 @@
 | [2026-10-04-build-TOOL-aWindowedPass-1-1-acceptance-ledger.md](../build/2026-10-04-build-TOOL-aWindowedPass-1-1-acceptance-ledger.md) | journal | — |
 | [2026-10-04-prompt-TOOL-aWindowedPass-1-0-run-mandate.md](../prompts/2026-10-04-prompt-TOOL-aWindowedPass-1-0-run-mandate.md) | journal | — |
 | [2026-10-04-prompt-TOOL-aWindowedPass-1-2-build-brief.md](../prompts/2026-10-04-prompt-TOOL-aWindowedPass-1-2-build-brief.md) | journal | — |
+| [2026-10-04-review-TOOL-aWindowedPass-1-2-3-4-5-closing-diff-round1.md](../reviews/2026-10-04-review-TOOL-aWindowedPass-1-2-3-4-5-closing-diff-round1.md) | diff-review | TOOL-aWindowedPass-2 TOOL-aWindowedPass-3 TOOL-aWindowedPass-4 TOOL-aWindowedPass-5 |
 
 <!-- /gen:spec-records -->
 
@@ -112,6 +113,9 @@ none
   docs line names the header, since the protocol row is unit 5's. The SOLO line reuses the counted
   write's per-instance text, so one string names a stray write however it is graded; every suite arm
   that asserts a COUNT now dispatches an overlapping sibling first.
+- rev-3 · 2026-10-04 · closing review r1 · S1 · §6 · H1 · M7 · every negative check-23 arm now dispatches beside a bound
+  sibling, and a self-scan arm reds one that dispatches unbound, since the solo rule had made eight
+  of them unable to fail; the unresolvable-base fallback has an arm of its own.
 
 ## 10. Reuse audit
 

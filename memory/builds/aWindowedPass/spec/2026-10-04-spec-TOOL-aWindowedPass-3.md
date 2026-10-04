@@ -1,6 +1,6 @@
 # TOOL-aWindowedPass-3 — a commit-time step refuses an open pass's undeclared write, naming the re-declare
 
-**Status:** CLOSED · rev-2 · 2026-10-04 · node a · Tier-2 · base 886b089d · streams tooling · order 5 · ratified 2026-10-04
+**Status:** CLOSED · rev-3 · 2026-10-04 · node a · Tier-2 · base 886b089d · streams tooling · order 5 · ratified 2026-10-04
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-10-04-build-TOOL-aWindowedPass-3-1-acceptance-ledger.md](../build/2026-10-04-build-TOOL-aWindowedPass-3-1-acceptance-ledger.md) | journal | — |
 | [2026-10-04-prompt-TOOL-aWindowedPass-3-2-build-brief.md](../prompts/2026-10-04-prompt-TOOL-aWindowedPass-3-2-build-brief.md) | journal | — |
+| [2026-10-04-review-TOOL-aWindowedPass-1-2-3-4-5-closing-diff-round1.md](../reviews/2026-10-04-review-TOOL-aWindowedPass-1-2-3-4-5-closing-diff-round1.md) | diff-review | TOOL-aWindowedPass-1 TOOL-aWindowedPass-2 TOOL-aWindowedPass-4 TOOL-aWindowedPass-5 |
 
 <!-- /gen:spec-records -->
 
@@ -120,6 +121,11 @@ none
   unshipped, a recorded decision rev-1 missed: a hook file is copied whole and would overwrite an
   adopter's own. The adopter gets a README line instead of a merged block. The gen-region comparison
   moved into the kit library as `check_gen_region_only`, so check 23 and this verb share one answer.
+- rev-3 · 2026-10-04 · closing review r1 · S2 · S3 · S4 · §6 · M1 · M2 · M4 · M5 · M10 · L1 · L4 · L5 · staged paths are listed with no
+  rename detection; the trailer key matches in any case and the subject is the first paragraph, as
+  the close reads them; amending a pass commit reopens its row for a trailered commit; the suggested
+  command is shell-quoted; the hook announces a conf with no kit, and an arm runs the hook itself;
+  the run-state, brief and gen-region subtractions each have an arm.
 
 ## 10. Reuse audit
 

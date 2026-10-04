@@ -2652,6 +2652,17 @@ user_skills = "/tmp/gk-fake-skills"
         gk.write_text(gkeep, encoding="utf-8")
         check("[aWP-4 AC5] ...and is green again once the generator is restored",
               _run_selfcheck(gcopy).returncode == 0, "")
+        # closing review r1, M9: a token the shell reader does not resolve, here only by its case,
+        # is refused too - 6c grades the path as the reader resolves it.
+        _g6t = gkeep.replace('path = "{map_root}/generated"', 'path = "{MAP_ROOT}/generated"')
+        check("[aWP r1 M9] LIVENESS the staged descriptor really carries an upper-case token",
+              _g6t != gkeep, "the replace matched nothing in the codebase-map descriptor")
+        gk.write_text(_g6t, encoding="utf-8")
+        r6t = _run_selfcheck(gcopy)
+        check("[aWP r1 M9] selfcheck 6c refuses a [[generated]] path token the reader cannot resolve",
+              r6t.returncode != 0 and "entry 'codebase-map' [[generated]] row" in r6t.stdout,
+              r6t.stdout[-1200:] + r6t.stderr[-300:])
+        gk.write_text(gkeep, encoding="utf-8")
 
         # --- DEPL-aRepatriatedFork-14 AC4: arm 7j2, an entry declaring no `[check]` table at all.
         tc = gcopy / PFX / KIT_NAMES["govkit"] / "entries" / "check-testsuite-counts.kit.toml"

@@ -1,6 +1,6 @@
 # TOOL-aWindowedPass-2 — a pass commit carries a `Pass:` trailer, and the legs attribute by it
 
-**Status:** CLOSED · rev-2 · 2026-10-04 · node a · Tier-2 · base 886b089d · streams tooling · order 2 · ratified 2026-10-04
+**Status:** CLOSED · rev-3 · 2026-10-04 · node a · Tier-2 · base 886b089d · streams tooling · order 2 · ratified 2026-10-04
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-10-04-build-TOOL-aWindowedPass-2-1-acceptance-ledger.md](../build/2026-10-04-build-TOOL-aWindowedPass-2-1-acceptance-ledger.md) | journal | — |
 | [2026-10-04-prompt-TOOL-aWindowedPass-2-2-build-brief.md](../prompts/2026-10-04-prompt-TOOL-aWindowedPass-2-2-build-brief.md) | journal | — |
+| [2026-10-04-review-TOOL-aWindowedPass-1-2-3-4-5-closing-diff-round1.md](../reviews/2026-10-04-review-TOOL-aWindowedPass-1-2-3-4-5-closing-diff-round1.md) | diff-review | TOOL-aWindowedPass-1 TOOL-aWindowedPass-3 TOOL-aWindowedPass-4 TOOL-aWindowedPass-5 |
 
 <!-- /gen:spec-records -->
 
@@ -78,10 +79,10 @@ trailer rides the same single spawn. `build_commit` reads the callers' cache, wh
 
 - security — N/A: attribution only.
 - perf / scale — no new spawn: the trailer rides the existing walk.
-- error / empty / loading states — a walk with no trailer anywhere is legacy, announced once per run.
-- observability — check 23 says which attribution each run's walks used.
-- risks — a run mixing trailered and untrailered pass commits attributes the untrailered ones to
-  nothing in a structural walk; the commit-time step refuses that shape.
+- error / empty / loading states — a commit with no trailer falls back to its subject, unannounced.
+- observability — none added: attribution is per commit, so no walk-level mode exists to report.
+- risks — a non-canonical trailer spelling; one token rule reads it alike at commit time and at
+  the close.
 - testing — fixture arms for structural, legacy and `Pass: none`.
 - migration — none: landed records stay legacy.
 - user docs — the Skill and verb carrier name the trailer.
@@ -117,6 +118,10 @@ none
   walk-wide switch would flip a landed build's verdict the moment a later trailered commit entered
   its range, since `build_commit` walks to HEAD. The build harness carries no commit text of its own,
   so only the unit harness changes; the two legs' caches move to the shared token producer.
+- rev-3 · 2026-10-04 · closing review r1 · M3 · L2 · L6 · §5 · one token rule for every trailer reader: ids split on
+  any non-id character and a `none` anywhere attributes the commit to nothing; check 23's ambiguity
+  test reads a trailered commit's trailer, not its subject; §5 struck the per-walk announcement and
+  attribution line, which the per-commit design never needed.
 
 ## 10. Reuse audit
 

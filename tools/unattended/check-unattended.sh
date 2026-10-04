@@ -310,6 +310,9 @@ GENERATED_INDEXES=$(resolve_generated_indexes "$ROOT" "$GENERATED_INDEXES" "$MEM
 # through it and a helper defined inside the guard does not exist on that path.
 REPORT=${GOV_UNATTENDED_REPORT:-0}
 report() { [ "$REPORT" = 1 ] && printf 'unattended-report: %s\n' "$1"; return 0; }
+# THE EFFECTIVE GENERATED SET, said once (closing review r1, L6): it is derived from every kit's
+# descriptor, so the one place a reader can see which outputs checks 23 and 38 forgive is this line.
+report "GENERATED_INDEXES resolved to: ${GENERATED_INDEXES:-nothing} - the kits' [[generated]] rows first, then the conf's additions"
 
 if [ "$SCOPE" != only28 ]; then
 
@@ -3767,7 +3770,13 @@ for f in $RUNS; do
     # LOOP-INVARIANT, HOISTED. `$dshit` does not change inside this loop, so reading its
     # subject once per SIBLING was a git spawn per sibling to answer the same question.
     # TOOL-aQuenchedHarness-7.
-    dshitsub=$(GIT log -1 --format=%s "$dshit" 2>/dev/null)
+    # A TRAILERED commit is attributed by its trailer alone, so its ambiguity is read from the trailer
+    # too (closing review r1, M3): a subject that merely MENTIONS a sibling skipped the subset test.
+    dshitsub=$(GIT log -1 --format='%s%x1f%(trailers:key=Pass,valueonly,separator=%x20)' "$dshit" 2>/dev/null)
+    case "$dshitsub" in
+      *$'\x1f') dshitsub=${dshitsub%$'\x1f'} ;;
+      *) dshitsub=${dshitsub#*$'\x1f'}; dshitsub=${dshitsub//[^A-Za-z0-9-]/ } ;;
+    esac
     while IFS= read -r dssib; do
       [ -n "$dssib" ] || continue
       dssitem=${dssib#* dispatch · item }; dssitem=${dssitem%% · reason *}
@@ -3893,7 +3902,11 @@ DSPEND
   # ---- on the bar or anywhere else, until a tree on its branch runs the leg.
   [ "$ds_over_n" -gt 0 ] || continue
   dsrb=$(fact_of "$f" run-branch); [ -n "$dsrb" ] || dsrb=$(fact_of "$f" branch-ref)
-  if [ -n "$DS_HEAD_REF" ] && [ "$dsrb" = "$DS_HEAD_REF" ]; then
+  if [ -z "$dsrb" ]; then
+    # A RECORD NAMING NO RUN BRANCH (a detached preflight) matches no checkout, its own close included,
+    # so "graded at its own close" would be false for it (closing review r1, M6). Said distinctly.
+    printf 'unattended: check 23 UNBOUND %s: %s counted - the record names no run branch, so no checkout binds it and no leg can fail it\n' "$f" "$ds_over_n"
+  elif [ -n "$DS_HEAD_REF" ] && [ "$dsrb" = "$DS_HEAD_REF" ]; then
     fail 23 "a pass of the run this branch drives committed outside the set it declared before dispatch while its window overlapped a sibling pass, and that declaration is the disjointness proof two concurrent passes rest on: $ds_over_n in $f$ds_over"
   else
     printf 'unattended: check 23 OTHER RUN %s: %s counted, graded at its own close - this tree drives %s\n' "$f" "$ds_over_n" "${DS_HEAD_REF:-a detached HEAD, which binds no run}"

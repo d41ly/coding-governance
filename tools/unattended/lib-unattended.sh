@@ -502,6 +502,22 @@ is_repo_root() {
 # readers of one config, one of them re-deriving it (memory/gotchas/two-readers-of-one-config-one-re-derived.md).
 # The sentinel itself, spelled ONCE. Both callers initialise the key to it before the conf is read,
 # and a second spelling in either would be a sentinel this comparison never recognises.
+# THE VALUE BASH SOURCING WOULD ASSIGN, read without sourcing (closing review r1, M8): `map_lib.load_conf`
+# tolerates an `export ` prefix, an inline comment and CRLF, and a reader re-deriving the same key more
+# strictly is two answers to one question. Whitespace right after `=` is an empty value, a quoted value
+# ends at its matching quote, an unquoted one at the first whitespace, and the last assignment wins.
+read_conf_value() { # conf file · key -> its value, or nothing when the file or the key is absent
+  awk -v k="$2" '
+    { sub(/\r$/, ""); s = $0; sub(/^[ \t]+/, "", s); sub(/^export[ \t]+/, "", s)
+      if (index(s, k "=") != 1) next
+      v = substr(s, length(k) + 2)
+      if (v ~ /^[ \t]/) v = ""
+      else if (v ~ /^"/)    { v = substr(v, 2); i = index(v, "\"");   if (i) v = substr(v, 1, i - 1) }
+      else if (v ~ /^\047/) { v = substr(v, 2); i = index(v, "\047"); if (i) v = substr(v, 1, i - 1) }
+      else sub(/[ \t].*$/, "", v)
+      out = v; got = 1 }
+    END { if (got) print out }' "$1" 2>/dev/null || :
+}
 SHARED_RECORDS_UNDECLARED="__kit-default__"
 resolve_shared_records() { # declared value · memory root -> the effective set
   if [ "$1" = "$SHARED_RECORDS_UNDECLARED" ]; then
@@ -521,18 +537,22 @@ resolve_shared_records() { # declared value · memory root -> the effective set
 # generated outputs and the shipped example two, so a hook-forced regeneration of the rest counted as
 # an undeclared write.
 #
+# A ROW MAY CARRY `when = "<conf file>:<KEY>=<value>"` (closing review r1, B1): it applies only when
+# that conf, at the repo root, assigns KEY exactly that value. memory-tree's backlog rows carry one,
+# because the backlog is GENERATED only under `BACKLOG_MODE=builds`; under the default it is authored,
+# is correctly a shared record, and an unconditional row refused every adopter's conf at load.
+#
 # WHAT IT DOES NOT CHECK: that a declared generator really writes the declared path — govkit selfcheck
 # grades the row's shape and that the generator ships, and no reader here runs a generator. A row whose
 # path holds another token is named on stderr and skipped, never guessed.
 resolve_generated_indexes() { # repo root · declared GENERATED_INDEXES · memory root -> the effective pairs
   local _rg_root=$1 _rg_decl=$2 _rg_mem=$3 _rg_here _rg_kitrel _rg_tool _rg_map _rg_d _rg_krel _rg_rows
-  local _rg_out="" _rg_p _rg_g _rg_seen=" "
+  local _rg_out="" _rg_p _rg_g _rg_w _rg_kv _rg_seen=" "
   _rg_here=$(cd "$(dirname "${BASH_SOURCE[0]}")" 2>/dev/null && pwd) || _rg_here=""
   _rg_kitrel=$(git -C "${_rg_here:-.}" rev-parse --show-prefix 2>/dev/null) || _rg_kitrel=""
   _rg_kitrel=${_rg_kitrel%/}
   case "$_rg_kitrel" in */*) _rg_tool=${_rg_kitrel%/*} ;; *) _rg_tool="" ;; esac
-  _rg_map=$(awk -F= '/^[[:space:]]*MAP_ROOT=/ { v = $2; gsub(/^[ "\047]+|[ "\047\r]+$/, "", v); print v }' \
-    "$_rg_root/.codebase-map.conf" 2>/dev/null | tail -n 1)
+  _rg_map=$(read_conf_value "$_rg_root/.codebase-map.conf" MAP_ROOT)
   [ -n "$_rg_map" ] || _rg_map="memory/map"
   # Both loops read SCRATCH FILES, never a pipe, a process substitution or a here-string over one:
   # memory/gotchas/bounded-through-a-pipe-is-unbounded.md, and the shell-hygiene leg that bans it.
@@ -545,13 +565,18 @@ resolve_generated_indexes() { # repo root · declared GENERATED_INDEXES · memor
     awk '
       function val(s) { sub(/^[^=]*=[ \t]*"/, "", s); sub(/".*$/, "", s); return s }
       { sub(/\r$/, "") }
-      /^\[\[generated\]\][ \t]*$/ { if (p != "") print p "\t" g; t = 1; p = ""; g = ""; next }
-      /^\[/                       { if (t && p != "") print p "\t" g; t = 0; p = ""; g = ""; next }
+      /^\[\[generated\]\][ \t]*$/ { if (p != "") print p "\t" g "\t" w; t = 1; p = ""; g = ""; w = ""; next }
+      /^\[/                       { if (t && p != "") print p "\t" g "\t" w; t = 0; p = ""; g = ""; w = ""; next }
       t && /^path[ \t]*=/         { p = val($0) }
       t && /^generator[ \t]*=/    { g = val($0) }
-      END { if (t && p != "") print p "\t" g }' "$_rg_root/$_rg_d" >"$_rg_rf" 2>/dev/null || :
-    while IFS=$'\t' read -r _rg_p _rg_g; do
+      t && /^when[ \t]*=/         { w = val($0) }
+      END { if (t && p != "") print p "\t" g "\t" w }' "$_rg_root/$_rg_d" >"$_rg_rf" 2>/dev/null || :
+    while IFS=$'\t' read -r _rg_p _rg_g _rg_w; do
       [ -n "$_rg_p" ] && [ -n "$_rg_g" ] || continue
+      if [ -n "$_rg_w" ]; then
+        _rg_kv=${_rg_w#*:}
+        [ "$(read_conf_value "$_rg_root/${_rg_w%%:*}" "${_rg_kv%%=*}")" = "${_rg_kv#*=}" ] || continue
+      fi
       _rg_p=${_rg_p//\{memory_root\}/$_rg_mem}; _rg_p=${_rg_p//\{map_root\}/$_rg_map}
       _rg_p=${_rg_p//\{kit\}/$_rg_krel}
       case "$_rg_p" in
@@ -735,7 +760,11 @@ pass_commit() {  # anchor · unit · run-state-path · [upper-bound, default HEA
     [ -n "$_pc" ] || continue
     _ptr=${_psub#*$'\x1f'}; [ "$_ptr" = "$_psub" ] && _ptr=""; _psub=${_psub%%$'\x1f'*}
     if [ -n "$_ptr" ]; then
-      case " $_ptr " in *" $_pu "*) ;; *) continue ;; esac
+      # ONE TOKEN RULE for every trailer reader (closing review r1, M2/L2): ids split on any character
+      # an id cannot hold, so `A, B` names both, and a `none` anywhere attributes the commit to nothing.
+      _ptr=" ${_ptr//[^A-Za-z0-9-]/ } "
+      case "$_ptr" in *" none "*) continue ;; esac
+      case "$_ptr" in *" $_pu "*) ;; *) continue ;; esac
     else
       id_in "$_psub" "$_pu" || continue
     fi
@@ -755,6 +784,32 @@ pass_commit() {  # anchor · unit · run-state-path · [upper-bound, default HEA
   done <"$_pf"
   rm -f "$_pf"
   return 1
+}
+
+# ONE ANSWER TO "did this change touch only gen regions" (TOOL-aWindowedPass-3). Check 23 asks it of a
+# commit against its parent, `--check-commit` of the index against HEAD; two copies of the strip would
+# let the close forgive what the commit-time step refused. Regions NEST, the build README's unit table
+# inside its index, so the strip counts depth rather than toggling. WHAT THIS DOES NOT SEE: a hand edit
+# inside a gen region is not told from a render.
+GEN_REGION_AWK='{ sub(/\r$/, "") } /^<!-- gen:[^ ]+ -->/ { g++; next } /^<!-- \/gen:[^ ]+ -->/ { if (g > 0) g--; next } !g'
+check_gen_region_only() { # before object · after object -> 0 when both exist and differ only inside gen regions
+  local _ga _gb
+  _ga=$(GIT show "$1" 2>/dev/null) || return 1
+  _gb=$(GIT show "$2" 2>/dev/null) || return 1
+  [ "$(printf '%s\n' "$_ga" | awk "$GEN_REGION_AWK")" = "$(printf '%s\n' "$_gb" | awk "$GEN_REGION_AWK")" ]
+}
+
+# THE ATTRIBUTION TOKENS OF A COMMIT, one `<sha> <tokens>` line per commit - TOOL-aWindowedPass-2. The
+# build-commit pick and its callers' subject caches all read this, so a commit is attributed one way
+# everywhere: a commit carrying a `Pass:` trailer yields `PASSTRAILER <its ids>` and NOT its subject,
+# so `Pass: none` names no unit; one with no trailer yields its subject's tokens, as before. Tokens
+# are runs of `[A-Za-z0-9-]`, the shape a whole-token `case " $id "` match reads.
+log_attribution_tokens() { # git-log revision arguments -> one tokenised line per commit
+  GIT log --format='%H %s%x1f%(trailers:key=Pass,valueonly,separator=%x20)' "$@" 2>/dev/null \
+    | awk -F '\037' '{ if ($2 != "") { split($1, h, " "); t = $2; gsub(/[^A-Za-z0-9-]/, " ", t)
+                                        if ((" " t " ") ~ / none /) t = ""; print h[1] " PASSTRAILER " t }
+                       else print $1 }' \
+    | tr -c 'A-Za-z0-9\n-' ' '
 }
 
 # ------------------------------------------------------------- which commit BUILT this unit, once
@@ -786,29 +841,6 @@ pass_commit() {  # anchor · unit · run-state-path · [upper-bound, default HEA
 # in a shared shard or as an ask in the run's own build. `GENERATED_INDEXES` arrives as
 # `index:generator` pairs; the generator half is never excluded, because a commit touching the
 # GENERATOR is touching product code.
-# THE ATTRIBUTION TOKENS OF A COMMIT, one `<sha> <tokens>` line per commit - TOOL-aWindowedPass-2. The
-# build-commit pick and its callers' subject caches all read this, so a commit is attributed one way
-# everywhere: a commit carrying a `Pass:` trailer yields `PASSTRAILER <its ids>` and NOT its subject,
-# so `Pass: none` names no unit; one with no trailer yields its subject's tokens, as before. Tokens
-# are runs of `[A-Za-z0-9-]`, the shape a whole-token `case " $id "` match reads.
-# ONE ANSWER TO "did this change touch only gen regions" (TOOL-aWindowedPass-3). Check 23 asks it of a
-# commit against its parent, `--check-commit` of the index against HEAD; two copies of the strip would
-# let the close forgive what the commit-time step refused. Regions NEST, the build README's unit table
-# inside its index, so the strip counts depth rather than toggling. WHAT THIS DOES NOT SEE: a hand edit
-# inside a gen region is not told from a render.
-GEN_REGION_AWK='{ sub(/\r$/, "") } /^<!-- gen:[^ ]+ -->/ { g++; next } /^<!-- \/gen:[^ ]+ -->/ { if (g > 0) g--; next } !g'
-check_gen_region_only() { # before object · after object -> 0 when both exist and differ only inside gen regions
-  local _ga _gb
-  _ga=$(GIT show "$1" 2>/dev/null) || return 1
-  _gb=$(GIT show "$2" 2>/dev/null) || return 1
-  [ "$(printf '%s\n' "$_ga" | awk "$GEN_REGION_AWK")" = "$(printf '%s\n' "$_gb" | awk "$GEN_REGION_AWK")" ]
-}
-
-log_attribution_tokens() { # git-log revision arguments -> one tokenised line per commit
-  GIT log --format='%H %s%x1f%(trailers:key=Pass,valueonly,separator=%x20)' "$@" 2>/dev/null \
-    | awk -F '\037' '{ if ($2 != "") { split($1, h, " "); print h[1] " PASSTRAILER " $2 } else print $1 }' \
-    | tr -c 'A-Za-z0-9\n-' ' '
-}
 build_commit() {  # rev-range · unit-id · build-dir · generated-indexes · shared-records · [cap] · [order]
   _bc_range=$1; _bc_id=$2; _bc_dir=$3; _bc_gen=$4; _bc_shared=$5
   _bc_cap=${6:-}

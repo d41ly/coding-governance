@@ -41,14 +41,20 @@ top=$(git rev-parse --show-toplevel 2>/dev/null) || exit 0
 # both the `tools/` prefix this repo uses and the bare prefix a copy-install produces.
 tool_root=tools
 un_name=unattended
+un_ran=""
 for base in "$top/$tool_root/$un_name" "$top/$un_name"; do
   if [ -f "$base/unattended.sh" ] && [ -f "$top/.unattended.conf" ]; then
+    un_ran=1
     bash "$base/unattended.sh" --check-commit "$1"; rc=$?
     [ "$rc" = 1 ] && exit 1
     [ "$rc" = 0 ] || echo "commit-msg: the unattended commit-time check could not run (exit $rc); check 23 still grades this commit at the close."
     break
   fi
 done
+# A conf with no kit beside it is a project that adopted runs and lost the driver: say so, once.
+if [ -z "$un_ran" ] && [ -f "$top/.unattended.conf" ]; then
+  echo "commit-msg: .unattended.conf is here but the unattended kit is not, so the commit-time check did NOT run; check 23 still grades this commit at the close."
+fi
 
 git_dir=$(git rev-parse --git-dir 2>/dev/null) || exit 0
 [ -f "$git_dir/MERGE_HEAD" ] || exit 0

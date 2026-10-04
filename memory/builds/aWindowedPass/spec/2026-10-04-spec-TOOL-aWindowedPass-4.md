@@ -1,6 +1,6 @@
 # TOOL-aWindowedPass-4 — kits declare their generated outputs, and the unattended kit reads them
 
-**Status:** CLOSED · rev-1 · 2026-10-04 · node a · Tier-2 · base 886b089d · streams tooling · order 1 · ratified 2026-10-04
+**Status:** CLOSED · rev-2 · 2026-10-04 · node a · Tier-2 · base 886b089d · streams tooling · order 1 · ratified 2026-10-04
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-10-04-build-TOOL-aWindowedPass-4-1-acceptance-ledger.md](../build/2026-10-04-build-TOOL-aWindowedPass-4-1-acceptance-ledger.md) | journal | — |
 | [2026-10-04-prompt-TOOL-aWindowedPass-4-2-build-brief.md](../prompts/2026-10-04-prompt-TOOL-aWindowedPass-4-2-build-brief.md) | journal | — |
+| [2026-10-04-review-TOOL-aWindowedPass-1-2-3-4-5-closing-diff-round1.md](../reviews/2026-10-04-review-TOOL-aWindowedPass-1-2-3-4-5-closing-diff-round1.md) | diff-review | TOOL-aWindowedPass-1 TOOL-aWindowedPass-2 TOOL-aWindowedPass-3 TOOL-aWindowedPass-5 |
 
 <!-- /gen:spec-records -->
 
@@ -91,7 +92,7 @@ default `map_lib.load_conf` applies), and `{kit}` from the descriptor's director
 - security — the resolver reads tracked descriptors; tokens resolve to repo-relative paths only.
 - perf / scale — one awk pass over a dozen small files per gate run.
 - error / empty / loading states — an unresolvable token is named and the row skipped.
-- observability — check 23 prints the effective set it read, with each pair's source.
+- observability — check 23 prints the effective set it read, on the report channel.
 - risks — a kit not installed contributes nothing, which is correct.
 - testing — arms over a fixture tree with declared rows and a conf addition.
 - migration — adopters' stamped `GENERATED_INDEXES` stays valid as an addition; duplicates collapse.
@@ -127,6 +128,11 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-04 · initial draft, from the owner's part (3) and the readers mapped at base.
+- rev-2 · 2026-10-04 · closing review r1 · B1 · M8 · M9 · L6 · §5 · memory-tree's backlog rows carry `when` on
+  `BACKLOG_MODE=builds`: under the default the backlog is authored and a shared record, and the
+  unconditional rows refused every adopter's conf at load; `read_conf_value` reads `MAP_ROOT` and a
+  `when` key as bash sourcing would; selfcheck 6c grades a path as the reader resolves it and a
+  `when`'s shape; the effective set is reported without per-pair sources.
 
 ## 10. Reuse audit
 

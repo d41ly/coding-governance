@@ -5758,7 +5758,9 @@ hit  "$out" "pass ARCH-tRun-1 stages paths outside the set it declared before di
 hit  "$out" "--dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}a.sh --writes ${PFX}stray.sh"
 # AC3: the run-state file and a declared generated output are not the pass's writes
 git rm -q --cached ${PFX}stray.sh; rm -f ${PFX}stray.sh
-printf 'live\n' >> memory/LIVE.md; printf '\n' >> memory/builds/tRun/RUN.md; git add -A >/dev/null
+# a REAL run-state line: a bare trailing newline is already forgiven by the gen-region compare, so it
+# could not show the run-state subtraction doing anything (closing review r1, M10)
+printf 'live\n' >> memory/LIVE.md; printf 'note: staged by the run\n' >> memory/builds/tRun/RUN.md; git add -A >/dev/null
 out=$(run --check-commit "$CCM"); rc=$?
 same "--check-commit subtracts the run-state file and a generated output, exit code" "$rc" "0"
 miss "$out" "FAILED"
@@ -5777,6 +5779,83 @@ out=$(run --check-commit "$CCM"); rc=$?
 same "--check-commit with no run bound, exit code" "$rc" "0"
 same "--check-commit with no run bound prints nothing" "$out" ""
 git checkout -q unit; git branch -q -D cc-unbound
+rm -f "$CCM"
+
+# ---- --check-commit, closing review r1: the shapes round 1 found graded differently at commit time
+# ---- and at the close, and the subtractions and the hook that had no arm. One setup per arm group:
+# ---- a bound run, ARCH-tRun-1 dispatched open on `a.sh`, and three committed files the arms move.
+cc_setup() {
+  build_specced_tree
+  printf '\nGENERATED_INDEXES="memory/LIVE.md:gen.py"\n' >> .unattended.conf
+  [ -z "$PFX" ] || mkdir -p "$PFX"
+  printf 'o\n' > ${PFX}old.sh
+  printf '# r\n\nprose\n\n<!-- gen:units -->\nold\n<!-- /gen:units -->\n' > memory/README.md
+  fixture
+  run --preflight tRun --keepalive-id k1 >/dev/null
+  run --dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}a.sh >/dev/null
+  git add -A >/dev/null && git commit -q -m "records: declare ARCH-tRun-1" --no-verify
+}
+CCM=$(mktemp)
+cc_setup
+# M1: a staged rename out of an undeclared path is graded by BOTH halves, as check 23 grades it
+git mv ${PFX}old.sh ${PFX}a.sh
+printf 'ARCH-tRun-1 builds its lane\n\nPass: ARCH-tRun-1\n' > "$CCM"
+out=$(run --check-commit "$CCM"); rc=$?
+same "--check-commit grades the source of a staged rename, exit code" "$rc" "1"
+hit  "$out" "${PFX}old.sh"
+git reset -q --hard
+# M2: a lower-case trailer key is still the trailer, so the stray write is graded
+printf 'b\n' > ${PFX}stray.sh; git add -A >/dev/null
+printf 'ARCH-tRun-1 builds its lane\n\npass: ARCH-tRun-1\n' > "$CCM"
+out=$(run --check-commit "$CCM"); rc=$?
+same "--check-commit reads a lower-case Pass key, exit code" "$rc" "1"
+hit  "$out" "pass ARCH-tRun-1 stages paths outside the set it declared before dispatch"
+# ...and a subject wrapped onto a second line still names the open pass
+printf 'lane work, continued\nfor ARCH-tRun-1 here\n' > "$CCM"
+out=$(run --check-commit "$CCM"); rc=$?
+same "--check-commit reads a wrapped subject as the close does, exit code" "$rc" "1"
+hit  "$out" "end the message with 'Pass: ARCH-tRun-1' when it is the pass"
+# L2: a `none` beside an id attributes the commit to nothing, as pass_commit now reads it
+printf 'records\n\nPass: none\nPass: ARCH-tRun-1\n' > "$CCM"
+out=$(run --check-commit "$CCM"); rc=$?
+same "--check-commit takes Pass: none beside an id as none, exit code" "$rc" "0"
+git reset -q --hard; rm -f ${PFX}stray.sh
+# L4 + M10: the brief rows, a gen-region-only change and a REAL run-state line are all subtracted
+BRIEFP=memory/builds/tRun/prompts/2026-08-21-prompt-ARCH-tRun-1-1-build-brief.md
+mkdir -p memory/builds/tRun/prompts && printf '# brief\n' > "$BRIEFP"
+printf '2026-08-21T00:00:01Z brief · item ARCH-tRun-1 · reason %s %s\n' \
+  "$(git hash-object "$BRIEFP" | cut -c1-12)" "$BRIEFP" >> memory/builds/tRun/RUN.md
+sed -i 's/^old$/new/' memory/README.md
+printf 'a\n' > ${PFX}a.sh; git add -A >/dev/null
+printf 'ARCH-tRun-1 builds its lane\n\nPass: ARCH-tRun-1\n' > "$CCM"
+out=$(run --check-commit "$CCM"); rc=$?
+same "--check-commit subtracts a brief, a gen-region change and a run-state line, exit code" "$rc" "0"
+# ...and the authored-line control: the same README edited outside its gen region is the pass's write
+sed -i 's/^prose$/edited prose/' memory/README.md; git add -A >/dev/null
+out=$(run --check-commit "$CCM"); rc=$?
+same "--check-commit counts an authored README line, exit code" "$rc" "1"
+hit  "$out" "memory/README.md"
+git reset -q --hard
+# M4: amending the pass commit with its trailer is not refused as a closed pass
+printf 'a\n' > ${PFX}a.sh; git add -A >/dev/null
+git commit -q -m "ARCH-tRun-1 builds its lane" -m "Pass: ARCH-tRun-1" --no-verify
+out=$(run --check-commit "$CCM"); rc=$?
+same "--check-commit lets the pass commit be amended, exit code" "$rc" "0"
+# M5: THE HOOK, run as git runs it - before its merge-only exit, blocking on 1 alone
+cc_setup
+REAL_ROOT=${HERE%/"$KIT_REL"}
+printf 'b\n' > ${PFX}stray.sh; git add -A >/dev/null
+printf 'ARCH-tRun-1 builds its lane\n\nPass: ARCH-tRun-1\n' > "$CCM"
+# the hook finds the kit inside the tree it runs in; the fixture runs the real driver from outside it
+_cckit=""; [ -e "./$KIT_REL/unattended.sh" ] || { mkdir -p "./$KIT_REL" && cp "$HERE"/*.sh "./$KIT_REL/"; _cckit=1; }
+out=$(bash "$REAL_ROOT/.githooks/commit-msg" "$CCM" 2>&1); rc=$?
+same "the commit-msg hook blocks an undeclared staged path with no MERGE_HEAD, exit code" "$rc" "1"
+hit  "$out" "pass ARCH-tRun-1 stages paths outside the set it declared before dispatch"
+git checkout -q -b cc-hook-unbound
+out=$(bash "$REAL_ROOT/.githooks/commit-msg" "$CCM" 2>&1); rc=$?
+same "the commit-msg hook lets a commit through when no run is bound, exit code" "$rc" "0"
+git checkout -q unit; git branch -q -D cc-hook-unbound
+[ -z "$_cckit" ] || rm -rf "./$KIT_REL"; git reset -q --hard
 rm -f "$CCM"
 
 # ---- CONDITION 3, FLAT HALF: the records the method names outright, plus the derived run-state file.
