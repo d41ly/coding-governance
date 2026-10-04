@@ -5916,6 +5916,35 @@ with build_tempdir() as _td:
           f"rc={_ml_dark.returncode} {_ml_dark.stdout}{_ml_dark.stderr}")
 
 
+# ---- TOOL-aMendedFleet-6: the conf reader writes UTF-8 whatever the host's code page -----------
+#
+# `adopt-lexicon.sh` reads the glosses from `--print-rows` through a pipe. Outside Python's UTF-8
+# mode a Windows pipe is the ANSI code page, so the em dash arrived as 0x97 and `lexicon wiring`
+# redded on the hosted runner while passing on a node exporting PYTHONUTF8=1. The child runs with
+# that mode OFF and PYTHONIOENCODING gone, and the arm reads BYTES: a text decode would hide the
+# codec it grades. Where the redirected stdout is UTF-8 anyway, nothing here can red, so it says so.
+_cx_env = {k: v for k, v in os.environ.items() if k != "PYTHONIOENCODING"}
+_cx_env["PYTHONUTF8"] = "0"
+_cx_probe = subprocess.run([sys.executable, "-c", "import sys; print(sys.stdout.encoding)"],
+                           env=_cx_env, capture_output=True)
+if _cx_probe.stdout.strip().lower().replace(b"-", b"") in (b"utf8", b"utf_8"):
+    print("lexicon selftest SKIP — AMF6's codec arm: a redirected stdout with PYTHONUTF8=0 is "
+          f"already {_cx_probe.stdout.strip().decode('ascii', 'replace')} on this host, so "
+          "`lexicon_conf.py`'s UTF-8 reconfigure is UNEXERCISED here. One arm unexercised.")
+else:
+    with build_tempdir() as _td:
+        _cx_conf = Path(_td) / ".lexicon.conf"
+        _cx_conf.write_text(BASE_CONF, encoding="utf-8", newline="\n")
+        _cx = subprocess.run([sys.executable, str(KIT / "lexicon_conf.py"), "--print-rows", str(_cx_conf)],
+                             env=_cx_env, capture_output=True)
+    _cx_97 = b"\x97" in _cx.stdout
+    check("AMF6 AC3: `--print-rows` under the host code page writes the gloss's em dash as UTF-8, "
+          "never the byte 0x97",
+          _cx.returncode == 0 and b"\xe2\x80\x94" in _cx.stdout and not _cx_97,
+          f"codec={_cx_probe.stdout.strip()!r} rc={_cx.returncode} has_0x97={_cx_97} "
+          f"{_cx.stdout[:120]!r} {_cx.stderr[:200]!r}")
+
+
 if FAILURES:
     print(f"lexicon selftest FAILED — {len(FAILURES)} of {PASSES + len(FAILURES)} arm(s):")
     for f in FAILURES:
