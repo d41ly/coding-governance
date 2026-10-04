@@ -846,7 +846,9 @@ verbs=$(grep -oE '^ +--[a-z]+\)' "$D" | tr -d ' )' | sort -u)
 # `--until` and `--reaped` are arguments of `--hold` (TOOL-dDerivedDocket-4 S2); `--replaces` and
 # `--scheduled` are arguments of `--resume` (TOOL-dDerivedDocket-4 S6, TOOL-dDerivedDocket-5 S6).
 # Undenied, each demanded a Skill section, a synopsis line and a VERBS_ entry of its own.
-_denied='--keepalive-id --item --value --override --waive --reason --code --subject --verdict --blockers --act --pass --successor --writes --leg --path --step --records-root --playbook-sha --run --set --framed --paths --unit --disposition --asks --until --reaped --replaces --scheduled'
+# TWO MORE, found red at aWindowedPass's VERIFYING and already red at its base: `--task` and
+# `--heartbeat` are arguments of `--register-task`/`--release-task`, documented on their header lines.
+_denied='--keepalive-id --item --value --override --waive --reason --code --subject --verdict --blockers --act --pass --successor --writes --leg --path --step --records-root --playbook-sha --run --set --framed --paths --unit --disposition --asks --until --reaped --replaces --scheduled --task --heartbeat'
 for _f in $_denied; do
   verbs=$(printf '%s
 ' "$verbs" | grep -vxF -- "$_f" || true)
