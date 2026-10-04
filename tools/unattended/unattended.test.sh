@@ -11476,7 +11476,7 @@ IH_PARK='INHERITED_RED=park\nINHERITED_RED_MAX_AGE=10\n'
 build_ih_policy "$IH_LAND"
 out=$(run_ih --close tRun $IHOVR)
 hit  "$out" "gates-green — the inherited-red policy reads land: INHERITED_RED=land with an age bound of 10 first-parent landings, read from .githooks/gate-env.sh at ${IH_R:0:8}"
-hit  "$out" "gates-green MET over an inherited-only red under INHERITED_RED=land: x leg red at ${IH_R:0:8}, every one INHERITED within the 10-landing age bound"
+hit  "$out" "gates-green MET over an inherited-only red under INHERITED_RED=land: x leg red at ${IH_R:0:8}, every one INHERITED; none aged past the 10-landing age bound"
 miss "$out" "a machine-checked DoD item is unmet, so --close blocks: gates-green"
 hit  "$(read_ih_facts)" "gates-inherited: ${IH_R:0:8} x leg"
 hit  "$(read_ih_facts)" "gates-run: unattended-"
@@ -11510,16 +11510,72 @@ out=$(run_ih --close tRun $IHOVR)
 same "AC18 GATE_ATTRIBUTE is the advertised tip, never local main" "$(grep '^GATE_ATTRIBUTE=' "$ih_out/barenv.txt")" "GATE_ATTRIBUTE=$IH_R"
 hit  "$out" "hold · inherited-red · until probe gate · x leg red at ${IH_R:0:8}, INHERITED; INHERITED_RED=park"
 
-# AC17: under land an aged row parks as the hold, and land beside a blank, zero or non-numeric bound
-# reads park, announced.
+# AC17, FLIPPED by TOOL-dUnstuckLanding-16 (ruling TOOL-dUnstuckLanding-22): under land an aged row is
+# MET and names itself aged, with no hold line; land beside a blank, zero or non-numeric bound reads
+# land with NO bound, announced, and is MET saying nothing is escalated.
 build_ih_policy "$IH_LAND"
 out=$(IH_AGE=aged run_ih --close tRun $IHOVR)
-hit  "$out" "hold · inherited-red · until probe gate · x leg red at ${IH_R:0:8}, INHERITED; INHERITED_RED=land"
-hit  "$out" "1 INHERITED leg(s) read aged or unproven past the age bound, which never lands"
+hit  "$out" "gates-green MET over an inherited-only red under INHERITED_RED=land: x leg red at ${IH_R:0:8}, every one INHERITED; aged past the 10-landing age bound, so each ask is BLOCKER: x leg"
+miss "$out" "hold · "
 for _b in "" 0 ten; do
   build_ih_policy "INHERITED_RED=land\nINHERITED_RED_MAX_AGE=$_b\n"
   out=$(run_ih --close tRun $IHOVR)
-  hit "$out" "gates-green — the inherited-red policy reads park: INHERITED_RED=land with no positive INHERITED_RED_MAX_AGE beside it in .githooks/gate-env.sh at ${IH_R:0:8}, which reads park"
+  hit "$out" "gates-green — the inherited-red policy reads land: INHERITED_RED=land with no positive INHERITED_RED_MAX_AGE beside it in .githooks/gate-env.sh at ${IH_R:0:8}, so no leg is aged and nothing is escalated"
+  hit "$out" "every one INHERITED; no age bound is declared, so no leg is aged and nothing is escalated"
+done
+
+# TOOL-dUnstuckLanding-16 AC4: INHERITED_RED undeclared at R, a bound of 2 and one aged INHERITED leg,
+# the witness armed. The policy reads the kit default land, the item is MET with a gates-inherited
+# fact, and the build's own BACKLOG gains one ask whose SEV reads BLOCKER, read back through ASKS_CMD.
+# Nothing outside the build's folder is staged. RED against the filer this replaced, which files HIGH
+# and so is REMOVED by a witness reading BLOCKER, and against the table that held an aged leg.
+IH_UNDECL='INHERITED_RED_MAX_AGE=2\n'
+build_ih_policy "$IH_UNDECL"; write_ih_asks
+out=$(IH_AGE=aged IH_ASK_SEV=BLOCKER run_ih --close tRun $IHOVR)
+hit  "$out" "gates-green — the inherited-red policy reads land: .githooks/gate-env.sh at ${IH_R:0:8} declares no INHERITED_RED, so the kit default land applies, with an age bound of 2 first-parent landings"
+hit  "$out" "gates-green MET over an inherited-only red under INHERITED_RED=land: x leg red at ${IH_R:0:8}, every one INHERITED; aged past the 2-landing age bound, so each ask is BLOCKER: x leg"
+hit  "$out" "gates-green: filed ask ARCH-tRun-2 for leg x leg red at ${IH_R:0:8}, BLOCKER, staged in memory/builds/tRun/BACKLOG.md"
+miss "$out" "a machine-checked DoD item is unmet, so --close blocks: gates-green"
+hit  "$(read_ih_facts)" "gates-inherited: ${IH_R:0:8} x leg"
+hit  "$(cat "$ih_dir/memory/builds/tRun/BACKLOG.md")" "· inherited red: leg x leg red at ${IH_R:0:8}, older than the 2-landing age bound · seen \`fx/x.sh\`@${IH_R:0:8} run \`bash fx/x.sh\`"
+hit  "$(cat "$ih_dir/memory/builds/tRun/BACKLOG.md")" "- SEV · ARCH-tRun-2 · BLOCKER · "
+hit  "$(tail -1 "$ih_out/asks-calls.txt")" "--tsv --ready ARCH-tRun-2 --target tRun"
+same "TOOL-dUnstuckLanding-16 AC4 nothing outside the build's folder is staged" \
+  "$(run_ih_repo diff --cached --name-only | grep -v '^memory/builds/tRun/')" ""
+
+# AC5: an age under the bound, and an unproven age, are MET with the ask filed HIGH — never escalated.
+for _a in 1 -; do
+  build_ih_policy "$IH_UNDECL"; write_ih_asks
+  out=$(IH_AGE="$_a" run_ih --close tRun $IHOVR)
+  hit  "$out" "gates-green MET over an inherited-only red under INHERITED_RED=land: x leg red at ${IH_R:0:8}, every one INHERITED; none aged past the 2-landing age bound"
+  hit  "$out" "gates-green: filed ask ARCH-tRun-2 for leg x leg red at ${IH_R:0:8}, HIGH, staged in memory/builds/tRun/BACKLOG.md"
+  hit  "$(cat "$ih_dir/memory/builds/tRun/BACKLOG.md")" "- SEV · ARCH-tRun-2 · HIGH · a merge-bar leg is red on the default branch"
+  miss "$(cat "$ih_dir/memory/builds/tRun/BACKLOG.md")" "older than the"
+done
+
+# AC6: gates-green twice over the same aged leg at the same R files ONE BLOCKER — the second reads the
+# first back OPEN at BLOCKER and reuses it. Under park, so the item can run again on the same run;
+# the SEV follows the age under either policy. An ask read back at another SEV is NOT reused (F3).
+build_ih_policy "INHERITED_RED=park\nINHERITED_RED_MAX_AGE=2\n"; write_ih_asks
+out=$(IH_AGE=aged IH_ASK_SEV=BLOCKER run_ih --close tRun $IHOVR)
+hit  "$out" "gates-green: filed ask ARCH-tRun-2 for leg x leg red at ${IH_R:0:8}, BLOCKER"
+hit  "$out" "hold · inherited-red · until probe gate · x leg red at ${IH_R:0:8}, INHERITED; INHERITED_RED=park"
+run_ih_repo add -A >/dev/null; run_ih_repo commit -q -m "records: the BLOCKER ask" --no-verify
+out=$(IH_AGE=aged IH_ASK_SEV=BLOCKER run_ih --close tRun $IHOVR)
+hit  "$out" "gates-green: ask ARCH-tRun-2 already OPEN for leg x leg at ${IH_R:0:8} · reused"
+same "TOOL-dUnstuckLanding-16 AC6 the reuse staged no BACKLOG row" "$(run_ih_repo diff --cached --name-only -- memory/builds/tRun/BACKLOG.md)" ""
+same "TOOL-dUnstuckLanding-16 AC6 one BLOCKER for the leg at R" "$(grep -c '^- SEV · ARCH-tRun-[0-9]* · BLOCKER · ' "$ih_dir/memory/builds/tRun/BACKLOG.md")" "1"
+out=$(IH_AGE=aged IH_ASK_SEV=HIGH run_ih --close tRun $IHOVR)
+miss "$out" "already OPEN for leg x leg"
+# ...and a second leg reading OWN beside the aged one, under land: UNMET with the attribution lines and
+# no hold line — a red of the run's own never lands, at any age of its neighbour.
+for _v in OWN MIXED; do
+  build_ih_policy "$IH_UNDECL"
+  out=$(IH_AGE=aged IH_SECOND="$_v" run_ih --close tRun $IHOVR)
+  hit  "$out" "a machine-checked DoD item is unmet, so --close blocks: gates-green"
+  hit  "$out" "GATE attr  y leg  $_v · stub"
+  miss "$out" "gates-green MET over an inherited-only red"
+  miss "$out" "hold · "
 done
 
 # AC15: the same inherited-only record on a bar whose verdict reads tree_moved yes is UNMET, naming it.
@@ -11593,7 +11649,7 @@ hit  "$out" "phase ABORTED"
 build_ih_policy "$IH_LAND"; write_ih_asks
 out=$(run_ih --close tRun $IHOVR)
 hit  "$out" "gates-green MET over an inherited-only red under INHERITED_RED=land"
-hit  "$out" "gates-green: filed ask ARCH-tRun-2 for leg x leg red at ${IH_R:0:8}, staged in memory/builds/tRun/BACKLOG.md"
+hit  "$out" "gates-green: filed ask ARCH-tRun-2 for leg x leg red at ${IH_R:0:8}, HIGH, staged in memory/builds/tRun/BACKLOG.md"
 hit  "$(run_ih_repo diff --cached -- memory/builds/tRun/BACKLOG.md)" "+- ARCH-tRun-2 · filed "
 hit  "$(cat "$ih_dir/memory/builds/tRun/BACKLOG.md")" " · seen \`fx/x.sh\`@${IH_R:0:8} run \`bash fx/x.sh\` · accept the leg is green at the default branch's tip"
 hit  "$(cat "$ih_dir/memory/builds/tRun/BACKLOG.md")" "- SEV · ARCH-tRun-2 · HIGH · a merge-bar leg is red on the default branch"

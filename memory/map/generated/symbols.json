@@ -6738,6 +6738,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "render_live_blockers",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "render_liveness",
       "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"

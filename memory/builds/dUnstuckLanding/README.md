@@ -84,14 +84,14 @@ ids TOOL-dUnstuckLanding-13 TOOL-dUnstuckLanding-14 TOOL-dUnstuckLanding-15 TOOL
 | [TOOL-dUnstuckLanding-2 — the design: unattended closes through inherited reds and closing decisions, plus attended-landing verbs](spec/2026-10-04-spec-TOOL-dUnstuckLanding-2.md) | 2 | 1 | CLOSED | rev-2 | 2026-10-04 |
 | [TOOL-dUnstuckLanding-12 — design rev-2: the closing review's five HIGH findings closed](spec/2026-10-04-spec-TOOL-dUnstuckLanding-12.md) | 3 | 1 | CLOSED | rev-1 | 2026-10-04 |
 | [TOOL-dUnstuckLanding-15 — drift-audit reports ABORTED run records whose work landed anyway](spec/2026-10-04-spec-TOOL-dUnstuckLanding-15.md) | 3 | 2 | CLOSED | rev-1 | 2026-10-04 |
-| [TOOL-dUnstuckLanding-16 — an INHERITED red lands at any age, and the age escalates its ask](spec/2026-10-04-spec-TOOL-dUnstuckLanding-16.md) | 4 | 2 | INPROGRESS | rev-1 | 2026-10-04 |
+| [TOOL-dUnstuckLanding-16 — an INHERITED red lands at any age, and the age escalates its ask](spec/2026-10-04-spec-TOOL-dUnstuckLanding-16.md) | 4 | 2 | CLOSED | rev-1 | 2026-10-04 |
 | [TOOL-dUnstuckLanding-17 — the history legs grade the run's own range, and check 23 a per-build budget](spec/2026-10-04-spec-TOOL-dUnstuckLanding-17.md) | 5 | 2 | INPROGRESS | rev-1 | 2026-10-04 |
 | [TOOL-dUnstuckLanding-18 — the close-decision table, and a build that lands with its rest carried forward](spec/2026-10-04-spec-TOOL-dUnstuckLanding-18.md) | 6 | 2 | INPROGRESS | rev-1 | 2026-10-04 |
 | [TOOL-dUnstuckLanding-19 — refresh before a verdict: one helper, the `refreshed-at` fact](spec/2026-10-04-spec-TOOL-dUnstuckLanding-19.md) | 7 | 2 | INPROGRESS | rev-1 | 2026-10-04 |
 | [TOOL-dUnstuckLanding-20 — `LANDING_NODES`: landing capability declared, resolved from machine and user, and a planned hand-off](spec/2026-10-04-spec-TOOL-dUnstuckLanding-20.md) | 8 | 2 | INPROGRESS | rev-1 | 2026-10-04 |
 <!-- /gen:build-units -->
 
-Records: 16 bound to this build, across 4 record folder(s).
+Records: 17 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

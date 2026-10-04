@@ -1031,9 +1031,9 @@ MOVED is unmet, naming the move, and prints no hold, because something writing t
 is yours to find.
 
 **A red the bar reads as INHERITED is not yours to override.** `gates-green` reads the inherited-red
-policy at the tip the remote advertises and attributes the red there. Under `land` an inherited-only
-red within its age bound is met. Under `park`, or past the bound, the item prints the hold for an
-inherited red, a line of the shape
+policy at the tip the remote advertises and attributes the red there. Under `land`, the kit default,
+an inherited-only red is met at any age, and a leg older than the age bound has its ask filed
+BLOCKER. Under a declared `park` the item prints the hold for an inherited red, a line of the shape
 `hold · inherited-red · until probe gate · <legs> red at <R8>, INHERITED; INHERITED_RED=<policy>`.
 `--override gates-green` and
 `--abort --code gate-red-out-of-scope` are both refused unless that bar's record reads every red leg

@@ -7039,9 +7039,13 @@ verb_resume() { # slug
 # pair of quotes stripped. A run that commits `land` into its own copy therefore enables nothing, and
 # a run that re-points the conf key moves nothing until a gated push has landed it.
 #
-# BLANK IS `park`, AND IT SAYS SO. Absent, blank or malformed reads `park`, and so does `land` with no
-# positive age bound beside it; every one of those is announced on the policy line, because the
-# difference between the two readings is whether an inherited red lands.
+# BLANK IS `land`, THE KIT DEFAULT, AND IT SAYS SO (ruling TOOL-dUnstuckLanding-22, superseding that
+# part of TOOL-dDerivedDocket-24's D12-i4; built by TOOL-dUnstuckLanding-16). No policy file named,
+# one absent at R, and an absent or blank `INHERITED_RED` all read `land`, and `land` with no positive
+# bound reads `land` with no bound. A value outside `park land` still reads `park`, because a typo must
+# never land a red, and so does a path that leaves the tree and a missing R, where nothing can read
+# INHERITED. Every reading is announced on the policy line. THE AGE DECIDES ESCALATION ONLY: an
+# INHERITED red lands under `land` at any age, and an aged leg's ask is filed BLOCKER, not HIGH.
 #
 # WHAT THIS DOES NOT DECIDE: whether a red is inherited. That is the runner's attribution, read here
 # from the run record of a bar whose id this driver pinned, and never re-derived.
@@ -7069,41 +7073,47 @@ read_policy_key() { # file text · key -> the LAST `<key>=` line's value, cleane
 
 GP_POLICY=park; GP_MAX_AGE=""; GP_WHY=""
 read_gate_policy() { # R -> GP_POLICY (park|land), GP_MAX_AGE (a positive integer, or empty) and GP_WHY
-  local r=$1 conf path blob pol age
+  local r=$1 conf path blob pol age bnd
   GP_POLICY=park; GP_MAX_AGE=""; GP_WHY=""
   if [ -z "$r" ]; then
     GP_WHY="no advertised tip was observed, so there is no R to read a gate policy at"; return 0
   fi
   # THE CONF'S OWN NAME, derived from the path this driver sourced, so the file is spelled once.
   if ! conf=$(GIT show "$r:${CONF##*/}" 2>/dev/null); then
-    GP_WHY="the project conf is absent at ${r:0:8}, so no gate policy is adopted there"; return 0
+    GP_POLICY=land
+    GP_WHY="the project conf is absent at ${r:0:8}, so no policy file is named and the kit default land applies, with no age bound"; return 0
   fi
   path=$(read_policy_key "$conf" GATE_POLICY_FILE)
   if [ -z "$path" ]; then
-    GP_WHY="GATE_POLICY_FILE is blank or absent in the conf at ${r:0:8}, so no gate policy is adopted"; return 0
+    GP_POLICY=land
+    GP_WHY="GATE_POLICY_FILE is blank or absent in the conf at ${r:0:8}, so the kit default land applies, with no age bound"; return 0
   fi
   case "$path" in
     /*|[A-Za-z]:*|..|../*|*/..|*/../*)
-      GP_WHY="GATE_POLICY_FILE at ${r:0:8} is not a repo-relative path inside the tree: $path"; return 0 ;;
+      GP_WHY="GATE_POLICY_FILE at ${r:0:8} is not a repo-relative path inside the tree, which reads park: $path"; return 0 ;;
   esac
   if ! blob=$(GIT show "$r:$path" 2>/dev/null); then
-    GP_WHY="GATE_POLICY_FILE names $path, which is absent at ${r:0:8}"; return 0
+    GP_POLICY=land
+    GP_WHY="GATE_POLICY_FILE names $path, which is absent at ${r:0:8}, so the kit default land applies, with no age bound"; return 0
   fi
   pol=$(read_policy_key "$blob" INHERITED_RED)
   age=$(read_policy_key "$blob" INHERITED_RED_MAX_AGE)
   case "$age" in ''|0*|*[!0-9]*) age="" ;; esac
+  if [ -n "$age" ]; then bnd="an age bound of $age first-parent landings"; else bnd="no age bound"; fi
+  # THE BOUND TRAVELS UNDER EITHER POLICY when one is declared: the runner ages and owns each
+  # INHERITED leg with it, and the auto-filed ask names that owner and is escalated BLOCKER when the
+  # leg reads aged. Nothing lands or holds on it.
   case "$pol" in
-    land) if [ -n "$age" ]; then
-            GP_POLICY=land; GP_MAX_AGE=$age
+    land) GP_POLICY=land; GP_MAX_AGE=$age
+          if [ -n "$age" ]; then
             GP_WHY="INHERITED_RED=land with an age bound of $age first-parent landings, read from $path at ${r:0:8}"
           else
-            GP_WHY="INHERITED_RED=land with no positive INHERITED_RED_MAX_AGE beside it in $path at ${r:0:8}, which reads park"
+            GP_WHY="INHERITED_RED=land with no positive INHERITED_RED_MAX_AGE beside it in $path at ${r:0:8}, so no leg is aged and nothing is escalated"
           fi ;;
-    # UNDER `park` THE BOUND STILL TRAVELS when one is declared: the runner ages and owns each
-    # INHERITED leg with it, and the auto-filed ask names that owner. Nothing lands on it.
     park) GP_MAX_AGE=$age; GP_WHY="INHERITED_RED=park, read from $path at ${r:0:8}" ;;
-    '')   GP_WHY="$path at ${r:0:8} declares no INHERITED_RED" ;;
-    *)    GP_WHY="INHERITED_RED is '$pol' in $path at ${r:0:8}, outside 'park land'" ;;
+    '')   GP_POLICY=land; GP_MAX_AGE=$age
+          GP_WHY="$path at ${r:0:8} declares no INHERITED_RED, so the kit default land applies, with $bnd" ;;
+    *)    GP_WHY="INHERITED_RED is '$pol' in $path at ${r:0:8}, outside 'park land', which reads park" ;;
   esac
 }
 
@@ -7112,19 +7122,20 @@ read_gate_policy() { # R -> GP_POLICY (park|land), GP_MAX_AGE (a positive intege
 #
 #   the verdict reads tree_moved yes                  moved   UNMET, naming the move
 #   no usable record (see below)                      none    UNMET exactly as before this unit
-#   every red INHERITED, none aged, policy land       land    MET, a gates-inherited fact
-#   every red INHERITED, policy park or any aged      hold    UNMET, the hold line
-#   any OWN, MIXED, DEAD PROBE or CONTENDED           other   UNMET, the attribution lines
+#   every red INHERITED, at any age, policy land       land    MET, a gates-inherited fact
+#   every red INHERITED, policy park                   hold    UNMET, the hold line
+#   any OWN, MIXED, DEAD PROBE or CONTENDED            other   UNMET, the attribution lines
 #
 # A USABLE RECORD is a RED verdict with no wall breach and `tree_moved no`, beside an attribution
 # with one row per failed leg. A wall that fired left the legs it killed out of the attribution, so a
-# partial record is not an all-INHERITED one. An UNPROVEN age reads as aged: it never lands. "Any
-# aged" is read inside the all-INHERITED rows, so a run's own red always reaches the attribution
-# lines rather than a hold that no resume can clear.
-GR_STATE=none; GR_LEGS=""; GR_WHY=""
-read_gates_record() { # run dir · policy -> GR_STATE, GR_LEGS (the red legs, comma-joined) and GR_WHY
-  local d=$1 pol=$2 v tm fl wb n=0 inh=0 aged=0 leg ver age
-  GR_STATE=none; GR_LEGS=""; GR_WHY=""
+# partial record is not an all-INHERITED one. THE AGE DECIDES NO ROW (TOOL-dUnstuckLanding-16 S3): an
+# aged leg, and one whose age is unproven, land under `land` like any other. GR_AGED names the legs
+# whose age reads `aged` — never an unproven one, since nothing proves it aged — for the BLOCKER
+# escalation and the MET line.
+GR_STATE=none; GR_LEGS=""; GR_WHY=""; GR_AGED=""
+read_gates_record() { # run dir · policy -> GR_STATE, GR_LEGS and GR_AGED (comma-joined) and GR_WHY
+  local d=$1 pol=$2 v tm fl wb n=0 inh=0 leg ver age
+  GR_STATE=none; GR_LEGS=""; GR_WHY=""; GR_AGED=""
   if [ -z "$d" ] || [ ! -f "$d/verdict" ]; then
     GR_WHY="the bar left no run record under the id this driver pinned"; return 0
   fi
@@ -7145,7 +7156,7 @@ read_gates_record() { # run dir · policy -> GR_STATE, GR_LEGS (the red legs, co
     n=$((n + 1)); GR_LEGS="$GR_LEGS${GR_LEGS:+,}$leg"
     [ "$ver" = INHERITED ] || continue
     inh=$((inh + 1))
-    case "$age" in ''|-|*[!0-9]*) aged=$((aged + 1)) ;; esac
+    [ "$age" = aged ] && GR_AGED="$GR_AGED${GR_AGED:+,}$leg"
   done < "$d/attribution"
   if [ "$n" = 0 ] || [ "$n" != "${fl:-}" ]; then
     GR_WHY="the attribution names $n red leg(s) and the verdict counts ${fl:-none} failed"; return 0
@@ -7153,9 +7164,8 @@ read_gates_record() { # run dir · policy -> GR_STATE, GR_LEGS (the red legs, co
   if [ "$inh" != "$n" ]; then
     GR_STATE=other; GR_WHY="a red leg reads OWN, MIXED, DEAD PROBE or CONTENDED, so this red is the run's to fix"; return 0
   fi
-  if [ "$pol" = land ] && [ "$aged" = 0 ]; then GR_STATE=land; return 0; fi
+  if [ "$pol" = land ]; then GR_STATE=land; return 0; fi
   GR_STATE=hold
-  [ "$aged" -gt 0 ] && GR_WHY="$aged INHERITED leg(s) read aged or unproven past the age bound, which never lands"
   return 0
 }
 
@@ -7230,14 +7240,21 @@ print_gate_backstop() { # where the bound came from -> the line, from GB_SUM and
 # and a KEEP row, in the grammar the memory-tree kit's parser reads. This driver is shell and has no
 # declared route to that kit's Python renderers, so it writes the rows in their grammar and has the
 # parser, reached through `ASKS_CMD` in call shape 1 with no `--at` (the rows are staged and exist at
-# no rev), read each new id back. One `ask` row, status OPEN, SEV HIGH and this slug as its home is
-# the only acceptance; anything else REMOVES the rows and prints the witness, so a grammar drift
-# between this writer and that parser is caught at write time rather than by the next reader.
+# no rev), read each new id back. One `ask` row, status OPEN, the SEV this item owes and this slug as
+# its home is the only acceptance; anything else REMOVES the rows and prints the witness, so a grammar
+# drift between this writer and that parser is caught at write time rather than by the next reader.
+#
+# THE SEV IS THE AGE'S ESCALATION (TOOL-dUnstuckLanding-16 S4, ruling TOOL-dUnstuckLanding-22). A leg
+# whose age reads `aged` — red already at R~n under the declared bound n — is filed BLOCKER, with a
+# text naming the bound; every other INHERITED leg, an unproven age included, is filed HIGH. The ask
+# stays in the CLOSING build's backlog either way, where ABSORB's fourth condition reads it.
 #
 # REUSED BEFORE IT IS FILED. An ask this build already filed for the SAME leg red at the SAME R, read
-# back OPEN, is named and nothing is written: each resume of a held run reruns this item over the same
-# inherited red, and a second HIGH ask per hold is noise an owner has to dispose of. The match needs R
-# as well as the leg, because the ask's `seen` locator and `run` command pin R.
+# back OPEN at the SEV now owed, is named and nothing is written: each resume of a held run reruns this
+# item over the same inherited red, and a second ask per hold is noise an owner has to dispose of. The
+# match needs R as well as the leg, because the ask's `seen` locator and `run` command pin R. An ask
+# read back at ANOTHER severity is not reused (the unit's F3): a BLOCKER that should exist is never
+# hidden behind a HIGH, and the duplicate is visible.
 #
 # STAGED BY THIS ITEM, and committed by the step that closes the run. On the MET path, under
 # `LANDER_MODE=in-place`, `--close` commits them in its own records commit (`write_close_commit`),
@@ -7310,8 +7327,8 @@ write_backlog_rows() { # BACKLOG.md path · slug · ask row · SEV row · KEEP r
   mv "$tmp" "$f"
 }
 
-read_ask_back() { # ask id · slug -> 0 when ASKS_CMD reads it back as ONE OPEN HIGH ask homed at slug; AB_WHY
-  local id=$1 slug=$2 rc rows n
+read_ask_back() { # ask id · slug · SEV -> 0 when ASKS_CMD reads it back as ONE OPEN ask of that SEV homed at slug; AB_WHY
+  local id=$1 slug=$2 sev=$3 rc rows n
   AB_WHY=""
   run_bounded $ASKS_CMD --tsv --ready "$id" --target "$slug"; rc=$?
   if [ -z "$RB_STDOUT" ]; then AB_WHY=$(derive_stream_verdict "$rc"); return 1; fi
@@ -7325,7 +7342,7 @@ read_ask_back() { # ask id · slug -> 0 when ASKS_CMD reads it back as ONE OPEN 
   n=$(printf '%s\n' "$rows" | awk 'NF' | wc -l | tr -d ' ')
   if [ "$n" != 1 ]; then AB_WHY="the declared ask generator returned $n row(s) for $id, and one is the only answer"; return 1; fi
   case "$rows" in
-    "$id	OPEN	$slug	HIGH") return 0 ;;
+    "$id	OPEN	$slug	$sev") return 0 ;;
   esac
   AB_WHY="the declared ask generator read $id back as: $rows"
   return 1
@@ -7333,18 +7350,20 @@ read_ask_back() { # ask id · slug -> 0 when ASKS_CMD reads it back as ONE OPEN 
 
 write_inherited_asks() { # slug · R · run dir
   local slug=$1 r=$2 d=$3 bl leg ver age own8 ownid cand reused fam seq id argv file tok a s k prior had restored
-  local r8=${2:0:8} today
+  local r8=${2:0:8} today sev
   bl="$M/builds/$slug/BACKLOG.md"
   today=$(date -u +%Y-%m-%d)
   [ -f "$d/attribution" ] || return 0
   while IFS=$'\t' read -r leg ver _ _ _ age own8 ownid _; do
     [ "$ver" = INHERITED ] || continue
-    # REUSE FIRST, over this build's own filings for the same leg AND the same R.
+    # THE SEV OWED: BLOCKER for an aged leg, HIGH for every other one, an unproven age included.
+    sev=HIGH; [ "$age" = aged ] && sev=BLOCKER
+    # REUSE FIRST, over this build's own filings for the same leg AND the same R, at the SEV owed.
     reused=""
     if [ -f "$bl" ] && [ -n "${ASKS_CMD:-}" ]; then
       while IFS= read -r cand; do
         [ -n "$cand" ] || continue
-        if read_ask_back "$cand" "$slug"; then
+        if read_ask_back "$cand" "$slug" "$sev"; then
           echo "gates-green: ask $cand already OPEN for leg $leg at $r8 · reused"; reused=1; break
         fi
       done < <(grep -F -- "inherited red: leg $leg red at $r8," "$bl" 2>/dev/null \
@@ -7372,12 +7391,18 @@ write_inherited_asks() { # slug · R · run dir
     [ -n "$file" ] || file=${argv%% *}
     seq=$(derive_ask_seq "$fam" "$slug")
     id="$fam-$slug-$seq"
-    if [ "$own8" != - ] && [ -n "$own8" ]; then
+    if [ "$sev" = BLOCKER ]; then
+      a="- $id · filed $today · inherited red: leg $leg red at $r8, older than the ${GP_MAX_AGE:-declared}-landing age bound · seen \`$file\`@$r8 run \`$argv\` · accept the leg is green at the default branch's tip"
+    elif [ "$own8" != - ] && [ -n "$own8" ]; then
       a="- $id · filed $today · inherited red: leg $leg red at $r8, introduced by $own8 · seen \`$file\`@$r8 run \`$argv\` · accept the leg is green at the default branch's tip → $own8"
     else
       a="- $id · filed $today · inherited red: leg $leg red at $r8, introduced by an unknown landing · seen \`$file\`@$r8 run \`$argv\` · accept the leg is green at the default branch's tip"
     fi
-    s="- SEV · $id · HIGH · a merge-bar leg is red on the default branch"
+    if [ "$sev" = BLOCKER ]; then
+      s="- SEV · $id · BLOCKER · a merge-bar leg is red on the default branch, older than the age bound"
+    else
+      s="- SEV · $id · HIGH · a merge-bar leg is red on the default branch"
+    fi
     k="- KEEP · $id · filed by an unattended run for the owning build; outside this build's goal"
     if [ -z "${ASKS_CMD:-}" ]; then
       echo "gates-green: ASKS_CMD is blank, so the auto-file is DARK and writes nothing; it would have filed, in $bl:"
@@ -7402,8 +7427,8 @@ write_inherited_asks() { # slug · R · run dir
       fi
     fi
     mkdir -p "${bl%/*}" && write_backlog_rows "$bl" "$slug" "$a" "$s" "$k" && GIT add -- "$bl" 2>/dev/null
-    if read_ask_back "$id" "$slug"; then
-      echo "gates-green: filed ask $id for leg $leg red at $r8, staged in $bl"
+    if read_ask_back "$id" "$slug" "$sev"; then
+      echo "gates-green: filed ask $id for leg $leg red at $r8, $sev, staged in $bl"
     else
       # REMOVED, and the file put back exactly as it was: a row the parser cannot read back is a row
       # every later reader would read differently from this writer. A path that EXISTED before the
@@ -7414,9 +7439,9 @@ write_inherited_asks() { # slug · R · run dir
         if cp -- "$prior" "$bl"; then GIT add -- "$bl" 2>/dev/null; else restored=0; fi
       else GIT rm -q --cached -f -- "$bl" >/dev/null 2>&1; rm -f -- "$bl"; fi
       if [ "$restored" = 1 ]; then
-        echo "gates-green: the rows for leg $leg were REMOVED — the declared ask generator did not read $id back as one OPEN HIGH ask homed at $slug: $AB_WHY"
+        echo "gates-green: the rows for leg $leg were REMOVED — the declared ask generator did not read $id back as one OPEN $sev ask homed at $slug: $AB_WHY"
       else
-        echo "gates-green: the rows for leg $leg could NOT be removed — $bl was not put back from its backup, which is KEPT at $prior; restore it by hand before committing. The declared ask generator did not read $id back as one OPEN HIGH ask homed at $slug: $AB_WHY"
+        echo "gates-green: the rows for leg $leg could NOT be removed — $bl was not put back from its backup, which is KEPT at $prior; restore it by hand before committing. The declared ask generator did not read $id back as one OPEN $sev ask homed at $slug: $AB_WHY"
         prior=""
       fi
       [ -z "${RB_OUT:-}" ] || printf '%s\n' "$RB_OUT" | sed 's/^/    /'
@@ -7928,7 +7953,7 @@ dod_met() { # slug · run-state file · item · checker
       # fixed that call site and did not grep for this one.
       DOD_OUT=""
       [ -n "$GATE_CMD" ] || return 1
-      local _grc _gr _gid _ggd _gh _gdir _gout _hold _gtry=0 _gbs=0 _gbound
+      local _grc _gr _gid _ggd _gh _gdir _gout _hold _gesc _gtry=0 _gbs=0 _gbound
       local -a _genv
       # TOOL-dDerivedDocket-24 S6 - THE BAR IS ATTRIBUTED AGAINST R AND HANDED THE POLICY READ AT R.
       # R is the tip `observe_anchor` saw the remote ADVERTISE, never local main or any other local
@@ -8062,10 +8087,10 @@ dod_met() { # slug · run-state file · item · checker
           fi ;;
         1)
           # TOOL-dDerivedDocket-24 S6 - THE DECISION TABLE over this bar's own record;
-          # `read_gates_record` states it, first matching row wins. Every red leg INHERITED within
-          # its age under `land` is MET; the same under `park`, or with an age past the bound, is
-          # UNMET and prints the hold line the Skill acts on; anything else is UNMET with the
-          # attribution lines exactly as before that unit.
+          # `read_gates_record` states it, first matching row wins. Every red leg INHERITED, at any
+          # age, under `land` is MET (TOOL-dUnstuckLanding-16); the same under `park` is UNMET and
+          # prints the hold line the Skill acts on; anything else is UNMET with the attribution lines
+          # exactly as before that unit. The MET line names the aged legs, whose asks are BLOCKER.
           read_gates_record "$_gdir" "$GP_POLICY"
           case "$GR_STATE" in
             moved)
@@ -8076,7 +8101,14 @@ dod_met() { # slug · run-state file · item · checker
               if [ "$GR_STATE" = land ]; then
                 GG_RUN_FACT="$_gid ${_gh:0:8}"
                 GG_INH_FACT="${_gr:0:8} $GR_LEGS"
-                DOD_OUT="gates-green MET over an inherited-only red under INHERITED_RED=land: $GR_LEGS red at ${_gr:0:8}, every one INHERITED within the ${GP_MAX_AGE}-landing age bound"
+                if [ -z "$GP_MAX_AGE" ]; then
+                  _gesc="no age bound is declared, so no leg is aged and nothing is escalated"
+                elif [ -n "$GR_AGED" ]; then
+                  _gesc="aged past the ${GP_MAX_AGE}-landing age bound, so each ask is BLOCKER: $GR_AGED"
+                else
+                  _gesc="none aged past the ${GP_MAX_AGE}-landing age bound"
+                fi
+                DOD_OUT="gates-green MET over an inherited-only red under INHERITED_RED=land: $GR_LEGS red at ${_gr:0:8}, every one INHERITED; $_gesc"
                 return 0
               fi
               if [ "$GR_STATE" = hold ]; then

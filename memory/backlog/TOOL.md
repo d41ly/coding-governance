@@ -444,7 +444,6 @@ Cite ids, never line numbers.
 | [TOOL-dUnstalledConvoy-36](../builds/dUnstalledConvoy/BACKLOG.md) | OPEN | — | — | 2026-08-24 | refusal_join.py's JOIN half has never executed. Its docstring promises… |
 | [TOOL-dUnstalledConvoy-37](../builds/dUnstalledConvoy/BACKLOG.md) | OPEN | — | — | 2026-08-24 | core.hooksPath is repo-global and absolute, so in this multi-worktree… |
 | [TOOL-dUnstalledConvoy-38](../builds/dUnstalledConvoy/BACKLOG.md) | OPEN | — | — | 2026-08-24 | --landed's check 34 compares the lander marker against the run's own… |
-| [TOOL-dUnstuckLanding-6](../builds/dUnstuckLanding/BACKLOG.md) | INPROGRESS | HIGH | TOOL-dUnstuckLanding-16 | 2026-10-04 | an INHERITED red lands whatever its age, and the age becomes an… |
 | [TOOL-dUnstuckLanding-7](../builds/dUnstuckLanding/BACKLOG.md) | INPROGRESS | HIGH | TOOL-dUnstuckLanding-17 | 2026-10-04 | the history-anchored legs (brief-recorded, check 23 and pass-order)… |
 | [TOOL-dUnstuckLanding-8](../builds/dUnstuckLanding/BACKLOG.md) | INPROGRESS | HIGH | TOOL-dUnstuckLanding-18 | 2026-10-04 | a closed close-decision table in the protocol, mapping each recurring… |
 | [TOOL-dUnstuckLanding-9](../builds/dUnstuckLanding/BACKLOG.md) | INPROGRESS | MED | TOOL-dUnstuckLanding-19 | 2026-10-04 | refresh before a verdict: one shared helper, called by --park,… |

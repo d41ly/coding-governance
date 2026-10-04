@@ -493,34 +493,43 @@ rotation does not re-date it. Blank turns the arm off, announced.
 
 ## 13. The inherited red — land, park, or absorb
 
-*`TOOL-dDerivedDocket-24`, by owner rulings D12-i4 and D12-i5. The hold code is §2's.*
+*`TOOL-dDerivedDocket-24`, by owner rulings D12-i4 and D12-i5; the age as an escalation and the kit
+default `land` by ruling `TOOL-dUnstuckLanding-22`, which supersedes that part of D12-i4. The hold
+code is §2's.*
 
 **The bar says whose a red is, and a policy says what happens next.** `gates-green` attributes a
 red against R, the tip `observe_anchor` saw the remote advertise, and ages each INHERITED leg against
 R's last `INHERITED_RED_MAX_AGE` first-parent landings: red with the same offenders at the far end
 is `aged`, and otherwise a bisection names the landing that introduced it. A probe that cannot
-answer reads `age unproven` and never counts toward the bound: a leg with no `signature` whose far
-end is red WITHOUT every non-blank line of this run's output is one, since text cannot tell a fixed
-offender from a moved count line; red carrying all of them is `aged`. The policy is the pair of
-keys in the file `GATE_POLICY_FILE` names, both read at R and parsed, never sourced. Blank or
-malformed reads `park`, and so does `land` with no positive bound; the item announces which.
+answer reads `age unproven` and is never escalated: a leg with no `signature` whose far end is red
+WITHOUT every non-blank line of this run's output is one, since text cannot tell a fixed offender
+from a moved count line; red carrying all of them is `aged`. **The age decides the escalation, never
+the landing.** The policy is the pair of keys in the file `GATE_POLICY_FILE` names, both read at R
+and parsed, never sourced. The kit default is `land`: a blank `GATE_POLICY_FILE`, a policy file
+absent at R, and an absent or blank `INHERITED_RED` all read it, and `land` with no positive bound
+reads `land` with no bound. A value outside `park land` reads `park`. The item announces which.
 
-- **`land`, every red INHERITED within the bound, on a bar whose verdict reads `tree_moved no`:**
-  MET, and the record gains `gates-inherited: <R8> <legs>`. The pre-push hook reads the same policy
-  at the same R and lands the push, printing the legs. An attended push lands over it too.
-- **`park`, the kit default, or any inherited red aged:** UNMET, printing
+- **`land`, every red INHERITED at any age, on a bar whose verdict reads `tree_moved no`:** MET, and
+  the record gains `gates-inherited: <R8> <legs>`; the MET line names the legs read `aged`. The
+  pre-push hook reads the same policy at the same R and lands the push, printing the legs. An
+  attended push lands over it too.
+- **`park`, declared:** UNMET, printing
   `hold · inherited-red · until probe gate · <legs> red at <R8>, INHERITED; INHERITED_RED=<policy>`.
   Take that hold in this order: commit the staged records, push the branch, reap the keepalive, then
   `--hold` with that code, condition and reason and `--reaped`. It refuses a dirty tree otherwise.
 - **Any leg OWN, MIXED, DEAD PROBE or CONTENDED, or a moved tree:** UNMET with the attribution
   lines. That red is the run's, and so is every red on a bar whose diff edited its own grader (KF3).
 
-**Every inherited leg gets an owner on the record.** Once `ASKS_CMD` is declared, the item files one
-ask per INHERITED leg in the build's `BACKLOG.md`: a `seen` locator pinned at R with the leg's `run`
-command, an `accept` clause, a SEV HIGH row and a KEEP row, staged and read back through `ASKS_CMD`.
-Rows the generator does not read back as one OPEN ask are removed and named. An OPEN ask this build
-already filed for the same leg at the same R is reused and named, so a repeated hold files nothing
-twice. With `ASKS_CMD` blank the item prints the rows it would file and writes nothing.
+**Every inherited leg gets an owner on the record, and its age escalates it.** Once `ASKS_CMD` is
+declared, the item files one ask per INHERITED leg in the closing build's `BACKLOG.md`: a `seen`
+locator pinned at R with the leg's `run` command, an `accept` clause, a SEV HIGH row and a KEEP row,
+staged and read back through `ASKS_CMD`. An `aged` leg's ask is SEV BLOCKER instead, its text
+`inherited red: leg <leg> red at <R8>, older than the <n>-landing age bound`, and the memory tree's
+generated LIVE index lists every OPEN BLOCKER ask under `## Open BLOCKER asks`. Rows the generator
+does not read back as one OPEN ask of the SEV owed are removed and named. An OPEN ask this build
+already filed for the same leg at the same R, read back at the SEV owed, is reused and named, so a
+repeated close files nothing twice. With `ASKS_CMD` blank the item prints the rows it would file and
+writes nothing.
 
 **The two escape routes are backed or refused.** `--close --override gates-green` and
 `--abort --code gate-red-out-of-scope` are refused, numbered, unless the record the `gates-run` fact

@@ -205,8 +205,9 @@ SPEC_TOKENS_CLI=""
 # OPTIONAL. The repo-relative GATE POLICY FILE `gates-green` reads `INHERITED_RED=park|land` and
 # `INHERITED_RED_MAX_AGE=<n>` from, when the bar is red only on legs the landing base already carries.
 # Both this key and the file it names are read AS COMMITTED AT the tip the remote advertises and are
-# PARSED, never sourced, so a run cannot grant itself a landing by editing either. BLANK means no
-# policy is adopted and every inherited red PARKS as a hold, announced, which is the kit default.
+# PARSED, never sourced, so a run cannot grant itself a landing by editing either. BLANK names no
+# policy file, so the kit default `land` applies with no age bound, announced: every inherited red
+# lands, and nothing is escalated (ruling TOOL-dUnstuckLanding-22). Declare `park` in the file to hold.
 GATE_POLICY_FILE=""
 
 # OPTIONAL, the same shape again, and the one key an ASK-DRIVEN run needs. The generator the driver

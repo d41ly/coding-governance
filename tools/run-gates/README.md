@@ -400,8 +400,11 @@ which reads every red DEAD PROBE rather than guessing.
 With the bound set, each INHERITED leg runs once more at `R~n`, `R`'s n-th first-parent ancestor,
 from `R`'s row in the same scratch worktree. Red there carrying every offender L carries appends
 `aged at R~<n>`; otherwise a bisection of the window names the landing that introduced the red,
-`age <k> · owner <sha8> <id>`. A probe that cannot answer appends `age unproven`, and only a number
-counts toward the inherited-green stamp. Without a `signature` the offenders are the output's
+`age <k> · owner <sha8> <id>`. A probe that cannot answer appends `age unproven`. The age decides
+no landing (ruling `TOOL-dUnstuckLanding-22`): under an exported `land` the inherited-green stamp is
+written whenever every red leg reads INHERITED, at any age and with or without a bound, its
+`max_age` empty when none was handed; the unattended driver escalates an `aged` leg's ask to
+BLOCKER. Without a `signature` the offenders are the output's
 non-blank lines: red with every line of L's is red there, and red with ANY other output cannot be
 answered, because text cannot tell a fixed offender from a moved count line. Such a leg is aged
 only while its text holds still or shrinks toward L's; one whose red prints a changing count

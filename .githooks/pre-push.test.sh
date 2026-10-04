@@ -939,19 +939,57 @@ case "$_o" in
   *) bad "IR AC15 a moved tree must block, got: $_o" ;;
 esac
 
-# AC17: an aged row blocks under land; land beside a blank, zero or non-numeric bound reads park.
-_o=$(run_ir_push IR_AGE=aged)
-case "$_o" in
-  *"x reads INHERITED with age 'aged'"*"rc=1") ok "IR AC17 an aged inherited leg is blocked under land" ;;
-  *) bad "IR AC17 an aged leg must block, got: $_o" ;;
-esac
+# AC17, FLIPPED by TOOL-dUnstuckLanding-16 (ruling TOOL-dUnstuckLanding-22): an aged row, and an
+# age-unproven one, LAND under land — the age escalates the driver's ask and decides no landing. Land
+# beside a blank, zero or non-numeric bound reads land with NO bound, announced, and lands too; the
+# runner is handed no bound.
+for _a in aged -; do
+  _o=$(run_ir_push IR_AGE="$_a")
+  case "$_o" in
+    *"red on inherited legs only — landing under INHERITED_RED=land: x"*"rc=0") ok "IR AC17 an inherited leg with age '$_a' lands under land" ;;
+    *) bad "IR AC17 an inherited leg with age '$_a' must land under land, got: $_o" ;;
+  esac
+done
 for _b in "" 0 ten; do
   build_ir_fixture "ac17$_b" "INHERITED_RED=land\nINHERITED_RED_MAX_AGE=$_b\n" || bad "IR AC17 could not build its fixture"
   _o=$(run_ir_push)
   case "$_o" in
-    *"reads park — INHERITED_RED=land with no positive INHERITED_RED_MAX_AGE beside it, which reads park"*"rc=1")
-      ok "IR AC17 land with the bound '$_b' reads park, announced, and blocks" ;;
-    *) bad "IR AC17 land with the bound '$_b' must read park, got: $_o" ;;
+    *"reads land — declared, with no age bound, so no leg is aged"*"landing under INHERITED_RED=land: x"*"rc=0")
+      ok "IR AC17 land with the bound '$_b' reads land with no bound, announced, and lands" ;;
+    *) bad "IR AC17 land with the bound '$_b' must read land with no bound, got: $_o" ;;
+  esac
+  case "$(cat "$ir_env" 2>/dev/null)" in
+    "policy=land age= attr=${IR_R}") ok "IR AC17 land with the bound '$_b' hands the runner no bound" ;;
+    *) bad "IR AC17 land with the bound '$_b' handed the runner: $(cat "$ir_env" 2>/dev/null)" ;;
+  esac
+done
+
+# TOOL-dUnstuckLanding-16 AC3: R's policy file declares ONLY a bound. The kit default is land, so the
+# policy line names it, and an aged inherited-only red lands. `park` declared beside the same bound
+# blocks it, and a malformed value reads park and blocks it — a typo must never land a red. The
+# branch's own copy says something else each time, so a reader of the pushed tree is graded too.
+build_ir_fixture ac3d 'INHERITED_RED_MAX_AGE=2\n' || bad "IR TOOL-dUnstuckLanding-16 AC3 could not build its fixture"
+printf 'INHERITED_RED=park\nINHERITED_RED_MAX_AGE=2\nGOV_KITROOT=%s\n' "$KIT_REL" > .githooks/gate-env.sh
+git add -A >/dev/null 2>&1; git commit -q -m "the branch declares park in its own copy" >/dev/null 2>&1
+_o=$(run_ir_push IR_AGE=aged)
+case "$_o" in
+  *"inherited-red policy at ${IR_R:0:8} reads land — no INHERITED_RED is declared in .githooks/gate-env.sh there, so the kit default land applies"*"red on inherited legs only — landing under INHERITED_RED=land: x"*"rc=0")
+    ok "IR TOOL-dUnstuckLanding-16 AC3 an undeclared policy reads the kit default land and an aged inherited red lands" ;;
+  *) bad "IR TOOL-dUnstuckLanding-16 AC3 an undeclared policy must read the kit default land and land, got: $_o" ;;
+esac
+case "$(cat "$ir_env" 2>/dev/null)" in
+  "policy=land age=2 attr=${IR_R}") ok "IR TOOL-dUnstuckLanding-16 AC3 the kit default hands the runner land and the declared bound 2" ;;
+  *) bad "IR TOOL-dUnstuckLanding-16 AC3 the kit default handed the runner: $(cat "$ir_env" 2>/dev/null)" ;;
+esac
+for _p in park lnad; do
+  build_ir_fixture "ac3$_p" "INHERITED_RED=$_p\nINHERITED_RED_MAX_AGE=2\n" || bad "IR TOOL-dUnstuckLanding-16 AC3 could not build its fixture"
+  printf 'INHERITED_RED=land\nINHERITED_RED_MAX_AGE=2\nGOV_KITROOT=%s\n' "$KIT_REL" > .githooks/gate-env.sh
+  git add -A >/dev/null 2>&1; git commit -q -m "the branch grants itself land" >/dev/null 2>&1
+  _o=$(run_ir_push IR_AGE=aged)
+  case "$_o" in
+    *"red on inherited legs only"*) bad "IR TOOL-dUnstuckLanding-16 AC3 INHERITED_RED=$_p at R landed an inherited red: $_o" ;;
+    *"inherited-red policy at ${IR_R:0:8} reads park"*"rc=1") ok "IR TOOL-dUnstuckLanding-16 AC3 INHERITED_RED=$_p at R reads park and blocks the red" ;;
+    *) bad "IR TOOL-dUnstuckLanding-16 AC3 INHERITED_RED=$_p at R must read park and block, got: $_o" ;;
   esac
 done
 
