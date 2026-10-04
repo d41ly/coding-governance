@@ -224,10 +224,7 @@ belonging here:
     than the lease.
 17. **The refresh**, `refreshed-at`: the tip a verdict verb last saw past BASE, or `unobserved`.
 18. **The landing node**, `landing: lander` or `handoff`, resolved by `--preflight` from
-    `LANDING_NODES` (§8) at BASE and written afresh like the lease; absent when undeclared.
-19. **The bar's staged set**, `gates-staged`, written beside `gates-run`: the record, the build's
-    `BACKLOG.md` and the views gates-green staged. `--handoff`'s bar tie excludes exactly these;
-    absent, the record alone.
+    `LANDING_NODES` (§8) at BASE and at R, and written afresh like the lease; absent when undeclared.
 
 Facts 10, 11 and 12 are ABSENT on a run that never reached the condition each records; the
 "nothing else" clause bounds what may appear, not what must. Fact 9 is always written, fact 13
@@ -428,7 +425,8 @@ onto the advertised tip, `--close` grading THAT merge under `GATE_FULL=1` and co
 `LANDED` is also DERIVED (D12-i2) from a pushed `LANDING` commit.
 `UNATTENDED-STOPS.md` carries the rest.
 **A node `LANDING_NODES` does not declare lands nothing**: its `--close` refuses an override, writes
-a met bar's facts and names `--handoff --code owner-landing`. The close's own node decides.
+a met bar's facts and names `--handoff --code owner-landing`. The close's own node decides. That
+hand-off's bar tie excludes only paths the close staged, each while HEAD holds the blob staged.
 
 `landed-via-lander` is the machine-checked DoD item for this, and the gate greps the close path for
 a bypass flag in both directions: the lander must be present, the flag must be absent.
@@ -505,7 +503,7 @@ In the repo-root `.unattended.conf`. Blank or absent turns the corresponding ass
 | `LANDED_ANCHOR_CUTOFF` | the date from which a `LANDED` record must name its anchor kind. A record whose first commit predates it is read as `remote`; blank or absent grandfathers every record |
 | `LANDED_FACTS_CUTOFF` | from this date a landed record carries its verb's facts. Blank is off |
 | `HANDOFF_CUTOFF` | from this date `ABORTED` means DISCARD, §3. Blank is off |
-| `LANDING_NODES` | `<tag>=<machine>/<user>` pairs that may land, read at BASE; any other node hands off; `%20` spells a space. Blank: every node, announced. §6 |
+| `LANDING_NODES` | `<tag>=<machine>/<user>` pairs that may land, read at BASE and at R; any other node hands off; `%20` spells a space. Blank: every node, announced. §6 |
 | `DISPOSITION_CUTOFF` | the date from which a review exit's RECORDED disposition is read instead of inferred from new unit ids. Graded on the run-state record's own first-commit date; a record before it keeps the id-delta proxy, EXCEPT one with no first-commit date at all — a staged, in-flight record is graded whatever the cutoff says, being the one case that can still record a disposition. Blank or absent grandfathers every record and the leg says so on stdout, because a silently disabled clause reads exactly like a clause finding nothing wrong |
 | `RUNLOG_SESSION_VARS` | the environment variable NAMES, space-separated and eight at most, whose values each run-log START records as `sess.<NAME>=` (§2); a value outside `[A-Za-z0-9_.:-]{1,128}` is written empty and flagged. OPTIONAL: blank records none |
 

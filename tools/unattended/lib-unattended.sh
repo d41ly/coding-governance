@@ -1488,14 +1488,16 @@ check_work_landed() { # record file · advertised tip -> 0 landed · 1 not · 2 
 #
 # 0 upheld · 1 not upheld · 2 undecidable, the reason in WL_WHY. On 0, WLF_NOW is EMPTY, or the
 # reason the predicate no longer reads the work landed at <advertised tip> - the report line a later
-# revert becomes. CALLED AS A PLAIN COMMAND, for WL_WHY's reason.
+# revert becomes - and WLF_UNDECIDED is EMPTY, or the reason it could not re-judge that at all
+# (implementation review round 2, L8): a probe that cannot read the tip's first-parent line is not a
+# revert anybody observed. CALLED AS A PLAIN COMMAND, for WL_WHY's reason.
 #
 # WHAT IT DOES NOT CHECK: the record's phase or its date against HANDOFF_CUTOFF, which check 15
 # grades beside it; nor that the recorded tip was the one advertised when `--settle` ran.
-WLF_NOW=""
-check_work_landed_fact() { # record file · advertised tip -> 0 upheld · 1 not · 2 undecidable; WL_WHY, WLF_NOW
+WLF_NOW=""; WLF_UNDECIDED=""
+check_work_landed_fact() { # record file · advertised tip -> 0 upheld · 1 not · 2 undecidable; WL_WHY, WLF_NOW, WLF_UNDECIDED
   local _wf_f="${1:-}" _wf_adv="${2:-}" _wf_v _wf_n _wf_t="" _wf_wit _wf_full _wf_rc
-  WLF_NOW=""; WL_WHY=""
+  WLF_NOW=""; WLF_UNDECIDED=""; WL_WHY=""
   _wf_v=$({ extract_run_facts < "$_wf_f"; } 2>/dev/null | sed -n 's/^work-landed-at: *//p' | head -1 | tr -d '\r')
   _wf_wit=$({ extract_run_facts < "$_wf_f"; } 2>/dev/null | sed -n 's/^witness: *//p' | head -1 | tr -d '\r')
   _wf_n=${_wf_v%% *}
@@ -1518,7 +1520,11 @@ check_work_landed_fact() { # record file · advertised tip -> 0 upheld · 1 not 
   fi
   check_work_landed "$_wf_f" "$_wf_t"; _wf_rc=$?
   [ "$_wf_rc" = 0 ] || return "$_wf_rc"
-  check_work_landed "$_wf_f" "$_wf_adv" || WLF_NOW="$WL_WHY"
+  check_work_landed "$_wf_f" "$_wf_adv"; _wf_rc=$?
+  case "$_wf_rc" in
+    1) WLF_NOW="$WL_WHY" ;;
+    2) WLF_UNDECIDED="$WL_WHY" ;;
+  esac
   WL_WHY="its witness ${_wf_n:0:8} reads landed at the tip the fact records, ${_wf_t:0:8}"
   return 0
 }

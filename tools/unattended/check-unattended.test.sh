@@ -5571,6 +5571,19 @@ same "AC7 a later revert leaves the kept record's fact upheld" \
   "$(printf '%s\n' "$out" | grep -F 'a record claims work-landed-at' | grep -c 'memory/builds/tKept/' || true)" "0"
 hit  "$out" "unattended-report: check 15 upheld work-landed-at in memory/builds/tKept/RUN.md at the tip it records, ${lg_tip:0:8}, and the content predicate no longer reads that work landed on the advertised tip "
 hit  "$out" "reported and never a red, because no verb rewrites the record: a commit on the tip's first-parent line reverts its commit ${lg_w_tKept:0:8}"
+# ---- Implementation review round 2, L8 (id 29): a tip whose first-parent line cannot be READ is not a
+# ---- revert anybody observed. A git double fails `log --first-parent` over the advertised tip alone,
+# ---- so the fact still reads upheld at the tip it records and is reported as not re-judged, never as
+# ---- undone. RED against the reader that folded the undecidable status into WLF_NOW.
+c15_adv=$(git ls-remote origin HEAD | cut -f1)
+c15_git=$(command -v git)
+mkdir -p "$TMPBIN"
+printf '#!/bin/sh\ncase " $* " in *" --first-parent "*" %s "*) exit 128 ;; esac\nexec "%s" "$@"\n' "$c15_adv" "$c15_git" > "$TMPBIN/git"
+chmod +x "$TMPBIN/git"
+out=$(PATH="$TMPBIN:$PATH" run_lg_leg)
+rm -f "$TMPBIN/git"
+hit  "$out" "unattended-report: check 15 upheld work-landed-at in memory/builds/tKept/RUN.md at the tip it records, ${lg_tip:0:8}, and it was not re-judged at the advertised tip ${c15_adv:0:8}: the tip's first-parent line since ${lg_w_tKept:0:8} cannot be read"
+miss "$out" "check 15 upheld work-landed-at in memory/builds/tKept/RUN.md at the tip it records, ${lg_tip:0:8}, and the content predicate no longer reads that work landed"
 sed -i 's/^HANDOFF_CUTOFF=.*/HANDOFF_CUTOFF="2000-01-01"/' .unattended.conf
 out=$(run_lg_leg)
 hit  "$out" "an ABORTED record first committed on or after HANDOFF_CUTOFF claims work-landed-at, and from that date ABORTED means discard, so no verb writes that its work landed: "
@@ -5904,6 +5917,27 @@ hit  "$(run)" "so that node hands off on every run with nothing else red: a=m/u/
 reset_tree
 printf 'LANDING_NODES="a=desk/john%%20smith"\n' >> .unattended.conf
 miss "$(run)" "UNATTENDED check 49 FAILED"
+reset_tree
+
+# ==== Implementation review round 2, hunt item 3: CHECK 50, the driver's inherited-red policy path
+# ---- against the pre-push hook's `_gate_env` derivation. A hook spelling another file reds, and so
+# ---- does a driver that moved its own; the two spelling one path stay silent, and a tree tracking no
+# ---- hook says it compared nothing. RED against the leg before the check, which read neither.
+out=$(GOV_UNATTENDED_REPORT=1 run)
+hit  "$out" "unattended-report: check 50 did not compare the inherited-red policy path - this tree tracks no .githooks/pre-push, so no hook reads one beside the driver"
+mkdir -p .githooks
+printf '#!/usr/bin/env bash\n_gate_env="$top/.githooks/gate-env.sh"\n' > .githooks/pre-push
+git add .githooks/pre-push
+out=$(GOV_UNATTENDED_REPORT=1 run)
+miss "$out" "UNATTENDED check 50 FAILED"
+hit  "$out" "unattended-report: check 50 compared the inherited-red policy path the driver and the pre-push hook read: .githooks/gate-env.sh"
+printf '#!/usr/bin/env bash\n_gate_env="$top/.githooks/policy-env.sh"\n' > .githooks/pre-push
+git add .githooks/pre-push
+hit  "$(run)" "the driver's inherited-red policy path is not the pre-push hook's, so on a conf naming no policy file the two readers of one policy read two files, and a red the driver lands is one the hook refuses to push: hook .githooks/policy-env.sh, driver .githooks/gate-env.sh"
+printf '#!/usr/bin/env bash\n_gate_env="$top/.githooks/gate-env.sh"\n' > .githooks/pre-push
+git add .githooks/pre-push
+mutate $KIT_REL/unattended.sh 's|hook="\.githooks/gate-env\.sh"|hook=".githooks/moved-env.sh"|'
+hit  "$(run)" "a red the driver lands is one the hook refuses to push: hook .githooks/gate-env.sh, driver .githooks/moved-env.sh"
 reset_tree
 fi   # ---- end REGION 8------------------------------------------------------------------------
 

@@ -1946,6 +1946,9 @@ while IFS= read -r f; do
       elif [ -n "$WLF_NOW" ]; then
         wla_t=${wla#* }
         report "check 15 upheld work-landed-at in $f at the tip it records, ${wla_t:0:8}, and the content predicate no longer reads that work landed on the advertised tip ${ADV_HEAD:0:8}, so a later change on the default branch undid it; reported and never a red, because no verb rewrites the record: $WLF_NOW"
+      elif [ -n "$WLF_UNDECIDED" ]; then
+        wla_t=${wla#* }
+        report "check 15 upheld work-landed-at in $f at the tip it records, ${wla_t:0:8}, and it was not re-judged at the advertised tip ${ADV_HEAD:0:8}: $WLF_UNDECIDED"
       fi
     fi
     if [ "$ph" = ABORTED ]; then
@@ -5807,6 +5810,27 @@ else
     fail 49 "LANDING_NODES declares a token that is not a <tag>=<machine>/<user> pair, or a tag or machine/user declared twice, and a malformed token never matches, so that node hands off on every run with nothing else red: $_c49_bad"
   else
     report "check 49 graded LANDING_NODES: $(set -f; set -- $LANDING_NODES; echo $#) pair(s), each well-formed and none declared twice"
+  fi
+fi
+
+# ---- check 50 - THE DRIVER READS THE POLICY FILE THE PRE-PUSH HOOK READS. Implementation review
+# ---- round 2, hunt item 3, on TOOL-dUnstuckLanding-16's fold: a conf naming no policy file makes the
+# ---- driver read the hook's own file at R, and the driver spells that path beside the hook's
+# ---- `_gate_env="$top/..."` derivation - two spellings of one fact, equal today and free to drift.
+# ---- Compared here, so a hook that moves its file reds the bar rather than the next landing.
+# ----
+# ---- What this does NOT check: that either path names the right file, nor a conf that NAMES a
+# ---- policy file, which the driver reads and the hook never does, a divergence older than this check.
+_c50_hook=.githooks/pre-push
+if ! git ls-files --error-unmatch -- "$_c50_hook" >/dev/null 2>&1; then
+  report "check 50 did not compare the inherited-red policy path - this tree tracks no $_c50_hook, so no hook reads one beside the driver"
+else
+  _c50_h=$(sed -n 's|^_gate_env="$top/\(.*\)"$|\1|p' "$_c50_hook" | head -1)
+  _c50_d=$(sed -n 's/^.* hook="\([^"]*\)".*$/\1/p' "$DRIVER" | head -1)
+  if [ -z "$_c50_h" ] || [ "$_c50_h" != "$_c50_d" ]; then
+    fail 50 "the driver's inherited-red policy path is not the pre-push hook's, so on a conf naming no policy file the two readers of one policy read two files, and a red the driver lands is one the hook refuses to push: hook ${_c50_h:-unread}, driver ${_c50_d:-unread}"
+  else
+    report "check 50 compared the inherited-red policy path the driver and the pre-push hook read: $_c50_d"
   fi
 fi
 

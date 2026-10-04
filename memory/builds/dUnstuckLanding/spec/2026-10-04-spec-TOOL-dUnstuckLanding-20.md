@@ -1,6 +1,6 @@
 # TOOL-dUnstuckLanding-20 — `LANDING_NODES`: landing capability declared, resolved from machine and user, and a planned hand-off
 
-**Status:** CLOSED · rev-3 · 2026-10-04 · node d · Tier-2 · base 98926870 · streams tooling · order 8 · closes TOOL-dUnstuckLanding-10
+**Status:** CLOSED · rev-4 · 2026-10-04 · node d · Tier-2 · base 98926870 · streams tooling · order 8 · closes TOOL-dUnstuckLanding-10
 
 <!-- gen:spec-records -->
 
@@ -10,6 +10,7 @@
 | [2026-10-04-prompt-TOOL-dUnstuckLanding-13-build-brief.md](../prompts/2026-10-04-prompt-TOOL-dUnstuckLanding-13-build-brief.md) | journal | TOOL-dUnstuckLanding-13 TOOL-dUnstuckLanding-14 TOOL-dUnstuckLanding-15 TOOL-dUnstuckLanding-16 TOOL-dUnstuckLanding-17 TOOL-dUnstuckLanding-18 TOOL-dUnstuckLanding-19 |
 | [2026-10-04-prompt-TOOL-dUnstuckLanding-13-spec-brief.md](../prompts/2026-10-04-prompt-TOOL-dUnstuckLanding-13-spec-brief.md) | journal | TOOL-dUnstuckLanding-13 TOOL-dUnstuckLanding-14 TOOL-dUnstuckLanding-15 TOOL-dUnstuckLanding-16 TOOL-dUnstuckLanding-17 TOOL-dUnstuckLanding-18 TOOL-dUnstuckLanding-19 |
 | [2026-10-04-review-TOOL-dUnstuckLanding-13-implementation-diff-round1.md](../reviews/2026-10-04-review-TOOL-dUnstuckLanding-13-implementation-diff-round1.md) | diff-review | TOOL-dUnstuckLanding-13 TOOL-dUnstuckLanding-14 TOOL-dUnstuckLanding-15 TOOL-dUnstuckLanding-16 TOOL-dUnstuckLanding-17 TOOL-dUnstuckLanding-18 TOOL-dUnstuckLanding-19 TOOL-dUnstuckLanding-25 |
+| [2026-10-04-review-TOOL-dUnstuckLanding-27-implementation-diff-round2.md](../reviews/2026-10-04-review-TOOL-dUnstuckLanding-27-implementation-diff-round2.md) | diff-review | TOOL-dUnstuckLanding-13 TOOL-dUnstuckLanding-14 TOOL-dUnstuckLanding-15 TOOL-dUnstuckLanding-16 TOOL-dUnstuckLanding-17 TOOL-dUnstuckLanding-19 TOOL-dUnstuckLanding-27 |
 
 <!-- /gen:spec-records -->
 
@@ -45,7 +46,13 @@ with no override.
   BASE is the one this run's first committed record blob carries, read by `read_pinned_base` over the
   record's history since its last rotation; a working-copy `base` fact that differs from it or is
   missing, or a BASE that does not resolve, is `handoff`. With no committed blob carrying a base, the
-  window between a preflight and its first records commit, the working copy's fact is read. It sets
+  window between a preflight and its first records commit, the working copy's fact is read. Only an
+  HONEST rotation opens that window: one adding only archives named `RUN.<PHASE>.<8 hex>.md` whose
+  hex prefixes the blob added, over a parent record `--preflight` retires; a staged archive add reads
+  the working copy only while HEAD's committed record is such a record. Any other rotation-shaped add
+  is a doubt, `handoff`. Handed R, the tip `observe_anchor` saw the remote advertise, it also reads
+  the key at R: `lander` only when both confs list this node, `undeclared` only when neither declares
+  the key, R's conf absent or blank included, and `handoff` otherwise. It sets
   `LN_STATE` to `undeclared`, `lander` or `handoff`, with `LN_TAG` and `LN_WHY`. It never calls
   `fail`. Undeclared or blank at BASE is `undeclared`, today's behaviour. A blob that does not
   evaluate to the end, an unreadable machine or user, or no matching pair, is `handoff`, the safe
@@ -57,7 +64,9 @@ with no override.
   fact `landing: lander` or `landing: handoff`, afresh at every preflight like the lease, because it
   describes the node holding the run. Undeclared writes no fact. Observed by AC5, AC6.
 - **S5 — `--close` on a hand-off node.** `--close` resolves again, for its own node, and that
-  answer decides; a disagreement with the recorded fact is printed. On `handoff`:
+  answer decides; a disagreement with the recorded fact is printed. It resolves at BASE before the
+  anchor round-trip and again with R after it, before any landing decision, printing a changed
+  answer; `--preflight` resolves with R, its anchor observed above it. On `handoff`:
   - an `--override` is refused as a free refusal, before the anchor observation, by a new numbered
     `fail` naming `--park` and `--handoff`;
   - otherwise the Definition of Done is evaluated as today, and an unmet item refuses as today;
@@ -121,14 +130,17 @@ and `USER` is unset.
 
 ### Resolution order
 
-1. The run's first committed blob pins a base the working copy's `base` fact differs from or lacks,
-   or the base does not resolve → `handoff`.
+1. A rotation-shaped add that is not an honest rotation, committed or staged → `handoff`. The run's
+   first committed blob pins a base the working copy's `base` fact differs from or lacks, or the base
+   does not resolve → `handoff`.
 2. No `base` fact, or no `.unattended.conf` blob at BASE → `undeclared`.
 3. The blob does not evaluate to its sentinel → `handoff`, "unknown is not absent".
 4. The key is blank → `undeclared`.
 5. `read_host_name` or `read_user_name` answers nothing → `handoff`.
 6. `resolve_landing_tag` returns a tag → `lander`. Otherwise → `handoff`, naming the machine/user it
    resolved and any malformed tokens.
+7. Handed R, steps 2 to 6 run again over R's conf; the pair is `lander` only when both read `lander`,
+   `undeclared` only when both read `undeclared`, and `handoff` otherwise (rev-4).
 
 Step 2 keeps a record with no BASE on today's path; such a record cannot pass
 `authorization-reachable` anyway, so it never reaches a landing.
@@ -152,7 +164,9 @@ before it returns (`tools/unattended/unattended.sh:7645-7659`).
 ### Inventory
 
 - Library functions `read_user_name`, `resolve_landing_tag` and `scan_landing_nodes`; driver
-  functions `resolve_landing_node` and `read_pinned_base`; globals `LN_STATE`, `LN_TAG` and `LN_WHY`. Each name is graded by
+  functions `resolve_landing_node`, `resolve_landing_at`, `read_pinned_base`, `check_honest_rotation`,
+  `check_retired_blob`, `read_blob_fact` and `check_handoff_override`; globals `LN_STATE`, `LN_TAG`
+  and `LN_WHY`, `RPB_BASE` and `RPB_WHY`. Each name is graded by
   the lexicon gate's shell cell, so ask `--suggest` for each before writing it.
 - Conf key `LANDING_NODES`. Fact key `landing`.
 - Two new driver `fail` branches in `--close`, and one new leg check. Each takes an arm in its
@@ -332,6 +346,14 @@ New arm: tools/unattended/check-unattended.test.sh · a fixture conf declaring a
   own conf, and still before the anchor round-trip. `%20` spells a space in a pair. The doubt
   branches and check 49's doubled pair and third field gained arms, each RED against a staged
   mutation routing the doubt elsewhere.
+- rev-4 · 2026-10-04 · S3 S5 §4 · folded implementation review round 2 M1 (ids 2, 27), L2 (id 9) and
+  M5 (id 22): the window opens only at an honest rotation and a staged one reads the working copy
+  only over a retirable HEAD record, else `handoff`; `LANDING_NODES` is also read at the advertised
+  tip R, after the anchor round-trip at `--close` and with the anchor at `--preflight`, so a base the
+  run chose no longer decides alone; the remaining residual, a run that commits a rotation-shaped add
+  beside a moved base, is stated in the function's header. Arms: a decoy archive commit, a staged
+  archive add, R dropping the node, and the rotation window on a declared and an undeclared conf,
+  each RED against the code before the fold or a staged mutation of the window.
 
 ## 10. Reuse audit
 

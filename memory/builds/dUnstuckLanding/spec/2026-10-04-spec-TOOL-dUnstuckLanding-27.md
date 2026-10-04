@@ -1,12 +1,13 @@
 # TOOL-dUnstuckLanding-27 — the implementation review's three HIGH findings closed
 
-**Status:** CLOSED · rev-2 · 2026-10-04 · node d · Tier-2 · base 98926870 · streams tooling
+**Status:** CLOSED · rev-3 · 2026-10-04 · node d · Tier-2 · base 98926870 · streams tooling
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-04-build-TOOL-dUnstuckLanding-27-1-acceptance-ledger.md](../build/2026-10-04-build-TOOL-dUnstuckLanding-27-1-acceptance-ledger.md) | journal | — |
+| [2026-10-04-review-TOOL-dUnstuckLanding-27-implementation-diff-round2.md](../reviews/2026-10-04-review-TOOL-dUnstuckLanding-27-implementation-diff-round2.md) | diff-review | TOOL-dUnstuckLanding-13 TOOL-dUnstuckLanding-14 TOOL-dUnstuckLanding-15 TOOL-dUnstuckLanding-16 TOOL-dUnstuckLanding-17 TOOL-dUnstuckLanding-19 TOOL-dUnstuckLanding-20 |
 
 <!-- /gen:spec-records -->
 
@@ -42,12 +43,15 @@ Close each one with the corrected fix the report records. Their duplicates are M
     names it. If that number has since moved, take the arm's current number.
   - Observed by AC2, AC3.
 - **S3 — H3.**
-  - **Change:** the paths that gates-green's own close step stages are recorded beside the
-    `gates-run` fact. They are the run-state file, the build's `BACKLOG.md` that
-    `write_inherited_asks` staged, and the paths `write_ask_views` reports staging.
-    `check_bar_tied`'s `record-only` mode then excludes exactly that recorded set, and never the whole
-    build folder. A record that names no set falls back to excluding the run-state file alone, which
-    is today's behaviour.
+  - **Change:** the paths that gates-green's own close step stages are recorded in the bar's own run
+    record, as `staged` beside its attribution, one `path@blob` line each, the blob the index holds
+    for it. They are the build's `BACKLOG.md` that `write_inherited_asks` staged and the paths
+    `write_ask_views` staged, recorded whenever the stage succeeded, whatever the render's verdict.
+    `check_bar_tied`'s `record-only` mode always excludes the run-state file, and excludes a recorded
+    path only while HEAD's blob for it is the recorded one and it names a file at the bar head or at
+    HEAD. A directory, a path absent at both ends, a path outside the memory root and one carrying a
+    `..` segment are each named on a NOTE line and never excluded. A bar whose record names no set
+    falls back to excluding the run-state file alone, which is today's behaviour.
   - Observed by AC4, AC5.
 - **S4 — the arms.** Each new arm is staged RED against the current code before it lands (§7):
   - one RANGE-mode arm in `check-brief-recorded.test.sh`;
@@ -70,19 +74,22 @@ Close each one with the corrected fix the report records. Their duplicates are M
 ## 4. Design
 
 Each fix is the review's corrected design, applied where the review cites it. For S3, the recorded
-set is a new fact in the run-state file, `gates-staged: <path> <path> …`. It is written on the same
-MET path that writes `gates-run`, and `check_bar_tied` reads it. A new fact owes PROTOCOL §2's fact
-list. The protocol has about 470 bytes of room. If the fact does not fit, pay for it with history
-prose only, as unit 20 did.
+set is the file `staged` in the bar's own run record under the git dir, written by
+`write_gates_staged` on the MET path over an inherited-only red, and `check_bar_tied` reads it from
+the record the `gates-run` fact names. It is not a run-state fact (rev-3): the round-1 build wrote it
+as `gates-staged:` in the run-state file, a line any edit after the bar could widen to a spec or to
+the whole memory root, so PROTOCOL §2 carries no fact for it and §6's hand-off sentence names the tie.
+What remains is the same-uid residual `check_inherited_override` states for the attribution beside
+it: the driver writes the set under the run's uid, so a run set on forging it can name a path and
+the blob HEAD carries.
 
 Three details the build settled (rev-2):
 
-- **No stale set.** Gates-green also writes `gates-run` on an UNMET bar. There, a record that already
-  carries `gates-staged` has it rewritten to the record alone, so a later bar never inherits an older
-  close's set. A record that never carried the fact gains none.
+- **No stale set.** Every bar has a run record of its own, so a later bar never inherits an older
+  close's set; an UNMET bar writes none (rev-3, replacing the rewrite of a run-state fact).
 - **The memory root bounds the set.** `check_bar_tied` excludes only entries under the memory root,
   because the close stages nothing else. Any other entry is named on a NOTE line and not excluded.
-- **The fallback is announced.** With no fact, the tie prints one NOTE line, once per process, saying
+- **The fallback is announced.** With no set, the tie prints one NOTE line, once per process, saying
   it excludes the run-state file alone.
 
 ### Files touched (estimate)
@@ -96,8 +103,10 @@ Three details the build settled (rev-2):
 
 ## 5. Production-readiness checklist
 
-- security — S2 narrows an admit, and S3 narrows an exclusion to a recorded set. Both move in the
-  safe direction.
+- security — S2 narrows an admit. S3 WIDENS the base's exclusion, which was the run-state file
+  alone, to a driver-written set; each entry is bounded to an exact file at the blob the close staged,
+  and the set is kept in the bar's run record, written under the run's own uid like the attribution
+  beside it, which is protocol section 9's residual and not a narrowing.
 - perf / scale — none.
 - error / empty / loading states — a record with no `gates-staged` fact falls back to today's
   behaviour, and the fallback is announced.
@@ -141,6 +150,13 @@ none
 - rev-2 · 2026-10-04 · built; §4 records three details the build settled: the UNMET path rewrites a stale
   `gates-staged` to the record alone, the tie excludes only entries under the memory root, and the
   fallback prints one NOTE line.
+- rev-3 · 2026-10-04 · S2 S3 §4 §5 · folded implementation review round 2 M2, L1 (ids 1, 7, 16, 28),
+  M4, L3 (ids 13, 11), M6, L4 (ids 23, 14), L6 (id 21) and L7 (id 25): the staged set moves out of
+  the run-state file into the bar's own run record as `path@blob` lines, and the tie excludes a path
+  only while HEAD holds the staged blob and it names a file at either end; the set is recorded
+  whenever the stage succeeds, whatever the render's verdict; §5 states the widening and its residual
+  honestly; S2's predicate is unchanged and its `pid-alive yes` half is armed; the tie's three settled
+  behaviours are armed, and the forged-set arm is split so only the forged entry differs.
 
 ## 10. Reuse audit
 

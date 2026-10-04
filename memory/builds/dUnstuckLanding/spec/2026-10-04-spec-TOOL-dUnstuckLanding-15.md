@@ -1,6 +1,6 @@
 # TOOL-dUnstuckLanding-15 — drift-audit reports ABORTED run records whose work landed anyway
 
-**Status:** CLOSED · rev-2 · 2026-10-04 · node d · Tier-2 · base 98926870 · streams tooling · order 3 · closes TOOL-dUnstuckLanding-5
+**Status:** CLOSED · rev-3 · 2026-10-04 · node d · Tier-2 · base 98926870 · streams tooling · order 3 · closes TOOL-dUnstuckLanding-5
 
 <!-- gen:spec-records -->
 
@@ -10,6 +10,7 @@
 | [2026-10-04-prompt-TOOL-dUnstuckLanding-13-build-brief.md](../prompts/2026-10-04-prompt-TOOL-dUnstuckLanding-13-build-brief.md) | journal | TOOL-dUnstuckLanding-13 TOOL-dUnstuckLanding-14 TOOL-dUnstuckLanding-16 TOOL-dUnstuckLanding-17 TOOL-dUnstuckLanding-18 TOOL-dUnstuckLanding-19 TOOL-dUnstuckLanding-20 |
 | [2026-10-04-prompt-TOOL-dUnstuckLanding-13-spec-brief.md](../prompts/2026-10-04-prompt-TOOL-dUnstuckLanding-13-spec-brief.md) | journal | TOOL-dUnstuckLanding-13 TOOL-dUnstuckLanding-14 TOOL-dUnstuckLanding-16 TOOL-dUnstuckLanding-17 TOOL-dUnstuckLanding-18 TOOL-dUnstuckLanding-19 TOOL-dUnstuckLanding-20 |
 | [2026-10-04-review-TOOL-dUnstuckLanding-13-implementation-diff-round1.md](../reviews/2026-10-04-review-TOOL-dUnstuckLanding-13-implementation-diff-round1.md) | diff-review | TOOL-dUnstuckLanding-13 TOOL-dUnstuckLanding-14 TOOL-dUnstuckLanding-16 TOOL-dUnstuckLanding-17 TOOL-dUnstuckLanding-18 TOOL-dUnstuckLanding-19 TOOL-dUnstuckLanding-20 TOOL-dUnstuckLanding-25 |
+| [2026-10-04-review-TOOL-dUnstuckLanding-27-implementation-diff-round2.md](../reviews/2026-10-04-review-TOOL-dUnstuckLanding-27-implementation-diff-round2.md) | diff-review | TOOL-dUnstuckLanding-13 TOOL-dUnstuckLanding-14 TOOL-dUnstuckLanding-16 TOOL-dUnstuckLanding-17 TOOL-dUnstuckLanding-19 TOOL-dUnstuckLanding-20 TOOL-dUnstuckLanding-27 |
 
 <!-- /gen:spec-records -->
 
@@ -94,8 +95,8 @@ zero.
   already does. Over the same fixture records, the library's content predicate and its first-commit
   dating must agree with this engine's in both directions, and over records carrying
   `work-landed-at` the engine's upheld reading must agree with the library's
-  `check_work_landed_fact`, the one check 15 calls. Where the library is absent, the arm prints its
-  skip. Observed by AC8.
+  `check_work_landed_fact`, the one check 15 calls. A fact whose recorded tip is off the base ref
+  is upheld by neither. Where the library is absent, the arm prints its skip. Observed by AC8.
 
 ## 3. Non-goals (OUT)
 
@@ -325,6 +326,9 @@ New arm: `tools/drift-audit/selftest.py` `test_work_landed_matches_the_driver` �
   never-merged run; three fixture records pin all three; upheld also requires the recorded tip on the
   base ref, and the parity arm holds it to the library's `check_work_landed_fact`; the tautological
   parity control leaves.
+- rev-3 · 2026-10-04 · S9 · folded implementation review round 2 L5 (id 18): the parity arm rewrites
+  tPos's fact to name the side branch's tip and both graders must refuse it, so the engine's
+  tip-on-base-ref conjunct is armed; `CHECK_FLOOR` rises by its two checks, 344 to 346.
 
 ## 10. Reuse audit
 

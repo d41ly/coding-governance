@@ -1,6 +1,6 @@
 # TOOL-dUnstuckLanding-14 — the attended terminal: a handed record derives LANDED, `--settle` writes it, and a landed ABORTED record gains `work-landed-at`
 
-**Status:** CLOSED · rev-4 · 2026-10-04 · node d · Tier-2 · base 98926870 · streams tooling · order 2 · closes TOOL-dUnstuckLanding-4
+**Status:** CLOSED · rev-5 · 2026-10-04 · node d · Tier-2 · base 98926870 · streams tooling · order 2 · closes TOOL-dUnstuckLanding-4
 
 <!-- gen:spec-records -->
 
@@ -10,6 +10,7 @@
 | [2026-10-04-prompt-TOOL-dUnstuckLanding-13-build-brief.md](../prompts/2026-10-04-prompt-TOOL-dUnstuckLanding-13-build-brief.md) | journal | TOOL-dUnstuckLanding-13 TOOL-dUnstuckLanding-15 TOOL-dUnstuckLanding-16 TOOL-dUnstuckLanding-17 TOOL-dUnstuckLanding-18 TOOL-dUnstuckLanding-19 TOOL-dUnstuckLanding-20 |
 | [2026-10-04-prompt-TOOL-dUnstuckLanding-13-spec-brief.md](../prompts/2026-10-04-prompt-TOOL-dUnstuckLanding-13-spec-brief.md) | journal | TOOL-dUnstuckLanding-13 TOOL-dUnstuckLanding-15 TOOL-dUnstuckLanding-16 TOOL-dUnstuckLanding-17 TOOL-dUnstuckLanding-18 TOOL-dUnstuckLanding-19 TOOL-dUnstuckLanding-20 |
 | [2026-10-04-review-TOOL-dUnstuckLanding-13-implementation-diff-round1.md](../reviews/2026-10-04-review-TOOL-dUnstuckLanding-13-implementation-diff-round1.md) | diff-review | TOOL-dUnstuckLanding-13 TOOL-dUnstuckLanding-15 TOOL-dUnstuckLanding-16 TOOL-dUnstuckLanding-17 TOOL-dUnstuckLanding-18 TOOL-dUnstuckLanding-19 TOOL-dUnstuckLanding-20 TOOL-dUnstuckLanding-25 |
+| [2026-10-04-review-TOOL-dUnstuckLanding-27-implementation-diff-round2.md](../reviews/2026-10-04-review-TOOL-dUnstuckLanding-27-implementation-diff-round2.md) | diff-review | TOOL-dUnstuckLanding-13 TOOL-dUnstuckLanding-15 TOOL-dUnstuckLanding-16 TOOL-dUnstuckLanding-17 TOOL-dUnstuckLanding-19 TOOL-dUnstuckLanding-20 TOOL-dUnstuckLanding-27 |
 
 <!-- /gen:spec-records -->
 
@@ -88,14 +89,16 @@ not merely present.
 - **S7 — the abandoned marker is read.** `--preflight`'s concurrent-run announcement excludes a
   record carrying `abandoned`, printing why, and the leg's check 7 report does the same, so the two
   count one population. `--resume` refuses such a record with a number before any write, naming
-  `--preflight`, which starts the next run on it under the keepalive it is handed and drops
-  `abandoned` and `work-landed-at`. Observed by AC6.
+  `--preflight`, which retires a record carrying both `abandoned` and `work-landed-at` to
+  `RUN.<phase>.<blob8>.md` as it retires a terminal one, and starts the next run on a fresh record
+  under the keepalive it is handed. Observed by AC6.
 - **S8 — check 15, upheld rather than present.** For every record, live or archived, carrying
   `work-landed-at`, the leg runs the library's `check_work_landed_fact`, which grades the fact AT THE
   TIP IT RECORDS. It reds when the fact's first field is not the record's witness, when its tip is not
   an ancestor of the advertised tip, or when `check_work_landed` does not read the work landed at that
   tip; a revert the advertised tip carries since is REPORTED, never a red, because no verb rewrites the
-  record. It also reds when the record is ABORTED and first committed on or after `HANDOFF_CUTOFF`, or
+  record, and a tip whose first-parent line cannot be read is REPORTED as not re-judged, never as a
+  revert. It also reds when the record is ABORTED and first committed on or after `HANDOFF_CUTOFF`, or
   when `abandoned` stands without `work-landed-at`. An unanswered remote is reported as a skip, as
   check 15's `landed-derived` arm already does. The fact-set arm gains a population, `attended`: a
   recorded LANDED carrying `landed-by: attended` owes `units-at-landing`, `landed-derived` and
@@ -306,7 +309,8 @@ run that pass.
   `abandoned:` and leaves `phase: BUILDING`; a `--preflight` of another fixture slug then prints the
   record as EXCLUDED rather than counting it, and `--resume` over the settled record is refused with
   a number, naming `--preflight` and writing nothing. A `--preflight` under a new keepalive over a
-  record settled that way drops `abandoned` and `work-landed-at` and records the new keepalive. With a
+  record settled that way retires it to an archive keeping `abandoned`, and the fresh record carries
+  neither `abandoned` nor `work-landed-at`, starts at `phase: RUNNING` and records the new keepalive. With a
   fresh lease making the verdict `LIVE`, the settle is refused.
   Red when: a terminal is written, the marker is not read, or a live run is settled.
 - **AC7** — When the fourth AC4 record is edited by hand to carry `work-landed-at:` while its work is
@@ -404,6 +408,11 @@ New arm: tools/unattended/check-unattended.test.sh · the AC7 hand-written fact 
   below the pinned check-2 ordinals, each armed. M2 (id 1), the security lens's duplicate of H2, is
   closed by `TOOL-dUnstuckLanding-27`, whose settle admits an UNBOUND lease only on a record that
   predates the lease facts or reads stale and not alive.
+- rev-5 · 2026-10-04 · S7 S8 AC6 · folded implementation review round 2 M3 (id 10) and L8 (id 29): a
+  record `--settle` marked `abandoned` beside `work-landed-at` is ROTATED by `--preflight` like a
+  terminal one, superseding rev-3's in-place drop, so the dead run's phase, attestations, review rows
+  and bar facts stay in its archive and the next run starts fresh; check 15 reports a tip whose
+  first-parent line cannot be read as not re-judged, never as a revert.
 
 ## 10. Reuse audit
 

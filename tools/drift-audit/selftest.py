@@ -93,7 +93,7 @@ EXECUTED: list[str] = []
 # on a run where no arm skipped; it rises by hand when arms land and never falls to absorb a missing
 # one. A run with a SKIP does not compare it, and says so, because a skipped arm's checks are absent
 # for a reason the floor cannot see.
-CHECK_FLOOR = 344
+CHECK_FLOOR = 346
 # 261 -> 267, TOOL-dDerivedDocket-26: the six checks of `test_legs_retried_after_timeout`.
 # 267 -> 277, TOOL-dDerivedDocket-34: the five checks of the retired dGV-13 signal leave, one
 # retirement check and the fourteen of `test_backlog_ask_signals` arrive.
@@ -106,6 +106,8 @@ CHECK_FLOOR = 344
 # rows (+6); AC4's merge-revert row (+1); L6's two-reader arm, two checks and one per fact (+4); and
 # M10's unjudged fleet line (+1), net +11. L6 reaches its four only where the library's bash runs,
 # as the parity arm already does, and a run without it skips and does not compare the floor.
+# 344 -> 346, implementation review round 2, L5, COUNTED the same way: the off-ref tip arm's two
+# checks, one per grader.
 
 
 def check(label: str, cond: bool, detail: str = "") -> None:
@@ -3363,6 +3365,24 @@ def test_work_landed_matches_the_driver(tmp: pathlib.Path) -> None:
     for path in sorted(held):
         check(f"parity: {path.split('/')[2]} work-landed-at reads the same upheld verdict in both",
               held[path] == graded.get(path), f"engine {held[path]} library {graded.get(path)}")
+
+    # ---- Implementation review round 2, L5: the tip-on-base-ref clause, armed. Both facts above name a
+    # tip on main, so the engine's `resolved.get(wla-tip) in parents` conjunct could be deleted with
+    # every check green. tPos's fact is rewritten to name the side branch's tip, which main does not
+    # carry, and both graders must refuse it: the engine's `upheld` False, the library's rc 1.
+    pos = f"{B}/tPos/RUN.md"
+    _write_run_record(r, pos, dict(facts, witness=shas["pos"][1], base=shas["pos"][0],
+                                   **{"work-landed-at": f"{shas['pos'][1]} {shas['side']}"}))
+    _run_dated(r, "2026-03-11", "add", "-A")
+    _run_dated(r, "2026-03-11", "commit", "-q", "-m", "records: tPos names an off-ref tip", "--no-verify")
+    tip = run(["git", "rev-parse", "main"], r).stdout.strip()
+    got = dr.read_aborted_verdicts(_build_run_ctx(dr, r))
+    off = [row["upheld"] for row in got["rows"] if row.get("wla") and row["path"] == pos]
+    check("parity: the engine does not uphold a fact whose tip is off the base ref (L5)",
+          off == [False], f"{off}")
+    out = run([shell, "-c", script, "parity", lib.as_posix(), tip, pos], r)
+    check("parity: the library does not uphold a fact whose tip is off the base ref (L5)",
+          out.stdout.strip() == f"{pos}|1", f"{out.stdout.strip()} stderr={out.stderr.strip()[:200]}")
 
 
 def test_version_carriers_agree(tmp: pathlib.Path) -> None:

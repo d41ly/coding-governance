@@ -42,6 +42,11 @@ close.
 - AC6 — amended rev-3 — `--resume` over the settled record refuses at 106 naming `--preflight`, and a
   `--preflight` under a new keepalive drops `abandoned` and `work-landed-at`; section 9's rev-3 line
   logs it.
+- AC6 — amended rev-5 — the `--preflight` under a new keepalive RETIRES the settled record instead:
+  a record settled at VERIFYING with `keepalive-reaped: yes` was archived as `RUN.VERIFYING.<blob8>.md`
+  keeping `abandoned`, and the fresh record read `phase: RUNNING` with no `keepalive-reaped`, no
+  `abandoned`, no `work-landed-at` and keepalive k2. Round 1's in-place drop kept VERIFYING and the
+  met attestation; section 9's rev-5 line logs it.
 - AC7 — `abandoned:` — the leg redded check 15 naming `work-landed-at`, the revert and
   `memory/builds/tArevert/RUN.md` for a hand-written fact on reverted work, redded none on the kept
   record's settled bytes, and redded a record carrying `abandoned:` with no `work-landed-at`.

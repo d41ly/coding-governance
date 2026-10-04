@@ -1,6 +1,6 @@
 # TOOL-dUnstuckLanding-16 — an INHERITED red lands at any age, and the age escalates its ask
 
-**Status:** CLOSED · rev-2 · 2026-10-04 · node d · Tier-2 · base 98926870 · streams tooling · order 4 · closes TOOL-dUnstuckLanding-6
+**Status:** CLOSED · rev-3 · 2026-10-04 · node d · Tier-2 · base 98926870 · streams tooling · order 4 · closes TOOL-dUnstuckLanding-6
 
 <!-- gen:spec-records -->
 
@@ -10,6 +10,7 @@
 | [2026-10-04-prompt-TOOL-dUnstuckLanding-13-build-brief.md](../prompts/2026-10-04-prompt-TOOL-dUnstuckLanding-13-build-brief.md) | journal | TOOL-dUnstuckLanding-13 TOOL-dUnstuckLanding-14 TOOL-dUnstuckLanding-15 TOOL-dUnstuckLanding-17 TOOL-dUnstuckLanding-18 TOOL-dUnstuckLanding-19 TOOL-dUnstuckLanding-20 |
 | [2026-10-04-prompt-TOOL-dUnstuckLanding-13-spec-brief.md](../prompts/2026-10-04-prompt-TOOL-dUnstuckLanding-13-spec-brief.md) | journal | TOOL-dUnstuckLanding-13 TOOL-dUnstuckLanding-14 TOOL-dUnstuckLanding-15 TOOL-dUnstuckLanding-17 TOOL-dUnstuckLanding-18 TOOL-dUnstuckLanding-19 TOOL-dUnstuckLanding-20 |
 | [2026-10-04-review-TOOL-dUnstuckLanding-13-implementation-diff-round1.md](../reviews/2026-10-04-review-TOOL-dUnstuckLanding-13-implementation-diff-round1.md) | diff-review | TOOL-dUnstuckLanding-13 TOOL-dUnstuckLanding-14 TOOL-dUnstuckLanding-15 TOOL-dUnstuckLanding-17 TOOL-dUnstuckLanding-18 TOOL-dUnstuckLanding-19 TOOL-dUnstuckLanding-20 TOOL-dUnstuckLanding-25 |
+| [2026-10-04-review-TOOL-dUnstuckLanding-27-implementation-diff-round2.md](../reviews/2026-10-04-review-TOOL-dUnstuckLanding-27-implementation-diff-round2.md) | diff-review | TOOL-dUnstuckLanding-13 TOOL-dUnstuckLanding-14 TOOL-dUnstuckLanding-15 TOOL-dUnstuckLanding-17 TOOL-dUnstuckLanding-19 TOOL-dUnstuckLanding-20 TOOL-dUnstuckLanding-27 |
 
 <!-- /gen:spec-records -->
 
@@ -44,7 +45,9 @@ what another one admits.
   `read_gate_policy` takes S2's reading table. A blank or absent `GATE_POLICY_FILE`, or a project
   conf absent at R, reads the file the pre-push hook reads, `.githooks/gate-env.sh` at R, before it
   falls to the kit default `land`, announced, so the driver and the hook cannot read one policy two
-  ways; where that file is absent too, the reading is `land`, naming both absences. `read_gates_record` returns `land` when every red leg reads INHERITED
+  ways; where that file is absent too, the reading is `land`, naming both absences. The driver
+  spells that path beside the hook's own `_gate_env` derivation, so the leg's check 50 compares the
+  two and reds when they differ, reporting a tree that tracks no hook. `read_gates_record` returns `land` when every red leg reads INHERITED
   under `land`, at any age, and `hold` under `park`. It also returns the aged legs, comma-joined, for
   S4. The MET line under `land` names the aged legs instead of claiming every leg sits inside the
   bound. Observed by AC4 and AC6.
@@ -292,6 +295,10 @@ New arm: tools/memory-tree/gen_build_index.py `--selftest` · AC7's BLOCKER and 
   (id 18): a conf naming no policy file reads the pre-push hook's own `.githooks/gate-env.sh` at R
   before the kit default, so the driver no longer reads land where the hook refuses the push; AC10
   arms each branch the ruling flipped, in the driver suite and the hook's suite.
+- rev-3 · 2026-10-04 · S3 · folded implementation review round 2 hunt item 3: the leg's new check 50
+  compares the driver's `.githooks/gate-env.sh` with the path the pre-push hook's `_gate_env`
+  derives, so the two spellings of one fact cannot drift apart silently; armed in the leg's suite
+  for a matching hook, a hook naming another file, a driver that moved its own, and no hook at all.
 
 ## 10. Reuse audit
 
