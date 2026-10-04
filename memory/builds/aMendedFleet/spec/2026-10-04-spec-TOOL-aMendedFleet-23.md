@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-23 — check 19 reports the gotcha anchors that select no tracked path
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · order 23
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · order 23
 
 <!-- gen:spec-records -->
 
@@ -37,6 +37,9 @@ makes check 19 REPORT them, non-gating, through a channel the hygiene leg actual
   name the non-gating lines. Observed by AC4, AC5.
 - **S6** — check 19's catalogue entry in `tools/memory-tree/HYGIENE.template.md` gains one sentence
   naming the advisory, and `memory/HYGIENE.md` is re-rendered from it. Observed by AC6.
+- **S7** — `memory/map/generated/symbols.json` is regenerated for the new
+  definitions. NOT OBSERVED by a criterion here: `python tools/codebase-map/gen_map.py --check` at
+  the close is its check, and §7 names the leg that reads it.
 
 ## 3. Non-goals (OUT)
 
@@ -103,6 +106,7 @@ unit sequences after 16 and before 24. The re-render in S6 is the parity script'
 - `tools/memory-tree/check-memory-hygiene.sh`
 - `tools/memory-tree/HYGIENE.template.md`
 - `memory/HYGIENE.md`
+- `memory/map/generated/symbols.json`
 
 ### Alternatives rejected
 
@@ -156,7 +160,7 @@ unit sequences after 16 and before 24. The re-render in S6 is the parity script'
 
 ## 7. Gates
 
-`memory hygiene` · `gotchas selftest` · `memory-hygiene self-test` · `harness arms (fail branches armed or pinned)` · `shell hygiene (a loop fed by a command substitution)` · `kit/dogfood doc parity` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `kit epoch (shipped bytes move, the version moves)` · `spec tokens (a spec's own names resolve)`
+`memory hygiene` · `gotchas selftest` · `memory-hygiene self-test` · `harness arms (fail branches armed or pinned)` · `shell hygiene (a loop fed by a command substitution)` · `kit/dogfood doc parity` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `kit epoch (shipped bytes move, the version moves)` · `codebase-map coverage + freshness` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/memory-tree/gotchas.py --selftest · S4's dead-anchor arm, staged red by removing S2's print line · none
 
@@ -168,6 +172,9 @@ none
 
 - rev-1 · 2026-10-04 · initial draft, from the synthesis's item [#25] and a probe of the catalogue at
   base reproducing its count.
+- rev-2 · 2026-10-04 · §2 S7 · §4 · §7 · M2 cross-read: the definitions this unit adds
+  move `memory/map/generated/symbols.json`, which `TOOL-aMendedFleet-82` and the build's other
+  code units regenerate and declare; this spec omitted the write, its Files touched row and the leg.
 
 ## 10. Reuse audit
 

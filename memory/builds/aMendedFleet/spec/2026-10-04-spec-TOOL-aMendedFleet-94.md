@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-94 — the wrapper's product-only prose loads from a path-scoped rule when a session opens a product file
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling+playbook · ratified 2026-10-04 · order 95
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling+playbook · ratified 2026-10-04 · order 95
 
 <!-- gen:spec-records -->
 
@@ -60,6 +60,8 @@ diet units 67, 68, 79 and the A/B unit 93, so it moves the wrapper as those left
 
 ### Edges
 
+- **consumes-from** `TOOL-aMendedFleet-74` — the path-scoped-rules half of the report's point, split
+  to this unit at that unit's §8 F1, with the rule-loading facts it first read from the PATH CLI.
 - **hands-off** external — routing rendered template blocks into path-scoped rules, which needs a
   renderer route this build's grant does not reach.
 - **hands-off** external — a standing check that each rule's `paths` globs match a tracked file, owed
@@ -80,8 +82,8 @@ Read at base `7af5f564`; `AGENTS.md` is byte-identical at the worktree tip `8312
 - This repository has no `.claude/rules/` directory, and `git grep` over `tools/` and `skills/`
   names none.
 - `awk` over `AGENTS.md` sizes the wrapper's sections at base: What ships here 2453 bytes, Layout 950,
-  Node registry 2144, Conventions 1096. PINNED 2026-10-04; the build re-measures after units 79 and 97
-  moved their parts.
+  Node registry 2144, Conventions 1096. PINNED 2026-10-04; the build re-measures after unit 79 moved
+  its part. Unit 97, which reshapes the Node registry, is ordered after this unit.
 - `tools/agent-instructions/` wires `AGENTS.md` as canonical with `CLAUDE.md` an import, and the
   `agent-instructions wiring` leg runs it with `--aliases claude` alone, so Claude Code is the one
   tool this repository declares. A rule file is read by Claude Code only, which is why S2's pointer
@@ -210,7 +212,7 @@ close.
   The report orders this point after its items 14, 15 and 20 are measured, the brief after units 67,
   68, 79 and 93. Unit 93 measures whether workflow judges need the charter at all; this unit moves
   wrapper prose an editing session needs only on product paths, so the A/B cannot change the pick.
-  What the ordering buys is a wrapper that units 79 and 68 have already reshaped, so the moved bytes
+  What the ordering buys is a wrapper that unit 79 has already reshaped, so the moved bytes
   and the byte delta are measured once, on the final text.
   RESOLVED (agent, 2026-10-04, delegated): build at order 95, moving the section as it reads at the
   unit's base, with no condition on unit 93's verdict.
@@ -224,6 +226,10 @@ close.
 
 - rev-1 · 2026-10-04 · initial draft; split from unit 74 at its F1, the CLI's rule loading read from
   both binaries, and the wrapper's sections sized at base.
+- rev-2 · 2026-10-04 · §3 · §4 · §8 · M2 cross-read: the split from unit 74 is now a declared
+  consumes-from `TOOL-aMendedFleet-74`, reciprocal to its hands-off; §4 said unit 97 moves its part
+  before this unit re-measures, but unit 97 is ordered after it; §8 F2 named unit 68 as reshaping
+  the wrapper, which edits the unattended Skill and not `AGENTS.md`.
 
 ## 10. Reuse audit
 

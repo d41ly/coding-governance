@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-67 — review and drift harnesses can spawn their judges as a read-only agent type that omits the charter
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 67
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 67
 
 <!-- gen:spec-records -->
 
@@ -47,9 +47,11 @@ defaults to it.
 ## 3. Non-goals (OUT)
 
 - The A/B run itself, one tier2 review with and without `workerType`, scored on precision and
-  first-turn tokens. §8 F4 moves it to a unit the run adds: it must run from the main loop, and its
-  token half reads unit 70's tokens-to-READY mode.
-- Making any worker type the default. That is the A/B unit's decision to take on its measurement.
+  first-turn tokens. §8 F4 moves it to `TOOL-aMendedFleet-93`: it must run from the main loop, and
+  its token half reads each judge's sidechain transcript directly, not unit 70's tokens-to-READY
+  mode, which stops at a main thread's READY point.
+- Making any worker type the default. That is `TOOL-aMendedFleet-93`'s decision to take on its
+  measurement.
 - A custom agent definition. §8 F1 found that the installed CLI does not let one omit the charter.
 - The drift-audit FINDERS. Each writes its prose writeup to a file as it works, which is both its
   deliverable and the durability control the harness records after a two-hour finder died with
@@ -59,8 +61,8 @@ defaults to it.
 
 ### Edges
 
-- **hands-off** external — the A/B run and the default it may set, which §8 F4 moves to a unit the
-  run adds to this build after units 67 and 70.
+- **hands-off** `TOOL-aMendedFleet-93` — the A/B run and the default it may set, which §8 F4 moves
+  to that unit, ordered after this one.
 
 ## 4. Design
 
@@ -143,8 +145,9 @@ lander by unit 65 or owed at the close.
   fixture: the stub runner is the evaluation shape the harness's own suite already uses, written to
   the scratchpad for this check.
 - **AC2** — When the same stub run is made with no `workerType`, against the unit's tip and against
-  `tools/workflows/tier2-review.js` as it stood at base `7af5f564`, the recorded prompts and options of
-  every spawn are identical between the two.
+  `tools/workflows/tier2-review.js` as it stood at the pass's starting commit, the recorded prompts
+  and options of every spawn are identical between the two. The starting commit, not base
+  `7af5f564`, because units 11, 17 and 18 move the same harness's prompts first.
   Red when: a default run's prompts or options change.
 - **AC3** — When the stub run is made with `workerType` set to `'two words'`, to `7` and to a
   65-character name, each throws an error naming `workerType` before the first spawn is recorded. These
@@ -161,7 +164,7 @@ lander by unit 65 or owed at the close.
 - **AC6** — When `node tools/workflows/check-workflow-syntax.js` and
   `bash tools/workflows/check-verifier-fanout.sh` run at the unit's tip, both exit 0, and a `diff` of
   each touched template against its render differs only on the `FANOUT_CAP` lines it differed on at
-  base.
+  the pass's starting commit.
   Red when: a script no longer parses, the verifier cap moves, or a render and its template diverge.
 
 ## 7. Gates
@@ -197,12 +200,17 @@ New arm: `tools/workflows/tier2-review.test.sh` · stub spawns recorded with and
   sidechain, which holds no Workflow tool, so no pass of this unit can start a tier2 run; and its
   token half needs unit 70's tokens-to-READY mode, ordered after this unit.
   RESOLVED (agent, 2026-10-04, delegated): split — the A/B run and the default it may set move to a
-  new unit the run adds, ordered after units 67 and 70.
+  new unit the run adds, ordered after units 67 and 70. That unit is `TOOL-aMendedFleet-93`, whose
+  §10 found unit 70's mode cannot see a judge's first turn, so it keeps the order and not the read.
 
 ## 9. Revision log
 
 - rev-1 · 2026-10-04 · initial draft, from a read of the three harnesses' spawn sites and durability
   instructions at base and of the PATH CLI's agent definitions on node a.
+- rev-2 · 2026-10-04 · §3 · AC2 · AC6 · §8 · M2 cross-read: the A/B unit is `TOOL-aMendedFleet-93`,
+  which reads judge transcripts and not unit 70's mode, so the non-goal and the edge now name it;
+  AC2 and AC6 compared against base, which units 11, 17 and 18 move first, and now compare against
+  the pass's starting commit.
 
 ## 10. Reuse audit
 

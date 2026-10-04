@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-43 — the map renders a card of at most 1 KB per feature from its dossier's toml fence
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 43
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 43
 
 <!-- gen:spec-records -->
 
@@ -29,8 +29,8 @@ dossiers near the cap, is a separate mechanism with a disjoint write set, and §
   at a character boundary with `...` appended when cut; one line naming status, streams and the
   dossier's repo-relative path; then one list line each for decisions, for every non-empty claims
   inventory in `inventory_ids` order, and for the path globs, each line naming its full item count
-  before its items. Items are added one at a time while the card stays within `CARD_CAP_BYTES`,
-  1024, counted in UTF-8 bytes from the heading through the card's last line, with room reserved
+  before its items. Items are added one at a time while the card stays within
+  `FEATURE_CARD_CAP_BYTES`, 1024, counted in UTF-8 bytes from the heading through the card's last line, with room reserved
   for the cut line. Every item that did not fit is counted, and the card ends with one line,
   `cut <n> item(s) to fit 1024 bytes; the dossier's toml fence lists them all`, when n is above
   zero. Observed by AC1 and AC2.
@@ -54,10 +54,11 @@ dossiers near the cap, is a separate mechanism with a disjoint write set, and §
 
 ## 3. Non-goals (OUT)
 
-- Moving measured history out of the dossiers near the cap. §8 F1 splits it into a unit the run
-  adds; it edits dossier prose, which this unit never reads.
-- Any reader of the cards. Which session step points a reader at a card is the orientation units'
-  question, units 77 and 78, and a pointer to a file that does not exist yet cannot be written first.
+- Moving measured history out of the dossiers near the cap. §8 F1 splits it into
+  `TOOL-aMendedFleet-89`; it edits dossier prose, which this unit never reads.
+- Any reader of the cards. No unit of this build points a session step at a card: the orientation
+  units, 77 and 78, add the overlaps cell and Step 4's context-command pointer and neither names the
+  cards, and a pointer to a file that does not exist yet cannot be written first.
 - Card content from dossier prose: constraints, gaps, seams or the reuse affordance. Prose has no
   fixed shape a 1 KB budget can cut fairly, and reading it would couple the cards to every prose edit.
 - A card for `FOUNDATION.md`, or a byte size or last-commit field on a card. The size moves with
@@ -69,9 +70,10 @@ dossiers near the cap, is a separate mechanism with a disjoint write set, and §
 
 - **consumes-from** `TOOL-aMendedFleet-37` — AC1 reads `map_diff.py --stale-dossiers`, which that
   unit builds, to observe that this unit refreshed the dossier whose paths it touched.
-- **hands-off** external — the measured-history move, which F1 assigns to a unit the run adds.
-- **hands-off** external — pointing a session step at the cards, which belongs to the orientation
-  units and is not built here.
+- **hands-off** `TOOL-aMendedFleet-89` — the measured-history move, which F1 assigns there; it edits
+  prose below the fences and leaves the cards file byte-identical.
+- **hands-off** external — pointing a session step at the cards, which no unit of this build owns
+  and is not built here.
 - **hands-off** external — the codebase-map kit version bump, owed once at the close.
 
 ## 4. Design
@@ -116,7 +118,7 @@ already started keeps its header count, so a reader always learns how many items
 | Identifier | Kind | Cell |
 |---|---|---|
 | `render_cards_md` | function, `map_lib.py` | `py.function`, verb `render`; `--suggest render_cards_md --as py.function` answered OK |
-| `CARD_CAP_BYTES` | module constant, `map_lib.py` | none |
+| `FEATURE_CARD_CAP_BYTES` | module constant, `map_lib.py` | none |
 | `CARDS.md` | generated artifact under the map root's `generated/` | none |
 
 ### Rollout
@@ -205,7 +207,7 @@ New arm: `tools/codebase-map/selftest.py` · a fixture tree with an ordinary dos
 
 - **F1** — Is moving measured history out of the dossiers near the cap part of this mechanism?
   RESOLVED (agent, 2026-10-04, delegated): split — the history move goes to a new unit the run
-  adds. It edits the prose of the seven dossiers near the cap and decides where measured history
+  adds, `TOOL-aMendedFleet-89`. It edits the prose of the seven dossiers near the cap and decides where measured history
   lives instead, while this unit renders from the fences and never reads prose: two mechanisms with
   disjoint write sets, and the build's rule is one mechanism per spec.
 - **F2** — One cards file, one file per feature, or a print mode?
@@ -220,6 +222,13 @@ New arm: `tools/codebase-map/selftest.py` · a fixture tree with an ordinary dos
 
 - rev-1 · 2026-10-04 · initial draft, from the synthesis's item [#47], `parse_dossier`,
   `_artifacts()`, the gate's `fresh` mapping and `check_gate_coverage.py`, re-measured at `fee9f62b`.
+- rev-2 · 2026-10-04 · S2 §3 §4 §8 · the M2 cross-read: the history move named `external` and "a unit
+  the run adds" while `TOOL-aMendedFleet-89` exists in this build, so the Non-goal, Edges and F1 name
+  it; the Non-goal gave the card pointer to units 77 and 78, whose specs add an overlaps cell and a
+  Step 4 pointer and never name the cards, so it now says no unit owns it; and the cap constant was
+  spelled `CARD_CAP_BYTES`, the name the session card's 8,192-byte cap already carries in
+  `skills/session-kickoff/manifest-check.sh` and units 76, 77 and 96 cite, so S2 and the Inventory
+  spell it `FEATURE_CARD_CAP_BYTES`.
 
 ## 10. Reuse audit
 

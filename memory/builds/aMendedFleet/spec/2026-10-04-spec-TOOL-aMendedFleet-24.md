@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-24 — dead repo paths in live build READMEs are reported, and the decision log's dead pointer is repaired
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 24
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 24
 
 <!-- gen:spec-records -->
 
@@ -45,6 +45,9 @@ directory this repo does not have.
   changes. Observed by AC5.
 - **S7** — check 15's catalogue entry in `tools/memory-tree/HYGIENE.template.md` gains one sentence
   naming the advisory population, and `memory/HYGIENE.md` is re-rendered from it. Observed by AC6.
+- **S8** — `memory/map/generated/symbols.json` is regenerated for the new
+  definitions. NOT OBSERVED by a criterion here: `python tools/codebase-map/gen_map.py --check` at
+  the close is its check, and §7 names the leg that reads it.
 
 ## 3. Non-goals (OUT)
 
@@ -118,6 +121,7 @@ runs beside another that writes it. The re-render in S7 is the parity script's `
 - `tools/memory-tree/HYGIENE.template.md`
 - `memory/HYGIENE.md`
 - `memory/DECISIONS.md`
+- `memory/map/generated/symbols.json`
 
 ### Alternatives rejected
 
@@ -169,7 +173,7 @@ runs beside another that writes it. The re-render in S7 is the parity script's `
 
 ## 7. Gates
 
-`memory hygiene` · `corpus-ids selftest` · `memory-hygiene self-test` · `kit/dogfood doc parity` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `kit epoch (shipped bytes move, the version moves)` · `spec tokens (a spec's own names resolve)`
+`memory hygiene` · `corpus-ids selftest` · `memory-hygiene self-test` · `kit/dogfood doc parity` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `kit epoch (shipped bytes move, the version moves)` · `codebase-map coverage + freshness` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/memory-tree/corpus_ids.py --selftest · S5's live-README arm, staged red by routing admitted files into the dead map · none
 
@@ -185,6 +189,9 @@ New arm: tools/memory-tree/corpus_ids.py --selftest · S5's live-README arm, sta
 
 - rev-1 · 2026-10-04 · initial draft, from the synthesis's item [#20], a replay of check 15's filters
   over the live READMEs at base, and a read of the decision log's header.
+- rev-2 · 2026-10-04 · §2 S8 · §4 · §7 · M2 cross-read: the definitions this unit adds
+  move `memory/map/generated/symbols.json`, which `TOOL-aMendedFleet-82` and the build's other
+  code units regenerate and declare; this spec omitted the write, its Files touched row and the leg.
 
 ## 10. Reuse audit
 

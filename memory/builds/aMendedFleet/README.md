@@ -5,7 +5,7 @@ opened: 2026-10-04
 streams: tooling+kickoff+playbook
 roster: TOOL+KICK+PLAY
 authorized-by: prompt
-ids: KICK-aMendedFleet-1 KICK-aMendedFleet-2 KICK-aMendedFleet-3 KICK-aMendedFleet-4 PLAY-aMendedFleet-1 PLAY-aMendedFleet-2 PLAY-aMendedFleet-3 PLAY-aMendedFleet-4 TOOL-aMendedFleet-1 TOOL-aMendedFleet-2 TOOL-aMendedFleet-3 TOOL-aMendedFleet-4 TOOL-aMendedFleet-5 TOOL-aMendedFleet-6 TOOL-aMendedFleet-7 TOOL-aMendedFleet-8 TOOL-aMendedFleet-9 TOOL-aMendedFleet-10 TOOL-aMendedFleet-11 TOOL-aMendedFleet-12 TOOL-aMendedFleet-13 TOOL-aMendedFleet-14 TOOL-aMendedFleet-15 TOOL-aMendedFleet-16 TOOL-aMendedFleet-17 TOOL-aMendedFleet-18 TOOL-aMendedFleet-19 TOOL-aMendedFleet-20 TOOL-aMendedFleet-21 TOOL-aMendedFleet-22 TOOL-aMendedFleet-23 TOOL-aMendedFleet-24 TOOL-aMendedFleet-25 TOOL-aMendedFleet-26 TOOL-aMendedFleet-27 TOOL-aMendedFleet-28 TOOL-aMendedFleet-29 TOOL-aMendedFleet-30 TOOL-aMendedFleet-31 TOOL-aMendedFleet-32 TOOL-aMendedFleet-33 TOOL-aMendedFleet-34 TOOL-aMendedFleet-35 TOOL-aMendedFleet-36 TOOL-aMendedFleet-37 TOOL-aMendedFleet-38 TOOL-aMendedFleet-39 TOOL-aMendedFleet-40 TOOL-aMendedFleet-41 TOOL-aMendedFleet-42 TOOL-aMendedFleet-43 TOOL-aMendedFleet-44 TOOL-aMendedFleet-45 TOOL-aMendedFleet-46 TOOL-aMendedFleet-47 TOOL-aMendedFleet-48 TOOL-aMendedFleet-49 TOOL-aMendedFleet-50 TOOL-aMendedFleet-51 TOOL-aMendedFleet-52 TOOL-aMendedFleet-53 TOOL-aMendedFleet-54 TOOL-aMendedFleet-55 TOOL-aMendedFleet-56 TOOL-aMendedFleet-57 TOOL-aMendedFleet-58 TOOL-aMendedFleet-59 TOOL-aMendedFleet-60 TOOL-aMendedFleet-61 TOOL-aMendedFleet-62 TOOL-aMendedFleet-63 TOOL-aMendedFleet-64 TOOL-aMendedFleet-65 TOOL-aMendedFleet-66 TOOL-aMendedFleet-67 TOOL-aMendedFleet-68 TOOL-aMendedFleet-69 TOOL-aMendedFleet-70 TOOL-aMendedFleet-71 TOOL-aMendedFleet-72 TOOL-aMendedFleet-73 TOOL-aMendedFleet-74 TOOL-aMendedFleet-75 TOOL-aMendedFleet-81 TOOL-aMendedFleet-82 TOOL-aMendedFleet-83 TOOL-aMendedFleet-84 TOOL-aMendedFleet-85 TOOL-aMendedFleet-86 TOOL-aMendedFleet-87 TOOL-aMendedFleet-88 TOOL-aMendedFleet-89 TOOL-aMendedFleet-90 TOOL-aMendedFleet-91 TOOL-aMendedFleet-92 TOOL-aMendedFleet-93 TOOL-aMendedFleet-94
+ids: KICK-aMendedFleet-1 KICK-aMendedFleet-2 KICK-aMendedFleet-3 KICK-aMendedFleet-4 PLAY-aMendedFleet-1 PLAY-aMendedFleet-2 PLAY-aMendedFleet-3 PLAY-aMendedFleet-4 TOOL-aMendedFleet-1 TOOL-aMendedFleet-2 TOOL-aMendedFleet-3 TOOL-aMendedFleet-4 TOOL-aMendedFleet-5 TOOL-aMendedFleet-6 TOOL-aMendedFleet-7 TOOL-aMendedFleet-8 TOOL-aMendedFleet-9 TOOL-aMendedFleet-10 TOOL-aMendedFleet-11 TOOL-aMendedFleet-12 TOOL-aMendedFleet-13 TOOL-aMendedFleet-14 TOOL-aMendedFleet-15 TOOL-aMendedFleet-16 TOOL-aMendedFleet-17 TOOL-aMendedFleet-18 TOOL-aMendedFleet-19 TOOL-aMendedFleet-20 TOOL-aMendedFleet-21 TOOL-aMendedFleet-22 TOOL-aMendedFleet-23 TOOL-aMendedFleet-24 TOOL-aMendedFleet-25 TOOL-aMendedFleet-26 TOOL-aMendedFleet-27 TOOL-aMendedFleet-28 TOOL-aMendedFleet-29 TOOL-aMendedFleet-30 TOOL-aMendedFleet-31 TOOL-aMendedFleet-32 TOOL-aMendedFleet-33 TOOL-aMendedFleet-34 TOOL-aMendedFleet-35 TOOL-aMendedFleet-36 TOOL-aMendedFleet-37 TOOL-aMendedFleet-38 TOOL-aMendedFleet-39 TOOL-aMendedFleet-40 TOOL-aMendedFleet-41 TOOL-aMendedFleet-42 TOOL-aMendedFleet-43 TOOL-aMendedFleet-44 TOOL-aMendedFleet-45 TOOL-aMendedFleet-46 TOOL-aMendedFleet-47 TOOL-aMendedFleet-48 TOOL-aMendedFleet-49 TOOL-aMendedFleet-50 TOOL-aMendedFleet-51 TOOL-aMendedFleet-52 TOOL-aMendedFleet-53 TOOL-aMendedFleet-54 TOOL-aMendedFleet-55 TOOL-aMendedFleet-56 TOOL-aMendedFleet-57 TOOL-aMendedFleet-58 TOOL-aMendedFleet-59 TOOL-aMendedFleet-60 TOOL-aMendedFleet-61 TOOL-aMendedFleet-62 TOOL-aMendedFleet-63 TOOL-aMendedFleet-64 TOOL-aMendedFleet-65 TOOL-aMendedFleet-66 TOOL-aMendedFleet-67 TOOL-aMendedFleet-68 TOOL-aMendedFleet-69 TOOL-aMendedFleet-70 TOOL-aMendedFleet-71 TOOL-aMendedFleet-72 TOOL-aMendedFleet-73 TOOL-aMendedFleet-74 TOOL-aMendedFleet-75 TOOL-aMendedFleet-81 TOOL-aMendedFleet-82 TOOL-aMendedFleet-83 TOOL-aMendedFleet-84 TOOL-aMendedFleet-85 TOOL-aMendedFleet-86 TOOL-aMendedFleet-87 TOOL-aMendedFleet-88 TOOL-aMendedFleet-89 TOOL-aMendedFleet-90 TOOL-aMendedFleet-91 TOOL-aMendedFleet-92 TOOL-aMendedFleet-93 TOOL-aMendedFleet-94 TOOL-aMendedFleet-95
 ---
 
 # aMendedFleet — the 2026-10-04 governance review, every point built as its own unit
@@ -41,6 +41,9 @@ and every red leg fixed. The prompt, the owner's four answers and the report are
 - No spec audit (owner, 2026-10-04); the closing diff review is every spec's first review.
 - Every new refusal or gate clause is observed RED on a staged break before it lands.
 - Per-unit dispatch is sequential (ratified `parallelism route: none`); specs fan out.
+- A pass touching a kickoff-manifest watched path re-stamps `last-audit` in its own commit, re-reads
+  §B, and advances `last-body-change`.
+- Dispatch follows the M2 cross-read's ordering constraints, not roster order.
 - Classified at kickoff (M2): every unit MISSING.
 
 ## Parked decisions
@@ -120,16 +123,16 @@ and every red leg fixed. The prompt, the owner's four answers and the report are
 | 67 | `TOOL-aMendedFleet-67` | 2 | a read-only worker agent type that omits the charter import |
 | 68 | `TOOL-aMendedFleet-68` | 2 | the unattended Skill becomes a router of at most 10 KB |
 | 69 | `TOOL-aMendedFleet-69` | 1 | the agent-instructions kit warns past 32 KiB and its stale rows are fixed |
-| 70 | `TOOL-aMendedFleet-70` | 1 | a tokens-to-READY report from the run journals |
+| 70 | `TOOL-aMendedFleet-70` | 1 | a tokens-to-READY report from session transcripts |
 | 71 | `TOOL-aMendedFleet-71` | 1 | present-tense counts in code comments are swept |
 | 72 | `TOOL-aMendedFleet-72` | 1 | the dead `gate-timings.tsv` path is removed |
 | 73 | `TOOL-aMendedFleet-73` | 2 | the vague-brief trial arm is run and recorded |
-| 74 | `TOOL-aMendedFleet-74` | 2 | path-scoped rules and a budgeted pre-build checklist, after the diet is measured |
+| 74 | `TOOL-aMendedFleet-74` | 2 | a dark, opt-in pre-build bug-class checklist in the unit harness |
 | 75 | `TOOL-aMendedFleet-75` | 1 | acceptance-criterion ids join the `New arm:` grammar |
 | 76 | `KICK-aMendedFleet-1` | 1 | the orientation card shows the last drift-history row |
 | 77 | `KICK-aMendedFleet-2` | 1 | the orientation card shows run overlaps and a stale-CLI note |
 | 78 | `KICK-aMendedFleet-3` | 1 | kickoff Step 4 points at the two context commands the build method spells once |
-| 79 | `PLAY-aMendedFleet-1` | 2 | the `AGENTS.md` wrapper loses its duplicate registry, repeated catalog and dated history |
+| 79 | `PLAY-aMendedFleet-1` | 2 | the `AGENTS.md` merge-bar section moves to a guide, without its repeated catalog or dated history |
 | 80 | `PLAY-aMendedFleet-2` | 1 | an experiment's instrument and result rows are committed to its build folder |
 | 81 | `TOOL-aMendedFleet-81` | 1 | the month shards carry only Build, Node and Opened, so the frozen claim holds |
 | 82 | `TOOL-aMendedFleet-82` | 1 | each recall query-log row carries the worktree HEAD, so a later commit is found by ancestry |
@@ -144,7 +147,7 @@ and every red leg fixed. The prompt, the owner's four answers and the report are
 | 91 | `TOOL-aMendedFleet-91` | 1 | a spec header can declare a records-only deliverable |
 | 92 | `TOOL-aMendedFleet-92` | 2 | check 23 grades the run's own range under a per-build budget |
 | 93 | `TOOL-aMendedFleet-93` | 2 | one tier2 run is A/B-tested with and without the charter import, and the default follows the result |
-| 94 | `PLAY-aMendedFleet-3` | 1 | the charter template's agent-instructions clause states what each tool reads today |
+| 94 | `PLAY-aMendedFleet-3` | 1 | the charter's wiring rule states a version-neutral reason instead of which file Claude Code reads |
 | 95 | `TOOL-aMendedFleet-94` | 2 | path-scoped rules for editing areas, after the diet is measured |
 | 96 | `KICK-aMendedFleet-4` | 1 | the orientation card notes a PATH CLI older than the running session |
 | 97 | `PLAY-aMendedFleet-4` | 1 | the `AGENTS.md` wrapper carries one node registry |
@@ -159,108 +162,108 @@ ids TOOL-aMendedFleet-21 TOOL-aMendedFleet-22 TOOL-aMendedFleet-23 TOOL-aMendedF
 ids TOOL-aMendedFleet-35 TOOL-aMendedFleet-36 TOOL-aMendedFleet-37 TOOL-aMendedFleet-38 TOOL-aMendedFleet-39 TOOL-aMendedFleet-40 TOOL-aMendedFleet-41 TOOL-aMendedFleet-42 TOOL-aMendedFleet-43 TOOL-aMendedFleet-44 TOOL-aMendedFleet-45 TOOL-aMendedFleet-46 TOOL-aMendedFleet-47 TOOL-aMendedFleet-48
 ids TOOL-aMendedFleet-49 TOOL-aMendedFleet-50 TOOL-aMendedFleet-51 TOOL-aMendedFleet-52 TOOL-aMendedFleet-53 TOOL-aMendedFleet-54 TOOL-aMendedFleet-55 TOOL-aMendedFleet-56 TOOL-aMendedFleet-57 TOOL-aMendedFleet-58 TOOL-aMendedFleet-59 TOOL-aMendedFleet-60 TOOL-aMendedFleet-61 TOOL-aMendedFleet-62
 ids TOOL-aMendedFleet-63 TOOL-aMendedFleet-64 TOOL-aMendedFleet-65 TOOL-aMendedFleet-66 TOOL-aMendedFleet-67 TOOL-aMendedFleet-68 TOOL-aMendedFleet-69 TOOL-aMendedFleet-70 TOOL-aMendedFleet-71 TOOL-aMendedFleet-72 TOOL-aMendedFleet-73 TOOL-aMendedFleet-74 TOOL-aMendedFleet-75 TOOL-aMendedFleet-81
-ids TOOL-aMendedFleet-82 TOOL-aMendedFleet-83 TOOL-aMendedFleet-84 TOOL-aMendedFleet-85 TOOL-aMendedFleet-86 TOOL-aMendedFleet-87 TOOL-aMendedFleet-88 TOOL-aMendedFleet-89 TOOL-aMendedFleet-90 TOOL-aMendedFleet-91 TOOL-aMendedFleet-92 TOOL-aMendedFleet-93 TOOL-aMendedFleet-94
+ids TOOL-aMendedFleet-82 TOOL-aMendedFleet-83 TOOL-aMendedFleet-84 TOOL-aMendedFleet-85 TOOL-aMendedFleet-86 TOOL-aMendedFleet-87 TOOL-aMendedFleet-88 TOOL-aMendedFleet-89 TOOL-aMendedFleet-90 TOOL-aMendedFleet-91 TOOL-aMendedFleet-92 TOOL-aMendedFleet-93 TOOL-aMendedFleet-94 TOOL-aMendedFleet-95
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-aMendedFleet-1 — restore the views helper and the `--status` entry merge 01c22e155 lost](spec/2026-10-04-spec-TOOL-aMendedFleet-1.md) | 1 | 1 | SPECCED | rev-1 | 2026-10-04 |
 | [TOOL-aMendedFleet-2 — a definition-level census of every merge since 2026-09-01](spec/2026-10-04-spec-TOOL-aMendedFleet-2.md) | 2 | 1 | SPECCED | rev-1 | 2026-10-04 |
-| [TOOL-aMendedFleet-3 — the lander refuses a merge that loses a definition a parent carried](spec/2026-10-04-spec-TOOL-aMendedFleet-3.md) | 3 | 2 | SPECCED | rev-2 | 2026-10-04 |
+| [TOOL-aMendedFleet-3 — the lander refuses a merge that loses a definition a parent carried](spec/2026-10-04-spec-TOOL-aMendedFleet-3.md) | 3 | 2 | SPECCED | rev-3 | 2026-10-04 |
 | [TOOL-aMendedFleet-4 — the govkit acceptance matrix reads its children as UTF-8 on every host](spec/2026-10-04-spec-TOOL-aMendedFleet-4.md) | 4 | 1 | SPECCED | rev-1 | 2026-10-04 |
 | [TOOL-aMendedFleet-5 — `transition-audit arms` passes on the hosted runner: the audit writes UTF-8](spec/2026-10-04-spec-TOOL-aMendedFleet-5.md) | 5 | 1 | SPECCED | rev-1 | 2026-10-04 |
 | [TOOL-aMendedFleet-6 — `lexicon wiring` passes on the hosted runner: the conf reader writes UTF-8](spec/2026-10-04-spec-TOOL-aMendedFleet-6.md) | 6 | 1 | SPECCED | rev-1 | 2026-10-04 |
-| [TOOL-aMendedFleet-7 — a census of the daily held job's red suites by root cause, adding one unit per cause](spec/2026-10-04-spec-TOOL-aMendedFleet-7.md) | 7 | 1 | SPECCED | rev-1 | 2026-10-04 |
-| [TOOL-aMendedFleet-8 — drift-audit reports `remote_ci_red_streak`](spec/2026-10-04-spec-TOOL-aMendedFleet-8.md) | 8 | 1 | SPECCED | rev-1 | 2026-10-04 |
-| [TOOL-aMendedFleet-9 — the daily held job's red suites reach the inherited-red HIGH auto-file](spec/2026-10-04-spec-TOOL-aMendedFleet-9.md) | 9 | 2 | SPECCED | rev-1 | 2026-10-04 |
-| [TOOL-aMendedFleet-10 — `--asks` rows carry the pointer and a 160-byte summary, and `--path` ranks and caps them](spec/2026-10-04-spec-TOOL-aMendedFleet-10.md) | 10 | 2 | SPECCED | rev-1 | 2026-10-04 |
+| [TOOL-aMendedFleet-7 — a census of the daily held job's red suites by root cause, adding one unit per cause](spec/2026-10-04-spec-TOOL-aMendedFleet-7.md) | 7 | 1 | SPECCED | rev-2 | 2026-10-04 |
+| [TOOL-aMendedFleet-8 — drift-audit reports `remote_ci_red_streak`](spec/2026-10-04-spec-TOOL-aMendedFleet-8.md) | 8 | 1 | SPECCED | rev-2 | 2026-10-04 |
+| [TOOL-aMendedFleet-9 — the daily held job's red suites reach the inherited-red HIGH auto-file](spec/2026-10-04-spec-TOOL-aMendedFleet-9.md) | 9 | 2 | SPECCED | rev-2 | 2026-10-04 |
+| [TOOL-aMendedFleet-10 — `--asks` rows carry the pointer and a 160-byte summary, and `--path` ranks and caps them](spec/2026-10-04-spec-TOOL-aMendedFleet-10.md) | 10 | 2 | SPECCED | rev-2 | 2026-10-04 |
 | [TOOL-aMendedFleet-11 — the review protocol and the review harness point reviewers at the filtered asks call](spec/2026-10-04-spec-TOOL-aMendedFleet-11.md) | 11 | 1 | SPECCED | rev-1 | 2026-10-04 |
-| [TOOL-aMendedFleet-12 — LIVE.md carries each build's last record date and splits ACTIVE from DORMANT](spec/2026-10-04-spec-TOOL-aMendedFleet-12.md) | 12 | 2 | SPECCED | rev-1 | 2026-10-04 |
-| [TOOL-aMendedFleet-13 — LIVE.md counts each build's landed-unclosed units from drift-audit's own join](spec/2026-10-04-spec-TOOL-aMendedFleet-13.md) | 13 | 2 | SPECCED | rev-1 | 2026-10-04 |
+| [TOOL-aMendedFleet-12 — LIVE.md carries each build's last record date and splits ACTIVE from DORMANT](spec/2026-10-04-spec-TOOL-aMendedFleet-12.md) | 12 | 2 | SPECCED | rev-2 | 2026-10-04 |
+| [TOOL-aMendedFleet-13 — LIVE.md counts each build's landed-unclosed units from drift-audit's own join](spec/2026-10-04-spec-TOOL-aMendedFleet-13.md) | 13 | 2 | SPECCED | rev-2 | 2026-10-04 |
 | [TOOL-aMendedFleet-14 — bulk backlog triage: aged unlabelled asks deferred on one triage ask, and five fixed-but-OPEN asks disposed](spec/2026-10-04-spec-TOOL-aMendedFleet-14.md) | 14 | 1 | SPECCED | rev-1 | 2026-10-04 |
 | [TOOL-aMendedFleet-15 — the shrink-only pin on `backlog_asks_unlabelled` is re-armed](spec/2026-10-04-spec-TOOL-aMendedFleet-15.md) | 15 | 1 | SPECCED | rev-1 | 2026-10-04 |
-| [TOOL-aMendedFleet-16 — `gotchas.py --for-diff` ranks classes by anchor specificity and cuts in tiers](spec/2026-10-04-spec-TOOL-aMendedFleet-16.md) | 16 | 2 | SPECCED | rev-1 | 2026-10-04 |
-| [TOOL-aMendedFleet-17 — `tier2-review.js` keeps each finding's bug-class label in the committed appendix](spec/2026-10-04-spec-TOOL-aMendedFleet-17.md) | 17 | 2 | SPECCED | rev-1 | 2026-10-04 |
-| [TOOL-aMendedFleet-18 — `tier2-review.js` prints one machine shape line with severity counts and output tokens](spec/2026-10-04-spec-TOOL-aMendedFleet-18.md) | 18 | 1 | SPECCED | rev-1 | 2026-10-04 |
-| [TOOL-aMendedFleet-19 — `gen_build_index.py --doctor <slug>` prints every failing build-folder rule in one pass](spec/2026-10-04-spec-TOOL-aMendedFleet-19.md) | 19 | 2 | SPECCED | rev-1 | 2026-10-04 |
-| [TOOL-aMendedFleet-20 — `--new-spec` writes a skeleton that already carries every shape a cutoff demands](spec/2026-10-04-spec-TOOL-aMendedFleet-20.md) | 20 | 1 | SPECCED | rev-1 | 2026-10-04 |
-| [TOOL-aMendedFleet-21 — a cutoff budget: armed `*_CUTOFF` keys are a pinned drift signal, so a new one must displace an old one](spec/2026-10-04-spec-TOOL-aMendedFleet-21.md) | 21 | 2 | SPECCED | rev-1 | 2026-10-04 |
-| [TOOL-aMendedFleet-22 — the generated views merge by taking one side](spec/2026-10-04-spec-TOOL-aMendedFleet-22.md) | 22 | 1 | SPECCED | rev-2 | 2026-10-04 |
-| [TOOL-aMendedFleet-23 — check 19 reports the gotcha anchors that select no tracked path](spec/2026-10-04-spec-TOOL-aMendedFleet-23.md) | 23 | 1 | SPECCED | rev-1 | 2026-10-04 |
-| [TOOL-aMendedFleet-24 — dead repo paths in live build READMEs are reported, and the decision log's dead pointer is repaired](spec/2026-10-04-spec-TOOL-aMendedFleet-24.md) | 24 | 1 | SPECCED | rev-1 | 2026-10-04 |
-| [TOOL-aMendedFleet-25 — live specs carry a declared byte ceiling, and a spec already over it is held at its recorded high-water](spec/2026-10-04-spec-TOOL-aMendedFleet-25.md) | 25 | 2 | SPECCED | rev-1 | 2026-10-04 |
-| [TOOL-aMendedFleet-26 — a `missing:` citation form names an id that has no record, with its own count](spec/2026-10-04-spec-TOOL-aMendedFleet-26.md) | 26 | 1 | SPECCED | rev-1 | 2026-10-04 |
+| [TOOL-aMendedFleet-16 — `gotchas.py --for-diff` ranks classes by anchor specificity and cuts in tiers](spec/2026-10-04-spec-TOOL-aMendedFleet-16.md) | 16 | 2 | SPECCED | rev-2 | 2026-10-04 |
+| [TOOL-aMendedFleet-17 — `tier2-review.js` keeps each finding's bug-class label in the committed appendix](spec/2026-10-04-spec-TOOL-aMendedFleet-17.md) | 17 | 2 | SPECCED | rev-2 | 2026-10-04 |
+| [TOOL-aMendedFleet-18 — `tier2-review.js` prints one machine shape line with severity counts and output tokens](spec/2026-10-04-spec-TOOL-aMendedFleet-18.md) | 18 | 1 | SPECCED | rev-2 | 2026-10-04 |
+| [TOOL-aMendedFleet-19 — `gen_build_index.py --doctor <slug>` prints every failing build-folder rule in one pass](spec/2026-10-04-spec-TOOL-aMendedFleet-19.md) | 19 | 2 | SPECCED | rev-2 | 2026-10-04 |
+| [TOOL-aMendedFleet-20 — `--new-spec` writes a skeleton that already carries every shape a cutoff demands](spec/2026-10-04-spec-TOOL-aMendedFleet-20.md) | 20 | 1 | SPECCED | rev-2 | 2026-10-04 |
+| [TOOL-aMendedFleet-21 — a cutoff budget: armed `*_CUTOFF` keys are a pinned drift signal, so a new one must displace an old one](spec/2026-10-04-spec-TOOL-aMendedFleet-21.md) | 21 | 2 | SPECCED | rev-2 | 2026-10-04 |
+| [TOOL-aMendedFleet-22 — the generated views merge by taking one side](spec/2026-10-04-spec-TOOL-aMendedFleet-22.md) | 22 | 1 | SPECCED | rev-3 | 2026-10-04 |
+| [TOOL-aMendedFleet-23 — check 19 reports the gotcha anchors that select no tracked path](spec/2026-10-04-spec-TOOL-aMendedFleet-23.md) | 23 | 1 | SPECCED | rev-2 | 2026-10-04 |
+| [TOOL-aMendedFleet-24 — dead repo paths in live build READMEs are reported, and the decision log's dead pointer is repaired](spec/2026-10-04-spec-TOOL-aMendedFleet-24.md) | 24 | 1 | SPECCED | rev-2 | 2026-10-04 |
+| [TOOL-aMendedFleet-25 — live specs carry a declared byte ceiling, and a spec already over it is held at its recorded high-water](spec/2026-10-04-spec-TOOL-aMendedFleet-25.md) | 25 | 2 | SPECCED | rev-2 | 2026-10-04 |
+| [TOOL-aMendedFleet-26 — a `missing:` citation form names an id that has no record, with its own count](spec/2026-10-04-spec-TOOL-aMendedFleet-26.md) | 26 | 1 | SPECCED | rev-2 | 2026-10-04 |
 | [TOOL-aMendedFleet-27 — recall excludes archived versioned snapshots by a declared pattern, and an arm proves a live line answers instead](spec/2026-10-04-spec-TOOL-aMendedFleet-27.md) | 27 | 1 | SPECCED | rev-1 | 2026-10-04 |
-| [TOOL-aMendedFleet-28 — the recall floor grades the served path, terms plus fusion](spec/2026-10-04-spec-TOOL-aMendedFleet-28.md) | 28 | 2 | SPECCED | rev-1 | 2026-10-04 |
-| [TOOL-aMendedFleet-29 — a recall gold set harvested from spec §10 probes, de-contaminated, graded at hit@10](spec/2026-10-04-spec-TOOL-aMendedFleet-29.md) | 29 | 2 | SPECCED | rev-1 | 2026-10-04 |
+| [TOOL-aMendedFleet-28 — the recall floor grades the served path, terms plus fusion](spec/2026-10-04-spec-TOOL-aMendedFleet-28.md) | 28 | 2 | SPECCED | rev-2 | 2026-10-04 |
+| [TOOL-aMendedFleet-29 — a recall gold set harvested from spec §10 probes, de-contaminated, graded at hit@10](spec/2026-10-04-spec-TOOL-aMendedFleet-29.md) | 29 | 2 | SPECCED | rev-2 | 2026-10-04 |
 | [TOOL-aMendedFleet-30 — superseded records are labelled in recall output](spec/2026-10-04-spec-TOOL-aMendedFleet-30.md) | 30 | 1 | WONTDO | rev-2 | 2026-10-04 |
-| [TOOL-aMendedFleet-31 — recall output keeps every hit and prints snippets only for the head](spec/2026-10-04-spec-TOOL-aMendedFleet-31.md) | 31 | 2 | SPECCED | rev-1 | 2026-10-04 |
-| [TOOL-aMendedFleet-32 — recall cache eviction removes deleted worktrees first and orders the rest by last query](spec/2026-10-04-spec-TOOL-aMendedFleet-32.md) | 32 | 2 | SPECCED | rev-1 | 2026-10-04 |
+| [TOOL-aMendedFleet-31 — recall output keeps every hit and prints snippets only for the head](spec/2026-10-04-spec-TOOL-aMendedFleet-31.md) | 31 | 2 | SPECCED | rev-2 | 2026-10-04 |
+| [TOOL-aMendedFleet-32 — recall cache eviction removes deleted worktrees first and orders the rest by last query](spec/2026-10-04-spec-TOOL-aMendedFleet-32.md) | 32 | 2 | SPECCED | rev-2 | 2026-10-04 |
 | [TOOL-aMendedFleet-33 — the recall README and Skill stop typing corpus figures, and a miss re-queries before grep](spec/2026-10-04-spec-TOOL-aMendedFleet-33.md) | 33 | 1 | SPECCED | rev-1 | 2026-10-04 |
-| [TOOL-aMendedFleet-34 — recall measures offline whether an answer was used, from the query log and the worktree's next commit](spec/2026-10-04-spec-TOOL-aMendedFleet-34.md) | 34 | 1 | SPECCED | rev-1 | 2026-10-04 |
+| [TOOL-aMendedFleet-34 — recall measures offline whether an answer was used, from the query log and the worktree's next commit](spec/2026-10-04-spec-TOOL-aMendedFleet-34.md) | 34 | 1 | SPECCED | rev-2 | 2026-10-04 |
 | [TOOL-aMendedFleet-35 — the map's symbol tier reads shell definitions through the lexicon's tokenizer](spec/2026-10-04-spec-TOOL-aMendedFleet-35.md) | 35 | 2 | SPECCED | rev-1 | 2026-10-04 |
 | [TOOL-aMendedFleet-36 — `reuse_lookup.py` prints within a byte budget and names what it cut](spec/2026-10-04-spec-TOOL-aMendedFleet-36.md) | 36 | 1 | SPECCED | rev-1 | 2026-10-04 |
-| [TOOL-aMendedFleet-37 — dossier freshness is derived from git, and drift-audit reports the dossiers older than their paths](spec/2026-10-04-spec-TOOL-aMendedFleet-37.md) | 37 | 2 | SPECCED | rev-1 | 2026-10-04 |
-| [TOOL-aMendedFleet-38 — `map_diff --converge`, its sink and its prescriptions are deleted](spec/2026-10-04-spec-TOOL-aMendedFleet-38.md) | 38 | 1 | SPECCED | rev-1 | 2026-10-04 |
-| [TOOL-aMendedFleet-39 — a harness-hooks inventory, and `git-hooks` holds real hook names only](spec/2026-10-04-spec-TOOL-aMendedFleet-39.md) | 39 | 2 | SPECCED | rev-1 | 2026-10-04 |
-| [TOOL-aMendedFleet-40 — the coverage gate refuses a `baseline.toml` that gained a key against its base](spec/2026-10-04-spec-TOOL-aMendedFleet-40.md) | 40 | 1 | SPECCED | rev-1 | 2026-10-04 |
-| [TOOL-aMendedFleet-41 — `replay-phrases.py --floor` grades a frozen phrase population against recorded floors](spec/2026-10-04-spec-TOOL-aMendedFleet-41.md) | 41 | 1 | SPECCED | rev-1 | 2026-10-04 |
-| [TOOL-aMendedFleet-42 — the reuse probe counts canonical-copy install sites beside fan-in](spec/2026-10-04-spec-TOOL-aMendedFleet-42.md) | 42 | 1 | SPECCED | rev-1 | 2026-10-04 |
-| [TOOL-aMendedFleet-43 — the map renders a card of at most 1 KB per feature from its dossier's toml fence](spec/2026-10-04-spec-TOOL-aMendedFleet-43.md) | 43 | 1 | SPECCED | rev-1 | 2026-10-04 |
-| [TOOL-aMendedFleet-44 — the map gate refuses a present-tense count of an inventory population in dossier prose](spec/2026-10-04-spec-TOOL-aMendedFleet-44.md) | 44 | 1 | SPECCED | rev-1 | 2026-10-04 |
+| [TOOL-aMendedFleet-37 — dossier freshness is derived from git, and drift-audit reports the dossiers older than their paths](spec/2026-10-04-spec-TOOL-aMendedFleet-37.md) | 37 | 2 | SPECCED | rev-2 | 2026-10-04 |
+| [TOOL-aMendedFleet-38 — `map_diff --converge`, its sink and its prescriptions are deleted](spec/2026-10-04-spec-TOOL-aMendedFleet-38.md) | 38 | 1 | SPECCED | rev-2 | 2026-10-04 |
+| [TOOL-aMendedFleet-39 — a harness-hooks inventory, and `git-hooks` holds real hook names only](spec/2026-10-04-spec-TOOL-aMendedFleet-39.md) | 39 | 2 | SPECCED | rev-2 | 2026-10-04 |
+| [TOOL-aMendedFleet-40 — the coverage gate refuses a `baseline.toml` that gained a key against its base](spec/2026-10-04-spec-TOOL-aMendedFleet-40.md) | 40 | 1 | SPECCED | rev-2 | 2026-10-04 |
+| [TOOL-aMendedFleet-41 — `replay-phrases.py --floor` grades a frozen phrase population against recorded floors](spec/2026-10-04-spec-TOOL-aMendedFleet-41.md) | 41 | 1 | SPECCED | rev-2 | 2026-10-04 |
+| [TOOL-aMendedFleet-42 — the reuse probe counts canonical-copy install sites beside fan-in](spec/2026-10-04-spec-TOOL-aMendedFleet-42.md) | 42 | 1 | SPECCED | rev-2 | 2026-10-04 |
+| [TOOL-aMendedFleet-43 — the map renders a card of at most 1 KB per feature from its dossier's toml fence](spec/2026-10-04-spec-TOOL-aMendedFleet-43.md) | 43 | 1 | SPECCED | rev-2 | 2026-10-04 |
+| [TOOL-aMendedFleet-44 — the map gate refuses a present-tense count of an inventory population in dossier prose](spec/2026-10-04-spec-TOOL-aMendedFleet-44.md) | 44 | 1 | SPECCED | rev-2 | 2026-10-04 |
 | [TOOL-aMendedFleet-45 — reviewers' by-design list comes from one source, the invariant records](spec/2026-10-04-spec-TOOL-aMendedFleet-45.md) | 45 | 1 | WONTDO | rev-2 | 2026-10-04 |
-| [TOOL-aMendedFleet-46 — the replay harness measures which shortlist quantity predicts a reuse miss, before any miss signal ships](spec/2026-10-04-spec-TOOL-aMendedFleet-46.md) | 46 | 1 | SPECCED | rev-1 | 2026-10-04 |
+| [TOOL-aMendedFleet-46 — the replay harness measures which shortlist quantity predicts a reuse miss, before any miss signal ships](spec/2026-10-04-spec-TOOL-aMendedFleet-46.md) | 46 | 1 | SPECCED | rev-2 | 2026-10-04 |
 | [TOOL-aMendedFleet-47 — `run_records_nonterminal_but_merged` honours derived LANDED, and the unused-verb pin drops to 0](spec/2026-10-04-spec-TOOL-aMendedFleet-47.md) | 47 | 1 | SPECCED | rev-1 | 2026-10-04 |
-| [TOOL-aMendedFleet-48 — drift readings append to a node-local history file](spec/2026-10-04-spec-TOOL-aMendedFleet-48.md) | 48 | 2 | SPECCED | rev-1 | 2026-10-04 |
-| [TOOL-aMendedFleet-49 — the unattended close prints the BASE..HEAD drift delta](spec/2026-10-04-spec-TOOL-aMendedFleet-49.md) | 49 | 1 | SPECCED | rev-1 | 2026-10-04 |
-| [TOOL-aMendedFleet-50 — a monthly escape-ratio report, outside the seconds tier](spec/2026-10-04-spec-TOOL-aMendedFleet-50.md) | 50 | 2 | SPECCED | rev-1 | 2026-10-04 |
-| [TOOL-aMendedFleet-51 — report-only drift signals over a pin nobody drains print pinless, and `readme_mechanism_drift` reads live builds only](spec/2026-10-04-spec-TOOL-aMendedFleet-51.md) | 51 | 1 | SPECCED | rev-1 | 2026-10-04 |
-| [TOOL-aMendedFleet-52 — the hand-kept signal compares the drift README's signal names against the names the engine reports](spec/2026-10-04-spec-TOOL-aMendedFleet-52.md) | 52 | 1 | SPECCED | rev-1 | 2026-10-04 |
-| [TOOL-aMendedFleet-53 — the dangling-pointer signal reads the declared auto-memory directory and checks its backticked paths against the tracked tree](spec/2026-10-04-spec-TOOL-aMendedFleet-53.md) | 53 | 1 | SPECCED | rev-1 | 2026-10-04 |
-| [TOOL-aMendedFleet-54 — drift reports `live_builds_without_activity` from the dormant rows LIVE.md renders](spec/2026-10-04-spec-TOOL-aMendedFleet-54.md) | 54 | 1 | SPECCED | rev-1 | 2026-10-04 |
-| [TOOL-aMendedFleet-55 — drift reports `open_asks_cited_by_product_source`, report-only](spec/2026-10-04-spec-TOOL-aMendedFleet-55.md) | 55 | 1 | SPECCED | rev-1 | 2026-10-04 |
-| [TOOL-aMendedFleet-56 — gateable stable-key drift signals are bounded by a shrink-only set of offender ids instead of a count](spec/2026-10-04-spec-TOOL-aMendedFleet-56.md) | 56 | 2 | SPECCED | rev-1 | 2026-10-04 |
-| [TOOL-aMendedFleet-57 — shrink-only lists are graded against their low-water mark](spec/2026-10-04-spec-TOOL-aMendedFleet-57.md) | 57 | 1 | SPECCED | rev-1 | 2026-10-04 |
-| [TOOL-aMendedFleet-58 — gate yield per leg is reported from the gates journal](spec/2026-10-04-spec-TOOL-aMendedFleet-58.md) | 58 | 1 | SPECCED | rev-1 | 2026-10-04 |
+| [TOOL-aMendedFleet-48 — drift readings append to a node-local history file](spec/2026-10-04-spec-TOOL-aMendedFleet-48.md) | 48 | 2 | SPECCED | rev-2 | 2026-10-04 |
+| [TOOL-aMendedFleet-49 — the unattended close prints the BASE..HEAD drift delta](spec/2026-10-04-spec-TOOL-aMendedFleet-49.md) | 49 | 1 | SPECCED | rev-3 | 2026-10-04 |
+| [TOOL-aMendedFleet-50 — a monthly escape-ratio report, outside the seconds tier](spec/2026-10-04-spec-TOOL-aMendedFleet-50.md) | 50 | 2 | SPECCED | rev-2 | 2026-10-04 |
+| [TOOL-aMendedFleet-51 — report-only drift signals over a pin nobody drains print pinless, and `readme_mechanism_drift` reads live builds only](spec/2026-10-04-spec-TOOL-aMendedFleet-51.md) | 51 | 1 | SPECCED | rev-2 | 2026-10-04 |
+| [TOOL-aMendedFleet-52 — the hand-kept signal compares the drift README's signal names against the names the engine reports](spec/2026-10-04-spec-TOOL-aMendedFleet-52.md) | 52 | 1 | SPECCED | rev-2 | 2026-10-04 |
+| [TOOL-aMendedFleet-53 — the dangling-pointer signal reads the declared auto-memory directory and checks its backticked paths against the tracked tree](spec/2026-10-04-spec-TOOL-aMendedFleet-53.md) | 53 | 1 | SPECCED | rev-2 | 2026-10-04 |
+| [TOOL-aMendedFleet-54 — drift reports `live_builds_without_activity` from the dormant rows LIVE.md renders](spec/2026-10-04-spec-TOOL-aMendedFleet-54.md) | 54 | 1 | SPECCED | rev-2 | 2026-10-04 |
+| [TOOL-aMendedFleet-55 — drift reports `open_asks_cited_by_product_source`, report-only](spec/2026-10-04-spec-TOOL-aMendedFleet-55.md) | 55 | 1 | SPECCED | rev-2 | 2026-10-04 |
+| [TOOL-aMendedFleet-56 — gateable stable-key drift signals are bounded by a shrink-only set of offender ids instead of a count](spec/2026-10-04-spec-TOOL-aMendedFleet-56.md) | 56 | 2 | SPECCED | rev-2 | 2026-10-04 |
+| [TOOL-aMendedFleet-57 — shrink-only lists are graded against their low-water mark](spec/2026-10-04-spec-TOOL-aMendedFleet-57.md) | 57 | 1 | SPECCED | rev-2 | 2026-10-04 |
+| [TOOL-aMendedFleet-58 — gate yield per leg is reported from the gates journal](spec/2026-10-04-spec-TOOL-aMendedFleet-58.md) | 58 | 1 | SPECCED | rev-2 | 2026-10-04 |
 | [TOOL-aMendedFleet-59 — timeout retries are grouped by leg across every git dir of the clone](spec/2026-10-04-spec-TOOL-aMendedFleet-59.md) | 59 | 1 | SPECCED | rev-1 | 2026-10-04 |
-| [TOOL-aMendedFleet-60 — a cross-run overlap probe over unmerged remote refs runs at preflight](spec/2026-10-04-spec-TOOL-aMendedFleet-60.md) | 60 | 2 | SPECCED | rev-1 | 2026-10-04 |
-| [TOOL-aMendedFleet-61 — preflight pins the launching CLI version and every resume compares it, and a missing resume tick is announced loudly](spec/2026-10-04-spec-TOOL-aMendedFleet-61.md) | 61 | 2 | SPECCED | rev-2 | 2026-10-04 |
-| [TOOL-aMendedFleet-62 — the two history legs grade the run's own range, reusing node d's bytes](spec/2026-10-04-spec-TOOL-aMendedFleet-62.md) | 62 | 2 | SPECCED | rev-1 | 2026-10-04 |
-| [TOOL-aMendedFleet-63 — `--close` and `--abort` render the run record themselves, after their own END line](spec/2026-10-04-spec-TOOL-aMendedFleet-63.md) | 63 | 1 | SPECCED | rev-1 | 2026-10-04 |
-| [TOOL-aMendedFleet-64 — `govkit selfcheck --fix` writes every kit-version carrier from its `version_from` constant](spec/2026-10-04-spec-TOOL-aMendedFleet-64.md) | 64 | 2 | SPECCED | rev-1 | 2026-10-04 |
-| [TOOL-aMendedFleet-65 — the lander mints kit versions, so a branch owes no bump](spec/2026-10-04-spec-TOOL-aMendedFleet-65.md) | 65 | 2 | SPECCED | rev-1 | 2026-10-04 |
+| [TOOL-aMendedFleet-60 — a cross-run overlap probe over unmerged remote refs runs at preflight](spec/2026-10-04-spec-TOOL-aMendedFleet-60.md) | 60 | 2 | SPECCED | rev-2 | 2026-10-04 |
+| [TOOL-aMendedFleet-61 — preflight pins the launching CLI version and every resume compares it, and a missing resume tick is announced loudly](spec/2026-10-04-spec-TOOL-aMendedFleet-61.md) | 61 | 2 | SPECCED | rev-3 | 2026-10-04 |
+| [TOOL-aMendedFleet-62 — the two history legs grade the run's own range, reusing node d's bytes](spec/2026-10-04-spec-TOOL-aMendedFleet-62.md) | 62 | 2 | SPECCED | rev-3 | 2026-10-04 |
+| [TOOL-aMendedFleet-63 — `--close` and `--abort` render the run record themselves, after their own END line](spec/2026-10-04-spec-TOOL-aMendedFleet-63.md) | 63 | 1 | SPECCED | rev-2 | 2026-10-04 |
+| [TOOL-aMendedFleet-64 — `govkit selfcheck --fix` writes every kit-version carrier from its `version_from` constant](spec/2026-10-04-spec-TOOL-aMendedFleet-64.md) | 64 | 2 | SPECCED | rev-2 | 2026-10-04 |
+| [TOOL-aMendedFleet-65 — the lander mints kit versions, so a branch owes no bump](spec/2026-10-04-spec-TOOL-aMendedFleet-65.md) | 65 | 2 | SPECCED | rev-2 | 2026-10-04 |
 | [TOOL-aMendedFleet-66 — the unattended close sequence lists the open asks that target files the run touched](spec/2026-10-04-spec-TOOL-aMendedFleet-66.md) | 66 | 1 | SPECCED | rev-1 | 2026-10-04 |
-| [TOOL-aMendedFleet-67 — review and drift harnesses can spawn their judges as a read-only agent type that omits the charter](spec/2026-10-04-spec-TOOL-aMendedFleet-67.md) | 67 | 2 | SPECCED | rev-1 | 2026-10-04 |
-| [TOOL-aMendedFleet-68 — the unattended Skill becomes a router of at most 10 KiB](spec/2026-10-04-spec-TOOL-aMendedFleet-68.md) | 68 | 2 | SPECCED | rev-1 | 2026-10-04 |
-| [TOOL-aMendedFleet-69 — the agent-instructions kit announces a canonical file past 32 KiB and states both tool facts as verified](spec/2026-10-04-spec-TOOL-aMendedFleet-69.md) | 69 | 1 | SPECCED | rev-1 | 2026-10-04 |
-| [TOOL-aMendedFleet-70 — runlog's extractor reports what a session spends in tokens and minutes before it reaches READY](spec/2026-10-04-spec-TOOL-aMendedFleet-70.md) | 70 | 1 | SPECCED | rev-1 | 2026-10-04 |
-| [TOOL-aMendedFleet-71 — one sweep gives every present-tense count in a code comment one of ANNOTATION-STYLE A4's three dispositions](spec/2026-10-04-spec-TOOL-aMendedFleet-71.md) | 71 | 1 | SPECCED | rev-1 | 2026-10-04 |
-| [TOOL-aMendedFleet-72 — the gate runner reaps the dead `gate-timings.tsv` it no longer reads](spec/2026-10-04-spec-TOOL-aMendedFleet-72.md) | 72 | 1 | SPECCED | rev-1 | 2026-10-04 |
+| [TOOL-aMendedFleet-67 — review and drift harnesses can spawn their judges as a read-only agent type that omits the charter](spec/2026-10-04-spec-TOOL-aMendedFleet-67.md) | 67 | 2 | SPECCED | rev-2 | 2026-10-04 |
+| [TOOL-aMendedFleet-68 — the unattended Skill becomes a router of at most 10 KiB](spec/2026-10-04-spec-TOOL-aMendedFleet-68.md) | 68 | 2 | SPECCED | rev-2 | 2026-10-04 |
+| [TOOL-aMendedFleet-69 — the agent-instructions kit announces a canonical file past 32 KiB and states both tool facts as verified](spec/2026-10-04-spec-TOOL-aMendedFleet-69.md) | 69 | 1 | SPECCED | rev-2 | 2026-10-04 |
+| [TOOL-aMendedFleet-70 — runlog's extractor reports what a session spends in tokens and minutes before it reaches READY](spec/2026-10-04-spec-TOOL-aMendedFleet-70.md) | 70 | 1 | SPECCED | rev-2 | 2026-10-04 |
+| [TOOL-aMendedFleet-71 — one sweep gives every present-tense count in a code comment one of ANNOTATION-STYLE A4's three dispositions](spec/2026-10-04-spec-TOOL-aMendedFleet-71.md) | 71 | 1 | SPECCED | rev-2 | 2026-10-04 |
+| [TOOL-aMendedFleet-72 — the gate runner reaps the dead `gate-timings.tsv` it no longer reads](spec/2026-10-04-spec-TOOL-aMendedFleet-72.md) | 72 | 1 | SPECCED | rev-2 | 2026-10-04 |
 | [TOOL-aMendedFleet-73 — the vague-brief trial arm: a full spec against a short plan, on a three-sentence brief](spec/2026-10-04-spec-TOOL-aMendedFleet-73.md) | 73 | 2 | SPECCED | rev-1 | 2026-10-04 |
-| [TOOL-aMendedFleet-74 — a unit can be handed the bug-class checklist for its write set before it writes code](spec/2026-10-04-spec-TOOL-aMendedFleet-74.md) | 74 | 2 | SPECCED | rev-1 | 2026-10-04 |
-| [TOOL-aMendedFleet-75 — a `New arm:` line declares the acceptance criteria its arm keeps observed](spec/2026-10-04-spec-TOOL-aMendedFleet-75.md) | 75 | 1 | SPECCED | rev-1 | 2026-10-04 |
-| [KICK-aMendedFleet-1 — the orientation card shows the last drift reading from the node's history](spec/2026-10-04-spec-KICK-aMendedFleet-1.md) | 76 | 1 | SPECCED | rev-1 | 2026-10-04 |
-| [KICK-aMendedFleet-2 — the orientation card shows which unmerged remote refs share paths with this tree's branch](spec/2026-10-04-spec-KICK-aMendedFleet-2.md) | 77 | 1 | SPECCED | rev-1 | 2026-10-04 |
+| [TOOL-aMendedFleet-74 — a unit can be handed the bug-class checklist for its write set before it writes code](spec/2026-10-04-spec-TOOL-aMendedFleet-74.md) | 74 | 2 | SPECCED | rev-2 | 2026-10-04 |
+| [TOOL-aMendedFleet-75 — a `New arm:` line declares the acceptance criteria its arm keeps observed](spec/2026-10-04-spec-TOOL-aMendedFleet-75.md) | 75 | 1 | SPECCED | rev-2 | 2026-10-04 |
+| [KICK-aMendedFleet-1 — the orientation card shows the last drift reading from the node's history](spec/2026-10-04-spec-KICK-aMendedFleet-1.md) | 76 | 1 | SPECCED | rev-2 | 2026-10-04 |
+| [KICK-aMendedFleet-2 — the orientation card shows which unmerged remote refs share paths with this tree's branch](spec/2026-10-04-spec-KICK-aMendedFleet-2.md) | 77 | 1 | SPECCED | rev-3 | 2026-10-04 |
 | [KICK-aMendedFleet-3 — kickoff Step 4 points at the two context commands the build method spells once](spec/2026-10-04-spec-KICK-aMendedFleet-3.md) | 78 | 1 | SPECCED | rev-1 | 2026-10-04 |
-| [PLAY-aMendedFleet-1 — the AGENTS.md wrapper's merge-bar section moves to a guide, without its repeated catalog or dated history](spec/2026-10-04-spec-PLAY-aMendedFleet-1.md) | 79 | 2 | SPECCED | rev-1 | 2026-10-04 |
-| [PLAY-aMendedFleet-2 — an experiment's instruments and result rows are committed beside its record, and the vague-brief arm gates §1 as a HIGH ask](spec/2026-10-04-spec-PLAY-aMendedFleet-2.md) | 80 | 1 | SPECCED | rev-1 | 2026-10-04 |
+| [PLAY-aMendedFleet-1 — the AGENTS.md wrapper's merge-bar section moves to a guide, without its repeated catalog or dated history](spec/2026-10-04-spec-PLAY-aMendedFleet-1.md) | 79 | 2 | SPECCED | rev-2 | 2026-10-04 |
+| [PLAY-aMendedFleet-2 — an experiment's instruments and result rows are committed beside its record, and the vague-brief arm gates §1 as a HIGH ask](spec/2026-10-04-spec-PLAY-aMendedFleet-2.md) | 80 | 1 | SPECCED | rev-2 | 2026-10-04 |
 | [TOOL-aMendedFleet-81 — the month shards carry only what never changes after their month](spec/2026-10-04-spec-TOOL-aMendedFleet-81.md) | 81 | 1 | SPECCED | rev-1 | 2026-10-04 |
-| [TOOL-aMendedFleet-82 — each recall query row carries the worktree's HEAD, so `--used` attributes a query after its worktree is gone](spec/2026-10-04-spec-TOOL-aMendedFleet-82.md) | 82 | 1 | SPECCED | rev-1 | 2026-10-04 |
-| [TOOL-aMendedFleet-83 — the unattended close sequence lists the dossiers its range touched and did not refresh](spec/2026-10-04-spec-TOOL-aMendedFleet-83.md) | 83 | 1 | SPECCED | rev-1 | 2026-10-04 |
+| [TOOL-aMendedFleet-82 — each recall query row carries the worktree's HEAD, so `--used` attributes a query after its worktree is gone](spec/2026-10-04-spec-TOOL-aMendedFleet-82.md) | 82 | 1 | SPECCED | rev-2 | 2026-10-04 |
+| [TOOL-aMendedFleet-83 — the unattended close sequence lists the dossiers its range touched and did not refresh](spec/2026-10-04-spec-TOOL-aMendedFleet-83.md) | 83 | 1 | SPECCED | rev-2 | 2026-10-04 |
 | [TOOL-aMendedFleet-84 — hygiene check 6 prices a build README by its authored bytes, so generated regions never bill the cap](spec/2026-10-04-spec-TOOL-aMendedFleet-84.md) | 84 | 1 | SPECCED | rev-1 | 2026-10-04 |
-| [TOOL-aMendedFleet-85 — the charter states what the codebase map's ratchet binds, and stops promising an inventory that cannot rot](spec/2026-10-04-spec-TOOL-aMendedFleet-85.md) | 85 | 1 | SPECCED | rev-1 | 2026-10-04 |
-| [TOOL-aMendedFleet-86 — the map digest reports code coverage apart from record coverage](spec/2026-10-04-spec-TOOL-aMendedFleet-86.md) | 86 | 1 | SPECCED | rev-1 | 2026-10-04 |
-| [TOOL-aMendedFleet-87 — a query joins changed paths to the gate legs that guard them](spec/2026-10-04-spec-TOOL-aMendedFleet-87.md) | 87 | 1 | SPECCED | rev-1 | 2026-10-04 |
-| [TOOL-aMendedFleet-88 — `map_imports.py` is deleted, having no consumer](spec/2026-10-04-spec-TOOL-aMendedFleet-88.md) | 88 | 1 | SPECCED | rev-1 | 2026-10-04 |
-| [TOOL-aMendedFleet-89 — measured history leaves the dossiers near the byte cap for the records that measured it](spec/2026-10-04-spec-TOOL-aMendedFleet-89.md) | 89 | 1 | SPECCED | rev-1 | 2026-10-04 |
-| [TOOL-aMendedFleet-90 — a report-only drift signal DEAD for N recorded readings is named for retirement or a filed ask](spec/2026-10-04-spec-TOOL-aMendedFleet-90.md) | 90 | 1 | SPECCED | rev-1 | 2026-10-04 |
+| [TOOL-aMendedFleet-85 — the charter states what the codebase map's ratchet binds, and stops promising an inventory that cannot rot](spec/2026-10-04-spec-TOOL-aMendedFleet-85.md) | 85 | 1 | SPECCED | rev-2 | 2026-10-04 |
+| [TOOL-aMendedFleet-86 — the map digest reports code coverage apart from record coverage](spec/2026-10-04-spec-TOOL-aMendedFleet-86.md) | 86 | 1 | SPECCED | rev-2 | 2026-10-04 |
+| [TOOL-aMendedFleet-87 — a query joins changed paths to the gate legs that guard them](spec/2026-10-04-spec-TOOL-aMendedFleet-87.md) | 87 | 1 | SPECCED | rev-2 | 2026-10-04 |
+| [TOOL-aMendedFleet-88 — `map_imports.py` is deleted, having no consumer](spec/2026-10-04-spec-TOOL-aMendedFleet-88.md) | 88 | 1 | SPECCED | rev-2 | 2026-10-04 |
+| [TOOL-aMendedFleet-89 — measured history leaves the dossiers near the byte cap for the records that measured it](spec/2026-10-04-spec-TOOL-aMendedFleet-89.md) | 89 | 1 | SPECCED | rev-2 | 2026-10-04 |
+| [TOOL-aMendedFleet-90 — a report-only drift signal DEAD for N recorded readings is named for retirement or a filed ask](spec/2026-10-04-spec-TOOL-aMendedFleet-90.md) | 90 | 1 | SPECCED | rev-2 | 2026-10-04 |
 | [TOOL-aMendedFleet-91 — a spec's status header declares a records-only deliverable, and the product-commit signal reads it](spec/2026-10-04-spec-TOOL-aMendedFleet-91.md) | 91 | 1 | SPECCED | rev-1 | 2026-10-04 |
-| [TOOL-aMendedFleet-92 — check 23 prints a fleet line, and drift-audit reads it from the newest bar run](spec/2026-10-04-spec-TOOL-aMendedFleet-92.md) | 92 | 2 | SPECCED | rev-1 | 2026-10-04 |
-| [TOOL-aMendedFleet-93 — one tier2 review run with and without the charter, and the review default follows the reading](spec/2026-10-04-spec-TOOL-aMendedFleet-93.md) | 93 | 2 | SPECCED | rev-1 | 2026-10-04 |
-| [PLAY-aMendedFleet-3 — the charter's wiring rule stops stating which file Claude Code reads](spec/2026-10-04-spec-PLAY-aMendedFleet-3.md) | 94 | 1 | SPECCED | rev-1 | 2026-10-04 |
-| [TOOL-aMendedFleet-94 — the wrapper's product-only prose loads from a path-scoped rule when a session opens a product file](spec/2026-10-04-spec-TOOL-aMendedFleet-94.md) | 95 | 2 | SPECCED | rev-1 | 2026-10-04 |
-| [KICK-aMendedFleet-4 — the orientation card notes a PATH CLI older than the running session](spec/2026-10-04-spec-KICK-aMendedFleet-4.md) | 96 | 1 | SPECCED | rev-1 | 2026-10-04 |
-| [PLAY-aMendedFleet-4 — the `AGENTS.md` wrapper carries one node registry](spec/2026-10-04-spec-PLAY-aMendedFleet-4.md) | 97 | 1 | SPECCED | rev-1 | 2026-10-04 |
+| [TOOL-aMendedFleet-92 — check 23 prints a fleet line, and drift-audit reads it from the newest bar run](spec/2026-10-04-spec-TOOL-aMendedFleet-92.md) | 92 | 2 | SPECCED | rev-3 | 2026-10-04 |
+| [TOOL-aMendedFleet-93 — one tier2 review run with and without the charter, and the review default follows the reading](spec/2026-10-04-spec-TOOL-aMendedFleet-93.md) | 93 | 2 | SPECCED | rev-2 | 2026-10-04 |
+| [PLAY-aMendedFleet-3 — the charter's wiring rule stops stating which file Claude Code reads](spec/2026-10-04-spec-PLAY-aMendedFleet-3.md) | 94 | 1 | SPECCED | rev-2 | 2026-10-04 |
+| [TOOL-aMendedFleet-94 — the wrapper's product-only prose loads from a path-scoped rule when a session opens a product file](spec/2026-10-04-spec-TOOL-aMendedFleet-94.md) | 95 | 2 | SPECCED | rev-2 | 2026-10-04 |
+| [KICK-aMendedFleet-4 — the orientation card notes a PATH CLI older than the running session](spec/2026-10-04-spec-KICK-aMendedFleet-4.md) | 96 | 1 | SPECCED | rev-2 | 2026-10-04 |
+| [PLAY-aMendedFleet-4 — the `AGENTS.md` wrapper carries one node registry](spec/2026-10-04-spec-PLAY-aMendedFleet-4.md) | 97 | 1 | SPECCED | rev-2 | 2026-10-04 |
 <!-- /gen:build-units -->
 
 Records: 4 bound to this build, across 2 record folder(s).

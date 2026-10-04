@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-64 — `govkit selfcheck --fix` writes every kit-version carrier from its `version_from` constant
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · closes DEPL-aHoistedPass-10 · advances TOOL-aBoundedVerdict-29 · order 64
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · closes DEPL-aHoistedPass-10 · advances TOOL-aBoundedVerdict-29 · order 64
 
 <!-- gen:spec-records -->
 
@@ -53,6 +53,9 @@ mint versions itself.
 - **S7** — A selftest arm in `tools/govkit/selftest.py` bumps a fixture entry's constant and asserts
   S2's rewrites and S5's zero. NOT OBSERVED by a criterion here: the selftest runs once at the
   close, and the arm is declared under `New arm:` in §7.
+- **S8** — `memory/map/generated/symbols.json` is regenerated for the new definitions. NOT OBSERVED
+  by a criterion here: `python tools/codebase-map/gen_map.py --check` at the close is its check, and
+  §7 names the leg that reads it.
 
 ## 3. Non-goals (OUT)
 
@@ -126,6 +129,7 @@ Read at the worktree HEAD `725b1449`, whose bytes under `tools/` equal base `7af
 
 - `tools/govkit/govkit.py`
 - `tools/govkit/selftest.py`
+- `memory/map/generated/symbols.json`
 
 ### Alternatives rejected
 
@@ -193,7 +197,7 @@ Read at the worktree HEAD `725b1449`, whose bytes under `tools/` equal base `7af
 
 ## 7. Gates
 
-`govkit selfcheck` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `govkit runbook parity` · `kit version markers` · `recall floor arms` · `lexicon naming predicates` · `line length` · `kit epoch (shipped bytes move, the version moves)` · `spec tokens (a spec's own names resolve)`
+`govkit selfcheck` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `govkit runbook parity` · `codebase-map coverage + freshness` · `kit version markers` · `recall floor arms` · `lexicon naming predicates` · `line length` · `kit epoch (shipped bytes move, the version moves)` · `spec tokens (a spec's own names resolve)` · `recall floor`
 
 New arm: `tools/govkit/selftest.py` · a fixture entry whose constant is bumped alone, then `selfcheck --fix`; a second run rewriting nothing; staged red by skipping the same-line clause · none
 
@@ -220,6 +224,9 @@ New arm: `tools/govkit/selftest.py` · a fixture entry whose constant is bumped 
 - rev-1 · 2026-10-04 · initial draft, from the spec brief's unit 64, report items [A#5] and [B#12],
   the two asks, check 5c and `entry_version` in `tools/govkit/govkit.py`, and the version gate's
   declared rows, read at base.
+- rev-2 · 2026-10-04 · S8 · §4 · §7 · M2 cross-read: the two Python definitions move
+  `memory/map/generated/symbols.json`, which the build's other Python-adding units declare with the
+  coverage leg and this spec omitted.
 
 ## 10. Reuse audit
 

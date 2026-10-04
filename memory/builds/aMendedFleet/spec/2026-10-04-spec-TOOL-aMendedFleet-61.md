@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-61 — preflight pins the launching CLI version and every resume compares it, and a missing resume tick is announced loudly
 
-**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 61
+**Status:** SPECCED · rev-3 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 61
 
 <!-- gen:spec-records -->
 
@@ -24,9 +24,10 @@ rejected an authored version floor in favour of the launching session's own vers
 
 - **S1** — `read_cli_version` in `tools/unattended/unattended.sh` reads the running session's CLI
   version from `AI_AGENT`, whose Claude Code shape is `claude-code_<major>-<minor>-<patch>_<kind>`.
-  It takes the field between the first and second underscore, turns its dashes into dots, and
-  prints it only when the result is two to four dot-separated integers; anything else, an unset
-  variable included, returns 1 and prints nothing. Observed by AC1 and AC4.
+  Only a value opening `claude-code_` is read: it takes the field between the first and second
+  underscore, turns its dashes into dots, and prints it only when the result is two to four
+  dot-separated integers; anything else, an unset variable or another agent's value included,
+  returns 1 and prints nothing. Observed by AC1, AC3 and AC4.
 - **S2** — `--preflight` pins the fact `cli-version` ONCE, the way it pins `base`: written only when
   the record carries none, with the literal `absent` when S1 returns 1. It is written beside
   `write_lease` and never inside it, because the lease-only difference `--landed` admits is a
@@ -175,9 +176,11 @@ One new run-state fact, `cli-version`, valued `<major>.<minor>.<patch>` or `abse
   `2.1.286`, the verb exits 0, and `grep cli-version` over the fixture's `RUN.md` still prints
   `2.1.286`.
   Red when: no warning prints, or the resume rewrote the pinned fact.
-- **AC3** — When the resume is repeated with `AI_AGENT` unset, stdout carries one `UNKNOWN` line
-  naming this session's side as missing, and the exit code equals AC2's.
-  Red when: an unset variable prints nothing or reads as equal.
+- **AC3** — When the resume is repeated with `AI_AGENT` unset, and again with
+  `AI_AGENT=other-agent_2-1-286_harness`, stdout carries one `UNKNOWN` line naming this session's
+  side as missing each time, and the exit code equals AC2's.
+  Red when: an unset variable prints nothing or reads as equal, or a value from another agent is
+  read as a Claude Code version.
 - **AC4** — When the resume is repeated with `AI_AGENT=claude-code_2-1-286_harness`, no `WARNING`
   or `NOTE` line names the CLI version; with `AI_AGENT=claude-code_2-1-290_harness` one `NOTE` line
   names both; and with `AI_AGENT=claude-code_2-1-99_harness` one `WARNING` line names both.
@@ -232,6 +235,9 @@ New arm: `tools/unattended/unattended.test.sh` · a fixture run preflighted unde
   [B#13], the live session environment, the PATH binary's bundled source, and a read of
   `verb_preflight`, `write_lease`, `print_resume_orientation` and the adopter's `--check` at base.
 - rev-2 · 2026-10-04 · §3 points the stale-CLI card note at `KICK-aMendedFleet-4`, split from unit 77.
+- rev-3 · 2026-10-04 · S1 AC3 · cross-read with `KICK-aMendedFleet-4`, which spells this rule again
+  and reads only a value opening `claude-code_`; S1 read any value's second field, so another
+  agent's `AI_AGENT` would have pinned a version. S1 now requires the prefix, and AC3 observes it.
 
 ## 10. Reuse audit
 

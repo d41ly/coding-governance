@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-7 — a census of the daily held job's red suites by root cause, adding one unit per cause
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · order 7
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · order 7
 
 <!-- gen:spec-records -->
 
@@ -66,8 +66,14 @@ this build already owns. It writes no product code: each cause is built by the u
 - **consumes-from** external — `gh` authenticated against the public repository, and the scheduled
   runs' logs, which GitHub retains for a bounded period; a run whose log has expired is not a
   census run.
-- **hands-off** `TOOL-aMendedFleet-1` — any cause classed `lost` whose code that unit restores.
-- **hands-off** `TOOL-aMendedFleet-4` — any cause whose fix lands in that unit's matrix module.
+- **consumes-from** `TOOL-aMendedFleet-1` — its spec's files touched, against which S4 attributes a
+  cause classed `lost` whose code that unit restores.
+- **consumes-from** `TOOL-aMendedFleet-4` — its spec's files touched, against which S4 attributes a
+  cause whose fix lands in that unit's matrix module.
+- **consumes-from** `TOOL-aMendedFleet-5` — its spec's files touched, for the transition-audit codec
+  cause.
+- **consumes-from** `TOOL-aMendedFleet-6` — its spec's files touched, for the lexicon conf reader's
+  codec cause.
 - **hands-off** `TOOL-aMendedFleet-9` — the census journal, as the population that unit's route
   must reach.
 - **hands-off** external — each cause S5 adds, whose spec the build's next spec pass authors.
@@ -184,6 +190,9 @@ The census writes records only. The journal path trips the two recall-floor guar
 ## 9. Revision log
 
 - rev-1 · 2026-10-04 · initial draft.
+- rev-2 · 2026-10-04 · §3 · the Edges handed off to units 1 and 4, both ordered before this one, so
+  nothing could be left to them; S4 reads their specs, and those of units 5 and 6, which is a
+  consumption. The edges now say so and name all four candidates S4 lists.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-87 — a query joins changed paths to the gate legs that guard them
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 87
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 87
 
 <!-- gen:spec-records -->
 
@@ -49,8 +49,9 @@ command and agrees with the spec gate by construction.
   decision; the query prints the two fields it reads and lets the reader apply it.
 - Changing the spec guards join, its broad floor or its waivers. The query shares the helpers and
   adds a mode; the default run is unchanged.
-- Wiring the query into kickoff or the review harness. Unit 78 points kickoff at its context
-  commands and owns that decision.
+- Wiring the query into kickoff or the review harness. Unit 78 points kickoff Step 4 at two context
+  commands, the bug-class checklist and the path-filtered asks, and this query is not one of them; no
+  unit of this build wires it anywhere.
 
 ### Edges
 
@@ -163,6 +164,9 @@ New arm: tools/check-spec-tokens.test.sh · a scratch manifest with one exact-fi
 
 - rev-1 · 2026-10-04 · initial draft, from the synthesis's item [#46], `check_guard_trips`,
   `derive_guarded_legs` and the manifest at base.
+- rev-2 · 2026-10-04 · §3 · the M2 cross-read: the Non-goal said unit 78 owns wiring this query into
+  kickoff, while `KICK-aMendedFleet-3`'s scope spells exactly two context commands and never this
+  one; the Non-goal now says no unit of this build wires it.
 
 ## 10. Reuse audit
 

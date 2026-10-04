@@ -1,6 +1,6 @@
 # KICK-aMendedFleet-1 — the orientation card shows the last drift reading from the node's history
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams kickoff · ratified 2026-10-04 · order 76
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams kickoff · ratified 2026-10-04 · order 76
 
 <!-- gen:spec-records -->
 
@@ -58,7 +58,7 @@ were. The card reads a file and never runs the report, so the cell costs no spaw
 - Writing the history file. That is unit 48, and the card never fills a missing file.
 - Running `drift_report.py`. The review priced the cell at no cost, and a report run costs seconds.
 - A trend, a delta against an earlier group, or a "rising" flag. The delta reader is unit 49 at the
-  unattended close; the rising signal is another unit of this build.
+  unattended close; no unit of this build adds a rising flag.
 - Re-reading the history on `--card --replay`. A replay prints the session-start card, which is the
   card's contract since `KICK-aReplayedCard-1`.
 - The overlap cell and a stale-CLI note, which are unit 77 and the unit split from it.
@@ -105,6 +105,7 @@ Read at the worktree HEAD `efc4b0c9`, whose bytes under `skills/session-kickoff/
 - `skills/session-kickoff/manifest-check.sh`
 - `skills/session-kickoff/manifest-check.test.sh`
 - `memory/map/features/session-kickoff.md`
+- `memory/map/generated/symbols.json`
 
 ### Alternatives rejected
 
@@ -180,6 +181,7 @@ New arm: `skills/session-kickoff/manifest-check.test.sh` · covers AC1 AC2 AC4 �
 
 - rev-1 · 2026-10-04 · initial draft, from the spec brief's unit 76, report items [A#55] and
   [A#60], unit 48's header contract, and a read of `render_card` and `CARD_PARTS_AWK` at base.
+- rev-2 · 2026-10-04 · §3 drops a rising signal no unit builds; §4 Files touched adds symbols.json, which TOOL-aMendedFleet-35 S1's shell layer indexes.
 
 ## 10. Reuse audit
 

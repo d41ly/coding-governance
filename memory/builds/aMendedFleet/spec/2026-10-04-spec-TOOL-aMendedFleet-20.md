@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-20 — `--new-spec` writes a skeleton that already carries every shape a cutoff demands
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 20
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 20
 
 <!-- gen:spec-records -->
 
@@ -45,6 +45,9 @@ slot that check 12 refuses until it is filled.
   that is not a positive integer. Observed by AC4.
 - **S6** — The kit README's scaffold paragraph names `--new-spec`, its arguments, the fill marker
   and the two commands an author runs after filling. Observed by AC6.
+- **S7** — `memory/map/generated/symbols.json` is regenerated for the new
+  definitions. NOT OBSERVED by a criterion here: `python tools/codebase-map/gen_map.py --check` at
+  the close is its check, and §7 names the leg that reads it.
 
 ## 3. Non-goals (OUT)
 
@@ -127,6 +130,7 @@ FILL_MARKER = "<fill:"
 - `tools/memory-tree/gen_build_index.py`
 - `tools/memory-tree/check-memory-hygiene.sh`
 - `tools/memory-tree/README.md`
+- `memory/map/generated/symbols.json`
 
 ### Alternatives rejected
 
@@ -188,7 +192,7 @@ FILL_MARKER = "<fill:"
 
 ## 7. Gates
 
-`build-index selftest` · `memory hygiene` · `memory-hygiene self-test` · `lexicon naming predicates` · `kit epoch (shipped bytes move, the version moves)` · `spec tokens (a spec's own names resolve)`
+`build-index selftest` · `memory hygiene` · `memory-hygiene self-test` · `lexicon naming predicates` · `kit epoch (shipped bytes move, the version moves)` · `recall floor` · `recall floor arms` · `codebase-map coverage + freshness` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/memory-tree/gen_build_index.py --selftest · the skeleton render over a fixture template, staged red by dropping one heading from the render · none
 New arm: tools/memory-tree/check-memory-hygiene.test.sh · a fixture spec carrying one fill slot, staged red by deleting the marker alternative · none
@@ -215,6 +219,9 @@ New arm: tools/memory-tree/check-memory-hygiene.test.sh · a fixture spec carryi
 
 - rev-1 · 2026-10-04 · initial draft, from `cmd_new_build`, check 12's placeholder line, the
   template's skeleton fence and every cutoff key in the conf at base.
+- rev-2 · 2026-10-04 · §2 S7 · §4 · §7 · M2 cross-read: the definitions this unit adds
+  move `memory/map/generated/symbols.json`, which `TOOL-aMendedFleet-82` and the build's other
+  code units regenerate and declare; this spec omitted the write, its Files touched row and the leg.
 
 ## 10. Reuse audit
 

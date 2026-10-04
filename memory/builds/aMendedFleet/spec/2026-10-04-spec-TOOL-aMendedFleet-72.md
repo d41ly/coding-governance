@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-72 — the gate runner reaps the dead `gate-timings.tsv` it no longer reads
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · advances TOOL-aMeteredTurnstile-3 · order 72
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · advances TOOL-aMeteredTurnstile-3 · order 72
 
 <!-- gen:spec-records -->
 
@@ -29,6 +29,10 @@ copy and no node needs a manual act.
 - **S2** — The comment above the ledger write says the runner deletes the retired file, and why: it is
   a stale second store of one fact, and the runner is the one program every node runs. Observed by
   AC3.
+- **S3** — THE MANIFEST STAMP. `tools/run-gates/run-gates.sh` is on the kickoff manifest's `watch:`
+  line, so the same commit re-stamps `last-audit:` in `memory/guides/SESSION-KICKOFF.md` with a
+  delta line in its message; the staged manifest leg of `.githooks/pre-commit` refuses the commit
+  otherwise. Observed by AC5.
 
 ## 3. Non-goals (OUT)
 
@@ -71,6 +75,7 @@ Read at base `7af5f564` on 2026-10-04.
 ### Files touched (estimate)
 
 - `tools/run-gates/run-gates.sh`
+- `memory/guides/SESSION-KICKOFF.md`
 
 ### Rollout
 
@@ -95,7 +100,7 @@ version moves once, minted at the lander by unit 65 or owed at the close.
 - observability — none added: the file is dead, and announcing its removal on every bar is noise.
 - risks — a reader nobody knows about loses the file. AC3 shows no tracked reader exists, and the
   file has not changed since 2026-08-20.
-- testing — AC1 and AC2 on a scratch fixture; AC3 by grep.
+- testing — AC1 and AC2 on a scratch fixture; AC3 by grep; AC5 by the manifest checker.
 - migration — the deletion is the migration.
 - user docs — N/A: no operator-facing surface changes.
 
@@ -118,10 +123,14 @@ version moves once, minted at the lander by unit 65 or owed at the close.
   `git rev-parse --git-common-dir` prints no longer shows the retired file.
   Red when: the file survives a bar run from this build's worktree.
   permission: observable only after the close runs the bar, which no unit pass may do.
+- **AC5** — When `bash skills/session-kickoff/manifest-check.sh` runs after the unit's commit, it
+  exits 0, and `git diff HEAD~1 HEAD -- memory/guides/SESSION-KICKOFF.md` shows the `last-audit:`
+  line moved.
+  Red when: check 5 reports unaudited drift on the run-gates runner script.
 
 ## 7. Gates
 
-`run-gates canary` · `line length` · `kit epoch (shipped bytes move, the version moves)` · `install-prefix (shipped surface)` · `spec tokens (a spec's own names resolve)`
+`run-gates canary` · `line length` · `kit epoch (shipped bytes move, the version moves)` · `install-prefix (shipped surface)` · `kickoff-manifest ratchet` · `recall floor` · `recall floor arms` · `spec tokens (a spec's own names resolve)`
 
 ## 8. Open questions
 
@@ -142,6 +151,9 @@ version moves once, minted at the lander by unit 65 or owed at the close.
 
 - rev-1 · 2026-10-04 · initial draft; the report's "dead path" re-verified as a dead file with no
   tracked reader, and a fixture run at base observed the file surviving a bar.
+- rev-2 · 2026-10-04 · S3 · AC5 · §4 · §7 · M2 cross-read: the runner is a watched path, which
+  units 78 and 94 re-stamp for and this spec did not, so S3 re-stamps the manifest, AC5 observes
+  it, and §7 names the manifest leg and the two recall legs the manifest's `memory/` path owes.
 
 ## 10. Reuse audit
 

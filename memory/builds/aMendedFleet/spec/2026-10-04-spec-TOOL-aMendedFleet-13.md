@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-13 — LIVE.md counts each build's landed-unclosed units from drift-audit's own join
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 13
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 13
 
 <!-- gen:spec-records -->
 
@@ -30,7 +30,8 @@ rather than re-implementing it, so the work-state file and the drift report cann
   generator does not track, counts nowhere. Observed by AC1 and AC2.
 - **S3** — `LIVE.md` gains one trailing column, `Landed-unclosed`, an integer on every row, zero
   included, placed after any column `TOOL-aMendedFleet-12` adds; and one opening sentence saying the
-  count is drift-audit's join and a candidate to close, not a verdict. Observed by AC1.
+  count is drift-audit's join and a candidate to close, not a verdict, placed after the dormancy
+  sentence that unit renders when both keys are set. Observed by AC1.
 - **S4** — Liveness: when the signal reports zero evidence files, the population its join reads is
   empty and every zero would be a reassuring one, so the generator refuses with a named error before
   writing any artifact. A tree with no non-terminal keyed spec renders zeros, which are a reading.
@@ -46,6 +47,9 @@ rather than re-implementing it, so the work-state file and the drift report cann
   `requires_if` row naming `drift-audit` on the key, the shape its sibling rows use; the module
   docstring's source list names the join as a fifth source read only under the key; and the kit
   README's generator row names the column and the key. Observed by AC7.
+- **S8** — `memory/map/generated/symbols.json` is regenerated for the new
+  definitions. NOT OBSERVED by a criterion here: `python tools/codebase-map/gen_map.py --check` at
+  the close is its check, and §7 names the leg that reads it.
 
 ## 3. Non-goals (OUT)
 
@@ -62,8 +66,9 @@ rather than re-implementing it, so the work-state file and the drift report cann
 
 ### Edges
 
-- **consumes-from** `TOOL-aMendedFleet-12` — the column order: this unit's column follows the two
-  that unit adds when both keys are set.
+- **consumes-from** `TOOL-aMendedFleet-12` — the column order and the sentence order: this unit's
+  column follows the two that unit adds, and its opening sentence follows that unit's, when both keys
+  are set.
 - **consumes-from** external — the drift-audit kit and its filled project layer, which this repo
   carries; without them the key is refused, never silently skipped.
 - **hands-off** external — the commit-subject predicate of node d's dLandedVerdict unit 1, and the
@@ -122,6 +127,7 @@ is amended with a rev bump.
 - `tools/memory-tree/.memory-tree.conf.example`
 - `.memory-tree.conf`
 - `memory/LIVE.md`
+- `memory/map/generated/symbols.json`
 
 ### Rollout
 
@@ -195,7 +201,7 @@ declares that it carries the drift kit; this repo sets it in the commit that re-
 
 ## 7. Gates
 
-`build-index selftest` · `build README slot contract` · `memory hygiene` · `kit/dogfood doc parity` · `recall floor` · `recall floor arms` · `transition-audit arms` · `straggler-guard arms` · `govkit selfcheck` · `drift-audit records` · `lexicon naming predicates` · `kit epoch (shipped bytes move, the version moves)` · `spec tokens (a spec's own names resolve)`
+`build-index selftest` · `build README slot contract` · `memory hygiene` · `kit/dogfood doc parity` · `recall floor` · `recall floor arms` · `transition-audit arms` · `straggler-guard arms` · `govkit selfcheck` · `drift-audit records` · `lexicon naming predicates` · `kit epoch (shipped bytes move, the version moves)` · `codebase-map coverage + freshness` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/memory-tree/gen_build_index.py --selftest · a canned three-row record, a raising resolver under the key, and one under a blank key · none
 
@@ -222,6 +228,11 @@ New arm: tools/memory-tree/gen_build_index.py --selftest · a canned three-row r
 
 - rev-1 · 2026-10-04 · initial draft, from `signal_spec_status`, its `Ctx`, `render_live` and a timed
   call of the signal on the live tree.
+- rev-2 · 2026-10-04 · §2 S8 · §4 · §7 · M2 cross-read: the definitions this unit adds
+  move `memory/map/generated/symbols.json`, which `TOOL-aMendedFleet-82` and the build's other
+  code units regenerate and declare; this spec omitted the write, its Files touched row and the leg.
+  §2 S3 and the §3 edge also say where its opening sentence sits beside
+  `TOOL-aMendedFleet-12`'s, which neither spec stated.
 
 ## 10. Reuse audit
 

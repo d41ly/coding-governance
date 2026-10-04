@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-12 — LIVE.md carries each build's last record date and splits ACTIVE from DORMANT
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 12
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 12
 
 <!-- gen:spec-records -->
 
@@ -42,6 +42,9 @@ reader of the one generated work-state file can tell live work from parked work.
   names the two columns and the key. Observed by AC7.
 - **S7** — Three `--selftest` arms in the generator: the commit-date fixture pair, the four-build
   boundary fixture and the blank-key byte comparison. Observed by AC2, AC3 and AC4.
+- **S8** — `memory/map/generated/symbols.json` is regenerated for the new
+  definitions. NOT OBSERVED by a criterion here: `python tools/codebase-map/gen_map.py --check` at
+  the close is its check, and §7 names the leg that reads it.
 
 ## 3. Non-goals (OUT)
 
@@ -110,6 +113,7 @@ amended with a rev bump.
 - `tools/memory-tree/.memory-tree.conf.example`
 - `.memory-tree.conf`
 - `memory/LIVE.md`
+- `memory/map/generated/symbols.json`
 
 ### Rollout
 
@@ -152,7 +156,7 @@ scratch probes §10 names.
 - risks — a mistyped future date in one record moves the anchor and marks every other build dormant;
   the sentence names the build that set it. A record dated in the past, such as a backfilled review,
   can make a build read as dormant while it is worked; the next pass's spec header date corrects it.
-- testing — two `--selftest` arms and direct calls on the live tree.
+- testing — the three `--selftest` arms of S7 and direct calls on the live tree.
 - migration — N/A — a rendered file; `--write` regenerates it.
 - user docs — the kit README's generator row and the example conf comment, S5 and S6.
 
@@ -196,7 +200,7 @@ scratch probes §10 names.
 
 ## 7. Gates
 
-`build-index selftest` · `build README slot contract` · `memory hygiene` · `kit/dogfood doc parity` · `recall floor` · `recall floor arms` · `transition-audit arms` · `straggler-guard arms` · `lexicon naming predicates` · `kit epoch (shipped bytes move, the version moves)` · `spec tokens (a spec's own names resolve)`
+`build-index selftest` · `build README slot contract` · `memory hygiene` · `kit/dogfood doc parity` · `recall floor` · `recall floor arms` · `transition-audit arms` · `straggler-guard arms` · `lexicon naming predicates` · `kit epoch (shipped bytes move, the version moves)` · `codebase-map coverage + freshness` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/memory-tree/gen_build_index.py --selftest · two fixture trees a year apart in commit dates, and a four-build boundary fixture · none
 
@@ -225,6 +229,10 @@ New arm: tools/memory-tree/gen_build_index.py --selftest · two fixture trees a 
 
 - rev-1 · 2026-10-04 · initial draft, from `render_live`, `collect` and the three-candidate probe on
   the live tree.
+- rev-2 · 2026-10-04 · §2 S8 · §4 · §7 · M2 cross-read: the definitions this unit adds
+  move `memory/map/generated/symbols.json`, which `TOOL-aMendedFleet-82` and the build's other
+  code units regenerate and declare; this spec omitted the write, its Files touched row and the leg.
+  §5 testing also says three self-test arms, as S7 does; it said two.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # PLAY-aMendedFleet-4 — the `AGENTS.md` wrapper carries one node registry
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams playbook+deployer · ratified 2026-10-04 · order 97
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams playbook+deployer · ratified 2026-10-04 · order 97
 
 <!-- gen:spec-records -->
 
@@ -43,6 +43,16 @@ and every adopter's render stays byte-identical.
   `none recorded`. The Tag and Machine/user cells of all four rows stay byte-identical. One sentence
   above the table says it is the registry §2's rules refer to, that this render carries no §2 table,
   and that a new node adds its row here. Observed by AC2 and AC4.
+- **S4** — THE SIZE, by the rule `PLAY-aMendedFleet-2` S3 states. Both size subjects stay inside
+  their declared ceilings, and where a subject's measured figure passes its recorded high-water,
+  the pass re-records it with `bash tools/check-template-size.sh --bump <subject>` and names the
+  byte delta in a `Decided:` trailer. Units 80, 85 and 94 move the template, and units 79, 80, 85
+  and 95 may move a high-water row, before this one, so whether either is passed is read at build
+  time. Observed by AC5.
+- **S5** — THE MANIFEST STAMP. The template is on the kickoff manifest's `watch:` line, so the same
+  commit re-stamps `last-audit:` in `memory/guides/SESSION-KICKOFF.md` with a delta line in its
+  message; the staged manifest leg of `.githooks/pre-commit` refuses the commit otherwise.
+  Observed by AC7.
 
 ## 3. Non-goals (OUT)
 
@@ -86,7 +96,9 @@ are byte-identical at the worktree tip `8312d315`.
   `registry:` key names, `AGENTS.md`, splitting each row on `|` and reading cells 2 and 3 only, so
   columns appended after Machine/user move nothing.
 - `tools/check-template-size.sh` sizes the template at 48193 bytes against a 48378 high-water and a
-  49152 ceiling, so the two fence lines, about 60 bytes, stay under the high-water. PINNED 2026-10-04.
+  49152 ceiling, PINNED 2026-10-04. Units 80 and 85 grow the template before this one and unit 94
+  shrinks it, so whether the two fence lines, about 60 bytes, pass the high-water is decided by
+  S4 at build time.
 - The aScouredKit statewave review of 2026-08-30 found the two tables, recommended the repeating-row
   renderer, and, failing that, a §2 that stops showing a one-row fleet.
 
@@ -96,6 +108,8 @@ are byte-identical at the worktree tip `8312d315`.
 - `tools/govkit/entries/playbook.kit.toml`
 - `.governance/deploy.toml`
 - `AGENTS.md`
+- `tools/template-size-highwater.txt`
+- `memory/guides/SESSION-KICKOFF.md`
 
 ### Alternatives rejected
 
@@ -114,7 +128,7 @@ are byte-identical at the worktree tip `8312d315`.
 - observability — the renderer's notes print `dropped   when:node-table` on every render.
 - risks — a session reading §2 alone finds the rules and no table; S3's sentence and the heading above
   the region name where the table is.
-- testing — AC1 to AC6 directly; the renderer's existing fence arms already cover a declared block.
+- testing — AC1 to AC7 directly; the renderer's existing fence arms already cover a declared block.
 - migration — N/A — no stored state.
 - user docs — N/A — the charter is the doc.
 
@@ -139,20 +153,26 @@ are byte-identical at the worktree tip `8312d315`.
   `grep -c -e "| daily-agent |" -e "agent5 @" -e "agent-0 @" -e "| d41ly |" AGENTS.md` prints 4.
   Red when: the new columns shift the Machine/user cell, or a row's identity cells changed.
   cost: under a minute; the clone is the only thing written.
-- **AC5** — When `bash tools/check-template-size.sh` runs, it exits 0 and prints no WARN line, and
+- **AC5** — When `bash tools/check-template-size.sh` and `bash tools/check-template-size.sh AGENTS.md`
+  run, each exits 0 and prints no WARN this pass introduced without a matching `--bump` row in
+  `tools/template-size-highwater.txt`, and
   `grep -c "when:node-table" coding-governance-agents.template.md` prints 2.
-  Red when: the fence is unbalanced or the template crossed its high-water.
+  Red when: the fence is unbalanced, or either subject grew past its high-water unpriced.
 - **AC6** — When, in that clone, `node-table` is removed from `drop_blocks` and
   `bash tools/playbook/adopt-playbook.sh --target .` re-renders, the region of the clone's `AGENTS.md`
   equals the region of the base `AGENTS.md` read with `git show`, compared with `diff` after both are
   cut by the AC2 `awk`.
   Red when: the fence changed what an adopter that keeps the block receives.
+- **AC7** — When `bash skills/session-kickoff/manifest-check.sh` runs after the unit's commit, it
+  exits 0, and `git diff HEAD~1 HEAD -- memory/guides/SESSION-KICKOFF.md` shows the `last-audit:`
+  line moved.
+  Red when: check 5 reports unaudited drift on `coding-governance-agents.template.md`.
 
 No new refusal is added: AC3 observes the renderer's existing refusal on the new name.
 
 ## 7. Gates
 
-`playbook render wiring` · `template size <=48KiB` · `charter size` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `recall floor arms` · `kickoff-manifest ratchet` · `agent-cap restatement` · `line length` · `kit epoch (shipped bytes move, the version moves)` · `spec tokens (a spec's own names resolve)`
+`playbook render wiring` · `template size <=48KiB` · `charter size` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `recall floor` · `recall floor arms` · `kickoff-manifest ratchet` · `agent-cap restatement` · `line length` · `kit epoch (shipped bytes move, the version moves)` · `spec tokens (a spec's own names resolve)`
 
 The three govkit legs and `recall floor arms` are owed by the descriptor's path under
 `tools/govkit/`; all run once, at the close.
@@ -173,6 +193,10 @@ The three govkit legs and `recall floor arms` are owed by the descriptor's path 
 
 - rev-1 · 2026-10-04 · initial draft; split from unit 79 at its F1, the two tables and their four
   readers read at base, and the renderer's fence semantics read from source.
+- rev-2 · 2026-10-04 · S4 · S5 · AC5 · AC7 · §4 · §7 · M2 cross-read: §4 judged the fence lines
+  against the base high-water, but units 80 and 85 grow the template first, so S4 prices growth by
+  `PLAY-aMendedFleet-2` S3's rule over both subjects; and the template is a watched path, which
+  units 78 and 94 re-stamp for and this spec did not, so S5 re-stamps and AC7 observes it.
 
 ## 10. Reuse audit
 

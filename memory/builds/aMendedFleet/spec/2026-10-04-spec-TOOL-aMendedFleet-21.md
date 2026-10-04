@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-21 — a cutoff budget: armed `*_CUTOFF` keys are a pinned drift signal, so a new one must displace an old one
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 21
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 21
 
 <!-- gen:spec-records -->
 
@@ -46,6 +46,9 @@ pin instead needs its reason written beside it.
   stops counting: its rule becomes unconditional and the key goes with its readers' date guards; two
   keys merge into one; or the key is blanked or unassigned, which disarms its rule. The paragraph
   says the signal cannot tell the third from the first two. Observed by AC5.
+- **S8** — `memory/map/generated/symbols.json` is regenerated for the new definitions. NOT OBSERVED
+  by a criterion here: `python tools/codebase-map/gen_map.py --check` at the close is its check, and
+  §7 names the legs that read it.
 
 ## 3. Non-goals (OUT)
 
@@ -57,8 +60,9 @@ pin instead needs its reason written beside it.
   the budget (§8 F1).
 - Grading whether a key's date is past every spec it reaches. That is the cutoff-relation check
   `tools/check-spec-tokens.py` already runs for the keys it reads.
-- Any rule about the order of units in this build. A later unit here that arms a new key, unit 25's
-  ceiling or unit 26's citation form for instance, meets this budget like any other change.
+- Any rule about the order of units in this build. A later unit here that arms a new key meets this
+  budget like any other change; unit 25's spec already declines a dated cutoff for that reason, and
+  unit 26's citation form arms none.
 
 ### Edges
 
@@ -112,6 +116,7 @@ and this list is amended with a rev bump.
 - `tools/drift-audit/drift_signals.template.py`
 - `tools/drift-audit/README.md`
 - `tools/drift-audit/selftest.py`
+- `memory/map/generated/symbols.json`
 
 ### Rollout
 
@@ -176,7 +181,7 @@ touches the kit.
 
 ## 7. Gates
 
-`drift-audit records` · `drift-audit selftest` · `lexicon naming predicates` · `kit epoch (shipped bytes move, the version moves)` · `spec tokens (a spec's own names resolve)`
+`drift-audit records` · `drift-audit selftest` · `codebase-map coverage + freshness` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `kit epoch (shipped bytes move, the version moves)` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/drift-audit/selftest.py · a fixture with two root confs carrying armed, blank, exported and commented cutoff lines, staged red by dropping the builder from SIGNALS · none
 
@@ -208,6 +213,10 @@ New arm: tools/drift-audit/selftest.py · a fixture with two root confs carrying
 
 - rev-1 · 2026-10-04 · initial draft, from `PINS`, `RATCHETS`, `ratchet_findings` and `load_conf` at
   base, and a count of every cutoff assignment in the tracked root confs and the shipped examples.
+- rev-2 · 2026-10-04 · §3 · S8 · §4 · §7 · M2 cross-read: §3 named unit 25's ceiling and unit 26's
+  citation form as later units arming a key, but unit 25's spec declines a dated cutoff because of
+  this budget and unit 26 arms none; and the new definitions owe `symbols.json`, which units 57, 59
+  and 90 regenerate and this spec omitted.
 
 ## 10. Reuse audit
 

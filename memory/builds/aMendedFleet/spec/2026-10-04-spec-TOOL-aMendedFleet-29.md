@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-29 — a recall gold set harvested from spec §10 probes, de-contaminated, graded at hit@10
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 29
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 29
 
 <!-- gen:spec-records -->
 
@@ -49,6 +49,9 @@ person has checked its labels.
   cannot see: a probe return the author never wrote into §10 survives as a label, the corpus graded
   is today's and includes records written after the probe, and only ids in the four declared
   families are labels. Observed by AC6.
+- **S8** — `memory/map/generated/symbols.json` is regenerated for the new
+  definitions. NOT OBSERVED by a criterion here: `python tools/codebase-map/gen_map.py --check` at
+  the close is its check, and §7 names the leg that reads it.
 
 ## 3. Non-goals (OUT)
 
@@ -110,6 +113,7 @@ wrap across a line break, which S1's flattening handles.
 - `tools/memory-recall/check-recall.py`
 - `tools/memory-recall/test_recall_floor.py`
 - `tools/memory-recall/README.md`
+- `memory/map/generated/symbols.json`
 
 The journal S6 writes sits under this build's `build/` folder. The kit version bump owed by the
 README edit is taken once at this build's close.
@@ -164,7 +168,7 @@ README edit is taken once at this build's close.
 
 ## 7. Gates
 
-`recall floor` · `recall floor arms` · `memory-recall kit selftest` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `kit version markers`
+`recall floor` · `recall floor arms` · `memory-recall kit selftest` · `memory hygiene` · `spec tokens (a spec's own names resolve)` · `kit version markers` · `codebase-map coverage + freshness`
 
 New arm: tools/memory-recall/test_recall_floor.py · a fixture root with no §10 probe, and a probe whose question carries an apostrophe across a wrap · none
 
@@ -187,6 +191,9 @@ New arm: tools/memory-recall/test_recall_floor.py · a fixture root with no §10
 ## 9. Revision log
 
 - rev-1 · 2026-10-04 · initial draft, from a measured harvest of the tracked spec set.
+- rev-2 · 2026-10-04 · §2 S8 · §4 · §7 · M2 cross-read: the definitions this unit adds
+  move `memory/map/generated/symbols.json`, which `TOOL-aMendedFleet-82` and the build's other
+  code units regenerate and declare; this spec omitted the write, its Files touched row and the leg.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-89 — measured history leaves the dossiers near the byte cap for the records that measured it
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 89
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 89
 
 <!-- gen:spec-records -->
 
@@ -34,7 +34,10 @@ this prose.
   `memory/map/features/memory-tree-hygiene.md` and `memory/map/features/memory-tree-merge-driver.md`
   is edited under S1's rule until each file is at most 18,432 bytes, which is 90% of the cap.
   A measurement passage becomes the constraint it justifies plus the id of the record that holds the
-  measurement. A constraint, a seam or a gap that is not history stays. Observed by AC1 and AC2.
+  measurement. A constraint, a seam or a gap that is not history stays. No rewritten sentence states
+  a digit count of an inventory population in the present tense: `TOOL-aMendedFleet-44`'s gate arm
+  refuses one, so such a figure leaves with its history or stays as a past-tense reading citing its
+  record. Observed by AC1, AC2 and AC3.
 - **S3** — Every record id the edit cites is one this tree already defines, found by `git grep`
   under the build folders or in `memory/DECISIONS.md`; a measurement whose record cannot be found
   keeps its sentence, because deleting the only copy of a non-derivable fact is the loss the rule
@@ -54,6 +57,10 @@ this prose.
 
 ### Edges
 
+- **consumes-from** `TOOL-aMendedFleet-43` — the cards file S4 keeps byte-identical, and the
+  `_README` layout-list edit this unit rebases onto.
+- **consumes-from** `TOOL-aMendedFleet-44` — the typed-count gate arm S2's rewrites must pass and
+  AC3 runs, and the Rules-list bullet S1's bullet sits beside.
 - **hands-off** external — the codebase-map kit version bump, owed once at the close, since S1
   moves `gen_map.py`.
 
@@ -105,7 +112,11 @@ equal base `7af5f564`'s. PINNED, measured 2026-10-04 on node a.
 ### Rollout
 
 Unit 43 edits the layout list of the same `_README` and `memory/map/README.md`, and is ordered
-first; this unit edits the Rules list below it and rebases onto unit 43's commit.
+first; this unit edits the Rules list below it and rebases onto unit 43's commit. Unit 44 adds its
+typed-count bullet to that same Rules list earlier still, and S1's bullet joins it as a sibling.
+Unit 39 changes the toml fences of `agent-cap`, `unattended`, `run-gates` and
+`memory-tree-hygiene` and makes just enough room under the cap for its claims, so §4's table is a
+writing-time reading and AC1's sizes are derived at the tip.
 
 ### Alternatives rejected
 
@@ -144,11 +155,13 @@ first; this unit edits the Rules list below it and rebases onto unit 43's commit
   `git grep -l` finds each such id under `memory/builds` or in `memory/DECISIONS.md`.
   Red when: a measurement paragraph cites no record, or cites an id the tree does not define, which
   would mint an orphan.
-- **AC3** — When `python tools/codebase-map/gen_map.py --check` runs at the tip, it exits 0, and
+- **AC3** — When `python tools/codebase-map/gen_map.py --check` runs at the tip, it exits 0,
+  `python tools/codebase-map/test_codebase_map.py` exits 0 with
+  `ok   test_dossier_prose_carries_no_typed_count`, and
   `git grep -n "Measured history lives in the record" -- memory/map/README.md tools/codebase-map/gen_map.py`
   hits once in each file.
-  Red when: a fence edit rode along and staled a generated artifact, or one README copy lacks the
-  rule.
+  Red when: a fence edit rode along and staled a generated artifact, a rewrite left a present-tense
+  population count, or one README copy lacks the rule.
 
 ## 7. Gates
 
@@ -171,6 +184,10 @@ first; this unit edits the Rules list below it and rebases onto unit 43's commit
 
 - rev-1 · 2026-10-04 · initial draft, split from unit 43's F1; sizes and measurement lines
   re-measured at `8312d315`.
+- rev-2 · 2026-10-04 · S2 §3 §4 AC3 · the M2 cross-read: `TOOL-aMendedFleet-44` lands a gate arm over
+  this unit's prose and a bullet in the same Rules list, and Rollout named only unit 43; S2 now keeps
+  that arm green, AC3 runs it, Edges declare 43 and 44, and Rollout records unit 39's fence edits to
+  four of the seven dossiers ahead of this one.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # PLAY-aMendedFleet-2 — an experiment's instruments and result rows are committed beside its record, and the vague-brief arm gates §1 as a HIGH ask
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams playbook · ratified 2026-10-04 · order 80
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams playbook · ratified 2026-10-04 · order 80
 
 <!-- gen:spec-records -->
 
@@ -47,6 +47,10 @@ produces.
   The spec's status header gains `advances <ask>` in a rev bump with its §9 line, so the unattended
   `asks-disposed` item reads the ask as KEEP after a CLOSED unit that advances it. Observed by AC4
   and AC5.
+- **S5** — THE MANIFEST STAMP. The template is on the kickoff manifest's `watch:` line, so the
+  commit that moves it re-stamps `last-audit:` in `memory/guides/SESSION-KICKOFF.md` with a delta
+  line in its message; the staged manifest leg of `.githooks/pre-commit` refuses the commit
+  otherwise. Observed by AC6.
 
 ## 3. Non-goals (OUT)
 
@@ -109,6 +113,7 @@ the PLAY family view afterwards.
 - `AGENTS.md`
 - `tools/template-size-highwater.txt`
 - `memory/builds/aMendedFleet/BACKLOG.md`
+- `memory/guides/SESSION-KICKOFF.md`
 
 ### Alternatives rejected
 
@@ -155,13 +160,17 @@ the PLAY family view afterwards.
   regenerates the index, its backlog line reports `0 verdict(s)`.
   Red when: a row is malformed, the ask lacks its `SEV` row, or the ask is filed outside this
   build's folder.
+- **AC6** — When `bash skills/session-kickoff/manifest-check.sh` runs after the unit's commit, it
+  exits 0, and `git diff HEAD~1 HEAD -- memory/guides/SESSION-KICKOFF.md` shows the `last-audit:`
+  line moved.
+  Red when: check 5 reports unaudited drift on `coding-governance-agents.template.md`.
 
 No new refusal or gate clause is added, so nothing here is observed RED on a staged break; each
 `Red when:` names the break an existing checker or grep reports.
 
 ## 7. Gates
 
-`template size <=48KiB` · `charter size` · `line length` · `playbook render wiring` · `playbook parity` · `memory hygiene` · `recall floor` · `recall floor arms` · `spec tokens (a spec's own names resolve)`
+`template size <=48KiB` · `charter size` · `line length` · `playbook render wiring` · `playbook parity` · `memory hygiene` · `kickoff-manifest ratchet` · `recall floor` · `recall floor arms` · `spec tokens (a spec's own names resolve)`
 
 The two recall legs are owed by the `memory/` guard over this build's `BACKLOG.md`. All run once, at
 the close.
@@ -190,6 +199,9 @@ the close.
 
 - rev-1 · 2026-10-04 · initial draft, from the aBlindedTrial trial report and its emptied scratch
   root, the template's §8, the two size records and the memory-tree kit's row grammar at base.
+- rev-2 · 2026-10-04 · S5 · AC6 · §4 · §7 · M2 cross-read: the template is a watched path, which
+  units 78 and 94 re-stamp the kickoff manifest for and this spec did not; S5 re-stamps it in the
+  same commit and AC6 observes it.
 
 ## 10. Reuse audit
 

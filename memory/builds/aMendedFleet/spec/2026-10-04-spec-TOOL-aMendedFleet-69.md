@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-69 — the agent-instructions kit announces a canonical file past 32 KiB and states both tool facts as verified
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 69
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 69
 
 <!-- gen:spec-records -->
 
@@ -55,7 +55,7 @@ charter's §6 requires of an environment claim.
 
 - The charter template's §6 sentence that an `AGENTS.md`-only repo "ships a repo Claude Code cannot
   read". It is a governance-template edit rendered into `AGENTS.md` by the playbook renderer, a
-  second mechanism; §8 F2 splits it to a unit the run adds.
+  second mechanism; §8 F2 splits it to `PLAY-aMendedFleet-3`.
 - Changing the default alias set, the modes, any exit code or the wiring itself. The import stays
   correct under both CLI behaviours.
 - Trimming this repo's `AGENTS.md` under 32 KiB, or changing the template's 48 KiB cap. The
@@ -67,8 +67,8 @@ charter's §6 requires of an environment claim.
 
 ### Edges
 
-- **hands-off** external — the charter template's §6 sentence, split by §8 F2 to a unit the run
-  adds.
+- **hands-off** `PLAY-aMendedFleet-3` — the charter template's §6 sentence, split to that unit by
+  §8 F2; it relies on this unit's stamped README as the fact's one home.
 - **consumes-from** external — network access and an authenticated `gh` at the build pass, which
   S5's stamps are verified through.
 
@@ -197,6 +197,8 @@ New arm: `tools/agent-instructions/adopt-agent-instructions.test.sh` · a canoni
 
 - rev-1 · 2026-10-04 · initial draft, from the kit's adopter and README at base, the vendor issue
   and changelog, and the Codex source, all read 2026-10-04.
+- rev-2 · 2026-10-04 · §3 · M2 cross-read: the §8 F2 split was named only as a unit the run adds;
+  it is `PLAY-aMendedFleet-3`, so the non-goal and the hands-off edge now name it.
 
 ## 10. Reuse audit
 

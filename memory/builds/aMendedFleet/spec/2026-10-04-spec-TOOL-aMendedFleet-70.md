@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-70 — runlog's extractor reports what a session spends in tokens and minutes before it reaches READY
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 70
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 70
 
 <!-- gen:spec-records -->
 
@@ -12,8 +12,8 @@
 
 The report's context-diet items are argued from one figure: a session spends a median of about
 66.7K tokens and 6.7 minutes before its kickoff reaches READY, over 23 sessions. That figure was
-computed once by hand and nothing in the tree can compute it again, so neither the diet units nor
-the A/B run split from unit 67 can show they moved it. runlog's extractor already streams every
+computed once by hand and nothing in the tree can compute it again, so no diet unit can show it
+moved it. runlog's extractor already streams every
 session's transcripts into timed `usage` events. This unit adds one report-only mode over it that
 finds each session's READY point and prints what the session spent to reach it, per session and as
 quartiles, so the baseline is a command instead of a sentence.
@@ -55,8 +55,9 @@ quartiles, so the baseline is a command instead of a sentence.
 - A new extract event kind, tool class or schema field. The mode reads what `extract_session`
   already returns plus S1's scan, so every existing consumer of an extract is untouched, which AC6
   observes.
-- First-turn tokens of workflow or sub-agent sidechains. The A/B unit split from unit 67 measures
-  those; it may extend this mode when it does.
+- First-turn tokens of workflow or sub-agent sidechains. `TOOL-aMendedFleet-93`, split from unit
+  67, measures a judge's first turn from its sidechain transcript directly, and neither reads nor
+  extends this mode.
 - A drift signal, a pin or a gate over the figure. It is a baseline to read, and nothing yet
   decides what value is wrong.
 - Disposing of `TOOL-aReplayedCard-9`, which unit 14 already decides.
@@ -65,8 +66,6 @@ quartiles, so the baseline is a command instead of a sentence.
 
 ### Edges
 
-- **hands-off** external — the A/B run split from unit 67, which reads this mode for its token half
-  and may extend it to sidechains.
 - **hands-off** external — the runlog kit version bump, owed once at the close.
 
 ## 4. Design
@@ -188,6 +187,9 @@ New arm: `tools/runlog/selftest.py` · the `ready` scenario with its witness rem
 
 - rev-1 · 2026-10-04 · initial draft, from the extractor and CLI at base and the kickoff engine's
   Step 5.
+- rev-2 · 2026-10-04 · §1 · §3 · M2 cross-read: this spec said the A/B unit reads and may extend
+  this mode; `TOOL-aMendedFleet-93` reads judge transcripts directly and puts extending the mode
+  out of its scope, so the goal, the sidechain non-goal and the hands-off edge now agree with it.
 
 ## 10. Reuse audit
 

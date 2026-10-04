@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-71 — one sweep gives every present-tense count in a code comment one of ANNOTATION-STYLE A4's three dispositions
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 71
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 71
 
 <!-- gen:spec-records -->
 
@@ -40,9 +40,13 @@ comment edits that apply it.
   test. `--selftest` runs the predicate over literal strings, one candidate and one frozen
   near-miss per marker. Observed by AC1 and AC2.
 - **S2** — THE DISPOSITIONS. A journal record beside the script lists every candidate the script
-  prints at base, one row each: path and line, the sentence, and one of `FROZEN`, `POINTED`,
-  `REWRITTEN` or `NOT-A-COUNT`, with the reason on every `NOT-A-COUNT` row. It opens with the
-  script's population line, so a short list is distinguishable from a dead walk. Observed by AC3.
+  prints at the pass's STARTING COMMIT, the tip the unit pass begins from, recorded with
+  `git rev-parse HEAD` before its first edit. That is not base `7af5f564`: units ordered before this
+  one edit files in the estimate below, unit 61 among them in `unattended.sh`, `lib-unattended.sh`
+  and `adopt-unattended.sh`, and their new comments are part of the population the sweep owes. One row each: path and line, the sentence,
+  and one of `FROZEN`, `POINTED`, `REWRITTEN` or `NOT-A-COUNT`, with the reason on every
+  `NOT-A-COUNT` row. It opens with the starting commit's sha and the script's population line, so
+  a short list is distinguishable from a dead walk. Observed by AC3.
 - **S3** — THE EDITS. Each row not marked `NOT-A-COUNT` is applied to its comment:
   - `FROZEN` adds the sha and date of the commit that wrote the figure, read with `git log -L` on
     the line, and turns "today" into "when this was written";
@@ -52,7 +56,8 @@ comment edits that apply it.
   render step, never by hand. No edit changes a line outside a comment or a docstring. Observed by
   AC4, AC5 and AC6.
 - **S4** — The two sentences the report names, in `tools/unattended/unattended.sh` near lines 4017
-  and 4021 at base, are among the applied rows. Observed by AC4.
+  and 4021 at base, are among the applied rows; the pass finds them by text, since unit 61 edits
+  that file first and moves its line numbers. Observed by AC4.
 
 ## 3. Non-goals (OUT)
 
@@ -152,11 +157,14 @@ re-stamp in the same commit, per the Definition of Done; none in the estimate is
 - **AC1** — When the census script runs with `--selftest`, it reports each literal candidate as a
   candidate and each literal frozen sentence as a near-miss, and exits 0.
   Red when: a frozen sentence is reported as a candidate, or a candidate is missed.
-- **AC2** — When the census script runs at base, in a `git clone --local` checked out at `7af5f564`
-  under a short `%TEMP%` path, its candidates include both sentences of `tools/unattended/unattended.sh` S4
-  names, the wrapped one included, and its population line names more than zero files of each kind.
+- **AC2** — When the census script runs in a `git clone --local` checked out at the pass's starting
+  commit S2 records, under a short `%TEMP%` path, its candidates include both sentences of
+  `tools/unattended/unattended.sh` S4 names, the wrapped one included, and its population line names
+  more than zero files of each kind.
   Red when: the walk reads nothing, or the wrapped count is missed.
   figure: every count is DERIVED at observation time.
+  fixture: both sentences are present at base; a sibling unit that rewrites either before this pass
+  leaves that half unobservable, and the dispositions record says so.
 - **AC3** — When the dispositions record is read, every candidate the AC2 run printed has exactly one
   row, joined on path and line, and every `NOT-A-COUNT` row carries a reason.
   Red when: a candidate has no disposition.
@@ -164,10 +172,10 @@ re-stamp in the same commit, per the Definition of Done; none in the estimate is
   `NOT-A-COUNT` row in the dispositions record, joined on path and sentence text since the edits
   move line numbers, and neither S4 sentence is among them.
   Red when: an applied disposition left its count in place.
-- **AC5** — When `git diff 7af5f564 -- <every file the sweep touched>` is filtered with `grep` to
-  changed lines that are not blank and not a comment or docstring line, it prints nothing; and for
-  every `*.template.*` pair touched, the `diff` of template and render prints at the tip what it
-  printed at base.
+- **AC5** — When `git diff <starting-commit> -- <every file the sweep touched>`, with the sha S2
+  records, is filtered with `grep` to changed lines that are not blank and not a comment or
+  docstring line, it prints nothing; and for every `*.template.*` pair touched, the `diff` of
+  template and render prints at the tip what it printed at that starting commit.
   Red when: the sweep moved behaviour, or a render was edited by hand.
 - **AC6** — When, for each edited sentence, `git grep -F` of a distinctive six-word fragment of its
   base wording runs over the tree at base, the only hit is the edited file itself, and that check
@@ -200,6 +208,10 @@ The held self-test legs above are owed by the guards the estimate trips and run 
 
 - rev-1 · 2026-10-04 · initial draft, from the style guide, a trial predicate over the tracked code
   population at base, and a read of its `today` subset.
+- rev-2 · 2026-10-04 · S2 · S4 · AC2 · AC5 · M2 cross-read: the census, its dispositions and the
+  behaviour diff were anchored at base `7af5f564`, but unit 61 and other units ordered first edit
+  files in this sweep, so a base diff reds on their code and a tip census finds their new comments
+  with no row; all three now anchor at the pass's starting commit, which S2 records.
 
 ## 10. Reuse audit
 

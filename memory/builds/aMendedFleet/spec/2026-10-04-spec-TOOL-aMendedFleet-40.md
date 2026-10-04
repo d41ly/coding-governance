@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-40 — the coverage gate refuses a `baseline.toml` that gained a key against its base
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 40 · closes TOOL-aHoistedPass-30 · advances TOOL-aProbedToolkit-8
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 40 · closes TOOL-aHoistedPass-30 · advances TOOL-aProbedToolkit-8
 
 <!-- gen:spec-records -->
 
@@ -57,7 +57,8 @@ constraint rather than a convention.
 
 - An escape for a deliberate addition. Every addition has a remedy that is not an addition: claim the
   key in a dossier. §8 F1 records why.
-- The digest's coverage figure, the other half of `TOOL-aProbedToolkit-8`; unit 39 §8 hands it on.
+- The digest's coverage figure, the other half of `TOOL-aProbedToolkit-8`; unit 39 §8 hands it to
+  `TOOL-aMendedFleet-86`, which closes that ask after this unit lands.
 - Gating the affordance grace list the same way. It is shrink-only too, and `map_diff.py
   --drop-affordance-exempt` already rewrites it downward; a growth assert there is its own unit.
 - Adopters whose gate was copied before this unit. Their frozen copy lacks the new test until they
@@ -66,6 +67,8 @@ constraint rather than a convention.
 
 ### Edges
 
+- **hands-off** `TOOL-aMendedFleet-86` — the digest's coverage figure; that unit's `closes` on
+  `TOOL-aProbedToolkit-8` rests on this unit's shrink assert having landed.
 - **hands-off** external — the codebase-map kit version bump, owed once at the close.
 
 ## 4. Design
@@ -179,6 +182,9 @@ New arm: tools/codebase-map/selftest.py · a fixture repository whose working ba
 
 - rev-1 · 2026-10-04 · initial draft, from the synthesis's item [#49], `compute_coverage`, the
   runner's base rule and the baseline header at base.
+- rev-2 · 2026-10-04 · §3 · the M2 cross-read: the digest-figure Non-goal said only that unit 39
+  hands it on, while `TOOL-aMendedFleet-86` holds it and declares a consumes-from on this unit; the
+  Non-goal and Edges now name it.
 
 ## 10. Reuse audit
 

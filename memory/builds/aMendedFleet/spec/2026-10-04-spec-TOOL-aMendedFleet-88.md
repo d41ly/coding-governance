@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-88 — `map_imports.py` is deleted, having no consumer
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 88
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 88
 
 <!-- gen:spec-records -->
 
@@ -119,8 +119,10 @@ Nothing is minted; this unit only deletes.
   pass's base, before any deletion, it prints exactly one path, the codebase-map kit's selftest.
   Red when: a second importer exists, and the pass parks instead of deleting.
 - **AC2** — When `git grep -n "map_imports" -- tools memory/map` and
-  `git grep -n -E "\bmi\.|resolve_kit_dir" -- tools/codebase-map/selftest.py` run after the unit's
-  commit, both print nothing.
+  `git grep -n -E "\bmi\.|^# >>> resolve_kit_dir|^def resolve_kit_dir" -- tools/codebase-map/selftest.py`
+  run after the unit's commit, both print nothing. The second grep names the dead copy's marker and
+  definition rather than the bare name, because `TOOL-aMendedFleet-42`'s install-site arm, earlier in
+  the order, may spell the helper's name in a fixture.
   Red when: a reader, a fixture or the dead canonical copy survives, or the module is still named
   anywhere in the kit or the map.
 - **AC3** — When `python tools/codebase-map/gen_map.py --check` runs after the unit's commit, it
@@ -151,6 +153,9 @@ No arm is added; three are deleted with the module they covered.
 
 - rev-1 · 2026-10-04 · initial draft, from the synthesis's item [#46], unit 42's F1 census and a
   re-read of every reader at base.
+- rev-2 · 2026-10-04 · AC2 · the M2 cross-read: AC2 required no `resolve_kit_dir` anywhere in the
+  kit selftest, while `TOOL-aMendedFleet-42` adds an install-site arm to the same file before this
+  unit, whose fixture may spell that name; AC2 now greps the dead copy's opening marker and `def`.
 
 ## 10. Reuse audit
 

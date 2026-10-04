@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-82 — each recall query row carries the worktree's HEAD, so `--used` attributes a query after its worktree is gone
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 82
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 82
 
 <!-- gen:spec-records -->
 
@@ -44,7 +44,8 @@ survives its worktree.
 - **S6** — `memory/map/generated/symbols.json` is regenerated for the new definition. NOT OBSERVED
   by a criterion here: `python tools/codebase-map/gen_map.py --check` at the close is its check,
   and §7 names the legs that read it.
-- **S7** — Self-test arms in `tools/memory-recall/selftest.py`: the AC3 fixture and the AC4 fixture.
+- **S7** — Self-test arms in `tools/memory-recall/selftest.py`: the AC3 fixture and the AC4 fixture,
+  with `SELFTEST_ARMS` moved by the arms added and its dated `N -> M` provenance line.
   NOT OBSERVED by a criterion here: the suite runs once at the close, and the arms are declared
   under `New arm:` in §7.
 
@@ -162,7 +163,7 @@ write `tools/memory-recall/query.py` or its README and are ordered first too.
 
 `memory-recall kit selftest` · `recall floor` · `recall floor arms` · `codebase-map coverage + freshness` · `lexicon naming predicates` · `encoding posture (text IO names its encoding)` · `kit epoch (shipped bytes move, the version moves)` · `spec tokens (a spec's own names resolve)`
 
-New arm: `tools/memory-recall/selftest.py` · the AC3 fixture staged red by deleting the row's `head`, and the AC4 two-child fixture · none
+New arm: `tools/memory-recall/selftest.py` · the AC3 fixture staged red by deleting the row's `head`, and the AC4 two-child fixture · `SELFTEST_ARMS` moves by the arms added, with its dated `N -> M` provenance line
 
 ## 8. Open questions
 
@@ -176,6 +177,8 @@ New arm: `tools/memory-recall/selftest.py` · the AC3 fixture staged red by dele
 
 - rev-1 · 2026-10-04 · initial draft, split from unit 34 at its F2, from a probe of node a's query
   log and the query row's assembly at base.
+- rev-2 · 2026-10-04 · S7 · §7 · M2 cross-read: the two new self-test arms move `SELFTEST_ARMS`,
+  as `TOOL-aMendedFleet-27` S5 moves it for its one arm; the arm line said the floor moves by none.
 
 ## 10. Reuse audit
 

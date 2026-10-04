@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-37 — dossier freshness is derived from git, and drift-audit reports the dossiers older than their paths
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 37
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 37
 
 <!-- gen:spec-records -->
 
@@ -71,7 +71,7 @@ with a shrink-only pin.
 ## 3. Non-goals (OUT)
 
 - The close-time "touched, not refreshed" block in `tools/unattended/unattended.sh`. §8 F1 splits it
-  into a unit the run adds; S3's range mode is the reader that unit calls.
+  into `TOOL-aMendedFleet-83`; S3's range mode is the reader that unit calls.
 - Gating on the count. It is report-only by the report's own wording, and a pin set ahead of today's
   value would be a scheduled refusal on the unguarded `drift-audit records` leg.
 - Excluding version-marker-only edits from the claimed side. §8 F2 measured it and it does not move
@@ -87,8 +87,9 @@ with a shrink-only pin.
 ### Edges
 
 - **consumes-from** external — a full clone: in a shallow one the signal is DEAD PROBE by design.
-- **hands-off** external — the close-time "touched, not refreshed" block, which F1 moves to a unit the
-  run adds to this build; it reads S3's range mode and builds nothing of its own.
+- **hands-off** `TOOL-aMendedFleet-83` — the close-time "touched, not refreshed" list, which F1 moves
+  there; it reads S3's range mode with `--json` and the `live` and `note` fields of §4's data model,
+  and computes no staleness of its own.
 - **hands-off** external — the codebase-map and drift-audit kit version bumps, owed once at the close.
 
 ## 4. Design
@@ -244,7 +245,7 @@ New arm: `tools/drift-audit/selftest.py` · canned `map_diff.py` output for a va
 
 - **F1** — Is the close-time "touched, not refreshed" list part of this mechanism?
   RESOLVED (agent, 2026-10-04, delegated): split — the close-time block in
-  `tools/unattended/unattended.sh` moves to a new unit the run adds. It is a consumer in another kit
+  `tools/unattended/unattended.sh` moves to a new unit the run adds, `TOOL-aMendedFleet-83`. It is a consumer in another kit
   with its own `.unattended.conf` declaration, since `MAP_CLI` names `reuse_lookup.py` and not
   `map_diff.py`, and node d's live build is rewriting that kit; units 49 and 66 are each one close
   block for the same reason. This unit ships the range mode that block calls.
@@ -264,6 +265,9 @@ New arm: `tools/drift-audit/selftest.py` · canned `map_diff.py` output for a va
 ## 9. Revision log
 
 - rev-1 · 2026-10-04 · initial draft.
+- rev-2 · 2026-10-04 · §3 §8 · the M2 cross-read: the close-time list's hand-off named `external`
+  and "a unit the run adds" while `TOOL-aMendedFleet-83` exists in this build and consumes S3's range
+  mode; the Non-goal, the Edges bullet and F1 now name that unit.
 
 ## 10. Reuse audit
 

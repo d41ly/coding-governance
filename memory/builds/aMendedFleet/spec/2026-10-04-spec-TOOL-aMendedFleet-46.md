@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-46 — the replay harness measures which shortlist quantity predicts a reuse miss, before any miss signal ships
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 46
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 46
 
 <!-- gen:spec-records -->
 
@@ -45,9 +45,12 @@ only from a verdict that names a predictor, and then as a unit the run adds.
   values. The run stays under the existing `CEILING_S` and exits as the mode without the flag does.
   Observed by AC1 and AC3.
 - **S5** — The verdict, measured at this unit's pass after unit 35 has landed, is recorded with its
-  date and sha in the `## Gaps` of `memory/map/features/codebase-map.md`, so the next ranker change
-  knows what to re-run, and the module docstring's usage block names `--predictors`. Observed by
-  AC4.
+  date and sha in this unit's AC4 evidence, and the `## Gaps` of
+  `memory/map/features/codebase-map.md` gains one line opening `miss predictor:` that states the
+  verdict and cites `TOOL-aMendedFleet-46`, so the next ranker change knows what to re-run and where
+  the reading lives. The dossier line carries no date, sha or node: `TOOL-aMendedFleet-89`'s rule
+  keeps those in the record that measured them. The module docstring's usage block names
+  `--predictors`. Observed by AC4.
 - **S6** — `memory/map/generated/symbols.json` is regenerated for the new definitions, and the
   dossier's prose is refreshed in the same commit. Observed by AC5.
 - **S7** — A selftest arm drives S2 and S3 over canned rows. NOT OBSERVED by a criterion here: the
@@ -170,9 +173,11 @@ measured at this pass, never copied from §4's table.
   and every row carries the eight predictor values.
   Red when: the JSON lacks the object, or a row lacks a value.
 - **AC4** — When `git grep -n "miss predictor" -- memory/map/features/codebase-map.md` runs, it hits
-  one line carrying a date and a sha, and `git grep -n -e "--predictors" -- tools/codebase-map/replay-phrases.py`
+  one line citing `TOOL-aMendedFleet-46`, and that unit's AC4 evidence states the verdict with the
+  date and sha it was measured at; and `git grep -n -e "--predictors" -- tools/codebase-map/replay-phrases.py`
   hits the docstring's usage block.
-  Red when: the verdict is measured and not recorded, or recorded without when it was measured.
+  Red when: the verdict is measured and not recorded, or the dossier line cites no record of when it
+  was measured.
 - **AC5** — When `python tools/codebase-map/gen_map.py --check` runs at the tip it exits 0, and
   `python tools/codebase-map/map_diff.py --stale-dossiers` does not list `codebase-map`.
   Red when: the symbol index is stale, or the unit leaves its own dossier older than its paths.
@@ -204,6 +209,10 @@ New arm: `tools/codebase-map/selftest.py` · canned rows with a separable and an
 
 - rev-1 · 2026-10-04 · initial draft, from the synthesis's item [#39], `assemble_shortlist`,
   `measure_phrase`, and an eight-predictor probe over the replay corpus at `fee9f62b`.
+- rev-2 · 2026-10-04 · S5 AC4 · the M2 cross-read: S5 wrote the verdict's date and sha into the
+  `codebase-map` dossier, while `TOOL-aMendedFleet-89` adds the map rule that when, where and on
+  which node a figure was measured live in the record and the dossier cites its id; the date and sha
+  now sit in this unit's AC4 evidence, and the dossier line cites this unit.
 
 ## 10. Reuse audit
 

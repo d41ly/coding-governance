@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-22 — the generated views merge by taking one side
 
-**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · order 22
+**Status:** SPECCED · rev-3 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · order 22
 
 <!-- gen:spec-records -->
 
@@ -44,8 +44,8 @@ merge driver and wires that driver per node. The month shards' frozen columns ar
 - The generated map artifacts under `memory/map/generated/`, which the report did not name; the
   codebase-map freshness leg reds them the same way, and the same attribute would serve them.
 - LIVE.md's own columns, which units 12 and 13 change.
-- The `HYGIENE.md` line saying a month shard freezes when its month passes. S4 makes it true, so the
-  carrier needs no edit.
+- The month shards' columns and the frozen claim the `HYGIENE.md` line makes about them, which
+  `TOOL-aMendedFleet-81` owns since the F1 split.
 
 ## 4. Design
 
@@ -62,10 +62,6 @@ Read at base `7af5f564`; no file below moved between it and `6a88fbf7`.
   taking one side loses no authored byte and leaves a file both checks call stale.
 - `check_merge_rows` in `tools/check-wiring.sh` is the per-node wiring precedent: attributes read
   through `git check-attr --stdin`, a config value checked, and `--fix` setting it.
-- The month shards change after their month. `git log -p` over `memory/ledger/` shows the Status
-  cell flipped a month late in each closed month: `aWireWarden` in the July shard at `60e2e8f99`,
-  `aClosedDocket` in the August shard at `4289f1b40`, and `aRepatriatedFork` twice in the September
-  shard on 2026-10-02. At `38524b752` that row's id count also moved from 58 to 60.
 - `git log --merges` counts 88 merges touching `memory/LIVE.md`, 73 touching the September shard and
   22 touching `memory/gotchas/INDEX.md`; PINNED, counted 2026-10-04 at `6a88fbf7`.
 
@@ -93,10 +89,6 @@ The per-node half is `git config merge.ours.driver true`, set by S2's arm.
 
 - **`merge=union`.** It concatenates both sides' rows, so the stale file carries duplicate rows that
   read as real until the next render.
-- **Dropping only the Status column, as the report proposed.** The id count moved a month late too,
-  so the shard would still not be frozen.
-- **Keeping Streams with a reworded claim.** A build's `streams:` front matter can gain a
-  discipline mid-build, so the claim would carry an exception and the carrier line a half-truth.
 
 ## 5. Production-readiness checklist
 
@@ -108,8 +100,8 @@ The per-node half is `git config merge.ours.driver true`, set by S2's arm.
 - observability — the stale side is named by check 9 or check 17 with its `--write` remedy.
 - risks — a merge commit can carry a stale view until the next render; every push runs the bar,
   which reds it, so it cannot reach the remote unrendered.
-- testing — direct runs in a scratch clone, one wiring self-test arm and one generator self-test arm.
-- migration — the next `--write` re-renders every shard once to the new columns.
+- testing — direct runs in a scratch clone and one wiring self-test arm.
+- migration — N/A: an attribute block and a per-node config value; no stored data changes.
 - user docs — the kit README and the runbook step, S3.
 
 ## 6. Acceptance criteria
@@ -152,20 +144,22 @@ New arm: tools/check-wiring.test.sh · a scratch repo declaring merge=ours with 
 - rev-1 · 2026-10-04 · initial draft, from `render_shards`, `check_merge_rows`, the shard history
   and a fixture merge with and without the driver configured.
 - rev-2 · 2026-10-04 · F1 resolved by split: S4, AC5, AC6 and F2 moved to `TOOL-aMendedFleet-81`.
+- rev-3 · 2026-10-04 · §3 · §4 · §5 · §10 · M2 cross-read: the split left the shard half behind in
+  prose. §3 still credited S4 with making the frozen claim true, and §4 evidence and alternatives,
+  §5 testing and migration and the §10 `render_shards` seam described the column change
+  `TOOL-aMendedFleet-81` now owns. Each moved to that spec or was cut.
 
 ## 10. Reuse audit
 
-The seams extended are `check_merge_rows` in `tools/check-wiring.sh`, whose attribute read and
-`--fix` path S2 copies for a second driver, and `render_shards` in
-`tools/memory-tree/gen_build_index.py`. Git's `merge.<driver>.driver` config is the platform
+The seam extended is `check_merge_rows` in `tools/check-wiring.sh`, whose attribute read and
+`--fix` path S2 copies for a second driver. Git's `merge.<driver>.driver` config is the platform
 mechanism, so nothing new is built to take a side.
 `python tools/codebase-map/reuse_lookup.py "merge attribute for a generated file so a merge conflict takes one side"`
 named `merge` in `tools/memory-tree/merge-rows.py`, the row driver this unit leaves in place, and no
 take-a-side seam, so none fits beyond git's own. Recall named `TOOL-aMendedLedger-1`, which made
 LIVE.md and the shards generated, and a landing record of `TOOL-aHoistedPass-1` that re-rendered four
 generated files by hand after a merge, the cost this unit removes. Where the report and the tree
-disagree: the report says dropping Status makes the frozen claim true, and the shard history shows
-the id count moving a month late too; and its conflict data predates the 2026-09-28 switch-over,
+disagree: its conflict data predates the 2026-09-28 switch-over,
 after which version carriers cause most conflicts, so the size of this unit's effect is unmeasured.
 
 Recall terms used: `python tools/memory-recall/query.py "how should a merge handle the generated LIVE.md and ledger shards, and was a merge driver for them declined" --terms "merge=ours merge=rows generated view LIVE.md ledger shard regenerate driver gitattributes check 9 stale render conflict"`

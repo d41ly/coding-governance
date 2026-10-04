@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-68 — the unattended Skill becomes a router of at most 10 KiB
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · advances TOOL-aScouredKit-23 · order 68
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · advances TOOL-aScouredKit-23 · order 68
 
 <!-- gen:spec-records -->
 
@@ -43,8 +43,8 @@ itself. A ceiling and a leg keep it there, which is half of what `TOOL-aScouredK
   with its `M<n>` carriers and the scope rule beside it; the paragraph opening `TWO items have NO
   override`; the sentence that a process not in the ledger is never killed; and, under a `## Close`
   heading, the paragraph opening with the hold lead check 43 finds. Observed by AC2, AC3, AC4, AC5.
-- **S4** — EVERY PLACEHOLDER STAYS. Each `{{...}}` token the template carries at base appears at least
-  once in the router, because a placeholder is a value only the render can give a run and the
+- **S4** — EVERY PLACEHOLDER STAYS. Each `{{...}}` token the template carries at the pass's starting
+  commit appears at least once in the router, because a placeholder is a value only the render can give a run and the
   companion cannot carry one. Observed by AC6.
 - **S5** — THE CEILING. `tools/template-size-limits.txt` gains a row for
   `.claude/skills/unattended/SKILL.md` at 10240 bytes, and `tools/gate-legs.json` a leg
@@ -56,6 +56,10 @@ itself. A ceiling and a leg keep it there, which is half of what `TOOL-aScouredK
   pointing at strings the router still carries; any that cannot be are moved to the closest rendered
   string of the same placeholder. NOT OBSERVED by a criterion here: the suite runs once at the close,
   and the arm is declared under `New arm:` in §7.
+- **S8** — THE MANIFEST STAMP. `tools/gate-legs.json` is on the kickoff manifest's `watch:` line, so
+  the commit that adds S5's leg also re-stamps `last-audit:` in `memory/guides/SESSION-KICKOFF.md`
+  with a delta line in its message; the staged manifest leg of `.githooks/pre-commit` refuses the
+  commit otherwise. Observed by AC11.
 
 ## 3. Non-goals (OUT)
 
@@ -126,6 +130,7 @@ Read at base `7af5f564`.
 - `tools/unattended/adopt-unattended.test.sh`
 - `tools/template-size-limits.txt`
 - `tools/gate-legs.json`
+- `memory/guides/SESSION-KICKOFF.md`
 
 ### Rollout
 
@@ -150,11 +155,15 @@ template. A run already in flight reads the Skill once at its start, so the cut 
 - observability — the new leg prints the byte count and headroom on every bar.
 - risks — a dropped instruction is the failure; AC7 and AC8 compare verbs and their order against
   the base Skill, and the closing diff review reads the cut.
-- testing — AC1 to AC10 directly; the arm in S7.
+- testing — AC1 to AC11 directly; the arm in S7.
 - migration — an adopter re-renders with the kit's own adopter on the next kit update.
 - user docs — S6.
 
 ## 6. Acceptance criteria
+
+Every "base" below means the pass's starting commit, the tip the unit pass begins from, and not the
+design base `7af5f564`: unit 63 edits `tools/unattended/SKILL.template.md` and its render first, so
+a comparison against `7af5f564` would red on that unit's change.
 
 - **AC1** — When `bash tools/check-template-size.sh .claude/skills/unattended/SKILL.md` runs at the
   unit's tip, it exits 0 against the 10240 row.
@@ -193,10 +202,14 @@ template. A run already in flight reads the Skill once at its start, so the cut 
   `.claude/skills/unattended/SKILL.md` and `bash tools/check-template-size.sh .claude/skills/unattended/SKILL.md`
   runs, it exits 1. This is the staged break for the new leg.
   Red when: an oversized router passes.
+- **AC11** — When `bash skills/session-kickoff/manifest-check.sh` runs after the unit's commit, it
+  exits 0, and `git diff HEAD~1 HEAD -- memory/guides/SESSION-KICKOFF.md` shows the `last-audit:`
+  line moved.
+  Red when: check 5 reports unaudited drift on `tools/gate-legs.json`.
 
 ## 7. Gates
 
-`unattended skill wiring` · `unattended kit gate` · `check-wiring self-test` · `lexicon naming predicates` · `recall floor` · `recall floor arms` · `run-gates canary` · `run-gates gov canary` · `line length` · `kit epoch (shipped bytes move, the version moves)` · `spec tokens (a spec's own names resolve)`
+`unattended skill wiring` · `unattended kit gate` · `check-wiring self-test` · `lexicon naming predicates` · `recall floor` · `recall floor arms` · `run-gates canary` · `run-gates gov canary` · `kickoff-manifest ratchet` · `line length` · `kit epoch (shipped bytes move, the version moves)` · `spec tokens (a spec's own names resolve)`
 
 The new leg S5 adds is not on the line above: the manifest names it only once this unit lands, and
 from then on it is graded like its sibling `unattended protocol size`. AC10 is its staged break.
@@ -224,6 +237,10 @@ New arm: `tools/unattended/adopt-unattended.test.sh` · the rendered router read
 
 - rev-1 · 2026-10-04 · initial draft, from a read of the Skill template's sections, the four contract
   files' sizes and headings, and the four Skill reads in `check-unattended.sh` at base.
+- rev-2 · 2026-10-04 · S4 · S8 · §6 · AC11 · §7 · M2 cross-read: unit 63 edits the Skill template
+  before this unit, so S4 and every base-against-tip criterion now compare against the pass's
+  starting commit; and `tools/gate-legs.json` is a watched path, which unit 78 and unit 94 re-stamp
+  for and this spec did not, so S8 re-stamps the manifest and AC11 observes it.
 
 ## 10. Reuse audit
 

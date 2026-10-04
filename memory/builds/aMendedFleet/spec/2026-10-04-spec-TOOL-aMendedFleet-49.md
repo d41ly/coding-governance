@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-49 — the unattended close prints the BASE..HEAD drift delta
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 49
+**Status:** SPECCED · rev-3 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 49
 
 <!-- gen:spec-records -->
 
@@ -49,6 +49,9 @@ file instead of from a recollection.
 - **S8** — The unattended driver suite gains one arm that closes a fixture run with a hand-written
   history file and asserts the block's heading and one moved signal. NOT OBSERVED by a criterion
   here: the suite runs once at the close, and the arm is declared under `New arm:` in §7.
+- **S9** — `memory/map/generated/symbols.json` is regenerated for the new definitions. NOT OBSERVED
+  by a criterion here: `python tools/codebase-map/gen_map.py --check` at the close is its check, and
+  §7 names the legs that read it.
 
 ## 3. Non-goals (OUT)
 
@@ -60,7 +63,8 @@ file instead of from a recollection.
   key table, a governance carrier, and the library's `resolve_kit_dir` already reaches a sibling
   kit without one.
 - The close's other report-only blocks, the touched-file open asks and the unrefreshed dossiers,
-  which are units 66 and 83 of this build. Each is its own call beside this one.
+  which are units 66 and 83 of this build. Units 66 and 83 print them at the move into `VERIFYING`
+  and on a resume at it, never in `--close`.
 - The kickoff card's drift line, which is a later unit of this build.
 - Bumping the drift-audit or unattended kit version here; each is owed once at the build's close.
 
@@ -100,6 +104,7 @@ The shas above are illustrative.
 - `tools/drift-audit/README.md`
 - `tools/unattended/unattended.sh`
 - `tools/unattended/unattended.test.sh`
+- `memory/map/generated/symbols.json`
 
 ### Alternatives rejected
 
@@ -153,7 +158,7 @@ The shas above are illustrative.
 
 ## 7. Gates
 
-`drift-audit records` · `drift-audit selftest` · `drift-audit wiring` · `unattended kit gate` · `kit epoch (shipped bytes move, the version moves)` · `install-prefix (shipped surface)` · `lexicon naming predicates` · `spec tokens (a spec's own names resolve)`
+`drift-audit records` · `drift-audit selftest` · `drift-audit wiring` · `unattended kit gate` · `codebase-map coverage + freshness` · `recall floor` · `recall floor arms` · `kit epoch (shipped bytes move, the version moves)` · `install-prefix (shipped surface)` · `lexicon naming predicates` · `spec tokens (a spec's own names resolve)`
 
 New arm: `tools/unattended/unattended.test.sh` · a fixture close with a hand-written history file in the fixture's common git dir · none
 New arm: `tools/drift-audit/selftest.py` · the four skip cases and one moved, one hash-only and one unchanged signal · `CHECK_FLOOR` moves by the checks the arm adds
@@ -172,6 +177,9 @@ New arm: `tools/drift-audit/selftest.py` · the four skip cases and one moved, o
 ## 9. Revision log
 
 - rev-1 · 2026-10-04 · initial draft.
+- rev-2 · 2026-10-04 · S9 · §4 · §7 · M2 cross-read: the new definitions owe `symbols.json`, which
+  units 57, 59 and 90 regenerate for theirs and this spec omitted.
+- rev-3 · 2026-10-04 · §3 states where units 66 and 83 print, which their specs fix at the move into VERIFYING (M2 cross-read).
 
 ## 10. Reuse audit
 

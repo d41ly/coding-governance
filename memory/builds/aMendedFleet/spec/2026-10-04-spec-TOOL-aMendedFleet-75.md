@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-75 — a `New arm:` line declares the acceptance criteria its arm keeps observed
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 75
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 75
 
 <!-- gen:spec-records -->
 
@@ -44,6 +44,9 @@ grammar and grades it: every id the field names must be a criterion the same spe
 - **S5** — An arm in `tools/check-spec-tokens.test.sh` over a fixture spec carrying a dangling id,
   `none`, a defined id, and an arm line with no field. NOT OBSERVED by a criterion here: the suite
   runs once at the close, and the arm is declared under `New arm:` in §7.
+- **S6** — `memory/map/generated/symbols.json` is regenerated for `scan_arm_covers`, in the same
+  commit. NOT OBSERVED by a criterion here: `python tools/codebase-map/gen_map.py --check` at the
+  close is its check, and §7 already names the leg that reads it.
 
 ## 3. Non-goals (OUT)
 
@@ -105,6 +108,7 @@ New arm: `tools/check-spec-tokens.test.sh` · covers AC1 AC2 · a dangling id st
 - `tools/memory-tree/SPEC-TEMPLATE.template.md`
 - `memory/TEMPLATE-SPEC.md`
 - `memory/map/features/spec-tokens.md`
+- `memory/map/generated/symbols.json`
 
 ### Alternatives rejected
 
@@ -190,6 +194,9 @@ New arm: `tools/check-spec-tokens.test.sh` · covers AC1 AC2 · a fixture spec w
 - rev-1 · 2026-10-04 · initial draft, from the spec brief's unit 75, report items [B#27] and
   [B#45], a read of `tools/check-spec-tokens.py` and both template copies, and a probe of every
   live spec's arm lines at base.
+- rev-2 · 2026-10-04 · S6 · §4 · M2 cross-read: `scan_arm_covers` moves
+  `memory/map/generated/symbols.json`, which units 18, 70 and 82 regenerate and declare for their
+  own definitions; this spec named the freshness leg but omitted the write and its Files touched row.
 
 ## 10. Reuse audit
 

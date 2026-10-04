@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-32 — recall cache eviction removes deleted worktrees first and orders the rest by last query
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 32
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 32
 
 <!-- gen:spec-records -->
 
@@ -39,7 +39,8 @@ each cache's last logged query, falling back to its build time.
 - **S5** — Each eviction line reads `evicted the least-recently-queried cache: <worktree> (last query
   <at>, built <built_at>, <size> MB)`, with `never` for a cache no query row names. The selftest arm
   `test_budget_lru`, which asserts the old wording, is updated to the new one, and a new arm pins
-  S4. Observed by AC1.
+  S4; `SELFTEST_ARMS` moves by the arms added, with its dated provenance line, as unit 27's S5 moves
+  it. Observed by AC1.
   **Readers:** by name: `tools/memory-recall/selftest.py`, which asserts the
   `least-recently-built` wording, and `tools/memory-recall/README.md` and `.memory-tree.conf`, which
   describe the order. by value: NO VALUE READERS — the line is printed to stderr and nothing parses
@@ -49,6 +50,9 @@ each cache's last logged query, falling back to its build time.
   "one cache is 2.4 MB" goes, since a cache here measures about 113 MB. Observed by AC6.
   **Readers:** by name: `.memory-tree.conf` alone spells the figure. by value: NO VALUE READERS — a
   comment, which nothing parses.
+- **S7** — `memory/map/generated/symbols.json` is regenerated for the new
+  definitions. NOT OBSERVED by a criterion here: `python tools/codebase-map/gen_map.py --check` at
+  the close is its check, and §7 names the leg that reads it.
 
 ## 3. Non-goals (OUT)
 
@@ -103,6 +107,7 @@ Read at base `7af5f564`; `tools/memory-recall/` and `.memory-tree.conf` are byte
 - `tools/memory-recall/selftest.py`
 - `tools/memory-recall/README.md`
 - `.memory-tree.conf`
+- `memory/map/generated/symbols.json`
 
 ### Rollout
 
@@ -165,9 +170,9 @@ the comment block above `RECALL_CACHE_BUDGET_MB`.
 
 ## 7. Gates
 
-`kit/dogfood doc parity` · `recall floor` · `transition-audit arms` · `straggler-guard arms` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`kit/dogfood doc parity` · `recall floor` · `transition-audit arms` · `straggler-guard arms` · `lexicon naming predicates` · `memory hygiene` · `recall floor arms` · `codebase-map coverage + freshness` · `spec tokens (a spec's own names resolve)`
 
-New arm: tools/memory-recall/selftest.py · siblings whose last-query order inverts their built_at order, a husk worktree, and an empty log, against today's built_at-only order · none
+New arm: tools/memory-recall/selftest.py · siblings whose last-query order inverts their built_at order, a husk worktree, and an empty log, against today's built_at-only order · `SELFTEST_ARMS` moves by the arms added, with its dated `N -> M` provenance line
 
 The first four are owed by `.memory-tree.conf`. `memory-recall kit selftest` and
 `recall floor arms` run at the close: their guard, `tools/memory-recall/`, is excluded as broad.
@@ -188,6 +193,11 @@ The first four are owed by `.memory-tree.conf`. `memory-recall kit selftest` and
 
 - rev-1 · 2026-10-04 · initial draft, from `ensure_cache`, both eviction passes and the live cache
   tree and query log.
+- rev-2 · 2026-10-04 · §2 S7 · §4 · §7 · M2 cross-read: the definitions this unit adds
+  move `memory/map/generated/symbols.json`, which `TOOL-aMendedFleet-82` and the build's other
+  code units regenerate and declare; this spec omitted the write, its Files touched row and the leg.
+  S5 and the §7 arm line also move `SELFTEST_ARMS` with the new arms, as
+  `TOOL-aMendedFleet-27` S5 moves it; the arm line said the floor moves by none.
 
 ## 10. Reuse audit
 

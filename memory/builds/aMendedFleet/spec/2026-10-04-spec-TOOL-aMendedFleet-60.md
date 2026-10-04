@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-60 — a cross-run overlap probe over unmerged remote refs runs at preflight
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 60
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 60
 
 <!-- gen:spec-records -->
 
@@ -21,12 +21,12 @@ bound, and refuses nothing.
 
 ## 2. Scope (IN)
 
-- **S1** — THE CALL. `check_cross_run_overlap` in `tools/unattended/unattended.sh` is defined after
-  `check_single_live` and called on the line after `check_single_live || true` in `verb_preflight`,
-  as `check_cross_run_overlap || true`. It always returns 0 and writes nothing. Observed by AC1, AC6
-  and AC7.
+- **S1** — THE CALL. `check_cross_run_overlap <slug>` in `tools/unattended/unattended.sh` is defined
+  after `check_single_live` and called on the line after `check_single_live || true` in
+  `verb_preflight`, as `check_cross_run_overlap "$slug" || true`; the slug names the build whose
+  specs S4 reads. It always returns 0 and writes nothing. Observed by AC1, AC6 and AC7.
 - **S2** — THE REFS. With the observed anchor `ASHA` empty, or naming no commit here, it prints one
-  `overlap probe UNAVAILABLE` line naming why and returns. Otherwise ONE
+  line, `unattended: overlap probe UNAVAILABLE — <why>`, and returns. Otherwise ONE
   `git for-each-ref --no-merged=<anchor> --no-merged=HEAD` over the single remote's
   `refs/remotes/<remote>/` lists each candidate with its tip sha and committer time, which excludes
   the default branch, every merged branch, and this run's own pushed branch while it is an ancestor
@@ -38,7 +38,8 @@ bound, and refuses nothing.
   changed whose status header is not `CLOSED` or `WONTDO` at the ref, read with ONE `git show` of
   all those specs at once and parsed by `read_files_touched`. Observed by AC1 and AC4.
 - **S4** — OUR PATHS: the names `git diff --name-only <anchor>...HEAD` prints, plus the same
-  Files-touched tokens from this build's own specs at `HEAD` that are not terminal. Observed by AC1.
+  Files-touched tokens from the specs under the slug's build folder at `HEAD` that are not terminal.
+  Observed by AC1.
 - **S5** — THE JOIN, in ONE `awk` process per ref: two paths are shared when they are equal or one
   is a directory the other sits under, after both are normalised by dropping a leading `./`, a
   trailing `/` and any interior `/./`. A path covered by a `SHARED_RECORDS` entry or by the index
@@ -49,11 +50,13 @@ bound, and refuses nothing.
   `git diff -U0 <anchor>...<ref>` for it carries a kit version marker, matched as `gov:kit`, a space,
   a kit name, `@` and a version. One such call per ref with candidates. A path the ref's specs
   declare stays, whatever its diff holds. Observed by AC2.
-- **S7** — THE ANNOUNCEMENT. With no shared path, one line: `unattended: overlap probe — <n>
-  unmerged remote ref(s) read as of this clone's last fetch, <a> aged out past 14 days, no shared
-  path`. Otherwise a header line saying this run is NOT blocked, then one line per ref with a shared
-  path: the ref, its tip's first 8 hex, its age in days, the count shared, and at most five paths
-  followed by `and <k> more`, each path tagged `diff` or `declared`. Observed by AC1, AC3 and AC4.
+- **S7** — THE ANNOUNCEMENT. The summary line always prints first, and always opens
+  `unattended: overlap probe — `: `<n> unmerged remote ref(s) read as of this clone's last fetch,
+  <a> aged out past 14 days, <u> unreadable, ` and then either `no shared path`, the whole output, or
+  `<s> sharing a path; this run is NOT blocked`. In the second form one line per ref with a shared
+  path follows: the ref, its tip's first 8 hex, its age in days, the count shared, and at most five
+  paths followed by `and <k> more`, each path tagged `diff` or `declared`. Observed by AC1, AC3 and
+  AC4.
 - **S8** — The kit README gains a section on the probe: what it reads, that it never fetches and so
   reads the refs as of the last fetch, what it excludes, and that it refuses nothing. Observed by
   AC7.
@@ -81,8 +84,8 @@ bound, and refuses nothing.
 
 ### Edges
 
-- **hands-off** external — the orientation card's line listing this probe's overlaps, unit 77 of
-  this build's roster, which owes the readable entry point the card calls.
+- **hands-off** `KICK-aMendedFleet-2` — the orientation card's line listing this probe's overlaps,
+  which owes the readable entry point the card calls and the empty-slug reading it needs.
 - **hands-off** external — the unattended kit version bump, owed once at the close.
 
 ## 4. Design
@@ -135,7 +138,6 @@ probes print separate lines and share no state.
 - `tools/unattended/unattended.sh`
 - `tools/unattended/unattended.test.sh`
 - `tools/unattended/README.md`
-- `memory/map/generated/symbols.json`
 
 ### Alternatives rejected
 
@@ -190,9 +192,11 @@ probes print separate lines and share no state.
   one-line zero; and when the third clone's remote URL names a path that does not exist and the
   preflight re-runs, stdout carries `overlap probe UNAVAILABLE`.
   Red when: a shared record is announced as contested, or a probe that could not run reads as clean.
-- **AC6** — When `grep -n "check_cross_run_overlap" tools/unattended/unattended.sh` runs, it prints
-  the definition and exactly one call, on the line after `check_single_live || true`.
-  Red when: the probe runs from a second place, or not at preflight.
+- **AC6** — When `grep -n "check_cross_run_overlap" tools/unattended/unattended.sh` runs at this
+  unit's commit, it prints the definition and exactly one call, on the line after
+  `check_single_live || true`. The one later caller this build adds is `print_overlaps`
+  (`KICK-aMendedFleet-2`), a read-only verb outside every run.
+  Red when: the probe runs from a pass verb, or not at preflight.
 - **AC7** — When `grep -n "overlap probe" tools/unattended/README.md` runs, it hits the new section,
   which states the probe never fetches and refuses nothing.
   Red when: the driver prints an announcement its README does not describe.
@@ -227,6 +231,13 @@ New arm: `tools/unattended/unattended.test.sh` · a fixture remote carrying an o
 - rev-1 · 2026-10-04 · initial draft, from the report's Q3 rank 3 ([B#10]) and the synthesis's
   cross-node claim gap ([#9]), and a scratch join of this build's specs against the two live remote
   refs at base.
+- rev-2 · 2026-10-04 · S1 S2 S4 S7 AC6 §3 · cross-read with `KICK-aMendedFleet-2`: the function now
+  takes the slug, which that unit calls empty; the UNAVAILABLE and summary lines are spelled, the
+  summary first in both forms, since the card prints the first line verbatim; AC6 counts the call at
+  this commit and names the card's verb as the one later caller; the external edge naming unit 77
+  now names `KICK-aMendedFleet-2`. §4's Files touched drops `memory/map/generated/symbols.json`:
+  the map enumerates Python and JavaScript definitions only, so the two shell functions move nothing
+  there, as the build's other shell-only units already declare.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-44 — the map gate refuses a present-tense count of an inventory population in dossier prose
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 44
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 44
 
 <!-- gen:spec-records -->
 
@@ -41,18 +41,20 @@ drains the two live hits in the same commit.
   and in `tools/codebase-map/test_codebase_map.template.py` runs S1 over every text
   `load_dossier_texts` returns, `FOUNDATION.md` included, prints one line
   `typed-count lint: <c> candidate(s) read in <d> dossier(s), <f> frozen` on every run, and asserts
-  no hit. A failure names each hit as `<dossier>:<line>: <match>` and the three remedies: state when
-  and where the number was measured, point at the file that owns it, or rewrite the sentence without it. The standalone
-  runner's tuple gains it. Observed by AC1 and AC2.
-- **S4** — The two live hits are drained: the `run-gates` sentence counting legs is frozen with
-  the measurement its own paragraph already dates, and the `codebase-map` bullet counting dossiers
-  and baseline keys is rewritten as a pointer to `baseline.toml` and `MAP.md`, which own both
-  figures. Each rewrite is checked against `git log -L` for the line before it is made, so a
-  freezing date is the real one. Observed by AC1.
+  no hit. A failure names each hit as `<dossier>:<line>: <match>` and the three remedies: freeze it
+  as a past-tense reading that cites the record which measured it, point at the file that owns it,
+  or rewrite the sentence without it. The first remedy never asks for a date or a node in the
+  dossier, because `TOOL-aMendedFleet-89`'s rule keeps when, where and on which node in the record.
+  The standalone runner's tuple gains it. Observed by AC1 and AC2.
+- **S4** — The two live hits are drained: the `run-gates` sentence counting legs becomes a
+  past-tense reading citing the record that made the measurement its own paragraph already dates,
+  and the `codebase-map` bullet counting dossiers and baseline keys is rewritten as a pointer to
+  `baseline.toml` and `MAP.md`, which own both figures. Each rewrite is checked against `git log -L`
+  for the line before it is made, so the cited record is the one that measured it. Observed by AC1.
 - **S5** — The rule is stated where a dossier author reads rules: one bullet in the `## Rules` list
   of `_README` in `tools/codebase-map/gen_map.py` and of its dogfood rendering `memory/map/README.md`,
-  and the gate's row in `tools/codebase-map/README.md`, which also states the gap of F3. Observed by
-  AC4.
+  and the gate's row in `tools/codebase-map/README.md`, which also states the gap of F3. The bullet
+  names S3's three remedies in S3's words. Observed by AC4.
 - **S6** — `memory/map/generated/symbols.json` is regenerated for the new definitions, and the prose
   of `memory/map/features/codebase-map.md` is refreshed in the same commit. Observed by AC1.
 - **S7** — A selftest arm drives S1 over fixture strings, the positives and negatives of AC3 among
@@ -204,6 +206,11 @@ New arm: `tools/codebase-map/selftest.py` · fixture strings for every S2 clause
 
 - rev-1 · 2026-10-04 · initial draft, from the synthesis's item [#41] lint, A4 of the annotation
   guide, the gate's decisions-pin arm, and a three-predicate probe over the dossiers at `fee9f62b`.
+- rev-2 · 2026-10-04 · S3 S4 S5 · the M2 cross-read: S3's first remedy told a dossier author to
+  state when and where a number was measured, while `TOOL-aMendedFleet-89` adds a bullet to the same
+  Rules list keeping when, where and on which node in the record that measured it; the remedy, and
+  S4's drain of the `run-gates` hit, are now a past-tense reading citing that record, which S2's
+  `measured` and past-tense markers already freeze, so the predicate does not move.
 
 ## 10. Reuse audit
 

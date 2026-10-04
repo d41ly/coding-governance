@@ -1,6 +1,6 @@
 # KICK-aMendedFleet-2 — the orientation card shows which unmerged remote refs share paths with this tree's branch
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams kickoff+tooling · ratified 2026-10-04 · order 77
+**Status:** SPECCED · rev-3 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams kickoff+tooling · ratified 2026-10-04 · order 77
 
 <!-- gen:spec-records -->
 
@@ -237,6 +237,10 @@ New arm: `tools/unattended/unattended.test.sh` · covers AC2 AC3 · `--overlaps`
 - rev-1 · 2026-10-04 · initial draft, from the spec brief's unit 77, report items [B#10] and
   [B#40], unit 60's spec and Edges, the live `aGraftedHelix` build's unit 2 spec read from its
   branch, and timings of the driver's startup and the ref reads on node a.
+- rev-2 · 2026-10-04 · §4 · Files touched named `memory/map/generated/symbols.json`, which
+  enumerates Python and JavaScript definitions only; this unit's three functions are shell, and
+  `KICK-aMendedFleet-1`, adding a shell function to the same engine, declares no such write.
+- rev-3 · 2026-10-04 · §4 Files touched restores symbols.json: TOOL-aMendedFleet-35 S1 indexes public shell functions from order 35 on.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-86 — the map digest reports code coverage apart from record coverage
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 86 · closes TOOL-aProbedToolkit-8
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 86 · closes TOOL-aProbedToolkit-8
 
 <!-- gen:spec-records -->
 
@@ -40,7 +40,9 @@ and the tree-wide figure the kit never printed exists.
 - **S5** — `map_diff.py --tree` attributes every tracked file instead of a range and prints the
   header and the S3 or S4 lines only, no per-feature file list. The range positional becomes
   optional in this mode only; given both, the parser refuses. The affordance-exempt rewrite flag
-  with `--tree` is refused too, because a whole tree would clear every grace. Observed by AC2.
+  with `--tree` is refused too, because a whole tree would clear every grace, and so is
+  `--stale-dossiers` with `--tree`, since `TOOL-aMendedFleet-37` already defines that mode's
+  no-range scope as the whole history and the two modes print different reports. Observed by AC2.
 - **S6** — The `map_diff.py` row of `tools/codebase-map/README.md` names `--tree` and the code and
   record lines, and the `codebase-map` dossier's sentence on the digest says which line is the
   convergence figure. Observed by AC5.
@@ -63,6 +65,8 @@ and the tree-wide figure the kit never printed exists.
 
 - **consumes-from** `TOOL-aMendedFleet-40` — the baseline half of `TOOL-aProbedToolkit-8`; without it
   this unit's `closes` verb would close an ask whose second finding is unanswered.
+- **consumes-from** `TOOL-aMendedFleet-37` — the `--stale-dossiers` flag in the same parser, whose
+  combination with `--tree` S5 refuses and AC2 observes.
 - **hands-off** external — the kit version bump at the close.
 
 ## 4. Design
@@ -137,8 +141,9 @@ Read at base `7af5f564`; `git diff --stat 7af5f564 HEAD` over every file below i
   figure: DERIVED at observation from `git diff --name-only HEAD~30..HEAD`; 290 and 345 at writing.
 - **AC2** — When `python tools/codebase-map/map_diff.py --tree` runs after the unit's commit, it prints
   the header and the two lines and no `## ` feature section, and its records total equals the line
-  count `git ls-files memory` prints; when `--tree` is given with a range, it exits non-zero.
-  Red when: the mode lists files, miscounts the tree, or accepts both inputs.
+  count `git ls-files memory` prints; when `--tree` is given with a range, or with
+  `--stale-dossiers`, it exits non-zero.
+  Red when: the mode lists files, miscounts the tree, or accepts either combination.
   figure: DERIVED from `git ls-files`; 2878 records at writing.
 - **AC3** — When a scratch clone under the TEMP root sets `RECORD_ROOTS="memory nosuchdir"` in its
   `.codebase-map.conf`, the AC1 command in it prints the `DEAD PROBE` line naming `nosuchdir` and no
@@ -175,6 +180,10 @@ New arm: tools/codebase-map/selftest.py · a fixture tree with one code file and
 
 - rev-1 · 2026-10-04 · initial draft, from `TOOL-aProbedToolkit-8`, `map_diff.py` and a partition of
   the digest's population at `8312d315`.
+- rev-2 · 2026-10-04 · §3 S5 AC2 · the M2 cross-read: `TOOL-aMendedFleet-37` makes the range optional
+  for `--stale-dossiers` in the same parser, and S5 left `--tree --stale-dossiers` undefined between
+  the two "optional in this mode only" rules; the parser now refuses it, AC2 observes that, and §3
+  Edges declares the flag it rests on.
 
 ## 10. Reuse audit
 

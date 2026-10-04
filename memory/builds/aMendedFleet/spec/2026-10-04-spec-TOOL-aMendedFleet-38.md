@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-38 — `map_diff --converge`, its sink and its prescriptions are deleted
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 38 · closes TOOL-aScouredKit-17
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 38 · closes TOOL-aScouredKit-17
 
 <!-- gen:spec-records -->
 
@@ -102,6 +102,8 @@ its sink on node a and the prescriptions, so the kit stops advertising a check t
 
 - **consumes-from** `TOOL-aMendedFleet-37` — AC7 observes the refreshed dossiers through the
   `--stale-dossiers` mode that unit adds to the same file; sequenced after it by `order`.
+- **consumes-from** `TOOL-aMendedFleet-36` — AC3 passes that unit's `--budget 0` so the byte budget
+  cuts no candidate the criterion reads.
 
 ## 4. Design
 
@@ -161,12 +163,14 @@ reference_index_for -- tools`, which names its definition in `map_lib.py` and it
   Red when: the flag still parses, or the digest broke with it.
 - **AC2** — When `git grep -n -w -e detect_collisions -e append_backlog -e backlog_keys -e
   CollisionFlag -e reference_index_for -e derive_backlog_path -e render_legacy_note -e _new_clones -e
-  _symbols_at_ref -e CLONE_COUNT_FILE -- tools .codebase-map.conf` runs, it prints nothing, and
-  `git grep -n -e "--converge" -e "reinvention-backlog" -- tools WIRE-INTO-PROJECT.md
-  .codebase-map.conf` prints nothing.
+  _symbols_at_ref -e CLONE_COUNT_FILE -- tools .codebase-map.conf` runs, it prints nothing,
+  `git grep -n -e "--converge" -- tools WIRE-INTO-PROJECT.md .codebase-map.conf` prints nothing,
+  and `git grep -n "reinvention-backlog" -- tools WIRE-INTO-PROJECT.md .codebase-map.conf` prints
+  exactly one line, the obsolete-path sentence S7 writes into `tools/codebase-map/README.md`.
   Red when: a reader still spells a deleted name, or a document still prescribes the mode.
 - **AC3** — When `python tools/codebase-map/reuse_lookup.py "normalise a display name into a url
-  slug"` runs, it exits 0 and prints its `## candidates` section with at least one row marked `SEAM`.
+  slug" --budget 0` runs, it exits 0 and prints its `## candidates` section with at least one row
+  marked `SEAM`; `--budget 0` is `TOOL-aMendedFleet-36`'s uncut answer, so no seam is hidden by a cut.
   Red when: the deletion took a helper the lookup still reads.
 - **AC4** — When `CODEBASE_MAP_ROOT` names an empty directory and `python
   tools/codebase-map/map_diff.py HEAD~1..HEAD` runs, it exits 2 with `refused` on stderr and prints
@@ -210,6 +214,10 @@ The eight arms S5 deletes are not moved anywhere: their subject is gone, so thei
 ## 9. Revision log
 
 - rev-1 · 2026-10-04 · initial draft.
+- rev-2 · 2026-10-04 · §3 AC2 AC3 · the M2 cross-read: AC2 required no tracked carrier of
+  `reinvention-backlog` under `tools` while S7 writes one sentence naming that path into the kit
+  README, so AC2 now expects exactly that line; AC3 ran the lookup at the default byte budget
+  `TOOL-aMendedFleet-36` lands first, which can cut every `SEAM` row, so it now passes `--budget 0`, and §3 Edges declares the edge it rests on.
 
 ## 10. Reuse audit
 

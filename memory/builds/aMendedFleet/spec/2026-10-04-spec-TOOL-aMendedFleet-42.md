@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-42 — the reuse probe counts canonical-copy install sites beside fan-in
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 42
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 42
 
 <!-- gen:spec-records -->
 
@@ -46,7 +46,7 @@ in the affordance worklist alike, so a seam means one thing in both.
   check; §8 F2 records why ordering stays on fan-in.
 - Changing `fan_in` itself, whose callers and selftest pin its meaning as a reference count.
 - What `map_imports.py` becomes, and a join from gate legs to the paths they exercise. §8 F1 moves
-  both to units the run adds.
+  them to `TOOL-aMendedFleet-88` and `TOOL-aMendedFleet-87`.
 - The fan-in noise `TOOL-aScouredKit-16` measures. Install sites are counted from a fixed marker
   grammar, not from name tokens, and add no noise of that kind; the ask stays open.
 - The codebase-map kit version bump, owed once at the build's close.
@@ -55,8 +55,11 @@ in the affordance worklist alike, so a seam means one thing in both.
 
 - **consumes-from** `TOOL-aMendedFleet-41` — AC2 runs that unit's `--floor`; without it there is no
   recorded reading to show the order unchanged against.
-- **hands-off** external — `map_imports.py`'s disposition and the legs-to-paths join, which F1 moves
-  to units the run adds to this build, and the kit version bump at the close.
+- **consumes-from** `TOOL-aMendedFleet-36` — AC1 and AC3 pass that unit's `--budget 0`, so the byte
+  budget cuts no candidate line they read.
+- **hands-off** `TOOL-aMendedFleet-87` — the legs-to-paths join F1 moves there.
+- **hands-off** `TOOL-aMendedFleet-88` — `map_imports.py`'s disposition F1 moves there, deletion.
+- **hands-off** external — the kit version bump at the close.
 
 ## 4. Design
 
@@ -118,7 +121,7 @@ Read at base `7af5f564` and re-run at `fee9f62ba`, byte-equal for every file bel
 ## 6. Acceptance criteria
 
 - **AC1** — When `python tools/codebase-map/reuse_lookup.py "find a sibling kit directory through the
-  install receipt"` runs after the unit's commit, the `resolve_kit_dir` line carries `fan-in 3`,
+  install receipt" --budget 0` runs after the unit's commit, the `resolve_kit_dir` line carries `fan-in 3`,
   `installs <n>` and `SEAM`, where n is one less than the count of files
   `git grep -l -E "^[[:space:]]*# >>> resolve_kit_dir"` prints; and the header carries an
   `install sites:` line with non-zero totals.
@@ -155,7 +158,8 @@ New arm: tools/codebase-map/selftest.py · a fixture tree with two carriers of o
   build shipped, does not import it; and the selftest's parity arm now skips because the lexicon kit
   no longer carries the original. Deletion is the recommendation the new unit inherits.
   RESOLVED (agent, 2026-10-04, delegated): split — the legs-to-paths join and the `map_imports.py`
-  disposition move to new units the run adds; this unit keeps the install count.
+  disposition move to new units the run adds, `TOOL-aMendedFleet-87` and `TOOL-aMendedFleet-88`;
+  this unit keeps the install count.
 - **F2 — Does the install count enter the shortlist order?**
   Options: display and seam status only; the ordering key too. The ordering is what unit 41's floor
   grades, and raising eight heavily installed names in every query whose stems they share is a
@@ -167,6 +171,10 @@ New arm: tools/codebase-map/selftest.py · a fixture tree with two carriers of o
 
 - rev-1 · 2026-10-04 · initial draft, from the synthesis's item [#46], `fan_in`, `seed_affordances`
   and a census of canonical-copy markers at base.
+- rev-2 · 2026-10-04 · §3 §8 AC1 AC3 · the M2 cross-read: the two split halves named `external` and
+  "units the run adds" while `TOOL-aMendedFleet-87` and `TOOL-aMendedFleet-88` exist in this build,
+  so the Non-goal, Edges and F1 name them; and AC1 read one candidate line at the default byte budget
+  `TOOL-aMendedFleet-36` lands first, which can cut it, so AC1, and AC3 through it, pass `--budget 0`.
 
 ## 10. Reuse audit
 

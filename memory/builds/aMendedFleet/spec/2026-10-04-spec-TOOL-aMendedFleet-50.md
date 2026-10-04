@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-50 — a monthly escape-ratio report, outside the seconds tier
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 50
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 50
 
 <!-- gen:spec-records -->
 
@@ -24,7 +24,8 @@ comparison between months, because one repository's before and after is not evid
 
 - **S1** — `drift_report.py --escape-ratio <month>`, the month written as four-digit year, hyphen,
   two-digit month. It computes no drift signal, so the seconds tier is not paid and not changed, and
-  it refuses to combine with `--check` or `--offenders`. `--json` prints the same result as one
+  it refuses to combine with `--check`, `--offenders` or `TOOL-aMendedFleet-49`'s `--delta`, the
+  other mode added to the same parser. `--json` prints the same result as one
   object with a per-fix list. A malformed month is refused with exit 2. Observed by AC1 and AC5.
 - **S2** — LANDINGS, from ONE `git rev-list --parents` of the base ref that `resolve_base_ref`
   resolves. Walking the first-parent chain oldest first, every commit newly reachable from a
@@ -59,6 +60,9 @@ comparison between months, because one repository's before and after is not evid
 - **S9** — The kit selftest gains one arm over a fixture history with a merge-landed contained fix,
   a merge-landed escaped fix, a direct fix, a stamp-only fix and a non-product fix. NOT OBSERVED by a
   criterion here: the suite runs once at the close, and the arm is declared under `New arm:` in §7.
+- **S10** — `memory/map/generated/symbols.json` is regenerated for the new definitions. NOT OBSERVED
+  by a criterion here: `python tools/codebase-map/gen_map.py --check` at the close is its check, and
+  §7 names the legs that read it.
 
 ## 3. Non-goals (OUT)
 
@@ -116,6 +120,7 @@ it is a mode and never a signal.
 - `tools/drift-audit/drift_report.py`
 - `tools/drift-audit/selftest.py`
 - `tools/drift-audit/README.md`
+- `memory/map/generated/symbols.json`
 
 ### Alternatives rejected
 
@@ -174,7 +179,7 @@ it is a mode and never a signal.
 
 ## 7. Gates
 
-`drift-audit records` · `drift-audit selftest` · `drift-audit wiring` · `kit epoch (shipped bytes move, the version moves)` · `lexicon naming predicates` · `spec tokens (a spec's own names resolve)`
+`drift-audit records` · `drift-audit selftest` · `drift-audit wiring` · `codebase-map coverage + freshness` · `recall floor` · `recall floor arms` · `kit epoch (shipped bytes move, the version moves)` · `lexicon naming predicates` · `spec tokens (a spec's own names resolve)`
 
 New arm: `tools/drift-audit/selftest.py` · a fixture history with a contained, an escaped, a direct, a stamp-only and a non-product fix, landed by merges and by direct commit · `CHECK_FLOOR` moves by the checks the arm adds
 
@@ -199,6 +204,10 @@ New arm: `tools/drift-audit/selftest.py` · a fixture history with a contained, 
 ## 9. Revision log
 
 - rev-1 · 2026-10-04 · initial draft.
+- rev-2 · 2026-10-04 · S1 · S10 · §4 · §7 · M2 cross-read: S1's refusals named `--check` and
+  `--offenders` but not `--delta`, which `TOOL-aMendedFleet-49` adds to the same parser first, so
+  the pair's combination was defined by neither; and the new definitions owe `symbols.json`, which
+  units 57, 59 and 90 regenerate for theirs and this spec omitted.
 
 ## 10. Reuse audit
 

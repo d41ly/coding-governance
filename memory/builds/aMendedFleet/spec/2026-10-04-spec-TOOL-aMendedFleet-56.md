@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-56 — gateable stable-key drift signals are bounded by a shrink-only set of offender ids instead of a count
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 56 · advances TOOL-aNumeralWarden-3
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 56 · advances TOOL-aNumeralWarden-3
 
 <!-- gen:spec-records -->
 
@@ -36,9 +36,10 @@ member against the base reds, so the bound is on identities and the raise-or-dra
   compares the `RATCHETS` row's scalar at base and HEAD; S3 replaces the first comparison for a
   baselined signal, and the second has no scalar left to read.
 - **S2** — IDENTITY. A detail row's identity is its `id` field when that is a string, and otherwise
-  the unlocated key `render_drift_offenders` already builds for the row, so a row with no id is never
-  silently matched. A new helper `derive_row_identity` in `tools/drift-audit/drift_report.py` is the
-  one spelling of that rule. Observed by AC2.
+  the unlocated key `extract_unlocated` builds for the row, the module-level helper
+  `TOOL-aMendedFleet-48` hoists out of `render_drift_offenders`, so a row with no id is never
+  silently matched and the unlocating step keeps one spelling. A new helper `derive_row_identity` in
+  `tools/drift-audit/drift_report.py` is the one spelling of that rule. Observed by AC2.
 - **S3** — THE VERDICT. For a signal named in `BASELINES`, `main` sets three fields on its record:
   `baseline`, the declared list's size, which also becomes its `pin` for display; `new`, the sorted
   identities of its rows that the list does not carry; and `stale`, the sorted listed ids no row
@@ -50,7 +51,8 @@ member against the base reds, so the bound is on identities and the raise-or-dra
   naming no gateable record, is refused before any table line, JSON or offender key is printed:
   exit 2 and one line naming the signal and the declarations, on the stderr channel `main` already
   uses for a bad project-layer value. The first conflict is caught before the signals run, the
-  second once their records exist. Observed by AC5.
+  second once their records exist and before `TOOL-aMendedFleet-48`'s `--check` history write, so a
+  refused run appends no reading. Observed by AC5.
 - **S5** — OFFENDER KEYS. `--offenders` emits, for a baselined signal, the existing key shape for each
   NEW row and a `{"stale": "<id>"}` key for each stale id, and never a key for a row the list
   carries, so the merge bar's red attribution compares only what moved. Observed by AC2, AC3.
@@ -71,6 +73,9 @@ member against the base reds, so the bound is on identities and the raise-or-dra
   gains an id against a committed base reds as a ratchet; a seed above the base pin reds; a signal
   in both declarations exits 2. NOT OBSERVED by a criterion here: the suite runs once at the close,
   and the arms are declared under `New arm:` in §7.
+- **S9** — `memory/map/generated/symbols.json` is regenerated for the new definitions. NOT OBSERVED
+  by a criterion here: `python tools/codebase-map/gen_map.py --check` at the close is its check, and
+  §7 names the legs that read it.
 
 ## 3. Non-goals (OUT)
 
@@ -85,6 +90,8 @@ member against the base reds, so the bound is on identities and the raise-or-dra
 
 ### Edges
 
+- **consumes-from** `TOOL-aMendedFleet-48` — `extract_unlocated`, the hoisted unlocating step S2
+  falls back to, and the `--check` history write S4 refuses ahead of.
 - **hands-off** external — identity sets for report-only signals, should one ever become gateable.
 - **hands-off** external — the drift-audit kit version bump, owed once at the close.
 
@@ -146,6 +153,7 @@ and 52 edit `PINS` and are ordered before this unit; dispatch is sequential.
 - `tools/drift-audit/drift_signals.template.py`
 - `tools/drift-audit/selftest.py`
 - `tools/drift-audit/README.md`
+- `memory/map/generated/symbols.json`
 
 ### Alternatives rejected
 
@@ -220,7 +228,7 @@ and 52 edit `PINS` and are ordered before this unit; dispatch is sequential.
 
 ## 7. Gates
 
-`drift-audit selftest` · `drift-audit records` · `drift-audit wiring` · `encoding posture (text IO names its encoding)` · `lexicon naming predicates` · `kit epoch (shipped bytes move, the version moves)` · `spec tokens (a spec's own names resolve)`
+`drift-audit selftest` · `drift-audit records` · `drift-audit wiring` · `encoding posture (text IO names its encoding)` · `codebase-map coverage + freshness` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `kit epoch (shipped bytes move, the version moves)` · `spec tokens (a spec's own names resolve)`
 
 New arm: `tools/drift-audit/selftest.py` · a fixture with a baselined signal: an equal-count swap, a drained listed id, a set gaining an id against a committed base, a seed above the base pin, a signal in both declarations · `CHECK_FLOOR` moves by the checks the arm adds
 
@@ -250,13 +258,19 @@ New arm: `tools/drift-audit/selftest.py` · a fixture with a baselined signal: a
 
 - rev-1 · 2026-10-04 · initial draft, from the synthesis's item [#52] and the
   `TOOL-dScaffoldedMirror-9` precedent, with the gateable pins measured at base.
+- rev-2 · 2026-10-04 · S2 · S4 · S9 · §3 · §4 · §7 · §10 · M2 cross-read: S2 fell back to the unlocating
+  step nested in `render_drift_offenders`, which `TOOL-aMendedFleet-48` S4 hoists to
+  `extract_unlocated` so the key keeps one spelling, and S4 did not say whether a refused run reaches
+  that unit's history write; both now name it, with a consumes-from edge. The new definitions owe
+  `symbols.json`, which units 57, 59 and 90 regenerate for theirs and this spec omitted.
 
 ## 10. Reuse audit
 
 The seams extended are all in `tools/drift-audit/drift_report.py` and its project layer:
 `build_lang_mode_findings`, the kit's set-shaped guard read at `git.base_ref` beside `RATCHETS`,
 which S6 copies in shape; `ratchet_findings`' rule that a file absent at the base is no comparison;
-`render_drift_offenders`' unlocated row key, which S2 falls back to; and the `PINS` declaration this
+`render_drift_offenders`' unlocated row key, hoisted by unit 48 as `extract_unlocated`, which S2
+falls back to; and the `PINS` declaration this
 replaces. `python tools/codebase-map/reuse_lookup.py "compare a shrink-only set of offender
 identities against the base ref"` returned `affordance_offenders` in the map kit and
 `resolve_pattern_sets` in the lexicon kit, each another kit's and neither a set-at-base guard, and

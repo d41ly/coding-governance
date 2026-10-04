@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-51 — report-only drift signals over a pin nobody drains print pinless, and `readme_mechanism_drift` reads live builds only
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 51
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 51
 
 <!-- gen:spec-records -->
 
@@ -11,8 +11,9 @@
 ## 1. Goal
 
 Six report-only drift signals print `over pin` on every run and no ask cites any of them, so the
-status column has trained its readers to skip it. Three of the six are drained by other units of
-this build. This unit disposes of the other three: a signal that has no pin by design prints
+status column has trained its readers to skip it. Three of the six are disposed of by other units
+of this build, and one of those three, `shrink_only_lists_not_shrinking`, keeps printing
+`over pin 0` because its rows are real regrowth. This unit disposes of the other three: a signal that has no pin by design prints
 `report only, no pin` instead of a fake `over pin 0`, the backlog watermark whose budget rationale
 ended at the switch to builds mode becomes pinless the same way, and `readme_mechanism_drift` stops
 grading CLOSED builds, where all of its 31 rows sit except 4, and its pin is re-seeded at what the
@@ -56,7 +57,7 @@ narrowed population measures.
 ## 3. Non-goals (OUT)
 
 - The DEAD-for-N-readings rule. It needs the drift history that unit 48 writes, so it is a second
-  mechanism; §8 F1 splits it into a unit the run adds.
+  mechanism; §8 F1 splits it into `TOOL-aMendedFleet-90`.
 - The three other over-pin report-only signals. `backlog_asks_unlabelled` is unit 15's re-armed
   pin, `run_records_nonterminal_but_merged` is unit 47's derived-LANDED fix, and
   `shrink_only_lists_not_shrinking` is unit 57's low-water grading.
@@ -69,9 +70,7 @@ narrowed population measures.
 
 ### Edges
 
-- **hands-off** `TOOL-aMendedFleet-15` — the `backlog_asks_unlabelled` pin, the fourth over-pin
-  report-only signal, which that unit re-arms.
-- **hands-off** external — the DEAD-for-N rule, which §8 F1 moves to a unit the run adds.
+- **hands-off** `TOOL-aMendedFleet-90` — the DEAD-for-N rule, which §8 F1 moves to that unit.
 - **hands-off** external — the drift-audit kit version bump, owed once at the close.
 
 ## 4. Design
@@ -103,7 +102,8 @@ Read at the worktree HEAD `fee9f62b`, whose bytes under `tools/` equal base `7af
 | `readme_mechanism_drift` | live builds only, pin re-seeded | this unit, S4 and S5 |
 | `backlog_asks_unlabelled` | shrink-only pin re-armed | unit 15 |
 | `run_records_nonterminal_but_merged` | derived-LANDED rule | unit 47 |
-| `shrink_only_lists_not_shrinking` | graded against its low-water mark | unit 57 |
+| `shrink_only_lists_not_shrinking` | graded against its low-water mark; stays `over pin 0`, since both rows read regrown | unit 57 |
+| `remote_ci_red_streak` | absent at base; arrives with unit 8 and keeps `over pin 0`, a red streak the units fixing remote CI drain | unit 8 |
 
 ### Inventory
 
@@ -193,6 +193,11 @@ New arm: `tools/drift-audit/selftest.py` · the readme-drift fixture spec flippe
 
 - rev-1 · 2026-10-04 · initial draft, from the synthesis's items [#54], [#61] and [#62], and a probe
   of the drift report and the readme-drift rows at base.
+- rev-2 · 2026-10-04 · §1 · §3 · §4 · M2 cross-read: §1 said all three sibling dispositions drain
+  their signal, but `TOOL-aMendedFleet-57` leaves `shrink_only_lists_not_shrinking` at value 2 over
+  pin 0; the disposition table lacked `remote_ci_red_streak`, which unit 8 adds before this unit;
+  the DEAD-for-N split now names `TOOL-aMendedFleet-90`; and the hands-off edge to unit 15 is
+  dropped, because that unit is ordered before this one and is left nothing to do.
 
 ## 10. Reuse audit
 

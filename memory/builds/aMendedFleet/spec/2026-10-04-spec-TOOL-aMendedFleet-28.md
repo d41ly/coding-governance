@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-28 — the recall floor grades the served path, terms plus fusion
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · advances TOOL-aProbedToolkit-10 · ratified 2026-10-04 · order 28
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · advances TOOL-aProbedToolkit-10 · ratified 2026-10-04 · order 28
 
 <!-- gen:spec-records -->
 
@@ -61,6 +61,9 @@ no-saturation ruling demands before any pin over it means anything. It advances
   The docstring of `check-recall.py` states what a `served` run still does not check: untracked files
   the CLI also indexes, the `--budget` byte cut `emit` applies to the fused list, and the CLI's
   default `k` of 20 against the pin's `k`. Observed by AC8.
+- **S9** — `memory/map/generated/symbols.json` is regenerated for the new
+  definitions. NOT OBSERVED by a criterion here: `python tools/codebase-map/gen_map.py --check` at
+  the close is its check, and §7 names the leg that reads it.
 
 ## 3. Non-goals (OUT)
 
@@ -73,8 +76,9 @@ no-saturation ruling demands before any pin over it means anything. It advances
 - Retiring or rescoping `TOOL-aTunedCompass-2` or `TOOL-aTunedCompass-3`. Their disposition is that
   build's own act; §8 F3.
 - Family coverage of the fixture's expected ids, the second half of `TOOL-aProbedToolkit-10`.
-- The question added by unit 27, beyond giving it both term lists. Unit 27 is ordered first, so this
-  unit's pass writes terms for every question the fixture holds when it runs.
+- A fixture question for unit 27's live-line property. That unit adds none: its gold arm lives in
+  `tools/memory-recall/selftest.py` over its own fixture corpus, so this unit writes both term lists
+  for exactly the questions the fixture holds when its pass runs.
 - Any change to `query.py`, `bench.py` or `union.py`. The floor reads the served functions and
   edits none of them.
 
@@ -138,6 +142,7 @@ has moved between that base and this spec.
 - `.memory-tree.conf`
 - `memory/guides/SESSION-KICKOFF.md`
 - `memory/map/features/memory-recall.md`
+- `memory/map/generated/symbols.json`
 
 The dossier's floor bullet is refreshed on touch. The memory-recall kit's version bump, owed by the
 README edit, is taken once at this build's close, after the last move.
@@ -245,6 +250,11 @@ New arm: tools/memory-recall/test_recall_floor.py · a fixture copy missing `nai
 ## 9. Revision log
 
 - rev-1 · 2026-10-04 · initial draft, from `check-recall.py`, `query.py` and the fixture at base.
+- rev-2 · 2026-10-04 · §2 S9 · §4 · §7 · M2 cross-read: the definitions this unit adds
+  move `memory/map/generated/symbols.json`, which `TOOL-aMendedFleet-82` and the build's other
+  code units regenerate and declare; this spec named the leg but omitted the write and its Files touched row.
+  §3 also corrects the bullet on unit 27, which said that unit adds a fixture question;
+  its S5 puts the gold arm in `tools/memory-recall/selftest.py` and its §3 adds none.
 
 ## 10. Reuse audit
 

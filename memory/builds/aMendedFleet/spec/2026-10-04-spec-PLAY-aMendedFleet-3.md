@@ -1,6 +1,6 @@
 # PLAY-aMendedFleet-3 — the charter's wiring rule stops stating which file Claude Code reads
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams playbook · ratified 2026-10-04 · order 94
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams playbook · ratified 2026-10-04 · order 94
 
 <!-- gen:spec-records -->
 
@@ -45,8 +45,9 @@ owns.
 
 ### Edges
 
-- **consumes-from** external — unit 69's F3 probe result, which established that the vendor fact
-  changes with the CLI version.
+- **consumes-from** `TOOL-aMendedFleet-69` — its F3 probe result, which established that the vendor
+  fact changes with the CLI version, and its stamped kit README, which §1 names as the fact's one
+  home once this clause leaves the template.
 
 ## 4. Design
 
@@ -149,6 +150,9 @@ New arm: none · a prose edit whose only reader is the renderer, which AC2 obser
 
 - rev-1 · 2026-10-04 · initial draft, from unit 69's F3 probe, the template and `AGENTS.md` at base,
   and both size checks.
+- rev-2 · 2026-10-04 · §3 · M2 cross-read: the edge on unit 69 was written `external` for a sibling
+  this unit builds after and relies on; it now names `TOOL-aMendedFleet-69`, which declares the
+  reciprocal hands-off.
 
 ## 10. Reuse audit
 

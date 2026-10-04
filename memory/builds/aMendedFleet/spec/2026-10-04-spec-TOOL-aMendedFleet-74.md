@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-74 — a unit can be handed the bug-class checklist for its write set before it writes code
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 74
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 74
 
 <!-- gen:spec-records -->
 
@@ -45,7 +45,7 @@ point, path-scoped rules, is a second mechanism and is split off (§8 F1).
 ## 3. Non-goals (OUT)
 
 - Path-scoped rules for editing areas. They are a context-diet mechanism in a different file, and the
-  report orders them after the diet units are measured; §8 F1 splits them to a unit the run adds.
+  report orders them after the diet units are measured; §8 F1 splits them to `TOOL-aMendedFleet-94`.
 - The parent harness handing `prebuild` out. The main loop composes each unit's Workflow call from
   `dispatch.args`, so a measuring build adds the key there; a declared switch in the parent belongs to
   whichever unit flips the default.
@@ -57,7 +57,8 @@ point, path-scoped rules, is a second mechanism and is split off (§8 F1).
 
 ### Edges
 
-- **hands-off** external — the path-scoped rules, split to a unit the run adds after the diet units.
+- **hands-off** `TOOL-aMendedFleet-94` — the path-scoped rules, split to that unit, which is ordered
+  after the diet units.
 - **hands-off** external — the measured build that decides whether a unit gets the checklist by
   default.
 
@@ -189,6 +190,9 @@ New arm: `tools/workflows/unattended-build.test.sh` · the child run with and wi
 
 - rev-1 · 2026-10-04 · initial draft; the point split in §8 F1, the child harness's prompt and args
   read at base, and the checklist sized over two real write sets.
+- rev-2 · 2026-10-04 · §3 · M2 cross-read: the split half's edge was written `external`; the run
+  added it as `TOOL-aMendedFleet-94`, so the non-goal and the hands-off edge now name it, and that
+  spec declares the reciprocal consumes-from.
 
 ## 10. Reuse audit
 

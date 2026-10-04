@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-52 — the hand-kept signal compares the drift README's signal names against the names the engine reports
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 52
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 52
 
 <!-- gen:spec-records -->
 
@@ -60,6 +60,9 @@ replaced by a pointer, so there is one list to keep.
   a stale extra name each count one and appear in `missing` and `extra`; and the existing arm that
   asserts an empty `HANDKEPT` reads as declared keeps passing. NOT OBSERVED by a criterion here: the
   suite runs once at the close, and the arms are declared under `New arm:` in §7.
+- **S8** — `memory/map/generated/symbols.json` is regenerated for the new definition. NOT OBSERVED
+  by a criterion here: `python tools/codebase-map/gen_map.py --check` at the close is its check, and
+  §7 names the legs that read it.
 
 ## 3. Non-goals (OUT)
 
@@ -74,7 +77,8 @@ replaced by a pointer, so there is one list to keep.
 ### Edges
 
 - **hands-off** external — every later unit that adds a signal owes its README row in the same
-  commit, or `drift-audit records` reds on it; units 8 and 37 already name that row in their scope.
+  commit, or `drift-audit records` reds on it; units 8, 21 and 37 before this unit, and units 54,
+  55 and 92 after it, already name that row in their scope.
 - **hands-off** external — the drift-audit kit version bump, owed once at the close.
 
 ## 4. Design
@@ -105,7 +109,7 @@ Read at the worktree HEAD `fee9f62b`, whose bytes under `tools/` and `.claude/` 
 
 ### Rollout
 
-Units 8 and 37 each add a signal and a README row and are ordered before this unit, so the set
+Units 8, 21 and 37 each add a signal and a README row and are ordered before this unit, so the set
 compares equal when this lands; a sibling that forgot its row reds here, at the right commit. Unit
 51 edits the same two files and is ordered first.
 
@@ -117,6 +121,7 @@ compares equal when this lands; a sibling that forgot its row reds here, at the 
 - `tools/drift-audit/README.md`
 - `tools/drift-audit/SKILL.template.md`
 - `.claude/skills/drift-audit/SKILL.md`
+- `memory/map/generated/symbols.json`
 
 ### Alternatives rejected
 
@@ -163,7 +168,7 @@ compares equal when this lands; a sibling that forgot its row reds here, at the 
 
 ## 7. Gates
 
-`drift-audit selftest` · `drift-audit records` · `drift-audit wiring` · `check-wiring self-test` · `lexicon naming predicates` · `encoding posture (text IO names its encoding)` · `kit epoch (shipped bytes move, the version moves)` · `spec tokens (a spec's own names resolve)`
+`drift-audit selftest` · `drift-audit records` · `drift-audit wiring` · `check-wiring self-test` · `codebase-map coverage + freshness` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `encoding posture (text IO names its encoding)` · `kit epoch (shipped bytes move, the version moves)` · `spec tokens (a spec's own names resolve)`
 
 New arm: `tools/drift-audit/selftest.py` · a fixture `HANDKEPT` row returning equal sets, then a set missing one name, then a set with one stale name · `CHECK_FLOOR` moves by the checks the arm adds
 
@@ -179,6 +184,11 @@ New arm: `tools/drift-audit/selftest.py` · a fixture `HANDKEPT` row returning e
 
 - rev-1 · 2026-10-04 · initial draft, from the synthesis's item [#58] and a probe of the README,
   Skill and engine name sets at base.
+- rev-2 · 2026-10-04 · §3 · §4 · S8 · §7 · M2 cross-read: the Edges line and the Rollout named units
+  8 and 37 as the earlier signal-adding units, but `TOOL-aMendedFleet-21` adds `cutoff_keys_armed`
+  and its README row before this unit too, and units 54, 55 and 92 add rows after it; and the new
+  definition owes `symbols.json`, which units 57, 59 and 90 regenerate for theirs and this spec
+  omitted.
 
 ## 10. Reuse audit
 

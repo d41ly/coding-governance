@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-39 — a harness-hooks inventory, and `git-hooks` holds real hook names only
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 39 · advances TOOL-aProbedToolkit-15
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 39 · advances TOOL-aProbedToolkit-15
 
 <!-- gen:spec-records -->
 
@@ -49,6 +49,13 @@ names git actually runs, so both inventories describe what steers a session and 
   added to `memory/map/baseline.toml`. The dossiers whose claims change refresh their prose in the
   same commit, and the generated `inventories.json` and `MAP.md` are re-rendered. Observed by AC5 and
   AC6.
+- **S6** — No claim lands by breaching the dossier cap. `agent-cap` and `unattended` sit within two
+  bytes of `DOSSIER_CAP_BYTES` at base, so the claims the §4 table adds to them would push each past
+  hygiene check 6's cap. The same commit makes room in each by the smallest prose cut that removes
+  measured history a record already holds, citing that record's id; the cap never moves. Shrinking
+  the whole near-cap band to 90% stays `TOOL-aMendedFleet-89`'s. Observed by AC7.
+  **Readers:** by name: NOT A NAME — the cut removes measured-history prose, not a named thing.
+  by value: NO VALUE READERS — the record the cut cites keeps the figures, and no tool reads dossier prose.
 
 ## 3. Non-goals (OUT)
 
@@ -56,8 +63,10 @@ names git actually runs, so both inventories describe what steers a session and 
   moving the `skill-engines` claim between dossiers. Both are claim housekeeping the synthesis lists
   beside this point; neither changes what an inventory enumerates.
 - The charter half of `TOOL-aProbedToolkit-15`, where the template oversells what the map guarantees.
-  That is a governance-carrier edit and a separate mechanism; §8 F1 hands it to a unit the run adds.
-- The coverage-number half of `TOOL-aProbedToolkit-8`, in the `map_diff.py` digest. §8 F1 hands it on.
+  That is a governance-carrier edit and a separate mechanism; §8 F1 hands it to
+  `TOOL-aMendedFleet-85`.
+- The coverage-number half of `TOOL-aProbedToolkit-8`, in the `map_diff.py` digest. §8 F1 hands it to
+  `TOOL-aMendedFleet-86`.
 - A `kit-entrypoints` inventory, which the synthesis says not to build yet.
 - Validating what a hook DOES. `tools/check-wiring.sh` owns whether a hook is wired, and each hook's
   own suite owns its behaviour.
@@ -66,8 +75,10 @@ names git actually runs, so both inventories describe what steers a session and 
 
 ### Edges
 
-- **hands-off** external — the template's overclaim and the digest's coverage figure, which F1 moves
-  to units the run adds to this build.
+- **hands-off** `TOOL-aMendedFleet-85` — the template's overclaim, the other half of
+  `TOOL-aProbedToolkit-15`, which F1 moves there.
+- **hands-off** `TOOL-aMendedFleet-86` — the digest's coverage figure, the half of
+  `TOOL-aProbedToolkit-8` F1 moves there.
 - **consumes-from** external — `json_artifact_inventory` in the codebase-map kit, already landed.
 
 ## 4. Design
@@ -190,6 +201,11 @@ and the remedy the error prints is to add the name to the constant.
 - **AC6** — When `grep -n "PreToolUse" memory/map/baseline.toml` runs after the unit's commit, it
   prints nothing.
   Red when: a harness key was baselined instead of claimed.
+- **AC7** — When a `python -c` reader reads `DOSSIER_CAP_BYTES` from `.memory-tree.conf` and the byte
+  size of every dossier and of `memory/map/FOUNDATION.md` this unit's commit touched, each is at most
+  the cap.
+  Red when: a claim pushed `agent-cap` or `unattended` past the cap.
+  figure: DERIVED at observation; 20,479 and 20,478 bytes at base against 20,480.
 
 ## 7. Gates
 
@@ -207,7 +223,8 @@ AC4 stage its refusals. No arm is added or moved.
   the digest's coverage figure, a change to `map_diff.py`, and the baseline's missing shrink assert,
   which is unit 40.
   RESOLVED (agent, 2026-10-04, delegated): split — the template overclaim and the digest's coverage
-  figure move to new units the run adds; this unit advances the first ask and closes neither.
+  figure move to new units the run adds, `TOOL-aMendedFleet-85` and `TOOL-aMendedFleet-86`; this unit
+  advances the first ask and closes neither.
 - **F2 — What is a git-hooks key?**
   Options: every non-test file, as today; every extension-less file; the names git documents.
   RESOLVED (agent, 2026-10-04, delegated): the documented names, with an unknown extension-less
@@ -218,6 +235,11 @@ AC4 stage its refusals. No arm is added or moved.
 
 - rev-1 · 2026-10-04 · initial draft, from the synthesis's items [#43] and [#44], `_git_hooks`,
   `json_artifact_inventory` and the settings file at base.
+- rev-2 · 2026-10-04 · §3 §8 S6 AC7 · the M2 cross-read: the two split halves named `external` and
+  "units the run adds" while `TOOL-aMendedFleet-85` and `TOOL-aMendedFleet-86` exist in this build,
+  so the Non-goals, Edges and F1 name them; and the claims this unit adds to `agent-cap` and
+  `unattended` would breach the dossier cap that `TOOL-aMendedFleet-89`, ordered after this unit,
+  is the first to relieve, so S6 and AC7 make the room in this commit.
 
 ## 10. Reuse audit
 

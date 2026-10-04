@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-83 — the unattended close sequence lists the dossiers its range touched and did not refresh
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 83
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 83
 
 <!-- gen:spec-records -->
 
@@ -106,6 +106,7 @@ same driver and are ordered first too; this unit rebases onto them.
 - `tools/unattended/unattended.sh`
 - `tools/unattended/README.md`
 - `tools/unattended/unattended.test.sh`
+- `memory/map/generated/symbols.json`
 
 ### Alternatives rejected
 
@@ -159,7 +160,7 @@ same driver and are ordered first too; this unit rebases onto them.
 
 ## 7. Gates
 
-`unattended kit gate` · `unattended skill wiring` · `install-prefix (shipped surface)` · `lexicon naming predicates` · `line length` · `kit epoch (shipped bytes move, the version moves)` · `spec tokens (a spec's own names resolve)`
+`unattended kit gate` · `codebase-map coverage + freshness` · `unattended skill wiring` · `install-prefix (shipped surface)` · `lexicon naming predicates` · `line length` · `kit epoch (shipped bytes move, the version moves)` · `spec tokens (a spec's own names resolve)` · `recall floor` · `recall floor arms`
 
 New arm: `tools/unattended/unattended.test.sh` · a fixture run moved into `VERIFYING` after a commit that touched a claimed path without its dossier, staged red by deleting the `verb_phase` call · none
 
@@ -185,6 +186,7 @@ New arm: `tools/unattended/unattended.test.sh` · a fixture run moved into `VERI
 
 - rev-1 · 2026-10-04 · initial draft, split from unit 37 at its F1, from a read of `verb_phase`,
   `print_selftests_owed`, `verb_close` and the conf's CLI keys at base.
+- rev-2 · 2026-10-04 · §4 Files touched and §7 add symbols.json and its coverage leg: the new public shell function is indexed after TOOL-aMendedFleet-35 S1.
 
 ## 10. Reuse audit
 

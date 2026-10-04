@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-8 — drift-audit reports `remote_ci_red_streak`
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · order 8
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · order 8
 
 <!-- gen:spec-records -->
 
@@ -55,6 +55,9 @@ cannot reach the remote prints DEAD PROBE, never a reassuring 0.
 - **S8** — The kit selftest gains one arm staging the pure function over canned rows and the reader's
   DEAD state, and the selftest's check floor moves by the checks it adds. NOT OBSERVED by a criterion
   here: the suite runs once at the close, and the arm is declared under `New arm:` in §7.
+- **S9** — `memory/map/generated/symbols.json` is regenerated for the new definitions. NOT OBSERVED
+  by a criterion here: `python tools/codebase-map/gen_map.py --check` at the close is its check, and
+  §7 names the legs that read it.
 
 ## 3. Non-goals (OUT)
 
@@ -62,7 +65,9 @@ cannot reach the remote prints DEAD PROBE, never a reassuring 0.
   is a scheduled refusal on the unguarded `drift-audit records` leg, the reason its report-only
   siblings give.
 - Fixing the reds, which units 4, 5, 6 and the causes unit 7 adds do.
-- Showing the streak on the orientation card or at the close; units 76 and 49 consume drift readings.
+- Showing the streak on the orientation card or at the close. Units 76 and 49 read the history
+  `TOOL-aMendedFleet-48` writes, and that history records `--check` runs only, where S4 makes this
+  signal NOT ASKED, so neither carries the streak; a reader runs the report without `--check`.
 - A second network client. `gh` is the one the brief names and the one node a is authenticated with.
 - Bumping the drift-audit kit version in this unit. Many units of this build move the kit, and the
   bump is owed once, after the last move, at the close; `govkit epoch` grades it there.
@@ -111,6 +116,7 @@ spawning `gh`, so the bar's leg stays offline and its output stays deterministic
 - `tools/drift-audit/drift_signals.template.py`
 - `tools/drift-audit/selftest.py`
 - `tools/drift-audit/README.md`
+- `memory/map/generated/symbols.json`
 
 ### Alternatives rejected
 
@@ -168,7 +174,7 @@ spawning `gh`, so the bar's leg stays offline and its output stays deterministic
 
 ## 7. Gates
 
-`drift-audit records` · `drift-audit selftest` · `drift-audit wiring` · `lexicon naming predicates` · `spec tokens (a spec's own names resolve)`
+`drift-audit records` · `drift-audit selftest` · `drift-audit wiring` · `codebase-map coverage + freshness` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `spec tokens (a spec's own names resolve)`
 
 New arm: `tools/drift-audit/selftest.py` · a canned row list per streak rule and a reader pointed at an unreachable host · `CHECK_FLOOR` moves by the arm's checks
 
@@ -184,6 +190,10 @@ New arm: `tools/drift-audit/selftest.py` · a canned row list per streak rule an
 ## 9. Revision log
 
 - rev-1 · 2026-10-04 · initial draft.
+- rev-2 · 2026-10-04 · §3 · S9 · §4 · §7 · M2 cross-read: the §3 card-and-close line said units 76
+  and 49 carry the streak, but `TOOL-aMendedFleet-48` writes `--check` readings only and S4 makes
+  this signal NOT ASKED there; and the new definitions owe `symbols.json`, which units 57, 59 and 90
+  regenerate and this spec omitted.
 
 ## 10. Reuse audit
 

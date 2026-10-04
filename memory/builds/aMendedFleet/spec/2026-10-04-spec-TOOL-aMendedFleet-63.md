@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-63 — `--close` and `--abort` render the run record themselves, after their own END line
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 63
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 63
 
 <!-- gen:spec-records -->
 
@@ -31,10 +31,14 @@ instruction a run can skip becomes an act the verb performs.
   is printed indented. A kit that does not resolve prints one `not asked` line naming the runlog
   kit, which is the Skill's own "no record is owed" case. The renderer's own no-record line passes
   through as the answer it is. Observed by AC1 and AC3.
-- **S4** — THE INDEX. On a `record written` answer, `write_run_record` lists `scan_dirty_paths`, runs
-  the generator `resolve_index_generator` names with `--write` through `run_bounded`, lists again,
-  and stages the record plus every path the second listing holds and the first did not. Paths that
-  were dirty before it ran are never staged by it. Observed by AC1.
+- **S4** — THE INDEX. On a `record written` answer, `write_run_record` stages the record FIRST,
+  because the generator lists its inputs with `git ls-files` and an untracked record is invisible to
+  the render. It then lists `scan_dirty_paths`, runs the generator `resolve_index_generator` names
+  with `--write` through `run_bounded`, lists again, and stages every path the second listing holds
+  and the first did not. Paths that were dirty before it ran are never staged by it, and it renders
+  nothing while a path under the memory root or `.memory-tree.conf` carries unstaged or untracked
+  changes: one line names those inputs and the repair. Both rules are the ones `write_ask_views`
+  carries, as `TOOL-aMendedFleet-1` restores it. Observed by AC1.
 - **S5** — THE COMMIT, only where the close already commits. Under `LANDER_MODE` set to `in-place`,
   after `--close`, it commits the staged record and index as `records(<slug>): the run record`
   through the same `run_bounded git commit` shape `write_close_commit` uses. Under `primary`, and
@@ -64,7 +68,9 @@ instruction a run can skip becomes an act the verb performs.
 
 ### Edges
 
-none
+- **consumes-from** `TOOL-aMendedFleet-1` — the render-and-stage rules of `write_ask_views`, which
+  S4 follows; the helper itself is not called, because its argument and its lines speak of filed
+  asks and that unit restores its bytes unchanged.
 
 ## 4. Design
 
@@ -143,9 +149,11 @@ Read at the worktree HEAD `725b1449`, whose bytes under `tools/` equal base `7af
 
 - **AC1** — When a scratch script built from the unattended suite's prologue and a fixture run that
   dispatched one unit runs `bash tools/unattended/unattended.sh --abort` with a reason and a halt
-  code, stdout carries an indented `runlog: record written` line, and `git diff --cached
-  --name-only` in the fixture lists that record and the run-state file.
-  Red when: the post-dispatch call is staged out, so the verb aborts and no record exists.
+  code, stdout carries an indented `runlog: record written` line, `git diff --cached
+  --name-only` in the fixture lists that record and the run-state file, and
+  `python tools/memory-tree/gen_build_index.py --check` passes there.
+  Red when: the post-dispatch call is staged out, so the verb aborts and no record exists, or the
+  record is staged after the render, so the index the commit carries omits it.
   cost: under a minute for the slice; the suite whole is never run.
   fixture: the suite prologue's fixture builder under a short `%TEMP%` root; that the builder
   reaches a dispatched unit cheaply is UNVERIFIED and the builder decides it.
@@ -202,6 +210,11 @@ New arm: `tools/unattended/unattended.test.sh` · a fixture run that dispatched 
 - rev-1 · 2026-10-04 · initial draft, from the spec brief's unit 63, report item [B#15], the runlog
   model's anomaly rules, the record's journal commitment, and a read of the dispatch block,
   `verb_close`, `verb_abort` and the Skill's record section at base.
+- rev-2 · 2026-10-04 · S4 AC1 §3 · cross-read with `TOOL-aMendedFleet-1`, which restores the
+  driver's other render-and-stage step: S4 rendered before staging the new record, which the
+  tracked-only generator cannot see, and rendered over a dirty input, the defect that helper's
+  rev-3 closed. S4 now stages first and refuses a dirty input as the helper does; AC1 reads the
+  index fresh.
 
 ## 10. Reuse audit
 

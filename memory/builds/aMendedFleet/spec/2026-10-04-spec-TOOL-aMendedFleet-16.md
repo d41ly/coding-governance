@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-16 — `gotchas.py --for-diff` ranks classes by anchor specificity and cuts in tiers
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 16
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 16
 
 <!-- gen:spec-records -->
 
@@ -41,6 +41,9 @@ leaves the checklist.
   `cmd_for_paths` as the one selection path. Observed by AC1.
 - **S6** — The kit README's `gotchas.py` row says the checklist is ranked by anchor specificity and
   cut at a tier boundary, and names the budget. Observed by AC5.
+- **S7** — `memory/map/generated/symbols.json` is regenerated for the new
+  definitions. NOT OBSERVED by a criterion here: `python tools/codebase-map/gen_map.py --check` at
+  the close is its check, and §7 names the leg that reads it.
 
 ## 3. Non-goals (OUT)
 
@@ -59,6 +62,8 @@ leaves the checklist.
 ### Edges
 
 - **hands-off** `TOOL-aMendedFleet-23` — the zero-select anchor report over the same catalogue.
+- **hands-off** `TOOL-aMendedFleet-17` — recording which classes a review caught, which reads the
+  item shape S4 keeps: the class slug as the first token after the box.
 - **hands-off** external — the driver's budgeted top-N per dispatch, which the report sequences after
   one build has measured whether ranking cuts checklist-fix commits.
 
@@ -120,6 +125,7 @@ Read at base `7af5f564` on 2026-10-04.
 
 - `tools/memory-tree/gotchas.py`
 - `tools/memory-tree/README.md`
+- `memory/map/generated/symbols.json`
 
 The memory-tree kit's version bump is owed once, at this build's close, after the last move.
 
@@ -176,7 +182,7 @@ The memory-tree kit's version bump is owed once, at this build's close, after th
 
 ## 7. Gates
 
-`gotchas selftest` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`gotchas selftest` · `memory hygiene` · `recall floor` · `recall floor arms` · `codebase-map coverage + freshness` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/memory-tree/gotchas.py --selftest · a three-tier fixture and a 2-plus-11 fixture at the shipped budget, against today's catalogue-order output · none
 
@@ -200,6 +206,11 @@ is the suite that exercises this file, and `memory hygiene` runs its checks 17 t
 ## 9. Revision log
 
 - rev-1 · 2026-10-04 · initial draft, from `cmd_for_paths`, `selectable` and the catalogue at base.
+- rev-2 · 2026-10-04 · §2 S7 · §4 · §7 · M2 cross-read: the definitions this unit adds
+  move `memory/map/generated/symbols.json`, which `TOOL-aMendedFleet-82` and the build's other
+  code units regenerate and declare; this spec omitted the write, its Files touched row and the leg.
+  §3 Edges also gains **hands-off** `TOOL-aMendedFleet-17`: that unit reads the item
+  shape S4 keeps, and neither spec declared the edge.
 
 ## 10. Reuse audit
 

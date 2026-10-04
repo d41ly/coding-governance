@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-57 — shrink-only lists are graded against their low-water mark
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 57
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 57
 
 <!-- gen:spec-records -->
 
@@ -52,7 +52,7 @@ reading's one other case, a list that never drained at all, stays an offender.
 ## 3. Non-goals (OUT)
 
 - The records-only spec-header declaration that `TOOL-aProbedToolkit-18` asks for. It is a second
-  mechanism and §8 F1 splits it out.
+  mechanism and §8 F1 splits it out to `TOOL-aMendedFleet-91`.
 - Making the signal gateable or giving it a pin above 0. A list may sit still for a week; the
   signal stays a report.
 - Replaying history beyond the first-parent line, or across a rename. A list renamed loses its
@@ -61,8 +61,8 @@ reading's one other case, a list that never drained at all, stays an offender.
 
 ### Edges
 
-- **hands-off** external — the records-only spec-header declaration, a new unit the run adds when it
-  performs §8 F1's split.
+- **hands-off** `TOOL-aMendedFleet-91` — the records-only spec-header declaration, the unit §8 F1's
+  split added.
 - **hands-off** external — the drift-audit kit version bump, owed once at the close.
 
 ## 4. Design
@@ -182,6 +182,9 @@ New arm: `tools/drift-audit/selftest.py` · a truth table over `check_shrink_row
 
 - rev-1 · 2026-10-04 · initial draft, from the synthesis's drift-audit item 9 ([#57]) and a replay
   of the five lists' first-parent history at base.
+- rev-2 · 2026-10-04 · §3 · M2 cross-read: the non-goal and the hands-off edge sent the records-only
+  declaration to an unnamed unit the run would add; `TOOL-aMendedFleet-91` is that unit and is now
+  named in both.
 
 ## 10. Reuse audit
 

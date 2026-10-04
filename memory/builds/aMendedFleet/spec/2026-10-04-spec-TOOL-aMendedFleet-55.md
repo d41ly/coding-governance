@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-55 — drift reports `open_asks_cited_by_product_source`, report-only
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 55
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 55
 
 <!-- gen:spec-records -->
 
@@ -43,6 +43,9 @@ precision figure exists, because source legitimately cites an ask it has not fix
   a sibling id one digit longer does not count for the shorter id, and an unreadable projection reads
   not live. NOT OBSERVED by a criterion here: the suite runs once at the close, and the arms are
   declared under `New arm:` in §7.
+- **S6** — `memory/map/generated/symbols.json` is regenerated for the new definition. NOT OBSERVED
+  by a criterion here: `python tools/codebase-map/gen_map.py --check` at the close is its check, and
+  §7 names the legs that read it.
 
 ## 3. Non-goals (OUT)
 
@@ -86,6 +89,7 @@ Read at worktree HEAD `725b1449`, whose `tools/` bytes equal base `7af5f564`'s.
 - `tools/drift-audit/drift_report.py`
 - `tools/drift-audit/selftest.py`
 - `tools/drift-audit/README.md`
+- `memory/map/generated/symbols.json`
 
 ### Alternatives rejected
 
@@ -134,7 +138,7 @@ Read at worktree HEAD `725b1449`, whose `tools/` bytes equal base `7af5f564`'s.
 
 ## 7. Gates
 
-`drift-audit selftest` · `drift-audit records` · `encoding posture (text IO names its encoding)` · `lexicon naming predicates` · `kit epoch (shipped bytes move, the version moves)` · `spec tokens (a spec's own names resolve)`
+`drift-audit selftest` · `drift-audit records` · `encoding posture (text IO names its encoding)` · `codebase-map coverage + freshness` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `kit epoch (shipped bytes move, the version moves)` · `spec tokens (a spec's own names resolve)`
 
 New arm: `tools/drift-audit/selftest.py` · a builds-mode fixture with an ask cited from product source, from a test file only, and by a longer sibling id · `CHECK_FLOOR` moves by the checks the arm adds
 
@@ -150,6 +154,8 @@ New arm: `tools/drift-audit/selftest.py` · a builds-mode fixture with an ask ci
 
 - rev-1 · 2026-10-04 · initial draft, from the synthesis's item [#59] and a scratch probe of live
   asks against `EVIDENCE_GLOBS` at base.
+- rev-2 · 2026-10-04 · S6 · §4 · §7 · M2 cross-read: the new definition owes `symbols.json`, which
+  units 57, 59 and 90 regenerate for theirs and this spec omitted.
 
 ## 10. Reuse audit
 

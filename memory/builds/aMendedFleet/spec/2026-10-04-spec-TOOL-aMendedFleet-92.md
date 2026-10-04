@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-92 — check 23 prints a fleet line, and drift-audit reads it from the newest bar run
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 92
+**Status:** SPECCED · rev-3 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 92
 
 <!-- gen:spec-records -->
 
@@ -54,6 +54,9 @@ it from the newest bar run, as node d's bytes wherever they still describe main.
   asserts check 23's default-channel output byte for byte is updated for the new line in the same
   pass. NOT OBSERVED by a criterion here: the suite runs once at the close, and AC2 and AC3 observe
   the behaviour through a slice.
+- **S7** — `memory/map/generated/symbols.json` is regenerated for the new definitions. NOT OBSERVED
+  by a criterion here: `python tools/codebase-map/gen_map.py --check` at the close is its check, and
+  §7 names the legs that read it.
 
 ## 3. Non-goals (OUT)
 
@@ -75,6 +78,10 @@ it from the newest bar run, as node d's bytes wherever they still describe main.
 
 - **consumes-from** external — main's per-run check 23 from the aWindowedPass build, which this unit
   totals and does not change.
+- **consumes-from** `TOOL-aMendedFleet-62` — the check-23 half of node d's unit 17 that unit's §8 F1
+  split off to this unit.
+- **consumes-from** `TOOL-aMendedFleet-59` — `read_git_dirs`, which the fleet reader reuses so a
+  fresh linked worktree reads the run records of every git dir of the clone.
 - **hands-off** external — the reconcile with node d's dUnstuckLanding unit 17, which meets one
   `SIGNALS` line, the `CHECK_FLOOR` line and the comment lines S3 names as differing hunks.
 
@@ -142,6 +149,7 @@ not graded.
 - `tools/drift-audit/drift_report.py`
 - `tools/drift-audit/selftest.py`
 - `tools/drift-audit/README.md`
+- `memory/map/generated/symbols.json`
 
 ### Alternatives rejected
 
@@ -203,7 +211,7 @@ not graded.
   line is cut from the drift engine's blob at node d's `d99cd0328`, read with `git show`, and from
   the unit commit's blob, and the two are compared with `diff`, they differ only on the comment lines
   that spell the
-  fleet line's fields, and `grep -c "check 23 fleet — "` over `tools/unattended/check-unattended.sh`
+  fleet line's fields and on the git-dir enumeration, which reuses `read_git_dirs` (§8 F4), and `grep -c "check 23 fleet — "` over `tools/unattended/check-unattended.sh`
   and over `tools/drift-audit/drift_report.py` prints at least 1 for each.
   Red when: a reader line was retyped, or the two kits spell the head differently.
 - **AC7** — When `grep -n fleet_over_budget tools/drift-audit/README.md` runs it prints one table row,
@@ -212,7 +220,7 @@ not graded.
 
 ## 7. Gates
 
-`unattended kit gate` · `drift-audit records` · `drift-audit wiring` · `drift-audit selftest` · `harness arms (fail branches armed or pinned)` · `lexicon naming predicates` · `install-prefix (shipped surface)` · `line length` · `kit epoch (shipped bytes move, the version moves)` · `spec tokens (a spec's own names resolve)`
+`unattended kit gate` · `drift-audit records` · `drift-audit wiring` · `drift-audit selftest` · `harness arms (fail branches armed or pinned)` · `codebase-map coverage + freshness` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `install-prefix (shipped surface)` · `line length` · `kit epoch (shipped bytes move, the version moves)` · `spec tokens (a spec's own names resolve)`
 
 New arm: `tools/unattended/check-unattended.test.sh` · a live record with one counted write prints the fleet line naming it; a clean graded record prints `over none`; a derived-LANDED-only population prints none · none
 New arm: `tools/drift-audit/selftest.py` · node d's `test_fleet_over_budget`: no conf, a conf with no record, one build over, `over none`, the record deleted · `CHECK_FLOOR` rises by 9
@@ -237,11 +245,19 @@ New arm: `tools/drift-audit/selftest.py` · node d's `test_fleet_over_budget`: n
   from it.
   RESOLVED (agent, 2026-10-04, delegated): `budget 0 per run`, per S1.
 
+- **F4 — Does the fleet reader keep node d's single git dir, or read every git dir of the clone?**
+  Options: keep node d's bytes and state that a fresh linked worktree reads DEAD; reuse unit 59's
+  `read_git_dirs`, as its sibling `legs_retried_after_timeout` does, and give up byte identity there.
+  RESOLVED (main loop, 2026-10-04, delegated, M3 most feature-rich): reuse `read_git_dirs`.
+
 ## 9. Revision log
 
 - rev-1 · 2026-10-04 · initial draft, from unit 62's split, node d's spec and commit `d99cd0328`, a
   three-way merge probe of its files against this tree, and main's check 23 as aWindowedPass left
   it.
+- rev-2 · 2026-10-04 · S7 · §4 · §7 · M2 cross-read: the new definitions owe `symbols.json`, which
+  units 57, 59 and 90 regenerate for theirs and this spec omitted.
+- rev-3 · 2026-10-04 · §3 edges consume TOOL-aMendedFleet-62 and -59; §8 F4 resolves the fleet reader onto `read_git_dirs`; AC6 admits that difference (M2 cross-read).
 
 ## 10. Reuse audit
 

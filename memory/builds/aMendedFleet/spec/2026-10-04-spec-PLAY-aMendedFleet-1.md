@@ -1,6 +1,6 @@
 # PLAY-aMendedFleet-1 — the AGENTS.md wrapper's merge-bar section moves to a guide, without its repeated catalog or dated history
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams playbook · ratified 2026-10-04 · order 79
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams playbook · ratified 2026-10-04 · order 79
 
 <!-- gen:spec-records -->
 
@@ -58,25 +58,25 @@ item, the duplicate node registry, is a separate mechanism and is split out (§8
 
 ## 3. Non-goals (OUT)
 
-- The wrapper's `## Node registry` table. It is split out to a new unit (§8 F1), and this unit
-  leaves it byte-identical.
+- The wrapper's `## Node registry` table. It is split out to `PLAY-aMendedFleet-4` (§8 F1), and
+  this unit leaves it byte-identical.
 - The rendered `gov:playbook` region, the template and `.governance/deploy.toml`. §6's catalog line
   is the surviving copy and is not edited, so the render-wiring leg sees no change.
 - Lowering the charter's 64512-byte ceiling in `tools/template-size-limits.txt` (§8 F3).
 - The kickoff manifest's own gate-command block, a third catalog in a different carrier, which the
   brief does not name and which sits 36 bytes under its own cap.
 - Rewording the moved paragraphs, including the closing line that spells the drift report and the
-  `--for-diff` checklist; unit 78 makes the build method that command's home, and a reword here
-  would re-review prose this unit only moves.
+  `--for-diff` checklist; the build method's M6 already spells that command, unit 78 adds the
+  path-set commands beside it in M5, and a reword here would re-review prose this unit only moves.
 - The wrapper's "What ships here" and "Layout" sections, and running `/doctor prompt-audit`, which
   is interactive-only.
-- Measuring the context diet. Unit 74 waits on that measurement; this unit records the byte delta
-  in its commit and nothing more.
+- Measuring the context diet. `TOOL-aMendedFleet-94`, split from unit 74, is ordered after that
+  measurement; this unit records the byte delta in its commit and nothing more.
 
 ### Edges
 
-- **hands-off** external — the node-registry deduplication, split to the unit the run adds for §8
-  F1: the template's single-row §2 table, the renderer, and the two registry readers.
+- **hands-off** `PLAY-aMendedFleet-4` — the node-registry deduplication, split to that unit at §8 F1:
+  the template's single-row §2 table, the renderer's drop list, and the wrapper's table.
 
 ## 4. Design
 
@@ -223,7 +223,8 @@ run once, at the close.
   and from drift-audit's node resolution. The second spans the template, the renderer, the deploy
   answers and the kickoff kit's reader, which is a second mechanism and a new deploy-time surface.
   Recommendation: split. `WIRE-INTO-PROJECT.md` also tells adopters the charter's §2 serves as the
-  registry, which the heading-keyed reader cannot find; the new unit owns that claim too.
+  registry, which the heading-keyed reader cannot find; the new unit, `PLAY-aMendedFleet-4`, puts
+  that adopter-facing claim out of its scope (its §3), so no unit of this build owns it.
   RESOLVED (agent, 2026-10-04, delegated): split — the node-registry deduplication moves to a new
   unit the run adds; this unit keeps the table byte-identical.
 - **F2** — Is the dated measurement paragraph moved into the guide or dropped?
@@ -241,6 +242,11 @@ run once, at the close.
 
 - rev-1 · 2026-10-04 · initial draft, from the wrapper, the size records, the two registry readers
   and the run-gates dossier at base.
+- rev-2 · 2026-10-04 · §3 · §8 · M2 cross-read: the registry split now names `PLAY-aMendedFleet-4`
+  in the non-goal and the edge; F1 said that unit owns the runbook's §2-registry claim, which its
+  §3 puts out of scope; §3 said unit 74 waits on the diet measurement, but unit 74 builds dark at
+  its order and the wait travels with `TOOL-aMendedFleet-94`; and §3 credited unit 78 with the
+  `--for-diff` command's home, which M6 already is.
 
 ## 10. Reuse audit
 

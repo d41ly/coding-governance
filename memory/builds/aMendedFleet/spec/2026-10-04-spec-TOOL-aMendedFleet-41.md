@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-41 — `replay-phrases.py --floor` grades a frozen phrase population against recorded floors
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 41
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 41
 
 <!-- gen:spec-records -->
 
@@ -35,7 +35,9 @@ ruling of 2026-08-23 that keeps kit self-tests and corpus graders off it.
 - **S4** — Without `--floor` the output is unchanged. With it the text output adds one block naming
   the population date, its count and each metric beside its floor, and `--json` adds a `floor`
   object carrying the same. `--floor` with `--limit` exits 2, since a partial population cannot be
-  graded against a floor of the whole. Observed by AC1 and AC5.
+  graded against a floor of the whole, and so does `--floor` with a `--budget` other than
+  `rl.DEFAULT_BUDGET`, since the `hit_at_budget` floor was read at that default. The floor block
+  names the budget it graded at. Observed by AC1 and AC5.
 - **S5** — The constants are measured at this unit's pass, after units 35 and 36 have landed, and
   their comment records the date, the node, the base sha and the readings. `FLOOR_CORPUS_DATE` is the
   day before the pass, so no record written later that day enters the population. The comment states
@@ -139,8 +141,10 @@ moves, which is what a floor exists to grade. Figures PINNED as read; S5 re-deri
   Red when: the frozen population admits a later record, or the plain run stops seeing it.
 - **AC5** — When `git grep -n -F "replay-phrases" -- tools/gate-legs.json .github .githooks` runs it
   prints nothing; `grep -n -F -- "--floor" memory/map/features/codebase-map.md` hits the
-  definition-of-done line; and `python tools/codebase-map/replay-phrases.py --floor --limit 5` exits 2.
-  Red when: the script reached a leg, the line is absent, or a partial population is graded.
+  definition-of-done line; `python tools/codebase-map/replay-phrases.py --floor --limit 5` exits 2;
+  and `python tools/codebase-map/replay-phrases.py --floor --budget 0` exits 2.
+  Red when: the script reached a leg, the line is absent, a partial population is graded, or the
+  budget floor is graded at a budget it was not read at.
 
 ## 7. Gates
 
@@ -164,6 +168,9 @@ No arm is added: the script is on no leg by owner ruling, and AC2 to AC4 stage i
 
 - rev-1 · 2026-10-04 · initial draft, from the synthesis's item [#50], `replay-phrases.py` at base and
   two readings of it.
+- rev-2 · 2026-10-04 · S4 AC5 · the M2 cross-read: `TOOL-aMendedFleet-36` gives the same CLI a
+  `--budget` flag, and a `--floor` run at another budget graded `hit_at_budget` against a floor read
+  at the default; S4 refuses that combination at exit 2 and AC5 observes it.
 
 ## 10. Reuse audit
 

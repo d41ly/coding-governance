@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-3 — the lander refuses a merge that loses a definition a parent carried
 
-**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · order 3 · ratified 2026-10-04
+**Status:** SPECCED · rev-3 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · order 3 · ratified 2026-10-04
 
 <!-- gen:spec-records -->
 
@@ -55,6 +55,9 @@ retires nothing.
   Exit 2 or an unresolvable kit prints and continues, since pre-push binds anyway. Observed by AC8.
 - **S6** — The mode's docstring and the pre-push block's header each state what the check does NOT
   see. Observed by AC9.
+- **S7** — `memory/map/generated/symbols.json` is regenerated for the new Python definitions.
+  NOT OBSERVED by a criterion here: `python tools/codebase-map/gen_map.py --check` at the close is its
+  check, and §7 names the leg that reads it.
 
 ## 3. Non-goals (OUT)
 
@@ -157,9 +160,12 @@ policy, far below the straggler-guard block, so the reconcile is two disjoint hu
 - `.githooks/pre-push.test.sh`
 - `tools/push-main.sh`
 - `tools/push-main.test.sh`
+- `memory/map/generated/symbols.json`
 
 Plus the lexicon kit's version carriers, whichever the kit-version legs name at build time. This
-set is disjoint from `TOOL-aMendedFleet-6`'s lexicon templates and `.gitattributes`.
+set shares `tools/lexicon/selftest.py` with `TOOL-aMendedFleet-6`, whose codec arm is a separate
+insertion, and `tools/push-main.sh` with `TOOL-aMendedFleet-65`, which calls the resolver blocks
+this unit adds rather than adding its own.
 
 ### Alternatives rejected
 
@@ -243,7 +249,7 @@ set is disjoint from `TOOL-aMendedFleet-6`'s lexicon templates and `.gitattribut
 
 ## 7. Gates
 
-`codebase-map kit selftest` · `lexicon selftest` · `lexicon naming predicates` · `pre-push self-test` · `push-main self-test` · `kit version markers` · `spec tokens (a spec's own names resolve)`
+`codebase-map kit selftest` · `codebase-map coverage + freshness` · `lexicon selftest` · `lexicon naming predicates` · `pre-push self-test` · `push-main self-test` · `kit version markers` · `spec tokens (a spec's own names resolve)` · `recall floor` · `recall floor arms`
 
 New arm: tools/lexicon/selftest.py · a fixture merge resolving a conflict to one side, against the base lexicon with no such mode · none
 New arm: .githooks/pre-push.test.sh · a raw default-branch push of that merge, against the base hook · none
@@ -270,6 +276,11 @@ New arm: tools/push-main.test.sh · --prepare over a branch carrying that merge,
 - rev-1 · 2026-10-04 · initial draft, from the report's `[B#11]` and Q3 rank 1, node d's ask 26
   read on its branch, and `01c22e155` re-observed at its parents.
 - rev-2 · 2026-10-04 · §3 gains the hands-off edge to `TOOL-aMendedFleet-65`, which declares consuming this unit's resolver in `tools/push-main.sh` (check 12 edge join).
+- rev-3 · 2026-10-04 · §4 · Files touched claimed disjointness from `TOOL-aMendedFleet-6`'s lexicon
+  templates and `.gitattributes`; that unit's rev-1 touches neither and shares
+  `tools/lexicon/selftest.py` with this one, so the line now names the shared files. S7 and §7: the
+  three Python definitions move `memory/map/generated/symbols.json`, which the build's other
+  Python-adding units declare with the coverage leg and this spec omitted.
 
 ## 10. Reuse audit
 

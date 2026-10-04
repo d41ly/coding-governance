@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-9 — the daily held job's red suites reach the inherited-red HIGH auto-file
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 9
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 9
 
 <!-- gen:spec-records -->
 
@@ -31,8 +31,10 @@ that same writer, so a red the daily job sees becomes one OPEN HIGH ask instead 
   `[A-Za-z0-9._-]+` ending `.yml` or `.yaml` is refused by name. Observed by AC5 and AC6.
 - **S4** — For each held job whose conclusion is `failure` or `timed_out`, the writer files one ask in
   the running build's `BACKLOG.md` with a `SEV · HIGH` row and a `KEEP` row, through the existing
-  `write_backlog_rows`, `derive_ask_seq` and `read_ask_back` helpers and the existing rollback. The
-  ask text opens `held red: suite <name> red at <sha8> on the daily held job, run <run id>`, its
+  `write_backlog_rows`, `derive_ask_seq` and `read_ask_back` helpers and the existing rollback, and,
+  once after its loop when it filed at least one ask, the views helper `write_ask_views` that
+  `TOOL-aMendedFleet-1` restores, called with the count filed exactly as `write_inherited_asks`
+  calls it, so the generated views move with the rows. The ask text opens `held red: suite <name> red at <sha8> on the daily held job, run <run id>`, its
   `seen` locator is the suite's script at that sha when `read_leg_argv` resolves the suite in the leg
   manifest, else the workflow file at that sha, and its accept clause is that the suite is green on
   the daily held job at the default branch's tip. Observed by AC3.
@@ -62,7 +64,8 @@ that same writer, so a red the daily job sees becomes one OPEN HIGH ask instead 
 
 ### Edges
 
-none
+- **consumes-from** `TOOL-aMendedFleet-1` — `write_ask_views`, restored there; without it a filed
+  held ask leaves the generated views stale and the close's records commit meets the freshness check.
 
 ## 4. Design
 
@@ -182,8 +185,10 @@ Candidates tested before choosing, per BUILD-METHOD M12, with the test that reje
   declares `ASKS_CMD` as `python tools/memory-tree/gen_build_index.py --asks`, with `read_held_reds`
   shadowed to print two red rows at the fixture's HEAD, the build's `BACKLOG.md` gains two asks,
   each with a `SEV · HIGH` and a `KEEP` row, and `gen_build_index.py --asks <id>` reads each as OPEN
-  and HIGH.
-  Red when: the rows are only printed, or an ask reads back other than OPEN HIGH.
+  and HIGH; stdout carries one `re-rendered the generated views for 2 filed ask(s)` line, and
+  `python tools/memory-tree/gen_build_index.py --check` passes in the fixture.
+  Red when: the rows are only printed, an ask reads back other than OPEN HIGH, or the views are left
+  stale.
   fixture: a `git clone --local` of this repository under a short `%TEMP%` path.
 - **AC4** — When `write_held_asks` runs a second time over the same two reds, and again with one of
   the two asks moved to another build's `BACKLOG.md`, it files nothing and prints `reused` for both.
@@ -238,12 +243,17 @@ New arm: tools/unattended/unattended.test.sh · a shadowed held reader over a fi
 ## 9. Revision log
 
 - rev-1 · 2026-10-04 · initial draft, from `write_inherited_asks` at base and an anonymous API probe.
+- rev-2 · 2026-10-04 · S4 AC3 §3 §10 · cross-read with `TOOL-aMendedFleet-1`: base's
+  `write_inherited_asks` is the copy a merge stripped of its views call, and that unit restores the
+  call; this writer copied the stripped pattern. S4 now calls `write_ask_views` after its loop, AC3
+  observes the render, and the edge declares the dependency.
 
 ## 10. Reuse audit
 
 The seam extended is the inherited-red auto-file in `tools/unattended/unattended.sh`:
 `write_inherited_asks` as the pattern, and its helpers `write_backlog_rows`, `derive_ask_seq`,
-`read_ask_back` and `read_leg_argv` called unchanged, with `read_policy_key` for the key at R.
+`read_ask_back` and `read_leg_argv` called unchanged, with `read_policy_key` for the key at R, and
+`write_ask_views` as `TOOL-aMendedFleet-1` restores it.
 `python tools/codebase-map/reuse_lookup.py "file a HIGH ask for a red leg inherited from the default
 branch"` printed `unscanned layers: .sh`, so it cannot see these shell seams; it named the
 `run_bounded` seam and the `UNATTENDED-ASKS.md` guide, and the helpers were found by reading the

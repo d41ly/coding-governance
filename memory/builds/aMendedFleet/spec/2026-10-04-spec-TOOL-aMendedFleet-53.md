@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-53 — the dangling-pointer signal reads the declared auto-memory directory and checks its backticked paths against the tracked tree
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 53 · advances TOOL-aUnmannedHelm-2
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 53 · advances TOOL-aUnmannedHelm-2
 
 <!-- gen:spec-records -->
 
@@ -58,6 +58,9 @@ describes is reported instead of being re-read as true.
   one tracked path and one untracked path under a tracked top-level directory reads value 1 of 2; a
   blank declaration reads not asked; a missing directory reads not live. NOT OBSERVED by a criterion
   here: the suite runs once at the close, and the arms are declared under `New arm:` in §7.
+- **S7** — `memory/map/generated/symbols.json` is regenerated for the new definition. NOT OBSERVED
+  by a criterion here: `python tools/codebase-map/gen_map.py --check` at the close is its check, and
+  §7 names the legs that read it.
 
 ## 3. Non-goals (OUT)
 
@@ -110,6 +113,7 @@ Read at worktree HEAD `725b1449`, whose `tools/` bytes equal base `7af5f564`'s.
 - `tools/drift-audit/drift_signals.template.py`
 - `tools/drift-audit/selftest.py`
 - `tools/drift-audit/README.md`
+- `memory/map/generated/symbols.json`
 
 ### Alternatives rejected
 
@@ -159,7 +163,7 @@ Read at worktree HEAD `725b1449`, whose `tools/` bytes equal base `7af5f564`'s.
 
 ## 7. Gates
 
-`drift-audit selftest` · `drift-audit records` · `drift-audit wiring` · `encoding posture (text IO names its encoding)` · `lexicon naming predicates` · `kit epoch (shipped bytes move, the version moves)` · `spec tokens (a spec's own names resolve)`
+`drift-audit selftest` · `drift-audit records` · `drift-audit wiring` · `encoding posture (text IO names its encoding)` · `codebase-map coverage + freshness` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `kit epoch (shipped bytes move, the version moves)` · `spec tokens (a spec's own names resolve)`
 
 New arm: `tools/drift-audit/selftest.py` · a fixture auto-memory directory with one note naming a tracked and an untracked path, then a blank declaration, then a missing directory · `CHECK_FLOOR` moves by the checks the arm adds
 
@@ -176,6 +180,8 @@ New arm: `tools/drift-audit/selftest.py` · a fixture auto-memory directory with
 
 - rev-1 · 2026-10-04 · initial draft, from the synthesis's item [#56] and a scratch probe of node
   `a`'s auto-memory against `git ls-files` at base.
+- rev-2 · 2026-10-04 · S7 · §4 · §7 · M2 cross-read: the new definition owes `symbols.json`, which
+  units 57, 59 and 90 regenerate for theirs and this spec omitted.
 
 ## 10. Reuse audit
 

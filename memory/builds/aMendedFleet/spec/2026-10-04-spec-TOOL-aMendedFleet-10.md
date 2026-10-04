@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-10 — `--asks` rows carry the pointer and a 160-byte summary, and `--path` ranks and caps them
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 10
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 10
 
 <!-- gen:spec-records -->
 
@@ -45,6 +45,9 @@ them, so the feed a stage reads is a few kilobytes about the files that stage to
   non-negative integer. Observed by AC6.
 - **S6** — The kit README's Print modes paragraph names `--path`, `--limit` and the two new fields.
   Observed by AC7.
+- **S7** — `memory/map/generated/symbols.json` is regenerated for the new
+  definitions. NOT OBSERVED by a criterion here: `python tools/codebase-map/gen_map.py --check` at
+  the close is its check, and §7 names the leg that reads it.
 
 ## 3. Non-goals (OUT)
 
@@ -115,6 +118,7 @@ replaced with its `--suggest` answer at build time, and this list is amended wit
 - `tools/memory-tree/gen_build_index.py`
 - `tools/memory-tree/backlog.py`
 - `tools/memory-tree/README.md`
+- `memory/map/generated/symbols.json`
 
 ### Rollout
 
@@ -181,7 +185,7 @@ change. The kit version bump is owed once, at this build's close, after the last
 
 ## 7. Gates
 
-`build README slot contract` · `memory hygiene` · `drift-audit records` · `spec tokens (a spec's own names resolve)`
+`build README slot contract` · `memory hygiene` · `drift-audit records` · `recall floor` · `recall floor arms` · `codebase-map coverage + freshness` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/memory-tree/gen_build_index.py --selftest · a five-ask fixture for `--path`, and a 400-byte summary, against today's generator · none
 
@@ -202,6 +206,9 @@ New arm: tools/memory-tree/gen_build_index.py --selftest · a five-ask fixture f
 ## 9. Revision log
 
 - rev-1 · 2026-10-04 · initial draft, from `cmd_asks`, `build_ask_row` and the R4 walk at base.
+- rev-2 · 2026-10-04 · §2 S7 · §4 · §7 · M2 cross-read: the definitions this unit adds
+  move `memory/map/generated/symbols.json`, which `TOOL-aMendedFleet-82` and the build's other
+  code units regenerate and declare; this spec omitted the write, its Files touched row and the leg.
 
 ## 10. Reuse audit
 

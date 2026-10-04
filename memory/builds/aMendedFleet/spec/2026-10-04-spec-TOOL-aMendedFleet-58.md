@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-58 — gate yield per leg is reported from the gates journal
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 58
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 58
 
 <!-- gen:spec-records -->
 
@@ -60,7 +60,8 @@ never went red in the window and whether it runs on every bar. It reports; it re
   owner's.
 - Knowing which legs RAN on a bar. The journal names only failures, so `bars` is an upper bound on
   how often a guarded or held leg ran; stderr says so. The per-run `<i>.leg` rows hold the exact set
-  for the handful of runs the runner keeps, and reading them is unit 59's population, not this one.
+  for the handful of runs the runner keeps, and no unit of this build reads them for yield; unit 59
+  reads the `<i>.retry.leg` rows and the verdicts beside them, not the `<i>.leg` rows.
 - A drift signal or a gate over yield. Report-only, per the review's item.
 - Reading another clone's journal: journals never leave their clone.
 - Bumping the runlog kit version, owed once at the close.
@@ -172,6 +173,8 @@ New arm: `tools/runlog/selftest.py` · a fixture journal with a capped line, a m
 
 - rev-1 · 2026-10-04 · initial draft, from the report's roadmap item 6 ([B#24]) and a tally of node
   a's gates journal against the manifest at base.
+- rev-2 · 2026-10-04 · §3 · M2 cross-read: §3 called the per-run `<i>.leg` rows unit 59's
+  population, but `TOOL-aMendedFleet-59` S2 reads only the verdicts and the `<i>.retry.leg` rows.
 
 ## 10. Reuse audit
 

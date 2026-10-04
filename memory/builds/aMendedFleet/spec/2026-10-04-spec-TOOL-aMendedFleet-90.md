@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-90 — a report-only drift signal DEAD for N recorded readings is named for retirement or a filed ask
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 90
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 90
 
 <!-- gen:spec-records -->
 
@@ -48,7 +48,8 @@ or file an ask and declare it. It stays report-only.
 - **S6** — No exit status moves in any mode. Observed by AC3.
 - **S7** — The drift-audit README gains a paragraph beside the signal table naming the rule, the two
   keys and the history it reads, and stating that it is report-only because the history is node-local.
-  Observed by AC5.
+  Its layout table's `drift_signals.py` row lists both keys among the project-layer names, as units
+  8, 53 and 56 do for theirs. Observed by AC5.
 - **S8** — Self-test arms in `tools/drift-audit/selftest.py`: a fixture history with a streak at,
   below and broken before the limit, a repeated-sha group, a reordered header and a missing file; and a
   stale `DEAD_FILED` entry. NOT OBSERVED by a criterion here: the suite runs once at the close, and the
@@ -200,6 +201,9 @@ New arm: `tools/drift-audit/selftest.py` · fixture histories with a streak at, 
 
 - rev-1 · 2026-10-04 · initial draft, split from unit 51's F1; the DEAD rows re-measured at
   `8312d315`.
+- rev-2 · 2026-10-04 · S7 · M2 cross-read: units 8, 53 and 56 add their new project-layer keys to
+  the README layout table's `drift_signals.py` row, and S7 left `DEAD_READINGS_LIMIT` and
+  `DEAD_FILED` out of it, so that row would stop listing every key the layer may carry.
 
 ## 10. Reuse audit
 

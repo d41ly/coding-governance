@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-31 — recall output keeps every hit and prints snippets only for the head
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 31
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 31
 
 <!-- gen:spec-records -->
 
@@ -38,13 +38,17 @@ beyond 20, and weak-term answers sat at ranks 9, 19 and 35 in the report.
 - **S5** — `emit` returns `(text, shown, spent, overflow, snippets)`; the existing call sites in
   `query.py` and `tools/memory-recall/selftest.py` take the fifth value. The selftest arm
   `test_budget_bounds_emission_and_beats_full_documents` moves its truncation probe to a budget
-  small enough that the pointer tier cannot hold all 20 fixture hits, and a new arm pins S1 to S3.
+  small enough that the pointer tier cannot hold all 20 fixture hits, and a new arm pins S1 to S3;
+  `SELFTEST_ARMS` moves by one with its dated provenance line, as unit 27's S5 moves it.
   Observed by AC5.
 - **S6** — The Skill's "Reading the answer" paragraph, edited in
   `tools/memory-recall/SKILL.template.md` and re-rendered into `.claude/skills/memory-recall/SKILL.md`,
   and the README's `Use` section say the head prints snippets, the rest prints pointers, and a pointer
   is opened by its path. The paragraph stops typing the default budget and names `--budget` instead.
   Observed by AC6.
+- **S7** — `memory/map/generated/symbols.json` is regenerated for the new
+  definitions. NOT OBSERVED by a criterion here: `python tools/codebase-map/gen_map.py --check` at
+  the close is its check, and §7 names the leg that reads it.
 
 ## 3. Non-goals (OUT)
 
@@ -114,6 +118,7 @@ snippets for ranks 1-6 · pointers for 7-40 of 40 hits · raise --budget for mor
 - `tools/memory-recall/README.md`
 - `tools/memory-recall/SKILL.template.md`
 - `.claude/skills/memory-recall/SKILL.md`
+- `memory/map/generated/symbols.json`
 
 ### Rollout
 
@@ -181,9 +186,9 @@ they build in order and never concurrently. The rendered Skill is regenerated wi
 
 ## 7. Gates
 
-`memory-recall skill wiring` · `check-wiring self-test` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+`memory-recall skill wiring` · `check-wiring self-test` · `lexicon naming predicates` · `memory hygiene` · `recall floor` · `recall floor arms` · `codebase-map coverage + freshness` · `spec tokens (a spec's own names resolve)`
 
-New arm: tools/memory-recall/selftest.py · a 20-hit fixture at a budget whose snippet share holds 3 hits, against today's all-snippet emission · none
+New arm: tools/memory-recall/selftest.py · a 20-hit fixture at a budget whose snippet share holds 3 hits, against today's all-snippet emission · `SELFTEST_ARMS` moves by the arms added, with its dated `N -> M` provenance line
 
 `memory-recall kit selftest`, `recall floor` and `recall floor arms` run at the close: their guard,
 `tools/memory-recall/`, is excluded as broad. `check-wiring self-test` and
@@ -205,6 +210,11 @@ New arm: tools/memory-recall/selftest.py · a 20-hit fixture at a budget whose s
 ## 9. Revision log
 
 - rev-1 · 2026-10-04 · initial draft, from `emit`, `render`, `rrf` and the live query log at base.
+- rev-2 · 2026-10-04 · §2 S7 · §4 · §7 · M2 cross-read: the definitions this unit adds
+  move `memory/map/generated/symbols.json`, which `TOOL-aMendedFleet-82` and the build's other
+  code units regenerate and declare; this spec omitted the write, its Files touched row and the leg.
+  S5 and the §7 arm line also move `SELFTEST_ARMS` with the new arm, as
+  `TOOL-aMendedFleet-27` S5 moves it; the arm line said the floor moves by none.
 
 ## 10. Reuse audit
 

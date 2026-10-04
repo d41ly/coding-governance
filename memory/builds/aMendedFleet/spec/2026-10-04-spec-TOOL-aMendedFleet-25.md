@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-25 — live specs carry a declared byte ceiling, and a spec already over it is held at its recorded high-water
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 25
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 25
 
 <!-- gen:spec-records -->
 
@@ -47,6 +47,9 @@ held at its recorded high-water, so it may shrink and may not grow.
   does not check, and the limits file's header gains one paragraph on CLASS rows. Observed by AC6.
 - **S8** — `tools/check-spec-tokens.test.sh` gains one arm, named under §7 `New arm:`.
   NOT OBSERVED by a pass: the suite is a self-test the close runs, and a pass runs none.
+- **S9** — `memory/map/generated/symbols.json` is regenerated for the two new definitions, in the
+  same commit. NOT OBSERVED by a criterion here: `python tools/codebase-map/gen_map.py --check` at
+  the close is its check, and §7 names the leg that reads it.
 
 ## 3. Non-goals (OUT)
 
@@ -131,6 +134,7 @@ spec-tokens: size join · no class row in tools/template-size-limits.txt (arm of
 - `tools/check-spec-tokens.test.sh`
 - `tools/template-size-limits.txt`
 - `tools/template-size-highwater.txt`
+- `memory/map/generated/symbols.json`
 
 ### Rollout
 
@@ -194,9 +198,9 @@ like any other change; S4's stale rule is what makes a closed one's row go.
 
 ## 7. Gates
 
-`spec tokens (a spec's own names resolve)` · `spec-tokens self-test` · `template size <=48KiB` · `template size gate selftest` · `lexicon naming predicates` · `kit epoch (shipped bytes move, the version moves)` · `python resolver (behaviour + inline parity + idiom ban)` · `push-main self-test` · `check-wiring self-test` · `settings-merge selftest` · `run-gates canary` · `run-gates evidence` · `foreign-prefix parity (every self-test at three prefixes)` · `install-prefix self-test` · `dead-path carriers self-test` · `kit-placeholders self-test`
+`spec tokens (a spec's own names resolve)` · `spec-tokens self-test` · `template size <=48KiB` · `template size gate selftest` · `lexicon naming predicates` · `kit epoch (shipped bytes move, the version moves)` · `python resolver (behaviour + inline parity + idiom ban)` · `push-main self-test` · `check-wiring self-test` · `settings-merge selftest` · `run-gates canary` · `run-gates evidence` · `foreign-prefix parity (every self-test at three prefixes)` · `install-prefix self-test` · `dead-path carriers self-test` · `kit-placeholders self-test` · `codebase-map coverage + freshness` · `recall floor` · `recall floor arms`
 
-Every leg past the first six is owed by the tool-root guard, which the checker excludes as broad;
+The last three are owed by S9's regenerated map artifact. Every other leg past the first six is owed by the tool-root guard, which the checker excludes as broad;
 they are named so the close reads one list.
 
 New arm: tools/check-spec-tokens.test.sh · a fixture tree with a class row, a padded live spec, a held spec grown by one line and a stale row for a terminal spec, staged red by skipping the size join · none
@@ -227,6 +231,10 @@ New arm: tools/check-spec-tokens.test.sh · a fixture tree with a class row, a p
 
 - rev-1 · 2026-10-04 · initial draft, from the template gate, its two sidecar files, the spec token
   checker at base, and a CR-stripped size census of every tracked spec.
+- rev-2 · 2026-10-04 · S9 · §4 · §7 · M2 cross-read: the two functions this unit adds to
+  `tools/check-spec-tokens.py` move `memory/map/generated/symbols.json`, which units 18, 70 and 82
+  regenerate and declare for their own definitions; this spec omitted the write, its Files touched
+  row and the legs it owes.
 
 ## 10. Reuse audit
 

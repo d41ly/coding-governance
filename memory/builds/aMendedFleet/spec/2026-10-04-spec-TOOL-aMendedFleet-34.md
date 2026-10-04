@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-34 — recall measures offline whether an answer was used, from the query log and the worktree's next commit
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · closes TOOL-aWeighedCompass-11 · order 34
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · closes TOOL-aWeighedCompass-11 · order 34
 
 <!-- gen:spec-records -->
 
@@ -44,6 +44,9 @@ supersedes the ask to widen the opened hook, as the review's plan says.
   AC3.
 - **S7** — `tools/memory-recall/README.md` lists `--used` beside `--export` in its usage block, with
   one sentence on what it joins and that it reads only live reflogs. Observed by AC5.
+- **S8** — `memory/map/generated/symbols.json` is regenerated for the new
+  definitions. NOT OBSERVED by a criterion here: `python tools/codebase-map/gen_map.py --check` at
+  the close is its check, and §7 names the leg that reads it.
 
 ## 3. Non-goals (OUT)
 
@@ -58,8 +61,8 @@ supersedes the ask to widen the opened hook, as the review's plan says.
 
 ### Edges
 
-- **hands-off** external — the `head` field on the query row that would make a removed worktree
-  attributable, which the run adds as its own unit per §8 F2.
+- **hands-off** `TOOL-aMendedFleet-82` — the `head` field on the query row that would make a removed
+  worktree attributable, split out at §8 F2, and the ancestry arm of `--used` that reads it.
 
 ## 4. Design
 
@@ -111,6 +114,7 @@ close.
 - `tools/memory-recall/query.py`
 - `tools/memory-recall/README.md`
 - `tools/memory-recall/selftest.py`
+- `memory/map/generated/symbols.json`
 
 ### Alternatives rejected
 
@@ -158,9 +162,9 @@ close.
 
 ## 7. Gates
 
-`memory-recall kit selftest` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `kit epoch (shipped bytes move, the version moves)` · `spec tokens (a spec's own names resolve)`
+`memory-recall kit selftest` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `kit epoch (shipped bytes move, the version moves)` · `codebase-map coverage + freshness` · `spec tokens (a spec's own names resolve)`
 
-New arm: tools/memory-recall/selftest.py · the AC1 fixture, staged red by removing S4's terms exclusion · none
+New arm: tools/memory-recall/selftest.py · the AC1 fixture, staged red by removing S4's terms exclusion · `SELFTEST_ARMS` moves by the arms added, with its dated `N -> M` provenance line
 
 ## 8. Open questions
 
@@ -181,6 +185,11 @@ New arm: tools/memory-recall/selftest.py · the AC1 fixture, staged red by remov
 
 - rev-1 · 2026-10-04 · initial draft, from the synthesis's item [#32] and a probe of node a's query
   log and worktree reflogs at base.
+- rev-2 · 2026-10-04 · §2 S8 · §4 · §7 · M2 cross-read: the definitions this unit adds
+  move `memory/map/generated/symbols.json`, which `TOOL-aMendedFleet-82` and the build's other
+  code units regenerate and declare; this spec omitted the write, its Files touched row and the leg.
+  §3 Edges also names `TOOL-aMendedFleet-82` for the `head` field, which it called
+  `external`, and the §7 arm line moves `SELFTEST_ARMS`, as `TOOL-aMendedFleet-27` S5 does.
 
 ## 10. Reuse audit
 

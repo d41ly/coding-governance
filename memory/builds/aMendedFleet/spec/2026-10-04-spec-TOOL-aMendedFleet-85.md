@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-85 — the charter states what the codebase map's ratchet binds, and stops promising an inventory that cannot rot
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling+playbook · ratified 2026-10-04 · order 85 · closes TOOL-aProbedToolkit-15
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling+playbook · ratified 2026-10-04 · order 85 · closes TOOL-aProbedToolkit-15
 
 <!-- gen:spec-records -->
 
@@ -38,6 +38,15 @@ render in `AGENTS.md`, and the runbook line that repeats it to adopters.
 - **S4** — The header's `closes TOOL-aProbedToolkit-15` stands only while unit 39, ordered first and
   answering the ask's unclaimed-steering-files half, is not retired. If it is retired before this
   unit closes, the pass flips the verb to `advances` in a rev bump with its §9 line. Observed by AC4.
+- **S5** — THE SIZE, by the rule `PLAY-aMendedFleet-2` S3 states. Both size subjects stay inside
+  their declared ceilings, and where a subject's measured figure passes its recorded high-water,
+  the pass re-records it with `bash tools/check-template-size.sh --bump <subject>` and names the
+  byte delta in a `Decided:` trailer. Units 79 and 80 may move both high-water rows first, so
+  whether either is passed is read at build time. Observed by AC3.
+- **S6** — THE MANIFEST STAMP. The template is on the kickoff manifest's `watch:` line, so the same
+  commit re-stamps `last-audit:` in `memory/guides/SESSION-KICKOFF.md` with a delta line in its
+  message; the staged manifest leg of `.githooks/pre-commit` refuses the commit otherwise.
+  Observed by AC5.
 
 ## 3. Non-goals (OUT)
 
@@ -56,6 +65,8 @@ render in `AGENTS.md`, and the runbook line that repeats it to adopters.
 
 - **consumes-from** `TOOL-aMendedFleet-39` — the half of `TOOL-aProbedToolkit-15` that S4's `closes`
   relies on; without it the ask is only advanced.
+- **consumes-from** `PLAY-aMendedFleet-1` — the wrapper trim that frees the `AGENTS.md` headroom the
+  reworded bullet's render spends; at base the charter sits 168 bytes under its row.
 
 ## 4. Design
 
@@ -83,6 +94,8 @@ byte-identical at the worktree tip `8312d315`.
 - `coding-governance-agents.template.md`
 - `AGENTS.md`
 - `WIRE-INTO-PROJECT.md`
+- `tools/template-size-highwater.txt`
+- `memory/guides/SESSION-KICKOFF.md`
 
 ### Rollout
 
@@ -117,21 +130,27 @@ the growth. Unit 38 also edits `WIRE-INTO-PROJECT.md`, in a different bullet; di
 - **AC2** — When `bash tools/playbook/adopt-playbook.sh --target . --check` runs, it exits 0.
   Red when: the template moved and the rendered region did not.
 - **AC3** — When `bash tools/check-template-size.sh` and `bash tools/check-template-size.sh AGENTS.md`
-  run, each exits 0.
-  Red when: the reworded bullet pushes either subject past its declared ceiling.
+  run, each exits 0, and neither prints a WARN this pass introduced without a matching `--bump` row
+  in `tools/template-size-highwater.txt`.
+  Red when: the reworded bullet pushes either subject past its declared ceiling, or its growth past
+  a high-water went unpriced.
   figure: 49152 and 64512 are the declared rows, read at observation time.
 - **AC4** — When `python tools/memory-tree/gen_build_index.py --asks TOOL-aProbedToolkit-15` runs
   after the pass, it lists `TOOL-aMendedFleet-85` among the ask's live specs and the ask reads
   SPECCED or INPROGRESS until this unit closes.
   Red when: the header's verb names an ask the fold cannot join, or still reads `closes` after unit
   39 was retired.
+- **AC5** — When `bash skills/session-kickoff/manifest-check.sh` runs after the unit's commit, it
+  exits 0, and `git diff HEAD~1 HEAD -- memory/guides/SESSION-KICKOFF.md` shows the `last-audit:`
+  line moved.
+  Red when: check 5 reports unaudited drift on `coding-governance-agents.template.md`.
 
 No new refusal or gate clause is added, so nothing here is observed RED on a staged break; each
 `Red when:` names the break an existing checker or grep reports.
 
 ## 7. Gates
 
-`template size <=48KiB` · `charter size` · `line length` · `playbook render wiring` · `playbook parity` · `govkit runbook parity` · `install-prefix (shipped surface)` · `spec tokens (a spec's own names resolve)`
+`template size <=48KiB` · `charter size` · `line length` · `playbook render wiring` · `playbook parity` · `govkit runbook parity` · `install-prefix (shipped surface)` · `kickoff-manifest ratchet` · `recall floor` · `recall floor arms` · `spec tokens (a spec's own names resolve)`
 
 All run once, at the close.
 
@@ -153,6 +172,10 @@ All run once, at the close.
 
 - rev-1 · 2026-10-04 · initial draft, split from unit 39 at its F1, from the four carriers of the
   phrase, the map kit's scaffolded rules and the aProbedToolkit measurements journal at base.
+- rev-2 · 2026-10-04 · S5 · S6 · AC3 · AC5 · §3 · §4 · §7 · M2 cross-read: `PLAY-aMendedFleet-2`
+  prices template and charter growth past a high-water with `--bump` and this unit, which grows
+  both after it, did not; the template is a watched path, which units 78 and 94 re-stamp for and
+  this spec did not; and the wrapper-trim dependency its Rollout states is now a declared edge.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-26 — a `missing:` citation form names an id that has no record, with its own count
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 26
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 26
 
 <!-- gen:spec-records -->
 
@@ -39,6 +39,9 @@ walker counts it on its own. Citing an id that HAS a record is unchanged.
 - **S6** — Check 14's catalogue entry in `tools/memory-tree/HYGIENE.template.md` gains two
   sentences, the form and its stale clause, and `memory/HYGIENE.md` is re-rendered from it by
   `bash tools/memory-tree/kit-dogfood-parity.test.sh --render`. Observed by AC4.
+- **S7** — `memory/map/generated/symbols.json` is regenerated for the new
+  definitions. NOT OBSERVED by a criterion here: `python tools/codebase-map/gen_map.py --check` at
+  the close is its check, and §7 names the leg that reads it.
 
 ## 3. Non-goals (OUT)
 
@@ -103,6 +106,7 @@ missing-form ids : <n>  [<ids>]
 - `tools/memory-tree/gen_build_index.py`
 - `tools/memory-tree/HYGIENE.template.md`
 - `memory/HYGIENE.md`
+- `memory/map/generated/symbols.json`
 
 ### Alternatives rejected
 
@@ -149,7 +153,7 @@ missing-form ids : <n>  [<ids>]
 
 ## 7. Gates
 
-`memory hygiene` · `corpus-ids selftest` · `build-index selftest` · `memory-hygiene self-test` · `verdict-epoch self-test` · `row-keyed merge driver replay` · `kit/dogfood doc parity` · `gotchas selftest` · `row-grammar selftest` · `backlog migration selftest` · `check-arms selftest` · `transition-audit arms` · `straggler-guard arms` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `kit epoch (shipped bytes move, the version moves)` · `spec tokens (a spec's own names resolve)`
+`memory hygiene` · `corpus-ids selftest` · `build-index selftest` · `memory-hygiene self-test` · `verdict-epoch self-test` · `row-keyed merge driver replay` · `kit/dogfood doc parity` · `gotchas selftest` · `row-grammar selftest` · `backlog migration selftest` · `check-arms selftest` · `transition-audit arms` · `straggler-guard arms` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `kit epoch (shipped bytes move, the version moves)` · `codebase-map coverage + freshness` · `spec tokens (a spec's own names resolve)`
 
 The memory-tree legs past the first four are owed by the kit-directory guard, which the checker
 excludes as broad; they are named so the close reads one list.
@@ -174,6 +178,9 @@ New arm: tools/memory-tree/gen_build_index.py --selftest · a fixture whose spec
 
 - rev-1 · 2026-10-04 · initial draft, from `walk`, `rosters`, the anchor patterns and the
   foreign-id gotcha at base, and a corpus report.
+- rev-2 · 2026-10-04 · §2 S7 · §4 · §7 · M2 cross-read: the definitions this unit adds
+  move `memory/map/generated/symbols.json`, which `TOOL-aMendedFleet-82` and the build's other
+  code units regenerate and declare; this spec omitted the write, its Files touched row and the leg.
 
 ## 10. Reuse audit
 

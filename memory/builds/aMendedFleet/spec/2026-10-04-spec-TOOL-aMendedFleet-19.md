@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-19 — `gen_build_index.py --doctor <slug>` prints every failing build-folder rule in one pass
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 19
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 19
 
 <!-- gen:spec-records -->
 
@@ -50,6 +50,9 @@ brief unit 19.
   carrying a `/`, and a slug naming no folder. Observed by AC4.
 - **S8** — The kit README's Print modes paragraph names `--doctor`, its two graders, its cost and the
   tracked-state precondition. Observed by AC7.
+- **S9** — `memory/map/generated/symbols.json` is regenerated for the new
+  definitions. NOT OBSERVED by a criterion here: `python tools/codebase-map/gen_map.py --check` at
+  the close is its check, and §7 names the leg that reads it.
 
 ## 3. Non-goals (OUT)
 
@@ -112,6 +115,7 @@ One grader outcome, the shape `derive_doctor_verdict` reads:
 
 - `tools/memory-tree/gen_build_index.py`
 - `tools/memory-tree/README.md`
+- `memory/map/generated/symbols.json`
 
 ### Rollout
 
@@ -180,7 +184,7 @@ bump is owed once, at this build's close.
 
 ## 7. Gates
 
-`build-index selftest` · `build README slot contract` · `memory hygiene` · `lexicon naming predicates` · `install-prefix (shipped surface)` · `kit version markers`
+`build-index selftest` · `build README slot contract` · `memory hygiene` · `lexicon naming predicates` · `install-prefix (shipped surface)` · `kit version markers` · `recall floor` · `recall floor arms` · `codebase-map coverage + freshness`
 
 New arm: tools/memory-tree/gen_build_index.py --selftest · the attribution arm of AC6 and the verdict arms of AC5, against today's generator, which has no doctor mode · none
 
@@ -211,6 +215,9 @@ New arm: tools/memory-tree/gen_build_index.py --selftest · the attribution arm 
 
 - rev-1 · 2026-10-04 · initial draft, from `cmd_check_format`, `check_contract_registry`, the mode
   dispatch and the hygiene gate's `--offenders` mode at base.
+- rev-2 · 2026-10-04 · §2 S9 · §4 · §7 · M2 cross-read: the definitions this unit adds
+  move `memory/map/generated/symbols.json`, which `TOOL-aMendedFleet-82` and the build's other
+  code units regenerate and declare; this spec omitted the write, its Files touched row and the leg.
 
 ## 10. Reuse audit
 

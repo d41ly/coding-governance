@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-17 — `tier2-review.js` keeps each finding's bug-class label in the committed appendix
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 17
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 17
 
 <!-- gen:spec-records -->
 
@@ -42,13 +42,17 @@ the records from the next review on. Report `[B#4]`, brief unit 17.
 - **S6** — The committed review record carries the column, because the synthesis already copies the
   appendix verbatim. NOT OBSERVED by this unit: only a live review writes a record, and this build's
   closing diff review is the first one that will.
+- **S7** — `memory/map/generated/symbols.json` is regenerated for the new
+  definitions. NOT OBSERVED by a criterion here: `python tools/codebase-map/gen_map.py --check` at
+  the close is its check, and §7 names the leg that reads it.
 
 ## 3. Non-goals (OUT)
 
 - Counting hits across records, and pruning or demoting classes nobody's review ever caught. The
   report names that as the step after this one; it needs the counts this unit starts to accrue.
-- Ranking or cutting the checklist itself. That is `TOOL-aMendedFleet-16`, which changes which items
-  `gotchas.py --for-diff` selects, not the item shape this unit reads.
+- Ranking or cutting the checklist itself. That is `TOOL-aMendedFleet-16`, which orders and compacts
+  the items `gotchas.py --for-diff` selects and keeps selection unchanged. Its S4 tags every item's
+  first line and keeps the class slug as the first token after the box, which is all S1 reads.
 - A `claim` column in the appendix. `TOOL-aSightedSkeptic-8` refused it (its §8 F4): free text is the
   cell most likely to break a row of the table `review_replay.py` parses, and this unit leaves that
   ruling standing.
@@ -60,9 +64,10 @@ the records from the next review on. Report `[B#4]`, brief unit 17.
 
 ### Edges
 
-- **consumes-from** external — the gotchas checklist item shape, a `[ ]` box then the class slug as
-  the first token. A future reshape degrades S1's names to their `C<n>` labels rather than to wrong
-  slugs, because a token that is not a lowercase slug is never taken for one.
+- **consumes-from** `TOOL-aMendedFleet-16` — the gotchas checklist item shape that unit's S4 keeps,
+  a `[ ]` box then the class slug as the first token, a tier tag after it. A future reshape degrades
+  S1's names to their `C<n>` labels rather than to wrong slugs, because a token that is not a
+  lowercase slug is never taken for one.
 
 ## 4. Design
 
@@ -112,6 +117,7 @@ The appendix header after this unit:
 - `tools/workflows/tier2-review.template.js`
 - `tools/workflows/tier2-review.js`
 - `tools/workflows/README.md`
+- `memory/map/generated/symbols.json`
 
 ### Rollout
 
@@ -174,7 +180,7 @@ owed once, at this build's close.
 
 ## 7. Gates
 
-`workflow script syntax` · `review-protocol parity (kit vs dogfood)` · `tier2-review self-test` · `verifier fan-out self-test` · `unattended-build self-test` · `review-join self-test` · `review-replay selftest` · `lexicon naming predicates`
+`workflow script syntax` · `review-protocol parity (kit vs dogfood)` · `tier2-review self-test` · `verifier fan-out self-test` · `unattended-build self-test` · `review-join self-test` · `review-replay selftest` · `lexicon naming predicates` · `recall floor` · `recall floor arms` · `codebase-map coverage + freshness`
 
 New arm: tools/workflows/tier2-review.test.sh · an appendix arm whose ledger carries labelled and unlabelled claims, asserting the nine-column header and the `classes` cells; the existing header pin moves to nine columns · the suite's assertion floor rises by the arms added
 
@@ -200,6 +206,12 @@ New arm: tools/workflows/tier2-review.test.sh · an appendix arm whose ledger ca
 
 - rev-1 · 2026-10-04 · initial draft, from `deriveChecklistShares`, the ledger and `renderAppendix` at
   base, and the stored lens files on node a.
+- rev-2 · 2026-10-04 · §2 S7 · §4 · §7 · M2 cross-read: the definitions this unit adds
+  move `memory/map/generated/symbols.json`, which `TOOL-aMendedFleet-82` and the build's other
+  code units regenerate and declare; this spec omitted the write, its Files touched row and the leg.
+  §3 also corrects its description of `TOOL-aMendedFleet-16`, which it said changes
+  which items are selected; that unit orders and compacts them and keeps selection. Edges: the
+  item-shape edge names that unit instead of `external`.
 
 ## 10. Reuse audit
 

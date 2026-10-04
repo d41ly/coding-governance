@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-93 — one tier2 review run with and without the charter, and the review default follows the reading
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 93
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 93
 
 <!-- gen:spec-records -->
 
@@ -80,8 +80,8 @@ reads. It never claims an effect beyond the one pair it measured.
 
 ### Edges
 
-- **consumes-from** external — unit 67's `workerType` argument and its durability announcement;
-  without them arm B cannot be spawned and S4 has nothing to default.
+- **consumes-from** `TOOL-aMendedFleet-67` — the `workerType` argument and its durability
+  announcement; without them arm B cannot be spawned and S4 has nothing to default.
 - **hands-off** external — the drift harnesses' default, and any second pair, which a later build
   may run with this unit's instrument.
 
@@ -255,6 +255,8 @@ New arm: `tools/workflows/tier2-review.test.sh` · only on `DEFAULT-PLAN`: stub 
 
 - rev-1 · 2026-10-04 · initial draft, from unit 67's spec, the harness's return object and resume
   key, a workflow agent's transcript and meta file on node a, and the aWindowedPass round-1 record.
+- rev-2 · 2026-10-04 · §3 · M2 cross-read: the edge on unit 67 was written `external` for a sibling
+  of this build; it now names `TOOL-aMendedFleet-67`, which declares the reciprocal hands-off.
 
 ## 10. Reuse audit
 

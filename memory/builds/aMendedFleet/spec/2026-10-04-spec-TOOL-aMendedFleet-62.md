@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-62 — the two history legs grade the run's own range, reusing node d's bytes
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 62
+**Status:** SPECCED · rev-3 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 62
 
 <!-- gen:spec-records -->
 
@@ -49,8 +49,10 @@ made afterwards in `83eec3021` so its own lexicon leg stayed green.
 
 - Check 23's half of node d's unit: its RANGE mode in `tools/unattended/check-unattended.sh`, the
   per-build budget key that takes the ceiling key's place, the fleet line, the retired measuring
-  flag, and the drift signal that reads the fleet line. §8 F1 splits them out. Their hunks also do
-  not apply to this tree as they stand, which this unit's probe measured.
+  flag, and the drift signal that reads the fleet line. §8 F1 splits them out, to
+  `TOOL-aMendedFleet-92`, which builds the fleet line and the drift signal and finds the range mode,
+  the budget key, the ceiling key and the flag already settled on main by another route. Their
+  hunks also do not apply to this tree as they stand, which this unit's probe measured.
 - Routing the driver or the kit gate through S1's reader. Node d left that as a known residual of
   three bounded observations of one advertisement, and this unit keeps their decision.
 - Node d's later units, whose commits touch `tools/unattended/lib-unattended.sh` after these, and
@@ -59,8 +61,8 @@ made afterwards in `83eec3021` so its own lexicon leg stayed green.
 
 ### Edges
 
-- **hands-off** external — check 23's range mode, its per-build budget, the fleet line and the drift
-  signal reading it, which §8 F1 moves to a new unit the run adds.
+- **hands-off** `TOOL-aMendedFleet-92` — check 23's range mode, its per-build budget, the fleet line and
+  the drift signal reading it, which §8 F1 split off.
 
 ## 4. Design
 
@@ -204,6 +206,10 @@ New arm: `tools/unattended/check-brief-recorded.test.sh` · node d's range arms:
 
 - rev-1 · 2026-10-04 · initial draft, from the spec brief's unit 62 and report item [B#14], node d's
   spec at `d99cd0328`, and an applicability probe of node d's three commits against base.
+- rev-2 · 2026-10-04 · §3 · the split-off half pointed at "a new unit the run adds"; it is
+  `TOOL-aMendedFleet-92`, which narrowed it to the fleet line and the drift signal. The Edges bullet
+  stays `external` until that unit declares the reciprocal edge.
+- rev-3 · 2026-10-04 · §3 names the hands-off to TOOL-aMendedFleet-92, which declares the consumes-from back (check 12 edge join).
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # KICK-aMendedFleet-4 — the orientation card notes a PATH CLI older than the running session
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams kickoff · ratified 2026-10-04 · order 96
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams kickoff · ratified 2026-10-04 · order 96
 
 <!-- gen:spec-records -->
 
@@ -104,7 +104,6 @@ Read at base `7af5f564`; `skills/session-kickoff/` is byte-identical at the work
 - `skills/session-kickoff/manifest-check.sh`
 - `skills/session-kickoff/manifest-check.test.sh`
 - `memory/map/features/session-kickoff.md`
-- `memory/map/generated/symbols.json`
 
 ### Alternatives rejected
 
@@ -190,6 +189,9 @@ New arm: `skills/session-kickoff/manifest-check.test.sh` · covers AC1 to AC4 ·
 
 - rev-1 · 2026-10-04 · initial draft; split from unit 77 at its F1, from unit 61's version rule and a
   timed `claude --version` read on node a.
+- rev-2 · 2026-10-04 · §4 · Files touched named `memory/map/generated/symbols.json`, which
+  enumerates Python and JavaScript definitions only; `derive_cli_line` is shell, and
+  `KICK-aMendedFleet-1`, adding a shell function to the same engine, declares no such write.
 
 ## 10. Reuse audit
 

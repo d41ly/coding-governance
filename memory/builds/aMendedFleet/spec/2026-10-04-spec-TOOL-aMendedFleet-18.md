@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-18 — `tier2-review.js` prints one machine shape line with severity counts and output tokens
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 18
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 18
 
 <!-- gen:spec-records -->
 
@@ -42,6 +42,9 @@ a grep. Report `[B#23]`, brief unit 18.
   own line, immediately above the appendix heading. Observed by AC4.
 - **S5** — The kit README's return-field paragraph states the grammar, what `out-tokens` covers and
   what it cannot. Observed by AC5.
+- **S6** — `memory/map/generated/symbols.json` is regenerated for the new
+  definitions. NOT OBSERVED by a criterion here: `python tools/codebase-map/gen_map.py --check` at
+  the close is its check, and §7 names the leg that reads it.
 
 ## 3. Non-goals (OUT)
 
@@ -94,6 +97,7 @@ cannot reach the record, and two lines, one per side, would disagree on `out-tok
 - `tools/workflows/tier2-review.template.js`
 - `tools/workflows/tier2-review.js`
 - `tools/workflows/README.md`
+- `memory/map/generated/symbols.json`
 
 ### Rollout
 
@@ -148,7 +152,7 @@ version bump is owed once, at this build's close.
 
 ## 7. Gates
 
-`workflow script syntax` · `review-protocol parity (kit vs dogfood)` · `tier2-review self-test` · `verifier fan-out self-test` · `unattended-build self-test` · `review-join self-test` · `lexicon naming predicates`
+`workflow script syntax` · `review-protocol parity (kit vs dogfood)` · `tier2-review self-test` · `verifier fan-out self-test` · `unattended-build self-test` · `review-join self-test` · `lexicon naming predicates` · `recall floor` · `recall floor arms` · `codebase-map coverage + freshness`
 
 New arm: tools/workflows/tier2-review.test.sh · each stubbed exit path asserts its return carries a `shape` matching the S1 grammar with the stage its path reaches, and `out-tokens=unknown` under the stub runtime · the suite's assertion floor rises by the arms added
 
@@ -166,6 +170,9 @@ New arm: tools/workflows/tier2-review.test.sh · each stubbed exit path asserts 
 ## 9. Revision log
 
 - rev-1 · 2026-10-04 · initial draft, from the five exit returns and the synthesis prompt at base.
+- rev-2 · 2026-10-04 · §2 S6 · §4 · §7 · M2 cross-read: the definitions this unit adds
+  move `memory/map/generated/symbols.json`, which `TOOL-aMendedFleet-82` and the build's other
+  code units regenerate and declare; this spec omitted the write, its Files touched row and the leg.
 
 ## 10. Reuse audit
 

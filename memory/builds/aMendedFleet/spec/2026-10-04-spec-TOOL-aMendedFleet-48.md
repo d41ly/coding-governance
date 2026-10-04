@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-48 — drift readings append to a node-local history file
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 48
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 48
 
 <!-- gen:spec-records -->
 
@@ -52,15 +52,20 @@ change at an equal count.
   moves `key_hash`, and a directory squatting on the file's name leaves the exit status unchanged.
   NOT OBSERVED by a criterion here: the suite runs once at the close, and the arm is declared under
   `New arm:` in §7.
+- **S8** — `memory/map/generated/symbols.json` is regenerated for the new definitions. NOT OBSERVED
+  by a criterion here: `python tools/codebase-map/gen_map.py --check` at the close is its check, and
+  §7 names the legs that read it.
 
 ## 3. Non-goals (OUT)
 
 - A reader of the file. The BASE-to-HEAD delta at the unattended close is
-  `TOOL-aMendedFleet-49`; the orientation card's last-row line is a later unit of this build.
+  `TOOL-aMendedFleet-49`, the DEAD-for-N rule is `TOOL-aMendedFleet-90`, and the orientation card's
+  last-row line is `KICK-aMendedFleet-1`.
 - Rotation or a size cap. At about 19 rows of about 120 B a bar, a thousand bars is about 2 MB;
   a cap is filed when a reading shows it is needed, not before.
-- A "rising" signal, the lexicon kill rule and identity baselines, which read this history and are
-  other units of this build.
+- A "rising" signal and a lexicon kill rule over this history. No unit of this build builds either,
+  and the identity baselines of `TOOL-aMendedFleet-56` read the project layer at the base ref, not
+  this file.
 - The fresh-file lexicon arm the synthesis mentioned beside the history. It is a second mechanism.
 - Writing from `--json` or the plain table. Those are an operator's ad-hoc reads, often from a dirty
   tree, and a history mixing them with bar readings could not say which reading graded a commit.
@@ -69,8 +74,12 @@ change at an equal count.
 ### Edges
 
 - **hands-off** `TOOL-aMendedFleet-49` — the delta reader of this file at the unattended close.
-- **hands-off** external — the orientation card's last-row line, a later unit of this build that
-  reads the header contract S2 defines.
+- **hands-off** `TOOL-aMendedFleet-56` — `extract_unlocated`, hoisted by S4, which that unit's row
+  identity falls back to instead of spelling the unlocating step a second time.
+- **hands-off** `TOOL-aMendedFleet-90` — the DEAD-for-N reader of this file, through
+  `resolve_history_path` and the header contract S2 defines.
+- **hands-off** `KICK-aMendedFleet-1` — the orientation card's last-row line, which reads the header
+  contract S2 defines.
 
 ## 4. Design
 
@@ -105,6 +114,7 @@ whose common dir is read-only reports the S5 stderr line on every bar and is oth
 - `tools/drift-audit/drift_report.py`
 - `tools/drift-audit/selftest.py`
 - `tools/drift-audit/README.md`
+- `memory/map/generated/symbols.json`
 
 ### Alternatives rejected
 
@@ -160,7 +170,7 @@ whose common dir is read-only reports the S5 stderr line on every bar and is oth
 
 ## 7. Gates
 
-`drift-audit records` · `drift-audit selftest` · `drift-audit wiring` · `kit epoch (shipped bytes move, the version moves)` · `lexicon naming predicates` · `spec tokens (a spec's own names resolve)`
+`drift-audit records` · `drift-audit selftest` · `drift-audit wiring` · `codebase-map coverage + freshness` · `recall floor` · `recall floor arms` · `kit epoch (shipped bytes move, the version moves)` · `lexicon naming predicates` · `spec tokens (a spec's own names resolve)`
 
 New arm: `tools/drift-audit/selftest.py` · two `--check` runs, a non-writing mode, a member swap at an equal count and a directory on the file's name, in a fixture repo · `CHECK_FLOOR` moves by the checks the arm adds
 
@@ -180,6 +190,11 @@ New arm: `tools/drift-audit/selftest.py` · two `--check` runs, a non-writing mo
 ## 9. Revision log
 
 - rev-1 · 2026-10-04 · initial draft.
+- rev-2 · 2026-10-04 · §3 · S8 · §4 · §7 · M2 cross-read: §3 said a rising signal, a lexicon kill
+  rule and identity baselines read this history, but no unit builds the first two and
+  `TOOL-aMendedFleet-56` reads the base ref's project layer; the readers that do exist, units 90 and
+  `KICK-aMendedFleet-1`, and unit 56's use of `extract_unlocated` are now named edges; and the new
+  definitions owe `symbols.json`, which units 57, 59 and 90 regenerate and this spec omitted.
 
 ## 10. Reuse audit
 

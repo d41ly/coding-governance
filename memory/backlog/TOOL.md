@@ -142,6 +142,7 @@ Cite ids, never line numbers.
 | [TOOL-aLexedStripper-4](../builds/aLexedStripper/BACKLOG.md) | OPEN | — | — | 2026-08-30 | STILL OPEN after TOOL-dMispairedQuote-1, which changed that function's… |
 | [TOOL-aLexedStripper-7](../builds/aLexedStripper/BACKLOG.md) | OPEN | — | — | 2026-08-30 | scan_js_definitions in tools/codebase-map/map_lib.py strips BLOCK… |
 | [TOOL-aLexedStripper-8](../builds/aLexedStripper/BACKLOG.md) | OPEN | — | — | 2026-08-30 | the codebase-map 1.3 and agent-cap 1.9 fixes land upstream, but an… |
+| [TOOL-aMendedFleet-95](../builds/aMendedFleet/BACKLOG.md) | OPEN | LOW | — | 2026-10-04 | WIRE-INTO-PROJECT.md tells an adopter that the charter's node registry… |
 | [TOOL-aMeteredTurnstile-2](../builds/aMeteredTurnstile/BACKLOG.md) | OPEN | — | — | 2026-08-20 | the bar LEAKS scratch git repos into TMPDIR and never sweeps them: 786… |
 | [TOOL-aMeteredTurnstile-3](../builds/aMeteredTurnstile/BACKLOG.md) | SPECCED | — | TOOL-aMendedFleet-72 | 2026-08-20 | gate-timings.tsv evicts on the RUN, never on the manifest: the… |
 | [TOOL-aMeteredTurnstile-5](../builds/aMeteredTurnstile/BACKLOG.md) | OPEN | — | — | 2026-08-20 | longest-first dispatch pessimises time-to-first-signal by construction:… |

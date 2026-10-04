@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-54 — drift reports `live_builds_without_activity` from the dormant rows LIVE.md renders
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 54
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 54
 
 <!-- gen:spec-records -->
 
@@ -39,6 +39,9 @@ resumed. It defines no second dormancy rule.
   unknown cell is unjudgeable; a column placed after `Activity` moves nothing. NOT OBSERVED by a
   criterion here: the suite runs once at the close, and the arms are declared under `New arm:` in
   §7.
+- **S5** — `memory/map/generated/symbols.json` is regenerated for the new definition. NOT OBSERVED
+  by a criterion here: `python tools/codebase-map/gen_map.py --check` at the close is its check, and
+  §7 names the legs that read it.
 
 ## 3. Non-goals (OUT)
 
@@ -80,6 +83,7 @@ Read at worktree HEAD `725b1449`, whose `tools/` and `memory/LIVE.md` bytes equa
 - `tools/drift-audit/drift_report.py`
 - `tools/drift-audit/selftest.py`
 - `tools/drift-audit/README.md`
+- `memory/map/generated/symbols.json`
 
 ### Alternatives rejected
 
@@ -125,7 +129,7 @@ Read at worktree HEAD `725b1449`, whose `tools/` and `memory/LIVE.md` bytes equa
 
 ## 7. Gates
 
-`drift-audit selftest` · `drift-audit records` · `encoding posture (text IO names its encoding)` · `lexicon naming predicates` · `kit epoch (shipped bytes move, the version moves)` · `spec tokens (a spec's own names resolve)`
+`drift-audit selftest` · `drift-audit records` · `encoding posture (text IO names its encoding)` · `codebase-map coverage + freshness` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `kit epoch (shipped bytes move, the version moves)` · `spec tokens (a spec's own names resolve)`
 
 New arm: `tools/drift-audit/selftest.py` · fixture LIVE.md tables with dormant rows, without the column, with an unknown cell and with a later column · `CHECK_FLOOR` moves by the checks the arm adds
 
@@ -139,6 +143,8 @@ New arm: `tools/drift-audit/selftest.py` · fixture LIVE.md tables with dormant 
 ## 9. Revision log
 
 - rev-1 · 2026-10-04 · initial draft, from the synthesis's item [#59] and unit 12's hands-off.
+- rev-2 · 2026-10-04 · S5 · §4 · §7 · M2 cross-read: the new definition owes `symbols.json`, which
+  units 57, 59 and 90 regenerate for theirs and this spec omitted.
 
 ## 10. Reuse audit
 

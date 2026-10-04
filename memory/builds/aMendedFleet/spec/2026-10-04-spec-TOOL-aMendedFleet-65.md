@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-65 — the lander mints kit versions, so a branch owes no bump
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 65
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 65
 
 <!-- gen:spec-records -->
 
@@ -42,7 +42,9 @@ and the two epoch legs stop demanding a bump anywhere but at the push boundary.
   counts as a bump for every move the merge contains, and the idempotency check and
   `check_prepared_merge` still see one merge whose first parent is the tip. A minter exit other than
   0 aborts the merge, checks the branch back out unmoved, prints the minter's lines and returns 1,
-  the shape of the CONFLICT refusal. Observed by AC1, AC3, AC6.
+  the shape of the CONFLICT refusal. Unit 3's merge-loss check keeps the place its S5 gives it, after
+  a merge commit exists and before the compare-and-swap `update-ref`, so it grades the committed,
+  minted merge. Observed by AC1, AC3, AC6.
 - **S4** — The attended landing, `push-main.sh` with no argument, runs the minter after its reconcile
   step on every attempt, with `--base` set to the fetched remote tip. When the minter wrote anything,
   it commits the writes on the default branch with the subject
@@ -68,6 +70,9 @@ and the two epoch legs stop demanding a bump anywhere but at the push boundary.
   `tools/memory-tree/check-verdict-epoch.test.sh` stage the moves AC1, AC7 and AC9 stage.
   NOT OBSERVED by a criterion here: those suites run once at the close, and each arm is declared
   under `New arm:` in §7.
+- **S10** — `memory/map/generated/symbols.json` is regenerated for the new definitions.
+  NOT OBSERVED by a criterion here: `python tools/codebase-map/gen_map.py --check` at the close is its
+  check, and §7 names the leg that reads it.
 
 ## 3. Non-goals (OUT)
 
@@ -148,6 +153,7 @@ and its mint then reads a value equal to the tip's and moves it one further.
 - `tools/push-main.test.sh`
 - `tools/memory-tree/check-verdict-epoch.sh`
 - `tools/memory-tree/check-verdict-epoch.test.sh`
+- `memory/map/generated/symbols.json`
 
 ### Rollout
 
@@ -233,7 +239,7 @@ close is satisfied by the lander.
 
 ## 7. Gates
 
-`kit epoch (shipped bytes move, the version moves)` · `verdict epoch (kit version dates the engine)` · `kit version markers` · `govkit selfcheck` · `govkit acceptance matrix` · `govkit refusal join` · `govkit selftest` · `recall floor arms` · `install-prefix (shipped surface)` · `lexicon naming predicates` · `line length` · `spec tokens (a spec's own names resolve)`
+`kit epoch (shipped bytes move, the version moves)` · `verdict epoch (kit version dates the engine)` · `kit version markers` · `govkit selfcheck` · `govkit acceptance matrix` · `govkit refusal join` · `govkit selftest` · `codebase-map coverage + freshness` · `recall floor arms` · `install-prefix (shipped surface)` · `lexicon naming predicates` · `line length` · `spec tokens (a spec's own names resolve)` · `recall floor`
 
 New arm: `tools/push-main.test.sh` · a fixture branch moving a runlog byte, prepared against the base lander, which merges the old value · none
 New arm: `tools/govkit/selftest.py` · `mint` over a fixture registry with one moved kit, against a base govkit with no such verb · none
@@ -266,6 +272,11 @@ New arm: `tools/memory-tree/check-verdict-epoch.test.sh` · an unbumped engine m
 
 - rev-1 · 2026-10-04 · initial draft, from a read of `cmd_epoch`, `cmd_prepare`, the attended
   landing, `check-verdict-epoch.sh`'s base rule and the hook's `GATE_PUSH_BASE` export at base.
+- rev-2 · 2026-10-04 · S3 · cross-read with `TOOL-aMendedFleet-3`: its S5 runs the merge-loss check
+  "after its merge", and this unit makes that merge `--no-commit` until the mint; S3 now places the
+  check after the minted merge is committed, so the two edits to `cmd_prepare` compose. S10, §4 and
+  §7: the two Python definitions move `memory/map/generated/symbols.json`, which the build's other
+  Python-adding units declare with the coverage leg and this spec omitted.
 
 ## 10. Reuse audit
 
