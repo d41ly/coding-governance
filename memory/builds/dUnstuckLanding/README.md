@@ -61,8 +61,8 @@ ids TOOL-dUnstuckLanding-1 TOOL-dUnstuckLanding-2 TOOL-dUnstuckLanding-3 TOOL-dU
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-dUnstuckLanding-1 — the closing-time failure census across gov, inCMS and NicoCares](spec/2026-10-04-spec-TOOL-dUnstuckLanding-1.md) | 1 | 1 | CLOSED | rev-1 | 2026-10-04 |
-| [TOOL-dUnstuckLanding-2 — the design: unattended closes through inherited reds and closing decisions, plus attended-landing verbs](spec/2026-10-04-spec-TOOL-dUnstuckLanding-2.md) | 2 | 1 | CLOSED | rev-1 | 2026-10-04 |
+| [TOOL-dUnstuckLanding-1 — the closing-time failure census across gov, inCMS and NicoCares](spec/2026-10-04-spec-TOOL-dUnstuckLanding-1.md) | 1 | 1 | CLOSED | rev-2 | 2026-10-04 |
+| [TOOL-dUnstuckLanding-2 — the design: unattended closes through inherited reds and closing decisions, plus attended-landing verbs](spec/2026-10-04-spec-TOOL-dUnstuckLanding-2.md) | 2 | 1 | CLOSED | rev-2 | 2026-10-04 |
 | [TOOL-dUnstuckLanding-12 — design rev-2: the closing review's five HIGH findings closed](spec/2026-10-04-spec-TOOL-dUnstuckLanding-12.md) | 3 | 1 | CLOSED | rev-1 | 2026-10-04 |
 <!-- /gen:build-units -->
 

@@ -30,18 +30,23 @@ No gate leg was run in this pass beyond the memory hygiene check over the staged
   - K1 is answered by §3 and §4.
   - K2 is answered by §5 and §6.
   - K3 is answered by §1 and §2.
-  - K6 is answered by §7 and §8.
+  - K6 is answered by §7 and §8, except inCMS's submodule pointer drift. That sub-shape is declined
+    under "What this does not answer" at rev-2 (closing review M8); rev-1's ledger called K6 fully
+    answered.
   - K4 and K5 are declined under "What this does not answer", each with its reason and its existing
     asks.
-- AC3 — `--settle` — §1 and §2 name each verb's phase or fact:
+- AC3 — `--settle` — §1 and §2 name each verb's phase or fact. Since rev-2, the content predicate
+  and the cutoff-dated meaning of ABORTED (closing review H1 and M2) sit under them:
   - `--handoff` writes `HELD` with `owner-landing` or `owner-decision`.
   - `--settle` writes `LANDED` with `landed-by: attended`, or the `work-landed-at` fact on an
     ABORTED record.
 
   Each verb's refusals are named, and the route for an existing ABORTED-but-landed record is
-  `--settle`. No verb writes a terminal without evaluating it: `--settle` writes only what the
-  ancestry derivation proves. `--landed`'s LANDING-only guard and the HELD refusals of
-  `UNATTENDED-STOPS.md` §1 are left as they are.
+  `--settle`. No verb writes a terminal without evaluating it: `--settle` writes only what a derivation
+  proves. For a handed record that is ancestry of its own hand-off commit; for an ABORTED or abandoned
+  record it is the content predicate. `--landed`'s LANDING-only guard is left as it is. The
+  `UNATTENDED-STOPS.md` §1 sentences the derivation changes are listed in §2's owes since rev-2
+  (closing review H4).
 - AC4 — `python tools/memory-tree/gen_build_index.py --asks --build dUnstuckLanding --all` — it read
   back all nine asks, `TOOL-dUnstuckLanding-3` to `-11`. Each was OPEN with a SEV of HIGH or MED, and
   the hygiene gate parsed each one's `KEEP` row with no verdict.

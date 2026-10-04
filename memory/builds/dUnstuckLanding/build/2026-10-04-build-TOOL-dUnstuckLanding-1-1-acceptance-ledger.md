@@ -9,9 +9,10 @@ repositories, and the driver line reads. No gate leg was run in this pass.
 
 **Evidences:** TOOL-dUnstuckLanding-1
 - AC1 — `2026-10-04-build-TOOL-dUnstuckLanding-1-census.md` — the "The runs" section has a
-  sub-section for each of gov, nc and inCMS. Every gov row carries an abort sha or a landing sha in
-  its evidence cell. The nc and inCMS sub-sections cite their landing commits and abort commits by
-  sha.
+  sub-section for each of gov, nc and inCMS. Since rev-2 (closing review M17), each one carries a run
+  table with slug, code, stage, landing and abort on every row. That covers all 15 gov aborts across
+  two tables, 13 in nc and 9 in inCMS. Every sha in those tables was checked with `git cat-file -e`
+  in its own repository.
 - AC2 — `git log origin/main` — for every ABORTED record (8 in gov, 13 in nc with one retired, and
   9 in inCMS with one retired), `git log <tip> --merges --grep=<slug>` found a merge naming the slug for
   29 of the 30. The 30th is nc `dBarredPostern`, whose work the historian traced to `23be1536`, a

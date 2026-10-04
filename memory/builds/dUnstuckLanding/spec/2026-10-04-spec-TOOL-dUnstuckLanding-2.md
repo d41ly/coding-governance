@@ -1,6 +1,6 @@
 # TOOL-dUnstuckLanding-2 — the design: unattended closes through inherited reds and closing decisions, plus attended-landing verbs
 
-**Status:** CLOSED · rev-1 · 2026-10-04 · node d · Tier-1 · base a587e82d · streams tooling · order 2
+**Status:** CLOSED · rev-2 · 2026-10-04 · node d · Tier-1 · base a587e82d · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -84,6 +84,7 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-04 · initial draft.
+- rev-2 · 2026-10-04 · S1 · S3 · S4 · S5 · AC2 · AC3 · §4 · folded closing review round 1's MEDIUM and LOW items into the design record and the asks: M2 to M11 and M13 to M16, and L1 to L7. M1 is closed by H2's pick and M12 by ask 5's rewrite. The HIGH items are TOOL-dUnstuckLanding-12.
 
 ## 10. Reuse audit
 

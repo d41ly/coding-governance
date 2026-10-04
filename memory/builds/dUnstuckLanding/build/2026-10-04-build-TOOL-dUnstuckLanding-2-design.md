@@ -42,8 +42,9 @@ The rest of the design is how a run reaches the right exit without asking anyone
 
 ## 1. The hand-off verb — `--handoff`
 
-**Answers** K2, K3 and K6. Of the 37 aborts, 36 handed work to the owner to land, and the abort
-codes said so (census, "The headline").
+**Answers** K2, K3 and K6. Of the 37 aborts, 36 runs' work reached the default branch, 29 of them
+by an attended merge, and 30 were coded with one of the four hand-off-shaped halt codes (census,
+"The headline").
 
 **Candidates.**
 
@@ -56,8 +57,8 @@ codes said so (census, "The headline").
 **Test.** What each one costs in readers, and whether each one keeps the record true. Counted at
 BASE `0c16a66b`:
 
-- **(a) touches far more readers.** It needs a twin wherever the driver special-cases `HELD`: 84
-  occurrences across 9 files. These are `unattended.sh` (58), `run-gates.sh` (10), `resume-tick.sh`
+- **(a) touches far more readers.** It needs a twin wherever the driver special-cases `HELD`: 85
+  matching lines across 9 files, counted by `grep -c HELD` per file. These are `unattended.sh` (58), `run-gates.sh` (10), `resume-tick.sh`
   (5), `stop-guard.js` (4), `run-unattended-gates.sh` (3), `check-unattended.sh` (2), and one each
   in `backlog.py`, `transition_audit.py` and `runlog/record.py`. It also needs an entry wherever the
   phase SETS are read: 6 files, plus `CORE_FLOOR`.
@@ -69,7 +70,7 @@ BASE `0c16a66b`:
 - **(c) keeps the record false.** It leaves a terminal that says the run finished. That is the
   falsehood the owner is complaining about.
 
-**(a) loses on cost.** Each of the 84 sites is a place for the amendment-leaves-its-other-half-
+**(a) loses on cost.** Each of the 85 sites is a place for the amendment-leaves-its-other-half-
 standing class to land. **(c) loses on truth.**
 
 **Pick — (b).** A new verb, `--handoff <slug> --code owner-landing|owner-decision --reason "<text>"
@@ -80,6 +81,13 @@ standing class to land. **(c) loses on truth.**
   is a recipe, not a paragraph. Under `in-place` the recipe is `--prepare` then `--land`. Under
   `primary` it is the lander from the primary tree.
 - **The settle hint.** It prints the `--settle` line from §2, which the owner runs after landing.
+- **The landing facts.** It writes `units-at-landing`, and `asks-at-landing` wherever the ask
+  contract applies, exactly as an in-place `--close` does. A settled hand-off then carries the facts
+  the landed fact-set arm requires (rev-2, M6).
+- **An attribution guard.** `--code owner-landing` is refused, by `check_inherited_override`'s
+  fail 83, when the last `gates-run` bar is red on any leg that does not read INHERITED. An OWN red is
+  the run's to fix or to hand off as `owner-decision`, never a finished landing waiting for an owner
+  (rev-2, M4).
 
 The two codes say what the owner owes:
 
@@ -88,7 +96,10 @@ The two codes say what the owner owes:
 - `owner-decision` — one parked decision stands first. A decision row is required, and the verb
   refuses without one.
 
-Both join `HOLD_CODES_CORE`, and `HOLD_FLOOR` moves from 5 to 7.
+Both join `HOLD_CODES_CORE`. `HOLD_FLOOR` is a per-project pin, so gov's `.unattended.conf` and the
+kit's example conf move it from 5 to 7 (rev-2, M11). `HANDOFF_CUTOFF` is a new conf key, and like
+every new key it joins the closed import allow-list (`check-unattended.sh:282-290`), the example conf
+and PROTOCOL §8's key table. Check 22 joins those three.
 
 **What changes for `--abort`.**
 
@@ -98,12 +109,16 @@ Both join `HOLD_CODES_CORE`, and `HOLD_FLOOR` moves from 5 to 7.
   the four hand-off-shaped codes prints a notice naming `--handoff`. Those codes are
   `external-prerequisite`, `gate-red-out-of-scope`, `scope-approval-needed` and
   `repo-state-out-of-mandate`. The verb cannot know that the work is sound; the run does.
-- **The backstop is §2's signal.** It flags any `ABORTED` record whose work reached the remote
-  anyway.
+- **The backstop is §2's signal.** It flags an `ABORTED` record whose work reached the remote
+  anyway. The cutoff dates the MEANING, not only the notice (rev-2, M2). A record first committed
+  before `HANDOFF_CUTOFF` is a legacy hand-off, and `--settle` may give it `work-landed-at`. A later
+  one meant discard, so landed work under it is reported as `discarded_work_landed`, and no verb
+  clears that.
 
 **What it owes.**
 
-- `unattended.sh`: the verb, the two codes, and the notice.
+- `unattended.sh`: the verb, the two codes, the notice, and the fail-83 guard.
+- `check-unattended.sh`: the allow-list entry for `HANDOFF_CUTOFF`, and the example conf.
 - `VERBS.template.md`: an entry for `--handoff`.
 - `STOPS.template.md`: §2 and §11. The durable restart a hand-off owes is `none`.
 - `PROTOCOL.template.md`: §3's ABORTED sentence.
@@ -186,15 +201,29 @@ Both join `HOLD_CODES_CORE`, and `HOLD_FLOOR` moves from 5 to 7.
   leg's check-7 exclusion and its fact-set arm accept it, with `landed-by: attended` added to the
   fact set.
 - **(c2) `--settle <slug>` writes what (c1) derives.** It also writes `work-landed-at` onto an
-  ABORTED record. Any session may run it, attended or not, because the act is an observation: it
-  writes only what the advertised tip proves.
+  ABORTED record first committed before `HANDOFF_CUTOFF` whose work the content predicate reads
+  landed. On a later ABORTED record it refuses with a number. Any session may run it, attended or
+  not, because the act is an observation: it writes only what the advertised tip proves.
+  - **A lease-dead non-terminal record (rev-2, M16).** Some records are interrupted with no verb
+    written at all: gov `aClosedDocket` and `aUnblockedFleet` at BUILDING, inCMS `aClearedPortico`
+    at BUILDING and `dPlumbedAtrium` at VERIFYING. For such a record whose work the content
+    predicate reads landed, `--settle` writes `work-landed-at` and an `abandoned` marker under the
+    CURRENT phase, never a terminal. `--preflight`'s concurrent-run announcement then reads the
+    marker as not-live.
+  - **Upheld, not merely present (rev-2, M3).** Check 15 tests each `work-landed-at` against the
+    content predicate, as it already tests `landed-derived` against the tip. A hand-written fact reds.
+  - **Its own landing (rev-2, L1).** A settle commit is a records commit made after the work landed,
+    so it needs a landing of its own. It rides the next landing from the same tree, or a batched
+    owner pass, and its record reads correctly in every deriving reader before then.
   - **What it refuses.** It refuses, numbered, on a record that neither derivation covers. It
     refuses on a live lease that is not the caller's. And it refuses when the remote does not answer.
   - **A narrow exception to fail 26.** For an ABORTED record, the one fact is the only write fail 26
     admits. The exception is stated in protocol §3 beside "A run that is already terminal cannot be
     moved at all", because a rule with an unstated exception is two answers to one question.
-- **(c3) A drift-audit signal, `aborted_work_landed`.** It lists every ABORTED record that the
-  content predicate reads ON and that carries no `work-landed-at`. Its liveness comes from the same
+- **(c3) A drift-audit signal, `aborted_work_landed`.** It lists every ABORTED record, first
+  committed before `HANDOFF_CUTOFF`, that the content predicate reads ON and that carries no upheld
+  `work-landed-at`. Its sibling class, `discarded_work_landed`, lists a later one, and no verb clears
+  it. Its liveness comes from the same
   three fixture records (c2)'s arms use, each of which must read OFF. It is never fed a free-standing
   sha. Its count today is not claimed here, because rev-1's 28 counted records that reached main, not
   work that landed.
@@ -213,7 +242,8 @@ Both join `HOLD_CODES_CORE`, and `HOLD_FLOOR` moves from 5 to 7.
   - §12.
 - `PROTOCOL.template.md`: §3, both the exception and the "write the two ends" sentence.
 - `VERBS.template.md`: an entry for `--settle`.
-- `tools/drift-audit/drift_report.py`: the signal.
+- `tools/drift-audit/drift_signals.template.py`, and gov's `drift_signals.py`: the signal (rev-2,
+  L6). `drift_report.py` only loads it.
 - `check-unattended.sh`: check 7, check 15 and the fact-set arm.
 
 **Filed as** `TOOL-dUnstuckLanding-4` for (c1) and (c2), and `TOOL-dUnstuckLanding-5` for (c3).
@@ -326,11 +356,11 @@ exceptions. nc's build tenure was behind 6 pin raises, and its history legs behi
 - **(a) Grade each such leg over the run's own range and the run's own budget.**
   - **The history legs**, `brief-recorded`, check 23 and `pass-order`, grade only commits in
     `<advertised tip>..HEAD`. A violation already on the default branch was graded when it landed,
-    and it is never graded again.
+    and it is never graded again. Check 23 is HERE and only here (rev-2, M7). Its undeclared-write
+    count is a count of passes, and a closing run's passes are its own range.
   - **The fleet counters** grade only the closing build's own contribution against a per-build
-    budget. Those counters are the undeclared-write count, build tenure, and any count summed over
-    other builds' records. The fleet total is REPORTED, with a `fleet` line, and never fails a
-    closing run.
+    budget. Those counters are build tenure and any count summed over OTHER builds' records. The
+    fleet total is REPORTED, with a `fleet` line, and never fails a closing run.
 - **(b) Leave the legs as they are, and let §3's policy land them as INHERITED.**
 - **(c) Leave them, and auto-exclude any record whose build has a derived terminal.** This
   generalises what gov did for check 23, where `TOOL-aSightedSkeptic-13` took the ceiling from 45 to
@@ -338,10 +368,10 @@ exceptions. nc's build tenure was behind 6 pin raises, and its history legs behi
 
 **Test.** The census instances:
 
-- **(b) cannot catch the shared-counter case.** A shared counter crossed by the run's OWN
-  increment, together with others' rows, reads MIXED, not INHERITED. inCMS `dTuckedKebab` was 29
-  against 20: 11 rows its own, 18 another build's. So (b) still stops on it, although the run's own
-  11 were the only part it could act on.
+- **(b) cannot catch the shared-counter case.** inCMS `dTuckedKebab` was 29 against 20: 11 rows its
+  own, 18 another build's. At R the count was 18, which is GREEN, so classifier rule 3
+  (`run-gates.sh:2397-2399`) reads the leg OWN (rev-2, L3). So (b) still stops on it, although
+  another build's 18 rows were what filled the ceiling.
 - **(c) fixes only part.** It closes the stale-record half: inCMS `dSnideCartographer`'s 18 rows
   were a record that never reached a terminal. It leaves build tenure, which counts OTHER live
   builds' age, and the history legs, whose subject is landed history.
@@ -350,12 +380,21 @@ exceptions. nc's build tenure was behind 6 pin raises, and its history legs behi
   most of the way to (a), with generated renders skipped and terminal records excluded. (a)
   finishes the job and names the principle: a closing run's bar grades the closing run.
 
-**Pick — (a).** Where a project wants the fleet ceiling to BIND somewhere, it binds in a scheduled
-or owner-run audit — drift-audit or the remote CI's daily `held` job. It does not bind in a closing
-run's bar.
+**Pick — (a).** Where a project wants a fleet total to BIND, it binds in a drift-audit signal,
+`fleet_over_budget`, with a liveness assertion: a fixture fleet over its total must be listed. It
+does not bind in a closing run's bar. Rev-1 named the remote CI's daily `held` job, which runs only
+the held self-test suites and never this leg (`.github/workflows/remote-ci.yml`), so the binding
+named there was none (rev-2, M10).
 
-**What it owes.** `check-unattended.sh` check 23, `check-brief-recorded.sh`, `check-pass-order.sh`,
-and the nc and inCMS tenure legs in their own repositories. **Filed as** `TOOL-dUnstuckLanding-7`
+**What it owes.**
+
+- `check-unattended.sh`: check 23's range.
+- `check-brief-recorded.sh` and `check-pass-order.sh`.
+- `.unattended.conf`: `UNDECLARED_WRITE_CEILING` becomes a per-build budget,
+  `UNDECLARED_WRITE_BUDGET`. Like every new key, it joins the allow-list, the example conf and
+  PROTOCOL §8.
+- The drift-audit signal `fleet_over_budget`.
+- The nc and inCMS tenure legs, in their own repositories. **Filed as** `TOOL-dUnstuckLanding-7`
 for the kit's three legs. The adopter tenure legs belong to §8's carriage.
 
 ## 5. Closing decisions get a standing disposition
@@ -412,14 +451,24 @@ How each candidate fares on that table:
   3 inCMS `build-complete` overrides are the population this rule addresses. Which of them meet the
   edge clause is that unit's own measurement to make, and is not claimed here.
 
+**This REVERSES an owner rule (rev-2, M5).** `build-complete` carries the owner's "merge and push
+only when the entire build is fully done" (`unattended.sh:7945`), and the `land-once-done`
+directive (D8) states the same thing. Carry-forward lands a build that is not fully done, so it needs
+a decision row superseding D8 as it applies to `build-complete`, and the ask requires that row by
+name. This is the second of the two reversals the opening promises; §3's is the first.
+
 **The rule beside M3's park rule.** BUILD-METHOD M3 says "No survivors → park". At the CLOSE, a park
 is never an abort: the park is recorded, and the run takes the table's exit. That is one sentence in
 M3. It points at the protocol section that holds the table, so the table exists once.
 
 **What it owes.**
 
-- `unattended.sh`: `build-complete`'s terms.
-- `PROTOCOL.template.md`: a new subsection holding the table.
+- `unattended.sh`: `build-complete`'s terms, and the comment at `:7945`.
+- `PROTOCOL.template.md`: a new subsection holding the table, and §4's `build-complete` row.
+- `SKILL.template.md`: the `land-once-done` waiver paragraph, which says a waiver still owes an
+  override at close.
+- BUILD-METHOD M8's Landing line.
+- `memory/DECISIONS.md`: a row superseding D8 as it applies to `build-complete`.
 - `BUILD-METHOD` M3: one sentence. The memory-tree kit renders it, and its budget is ≤30720 bytes,
   so the sentence must fit or displace.
 - `SKILL.template.md`: the Close section.
@@ -428,7 +477,7 @@ M3. It points at the protocol section that holds the table, so the table exists 
 
 ## 6. Refresh before a verdict
 
-**Answers** K2's last row and K1's stale-BASE variant:
+**Answers** K2's last row, and the stale-BASE variant the census lists under K1:
 
 - nc `dGuardedThreshold` parked a question that main had answered four hours earlier.
 - gov `aBranchedMandate` overrode a red that came only from a stale LOCAL main.
@@ -456,7 +505,16 @@ M3. It points at the protocol section that holds the table, so the table exists 
   changes no write. The fact makes a stale verdict visible to the wrap-up rather than to the next
   person who trips on it.
 
-**Pick — (b).** **Filed as** `TOOL-dUnstuckLanding-9`.
+**Pick — (b).**
+
+**What it owes (rev-2, M9).**
+
+- `unattended.sh`: one shared helper, called by `--park`, `--handoff`, `--abort`, and `--close`
+  under `primary`, which observes the tip and writes `refreshed-at`.
+- `VERBS.template.md`: the four entries.
+- `PROTOCOL.template.md`: §2's fact list.
+
+**Filed as** `TOOL-dUnstuckLanding-9`.
 
 ## 7. Landing capability is declared, and checked at `--preflight`
 
@@ -478,7 +536,19 @@ M3. It points at the protocol section that holds the table, so the table exists 
   refusing loses them.
 - **(b) keeps the work and makes the ending honest from the first commit.**
 
-**Pick — (b).** The inCMS half is not a node capability. It is the `primary` lander publishing other
+**Pick — (b).** The node is identified the way the charter's §2 requires, by machine and user and
+never by path. The driver has no node reader today: a case-insensitive grep over it for
+`hostname`, `whoami` and `node_id` finds only a URL-normalisation comment, at `unattended.sh:891`. So the conf declares `LANDING_NODES` as `<tag>=<machine>/<user>` pairs, and the
+driver resolves `hostname` and the user against them. A node it cannot resolve is treated as not
+able to land: the run hands off, which is the safe direction (rev-2, M9).
+
+**What it owes.**
+
+- `unattended.sh`: the resolver and the `landing: handoff` fact.
+- `--close`'s branch that names `--handoff` instead of the lander.
+- The allow-list, the example conf and PROTOCOL §8, for `LANDING_NODES`.
+
+The inCMS half is not a node capability. It is the `primary` lander publishing other
 sessions' commits from a shared local `main`, and gov's `in-place` mode removed it here
 (the `LANDER_MODE` declaration in `.unattended.conf` and its comment). That half is §8's.
 
@@ -522,9 +592,13 @@ containment rules, and the owner of each adopter scaffolds it. **Filed as** `TOO
 - **Conservative attribution** (the comparator rule and KF3). It is deliberate. The runner's header
   records two wrong "not mine" claims among five stops, and loosening it would buy back the class it
   closed.
-- **The two abandoned BUILDING records**, gov `aClosedDocket` and `aUnblockedFleet`. Once §1 and §2
-  land, `--settle` reports them as covered by neither derivation, which is the honest state, and
-  their owner decides.
+- **inCMS's submodule pointer drift (5 instances, census K6).** A primary tree holds one
+  `vendor/nicocares-package` checkout for every session, and the lander reds on pointer drift by
+  design. The cure is inCMS's own: one checkout per worktree, or the pin published before the
+  landing. `in-place` landing (§8) removes only the shared-`main` half. Declined here, with that
+  reason (rev-2, M8).
+- **The four interrupted records with no verb written** are no longer left over. §2's (c2) gives
+  them `work-landed-at` and an `abandoned` marker under their current phase (rev-2, M16).
 
 ## Order
 

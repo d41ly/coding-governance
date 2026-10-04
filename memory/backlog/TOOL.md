@@ -450,6 +450,6 @@ Cite ids, never line numbers.
 | [TOOL-dUnstuckLanding-6](../builds/dUnstuckLanding/BACKLOG.md) | OPEN | HIGH | — | 2026-10-04 | an INHERITED red lands whatever its age, and the age becomes an… |
 | [TOOL-dUnstuckLanding-7](../builds/dUnstuckLanding/BACKLOG.md) | OPEN | HIGH | — | 2026-10-04 | the history-anchored legs (brief-recorded, check 23 and pass-order)… |
 | [TOOL-dUnstuckLanding-8](../builds/dUnstuckLanding/BACKLOG.md) | OPEN | HIGH | — | 2026-10-04 | a closed close-decision table in the protocol, mapping each recurring… |
-| [TOOL-dUnstuckLanding-9](../builds/dUnstuckLanding/BACKLOG.md) | OPEN | MED | — | 2026-10-04 | refresh before a verdict: --park, --handoff, --abort, and --close under… |
-| [TOOL-dUnstuckLanding-10](../builds/dUnstuckLanding/BACKLOG.md) | OPEN | MED | — | 2026-10-04 | landing capability is declared, as LANDING_NODES in .unattended.conf. A… |
+| [TOOL-dUnstuckLanding-9](../builds/dUnstuckLanding/BACKLOG.md) | OPEN | MED | — | 2026-10-04 | refresh before a verdict: one shared helper, called by --park,… |
+| [TOOL-dUnstuckLanding-10](../builds/dUnstuckLanding/BACKLOG.md) | OPEN | MED | — | 2026-10-04 | landing capability is declared, as LANDING_NODES pairs of… |
 | [TOOL-dUnstuckLanding-11](../builds/dUnstuckLanding/BACKLOG.md) | OPEN | HIGH | — | 2026-10-04 | carry the kit that ships asks 3 to 10 into inCMS and NicoCares through… |

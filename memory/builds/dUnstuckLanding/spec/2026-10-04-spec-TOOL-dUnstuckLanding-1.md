@@ -1,6 +1,6 @@
 # TOOL-dUnstuckLanding-1 — the closing-time failure census across gov, inCMS and NicoCares
 
-**Status:** CLOSED · rev-1 · 2026-10-04 · node d · Tier-1 · base a587e82d · streams tooling · order 1
+**Status:** CLOSED · rev-2 · 2026-10-04 · node d · Tier-1 · base a587e82d · streams tooling · order 1
 
 <!-- gen:spec-records -->
 
@@ -80,6 +80,7 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-04 · initial draft.
+- rev-2 · 2026-10-04 · S1 · AC1 · AC2 · §2 · folded closing review round 1: the run tables for nc and inCMS, plus code and stage for gov's other seven aborts (M17); the stale-BASE variant and three gov instances under K1a (L5); the witness probe restated as structural, and the aMeteredTurnstile row corrected (H1, carried by TOOL-dUnstuckLanding-12).
 
 ## 10. Reuse audit
 

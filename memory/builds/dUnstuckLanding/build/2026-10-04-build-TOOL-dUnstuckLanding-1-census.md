@@ -88,13 +88,17 @@ Six of inCMS's nine aborts do so in so many words (`history-incms` §a.1).
 | `aHoistedPass` | `repo-state-out-of-mandate` | lander: diverged primary main, two bars killed at 3604 s and 3602 s | `8a36ff4e` | abort `36a90178` |
 | `dTieredTribunal` | `repo-state-out-of-mandate` | after the push, killed before the marker; aborted BY ANOTHER run | pushed `b4e1d5be` BEFORE the abort | `d7ba0f67` |
 
-The remaining seven gov aborts:
+The remaining seven gov aborts no longer read ABORTED on `origin/main`:
 
-- **Re-run to LANDED.** Three were re-run to LANDED through a fresh `--preflight`: `aBoundedVerdict`,
-  `aGradedDialect` and `aBatchedArm`.
-- **Hand-flipped.** Three were hand-flipped to LANDED past check 26, on owner instruction
-  (`56b945cb`): `aDeclaredBound`'s re-run, `aFusedCharter` and `aPromptedMandate`.
-- **Deleted.** One was deleted (`dHonouredPark`, `994a93b0`).
+| Slug | Code | Died at | Outcome | Evidence |
+|---|---|---|---|---|
+| `aBoundedVerdict` | `gate-red-out-of-scope` | close: check 7 counted another run's LANDING record | re-run to LANDED `77246746` | abort `e3ee4782` |
+| `aGradedDialect` | `scope-approval-needed` | close: private inCMS source in a public repo | owner ruling `67964f14`, re-run to LANDED `fdd754bf` | abort `74c30731` |
+| `aBatchedArm` | `scope-approval-needed` | mid-build: the 20-minute target unreachable in scope | owner added a unit, re-run to LANDED `a7c78ad2` | abort `71b67453` |
+| `aDeclaredBound` | `fork-unresolvable` | before the build: two audit rounds BLOCKED | landed `17987036`; the re-run's record was hand-flipped to LANDED past check 26 | `fa5e6225`, `56b945cb` |
+| `aFusedCharter` | before the vocabulary | lander: merged on local main only | hand-flipped to LANDED on owner instruction | `f8c8dded`, `56b945cb` |
+| `aPromptedMandate` | before the vocabulary | stopped at LANDING, never pushed; aborted by another session | hand-flipped to LANDED | `d1bc3f39`, `56b945cb` |
+| `dHonouredPark` | `external-prerequisite` | close: closing review round 2 died on a session limit | the record was DELETED, because check 29 redded on it | `69884002`, `994a93b0` |
 
 **Overrides recorded at gov closes.** These have no abort, but the same pressures show in them:
 
@@ -116,6 +120,22 @@ The remaining seven gov aborts:
   (`f33cce22`, `1f5e00ca`). The integration merge `23be1536` then deliberately kept main's ABORTED,
   because LANDED "would manufacture a state no sequence of verbs produced".
 
+| Slug | Code | Died at | Landed by | Abort |
+|---|---|---|---|---|
+| `aBoxedCipher` | `external-prerequisite` | VERIFYING: gate 8 needs a core unit; pass-order red | `19205bd7` | `e6e5b8c9` |
+| `aCharteredWard` | `external-prerequisite` | VERIFYING: the core half unpushed | `f93ba57a` | `e8163001` |
+| `aClearedPortico` | `repo-state-out-of-mandate` | VERIFYING: owner ruled no push; tenure red at midnight | carried by `80a91de9` and core `baadb42e5`, before the abort | `1b32a6cc` |
+| `aGildedQuiver` | `external-prerequisite` | REVIEWING, review converged: core must land first | `c1137add` | `f884ba11` |
+| `aTactfulWicket` | `external-prerequisite` | VERIFYING: core ABI floor; core's run aborted | `2c6f1d26` | `f48e861b` |
+| `aTiledEstuary` | `external-prerequisite` | VERIFYING: its core fix on an unpushed branch | `56acbb00` | `03d3f6bf` |
+| `bVettedParcel` | `external-prerequisite` | LANDING: node b | `1e308c9b` | `e7ed35bd` |
+| `bRoutedConcierge` | `external-prerequisite` | LANDING: node b | `4b687831` | `6f316a5a` |
+| `bSteadiedCovenant` | `external-prerequisite` | LANDING: node b | `9a868229` | `903a0cd8` |
+| `bIndexedAlmanac` | `external-prerequisite` | LANDING: node b | `6698bf04` | `52225768` |
+| `dBarredPostern` | `gate-red-out-of-scope` | BUILDING, at the landing boundary: check 7 on a foreign record | `23be1536` | `606fdc9e` |
+| `dPlumbedAtrium` | `fork-unresolvable` | REVIEWING: `build-complete` blocked; aborted by another run | its work was on main before the abort | `74b010b4` |
+| `dCandidLodestar` (retired) | `gate-red-out-of-scope` | FOLDING: core moved under the run | a re-run reached LANDED | `b5706e62` |
+
 ### inCMS: 9 aborts, 9 landed, 8 still ABORTED
 
 - **The lone re-run.** `aRisingCultivar` was the only one re-run (`aba970028`) to LANDED.
@@ -128,6 +148,18 @@ The remaining seven gov aborts:
   - `aClearedPortico` is at BUILDING.
 - **Stamps that are not published.** Five more records were stamped LANDED on the `local` anchor
   and never pushed.
+
+| Slug | Code | Died at | Landed by | Abort |
+|---|---|---|---|---|
+| `aMendedTollgate` | `repo-state-out-of-mandate` | lander: local main carried 8 commits from 3 other sessions | `3d8e37b2b` | `05ee30664` |
+| `aRenewedTether` | `gate-red-out-of-scope` | close: check 23 at 20 against 18 | `fbc3f7982`, after an owner ceiling raise | `a3cc78b0d` |
+| `aLanternedFoyer` | `gate-red-out-of-scope` | lander: four refusals, load flakes and SSH | `204b604bc` | `cf3c163ad` |
+| `dTuckedKebab` | `gate-red-out-of-scope` | close: check 23 at 29 against 20 | `bb20e7601` | `a1818fdcc` |
+| `aDeputedApothecary` | `gate-red-out-of-scope` | lander: alembic `0xC000070A` | `eee619657`, another run's push | `658c6e9c8` |
+| `aCharteredWard` | `gate-red-out-of-scope` | lander: five red pre-push bars | `f90f4ccc0`, via another push | `508692d71` |
+| `aTactfulWicket` | `gate-red-out-of-scope` | close: check 23 at 24 against 20 | `f20531108` | `e97e657c5` |
+| `aGildedQuiver` | `external-prerequisite` | close: check 23 and brief-recorded | `fc4ac5aaa` | `d3459791b` |
+| `aRisingCultivar` (retired) | `fork-unresolvable` | close: check 23 at 23 against 20 | a re-run reached LANDED, `e085fb8b7` | retired at `aba970028` |
 
 ## Failure classes
 
@@ -154,7 +186,7 @@ from each report's section b:
 K6 is the node-b class in nc (B1). In inCMS it is the shared primary tree (B3: 1 abort and 9 parked
 landings) together with submodule drift (B4, 5).
 
-Every instance is cited in the per-repo detail below.
+Every instance is cited in the per-repo detail below, or in the run tables above.
 
 ### K1 — a red bar the run did not cause
 
@@ -168,6 +200,15 @@ Five sub-shapes. They are distinct because each is cured by a different mechanis
     `gates-inherited: 87c245b3`, and is the only policy landing on record.
   - gov `aSightedSkeptic`: the canary and the merge-rows replay, asks `TOOL-aSightedSkeptic-11` and
     `-12`.
+  - gov `aReapedSpinner`: 13 of 104 legs red, 5 of which reproduced on clean main, so the bar was
+    MIXED. Overridden on owner instruction, RUN.md 2026-09-08T19:24 (rev-2).
+
+  **The stale-BASE variant** (rev-2) is a red read against a base main had already moved past:
+  - gov `aBranchedMandate`'s drift-audit red came only from a stale LOCAL main. Overridden, RUN.md
+    2026-08-18T02:05:52Z.
+  - gov `aStagedLane` claimed "pre-existing" for lexicon 463 against a pin of 461. The claim was later
+    withdrawn by `TOOL-aStagedLane-6`. RUN.md 2026-09-05T04:14.
+  - nc `dGuardedThreshold` parked a question main had already answered. That one is under K2.
 
   Duplicated effort is recorded too: `94a41505`, "two nodes fixed the same two red legs".
 - **K1b — a FLEET counter the run's own bar grades over other builds' state.**
