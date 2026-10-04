@@ -237,8 +237,8 @@ ids TOOL-aMendedFleet-96 TOOL-aMendedFleet-97 TOOL-aMendedFleet-98 TOOL-aMendedF
 | [TOOL-aMendedFleet-58 — gate yield per leg is reported from the gates journal](spec/2026-10-04-spec-TOOL-aMendedFleet-58.md) | 58 | 1 | SPECCED | rev-2 | 2026-10-04 |
 | [TOOL-aMendedFleet-59 — timeout retries are grouped by leg across every git dir of the clone](spec/2026-10-04-spec-TOOL-aMendedFleet-59.md) | 59 | 1 | SPECCED | rev-1 | 2026-10-04 |
 | [TOOL-aMendedFleet-60 — a cross-run overlap probe over unmerged remote refs runs at preflight](spec/2026-10-04-spec-TOOL-aMendedFleet-60.md) | 60 | 2 | SPECCED | rev-2 | 2026-10-04 |
-| [TOOL-aMendedFleet-61 — preflight pins the launching CLI version and every resume compares it, and a missing resume tick is announced loudly](spec/2026-10-04-spec-TOOL-aMendedFleet-61.md) | 61 | 2 | SPECCED | rev-3 | 2026-10-04 |
-| [TOOL-aMendedFleet-62 — the two history legs grade the run's own range, reusing node d's bytes](spec/2026-10-04-spec-TOOL-aMendedFleet-62.md) | 62 | 2 | SPECCED | rev-3 | 2026-10-04 |
+| [TOOL-aMendedFleet-62 — the two history legs grade the run's own range, reusing node d's bytes](spec/2026-10-04-spec-TOOL-aMendedFleet-62.md) | 61 | 2 | SPECCED | rev-4 | 2026-10-04 |
+| [TOOL-aMendedFleet-61 — preflight pins the launching CLI version and every resume compares it, and a missing resume tick is announced loudly](spec/2026-10-04-spec-TOOL-aMendedFleet-61.md) | 62 | 2 | SPECCED | rev-4 | 2026-10-04 |
 | [TOOL-aMendedFleet-63 — `--close` and `--abort` render the run record themselves, after their own END line](spec/2026-10-04-spec-TOOL-aMendedFleet-63.md) | 63 | 1 | SPECCED | rev-2 | 2026-10-04 |
 | [TOOL-aMendedFleet-64 — `govkit selfcheck --fix` writes every kit-version carrier from its `version_from` constant](spec/2026-10-04-spec-TOOL-aMendedFleet-64.md) | 64 | 2 | SPECCED | rev-2 | 2026-10-04 |
 | [TOOL-aMendedFleet-65 — the lander mints kit versions, so a branch owes no bump](spec/2026-10-04-spec-TOOL-aMendedFleet-65.md) | 65 | 2 | SPECCED | rev-2 | 2026-10-04 |
@@ -370,8 +370,8 @@ TOOL-aMendedFleet-94 TOOL-aMendedFleet-100 TOOL-aMendedFleet-101 TOOL-aMendedFle
 | 58 | `TOOL-aMendedFleet-58` | no |
 | 59 | `TOOL-aMendedFleet-59` | no |
 | 60 | `TOOL-aMendedFleet-60` | no |
-| 61 | `TOOL-aMendedFleet-61` | no |
-| 62 | `TOOL-aMendedFleet-62` | no |
+| 61 | `TOOL-aMendedFleet-62` | no |
+| 62 | `TOOL-aMendedFleet-61` | no |
 | 63 | `TOOL-aMendedFleet-63` | no |
 | 64 | `TOOL-aMendedFleet-64` | no |
 | 65 | `TOOL-aMendedFleet-65` | no |

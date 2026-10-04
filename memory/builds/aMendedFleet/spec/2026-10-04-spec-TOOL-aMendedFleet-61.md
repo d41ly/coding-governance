@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-61 — preflight pins the launching CLI version and every resume compares it, and a missing resume tick is announced loudly
 
-**Status:** SPECCED · rev-3 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 61
+**Status:** SPECCED · rev-4 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 62
 
 <!-- gen:spec-records -->
 
@@ -238,6 +238,7 @@ New arm: `tools/unattended/unattended.test.sh` · a fixture run preflighted unde
 - rev-3 · 2026-10-04 · S1 AC3 · cross-read with `KICK-aMendedFleet-4`, which spells this rule again
   and reads only a value opening `claude-code_`; S1 read any value's second field, so another
   agent's `AI_AGENT` would have pinned a version. S1 now requires the prefix, and AC3 observes it.
+- rev-4 · 2026-10-04 · §1 status header order 61 -> 62: unit 62 builds first so node d's patch applies byte-identically (M2 cross-read ordering).
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-62 — the two history legs grade the run's own range, reusing node d's bytes
 
-**Status:** SPECCED · rev-3 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 62
+**Status:** SPECCED · rev-4 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 61
 
 <!-- gen:spec-records -->
 
@@ -210,6 +210,7 @@ New arm: `tools/unattended/check-brief-recorded.test.sh` · node d's range arms:
   `TOOL-aMendedFleet-92`, which narrowed it to the fleet line and the drift signal. The Edges bullet
   stays `external` until that unit declares the reciprocal edge.
 - rev-3 · 2026-10-04 · §3 names the hands-off to TOOL-aMendedFleet-92, which declares the consumes-from back (check 12 edge join).
+- rev-4 · 2026-10-04 · §1 status header order 62 -> 61: built before unit 61, whose insertion could break the byte-identical apply of node d's patch.
 
 ## 10. Reuse audit
 
