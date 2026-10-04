@@ -7,7 +7,7 @@ roster: TOOL
 authorized-by: prompt
 spec-audit: 2026-10-05
 status: OPEN
-ids: TOOL-aEvidencedLens-1 TOOL-aEvidencedLens-10
+ids: TOOL-aEvidencedLens-1 TOOL-aEvidencedLens-2 TOOL-aEvidencedLens-3 TOOL-aEvidencedLens-4 TOOL-aEvidencedLens-5 TOOL-aEvidencedLens-6 TOOL-aEvidencedLens-7 TOOL-aEvidencedLens-8 TOOL-aEvidencedLens-9 TOOL-aEvidencedLens-10 TOOL-aEvidencedLens-11
 ---
 
 # aEvidencedLens — a spec audit the owner opts into gathers evidence, and every finding becomes a unit
@@ -69,13 +69,13 @@ evidence no lens was allowed to gather. The owner's prompt and the one answered 
 
 <!-- gen:build-index -->
 **Build status:** OPEN · 0 unit(s) · node a · opened 2026-10-05 · streams tooling
-ids TOOL-aEvidencedLens-1 TOOL-aEvidencedLens-10
+ids TOOL-aEvidencedLens-1 TOOL-aEvidencedLens-2 TOOL-aEvidencedLens-3 TOOL-aEvidencedLens-4 TOOL-aEvidencedLens-5 TOOL-aEvidencedLens-6 TOOL-aEvidencedLens-7 TOOL-aEvidencedLens-8 TOOL-aEvidencedLens-9 TOOL-aEvidencedLens-10 TOOL-aEvidencedLens-11
 
 <!-- gen:build-units -->
 *No spec under this build carries a status header; the status above is declared in the front matter.*
 <!-- /gen:build-units -->
 
-Records: 1 bound to this build, across 1 record folder(s).
+Records: 2 bound to this build, across 1 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
