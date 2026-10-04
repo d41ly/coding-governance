@@ -477,7 +477,7 @@ CONF="$ROOT/.unattended.conf"
 MEMORY_ROOT=memory; LANDER=""; LANDER_MODE=""; SELFTESTS_OWED_PATHS=""; BYPASS_BAN=""; GATE_CMD=""; WIRING_CHECK=""
 KEEPALIVE_CREATE=""; KEEPALIVE_DELETE=""; PHASES_EXTRA=""; DOD_EXTRA=""; DIRECTIVES_EXTRA=""; ANCHOR_SCOPE=""; UNITS_REGION_CUTOFF=""; SHARED_RECORDS="$SHARED_RECORDS_UNDECLARED"; GENERATED_INDEXES=""; SPEC_THIN_CUTOFF=""
 HALT_CODES_EXTRA=""; HALT_FLOOR=""; LANDER_MARKER=""; RECALL_CLI=""; MAP_CLI=""; SPEC_TOKENS_CLI=""
-ASKS_CMD=""; HOLD_CODES_EXTRA=""; HOLD_FLOOR=""; LANDED_FACTS_CUTOFF=""; GATE_POLICY_FILE=""; PROCMON_CMD=""
+ASKS_CMD=""; HELD_CI_WORKFLOW=""; HOLD_CODES_EXTRA=""; HOLD_FLOOR=""; LANDED_FACTS_CUTOFF=""; GATE_POLICY_FILE=""; PROCMON_CMD=""
 RESUME_SCHEDULE=""; RESUME_SCHEDULE_CREATE=""; RESUME_SCHEDULE_DELETE=""; RESUME_SCHEDULE_DELAY=""; RESUME_SCHEDULE_LIMIT=""
 GATE_BOUND=""; GATE_WALL=""; GATE_PROFILE_CMD=""; UNIT_STALL_BOUND=""; TASK_STALL_BOUND=""; REVIEW_ROUNDS=""; RESUME_STALE_BOUND=""; RESUME_ATTEMPTS=""; RESUME_TURNS=""
 DISPOSITION_CUTOFF=""; SPEC_AUDIT_DEFAULT=""; RUNLOG_SESSION_VARS=""; RUNLOG_SWITCH=${GOV_RUNLOG:-}
@@ -497,6 +497,9 @@ DISPOSITION_CUTOFF=""; SPEC_AUDIT_DEFAULT=""; RUNLOG_SESSION_VARS=""; RUNLOG_SWI
 #   * ASKS_CMD (TOOL-dDerivedDocket-16) - the ASK GENERATOR, in RECALL_CLI's register: optional,
 #     blank is "not adopted" and is ANNOUNCED. A build README carrying an `asks:` key while this is
 #     blank REFUSES at preflight rather than pinning a mandate nothing in the project can grade.
+#   * HELD_CI_WORKFLOW (TOOL-aMendedFleet-9) - the workflow file whose daily scheduled held job
+#     `gates-green` reads after its bar. The value THIS source binds decides nothing:
+#     `write_held_asks` re-reads the key from the conf at R. Blank is DARK, announced.
 #   * HOLD_CODES_EXTRA and HOLD_FLOOR - the HOLD vocabulary's project half, and its shrink-only
 #     floor. Spelled beside the halt keys and never merged with them: a halt code ENDS a run and a
 #     hold code PAUSES one, and one list would let a pause be recorded as an ending.
@@ -7127,8 +7130,60 @@ read_ask_back() { # ask id · slug -> 0 when ASKS_CMD reads it back as ONE OPEN 
   return 1
 }
 
+read_roster_family() { # slug -> the first family of the build README's front-matter roster; nothing when none
+  awk 'NR == 1 { next } /^---/ { exit } /^roster:/ { v = $0; sub(/^roster:[[:space:]]*/, "", v); print v; exit }' \
+    "$(readme_of "$1")" 2>/dev/null | tr '+, ' '\n\n\n' | grep -m1 -E '^[A-Z]+$'
+}
+
+# THE BACKUP, THE WRITE, THE READ-BACK AND THE ROLLBACK, one copy for every auto-filer of this
+# section. It prints exactly one line naming the subject (`leg <name>`, `suite <name>`) and returns 0
+# only when the ask was filed and read back.
+#
+# THE BACKUP IS THE ROLLBACK'S PRECONDITION, so it is PROVEN before the file is touched, and a
+# file that cannot be backed up is not written at all (closing diff review of dDerivedDocket,
+# F4). This used to set `had=1` before the backup existed and never look again: under a temp store
+# that failed after the bar ran, `mktemp` left `prior` empty, the restore guard read false, and
+# the rollback's other arm DELETED a BACKLOG.md that existed before the write and staged the
+# deletion into the close's records commit. A `cp` that failed or stopped short left a backup the
+# restore then copied over the file. `cmp` is the proof: a backup that is not byte for byte the
+# file is not a backup.
+write_ask_rows() { # BACKLOG.md path · slug · ask id · subject · sha8 · ask row · SEV row · KEEP row -> 0 filed
+  local bl=$1 slug=$2 id=$3 what=$4 at8=$5 prior="" had=0 restored rc=0
+  if [ -f "$bl" ]; then
+    had=1
+    if ! prior=$(mktemp) || ! cp -- "$bl" "$prior" || ! cmp -s "$bl" "$prior"; then
+      [ -z "$prior" ] || rm -f -- "$prior"
+      echo "gates-green: no ask filed for $what — $bl could not be backed up before the write, so a rollback could not put it back, and it is left exactly as it was"
+      return 1
+    fi
+  fi
+  mkdir -p "${bl%/*}" && write_backlog_rows "$bl" "$slug" "$6" "$7" "$8" && GIT add -- "$bl" 2>/dev/null
+  if read_ask_back "$id" "$slug"; then
+    echo "gates-green: filed ask $id for $what red at $at8, staged in $bl"
+  else
+    rc=1
+    # REMOVED, and the file put back exactly as it was: a row the parser cannot read back is a row
+    # every later reader would read differently from this writer. A path that EXISTED before the
+    # write is only ever restored from its proven backup and never removed; a restore that fails
+    # KEEPS the backup and names it, because deleting the one good copy is the step to refuse.
+    restored=1
+    if [ "$had" = 1 ]; then
+      if cp -- "$prior" "$bl"; then GIT add -- "$bl" 2>/dev/null; else restored=0; fi
+    else GIT rm -q --cached -f -- "$bl" >/dev/null 2>&1; rm -f -- "$bl"; fi
+    if [ "$restored" = 1 ]; then
+      echo "gates-green: the rows for $what were REMOVED — the declared ask generator did not read $id back as one OPEN HIGH ask homed at $slug: $AB_WHY"
+    else
+      echo "gates-green: the rows for $what could NOT be removed — $bl was not put back from its backup, which is KEPT at $prior; restore it by hand before committing. The declared ask generator did not read $id back as one OPEN HIGH ask homed at $slug: $AB_WHY"
+      prior=""
+    fi
+    [ -z "${RB_OUT:-}" ] || printf '%s\n' "$RB_OUT" | sed 's/^/    /'
+  fi
+  [ -z "$prior" ] || rm -f -- "$prior"
+  return "$rc"
+}
+
 write_inherited_asks() { # slug · R · run dir
-  local slug=$1 r=$2 d=$3 bl leg ver age own8 ownid cand reused fam seq id argv file tok a s k prior had restored
+  local slug=$1 r=$2 d=$3 bl leg ver age own8 ownid cand reused fam seq id argv file tok a s k
   local r8=${2:0:8} today filed=0
   bl="$M/builds/$slug/BACKLOG.md"
   today=$(date -u +%Y-%m-%d)
@@ -7151,10 +7206,7 @@ write_inherited_asks() { # slug · R · run dir
     # the first family of the build README's roster.
     fam=""
     case "$ownid" in [A-Z]*-*) fam=${ownid%%-*} ;; esac
-    if [ -z "$fam" ]; then
-      fam=$(awk 'NR == 1 { next } /^---/ { exit } /^roster:/ { v = $0; sub(/^roster:[[:space:]]*/, "", v); print v; exit }' \
-              "$(readme_of "$slug")" 2>/dev/null | tr '+, ' '\n\n\n' | grep -m1 -E '^[A-Z]+$')
-    fi
+    [ -n "$fam" ] || fam=$(read_roster_family "$slug")
     if [ -z "$fam" ]; then
       echo "gates-green: no ask filed for leg $leg — the build README names no roster family and the age probe named no owner id, so there is no family to mint the id in"
       continue
@@ -7180,50 +7232,198 @@ write_inherited_asks() { # slug · R · run dir
       printf '    %s\n' "$a" "$s" "$k"
       continue
     fi
-    # THE BACKUP IS THE ROLLBACK'S PRECONDITION, so it is PROVEN before the file is touched, and a
-    # file that cannot be backed up is not written at all (closing diff review of dDerivedDocket,
-    # F4). This used to set `had=1` before the backup existed and never look again: under a temp store
-    # that failed after the bar ran, `mktemp` left `prior` empty, the restore guard read false, and
-    # the rollback's other arm DELETED a BACKLOG.md that existed before the write and staged the
-    # deletion into the close's records commit. A `cp` that failed or stopped short left a backup the
-    # restore then copied over the file. `cmp` is the proof: a backup that is not byte for byte the
-    # file is not a backup.
-    had=0; prior=""
-    if [ -f "$bl" ]; then
-      had=1
-      if ! prior=$(mktemp) || ! cp -- "$bl" "$prior" || ! cmp -s "$bl" "$prior"; then
-        [ -z "$prior" ] || rm -f -- "$prior"
-        echo "gates-green: no ask filed for leg $leg — $bl could not be backed up before the write, so a rollback could not put it back, and it is left exactly as it was"
-        continue
-      fi
-    fi
-    mkdir -p "${bl%/*}" && write_backlog_rows "$bl" "$slug" "$a" "$s" "$k" && GIT add -- "$bl" 2>/dev/null
-    if read_ask_back "$id" "$slug"; then
-      echo "gates-green: filed ask $id for leg $leg red at $r8, staged in $bl"
-      filed=$((filed + 1))
-    else
-      # REMOVED, and the file put back exactly as it was: a row the parser cannot read back is a row
-      # every later reader would read differently from this writer. A path that EXISTED before the
-      # write is only ever restored from its proven backup and never removed; a restore that fails
-      # KEEPS the backup and names it, because deleting the one good copy is the step to refuse.
-      restored=1
-      if [ "$had" = 1 ]; then
-        if cp -- "$prior" "$bl"; then GIT add -- "$bl" 2>/dev/null; else restored=0; fi
-      else GIT rm -q --cached -f -- "$bl" >/dev/null 2>&1; rm -f -- "$bl"; fi
-      if [ "$restored" = 1 ]; then
-        echo "gates-green: the rows for leg $leg were REMOVED — the declared ask generator did not read $id back as one OPEN HIGH ask homed at $slug: $AB_WHY"
-      else
-        echo "gates-green: the rows for leg $leg could NOT be removed — $bl was not put back from its backup, which is KEPT at $prior; restore it by hand before committing. The declared ask generator did not read $id back as one OPEN HIGH ask homed at $slug: $AB_WHY"
-        prior=""
-      fi
-      [ -z "${RB_OUT:-}" ] || printf '%s\n' "$RB_OUT" | sed 's/^/    /'
-    fi
-    [ -z "$prior" ] || rm -f -- "$prior"
+    write_ask_rows "$bl" "$slug" "$id" "leg $leg" "$r8" "$a" "$s" "$k" && filed=$((filed + 1))
   done < "$d/attribution"
   # TOOL-dMendedRecall-2 S1 - THE VIEWS, once per call and only when this call FILED: a reused ask,
   # the dark path, a leg it could not file and rows it rolled back move no view, so a call that
   # files nothing prints exactly what it printed before the views were its job. A miss is named
   # by the helper and changes nothing here: the item's verdict is the caller's, as it was.
+  [ "$filed" -gt 0 ] || return 0
+  write_ask_views "$filed" || :
+  return 0
+}
+
+# ---- THE DAILY HELD JOB'S REDS, routed into the same auto-file. TOOL-aMendedFleet-9.
+# The remote CI workflow's scheduled `held` job runs the self-test suites the merge bar does not, and
+# its reds had no owner on any record. `gates-green` reads the latest COMPLETED scheduled run of the
+# workflow `HELD_CI_WORKFLOW` names, after its bar and on every return code, and files one OPEN HIGH
+# ask per red held suite through the helpers above.
+#
+# THE KEY IS READ AT R AND NEVER FROM THE TREE, by `read_policy_key`, parse-only, as the gate policy
+# is. Blank or absent is DARK and makes no request; a value outside `[A-Za-z0-9._-]+` ending `.yml`
+# or `.yaml` is refused by name before any URL is built from it.
+#
+# THE READ: one anonymous HTTPS GET of the runs listing and one per page of that run's jobs, at the
+# literal host `api.github.com`, for the owner and repository parsed out of the anchor URL only when
+# its host is `github.com`. No redirect is followed, no credential is sent or read, every request is
+# bounded at 30 seconds and every response at 4 MiB. Every way the read can fail to see the job is a
+# DEAD PROBE line that files nothing: a non-GitHub anchor, a non-200 answer, no completed scheduled
+# run, no job named `held <suite>`, or fewer jobs read than the API declares. A green day prints a
+# zero red count beside a non-zero job count, so a broken probe cannot read as a clean one.
+#
+# REUSED BEFORE IT IS FILED, over EVERY build's `BACKLOG.md`, not only this one's: a red the daily
+# job carries for a week would otherwise collect one HIGH ask per closing build. A job name is
+# untrusted text bound for a tracked file, so one carrying a backtick, a control character, the
+# ` · ` separator or the ` → ` arrow is refused and named, and so is a head sha R does not descend
+# from. Nothing here changes the caller's verdict.
+read_held_reds() { # anchor URL · workflow file name -> one TAB row per held job and ONE liveness line, or ONE DEAD PROBE line
+  local py
+  if ! py=$(resolve_python 2>/dev/null) || [ -z "$py" ]; then
+    echo "held reader: DEAD PROBE — no python launcher resolves, so nothing was read"; return 0
+  fi
+  RHR_URL="$1" RHR_WF="$2" "$py" -c '
+import json, os, re, sys, urllib.error, urllib.request
+try:
+    sys.stdout.reconfigure(encoding="utf-8", newline="\n")
+except Exception:
+    pass
+def dead(why):
+    print("held reader: DEAD PROBE — " + why)
+    sys.exit(0)
+url, wf = os.environ["RHR_URL"].strip(), os.environ["RHR_WF"]
+if not re.fullmatch(r"[A-Za-z0-9._-]+\.ya?ml", wf):
+    dead("the workflow file name is outside [A-Za-z0-9._-]+ ending .yml or .yaml: " + repr(wf))
+m = re.fullmatch(r"(?:https://github\.com/|ssh://git@github\.com/|git@github\.com:)([A-Za-z0-9._-]+)/([A-Za-z0-9._-]+?)(?:\.git)?/?", url)
+if not m:
+    dead("the anchor URL is not a github.com repository, so there is no public job listing to read: " + (url or "(none)"))
+class Refuse(urllib.request.HTTPRedirectHandler):
+    def redirect_request(self, *args, **kwargs):
+        return None
+opener, cap = urllib.request.build_opener(Refuse), 4 << 20
+def get(path):
+    req = urllib.request.Request("https://api.github.com" + path, headers={
+        "Accept": "application/vnd.github+json", "User-Agent": "unattended-held-reader"})
+    try:
+        with opener.open(req, timeout=30) as r:
+            status, body = r.status, r.read(cap + 1)
+    except urllib.error.HTTPError as e:
+        dead("GET " + path + " answered HTTP " + str(e.code))
+    except Exception as e:
+        dead("GET " + path + " did not answer: " + type(e).__name__)
+    if status != 200:
+        dead("GET " + path + " answered HTTP " + str(status))
+    if len(body) > cap:
+        dead("GET " + path + " answered more than the 4 MiB cap")
+    try:
+        return json.loads(body)
+    except ValueError:
+        dead("GET " + path + " answered something that is not JSON")
+base = "/repos/%s/%s/actions" % (m.group(1), m.group(2))
+runs = get(base + "/workflows/" + wf + "/runs?event=schedule&status=completed&per_page=1").get("workflow_runs") or []
+if not runs:
+    dead("no completed scheduled run of " + wf + " exists at " + m.group(1) + "/" + m.group(2))
+rid, sha = runs[0].get("id"), str(runs[0].get("head_sha") or "")
+jobs, total, page = [], None, 1
+while True:
+    got = get(base + "/runs/%s/jobs?per_page=100&page=%d" % (rid, page))
+    total, batch = got.get("total_count"), got.get("jobs") or []
+    jobs += batch
+    if not batch or not isinstance(total, int) or len(jobs) >= total or page >= 50:
+        break
+    page += 1
+if not isinstance(total, int) or len(jobs) != total:
+    dead("run %s declares %s job(s) and %d were read" % (rid, total, len(jobs)))
+held = [j for j in jobs if str(j.get("name") or "").startswith("held ") and str(j.get("name"))[5:].strip()]
+if not held:
+    dead("run %s at %s carries %d job(s) and none is named held <suite>" % (rid, sha[:8], len(jobs)))
+red = 0
+for j in held:
+    c = str(j.get("conclusion") or "")
+    red += c in ("failure", "timed_out")
+    # A TAB, a newline, a CR or a NUL in a name would split the row; each becomes U+001F, a control
+    # character the writer refuses by name, so the row grammar holds and the refusal stays visible.
+    print("held\t%s\t%s\t%s\t%s" % (str(j["name"])[5:].translate({0: 31, 9: 31, 10: 31, 13: 31}), sha, rid, c))
+print("held reader: run %s at %s · %d held job(s) read · %d red" % (rid, sha[:8], len(held), red))
+' || echo "held reader: DEAD PROBE — the reader exited $? without a verdict"
+}
+
+write_held_asks() { # slug · R · bar run dir -> one line per red held suite: filed, reused or refused; never a verdict
+  local slug=$1 r=$2 d=$3 r8=${2:0:8} conf wf out line suite sha run concl sha8 bl f home cand reused fam seq id
+  local argv file tok seen a s k today filed=0
+  local -a rows=()
+  if [ -z "$r" ]; then
+    echo "gates-green: held reader — no advertised tip was observed, so there is no R to read HELD_CI_WORKFLOW at, and nothing is read"
+    return 0
+  fi
+  conf=$(GIT show "$r:${CONF##*/}" 2>/dev/null) || conf=""
+  wf=$(read_policy_key "$conf" HELD_CI_WORKFLOW)
+  if [ -z "$wf" ]; then
+    echo "gates-green: held reader DARK — HELD_CI_WORKFLOW is blank or absent in the conf at $r8, so no request is made"
+    return 0
+  fi
+  if [[ ! $wf =~ ^[A-Za-z0-9._-]+\.ya?ml$ ]]; then
+    echo "gates-green: held reader refused — HELD_CI_WORKFLOW at $r8 is outside [A-Za-z0-9._-]+ ending .yml or .yaml, so no URL is built from it: $(printf '%q' "$wf")"
+    return 0
+  fi
+  out=$(read_held_reds "${AURL:-}" "$wf")
+  while IFS= read -r line; do
+    case "$line" in
+      held$'\t'*) rows+=("$line") ;;
+      ?*) echo "gates-green: $line" ;;
+    esac
+  done <<< "$out"
+  bl="$M/builds/$slug/BACKLOG.md"
+  today=$(date -u +%Y-%m-%d)
+  for line in "${rows[@]}"; do
+    IFS=$'\t' read -r _ suite sha run concl <<< "$line"
+    case "$concl" in failure|timed_out) ;; *) continue ;; esac
+    case "$suite" in
+      *'`'*|*[[:cntrl:]]*|*' · '*|*' → '*)
+        echo "gates-green: held suite refused, no ask filed — its name carries a backtick, a control character, the ' · ' separator or the ' → ' arrow, any of which breaks the ask grammar: $(printf '%q' "$suite")"
+        continue ;;
+    esac
+    if [[ ! $sha =~ ^[0-9a-f]{40}$ ]] || [[ ! $run =~ ^[0-9]+$ ]]; then
+      echo "gates-green: no ask filed for held suite $suite — the reader's row carries a head sha or run id that is not one: $sha $run"
+      continue
+    fi
+    sha8=${sha:0:8}
+    if ! GIT merge-base --is-ancestor "$sha" "$r" 2>/dev/null; then
+      echo "gates-green: no ask filed for held suite $suite — its head sha $sha is not an ancestor of R $r8 here, so the red is not proven on the default branch"
+      continue
+    fi
+    reused=""
+    if [ -n "${ASKS_CMD:-}" ]; then
+      for f in "$M"/builds/*/BACKLOG.md; do
+        [ -f "$f" ] || continue
+        home=${f%/BACKLOG.md}; home=${home##*/}
+        while IFS= read -r cand; do
+          [ -n "$cand" ] || continue
+          if read_ask_back "$cand" "$home"; then
+            echo "gates-green: ask $cand already OPEN HIGH for held suite $suite in $f · reused"; reused=1; break
+          fi
+        done < <(grep -F -- "held red: suite $suite red at " "$f" 2>/dev/null \
+                   | awk '/^- [A-Z][A-Z]*-[A-Za-z0-9]+-[0-9]+ · filed / { v = $2; print v }')
+        [ -z "$reused" ] || break
+      done
+    fi
+    [ -z "$reused" ] || continue
+    fam=$(read_roster_family "$slug")
+    if [ -z "$fam" ]; then
+      echo "gates-green: no ask filed for held suite $suite — the build README names no roster family, so there is no family to mint the id in"
+      continue
+    fi
+    # THE LOCATOR: the suite's own script at that sha when the leg manifest the bar's header names
+    # resolves it there, else the workflow file at that sha, which is where the suite's job is defined.
+    if argv=$(read_leg_argv "$d" "$sha" "$suite") && [ -n "$argv" ]; then
+      file=""
+      for tok in ${argv#* }; do case "$tok" in -*) ;; *) file=$tok; break ;; esac; done
+      [ -n "$file" ] || file=${argv%% *}
+      seen="seen \`$file\`@$sha8 run \`$argv\`"
+    else
+      seen="seen \`.github/workflows/$wf\`@$sha8"
+    fi
+    seq=$(derive_ask_seq "$fam" "$slug")
+    id="$fam-$slug-$seq"
+    a="- $id · filed $today · held red: suite $suite red at $sha8 on the daily held job, run $run · $seen · accept the suite is green on the daily held job at the default branch's tip"
+    s="- SEV · $id · HIGH · a held self-test is red on the default branch's daily job"
+    k="- KEEP · $id · filed by an unattended run for the owning build; outside this build's goal"
+    if [ -z "${ASKS_CMD:-}" ]; then
+      echo "gates-green: ASKS_CMD is blank, so the held auto-file is DARK and writes nothing; it would have filed, in $bl:"
+      printf '    %s\n' "$a" "$s" "$k"
+      continue
+    fi
+    write_ask_rows "$bl" "$slug" "$id" "held suite $suite" "$sha8" "$a" "$s" "$k" && filed=$((filed + 1))
+  done
   [ "$filed" -gt 0 ] || return 0
   write_ask_views "$filed" || :
   return 0
@@ -7697,7 +7897,7 @@ dod_met() { # slug · run-state file · item · checker
       DOD_OUT=""
       [ -n "$GATE_CMD" ] || return 1
       local _grc _gr _gid _ggd _gh _gdir _gout _hold _gtry=0 _gbs=0 _gbound
-      local -a _genv
+      local -a _genv _grb
       # TOOL-dDerivedDocket-24 S6 - THE BAR IS ATTRIBUTED AGAINST R AND HANDED THE POLICY READ AT R.
       # R is the tip `observe_anchor` saw the remote ADVERTISE, never local main or any other local
       # ref: a run's own commit on local main carrying `land` and its own red would sit at R, read
@@ -7773,6 +7973,14 @@ dod_met() { # slug · run-state file · item · checker
         { [ "$_grc" = 3 ] && [ "$_gtry" = 1 ]; } || break
         echo "unattended: gates-green — the bar exited 3, TREE MOVED: the tree changed while it ran, so no verdict describes it; running it once more"
       done
+      # TOOL-aMendedFleet-9 S7 - THE DAILY HELD JOB'S REDS reach the auto-file after the bar has
+      # returned, on EVERY return code: held suites are not bar legs, so the red-bar branch alone
+      # would never see the common case, a green bar over red held suites. A BARE STATEMENT, and the
+      # bar's own capture is put back after it because the read-back inside reuses `run_bounded`, so
+      # the writer's outcome reaches neither DOD_OUT nor this item's return.
+      _grb=("$RB_OUT" "$RB_STDOUT" "$RB_TOOK" "$RB_ERR")
+      write_held_asks "$slug" "$_gr" "$_gdir"
+      RB_OUT=${_grb[0]}; RB_STDOUT=${_grb[1]}; RB_TOOK=${_grb[2]}; RB_ERR=${_grb[3]}
       # THE `gates-run` FACT, naming this bar's id and the HEAD it graded - the record S7's two
       # refusals consult. On a MET bar it is written with the close's other writes, after the carry
       # check, so a refusal there still writes nothing; on an UNMET one it is written HERE, because

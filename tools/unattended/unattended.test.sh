@@ -11429,7 +11429,7 @@ printf '#!/usr/bin/env bash\ncase "${F4_CP_FAILS:-}" in\n  backup)  [ "$2" = "$F
   > "$TMP/f4-shim/cp"
 chmod +x "$TMP/f4-shim/cp"
 f4_shim=$(cd "$TMP/f4-shim" && pwd)
-slice_fn write_inherited_asks; slice_fn write_backlog_rows
+slice_fn write_inherited_asks; slice_fn write_backlog_rows; slice_fn write_ask_rows
 read_leg_argv() { printf 'bash x.sh'; }
 derive_ask_seq() { printf '2'; }
 read_ask_back() { AB_WHY="the double reads nothing back"; [ "${F4_READBACK:-no}" = yes ]; }
@@ -11483,8 +11483,57 @@ hit  "$out" "f4-views-double: 1 filed"
 same "F4 the views helper is called once per filing call" "$(printf '%s\n' "$out" | grep -c 'f4-views-double')" "1"
 hit  "$(cat "$f4_dir/memory/builds/tRun/BACKLOG.md")" "- KEEP · ARCH-tRun-1 · authored, and kept live on purpose"
 hit  "$(cat "$f4_dir/memory/builds/tRun/BACKLOG.md")" "- SEV · ARCH-tRun-2 · HIGH · a merge-bar leg is red on the default branch"
-unset -f write_inherited_asks write_backlog_rows read_leg_argv derive_ask_seq read_ask_back write_ask_views run_f4_filer seed_f4_tree
+unset -f write_inherited_asks write_backlog_rows write_ask_rows read_leg_argv derive_ask_seq read_ask_back write_ask_views run_f4_filer seed_f4_tree
 rm -rf "$f4_dir" "$TMP/f4-authored.md" "$TMP/f4-not-a-dir" "$TMP/f4-shim"
+
+# TOOL-aMendedFleet-9: THE DAILY HELD JOB'S REDS. SLICED, with the reader shadowed and ASKS_CMD blank,
+# so the writer only PRINTS what it would file. The key is read at R: blank is DARK and a bad shape is
+# refused, and neither reaches the reader. Over an armed key, a red row prints in the ask grammar, a
+# green row is skipped, and a backtick name and a sha R does not descend from are refused by name.
+h9_dir=$(mktemp -d)
+( cd "$h9_dir" && git init -q -b main . && git config user.email t@t.test && git config user.name t \
+    && git config core.autocrlf false && mkdir -p memory/builds/tRun \
+    && printf -- '---\nslug: tRun\nroster: ARCH\n---\n' > memory/builds/tRun/README.md \
+    && printf 'HELD_CI_WORKFLOW=""\n' > .unattended.conf && git add -A && git commit -q -m blank --no-verify ) >/dev/null 2>&1
+slice_fn write_held_asks; slice_fn read_policy_key; slice_fn read_roster_family
+readme_of() { printf '%s/builds/%s/README.md' "$M" "$1"; }
+read_leg_argv() { return 1; }
+derive_ask_seq() { printf '7'; }
+read_held_reds() { echo "$2" >> "$h9_dir/.git/h9-calls"; [ -z "$H9_ROWS" ] || printf '%s\n' "$H9_ROWS"; echo "held reader: run 9 at stub · 4 held job(s) read · 3 red"; }
+run_h9() { # R -> the sliced writer's output over the arm's repository, with ASKS_CMD blank
+  local M=memory ASKS_CMD="" CONF=.unattended.conf AURL=https://github.com/o/r.git
+  ( cd "$h9_dir" || exit 2; write_held_asks tRun "$1" ""; echo "h9-rc=$?" ) 2>&1
+}
+H9_ROWS=""
+h9_r=$(git -C "$h9_dir" rev-parse HEAD)
+out=$(run_h9 "$h9_r")
+hit  "$out" "gates-green: held reader DARK — HELD_CI_WORKFLOW is blank or absent in the conf at ${h9_r:0:8}, so no request is made"
+hit  "$out" "h9-rc=0"
+n=$((n+1)); [ ! -s "$h9_dir/.git/h9-calls" ] || { echo "FAIL held: a blank HELD_CI_WORKFLOW at R still called the reader"; st=1; }
+printf 'HELD_CI_WORKFLOW="../x.yml"\n' > "$h9_dir/.unattended.conf"; git -C "$h9_dir" commit -qam bad --no-verify
+h9_r=$(git -C "$h9_dir" rev-parse HEAD)
+out=$(run_h9 "$h9_r")
+hit  "$out" "gates-green: held reader refused — HELD_CI_WORKFLOW at ${h9_r:0:8} is outside [A-Za-z0-9._-]+ ending .yml or .yaml"
+hit  "$out" "h9-rc=0"
+n=$((n+1)); [ ! -s "$h9_dir/.git/h9-calls" ] || { echo "FAIL held: a refused HELD_CI_WORKFLOW reached the reader"; st=1; }
+printf 'HELD_CI_WORKFLOW="remote-ci.yml"\n' > "$h9_dir/.unattended.conf"; git -C "$h9_dir" commit -qam armed --no-verify
+h9_r=$(git -C "$h9_dir" rev-parse HEAD)
+h9_off=$(git -C "$h9_dir" commit-tree -p HEAD -m off "$(git -C "$h9_dir" rev-parse 'HEAD^{tree}')")
+H9_ROWS=$(printf 'held\tok suite\t%s\t9\tfailure\nheld\tgreen suite\t%s\t9\tsuccess\nheld\tbad`suite\t%s\t9\tfailure\nheld\toff suite\t%s\t9\ttimed_out' "$h9_r" "$h9_r" "$h9_r" "$h9_off")
+out=$(run_h9 "$h9_r")
+hit  "$out" "gates-green: held reader: run 9 at stub · 4 held job(s) read · 3 red"
+hit  "$out" "gates-green: ASKS_CMD is blank, so the held auto-file is DARK and writes nothing; it would have filed, in memory/builds/tRun/BACKLOG.md:"
+hit  "$out" " · held red: suite ok suite red at ${h9_r:0:8} on the daily held job, run 9 · seen \`.github/workflows/remote-ci.yml\`@${h9_r:0:8} · accept the suite is green on the daily held job at the default branch's tip"
+hit  "$out" "    - SEV · ARCH-tRun-7 · HIGH · a held self-test is red on the default branch's daily job"
+hit  "$out" "gates-green: held suite refused, no ask filed — its name carries a backtick"
+hit  "$out" "gates-green: no ask filed for held suite off suite — its head sha $h9_off is not an ancestor of R ${h9_r:0:8} here"
+hit  "$out" "h9-rc=0"
+miss "$out" "suite green suite"
+miss "$out" "suite bad"
+n=$((n+1)); [ ! -e "$h9_dir/memory/builds/tRun/BACKLOG.md" ] || { echo "FAIL held: the writer with ASKS_CMD blank wrote a BACKLOG.md"; st=1; }
+unset -f write_held_asks read_policy_key read_roster_family readme_of read_leg_argv derive_ask_seq read_held_reds run_h9
+unset H9_ROWS
+rm -rf "$h9_dir"
 
 # AC21 and AC23: under park with the witness set, the rows are staged beside the hold line; commit,
 # push, reap and hold as the line says, and the hold is accepted. Resumed and closed again over the

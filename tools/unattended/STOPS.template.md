@@ -460,6 +460,16 @@ Rows the generator does not read back as one OPEN ask are removed and named. An 
 already filed for the same leg at the same R is reused and named, so a repeated hold files nothing
 twice. With `ASKS_CMD` blank the item prints the rows it would file and writes nothing.
 
+**The daily held job's reds get an owner too.** After the bar returns, on every return code and
+without touching the verdict, the item reads the latest completed scheduled run of the workflow
+`HELD_CI_WORKFLOW` names, read from the conf at R, through the public API with no credential, and
+files one ask per held suite whose job concluded `failure` or `timed_out`, in the same grammar and
+through the same read-back and rollback: SEV HIGH, a KEEP row, and an `accept` clause asking for the
+suite green on the daily held job. An OPEN HIGH ask for the same suite in ANY build's `BACKLOG.md`
+is reused and named. A name carrying a backtick, a control character, ` · ` or ` → `, and a head sha
+R does not descend from, are refused and named. Every way the read can fail is a `DEAD PROBE` line
+that files nothing, and blank `HELD_CI_WORKFLOW` is DARK, announced, with no request made.
+
 **The two escape routes are backed or refused.** `--close --override gates-green` and
 `--abort --code gate-red-out-of-scope` are refused, numbered, unless the record the `gates-run` fact
 names reads every red leg INHERITED, on a bar whose header shows `head` equal to HEAD and

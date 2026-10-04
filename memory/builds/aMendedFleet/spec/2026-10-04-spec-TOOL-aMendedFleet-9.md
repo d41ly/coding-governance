@@ -1,10 +1,12 @@
 # TOOL-aMendedFleet-9 — the daily held job's red suites reach the inherited-red HIGH auto-file
 
-**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 9
+**Status:** CLOSED · rev-3 · 2026-10-05 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 9
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-04-build-TOOL-aMendedFleet-9-1-acceptance-ledger.md](../build/2026-10-04-build-TOOL-aMendedFleet-9-1-acceptance-ledger.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
@@ -107,8 +109,13 @@ The ask, SEV and KEEP rows, in the grammar `tools/memory-tree/backlog.py` parses
 
 ### Inventory
 
-- `read_held_reds` — the reader: anchor URL, conf blob at R, R in; TAB rows and the liveness line out.
-- `write_held_asks` — the writer: slug, R, bar run dir in; staged rows and one line per suite out.
+- `read_held_reds` — the reader: anchor URL and the workflow file name in; TAB rows and the liveness
+  line out. It re-checks the name's shape before building a URL from it.
+- `write_held_asks` — the writer: slug, R, bar run dir in; reads `HELD_CI_WORKFLOW` from the conf at
+  R, prints the DARK line or the refusal before any reader call, then staged rows and one line per
+  suite out.
+- `write_ask_rows` and `read_roster_family` — the backup, write, read-back and rollback block and the
+  roster-family read, lifted out of `write_inherited_asks` unchanged so both writers share one copy.
 - `HELD_CI_WORKFLOW` — the optional conf key, `kit.toml` `optional_keys`, defaulted blank on the
   driver's init block beside `ASKS_CMD`.
 
@@ -247,6 +254,11 @@ New arm: tools/unattended/unattended.test.sh · a shadowed held reader over a fi
   `write_inherited_asks` is the copy a merge stripped of its views call, and that unit restores the
   call; this writer copied the stripped pattern. S4 now calls `write_ask_views` after its loop, AC3
   observes the render, and the edge declares the dependency.
+- rev-3 · 2026-10-05 · §4 Inventory · build: the reader takes the workflow file name rather than the
+  conf blob and R, because AC5 and AC6 need the DARK line and the key refusal printed with no reader
+  call, so the writer reads the key at R and the reader has no use for R; the writer's rollback block
+  and roster-family read are lifted into two shared helpers so `write_inherited_asks` and this writer
+  run one copy of the existing rollback, as S4 says.
 
 ## 10. Reuse audit
 

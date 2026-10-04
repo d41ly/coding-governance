@@ -209,7 +209,9 @@ never tracked; read by `--liveness`, `--status`, `--landed` and the tick.
 remote advertises, and hands the bar the inherited-red policy it read at that tip. It then reads that
 bar's own run record: an inherited-only red within its age bound is met under `land`, parks as the
 `inherited-red` hold under `park`, and files an ask for each inherited leg once `ASKS_CMD` is
-declared. The contract is `UNATTENDED-STOPS.md`. One residual moved here from the protocol's §3 when
+declared. After the bar, on every return code, it also reads the daily scheduled held job of the
+workflow `HELD_CI_WORKFLOW` names and files one HIGH ask per red held suite the same way, reusing an
+OPEN one in any build. The contract is `UNATTENDED-STOPS.md`. One residual moved here from the protocol's §3 when
 that arm grew its decision table (`TOOL-dDerivedDocket-24`): two runs CLOSING together in one clone
 contend on the bar's turnstile. Where the project declares a profile, the queue wait has its own term
 in the bar's backstop and the second run waits it out; where it does not, the wait is charged
