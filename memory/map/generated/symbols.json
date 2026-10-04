@@ -1788,6 +1788,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "check_merge_losses",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
+    },
+    {
       "id": "check_msys_addressable",
       "kind": "function",
       "file": "tools/process-monitor/reap.py"
@@ -5533,6 +5538,11 @@
       "file": "tools/memory-tree/corpus_ids.py"
     },
     {
+      "id": "read_defs_at_sha",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
+    },
+    {
       "id": "read_deploy",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
@@ -6071,6 +6081,11 @@
       "id": "read_summary_counts",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "read_superseded",
+      "kind": "function",
+      "file": "tools/lexicon/lexicon.py"
     },
     {
       "id": "read_surface_disagreements",

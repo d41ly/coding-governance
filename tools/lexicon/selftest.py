@@ -5827,6 +5827,95 @@ check("AC6: ...and a refusal-blown reading earns `probe` too, so F2 reaches the 
       f"{read_ts_mode(_ts_all)} clears_f1={_ts_all['clears_f1']}")
 
 
+# ---- TOOL-aMendedFleet-3: `--merge-losses`, a merge that LOSES a definition a parent carried ------
+#
+# ONE fixture history, several resolutions of the same conflicting merge. The base defines `fa`,
+# `fk` and `fz`; side A rewrites `fa`; side B rewrites `fa` too (the conflict), adds `fb` beside a
+# same-named STUB in `t.sh`, and takes `fz` out. Each case checks side A out, merges B without
+# committing, WRITES the resolution, and commits — so the resolution is the case, not git's choice.
+# The stub is the rev-4 class: merge `01c22e155` lost `write_ask_views` while a suite stub of the
+# same name stood in another file, and a check clearing by bare name passed it.
+with build_tempdir() as _td:
+    _r = Path(_td)
+    _git = lambda *a: subprocess.run(["git", *a], cwd=_r, capture_output=True, text=True)  # noqa: E731
+    _git("init", "-q", "-b", "main")
+    for _k, _v in (("user.email", "s@e"), ("user.name", "s"), ("core.autocrlf", "false")):
+        _git("config", _k, _v)
+    _ml_conf = 'LANGS="sh:shell-tokens:parser conf::dark"\n'
+    (_r / ".lexicon.conf").write_text(_ml_conf, encoding="utf-8", newline="\n")
+    (_r / "a.sh").write_text("fa() { :; }\nfk() { :; }\nfz() { :; }\n", encoding="utf-8", newline="\n")
+    _git("add", "-A")
+    _git("commit", "-qm", "base")
+    _git("checkout", "-q", "-b", "sideB")
+    (_r / "a.sh").write_text("fa() { echo B; }\nfb() { :; }\nfk() { :; }\n", encoding="utf-8", newline="\n")
+    (_r / "t.sh").write_text("fb() { echo stub; }\n", encoding="utf-8", newline="\n")
+    _git("add", "-A")
+    _git("commit", "-qm", "side B")
+    _git("checkout", "-q", "-b", "sideA", "main")
+    (_r / "a.sh").write_text("fa() { echo A; }\nfk() { :; }\nfz() { :; }\n", encoding="utf-8", newline="\n")
+    _git("commit", "-qam", "side A")
+    _ml_a = _git("rev-parse", "HEAD").stdout.strip()
+    _ml_runs = {}
+    for _case, _files, _msg in (
+            ("lose", {"a.sh": "fa() { echo A; }\nfk() { :; }\n"}, "merge B, taking side A"),
+            ("keep", {"a.sh": "fa() { echo A; }\nfb() { :; }\nfk() { :; }\n"}, "merge B, keeping both"),
+            ("sup", {"a.sh": "fa() { echo A; }\nfk() { :; }\n"}, "merge B\n\nsuperseded: fb -> fa\n"),
+            ("badsup", {"a.sh": "fa() { echo A; }\nfk() { :; }\n"}, "merge B\n\nsuperseded: fb -> nothere\n"),
+            ("move", {"a.sh": "fb() { :; }\nfk() { :; }\n", "b.sh": "fa() { echo A; }\n"}, "merge B, moving fa"),
+            ("both", {"a.sh": "fa() { echo A; }\nfb() { :; }\n"}, "merge B, taking out fk")):
+        _git("checkout", "-q", "--detach", _ml_a)
+        _git("merge", "--no-commit", "--no-ff", "sideB")
+        for _rel, _body in _files.items():
+            (_r / _rel).write_text(_body, encoding="utf-8", newline="\n")
+        _git("add", "-A")
+        _git("commit", "-qm", _msg)
+        _ml_m = _git("rev-parse", "HEAD").stdout.strip()
+        if _case == "lose":
+            # The RESTORE: one commit on top of the losing merge, re-adding `fb` where it was.
+            (_r / "a.sh").write_text("fa() { echo A; }\nfb() { :; }\nfk() { :; }\n", encoding="utf-8",
+                                     newline="\n")
+            _git("commit", "-qam", "restore fb")
+            _ml_runs["restore"] = subprocess.run(
+                [sys.executable, str(KIT / "lexicon.py"), "--merge-losses", f"{_ml_a}..HEAD"],
+                cwd=_r, capture_output=True, text=True, encoding="utf-8")
+        _ml_runs[_case] = subprocess.run(
+            [sys.executable, str(KIT / "lexicon.py"), "--merge-losses", f"{_ml_a}..{_ml_m}"],
+            cwd=_r, capture_output=True, text=True, encoding="utf-8")
+    _o = {k: (v.returncode, v.stdout + v.stderr) for k, v in _ml_runs.items()}
+    check("AMF3 AC3: a merge resolving to side A and losing side B's `fb` exits 1 naming it, though a "
+          "same-named stub stands in another file",
+          _o["lose"][0] == 1 and "a.sh: fb" in _o["lose"][1] and "parent 2" in _o["lose"][1], f"{_o['lose']}")
+    check("AMF3 AC3/AC4: the same merge keeping both exits 0, and lacking `fz`, which side B took out "
+          "since the base, is no loss", _o["keep"][0] == 0 and "losses=0" in _o["keep"][1], f"{_o['keep']}")
+    check("AMF3 AC3: `superseded: fb -> fa` clears it and is counted",
+          _o["sup"][0] == 0 and "superseded=1" in _o["sup"][1], f"{_o['sup']}")
+    check("AMF3 AC3: `superseded: fb -> nothere` refuses, naming the successor",
+          _o["badsup"][0] == 1 and "nothere" in _o["badsup"][1], f"{_o['badsup']}")
+    check("AMF3 AC4: a commit re-adding `fb` after the losing merge clears it at the range tip, counted",
+          _o["restore"][0] == 0 and "restored=1" in _o["restore"][1], f"{_o['restore']}")
+    check("AMF3 AC4: a merge moving `fa` to a second file exits 0, counted as masked",
+          _o["move"][0] == 0 and "masked=1" in _o["move"][1], f"{_o['move']}")
+    check("AMF3 AC4: a merge taking out `fk`, which both parents carried from the base, exits 1",
+          _o["both"][0] == 1 and "a.sh: fk" in _o["both"][1] and "parents 1 and 2" in _o["both"][1],
+          f"{_o['both']}")
+    check("AMF3 AC10: every run prints its summary line with its seconds",
+          all("seconds=" in v[1] for v in _o.values()), f"{_o}")
+    # AC5 — the reassuring zero of a reader that reads nothing is a DEAD PROBE, never a pass.
+    (_r / ".lexicon.conf").write_text('LANGS="sh::dark conf::dark"\n', encoding="utf-8", newline="\n")
+    _ml_dark = subprocess.run([sys.executable, str(KIT / "lexicon.py"), "--merge-losses", f"{_ml_a}..sideB"],
+                              cwd=_r, capture_output=True, text=True, encoding="utf-8")
+    _ml_dark2 = subprocess.run(
+        [sys.executable, str(KIT / "lexicon.py"), "--merge-losses",
+         f"{_ml_a}..{_git('rev-parse', 'HEAD').stdout.strip()}"],
+        cwd=_r, capture_output=True, text=True, encoding="utf-8")
+    check("AMF3 AC5: a declaration arming no language exits 2 and prints DEAD PROBE",
+          _ml_dark2.returncode == 2 and "DEAD PROBE" in _ml_dark2.stdout,
+          f"rc={_ml_dark2.returncode} {_ml_dark2.stdout}{_ml_dark2.stderr}")
+    check("AMF3: a range holding no merge grades nothing and exits 0 without reading the declaration",
+          _ml_dark.returncode == 0 and "graded=0" in _ml_dark.stdout,
+          f"rc={_ml_dark.returncode} {_ml_dark.stdout}{_ml_dark.stderr}")
+
+
 if FAILURES:
     print(f"lexicon selftest FAILED — {len(FAILURES)} of {PASSES + len(FAILURES)} arm(s):")
     for f in FAILURES:

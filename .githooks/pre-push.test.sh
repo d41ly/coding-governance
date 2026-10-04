@@ -1262,4 +1262,52 @@ else
 fi
 cd "$pfx_home" || exit 2
 
+# ---- TOOL-aMendedFleet-3: A MERGE THAT LOSES A DEFINITION, refused on the default branch -----------
+# A fixture whose sideB adds `fb` and whose main merges sideB resolving the conflict to main's side,
+# which is merge `01c22e155`'s shape. The lexicon kit is copied to the fixture's root under the name
+# its directory has here, committed with a `.lexicon.conf` arming shell, so the hook finds it from
+# the pushing tree. Observed RED against the base hook: the token was `raw-push` and nothing named
+# the loss. AC7 is the control: the same merge carrying a valid `superseded:` line passes this block
+# and reaches the later raw-push refusal.
+if _ml_lex=$(resolve_kit_dir "$_rkd_py" lexicon lexicon.py "$SRC/$KIT_REL" 2>/dev/null); then
+  _ml_home=${_ml_lex##*/}
+  git init -q --bare "$tmp/ml.git"
+  git init -q "$tmp/ml"
+  cd "$tmp/ml" || exit 2
+  git config user.email t@example.com; git config user.name t; git config core.autocrlf false
+  git config core.hooksPath "$tmp/hooks"
+  cp -r "$SRC/$_ml_lex" "$_ml_home"; rm -rf "$_ml_home/__pycache__"
+  printf 'LANGS="sh:shell-tokens:parser"\n' > .lexicon.conf
+  printf '__pycache__/\n' > .gitignore
+  printf 'fa() { :; }\n' > a.sh
+  git add -A; git commit -q -m base; git branch -M main
+  git remote add origin "$tmp/ml.git"; git push -q --no-verify origin main
+  git -C "$tmp/ml.git" symbolic-ref HEAD refs/heads/main
+  git checkout -q -b sideB
+  printf 'fa() { echo B; }\nfb() { :; }\n' > a.sh; git commit -q -am "side B"
+  git checkout -q main
+  printf 'fa() { echo A; }\n' > a.sh; git commit -q -am "side A"
+  git merge -q --no-ff --no-commit sideB >/dev/null 2>&1
+  printf 'fa() { echo A; }\n' > a.sh; git add a.sh; git commit -q -m "merge sideB, taking side A"
+  before=$(git -C "$tmp/ml.git" rev-parse main)
+  msg=$(git push origin main 2>&1)
+  case "$msg|$(read_token)" in
+    *"a.sh: fb"*"|merge-loss") [ "$(git -C "$tmp/ml.git" rev-parse main)" = "$before" ] \
+        && ok "AMF3 AC6 a raw push of a merge losing fb is refused as merge-loss, naming it, remote unmoved" \
+        || bad "AMF3 AC6 the remote moved over a merge-loss refusal" ;;
+    *) bad "AMF3 AC6 expected the merge-loss refusal, got: ${msg:-<push SUCCEEDED>} | token '$(read_token)'" ;;
+  esac
+  git commit -q --amend -m "merge sideB, taking side A
+
+superseded: fb -> fa"
+  msg=$(git push origin main 2>&1)
+  case "$(read_token)" in
+    merge-loss|"") bad "AMF3 AC7 a superseded merge should pass the merge-loss block, got: ${msg:-<push SUCCEEDED>} | token '$(read_token)'" ;;
+    *) ok "AMF3 AC7 a merge carrying a valid superseded: line reaches the later '$(read_token)' refusal" ;;
+  esac
+  cd "$pfx_home" || exit 2
+else
+  bad "AMF3 the lexicon kit does not resolve beside this hook's kit root, so the merge-loss arms did not run"
+fi
+
 [ "$fail" = 0 ] && { echo "pre-push.test: all cases ok"; exit 0; } || { echo "pre-push.test: FAILURES"; exit 1; }

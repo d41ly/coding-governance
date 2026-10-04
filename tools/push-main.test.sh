@@ -4,7 +4,7 @@
 #
 # Cases 1-8 are the ATTENDED landing, from a primary tree with the default branch checked out, and
 # so are the cases after them up to AC1 (TOOL-aRepatriatedFork-5, -8: the lander marker, the one
-# dirty definition, the refusal channel). Then cases 9-22 AGAIN, a separate block: the IN-PLACE
+# dirty definition, the refusal channel). Then cases 9-23 AGAIN, a separate block: the IN-PLACE
 # landing flags (TOOL-dDerivedDocket-2), over a second fixture that adds
 # what they need: a linked worktree on a run branch, and a local default branch carrying commits
 # nobody pushed. What this file does NOT check: anything about a real remote or a real bar — the
@@ -574,5 +574,40 @@ rema=$(git ls-remote "$tmp/remote2.git" refs/heads/main | awk '{print $1}')
 [ "$rc22b" = 3 ] && [ "$rc22c" = 3 ] && [ "$remb" = "$rema" ] \
   && ok "22b an unreachable remote exits 3 from both read-only flags, and pushes nothing" \
   || bad "22b rc-carry=$rc22b rc-prepared=$rc22c $out22b $out22c"
+
+# 23 — TOOL-aMendedFleet-3 AC8: --prepare over a branch carrying a merge that LOSES a definition one
+#      parent carried refuses BEFORE the branch moves, naming it. The fixture's sideB adds `fb`; the
+#      run branch merges sideB resolving the conflict to its own side, merge `01c22e155`'s shape. The
+#      lexicon kit is the directory beside this lander that holds its anchor, copied beside the
+#      fixture's lander under the same name, where the lander looks for it. Observed RED against the
+#      base lander, which moved the branch to the prepared merge and exited 0.
+_ml_lex=$(cd "$HERE" && for d in */; do [ -f "$d/lexicon.py" ] && { printf '%s' "${d%/}"; break; }; done)
+if [ -n "$_ml_lex" ]; then
+  git init -q --bare "$tmp/remote3.git"
+  setup_repo "$tmp/work3" origin "$tmp/remote3.git"
+  git config core.autocrlf false
+  cp -r "$HERE/$_ml_lex" "./$KIT_REL$_ml_lex"; rm -rf "./$KIT_REL$_ml_lex/__pycache__"
+  printf 'LANGS="sh:shell-tokens:parser"\n' > .lexicon.conf
+  printf '__pycache__/\n' > .gitignore
+  printf 'fa() { :; }\n' > a.sh
+  git add -A; git commit -q -m "lexicon and a.sh"
+  git push -q --no-verify origin main
+  git -C "$tmp/remote3.git" symbolic-ref HEAD refs/heads/main
+  git checkout -q -b sideB
+  printf 'fa() { echo B; }\nfb() { :; }\n' > a.sh; git commit -q -am "side B"
+  git checkout -q -b feat main
+  printf 'fa() { echo A; }\n' > a.sh; git commit -q -am "TOOL-tFix-5: side A"
+  git merge -q --no-ff --no-commit sideB >/dev/null 2>&1
+  printf 'fa() { echo A; }\n' > a.sh; git add a.sh; git commit -q -m "merge sideB, taking side A"
+  before23=$(git rev-parse refs/heads/feat)
+  out23=$(bash "$lander" --prepare --slug fx 2>&1); rc23=$?
+  [ "$rc23" = 1 ] && [ "$(git rev-parse refs/heads/feat)" = "$before23" ] \
+    && [ "$(git symbolic-ref --short HEAD 2>/dev/null)" = feat ] \
+    && case "$out23" in *"a.sh: fb"*) true ;; *) false ;; esac \
+    && ok "23 --prepare refuses a merge losing fb, naming it; the branch is unmoved and checked out" \
+    || bad "23 rc=$rc23 head=$(git symbolic-ref --short HEAD 2>/dev/null) $out23"
+else
+  bad "23 no directory beside this lander holds the lexicon kit, so the merge-loss arm did not run"
+fi
 
 [ "$fail" = 0 ] && { echo "push-main.test: all cases ok"; exit 0; } || { echo "push-main.test: FAILURES"; exit 1; }

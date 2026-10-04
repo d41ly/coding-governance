@@ -76,6 +76,7 @@ successor. TOOL-aSurfacedLexicon-2.
 import re
 import subprocess
 import sys
+import time
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -4104,6 +4105,229 @@ def run_expand(root: Path) -> int:
     return 0
 
 
+#: One `superseded: <name> -> <successor>` line of a merge's message: the declared escape from a
+#: merge-loss refusal. TOOL-aMendedFleet-3 S2 and §8 F1.
+SUPERSEDED_RX = re.compile(r"^superseded:[ \t]*(\S+)[ \t]*->[ \t]*(\S+)[ \t]*$", re.M)
+
+
+def read_defs_at_sha(root: Path, sha: str, armed: dict, sets: dict, paths=None, cache=None):
+    """`{(path, name)}` — every function definition an armed extractor sees in the tree at `sha`,
+    restricted to `paths` when given. `None` when a git call failed, which is not an empty tree.
+
+    ONE `git ls-tree` and at most ONE `git cat-file --batch` per call: the shape `drift_report.py`'s
+    `_read_defs_at_sha` measured, because on Windows a per-file read is spawn-bound. COPIED rather
+    than imported — that script roots itself on its own kit and loads the drift project layer, so a
+    refusal-capable check resting on it would not start in a tree without drift-audit. The
+    extractor is the shared part, and it is this kit's own `extract_text`.
+
+    `cache` maps `(blob, ext)` to the names read from it, so a blob unchanged across the four shas
+    of one merge is parsed once. A blob its extractor cannot parse contributes NO names. That is the
+    drift reader's rule, and here it fails closed: a merge that leaves a file unparseable has lost
+    what the file held, and says so as losses rather than passing.
+    """
+    cache = {} if cache is None else cache
+    listing = subprocess.run(["git", "ls-tree", "-r", "-z", sha], cwd=root, capture_output=True)
+    if listing.returncode != 0:
+        return None
+    want = []
+    for rec in listing.stdout.split(b"\0"):
+        meta, _, raw = rec.partition(b"\t")
+        bits = meta.split()
+        if len(bits) < 3 or bits[1] != b"blob":
+            continue
+        rel = raw.decode("utf-8", errors="replace")
+        ext = ext_of(rel)
+        if ext not in armed or (paths is not None and rel not in paths):
+            continue
+        want.append(((bits[2].decode("ascii"), ext), rel))
+    todo = sorted({key for key, _ in want if key not in cache})
+    if todo:
+        batch = subprocess.run(["git", "cat-file", "--batch"], cwd=root, capture_output=True,
+                               input="".join(blob + "\n" for blob, _ in todo).encode("ascii"))
+        if batch.returncode != 0:
+            return None
+        buf, i = batch.stdout, 0
+        for key in todo:
+            nl = buf.find(b"\n", i)
+            header = buf[i:nl].split() if nl >= 0 else []
+            if len(header) < 3 or not header[2].isdigit():
+                return None
+            size = int(header[2])
+            src = buf[nl + 1: nl + 1 + size].decode("utf-8", errors="replace")
+            i = nl + 1 + size + 1
+            pset, mode = armed[key[1]]
+            try:
+                got = extract_text(src, mode, pset, sets=sets)
+            except (SyntaxError, ValueError, KeyError):
+                got = None
+            cache[key] = frozenset(nm for nm, _ln in got[0]) if got else frozenset()
+    return {(rel, nm) for key, rel in want for nm in cache[key]}
+
+
+def read_superseded(message: str) -> list:
+    """`[(name, successor)]` — every `superseded:` line of a merge's message, in order."""
+    return SUPERSEDED_RX.findall(message or "")
+
+
+def check_merge_losses(root: Path, rng: str) -> int:
+    """`--merge-losses <a>..<b>`: exit 1 when a two-parent merge in the range LOSES a definition a
+    parent carried. TOOL-aMendedFleet-3, mechanizing the charter's §1 Landing sentence "diff the
+    merge against BOTH parents" — merge `01c22e155` took one side and lost `write_ask_views`.
+
+    THE RULE. For merge M with parents P1, P2 and base B, over the ARMED paths where M's tree differs
+    from either parent: a `(path, name)` in Pi and not in M is a candidate, UNLESS it is in B and not
+    in the other parent — the other side took it out and git applied that. A candidate then clears,
+    COUNTED and printed, when its name is defined anywhere in M (`masked`, a move), anywhere at `<b>`
+    (`restored`, a later commit put it back), or when M's message carries `superseded: <name> ->
+    <successor>` and the successor is a definition in M (`superseded`). What remains is a loss.
+
+    WHAT THIS DOES NOT SEE, stated so a green run is not read as semantic coverage:
+      * a body that lost lines under a surviving name, and any loss below definition level — prose,
+        a record row, a conf key;
+      * a language `.lexicon.conf` does not arm, and a `probe` reader's misses;
+      * a loss masked by a same-named definition elsewhere in the merge's tree (the masked count is
+        printed every run, so the case is visible rather than silent);
+      * an octopus merge, or one with no merge base — each is SKIPPED and named, never graded.
+
+    Exit 0 no loss · 1 a loss or a `superseded:` line naming no definition · 2 a DEAD PROBE: no
+    declaration, no armed language, a git call that failed, or armed paths read with zero
+    definitions found across all of them. One summary line prints on every run, with its seconds.
+    """
+    started = time.monotonic()
+    git = lambda *args: subprocess.run(["git", *args], cwd=root, capture_output=True,  # noqa: E731
+                                       text=True, encoding="utf-8", errors="replace")
+    counts = dict.fromkeys(("graded", "skipped", "paths", "losses", "masked", "restored",
+                            "superseded"), 0)
+    dead, refused, found = "", False, 0
+    a, sep, b = rng.partition("..")
+    tip = git("rev-parse", "--verify", "--quiet", f"{b}^{{commit}}") if sep and a and b else None
+    merges = git("rev-list", "--reverse", "--merges", "--parents", f"{a}..{b}") if tip else None
+    conf_path = root / CONF_NAME
+    armed, sets = {}, None
+    if not (sep and a and b) or b.startswith("."):
+        dead = f"the range must be <a>..<b>, got {rng!r}"
+    elif tip.returncode != 0 or merges.returncode != 0:
+        dead = f"git could not resolve the range {rng!r}: {(merges.stderr or tip.stderr).strip()}"
+    elif merges.stdout.strip() and not conf_path.exists():
+        dead = f"no {CONF_NAME} at {root.as_posix()}, so no language is armed to read definitions"
+    elif merges.stdout.strip():
+        try:
+            conf = load_conf(conf_path)
+            sets = resolve_pattern_sets(conf)
+            armed = {ext: (pset, mode) for ext, pset, mode in langs(conf)
+                     if resolve_extractor(mode, pset, sets) is not None}
+        except (ConfError, ValueError) as exc:
+            dead = f"{CONF_NAME} does not load: {exc}"
+        if not dead and not armed:
+            dead = f"{CONF_NAME} arms no language, so no definition can be read"
+    cache, tip_homes = {}, None
+    rows = [] if dead or tip is None else [ln.split() for ln in merges.stdout.splitlines() if ln.strip()]
+    for merge, *parents in rows:
+        if len(parents) != 2:
+            counts["skipped"] += 1
+            print(f"merge-losses: SKIPPED {merge[:8]} — an octopus merge of {len(parents)} parents is not graded")
+            continue
+        base = git("merge-base", *parents)
+        if base.returncode == 1 and not base.stdout.strip():
+            counts["skipped"] += 1
+            print(f"merge-losses: SKIPPED {merge[:8]} — its parents share no merge base, so nothing is graded")
+            continue
+        changed, diffs = set(), [git("diff", "--name-only", "--no-renames", "-z", p, merge) for p in parents]
+        if base.returncode != 0 or any(d.returncode != 0 for d in diffs):
+            dead = f"git could not read merge {merge[:8]}'s base or parent diffs"
+            break
+        for d in diffs:
+            changed |= {x for x in d.stdout.split("\0") if x and ext_of(x) in armed}
+        counts["graded"] += 1
+        counts["paths"] += len(changed)
+        if not changed:
+            continue
+        shas = (base.stdout.strip(), parents[0], parents[1], merge)
+        at = [read_defs_at_sha(root, sha, armed, sets, changed, cache) for sha in shas]
+        if any(x is None for x in at):
+            dead = f"git could not read the definitions of merge {merge[:8]} at one of its four shas"
+            break
+        at_base, at_p1, at_p2, at_merge = at
+        found += sum(len(x) for x in at)
+        lost = {}
+        for num, mine, other in ((1, at_p1, at_p2), (2, at_p2, at_p1)):
+            for d in mine - at_merge:
+                if d in at_base and d not in other:
+                    continue
+                lost.setdefault(d, []).append(num)
+        sup = read_superseded(git("log", "-1", "--format=%B", merge).stdout)
+        if not lost and not sup:
+            continue
+        # WHOLE-TREE INDEXES, `{name: {paths}}`, read only now that a candidate or a `superseded:`
+        # line exists. The blob cache makes each one mostly a re-index of blobs already parsed.
+        # Indexed per PATH, not as a bare name set (rev-4): a name set let the suite's own stub of
+        # `write_ask_views` in `unattended.test.sh` mask the very loss this check exists for.
+        homes = {}
+        for key, sha in (("merge", merge), ("p1", parents[0]), ("p2", parents[1])):
+            if key != "merge" and not any(int(key[1]) in nums for nums in lost.values()):
+                continue
+            whole = read_defs_at_sha(root, sha, armed, sets, None, cache)
+            if whole is None:
+                dead = f"git could not read the whole tree of {sha[:8]}, of merge {merge[:8]}"
+                break
+            homes[key] = {}
+            for p, nm in whole:
+                homes[key].setdefault(nm, set()).add(p)
+        if dead:
+            break
+        successor = {}
+        for name, succ in sup:
+            if succ in homes["merge"]:
+                successor[name] = succ
+            else:
+                refused = True
+                print(f"merge-losses: BAD SUPERSEDED {merge[:8]} — 'superseded: {name} -> {succ}' names "
+                      f"'{succ}', which is no definition in the merge's tree")
+        for path, name in sorted(lost):
+            nums = lost[(path, name)]
+            # A NEW HOME is a path the carrying parent did not define the name in. Only there does a
+            # same-named definition read as a move or a restore; at an OLD home it is a second copy
+            # that already stood beside the lost one (§8 F2, as refined at rev-4).
+            old = set().union(*(homes[f"p{n}"].get(name, set()) for n in nums))
+            if homes["merge"].get(name, set()) - old:
+                counts["masked"] += 1
+                continue
+            if tip_homes is None:
+                whole_tip = read_defs_at_sha(root, tip.stdout.strip(), armed, sets, None, cache)
+                if whole_tip is None:
+                    dead = f"git could not read the whole tree at the range tip {b}"
+                    break
+                tip_homes = {}
+                for p, nm in whole_tip:
+                    tip_homes.setdefault(nm, set()).add(p)
+            at_tip = tip_homes.get(name, set())
+            if path in at_tip or at_tip - old:
+                counts["restored"] += 1
+            elif name in successor:
+                counts["superseded"] += 1
+            else:
+                counts["losses"] += 1
+                which = f"parent {nums[0]}" if len(nums) == 1 else "parents 1 and 2"
+                print(f"merge-losses: LOSS {merge[:8]} {which}: {path}: {name}")
+        if dead:
+            break
+    if not dead and counts["paths"] and not found:
+        dead = (f"{counts['paths']} armed path(s) read across {counts['graded']} merge(s) and zero "
+                f"definitions found, so the reader is not reading")
+    if counts["losses"]:
+        print("  remedy: restore each lost definition in a new commit (a definition the range tip carries "
+              "clears), or, where the loss is deliberate, add 'superseded: <name> -> <successor>' to the "
+              "merge's message, naming a definition the merge keeps")
+    if dead:
+        print(f"merge-losses: DEAD PROBE — {dead}")
+    print("merge-losses: " + " ".join(f"{k}={v}" for k, v in counts.items())
+          + f" seconds={time.monotonic() - started:.2f}")
+    # A LOSS OUTRANKS A LATER DEAD PROBE: what was observed is refused even if a later read failed.
+    if counts["losses"] or refused:
+        return 1
+    return 2 if dead else 0
+
+
 def resolve_self_path() -> str:
     """This file's path AS THE OPERATOR WOULD TYPE IT, derived from `__file__` (S5).
 
@@ -4132,7 +4356,8 @@ def resolve_self_path() -> str:
 def main(argv: list[str]) -> int:
     me = resolve_self_path()
     mode = argv[1] if len(argv) > 1 else "--check"
-    if mode not in ("--check", "--list", "--measure", "--suggest", "--expand", "--offenders"):
+    if mode not in ("--check", "--list", "--measure", "--suggest", "--expand", "--offenders",
+                    "--merge-losses"):
         # THE USAGE BLOCK LIVES HERE AND NOWHERE ELSE. It moved out of the module docstring, whose
         # copy spelled the install prefix six times and reached every adopter unchanged.
         sys.stderr.write(
@@ -4146,7 +4371,13 @@ def main(argv: list[str]) -> int:
             "  --suggest <name> --as <ext>.<surface>\n"
             "                     one line for ONE identifier, no corpus pass\n"
             "  --expand           propose the live clusters this table does not declare; writes\n"
-            "                     nothing. The stamp lives in adopt-lexicon.sh --expand --stamp\n")
+            "                     nothing. The stamp lives in adopt-lexicon.sh --expand --stamp\n"
+            "  --merge-losses <a>..<b>\n"
+            "                     exit 1 when a merge in the range loses a definition a parent\n"
+            "                     carried; 2 when it cannot answer\n")
+        return 2
+    if mode == "--merge-losses" and (len(argv) != 3 or ".." not in argv[2]):
+        sys.stderr.write(f"usage: python {me} --merge-losses <a>..<b>\n")
         return 2
     if mode == "--expand" and len(argv) > 2:
         # REFUSED RATHER THAN IGNORED. Every other mode here reads `argv[1]` and drops the rest, so
@@ -4189,6 +4420,10 @@ def main(argv: list[str]) -> int:
     # exit-code claim belongs. Round-2 review F8.
     if mode == "--expand":
         return run_expand(root)
+    # The MERGE-LOSS verb reads git objects and decides only its own exit; like the two above it
+    # returns before `run()`, so it cannot reach a pin or a waiver. TOOL-aMendedFleet-3.
+    if mode == "--merge-losses":
+        return check_merge_losses(root, argv[2])
     return run(root, list_mode=(mode == "--list"), measure_mode=(mode == "--measure"),
                offenders_mode=(mode == "--offenders"))
 

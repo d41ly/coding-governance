@@ -1,10 +1,12 @@
 # TOOL-aMendedFleet-3 — the lander refuses a merge that loses a definition a parent carried
 
-**Status:** SPECCED · rev-3 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · order 3 · ratified 2026-10-04
+**Status:** CLOSED · rev-4 · 2026-10-05 · node a · Tier-2 · base 7af5f564 · streams tooling · order 3 · ratified 2026-10-04
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-04-build-TOOL-aMendedFleet-3-1-acceptance-ledger.md](../build/2026-10-04-build-TOOL-aMendedFleet-3-1-acceptance-ledger.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
@@ -31,8 +33,9 @@ retires nothing.
   base and absent from the other parent: the other side took it out, and git applied that.
   Observed by AC1, AC2, AC3, AC4.
 - **S2** — Three dispositions clear a candidate loss, each counted and printed rather than silent:
-  `masked` when the name is defined anywhere in the merge's tree (a move); `restored` when the name
-  is defined anywhere in the tree at `<b>`, the range tip (a later commit put it back); `superseded`
+  `masked` when the merge's tree defines the name at a NEW home, a path the carrying parent did not
+  define it in (a move); `restored` when the tree at `<b>`, the range tip, defines it at the lost
+  path or at such a new home (a later commit put it back); `superseded`
   when the merge's message carries a line `superseded: <name> -> <successor>` and `<successor>` is a
   definition in the merge's tree. A `superseded:` line whose successor names no definition there is
   itself reported, naming the successor. Observed by AC3, AC4.
@@ -120,13 +123,15 @@ For merge `M` with parents `P1`, `P2` and base `B = merge-base(P1, P2)`, over th
 
 ```
 candidate = { d in defs(Pi) : d not in defs(M) and not (d in defs(B) and d not in defs(Pj)) }
-loss      = candidate - masked(name in defs(M) anywhere)
-                      - restored(name in defs(<b>) anywhere)
+loss      = candidate - masked(name in defs(M) at a new home)
+                      - restored(d in defs(<b>), or name in defs(<b>) at a new home)
                       - superseded(merge message names it, successor in defs(M))
 ```
 
-`d` is `(path, name)`. The `anywhere` reads are name sets over every armed path of that tree, read
-only when a candidate exists, so a clean merge costs the changed paths alone.
+`d` is `(path, name)`. A new home is a path the carrying parent (or parents) did not define the name
+in. The whole-tree reads behind it are name-to-path indexes over every armed path of M, of the
+carrying parent and of `<b>`, read only when a candidate exists, so a clean merge costs the changed
+paths alone.
 
 ### Inventory
 
@@ -158,6 +163,7 @@ policy, far below the straggler-guard block, so the reconcile is two disjoint hu
 - `tools/lexicon/README.md`
 - `.githooks/pre-push`
 - `.githooks/pre-push.test.sh`
+- `.githooks/pre-push.runlog.test.sh`
 - `tools/push-main.sh`
 - `tools/push-main.test.sh`
 - `memory/map/generated/symbols.json`
@@ -266,6 +272,8 @@ New arm: tools/push-main.test.sh · --prepare over a branch carrying that merge,
   Strict catches a loss masked by a same-named definition and reds every move; clearing accepts
   moves and can mask a loss of a common name. Recommendation: clear, and print the masked count.
   RESOLVED (agent, 2026-10-04, delegated): clear by name, counted as masked and printed.
+  Narrowed at rev-4 by veto 1, since the bare-name form fails AC1: the name clears only at a path
+  the carrying parent did not define it in (§9).
 - **F3 — Judge each merge alone, or clear a loss the range tip has restored?** Alone, a loss on a
   branch can be cleared only by rewriting the merge; with tip clearing, one restore commit is the
   remedy and the refusal loop terminates. Recommendation: clear at the tip, counted as restored.
@@ -281,6 +289,12 @@ New arm: tools/push-main.test.sh · --prepare over a branch carrying that merge,
   `tools/lexicon/selftest.py` with this one, so the line now names the shared files. S7 and §7: the
   three Python definitions move `memory/map/generated/symbols.json`, which the build's other
   Python-adding units declare with the coverage leg and this spec omitted.
+- rev-4 · 2026-10-05 · build · S2, §4's rule and §8 F2: `masked` and `restored` clear a name only at
+  a path the carrying parent did not define it in, or at the lost path itself for `restored`. Built
+  as rev-3 said, AC1 exited 0 with `masked=1`: the driver suite's stub `write_ask_views()` in
+  `tools/unattended/unattended.test.sh`, present at the second parent and at the merge, masked the
+  very loss this unit exists for. Also: `.githooks/pre-push.runlog.test.sh` joins the files touched,
+  because its exit table must name the new `merge-loss` refusal site.
 
 ## 10. Reuse audit
 
