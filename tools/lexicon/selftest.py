@@ -5837,7 +5837,7 @@ check("AC6: ...and a refusal-blown reading earns `probe` too, so F2 reaches the 
 # same name stood in another file, and a check clearing by bare name passed it.
 with build_tempdir() as _td:
     _r = Path(_td)
-    _git = lambda *a: subprocess.run(["git", *a], cwd=_r, capture_output=True, text=True)  # noqa: E731
+    _git = lambda *a: subprocess.run(["git", *a], cwd=_r, capture_output=True, text=True, encoding="utf-8")  # noqa: E731
     _git("init", "-q", "-b", "main")
     for _k, _v in (("user.email", "s@e"), ("user.name", "s"), ("core.autocrlf", "false")):
         _git("config", _k, _v)
