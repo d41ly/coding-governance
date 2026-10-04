@@ -7313,6 +7313,10 @@ runs = get(base + "/workflows/" + wf + "/runs?event=schedule&status=completed&pe
 if not runs:
     dead("no completed scheduled run of " + wf + " exists at " + m.group(1) + "/" + m.group(2))
 rid, sha = runs[0].get("id"), str(runs[0].get("head_sha") or "")
+# EVERY FIELD BEFORE THE LAST IS NON-EMPTY: the writer splits on TAB, which bash collapses, so an
+# empty sha would shift the conclusion out of its field and a red would read as no verdict at all.
+if not re.fullmatch(r"[0-9a-f]{40}", sha) or not isinstance(rid, int):
+    dead("the latest completed scheduled run carries no 40-hex head sha or integer id: %r %r" % (sha, rid))
 jobs, total, page = [], None, 1
 while True:
     got = get(base + "/runs/%s/jobs?per_page=100&page=%d" % (rid, page))
