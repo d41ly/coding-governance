@@ -63,3 +63,5 @@ base: 5266d22eba31cdbf15425773d245cd23d7b9cdf5
 2026-10-04T19:26:51Z rescope · item add TOOL-aGraftedHelix-21 · reason spec-audit of units 16 to 19 round 1 id 22 HIGH and id 17 HIGH: the delta loop lists untracked paths in another mode than the pre-stage record holds them, so a wholly untracked foreign directory is staged whole, and it filters by a shell variable that nothing keeps across a split block, so every changed path is staged; repairs TOOL-aGraftedHelix-16
 
 2026-10-04T19:26:54Z rescope · item add TOOL-aGraftedHelix-22 · reason spec-audit of units 16 to 19 round 1 id 6 HIGH: unit 19's read-axis refusal has no criterion, so a build that omits it passes every criterion and the derived arm stays green over an uncovered cell; repairs TOOL-aGraftedHelix-19
+
+2026-10-04T19:44:17Z review · item aGraftedHelix-spec-set-r3 · reason verdict CLEAN · blockers 0 · CONVERGED · disposition promote
