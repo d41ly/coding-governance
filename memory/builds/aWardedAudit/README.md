@@ -52,7 +52,7 @@ before any code. The owner rules that only the owner opts in. The prompt is in `
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 3 unit(s) · node a · opened 2026-10-05 · streams tooling
+**Build status:** CLOSED · 3 unit(s) · node a · opened 2026-10-05 · streams tooling
 ids TOOL-aWardedAudit-1 TOOL-aWardedAudit-2 TOOL-aWardedAudit-3 TOOL-aWardedAudit-4
 
 <!-- gen:build-units -->
@@ -60,7 +60,7 @@ ids TOOL-aWardedAudit-1 TOOL-aWardedAudit-2 TOOL-aWardedAudit-3 TOOL-aWardedAudi
 |---|---|---|---|---|---|
 | [TOOL-aWardedAudit-1 — the driver honours a spec-audit opt-in only from the owner's side](spec/2026-10-05-spec-TOOL-aWardedAudit-1.md) | 1 | 2 | CLOSED | rev-1 | 2026-10-05 |
 | [TOOL-aWardedAudit-2 — the fan-out hook admits a spec audit only on an owner opt-in](spec/2026-10-05-spec-TOOL-aWardedAudit-2.md) | 2 | 2 | CLOSED | rev-2 | 2026-10-05 |
-| [TOOL-aWardedAudit-3 — the carriers state that only the owner opts a build into the spec audit](spec/2026-10-05-spec-TOOL-aWardedAudit-3.md) | 3 | 1 | OPEN | rev-1 | 2026-10-05 |
+| [TOOL-aWardedAudit-3 — the carriers state that only the owner opts a build into the spec audit](spec/2026-10-05-spec-TOOL-aWardedAudit-3.md) | 3 | 1 | CLOSED | rev-1 | 2026-10-05 |
 <!-- /gen:build-units -->
 
 Records: 4 bound to this build, across 2 record folder(s).
