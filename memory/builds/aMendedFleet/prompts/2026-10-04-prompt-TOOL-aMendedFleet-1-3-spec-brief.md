@@ -39,6 +39,17 @@ record `...-1-0-run-mandate.md` first: it carries the owner's four answers, whic
      new, and §8 recording `RESOLVED · retire to that unit`; the run retires it.
 8. **Every new refusal or gate clause is observed RED on a staged break** — say how in §6.
 9. **Order**: the status header carries `order <n>`, `n` being the unit's roster row number.
+10. **Never spell the literal `YYYY-MM-DD` or `<FAMILY-slug-seq>` anywhere in a spec**: hygiene check 12
+    reads either as an unfilled skeleton placeholder. Write "the date" or a real date.
+11. **No shell process substitution or parentheses glued to a path inside backticks** (`` `diff <(grep x a.md)` ``):
+    `check-spec-tokens.py` reads `a.md)` as a path and reds. Describe the comparison in prose.
+12. **A §2 item whose prose says a thing is removed, dropped, deleted or retired owes a `**Readers:**`
+    clause** (hygiene check 25): `by name:` the readers that spell it, then `by value:` its readers or
+    `NO VALUE READERS` and a reason. Add one whenever in doubt.
+13. **No spec comes back FORKED on a split question.** Writers run concurrently and cannot mint
+    roster numbers, so never author a second spec. If a unit is two mechanisms, mark the §8 item
+    `RESOLVED (agent, 2026-10-04, delegated): split — <items> move to a new unit the run adds`; the
+    run performs the split and rev-bumps this spec.
 
 ## Per-unit points
 
