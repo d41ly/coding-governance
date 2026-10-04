@@ -1,12 +1,13 @@
 # TOOL-aGraftedHelix-8 — every automatic self-heal appends one line to a health log the orientation card counts
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-1 · base 5266d22e · streams tooling+kickoff · order 9 · ratified 2026-10-04
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 5266d22e · streams tooling+kickoff · order 9 · ratified 2026-10-04
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-04-prompt-TOOL-aGraftedHelix-1-1-spec-brief.md](../prompts/2026-10-04-prompt-TOOL-aGraftedHelix-1-1-spec-brief.md) | journal | TOOL-aGraftedHelix-1 TOOL-aGraftedHelix-2 TOOL-aGraftedHelix-3 TOOL-aGraftedHelix-4 TOOL-aGraftedHelix-5 TOOL-aGraftedHelix-6 TOOL-aGraftedHelix-7 TOOL-aGraftedHelix-9 |
+| [2026-10-04-review-TOOL-aGraftedHelix-1-spec-audit-round1.md](../reviews/2026-10-04-review-TOOL-aGraftedHelix-1-spec-audit-round1.md) | spec-audit | TOOL-aGraftedHelix-1 TOOL-aGraftedHelix-2 TOOL-aGraftedHelix-3 TOOL-aGraftedHelix-4 TOOL-aGraftedHelix-5 TOOL-aGraftedHelix-6 TOOL-aGraftedHelix-7 TOOL-aGraftedHelix-9 |
 
 <!-- /gen:spec-records -->
 
@@ -34,7 +35,8 @@ last 24 hours, so a session learns at start that its repository repaired itself.
   Observed by AC3; the arm's own red on a staged break is observed at the close (§7).
 - **S3** — `tools/check-wiring.sh` writes `hookspath-set` where its hooks arm sets an unset
   `core.hooksPath`, and `merge-driver-set` where its merge arm sets an unset `merge.rows.driver`, in
-  whichever mode reached the branch, the mode named in the detail. Observed by AC4 and AC5.
+  whichever mode reached the branch, the mode named in the detail. Observed by AC4, both arms, and
+  AC5.
 - **S4** — `tools/process-monitor/reap.py` writes `tree-killed` once per kill target, after
   `check_survivors` has read the census back, on both non-dry-run paths: the `--kill`/`--kill-msys`
   path in `main` and the loop in `run_sweep`. A dry run reaches neither call. The log is resolved
@@ -277,9 +279,14 @@ common dir.
   'reap', 'tree-killed', 'x')" "$GCD/health.log"` runs, the file holds 251 lines, the old lines 251
   to 500 in order and then the new one; the same fixture through AC1's bash call gives the same
   shape, and `awk -F'\t' 'NF != 4'` over a log both languages appended to prints nothing.
+  A second fixture of 499 lines holds 500 after one append, with no trim. The Python copy's three
+  failure paths each return `None`, print one `health: NOTE -` line on stderr and raise nothing:
+  `reap.add_health_event('', 'reap', 'tree-killed', 'x')`, the same call with the event `Bad`, and
+  a log path inside a missing directory.
   Red when: the trim keeps the oldest half, or fires at 499 or 501 lines, or the Python stamp is
-  spelled `Z` and AC1's pattern refuses it.
-  figure: 500, 250 and 251 are PINNED by `HEALTH_LOG_CAP_LINES`.
+  spelled `Z` and AC1's pattern refuses it, or a Python failure path raises, which turns a
+  completed kill into a traceback.
+  figure: 499, 500, 250 and 251 are PINNED by `HEALTH_LOG_CAP_LINES`.
 - **AC3** — When `awk '/^# >>> health_log_sh/,/^# <<< health_log_sh/' <file> | tr -d '\r' | cksum`
   runs over every file `git grep -l '^# >>> health_log_sh'` lists, one checksum prints; the same
   holds for `health_log_py`; and the two lists name the canonical, every IN writer's file and the
@@ -289,14 +296,19 @@ common dir.
   `.githooks/pre-commit` and a copy of the checker at its own relative path and has no
   `core.hooksPath`, it prints its `FIXED    hooks` line and `$GCD/health.log` gains one line whose
   second and third fields are `check-wiring` and `hookspath-set`; a second run prints `ok       hooks`
-  and adds no line.
-  Red when: the call sits outside the branch that ran `git config`, so the second run writes too.
+  and adds no line. The same holds for the merge arm: with `merge.rows.driver` unset, the first
+  `--session` appends one `merge-driver-set` line and a second run appends none.
+  Red when: either call sits outside the branch that ran `git config`, so the second run writes
+  too and the card counts a self-heal on every SessionStart.
   fixture: built per run; the tree holds none today.
 - **AC5** — When `git grep -nE 'add_health_event' -- tools/check-wiring.sh tools/process-monitor/
   tools/unattended/ tools/run-gates/` runs, the call lines name `hookspath-set` and
   `merge-driver-set` in the checker, `tree-killed` twice in `reap.py`, each after a `check_survivors`
   call in its function, `run-resumed` and `resume-failed` in `resume-tick.sh`, and `beacon-reaped`,
-  `ticket-swept`, `scratch-swept`, `turnstile-expired` and `retry-passed` in the gate runner.
+  `ticket-swept`, `scratch-swept`, `turnstile-expired` and `retry-passed` in the gate runner. This
+  criterion proves PRESENCE only. Placement is proved by a behaviour arm per site in §7: AC4 for
+  the two checker sites, the process-monitor arm for `tree-killed`, the resume-tick arm for the two
+  tick events, and the turnstile and canary arms for the five gate-runner events.
   Red when: a site §4 marks IN carries no call, or a `tree-killed` call precedes the read-back.
 - **AC6** — When the same `git grep -nE 'add_health_event'` runs after units 1 and 7 are built on
   the run branch, it also names `claim-taken-over` in the driver's stale-claim take-over and
@@ -334,6 +346,10 @@ on demand through its own runner, so the resume-tick arm below is owed to that r
 New arm: tools/lib/resolve-python.test.sh · PARITY_ROWS rows health_log_sh and health_log_py; stage one copy's trim count edited · none
 New arm: tools/lib/resolve-python.test.sh · both canonicals append to one scratch log; stage the Python stamp spelled Z · none
 New arm: tools/check-wiring.test.sh · --session over an unset core.hooksPath appends one hookspath-set line; stage the call moved to the ok branch · none
+New arm: tools/check-wiring.test.sh · --session over an unset merge.rows.driver appends one merge-driver-set line and a second run none; stage the call moved to the ok branch · none
+New arm: tools/run-gates/run-gates.turnstile.test.sh · the dead-waiter queue fixture appends one ticket-swept line, the expired wait one turnstile-expired line, and the dead bar's scratch one scratch-swept line; stage each call moved off its branch · none
+New arm: tools/process-monitor/selftest.py · the Python appender's empty path, refused event and missing directory each return None with one NOTE line; stage the guard removed so the call raises · none
+New arm: tools/lib/resolve-python.test.sh · the 499-line fixture holds 500 after one append; stage the trim threshold lowered by one · none
 New arm: tools/process-monitor/selftest.py · its real-kill fixture appends one tree-killed line, its dry-run sweep none; stage the call moved into the dry-run branch · none
 New arm: tools/unattended/resume-tick.test.sh · the STALE relaunch fixture appends one run-resumed line, the no-pid launch one resume-failed; stage the call moved above the pid check · none
 New arm: tools/run-gates/run-gates.turnstile.test.sh · the dead-holder fixture appends one beacon-reaped line; stage the call commented out · none
@@ -363,6 +379,11 @@ New arm: skills/session-kickoff/manifest-check.test.sh · AC7's seeded log and A
 
 - rev-1 · 2026-10-04 · initial draft, from the spec brief's unit 8 section and the writers at base
   `5266d22e`.
+- rev-2 · 2026-10-04 · §6 §7 · S1 S3 · AC2 AC4 AC5 · folded the round-1 spec audit's findings on
+  this unit: 24 (AC2 observes the Python copy's three failure paths); 25 (AC4 extends to the merge
+  arm, AC5 says it proves presence only and names each site's placement arm, and §7 gains the
+  merge, ticket, wait and scratch arms); and 26 (AC2's 499-line fixture, the side of the
+  threshold a 500-line fixture cannot see).
 
 ## 10. Reuse audit
 

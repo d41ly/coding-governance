@@ -1,12 +1,13 @@
 # TOOL-aGraftedHelix-6 — a decision row or gotcha whose normalized text another record already holds reds
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-2 · base 5266d22e · streams tooling · order 6
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-2 · base 5266d22e · streams tooling · order 6 · ratified 2026-10-04
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-04-prompt-TOOL-aGraftedHelix-1-1-spec-brief.md](../prompts/2026-10-04-prompt-TOOL-aGraftedHelix-1-1-spec-brief.md) | journal | TOOL-aGraftedHelix-1 TOOL-aGraftedHelix-2 TOOL-aGraftedHelix-3 TOOL-aGraftedHelix-4 TOOL-aGraftedHelix-5 TOOL-aGraftedHelix-7 TOOL-aGraftedHelix-8 TOOL-aGraftedHelix-9 |
+| [2026-10-04-review-TOOL-aGraftedHelix-1-spec-audit-round1.md](../reviews/2026-10-04-review-TOOL-aGraftedHelix-1-spec-audit-round1.md) | spec-audit | TOOL-aGraftedHelix-1 TOOL-aGraftedHelix-2 TOOL-aGraftedHelix-3 TOOL-aGraftedHelix-4 TOOL-aGraftedHelix-5 TOOL-aGraftedHelix-7 TOOL-aGraftedHelix-8 TOOL-aGraftedHelix-9 |
 
 <!-- /gen:spec-records -->
 
@@ -27,23 +28,30 @@ write-time duplicate check; the near half is `TOOL-aGraftedHelix-9`.
   `tools/memory-tree/row_grammar.py` gains a `body` field on each gotcha record: the file's text after
   the block the shared `FM_RE` matches. A row's keyed text is its existing `summary`, which already
   stands after the row's own id. Observed by AC1 and AC5.
-- **S3** — A new mode, `row_grammar.py --check-content`. It derives every record's key and reds each
-  key held by records of two or more distinct identities, one finding per key naming every holder's
-  location. A key held twice under ONE identity is not this check's: check 20 owns an id twice in one
-  document, check 24 owns one across a `cut` rotation, and a `snapshot` carry-forward is that by
-  design. An empty key is not graded and is counted. Every run prints a summary line, a graded count
-  of 0 included. Observed by AC1, AC2, AC3, AC4 and AC5.
+- **S3** — A new mode, `row_grammar.py --check-content [<base>]`, whose base defaults as
+  `--check-relations` derives one. It derives every record's key and reds each
+  key held by records of two or more distinct identities when at least one holder was ADDED since
+  the mainline merge-base, one finding per key naming every holder's location. The base and the
+  added set are `TOOL-aGraftedHelix-9`'s `derive_relation_base` and identity-presence test, read
+  the same way. A key whose every holder is present at the base is LANDED: it is counted and not
+  reported, because nobody may edit a landed append-only row or take it out. With no resolvable
+  base every key is graded, and the summary line says so. A key held twice under ONE identity is not
+  this check's: check 20 owns an id twice in one document, check 24 owns one across a `cut`
+  rotation, and a `snapshot` carry-forward is that by design, across documents included. An empty
+  key is not graded and is counted. Every run prints a summary line, a graded count of 0 included.
+  Observed by AC1, AC2, AC3, AC4, AC5, AC10 and AC11.
 - **S4** — Hygiene check 28 is wired: the module constant `CONTENT_CHECK = 28`, a full-run dispatch
   block in `tools/memory-tree/check-memory-hygiene.sh` that prints the mode's output on a green run
   too and keys offenders under 28, its catalog entry in `tools/memory-tree/HYGIENE.template.md`
   re-rendered into `memory/HYGIENE.md`, and the kit README's check count moved to 28. Observed by
   AC7 and AC8.
 - **S5** — The module header states what check 28 does NOT check, and each new branch has a
-  `--selftest` arm whose fixture makes it fire. Observed by AC1 to AC4 and AC9.
+  `--selftest` arm whose fixture makes it fire. Observed by AC1 to AC4, AC9, AC10 and AC11.
 - **S6** — The memory-tree kit version moves once, after the last move, in every carrier
-  `tools/check-kit-versions.sh` pairs, and the row-grammar dossier's prose names the new mode.
-  NOT OBSERVED by a criterion here: the kit-versions, verdict-epoch and codebase-map legs grade it
-  at the close (§7), and a pass runs none of them.
+  `tools/check-kit-versions.sh` pairs, and the row-grammar dossier's prose names the new mode. One
+  of those carriers is line 1 of `memory/guides/BUILD-METHOD.md`, which the re-render moves and
+  nothing else in that file, under `TOOL-aGraftedHelix-3`'s §8 F1 ruling (§8 F1 here). Observed by
+  AC12; the kit-versions, verdict-epoch and codebase-map legs grade the rest at the close (§7).
 
 ## 3. Non-goals (OUT)
 
@@ -52,10 +60,11 @@ write-time duplicate check; the near half is `TOOL-aGraftedHelix-9`.
   answer to their question.
 - Any record kind other than decision rows and gotchas, including backlog asks under the `shards`
   layout: `scan_records` takes only the decision index and its archives from the row documents.
-- A shrink-only pin or a waiver registry. The tree holds no duplicate today (§4 "Evidence"), and the
-  first duplicate cannot land unnoticed: a push carries both sides of any merge, so the push
-  boundary's bar sees both holders while one of them is still a record its author can change. The
-  bypass that skips that bar skips every other leg too.
+- A shrink-only pin, a waiver registry or a conf key. An adopter's landed duplicates are LANDED keys,
+  counted and never reported, so a kit update cannot red a corpus nobody may edit (§8 F2). A new
+  duplicate cannot land unnoticed: a push carries both sides of any merge, so the push boundary's
+  bar grades the added holder while it is still a record its author can change. The bypass that
+  skips that bar skips every other leg too.
 - The pre-commit `--staged` path. Check 28 runs on full runs only, as checks 13 to 20 and 24 do.
 - Front matter. Two gotchas with one body and different `description` lines are one record twice.
 
@@ -64,6 +73,12 @@ write-time duplicate check; the near half is `TOOL-aGraftedHelix-9`.
 - **consumes-from** `TOOL-aGraftedHelix-9` — the record enumeration `scan_records` in
   `tools/memory-tree/row_grammar.py` and the shared `FM_RE` in `tree_lib.py`, both built in that
   unit's pass; without them this unit would walk the decision index and the catalogue a second time.
+  Also `derive_relation_base` and the identity-presence test that splits ADDED records from those
+  present at the base, which decide which keys this check reports.
+- **hands-off** `TOOL-aGraftedHelix-13` — the hygiene engine's dispatch block for check 28, which
+  calls `--check-content` and keys offenders under `CONTENT_CHECK`. AC7 here proves the block is
+  present; that unit observes it red the leg and print its summary on a green run (round-1 audit
+  finding 20).
 
 ## 4. Design
 
@@ -110,8 +125,10 @@ check 28: 2 records hold one content key — memory/DECISIONS.md:140 (TOOL-x-12)
 Every run, red or green, prints one summary line:
 
 ```
-row-grammar: check 28 graded <n> record(s) — <r> row(s), <g> gotcha(s), <e> with an empty key, <d> key(s) held twice
+row-grammar: check 28 graded <n> record(s) in <base8>..HEAD — <r> row(s), <g> gotcha(s), <e> with an empty key, <d> key(s) held twice, <l> landed key(s) held twice and not reported
 ```
+
+With no resolvable base, `in <base8>..HEAD` reads `with no mainline base, every key graded`.
 
 ### Inventory
 
@@ -128,9 +145,10 @@ Every function name was answered `OK` by `lexicon.py --suggest <name> --as py.fu
 
 ### Rollout
 
-The check lands red with no pin, because the tree holds no duplicate. Every decision row and gotcha
-this build adds is graded by it at the close; a hit there is a record that has not landed, and the
-remedy is to fold the two into one.
+The check lands red with no pin, because the tree holds no duplicate, and in every adopter, because
+landed duplicates are counted rather than reported. Every decision row and gotcha this build adds is
+graded by it at the close. A hit there always includes a record that has not landed, and the remedy
+is to reword or drop THAT record; a landed row is never edited or removed.
 
 ### Files touched (estimate)
 
@@ -141,6 +159,7 @@ remedy is to fold the two into one.
 - `tools/memory-tree/README.md`
 - `memory/HYGIENE.md`
 - `memory/map/features/row-grammar.md`
+- `memory/guides/BUILD-METHOD.md`, line 1 only, the kit version marker the re-render moves
 - the memory-tree kit's version carriers
 
 ### Alternatives rejected
@@ -158,7 +177,8 @@ remedy is to fold the two into one.
 
 - security — Read-only over tracked files; it writes nothing.
 - perf / scale — One pass over the records `scan_records` already reads and one dict, 354 records
-  today; no index, no git spawn beyond the enumeration's own.
+  today; no index. The base costs unit 9's spawns, one merge-base, two tree listings and one
+  `git show` per row document, which a run that also grades check 27 pays once if the two share it.
 - error / empty / loading states — An empty population prints a graded count of 0; an empty key is
   counted, not compared; an unreadable record surfaces through the enumeration's existing refusal.
 - observability — The summary line prints on every run, and the hygiene dispatch block shows it on
@@ -182,10 +202,12 @@ remedy is to fold the two into one.
   new id, as `- **<id>** — **<text>**`, the mode exits 1 naming both locations. Observed by
   `python tools/memory-tree/row_grammar.py --selftest`.
   Red when: the shape difference lets the re-mint through.
-- **AC3** — When a fixture holds one id twice with one text, and separately two gotchas with
-  different bodies, the mode prints no `check 28:` line for either and exits 0. Observed by
+- **AC3** — When a fixture under `ROTATION_MODE=snapshot` holds one id with one text in its
+  decision index and again in a rotated archive, and separately two gotchas with different bodies,
+  the mode prints no `check 28:` line for either and exits 0. Observed by
   `python tools/memory-tree/row_grammar.py --selftest`.
-  Red when: a same-identity pair or two distinct bodies is reported.
+  Red when: a same-identity pair across two documents, which a build keyed on path and id reports,
+  or two distinct bodies is reported.
 - **AC4** — When a fixture holds no decision index and no gotcha, the mode exits 0 and prints its
   summary line with a graded count of 0. Observed by
   `python tools/memory-tree/row_grammar.py --selftest`.
@@ -207,26 +229,61 @@ remedy is to fold the two into one.
   `check-memory-hygiene.sh` reads `28 checks`.
   Red when: the catalog or the README count disagrees with the module constant.
 - **AC9** — When the header of `tools/memory-tree/row_grammar.py` is read, it states that check 28
-  does NOT check a paraphrase, an id held twice, a record outside the two kinds, or front matter.
-  Red when: any of the four is unstated.
+  does NOT check a paraphrase, an id held twice, a record outside the two kinds, front matter, or a
+  duplicate whose every holder had landed at the base.
+  Red when: any of the five is unstated.
+- **AC10** — When a `--selftest` fixture commits two decision rows with one text under two ids at
+  its base, and `row_grammar.py --check-content <base>` runs with nothing added, it exits 0 and its
+  summary line counts 1 landed key. When a third row restating them is then added under a new id,
+  it exits 1 naming all three holders. Observed by
+  `python tools/memory-tree/row_grammar.py --selftest`.
+  Red when: a landed pair reds, which no author can repair, or an added restatement of it passes.
+- **AC11** — When a `--selftest` fixture holds two records whose keys normalize to empty, the mode
+  prints no `check 28:` line and its summary counts 2 with an empty key; when three records hold
+  one key, the finding names all three. Observed by
+  `python tools/memory-tree/row_grammar.py --selftest`.
+  Red when: two empty-bodied records red each other, or a three-holder finding names two.
+- **AC12** — When `git diff <the pass's parent sha> -- memory/guides/BUILD-METHOD.md` runs at the
+  pass's commit, it changes line 1 only.
+  Red when: the method's content moved, which shared invariant 10 forbids.
 
 ## 7. Gates
 
 `memory hygiene` · `row-grammar selftest` · `kit/dogfood doc parity` · `memory-hygiene self-test` · `lexicon naming predicates` · `codebase-map coverage + freshness` · `recall floor` · `recall floor arms` · `kit version markers` · `verdict epoch (kit version dates the engine)` · `kit epoch (shipped bytes move, the version moves)`
 
-The close runs these; no pass does. The two recall legs are owed by the memory root's guard, which
-`memory/HYGIENE.md` reaches, and the last three grade S6's kit version bump.
+A pass runs `python tools/memory-tree/row_grammar.py --selftest` as its direct check, each new arm
+observed red on a staged break first; the close runs the legs listed above. The two recall legs are
+owed by the memory root's guard, which `memory/HYGIENE.md` reaches, and the last three grade S6's
+kit version bump.
 
-New arm: `tools/memory-tree/row_grammar.py --selftest` · fixture trees holding a gotcha body twice under five surface differences, a row re-minted in the other shape, a same-id pair, distinct bodies and an empty population · the module's arm count rises by the new arms
+New arm: `tools/memory-tree/row_grammar.py --selftest` · fixture trees holding a gotcha body twice under five surface differences, a row re-minted in the other shape, a same-id pair across a snapshot rotation, distinct bodies, an empty population, a landed pair with and without an added restatement, two empty keys and three holders · the module's arm count rises by the new arms
 
 ## 8. Open questions
 
-none
+- **F1 — Does the memory-tree bump's re-render of line 1 of `memory/guides/BUILD-METHOD.md` breach
+  shared invariant 10, which says no unit edits that file?** `TOOL-aGraftedHelix-3` §8 F1 decided
+  this for the kit's version marker: the line is a derived carrier `check-kit-versions.sh` pairs
+  with the engine constant, and the invariant protects the method's content, which the render
+  leaves byte-identical below line 1. RESOLVED (agent, 2026-10-04, delegated): as unit 3's Option
+  A, the file listed under Files touched as line 1 only, and AC12 observes that only line 1 moved.
+- **F2 — How does check 28 treat an adopter's landed duplicates?** (a) Grade only keys an added
+  record holds, as check 27 grades only added records; (b) a shrink-only content-duplicate pin with
+  an emit verb, as check 20 carries; (c) ship the check dark in the example conf. Landed rows may
+  never be edited or removed, so (b) pins a count nobody may lower, the old "fold the two" remedy
+  asks for an edit nobody may make, and (c) leaves every adopter ungraded. (a) grades every new duplicate in every adopter and reuses the
+  base unit 9 already derives. RESOLVED (agent, 2026-10-04, delegated): (a).
 
 ## 9. Revision log
 
 - rev-1 · 2026-10-04 · initial draft from the aGraftedHelix spec brief, with the duplicate census
   measured on node `a` at base `5266d22e`.
+- rev-2 · 2026-10-04 · §3 §4 §5 §6 §7 §8 · S3 S5 S6 · AC3 AC9 AC10 AC11 AC12 · folded the round-1
+  spec audit's findings on this unit: 48 (landed duplicates are counted and never reported, S3, §3,
+  §4 Rollout, §8 F2, AC10); 21 (AC3's same-id pair sits across a snapshot rotation); 22 (AC11, the
+  empty-key branch and three holders); 36 (§7 states that the pass runs the module's `--selftest` as
+  its direct check); and 37 (`memory/guides/BUILD-METHOD.md` line 1 listed, §8 F1 citing unit 3's
+  ruling, AC12). §3 Edges extends the consumes-from to unit 9's base and gains the hands-off to the
+  unit promoted from finding 20.
 
 ## 10. Reuse audit
 

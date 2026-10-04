@@ -261,7 +261,7 @@ Cite ids, never line numbers.
 | [TOOL-aSurfacedLexicon-16](../builds/aSurfacedLexicon/BACKLOG.md) | OPEN | — | — | 2026-09-04 | REVIEW FINDING D25, raised by the rebuild research pass and filed… |
 | [TOOL-aSurfacedLexicon-17](../builds/aSurfacedLexicon/BACKLOG.md) | OPEN | — | — | 2026-09-05 | THE GENERATED BUILD-ORDER TABLE'S Parallel COLUMN IS DERIVED FROM THE… |
 | [TOOL-aSurfacedLexicon-21](../builds/aSurfacedLexicon/BACKLOG.md) | OPEN | — | — | 2026-09-05 | THE UNARMED-BRANCH META-GATE CANNOT SEE PYTHON, and that is why unarmed… |
-| [TOOL-aSurfacedLexicon-22](../builds/aSurfacedLexicon/BACKLOG.md) | OPEN | — | — | 2026-09-06 | THE WALK IS FIXED AND THE CEILING NOW MEASURES CONTENTION INSTEAD.… |
+| [TOOL-aSurfacedLexicon-22](../builds/aSurfacedLexicon/BACKLOG.md) | SPECCED | — | TOOL-aGraftedHelix-5 | 2026-09-06 | THE WALK IS FIXED AND THE CEILING NOW MEASURES CONTENTION INSTEAD.… |
 | [TOOL-aSurfacedLexicon-23](../builds/aSurfacedLexicon/BACKLOG.md) | OPEN | — | — | 2026-09-06 | A CELL CANNOT SAY "PRODUCT CODE, NOT RECORDS", so two surfaces ship… |
 | [TOOL-aSurfacedLexicon-24](../builds/aSurfacedLexicon/BACKLOG.md) | OPEN | — | — | 2026-09-06 | A SKIP CLAIM WRITTEN AS check(<label>, True) IS A COMMENT WEARING A… |
 | [TOOL-aSurfacedLexicon-25](../builds/aSurfacedLexicon/BACKLOG.md) | OPEN | — | — | 2026-09-06 | A PUSH TO THE DEFAULT BRANCH PROCEEDED WITH NO BAR RUN, and the hook… |

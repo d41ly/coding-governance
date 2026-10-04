@@ -1,12 +1,13 @@
 # TOOL-aGraftedHelix-3 — invariant records in the bug-class catalogue become the review's by-design list
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-2 · base 5266d22e · streams tooling · order 3 · ratified 2026-10-04
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-2 · base 5266d22e · streams tooling · order 3 · ratified 2026-10-04
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-04-prompt-TOOL-aGraftedHelix-1-1-spec-brief.md](../prompts/2026-10-04-prompt-TOOL-aGraftedHelix-1-1-spec-brief.md) | journal | TOOL-aGraftedHelix-1 TOOL-aGraftedHelix-2 TOOL-aGraftedHelix-4 TOOL-aGraftedHelix-5 TOOL-aGraftedHelix-6 TOOL-aGraftedHelix-7 TOOL-aGraftedHelix-8 TOOL-aGraftedHelix-9 |
+| [2026-10-04-review-TOOL-aGraftedHelix-1-spec-audit-round1.md](../reviews/2026-10-04-review-TOOL-aGraftedHelix-1-spec-audit-round1.md) | spec-audit | TOOL-aGraftedHelix-1 TOOL-aGraftedHelix-2 TOOL-aGraftedHelix-4 TOOL-aGraftedHelix-5 TOOL-aGraftedHelix-6 TOOL-aGraftedHelix-7 TOOL-aGraftedHelix-8 TOOL-aGraftedHelix-9 |
 
 <!-- /gen:spec-records -->
 
@@ -41,16 +42,18 @@ needed. The unit also routes the checklist into the spec audit, which has never 
 - **S6** — `LEG_MANIFEST` is declared in `.memory-tree.conf` as `tools/gate-legs.json`. It is also
   declared blank, with its comment, in the shipped `tools/memory-tree/.memory-tree.conf.example`.
   When it is blank, a guard token that is not a tracked path is announced as unresolved and does not
-  fail the check. Observed by AC2 and AC3.
+  fail the check. Observed by AC2, AC3 and AC11.
 - **S7** — The hygiene engine prints `gotchas.py --check`'s output on a green run too, as it already
   does for `corpus_ids.py` and `row_grammar.py`. Otherwise S6's announcement would never reach a
   reader. Observed by AC3.
 - **S8** — `tools/workflows/tier2-review.template.js` handles a string `checklist` carrying an I4
   block. It cuts the block out before `parseChecklist()`, so no by-design line is ever swept as a
-  bug class. It uses the block as `byDesign` when `args.byDesign` is absent. It refuses a block
-  whose header count disagrees with its entry lines. It reads a remainder made only of `# ` header
-  lines as zero items, rather than refusing it. It logs which by-design source it used, and the RUN
-  INTEGRITY block states that source. Observed by AC6 and AC7.
+  bug class. `byDesign` becomes the caller's `args.byDesign` when one is supplied, then the block's
+  entries, each source under its own label, so a caller's tracked-issue list never displaces the
+  invariants. It refuses a block whose header count disagrees with its entry lines. It reads a
+  remainder made only of `# ` header lines as zero items, rather than refusing it. It logs each
+  by-design source it used with its count, and the RUN INTEGRITY block states them. Observed by AC6
+  and AC7.
 - **S9** — The spec-audit stage of `tools/workflows/unattended-build.template.js` gets a checklist.
   Its subject-resolver agent also runs the kit's `gotchas.py --for-paths` over every path in the
   subjects' `### Files touched` sub-heads. It returns that stdout verbatim with the paths it passed,
@@ -172,11 +175,15 @@ invariant record exists, so the check rises by roughly the walk, inside a leg wh
 4. The remainder, which is everything outside the block, goes to `parseChecklist()`. When every
    non-blank line of it opens with `# `, it parses as zero items and logs `supplied with no item`,
    instead of taking the non-blank-string refusal. That refusal still covers prose with no item.
-5. `byDesign` is `a.byDesign` when supplied. Otherwise it is the entries, newline-joined. With zero
-   entries or no block it is `none supplied`.
+5. `byDesign` is the concatenation of two labelled parts, each present only when non-empty: the
+   caller's `a.byDesign` under `Known and tracked — do not re-report:`, then the entries,
+   newline-joined, under `Intended behaviour — invariants this change touches:`. With neither it is
+   `none supplied`. The two inputs differ: the args contract defines `byDesign` as known and
+   tracked issues (`tools/workflows/tier2-review.template.js:76`), and an invariant is intended
+   behaviour, so neither replaces the other.
 
-Log lines, one per run, name the source: `by-design: the caller's byDesign (the checklist's block of
-<n> was not used)`, `by-design: <n> invariant(s) from the checklist's by-design block`, or
+Log lines, one per run, name each source and its count: `by-design: the caller's byDesign`,
+`by-design: <n> invariant(s) from the checklist's by-design block`, both when both are present, or
 `by-design: none supplied — no caller byDesign and <no block | a block of 0>`. RUN INTEGRITY gains a
 `By design:` clause carrying the same words. The review key already fingerprints `byDesign` and the
 parsed `checklist`. Both are now computed after extraction, so the key reads what the lenses read.
@@ -314,8 +321,9 @@ The seed records themselves are three new files under `memory/gotchas/`.
 ## 5. Production-readiness checklist
 
 - security — N/A for authority: the block is repository content of the same trust as the checklist
-  that already reaches the prompt. A caller's `byDesign` still wins, so a block cannot override an
-  explicit instruction.
+  that already reaches the prompt. A caller's `byDesign` is kept whole and labelled ahead of the
+  block, so a block cannot override an explicit instruction, and the instruction cannot erase the
+  invariants.
 - perf / scale — one corpus walk per `--check` while any invariant exists, about 2.8 s on node `a`.
   The checklist verbs are unchanged. Each invariant costs one line in the brief of the lenses whose
   selection touches it.
@@ -347,9 +355,13 @@ The seed records themselves are three new files under `memory/gotchas/`.
 - **AC2** — When `python tools/memory-tree/gotchas.py --selftest` runs, it prints `PASS` with arms
   for: the block on a hit, the `0` header on a miss, an unresolved `decision:`, a missing section, an
   unresolved guard path, a leg name resolved through a fixture `LEG_MANIFEST`, the blank-key
-  announcement, an unanchored invariant and a `universal` invariant. Each arm was observed FAIL once,
-  with its predicate disabled in the working tree, before it landed.
-  Red when: an arm passes with its predicate disabled.
+  announcement, an unanchored invariant, a `universal` invariant, an invariant whose only anchor
+  resolves to an append-only path, a set `LEG_MANIFEST` naming a missing file, which prints a
+  `HYGIENE` line and no traceback, and an absent id-grammar kit, which prints `NOT resolved` and
+  exits 0. Each arm was observed FAIL once, with its predicate disabled in the working tree, the
+  inert-only arm with `inert_only()` disabled, before it landed.
+  Red when: an arm passes with its predicate disabled, or an invariant anchored only on the
+  decision log passes check 19.
 - **AC3** — When one seed's `decision:` is changed in the working tree to an id no record defines,
   `python tools/memory-tree/gotchas.py --check` exits 1 and prints `HYGIENE check 18` naming that
   record and that id. Restored, it exits 0. When `LEG_MANIFEST` is blanked in `.memory-tree.conf`,
@@ -370,21 +382,30 @@ The seed records themselves are three new files under `memory/gotchas/`.
 - **AC6** — When a scratch `node` probe evaluates the prelude of the rendered
   `tools/workflows/tier2-review.js`, the same extraction the harness self-test performs, it runs with
   AC1's stdout as `checklist`. It then logs `by-design: 1 invariant(s) from the checklist's by-design
-  block`, and no parsed checklist item opens with the seed's name. Given `byDesign: 'x'`, it logs the
-  caller's source, and the items still exclude the block. Given a header claiming 2 over one entry,
-  it refuses and names both numbers. Given a remainder of header lines only, it parses zero items
-  without refusing.
-  Red when: a by-design entry is counted as a checklist item, or a mismatch proceeds.
-- **AC7** — When `grep -c "By design:" tools/workflows/tier2-review.js` runs, it prints at least 1.
-  When the workflows kit's renderer runs in its render mode, `git status --porcelain tools/workflows/`
-  prints nothing new, so the render equals the template.
-  Red when: RUN INTEGRITY omits the source, or the render was edited by hand.
+  block`, and no parsed checklist item opens with the seed's name. The synthesis prompt, sliced the
+  way the harness self-test already slices it for RUN INTEGRITY, carries
+  `By design: 1 invariant(s) from the checklist's by-design block`. Given `byDesign: 'x'`, it logs
+  both sources, the resolved `byDesign` carries `x` and the seed's entry under their two labels, the
+  RUN INTEGRITY clause names both, and the items still exclude the block. Given a header claiming 2
+  over one entry, it refuses and names both numbers. Given a remainder of header lines only, it
+  parses zero items without refusing.
+  Red when: a by-design entry is counted as a checklist item, a mismatch proceeds, a caller's
+  `byDesign` drops the invariants, or RUN INTEGRITY omits or misstates a source.
+- **AC7** — When the workflows kit's renderer runs in its render mode,
+  `git status --porcelain tools/workflows/` prints nothing new, so the render equals the template.
+  The RUN INTEGRITY clause is observed in AC6's sliced prompt, not by a source grep, which any
+  comment would satisfy.
+  Red when: the render was edited by hand.
 - **AC8** — When a scratch `node` probe evaluates the rendered `tools/workflows/unattended-build.js`
   the way the build-harness self-test does, it uses a stub resolver returning subjects plus a
   `checklist`. The stub `workflow()` then records spec-audit args whose `checklist` equals the stub's
   string. With the field absent, a `WARNING:` line names the missing checklist and no `checklist` key
-  is passed.
-  Red when: the audit call drops the resolver's checklist, or its absence is silent.
+  is passed. Given a caller `checklist` argument beside the resolver's, the audit receives the
+  caller's. The rendered resolver prompt in `tools/workflows/unattended-build.js` names
+  `gotchas.py --for-paths` through the rendered memory-tree path, and names `### Files touched`.
+  Red when: the audit call drops the resolver's checklist, its absence is silent, the resolver's
+  overrides the caller's, or the prompt carries no instruction to run `--for-paths`, which a stub
+  resolver alone cannot see.
   permission: the permanent arm lives in the build-harness self-test, which the main loop runs at
   VERIFYING.
 - **AC9** — When `python tools/memory-tree/gotchas.py --report` runs, at least three `invariant`
@@ -397,9 +418,11 @@ The seed records themselves are three new files under `memory/gotchas/`.
 - **AC11** — When `grep -c "kind: invariant" memory/HYGIENE.md tools/memory-tree/README.md` runs,
   each file counts at least 1. When `grep -c "by design —" tools/workflows/README.md` runs, it
   prints at least 1. When `grep -c "supplied by no caller anywhere in the tree" tools/workflows/tier2-review.js`
-  runs, it prints 0.
-  Red when: a rule document still describes the catalogue as classes, notes and superseded only, or
-  the harness still states that nothing fills `byDesign`.
+  runs, it prints 0. `grep -n '^LEG_MANIFEST=""' tools/memory-tree/.memory-tree.conf.example`
+  prints one line.
+  Red when: a rule document still describes the catalogue as classes, notes and superseded only,
+  the harness still states that nothing fills `byDesign`, or the example conf ships a manifest path
+  an adopter may lack.
 - **AC12** — When `python tools/govkit/govkit.py epoch --base <the pass's parent sha>` runs, its
   `memory-tree` and `review-harness` lines read `clean` at the bumped versions.
   `git diff <the pass's parent sha> -- memory/guides/BUILD-METHOD.md` changes line 1 only.
@@ -415,6 +438,8 @@ New arm: tools/memory-tree/gotchas.py · each invariant predicate disabled in th
 New arm: tools/memory-tree/check-memory-hygiene.test.sh · the green-run print at the gotchas call site deleted · none
 New arm: tools/workflows/tier2-review.test.sh · extraction disabled, so a by-design entry lands in the items · the suite's assertion floor, raised by the arms added
 New arm: tools/workflows/unattended-build.test.sh · the resolver's checklist not forwarded · the suite's assertion floor, raised by the arms added
+New arm: tools/workflows/tier2-review.test.sh · the RUN INTEGRITY slice carrying each by-design source, and a caller byDesign beside a block; stage the clause deleted and the caller's value made to replace the block · the suite's assertion floor, raised by the arms added
+New arm: tools/workflows/unattended-build.test.sh · a caller checklist beside the resolver's, and the rendered resolver prompt's --for-paths instruction; stage the precedence reversed and the instruction deleted · the suite's assertion floor, raised by the arms added
 
 ## 8. Open questions
 
@@ -441,6 +466,13 @@ New arm: tools/workflows/unattended-build.test.sh · the resolver's checklist no
 - rev-1 · 2026-10-04 · initial draft, from the spec brief's unit 3 section and pinned interfaces I4
   and I5. Grounded against `gotchas.py`, the two workflow templates and the hygiene call site at
   `89bcefc8`.
+- rev-2 · 2026-10-04 · §4 §5 §6 §7 · S6 S8 · AC2 AC6 AC7 AC8 AC11 · folded the round-1 spec audit's
+  findings on this unit: 50 (a caller's `byDesign` and the block are concatenated under two labels
+  rather than one replacing the other, §4 step 5, §5 security, AC6); 12 (RUN INTEGRITY's by-design
+  source is observed in AC6's sliced synthesis prompt, and AC7's source grep is dropped); 13 (AC8
+  observes the rendered resolver prompt and the caller-checklist precedence); 14 (AC2's inert-only
+  invariant arm); and 15 (AC2's missing-manifest and absent-grammar arms, and AC11's example-conf
+  grep).
 
 ## 10. Reuse audit
 

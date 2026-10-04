@@ -1,12 +1,13 @@
 # TOOL-aGraftedHelix-7 — the gate runner stops dispatching legs above a declared memory fraction and records the pause
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-2 · base 5266d22e · streams tooling · order 8 · ratified 2026-10-04
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-2 · base 5266d22e · streams tooling · order 8 · ratified 2026-10-04
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-04-prompt-TOOL-aGraftedHelix-1-1-spec-brief.md](../prompts/2026-10-04-prompt-TOOL-aGraftedHelix-1-1-spec-brief.md) | journal | TOOL-aGraftedHelix-1 TOOL-aGraftedHelix-2 TOOL-aGraftedHelix-3 TOOL-aGraftedHelix-4 TOOL-aGraftedHelix-5 TOOL-aGraftedHelix-6 TOOL-aGraftedHelix-8 TOOL-aGraftedHelix-9 |
+| [2026-10-04-review-TOOL-aGraftedHelix-1-spec-audit-round1.md](../reviews/2026-10-04-review-TOOL-aGraftedHelix-1-spec-audit-round1.md) | spec-audit | TOOL-aGraftedHelix-1 TOOL-aGraftedHelix-2 TOOL-aGraftedHelix-3 TOOL-aGraftedHelix-4 TOOL-aGraftedHelix-5 TOOL-aGraftedHelix-6 TOOL-aGraftedHelix-8 TOOL-aGraftedHelix-9 |
 
 <!-- /gen:spec-records -->
 
@@ -40,15 +41,18 @@ taken during a pause out of ceiling evidence.
   it prints nothing and fails. A knob that is on over a host giving no reading prints one
   `run-gates: NOTE` line at start and reads INERT. Observed by AC4 and AC7.
 - **S4** — Before every dispatch, the runner calls `check_dispatch_pause` with the count of legs
-  running. It HOLDS when the reading is above the threshold and at least one leg runs, and a hold
-  ends, so the waiting leg dispatches, when the reading falls to or under the threshold (`fell`),
-  when the episode has held `MEMPAUSE_HOLD` seconds (`bound`), when no leg is left running
-  (`drained`), when the reading becomes unavailable (`unread`) or when the wall fires (`wall`). A
-  decision happens when a leg completes; nothing polls. Observed by AC5 and AC6.
+  running, at BOTH of its dispatch sites: the inner pass, and the forced-progress branch, which
+  passes a count of 0. It HOLDS when the reading is above the threshold and at least one leg runs,
+  and a hold ends, so the waiting leg dispatches, when the reading falls to or under the threshold
+  (`fell`), when a decision finds the episode has held `MEMPAUSE_HOLD` seconds or more (`bound`),
+  when no leg is left running (`drained`), when the reading becomes unavailable (`unread`) or when
+  the wall fires (`wall`). A decision happens when a leg completes; nothing polls. So the bound is
+  tested at the first leg completion after it expires, and a hold lasts at most until then.
+  Observed by AC5, AC6, AC12 and AC14.
 - **S5** — Each closed episode is one row in the run record's `pauses` file; the verdict file
   gains `paused` and `paused_s` in all three of its writers; and one `memory:` summary line prints
   after the pool drains, on every run. The two whole-output comparisons in the run-gates suites
-  filter that line and check it was printed once. Observed by AC5, AC6 and AC8.
+  filter that line and check it was printed once. Observed by AC5, AC6, AC8 and AC13.
 - **S6** — The self-test runner's pooled sweep makes the same check before each suite it
   dispatches, with its own count of suites running, reads the threshold from the one
   `--print-profile` call it already makes, and prints the same summary line. It keeps no run
@@ -143,7 +147,9 @@ decision adds no spawn.
 3. The reading is at or under the threshold: close an open episode as `fell`; dispatch.
 4. Nothing runs: close an open episode as `drained`; dispatch. A hold can never outlive the last
    running job, so a pause cannot deadlock a pool.
-5. An open episode has held `MEMPAUSE_HOLD` seconds: close it as `bound`; dispatch.
+5. An open episode has held `MEMPAUSE_HOLD` seconds or more: close it as `bound`; dispatch. This
+   is tested only when a decision runs, so an episode is released at the first leg completion
+   after `MEMPAUSE_HOLD` seconds, never at the instant the bound expires.
 6. Otherwise open an episode if none is open, and hold.
 
 `write_pause_row <ended-by>` closes the open episode: it adds one `pauses` row when the caller set
@@ -154,8 +160,17 @@ In the bar's inner dispatch loop the call sits after the sentinel skip and befor
 hold steps the dispatch index back and leaves the inner loop, and the reader then blocks on
 `wait -n` exactly as it does with a full pool; at least one leg runs by rule 4, so that wait
 returns. The next completion re-runs the decision for the same leg. Under a pressure that never
-falls, each episode releases one leg per `MEMPAUSE_HOLD`, and the pool drains toward width 1, so
-the bar slows and keeps moving.
+falls, each episode releases one leg at the first completion after `MEMPAUSE_HOLD` seconds, so a
+hold lasts until the first running leg to finish after the bound does, and the pool drains toward
+width 1; the bar slows and keeps moving.
+
+The runner has a SECOND dispatch site. When nothing is live, legs remain and the inner pass
+dispatched nothing, the forced-progress branch (`tools/run-gates/run-gates.sh:3093-3097`) runs one
+leg so the loop can never spin. A hold steps the index back, so a held leg can reach that branch
+when the running legs finish between the inner pass's count and the outer liveness test, a window
+the runner's own comment measures as common. The branch therefore calls `check_dispatch_pause 0`
+before its `runleg`: rule 4 closes the open episode `drained` and the leg dispatches. Without that
+call the episode would survive the loop and close as `wall` with no wall fired.
 
 The sweep in `tools/run-gates/run-selftests.sh` dispatches through a simpler loop: it starts a
 suite, counts it in `live`, and waits on `wait -n` once `live` reaches the outer width. The call
@@ -234,7 +249,9 @@ re-rendered with `python tools/codebase-map/gen_map.py --write` in the same comm
 - security — Reads one kernel file and two cgroup files and writes integers into a mode-700 run
   record. No path in it comes from a leg.
 - perf / scale — One builtin read per dispatch decision, 0.69 ms on node `a`, and no added spawn.
-  Under real pressure a hold slows the bar by design, at most one `MEMPAUSE_HOLD` per released leg.
+  Under real pressure a hold slows the bar by design. It is released at the first leg completion
+  after `MEMPAUSE_HOLD` seconds, so one hold lasts at most until then, which is bounded by the
+  running legs' own ceilings and by the wall.
 - error / empty / loading states — No reading is INERT and announced at start, `unread` mid-run,
   and never a 0 % reading. A malformed table value refuses; a malformed override is announced and
   leaves the pause off.
@@ -292,9 +309,10 @@ re-rendered with `python tools/codebase-map/gen_map.py --write` in the same comm
   over leg A sleeping 8 s, leg B sleeping 1 s that first rewrites the fixture to 95 %, leg C
   sleeping 4 s and instant legs D and E, the `pauses` file holds a row ending `bound` and a row
   ending `drained`, every leg reports, and the exit code equals the same fixture's run with
-  `GATE_MEMPAUSE=0`.
-  Red when: a held dispatch waits past the bound while legs still run, or the run fails to finish
-  inside an outer bound of 60 s.
+  `GATE_MEMPAUSE=0`. Traced: B ends at 1 s and D is held; C ends at 4 s, past D's 2 s bound, and
+  D is released `bound`; E is held from then until A ends at 8 s and closes `drained`.
+  Red when: a held dispatch survives a leg completion that occurs after its bound while legs still
+  run, or the run fails to finish inside an outer bound of 60 s.
 - **AC7** — When `$S` runs with `GATE_MEMPAUSE=90` and `GATE_MEMINFO` naming a file that does not
   exist, stderr carries one `run-gates: NOTE` line naming the pause INERT, the profile line carries
   `mempause INERT`, no `pauses` row is written, and the summary line opens `memory: no reading`.
@@ -323,6 +341,23 @@ re-rendered with `python tools/codebase-map/gen_map.py --write` in the same comm
   `bash skills/session-kickoff/manifest-check.sh` prints no `MANIFEST check 5 FAILED` line, and
   `grep -n 'mempause' memory/guides/SESSION-KICKOFF.md` names the command catalog's line.
   Red when: the runner moved and its version, the audit stamp or the catalog line did not.
+- **AC12** — When `$S` runs AC5's fixture with leg A deleting the `GATE_MEMINFO` file instead of
+  rewriting it, the `pauses` file holds one row ending `unread`, and B and C dispatch at A's end.
+  Red when: an unreadable meminfo mid-hold holds until the bound instead of releasing.
+- **AC13** — When `$S` runs at width 2 with `GATE_MEMPAUSE=90`, `GATE_MEMINFO` at 95 % and a
+  `GATE_WALL` of 3 s, over leg A sleeping 10 s and an instant leg B that the pressure holds, the
+  `pauses` file holds a row ending `wall`, the verdict file carries `paused` and `paused_s`, and
+  stdout carries exactly one line opening `memory:`.
+  Red when: a wall-stopped run omits its open episode, its verdict keys or its summary line.
+- **AC14** — When the block, extracted by the AC3 `awk`, is sourced with an episode open and the
+  reading above the threshold, `check_dispatch_pause 0` returns 1 and adds one `pauses` row ending
+  `drained`. When `$S` runs twenty times at width 2 with `GATE_MEMPAUSE=90` and `GATE_MEMINFO` at
+  95 % over an instant leg A and a leg B the pressure holds, no run's `pauses` file holds a row
+  ending `wall`.
+  Red when: the forced-progress branch dispatches a held leg with no decision, so its episode
+  closes `wall` with no wall fired.
+  cost: twenty fixture bars of about a second each; the race the runner's comment measures at 6 of
+  30 legs is what the repetition samples.
 
 ## 7. Gates
 
@@ -338,12 +373,14 @@ New arm: tools/run-gates/run-gates.test.sh and tools/run-gates/run-gates.runlog.
 New arm: tools/lib/resolve-python.test.sh · the mempause_sh parity row; stage one byte edited in the self-test runner's copy · none
 New arm: tools/run-gates/run-selftests.test.sh · AC9's pooled fixture; stage the call deleted from the sweep's loop · FLOOR_ASSERTIONS rises by the arms added
 New arm: tools/run-gates/run-gates.evidence.test.sh · AC10 over fixture rows; stage the overlap test made non-strict · FLOOR_ASSERTIONS rises by the arms added
+New arm: tools/run-gates/run-gates.test.sh · AC12's deleted meminfo, AC13's wall during a hold and AC14's forced-progress decision; stage rule 2 deleted, the wall close deleted, and the forced branch's call deleted · FLOOR_ASSERTIONS rises by the arms added
 
 ## 8. Open questions
 
 - **F1 — Is a hold bounded per episode, or by a budget for the whole run?** (a) Per episode: each
-  episode holds at most `MEMPAUSE_HOLD`, then releases one leg, and a further held decision opens a
-  new episode, so under lasting pressure the pool runs narrow and keeps moving. (b) Per run: once
+  episode is released at the first leg completion after `MEMPAUSE_HOLD` seconds and lasts at most
+  until then, and a further held decision opens a new episode, so under lasting pressure the pool
+  runs narrow and keeps moving; at least one leg always runs while a hold is open. (b) Per run: once
   the run's summed hold reaches a budget, the pause disarms for the rest of the run. Both meet the
   brief's criteria, and neither trips a veto. (b) re-opens full-width dispatch exactly while the
   pressure lasts, which is the thrash this unit exists to stop, so it leaves the unit's own goal
@@ -369,6 +406,12 @@ New arm: tools/run-gates/run-gates.evidence.test.sh · AC10 over fixture rows; s
 - rev-1 · 2026-10-04 · initial draft, from the spec brief's unit 7 section, the prompt record's
   sixth item, `run-gates.sh`, `run-selftests.sh` and `gate-profiles.txt` at base `5266d22e`, and
   the readings recorded in §4.
+- rev-2 · 2026-10-04 · §4 §5 §6 §7 §8 · S4 S5 · AC6 AC12 AC13 AC14 · folded the round-1 spec
+  audit's findings on this unit: 33 and 41, one defect (the hold bound is tested at the next leg
+  completion, restated in S4, rule 5, the dispatch paragraph, §5 perf and §8 F1, and AC6's Red-when
+  rewritten to that semantics with its trace); 40 (the forced-progress branch named as a second
+  dispatch site and routed through `check_dispatch_pause 0`, S4, AC14); and 23 (AC12's `unread`
+  and AC13's `wall` end reasons and the wall-stopped summary).
 
 ## 10. Reuse audit
 

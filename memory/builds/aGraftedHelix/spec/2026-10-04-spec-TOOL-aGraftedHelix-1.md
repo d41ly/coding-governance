@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-1 — the driver claims a run on the remote as a compare-and-swap ref, and refuses a live foreign claim
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-2 · base 5266d22e · streams tooling · order 1 · advances TOOL-aReapedTicket-5 · ratified 2026-10-04
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-2 · base 5266d22e · streams tooling · order 1 · advances TOOL-aReapedTicket-5 · ratified 2026-10-04
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-10-04-prompt-TOOL-aGraftedHelix-1-0-run-mandate.md](../prompts/2026-10-04-prompt-TOOL-aGraftedHelix-1-0-run-mandate.md) | journal | — |
 | [2026-10-04-prompt-TOOL-aGraftedHelix-1-1-spec-brief.md](../prompts/2026-10-04-prompt-TOOL-aGraftedHelix-1-1-spec-brief.md) | journal | TOOL-aGraftedHelix-2 TOOL-aGraftedHelix-3 TOOL-aGraftedHelix-4 TOOL-aGraftedHelix-5 TOOL-aGraftedHelix-6 TOOL-aGraftedHelix-7 TOOL-aGraftedHelix-8 TOOL-aGraftedHelix-9 |
+| [2026-10-04-review-TOOL-aGraftedHelix-1-spec-audit-round1.md](../reviews/2026-10-04-review-TOOL-aGraftedHelix-1-spec-audit-round1.md) | spec-audit | TOOL-aGraftedHelix-2 TOOL-aGraftedHelix-3 TOOL-aGraftedHelix-4 TOOL-aGraftedHelix-5 TOOL-aGraftedHelix-6 TOOL-aGraftedHelix-7 TOOL-aGraftedHelix-8 TOOL-aGraftedHelix-9 |
 
 <!-- /gen:spec-records -->
 
@@ -31,22 +32,23 @@ does not hold its claim cannot close.
   namespace `refs/gov/remote/runs/`, then ONE `for-each-ref` call and ONE date conversion for all
   ages, and derives a verdict per claim: `live`, `stale`, `held`, `terminal` or `unknown`
   (§4 "Verdicts"). It writes no `FETCH_HEAD`, no branch and no remote-tracking ref. Observed by
-  AC1, AC2 and AC3.
+  AC1, AC2, AC3 and AC16.
 - **S3** — `write_claim` writes one claim through `git push --porcelain
   --force-with-lease=refs/gov/runs/<slug>:<observed sha>`, with an EMPTY expected sha for a create,
   and reports exactly one of three outcomes: written, lost (the porcelain status line reads
   `stale info` or `fetch first`), or not completed (anything else, named). Every write it makes
-  leaves the ref in place on the remote. Observed by AC4, AC6 and AC9.
+  leaves the ref in place on the remote. Observed by AC4, AC6, AC9 and AC17.
 - **S4** — `check_claim_writable` decides, from the claim this call read and the run's lease
   identity, whether the call may write, must refuse, or takes the claim over, by the table in §4
   "Who may write a claim". A take-over of a claim whose verdict is `stale` is a branch of its own at
   both take-over sites and prints a `claim taken over` line naming the previous node, session and
-  beat age. Observed by AC4, AC5, AC7 and AC8.
+  beat age. Every cell of that table is driven by `TOOL-aGraftedHelix-12`'s arm (§3 Edges).
+  Observed by AC4, AC5, AC7, AC8 and AC19.
 - **S5** — `--preflight` reads the claims right after `observe_anchor`. A foreign `live`, `held` or
   `unknown` claim on this slug is check 89, joining the other preconditions through `status`. The
   write runs after the write gate and BEFORE the rotation and `scaffold_runmd`, so a lost race
   (check 90) or a write that did not complete (check 91) leaves the tree untouched. Observed by
-  AC4, AC5 and AC6.
+  AC4, AC5, AC6 and AC17.
 - **S6** — `check_single_live` widens its announcement: after the local records it lists the
   claims on the remote naming OTHER slugs whose verdict is `live`, `held`, `stale` or `unknown`,
   one line each, and stays silent at zero. A `terminal` claim is not listed. Observed by AC11.
@@ -54,15 +56,16 @@ does not hold its claim cannot close.
   `--replaces` block and the LANDING re-bind write the new keepalive into the claim; `run_takeover`
   reads and writes the claim after the authorization block and BEFORE `write_lease`. A claim that
   another session holds `live` refuses the holder row with check 90 and the take-over with check
-  89, each before any local write. Observed by AC7 and AC8.
+  89, each before any local write. Observed by AC7, AC8 and AC18.
 - **S8** — `--dispatch` and `--close` read the claim as the holder and renew it when due. `--close`
-  refuses with check 90 when the run does not hold its claim and with check 91 when the claim cannot
-  be read, before any DoD item is graded. Observed by AC10.
+  refuses with check 90 when the run does not hold its claim, a foreign `stale` one included, and
+  with check 91 when the claim cannot be read, before any DoD item is graded. `--dispatch` refuses
+  with check 90 the same way and writes no row. Observed by AC10 and AC19.
 - **S9** — Status writes. `--hold` writes `held`, `--landed` writes `landed` and `--abort` writes
   `aborted`, each after its own `stage_or_fail` succeeds. A claim this call may not write, or a
   write that does not complete, is announced on one line and never fails the verb; the local record
   is the truth and the claim ages to `stale`. A terminal claim stays on the remote for the next run
-  of the slug to take over. Observed by AC9.
+  of the slug to take over. Observed by AC9 and AC20.
 - **S10** — Two verbs. `--claims` (interface I2, no slug) prints one TAB-separated line per claim,
   `slug`, `node`, `status`, `beat-age-s`, `verdict`, sorted by slug, or the single line
   `claims: none`, and exits 2 with check 91 when the remote does not answer. `--beat <slug>` is the
@@ -89,6 +92,14 @@ does not hold its claim cannot close.
   unattended-stops dossier gains the claim paragraph. Observed by AC14.
 - **S15** — The cost of one claim read and one claim write is measured on node `a` and recorded in
   the unit's acceptance ledger. Observed by AC15.
+- **S16** — Claims land dark. `RUN_CLAIMS` is a closed `on`/`off` switch in `.unattended.conf`.
+  Blank or absent reads `off`, with one `unattended: NOTE` line naming the key; any other value is
+  refused by name, as `RESUME_SCHEDULE`'s is. Off, no verb reads, writes or refuses on a claim:
+  `--preflight`, `--resume`, `--dispatch`, `--close` and the status writes behave as at base, and
+  `--beat` prints a `skipped:` line naming the switch. `--claims` stays the remote reader either
+  way. This repository's `.unattended.conf` declares `RUN_CLAIMS="on"`, and the shipped
+  `tools/unattended/.unattended.conf.example` declares `RUN_CLAIMS="off"` with its comment.
+  Observed by AC21.
 
 ## 3. Non-goals (OUT)
 
@@ -97,15 +108,16 @@ does not hold its claim cannot close.
   what a check under the run's own uid cannot buy, and this unit adds nothing to that list.
 - **Deleting claims.** A terminal claim stays on the remote. The next run of the slug takes it
   over, and the card hides old ones (`TOOL-aGraftedHelix-2`).
-- **A new conf key.** `live` and `stale` split on `RESUME_STALE_BOUND`, the bound `--liveness`
-  already reads. No conf key turns claims off; a host that refuses the namespace refuses
-  `--preflight` with check 91, named.
+- **A second bound.** `live` and `stale` split on `RESUME_STALE_BOUND`, the bound `--liveness`
+  already reads. The one new conf key is S16's switch, which decides whether claims run at all and
+  bounds nothing; with it on, a host that refuses the namespace refuses `--preflight` with check 91,
+  named.
 - **`--liveness` and `--status` stay offline.** Neither reads the remote; `--claims` is the remote
   reader.
 - **The hooks and their lease binder.** `run-lease.js`, the stop-guard and the stall-recorder bind
   to the run-state lease and are not edited; the claim is not a lease file.
-- **The pre-push hook.** It belongs to another kit. A claim push takes its non-default exit today;
-  the branch-bar residual is §5's.
+- **The pre-push hook.** It belongs to another kit. Which of its branches a claim push takes, and
+  with which invocation, is `TOOL-aGraftedHelix-10`'s (§3 Edges); the branch-bar residual is §5's.
 - **The orientation card line** is `TOOL-aGraftedHelix-2`; the health log is
   `TOOL-aGraftedHelix-8`.
 - **A gate leg over claims.** The claim is a remote fact; the unattended kit gate keeps grading the
@@ -118,6 +130,16 @@ does not hold its claim cannot close.
   exit 2 with a named refusal when the remote does not answer.
 - **hands-off** `TOOL-aGraftedHelix-8` — the take-over of a claim whose verdict is `stale`, a
   branch of its own at both take-over sites, where that unit sits its `claim-taken-over` event.
+- **hands-off** `TOOL-aGraftedHelix-10` — the claim push's target: `write_claim` pushes to the URL
+  `resolve_claim_remote` prints, which the tracked pre-push hook refuses wherever
+  `GOV_DEFAULT_BRANCH` is unset (round-1 audit finding 38). That unit pushes by the remote's name
+  and observes the write through the hook.
+- **hands-off** `TOOL-aGraftedHelix-11` — the identity a renewal writes: `write_claim_beat` and the
+  holder renewals read the session from the environment, which the OS-scheduled tick running
+  `--beat` does not carry (finding 39). That unit copies identity from the lease record.
+- **hands-off** `TOOL-aGraftedHelix-12` — per-cell coverage of the §4 table that
+  `check_claim_writable` implements: the refusing cells, `--beat`'s declined writes and every
+  other cell §6 does not observe (findings 2, 3 and 46).
 
 ## 4. Design
 
@@ -211,13 +233,17 @@ about to record (`absent` compares literally, so two absent sessions fall back o
 | same session | rewrite | take | take | write |
 | foreign `live` | check 89 | check 89 | check 90 | announce |
 | foreign `held` | check 89 | take | check 90 | announce |
-| foreign `stale` | take, announced | take, announced | take, announced | write |
+| foreign `stale` | take, announced | take, announced | check 90 | write |
 | foreign `terminal` | take | check 89 | check 90 | write |
 | `unknown` | check 89 | check 89 | check 90 | announce |
 
 The take-over column's `held` cell is the HELD rows of the resume matrix, which already decided
 the release; a foreign `terminal` claim there means another driver finished the slug, so taking it
-would land it twice. "Announce" is one line naming the holder, `unattended: claim not written —
+would land it twice. The holder column refuses a foreign `stale` claim: a holder whose claim
+another session took has lost it, and must `--abort --code claim-lost`. The holder's own restart is
+the `same session` row, and `--replaces` compares the claim with the record's own facts, so it
+reads `mine`. So the stale take-over happens at exactly the two take-over sites, `--preflight` and
+`run_takeover`, which is where `TOOL-aGraftedHelix-8` logs it. "Announce" is one line naming the holder, `unattended: claim not written —
 <slug> is held <status> by session <s> on <node>, beat <n>s`, and the verb goes on.
 
 ### Call sites
@@ -264,7 +290,7 @@ dOldBuild	agent-0	landed	914002	terminal
 
 `--beat <slug>` prints `unattended: beat — <slug> · renewed <beat-utc>` or
 `unattended: beat — <slug> · skipped: <why>`, where `<why>` is the verdict, another host, a claim
-not this run's, a beat not yet due, or a remote that did not answer. It writes only through the
+not this run's, a beat not yet due, a remote that did not answer, or `RUN_CLAIMS` off. It writes only through the
 `none` and `mine` rows of the holder column; every other row is a skipped line, because the tick
 is not the driver and the run's own next verb decides a lost claim. It reads the verdict from the
 same derivation `--liveness` prints and never re-derives it. Each verb's header comment says what
@@ -276,8 +302,17 @@ its run does not hold.
 New functions, each in cell `sh.function` and each asked of `python tools/lexicon/lexicon.py
 --suggest <name> --as sh.function` on 2026-10-04, all `OK`: `resolve_claim_remote`, `read_claims`,
 `check_claim_writable`, `write_claim`, `write_claim_beat`, `print_claims`. New checks 89, 90 and
-91; the highest at base is 88. New core halt code `claim-lost`. No new file, gate leg, conf key or
-lexicon verb, so no inventory key of the codebase map is minted.
+91; the highest at base is 88. New core halt code `claim-lost`. New conf key `RUN_CLAIMS` (S16),
+declared in both conf files. No new file, gate leg or lexicon verb, so no inventory key of the
+codebase map is minted.
+
+### The switch
+
+Charter §1 lands Tier-2 behaviour dark, behind a default-OFF flag. The last kit behaviour that
+shipped on, auto-resume, did so by an owner ruling with an opt-out (`TOOL-dDerivedDocket-5`); this
+unit has no such ruling, so it ships off. Blank and absent both read `off`, so an adopter with an
+existing conf is never exposed by a kit update. The run mandate's ruling that a claim push needs no
+ask is what lets this repository turn it on.
 
 ### Files touched (estimate)
 
@@ -300,10 +335,11 @@ lexicon verb, so no inventory key of the codebase map is minted.
 
 ### Rollout
 
-Dark for every run preflighted before this lands: it has no claim, and its holder's next
-`--resume` creates one through the `none` row. A clone whose remote refuses `refs/gov/` refuses
-`--preflight` with check 91 naming the porcelain reason, which is the honest state: a run that
-cannot publish its claim cannot be told from a second driver.
+Dark in every adopter: the shipped example conf declares `RUN_CLAIMS="off"`, and a conf without
+the key reads off. In this repository the key is on, and a run preflighted before this lands has no
+claim; its holder's next `--resume` creates one through the `none` row. With the switch on, a clone
+whose remote refuses `refs/gov/` refuses `--preflight` with check 91 naming the porcelain reason,
+which is the honest state: a run that cannot publish its claim cannot be told from a second driver.
 
 ### Alternatives rejected
 
@@ -388,14 +424,17 @@ the empty tree and pushed to `refs/gov/runs/<slug>`.
   Red when: either is refused, or the claim still names the old session.
 - **AC6** — When a `git` shim on `PATH` moves `refs/gov/runs/<slug>` between the driver's read and
   its push, `--preflight` exits with `UNATTENDED check 90 FAILED` and the run-state file does not
-  exist.
-  Red when: the record is created over a lost claim.
+  exist. Run once more on a slug whose prior run left a terminal record, the prior record is
+  byte-unchanged and unmoved after the check 90.
+  Red when: the record is created over a lost claim, or the rotation ran before the CAS.
 - **AC7** — When the holder runs `--resume <slug> --keepalive-id <recorded id>` with its claim's beat
   older than a quarter of `RESUME_STALE_BOUND`, `beat-utc` moves; with a younger beat the ref's sha
   is unchanged; with the claim rewritten to another session `live`, the exit is non-zero with
   `UNATTENDED check 90 FAILED` naming `--code claim-lost`, and `--abort <slug> --code claim-lost`
-  is then accepted.
-  Red when: the holder writes over another session's live claim, or `claim-lost` is refused.
+  is then accepted. `grep -c '^HALT_FLOOR="8"$' .unattended.conf tools/unattended/.unattended.conf.example`
+  reports 1 for each file.
+  Red when: the holder writes over another session's live claim, `claim-lost` is refused, or a
+  floor left at 7 lets the new code be dropped silently.
 - **AC8** — When a different session's `--resume` reaches `run_takeover` on a presumed-stopped
   record whose claim another session holds `live`, it exits with `UNATTENDED check 89 FAILED` and
   the run-state file is byte-unchanged; with that claim `stale`, the take-over completes and the
@@ -409,18 +448,24 @@ the empty tree and pushed to `refs/gov/runs/<slug>`.
 - **AC10** — When `--close` runs on a run whose claim another session holds `live`, it exits with
   `UNATTENDED check 90 FAILED` before any DoD line, and no LANDING record is written.
   Red when: a run that does not hold its claim closes.
-- **AC11** — When `--preflight` runs while the remote holds a `live` claim and a `landed` claim for
-  two OTHER slugs, its output lists the live one under `claim(s) on the remote` and not the landed
-  one; with neither present, it prints no such line.
-  Red when: a terminal claim is listed, or the line prints at zero.
+- **AC11** — When `--preflight` runs while the remote holds one claim of another slug per verdict,
+  `live`, `stale`, `held`, `unknown` and `terminal`, its output lists the first four under
+  `claim(s) on the remote` and not the terminal one; with none present, it prints no such line.
+  Red when: a terminal claim is listed, a stale, held or unknown one is omitted, or the line
+  prints at zero.
 - **AC12** — When the tick suite's `LIVE` fixture runs `tools/unattended/resume-tick.sh`, the
   decision line reads `beat · unattended: beat —` and the fixture claim's `beat-utc` moved; with
   `--dry-run` the line ends ` (dry-run)` and the ref is unchanged.
   Red when: a `LIVE` run falls to `skip · verdict LIVE`, or a dry run pushes.
   cost: the tick suite's new block runs as a slice.
 - **AC13** — When `bash tools/unattended/adopt-unattended.sh --check` runs after the edit, it exits
-  0, and `grep -n -- '--claims' memory/guides/UNATTENDED-VERBS.md` finds the new entry.
-  Red when: a template moved without its render.
+  0, and `grep -n -- '--claims' memory/guides/UNATTENDED-VERBS.md` finds the new entry. Each file
+  read as one line, `tr '\n' ' ' < .claude/skills/unattended/SKILL.md | grep -c 'For the holder it writes nothing'`
+  prints 0, and so does the same probe over `tools/unattended/SKILL.template.md`; both print 1 at
+  base, observed before the edit. `awk '/^## 7\. /,/^## 9\. /' memory/guides/UNATTENDED-STOPS.md | grep -c claim`
+  prints a non-zero count, against 0 at base.
+  Red when: a template moved without its render, or the S13 sentences were never edited, which
+  render parity alone passes.
 - **AC14** — When `bash tools/check-kit-versions.sh` runs, it exits 0, and
   `python tools/govkit/govkit.py epoch --base 5266d22e` names no unattended carrier left behind.
   Red when: a carrier of the unattended version kept the old one.
@@ -430,6 +475,44 @@ the empty tree and pushed to `refs/gov/runs/<slug>`.
   figure: PINNED at the build pass, with the date and node.
   permission: a write to the real remote is a claim push, which the owner's prompt ruled needs no
   ask (the run mandate under `prompts/`).
+- **AC16** — When the remote holds a claim whose `beat-utc` is stamp-shaped but invalid,
+  `2026-02-30T00:00:00Z`, sorting before a fresh `live` claim, `--claims` prints every claim whose
+  beat went through that `date -u -f -` call with verdict `unknown` and age `-`. This is a separate
+  fixture from AC2's, whose ages it would otherwise turn `unknown`.
+  Red when: any claim of that call reads `live` or `stale`, or prints an age taken from another
+  claim's beat.
+- **AC17** — When a `git` shim on `PATH` makes the claim push print a `!` status line that is
+  neither `stale info` nor `fetch first`, and again when it makes the push exit 124, `--preflight`
+  exits with `UNATTENDED check 91 FAILED`, never check 90, and the clone holds no run-state file.
+  Red when: a refused or timed-out push is reported as a lost race.
+- **AC18** — When `--resume <slug> --replaces <old> --keepalive-id <new>` runs, the claim's
+  `keepalive` is `<new>`, and a following `--resume <slug> --keepalive-id <new>` exits 0 with
+  `git ls-remote <bare> refs/gov/runs/<slug>` unchanged while the beat is not due; this runs once
+  with `CLAUDE_CODE_SESSION_ID` unset. When the LANDING re-bind meets the prior session's claim
+  seeded `stale`, the claim then names the re-binding session's keepalive; seeded as a fresh
+  foreign `live` claim, it prints `claim not written` and exits 0. When a holder `--resume` meets a
+  claim carrying this `CLAUDE_CODE_SESSION_ID` under an older keepalive, the claim is rewritten and
+  the exit is 0.
+  Red when: the run wedges on its own replacement with check 90, or the `same session` row is
+  read as foreign.
+- **AC19** — When a `git` shim on `PATH` fails only the fetch of `refs/gov/runs/*` while the anchor
+  read still answers, `--close` exits with `UNATTENDED check 91 FAILED` before any DoD line. When
+  the claim is rewritten to another session `live`, `--dispatch` exits with `UNATTENDED check 90 FAILED`
+  and the run-state file is byte-unchanged. When it is rewritten to another session `stale`,
+  `--close` and `--dispatch` each exit with check 90 naming `--code claim-lost`, and the claim ref
+  is unmoved.
+  Red when: a close lands a claim it never read, a dispatch writes a row for a run another session
+  drives, or a holder takes a successor's stale claim.
+- **AC20** — When `--landed` runs on a fixture run whose claim is `live` and its own, the claim then
+  reads `status: landed` and `--claims` prints it with verdict `terminal`. This is its own case,
+  because AC9's sequence ends at a terminal `--abort`.
+  Red when: a landed run's claim stays `live` and ages to `stale`.
+- **AC21** — When the fixture's `.unattended.conf` has no `RUN_CLAIMS` line, `--preflight` exits 0,
+  prints one `unattended: NOTE` line naming `RUN_CLAIMS`, and `git ls-remote <bare> 'refs/gov/*'`
+  prints nothing. With `RUN_CLAIMS="maybe"` it refuses naming the key. In the tree,
+  `grep -c '^RUN_CLAIMS="on"$' .unattended.conf` prints 1 and
+  `grep -c '^RUN_CLAIMS="off"$' tools/unattended/.unattended.conf.example` prints 1.
+  Red when: a conf without the key writes a claim, or an unrecognised value selects a default.
 
 ## 7. Gates
 
@@ -438,6 +521,14 @@ the empty tree and pushed to `refs/gov/runs/<slug>`.
 New arm: tools/unattended/unattended.test.sh · the claim read, the verdicts, checks 89, 90 and
 91, the status writes and the close refusal, each staged by reverting its branch · the suite's
 floor rises by its new arm count
+
+New arm: tools/unattended/unattended.test.sh · AC16 to AC21, each staged by reverting its branch:
+the answer-count alignment, the non-race refusal class, the replace and re-bind writes, the close
+and dispatch holder reads, the landed write and the switch · the suite's floor rises by its new
+arm count
+
+These arms observe the cells §6 names. Every other cell of the §4 table is driven by
+`TOOL-aGraftedHelix-12`'s table-driven arm, which marks a cell no path reaches as unreached.
 
 New arm: tools/unattended/resume-tick.test.sh · the LIVE row runs --beat, and --dry-run pushes
 nothing · the suite's floor rises by its new arm count
@@ -481,11 +572,32 @@ once, through the kit's own runner, at VERIFYING.
   false the day this lands, and that template is not a governance carrier.
   RESOLVED (agent, 2026-10-04, delegated): edited, on the same rule as the three: only where the
   shipped text would otherwise be false.
+- **F8 — Do claims ship on, or behind a switch?** Charter §1 lands Tier-2 behaviour behind a
+  default-OFF flag. Shipping on needs an owner ruling of `TOOL-dDerivedDocket-5`'s shape, which
+  this build does not have, and leaves an adopter whose remote refuses `refs/gov/` with a downgrade
+  as the only way out. A switch that reads off when absent exposes no adopter at a kit update, and
+  this repository turns it on. RESOLVED (agent, 2026-10-04, delegated): the `RUN_CLAIMS` switch of
+  S16, off when blank or absent.
+- **F9 — Does a holder take over a foreign `stale` claim?** Taking it contradicts §1 and S8, puts
+  a take-over outside the two sites unit 8 logs, and lets a displaced holder close over its
+  successor once the successor goes stale. Refusing it costs nothing: the holder's own restart is
+  the `same session` row. RESOLVED (agent, 2026-10-04, delegated): the holder column answers a
+  foreign `stale` claim with check 90 and the `claim-lost` remedy.
 
 ## 9. Revision log
 
 - rev-1 · 2026-10-04 · initial draft, from the spec brief's unit 1 and the driver at base
   `5266d22e`.
+- rev-2 · 2026-10-04 · §3 §4 §6 §7 §8 §10 · S2 S3 S4 S5 S7 S8 S9 S16 · AC6 AC7 AC11 AC13 AC16 AC17
+  AC18 AC19 AC20 AC21 · folded the round-1 spec audit's MEDIUM and LOW findings on this unit:
+  finding 1 (AC16, the answer-count alignment); 4 (AC18, the replace and re-bind writes and the
+  `same session` row); 5 (AC19, the close's check 91 and the dispatch's holder read); 6 (AC17 and
+  the AC6 rotation variant); 7 (AC20, the landed write); 8 (AC13, sentence probes observed at
+  base); 32 (the holder column's foreign `stale` cell becomes check 90, §8 F9, AC19); 46 (per-cell
+  coverage handed to `TOOL-aGraftedHelix-12`, §7, and `TOOL-dDerivedDocket-40` cited in §10); 47
+  (the `RUN_CLAIMS` switch, S16, §8 F8, AC21); and 9 (AC11 per verdict, and the quoted
+  `HALT_FLOOR` grep in AC7). §3 gains hands-off edges to the units promoted from findings 38, 31,
+  39, 2 and 3, and its pre-push sentence stops claiming the non-default exit.
 
 ## 10. Reuse audit
 
@@ -501,7 +613,10 @@ unit (TOOL-aWokenSentinel-1), the announcement that replaced the single-live ref
 (TOOL-aUnblockedFleet-1), and the open staleness-bound ask this unit advances
 (TOOL-aReapedTicket-5). Where a hit and the code could seem to disagree: STOPS §7 says nothing
 refreshes the lease, and that stays true, because the claim's beat is a remote fact and never
-restages the tracked record, which was that ruling's reason.
+restages the tracked record, which was that ruling's reason. Prior art for the per-cell coverage
+this unit hands to `TOOL-aGraftedHelix-12` is the open ask `TOOL-dDerivedDocket-40`, which records
+the same class for the resume matrix of `TOOL-dDerivedDocket-4`; it is cited here and carries no
+header verb, because per-cell arms over this table move neither that guide nor its leg.
 
 Recall terms used: lease keepalive preflight concurrent run announcement check_single_live double drive take-over resume matrix staleness bound remote anchor
 

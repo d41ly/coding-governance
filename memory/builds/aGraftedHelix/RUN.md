@@ -33,3 +33,15 @@ base: 5266d22eba31cdbf15425773d245cd23d7b9cdf5
 ## Parked
 
 2026-10-04T15:45:33Z rescope · item add TOOL-aGraftedHelix-9 · reason M2 decompose: unit 6 named two mechanisms, an exact content-key check (memory-tree) and a near-match relation check (recall index); one mechanism per spec splits them
+
+2026-10-04T17:06:16Z review · item aGraftedHelix-spec-set-r1 · reason verdict BLOCKED · blockers 2 · BOUNDED · disposition promote
+
+2026-10-04T17:15:16Z rescope · item add TOOL-aGraftedHelix-10 · reason spec-audit round 1 id 38 BLOCKER and id 31 HIGH: the claim push names a URL, and the tracked pre-push hook refuses a URL push wherever GOV_DEFAULT_BRANCH is unset; repairs TOOL-aGraftedHelix-1
+
+2026-10-04T17:15:19Z rescope · item add TOOL-aGraftedHelix-11 · reason spec-audit round 1 id 39 BLOCKER: --beat from the OS-scheduled tick rewrites the claim's session to absent, and the holder then reads its own claim as foreign; repairs TOOL-aGraftedHelix-1
+
+2026-10-04T17:15:23Z rescope · item add TOOL-aGraftedHelix-12 · reason spec-audit round 1 id 2 HIGH and id 3 HIGH: the refusing cells of the claim write table and the writes --beat declines have no criterion; repairs TOOL-aGraftedHelix-1
+
+2026-10-04T17:15:26Z rescope · item add TOOL-aGraftedHelix-13 · reason spec-audit round 1 id 20 HIGH: the hygiene engine's dispatch of check 28 is observed only by a grep that a comment satisfies; repairs TOOL-aGraftedHelix-6
+
+2026-10-04T17:15:30Z rescope · item add TOOL-aGraftedHelix-14 · reason spec-audit round 1 id 27 HIGH: the hygiene engine's dispatch of check 27 is observed only by a grep that a comment satisfies; repairs TOOL-aGraftedHelix-9

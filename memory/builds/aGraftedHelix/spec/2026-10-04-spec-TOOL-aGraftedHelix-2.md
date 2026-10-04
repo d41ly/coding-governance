@@ -1,12 +1,13 @@
 # TOOL-aGraftedHelix-2 — the orientation card lists the remote run claims under a two-clock rule
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-1 · base 5266d22e · streams kickoff · order 2 · ratified 2026-10-04
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 5266d22e · streams kickoff · order 2 · ratified 2026-10-04
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-04-prompt-TOOL-aGraftedHelix-1-1-spec-brief.md](../prompts/2026-10-04-prompt-TOOL-aGraftedHelix-1-1-spec-brief.md) | journal | TOOL-aGraftedHelix-1 TOOL-aGraftedHelix-3 TOOL-aGraftedHelix-4 TOOL-aGraftedHelix-5 TOOL-aGraftedHelix-6 TOOL-aGraftedHelix-7 TOOL-aGraftedHelix-8 TOOL-aGraftedHelix-9 |
+| [2026-10-04-review-TOOL-aGraftedHelix-1-spec-audit-round1.md](../reviews/2026-10-04-review-TOOL-aGraftedHelix-1-spec-audit-round1.md) | spec-audit | TOOL-aGraftedHelix-1 TOOL-aGraftedHelix-3 TOOL-aGraftedHelix-4 TOOL-aGraftedHelix-5 TOOL-aGraftedHelix-6 TOOL-aGraftedHelix-7 TOOL-aGraftedHelix-8 TOOL-aGraftedHelix-9 |
 
 <!-- /gen:spec-records -->
 
@@ -29,12 +30,14 @@ which of those are live, stale or held, and which ended recently, with old histo
   of `resolve_id_reader` becomes `resolve_kit_file <home> <anchor>`, which `resolve_id_reader` then
   calls for `memory-tree corpus_ids.py`; the card calls it for `unattended unattended.sh`. No path
   of the unattended kit is spelled in the engine. Nothing resolving prints
-  `claims — skipped: no unattended driver resolves in this tree`. Observed by AC7.
+  `claims — skipped: no unattended driver resolves in this tree`. Observed by AC7 and AC12.
 - **S4** — The read is bounded: `timeout -k 2 $CARD_CLAIMS_BOUND bash <driver> --claims`, default
   15 s, stdin from `/dev/null` so a hook's never-closing pipe cannot hold it, its stdout captured to
   a scratch file under the card's own directory and never through a command substitution. A fired bound prints `claims — skipped: --claims did not answer within
   15s, so the remote's claims are unknown, not none`. A node with no working `timeout -k` prints a
-  `skipped:` line naming that and runs no read. Observed by AC5.
+  `skipped:` line naming that and runs no read. The call runs with `GOV_RUNLOG=0`, the driver's
+  documented switch that writes no journal line, because the runlog kit reads the driver's journal
+  and a card write is no run. Observed by AC5, AC12 and AC14.
 - **S5** — The two clocks. The first is the driver's: `live` and `stale` split on
   `RESUME_STALE_BOUND`, read inside `--claims` and never here. The second is the card's
   `CARD_CLAIMS_HIDE_S`, 86400 s: a `stale` or `terminal` claim whose beat is older is hidden and
@@ -46,12 +49,16 @@ which of those are live, stale or held, and which ended recently, with old histo
   `stale`, `terminal` and then by slug, so a busy remote cannot push a live claim off the card; one
   `… <m> more` row follows past the cap. A non-zero exit prints `claims — skipped: ` and the driver's
   first refusal line, cut at 160 bytes. The rows are split with `awk -F'\t'`, never `read`. Observed
-  by AC1, AC4 and AC5.
+  by AC1, AC4, AC5 and AC11.
 - **S7** — The remote contact is narrowed and recorded. The card moves no branch, no
   remote-tracking ref and writes no `FETCH_HEAD`; the driver's private claim cache is the only ref
-  namespace its read touches. One `memory/DECISIONS.md` row under this unit's id records that the
-  card now makes this one bounded read, narrowing the no-fetch clause KICK-aReplayedCard-1 S8 set.
-  `--card --replay` makes no read and prints the stored cell. Observed by AC6 and AC10.
+  namespace its read touches. One `memory/DECISIONS.md` row under this unit's id records it, and
+  its text opens with the pinned form
+  `SUPERSEDES KICK-aReplayedCard-1's no-fetch clause and its card budget:`, followed by the one
+  bounded read through the driver and the card's new wall, taken from AC10's measured figure. That
+  form is the partial edge `TOOL-aGraftedHelix-4`'s grammar reads, so recall labels
+  KICK-aReplayedCard-1 partly superseded and stops serving its 1.6 s budget unlabelled.
+  `--card --replay` makes no read and prints the stored cell. Observed by AC6, AC10 and AC13.
 - **S8** — The engine's version and the manifest. `KIT_MANIFEST_VERSION` and its `gov:kit
   kickoff-manifest@` marker move once after the last edit; `MANIFEST_FORMAT` does not move. The
   kickoff manifest's `last-audit` is re-stamped with a delta line, because
@@ -157,9 +164,9 @@ New functions in cell `sh.function`, each `OK` from `python tools/lexicon/lexico
 - error / empty / loading states — No conf, no driver, no `timeout -k`, a fired bound, a refusing
   driver and no claim each print their own `claims —` form, and the card is still written.
 - observability — The cell is the observation; a `skipped:` form says why it has none.
-- risks — Every card write in a tree adopting the unattended kit now starts the driver once, and
-  that call adds its START and END lines to the driver's machine-local run log, which nothing reads
-  back.
+- risks — Every card write in a tree adopting the unattended kit now starts the driver once. The
+  runlog kit reads the driver's journal (`runlog_lib.PRODUCER_FILES` maps `driver` to `driver.log`),
+  so the call runs with `GOV_RUNLOG=0` and adds no line to it (S4, AC14).
   Existing card arms in the self-test run in a clone whose remote is the local checkout, which
   answers `claims: none` in about two seconds per write.
 - testing — New arms in the card suite, each observed RED on a staged break: claims seeded with
@@ -217,6 +224,28 @@ a bare repository whose claims are seeded with `git commit-tree` over the empty 
   broken prints the stored `claims —` head unchanged.
   Red when: either figure is missing, or the replay reads the remote.
   figure: PINNED at the build pass, with the date and node.
+- **AC11** — When the fixture's remote holds ten kept claims, nine `terminal` ones from two hours
+  ago and one fresh `live` one whose slug sorts last, the card written with
+  `bash skills/session-kickoff/manifest-check.sh --card --write --session t2` prints exactly
+  `CARD_CLAIMS_ROWS` rows, the live claim on the first, and a `… 2 more` row after them.
+  Red when: the live claim is missing, or the rows are in slug order.
+  figure: the row count is DERIVED from `CARD_CLAIMS_ROWS`, 8 when written.
+- **AC12** — When the fixture's driver is deleted, the card reads
+  `claims — skipped: no unattended driver resolves in this tree`. When a `timeout` shim on `PATH`
+  fails every `-k` call and the driver is a stub that touches a marker file, the card prints a
+  `skipped:` line naming `timeout -k` and the marker file does not exist. When the driver is a stub
+  that runs `cat >/dev/null` and then prints `claims: none`, the card written as
+  `sleep 30 | bash skills/session-kickoff/manifest-check.sh --card --write --session t2` with
+  `CARD_CLAIMS_BOUND=2` reads `claims — none on the remote`.
+  Red when: a missing driver reaches `bash ''`, the read runs without its bound, or the hook's open
+  pipe reaches the driver's stdin so the bound fires.
+- **AC13** — When `grep -c "SUPERSEDES KICK-aReplayedCard-1's no-fetch clause and its card budget:" memory/DECISIONS.md`
+  runs after the pass, it prints 1.
+  Red when: the row says "narrows" or any other verb recall's supersession grammar does not read.
+- **AC14** — When the card is written in the fixture, the line count of the `driver.log` journal
+  under the fixture's git common dir is the same before and after, with `GOV_RUNLOG` unset in the
+  caller's environment.
+  Red when: a card write appends a slug-less invocation pair to the journal the runlog CLI reads.
 
 ## 7. Gates
 
@@ -225,6 +254,11 @@ a bare repository whose claims are seeded with `git commit-tree` over the empty 
 New arm: skills/session-kickoff/manifest-check.test.sh · the seven-claim remote, the missing conf,
 the broken remote, the slow driver and the replay, each staged by reverting its branch · the
 suite's floor rises by its new arm count
+
+New arm: skills/session-kickoff/manifest-check.test.sh · AC11's ten-claim remote, AC12's missing
+driver, failing timeout and open stdin, and AC14's journal count; stage the order set to slug, the
+skip test deleted, the stdin redirect deleted and GOV_RUNLOG=0 deleted · the suite's floor rises by
+its new arm count
 
 ## 8. Open questions
 
@@ -250,6 +284,11 @@ suite's floor rises by its new arm count
 
 - rev-1 · 2026-10-04 · initial draft, from the spec brief's unit 2 and the engine at base
   `5266d22e`.
+- rev-2 · 2026-10-04 · §5 §6 §7 · S3 S4 S6 S7 · AC11 AC12 AC13 AC14 · folded the round-1 spec
+  audit's findings on this unit: 10 (AC11, the row cap, the more row and the verdict-first order);
+  51 (S7 pins the row's `SUPERSEDES ...'s` form and its card budget, AC13); 11 (AC12, the no-driver
+  form, the `timeout -k` skip and the stdin redirect); and 52 (S4 runs the call with
+  `GOV_RUNLOG=0`, §5 risks corrected, AC14).
 
 ## 10. Reuse audit
 

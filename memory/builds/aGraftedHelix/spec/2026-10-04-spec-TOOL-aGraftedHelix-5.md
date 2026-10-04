@@ -1,12 +1,13 @@
 # TOOL-aGraftedHelix-5 — each leg reading is stamped faithful or contended by a foreign-load census, and only faithful readings argue a ceiling
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-2 · base 5266d22e · streams tooling · order 7 · ratified 2026-10-04
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-2 · base 5266d22e · streams tooling · order 7 · advances TOOL-aSurfacedLexicon-22 · ratified 2026-10-04
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-04-prompt-TOOL-aGraftedHelix-1-1-spec-brief.md](../prompts/2026-10-04-prompt-TOOL-aGraftedHelix-1-1-spec-brief.md) | journal | TOOL-aGraftedHelix-1 TOOL-aGraftedHelix-2 TOOL-aGraftedHelix-3 TOOL-aGraftedHelix-4 TOOL-aGraftedHelix-6 TOOL-aGraftedHelix-7 TOOL-aGraftedHelix-8 TOOL-aGraftedHelix-9 |
+| [2026-10-04-review-TOOL-aGraftedHelix-1-spec-audit-round1.md](../reviews/2026-10-04-review-TOOL-aGraftedHelix-1-spec-audit-round1.md) | spec-audit | TOOL-aGraftedHelix-1 TOOL-aGraftedHelix-2 TOOL-aGraftedHelix-3 TOOL-aGraftedHelix-4 TOOL-aGraftedHelix-6 TOOL-aGraftedHelix-7 TOOL-aGraftedHelix-8 TOOL-aGraftedHelix-9 |
 
 <!-- /gen:spec-records -->
 
@@ -16,7 +17,9 @@
 `<git-dir>/gate-run/<runid>/`, and a reading taken while another session's suite or another clone's
 bar loaded the host reads exactly like a slow leg. This unit takes a census of foreign gate work
 while each leg runs, writes it into the leg's row as interface I6's `foreign` field, and makes the
-evidence tool argue only from readings whose census found none, saying how many it set aside.
+evidence tool argue only from runner readings whose census found none, saying how many it set
+aside. A reading recorded by hand through `--observed` stays admissible, as `TOOL-cMendedVintage-17`
+rules, and is declared as the one uncensused path.
 
 ## 2. Scope (IN)
 
@@ -27,16 +30,18 @@ evidence tool argue only from readings whose census found none, saying how many 
   runner's own ancestors and descendants are never foreign, and a tree counts once, at its topmost
   matching process. It prints `unknown` when `ps` fails, when the header names no PID or PPID
   column, or when the snapshot holds no row for the runner itself. Observed by AC1, AC2 and AC3.
-- **S2** — `arm_census` starts, at the first dispatch and beside `arm_wall`, a detached sampler
-  shaped like `ts_tick_start`. It truncates the run record's `census` file, appends one sample at
-  once, then appends one every `CENSUS_EVERY` seconds until the runner is gone or the run stops it.
-  `CENSUS_EVERY` is 60, and `GATE_CENSUS_EVERY` overrides it with a positive integer; any other
-  override value prints one `run-gates: NOTE` line and keeps 60. A first sample reading `unknown`
-  prints one `run-gates: NOTE` line on stderr. Observed by AC3, AC4 and AC5.
+- **S2** — `arm_census` runs at the first dispatch, beside `arm_wall`. In the runner's own shell,
+  before it returns to the dispatch loop, it truncates the run record's `census` file and appends
+  one sample, so every first-wave leg has a sample inside its window. A first sample reading
+  `unknown` prints one `run-gates: NOTE` line on stderr from that same shell. Only then does it start
+  a detached sampler shaped like `ts_tick_start`, which appends one sample every `CENSUS_EVERY`
+  seconds until the runner is gone or the run stops it. `CENSUS_EVERY` is 60, and
+  `GATE_CENSUS_EVERY` overrides it with a positive integer; any other override value prints one
+  `run-gates: NOTE` line and keeps 60. Observed by AC3, AC4, AC5 and AC11.
 - **S3** — `runleg` writes the eighth field of every `.leg` and `.retry.leg` row from
   `derive_foreign`: over the samples stamped inside `[start − 3 × CENSUS_EVERY, end]`, the largest
   positive count; else `unknown` when any sample there reads `unknown` or none exists; else `0`.
-  Observed by AC1, AC3 and AC5.
+  Observed by AC1, AC3, AC5 and AC12.
 - **S4** — Every reader of a `.leg` row in the runner keeps its arity: the ledger block's read at
   `tools/run-gates/run-gates.sh:3128` takes field 7 alone, so `gate-ledger.tsv` stays five fields.
   Observed by AC6.
@@ -47,11 +52,13 @@ evidence tool argue only from readings whose census found none, saying how many 
   leg whose every reading was set aside on its own line rather than as UNBACKED, and keeps DEAD
   PROBE for a record holding no reading at all. `--write` names the same counts on its summary line
   and, when everything was set aside, holds every evidence row without reporting DEAD PROBE.
-  Observed by AC7 and AC8.
+  `--write --observed '<leg>=<seconds>' --how ...` never passes through `read_runs` and is not
+  filtered: it is the declared exception of §4 "The manual reading". Observed by AC7, AC8 and AC13.
 - **S6** — The run header gains `census_every`, outside the four-key envelope block. The README's
   run-record and ceiling sections, the `derive-ceilings.py` docstring, the header lines `--write`
   generates into `tools/run-gates/ceiling-evidence.txt` and the run-gates dossier say what the field
-  means and what the census cannot see. Observed by AC9.
+  means, what the census cannot see, and that an `--observed` reading is admitted uncensused, its
+  `--how` text the only record of the load it was taken under. Observed by AC9 and AC13.
 - **S7** — The run-gates kit version moves once, after this unit's last move, in every carrier
   `tools/check-kit-versions.sh` pairs, and the kickoff manifest's audit stamp is renewed because the
   runner is on its watch list. Observed by AC10.
@@ -128,12 +135,15 @@ full command line, so a python leg run by another session is visible.
 
 ### The sampler
 
-`arm_census` follows `ts_tick_start` property by property: a subshell whose stdio goes to
-`/dev/null`, disowned so `live()` never counts it, exiting when `kill -0` on the runner fails or a
-disarm marker exists in the scratch directory. The first sample is taken before the loop and
-before the first leg dispatches, so every leg has one inside its window. The run stops it beside
-`remove_wall_watcher`, and `cleanup` stops it on a signal. A `kill -9` on the runner leaves it to
-exit at its next tick, holding no descriptor of the caller's.
+The first sample is not the sampler's. A backgrounded subshell gives no ordering against its
+parent, and the `ts_tick_start` shape sends its stdio to `/dev/null`, so neither "before the first
+leg" nor the first sample's NOTE line could come from inside it. `arm_census` therefore truncates
+the file and takes the first sample synchronously, about 52 ms on a quiet host, and prints the NOTE
+itself. Only the periodic loop is detached, and it follows `ts_tick_start` property by property: a
+subshell whose stdio goes to `/dev/null`, disowned so `live()` never counts it, exiting when
+`kill -0` on the runner fails or a disarm marker exists in the scratch directory. The run stops it
+beside `remove_wall_watcher`, and `cleanup` stops it on a signal. A `kill -9` on the runner leaves
+it to exit at its next tick, holding no descriptor of the caller's.
 
 Cost, PINNED on node `a` 2026-10-04: `ps -ef` 27 ms per snapshot, 20 in 0.543 s, and an `awk`
 spawn 25 ms, so one sample is two spawns and about 52 ms on a quiet host. At 60 s that is 120
@@ -158,6 +168,23 @@ than DEAD PROBE.
 
 `--report` keeps its table and appends `aside` as the last column. One header line follows the
 existing two: `# set aside: <c> contended, <u> uncensused — readings that argue no ceiling`.
+
+### The manual reading
+
+`derive-ceilings.py --write --observed '<leg>=<seconds>' --how ...` writes an evidence row
+directly and never reads a run record, so no census reaches it. Its docstring and
+`memory/DECISIONS.md` record `TOOL-cMendedVintage-17`: a reading taken outside the runner is
+admissible, and has to be. This unit keeps that ruling. The path stays admitted and unfiltered,
+and the docstring, the README's ceiling section and the generated evidence header each state that
+it is the one uncensused route, with its `--how` text the only record of the load. Closing it would
+reverse a ratified decision, and filtering it has nothing to filter on.
+
+### The ask this advances
+
+`TOOL-aSurfacedLexicon-22` records a ceiling row written twice from contended readings and names
+three candidates. The `foreign` field answers the second one's purpose, a contended verdict told
+apart from a slow one, for every leg reading rather than only beside a kill. It reports foreign
+gate work, not the pool width, so the ask is advanced and not closed.
 
 ### Inventory
 
@@ -201,8 +228,9 @@ The evidence file moves in its generated header lines only, by one `--write`; it
 
 - security — The census writes pids and matched tokens, never command lines. The run record is
   mode 700, and the file is truncated at arm so a reused run id's stale samples are never read.
-- perf / scale — Two spawns per sample, detached, at most one sample a minute (§4). The worker
-  reads the census with builtins only, and the ledger and dispatch paths gain no spawn.
+- perf / scale — Two spawns per sample, at most one sample a minute (§4). The first sample runs on
+  the dispatch path once per run, about 52 ms; every later one is detached. The worker reads the
+  census with builtins only, and the ledger path gains no spawn.
 - error / empty / loading states — `ps` failing, an unparseable header, a snapshot without the
   runner, or no sample in a leg's window reads `unknown`, never `0`, and a first `unknown` sample
   is announced once.
@@ -238,9 +266,11 @@ named below by its basename.
 - **AC3** — When `$S` runs with a `ps` stub that exits 1 first on `PATH`, every `.leg` row's
   `foreign` field reads `unknown`, every `census` line reads `unknown`, stderr carries one
   `run-gates: NOTE` line naming the census, and the verdict equals the same fixture's without the
-  stub.
-  Red when: a census that could not read the process table stamps any row `0`, or the stub moves
-  the verdict.
+  stub. The same holds with a `ps` stub that prints a header carrying no `PID` or `PPID` column,
+  and with one that prints a valid table omitting the runner's own pid: every `.leg` row's
+  `foreign` field reads `unknown`.
+  Red when: a census that could not read the process table, or could not see its observer, stamps
+  any row `0`, or a stub moves the verdict.
 - **AC4** — When `$S` runs with `GATE_JOBS=1` and two legs, both legs report, and a `$(...)`
   capture of the runner returns within 30 s of the runner's own exit while `CENSUS_EVERY` is 60.
   Red when: the sampler is a live job, so the serial pool never dispatches its second leg, or it
@@ -278,6 +308,22 @@ named below by its basename.
   `python tools/govkit/govkit.py epoch --base <the pass's base>` names no run-gates entry, and
   `bash skills/session-kickoff/manifest-check.sh` prints no `MANIFEST check 5 FAILED` line.
   Red when: the runner's bytes moved and its version or the manifest's audit stamp did not.
+- **AC11** — When `$S` runs at width 2 over two first-wave legs that each exit within a second,
+  with `GATE_CENSUS_EVERY` left at 60, both `.leg` rows carry a numeric `foreign` field, and the
+  `census` file's first line is stamped no later than either leg's start.
+  Red when: a first-wave leg reads `unknown` because the first sample landed after it ended.
+- **AC12** — When `$S` runs one leg that times out under the pool and passes on the serial retry,
+  its `.retry.leg` row holds eight fields with a numeric or `unknown` eighth. When a fixture
+  `census` file holds an `unknown` sample and a sample of `2` inside one leg's window,
+  `derive_foreign` stamps that leg `2`.
+  Red when: a retry row is written with seven fields, or an `unknown` sample outranks a positive
+  count.
+- **AC13** — When `python tools/run-gates/derive-ceilings.py --write --observed 'L=55' --how 'quiet host, no other session'`
+  runs over AC8's fixture, L's evidence row is written from that reading, and the header lines it
+  renders state that an `--observed` reading is admitted uncensused. `grep -n 'TOOL-cMendedVintage-17' tools/run-gates/README.md`
+  names the ceiling section's sentence on that route.
+  Red when: the manual route is refused, reversing a ratified ruling, or no document says it is
+  uncensused.
 
 ## 7. Gates
 
@@ -289,6 +335,7 @@ self-tests, so the close owes each a run of its own, bounded, rather than inside
 
 New arm: tools/run-gates/run-gates.evidence.test.sh · AC1 to AC6 as fixture bars; stage the ancestor walk deleted, the window reach set to zero, the sampler left undisowned, and the ledger read's trailing field deleted · FLOOR_ASSERTIONS rises by the arms added
 New arm: tools/run-gates/run-gates.evidence.test.sh · AC7 and AC8 over fixture rows; stage the census filter deleted and the DEAD PROBE test moved after it · FLOOR_ASSERTIONS rises by the arms added
+New arm: tools/run-gates/run-gates.evidence.test.sh · AC3's two blind-census stubs, AC11's sub-second first wave, AC12's retry row and mixed window, and AC13's manual route; stage the observer test deleted, the first sample moved into the detached loop, the retry row's eighth field dropped, the positive-over-unknown order reversed and the exception sentence deleted · FLOOR_ASSERTIONS rises by the arms added
 
 ## 8. Open questions
 
@@ -320,6 +367,13 @@ New arm: tools/run-gates/run-gates.evidence.test.sh · AC7 and AC8 over fixture 
 
 - rev-1 · 2026-10-04 · initial draft, from the spec brief's unit 5 section, `run-gates.sh` and
   `derive-ceilings.py` at base `5266d22e`, and the probes recorded in §4 and §8.
+- rev-2 · 2026-10-04 · §1 §4 §5 §6 §7 · S2 S3 S5 S6 · AC3 AC11 AC12 AC13 · folded the round-1 spec
+  audit's findings on this unit: 35 (the truncation and first sample run synchronously before
+  dispatch and only the periodic loop is detached, S2, §4 "The sampler", AC11); 43 (the
+  `--observed` route is named and kept as `TOOL-cMendedVintage-17`'s declared exception, §1, S5,
+  S6, §4 "The manual reading", AC13); 18 (AC3's two blind-census stubs); 19 (AC12, the retry
+  row's eighth field and the mixed window); and 45 (the header advances
+  `TOOL-aSurfacedLexicon-22`, and §4 says which candidate the field answers).
 
 ## 10. Reuse audit
 
@@ -333,7 +387,8 @@ properties the sampler copies; `scan_descendants`'s continuation-row guard; and 
 in-bar sibling this unit deliberately does not touch. The recall probe surfaced
 `TOOL-aPooledSweep-2`, whose withheld reading with a stated count is the pattern the `# set aside:`
 line follows, and `TOOL-aSurfacedLexicon-22`, whose leg was written up twice from contended
-readings. Where probe and source disagreed: nothing the map ranked touches a leg reading.
+readings; that open ask is this unit's to advance, and the header says so. Where probe and source
+disagreed: nothing the map ranked touches a leg reading.
 Rejected candidates and the tests that rejected them are §8 F1 and F2.
 
 Recall terms used: ceiling evidence derive-ceilings contended reading neighbours serial retry timeout monotone headroom spawn floor HOST

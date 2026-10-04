@@ -1,12 +1,13 @@
 # TOOL-aGraftedHelix-9 — a newly added decision row or gotcha that ranks as a near match must name its relation
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-2 · base 5266d22e · streams tooling · order 5 · ratified 2026-10-04
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-2 · base 5266d22e · streams tooling · order 5 · ratified 2026-10-04
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-04-prompt-TOOL-aGraftedHelix-1-1-spec-brief.md](../prompts/2026-10-04-prompt-TOOL-aGraftedHelix-1-1-spec-brief.md) | journal | TOOL-aGraftedHelix-1 TOOL-aGraftedHelix-2 TOOL-aGraftedHelix-3 TOOL-aGraftedHelix-4 TOOL-aGraftedHelix-5 TOOL-aGraftedHelix-6 TOOL-aGraftedHelix-7 TOOL-aGraftedHelix-8 |
+| [2026-10-04-review-TOOL-aGraftedHelix-1-spec-audit-round1.md](../reviews/2026-10-04-review-TOOL-aGraftedHelix-1-spec-audit-round1.md) | spec-audit | TOOL-aGraftedHelix-1 TOOL-aGraftedHelix-2 TOOL-aGraftedHelix-3 TOOL-aGraftedHelix-4 TOOL-aGraftedHelix-5 TOOL-aGraftedHelix-6 TOOL-aGraftedHelix-7 TOOL-aGraftedHelix-8 |
 
 <!-- /gen:spec-records -->
 
@@ -36,7 +37,7 @@ hygiene gate that already owns the row grammar.
   both at it and at `HEAD`, so a gotcha renamed inside the range is added under its new name and
   never eligible under its old one. An armed run with no resolvable base reds naming it, an empty
   added set prints a graded count of 0, and an unarmed run reads no history at all. Observed by AC1,
-  AC5, AC7 and AC9.
+  AC5, AC7, AC9 and AC14.
 - **S3** — The near-match predicate, pinned in §4 "The predicate": an in-memory index over the
   record population built by the recall kit's `bench.build_index`, queried with the record's own
   summary text through `bench.match_expr`; the top eligible hit is a NEAR MATCH when the Jaccard similarity
@@ -54,7 +55,7 @@ hygiene gate that already owns the row grammar.
   `red:0.125`, the value §8 F1 measured. The kit's example conf declares it blank, because a floor
   measured on gov's corpus is not a floor for another corpus. A malformed value, or an armed key
   with the recall kit's index builder absent or too old, is a named refusal and never a traceback.
-  Observed by AC1, AC4, AC5 and AC6.
+  Observed by AC1, AC4, AC5, AC6 and AC11.
 - **S6** — A second mode, `row_grammar.py --measure-relations [<floor> [<base>]]`, replays every
   row and gotcha the history added against the records older than it, with the S3 predicate, and
   prints the would-flag count per band and the flagged pairs at the floor given, or at the declared
@@ -71,8 +72,9 @@ hygiene gate that already owns the row grammar.
   `--selftest` arm whose fixture makes it fire. Observed by AC1 to AC7, AC12 and AC13.
 - **S9** — The memory-tree kit version moves once, after the last move, in every carrier
   `tools/check-kit-versions.sh` pairs, and the row-grammar dossier's prose names the two new modes.
-  NOT OBSERVED by a criterion here: the kit-versions, verdict-epoch and codebase-map legs grade it
-  at the close (§7), and a pass runs none of them.
+  One of those carriers is line 1 of `memory/guides/BUILD-METHOD.md`, which the re-render moves and
+  nothing else in that file, under `TOOL-aGraftedHelix-3`'s §8 F1 ruling (§8 F2 here). Observed by
+  AC15; the kit-versions, verdict-epoch and codebase-map legs grade the rest at the close (§7).
 
 ## 3. Non-goals (OUT)
 
@@ -93,10 +95,19 @@ hygiene gate that already owns the row grammar.
 ### Edges
 
 - **consumes-from** `TOOL-aGraftedHelix-4` — `extract_supersessions` and `derive_supersession_map`
-  in the recall kit's `extract.py`, called here to accept a named successor and to tag a superseded
-  hit; without them a record naming the successor of an old hit still reds.
+  in the recall kit's `extract.py`, called directly here to accept a named successor and to tag a
+  superseded hit; nothing here reads the cache manifest or a hit's fields. Without them a record
+  naming the successor of an old hit still reds. Only a relation spelled `supersedes <id>` reaches
+  that map; a bare `supersedes` token satisfies this check and adds no edge, so the finding's
+  remedy text suggests the `supersedes <id>` form.
 - **hands-off** `TOOL-aGraftedHelix-6` — the record enumeration `scan_records` and the shared
-  `FM_RE` in `tree_lib.py`, which that unit extends with a gotcha body field for its content key.
+  `FM_RE` in `tree_lib.py`, which that unit extends with a gotcha body field for its content key;
+  and `derive_relation_base` with the identity-presence test, which that unit uses to report only
+  keys an added record holds.
+- **hands-off** `TOOL-aGraftedHelix-14` — the hygiene engine's dispatch block for check 27, which
+  calls `--check-relations` and keys offenders under `RELATION_CHECK`. AC10 here proves the block is
+  present; that unit observes it red the leg under `NEAR_MATCH_GATE` and print its summary on a
+  green run (round-1 audit finding 27).
 
 ## 4. Design
 
@@ -239,8 +250,11 @@ would be flagged, then every flagged pair at the floor it was given.
 A finding, one line per unsatisfied near match, with `WARN` in place of `check 27:` under `warn`:
 
 ```
-check 27: TOOL-x-12 (memory/DECISIONS.md:140) near-matches TOOL-y-3 [superseded by TOOL-y-9] at 0.143, shared `scoping` — name it, or carry supersedes, coexists-with or disputes
+check 27: TOOL-x-12 (memory/DECISIONS.md:140) near-matches TOOL-y-3 [superseded by TOOL-y-9] at 0.143, shared `scoping` — name it, or carry supersedes <id>, coexists-with or disputes
 ```
+
+The remedy names `supersedes <id>` rather than the bare token, because only that form reaches
+`TOOL-aGraftedHelix-4`'s map; a bare token still satisfies the check.
 
 On every armed run, red or green, one summary line, and unarmed the NOT ARMED line instead:
 
@@ -288,6 +302,7 @@ at the close, and the remedy is one relation token or one named id in a record t
 - `memory/HYGIENE.md`
 - `.memory-tree.conf`
 - `memory/map/features/row-grammar.md`
+- `memory/guides/BUILD-METHOD.md`, line 1 only, the kit version marker the re-render moves
 - the memory-tree kit's version carriers
 
 ### Alternatives rejected
@@ -369,16 +384,23 @@ at the close, and the remedy is one relation token or one named id in a record t
   figure: PINNED, measured 2026-10-04 on node `a`; the base argument holds the population at the
   one the measurement saw, so later records cannot move it.
 - **AC9** — When `python tools/memory-tree/row_grammar.py --check-relations 5266d22e` runs on this
-  tree at the unit's build commit, its summary line names a graded count equal to the rows and
-  gotchas this build has added since `5266d22e`, whatever its exit.
-  Red when: it reports 0 while `git diff --name-only --diff-filter=A 5266d22e..HEAD -- memory/gotchas/`
-  lists a record file.
+  tree at the unit's build commit, its summary line names a graded count equal to an identity set
+  difference derived at observation, whatever its exit. The figure is the gotcha stems
+  `git ls-tree --name-only HEAD memory/gotchas/` lists that the same listing at `5266d22e` does not,
+  `INDEX.md` excluded, plus the row ids the row grammar keys across the decision index and its
+  archives at `HEAD` and not at `5266d22e`.
+  Red when: the summary's graded count differs from that figure, whether by dropped rows, a missed
+  archive or a rename counted from added diff lines.
+  figure: DERIVED at observation, by identity and never by `--diff-filter=A` lines, whose default
+  rename detection drops a renamed gotcha.
 - **AC10** — When `grep -n 'RELATION_CHECK = 27' tools/memory-tree/row_grammar.py` and
   `grep -n 'check-relations' tools/memory-tree/check-memory-hygiene.sh` run, each prints one line.
   Red when: the constant or the dispatch block is absent.
 - **AC11** — When `grep -c '^27\. ' memory/HYGIENE.md` runs, it prints 1, and the kit README's row
-  for `check-memory-hygiene.sh` reads `27 checks`.
-  Red when: the catalog or the README count disagrees with the module constant.
+  for `check-memory-hygiene.sh` reads `27 checks`. `grep -n '^NEAR_MATCH_GATE=""' tools/memory-tree/.memory-tree.conf.example`
+  prints one line, and `grep -n 'NEAR_MATCH_GATE="red:0.125"' .memory-tree.conf` prints one line.
+  Red when: the catalog or the README count disagrees with the module constant, or the example conf
+  arms check 27 in every new adopter at a floor measured on another corpus.
 - **AC12** — When a copy-install `--selftest` fixture holds a base row, a later base row reading
   `SUPERSEDES <the first id>`, and an added row restating the first while naming only the second,
   `--check-relations <base>` counts the match as satisfied; with the naming taken out it reds and
@@ -389,14 +411,25 @@ at the close, and the remedy is one relation token or one named id in a record t
   does NOT check a near match below the top hit, a paraphrase under the floor, a bare relation token
   that names no record, or a row edited in place.
   Red when: any of the four is unstated.
+- **AC14** — When a `--selftest` fixture holds `origin/main` behind a local `main` and a branch
+  adding one restated row, `--check-relations` with no argument names the merge-base of
+  `origin/main` and `HEAD` as `<base8>` and grades exactly that row. With `GOV_DEFAULT_BRANCH=trunk`
+  and only `trunk` present, it resolves `trunk`. Observed by
+  `python tools/memory-tree/row_grammar.py --selftest`.
+  Red when: the derivation takes a branch tip, prefers a stale local `main`, or ignores
+  `GOV_DEFAULT_BRANCH`, which the hygiene dispatch, the production caller, would inherit.
+- **AC15** — When `git diff <the pass's parent sha> -- memory/guides/BUILD-METHOD.md` runs at the
+  pass's commit, it changes line 1 only.
+  Red when: the method's content moved, which shared invariant 10 forbids.
 
 ## 7. Gates
 
 `memory hygiene` · `row-grammar selftest` · `gotchas selftest` · `kit/dogfood doc parity` · `memory-hygiene self-test` · `lexicon naming predicates` · `codebase-map coverage + freshness` · `recall floor` · `recall floor arms` · `transition-audit arms` · `straggler-guard arms` · `kit version markers` · `verdict epoch (kit version dates the engine)` · `kit epoch (shipped bytes move, the version moves)`
 
-The close runs these; no pass does. The four recall, transition-audit and straggler-guard legs are
-owed by the guards of the memory root and the conf this unit's write set reaches, and the last
-three grade S9's kit version bump.
+A pass runs `python tools/memory-tree/row_grammar.py --selftest` as its direct check, each new arm
+observed red on a staged break first; the close runs the legs listed above. The four recall,
+transition-audit and straggler-guard legs are owed by the guards of the memory root and the conf
+this unit's write set reaches, and the last three grade S9's kit version bump.
 
 New arm: `tools/memory-tree/row_grammar.py --selftest` · fixture repos with a base commit, a restated row, a restated gotcha description, warn and blank keys, a malformed key, an absent recall kit and a missing base · the module's arm count rises by the new arms
 
@@ -426,11 +459,27 @@ New arm: `tools/memory-tree/row_grammar.py --selftest` · fixture repos with a b
   (b) M3's rule takes the more feature-rich, (a), which catches 19 true relations against 8.
   RESOLVED (agent, 2026-10-04, delegated): (a), `NEAR_MATCH_GATE="red:0.125"` in this
   repository, blank in the kit's example conf.
+- **F2 — Does the memory-tree bump's re-render of line 1 of `memory/guides/BUILD-METHOD.md` breach
+  shared invariant 10, which says no unit edits that file?** `TOOL-aGraftedHelix-3` §8 F1 decided
+  this for the kit's version marker: the line is a derived carrier `check-kit-versions.sh` pairs
+  with the engine constant, and the invariant protects the method's content, which the render
+  leaves byte-identical below line 1. RESOLVED (agent, 2026-10-04, delegated): as unit 3's Option
+  A, the file listed under Files touched as line 1 only, and AC15 observes that only line 1 moved.
 
 ## 9. Revision log
 
 - rev-1 · 2026-10-04 · initial draft from the aGraftedHelix spec brief, with F1 measured by replay
   on node `a` at base `5266d22e`.
+- rev-2 · 2026-10-04 · §3 §4 §6 §7 §8 · S2 S5 S9 · AC9 AC11 AC14 AC15 · folded the round-1 spec
+  audit's findings on this unit: 28 (AC14, the no-argument base derivation the hygiene dispatch
+  uses); 29 (AC11 greps the example conf's blank `NEAR_MATCH_GATE` and this repository's armed
+  value); 30 (AC9 derives its equality as an identity set difference); 36 (§7 states that the pass
+  runs the module's `--selftest` as its direct check); and 37 (`memory/guides/BUILD-METHOD.md`
+  line 1 listed, §8 F2 citing unit 3's ruling, AC15). §3 Edges: the consumes-from
+  `TOOL-aGraftedHelix-4` is amended as the mirror of finding 34's correction, and the finding's
+  remedy text in §4 now names `supersedes <id>`; the hands-off to `TOOL-aGraftedHelix-6` adds the
+  base derivation that unit now uses (finding 48); and a hands-off to the unit promoted from
+  finding 27 is added.
 
 ## 10. Reuse audit
 
