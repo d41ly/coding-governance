@@ -76,7 +76,7 @@ ids TOOL-aGraftedHelix-1 TOOL-aGraftedHelix-9
 *No spec under this build carries a status header; the status above is declared in the front matter.*
 <!-- /gen:build-units -->
 
-Records: 1 bound to this build, across 1 record folder(s).
+Records: 2 bound to this build, across 1 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
