@@ -70,3 +70,11 @@ base: 7af5f564641d231f8b78f6b183dde1b6bf53111d
 2026-10-04T19:54:41Z rescope · item add TOOL-aMendedFleet-92 · reason split from TOOL-aMendedFleet-62 at its F1: check 23's range mode and budget are a hygiene-gate mechanism apart from the history legs
 
 2026-10-04T19:54:43Z rescope · item add TOOL-aMendedFleet-93 · reason split from TOOL-aMendedFleet-67 at its F1: the A/B experiment and the default it sets follow the agent type
+
+2026-10-04T20:15:11Z rescope · item add PLAY-aMendedFleet-3 · reason split from TOOL-aMendedFleet-69 at its F1: a charter-template clause is a governance-carrier edit apart from the kit's warning
+
+2026-10-04T20:15:14Z rescope · item add TOOL-aMendedFleet-94 · reason split from TOOL-aMendedFleet-74 at its F1: path-scoped rules and the pre-build checklist are two mechanisms
+
+2026-10-04T20:15:16Z rescope · item add KICK-aMendedFleet-4 · reason split from KICK-aMendedFleet-2 at its F1: the stale-CLI note is a second card line with its own reader
+
+2026-10-04T20:15:19Z rescope · item add PLAY-aMendedFleet-4 · reason split from PLAY-aMendedFleet-1 at its F1: the registry dedup is a separate edit from the wrapper trim

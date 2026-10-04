@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-61 — preflight pins the launching CLI version and every resume compares it, and a missing resume tick is announced loudly
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 61
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 61
 
 <!-- gen:spec-records -->
 
@@ -68,7 +68,7 @@ rejected an authored version floor in favour of the launching session's own vers
 - Updating the CLI on node a, parked beside it for the same reason.
 - An authored minimum-version constant. The review rejected it: the comparison is against the
   version that launched the run.
-- The session card's NOTE when the PATH CLI is older than the running session. That is unit 77, in
+- The session card's NOTE when the PATH CLI is older than the running session. That is `KICK-aMendedFleet-4` (split from unit 77), in
   the kickoff engine, and reads no run-state fact.
 - A comparison inside `resume-tick.sh` before it launches. The session it launches runs `--resume`
   under its own `AI_AGENT`, so the comparison happens in the process whose version matters.
@@ -231,6 +231,7 @@ New arm: `tools/unattended/unattended.test.sh` · a fixture run preflighted unde
 - rev-1 · 2026-10-04 · initial draft, from the spec brief's unit 61, report items [B#40] and
   [B#13], the live session environment, the PATH binary's bundled source, and a read of
   `verb_preflight`, `write_lease`, `print_resume_orientation` and the adopter's `--check` at base.
+- rev-2 · 2026-10-04 · §3 points the stale-CLI card note at `KICK-aMendedFleet-4`, split from unit 77.
 
 ## 10. Reuse audit
 

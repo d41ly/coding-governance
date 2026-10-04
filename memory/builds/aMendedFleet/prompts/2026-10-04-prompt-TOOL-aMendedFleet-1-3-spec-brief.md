@@ -236,3 +236,7 @@ record `...-1-0-run-mandate.md` first: it carries the owner's four answers, whic
 - **91** — split from 57 at its F1: the records-only spec-header declaration of `TOOL-aProbedToolkit-18`; unit 57 keeps the low-water mark.
 - **92** — split from 62 at its F1: check 23's range mode, the per-build budget key and the ceiling key it replaces, the measuring flag, the fleet line and the drift signal reading it. Node d built the same on its branch (commit `d99cd0328`, check 23 half); reuse its bytes.
 - **93** — split from 67 at its F1: the A/B run (precision and first-turn tokens) and the default it may set, ordered after units 67 and 70.
+- **94** (`PLAY-aMendedFleet-3`) — split from 69 at its F1: the charter template's §6 "Claude Code cannot read" clause and its render in `AGENTS.md`. Read unit 69's F3 probe result first.
+- **95** (`TOOL-aMendedFleet-94`) — split from 74 at its F1: path-scoped rules, ordered after units 67, 68, 79 and 93; unit 74 keeps the pre-build checklist.
+- **96** (`KICK-aMendedFleet-4`) — split from 77 (KICK-2) at its F1: the card compares PATH `claude --version` with the running session's version as unit 61 reads it.
+- **97** (`PLAY-aMendedFleet-4`) — split from 79 (PLAY-1) at its F1: deduplicate the second node registry in the `AGENTS.md` wrapper; unit 79 keeps the table byte-identical.
