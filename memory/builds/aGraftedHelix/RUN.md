@@ -55,3 +55,5 @@ base: 5266d22eba31cdbf15425773d245cd23d7b9cdf5
 2026-10-04T18:36:34Z rescope · item add TOOL-aGraftedHelix-18 · reason spec-audit of units 10 to 15 round 1 id 22 HIGH: the holder row's write_lease moves the lease facts mid-call and unit 11 states no read-before-write order, so a holder whose session changed reads its own claim as foreign live; repairs TOOL-aGraftedHelix-11
 
 2026-10-04T18:36:36Z rescope · item add TOOL-aGraftedHelix-19 · reason spec-audit of units 10 to 15 round 1 id 31 HIGH: unit 12's arm keeps a hand-typed copy of the claim write table, so a verdict or mode added later leaves it green while the record calls it the class gate; repairs TOOL-aGraftedHelix-12
+
+2026-10-04T18:52:42Z review · item aGraftedHelix-spec-set-r2 · reason verdict CLEAN · blockers 0 · CONVERGED · disposition promote
