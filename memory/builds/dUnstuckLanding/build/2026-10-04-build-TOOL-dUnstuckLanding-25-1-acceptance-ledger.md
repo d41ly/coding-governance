@@ -40,7 +40,7 @@ and the gate legs are owed to the close.
     `TOOL-aRepatriatedFork-46`'s derived `mt_name`, which the merge kept on purpose. The other 33
     lines are present.
   - The 24 other conflicted files — superseded. Each added only the `unattended@1.48` marker, and
-    the successor is the marker at HEAD, `unattended@1.56`. They are `.claude/skills/unattended/SKILL.md`,
+    the successor is the marker at HEAD, `unattended@1.57`. They are `.claude/skills/unattended/SKILL.md`,
     the guides `PLAYBOOK-TEMPLATE.md`, `UNATTENDED-ASKS.md`, `UNATTENDED-PROTOCOL.md` and
     `UNATTENDED-STOPS.md`, and, under `tools/unattended/`, `ASKS.template.md`,
     `PLAYBOOK-TEMPLATE.template.md`, `PROTOCOL.template.md`, `README.md`, `SKILL.template.md`,

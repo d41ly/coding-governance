@@ -1,12 +1,12 @@
 # Coding Governance — the agent charter template
 
-*Template **v3.3** · 2026-10-01. One file. One line per directive, and a wrapped line is still one
+*Template **v3.4** · 2026-10-04. One file. One line per directive, and a wrapped line is still one
 rule. This file BECOMES a project's `AGENTS.md`: `<prefix>/playbook/adopt-playbook.sh` fills every
 placeholder and drops the blocks a target has no kit for, so filling it is a program's job and not a
 reader's — see `WIRE-INTO-PROJECT.md` for what a program cannot decide. History lives in the
 `…-v-N-N.md` snapshots and in git.*
 
-<!-- governance-template: v3.3 -->
+<!-- governance-template: v3.4 -->
 
 > **What:** a project-agnostic charter for running Claude Code (or any agent) across several
 > machines/sessions ("nodes") on one repo. **Use:** deploy it with the renderer; the rules are
