@@ -42,6 +42,11 @@ prompt is recorded verbatim under `prompts/`.
 - The census reads the other two repositories and never writes to them.
 - `Tier-1` per unit, because both units write only memory-tree records. The closing diff review is
   still owed, under the `diff-reviewed` directive.
+- Closing review round 1 converged: 0 blockers, 5 HIGH, 17 MEDIUM, 7 LOW. Its HIGHs became
+  `TOOL-dUnstuckLanding-12`, and its other findings folded into rev-2 of specs 1 and 2. H1 is
+  left-shifted as a new gotcha class, `liveness-negative-from-another-population`. The rest map onto
+  existing classes: `observed-by-claim-no-arm-discharges` (H2, M12 to M15),
+  `amendment-leaves-its-other-half-standing` (H3, H4, M11) and `two-answers-to-one-question` (M5, M7).
 
 ## Parked decisions
 
