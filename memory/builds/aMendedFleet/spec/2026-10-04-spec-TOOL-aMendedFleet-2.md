@@ -1,10 +1,13 @@
 # TOOL-aMendedFleet-2 — a definition-level census of every merge since 2026-09-01
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · order 2
+**Status:** CLOSED · rev-1 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-04-build-TOOL-aMendedFleet-2-1-acceptance-ledger.md](../build/2026-10-04-build-TOOL-aMendedFleet-2-1-acceptance-ledger.md) | journal | — |
+| [2026-10-04-build-TOOL-aMendedFleet-2-2-merge-census.md](../build/2026-10-04-build-TOOL-aMendedFleet-2-2-merge-census.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
