@@ -1,10 +1,12 @@
 # TOOL-aGraftedHelix-18 — the holder row decides `mine` before its `write_lease` and copies the claim's identity after it
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-2 · base 5266d22e · streams tooling · order 3
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-2 · base 5266d22e · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-04-review-TOOL-aGraftedHelix-16-spec-audit-round1.md](../reviews/2026-10-04-review-TOOL-aGraftedHelix-16-spec-audit-round1.md) | spec-audit | TOOL-aGraftedHelix-16 TOOL-aGraftedHelix-17 TOOL-aGraftedHelix-19 |
 
 <!-- /gen:spec-records -->
 
@@ -48,6 +50,15 @@ observes it under a changed session. It closes finding 22 (HIGH) of the round-1 
   missing stamp.
 - **The `same session` row.** It still recognises the holder's own restart from the environment, as
   unit 11 §3 states.
+- **The claim's `lease-utc` on a holder renewal.** A holder-row `write_lease`, like the `--replaces`
+  block under unit 11 S1, resets the record's `lease-utc`, and the claim write that follows copies the
+  new stamp, so AC2 expects the two equal. That supersedes unit 1 §4 "The claim record"'s "kept
+  across a holder's renewals" for a renewal whose `write_lease` moved a fact. No verdict, age or
+  take-over line reads the claim's `lease-utc`; only the renewal comparison does, and it follows the
+  record.
+- **A claim write that does not complete.** This unit pins the order for a push that lands. What the
+  record holds when the holder's claim push times out or the remote is unreachable, and the lost race
+  reaching check 90 before any local write, are `TOOL-aGraftedHelix-20`'s (§3 Edges).
 
 ### Edges
 
@@ -55,6 +66,10 @@ observes it under a changed session. It closes finding 22 (HIGH) of the round-1 
   record's lease facts, its renewal comparison, and the before-and-after order it states for the
   `--replaces` block, which this unit extends to the holder row; without it the holder row reads its
   identity from the environment and there is no order to pin.
+- **hands-off** `TOOL-aGraftedHelix-20` — the claim write's place in §4 "The order" when its push may
+  not complete: the CAS moved ahead of `write_lease` under one shared stamp, a lost race refused
+  before any local write, and the `prior-session` lease fact the widened `mine` test accepts
+  (finding 9 of the round-1 audit of units 16 to 19).
 
 ## 4. Design
 
@@ -79,7 +94,9 @@ observes it under a changed session. It closes finding 22 (HIGH) of the round-1 
 
 With an unchanged session the first and third reads are the same state and nothing moves. With a
 changed session the claim is `mine` against the old facts, then follows the new ones, so the next
-holder call reads `mine` again.
+holder call reads `mine` again. That holds for a push that lands. `TOOL-aGraftedHelix-20`, built
+next, swaps the second and third rows so the CAS precedes the local write, and states what the
+record holds when the push does not land.
 
 ### Inventory
 
@@ -105,8 +122,9 @@ No new function, check, conf key or file. The holder row's claim write reads the
 
 - security — No new surface. The claim publishes the lease facts the run branch already carries.
 - perf / scale — At most one extra claim push, on the call whose `write_lease` moved a fact.
-- error / empty / loading states — A claim write that does not complete is unit 1's announce row,
-  unchanged.
+- error / empty / loading states — A claim write that does not complete is unit 1's announce row
+  here. Under this unit's order it leaves the record and the claim naming different sessions, which
+  `TOOL-aGraftedHelix-20` closes.
 - observability — The holder row's existing `lease recorded` line names the session move, and the
   claim then shows the new session.
 - risks — A harness that changes `CLAUDE_PID` on every call would make a claim write due on every
@@ -153,6 +171,11 @@ none
 
 - rev-1 · 2026-10-04 · initial draft, promoted from finding 22 of the round-1 spec audit of units 10
   to 15, grounded against `write_lease` and the holder row at base `5266d22e`.
+- rev-2 · 2026-10-04 · §3 §4 §5 · folded the round-1 spec audit of units 16 to 19 on this unit.
+  Finding 15: §3 records that a holder-row `write_lease` resets the claim's `lease-utc`, superseding
+  unit 1 §4's "kept across a holder's renewals" for such a renewal; AC2 is unchanged. Finding 9 is
+  promoted to `TOOL-aGraftedHelix-20`: §3 gains its hands-off and a non-goal, and §4 "The order" and
+  §5 point at it for a push that does not complete.
 
 ## 10. Reuse audit
 

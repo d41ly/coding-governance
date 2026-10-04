@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-1 — the driver claims a run on the remote as a compare-and-swap ref, and refuses a live foreign claim
 
-**Status:** SPECCED · rev-3 · 2026-10-04 · node a · Tier-2 · base 5266d22e · streams tooling · order 1 · advances TOOL-aReapedTicket-5 · ratified 2026-10-04
+**Status:** SPECCED · rev-4 · 2026-10-04 · node a · Tier-2 · base 5266d22e · streams tooling · order 1 · advances TOOL-aReapedTicket-5 · ratified 2026-10-04
 
 <!-- gen:spec-records -->
 
@@ -145,6 +145,10 @@ does not hold its claim cannot close.
   rows and the four modes become driver constants beside `check_claim_writable`, which refuses a
   value outside them, so the per-cell arm derives its cells instead of typing them (round-1 audit of
   units 10 to 15, finding 31).
+- **hands-off** `TOOL-aGraftedHelix-20` — the holder row's claim write that does not land: the CAS
+  moved ahead of `write_lease`, and a `prior-session` lease fact the `mine` test accepts on the
+  holder and status-write columns, so an "announce, continue" holder write cannot leave the run
+  reading its own claim as foreign (round-1 audit of units 16 to 19, finding 9).
 
 ## 4. Design
 
@@ -606,6 +610,10 @@ once, through the kit's own runner, at VERIFYING.
 - rev-3 · 2026-10-04 · §3 · §3 gains the hands-off to `TOOL-aGraftedHelix-19`, promoted from
   finding 31 of the round-1 spec audit of units 10 to 15, which declares this unit's table axes as
   driver constants. No cell, scope item or criterion of this unit moves.
+- rev-4 · 2026-10-04 · §3 · §3 gains the hands-off to `TOOL-aGraftedHelix-20`, promoted from
+  finding 9 of the round-1 spec audit of units 16 to 19, which widens this unit's `mine` test by a
+  `prior-session` lease fact on the holder and status-write columns. No cell, scope item or
+  criterion of this unit moves.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-11 — a claim write copies its identity from the run's lease record, never from the writer's environment
 
-**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-2 · base 5266d22e · streams tooling · order 2 · ratified 2026-10-04
+**Status:** SPECCED · rev-3 · 2026-10-04 · node a · Tier-2 · base 5266d22e · streams tooling · order 2 · ratified 2026-10-04
 
 <!-- gen:spec-records -->
 
@@ -68,6 +68,11 @@ from the run's lease record. It closes finding 39 (BLOCKER) of the round-1 spec 
   `mine` decided against the record's facts before that call, and the claim write copying them after
   it, with an arm under a changed session. §4 "The rule" states the order for the `--replaces`
   block only (round-1 audit of units 10 to 15, finding 22).
+- **hands-off** `TOOL-aGraftedHelix-20` — the `--resume` holder row when its `write_lease` is due:
+  the claim written by CAS before `write_lease` with the values the call records and one stamp passed
+  as `write_lease`'s third argument, and the `prior-session` fact `mine` accepts when that CAS
+  does not land. That unit supersedes §3's "The `mine` test ... is unchanged" for the holder and
+  status-write columns (round-1 audit of units 16 to 19, finding 9).
 
 ## 4. Design
 
@@ -195,6 +200,10 @@ slice, and the main loop runs the suites once at VERIFYING.
   this unit: 26 (the take sites compute one lease stamp and hand it to the claim write and to
   `write_lease`, which takes it as an optional argument, §4 "One stamp per take", AC4 and its arm).
   §3 gains the hands-off to the unit promoted from finding 22.
+- rev-3 · 2026-10-04 · §3 · §3 gains the hands-off to `TOOL-aGraftedHelix-20`, promoted from
+  finding 9 of the round-1 spec audit of units 16 to 19, which writes the holder row's claim before
+  its `write_lease` and widens the `mine` test this unit's §3 leaves unchanged. No scope item or
+  criterion of this unit moves.
 
 ## 10. Reuse audit
 

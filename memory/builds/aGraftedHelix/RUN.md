@@ -57,3 +57,9 @@ base: 5266d22eba31cdbf15425773d245cd23d7b9cdf5
 2026-10-04T18:36:36Z rescope · item add TOOL-aGraftedHelix-19 · reason spec-audit of units 10 to 15 round 1 id 31 HIGH: unit 12's arm keeps a hand-typed copy of the claim write table, so a verdict or mode added later leaves it green while the record calls it the class gate; repairs TOOL-aGraftedHelix-12
 
 2026-10-04T18:52:42Z review · item aGraftedHelix-spec-set-r2 · reason verdict CLEAN · blockers 0 · CONVERGED · disposition promote
+
+2026-10-04T19:26:41Z rescope · item add TOOL-aGraftedHelix-20 · reason spec-audit of units 16 to 19 round 1 id 9 HIGH: unit 18 runs write_lease before the claim CAS, so a changed-session holder call whose claim push does not complete leaves the record and the claim naming different sessions, and the next call refuses its own claim with check 90; repairs TOOL-aGraftedHelix-18
+
+2026-10-04T19:26:51Z rescope · item add TOOL-aGraftedHelix-21 · reason spec-audit of units 16 to 19 round 1 id 22 HIGH and id 17 HIGH: the delta loop lists untracked paths in another mode than the pre-stage record holds them, so a wholly untracked foreign directory is staged whole, and it filters by a shell variable that nothing keeps across a split block, so every changed path is staged; repairs TOOL-aGraftedHelix-16
+
+2026-10-04T19:26:54Z rescope · item add TOOL-aGraftedHelix-22 · reason spec-audit of units 16 to 19 round 1 id 6 HIGH: unit 19's read-axis refusal has no criterion, so a build that omits it passes every criterion and the derived arm stays green over an uncovered cell; repairs TOOL-aGraftedHelix-19
