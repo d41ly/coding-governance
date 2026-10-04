@@ -1,10 +1,12 @@
 # TOOL-aGraftedHelix-21 — the spec commit block's delta loop lists untracked paths as its record does, compares paths, and refuses when its record is unset
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-1 · base 5266d22e · streams tooling · order 12
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 5266d22e · streams tooling · order 12
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-04-review-TOOL-aGraftedHelix-20-spec-audit-round1.md](../reviews/2026-10-04-review-TOOL-aGraftedHelix-20-spec-audit-round1.md) | spec-audit | TOOL-aGraftedHelix-20 TOOL-aGraftedHelix-22 |
 
 <!-- /gen:spec-records -->
 
@@ -29,21 +31,28 @@ audit of units 16 to 19.
   step 1's record. The loop compares each line's PATH field, the text after the two status columns
   and the space, with the path fields of the record's lines, never whole lines. A wholly untracked
   foreign directory then lists file by file, each file is in the record, and none is staged; a
-  recorded path whose status letters moved during the render is still recognised. Observed by AC1
-  and AC2.
+  recorded path whose status letters moved during the render, such as a foreign ` M` file that
+  reads ` D` by step 5, is still recognised and never staged. Observed by AC1 and AC2.
 - **S2** — The prose around the block says it runs as ONE Bash invocation, because the record is a
   shell variable and the agent's Bash tool keeps no shell state between calls. Observed by AC1.
-- **S3** — Before its loop, step 5 refuses when the record variable is unset, tested as `${rec+x}`
-  and never by emptiness, so a clean tree, whose record is set and empty, proceeds. The refusal
-  exits non-zero naming the record before the loop stages anything, so the block stops before its
-  commit, and unit 16 S3's prose returns `committed: false` with that output. Observed by AC1 and AC2.
+- **S3** — The block tests the record variable twice, each time as `${rec+x}` and never by
+  emptiness, so a clean tree, whose record is set and empty, proceeds. The EARLY guard sits right
+  after step 1, before step 2, so before step 3's first `git add`: unset there, the block exits
+  non-zero naming the record, having staged and rendered nothing. The LATE guard sits before step
+  5's loop: unset there, the block exits non-zero naming the record AND the cleanup it leaves owed,
+  which is to restore every unstaged path under the memory root other than the spec paths and then
+  unstage the spec paths. Either refusal stops the block before its commit, and unit 16 S3's prose
+  returns `committed: false` with that output. Observed by AC1 and AC2.
 - **S4** — Unit 16's real-git arm in `tools/workflows/unattended-build.test.sh` plants a third
   foreign path, an untracked file inside an untracked directory, and asserts
-  `git ls-tree -r --name-only HEAD` lists no path under that directory. A second arm runs the
-  extracted block with step 1's assignment line taken out, the shape a split invocation leaves, and
-  asserts a non-zero exit naming the record, `git rev-parse HEAD` unmoved, and no foreign path in
-  `git diff --cached --name-only`. NOT OBSERVED by a criterion here: the suite is a kit self-test the
-  main loop runs once at the close (§7).
+  `git ls-tree -r --name-only HEAD` lists no path under that directory. This SUPERSEDES unit 16 §4
+  "The arm"'s row "`git status --porcelain` lists exactly the two foreign paths, unchanged" by name:
+  `git status --porcelain --untracked-files=all` lists exactly the three foreign paths, unchanged,
+  because plain porcelain collapses the untracked directory to a third `?? foreign/` line. A second
+  arm runs the extracted block twice more, once per guard, with §6 AC2's two stimuli and its
+  assertions. A third arm moves unit 16's foreign tracked modified file from ` M` to ` D` between
+  step 4 and step 5, and asserts that change stays out of `HEAD`. NOT OBSERVED by a criterion here: the suite is a kit
+  self-test the main loop runs once at the close (§7).
 - **S5** — The review-harness kit version and the harness's own `unattended-build@` engine identity
   each move once, after this unit's last move. Observed by AC3.
 
@@ -58,7 +67,9 @@ audit of units 16 to 19.
   block: a loud `committed: false`, never a wrong commit. The generator's outputs carry no such byte.
 - **The record as a file under the git directory.** It survives a split, but it is a second carrier
   to clean up and a stale copy a later split call could read. S2 and S3 make the split a refusal
-  instead.
+  instead. The early guard refuses before the block's first side effect, so the split shape step 1's
+  loss leaves behind owes no cleanup; only a record lost after step 4 does, and the late guard's
+  refusal names it.
 
 ### Edges
 
@@ -85,18 +96,24 @@ audit of units 16 to 19.
 | step | listing | compared by |
 |---|---|---|
 | 1, the record | `git status --porcelain --untracked-files=all` | — |
+| after 1, the early guard | none: `${rec+x}` | — |
+| 5, before the loop, the late guard | none: `${rec+x}` | — |
 | 5, the delta | `git status --porcelain --untracked-files=all` | the path field of each line |
 
-Under `set -e` the membership test sits in the loop's own `if` or `case`, as unit 16 requires, and
-the `${rec+x}` guard precedes the loop.
+Under `set -e` the membership test sits in the loop's own `if` or `case`, as unit 16 requires. A
+guard on a state the block needs runs before the block's first side effect, and a refusal names the
+cleanup it leaves owed; the late guard is the second net for a record lost after step 1.
 
 ### The arm's foreign paths
 
 | path | kind | asserted |
 |---|---|---|
-| a tracked file outside the generator's inputs | modified, unstaged | unit 16's |
-| an untracked file at the root | untracked | unit 16's |
-| foreign/sub/brief.md | untracked, inside an untracked directory | no `foreign/` path in `HEAD`, and still listed by `git status --porcelain --untracked-files=all` |
+| a tracked file outside the generator's inputs | modified, unstaged | unit 16's, except its listing row |
+| an untracked file at the root | untracked | unit 16's, except its listing row |
+| foreign/sub/brief.md | untracked, inside an untracked directory | no `foreign/` path in `HEAD` |
+
+The listing row replaces unit 16's for all three: `git status --porcelain --untracked-files=all`
+lists exactly these three paths, unchanged.
 
 ### Inventory
 
@@ -117,12 +134,14 @@ and one arm.
 - perf / scale — The second listing walks untracked directories file by file, as the first already
   does.
 - error / empty / loading states — An unset record is `committed: false` naming it. A clean tree's
-  empty record proceeds.
-- observability — The refusal's text names the record and says the block must run as one
-  invocation.
+  empty record proceeds. A record lost after step 4 leaves rendered views and staged specs, and the
+  late guard's refusal names the cleanup that clears them.
+- observability — Each refusal's text names the record and says the block must run as one
+  invocation; the late guard's names the cleanup too.
 - risks — A path git C-quotes that the loop must stage stops the block, by design (§3).
-- testing — S4's two arms, observed RED with the flag removed from step 5's listing and with the
-  `${rec+x}` guard deleted.
+- testing — S4's arms, each observed RED under its own staged break: the flag removed from step 5's
+  listing, the early guard deleted, the late guard deleted, and a membership test comparing whole
+  lines.
 - migration — None.
 - user docs — N/A: the stage is internal to the harness.
 
@@ -132,19 +151,28 @@ Criteria AC1 and AC2 run unit 16's scratch `node` probe and decode the `commit:s
 its `promptjson:` channel. Each staged break is made in a scratch COPY of the render.
 
 - **AC1** — When the probe runs a call whose SPEC double authors `A-tB-1`, the decoded prompt's block
-  lists with `git status --porcelain --untracked-files=all` at step 1 and again at step 5, its
-  `${rec+x}` test precedes step 5's loop, and the prose says the block runs as ONE Bash invocation.
-  Red when: the two listings differ, or the guard or the instruction is absent. Staged: the flag
+  lists with `git status --porcelain --untracked-files=all` at step 1 and again at step 5, a
+  `${rec+x}` test sits between step 1 and step 2 and another precedes step 5's loop, and the prose
+  says the block runs as ONE Bash invocation.
+  Red when: the two listings differ, or either guard or the instruction is absent. Staged: the flag
   deleted from step 5's listing in the copy makes the two listing lines differ.
 - **AC2** — When the block extracted from AC1's decoded prompt runs in unit 16's scratch repository
   at a short path under `%TEMP%`, with foreign/sub/brief.md untracked beside unit 16's two foreign
   paths, it exits 0, `git ls-tree -r --name-only HEAD` names no path under `foreign/`, and
-  `git status --porcelain --untracked-files=all` still lists foreign/sub/brief.md. With step 1's
-  assignment line deleted from the extracted block, it exits non-zero naming the record, and
-  `git rev-parse HEAD` is unchanged.
-  Red when: foreign untracked work is committed, or a split block commits. Staged: the run over the
-  copy without the flag puts foreign/sub/brief.md in `HEAD`; the run with the guard deleted and
-  step 1's line deleted moves `HEAD` and commits the foreign paths.
+  `git status --porcelain --untracked-files=all` lists exactly the three foreign paths, unchanged.
+  With a line inserted between step 4 and step 5 that deletes unit 16's foreign tracked modified
+  file, so its status moves from ` M` to ` D`, the block exits 0 and
+  `git ls-tree -r --name-only HEAD` still names that file. With step 1's assignment line deleted,
+  the block exits non-zero naming the record, `git diff --cached --name-only` is empty, and
+  `git status --porcelain --untracked-files=all` equals its value before the run. With `unset rec`
+  inserted after step 4, it exits non-zero naming the record and the cleanup, `git rev-parse HEAD`
+  is unchanged, and after that cleanup the block, re-run as one invocation, exits 0.
+  Red when: foreign untracked work is committed, a foreign deletion is committed, a record lost at
+  step 1 leaves anything staged or rendered, or a record lost after step 4 commits. Staged: the run
+  over the copy without the flag puts foreign/sub/brief.md in `HEAD`; a membership test comparing
+  whole lines puts the deletion in `HEAD`; with the early guard deleted, the step-1 stimulus reaches
+  the late guard only after staging and rendering, and its index and listing assertions red; with
+  the late guard deleted, the step-4 stimulus commits the foreign paths and moves `HEAD`.
 - **AC3** — When `python tools/govkit/govkit.py epoch --base <the pass's parent sha>` runs at the
   pass's commit, it names no review-harness carrier left behind, and
   `bash tools/check-kit-versions.sh` exits 0. Line 3 of `tools/workflows/unattended-build.js`
@@ -159,7 +187,11 @@ its `promptjson:` channel. Each staged break is made in a scratch COPY of the re
 
 New arm: tools/workflows/unattended-build.test.sh · the real-git arm's fixture gains an untracked file inside an untracked directory; stage step 5's listing without --untracked-files=all · the suite's floor rises by the arms added
 
-New arm: tools/workflows/unattended-build.test.sh · the extracted block with step 1's assignment deleted refuses and leaves HEAD unmoved; stage the ${rec+x} guard deleted · the suite's floor rises by the arms added
+New arm: tools/workflows/unattended-build.test.sh · the extracted block with step 1's assignment deleted refuses with nothing staged or rendered; stage the early guard deleted · the suite's floor rises by the arms added
+
+New arm: tools/workflows/unattended-build.test.sh · the extracted block with unset rec after step 4 refuses naming the cleanup, leaves HEAD unmoved, and passes when re-run after it; stage the late guard deleted · the suite's floor rises by the arms added
+
+New arm: tools/workflows/unattended-build.test.sh · a foreign tracked file deleted between step 4 and step 5 stays out of HEAD; stage a membership test comparing whole lines · the suite's floor rises by the arms added
 
 The close runs the legs and the suite. A pass runs the probe and the scratch repository of §6 as its
 check.
@@ -172,6 +204,12 @@ none
 
 - rev-1 · 2026-10-04 · initial draft, promoted from findings 22 and 17 of the round-1 spec audit of
   units 16 to 19, grounded against unit 16 rev-2 and a two-listing probe on node `a`.
+- rev-2 · 2026-10-04 · §2 §3 §4 §5 §6 §7 · S1 S3 S4 · AC1 AC2 · folded the round-1 spec audit of
+  units 20 to 22 on this unit. Finding 3: AC2 deletes a foreign tracked file between step 4 and
+  step 5, so a whole-line membership test reds, with its own arm. Finding 9: S4 and §4 supersede
+  unit 16's exactly-two listing row by name, with `--untracked-files=all` and three paths. Findings
+  10 and 15: S3 tests the record twice, right after step 1 and before step 5's loop, the late
+  refusal names the cleanup, and AC2 and §7 give each guard its own stimulus and staged break.
 
 ## 10. Reuse audit
 

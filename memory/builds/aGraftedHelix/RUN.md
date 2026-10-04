@@ -65,3 +65,5 @@ base: 5266d22eba31cdbf15425773d245cd23d7b9cdf5
 2026-10-04T19:26:54Z rescope · item add TOOL-aGraftedHelix-22 · reason spec-audit of units 16 to 19 round 1 id 6 HIGH: unit 19's read-axis refusal has no criterion, so a build that omits it passes every criterion and the derived arm stays green over an uncovered cell; repairs TOOL-aGraftedHelix-19
 
 2026-10-04T19:44:17Z review · item aGraftedHelix-spec-set-r3 · reason verdict CLEAN · blockers 0 · CONVERGED · disposition promote
+
+2026-10-04T20:16:20Z rescope · item add TOOL-aGraftedHelix-23 · reason spec-audit of units 20 to 22 round 1 id 6 HIGH, id 12 HIGH, id 2 HIGH, id 7 HIGH and id 1 HIGH: unit 20's prior-session fact stays sticky while other writers land the claim under a new session, no criterion drives two incomplete holder calls in a row, a stored absent session reads as no fact, and the widened mine test is driven only at --resume, so a live run reads its own claim as foreign and is forced to claim-lost; repairs TOOL-aGraftedHelix-20

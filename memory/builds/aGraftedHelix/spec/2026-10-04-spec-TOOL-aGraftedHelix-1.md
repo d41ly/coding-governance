@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-1 — the driver claims a run on the remote as a compare-and-swap ref, and refuses a live foreign claim
 
-**Status:** SPECCED · rev-4 · 2026-10-04 · node a · Tier-2 · base 5266d22e · streams tooling · order 1 · advances TOOL-aReapedTicket-5 · ratified 2026-10-04
+**Status:** SPECCED · rev-5 · 2026-10-04 · node a · Tier-2 · base 5266d22e · streams tooling · order 1 · advances TOOL-aReapedTicket-5 · ratified 2026-10-04
 
 <!-- gen:spec-records -->
 
@@ -149,6 +149,10 @@ does not hold its claim cannot close.
   moved ahead of `write_lease`, and a `prior-session` lease fact the `mine` test accepts on the
   holder and status-write columns, so an "announce, continue" holder write cannot leave the run
   reading its own claim as foreign (round-1 audit of units 16 to 19, finding 9).
+- **hands-off** `TOOL-aGraftedHelix-23` — where `check_claim_writable` reads the `prior-session`
+  fact and how it compares it: read from the run-state file inside the function for every holder and
+  status-write site, never handed in by a caller, and tested as membership in a set whose empty
+  value is the cleared state (round-1 audit of units 20 to 22, findings 6, 12, 2, 7 and 1).
 
 ## 4. Design
 
@@ -614,6 +618,10 @@ once, through the kit's own runner, at VERIFYING.
   finding 9 of the round-1 spec audit of units 16 to 19, which widens this unit's `mine` test by a
   `prior-session` lease fact on the holder and status-write columns. No cell, scope item or
   criterion of this unit moves.
+- rev-5 · 2026-10-04 · §3 · §3 gains the hands-off to `TOOL-aGraftedHelix-23`, promoted from
+  findings 6, 12, 2, 7 and 1 of the round-1 spec audit of units 20 to 22, which makes
+  `check_claim_writable` read the `prior-session` set itself on the holder and status-write columns.
+  No cell, scope item or criterion of this unit moves.
 
 ## 10. Reuse audit
 

@@ -1,10 +1,12 @@
 # TOOL-aGraftedHelix-22 — the claim write decision refuses a derived claim-read class outside `CLAIM_READS`, observed by a criterion and kept by a standing arm
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-1 · base 5266d22e · streams tooling · order 4
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 5266d22e · streams tooling · order 4
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-04-review-TOOL-aGraftedHelix-20-spec-audit-round1.md](../reviews/2026-10-04-review-TOOL-aGraftedHelix-20-spec-audit-round1.md) | spec-audit | TOOL-aGraftedHelix-20 TOOL-aGraftedHelix-21 |
 
 <!-- /gen:spec-records -->
 
@@ -28,14 +30,15 @@ finding 6 (HIGH) of the round-1 spec audit of units 16 to 19.
   and at `--preflight`, whose claim write precedes every local write, before any local write too.
   Observed by AC1.
 - **S2** — `tools/unattended/unattended.test.sh` gains a standing arm for S1. In a scratch copy of
-  the driver, `CLAIM_READS` lacks the existing member `foreign-stale`, so the class still has its
-  case branch. The arm runs `--preflight` over a seeded foreign stale claim and asserts S1's
-  refusal line naming `foreign-stale` and `CLAIM_READS`, an unmoved claim ref and no run-state file.
-  Its staged break takes the read-axis membership test out of the copy: the class then reaches its
-  `take, announced` cell, the claim ref moves, and the arm reds. This is the arm
-  `tools/memory-tree/check-arms.py` requires of S1's branch. Observed by AC1, which makes the arm's
-  observation and its staged break directly; the arm itself is the suite's, which the main loop runs
-  at VERIFYING.
+  the driver, `CLAIM_READS` lacks its existing member for a foreign stale claim, spelled as unit 19
+  §4 "The constants" lets that member be spelled, so the class still has its case branch. The arm
+  runs `--preflight` over a seeded foreign stale claim and asserts S1's refusal line naming that
+  member and `CLAIM_READS`, an unmoved claim ref and no run-state file. Its staged break takes the
+  read-axis membership test out of the copy: the class then reaches its `take, announced` cell, the
+  claim ref moves, and the arm reds. This is the arm `tools/memory-tree/check-arms.py` requires of
+  S1's branch, and S1's branch is ARMED by it rather than pinned. Observed by AC1, which makes the
+  arm's observation and its staged break directly, and by AC3, which reads that the branch is armed
+  by this arm; the arm itself is the suite's, which the main loop runs at VERIFYING.
 - **S3** — The unattended kit version moves once after this unit's last move, in every carrier
   `tools/check-kit-versions.sh` pairs. Observed by AC2.
 
@@ -97,7 +100,8 @@ new function, constant, conf key or file. No codebase-map key is minted.
 - observability — The refusal names the class and the constant it is missing from.
 - risks — A class `check_claim_writable` derives today and the constant lacks would refuse on first
   use. Unit 19's constant lists every class unit 1's table names, so none does.
-- testing — S2's arm, observed RED with the read-axis membership test removed.
+- testing — S2's arm, observed RED with the read-axis membership test removed, and AC3's report
+  read, observed RED with S1's branch pinned in a tracked `unarmed-branches.txt` instead.
 - migration — None: the table lands with unit 1 in this build.
 - user docs — N/A.
 
@@ -106,11 +110,12 @@ new function, constant, conf key or file. No codebase-map key is minted.
 The fixture is unit 1's driver fixture: a `git clone --local` of this repository under `%TEMP%`, its
 one remote re-pointed at a bare repository, `RUN_CLAIMS` on.
 
-- **AC1** — When a scratch copy of the driver with `foreign-stale` removed from `CLAIM_READS` runs
+- **AC1** — When a scratch copy of the driver with the foreign stale member removed from
+  `CLAIM_READS`, spelled as unit 19 spells it, runs
   `--preflight <slug> --keepalive-id k2` over the fixture, whose bare remote holds a claim for
   `<slug>` written by another session under another keepalive with `status: live` and a `beat-utc`
-  older than `RESUME_STALE_BOUND`, it prints `UNATTENDED check <n> FAILED` naming `foreign-stale`
-  and `CLAIM_READS`, `git ls-remote <bare> refs/gov/runs/<slug>` prints the same sha before and
+  older than `RESUME_STALE_BOUND`, it prints `UNATTENDED check <n> FAILED` naming that member and
+  `CLAIM_READS`, `git ls-remote <bare> refs/gov/runs/<slug>` prints the same sha before and
   after, and the run-state file does not exist. With the read-axis membership test also removed from
   the copy, the same call takes the claim and that sha moves.
   Red when: an undeclared claim-read class reaches its cell.
@@ -118,12 +123,17 @@ one remote re-pointed at a bare repository, `RUN_CLAIMS` on.
   `python tools/govkit/govkit.py epoch --base <the pass's parent sha>` names no unattended carrier
   left behind.
   Red when: the driver's bytes moved and the unattended version did not.
+- **AC3** — When `python tools/memory-tree/check-arms.py --report` runs at the pass's commit, the row
+  for S1's branch under `tools/unattended/unattended.sh` reads `ARMED` and ends
+  `by tools/unattended/unattended.test.sh`, and no tracked `unarmed-branches.txt` holds a row pinning
+  that branch.
+  Red when: the branch is pinned rather than armed, so its report row reads `PINNED`.
 
 ## 7. Gates
 
 `unattended kit gate` · `kit version markers` · `kit epoch (shipped bytes move, the version moves)` · `harness arms (fail branches armed or pinned)` · `line length` · `shell hygiene (a loop fed by a command substitution)` · `spec tokens (a spec's own names resolve)`
 
-New arm: tools/unattended/unattended.test.sh · S1's refusal, driven at --preflight over a scratch driver with foreign-stale removed from CLAIM_READS and a seeded foreign stale claim; stage the read-axis membership test removed · the suite's floor rises by its new arm count
+New arm: tools/unattended/unattended.test.sh · S1's refusal, driven at --preflight over a scratch driver with the foreign stale member removed from CLAIM_READS and a seeded foreign stale claim; stage the read-axis membership test removed · the suite's floor rises by its new arm count
 
 The unattended suites are not on the bar (`tools/unattended/README.md`). A pass runs AC1 directly,
 and the main loop runs the suite once at VERIFYING.
@@ -137,6 +147,10 @@ none
 - rev-1 · 2026-10-04 · initial draft, promoted from finding 6 of the round-1 spec audit of units 16
   to 19, grounded against unit 19 rev-2, unit 1's call-site table and `check-arms.py` at base
   `5266d22e`.
+- rev-2 · 2026-10-04 · §2 §5 §6 §7 · S2 · AC1 AC3 · folded the round-1 spec audit of units 20 to 22
+  on this unit. Finding 4: AC3 reads `check-arms.py --report` for S1's branch ARMED by the suite and
+  pinned nowhere, so a build that pins the branch reds; S2 names it. Finding 11: S2, AC1 and §7 name
+  the foreign stale member as unit 19 spells it, never a restated literal.
 
 ## 10. Reuse audit
 
