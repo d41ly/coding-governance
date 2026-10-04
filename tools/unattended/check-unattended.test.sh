@@ -5356,6 +5356,31 @@ ma0_reset; sed -i 's/^may: none$/may: tools\/lander-granted.sh/' "$ma0/memory/bu
 out=$(ma_leg "$ma0")
 hit "$out" "a run-state file pins a may: grant while recording an authorization mode that resolves at the second anchor, so the grant could be one the run wrote for itself - ruling D12-j honours a grant only under slug: mode [prompt], may: [bin/lander-granted.sh] in memory/builds/tPrompt/RUN.md"
 
+
+# ---- TOOL-aWardedAudit-5: THE SPEC-AUDIT OPT-IN IS A GRANT TOO. A live record on the builder's graph,
+# ---- whose run then writes a blank default (no opt-in), a dated default and a `spec-audit:` line,
+# ---- while the OWNER's commit on main writes `spec-audit:` into another README. Observed RED-first
+# ---- against the base checker, which read `may:` alone.
+ma_init gsa; masa="$ma_root/gsa"
+printf 'SPEC_AUDIT_DEFAULT=""\n' >> "$masa/.unattended.conf"; ma_commit "$masa" "run blanks the default"
+printf 'SPEC_AUDIT_DEFAULT="2026-10-05"\n' >> "$masa/.unattended.conf"; ma_commit "$masa" "run dates the default"
+sed -i '/^slug: tOther3$/a spec-audit: 2026-10-05' "$masa/memory/builds/tOther3/README.md"; ma_commit "$masa" "run opts in"
+( cd "$masa" && git checkout -q main ) >/dev/null 2>&1
+sed -i '/^slug: tOther$/a spec-audit: 2026-10-05' "$masa/memory/builds/tOther/README.md"; ma_commit "$masa" "owner opts in"
+( cd "$masa" && git push -q origin main && git checkout -q unit ) >/dev/null 2>&1
+MASA_BLANK=$(git -C "$masa" log --format=%H --grep='^run blanks the default$' -1)
+MASA_DATE=$(git -C "$masa" log --format=%H --grep='^run dates the default$' -1)
+MASA_KEY=$(git -C "$masa" log --format=%H --grep='^run opts in$' -1)
+MASA_OWN=$(git -C "$masa" log main --format=%H --grep='^owner opts in$' -1)
+n=$((n+1)); { [ -n "$MASA_BLANK" ] && [ -n "$MASA_DATE" ] && [ -n "$MASA_KEY" ] && [ -n "$MASA_OWN" ]; } \
+  || { echo "FAIL the TOOL-aWardedAudit-5 fixture did not build its four commits"; st=1; }
+out=$(ma_leg "$masa")
+hit  "$out" "a commit among a run's own commits writes a spec-audit: line into a build README, so a run could land the opt-in the next run's pre-code audit would rest on, and only the owner opts a build in - commit and README follow: $MASA_KEY in memory/builds/tOther3/README.md, run memory/builds/tRun/RUN.md"
+hit  "$out" "a commit among a run's own commits writes a non-blank SPEC_AUDIT_DEFAULT into the project conf, so a run could land the project-wide opt-in every later run's pre-code audit would rest on, and only the owner opts a build in - commit and conf follow: $MASA_DATE in .unattended.conf, run memory/builds/tRun/RUN.md"
+miss "$out" "$MASA_BLANK in .unattended.conf"
+miss "$out" "$MASA_OWN in memory/builds/tOther/README.md"
+# ...and the may: arm keeps its own message on the same graph.
+hit  "$out" "$MA_WRITES $(git -C "$masa" log --format=%H --grep='^run grants$' -1) $MA_RUN_RD"
 # ---- G1: A LIVE RECORD, AND AN IN-PLACE TERMINAL ONE, over unit 2's prepared merge T - first parent
 # ---- the advertised tip, which carries the owner's grant, second parent the run branch.
 ma_init g1; ma1="$ma_root/g1"

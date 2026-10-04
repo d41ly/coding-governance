@@ -1,6 +1,6 @@
 # TOOL-aWardedAudit-5 — the bar refuses a run commit that writes a spec-audit opt-in
 
-**Status:** OPEN · rev-1 · 2026-10-05 · node a · Tier-2 · base 8cfe5678 · streams tooling · order 5
+**Status:** CLOSED · rev-1 · 2026-10-05 · node a · Tier-2 · base 8cfe5678 · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
