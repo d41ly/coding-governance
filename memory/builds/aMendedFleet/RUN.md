@@ -64,3 +64,9 @@ base: 7af5f564641d231f8b78f6b183dde1b6bf53111d
 2026-10-04T19:27:12Z rescope · item add TOOL-aMendedFleet-90 · reason split from TOOL-aMendedFleet-51 at its F1: the DEAD-for-N rule needs unit 48's history
 
 2026-10-04T19:27:23Z rescope · item retire TOOL-aMendedFleet-45 · reason the live aGraftedHelix build owns the invariants registry as reviewers' default by-design source (its unit 3, ratified 2026-10-04); the report itself says make it the one source and drop a second pipeline
+
+2026-10-04T19:54:38Z rescope · item add TOOL-aMendedFleet-91 · reason split from TOOL-aMendedFleet-57 at its F1: a spec-header grammar change apart from the low-water grade
+
+2026-10-04T19:54:41Z rescope · item add TOOL-aMendedFleet-92 · reason split from TOOL-aMendedFleet-62 at its F1: check 23's range mode and budget are a hygiene-gate mechanism apart from the history legs
+
+2026-10-04T19:54:43Z rescope · item add TOOL-aMendedFleet-93 · reason split from TOOL-aMendedFleet-67 at its F1: the A/B experiment and the default it sets follow the agent type

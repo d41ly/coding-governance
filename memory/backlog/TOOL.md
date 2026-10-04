@@ -33,7 +33,7 @@ Cite ids, never line numbers.
 | [TOOL-aBoundedVerdict-26](../builds/aBoundedVerdict/BACKLOG.md) | OPEN | — | — | 2026-08-19 | run-gates.sh / tail -N returns TAIL's exit status, so the idiom that… |
 | [TOOL-aBoundedVerdict-27](../builds/aBoundedVerdict/BACKLOG.md) | OPEN | — | — | 2026-08-19 | unattended.test.sh's 344 assertions share ONE mutable fixture tree with… |
 | [TOOL-aBoundedVerdict-28](../builds/aBoundedVerdict/BACKLOG.md) | OPEN | — | — | 2026-08-19 | BUILD-METHOD.md is at 249 lines against its own ≤250 self-declared cap… |
-| [TOOL-aBoundedVerdict-29](../builds/aBoundedVerdict/BACKLOG.md) | OPEN | — | — | 2026-08-19 | check-verdict-epoch.sh's remedy names THREE files to bump; the kit has… |
+| [TOOL-aBoundedVerdict-29](../builds/aBoundedVerdict/BACKLOG.md) | SPECCED | — | TOOL-aMendedFleet-64 | 2026-08-19 | check-verdict-epoch.sh's remedy names THREE files to bump; the kit has… |
 | [TOOL-aBoundedVerdict-31](../builds/aBoundedVerdict/BACKLOG.md) | OPEN | — | — | 2026-08-20 | every TemporaryDirectory() in the kits can red the bar on WINDOWS for a… |
 | [TOOL-aBoundedVerdict-32](../builds/aBoundedVerdict/BACKLOG.md) | OPEN | — | — | 2026-08-20 | TOOL-cBriefedPilot-18 AC9 was CLAIMED at a close it was not met at. It… |
 | [TOOL-aBranchedMandate-5](../builds/aBranchedMandate/BACKLOG.md) | OPEN | — | — | 2026-08-17 | adopt-drift-audit.sh diffs its render with no [ -s ] test, so… |
@@ -148,7 +148,7 @@ Cite ids, never line numbers.
 | [TOOL-aMeteredTurnstile-6](../builds/aMeteredTurnstile/BACKLOG.md) | OPEN | — | — | 2026-08-20 | the bar did not get slower, PROCESS CREATION did: measured 2026-08-20… |
 | [TOOL-aNamedGesture-2](../builds/aNamedGesture/BACKLOG.md) | OPEN | — | — | 2026-08-25 | the kickoff manifest's last-audit stamp read 2026-08-26T10:10:00+03:00… |
 | [TOOL-aNumeralWarden-2](../builds/aNumeralWarden/BACKLOG.md) | OPEN | — | — | 2026-08-10 | agent-cap's enclosing-opener walk is defeated by two nested wrappers or… |
-| [TOOL-aNumeralWarden-3](../builds/aNumeralWarden/BACKLOG.md) | OPEN | — | — | 2026-08-10 | a drift-audit pin RAISE is indistinguishable from a population drain to… |
+| [TOOL-aNumeralWarden-3](../builds/aNumeralWarden/BACKLOG.md) | SPECCED | — | TOOL-aMendedFleet-56 | 2026-08-10 | a drift-audit pin RAISE is indistinguishable from a population drain to… |
 | [TOOL-aPacedTurnstile-9](../builds/aPacedTurnstile/BACKLOG.md) | OPEN | — | — | 2026-08-18 | prove each leg guard COMPLETE, the sound fix TOOL-aPacedTurnstile-7… |
 | [TOOL-aPacedTurnstile-11](../builds/aPacedTurnstile/BACKLOG.md) | OPEN | — | — | 2026-08-18 | govkit's selfcheck cannot see that an entry SPELLING another entry's… |
 | [TOOL-aPacedTurnstile-12](../builds/aPacedTurnstile/BACKLOG.md) | OPEN | — | — | 2026-08-18 | govkit's selfcheck joins a descriptor's [[gate_leg]] rows to the repo's… |
@@ -233,7 +233,7 @@ Cite ids, never line numbers.
 | [TOOL-aScouredKit-19](../builds/aScouredKit/BACKLOG.md) | OPEN | — | — | 2026-08-30 | FIVE PYTHON READERS RE-PARSE .memory-tree.conf WITH A NAIVE… |
 | [TOOL-aScouredKit-21](../builds/aScouredKit/BACKLOG.md) | OPEN | — | — | 2026-08-30 | tools/check-testsuite-counts.sh hardcodes MANIFEST=tools/gate-legs.json… |
 | [TOOL-aScouredKit-22](../builds/aScouredKit/BACKLOG.md) | OPEN | — | — | 2026-08-30 | memory/HYGIENE.md's numbered catalog — the file whose own line 115… |
-| [TOOL-aScouredKit-23](../builds/aScouredKit/BACKLOG.md) | OPEN | — | — | 2026-08-30 | WIRE-INTO-PROJECT.md (59833 B / 816 lines) and… |
+| [TOOL-aScouredKit-23](../builds/aScouredKit/BACKLOG.md) | SPECCED | — | TOOL-aMendedFleet-68 | 2026-08-30 | WIRE-INTO-PROJECT.md (59833 B / 816 lines) and… |
 | [TOOL-aScouredKit-24](../builds/aScouredKit/BACKLOG.md) | OPEN | — | — | 2026-08-30 | ELEVEN OF 25 REGISTRY ENTRIES ARE NEVER PASSED TO apply BY ANY GATE,… |
 | [TOOL-aScouredKit-26](../builds/aScouredKit/BACKLOG.md) | OPEN | — | — | 2026-08-30 | A CROSS-ENTRY DESTINATION TOKEN DOES NOT EXIST, and TOOL-aScouredKit-15… |
 | [TOOL-aScouredKit-27](../builds/aScouredKit/BACKLOG.md) | OPEN | — | — | 2026-08-30 | chunk DECIDES WHETHER A LEG RUNS AND DOES NOT TRAVEL TO ADOPTERS.… |
@@ -280,7 +280,7 @@ Cite ids, never line numbers.
 | [TOOL-aUnblockedFleet-7](../builds/aUnblockedFleet/BACKLOG.md) | OPEN | — | — | 2026-08-31 | THE LANDER MARKER IS SHARED BY EVERY WORKTREE OF ONE CLONE, so two… |
 | [TOOL-aUnblockedFleet-8](../builds/aUnblockedFleet/BACKLOG.md) | OPEN | — | — | 2026-08-31 | TWO CONCURRENT UNATTENDED CLOSES IN ONE CLONE CONTEND ON THE MERGE… |
 | [TOOL-aUnblockedFleet-9](../builds/aUnblockedFleet/BACKLOG.md) | OPEN | — | — | 2026-08-31 | FIVE ACCEPTANCE CRITERIA OF TOOL-aUnblockedFleet-2 ARE WRITTEN,… |
-| [TOOL-aUnmannedHelm-2](../builds/aUnmannedHelm/BACKLOG.md) | OPEN | — | — | 2026-08-10 | the ledger_dir in tools/drift-audit/drift_report.py points at an… |
+| [TOOL-aUnmannedHelm-2](../builds/aUnmannedHelm/BACKLOG.md) | SPECCED | — | TOOL-aMendedFleet-53 | 2026-08-10 | the ledger_dir in tools/drift-audit/drift_report.py points at an… |
 | [TOOL-aUnmannedHelm-10](../builds/aUnmannedHelm/BACKLOG.md) | OPEN | — | — | 2026-08-10 | three root docs (AGENTS.md, WIRE-INTO-PROJECT.md, .gitattributes) come… |
 | [TOOL-aWalkedCorpus-2](../builds/aWalkedCorpus/BACKLOG.md) | DEFERRED | — | TOOL-aWalkedCorpus-2 | 2026-08-17 | a recall quality floor. Measured NOT buildable against bench.py as it… |
 | [TOOL-aWalkedCorpus-4](../builds/aWalkedCorpus/BACKLOG.md) | OPEN | — | — | 2026-08-17 | memory-recall selftest.py mints its two synthetic corpus ids in a LIVE… |

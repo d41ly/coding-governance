@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-3 — the lander refuses a merge that loses a definition a parent carried
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · order 3 · ratified 2026-10-04
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · order 3 · ratified 2026-10-04
 
 <!-- gen:spec-records -->
 
@@ -79,6 +79,9 @@ retires nothing.
 - **hands-off** external — `tools/drift-audit/drift_report.py` keeps its own `_read_defs_at_sha`, a
   whole-tree reader over the same extractor; moving it onto the reader this unit adds is a
   separate mechanism, filed as an ask by this unit's build pass.
+- **hands-off** `TOOL-aMendedFleet-65` — the python and kit resolution this unit adds to
+  `tools/push-main.sh` for its merge-loss call, which unit 65's version minter reuses rather than
+  adding a second resolver to the same script.
 
 ## 4. Design
 
@@ -266,6 +269,7 @@ New arm: tools/push-main.test.sh · --prepare over a branch carrying that merge,
 
 - rev-1 · 2026-10-04 · initial draft, from the report's `[B#11]` and Q3 rank 1, node d's ask 26
   read on its branch, and `01c22e155` re-observed at its parents.
+- rev-2 · 2026-10-04 · §3 gains the hands-off edge to `TOOL-aMendedFleet-65`, which declares consuming this unit's resolver in `tools/push-main.sh` (check 12 edge join).
 
 ## 10. Reuse audit
 

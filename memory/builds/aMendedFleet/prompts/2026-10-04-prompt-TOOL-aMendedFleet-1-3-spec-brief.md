@@ -233,3 +233,6 @@ record `...-1-0-run-mandate.md` first: it carries the owner's four answers, whic
 - **88** — split from 42 at its F1: no tracked file imports it except the kit selftest, whose parity arm now skips. Deletion is the recommendation; re-verify consumers first.
 - **89** — split from 43 at its F1: edit the prose of the seven dossiers near the 20480 B cap and decide where measured history lives. Unit 43 renders cards from the fences and never reads prose.
 - **90** — split from 51 at its F1: the DEAD-for-N rule, after unit 48's history file exists.
+- **91** — split from 57 at its F1: the records-only spec-header declaration of `TOOL-aProbedToolkit-18`; unit 57 keeps the low-water mark.
+- **92** — split from 62 at its F1: check 23's range mode, the per-build budget key and the ceiling key it replaces, the measuring flag, the fleet line and the drift signal reading it. Node d built the same on its branch (commit `d99cd0328`, check 23 half); reuse its bytes.
+- **93** — split from 67 at its F1: the A/B run (precision and first-turn tokens) and the default it may set, ordered after units 67 and 70.
