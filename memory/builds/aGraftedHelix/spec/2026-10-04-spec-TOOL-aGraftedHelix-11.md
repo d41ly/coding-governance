@@ -1,12 +1,13 @@
 # TOOL-aGraftedHelix-11 — a claim write copies its identity from the run's lease record, never from the writer's environment
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-2 · base 5266d22e · streams tooling · order 2 · ratified 2026-10-04
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-2 · base 5266d22e · streams tooling · order 2 · ratified 2026-10-04
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-04-prompt-TOOL-aGraftedHelix-1-2-build-brief.md](../prompts/2026-10-04-prompt-TOOL-aGraftedHelix-1-2-build-brief.md) | journal | TOOL-aGraftedHelix-1 TOOL-aGraftedHelix-2 TOOL-aGraftedHelix-3 TOOL-aGraftedHelix-4 TOOL-aGraftedHelix-5 TOOL-aGraftedHelix-6 TOOL-aGraftedHelix-7 TOOL-aGraftedHelix-8 TOOL-aGraftedHelix-9 TOOL-aGraftedHelix-10 TOOL-aGraftedHelix-12 TOOL-aGraftedHelix-13 TOOL-aGraftedHelix-14 TOOL-aGraftedHelix-15 |
+| [2026-10-04-review-TOOL-aGraftedHelix-10-spec-audit-round1.md](../reviews/2026-10-04-review-TOOL-aGraftedHelix-10-spec-audit-round1.md) | spec-audit | TOOL-aGraftedHelix-10 TOOL-aGraftedHelix-12 TOOL-aGraftedHelix-13 TOOL-aGraftedHelix-14 TOOL-aGraftedHelix-15 |
 
 <!-- /gen:spec-records -->
 
@@ -40,6 +41,11 @@ from the run's lease record. It closes finding 39 (BLOCKER) of the round-1 spec 
   VERIFYING, and each arm's red on a staged break is observed there (§7).
 - **S5** — The unattended kit version moves once after this unit's last move, in every carrier
   `tools/check-kit-versions.sh` pairs. Observed by AC3.
+- **S6** — `--preflight` and `run_takeover` compute the lease stamp ONCE per call and pass that one
+  value to the claim write and to `write_lease`, which takes it as an optional third argument and
+  reads the clock only when it is absent. The claim taken at those sites therefore carries the
+  record's `lease-utc` byte for byte, and the holder's next renewal finds no field differing.
+  Observed by AC4.
 
 ## 3. Non-goals (OUT)
 
@@ -58,6 +64,10 @@ from the run's lease record. It closes finding 39 (BLOCKER) of the round-1 spec 
 - **consumes-from** `TOOL-aGraftedHelix-1` — `write_claim`, `write_claim_beat`,
   `check_claim_writable` and the claim record's eight keys; without them there is no identity to
   copy.
+- **hands-off** `TOOL-aGraftedHelix-18` — the holder row's order around its own `write_lease`:
+  `mine` decided against the record's facts before that call, and the claim write copying them after
+  it, with an arm under a changed session. §4 "The rule" states the order for the `--replaces`
+  block only (round-1 audit of units 10 to 15, finding 22).
 
 ## 4. Design
 
@@ -89,7 +99,16 @@ facts it leaves. So the claim follows the record's new keepalive, and the next h
 ### Inventory
 
 No new function, check or file. `write_claim_beat` takes its identity from the record instead of
-its caller.
+its caller. `write_lease` gains an optional third argument, the lease stamp; its existing callers
+pass none and keep reading the clock.
+
+### One stamp per take
+
+`write_lease` stamps `lease-utc` itself with `date -u` (`tools/unattended/unattended.sh:5569`), and
+unit 1's call-site table puts both take sites' claim writes BEFORE `write_lease`. Computed
+separately, the claim's stamp and the record's would differ by the claim push's latency, so the
+holder's first renewal would push at once and `--claims` would publish a stamp the record never
+held until then. The take sites therefore compute the stamp first and hand it to both writers.
 
 ### Files touched (estimate)
 
@@ -140,6 +159,11 @@ on a bare remote seeded by real `gov-claim` messages.
   `python tools/govkit/govkit.py epoch --base <the pass's parent sha>` names no unattended carrier
   left behind.
   Red when: the driver's bytes moved and the unattended version did not.
+- **AC4** — When `--preflight <slug> --keepalive-id k1` runs in unit 1's driver fixture, the claim's
+  `lease-utc` equals the `lease-utc:` fact of the run's `RUN.md` byte for byte. A following
+  `--resume <slug> --keepalive-id k1` under the same session, with the beat not yet due, leaves
+  `git ls-remote <bare> refs/gov/runs/<slug>` printing the same sha before and after.
+  Red when: the two stamps differ, so the first renewal pushes at once.
 
 ## 7. Gates
 
@@ -148,6 +172,8 @@ on a bare remote seeded by real `gov-claim` messages.
 New arm: tools/unattended/resume-tick.test.sh · the LIVE row's --beat under env -u CLAUDE_CODE_SESSION_ID, over a seeded claim and over none; stage the session read back from the environment · the suite's floor rises by its new arm count
 
 New arm: tools/unattended/unattended.test.sh · --dispatch under another session id, beat due and not due; stage the identity read back from the environment · the suite's floor rises by its new arm count
+
+New arm: tools/unattended/unattended.test.sh · the claim's lease-utc equals the record's after --preflight, and the next --resume pushes nothing; stage write_lease reading its own clock at the take site · the suite's floor rises by its new arm count
 
 The unattended suites are not on the bar (`tools/unattended/README.md`). A pass runs its blocks as a
 slice, and the main loop runs the suites once at VERIFYING.
@@ -165,6 +191,10 @@ slice, and the main loop runs the suites once at VERIFYING.
 
 - rev-1 · 2026-10-04 · initial draft, promoted from the round-1 spec audit's finding 39, grounded
   against unit 1's spec, `resume-tick.sh` and `write_lease` at base `5266d22e`.
+- rev-2 · 2026-10-04 · §3 §4 §6 §7 · S6 · AC4 · folded the round-1 spec audit of units 10 to 15 on
+  this unit: 26 (the take sites compute one lease stamp and hand it to the claim write and to
+  `write_lease`, which takes it as an optional argument, §4 "One stamp per take", AC4 and its arm).
+  §3 gains the hands-off to the unit promoted from finding 22.
 
 ## 10. Reuse audit
 

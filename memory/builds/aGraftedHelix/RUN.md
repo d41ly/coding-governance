@@ -47,3 +47,11 @@ base: 5266d22eba31cdbf15425773d245cd23d7b9cdf5
 2026-10-04T17:15:30Z rescope · item add TOOL-aGraftedHelix-14 · reason spec-audit round 1 id 27 HIGH: the hygiene engine's dispatch of check 27 is observed only by a grep that a comment satisfies; repairs TOOL-aGraftedHelix-9
 
 2026-10-04T17:36:04Z rescope · item add TOOL-aGraftedHelix-15 · reason discovery while driving the harness: a build whose specs the SPEC stage authors always meets the AUDIT stage's empty-subject refusal on the first call (the specs are uncommitted), and the documented re-invoke under resumeFromRunId replays the resolver's cached empty answer; observed twice on wf_7b67cf1d-995 (the second failure in 20 ms); the route completed only with caller-pinned subjects
+
+2026-10-04T18:36:21Z rescope · item add TOOL-aGraftedHelix-16 · reason spec-audit of units 10 to 15 round 1 id 21 HIGH: the commit stage stages the authored specs before the generator rewrites them, so the commit holds pre-render blobs and the dirty-tree refusal fires on the first call; repairs TOOL-aGraftedHelix-15
+
+2026-10-04T18:36:31Z rescope · item add TOOL-aGraftedHelix-17 · reason spec-audit of units 10 to 15 round 1 id 16 HIGH: unit 14's fixture row restates a base row, so unit 6's check 28 reds the same branch and the permanent arm cannot fail once unit 6 lands; repairs TOOL-aGraftedHelix-14
+
+2026-10-04T18:36:34Z rescope · item add TOOL-aGraftedHelix-18 · reason spec-audit of units 10 to 15 round 1 id 22 HIGH: the holder row's write_lease moves the lease facts mid-call and unit 11 states no read-before-write order, so a holder whose session changed reads its own claim as foreign live; repairs TOOL-aGraftedHelix-11
+
+2026-10-04T18:36:36Z rescope · item add TOOL-aGraftedHelix-19 · reason spec-audit of units 10 to 15 round 1 id 31 HIGH: unit 12's arm keeps a hand-typed copy of the claim write table, so a verdict or mode added later leaves it green while the record calls it the class gate; repairs TOOL-aGraftedHelix-12

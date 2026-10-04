@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-1 — the driver claims a run on the remote as a compare-and-swap ref, and refuses a live foreign claim
 
-**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-2 · base 5266d22e · streams tooling · order 1 · advances TOOL-aReapedTicket-5 · ratified 2026-10-04
+**Status:** SPECCED · rev-3 · 2026-10-04 · node a · Tier-2 · base 5266d22e · streams tooling · order 1 · advances TOOL-aReapedTicket-5 · ratified 2026-10-04
 
 <!-- gen:spec-records -->
 
@@ -141,6 +141,10 @@ does not hold its claim cannot close.
 - **hands-off** `TOOL-aGraftedHelix-12` — per-cell coverage of the §4 table that
   `check_claim_writable` implements: the refusing cells, `--beat`'s declined writes and every
   other cell §6 does not observe (findings 2, 3 and 46).
+- **hands-off** `TOOL-aGraftedHelix-19` — the table's two axes as declarations: the eight claim-read
+  rows and the four modes become driver constants beside `check_claim_writable`, which refuses a
+  value outside them, so the per-cell arm derives its cells instead of typing them (round-1 audit of
+  units 10 to 15, finding 31).
 
 ## 4. Design
 
@@ -599,6 +603,9 @@ once, through the kit's own runner, at VERIFYING.
   (the `RUN_CLAIMS` switch, S16, §8 F8, AC21); and 9 (AC11 per verdict, and the quoted
   `HALT_FLOOR` grep in AC7). §3 gains hands-off edges to the units promoted from findings 38, 31,
   39, 2 and 3, and its pre-push sentence stops claiming the non-default exit.
+- rev-3 · 2026-10-04 · §3 · §3 gains the hands-off to `TOOL-aGraftedHelix-19`, promoted from
+  finding 31 of the round-1 spec audit of units 10 to 15, which declares this unit's table axes as
+  driver constants. No cell, scope item or criterion of this unit moves.
 
 ## 10. Reuse audit
 

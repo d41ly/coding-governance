@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-6 — a decision row or gotcha whose normalized text another record already holds reds
 
-**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-2 · base 5266d22e · streams tooling · order 6 · ratified 2026-10-04
+**Status:** SPECCED · rev-3 · 2026-10-04 · node a · Tier-2 · base 5266d22e · streams tooling · order 6 · ratified 2026-10-04
 
 <!-- gen:spec-records -->
 
@@ -81,6 +81,10 @@ write-time duplicate check; the near half is `TOOL-aGraftedHelix-9`.
   calls `--check-content` and keys offenders under `CONTENT_CHECK`. AC7 here proves the block is
   present; that unit observes it red the leg and print its summary on a green run (round-1 audit
   finding 20).
+- **hands-off** `TOOL-aGraftedHelix-17` — check 28's `check 28:` line, which that unit's arm asserts
+  absent from check 27's engine arm and observes red with a verbatim branch row, because this check
+  is always on and a content-duplicate fixture row would hold that arm's exit (round-1 audit of
+  units 10 to 15, finding 16).
 
 ## 4. Design
 
@@ -286,6 +290,9 @@ New arm: `tools/memory-tree/row_grammar.py --selftest` · fixture trees holding 
   its direct check); and 37 (`memory/guides/BUILD-METHOD.md` line 1 listed, §8 F1 citing unit 3's
   ruling, AC12). §3 Edges extends the consumes-from to unit 9's base and gains the hands-off to the
   unit promoted from finding 20.
+- rev-3 · 2026-10-04 · §3 · §3 gains the hands-off to `TOOL-aGraftedHelix-17`, promoted from
+  finding 16 of the round-1 spec audit of units 10 to 15, whose arm asserts this check's line absent
+  from check 27's engine arm. No scope item or criterion of this unit moves.
 
 ## 10. Reuse audit
 

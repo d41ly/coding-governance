@@ -109,7 +109,7 @@ Cite ids, never line numbers.
 | [TOOL-aHoistedPass-32](../builds/aHoistedPass/BACKLOG.md) | OPEN | — | — | 2026-09-05 | FIVE tools/ CARRIERS STATE THE SUPERSEDED parallelism route: none, none… |
 | [TOOL-aHoistedPass-33](../builds/aHoistedPass/BACKLOG.md) | OPEN | — | — | 2026-09-05 | THE gov:kit unattended-build@1.0 MARKER ON LINE 3 OF THAT HARNESS'S OWN… |
 | [TOOL-aHoistedPass-34](../builds/aHoistedPass/BACKLOG.md) | OPEN | — | — | 2026-09-05 | meta.description AND meta.phases IN A WORKFLOW SCRIPT ARE GRADED BY… |
-| [TOOL-aHoistedPass-35](../builds/aHoistedPass/BACKLOG.md) | OPEN | — | — | 2026-09-05 | THE HANDED-OUT ROSTER CARRIES AN EMPTY specPath FOR EVERY… |
+| [TOOL-aHoistedPass-35](../builds/aHoistedPass/BACKLOG.md) | SPECCED | — | TOOL-aGraftedHelix-15 | 2026-09-05 | THE HANDED-OUT ROSTER CARRIES AN EMPTY specPath FOR EVERY… |
 | [TOOL-aHoistedPass-36](../builds/aHoistedPass/BACKLOG.md) | OPEN | — | — | 2026-09-05 | tools/unattended/unattended.test.sh HAS NEVER BEEN RUN TO COMPLETION… |
 | [TOOL-aHoistedPass-37](../builds/aHoistedPass/BACKLOG.md) | OPEN | — | — | 2026-09-05 | check-unattended.sh --only 28 DIES AT CHECK 30 AND HAS SINCE CHECK 30… |
 | [TOOL-aHoistedPass-38](../builds/aHoistedPass/BACKLOG.md) | OPEN | — | — | 2026-09-05 | tools/unattended/check-unattended.test.sh IS RED IN BOTH SHARDS FOR… |

@@ -1,12 +1,13 @@
 # TOOL-aGraftedHelix-12 — every cell of the claim write table, and every write `--beat` declines, is observed
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-1 · base 5266d22e · streams tooling · order 2
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 5266d22e · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-04-prompt-TOOL-aGraftedHelix-1-2-build-brief.md](../prompts/2026-10-04-prompt-TOOL-aGraftedHelix-1-2-build-brief.md) | journal | TOOL-aGraftedHelix-1 TOOL-aGraftedHelix-2 TOOL-aGraftedHelix-3 TOOL-aGraftedHelix-4 TOOL-aGraftedHelix-5 TOOL-aGraftedHelix-6 TOOL-aGraftedHelix-7 TOOL-aGraftedHelix-8 TOOL-aGraftedHelix-9 TOOL-aGraftedHelix-10 TOOL-aGraftedHelix-11 TOOL-aGraftedHelix-13 TOOL-aGraftedHelix-14 TOOL-aGraftedHelix-15 |
+| [2026-10-04-review-TOOL-aGraftedHelix-10-spec-audit-round1.md](../reviews/2026-10-04-review-TOOL-aGraftedHelix-10-spec-audit-round1.md) | spec-audit | TOOL-aGraftedHelix-10 TOOL-aGraftedHelix-11 TOOL-aGraftedHelix-13 TOOL-aGraftedHelix-14 TOOL-aGraftedHelix-15 |
 
 <!-- /gen:spec-records -->
 
@@ -34,7 +35,8 @@ findings 2 and 3 (HIGH) of the round-1 spec audit.
   sha moved and whether the run-state file changed, or `unreached` with the reason no path reaches
   the cell. The arm seeds each claim state with real `gov-claim` messages over a bare remote. It
   asserts that its own table holds rows × columns cells before it drives one, so a missing row reds
-  rather than shrinking the arm. NOT OBSERVED by a criterion here: the suite is the main loop's to
+  rather than shrinking the arm. That count reads only the arm's own rows; deriving the cell set from
+  the driver, so a class or mode added later reds too, is `TOOL-aGraftedHelix-19`'s. NOT OBSERVED by a criterion here: the suite is the main loop's to
   run at VERIFYING, and each cell's red on a staged break is observed there (§7).
 - **S4** — The unattended kit version moves once after this unit's last move if its shipped bytes
   moved, in every carrier `tools/check-kit-versions.sh` pairs. Observed by AC3.
@@ -44,7 +46,9 @@ findings 2 and 3 (HIGH) of the round-1 spec audit.
 - **Changing a cell.** The table is unit 1's. This unit observes the table as unit 1's latest rev
   states it, including that rev's holder-column `stale` cell.
 - **A spec lint joining a decision table's rows to criteria.** The audit offered it as a class
-  gate. It would be a new reader of spec prose, and this arm is the class gate for this table.
+  gate. It would be a new reader of spec prose. This arm becomes the class gate for this table only
+  once `TOOL-aGraftedHelix-19` derives its cells from the driver; built alone, it is an instance
+  check over today's thirty-two cells.
 - **The resume matrix.** `TOOL-dDerivedDocket-40` records the same class for the resume matrix of
   `TOOL-dDerivedDocket-4`; this arm moves neither its guide nor its leg.
 
@@ -52,6 +56,9 @@ findings 2 and 3 (HIGH) of the round-1 spec audit.
 
 - **consumes-from** `TOOL-aGraftedHelix-1` — `check_claim_writable`, its §4 table and its four
   call-site modes, and `--beat`; without them there is no cell to drive.
+- **hands-off** `TOOL-aGraftedHelix-19` — the arm's cell set: that unit declares the table's rows
+  and modes as driver constants the decision refuses outside of, and has this arm derive its cells
+  from them in place of its own row count (round-1 audit of units 10 to 15, finding 31).
 
 ## 4. Design
 
@@ -127,6 +134,9 @@ none
 ## 9. Revision log
 
 - rev-1 · 2026-10-04 · initial draft, promoted from the round-1 spec audit's findings 2 and 3.
+- rev-2 · 2026-10-04 · §2 §3 · S3 · the round-1 spec audit of units 10 to 15 promoted its finding
+  31 on this unit to `TOOL-aGraftedHelix-19`. S3 and §3 stop calling the arm the class gate on its
+  own row count, and §3 gains the hands-off to that unit.
 
 ## 10. Reuse audit
 

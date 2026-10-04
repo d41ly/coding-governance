@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-15 — the build harness commits the specs its writers authored before AUDIT pins them, and its commit-first refusals name a remedy a resume cannot replay
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-1 · base 5266d22e · streams tooling · order 10 · ratified 2026-10-04
+**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 5266d22e · streams tooling · order 10 · advances TOOL-aHoistedPass-35 · ratified 2026-10-04
 
 <!-- gen:spec-records -->
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-10-04-prompt-TOOL-aGraftedHelix-1-2-build-brief.md](../prompts/2026-10-04-prompt-TOOL-aGraftedHelix-1-2-build-brief.md) | journal | TOOL-aGraftedHelix-1 TOOL-aGraftedHelix-2 TOOL-aGraftedHelix-3 TOOL-aGraftedHelix-4 TOOL-aGraftedHelix-5 TOOL-aGraftedHelix-6 TOOL-aGraftedHelix-7 TOOL-aGraftedHelix-8 TOOL-aGraftedHelix-9 TOOL-aGraftedHelix-10 TOOL-aGraftedHelix-11 TOOL-aGraftedHelix-12 TOOL-aGraftedHelix-13 TOOL-aGraftedHelix-14 |
 | [2026-10-04-prompt-TOOL-aGraftedHelix-15-1-spec-brief.md](../prompts/2026-10-04-prompt-TOOL-aGraftedHelix-15-1-spec-brief.md) | journal | — |
+| [2026-10-04-review-TOOL-aGraftedHelix-10-spec-audit-round1.md](../reviews/2026-10-04-review-TOOL-aGraftedHelix-10-spec-audit-round1.md) | spec-audit | TOOL-aGraftedHelix-10 TOOL-aGraftedHelix-11 TOOL-aGraftedHelix-12 TOOL-aGraftedHelix-13 TOOL-aGraftedHelix-14 |
 
 <!-- /gen:spec-records -->
 
@@ -27,22 +28,26 @@ a build whose specs the harness authors.
 - **S1** — A commit stage: one agent, labelled `commit:specs:<slug>`, spawned after the SPEC fan
   returns and before the AUDIT phase. It runs whenever the writers report at least one `authored` id
   that `units` carries, and the caller supplied no `subjects`. It stages exactly the authored specs
-  plus what `gen_build_index.py --write` re-renders, and commits once with `Pass: none`. It returns
-  `committed`, `sha`, `why`, `specs` and `summary`. Observed by AC1 and AC3.
+  plus what `gen_build_index.py --write` re-renders, and commits once with `Pass: none`. After the
+  commit it runs the per-pass bug-class checklist over that commit. It returns `committed`, `sha`,
+  `why`, `specs`, `summary` and an optional `checklist`. Observed by AC1 and AC3.
 - **S2** — The stage's `specs` list writes each committed path into its unit's `specPath` for the
-  rest of the call, so the resolver's roster and the hand-out roster both carry it. Observed by AC2.
+  rest of the call, so the resolver's roster and the hand-out roster both carry it. Where the caller
+  supplied a different path, the committed one wins and a log line names both. Observed by AC2.
 - **S3** — A commit stage that returns nothing, returns `committed: false`, returns a `sha` that is
-  not 40 hex, or omits an authored id from `specs` refuses the call before the resolver spawns,
-  naming which. Observed by AC4.
+  not 40 hex, omits an authored id from `specs`, or names a path outside the build's spec folder
+  refuses the call before the resolver spawns, naming which. Observed by AC4.
 - **S4** — The resolver also returns `notAtHead`: each audit spec that exists in the working tree
   and has no blob at `HEAD`. Any entry refuses, naming the paths and the cause. An audit unit that
   reaches the resolver branch with no `specPath`, and that `specRefused` does not carry, refuses
-  before the resolver spawns. Observed by AC5.
+  before the resolver spawns, naming `--plan <slug> --paths` as the cause. An audit set whose every
+  unit `specRefused` carries refuses there too, naming those refusals. Observed by AC5.
 - **S5** — One remedy sentence, computed once from `specAudit` and `auditIds`, closes every refusal
   that asks for a commit. Those are S3's, S4's, the dirty-tree refusal, the empty-subject refusal and
-  the clean-round no-unit refusal. It names a fresh re-invoke without `resumeFromRunId` and, where
-  `subjects` is legal, a resume with `subjects` pinned from `git ls-tree HEAD`. The empty-subject
-  refusal also states its cause. Observed by AC6.
+  the clean-round no-unit refusal. It says to rebuild `units` from `--plan <slug> --paths` after
+  committing, then names a fresh re-invoke without `resumeFromRunId` and, where `subjects` is legal,
+  a resume with `subjects` pinned from `git ls-tree HEAD`. The empty-subject refusal also states its
+  cause. Observed by AC4 and AC6.
 - **S6** — Every statement of who commits agrees with S1. That is the writers' prompt, the header's
   author-never-commit paragraph, the SPEC-stage comment, the hand-out's `specPath` comment, the
   clean-round `owed` comment and `meta`. The header gains one paragraph on what the stage does not
@@ -55,6 +60,11 @@ a build whose specs the harness authors.
 - **S9** — The harness suite gains the arms §7 names, and its moved arms are repointed. NOT OBSERVED
   by a criterion here: the suite is a kit self-test the main loop runs once at the close, and a pass
   runs no suite (shared invariant 11).
+- **S10** — The commit stage's checklist output reaches whoever acts on it, because moving the spec
+  commit into the program moves the checklist BUILD-METHOD M6 owes after it. On the audit route it is
+  appended to the checklist the audit receives, beside the resolver's. On the audit-OFF route the
+  hand-out carries it with the stage's sha as `specCommit`, with the instruction to act on it before
+  the first dispatch. Observed by AC1.
 
 ## 3. Non-goals (OUT)
 
@@ -70,8 +80,12 @@ a build whose specs the harness authors.
 - **The deferred-platform re-run.** Its "re-run ONCE with identical args" reuses the review's results
   on disk by design and asks for no commit.
 - **A `closes` verb on `TOOL-aHoistedPass-35`**, the open ask on the roster's empty `specPath`. S2
-  answers it on every route where the commit stage runs. The roster this writer was handed carried no
-  `closes` list, so the claim is left to whoever plans that ask.
+  answers it on every route where the commit stage runs, which the header's `advances` verb records.
+  The roster this writer was handed carried no `closes` list, so the claim of closure is left to
+  whoever plans that ask.
+- **The re-stage after the generator, and an arm running the stage's git sequence for real.** The
+  commit S1 describes stages each spec before `gen_build_index.py --write` renders it, so the commit
+  holds the pre-render blob. That repair is `TOOL-aGraftedHelix-16`'s (§3 Edges).
 
 ### Edges
 
@@ -79,6 +93,10 @@ a build whose specs the harness authors.
   the optional `checklist` and `checklistPaths` fields it adds to `SUBJECTS_SCHEMA`, and its moves of
   both version lines. This unit edits the same prompt, schema and lines after it and keeps all three.
   Built before it, this unit's edits would be overwritten.
+- **hands-off** `TOOL-aGraftedHelix-16` — the commit stage's git steps: the re-stage of the authored
+  specs after `gen_build_index.py --write`, the post-commit `git status --porcelain` check that turns
+  a dirty spec into `committed: false`, and the real-git arm that runs the traced prompt's block
+  (finding 21 of the round-1 audit of units 10 to 15).
 
 ## 4. Design
 
@@ -130,17 +148,23 @@ const SPEC_COMMIT_SCHEMA = {
       items: { type: 'object', required: ['id', 'path'], properties: { id: { type: 'string' }, path: { type: 'string' } } },
     },
     summary: { type: 'string' },
+    checklist: { type: 'string' },
   },
 }
 ```
+
+`checklist` is optional, so a double that omits it still validates, and an empty string is carried
+as no checklist.
 
 `sha` carries no schema pattern, matching `UNIT_SCHEMA`. The script checks it, so a bad value
 refuses by name instead of failing validation into a null.
 
 **The prompt** opens with `GROUND` and orders these steps in this sequence:
 
-1. Find each id's spec: the file under `memory/builds/<slug>/spec/` whose status header carries the
-   id. Return them as `specs`, repo-relative and forward-slashed.
+1. Find each id's spec: the file under `memory/builds/<slug>/spec/` whose H1 line opens
+   `# <id> —`, which is the key `gen_build_index.py` reads the id from (`H1_RE`); its basename ends
+   `-spec-<id>.md`. The status header carries no id. Return them as `specs`, repo-relative and
+   forward-slashed.
 2. Record `git status --porcelain --untracked-files=all` in `repo` before anything is staged. Every
    path it lists other than those specs is FOREIGN, and is never staged by this stage.
 3. `git add -- <the spec paths>`, then `python {{MEMORY_TREE_DIR}}/gen_build_index.py --write`, then
@@ -154,11 +178,16 @@ refuses by name instead of failing validation into a null.
 5. A refusal from a hook, the generator or git returns `committed: false` with its first lines in
    `why`. Do not edit a spec to clear it, and do not retry around it.
 6. Return `sha` as the full 40-hex `git rev-parse HEAD`.
+7. Run the `CHECKLIST` command, `gotchas.py --for-diff HEAD~1..HEAD`, over the commit just made,
+   and return its stdout as `checklist`. It always exits 0; an empty selection returns an empty
+   string.
 
 `Pass: none` is the trailer the precedent spec commit `b3a5e2ecf` carries. `--check-commit` returns
-at a `none` trailer before it reads any declaration. `find_build_commit` in
-`tools/unattended/lib-unattended.sh` excludes a commit confined to the build folder, the generated
-indexes and the shared records, so `pass-order history` never selects this commit as a build commit.
+at a `none` trailer before it reads any declaration. Two filters keep this commit out of
+`pass-order history`'s build commits, in the order they fire. `read_attribution_tokens` in
+`tools/unattended/lib-unattended.sh` maps a `Pass: none` trailer to no unit token. Behind it,
+`build_commit` in the same file excludes a commit confined to the build folder, the generated
+indexes and the shared records, and that exclusion alone would also suffice.
 
 **Validation**, in the script, in this order, each a throw ending in the S5 remedy:
 
@@ -167,9 +196,16 @@ indexes and the shared records, so `pass-order history` never selects this commi
 | null | the stage, and that the authored specs are on disk and uncommitted |
 | `committed` is not `true` | the agent's `why`, quoted |
 | `sha` fails `/^[0-9a-f]{40}$/` | the `sha` field and its value |
-| an `authoredIds` member with no `specs` entry, or a path outside the build's spec folder | each such id |
+| an `authoredIds` member with no `specs` entry | each such id |
+| a `specs` path outside `memory/builds/<slug>/spec/` | each such id and its path |
 
 On success the stage logs `spec stage: committed <n> spec(s) at <sha>`.
+
+**The checklist (S10).** A non-empty `checklist` is appended, under a label naming the spec commit,
+to the checklist the audit receives, after the resolver's own. On the audit-OFF route the hand-out
+gains `specCommit: {sha, checklist}`, and the hand-out's instruction says to act on that checklist
+before the first `--dispatch`. M8's closing checklist over `<BASE>..HEAD` still runs; this one is the
+per-pass obligation M6 attaches to the spec pass.
 
 ### The path fill (S2)
 
@@ -183,7 +219,15 @@ point, so the resolver's roster and the hand-out roster read the fill.
 Before the resolver spawns, an audit unit with no `specPath` that `specRefused` does not carry
 refuses, naming the ids. After the fill, such a unit can only be one the writers counted
 `alreadyPresent` with no path from the caller. The resolver's prompt says to skip a unit with no
-path, so today it is audited by nobody and nothing says so.
+path, so today it is audited by nobody and nothing says so. The refusal names its cause: `units`
+was copied from `--plan <slug> --paths` while the spec was MISSING, which prints an empty path, so
+the caller re-reads that command now the spec is committed. This is the refusal a fresh re-invoke
+after an S3 refusal meets, because the writers then count the hand-committed spec `alreadyPresent`,
+no commit stage runs, and no fill happens.
+
+Also before the resolver spawns, an audit set whose every unit `specRefused` carries refuses, naming
+those refusals. Without it, live writers that refused every audit unit leave `liveWriters` above
+zero, the all-dead throw does not fire, and the resolver returns nothing to pin.
 
 The resolver prompt gains one instruction: a spec path that exists in the working tree and does not
 resolve at `HEAD` goes in `notAtHead` as `{path}`, and never in `subjects`. `SUBJECTS_SCHEMA` gains
@@ -195,12 +239,17 @@ refuses too. Auditing the resolved half and rostering the rest unaudited is the 
 `owed` filter already names on its own path.
 
 The empty-subject refusal keeps its first sentence, which operators grep. It gains the cause it can
-now state: every audit unit carried a path, none resolved at `HEAD` and none exists on disk, so the
-paths in `units` are wrong. It names `--plan <slug> --paths` and ends in the remedy.
+now state, over the audit units `specRefused` does not carry: each carried a path, none resolved at
+`HEAD` and none exists on disk, so the paths in `units` are wrong. It names `--plan <slug> --paths`
+and ends in the remedy.
 
 ### The remedy (S5)
 
 Computed once, after the args block, as `resumeRemedy`:
+
+Every form opens the same way: commit the specs, then rebuild `units` from
+`bash tools/unattended/unattended.sh --plan <slug> --paths`, so every unit carries its committed
+`specPath`. Then:
 
 | `specAudit` | `auditIds` | the remedy names |
 |---|---|---|
@@ -212,7 +261,10 @@ Each form ends with the reason. A resume replays every agent call whose prompt i
 stage's cached answer returns the same refusal however the tree has moved since. That is the Workflow
 runtime's documented resume contract: the longest unchanged prefix of agent calls returns cached
 results. `wf_7b67cf1d-995` is its observation here. A fresh call re-runs the writers, which count each
-committed spec `alreadyPresent`, so the commit stage does not run and the resolver reads `HEAD` live.
+committed spec `alreadyPresent`, so the commit stage does not run and nothing fills `specPath`. The
+rebuilt `units` is what carries the paths on that call, and the resolver then reads `HEAD` live. A
+resume with `subjects` skips the commit stage too, and the clean-round `owed` filter needs
+`u.specPath`, so the rebuild is owed on that route as well.
 
 The dirty-tree refusal keeps `Commit the fold` and loses `re-invoke with the same arguments`, which
 under a resume is the replay. The clean-round no-unit refusal and S3's and S4's refusals end the
@@ -251,6 +303,8 @@ same way. One constant serves every such site, so the sites cannot drift into tw
 | `resumeRemedy` | constant | the template, after the args block |
 | `authoredIds` | constant | the template, after the SPEC merge |
 | `notAtHead` | resolver return field | `SUBJECTS_SCHEMA` |
+| `checklist` | optional commit-stage return field | `SPEC_COMMIT_SCHEMA` |
+| `specCommit` | hand-out field, `{sha, checklist}` | the audit-OFF hand-out |
 | `commit:specs:<slug>` | agent label | the commit stage |
 
 No new named function, so no `.lexicon.conf` cell grades this unit. A helper the builder finds it
@@ -293,14 +347,16 @@ builds an arm of the fork. Three tests:
   this run.
 - **T2, fresh call.** The writers' prompt counts an existing spec `alreadyPresent`, and the
   `--plan <slug> --paths` verb prints an empty path for an untracked spec, as observed above. A fresh
-  call re-runs every writer, which finds each spec present.
-- **T3, `pass-order history`.** `find_build_commit` excludes a spec commit, and every candidate puts
-  the spec commit before any roster hand-out. T3 discriminates none of them. It is recorded so the
-  next build does not re-run it.
+  call re-runs every writer, which finds each spec present, so no candidate's own stage fills
+  `specPath` on that call. A candidate passes T2 only where its refusal sends the caller to re-read
+  `--plan <slug> --paths` after committing, so the units the fresh call carries hold their paths.
+- **T3, `pass-order history`.** `read_attribution_tokens` drops a `Pass: none` spec commit first and
+  `build_commit` excludes it behind that, and every candidate puts the spec commit before any roster
+  hand-out. T3 discriminates none of them. It is recorded so the next build does not re-run it.
 
 | candidate | T1 | T2 | one call | verdict |
 |---|---|---|---|---|
-| (a) a commit stage after the writers | passes | passes | yes | taken |
+| (a) a commit stage after the writers | passes | passes, with the remedy's `--plan` re-read | yes | taken |
 | (b) the resolver reports `notAtHead` and the harness refuses | fails | passes | no | kept as S4 and S5 |
 | (c) the SPEC stage returns early with a commit instruction | fails | passes | no | rejected |
 | (d) pin at `git hash-object -w` blobs, commit later | passes | passes | yes | rejected |
@@ -308,7 +364,8 @@ builds an arm of the fork. Three tests:
 
 (a) passes T1 because its first call needs no re-invoke for this cause, and a resume after a later
 failure replays a commit history already holds. Its own failure path does replay, which is why it
-carries (b)'s refusal and the S5 remedy.
+carries (b)'s refusal and the S5 remedy. Its T2 pass rests on that remedy naming the `--plan`
+re-read: rev-1 credited the resolver's live read of `HEAD`, which a pathless unit never reaches.
 
 (b) alone fails T1 as a route: the resolver's cached answer replays. Its refusal does name the two
 routes that pass. It loses on the mechanism the README roster states for this unit, because every
@@ -351,7 +408,8 @@ resolver would still meet uncommitted specs on the first call.
 - testing — The arms §7 names, each observed red on its staged break at the close. The pass observes
   the program through the stub-hook probe of §6.
 - migration — None. Callers keep their arguments, and an audit-OFF caller that commits after the
-  call finds nothing to commit.
+  call finds nothing to commit. That caller now reads the spec pass's checklist from the hand-out's
+  `specCommit` instead of running it after its own commit.
 - user docs — `tools/workflows/README.md`, per S6.
 
 ## 6. Acceptance criteria
@@ -365,41 +423,59 @@ Each staged break is made in a scratch COPY of the render and observed once.
   `specPath`, with a commit double returning `committed: true`, a 40-hex `sha` and that id's path,
   the trace holds exactly one `agent:commit:specs:tB` line. It sits after the last `agent:spec:` line
   and before `agent:audit:subjects`. Its traced prompt names `gen_build_index.py --write`, the
-  trailer `Pass: none` and `A-tB-1`, and orders every path listed before staging left unstaged as
-  the literal `FOREIGN`. The log carries `spec stage: committed 1 spec(s) at` with the sha.
-  With `specAudit` absent the stage still runs once and the roster is handed out.
-  Red when: the stage is missing or runs after the resolver. Staged: the stage's `agent(` call
-  deleted in the copy leaves no `agent:commit:` line in the trace.
+  trailer `Pass: none`, `A-tB-1`, the H1 line as the locator, and `gotchas.py --for-diff HEAD~1..HEAD`,
+  and orders every path listed before staging left unstaged as the literal `FOREIGN`. The log
+  carries `spec stage: committed 1 spec(s) at` with the sha. With the commit double returning a
+  `checklist` string, the traced audit call's `checklist` argument carries that string after the
+  resolver's. With `specAudit` absent the stage still runs once, the roster is handed out, and the
+  hand-out's `specCommit` carries the sha and that string.
+  Red when: the stage is missing or runs after the resolver, or its checklist reaches nobody. Staged:
+  the stage's `agent(` call deleted in the copy leaves no `agent:commit:` line in the trace.
   cost: an end-to-end call through the Workflow runtime cannot run inside a pass, because a sidechain
   holds no `Workflow` tool. The next harnessed build with a MISSING spec and a declared audit is that
   observation.
   permission: the permanent arms are the harness suite's, which only the main loop runs, once.
 - **AC2** — When AC1's probe reaches the resolver, its traced prompt names the committed path for
-  `A-tB-1`, and the hand-out's `roster` entry for `A-tB-1` carries that path as `specPath`.
-  Red when: the path is not written back. Staged: the fill loop deleted in the copy leaves the
-  resolver prompt showing `(to be authored under` for `A-tB-1`.
+  `A-tB-1`, and the hand-out's `roster` entry for `A-tB-1` carries that path as `specPath`. Run
+  again with the unit carrying a caller-supplied spec path that differs from the committed one, the
+  resolver prompt and the roster carry the committed path, and one log line names both paths.
+  Red when: the path is not written back, or the caller's path wins. Staged: the fill loop deleted in
+  the copy leaves the resolver prompt showing `(to be authored under` for `A-tB-1`.
 - **AC3** — When the SPEC double authors nothing, the trace holds no `agent:commit:` line. When the
   call carries caller `subjects` beside an authored id, the trace holds none either, and the log names
-  the authored id as left uncommitted.
+  the authored id as left to the caller.
   Red when: the stage runs with nothing to commit, or beside caller `subjects`, where a resume would
   replay a cached failure.
 - **AC4** — When the commit double returns null, then `committed: false` with a `why`, then a 7-hex
-  `sha`, then `specs` lacking `A-tB-1`, each run ends in `THROW`. The messages name, in turn, the
-  stage, the `why` text, `sha`, and `A-tB-1`. Each carries `resumeFromRunId`, and no trace holds an
-  `agent:audit:subjects` or a `workflow:` line.
-  Red when: any of the four reaches the resolver.
+  `sha`, then `specs` lacking `A-tB-1`, then `specs` naming `A-tB-1` at a path under another build's
+  spec folder, each run ends in `THROW`. The messages name, in turn, the stage, the `why` text, `sha`,
+  `A-tB-1`, and `A-tB-1` with its path. Each carries `resumeFromRunId` and `--plan`, and no trace
+  holds an `agent:audit:subjects` or a `workflow:` line. The null run repeated with `specAudit` absent
+  names a re-invoke without `resumeFromRunId` and carries no `git ls-tree`.
+  Red when: any of the five reaches the resolver, or the audit-OFF remedy offers a resume.
 - **AC5** — When the resolver double returns no subjects and a `notAtHead` naming one path, the run
   ends in `THROW` naming that path and `not at HEAD`. Its remedy names a re-invoke without
   `resumeFromRunId` and carries `git ls-tree HEAD`. The same double under `auditIds` says `subjects`
   cannot stand beside `auditIds`, and carries no `git ls-tree`. One resolved subject beside one
   `notAtHead` path also ends in `THROW`, with no `workflow:` line. A unit carrying no `specPath`
-  that no writer refused ends in `THROW` before any `agent:audit:subjects` line.
-  Red when: `notAtHead` is read as an empty set. Staged: the `notAtHead` branch deleted in the copy
-  lets the run reach `no spec subjects could be pinned` without naming the path.
+  that no writer refused ends in `THROW` before any `agent:audit:subjects` line, naming
+  `--plan <slug> --paths`; that is also the end of a fresh call over a pathless unit whose spec the
+  writers count `alreadyPresent`. A call whose writers refused every audit unit ends in `THROW`
+  naming those refusals, before any `agent:audit:subjects` line. The traced `agent:audit:subjects`
+  prompt names `notAtHead` and the instruction that a path existing in the working tree and not
+  resolving at `HEAD` goes there.
+  Red when: `notAtHead` is read as an empty set, or the instruction a real resolver needs is missing.
+  Staged: the `notAtHead` branch deleted in the copy lets the run reach
+  `no spec subjects could be pinned` without naming the path; the instruction deleted in the copy
+  reds the prompt check.
 - **AC6** — When the resolver double returns no subjects and no `notAtHead`, the `THROW` keeps
   `no spec subjects could be pinned` and adds `--plan` and `resumeFromRunId`. A resolver double whose
-  `tree` differs from its `blob` ends in `THROW` carrying `Commit the fold` and `resumeFromRunId`.
-  `grep -c "re-invoke with the same arguments" tools/workflows/unattended-build.js` prints `0`.
+  `tree` differs from its `blob` ends in `THROW` carrying `Commit the fold` and `resumeFromRunId`. A
+  clean-round double with no owed unit ends in the clean-round `THROW`, which carries
+  `resumeFromRunId` and `--plan`, and under `auditIds` carries no `git ls-tree`; a call carrying
+  caller `subjects` over units with no `specPath` reaches the same `THROW`.
+  `grep -c "re-invoke with the same arguments" tools/workflows/unattended-build.js` prints `0`, and
+  so does `grep -c "Commit the authored specs and re-invoke" tools/workflows/unattended-build.js`.
   Red when: a refusal that asks for a commit names a re-invoke a resume replays.
 - **AC7** — When the probe traces the writers' prompt, it carries
   `one committer commits once after all of you return` and not
@@ -407,9 +483,12 @@ Each staged break is made in a scratch COPY of the render and observed once.
   `grep -n "THE SPEC COMMIT (TOOL-aGraftedHelix-15)" tools/workflows/unattended-build.js`.
   `grep -c "names four install paths" tools/workflows/README.md` prints `0`, and
   `grep -n "gen_build_index" tools/workflows/README.md` prints the install-path sentence.
-  Red when: the writers or the README still give the old answer beside the new one.
-- **AC8** — When the template is re-rendered by the workflows kit's renderer in its `--render` mode,
-  a second render leaves `git status --porcelain tools/workflows/` unchanged.
+  `grep -c "the caller commits" tools/workflows/unattended-build.js` prints `0`. The hand-out's
+  `specPath` comment names the commit stage, and `meta`'s `description` names the commit.
+  Red when: the writers, a comment, `meta` or the README still give the old answer beside the new
+  one.
+- **AC8** — When the workflows kit's renderer runs ONCE in its `--render` mode at the pass's commit,
+  `git status --porcelain tools/workflows/` prints nothing.
   `node tools/workflows/check-workflow-syntax.js` reports every script parsed clean. A `Workflow`
   tool-call JSON naming the rendered harness as its `scriptPath`, piped into
   `node tools/hooks/agent-cap.js`, exits 0.
@@ -426,13 +505,13 @@ Each staged break is made in a scratch COPY of the render and observed once.
 
 `unattended-build self-test` · `tier2-review self-test` · `verifier fan-out self-test` · `review-join self-test` · `workflow script syntax` · `review-protocol parity (kit vs dogfood)` · `kit version markers` · `kit epoch (shipped bytes move, the version moves)` · `method carriers (every pointer declared)` · `pass-order history` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
-New arm: tools/workflows/unattended-build.test.sh · the commit stage's placement, prompt and log over a SPEC double authoring a pathless unit, with the audit declared and absent; stage the stage call deleted · the suite's floor rises by the arms added
+New arm: tools/workflows/unattended-build.test.sh · the commit stage's placement, prompt, log and checklist routing over a SPEC double authoring a pathless unit, with the audit declared and absent; stage the stage call deleted · the suite's floor rises by the arms added
 
-New arm: tools/workflows/unattended-build.test.sh · the path fill into the resolver prompt and the roster; stage the fill deleted · the suite's floor rises by the arms added
+New arm: tools/workflows/unattended-build.test.sh · the path fill into the resolver prompt and the roster, with and without a differing caller path; stage the fill deleted · the suite's floor rises by the arms added
 
-New arm: tools/workflows/unattended-build.test.sh · the four commit-stage refusals and the two skips · the suite's floor rises by the arms added
+New arm: tools/workflows/unattended-build.test.sh · the five commit-stage refusals, the outside-folder path among them, and the two skips, with the audit declared and absent · the suite's floor rises by the arms added
 
-New arm: tools/workflows/unattended-build.test.sh · the notAtHead, partial, pathless and empty refusals with and without auditIds, and the remedy at the dirty-tree refusal; stage the notAtHead branch deleted · the suite's floor rises by the arms added
+New arm: tools/workflows/unattended-build.test.sh · the notAtHead, partial, pathless, all-refused and empty refusals with and without auditIds, the resolver prompt's notAtHead instruction, the clean-round no-unit refusal with and without caller subjects, and the remedy at the dirty-tree refusal; stage the notAtHead branch deleted, then the instruction · the suite's floor rises by the arms added
 
 Moved arms, in the same suite. The writers' "the caller commits once after them" arm is repointed at
 the new sentence. Every arm that reaches the resolver or the audit-OFF hand-out without caller
@@ -468,6 +547,17 @@ The close runs the legs and the suite. A pass runs the probe and the commands of
 
 - rev-1 · 2026-10-04 · initial draft, adopted mid-run from the harness's first-call audit trap on
   `wf_7b67cf1d-995`.
+- rev-2 · 2026-10-04 · §3 §4 §6 §7 §10 · S1 S2 S3 S4 S5 S10 · AC1 AC2 AC3 AC4 AC5 AC6 AC7 AC8 ·
+  folded the round-1 spec audit of units 10 to 15 on this unit: 15 and 17 (the remedy rebuilds
+  `units` from `--plan <slug> --paths`, the pathless refusal names that cause, T2's verdict for (a)
+  rests on the remedy, AC3's log says left to the caller, AC5 and AC6 drive both routes); 9 and 18
+  (AC4 runs the audit-OFF remedy, AC6 drives the clean-round no-unit refusal); 7 (AC5 reads the
+  resolver prompt's `notAtHead` instruction); 6 (AC8 renders once and reads porcelain); 8 and 20
+  (S3 and a fifth AC4 run refuse an outside-folder path); 10 (AC2's caller-path case); 27 (step 1
+  locates by the H1 line); 35 (step 7 and S10 carry the per-pass checklist); 19 (the all-refused
+  refusal, and the empty-subject cause over unrefused units); 11 (AC7's carriers); 30 and 37
+  (`build_commit` and `read_attribution_tokens` replace a dead name); and 36 (the header's
+  `advances` verb). §3 gains the hands-off to the unit promoted from finding 21.
 
 ## 10. Reuse audit
 
@@ -479,9 +569,11 @@ hash journal lines and commit nothing. So no existing seam fits through the prob
 unit extends were found by reading the harness. They are the unit child's commit contract in
 `tools/workflows/unattended-unit.js`, its `UNIT_SCHEMA` and its `Pass:` trailer rule, copied because
 workflow scripts cannot import. They are the resolver and its dirty-tree refusal in
-`tools/workflows/unattended-build.template.js`. And they are `find_build_commit` in
-`tools/unattended/lib-unattended.sh`, whose exclusion is why a spec commit is never graded as a
-build commit.
+`tools/workflows/unattended-build.template.js`. And they are `read_attribution_tokens` and
+`build_commit` in `tools/unattended/lib-unattended.sh`: the first drops a `Pass: none` commit's unit
+tokens, and the second's path exclusion would keep a spec commit out of the build commits on its own.
+Rev-1 cited the second under a name no file defines, which survives only as a historical spelling
+in a comment.
 
 The recall question was "why does the build harness spec stage not commit, and how does the audit
 resolver pin spec subjects". It returned `TOOL-aStagedLane-3`, whose author-never-commit rule is about N writers on
