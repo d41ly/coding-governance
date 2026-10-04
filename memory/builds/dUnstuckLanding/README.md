@@ -91,12 +91,12 @@ ids TOOL-dUnstuckLanding-25 TOOL-dUnstuckLanding-26
 | [TOOL-dUnstuckLanding-18 — the close-decision table, and a build that lands with its rest carried forward](spec/2026-10-04-spec-TOOL-dUnstuckLanding-18.md) | 6 | 2 | INPROGRESS | rev-1 | 2026-10-04 |
 | [TOOL-dUnstuckLanding-19 — refresh before a verdict: one helper, the `refreshed-at` fact](spec/2026-10-04-spec-TOOL-dUnstuckLanding-19.md) | 7 | 2 | INPROGRESS | rev-1 | 2026-10-04 |
 | [TOOL-dUnstuckLanding-20 — `LANDING_NODES`: landing capability declared, resolved from machine and user, and a planned hand-off](spec/2026-10-04-spec-TOOL-dUnstuckLanding-20.md) | 8 | 2 | INPROGRESS | rev-1 | 2026-10-04 |
-| [TOOL-dUnstuckLanding-25 — restore the two dMendedRecall units a merge resolution dropped](spec/2026-10-04-spec-TOOL-dUnstuckLanding-25.md) | — | 2 | INPROGRESS | rev-1 | 2026-10-04 |
+| [TOOL-dUnstuckLanding-25 — restore the two dMendedRecall units a merge resolution dropped](spec/2026-10-04-spec-TOOL-dUnstuckLanding-25.md) | — | 2 | CLOSED | rev-1 | 2026-10-04 |
 <!-- /gen:build-units -->
 
-Records: 17 bound to this build, across 4 record folder(s).
+Records: 18 bound to this build, across 4 record folder(s).
 
-Ids no record names: TOOL-dUnstuckLanding-25.
+Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: TOOL-dUnstuckLanding-1 TOOL-dUnstuckLanding-12 TOOL-dUnstuckLanding-13 TOOL-dUnstuckLanding-14 TOOL-dUnstuckLanding-15 TOOL-dUnstuckLanding-16 TOOL-dUnstuckLanding-17 TOOL-dUnstuckLanding-18 TOOL-dUnstuckLanding-19 TOOL-dUnstuckLanding-2
 TOOL-dUnstuckLanding-20 TOOL-dUnstuckLanding-25.

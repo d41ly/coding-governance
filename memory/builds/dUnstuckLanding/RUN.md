@@ -98,3 +98,7 @@ base: 0c16a66b53c9fd809ca198b612a23c62132edcc0
 2026-10-04T12:37:31Z dispatch · item 1fa5ba1f TOOL-dUnstuckLanding-16 · reason tools/unattended/README.md
 
 2026-10-04T12:40:53Z rescope · item add TOOL-dUnstuckLanding-25 · reason discovery adopted (protocol section 11), found by unit 16: merge 01c22e15 (aRepatriatedFork taking origin/main) resolved its unattended.sh and VERBS.template.md conflicts to one side and dropped TOOL-dMendedRecall-2's write_ask_views (108 of 129 lines) and TOOL-dMendedRecall-3's --status entry (29 lines); both are on origin/main reverted, their arms fail, and this build's close runs those self-tests
+
+2026-10-04T12:46:18Z dispatch · item c99236c2 TOOL-dUnstuckLanding-25 · reason tools/unattended/unattended.sh tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md memory/builds/dUnstuckLanding/spec/2026-10-04-spec-TOOL-dUnstuckLanding-25.md memory/builds/dUnstuckLanding/build/2026-10-04-build-TOOL-dUnstuckLanding-25-1-acceptance-ledger.md
+
+2026-10-04T12:46:22Z brief · item TOOL-dUnstuckLanding-25 · reason cd089f69a73f memory/builds/dUnstuckLanding/prompts/2026-10-04-prompt-TOOL-dUnstuckLanding-13-build-brief.md

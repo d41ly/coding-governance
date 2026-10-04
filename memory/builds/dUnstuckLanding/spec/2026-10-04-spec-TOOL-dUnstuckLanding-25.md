@@ -1,10 +1,12 @@
 # TOOL-dUnstuckLanding-25 — restore the two dMendedRecall units a merge resolution dropped
 
-**Status:** INPROGRESS · rev-1 · 2026-10-04 · node d · Tier-2 · base 98926870 · streams tooling
+**Status:** CLOSED · rev-1 · 2026-10-04 · node d · Tier-2 · base 98926870 · streams tooling
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-04-build-TOOL-dUnstuckLanding-25-1-acceptance-ledger.md](../build/2026-10-04-build-TOOL-dUnstuckLanding-25-1-acceptance-ledger.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
