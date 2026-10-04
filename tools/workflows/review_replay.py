@@ -40,7 +40,6 @@ Exit: 0 scored run or listed corpus · 1 red self-test · 2 any refusal or argum
 import argparse
 import contextlib
 import io
-import os
 import pathlib
 import re
 import subprocess
@@ -405,10 +404,6 @@ def run_selftest():
             why = f"raised {exc!r}"
         print(f"ok {name}" if why is None else f"FAIL {name}: {why}")
         passed += why is None
-        # FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
-        if os.environ.get("FOREIGN_PREFIX_PROBE") == "1":
-            print("foreign-prefix-probe: stopped after 1 arm")
-            return 0 if passed == ran else 1
     print(f"selftest: {passed}/{ARMS_DECLARED} arms")
     if ran != ARMS_DECLARED:
         print(f"FAIL selftest: {ran} arm(s) ran against {ARMS_DECLARED} declared")

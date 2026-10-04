@@ -24,7 +24,7 @@
 #   Exit 0 = adopted / wired · 1 = unwired or refused · 2 = wrong invocation or not a repo.
 set -u
 
-KIT_PROCESS_MONITOR_VERSION="0.12"   # gov:kit process-monitor@0.13 — the deployer's read (kit.toml version_from)
+KIT_PROCESS_MONITOR_VERSION="0.13"   # gov:kit process-monitor@0.13 — the deployer's read (kit.toml version_from)
 
 # >>> resolve_python — canonical copy: resolve-python.sh in gov's lib dir (byte-identical; gated)
 resolve_python() {
