@@ -1382,9 +1382,9 @@ def build_lexicon_marginal_offense_rate(ctx) -> dict:
 # ahead of today's count becomes a scheduled refusal: the day the count crosses it every merge reds
 # until someone raises the pin or closes rows, which is the refusal this signal exists to make
 # unnecessary. `shrink_only_lists_not_shrinking` runs the same way for the same reason. If a later
-# unit gates this, it must pin a MEASURED value with a movement rule AND declare that pin in the
-# shipped conf template — a signal absent from an adopter's PINS falls back to tolerance 0, so a
-# gateable version would red their first run on one open row.
+# unit gates this, it must pin a MEASURED value with a movement rule AND give the record a numeric
+# tolerance — a gateable record with a None one trips the engine's assertion in `main` — AND declare
+# that pin in the shipped conf template.
 #
 # PINLESS since TOOL-aMendedFleet-51: `tolerance` is None and the status column prints `report only,
 # no pin`. Under `BACKLOG_MODE="builds"` the reading is every live ask, which rises with every ask

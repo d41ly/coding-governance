@@ -113,8 +113,8 @@ A report-only signal with no pin by design prints `report only, no pin` in the s
 `over pin 0`: it has nothing to be over, so the column states that rather than raising a red-looking
 word nobody acts on. Its `--json` record carries `null` for both `tolerance` and `pin`. A project
 that wants a threshold for one declares it in its `PINS`, and the column then compares against it.
-`lexicon_marginal_offense_rate` and `live_backlog_rows_per_shard` are the pinless ones; a gateable
-signal never is.
+Which signals are pinless is the status column's to say, not this paragraph's; a gateable signal
+never is.
 
 | Signal | Asks | Gateable |
 |---|---|---|
