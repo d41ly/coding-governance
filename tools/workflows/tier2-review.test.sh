@@ -1176,6 +1176,14 @@ async function runLedgerArms() {
   // complete path alone, and ABSENT on the other five, since no adjudicated count exists there.
   let regradedSeen = 0
   const regradedWrong = []
+  // TOOL-aMendedFleet-18 - each exit's `shape` matches the S1 grammar at the stage its path reaches,
+  // is logged, and reads `out-tokens=unknown` because the stub runtime's `budget` has no `spent`.
+  const SHAPE_RE = /^review-shape kind=(diff-review|spec-audit) round=\d+ intensity=(full|light) at=(find|verify|synth) raw=(\d+|-) confirmed=(\d+|-) refuted=(\d+|-) unverified=(\d+|-) blocker=(\d+|-) high=(\d+|-) medium=(\d+|-) low=(\d+|-) agents=\d+ out-tokens=unknown$/
+  const shapeStage = { 'every lens dead': 'find', 'no finding raised': 'find', 'every finding refuted': 'verify',
+    'one skeptic batch dead': 'verify', 'the synthesis dead': 'synth', complete: 'synth' }
+  let shapeSeen = 0
+  const shapeWrong = []
+  let synthPromptShape = false
   for (const [what, stubs, ctype, extra] of paths) {
     r = await runReview(DIFF, stubs)
     if (!checkNoThrow(r, 'ledger exit ' + what)) continue
@@ -1183,9 +1191,20 @@ async function runLedgerArms() {
     ck(fieldsOk(r) && typed && extra(r.result), 'ledger: every exit path carries the ledger: ' + what)
     regradedSeen++
     if (what === 'complete' ? !Array.isArray(r.result.regraded) : 'regraded' in r.result) regradedWrong.push(what)
+    shapeSeen++
+    const sh = typeof r.result.shape === 'string' ? r.result.shape : ''
+    if (!SHAPE_RE.test(sh) || sh.indexOf(' at=' + shapeStage[what] + ' ') === -1 || r.logs.indexOf(sh) === -1) shapeWrong.push(what)
+    if (what === 'complete') {
+      const sp = r.trace.find((t) => t.label === 'synth')
+      synthPromptShape = !!sp && sh.length > 0 && sp.prompt.indexOf('<<<SHAPE\n' + sh + '\nSHAPE>>>') !== -1 &&
+        sh.indexOf(' raw=5 confirmed=5 refuted=0 unverified=0 ') !== -1 && sh.indexOf(' agents=11 ') !== -1
+    }
   }
   ck(regradedSeen === 6 && regradedWrong.length === 0,
     'severity: regraded is returned only where a synthesis ran, over the six exit paths' + (regradedWrong.length ? ' — wrong on: ' + regradedWrong.join(', ') : ''))
+  ck(shapeSeen === 6 && shapeWrong.length === 0,
+    'shape: every exit returns and logs a review-shape line at the stage it reached, out-tokens unknown under the stub' + (shapeWrong.length ? ' — wrong on: ' + shapeWrong.join(', ') : ''))
+  ck(synthPromptShape, 'shape: the synthesis is handed the at=synth line the complete return carries, with the run\'s counts')
 }
 
 runWholeScriptArms().then(() => {
@@ -1242,7 +1261,9 @@ printf '%s\n' "$out"
 # apart from no verdict (1) and an all-uncertain note (1).
 # RAISED 180 -> 181 by TOOL-aMendedFleet-17: 1 assertion, the ledger's `classes` and the appendix's
 # ninth column over labelled, out-of-range and unlabelled claims (1).
-FLOOR_ASSERTIONS=181
+# RAISED 181 -> 183 by TOOL-aMendedFleet-18: 2 assertions, counted off the block — every exit's
+# review-shape line at its stage (1) and the synthesis prompt carrying the complete return's line (1).
+FLOOR_ASSERTIONS=183
 executed=$(printf '%s\n' "$out" | sed -n 's/^---- \([0-9][0-9]*\) passed.*/\1/p' | tail -1)
 if [ -z "$executed" ]; then
   echo "FAIL the runner printed no assertion count at all — it died before its summary line"

@@ -5303,6 +5303,16 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "readOutputTokens",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "readOutputTokens",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
+    },
+    {
       "id": "readPaths",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
@@ -6603,6 +6613,16 @@
       "file": "tools/workflows/unattended-build.template.js"
     },
     {
+      "id": "renderShapeLine",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "renderShapeLine",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
+    },
+    {
       "id": "renderShippedBlanks",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
@@ -6616,6 +6636,16 @@
       "id": "renderShippedView",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
+    },
+    {
+      "id": "renderStageShape",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "renderStageShape",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
     },
     {
       "id": "renderStrippedLine",

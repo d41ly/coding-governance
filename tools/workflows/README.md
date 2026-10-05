@@ -204,7 +204,20 @@ trust boundary is not one to review light: the `security` lens is one of the two
 
 Every finding carries `lens`, the key of the lens the harness dispatched, never the label the agent
 echoed back, and every finding line in a skeptic prompt, the synthesis prompt and the run log names
-it as `lens=<key>`. Every return carries three fields beside the counts:
+it as `lens=<key>`. Every return carries four fields beside the counts:
+
+- `shape` — one record line, also logged, in this fixed grammar:
+  `review-shape kind=<diff-review|spec-audit> round=<n> intensity=<full|light> at=<find|verify|synth> raw=<n|-> confirmed=<n|-> refuted=<n|-> unverified=<n|-> blocker=<n|-> high=<n|-> medium=<n|-> low=<n|-> agents=<n> out-tokens=<n|unknown>`.
+  `at` is the stage the exit reached; a count that stage has not produced is `-`, never `0`, and the
+  every-lens-dead exit prints `raw=-`. The four severities count RAW confirmed findings by binding
+  grade, not the synthesis's adjudicated items, which stay in `blockers` and `highs`. `agents` is the
+  final return's formula through the stage reached. `out-tokens` is a `budget.spent()` DELTA from just
+  before the first agent: the counter is a pool shared by the main loop and every workflow in the
+  turn, so spend elsewhere during the run inflates it, and `unknown` means no `budget` was readable.
+  The `at=synth` line is rendered before the synthesis agent runs, so its out-tokens EXCLUDE the
+  synthesis agent's own spend. The synthesis is told to copy it verbatim, alone on its line,
+  immediately above the appendix heading, and the final return carries the same string, so the
+  record's copy can be compared to it.
 
 - `ledger` — one entry per finding in id order: `id`, `lens`, `ref`, `severity` (the finder's),
   `skepticSeverity`, `verdict` (`confirmed`, `refuted`, `uncertain`, or `unverified` when no verdict

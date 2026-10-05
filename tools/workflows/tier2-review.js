@@ -70,6 +70,23 @@ function buildKeyedSchema(schema, extra) {
   }
 }
 
+// --- TOOL-aMendedFleet-18 — the REVIEW-SHAPE line, one byte-stable record line per exit ----------
+// Pure, so a `node` slice evaluates it alone. A count the run has not produced at that stage arrives
+// null or absent and prints `-`, never `0`: a zero is a result and an absence is not. `key=value`
+// fields and no head from the chat micro-format set, because this is a RECORD line.
+function renderShapeLine(fields) {
+  return `review-shape kind=${fields.kind} round=${fields.round} intensity=${fields.intensity} at=${fields.at} ` +
+    ['raw', 'confirmed', 'refuted', 'unverified', 'blocker', 'high', 'medium', 'low']
+      .map((k) => `${k}=${fields[k] === null || fields[k] === undefined ? '-' : fields[k]}`).join(' ') +
+    ` agents=${fields.agents} out-tokens=${fields.outTokens === null || fields.outTokens === undefined ? 'unknown' : fields.outTokens}`
+}
+// The runtime's `budget.spent()` is the OUTPUT tokens spent this turn across the main loop and every
+// workflow, a shared pool, so only a delta isolates a run. Read through a `typeof` guard: the harness's
+// own suite and a `node` slice have no `budget`, and an absent counter is `null`, never a number.
+function readOutputTokens() {
+  return typeof budget === 'object' && budget !== null && typeof budget.spent === 'function' ? budget.spent() : null
+}
+
 // --- inputs (via Workflow `args`) ---------------------------------------
 // { base: "<immutable SHA>", head: "HEAD", repo: "/path/to/worktree",
 //   context: "what this diff does + the security model + what's by-design",
@@ -618,6 +635,15 @@ const specSubject = isSpec
 function deriveReviewKey(b, h) {
   return `${kind}-r${round}-${isSpec ? specSubject : deriveSubjectPair(b, h)}-${inputPrint}`
 }
+// TOOL-aMendedFleet-18 S2/S3 - the token counter is read ONCE before the first agent, and a stage's
+// line is the delta to its own read. `agents` follows the final return's formula through the stage
+// reached (spec rev-3): finders at find, plus skeptic batches at verify, plus the synthesis at synth.
+const tokensAtStart = readOutputTokens()
+function renderStageShape(at, counts, agents) {
+  const now = readOutputTokens()
+  return renderShapeLine(Object.assign({ kind: kind, round: round, intensity: intensity, at: at, agents: agents,
+    outTokens: tokensAtStart === null || now === null ? null : now - tokensAtStart }, counts))
+}
 phase('Resume')
 const probe = await agent(
   `You are the RESUME PROBE of a Tier-2 review. You read files and report them. You judge nothing, ` +
@@ -820,7 +846,11 @@ const allFindings = finderResults
 // ---- cannot repair an adjudication, so that path keeps the refusal its callers already make.
 if (lensesDead === lensesRunning) {
   log(`UNVERIFIED — all ${lensesRunning} lenses failed to return. Nothing was reviewed. Deferred: re-run with identical args.`)
+  // TOOL-aMendedFleet-18 S3 - no lens returned, so even `raw` was never produced (spec rev-3).
+  const shapeLine = renderStageShape('find', {}, lensesRunning)
+  log(shapeLine)
   return {
+    shape: shapeLine,
     // TOOL-dTieredTribunal-1 S3 - null, never 0. No synthesis ran, so there is no adjudicated count.
     exit: 'deferred-platform', key: reviewKey, pending: deadLensLabels,
     confirmed: [], report: null, root: repo, blockers: null, highs: null, lensesRun: 0, lensesDead,
@@ -839,8 +869,11 @@ if (allFindings.length === 0) {
     ? `DEFERRED: ${lensesDead}/${lensesRunning} lenses died and the survivors found nothing — re-run with identical args to dispatch only ${deadLensLabels.join(', ')}`
     : 'clean: 0 findings'
   log(note)
+  const shapeLine = renderStageShape('find', { raw: 0 }, lensesRunning)
+  log(shapeLine)
   // TOOL-dTieredTribunal-1 S3 - null, never 0: no synthesis ran on this path either.
   return {
+    shape: shapeLine,
     exit: deferred ? 'deferred-platform' : 'complete', key: reviewKey, pending: deadLensLabels,
     confirmed: [], report: null, root: repo, blockers: null, highs: null, lensesRun: liveResults.length, lensesDead,
     lensesReused: reusedLens.size, note, round, priorFindings: priorFindings.length, intensity, skippedLenses,
@@ -1092,6 +1125,14 @@ function renderAppendix(rows) {
     .join('\n')
 }
 const appendix = renderAppendix(ledger)
+// TOOL-aMendedFleet-18 S1 - every count the verify stage produced, the four severities over RAW
+// confirmed findings by binding grade; a grade outside the closed four is counted in none.
+const verifiedCounts = { raw: allFindings.length, confirmed: confirmed.length, refuted: refuted.length,
+  unverified: unverified.length, blocker: 0, high: 0, medium: 0, low: 0 }
+for (const f of confirmed) {
+  const g = deriveBindingSeverity(f)
+  if (SEVERITIES.indexOf(g) !== -1) verifiedCounts[g]++
+}
 
 // U6/S7: the run that most needs a written report is the one where findings were raised and nothing
 // came back to judge them. The old `judged === 0` early return returned WITHOUT a report in exactly
@@ -1105,7 +1146,10 @@ if (confirmed.length + unverified.length === 0) {
   // A REFUTATION OVER A PARTIAL FAN DEFERS. It used to return `… treat as partial` beside a null
   // count, which a caller had to parse prose to tell from the clean result on the line below it.
   const deferred = pendingLabels.length > 0
+  const shapeLine = renderStageShape('verify', verifiedCounts, lensesRunning + batches.length)
+  log(shapeLine)
   return {
+    shape: shapeLine,
     exit: deferred ? 'deferred-platform' : 'complete', key: reviewKey, pending: pendingLabels,
     // TOOL-dTieredTribunal-1 S3 - null, never 0. Every finding was refuted, which is a RESULT, but
     // no synthesis pass ran to adjudicate a blocker count, so there is none to report.
@@ -1132,7 +1176,10 @@ if (pendingLabels.length) {
     `The ${confirmed.length} confirmed and ${unverified.length} unverified finding(s) so far:`)
   for (const f of confirmed) log(`  CONFIRMED [${deriveBindingSeverity(f)}] lens=${f.lens} ${f.ref} - ${f.claim}`)
   for (const f of unverified) log(`  UNVERIFIED [${f.severity}] lens=${f.lens} ${f.ref} - ${f.claim}`)
+  const shapeLine = renderStageShape('verify', verifiedCounts, lensesRunning + batches.length)
+  log(shapeLine)
   return {
+    shape: shapeLine,
     exit: 'deferred-platform', key: reviewKey, pending: pendingLabels,
     root: repo, raw: allFindings.length, confirmed: confirmed.length, refuted: refuted.length,
     unverified: unverified.length, uncertain: uncertainFindings.length, conflicts: conflicts.size, duplicates, spurious, precision,
@@ -1145,6 +1192,11 @@ if (pendingLabels.length) {
 }
 
 // --- Phase 3: SYNTHESIZE — one agent writes the report ------------------
+// TOOL-aMendedFleet-18 S3/S4 - rendered BEFORE the synthesis, because that agent writes the record and
+// this script cannot: the line the record copies and the line the final return carries are one string.
+// Its `out-tokens` therefore excludes the synthesis agent's own spend (spec section 3).
+const synthShape = renderStageShape('synth', verifiedCounts, lensesRunning + batches.length + 1)
+log(synthShape)
 phase('Synthesize')
 const synth = await agent(
   `Write the Tier-2 review report for: ${context}\n\n` +
@@ -1292,6 +1344,9 @@ const synth = await agent(
     // TOOL-aSightedSkeptic-8 S7 - the harness renders the appendix and the agent only copies it: a
     // table composed from these lines would miss every refuted finding, which no line above shows.
     // The copy is NOT verified here (spec F2); the return's `appendix` holds the exact text.
+    // TOOL-aMendedFleet-18 S4 - the shape line rides the same copy instruction; the return's `shape` holds it.
+    `\n\nREVIEW-SHAPE LINE - copy the review-shape line between the two marker lines below VERBATIM, alone on its own line, immediately above the appendix heading, and neither marker line copied.\n` +
+    `<<<SHAPE\n${synthShape}\nSHAPE>>>` +
     (appendix
       ? `\n\nAPPENDIX - the report's LAST section, after everything else, is the text between the two marker lines ` +
         `below, copied VERBATIM: unedited, no row added, dropped, reordered or reworded, and neither marker line copied.\n` +
@@ -1399,6 +1454,7 @@ if (!synth) {
 // TOOL-dDerivedDocket-29 S5 - past the partial-fan return above, the synthesis is the only agent left
 // that can have died, so it alone decides `exit` here. The tally fault stays `complete`.
 return {
+  shape: synthShape, // TOOL-aMendedFleet-18 S3 - the line handed to the synthesis, unchanged
   exit: synth ? 'complete' : 'deferred-platform',
   key: reviewKey,
   pending: synth ? [] : ['synth'],
