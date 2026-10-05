@@ -634,6 +634,38 @@ def test_renders_round_trip_and_determinism():
     assert marker in one and marker in j
 
 
+def _test_feature_cards():
+    """TOOL-aMendedFleet-43: CARDS.md renders from the fences alone, one card per dossier, each
+    within FEATURE_CARD_CAP_BYTES, and an overflowing card counts exactly what it dropped."""
+    f = m.parse_dossier(DOSSIER.replace('"x"', '"foundation"', 1), IDS, source="f")
+    plain = m.parse_dossier(DOSSIER, IDS, source="t")
+    big = m.Dossier(
+        feature="big", title="é" * 300, status="building", streams=("core",),
+        decisions=(), claims=claims(flags=("a_flag",)),
+        globs=tuple(f"src/very/long/path/number/{i:03d}/**" for i in range(60)),
+    )
+    empty = m.render_cards_md(m.MapTree(foundation=f, dossiers=(), baseline=EMPTY_BASE), IDS, "docs/map")
+    assert "# Feature cards" in empty and "\n## " not in empty, "an empty tree renders a heading only"
+    tree = m.MapTree(foundation=f, dossiers=(plain, big), baseline=EMPTY_BASE)
+    text = m.render_cards_md(tree, IDS, "docs/map")
+    permuted = m.MapTree(foundation=f, dossiers=(big, plain), baseline=EMPTY_BASE)
+    assert text == m.render_cards_md(permuted, IDS, "docs/map"), "cards must not depend on input order"
+    cards = re.split(r"(?m)^(?=## )", text)[1:]
+    assert [c.split("\n", 1)[0] for c in cards] == ["## big", "## x"], "one card per dossier, sorted, no foundation"
+    for c in cards:
+        assert len(c.encode("utf-8")) <= m.FEATURE_CARD_CAP_BYTES, f"card over the cap: {len(c.encode('utf-8'))}"
+    x = cards[1]
+    assert "dossier `docs/map/features/x.md`" in x and "- decisions 1: `REC-someSlug-1`" in x
+    assert "- flags 1: `a_flag`" in x and "routes" not in x and "- cut" not in x
+    lines = cards[0].rstrip("\n").split("\n")
+    assert lines[2].endswith("...") and len(lines[2].encode("utf-8")) <= 160, lines[2]
+    globs = next(ln for ln in lines if ln.startswith("- globs "))
+    assert globs.startswith("- globs 60: "), globs
+    shown = globs.count("`") // 2 + 1  # plus the one flags item
+    cut = re.fullmatch(r"- cut (\d+) item\(s\) to fit 1024 bytes; the dossier's toml fence lists them all", lines[-1])
+    assert cut and int(cut.group(1)) == 61 - shown, (lines[-1], shown)
+
+
 def test_conf_grammar(tmp: Path):
     (tmp / ".codebase-map.conf").write_text(
         '# c\nMAP_ROOT=docs/map\nGATE_FILE="tests/test map.py"\n'
@@ -1760,6 +1792,7 @@ def main() -> int:
     failures += check(
         "symbols.json deterministic + fail-closed render", test_symbols_render_deterministic_and_fail_closed
     )
+    failures += check("feature cards: fence-only, capped, cut counted (TOOL-aMendedFleet-43)", _test_feature_cards)
     with tempfile.TemporaryDirectory() as td:
         failures += check(
             "extractor helpers fail closed", lambda: test_extractor_helpers_fail_closed(Path(td))

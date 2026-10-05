@@ -354,3 +354,5 @@ base: 7af5f564641d231f8b78f6b183dde1b6bf53111d
 2026-10-05T08:29:14Z brief · item TOOL-aMendedFleet-43 · reason 4c433d32841d memory/builds/aMendedFleet/prompts/2026-10-04-prompt-TOOL-aMendedFleet-1-4-build-brief.md
 
 2026-10-05T08:33:20Z dispatch · item 6616a4e6 TOOL-aMendedFleet-43 · reason tools/codebase-map/map_lib.py tools/codebase-map/gen_map.py tools/codebase-map/test_codebase_map.py tools/codebase-map/test_codebase_map.template.py tools/codebase-map/selftest.py tools/codebase-map/README.md memory/map/README.md memory/map/features/codebase-map.md memory/builds/aMendedFleet/spec/2026-10-04-spec-TOOL-aMendedFleet-43.md
+
+2026-10-05T08:58:15Z dispatch · item 36387492 TOOL-aMendedFleet-43 · reason tools/codebase-map/map_lib.py tools/codebase-map/selftest.py memory/map/generated

@@ -11583,6 +11583,11 @@
       "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
+      "id": "render_cards_md",
+      "kind": "function",
+      "file": "tools/codebase-map/map_lib.py"
+    },
+    {
       "id": "render_cell",
       "kind": "function",
       "file": "tools/runlog/record.py"
