@@ -22,6 +22,8 @@
 #   host: names another node              -> skip · leased on <host>, not this node <me>
 #   verdict HELD                          -> skip · HELD · its restart is the durable schedule --hold printed, never this tick
 #   verdict ELSEWHERE                     -> skip · ELSEWHERE · the run's branch is <ref>, and this worktree is not on it ...
+#   verdict LIVE                          -> beat · <the driver's `--beat` line>, run in the worktree; a run
+#     waiting on one long Workflow gets no idle-wake, so this is what keeps its remote claim fresh
 #   verdict not STALE, and not            -> skip · verdict <V>
 #     FINISHED-UNSTAMPED with stale: yes
 #   holder-ref absent                     -> skip · NO RUN BRANCH · the record names neither run-branch nor branch-ref ...
@@ -285,6 +287,15 @@ run_tick() { # worktree · slug · session · host
   # one slug from two worktrees while the run's own copy is graded in its own.
   if [ "$RL_VERDICT" = ELSEWHERE ]; then
     print_decision "$slug" "$wt" "skip · ELSEWHERE · the run's branch is $RL_HOLDER, and this worktree is not on it, so nothing is killed or launched from this copy"; return 0
+  fi
+  # LIVE RENEWS THE RUN'S CLAIM (TOOL-aGraftedHelix-1 S11): the driver's `--beat`, run in the run's
+  # worktree, decides whether the claim is this run's and due and prints its one `beat —` line, which
+  # is quoted whole; this tick re-derives nothing. `--dry-run` names the row and runs nothing.
+  if [ "$RL_VERDICT" = LIVE ]; then
+    if [ "$DRY_RUN" = 1 ]; then print_decision "$slug" "$wt" "beat · --beat $slug would run"; return 0; fi
+    out=$(cd "$wt" && bash "$DRIVER" --beat "$slug" 2>/dev/null </dev/null)
+    out=$(printf '%s\n' "$out" | grep -m 1 '^unattended: beat — ')
+    print_decision "$slug" "$wt" "beat · ${out:-the driver printed no beat line}"; return 0
   fi
   case "$RL_VERDICT:$RL_STALE" in STALE:*|FINISHED-UNSTAMPED:yes) ;; *) print_decision "$slug" "$wt" "skip · verdict $RL_VERDICT"; return 0 ;; esac
   # A VERDICT THAT WOULD ACT, ON A RECORD NAMING NO BRANCH: no one worktree can be shown to hold it,

@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.60 -->
+<!-- gov:kit unattended@1.61 -->
 # The unattended stop contract — HELD, the hold codes and the lease
 
 *Installed beside `UNATTENDED-PROTOCOL.md` from the unattended kit and byte-compared against the
@@ -157,6 +157,50 @@ session that holds the lease. It prevents an accidental second driver, not a mal
 `lease-utc`, which `--landed` grades stop lines against. A clock that cannot answer reads UNKNOWN,
 announced, and declines the take-over.
 
+**The claim on the remote** is where two NODES learn of each other, which the lease cannot do
+because it lives on the run's own branch. Where `RUN_CLAIMS` is `on` (absent or blank is `off`), the
+ref `refs/gov/runs/<slug>` on the remote the landing push goes to names a parentless commit over the
+empty tree whose message is `gov-claim <slug>`, a blank line, and eight `key: value` lines: `slug`,
+`node`, `host`, `session`, `keepalive`, `status` (`live`, `held`, `landed` or `aborted`),
+`lease-utc` and `beat-utc`. Every write is a compare-and-swap, `--force-with-lease` on the sha the
+same call read, empty for a create, and leaves the ref in place; a terminal claim is taken over by
+the slug's next run and never deleted. `--claims` lists every claim. The beat renewing it is a
+remote fact and never restages the record, so nothing above changes. It stops an accidental second
+driver, as the lease does; a run holding the push credential can force or delete the ref.
+
+| claim | verdict |
+|---|---|
+| `live`, beat at most `RESUME_STALE_BOUND` old | `live` |
+| `live`, beat older | `stale` |
+| `held`, any age | `held` |
+| `landed` or `aborted` | `terminal` |
+| a key missing, a slug other than the ref's, a status outside the set, a beat that does not parse | `unknown`, age `-` |
+
+A claim is `mine` when its `keepalive` AND `session` equal the run's lease (`absent` compares
+literally); `same session` when its `session` is this harness's session; `foreign` otherwise, read
+by its verdict. The rows are tested in that order.
+
+| claim read | `--preflight` | take-over | holder | status write |
+|---|---|---|---|---|
+| none | create | create | create | create |
+| mine | renew | renew | renew when due | write |
+| same session | rewrite | take | take | write |
+| foreign `live` | check 89 | check 89 | check 90 | announce |
+| foreign `held` | check 89 | take | check 90 | announce |
+| foreign `stale` | take, announced | take, announced | check 90 | write |
+| foreign `terminal` | take | check 89 | check 90 | write |
+| `unknown` | check 89 | check 89 | check 90 | announce |
+
+The holder is `--resume`'s holder row and its `--replaces` block, `--dispatch` and `--close`; it
+renews when the beat is a quarter of the bound old or a field it writes differs, and otherwise only
+reads, so a lost claim is found on every call. A race lost between the read and the push is check
+90; a push refused for any other reason, or not answered, is check 91 at `--preflight`, at a
+take-over and at `--close`, and one announced line at the holder's `--resume` and `--dispatch`, which
+work offline. A holder refused at check 90 ends with `--abort <slug> --code claim-lost`. The status
+writes are `--hold` (`held`), `--landed` (`landed`), `--abort` (`aborted`) and the landing re-bind
+(`live`, its new keepalive), each after its own staging and never failing its verb. The resume tick
+renews a `LIVE` run's claim through `--beat`, which writes only the none and `mine` rows.
+
 ## 8. The resume matrix
 
 `--resume` is orientation or take-over, and the lease separates them. Rows apply in order, after the
@@ -174,7 +218,7 @@ announced, and declines the take-over.
 | HELD, condition unmet | any | `still held`, writes nothing |
 | HELD, `lease-utc` after `held-at`, clock fresh, another session and keepalive | an id | refuses 58: a take-over recorded its lease and has not moved the phase |
 | HELD, otherwise | an id, or none | take-over; no id, the status block then check 59 |
-| working | the recorded keepalive | the holder: writes nothing unless the record lacks `lease-utc` or names another session or pid than the harness exposes, then records and stages; reaps orphans (§14) |
+| working | the recorded keepalive | the holder: writes nothing to the record unless it lacks `lease-utc` or names another session or pid than the harness exposes, then records and stages; with `RUN_CLAIMS` on, first reads its claim (§7), renewing it when due and refusing at check 90 one another session holds; reaps orphans (§14) |
 | working, clock fresh or unknown | a new id with `--replaces` the recorded keepalive | the holder replaces its job: `write_lease`, staged; another `--replaces` id refuses 58 |
 | working | a new id, the recorded session (not `absent`), under a pid the record does not name | the holder's process restarted: take-over; refuses 58 first if the recorded pid lives |
 | working, no lease, age unanswerable | a new id, or none | the status block, then check 57 |

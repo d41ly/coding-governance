@@ -2,7 +2,7 @@
 name: unattended
 description: Start, resume, or close a run that will merge and push with NO owner turn between start and finish. Use when the owner wants a committed build carried to landing unattended, when a previous unattended run needs resuming after compaction or process death, or when one needs closing. Do NOT use for ordinary work where the explicit ask before a merge and a push still applies — that is the default, and this skill is the narrow exception to it.
 ---
-<!-- gov:kit unattended@1.60 -->
+<!-- gov:kit unattended@1.61 -->
 
 # Unattended runs
 
@@ -35,10 +35,12 @@ check 58 naming another branch, where this worktree's copy is a HELD or working 
 lease and this worktree is not on its run branch; under
 `in-place`, where a landed record stays LANDING until the next `--preflight` retires it, `--resume`
 prints nothing to resume and `--audit` then refuses with check 51. FIRST,
-`bash tools/unattended/unattended.sh --resume <slug> --keepalive-id <your own id>`. For the holder it
-writes nothing, because whether a run is live is derived from what `--liveness` reads, which this
-very tick moves; the act is there to refuse a session that no longer holds the slug before the
-second act runs. SECOND, and ONLY when that first act neither refuses nor prints
+`bash tools/unattended/unattended.sh --resume <slug> --keepalive-id <your own id>`. The holder's call
+writes nothing to the record, because whether a run is live is derived from what `--liveness` reads,
+which this very tick moves; where `RUN_CLAIMS` is `on` it reads the run's claim on the remote and
+renews it when due, and a claim another session holds refuses it at check 90, which you end with
+`--abort <slug> --code claim-lost`. The act is there to refuse a session that no longer holds the
+slug before the second act runs. SECOND, and ONLY when that first act neither refuses nor prints
 `still held`, `bash tools/unattended/unattended.sh --audit <slug>`. After either of those two outcomes
 this session does not drive the slug, and acting on a `STALLED` verdict would re-dispatch units a
 live holder is driving, or a held run's units — the double drive the lease exists to stop. The verb prints one line per dispatched-and-open unit with how long the TREE has
@@ -753,6 +755,13 @@ definition, so the absence is a decision and not an oversight.
 
   ```bash
   bash tools/unattended/unattended.sh --liveness <slug>
+  ```
+- Where `RUN_CLAIMS` is `on`, the claims on the remote, which is where a second node driving a slug
+  shows up; the resume tick renews a `LIVE` run's own claim with `--beat`:
+
+  ```bash
+  bash tools/unattended/unattended.sh --claims          # one row per claim: slug, node, status, beat age, verdict
+  bash tools/unattended/unattended.sh --beat <slug>     # the tick's heartbeat; one `beat —` line
   ```
 
 ## While the work runs

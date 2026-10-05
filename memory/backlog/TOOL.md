@@ -193,7 +193,7 @@ Cite ids, never line numbers.
 | [TOOL-aReapedSpinner-18](../builds/aReapedSpinner/BACKLOG.md) | OPEN | — | — | 2026-09-08 | THE govkit selftest LEG CARRIES FOUR STALE ASSERTIONS AND REDS ON MAIN.… |
 | [TOOL-aReapedSpinner-19](../builds/aReapedSpinner/BACKLOG.md) | OPEN | — | — | 2026-09-08 | THREE LEGS RED ON MAIN OVER THE SAME TWO STALE EXPECTATIONS, AND THIS… |
 | [TOOL-aReapedTicket-4](../builds/aReapedTicket/BACKLOG.md) | OPEN | — | — | 2026-08-27 | ts_try_reap in tools/run-gates/run-gates.sh reaps the holder beacon… |
-| [TOOL-aReapedTicket-5](../builds/aReapedTicket/BACKLOG.md) | SPECCED | — | TOOL-aGraftedHelix-1 | 2026-08-27 | NARROWED by aUnblockedFleet (2026-08-31) to the STALENESS BOUND alone.… |
+| [TOOL-aReapedTicket-5](../builds/aReapedTicket/BACKLOG.md) | OPEN | — | — | 2026-08-27 | NARROWED by aUnblockedFleet (2026-08-31) to the STALENESS BOUND alone.… |
 | [TOOL-aRelaxedShard-2](../builds/aRelaxedShard/BACKLOG.md) | OPEN | — | — | 2026-08-17 | check 6's build-README class (25,600 B, cl=0) has NO byte-axis arm:… |
 | [TOOL-aRepatriatedFork-20](../builds/aRepatriatedFork/BACKLOG.md) | OPEN | — | — | 2026-09-23 | DRAIN THE CARRIED ENCODING SITES:… |
 | [TOOL-aRepatriatedFork-22](../builds/aRepatriatedFork/BACKLOG.md) | OPEN | — | — | 2026-09-24 | check_waivers in tools/unattended/unattended.sh tests *"$BYPASS_BAN"*,… |

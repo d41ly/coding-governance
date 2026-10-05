@@ -49,6 +49,12 @@ by name, the stop-guard allows, and the matrix's HELD and working rows refuse a 
 58, naming where the run is driven from (`TOOL-dDerivedDocket-62`). A record naming no branch is
 graded where it is read, and the tick acts on none of its copies.
 
+**Two nodes meet at the remote, not at the merge.** The lease lives on the run's own branch, so with
+`RUN_CLAIMS` on every run also claims `refs/gov/runs/<slug>` on the landing remote by
+compare-and-swap: `--preflight` and a take-over refuse another session's live claim (check 89), the
+holder's verbs refuse one at check 90 and end with halt code `claim-lost`, and `--claims` lists them
+all. The beat is a remote fact, so the record is never restaged for it (`TOOL-aGraftedHelix-1`).
+
 **The holder keeps its own `--replaces`.** The matrix reads `--replaces` above the same-session row,
 and that row takes only a caller under a pid the record does not name, because a restart is a new
 process. The holder's own process, or a sub-agent inside it, carries both the recorded session and
