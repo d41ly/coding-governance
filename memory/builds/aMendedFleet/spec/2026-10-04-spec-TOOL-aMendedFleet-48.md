@@ -1,10 +1,12 @@
 # TOOL-aMendedFleet-48 — drift readings append to a node-local history file
 
-**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 48
+**Status:** CLOSED · rev-3 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 48
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-04-build-TOOL-aMendedFleet-48-1-acceptance-ledger.md](../build/2026-10-04-build-TOOL-aMendedFleet-48-1-acceptance-ledger.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
@@ -25,7 +27,8 @@ change at an equal count.
   `drift_report.py` appends one row per record in `SIGNALS` order to `drift-history.tsv` in the
   directory `git rev-parse --git-common-dir` names, resolved against the repo root. `--offenders`,
   `--json` and the plain table never write, so the bar's signature run at another tree writes
-  nothing. Observed by AC1 and AC4.
+  nothing. A run carrying `--json` never writes even beside `--check`, so its stdout stays one JSON
+  document. Observed by AC1 and AC4.
 - **S2** — A file that does not exist, or exists empty, first receives one header line naming the
   columns, `#utc`, `sha`, `base_ref`, `base_sha`, `signal`, `state`, `value`, `of`, `key_hash`,
   tab-separated. Readers locate columns by this header, never by position, and the header is the
@@ -195,6 +198,9 @@ New arm: `tools/drift-audit/selftest.py` · two `--check` runs, a non-writing mo
   `TOOL-aMendedFleet-56` reads the base ref's project layer; the readers that do exist, units 90 and
   `KICK-aMendedFleet-1`, and unit 56's use of `extract_unlocated` are now named edges; and the new
   definitions owe `symbols.json`, which units 57, 59 and 90 regenerate and this spec omitted.
+- rev-3 · 2026-10-05 · S1 · the build found `--json --check` in use, by the selftest's base-ref arm,
+  which parses that run's stdout as one JSON document; S5's stdout line would break it, so a run
+  carrying `--json` never writes, matching S1's "`--json` never writes" and §3's non-goal.
 
 ## 10. Reuse audit
 

@@ -93,7 +93,8 @@ EXECUTED: list[str] = []
 # on a run where no arm skipped; it rises by hand when arms land and never falls to absorb a missing
 # one. A run with a SKIP does not compare it, and says so, because a skipped arm's checks are absent
 # for a reason the floor cannot see.
-CHECK_FLOOR = 302
+CHECK_FLOOR = 309
+# 302 -> 309, TOOL-aMendedFleet-48: the seven checks of `test_drift_history`.
 # 295 -> 302, TOOL-aMendedFleet-47: the run-records arm's derived-LANDED checks — three derived
 # fixtures left unlisted, their count, the summary line, and the LANDING call-count size's two.
 # 289 -> 295, TOOL-aMendedFleet-37: the six checks of `test_stale_dossiers`.
@@ -3062,6 +3063,53 @@ def test_park_sets_match_the_driver(tmp: pathlib.Path) -> None:
           "heartbeat" in grown - set(dr._RUN_PARK_KINDS_OWED), f"extracted {sorted(grown)}")
 
 
+def test_drift_history(tmp: pathlib.Path) -> None:
+    """TOOL-aMendedFleet-48 S7: `--check` appends one group per run to the common dir's history,
+    the other modes write nothing, the key hash sees a member swap, and a failed write is no verdict."""
+    print("drift history (--check appends a group; other modes never write; a failed write is no verdict)")
+    import json
+    sys.path.insert(0, str(KIT))
+    import drift_report as dr
+
+    r = make_repo(tmp, name="history")
+    hist = r / ".git" / dr.HISTORY_FILE
+    n = len(json.loads(run([sys.executable, REPORT_REL, "--json"], r).stdout))
+    first = run([sys.executable, REPORT_REL, "--check"], r)
+    run([sys.executable, REPORT_REL, "--check"], r)
+    lines = hist.read_text(encoding="utf-8").splitlines() if hist.is_file() else []
+    check("history: two --check runs write one header and two groups of one row per record",
+          len(lines) == 1 + 2 * n and lines[0] == "\t".join(dr.HISTORY_COLUMNS)
+          and sum(ln.startswith("#") for ln in lines) == 1, f"{len(lines)} lines for {n} records")
+    check("history: every row carries nine fields and a state in the four-state set",
+          all(len(ln.split("\t")) == 9 and ln.split("\t")[5] in ("live", "dead", "not-asked", "declared-empty")
+              for ln in lines[1:]) and bool(lines[1:]), lines[1] if len(lines) > 1 else "")
+    run([sys.executable, REPORT_REL, "--offenders"], r)
+    run([sys.executable, REPORT_REL, "--json"], r)
+    run([sys.executable, REPORT_REL, "--json", "--check"], r)
+    after = hist.read_text(encoding="utf-8").splitlines() if hist.is_file() else []
+    check("history: --offenders, --json and --json --check write nothing", after == lines,
+          f"{len(lines)} -> {len(after)} lines")
+
+    def hash_of(detail):
+        rec = {"signal": "s", "value": len(detail), "of": 9, "live": True, "detail": detail}
+        return dr.build_history_rows([rec], set(), "t", "h", "b", "bs")[0].split("\t")[8]
+
+    one = hash_of([{"path": "a.md"}, {"path": "b.md"}])
+    check("history: a member swap at an equal count moves key_hash",
+          one != hash_of([{"path": "a.md"}, {"path": "c.md"}]), one)
+    check("history: a moved line locator does not move key_hash",
+          hash_of([{"path": "a.md:3"}, {"path": "b.md", "line": 4}])
+          == hash_of([{"path": "a.md:7"}, {"path": "b.md", "line": 9}]), one)
+
+    hist.unlink()
+    hist.mkdir()
+    squat = run([sys.executable, REPORT_REL, "--check"], r)
+    check("history: a directory on the file's name leaves the exit status unchanged",
+          squat.returncode == first.returncode, f"{first.returncode} -> {squat.returncode}")
+    check("history: ...and stderr names the path it could not write",
+          "history NOT written to" in squat.stderr and dr.HISTORY_FILE in squat.stderr, squat.stderr[-300:])
+
+
 def test_version_carriers_agree(tmp: pathlib.Path) -> None:
     """TOOL-dLoggedFlight-13 S6: every carrier of this kit's version agrees with the engine's constant.
 
@@ -3127,6 +3175,7 @@ def main() -> int:
         test_evidence_globs_exclude_test_templates(tmp)
         test_nonterminal_merged_runs(tmp)
         test_park_sets_match_the_driver(tmp)
+        test_drift_history(tmp)
         test_version_carriers_agree(tmp)
     print()
     if SKIPS:

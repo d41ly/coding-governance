@@ -38,6 +38,7 @@ from __future__ import annotations
 
 import argparse
 import datetime
+import hashlib
 import json
 import os
 import pathlib
@@ -2775,6 +2776,74 @@ def resolve_base_ref(root: pathlib.Path, explicit: str | None) -> str:
                      f"input this report used to grade instead of what landed.")
 
 
+def extract_unlocated(v):
+    """A detail row with its LINE LOCATORS dropped — the `line`/`lines` fields and a trailing
+    `:<digits>` on any string. ONE spelling, shared by `--offenders` and the history's key hash."""
+    if isinstance(v, str):
+        return re.sub(r":\d+$", "", v)
+    if isinstance(v, list):
+        return [extract_unlocated(x) for x in v]
+    if isinstance(v, dict):
+        return {k: extract_unlocated(x) for k, x in v.items() if k not in ("line", "lines")}
+    return v
+
+
+# TOOL-aMendedFleet-48. Every `--check` appends one row per signal here, in the git COMMON dir so
+# every worktree of a clone writes one history. Readers locate columns by the header, never by
+# position: the header is the file's whole contract. Node-local, never pushed, never rotated.
+HISTORY_FILE = "drift-history.tsv"
+HISTORY_COLUMNS = ("#utc", "sha", "base_ref", "base_sha", "signal", "state", "value", "of", "key_hash")
+
+
+def build_history_rows(out: list, declared: set, utc: str, sha: str, base_ref: str,
+                       base_sha: str) -> list[str]:
+    """One TSV row per record, in `SIGNALS` order. `key_hash` is the first 16 hex of the SHA-256 of
+    the record's detail keys exactly as `--offenders` spells them, sorted and LF-joined, so a member
+    swap at an equal count moves it and a moved line number does not; `-` for any state but live."""
+    rows = []
+    for s in out:
+        if s.get("not_asked"):
+            state = "not-asked"
+        elif not s["live"]:
+            state = "declared-empty" if s["signal"] in declared else "dead"
+        else:
+            state = "live"
+        key_hash = "-"
+        if state == "live":
+            keys = render_drift_offenders([s], [], [])
+            key_hash = hashlib.sha256("\n".join(sorted(keys)).encode("utf-8")).hexdigest()[:16]
+        rows.append("\t".join((utc, sha, base_ref, base_sha, s["signal"], state,
+                               str(s["value"]), str(s["of"]), key_hash)))
+    return rows
+
+
+def resolve_history_path(root: pathlib.Path) -> pathlib.Path | None:
+    """`<git-common-dir>/drift-history.tsv`, the common dir resolved against the repo root; None
+    when git cannot name one."""
+    out = subprocess.run(["git", "-C", str(root), "rev-parse", "--git-common-dir"],
+                         capture_output=True, text=True, encoding="utf-8", errors="replace")
+    common = out.stdout.strip()
+    if out.returncode != 0 or not common:
+        return None
+    return (root / common).resolve() / HISTORY_FILE
+
+
+def write_drift_history(path: pathlib.Path | None, rows: list[str]) -> None:
+    """Append `rows` in ONE binary write, the header first into an absent or empty file, so two bars
+    on one node interleave whole groups at worst. A failure is one stderr line and never touches the
+    exit status; a success is one stdout line, so a missing line is a visible miss."""
+    try:
+        if path is None:
+            raise OSError("git rev-parse --git-common-dir named no directory")
+        with open(path, "ab") as fh:
+            head = "" if fh.tell() else "\t".join(HISTORY_COLUMNS) + "\n"
+            fh.write((head + "".join(r + "\n" for r in rows)).encode("utf-8"))
+    except OSError as exc:
+        print(f"drift-report: history NOT written to {path}: {exc}", file=sys.stderr)
+        return
+    print(f"drift-report: {len(rows)} history rows appended to {path}")
+
+
 def render_drift_offenders(over: list, dead: list, ratchets: list) -> list[str]:
     """`--offenders`: one `<signal>\t<detail key>` line per thing `--check` would red on.
 
@@ -2790,15 +2859,6 @@ def render_drift_offenders(over: list, dead: list, ratchets: list) -> list[str]:
     line and would read as a new finding on every branch. A key repeating inside one signal carries
     `#<k>`, its occurrence ordinal, so two identical rows stay two.
     """
-    def extract_unlocated(v):
-        if isinstance(v, str):
-            return re.sub(r":\d+$", "", v)
-        if isinstance(v, list):
-            return [extract_unlocated(x) for x in v]
-        if isinstance(v, dict):
-            return {k: extract_unlocated(x) for k, x in v.items() if k not in ("line", "lines")}
-        return v
-
     rows = []
     for s in over:
         for d in s["detail"]:
@@ -2895,7 +2955,9 @@ def main(argv: list[str] | None = None) -> int:
     if args.json:
         print(json.dumps(out, indent=1))
     else:
-        head = ctx.git.run("rev-parse", "--short=8", "HEAD").stdout.strip()
+        # FULL, because the history row carries HEAD whole; the header shows eight, like base_at.
+        head_sha = ctx.git.run("rev-parse", "HEAD").stdout.strip()
+        head = head_sha[:8]
         # THE BASE IS A HEADER FACT, ref AND sha. Two nodes comparing reports can then see at once
         # whether they graded the same commit, which a bare branch name never told them.
         print(f"# drift-report at {head} (base {base_ref} @ {base_at}) · kit {KIT_DRIFT_AUDIT_VERSION}")
@@ -2933,6 +2995,13 @@ def main(argv: list[str] | None = None) -> int:
         print("\n# detail: rerun with --json")
 
     if args.check:
+        if not args.json:
+            # TOOL-aMendedFleet-48: the bar's reading persists. `--json` never writes, even beside
+            # `--check`, so its stdout stays one JSON document; the write never moves the verdict.
+            utc = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+            write_drift_history(resolve_history_path(root), build_history_rows(
+                out, set(getattr(ctx.proj, "DECLARED_EMPTY", ()) or ()), utc, head_sha, base_ref,
+                base_sha.stdout.strip()))
         # The populations are computed above, once, for this mode and `--offenders` alike.
         for r in ratchets:
             print(f"\ndrift-report: RATCHET WEAKENED — {r}", file=sys.stderr)

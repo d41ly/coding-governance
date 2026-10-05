@@ -386,3 +386,5 @@ base: 7af5f564641d231f8b78f6b183dde1b6bf53111d
 2026-10-05T10:21:39Z dispatch · item 6a30bf5e TOOL-aMendedFleet-47 · reason tools/drift-audit/drift_report.py tools/drift-audit/drift_signals.py tools/drift-audit/selftest.py memory/builds/aMendedFleet/spec/2026-10-04-spec-TOOL-aMendedFleet-47.md memory/LIVE.md memory/ledger/2026-10.md memory/builds/aMendedFleet/README.md tools/drift-audit/README.md
 
 2026-10-05T10:24:28Z brief · item TOOL-aMendedFleet-48 · reason 4c433d32841d memory/builds/aMendedFleet/prompts/2026-10-04-prompt-TOOL-aMendedFleet-1-4-build-brief.md
+
+2026-10-05T10:30:08Z dispatch · item 25ae3386 TOOL-aMendedFleet-48 · reason tools/drift-audit/drift_report.py tools/drift-audit/selftest.py tools/drift-audit/README.md memory/map/generated/symbols.json memory/builds/aMendedFleet/spec/2026-10-04-spec-TOOL-aMendedFleet-48.md memory/builds/aMendedFleet/build/2026-10-04-build-TOOL-aMendedFleet-48-1-acceptance-ledger.md memory/builds/aMendedFleet/README.md

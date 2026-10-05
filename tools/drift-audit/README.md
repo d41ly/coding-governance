@@ -103,6 +103,7 @@ Then, in order:
 | `SKILL.template.md` | kit | rendered to `.claude/skills/drift-audit/SKILL.md` by the adopt script |
 | `adopt-drift-audit.sh` | kit | adopt + the `--check` sync arm for the merge bar |
 | `selftest.py` | kit | the kit's own falsifiability test |
+| `<git-common-dir>/drift-history.tsv` | **node** | written by `--check`: one row per signal per run, never pushed |
 
 Tier 2 needs the two workflow scripts from `<prefix>/workflows/drift-audit-{code,state}.js`.
 
@@ -193,6 +194,22 @@ Three states, three distinct sentences, and the split is the point:
 The retired ternary had three branches and conflated the last two into the bare word `complete`, so
 a run that measured NOTHING reported the same word as a clean one. Changing any of these sentences
 is a version bump like any other.
+
+## The reading history — `drift-history.tsv`
+
+Every `--check` run, the mode the merge bar's leg executes, appends one GROUP of rows to
+`drift-history.tsv` in the directory `git rev-parse --git-common-dir` names, so every worktree of a
+clone writes one history. `--offenders`, `--json` (even beside `--check`) and the plain table never
+write. The file is node-local: it lives in the git dir, so git never pushes it.
+
+The first line is a header, `#utc`, `sha`, `base_ref`, `base_sha`, `signal`, `state`, `value`, `of`,
+`key_hash`, tab-separated, and readers locate columns by it, never by position. A group shares `utc`
+and the full HEAD `sha`; `state` is `live`, `dead`, `not-asked` or `declared-empty`; `key_hash` is 16
+hex of the SHA-256 over the record's detail keys as `--offenders` spells them, so it moves when the
+members change at an equal count and not when a line number moves, and is `-` for any state but
+`live`. One group per bar, one row per entry of `SIGNALS`, and no rotation. A write that fails prints one
+`history NOT written` line on stderr and never changes the exit status; a write that succeeds prints
+one stdout line naming the row count and the path.
 
 ## What "landed" is measured against — the base ladder
 

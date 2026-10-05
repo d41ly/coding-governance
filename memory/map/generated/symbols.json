@@ -1513,6 +1513,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "build_history_rows",
+      "kind": "function",
+      "file": "tools/drift-audit/drift_report.py"
+    },
+    {
       "id": "build_hold_fixture",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
@@ -6326,6 +6331,11 @@
       "id": "extract_text",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
+    },
+    {
+      "id": "extract_unlocated",
+      "kind": "function",
+      "file": "tools/drift-audit/drift_report.py"
     },
     {
       "id": "fact",
@@ -12408,6 +12418,11 @@
       "file": "tools/govkit/selftest.py"
     },
     {
+      "id": "resolve_history_path",
+      "kind": "function",
+      "file": "tools/drift-audit/drift_report.py"
+    },
+    {
       "id": "resolve_hits",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -15923,6 +15938,11 @@
       "file": "tools/codebase-map/selftest.py"
     },
     {
+      "id": "test_drift_history",
+      "kind": "function",
+      "file": "tools/drift-audit/selftest.py"
+    },
+    {
       "id": "test_dry_run_walks_the_same_set_and_kills_nothing",
       "kind": "function",
       "file": "tools/process-monitor/selftest.py"
@@ -17826,6 +17846,11 @@
       "id": "write_dl_landing",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "write_drift_history",
+      "kind": "function",
+      "file": "tools/drift-audit/drift_report.py"
     },
     {
       "id": "write_edge_spec",
