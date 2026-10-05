@@ -93,7 +93,8 @@ EXECUTED: list[str] = []
 # on a run where no arm skipped; it rises by hand when arms land and never falls to absorb a missing
 # one. A run with a SKIP does not compare it, and says so, because a skipped arm's checks are absent
 # for a reason the floor cannot see.
-CHECK_FLOOR = 327
+CHECK_FLOOR = 330
+# 327 -> 330, TOOL-aMendedFleet-51: the readme-drift all-CLOSED arm and the two pinless checks.
 # 318 -> 327, TOOL-aMendedFleet-50: the nine checks of `test_escape_ratio`.
 # 309 -> 318, TOOL-aMendedFleet-49: the nine checks of `test_drift_delta`.
 # 302 -> 309, TOOL-aMendedFleet-48: the seven checks of `test_drift_history`.
@@ -1238,6 +1239,15 @@ def test_live_backlog_rows(tmp: pathlib.Path) -> None:
     check("counts LIVE rows, not entries: 3 of 5", got["value"] == 3, f"got {got['value']}")
     check("reports every shard, so a total cannot hide one", got["of"] == 2, f"got {got['of']}")
     check("probe is LIVE with shards present", got["live"] is True)
+    # --- PINLESS BY DESIGN (TOOL-aMendedFleet-51 S1, S3): a None tolerance serialises as null, the
+    # --- pin resolves to null with no PINS entry, and the table says so instead of `over pin 0`.
+    check("pinless: the record serialises a null tolerance and a null pin",
+          got["tolerance"] is None and got["pin"] is None,
+          f"tolerance={got['tolerance']!r} pin={got['pin']!r}")
+    _row = next((ln for ln in run([sys.executable, REPORT_REL], r).stdout.splitlines()
+                 if "live_backlog_rows_per_shard" in ln), "")
+    check("pinless: its printed row reads 'report only, no pin' and nothing about being over",
+          "report only, no pin" in _row and "over" not in _row, f"row={_row.strip()!r}")
     per = {d["shard"]: d for d in got["detail"]}
     check("the empty shard reports 0 rather than being skipped",
           per.get("memory/backlog/DES.md", {}).get("live") == 0,
@@ -1395,7 +1405,7 @@ def test_readme_mechanism_drift(tmp: pathlib.Path) -> None:
     spec = [
         "# TOOL-aDrift-1 - a drifting thing",
         "",
-        "**Status:** CLOSED - rev-2 - 2026-01-05 - node a - Tier-2 - base 0000000",
+        "**Status:** INPROGRESS - rev-2 - 2026-01-05 - node a - Tier-2 - base 0000000",
         "",
         "## 9. Revision log",
         "",
@@ -1435,6 +1445,20 @@ def test_readme_mechanism_drift(tmp: pathlib.Path) -> None:
     # REPORT ONLY, for the reason F2 settled: `drift-audit records` is an unguarded merge-bar leg and
     # this predicate reports a POINTER, not a proven contradiction.
     check("the signal is not gateable", got["gateable"] is False)
+
+    # --- TOOL-aMendedFleet-51 S4: a build whose every spec is CLOSED is a frozen record and is not
+    # --- graded. EVERY spec of the build is flipped, `make_repo`'s SPECCED one included, because a
+    # --- single live spec keeps the whole build graded. The arm above read one row from this tree.
+    for _sp in sorted((r / SPEC_DIR_FOR_FIXTURE).glob("*.md")):
+        _txt = _sp.read_text(encoding="utf-8")
+        _sp.write_text(re.sub(r"^\*\*Status:\*\*\s*[A-Za-z]+", "**Status:** CLOSED", _txt, flags=re.M),
+                       encoding="utf-8", newline="\n")
+    run(["git", "add", "-A"], r)
+    run(["git", "commit", "-q", "-m", "close every spec", "--no-verify"], r)
+    shut = report(r)["readme_mechanism_drift"]
+    check("S4: a build whose every spec is CLOSED is not graded, so it reads zero rows",
+          shut["value"] == 0 and shut["detail"] == [] and shut["of"] == 0,
+          f"got value={shut['value']} of={shut['of']} rows={shut['detail'][:1]}")
 
     # --- AC2: a README and spec set that AGREE are silent, and the probe stays live -----------
     r2 = make_repo(tmp, name="rmagree")
@@ -1544,6 +1568,9 @@ def test_readme_mechanism_drift(tmp: pathlib.Path) -> None:
         (_d / ("2026-01-01-spec-a" + _b + "-1.md")).write_text(
             NL_.join([
                 "# TOOL-a" + _b + "-1 - a thing",
+                "",
+                # LIVE, so the build is graded at all (TOOL-aMendedFleet-51 S4).
+                "**Status:** INPROGRESS - rev-2 - 2026-01-05 - node a - Tier-2 - base 0000000",
                 "",
                 "## 9. Revision log",
                 "",

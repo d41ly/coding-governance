@@ -242,7 +242,13 @@ PINS: dict[str, int] = {
     # improvement, which is why this says so. 19 rows over 7 of 61 build READMEs. Report-only, so it
     # never blocks a merge; it is here so a non-zero count does not read "out of tolerance" from day
     # one. Drain it: each row is one README sentence to re-read against the spec revision beside it.
-    "readme_mechanism_drift": 19,
+    #
+    # 19 -> 4, a DRAIN by narrowing, not by re-reading (TOOL-aMendedFleet-51). The signal now grades
+    # only builds with at least one non-terminal spec: 27 of the 31 rows it read at that unit's base
+    # sat in builds whose every spec is CLOSED or WONTDO, frozen records nobody acts on. Re-measured
+    # at that unit's commit: 4 rows over 19 live-build READMEs, in dScaffoldedMirror and
+    # dScriptedRepeat.
+    "readme_mechanism_drift": 4,
     # 7 — the number of legs in `<prefix>/gate-legs.json` whose script path the charter's gate-suite
     # section does not cite, measured at 647bfd9. The old seed of 1 was a per-row boolean against a
     # one-row population, so `value > pin` needed 2 against a ceiling of 1 and the signal could not
@@ -275,26 +281,6 @@ PINS: dict[str, int] = {
     "lexicon_verbs_declared_but_unused": 0,
     # 0, and it can move: the stamp is a date and the language surface is a commit date, so adding a
     # LANGS entry without re-ratifying turns this to 1 the same day.
-    # 81 — the live (non-terminal) row count of the LARGEST backlog shard, measured 2026-08-18 on
-    # memory/backlog/TOOL.md. TOOL-aRelaxedShard-4.
-    #
-    # This is a WATERMARK, not a ceiling, and the signal is `gateable: False` so crossing it never
-    # blocks a merge. What it buys is that RAISING it lands in RATCHETS below and therefore needs a
-    # reason written in place — which is the whole point: this repo hit a spent budget twice in one
-    # session because the number nobody was tracking moved without anyone deciding it should.
-    #
-    # Do not turn this gateable without also declaring it in the shipped conf template. A signal
-    # absent from an adopter's PINS falls back to tolerance 0, so a gateable version reds their first
-    # `--check` on one open row.
-    # 81 -> 89. RAISED at the reground onto main, and by the signal doing its job on its first real
-    # merge: two branches' live rows united, and neither side was over its own watermark. Same shape
-    # as the read-path ceiling in that same reconcile, one budget over — that ceiling has since been
-    # retired (TOOL-dSpentCeiling-1) and its RATCHETS row deleted with it.
-    # 89 -> 454. RE-MEASURED at the backlog switch-over (TOOL-dDerivedDocket-34 S10), and a change of
-    # UNIT rather than of backlog: under BACKLOG_MODE="builds" the reading is every live ask in the
-    # generator's `--asks --json` projection, 454 over 104 ask files (TOOL 425, DEPL 26, KICK 3),
-    # where the shards reading was the largest shard's own count. Nothing was filed to earn it.
-    "live_backlog_rows_per_shard": 454,
     # MEASURED at the unit that added the signal, on this corpus, and expected to be small: the
     # slug discriminator drops every fixture id with no waiver list at all, so what remains is
     # actionable rather than tolerated. A drain target from the first commit, which is why it is
@@ -392,8 +378,6 @@ RATCHETS: list[dict] = [
      "key": "non_terminal_specs_cited_by_product_source", "weakens": "up"},
     {"file": _THIS_FILE,
      "key": "handkept_inventories_disagreeing_with_source", "weakens": "up"},
-    {"file": _THIS_FILE,
-     "key": "live_backlog_rows_per_shard", "weakens": "up"},
     # The signal is report-only, so crossing this pin never blocks a merge. What the row buys is
     # that RAISING it needs a reason written in place — which is the whole of "shrink-only" for
     # an ungateable pin, and without it the word is a comment.

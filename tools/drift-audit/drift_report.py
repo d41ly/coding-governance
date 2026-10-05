@@ -1294,7 +1294,7 @@ def build_lexicon_marginal_offense_rate(ctx) -> dict:
     # Asking whether the REPOSITORY is truncated is the assertion that actually fires. A derived base
     # is only as trustworthy as the history it was derived from.
     if ctx.git.run("rev-parse", "--is-shallow-repository").stdout.strip() == "true":
-        return {"signal": name, "value": 0, "of": 0, "tolerance": 0, "gateable": False,
+        return {"signal": name, "value": 0, "of": 0, "tolerance": None, "gateable": False,
                 "live": False, "unjudgeable": 0,
                 "detail": [{"note": "DEAD PROBE — this is a shallow clone, so the commit that added "
                                     ".lexicon.conf is not necessarily present and a derived base "
@@ -1302,7 +1302,7 @@ def build_lexicon_marginal_offense_rate(ctx) -> dict:
 
     # L1b — and the base still has to resolve, for a grafted or otherwise mangled history.
     if not base or not ctx.git.is_commit(base):
-        return {"signal": name, "value": 0, "of": 0, "tolerance": 0, "gateable": False,
+        return {"signal": name, "value": 0, "of": 0, "tolerance": None, "gateable": False,
                 "live": False, "unjudgeable": 0,
                 "detail": [{"note": "DEAD PROBE — the commit that added .lexicon.conf does not "
                                     "resolve in this object store (a shallow or grafted clone); "
@@ -1320,7 +1320,7 @@ def build_lexicon_marginal_offense_rate(ctx) -> dict:
     # L2 and L3 — a population that is empty at either end means the extractor is not reading, which
     # is indistinguishable from a clean window unless it is said out loud.
     if at_base is None or at_head is None or not at_base or not at_head:
-        return {"signal": name, "value": 0, "of": 0, "tolerance": 0, "gateable": False,
+        return {"signal": name, "value": 0, "of": 0, "tolerance": None, "gateable": False,
                 "live": False, "unjudgeable": 0,
                 "detail": [{"note": "DEAD PROBE — the definition population is empty at the base or "
                                     "at HEAD, so the extractor is not reading this tree",
@@ -1358,7 +1358,7 @@ def build_lexicon_marginal_offense_rate(ctx) -> dict:
     def _measure_pct(a, b):
         return round(100.0 * len(a) / len(b), 1) if b else 0.0
 
-    return {"signal": name, "value": len(offenders), "of": len(gradeable), "tolerance": 0,
+    return {"signal": name, "value": len(offenders), "of": len(gradeable), "tolerance": None,
             "gateable": False, "live": bool(at_base and at_head), "unjudgeable": 0,
             "detail": [
                 {"note": "offenders added per definition added since the declaration was adopted",
@@ -1385,6 +1385,11 @@ def build_lexicon_marginal_offense_rate(ctx) -> dict:
 # unit gates this, it must pin a MEASURED value with a movement rule AND declare that pin in the
 # shipped conf template — a signal absent from an adopter's PINS falls back to tolerance 0, so a
 # gateable version would red their first run on one open row.
+#
+# PINLESS since TOOL-aMendedFleet-51: `tolerance` is None and the status column prints `report only,
+# no pin`. Under `BACKLOG_MODE="builds"` the reading is every live ask, which rises with every ask
+# filed, and the shard-rotation floor the old watermark guarded no longer exists. A project that
+# still wants a pin declares one in its PINS, and the status column then compares against it.
 #
 # The terminal set is SPELLED HERE. `.memory-tree.conf` declares no status vocabulary and no sibling
 # module exposes one, so there is nothing to borrow; the engine already hardcodes the same tokens for
@@ -1462,7 +1467,7 @@ def build_live_backlog_rows(ctx) -> dict:
         rows, examined, note = read_asks_projection(ctx, all_rows=False)
         if rows is None:
             return {"signal": "live_backlog_rows_per_shard", "value": 0, "of": 0,
-                    "tolerance": ctx.pins.get("live_backlog_rows_per_shard", 0),
+                    "tolerance": None,
                     "gateable": False, "live": False, "detail": [{"note": note}]}
         per: dict = {}
         for row in rows:
@@ -1472,7 +1477,7 @@ def build_live_backlog_rows(ctx) -> dict:
             "signal": "live_backlog_rows_per_shard",
             "value": len(rows),
             "of": examined,
-            "tolerance": ctx.pins.get("live_backlog_rows_per_shard", 0),
+            "tolerance": None,
             "gateable": False,
             # LIVENESS FROM THE FILES THE PROJECTION READ. A builds-mode tree whose projection
             # examined no ask file cannot move this count.
@@ -1504,15 +1509,10 @@ def build_live_backlog_rows(ctx) -> dict:
         # split per-gate to avoid.
         "value": max((r["live"] for r in judgeable), default=0),
         "of": len(rows),
-        # The threshold comes from the project layer. It is read into `tolerance` here because that
-        # is this signal's declared floor; the status line now compares against the RESOLVED `pin`,
-        # exactly as the gateable branches do, and `pin` falls back to `tolerance` when PINS declares
-        # none — so this read still decides the verdict for this signal either way. The clause that
-        # used to sit here said the report loop compares against `tolerance` rather than `pin`, which
-        # a closing review found true until the same fold made it false and left this sentence
-        # standing. Absent, the threshold is 0 and every non-empty shard reads as over — which trains
-        # a reader to ignore the line, the failure mode this signal is supposed to cure.
-        "tolerance": ctx.pins.get("live_backlog_rows_per_shard", 0),
+        # NO PIN BY DESIGN: None, so the status column prints `report only, no pin` unless the
+        # project's PINS declares one. A fallback of 0 printed `over pin 0` for every non-empty
+        # shard, which trains a reader to ignore the line, the failure this signal is meant to cure.
+        "tolerance": None,
         "gateable": False,
         # A tree with no backlog shards at all cannot move this signal, so it reports DEAD rather than
         # a reassuring 0 — the liveness assertion every signal here carries.
@@ -1690,18 +1690,28 @@ def build_readme_mechanism_drift(ctx) -> dict:
     def _extract_slug(path: str) -> str:
         return path[len(prefix):].split("/")[0] if path.startswith(prefix) else ""
 
+    graded = 0
     for rel in sorted(readmes):
         build = _extract_slug(rel)
         if not build:
             continue
+        # LIVE BUILDS ONLY (TOOL-aMendedFleet-51 S4). A build whose every spec is CLOSED or WONTDO is
+        # a frozen record: 27 of the 31 rows this signal first reported sat in such builds and none
+        # was worth acting on. Liveness is read from the `**Status:**` line of the spec text read
+        # below for the revision log anyway, so no file is read twice.
+        texts = [(sp, _read(ctx, sp)) for sp in specs_by_build.get(build, [])]
+        if not any((m := _STATUS.search(t)) and m.group(1).upper() not in _TERMINAL_STATUSES
+                   for _, t in texts):
+            continue
+        graded += 1
         lines = _read(ctx, rel).split("\n")
         cut = next((i for i, ln in enumerate(lines) if ln.startswith(_GEN_MARK)), len(lines))
         # THE REVISION ENTRIES, read as data. A continuation line is folded into the entry above it,
         # because a revision's reason routinely wraps and the token often sits in the wrap.
         revs = []
-        for sp in specs_by_build.get(build, []):
+        for sp, text in texts:
             inlog = False
-            for ln in _read(ctx, sp).split("\n"):
+            for ln in text.split("\n"):
                 if ln.startswith("## "):
                     inlog = "Revision log" in ln
                     continue
@@ -1762,7 +1772,7 @@ def build_readme_mechanism_drift(ctx) -> dict:
     return {
         "signal": "readme_mechanism_drift",
         "value": len(rows),
-        "of": len(readmes),
+        "of": graded,
         "tolerance": ctx.pins.get("readme_mechanism_drift", 0),
         # REPORT ONLY. `drift-audit records` is an unguarded merge-bar leg, and this predicate reports
         # a POINTER rather than a proven contradiction - gating it would red a merge on a README
@@ -3263,6 +3273,10 @@ def main(argv: list[str] | None = None) -> int:
     ctx.offline = bool(args.check or args.offenders)
     out = [s(ctx) for s in SIGNALS]
     for s in out:
+        # A None tolerance is a report-only signal with NO PIN BY DESIGN (TOOL-aMendedFleet-51): its
+        # pin stays None unless PINS declares one, and the table prints `report only, no pin`. A
+        # gateable record never carries one, because `--check` compares its value against the pin.
+        assert not (s["gateable"] and s["tolerance"] is None), f"{s['signal']}: gateable with no tolerance"
         s["pin"] = ctx.pins.get(s["signal"], s["tolerance"])
 
     # THE THREE POPULATIONS `--check` reds on, computed ONCE for both modes that read them, so
@@ -3313,6 +3327,10 @@ def main(argv: list[str] | None = None) -> int:
                           else "DEAD PROBE — signal cannot move, ignore its value")
             elif s["value"] < 0:
                 status = "n/a"
+            elif s["pin"] is None:
+                # NOT `over pin 0`: a signal with no pin by design has nothing to be over, and a
+                # red-looking word nobody acts on trains the reader to skip the whole column.
+                status = "report only, no pin"
             elif s["gateable"] and s["value"] > s["pin"]:
                 status = f"OVER PIN {s['pin']} — gateable"
             elif s["gateable"]:

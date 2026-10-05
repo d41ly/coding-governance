@@ -109,6 +109,13 @@ Tier 2 needs the two workflow scripts from `<prefix>/workflows/drift-audit-{code
 
 ## The signals
 
+A report-only signal with no pin by design prints `report only, no pin` in the status column, never
+`over pin 0`: it has nothing to be over, so the column states that rather than raising a red-looking
+word nobody acts on. Its `--json` record carries `null` for both `tolerance` and `pin`. A project
+that wants a threshold for one declares it in its `PINS`, and the column then compares against it.
+`lexicon_marginal_offense_rate` and `live_backlog_rows_per_shard` are the pinless ones; a gateable
+signal never is.
+
 | Signal | Asks | Gateable |
 |---|---|---|
 | `ledger_rows_contradicting_git` | does an in-flight row claim "not merged" about a landed sha? | yes |
@@ -120,7 +127,7 @@ Tier 2 needs the two workflow scripts from `<prefix>/workflows/drift-audit-{code
 | `lexicon_verbs_declared_but_unused` | does the verb table still describe the code it was derived from? | yes |
 | `lexicon_ratified_older_than_language_surface` | was the table curated since the languages it grades last moved? | yes |
 | `live_backlog_rows_per_shard` | is a shard’s live set approaching the floor rotation cannot clear? Under `BACKLOG_MODE="builds"`, how many asks derive live, read from the generator’s own live projection? | no |
-| `readme_mechanism_drift` | does a build README still describe a mechanism its own spec set revised? | no |
+| `readme_mechanism_drift` | does a build README still describe a mechanism its own spec set revised? Grades live builds only: a build whose every spec is CLOSED or WONTDO is a frozen record and is skipped, and `of` counts the READMEs of live builds. | no |
 | `backlog_asks_contested` | does an ask carry both closing and declining evidence, or terminal evidence beside a live spec? Not asked under `shards`. | no |
 | `backlog_evidence_sha` | does every `by <sha>` closing an ask resolve to a commit in this clone? Not asked under `shards`. | no |
 | `backlog_asks_unlabelled` | how many live asks carry no severity row? Not asked under `shards`. | no |

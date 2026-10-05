@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-51 — report-only drift signals over a pin nobody drains print pinless, and `readme_mechanism_drift` reads live builds only
 
-**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 51
+**Status:** CLOSED · rev-3 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 51
 
 <!-- gen:spec-records -->
 
@@ -50,9 +50,12 @@ narrowed population measures.
   and the `readme_mechanism_drift` row says it grades live builds only. Observed by AC5.
 - **S7** — Self-test arms in `tools/drift-audit/selftest.py`: the `readme_mechanism_drift` fixture
   spec moves from CLOSED to INPROGRESS so its existing arms keep a live build to grade, and one arm
-  flips it to CLOSED and asserts zero rows; one arm asserts a record with a `None` tolerance prints
-  `report only, no pin` and serialises as `null`. NOT OBSERVED by a criterion here: the suite runs
-  once at the close, and the arms are declared under `New arm:` in §7.
+  flips every spec of that fixture build to CLOSED, the SPECCED one the fixture repository seeds
+  beside it included, and asserts zero rows; the nested-root arm's two builds take an INPROGRESS
+  status line, since a spec with none carries no live token; one arm asserts a record with a
+  `None` tolerance prints `report only, no pin` and serialises as `null`. NOT OBSERVED by a
+  criterion here: the suite runs once at the close, and the arms are declared under `New arm:`
+  in §7.
 
 ## 3. Non-goals (OUT)
 
@@ -85,7 +88,7 @@ Read at the worktree HEAD `fee9f62b`, whose bytes under `tools/` equal base `7af
   `backlog_asks_unlabelled` 452 over 0 and `run_records_nonterminal_but_merged` 13 over 5. PINNED,
   measured 2026-10-04.
 - Of the 31 `readme_mechanism_drift` rows, 27 sit in 12 builds whose every spec is CLOSED or WONTDO.
-  The other 4 sit in `dScaffoldedMirror` (one DEFERRED spec) and `dScriptedRepeat` (one SPECCED
+  The other 4 sit in `dScaffoldedMirror` (six DEFERRED specs, re-counted at build) and `dScriptedRepeat` (one SPECCED
   spec), both listed in `memory/LIVE.md`. A scratch probe joined the detail rows to each build's
   spec status headers. PINNED, measured 2026-10-04; the source synthesis predicted 4.
 - `build_lexicon_marginal_offense_rate` sets `"tolerance": 0` on all four return paths, and its
@@ -156,7 +159,7 @@ every arm that grades it; S7 moves the fixture to INPROGRESS in the same commit.
   `tools/drift-audit/drift_signals.py`.
   Red when: a row names a build whose every spec is CLOSED or WONTDO.
   figure: DERIVED at observation time; the §4 probe read 4 rows.
-- **AC3** — When, in a scratch clone of the unit's tip under a short `%TEMP%` path, the one
+- **AC3** — When, in a scratch clone of the unit's tip under a short `%TEMP%` path, every
   non-terminal spec status of `dScaffoldedMirror` is edited to CLOSED and
   `python tools/drift-audit/drift_report.py --json` runs, the `readme_mechanism_drift` value falls by
   the number of rows that build carried and no row names it.
@@ -198,6 +201,10 @@ New arm: `tools/drift-audit/selftest.py` · the readme-drift fixture spec flippe
   pin 0; the disposition table lacked `remote_ci_red_streak`, which unit 8 adds before this unit;
   the DEAD-for-N split now names `TOOL-aMendedFleet-90`; and the hands-off edge to unit 15 is
   dropped, because that unit is ordered before this one and is left nothing to do.
+- rev-3 · 2026-10-05 · §4 · S7 · AC3 · build: `dScaffoldedMirror` holds six DEFERRED specs, not
+  one, so AC3 closes every non-terminal one; the selftest fixture build also holds a SPECCED spec
+  the fixture repository seeds, so S7's CLOSED arm flips every spec of the build; and the
+  nested-root arm's specs carried no status line, so they take an INPROGRESS one to stay graded.
 
 ## 10. Reuse audit
 
