@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-6 — a decision row or gotcha whose normalized text another record already holds reds
 
-**Status:** SPECCED · rev-3 · 2026-10-04 · node a · Tier-2 · base 5266d22e · streams tooling · order 6 · ratified 2026-10-04
+**Status:** SPECCED · rev-4 · 2026-10-05 · node a · Tier-2 · base 5266d22e · streams tooling · order 6 · ratified 2026-10-04
 
 <!-- gen:spec-records -->
 
@@ -24,8 +24,10 @@ write-time duplicate check; the near half is `TOOL-aGraftedHelix-9`.
 
 ## 2. Scope (IN)
 
-- **S1** — `tools/memory-tree/tree_lib.py` gains `derive_content_key(text)`, the five-step
-  normalization §4 "The key" pins, so the kit holds one spelling of it. Observed by AC1 and AC2.
+- **S1** — `tools/memory-tree/row_grammar.py` gains `derive_content_key(text)`, the five-step
+  normalization §4 "The key" pins, so the kit holds one spelling of it. It lives beside its one
+  reader: `tree_lib.py`'s header admits only a name at least two engines read. Observed by AC1 and
+  AC2.
 - **S2** — The record enumeration `scan_records` that `TOOL-aGraftedHelix-9` adds to
   `tools/memory-tree/row_grammar.py` gains a `body` field on each gotcha record: the file's text after
   the block the shared `FM_RE` matches. A row's keyed text is its existing `summary`, which already
@@ -35,7 +37,8 @@ write-time duplicate check; the near half is `TOOL-aGraftedHelix-9`.
   key held by records of two or more distinct identities when at least one holder was ADDED since
   the mainline merge-base, one finding per key naming every holder's location. The base and the
   added set are `TOOL-aGraftedHelix-9`'s `derive_relation_base` and identity-presence test, read
-  the same way. A key whose every holder is present at the base is LANDED: it is counted and not
+  the same way; `derive_relation_base` gains a defaulted `check` argument so an explicit base that
+  resolves to no commit is refused under check 28's number rather than 27's. A key whose every holder is present at the base is LANDED: it is counted and not
   reported, because nobody may edit a landed append-only row or take it out. With no resolvable
   base every key is graded, and the summary line says so. A key held twice under ONE identity is not
   this check's: check 20 owns an id twice in one document, check 24 owns one across a `cut`
@@ -135,12 +138,15 @@ row-grammar: check 28 graded <n> record(s) in <base8>..HEAD — <r> row(s), <g> 
 ```
 
 With no resolvable base, `in <base8>..HEAD` reads `with no mainline base, every key graded`.
+`<n>` is every record `scan_records` returns, empty keys included, so `<r>` and `<g>` sum to it;
+`<d>` is the number of keys reported. A gotcha holder is spelled as a row's is, `<where> (<ident>)`,
+its `where` being its path and its `ident` its stem.
 
 ### Inventory
 
 | identifier | kind | cell |
 |---|---|---|
-| `derive_content_key` | function, in `tree_lib.py` | `py.function` |
+| `derive_content_key` | function | `py.function` |
 | `check_content` | function | `py.function` |
 | `cmd_check_content` | function | `py.function` |
 | `CONTENT_CHECK` | module constant | none graded |
@@ -158,7 +164,6 @@ is to reword or drop THAT record; a landed row is never edited or removed.
 
 ### Files touched (estimate)
 
-- `tools/memory-tree/tree_lib.py`
 - `tools/memory-tree/row_grammar.py`
 - `tools/memory-tree/check-memory-hygiene.sh`
 - `tools/memory-tree/HYGIENE.template.md`
@@ -293,13 +298,19 @@ New arm: `tools/memory-tree/row_grammar.py --selftest` · fixture trees holding 
 - rev-3 · 2026-10-04 · §3 · §3 gains the hands-off to `TOOL-aGraftedHelix-17`, promoted from
   finding 16 of the round-1 spec audit of units 10 to 15, whose arm asserts this check's line absent
   from check 27's engine arm. No scope item or criterion of this unit moves.
+- rev-4 · 2026-10-05 · S1 S3 · §4 Output, Inventory, Files touched · §10 · the build pass's
+  divergences, recorded before the code: `derive_content_key` lives in `row_grammar.py`, its one
+  reader, because `tree_lib.py`'s header admits only a name two engines read and none other reads
+  this one; `derive_relation_base` gains a defaulted `check` argument so an unresolvable explicit
+  base is refused as check 28's; and the summary's `<n>`, `<d>` and a gotcha holder's spelling are
+  pinned. No criterion moves.
 
 ## 10. Reuse audit
 
 The seams extended, each verified against source at base `5266d22e`: the record enumeration
 `scan_records` and the shared `FM_RE` that `TOOL-aGraftedHelix-9` builds, so this unit adds a key
-and a mode and no second walk; `tree_lib.py` as the kit's home for helpers two modules share; and
-check 24's `--check-rotation` as the precedent for a second mode on `row_grammar.py` with its own
+and a mode and no second walk; `row_grammar.py` itself as the key's home, since `tree_lib.py`
+holds only helpers two modules share and this one has a single reader (rev-4); and check 24's `--check-rotation` as the precedent for a second mode on `row_grammar.py` with its own
 dispatch block. `reuse_lookup.py` with "red when two records carry the same normalized text"
 ranked `read_text` and `write_text` in `gen_build_index.py` first, which are byte IO and not a
 normalization, then `records` in `gotchas.py`, which the enumeration above supersedes for this
