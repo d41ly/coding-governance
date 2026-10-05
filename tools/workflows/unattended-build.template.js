@@ -1,6 +1,6 @@
 export const meta = {
   name: 'unattended-build',
-  version: '1.5', // gov:kit unattended-build@1.5 — engine identity (the .template.js is the source; the .js beside it is RENDERED by check-protocol-parity.test.sh --render)
+  version: '1.6', // gov:kit unattended-build@1.6 — engine identity (the .template.js is the source; the .js beside it is RENDERED by check-protocol-parity.test.sh --render)
   description:
     'Runs a build SPEC -> AUDIT -> DISPOSAL as ordered stages of ONE program, then hands the caller an ordered roster and stops. Stage order is a property of control flow rather than of an agent recollection across a context that compacts, and the roster is unreachable unless the audit verdict is terminal. The SPEC stage ends in ONE commit of the specs its writers authored, so the audit pins them at HEAD in the same call. AUDIT is opt-in: with no `specAudit` arg the stage announces itself OFF by declaration and the roster follows SPEC completion.',
   phases: [
@@ -830,9 +830,16 @@ if (!authoredIds.length) {
   // runs and the suite's real-git arm extracts and runs, so the two cannot diverge. `set -e` stops it
   // at the first failing step instead of committing past a failed render. THE RE-ADD after the render
   // is the fix: the generator rewrites every tracked spec's records region, so a spec staged before it
-  // went into the commit as its pre-render blob and the resolver's `HEAD:` compare refused it. While
-  // the delta loop compares whole lines, an authored spec's `??` line becomes `AM`, so the loop
-  // stages it too; the re-add is what still stages it once the loop compares paths. THE INPUT CHECK
+  // went into the commit as its pre-render blob and the resolver's `HEAD:` compare refused it. The
+  // delta loop compares PATHS (TOOL-aGraftedHelix-21), so an authored spec, which the record holds, is
+  // staged by the re-add alone. THE TWO LISTINGS are one command, `--untracked-files=all` both times:
+  // plain porcelain collapses a wholly untracked directory to one `?? <dir>/` line the per-file record
+  // never holds, and the loop staged another writer's directory whole. Comparing by path keeps a
+  // recorded file whose status letters moved during the render (` M` to ` D`) out of the commit. THE
+  // RECORD IS A SHELL VARIABLE and the agent's Bash tool keeps none between calls, so the block runs as
+  // ONE invocation and tests `${rec+x}` twice, never by emptiness, since a clean tree's record is set
+  // and empty: once before its first side effect, and once before the loop, where a refusal names the
+  // cleanup the staged specs and rendered views leave owed. THE INPUT CHECK
   // refuses before anything is staged when a generator input carries an unstaged change, because the
   // generator reads tracked bytes off the DISK and would render views the commit does not hold
   // (`TOOL-dMendedRecall-2` rev-3 S3's rule); `-B` keeps its bytecode out of the delta (its rev-2 S2).
@@ -841,7 +848,8 @@ if (!authoredIds.length) {
   // would end the block under `set -e` on a call with no foreign change.
   const commitBlock = [
     'set -e',
-    'before=$(git status --porcelain --untracked-files=all)',
+    'rec=$(git status --porcelain --untracked-files=all)',
+    'if [ -z "${rec+x}" ]; then echo "refused, nothing staged or rendered: the record of step 1, rec, is unset, so this block was split across Bash calls; run it as ONE invocation" >&2; exit 1; fi',
     'root=$(set -- <spec paths>; printf \'%s\' "${1%%/builds/*}")',
     'changed=$(git diff --name-only -- "$root" .memory-tree.conf {{MEMORY_TREE_DIR}})',
     'dirty=\'\'',
@@ -851,8 +859,9 @@ if (!authoredIds.length) {
     'git add -- <spec paths>',
     'python -B {{MEMORY_TREE_DIR}}/gen_build_index.py --write',
     'git add -- <spec paths>',
-    'git status --porcelain | while IFS= read -r line; do',
-    '  if printf \'%s\\n\' "$before" | grep -xF -- "$line" >/dev/null; then :; else git add -- "${line#???}"; fi',
+    'if [ -z "${rec+x}" ]; then echo "refused before the commit: the record of step 1, rec, is unset, so this block was split across Bash calls; the specs are staged and the views rendered, so restore every unstaged path under the memory root other than <spec paths>, then run git reset -q -- <spec paths>, then run the block again as ONE invocation" >&2; exit 1; fi',
+    'git status --porcelain --untracked-files=all | while IFS= read -r line; do',
+    '  if printf \'%s\\n\' "$rec" | cut -c4- | grep -xF -- "${line#???}" >/dev/null; then :; else git add -- "${line#???}"; fi',
     'done',
     'git commit -q -m \'spec(' + slug + '): ' + authoredIds.join(' ') + '\' -m \'Committed by the spec commit stage of the build harness.\' --trailer \'Pass: none\' --trailer \'<attribution trailer>\'',
     'git status --porcelain -- <spec paths>',
@@ -867,16 +876,21 @@ if (!authoredIds.length) {
       'header carries no id. Return them as `specs`, one `{id, path}` per id, repo-relative and forward-slashed.\n' +
       '2. Run the block below in ' + repo + ' exactly as written, except that every `<spec paths>` becomes ' +
       'those paths, space-separated, and `<attribution trailer>` becomes the attribution trailer the ' +
-      'charter mandates. It is the only copy of this stage\'s git sequence: add no step to it. Its lines, ' +
-      'in order: record the tree before anything is staged, and every path that record lists other than ' +
-      'those specs is FOREIGN, and is never staged by this stage; refuse, with nothing staged or rendered, ' +
+      'charter mandates. It is the only copy of this stage\'s git sequence: add no step to it. Run it as ' +
+      'ONE Bash invocation: its record of the tree is a shell variable, and your Bash tool keeps no shell ' +
+      'state between calls, so a block split across calls loses the record and refuses. Its lines, ' +
+      'in order: record the tree before anything is staged, every untracked file listed singly, and every ' +
+      'path that record lists other than those specs is FOREIGN, and is never staged by this stage; ' +
+      'refuse, with nothing staged or rendered, when that record is missing; refuse, with nothing staged or rendered, ' +
       'when an input of the build-index generator carries a change the index does not hold, the inputs ' +
       'being the memory root the specs sit under, the memory-tree conf and the generator\'s own directory, ' +
       'because the generator reads tracked bytes off the disk and would render views the commit does not ' +
       'hold; stage the specs, because the generator renders over tracked specs only; render the generated ' +
       'views without writing bytecode caches; stage the specs AGAIN, because the render rewrote their ' +
-      'records region after they were staged; stage each path the render changed that the record did not ' +
-      'list, which are the generator\'s outputs; commit ONCE on the checked-out branch, the message closing ' +
+      'records region after they were staged; refuse when the record is missing there, naming the cleanup ' +
+      'the staged specs and rendered views leave owed; stage each path the render changed whose PATH the ' +
+      'record does not list, listed the same way and compared by path alone, which are the generator\'s ' +
+      'outputs; commit ONCE on the checked-out branch, the message closing ' +
       'on one trailer block of `Pass: none` and the attribution trailer; and list the specs\' own status, ' +
       'which must be empty. Never `git add -A` or `git add -u`, never --no-verify, never amend, never push ' +
       'or merge.\n' +

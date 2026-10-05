@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-21 — the spec commit block's delta loop lists untracked paths as its record does, compares paths, and refuses when its record is unset
 
-**Status:** SPECCED · rev-4 · 2026-10-05 · node a · Tier-1 · base 5266d22e · streams tooling · order 12
+**Status:** CLOSED · rev-4 · 2026-10-05 · node a · Tier-1 · base 5266d22e · streams tooling · order 12
 
 <!-- gen:spec-records -->
 

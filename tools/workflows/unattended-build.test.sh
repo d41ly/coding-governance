@@ -1619,9 +1619,9 @@ hasnt_ "BT3-AC6 declared: nothing announces the audit off" "$o" "OFF by declarat
 o=$(run_wf "$(printf '%s' "$T_UNITS" | sed 's#"specAudit":"2026-09-20",##; s#"subjects":\[[^]]*\],##')" '{"spec":{"authored":[],"alreadyPresent":[],"refused":[],"summary":"s"}}')
 has    "BT3 attended, OFF, every unit terminal: the exit carries the audit object" "$o" '"audit":{"ran":false,"verdict":"NOT-OWED"'
 has    "BT3 ...with an empty roster, by filtering" "$o" '"roster":[]'
-# ---- AC7: both carriers read 1.5 — the render is byte-compared to the template by the parity leg,
+# ---- AC7: both carriers read 1.6 — the render is byte-compared to the template by the parity leg,
 # ---- so the marker moving in one file and not the other reds there; this arm reads the render.
-has    "BT3-AC7 the render carries the engine version 1.5" "$(sed -n '3p' "$F")" "version: '1.5', // gov:kit unattended-build@1.5"
+has    "BT3-AC7 the render carries the engine version 1.6" "$(sed -n '3p' "$F")" "version: '1.6', // gov:kit unattended-build@1.6"
 
 # ================================== TOOL-dPolishedVitrine-1 — THE HARNESS IS RENDERED AT INSTALL
 # The harness shipped as an ENGINE file, and apply writes those verbatim, so every install path it
@@ -1951,9 +1951,11 @@ fi
 # ---- the block's own render line names, plus two foreign paths. `PYTHONDONTWRITEBYTECODE` is unset
 # ---- for the run: a host that sets it hides the `-B` break, and node `a` sets it. Each arm read RED on
 # ---- a staged copy of the render: step 5 removed whole, the loop's filter inverted, `-B` removed, the
-# ---- input check removed, the channel flattened. The re-add removed ALONE reds no real-git row,
-# ---- measured: the loop compares whole lines, so an authored spec's `??` line, `AM` after the render,
-# ---- is staged by the loop too. The order arm below is that line's red until the loop compares paths.
+# ---- input check removed, the channel flattened. Since TOOL-aGraftedHelix-21 the loop compares PATHS,
+# ---- so the authored spec, which the record holds, is staged by the re-add alone, and the re-add
+# ---- removed reds the blob row. GH21 plants a third foreign path, a file inside a wholly untracked
+# ---- directory, and runs the block three more times: its record lost at step 1, its record lost after
+# ---- step 4, and a recorded foreign file deleted between step 4 and step 5.
 o=$(run_pathless "$P_OFF" "$P_SPEC" "$COMMIT_OK")
 pj=$(printf '%s\n' "$o" | sed -n 's/^promptjson:commit:specs:tB://p')
 same   "GH16 the promptjson channel decodes a multi-line prompt to a string holding a newline" \
@@ -1995,11 +1997,13 @@ build_spec_commit_repo() { # dir -> the `_b1` shape, the whole kit at $GKD, the 
       && "$_rkd_py" -B "$GKD/gen_build_index.py" --write >/dev/null 2>&1 && git add -A && git commit -q -m gen )
   printf 'edited\n' >> "$d/notes.txt"
   printf 'scratch\n' > "$d/scratch.txt"
+  mkdir -p "$d/foreign/sub" && printf 'brief\n' > "$d/foreign/sub/brief.md"
   printf '# A-tB-1 — the authored unit\n\n**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-1 · base 0123abcd · streams arch\n\nbody\n' \
     > "$d/$CPATH"
 }
-run_spec_commit_block() { # dir -> the extracted block's output with both placeholders filled, then `rc=<exit>`
+run_spec_commit_block() { # dir [sed script] -> the extracted block's output with both placeholders filled, then `rc=<exit>`
   local b=${GB//"<spec paths>"/$CPATH}
+  [ -z "${2:-}" ] || b=$(printf '%s\n' "$b" | sed "$2")
   printf '%s\n' "${b//"<attribution trailer>"/Co-Authored-By: t <t@t.test>}" > "$LAY/gh16-block.sh"
   ( cd "$1" && env -u PYTHONDONTWRITEBYTECODE GH16_PY="$_rkd_py" \
       bash -c 'python() { command "$GH16_PY" "$@"; }; . "$1"' gh16 "$LAY/gh16-block.sh" 2>&1; echo "rc=$?" )
@@ -2017,7 +2021,10 @@ if [ -n "$GKD" ] && build_spec_commit_repo "$G16" && [ "$(git -C "$G16" rev-list
   has    "GH16 ...and the build README the render moved" "$names" "memory/builds/tB/README.md"
   hasnt_ "GH16 ...and not the foreign tracked edit" "$names" "notes.txt"
   hasnt_ "GH16 ...nor the foreign untracked file" "$names" "scratch.txt"
-  same   "GH16 the foreign paths are left exactly as planted" "$(cd "$G16" && git status --porcelain)" "$(printf ' M notes.txt\n?? scratch.txt')"
+  same   "GH21 the foreign paths are left exactly as planted, every untracked file listed singly" \
+    "$(cd "$G16" && git status --porcelain --untracked-files=all)" "$(printf ' M notes.txt\n?? foreign/sub/brief.md\n?? scratch.txt')"
+  same   "GH21 ...and no file of the wholly untracked foreign directory is committed" \
+    "$(cd "$G16" && git ls-tree -r --name-only HEAD | grep -c '^foreign/')" "0"
   same   "GH16 no bytecode cache is committed" "$(cd "$G16" && git ls-tree -r --name-only HEAD | grep -c __pycache__)" "0"
   same   "GH16 the subject is the one the program filled" "$(cd "$G16" && git log -1 --format=%s)" "spec(tB): A-tB-1"
   same   "GH16 Pass: none is a trailer of the commit" "$(cd "$G16" && git log -1 --format='%(trailers:key=Pass,valueonly)')" "none"
@@ -2036,6 +2043,36 @@ if [ -n "$GKD" ] && build_spec_commit_repo "$G16" && [ "$(git -C "$G16" rev-list
   has    "GH16 ...naming that input" "$out" "memory/builds/tB/spec/2026-10-04-spec-A-tB-2.md"
   same   "GH16 ...with HEAD unmoved" "$(git -C "$G16V" rev-parse HEAD)" "$h0"
   same   "GH16 ...and nothing staged" "$(cd "$G16V" && git diff --cached --name-only)" ""
+  # TOOL-aGraftedHelix-21: the record is a shell variable, and a block split across Bash calls loses
+  # it. Lost at step 1, the EARLY guard refuses before the first side effect; its staged break, the
+  # guard deleted, reaches the late guard only after staging and rendering, so both rows below red.
+  G21E="$LAY/gh21e"; build_spec_commit_repo "$G21E"
+  s0=$(cd "$G21E" && git status --porcelain --untracked-files=all)
+  out=$(run_spec_commit_block "$G21E" '/^rec=/d')
+  hasnt_ "GH21 the record lost at step 1: the block exits non-zero" "$(printf '%s\n' "$out" | tail -1)" "rc=0"
+  has    "GH21 ...naming the record" "$out" "the record of step 1, rec, is unset"
+  same   "GH21 ...with nothing staged" "$(cd "$G21E" && git diff --cached --name-only)" ""
+  same   "GH21 ...and nothing rendered: the listing is what it was before the run" \
+    "$(cd "$G21E" && git status --porcelain --untracked-files=all)" "$s0"
+  # Lost after step 4, the LATE guard refuses before the loop and names the cleanup the staged specs
+  # and rendered views leave owed; its staged break, the guard deleted, commits every foreign path.
+  G21L="$LAY/gh21l"; build_spec_commit_repo "$G21L"
+  h0=$(git -C "$G21L" rev-parse HEAD)
+  out=$(run_spec_commit_block "$G21L" '/gen_build_index[.]py --write$/a unset rec')
+  hasnt_ "GH21 the record lost after step 4: the block exits non-zero" "$(printf '%s\n' "$out" | tail -1)" "rc=0"
+  has    "GH21 ...naming the record" "$out" "the record of step 1, rec, is unset"
+  has    "GH21 ...and the cleanup it leaves owed" "$out" "other than $CPATH, then run git reset -q -- $CPATH"
+  same   "GH21 ...with HEAD unmoved" "$(git -C "$G21L" rev-parse HEAD)" "$h0"
+  ( cd "$G21L" && git diff --name-only -- memory | grep -vxF -- "$CPATH" | while IFS= read -r p; do git checkout -q -- "$p"; done
+    git reset -q -- "$CPATH" )
+  out=$(run_spec_commit_block "$G21L")
+  same   "GH21 ...and after that cleanup the block, run again as one invocation, exits 0" "$(printf '%s\n' "$out" | tail -1)" "rc=0"
+  # A recorded foreign file whose status letters move during the render, ` M` to ` D`, is still the
+  # record's by PATH; its staged break, a membership test comparing whole lines, commits the deletion.
+  G21D="$LAY/gh21d"; build_spec_commit_repo "$G21D"
+  out=$(run_spec_commit_block "$G21D" '/gen_build_index[.]py --write$/a rm notes.txt')
+  same   "GH21 a foreign file deleted between step 4 and step 5: the block exits 0" "$(printf '%s\n' "$out" | tail -1)" "rc=0"
+  same   "GH21 ...and HEAD still names it" "$(cd "$G21D" && git ls-tree -r --name-only HEAD | grep -cx 'notes.txt')" "1"
 else
   n=$((n+1)); echo "FAIL GH16 the real-git arm could not start: block '$(printf '%s' "$GB" | head -1)', kit dir '$GKD' -- every arm it holds went UNRUN"; st=1
 fi
@@ -2057,7 +2094,11 @@ fi
 # RAISED 365 -> 387 by TOOL-aGraftedHelix-16: its 22 static sites, counted with the grep above as 507 at
 # the unit's parent and 529 after — the channel canary, the block's shape (3), the real-git run (14)
 # and the dirty-input variant (4). All of them sit on the path a green run takes.
-FLOOR_ASSERTIONS=387
+# RAISED 387 -> 399 by TOOL-aGraftedHelix-21: its 12 static sites, counted with the grep above as 529 at
+# the unit's parent and 541 after — the listing row split in two (+1), the record lost at step 1 (4), the
+# record lost after step 4 with its cleanup and re-run (5) and the foreign deletion (2). All of them sit
+# on the path a green run takes.
+FLOOR_ASSERTIONS=399
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; st=1; }
 # NOTHING RUNS AFTER THE TERMINAL EXIT (TOOL-dUnstalledConvoy-19): the floor cannot see an arm
 # appended past `exit $st`, and neither can check-arms.py or the summary line. One grep can. The
