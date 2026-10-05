@@ -11,8 +11,8 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 ## Run facts
 refreshed-at: fd82e883102c570ea66f4f3244a92c70f7c19083 · park · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 32645a03d6d16676afbcbb48908ae620e6668967
-phase: REVIEWING
+witness: a1f965e6302eb23114c784d3eb2b5fb3a30e9798
+phase: BUILDING
 branch-sha: 3640cf580d9df31e5cbe74be89024dd5a40e9f85
 branch-ref: refs/heads/branch/spec-review-improvements-f59dad
 spec-audit: 2026-10-05
@@ -88,3 +88,7 @@ base: 3640cf580d9df31e5cbe74be89024dd5a40e9f85
 2026-10-05T01:00:35Z rescope · item add TOOL-aEvidencedLens-15 · reason spec-audit round 1 (reviews/2026-10-05-review-TOOL-aEvidencedLens-12-spec-audit-round1.md) ids 1, 5 and 14 HIGH: unit 13 masks only result.key in its BASE comparison, but the diff-kind resume:probe spells the key as a template carrying inputPrint, which the REVIEW_SHAPE move changes, so its AC1 and AC2 are red on a correct build and invite reverting that move; repairs TOOL-aEvidencedLens-13
 
 2026-10-05T01:11:02Z review · item aEvidencedLens-spec-set-r2 · reason verdict CLEAN · blockers 0 · CONVERGED · disposition promote
+
+2026-10-05T01:13:52Z dispatch · item a1f965e6 TOOL-aEvidencedLens-10 · reason tools/workflows/review_replay.py tools/workflows/README.md memory/map/generated/symbols.json memory/builds/aEvidencedLens/spec/2026-10-05-spec-TOOL-aEvidencedLens-10.md memory/builds/aEvidencedLens/README.md
+
+2026-10-05T01:13:56Z brief · item TOOL-aEvidencedLens-10 · reason 61f076199a07 memory/builds/aEvidencedLens/prompts/2026-10-05-prompt-TOOL-aEvidencedLens-10-2-build-brief.md
