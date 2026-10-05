@@ -9,12 +9,14 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
-gates-run: unattended-179121147958199819510-882689 f1ab3000
+asks-at-landing: TOOL-dThriftyLanding-7=OPEN
+units-at-landing: TOOL-dThriftyLanding-1 TOOL-dThriftyLanding-2 TOOL-dThriftyLanding-3 TOOL-dThriftyLanding-4 TOOL-dThriftyLanding-5 TOOL-dThriftyLanding-6 TOOL-dThriftyLanding-8 TOOL-dThriftyLanding-9 TOOL-dThriftyLanding-10 TOOL-dThriftyLanding-11 TOOL-dThriftyLanding-12
+gates-run: unattended-179121532852273432207-1211103 736b6f85
 parked-surfaced: yes
 keepalive-reaped: yes
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: 675ff88983b3b9bf5f904d09066f79e6e75bffce
-phase: VERIFYING
+phase: LANDING
 branch-sha: 9c49bed108a9407d278b1ad701b86613f1046f0b
 branch-ref: refs/heads/branch/push-main-gate-optimization-3d9780
 may: none
