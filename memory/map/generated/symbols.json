@@ -1948,6 +1948,11 @@
       "file": "tools/gate-lint/sh_hygiene.py"
     },
     {
+      "id": "check_relations",
+      "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
+    },
+    {
       "id": "check_retired_flags",
       "kind": "function",
       "file": "tools/govkit/selftest.py"
@@ -2308,6 +2313,11 @@
       "file": "tools/runlog/runlog.py"
     },
     {
+      "id": "cmd_check_relations",
+      "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
+    },
+    {
       "id": "cmd_check_rotation",
       "kind": "function",
       "file": "tools/memory-tree/row_grammar.py"
@@ -2366,6 +2376,11 @@
       "id": "cmd_measure",
       "kind": "function",
       "file": "tools/memory-tree/corpus_ids.py"
+    },
+    {
+      "id": "cmd_measure_relations",
+      "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
     },
     {
       "id": "cmd_model",
@@ -3186,6 +3201,16 @@
       "id": "derive_registry_path",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "derive_relation_base",
+      "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
+    },
+    {
+      "id": "derive_relation_successors",
+      "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
     },
     {
       "id": "derive_rename_map",
@@ -4118,6 +4143,11 @@
       "file": "tools/drift-audit/drift_report.py"
     },
     {
+      "id": "load_recall_kit",
+      "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
+    },
+    {
       "id": "load_registry",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -4556,6 +4586,11 @@
       "id": "measure_lone_cr",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "measure_near_match",
+      "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
     },
     {
       "id": "measure_orphans",
@@ -5956,6 +5991,11 @@
       "id": "read_registry",
       "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"
+    },
+    {
+      "id": "read_relation_gate",
+      "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
     },
     {
       "id": "read_rev",
@@ -7380,6 +7420,11 @@
     {
       "id": "resolve_kit_dir",
       "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
+    },
+    {
+      "id": "resolve_kit_dir",
+      "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"
     },
     {
@@ -8058,6 +8103,11 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "scan_added_records",
+      "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
+    },
+    {
       "id": "scan_anomalies",
       "kind": "function",
       "file": "tools/runlog/model.py"
@@ -8261,6 +8311,11 @@
       "id": "scan_record_rows",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "scan_records",
+      "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
     },
     {
       "id": "scan_replaced_spellings",

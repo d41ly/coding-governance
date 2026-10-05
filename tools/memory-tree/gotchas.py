@@ -51,7 +51,8 @@ import tempfile
 HERE = pathlib.Path(__file__).resolve().parent
 HYGIENE = HERE / "check-memory-hygiene.sh"
 BEGIN, END = "<!-- BEGIN GENERATED -->", "<!-- END GENERATED -->"
-FM_RE = re.compile(r"\A---\n(.*?)\n---\n", re.S)
+# The front-matter pattern is `tree_lib.FM_RE`, imported below with the conf parser
+# (TOOL-aGraftedHelix-9): `row_grammar.py` reads the same block for check 27.
 # A path-ish token inside backticks: at least one `/`, or a known source extension.
 ANCHOR_RE = re.compile(r"`([^`\s]+(?:/[^`\s]*|\.(?:md|py|sh|js|json|ts|toml|yml|yaml|conf|txt)))`")
 # A record DECLARES its resolution by naming a gate, or by saying in as many words that it has none.
@@ -100,7 +101,7 @@ def write(path, text):
 # and the python half mis-read REMOVED coverage with the gate still green. TOOL-aRepatriatedFork-9
 # moved it into `tree_lib.py`, so this engine no longer needs a sibling ENGINE to import.
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from tree_lib import kit_rel, parse_conf  # noqa: E402  the kit's ONE conf parser
+from tree_lib import FM_RE, kit_rel, parse_conf  # noqa: E402  the kit's ONE conf parser
 
 def load_conf(root: str) -> dict:
     conf = {"MEMORY_ROOT": "memory", "UNIVERSAL_BUDGET": "", "LEG_MANIFEST": ""}

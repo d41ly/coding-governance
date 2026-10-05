@@ -286,6 +286,19 @@ ROW_DUPLICATE_PIN="0"
 SEVERITY_UNLABELLED_PIN=""
 LIVE_ROW_PIN=""
 
+# Check 27 — every decision row and gotcha ADDED since the mainline merge-base is ranked against the
+# records that existed there, with the memory-recall kit's index builder, and a top hit at or above
+# the floor that shares a term of four or more characters must be named by the new record or
+# answered with `supersedes <id>`, `coexists-with` or `disputes`. Grammar `red:<floor>` or
+# `warn:<floor>`, the floor a decimal in (0, 1]. A malformed value is a named refusal, and so is an
+# armed key with no memory-recall kit installed beside this one.
+# BLANK = NOT ARMED, announced on every run, and blank is what this kit ships: a floor measured on
+# another corpus is not a floor for yours. Measure your own before arming —
+# `row_grammar.py --measure-relations <floor>` replays your history and prints, per band, how many
+# records the check would have flagged, then every flagged pair to hand-grade. Arm `red` only at a
+# floor whose graded precision you are content to answer for.
+NEAR_MATCH_GATE=""
+
 # check-arms.py - per-gate floors for the harness meta-gate, one `<gate>:<branches>:<armed>` token
 # per discovered gate: the gate's fail branches, and how many of them its sibling test arms, may not
 # fall below these. BLANK IS REFUSED while any gate is discovered, and installing this kit installs

@@ -29,7 +29,26 @@ never a refusal and never off: a default that can only tighten needs no ceremony
 cost every hygiene fixture and every freshly scaffolded adopter a red bar.
 
 CLI: --check (gate), --report (human), --emit-pin (the current counts, for re-pinning), --ages (row
-age DERIVED from git rather than stored), --check-rotation (check 24), --selftest.
+age DERIVED from git rather than stored), --check-rotation (check 24), --check-relations [<base>]
+(check 27), --measure-relations [<floor> [<base>]] (check 27's replay instrument), --selftest.
+
+CHECK 27 (TOOL-aGraftedHelix-9) — every decision row and gotcha ADDED since the mainline merge-base
+is ranked against the records that existed there, with the memory-recall kit's own index builder,
+and a top hit that clears `NEAR_MATCH_GATE`'s floor AND shares a term of four or more characters
+must be named by the new record, or answered with `supersedes`, `coexists-with` or `disputes`. It
+OBLIGES a relation and never judges one: which of two records is right is nobody's assertion here.
+What check 27 does NOT check, said here because a structural check reads as a semantic one to
+everybody who did not write it:
+  - a near match BELOW THE TOP HIT. Only the first eligible hit is graded; a second record the new
+    one restates just as closely goes unasked.
+  - a PARAPHRASE UNDER THE FLOOR. Similarity is a Jaccard over `bench.terms`, so a restatement in
+    different words is invisible to it however exact its meaning.
+  - a BARE RELATION TOKEN THAT NAMES NO RECORD. `coexists-with` alone satisfies the check whether or
+    not it is about the hit; only `supersedes <id>` reaches the recall kit's superseded-by map.
+  - a ROW EDITED IN PLACE. The added set is decided by identity alone, so a changed row whose id was
+    already at the base is not graded; the decision index is append-only, which is check 20's and
+    the merge driver's business.
+Nor a record compared with another added in the same range, nor any record kind but those two.
 
 PROVENANCE. The backlog-row grammar, the two shard pins and `--ages` were written in adopter nc's
 fork of this file and taken upstream by TOOL-aRepatriatedFork-9, with two grammar corrections that
@@ -47,7 +66,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 # made both a hard prerequisite of this module, and at an adopter whose copies of those two are its
 # own programs this check died on import. `scan_engine_imports` below keeps it that way.
 from tree_lib import (  # noqa: E402  the kit's shared helpers
-    CENSUS_TERMINAL, STATUS_TOKENS, TERMINAL as TERMINAL_STATUS, parse_conf, unfenced_lines,
+    CENSUS_TERMINAL, FM_RE, STATUS_TOKENS, TERMINAL as TERMINAL_STATUS, parse_conf, unfenced_lines,
 )
 
 CHECK = 20
@@ -226,8 +245,12 @@ def derive_row_stems(conf):
     return [] if read_backlog_mode(conf) == "builds" else derive_families(conf)
 
 
-def row_docs(root, m, conf):
+def row_docs(root, m, conf, rev=None):
     """Every row-shaped document: the live index, the backlog shards, and the rotated archives.
+
+    `rev` lists them as they stood at that commit, through `git ls-tree`, rather than as tracked now
+    — check 27's presence test, which reads the base's row documents with ONE selection rule rather
+    than a second spelling of it.
 
     An archive is a ROTATION of one of those documents, so it is recognised by the name of the
     document it rotated — `DECISIONS` or a DECLARED family. The first cut kept only the `DECISIONS.`
@@ -252,7 +275,8 @@ def row_docs(root, m, conf):
     generated views, ask uniqueness is the fold's corpus-wide verdict rather than a per-file one,
     and the per-build ask files hold one row per id by construction.
     """
-    tracked = [p for p in run("git", "ls-files", "--", m + "/", cwd=root).split("\n") if p]
+    lister = ("git", "ls-tree", "-r", "--name-only", rev) if rev else ("git", "ls-files")
+    tracked = [p for p in run(*lister, "--", m + "/", cwd=root).split("\n") if p]
     rot = build_rotated_re(conf)
     shards = read_backlog_mode(conf) != "builds"
     keep = []
@@ -853,6 +877,468 @@ def cmd_check_rotation(root, conf):
         return 0
     print(f"rotation-mode: clean (`cut`, {graded} rotated archive(s): terminal-only and disjoint "
           f"from their live indexes)")
+    return 0
+
+
+# ============================== CHECK 27 — a newly added record that ranks as a near match names it
+# TOOL-aGraftedHelix-9. Prior art used to be checked only as a lens of a spec audit, so two nodes
+# could each record what is in effect one decision, or a decision that quietly narrows an older one,
+# with every leg green. The predicate is pinned in the unit's spec §4 because its §8 F1 measured the
+# floor with exactly this construction; a different one is a different floor. What it does NOT check
+# is stated in the module docstring.
+RELATION_CHECK = 27
+RELATION_KEY = "NEAR_MATCH_GATE"
+# The three tokens that answer a near match on their own. Only `supersedes <id>` reaches the recall
+# kit's superseded-by map, which is why a finding's remedy names that form.
+RELATION_TOKEN_RE = re.compile(r"\b(supersedes|coexists-with|disputes)\b", re.I)
+# The replay's band edges, printed on every `--measure-relations` run.
+RELATION_BANDS = (0.10, 0.125, 0.15, 0.175, 0.20)
+# `(?<![\w-])` / `(?![\w-])`: a name delimited so `TOOL-a-1` is not found inside `TOOL-a-12`.
+NAME_EDGE = (r"(?<![\w-])(?:", r")(?![\w-])")
+
+
+# The recall kit is reached through the canonical resolver, receipt row first, and never by a typed
+# path: `corpus_ids.py` reaches the same kit for its id grammar the same way.
+# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
+def resolve_kit_dir(home, anchor, here):
+    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
+
+    1. receipt — the `.governance/install.json` row whose `source` ends in <home>/<anchor> and
+       whose `path` exists inside this tree. The only record of a RENAMED kit dir: no probe finds
+       a memory-recall kit an adopter homed at `scripts/recall/`.
+    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
+    3. refuse — LookupError naming the three places looked; never a guessed prefix.
+    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
+    """
+    import json
+    import pathlib
+    here = pathlib.Path(here).absolute()  # never resolve(): a junction must not move it
+    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
+    receipt = root / ".governance" / "install.json"
+    try:
+        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("path"):
+            continue
+        if str(row.get("source") or "").split("/")[-2:] != [home, anchor]:
+            continue
+        hit = (root / str(row["path"])).absolute()
+        if hit.is_file() and root in hit.parents and ".." not in hit.parts:
+            return hit.parent
+    probes = (here / home, here.parent / home)
+    for cand in probes:
+        if (cand / anchor).is_file():
+            return cand
+    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
+        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
+# <<< resolve_kit_dir
+
+
+def read_relation_gate(conf):
+    """-> `(mode, floor)` from NEAR_MATCH_GATE, or None when it is blank, which is NOT ARMED.
+
+    Blank is the kit's shipped value and is announced on every run rather than passed over: a floor
+    measured on one corpus is not a floor for another, so arming is the adopter's measured act
+    (`--measure-relations` is the instrument). A malformed value is a named refusal, never a
+    traceback and never a guess at what was meant.
+    """
+    raw = conf.get(RELATION_KEY, "").strip()
+    if not raw:
+        return None
+    mm = re.fullmatch(r"(red|warn):([0-9]*\.?[0-9]+)", raw)
+    floor = float(mm.group(2)) if mm else 0.0
+    if not mm or not 0 < floor <= 1:
+        raise Problem(f"row-grammar: {RELATION_KEY}='{raw}' is not `red:<floor>` or `warn:<floor>` "
+                      f"with the floor a decimal in (0, 1]; blank it to leave check {RELATION_CHECK} "
+                      f"unarmed")
+    return mm.group(1), floor
+
+
+def load_recall_kit():
+    """-> the memory-recall kit's `bench` module, or a refusal naming that kit and the key.
+
+    An absent or too-old index builder while the key is armed is a NAMED refusal: a check that could
+    not rank anything and exited 0 would read as a clean range. Imported with
+    `sys.dont_write_bytecode` set first, the line the recall kit carries itself, so the import writes
+    nothing inside the audited tree.
+    """
+    here = os.path.dirname(os.path.abspath(__file__))
+    try:
+        kit = str(resolve_kit_dir("memory-recall", "bench.py", here))
+    except LookupError as exc:
+        raise Problem(f"row-grammar: check {RELATION_CHECK} is armed by {RELATION_KEY} and ranks with "
+                      f"the memory-recall kit's index builder, which is not installed — {exc}. "
+                      f"Install that kit beside this one, or blank {RELATION_KEY}") from None
+    sys.dont_write_bytecode = True
+    if kit not in sys.path:
+        sys.path.insert(0, kit)
+    try:
+        import bench  # noqa: E402  (deliberately late: an unarmed run never needs the sibling)
+    except Exception as exc:  # noqa: BLE001 — a traceback here would be the finding
+        raise Problem(f"row-grammar: check {RELATION_CHECK} could not import the memory-recall kit's "
+                      f"bench.py from {kit}: {type(exc).__name__}: {exc}") from None
+    missing = [n for n in ("build_index", "match_expr", "terms", "ALIAS_WEIGHT")
+               if not hasattr(bench, n)]
+    if missing:
+        raise Problem(f"row-grammar: check {RELATION_CHECK} is armed by {RELATION_KEY}, but the "
+                      f"memory-recall kit's bench.py at {kit} predates {', '.join(missing)}; update "
+                      f"that kit, or blank {RELATION_KEY}")
+    return bench
+
+
+def derive_relation_successors(root):
+    """-> `{old id: [[new id, 'whole'|'partial'], ...]}`, the map `TOOL-aGraftedHelix-4` serves.
+
+    That unit's two functions and no third, called the way its cache builder in `query.py` calls
+    them: `extract_supersessions` over every file `extract.corpus_inputs` lists, then one
+    `derive_supersession_map` with every anchored id as defined. Read directly rather than from the
+    query cache's manifest, because `query.ensure_cache` rebuilds that cache whenever the corpus
+    moved, and a hygiene leg must not write a shared cache as a side effect of grading.
+
+    `extract.py` binds its id grammar to the repository the recall kit is INSTALLED in, which is the
+    audited one on every real run (`grammar-bound-to-the-wrong-root`). The self-test's arms that
+    reach this run a copy-install fixture for that reason. Call it after `load_recall_kit`, which put
+    the kit on `sys.path`.
+    """
+    import pathlib
+    try:
+        import extract  # noqa: E402  (deliberately late: only an unsatisfied near match needs it)
+        need = ("corpus_inputs", "extract_records", "extract_supersessions", "derive_supersession_map")
+        missing = [n for n in need if not hasattr(extract, n)]
+        if missing:
+            raise Problem(f"row-grammar: check {RELATION_CHECK} needs the memory-recall kit's "
+                          f"superseded-by map, and its extract.py predates {', '.join(missing)}; "
+                          f"update that kit")
+        repo = pathlib.Path(root)
+        files, _declared = extract.corpus_inputs(repo)
+        edges, defined = [], set()
+        for path in files:
+            try:
+                text = (repo / path).read_text(encoding="utf-8", errors="replace")
+            except OSError:
+                continue
+            if not text:
+                continue
+            recs = extract.extract_records(path, text)
+            defined.update(r["id"] for r in recs)
+            edges += extract.extract_supersessions(path, text, recs)
+        return extract.derive_supersession_map(edges, defined)[0]
+    except Problem:
+        raise
+    except Exception as exc:  # noqa: BLE001 — the sibling's own errors are different classes
+        raise Problem(f"row-grammar: check {RELATION_CHECK} could not derive the superseded-by map "
+                      f"from the memory-recall kit: {type(exc).__name__}: {exc}") from None
+
+
+def scan_records(root, conf):
+    """-> one dict per record of check 27's population, in a FIXED order the index's rowids follow.
+
+    Every row the row grammar keys in the decision index and its rotated archives (the members of
+    `row_docs()` whose stem is `DECISIONS`), then every tracked gotcha record directly under
+    `<memory>/gotchas/` except its `INDEX.md`. Texts are read from the worktree, which is HEAD's on a
+    clean tree. Fields: `kind` (row | gotcha) · `ident` (the id | the file stem) · `names` (what a
+    record names it by: the id | the stem and the front-matter `name`) · `where` (`<path>:<line>` |
+    `<path>`) · `path` · `summary` (what similarity is measured on: the line after the keyed prefix |
+    the front-matter `description`) · `full` (what satisfaction reads: the whole line | the whole
+    file) · `slug` (the id's middle segment | None).
+    """
+    m = conf["MEMORY_ROOT"]
+    rowre = re.compile(r"^\s*[-*]\s+[`*]*(" + id_pattern(conf).pattern + r")\b")
+    out = []
+    for p in row_docs(root, m, conf):
+        if os.path.basename(p).split(".")[0] != "DECISIONS":
+            continue
+        try:
+            text = read(os.path.join(root, p))
+        except OSError:
+            raise Problem(f"row-grammar: {p} is tracked but is not on disk, so check "
+                          f"{RELATION_CHECK} could not read its rows") from None
+        for n, line in unfenced_lines(text):
+            mm = rowre.match(line) if line is not None else None
+            if mm:
+                rid = mm.group(1)
+                out.append({"kind": "row", "ident": rid, "names": [rid], "where": f"{p}:{n}",
+                            "path": p, "summary": line[mm.end():], "full": line,
+                            "slug": rid.split("-")[1]})
+    gdir = f"{m}/gotchas/"
+    for p in run("git", "ls-files", "--", gdir, cwd=root).split("\n"):
+        if not p.endswith(".md") or "/" in p[len(gdir):] or p == f"{gdir}INDEX.md":
+            continue
+        try:
+            with open(os.path.join(root, p), encoding="utf-8", errors="replace") as fh:
+                text = fh.read()
+        except OSError:
+            raise Problem(f"row-grammar: {p} is tracked but is not on disk, so check "
+                          f"{RELATION_CHECK} could not read it") from None
+        # Column-0 `key: value` lines inside the block, the rule `gotchas.py` enforces for checks
+        # 17-19; a malformed block is theirs to red, and reads here as an empty description.
+        fm = {}
+        hm = FM_RE.match(text)
+        for line in (hm.group(1).split("\n") if hm else []):
+            if line[:1].isspace() or ":" not in line:
+                continue
+            k, _, v = line.partition(":")
+            fm[k.strip()] = v.strip()
+        stem = os.path.basename(p)[:-3]
+        out.append({"kind": "gotcha", "ident": stem, "names": [stem, fm.get("name", "")],
+                    "where": p, "path": p, "summary": fm.get("description", ""), "full": text,
+                    "slug": None})
+    return out
+
+
+def derive_relation_base(root, base=None):
+    """-> the commit check 27 measures from: `base` resolved, or the mainline merge-base.
+
+    `check-verdict-epoch.sh`'s derivation: the merge-base of `origin/<branch>` and HEAD, then of
+    `<branch>` and HEAD, with `<branch>` from GOV_DEFAULT_BRANCH or `main`. The remote first, so a
+    stale local `main` cannot widen the range. No base while armed is a RED naming it, because the
+    bar judges a leg by its exit code and a zero-status skip would read as a pass.
+    """
+    if base:
+        p = subprocess.run(["git", "rev-parse", "--verify", "--quiet", base + "^{commit}"], cwd=root,
+                           capture_output=True, text=True, encoding="utf-8")
+        if p.returncode != 0 or not p.stdout.strip():
+            raise Problem(f"row-grammar: check {RELATION_CHECK} was given the base '{base}', which "
+                          f"does not resolve to a commit here")
+        return p.stdout.strip()
+    branch = os.environ.get("GOV_DEFAULT_BRANCH", "").strip() or "main"
+    for ref in (f"origin/{branch}", branch):
+        p = subprocess.run(["git", "merge-base", ref, "HEAD"], cwd=root, capture_output=True,
+                           text=True, encoding="utf-8")
+        if p.returncode == 0 and p.stdout.strip():
+            return p.stdout.strip()
+    raise Problem(f"row-grammar: check {RELATION_CHECK} is armed and found no mainline base — neither "
+                  f"origin/{branch} nor {branch} shares history with HEAD, so no added record can be "
+                  f"told from an old one. Fetch full history, set GOV_DEFAULT_BRANCH, or pass a base")
+
+
+def scan_added_records(root, conf, base, recs):
+    """-> `(added, eligible)`: the records of `recs` whose identity is absent at `base`, and those
+    present there, both as the same dicts `scan_records` returned.
+
+    IDENTITY, never diff lines. A row is present at the base when the row grammar keys its id in
+    the base's row documents, each read with `git show`; a gotcha when `git ls-tree` lists its path.
+    So a gotcha renamed inside the range is added under its new name and never eligible under its
+    old one, which `--diff-filter=A` with git's default rename detection would get wrong.
+    """
+    m = conf["MEMORY_ROOT"]
+    rowre = re.compile(r"^\s*[-*]\s+[`*]*(" + id_pattern(conf).pattern + r")\b")
+    present = set()
+    for p in row_docs(root, m, conf, rev=base):
+        if os.path.basename(p).split(".")[0] != "DECISIONS":
+            continue
+        for _n, line in unfenced_lines(run("git", "show", f"{base}:{p}", cwd=root)):
+            mm = rowre.match(line) if line is not None else None
+            if mm:
+                present.add(("row", mm.group(1)))
+    for p in run("git", "ls-tree", "--name-only", base, "--", f"{m}/gotchas/", cwd=root).split("\n"):
+        if p.endswith(".md") and os.path.basename(p) != "INDEX.md":
+            present.add(("gotcha", os.path.basename(p)[:-3]))
+    added = [r for r in recs if (r["kind"], r["ident"]) not in present]
+    eligible = [r for r in recs if (r["kind"], r["ident"]) in present]
+    return added, eligible
+
+
+def measure_near_match(bench, db, recs, tsets, i, eligible):
+    """-> `(j, jaccard, shared, own)` for record `i`'s TOP ELIGIBLE hit; `j` is None when it has none.
+
+    Steps 2 to 4 of the spec's predicate. The query is `bench.match_expr` over the record's summary,
+    ranked by `bm25(d, 1.0, 1.0, ALIAS_WEIGHT)`, LIMIT 200, and the first returned rowid `eligible`
+    accepts is the hit. `own` is a hit that is a row of the record's own slug: grading ENDS there
+    and never advances to the next hit, because the measurement dropped those pairs and advancing was
+    not measured. `shared` is the shared terms of four or more characters; the caller applies the
+    floor, so the replay can count every band from one ranking. No syntax error is caught here:
+    `match_expr` double-quotes every term, so a MATCH that fails is a broken index, not a miss.
+    """
+    r = recs[i]
+    ranked = [x[0] for x in db.execute(
+        "SELECT rowid FROM d WHERE d MATCH ? ORDER BY bm25(d, 1.0, 1.0, ?) LIMIT 200",
+        (bench.match_expr(r["summary"]), bench.ALIAS_WEIGHT))]
+    j = next((x for x in ranked if x != i and eligible(x)), None)
+    if j is None:
+        return None, 0.0, [], False
+    h = recs[j]
+    if r["kind"] == "row" and h["kind"] == "row" and r["slug"] == h["slug"]:
+        return j, 0.0, [], True
+    a, b = tsets[i], tsets[j]
+    return j, len(a & b) / max(1, len(a | b)), sorted(t for t in a & b if len(t) >= 4), False
+
+
+def check_relations(root, conf, base, gate, bench):
+    """-> `(findings, stats)` for every record added since `base`. Step 5 of the predicate is here.
+
+    The index holds the WHOLE population at HEAD, so its term statistics are the replay's; only the
+    records present at the base are eligible hits. A near match is satisfied when the new record's
+    full text names the hit, names a successor the superseded-by map holds for it, or carries a
+    relation token. The map costs a corpus walk, so it is derived only when some near match is
+    unsatisfied by the cheap two, and once.
+    """
+    mode, floor = gate
+    recs = scan_records(root, conf)
+    added, eligible = scan_added_records(root, conf, base, recs)
+    stats = {"graded": len(added), "base": len(eligible), "near": 0, "satisfied": 0, "own": 0}
+    if not added:
+        return [], stats
+    db = bench.build_index([{"id": r["ident"] if r["kind"] == "row" else "", "path": r["path"],
+                             "text": r["summary"]} for r in recs])
+    tsets = [set(bench.terms(r["summary"])) for r in recs]
+    pos = {id(r): i for i, r in enumerate(recs)}
+    ok = {pos[id(r)] for r in eligible}
+    unsat = []
+    for r in added:
+        j, jac, shared, own = measure_near_match(bench, db, recs, tsets, pos[id(r)], ok.__contains__)
+        if own:
+            stats["own"] += 1
+            continue
+        if j is None or not shared or jac < floor:
+            continue
+        stats["near"] += 1
+        names = [x for x in recs[j]["names"] if x]
+        named = re.compile(NAME_EDGE[0] + "|".join(map(re.escape, names)) + NAME_EDGE[1])
+        if named.search(r["full"]) or RELATION_TOKEN_RE.search(r["full"]):
+            stats["satisfied"] += 1
+            continue
+        unsat.append((r, recs[j], jac, shared))
+    smap = derive_relation_successors(root) if unsat else {}
+    findings = []
+    for r, h, jac, shared in unsat:
+        edges = smap.get(h["ident"], [])
+        succ = [n for n, _kind in edges]
+        if succ and re.search(NAME_EDGE[0] + "|".join(map(re.escape, succ)) + NAME_EDGE[1],
+                              r["full"]):
+            stats["satisfied"] += 1
+            continue
+        # The tag is `TOOL-aGraftedHelix-4`'s spelling (`query.render_supersession_tag`): the whole
+        # successors, or the partial ones when there is no whole edge.
+        whole = [n for n, kind in edges if kind == "whole"]
+        tag = (f" [superseded by {', '.join(whole)}]" if whole else
+               f" [partly superseded by {', '.join(succ)}]" if succ else "")
+        head = f"check {RELATION_CHECK}:" if mode == "red" else "WARN"
+        terms = ", ".join(f"`{t}`" for t in shared[:3])
+        findings.append(f"{head} {r['ident']} ({r['where']}) near-matches {h['ident']}{tag} at "
+                        f"{jac:.3f}, shared {terms} — name it, or carry supersedes <id>, "
+                        f"coexists-with or disputes")
+    return findings, stats
+
+
+def cmd_check_relations(root, conf, base=None):
+    gate = read_relation_gate(conf)
+    if gate is None:
+        # An unarmed run reads no history at all, so a tree with no mainline still runs green.
+        print(f"row-grammar: check {RELATION_CHECK} NOT ARMED — {RELATION_KEY} is blank, so no added "
+              f"record was compared")
+        return 0
+    bench = load_recall_kit()
+    sha = derive_relation_base(root, base)
+    findings, st = check_relations(root, conf, sha, gate, bench)
+    for f in findings:
+        print(f)
+    print(f"row-grammar: check {RELATION_CHECK} graded {st['graded']} added record(s) in "
+          f"{sha[:8]}..HEAD against {st['base']} at base — {st['near']} near match(es), "
+          f"{st['satisfied']} satisfied, {st['own']} own-session, mode {gate[0]} floor {gate[1]:g}")
+    return 1 if findings and gate[0] == "red" else 0
+
+
+def cmd_measure_relations(root, conf, floor=None, base=None):
+    """The replay §8 F1 decided the floor with, shipped so an adopter can measure their own.
+
+    Every row and gotcha present at HEAD (and at `base`, when given, so a measurement repeats exactly
+    after newer records have moved the index's term statistics) is ranked against the records OLDER
+    than it with the check's own predicate. A row's add commit is the first commit in
+    `git log --reverse -m -p` over the decision index and its archives whose diff adds a line the
+    row grammar keys with its id; `-m` because a merge's own resolution can add a row no parent
+    carries. A gotcha's is the first `--diff-filter=A` commit naming its path in the same flags.
+    OLDER is an earlier committer time. A record with no add commit is neither ranked nor ranked
+    against, and is counted.
+    """
+    gate = read_relation_gate(conf)
+    if floor is None:
+        if gate is None:
+            raise Problem(f"row-grammar: --measure-relations needs a floor: pass one, or declare "
+                          f"{RELATION_KEY}")
+        floor = gate[1]
+    else:
+        try:
+            floor = float(floor)
+        except ValueError:
+            floor = -1.0
+        if not 0 < floor <= 1:
+            raise Problem("row-grammar: --measure-relations takes a floor that is a decimal in (0, 1]")
+    bench = load_recall_kit()
+    m = conf["MEMORY_ROOT"]
+    recs = scan_records(root, conf)
+    sha = derive_relation_base(root, base) if base else None
+    if sha:
+        recs = scan_added_records(root, conf, sha, recs)[1]
+    docs = [p for p in row_docs(root, m, conf) if os.path.basename(p).split(".")[0] == "DECISIONS"]
+    rowre = re.compile(r"^\s*[-*]\s+[`*]*(" + id_pattern(conf).pattern + r")\b")
+    gdir = f"{m}/gotchas/"
+    times, cur = {}, None
+    walks = (("row", ["-p", "-U0", "--"] + docs),
+             ("gotcha", ["--diff-filter=A", "--name-only", "--", gdir]))
+    for kind, argv in walks:
+        p = subprocess.run(["git", "log", "--reverse", "-m", "--no-renames", "--format=@@C %H %ct"]
+                           + argv, cwd=root, capture_output=True, text=True, encoding="utf-8",
+                           errors="replace")
+        if p.returncode != 0:
+            raise Problem(f"row-grammar: the replay's {kind} walk failed: {p.stderr.strip()}")
+        for line in p.stdout.split("\n"):
+            if line.startswith("@@C "):
+                cur = int(line.split()[2])
+            elif kind == "row" and line.startswith("+") and not line.startswith("+++"):
+                mm = rowre.match(line[1:])
+                if mm:
+                    times.setdefault(("row", mm.group(1)), cur)
+            elif kind == "gotcha" and line.startswith(gdir) and line.endswith(".md") \
+                    and "/" not in line[len(gdir):]:
+                times.setdefault(("gotcha", os.path.basename(line)[:-3]), cur)
+    t = [times.get((r["kind"], r["ident"])) for r in recs]
+    db = bench.build_index([{"id": r["ident"] if r["kind"] == "row" else "", "path": r["path"],
+                             "text": r["summary"]} for r in recs])
+    tsets = [set(bench.terms(r["summary"])) for r in recs]
+    pairs, graded, own, smap = [], 0, 0, None
+    for i, r in enumerate(recs):
+        if t[i] is None:
+            continue
+        j, jac, shared, is_own = measure_near_match(
+            bench, db, recs, tsets, i, lambda x: t[x] is not None and t[x] < t[i])
+        if j is None:
+            continue
+        graded += 1
+        if is_own:
+            own += 1
+            continue
+        if not shared:
+            continue
+        h = recs[j]
+        names = [x for x in h["names"] if x]
+        if re.search(NAME_EDGE[0] + "|".join(map(re.escape, names)) + NAME_EDGE[1], r["full"]) \
+                or RELATION_TOKEN_RE.search(r["full"]):
+            continue
+        if smap is None:
+            smap = derive_relation_successors(root)
+        succ = [n for n, _kind in smap.get(h["ident"], [])]
+        if succ and re.search(NAME_EDGE[0] + "|".join(map(re.escape, succ)) + NAME_EDGE[1],
+                              r["full"]):
+            continue
+        pairs.append((jac, r, h, shared))
+    nrows = sum(1 for r in recs if r["kind"] == "row")
+    scope = f" present at {sha[:8]} and HEAD" if sha else " present at HEAD"
+    print(f"row-grammar: check {RELATION_CHECK} replay over {len(recs)} record(s){scope} "
+          f"({nrows} rows, {len(recs) - nrows} gotchas), {t.count(None)} with no add commit — "
+          f"{graded} top hit(s) graded, {own} own-session")
+    for edge in sorted(set(RELATION_BANDS + (floor,))):
+        hit = [p for p in pairs if p[0] >= edge]
+        rows = sum(1 for p in hit if p[1]["kind"] == "row")
+        print(f"row-grammar: band {edge:.3f} would flag {len(hit)} record(s): {rows} rows, "
+              f"{len(hit) - rows} gotchas")
+    flagged = sorted((p for p in pairs if p[0] >= floor), key=lambda p: -p[0])
+    print(f"row-grammar: {len(flagged)} pair(s) flagged at floor {floor:g}, new record > top hit:")
+    for jac, r, h, shared in flagged:
+        print(f"  {jac:.3f}  {r['ident']} > {h['ident']}  shared "
+              + ", ".join(f"`{x}`" for x in shared[:3]))
     return 0
 
 
@@ -1806,6 +2292,250 @@ def cmd_selftest():
             lambda: "owner-exempt" if not [h for h in scan_engine_imports(staged)[0]
                                            if h[0] == "gen_build_index.py"] else "FLAGGED")
 
+        # ------------------------------------------------- CHECK 27 (TOOL-aGraftedHelix-9)
+        # EVERY ARM RUNS A COPY-INSTALL FIXTURE, as a subprocess whose cwd is the fixture: this kit's
+        # modules and the recall kit's are copied into the fixture repository, so the fixture IS the
+        # kit's repository. `extract.py` binds its id grammar to the repository the recall kit is
+        # installed in, and an in-process arm reaching the superseded-by map would grade THIS repo's
+        # grammar over a foreign root and pass (`grammar-bound-to-the-wrong-root`). An inherited
+        # GOV_DEFAULT_BRANCH is dropped, because the base derivation reads it.
+        # The fixture lays each kit out where THIS install has it, relative to its checkout, so the
+        # arms spell no kit path (the install-prefix ban) and run at an adopter's prefix too. Its
+        # install receipt rides along when there is one, which is how a re-homed recall kit resolves.
+        import shutil
+        kdir = os.path.dirname(os.path.abspath(__file__))
+        try:
+            rhome = str(resolve_kit_dir("memory-recall", "bench.py", kdir))
+        except LookupError:
+            rhome = None
+        kroot = kdir
+        while not os.path.exists(os.path.join(kroot, ".git")) and os.path.dirname(kroot) != kroot:
+            kroot = os.path.dirname(kroot)
+        mrel = os.path.relpath(kdir, kroot)
+        rrel = os.path.relpath(rhome, kroot) if rhome else None
+        receipt = os.path.join(".governance", "install.json")
+
+        def build_fixture(name, recall=True):
+            t = os.path.join(base, name)
+            for src, rel in [(kdir, mrel)] + ([(rhome, rrel)] if recall else []):
+                os.makedirs(os.path.join(t, rel))
+                for f in os.listdir(src):
+                    if f.endswith(".py"):
+                        shutil.copyfile(os.path.join(src, f), os.path.join(t, rel, f))
+            if os.path.isfile(os.path.join(kroot, receipt)):
+                os.makedirs(os.path.join(t, os.path.dirname(receipt)))
+                shutil.copyfile(os.path.join(kroot, receipt), os.path.join(t, receipt))
+            run("git", "init", "-q", ".", cwd=t)
+            run("git", "symbolic-ref", "HEAD", "refs/heads/main", cwd=t)
+            run("git", "config", "user.email", "t@t.test", cwd=t)
+            run("git", "config", "user.name", "t", cwd=t)
+            _write_commit(t, "2026-01-01", dict(rel_base), msg="base")
+            return t, run("git", "rev-parse", "HEAD", cwd=t).strip()
+
+        def run_fixture(t, *args, branch=None):
+            env = dict(os.environ)
+            env.pop("GOV_DEFAULT_BRANCH", None)
+            if branch:
+                env["GOV_DEFAULT_BRANCH"] = branch
+            me = os.path.join(t, mrel, os.path.basename(os.path.abspath(__file__)))
+            p = subprocess.run([sys.executable, me] + list(args), cwd=t, capture_output=True,
+                               text=True, encoding="utf-8", env=env)
+            return f"rc={p.returncode} {p.stdout}{p.stderr}"
+
+        def set_branch(t, sha, files, date="2026-02-01"):
+            run("git", "checkout", "-q", "-B", "arm", sha, cwd=t)
+            _write_commit(t, date, files, msg="arm")
+            return t
+
+        def build_gotcha(stem, desc, body="A body.\n"):
+            return f"---\nname: {stem}\ndescription: {desc}\n---\n\n{body}"
+
+        rows = ["# decisions", "",
+                "- ARCH-tBase-1 · rotation archives keep terminal rows only, and a live row never moves into one",
+                "- ARCH-tBase-2 · the merge driver keys every row by its identifier and refuses a duplicated key",
+                "- ARCH-tOld-1 · reviewers receive the security model before hunting findings in a diff",
+                "- ARCH-tNext-1 · SUPERSEDES ARCH-tOld-1 — priming moved into the harness prompt template",
+                "- ARCH-tLedger-1 · acceptance ledgers record one line per criterion with the sha it ran at",
+                "- ARCH-tWider-1 · supersedes ARCH-tLedger-1's line format: each entry names its command too",
+                ""]
+        conf = 'MEMORY_ROOT=memory\nFAMILIES="arch:ARCH"\nNEAR_MATCH_GATE="{}"\n'
+        rel_base = {
+            ".gitignore": "__pycache__/\n",
+            ".memory-tree.conf": conf.format("red:0.125"),
+            "memory/DECISIONS.md": "\n".join(rows),
+            "memory/gotchas/INDEX.md": "# gotchas\n",
+            "memory/gotchas/crlf-breaks-shebang-lines.md": build_gotcha(
+                "crlf-breaks-shebang-lines",
+                "a carriage return left in a shell script breaks its shebang line on every node"),
+            "memory/gotchas/heredoc-mangles-backslashes.md": build_gotcha(
+                "heredoc-mangles-backslashes",
+                "a bash heredoc mangles backslash escapes before python ever reads them"),
+        }
+        restated = "- ARCH-tNew-1 · rotation archives keep terminal rows only, so a live row never moves into one"
+        unrelated = "- ARCH-tNew-2 · zebra quokka axolotl"
+
+        def add_rows(*lines):
+            return {"memory/DECISIONS.md": "\n".join(rows[:-1] + list(lines) + [""])}
+
+        if rhome is None:
+            print("arm SKIP  check 27's recall-dependent arms did NOT run: no memory-recall kit is "
+                  "installed beside this one, so nothing here ranked a record")
+        else:
+            f1, b0 = build_fixture("relations")
+            # AC1 — a restated row reds, naming itself, its line and the base row it restates. The
+            # unrelated row has no eligible hit at all, which is the `none` branch beside it.
+            set_branch(f1, b0, add_rows(restated, unrelated))
+            arm("check 27: a restated decision row reds naming its id, line and the base row",
+                "rc=1 check 27: ARCH-tNew-1 (memory/DECISIONS.md:9) near-matches ARCH-tBase-1 at",
+                lambda: run_fixture(f1, "--check-relations", b0))
+            arm("check 27: the summary counts both added rows and the one near match",
+                f"graded 2 added record(s) in {b0[:8]}..HEAD against 8 at base — 1 near match(es), "
+                f"0 satisfied, 0 own-session, mode red floor 0.125",
+                lambda: run_fixture(f1, "--check-relations", b0))
+            # The replay instrument over the same history: the restated row is the one flagged pair.
+            arm("--measure-relations flags the restated row against the record it restates",
+                "ARCH-tNew-1 > ARCH-tBase-1", lambda: run_fixture(f1, "--measure-relations", "0.125"))
+            arm("--measure-relations with no floor reads the declared one",
+                "flagged at floor 0.125", lambda: run_fixture(f1, "--measure-relations"))
+            arm("--measure-relations refuses a floor outside (0, 1]", "takes a floor that is a decimal",
+                lambda: run_fixture(f1, "--measure-relations", "2"))
+            # AC2 — a relation token, and separately the hit's id, each satisfy it.
+            set_branch(f1, b0, add_rows(restated + "; coexists-with the archive rule"))
+            arm("check 27: a relation token satisfies the near match", "rc=0 row-grammar: check 27 "
+                "graded 1 added record(s) in " + b0[:8] + "..HEAD against 8 at base — 1 near "
+                "match(es), 1 satisfied", lambda: run_fixture(f1, "--check-relations", b0))
+            set_branch(f1, b0, add_rows(restated + ", as ARCH-tBase-1 already rules"))
+            arm("check 27: naming the hit's id satisfies the near match", "1 near match(es), 1 satisfied",
+                lambda: run_fixture(f1, "--check-relations", b0))
+            # The own-session branch: a top hit of the record's own slug ends its grading.
+            set_branch(f1, b0, add_rows(restated.replace("ARCH-tNew-1", "ARCH-tBase-9")))
+            arm("check 27: a top hit of the added row's own slug is counted own-session, not graded",
+                "rc=0 row-grammar: check 27 graded 1 added record(s) in " + b0[:8] + "..HEAD against "
+                "8 at base — 0 near match(es), 0 satisfied, 1 own-session",
+                lambda: run_fixture(f1, "--check-relations", b0))
+            # AC3 — a gotcha whose description restates a base gotcha's; then its body names it.
+            g = "memory/gotchas/carriage-return-kills-the-interpreter-line.md"
+            gdesc = "a carriage return left in a shell script breaks the shebang line on every windows node"
+            set_branch(f1, b0, {g: build_gotcha("carriage-return-kills-the-interpreter-line", gdesc)})
+            arm("check 27: a restated gotcha reds naming both stems",
+                "rc=1 check 27: carriage-return-kills-the-interpreter-line (" + g + ") near-matches "
+                "crlf-breaks-shebang-lines at", lambda: run_fixture(f1, "--check-relations", b0))
+            set_branch(f1, b0, {g: build_gotcha("carriage-return-kills-the-interpreter-line", gdesc,
+                                               "Narrows crlf-breaks-shebang-lines to Windows.\n")})
+            arm("check 27: a gotcha whose body names the base stem passes", "1 near match(es), 1 satisfied",
+                lambda: run_fixture(f1, "--check-relations", b0))
+            # AC12 — the superseded-by map: naming the hit's SUCCESSOR satisfies; without it the
+            # finding carries that unit's tag, whole and partial.
+            told = "- ARCH-tNew-3 · reviewers receive the security model before they hunt findings in any diff"
+            set_branch(f1, b0, add_rows(told + ", per ARCH-tNext-1"))
+            arm("check 27: naming the successor the superseded-by map holds satisfies the match",
+                "rc=0 row-grammar: check 27 graded 1 added record(s) in " + b0[:8] + "..HEAD against 8 "
+                "at base — 1 near match(es), 1 satisfied", lambda: run_fixture(f1, "--check-relations", b0))
+            arm("--measure-relations reads the same map, so a named successor is not flagged",
+                "row-grammar: 0 pair(s) flagged at floor 0.125",
+                lambda: run_fixture(f1, "--measure-relations", "0.125"))
+            set_branch(f1, b0, add_rows(told))
+            arm("check 27: a superseded hit is tagged with its whole successor",
+                "near-matches ARCH-tOld-1 [superseded by ARCH-tNext-1] at",
+                lambda: run_fixture(f1, "--check-relations", b0))
+            set_branch(f1, b0, add_rows("- ARCH-tNew-4 · acceptance ledgers record one line per "
+                                        "criterion and the sha each ran at"))
+            arm("check 27: a partly superseded hit carries the partial tag",
+                "near-matches ARCH-tLedger-1 [partly superseded by ARCH-tWider-1] at",
+                lambda: run_fixture(f1, "--check-relations", b0))
+            # The map's two refusals: an extract.py too old to derive it, and one that raises.
+            stub = os.path.join(rrel, "extract.py").replace(os.sep, "/")
+            set_branch(f1, b0, dict(add_rows(restated), **{stub: "X = 1\n"}))
+            arm("check 27: an extract.py that predates the map is a named refusal",
+                "its extract.py predates corpus_inputs", lambda: run_fixture(f1, "--check-relations", b0))
+            set_branch(f1, b0, dict(add_rows(restated), **{stub: "raise RuntimeError('broken kit')\n"}))
+            arm("check 27: a map derivation that raises is a named refusal, not a traceback",
+                "could not derive the superseded-by map from the memory-recall kit: RuntimeError",
+                lambda: run_fixture(f1, "--check-relations", b0))
+            # AC4 / AC5 — the key's modes.
+            set_branch(f1, b0, dict(add_rows(restated), **{".memory-tree.conf": conf.format("warn:0.125")}))
+            arm("check 27: warn mode prints a WARN line and exits 0",
+                "rc=0 WARN ARCH-tNew-1 (memory/DECISIONS.md:9) near-matches ARCH-tBase-1",
+                lambda: run_fixture(f1, "--check-relations", b0))
+            set_branch(f1, b0, dict(add_rows(restated), **{".memory-tree.conf": conf.format("")}))
+            arm("check 27: a blank key is NOT ARMED, announced, and exits 0",
+                "rc=0 row-grammar: check 27 NOT ARMED", lambda: run_fixture(f1, "--check-relations", b0))
+            arm("--measure-relations with no floor and a blank key refuses", "needs a floor",
+                lambda: run_fixture(f1, "--measure-relations"))
+            for bad in ("red:1.5", "amber:0.1"):
+                set_branch(f1, b0, {".memory-tree.conf": conf.format(bad)})
+                arm(f"check 27: a malformed key '{bad}' refuses naming the key, with no traceback",
+                    f"rc=1 row-grammar: NEAR_MATCH_GATE='{bad}' is not",
+                    lambda: (lambda o: o if "Traceback" not in o else "TRACEBACK " + o)(
+                        run_fixture(f1, "--check-relations", b0)))
+            # The population reader's refusal: a tracked document that is not on disk.
+            set_branch(f1, b0, add_rows(restated))
+            os.remove(os.path.join(f1, "memory", "DECISIONS.md"))
+            arm("check 27: a tracked decision index missing from disk fails named",
+                "memory/DECISIONS.md is tracked but is not on disk", lambda: run_fixture(f1, "--check-relations", b0))
+            run("git", "checkout", "-q", "--", "memory/DECISIONS.md", cwd=f1)
+            os.remove(os.path.join(f1, "memory", "gotchas", "heredoc-mangles-backslashes.md"))
+            arm("check 27: a tracked gotcha missing from disk fails named",
+                "heredoc-mangles-backslashes.md is tracked but is not on disk",
+                lambda: run_fixture(f1, "--check-relations", b0))
+            run("git", "checkout", "-q", "--", "memory/gotchas/", cwd=f1)
+            # AC7 — an explicit base that does not resolve; the base equal to HEAD.
+            arm("check 27: an explicit base that resolves to no commit is a named refusal",
+                "was given the base 'nosuchref'", lambda: run_fixture(f1, "--check-relations", "nosuchref"))
+            run("git", "checkout", "-q", "--detach", b0, cwd=f1)
+            arm("check 27: a base equal to HEAD exits 0 with a graded count of 0",
+                f"rc=0 row-grammar: check 27 graded 0 added record(s) in {b0[:8]}..HEAD",
+                lambda: run_fixture(f1, "--check-relations", b0))
+            # AC14 — the no-argument base. origin/main sits BEHIND a local main that moved on with a
+            # non-record commit, and the branch under test leaves that local main: the merge-base with
+            # the REMOTE is b0, with the local main b1, so the base8 printed says which was preferred.
+            run("git", "checkout", "-q", "main", cwd=f1)
+            _write_commit(f1, "2026-01-15", {"notes.txt": "a commit that adds no record\n"}, msg="b1")
+            b1 = run("git", "rev-parse", "HEAD", cwd=f1).strip()
+            run("git", "update-ref", "refs/remotes/origin/main", b0, cwd=f1)
+            set_branch(f1, "main", add_rows(restated))
+            arm("check 27: with no argument the base is the merge-base with origin/main, not a stale local main",
+                f"graded 1 added record(s) in {b0[:8]}..HEAD", lambda: run_fixture(f1, "--check-relations"))
+            # ...and the MERGE-BASE, never the remote tip: here origin/main has moved past the fork.
+            run("git", "checkout", "-q", "-B", "side", b0, cwd=f1)
+            _write_commit(f1, "2026-01-20", {"side.txt": "the remote moved on\n"}, msg="side")
+            run("git", "update-ref", "refs/remotes/origin/main", "side", cwd=f1)
+            run("git", "checkout", "-q", "arm", cwd=f1)
+            arm("check 27: the base is the merge-base with origin/main, not its tip",
+                f"graded 1 added record(s) in {b0[:8]}..HEAD", lambda: run_fixture(f1, "--check-relations"))
+            # AC7's missing base, then GOV_DEFAULT_BRANCH naming the only mainline there is.
+            run("git", "update-ref", "-d", "refs/remotes/origin/main", cwd=f1)
+            run("git", "branch", "-m", "main", "trunk", cwd=f1)
+            arm("check 27: no origin/main and no main is a red naming the missing base",
+                "rc=1 row-grammar: check 27 is armed and found no mainline base",
+                lambda: run_fixture(f1, "--check-relations"))
+            arm("check 27: GOV_DEFAULT_BRANCH=trunk resolves trunk",
+                f"graded 1 added record(s) in {b1[:8]}..HEAD",
+                lambda: run_fixture(f1, "--check-relations", branch="trunk"))
+
+        # AC6 — no recall kit installed beside this one; then one too old, then one that cannot load.
+        f2, b2 = build_fixture("relations-norecall", recall=False)
+        arm("check 27: an armed key with no recall kit installed refuses naming the kit and the key",
+            "check 27 is armed by NEAR_MATCH_GATE and ranks with the memory-recall kit's index builder, "
+            "which is not installed", lambda: run_fixture(f2, "--check-relations", b2))
+        arm("...and prints no traceback", "NO-TRACEBACK",
+            lambda: "TRACEBACK" if "Traceback" in run_fixture(f2, "--check-relations", b2) else "NO-TRACEBACK")
+        if rrel is None:
+            print("arm SKIP  check 27's two stale-kit arms did NOT run: with no memory-recall kit "
+                  "installed there is no place to lay a stale one where this install would find it")
+        else:
+            stub = os.path.join(f2, rrel, "bench.py")
+            os.makedirs(os.path.dirname(stub))
+            with open(stub, "w", encoding="utf-8") as fh:
+                fh.write("ALIAS_WEIGHT = 0.4\n")
+            arm("check 27: a recall kit whose bench.py predates the index builder refuses by name",
+                "predates build_index, match_expr, terms", lambda: run_fixture(f2, "--check-relations", b2))
+            with open(stub, "w", encoding="utf-8") as fh:
+                fh.write("raise RuntimeError('half-installed')\n")
+            arm("check 27: a bench.py that cannot be imported refuses by name",
+                "could not import the memory-recall kit's bench.py",
+                lambda: run_fixture(f2, "--check-relations", b2))
+
     if fails:
         print(f"FAIL — {len(fails)} arm(s) failed")
         return 1
@@ -1833,8 +2563,13 @@ def main(argv):
         return cmd_ages(root, conf)
     if mode == "--check-rotation":
         return cmd_check_rotation(root, conf)
+    if mode == "--check-relations":
+        return cmd_check_relations(root, conf, argv[2] if len(argv) > 2 else None)
+    if mode == "--measure-relations":
+        return cmd_measure_relations(root, conf, argv[2] if len(argv) > 2 else None,
+                                     argv[3] if len(argv) > 3 else None)
     print(f"row-grammar: unknown argument '{mode}'; the modes are --check, --check-rotation, "
-          f"--report, --emit-pin, --ages and --selftest")
+          f"--check-relations, --measure-relations, --report, --emit-pin, --ages and --selftest")
     return 2
 
 

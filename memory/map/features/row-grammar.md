@@ -94,6 +94,22 @@ check 20's capture on green for that reason, since swallowing it would silence t
   declared families would assert one value against another the same call derives, which is the
   tautology that let the wrong-families arm pass by finding nothing.
 
+### Check 27 — a new record that ranks as a near match names its relation
+
+`--check-relations [<base>]` is hygiene check 27, `TOOL-aGraftedHelix-9`. `scan_records` enumerates
+the population once: every decision row the grammar keys, then every gotcha under `gotchas/`. The
+records whose identity is absent at the mainline merge-base are ranked with the memory-recall kit's
+own `bench.build_index`. The base is `origin/<branch>`, then `<branch>`, read the way
+`check-verdict-epoch.sh` reads it. A top hit clearing `NEAR_MATCH_GATE`'s floor that shares a
+four-character term must be named, have a named successor, or be answered with a relation token.
+The predicate is pinned rather than tuned, because the floor was measured with exactly this
+construction. `--measure-relations [<floor> [<base>]]` is that measurement, shipped: it replays
+history and reproduces the spec's graded pairs at `5266d22e` exactly. The recall kit is reached through
+the canonical `resolve_kit_dir` block. A blank key is NOT ARMED and reads no history; an absent kit
+while armed is a named refusal. The superseded-by map is derived only when a near match is otherwise
+unsatisfied, from `TOOL-aGraftedHelix-4`'s two functions and never from the query cache, which a
+hygiene leg must not write.
+
 ### The marker contract
 
 Four live readers parse the generated-region markers: `apply_region` in the index generator

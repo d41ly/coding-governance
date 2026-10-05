@@ -33,6 +33,13 @@ TERMINAL = ("CLOSED", "WONTDO")
 # rather than two modules that happen to disagree.
 CENSUS_TERMINAL = ("CLOSED", "WONTDO", "DEFERRED")
 
+# A gotcha record's front-matter block: `---` at line 1, the column-0 `key: value` lines, `---`.
+# Read by `gotchas.py` (checks 17-19, which grade the keys) and by `row_grammar.py`'s record
+# enumeration (check 27, which ranks a record by its `description`). TOOL-aGraftedHelix-9 moved it
+# here so the kit holds one copy: two engines spelling one block are free to disagree on where a
+# record's front matter ends.
+FM_RE = re.compile(r"\A---\n(.*?)\n---\n", re.S)
+
 
 def kit_rel() -> str:
     """This kit's directory relative to the enclosing checkout, DERIVED and never spelled.

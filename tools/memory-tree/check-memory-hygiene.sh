@@ -30,7 +30,7 @@ set -u
 # no key at all, which the bar reads as a probe that could not answer rather than as a clean set.
 OFFENDERS=0; OFFENDER_KEYS=""
 if [ "${1:-}" = "--offenders" ]; then OFFENDERS=1; exec 3>&1 1>/dev/null; fi
-KIT_MEMORY_TREE_VERSION=2.119   # gov:kit memory-tree@2.119 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
+KIT_MEMORY_TREE_VERSION=2.120   # gov:kit memory-tree@2.120 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 MEMORY_ROOT=memory
@@ -2484,6 +2484,21 @@ if [ "$STAGED" = 0 ]; then
     printf '%s
 ' "$rowg"; status=1
     [ "$OFFENDERS" = 0 ] || add_offender_keys 20 $'\n'"$rowg"
+  fi
+fi
+
+# 27 — a decision row or gotcha ADDED since the mainline merge-base that ranks as a near match of an
+# older record must name it, or carry a relation token. Delegated to row_grammar.py, the row
+# grammar's owner, for the reason 20 and 24 are (TOOL-cSpliceWarden-6), and ranked with the
+# memory-recall kit's own index builder (TOOL-aGraftedHelix-9). Full runs only: it reads a commit
+# range, which a staged selection has no use for. The capture is printed on a GREEN run too, because
+# its summary line, or its NOT ARMED line, is the only evidence the check graded anything.
+if [ "$STAGED" = 0 ]; then
+  if relm=$("$_PY" "$HERE/row_grammar.py" --check-relations 2>&1); then
+    [ -z "$relm" ] || printf '%s\n' "$relm"
+  else
+    printf '%s\n' "$relm"; status=1
+    [ "$OFFENDERS" = 0 ] || add_offender_keys 27 $'\n'"$relm"
   fi
 fi
 

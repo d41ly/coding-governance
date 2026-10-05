@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-9 — a newly added decision row or gotcha that ranks as a near match must name its relation
 
-**Status:** SPECCED · rev-3 · 2026-10-05 · node a · Tier-2 · base 5266d22e · streams tooling · order 5 · ratified 2026-10-04
+**Status:** CLOSED · rev-3 · 2026-10-05 · node a · Tier-2 · base 5266d22e · streams tooling · order 5 · ratified 2026-10-04
 
 <!-- gen:spec-records -->
 

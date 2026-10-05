@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.119 -->
+<!-- gov:kit memory-tree@2.120 -->
 # memory/ retention & hygiene
 
 `memory/` is the project's AI-first memory: version-controlled, travelling to every node on clone.
@@ -479,6 +479,24 @@ imported, and with a pin set and the kit absent the failure is NAMED, not a trac
     cannot list its own sha. A tree that wants the same refusal at the moment a merge is CONCLUDED
     wires the module as a `commit-msg` hook, which is the one hook a clean `git merge` and a
     conflicted one both reach.
+
+27. **a new record that RESTATES an older one names it** — every decision row and every gotcha whose
+    identity is absent at the mainline merge-base is ranked against the records present there, with
+    the memory-recall kit's own index builder over each record's summary (a row's text after its id,
+    a gotcha's `description`). A top hit that reaches `NEAR_MATCH_GATE`'s floor in Jaccard similarity
+    AND shares a term of four or more characters is a NEAR MATCH, and the new record must name the
+    hit, name a successor the recall kit's superseded-by map holds for it, or carry `supersedes`,
+    `coexists-with` or `disputes`. It obliges a relation and never judges one. A hit that is a row of
+    the new row's own session slug is counted and not graded. Delegated to `row_grammar.py`, which
+    owns the row grammar; full runs only, because it reads a commit range. `red:<floor>` fails the
+    leg, `warn:<floor>` prints `WARN` lines and passes, BLANK is NOT ARMED and says so on every run,
+    and the kit ships it blank: a floor measured on another corpus is not a floor for yours, so
+    measure your own with `row_grammar.py --measure-relations <floor>` before arming it. An armed
+    run with no mainline base, or with no memory-recall kit installed, is a named refusal. Every
+    armed run prints one summary line with its counts, red or green.
+    NOT GRADED, and said out loud: a near match below the TOP hit; a paraphrase under the floor; a
+    bare relation token that names no record; a row edited in place, since the added set is decided
+    by identity alone; and two records added in the same range.
 
 ## Record bindings — how a record names its spec
 
