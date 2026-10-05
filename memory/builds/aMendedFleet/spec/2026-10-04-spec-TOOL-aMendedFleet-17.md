@@ -1,10 +1,12 @@
 # TOOL-aMendedFleet-17 — `tier2-review.js` keeps each finding's bug-class label in the committed appendix
 
-**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 17
+**Status:** CLOSED · rev-2 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 17
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-04-build-TOOL-aMendedFleet-17-1-acceptance-ledger.md](../build/2026-10-04-build-TOOL-aMendedFleet-17-1-acceptance-ledger.md) | journal | — |
 
 <!-- /gen:spec-records -->
 

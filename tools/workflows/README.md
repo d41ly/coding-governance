@@ -208,13 +208,18 @@ it as `lens=<key>`. Every return carries three fields beside the counts:
 
 - `ledger` — one entry per finding in id order: `id`, `lens`, `ref`, `severity` (the finder's),
   `skepticSeverity`, `verdict` (`confirmed`, `refuted`, `uncertain`, or `unverified` when no verdict
-  stands), `reason`, `fixVerdict` and `claim`. An absent optional value is `null`.
+  stands), `reason`, `fixVerdict`, `claim` and `classes`. An absent optional value is `null`.
+  `classes` lists the checklist classes the claim's leading `C<n>` labels denote, by each item's
+  slug, in order and without duplicates; a label with no slug to resolve, its item absent or not
+  slug-led, is kept as `C<n>`. It is `[]` when the claim opens with no label or the run had no
+  checklist.
 - `confirmedFindings` — one entry per confirmed finding: `id`, `lens`, `ref`, `claim`, `severity` (the
   binding grade), `fix` and `fixVerdict`. A fix the skeptic judged unsound is replaced by its note
   when it gave one. Pass this array as the next round's `priorFindings` rather than re-typing it.
-- `appendix` — the ledger as a markdown table under `## Appendix — every finding`, with the eight
-  columns `id | lens | ref | severity | skepticSeverity | verdict | reason | fixVerdict`. A cell is `-`
-  when its value is absent, a `|` is escaped, and line breaks fold to a space.
+- `appendix` — the ledger as a markdown table under `## Appendix — every finding`, with the nine
+  columns `id | lens | ref | severity | skepticSeverity | verdict | reason | fixVerdict | classes`. The
+  ninth joins the `classes` names with one space, so a class's hits can be counted across records. A
+  cell is `-` when its value is absent or empty, a `|` is escaped, and line breaks fold to a space.
 
 The two exits before any skeptic runs, every lens dead and no finding raised, return `[]`, `[]` and
 `''`; a deferred return carries what was judged so far. The harness renders the appendix and tells the

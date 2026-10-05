@@ -3558,6 +3558,16 @@
       "file": "tools/unattended/stall-recorder.js"
     },
     {
+      "id": "extractFindingClasses",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "extractFindingClasses",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
+    },
+    {
       "id": "extract_acceptance",
       "kind": "function",
       "file": "tools/check-spec-tokens.py"

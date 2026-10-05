@@ -1124,10 +1124,10 @@ async function runLedgerArms() {
     const rows = al.slice(4)
     const unescaped = (row) => row.split('').filter((ch, i) => ch === '|' && row[i - 1] !== '\\').length
     ck(al[0] === '## Appendix — every finding' && al[1] === '' &&
-      al[2] === '| id | lens | ref | severity | skepticSeverity | verdict | reason | fixVerdict |' && al[3] === '|---|---|---|---|---|---|---|---|' &&
+      al[2] === '| id | lens | ref | severity | skepticSeverity | verdict | reason | fixVerdict | classes |' && al[3] === '|---|---|---|---|---|---|---|---|---|' &&
       rows.length === 5 && rows.length === r.result.ledger.length && rows[0].indexOf('| 1 | security | security.js:1 | high | - | refuted |') === 0,
-      'ledger: the appendix is rendered by the harness: heading, eight columns, one row per finding, the refuted one included')
-    ck(rows.length === 5 && rows.every((row) => unescaped(row) === 9) && rows[0].indexOf('x \\| y z') !== -1 && ap.indexOf('\r') === -1,
+      'ledger: the appendix is rendered by the harness: heading, nine columns, one row per finding, the refuted one included')
+    ck(rows.length === 5 && rows.every((row) => unescaped(row) === 10) && rows[0].indexOf('x \\| y z') !== -1 && ap.indexOf('\r') === -1,
       'ledger: the appendix is rendered by the harness: a pipe and a line break in a cell leave the row count unchanged')
     const sp = r.trace.find((t) => t.label === 'synth')
     ck(ap.length > 0 && !!sp && sp.prompt.indexOf(ap) !== -1 && sp.prompt.indexOf('VERBATIM') !== -1,
@@ -1141,6 +1141,23 @@ async function runLedgerArms() {
     const al = ap.split('\n')
     ck(al.length === 9 && ap.split(/\r\n|[\n\r\x0b\x0c\x1c-\x1e\x85\u2028\u2029]/).length === al.length && al[4].indexOf('| p q r s t u v w |') !== -1,
       'ledger: the appendix is rendered by the harness: a U+2028 in a reason cell leaves the row count unchanged')
+  }
+  // ---- TOOL-aMendedFleet-17 AC2: a claim's head labels resolve to the run's item slugs in `classes`,
+  // ---- an out-of-range label stays `C<n>`, and an unlabelled claim renders `-` in the ninth column.
+  const buildLabelLens = (label) => {
+    const lr = buildLensReturn(label)
+    if (lr.lens === 'security') lr.findings[0].claim = 'C2 — x'
+    if (lr.lens === 'correctness') lr.findings[0].claim = '[C1] C9: y'
+    return lr
+  }
+  r = await runReview(Object.assign({}, DIFF, { checklist: ['[ ] alpha-one (universal)', '[ ] beta-two'] }), buildStubs({ 'find:': buildLabelLens }))
+  if (checkNoThrow(r, 'ledger classes')) {
+    const lg = Array.isArray(r.result.ledger) ? r.result.ledger : []
+    const al = (typeof r.result.appendix === 'string' ? r.result.appendix : '').split('\n')
+    ck(lg.length === 5 && JSON.stringify(lg.map((e) => e.classes)) === JSON.stringify([['beta-two'], ['alpha-one', 'C9'], [], [], []]) &&
+      al[2].endsWith(' | fixVerdict | classes |') && al[4].endsWith(' | beta-two |') && al[5].endsWith(' | alpha-one C9 |') &&
+      al.slice(6).every((row) => row.endsWith(' | - |')),
+      'ledger: classes resolves each head label to its item slug, keeps C<n> out of range, and renders - when unlabelled')
   }
 
   // ---- AC6: six exit paths. `confirmed` keeps its per-path type, which unattended-build.js reads.
@@ -1223,7 +1240,9 @@ printf '%s\n' "$out"
 # RAISED 175 -> 180 by TOOL-aSightedSkeptic-10: 5 assertions, counted off the block — the synthesis-death
 # log's binding grade and rendered fix (2), the deferred log's binding grade (1), one uncertain answer
 # apart from no verdict (1) and an all-uncertain note (1).
-FLOOR_ASSERTIONS=180
+# RAISED 180 -> 181 by TOOL-aMendedFleet-17: 1 assertion, the ledger's `classes` and the appendix's
+# ninth column over labelled, out-of-range and unlabelled claims (1).
+FLOOR_ASSERTIONS=181
 executed=$(printf '%s\n' "$out" | sed -n 's/^---- \([0-9][0-9]*\) passed.*/\1/p' | tail -1)
 if [ -z "$executed" ]; then
   echo "FAIL the runner printed no assertion count at all — it died before its summary line"

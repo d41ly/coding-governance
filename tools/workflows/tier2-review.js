@@ -1028,6 +1028,25 @@ log(
       : precision < 0.5 ? ' (below 0.5 — tighten scope/priming next time, don\'t add agents)' : ''),
 )
 
+// TOOL-aMendedFleet-17 S1 - the class names a claim's HEAD labels denote. Only the leading run of
+// `C<n>`, `[C<n>]`, each optionally followed by `:` or `,`, is read, so a `C3` in the prose is not
+// a label. Label n names item n's first token after an optional `[ ]`/`[x]` box when that token is a
+// lowercase slug; otherwise, and for an n outside the items, the label itself, which no slug spells.
+function extractFindingClasses(claim, items) {
+  const names = []
+  let rest = String(claim || '')
+  let m
+  while ((m = /^\s*(?:\[C(\d+)\]|C(\d+))[:,]?(?=\s|$)/.exec(rest))) {
+    rest = rest.slice(m[0].length)
+    const n = m[1] || m[2]
+    const item = items[n - 1]
+    const slug = typeof item === 'string' ? /^(?:\[[ x]\]\s+)?([a-z][a-z0-9]*(?:-[a-z0-9]+)*)(?=\s|$)/.exec(item) : null
+    const name = slug ? slug[1] : 'C' + n
+    if (names.indexOf(name) === -1) names.push(name)
+  }
+  return names
+}
+
 // TOOL-aSightedSkeptic-8 S3 - THE LEDGER, every finding and its verdict in id order, refuted ones
 // included: the only place a refuted finding reaches a record. Read through verdictById by the
 // integer id, never by `ref` (two findings at one file:line would collapse into one row).
@@ -1043,6 +1062,8 @@ const ledger = allFindings.map((f) => {
     reason: conflicts.has(f.id) ? 'contradictory verdicts' : v ? String(v.reason || '') : '',
     fixVerdict: v && FIX_VERDICTS.indexOf(v.fixVerdict) !== -1 ? v.fixVerdict : null,
     claim: f.claim,
+    // TOOL-aMendedFleet-17 S2 - empty with no checklist, where no label can denote a class.
+    classes: CHECKLIST_ITEMS.length ? extractFindingClasses(f.claim, CHECKLIST_ITEMS) : [],
   }
 })
 // S4 - the confirmed set in the shape `priorFindings` reads, so round N+1 is handed it rather than a
@@ -1061,12 +1082,13 @@ const confirmedFindings = confirmed.map((f) => {
 function renderCell(v) {
   return v === null || v === undefined || v === '' ? '-' : String(v).replace(/[\r\n\x0b\x0c\x1c-\x1e\x85\u2028\u2029]+/g, ' ').replace(/\|/g, '\\|')
 }
-// The eight columns are the hand-off to TOOL-aSightedSkeptic-9; `claim` rides the ledger only (spec F4).
+// The first eight columns are the hand-off to TOOL-aSightedSkeptic-9; `claim` rides the ledger only
+// (spec F4). TOOL-aMendedFleet-17 S3 - `classes` is the ninth, its names joined by one space.
 function renderAppendix(rows) {
   if (!rows.length) return ''
-  const cols = ['id', 'lens', 'ref', 'severity', 'skepticSeverity', 'verdict', 'reason', 'fixVerdict']
+  const cols = ['id', 'lens', 'ref', 'severity', 'skepticSeverity', 'verdict', 'reason', 'fixVerdict', 'classes']
   return ['## Appendix — every finding', '', '| ' + cols.join(' | ') + ' |', '|' + cols.map(() => '---').join('|') + '|']
-    .concat(rows.map((e) => '| ' + cols.map((c) => renderCell(e[c])).join(' | ') + ' |'))
+    .concat(rows.map((e) => '| ' + cols.map((c) => renderCell(c === 'classes' ? (e.classes || []).join(' ') : e[c])).join(' | ') + ' |'))
     .join('\n')
 }
 const appendix = renderAppendix(ledger)
