@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-4 — recall labels a superseded record and ranks it under its successor
 
-**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 5266d22e · streams tooling · order 4 · ratified 2026-10-04
+**Status:** SPECCED · rev-3 · 2026-10-05 · node a · Tier-1 · base 5266d22e · streams tooling · order 4 · ratified 2026-10-04
 
 <!-- gen:spec-records -->
 
@@ -98,7 +98,8 @@ P3 = r"\bsuperseded[ -]by\s+((?:" + W + ID + r"\b[`*\]]*[\s,]*)+)" # on a `**Sta
 PARTIAL = r"^[`*\]]*(?:['’]s\b|\s+for\b)"                     # matched against the text right after the id
 ```
 
-All three are case-insensitive. `ID` and `ID_RE` are the module's own grammar, and P3's H1 id comes
+All three are case-insensitive, and so is `PARTIAL`, because this corpus writes `SUPERSEDES` in
+capitals and can write the clause after it the same way. `ID` and `ID_RE` are the module's own grammar, and P3's H1 id comes
 from `load_parse_spec_h1()`, the predicate `extract_records` already calls. P3 reads the status
 line's text and no status grammar. It needs no token check, because a header tail carries pointers
 and declared verbs only (`memory/TEMPLATE-SPEC.md`), so a `superseded by <id>` there is a pointer
@@ -186,11 +187,17 @@ key holds `{"edges": {old: [[new, kind], …]}, "counts": {...}}`. At 23 ids tha
 | `extract_supersessions` | `extract.py` | `py.function` |
 | `derive_supersession_map` | `extract.py` | `py.function` |
 | `derive_supersession_order` | `query.py` | `py.function` |
+| `render_supersession_tag` | `query.py` | `py.function` |
 | `EVIDENCE_BANNER` | `query.py` | constant |
 | `superseded_by`, `supersession` | keys on a hit dict | n/a |
 
+`render_supersession_tag(hit)` is the one spelling of the S6 tag, which `render()` and `emit()`'s
+`full=True` branch both print; a copy in each would be two answers to one question. `run_fusion`
+takes the map as a fourth parameter, `smap`, which `main()` passes from the manifest on both the
+healthy and the rebuild call, and an empty map moves nothing.
+
 Each function name was asked of `python tools/lexicon/lexicon.py --suggest <name> --as py.function`
-on 2026-10-04 and answered OK. No new file, leg, conf key or gotcha, so the map gains no inventory
+on 2026-10-04 and answered OK; `render_supersession_tag` on 2026-10-05. No new file, leg, conf key or gotcha, so the map gains no inventory
 key.
 
 ### Files touched (estimate)
@@ -328,6 +335,9 @@ New arm: tools/memory-recall/selftest.py · AC10's order cases and AC11's full-b
   on this unit: 16 (AC10, the order step's fixture cases); 17 (AC11, the `full=True` tag and the
   two-successor tag); and 34 (the hands-off edge to `TOOL-aGraftedHelix-9` rewritten to the
   interface that unit consumes, with the bare-token sentence corrected).
+- rev-3 · 2026-10-05 · §4 · the build pass's divergences, before the code: the inventory gains
+  `render_supersession_tag`, the one spelling of the tag both renderers print; `run_fusion` takes
+  the map as an `smap` parameter; and `PARTIAL` is case-insensitive like the three patterns.
 
 ## 10. Reuse audit
 
