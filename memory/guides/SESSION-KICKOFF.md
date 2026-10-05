@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.4 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-10-05T09:00:38+03:00 @ efad4cee4d1991b2be15d0074fb65af6af42e641
+last-audit: 2026-10-05T09:58:12+03:00 @ 233c03849cb55c4144733ab0978a22ae1d1ed762
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/run-gates/run-selftests.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 5ec23c24562eb50a3464aef0be2ac16b9da8303e
+last-body-change: 233c03849cb55c4144733ab0978a22ae1d1ed762
 check-script: skills/session-kickoff/manifest-check.sh
 registry: AGENTS.md
 -->
@@ -126,9 +126,10 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   floor is excluded and printed with its count, a one-segment root such as `tools/` under the sub-head
   declares nothing, and a spec with no Gates heading is not joined. `TOOL-aBlindedTrial-8`.
 
-- **The pre-code spec audit is owed where the build README's `spec-audit: <date>` OR `.unattended.conf`'s
-  `SPEC_AUDIT_DEFAULT` (read at BASE, the README winning) declares it; under neither, nothing is owed
-  and the kickoff engine asks the owner once at READY.** `TOOL-aBlindedTrial-6`, `-7`, `KICK-aBlindedTrial-1`.
+- **The pre-code spec audit is owed where the OWNER declares it: a `slug` README's `spec-audit: <date>`
+  OR `.unattended.conf`'s `SPEC_AUDIT_DEFAULT` on the default branch; a run never declares either.
+  Under neither, none is owed; kickoff asks at READY.**
+  `TOOL-aBlindedTrial-6`, `-7`, `TOOL-aWardedAudit-4`, `KICK-aBlindedTrial-1`.
 
 - **Before starting work inside a kit, check whether another node is already rewriting it.**
   `git log origin/main --oneline -20 -- tools/<kit>/` answers it in one second. Hit twice:

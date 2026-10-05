@@ -1624,10 +1624,42 @@ read_asks_of() { # README blob text -> the asks: value, or nothing
 # ---- an absent key means `none` and an empty one is a malformed grant, and a bare empty string
 # ---- cannot tell them apart.
 read_may_of() { # README blob text -> `may=<value>` when the front matter carries the key, or nothing
-  printf '%s\n' "$1" | awk '
+  read_fm_key_of may "$1"
+}
+# ---- TOOL-aWardedAudit-5 - the same read for any front-matter KEY, so the spec-audit opt-in is read
+# ---- exactly as the grant is: front matter only, first line of the key, PRESENCE tagged. The key
+# ---- is compared as a literal prefix, never spliced into a regex.
+read_fm_key_of() { # key · README blob text -> `<key>=<value>` when the front matter carries the key, or nothing
+  printf '%s\n' "$2" | awk -v k="$1" '
     NR == 1 { if ($0 !~ /^---[[:space:]]*\r?$/) exit; next }
     /^---[[:space:]]*\r?$/ { exit }
-    /^may:/ { v = $0; sub(/^may:[[:space:]]*/, "", v); sub(/[[:space:]]*\r?$/, "", v); print "may=" v; exit }'
+    index($0, k ":") == 1 { v = substr($0, length(k) + 2); sub(/^[[:space:]]*/, "", v); sub(/[[:space:]]*\r?$/, "", v); print k "=" v; exit }'
+}
+# ---- TOOL-aWardedAudit-5 - the project-wide opt-in out of a conf blob: the LAST `SPEC_AUDIT_DEFAULT=`
+# ---- assignment's raw value, a trailing ` # comment` and one layer of matching quotes stripped.
+# ---- WHAT IT DOES NOT DO: evaluate the conf. The driver reads the key by evaluating the blob, so a
+# ---- value assembled from a variable, or an assignment a `return` never reaches, reads differently
+# ---- here; this is the bar's raw second opinion on what a commit WROTE, not on what the driver reads.
+read_conf_default_of() { # conf blob text -> the raw value, or nothing
+  printf '%s\n' "$1" | awk -v q="'" '
+    /^[[:space:]]*(export[[:space:]]+)?SPEC_AUDIT_DEFAULT=/ {
+      v = $0; sub(/^[[:space:]]*(export[[:space:]]+)?SPEC_AUDIT_DEFAULT=/, "", v)
+      sub(/[[:space:]]+#.*$/, "", v); sub(/[[:space:]]*\r?$/, "", v)
+      if (length(v) >= 2 && ((substr(v, 1, 1) == "\"" && substr(v, length(v), 1) == "\"") || (substr(v, 1, 1) == q && substr(v, length(v), 1) == q)))
+        v = substr(v, 2, length(v) - 2)
+      last = v }
+    END { printf "%s", last }'
+}
+# ---- The value a grant-write KEY carries at one revision of one file, tagged, or nothing: a README
+# ---- front-matter key by presence, the conf default only when NON-BLANK, because a blank default is
+# ---- the shipped state and opts nothing in.
+read_grant_key_at() { # key · rev · path
+  local _gk_b _gk_v
+  _gk_b=$(GIT show "$2:$3" 2>/dev/null)
+  case "$1" in
+    SPEC_AUDIT_DEFAULT) _gk_v=$(read_conf_default_of "$_gk_b"); [ -z "$_gk_v" ] || printf 'SPEC_AUDIT_DEFAULT=%s' "$_gk_v" ;;
+    *) read_fm_key_of "$1" "$_gk_b" ;;
+  esac
 }
 
 # ---- TOOL-dDerivedDocket-19 S4, the cross-run arm's reader. Given a run's OWN commits on stdin, one
@@ -1650,10 +1682,16 @@ read_may_of() { # README blob text -> `may=<value>` when the front matter carrie
 # ----
 # ---- WHAT IT DOES NOT SEE: a README under a path other than `<MEMORY_ROOT>/builds/<slug>/README.md`,
 # ---- and a grant a run carries in some other file. Neither is a place the driver reads a grant from.
-scan_grant_writes() { # stdin: commit ids -> `<commit> <README>` per commit that writes a may: line into one
-  local _sg_c _sg_p _sg_new _sg_par _sg_hit
+# ----
+# ---- THREE KEYS, ONE WALK (TOOL-aWardedAudit-5). The spec-audit opt-in is the owner's on the same
+# ---- reading as the grant, so a run that LANDS one - a `spec-audit:` line in any build README, or a
+# ---- non-blank `SPEC_AUDIT_DEFAULT` in the project conf - opts the next run in with no owner turn,
+# ---- exactly as a landed `may:` grants it. The same diff serves all three, and each line it prints
+# ---- names its key so the caller can say which.
+scan_grant_writes() { # stdin: commit ids -> `<commit> <file> <key>` per commit that writes a grant or an opt-in
+  local _sg_c _sg_p _sg_k _sg_new _sg_par _sg_hit
   GIT diff-tree --stdin -r -p --cc --no-renames --no-ext-diff --no-textconv --format='commit %H %P' \
-      -- ":(glob)$M/builds/*/README.md" 2>/dev/null \
+      -- ":(glob)$M/builds/*/README.md" ".unattended.conf" 2>/dev/null \
     | awk -v pre="$M/builds/" '
         /^commit [0-9a-f]+/ { c = $2; np = NF - 2; f = ""; inh = 0; next }
         /^diff --git / { f = $NF; sub(/^b\//, "", f); inh = 0; next }
@@ -1662,18 +1700,23 @@ scan_grant_writes() { # stdin: commit ids -> `<commit> <README>` per commit that
         inh == 1 {
           w = (np > 1) ? np : 1
           lead = substr($0, 1, w); body = substr($0, w + 1)
-          if (body ~ /^may:/ && lead !~ /[^+]/ && index(f, pre) == 1 \
-              && substr(f, length(pre) + 1) ~ /^[^\/]+\/README\.md$/) print c " " f
+          if (lead ~ /[^+]/) next
+          if (f == ".unattended.conf") {
+            if (body ~ /^[[:space:]]*(export[[:space:]]+)?SPEC_AUDIT_DEFAULT=/) print c " " f " SPEC_AUDIT_DEFAULT"
+          } else if (index(f, pre) == 1 && substr(f, length(pre) + 1) ~ /^[^\/]+\/README\.md$/) {
+            if (body ~ /^may:/) print c " " f " may"
+            else if (body ~ /^spec-audit:/) print c " " f " spec-audit"
+          }
         }' | sort -u \
-    | while read -r _sg_c _sg_p; do
-        [ -n "$_sg_p" ] || continue
-        _sg_new=$(read_may_of "$(GIT show "$_sg_c:$_sg_p" 2>/dev/null)")
+    | while read -r _sg_c _sg_p _sg_k; do
+        [ -n "$_sg_k" ] || continue
+        _sg_new=$(read_grant_key_at "$_sg_k" "$_sg_c" "$_sg_p")
         [ -n "$_sg_new" ] || continue
         _sg_hit=1
         for _sg_par in $(GIT rev-list --parents -n 1 "$_sg_c" 2>/dev/null | cut -d' ' -f2-); do
-          [ "$(read_may_of "$(GIT show "$_sg_par:$_sg_p" 2>/dev/null)")" = "$_sg_new" ] && _sg_hit=0
+          [ "$(read_grant_key_at "$_sg_k" "$_sg_par" "$_sg_p")" = "$_sg_new" ] && _sg_hit=0
         done
-        [ "$_sg_hit" = 1 ] && printf '%s %s\n' "$_sg_c" "$_sg_p"
+        [ "$_sg_hit" = 1 ] && printf '%s %s %s\n' "$_sg_c" "$_sg_p" "$_sg_k"
       done
 }
 
@@ -2501,9 +2544,16 @@ while IFS= read -r f; do
       # BASE, and it is what a live record reads as once everything it wrote is on the advertised
       # tip without a committed LANDING to walk from - a skip that looks like a pass otherwise.
       [ -n "$maycs" ] || report "check 19's grant-write and round-bound arms examined NO own commit of $f - the range from $mayend over base $rb past its exclusions is empty"
-      while read -r maysha mayrd; do
+      while read -r maysha mayrd mayky; do
         [ -n "$maysha" ] || continue
-        fail 19 "a commit among a run's own commits writes a may: line into a build README, so a run could land the grant the next run would be authorized by - commit and README follow: $maysha in $mayrd, run $f"
+        case "$mayky" in
+          spec-audit)
+            fail 19 "a commit among a run's own commits writes a spec-audit: line into a build README, so a run could land the opt-in the next run's pre-code audit would rest on, and only the owner opts a build in - commit and README follow: $maysha in $mayrd, run $f" ;;
+          SPEC_AUDIT_DEFAULT)
+            fail 19 "a commit among a run's own commits writes a non-blank SPEC_AUDIT_DEFAULT into the project conf, so a run could land the project-wide opt-in every later run's pre-code audit would rest on, and only the owner opts a build in - commit and conf follow: $maysha in $mayrd, run $f" ;;
+          *)
+            fail 19 "a commit among a run's own commits writes a may: line into a build README, so a run could land the grant the next run would be authorized by - commit and README follow: $maysha in $mayrd, run $f" ;;
+        esac
       done < <(printf '%s
 ' "$maywr")
       # ---- 19: NO RUN COMMIT CHANGES THE ROUND BOUND - TOOL-aEvidencedLens-9 S3. The owner ruled on
@@ -4673,6 +4723,7 @@ unattended.sh	asks:	the build README's front matter, a scan its `---` close boun
 unattended.sh	may:	the build README's front matter, a scan its `---` close bounds
 check-unattended.sh	asks:	the build README's front matter, a scan its `---` close bounds
 check-unattended.sh	may:	the build README's front matter or a commit's diff of it, never a run-state file
+check-unattended.sh	spec-audit:	the build README's front matter or a commit's diff of it, never a run-state file (TOOL-aWardedAudit-5)
 lib-unattended.sh	(keepalive|	check_lease_only_diff grades git diff -U0 hunk lines, which carry no section to scope to
 resume-tick.sh	pid: 	the driver's --liveness stdout, not a run-state file
 stop-guard.js	' + key	parseLiveness reads the driver's --liveness stdout, not a run-state file
