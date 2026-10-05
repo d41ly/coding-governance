@@ -13,9 +13,9 @@
 
 ## The suite arm
 
-The fourteen new assertions in `tools/unattended/unattended.test.sh`, beside the concurrent-run arms
+The fifteen new assertions in `tools/unattended/unattended.test.sh`, beside the concurrent-run arms
 in region one, were cut out by line range behind the suite's prologue with `HERE` pinned to the kit
-dir and run alone from the session scratchpad: 34 assertions passed, prologue included. With the
-probe's one call deleted from the working driver the same slice failed nine of them, the `miss`
+dir and run alone from the session scratchpad: 35 assertions passed, prologue included. With the
+probe's one call deleted from the working driver, the slice as first written, before the WONTDO arm gained its `hit`, failed nine of its fourteen, the `miss`
 arms passing vacuously as they must; the call was restored byte for byte. The whole suite was not
-run; it is owed at the close, and both floors were raised by the fourteen counted off the block.
+run; it is owed at the close, and both floors were raised by the fifteen counted off the block.

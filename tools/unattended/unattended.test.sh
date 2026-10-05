@@ -770,6 +770,7 @@ hit "$out" "1 shared: src/ov.sh (declared)"
 reset_tree; add_overlap_commit src/ov.sh ours; build_overlap_ref memory/builds/tSide/spec/2026-10-04-spec-X-tSide-1.md "$(print_overlap_spec WONTDO)" ""
 out=$(run --preflight tRun --keepalive-id k1)
 miss "$out" "src/ov.sh (declared)"
+hit "$out" "1 unmerged remote ref(s) read as of this clone's last fetch, 0 aged out past 14 days, 0 unreadable, no shared path"
 # AC5: a shared record is never contested, and a probe with no anchor says it did not run.
 reset_tree; add_overlap_commit memory/DECISIONS.md ours; build_overlap_ref memory/DECISIONS.md theirs ""
 out=$(run --preflight tRun --keepalive-id k1)
@@ -12608,10 +12609,10 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # RAISED 1843 -> 1877 by TOOL-aRepatriatedFork-53: the task-registry block's 34 unconditional
 # hit/miss/same/mutate lines in region two beside the `--audit` arms, COUNTED off the block; no suite
 # ran in the pass, and each case was observed by a scratch fixture driving the driver itself.
-# RAISED 1877 -> 1891 by TOOL-aMendedFleet-60: the overlap probe's 14 hit/miss/same lines in region
+# RAISED 1877 -> 1892 by TOOL-aMendedFleet-60: the overlap probe's 15 hit/miss/same lines in region
 # one beside the concurrent-run arms, COUNTED off the block; no suite ran in the pass, and the block
 # was observed green in a prologue slice and red with the probe's call deleted.
-FLOOR_ASSERTIONS=1891
+FLOOR_ASSERTIONS=1892
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -12733,8 +12734,8 @@ FLOOR_ASSERTIONS=1891
 # measured 419 is ~19 % of headroom), rather than pinning at 100 % of observation.
 PROLOGUE_ARMS=18
 # RAISED 208 -> 209: region one's in_shard block-length arm, see FLOOR_ASSERTIONS.
-# RAISED 209 -> 223: the overlap probe's 14 region-one assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_1=223
+# RAISED 209 -> 224: the overlap probe's 15 region-one assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_1=224
 # +6 for the run_bounded and verb arms, which sit above the REGION TWO terminator and are therefore
 # paid by shard 2 as well as by an unsharded run.
 # +61 for the TOOL-dDerivedDocket-28 process-ledger arms, all in region two - see FLOOR_ASSERTIONS.
