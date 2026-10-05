@@ -6958,6 +6958,11 @@
       "file": "tools/lexicon/lexicon.py"
     },
     {
+      "id": "render_pointer",
+      "kind": "function",
+      "file": "tools/memory-recall/query.py"
+    },
+    {
       "id": "render_push_lines",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -10444,6 +10449,11 @@
     },
     {
       "id": "test_skill_drift_reds",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_snippet_share_bounds_the_head_and_pointers_keep_the_rest",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
     },

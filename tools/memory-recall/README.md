@@ -72,6 +72,12 @@ recall@20 0.71 → 0.84 on its hard slice) and the CLI cannot produce the terms 
 and stdlib-only. The caller is a model, so supplying them costs nothing. `--no-terms` runs the
 un-rewritten baseline deliberately and is logged as such.
 
+The answer keeps every hit the byte budget reaches, in two tiers. The head prints snippets while
+they stay within `SNIPPET_SHARE` (a quarter) of `--budget`; every later hit prints as a one-line
+pointer, `[n] id · path:line`, and is opened by its path. A closing line names the split, and the
+query log's `n_snippets` counts the head while `n_shown` and `shown_paths` count both tiers. A hard
+top-N cut was rejected: logged opens sit beyond rank 20.
+
 ## What it writes — nothing inside your worktree
 
 The cache (`records.db`, `chunks.db`, `manifest.json`) and the append-only query log

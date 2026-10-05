@@ -127,7 +127,7 @@ def resolve_memory_root() -> str:
 # `main()` already asserts `len(order) == len(_checks)`, which is DECLARED versus RAN: delete an arm
 # from both the order list and the definitions and it passes silently. This is the external number
 # that cannot be satisfied by deleting both halves.
-SELFTEST_ARMS = 76
+SELFTEST_ARMS = 77
 # 34 -> 58 on 2026-08-24 (adopter ic's recall contrib branch): twenty-four arms — twenty-three ported from
 #   adopter ic's scripts/recall/selftest.py plus one written here. NINE over `bench.py`/`union.py`,
 #   which `verbatim.json` pinned by digest and nothing exercised; ELEVEN over the half of
@@ -160,6 +160,9 @@ SELFTEST_ARMS = 76
 # 75 -> 76 on 2026-10-05 (TOOL-aMendedFleet-27): ONE arm, the gold arm of `RECALL_EXCLUDE` - a live
 #   guide and two archived versioned copies of its rule; declared, the live line answers and no copy
 #   does; blank, the copies return.
+# 76 -> 77 on 2026-10-05 (TOOL-aMendedFleet-31): ONE arm, the two-tier emission - twenty equal hits
+#   at a budget whose snippet share holds three print three snippets and seventeen pointer lines,
+#   and a budget too small for every pointer still truncates.
 
 
 def check_provenance_chain(src: str | None = None, pinned: int | None = None) -> str:
@@ -2145,25 +2148,63 @@ def test_budget_bounds_emission_and_beats_full_documents():
     q = "latch guard stale write"
 
     for budget in (600, 2_000, 20_000):
-        text, shown, spent, overflow = QRY.emit(hits, q, budget)
-        assert spent == len(text.encode()) - max(0, shown - 1), "accounting must match the emission"
+        text, shown, spent, overflow, snippets = QRY.emit(hits, q, budget)
+        # Snippets are separated by a blank line, pointers by none, and one blank line splits them.
+        seps = max(0, snippets - 1) + (1 if shown > snippets else 0)
+        assert spent == len(text.encode()) - seps, "accounting must match the emission"
         if shown > 1:
             assert spent <= budget, f"emitted {spent} B over a {budget} B budget"
         assert shown >= 1, "a budget must never emit an empty list while hits exist"
 
     # A budget below one hit emits exactly that hit and reports the overflow.
-    _, shown, _, overflow = QRY.emit(hits, q, 10)
+    _, shown, _, overflow, _ = QRY.emit(hits, q, 10)
     assert shown == 1 and overflow > 0, "a lone oversized hit is emitted and its overflow named"
 
-    # Truncation is reachable, which a default-budget-only test would never show.
-    _, shown, _, _ = QRY.emit(hits, q, 2_000)
+    # Truncation is reachable, which a default-budget-only test would never show. Pointers are
+    # cheap, so the budget must be small enough that even they cannot reach hit 20.
+    _, shown, _, _, _ = QRY.emit(hits, q, 600)
     assert shown < len(hits), "the shown-N-of-M path must be exercised by some budget"
 
     # Snippets against whole documents, same pool, same budget ceiling raised out of the way.
-    _, _, snip_b, _ = QRY.emit(hits, q, 10_000_000)
-    _, _, full_b, _ = QRY.emit(hits, q, 10_000_000, full=True)
+    _, _, snip_b, _, _ = QRY.emit(hits, q, 10_000_000)
+    _, _, full_b, _, _ = QRY.emit(hits, q, 10_000_000, full=True)
     assert snip_b <= 0.4 * full_b, f"snippets cost {snip_b} B against {full_b} B for full documents"
     return f"snippets {snip_b} B against {full_b} B for the same 20 hits"
+
+
+@check("emit: snippets stop at SNIPPET_SHARE of the budget and every later hit is a pointer line")
+def test_snippet_share_bounds_the_head_and_pointers_keep_the_rest():
+    """TOOL-aMendedFleet-31. Twenty equal hits at a budget whose snippet share holds exactly three:
+    three snippets, seventeen pointers, a fifth return of 3, every snippet above every pointer. The
+    all-snippet emission this replaced prints twenty snippets and returns four values, so it reds
+    here. A budget too small for every pointer still truncates, so `shown N of M` stays reachable.
+    """
+    import query as QRY
+    hits = [
+        {
+            "set": "records",
+            "id": f"TOOL-{i:03d}",
+            "path": f"{resolve_memory_root()}/tooling/area{i:02d}.md",
+            "line": 10 + i,
+            "snippet": "…the latch closes on flush and the guard rejects a stale write…",
+            "text": "the latch closes on flush and the guard rejects a stale write.",
+        }
+        for i in range(1, 21)
+    ]
+    q = "latch guard stale write"
+    one = len(f"[1] {QRY.render(hits[0], q)[0]}\n".encode())
+    budget = int(3.5 * one / QRY.SNIPPET_SHARE)  # the share holds 3 snippets and not a 4th
+    text, shown, spent, _, snippets = QRY.emit(hits, q, budget)
+    assert (snippets, shown) == (3, 20), f"{snippets} snippets, {shown} shown at {budget} B"
+    ranks = [ln for ln in text.splitlines() if ln.startswith("[")]
+    assert len(ranks) == 20, f"{len(ranks)} hit lines for 20 hits"
+    bodies = [i for i, ln in enumerate(text.splitlines()) if ln.startswith("    ")]
+    assert len(bodies) == 3 and max(bodies) < text.splitlines().index(ranks[3]), "a snippet follows a pointer"
+    assert ranks[3] == QRY.render_pointer(hits[3], 4), f"pointer line is {ranks[3]!r}"
+    assert spent <= budget
+    _, small, _, _, _ = QRY.emit(hits, q, int(1.2 * one / QRY.SNIPPET_SHARE))
+    assert 1 <= small < 20, f"a budget too small for every pointer showed {small} of 20"
+    return f"3 snippets + 17 pointers in {spent} B of {budget} B; {small} of 20 at the small budget"
 
 
 @check("supplied --terms bypass terms() verbatim, and the refusal LEADS with --terms")
@@ -3108,6 +3149,7 @@ def main() -> int:
         test_build_index_default_stays_in_memory, test_query_expr_refuses_empty_and_phrases_ids,
         test_rrf_is_rank_based_not_score_based, test_rrf_key_separates_two_windows_of_one_section,
         test_budget_bounds_emission_and_beats_full_documents,
+        test_snippet_share_bounds_the_head_and_pointers_keep_the_rest,
         test_rewrite_terms_are_required_and_survive_verbatim,
         test_argv_grammar_and_the_refusal_are_gated, test_result_cap_keeps_the_true_hit_count,
         test_shown_paths_make_every_rank_recoverable,

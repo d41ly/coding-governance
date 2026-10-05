@@ -156,6 +156,10 @@ SNIPPET_TOKENS = 64  # FTS5's documented maximum; a larger value is silently cla
 # The default is the MEASURED cost of the shipped configuration: union.py reports 19 606 B for
 # records:fts5+chunks:fts5 at k=20 PER SOURCE, which is ~40 hits, not 20.
 DEFAULT_BUDGET = 20_000
+# The share of `--budget` the SNIPPET tier may spend; later hits print as one-line pointers. Not
+# tuned: the gold set (n=12 to 16) cannot price a share. Measured opens sit at median rank 6 and as
+# deep as 37, so a count cut drops answers and a share keeps `--budget` the one knob.
+SNIPPET_SHARE = 0.25
 TERM_BAND = (8, 14)  # the instruction the SEALED rewriters were given -- not a measured optimum
 
 # --- ARCH-aTemperedLoom-20 -----------------------------------------------------------------------
@@ -812,37 +816,59 @@ def render(hit: dict, question: str, extra_terms: list[str] | None = None) -> tu
     return f"{head}{hit['path']}:{hit['line']}{tag}\n    {body}", is_head
 
 
+def render_pointer(hit: dict, n: int) -> str:
+    """One hit as a single line, ``[n] id · path:line`` -- the header half of ``render``."""
+    head = f"{hit['id']} · " if hit["id"] else ""
+    return f"[{n}] {head}{hit['path']}:{hit['line']}"
+
+
 def emit(
     hits: list[dict], question: str, budget: int, full: bool = False
-) -> tuple[str, int, int, int]:
-    """Render hits in rank order until the NEXT one would exceed ``budget``.
+) -> tuple[str, int, int, int, int]:
+    """Render hits in rank order, in two tiers, until the NEXT one would exceed ``budget``.
 
-    Returns ``(text, shown, bytes_spent, overflow)``. The one exception to the bound is a budget too
-    small for even the first hit: that hit is emitted alone and ``overflow`` says by how much,
-    rather than printing an empty list that reads as "no such record".
+    The SNIPPET tier renders whole hits while their bytes stay within ``SNIPPET_SHARE`` of the
+    budget, and the first hit is always in it. Every later hit is a POINTER, one line, so a deep
+    hit stays in the list at a fraction of a snippet's cost (TOOL-aMendedFleet-31).
+
+    Returns ``(text, shown, bytes_spent, overflow, snippets)``; ``shown`` counts both tiers. The one
+    exception to the bound is a budget too small for even the first hit: that hit is emitted alone
+    and ``overflow`` says by how much, rather than printing an empty list that reads as "no such
+    record". ``bytes_spent`` counts each hit's own bytes, not the newlines that separate them.
 
     ``full=True`` renders whole documents instead of snippets. It is not a CLI flag -- restoring
     whole-document output is the cost this item exists to remove -- it exists so the saving can be
     MEASURED against the same ranked pool rather than against a number written in a document.
     """
-    parts: list[str] = []
-    spent = shown = overflow = 0
+    snippet_parts: list[str] = []
+    pointer_parts: list[str] = []
+    spent = overflow = 0
     for n, h in enumerate(hits, 1):
-        if full:
-            text = f"{h['id'] + ' · ' if h['id'] else ''}{h['path']}:{h['line']}\n    {h['text']}"
-        else:
-            text, _ = render(h, question)
-        chunk = f"[{n}] {text}\n"
+        if not pointer_parts:
+            if full:
+                text = f"{h['id'] + ' · ' if h['id'] else ''}{h['path']}:{h['line']}\n    {h['text']}"
+            else:
+                text, _ = render(h, question)
+            chunk = f"[{n}] {text}\n"
+            cost = len(chunk.encode())
+            if not snippet_parts and cost > budget:
+                snippet_parts.append(chunk)
+                spent, overflow = cost, cost - budget
+                break
+            if not snippet_parts or spent + cost <= budget * SNIPPET_SHARE:
+                snippet_parts.append(chunk)
+                spent += cost
+                continue
+        chunk = render_pointer(h, n) + "\n"
         cost = len(chunk.encode())
         if spent + cost > budget:
-            if shown == 0:
-                parts.append(chunk)
-                shown, spent, overflow = 1, cost, cost - budget
             break
-        parts.append(chunk)
+        pointer_parts.append(chunk)
         spent += cost
-        shown += 1
-    return "\n".join(parts), shown, spent, overflow
+    text = "\n".join(snippet_parts)
+    if pointer_parts:
+        text += "\n" + "".join(pointer_parts)
+    return text, len(snippet_parts) + len(pointer_parts), spent, overflow, len(snippet_parts)
 
 
 # ---------------------------------------------------------------------------------- the log
@@ -1322,8 +1348,13 @@ def main(argv: list[str] | None = None) -> int:
         print(dead, file=sys.stderr)
     print(f"{len(hits)} hits for: {question}\n")
 
-    out, shown, spent, overflow = emit(hits, question + " " + " ".join(terms), budget)
+    out, shown, spent, overflow, snippets = emit(hits, question + " " + " ".join(terms), budget)
     print(out)
+    if shown > snippets:
+        print(
+            f"snippets for ranks 1-{snippets} · pointers for {snippets + 1}-{shown} "
+            f"of {len(hits)} hits · raise --budget for more snippets"
+        )
     if shown < len(hits):
         print(
             f"shown {shown} of {len(hits)} within {budget:,} B "
@@ -1343,7 +1374,8 @@ def main(argv: list[str] | None = None) -> int:
             "bytes_emitted": spent,
             "worktree": str(repo),
             "n_hits": len(hits),
-            "n_shown": shown,
+            "n_shown": shown,  # both tiers: a pointer line shows the path, so it maps to a rank
+            "n_snippets": snippets,
             # Top RESULT_CAP only. Embedding every fused hit cost 12 987 B per record (mean 131.8
             # results) -- a month of six-node traffic in hundreds of MB. `n_hits` above keeps the
             # TRUE total, so the cap shrinks the log without clamping the count. What is lost: the
