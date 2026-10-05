@@ -310,6 +310,15 @@ revision. `--new-build <slug> --asks <IDLIST>` scaffolds the build README an own
 the readiness table first, refuses when an id is filed nowhere or every id grades `no`, and
 otherwise writes and stages that README and its contract row, then renders.
 
+`--doctor <slug>` prints every failing rule one build folder owes, in one run, and writes nothing.
+`--doctor` runs two graders past their first failure: `hygiene`, the gate's full `--offenders` run
+filtered to keys naming the folder or an id of its slug, and `slot-contract`, the registry row,
+slots and slot budget of that folder's README. `--doctor` costs one full hygiene run, one to three
+minutes on node a. `--doctor` needs the folder tracked, since both graders read tracked files: an
+untracked file is counted with the `git add` remedy, and a folder with nothing tracked exits 2
+ungraded. It exits 1 on a failing rule and 2 when a grader cannot answer; the spec-token checker
+is not consulted.
+
 ### Stragglers
 
 A branch that forked before the switch and kept editing authored shards carries row changes with no

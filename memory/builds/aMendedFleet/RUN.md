@@ -206,3 +206,5 @@ base: 7af5f564641d231f8b78f6b183dde1b6bf53111d
 2026-10-05T01:20:06Z dispatch · item 074db83a TOOL-aMendedFleet-18 · reason tools/workflows/tier2-review.template.js tools/workflows/tier2-review.js tools/workflows/README.md tools/workflows/tier2-review.test.sh memory/map/generated/symbols.json memory/builds/aMendedFleet/spec/2026-10-04-spec-TOOL-aMendedFleet-18.md memory/LIVE.md memory/builds/aMendedFleet/README.md
 
 2026-10-05T01:27:41Z brief · item TOOL-aMendedFleet-19 · reason ca9f6d277d8a memory/builds/aMendedFleet/prompts/2026-10-04-prompt-TOOL-aMendedFleet-1-4-build-brief.md
+
+2026-10-05T01:32:10Z dispatch · item 586b7b48 TOOL-aMendedFleet-19 · reason tools/memory-tree/gen_build_index.py tools/memory-tree/README.md memory/map/generated/symbols.json memory/builds/aMendedFleet/spec/2026-10-04-spec-TOOL-aMendedFleet-19.md memory/builds/aMendedFleet/build/2026-10-04-build-TOOL-aMendedFleet-19-1-acceptance-ledger.md memory/builds/aMendedFleet/README.md

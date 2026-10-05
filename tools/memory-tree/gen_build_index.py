@@ -5,6 +5,7 @@
     python <prefix>/memory-tree/gen_build_index.py --write         # (re)render every artifact
     python <prefix>/memory-tree/gen_build_index.py --check-format  # the slot contract + heading canon
     python <prefix>/memory-tree/gen_build_index.py --survey        # the canon over every README, never fails
+    python <prefix>/memory-tree/gen_build_index.py --doctor <slug> # every failing rule for one build folder
     python <prefix>/memory-tree/gen_build_index.py --selftest      # fixtures, in a temp dir
 
 WHAT --check-format DOES NOT CHECK. It grades POSITION for every tracked build README and SHAPE — the
@@ -5967,6 +5968,32 @@ def cmd_selftest() -> int:
         arm("AC2 — two trees a year apart in commit dates render one LIVE.md", "apart=True same=True",
             lambda: f"apart={_l_dates[0] != _l_dates[1]} same={_l_renders[0] == _l_renders[1]}")
 
+    # TOOL-aMendedFleet-19 AC6 — the attribution delimits the slug on both sides, so `zA` never claims
+    # `zAB`'s README or ids. A substring match would attribute all four and count none elsewhere.
+    _d_keys = ["check 9\tmemory/builds/zA/README.md", "check 21\tTOOL-zA-3 cited by nothing",
+               "check 9\tmemory/builds/zAB/README.md", "check 21\tTOOL-zAB-2 cited by nothing", ""]
+    arm("TOOL-aMendedFleet-19 AC6 — zA takes its README and id, zAB's two count elsewhere",
+        "['memory/builds/zA/README.md', 'TOOL-zA-3 cited by nothing'] 2",
+        lambda: "%s %d" % ([k for _r, k in scan_doctor_offenders(_d_keys, "zA", "memory")[0]],
+                           scan_doctor_offenders(_d_keys, "zA", "memory")[1]))
+    # AC5 — a hygiene child exiting 2, or exiting 1 naming no key, is unanswered: exit 2, naming the
+    # grader, and the slot-contract finding beside it still prints. The third arm holds the answered
+    # case at 1, so a verdict returning 2 unconditionally cannot pass the pair.
+    _d_slot = {"grader": "slot-contract", "answered": True, "why": "", "mine": [("registry", "no row")],
+               "elsewhere": 0}
+    for _d_code in (2, 1):
+        _d_hyg = {"grader": "hygiene", "answered": True, "why": "", "code": _d_code, "mine": [],
+                  "elsewhere": 0}
+        arm(f"TOOL-aMendedFleet-19 AC5 — hygiene exit {_d_code} with no key reads exit 2, slot finding kept",
+            "2 True True", lambda h=_d_hyg: "%d %s %s" % (
+                derive_doctor_verdict("zA", [h, _d_slot])[0],
+                "doctor zA: hygiene did not answer" in "\n".join(derive_doctor_verdict("zA", [h, _d_slot])[1]),
+                "doctor zA: slot-contract registry — no row" in "\n".join(derive_doctor_verdict("zA", [h, _d_slot])[1])))
+    arm("TOOL-aMendedFleet-19 S4 — an answered hygiene run with a key elsewhere and a slot finding reads 1",
+        "1", lambda: str(derive_doctor_verdict("zA", [
+            {"grader": "hygiene", "answered": True, "why": "", "code": 1, "mine": [], "elsewhere": 3},
+            _d_slot])[0]))
+
     # THE SIBLING MODULE'S OWN ARMS RUN HERE, inside this leg, rather than as a leg of their own.
     # `backlog.py` is a LIBRARY with no bar leg and no adopter-visible verb; a second leg for it
     # would be one more row in the manifest for a file this one already imports. Its arms print
@@ -5980,15 +6007,172 @@ def cmd_selftest() -> int:
     return 0
 
 
+# ------------------------------------------------------------------ --doctor (TOOL-aMendedFleet-19)
+# A new build folder owes several things graded by different checkers, two of which stop at their
+# first failure, so a hand-written folder used to surface its rules one bar cycle at a time. The
+# doctor runs both graders that own those rules, keeps going past every failure, and prints the ones
+# attributed to ONE folder. It reads and prints; it fixes nothing.
+#
+# WHAT IT DOES NOT CHECK. The spec-token checker sits outside this kit and is never consulted, and a
+# hygiene key naming neither the folder's path nor an id of its slug is counted elsewhere rather than
+# attributed — the summary's elsewhere count is what keeps such a key visible.
+DOCTOR_USAGE = "usage: gen_build_index.py --doctor <slug>"
+
+
+def read_doctor_args(argv: list) -> str:
+    """`--doctor`'s own parse: exactly one slug, never a path (F4). Every refusal names the usage."""
+    if len(argv) != 1 or argv[0].startswith("--"):
+        raise Problem(f"--doctor takes exactly one build slug. {DOCTOR_USAGE}")
+    slug = argv[0]
+    if "/" in slug or "\\" in slug:
+        raise Problem(f"--doctor takes a slug, not a path: `{slug}`. {DOCTOR_USAGE}")
+    if not backlog.SLUG_RE.match(slug):
+        raise Problem(f"`{slug}` is not a build slug. {DOCTOR_USAGE}")
+    return slug
+
+
+def scan_doctor_offenders(keys: list, slug: str, memory_root: str) -> tuple:
+    """`(mine, elsewhere)` from `check <n><TAB><key>` lines. S2's attribution, delimited both sides.
+
+    A key is this folder's when it carries the folder's path or an id `<FAMILY>-<slug>-<seq>`. The
+    slug is delimited on BOTH sides, so slug `zA` never claims `zAB`'s README or its ids.
+    """
+    path_re = re.compile(re.escape(f"{memory_root.rstrip('/')}/builds/{slug}") + r"(?![A-Za-z0-9])")
+    id_re = re.compile(r"(?<![A-Za-z0-9])[A-Z]+-" + re.escape(slug) + r"-[0-9]+")
+    mine, elsewhere = [], 0
+    for line in keys:
+        if not line.strip():
+            continue
+        rule, _tab, key = line.partition("\t")
+        if not _tab:
+            rule, key = "check ?", line
+        # A Windows child can join a path with `\`, as check 9's message does at the repo root.
+        if path_re.search(key.replace("\\", "/")) or id_re.search(key):
+            mine.append((rule.strip(), key.strip()))
+        else:
+            elsewhere += 1
+    return mine, elsewhere
+
+
+def run_hygiene_offenders(root: str, slug: str, memory_root: str) -> dict:
+    """Grader one: the hygiene gate's `--offenders` run as a child, its keys attributed (S2, S5)."""
+    out = {"grader": "hygiene", "answered": False, "why": "", "mine": [], "elsewhere": 0}
+    script = os.path.join(os.path.dirname(os.path.abspath(__file__)), "check-memory-hygiene.sh")
+    try:
+        # Deferred: only this mode needs a bash, and corpus_ids already owns the Windows rule that a
+        # bash on PATH may be a launcher for a different filesystem.
+        import corpus_ids  # noqa: PLC0415
+        sh = corpus_ids.resolve_bash()
+    except Exception as exc:  # noqa: BLE001 — no usable bash is an unanswered grader, never clean
+        out["why"] = f"no usable bash: {exc}"
+        return out
+    try:
+        p = subprocess.run([sh, script.replace(os.sep, "/"), "--offenders"], cwd=root,
+                           capture_output=True, text=True, encoding="utf-8", env=_build_git_env())
+    except OSError as exc:
+        out["why"] = f"cannot run {sh}: {exc}"
+        return out
+    out["answered"], out["code"] = True, p.returncode
+    out["mine"], out["elsewhere"] = scan_doctor_offenders(p.stdout.split("\n"), slug, memory_root)
+    return out
+
+
+def check_folder_slots(root: str, conf: dict, slug: str) -> dict:
+    """Grader two: the slot contract for this folder's README only (S3), past its first failure."""
+    out = {"grader": "slot-contract", "answered": True, "why": "", "mine": [], "elsewhere": 0}
+    m = conf["MEMORY_ROOT"]
+    rel = f"{m}/builds/{slug}/README.md"
+    tracked = extract_build_readmes(run("git", "ls-files", "--", f"{m}/builds/", cwd=root).split("\n"), m)
+    bound = set()
+    try:
+        bound, exempt, _pin = read_contract_rows(root, conf)
+        if rel not in bound and rel not in exempt:
+            out["mine"].append(("registry", f"{m}/{CONTRACT_REGISTRY} names neither a bound nor an "
+                                            f"exempt row for `{rel}`"))
+        check_contract_registry(root, conf, tracked)
+    except Problem as exc:
+        # The registry check raises on its FIRST failure: one naming this README is ours, any other
+        # is counted elsewhere, and the slot walk below runs either way.
+        if rel not in str(exc):
+            out["elsewhere"] += 1
+        elif not out["mine"]:
+            out["mine"].append(("registry", str(exc)))
+    if rel not in tracked:
+        out["mine"].append(("slot", f"{rel} is not a tracked build README, so no slot rule can grade it"))
+        return out
+    for line, why in slot_violations(read_text(os.path.join(root, rel)), rel, canon=rel in bound):
+        out["mine"].append(("slot", f"{rel}:{line} — {why}"))
+    if rel in bound:
+        try:
+            hard, _adv = scan_slot_budget(root, conf, rel)
+        except Problem as exc:
+            out["answered"], out["why"] = False, str(exc)
+            return out
+        out["mine"] += [("budget", h.strip()) for h in hard]
+    return out
+
+
+def derive_doctor_verdict(slug: str, outcomes: list) -> tuple:
+    """`(exit, lines)` from both graders' outcomes. A grader that cannot answer is never clean (S5).
+
+    The hygiene child exiting anything but 0 or 1, or exiting 1 naming no key, did not answer — even
+    when a caller marked it answered. Every other grader's findings still print beside it.
+    """
+    lines, unanswered, failing, elsewhere = [], [], 0, 0
+    for o in outcomes:
+        code = o.get("code")
+        if (not o["answered"] or code not in (None, 0, 1)
+                or (code == 1 and not o["mine"] and not o["elsewhere"])):
+            why = o["why"] or (f"its child exited {code} naming no offender" if code in (0, 1)
+                               else f"its child exited {code}")
+            unanswered.append(o["grader"])
+            lines.append(f"doctor {slug}: {o['grader']} did not answer — {why}")
+        for rule, detail in o["mine"]:
+            lines.append(f"doctor {slug}: {o['grader']} {rule} — {detail}")
+            failing += 1
+        elsewhere += o["elsewhere"]
+    graders = " and ".join(o["grader"] for o in outcomes)
+    lines.append(f"doctor {slug}: {failing} failing rule(s) from graders {graders}; {elsewhere} "
+                 f"offender(s) the graders named outside this folder; the spec-token checker outside "
+                 f"this kit was not consulted"
+                 + (f"; NOT ANSWERED: {', '.join(unanswered)}" if unanswered else ""))
+    return (2 if unanswered else 1 if failing else 0), lines
+
+
+def cmd_doctor(root: str, conf: dict, slug: str) -> int:
+    """Every failing build-folder rule for one slug, in one pass (TOOL-aMendedFleet-19)."""
+    m = conf["MEMORY_ROOT"]
+    folder = f"{m}/builds/{slug}"
+    if not os.path.isdir(os.path.join(root, folder)):
+        raise Problem(f"--doctor {slug}: no folder {folder}/ on disk. {DOCTOR_USAGE}")
+    # S6 — both graders read TRACKED files, so an untracked file is invisible to them. Say so first.
+    tracked = [p for p in run("git", "ls-files", "--", f"{folder}/", cwd=root).split("\n") if p]
+    untracked = [p for p in run("git", "ls-files", "--others", "--exclude-standard", "--", f"{folder}/",
+                                cwd=root).split("\n") if p]
+    remedy = f"`git add {folder}` first, because both graders read tracked files only"
+    if not tracked:
+        print(f"doctor {slug}: {len(untracked)} untracked file(s) and none tracked under {folder}/; "
+              f"run {remedy}. Nothing graded.")
+        return 2
+    if untracked:
+        print(f"doctor {slug}: {len(untracked)} untracked file(s) under {folder}/ are invisible to "
+              f"both graders; run {remedy}.")
+    code, lines = derive_doctor_verdict(slug, [run_hygiene_offenders(root, slug, m),
+                                               check_folder_slots(root, conf, slug)])
+    for line in lines:
+        print(line)
+    return code
+
+
 def main(argv: list) -> int:
     mode = argv[1] if len(argv) > 1 else "--check"
     if mode == "--selftest":
         return cmd_selftest()
     if mode not in ("--check", "--write", "--check-format", "--print-bindings", "--survey",
-                    "--report", "--bump", "--asks", "--new-build"):
+                    "--report", "--bump", "--asks", "--new-build", "--doctor"):
         print("usage: gen_build_index.py "
               "[--check|--write|--check-format|--survey|--report|--bump|"
-              "--print-bindings|--asks|--new-build|--selftest]")
+              "--print-bindings|--asks|--new-build|--doctor|--selftest]")
         return 2
     try:
         root = run("git", "rev-parse", "--show-toplevel").strip()
@@ -6009,6 +6193,14 @@ def main(argv: list) -> int:
             print(f"build-index: {exc}", file=sys.stderr)
             return 2
         return cmd_asks(root, conf, args)
+    # `--doctor` refuses with 2, not the handler's 1: a refusal there is a usage error, and 1 is the
+    # mode's own "a rule fails" verdict.
+    if mode == "--doctor":
+        try:
+            return cmd_doctor(root, conf, read_doctor_args(argv[2:]))
+        except Problem as exc:
+            print(f"build-index: {exc}")
+            return 2
     try:
         if mode == "--new-build":
             return cmd_new_build(root, conf, read_new_build_args(argv[2:]))

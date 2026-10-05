@@ -1,10 +1,12 @@
 # TOOL-aMendedFleet-19 — `gen_build_index.py --doctor <slug>` prints every failing build-folder rule in one pass
 
-**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 19
+**Status:** CLOSED · rev-3 · 2026-10-05 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 19
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-04-build-TOOL-aMendedFleet-19-1-acceptance-ledger.md](../build/2026-10-04-build-TOOL-aMendedFleet-19-1-acceptance-ledger.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
@@ -108,8 +110,12 @@ One grader outcome, the shape `derive_doctor_verdict` reads:
 
 ```
 {"grader": "hygiene" | "slot-contract", "answered": bool, "why": "<when not answered>",
+ "code": <the hygiene child's exit, absent for the slot contract>,
  "mine": [("<rule>", "<detail>"), ...], "elsewhere": <int>}
 ```
+
+`derive_doctor_verdict` applies S5 to `code` itself, so an outcome a caller marked answered still
+reads unanswered when its child exited 2, or exited 1 naming no key.
 
 ### Files touched (estimate)
 
@@ -218,6 +224,9 @@ New arm: tools/memory-tree/gen_build_index.py --selftest · the attribution arm 
 - rev-2 · 2026-10-04 · §2 S9 · §4 · §7 · M2 cross-read: the definitions this unit adds
   move `memory/map/generated/symbols.json`, which `TOOL-aMendedFleet-82` and the build's other
   code units regenerate and declare; this spec omitted the write, its Files touched row and the leg.
+- rev-3 · 2026-10-05 · §4 Data model · build: the outcome carries the hygiene child's exit `code`,
+  because AC5 hands `derive_doctor_verdict` an exit with no key and the rev-2 shape had no field to
+  carry it in; the verdict applies S5 to that field.
 
 ## 10. Reuse audit
 
