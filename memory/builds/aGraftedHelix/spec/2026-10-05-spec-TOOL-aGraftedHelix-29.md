@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-29 — the by-design block is rendered from the invariant records at the review's base, so a change cannot write its own exemption
 
-**Status:** SPECCED · rev-1 · 2026-10-05 · node a · Tier-2 · base 018b5675 · streams tooling · order 13 · ratified 2026-10-05
+**Status:** SPECCED · rev-2 · 2026-10-05 · node a · Tier-2 · base 018b5675 · streams tooling · order 13 · ratified 2026-10-05
 
 <!-- gen:spec-records -->
 
@@ -62,8 +62,9 @@ under review.
   parent's `gotchas.py` with the arm grafted in. Observed by AC1, AC2, AC3 and AC4.
 - **S9** — The build harness's subject resolver runs `gotchas.py --for-paths --base <base> <paths>`
   when the call's `base` has the 7-40 hex shape, and its `checklist from` log line names that base.
-  Without one it runs the command as today and the stage logs a `WARNING:` that the audit's by-design
-  block was read from the working tree. The build-harness suite gains arms for both. Observed by AC7.
+  Without one it runs the command as today, and when the stage takes the resolver's checklist it logs
+  a `WARNING:` that the audit's by-design block was read from the working tree. The build-harness
+  suite gains arms for both. Observed by AC7.
 - **S10** — The review suite gains an end-to-end arm. It runs the real checker's `--for-diff` over a
   two-commit fixture whose second commit adds an invariant, and feeds that stdout to the review
   harness as `checklist`, asserting the added invariant never reaches `byDesign` (§8 F2). Observed by
@@ -188,10 +189,11 @@ does not parse, as it does today.
 behaves as today and adds S5's working-tree header line. With `base` set:
 
 - The class and universal selection is unchanged, from `records`.
-- `derive_moved_invariants(recs, at_base, changed, paths)` returns the records to itemise: every
+- `derive_moved_invariants(recs, at_base, changed, paths, m)` returns the records to itemise: every
   record of kind `invariant` in either list whose path is in `changed`, and whose own path is in
   `paths` or whose anchors in either list select one of `paths`. Each is named from the working
-  tree's record where one exists and from the base's otherwise, sorted by path.
+  tree's record where one exists and from the base's otherwise, sorted by path. `m` is the memory
+  root, which `selectable` takes to exclude the catalogue.
 - The block is every `invariant` record in `at_base` whose path is not in `changed` and whose base
   anchors select one of `paths` through `selectable`, rendered by `render_by_design`.
 - For `--for-diff`, `changed` is the normalised `--name-only` list, the same list as `paths`. For
@@ -230,18 +232,21 @@ parity checker's can mistake one for the block's head.
 prints the usage line and exits 2. The revision goes through `resolve_range_base` as a single
 revision. The changed set compares each record's `text` at the base with the working tree's record
 of the same path, so an edit, a new untracked record and a record taken out of the working tree all
-count.
+count. A base record that did not parse counts too: the working tree's records all parse, or
+`records` refuses, so its base text cannot equal a working-tree record of the same path.
 
 ### The build harness
 
 In `tools/workflows/unattended-build.template.js`, beside `AUDIT_CHECKLIST`, a constant `auditBase`
 holds `base` when it matches `/^[0-9a-f]{7,40}$/`, the shape `badSubject` already tests, and `''`
 otherwise. The resolver prompt runs `AUDIT_CHECKLIST + (auditBase ? ' --base ' + auditBase : '') +
-' <paths>'`. When the resolver's checklist is taken, `checklistFrom` gains ` at base <first 12>`. When
-`specAudit` is set and `auditBase` is empty, the stage logs `WARNING: the audit's checklist reads
+' <paths>'`. When the resolver's checklist is taken, `checklistFrom` gains ` at base <first 12>`, and
+when it is taken with `auditBase` empty the stage logs `WARNING: the audit's checklist reads
 invariants from the working tree — no pinned \`base\` was passed, so an invariant this build added
-can stand as by design`. The per-pass `CHECKLIST` and the spec commit's `--for-diff` are ranges
-already and are not changed.
+can stand as by design`. That is the one route on which the audit's by-design block is the stdout of
+the `--for-paths` this stage asked for: a caller's own `checklist` is the caller's authority (§3),
+and a resolver that returned none already logs its own `WARNING:`. The per-pass `CHECKLIST` and the
+spec commit's `--for-diff` are ranges already and are not changed.
 
 The build-harness suite gains three arms beside GH3: with a 40-hex `base` added to the `NOSUBJ`
 args, the resolver prompt carries `--for-paths --base <that sha> <paths>` and the log line names the
@@ -296,7 +301,9 @@ on 2026-10-05 and answered OK. No codebase-map inventory key is minted: the func
 - `memory/guides/BUILD-METHOD.md`, `memory/TEMPLATE-SPEC.md` and `memory/guides/ANNOTATION-STYLE.md`,
   line 1 by the render only
 - `memory/gotchas/inputs-inside-the-subjects-reach.md`
-- `memory/gotchas/INDEX.md`, by `gotchas.py --write`
+- `memory/gotchas/INDEX.md`, by `gotchas.py --write`, in a `Pass: none` records commit after the
+  build commit: `--dispatch` refuses the index declared beside its generator (check 49), as it did
+  for unit 3, which rode its index re-render the same way
 - `tools/workflows/unattended-build.template.js`
 - `tools/workflows/unattended-build.js`, by the render
 - `tools/workflows/unattended-build.test.sh`
@@ -512,6 +519,13 @@ slices of AC7 and AC8; the main loop runs the whole suites once at VERIFYING.
 - rev-1 · 2026-10-05 · initial draft, from the unit 29-32 spec brief and the closing review's H1,
   grounded against `gotchas.py`, the review and build harness templates and both of their suites at
   `018b5675`.
+- rev-2 · 2026-10-05 · before the build, against the tree at `489f1ec7`: every §4 Evidence line held.
+  Three design lines did not match the code they describe. `derive_moved_invariants` takes the memory
+  root, because `selectable` needs it. The S6 changed set counts a base record that did not parse,
+  which the comparison by text could not reach. The build harness's `WARNING:` is logged where the
+  stage takes the resolver's checklist, the only route its by-design block comes from the command
+  this stage ran, so a caller's checklist no longer draws a false warning; S9 says so. And the
+  catalogue index rides a records commit, because `--dispatch` refused it beside its generator.
 
 ## 10. Reuse audit
 
