@@ -651,10 +651,10 @@ def test_by_leg_yield():
     check("by-leg: every manifest leg plus every journal-only leg prints once, most reds first",
           (len(rows), len(by), rows[0]["leg"] if rows else None), (23, 23, "alpha"))
     check("by-leg: the capped line is unattributed and only the mismatched line is mismatched",
-          "by-leg unattributed=2 mismatched=1" in r.stderr, True)
+          "by-leg unattributed=2 mismatched=1\n" in r.stderr, True)
     check("by-leg: the window skips the NONE line's empty start and counts it apart",
-          "window 2026-10-01T00:00:01Z .. 2026-10-01T00:00:04Z bars=3 red_bars=2 none=1" in r.stderr,
-          True)
+          "window 2026-10-01T00:00:01Z .. 2026-10-01T00:00:04Z bars=3 red_bars=2 none=1 other=0\n"
+          in r.stderr, True)
     r = run_cli(["journal", "--producer", "gates", "--by-leg"], primary)
     rows = [json.loads(ln) for ln in r.stdout.splitlines() if ln.strip()]
     check("by-leg without --legs: only legs that went red print, with no population fields",
