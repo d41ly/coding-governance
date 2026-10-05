@@ -944,6 +944,68 @@ def check_epoch_verb(tmp: pathlib.Path) -> None:
           p.returncode == 2 and "epoch takes no arguments except --base" in p.stderr, p.stderr)
 
 
+def check_fix_carriers(tmp: pathlib.Path) -> None:
+    """TOOL-aMendedFleet-64 S7 — `write_version_carriers` over a two-entry fixture, then again.
+
+    `vk`'s constant is bumped alone to 1.1. Its same-line copy, a `version:` field matching the OTHER
+    entry's pattern in a file carrying `vk`'s marker, its CRLF README marker and the alias on its own
+    constant line must all move; `wk`'s own field and a decoy carrying no registry marker must not,
+    and a file that does not decode is skipped. A second run rewrites nothing. Skipping the same-line
+    clause leaves `copy.sh` at 1.0 and reds the first assertion.
+    """
+    gk = govkit_module()
+    fx = tmp / "fix-fx"
+    files = {
+        "vk/vk.sh": b"KIT_VK_VERSION=1.1   # gov:kit vk@1.0 // gov:kit vk-alias@1.0\n",
+        "vk/copy.sh": b"KIT_VK_VERSION=1.0   # gov:kit vk@1.0\n",
+        "vk/harness.js": b"  version: '1.0',\n// gov:kit vk@1.0\n",
+        "vk/README.md": b"<!-- gov:kit vk@1.0 -->\r\nprose naming 1.0\r\n",
+        "vk/blob.dat": b"\xff\xfe gov:kit vk@1.0\n",
+        "wk/wk.js": b"  version: '2.0', // gov:kit wk@2.0\n",
+        "wk/decoy.js": b"  version: '9.9', // gov:kit other@9.9\n",
+    }
+    for rel, data in files.items():
+        (fx / rel).parent.mkdir(parents=True, exist_ok=True)
+        (fx / rel).write_bytes(data)
+    git(fx, "init", "-q")
+    git(fx, "add", "-A")
+    descs = {
+        "vk": ({"id": "vk", "home": "vk",
+                "version_from": {"file": "vk.sh", "pattern": "^KIT_VK_VERSION="}}, "vk/kit.toml"),
+        "wk": ({"id": "wk", "home": "wk",
+                "version_from": {"file": "wk.js", "pattern": "version: "}}, "wk/kit.toml"),
+    }
+    with contextlib.redirect_stdout(io.StringIO()) as said:
+        first = gk.write_version_carriers(fx, descs, gk.derive_marker_basis(fx, descs))
+
+    def read_fx(rel: str) -> bytes:
+        return (fx / rel).read_bytes()
+    check("[aMF-64 S2] a same-line constant copy moves with the constant",
+          read_fx("vk/copy.sh") == b"KIT_VK_VERSION=1.1   # gov:kit vk@1.1\n", repr(read_fx("vk/copy.sh")))
+    check("[aMF-64 S2] another entry's pattern moves in a file carrying only this entry's marker",
+          read_fx("vk/harness.js") == b"  version: '1.1',\n// gov:kit vk@1.1\n", repr(read_fx("vk/harness.js")))
+    check("[aMF-64 S2] the alias on the constant's own line moves, the constant does not",
+          read_fx("vk/vk.sh") == b"KIT_VK_VERSION=1.1   # gov:kit vk@1.1 // gov:kit vk-alias@1.1\n",
+          repr(read_fx("vk/vk.sh")))
+    check("[aMF-64 S3] a CRLF carrier keeps its line endings, and prose naming the old value stays",
+          read_fx("vk/README.md") == b"<!-- gov:kit vk@1.1 -->\r\nprose naming 1.0\r\n",
+          repr(read_fx("vk/README.md")))
+    check("[aMF-64 S2] the ownership clause leaves the other entry's field and a foreign-marked decoy",
+          read_fx("wk/wk.js") == files["wk/wk.js"] and read_fx("wk/decoy.js") == files["wk/decoy.js"],
+          repr(read_fx("wk/decoy.js")))
+    check("[aMF-64 S3] a file that does not decode is named and left untouched",
+          read_fx("vk/blob.dat") == files["vk/blob.dat"] and "vk/blob.dat" in said.getvalue(),
+          said.getvalue())
+    check("[aMF-64 S2] the rewrites are returned one per carrier", len(first) == 7, repr(first))
+    with contextlib.redirect_stdout(io.StringIO()):
+        second = gk.write_version_carriers(fx, descs, gk.derive_marker_basis(fx, descs))
+    check("[aMF-64 S5] a second run over a fixed tree rewrites nothing", second == [], repr(second))
+    p = subprocess.run([sys.executable, str(GOVKIT), "selfcheck", "--bogus"],
+                       capture_output=True, text=True, encoding="utf-8")
+    check("[aMF-64 S4] selfcheck refuses an unknown flag naming --write and --fix",
+          p.returncode == 2 and "--write" in p.stderr and "--fix" in p.stderr, p.stderr)
+
+
 OWN_KIT = """id = "demo"
 home = "demo"
 version_from = { none = "fixture" }
@@ -2029,6 +2091,7 @@ def main() -> int:
         check_answers_parity(tmp / "ap")
         check_shipped_verb(tmp)
         check_epoch_verb(tmp)
+        check_fix_carriers(tmp)
         check_adopter_owned(tmp / "own")
         check_apply_owned(tmp / "ao")
         check_pytest_ini_probe(tmp / "pi")

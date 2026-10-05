@@ -3063,6 +3063,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "check_fix_carriers",
+      "kind": "function",
+      "file": "tools/govkit/selftest.py"
+    },
+    {
       "id": "check_fixtures",
       "kind": "function",
       "file": "tools/run-gates/check-receipt.py"
@@ -5301,6 +5306,11 @@
       "id": "derive_low_waters",
       "kind": "function",
       "file": "tools/drift-audit/drift_report.py"
+    },
+    {
+      "id": "derive_marker_basis",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
     },
     {
       "id": "derive_marker_coupling",
@@ -18416,6 +18426,11 @@
       "id": "write_transcript_lines",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "write_version_carriers",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
     },
     {
       "id": "write_vintage_receipt",

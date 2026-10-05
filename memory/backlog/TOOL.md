@@ -33,7 +33,7 @@ Cite ids, never line numbers.
 | [TOOL-aBoundedVerdict-26](../builds/aBoundedVerdict/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-19 | run-gates.sh / tail -N returns TAIL's exit status, so the idiom that… |
 | [TOOL-aBoundedVerdict-27](../builds/aBoundedVerdict/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-19 | unattended.test.sh's 344 assertions share ONE mutable fixture tree with… |
 | [TOOL-aBoundedVerdict-28](../builds/aBoundedVerdict/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-19 | BUILD-METHOD.md is at 249 lines against its own ≤250 self-declared cap… |
-| [TOOL-aBoundedVerdict-29](../builds/aBoundedVerdict/BACKLOG.md) | SPECCED | — | TOOL-aMendedFleet-64 | 2026-08-19 | check-verdict-epoch.sh's remedy names THREE files to bump; the kit has… |
+| [TOOL-aBoundedVerdict-29](../builds/aBoundedVerdict/BACKLOG.md) | OPEN | — | — | 2026-08-19 | check-verdict-epoch.sh's remedy names THREE files to bump; the kit has… |
 | [TOOL-aBoundedVerdict-31](../builds/aBoundedVerdict/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-20 | every TemporaryDirectory() in the kits can red the bar on WINDOWS for a… |
 | [TOOL-aBoundedVerdict-32](../builds/aBoundedVerdict/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-20 | TOOL-cBriefedPilot-18 AC9 was CLAIMED at a close it was not met at. It… |
 | [TOOL-aBranchedMandate-5](../builds/aBranchedMandate/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-17 | adopt-drift-audit.sh diffs its render with no [ -s ] test, so… |

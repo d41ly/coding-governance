@@ -673,6 +673,131 @@ def entry_members(root: pathlib.Path, entry_id: str, desc: dict, desc_path: str)
     return claimed
 
 
+def derive_marker_basis(root: pathlib.Path, descs: dict[str, tuple[dict, str]]) -> dict[str, set[str]]:
+    """TOOL-aMendedFleet-64 S1. Each entry's `gov:kit` marker population: every tracked path its
+    `entry_members` claim, plus its declared `marker_carriers`, `*.test.sh` excluded.
+
+    ONE function because two readers need the same set: `selfcheck` check 5c grades it and
+    `write_version_carriers` writes it, so a file the fixer would miss is a file the check misses too.
+    `*.test.sh` is out because `check-verdict-epoch.test.sh` carries a marker inside a `sed` that
+    mutates a scratch fixture — noise in a deployer's grep, not a wrong claim.
+    """
+    # `-z` AND A NUL SPLIT, never a whitespace one: git quotes a non-ASCII path and prints a spaced
+    # one raw, so a bare `.split()` here loses both. Same defect as the renormalize guards, one
+    # repository over — gov's own tree today has no such path, which is exactly why it would rot.
+    tracked_gov = [f for f in subprocess.run(
+        ["git", "-C", str(root), "ls-files", "-z"],
+        capture_output=True, text=True).stdout.split("\0") if f]
+    tracked_set = set(tracked_gov)
+    # Derived only when a carrier needs resolving: a fixture with no registry has no tool root.
+    troot = (derive_tool_root(root)
+             if any(d.get("marker_carriers") for d, _dp in descs.values()) else "")
+    basis: dict[str, set[str]] = {}
+    for eid, (d, dpath) in descs.items():
+        pref = entry_members(root, eid, d, dpath)
+        # `{prefix}`-tokened, never a literal `tools/`: a descriptor ships to adopters and a
+        # hardcoded prefix in one resolves to nothing in a target installed elsewhere. This is
+        # the class `check-install-prefix.sh` grades, and it caught this line on the first bar.
+        allow = {resolve_prefix_token(c, troot) for c in (d.get("marker_carriers") or [])}
+        basis[eid] = {f for f in allow if f in tracked_set} | {
+            f for f in tracked_gov
+            if not f.endswith(".test.sh")
+            and any(f == p or f.startswith(p.rstrip("/") + "/") for p in pref)}
+    return basis
+
+
+def write_version_carriers(root: pathlib.Path, descs: dict[str, tuple[dict, str]],
+                           basis: dict[str, set[str]]) -> list[tuple[str, str, str, str, str]]:
+    """TOOL-aMendedFleet-64 S2, S3. Write every version carrier in `basis` from its entry's
+    `version_from` constant; return one `(path, entry, carrier id, old, new)` per rewrite.
+
+    Within an entry's basis it rewrites: every `gov:kit <entry>@<n>` marker whose number differs;
+    and, on a line matching ANY entry's `version_from` pattern then an optional quote and a number,
+    that number plus every same-line `gov:kit <alias>@<n>` whose alias is no OTHER entry's id — but
+    only when the line carries this entry's marker, or the file does elsewhere and carries no other
+    entry's marker at all. That ownership clause is what keeps review-harness's `version: ` number
+    out of the drift-audit harnesses its `**` also claims. On the constant's own line only the
+    aliases move; its number is the source.
+
+    WHAT IT DOES NOT DO: mint a value, run a `[[regenerate]]` argv, or touch a file outside the
+    basis. Bytes are kept: read and written as UTF-8 with `newline=""`, split on `\\n` alone, and a
+    file is written only when a byte changed. A file that does not decode is named and skipped.
+    """
+    mk = re.compile(r"gov:kit ([a-z0-9-]+)@([0-9]+(?:\.[0-9]+)*)")
+    numv = re.compile(r"([0-9]+(?:\.[0-9]+)+)")
+    carrier_rxs = []
+    for d, _dp in descs.values():
+        vf = d.get("version_from") or {}
+        if "none" in vf or not vf.get("pattern"):
+            continue
+        try:
+            carrier_rxs.append(re.compile("(?:" + vf["pattern"] + r")['\"]?([0-9]+(?:\.[0-9]+)*)"))
+        except re.error:
+            continue
+    texts: dict[str, list[str]] = {}   # path -> [as read, as rewritten so far]
+    skipped: set[str] = set()
+    rewrites: list[tuple[str, str, str, str, str]] = []
+    for eid, (d, _dp) in sorted(descs.items()):
+        vf = d.get("version_from") or {}
+        if "none" in vf or not vf.get("file") or not vf.get("pattern"):
+            continue
+        m = numv.search(entry_version(root, d) or "")
+        if not m:
+            continue
+        want = m.group(1)
+        home = (d.get("home") or "").rstrip("/")
+        src = f"{home}/{vf['file']}" if home else vf["file"]
+        try:
+            own_rx = re.compile(vf["pattern"])
+        except re.error:
+            continue
+        for f in sorted(basis.get(eid, ())):
+            if f in skipped:
+                continue
+            if f not in texts:
+                fp = root / f
+                if not fp.is_file():
+                    continue
+                try:
+                    with open(fp, encoding="utf-8", newline="") as fh:
+                        raw = fh.read()
+                except UnicodeDecodeError:
+                    print(f"govkit: fix skip {f} · not UTF-8, left untouched")
+                    skipped.add(f)
+                    continue
+                except OSError:
+                    continue
+                texts[f] = [raw, raw]
+            lines = texts[f][1].split("\n")
+            file_ids = {h.group(1) for h in mk.finditer(texts[f][1])}
+            foreign = any(i != eid and i in descs for i in file_ids)
+            const_at = (next((n for n, ln in enumerate(lines) if own_rx.search(ln)), -1)
+                        if f == src else -1)
+            for n, ln in enumerate(lines):
+                line_own = any(h.group(1) == eid for h in mk.finditer(ln))
+                owned = line_own or (eid in file_ids and not foreign)
+                hits = [h for h in (rx.search(ln) for rx in carrier_rxs) if h] if n != const_at else []
+                num = min(hits, key=lambda h: h.start(1)) if hits and owned else None
+                aliases = num is not None or (n == const_at and line_own)
+                edits = []   # (start, end, carrier id, old)
+                if num is not None and num.group(1) != want:
+                    edits.append((num.start(1), num.end(1), eid, num.group(1)))
+                for h in mk.finditer(ln):
+                    cid = h.group(1)
+                    if h.group(2) != want and (cid == eid or (aliases and cid not in descs)):
+                        edits.append((h.start(2), h.end(2), cid, h.group(2)))
+                for s, e, cid, old in sorted(edits, reverse=True):
+                    ln = ln[:s] + want + ln[e:]
+                    rewrites.append((f, eid, cid, old, want))
+                lines[n] = ln
+            texts[f][1] = "\n".join(lines)
+    for f, (raw, cur) in sorted(texts.items()):
+        if cur != raw:
+            with open(root / f, "w", encoding="utf-8", newline="") as fh:
+                fh.write(cur)
+    return sorted(rewrites)
+
+
 # ------------------------------------------------------------------------------- selection + tokens
 # The DEFAULT set is DECLARED IN THE REGISTRY, not here. It began as a constant in this file, and a
 # scratch fixture caught what that meant: the engine named five kits by hand while the registry named
@@ -1497,9 +1622,29 @@ def scan_uncontained_writes(src: str) -> list[tuple[int, str, str]]:
     return sorted(out)
 
 
-def selfcheck(root: pathlib.Path, write: bool = False) -> int:
-    r = Report()
+def selfcheck(root: pathlib.Path, write: bool = False, fix: bool = False) -> int:
     reg = load_registry(root)
+    if fix:
+        # TOOL-aMendedFleet-64 S4. The carriers are written FIRST, then every arm below grades the
+        # result exactly as it would without the flag. The descriptors are read here on a throwaway
+        # report so a read failure is reported once, by the arms' own read below.
+        fdescs = read_descriptors(root, reg, Report())
+        fixed = write_version_carriers(root, fdescs, derive_marker_basis(root, fdescs))
+        for f, _eid, cid, old, new in fixed:
+            print(f"govkit: fix {f} · {cid} {old} -> {new}")
+        troot = derive_tool_root(root)
+        for eid in sorted({row[1] for row in fixed}):
+            fd = fdescs[eid][0]
+            ctx = {**canonical_ctx(eid), "kit": (fd.get("home") or "").rstrip("/") or troot}
+            argvs = list(dict.fromkeys(resolve_tokens(" ".join(str(a) for a in (g.get("argv") or [])),
+                                                      ctx)[0]
+                                       for g in (fd.get("regenerate") or [])))
+            if argvs:
+                print(f"govkit: fix {eid} moved · next: {' ; '.join(argvs)}")
+            else:
+                print(f"govkit: fix {eid} moved · declares no [[regenerate]], nothing to re-render")
+        print(f"govkit: fix total {len(fixed)} carrier(s) rewritten")
+    r = Report()
 
     entries = reg.get("entry", [])
     exempts = reg.get("exempt", [])
@@ -1893,20 +2038,9 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
     # `-z` AND A NUL SPLIT, never a whitespace one: git quotes a non-ASCII path and prints a spaced
     # one raw, so a bare `.split()` here loses both. Same defect as the renormalize guards, one
     # repository over — gov's own tree today has no such path, which is exactly why it would rot.
-    _tracked_gov = [f for f in subprocess.run(
-        ["git", "-C", str(root), "ls-files", "-z"],
-        capture_output=True, text=True).stdout.split("\0") if f]
-    _claimed: dict[str, set[str]] = {}
-    for eid, (d, dpath) in descs.items():
-        pref = entry_members(root, eid, d, dpath)
-        # `{prefix}`-tokened, never a literal `tools/`: a descriptor ships to adopters and a
-        # hardcoded prefix in one resolves to nothing in a target installed elsewhere. This is
-        # the class `check-install-prefix.sh` grades, and it caught this line on the first bar.
-        allow = {resolve_prefix_token(c, derive_tool_root(root)) for c in (d.get("marker_carriers") or [])}
-        _claimed[eid] = allow | {
-            f for f in _tracked_gov
-            if not f.endswith(".test.sh")
-            and any(f == p or f.startswith(p.rstrip("/") + "/") for p in pref)}
+    # The basis is `derive_marker_basis`, which `selfcheck --fix` writes through too
+    # (TOOL-aMendedFleet-64 S1): one population, so the fixer writes exactly what is graded.
+    _claimed = derive_marker_basis(root, descs)
     _owner: dict[str, str] = {}
     for eid, files in _claimed.items():
         for f in files:
@@ -2267,7 +2401,7 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
     #           legs, and it does not compare a descriptor's guard with the manifest's
     #           (TOOL-aPacedTurnstile-12 records that nothing does).
     if legs_path.is_file():
-        tracked_set = set(_tracked_gov)
+        tracked_set = set(tracked(root))
         graded = readers = 0
         for leg in json.loads(legs_path.read_text(encoding="utf-8")):
             guard = [g for g in (leg.get("guard") or []) if g]
@@ -12223,7 +12357,7 @@ def cmd_epoch(root: pathlib.Path, base: str | None) -> int:
 
 # ------------------------------------------------------------------------------------------- main
 USAGE = """usage:
-  govkit.py selfcheck
+  govkit.py selfcheck [--write] [--fix]
   govkit.py shipped
   govkit.py epoch [--base <rev>]
   govkit.py plan --target <path> [--kits a,b | --all] [--coverage] [--emit-declines] [--run-discharge]
@@ -12234,6 +12368,9 @@ USAGE = """usage:
                    [--staged] [--suggest-pins]
   govkit.py intake --target <path> [--kits a,b | --all] [--answer key=value ...]
 
+`selfcheck --fix` writes every kit-version carrier in check 5c's basis (markers, same-line constant
+copies, a harness `version:` field) from its entry's `version_from` constant, then grades as plain
+`selfcheck`; it prints each moved entry's `[[regenerate]]` argv and leaves running it to you.
 `plan`, `check`, `update` and `adopt` are READ-ONLY and none writes a byte; `update --write` performs
 what `update` printed. `adopt` is the BOOTSTRAP: it writes the receipt an already-installed tree
 never had, by measuring that tree against gov's own history, and `--write` is what records it. It
@@ -12679,6 +12816,16 @@ def main(argv: list[str]) -> int:
         sys.stderr.write(USAGE)
         return 0 if argv else 2
     try:
+        if argv[0] == "selfcheck":
+            # `--write` regenerates the subject pin and `--fix` writes the version carriers
+            # (TOOL-aMendedFleet-64 S4); nothing else is accepted. Kept narrow on purpose:
+            # `selfcheck` is the verb a gate leg runs, and a verb that writes by default would let
+            # the bar repair the very record it is supposed to be grading. Parsed here, before
+            # `parse_args`, so a refusal names both flags rather than the generic one.
+            flags = argv[1:]
+            if len(flags) != len(set(flags)) or any(a not in ("--write", "--fix") for a in flags):
+                raise Refusal("selfcheck takes no arguments except --write and --fix")
+            return selfcheck(repo_root(), write="--write" in flags, fix="--fix" in flags)
         if argv[0] == "epoch":
             # Parsed here and not in `parse_args`: `--base` is this verb's alone.
             if len(argv) not in (1, 3) or (len(argv) == 3 and argv[1] != "--base"):
@@ -12688,13 +12835,6 @@ def main(argv: list[str]) -> int:
          PINS, RE_ADOPT, COVERAGE, EMIT_DECLINES, RUN_DISCHARGE, STAGED, ACCEPT_ROLE_MOVES,
          SUGGEST_PINS) = parse_args(argv)
         root = repo_root()
-        if verb == "selfcheck":
-            # `--write` is the ONLY argument, and it regenerates the subject pin. Kept narrow on
-            # purpose: `selfcheck` is the verb a gate leg runs, and a verb that writes by default
-            # would let the bar repair the very record it is supposed to be grading.
-            if len(argv) > 2 or (len(argv) == 2 and argv[1] != "--write"):
-                raise Refusal("selfcheck takes no arguments except --write")
-            return selfcheck(root, write=(len(argv) == 2))
         if verb == "shipped":
             if len(argv) > 1:
                 raise Refusal("shipped takes no arguments")

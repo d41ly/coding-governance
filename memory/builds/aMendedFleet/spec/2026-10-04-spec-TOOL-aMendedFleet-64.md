@@ -1,10 +1,12 @@
 # TOOL-aMendedFleet-64 — `govkit selfcheck --fix` writes every kit-version carrier from its `version_from` constant
 
-**Status:** SPECCED · rev-3 · 2026-10-05 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · closes DEPL-aHoistedPass-10 · advances TOOL-aBoundedVerdict-29 · order 64
+**Status:** CLOSED · rev-3 · 2026-10-05 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · closes DEPL-aHoistedPass-10 · advances TOOL-aBoundedVerdict-29 · order 64
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-04-build-TOOL-aMendedFleet-64-1-acceptance-ledger.md](../build/2026-10-04-build-TOOL-aMendedFleet-64-1-acceptance-ledger.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
