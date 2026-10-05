@@ -57,6 +57,24 @@ RECEIPT_SCHEMA = 3  # bumped by any unit that adds a per-role row field; readers
 # which legs its doc-only pushes skip, so it is that repository's answer and no kit may carry gov's.
 POLICY_KEYS = ("GATE_SELFTESTS", "INHERITED_RED", "INHERITED_RED_MAX_AGE", "GATE_DOC_PATHS")
 
+
+def build_policy_re() -> "re.Pattern[str]":
+    """The line predicate check 7h3 grades every shipped line with: an ASSIGNMENT of a POLICY_KEYS key.
+
+    One compiled object, built here and nowhere else, so the selftest grades the engine's own pattern
+    rather than a copy of it. The value arm takes a double- or single-quoted value holding blanks
+    beside a bare one (TOOL-dThriftyLanding-10): `GATE_DOC_PATHS` is a space-separated list, and the
+    old bare non-blank run stopped at its first blank, so the doc class was invisible in the only
+    spelling it has. The
+    tail is unchanged — blanks, an optional comment, end of line — so `KEY="a b" bash x` is still an
+    invocation and not a policy.
+    """
+    pk = "|".join(re.escape(k) for k in POLICY_KEYS)
+    return re.compile(
+        r"^[ \t]*(?::[ \t]+)?(?:export[ \t]+)?"
+        r"(?:(" + pk + r")=(?:\"[^\"]*\"|'[^']*'|\S*)|\$\{(" + pk + r"):?=[^}]*\})"
+        r"[ \t]*(?:#.*)?$")
+
 # The hard order's step ids, RESERVED here in one ordered tuple — including the steps this engine
 # does not perform yet. A step id is data, not a print: the ordering criterion is an assertion about
 # ORDER, and before this there was nothing stable to order. Later units FILL steps and may never
@@ -2710,11 +2728,7 @@ def selfcheck(root: pathlib.Path, write: bool = False) -> int:
     # inherited-red pair is caught in every spelling `GATE_SELFTESTS` is. Re-run over the tracked tree
     # after widening: one policy file, `.githooks/gate-env.sh`, now assigning two of the three keys,
     # and still no invocation matched. The first capture that matched names the key in the refusal.
-    _pk = "|".join(re.escape(k) for k in POLICY_KEYS)
-    policy_re = re.compile(
-        r"^[ \t]*(?::[ \t]+)?(?:export[ \t]+)?"
-        r"(?:(" + _pk + r")=\S*|\$\{(" + _pk + r"):?=[^}]*\})"
-        r"[ \t]*(?:#.*)?$")
+    policy_re = build_policy_re()
     # THE SHIPPED SET, resolved the way `apply` resolves it. `claims` covers only 13 of 58 file
     # rules in this tree, so deriving from that key alone would have quantified over a third of the
     # payload and reported a confident zero over the rest — the could-not-fail shape, arriving as an

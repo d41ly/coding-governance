@@ -973,6 +973,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "build_policy_re",
+      "kind": "function",
+      "file": "tools/govkit/govkit.py"
+    },
+    {
       "id": "build_preflight_state",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
