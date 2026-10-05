@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-28 — a parity gate holds the by-design head the catalogue renders equal to the pattern the review harness parses
 
-**Status:** SPECCED · rev-1 · 2026-10-05 · node a · Tier-1 · base 5266d22e · streams tooling · order 12
+**Status:** SPECCED · rev-2 · 2026-10-05 · node a · Tier-1 · base 5266d22e · streams tooling · order 12
 
 <!-- gen:spec-records -->
 
@@ -36,11 +36,14 @@ parity leg, so every bar runs it.
   defines no `render_by_design` is drift, exit 1. A catalogue declaring neither prints a `SKIP` line
   and exits 0, since it renders no block and the harness truthfully logs none. Exit 2 with a
   `REFUSING` line covers a template carrying zero or two declarations, a catalogue that cannot be
-  imported, an absent `node`, and evaluator output that is malformed or answers fewer heads than were
-  sent. Observed by AC2, AC3 and AC4.
+  imported, a `render_by_design` that raises over the synthetic records, an absent `node`, and
+  evaluator output that is malformed or answers any number of heads other than the number sent.
+  Observed by AC2, AC3 and AC4.
 - **S3** — `--selftest` runs one arm per outcome in S1 and S2 over fixtures it writes to a temporary
   directory, prints `selftest: <passed>/<declared> arms`, and fails when fewer arms ran than
-  `ARMS_DECLARED`. That is the shape `review_replay.py` in the same kit already uses. Observed by AC4.
+  `ARMS_DECLARED`. That is the shape `review_replay.py` in the same kit already uses. Its fixtures
+  spell a fixture head of their own, never the real one, so the self-test is not a third spelling of
+  the pair. Observed by AC4.
 - **S4** — `tools/workflows/check-protocol-parity.test.sh` runs the checker in the leg's check mode, after
   the pointer arm and before the closing in-parity line, over the `MTD` it already resolves. The
   checker's exit status becomes the leg's. An absent checker file is a `missing shipped copy` red,
@@ -48,7 +51,8 @@ parity leg, so every bar runs it.
   by-design arm did NOT run and why. Observed by AC5 and AC6.
 - **S5** — `tools/workflows/unattended-build.test.sh` copies the checker into every layout its
   `build_layout` writes, so the check-mode layout runs keep their verdicts. It gains arms for the
-  leg over a layout holding the real catalogue, the same layout with the head reworded and committed,
+  leg over a layout holding the real catalogue with the `tree_lib.py` it imports, the same layout
+  with the head reworded and committed,
   the flat layout's stub catalogue, and the checker's `--selftest`. Its `FLOOR_ASSERTIONS` rises by
   the arms added. Observed by AC6.
 - **S6** — The review-harness version moves once after this unit's last move, on the template's
@@ -83,10 +87,14 @@ parity leg, so every bar runs it.
 ### Evidence
 
 Read at `f0971667`, the run branch's tip carrying unit 3's code; the build's pinned base predates it.
+Re-read at `25dc6e5f` for rev-2, after the merge of `origin/main` and units 9, 15, 16 and 21.
 
-- `tools/memory-tree/gotchas.py:73` declares the format string, `:553` defines `render_by_design`,
-  which always prints the head, `0` included, and `:66` declares `KINDS` with `invariant` in it. The
-  module imports only the standard library and runs nothing at import.
+- `tools/memory-tree/gotchas.py:74` declares the format string, `:554` defines `render_by_design`,
+  which always prints the head, `0` included, and `:67` declares `KINDS` with `invariant` in it. The
+  module imports the standard library and, since the build's unit 9, `tree_lib.py` from its OWN
+  directory, which it puts on `sys.path` first. It runs nothing else at import. A copy of it imports
+  only beside a copy of `tree_lib.py`, and an import writes `__pycache__` beside the catalogue unless
+  bytecode writing is off, so the checker turns it off.
 - `tools/workflows/tier2-review.template.js:291` declares the pattern. `extractByDesign` at `:292`
   right-trims each line, calls `test`, then `exec` on the line found, and reads group 1 as the count.
   With no head found it returns no entries, and the harness logs `none supplied`.
@@ -247,8 +255,9 @@ file this unit touches is in the kickoff manifest's `watch:`, so no re-stamp is 
   Red when: the harness's pattern fails to match a head the catalogue renders, captures anything but
   its count, or matches the head behind a leading space.
   figure: the counts are PINNED in `SAMPLE_COUNTS`, and the line prints them from it.
-- **AC2** — When a copy of `tools/memory-tree/gotchas.py` in a directory under the run's scratchpad
-  has `by design` in `BY_DESIGN_HEAD` changed to `by-design`,
+- **AC2** — When a copy of `tools/memory-tree/gotchas.py`, beside a copy of the `tree_lib.py` it
+  imports, in a directory under the run's scratchpad has `by design` in `BY_DESIGN_HEAD` changed to
+  `by-design`,
   `cd tools/workflows && python check_by_design_parity.py <scratch-dir>` exits 1 with a `DRIFT`
   line quoting the rendered head. With the constant as shipped and the copy's `render_by_design`
   printing that reworded head as its own literal, it exits 1 the same way. With `render_by_design`
@@ -280,8 +289,11 @@ file this unit touches is in the kickoff manifest's `watch:`, so no re-stamp is 
   behind the suite's prologue, it reports four things. The layout holding a copy of the real
   catalogue passes with the agreement line. The same layout with the head reworded and committed
   reds with `DRIFT` and `rc=1`. The flat layout's stub catalogue passes with `rc=0` and the `SKIP`
-  line. The checker's `--selftest` exits 0. Each new arm was observed red with the leg's call to the
-  checker cut from a scratch copy of the leg, and `FLOOR_ASSERTIONS` is raised by the arms added.
+  line. The checker's `--selftest` exits 0. The agreement, `DRIFT`, `rc=1` and `SKIP` arms were
+  observed red with the leg's call to the checker cut from a scratch copy of the leg, and the
+  `--selftest` arm with a scratch copy of the checker whose `ARMS_DECLARED` is one above the arms
+  written; an `rc=0` arm cannot red on a cut call, which is why each pass arm is paired with a line
+  arm. `FLOOR_ASSERTIONS` is raised by the arms added.
   Red when: the leg runs no checker and those arms stay green.
   permission: the whole suite is the main loop's, run once at VERIFYING; a pass runs the slice only.
 - **AC7** — When `python tools/govkit/govkit.py epoch --base <the pass's parent sha>` runs at the
@@ -317,6 +329,13 @@ none
 - rev-1 · 2026-10-05 · initial draft, from the unit-27/28 spec brief and unit 3's acceptance ledger,
   grounded against `gotchas.py`, the review harness template, the parity leg and the build-harness
   suite at `f0971667`.
+- rev-2 · 2026-10-05 · re-read against the tree at `25dc6e5f` before any code. §4's evidence said
+  `gotchas.py` imports only the standard library; it now imports `tree_lib.py` from its own
+  directory, so AC2's scratch directory and S5's real-catalogue layout carry that file too, and the
+  checker turns bytecode writing off. S2 adds a renderer that raises over the synthetic records to
+  the refusals and refuses any result count other than the heads sent, not only a smaller one. S3
+  keeps the real head out of the self-test's fixtures. AC6 names which arms a cut call reds and how
+  the `--selftest` arm is observed red. §4's line numbers move to the current tip.
 
 ## 10. Reuse audit
 
