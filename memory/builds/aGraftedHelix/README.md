@@ -143,7 +143,7 @@ ids TOOL-aGraftedHelix-27 TOOL-aGraftedHelix-28 TOOL-aGraftedHelix-29 TOOL-aGraf
 | [TOOL-aGraftedHelix-33 — the spec commit stage places every spec a writer authored, named by id or by path, and refuses an entry it cannot place](spec/2026-10-06-spec-TOOL-aGraftedHelix-33.md) | 17 | 1 | CLOSED | rev-2 | 2026-10-06 |
 <!-- /gen:build-units -->
 
-Records: 47 bound to this build, across 4 record folder(s).
+Records: 48 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
