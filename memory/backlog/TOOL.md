@@ -278,7 +278,7 @@ Cite ids, never line numbers.
 | [TOOL-aTracedSpawn-2](../builds/aTracedSpawn/BACKLOG.md) | OPEN | — | — | 2026-09-08 | THE REMAINING 320 SPAWNS IN check-unattended.sh's FIXTURE FRAME, after… |
 | [TOOL-aTracedSpawn-3](../builds/aTracedSpawn/BACKLOG.md) | OPEN | — | — | 2026-09-08 | THE SHARD-2 FAILURE COUNT AFTER THE FIXTURE-HEADING FIX IS UNMEASURED,… |
 | [TOOL-aUnblockedFleet-9](../builds/aUnblockedFleet/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-31 | FIVE ACCEPTANCE CRITERIA OF TOOL-aUnblockedFleet-2 ARE WRITTEN,… |
-| [TOOL-aUnmannedHelm-2](../builds/aUnmannedHelm/BACKLOG.md) | SPECCED | — | TOOL-aMendedFleet-53 | 2026-08-10 | the ledger_dir in tools/drift-audit/drift_report.py points at an… |
+| [TOOL-aUnmannedHelm-2](../builds/aUnmannedHelm/BACKLOG.md) | OPEN | — | — | 2026-08-10 | the ledger_dir in tools/drift-audit/drift_report.py points at an… |
 | [TOOL-aUnmannedHelm-10](../builds/aUnmannedHelm/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-10 | three root docs (AGENTS.md, WIRE-INTO-PROJECT.md, .gitattributes) come… |
 | [TOOL-aWalkedCorpus-2](../builds/aWalkedCorpus/BACKLOG.md) | DEFERRED | — | TOOL-aWalkedCorpus-2 | 2026-08-17 | a recall quality floor. Measured NOT buildable against bench.py as it… |
 | [TOOL-aWalkedCorpus-4](../builds/aWalkedCorpus/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-17 | memory-recall selftest.py mints its two synthetic corpus ids in a LIVE… |

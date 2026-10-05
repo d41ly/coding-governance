@@ -424,6 +424,12 @@ RATCHETS: list[dict] = [
 
 CHARTER = "AGENTS.md"
 
+# The auto-memory directory `dangling_pointers_in_own_ledger` audits (TOOL-aMendedFleet-53): `~` is
+# the home directory and `{checkout}` the primary checkout's Claude Code project key, so every node
+# and every worktree reads its own machine's notes. Report-only, and a node with no such directory
+# reads DEAD PROBE rather than a clean 0.
+AUTO_MEMORY_DIR = "~/.claude/projects/{checkout}/memory"
+
 # The remote CI workflow `remote_ci_red_streak` reads through `gh` (TOOL-aMendedFleet-8). Report-only
 # and NOT ASKED under --check, so the merge bar stays offline; no pin, so any red streak reads over.
 REMOTE_CI_WORKFLOW = "remote-ci.yml"

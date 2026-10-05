@@ -99,7 +99,7 @@ Then, in order:
 |---|---|---|
 | `drift_report.py` | kit | the engine: the signal implementations, `--json`, `--check`, `--delta`, `--escape-ratio` |
 | `drift_signals.template.py` | kit | the project layer's starting point |
-| `drift_signals.py` | **project** | `PRODUCT_GLOBS`, `SHRINK_ONLY`, `HANDKEPT`, `PINS`, `RATCHETS`, optional `CHARTER`, `TRACE_CUTOFF`, `TRACE_GLOBS`, `TRACE_WAIVER`, `RATCHET_LOOKBACK`, `REMOTE_CI_WORKFLOW` |
+| `drift_signals.py` | **project** | `PRODUCT_GLOBS`, `SHRINK_ONLY`, `HANDKEPT`, `PINS`, `RATCHETS`, optional `CHARTER`, `TRACE_CUTOFF`, `TRACE_GLOBS`, `TRACE_WAIVER`, `RATCHET_LOOKBACK`, `REMOTE_CI_WORKFLOW`, `AUTO_MEMORY_DIR` |
 | `SKILL.template.md` | kit | rendered to `.claude/skills/drift-audit/SKILL.md` by the adopt script |
 | `adopt-drift-audit.sh` | kit | adopt + the `--check` sync arm for the merge bar |
 | `selftest.py` | kit | the kit's own falsifiability test |
@@ -123,7 +123,7 @@ never is.
 | `non_terminal_specs_cited_by_product_source` | does a SPECCED/INPROGRESS spec describe shipped work? | yes |
 | `shrink_only_lists_not_shrinking` | are the lists that promise to shrink actually shrinking? | no |
 | `handkept_inventories_disagreeing_with_source` | does a hand-kept list still match what generates it? | yes |
-| `dangling_pointers_in_own_ledger` | do this node's own rows point at worktrees that exist? | no |
+| `dangling_pointers_in_own_ledger` | do this node's auto-memory notes (`AUTO_MEMORY_DIR`) name repo paths that `git ls-files` still carries? | no |
 | `closed_specs_with_no_product_commit` | does a CLOSED spec have a commit that names it and changed the product? | yes |
 | `lexicon_verbs_declared_but_unused` | does the verb table still describe the code it was derived from? | yes |
 | `lexicon_ratified_older_than_language_surface` | was the table curated since the languages it grades last moved? | yes |

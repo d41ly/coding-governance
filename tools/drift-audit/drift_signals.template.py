@@ -135,11 +135,22 @@ PINS: dict[str, int] = {
 }
 
 # --------------------------------------------------------------------------------------------
-# CHARTER — optional. The file holding the node-registry table, used to resolve THIS node's tag for
-# the node-scoped dangling-pointer signal. Defaults to AGENTS.md then CLAUDE.md when unset.
+# CHARTER — optional. The governing doc a HANDKEPT probe reads as `ctx.charter`, as the example
+# probe above does. Defaults to AGENTS.md then CLAUDE.md when unset.
 # --------------------------------------------------------------------------------------------
 
 # CHARTER = "AGENTS.md"
+
+# --------------------------------------------------------------------------------------------
+# AUTO_MEMORY_DIR — optional. The agent auto-memory directory `dangling_pointers_in_own_ledger`
+# audits: every backticked repo path in its `*.md` notes is checked against `git ls-files`. Two
+# expansions: `~` is the user's home, and `{checkout}` is the primary checkout's absolute path with
+# every character outside `[A-Za-z0-9-]` turned into `-`, which is how Claude Code keys a project.
+# For Claude Code: "~/.claude/projects/{checkout}/memory". BLANK is NOT ASKED; a declaration naming
+# no directory on this node reads DEAD PROBE. Report-only: the notes are one machine's.
+# --------------------------------------------------------------------------------------------
+
+AUTO_MEMORY_DIR: str = ""
 
 # --------------------------------------------------------------------------------------------
 # REMOTE_CI_WORKFLOW — optional. The workflow file (e.g. "ci.yml") whose runs on the default branch

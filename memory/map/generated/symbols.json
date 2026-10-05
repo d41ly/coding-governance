@@ -12298,6 +12298,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "resolve_auto_memory_dir",
+      "kind": "function",
+      "file": "tools/drift-audit/drift_report.py"
+    },
+    {
       "id": "resolve_backend",
       "kind": "function",
       "file": "tools/process-monitor/census.py"
@@ -15736,6 +15741,11 @@
       "id": "test_audit_reds_on_unresolved_target",
       "kind": "function",
       "file": "tools/memory-recall/test_recall_floor.py"
+    },
+    {
+      "id": "test_auto_memory_pointers",
+      "kind": "function",
+      "file": "tools/drift-audit/selftest.py"
     },
     {
       "id": "test_backlog_ask_signals",

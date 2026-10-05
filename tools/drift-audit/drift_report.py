@@ -23,7 +23,7 @@ can still move over a non-empty population, and a dead probe prints DEAD PROBE i
 
 WHAT IS ENGINE AND WHAT IS PROJECT. The signal implementations are generic over any repo that
 follows the governance playbook (a memory tree, TEMPLATE-SPEC status headers, a per-node in-flight
-ledger, a node registry in the charter). Everything genuinely repo-shaped — which paths are product
+ledger, an agent auto-memory directory). Everything genuinely repo-shaped — which paths are product
 source, which lists promise to shrink, which hand-kept inventories mirror a generated one, and the
 PINS — lives in the project layer `drift_signals.py`, copied from `drift_signals.template.py` at
 adoption. Same split as codebase-map's `map_extractors.py`.
@@ -799,37 +799,89 @@ def signal_handkept(ctx) -> dict:
 
 
 # --------------------------------------------------------------------------------------------
-# Signal 5 — this node's own ledger pointers that no longer resolve
+# Signal 5 — this node's auto-memory notes naming repo paths the tracked tree no longer carries
 # --------------------------------------------------------------------------------------------
+#
+# TOOL-aMendedFleet-53. The name is kept for its readers (the history rows among them); the
+# per-node ledger shard it used to read retired with the authored session ledger. What it reads now
+# is the agent's auto-memory, declared by the project layer as AUTO_MEMORY_DIR.
 
-_LOCAL_PATH = re.compile(r"(?:[A-Za-z]:[\\/]|/(?:home|Users)/)[A-Za-z0-9_\\/.-]+")
+_BACKTICKED = re.compile(r"`([^`\n]+)`")
+_NOT_A_PATH = set("<>{}*?$|\"'\\")
+_LINE_SUFFIX = re.compile(r":\d+$")
+
+
+def resolve_auto_memory_dir(root: pathlib.Path, declared: str) -> pathlib.Path | None:
+    """Expand an AUTO_MEMORY_DIR declaration; None when it is blank (NOT ASKED).
+
+    `~` is the user's home. `{checkout}` is the PRIMARY checkout's absolute path with every
+    character outside `[A-Za-z0-9-]` turned into `-` — how Claude Code keys a project's
+    auto-memory. The primary checkout is the parent of the common git dir, so every worktree of one
+    clone reads the same directory. If git cannot answer, the token stays unexpanded and the path
+    names no directory, which the signal reports as DEAD with the path it tried."""
+    declared = (declared or "").strip()
+    if not declared:
+        return None
+    if "{checkout}" in declared:
+        out = subprocess.run(["git", "-C", str(root), "rev-parse", "--path-format=absolute",
+                              "--git-common-dir"], capture_output=True, text=True,
+                             encoding="utf-8", errors="replace")
+        common = out.stdout.strip()
+        if out.returncode == 0 and common:
+            key = re.sub(r"[^A-Za-z0-9-]", "-", str(pathlib.Path(common).parent))
+            declared = declared.replace("{checkout}", key)
+    return root / pathlib.Path(declared).expanduser()
 
 
 def signal_dangling_pointers(ctx) -> dict:
-    """Node-scoped ON PURPOSE. Another node's paths live on another machine and are unknowable from
-    this clone; reporting them missing would be the confidently-wrong-answer class. If the node tag
-    cannot be resolved, the probe reports DEAD rather than guessing."""
-    tag = ctx.node_tag
-    if not tag:
-        return {"signal": "dangling_pointers_in_own_ledger", "value": -1, "of": 0, "tolerance": 0,
-                "gateable": False, "live": False,
-                "detail": [{"note": "node tag not resolvable from the charter registry; skipped"}]}
-    f = ctx.ledger_dir / f"{tag}.md"
-    if not f.exists():
-        return {"signal": "dangling_pointers_in_own_ledger", "value": -1, "of": 0, "tolerance": 0,
-                "gateable": False, "live": False,
-                "detail": [{"note": f"no ledger file for node {tag}"}]}
-    txt = f.read_text(encoding="utf-8", errors="replace")
-    paths = sorted({p.replace("\\", "/").rstrip("`,)./") for p in _LOCAL_PATH.findall(txt)})
-    gone = [p for p in paths if not pathlib.Path(p).is_dir()]
+    """Node-scoped ON PURPOSE: the notes live on this machine, so the value is this machine's and
+    the record never gates. Each backticked span carrying a `/`, no whitespace and none of
+    `< > { } * ? $ | " ' \\` is judged — after a trailing `:<digits>` and a trailing `/` go — when its
+    first segment is a top-level entry of `git ls-files`; it resolves when it equals a tracked file
+    or a directory prefix of one. The tracked set is the oracle, not the disk: an untracked
+    leftover would make a stale note read as true."""
+    name = "dangling_pointers_in_own_ledger"
+    d = resolve_auto_memory_dir(ctx.root, ctx.auto_memory_dir)
+    if d is None:
+        return _build_not_asked(name, "the project layer declares no AUTO_MEMORY_DIR, so there is no "
+                                      "node-local memory to audit")
+    dead = {"signal": name, "value": -1, "of": 0, "tolerance": None, "gateable": False,
+            "live": False, "unjudgeable": 0}
+    if not d.is_dir():
+        return {**dead, "detail": [{"note": f"DEAD PROBE — AUTO_MEMORY_DIR resolves to {d}, "
+                                            f"which is not a directory on this node"}]}
+    files = [f for f in ctx.git.run("ls-files", "-z").stdout.split("\0") if f]
+    dirs = {f[:i] for f in files for i, c in enumerate(f) if c == "/"}
+    tops = {f.split("/", 1)[0] for f in files}
+    tracked = set(files) | dirs
+    judged, unreadable = set(), 0
+    for note in sorted(d.glob("*.md")):
+        try:
+            text = note.read_text(encoding="utf-8")
+        except (OSError, UnicodeDecodeError):
+            unreadable += 1
+            continue
+        for tok in _BACKTICKED.findall(text):
+            if "/" not in tok or any(c.isspace() or c in _NOT_A_PATH for c in tok):
+                continue
+            tok = _LINE_SUFFIX.sub("", tok).rstrip("/")
+            if tok and tok.split("/", 1)[0] in tops:
+                judged.add((note.name, tok))
+    if not judged:
+        return {**dead, "unjudgeable": unreadable,
+                "detail": [{"note": f"DEAD PROBE — no note under {d} names a judgeable repo path"}]}
+    gone = sorted(p for p in judged if p[1] not in tracked)
     return {
-        "signal": "dangling_pointers_in_own_ledger",
+        "signal": name,
         "value": len(gone),
-        "of": len(paths),
-        "tolerance": 0,
+        "of": len(judged),
+        # Pinless (TOOL-aMendedFleet-51): the value is one machine's notes, so a committed pin
+        # would be another node's wrong answer.
+        "tolerance": None,
         "gateable": False,
-        "live": len(paths) > 0,
-        "detail": [{"node": tag, "gone": gone}],
+        "live": bool(judged),
+        "unjudgeable": unreadable,
+        "detail": [{"note_file": n, "path": p} for n, p in gone],
     }
 
 
@@ -2710,28 +2762,14 @@ class Ctx:
         # not know about — e.g. DECLARED_EMPTY, which an older adopter will not have.
         self.proj = proj
         self.charter = getattr(proj, "CHARTER", None) or self._find_charter()
-        self.node_tag = self._resolve_node_tag()
+        # TOOL-aMendedFleet-53. The auto-memory directory signal 5 audits; BLANK or undeclared is
+        # NOT ASKED, so an older adopter's project layer keeps importing.
+        self.auto_memory_dir = (getattr(proj, "AUTO_MEMORY_DIR", "") or "").strip()
 
     def _find_charter(self) -> str | None:
         for c in _CHARTER_CANDIDATES:
             if (self.root / c).exists():
                 return c
-        return None
-
-    def _resolve_node_tag(self) -> str | None:
-        """Match this machine's user against the charter's node-registry table."""
-        import os
-
-        if not self.charter:
-            return None
-        user = (os.environ.get("USERNAME") or os.environ.get("USER") or "").lower()
-        if not user:
-            return None
-        text = (self.root / self.charter).read_text(encoding="utf-8", errors="replace")
-        for line in text.splitlines():
-            m = re.match(r"\|\s*`([a-z])`\s*\|\s*`?([A-Za-z0-9_@.-]+)`?", line.strip())
-            if m and m.group(2).lower() in user:
-                return m.group(1)
         return None
 
 

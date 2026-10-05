@@ -93,8 +93,9 @@ EXECUTED: list[str] = []
 # on a run where no arm skipped; it rises by hand when arms land and never falls to absorb a missing
 # one. A run with a SKIP does not compare it, and says so, because a skipped arm's checks are absent
 # for a reason the floor cannot see.
-CHECK_FLOOR = 339
+CHECK_FLOOR = 345
 # 330 -> 339, TOOL-aMendedFleet-52: the nine checks of `test_handkept_name_sets`.
+# 339 -> 345, TOOL-aMendedFleet-53: the six checks of `test_auto_memory_pointers`.
 # 327 -> 330, TOOL-aMendedFleet-51: the readme-drift all-CLOSED arm and the two pinless checks.
 # 318 -> 327, TOOL-aMendedFleet-50: the nine checks of `test_escape_ratio`.
 # 309 -> 318, TOOL-aMendedFleet-49: the nine checks of `test_drift_delta`.
@@ -2765,6 +2766,48 @@ def test_remote_ci_red_streak(tmp: pathlib.Path) -> None:
           and got["detail"][0]["note"].startswith("DEAD PROBE"), f"got {got}")
 
 
+def test_auto_memory_pointers(tmp: pathlib.Path) -> None:
+    """TOOL-aMendedFleet-53: `dangling_pointers_in_own_ledger` judges the backticked repo paths in a
+    declared auto-memory directory against `git ls-files`, and its two non-live states."""
+    import types
+    print("auto-memory pointers (tracked vs untracked; not asked; dead)")
+    sys.path.insert(0, str(KIT))
+    import drift_report as dr
+
+    r = tmp / "automem-repo"
+    (r / "src").mkdir(parents=True)
+    (r / "src" / "a.py").write_text("x = 1\n", encoding="utf-8", newline="\n")
+    run(["git", "init", "-q", "-b", "main"], r)
+    run(["git", "add", "-A"], r)
+    run(["git", "-c", "user.name=t", "-c", "user.email=t@t", "commit", "-q", "-m", "seed",
+         "--no-verify"], r)
+    notes = tmp / "automem-notes"
+    notes.mkdir()
+    # One tracked path (with a line suffix), one untracked path under a tracked top-level directory,
+    # and spans the probe must not judge: an untracked top level, a placeholder and a bare word.
+    (notes / "n.md").write_text("See `src/a.py:3` and `src/gone.py`; not `elsewhere/x.py`, "
+                                "`src/<name>.py` or `word`.\n", encoding="utf-8", newline="\n")
+    ctx = types.SimpleNamespace(root=r, git=dr.Git(r, "main"), pins={}, auto_memory_dir=str(notes))
+    got = dr.signal_dangling_pointers(ctx)
+    check("auto-memory: one tracked and one untracked path read 1 of 2",
+          got["value"] == 1 and got["of"] == 2 and got["live"] is True, f"got {got}")
+    check("auto-memory: the detail row names the note and the untracked path",
+          got["detail"] == [{"note_file": "n.md", "path": "src/gone.py"}], f"got {got['detail']}")
+    check("auto-memory: report-only and pinless",
+          got["gateable"] is False and got["tolerance"] is None, f"got {got}")
+    ctx.auto_memory_dir = ""
+    check("auto-memory: a blank declaration is NOT ASKED",
+          dr.signal_dangling_pointers(ctx).get("not_asked") is True)
+    ctx.auto_memory_dir = str(tmp / "no-such-dir")
+    got = dr.signal_dangling_pointers(ctx)
+    check("auto-memory: a missing directory is DEAD PROBE naming the resolved path",
+          got["live"] is False and not got.get("not_asked")
+          and "no-such-dir" in got["detail"][0]["note"], f"got {got}")
+    key = dr.resolve_auto_memory_dir(r, "{checkout}").name
+    check("auto-memory: {checkout} expands to a [A-Za-z0-9-] key",
+          re.fullmatch(r"[A-Za-z0-9-]+", key) is not None, f"got {key}")
+
+
 def test_stale_dossiers(tmp: pathlib.Path) -> None:
     """TOOL-aMendedFleet-37: the three states of `dossiers_older_than_their_paths` over canned
     `map_diff.py --stale-dossiers --json` output — the rule is the map kit's, so the arm grades only
@@ -3355,6 +3398,7 @@ def main() -> int:
         test_asks_disposed_overrides(tmp)
         test_legs_retried_after_timeout(tmp)
         test_remote_ci_red_streak(tmp)
+        test_auto_memory_pointers(tmp)
         test_cutoff_keys_armed(tmp)
         test_stale_dossiers(tmp)
         test_backlog_stragglers(tmp)
