@@ -235,7 +235,7 @@ it as `lens=<key>`. Every return carries four fields beside the counts:
   cell is `-` when its value is absent or empty, a `|` is escaped, and line breaks fold to a space.
 
 The two exits before any skeptic runs, every lens dead and no finding raised, return `[]`, `[]` and
-`''`; a deferred return carries what was judged so far. The harness renders the appendix and tells the
+`''` as the ledger, the confirmed set and the appendix; a deferred return carries what was judged so far. The harness renders the appendix and tells the
 synthesis to copy it verbatim as the report's last section. That copy is the only way a REFUTED finding
 reaches a record, and the harness cannot check it was made: compare the report against the returned
 `appendix`. A run whose every finding is refuted writes no report, so there the appendix exists in the
