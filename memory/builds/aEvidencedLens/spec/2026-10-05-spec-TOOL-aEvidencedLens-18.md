@@ -1,6 +1,6 @@
 # TOOL-aEvidencedLens-18 — unit 15's observation is completed: the HEAD bytes tied to their blob, a break on the masked line, all four prints, both edges, and the closing pass's write set
 
-**Status:** SPECCED · rev-2 · 2026-10-05 · node a · Tier-2 · base 028b5cac · streams tooling · order 10
+**Status:** SPECCED · rev-3 · 2026-10-05 · node a · Tier-2 · base 028b5cac · streams tooling · order 10
 
 <!-- gen:spec-records -->
 
@@ -57,9 +57,11 @@ pieces of evidence, writes them to its own ledger, and repairs the two record de
   takes a rev bump and a §9 line, all in this unit's pass, so check 12's reciprocity join sees both
   ends at once. Observed by AC4.
 - **S5** — THE CLOSING PASS DECLARES WHAT IT WRITES (id 3). This unit now orders after unit 15, so
-  unit 15's pass no longer flips the build status and writes neither generated index. This unit is
-  then the build's last open unit, and its own `--dispatch` declares `memory/LIVE.md` and
-  `memory/ledger/2026-10.md`, which its closing commit rewrites. Observed by AC5.
+  unit 15's pass no longer flips the build status and writes neither generated index. This unit's
+  own `--dispatch` declares `memory/LIVE.md` and `memory/ledger/2026-10.md`, and its pass commit
+  writes each only if `gen_build_index.py --write` moves that row. Units 19 and 20 were promoted
+  after this unit at order 11, so this unit is not the build's last open unit, the build stays
+  SPECCED when it closes, and its pass writes neither. Observed by AC5.
 - **S6** — The blob ids, the hash-object equalities, the four prints, the four token counts and the
   outcomes of AC2 to AC5 are written to this unit's acceptance ledger,
   `memory/builds/aEvidencedLens/build/2026-10-05-build-TOOL-aEvidencedLens-18-1-acceptance-ledger.md`,
@@ -134,9 +136,8 @@ None under `tools/`. The dispatch write set is:
   `memory/builds/aEvidencedLens/spec/2026-10-05-spec-TOOL-aEvidencedLens-1.md`, for S4's edges;
 - this spec's own status header and `gen:spec-records` region;
 - the regenerated `memory/builds/aEvidencedLens/README.md`;
-- `memory/LIVE.md` and `memory/ledger/2026-10.md`. This is the last open unit, so closing it
-  re-renders the build status and these two rows change. Declaring them is right here because this
-  pass does write them.
+- `memory/LIVE.md` and `memory/ledger/2026-10.md`, declared by the main loop's dispatch. The pass
+  writes either only if the generator moves its row; with units 19 and 20 open it moves neither.
 
 The stub driver and every render live in the run's scratch directory.
 
@@ -199,9 +200,11 @@ the suite and runs in seconds.
   observe it.
 - **AC5** — When `git show --name-only` is read for unit 15's pass commit, it lists neither
   `memory/LIVE.md` nor `memory/ledger/2026-10.md`. This unit's `--dispatch` row in the build's
-  `RUN.md` lists both, and this unit's pass commit writes both.
-  Red when: unit 15's pass wrote either index, or this pass writes an index its dispatch did not
-  declare.
+  `RUN.md` lists both. `git diff --cached --name-only` before this unit's pass commit lists each
+  index only if `gen_build_index.py --write` moved its row, which with units 19 and 20 open it does
+  not.
+  Red when: unit 15's pass wrote either index, this pass writes an index its dispatch did not
+  declare, or it stages an index row the generator did not move.
 - **AC6** — When `2026-10-05-build-TOOL-aEvidencedLens-18-1-acceptance-ledger.md` under the build's
   `build/` folder is read, it carries `**Serves:** journal TOOL-aEvidencedLens-18` and an
   `**Evidences:** TOOL-aEvidencedLens-18` block. The block names the two blob ids with their
@@ -230,6 +233,11 @@ none
   (`reviews/2026-10-05-review-TOOL-aEvidencedLens-18-spec-audit-round1.md`) promoted for id 14
   (HIGH) and for ids 7, 12 and 15 (MEDIUM) and 1, 2, 3, 4, 5, 6, 8, 9, 10, 11 and 16 (LOW). Nothing
   else moves; this unit builds as written.
+- rev-3 · 2026-10-05 · §2 §4 §6 S5 AC5 · the build pass diverged before code: S5, §4's last
+  files-touched bullet and AC5 assumed this unit is the build's last open unit, which held only
+  until units 19 and 20 were promoted after it. With them open the build stays SPECCED, so the pass
+  writes neither generated index; S5 and AC5 now make each write conditional on the generator moving
+  its row. `TOOL-aEvidencedLens-20` S2 carries the fuller correction; nothing else moves.
 
 ## 10. Reuse audit
 
