@@ -6,6 +6,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-05-build-TOOL-dThriftyLanding-1-runlog-58509c21.md](../build/2026-10-05-build-TOOL-dThriftyLanding-1-runlog-58509c21.md) | journal | TOOL-dThriftyLanding-1 TOOL-dThriftyLanding-2 TOOL-dThriftyLanding-3 TOOL-dThriftyLanding-4 TOOL-dThriftyLanding-5 TOOL-dThriftyLanding-6 TOOL-dThriftyLanding-9 TOOL-dThriftyLanding-10 TOOL-dThriftyLanding-11 TOOL-dThriftyLanding-12 |
 | [2026-10-05-build-TOOL-dThriftyLanding-8-1-acceptance-ledger.md](../build/2026-10-05-build-TOOL-dThriftyLanding-8-1-acceptance-ledger.md) | journal | — |
 | [2026-10-05-prompt-TOOL-dThriftyLanding-8-1-build-brief.md](../prompts/2026-10-05-prompt-TOOL-dThriftyLanding-8-1-build-brief.md) | journal | — |
 

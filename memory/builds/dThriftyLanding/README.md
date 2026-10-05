@@ -85,7 +85,7 @@ ids TOOL-dThriftyLanding-13
 | [TOOL-dThriftyLanding-12 — the closing review's batched minors, round 1](spec/2026-10-05-spec-TOOL-dThriftyLanding-12.md) | 12 | 2 | CLOSED | rev-2 | 2026-10-05 |
 <!-- /gen:build-units -->
 
-Records: 24 bound to this build, across 4 record folder(s).
+Records: 25 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
