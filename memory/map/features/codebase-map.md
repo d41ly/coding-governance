@@ -121,6 +121,9 @@ repo-wide python-launcher seam rather than anything this feature owns.
   liveness.** `shown_paths` is the deduped, file-backed, repo-relative source set the answer
   pointed a reader at, in shortlist order; `n_sources` is that count BEFORE `SOURCE_PATHS_CAP`, so
   a truncated list is visible AS truncated rather than as a short one.
+- **The byte budget cuts the log the way it cuts the answer** (TOOL-aMendedFleet-36). `shown_paths`
+  and `n_sources` are derived from the candidates `derive_budget_cut()` SHOWED, and `n_cut` counts
+  the ranked candidates the budget dropped. A row older than that key lacks it: unknown, not zero.
 - **`n_shown` was NOT redefined.** It still counts RANKED CANDIDATES, which is a different number
   from the path count. Measured on one live row BEFORE the dossier branch landed, 39 ranked against
   10 sources; the same shape holds after it, at a larger source count. An analysis joining
