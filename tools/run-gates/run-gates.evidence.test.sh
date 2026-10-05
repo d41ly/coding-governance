@@ -142,7 +142,7 @@ bad=0
 # two helpers every arm routes through -- so it can never drift from the arms the way a hardcoded
 # literal does. That drift is the recorded failure this leg exists for: a suite printed a fixed
 # `PASS (130 assertions)` for its whole life with no counter behind it.
-FLOOR_ASSERTIONS=109
+FLOOR_ASSERTIONS=110
 n=0
 ok()   { n=$((n+1)); echo "  ok   — $1"; }
 nope() { n=$((n+1)); echo "  FAIL — $1"; bad=1; }
@@ -803,13 +803,28 @@ rc=$(rec_run GATE_FULL=1 GATE_TURNSTILE=1 GATE_CENSUS_EVERY=60)
 sleep 2
 ps -ef > "$tmp/cn-ps.txt" 2>/dev/null
 cn_left=$(grep -F -- "${REC_T##*/}/$KIT_REL/run-gates.sh" "$tmp/cn-ps.txt")
+# THE CONTROL: the bar HELD the turnstile, so it started a ticker, and an absence below is a verdict.
+cn_held=$(awk -F'\t' '$1 == "queued_from" { print $2 }' "$(rec_dir)/header" 2>/dev/null)
 if [ ! -s "$tmp/cn-ps.txt" ]; then
   skipped "AC14 ps -ef printed nothing here, so a lingering ticker went UNSEEN"
+elif [ "$cn_held" != held ]; then
+  nope "AC14 control: the bar's turnstile reads '$cn_held', not held, so no ticker started and the absence below would grade nothing"
 elif [ -z "$cn_left" ]; then
   ok "AC14 no process naming the finished bar's runner path remains (rc=$rc)"
 else
   nope "AC14 the finished bar left processes the next bar's census would count as foreign:"; printf '%s\n' "$cn_left" | cut -c1-160 | sed 's/^/      /'
 fi
+rec_done
+
+# --- S2's override refusal: a period that is not a positive integer is announced and not used -----
+# AC5 shows a valid override is honoured (four samples in a 15 s leg cannot come from 60 s); this is
+# the other branch, which no criterion reads: one NOTE naming the value, and the header keeping 60.
+rec_repo
+rc=$(rec_run GATE_FULL=1 GATE_CENSUS_EVERY=abc)
+[ "$(grep -c "run-gates: NOTE - GATE_CENSUS_EVERY='abc'" "$REC_OUT")" = 1 ] \
+  && [ "$(awk -F'\t' '$1 == "census_every" { print $2 }' "$(rec_dir)/header" 2>/dev/null)" = 60 ] \
+  && ok "S2 a GATE_CENSUS_EVERY that is not a positive integer prints one NOTE and the run samples every 60 s" \
+  || { nope "S2 an invalid GATE_CENSUS_EVERY was not announced once, or the header does not keep 60 (rc=$rc)"; grep 'NOTE' "$REC_OUT" | sed 's/^/      /'; }
 rec_done
 rm -f "$REC_OUT"
 
