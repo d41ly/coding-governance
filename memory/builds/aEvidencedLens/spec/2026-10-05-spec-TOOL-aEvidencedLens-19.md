@@ -1,11 +1,12 @@
 # TOOL-aEvidencedLens-19 — unit 18's byte tie is observed with filters off: each saved harness file equals its blob byte for byte, and a CRLF copy and a one-byte append each red it
 
-**Status:** SPECCED · rev-1 · 2026-10-05 · node a · Tier-2 · base 028b5cac · streams tooling · order 11
+**Status:** CLOSED · rev-1 · 2026-10-05 · node a · Tier-2 · base 028b5cac · streams tooling · order 11
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-05-build-TOOL-aEvidencedLens-19-1-acceptance-ledger.md](../build/2026-10-05-build-TOOL-aEvidencedLens-19-1-acceptance-ledger.md) | journal | — |
 | [2026-10-05-prompt-TOOL-aEvidencedLens-19-2-build-brief.md](../prompts/2026-10-05-prompt-TOOL-aEvidencedLens-19-2-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
