@@ -5709,6 +5709,9 @@ miss "$out" "$MA_ROUNDS $MA_OWNR"
 same "round walk: an evil run merge fails check 19 once" "$(ma_round_count "$out")" 1
 mutate "$mar/$KIT_REL/lib-unattended.sh" 's/GIT rev-list "\$_rrc_end" "^\$_rrc_base" \$_rrc_ex 2>/GIT rev-list "$_rrc_end" "^$_rrc_base" $_rrc_ex ${_rrc_ex:+--no-merges} 2>/'
 same "round walk: a walk that drops the merge itself names nothing" "$(ma_round_count "$(ma_leg "$mar")")" 0
+# ...and the broken leg is alive, not mute: on AC2's graph it still walks and names the run's plain raise
+cp "$mar/$KIT_REL/lib-unattended.sh" "$ma_root/grw2/$KIT_REL/lib-unattended.sh"
+hit "$(ma_leg "$ma_root/grw2")" "$MA_ROUNDS $MA_RR 2 -> 3, run memory/builds/tRun/RUN.md"
 rm -rf "$ma_root"
 
 
