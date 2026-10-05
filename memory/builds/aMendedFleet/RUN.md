@@ -372,3 +372,5 @@ base: 7af5f564641d231f8b78f6b183dde1b6bf53111d
 2026-10-05T09:36:55Z dispatch · item eadf0ed6 TOOL-aMendedFleet-44 · reason memory/builds/aMendedFleet/README.md memory/LIVE.md
 
 2026-10-05T09:41:23Z dispatch · item 0c7feff9 TOOL-aMendedFleet-44 · reason tools/codebase-map/README.md memory/LIVE.md
+
+2026-10-05T09:44:18Z brief · item TOOL-aMendedFleet-46 · reason 4c433d32841d memory/builds/aMendedFleet/prompts/2026-10-04-prompt-TOOL-aMendedFleet-1-4-build-brief.md
