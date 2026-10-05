@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-2 — the orientation card lists the remote run claims under a two-clock rule
 
-**Status:** SPECCED · rev-3 · 2026-10-05 · node a · Tier-1 · base 5266d22e · streams kickoff · order 2 · ratified 2026-10-04
+**Status:** CLOSED · rev-3 · 2026-10-05 · node a · Tier-1 · base 5266d22e · streams kickoff · order 2 · ratified 2026-10-04
 
 <!-- gen:spec-records -->
 

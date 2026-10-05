@@ -690,6 +690,7 @@ GOVROOT=$(git -C "$(dirname "$CHECK")" rev-parse --show-toplevel)
 # spelled kit path resolved at gov's prefix only. An empty answer is the checker's own "id
 # citations unchecked" state, and the fixture below then fails naming the clone step.
 eval "$(awk '/^resolve_kit_dir\(\) \{$/,/^}$/' "$CHECK")"
+eval "$(awk '/^resolve_kit_file\(\) \{$/,/^}$/' "$CHECK")"   # the id reader's body since TOOL-aGraftedHelix-2 S3
 eval "$(awk '/^resolve_id_reader\(\) \{$/,/^}$/' "$CHECK")"
 MC_PY=$(resolve_python 2>/dev/null) || MC_PY=""
 READER=$(ROOT="$GOVROOT" MC_DIR="$(dirname "$CHECK")" resolve_id_reader)
@@ -1237,6 +1238,151 @@ CHECK=$L3_CHECK
   && { echo "ok   L3 a checker outside the repo grades ids through the repo's flat memory-tree reader (exit 0)"; pass=$((pass+1)); } \
   || { echo "FAIL L3 a checker outside the repo grades ids through the repo's flat memory-tree reader (exit $got)"; sed 's/^/    /' "$CARD_OUT"; fail=$((fail+1)); }
 
+# ---- TOOL-aGraftedHelix-2: the `claims —` cell, each arm observed RED on a staged break first ----
+# Every arm writes in worktree A of the card clone, whose one remote is re-pointed at a bare
+# repository of seeded claims and restored after the block. A claim is a real `gov-claim` commit over
+# the empty tree, set by update-ref in the bare repository: the ref state the driver's push leaves.
+# Ages count back from one clock read here. The stale split is the clone's own RESUME_STALE_BOUND,
+# read by the driver and never by the card, so a live claim two hours old reads `stale` through it.
+# The driver is found the way the checker finds it, never by a spelled kit path. An arm that swaps
+# the driver, the conf, the remote or PATH restores it before the next one.
+CLB="$TMP/claims.git"; CLURL0=$(git -C "$CCLONE" remote get-url origin)
+CLDRV=$(ROOT="$CWT" MC_DIR="$(dirname "$CHECK")" resolve_kit_file unattended unattended.sh)
+CLDRV_REL=${CLDRV#"$CWT"/}
+git init -q --bare "$CLB" && git -C "$CCLONE" remote set-url origin "$CLB" && [ -n "$CLDRV" ] \
+  || { echo "FAIL claims fixture: no bare remote at $CLB, no re-pointed origin, or no driver resolved in $CWT"; fail=$((fail+1)); }
+CLET=$(git -C "$CLB" hash-object -t tree -w --stdin </dev/null)
+CLNOW=$(date +%s)
+# seed_claim <slug> <status> <beat age in s, or - for no beat-utc line>
+seed_claim() {
+  local b c l=""
+  b=$(date -u -d "@$((CLNOW - ${3/-/0}))" +%Y-%m-%dT%H:%M:%SZ)
+  [ "$3" = - ] || l="beat-utc: $b"
+  c=$(printf 'gov-claim %s\n\nslug: %s\nnode: n1\nhost: h1\nsession: s1\nkeepalive: k1\nstatus: %s\nlease-utc: %s\n%s\n' "$1" "$1" "$2" "$b" "$l" \
+    | GIT_AUTHOR_NAME=t GIT_AUTHOR_EMAIL=t@test GIT_COMMITTER_NAME=t GIT_COMMITTER_EMAIL=t@test git -C "$CLB" commit-tree "$CLET") \
+    && git -C "$CLB" update-ref "refs/gov/runs/$1" "$c"
+}
+remove_claims() { git -C "$CLB" for-each-ref --format='delete %(refname)' refs/gov/runs/ | git -C "$CLB" update-ref --stdin; }
+# The stored card's `claims —` cell, every numeric beat age masked: the clock moves between seed and read.
+read_claims_cell() { awk '/^claims — /{f=1} /^recent —/{exit} f' "$CARD_HOME/$1.md" | sed -E 's/ · beat [0-9]+s · / · beat Ns · /'; }
+read_lines() { if [ -f "$1" ]; then awk 'END{print NR}' "$1"; else echo 0; fi; }   # 0 for an absent file
+
+# AC1, AC2, AC6 — seven claims: a fresh live one, a held one three days old, a live one two hours
+# old (stale), a live one three days old (stale, hidden), a landed one two hours old (terminal), an
+# aborted one three days old (terminal, hidden) and one with no beat-utc (unknown). Slugs sort in
+# the REVERSE of the verdict order, so a slug-ordered cell cannot pass.
+seed_claim zLive live 60; seed_claim yHeld held 259200; seed_claim wStale live 7200; seed_claim uStaleOld live 259200
+seed_claim vLanded landed 7200; seed_claim tAborted aborted 259200; seed_claim xBare live -
+{ git -C "$CWT" rev-parse HEAD; git -C "$CCLONE" for-each-ref refs/heads refs/remotes; } > "$TMP/cl.refs"
+CLGD=$(git -C "$CWT" rev-parse --absolute-git-dir); rm -f "$CLGD/FETCH_HEAD" "$CCLONE/.git/FETCH_HEAD"
+t0=$(date +%s%N)
+run_card "AGH2 AC1 --card --write over the seven-claim remote" "$CWT" 0 "claims — 7 on the remote · 5 shown · 2 hidden" --card --write --session "$NONCE-c1"
+cl_ms_on=$(( ($(date +%s%N) - t0) / 1000000 ))
+check_eq "AGH2 AC1 the five kept claims in verdict order; the three-day stale and aborted ones hidden, the held and unknown ones not" \
+  "$(printf 'claims — 7 on the remote · 5 shown · 2 hidden\n  zLive · n1 · live · beat Ns · live\n  yHeld · n1 · held · beat Ns · held\n  xBare · n1 · live · beat - · unknown\n  wStale · n1 · live · beat Ns · stale\n  vLanded · n1 · landed · beat Ns · terminal')" \
+  "$(read_claims_cell "$NONCE-c1")"
+check_eq "AGH2 AC2 the claims — head sits directly below live —, so the startup split files it before recent —" \
+  "claims — 7 on the remote · 5 shown · 2 hidden" "$(awk '/^live — /{getline; print; exit}' "$CARD_HOME/$NONCE-c1.md")"
+(cd "$CWT" && bash "$CHECK" --card --check --session "$NONCE-c1" </dev/null > "$CARD_OUT" 2>&1)
+check_eq "AGH2 AC2 --card --check grades no row of the cell UNVERIFIED" "0" "$(grep -c 'UNVERIFIED' "$CARD_OUT")"
+check_eq "AGH2 AC6 HEAD, every branch and every remote-tracking ref are unchanged by the read" \
+  "$(cat "$TMP/cl.refs")" "$(git -C "$CWT" rev-parse HEAD; git -C "$CCLONE" for-each-ref refs/heads refs/remotes)"
+[ ! -e "$CLGD/FETCH_HEAD" ] && [ ! -e "$CCLONE/.git/FETCH_HEAD" ] && { echo "ok   AGH2 AC6 the read wrote no FETCH_HEAD"; pass=$((pass+1)); } \
+  || { echo "FAIL AGH2 AC6 the read wrote no FETCH_HEAD"; fail=$((fail+1)); }
+check_eq "AGH2 AC6 liveness: the read reached the remote, its seven claims are in the driver's private cache and nowhere else" \
+  "7" "$(git -C "$CCLONE" for-each-ref refs/gov/ | grep -c .)"
+
+# AC10 and S7 — the replay reads no remote: with the remote broken, the stored head prints
+# unchanged, and a replay that finds no card writes one whose cell made no read.
+git -C "$CCLONE" remote set-url origin "$TMP/nope.git"
+run_card "AGH2 AC10 --card --replay with the remote broken" "$CWT" 0 - --card --replay --session "$NONCE-c1"
+check_eq "AGH2 AC10 the replay prints the stored claims — head unchanged" \
+  "claims — 7 on the remote · 5 shown · 2 hidden" "$(grep -m1 '^claims — ' "$CARD_OUT")"
+run_card "AGH2 S7 a replay that finds no stored card writes one whose cell reads no remote" "$CWT" 0 \
+  "claims — skipped: --card --replay reads no remote" --card --replay --session "$NONCE-c1n"
+
+# AC4 — a remote URL naming nothing: the driver's own refusal, never the empty answer.
+run_card "AGH2 AC4 a remote that names nothing reads skipped: and the driver's check 91" "$CWT" 0 \
+  "claims — skipped: UNATTENDED check 91 FAILED" --card --write --session "$NONCE-c4"
+# The refusal is cut at 160 bytes after the `claims — skipped: ` prefix, and the driver's line is longer.
+cl_len=$(grep -m1 '^claims — skipped: ' "$CARD_HOME/$NONCE-c4.md" 2>/dev/null | LC_ALL=C awk '{ print length($0) - length("claims — skipped: ") }')
+[ -f "$CARD_HOME/$NONCE-c4.md" ] && ! grep -q 'none on the remote' "$CARD_HOME/$NONCE-c4.md" && [ "${cl_len:-999}" -le 160 ] \
+  && { echo "ok   AGH2 AC4 the card is written, a failed read never reads none on the remote, and the refusal is cut to ${cl_len} of 160 bytes"; pass=$((pass+1)); } \
+  || { echo "FAIL AGH2 AC4 the card is written, a failed read never reads none on the remote, and the refusal is cut to 160 bytes (${cl_len:-no line})"; fail=$((fail+1)); }
+git -C "$CCLONE" remote set-url origin "$CLB"
+
+# AC3 — no .unattended.conf: the skipped: form, exit 0, and no driver start; its wall is AC10's
+# figure without the cell, beside AC1's with it.
+mv "$CWT/.unattended.conf" "$TMP/cl.conf"
+t0=$(date +%s%N)
+run_card "AGH2 AC3 no .unattended.conf reads skipped: and the card is written" "$CWT" 0 \
+  "claims — skipped: no .unattended.conf in this tree" --card --write --session "$NONCE-c3"
+cl_ms_off=$(( ($(date +%s%N) - t0) / 1000000 ))
+mv "$TMP/cl.conf" "$CWT/.unattended.conf"
+echo "info AGH2 AC10 card write wall: ${cl_ms_on} ms with the claims read, ${cl_ms_off} ms without"
+
+# AC5 — a driver that never answers: the bound fires, the cell says so, and the write returns
+# without waiting for the sleeper.
+printf '#!/bin/sh\nsleep 30\n' > "$CLDRV"
+export CARD_CLAIMS_BOUND=2; t0=$(date +%s)
+run_card "AGH2 AC5 a driver that sleeps past CARD_CLAIMS_BOUND reads skipped: naming the bound" "$CWT" 0 \
+  "claims — skipped: --claims did not answer within 2s" --card --write --session "$NONCE-c5"
+cl_s=$(( $(date +%s) - t0 )); unset CARD_CLAIMS_BOUND
+[ "$cl_s" -lt 10 ] && { echo "ok   AGH2 AC5 the write returned in ${cl_s}s, under 10, not after the sleeper"; pass=$((pass+1)); } \
+  || { echo "FAIL AGH2 AC5 the write returned in ${cl_s}s, not under 10: the read waited for the sleeper"; fail=$((fail+1)); }
+# The arms above prove the bound for 2 and the hide age only between two hours and three days; the
+# SHIPPED values are the spec's, pinned by reading them, as AC7's CARD_CAP_BYTES pin does.
+grep -qE '^CARD_CLAIMS_BOUND=\$\{CARD_CLAIMS_BOUND:-15\}$' "$CHECK" && grep -qE '^CARD_CLAIMS_HIDE_S=86400$' "$CHECK" \
+  && { echo "ok   AGH2 S4 S5 the shipped CARD_CLAIMS_BOUND default is 15 and CARD_CLAIMS_HIDE_S is 86400"; pass=$((pass+1)); } \
+  || { echo "FAIL AGH2 S4 S5 the shipped CARD_CLAIMS_BOUND default is 15 and CARD_CLAIMS_HIDE_S is 86400"; grep -nE '^CARD_CLAIMS_(BOUND|HIDE_S)=' "$CHECK" | sed 's/^/    /'; fail=$((fail+1)); }
+git -C "$CWT" checkout -q -- "$CLDRV_REL"
+
+# AC11 — ten kept claims, nine terminal ones and a live one whose slug sorts last: exactly
+# CARD_CLAIMS_ROWS rows, read from the checker, the live one first, then one more row.
+remove_claims
+for s in bT1 bT2 bT3 bT4 bT5 bT6 bT7 bT8 bT9; do seed_claim "$s" landed 7200; done
+seed_claim zzLive live 60
+run_card "AGH2 AC11 --card --write over ten kept claims" "$CWT" 0 "claims — 10 on the remote · 10 shown · 0 hidden" --card --write --session "$NONCE-c11"
+cl_cap=$(sed -n 's/^CARD_CLAIMS_ROWS=\([0-9][0-9]*\)$/\1/p' "$CHECK")
+cl_want=$(printf 'claims — 10 on the remote · 10 shown · 0 hidden\n  zzLive · n1 · live · beat Ns · live\n'
+  i=1; while [ "$i" -lt "${cl_cap:-0}" ]; do printf '  bT%s · n1 · landed · beat Ns · terminal\n' "$i"; i=$((i+1)); done
+  printf '  … %s more' "$((10 - ${cl_cap:-0}))")
+check_eq "AGH2 AC11 exactly CARD_CLAIMS_ROWS (${cl_cap:-unreadable}) rows, the live claim first, then the more row" "$cl_want" "$(read_claims_cell "$NONCE-c11")"
+
+# AC12 — no driver; no working `timeout -k`; and the hook's never-closing stdin.
+rm -f "$CLDRV"
+run_card "AGH2 AC12 a driver that resolves nowhere reads skipped:, never bash ''" "$CWT" 0 \
+  "claims — skipped: no unattended driver resolves in this tree" --card --write --session "$NONCE-c12a"
+mkdir -p "$TMP/tshim"
+printf '#!/bin/sh\nfor a in "$@"; do [ "$a" = -k ] && exit 125; done\nexec "%s" "$@"\n' "$(command -v timeout)" > "$TMP/tshim/timeout"
+chmod +x "$TMP/tshim/timeout"
+printf '#!/bin/sh\ntouch "%s"\necho "claims: none"\n' "$TMP/cl.marker" > "$CLDRV"; rm -f "$TMP/cl.marker"
+(cd "$CWT" && PATH="$TMP/tshim:$PATH" bash "$CHECK" --card --write --session "$NONCE-c12b" </dev/null > "$CARD_OUT" 2>&1); got=$?
+[ "$got" = 0 ] && grep -q '^claims — skipped: .*timeout -k' "$CARD_OUT" && [ ! -e "$TMP/cl.marker" ] \
+  && { echo "ok   AGH2 AC12 with no working timeout -k the cell is skipped: naming it, and the driver never ran"; pass=$((pass+1)); } \
+  || { echo "FAIL AGH2 AC12 with no working timeout -k the cell is skipped: naming it, and the driver never ran (exit $got)"; sed 's/^/    /' "$CARD_OUT"; ls "$TMP/cl.marker" 2>/dev/null | sed 's/^/    ran: /'; fail=$((fail+1)); }
+(cd "$CWT" && bash "$CLDRV" >/dev/null 2>&1)
+[ -e "$TMP/cl.marker" ] && { echo "ok   AGH2 AC12 liveness: the stub driver does touch its marker when run"; pass=$((pass+1)); } \
+  || { echo "FAIL AGH2 AC12 liveness: the stub driver never touched its marker, so the arm above observes nothing"; fail=$((fail+1)); }
+printf '#!/bin/sh\ncat >/dev/null\necho "claims: none"\n' > "$CLDRV"
+mkfifo "$TMP/clstdin" 2>/dev/null; exec 9<>"$TMP/clstdin"
+timeout 2 cat <&9 >/dev/null 2>&1; got=$?
+check_eq "AGH2 AC12 liveness: the held stdin reports no EOF (124 = still open)" "124" "$got"
+(cd "$CWT" && CARD_CLAIMS_BOUND=2 bash "$CHECK" --card --write --session "$NONCE-c12c" <&9 > "$CARD_OUT" 2>&1); got=$?
+check_eq "AGH2 AC12 with the hook's stdin held open the driver still reads EOF and answers" "0 claims — none on the remote" "$got $(grep -m1 '^claims — ' "$CARD_OUT")"
+exec 9>&-; rm -f "$TMP/clstdin"
+git -C "$CWT" checkout -q -- "$CLDRV_REL"
+
+# AC14 — a card write adds no line to the driver's journal, with GOV_RUNLOG unset in the caller;
+# the driver called directly the same way does add one, so the count can move.
+CLJ="$CCLONE/.git/runlog/driver.log"; cl_j0=$(read_lines "$CLJ")
+(cd "$CWT" && env -u GOV_RUNLOG bash "$CHECK" --card --write --session "$NONCE-c14" </dev/null > "$CARD_OUT" 2>&1)
+check_eq "AGH2 AC14 a card write adds no line to the driver's journal" "$cl_j0" "$(read_lines "$CLJ")"
+(cd "$CWT" && env -u GOV_RUNLOG bash "$CLDRV" --claims </dev/null >/dev/null 2>&1)
+[ "$(read_lines "$CLJ")" -gt "$cl_j0" ] && { echo "ok   AGH2 AC14 liveness: the driver called directly does write that journal"; pass=$((pass+1)); } \
+  || { echo "FAIL AGH2 AC14 liveness: the driver called directly wrote no journal line at $CLJ, so the arm above observes nothing"; fail=$((fail+1)); }
+git -C "$CCLONE" remote set-url origin "$CLURL0"
+
 # C12 — the manifest carries no CR byte. Round 3's M1: the §B bullet ABOUT raw CR bytes had its own
 # CR eaten twice by text-mode rewrites, leaving a sentence that said a newline becomes a newline.
 # BOTH directions, because a check that has only ever been seen pass is an assertion about nothing,
@@ -1269,7 +1415,8 @@ check_eq "AC11 the suite left no card in this repository's shared common dir ($r
 # unraised floor is the one thing that lets a later edit delete the arms and red nothing.
 # +2: C12's pair, the CR-byte check's green and red cases (round 3 M1's left-shift).
 # +2: L3's pair, the junction-copy setup and its graded-ids arm (aRepatriatedFork round 1 L3).
-FLOOR_ASSERTIONS=180
+# +25: TOOL-aGraftedHelix-2's `claims —` block, every arm of which runs on every node.
+FLOOR_ASSERTIONS=205
 [ "$pass" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $pass assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; fail=$((fail+1)); }
 # GUARDED on the failure count. Printing PASS unconditionally meant a suite with failing arms still
 # reported success on its last line — the exact shape the floor above exists to catch, introduced

@@ -34,7 +34,7 @@
 #          verb with no session id, a path-shaped one, a card over its byte cap, an append whose
 #          READY line pins a BASE that is not HEAD, or an id reader that could not answer).
 set -u
-KIT_MANIFEST_VERSION="1.16"   # gov:kit kickoff-manifest@1.16 — the registry id
+KIT_MANIFEST_VERSION="1.17"   # gov:kit kickoff-manifest@1.17 — the registry id
 # TWO NUMBERS, not one (TOOL-aRepatriatedFork-15 S4). KIT_MANIFEST_VERSION above is the kit's
 # VINTAGE: it bumps whenever a shipped byte of this kit moves, which is what `govkit.py epoch` grades.
 # MANIFEST_FORMAT is the manifest FORMAT, the only number an adopter's `kickoff-manifest: v<N>`
@@ -126,6 +126,12 @@ cd "$ROOT" || exit 2
 # instruction from nobody. The cap is one constant; the append verb of the next unit refuses against
 # the same one. The env override exists for the self-test's over-cap arm and is not an adopter knob.
 CARD_CAP_BYTES=${CARD_CAP_BYTES:-8192}
+# The `claims —` cell's three constants (TOOL-aGraftedHelix-2): the read's bound in seconds, the
+# second clock's hide age, and the row cap. The bound's env override exists for the self-test's
+# slow-driver arm, as CARD_CAP_BYTES's does; none of the three is an adopter knob.
+CARD_CLAIMS_BOUND=${CARD_CLAIMS_BOUND:-15}
+CARD_CLAIMS_HIDE_S=86400
+CARD_CLAIMS_ROWS=8
 
 # The session id, in PRECEDENCE order: `--session` answers FIRST and SUPPRESSES the stdin read;
 # only a caller that passed none falls through to the `{"session_id": …}` JSON the SessionStart hook
@@ -231,8 +237,9 @@ derive_node_tag() {
   esac
 }
 
-# The startup card, rendered from facts a script can derive: no fetch, no ref move, no manifest
-# audit — the engine's Step 1 and Step 2b own those and each costs a kickoff, not a session start.
+# The startup card, rendered from facts a script can derive: no branch or remote-tracking ref move,
+# no FETCH_HEAD, no manifest audit — the engine's Step 1 and Step 2b own those and each costs a
+# kickoff, not a session start. Its one remote contact is the bounded `claims —` read below.
 # `$1` names the writer verb the header carries; a card the replay wrote fresh says `--card --replay`,
 # which is the one byte-level fact that tells a session started before the writer was wired from one
 # whose startup ran it. The `live —` cell reads the memory-tree conf when there is one and reports
@@ -266,9 +273,79 @@ render_card() {
   render_tree_cell
   printf 'worktrees — %s\n' "$(git worktree list 2>/dev/null | wc -l | tr -d '[:space:]')"
   printf '%s\n' "$live"
+  derive_claims_line "$verb"
   printf 'recent —\n'
   git log --oneline -5 2>/dev/null
   printf 'READY — none yet\n'
+}
+
+# The `claims —` cell (TOOL-aGraftedHelix-2): the remote's run claims, read through the unattended
+# kit's own `--claims` verb and never re-derived here, because the driver owns the claim format, the
+# stale bound and the verdict table, and a second reader of them is a second implementation. That
+# read moves no branch or remote-tracking ref and writes no FETCH_HEAD; the driver's private claim
+# cache is the only ref namespace it touches. TWO CLOCKS: the driver's splits `live` from `stale`;
+# this one hides a `stale` or `terminal` claim whose beat is older than CARD_CLAIMS_HIDE_S, and never
+# a `live`, `held` or `unknown` one, which want a reader whatever their age. THE BOUND IS A KILL INTO
+# A FILE: `timeout` kills its own process group, and a `$( )` capture would still wait for any
+# grandchild holding the pipe, so the bound would decide the verdict and not the clock. stdin is
+# /dev/null, since the hook's pipe never closes; GOV_RUNLOG=0 keeps a card write out of the driver
+# journal the runlog kit reads as runs. Every failure is its own `skipped:` form, never `none`, and
+# the card still writes. A replay reads no remote. WHAT THIS DOES NOT CHECK: who drives a slug, or
+# whether a claim is honest — it prints what the driver answered.
+derive_claims_line() {   # $1 = the writer verb → the cell's head line and its rows
+  local drv sd rc
+  [ "$1" = replay ] && { printf 'claims — skipped: --card --replay reads no remote\n'; return 0; }
+  [ -f "$ROOT/.unattended.conf" ] || { printf 'claims — skipped: no .unattended.conf in this tree\n'; return 0; }
+  drv=$(resolve_kit_file unattended unattended.sh)
+  [ -n "$drv" ] || { printf 'claims — skipped: no unattended driver resolves in this tree\n'; return 0; }
+  timeout -k 1 5 true </dev/null >/dev/null 2>&1 \
+    || { printf 'claims — skipped: this node has no working timeout -k, so the read would be unbounded and none ran\n'; return 0; }
+  sd=$(mkdir -p "$CARD_DIR" && mktemp -d "$CARD_DIR/.claims.XXXXXX") \
+    || { printf 'claims — skipped: no scratch directory under %s to capture the read in\n' "$CARD_DIR"; return 0; }
+  GOV_RUNLOG=0 timeout -k 2 "$CARD_CLAIMS_BOUND" bash "$drv" --claims </dev/null >"$sd/out" 2>"$sd/err"; rc=$?
+  case "$rc" in
+    0)
+      # Split on the TAB in awk, never `read`: an empty field collapses under `read`. Ordered by
+      # verdict, then slug, so a busy remote cannot push a live claim off the card.
+      # ponytail: insertion sort, O(n^2) over a card's handful of claims; sort(1) if a remote holds hundreds.
+      LC_ALL=C awk -F'\t' -v hide="$CARD_CLAIMS_HIDE_S" -v cap="$CARD_CLAIMS_ROWS" '
+        BEGIN { n = split("live held unknown stale terminal", o, " "); for (i = 1; i <= n; i++) rk[o[i]] = i }
+        { sub(/\r$/, "") }
+        $0 == "claims: none" { none = 1; next }
+        NF == 5 && ($5 in rk) {
+          all++
+          if (($5 == "stale" || $5 == "terminal") && $4 ~ /^[0-9]+$/ && $4 + 0 > hide + 0) { hid++; next }
+          k = rk[$5] "\t" $1
+          r = "  " $1 " · " $2 " · " $3 " · beat " ($4 ~ /^[0-9]+$/ ? $4 "s" : "-") " · " $5
+          for (i = ++m; i > 1 && key[i - 1] > k; i--) { key[i] = key[i - 1]; row[i] = row[i - 1] }
+          key[i] = k; row[i] = r; next
+        }
+        NF && bad == "" { bad = $0 }
+        END {
+          if (bad != "") { print "claims — skipped: --claims printed a line this card cannot read: " substr(bad, 1, 120); exit }
+          if (all == 0) {
+            if (none) print "claims — none on the remote"
+            else print "claims — skipped: --claims exited 0 with neither a claim row nor claims: none, so the remote'"'"'s claims are unknown, not none"
+            exit
+          }
+          printf "claims — %d on the remote · %d shown · %d hidden\n", all, m, hid
+          for (i = 1; i <= m && i <= cap; i++) print row[i]
+          if (m > cap) printf "  … %d more\n", m - cap
+        }' "$sd/out" ;;
+    124|137)
+      printf "claims — skipped: --claims did not answer within %ss, so the remote's claims are unknown, not none\n" "$CARD_CLAIMS_BOUND" ;;
+    *)
+      # The driver's first refusal line — `fail` prints to stdout — else its first line of any kind,
+      # cut at 160 bytes. ponytail: a cut that splits a UTF-8 character drops the high bytes it left.
+      LC_ALL=C awk -v rc="$rc" '{ sub(/\r$/, "") }
+        NF && f == "" { f = $0 }
+        /FAILED/ { f = $0; exit }
+        END { if (f == "") f = "--claims exited " rc " and printed nothing"
+              if (length(f) > 160) { f = substr(f, 1, 160); sub(/[\200-\377]+$/, "", f) }
+              print "claims — skipped: " f }' "$sd/out" "$sd/err" ;;
+  esac
+  rm -rf "$sd" 2>/dev/null
+  return 0
 }
 
 # Persist the rendered card and print the same bytes. Rendered to a variable FIRST so an over-cap
@@ -407,28 +484,35 @@ r = next((p for p in (d, *d.parents) if (p / ".git").exists()), d.anchor)
 print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
 }
 
-# The memory-tree kit's id reader, through the sibling resolver (TOOL-aRepatriatedFork-2 S3): the
-# receipt, which is the only record of a flat or renamed install, then the two probes beside this
-# kit. Anchored at this script's dir FIRST, then at the repo root: the per-machine junction copy
-# resolves into gov's checkout, where neither rung sees the graded repo (closing review round 1
-# L3). An answer counts only if the file is in THIS repo. Gov homes THIS kit under skills/, which
-# no probe walks from, and gov keeps no receipt, so the last rung is the ONE reader this repo
-# TRACKS. It is derived from the index, where the rung it replaced was two spelled prefixes, gov's
-# and the root (TOOL-aRepatriatedFork-24 S8). Two tracked readers are ambiguous, and so is none;
-# either way this returns empty, and the caller says so.
-resolve_id_reader() {
+# A sibling kit's file, `resolve_kit_file <home> <anchor>`, through the sibling resolver
+# (TOOL-aRepatriatedFork-2 S3): the receipt, which is the only record of a flat or renamed install,
+# then the two probes beside this kit. Anchored at this script's dir FIRST, then at the repo root:
+# the per-machine junction copy resolves into gov's checkout, where neither rung sees the graded repo
+# (closing review round 1 L3). An answer counts only if the file is in THIS repo. Gov homes THIS kit
+# under skills/, which no probe walks from, and gov keeps no receipt, so the last rung is the ONE
+# <anchor> this repo TRACKS. It is derived from the index, where the rung it replaced was two spelled
+# prefixes, gov's and the root (TOOL-aRepatriatedFork-24 S8). Two tracked anchors are ambiguous, and
+# so is none; either way this returns empty, and the caller says so. ONE body for every sibling this
+# kit reads — the memory-tree id reader and the unattended driver (TOOL-aGraftedHelix-2 S3) — so no
+# sibling kit's path is spelled here.
+resolve_kit_file() {
   local d py here
   py=$(resolve_python 2>/dev/null) || py=""
   if [ -n "$py" ]; then
     for here in "$MC_DIR" "$ROOT"; do
-      d=$(resolve_kit_dir "$py" memory-tree corpus_ids.py "$here" 2>/dev/null) || continue
-      [ -f "$ROOT/$d/corpus_ids.py" ] && { printf '%s\n' "$ROOT/$d/corpus_ids.py"; return 0; }
+      d=$(resolve_kit_dir "$py" "$1" "$2" "$here" 2>/dev/null) || continue
+      [ -f "$ROOT/$d/$2" ] && { printf '%s\n' "$ROOT/$d/$2"; return 0; }
     done
   fi
-  d=$(git -C "$ROOT" ls-files -- corpus_ids.py '*/corpus_ids.py' 2>/dev/null)
+  d=$(git -C "$ROOT" ls-files -- "$2" "*/$2" 2>/dev/null)
   case "$d" in *"
 "*|"") ;; *) [ -f "$ROOT/$d" ] && printf '%s\n' "$ROOT/$d" ;; esac
   return 0
+}
+
+# The memory-tree kit's id reader.
+resolve_id_reader() {
+  resolve_kit_file memory-tree corpus_ids.py
 }
 
 # One token per line, `<line>\t<kind>\t<token>\t<range>`, kinds `path` (a slash and an extension —
