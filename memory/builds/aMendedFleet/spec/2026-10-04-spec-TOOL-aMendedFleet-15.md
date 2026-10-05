@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-15 — the shrink-only pin on `backlog_asks_unlabelled` is re-armed
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 15
+**Status:** CLOSED · rev-1 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 15
 
 <!-- gen:spec-records -->
 

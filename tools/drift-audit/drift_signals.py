@@ -320,6 +320,15 @@ PINS: dict[str, int] = {
     # `over pin` once it rises. The records are not named here, for the reason the non-terminal-specs
     # pin above gives: read the signal's own `detail`.
     "run_records_nonterminal_but_merged": 5,
+    # 447 — MEASURED at TOOL-aMendedFleet-15, after the prior unit's five dispositions. It stands in
+    # for check 20's `SEVERITY_UNLABELLED_PIN`, which the backlog switch-over blanked because the
+    # shard census reads a generated view as zero rows; this signal shipped with no pin, so it read
+    # `over pin 0` on every run and a rise moved no number anybody was held to.
+    # The population can only FALL on its own: V12 refuses an ask filed on or after ASK_CUTOFF with
+    # no SEV row, so a new unlabelled ask arrives only as a pre-cutoff row relocated from a stale
+    # branch, or as a terminal ask a REOPEN revives. Report-only, like its sibling above; the
+    # RATCHETS row below is what makes a raise cost a written `<old> -> <new>` reason.
+    "backlog_asks_unlabelled": 447,
 }
 
 # --------------------------------------------------------------------------------------------
@@ -377,6 +386,7 @@ RATCHETS: list[dict] = [
     # an ungateable pin, and without it the word is a comment.
     {"file": _THIS_FILE,
      "key": "source_cited_ids_resolving_to_no_record", "weakens": "up"},
+    {"file": _THIS_FILE, "key": "backlog_asks_unlabelled", "weakens": "up"},
     # A pin in ANOTHER kit's conf. The ratchet does not care which file a scalar lives in, and
     # codebase-map has no shrink-only mechanism of its own - so an adopter without drift-audit
     # gets a declared pin and no enforcement, which the conf example states rather than hides.
