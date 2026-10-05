@@ -105,7 +105,7 @@ ids TOOL-aGraftedHelix-14 TOOL-aGraftedHelix-15 TOOL-aGraftedHelix-16 TOOL-aGraf
 | [TOOL-aGraftedHelix-10 — a claim push names the remote, so the tracked pre-push hook observes its default branch and takes the non-default exit](spec/2026-10-04-spec-TOOL-aGraftedHelix-10.md) | 2 | 2 | CLOSED | rev-3 | 2026-10-05 |
 | [TOOL-aGraftedHelix-11 — a claim write copies its identity from the run's lease record, never from the writer's environment](spec/2026-10-04-spec-TOOL-aGraftedHelix-11.md) | 2 | 2 | CLOSED | rev-4 | 2026-10-05 |
 | [TOOL-aGraftedHelix-12 — every cell of the claim write table, and every write `--beat` declines, is observed](spec/2026-10-04-spec-TOOL-aGraftedHelix-12.md) | 2 | 1 | CLOSED | rev-4 | 2026-10-05 |
-| [TOOL-aGraftedHelix-2 — the orientation card lists the remote run claims under a two-clock rule](spec/2026-10-04-spec-TOOL-aGraftedHelix-2.md) | 2 | 1 | SPECCED | rev-2 | 2026-10-04 |
+| [TOOL-aGraftedHelix-2 — the orientation card lists the remote run claims under a two-clock rule](spec/2026-10-04-spec-TOOL-aGraftedHelix-2.md) | 2 | 1 | SPECCED | rev-3 | 2026-10-05 |
 | [TOOL-aGraftedHelix-18 — the holder row decides `mine` before its `write_lease` and copies the claim's identity after it](spec/2026-10-04-spec-TOOL-aGraftedHelix-18.md) | 3 | 2 | SPECCED | rev-2 | 2026-10-04 |
 | [TOOL-aGraftedHelix-19 — the claim write table's rows and modes are driver constants the decision refuses outside of, and the per-cell arm derives its cells from them](spec/2026-10-04-spec-TOOL-aGraftedHelix-19.md) | 3 | 1 | SPECCED | rev-2 | 2026-10-04 |
 | [TOOL-aGraftedHelix-3 — invariant records in the bug-class catalogue become the review's by-design list](spec/2026-10-04-spec-TOOL-aGraftedHelix-3.md) | 3 | 2 | SPECCED | rev-2 | 2026-10-04 |
