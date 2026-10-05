@@ -910,6 +910,31 @@ check_eq "AC9 a primary tree's card says primary" "tree — $(git -C "$TMP/ahead
 mkrepo noconf; write_manifest "$R" "$(head_sha "$R")" "Makefile" "docs/GOV.md"
 run_card "AC10 --card --write with no .memory-tree.conf exits 0" "$R" 0 "live — skipped: no .memory-tree.conf in this tree" --card --write --session "$NONCE-t10"
 
+# KICK-aMendedFleet-1 — the `drift —` cell over a hand-written history in the common dir: two
+# groups (the cell names the SECOND), then a replay after a third group, an absent file, a header
+# missing `signal`, and a truncated last line. Staged red by deleting the `derive_drift_line` call.
+mkrepo drifthist; DH="$R/.git/drift-history.tsv"; dh_head=$(head_sha "$R")
+{ printf '#utc\tsha\tbase_ref\tbase_sha\tsignal\tstate\tvalue\tof\tkey_hash\n'
+  printf '2026-10-01T00:00:00Z\taaaaaaaabbbbbbbb\torigin/main\tx\tsigOld\tlive\t9\t9\th\n'
+  for r in 'sigLive\tlive\t2\t76' 'sigZero\tlive\t0\t10' 'sigDead\tdead\t0\t0'; do
+    printf "2026-10-02T00:00:00Z\t%s\torigin/main\tx\t$r\t-\n" "$dh_head"; done; } > "$DH"
+dh_want="drift — last bar 2026-10-02T00:00:00Z at ${dh_head:0:8} · HEAD · 3 signals · 1 nonzero · 1 dead · sigDead DEAD, sigLive=2/76"
+read_drift_cell() { grep -m1 '^drift — ' "$R/.git/orientation/$NONCE-$1.md"; }
+run_card "drift cell: --card --write over a two-group history" "$R" 0 - --card --write --session "$NONCE-t76a"
+check_eq "drift cell: the LAST group's utc, sha, counts and names, dead first" "$dh_want" "$(read_drift_cell t76a)"
+check_eq "drift cell: sits after worktrees — and before live —" "worktrees drift live" \
+  "$(grep -oE '^(worktrees|drift|live) — ' "$R/.git/orientation/$NONCE-t76a.md" | cut -d' ' -f1 | tr '\n' ' ' | sed 's/ $//')"
+printf '2026-10-03T00:00:00Z\t%s\to\tx\tsigNew\tdead\t0\t0\t-\n' "$dh_head" >> "$DH"
+run_card "drift cell: --card --replay after a third group" "$R" 0 - --card --replay --session "$NONCE-t76a"
+check_eq "drift cell: the replay prints the stored cell, not the new group" "$dh_want" "$(grep -m1 '^drift — ' "$CARD_OUT")"
+head -n 5 "$DH" > "$TMP/dh.keep"; rm -f "$DH"
+run_card "drift cell: an absent history is a skipped: line at exit 0" "$R" 0 "drift — skipped: no drift-history.tsv in the git common dir" --card --write --session "$NONCE-t76b"
+sed '1s/\tsignal\t/\tsignalX\t/' "$TMP/dh.keep" > "$DH"
+run_card "drift cell: a header lacking signal is UNKNOWN naming it" "$R" 0 "drift — UNKNOWN: drift-history.tsv header lacks signal" --card --write --session "$NONCE-t76c"
+{ cat "$TMP/dh.keep"; printf '2026-10-04T00:00:00Z\tdeadbeef\to'; } > "$DH"
+run_card "drift cell: a truncated last line is a write in progress" "$R" 0 - --card --write --session "$NONCE-t76d"
+check_eq "drift cell: the truncated line is not counted" "$dh_want" "$(read_drift_cell t76d)"
+
 # ---- KICK-aReplayedCard-2: --card --append and --card --check ------------------------------------
 # Every arm runs in the clone's linked worktrees, whose common dir holds the cards. The reader the
 # append spawns is the clone's copy of the memory-tree id reader, which the fixture commit above

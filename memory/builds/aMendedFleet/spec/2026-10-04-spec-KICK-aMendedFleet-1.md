@@ -1,6 +1,6 @@
 # KICK-aMendedFleet-1 — the orientation card shows the last drift reading from the node's history
 
-**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams kickoff · ratified 2026-10-04 · order 76
+**Status:** CLOSED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams kickoff · ratified 2026-10-04 · order 76
 
 <!-- gen:spec-records -->
 

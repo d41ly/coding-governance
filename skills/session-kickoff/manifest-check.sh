@@ -231,12 +231,56 @@ derive_node_tag() {
   esac
 }
 
+# The `drift —` cell (KICK-aMendedFleet-1): the LAST group of `drift-history.tsv` in the git common
+# dir, the file every bar's `drift-audit records` leg appends to (TOOL-aMendedFleet-48). It READS that
+# file and never runs the report: one `head` and one `tail -n 400` into one C-locale awk, so the
+# 320-byte cut is a byte count. Columns are found by the header, one leading `#` stripped; a line
+# whose field count differs from the header's is a write in progress and is skipped. The group is
+# every trailing row sharing the last complete row's utc and sha. Callers run `derive_head_state`.
+derive_drift_line() {
+  local hist="${CARD_DIR%/orientation}/drift-history.tsv"
+  [ -f "$hist" ] || { printf 'drift — skipped: no drift-history.tsv in the git common dir\n'; return 0; }
+  { head -n 1 "$hist"; tail -n 400 "$hist"; } | LC_ALL=C awk -F'\t' -v head="$HEAD_SHA" '
+    { sub(/\r$/, "") }
+    NR == 1 { nf = NF
+      for (i = 1; i <= NF; i++) { h = $i; sub(/^#/, "", h); col[h] = i }
+      split("utc sha signal state value of", need, " ")
+      for (i = 1; i <= 6; i++) if (!(need[i] in col)) { missing = need[i]; exit }
+      next }
+    $1 ~ /^#/ || NF != nf { next }
+    { n++; key[n] = $col["utc"] "\t" $col["sha"]; sig[n] = $col["signal"]; st[n] = $col["state"]
+      val[n] = $col["value"]; of[n] = $col["of"]; utc[n] = $col["utc"]; sha[n] = $col["sha"] }
+    END {
+      if (missing != "") { printf "drift — UNKNOWN: drift-history.tsv header lacks %s\n", missing; exit }
+      if (n == 0) { print "drift — skipped: drift-history.tsv holds no reading"; exit }
+      for (s = n; s > 1 && key[s - 1] == key[n]; s--) ;
+      g = n - s + 1; z = 0; d = 0; m = 0
+      for (i = s; i <= n; i++) {
+        if (st[i] == "dead") { d++; names[++m] = sig[i] " DEAD" }
+        else if (st[i] == "live" && val[i] ~ /^[0-9]+$/ && val[i] + 0 > 0) { z++; nz[z] = i }
+      }
+      for (i = 2; i <= z; i++) for (j = i; j > 1 && val[nz[j]] + 0 > val[nz[j - 1]] + 0; j--) {
+        t = nz[j]; nz[j] = nz[j - 1]; nz[j - 1] = t }
+      for (i = 1; i <= z; i++) names[++m] = sig[nz[i]] "=" val[nz[i]] "/" of[nz[i]]
+      line = sprintf("drift — last bar %s at %s · %s · %d signals · %d nonzero · %d dead", utc[n],
+        substr(sha[n], 1, 8), (sha[n] == head ? "HEAD" : "not HEAD"), g, z, d)
+      for (i = 1; i <= m; i++) {
+        add = (i == 1 ? " · " : ", ") names[i]
+        if (length(line add) + (i < m ? 24 : 0) > 320) { line = line (i == 1 ? " · " : ", ") "… " (m - i + 1) " more"; break }
+        line = line add
+      }
+      print line
+    }'
+}
+
 # The startup card, rendered from facts a script can derive: no fetch, no ref move, no manifest
 # audit — the engine's Step 1 and Step 2b own those and each costs a kickoff, not a session start.
 # `$1` names the writer verb the header carries; a card the replay wrote fresh says `--card --replay`,
 # which is the one byte-level fact that tells a session started before the writer was wired from one
 # whose startup ran it. The `live —` cell reads the memory-tree conf when there is one and reports
-# `skipped:` otherwise, because this kit requires no other kit.
+# `skipped:` otherwise, because this kit requires no other kit. The `drift —` cell, between
+# `worktrees —` and `live —`, is `derive_drift_line`: the last group of `drift-history.tsv` in the
+# git common dir, read from that file and never from a report run.
 derive_head_state() {   # → HEAD_BRANCH HEAD_SHA HEAD_DIRTY, read once by the card and once by the `now —` line
   local n
   HEAD_BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null) || HEAD_BRANCH=HEAD
@@ -265,6 +309,7 @@ render_card() {
   derive_node_tag "$registry"
   render_tree_cell
   printf 'worktrees — %s\n' "$(git worktree list 2>/dev/null | wc -l | tr -d '[:space:]')"
+  derive_drift_line
   printf '%s\n' "$live"
   printf 'recent —\n'
   git log --oneline -5 2>/dev/null
