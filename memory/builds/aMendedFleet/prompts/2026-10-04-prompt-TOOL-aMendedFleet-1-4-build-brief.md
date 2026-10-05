@@ -48,6 +48,11 @@ owner's four answers.
   `tools/unattended/`. Where your spec names one of its commits, reuse those bytes exactly.
 - **Ids.** Never write an id-shaped token for an id main does not define (node d's and aGraftedHelix's
   unlanded ids): paraphrase "node d's dUnstuckLanding unit 25".
+- **Shared records are the main loop's.** `memory/DECISIONS.md` and `memory/project/readme-contract.txt`
+  are `SHARED_RECORDS`; `--dispatch` check 49 refuses either in any pass write set. If your spec needs
+  an edit to one, do NOT stop: build everything else, leave the spec SPECCED, and return the exact edit
+  (file, old line, new line) as a need. The main loop applies it in a records commit and closes you.
+- **New ids are the main loop's.** A pass never mints an id. If your spec needs one, return the need.
 - **Scratch** is the session scratchpad your grounding sentence names; a clone or fixture repository
   goes under `%TEMP%/<short-name>`.
 - **Windows host.** Author files with the Write/Edit tools; bash heredocs and python text mode corrupt
