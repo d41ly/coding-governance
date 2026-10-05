@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-11 — a claim write copies its identity from the run's lease record, never from the writer's environment
 
-**Status:** SPECCED · rev-3 · 2026-10-04 · node a · Tier-2 · base 5266d22e · streams tooling · order 2 · ratified 2026-10-04
+**Status:** SPECCED · rev-4 · 2026-10-05 · node a · Tier-2 · base 5266d22e · streams tooling · order 2 · ratified 2026-10-04
 
 <!-- gen:spec-records -->
 
@@ -31,8 +31,10 @@ from the run's lease record. It closes finding 39 (BLOCKER) of the round-1 spec 
   `--beat`. `node` is copied from the claim on the `mine` row and read from the environment on the
   others. Observed by AC1 and AC2.
 - **S2** — Renewal's "a field the write would set differs" compares the claim with those copied
-  values. A writer whose environment names another session therefore makes no write due. Observed
-  by AC2.
+  values: the record's `host`, `session` and `lease-utc`, the keepalive the write sets, and status
+  `live`. `node` is not compared, because the `mine` row copies it from the claim. A writer whose
+  environment names another session therefore makes no write due. A `mine` claim checked with no
+  record handed in, at a take site or the `--replaces` block, is always due. Observed by AC2.
 - **S3** — `write_claim_beat` reads the lease facts itself, on both the `none` row and the `mine`
   row, so the tick's call needs no identity argument. Observed by AC1.
 - **S4** — The tick suite runs its `--beat` arm under `env -u CLAUDE_CODE_SESSION_ID`, the
@@ -41,11 +43,11 @@ from the run's lease record. It closes finding 39 (BLOCKER) of the round-1 spec 
   VERIFYING, and each arm's red on a staged break is observed there (§7).
 - **S5** — The unattended kit version moves once after this unit's last move, in every carrier
   `tools/check-kit-versions.sh` pairs. Observed by AC3.
-- **S6** — `--preflight` and `run_takeover` compute the lease stamp ONCE per call and pass that one
-  value to the claim write and to `write_lease`, which takes it as an optional third argument and
-  reads the clock only when it is absent. The claim taken at those sites therefore carries the
-  record's `lease-utc` byte for byte, and the holder's next renewal finds no field differing.
-  Observed by AC4.
+- **S6** — `--preflight`, `run_takeover` and the `--replaces` block compute the lease stamp ONCE
+  per call and pass that one value to the claim write and to `write_lease`, which takes it as an
+  optional third argument and reads the clock only when it is absent. The claim written at those
+  sites therefore carries the record's `lease-utc` byte for byte, and the holder's next renewal
+  finds no field differing. Observed by AC4.
 
 ## 3. Non-goals (OUT)
 
@@ -99,13 +101,23 @@ from the run's lease record. It closes finding 39 (BLOCKER) of the round-1 spec 
 
 The `--replaces` block decides `mine` against the facts as they stood before it, and writes the
 facts it leaves. So the claim follows the record's new keepalive, and the next holder call reads
-`mine` again.
+`mine` again. The facts it leaves are the values its `write_lease` records: the new keepalive, this
+harness's session and host, and the one stamp of S6. The block writes those values with its push
+still BEFORE `write_lease`, as unit 1 S7 orders it, so a race lost there writes nothing locally.
+The LANDING re-bind already writes its claim after its `write_lease`, so it copies the record as
+that call leaves it.
 
 ### Inventory
 
 No new function, check or file. `write_claim_beat` takes its identity from the record instead of
-its caller. `write_lease` gains an optional third argument, the lease stamp; its existing callers
-pass none and keep reading the clock.
+its caller. `write_lease` gains an optional third argument, the lease stamp; its other callers
+pass none and keep reading the clock. `check_claim_writable` gains an optional sixth argument, the
+run-state file whose lease facts S2 compares. `write_claim` gains two optional arguments: the
+run-state file a copying write takes `session`, `host` and `lease-utc` from, and, at a site that
+passes none, the lease stamp of S6. Every writer of §4 "The rule" except the three stamp sites
+passes the record to both; the keepalive argument the copying writers pass is already the
+record's. On the `mine` row `check_claim_writable` leaves the claim's `node` for `write_claim` to
+keep.
 
 ### One stamp per take
 
@@ -178,7 +190,7 @@ New arm: tools/unattended/resume-tick.test.sh · the LIVE row's --beat under env
 
 New arm: tools/unattended/unattended.test.sh · --dispatch under another session id, beat due and not due; stage the identity read back from the environment · the suite's floor rises by its new arm count
 
-New arm: tools/unattended/unattended.test.sh · the claim's lease-utc equals the record's after --preflight, and the next --resume pushes nothing; stage write_lease reading its own clock at the take site · the suite's floor rises by its new arm count
+New arm: tools/unattended/unattended.test.sh · the claim's lease-utc equals the record's after --preflight, a git shim holding the claim push past a second boundary, and the next --resume pushes nothing; stage write_lease reading its own clock at the take site · the suite's floor rises by its new arm count
 
 The unattended suites are not on the bar (`tools/unattended/README.md`). A pass runs its blocks as a
 slice, and the main loop runs the suites once at VERIFYING.
@@ -204,6 +216,16 @@ slice, and the main loop runs the suites once at VERIFYING.
   finding 9 of the round-1 spec audit of units 16 to 19, which writes the holder row's claim before
   its `write_lease` and widens the `mine` test this unit's §3 leaves unchanged. No scope item or
   criterion of this unit moves.
+- rev-4 · 2026-10-05 · §2 §4 §7 · S2 S6 · the build pass's divergences, before the code: §4
+  "Inventory" said no signature moves but `write_lease`'s, yet the copied identity has to reach both
+  the renewal comparison and the write, so `check_claim_writable` and `write_claim` each take the
+  run-state file as an optional argument, and `write_claim` takes S6's stamp where none is passed.
+  S2 now names the compared fields: `node` leaves the comparison, because the `mine` row copies it
+  from the claim. S6 adds the `--replaces` block, which records a lease in the same call and so
+  writes the values that lease records under one stamp, with its push kept before `write_lease` so
+  a lost race still writes nothing, rather than moving its claim write after `write_lease` to copy
+  the record. §7's AC4 arm holds the claim push past a second boundary with a git shim, so the
+  staged break reds every time instead of only when the clock happens to tick.
 
 ## 10. Reuse audit
 
