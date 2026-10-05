@@ -76,7 +76,9 @@ function buildKeyedSchema(schema, extra) {
 //   byDesign: "known/tracked issues reviewers must NOT re-report",
 //   reviewDir: "where synth writes the report (repo-relative)",
 //   kind: "diff-review" | "spec-audit",   // DEFAULTS to "diff-review" when absent
-//   subjects: [{ path, blob }],           // spec-audit ONLY; blob is 7-40 hex, per subject
+//   subjects: [{ path, blob, prevBlob }], // spec-audit ONLY; blob is 7-40 hex, per subject; prevBlob, optional
+//                                         // and legal at round > 1 only, is the 7-40 hex blob of that path
+//                                         // the previous round audited, and names the fold diff
 //   scratch: "<absolute session scratchpad>", // spec-audit ONLY and REQUIRED there: where a probing lens
 //                                         // writes its temporary files; refused if relative, multi-line
 //                                         // or equal to or under `repo`; a diff review never reads it
@@ -223,7 +225,26 @@ if (isSpec) {
     if (round > 1) throw new Error(why)
     log('WARNING: ' + why)
   }
+  // TOOL-aEvidencedLens-4 S1 - `prevBlob`, the blob the previous round audited. Refused when malformed
+  // and refused at round 1 at any shape (spec F1): it has no meaning there, so it is a caller error, and
+  // ignoring it would drop the caller's input silently. The diff kind never reads it.
+  const prevBadIdx = subjects.findIndex(
+    (x) => !!x && typeof x === 'object' && x.prevBlob !== undefined && (round === 1 || !PINNED_SHA.test(String(x.prevBlob)))
+  )
+  if (prevBadIdx !== -1)
+    throw new Error('tier2-review: subject ' + prevBadIdx + "'s `prevBlob` must be an immutable 7-40 hex object id, the blob " +
+      'of that path the previous round audited, and is legal at round > 1 only. Got ' +
+      JSON.stringify(subjects[prevBadIdx].prevBlob) + ' at round ' + round + '.')
 }
+// S3 - how many subjects name their fold diff, and whether a fold round has nothing naming its fold text.
+const prevBlobCount = isSpec ? subjects.filter((x) => !!x && typeof x === 'object' && x.prevBlob !== undefined).length : 0
+const foldDegraded = isSpec && round > 1 && prevBlobCount === 0 && priorFindings.length === 0
+if (foldDegraded)
+  log('WARNING: a DEGRADED fold review: round ' + round + ' with no subject carrying prevBlob and no priorFindings, so nothing ' +
+    "names the text the previous round's fixes introduced; every subject is reviewed whole")
+else if (isSpec && round > 1 && prevBlobCount < subjects.length)
+  log('WARNING: no prevBlob was supplied for ' + subjects.filter((x) => !x || typeof x !== 'object' || x.prevBlob === undefined)
+    .map((x) => (x && typeof x === 'object' ? x.path : String(x))).join(', ') + ', so the fold diff of each is unknown and it is reviewed whole')
 // TOOL-aEvidencedLens-2 S4 - `scratch`, the one place a PROBING spec lens may write. REQUIRED on the
 // spec kind (spec F1: a lens briefed to probe with no scratch has nowhere legal to write, and owner
 // ruling TOOL-aProbedUnit-10 makes it required on every harness agent), refused by the build harness's
@@ -670,7 +691,10 @@ const REVIEW_SHAPE = 'lenses5-r2'
 // TOOL-aSightedSkeptic-7 S8 - and so does `intensity`: a light run and a full run never share a lens file.
 // TOOL-aEvidencedLens-2 S5 - and, on the spec kind only, PROBE_RULES, spread so the diff print object is
 // unchanged. `scratch` is a location, not content, and stays out: a resumed run has a new scratchpad.
-const inputPrint = deriveFnv1a(renderCanonical({ shape: REVIEW_SHAPE, context: context, byDesign: byDesign, priorFindings: priorFindings, lensNotes: lensNotes, specs: SPECS, checklist: checklist, intensity: intensity, ...(isSpec ? { probeRules: PROBE_RULES } : {}) }))
+// TOOL-aEvidencedLens-4 S7 - and `prevBlobs`, one per subject in order, null where absent, ONLY when some
+// subject carries one: a run carrying none, the diff kind included, keeps its print and so its key.
+const inputPrint = deriveFnv1a(renderCanonical({ shape: REVIEW_SHAPE, context: context, byDesign: byDesign, priorFindings: priorFindings, lensNotes: lensNotes, specs: SPECS, checklist: checklist, intensity: intensity, ...(isSpec ? { probeRules: PROBE_RULES } : {}),
+  ...(prevBlobCount ? { prevBlobs: subjects.map((x) => (x && typeof x === 'object' && x.prevBlob !== undefined ? x.prevBlob : null)) } : {}) }))
 const specSubject = isSpec
   ? deriveFnv1a(subjects.map((x) => (x && typeof x === 'object' ? `${x.path}@${x.blob}` : String(x))).join('\n'))
   : ''
@@ -684,7 +708,10 @@ const probe = await agent(
     `1. Run \`git -C ${repo} rev-parse --git-common-dir\`. Turn the answer into an ABSOLUTE path with ` +
     `forward slashes (a relative answer is relative to ${repo}) and return it as commonDir.\n` +
     (isSpec
-      ? ''
+      // TOOL-aEvidencedLens-4 S4 - the move check's read half. The probe reports; the HARNESS compares.
+      ? `2. For EACH path below, run \`git -C ${repo} hash-object <path>\` and return blobs: one {path, now} per path, ` +
+        `now being the hash it prints, or an empty string when the command fails. Compare nothing:\n` +
+        subjects.map((x) => `  - ${x && typeof x === 'object' ? x.path : String(x)}`).join('\n') + `\n`
       : `2. Run \`git -C ${repo} rev-parse --verify ${base}^{commit}\` and \`git -C ${repo} rev-parse --verify ${head}^{commit}\` ` +
         `and return the two FULL shas as base and head. Return an empty string for one that does not resolve.\n`) +
     `3. The review directory is <commonDir>/review-lenses/` +
@@ -696,7 +723,7 @@ const probe = await agent(
     `find file's JSON in finds and each verify file's JSON in verifies, EXACTLY as it is on disk plus ` +
     `a name field holding its file name. Do not repair, complete or re-judge anything: a file that ` +
     `does not parse, or lacks a field the schema requires, is left out and its name listed in skipped.\n` +
-    `Return JSON {commonDir, ${isSpec ? '' : 'base, head, '}finds:[...], verifies:[...], skipped:[...]}.`,
+    `Return JSON {commonDir, ${isSpec ? 'blobs:[...], ' : 'base, head, '}finds:[...], verifies:[...], skipped:[...]}.`,
   {
     label: 'resume:probe',
     phase: 'Resume',
@@ -710,6 +737,8 @@ const probe = await agent(
         finds: { type: 'array', items: buildKeyedSchema(isSpec ? SPEC_FINDING_SCHEMA : FINDING_SCHEMA, []) },
         verifies: { type: 'array', items: buildKeyedSchema(VERDICT_SCHEMA, ['batch']) },
         skipped: { type: 'array', items: { type: 'string' } },
+        // Optional (spec F2): a probe that omits it reads as every subject UNCHECKED, never as none moved.
+        ...(isSpec ? { blobs: { type: 'array', items: { type: 'object', required: ['path', 'now'], properties: { path: { type: 'string' }, now: { type: 'string' } } } } } : {}),
       },
     },
   },
@@ -728,6 +757,21 @@ if (!isSpec && probeLive && FULL_SHA.test(String(probe.base)) && FULL_SHA.test(S
   log(`WARNING: the resume probe did not resolve ${base}...${head} to two full shas — nothing can be reused, and the lenses are handed the refs as given`)
 }
 if (!probeLive) log('WARNING: the resume probe died — nothing could be reused, so every lens is dispatched with the refs as given')
+// TOOL-aEvidencedLens-4 S4/S6 - the move check's judging half. A subject is MOVED when the probe read a
+// 40-hex hash that does not begin with the pinned blob, and UNCHECKED when no usable hash came back: a
+// dead probe, a missing `blobs` key or row, or an empty `now` never reads as "none moved".
+const probeBlobs = isSpec && probeLive && Array.isArray(probe.blobs) ? probe.blobs : []
+const movedSubjects = []
+const uncheckedSubjects = []
+for (const x of isSpec ? subjects : []) {
+  if (!x || typeof x !== 'object') continue
+  const row = probeBlobs.find((b) => b && b.path === x.path)
+  const now = row && typeof row.now === 'string' ? row.now : ''
+  if (!/^[0-9a-f]{40}$/.test(now)) uncheckedSubjects.push(x.path)
+  else if (now.indexOf(String(x.blob)) !== 0) movedSubjects.push({ path: x.path, blob: x.blob, now: now })
+}
+for (const m of movedSubjects)
+  log(`WARNING: ${m.path} MOVED since it was pinned: pinned ${m.blob}, now ${m.now} — every lens reviews it as it now stands and reads the moved text as unreviewed fold text`)
 const reviewKey = deriveReviewKey(baseSha, headSha)
 const keyDir = probeLive
   ? `${String(probe.commonDir).replace(/\\/g, '/').replace(/\/+$/, '')}/review-lenses/${reviewKey}`
@@ -789,11 +833,28 @@ function renderBrief(role) {
   const lines = [
     `REPO: ${repo} — run every git command as \`git -C ${repo} …\`; every path below is relative to it.`,
     isSpec
-      ? `SUBJECT: the spec set, each file at its pinned blob:\n` + subjects.map((x) => `  - ${x.path}  blob ${x.blob}`).join('\n')
+      ? `SUBJECT: the spec set, each file at its pinned blob:\n` + subjects.map((x) => {
+        const mv = movedSubjects.find((m) => m.path === x.path)
+        return `  - ${x.path}  blob ${x.blob}` + (mv ? `  MOVED since pinned, now ${mv.now}` : '')
+      }).join('\n')
       : `SUBJECT: the diff \`${diffCmd}\`.`,
     `CONTEXT: ${context}`,
     renderIntent(),
-    `REVIEW ROUND: ${round}${round > 1 ? (isSpec ? ' - this is a FOLD review. Aim at the text the previous round\'s fixes introduced, which is the only text in these documents nobody has reviewed.' : ' - this is a FOLD review. The diff above is what the previous round\'s fixes introduced, not the whole build.') : ''}`,
+    // TOOL-aEvidencedLens-4 S2/S3 - a spec fold round NAMES its fold text: one diff per subject from the
+    // blob the previous round audited, or says plainly that nothing names it. Round 1 is unchanged.
+    `REVIEW ROUND: ${round}${round > 1
+      ? (isSpec
+        ? (foldDegraded
+          ? ' - a DEGRADED fold review: no subject carries prevBlob and no priorFindings were supplied, so nothing names the text the previous round\'s fixes introduced. Review every subject whole.'
+          : ' - this is a FOLD review.\nFOLD DIFF - the PRIMARY subject is the text the previous round\'s fixes introduced. Read each diff\n' +
+            'below FIRST, then each file whole for agreement. A diff command that fails means its file is\nreviewed whole.\n' +
+            subjects.map((x) => `  - ${x.path}: ` + (x.prevBlob === undefined
+              ? 'no prevBlob was supplied - review this file whole'
+              : String(x.prevBlob).indexOf(String(x.blob)) === 0 || String(x.blob).indexOf(String(x.prevBlob)) === 0
+                ? 'unchanged since the previous round'
+                : `git -C ${repo} diff ${x.prevBlob} ${x.blob}`)).join('\n'))
+        : ' - this is a FOLD review. The diff above is what the previous round\'s fixes introduced, not the whole build.')
+      : ''}`,
   ]
   if (skeptic && !isSpec)
     lines.push(`SCOPE: a finding is in scope only if this diff introduced its defect or made it reachable. A defect present unchanged at the base is PRE-EXISTING: refute it. Check with \`git -C ${repo} show ${baseSha}:<path>\`.`)
@@ -803,7 +864,9 @@ function renderBrief(role) {
       ? `PRIOR ROUND'S CONFIRMED FINDINGS - these were RAISED AND FIXED. A finding that re-raises one of these originals, rather than a defect in its fix, is refuted as a duplicate:\n`
       : `PRIOR ROUND'S CONFIRMED FINDINGS - these were RAISED AND FIXED. Judge the FIX, and do not re-raise the original:\n`) +
       priorFindings.map((f) => `  - ${f.ref || '(no ref)'} - ${f.claim || f.title || '(no claim)'}`).join('\n')
-    : `PRIOR ROUND'S FINDINGS: none - this is a first-round review of ${isSpec ? 'the whole spec set' : 'the whole diff'}.`)
+    : isSpec && round > 1
+      ? `PRIOR ROUND'S FINDINGS: none supplied for this round-${round} review.`
+      : `PRIOR ROUND'S FINDINGS: none - this is a first-round review of ${isSpec ? 'the whole spec set' : 'the whole diff'}.`)
   return lines.join('\n') + '\n\n'
 }
 
@@ -821,11 +884,14 @@ const finderResults = await boundedParallel(
       (isSpec
         // S6 - the spec kind's acquire sentence. The lens holds a filesystem and the orchestrator does
         // not, so the BLOB COMPARISON happens here. Without it S5 is a string test any caller
-        // satisfies; with it, a spec that moved since the caller pinned it is a blocker finding.
+        // satisfies. TOOL-aEvidencedLens-4 S5 - the move is no longer a fixed BLOCKER: the resume probe
+        // reports it to RUN INTEGRITY, and a defect IN the moved text is graded by the rubric like any other.
         ? `You are the ${L.key} reviewer of a SPEC SET. For EACH subject listed under SUBJECT above: first run ` +
-          `\`git hash-object <path>\` in ${repo} and compare the result to the pinned blob. A mismatch ` +
-          `means the spec MOVED since this review was commissioned — report it as a BLOCKER finding ` +
-          `and review the file as it now stands. Then Read the file WHOLE.\n\n`
+          `\`git -C ${repo} hash-object <path>\` and compare the result to the pinned blob. A mismatch ` +
+          `means the spec MOVED since this review was commissioned: review the file as it now stands, and read ` +
+          `the moved text with \`git -C ${repo} diff <blob> -- <path>\` as unreviewed fold text. Report a defect IN ` +
+          `that text as a finding graded by the SEVERITY RUBRIC below; the move itself is not a finding. ` +
+          `Then Read the file WHOLE.\n\n`
         : `You are the ${L.key} reviewer. Review ONLY the diff named under SUBJECT above (run \`${diffCmd}\`, then Read/Grep the touched files + their immediate callers).\n\n`) +
         `LENS: ${L.brief}\n` +
         // TOOL-aEvidencedLens-2 S2 - the probe policy directly under the brief; '' on the diff kind.
@@ -1307,6 +1373,17 @@ const synth = await agent(
         runningLensKeys.map((k) => `${k} ${checklistShares[k].length}`).join(', ') + `.\n`
       : `Checklist: NONE swept — ${a.checklist === undefined ? 'absent' : 'supplied with no item'}; a zero count is not ` +
         `evidence the project's recurring bug classes are absent.\n`) +
+    // TOOL-aEvidencedLens-4 S6 - spec kind only: the move check, and at round > 1 how the fold text was named.
+    (isSpec
+      ? `move check: ` + (!probeLive
+        ? 'the resume probe died, so no subject\'s current blob was checked.\n'
+        : (movedSubjects.length ? movedSubjects.map((m) => `${m.path} MOVED from pinned ${m.blob} to ${m.now}`).join('; ') : 'no checked subject moved') +
+          (uncheckedSubjects.length ? `; UNCHECKED, no usable current blob: ${uncheckedSubjects.join(', ')}` : '') + `.\n`) +
+        (round > 1
+          ? `fold diff: ${prevBlobCount} of ${subjects.length} subject(s) carried prevBlob` +
+            (foldDegraded ? ` - a DEGRADED fold review: no priorFindings either, so nothing named the text the previous round's fixes introduced and every subject was reviewed whole` : '') + `.\n`
+          : '')
+      : '') +
     `If lenses died, the finding set is INCOMPLETE and a zero count is not evidence of absence. ` +
     `Say so where you would otherwise call a zero positive evidence.\n\n` +
     // The range line is what the unattended kit's `closing-review-recorded` joins on, so the value

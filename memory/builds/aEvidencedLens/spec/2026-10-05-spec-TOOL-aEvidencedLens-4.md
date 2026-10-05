@@ -1,6 +1,6 @@
 # TOOL-aEvidencedLens-4 — a spec fold round reads its diff, and a moved subject is graded, not fixed at BLOCKER
 
-**Status:** SPECCED · rev-2 · 2026-10-05 · node a · Tier-2 · base 028b5cac · streams tooling · order 4 · ratified 2026-10-05
+**Status:** CLOSED · rev-2 · 2026-10-05 · node a · Tier-2 · base 028b5cac · streams tooling · order 4 · ratified 2026-10-05
 
 <!-- gen:spec-records -->
 

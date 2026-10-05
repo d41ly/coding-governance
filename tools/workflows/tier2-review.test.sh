@@ -190,6 +190,14 @@ armScratch('spec scratch: a sibling sharing the repo prefix proceeds', Object.as
 armScratch('spec scratch: a Windows path proceeds, folded to forward slashes', Object.assign({ scratch: 'C:\\t\\s' }, GOOD_SPEC), 'C:/t/s')
 armScratch('spec scratch: a diff review never reads it', { scratch: 7 }, '')
 
+// ---- TOOL-aEvidencedLens-4 AC1 — `prevBlob`, refused malformed and refused at round 1 (spec F1) ----
+// A refusal names `prevBlob`, so the subject ladder's own `needs \`subjects\`` throw cannot satisfy one.
+const PREV = '`prevBlob`'
+arm('fold: a malformed prevBlob at round 2 -> refused', { kind: 'spec-audit', round: 2, subjects: [{ path: 'a.md', blob: BLOB, prevBlob: 'zz' }] }, PREV)
+arm('fold: a well-formed prevBlob at round 1 -> refused', { kind: 'spec-audit', round: 1, subjects: [{ path: 'a.md', blob: BLOB, prevBlob: 'abc1235' }] }, PREV)
+arm('fold: a well-formed prevBlob at round 2 -> proceeds', { kind: 'spec-audit', round: 2, subjects: [{ path: 'a.md', blob: BLOB, prevBlob: 'abc1235' }] }, null)
+arm('fold: a diff review ignores a bad prevBlob', { round: 1, subjects: [{ path: 'a.md', blob: BLOB, prevBlob: 'zz' }] }, null)
+
 // ---- D9 — the `args` header must carry every field the file reads --------------------------------
 // BUILD-METHOD M4 sends a reader to that block for the spec-audit spelling, and it named neither
 // `kind` nor `subjects` when the rule was written to point at it. An omitted `kind` DEFAULTS rather
@@ -1298,6 +1306,68 @@ async function runLedgerArms() {
       row.verdict === 'refuted' && !r.logs.some((l) => /DUPLICATE of an id/.test(l)),
       'spec skeptic: a diff-kind verify prompt carries no evidence field and no probe policy, and its duplicate refutation is not scanned')
   }
+
+  // ==== TOOL-aEvidencedLens-4 — a spec fold round reads its diff, and a moved subject is graded, not
+  // ==== fixed at BLOCKER. Every arm is RED against the parent render, which prints no FOLD DIFF, no
+  // ==== DEGRADED, no `move check:` clause and asks the probe for no hash.
+  const extractIntegrity = (run) => { const sp = run.trace.find((t) => t.label === 'synth'); return sp ? sp.prompt.slice(sp.prompt.indexOf('RUN INTEGRITY')) : '' }
+  const P40 = 'a'.repeat(40)
+  const D40 = 'd'.repeat(40)
+  const E40 = 'e'.repeat(40)
+  const THREE = [{ path: 'one.md', blob: D40, prevBlob: P40 }, { path: 'two.md', blob: E40, prevBlob: E40.slice(0, 9) }, { path: 'three.md', blob: 'abc1234' }]
+  r = await runReview(Object.assign({}, SPEC, { round: 2, subjects: THREE, priorFindings: [{ ref: 'one.md:section 2', claim: 'PRIOR' }] }), ALL_OK)
+  if (checkNoThrow(r, 'fold three shapes')) {
+    const fv = scanPrompts(r, 'find:').concat(scanPrompts(r, 'verify:'))
+    const extractFoldLine = (p, path) => p.split('\n').find((l) => l.indexOf('  - ' + path + ': ') === 0) || ''
+    ck(fv.length === 10 && fv.every((t) => t.prompt.indexOf('FOLD DIFF') !== -1 && t.prompt.indexOf('first-round') === -1 &&
+      extractFoldLine(t.prompt, 'one.md') === '  - one.md: git -C /tmp/r diff ' + P40 + ' ' + D40 &&
+      extractFoldLine(t.prompt, 'two.md') === '  - two.md: unchanged since the previous round' &&
+      extractFoldLine(t.prompt, 'three.md') === '  - three.md: no prevBlob was supplied - review this file whole'),
+      'fold: a round-2 spec run carries each subject\'s FOLD DIFF line in every find: and verify: prompt')
+    ck(r.logs.some((l) => l.indexOf('WARNING:') === 0 && l.indexOf('three.md') !== -1) && !r.logs.some((l) => l.indexOf('WARNING:') === 0 && /\b(one|two)\.md/.test(l)) &&
+      extractIntegrity(r).indexOf('fold diff: 2 of 3 subject(s) carried prevBlob.') !== -1,
+      'fold: a WARNING names the subject lacking prevBlob, and RUN INTEGRITY says 2 of 3')
+  }
+  r = await runReview(Object.assign({}, SPEC, { round: 2 }), ALL_OK)
+  if (checkNoThrow(r, 'fold degraded')) {
+    const ff = scanPrompts(r, 'find:')
+    ck(ff.length === 5 && r.trace.every((t) => t.prompt.indexOf('first-round review') === -1) &&
+      ff.every((t) => t.prompt.indexOf('DEGRADED fold review') !== -1 && t.prompt.indexOf('none supplied for this round-2 review') !== -1 && t.prompt.indexOf('FOLD DIFF') === -1) &&
+      r.logs.some((l) => l.indexOf('WARNING:') === 0 && l.indexOf('DEGRADED') !== -1) && extractIntegrity(r).indexOf('DEGRADED') !== -1,
+      'fold: a round-2 run with neither input is a DEGRADED fold review, warned and in RUN INTEGRITY, never first-round')
+  }
+  const MOVED40 = 'f0' + '1'.repeat(38)
+  const TWO = Object.assign({}, SPEC, { subjects: [{ path: 'm.md', blob: 'abc1234' }, { path: 'u.md', blob: 'abc9999' }] })
+  r = await runReview(TWO, buildStubs({ 'resume:probe': Object.assign(buildProbe(), { blobs: [{ path: 'm.md', now: MOVED40 }, { path: 'u.md', now: '' }] }) }))
+  if (checkNoThrow(r, 'fold moved')) {
+    const ri = extractIntegrity(r)
+    ck(r.logs.some((l) => l.indexOf('WARNING: m.md MOVED') === 0 && l.indexOf('abc1234') !== -1 && l.indexOf(MOVED40) !== -1) && !r.logs.some((l) => l.indexOf('u.md MOVED') !== -1) &&
+      scanPrompts(r, 'find:').length === 5 && scanPrompts(r, 'find:').every((t) => t.prompt.indexOf('  - m.md  blob abc1234  MOVED since pinned, now ' + MOVED40) !== -1 && t.prompt.indexOf('  - u.md  blob abc9999\n') !== -1) &&
+      ri.indexOf('m.md MOVED from pinned abc1234 to ' + MOVED40) !== -1 && ri.indexOf('UNCHECKED, no usable current blob: u.md.') !== -1,
+      'fold: a moved and an unusable blob: the WARNING, the MOVED SUBJECT line and RUN INTEGRITY name each')
+    const pp = r.trace.find((t) => t.label === 'resume:probe')
+    ck(!!pp && pp.prompt.indexOf('hash-object') !== -1 && pp.prompt.indexOf('  - m.md') !== -1 && pp.prompt.indexOf('  - u.md') !== -1 &&
+      !!pp.schema.properties.blobs && pp.schema.required.indexOf('blobs') === -1 &&
+      r.trace.every((t) => t.prompt.indexOf('as a BLOCKER finding') === -1 && t.prompt.indexOf('diff -u - ') === -1) &&
+      scanPrompts(r, 'find:').every((t) => t.prompt.indexOf('diff <blob> -- <path>') !== -1 && t.prompt.indexOf('SEVERITY RUBRIC') !== -1),
+      'fold: the spec probe asks for hash-object per subject with blobs optional, and no prompt carries the fixed BLOCKER')
+  }
+  r = await runReview(TWO, buildStubs({ 'resume:probe': null }))
+  if (checkNoThrow(r, 'fold null probe')) ck(extractIntegrity(r).indexOf('move check: the resume probe died') !== -1, 'fold: a null probe reads as the resume probe died, never as no move')
+  r = await runReview(TWO, ALL_OK)
+  if (checkNoThrow(r, 'fold no blobs key')) {
+    const ri = extractIntegrity(r)
+    ck(ri.indexOf('UNCHECKED, no usable current blob: m.md, u.md.') !== -1 && ri.indexOf('the resume probe died') === -1,
+      'fold: a live probe with no blobs key leaves every subject UNCHECKED, not died')
+  }
+  const deriveFoldKey = async (pb) => {
+    const x = await runReview(Object.assign({}, SPEC, { round: 2, priorFindings: [{ ref: 'a', claim: 'b' }], subjects: [{ path: 's.md', blob: 'abc1234', prevBlob: pb }] }), ALL_OK)
+    return x.result ? x.result.key : 'threw'
+  }
+  const k0 = await deriveFoldKey(undefined)
+  const k1 = await deriveFoldKey('abc1230')
+  const k2b = await deriveFoldKey('abc1231')
+  ck(k1 !== 'threw' && k0 !== k1 && k1 !== k2b && k0 !== k2b, 'fold: the review key moves with prevBlob')
 }
 
 runWholeScriptArms().then(() => {
@@ -1360,7 +1430,11 @@ printf '%s\n' "$out"
 # RAISED 197 -> 205 by TOOL-aEvidencedLens-3: 8 assertions, counted off the block — the skeptic sentence
 # (1), the evidence on the verify line (1), the shared probe-policy bytes (1), a kept duplicate (1), three
 # orphaned duplicates (3) and the untouched diff kind (1).
-FLOOR_ASSERTIONS=205
+# RAISED 205 -> 217 by TOOL-aEvidencedLens-4: 12 assertions, counted off the block — four prelude `fold:`
+# prevBlob arms (4), the three FOLD DIFF shapes and their WARNING and count (2), the DEGRADED round (1),
+# the moved and unusable blobs and the probe's hash-object ask (2), a null probe (1), a probe with no
+# blobs key (1) and the key over prevBlob (1).
+FLOOR_ASSERTIONS=217
 executed=$(printf '%s\n' "$out" | sed -n 's/^---- \([0-9][0-9]*\) passed.*/\1/p' | tail -1)
 if [ -z "$executed" ]; then
   echo "FAIL the runner printed no assertion count at all — it died before its summary line"
