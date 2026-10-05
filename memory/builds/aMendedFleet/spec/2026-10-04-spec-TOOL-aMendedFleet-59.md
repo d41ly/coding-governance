@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-59 — timeout retries are grouped by leg across every git dir of the clone
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 59
+**Status:** CLOSED · rev-2 · 2026-10-05 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 59
 
 <!-- gen:spec-records -->
 
@@ -136,7 +136,8 @@ equal base `7af5f564`'s.
   Red when: a leg that failed on its retry reads like one that passed on it.
   figure: PINNED at writing, 2026-10-04.
 - **AC3** — When, in a scratch repository under a short `%TEMP%` path with no run record anywhere,
-  `python <worktree>/tools/drift-audit/drift_report.py --json` runs, the record reads `live` false;
+  holding a copy of `tools/drift-audit/`, a `.memory-tree.conf` stub and `GOV_DEFAULT_BRANCH`
+  naming its branch, its copy of `drift_report.py --json` runs, the record reads `live` false;
   and when a verdict carrying `retried 1` and one retry row are written under that repository's
   `.git/worktrees/w1/gate-run/r1/` and it runs again, `live` is true and `git_dirs` is 1.
   Red when: a record in a linked worktree's git dir is missed, or an empty clone reads 0 rather than
@@ -170,6 +171,9 @@ New arm: `tools/drift-audit/selftest.py` · a fixture with run records in the co
 
 - rev-1 · 2026-10-04 · initial draft, from the synthesis's drift-audit item 8 ([#53]) and a count of
   the run records under node a's common dir at base.
+- rev-2 · 2026-10-05 · AC3 runs the scratch repository's own copy of the kit: the report resolves
+  its repo root from the script's location, so the worktree's copy run inside the scratch repository
+  reads the worktree, not the scratch repository. Closed by the build pass.
 
 ## 10. Reuse audit
 

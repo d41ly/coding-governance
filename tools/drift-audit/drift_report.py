@@ -2647,49 +2647,81 @@ def build_nonterminal_merged_runs(ctx) -> dict:
 # The gate runner retries, once and alone, a leg whose own ceiling fired, and counts a pass on that
 # retry as green. That is right for one bar and invisible across many: a leg that needs its retry on
 # every bar is a leg whose ceiling no longer fits the box, and a green bar says nothing about it. Each
-# run record's verdict file carries `retried <n>`, and this sums it over the records the git dir
-# still holds.
+# run record's verdict file carries `retried <n>`, and this sums it over the records EVERY git dir
+# of the clone still holds — the common dir and each linked worktree's under its `worktrees/` —
+# because the runner writes into whichever git dir ran the bar (TOOL-aMendedFleet-59). The detail
+# is one row per leg, named by the `<i>.retry.leg` rows beside the verdicts: how often it was
+# retried, how often it failed even on its retry, and in how many git dirs.
 #
-# REPORT-ONLY, over a window nobody chose here: the runner keeps a handful of run directories and
-# sweeps the rest, so the figure describes the last few bars of THIS worktree's git dir and is not a
-# history. LIVENESS is a verdict file that carries the key at all. A git dir with no run record, or
+# REPORT-ONLY, over a window nobody chose here: the runner keeps a handful of run directories per
+# git dir and sweeps the rest, and `git worktree remove` deletes a worktree's git dir with its
+# records, so the figure describes the last few bars of each git dir still present and is not a
+# history. LIVENESS is a verdict file that carries the key at all. A clone with no run record, or
 # only records from a runner that predates the retry, cannot move this signal, and it says DEAD
 # PROBE rather than a reassuring 0.
 #
-# WHAT IT DOES NOT CHECK: which legs were retried. The verdict file counts them; the per-leg
-# `<i>.retry.leg` rows beside it name them, and a reader who wants the names reads those.
+# WHAT IT DOES NOT CHECK: whether a retry was a spinning leg or a starved one; a timeout verdict
+# cannot tell them apart. `unattributed` is the verdict sum minus the retry rows read, nonzero when
+# a counted retry names no leg.
 _RUN_RECORD_DIR = "gate-run"
 
 
+def read_git_dirs(ctx) -> list[pathlib.Path]:
+    """The clone's common dir, then every directory under its `worktrees/` in sorted order; empty
+    when git cannot name the common dir."""
+    out = ctx.git.run("rev-parse", "--path-format=absolute", "--git-common-dir")
+    common = out.stdout.strip() if out.returncode == 0 else ""
+    if not common:
+        return []
+    base = pathlib.Path(common)
+    linked = base / "worktrees"
+    return [base] + (sorted(d for d in linked.iterdir() if d.is_dir()) if linked.is_dir() else [])
+
+
 def measure_legs_retried_after_timeout(ctx) -> dict:
-    """`retried` summed over every readable run-record verdict under this worktree's git dir."""
+    """`retried` summed over every readable run-record verdict under every git dir of the clone,
+    with one detail row per leg the `<i>.retry.leg` rows name."""
     name = "legs_retried_after_timeout"
-    rows = []
-    gd = ctx.git.run("rev-parse", "--git-dir")
-    base = pathlib.Path(gd.stdout.strip()) if gd.returncode == 0 and gd.stdout.strip() else None
-    if base is not None and not base.is_absolute():
-        base = ctx.root / base
-    if base is not None:
+    total, of, judged, rows_read = 0, 0, 0, 0
+    holding = set()
+    legs: dict[str, dict] = {}
+    for base in read_git_dirs(ctx):
         for verdict in sorted((base / _RUN_RECORD_DIR).glob("*/verdict")):
             try:
                 text = verdict.read_text(encoding="utf-8", errors="replace")
             except OSError:
                 continue
-            retried = None
+            of += 1
+            holding.add(base)
             for line in text.splitlines():
                 key, _, val = line.rstrip("\r").partition("\t")
                 if key == "retried" and val.strip().isdigit():
-                    retried = int(val.strip())
-            rows.append({"run": verdict.parent.name, "retried": retried})
-    judgeable = [r for r in rows if r["retried"] is not None]
+                    total += int(val.strip())
+                    judged += 1
+                    break
+            for row in sorted(verdict.parent.glob("*.retry.leg")):
+                try:
+                    fields = row.read_text(encoding="utf-8", errors="replace").splitlines()[0].split("\t")
+                except (OSError, IndexError):
+                    continue
+                leg = legs.setdefault(fields[0], {"leg": fields[0], "retried": 0,
+                                                  "failed_after_retry": 0, "git_dirs": set()})
+                leg["retried"] += 1
+                leg["failed_after_retry"] += (fields[1:2] or [""])[0].strip() != "ok"
+                leg["git_dirs"].add(base)
+                rows_read += 1
+    detail = [dict(r, git_dirs=len(r["git_dirs"]))
+              for r in sorted(legs.values(), key=lambda r: (-r["retried"], r["leg"]))]
     return {
         "signal": name,
-        "value": sum(r["retried"] for r in judgeable),
-        "of": len(rows),
+        "value": total,
+        "of": of,
         "tolerance": ctx.pins.get(name, 0),
         "gateable": False,
-        "live": bool(judgeable),
-        "detail": rows,
+        "live": bool(judged),
+        "git_dirs": len(holding),
+        "unattributed": total - rows_read,
+        "detail": detail,
     }
 
 

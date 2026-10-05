@@ -10078,6 +10078,11 @@
       "file": "tools/playbook/render_playbook.py"
     },
     {
+      "id": "read_git_dirs",
+      "kind": "function",
+      "file": "tools/drift-audit/drift_report.py"
+    },
+    {
       "id": "read_git_lines",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"

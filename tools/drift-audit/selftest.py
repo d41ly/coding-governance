@@ -93,7 +93,8 @@ EXECUTED: list[str] = []
 # on a run where no arm skipped; it rises by hand when arms land and never falls to absorb a missing
 # one. A run with a SKIP does not compare it, and says so, because a skipped arm's checks are absent
 # for a reason the floor cannot see.
-CHECK_FLOOR = 377
+CHECK_FLOOR = 383
+# 377 -> 383, TOOL-aMendedFleet-59: the six every-git-dir checks in `test_legs_retried_after_timeout`.
 # 365 -> 377, TOOL-aMendedFleet-57: the twelve checks of `test_shrink_low_water`.
 # 357 -> 365, TOOL-aMendedFleet-56: the eight checks of `test_baselines`.
 # 352 -> 357, TOOL-aMendedFleet-55: the five `open_asks_cited_by_product_source` checks.
@@ -2800,11 +2801,16 @@ def test_asks_disposed_overrides(tmp: pathlib.Path) -> None:
 # ---------------------------------------------------------------------------------------------
 
 
-def _write_gate_verdict(r: pathlib.Path, run: str, body: str) -> None:
-    """One run record's verdict file under the fixture's git dir, where the gate runner writes it."""
-    d = r / ".git" / "gate-run" / run
+def _write_gate_verdict(r: pathlib.Path, run: str, body: str, git_dir: str = ".git",
+                        retries: tuple = ()) -> None:
+    """One run record's verdict file under a fixture git dir, where the gate runner writes it, with
+    one `<i>.retry.leg` row per `(leg, status)` in `retries`."""
+    d = r / git_dir / "gate-run" / run
     d.mkdir(parents=True, exist_ok=True)
     (d / "verdict").write_text(body, encoding="utf-8", newline="\n")
+    for i, (leg, status) in enumerate(retries):
+        (d / f"{i}.retry.leg").write_text(f"{leg}\t{status}\t0\t3\t1\t2\tabc\n",
+                                          encoding="utf-8", newline="\n")
 
 
 def test_legs_retried_after_timeout(tmp: pathlib.Path) -> None:
@@ -2834,6 +2840,25 @@ def test_legs_retried_after_timeout(tmp: pathlib.Path) -> None:
     dead = report(make_repo(tmp, name="noruns"))["legs_retried_after_timeout"]
     check("a git dir with no run record reports DEAD rather than 0",
           dead["live"] is False, f"live={dead['live']} value={dead['value']}")
+    # --- TOOL-aMendedFleet-59: every git dir of the clone, grouped by leg ---------------------------
+    # Red against a reader of the current git dir alone: the linked worktree's record goes unread.
+    w = make_repo(tmp, name="retriedwt")
+    _write_gate_verdict(w, "r1", "verdict\tGREEN\nretried\t1\n", retries=(("leg a", "ok"),))
+    _write_gate_verdict(w, "r1", "verdict\tRED\nretried\t2\n", git_dir=".git/worktrees/w1",
+                        retries=(("leg a", "ok"), ("leg b", "fail")))
+    got = report(w)["legs_retried_after_timeout"]
+    check("a linked worktree's run record is summed beside the common dir's",
+          got["value"] == 3 and got["of"] == 2, f"value {got['value']} of {got['of']}")
+    check("`git_dirs` counts the git dirs holding a record", got["git_dirs"] == 2, f"got {got['git_dirs']}")
+    check("every counted retry names its leg", got["unattributed"] == 0, f"got {got['unattributed']}")
+    legs = {d["leg"]: d for d in got["detail"]}
+    check("a leg retried in two git dirs reads 2 retries over 2 git dirs",
+          legs.get("leg a", {}).get("retried") == 2 and legs["leg a"]["git_dirs"] == 2, f"got {legs}")
+    check("a leg that failed on its retry reads `failed_after_retry` 1",
+          legs.get("leg b", {}).get("failed_after_retry") == 1
+          and legs.get("leg a", {}).get("failed_after_retry") == 0, f"got {legs}")
+    check("the detail orders legs by retries descending",
+          [d["leg"] for d in got["detail"]] == ["leg a", "leg b"], f"got {got['detail']}")
 
 
 def test_cutoff_keys_armed(tmp: pathlib.Path) -> None:

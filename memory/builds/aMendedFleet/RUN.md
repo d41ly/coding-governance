@@ -440,3 +440,7 @@ base: 7af5f564641d231f8b78f6b183dde1b6bf53111d
 2026-10-05T13:48:03Z dispatch · item f8fc8172 TOOL-aMendedFleet-58 · reason tools/runlog/runlog.py tools/runlog/selftest.py tools/runlog/README.md tools/runlog/SKILL.template.md .claude/skills/runlog/SKILL.md memory/map/generated/symbols.json memory/builds/aMendedFleet/spec/2026-10-04-spec-TOOL-aMendedFleet-58.md memory/builds/aMendedFleet/README.md memory/backlog/TOOL.md
 
 2026-10-05T13:58:54Z brief · item TOOL-aMendedFleet-59 · reason 4c433d32841d memory/builds/aMendedFleet/prompts/2026-10-04-prompt-TOOL-aMendedFleet-1-4-build-brief.md
+
+2026-10-05T14:04:14Z dispatch · item 2cb82a56 TOOL-aMendedFleet-59 · reason tools/drift-audit/drift_report.py tools/drift-audit/selftest.py tools/drift-audit/README.md memory/map/generated/symbols.json memory/builds/aMendedFleet/spec/2026-10-04-spec-TOOL-aMendedFleet-59.md memory/LIVE.md
+
+2026-10-05T14:10:38Z dispatch · item 2cb82a56 TOOL-aMendedFleet-59 · reason tools/drift-audit/drift_report.py tools/drift-audit/selftest.py tools/drift-audit/README.md memory/map/generated/symbols.json memory/builds/aMendedFleet/spec/2026-10-04-spec-TOOL-aMendedFleet-59.md memory/LIVE.md memory/builds/aMendedFleet/README.md

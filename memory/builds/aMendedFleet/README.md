@@ -235,7 +235,7 @@ ids TOOL-aMendedFleet-96 TOOL-aMendedFleet-97 TOOL-aMendedFleet-98 TOOL-aMendedF
 | [TOOL-aMendedFleet-56 — gateable stable-key drift signals are bounded by a shrink-only set of offender ids instead of a count](spec/2026-10-04-spec-TOOL-aMendedFleet-56.md) | 56 | 2 | CLOSED | rev-3 | 2026-10-05 |
 | [TOOL-aMendedFleet-57 — shrink-only lists are graded against their low-water mark](spec/2026-10-04-spec-TOOL-aMendedFleet-57.md) | 57 | 1 | CLOSED | rev-3 | 2026-10-04 |
 | [TOOL-aMendedFleet-58 — gate yield per leg is reported from the gates journal](spec/2026-10-04-spec-TOOL-aMendedFleet-58.md) | 58 | 1 | CLOSED | rev-3 | 2026-10-05 |
-| [TOOL-aMendedFleet-59 — timeout retries are grouped by leg across every git dir of the clone](spec/2026-10-04-spec-TOOL-aMendedFleet-59.md) | 59 | 1 | SPECCED | rev-1 | 2026-10-04 |
+| [TOOL-aMendedFleet-59 — timeout retries are grouped by leg across every git dir of the clone](spec/2026-10-04-spec-TOOL-aMendedFleet-59.md) | 59 | 1 | CLOSED | rev-2 | 2026-10-05 |
 | [TOOL-aMendedFleet-60 — a cross-run overlap probe over unmerged remote refs runs at preflight](spec/2026-10-04-spec-TOOL-aMendedFleet-60.md) | 60 | 2 | SPECCED | rev-2 | 2026-10-04 |
 | [TOOL-aMendedFleet-62 — the two history legs grade the run's own range, reusing node d's bytes](spec/2026-10-04-spec-TOOL-aMendedFleet-62.md) | 61 | 2 | SPECCED | rev-4 | 2026-10-04 |
 | [TOOL-aMendedFleet-61 — preflight pins the launching CLI version and every resume compares it, and a missing resume tick is announced loudly](spec/2026-10-04-spec-TOOL-aMendedFleet-61.md) | 62 | 2 | SPECCED | rev-4 | 2026-10-04 |
