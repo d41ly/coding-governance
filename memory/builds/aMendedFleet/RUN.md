@@ -556,3 +556,5 @@ base: 7af5f564641d231f8b78f6b183dde1b6bf53111d
 2026-10-05T23:11:04Z dispatch · item 33292ce1 TOOL-aMendedFleet-75 · reason tools/check-spec-tokens.py tools/check-spec-tokens.test.sh tools/memory-tree/SPEC-TEMPLATE.template.md memory/TEMPLATE-SPEC.md memory/map/features/spec-tokens.md memory/map/generated/symbols.json memory/builds/aMendedFleet/spec/2026-10-04-spec-TOOL-aMendedFleet-75.md memory/builds/aMendedFleet/README.md
 
 2026-10-05T23:14:49Z dispatch · item 33292ce1 TOOL-aMendedFleet-75 · reason tools/check-spec-tokens.py tools/check-spec-tokens.test.sh tools/memory-tree/SPEC-TEMPLATE.template.md memory/TEMPLATE-SPEC.md memory/map/features/spec-tokens.md memory/map/generated/symbols.json memory/builds/aMendedFleet/spec/2026-10-04-spec-TOOL-aMendedFleet-75.md memory/builds/aMendedFleet/README.md memory/builds/aMendedFleet/spec/2026-10-04-spec-KICK-aMendedFleet-4.md
+
+2026-10-05T23:29:33Z brief · item KICK-aMendedFleet-1 · reason 4c433d32841d memory/builds/aMendedFleet/prompts/2026-10-04-prompt-TOOL-aMendedFleet-1-4-build-brief.md
