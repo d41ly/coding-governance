@@ -344,8 +344,9 @@ CLAIM_ARMS = [(name, re.compile(shape.format(**CLAIM_PARTS), re.I)) for name, sh
 # The refusal set, one row per class, and the FIRST ROW TO MATCH DECIDES. The first row is the shared
 # SPACE CLAUSE, which clears: every live key carrying punctuation also carries a space, so this row is
 # what keeps the three classes disjoint from the key set, and the self-test re-derives that on every
-# run. A FILENAME key is the one exception, and CODE SYMBOL clears it by shape: the git-hooks key
-# `pre_push_bar_selftest.py` carries an underscore and no space (TOOL-aRepatriatedFork-5, gate repair
+# run. A FILENAME key is the one exception, and CODE SYMBOL clears it by shape: a key such as
+# `pre_push_bar_selftest.py`, a git-hooks key until TOOL-aMendedFleet-39 kept only names git runs,
+# carries an underscore and no space (TOOL-aRepatriatedFork-5, gate repair
 # at VERIFYING). GLOB is tested before PATH so `tools/*/kit.toml` reports its real shape; both rest on the same
 # sentence of the map's contract, so the order moves a label and never a verdict.
 CLAIM_REFUSALS = (
