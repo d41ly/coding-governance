@@ -9328,6 +9328,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "print_touched_asks",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "print_unattributed",
       "kind": "function",
       "file": "tools/run-gates/check-receipt.py"

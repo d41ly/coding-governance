@@ -241,6 +241,45 @@ reaches a record, and the harness cannot check it was made: compare the report a
 `appendix`. A run whose every finding is refuted writes no report, so there the appendix exists in the
 return alone, and the caller writes it down if it wants one.
 
+## `workerType` — judges spawned as a named agent type, in all three harnesses
+
+Every agent a harness spawns loads the charter through `CLAUDE.md` before its task. A judge reads a
+brief the harness wrote and lands nothing, so `workerType` lets a caller spawn the JUDGES as a named
+agent type instead. Absent, every spawn is byte-identical to a run without it; no caller passes it yet.
+
+```js
+// tier2-review.js: every finder and every skeptic batch spawns as the type
+args: { repo, base, head, reviewDir, workerType: 'Plan' }
+// drift-audit-code.js and drift-audit-state.js: the skeptic batches only
+args: { repo, base, outDir, workerType: 'Plan' }
+```
+
+The value must match `^[A-Za-z][A-Za-z0-9_-]{0,63}$`, or the harness refuses before any agent spawns
+with a message naming `workerType`. A well-formed name the platform does not know comes back as its
+named `not found` refusal, which each harness already counts as a dead agent. The orchestrating
+agents never take the type: the tier2 resume probe reads the lens files and the synthesis writes the
+report.
+
+Under a type, a tier2 judge is told to write no `find-*.json` or `verify-*.json` and to return `path`
+empty, because the read-only types hold no Write tool. One log line names the type and says the run's
+lens and batch results are NOT durable, so a resume re-dispatches them. `workerType` joins the review
+key only when given, so a run under a type is never answered from a default run's lens files.
+
+The drift FINDERS keep the default type. Each writes its prose writeup under `outDir`, `wave1-<lens>.md`
+from the code harness and `wave2-<lens>.md` from the state harness, as it works, and that file is both its deliverable and the harness's durability control, after a
+two-hour finder once died with nothing on disk; a type with no Write tool can hold neither.
+
+Which types omit the charter — verified 2026-10-04, node a, Claude Code 2.1.178, by a read-only
+`grep -a -o` over the installed binary for `omitClaudeMd`:
+
+- Only the built-in `Explore` (model `haiku`) and `Plan` (model `inherit`) set it. Both disallow the
+  file-editing tools and carry a read-only prompt. `Explore` also changes the model, so an A/B over
+  it measures two effects at once; `Plan` changes only the context.
+- A project agent definition cannot ask for it: the CLI's list of known definition front-matter keys
+  does not carry the field, so a custom type buys a tool restriction and none of the saving.
+- UNVERIFIED: whether a custom definition added mid-session is spawnable without restarting the
+  session. Name a built-in type unless that has been measured.
+
 ## `review_replay.py` — a review scored for recall against a past round
 
 Stdlib Python, run under the repo's python launcher. It answers one question nothing else here can:

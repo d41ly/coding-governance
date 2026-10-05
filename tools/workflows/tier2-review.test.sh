@@ -198,7 +198,7 @@ async function runReview(args, stubs, source) {
   const logs = []
   const agent = async (prompt, opts) => {
     const label = (opts && opts.label) || '(unlabelled)'
-    trace.push({ label: label, prompt: String(prompt), schema: opts && opts.schema })
+    trace.push({ label: label, prompt: String(prompt), schema: opts && opts.schema, agentType: opts && opts.agentType })
     let v = resolveStub(stubs, label)
     if (typeof v === 'function') v = v(label, String(prompt))
     return v === undefined || v === null ? null : JSON.parse(JSON.stringify(v))
@@ -289,6 +289,24 @@ async function runWholeScriptArms() {
   if (checkNoThrow(r, 'dead probe')) {
     ck(r.scanSpawned('find:').length === 5, 'AC4 a dead probe dispatches all five lenses')
     ck(r.logs.some((l) => l.indexOf('nothing could be reused') !== -1), 'AC4 ...and the log says nothing could be reused')
+  }
+
+  // ---- TOOL-aMendedFleet-67 S5 - `workerType` routes the JUDGES and only them, and they write nothing.
+  // ---- The default half reads the first run's judges, so an arm that always sets the option reds here.
+  ck(finds.concat(verifies).every((t) => t.agentType === undefined), 'workerType: absent, no judge spawn carries an agentType')
+  r = await runReview(Object.assign({ workerType: 'Plan' }, DIFF), ALL_OK)
+  if (checkNoThrow(r, 'workerType run')) {
+    const judges = r.trace.filter((t) => /^(find|verify):/.test(t.label))
+    const orch = r.trace.filter((t) => !/^(find|verify):/.test(t.label))
+    ck(judges.length === 10 && judges.every((t) => t.agentType === 'Plan'), 'workerType: all five finders and five skeptic batches spawn as Plan')
+    ck(orch.length === 2 && orch.every((t) => t.agentType === undefined), 'workerType: the probe and the synthesis carry none: ' + orch.map((t) => t.label).join(' '))
+    ck(judges.every((t) => t.prompt.indexOf('DURABILITY') === -1), 'workerType: no judge is told to write a lens or verify file')
+    ck(r.logs.some((l) => l.indexOf('worker type Plan') === 0 && l.indexOf('NOT durable') !== -1), 'workerType: the log says the results are not durable')
+    ck(r.result.key !== K, 'workerType: the key differs from the default run\'s, so no default lens file answers it')
+  }
+  for (const [lbl, v] of [['two words', 'two words'], ['a number', 7], ['65 characters', 'A'.repeat(65)]]) {
+    r = await runReview(Object.assign({ workerType: v }, DIFF), ALL_OK)
+    ck(!!r.threw && r.threw.indexOf('workerType') !== -1 && r.trace.length === 0, 'workerType: ' + lbl + ' is refused before any spawn')
   }
 
   // ---- AC2: two lenses die; the re-run is fed the three survivors' files and dispatches exactly two.

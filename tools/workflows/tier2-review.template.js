@@ -101,8 +101,10 @@ function readOutputTokens() {
 //   lensNotes: { "<lens key>": "<note>" }, // project addendum per lens of THIS kind; absent -> {} and a WARNING
 //   intensity: "full" | "light",          // DEFAULTS to "full"; only the CALLER picks light, which runs
 //                                         // LIGHT_LENSES and names the lenses it skipped; a spec-audit refuses light
-//   checklist: "<preamble>\n- <item>\n  <continuation>" | ["<item>", ...] } // the project's recurring
+//   checklist: "<preamble>\n- <item>\n  <continuation>" | ["<item>", ...], // the project's recurring
 //                                         // bug classes, each item swept by exactly one lens; absent -> a WARNING
+//   workerType: "<agent type>" }          // the type every finder and skeptic spawns as; absent -> the
+//                                         // default type. Under one the judges write no lens file
 // D9 - `kind` and `subjects` were added without extending this block, and BUILD-METHOD M4 sends a
 // reader HERE for the spec-audit spelling. An absent `kind` does not refuse - it defaults - so a
 // header missing the field buys exactly the failure M4 exists to prevent: a code-shaped review of a
@@ -171,6 +173,16 @@ if (typeof intensity !== 'string' || ['full', 'light'].indexOf(intensity) === -1
   throw new Error('tier2-review: `intensity` must be one of full | light. Got ' + JSON.stringify(a.intensity) + '.')
 if (isSpec && intensity === 'light')
   throw new Error('tier2-review: a spec-audit has no light lens subset; `intensity` must be full or absent. Got "light".')
+// TOOL-aMendedFleet-67 S1/S2 - `workerType`, the agent type the JUDGES spawn as: every finder and every
+// skeptic, never the resume probe or the synthesis, which read and write the lens files and the report.
+// Shape-checked here, before any spawn. The built-in types that omit the charter hold no Write tool,
+// so under one the judges get no DURABILITY instruction and the run says its results are not durable.
+const workerType = a.workerType === undefined ? '' : a.workerType
+if (a.workerType !== undefined && (typeof a.workerType !== 'string' || !/^[A-Za-z][A-Za-z0-9_-]{0,63}$/.test(a.workerType)))
+  throw new Error('tier2-review: `workerType` must be an agent type name matching ^[A-Za-z][A-Za-z0-9_-]{0,63}$. Got ' + JSON.stringify(a.workerType) + '.')
+const judgeOpts = workerType ? { agentType: workerType } : {}
+if (workerType)
+  log(`worker type ${workerType} — every finder and skeptic spawns as it and writes no find-*.json or verify-*.json, so this run's lens and batch results are NOT durable and a resume re-dispatches them`)
 // S7 - the context default is per-kind, and each is wrong if the other kind inherits it.
 const context = a.context || (isSpec ? 'the spec set under audit' : 'the cumulative diff landing on main')
 const byDesign = a.byDesign || 'none supplied'
@@ -628,7 +640,9 @@ const REVIEW_SHAPE = 'lenses5-r1'
 // TOOL-aSightedSkeptic-4 S7 - so does the PARSED checklist: a CRLF string and its LF twin are one key,
 // and a lens swept under one checklist is never reused under another.
 // TOOL-aSightedSkeptic-7 S8 - and so does `intensity`: a light run and a full run never share a lens file.
-const inputPrint = deriveFnv1a(renderCanonical({ shape: REVIEW_SHAPE, context: context, byDesign: byDesign, priorFindings: priorFindings, lensNotes: lensNotes, specs: SPECS, checklist: checklist, intensity: intensity }))
+// TOOL-aMendedFleet-67 S2 - and so does `workerType`, only when given, so a default key never moves and
+// an A/B arm under a type is never answered from the default arm's lens files.
+const inputPrint = deriveFnv1a(renderCanonical(Object.assign({ shape: REVIEW_SHAPE, context: context, byDesign: byDesign, priorFindings: priorFindings, lensNotes: lensNotes, specs: SPECS, checklist: checklist, intensity: intensity }, workerType ? { workerType: workerType } : {})))
 const specSubject = isSpec
   ? deriveFnv1a(subjects.map((x) => (x && typeof x === 'object' ? `${x.path}@${x.blob}` : String(x))).join('\n'))
   : ''
@@ -807,11 +821,14 @@ const finderResults = await boundedParallel(
         SEVERITY_RUBRIC + `\n` +
         // TOOL-dDerivedDocket-29 S1 - WRITE BEFORE RETURN. A fan that dies on a session limit loses
         // every structured return with it; a file on disk survives, and the next run's probe reuses it.
-        `\nDURABILITY — BEFORE you return, whatever you found, Write the exact JSON object you are about to return, plus one more field "key":"${reviewKey}", to ${keyDir}/find-${L.key}.json, creating the directory if it is missing.${keyDirHow} Set path to that file's absolute, forward-slash path.\n` +
+        // TOOL-aMendedFleet-67 S2 - a judge under `workerType` holds no Write tool, so it is told none.
+        (workerType
+          ? `\nWrite no file. Set path to an empty string.\n`
+          : `\nDURABILITY — BEFORE you return, whatever you found, Write the exact JSON object you are about to return, plus one more field "key":"${reviewKey}", to ${keyDir}/find-${L.key}.json, creating the directory if it is missing.${keyDirHow} Set path to that file's absolute, forward-slash path.\n`) +
         (isSpec
           ? `Return JSON {lens:"${L.key}", path, findings:[{file,where,severity,claim,impact,fix}]}.`
           : `Return JSON {lens:"${L.key}", path, findings:[{file,line,severity,claim,impact,fix}]}.`),
-        { label: `find:${L.key}`, phase: 'Find', schema: isSpec ? SPEC_FINDING_SCHEMA : FINDING_SCHEMA },
+        Object.assign({ label: `find:${L.key}`, phase: 'Find', schema: isSpec ? SPEC_FINDING_SCHEMA : FINDING_SCHEMA }, judgeOpts),
       ),
   ),
 )
@@ -944,13 +961,15 @@ const verdictResults = await boundedParallel(
         `"none" when no fix was proposed. For "unsound", \`fixNote\` holds ONLY the corrected fix, and is empty when you have none; ` +
         `say why the fix is unsound in \`reason\`, never in \`fixNote\`. ` +
         `The fix verdict NEVER changes the finding's verdict: judge the claim on its own, then the fix on its own.` +
-        `\n\nDURABILITY — BEFORE you return, Write the exact JSON object you are about to return, plus two more fields ` +
-        `"key":"${reviewKey}" and "batch":"${batchPrints[gi]}", to ${keyDir}/verify-${group[0].id}-${group[group.length - 1].id}.json, ` +
-        `creating the directory if it is missing.${keyDirHow} Set path to that file's absolute, forward-slash path.` +
+        (workerType
+          ? `\n\nWrite no file. Set path to an empty string.`
+          : `\n\nDURABILITY — BEFORE you return, Write the exact JSON object you are about to return, plus two more fields ` +
+            `"key":"${reviewKey}" and "batch":"${batchPrints[gi]}", to ${keyDir}/verify-${group[0].id}-${group[group.length - 1].id}.json, ` +
+            `creating the directory if it is missing.${keyDirHow} Set path to that file's absolute, forward-slash path.`) +
         `\n\nReturn JSON {path, verdicts:[{id:<the integer id shown above>, verdict:"confirmed"|"refuted"|"uncertain", reason, severity:"blocker"|"high"|"medium"|"low" (on a confirmed verdict), fixVerdict:"sound"|"unsound"|"none", fixNote}]}. ` +
         `Emit EXACTLY one verdict per finding above (${group.length} verdicts, ids ${group.map((f) => f.id).join(', ')}). ` +
         `Copy the integer id — do NOT re-type the file path, and do not renumber.`,
-        { label: batchLabels[gi], phase: 'Verify', schema: VERDICT_SCHEMA },
+        Object.assign({ label: batchLabels[gi], phase: 'Verify', schema: VERDICT_SCHEMA }, judgeOpts),
       ),
   ),
 )

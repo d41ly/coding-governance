@@ -80,10 +80,17 @@ function chunk(a, n) {
 //   heuristics: "any orchestrator heuristic handed over, WITH its known failure mode",
 //   byDesign: "recorded/backlogged issues reviewers must NOT re-report",
 //   lenses: ["map-truth","memory-rot","charter-drift","work-state","record-gate-integrity"],
+//   workerType: "<agent type>",            // the type every SKEPTIC batch spawns as; absent -> the default
 // }
 const a = args || {}
 const REPO = a.repo || '.'
 const BASE = a.base || 'HEAD'
+// TOOL-aMendedFleet-67 S3 - `workerType` routes the SKEPTIC batches only. A finder writes its
+// writeup to outDir as it works, which is its deliverable and its durability control, and a
+// read-only type holds no Write tool. Shape-checked before any spawn.
+if (a.workerType !== undefined && (typeof a.workerType !== 'string' || !/^[A-Za-z][A-Za-z0-9_-]{0,63}$/.test(a.workerType)))
+  throw new Error('drift-audit-state: `workerType` must be an agent type name matching ^[A-Za-z][A-Za-z0-9_-]{0,63}$. Got ' + JSON.stringify(a.workerType) + '.')
+const skepticOpts = a.workerType ? { agentType: a.workerType } : {}
 const OUT = a.outDir || `${REPO}/memory`
 const MEM = a.memoryRoot || 'memory'
 const CHARTER = a.charter || 'AGENTS.md'
@@ -385,7 +392,7 @@ ${a.byDesign || '(none supplied)'}
 
 FINDINGS BATCH ${bi + 1}:
 ${JSON.stringify(b, null, 1)}`,
-      { label: `verify:batch${bi + 1}`, phase: 'Verify', schema: VERDICT_SCHEMA }
+      Object.assign({ label: `verify:batch${bi + 1}`, phase: 'Verify', schema: VERDICT_SCHEMA }, skepticOpts)
     )
   ),
   CAP

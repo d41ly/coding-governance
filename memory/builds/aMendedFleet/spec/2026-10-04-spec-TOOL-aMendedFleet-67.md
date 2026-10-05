@@ -1,10 +1,12 @@
 # TOOL-aMendedFleet-67 — review and drift harnesses can spawn their judges as a read-only agent type that omits the charter
 
-**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 67
+**Status:** CLOSED · rev-3 · 2026-10-05 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 67
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-04-build-TOOL-aMendedFleet-67-1-acceptance-ledger.md](../build/2026-10-04-build-TOOL-aMendedFleet-67-1-acceptance-ledger.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
@@ -31,7 +33,11 @@ defaults to it.
 - **S2** — Under `workerType`, the finder and skeptic prompts carry no DURABILITY instruction to write
   a `find-*.json` or `verify-*.json` file, because a read-only type holds no Write tool and its own
   prompt forbids file creation. The harness logs one line naming the worker type and saying this
-  run's lens and batch results are not durable, so a resume re-dispatches them. Observed by AC1.
+  run's lens and batch results are not durable, so a resume re-dispatches them. Each judge returns
+  its JSON with `path` empty, which the schemas still require. The review key's input print carries
+  the type, and only when one is given, so a run under a type never reuses a default run's lens or
+  batch file: an A/B arm answered from the other arm's files measures nothing. Observed by AC1; the
+  key half by the S5 arm.
 - **S3** — `tools/workflows/drift-audit-code.template.js`, `tools/workflows/drift-audit-state.template.js`
   and their renders read the same argument under the same validation, and pass it to their SKEPTIC
   batches only. Their finders keep the default type. Observed by AC4.
@@ -211,6 +217,10 @@ New arm: `tools/workflows/tier2-review.test.sh` · stub spawns recorded with and
   which reads judge transcripts and not unit 70's mode, so the non-goal and the edge now name it;
   AC2 and AC6 compared against base, which units 11, 17 and 18 move first, and now compare against
   the pass's starting commit.
+- rev-3 · 2026-10-05 · S2 · build: the resume probe reuses any lens file under the same key, so a
+  `workerType` run following a default run on the same inputs would have reused every default lens
+  and measured nothing; the key now carries the type when one is given, and a judge returns `path`
+  empty because its schema still requires the field. Default keys and prompts are unchanged.
 
 ## 10. Reuse audit
 
