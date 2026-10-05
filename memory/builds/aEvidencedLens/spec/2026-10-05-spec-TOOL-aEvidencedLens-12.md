@@ -1,6 +1,6 @@
 # TOOL-aEvidencedLens-12 — the spec skeptic line carries a finding's evidence through a line-break-only fold, so a pipe survives
 
-**Status:** SPECCED · rev-3 · 2026-10-05 · node a · Tier-2 · base 028b5cac · streams tooling · order 7
+**Status:** CLOSED · rev-3 · 2026-10-05 · node a · Tier-2 · base 028b5cac · streams tooling · order 7
 
 <!-- gen:spec-records -->
 

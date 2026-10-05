@@ -1088,11 +1088,12 @@ const verdictResults = await boundedParallel(
         `For each finding you CONFIRM, also return \`severity\`, graded by this rubric against what you read, independent of the finder's bracketed grade.\n\n` +
         `Findings to judge:\n` +
         // TOOL-aSightedSkeptic-8 S2 - `lens=` after the grade; `id=<n> [` stays first for the stubs' id pattern.
-        // TOOL-aEvidencedLens-3 S3 - the spec kind appends the finder's evidence, folded to one line by
-        // renderCell (absent reads `-`). renderCell also escapes `|`; TOOL-aEvidencedLens-12 owns that.
+        // TOOL-aEvidencedLens-3 S3 - the spec kind appends the finder's evidence, folded to one line
+        // (absent or blank reads `-`). TOOL-aEvidencedLens-12 S2 - renderPromptLine, never renderCell:
+        // the skeptic RE-RUNS this command, so a pipe in it must reach the prompt unescaped.
         group
           .map((f) => `id=${f.id} [${f.severity}] lens=${f.lens} ${f.ref} — ${f.claim} | impact: ${f.impact} | fix: ${f.fix}` +
-            (isSpec ? ` | evidence: ${renderCell(f.evidence)}` : ''))
+            (isSpec ? ` | evidence: ${renderPromptLine(f.evidence)}` : ''))
           .join('\n') +
         // TOOL-aSightedSkeptic-2 S2 - the fix is judged as a SECOND, separate question. It never moves
         // the claim's verdict (spec section 8 F1): a real defect with a bad fix is still a real defect.
@@ -1271,8 +1272,15 @@ const confirmedFindings = confirmed.map((f) => {
 // S6 - one cell: absent as `-`, a pipe escaped, and a run of any character Python's str.splitlines
 // breaks on folded to one space, so no claim or reason can forge or cut a row in the table
 // TOOL-aSightedSkeptic-9 parses (closing review round 1, L2: CR/LF alone let a U+2028 cut one).
+// TOOL-aEvidencedLens-12 S1 - the line-break fold alone, for a prompt line: nothing else is rewritten,
+// and a value blank once folded reads `-` like an absent one. renderCell is this plus the pipe escape.
+function renderPromptLine(v) {
+  if (v === null || v === undefined) return '-'
+  const s = String(v).replace(/[\r\n\x0b\x0c\x1c-\x1e\x85\u2028\u2029]+/g, ' ')
+  return s.trim() === '' ? '-' : s
+}
 function renderCell(v) {
-  return v === null || v === undefined || v === '' ? '-' : String(v).replace(/[\r\n\x0b\x0c\x1c-\x1e\x85\u2028\u2029]+/g, ' ').replace(/\|/g, '\\|')
+  return renderPromptLine(v).replace(/\|/g, '\\|')
 }
 // The eight columns are the hand-off to TOOL-aSightedSkeptic-9; `claim` rides the ledger only (spec F4).
 function renderAppendix(rows) {

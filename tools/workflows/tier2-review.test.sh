@@ -1278,6 +1278,18 @@ async function runLedgerArms() {
     ck(!!fslice && sv.every((t) => extractProbeSlice(t.prompt) === fslice && t.prompt.indexOf('PROBE POLICY') < t.prompt.indexOf('Findings to judge:')),
       'spec skeptic: the verify prompt carries the finders\' PROBE POLICY bytes, before Findings to judge:')
   }
+  // ==== TOOL-aEvidencedLens-12 — the skeptic RE-RUNS the evidence, so it is folded by renderPromptLine:
+  // ==== line breaks only. RED against the unit's predecessor render, whose renderCell wrote `\|`.
+  const PIPED = { coherence: 'cmd: git ls-files | grep -c spec -> 11', grounding: 'cmd: git ls-files | grep x\n-> 2', reuse: '\n' }
+  r = await runReview(SPEC, buildStubs({ 'find:': (label) => { const out = buildLensReturn(label); if (PIPED[out.lens] !== undefined) out.findings[0].evidence = PIPED[out.lens]; return out } }))
+  if (checkNoThrow(r, 'spec evidence: pipe run')) {
+    const pv = r.trace.filter((t) => t.label.indexOf('verify:') === 0)
+    const pline = (id) => pv.map((t) => t.prompt.split('\n').find((l) => l.indexOf('id=' + id + ' [') === 0)).find(Boolean) || ''
+    ck(pline(1).endsWith(' | fix: f | evidence: cmd: git ls-files | grep -c spec -> 11') && pline(2).endsWith(' | evidence: cmd: git ls-files | grep x -> 2') &&
+      !pv.some((t) => t.prompt.indexOf('\\|') !== -1 || /^-> 2/m.test(t.prompt)),
+      'spec evidence: a pipe in evidence reaches the verify line unescaped, byte for byte, and a line break folds to one space')
+    ck(pline(3).endsWith(' | fix: f | evidence: -'), 'spec evidence: evidence that is only a line break reads | evidence: -')
+  }
   r = await runReview(SPEC, buildStubs({ 'find:': buildPairLens, 'verify:': buildSkepticAnswers({ 2: { verdict: 'refuted', reason: 'duplicate of id=1' } }) }))
   if (checkNoThrow(r, 'spec skeptic kept duplicate')) {
     const row = (r.result.ledger || []).find((e) => e.id === 2) || {}
@@ -1527,7 +1539,9 @@ printf '%s\n' "$out"
 # RAISED 217 -> 229 by TOOL-aEvidencedLens-6: 12 assertions, counted off the block — own and shared items (2),
 # mixed verdicts (1), a tally fault (1), a dead synthesis and a dead lens (2), the no-finding, every-refuted
 # and every-lens-dead exits (3), the spec synthesis block and its log lines (2) and a light run (1).
-FLOOR_ASSERTIONS=229
+# RAISED 229 -> 231 by TOOL-aEvidencedLens-12: 2 assertions, counted off the `spec evidence:` block — a
+# piped one-line and two-line evidence unescaped on one line (1) and line-break-only evidence as - (1).
+FLOOR_ASSERTIONS=231
 executed=$(printf '%s\n' "$out" | sed -n 's/^---- \([0-9][0-9]*\) passed.*/\1/p' | tail -1)
 if [ -z "$executed" ]; then
   echo "FAIL the runner printed no assertion count at all — it died before its summary line"
