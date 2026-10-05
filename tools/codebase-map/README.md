@@ -36,7 +36,7 @@ project specifics live in exactly two files the adopting repo owns.
 
   It writes `generated/inventories.json`, `generated/MAP.md`, `generated/CARDS.md` and, where the
   SYMBOL tier is declared, `generated/symbols.json`. `CARDS.md` holds one card of at most
-  `FEATURE_CARD_CAP_BYTES` (1024) per feature dossier, rendered by `render_cards_md` from the toml
+  `FEATURE_CARD_CAP_BYTES` bytes per feature dossier, rendered by `render_cards_md` from the toml
   fence alone: title, status, streams, path, then decisions, claims and globs, each with its full
   count, and a `cut <n> item(s)` line naming what did not fit. A prose edit never stales it.
   An adopter upgrading past this kit's first `CARDS.md` adds one line to its gate's `fresh`

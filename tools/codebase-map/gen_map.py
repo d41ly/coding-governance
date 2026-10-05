@@ -103,7 +103,7 @@ inventories: `{kit}/map_extractors.py`; gate: see `.codebase-map.conf` GATE_FILE
 - `features/<feature>.md` — one dossier per feature: first ```toml fence = machine claims,
   then `## Constraints & why` · `## Shared seams` · `## Gaps` · `## Reuse affordance` prose.
 - `generated/` — `inventories.json` (keys-only) + `MAP.md` (claimant-annotated) + `CARDS.md`
-  (one card of at most 1 KB per feature, from its toml fence alone) + `symbols.json`
+  (one byte-capped card per feature, from its toml fence alone) + `symbols.json`
   (reuse-recall index — only when the SYMBOL tier is declared in map_extractors.py); regenerate
   with `{regen}`, never hand-edit.
 
