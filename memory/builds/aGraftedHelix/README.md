@@ -140,7 +140,7 @@ ids TOOL-aGraftedHelix-27 TOOL-aGraftedHelix-28 TOOL-aGraftedHelix-29 TOOL-aGraf
 | [TOOL-aGraftedHelix-30 — a verb grades `authorization-reachable` alone, and every reconciling merge runs it before the run spends more](spec/2026-10-05-spec-TOOL-aGraftedHelix-30.md) | 14 | 2 | CLOSED | rev-1 | 2026-10-05 |
 | [TOOL-aGraftedHelix-31 — `--settle` writes the run claim, and a terminal-phase writer that writes no claim reds](spec/2026-10-05-spec-TOOL-aGraftedHelix-31.md) | 15 | 2 | CLOSED | rev-1 | 2026-10-05 |
 | [TOOL-aGraftedHelix-32 — the closing review's 21 MEDIUM and LOW findings, fixed as one batch](spec/2026-10-05-spec-TOOL-aGraftedHelix-32.md) | 16 | 2 | CLOSED | rev-3 | 2026-10-05 |
-| [TOOL-aGraftedHelix-33 — the spec commit stage places every spec a writer authored, named by id or by path, and refuses an entry it cannot place](spec/2026-10-06-spec-TOOL-aGraftedHelix-33.md) | 17 | 1 | SPECCED | rev-1 | 2026-10-06 |
+| [TOOL-aGraftedHelix-33 — the spec commit stage places every spec a writer authored, named by id or by path, and refuses an entry it cannot place](spec/2026-10-06-spec-TOOL-aGraftedHelix-33.md) | 17 | 1 | SPECCED | rev-2 | 2026-10-06 |
 <!-- /gen:build-units -->
 
 Records: 47 bound to this build, across 4 record folder(s).

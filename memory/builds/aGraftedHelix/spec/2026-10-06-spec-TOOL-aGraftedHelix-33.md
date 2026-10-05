@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-33 — the spec commit stage places every spec a writer authored, named by id or by path, and refuses an entry it cannot place
 
-**Status:** SPECCED · rev-1 · 2026-10-06 · node a · Tier-1 · base 018b5675 · streams tooling · order 17 · ratified 2026-10-06
+**Status:** SPECCED · rev-2 · 2026-10-06 · node a · Tier-1 · base 018b5675 · streams tooling · order 17 · ratified 2026-10-06
 
 <!-- gen:spec-records -->
 
@@ -47,7 +47,8 @@ writer schema holds the three lists to roster ids.
   by its unit, for S4. It logs one line per such entry carrying `resolved by path`, the entry and its
   id. An entry S2 resolves to none THROWS before the commit stage, naming the writer group, the entry
   as JSON and its folded form, with the phrase `names no roster unit by id and no unit's spec by path`
-  and the shared resume remedy. Every later reader of `specced.authored` then reads unit ids:
+  and the shared resume remedy. The merge collects every such entry across the writers and throws
+  once after it, naming each, so a run with two unplaceable entries is refused for both. Every later reader of `specced.authored` then reads unit ids:
   `authoredIds`, the attended exemption `speccedNow`, and `speccedCount`. `authoredIds` keeps one
   test, the refused exclusion, because the merge settles roster membership and duplicates, and its
   comment says so. `specFolder` is defined once, above the merge, and the commit stage's outside test
@@ -242,9 +243,11 @@ under the build's spec folder.
   commit line names `spec(tB): A-tB-1 A-tB-2 A-tB-3 A-tB-4`, the log reads `committed 4 spec(s)` and
   carries three `resolved by path` lines, and every returned roster row carries a non-empty
   `specPath`.
-  Red when: the merge matches ids alone, as in `wf_dff1cb65-954`, so the commit line names `A-tB-1`
-  alone and three roster rows carry an empty `specPath`. Staged: the merge's call to the resolver
-  bypassed in a render copy, so every entry passes through as written.
+  Red when: the merge does not resolve a path entry to its unit, as in `wf_dff1cb65-954`. Staged: the
+  merge's call to the resolver bypassed in a render copy, so every entry passes through as written.
+  Because S3 moves the roster-membership test out of `authoredIds`, the raw paths then reach the
+  commit line beside `A-tB-1`, and the run throws `named no committed spec` for them, rather than
+  committing `A-tB-1` alone as the pre-S3 tree did.
 - **AC2** — When five units run against a fixture repo spelled with a drive letter, `A-tB-5` carrying
   a caller `specPath` whose basename follows no recording grammar, and the writers return unit 1's
   spec absolute with backslashes, unit 2's in the MSYS form opening with the drive letter as a
@@ -356,6 +359,10 @@ as its check.
 - rev-1 · 2026-10-06 · initial draft, adopted mid-run from the spec commit stage's first live use,
   `wf_dff1cb65-954`, grounded against the template at `bdc93251` and a basename-routing probe over
   every tracked spec.
+- rev-2 · 2026-10-06 · node a · build pass: AC1's red stated what the pre-S3 tree printed, which the
+  staged break cannot reproduce once `authoredIds` loses its membership test, so it now states what
+  the break prints; S3 says the merge collects every unplaceable entry into one throw. Re-read against
+  the template at `0bc5f0f8`, after unit 32's `--only` commit: S1 to S8 still hold as written.
 
 ## 10. Reuse audit
 
