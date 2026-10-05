@@ -317,6 +317,9 @@ to every consumer, so a registry a gate names and nothing creates is invisible u
     `builds/<slug>/BACKLOG.md`: the ask keeps its path grading and the view's derived text does not.
     The member is replaced rather than dropped, because dropping it alone would take every graded
     ask path token out of this check and report green.
+    The build READMEs `LIVE.md` links are an ADVISORY population: their dead citations, a trailing
+    `:<line>` locator cut first, print as one NON-GATING `HYGIENE advisory check 15:` note and are
+    never registered, because a build README is a record of its moment.
 16. **read-path accounting** — the files `CHARTER` points a session at, under `MEMORY_ROOT`, derived
     from the charter's own text through three token arms. TWO rules, and NO byte budget: rule 3 is
     that every member is byte-capped by check 6 or listed in `READ_PATH_WAIVER`, because a charter

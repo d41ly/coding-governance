@@ -232,3 +232,7 @@ base: 7af5f564641d231f8b78f6b183dde1b6bf53111d
 2026-10-05T02:36:01Z brief · item TOOL-aMendedFleet-24 · reason ca9f6d277d8a memory/builds/aMendedFleet/prompts/2026-10-04-prompt-TOOL-aMendedFleet-1-4-build-brief.md
 
 2026-10-05T02:43:49Z brief · item TOOL-aMendedFleet-24 · reason 37e2c28ec58f memory/builds/aMendedFleet/prompts/2026-10-04-prompt-TOOL-aMendedFleet-1-4-build-brief.md
+
+2026-10-05T02:46:38Z dispatch · item d1b72876 TOOL-aMendedFleet-24 · reason tools/memory-tree/corpus_ids.py tools/memory-tree/HYGIENE.template.md memory/HYGIENE.md memory/map/generated/symbols.json memory/builds/aMendedFleet/spec/2026-10-04-spec-TOOL-aMendedFleet-24.md memory/LIVE.md
+
+2026-10-05T02:52:57Z dispatch · item d1b72876 TOOL-aMendedFleet-24 · reason tools/memory-tree/corpus_ids.py tools/memory-tree/HYGIENE.template.md memory/HYGIENE.md memory/map/generated/symbols.json memory/builds/aMendedFleet/spec/2026-10-04-spec-TOOL-aMendedFleet-24.md memory/builds/aMendedFleet/README.md

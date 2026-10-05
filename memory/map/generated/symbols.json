@@ -5888,6 +5888,11 @@
       "file": "tools/process-monitor/selftest.py"
     },
     {
+      "id": "read_live_readmes",
+      "kind": "function",
+      "file": "tools/memory-tree/corpus_ids.py"
+    },
+    {
       "id": "read_log",
       "kind": "function",
       "file": "tools/memory-recall/query.py"
