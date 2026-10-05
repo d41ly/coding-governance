@@ -196,6 +196,15 @@ label `Intended behaviour — invariants this change touches:`, after a caller's
 its entry lines refuses before any agent spawns. Each source is logged as a `by-design:` line, and
 RUN INTEGRITY's `By design:` clause names the same sources. The array form carries no block.
 
+That head is spelled twice, in two kits: the memory-tree kit's `gotchas.py` prints it and this
+harness's `BY_DESIGN_HEAD` pattern finds it. `check_by_design_parity.py` holds the pair. It renders
+the head through the catalogue's own `render_by_design`, runs the template's pattern over it in
+`node`, and reds when the pattern stops matching, stops capturing the count, or matches the head
+behind a leading space. The parity leg runs it in check mode over the memory-tree kit it resolved,
+so a head reworded in either kit reds the bar rather than leaving the harness logging
+`none supplied`. A catalogue that predates the block skips out loud, and `--selftest` covers every
+outcome.
+
 `unattended-build.js` hands its spec audit a checklist the same way: the subject resolver runs
 `gotchas.py --for-paths` over the paths the specs' `### Files touched` sub-heads name and returns its
 stdout, which the stage forwards as `checklist`; a caller's `checklist` argument wins, and none at

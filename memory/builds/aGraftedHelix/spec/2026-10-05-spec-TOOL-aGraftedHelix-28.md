@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-28 — a parity gate holds the by-design head the catalogue renders equal to the pattern the review harness parses
 
-**Status:** SPECCED · rev-2 · 2026-10-05 · node a · Tier-1 · base 5266d22e · streams tooling · order 12
+**Status:** CLOSED · rev-2 · 2026-10-05 · node a · Tier-1 · base 5266d22e · streams tooling · order 12
 
 <!-- gen:spec-records -->
 

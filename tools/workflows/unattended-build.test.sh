@@ -1656,7 +1656,9 @@ build_layout() { # dir · kit dir · unattended dir, or '-' for none · checklis
   mkdir -p "$d/$kd" "$d/memory/guides"
   ( cd "$d" && git init -q -b main . && git config user.email t@t.test && git config user.name t \
       && git config core.autocrlf false )
-  cp "$HERE/unattended-build.template.js" "$HERE/check-protocol-parity.test.sh" \
+  # The by-design checker rides the parity leg's check mode (TOOL-aGraftedHelix-28), so a layout without
+  # it reds every check-mode run with a missing shipped copy.
+  cp "$HERE/unattended-build.template.js" "$HERE/check-protocol-parity.test.sh" "$HERE/check_by_design_parity.py" \
      "$HERE/REVIEW-PROTOCOL.template.md" "$HERE/tier2-review.js" "$HERE/unattended-unit.js" "$d/$kd/"
   # THE RENDERER ASKS THE HOOK FOR FANOUT_CAP (TOOL-aRepatriatedFork-7 S11), through the fan-out
   # gate's `--print-cap`, and refuses to render when nothing answers. `requires = ["agent-cap"]`, so a
@@ -1793,6 +1795,7 @@ o=$(run_layout "$RO" scripts/$WFK)
 has "PV-F3 --check grades the protocol and passes" "$o" "in parity"
 has "PV-F3 ...at exit 0" "$o" "rc=0"
 has "PV-F3 ...and the green line says a pair went ungraded" "$o" "1 pair(s) SKIPPED"
+has "GH28 review-harness only: the leg says the by-design arm did NOT run, and why" "$o" "the by-design arm did NOT run — neither"
 # THE PROTOCOL IS GRADED, NOT MERELY UNBLOCKED. A skip that also swallowed the protocol pair would pass
 # every arm above, so its drift has to still red.
 printf 'a hand edit\n' >> "$RO/memory/guides/REVIEW-PROTOCOL.md"
@@ -1880,6 +1883,29 @@ has "PV-AC5 ...at exit 1" "$o" "rc=1"
 ( cd "$FL" && git rm -q --cached scripts/$WFK/stray.template.md ) && rm -f "$FL/scripts/$WFK/stray.template.md"
 o=$(run_layout "$FL" scripts/$WFK)
 has "PV-AC5 control: with the render and the pairs restored the leg is green again" "$o" "rc=0"
+
+# ---- TOOL-aGraftedHelix-28: THE BY-DESIGN HEAD PAIR, THROUGH THE LEG. The memory-tree kit prints the
+# ---- head and the review harness's pattern finds it; the leg runs `check_by_design_parity.py` over
+# ---- the catalogue it resolved and takes its exit. Three catalogues: the flat layout's stub, which
+# ---- predates the block and SKIPS; a copy of the real one with the `tree_lib.py` it imports, which
+# ---- agrees; and that copy with its head reworded and committed, which reds. Every line arm here and
+# ---- the review-only one above read RED with the leg's call to the checker cut from a scratch copy of
+# ---- the leg; an `rc=0` arm cannot red on a cut call, so each is paired with the line it must carry.
+has "GH28 the flat layout's stub catalogue: the leg passes" "$o" "rc=0"
+has "GH28 ...printing the checker's SKIP line" "$o" "by-design parity: SKIP"
+BD="$LAY/bydesign"; build_layout "$BD" scripts/$WFK scripts/$UNK scripts/gotchas.py
+cp "$ROOT/$MT_KIT_DIR/gotchas.py" "$ROOT/$MT_KIT_DIR/tree_lib.py" "$BD/scripts/"
+( cd "$BD" && git add -A ) && run_layout "$BD" scripts/$WFK --render >/dev/null
+o=$(run_layout "$BD" scripts/$WFK)
+has "GH28 a copy of the real catalogue: the leg passes" "$o" "rc=0"
+has "GH28 ...printing the checker's agreement line" "$o" "by-design parity: agreement"
+sed -i 's/^BY_DESIGN_HEAD = "# by design/BY_DESIGN_HEAD = "# by-design/' "$BD/scripts/gotchas.py"
+( cd "$BD" && git -c core.hooksPath=.git/no-hooks commit -qam "the head reworded" )
+o=$(run_layout "$BD" scripts/$WFK)
+has "GH28 the head reworded and committed: the leg reds with DRIFT" "$o" "by-design parity: DRIFT"
+has "GH28 ...at exit 1" "$o" "rc=1"
+o=$("$_rkd_py" "$HERE/check_by_design_parity.py" --selftest 2>&1; echo "rc=$?")
+has "GH28 the checker's --selftest passes every arm it declares" "$o" "rc=0"
 
 # ---- AC6: the two NEGATIVE CONTROLS.
 # The harness spelled for THIS repo's install, which is what apply shipped before this unit. The
@@ -2098,7 +2124,11 @@ fi
 # the unit's parent and 541 after — the listing row split in two (+1), the record lost at step 1 (4), the
 # record lost after step 4 with its cleanup and re-run (5) and the foreign deletion (2). All of them sit
 # on the path a green run takes.
-FLOOR_ASSERTIONS=399
+# RAISED 399 -> 407 by TOOL-aGraftedHelix-28: its 8 static sites, counted with the grep above as 541 at
+# the unit's parent and 549 after — the review-only layout's skip line (1), the stub catalogue's SKIP
+# (2), the real catalogue's agreement (2), the reworded head's DRIFT (2) and the checker's --selftest
+# (1). All of them sit on the path a green run takes.
+FLOOR_ASSERTIONS=407
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; st=1; }
 # NOTHING RUNS AFTER THE TERMINAL EXIT (TOOL-dUnstalledConvoy-19): the floor cannot see an arm
 # appended past `exit $st`, and neither can check-arms.py or the summary line. One grep can. The

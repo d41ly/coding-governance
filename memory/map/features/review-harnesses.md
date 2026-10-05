@@ -117,6 +117,14 @@ unless they reproduce their own stated confirmed count. `--corpus` lists the rep
 ONE `git cat-file` for the whole walk. Its `--selftest` is the held leg `review-replay selftest`,
 declared in this kit's `kit.toml` because the tool ships, unlike the `*.test.sh` suites beside it.
 
+**`check_by_design_parity.py` holds the by-design head across two kits** (`TOOL-aGraftedHelix-28`).
+The memory-tree kit's `gotchas.py` prints the head through `render_by_design`, and
+`tier2-review.template.js` finds it with `BY_DESIGN_HEAD`; a rewording in either makes the harness
+log `none supplied`, which reads as "no invariant touched". The checker calls the renderer and runs
+the pattern in `node`, so it compares behaviour, never text. It rides `check-protocol-parity.test.sh`
+in check mode over the memory-tree directory that leg already resolves, so no new leg exists and the
+sibling kit stays a derived path. Its `--selftest` runs from the build-harness suite, not the bar.
+
 ## Gaps
 
 - **The pipeline is still implemented three times, and since `aSightedSkeptic` the three no longer

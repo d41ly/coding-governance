@@ -733,6 +733,11 @@
       "file": "tools/memory-recall/test_recall_floor.py"
     },
     {
+      "id": "build_fixture",
+      "kind": "function",
+      "file": "tools/workflows/check_by_design_parity.py"
+    },
+    {
       "id": "build_forbidden",
       "kind": "function",
       "file": "tools/runlog/record.py"
@@ -1851,6 +1856,11 @@
       "id": "check_packing",
       "kind": "function",
       "file": "tools/run-gates/profile_bar.py"
+    },
+    {
+      "id": "check_parity",
+      "kind": "function",
+      "file": "tools/workflows/check_by_design_parity.py"
     },
     {
       "id": "check_pass",
@@ -4068,6 +4078,11 @@
       "file": "tools/memory-tree/corpus_ids.py"
     },
     {
+      "id": "load_checker",
+      "kind": "function",
+      "file": "tools/workflows/check_by_design_parity.py"
+    },
+    {
       "id": "load_conf",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
@@ -4526,6 +4541,11 @@
       "id": "main",
       "kind": "function",
       "file": "tools/unattended/stop-guard.js"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/workflows/check_by_design_parity.py"
     },
     {
       "id": "main",
@@ -5236,6 +5256,11 @@
       "id": "print_unattributed",
       "kind": "function",
       "file": "tools/run-gates/check-receipt.py"
+    },
+    {
+      "id": "print_verdict",
+      "kind": "function",
+      "file": "tools/workflows/check_by_design_parity.py"
     },
     {
       "id": "print_verdicts",
@@ -6858,6 +6883,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "render_heads",
+      "kind": "function",
+      "file": "tools/workflows/check_by_design_parity.py"
+    },
+    {
       "id": "render_id_run",
       "kind": "function",
       "file": "tools/runlog/record.py"
@@ -8083,6 +8113,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "run_pattern",
+      "kind": "function",
+      "file": "tools/workflows/check_by_design_parity.py"
+    },
+    {
       "id": "run_plan",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
@@ -8136,6 +8171,11 @@
       "id": "run_selftest",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "run_selftest",
+      "kind": "function",
+      "file": "tools/workflows/check_by_design_parity.py"
     },
     {
       "id": "run_selftest",
