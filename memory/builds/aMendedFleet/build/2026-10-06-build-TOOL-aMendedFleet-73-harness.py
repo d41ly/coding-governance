@@ -282,7 +282,7 @@ def cmd_tokens(a):
         if src != "workflow":
             continue
         if file_no not in tag_of and rec.get("type") == "user":
-            m = TAG_RE.match(read_first_text(rec).lstrip())
+            m = TAG_RE.search(read_first_text(rec))  # the Workflow harness prefixes a preamble to every prompt
             tag_of[file_no] = m.group(1) if m else None
         msg = rec.get("message") if isinstance(rec.get("message"), dict) else {}
         use = msg.get("usage")

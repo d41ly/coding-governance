@@ -1,14 +1,18 @@
 # TOOL-aMendedFleet-73 — the vague-brief trial arm: a full spec against a short plan, on a three-sentence brief
 
-**Status:** INPROGRESS · rev-2 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 73
+**Status:** CLOSED · rev-3 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 73
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-04-build-TOOL-aMendedFleet-73-1-acceptance-ledger.md](../build/2026-10-04-build-TOOL-aMendedFleet-73-1-acceptance-ledger.md) | journal | — |
 | [2026-10-06-build-TOOL-aMendedFleet-73-brief.md](../build/2026-10-06-build-TOOL-aMendedFleet-73-brief.md) | journal | — |
+| [2026-10-06-build-TOOL-aMendedFleet-73-freeze.tsv](../build/2026-10-06-build-TOOL-aMendedFleet-73-freeze.tsv) | journal | — |
 | [2026-10-06-build-TOOL-aMendedFleet-73-harness.py](../build/2026-10-06-build-TOOL-aMendedFleet-73-harness.py) | journal | — |
 | [2026-10-06-build-TOOL-aMendedFleet-73-hidden-suite.py](../build/2026-10-06-build-TOOL-aMendedFleet-73-hidden-suite.py) | journal | — |
+| [2026-10-06-build-TOOL-aMendedFleet-73-results.tsv](../build/2026-10-06-build-TOOL-aMendedFleet-73-results.tsv) | journal | — |
+| [2026-10-06-build-TOOL-aMendedFleet-73-trial-report.md](../build/2026-10-06-build-TOOL-aMendedFleet-73-trial-report.md) | journal | — |
 | [2026-10-06-build-TOOL-aMendedFleet-73-trial.js](../build/2026-10-06-build-TOOL-aMendedFleet-73-trial.js) | journal | — |
 
 <!-- /gen:spec-records -->
@@ -243,15 +247,18 @@ UNVERIFIED for a vaguer brief. Concurrency never exceeds five.
   0.
   Red when: the script fails to parse, or the hook denies its fan-out.
 - **AC5** — When stages 4 and 5 have run, the planted stub's decision-met rate printed by `aggregate`
-  is at most 0.25.
+  is at most 0.25; when the workflow stopped at AC3's headroom guard, stages 4 and 5 did not run and
+  the trial report says so.
   Red when: the stub scores higher, which means the probes cannot tell a tool from nothing.
 - **AC6** — When `aggregate` runs from a fresh `git clone --local` of the unit's tip, with no
   `%TEMP%` state, it prints the record's results table byte-identical, the exact p over 252 splits and
-  one of the four verdict words.
+  one of the four verdict words; after a headroom stop it holds no score row and exits as a DEAD
+  PROBE, and the committed rows file carries the pilot's grading rows the report quotes.
   Red when: a figure needs a file outside the repository, or the record and the rows disagree.
   cost: seconds; the arms themselves are the main loop's, at the estimate in §4.
-- **AC7** — When the `tokens` verb runs over the workflow's session tree, it reports 0 untagged agents
-  and a per-cell output-token sum for all ten cells and the pilot.
+- **AC7** — When the `tokens` verb runs over the workflow's session tree, it reports a per-tag
+  output-token sum for every agent the trial spawned, and 0 untagged agents when the trial ran in a
+  session of its own; in a shared session the other workflows' agents count as untagged.
   Red when: an agent's usage joins no tag.
 - **AC8** — When `git log --format=%s` lists this build's commits naming the unit, the commit adding
   the harness, the suite and the workflow precedes the commit adding the result rows, and the spec
@@ -302,6 +309,12 @@ New arm: none · the instruments carry their own liveness controls (AC2, AC3, AC
   cell built a tool, so `cells --blind` and `aggregate --collect` carry the salted names and the
   unblinding inside the six verbs; and a Workflow script runs no command, so two runner agents run
   the grading verbs, which moves the agent estimate from 26 to 27.
+- rev-3 · 2026-10-06 · AC5 · AC6 · AC7 · the main loop ran the trial once and it stopped at the
+  pilot: intent 10 of 10, above the 0.8 guard, after three agents. AC5 and AC6 gain the stop's
+  branch, since stages 4 and 5 never ran. AC7 read every agent as untagged because the Workflow
+  harness prefixes a preamble to each prompt, so the `tokens` verb now searches for the tag instead
+  of matching it at the start; and the verb reads the whole session tree, so 0 untagged holds only
+  for a trial run in a session of its own. The unit closes on the stop.
 
 ## 10. Reuse audit
 

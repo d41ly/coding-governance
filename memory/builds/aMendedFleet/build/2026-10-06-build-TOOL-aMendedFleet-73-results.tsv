@@ -1,0 +1,9 @@
+# **Serves:** journal TOOL-aMendedFleet-73
+# kind	cell	key	value
+hidden	pilot	contract_pass	5
+hidden	pilot	contract_total	15
+hidden	pilot	intent_pass	10
+hidden	pilot	intent_total	10
+tokens	pilot	out	6676
+tokens	runner-pilot	out	386
+tokens	verifier	out	2269
