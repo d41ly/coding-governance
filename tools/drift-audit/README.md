@@ -158,7 +158,9 @@ An unattended run's record can keep saying `LANDING` or `BUILDING` after its wor
 branch, so "did it land?" cannot be answered from the record. The signal reads every tracked
 `RUN.md`, and every rotated `RUN.<phase>.<blob8>.md`, **at HEAD and never in the working tree**. It
 counts a record whose phase is not terminal, whose witness is an ancestor of the base ref, and whose
-witness is neither equal to nor behind the record's own `base:`. It reports and never gates, because
+witness is neither equal to nor behind the record's own `base:`. A `LANDING` record whose landing
+commit, the newest commit at HEAD that changed it, is on the base ref reads **derived LANDED** and is
+neither counted nor unjudgeable; the detail's summary line counts those. It reports and never gates, because
 a sanctioned worktree landing raises the count through nobody's fault.
 
 A witness at or behind its base is **unjudgeable**, not clean. The witness is HEAD at the last verb

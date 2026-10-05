@@ -2979,7 +2979,8 @@ def test_nonterminal_merged_runs(tmp: pathlib.Path) -> None:
           blind["live"] is False and blind["value"] == 0 and "rev-list" in str(blind["detail"]),
           f"{blind}")
 
-    # ---- AC4, three git calls for five records and for fifty. A separate minimal repo, so the count
+    # ---- AC4, three git calls for five records and for fifty, four once LANDING records exist. A
+    # separate minimal repo, so the count
     # is over a population the arm sets rather than over whatever the fixture above accumulated.
     small = tmp / "runcalls"
     small.mkdir()
