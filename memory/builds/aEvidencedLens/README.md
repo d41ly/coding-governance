@@ -93,9 +93,9 @@ ids TOOL-aEvidencedLens-14
 | [TOOL-aEvidencedLens-11 — the method, the memory-tree README, the Skill, the verbs entry and a decision record state what units 1 to 9 built](spec/2026-10-05-spec-TOOL-aEvidencedLens-11.md) | 8 | 1 | SPECCED | rev-2 | 2026-10-05 |
 <!-- /gen:build-units -->
 
-Records: 14 bound to this build, across 3 record folder(s).
+Records: 17 bound to this build, across 3 record folder(s).
 
-Ids no record names: TOOL-aEvidencedLens-12 TOOL-aEvidencedLens-13 TOOL-aEvidencedLens-14.
+Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: TOOL-aEvidencedLens-12 TOOL-aEvidencedLens-13 TOOL-aEvidencedLens-14.
 <!-- /gen:build-index -->
