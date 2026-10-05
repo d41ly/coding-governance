@@ -98,3 +98,7 @@ base: 3640cf580d9df31e5cbe74be89024dd5a40e9f85
 2026-10-05T01:25:22Z dispatch · item 97bd051c TOOL-aEvidencedLens-7 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/runlog-writer.test.sh memory/builds/aEvidencedLens/spec/2026-10-05-spec-TOOL-aEvidencedLens-7.md memory/builds/aEvidencedLens/README.md
 
 2026-10-05T01:25:26Z brief · item TOOL-aEvidencedLens-7 · reason bcc3df631758 memory/builds/aEvidencedLens/prompts/2026-10-05-prompt-TOOL-aEvidencedLens-7-2-build-brief.md
+
+2026-10-05T01:42:11Z dispatch · item 694b7b63 TOOL-aEvidencedLens-9 · reason tools/unattended/check-unattended.sh tools/unattended/check-unattended.test.sh memory/builds/aEvidencedLens/spec/2026-10-05-spec-TOOL-aEvidencedLens-9.md memory/builds/aEvidencedLens/README.md
+
+2026-10-05T01:42:14Z brief · item TOOL-aEvidencedLens-9 · reason eb9e746f784d memory/builds/aEvidencedLens/prompts/2026-10-05-prompt-TOOL-aEvidencedLens-9-2-build-brief.md
