@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-26 — a failed `prior-session` add or `write_lease` fact fails the call through check 17, and both of the add's triggers reach one guarded call site, each observed
 
-**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-2 · base 5266d22e · streams tooling · order 8
+**Status:** SPECCED · rev-3 · 2026-10-05 · node a · Tier-2 · base 5266d22e · streams tooling · order 8
 
 <!-- gen:spec-records -->
 
@@ -24,7 +24,7 @@ three HIGH findings, which are two defects.
 - Finding 6: unit 24 S1 gives the add two triggers, a CAS that did not complete and a claim that
   could not be read, and unit 25 AC1 drives only the first. A build that guards only the CAS path's
   add passes it, and on an unreachable remote with a failed add runs `write_lease`, so the next
-  `s2` call answers check 90 and the run is forced to `--abort --code claim-lost`.
+  `s2` call answers check 108 and the run is forced to `--abort --code claim-lost`.
 
 This unit makes a failed add and a failed `write_lease` fact each set the exit through check 17,
 gives the add one call site for both triggers, pins that the row pushes no claim it could not read,
@@ -46,8 +46,13 @@ of the round-1 spec audit of unit 25.
     `--resume` reads the process exit, which a failed add now makes 1 where unit 25's build leaves
     0, and stdout, which now carries the check-17 line. A `--resume` that refuses already exits 1
     through `fail` on its other paths, so the value is not a new one to those callers.
-- **S2** — Each `set_fact` line in `write_lease` (`:5559` to `:5569`) is written
-  `|| { fail 17 "cannot record the lease: <fact> in $rel"; return 1; }`, naming its own fact. A
+- **S2** — The six `set_fact` lines in `write_lease` (`:5559` to `:5569`) become ONE `set_fact`
+  in a loop over the six facts in their written order, `keepalive session pid host pid-image
+  lease-utc`, each value computed in its arm exactly as before, the two probes included, and that
+  one line is written `|| { fail 17 "cannot record the lease: $k in $rel"; return 1; }`, naming the
+  fact through the loop's variable. One guarded site, for S3's reason: a seventh lease fact cannot
+  skip the guard, and the harness-arms leg keys every `fail` call site by its literal text, so six
+  literal fact names would be six branches of which §6 drives one. A
   failed lease fact then exits 1 at every caller, each of which returns on it already with no
   `fail` of its own: `--preflight` (`:5324`), `run_takeover` (`:6356`), the LANDING re-bind
   (`:6532`), the holder row (`:6599`) and `--replaces` (`:6658`). This makes unit 24 AC1's exit
@@ -58,15 +63,20 @@ of the round-1 spec audit of unit 25.
     on `set_fact`'s three earlier refusals.
 - **S3** — Both of the add's triggers reach ONE `set_fact` call site, the one S1 guards. The value
   it writes is computed per trigger as unit 23 S2 states; the write is one line. This supersedes
-  any per-trigger add site a build of units 23 to 25 made. Observed by AC1 and AC3, one leg per
+  any per-trigger add site a build of units 23 to 25 made. It already stands at this unit's
+  start: the add is one `set_fact` under `cas != 0`, which both triggers take, because a claim
+  that could not be read leaves `cw` empty, so no CAS runs and `cas` stays empty. No driver byte
+  moves for S3. Observed by AC1 and AC3, one leg per
   trigger. The single site itself is NOT OBSERVED as a count by a criterion here: the clear writes
   the same fact, so a count of call sites cannot tell an add from a clear, and each trigger's leg
   observes the return that trigger takes, which is what the single site is for.
 - **S4** — On a holder-row call whose claim read did not answer, the row pushes no claim. A
   `write_claim` CAS leases against the sha the read observed (unit 1 S3), and a read that did not
   answer observed none; an empty expected sha asserts a create, which a remote that answers the
-  push but not the fetch reports as lost, and the holder row answers a lost race with check 90 on a
-  claim this run holds. This narrows unit 20 S1's CAS to a call whose claim read answered. Observed
+  push but not the fetch reports as lost, and the holder row answers a lost race with check 108 on a
+  claim this run holds. This narrows unit 20 S1's CAS to a call whose claim read answered. It
+  already stands at this unit's start: the holder row's CAS runs only under `[ -n "$cw" ]`, and
+  `cw` is set only when `read_claims` answered. No driver byte moves for S4. Observed
   by AC3.
 - **S5** — `tools/unattended/unattended.test.sh` gains the arms §7 names. NOT OBSERVED by a
   criterion here: the suite is the main loop's to run at VERIFYING, and each arm's red on its
@@ -115,8 +125,8 @@ of the round-1 spec audit of unit 25.
 - The rotation copy at `:5095` to `:5098` and the `gates-run` write at `:7662` tolerate a failed
   `set_fact`, so the `fail` belongs at the protecting callers and not inside `set_fact`.
 - Unit 1 S3: `write_claim` pushes `--force-with-lease=refs/gov/runs/<slug>:<observed sha>`, with an
-  empty expected sha for a create. Unit 1 S8: `--close` refuses with check 91 when the claim cannot be
-  read, before any write. Unit 1 §5: a remote that does not answer is check 91 or an announcement,
+  empty expected sha for a create. Unit 1 S8: `--close` refuses with check 109 when the claim cannot be
+  read, before any write. Unit 1 §5: a remote that does not answer is check 109 or an announcement,
   never an empty list.
 
 ### The rule
@@ -150,7 +160,7 @@ exit those criteria dropped, as exactly 1, with its line.
 ### Inventory
 
 No new fact, function, check, conf key or file. Two `fail 17` messages are added, at the add and in
-`write_lease`. No lexicon cell and no codebase-map key is minted.
+`write_lease`'s one guarded write. No lexicon cell and no codebase-map key is minted.
 
 ### Files touched (estimate)
 
@@ -169,11 +179,15 @@ No new fact, function, check, conf key or file. Two `fail 17` messages are added
   function the same way, and the lease is one function, so the `fail` goes where they all route.
 - **One guarded add site per trigger.** It is one edit away from an unguarded one; a single site
   makes the per-trigger split impossible rather than merely detected.
+- **Six literal guards in `write_lease`, one per fact.** Each is a `fail` branch with its own
+  literal text, and §6 fails one fact, so five branches stand unarmed: the harness-arms leg reds
+  them, and a pin row for code this unit writes is a waiver of its own criterion. A seventh fact is
+  one edit away from an unguarded line, the add's argument above.
 - **Key the unreachable leg's marker on the failed fetch and leave the push unpinned.** If the row
   attempted a CAS there, the once-only shim would spend itself on the CAS's temporary file, the add
   would write `s1`, and the leg would red on a correct build.
 - **Attempt the CAS on an unreadable claim.** S4: it has no observed sha to lease against, and an
-  empty one turns a fetch-only outage into check 90.
+  empty one turns a fetch-only outage into check 108.
 - **A line-scan gate for a `return` with no `fail`.** Over `verb_resume` at base it hits ten lines,
   most of them callees that call `fail` themselves, so the predicate needs callee knowledge: a gate
   of its own, under the method's one-mechanism rule.
@@ -221,7 +235,7 @@ driver's `fact` over the run-state file.
   `UNATTENDED check 17 FAILED — cannot record a run fact: prior-session in`, and leaves
   `session: s1`, `fact` printing nothing for `prior-session`, and `lease-utc` at its pre-call value,
   and the shim's log names no `push` for that call. A second `s2` call with the remote restored and
-  the `mktemp` shim removed exits 0, prints no `UNATTENDED check 90 FAILED`, leaves a claim naming
+  the `mktemp` shim removed exits 0, prints no `UNATTENDED check 108 FAILED`, leaves a claim naming
   `session: s2`, leaves `fact` printing nothing for `prior-session`, and leaves
   `git diff --name-only` naming no run-state file.
   Red when: the unreadable trigger reaches an add whose failure does not stop the row, so
@@ -238,9 +252,9 @@ driver's `fact` over the run-state file.
 
 New arm: tools/unattended/unattended.test.sh · unit 25's 124 leg asserting exit 1 and the check-17 line naming prior-session; stage the add's fail 17 removed with its return 1 kept, observed red by the exit · the suite's floor rises by its new arm count
 
-New arm: tools/unattended/unattended.test.sh · unit 24's first leg and unreachable leg asserting exit 1 and the check-17 lease line; stage the fail 17 removed from the write_lease fact line the shim fails with its return 1 kept, observed red by the exit · the suite's floor rises by its new arm count
+New arm: tools/unattended/unattended.test.sh · unit 24's first leg and unreachable leg asserting exit 1 and the check-17 lease line; stage the fail 17 removed from write_lease's one guarded write with its return 1 kept, observed red by the exit · the suite's floor rises by its new arm count
 
-New arm: tools/unattended/unattended.test.sh · an s2 holder call with the remote unreachable whose add a mktemp shim keyed on the failed claim fetch fails, asserting exit 1, the check-17 prior-session line, session s1, an empty set and no claim push in the git shim's log, then a restored s2 call with no check 90; stage the unreadable path rerouted to a second add whose set_fact carries no guard, and separately that path routed into a CAS with an empty expected sha, each observed red through this leg · the suite's floor rises by its new arm count
+New arm: tools/unattended/unattended.test.sh · an s2 holder call with the remote unreachable whose add a mktemp shim keyed on the failed claim fetch fails, asserting exit 1, the check-17 prior-session line, session s1, an empty set and no claim push in the git shim's log, then a restored s2 call with no check 108; stage the unreadable path rerouted to a second add whose set_fact carries no guard, and separately that path routed into a CAS with an empty expected sha, each observed red through this leg · the suite's floor rises by its new arm count
 
 The unattended suites are not on the bar (`tools/unattended/README.md`). A pass runs its criteria
 directly, and the main loop runs the suite once at VERIFYING.
@@ -260,6 +274,15 @@ none
   `two-answers-to-one-question`. §5 perf no longer says S4 saves a push, which presumed a build that
   pushes on an unreadable claim; it says what S4 spends. Unit 23's sequence-d arm, which said
   "two unreachable pushes", is corrected in its own spec.
+- rev-3 · 2026-10-05 · §1 §2 §4 §7 · S2 S3 S4 · the build pass's divergences, before the code. The
+  claim refusals were renumbered before the reconciling merge at `909c5e0b`, because main's own
+  driver already uses 89 to 106: check 90 reads as check 108 and check 91 as check 109 throughout.
+  S2's six guarded lines become one guarded write in a loop over the same facts in the same order,
+  because the harness-arms leg keys a `fail` branch by its literal text and §6 fails one fact; the
+  message a caller reads is unchanged. S3 and S4 already stand in the driver at this unit's start
+  (the add's single site under `cas != 0`, the CAS under `[ -n "$cw" ]`), so they move no byte and
+  AC3 observes them. The `:<line>` citations in §1 to §4 are the driver at base `5266d22e`; the
+  driver has moved since, and each names the same statement.
 
 ## 10. Reuse audit
 
