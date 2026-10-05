@@ -122,6 +122,7 @@ sed -e 's/^ANCHOR_SCOPE=.*/ANCHOR_SCOPE="published"/' -e 's|^GATE_CMD=.*|GATE_CM
     -e 's|^WIRING_CHECK=.*|WIRING_CHECK="true"|' -e 's|^KICKOFF_ENGINE=.*|KICKOFF_ENGINE=""|' \
     -e 's|^SPEC_TOKENS_CLI=.*|SPEC_TOKENS_CLI=""|' \
     -e 's/^LANDER_MODE=.*/LANDER_MODE="primary"/' -e 's|^GATE_PROFILE_CMD=.*|GATE_PROFILE_CMD=""|' \
+    -e 's|^UNDECLARED_WRITE_BUDGET=.*|UNDECLARED_WRITE_BUDGET="0"|' \
     "$(git -C "$HERE" rev-parse --show-toplevel)/.unattended.conf" > .unattended.conf
 git add -A >/dev/null && git commit -q -m base --no-verify
 git remote add origin ../origin.git && git push -q origin main

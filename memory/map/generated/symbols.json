@@ -528,6 +528,11 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "build_aborted_work_landed",
+      "kind": "function",
+      "file": "tools/drift-audit/drift_report.py"
+    },
+    {
       "id": "build_aggregate",
       "kind": "function",
       "file": "tools/runlog/record.py"
@@ -681,6 +686,11 @@
       "id": "build_diff_lines",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "build_discarded_work_landed",
+      "kind": "function",
+      "file": "tools/drift-audit/drift_report.py"
     },
     {
       "id": "build_discovered_fixture",
@@ -2141,6 +2151,11 @@
       "id": "check_window_invariant",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "check_work_landed",
+      "kind": "function",
+      "file": "tools/drift-audit/drift_report.py"
     },
     {
       "id": "check_worksheets_fresh",
@@ -4568,6 +4583,11 @@
       "file": "tools/runlog/model.py"
     },
     {
+      "id": "measure_fleet_over_budget",
+      "kind": "function",
+      "file": "tools/drift-audit/drift_report.py"
+    },
+    {
       "id": "measure_git_calls",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -4876,6 +4896,11 @@
       "id": "parse_conf_line",
       "kind": "function",
       "file": "tools/memory-tree/tree_lib.py"
+    },
+    {
+      "id": "parse_conf_text",
+      "kind": "function",
+      "file": "tools/drift-audit/drift_report.py"
     },
     {
       "id": "parse_cpu_clock",
@@ -5403,6 +5428,11 @@
       "file": "tools/unattended/gate-guard.js"
     },
     {
+      "id": "read_aborted_verdicts",
+      "kind": "function",
+      "file": "tools/drift-audit/drift_report.py"
+    },
+    {
       "id": "read_agree_field",
       "kind": "function",
       "file": "tools/lexicon/selftest.py"
@@ -5671,6 +5701,11 @@
       "id": "read_filed_days",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "read_first_commit_date",
+      "kind": "function",
+      "file": "tools/drift-audit/drift_report.py"
     },
     {
       "id": "read_fixture",
@@ -6813,6 +6848,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "render_live_blockers",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "render_liveness",
       "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"
@@ -7221,6 +7261,11 @@
       "id": "resolve_bash",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "resolve_bash_shell",
+      "kind": "function",
+      "file": "tools/drift-audit/selftest.py"
     },
     {
       "id": "resolve_cache_dir",
@@ -8723,6 +8768,11 @@
       "file": "tools/process-monitor/selftest.py"
     },
     {
+      "id": "test_aborted_work_landed",
+      "kind": "function",
+      "file": "tools/drift-audit/selftest.py"
+    },
+    {
       "id": "test_absent_fixture_reds",
       "kind": "function",
       "file": "tools/memory-recall/test_recall_floor.py"
@@ -9311,6 +9361,11 @@
       "id": "test_fan_in_subtracts_every_definer",
       "kind": "function",
       "file": "tools/codebase-map/selftest.py"
+    },
+    {
+      "id": "test_fleet_over_budget",
+      "kind": "function",
+      "file": "tools/drift-audit/selftest.py"
     },
     {
       "id": "test_floor_reds_alone",
@@ -10516,6 +10571,11 @@
       "id": "test_window_ac1_ac4_git_only_bounds",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "test_work_landed_matches_the_driver",
+      "kind": "function",
+      "file": "tools/drift-audit/selftest.py"
     },
     {
       "id": "test_worker_survives_post_to_closed_loop_and_connection_stays_usable",

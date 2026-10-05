@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.70 -->
+<!-- gov:kit unattended@1.71 -->
 # The unattended stop contract — HELD, the hold codes and the lease
 
 *Installed beside `UNATTENDED-PROTOCOL.md` from the unattended kit and byte-compared against the
@@ -30,20 +30,32 @@ Three consequences, and each of them is a refusal in the driver rather than a co
   none of them — a pause nothing can evaluate and `--resume` cannot release.
 - `--preflight` over a HELD record refuses, naming `--resume`. The re-preflight the protocol
   sanctions after a compaction is for a run that is WORKING; a paused one has a release condition to
-  test, an authorization to re-verify and a lease to take.
+  test, an authorization to re-verify and a lease to take. The one exception is a hand-off its owner
+  landed: it derives `LANDED (attended)` (§12), so `--preflight` retires it rather than refusing.
 
-Only `--landed` and `--abort` still write a terminal, and both go through the working phase a resume
-returns the run to. A `LANDING` record the remote carries reads `LANDED` without either, and the next
-`--preflight` of its slug writes that before it retires the record (§12).
+`--landed`, `--abort` and `--settle` write a terminal. The first two go through the working phase a
+resume returns the run to; `--settle` writes one only over a hand-off its owner landed (§12). A
+`LANDING` record the remote carries reads `LANDED` without any of them, and the next `--preflight` of
+its slug writes that before it retires the record (§12).
 
 ## 2. The codes
 
 Kit-owned core, extended by `HOLD_CODES_EXTRA` and pinned shrink-only by `HOLD_FLOOR`:
 
-`host-degraded` · `platform-limit` · `platform-unavailable` · `host-owner-action` · `inherited-red`
+`host-degraded` · `platform-limit` · `platform-unavailable` · `host-owner-action` · `inherited-red` ·
+`owner-landing` · `owner-decision`
 
 These are a SECOND vocabulary beside the halt codes and never an extension of them. A halt code ends
 a run and a hold code pauses one, and a single list would let a pause be recorded as an ending.
+
+**`owner-landing` and `owner-decision` are the HAND-OFF codes, and `--handoff` is their only
+producer.** A run whose work is sound and which an owner must land, or decide first, ends HELD under
+one of them rather than `ABORTED`, which from `HANDOFF_CUTOFF` means DISCARD. `owner-landing` says
+only the landing remains; `owner-decision` says a parked decision stands first. `--handoff` writes
+the landing recipe as a `handoff` row in the parked region, `units-at-landing`, and
+`asks-at-landing` wherever the freeze is non-empty, and prints the recipe after its HELD line. A
+`--hold` naming either code is refused, because a hold written without the guard, the recipe and the
+facts is a hand-off nothing can land or settle.
 
 ## 3. The release conditions
 
@@ -86,6 +98,19 @@ that is not what the tree holds — and the take-over would re-verify a mandate 
 5. Under `ANCHOR_SCOPE=published`, the branch tip must be on its remote.
 6. An optional `--pending-run <runId>` must be 1 to 64 letters, digits, `_` and `-`. It becomes a fact
    and a checkpoint line, and a separator or a newline inside it would forge a second of either.
+7. The code may not be a hand-off code; `--handoff` writes those.
+
+`--handoff` routes through these same refusals with the condition fixed at `owner`, and adds three
+of its own, each before any write:
+
+- **The attribution guard, on `owner-landing`.** The bar the record's `gates-run` fact names must
+  read GREEN, on a clean tree that did not move, at HEAD or at a commit differing from HEAD in the
+  run-state file alone; otherwise every red leg must read INHERITED, the refusal an override of
+  `gates-green` meets at `--close`. An OWN red is the run's to fix, or to hand off as
+  `owner-decision`.
+- **A parked decision, under `owner-decision`.** The row is the question the owner is handed.
+- **The landing facts and the recipe.** A freeze that cannot be derived refuses, and so does a
+  recipe naming no lander or no branch.
 
 ### The unpublished-tip exception
 
@@ -219,7 +244,9 @@ renews a `LIVE` run's claim through `--beat`, which writes only the none and `mi
 
 | Record | Caller and clock | `--resume` |
 |---|---|---|
+| carrying `abandoned` | any, ahead of the `--scheduled` refusals | refuses 106, writing nothing, naming `--preflight`, which retires the record to its archive and starts the next run on a fresh one under the id it is handed |
 | recorded terminal | any | nothing to resume; with an id, check 26 |
+| HELD under a hand-off code, derived `LANDED (attended)` | any | nothing to resume, naming `--settle`; writes nothing, never the take-over or the re-bind |
 | LANDING derived LANDED, not observed | an id, on a branch where that landing's `--landed` does not run, the record naming a branch fact | nothing to resume, naming the record's run branch; writes nothing |
 | LANDING derived LANDED, not observed | an id | RE-BIND: `write_lease`, staged, never committed, whatever the clock or session; a record naming neither branch fact re-binds anywhere, announced as not scoped |
 | LANDING derived LANDED, not observed | no id | nothing to resume |
@@ -323,6 +350,10 @@ available.
 *A run that ends HELD used to resume only when somebody typed `--resume`, so a usage limit that
 resets at 03:00 cost the whole night. This section is the contract for the restart `--hold` files
 instead. The protocol's section 5 points here and states none of it.*
+
+A hand-off owes no durable restart. `--handoff` holds with the condition `owner`, so its
+`resume-owed` reads `none · owner` and nothing is filed: the way out is the owner's landing or
+decision, never a scheduled resume.
 
 ### The five keys
 
@@ -451,8 +482,43 @@ verb, `--resume`, `--audit` and `--preflight`'s rotation test derive; so do the 
 exclusion, its fact-set arm and its cross-run grant arm. The committed live index does NOT: it is
 freshness-gated, and the remote tip moves while the index does not. `--landed`'s own guard reads the
 RECORDED phase, because its postcondition is the terminal. The remote is observed only for a
-`LANDING` record, quietly; an unanswered remote, or a tip this clone lacks, leaves `LANDING` and
-`--status` prints the reason.
+`LANDING` record or a HELD one under a hand-off code, quietly; an unanswered remote, or a tip this
+clone lacks, leaves the recorded phase and `--status` prints the reason for a `LANDING`.
+
+**A hand-off its owner landed reads `LANDED (attended)`.** A HELD record under `owner-landing` or
+`owner-decision` whose own commit — found by the same content rule, HEAD's copy reading HELD under a
+hand-off code — is on the advertised tip derives `LANDED` everywhere a reader derives, and `--status`
+prints `LANDED (attended)`. The hand-off commit is the run's last act on its branch, so a landing that
+carries it carries the work. A HELD record under any other code never derives and never observes the
+remote: a paused run whose branch somebody merged was not handed off, and a terminal derived under a
+live lease would end it through check 26. `--liveness` takes no network: it tests the same commit
+against the ref its `finished-unstamped` test resolves, and reads `terminal`. `--resume` writes
+nothing and names `--settle`; `--preflight` retires it, its copy gaining `landed-by: attended`.
+
+**`--settle <slug>` writes what git proves.** Over a landed hand-off it writes `phase: LANDED`, the
+landing commit as `witness`, `landed-derived` and `landed-by: attended`. Over an `ABORTED` record
+first committed before `HANDOFF_CUTOFF` — a blank cutoff refuses every one — it writes one fact,
+`work-landed-at: <witness> <tip>`, the only write a terminal record admits. Over a working record
+whose `--liveness` verdict is `STALE` or `UNBOUND` it writes `work-landed-at` and `abandoned: <utc>`
+under the current phase; `--preflight`'s announcement and the leg's check 7 report exclude a record
+carrying `abandoned`, `--resume` refuses it (§8), and the next `--preflight` retires it to
+`RUN.<phase>.<blob8>.md`, so the settle evidence is archived and the next run starts fresh. It refuses, numbered and before any write, a HELD record under another code, a
+`LANDING` or `LANDED` record, a record differing from HEAD's copy beyond its lease lines, a live
+lease, an unanswered remote and an undecidable predicate; it STAGES the record and never commits,
+so the settle commit rides the next landing from that tree or a batched owner pass. A live `RUN.md`
+only: an archived record is immutable.
+
+**Where an `ABORTED` run's work went is decided by CONTENT, never by witness ancestry.** `--abort`
+commits the record on top of its witness, so every record read from the tip has its witness there.
+Landed is all three: the witness is not an ancestor of the record's `base` and `base..witness` holds a
+commit naming the slug in its subject or touching its build folder; every such commit is on the tip;
+and no commit on the tip's first-parent line since the witness carries `This reverts commit` naming
+one, or naming a merge that brought one onto the tip. A missing or unresolvable `base` is
+undecidable. `--settle` and check 15 ask the one library predicate. Check 15 grades `work-landed-at`
+at the tip it records: it reds one that does not name the witness, whose tip is not on the advertised
+tip, or whose work the predicate does not read landed there, and REPORTS a later revert, since no verb
+rewrites the record, and a tip whose line it cannot read as not re-judged, never as a revert. It reds one on an `ABORTED` record not predating `HANDOFF_CUTOFF`, and an
+`abandoned` standing without it.
 
 **Under `in-place`, `--landed` is an OBSERVATION.** It writes nothing to the tree, prints the
 derivation, and logs it, per landing commit, to `landed.<slug>.log` under the git common dir, so no
@@ -477,7 +543,8 @@ evidence and tests the commit it names against the advertised tip.
 
 **The fact-set arm, graded by `LANDER_MODE` from `LANDED_FACTS_CUTOFF`.** A recorded `LANDED` that
 `--landed` wrote carries `landed-anchor`, `units-at-landing` and `unpushed-at-landing`; a rotated
-derived one carries `units-at-landing` and `landed-derived`; under `in-place` a committed `LANDING`
+derived one carries `units-at-landing` and `landed-derived`; an `attended` one, carrying
+`landed-by: attended`, carries those and `landed-by`; under `in-place` a committed `LANDING`
 carries `units-at-landing`. Under `primary`, a committed `LANDING` the remote already carries is
 REPORTED naming `--landed` and never graded, since that is the verb that completes it. Each record is
 dated by its FIRST commit read with `--follow`, floored at a rotated folder's newest archive, so a
@@ -485,34 +552,45 @@ rotation does not re-date it. Blank turns the arm off, announced.
 
 ## 13. The inherited red — land, park, or absorb
 
-*`TOOL-dDerivedDocket-24`, by owner rulings D12-i4 and D12-i5. The hold code is §2's.*
+*`TOOL-dDerivedDocket-24`, by owner rulings D12-i4 and D12-i5; the age as an escalation and the kit
+default `land` by ruling `TOOL-dUnstuckLanding-22`, which supersedes that part of D12-i4. The hold
+code is §2's.*
 
 **The bar says whose a red is, and a policy says what happens next.** `gates-green` attributes a
 red against R, the tip `observe_anchor` saw the remote advertise, and ages each INHERITED leg against
 R's last `INHERITED_RED_MAX_AGE` first-parent landings: red with the same offenders at the far end
 is `aged`, and otherwise a bisection names the landing that introduced it. A probe that cannot
-answer reads `age unproven` and never counts toward the bound: a leg with no `signature` whose far
-end is red WITHOUT every non-blank line of this run's output is one, since text cannot tell a fixed
-offender from a moved count line; red carrying all of them is `aged`. The policy is the pair of
-keys in the file `GATE_POLICY_FILE` names, both read at R and parsed, never sourced. Blank or
-malformed reads `park`, and so does `land` with no positive bound; the item announces which.
+answer reads `age unproven` and is never escalated: a leg with no `signature` whose far end is red
+WITHOUT every non-blank line of this run's output is one, since text cannot tell a fixed offender
+from a moved count line; red carrying all of them is `aged`. **The age decides the escalation, never
+the landing.** The policy is the pair of keys in the file `GATE_POLICY_FILE` names, both read at R
+and parsed, never sourced. A blank `GATE_POLICY_FILE`, or a conf absent at R, reads the file the
+pre-push hook reads, `.githooks/gate-env.sh` at R, so the two readers cannot disagree. The kit
+default is `land`: that file absent too, a named policy file absent at R, and an absent or blank
+`INHERITED_RED` all read it, and `land` with no positive bound reads `land` with no bound. A value
+outside `park land` reads `park`. The item announces which.
 
-- **`land`, every red INHERITED within the bound, on a bar whose verdict reads `tree_moved no`:**
-  MET, and the record gains `gates-inherited: <R8> <legs>`. The pre-push hook reads the same policy
-  at the same R and lands the push, printing the legs. An attended push lands over it too.
-- **`park`, the kit default, or any inherited red aged:** UNMET, printing
+- **`land`, every red INHERITED at any age, on a bar whose verdict reads `tree_moved no`:** MET, and
+  the record gains `gates-inherited: <R8> <legs>`; the MET line names the legs read `aged`. The
+  pre-push hook reads the same policy at the same R and lands the push, printing the legs. An
+  attended push lands over it too.
+- **`park`, declared:** UNMET, printing
   `hold · inherited-red · until probe gate · <legs> red at <R8>, INHERITED; INHERITED_RED=<policy>`.
   Take that hold in this order: commit the staged records, push the branch, reap the keepalive, then
   `--hold` with that code, condition and reason and `--reaped`. It refuses a dirty tree otherwise.
 - **Any leg OWN, MIXED, DEAD PROBE or CONTENDED, or a moved tree:** UNMET with the attribution
   lines. That red is the run's, and so is every red on a bar whose diff edited its own grader (KF3).
 
-**Every inherited leg gets an owner on the record.** Once `ASKS_CMD` is declared, the item files one
-ask per INHERITED leg in the build's `BACKLOG.md`: a `seen` locator pinned at R with the leg's `run`
-command, an `accept` clause, a SEV HIGH row and a KEEP row, staged and read back through `ASKS_CMD`.
-Rows the generator does not read back as one OPEN ask are removed and named. An OPEN ask this build
-already filed for the same leg at the same R is reused and named, so a repeated hold files nothing
-twice. With `ASKS_CMD` blank the item prints the rows it would file and writes nothing.
+**Every inherited leg gets an owner on the record, and its age escalates it.** Once `ASKS_CMD` is
+declared, the item files one ask per INHERITED leg in the closing build's `BACKLOG.md`: a `seen`
+locator pinned at R with the leg's `run` command, an `accept` clause, a SEV HIGH row and a KEEP row,
+staged and read back through `ASKS_CMD`. An `aged` leg's ask is SEV BLOCKER instead, its text
+`inherited red: leg <leg> red at <R8>, older than the <n>-landing age bound`, and the memory tree's
+generated LIVE index lists every OPEN BLOCKER ask under `## Open BLOCKER asks`. Rows the generator
+does not read back as one OPEN ask of the SEV owed are removed and named. An OPEN ask this build
+already filed for the same leg at the same R, read back at the SEV owed, is reused and named, so a
+repeated close files nothing twice. With `ASKS_CMD` blank the item prints the rows it would file and
+writes nothing.
 
 **The two escape routes are backed or refused.** `--close --override gates-green` and
 `--abort --code gate-red-out-of-scope` are refused, numbered, unless the record the `gates-run` fact
@@ -574,3 +652,42 @@ ledger is removed — or KEPT, naming each live pid, while a recorded process is
 
 **What it cannot see**: a process the agent starts in its own shell, such as a suite at `VERIFYING`.
 The driver did not start it, so it is not recorded and never reaped here.
+
+## 15. The close-decision table
+
+*`TOOL-dUnstuckLanding-18`, by owner ruling `TOOL-dUnstuckLanding-23`, which supersedes D8 as
+`build-complete` applies it. The hand-off codes are §2's.*
+
+**At the close a park is never an abort.** A decision a run reaches at the close is recorded and
+then takes the exit this table names. The rows are CLOSED: each is one decision KIND the closing-time
+census found, with its exit and the record that exit writes.
+
+| Decision kind | Exit | Record |
+|---|---|---|
+| land a partial build | LAND, when `build-complete`'s carry-forward term meets; otherwise HAND OFF `owner-decision` | one `rescope · item defer` row per carried unit |
+| move a shrink-only pin | none owed: the kit's history legs grade only the run's own range, so they no longer ask it; a pin the run's own diff must move is HAND OFF `owner-decision` | the decision park row |
+| act on another run's record | no act: concurrent runs are permitted, and a landed record derives its terminal (§12) | none |
+| publish another session's commits | does not arise under `in-place`; under `primary`, HAND OFF `owner-landing` | the handoff row |
+| land in a dependency order across repositories | HAND OFF `owner-landing`, the recipe naming each repository in order | the handoff row |
+| land from a node `LANDING_NODES` does not declare able to land | HAND OFF `owner-landing`, after the close records the bar | the handoff row |
+| choose a fix where every option touches a carrier | HAND OFF `owner-decision` | the decision park row |
+| a question the default branch already answered | observe the advertised tip first, and take the exit the answer selects; unanswered, HAND OFF `owner-decision` | the park row |
+
+**A kind this table does not list is a HAND OFF under `owner-decision`**, because the work is sound
+and only a turn is missing. **ABORT is reserved for work that must not land as it stands** — the
+halt codes, never a decision the owner could take in one read.
+
+**The carry-forward term.** `build-complete`'s fifth term carries a non-terminal unit forward, and
+prints one `carried forward` line naming it and its ask, only when ALL FIVE hold, checked in this
+order and each unmet one named with its unit:
+
+1. its spec status is `DEFERRED`;
+2. the roster this run started with carries it, so a unit the run added — a promoted finding, an
+   adopted discovery — is never carried;
+3. the run-state file carries its `rescope · item defer <unit>` row, written by
+   `--rescope <slug> --act defer` and owed to the owner at the wrap-up;
+4. its spec header `closes` or `advances` an ask this build's own `BACKLOG.md` files under this
+   build's slug, and `ASKS_CMD` reads that ask neither CLOSED nor WONTDO — a blank `ASKS_CMD` is
+   unmet, naming the missing contract;
+5. no CLOSED unit's spec declares a `consumes-from` edge onto it, because a closed half that needs
+   the open half is not landable, and that build is a HAND OFF instead.

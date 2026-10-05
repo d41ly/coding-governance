@@ -1,6 +1,6 @@
 # drift-audit kit
 
-`gov:kit drift-audit@1.22` — the marker a deployer greps; paired with `KIT_DRIFT_AUDIT_VERSION` in
+`gov:kit drift-audit@1.23` — the marker a deployer greps; paired with `KIT_DRIFT_AUDIT_VERSION` in
 `drift_report.py` and asserted equal by `<prefix>/check-kit-versions.sh`, which also holds each Tier-2
 harness's own `meta.version` to the same number.
 
@@ -126,7 +126,10 @@ Tier 2 needs the two workflow scripts from `<prefix>/workflows/drift-audit-{code
 | `backlog_stragglers` | does a ref still carry backlog row changes unaccounted against the default branch? | no |
 | `asks_disposed_overrides` | how often did a run buy the `asks-disposed` Definition-of-Done item with an override? | no |
 | `run_records_nonterminal_but_merged` | does a run record still read live after its work reached the default branch? | no |
+| `aborted_work_landed` | does a live ABORTED record dated before `HANDOFF_CUTOFF` have work the content predicate reads landed, with no upheld `work-landed-at`? Cleared by the unattended kit's `--settle`; an archive is listed and not counted. | no |
+| `discarded_work_landed` | did the work of an ABORTED record dated on or after `HANDOFF_CUTOFF`, when ABORTED means discard, land anyway? No verb clears it. Not asked while the key is blank. | no |
 | `legs_retried_after_timeout` | how many legs did the merge bar retry, once and alone, after their own ceiling fired, over the run records this git dir still holds? | no |
+| `fleet_over_budget` | which builds hold more undeclared writes than the unattended kit's per-build `UNDECLARED_WRITE_BUDGET`, read from the `check 23 fleet` line of the newest bar run this git dir holds? Not asked without `.unattended.conf`. | no |
 
 **Every signal carries a `live` field.** A signal whose population is empty prints `DEAD PROBE`
 instead of a clean `0`. This is the kit's central rule and it is not decoration: the upstream repo's

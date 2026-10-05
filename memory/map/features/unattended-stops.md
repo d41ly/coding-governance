@@ -14,7 +14,7 @@ git-hooks = []
 workflow-scripts = []
 skill-engines = []
 rendered-skills = []
-gotcha-classes = []
+gotcha-classes = ["liveness-negative-from-another-population.md"]
 guides = []
 backlog-shards = []
 lexicon-verbs = []
@@ -27,9 +27,11 @@ globs = [
 ]
 ```
 
-Split out of `unattended` when that dossier reached its size cap, so it claims no keys: every key it
-touches is claimed there. The split follows the stop contract's seam: that dossier is how a run
-proceeds, this one is how it pauses, which session drives it, and which processes it may reap.
+Split out of `unattended` when that dossier reached its size cap, so the keys it touches are
+claimed there, save the one gotcha class that arrived with the cap already reached: a probe of
+aborted records whose liveness negative came from another population. The split follows the stop
+contract's seam: that dossier is how a run proceeds, this one is how it pauses, which session
+drives it, and which processes it may reap.
 
 ## Constraints & why
 

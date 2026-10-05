@@ -214,8 +214,11 @@ SPEC_TOKENS_CLI=""
 # OPTIONAL. The repo-relative GATE POLICY FILE `gates-green` reads `INHERITED_RED=park|land` and
 # `INHERITED_RED_MAX_AGE=<n>` from, when the bar is red only on legs the landing base already carries.
 # Both this key and the file it names are read AS COMMITTED AT the tip the remote advertises and are
-# PARSED, never sourced, so a run cannot grant itself a landing by editing either. BLANK means no
-# policy is adopted and every inherited red PARKS as a hold, announced, which is the kit default.
+# PARSED, never sourced, so a run cannot grant itself a landing by editing either. BLANK names no
+# policy file, so the pre-push hook's own .githooks/gate-env.sh is read at that tip instead, exactly
+# as the hook reads it; where that is absent too, the kit default `land` applies with no age bound,
+# announced: every inherited red lands, and nothing is escalated (ruling TOOL-dUnstuckLanding-22).
+# Declare `park` in the file to hold.
 GATE_POLICY_FILE=""
 
 # OPTIONAL, the same shape again, and the one key an ASK-DRIVEN run needs. The generator the driver
@@ -336,9 +339,10 @@ SPEC_THIN_CUTOFF=""
 # TOOL-aBlindedTrial-7 - a PROJECT-WIDE opt-in to the pre-code spec audit: a YYYY-MM-DD date
 # recording the day the project ruled audits on. Any dated value opts EVERY build in whose README
 # declares no `spec-audit:` key, for every run whose BASE carries it; the date is a record, not a
-# threshold, and is compared to nothing - unlike the cutoffs above, which grade a date. Read at the
-# pinned BASE by check_authorization, never from the working copy, so a run cannot blank it to
-# escape; a README key wins whatever it says; a non-date is a refusal, and so is a BASE conf whose
+# threshold, and is compared to nothing - unlike the cutoffs above, which grade a date. Read by
+# check_authorization at the DEFAULT-BRANCH side of BASE, never from the working copy or a tip the
+# run pushed, because the opt-in is the owner's (TOOL-aWardedAudit-4) - so a run can neither commit
+# one on its own branch nor blank it to escape; a README key wins whatever it says; a non-date is a refusal, and so is a BASE conf whose
 # evaluation does not reach the end. BLANK or absent keeps the
 # per-build opt-in - a per-adopter fact, like every cutoff above, so the example ships it blank.
 SPEC_AUDIT_DEFAULT=""
@@ -360,10 +364,24 @@ HALT_FLOOR="8"
 # undeclared or malformed is a refusal, not a defaulted value, because a pin that quietly defaults
 # is a pin nobody set.
 HOLD_CODES_EXTRA=""
-HOLD_FLOOR="5"
+HOLD_FLOOR="7"
 
+# The UNDECLARED-WRITE BUDGET, per build. A concurrently dispatched pass declares its write set
+# before it starts, and that declaration is the disjointness proof two passes rest on. Check 23
+# compares the declaration against what the pass actually committed, counts only a pass whose window
+# overlapped a sibling pass's, and fails the RUN THIS BRANCH DRIVES when its counted passes wrote
+# outside their declarations more times than this budget admits. Undeclared or malformed is a
+# refusal, not a defaulted value, for the reason the floor above gives.
+#
+# 0 is the value a repo adopting this kit wants, and it means what it says: a pass that writes
+# outside its declaration while a sibling ran beside it reds its own build's close. Other builds'
+# records never count against it: their counts are printed, their total on a `check 23 fleet` line
+# that never fails a run, and the drift report's `fleet_over_budget` signal lists the builds over
+# budget. When the remote's tip resolves and the run has commits it lacks, a pass already on that
+# tip is not graded again.
 # UNDECLARED_WRITE_CEILING is RETIRED (TOOL-aWindowedPass-5): check 23 grades the run a branch
-# drives against zero, counting only passes that overlapped a sibling, so there is no pin.
+# drives against the budget above, counting only passes that overlapped a sibling, so there is no pin.
+UNDECLARED_WRITE_BUDGET="0"
 
 # The LANDER MARKER. A BARE NAME, resolved by the lander AND by `--landed` against
 # `git rev-parse --git-common-dir` — never a tree-relative path, which names a different file in
@@ -397,6 +415,24 @@ LANDED_ANCHOR_CUTOFF=""
 # may lack facts nobody can reconstruct. --preflight refuses to retire a record this would red.
 # Blank or absent turns the arm off, announced. Set it to the day you adopt the derived terminal.
 LANDED_FACTS_CUTOFF=""
+
+# The date from which ABORTED means DISCARD: the run's work must not land as it stands, and a run
+# whose work is sound but which an owner must land or decide ends HELD through --handoff instead.
+# From it, an --abort naming a hand-off-shaped halt code, on a record first committed on or after
+# it, prints a notice naming --handoff and then aborts as asked; it never refuses. Blank or absent
+# turns the notice off, announced. Set it strictly past the newest record any branch can still
+# write under the old meaning, which is usually the day after you adopt the hand-off.
+HANDOFF_CUTOFF=""
+
+# Which nodes may LAND a run, as space-separated `<tag>=<machine>/<user>` pairs: the tag one
+# lowercase letter, the machine as COMPUTERNAME or hostname names it and the user as USERNAME or
+# `id -un` does, all compared lowercased, e.g. "a=desk-a/alice b=build-02/ci". A space in a name is
+# written %20, as in "c=desk-c/john%20smith". Never a path, because roots can be identical across
+# machines. Read at the BASE the run's record was first committed with, so a run cannot add its own
+# node, and a moved base fact reads handoff. A run on any other node starts normally, records `landing: handoff`, and ends at
+# --handoff --code owner-landing with no override. The gate leg reds a malformed or doubled token.
+# Blank or absent: every node may land, announced at --preflight.
+LANDING_NODES=""
 
 # TOOL-dBriefedPass-3 — the date from which a CLOSED unit whose BUILD COMMIT predates a conforming
 # spec for it blocks the bar. Graded on the build README's `opened:` date, the same idiom

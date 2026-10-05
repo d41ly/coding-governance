@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.4 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-10-05T10:31:34+03:00 @ 5e3c27a6fd93bccc4affec24510428ea8d6e12c5
+last-audit: 2026-10-05T09:58:12+03:00 @ 233c03849cb55c4144733ab0978a22ae1d1ed762
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/run-gates/run-selftests.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 56321bcfc8ccb4a1a295b652d0c8decd26848b57
+last-body-change: 233c03849cb55c4144733ab0978a22ae1d1ed762
 check-script: skills/session-kickoff/manifest-check.sh
 registry: AGENTS.md
 -->
@@ -51,9 +51,9 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   BUILD-METHOD's, both changed under `TOOL-dUnstalledConvoy`, and both invert what a session would
   otherwise assume: M2/M3 give a run delegated authority to retire, supersede or add units inside the
   build's stated goal rather than stalling on a spec that turned out wrong, and M6's parallel default
-  now binds delegated passes only. Conditions and bounds are M3's and M6's. What
-  is NOT in force is the VERIFICATION: `--dispatch` records a pass's declared write set and the
-  comparison only REPORTS (`TOOL-dUnstalledConvoy-23`). Declare them anyway; green is not a proof.
+  now binds delegated passes only. Conditions and bounds are M3's and M6's. Check 23 counts only a
+  pass that overlapped a sibling and fails only the branch's own run, over `UNDECLARED_WRITE_BUDGET`;
+  `--check-commit` refuses an undeclared staged path (`TOOL-aWindowedPass-1`, `-3`, `-5`).
 
 - **Every session start writes an ORIENTATION CARD** at `<git-common-dir>/orientation/<session_id>.md`
   (`manifest-check.sh --card --write`, wired as a SessionStart hook; `--card --replay` re-injects it
@@ -126,9 +126,10 @@ Restore it with `bash skills/session-kickoff/manifest-check.sh --task-skeleton`.
   floor is excluded and printed with its count, a one-segment root such as `tools/` under the sub-head
   declares nothing, and a spec with no Gates heading is not joined. `TOOL-aBlindedTrial-8`.
 
-- **The pre-code spec audit is owed where the build README's `spec-audit: <date>` OR `.unattended.conf`'s
-  `SPEC_AUDIT_DEFAULT` (read at BASE, the README winning) declares it; under neither, nothing is owed
-  and the kickoff engine asks the owner once at READY.** `TOOL-aBlindedTrial-6`, `-7`, `KICK-aBlindedTrial-1`.
+- **The pre-code spec audit is owed where the OWNER declares it: a `slug` README's `spec-audit: <date>`
+  OR `.unattended.conf`'s `SPEC_AUDIT_DEFAULT` on the default branch; a run never declares either.
+  Under neither, none is owed; kickoff asks at READY.**
+  `TOOL-aBlindedTrial-6`, `-7`, `TOOL-aWardedAudit-4`, `KICK-aBlindedTrial-1`.
 
 - **Before starting work inside a kit, check whether another node is already rewriting it.**
   `git log origin/main --oneline -20 -- tools/<kit>/` answers it in one second. Hit twice:
@@ -183,7 +184,7 @@ GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh   # also run EVERY self-test 
 GATE_ATTRIBUTE=<rev> bash tools/run-gates/run-gates.sh   # re-run each RED leg at <rev> and print whose red it is: OWN, INHERITED, MIXED, CONTENDED or DEAD PROBE. Report-only, the exit never moves; .githooks/pre-push exports the remote sha. TOOL-dDerivedDocket-23
 bash tools/run-gates/run-selftests.sh --serial  # the HELD population on demand, budget-timed; --pooled withholds cost verdicts and REFUSES any row with no calibrated reading until --pooled --calibrate has run (TOOL-aBatchedArm-5); bare REFUSES; GOV_NODE must be a registry tag; a pooled red keeps each row's output under <git-dir>/gate-logs/selftests/. TOOL-aBatchedArm-4, -5
 bash tools/unattended/run-unattended-gates.sh --pooled   # DoD for tools/unattended/ work: pooled PARITY against tools/run-gates/selftest-pooled-evidence.txt, or `--selftests --serial --attribute <BASE>` reading `verdict clean`. TOOL-dDerivedDocket-1
-python tools/memory-tree/gotchas.py --for-diff <base>..<head>   # the recurring-bug-class checklist + by-design block for THIS diff — run it before a review
+python tools/memory-tree/gotchas.py --for-diff <base>..<head>   # bug-class checklist + by-design block for THIS diff; run before a review
 python tools/drift-audit/drift_report.py   # ~seconds, no agents: do this repo's own RECORDS still match reality?
 python tools/govkit/govkit.py epoch --base <base>   # a kit whose shipped bytes moved since <base> and whose version did not: run after a commit that touches a kit. TOOL-aRepatriatedFork-15
 python3 tools/gate-lint/encoding_posture.py memory/project/encoding-posture-sites.txt . tools skills   # text IO that names no encoding; the registry may fall and never rise. TOOL-aRepatriatedFork-3

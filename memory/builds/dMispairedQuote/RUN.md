@@ -9,6 +9,7 @@ with its anchor evidence, and the parked decisions.
 <!-- /run:generated -->
 
 ## Run facts
+work-landed-at: 91058925b19addc557954bae0f8884d7f03d81a3 028b5cac6504b37b99d83180b65bf211deb972b6
 halt-code: gate-red-out-of-scope
 parked-surfaced: yes, 2 surfaced
 keepalive-reaped: yes

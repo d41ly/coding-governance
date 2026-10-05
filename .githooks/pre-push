@@ -1022,9 +1022,13 @@ GATE_FULL_MAX_LAG=10
 # PARSED out of the file as committed at the remote sha git fed this hook — R, the landing base, which
 # only a gated push can move — and R's bytes are never executed: one anchored match per key, a
 # trailing comment and one pair of quotes stripped, then validated against `park land` or a positive
-# integer. Absent, blank or malformed reads `park`, and so does `land` with no positive bound; the
-# policy line below ANNOUNCES which, on every gated push. An adopter with no such file reads `park`,
-# which is exactly the behaviour this hook had before the two keys existed.
+# integer. THE KIT DEFAULT IS `land` (ruling TOOL-dUnstuckLanding-22, superseding that part of
+# TOOL-dDerivedDocket-24's D12-i4; built by TOOL-dUnstuckLanding-16): an absent or blank
+# `INHERITED_RED`, and a file absent at R, read `land`, and `land` with no positive bound reads `land`
+# with no bound. The bound decides no landing any more — an INHERITED red lands at any age, and the
+# age only escalates the ask the unattended driver files. A value outside `park land` still reads
+# `park`, because a typo must not land a red, and so does a remote with no tip, where nothing can read
+# INHERITED. The policy line below ANNOUNCES which reading it took, on every gated push.
 #
 # THE RELATIVE PATH IS DERIVED from the one the source reads, so this hook spells the file once. The
 # four names are cleared so neither a sourced assignment nor the caller's environment reaches the
@@ -1051,26 +1055,26 @@ read_policy_key() { # file text · key -> the LAST `<key>=` line's value, cleane
   printf '%s' "$v"
 }
 
-read_policy_at() { # sha -> PP_POLICY (park|land), PP_MAX_AGE (set under land only) and PP_WHY
-  local sha=$1 blob pol age
+read_policy_at() { # sha -> PP_POLICY (park|land), PP_MAX_AGE (the positive bound declared, or empty) and PP_WHY
+  local sha=$1 blob pol age bnd
   PP_POLICY=park; PP_MAX_AGE=""; PP_WHY=""
   if [ -z "$sha" ] || [ -z "${sha//0/}" ]; then
     PP_WHY="the remote holds no tip for $def yet, so there is no R to read a policy at"; return 0
   fi
   if ! blob=$(git show "$sha:$_gate_env_rel" 2>/dev/null); then
-    PP_WHY="$_gate_env_rel is absent at ${sha:0:8}, so no policy is adopted there"; return 0
+    PP_POLICY=land
+    PP_WHY="$_gate_env_rel is absent at ${sha:0:8}, so the kit default land applies, with no age bound"; return 0
   fi
   pol=$(read_policy_key "$blob" INHERITED_RED)
   age=$(read_policy_key "$blob" INHERITED_RED_MAX_AGE)
   case "$age" in ''|0*|*[!0-9]*) age="" ;; esac
+  if [ -n "$age" ]; then bnd="an age bound of $age first-parent landings, which escalates an aged leg's ask and lands it"
+  else bnd="no age bound, so no leg is aged"; fi
   case "$pol" in
-    land) if [ -n "$age" ]; then
-            PP_POLICY=land; PP_MAX_AGE=$age; PP_WHY="declared, with an age bound of $age first-parent landings"
-          else
-            PP_WHY="INHERITED_RED=land with no positive INHERITED_RED_MAX_AGE beside it, which reads park"
-          fi ;;
-    park) PP_WHY="declared" ;;
-    '')   PP_WHY="no INHERITED_RED is declared in $_gate_env_rel there" ;;
+    land) PP_POLICY=land; PP_MAX_AGE=$age; PP_WHY="declared, with $bnd" ;;
+    park) PP_MAX_AGE=$age; PP_WHY="declared" ;;
+    '')   PP_POLICY=land; PP_MAX_AGE=$age
+          PP_WHY="no INHERITED_RED is declared in $_gate_env_rel there, so the kit default land applies, with $bnd" ;;
     *)    PP_WHY="INHERITED_RED is '$pol' there, outside 'park land', which reads park" ;;
   esac
 }
@@ -1326,19 +1330,21 @@ export GATE_RUN_ID="$RUNLOG_GATE_RUN"
 # red is re-run against the tree the push would land on rather than against the tree that has it.
 # An all-zero sha is a branch the remote does not have yet, so there is no base to name. A runner
 # older than the attribution ignores the variable. TOOL-dDerivedDocket-23. The policy read at R rides
-# with it, and the age bound only under `land`, the one policy that reads the age.
+# with it, and the age bound only under `land`, the one policy whose attribution lines show the age:
+# under `park` nothing lands here, so the probe's extra leg runs would buy nothing.
 if [ -n "$main_remote" ] && [ -n "${main_remote//0/}" ]; then
   export GATE_ATTRIBUTE="$main_remote"
   export GATE_INHERITED_RED="$PP_POLICY"
-  [ -n "$PP_MAX_AGE" ] && export GATE_INHERITED_RED_MAX_AGE="$PP_MAX_AGE"
+  [ "$PP_POLICY" = land ] && [ -n "$PP_MAX_AGE" ] && export GATE_INHERITED_RED_MAX_AGE="$PP_MAX_AGE"
 fi
 
 # check_inherited_verdict <run dir> — rc 0 when THAT bar's own record reads RED on an UNMOVED tree,
-# its wall unfired, and every failed leg INHERITED with a proven age inside the bound, attributed
-# against the remote's own sha, one attribution row per failed leg. Sets PP_LEGS, or PP_NOT naming
-# the first condition that failed. It reads the record of the run id pinned above and no other.
+# its wall unfired, and every failed leg INHERITED, whatever its age column reads (a number, `aged`,
+# or `-` for unproven: TOOL-dUnstuckLanding-16 S2), attributed against the remote's own sha, one
+# attribution row per failed leg. Sets PP_LEGS, or PP_NOT naming the first condition that failed. It
+# reads the record of the run id pinned above and no other.
 check_inherited_verdict() {
-  local d=$1 v tm fl wb n=0 bad="" leg ver rsha age
+  local d=$1 v tm fl wb n=0 bad="" leg ver rsha
   PP_LEGS=""; PP_NOT=""
   if [ ! -f "$d/verdict" ]; then
     PP_NOT="the bar left no verdict in its run record, so nothing says which legs failed"; return 1
@@ -1357,14 +1363,11 @@ check_inherited_verdict() {
   if [ ! -f "$d/attribution" ]; then
     PP_NOT="the bar wrote no attribution record, so no red leg is shown to be inherited"; return 1
   fi
-  while IFS=$'\t' read -r leg ver _ _ rsha age _; do
+  while IFS=$'\t' read -r leg ver _ _ rsha _; do
     [ -n "$leg" ] || continue
     n=$((n + 1))
     PP_LEGS="$PP_LEGS${PP_LEGS:+, }$leg"
     if [ "$ver" != INHERITED ]; then bad="$leg reads $ver"; break; fi
-    case "$age" in
-      ''|-|*[!0-9]*) bad="$leg reads INHERITED with age '${age:-none}', not a proven age inside the bound"; break ;;
-    esac
     if [ "$rsha" != "$main_remote" ]; then bad="$leg was attributed against ${rsha:0:8}, not the remote's ${main_remote:0:8}"; break; fi
   done < "$d/attribution"
   if [ -n "$bad" ]; then PP_NOT=$bad; return 1; fi
@@ -1425,7 +1428,8 @@ if [ "$rc" -eq 0 ]; then
       fi ;;
   esac
 fi
-# A RED ON INHERITED LEGS ONLY LANDS UNDER `land`, and nowhere else (D12-i4). The exit that follows is
+# A RED ON INHERITED LEGS ONLY LANDS UNDER `land`, and nowhere else (D12-i4), at any age since ruling
+# TOOL-dUnstuckLanding-22. The exit that follows is
 # still this hook's one exit, so the run log's decision stays the gate decision above; the landing is
 # the printed line. An attended push lands over it too: `land` is this repository's policy for every
 # push, not an unattended exception, and the line says so.

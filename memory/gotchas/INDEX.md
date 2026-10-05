@@ -68,6 +68,7 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [ledger-token-wrapped-across-a-line-joins-nothing](ledger-token-wrapped-across-a-line-joins-nothing.md) | class | 2 |  | hygiene check 23 extracts a ledger line's backticked tokens PER LINE, so a token the writer wrapped across a line break belongs to no line and the criterion it answers reads as unanswered |
 | [line-count-reads-empty-capture-as-one](line-count-reads-empty-capture-as-one.md) | class | 4 |  | a line count over a captured variable that adds a newline before counting reads an EMPTY capture as one line, so a one-line assertion cannot fail on a command that wrote nothing |
 | [line-keyed-registry-reds-on-a-file-that-grew](line-keyed-registry-reds-on-a-file-that-grew.md) | class | 3 |  | a waiver keyed <path>:<line> stops matching when anything is inserted above it, so a gate reds on a file whose waived line nobody touched |
+| [liveness-negative-from-another-population](liveness-negative-from-another-population.md) | class | 2 |  | a probe is shown able to read negative on inputs it will never act on, while over its real population a positive is structural, so the liveness assertion passes and certifies nothing |
 | [merge-keeps-both-sides-of-one-derivation](merge-keeps-both-sides-of-one-derivation.md) | class | 2 |  | a conflict-free merge leaves two derivations of one value, disagreeing, and the first is a dead store |
 | [msys-grep-counts-cr-on-every-line](msys-grep-counts-cr-on-every-line.md) | class | 3 |  | on an MSYS node `grep -c $'\r'` matches every line of an LF-only file, so a CR probe reports the whole file as CRLF and a clean tree as dirty |
 | [naming-leg-grades-what-python-named](naming-leg-grades-what-python-named.md) | class | 1 |  | the naming gate grades nested helpers and dunder methods, and its armed set follows symbols.json, so a new file reds on a later unrelated commit and only at the lander |
@@ -113,6 +114,6 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [witness-graded-against-a-fact-written-after-it](witness-graded-against-a-fact-written-after-it.md) | class | 2 |  | a sidecar line that outlives the lease it was written under is graded against the id the new lease replaced, so a dead incarnation's witness passes the check the live one owes |
 | [worktree-crlf-outside-the-gated-population](worktree-crlf-outside-the-gated-population.md) | class | 3 |  | a worktree checkout lands CRLF on eol-pinned files, no wiring gate sees it, and the reader that breaks is a consumer no gate byte-compares |
 
-98 record(s): 95 class, 0 note, 3 invariant, 0 superseded · 6 universal · 0 unanchored
+99 record(s): 96 class, 0 note, 3 invariant, 0 superseded · 6 universal · 0 unanchored
 
 <!-- END GENERATED -->

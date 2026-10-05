@@ -287,7 +287,7 @@ kit docs and `memory/guides/SESSION-KICKOFF.md`) · `.claude/skills/unattended/S
   Red when: the header's exception TWO still names check 7 alone while check 23 prints on the default
   channel.
 - **AC9** — When `bash tools/check-kit-versions.sh` and `python tools/govkit/govkit.py epoch` run they
-  exit 0, `grep -n '^KIT_UNATTENDED_VERSION=1.56' tools/unattended/unattended.sh` prints one line, and
+  exit 0, `grep -n '^KIT_UNATTENDED_VERSION=1.57' tools/unattended/unattended.sh` prints one line, and
   `git grep -l 'gov:kit unattended@1.55' -- tools .claude memory/guides` prints nothing.
   Red when: a carrier still names 1.55, or a shipped byte moved without the version.
 - **AC10** — When `bash skills/session-kickoff/manifest-check.sh` runs at the pass's commit it exits 0.

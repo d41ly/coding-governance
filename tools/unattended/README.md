@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.70 -->
+<!-- gov:kit unattended@1.71 -->
 # The unattended-run kit
 
 The binding contract is not here. It is `UNATTENDED-PROTOCOL.md` together with
@@ -207,9 +207,10 @@ never tracked; read by `--liveness`, `--status`, `--landed` and the tick.
 
 `gates-green` runs `GATE_CMD` under a run id the driver pins, attributes a red against the tip the
 remote advertises, and hands the bar the inherited-red policy it read at that tip. It then reads that
-bar's own run record: an inherited-only red within its age bound is met under `land`, parks as the
-`inherited-red` hold under `park`, and files an ask for each inherited leg once `ASKS_CMD` is
-declared. The contract is `UNATTENDED-STOPS.md`. One residual moved here from the protocol's §3 when
+bar's own run record: an inherited-only red is met under `land`, the kit default, at any age; it
+parks as the `inherited-red` hold under a declared `park`; and it files an ask for each inherited leg
+once `ASKS_CMD` is declared, at SEV BLOCKER for a leg older than the age bound
+(`TOOL-dUnstuckLanding-16`). The contract is `UNATTENDED-STOPS.md`. One residual moved here from the protocol's §3 when
 that arm grew its decision table (`TOOL-dDerivedDocket-24`): two runs CLOSING together in one clone
 contend on the bar's turnstile. Where the project declares a profile, the queue wait has its own term
 in the bar's backstop and the second run waits it out; where it does not, the wait is charged
@@ -265,6 +266,7 @@ check-unattended.sh              # the kit gate
 check-playbook.sh                # playbook validity, including the fixture
 check-pass-order.sh              # refuses a unit built before it was specced
 check-brief-recorded.sh          # refuses a closed unit whose build commit records no brief
+                                 # both grade only the run's commits past the remote's tip, else all
 run-unattended-gates.sh --serial # the kit's self-tests, ON DEMAND ONLY; the mode is declared,
                                  # --pooled withholds every cost verdict, and bare REFUSES
 run-unattended-gates.sh --pooled # the DoD for work touching this kit: parity against the calibrated evidence

@@ -79,7 +79,7 @@
  */
 'use strict'
 
-const KIT_AGENT_CAP_VERSION = '1.28' // gov:kit agent-cap@1.28 — engine identity (this file is deployed verbatim; the constant is the deployer's version marker)
+const KIT_AGENT_CAP_VERSION = '1.30' // gov:kit agent-cap@1.30 — engine identity (this file is deployed verbatim; the constant is the deployer's version marker)
 // A BARE LITERAL, never an environment read. An env-settable ceiling is the defeatable class this
 // guard exists to remove, and it leaves no diff behind when someone raises it.
 const CAP = 5
@@ -1834,8 +1834,9 @@ function scanJoinFindings(script) {
 // absent here, so it falls to the conf, where the driver instead refuses it (fail 52) — the
 // disagreement admits an audit, which is the safe direction. Second limit, the same direction: a
 // `;`-joined line (`SPEC_AUDIT_DEFAULT="<date>"; X=1`) is no assignment to this reader and the
-// README deny stands, while the shell reads the date. Worktree here, BASE there: this hook
-// guards a session with an owner present; the BASE read is the one that binds an unattended run.
+// README deny stands, while the shell reads the date. Worktree here, BASE there, for an ATTENDED
+// session alone: beside a live run-state file the hook reads only the fact the driver pinned from
+// the owner's side, and never the worktree README or conf (TOOL-aWardedAudit-2).
 
 // The `builds/<slug>` a repo-relative path sits under, or null: no `builds` segment, any `..`
 // segment, or a spelling that is not repo-relative at all — absolute (`/…`, `X:…`) or `~`-rooted
@@ -1867,6 +1868,9 @@ function readSpecAuditDefault(bytes) {
   return v
 }
 
+// The run-state phases past which no pre-code audit is owed: a record in one is no live run here.
+const NO_AUDIT_PHASES = ['LANDING', 'LANDED', 'ABORTED']
+
 function checkSpecAuditDeclared(data) {
   const ID = 'TOOL-aBlindedTrial-6'
   const renderDeny = (why) =>
@@ -1874,7 +1878,9 @@ function checkSpecAuditDeclared(data) {
     `README's FRONT MATTER carries \`spec-audit: <YYYY-MM-DD>\` (the owner's date; a value that is ` +
     `not a date, or the key inside the body, reads as absent), or the project's .unattended.conf ` +
     `declares \`SPEC_AUDIT_DEFAULT="<YYYY-MM-DD>"\` for every build whose README declares no key ` +
-    `(TOOL-aBlindedTrial-7). This rule reads the Workflow call's ` +
+    `(TOOL-aBlindedTrial-7). The opt-in is the OWNER's (TOOL-aWardedAudit-4): never a key in an ` +
+    `\`authorized-by: prompt\` or \`recipe\` README, which the run writes itself, and in a live ` +
+    `unattended run only the \`spec-audit:\` fact its preflight pinned. This rule reads the Workflow call's ` +
     `structured args only, never the script text.\n`
   let readme = '(unplaced)'
   try {
@@ -1882,15 +1888,44 @@ function checkSpecAuditDeclared(data) {
     if (typeof a === 'string') {
       try { a = JSON.parse(a) } catch { return null }
     }
-    if (!a || typeof a !== 'object' || Array.isArray(a) || String(a.kind) !== 'spec-audit') return null
+    if (!a || typeof a !== 'object' || Array.isArray(a)) return null
+    // TOOL-aWardedAudit-2 S4 — THE BUILD HARNESS'S `specAudit` IS THE SAME ACT ONE CALL EARLIER. The
+    // harness runs its audit through a `workflow()` call inside its own script, a runtime call no
+    // hook sees, so the only tool call there is to judge is the one carrying `specAudit`. It is placed
+    // by the harness's own default, `memory/builds/<slug>/reviews`, when `reviewDir` is absent, and a
+    // `slug` that is not one path segment cannot be placed. Presence is the test, whatever the value.
+    const harness = a.specAudit !== undefined
+    if (String(a.kind) !== 'spec-audit' && !harness) return null
     if (typeof a.repo !== 'string' || a.repo === '') {
       return renderDeny(`a spec-audit Workflow call whose \`repo\` is not a non-empty string cannot be placed, so it cannot be admitted.`)
     }
-    const parts = String(a.reviewDir === undefined || a.reviewDir === null ? '' : a.reviewDir)
+    let rdir = a.reviewDir
+    if (harness && !rdir) {
+      if (typeof a.slug !== 'string' || !/^[A-Za-z0-9_-]+$/.test(a.slug)) {
+        return renderDeny(`a Workflow call carrying \`specAudit\` whose \`slug\` (${JSON.stringify(a.slug)}) is not one path segment, and which names no \`reviewDir\`, cannot be placed, so it cannot be admitted.`)
+      }
+      rdir = 'memory/builds/' + a.slug + '/reviews'
+    }
+    const parts = String(rdir === undefined || rdir === null ? '' : rdir)
       .replace(/\\/g, '/').replace(/\/+$/, '').split('/')
     const dir = parts.slice(0, -1) // reviewDir's parent: the build folder
     if (dir.length < 2 || dir[dir.length - 2] !== 'builds' || dir[dir.length - 1] === '' || parts.indexOf('..') !== -1) {
-      return renderDeny(`a spec-audit Workflow call whose \`reviewDir\` (${JSON.stringify(a.reviewDir)}) is not directly under a \`builds/<slug>/\` folder, or climbs through \`..\`, cannot be placed, so it cannot be admitted.`)
+      return renderDeny(`a spec-audit Workflow call whose \`reviewDir\` (${JSON.stringify(rdir)}) is not directly under a \`builds/<slug>/\` folder, or climbs through \`..\`, cannot be placed, so it cannot be admitted.`)
+    }
+    // TOOL-aWardedAudit-6 S1 — A HARNESS CALL IS PLACED IN ITS OWN SLUG'S BUILD. Its nested audit reads
+    // `units[].specPath` and writes to `reviewDir`, and nothing in the harness compares either with
+    // `slug`, so a `reviewDir` under another build read THAT build's README and run-state file while
+    // auditing this one's specs — a live run's pinned fact routed around by one argument. A unit with
+    // no `specPath` is still to be specced and names nothing to place.
+    if (harness && typeof a.slug === 'string' && a.slug !== '') {
+      if (dir[dir.length - 1] !== a.slug) {
+        return renderDeny(`a Workflow call carrying \`specAudit\` for \`slug\` ${JSON.stringify(a.slug)} names a \`reviewDir\` (${JSON.stringify(rdir)}) under another build, whose README and run-state file are not this run's, so it cannot be admitted.`)
+      }
+      const strayUnit = (Array.isArray(a.units) ? a.units : []).find((u) =>
+        u && typeof u.specPath === 'string' && u.specPath !== '' && extractBuildSlug(u.specPath) !== a.slug)
+      if (strayUnit !== undefined) {
+        return renderDeny(`a Workflow call carrying \`specAudit\` for \`slug\` ${JSON.stringify(a.slug)} names a \`units[].specPath\` (${JSON.stringify(strayUnit.specPath)}) outside \`builds/${a.slug}/\`, so it would audit a build whose opt-in this rule never read.`)
+      }
     }
     if (Array.isArray(a.subjects)) {
       const stray = a.subjects.find((s) => extractBuildSlug(s && s.path) !== dir[dir.length - 1])
@@ -1913,6 +1948,43 @@ function checkSpecAuditDeclared(data) {
     const bytes = require('fs').readFileSync(readme, 'utf8')
     const { readFrontMatterKey } = require(path.join(__dirname, 'scratch-guard.js'))
     const v = readFrontMatterKey(bytes, 'spec-audit')
+    // TOOL-aWardedAudit-2 S1 — A LIVE UNATTENDED RUN IS DECIDED BY ITS RUN-STATE FACT, never by the
+    // worktree. The driver's preflight pinned `spec-audit:` from the owner's side (a slug README at
+    // BASE, or the default at the default-branch side), and a key or default the run writes into its
+    // worktree afterwards is the self-opt-in that ruling refuses. `RUN.md` beside the README, with a
+    // `phase:` fact outside NO_AUDIT_PHASES, is a live run; ENOENT is an attended session and
+    // falls through; any other read failure is a deny, on the fail-closed rule above. Column-1 fact
+    // lines only, the driver's own shape: a parked row opens with a timestamp and never matches.
+    const runmd = path.join(root, ...dir, 'RUN.md').split(path.sep).join('/')
+    let rbytes = null
+    try { rbytes = require('fs').readFileSync(runmd, 'utf8') } catch (e) {
+      if (!e || e.code !== 'ENOENT') return renderDeny(`${runmd} could not be read for its \`phase:\` and \`spec-audit:\` facts (${(e && e.code) || (e && e.message) || e}), and a run-state file this hook cannot read is not one it may approve from.`)
+    }
+    if (rbytes !== null) {
+      // TOOL-aWardedAudit-6 S2 — READ AS THE DRIVER'S `fact()` READS: inside `## Run facts` alone, up to
+      // the next `## ` heading, so a key-shaped line anywhere else decides nothing. NO_AUDIT_PHASES is
+      // NOT a copy of the driver's terminal set: it adds LANDING, because a record past its close owes
+      // no pre-code audit, and a committed LANDING outlives its push on every landed build in the tree.
+      const facts = (/^## Run facts[ \t]*\r?$([\s\S]*?)(?=^## |(?![\s\S]))/m.exec(rbytes) || [])[1] || ''
+      const phase = (/^phase:[ \t]*(\S+)[ \t]*\r?$/m.exec(facts) || [])[1] || ''
+      if (NO_AUDIT_PHASES.indexOf(phase) === -1) {
+        const f = (/^spec-audit:[ \t]*(\S+)[ \t]*\r?$/m.exec(facts) || [])[1] || ''
+        // The harness's `specAudit` must BE the pinned date: a different date is a declaration the
+        // preflight never read, which is the self-opt-in again with a fact standing beside it.
+        if (/^\d{4}-\d{2}-\d{2}$/.test(f) && (!harness || a.specAudit === f)) return null
+        if (/^\d{4}-\d{2}-\d{2}$/.test(f)) {
+          return renderDeny(`${runmd} pins \`spec-audit: ${f}\`, and this call passes \`specAudit\` ${JSON.stringify(a.specAudit)}; the harness takes the pinned date or nothing.`)
+        }
+        return renderDeny(`${runmd} is a live unattended run (phase ${phase || '(none)'}) that pins no dated \`spec-audit:\` fact, so its preflight found no owner opt-in, and a key or default written into the worktree since is the run's own.`)
+      }
+    }
+    // TOOL-aWardedAudit-2 S2 — a README the run writes itself admits nothing by its own key: the
+    // driver refuses the same line at check 89, so admitting it here would spend an audit the run
+    // can never record. Presence is the test, a non-date included, so the deny names the cause.
+    const mode = readFrontMatterKey(bytes, 'authorized-by')
+    if (v !== null && mode !== null && mode !== 'slug') {
+      return renderDeny(`${readme} declares \`spec-audit: ${v}\` under \`authorized-by: ${mode}\`, a README the run writes itself, so the key admits nothing.`)
+    }
     if (v !== null && /^\d{4}-\d{2}-\d{2}$/.test(v)) return null
     if (v === null) {
       // README silent: the project default, from the WORKTREE conf. ENOENT is no default; any other
