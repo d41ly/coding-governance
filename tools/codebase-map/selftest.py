@@ -1089,15 +1089,15 @@ def _test_install_sites(tmp: Path):
     counting the source: the count is then three. A candidate at fan-in 1 with two installs is a
     SEAM at threshold 3, and its line prints `installs 2`."""
     import subprocess
-    marker = "# >>> helper -- canonical copy: helper.py in the lib dir (byte-identical; gated)\n"
-    (tmp / "lib").mkdir()
-    (tmp / "lib" / "helper.py").write_text(marker + "def helper():\n    pass\n", encoding="utf-8")
+    marker = "# >>> helper -- canonical copy: helper.py in the src dir (byte-identical; gated)\n"
+    (tmp / "src").mkdir()
+    (tmp / "src" / "helper.py").write_text(marker + "def helper():\n    pass\n", encoding="utf-8")
     (tmp / "a.sh").write_text("cat <<'EOF'\n" + marker + "EOF\n", encoding="utf-8")
     (tmp / "b.js").write_text("  // >>> helper -- canonical copy: helper.py\n", encoding="utf-8")
     (tmp / "untracked.sh").write_text(marker, encoding="utf-8")
     subprocess.run(["git", "-c", "init.defaultBranch=main", "init", "-q", str(tmp)],
                    check=True, capture_output=True)
-    subprocess.run(["git", "-C", str(tmp), "add", "lib/helper.py", "a.sh", "b.js"],
+    subprocess.run(["git", "-C", str(tmp), "add", "src/helper.py", "a.sh", "b.js"],
                    check=True, capture_output=True)
     sites, why = m._scan_install_sites(tmp)
     assert why == "", why
@@ -1105,8 +1105,8 @@ def _test_install_sites(tmp: Path):
 
     corpus = rl.Corpus(candidates={}, shared_seams={}, symbol_files=[], threshold=3,
                        installs=sites)
-    pool = {"helper": rl.Candidate("helper", ("symbol",), "function", ("lib/helper.py",))}
-    r = rl._rank(pool, corpus, {"helper": {"lib/helper.py", "c.py"}}, "helper", True, "name stem")
+    pool = {"helper": rl.Candidate("helper", ("symbol",), "function", ("src/helper.py",))}
+    r = rl._rank(pool, corpus, {"helper": {"src/helper.py", "c.py"}}, "helper", True, "name stem")
     assert (r.fanin, r.installs, r.is_seam) == (1, 2, True), r
     assert "fan-in 1 | installs 2 | SEAM" in rl._line(r, corpus), rl._line(r, corpus)
 

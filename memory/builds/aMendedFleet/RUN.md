@@ -454,3 +454,7 @@ base: 7af5f564641d231f8b78f6b183dde1b6bf53111d
 2026-10-05T14:48:47Z dispatch · item ea3a47d2 TOOL-aMendedFleet-60 · reason memory/builds/aMendedFleet/README.md
 
 2026-10-05T14:53:23Z dispatch · item ea3a47d2 TOOL-aMendedFleet-60 · reason memory/builds/aMendedFleet/README.md memory/builds/aMendedFleet/build/2026-10-04-build-TOOL-aMendedFleet-60-1-acceptance-ledger.md memory/builds/aMendedFleet/spec/2026-10-04-spec-TOOL-aMendedFleet-60.md tools/unattended/README.md tools/unattended/unattended.sh tools/unattended/unattended.test.sh
+
+2026-10-05T15:06:21Z dispatch · item 2c4eaa3d TOOL-aMendedFleet-42 · reason tools/codebase-map/map_lib.py tools/codebase-map/selftest.py
+
+2026-10-05T15:08:44Z dispatch · item 2c4eaa3d TOOL-aMendedFleet-42 · reason tools/codebase-map/map_lib.py tools/codebase-map/selftest.py memory/map/generated/symbols.json

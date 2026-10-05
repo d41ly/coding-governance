@@ -855,7 +855,7 @@ def derive_present_layers(root: Path, skip_dirs: frozenset[str] = _SKIP_DIRS) ->
 
 
 #: A canonical-copy block's OPENING line: `#` or `//`, then `>>>`, then the block name. The grammar
-#: `tools/lib/resolve-python.test.sh` extracts blocks by; only the opening line is read here.
+#: the shared resolve-python test extracts blocks by; only the opening line is read here.
 _INSTALL_MARKER_RE = re.compile(r"^\s*(?:#|//) >>> ([A-Za-z_][A-Za-z0-9_]*)(.*)$")
 _CANONICAL_SOURCE_RE = re.compile(r"canonical copy:\s*(\S+)")
 

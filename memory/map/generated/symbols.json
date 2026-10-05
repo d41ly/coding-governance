@@ -393,6 +393,11 @@
       "file": ".githooks/straggler-guard.test.sh"
     },
     {
+      "id": "add_overlap_commit",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
       "id": "add_pass",
       "kind": "function",
       "file": "tools/process-monitor/adopt-process-monitor.test.sh"
@@ -1733,6 +1738,11 @@
       "file": "tools/drift-audit/drift_report.py"
     },
     {
+      "id": "build_overlap_ref",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
       "id": "build_owned_fixture",
       "kind": "function",
       "file": "tools/run-gates/run-gates.test.sh"
@@ -2916,6 +2926,11 @@
       "id": "check_count_sources",
       "kind": "function",
       "file": "tools/runlog/record.py"
+    },
+    {
+      "id": "check_cross_run_overlap",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "check_cutoff_armed",
@@ -9168,6 +9183,11 @@
       "file": "tools/run-gates/run-selftests.sh"
     },
     {
+      "id": "print_overlap_spec",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
       "id": "print_pass",
       "kind": "function",
       "file": "tools/run-gates/foreign-prefix.gov.test.sh"
@@ -10026,6 +10046,11 @@
       "id": "read_filed_days",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "read_files_touched",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "read_first_commit_date",
