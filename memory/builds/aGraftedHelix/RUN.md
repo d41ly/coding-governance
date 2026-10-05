@@ -30,3 +30,5 @@ anchor-ref: refs/heads/main
 base: 018b5675727d4c3f316e5b6c53b11c688f03a472
 
 ## Parked
+
+2026-10-05T17:41:17Z rescope · item add TOOL-aGraftedHelix-33 · reason discovery on the spec-commit stage's first live use (wf_dff1cb65-954): writers reported authored specs as ids (unit 29) and as paths (30-32); the commit stage matched ids alone, committed one of four specs, and handed out a roster with three MISSING units and no refusal
