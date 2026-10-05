@@ -1,10 +1,12 @@
 # TOOL-aMendedFleet-32 — recall cache eviction removes deleted worktrees first and orders the rest by last query
 
-**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 32
+**Status:** CLOSED · rev-2 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 32
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-04-build-TOOL-aMendedFleet-32-1-acceptance-ledger.md](../build/2026-10-04-build-TOOL-aMendedFleet-32-1-acceptance-ledger.md) | journal | — |
 
 <!-- /gen:spec-records -->
 

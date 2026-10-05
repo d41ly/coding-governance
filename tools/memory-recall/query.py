@@ -426,14 +426,28 @@ def _build_cache(repo: pathlib.Path, dirp: pathlib.Path, files: list[str],
     return man
 
 
+def check_dead_worktree(wt: str) -> bool:
+    """Is the recorded worktree gone? True when the path does not exist OR holds no ``.git`` entry.
+
+    A primary tree holds a ``.git`` directory and a linked worktree a ``.git`` file; the empty husk
+    `git worktree remove` leaves on Windows (a live process holding it as cwd) holds neither, and
+    under existence alone it kept its ~113 MB cache forever (TOOL-aMendedFleet-32, F2).
+    """
+    p = pathlib.Path(wt)
+    return not p.exists() or not (p / ".git").exists()
+
+
 def evict_dead_siblings(keep: pathlib.Path) -> list[str]:
-    """Delete sibling caches whose recorded ``worktree`` no longer exists. Returns what went.
+    """Delete sibling caches whose recorded ``worktree`` is dead (`check_dead_worktree`). Returns
+    what went; a directory that could not be removed is reported on stderr and is not in the list.
 
     ONE predicate, read in two directions: an unreadable manifest means REBUILD MINE, NEVER DELETE
     THEIRS. The builder writes both .db files BEFORE the manifest, deliberately and atomically, so
     a directory with no readable manifest is exactly the shape of a sibling mid-first-build --
     evicting it destroys a live cache while its builder is still writing. A pre-fork manifest with
     no ``worktree`` key is kept for the same reason: absence of evidence.
+
+    Deletes through `_remove_cache_dir`, manifest last, for the reason its docstring measures.
     """
     gone: list[str] = []
     parent = keep.parent
@@ -448,10 +462,13 @@ def evict_dead_siblings(keep: pathlib.Path) -> list[str]:
         if man is None:                      # never-evict: no readable manifest
             continue
         wt = man.get("worktree")
-        if not wt or pathlib.Path(wt).exists():
+        if not wt or not check_dead_worktree(wt):
             continue
-        shutil.rmtree(d, ignore_errors=True)
-        gone.append(wt)
+        if _remove_cache_dir(d):
+            gone.append(wt)
+        else:
+            print(f"could NOT evict the cache of dead worktree {wt} — something in it is still "
+                  "open; its manifest was left in place so a later pass can retry", file=sys.stderr)
     return gone
 
 
@@ -546,8 +563,40 @@ def _remove_cache_dir(d: pathlib.Path) -> bool:
     return not d.exists()
 
 
-def evict_over_budget(keep: pathlib.Path, budget_mb: float | None) -> list[str]:
-    """Bring `recall/cache/` under its byte budget by evicting LEAST-RECENTLY-BUILT first.
+def load_last_queries(log: pathlib.Path) -> dict[str, str]:
+    """``worktree`` -> the newest ``at`` of its ``query`` rows in the query log, read once.
+
+    A missing or unreadable log is an EMPTY map, never an error: eviction then falls back to
+    ``built_at`` order. Malformed lines and non-``query`` rows are skipped — an ``opened`` row
+    follows a ``query`` row of the same worktree, so it would move no order anyway.
+    """
+    last: dict[str, str] = {}
+    try:
+        with log.open(encoding="utf-8") as fh:
+            for line in fh:
+                try:
+                    row = json.loads(line)
+                except ValueError:
+                    continue
+                if not isinstance(row, dict) or row.get("type") != "query":
+                    continue
+                wt, at = row.get("worktree"), row.get("at")
+                # both sides are `isoformat(timespec="seconds")` in UTC, so text order is time order
+                if isinstance(wt, str) and isinstance(at, str) and at > last.get(wt, ""):
+                    last[wt] = at
+    except (OSError, UnicodeError):
+        return {}
+    return last
+
+
+def evict_over_budget(keep: pathlib.Path, budget_mb: float | None,
+                      last_queries: dict[str, str] | None = None) -> list[str]:
+    """Bring `recall/cache/` under its byte budget by evicting LEAST-RECENTLY-QUERIED first.
+
+    A cache's age is the newer of its last logged query (`last_queries`, from `load_last_queries`)
+    and its ``built_at``, ties broken by ``built_at``. Build time ALONE evicted a sibling queried all
+    day from a warm cache ahead of one rebuilt once and abandoned (TOOL-aMendedFleet-32). An empty
+    map is exactly the old least-recently-built order.
 
     THE WHOLE PLAN IS COMPUTED BEFORE ANYTHING IS DELETED. Greedy oldest-first eviction and "when
     the budget cannot be met, delete nothing" are incompatible otherwise: a greedy loop deletes until
@@ -574,6 +623,7 @@ def evict_over_budget(keep: pathlib.Path, budget_mb: float | None) -> list[str]:
     if total <= budget:
         return out
 
+    last_queries = last_queries or {}
     candidates = []
     for d in dirs:
         if d == keep or _mid_build(d):
@@ -581,14 +631,16 @@ def evict_over_budget(keep: pathlib.Path, budget_mb: float | None) -> list[str]:
         man = read_manifest(d)
         if man is None or not man.get("built_at"):
             continue
-        candidates.append((man["built_at"], d, man.get("worktree") or "?"))
-    candidates.sort(key=lambda t: t[0])       # oldest built_at first
+        wt = man.get("worktree") or "?"
+        candidates.append((man["built_at"], d, wt, last_queries.get(wt)))
+    # oldest of (last query, built_at) first; ties by built_at
+    candidates.sort(key=lambda t: (max(t[3] or "", t[0]), t[0]))
 
     plan, projected = [], total
-    for built_at, d, wt in candidates:
+    for built_at, d, wt, last in candidates:
         if projected <= budget:
             break
-        plan.append((built_at, d, wt))
+        plan.append((built_at, d, wt, last))
         projected -= sizes[d]
     if projected > budget:
         out.append(
@@ -598,7 +650,7 @@ def evict_over_budget(keep: pathlib.Path, budget_mb: float | None) -> list[str]:
             % ((total - budget) / 1048576, budget_mb)
         )
         return out
-    for built_at, d, wt in plan:
+    for built_at, d, wt, last in plan:
         # RE-CHECK AT THE MOMENT OF DELETION. The plan is a proposal made from a snapshot; a sibling
         # can start a build between the snapshot and this loop, and a plan is not a licence to delete
         # something that has become live since it was made.
@@ -606,8 +658,8 @@ def evict_over_budget(keep: pathlib.Path, budget_mb: float | None) -> list[str]:
             out.append("did NOT evict %s: a build started in it after the plan was made" % wt)
             continue
         if _remove_cache_dir(d):
-            out.append("evicted the least-recently-built cache: %s (built %s, %.1f MB)"
-                       % (wt, built_at, sizes[d] / 1048576))
+            out.append("evicted the least-recently-queried cache: %s (last query %s, built %s, %.1f MB)"
+                       % (wt, last or "never", built_at, sizes[d] / 1048576))
         else:
             out.append("could NOT evict %s (built %s) — something in it is still open; its manifest "
                        "was left in place so a later pass can retry" % (wt, built_at))
@@ -658,8 +710,9 @@ def ensure_cache(repo: pathlib.Path, force: bool = False) -> tuple[pathlib.Path,
     # second pass over whatever survives, and both run only AFTER a successful build: a cache is
     # replaceable only once its replacement exists.
     for wt in evict_dead_siblings(dirp):
-        print(f"evicted the cache of a worktree that no longer exists: {wt}", file=sys.stderr)
-    for line in evict_over_budget(dirp, CONF.cache_budget_mb):
+        print(f"evicted the cache of a worktree that no longer exists or holds no .git: {wt}",
+              file=sys.stderr)
+    for line in evict_over_budget(dirp, CONF.cache_budget_mb, load_last_queries(log_path(repo))):
         print(line, file=sys.stderr)
     return dirp, built, True
 

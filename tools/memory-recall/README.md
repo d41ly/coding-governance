@@ -98,24 +98,28 @@ age. Two passes run after a successful build, never before (a cache is replaceab
 replacement exists):
 
 1. **dead-worktree eviction**, unconditional and free: a sibling whose recorded `worktree` no longer
-   exists goes. A cache with **no readable manifest** is never evicted — that is the shape of a
-   sibling mid-first-build.
+   exists, or exists as an empty husk holding no `.git` entry (what `git worktree remove` leaves on
+   Windows while a process holds the directory), goes. A cache with **no readable manifest** is
+   never evicted — that is the shape of a sibling mid-first-build. A directory that cannot be
+   removed is reported `could NOT evict` and keeps its manifest for a later pass.
 2. **the byte budget**, `RECALL_CACHE_BUDGET_MB` in `.memory-tree.conf`. **Absent** = the kit's
+   default, 512 MB; **blank** = uncapped. Eviction is least-recently-queried first: a cache's age is
+   the newer of its worktree's last `query` row in `queries.jsonl` and its `built_at`, ties broken by
+   `built_at`, so a sibling queried all day from a warm cache outlives one rebuilt once and
+   abandoned. It stops the moment the tree is under budget. Three directories are never candidates: the current
+   worktree's cache (evicting it makes the budget a rebuild loop), one that is **mid-build** — a
+   database newer than its manifest, which is true during a *re*build too, when the previous manifest
+   is still readable — and one whose manifest has no `built_at`. When the budget cannot be met
+   without reaching past them, the shortfall is reported and **nothing** is deleted.
+
+Every eviction prints one line naming the worktree, its last query (`never` when no row names it) and
+its `built_at`. A cache that vanishes silently is indistinguishable from one that was never built.
 
 `RECALL_EXTRA_SOURCES` — space-separated, repo-RELATIVE files whose `KEY=value` declarations join
 the corpus as chunks, each carrying the comment block above it. Blank or absent is the pre-widening
 corpus exactly; a declared file that does not exist is skipped with one line. **Declared, never
 globbed** — corpus membership is a decision about what counts as an answer. Note for adopters: a
 file you name here is INDEXED, so do not name one holding secrets.
-   default, 512 MB; **blank** = uncapped. Eviction is least-recently-built first by `built_at`, and
-   it stops the moment the tree is under budget. Three directories are never candidates: the current
-   worktree's cache (evicting it makes the budget a rebuild loop), one that is **mid-build** — a
-   database newer than its manifest, which is true during a *re*build too, when the previous manifest
-   is still readable — and one whose manifest has no `built_at`. When the budget cannot be met
-   without reaching past them, the shortfall is reported and **nothing** is deleted.
-
-Every eviction prints one line naming the worktree and its `built_at`. A cache that vanishes silently
-is indistinguishable from one that was never built.
 
 ## Adopt (per project)
 

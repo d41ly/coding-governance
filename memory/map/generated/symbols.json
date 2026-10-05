@@ -1663,6 +1663,11 @@
       "file": "tools/check-spec-tokens.py"
     },
     {
+      "id": "check_dead_worktree",
+      "kind": "function",
+      "file": "tools/memory-recall/query.py"
+    },
+    {
       "id": "check_declaration",
       "kind": "function",
       "file": "tools/lexicon/lexicon_conf.py"
@@ -4146,6 +4151,11 @@
       "id": "load_kit_conf",
       "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"
+    },
+    {
+      "id": "load_last_queries",
+      "kind": "function",
+      "file": "tools/memory-recall/query.py"
     },
     {
       "id": "load_map_tree",
@@ -9053,6 +9063,11 @@
       "file": "tools/memory-recall/selftest.py"
     },
     {
+      "id": "test_budget_orders_by_last_query",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
       "id": "test_budget_protections",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
@@ -9304,6 +9319,11 @@
     },
     {
       "id": "test_eviction",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_eviction_husk",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
     },
@@ -9576,6 +9596,11 @@
       "id": "test_lang_mode_ratchet",
       "kind": "function",
       "file": "tools/drift-audit/selftest.py"
+    },
+    {
+      "id": "test_last_queries_and_empty_log",
+      "kind": "function",
+      "file": "tools/memory-recall/selftest.py"
     },
     {
       "id": "test_leaves_are_killed_first",

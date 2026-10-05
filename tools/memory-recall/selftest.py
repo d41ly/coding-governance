@@ -127,7 +127,7 @@ def resolve_memory_root() -> str:
 # `main()` already asserts `len(order) == len(_checks)`, which is DECLARED versus RAN: delete an arm
 # from both the order list and the definitions and it passes silently. This is the external number
 # that cannot be satisfied by deleting both halves.
-SELFTEST_ARMS = 77
+SELFTEST_ARMS = 80
 # 34 -> 58 on 2026-08-24 (adopter ic's recall contrib branch): twenty-four arms — twenty-three ported from
 #   adopter ic's scripts/recall/selftest.py plus one written here. NINE over `bench.py`/`union.py`,
 #   which `verbatim.json` pinned by digest and nothing exercised; ELEVEN over the half of
@@ -163,6 +163,9 @@ SELFTEST_ARMS = 77
 # 76 -> 77 on 2026-10-05 (TOOL-aMendedFleet-31): ONE arm, the two-tier emission - twenty equal hits
 #   at a budget whose snippet share holds three print three snippets and seventeen pointer lines,
 #   and a budget too small for every pointer still truncates.
+# 77 -> 80 on 2026-10-05 (TOOL-aMendedFleet-32): THREE arms over cache eviction - live siblings whose
+#   last-query order inverts their built_at order, a husk worktree with no .git, and the query-log
+#   reader with its empty-map fallback to built_at order.
 
 
 def check_provenance_chain(src: str | None = None, pinned: int | None = None) -> str:
@@ -1006,7 +1009,7 @@ def _budget_conf(mb: str) -> str:
     return CONF + f'RECALL_CACHE_BUDGET_MB="{mb}"\n'
 
 
-@check("the cache budget evicts least-recently-built first and stops at the budget")
+@check("the cache budget evicts the oldest first and stops at the budget")
 def test_budget_lru():
     root, kitdir = make_repo(conf=_budget_conf("0.4"))
     try:
@@ -1019,7 +1022,7 @@ def test_budget_lru():
         assert not old.exists(), "the oldest cache survived an over-budget run"
         assert new.exists(), "eviction did not STOP once the tree was under budget"
         assert cache_of(root).exists(), "the CURRENT worktree's cache was evicted"
-        assert "evicted the least-recently-built cache" in proc.stderr, "the eviction was silent"
+        assert "evicted the least-recently-queried cache" in proc.stderr, "the eviction was silent"
         assert "2020-01-01" in proc.stderr, "the report does not name what went"
         return "oldest gone, newer kept, current kept, reported"
     finally:
@@ -1217,16 +1220,102 @@ def test_budget_blank():
         proc = run(root, kitdir, *Q, "--rebuild")
         assert proc.returncode == 0, proc.stderr
         assert old.exists(), "a blank budget still evicted by size"
-        assert "least-recently-built" not in proc.stderr, "the size pass ran with a blank budget"
+        assert "least-recently-queried" not in proc.stderr, "the size pass ran with a blank budget"
         # ...and the SAME tree under a real budget does evict it, so the arm above is not passing
         # because the fixture is under budget anyway.
         (root / ".memory-tree.conf").write_text(_budget_conf("0.4"), encoding="utf-8", newline="\n")
         proc2 = run(root, kitdir, *Q, "--rebuild")
         assert not old.exists(), "the same tree under a real budget did not evict — the blank arm is vacuous"
-        assert "least-recently-built" in proc2.stderr
+        assert "least-recently-queried" in proc2.stderr
         return "blank = uncapped, and the same tree evicts once a budget is set"
     finally:
         cleanup(root)
+
+
+# ------------------------------------------ last-query order and husk worktrees (TOOL-aMendedFleet-32)
+
+
+@check("the cache budget evicts least-recently-QUERIED first: an old build in use outlives an idle one")
+def test_budget_orders_by_last_query():
+    """Three LIVE siblings built A, B, C oldest first, last queried A newest. Build order alone
+    evicts A, the one in use; the last-query order evicts B and names its last query."""
+    root, kitdir = make_repo(conf=_budget_conf("0.4"))
+    try:
+        run(root, kitdir, *Q)
+        caches = cache_of(root).parent
+        # A live worktree is a directory holding a `.git` entry. Under the fixture's own .git, so
+        # cleanup(root) takes them and no corpus walk ever sees them.
+        trees = {}
+        for n in "ABC":
+            t = git_common_dir(root) / "wt" / n
+            t.mkdir(parents=True)
+            (t / ".git").write_text("gitdir: nowhere\n", encoding="utf-8")
+            trees[n] = str(t)
+        sib = {n: _sib(caches, n, kb=150, built_at=f"2020-0{i}-01T00:00:00+00:00", worktree=trees[n])
+               for i, n in enumerate("ABC", 1)}
+        rows = (("A", "2022-01-01T00:00:00+00:00"), ("B", "2020-06-01T00:00:00+00:00"),
+                ("C", "2021-01-01T00:00:00+00:00"), ("A", "2020-07-01T00:00:00+00:00"))
+        log = git_common_dir(root) / "recall" / "queries.jsonl"
+        with log.open("a", encoding="utf-8", newline="\n") as fh:
+            for n, at in rows:
+                fh.write(json.dumps({"type": "query", "at": at, "worktree": trees[n]}) + "\n")
+        proc = run(root, kitdir, *Q, "--rebuild")
+        assert proc.returncode == 0, proc.stderr
+        assert sib["A"].exists(), "A, built first and queried last, was evicted: build order still rules"
+        assert not sib["B"].exists(), "B, the least-recently-queried cache, survived an over-budget run"
+        assert sib["C"].exists(), "eviction did not STOP once the tree was under budget"
+        assert "last query 2020-06-01" in proc.stderr, "the line does not name B's last query"
+        return "A kept on its last query, B evicted and named by it, C kept"
+    finally:
+        cleanup(root)
+
+
+@check("cache eviction: a husk worktree (exists, no .git) goes with a vanished one; a live one stays")
+def test_eviction_husk():
+    root, kitdir = make_repo()
+    try:
+        run(root, kitdir, *Q)
+        caches = cache_of(root).parent
+        husk = git_common_dir(root) / "husk"
+        husk.mkdir()
+        gone = _sib(caches, "gone", kb=1, worktree=str(root / "no" / "such" / "tree"))
+        hsk = _sib(caches, "husk", kb=1, worktree=str(husk))
+        live = _sib(caches, "live", kb=1, worktree=str(root))
+        proc = run(root, kitdir, *Q, "--rebuild")
+        assert proc.returncode == 0, proc.stderr
+        assert not gone.exists(), "a cache for a vanished worktree survived"
+        assert not hsk.exists(), "a cache for an empty husk worktree survived"
+        assert live.exists(), "a cache for a LIVE worktree was evicted"
+        assert str(husk) in proc.stderr, "the husk eviction was silent"
+        return "vanished and husk evicted and reported, live kept"
+    finally:
+        cleanup(root)
+
+
+@check("load_last_queries keeps each worktree's newest query row; an empty map is built_at order")
+def test_last_queries_and_empty_log():
+    scratch = pathlib.Path(tempfile.mkdtemp(prefix="mrecall-lq-")).resolve()
+    try:
+        log = scratch / "queries.jsonl"
+        rows = ({"type": "query", "at": "2021-01-01T00:00:00+00:00", "worktree": "W"},
+                {"type": "opened", "at": "2023-01-01T00:00:00+00:00", "worktree": "W"},
+                {"type": "query", "at": "2020-01-01T00:00:00+00:00", "worktree": "W"})
+        log.write_text("{not json\n" + "".join(json.dumps(r) + "\n" for r in rows),
+                       encoding="utf-8", newline="\n")
+        got = query.load_last_queries(log)
+        assert got == {"W": "2021-01-01T00:00:00+00:00"}, f"wrong map: {got}"
+        assert query.load_last_queries(scratch / "absent.jsonl") == {}, "an absent log is not empty"
+        caches = scratch / "cache"
+        keep = caches / "keep"
+        keep.mkdir(parents=True)
+        old = _sib(caches, "old", kb=300, built_at="2020-01-01T00:00:00+00:00", worktree="X")
+        new = _sib(caches, "new", kb=100, built_at="2021-01-01T00:00:00+00:00", worktree="Y")
+        out = query.evict_over_budget(keep, 0.3, {})
+        assert not old.exists() and new.exists(), f"an empty map left built_at order: {out}"
+        assert any("last query never" in line for line in out), f"no `never` in {out}"
+        return "newest query row kept, opened and malformed skipped, absent log empty, empty map = built_at"
+    finally:
+        cleanup(scratch)
 
 
 def copy_extra(kitdir: pathlib.Path, *names: str) -> None:
@@ -3134,6 +3223,8 @@ def main() -> int:
         test_budget_lru, test_budget_protections, test_build_marker_lifecycle,
         test_budget_build_in_flight, test_budget_marker_ttl,
         test_budget_cannot_satisfy, test_budget_recheck_before_delete, test_budget_blank,
+        # TOOL-aMendedFleet-32: last-query order, husk worktrees, the log reader
+        test_budget_orders_by_last_query, test_eviction_husk, test_last_queries_and_empty_log,
         test_python3_only,
         test_scaffold_converges, test_skill_drift_reds, test_crlf_working_copy_is_not_drift,
         test_skill_description_invariants, test_hook_test,
