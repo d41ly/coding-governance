@@ -2,10 +2,10 @@
 
 <!-- kickoff-manifest: v1.4 · instantiated from skills/session-kickoff/MANIFEST-TEMPLATE.md -->
 <!-- manifest-audit
-last-audit: 2026-10-05T06:44:15+03:00 @ ebfed9a2192f63ed2b85f4d109135f5014eeed6e
+last-audit: 2026-10-05T06:52:11+03:00 @ 56321bcfc8ccb4a1a295b652d0c8decd26848b57
 watch: tools/memory-tree/check-memory-hygiene.sh; tools/check-template-size.sh; tools/run-gates/run-gates.sh; tools/run-gates/run-selftests.sh; tools/gate-legs.json; skills/session-kickoff/manifest-check.sh; .memory-tree.conf; coding-governance-agents.template.md; skills/session-kickoff/SKILL.md; .unattended.conf; memory/guides/BUILD-METHOD.md
 verify-paths: AGENTS.md; coding-governance-agents.template.md; README.md; memory/guides/BUILD-METHOD.md
-last-body-change: 30c5cb34aba27c0cc71a03c95817a32844a0e37d
+last-body-change: 56321bcfc8ccb4a1a295b652d0c8decd26848b57
 check-script: skills/session-kickoff/manifest-check.sh
 registry: AGENTS.md
 -->
@@ -183,7 +183,7 @@ GATE_SELFTESTS=1 bash tools/run-gates/run-gates.sh   # also run EVERY self-test 
 GATE_ATTRIBUTE=<rev> bash tools/run-gates/run-gates.sh   # re-run each RED leg at <rev> and print whose red it is: OWN, INHERITED, MIXED, CONTENDED or DEAD PROBE. Report-only, the exit never moves; .githooks/pre-push exports the remote sha. TOOL-dDerivedDocket-23
 bash tools/run-gates/run-selftests.sh --serial  # the HELD population on demand, budget-timed; --pooled withholds cost verdicts and REFUSES any row with no calibrated reading until --pooled --calibrate has run (TOOL-aBatchedArm-5); bare REFUSES; GOV_NODE must be a registry tag; a pooled red keeps each row's output under <git-dir>/gate-logs/selftests/. TOOL-aBatchedArm-4, -5
 bash tools/unattended/run-unattended-gates.sh --pooled   # DoD for tools/unattended/ work: pooled PARITY against tools/run-gates/selftest-pooled-evidence.txt, or `--selftests --serial --attribute <BASE>` reading `verdict clean`. TOOL-dDerivedDocket-1
-python tools/memory-tree/gotchas.py --for-diff <base>..<head>   # the recurring-bug-class checklist for THIS diff — run it before a review
+python tools/memory-tree/gotchas.py --for-diff <base>..<head>   # the recurring-bug-class checklist + by-design block for THIS diff — run it before a review
 python tools/drift-audit/drift_report.py   # ~seconds, no agents: do this repo's own RECORDS still match reality?
 python tools/govkit/govkit.py epoch --base <base>   # a kit whose shipped bytes moved since <base> and whose version did not: run after a commit that touches a kit. TOOL-aRepatriatedFork-15
 python3 tools/gate-lint/encoding_posture.py memory/project/encoding-posture-sites.txt . tools skills   # text IO that names no encoding; the registry may fall and never rise. TOOL-aRepatriatedFork-3

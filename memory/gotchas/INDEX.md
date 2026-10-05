@@ -32,8 +32,10 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [bash-c-multiline-flattens-under-msys](bash-c-multiline-flattens-under-msys.md) | class | 4 |  | a multi-line script handed to `bash -c` from a Windows python re-parses as one line under the MSYS layer, and a backslashed `C:\` path handed to MSYS bash loses its separators, so a probe that works in a shell fails from a subprocess with an error naming neither cause |
 | [borrowed-seed-inherits-its-head-state](borrowed-seed-inherits-its-head-state.md) | class | 3 |  | a fixture built from another suite's seed inherits that seed's HEAD state, and a probe that reads HEAD is dead on an unborn one |
 | [bounded-through-a-pipe-is-unbounded](bounded-through-a-pipe-is-unbounded.md) | class | 7 |  | a wall-clock timeout captured through a command substitution bounds the verdict and not the clock, and reports success on schedule while the caller blocks |
+| [canary-waits-on-a-rendezvous-not-a-clock](canary-waits-on-a-rendezvous-not-a-clock.md) | invariant | 1 |  | the run-gates canary never compares elapsed times, and that is the ruling, not a gap |
 | [check-format-grades-two-populations](check-format-grades-two-populations.md) | class | 3 |  | the build README slot gate binds every tracked README on one axis and only the declared ones on the other, so a new folder can red on a rule its author never opted into |
 | [concurrency-is-not-a-budget](concurrency-is-not-a-budget.md) | class | 6 |  | a per-item verify fan-out passes a concurrency cap and still spawns one agent per finding |
+| [concurrent-runs-are-announced-not-refused](concurrent-runs-are-announced-not-refused.md) | invariant | 2 |  | two live unattended runs of different builds are announced at preflight and never refused, and that is the ruling, not a gap |
 | [conf-value-interpolated-into-a-regex](conf-value-interpolated-into-a-regex.md) | class | 10 |  | a config value spliced into a regex must be VALIDATED as a plain path, not escaped — a quoted value matches nothing and a value with a pipe swallows a subtree, both silently |
 | [containment-tested-one-way](containment-tested-one-way.md) | class | 8 |  | a guard asking only "is this path under the protected one" refuses the narrow declarations and admits the one that claims everything |
 | [criterion-asserts-what-its-own-command-cannot-show](criterion-asserts-what-its-own-command-cannot-show.md) | class | 2 |  | an acceptance criterion names a command and then asserts a figure that command never prints, a field nothing the change moves, or a state that holds when the scope item is skipped |
@@ -96,6 +98,7 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [suite-edited-while-bash-executes-it](suite-edited-while-bash-executes-it.md) | class | 2 |  | bash reads a script incrementally by byte offset, so editing a suite file while a long run of it is executing corrupts the parse at the old offset and the run dies with a syntax error that names no edit |
 | [suite-invalidated-by-a-commit-under-it](suite-invalidated-by-a-commit-under-it.md) | class | 1 |  | a suite that pins gov's revision at import and stamps fixtures from live HEAD is silently invalidated by any commit made while it runs, and the failures name the product |
 | [swallowed-delegate-reads-as-clean](swallowed-delegate-reads-as-clean.md) | class | 2 |  | a gate that discards its delegate's exit status reads a delegate that never ran as a clean population |
+| [sweep-issues-no-cost-verdict](sweep-issues-no-cost-verdict.md) | invariant | 1 |  | the self-test sweep never grades a suite's wall clock against its budget, and that is the ruling, not a gap |
 | [text-mode-read-eats-a-bare-cr](text-mode-read-eats-a-bare-cr.md) | class | 2 |  | reading a CRLF worktree file in text mode turns a bare CR inside a regex into a newline |
 | [trace-profile-measures-itself](trace-profile-measures-itself.md) | class | 1 |  | a per-line set -x profile charges its own write overhead to the next line, so its seconds rank by call count and an optimisation aimed at them moves nothing |
 | [trailing-comma-counted-as-an-element](trailing-comma-counted-as-an-element.md) | class | 5 |  | a counter scoring one-plus-every-top-level-comma reads a trailing comma as a real item, so every multi-line literal measures one too many |
@@ -109,6 +112,6 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [witness-graded-against-a-fact-written-after-it](witness-graded-against-a-fact-written-after-it.md) | class | 2 |  | a sidecar line that outlives the lease it was written under is graded against the id the new lease replaced, so a dead incarnation's witness passes the check the live one owes |
 | [worktree-crlf-outside-the-gated-population](worktree-crlf-outside-the-gated-population.md) | class | 3 |  | a worktree checkout lands CRLF on eol-pinned files, no wiring gate sees it, and the reader that breaks is a consumer no gate byte-compares |
 
-94 record(s): 94 class, 0 note, 0 superseded · 6 universal · 0 unanchored
+97 record(s): 94 class, 0 note, 3 invariant, 0 superseded · 6 universal · 0 unanchored
 
 <!-- END GENERATED -->
