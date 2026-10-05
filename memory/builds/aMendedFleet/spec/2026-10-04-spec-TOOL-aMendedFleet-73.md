@@ -215,7 +215,7 @@ UNVERIFIED for a vaguer brief. Concurrency never exceeds five.
 
 - security — cells are scratch git repositories under `%TEMP%`, each forbidden to read outside itself;
   no secret enters a prompt, and every agent writes only inside its cell or this build's `build/`.
-- perf / scale — about 26 agents, never more than five at once; one Workflow call.
+- perf / scale — about 27 agents, never more than five at once; one Workflow call.
 - error / empty / loading states — a session limit kills workflow agents silently, so the main loop
   resumes the run by its id; a cell with no tool scores 0 and is named, never dropped.
 - observability — every agent's prompt carries its tag, and the record names every stage's count.
@@ -297,7 +297,7 @@ New arm: none · the instruments carry their own liveness controls (AC2, AC3, AC
 
 - rev-1 · 2026-10-04 · initial draft; the first trial's record re-read, its scratch root found empty,
   and the arm designed with a decision rule registered before it runs.
-- rev-2 · 2026-10-06 · S2 · S4 · §4 · the unit pass found three things the design needed and did not
+- rev-2 · 2026-10-06 · S2 · S4 · §4 · §5 · the unit pass found three things the design needed and did not
   name: the pilot needs a cell of its own, so `cells` makes eleven; the scorers must not see which
   cell built a tool, so `cells --blind` and `aggregate --collect` carry the salted names and the
   unblinding inside the six verbs; and a Workflow script runs no command, so two runner agents run
