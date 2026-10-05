@@ -4838,6 +4838,11 @@
       "file": "tools/memory-tree/transition_audit.py"
     },
     {
+      "id": "derive_budget_cut",
+      "kind": "function",
+      "file": "tools/codebase-map/reuse_lookup.py"
+    },
+    {
       "id": "derive_cache_key",
       "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"
@@ -15676,6 +15681,11 @@
       "id": "test_budget_cannot_satisfy",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_budget_cut_shows_first_and_names_the_rest",
+      "kind": "function",
+      "file": "tools/codebase-map/selftest.py"
     },
     {
       "id": "test_budget_lru",

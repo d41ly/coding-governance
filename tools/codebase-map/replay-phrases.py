@@ -165,9 +165,13 @@ def check_path_match(candidate: str, target: str) -> bool:
             or target.endswith("/" + candidate))
 
 
-def measure_phrase(corpus, ref, phrase: str, truth: list[str]) -> dict:
+def measure_phrase(corpus, ref, phrase: str, truth: list[str], budget: int = 0,
+                   scan: dict | None = None) -> dict:
     """Rank one phrase and locate the first ground-truth path in the shortlist."""
-    sl = rl.assemble_shortlist(phrase, corpus, ref)
+    sl = rl.assemble_shortlist(phrase, corpus, ref, scan)
+    # hit@budget reads the cut `reuse_lookup` prints, from the function that prints it
+    # (TOOL-aMendedFleet-36 S5); it never re-derives the cut here.
+    shown, _ = rl.derive_budget_cut(sl, corpus, budget)
     # RANK BY CANDIDATE, NOT BY FILE, and the difference is not cosmetic. `TOOL-dTracedLattice-1` S1
     # replaced `Candidate.file` with `files`, so one candidate now contributes every definer of its
     # symbol. Counting file POSITIONS then makes a candidate with four definers cost four ranks,
@@ -186,6 +190,7 @@ def measure_phrase(corpus, ref, phrase: str, truth: list[str]) -> dict:
         "hit": rank is not None,
         "hit5": rank is not None and rank <= 5,
         "hit10": rank is not None and rank <= 10,
+        "hit_at_budget": rank is not None and rank <= len(shown),
     }
 
 
@@ -195,6 +200,9 @@ def main() -> int:
     ap.add_argument("--limit", type=int, default=0, help="grade only the first N phrases")
     ap.add_argument("--ceiling", type=float, default=CEILING_S,
                     help=f"wall-clock ceiling in seconds (declared: {CEILING_S:g})")
+    ap.add_argument("--budget", type=int, default=rl.DEFAULT_BUDGET,
+                    help=f"byte budget hit@budget is read at (default {rl.DEFAULT_BUDGET}); "
+                         "0 = unbounded")
     args = ap.parse_args()
 
     if not args.json:
@@ -216,8 +224,11 @@ def main() -> int:
         graded = graded[: args.limit]
 
     corpus = rl.load_corpus()
-    ref = m.build_reference_index(corpus.symbol_files)
-    rows = [measure_phrase(corpus, ref, p, t) for p, t in graded]
+    # The scan stats ride each shortlist so its header -- which the budget charges -- carries the
+    # bytes a real lookup prints.
+    scan: dict = {}
+    ref = m.build_reference_index(corpus.symbol_files, stats=scan)
+    rows = [measure_phrase(corpus, ref, p, t, args.budget, scan) for p, t in graded]
 
     # THE DENOMINATOR IS DECLARED. A phrase whose ground-truth paths are not in the ranked corpus
     # at all -- a spec citing a file the symbol index does not carry -- can never register a hit,
@@ -244,6 +255,9 @@ def main() -> int:
         "hit_rate": round(len(hits) / len(rows), 3) if rows else None,
         "hit5_rate": round(sum(r["hit5"] for r in rows) / len(rows), 3) if rows else None,
         "hit10_rate": round(sum(r["hit10"] for r in rows) / len(rows), 3) if rows else None,
+        "budget": args.budget,
+        "hit_at_budget": (round(sum(r["hit_at_budget"] for r in rows) / len(rows), 3)
+                          if rows else None),
         "upper_median_rank_of_first_correct": median,
         "elapsed_s": round(elapsed, 1),
         "ceiling_s": args.ceiling,
@@ -258,6 +272,7 @@ def main() -> int:
         print(f"hit rate                    {summary['hit_rate']}")
         print(f"hit@5                       {summary['hit5_rate']}")
         print(f"hit@10                      {summary['hit10_rate']}")
+        print(f"hit@budget ({args.budget} B)    {summary['hit_at_budget']}")
         print(f"upper-median rank of first correct {summary['upper_median_rank_of_first_correct']}")
         print(f"phrases that CANNOT hit (truth outside the corpus) "
               f"{summary['phrases_truth_unreachable']}")

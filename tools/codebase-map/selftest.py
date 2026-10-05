@@ -1100,7 +1100,7 @@ def test_lookup_row_carries_sources(tmp: Path):
         assert labelled <= set(paths), f"showed a source the log dropped: {labelled - set(paths)}"
         # (b) the row carries both fields, and n_shown keeps its OLD meaning -- the ranked count,
         #     which is a different number from the path count.
-        rl.write_lookup(m.repo_root(), "q", len(sl.ranked), paths)
+        rl.write_lookup(m.repo_root(), "q", len(sl.ranked), paths, 0)
         log = rl._resolve_git_dir(m.repo_root()) / "codebase-map" / "lookups.jsonl"
         row = json.loads(log.read_text(encoding="utf-8").strip().splitlines()[-1])
         assert row["n_shown"] == len(sl.ranked), row
@@ -1110,7 +1110,7 @@ def test_lookup_row_carries_sources(tmp: Path):
         # (c) THE CAP, exercised rather than assumed: n_sources records the pre-cap count, so a
         #     truncated list is visible AS truncated. Without this the cap is a constant nothing reads.
         many = [f"src/f{i}.py" for i in range(rl.SOURCE_PATHS_CAP + 7)]
-        rl.write_lookup(m.repo_root(), "q2", 999, many)
+        rl.write_lookup(m.repo_root(), "q2", 999, many, 0)
         row = json.loads(log.read_text(encoding="utf-8").strip().splitlines()[-1])
         assert len(row["shown_paths"]) == rl.SOURCE_PATHS_CAP, len(row["shown_paths"])
         assert row["n_sources"] == len(many), row["n_sources"]
@@ -1132,7 +1132,7 @@ def test_lookup_row_carries_sources(tmp: Path):
         #     pointed at a tree with no git dir at all, which is the real resolution failure.
         nogit = tmp / "nogit"
         nogit.mkdir()
-        rl.write_lookup(nogit, "q3", 1, ["src/text.py"])  # must not raise
+        rl.write_lookup(nogit, "q3", 1, ["src/text.py"], 0)  # must not raise
         assert not list(nogit.rglob("lookups.jsonl")), "wrote a row with no git dir to write into"
     finally:
         os.environ.pop("CODEBASE_MAP_ROOT", None)
@@ -1871,6 +1871,8 @@ def main() -> int:
                       test_a_new_conditional_tier_reports_itself)
     failures += check("gate and template are byte-identical (AC5)",
                       test_the_gate_and_its_template_are_byte_identical)
+    failures += check("reuse-lookup: the byte budget keeps the first candidate (aMendedFleet-36)",
+                      test_budget_cut_shows_first_and_names_the_rest)
     failures += check("gov-only files withheld on both paths (AC13)",
                       test_gov_only_files_are_withheld_on_both_paths)
     failures += check("scan coverage line cannot go quiet (AC12)",
@@ -2086,6 +2088,41 @@ def test_scan_coverage_line_cannot_go_quiet():
     # everything and found nothing".
     quiet = rl.render(rl.Shortlist("q", [], (), corpus.threshold, {}, {}), corpus)
     assert "scan coverage: not run" in quiet, quiet
+
+
+def test_budget_cut_shows_first_and_names_the_rest():
+    """TOOL-aMendedFleet-36 — the byte budget cuts the ranked tail, never the first candidate.
+
+    A synthetic shortlist, so the arm grades the cut rule rather than this corpus's sizes. Staged
+    red by deleting the first-candidate exception in `derive_budget_cut`: budget 1 then shows none.
+    """
+    corpus = rl.Corpus(candidates={}, shared_seams={}, symbol_files=[], threshold=3,
+                       has_symbols=True, decisions_by_feature={})
+    ranked = [rl.Ranked(rl.Candidate(f"cand{i}", ("symbol",), "function", (f"src/f{i}.py",)),
+                        True, 0, "stem match") for i in range(6)]
+    sl = rl.Shortlist("q", ranked, (), 3, {}, {})
+    shown, n_cut = rl.derive_budget_cut(sl, corpus, 1)
+    assert [r.candidate.name for r in shown] == ["cand0"] and n_cut == 5, (shown, n_cut)
+    text = rl.render(sl, corpus, 1)
+    assert sum(ln.startswith("- cand") for ln in text.splitlines()) == 1, text
+    assert ("cut 5 of 6 candidate(s) past the 1-byte budget - rerun with --budget 0 to see them all"
+            in text), text
+    assert text.rstrip("\n").splitlines()[-1].startswith("Decision:"), text
+    full = rl.render(sl, corpus, 0)
+    assert sum(ln.startswith("- cand") for ln in full.splitlines()) == 6, full
+    assert "\ncut " not in full, full
+    # Every budget: the printed head stays within it once more than one candidate is shown, and
+    # the shown count never falls as the budget grows. LIVENESS: some budget must cut mid-list.
+    prev, partial = 0, False
+    for budget in range(1, len(full.encode("utf-8")) + 64, 7):
+        shown, n_cut = rl.derive_budget_cut(sl, corpus, budget)
+        assert len(shown) >= prev and len(shown) + n_cut == 6, (budget, len(shown), prev)
+        head = rl.render(sl, corpus, budget).split("\ncut ")[0] + "\n"
+        if n_cut and len(shown) > 1:
+            assert len(head.encode("utf-8")) <= budget, (budget, len(head.encode("utf-8")))
+        partial |= 1 < len(shown) < 6
+        prev = len(shown)
+    assert partial, "no budget cut mid-list, so the bound above was never exercised"
 
 
 def test_gov_only_files_are_withheld_on_both_paths():

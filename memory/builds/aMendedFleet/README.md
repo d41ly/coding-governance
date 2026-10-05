@@ -212,7 +212,7 @@ ids TOOL-aMendedFleet-96 TOOL-aMendedFleet-97 TOOL-aMendedFleet-98 TOOL-aMendedF
 | [TOOL-aMendedFleet-33 — the recall README and Skill stop typing corpus figures, and a miss re-queries before grep](spec/2026-10-04-spec-TOOL-aMendedFleet-33.md) | 33 | 1 | CLOSED | rev-2 | 2026-10-04 |
 | [TOOL-aMendedFleet-34 — recall measures offline whether an answer was used, from the query log and the worktree's next commit](spec/2026-10-04-spec-TOOL-aMendedFleet-34.md) | 34 | 1 | CLOSED | rev-3 | 2026-10-05 |
 | [TOOL-aMendedFleet-35 — the map's symbol tier reads shell definitions through the lexicon's tokenizer](spec/2026-10-04-spec-TOOL-aMendedFleet-35.md) | 35 | 2 | CLOSED | rev-2 | 2026-10-04 |
-| [TOOL-aMendedFleet-36 — `reuse_lookup.py` prints within a byte budget and names what it cut](spec/2026-10-04-spec-TOOL-aMendedFleet-36.md) | 36 | 1 | SPECCED | rev-1 | 2026-10-04 |
+| [TOOL-aMendedFleet-36 — `reuse_lookup.py` prints within a byte budget and names what it cut](spec/2026-10-04-spec-TOOL-aMendedFleet-36.md) | 36 | 1 | CLOSED | rev-1 | 2026-10-04 |
 | [TOOL-aMendedFleet-37 — dossier freshness is derived from git, and drift-audit reports the dossiers older than their paths](spec/2026-10-04-spec-TOOL-aMendedFleet-37.md) | 37 | 2 | SPECCED | rev-2 | 2026-10-04 |
 | [TOOL-aMendedFleet-38 — `map_diff --converge`, its sink and its prescriptions are deleted](spec/2026-10-04-spec-TOOL-aMendedFleet-38.md) | 38 | 1 | SPECCED | rev-2 | 2026-10-04 |
 | [TOOL-aMendedFleet-39 — a harness-hooks inventory, and `git-hooks` holds real hook names only](spec/2026-10-04-spec-TOOL-aMendedFleet-39.md) | 39 | 2 | SPECCED | rev-2 | 2026-10-04 |

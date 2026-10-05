@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-36 — `reuse_lookup.py` prints within a byte budget and names what it cut
 
-**Status:** SPECCED · rev-1 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · closes TOOL-aProbedToolkit-9 · order 36
+**Status:** CLOSED · rev-1 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · closes TOOL-aProbedToolkit-9 · order 36
 
 <!-- gen:spec-records -->
 

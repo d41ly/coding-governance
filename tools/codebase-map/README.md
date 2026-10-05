@@ -54,6 +54,11 @@ project specifics live in exactly two files the adopting repo owns.
   ranks a reuse shortlist from the map's four recall sources (symbols · inventory keys · affordance
   seams · shared-seams prose), plus the agent-instruction that turns it into a decision. Run it
   BEFORE building new behaviour to wire through an existing seam instead of reinventing it.
+  Output is bounded by `--budget <bytes>` (default `DEFAULT_BUDGET` in the script, measured over
+  the replay corpus): the header, candidates and sources stop before the first candidate that
+  would pass it, the first candidate always shows, and a `cut <n> of <m> candidate(s)` line names
+  what was dropped. `--budget 0` shows them all; the partial-recall notice and the `Decision:`
+  line print at every budget.
 - `adopt-codebase-map.sh --scaffold` — the one-shot adopter.
 - `.codebase-map.conf.example` — per-repo conf (MAP_ROOT · GATE_FILE · MAP_DIFF_CMD).
 - `selftest.py` — the kit's own contract check (`python <kit>/selftest.py`).

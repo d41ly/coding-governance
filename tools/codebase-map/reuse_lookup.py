@@ -63,6 +63,13 @@ NEIGHBOUR_CAP = 12
 # row that nobody has called expensive. Re-measure before trusting it. Cheap to raise, since
 # `n_sources` records what was cut.
 SOURCE_PATHS_CAP = 40
+# The byte budget for the header, candidate and sources blocks; `--budget 0` lifts it. The trailer
+# (partial-recall paragraph + Decision line) is printed outside it at every budget. TOOL-aMendedFleet-36
+# S4: the smallest value on 4096/8192/12288/16384/24576/32768 whose hit@budget over the replay corpus
+# is >= 0.97 of the unbounded hit rate. Measured 2026-10-05 on node a with `replay-phrases.py
+# --budget`, 440 graded phrases, unbounded hit rate 0.845: hit@24576 0.832 (0.985 of it), and the
+# value below, hit@16384 0.807 (0.955), misses the rule. Re-measure when the ranker or corpus moves.
+DEFAULT_BUDGET = 24576
 
 
 @dataclass(frozen=True)
@@ -423,13 +430,12 @@ def _counts(corpus: Corpus) -> dict[str, int]:
 # ======================================================================================
 
 
-def render(shortlist: Shortlist, corpus: Corpus) -> str:
-    # ASCII-only output: this prints to a console whose encoding is not guaranteed UTF-8 (a C/
-    # ASCII locale in CI, a Windows codepage), and a `print` of `—`/`·` there raises
-    # UnicodeEncodeError. Data (ids, paths) is already ASCII; keep the separators ASCII too.
+def _render_header(shortlist: Shortlist) -> list[str]:
+    """The banner lines `render` opens with, ending in a blank line. Its own function so
+    `derive_budget_cut` charges exactly the bytes `render` prints."""
     q = shortlist.query
     cc = shortlist.corpus_counts
-    out: list[str] = [
+    return [
         f'# reuse-lookup: "{q}"',
         f"# corpus: {cc.get('symbol', 0)} symbols | {cc.get('inventory', 0)} inventory keys | "
         f"{cc.get('affordance-seam', 0)} affordance seams | {cc.get('shared-seams', 0)} dossiers",
@@ -450,18 +456,76 @@ def render(shortlist: Shortlist, corpus: Corpus) -> str:
         _scan_line(shortlist),
         "",
     ]
+
+
+_CANDIDATES_HEAD = "## candidates (ranked - read these before building)"
+_SOURCES_HEAD = "## sources to open"
+_NO_SOURCES = "(no file-backed sources - inspect the candidates above)"
+
+
+def derive_budget_cut(shortlist: Shortlist, corpus: Corpus, budget: int) -> tuple[list[Ranked], int]:
+    """The ranked candidates to SHOW within ``budget`` bytes, and how many were cut.
+
+    TOOL-aMendedFleet-36 S1, the rule of `emit` in the recall kit's `query.py`, copied rather than
+    imported (another kit). Walks the ranking in order, charging each candidate its `_line` plus the
+    source lines it adds that no earlier candidate added, on top of the header, and stops before the
+    first candidate that would take the header + candidates + sources blocks past ``budget``. The
+    FIRST candidate is always shown, so a tight budget never reads as "no seam fits". 0 shows all.
+    """
+    ranked = shortlist.ranked
+    if budget <= 0 or not ranked:
+        return list(ranked), 0
+
+    def measure_bytes(line: str) -> int:
+        return len(line.encode("utf-8")) + 1  # + the newline `render` joins with
+
+    fixed = sum(measure_bytes(x) for x in _render_header(shortlist))
+    fixed += measure_bytes(_CANDIDATES_HEAD) + measure_bytes("") + measure_bytes(_SOURCES_HEAD)
+    root_name = _derive_map_root_name()
+    seen: set[str] = set()
+    cand_bytes = src_bytes = 0
+    shown: list[Ranked] = []
+    for r in ranked:
+        new = []
+        for kind, value in _scan_sources(Shortlist(shortlist.query, [r], (), 0), root_name):
+            label = _render_source_label(kind, value, root_name)
+            if label not in seen and label not in new:
+                new.append(label)
+        c_add = measure_bytes(_line(r, corpus))
+        s_add = sum(measure_bytes(f"- {x}") for x in new)
+        s_total = src_bytes + s_add
+        total = fixed + cand_bytes + c_add + (s_total if s_total else measure_bytes(f"- {_NO_SOURCES}"))
+        if shown and total > budget:
+            break
+        shown.append(r)
+        seen.update(new)
+        cand_bytes += c_add
+        src_bytes = s_total
+    return shown, len(ranked) - len(shown)
+
+
+def render(shortlist: Shortlist, corpus: Corpus, budget: int = 0) -> str:
+    # ASCII-only output: this prints to a console whose encoding is not guaranteed UTF-8 (a C/
+    # ASCII locale in CI, a Windows codepage), and a `print` of `—`/`·` there raises
+    # UnicodeEncodeError. Data (ids, paths) is already ASCII; keep the separators ASCII too.
+    out: list[str] = _render_header(shortlist)
     if shortlist.empty:
         out.append("no seam fits - nothing in the corpus shares a token stem with the query.")
         out.append("If the behaviour is genuinely new, build it; record `none - <why>` in the "
                    "dossier's ## Reuse affordance.")
     else:
-        out.append("## candidates (ranked - read these before building)")
-        for r in shortlist.ranked:
+        shown, n_cut = derive_budget_cut(shortlist, corpus, budget)
+        out.append(_CANDIDATES_HEAD)
+        for r in shown:
             out.append(_line(r, corpus))
         out.append("")
-        out.append("## sources to open")
-        for line in _sources(shortlist, corpus):
+        out.append(_SOURCES_HEAD)
+        for line in _sources(Shortlist(shortlist.query, shown, shortlist.recall_dark,
+                                       shortlist.threshold), corpus):
             out.append(f"- {line}")
+        if n_cut:
+            out.append(f"cut {n_cut} of {len(shortlist.ranked)} candidate(s) past the {budget}-byte "
+                       "budget - rerun with --budget 0 to see them all")
 
     # DERIVED, like the banner line above and for the same reason: a conf naming a layer that is
     # not there would print a partial-recall warning about a population the walk never saw, and a
@@ -618,7 +682,16 @@ def _line(r: Ranked, corpus: "Corpus | None" = None) -> str:
     return head
 
 
-def _scan_sources(shortlist: Shortlist):
+def _derive_map_root_name() -> str:
+    """Repo-RELATIVE map root (e.g. "memory/map"), not its leaf name — the default MAP_ROOT is
+    nested, and printing "map/features/…" would send the reader to a path that does not exist."""
+    try:
+        return m.map_root().relative_to(m.repo_root()).as_posix()
+    except ValueError:
+        return m.map_root().name
+
+
+def _scan_sources(shortlist: Shortlist, root_name: str = ""):
     """The ONE walk over a shortlist's sources, yielding `(kind, value)` in shortlist order.
 
     `kind` is `symbol`, `dossier` or `inventory`; only the first two are openable PATHS.
@@ -629,11 +702,10 @@ def _scan_sources(shortlist: Shortlist):
     the log while the reader was still shown it (measured: 6 of 19 entries on one live query), and
     the fix for THAT made the two walks agree by copying, which is the same defect one move later.
     Two readers of one fact is the class; one walk with two views is the answer.
+
+    ``root_name`` lets a caller walking candidate by candidate resolve the map root once.
     """
-    try:
-        root_name = m.map_root().relative_to(m.repo_root()).as_posix()
-    except ValueError:
-        root_name = m.map_root().name
+    root_name = root_name or _derive_map_root_name()
     for r in shortlist.ranked:
         c = r.candidate
         for f in c.files:
@@ -668,28 +740,18 @@ def _sources(shortlist: Shortlist, corpus: Corpus) -> list[str]:
     its OWN source: a symbol -> its def file; a declared/prose seam -> its dossier; an inventory
     key -> the inventory (via the generated MAP). `detail` is overloaded per source, so branch
     on which source the candidate came from, not on kind."""
-    # Repo-RELATIVE map root (e.g. "memory/map"), not its leaf name — the default MAP_ROOT is
-    # nested, and printing "map/features/…" would send the reader to a path that does not exist.
-    try:
-        root_name = m.map_root().relative_to(m.repo_root()).as_posix()
-    except ValueError:
-        root_name = m.map_root().name
-    lines: list[str] = []
-    seen: set[str] = set()
+    root_name = _derive_map_root_name()
+    labels = (_render_source_label(k, v, root_name) for k, v in _scan_sources(shortlist, root_name))
+    return list(dict.fromkeys(labels)) or [_NO_SOURCES]
 
-    def add(line: str) -> None:
-        if line not in seen:
-            seen.add(line)
-            lines.append(line)
 
-    for kind, value in _scan_sources(shortlist):
-        if kind == "symbol":
-            add(f"symbol def: {value}")
-        elif kind == "dossier":
-            add(f"dossier: {value}")
-        else:
-            add(f"inventory `{value}` (see {root_name}/generated/MAP.md)")
-    return lines or ["(no file-backed sources - inspect the candidates above)"]
+def _render_source_label(kind: str, value: str, root_name: str) -> str:
+    """One `_scan_sources` entry as the reader sees it; `derive_budget_cut` charges these bytes."""
+    if kind == "symbol":
+        return f"symbol def: {value}"
+    if kind == "dossier":
+        return f"dossier: {value}"
+    return f"inventory `{value}` (see {root_name}/generated/MAP.md)"
 
 
 # ======================================================================================
@@ -722,7 +784,7 @@ def _resolve_git_dir(root: Path) -> Path | None:
     return gitdir
 
 
-def write_lookup(root: Path, query: str, n_shown: int, paths: list[str]) -> None:
+def write_lookup(root: Path, query: str, n_shown: int, paths: list[str], n_cut: int) -> None:
     """Append one JSONL row recording that this probe RAN. Never fatal, never gating.
 
     WHY: ``BUILD-METHOD`` M5 names two reuse probes and only the recall one left evidence, so a
@@ -762,6 +824,9 @@ def write_lookup(root: Path, query: str, n_shown: int, paths: list[str]) -> None
             # one field silently changing what it counts. The two new fields are the path view.
             "shown_paths": paths[:SOURCE_PATHS_CAP],
             "n_sources": len(paths),
+            # TOOL-aMendedFleet-36 S6: `paths` are the SHOWN candidates' sources, and this is how
+            # many ranked candidates the byte budget cut. An older row lacks it: unknown, not zero.
+            "n_cut": n_cut,
         }
         with path.open("a", encoding="utf-8", newline="\n") as fh:
             fh.write(json.dumps(row, ensure_ascii=False) + "\n")
@@ -769,10 +834,21 @@ def write_lookup(root: Path, query: str, n_shown: int, paths: list[str]) -> None
         print(f"warning: lookup log not written ({exc})", file=sys.stderr)
 
 
+def _parse_budget(text: str) -> int:
+    """argparse `type` for `--budget`: a non-negative integer, else argparse exits 2."""
+    n = int(text)  # a ValueError here is argparse's "invalid value", exit 2
+    if n < 0:
+        raise argparse.ArgumentTypeError(f"--budget must be >= 0, got {n}")
+    return n
+
+
 def main(argv: list[str] | None = None) -> int:
     # `<kit>` resolved, so the usage line --help prints names this install's real prefix.
     parser = argparse.ArgumentParser(description=__doc__.replace("<kit>", m.kit_rel()))
     parser.add_argument("query", nargs="+", help="a behaviour description, e.g. 'send a templated email'")
+    parser.add_argument("--budget", type=_parse_budget, default=DEFAULT_BUDGET,
+                        help=f"byte budget for the header, candidates and sources (default "
+                             f"{DEFAULT_BUDGET}); 0 shows every candidate")
     args = parser.parse_args(argv)
     query = " ".join(args.query)
 
@@ -802,10 +878,13 @@ def main(argv: list[str] | None = None) -> int:
               f"the corpus. The declaration is stale — delete it rather than carrying a layer that "
               f"is not there.", file=sys.stderr)
     shortlist = assemble_shortlist(query, corpus, ref_index, scan)
-    print(render(shortlist, corpus), end="")
+    print(render(shortlist, corpus, args.budget), end="")
     # AFTER the answer is rendered, so a row means a lookup that ANSWERED. Before it, a crash in
-    # render() would leave evidence of a probe whose result nobody ever saw.
-    write_lookup(m.repo_root(), query, len(shortlist.ranked), derive_source_paths(shortlist))
+    # render() would leave evidence of a probe whose result nobody ever saw. The paths are the
+    # SHOWN candidates' -- the same cut `render` printed, re-derived from the same inputs.
+    shown, n_cut = derive_budget_cut(shortlist, corpus, args.budget)
+    view = Shortlist(shortlist.query, shown, shortlist.recall_dark, shortlist.threshold)
+    write_lookup(m.repo_root(), query, len(shortlist.ranked), derive_source_paths(view), n_cut)
     return 0  # advisory: a RESULT never fails (never a gate). Only the refusal above exits non-zero.
 
 
