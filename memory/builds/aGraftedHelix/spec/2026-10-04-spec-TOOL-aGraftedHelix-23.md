@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-23 — the `prior-session` fact is the set of sessions an incomplete holder write may have left the claim under, read by `check_claim_writable` itself and emptied by the next `--resume` holder-row claim write that lands
 
-**Status:** SPECCED · rev-5 · 2026-10-04 · node a · Tier-2 · base 5266d22e · streams tooling · order 5
+**Status:** SPECCED · rev-6 · 2026-10-05 · node a · Tier-2 · base 5266d22e · streams tooling · order 5
 
 <!-- gen:spec-records -->
 
@@ -272,18 +272,19 @@ names no run-state file.
   Red when: the widening reaches only the `--resume` row, so `--dispatch` answers check 90 or
   `--hold` announces instead of writing; or `--hold` ends in `UNATTENDED check 2 FAILED`, which is
   its setup leaving the record uncommitted, not the widening.
-- **AC5** — When sequence d of §4 runs and the next call is under `s3` with `CLAUDE_PID` changed, a
-  new `--keepalive-id` and the remote restored, it takes the run over, prints no
-  `UNATTENDED check 89 FAILED`, and leaves a claim naming the new keepalive and `session: s3`.
-  When sequence c of §4 runs up to, but not including, its closing call, the set reads `s1 s2` and
-  the claim names `session: s2`, the set's second member, and both are asserted before the next
-  call. That call, under `s3` with `CLAUDE_PID` changed, a new `--keepalive-id` and the remote
-  restored, takes the run over, prints no `UNATTENDED check 89 FAILED`, and leaves a claim naming
-  the new keepalive and `session: s3`. With the fixture leased under `CLAUDE_CODE_SESSION_ID` unset,
-  so record and claim both name session `absent`, an `s2` holder call whose claim push exits 124
-  leaves the set reading `absent`. An `s2` call with `CLAUDE_PID` changed and a new
-  `--keepalive-id` then takes the run over, prints no `UNATTENDED check 89 FAILED`, and leaves a
-  claim naming the new keepalive and `session: s2`.
+- **AC5** — When sequence d of §4 runs up to, but not including, its closing call, the claim names
+  `session: s1`, the set's first member, and is asserted before the next call. That call, under
+  `s3` with `CLAUDE_PID` changed, a new `--keepalive-id` and the remote restored, takes the run
+  over, prints no `UNATTENDED check 89 FAILED`, and leaves a claim naming the new keepalive and
+  `session: s3`. When sequence c of §4 runs up to, but not including, its closing call, the set
+  reads `s1 s2` and the claim names `session: s2`, the set's second member, and both are asserted
+  before the next call. That call, under `s3` with `CLAUDE_PID` changed, a new `--keepalive-id`
+  and the remote restored, takes the run over, prints no `UNATTENDED check 89 FAILED`, and leaves a
+  claim naming the new keepalive and `session: s3`. With the fixture leased under
+  `CLAUDE_CODE_SESSION_ID` unset, so record and claim both name session `absent`, an `s2` holder
+  call whose claim push exits 124 leaves the set reading `absent`. An `s2` call with `CLAUDE_PID`
+  changed and a new `--keepalive-id` then takes the run over, prints no
+  `UNATTENDED check 89 FAILED`, and leaves a claim naming the new keepalive and `session: s2`.
   Red when: the restart widening compares the whole value of the set with the claim's session,
   compares its first member only, or skips an `absent` member, so a restart answers check 89.
 - **AC6** — When `bash tools/check-kit-versions.sh` runs at the pass's commit it exits 0, and
@@ -307,7 +308,7 @@ New arm: tools/unattended/unattended.test.sh · AC2's two renewal legs, a landed
 
 New arm: tools/unattended/unattended.test.sh · after one incomplete s2 call, --dispatch writes, and over a second copy whose staged record is committed and pushed in build_hold_fixture's shape (unattended.test.sh:2826-2830), --hold writes held with no announce; stage the set supplied to check_claim_writable from the --resume row only · the suite's floor rises by its new arm count
 
-New arm: tools/unattended/unattended.test.sh · after sequence d, the s3 restart under a new keepalive takes over with no check 89; stage the restart widening comparing the whole value · the suite's floor rises by its new arm count
+New arm: tools/unattended/unattended.test.sh · after sequence d short of its closing call, the s3 restart under a new keepalive takes over with no check 89; stage the restart widening comparing the whole value · the suite's floor rises by its new arm count
 
 New arm: tools/unattended/unattended.test.sh · sequence c short of its closing call, the set s1 s2 and the claim s2 asserted, then the s3 restart under a new keepalive takes over with no check 89; stage the restart widening comparing the first member only · the suite's floor rises by its new arm count
 
@@ -353,6 +354,13 @@ none
   `TOOL-aGraftedHelix-26`, which selected `two-answers-to-one-question`. The sequence-d arm said
   "two unreachable pushes", and that unit's S4 pins that a call whose claim read did not answer
   pushes no claim; the arm now says two calls with the remote unreachable.
+- rev-6 · 2026-10-05 · §6 §7 · AC5 · the build pass's one divergence, before the code. AC5's first
+  leg read "when sequence d of §4 runs", and §4 ends every sequence in a closing call that empties
+  the set and leaves the claim at `s3`, so the restart after it is unit 1's plain same-session row
+  and its arm could not red under the whole-value break it names. The leg and its arm now stop short
+  of d's closing call, the reading "the remote restored" already implied, with the claim at `s1`
+  asserted first; this is `TOOL-aGraftedHelix-24` S3's correction, taken here because an arm that
+  cannot red may not land.
 
 ## 10. Reuse audit
 
