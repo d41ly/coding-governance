@@ -130,7 +130,7 @@ ids TOOL-aGraftedHelix-27 TOOL-aGraftedHelix-28
 | [TOOL-aGraftedHelix-8 — every automatic self-heal appends one line to a health log the orientation card counts](spec/2026-10-04-spec-TOOL-aGraftedHelix-8.md) | 9 | 1 | CLOSED | rev-3 | 2026-10-05 |
 | [TOOL-aGraftedHelix-15 — the build harness commits the specs its writers authored before AUDIT pins them, and its commit-first refusals name a remedy a resume cannot replay](spec/2026-10-04-spec-TOOL-aGraftedHelix-15.md) | 10 | 1 | CLOSED | rev-3 | 2026-10-05 |
 | [TOOL-aGraftedHelix-16 — the spec commit stage re-stages the authored specs after the generator renders them, and a real-git arm runs the prompt's own git block](spec/2026-10-04-spec-TOOL-aGraftedHelix-16.md) | 11 | 1 | CLOSED | rev-3 | 2026-10-05 |
-| [TOOL-aGraftedHelix-21 — the spec commit block's delta loop lists untracked paths as its record does, compares paths, and refuses when its record is unset](spec/2026-10-04-spec-TOOL-aGraftedHelix-21.md) | 12 | 1 | SPECCED | rev-3 | 2026-10-04 |
+| [TOOL-aGraftedHelix-21 — the spec commit block's delta loop lists untracked paths as its record does, compares paths, and refuses when its record is unset](spec/2026-10-04-spec-TOOL-aGraftedHelix-21.md) | 12 | 1 | SPECCED | rev-4 | 2026-10-05 |
 | [TOOL-aGraftedHelix-28 — a parity gate holds the by-design head the catalogue renders equal to the pattern the review harness parses](spec/2026-10-05-spec-TOOL-aGraftedHelix-28.md) | 12 | 1 | SPECCED | rev-1 | 2026-10-05 |
 <!-- /gen:build-units -->
 

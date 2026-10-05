@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-21 — the spec commit block's delta loop lists untracked paths as its record does, compares paths, and refuses when its record is unset
 
-**Status:** SPECCED · rev-3 · 2026-10-04 · node a · Tier-1 · base 5266d22e · streams tooling · order 12
+**Status:** SPECCED · rev-4 · 2026-10-05 · node a · Tier-1 · base 5266d22e · streams tooling · order 12
 
 <!-- gen:spec-records -->
 
@@ -32,7 +32,8 @@ audit of units 16 to 19.
   and the space, with the path fields of the record's lines, never whole lines. A wholly untracked
   foreign directory then lists file by file, each file is in the record, and none is staged; a
   recorded path whose status letters moved during the render, such as a foreign ` M` file that
-  reads ` D` by step 5, is still recognised and never staged. Observed by AC1 and AC2.
+  reads ` D` by step 5, is still recognised and never staged. Step 1's record is the shell variable
+  `rec`, renamed from unit 16's `before`, because S3 and AC2 spell `rec`. Observed by AC1 and AC2.
 - **S2** — The prose around the block says it runs as ONE Bash invocation, because the record is a
   shell variable and the agent's Bash tool keeps no shell state between calls. Observed by AC1.
 - **S3** — The block tests the record variable twice, each time as `${rec+x}` and never by
@@ -116,6 +117,25 @@ cleanup it leaves owed; the late guard is the second net for a record lost after
 
 The listing row replaces unit 16's for all three: `git status --porcelain --untracked-files=all`
 lists exactly these three paths, unchanged.
+
+### The input check under a live run
+
+Unit 16's input check refuses on any UNSTAGED change under the memory root, so a run-state file
+`RUN.md` carrying one refuses the stage although the generator never reads it: `gen_build_index.py`
+names no `RUN.md`, and its `record_paths` admits only a build's kind folders, never the build
+folder's root where `RUN.md` sits. That is right for a live run, and this unit keeps it. Every driver
+verb that writes the run-state file stages it straight after (`stage_or_fail`,
+`tools/unattended/unattended.sh:3134`), and the check reads `git diff --name-only`, the working tree
+against the index, so no driver write trips it. An unstaged change there means a writer outside the
+driver touched a file the protocol says the owner authors none of, and the cost of refusing is a
+loud `committed: false` and a named throw with its remedy, never a wrong commit. Narrowing the check
+to the generator's real inputs would be unit 16's input check, a non-goal here.
+
+The corollary, measured from the same two facts: a STAGED change is not refused, and the block's
+commit takes the whole index, so a run-state write the driver staged and nobody committed yet rides
+the spec commit. For the run-state file that is benign, since it is the run's own record and the
+driver leaves its writes staged for the next commit from the tree. Foreign staged work in general
+riding that commit is the whole-index commit, unit 16's, and outside this unit.
 
 ### Inventory
 
@@ -216,6 +236,10 @@ none
   selected `amendment-leaves-its-other-half-standing` and `git-rm-cached-refuses-a-diverged-index-blob`.
   §4 Inventory and S4 counted one arm where §7 names four, and S3's cleanup unstages the spec paths
   with `git reset`, since a staged new spec's blob differs from both `HEAD` and the working copy.
+- rev-4 · 2026-10-05 · §2 §4 · S1 · grounded against the built unit 16 block before any code. S1
+  names the record `rec`, since the block names it `before` while S3 and AC2 spell `rec`. §4 adds
+  whether the input check's refusal on an unstaged run-state file is right for a live run: it is, and
+  a staged one rides the commit.
 
 ## 10. Reuse audit
 
