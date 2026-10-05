@@ -144,6 +144,7 @@ Cite ids, never line numbers.
 | [TOOL-aMendedFleet-95](../builds/aMendedFleet/BACKLOG.md) | OPEN | LOW | — | 2026-10-04 | WIRE-INTO-PROJECT.md tells an adopter that the charter's node registry… |
 | [TOOL-aMendedFleet-96](../builds/aMendedFleet/BACKLOG.md) | OPEN | LOW | — | 2026-10-05 | tools/drift-audit/drift_report.py keeps its own _read_defs_at_sha, a… |
 | [TOOL-aMendedFleet-106](../builds/aMendedFleet/BACKLOG.md) | OPEN | LOW | — | 2026-10-05 | OWNER TRIAGE OF THE AGED UNLABELLED ASKS. TOOL-aMendedFleet-14 deferred… |
+| [TOOL-aMendedFleet-107](../builds/aMendedFleet/BACKLOG.md) | OPEN | MED | — | 2026-10-05 | --dispatch check 49 refuses a pass declaring a generator together with… |
 | [TOOL-aMeteredTurnstile-2](../builds/aMeteredTurnstile/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-20 | the bar LEAKS scratch git repos into TMPDIR and never sweeps them: 786… |
 | [TOOL-aMeteredTurnstile-3](../builds/aMeteredTurnstile/BACKLOG.md) | SPECCED | — | TOOL-aMendedFleet-72 | 2026-08-20 | gate-timings.tsv evicts on the RUN, never on the manifest: the… |
 | [TOOL-aMeteredTurnstile-5](../builds/aMeteredTurnstile/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-20 | longest-first dispatch pessimises time-to-first-signal by construction:… |
