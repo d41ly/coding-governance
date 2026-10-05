@@ -968,7 +968,8 @@ def check_fix_carriers(tmp: pathlib.Path) -> None:
         (fx / rel).parent.mkdir(parents=True, exist_ok=True)
         (fx / rel).write_bytes(data)
     git(fx, "init", "-q")
-    git(fx, "add", "-A")
+    # `-f`: a machine-global excludes file may ignore `*.dat`, and the basis reads tracked paths only.
+    git(fx, "add", "-A", "-f")
     descs = {
         "vk": ({"id": "vk", "home": "vk",
                 "version_from": {"file": "vk.sh", "pattern": "^KIT_VK_VERSION="}}, "vk/kit.toml"),
