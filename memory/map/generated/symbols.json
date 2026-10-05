@@ -2768,6 +2768,11 @@
       "file": "tools/memory-tree/transition_audit.py"
     },
     {
+      "id": "derive_anchor_tier",
+      "kind": "function",
+      "file": "tools/memory-tree/gotchas.py"
+    },
+    {
       "id": "derive_archive_name",
       "kind": "function",
       "file": "tools/runlog/selftest.py"

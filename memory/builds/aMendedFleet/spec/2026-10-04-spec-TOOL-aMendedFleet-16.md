@@ -1,10 +1,12 @@
 # TOOL-aMendedFleet-16 — `gotchas.py --for-diff` ranks classes by anchor specificity and cuts in tiers
 
-**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 16
+**Status:** CLOSED · rev-3 · 2026-10-05 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 16
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-04-build-TOOL-aMendedFleet-16-1-acceptance-ledger.md](../build/2026-10-04-build-TOOL-aMendedFleet-16-1-acceptance-ledger.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
@@ -22,8 +24,9 @@ leaves the checklist.
 
 - **S1** — Every (anchor, changed path) pair `selectable` admits is given a TIER by
   `derive_anchor_tier`: `path` when the anchor names that file, written whole or as a trailing
-  suffix of two or more segments; `directory` when the anchor names a directory on that path at a
-  segment boundary; `basename` for every other pair `selectable` admits. A class's tier is the best
+  suffix of two or more segments; `directory` when the anchor is a LEADING directory of that path,
+  ending at a segment boundary; `basename` for every other pair `selectable` admits, a floating
+  directory segment that does not start the path included. A class's tier is the best
   tier any of its anchors reaches. Selection itself is untouched: `selectable` decides membership,
   and the tier only orders it. Observed by AC1 and AC2.
 - **S2** — The selected classes print in tier order, and within a tier by the number of changed paths
@@ -211,6 +214,10 @@ is the suite that exercises this file, and `memory hygiene` runs its checks 17 t
   code units regenerate and declare; this spec omitted the write, its Files touched row and the leg.
   §3 Edges also gains **hands-off** `TOOL-aMendedFleet-17`: that unit reads the item
   shape S4 keeps, and neither spec declared the edge.
+- rev-3 · 2026-10-05 · §2 S1 · build pass: "names a directory on that path at a segment boundary"
+  read two ways, and only the LEADING-prefix reading reproduces the §4 pinned tier table on all five
+  ranges; the any-segment reading moved a floating directory segment into the directory tier and
+  disagreed on four rows. S1 now says leading directory, and the table stands unchanged.
 
 ## 10. Reuse audit
 

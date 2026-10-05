@@ -57,6 +57,11 @@ ANCHOR_RE = re.compile(r"`([^`\s]+(?:/[^`\s]*|\.(?:md|py|sh|js|json|ts|toml|yml|
 # satisfied one and not the other. Every consumer calls `declares()`; nobody re-types the alternation.
 DECLARES_RE = re.compile(r"gated by|gated in|gated at|documented[ -]check|no machine gate", re.I)
 KINDS = ("class", "note", "superseded")
+# The checklist's ORDER and CUT (TOOL-aMendedFleet-16). A selected class is ranked by how specifically
+# its best anchor matched a changed path; whole tiers print in full while they fit the budget, and from
+# the first tier that does not, every class prints as one line. No class ever leaves the checklist.
+TIER_NAMES = ("path", "directory", "basename")
+CHECKLIST_FULL_BUDGET = 12
 
 
 class Problem(Exception):
@@ -196,6 +201,23 @@ def selectable(anchor: str, paths, m: str) -> set:
     return {p for p in paths
             if not p.startswith(skip)
             and (anchor in p or p in anchor or os.path.basename(p) == os.path.basename(anchor))}
+
+
+def derive_anchor_tier(anchor: str, path: str) -> int:
+    """How specifically an anchor names a path `selectable` ALREADY admitted: an index into TIER_NAMES.
+
+    0 `path` — the anchor is the file, whole or as a trailing suffix of two or more segments.
+    1 `directory` — the anchor is a LEADING directory of the path, ending at a segment boundary.
+    2 `basename` — every other admitted pair: the basename arm, or a floating segment such as
+      `/spec/`, which names a directory nowhere in particular.
+    It only ORDERS; membership stays `selectable`'s, so the one selection predicate stays one.
+    """
+    if anchor == path or ("/" in anchor and not anchor.endswith("/") and path.endswith("/" + anchor)):
+        return 0
+    d = anchor.rstrip("/")
+    if d and path.startswith(d + "/"):
+        return 1
+    return 2
 
 
 def inert_only(rec: dict, paths, m: str, append_only: re.Pattern) -> bool:
@@ -376,14 +398,38 @@ def cmd_for_paths(root: str, conf: dict, paths, label: str = None, noun: str = "
         if r["universal"]:
             uni.append(r)
             continue
+        best, reach = None, set()
         for a in r["anchors"]:
-            if selectable(a, paths, m):
-                hit.append(r)
-                break
+            for p in selectable(a, paths, m):
+                t = derive_anchor_tier(a, p)
+                if best is None or t < best:
+                    best, reach = t, {p}
+                elif t == best:
+                    reach.add(p)
+        if best is not None:
+            hit.append((best, -len(reach), r["name"], r))
+    # Tier, then the paths the class reaches at that tier (most first), then name.
+    hit.sort(key=lambda h: h[:3])
+    counts = [sum(1 for h in hit if h[0] == t) for t in range(len(TIER_NAMES))]
+    # The cut never splits a tier and never compacts the first one; universals sit outside the budget.
+    full, shown = set(), 0
+    for t, n in enumerate(counts):
+        if n and (not shown or shown + n <= CHECKLIST_FULL_BUDGET):
+            full.add(t)
+            shown += n
+        elif n:
+            break
     print(f"# recurring-bug-class checklist for {label or f'{len(paths)} path(s)'} ({len(paths)} {noun}(s))")
     print(f"# {len(hit)} class(es) selected by an anchor + {len(uni)} universal")
-    for r in uni + hit:
-        print(f"\n- [ ] {r['name']}{' (universal)' if r['universal'] else ''}\n      {r['description']}\n      {r['path']}")
+    print("# by anchor specificity: " + " · ".join(f"{n} {TIER_NAMES[t]}" for t, n in enumerate(counts))
+          + "; a cut tier prints one line per class")
+    for r in uni:
+        print(f"\n- [ ] {r['name']} (universal)\n      {r['description']}\n      {r['path']}")
+    for t, _, _, r in hit:
+        if t in full:
+            print(f"\n- [ ] {r['name']} ({TIER_NAMES[t]})\n      {r['description']}\n      {r['path']}")
+        else:
+            print(f"\n- [ ] {r['name']} ({TIER_NAMES[t]}) · {r['path']}")
     return 0
 
 
@@ -615,6 +661,37 @@ def cmd_selftest() -> int:
         arm("--for-paths refuses a path that selects the whole tree", "selects the whole tree",
             lambda: cmd_for_paths(t8, c8, ["."]))
         arm("--for-diff omits a non-class record", "[rc=0]", lambda: 0 if "- [ ] note" not in text else 1)
+
+        # ---- TOOL-aMendedFleet-16: order by anchor specificity, cut in whole tiers ------------------
+        # File names put the catalogue in the REVERSE of tier order, so catalogue order reds the arm.
+        tgt = f"{PFX}sub/target.sh"
+        G = "Gated by the hygiene gate.\n"
+        three = {"a-base.md": _rec("a-base", "d", f"Fires on `elsewhere/target.sh`. {G}"),
+                 "b-dir.md": _rec("b-dir", "d", f"Fires on `{PFX}sub/`. {G}"),
+                 "c-path.md": _rec("c-path", "d", f"Fires on `{tgt}`. {G}"),
+                 "u.md": _rec("u", "d", "Everywhere. No machine gate.\n", universal=True)}
+        cut = {f"p{i}.md": _rec(f"p{i}", "d", f"Fires on `{tgt}`. {G}") for i in (1, 2)}
+        cut.update({f"d{i:02}.md": _rec(f"d{i:02}", "d", f"Fires on `{PFX}sub/`. {G}") for i in range(1, 12)})
+        want3 = ["- [ ] u (universal)", "- [ ] c-path (path)", "- [ ] b-dir (directory)", "- [ ] a-base (basename)"]
+        wantc = (["- [ ] p1 (path)", "- [ ] p2 (path)"]
+                 + [f"- [ ] d{i:02} (directory) · memory/gotchas/d{i:02}.md" for i in range(1, 12)])
+        for tag, recs_, want in (("three tiers", three, want3), ("2 path + 11 directory", cut, wantc)):
+            tt = os.path.join(base, tag.replace(" ", "-").replace("+", "")); os.makedirs(tt)
+            ct = _scratch(tt, recs_, {tgt: "#!/usr/bin/env bash\n"})
+            write(os.path.join(tt, tgt), "#!/usr/bin/env bash\n# edited\n")
+            run("git", "add", "-A", cwd=tt); run("git", "commit", "-q", "-m", "edit", "--no-verify", cwd=tt)
+            for verb in ("--for-diff", "--for-paths"):
+                out = io.StringIO()
+                with contextlib.redirect_stdout(out):
+                    if verb == "--for-diff":
+                        cmd_for_diff(tt, ct, "HEAD~1..HEAD")
+                    else:
+                        cmd_for_paths(tt, ct, [tgt])
+                got = [ln for ln in out.getvalue().split("\n") if ln.startswith("- [ ] ")]
+                arm(f"{verb} ranks by specificity and cuts whole tiers: {tag}", "[rc=0]",
+                    lambda got=got, want=want: 0 if got == want else 1)
+        arm("the third header line counts each tier", "# by anchor specificity: 2 path · 11 directory · "
+            "0 basename; a cut tier prints one line per class", lambda: cmd_for_paths(tt, ct, [tgt]))
 
     if fails:
         print(f"FAIL — {len(fails)} arm(s) failed")
