@@ -1490,6 +1490,12 @@ if (!specAudit) {
   const unitFloor = au.blockers + au.highs + (minors > 0 ? 1 : 0)
   const unitCeiling = au.blockers + au.highs + adjudicated + (confirmedMinors > 0 ? 2 : 0)
   const refutedOk = Number.isInteger(refuted) && refuted >= 0 && refuted <= au.unverified
+  // TWO ARMS BELOW ARE UNREACHABLE TODAY, kept on purpose and said so (guard-above-a-fold class).
+  // `d.promoted < au.confirmed` is settled by the sum, `folded` 0 and `refuted <= unverified`, which
+  // leave `promoted = confirmed + unverified - refuted`. The `promoted`/`promotedIds` pairing is
+  // settled by the unit bounds: a positive `promoted` has a floor of one, a zero one a ceiling of
+  // zero. Each stays as its own NAMED refusal should the arm above it ever loosen; neither is a
+  // redundant guard to delete, and the bounds and sum above them are not either.
   if (!d || d.disposed !== true || stood.length || !counted || !refutedOk ||
       d.promoted + d.folded + refuted + stood.length !== outstanding ||
       d.folded !== 0 || d.promoted < au.confirmed ||
