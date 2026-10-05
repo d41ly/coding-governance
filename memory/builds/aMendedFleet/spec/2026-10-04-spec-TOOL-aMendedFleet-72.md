@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-72 — the gate runner reaps the dead `gate-timings.tsv` it no longer reads
 
-**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · advances TOOL-aMeteredTurnstile-3 · order 72
+**Status:** CLOSED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · advances TOOL-aMeteredTurnstile-3 · order 72
 
 <!-- gen:spec-records -->
 

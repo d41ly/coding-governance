@@ -3152,6 +3152,12 @@ if [ -n "$LEDGER" ]; then
   # ATOMIC rather than a copy in place. A reader that opens the ledger while the bar is mid-write
   # got a truncated file before; a rename is the only way this file is ever replaced now.
   mv -f "$merged" "$LEDGER" 2>/dev/null || cp "$merged" "$LEDGER" 2>/dev/null || true
+  # THE RETIRED CACHE IS DELETED HERE. Nothing reads `gate-timings.tsv` since the ledger replaced it,
+  # yet every node that ran an older runner still holds a copy: a stale second store of one fact that
+  # build records had to warn readers not to cite. The runner is the one program every node runs, so it
+  # clears its own git dir and the common dir (the turnstile's `TS_COMMON`, empty when that is off).
+  # That one filename and nothing else; a failed delete never moves the verdict (TOOL-aMendedFleet-72).
+  rm -f "$gd/gate-timings.tsv" ${TS_COMMON:+"$TS_COMMON/gate-timings.tsv"} 2>/dev/null || true
 fi
 
 echo "----"
