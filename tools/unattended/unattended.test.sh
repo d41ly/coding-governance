@@ -14257,6 +14257,147 @@ fi   # ---- region two continues below: one compound block past about 3000 comma
      # ---- bash 5.3 on Cygwin (exit 139), so the region is cut into blocks at top-level seams
 if in_shard 2; then
 
+# ==================================================================================================
+# TOOL-aGraftedHelix-32 — THE CLOSING REVIEW'S MINORS IN THE DRIVER. AC18 (M8, L1): the GH26 AC3
+# no-push witness gets a leg of its own, the bare origin in place, no mktemp shim, and a git shim that
+# fails only the claim fetch and logs every argument list, so nothing absorbs a push before the log
+# sees it. RED against a driver copy routing the unread claim into a CAS with an empty expected sha.
+# AC6 (M3): a claim push waits while push-main holds `push-main-active` in this git dir, so a beat
+# landing mid-bar cannot clear the verdict files the lander trusts. AC7 to AC11 (M4,
+# TOOL-aBranchedMandate-9): a --preflight refusal after its claim write leaves the tree as it found it
+# and writes a claim it CREATED `aborted`, one it renewed left with a line. AC12: the post-claim
+# `return 1` sits in that one restoring branch. AC15 (M6): a soft claim read meets check 24 as one
+# announced line and the verb exits 0. Units 20's and 24's helpers, and the claim block's.
+# ==================================================================================================
+GU_BIN=$(mktemp -d)
+cat > "$GU_BIN/git" <<EOF
+#!/usr/bin/env bash
+printf ' %s \n' "\$*" >> "$GU_BIN/git.log"
+case " \$* " in *" fetch "*"refs/gov/runs/"*) exit 1 ;; esac
+exec "$GH_GIT" "\$@"
+EOF
+cat > "$GU_BIN/git.add" <<EOF
+#!/usr/bin/env bash
+case " \$* " in *" add -- memory/builds/tRun/RUN.md "*) exit 1 ;; esac
+exec "$GH_GIT" "\$@"
+EOF
+chmod +x "$GU_BIN/git" "$GU_BIN/git.add"
+mkdir -p "$GU_BIN/add"; cp "$GU_BIN/git.add" "$GU_BIN/add/git"
+# ---- AC18: over unit 25's aged base, an s2 holder call whose claim fetch fails pushes nothing.
+build_prior_base
+sed -i "s/^lease-utc: .*/lease-utc: $(derive_claim_ago 600)/" memory/builds/tRun/RUN.md
+git add -A >/dev/null && git commit -q -m gu-aged --no-verify
+gu_sha=$(read_claim_ref tRun)
+out=$(CLAUDE_CODE_SESSION_ID=s2 PATH="$GU_BIN:$PATH" bash "$SCRIPT" --resume tRun --keepalive-id k1 2>&1); rc=$?
+hit  "$out" "unattended: claims not read — the remote did not answer, git fetch exited 1"
+same "GH32 AC18 the unread holder call's git log names no push" "$(grep -c ' push ' "$GU_BIN/git.log")" "0"
+same "GH32 AC18 ...the claim ref is unmoved" "$(git ls-remote "$ORIGIN" refs/gov/runs/tRun | cut -f1)" "$gu_sha"
+same "GH32 AC18 ...and the call exits 0, the read announced and the lease recorded" "$rc" "0"
+remove_claim_refs; reset_tree
+# ---- AC6: a due beat over a live run waits while push-main holds its marker in this git dir.
+build_claim_held
+seed_claim tRun fixture-session k1 live "$(derive_claim_ago $((GH_BOUND / 3)))" "${USERNAME:-${USER:-absent}}" "$(read_host_name)"
+gu_gd=$(git rev-parse --absolute-git-dir); gu_sha=$(read_claim_ref tRun)
+: > "$gu_gd/push-main-active"; printf 'gate-red\tthe bar went red\n' > "$gu_gd/pre-push-refusal"
+gu_rf=$(git hash-object "$gu_gd/pre-push-refusal")
+out=$(run --beat tRun)
+hit  "$out" "unattended: beat — tRun · skipped: the write did not complete: push-main is landing from this git dir, so a claim push now would clear its verdict files: "
+same "GH32 AC6 the beat prints one beat line" "$(printf '%s\n' "$out" | grep -c '^unattended: beat — ')" "1"
+same "GH32 AC6 ...leaves pre-push-refusal byte-identical" "$(git hash-object "$gu_gd/pre-push-refusal" 2>/dev/null)" "$gu_rf"
+same "GH32 AC6 ...and the claim ref unmoved" "$(git ls-remote "$ORIGIN" refs/gov/runs/tRun | cut -f1)" "$gu_sha"
+rm -f "$gu_gd/push-main-active" "$gu_gd/pre-push-refusal"
+remove_claim_refs; reset_tree
+# ---- AC7: a finished record over a README missing its build-index close refuses at check 9 before the
+# ---- rotation; a live record missing its generated close refuses before the claim write.
+build_aborted_run() { run --preflight tRun --keepalive-id k1 >/dev/null; sed -i 's/^phase: .*/phase: ABORTED/' memory/builds/tRun/RUN.md; fixture; }
+reset_tree; build_aborted_run
+mutate memory/builds/tRun/README.md '/^<!-- \/gen:build-index -->$/d'; fixture
+out=$(run --preflight tRun --keepalive-id k2); rc=$?
+same "GH32 AC7 a malformed README under a finished record exits 1" "$rc" "1"
+hit  "$out" "the build README's generated markers are malformed, and the unit list is DERIVED from there, so an unpaired marker is not something to guess around"
+miss "$out" "retired the finished record"
+same "GH32 AC7 ...and leaves the tree clean" "$(git status --porcelain)" ""
+build_claim_held
+mutate memory/builds/tRun/RUN.md '/^<!-- \/run:generated -->$/d'; fixture
+gu_sha=$(read_claim_ref tRun)
+out=$(run --preflight tRun --keepalive-id k1); rc=$?
+same "GH32 AC7 a live record missing its generated close exits 1" "$rc" "1"
+hit  "$out" "the run-state file's generated markers are malformed — exactly one open and one close, close after open"
+same "GH32 AC7 ...with its claim at the pre-call sha" "$(git ls-remote "$ORIGIN" refs/gov/runs/tRun | cut -f1)" "$gu_sha"
+remove_claim_refs
+# ---- AC8: a session id carrying a carriage return refuses at write_lease, after the rotation; the
+# ---- refusal puts the finished record back, and the next clean call archives it.
+reset_tree; build_aborted_run
+gu_blob=$(git rev-parse HEAD:memory/builds/tRun/RUN.md)
+# REDIRECTED, never captured: on node a a carriage return in an environment value does not reach a
+# child started inside `$(...)`, so a captured call ran under `s1` and preflighted green. MEASURED.
+CLAUDE_CODE_SESSION_ID=$'s\r1' bash "$SCRIPT" --preflight tRun --keepalive-id k2 >"$GU_BIN/ac8.out" 2>&1; rc=$?
+out=$(cat "$GU_BIN/ac8.out")
+same "GH32 AC8 a refusal after the rotation exits 1" "$rc" "1"
+hit  "$out" "UNATTENDED check 17 FAILED"
+hit  "$out" "unattended: --preflight refused; the run-state file is unchanged"
+same "GH32 AC8 ...leaves the tree clean" "$(git status --porcelain)" ""
+same "GH32 AC8 ...the record at its HEAD blob" "$(git hash-object memory/builds/tRun/RUN.md)" "$gu_blob"
+same "GH32 AC8 ...and no archive" "$(ls memory/builds/tRun | grep -c '^RUN\.ABORTED\.')" "0"
+out=$(run --preflight tRun --keepalive-id k2)
+hit  "$out" "preflight OK"
+hit  "$out" "unattended: retired the finished record — memory/builds/tRun/RUN.md -> "
+# ---- AC9: the stage itself refused - a git shim failing only the run-state file's add.
+reset_tree; build_aborted_run
+out=$(PATH="$GU_BIN/add:$PATH" bash "$SCRIPT" --preflight tRun --keepalive-id k2 2>&1); rc=$?
+same "GH32 AC9 a refused stage exits 1" "$rc" "1"
+hit  "$out" "cannot stage the run-state file, and the gate leg's whole per-run population is the index, so an unstaged run is invisible to every check it has"
+hit  "$out" "unattended: --preflight refused; the run-state file is unchanged"
+same "GH32 AC9 ...leaves the tree clean" "$(git status --porcelain)" ""
+same "GH32 AC9 ...and no archive" "$(ls memory/builds/tRun | grep -c '^RUN\.ABORTED\.')" "0"
+# ---- AC10: the same refusal over a claim this call CREATED writes it aborted.
+arm_claim_fixture; build_aborted_run; remove_claim_refs
+out=$(PATH="$GU_BIN/add:$PATH" bash "$SCRIPT" --preflight tRun --keepalive-id k2 2>&1); rc=$?
+same "GH32 AC10 a refused stage under a created claim exits 1" "$rc" "1"
+same "GH32 AC10 ...prints one claim marked aborted line" "$(printf '%s\n' "$out" | grep -c '^unattended: claim marked aborted — tRun, created by this refused call$')" "1"
+same "GH32 AC10 ...and --claims reads it aborted, terminal" "$(bash "$SCRIPT" --claims 2>/dev/null | awk -F'\t' '$1 == "tRun" { print $3, $5 }')" "aborted terminal"
+remove_claim_refs
+# ---- AC11: over a claim this call RENEWED, the claim is left live and the record put back.
+build_claim_held
+gu_blob=$(git rev-parse HEAD:memory/builds/tRun/RUN.md)
+out=$(PATH="$GU_BIN/add:$PATH" bash "$SCRIPT" --preflight tRun --keepalive-id k1 2>&1); rc=$?
+same "GH32 AC11 a refused re-preflight exits 1" "$rc" "1"
+same "GH32 AC11 ...prints one claim left line naming renew" "$(printf '%s\n' "$out" | grep -c '^unattended: claim left — tRun · renew · this call refused after it$')" "1"
+same "GH32 AC11 ...--claims reads it live" "$(bash "$SCRIPT" --claims 2>/dev/null | awk -F'\t' '$1 == "tRun" { print $3 }')" "live"
+same "GH32 AC11 ...and the record is at its HEAD blob" "$(git hash-object memory/builds/tRun/RUN.md)" "$gu_blob"
+remove_claim_refs; reset_tree
+# ---- AC12: after its claim write, verb_preflight returns 1 only inside the branch taken when
+# ---- write_preflight_record fails, so no refusal there skips the restore and the claim disposition.
+read_post_claim_returns() { # driver -> `<inside>:<outside>` counts of `return 1` after the claim write
+  sed -n '/^verb_preflight()/,/^}/p' "$1" | awk '
+    /! write_claim "\$slug" live / { cw = 1 }
+    cw && !past && /^  fi$/ { past = 1; next }
+    !past { next }
+    /^  if ! write_preflight_record; then$/ { inb = 1 }
+    /return 1/ { if (inb) good++; else bad++ }
+    inb && /^  fi$/ { inb = 0 }
+    END { print good + 0 ":" bad + 0 }'
+}
+same "GH32 AC12 verb_preflight's one post-claim return 1 is the restoring branch's" "$(read_post_claim_returns "$SCRIPT")" "1:0"
+# ---- AC15: a second remote added after preflight is check 24 to the soft claim read: one announced
+# ---- line, no check-24 failure, exit 0 and exactly one dispatch row.
+build_claim_held
+mkdir -p memory/builds/tRun/spec
+printf '# ARCH-tRun-1 — u\n\n**Status:** SPECCED · rev-1 · 2026-08-20 · node a · Tier-2 · base 0123abcd\n\n## 2. Scope (IN)\n\n- s\n\n## 6. Acceptance criteria\n\n- AC1 observable.\n\n## 7. Gates\n\n- g\n\n## 8. Open questions\n\nnone\n' > memory/builds/tRun/spec/one.md
+git add -A >/dev/null && git commit -q -m gu-spec --no-verify
+git remote add gu-second "$ORIGIN"
+out=$(run --dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}a.sh); rc=$?
+git remote remove gu-second
+same "GH32 AC15 a dispatch reading claims under two remotes exits 0" "$rc" "0"
+same "GH32 AC15 ...prints one claims-not-read line naming check 24" "$(printf '%s\n' "$out" | grep -c '^unattended: claims not read — the clone does not declare exactly one remote, check 24$')" "1"
+miss "$out" "UNATTENDED check 24 FAILED"
+same "GH32 AC15 ...and writes exactly one dispatch row" "$(grep -c 'dispatch · item ' memory/builds/tRun/RUN.md)" "1"
+rm -rf "$GU_BIN"; remove_claim_refs; reset_tree
+
+fi   # ---- region two continues below: one compound block past about 3000 commands segfaults
+     # ---- bash 5.3 on Cygwin (exit 139), so the region is cut into blocks at top-level seams
+if in_shard 2; then
+
 # ---- AC6: `--hold` refuses, numbered and before any record write, while a recorded bar is alive under
 # ---- a LIVE driver — this suite's own shell stands in for it — and proceeds once the bar has exited.
 init_pl_fixture

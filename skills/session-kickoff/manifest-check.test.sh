@@ -1263,6 +1263,10 @@ seed_claim() {
     && git -C "$CLB" update-ref "refs/gov/runs/$1" "$c"
 }
 remove_claims() { git -C "$CLB" for-each-ref --format='delete %(refname)' refs/gov/runs/ | git -C "$CLB" update-ref --stdin; }
+# Every arm below but AC14's off arm reads claims, which the driver does only where RUN_CLAIMS is `on`
+# (TOOL-aGraftedHelix-32): this repository's conf says so, and a clone whose conf does not is switched
+# on here, in the work tree alone, so these verdicts never rest on what the cloned repository declares.
+grep -q '^RUN_CLAIMS="on"$' "$CWT/.unattended.conf" || printf 'RUN_CLAIMS="on"\n' >> "$CWT/.unattended.conf"
 # The stored card's `claims —` cell, every numeric beat age masked: the clock moves between seed and read.
 # It ends at the `health —` line TOOL-aGraftedHelix-8 puts between it and `recent —`.
 read_claims_cell() { awk '/^claims — /{f=1} /^(health|recent) —/{exit} f' "$CARD_HOME/$1.md" | sed -E 's/ · beat [0-9]+s · / · beat Ns · /'; }
@@ -1382,6 +1386,20 @@ check_eq "AGH2 AC14 a card write adds no line to the driver's journal" "$cl_j0" 
 (cd "$CWT" && env -u GOV_RUNLOG bash "$CLDRV" --claims </dev/null >/dev/null 2>&1)
 [ "$(read_lines "$CLJ")" -gt "$cl_j0" ] && { echo "ok   AGH2 AC14 liveness: the driver called directly does write that journal"; pass=$((pass+1)); } \
   || { echo "FAIL AGH2 AC14 liveness: the driver called directly wrote no journal line at $CLJ, so the arm above observes nothing"; fail=$((fail+1)); }
+
+# TOOL-aGraftedHelix-32 AC14 — RUN_CLAIMS off: the driver answers `claims: off` and reads nothing, and
+# the cell names the switch. A git shim on PATH logs every git call, so its zero fetches is a reading:
+# the card's own git calls land in the same log. The conf is switched in the work tree and restored.
+# RED against the card's awk with the `claims: off` branch cut, which reads it as an unreadable line.
+cp "$CWT/.unattended.conf" "$TMP/cl.on.conf"
+sed -i 's/^RUN_CLAIMS=.*/RUN_CLAIMS="off"/' "$CWT/.unattended.conf"
+mkdir -p "$TMP/gshim"; : > "$TMP/gshim/git.log"
+printf '#!/bin/sh\necho "$*" >> "%s"\nexec "%s" "$@"\n' "$TMP/gshim/git.log" "$(command -v git)" > "$TMP/gshim/git"; chmod +x "$TMP/gshim/git"
+(cd "$CWT" && PATH="$TMP/gshim:$PATH" bash "$CHECK" --card --write --session "$NONCE-c32" </dev/null > "$CARD_OUT" 2>&1)
+check_eq "AGH32 AC14 RUN_CLAIMS off: the cell reads skipped, naming the switch" "claims — skipped: RUN_CLAIMS is off" "$(read_claims_cell "$NONCE-c32")"
+check_eq "AGH32 AC14 ...the git shim logs no fetch" "0" "$(grep -c 'fetch' "$TMP/gshim/git.log")"
+check_eq "AGH32 AC14 ...and it saw the card's own git calls, so that zero is a reading" "yes" "$([ -s "$TMP/gshim/git.log" ] && echo yes || echo no)"
+cp "$TMP/cl.on.conf" "$CWT/.unattended.conf"
 git -C "$CCLONE" remote set-url origin "$CLURL0"
 
 # ---- TOOL-aGraftedHelix-8: the `health —` cell, each arm observed RED on a staged break first -----
@@ -1439,7 +1457,8 @@ check_eq "AC11 the suite left no card in this repository's shared common dir ($r
 # +2: L3's pair, the junction-copy setup and its graded-ids arm (aRepatriatedFork round 1 L3).
 # +25: TOOL-aGraftedHelix-2's `claims —` block, every arm of which runs on every node.
 # +4: TOOL-aGraftedHelix-8's `health —` block, two writes and the two cells they wrote.
-FLOOR_ASSERTIONS=209
+# +3: TOOL-aGraftedHelix-32's RUN_CLAIMS-off arm, the cell, the fetch count and the shim's liveness.
+FLOOR_ASSERTIONS=212
 [ "$pass" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $pass assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; fail=$((fail+1)); }
 # GUARDED on the failure count. Printing PASS unconditionally meant a suite with failing arms still
 # reported success on its last line — the exact shape the floor above exists to catch, introduced

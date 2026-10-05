@@ -16,6 +16,13 @@
 // all three. The Workflow runtime evaluates the body as an async function with the hooks injected as
 // parameters, so that is the shape this gate parses: strip the leading `export` keyword, then hand
 // the source to the AsyncFunction constructor. Constructing does NOT execute it.
+//
+// A SECOND PASS OVER THE SAME POPULATION (TOOL-aGraftedHelix-32 S2): a line whose FIRST string
+// literal opens `git commit` and that carries no ` -- ` exits 1, naming the file and the line. A
+// pathless commit takes the WHOLE index, so an entry staged before the block an agent runs - the
+// run's own RUN.md, which the driver's verbs leave staged - rides a commit nobody meant it to.
+// WHAT THE PASS DOES NOT CHECK: a commit command built at run time from pieces, a commit an agent
+// composes from prose, and a ` -- ` that sits inside a message argument, which reads as a pathspec.
 'use strict'
 const fs = require('fs')
 const { execFileSync } = require('child_process')
@@ -28,6 +35,8 @@ const HOOKS = ['args', 'agent', 'parallel', 'pipeline', 'phase', 'log', 'budget'
 // instead of a path list means a new workflow is covered the day it lands, and a gate/helper script
 // that happens to live in the same directory is not mis-parsed as one.
 const MARKER = /^\s*export\s+const\s+meta\s*=/m
+// The line's first string literal, opening `git commit` (S2's pass).
+const COMMIT_LITERAL = /^[^'"`]*['"`]git commit\b/
 
 // --cached AND --others: a workflow script is parsed the moment it exists rather than the moment it
 // is staged, which is when its syntax actually matters — the runtime will happily be handed an
@@ -60,6 +69,7 @@ if (!explicit) {
 
 let checked = 0
 let bad = 0
+let pathless = 0
 for (const f of files) {
   let src
   try {
@@ -81,12 +91,17 @@ for (const f of files) {
     console.log(`workflow-syntax: ${f} — ${e.name}: ${e.message}`)
     bad++
   }
+  src.split('\n').forEach((line, i) => {
+    if (COMMIT_LITERAL.test(line) && !line.includes(' -- ')) {
+      console.log(`workflow-syntax: ${f}:${i + 1} — a git commit with no \` -- \` pathspec commits the whole index, so an entry staged before it rides the commit`)
+      pathless++
+    }
+  })
 }
 
-if (bad) {
-  console.log(`workflow-syntax: ${bad} file(s) failed to parse`)
-  process.exit(1)
-}
+if (bad) console.log(`workflow-syntax: ${bad} file(s) failed to parse`)
+if (pathless) console.log(`workflow-syntax: ${pathless} pathless git commit line(s)`)
+if (bad || pathless) process.exit(1)
 // A discovery run that found NOTHING is not a pass — it is a gate whose population evaporated
 // (a renamed directory, a dropped marker). Say so and fail rather than print a green line.
 if (!explicit && checked === 0) {

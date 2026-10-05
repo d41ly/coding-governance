@@ -1,6 +1,6 @@
 export const meta = {
   name: 'unattended-build',
-  version: '1.8', // gov:kit unattended-build@1.8 — engine identity (the .template.js is the source; the .js beside it is RENDERED by check-protocol-parity.test.sh --render)
+  version: '1.9', // gov:kit unattended-build@1.9 — engine identity (the .template.js is the source; the .js beside it is RENDERED by check-protocol-parity.test.sh --render)
   description:
     'Runs a build SPEC -> AUDIT -> DISPOSAL as ordered stages of ONE program, then hands the caller an ordered roster and stops. Stage order is a property of control flow rather than of an agent recollection across a context that compacts, and the roster is unreachable unless the audit verdict is terminal. The SPEC stage ends in ONE commit of the specs its writers authored, so the audit pins them at HEAD in the same call. AUDIT is opt-in: with no `specAudit` arg the stage announces itself OFF by declaration and the roster follows SPEC completion.',
   phases: [
@@ -494,11 +494,15 @@ function renderCloses(list) {
 // writes the header lines of both first, the label between them, then both item sets, an item whose
 // first line is already listed dropped with its continuation, then ONE by-design head counting the
 // union of both blocks' entries. The head is COPIED from `tier2-review.js`'s `BY_DESIGN_HEAD`, because
-// workflow scripts cannot import: the two spellings are one figure with a stated source.
+// workflow scripts cannot import, and it is emitted from ONE declaration, `BY_DESIGN_FORMAT`, never a
+// literal in the return (TOOL-aGraftedHelix-32 S3). `check_by_design_parity.py` evaluates both lines
+// against the head the catalogue renders and reds on any other spelling it finds, so every copy is
+// one figure with a stated source and a gate.
 // A block whose own head disagrees with its entries carries that difference into the merged head as
 // `gap`, so the review harness's head-count refusal still fires on a truncated block.
 // WHAT IT DOES NOT CHECK: that either input is the checker's stdout.
 const BY_DESIGN_HEAD = /^# by design — (\d+) invariant\(s\) this selection touches$/
+const BY_DESIGN_FORMAT = '# by design — {n} invariant(s) this selection touches'
 function renderChecklistUnion(first, label, second) {
   const head = [], items = [], design = []
   let gap = 0
@@ -517,7 +521,7 @@ function renderChecklistUnion(first, label, second) {
       else if (cur >= 0) items[cur] += '\n' + line
     }
   }
-  return head.concat(items, ['# by design — ' + (design.length + gap) + ' invariant(s) this selection touches'], design).join('\n')
+  return head.concat(items, [BY_DESIGN_FORMAT.replace('{n}', String(design.length + gap))], design).join('\n')
 }
 
 // --- the stage return schemas -----------------------------------------------------------------
@@ -904,6 +908,10 @@ if (!authoredIds.length) {
   // `<attribution trailer>` is a placeholder because the charter's trailer is the agent's to know.
   // The loop's membership test sits in its own `if`: a no-match `grep` in a command substitution
   // would end the block under `set -e` on a call with no foreign change.
+  // TOOL-aGraftedHelix-32 S1 - THE COMMIT NAMES ITS OWN PATHS: the specs and the `delta` the loop staged.
+  // A pathless commit took the WHOLE index, so an entry staged before the block, the run's own RUN.md
+  // that the driver's verbs leave staged among them, rode a `Pass: none` commit no pass check grades.
+  // The loop reads its listing through process substitution, never a pipe, so `delta` outlives it.
   const commitBlock = [
     'set -e',
     'rec=$(git status --porcelain --untracked-files=all)',
@@ -918,10 +926,11 @@ if (!authoredIds.length) {
     'python -B {{MEMORY_TREE_DIR}}/gen_build_index.py --write',
     'git add -- <spec paths>',
     'if [ -z "${rec+x}" ]; then echo "refused before the commit: the record of step 1, rec, is unset, so this block was split across Bash calls; the specs are staged and the views rendered, so restore every unstaged path under the memory root other than <spec paths>, then run git reset -q -- <spec paths>, then run the block again as ONE invocation" >&2; exit 1; fi',
-    'git status --porcelain --untracked-files=all | while IFS= read -r line; do',
-    '  if printf \'%s\\n\' "$rec" | cut -c4- | grep -xF -- "${line#???}" >/dev/null; then :; else git add -- "${line#???}"; fi',
-    'done',
-    'git commit -q -m \'spec(' + slug + '): ' + authoredIds.join(' ') + '\' -m \'Committed by the spec commit stage of the build harness.\' --trailer \'Pass: none\' --trailer \'<attribution trailer>\'',
+    'delta=()',
+    'while IFS= read -r line; do',
+    '  if printf \'%s\\n\' "$rec" | cut -c4- | grep -xF -- "${line#???}" >/dev/null; then :; else git add -- "${line#???}"; delta+=("${line#???}"); fi',
+    'done < <(git status --porcelain --untracked-files=all)',
+    'git commit --only -q -m \'spec(' + slug + '): ' + authoredIds.join(' ') + '\' -m \'Committed by the spec commit stage of the build harness.\' --trailer \'Pass: none\' --trailer \'<attribution trailer>\' -- <spec paths> "${delta[@]}"',
     'git status --porcelain -- <spec paths>',
   ].join('\n')
   const sc = await agent(
@@ -948,7 +957,8 @@ if (!authoredIds.length) {
       'records region after they were staged; refuse when the record is missing there, naming the cleanup ' +
       'the staged specs and rendered views leave owed; stage each path the render changed whose PATH the ' +
       'record does not list, listed the same way and compared by path alone, which are the generator\'s ' +
-      'outputs; commit ONCE on the checked-out branch, the message closing ' +
+      'outputs; commit ONCE on the checked-out branch, naming only the specs and the paths that loop ' +
+      'staged, so an entry already staged before the block stays staged and out of the commit, the message closing ' +
       'on one trailer block of `Pass: none` and the attribution trailer; and list the specs\' own status, ' +
       'which must be empty. Never `git add -A` or `git add -u`, never --no-verify, never amend, never push ' +
       'or merge.\n' +

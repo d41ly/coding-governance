@@ -118,12 +118,18 @@ ONE `git cat-file` for the whole walk. Its `--selftest` is the held leg `review-
 declared in this kit's `kit.toml` because the tool ships, unlike the `*.test.sh` suites beside it.
 
 **`check_by_design_parity.py` holds the by-design head across two kits** (`TOOL-aGraftedHelix-28`).
-The memory-tree kit's `gotchas.py` prints the head through `render_by_design`, and
-`tier2-review.template.js` finds it with `BY_DESIGN_HEAD`; a rewording in either makes the harness
-log `none supplied`, which reads as "no invariant touched". The checker calls the renderer and runs
-the pattern in `node`, so it compares behaviour, never text. It rides `check-protocol-parity.test.sh`
+The memory-tree kit's `gotchas.py` prints the head through `render_by_design`, and every template in
+the checker's `EVALUATED_TEMPLATES` spells it: `tier2-review.template.js` and
+`unattended-build.template.js` each find it with `BY_DESIGN_HEAD`, and the build harness emits its
+merged head from `BY_DESIGN_FORMAT`; a rewording in one makes a harness log `none supplied`, which
+reads as "no invariant touched". The checker calls the renderer, runs each pattern in `node` and
+renders the format at the same counts, so it compares behaviour, never text. Its population is
+DERIVED (`TOOL-aGraftedHelix-32`): it scans its own directory and the memory-tree kit for the head's
+fixed tail and reds on a spelling outside the evaluated set. It rides `check-protocol-parity.test.sh`
 in check mode over the memory-tree directory that leg already resolves, so no new leg exists and the
 sibling kit stays a derived path. Its `--selftest` runs from the build-harness suite, not the bar.
+`check-workflow-syntax.js` also bans a `git commit` line with no ` -- ` pathspec in any workflow
+script, since a pathless commit takes every entry already staged (`TOOL-aGraftedHelix-32`).
 
 ## Gaps
 

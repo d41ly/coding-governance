@@ -82,9 +82,12 @@ generator; the resolver reached through a directory link from a second repositor
 resolver called from a library copy outside any repository. The CLASS has **no machine gate**. The
 predicate that finds the probes, a `git -C <dir> rev-parse --show-...` line in shell, printed 26
 lines tree-wide at `f0971667`, and telling which of them a hook can reach is a question about
-callers, not about the line. A gate over them is a mechanism of its own, handed off rather than
-implied here. Until then it is a documented check: a reviewer of a diff that adds a location probe
-asks whether a hook or a merge driver can run it.
+callers, not about the line. A gate over them is a mechanism of its own, and its hand-off now has a
+recipient: the parked item `location-probe-class-gate` in the aGraftedHelix run-state file,
+memory/builds/aGraftedHelix/RUN.md, records the question, the options and why no option survived
+for that run, so the orchestrator or the owner may still adopt it. Until then it is a documented
+check: a reviewer of a diff that adds a location probe asks whether a hook or a merge driver can run
+it.
 
 ## What this does NOT say
 

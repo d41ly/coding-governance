@@ -1836,7 +1836,7 @@ has    "BT3 attended, OFF, every unit terminal: the exit carries the audit objec
 has    "BT3 ...with an empty roster, by filtering" "$o" '"roster":[]'
 # ---- AC7: both carriers read 1.8 — the render is byte-compared to the template by the parity leg,
 # ---- so the marker moving in one file and not the other reds there; this arm reads the render.
-has    "BT3-AC7 the render carries the engine version 1.8" "$(sed -n '3p' "$F")" "version: '1.8', // gov:kit unattended-build@1.8"
+has    "BT3-AC7 the render carries the engine version 1.9" "$(sed -n '3p' "$F")" "version: '1.9', // gov:kit unattended-build@1.9"
 
 # ================================== TOOL-dPolishedVitrine-1 — THE HARNESS IS RENDERED AT INSTALL
 # The harness shipped as an ENGINE file, and apply writes those verbatim, so every install path it
@@ -2314,9 +2314,31 @@ if [ -n "$GKD" ] && build_spec_commit_repo "$G16" && [ "$(git -C "$G16" rev-list
   out=$(run_spec_commit_block "$G21D" '/gen_build_index[.]py --write$/a rm notes.txt')
   same   "GH21 a foreign file deleted between step 4 and step 5: the block exits 0" "$(printf '%s\n' "$out" | tail -1)" "rc=0"
   same   "GH21 ...and HEAD still names it" "$(cd "$G21D" && git ls-tree -r --name-only HEAD | grep -cx 'notes.txt')" "1"
+  # TOOL-aGraftedHelix-32 AC1: entries ALREADY STAGED before the block, a foreign tracked edit and a new
+  # run-state file as the driver's verbs leave one, stay staged and out of the commit, because the
+  # commit names its own paths. RED against the block with the commit line's pathspec part cut.
+  G32="$LAY/gh32"; build_spec_commit_repo "$G32"
+  ( cd "$G32" && printf '# tB - run state\n' > memory/builds/tB/RUN.md && git add -- notes.txt memory/builds/tB/RUN.md )
+  out=$(run_spec_commit_block "$G32")
+  same   "GH32 pre-staged entries: the block exits 0" "$(printf '%s\n' "$out" | tail -1)" "rc=0"
+  names=$(cd "$G32" && git show --name-only --format= HEAD)
+  hasnt_ "GH32 ...the commit holds no pre-staged foreign edit" "$names" "notes.txt"
+  hasnt_ "GH32 ...nor the pre-staged run-state file" "$names" "memory/builds/tB/RUN.md"
+  same   "GH32 ...and both are still staged" "$(cd "$G32" && git diff --cached --name-only)" "$(printf 'memory/builds/tB/RUN.md\nnotes.txt')"
 else
   n=$((n+1)); echo "FAIL GH16 the real-git arm could not start: block '$(printf '%s' "$GB" | head -1)', kit dir '$GKD' -- every arm it holds went UNRUN"; st=1
 fi
+
+# ---- TOOL-aGraftedHelix-32 AC2: THE PATHLESS-COMMIT BAN, the syntax check's second pass, over two
+# ---- fixture scripts handed explicitly: a `git commit` line with no ` -- ` reds naming its file and
+# ---- line, and the same line with a pathspec passes. RED against the check with its predicate inverted.
+printf "export const meta = { name: 'p' }\nconst b = [\n  'git commit -q -m x',\n]\n" > "$LAY/gh32-pathless.js"
+printf "export const meta = { name: 'q' }\nconst b = [\n  'git commit --only -q -m x -- a.md',\n]\n" > "$LAY/gh32-pathspec.js"
+o=$(node "$HERE/check-workflow-syntax.js" "$LAY/gh32-pathless.js" 2>&1; echo "rc=$?")
+has    "GH32 a pathless git commit line reds the syntax check" "$o" "rc=1"
+has    "GH32 ...naming the file and its line" "$o" "gh32-pathless.js:3 — a git commit with no"
+o=$(node "$HERE/check-workflow-syntax.js" "$LAY/gh32-pathspec.js" 2>&1; echo "rc=$?")
+has    "GH32 the same line with a pathspec passes" "$o" "rc=0"
 
 # FLOOR_ASSERTIONS — a shrink-only pin on the EXECUTED count, not on the written one. Authored from a
 # static count of the `same`/`has`/`hasnt_` sites in this file — `grep -cE '^\s*(same|has|hasnt_) '`
@@ -2354,7 +2376,10 @@ fi
 # the unit's parent and 626 after — the pinned base forwarded, logged and unwarned (3), no base kept
 # and warned (2), and a base of another shape forwarding nothing and warned (2). All of them sit on the
 # path a green run takes.
-FLOOR_ASSERTIONS=502
+# RAISED 502 -> 509 by TOOL-aGraftedHelix-32: its 7 static sites — the pre-staged entries run of the
+# spec commit block (4) and the pathless-commit ban over its two fixture scripts (3). All of them sit
+# on the path a green run takes.
+FLOOR_ASSERTIONS=509
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; st=1; }
 # NOTHING RUNS AFTER THE TERMINAL EXIT (TOOL-dUnstalledConvoy-19): the floor cannot see an arm
 # appended past `exit $st`, and neither can check-arms.py or the summary line. One grep can. The

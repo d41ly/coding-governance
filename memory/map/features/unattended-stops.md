@@ -14,7 +14,7 @@ git-hooks = []
 workflow-scripts = []
 skill-engines = []
 rendered-skills = []
-gotcha-classes = ["liveness-negative-from-another-population.md"]
+gotcha-classes = ["liveness-negative-from-another-population.md", "orchestrator-hand-off-owed-a-disposition.md"]
 guides = []
 backlog-shards = []
 lexicon-verbs = []
@@ -53,9 +53,15 @@ graded where it is read, and the tick acts on none of its copies.
 
 **Two nodes meet at the remote, not at the merge.** The lease lives on the run's own branch, so with
 `RUN_CLAIMS` on every run also claims `refs/gov/runs/<slug>` on the landing remote by
-compare-and-swap: `--preflight` and a take-over refuse another session's live claim (check 89), the
-holder's verbs refuse one at check 90 and end with halt code `claim-lost`, and `--claims` lists them
-all. The beat is a remote fact, so the record is never restaged for it (`TOOL-aGraftedHelix-1`).
+compare-and-swap: `--preflight` and a take-over refuse another session's live claim (check 107), the
+holder's verbs refuse one at check 108 and end with halt code `claim-lost`, a claim read or write that
+does not complete is check 109, and `--claims` lists them all. The beat is a remote fact, so the
+record is never restaged for it (`TOOL-aGraftedHelix-1`). Where `RUN_CLAIMS` is off, `--claims` prints
+`claims: off` and reads nothing. A claim push waits while push-main holds `push-main-active` in the
+same git dir, and a `--preflight` refused after its claim write restores the record and writes a claim
+it created `aborted` (`TOOL-aGraftedHelix-32`). The class `orchestrator-hand-off-owed-a-disposition.md`
+is claimed here because its remedy is a stop: a discovery handed to the orchestrator resolves to a
+unit or to a row `--park` writes, and the close checks every such line does.
 
 **The holder keeps its own `--replaces`.** The matrix reads `--replaces` above the same-session row,
 and that row takes only a caller under a pid the record does not name, because a restart is a new

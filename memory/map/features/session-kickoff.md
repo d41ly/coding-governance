@@ -64,6 +64,9 @@ contact is the `claims —` cell (`TOOL-aGraftedHelix-2`): in a tree with `.unat
 written card runs the unattended driver's `--claims` once under a kill bound, found through the same
 sibling resolver as the id reader, and lists the remote's run claims by the driver's verdict, hiding
 `stale` and `terminal` ones older than the checker's `CARD_CLAIMS_HIDE_S`; a replay reads no remote.
+Where the conf's `RUN_CLAIMS` is not `on` the driver answers `claims: off` without a read and the
+cell reads `skipped: RUN_CLAIMS is off`, so the shipped dark default pays no fetch per session start
+and the card never reads the switch itself (`TOOL-aGraftedHelix-32`).
 
 The engine's kickoff lands on the card through `--card --append` (`KICK-aReplayedCard-2`), which
 checks every cited path, line range and record id for EXISTENCE in two spawns — one

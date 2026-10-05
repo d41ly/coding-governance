@@ -3213,6 +3213,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "derive_needle",
+      "kind": "function",
+      "file": "tools/workflows/check_by_design_parity.py"
+    },
+    {
       "id": "derive_node_tag",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
@@ -3316,6 +3321,11 @@
       "id": "derive_root_confs",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "derive_row_re",
+      "kind": "function",
+      "file": "tools/memory-tree/row_grammar.py"
     },
     {
       "id": "derive_row_stems",
@@ -8128,6 +8138,11 @@
       "file": "tools/lexicon/selftest.py"
     },
     {
+      "id": "run_format",
+      "kind": "function",
+      "file": "tools/workflows/check_by_design_parity.py"
+    },
+    {
       "id": "run_fragment_merges",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -8191,6 +8206,11 @@
       "id": "run_kit_check",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "run_node",
+      "kind": "function",
+      "file": "tools/workflows/check_by_design_parity.py"
     },
     {
       "id": "run_pattern",
@@ -8451,6 +8471,11 @@
       "id": "scan_handoffs",
       "kind": "function",
       "file": "tools/check-spec-tokens.py"
+    },
+    {
+      "id": "scan_head_spellings",
+      "kind": "function",
+      "file": "tools/workflows/check_by_design_parity.py"
     },
     {
       "id": "scan_heartbeat_streaks",

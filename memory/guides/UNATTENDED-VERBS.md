@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.78 -->
+<!-- gov:kit unattended@1.79 -->
 # Unattended runs — the verbs
 
 *This file is the second half of the binding contract; `UNATTENDED-PROTOCOL.md` is the first. Two
@@ -274,7 +274,9 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
 - `--claims` — every run claim on the remote, one TAB-separated row each: slug, node, status,
   beat age in seconds and verdict, `live`, `stale`, `held`, `terminal` or `unknown`, sorted by slug;
   `claims: none` when there is none, and exit 2 with check 109 when the remote does not answer, never
-  an empty list. It takes no slug, reads whatever `RUN_CLAIMS` says, and decides nothing about who
+  an empty list. Where `RUN_CLAIMS` is not `on` it prints the single line `claims: off`, exits 0
+  and reads nothing, since no verb writes or reads a claim then; `git ls-remote <remote>
+  'refs/gov/runs/*'` still shows a leftover one. It takes no slug and decides nothing about who
   drives: `UNATTENDED-STOPS.md` §7 is what the verdicts mean.
 - `--beat` — `--beat <slug>`, the resume tick's heartbeat for a run `--liveness` reads `LIVE` on this
   host: it renews that run's own claim when due and prints exactly one `beat —` line, `renewed` or

@@ -51,7 +51,7 @@
 # The generated region holds NO copy: the unit list is DERIVED from the build README's already-derived,
 # already-byte-compared slice. One derivation in the tree; this file is not a second one.
 set -u
-KIT_UNATTENDED_VERSION=1.78   # gov:kit unattended@1.78 — kit identity; set HERE, never from .unattended.conf
+KIT_UNATTENDED_VERSION=1.79   # gov:kit unattended@1.79 — kit identity; set HERE, never from .unattended.conf
 
 # ------------------------------------------------------------------------------ the dereference pin
 # A sha is a NAME, and turning a name into bytes or into ancestry happens in the run's own object
@@ -1796,7 +1796,7 @@ observe_anchor() {
 # keepalive, status, lease-utc, beat-utc. The verdicts, the table of who may write and the call
 # sites are the stops guide's section 7, rendered from STOPS.template.md; this file implements them.
 #
-# DARK BY DEFAULT: nothing below runs while RUN_CLAIMS is `off`, except `--claims`, which only reads.
+# DARK BY DEFAULT: nothing below runs while RUN_CLAIMS is `off`; `--claims` then prints `claims: off`.
 #
 # WHAT THIS DOES NOT CHECK. It is no lock against a run holding the push credential, which can force
 # or delete the ref: it stops an ACCIDENTAL second driver, as the lease does. `--liveness` and
@@ -1837,7 +1837,9 @@ read_claims() { # strict|soft|quiet -> 0 with CLAIM_ROWS, or 1 with CL_WHY
   CLAIM_ROWS=""; CL_WHY=""
   # QUIET IS QUIET FOR CHECK 24 TOO: `--beat` refuses nothing but a missing record, so the remote
   # count's own refusal is swallowed, status and run-log entry included, and reaches CL_WHY instead.
-  if [ "$pol" = quiet ]; then
+  # SOFT TAKES THE SAME BRANCH (TOOL-aGraftedHelix-32): its callers promise a claim step announced
+  # and never failing the verb, so check 24 reaches them only as the one `claims not read` line.
+  if [ "$pol" = quiet ] || [ "$pol" = soft ]; then
     resolve_claim_remote >/dev/null; rc=$?
     status=$_st; RUNLOG_CHECKS=("${RUNLOG_CHECKS[@]:0:$_nc}")
   else
@@ -1908,9 +1910,12 @@ read_claims() { # strict|soft|quiet -> 0 with CLAIM_ROWS, or 1 with CL_WHY
 
 # --claims, interface I2: one TAB-separated row per claim on the remote - slug, node, status,
 # beat-age-s, verdict - sorted by slug, or the single line `claims: none`; exit 2 with check 109 when
-# the remote does not answer, never an empty list. It reads whatever RUN_CLAIMS says, because a read
-# changes nothing. WHAT IT DOES NOT CHECK: who drives anything; it reports and decides nothing.
+# the remote does not answer, never an empty list. Where RUN_CLAIMS is not `on` it prints the single
+# line `claims: off` and reads nothing (TOOL-aGraftedHelix-32): no verb writes or reads a claim then,
+# so a leftover claim is inert and the read bought a SessionStart fetch for nothing; it shows again
+# once the switch is on. WHAT IT DOES NOT CHECK: who drives anything; it reports and decides nothing.
 print_claims() { # -> the rows on stdout; rc 2 when the remote does not answer
+  [ "$RUN_CLAIMS" = on ] || { echo "claims: off"; return 0; }
   read_claims strict || return 2
   if [ -z "$CLAIM_ROWS" ]; then echo "claims: none"; return 0; fi
   printf '%s\n' "$CLAIM_ROWS" | cut -f1-5
@@ -2032,7 +2037,10 @@ check_claim_writable() { # slug · mode · lease keepalive · lease session · t
 # every claim. The driver never supplies that variable, so a remote with no recorded HEAD is a
 # `default-branch` refusal and NOT COMPLETED, its message carrying `git remote set-head <name> -a`,
 # which the hook prints only to the stderr this push discards. The hook's refusal file is removed
-# before the push, as push-main removes it, so a token read after it came from THIS push's hook.
+# before the push, as push-main removes it, so a token read after it came from THIS push's hook -
+# which holds only because no claim push runs while push-main holds `push-main-active` in the same
+# git dir (TOOL-aGraftedHelix-32): that hook clears both verdict files the lander trusts on every
+# run, so a beat landing mid-bar would erase the landing's verdict. One writer per verdict file.
 # THE IDENTITY IS THE LEASE RECORD'S (TOOL-aGraftedHelix-11), so a writer the OS scheduler launched
 # with no session, or a Workflow child under another one, never rewrites it. Handed the run-state
 # file, the write copies its `session`, `host` and `lease-utc` (the keepalive argument is the
@@ -2052,7 +2060,9 @@ write_claim() { # slug · status · keepalive · strict|holder|soft|quiet · [ru
   sid="${sid:-absent}"; node="${CW_NODE:-${USERNAME:-${USER:-absent}}}"
   msg=$(printf 'gov-claim %s\n\nslug: %s\nnode: %s\nhost: %s\nsession: %s\nkeepalive: %s\nstatus: %s\nlease-utc: %s\nbeat-utc: %s' \
     "$slug" "$slug" "${node//[$'\n\r\t']/ }" "${host:-absent}" "${sid//[$'\n\r\t']/ }" "${ka//[$'\n\r\t']/ }" "$st" "$lease" "$WC_BEAT")
-  if ! d=$(mktemp); then
+  if [ -n "$RUNLOG_GITDIR" ] && [ -f "$RUNLOG_GITDIR/push-main-active" ]; then
+    WC_WHY="push-main is landing from this git dir, so a claim push now would clear its verdict files: $RUNLOG_GITDIR/push-main-active"; rc=2
+  elif ! d=$(mktemp); then
     WC_WHY="cannot create a scratch file to bound the push"; rc=2
   elif ! t=$(GIT mktree </dev/null) || ! c=$(GIT_AUTHOR_NAME=gov-claim GIT_AUTHOR_EMAIL=gov-claim@invalid GIT_COMMITTER_NAME=gov-claim GIT_COMMITTER_EMAIL=gov-claim@invalid GIT commit-tree "$t" -m "$msg" 2>/dev/null); then
     WC_WHY="the claim commit could not be built in this clone"; rc=2
@@ -6045,7 +6055,7 @@ check_settled_abandoned() { # run-state file -> 0 when it carries both
 }
 
 verb_preflight() { # slug · keepalive-id
-  local slug="$1" kid="$2" rel base src payload tmp arch="" rotate=0 _pf_ka _pf_miss _pf_fix _pf_gbt="" _pf_cka _pf_lu="" _pf_ab=""
+  local slug="$1" kid="$2" rel base src payload tmp arch="" rotate=0 _pf_ka _pf_miss _pf_fix _pf_gbt="" _pf_cka _pf_lu="" _pf_ab="" _pf_left _pf_p _pf_act
   # TOOL-dDerivedDocket-16 S6 - THE IDS TEST RUNS FIRST, before `check_slug` and before any anchor
   # work, because it needs no tree. `check_slug`'s own grammar ADMITS an id - letters, digits and
   # dashes, opening on a letter - so an id reached the folder lookup and was refused with a message
@@ -6251,6 +6261,20 @@ verb_preflight() { # slug · keepalive-id
   # TOOL-dDerivedDocket-31 - the cutoff the spec-audit line below grades FORKED with, loaded here so
   # an unreadable one refuses while the tree is still untouched.
   load_fork_cutoff || true
+  # TOOL-aGraftedHelix-32 S6 (TOOL-aBranchedMandate-9) - THE TWO MARKER READS, HERE and not after the
+  # rotation. Both are pure reads, so they join `status` like every refusal above; placed after the
+  # claim write and the rotation, a malformed README archived the finished record and published a
+  # live claim before refusing. The unit list is DERIVED from the README's pair at read time, never
+  # copied, so an unpaired marker is something to refuse rather than to guess around. The record's
+  # own pair is read here only for a record that stays: a rotated one is replaced by the scaffold,
+  # whose markers the write half grades.
+  src=$(readme_of "$slug")
+  if ! region "$src" "$SRC_OPEN" "$SRC_CLOSE" >/dev/null 2>&1; then
+    fail 9 "the build README's generated markers are malformed, and the unit list is DERIVED from there, so an unpaired marker is not something to guess around: $src"
+  fi
+  if [ -f "$rel" ] && [ "$rotate" != 1 ] && ! region "$rel" "$GEN_OPEN" "$GEN_CLOSE" >/dev/null 2>&1; then
+    fail 9 "the run-state file's generated markers are malformed — exactly one open and one close, close after open: $rel"
+  fi
   # NOTHING is written until every precondition above has passed. A verb that writes and then
   # discovers a refusal has already changed the state the refusal was about.
   [ "$status" = 0 ] || { [ -z "$PF_LCOPY" ] || rm -f "$PF_LCOPY"; echo "unattended: --preflight refused; the run-state file is unchanged"; return 1; }
@@ -6267,6 +6291,65 @@ verb_preflight() { # slug · keepalive-id
     return 1
   fi
 
+  # TOOL-aGraftedHelix-32 S6 and S7 (TOOL-aBranchedMandate-9) - EVERY REFUSAL AFTER THE CLAIM WRITE
+  # LEAVES THIS CALL'S WRITES UNDONE. The rotation, the scaffold and the facts are one function, and
+  # its one failure branch restores the run-state path and the archive path to their bytes at HEAD,
+  # index and work tree: `check_clean` proved the tree clean at the gate, so HEAD is exactly what
+  # this call found, and "the run-state file is unchanged" is true when it is printed. A claim this
+  # call CREATED is then written `aborted` through the status-write block `--abort` uses, so the next
+  # preflight reads a terminal claim; one it renewed, rewrote or took is left, because ending a renewed
+  # claim ends a live run's and a replaced one cannot be restored, and a claim is never deleted.
+  if ! write_preflight_record; then
+    _pf_left=""
+    for _pf_p in "$rel" ${arch:+"$arch"}; do
+      if [ -n "$(GIT ls-tree --name-only HEAD -- "$_pf_p" 2>/dev/null)" ]; then
+        GIT checkout -q HEAD -- "$_pf_p" >/dev/null 2>&1 || _pf_left="$_pf_left $_pf_p"
+      else
+        { GIT rm --cached -q --ignore-unmatch -- "$_pf_p" >/dev/null 2>&1 && rm -f -- "$_pf_p"; } || _pf_left="$_pf_left $_pf_p"
+      fi
+    done
+    [ -z "$PF_LCOPY" ] || rm -f "$PF_LCOPY"
+    _pf_act=""; [ -z "$PF_CLAIM" ] || _pf_act="$CW_ACT"
+    case "$_pf_act" in
+      create)
+        if read_claims soft && check_claim_writable "$slug" status "$_pf_cka" "${CLAUDE_CODE_SESSION_ID:-absent}" "$_pf_cka" \
+          && write_claim "$slug" aborted "$_pf_cka" soft "" "$_pf_lu"; then
+          echo "unattended: claim marked aborted — $slug, created by this refused call"
+        else
+          echo "unattended: claim left — $slug · create · its status write did not land, so it reads live until it ages to stale after ${RESUME_STALE_BOUND}s"
+        fi ;;
+      "") ;;
+      *) echo "unattended: claim left — $slug · $_pf_act · this call refused after it" ;;
+    esac
+    if [ -n "$_pf_left" ]; then
+      echo "unattended: --preflight refused; the restore did not put back:$_pf_left"
+    else
+      echo "unattended: --preflight refused; the run-state file is unchanged"
+    fi
+    return 1
+  fi
+  # THE LEASE WAS RECORDED ABOVE, by `write_lease` into the run-state facts, and the record is staged:
+  # there is no second lease record to take (TOOL-dDerivedDocket-61).
+  # TOOL-dDerivedDocket-28 S3 - THE RUN'S OWN ORPHANS ARE REAPED HERE, after every precondition passed
+  # and the lease is held: a kill is the least reversible thing this verb does, so a refused preflight
+  # must not have done it.
+  run_orphan_reap "$slug"
+  # RE-READ, like the base above and for the identical reason. Unit 5 froze the anchor triple, so on
+  # a second preflight $AREF/$ASHA hold what was just OBSERVED while the record holds what is pinned.
+  # Printing the observation would be the same lie in the operator's face that the unconditional
+  # base write was on disk, one field over.
+  print_spec_audit_line "$slug" "$rel"
+  echo "unattended: preflight OK — base $base · anchor $(fact "$rel" anchor-ref) at $(fact "$rel" anchor-sha) · keepalive $kid · region copied from $src"
+  return 0
+}
+
+# TOOL-aGraftedHelix-32 S6 - THE WRITE HALF OF --preflight, everything after the claim write: the
+# rotation, the scaffold, the facts, the lease and the stage. Called with no arguments from
+# `verb_preflight` alone, whose locals it reads and sets through bash's dynamic scope, so its body is
+# the one that ran inline before. It exists so its ONE failure branch in the caller can undo it.
+# WHAT THIS DOES NOT CHECK: any precondition - every refusal that needs nothing written is above the
+# caller's write gate, and one placed here costs the caller a restore.
+write_preflight_record() { # -> 0 the record written and staged, or 1 with the check printed
   # ROTATION, HALF TWO: the RENAME, in scaffold_runmd's position and for scaffold_runmd's reason —
   # nothing is written until every precondition above has passed.
   #
@@ -6294,23 +6377,9 @@ verb_preflight() { # slug · keepalive-id
     [ -z "$_pf_ab" ] || echo "unattended: preflight — the record carried abandoned at $_pf_ab, written by --settle over a dead lease whose work landed, so it is retired like a finished one and this run starts on a fresh record"
   fi
 
-  # The unit list is DERIVED at read time, never copied here. A copy has to be refreshed by
-  # something, and the only writer was this verb — which refuses once a run is live. So an ordinary
-  # pass (a spec rev bump moves the build index) left the copy stale with no reachable way to repair
-  # it, and the refusal named a remedy that did not exist. Deriving removes the class rather than
-  # adding a verb to service it. Both markers are still VALIDATED, because a malformed pair is
-  # something to refuse rather than to guess around.
-  #
-  # TOOL-aPromptedMandate-6 fold, review M1 - the README's pair is validated BEFORE the scaffold, not
-  # after it. The comment below has always said the run-state file is created after EVERY precondition
-  # passed, and this one ran later, so a malformed README left an orphan untracked RUN.md behind a
-  # refusal - and the retry then met the DIRTY-TREE refusal instead, naming a cause that was this
-  # verb's own leftover. Observed during this build's first manual reproduction.
-  src=$(readme_of "$slug")
-  if ! region "$src" "$SRC_OPEN" "$SRC_CLOSE" >/dev/null 2>&1; then
-    fail 9 "the build README's generated markers are malformed, and the unit list is DERIVED from there, so an unpaired marker is not something to guess around: $src"
-    return 1
-  fi
+  # The unit list is DERIVED at read time, never copied here, and the README's pair it is derived
+  # from is graded above the write gate with the other reads (TOOL-aGraftedHelix-32 S6), so a
+  # malformed README refuses before the claim write and the rotation rather than after them.
 
   # The run-state file is created here, AFTER every precondition passed. A verb that scaffolds and
   # then discovers a refusal has already changed the state the refusal was about.
@@ -6459,18 +6528,6 @@ verb_preflight() { # slug · keepalive-id
     done
   fi
   stage_or_fail "$rel" || return 1
-  # THE LEASE WAS RECORDED ABOVE, by `write_lease` into the run-state facts, and the record is staged:
-  # there is no second lease record to take (TOOL-dDerivedDocket-61).
-  # TOOL-dDerivedDocket-28 S3 - THE RUN'S OWN ORPHANS ARE REAPED HERE, after every precondition passed
-  # and the lease is held: a kill is the least reversible thing this verb does, so a refused preflight
-  # must not have done it.
-  run_orphan_reap "$slug"
-  # RE-READ, like the base above and for the identical reason. Unit 5 froze the anchor triple, so on
-  # a second preflight $AREF/$ASHA hold what was just OBSERVED while the record holds what is pinned.
-  # Printing the observation would be the same lie in the operator's face that the unconditional
-  # base write was on disk, one field over.
-  print_spec_audit_line "$slug" "$rel"
-  echo "unattended: preflight OK — base $base · anchor $(fact "$rel" anchor-ref) at $(fact "$rel" anchor-sha) · keepalive $kid · region copied from $src"
   return 0
 }
 

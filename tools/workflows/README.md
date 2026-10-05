@@ -203,14 +203,18 @@ reaches `byDesign`: it arrives as an ordinary `- [ ] NEW/CHANGED invariant <name
 lens like any class, and the checker's header line naming the base is preamble. This suite's
 by-design range arm runs the real checker over a fixture range and holds that end to end.
 
-That head is spelled twice, in two kits: the memory-tree kit's `gotchas.py` prints it and this
-harness's `BY_DESIGN_HEAD` pattern finds it. `check_by_design_parity.py` holds the pair. It renders
-the head through the catalogue's own `render_by_design`, runs the template's pattern over it in
-`node`, and reds when the pattern stops matching, stops capturing the count, or matches the head
-behind a leading space. The parity leg runs it in check mode over the memory-tree kit it resolved,
-so a head reworded in either kit reds the bar rather than leaving the harness logging
-`none supplied`. A catalogue that predates the block skips out loud, and `--selftest` covers every
-outcome.
+The memory-tree kit's `gotchas.py` prints that head, and every template the checker's
+`EVALUATED_TEMPLATES` names spells it: this harness's `BY_DESIGN_HEAD` pattern finds it, and the build
+harness carries a second pattern and the `BY_DESIGN_FORMAT` its merged checklist is emitted from.
+`check_by_design_parity.py` holds them all. It renders the head through the catalogue's own
+`render_by_design`, runs each template's pattern over it in `node`, renders the format at the same
+counts, and reds when a pattern stops matching, stops capturing the count, or matches the head behind
+a leading space, or when the format renders any other head. It does not trust that list: it scans
+its own directory and the memory-tree kit for every file carrying the head's fixed tail and reds on
+one outside the evaluated set, so the population is derived rather than stated. The parity leg runs
+it in check mode over the memory-tree kit it resolved, so a head reworded in one place reds the bar
+rather than leaving a harness logging `none supplied`. A catalogue that predates the block skips out
+loud, and `--selftest` covers every outcome.
 
 `unattended-build.js` hands its spec audit a checklist the same way: the subject resolver runs
 `gotchas.py --for-paths` over the paths the specs' `### Files touched` sub-heads name and returns its

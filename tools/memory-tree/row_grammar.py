@@ -200,6 +200,17 @@ def id_pattern(conf):
     return re.compile(r"(?:" + "|".join(sorted(re.escape(f) for f in fams)) + r")-[A-Za-z0-9]+-\d+[a-z]*")
 
 
+def derive_row_re(conf):
+    """The ONE row regex: a dash, optional emphasis, then an id of this tree's families.
+
+    TOOL-aGraftedHelix-32 S14: check 20's scan, check 24's rotation and the three readers of checks 27
+    and 28 each built this inline, five byte-equal copies, so a grammar fix applied to one would let
+    the others enumerate another row population with no gate noticing. `--selftest` counts the
+    literal's prefix in this file and requires one.
+    """
+    return re.compile(r"^\s*[-*]\s+[`*]*(" + id_pattern(conf).pattern + r")\b")
+
+
 # Family-INDEPENDENT id shape, used only as the vacuity precondition. Deriving that precondition
 # from the declared FAMILIES would assert one value against another the same call derives — the
 # tautology this repo records as assertion-between-two-derived-values, and it made the
@@ -319,7 +330,7 @@ def scan(root, conf):
     idre = id_pattern(conf)
     # A ROW leads with a dash and then an id, optionally emphasised. Anything else on the line is
     # prose and is not this check's business.
-    rowre = re.compile(r"^\s*[-*]\s+[`*]*(" + idre.pattern + r")\b")
+    rowre = derive_row_re(conf)
     rows = loose = 0
     unkeyed, dupes, open_fences = [], [], []
     for p in row_docs(root, m, conf):
@@ -808,7 +819,7 @@ def check_rotation(root, conf):
     m = conf["MEMORY_ROOT"]
     mode = conf.get("ROTATION_MODE", "").strip()
     idre = id_pattern(conf)
-    rowre = re.compile(r"^\s*[-*]\s+[`*]*(" + idre.pattern + r")\b")
+    rowre = derive_row_re(conf)
     statusre = re.compile(r"^\s*[-*]\s+[`*]*" + idre.pattern + r"[`*]*\s*·\s*("
                           + "|".join(STATUS_TOKENS) + r")\b")
     docs = row_docs(root, m, conf)
@@ -1059,7 +1070,7 @@ def scan_records(root, conf):
     the text after the front-matter block, or the whole file when it has none).
     """
     m = conf["MEMORY_ROOT"]
-    rowre = re.compile(r"^\s*[-*]\s+[`*]*(" + id_pattern(conf).pattern + r")\b")
+    rowre = derive_row_re(conf)
     out = []
     for p in row_docs(root, m, conf):
         if os.path.basename(p).split(".")[0] != "DECISIONS":
@@ -1139,7 +1150,7 @@ def scan_added_records(root, conf, base, recs):
     old one, which `--diff-filter=A` with git's default rename detection would get wrong.
     """
     m = conf["MEMORY_ROOT"]
-    rowre = re.compile(r"^\s*[-*]\s+[`*]*(" + id_pattern(conf).pattern + r")\b")
+    rowre = derive_row_re(conf)
     present = set()
     for p in row_docs(root, m, conf, rev=base):
         if os.path.basename(p).split(".")[0] != "DECISIONS":
@@ -1288,7 +1299,7 @@ def cmd_measure_relations(root, conf, floor=None, base=None):
     if sha:
         recs = scan_added_records(root, conf, sha, recs)[1]
     docs = [p for p in row_docs(root, m, conf) if os.path.basename(p).split(".")[0] == "DECISIONS"]
-    rowre = re.compile(r"^\s*[-*]\s+[`*]*(" + id_pattern(conf).pattern + r")\b")
+    rowre = derive_row_re(conf)
     gdir = f"{m}/gotchas/"
     times, cur = {}, None
     walks = (("row", ["-p", "-U0", "--"] + docs),
@@ -1732,6 +1743,15 @@ def cmd_selftest():
         with redirect_stdout(buf):
             rc = fn(root, conf)
         return f"rc={rc} " + buf.getvalue()
+
+    # TOOL-aGraftedHelix-32 S14: the row regex is built in ONE place. The prefix is spelled here with
+    # doubled backslashes, so this line is not a copy of the one it counts; a sixth inline copy reds.
+    def measure_row_re_copies():
+        with open(__file__, encoding="utf-8") as fh:
+            n = fh.read().count('r"^\\s*[-*]\\s+[`*]*("')
+        return f"{n} copy(ies) of the row regex's prefix in row_grammar.py"
+    arm("the row regex is built once, in derive_row_re", "1 copy(ies) of the row regex's prefix",
+        measure_row_re_copies)
 
     with tempfile.TemporaryDirectory() as base:
         # POSITIVE: a clean corpus passes and says how much it looked at.

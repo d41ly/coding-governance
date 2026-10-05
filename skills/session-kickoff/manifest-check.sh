@@ -34,7 +34,7 @@
 #          verb with no session id, a path-shaped one, a card over its byte cap, an append whose
 #          READY line pins a BASE that is not HEAD, or an id reader that could not answer).
 set -u
-KIT_MANIFEST_VERSION="1.18"   # gov:kit kickoff-manifest@1.18 — the registry id
+KIT_MANIFEST_VERSION="1.19"   # gov:kit kickoff-manifest@1.19 — the registry id
 # TWO NUMBERS, not one (TOOL-aRepatriatedFork-15 S4). KIT_MANIFEST_VERSION above is the kit's
 # VINTAGE: it bumps whenever a shipped byte of this kit moves, which is what `govkit.py epoch` grades.
 # MANIFEST_FORMAT is the manifest FORMAT, the only number an adopter's `kickoff-manifest: v<N>`
@@ -382,8 +382,10 @@ render_health_cell() {
 # grandchild holding the pipe, so the bound would decide the verdict and not the clock. stdin is
 # /dev/null, since the hook's pipe never closes; GOV_RUNLOG=0 keeps a card write out of the driver
 # journal the runlog kit reads as runs. Every failure is its own `skipped:` form, never `none`, and
-# the card still writes. A replay reads no remote. WHAT THIS DOES NOT CHECK: who drives a slug, or
-# whether a claim is honest — it prints what the driver answered.
+# the card still writes. A replay reads no remote. THE SWITCH IS THE DRIVER'S (TOOL-aGraftedHelix-32):
+# where RUN_CLAIMS is not `on`, `--claims` prints `claims: off` and reads nothing, and the cell says so;
+# this card never reads the conf's switch itself, so the driver stays its one reader. WHAT THIS DOES
+# NOT CHECK: who drives a slug, or whether a claim is honest — it prints what the driver answered.
 derive_claims_line() {   # $1 = the writer verb → the cell's head line and its rows
   local drv sd rc
   [ "$1" = replay ] && { printf 'claims — skipped: --card --replay reads no remote\n'; return 0; }
@@ -404,6 +406,7 @@ derive_claims_line() {   # $1 = the writer verb → the cell's head line and its
         BEGIN { n = split("live held unknown stale terminal", o, " "); for (i = 1; i <= n; i++) rk[o[i]] = i }
         { sub(/\r$/, "") }
         $0 == "claims: none" { none = 1; next }
+        $0 == "claims: off" { off = 1; next }
         NF == 5 && ($5 in rk) {
           all++
           if (($5 == "stale" || $5 == "terminal") && $4 ~ /^[0-9]+$/ && $4 + 0 > hide + 0) { hid++; next }
@@ -416,7 +419,8 @@ derive_claims_line() {   # $1 = the writer verb → the cell's head line and its
         END {
           if (bad != "") { print "claims — skipped: --claims printed a line this card cannot read: " substr(bad, 1, 120); exit }
           if (all == 0) {
-            if (none) print "claims — none on the remote"
+            if (off) print "claims — skipped: RUN_CLAIMS is off"
+            else if (none) print "claims — none on the remote"
             else print "claims — skipped: --claims exited 0 with neither a claim row nor claims: none, so the remote'"'"'s claims are unknown, not none"
             exit
           }

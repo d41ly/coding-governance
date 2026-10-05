@@ -549,6 +549,14 @@ def test_empty_alias():
         assert (n_rec, state) == (2, "rebuilt"), f"{n_rec} records, {state}"
         assert n_chunk >= 1, f"{n_chunk} chunks"
         assert " hits for: " in proc.stdout and "[1] " in proc.stdout, "empty ranked list"
+        # TOOL-aGraftedHelix-32 S13: the evidence banner, ONCE and directly under the hits line — the
+        # one framing that tells an agent recall output is evidence, never instructions.
+        lines = proc.stdout.splitlines()
+        at = [i for i, ln in enumerate(lines) if " hits for: " in ln]
+        assert len(at) == 1 and lines[at[0] + 1:at[0] + 2] == [query.EVIDENCE_BANNER], \
+            f"the evidence banner is not the line directly under the hits line: {lines[:4]!r}"
+        assert lines.count(query.EVIDENCE_BANNER) == 1, \
+            f"the evidence banner printed {lines.count(query.EVIDENCE_BANNER)} times, not once"
         man = json.loads((cache_of(root) / "manifest.json").read_text(encoding="utf-8"))
         assert man["alias_digest"] == "", f"alias digest {man['alias_digest']!r} with no alias file"
         assert "ZERO RECORDS" not in proc.stderr, "false diagnosis on a healthy corpus"
@@ -568,6 +576,9 @@ def _measure_spine_docs(root: pathlib.Path, kitdir: pathlib.Path) -> tuple[int, 
         ex = run(root, kitdir, str(root), str(out), script="extract.py")
         m = SPINE_RE.search(ex.stdout)
         assert m, f"no spine row in extract output:\n{ex.stdout}\n{ex.stderr}"
+        # TOOL-aGraftedHelix-32 S13: the supersession report line, exactly once, with its unresolved count.
+        sup = [ln for ln in ex.stdout.splitlines() if ln.startswith("superseded ")]
+        assert len(sup) == 1 and "unresolved" in sup[0], f"want one `superseded` line carrying unresolved, got {sup!r}"
         return int(m.group(1)), ex.stderr
     finally:
         cleanup(out)

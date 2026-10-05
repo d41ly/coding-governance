@@ -47,14 +47,32 @@ the decision, and the consumer fails closed.
 **Then vet the indirection** that made the inputs differ, since a sourced file can also just decide
 for the first process. `gate-env.sh` is now sourced only when tracked at the pushed sha and clean.
 
+## The second instance: a verdict file with a second writer
+
+`TOOL-aGraftedHelix-32` (the closing review of that build, M3). The lander trusts two files the
+tracked pre-push hook writes in its git dir, `pre-push-refusal` and `pre-push-bar`, and that hook
+clears both on EVERY run, before its own skip of a non-default branch. The run claim's push in
+`write_claim` (`tools/unattended/unattended.sh`) runs that same hook, and the resume tick's `--beat`
+pushes a claim from the run's worktree while a landing bar there takes far longer than one beat
+interval. So a beat landing mid-bar erased the landing's verdict, push-main wrote no lander marker,
+and `--landed` refused a green, pushed landing. Here the second process does not re-derive the
+verdict; it deletes it. The remedy is the same channel rule turned on writers: every file the lander
+trusts has exactly one writer per push, so `write_claim` pushes nothing while `push-main-active`
+sits in that git dir, returning its not-completed code with a reason naming the marker.
+
 ## Its gate
+
+The verdict-file instance is **gated by** the driver suite's GH32 AC6 arm, which plants
+`push-main-active` and a `pre-push-refusal` beside a due beat and asserts the file byte-identical and
+the claim ref unmoved; it read RED against a driver copy without the guard.
 
 No class-wide machine gate: a predicate that found two processes reading one name would red on every
 sanctioned shared setting. The instance is gated by `tools/push-main.test.sh` arms H1 and H1b, which
 drive the lander with the escape set only inside `gate-env.sh`, committed and then excluded, and
 assert the marker is absent. The documented check, for a review: for each decision one process
 records about another's act, name the file or token that carries the verdict between them. If the
-answer is "both read the same variable", that is this class.
+answer is "both read the same variable", that is this class. And for each such file, name every
+process that writes or clears it during the act it records; more than one is the second instance.
 
 ## Related
 

@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-32 — the closing review's 21 MEDIUM and LOW findings, fixed as one batch
 
-**Status:** SPECCED · rev-3 · 2026-10-05 · node a · Tier-2 · base 018b5675 · streams tooling+kickoff · order 16 · closes TOOL-aBranchedMandate-9 · ratified 2026-10-05
+**Status:** CLOSED · rev-3 · 2026-10-05 · node a · Tier-2 · base 018b5675 · streams tooling+kickoff · order 16 · closes TOOL-aBranchedMandate-9 · ratified 2026-10-05
 
 <!-- gen:spec-records -->
 
