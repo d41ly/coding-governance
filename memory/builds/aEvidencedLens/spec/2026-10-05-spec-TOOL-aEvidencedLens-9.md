@@ -1,6 +1,6 @@
 # TOOL-aEvidencedLens-9 — the bar refuses a run commit that changes `REVIEW_ROUNDS`
 
-**Status:** CLOSED · rev-3 · 2026-10-05 · node a · Tier-2 · base 028b5cac · streams tooling · order 6
+**Status:** CLOSED · rev-4 · 2026-10-05 · node a · Tier-2 · base 028b5cac · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
@@ -90,6 +90,7 @@ definition of a run's own commits.
   grant scan hits, so a round write in the unwalked superset, such as an owner raise merged into the
   run before its witness, reds an archived record for ever; that unit walks on either scan's hit and
   observes the excluded-commit case (round-1 spec audit, id 37, HIGH).
+- **hands-off** `TOOL-aEvidencedLens-21` — the closing diff review's batched minors, which amend what this unit built.
 
 ## 4. Design
 
@@ -262,6 +263,8 @@ New arm: tools/unattended/check-unattended.test.sh · a post-cutoff countless an
 - rev-3 · 2026-10-05 · S1 · build pass. S1 now strips a trailing ` # comment` and reads an
   EMPTY last assignment as the default, because the driver sources the conf and `read_bound_key`
   takes an empty value as unset; the raw reading would have called `REVIEW_ROUNDS=""` a change from 1.
+- rev-4 · 2026-10-05 · §3 · the mirror of `TOOL-aEvidencedLens-21`'s consumes-from edge, written by
+  the main loop when the closing review's minors were promoted.
 
 ## 10. Reuse audit
 

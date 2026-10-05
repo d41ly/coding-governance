@@ -172,3 +172,5 @@ base: 3640cf580d9df31e5cbe74be89024dd5a40e9f85
 2026-10-05T04:21:45Z dispatch · item b156dafa TOOL-aEvidencedLens-20 · reason memory/builds/aEvidencedLens/build/2026-10-05-build-TOOL-aEvidencedLens-20-1-acceptance-ledger.md memory/builds/aEvidencedLens/spec/2026-10-05-spec-TOOL-aEvidencedLens-18.md memory/LIVE.md memory/ledger/2026-10.md memory/builds/aEvidencedLens/spec/2026-10-05-spec-TOOL-aEvidencedLens-20.md memory/builds/aEvidencedLens/README.md
 
 2026-10-05T04:39:47Z review · item aEvidencedLens · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 0 · minors 9 · disposition promote
+
+2026-10-05T04:42:24Z rescope · item add TOOL-aEvidencedLens-21 · reason closing diff review round 1 (2026-10-05-review-TOOL-aEvidencedLens-1-closing-diff-review-round1.md): its 4 MEDIUM and 5 LOW findings, ids 1 2 4 5 6 7 8 10 11, promoted as one batched unit

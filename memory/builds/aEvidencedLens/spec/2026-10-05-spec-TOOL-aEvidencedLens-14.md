@@ -1,6 +1,6 @@
 # TOOL-aEvidencedLens-14 — check 19 walks a terminal record's exclusions when EITHER owner-held scan hits, so an owner's round raise never reds an archived record
 
-**Status:** CLOSED · rev-2 · 2026-10-05 · node a · Tier-2 · base 028b5cac · streams tooling · order 7
+**Status:** CLOSED · rev-3 · 2026-10-05 · node a · Tier-2 · base 028b5cac · streams tooling · order 7
 
 <!-- gen:spec-records -->
 
@@ -62,6 +62,7 @@ of the round-1 spec audit.
 
 - **consumes-from** `TOOL-aEvidencedLens-9` — the round scan, `scan_round_writes` and its call in
   check 19; without it there is no second scan to share the walk's trigger.
+- **hands-off** `TOOL-aEvidencedLens-21` — the closing diff review's batched minors, which amend what this unit built.
 
 ## 4. Design
 
@@ -180,6 +181,8 @@ none
   red on a staged walk that excludes the merge itself; S2 states that a merge's own write is a run
   write the walk keeps; and the §6 preamble and §5 testing line exempt that arm from the pass-start
   red, because the unwalked leg names a kept merge too. AC5's count stays at 3.
+- rev-3 · 2026-10-05 · §3 · the mirror of `TOOL-aEvidencedLens-21`'s consumes-from edge, written by
+  the main loop when the closing review's minors were promoted.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-aEvidencedLens-7 — `--review` takes highs and minors on a spec subject's exit and requires `promote` when any stood
 
-**Status:** CLOSED · rev-2 · 2026-10-05 · node a · Tier-2 · base 028b5cac · streams tooling · order 6
+**Status:** CLOSED · rev-3 · 2026-10-05 · node a · Tier-2 · base 028b5cac · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
@@ -96,6 +96,7 @@ stood and a row that stood on anything must promote it.
   spec-subject row that carries no counts or records `fold`.
 - **hands-off** `TOOL-aEvidencedLens-11` — the Skill's spec-subject review invocation, the verbs entry
   and the method's M4, which still say a spec audit's mediums and lows fold.
+- **hands-off** `TOOL-aEvidencedLens-21` — the closing diff review's batched minors, which amend what this unit built.
 
 ## 4. Design
 
@@ -254,6 +255,8 @@ New arm: tools/unattended/unattended.test.sh · `fold` at a converged spec exit,
   non-goal is replaced by `SPEC_COUNTS_CUTOFF`, declared here beside `FOLD_CUTOFF` and observed by
   AC9, and the §3 hands-off to `TOOL-aEvidencedLens-9` now carries check 2's reading of it. Id 13
   (LOW): AC7's alternation adds the two stale comments at `review_exit_note` and in `verb_review`.
+- rev-3 · 2026-10-05 · §3 · the mirror of `TOOL-aEvidencedLens-21`'s consumes-from edge, written by
+  the main loop when the closing review's minors were promoted.
 
 ## 10. Reuse audit
 

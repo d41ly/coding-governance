@@ -1,6 +1,6 @@
 # TOOL-aEvidencedLens-8 — the build harness promotes spec-audit minors, batched, and records the counts
 
-**Status:** CLOSED · rev-2 · 2026-10-05 · node a · Tier-2 · base 028b5cac · streams tooling · order 7 · ratified 2026-10-05
+**Status:** CLOSED · rev-3 · 2026-10-05 · node a · Tier-2 · base 028b5cac · streams tooling · order 7 · ratified 2026-10-05
 
 <!-- gen:spec-records -->
 
@@ -111,6 +111,7 @@ a spec subject's terminal exit, so the driver accepts the harness's record and c
   counts on a spec subject, and every record S4 writes at zero blockers is refused.
 - **hands-off** `TOOL-aEvidencedLens-11` — the method's M4, the Skill and the verbs entry state that
   the harness promotes spec-audit minors batched and records `--highs` and `--minors` itself.
+- **hands-off** `TOOL-aEvidencedLens-21` — the closing diff review's batched minors, which amend what this unit built.
 
 ## 4. Design
 
@@ -319,6 +320,8 @@ New arm: tools/workflows/unattended-build.test.sh · a retry text omitting `--hi
   chain bounded; the generation bound is §8 F3, parked for the owner as option (b). Id 16 (LOW):
   AC9's alternation adds the reconciliation comment's two phrases. Id 30 (LOW, its unit-8 half):
   §7's arms raise `FLOOR_ASSERTIONS` by the assertions added.
+- rev-3 · 2026-10-05 · §3 · the mirror of `TOOL-aEvidencedLens-21`'s consumes-from edge, written by
+  the main loop when the closing review's minors were promoted.
 
 ## 10. Reuse audit
 

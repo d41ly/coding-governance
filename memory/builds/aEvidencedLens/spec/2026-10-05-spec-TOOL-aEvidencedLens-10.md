@@ -1,6 +1,6 @@
 # TOOL-aEvidencedLens-10 — `review_replay.py` scores a spec-audit report against a past one by file and section
 
-**Status:** CLOSED · rev-3 · 2026-10-05 · node a · Tier-1 · base 028b5cac · streams tooling · order 6 · ratified 2026-10-05
+**Status:** CLOSED · rev-4 · 2026-10-05 · node a · Tier-1 · base 028b5cac · streams tooling · order 6 · ratified 2026-10-05
 
 <!-- gen:spec-records -->
 
@@ -70,7 +70,7 @@ improved harness against round 1 on this build's own specs.
 
 ### Edges
 
-none
+- **hands-off** `TOOL-aEvidencedLens-21` — the closing diff review's batched minors, which amend what this unit built.
 
 ## 4. Design
 
@@ -206,6 +206,8 @@ New arm: tools/workflows/review_replay.py · `per-lens-known` an appendix known 
 - rev-3 · 2026-10-05 · §4 · build pass. The Inventory adds `measure_replay`: the S3 window forcing
   lived in `main` alone, where no fixture-only arm can reach it, so `window-0` could not go red on a
   build that dropped it. One function now carries the known-to-score path for `main` and the arms.
+- rev-4 · 2026-10-05 · §3 · the mirror of `TOOL-aEvidencedLens-21`'s consumes-from edge, written by
+  the main loop when the closing review's minors were promoted.
 
 ## 10. Reuse audit
 

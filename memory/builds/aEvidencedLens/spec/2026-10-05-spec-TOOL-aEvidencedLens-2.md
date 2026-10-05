@@ -1,6 +1,6 @@
 # TOOL-aEvidencedLens-2 — spec lenses probe read-only, and every spec finding carries its evidence
 
-**Status:** CLOSED · rev-2 · 2026-10-05 · node a · Tier-2 · base 028b5cac · streams tooling · order 2
+**Status:** CLOSED · rev-3 · 2026-10-05 · node a · Tier-2 · base 028b5cac · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
@@ -81,6 +81,7 @@ finding carry the evidence it rests on, so a skeptic can re-run it.
 - **hands-off** external — `TOOL-aProbedUnit-16`, the ask that every review harness hand its agents a
   scratch root, stays open for the diff kind and the two drift-audit harnesses. This unit discharges
   its spec-audit half only, so the header carries no `advances` verb across builds.
+- **hands-off** `TOOL-aEvidencedLens-21` — the closing diff review's batched minors, which amend what this unit built.
 
 ## 4. Design
 
@@ -325,6 +326,8 @@ New arm: tools/workflows/tier2-review.test.sh · the spec finding schema require
   AC3 adds the sibling `/tmp/rs`, a trailing-slash value, a case-folded Windows pair and the folded
   value on the `PROBE POLICY` line. Id 27 (MEDIUM): AC1 no longer asserts the block is absent from
   `verify:`, which `TOOL-aEvidencedLens-3` S5 fills after this unit.
+- rev-3 · 2026-10-05 · §3 · the mirror of `TOOL-aEvidencedLens-21`'s consumes-from edge, written by
+  the main loop when the closing review's minors were promoted.
 
 ## 10. Reuse audit
 

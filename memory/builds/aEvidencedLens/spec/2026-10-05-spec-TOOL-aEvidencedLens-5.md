@@ -1,6 +1,6 @@
 # TOOL-aEvidencedLens-5 — the build harness hands the audit its context, sibling specs, checklist and prior findings
 
-**Status:** CLOSED · rev-2 · 2026-10-05 · node a · Tier-2 · base 028b5cac · streams tooling · order 6 · ratified 2026-10-05
+**Status:** CLOSED · rev-3 · 2026-10-05 · node a · Tier-2 · base 028b5cac · streams tooling · order 6 · ratified 2026-10-05
 
 <!-- gen:spec-records -->
 
@@ -99,6 +99,7 @@ one it could not produce.
   without this unit the build harness's audit is refused there.
 - **consumes-from** `TOOL-aEvidencedLens-4` — a spec subject's `prevBlob`, which the review harness
   validates and reads at a fold round; without it S5's field is an unread key.
+- **hands-off** `TOOL-aEvidencedLens-21` — the closing diff review's batched minors, which amend what this unit built.
 
 ## 4. Design
 
@@ -296,6 +297,8 @@ New arm: tools/workflows/unattended-build.test.sh · a malformed `prevSubjects`,
   the phase detail's four inputs. Id 32 (LOW): S8 names each one-missing case as unit 4 S3 grades it.
   Id 33 (LOW): S7 and AC7 omit `priorFindings` instead of returning `[]`. Id 43 (LOW): S1 composes
   `context` from `briefDir`. Id 30 (LOW, its unit-5 half): §7's arms raise `FLOOR_ASSERTIONS`.
+- rev-3 · 2026-10-05 · §3 · the mirror of `TOOL-aEvidencedLens-21`'s consumes-from edge, written by
+  the main loop when the closing review's minors were promoted.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-aEvidencedLens-4 — a spec fold round reads its diff, and a moved subject is graded, not fixed at BLOCKER
 
-**Status:** CLOSED · rev-2 · 2026-10-05 · node a · Tier-2 · base 028b5cac · streams tooling · order 4 · ratified 2026-10-05
+**Status:** CLOSED · rev-3 · 2026-10-05 · node a · Tier-2 · base 028b5cac · streams tooling · order 4 · ratified 2026-10-05
 
 <!-- gen:spec-records -->
 
@@ -88,6 +88,7 @@ that the run-integrity block names and the lenses grade on its consequence.
 ### Edges
 
 - **hands-off** `TOOL-aEvidencedLens-5` — the per-subject `prevBlob` field and its validation; that unit passes it from the previous round's pin on a fold re-invoke, and without it every fold round this unit improves is DEGRADED.
+- **hands-off** `TOOL-aEvidencedLens-21` — the closing diff review's batched minors, which amend what this unit built.
 
 ## 4. Design
 
@@ -300,6 +301,8 @@ version bump at the close (shared invariant 7).
   asserts the `none supplied for this round-2 review` line and AC2 the `2 of 3` count. Id 44 (LOW):
   S5's moved-text read is `git -C <repo> diff <blob> -- <path>`, not a cwd-dependent pipe. Id 34
   (LOW, its unit-4 half): base 3640cf58 becomes 028b5cac, with §4 Evidence restated against it.
+- rev-3 · 2026-10-05 · §3 · the mirror of `TOOL-aEvidencedLens-21`'s consumes-from edge, written by
+  the main loop when the closing review's minors were promoted.
 
 ## 10. Reuse audit
 
