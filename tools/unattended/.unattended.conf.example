@@ -159,7 +159,7 @@ RESUME_SCHEDULE_LIMIT="6"
 # goes to, as the ref `refs/gov/runs/<slug>` written by compare-and-swap, so a second node's
 # `--preflight` of the same slug is refused before it starts rather than met at the merge.
 # `on` or `off`; absent or blank is `off`, and `--preflight` says so on stderr; any other spelling
-# is a refusal. On, a remote that refuses the push refuses `--preflight` with check 91.
+# is a refusal. On, a remote that refuses the push refuses `--preflight` with check 109.
 # The kit ships it OFF: turn it on once your remote accepts a push to `refs/gov/runs/<slug>`.
 RUN_CLAIMS="off"
 

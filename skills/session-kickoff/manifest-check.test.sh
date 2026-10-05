@@ -1302,8 +1302,8 @@ run_card "AGH2 S7 a replay that finds no stored card writes one whose cell reads
   "claims — skipped: --card --replay reads no remote" --card --replay --session "$NONCE-c1n"
 
 # AC4 — a remote URL naming nothing: the driver's own refusal, never the empty answer.
-run_card "AGH2 AC4 a remote that names nothing reads skipped: and the driver's check 91" "$CWT" 0 \
-  "claims — skipped: UNATTENDED check 91 FAILED" --card --write --session "$NONCE-c4"
+run_card "AGH2 AC4 a remote that names nothing reads skipped: and the driver's check 109" "$CWT" 0 \
+  "claims — skipped: UNATTENDED check 109 FAILED" --card --write --session "$NONCE-c4"
 # The refusal is cut at 160 bytes after the `claims — skipped: ` prefix, and the driver's line is longer.
 cl_len=$(grep -m1 '^claims — skipped: ' "$CARD_HOME/$NONCE-c4.md" 2>/dev/null | LC_ALL=C awk '{ print length($0) - length("claims — skipped: ") }')
 [ -f "$CARD_HOME/$NONCE-c4.md" ] && ! grep -q 'none on the remote' "$CARD_HOME/$NONCE-c4.md" && [ "${cl_len:-999}" -le 160 ] \

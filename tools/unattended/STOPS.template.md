@@ -189,23 +189,23 @@ by one space, `absent` a member like any other, and the empty value or a missing
 | none | create | create | create | create |
 | mine | renew | renew | renew when due | write |
 | same session | rewrite | take | take | write |
-| foreign `live` | check 89 | check 89 | check 90 | announce |
-| foreign `held` | check 89 | take | check 90 | announce |
-| foreign `stale` | take, announced | take, announced | check 90 | write |
-| foreign `terminal` | take | check 89 | check 90 | write |
-| `unknown` | check 89 | check 89 | check 90 | announce |
+| foreign `live` | check 107 | check 107 | check 108 | announce |
+| foreign `held` | check 107 | take | check 108 | announce |
+| foreign `stale` | take, announced | take, announced | check 108 | write |
+| foreign `terminal` | take | check 107 | check 108 | write |
+| `unknown` | check 107 | check 107 | check 108 | announce |
 
 The holder is `--resume`'s holder row and its `--replaces` block, `--dispatch` and `--close`; it
 renews when the beat is a quarter of the bound old or a field it writes differs, and otherwise only
 reads, so a lost claim is found on every call. A race lost between the read and the push is check
-90; a push refused for any other reason, or not answered, is check 91 at `--preflight`, at a
+108; a push refused for any other reason, or not answered, is check 109 at `--preflight`, at a
 take-over and at `--close`, and one announced line at the holder's `--resume` and `--dispatch`, which
 work offline. The holder row whose `write_lease` is due pushes first, under the values and the one
 stamp `write_lease` then records, so a lost race leaves the record untouched; a push that does not
 land, or a claim it could not read, ADDS to `prior-session` the record's session from before the
 call and the read claim's session, each once. That row is the set's one writer: the next claim
 write of that row that lands empties it, writing the empty value only when the set is non-empty, and
-a landed `--beat`, `--dispatch` or status write leaves it as it is. A holder refused at check 90
+a landed `--beat`, `--dispatch` or status write leaves it as it is. A holder refused at check 108
 ends with `--abort <slug> --code claim-lost`. The status
 writes are `--hold` (`held`), `--landed` (`landed`), `--abort` (`aborted`) and the landing re-bind
 (`live`, its new keepalive), each after its own staging and never failing its verb. The resume tick
@@ -228,7 +228,7 @@ renews a `LIVE` run's claim through `--beat`, which writes only the none and `mi
 | HELD, condition unmet | any | `still held`, writes nothing |
 | HELD, `lease-utc` after `held-at`, clock fresh, another session and keepalive | an id | refuses 58: a take-over recorded its lease and has not moved the phase |
 | HELD, otherwise | an id, or none | take-over; no id, the status block then check 59 |
-| working | the recorded keepalive | the holder: writes nothing to the record unless it lacks `lease-utc` or names another session or pid than the harness exposes, then records and stages; with `RUN_CLAIMS` on, first reads its claim (§7), renewing it when due and refusing at check 90 one another session holds; reaps orphans (§14) |
+| working | the recorded keepalive | the holder: writes nothing to the record unless it lacks `lease-utc` or names another session or pid than the harness exposes, then records and stages; with `RUN_CLAIMS` on, first reads its claim (§7), renewing it when due and refusing at check 108 one another session holds; reaps orphans (§14) |
 | working, clock fresh or unknown | a new id with `--replaces` the recorded keepalive | the holder replaces its job: `write_lease`, staged; another `--replaces` id refuses 58 |
 | working | a new id, the recorded session (not `absent`), under a pid the record does not name | the holder's process restarted: take-over; refuses 58 first if the recorded pid lives |
 | working, no lease, age unanswerable | a new id, or none | the status block, then check 57 |

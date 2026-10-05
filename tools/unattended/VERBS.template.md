@@ -22,10 +22,10 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   its queue bound plus a margin, as the `gate-backstop` fact, and it refuses a wall below the
   largest leg ceiling that profile reports.
   Where `RUN_CLAIMS` is `on` it reads every run claim on the remote right after the anchor, lists the
-  ones of OTHER slugs that are not terminal, and refuses at check 89 a live, held or unreadable claim
+  ones of OTHER slugs that are not terminal, and refuses at check 107 a live, held or unreadable claim
   another session holds on this slug; it takes over a stale or terminal one. Its own claim is written
   by compare-and-swap after every precondition and BEFORE the rotation and the scaffold, so a race it
-  loses (check 90) or a write that does not complete (check 91) leaves the tree untouched.
+  loses (check 108) or a write that does not complete (check 109) leaves the tree untouched.
   `UNATTENDED-STOPS.md` §7 is the contract; undeclared, the switch is `off` and one NOTE says so.
 - `--phase` — writes a phase and its witness. Without it the vocabulary is decorative: only
   `--preflight` and `--close` ever wrote one, so every member between them entered the file only by
@@ -126,7 +126,7 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   record, while a take-over, `--replaces`, the holder's restarted process and a pushed landing not yet
   observed re-record keepalive, session and pid and stage the record; refused on a recorded terminal.
   Where `RUN_CLAIMS` is `on` the holder reads its claim on the remote on every call and renews it when
-  due, a claim another session holds is check 90 for the holder and check 89 for a take-over, and
+  due, a claim another session holds is check 108 for the holder and check 107 for a take-over, and
   `--replaces` and the landing re-bind write their new keepalive into it (`UNATTENDED-STOPS.md` §7).
   `--scheduled <held-at>` marks it as the restart a DURABLE schedule issued. It refuses, numbered
   and before any write, unless the exact hold that schedule was filed for is still the record's
@@ -138,8 +138,8 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   bounded by the pinned backstop, and `gates-green` names each other way a bar ends as what it is: a
   TREE MOVED exit is run once more, and a HOST exit or a kill before the bar acquired the repository
   prints a `hold ·` line rather than reading as a red leg. Where `RUN_CLAIMS` is `on`, before any
-  item is graded, a run that does not hold its claim on the remote is check 90 and a claim that
-  cannot be read or renewed is check 91: a close that lands a claim it never read is a double landing.
+  item is graded, a run that does not hold its claim on the remote is check 108 and a claim that
+  cannot be read or renewed is check 109: a close that lands a claim it never read is a double landing.
 - `--landed` — an OBSERVATION rather than a claim, guarded on the RECORDED phase. It accepts a record
   only at `LANDING` and re-observes the anchor. Under `primary` it is the one writer of `LANDED` and
   refuses unless HEAD is an ancestor of the tip the remote advertises; where `LANDER_MARKER` is
@@ -185,7 +185,7 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   an unattended build closes each unit spec in its own build commit, and this verb is the one point
   that sees a spec before its unit builds. A blank or absent key is an ANNOUNCED skip on stdout,
   never a silent pass. Where `RUN_CLAIMS` is `on` it reads the run's claim as the holder after every
-  local refusal and before the row: another session's claim is check 90 and no row is written.
+  local refusal and before the row: another session's claim is check 108 and no row is written.
 - `--review` — records ONE review round for a subject and reports what the loop is doing:
   `CONVERGING`, `CONVERGED`, `NON-CONVERGENT`, `CEILING` or `BOUNDED`. The round is an append-only
   `review` line in the parked region, a `history` kind, so it never inflates the count of decisions
@@ -218,7 +218,7 @@ run log `UNATTENDED-PROTOCOL.md` §2 describes, and no verb reads it.
   a `--dispatch` would anchor at the commit the amend replaces, which check 23 never grades.
 - `--claims` — every run claim on the remote, one TAB-separated row each: slug, node, status,
   beat age in seconds and verdict, `live`, `stale`, `held`, `terminal` or `unknown`, sorted by slug;
-  `claims: none` when there is none, and exit 2 with check 91 when the remote does not answer, never
+  `claims: none` when there is none, and exit 2 with check 109 when the remote does not answer, never
   an empty list. It takes no slug, reads whatever `RUN_CLAIMS` says, and decides nothing about who
   drives: `UNATTENDED-STOPS.md` §7 is what the verdicts mean.
 - `--beat` — `--beat <slug>`, the resume tick's heartbeat for a run `--liveness` reads `LIVE` on this

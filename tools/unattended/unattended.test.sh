@@ -12136,7 +12136,7 @@ seed_claim gA s-a k-a live "2026-02-30T00:00:00Z"
 seed_claim gB s-b k-b live "$(derive_claim_now)"
 out=$(bash "$SCRIPT" --claims 2>/dev/null)
 same "AC16 an invalid stamp reads every claim of the date call unknown, aged -" "$(printf '%s\n' "$out" | cut -f1,4,5 | tr '\t\n' ':;')" "gA:-:unknown;gB:-:unknown;"
-# ---- AC3: a remote that does not answer is exit 2 and check 91, never `claims: none`.
+# ---- AC3: a remote that does not answer is exit 2 and check 109, never `claims: none`.
 git remote set-url origin "$ORIGIN_DIR/no-such-remote.git"
 out=$(bash "$SCRIPT" --claims 2>&1); rc=$?
 git remote set-url origin "$ORIGIN"
@@ -12145,7 +12145,7 @@ hit  "$out" "the claims on the remote could not be read, so whether another sess
 miss "$out" "claims: none"
 
 # ---- AC4: --preflight claims the slug on the remote, and a second clone under another session and
-# ---- keepalive is refused at check 89 naming the holder, with no run-state file written.
+# ---- keepalive is refused at check 107 naming the holder, with no run-state file written.
 arm_claim_fixture
 out=$(run --preflight tFresh --keepalive-id k1)
 hit  "$out" "preflight OK"
@@ -12194,7 +12194,7 @@ arm_claim_fixture
 out=$(run --preflight tFresh --keepalive-id k1)
 miss "$out" "claim(s) on the remote"
 
-# ---- AC6: a race lost between the read and the push is check 90, and nothing is written: no record,
+# ---- AC6: a race lost between the read and the push is check 108, and nothing is written: no record,
 # ---- and on a slug whose prior run left a terminal record, no rotation.
 arm_claim_fixture
 GH_RACER=$(git --git-dir="$ORIGIN" commit-tree "$(git --git-dir="$ORIGIN" mktree </dev/null)" -m "gov-claim racer")
@@ -12213,12 +12213,12 @@ run --preflight tRun --keepalive-id k1 >/dev/null
 sed -i 's/^phase: .*/phase: ABORTED/' memory/builds/tRun/RUN.md
 add_facts memory/builds/tRun/RUN.md "halt-code: fork-unresolvable"; fixture; before=$(sum)
 out=$(PATH="$GH_BIN:$PATH" bash "$SCRIPT" --preflight tRun --keepalive-id k2 2>&1)
-hit  "$out" "UNATTENDED check 90 FAILED"
+hit  "$out" "UNATTENDED check 108 FAILED"
 miss "$out" "retired the finished record"
 same "AC6 the terminal record is byte-unchanged after the lost race" "$(sum)" "$before"
 same "AC6 ...and unmoved: no archive beside it" "$(git ls-files 'memory/builds/tRun/RUN.*.md' | grep -c .)" "0"
-# ---- AC17: a push refused for any reason but a race, and a push the bound killed, are check 91,
-# ---- never check 90, and leave no run-state file.
+# ---- AC17: a push refused for any reason but a race, and a push the bound killed, are check 109,
+# ---- never check 108, and leave no run-state file.
 arm_claim_fixture
 cat > "$GH_BIN/git" <<EOF
 #!/usr/bin/env bash
@@ -12229,7 +12229,7 @@ chmod +x "$GH_BIN/git"
 out=$(PATH="$GH_BIN:$PATH" bash "$SCRIPT" --preflight tFresh --keepalive-id k1 2>&1)
 hit  "$out" "the claim write did not complete, so whether this run holds its slug on the remote is unknown rather than lost, and nothing was written"
 hit  "$out" "[remote rejected] (pre-receive hook declined)"
-miss "$out" "UNATTENDED check 90 FAILED"
+miss "$out" "UNATTENDED check 108 FAILED"
 n=$((n+1)); [ ! -e memory/builds/tFresh/RUN.md ] || { echo "FAIL AC17 a refused push wrote the run-state file"; st=1; }
 cat > "$GH_BIN/git" <<EOF
 #!/usr/bin/env bash
@@ -12237,12 +12237,12 @@ case " \$* " in *" push "*"refs/gov/runs/"*) exit 124 ;; esac
 exec "$GH_GIT" "\$@"
 EOF
 out=$(PATH="$GH_BIN:$PATH" bash "$SCRIPT" --preflight tFresh --keepalive-id k1 2>&1)
-hit  "$out" "UNATTENDED check 91 FAILED"
-miss "$out" "UNATTENDED check 90 FAILED"
+hit  "$out" "UNATTENDED check 109 FAILED"
+miss "$out" "UNATTENDED check 108 FAILED"
 n=$((n+1)); [ ! -e memory/builds/tFresh/RUN.md ] || { echo "FAIL AC17 a killed push wrote the run-state file"; st=1; }
 rm -f "$GH_BIN/git"
 
-# ---- AC7: the holder renews only when due, refuses another session's live claim at check 90 naming
+# ---- AC7: the holder renews only when due, refuses another session's live claim at check 108 naming
 # ---- claim-lost, and that code ends the run; the kit's example declares the raised floor.
 build_claim_held
 gh_sha=$(read_claim_ref tRun)
@@ -12265,13 +12265,13 @@ hit  "$out" "phase ABORTED · witness"
 hit  "$out" "unattended: claim not written — tRun is held live by session s-other on other, beat "
 same "AC9 an abort under another session's live claim still exits 0" "$rc" "0"
 same "AC7 the kit's example raises HALT_FLOOR to the new core size" "$(grep -c '^HALT_FLOOR="8"$' "$HERE/.unattended.conf.example")" "1"
-# ---- AC8: a take-over refuses another session's LIVE claim at check 89 with the record unchanged, and
+# ---- AC8: a take-over refuses another session's LIVE claim at check 107 with the record unchanged, and
 # ---- takes a STALE one, the claim then naming the new session.
 build_claim_held; GIT_AUTHOR_DATE="2000-01-01T00:00:00Z" GIT_COMMITTER_DATE="2000-01-01T00:00:00Z" git commit -q --allow-empty -m gh-aged --no-verify
 seed_claim tRun s-third k-third live "$(derive_claim_now)"
 before=$(sum)
 out=$(CLAUDE_CODE_SESSION_ID=s-new run --resume tRun --keepalive-id kB)
-hit  "$out" "UNATTENDED check 89 FAILED"
+hit  "$out" "UNATTENDED check 107 FAILED"
 same "AC8 the refused take-over left the record byte-unchanged" "$(sum)" "$before"
 seed_claim tRun s-third k-third live "$(derive_claim_ago $((GH_BOUND + 600)))"
 out=$(CLAUDE_CODE_SESSION_ID=s-new run --resume tRun --keepalive-id kB)
@@ -12294,17 +12294,17 @@ out=$(run --abort tRun --code fork-unresolvable --reason "the claim arm ends its
 hit  "$out" "phase ABORTED"
 same "AC9 --abort writes aborted" "$(read_claim_field tRun status)" "aborted"
 same "AC9 ...and the terminal claim stays on the remote" "$(git ls-remote "$ORIGIN" refs/gov/runs/tRun | grep -c .)" "1"
-# ---- AC10: --close refuses at check 90, before any Definition-of-Done line, a run whose claim another
+# ---- AC10: --close refuses at check 108, before any Definition-of-Done line, a run whose claim another
 # ---- session holds live, and writes no LANDING.
 build_claim_held
 seed_claim tRun s-other k-other live "$(derive_claim_now)"
 out=$(run --close tRun)
-hit  "$out" "UNATTENDED check 90 FAILED"
+hit  "$out" "UNATTENDED check 108 FAILED"
 miss "$out" "UNATTENDED check 13 FAILED"
 same "AC10 the refused close wrote no LANDING" "$(sed -n 's/^phase: //p' memory/builds/tRun/RUN.md)" "RUNNING"
 
-# ---- AC19: a claim read that fails while the anchor answers is check 91 at --close; another session's
-# ---- live claim is check 90 at --dispatch with no row; a STALE foreign one refuses both, ref unmoved.
+# ---- AC19: a claim read that fails while the anchor answers is check 109 at --close; another session's
+# ---- live claim is check 108 at --dispatch with no row; a STALE foreign one refuses both, ref unmoved.
 build_claim_held
 cat > "$GH_BIN/git" <<EOF
 #!/usr/bin/env bash
@@ -12313,7 +12313,7 @@ exec "$GH_GIT" "\$@"
 EOF
 chmod +x "$GH_BIN/git"
 out=$(PATH="$GH_BIN:$PATH" bash "$SCRIPT" --close tRun 2>&1)
-hit  "$out" "UNATTENDED check 91 FAILED"
+hit  "$out" "UNATTENDED check 109 FAILED"
 miss "$out" "UNATTENDED check 13 FAILED"
 rm -f "$GH_BIN/git"
 mkdir -p memory/builds/tRun/spec
@@ -12322,7 +12322,7 @@ git add -A >/dev/null && git commit -q -m gh-spec --no-verify
 seed_claim tRun s-other k-other live "$(derive_claim_now)"
 before=$(sum)
 out=$(run --dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}a.sh)
-hit  "$out" "UNATTENDED check 90 FAILED"
+hit  "$out" "UNATTENDED check 108 FAILED"
 miss "$out" "dispatch declared"
 same "AC19 the refused dispatch left the record byte-unchanged" "$(sum)" "$before"
 seed_claim tRun s-other k-other live "$(derive_claim_ago $((GH_BOUND + 600)))"
@@ -12451,19 +12451,19 @@ same "AC2 the hooked holder resume exits 0" "$rc" "0"
 n=$((n+1)); [ "$(read_claim_field tFresh beat-utc)" != "$gk_old" ] || { echo "FAIL AC2 a due beat did not move through the hooked push: $out"; st=1; }
 n=$((n+1)); [ ! -e "$GK_GD/pre-push-refusal" ] || { echo "FAIL AC2 the hooked update left a refusal file"; st=1; }
 hit  "$(read_hooked_journal)" "decision=skip-nondefault"
-# ---- AC3: no recorded origin/HEAD is the hook's `default-branch` refusal - check 91, never 90, the
+# ---- AC3: no recorded origin/HEAD is the hook's `default-branch` refusal - check 109, never 90, the
 # ---- remedy composed from the remote's name, no record - and the driver supplies no default.
 build_hooked_fixture; git remote set-head origin -d
 out=$(run_hooked --preflight tFresh --keepalive-id k1); rc=$?
 n=$((n+1)); [ "$rc" != 0 ] || { echo "FAIL AC3 a hook-refused claim push preflighted"; st=1; }
-hit  "$out" "UNATTENDED check 91 FAILED"
-miss "$out" "UNATTENDED check 90 FAILED"
+hit  "$out" "UNATTENDED check 109 FAILED"
+miss "$out" "UNATTENDED check 108 FAILED"
 hit  "$out" "the pre-push hook refused it: default-branch"
 hit  "$out" "git remote set-head origin -a"
 same "AC3 ...and nothing reached the remote" "$(git ls-remote "$ORIGIN" refs/gov/runs/tFresh | grep -c .)" "0"
 n=$((n+1)); [ ! -e memory/builds/tFresh/RUN.md ] || { echo "FAIL AC3 a hook-refused claim push wrote the run-state file"; st=1; }
 # ---- AC5: a refusal file an EARLIER push left is removed before the claim push, so a push that
-# ---- never reached the hook is check 91 with git's exit and no token.
+# ---- never reached the hook is check 109 with git's exit and no token.
 build_hooked_fixture
 printf 'gate-red\tpre-push: merge bar RED - push blocked\n' > "$GK_GD/pre-push-refusal"
 cat > "$GK_BIN/git" <<EOF
@@ -12473,7 +12473,7 @@ exec "$GK_GIT" "\$@"
 EOF
 chmod +x "$GK_BIN/git"
 out=$(PATH="$GK_BIN:$PATH" run_hooked --preflight tFresh --keepalive-id k1); rc=$?
-hit  "$out" "UNATTENDED check 91 FAILED"
+hit  "$out" "UNATTENDED check 109 FAILED"
 hit  "$out" "git push exited 128"
 miss "$out" "gate-red"
 miss "$out" "set-head"
@@ -12556,27 +12556,27 @@ if in_shard 2; then
 GC_CELLS='none             preflight 0 -  moved changed -
 mine             preflight 0 -  moved changed -
 same             preflight 0 -  moved changed -
-foreign-live     preflight 1 89 same  same    -
-foreign-held     preflight 1 89 same  same    -
+foreign-live     preflight 1 107 same  same    -
+foreign-held     preflight 1 107 same  same    -
 foreign-stale    preflight 0 -  moved changed taken
 foreign-terminal preflight 0 -  moved changed -
-foreign-unknown  preflight 1 89 same  same    -
+foreign-unknown  preflight 1 107 same  same    -
 none             take-over 0 -  moved changed -
 mine             take-over 0 -  moved changed -
 same             take-over 0 -  moved changed -
-foreign-live     take-over 1 89 same  same    -
+foreign-live     take-over 1 107 same  same    -
 foreign-held     take-over 0 -  moved changed -
 foreign-stale    take-over 0 -  moved changed taken
-foreign-terminal take-over 1 89 same  same    -
-foreign-unknown  take-over 1 89 same  same    -
+foreign-terminal take-over 1 107 same  same    -
+foreign-unknown  take-over 1 107 same  same    -
 none             holder    0 -  moved same    -
 mine             holder    0 -  moved same    -
 same             holder    0 -  moved same    -
-foreign-live     holder    1 90 same  same    -
-foreign-held     holder    1 90 same  same    -
-foreign-stale    holder    1 90 same  same    -
-foreign-terminal holder    1 90 same  same    -
-foreign-unknown  holder    1 90 same  same    -
+foreign-live     holder    1 108 same  same    -
+foreign-held     holder    1 108 same  same    -
+foreign-stale    holder    1 108 same  same    -
+foreign-terminal holder    1 108 same  same    -
+foreign-unknown  holder    1 108 same  same    -
 none             status    0 -  moved changed -
 mine             status    0 -  moved changed -
 same             status    0 -  moved changed -
@@ -12647,7 +12647,7 @@ run_claim_cell() { # row · mode -> GC_GOT
   [ -n "$r1" ] || [ -z "$r0" ] || ref=gone
   [ "$h1" = "$h0" ] || rec=changed
   # A WRITE THAT LOST is `lost`, never the refusal or the announcement it can coincide with: a row
-  # misread as `none` pushes against an empty lease, loses, and exits as check 90 or a `claim not
+  # misread as `none` pushes against an empty lease, loses, and exits as check 108 or a `claim not
   # written` line too - only the sentence tells the table's decision from a race the push lost.
   case "$out" in
     *"the claim moved on the remote between"*|*"unattended: claim not written — $slug · "*) line=lost ;;
@@ -12705,7 +12705,7 @@ hit  "$out" "unattended: beat — tRun · skipped: the claim write table refused
 same "GH19 S2 a refused --beat creates no claim" "$(read_claim_ref tRun)" ""
 git --git-dir="$ORIGIN" update-ref refs/gov/runs/tRun "$gc_sha"
 out=$(bash "$gc_drv/unattended.sh" --hold tRun --code platform-limit --until owner --reason "the mode axis" --reaped k1 2>&1)
-hit  "$out" "UNATTENDED check 92 FAILED — this call passed a claim mode the driver does not declare, so the claim write table has no column for it and nothing was written; declare the mode in CLAIM_MODES beside its case branch, or pass a declared one: mode status · CLAIM_MODES $gc_m1"
+hit  "$out" "UNATTENDED check 110 FAILED — this call passed a claim mode the driver does not declare, so the claim write table has no column for it and nothing was written; declare the mode in CLAIM_MODES beside its case branch, or pass a declared one: mode status · CLAIM_MODES $gc_m1"
 same "GH19 S5 the refused status write moves no claim ref" "$(read_claim_ref tRun)" "$gc_sha"
 rm -rf "$gc_drv"
 remove_claim_refs; reset_tree
@@ -12724,7 +12724,7 @@ same "GH22 S2 the scratch driver's CLAIM_READS is the kit's less foreign-stale" 
 seed_claim_row foreign-stale tFresh s-new k2
 gc_sha=$(read_claim_ref tFresh)
 out=$(CLAUDE_CODE_SESSION_ID=s-new bash "$gc_drv/unattended.sh" --preflight tFresh --keepalive-id k2 2>&1)
-hit  "$out" "UNATTENDED check 93 FAILED — this call derived a claim-read class the driver does not declare, so the claim write table has no row for it and nothing was written; declare the class in CLAIM_READS beside its case branch: class foreign-stale · CLAIM_READS $gc_r1"
+hit  "$out" "UNATTENDED check 111 FAILED — this call derived a claim-read class the driver does not declare, so the claim write table has no row for it and nothing was written; declare the class in CLAIM_READS beside its case branch: class foreign-stale · CLAIM_READS $gc_r1"
 same "GH22 S2 the refused preflight moves no claim ref" "$(read_claim_ref tFresh)" "$gc_sha"
 same "GH22 S2 ...and writes no run-state file" "$([ -e memory/builds/tFresh/RUN.md ] && echo present || echo absent)" "absent"
 rm -rf "$gc_drv"
@@ -12733,7 +12733,7 @@ remove_claim_refs; reset_tree
 # ==================================================================================================
 # TOOL-aGraftedHelix-18 — THE HOLDER ROW DECIDES `mine` BEFORE ITS write_lease AND COPIES THE CLAIM'S
 # IDENTITY AFTER IT. AC1: a record and claim preflighted under s1, the holder's --resume under s2
-# moves the claim to s2, and a second call under s2 reads it `mine`, never check 90. AC2: a changed
+# moves the claim to s2, and a second call under s2 reads it `mine`, never check 108. AC2: a changed
 # pid alone moves `lease-utc`, the claim then carries the record's stamp byte for byte, and the next
 # call under that pid pushes nothing. The record's stamp is first set ten minutes back, so a
 # write_lease inside the preflight's own second still moves it. RED against a driver whose claim
@@ -12751,7 +12751,7 @@ hit  "$out" "unattended: lease recorded · keepalive k1 · session s1 -> s2"
 same "GH18 AC1 ...and the claim follows the record to s2" "$(read_claim_field tRun session)" "s2"
 out=$(CLAUDE_CODE_SESSION_ID=s2 run --resume tRun --keepalive-id k1); rc=$?
 same "GH18 AC1 the second call under s2 exits 0" "$rc" "0"
-miss "$out" "UNATTENDED check 90 FAILED"
+miss "$out" "UNATTENDED check 108 FAILED"
 # ---- AC2
 build_claim_held
 sed -i "s/^lease-utc: .*/lease-utc: $(derive_claim_ago 600)/" memory/builds/tRun/RUN.md
@@ -12772,7 +12772,7 @@ remove_claim_refs; reset_tree
 # preflighted under s1 and calls the holder's --resume under s2, so its write_lease is due. AC2: a
 # claim push made to exit 124, and a remote renamed away, each leave the record at s2 with
 # `prior-session: s1` and the claim at s1, staged; a second s2 call reads that claim `mine`, lands it
-# under s2 and empties the set. AC1: a lost race is check 90 with the record and the index
+# under s2 and empties the set. AC1: a lost race is check 108 with the record and the index
 # untouched. AC3: under a date shim advancing every clock read, the claim and the record carry one
 # stamp, and a renewal over a record without the fact writes nothing. AC6: the session's restart under
 # a new keepalive takes the run over through `same session`, and an s3 take-over through the
@@ -12803,7 +12803,7 @@ same "GH20 AC2 ...while the claim still names s1" "$(read_claim_field tRun sessi
 same "GH20 AC2 ...and the record is staged" "$(git diff --name-only -- memory/builds/tRun/RUN.md)" ""
 out=$(CLAUDE_CODE_SESSION_ID=s2 run --resume tRun --keepalive-id k1); rc=$?
 same "GH20 AC2 the second s2 call exits 0" "$rc" "0"
-miss "$out" "UNATTENDED check 90 FAILED"
+miss "$out" "UNATTENDED check 108 FAILED"
 same "GH20 AC2 ...lands the claim under s2" "$(read_claim_field tRun session)" "s2"
 same "GH20 AC2 ...empties the prior-session set (TOOL-aGraftedHelix-23 S7)" "$(read_run_fact prior-session)" ""
 same "GH20 AC2 ...and stages the record it cleared" "$(git diff --name-only -- memory/builds/tRun/RUN.md)" ""
@@ -12821,11 +12821,11 @@ same "GH20 AC2 ...while the claim still names s1" "$(read_claim_field tRun sessi
 same "GH20 AC2 ...and the record is staged" "$(git diff --name-only -- memory/builds/tRun/RUN.md)" ""
 out=$(CLAUDE_CODE_SESSION_ID=s2 run --resume tRun --keepalive-id k1); rc=$?
 same "GH20 AC2 the second s2 call with the remote restored exits 0" "$rc" "0"
-miss "$out" "UNATTENDED check 90 FAILED"
+miss "$out" "UNATTENDED check 108 FAILED"
 same "GH20 AC2 ...lands the claim under s2" "$(read_claim_field tRun session)" "s2"
 same "GH20 AC2 ...empties the prior-session set (TOOL-aGraftedHelix-23 S7)" "$(read_run_fact prior-session)" ""
 same "GH20 AC2 ...and stages the record it cleared" "$(git diff --name-only -- memory/builds/tRun/RUN.md)" ""
-# ---- AC1: the s2 call that loses the race is check 90, and the run-state file and the index are
+# ---- AC1: the s2 call that loses the race is check 108, and the run-state file and the index are
 # ---- untouched. Red when the CAS runs after write_lease: the record moved on a call that lost.
 build_prior_base
 GP_RACER=$(git --git-dir="$ORIGIN" commit-tree "$(git --git-dir="$ORIGIN" mktree </dev/null)" -m "gov-claim racer")
@@ -12839,7 +12839,7 @@ before=$(sum)
 out=$(CLAUDE_CODE_SESSION_ID=s2 PATH="$GP_BIN:$PATH" bash "$SCRIPT" --resume tRun --keepalive-id k1 2>&1); rc=$?
 rm -f "$GP_BIN/git"
 n=$((n+1)); [ "$rc" != 0 ] || { echo "FAIL GH20 AC1 the s2 call that lost its race exited 0"; st=1; }
-hit  "$out" "UNATTENDED check 90 FAILED"
+hit  "$out" "UNATTENDED check 108 FAILED"
 same "GH20 AC1 the record's session still reads s1" "$(read_run_fact session)" "s1"
 same "GH20 AC1 ...the record is byte-unchanged" "$(sum)" "$before"
 same "GH20 AC1 ...the working copy names no run-state file" "$(git diff --name-only -- memory/builds/tRun/RUN.md)" ""
@@ -12872,7 +12872,7 @@ same "GH20 AC3 the renewing s2 call exits 0" "$rc" "0"
 n=$((n+1)); [ "$(read_claim_ref tRun)" != "$gp_sha" ] || { echo "FAIL GH20 AC3 the due renewal did not move the claim ref"; st=1; }
 same "GH20 AC3 ...and over a record without the fact writes nothing local" "$(git status --porcelain)" ""
 # ---- AC6: after an incomplete s2 push, the s2 restart under a new keepalive and pid takes the run over
-# ---- with no check 89. Then, over the same record and claim aged by date, an s3 take-over through the
+# ---- with no check 107. Then, over the same record and claim aged by date, an s3 take-over through the
 # ---- presumed-stopped row announces the claim taken over from s1.
 build_prior_base
 cp "$GP_BIN/git.124" "$GP_BIN/git"
@@ -12884,7 +12884,7 @@ gp_aged=$(git rev-parse HEAD)
 out=$(CLAUDE_CODE_SESSION_ID=s2 CLAUDE_PID=4242 run --resume tRun --keepalive-id k2); rc=$?
 same "GH20 AC6 the s2 restart under a new keepalive exits 0" "$rc" "0"
 hit  "$out" "this resume TAKES THE RUN OVER in its place"
-miss "$out" "UNATTENDED check 89 FAILED"
+miss "$out" "UNATTENDED check 107 FAILED"
 same "GH20 AC6 ...and leaves the claim under the new keepalive" "$(read_claim_field tRun keepalive)" "k2"
 same "GH20 AC6 ...and session s2" "$(read_claim_field tRun session)" "s2"
 git reset -q --hard "$gp_aged"; git clean -qfd
@@ -12901,7 +12901,7 @@ rm -rf "$GP_BIN"; remove_claim_refs; reset_tree
 # AND EVERY READER TESTS MEMBERSHIP. Every arm starts from unit 20's base, record and claim
 # preflighted under s1. "124" is unit 20's git shim making the claim push exit 124; "away" renames the
 # bare origin away for that one call. AC1: sequences a to d of the spec's section 4 leave the line
-# `prior-session: s1 s2` before a closing s3 call that lands with no check 90 and empties the set; the
+# `prior-session: s1 s2` before a closing s3 call that lands with no check 108 and empties the set; the
 # landed `--beat` of a and c and `--dispatch` of b move the claim to s2 and leave the set at s1. AC2:
 # sequences e and f, two incomplete calls in a row, keep s1; a landed renewal over a record without
 # the fact, and an incomplete one whose write_lease is not due, each leave the tree clean. AC3: a set
@@ -12934,7 +12934,7 @@ run_prior_resume() { # label · session · none|124|away · [keepalive] · [pid]
 # The closing call of a sequence: no shim, under its last session and pid, lands and empties the set.
 check_prior_close() { # label · session · [pid]
   run_prior_resume "$1" "$2" none k1 "${3:-$CLAUDE_PID}"
-  miss "$GQ_OUT" "UNATTENDED check 90 FAILED"
+  miss "$GQ_OUT" "UNATTENDED check 108 FAILED"
   same "$1 ...leaves the claim naming $2" "$(read_claim_field tRun session)" "$2"
   same "$1 ...and the prior-session set empty" "$(read_run_fact prior-session)" ""
 }
@@ -12953,7 +12953,7 @@ build_prior_seq() { # a|b|c|d|e|f
          hit  "$out" "unattended: beat — tRun · renewed " ;;
     b)   out=$(CLAUDE_CODE_SESSION_ID=s2 run --dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}a.sh); rc=$?
          same "GH23 AC1 b and AC4 the --dispatch under s2 exits 0" "$rc" "0"
-         miss "$out" "UNATTENDED check 90 FAILED"
+         miss "$out" "UNATTENDED check 108 FAILED"
          same "GH23 AC4 ...and leaves no unstaged run-state file" "$(git diff --name-only -- memory/builds/tRun/RUN.md)" "" ;;
   esac
   case "$1" in
@@ -12969,7 +12969,7 @@ build_prior_seq() { # a|b|c|d|e|f
 }
 # A record and claim leased with no session, so both name `absent`.
 build_prior_absent() { arm_claim_fixture; env -u CLAUDE_CODE_SESSION_ID bash "$SCRIPT" --preflight tRun --keepalive-id k1 >/dev/null 2>&1; git add -A >/dev/null && git commit -q -m gq-absent --no-verify; }
-# ---- AC1: sequences a to d, each ending in a closing s3 call that answers no check 90.
+# ---- AC1: sequences a to d, each ending in a closing s3 call that answers no check 108.
 for gq_s in a b c d; do
   build_prior_seq "$gq_s"
   case "$gq_s" in d) gq_c=s1 ;; *) gq_c=s2 ;; esac
@@ -13033,7 +13033,7 @@ build_prior_seq d
 same "GH23 AC5 d the claim before the restart names s1" "$(read_claim_field tRun session)" "s1"
 write_aged_commit
 run_prior_resume "GH23 AC5 d restart" s3 none k3 4244
-miss "$GQ_OUT" "UNATTENDED check 89 FAILED"
+miss "$GQ_OUT" "UNATTENDED check 107 FAILED"
 hit  "$GQ_OUT" "this resume TAKES THE RUN OVER in its place"
 same "GH23 AC5 d ...leaves the claim under the new keepalive" "$(read_claim_field tRun keepalive)" "k3"
 same "GH23 AC5 d ...and session s3" "$(read_claim_field tRun session)" "s3"
@@ -13041,7 +13041,7 @@ build_prior_seq c
 same "GH23 AC5 c the claim before the restart names s2" "$(read_claim_field tRun session)" "s2"
 write_aged_commit
 run_prior_resume "GH23 AC5 c restart" s3 none k3 4244
-miss "$GQ_OUT" "UNATTENDED check 89 FAILED"
+miss "$GQ_OUT" "UNATTENDED check 107 FAILED"
 same "GH23 AC5 c ...leaves the claim under the new keepalive" "$(read_claim_field tRun keepalive)" "k3"
 same "GH23 AC5 c ...and session s3" "$(read_claim_field tRun session)" "s3"
 build_prior_absent
@@ -13049,7 +13049,7 @@ run_prior_resume "GH23 AC5 absent" s2 124
 same "GH23 AC5 absent ...leaves the set absent" "$(read_run_fact prior-session)" "absent"
 write_aged_commit
 run_prior_resume "GH23 AC5 absent restart" s2 none k2 4244
-miss "$GQ_OUT" "UNATTENDED check 89 FAILED"
+miss "$GQ_OUT" "UNATTENDED check 107 FAILED"
 same "GH23 AC5 absent ...leaves the claim under the new keepalive" "$(read_claim_field tRun keepalive)" "k2"
 same "GH23 AC5 absent ...and session s2" "$(read_claim_field tRun session)" "s2"
 rm -rf "$GQ_BIN"; remove_claim_refs; reset_tree

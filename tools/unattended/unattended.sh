@@ -794,7 +794,7 @@ DOD_NO_OVERRIDE="authorization-reachable pieces-complete"
 #   repo-state-out-of-mandate the repository state at start was outside what the mandate reaches.
 #   gate-red-out-of-scope     a gate is red and its fix lies outside the mandate scope.
 #   claim-lost                another session holds this run's claim on the remote, so the run must
-#                             not drive its slug any more (TOOL-aGraftedHelix-1); check 90 names it.
+#                             not drive its slug any more (TOOL-aGraftedHelix-1); check 108 names it.
 # THE RUNAWAY CEILING, and it is a BACKSTOP rather than the mechanism. A SPEC subject is bounded by
 # `REVIEW_ROUNDS` and exits in a disposition; the DIFF review is bounded by the convergence predicate;
 # this ceiling backstops both, so a defect in the predicate cannot produce an unbounded loop. It is
@@ -1720,7 +1720,7 @@ resolve_claim_remote() { # -> CR_NAME and CR_URL; check 24 when the clone declar
 # beat-age-s, verdict, sha, session, keepalive, host, lease-utc, beat-utc. `date -f` skips a line it
 # cannot parse and exits 1, so a count of answers that differs from the count asked is a DEAD PROBE
 # and every age reads `-`, with the verdict `unknown`, rather than shifting onto the next claim.
-# The policy says what a failed read prints: `strict` is check 91, `soft` a line, `quiet` nothing.
+# The policy says what a failed read prints: `strict` is check 109, `soft` a line, `quiet` nothing.
 read_claims() { # strict|soft|quiet -> 0 with CLAIM_ROWS, or 1 with CL_WHY
   local pol="$1" d rc alive=1 nask ngot _st=$status _nc=${#RUNLOG_CHECKS[@]}
   CLAIM_ROWS=""; CL_WHY=""
@@ -1747,7 +1747,7 @@ read_claims() { # strict|soft|quiet -> 0 with CLAIM_ROWS, or 1 with CL_WHY
   if [ -n "$CL_WHY" ]; then
     [ -z "${d:-}" ] || rm -rf "$d"
     case "$pol" in
-      strict) fail 91 "the claims on the remote could not be read, so whether another session drives this slug is unknown rather than no, and nothing was written: $CL_WHY" ;;
+      strict) fail 109 "the claims on the remote could not be read, so whether another session drives this slug is unknown rather than no, and nothing was written: $CL_WHY" ;;
       soft) echo "unattended: claims not read — $CL_WHY" ;;
     esac
     return 1
@@ -1796,7 +1796,7 @@ read_claims() { # strict|soft|quiet -> 0 with CLAIM_ROWS, or 1 with CL_WHY
 }
 
 # --claims, interface I2: one TAB-separated row per claim on the remote - slug, node, status,
-# beat-age-s, verdict - sorted by slug, or the single line `claims: none`; exit 2 with check 91 when
+# beat-age-s, verdict - sorted by slug, or the single line `claims: none`; exit 2 with check 109 when
 # the remote does not answer, never an empty list. It reads whatever RUN_CLAIMS says, because a read
 # changes nothing. WHAT IT DOES NOT CHECK: who drives anything; it reports and decides nothing.
 print_claims() { # -> the rows on stdout; rc 2 when the remote does not answer
@@ -1823,7 +1823,7 @@ CLAIM_MODES="preflight take-over holder status beat"
 # which is due. Modes are the table's columns plus `beat`, which writes only through the none and
 # `mine` rows of the holder column and declines every other row in silence for `--beat` to name.
 # rc 0: write (CW_ACT create|renew|rewrite|take|take-announced|write) · rc 2: `mine` and not due ·
-# rc 1: refused, check 89, 90, 92 or 93 printed · rc 3: not written, announced (status) or declined (beat).
+# rc 1: refused, check 107, 108, 110 or 111 printed · rc 3: not written, announced (status) or declined (beat).
 # TOOL-aGraftedHelix-11 - THE RUN-STATE FILE, sixth, is where a write that does not take the claim
 # copies its identity from, the one `write_claim` is handed too: `--preflight` and a take-over pass
 # none, every other writer passes the record. `mine` keeps the claim's own `node`.
@@ -1840,7 +1840,7 @@ check_claim_writable() { # slug · mode · lease keepalive · lease session · t
   CW_ACT=""; CW_SHA=""; CW_NODE=""; CW_WHO=""; CW_SESS=""
   case " $CLAIM_MODES " in
     *" $mode "*) ;;
-    *) fail 92 "this call passed a claim mode the driver does not declare, so the claim write table has no column for it and nothing was written; declare the mode in CLAIM_MODES beside its case branch, or pass a declared one: mode $mode · CLAIM_MODES $CLAIM_MODES"
+    *) fail 110 "this call passed a claim mode the driver does not declare, so the claim write table has no column for it and nothing was written; declare the mode in CLAIM_MODES beside its case branch, or pass a declared one: mode $mode · CLAIM_MODES $CLAIM_MODES"
        return 1 ;;
   esac
   row=""
@@ -1863,7 +1863,7 @@ check_claim_writable() { # slug · mode · lease keepalive · lease session · t
   fi
   case " $CLAIM_READS " in
     *" $cls "*) ;;
-    *) fail 93 "this call derived a claim-read class the driver does not declare, so the claim write table has no row for it and nothing was written; declare the class in CLAIM_READS beside its case branch: class $cls · CLAIM_READS $CLAIM_READS"
+    *) fail 111 "this call derived a claim-read class the driver does not declare, so the claim write table has no row for it and nothing was written; declare the class in CLAIM_READS beside its case branch: class $cls · CLAIM_READS $CLAIM_READS"
        return 1 ;;
   esac
   if [ "$cls" = mine ]; then
@@ -1893,10 +1893,10 @@ check_claim_writable() { # slug · mode · lease keepalive · lease session · t
     preflight:foreign-stale|take-over:foreign-stale) CW_ACT=take-announced ;;
     beat:*) return 3 ;;
     preflight:*|take-over:*)
-      fail 89 "another session holds this slug's claim on the remote, so a second driver would start beside it; nothing was written, and the claim names its holder: $CW_WHO"
+      fail 107 "another session holds this slug's claim on the remote, so a second driver would start beside it; nothing was written, and the claim names its holder: $CW_WHO"
       return 1 ;;
     holder:*)
-      fail 90 "this run does not hold its claim on the remote, because another session's claim is there, so it must not drive the slug and nothing was written; end the run with --abort <slug> --code claim-lost, the halt code for a lost claim: $CW_WHO"
+      fail 108 "this run does not hold its claim on the remote, because another session's claim is there, so it must not drive the slug and nothing was written; end the run with --abort <slug> --code claim-lost, the halt code for a lost claim: $CW_WHO"
       return 1 ;;
     *) echo "unattended: claim not written — $slug is held $c_status by session $c_sess on $c_node, beat $c_btxt"
        return 3 ;;
@@ -1911,8 +1911,8 @@ check_claim_writable() { # slug · mode · lease keepalive · lease session · t
 # COMPLETED and carries git's reason or the exit, so a pre-push refusal is never reported as a race.
 # Every write leaves the ref on the remote, a terminal one included. The commit has a FIXED identity,
 # so a clone with none configured still writes and the claim publishes no address the run's commits
-# do not already carry. The policy says what a failure prints: `strict` checks 90 and 91, `holder`
-# check 90 and a line, `soft` two lines, `quiet` nothing - `--beat` names its own skip.
+# do not already carry. The policy says what a failure prints: `strict` checks 108 and 109, `holder`
+# check 108 and a line, `soft` two lines, `quiet` nothing - `--beat` names its own skip.
 # THE PUSH NAMES THE REMOTE, `CR_NAME`, never its URL (TOOL-aGraftedHelix-10). Given a name, the
 # tracked pre-push hook observes `<name>/HEAD` as the default branch, the pushed ref is not that
 # branch, and the hook exits `skip-nondefault`, or runs the branch bar a repository declares as
@@ -1973,8 +1973,8 @@ write_claim() { # slug · status · keepalive · strict|holder|soft|quiet · [ru
     return 0
   fi
   case "$rc:$pol" in
-    1:strict|1:holder) fail 90 "the claim moved on the remote between this call's read and its write, so another session took the slug first and this run must not drive it; nothing was written, and a run that has a record ends with --abort <slug> --code claim-lost: $slug · $WC_WHY" ;;
-    2:strict) fail 91 "the claim write did not complete, so whether this run holds its slug on the remote is unknown rather than lost, and nothing was written: $slug · $WC_WHY" ;;
+    1:strict|1:holder) fail 108 "the claim moved on the remote between this call's read and its write, so another session took the slug first and this run must not drive it; nothing was written, and a run that has a record ends with --abort <slug> --code claim-lost: $slug · $WC_WHY" ;;
+    2:strict) fail 109 "the claim write did not complete, so whether this run holds its slug on the remote is unknown rather than lost, and nothing was written: $slug · $WC_WHY" ;;
     *:quiet) ;;
     *) echo "unattended: claim not written — $slug · $WC_WHY" ;;
   esac
@@ -5655,7 +5655,7 @@ verb_preflight() { # slug · keepalive-id
   [ "$status" = 0 ] || { [ -z "$PF_LCOPY" ] || rm -f "$PF_LCOPY"; echo "unattended: --preflight refused; the run-state file is unchanged"; return 1; }
   # THE CLAIM WRITE, the compare-and-swap that makes this session the slug's driver on the remote.
   # BEFORE the rotation and the scaffold (memory/gotchas/destructive-step-before-its-precondition.md):
-  # check 90 is a race this call lost and check 91 a write that did not complete, and either leaves
+  # check 108 is a race this call lost and check 109 a write that did not complete, and either leaves
   # the tree exactly as it was. ONE LEASE STAMP for this take, handed to the claim and to
   # `write_lease` below, so the claim's `lease-utc` is the record's byte for byte and the holder's
   # first renewal finds no field differing (TOOL-aGraftedHelix-11 S6).
@@ -6774,8 +6774,8 @@ run_takeover() { # slug · run-state file · keepalive id · held|working · pha
   check_ask_mandate "$slug" "$rel" || return 1
   # TOOL-aGraftedHelix-1 S7 - THE CLAIM, read and written AFTER the authorization block and BEFORE
   # anything this take-over writes or kills, judged against the lease it is about to record: this
-  # keepalive and this harness's session. A live claim another session holds is check 89, a race
-  # lost to one check 90, a write that did not complete check 91, and each leaves the record alone.
+  # keepalive and this harness's session. A live claim another session holds is check 107, a race
+  # lost to one check 108, a write that did not complete check 109, and each leaves the record alone.
   # One lease stamp for the claim and `write_lease` below (TOOL-aGraftedHelix-11 S6), read at the
   # push and not before the claim read, so `lease-utc` still dates this take as closely as it can.
   # THE RESTART ROW ALONE hands the record (TOOL-aGraftedHelix-20 S8): the recorded session's own
@@ -7044,9 +7044,9 @@ verb_resume() { # slug
   # row, so a write on every call would restage the record every ten minutes and move `lease-utc`.
   if [ -n "$KID" ] && [ "$KID" = "$ka" ]; then
     # TOOL-aGraftedHelix-1 S7 - THE HOLDER READS ITS CLAIM on every call, so a lost one is found.
-    # Another session's claim is check 90 and nothing is written; a read or a write that does not
+    # Another session's claim is check 108 and nothing is written; a read or a write that does not
     # complete is announced and the holder goes on, as it does offline at base.
-    # TOOL-aGraftedHelix-18 - THE ORDER: the claim read, the `mine` test and check 90 read the
+    # TOOL-aGraftedHelix-18 - THE ORDER: the claim read, the `mine` test and check 108 read the
     # record's lease facts as they stood BEFORE this row's `write_lease`.
     # TOOL-aGraftedHelix-20 - and the claim CAS runs BEFORE `write_lease` too, writing the values it is
     # about to record under the one stamp both are handed, so a race lost here writes nothing local.
@@ -7861,7 +7861,7 @@ verb_close() { # slug   (override pairs arrive in OV_ITEMS / OV_REASONS)
   observe_anchor || true
   # TOOL-aGraftedHelix-1 S8 - A RUN THAT DOES NOT HOLD ITS CLAIM DOES NOT CLOSE, and that is decided
   # before any Definition-of-Done item is graded: another session's claim, a foreign stale one
-  # included, is check 90, and a claim that cannot be read or renewed is check 91, because a close
+  # included, is check 108, and a claim that cannot be read or renewed is check 109, because a close
   # that lands a claim it never read is the double landing the claim exists to stop.
   if [ "$RUN_CLAIMS" = on ]; then
     read_claims strict || return 1
@@ -10636,7 +10636,7 @@ SIBS
   # refusal nobody can clear is the stall this build exists to remove.
   # TOOL-aGraftedHelix-1 S8 - A PASS IS DISPATCHED ONLY BY THE RUN THAT HOLDS ITS CLAIM, read as the
   # holder and renewed when due, after every local refusal above and BEFORE the row is written:
-  # another session's claim is check 90 and no row; a read or a write that does not complete is
+  # another session's claim is check 108 and no row; a read or a write that does not complete is
   # announced and the dispatch goes on, as the holder's paths do offline.
   if [ "$RUN_CLAIMS" = on ] && read_claims soft; then
     _dk=$(fact "$rel" keepalive)

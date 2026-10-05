@@ -38,7 +38,7 @@ prints nothing to resume and `--audit` then refuses with check 51. FIRST,
 `bash tools/unattended/unattended.sh --resume <slug> --keepalive-id <your own id>`. The holder's call
 writes nothing to the record, because whether a run is live is derived from what `--liveness` reads,
 which this very tick moves; where `RUN_CLAIMS` is `on` it reads the run's claim on the remote and
-renews it when due, and a claim another session holds refuses it at check 90, which you end with
+renews it when due, and a claim another session holds refuses it at check 108, which you end with
 `--abort <slug> --code claim-lost`. The act is there to refuse a session that no longer holds the
 slug before the second act runs. SECOND, and ONLY when that first act neither refuses nor prints
 `still held`, `bash tools/unattended/unattended.sh --audit <slug>`. After either of those two outcomes

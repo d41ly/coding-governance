@@ -803,7 +803,7 @@ rm -rf "$G12"
 # ---- LEASE's identity: the record's session, keepalive, host and lease-utc. Between the two, the
 # ---- holder's own --resume under the lease's session and pid reads that claim as its own. The record
 # ---- carries every lease fact, so each comparison has a value to miss. RED against a driver whose
-# ---- claim write reads the session back from the environment: `absent`, then check 90.
+# ---- claim write reads the session back from the environment: `absent`, then check 108.
 CONF_EXTRA="$(printf 'RESUME_STALE_BOUND="1800"\nRUN_CLAIMS="on"')" build_fixture 999999999
 G11="$GITTMP/rt-origin11.git"; rm -rf "$G11"; git init -q --bare "$G11"
 G11_HOST=$(read_host_name)
@@ -818,7 +818,7 @@ check_hit  "$OUT" "resume-tick: tRun · $FX · beat · unattended: beat — tRun
 check_same "GH11 AC1 ...under the lease's session, never absent" "$(git --git-dir="$G11" log -1 --format=%B refs/gov/runs/tRun | sed -n 's/^session: //p')" "$SID"
 G11_OUT=$(cd "$FX" && CLAUDE_CODE_SESSION_ID="$SID" CLAUDE_PID=999999999 bash "$KIT/unattended.sh" --resume tRun --keepalive-id kT 2>&1); G11_RC=$?
 check_same "GH11 AC1 the holder's resume under the lease's session exits 0" "$G11_RC" "0"
-check_miss "$G11_OUT" "UNATTENDED check 90 FAILED" "GH11 AC1 ...and reads the claim the tick wrote as its own"
+check_miss "$G11_OUT" "UNATTENDED check 108 FAILED" "GH11 AC1 ...and reads the claim the tick wrote as its own"
 git --git-dir="$G11" update-ref -d refs/gov/runs/tRun
 run_tick_over "$TICK"
 check_hit  "$OUT" "resume-tick: tRun · $FX · beat · unattended: beat — tRun · renewed " "GH11 AC1 the tick with no session id creates a claim over an empty remote"
