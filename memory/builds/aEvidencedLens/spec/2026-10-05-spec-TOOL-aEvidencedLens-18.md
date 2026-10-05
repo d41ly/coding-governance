@@ -1,12 +1,13 @@
 # TOOL-aEvidencedLens-18 — unit 15's observation is completed: the HEAD bytes tied to their blob, a break on the masked line, all four prints, both edges, and the closing pass's write set
 
-**Status:** SPECCED · rev-1 · 2026-10-05 · node a · Tier-2 · base 028b5cac · streams tooling · order 10
+**Status:** SPECCED · rev-2 · 2026-10-05 · node a · Tier-2 · base 028b5cac · streams tooling · order 10
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-05-prompt-TOOL-aEvidencedLens-18-2-build-brief.md](../prompts/2026-10-05-prompt-TOOL-aEvidencedLens-18-2-build-brief.md) | journal | — |
+| [2026-10-05-review-TOOL-aEvidencedLens-18-spec-audit-round1.md](../reviews/2026-10-05-review-TOOL-aEvidencedLens-18-spec-audit-round1.md) | spec-audit | — |
 
 <!-- /gen:spec-records -->
 
@@ -86,6 +87,11 @@ pieces of evidence, writes them to its own ledger, and repairs the two record de
   harness, so the HEAD blob this unit reads is the harness the build ships.
 - **consumes-from** `TOOL-aEvidencedLens-1` — the `REVIEW_SHAPE` move that makes each arg set's
   BASE and HEAD prints differ; AC3's per-arg-set red rests on it.
+- **hands-off** `TOOL-aEvidencedLens-19` — this unit's AC1 observation, which that unit re-runs over
+  bytes saved with `git cat-file blob` and tied with filters off, with a CRLF copy and a one-byte
+  append each observed red.
+- **hands-off** `TOOL-aEvidencedLens-20` — this unit's completed observation and its ledger, whose
+  criteria that unit observes live and whose §1 and §4 prose it corrects.
 
 ## 4. Design
 
@@ -219,6 +225,11 @@ none
 - rev-1 · 2026-10-05 · initial draft, the minors batch promoted from the spec audit of unit 15
   (`reviews/2026-10-05-review-TOOL-aEvidencedLens-15-spec-audit-round1.md`), ids 4 and 5 (MEDIUM)
   and ids 1, 2, 3 and 6 (LOW), repairing `TOOL-aEvidencedLens-15`.
+- rev-2 · 2026-10-05 · §3 · gains the hands-off to `TOOL-aEvidencedLens-19` and to
+  `TOOL-aEvidencedLens-20`, the units the spec audit of this unit
+  (`reviews/2026-10-05-review-TOOL-aEvidencedLens-18-spec-audit-round1.md`) promoted for id 14
+  (HIGH) and for ids 7, 12 and 15 (MEDIUM) and 1, 2, 3, 4, 5, 6, 8, 9, 10, 11 and 16 (LOW). Nothing
+  else moves; this unit builds as written.
 
 ## 10. Reuse audit
 

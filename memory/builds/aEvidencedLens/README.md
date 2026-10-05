@@ -6,7 +6,7 @@ streams: tooling
 roster: TOOL
 authorized-by: prompt
 spec-audit: 2026-10-05
-ids: TOOL-aEvidencedLens-1 TOOL-aEvidencedLens-2 TOOL-aEvidencedLens-3 TOOL-aEvidencedLens-4 TOOL-aEvidencedLens-5 TOOL-aEvidencedLens-6 TOOL-aEvidencedLens-7 TOOL-aEvidencedLens-8 TOOL-aEvidencedLens-9 TOOL-aEvidencedLens-10 TOOL-aEvidencedLens-11 TOOL-aEvidencedLens-12 TOOL-aEvidencedLens-13 TOOL-aEvidencedLens-14 TOOL-aEvidencedLens-15 TOOL-aEvidencedLens-16 TOOL-aEvidencedLens-17 TOOL-aEvidencedLens-18
+ids: TOOL-aEvidencedLens-1 TOOL-aEvidencedLens-2 TOOL-aEvidencedLens-3 TOOL-aEvidencedLens-4 TOOL-aEvidencedLens-5 TOOL-aEvidencedLens-6 TOOL-aEvidencedLens-7 TOOL-aEvidencedLens-8 TOOL-aEvidencedLens-9 TOOL-aEvidencedLens-10 TOOL-aEvidencedLens-11 TOOL-aEvidencedLens-12 TOOL-aEvidencedLens-13 TOOL-aEvidencedLens-14 TOOL-aEvidencedLens-15 TOOL-aEvidencedLens-16 TOOL-aEvidencedLens-17 TOOL-aEvidencedLens-18 TOOL-aEvidencedLens-19 TOOL-aEvidencedLens-20
 ---
 
 # aEvidencedLens — a spec audit the owner opts into gathers evidence, and every finding becomes a unit
@@ -68,13 +68,15 @@ evidence no lens was allowed to gather. The owner's prompt and the one answered 
 | 14 | `TOOL-aEvidencedLens-14` | 2 | PROMOTED: check 19 walks a terminal record's exclusions when either owner-held scan hits |
 | 15 | `TOOL-aEvidencedLens-15` | 2 | PROMOTED: the diff-kind resume probe is observed from BASE with every REVIEW_SHAPE-derived value masked, its review key and its input print |
 | 16 | `TOOL-aEvidencedLens-18` | 2 | PROMOTED: the minors batch of unit 15's audit: HEAD bytes tied to their blob, a break on the masked line, four prints, two edges, the closing write set |
+| 17 | `TOOL-aEvidencedLens-19` | 2 | PROMOTED: unit 18's byte tie observed with filters off, a CRLF copy and a one-byte append each red |
+| 18 | `TOOL-aEvidencedLens-20` | 2 | PROMOTED: the minors batch of unit 18's audit: its criteria observed live, its prose corrected, a derived closing write set |
 
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 16 unit(s) · node a · opened 2026-10-05 · streams tooling
+**Build status:** SPECCED · 18 unit(s) · node a · opened 2026-10-05 · streams tooling
 ids TOOL-aEvidencedLens-1 TOOL-aEvidencedLens-2 TOOL-aEvidencedLens-3 TOOL-aEvidencedLens-4 TOOL-aEvidencedLens-5 TOOL-aEvidencedLens-6 TOOL-aEvidencedLens-7 TOOL-aEvidencedLens-8 TOOL-aEvidencedLens-9 TOOL-aEvidencedLens-10 TOOL-aEvidencedLens-11 TOOL-aEvidencedLens-12 TOOL-aEvidencedLens-13
-ids TOOL-aEvidencedLens-14 TOOL-aEvidencedLens-15 TOOL-aEvidencedLens-16 TOOL-aEvidencedLens-17 TOOL-aEvidencedLens-18
+ids TOOL-aEvidencedLens-14 TOOL-aEvidencedLens-15 TOOL-aEvidencedLens-16 TOOL-aEvidencedLens-17 TOOL-aEvidencedLens-18 TOOL-aEvidencedLens-19 TOOL-aEvidencedLens-20
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -94,14 +96,16 @@ ids TOOL-aEvidencedLens-14 TOOL-aEvidencedLens-15 TOOL-aEvidencedLens-16 TOOL-aE
 | [TOOL-aEvidencedLens-11 — the method, the memory-tree README, the Skill, the verbs entry and a decision record state what units 1 to 9 built](spec/2026-10-05-spec-TOOL-aEvidencedLens-11.md) | 8 | 1 | CLOSED | rev-3 | 2026-10-05 |
 | [TOOL-aEvidencedLens-13 — no diff-kind lens or skeptic prompt moved from BASE through unit 12, observed once with the review key masked](spec/2026-10-05-spec-TOOL-aEvidencedLens-13.md) | 8 | 2 | CLOSED | rev-2 | 2026-10-05 |
 | [TOOL-aEvidencedLens-15 — the diff-kind resume probe is observed from BASE with every REVIEW_SHAPE-derived value masked, its review key and its input print](spec/2026-10-05-spec-TOOL-aEvidencedLens-15.md) | 9 | 2 | CLOSED | rev-2 | 2026-10-05 |
-| [TOOL-aEvidencedLens-18 — unit 15's observation is completed: the HEAD bytes tied to their blob, a break on the masked line, all four prints, both edges, and the closing pass's write set](spec/2026-10-05-spec-TOOL-aEvidencedLens-18.md) | 10 | 2 | SPECCED | rev-1 | 2026-10-05 |
+| [TOOL-aEvidencedLens-18 — unit 15's observation is completed: the HEAD bytes tied to their blob, a break on the masked line, all four prints, both edges, and the closing pass's write set](spec/2026-10-05-spec-TOOL-aEvidencedLens-18.md) | 10 | 2 | SPECCED | rev-2 | 2026-10-05 |
+| [TOOL-aEvidencedLens-19 — unit 18's byte tie is observed with filters off: each saved harness file equals its blob byte for byte, and a CRLF copy and a one-byte append each red it](spec/2026-10-05-spec-TOOL-aEvidencedLens-19.md) | 11 | 2 | SPECCED | rev-1 | 2026-10-05 |
+| [TOOL-aEvidencedLens-20 — the minors batch of unit 18's audit: each of its criteria observed live, unit 15's prints and break reused by name, the revs it expects, its false prose corrected, and a closing write set derived rather than asserted](spec/2026-10-05-spec-TOOL-aEvidencedLens-20.md) | 11 | 2 | SPECCED | rev-1 | 2026-10-05 |
 <!-- /gen:build-units -->
 
-Records: 24 bound to this build, across 4 record folder(s).
+Records: 25 bound to this build, across 4 record folder(s).
 
-Ids no record names: none — every unit id is named by a record.
+Ids no record names: TOOL-aEvidencedLens-19 TOOL-aEvidencedLens-20.
 
-Ids no `spec-audit` record has ever named: TOOL-aEvidencedLens-18.
+Ids no `spec-audit` record has ever named: TOOL-aEvidencedLens-19 TOOL-aEvidencedLens-20.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -118,6 +122,7 @@ Ids no `spec-audit` record has ever named: TOOL-aEvidencedLens-18.
 | 8 | `TOOL-aEvidencedLens-11`, `TOOL-aEvidencedLens-13` | yes |
 | 9 | `TOOL-aEvidencedLens-15` | no |
 | 10 | `TOOL-aEvidencedLens-18` | no |
+| 11 | `TOOL-aEvidencedLens-19`, `TOOL-aEvidencedLens-20` | yes |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

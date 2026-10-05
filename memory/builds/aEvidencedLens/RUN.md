@@ -144,3 +144,7 @@ base: 3640cf580d9df31e5cbe74be89024dd5a40e9f85
 2026-10-05T03:31:41Z brief · item TOOL-aEvidencedLens-15 · reason 3b6c208f6a98 memory/builds/aEvidencedLens/prompts/2026-10-05-prompt-TOOL-aEvidencedLens-15-2-build-brief.md
 
 2026-10-05T03:34:57Z dispatch · item e4e3528c TOOL-aEvidencedLens-15 · reason memory/builds/aEvidencedLens/build/2026-10-05-build-TOOL-aEvidencedLens-15-1-acceptance-ledger.md memory/builds/aEvidencedLens/spec/2026-10-05-spec-TOOL-aEvidencedLens-15.md memory/builds/aEvidencedLens/README.md
+
+2026-10-05T03:53:11Z rescope · item add TOOL-aEvidencedLens-19 · reason spec-audit round 1 (reviews/2026-10-05-review-TOOL-aEvidencedLens-18-spec-audit-round1.md) id 14 HIGH: unit 18 ties each saved harness file to its blob with plain git hash-object, which runs the CRLF clean filter on this node, so a CRLF-rewritten copy hashes equal to its LF blob and the tie certifies bytes it does not check, with no staged break observing it red; repairs TOOL-aEvidencedLens-18
+
+2026-10-05T03:53:19Z rescope · item add TOOL-aEvidencedLens-20 · reason spec-audit round 1 (reviews/2026-10-05-review-TOOL-aEvidencedLens-18-spec-audit-round1.md) ids 7, 12 and 15 MEDIUM, ids 1, 2, 3, 4, 5, 6, 8, 9, 10, 11 and 16 LOW, batched: unit 18's tie runs with filters on and its red-whens are green by construction, it asserts it is the build's last open unit, its ledger observes its own commit, its rev clause is already green, its premise and print claims are stale, and it names a step-1 break unit 15 never recorded; repairs TOOL-aEvidencedLens-18
