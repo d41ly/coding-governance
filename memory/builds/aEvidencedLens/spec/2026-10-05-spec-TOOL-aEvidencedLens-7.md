@@ -1,11 +1,12 @@
 # TOOL-aEvidencedLens-7 — `--review` takes highs and minors on a spec subject's exit and requires `promote` when any stood
 
-**Status:** CLOSED · rev-3 · 2026-10-05 · node a · Tier-2 · base 028b5cac · streams tooling · order 6
+**Status:** CLOSED · rev-4 · 2026-10-05 · node a · Tier-2 · base 028b5cac · streams tooling · order 6
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-05-build-TOOL-aEvidencedLens-7-1-acceptance-ledger.md](../build/2026-10-05-build-TOOL-aEvidencedLens-7-1-acceptance-ledger.md) | journal | — |
 | [2026-10-05-prompt-TOOL-aEvidencedLens-1-1-spec-brief.md](../prompts/2026-10-05-prompt-TOOL-aEvidencedLens-1-1-spec-brief.md) | journal | TOOL-aEvidencedLens-1 TOOL-aEvidencedLens-2 TOOL-aEvidencedLens-3 TOOL-aEvidencedLens-4 TOOL-aEvidencedLens-5 TOOL-aEvidencedLens-6 TOOL-aEvidencedLens-8 TOOL-aEvidencedLens-9 TOOL-aEvidencedLens-10 TOOL-aEvidencedLens-11 |
 | [2026-10-05-prompt-TOOL-aEvidencedLens-7-2-build-brief.md](../prompts/2026-10-05-prompt-TOOL-aEvidencedLens-7-2-build-brief.md) | journal | — |
 | [2026-10-05-review-TOOL-aEvidencedLens-1-closing-diff-review-round1.md](../reviews/2026-10-05-review-TOOL-aEvidencedLens-1-closing-diff-review-round1.md) | diff-review | TOOL-aEvidencedLens-1 TOOL-aEvidencedLens-2 TOOL-aEvidencedLens-3 TOOL-aEvidencedLens-4 TOOL-aEvidencedLens-5 TOOL-aEvidencedLens-6 TOOL-aEvidencedLens-8 TOOL-aEvidencedLens-9 TOOL-aEvidencedLens-10 TOOL-aEvidencedLens-11 TOOL-aEvidencedLens-12 TOOL-aEvidencedLens-13 TOOL-aEvidencedLens-14 TOOL-aEvidencedLens-15 TOOL-aEvidencedLens-18 TOOL-aEvidencedLens-19 TOOL-aEvidencedLens-20 |
@@ -203,11 +204,11 @@ named. Each refusal is first observed against the driver at the pass's base, rea
   at a `BOUNDED` exit with `--blockers 2 --highs 0 --minors 0 --disposition fold` the refusal no longer
   contains `fold is legal only at CONVERGED`.
   Red when: `fold` is accepted at a converged spec exit, or a sentence points at a legal fold.
-- **AC5** — When a spec subject converges with `--blockers 0 --highs 0 --minors 0 --disposition
-  promote`, `--review` refuses as promoting nothing; with no disposition it writes the row.
+- **AC5** — When a spec subject converges with
+  `--blockers 0 --highs 0 --minors 0 --disposition promote`, `--review` refuses as promoting nothing; with no disposition it writes the row.
   Red when: a zero-standing promote row is written on a spec subject.
-- **AC6** — When a spec subject exits `BOUNDED` with `--blockers 1 --highs 1 --minors 4 --disposition
-  promote`, the row ends `blockers 1 · BOUNDED · highs 1 · minors 4 · disposition promote` and the
+- **AC6** — When a spec subject exits `BOUNDED` with
+  `--blockers 1 --highs 1 --minors 4 --disposition promote`, the row ends `blockers 1 · BOUNDED · highs 1 · minors 4 · disposition promote` and the
   echo names a floor of 3 units and the batched sentence.
   Red when: the counts follow the disposition, or the echo prints the sentence saying a MEDIUM or LOW
   is folded.
@@ -257,6 +258,8 @@ New arm: tools/unattended/unattended.test.sh · `fold` at a converged spec exit,
   (LOW): AC7's alternation adds the two stale comments at `review_exit_note` and in `verb_review`.
 - rev-3 · 2026-10-05 · §3 · the mirror of `TOOL-aEvidencedLens-21`'s consumes-from edge, written by
   the main loop when the closing review's minors were promoted.
+- rev-4 · 2026-10-05 · AC5 AC6 · rewrapped so each backticked flag span sits on one physical line;
+  hygiene check 23 pairs backticks per line, so the wrapped span joined no ledger token.
 
 ## 10. Reuse audit
 

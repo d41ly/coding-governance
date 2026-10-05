@@ -47,12 +47,12 @@ evidence no lens was allowed to gather. The owner's prompt and the one answered 
 ## Parked decisions
 
 - The spec-audit promotion chain's generation bound: should M4 bound a chain of promotions by
-  generation as well as by precision? Parked in `RUN.md` at 2026-10-04T23:32:23Z, and re-parked at
-  2026-10-05T03:59:40Z when the run stopped the chain after round 4.
-- Options those rows record: a generation bound in M4, closing a promotion of a promotion unaudited
-  under M4's `specs-audited` override; a size floor, folding the minors of an observation-only unit;
-  keeping the precision bound alone; or an owner-set generation cap.
-- Refused because each changes M4, a governance carrier (M3 veto 2). Units 19 and 20 are built
+  generation as well as by precision? Parked in `RUN.md` at 2026-10-05T03:59:40Z, when the run
+  stopped the chain after round 4.
+- Options seen: a generation bound in M4, building a promotion of a promotion unaudited under M4's
+  `specs-audited` override; a size floor, folding the minors of an observation-only unit; keeping
+  the precision bound alone; or an owner-set generation cap.
+- Refused because each changes M4, a governance carrier (M3 veto 2). Units 19, 20 and 21 are built
   unaudited, and `specs-audited` is overridden at the close, naming this park.
 
 <!-- roster:units -->
@@ -96,7 +96,7 @@ ids TOOL-aEvidencedLens-14 TOOL-aEvidencedLens-15 TOOL-aEvidencedLens-16 TOOL-aE
 | [TOOL-aEvidencedLens-6 — the review returns a per-lens yield over defect clusters, unique defects counted](spec/2026-10-05-spec-TOOL-aEvidencedLens-6.md) | 5 | 2 | CLOSED | rev-3 | 2026-10-05 |
 | [TOOL-aEvidencedLens-10 — `review_replay.py` scores a spec-audit report against a past one by file and section](spec/2026-10-05-spec-TOOL-aEvidencedLens-10.md) | 6 | 1 | CLOSED | rev-4 | 2026-10-05 |
 | [TOOL-aEvidencedLens-5 — the build harness hands the audit its context, sibling specs, checklist and prior findings](spec/2026-10-05-spec-TOOL-aEvidencedLens-5.md) | 6 | 2 | CLOSED | rev-3 | 2026-10-05 |
-| [TOOL-aEvidencedLens-7 — `--review` takes highs and minors on a spec subject's exit and requires `promote` when any stood](spec/2026-10-05-spec-TOOL-aEvidencedLens-7.md) | 6 | 2 | CLOSED | rev-3 | 2026-10-05 |
+| [TOOL-aEvidencedLens-7 — `--review` takes highs and minors on a spec subject's exit and requires `promote` when any stood](spec/2026-10-05-spec-TOOL-aEvidencedLens-7.md) | 6 | 2 | CLOSED | rev-4 | 2026-10-05 |
 | [TOOL-aEvidencedLens-9 — the bar refuses a run commit that changes `REVIEW_ROUNDS`](spec/2026-10-05-spec-TOOL-aEvidencedLens-9.md) | 6 | 2 | CLOSED | rev-4 | 2026-10-05 |
 | [TOOL-aEvidencedLens-12 — the spec skeptic line carries a finding's evidence through a line-break-only fold, so a pipe survives](spec/2026-10-05-spec-TOOL-aEvidencedLens-12.md) | 7 | 2 | CLOSED | rev-5 | 2026-10-05 |
 | [TOOL-aEvidencedLens-14 — check 19 walks a terminal record's exclusions when EITHER owner-held scan hits, so an owner's round raise never reds an archived record](spec/2026-10-05-spec-TOOL-aEvidencedLens-14.md) | 7 | 2 | CLOSED | rev-3 | 2026-10-05 |
@@ -110,7 +110,7 @@ ids TOOL-aEvidencedLens-14 TOOL-aEvidencedLens-15 TOOL-aEvidencedLens-16 TOOL-aE
 | [TOOL-aEvidencedLens-21 — the closing diff review's batched minors, round 1](spec/2026-10-05-spec-TOOL-aEvidencedLens-21.md) | 12 | 2 | CLOSED | rev-1 | 2026-10-05 |
 <!-- /gen:build-units -->
 
-Records: 43 bound to this build, across 4 record folder(s).
+Records: 46 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
