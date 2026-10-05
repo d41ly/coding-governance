@@ -1487,7 +1487,10 @@ cleanup
 # U22 AC3 — the merge=ours arm. git ships `ours` as a strategy, not a driver, so the attribute alone
 # falls back to a text merge; the arm names the unset driver, wires `true` under --fix and --session,
 # and never overwrites a value somebody else set. The baseline rc is 0 (hooks wired, no other kit
-# adopted), so each rc=1 below is this arm's own.
+# adopted), so each rc=1 below is this arm's own. Global and system config are cut off for the arm:
+# git reads `merge.ours.driver` from them too, so a node that set it globally would make "unset"
+# unreachable here and red the arm for the machine's reasons.
+export GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1
 newrepo; git config core.hooksPath .githooks
 mkdir -p memory; printf 'x\n' > memory/LIVE.md
 out=$(chk --check); rc=$?
@@ -1510,6 +1513,7 @@ chk --session >/dev/null; rc=$?; got=$(git config merge.ours.driver 2>/dev/null 
 ck "U22 AC3 ...--session wires the unset driver, exit 0" \
    "$([ "$rc" = 0 ] && [ "$got" = true ] && echo 1 || echo 0)"
 cleanup
+unset GIT_CONFIG_GLOBAL GIT_CONFIG_NOSYSTEM
 
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ]
