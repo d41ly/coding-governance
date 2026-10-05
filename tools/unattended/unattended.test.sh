@@ -9580,14 +9580,16 @@ reset_tree
 # ---- hand-written history in the fixture's common git dir. The driver runs from a COPY inside the
 # ---- fixture, beside a copy of the drift reader: the reader resolves beside the driver's own kit dir
 # ---- and reads the history of the repository it sits in, so the real kit would read the real repo.
-_da_rel=$(resolve_kit_dir "$_rkd_py" drift-audit drift_report.py "$HERE" 2>/dev/null) || _da_rel=""
+# The copy sits at the <home> the driver's resolver asks for, held once so no line spells a kit path.
+_da_home=drift-audit
+_da_rel=$(resolve_kit_dir "$_rkd_py" "$_da_home" drift_report.py "$HERE" 2>/dev/null) || _da_rel=""
 if [ -z "$_da_rel" ]; then
   echo "  SKIP the drift-delta close arm: no drift-audit kit resolves beside this one, so nothing prints the delta"
 else
   build_hold_fixture
-  mkdir -p dk/u dk/drift-audit
+  mkdir -p dk/u "dk/$_da_home"
   cp "$HERE/unattended.sh" "$HERE/lib-unattended.sh" "$HERE/check-playbook.sh" dk/u/
-  cp "$(git -C "$HERE" rev-parse --show-toplevel)/$_da_rel/drift_report.py" dk/drift-audit/
+  cp "$(git -C "$HERE" rev-parse --show-toplevel)/$_da_rel/drift_report.py" "dk/$_da_home/"
   git add -A >/dev/null && git commit -q -m dk --no-verify
   _dh="$(git rev-parse --git-common-dir)/drift-history.tsv"
   { printf '#utc\tsha\tbase_ref\tbase_sha\tsignal\tstate\tvalue\tof\tkey_hash\n'
