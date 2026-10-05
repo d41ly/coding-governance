@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-15 — the build harness commits the specs its writers authored before AUDIT pins them, and its commit-first refusals name a remedy a resume cannot replay
 
-**Status:** SPECCED · rev-3 · 2026-10-05 · node a · Tier-1 · base 5266d22e · streams tooling · order 10 · advances TOOL-aHoistedPass-35 · ratified 2026-10-04
+**Status:** CLOSED · rev-3 · 2026-10-05 · node a · Tier-1 · base 5266d22e · streams tooling · order 10 · advances TOOL-aHoistedPass-35 · ratified 2026-10-04
 
 <!-- gen:spec-records -->
 

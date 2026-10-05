@@ -34,8 +34,9 @@ an install from before that migrates them the way the build harness migrated at 
 `*.template.js` is a render source, not a harness: the verifier fan-out and syntax gates judge its
 render and skip the template.
 
-**Edit the template, never the render.** The build harness names four install paths: the driver,
-the bug-class checklist, the review sub-workflow it awaits and the child it hands the caller. A
+**Edit the template, never the render.** The build harness names install paths: the driver,
+the bug-class checklist, the build-index generator `gen_build_index.py` its spec commit runs, the
+review sub-workflow it awaits and the child it hands the caller. A
 workflow script has no filesystem when it runs, so it cannot find its siblings, and apply would
 write a shipped copy verbatim, naming this repo's `tools/` layout in every adopter. So the kit
 renders it instead, and `kit.toml`'s `[[regenerate]]` block re-runs the render on every update run
@@ -199,6 +200,13 @@ RUN INTEGRITY's `By design:` clause names the same sources. The array form carri
 `gotchas.py --for-paths` over the paths the specs' `### Files touched` sub-heads name and returns its
 stdout, which the stage forwards as `checklist`; a caller's `checklist` argument wins, and none at
 all logs a `WARNING:`.
+
+Its SPEC stage ends in ONE commit (TOOL-aGraftedHelix-15): when the writers authored a unit and the
+caller pinned no `subjects`, one agent commits the authored specs with `Pass: none` and the program
+writes each committed path onto its unit, so the audit pins them at `HEAD` in the same call. That
+commit's `--for-diff` checklist is merged into the audit's, under one by-design head; with the audit
+off it rides the hand-out as `specCommit`. Every refusal that asks for a commit names a fresh
+re-invoke, never a `resumeFromRunId` resume, because a resume replays the cached answer that refused.
 
 `intensity` is `'full'` or `'light'`, and absent it is `'full'`. Only the caller picks it; the harness
 never chooses light for itself, whatever the diff's size or history:

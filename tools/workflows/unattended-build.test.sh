@@ -216,6 +216,15 @@ run_wf() { # args-expr · returns-expr · [script] -> prints the trace, then RES
 
 UNITS='{"repo":"/tmp/r","slug":"tB","scratch":"/tmp/s","specAudit":"2026-09-20","subjects":[{"path":"s1","blob":"abc1234"},{"path":"s2","blob":"def5678"}],"units":[{"id":"A-tB-1","order":1,"specPath":"s1","briefPath":"b1"},{"id":"A-tB-2","order":1,"specPath":"s2","briefPath":"b2"},{"id":"A-tB-3","order":2,"specPath":"s3","briefPath":"b3"}]}'
 SPEC_OK='{"authored":["A-tB-1"],"alreadyPresent":["A-tB-2","A-tB-3"],"refused":[],"summary":"ok"}'
+# TOOL-aGraftedHelix-15 - the spec COMMIT stage's double. The stage runs whenever the writers authored a
+# unit of the roster and the caller pinned no `subjects`, so every fixture that strips `subjects` meets
+# it. It names the authored unit's committed path and returns no `checklist`, so the arms written before
+# the stage keep reading the resolver's checklist unmerged. `SPEC_C` is `SPEC_OK` with the double riding
+# beside it, for the maps spelled out by hand: `{"spec:":<SPEC_OK>,"commit:":<COMMIT_OK>,...}`.
+CSHA=89abcdef0123456789abcdef0123456789abcdef
+CPATH=memory/builds/tB/spec/2026-10-04-spec-A-tB-1.md
+COMMIT_OK='{"committed":true,"sha":"'$CSHA'","why":"","specs":[{"id":"A-tB-1","path":"'$CPATH'"}],"summary":"ok"}'
+SPEC_C="$SPEC_OK"',"commit:":'"$COMMIT_OK"
 # TOOL-aHoistedPass-6 - the BUILD double is gone with the stage. What a terminal verdict now
 # reaches is the DISPOSAL stage, and past it the roster hand-out, which is a return rather than an
 # agent. `returns` takes an optional THIRD argument so an arm can hand back a FAILED disposal.
@@ -245,7 +254,7 @@ returns() { local dflt ids='[]' places='[]'
   [ "${2:-0}" -gt 0 ] && { ids='["A-tB-p"]'; places='[{"unit":"A-tB-p","repairs":"A-tB-3","order":3}]'; }
   dflt=$(printf '{"disposed":true,"standing":[],"promoted":%s,"folded":0,"promotedIds":%s,"edges":[],"placements":%s,"summary":"ok"}' "${2:-0}" "$ids" "$places")
   printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
-  "$SPEC_OK" "$(review_out "${2:-0}")" "$(rec "$1")" "${3:-$dflt}"; }
+  "$SPEC_C" "$(review_out "${2:-0}")" "$(rec "$1")" "${3:-$dflt}"; }
 audit() { printf '%s' "$1"; }
 
 # ---- AC2: THE ARGS GUARD, BOTH DIRECTIONS. The first cut of the guard this ports from tested
@@ -656,7 +665,8 @@ hasnt_ "ALL writers dead: no roster is ever handed out" "$o" '"roster"'
 # ---- half of clause 3 of the disjointness proof, and no gate downstream of here reads a prompt.
 o=$(run_wf "$S3" '{"spec":{"authored":["x"],"alreadyPresent":[],"refused":[],"summary":"s"},"workflow":{"blockers":0,"confirmed":0,"highs":0,"unverified":0,"report":"r.md"},"audit:record":{"token":"CONVERGED"}}')
 has "writers: told to author and NOT commit" "$o" "AUTHOR ONLY — DO NOT COMMIT"
-has "writers: told the caller commits once after them" "$o" "the caller commits once after all of you"
+has    "writers: told one committer commits once after them" "$o" "one committer commits once after all of you return"
+hasnt_ "writers: ...and never the old answer beside it" "$o" "the caller commits once after all of you"
 # AC9 - S4's generator prohibition, which had no criterion at all before this arm.
 has "writers: told not to run the index generator" "$o" "do not run the build-index generator"
 
@@ -1056,7 +1066,7 @@ NOSUBJ=$(printf '%s' "$UNITS" | sed 's#"subjects":\[[^]]*\],##' | sed 's#"slug":
 # The supplied-subject fixtures in `$UNITS` keep their 7-hex blobs: they never enter that branch.
 B40=0123456789abcdef0123456789abcdef01234567
 T40=fedcba9876543210fedcba9876543210fedcba98
-o=$(run_wf "$NOSUBJ" "$(printf '{"spec:":%s,"audit:subjects":{"subjects":[{"path":"s3","blob":"%s","tree":"%s"}]},"workflow":%s,"audit:record":%s,"dispose:":%s}' "$SPEC_OK" "$B40" "$B40" "$(review_out 0)" "$(rec CONVERGED)" "$DISPOSE_OK")")
+o=$(run_wf "$NOSUBJ" "$(printf '{"spec:":%s,"audit:subjects":{"subjects":[{"path":"s3","blob":"%s","tree":"%s"}]},"workflow":%s,"audit:record":%s,"dispose:":%s}' "$SPEC_C" "$B40" "$B40" "$(review_out 0)" "$(rec CONVERGED)" "$DISPOSE_OK")")
 has    "B round 2 over the promoted id does not throw" "$o" "RESULT"
 p=$(printf '%s\n' "$o" | grep '^prompt:audit:record:r2:')
 has    "B round 2 records under its own generation key" "$p" "--subject tB-spec-set-r2 --verdict"
@@ -1325,7 +1335,7 @@ has    "R2-C the post-disposal nextAction names subjects among what NOT to pass"
 # ---- E (id 14): the callee is handed the SUBJECT's round, not the invocation's. Under the kit
 # ---- default every promoted-spec audit lands at invocation round 2, and `tier2-review.js` primed
 # ---- it as a FOLD review of a spec nobody had reviewed.
-o=$(run_wf "$NOSUBJ" "$(printf '{"spec:":%s,"audit:subjects":{"subjects":[{"path":"s3","blob":"%s","tree":"%s"}]},"workflow":%s,"audit:record":%s,"dispose:":%s}' "$SPEC_OK" "$B40" "$B40" "$(review_out 0)" "$(rec CONVERGED)" "$DISPOSE_OK")")
+o=$(run_wf "$NOSUBJ" "$(printf '{"spec:":%s,"audit:subjects":{"subjects":[{"path":"s3","blob":"%s","tree":"%s"}]},"workflow":%s,"audit:record":%s,"dispose:":%s}' "$SPEC_C" "$B40" "$B40" "$(review_out 0)" "$(rec CONVERGED)" "$DISPOSE_OK")")
 w=$(printf '%s\n' "$o" | grep '^wargs:')
 has    "R2-E a post-disposal re-invoke at round 2 hands the callee round 1" "$w" '"round":1'
 has    "R2-E ...as a spec-audit" "$w" '"kind":"spec-audit"'
@@ -1339,17 +1349,17 @@ has    "R2-E ...while the harness keeps its own round for the record" "$o" "prom
 # ---- subject. INSIDE the resolver branch only: the supplied-subject fixtures above carry no
 # ---- `tree` and never enter it. Each arm read RED first against the render at 12513c25, where
 # ---- the first and third proceed to the sub-workflow and the second finds no `tree` to strip.
-o=$(run_wf "$NOSUBJ" "$(printf '{"spec:":%s,"audit:subjects":{"subjects":[{"path":"s3","blob":"%s","tree":"%s"}]},"workflow":%s,"audit:record":%s,"dispose:":%s}' "$SPEC_OK" "$B40" "$T40" "$(review_out 0)" "$(rec CONVERGED)" "$DISPOSE_OK")")
+o=$(run_wf "$NOSUBJ" "$(printf '{"spec:":%s,"audit:subjects":{"subjects":[{"path":"s3","blob":"%s","tree":"%s"}]},"workflow":%s,"audit:record":%s,"dispose:":%s}' "$SPEC_C" "$B40" "$T40" "$(review_out 0)" "$(rec CONVERGED)" "$DISPOSE_OK")")
 has    "WS15 a resolved subject whose tree differs from its blob THROWS" "$o" "THROW"
 has    "WS15 ...naming the path and both hashes" "$o" "s3 HEAD $B40 tree $T40"
 has    "WS15 ...and the remedy" "$o" "Commit the fold"
 same   "WS15 ...and no lens was dispatched" "$(printf '%s\n' "$o" | grep -c '^workflow:')" "0"
-o=$(run_wf "$NOSUBJ" "$(printf '{"spec:":%s,"audit:subjects":{"subjects":[{"path":"s3","blob":"%s","tree":"%s"}]},"workflow":%s,"audit:record":%s,"dispose:":%s}' "$SPEC_OK" "$B40" "$B40" "$(review_out 0)" "$(rec CONVERGED)" "$DISPOSE_OK")")
+o=$(run_wf "$NOSUBJ" "$(printf '{"spec:":%s,"audit:subjects":{"subjects":[{"path":"s3","blob":"%s","tree":"%s"}]},"workflow":%s,"audit:record":%s,"dispose:":%s}' "$SPEC_C" "$B40" "$B40" "$(review_out 0)" "$(rec CONVERGED)" "$DISPOSE_OK")")
 same   "WS15 an agreeing pair reaches the sub-workflow" "$(printf '%s\n' "$o" | grep -c '^workflow:')" "1"
 w=$(printf '%s\n' "$o" | grep '^wargs:')
 has    "WS15 ...handed {path, blob}" "$w" "\"subjects\":[{\"path\":\"s3\",\"blob\":\"$B40\"}]"
 same   "WS15 ...with tree stripped" "$(printf '%s' "$w" | grep -c '"tree"')" "0"
-o=$(run_wf "$NOSUBJ" "$(printf '{"spec:":%s,"audit:subjects":{"subjects":[{"path":"s3","blob":"%s"}]},"workflow":%s,"audit:record":%s,"dispose:":%s}' "$SPEC_OK" "$B40" "$(review_out 0)" "$(rec CONVERGED)" "$DISPOSE_OK")")
+o=$(run_wf "$NOSUBJ" "$(printf '{"spec:":%s,"audit:subjects":{"subjects":[{"path":"s3","blob":"%s"}]},"workflow":%s,"audit:record":%s,"dispose:":%s}' "$SPEC_C" "$B40" "$(review_out 0)" "$(rec CONVERGED)" "$DISPOSE_OK")")
 has    "WS15 a resolved subject with no tree THROWS naming the field" "$o" "40-hex tree"
 hasnt_ "WS15 ...and not as a dirty tree" "$o" "Commit the fold"
 
@@ -1358,15 +1368,15 @@ hasnt_ "WS15 ...and not as a dirty tree" "$o" "Commit the fold"
 # ---- wins, and an absence is a WARNING with no `checklist` key passed. Each arm read RED first on a
 # ---- staged break: the forward dropped, the precedence reversed, the prompt's instruction deleted.
 GH3_RES='"audit:subjects":{"subjects":[{"path":"s3","blob":"%s","tree":"%s"}],"checklist":"RESOLVERCLX","checklistPaths":["a.sh","b.sh"]}'
-o=$(run_wf "$NOSUBJ" "$(printf '{"spec:":%s,'"$GH3_RES"',"workflow":%s,"audit:record":%s,"dispose:":%s}' "$SPEC_OK" "$B40" "$B40" "$(review_out 0)" "$(rec CONVERGED)" "$DISPOSE_OK")")
+o=$(run_wf "$NOSUBJ" "$(printf '{"spec:":%s,'"$GH3_RES"',"workflow":%s,"audit:record":%s,"dispose:":%s}' "$SPEC_C" "$B40" "$B40" "$(review_out 0)" "$(rec CONVERGED)" "$DISPOSE_OK")")
 w=$(printf '%s\n' "$o" | grep '^wargs:')
 has    "GH3 the resolver's checklist reaches the spec audit as checklist" "$w" '"checklist":"RESOLVERCLX"'
 has    "GH3 ...and the stage says where it came from" "$o" "log:audit round 2: checklist from --for-paths over 2 path(s)"
-o=$(run_wf "$NOSUBJ" "$(printf '{"spec:":%s,"audit:subjects":{"subjects":[{"path":"s3","blob":"%s","tree":"%s"}]},"workflow":%s,"audit:record":%s,"dispose:":%s}' "$SPEC_OK" "$B40" "$B40" "$(review_out 0)" "$(rec CONVERGED)" "$DISPOSE_OK")")
+o=$(run_wf "$NOSUBJ" "$(printf '{"spec:":%s,"audit:subjects":{"subjects":[{"path":"s3","blob":"%s","tree":"%s"}]},"workflow":%s,"audit:record":%s,"dispose:":%s}' "$SPEC_C" "$B40" "$B40" "$(review_out 0)" "$(rec CONVERGED)" "$DISPOSE_OK")")
 has    "GH3 a resolver returning no checklist is a WARNING naming the gap" "$o" "log:WARNING: audit round 2: no checklist reached the spec audit"
 hasnt_ "GH3 ...and no checklist key is passed" "$(printf '%s\n' "$o" | grep '^wargs:')" '"checklist"'
 o=$(run_wf "$(printf '%s' "$NOSUBJ" | sed 's#"slug":"tB",#"slug":"tB","checklist":"CALLERCLX",#')" \
-    "$(printf '{"spec:":%s,'"$GH3_RES"',"workflow":%s,"audit:record":%s,"dispose:":%s}' "$SPEC_OK" "$B40" "$B40" "$(review_out 0)" "$(rec CONVERGED)" "$DISPOSE_OK")")
+    "$(printf '{"spec:":%s,'"$GH3_RES"',"workflow":%s,"audit:record":%s,"dispose:":%s}' "$SPEC_C" "$B40" "$B40" "$(review_out 0)" "$(rec CONVERGED)" "$DISPOSE_OK")")
 w=$(printf '%s\n' "$o" | grep '^wargs:')
 has    "GH3 a caller checklist beside the resolver's is the one the audit receives" "$w" '"checklist":"CALLERCLX"'
 hasnt_ "GH3 ...and the resolver's is not passed" "$w" "RESOLVERCLX"
@@ -1374,6 +1384,128 @@ p=$(printf '%s\n' "$o" | grep '^prompt:audit:subjects:r2:')
 has    "GH3 the rendered resolver prompt runs --for-paths through the rendered memory-tree path" "$p" \
     "python ${PFX}${MT_KIT}/gotchas.py --for-paths <those paths>"
 has    "GH3 ...over the paths under the specs' Files touched sub-heads" "$p" '### Files touched'
+
+# ---- TOOL-aGraftedHelix-15: THE SPEC COMMIT STAGE, its path fill, its refusals and the one remedy. The
+# ---- fixture carrying the weight is a PATHLESS authored unit: it is what `--plan <slug> --paths` hands a
+# ---- caller for a MISSING spec, and the unit the resolver could not pin before the stage existed. Each
+# ---- arm read RED on a staged copy of the render: the stage call deleted, the fill deleted, the
+# ---- `notAtHead` branch deleted, the resolver's instruction deleted.
+P_UNITS='{"repo":"/tmp/r","slug":"tB","scratch":"/tmp/s","specAudit":"2026-09-20","units":[{"id":"A-tB-1","order":1,"briefPath":"b1"}]}'
+P_OFF=$(printf '%s' "$P_UNITS" | sed 's#"specAudit":"2026-09-20",##')
+P_SPEC='{"authored":["A-tB-1"],"alreadyPresent":[],"refused":[],"summary":"ok"}'
+P_SUBJ='"audit:subjects":{"subjects":[{"path":"'$CPATH'","blob":"'$B40'","tree":"'$B40'"}],"checklist":"# r-head\n- [ ] alpha (universal)\n      a\n- [ ] beta\n      b\n# by design — 1 invariant(s) this selection touches\n- inv-one — x → y (D-1)","checklistPaths":["a.sh"]}'
+P_CCL='# c-head\n- [ ] alpha (universal)\n      a\n- [ ] gamma\n      g\n# by design — 1 invariant(s) this selection touches\n- inv-two — x → y (D-2)'
+P_COMMIT='{"committed":true,"sha":"'$CSHA'","why":"","specs":[{"id":"A-tB-1","path":"'$CPATH'"}],"summary":"ok","checklist":"'$P_CCL'"}'
+run_pathless() { # args · spec double · commit double · resolver map entry, or '' -> the run, audit and disposal doubled clean
+  run_wf "$1" "$(printf '{"spec:":%s,"commit:":%s%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
+    "$2" "$3" "${4:+,$4}" "$(review_out 0)" "$(rec CONVERGED)" "$DISPOSE_OK")"
+}
+# AC1 - placement, prompt, log, and the checklist merged after the resolver's under ONE by-design head.
+o=$(run_pathless "$P_UNITS" "$P_SPEC" "$P_COMMIT" "$P_SUBJ")
+ag=$(printf '%s\n' "$o" | grep '^agent:' | tr '\n' ' ')
+has    "GH15 the commit stage runs after the writers and before the resolver" "$ag" "agent:spec:tB:g0 agent:commit:specs:tB agent:audit:subjects:r1"
+same   "GH15 ...exactly once" "$(printf '%s\n' "$o" | grep -c '^agent:commit:')" "1"
+p=$(printf '%s\n' "$o" | grep '^prompt:commit:specs:tB:')
+has    "GH15 its prompt runs the rendered build-index generator" "$p" "python ${PFX}${MT_KIT}/gen_build_index.py --write"
+has    "GH15 ...commits with the Pass: none trailer" "$p" '`Pass: none`'
+has    "GH15 ...names the authored id" "$p" "spec(tB): A-tB-1"
+has    "GH15 ...locates a spec by its H1 line" "$p" "whose H1 line opens"
+has    "GH15 ...never stages a path listed before staging" "$p" "is FOREIGN, and is never staged by this stage"
+has    "GH15 ...and runs the per-pass checklist over its commit" "$p" "python ${PFX}${MT_KIT}/gotchas.py --for-diff HEAD~1..HEAD"
+has    "GH15 the commit is logged with its sha" "$o" "log:spec stage: committed 1 spec(s) at $CSHA"
+w=$(printf '%s\n' "$o" | grep '^wargs:')
+has    "GH15 the audit's checklist opens with both heads and the label between them" "$w" '"checklist":"# r-head\n# the spec commit '"$CSHA"' — python '"${PFX}${MT_KIT}"'/gotchas.py --for-diff HEAD~1..HEAD\n# c-head\n- [ ] alpha'
+has    "GH15 ...carries the commit's new item after the resolver's" "$w" '- [ ] beta\n      b\n- [ ] gamma'
+same   "GH15 ...and a repeated item once" "$(printf '%s' "$w" | grep -o 'alpha' | wc -l | tr -d ' ')" "1"
+has    "GH15 ...under ONE by-design head counting both blocks" "$w" '# by design — 2 invariant(s) this selection touches\n- inv-one — x → y (D-1)\n- inv-two'
+same   "GH15 ...and no second head" "$(printf '%s' "$w" | grep -o 'by design' | wc -l | tr -d ' ')" "1"
+# The head is a COPY of the review harness's, because workflow scripts cannot import, so the pair is
+# compared here: a head one of them re-spells would merge into a block the other no longer cuts out.
+same   "GH15 the merged head is the review harness's own head, byte for byte" \
+  "$(grep -o 'BY_DESIGN_HEAD = .*' "$F")" "$(grep -o 'BY_DESIGN_HEAD = .*' "$HERE/tier2-review.js")"
+has    "GH15 the checklist source names the merge" "$o" "checklist from --for-paths over 1 path(s), merged with the spec commit ${CSHA:0:12}'s --for-diff"
+# AC1 - audit OFF: the stage still runs once, and the hand-out carries the commit and its checklist.
+o=$(run_pathless "$P_OFF" "$P_SPEC" "$P_COMMIT" '')
+same   "GH15 OFF: the commit stage runs once" "$(printf '%s\n' "$o" | grep -c '^agent:commit:specs:tB')" "1"
+has    "GH15 OFF: the roster is handed out" "$o" '"roster":[{"id":"A-tB-1"'
+has    "GH15 OFF: the hand-out carries specCommit with the sha and the checklist" "$o" '"specCommit":{"sha":"'"$CSHA"'","checklist":"# c-head'
+has    "GH15 OFF: ...and says to act on it before the first dispatch" "$o" 'ACT on `specCommit.checklist`'
+# AC2 - the path fill reaches the resolver's roster and the hand-out's, and wins over a caller path.
+o=$(run_pathless "$P_UNITS" "$P_SPEC" "$COMMIT_OK" "$P_SUBJ")
+p=$(printf '%s\n' "$o" | grep '^prompt:audit:subjects:r1:')
+has    "GH15 the resolver's roster carries the committed path" "$p" "A-tB-1 | spec $CPATH"
+has    "GH15 ...and the hand-out's roster too" "$o" '"specPath":"'"$CPATH"'"'
+o=$(run_pathless "$(printf '%s' "$P_UNITS" | sed 's#"order":1,#"order":1,"specPath":"s1",#')" "$P_SPEC" "$COMMIT_OK" "$P_SUBJ")
+p=$(printf '%s\n' "$o" | grep '^prompt:audit:subjects:r1:')
+has    "GH15 a differing caller path loses to the committed one" "$p" "A-tB-1 | spec $CPATH"
+hasnt_ "GH15 ...and is gone from the resolver's roster" "$p" "| spec s1 |"
+has    "GH15 ...and one log line names both" "$o" "log:spec stage: A-tB-1 specPath s1 -> $CPATH"
+# AC3 - the two skips, each logged, neither spawning the stage.
+o=$(run_wf "$NOSUBJ" "$(printf '{"spec:":%s,"audit:subjects":{"subjects":[{"path":"s3","blob":"%s","tree":"%s"}]},"workflow":%s,"audit:record":%s,"dispose:":%s}' '{"authored":[],"alreadyPresent":["A-tB-1","A-tB-2","A-tB-3"],"refused":[],"summary":"s"}' "$B40" "$B40" "$(review_out 0)" "$(rec CONVERGED)" "$DISPOSE_OK")")
+hasnt_ "GH15 nothing authored: no commit stage" "$o" "agent:commit:"
+has    "GH15 ...and the skip says why" "$o" "log:spec stage: no commit — the writers authored no unit of this roster"
+o=$(run_wf "$UNITS" "$(returns CONVERGED 0)")
+hasnt_ "GH15 caller subjects beside an authored id: no commit stage" "$o" "agent:commit:"
+has    "GH15 ...and the log leaves the id to the caller" "$o" "so A-tB-1 is left to the caller to commit"
+# AC4 - the five refusals, each before the resolver and the sub-workflow, each ending in the remedy.
+for c in 'null|the spec commit stage returned nothing' \
+         '{"committed":false,"sha":"","why":"hook said no","specs":[],"summary":"x"}|hook said no' \
+         '{"committed":true,"sha":"abc1234","why":"","specs":[{"id":"A-tB-1","path":"'$CPATH'"}],"summary":"x"}|returned `sha` "abc1234"' \
+         '{"committed":true,"sha":"'$CSHA'","why":"","specs":[],"summary":"x"}|named no committed spec for A-tB-1' \
+         '{"committed":true,"sha":"'$CSHA'","why":"","specs":[{"id":"A-tB-1","path":"memory/builds/tX/spec/x.md"}],"summary":"x"}|A-tB-1 at "memory/builds/tX/spec/x.md"'; do
+  o=$(run_pathless "$P_UNITS" "$P_SPEC" "${c%%|*}" "$P_SUBJ")
+  has    "GH15 refusal [${c##*|}]: THROWS naming it" "$o" "${c##*|}"
+  has    "GH15 refusal [${c##*|}]: ...with a fresh re-invoke and the --plan rebuild" "$(printf '%s\n' "$o" | grep '^THROW')" 'WITHOUT `resumeFromRunId`'
+  has    "GH15 refusal [${c##*|}]: ...naming --plan" "$o" "--plan tB --paths"
+  hasnt_ "GH15 refusal [${c##*|}]: ...before the resolver" "$o" "agent:audit:subjects"
+  hasnt_ "GH15 refusal [${c##*|}]: ...and before the sub-workflow" "$o" "workflow:"
+done
+o=$(run_pathless "$P_OFF" "$P_SPEC" 'null' '')
+has    "GH15 OFF refusal: names a fresh re-invoke" "$o" 'WITHOUT `resumeFromRunId`.'
+hasnt_ "GH15 OFF refusal: ...and offers no resume with subjects" "$o" "git ls-tree"
+# AC5 - notAtHead, partial, pathless and all-refused refusals, and the resolver's instruction.
+o=$(run_pathless "$P_UNITS" "$P_SPEC" "$COMMIT_OK" '"audit:subjects":{"subjects":[],"notAtHead":[{"path":"'$CPATH'"}]}')
+has    "GH15 notAtHead: THROWS naming the path" "$o" "not at HEAD, so no blob pins them: $CPATH"
+has    "GH15 notAtHead: ...with a fresh re-invoke" "$o" 'WITHOUT `resumeFromRunId`'
+has    "GH15 notAtHead: ...or a resume with pinned subjects" "$o" "git ls-tree HEAD"
+p=$(printf '%s\n' "$o" | grep '^prompt:audit:subjects:r1:')
+has    "GH15 the resolver prompt names notAtHead" "$p" '`notAtHead`'
+has    "GH15 ...for a path in the working tree that does not resolve at HEAD" "$p" "EXISTS in the working tree and does NOT resolve at HEAD"
+o=$(run_wf "$NOSUBJ" "$(printf '{"spec:":%s,"audit:subjects":{"subjects":[],"notAtHead":[{"path":"s3"}]},"workflow":%s,"audit:record":%s,"dispose:":%s}' "$SPEC_C" "$(review_out 0)" "$(rec CONVERGED)" "$DISPOSE_OK")")
+has    "GH15 notAtHead under auditIds: THROWS" "$o" "not at HEAD, so no blob pins them: s3"
+has    "GH15 ...saying subjects cannot stand beside auditIds" "$o" '`subjects` cannot stand beside `auditIds`'
+hasnt_ "GH15 ...and offering no git ls-tree" "$o" "git ls-tree"
+o=$(run_pathless "$P_UNITS" "$P_SPEC" "$COMMIT_OK" '"audit:subjects":{"subjects":[{"path":"'$CPATH'","blob":"'$B40'","tree":"'$B40'"}],"notAtHead":[{"path":"x.md"}]}')
+has    "GH15 a partial set THROWS" "$o" "not at HEAD, so no blob pins them: x.md"
+hasnt_ "GH15 ...and audits no half of it" "$o" "workflow:"
+o=$(run_pathless "$P_UNITS" '{"authored":[],"alreadyPresent":["A-tB-1"],"refused":[],"summary":"ok"}' "$COMMIT_OK" "$P_SUBJ")
+has    "GH15 a pathless unit no writer refused THROWS" "$o" 'A-tB-1 carry no `specPath`'
+has    "GH15 ...naming the --plan re-read" "$o" "--plan tB --paths\` while the spec was MISSING"
+hasnt_ "GH15 ...before the resolver" "$o" "agent:audit:subjects"
+o=$(run_pathless "$P_UNITS" '{"authored":[],"alreadyPresent":[],"refused":["A-tB-1"],"summary":"cannot"}' "$COMMIT_OK" "$P_SUBJ")
+has    "GH15 every audit unit refused THROWS naming the refusals" "$o" "refused every audit unit (A-tB-1"
+hasnt_ "GH15 ...before the resolver" "$o" "agent:audit:subjects"
+# AC6 - the empty refusal keeps its words and gains the cause; the dirty and clean-round refusals end
+# in the remedy, with and without auditIds and with caller subjects.
+o=$(run_pathless "$P_UNITS" "$P_SPEC" "$COMMIT_OK" '"audit:subjects":{"subjects":[]}')
+has    "GH15 empty: keeps the refusal operators grep" "$o" "no spec subjects could be pinned at round 1"
+has    "GH15 empty: ...states the cause" "$o" "none resolved at HEAD or exists on disk"
+has    "GH15 empty: ...and ends in the remedy" "$o" 'WITHOUT `resumeFromRunId`'
+o=$(run_wf "$NOSUBJ" "$(printf '{"spec:":%s,"audit:subjects":{"subjects":[{"path":"s3","blob":"%s","tree":"%s"}]},"workflow":%s,"audit:record":%s,"dispose:":%s}' "$SPEC_C" "$B40" "$T40" "$(review_out 0)" "$(rec CONVERGED)" "$DISPOSE_OK")")
+has    "GH15 dirty: keeps Commit the fold" "$o" "Commit the fold"
+has    "GH15 dirty: ...and names a fresh re-invoke" "$o" 'WITHOUT `resumeFromRunId`'
+hasnt_ "GH15 dirty: ...and never the same arguments again" "$o" "re-invoke with the same arguments"
+CLEAN='{"blockers":null,"confirmed":[],"lensesDead":0,"unverified":0,"report":null,"note":"clean"}'
+o=$(run_wf "$P_UNITS" "$(printf '{"spec:":%s,"commit:":%s,"audit:subjects":{"subjects":[{"path":"zz.md","blob":"%s","tree":"%s"}]},"workflow":%s,"audit:record":%s}' "$P_SPEC" "$COMMIT_OK" "$B40" "$B40" "$CLEAN" "$(rec CONVERGED)")")
+has    "GH15 clean round over no unit: THROWS" "$o" "covered NO unit"
+has    "GH15 ...with the --plan rebuild and a fresh re-invoke" "$o" 'WITHOUT `resumeFromRunId`'
+o=$(run_wf "$NOSUBJ" "$(printf '{"spec:":%s,"audit:subjects":{"subjects":[{"path":"zz.md","blob":"%s","tree":"%s"}]},"workflow":%s,"audit:record":%s}' "$SPEC_C" "$B40" "$B40" "$CLEAN" "$(rec CONVERGED)")")
+has    "GH15 clean round under auditIds: THROWS" "$o" "covered NO unit"
+hasnt_ "GH15 ...offering no git ls-tree" "$o" "git ls-tree"
+o=$(run_wf '{"repo":"/tmp/r","slug":"tB","scratch":"/tmp/s","specAudit":"2026-09-20","subjects":[{"path":"s9","blob":"abc1234"}],"units":[{"id":"A-tB-1","order":1}]}' \
+    "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s}' '{"authored":[],"alreadyPresent":["A-tB-1"],"refused":[],"summary":"s"}' "$CLEAN" "$(rec CONVERGED)")")
+has    "GH15 caller subjects over pathless units reach the same clean-round THROW" "$o" "covered NO unit"
+has    "GH15 ...with the remedy" "$o" "--plan tB --paths"
 
 # ---- F (id 16): an UNVERIFIED finding the stage judges not a defect has a route. `refuted` is
 # ---- optional, bounded by `unverified`, in the sum, and the severity floors stand.
@@ -1416,7 +1548,7 @@ OFF_UNITS=$(printf '%s' "$UNITS" | sed 's#"specAudit":"2026-09-20",##; s#"subjec
 # ---- one the pre-edit harness threw at the resolver before it could await the sub-workflow, and the
 # ---- `workflow:` absence arm passed over a harness that had not been reached — the vacuous pass,
 # ---- observed here. With subjects on offer, the pre-edit harness awaits and the arm reds.
-o=$(run_wf "$OFF_UNITS" "$(printf '{"spec:":%s,"audit:subjects":{"subjects":[{"path":"s1","blob":"abc1234"}]}}' "$SPEC_OK")")
+o=$(run_wf "$OFF_UNITS" "$(printf '{"spec:":%s,"audit:subjects":{"subjects":[{"path":"s1","blob":"abc1234"}]}}' "$SPEC_C")")
 has    "BT3-AC2 OFF: the audit stage announces itself OFF by declaration" "$o" "log:audit stage: OFF by declaration"
 hasnt_ "BT3-AC2 OFF: the sub-workflow is never awaited" "$o" "workflow:"
 hasnt_ "BT3-AC2 OFF: ...and its args are never composed" "$o" "wargs:"
@@ -1481,9 +1613,9 @@ hasnt_ "BT3-AC6 declared: nothing announces the audit off" "$o" "OFF by declarat
 o=$(run_wf "$(printf '%s' "$T_UNITS" | sed 's#"specAudit":"2026-09-20",##; s#"subjects":\[[^]]*\],##')" '{"spec":{"authored":[],"alreadyPresent":[],"refused":[],"summary":"s"}}')
 has    "BT3 attended, OFF, every unit terminal: the exit carries the audit object" "$o" '"audit":{"ran":false,"verdict":"NOT-OWED"'
 has    "BT3 ...with an empty roster, by filtering" "$o" '"roster":[]'
-# ---- AC7: both carriers read 1.3 — the render is byte-compared to the template by the parity leg,
+# ---- AC7: both carriers read 1.4 — the render is byte-compared to the template by the parity leg,
 # ---- so the marker moving in one file and not the other reds there; this arm reads the render.
-has    "BT3-AC7 the render carries the engine version 1.3" "$(sed -n '3p' "$F")" "version: '1.3', // gov:kit unattended-build@1.3"
+has    "BT3-AC7 the render carries the engine version 1.4" "$(sed -n '3p' "$F")" "version: '1.4', // gov:kit unattended-build@1.4"
 
 # ================================== TOOL-dPolishedVitrine-1 — THE HARNESS IS RENDERED AT INSTALL
 # The harness shipped as an ENGINE file, and apply writes those verbatim, so every install path it
@@ -1816,7 +1948,10 @@ fi
 # RAISED 293 -> 301 by TOOL-aGraftedHelix-3: the eight GH3 sites, counted off the block — the resolver's
 # checklist forwarded and logged (2), its absence warned with no key passed (2), the caller's precedence
 # (2) and the rendered resolver prompt's instruction (2).
-FLOOR_ASSERTIONS=301
+# RAISED 301 -> 365 by TOOL-aGraftedHelix-15: its 64 static sites, counted with the grep above as 443 at
+# the unit's parent and 507 after — the GH15 block's 63 and the writers' arm's new absence. The block's
+# refusal loop runs five of them five times, so it executes 83, and the floor stays a lower bound.
+FLOOR_ASSERTIONS=365
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; st=1; }
 # NOTHING RUNS AFTER THE TERMINAL EXIT (TOOL-dUnstalledConvoy-19): the floor cannot see an arm
 # appended past `exit $st`, and neither can check-arms.py or the summary line. One grep can. The
