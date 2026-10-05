@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-16 — the spec commit stage re-stages the authored specs after the generator renders them, and a real-git arm runs the prompt's own git block
 
-**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 5266d22e · streams tooling · order 11
+**Status:** SPECCED · rev-3 · 2026-10-05 · node a · Tier-1 · base 5266d22e · streams tooling · order 11
 
 <!-- gen:spec-records -->
 
@@ -35,8 +35,9 @@ round-1 spec audit of units 10 to 15.
   tells the agent to quote those porcelain lines in `why`, so the stage's existing validation throws
   naming them. Observed by AC1 and AC4.
 - **S3** — The stage's git sequence, from the pre-stage record through S2's check, is written in the
-  prompt as ONE fenced shell block that opens with `set -e` and whose only placeholder is
-  `<spec paths>`. The prose steps around it say what each command is for and never restate one of
+  prompt as ONE fenced shell block that opens with `set -e` and whose only placeholders are
+  `<spec paths>` and `<attribution trailer>`, the trailer the charter mandates, which only the agent
+  knows. The prose steps around it say what each command is for and never restate one of
   the block's command lines. The prose says that a step exiting non-zero returns `committed: false`
   with that step's output in `why`. That makes the block the one copy an arm can run, and a failed
   render stops the block instead of committing past it. Observed by AC1.
@@ -130,15 +131,16 @@ The fenced block S3 names. It opens with `set -e`, then in this order:
 3. `git add -- <spec paths>`.
 4. `python -B {{MEMORY_TREE_DIR}}/gen_build_index.py --write`.
 5. `git add -- <spec paths>` again, then stage each path changed now that step 1 did not list.
-6. `git commit`, with the subject and trailers unit 15 states.
+6. `git commit`, with the subject and trailers unit 15 states, the trailers passed as `--trailer`
+   so `Pass: none` and `<attribution trailer>` close the message as one trailer block.
 7. `git status --porcelain -- <spec paths>`, which must print nothing.
 
 The builder writes step 5's second half as a loop over `git status --porcelain` filtered by step 1's
 record. Under `set -e` the filter is never a `grep` that exits 1 on no match inside a command
 substitution, or a call with no foreign changes would stop before the commit; a membership test in
 the loop's own `if` or `case` is the shape. The program fills the slug and the ids into the commit
-subject before the prompt is sent, so `<spec paths>`, which the agent finds, is the one placeholder
-left. The surrounding prose names each step's purpose, says the block runs as written, and spells
+subject before the prompt is sent, so `<spec paths>`, which the agent finds, and
+`<attribution trailer>`, which the program cannot know, are the two placeholders left. The surrounding prose names each step's purpose, says the block runs as written, and spells
 none of its command lines a second time, so an agent following prose and an arm running the block
 cannot diverge.
 
@@ -154,7 +156,10 @@ fails at `import backlog` (`gen_build_index.py:290`). The repository carries no 
 Two foreign paths are planted after that commit: one tracked file outside the memory root, the conf
 and the kit directory, modified and unstaged, and one untracked file at the repository root. The arm
 then writes one spec carrying a status header and no records region, untracked, and runs the
-extracted block. It asserts:
+extracted block with both placeholders filled. It runs it with `PYTHONDONTWRITEBYTECODE` unset, because
+a host that sets it hides the `-B` break: node `a` sets it to `1`, and there the break committed no
+cache until the variable was unset. A `python` that does not run on the host is reached through the
+suite's resolved launcher, and the block's text is not edited for it. It asserts:
 
 | assertion | what it rules out |
 |---|---|
@@ -169,9 +174,16 @@ extracted block. It asserts:
 A variant adds a foreign unstaged edit to a second spec's status header and asserts that the block
 exits non-zero naming that spec, with `HEAD` and the index unmoved.
 
-Staged breaks, each made in a scratch copy of the render: step 5's re-add removed reds the first
-pair; the loop's filter inverted puts a foreign path in `HEAD`; `-B` removed puts a `__pycache__`
-path in `HEAD`; step 2 removed lets the variant commit, and the clean clone's `--check` reads drift.
+Staged breaks, each made in a scratch copy of the render: step 5 removed whole, the re-add and the
+loop, reds the first pair, which is unit 15's defect; the loop's filter inverted puts a foreign path
+in `HEAD`; `-B` removed puts a `__pycache__` path in `HEAD`; step 2 removed lets the variant commit,
+and the clean clone's `--check` reads drift.
+
+The re-add removed ALONE is not a red here, measured: step 5's loop compares whole lines, and an
+authored spec's line moves from `?? <spec>` in the record to `AM <spec>` after the render, so the loop
+stages the rendered spec too. The re-add's own red in this unit is AC1's order predicate. It becomes
+the only stager of a spec once `TOOL-aGraftedHelix-21` compares by path, because the record holds the
+spec's path.
 
 ### Inventory
 
@@ -220,8 +232,9 @@ S7 adds to the suite. Each staged break is made in a scratch COPY of the render.
   non-zero returns `committed: false` with its output. Before the predicate is wired, its hits and
   near-misses over the real decoded prompt are printed.
   Red when: the re-add or the post-commit status is missing, a block command is restated in prose,
-  or the quoting instruction is absent. Staged: the re-add deleted in the copy leaves no `git add`
-  line after the `--write` line; a prose `git add -- <spec paths>` step re-inserted outside the block
+  or the quoting instruction is absent. Staged: the re-add deleted in the copy leaves no
+  `git add -- <spec paths>` line after the `--write` line, the loop's own `git add` being a different
+  line; a prose `git add -- <spec paths>` step re-inserted outside the block
   reds the restatement predicate; the quoting sentence deleted reds its assertion.
 - **AC2** — When the block extracted from AC1's decoded prompt runs in a scratch repository at a
   short path under `%TEMP%`, built as §4 "The arm" states with both foreign paths planted, every
@@ -233,8 +246,8 @@ S7 adds to the suite. Each staged break is made in a scratch COPY of the render.
   added, the block exits non-zero naming that spec, and `git rev-parse HEAD` is unchanged.
   Red when: the commit holds the pre-render blob, the generator never ran, a foreign path or a cache
   is committed, or the commit holds views derived from a foreign input. Staged: the run over the copy
-  without the re-add prints ` M <spec>` and the two hashes differ; each other break §4 "The arm"
-  names reds its own row.
+  without step 5 prints ` M <spec>` and the two hashes differ; each other break §4 "The arm" names
+  reds its own row.
 - **AC3** — When `python tools/govkit/govkit.py epoch --base <the pass's parent sha>` runs at the
   pass's commit, it names no review-harness carrier left behind, and
   `bash tools/check-kit-versions.sh` exits 0. Line 3 of `tools/workflows/unattended-build.js`
@@ -273,6 +286,15 @@ none
   render. Finding 16: S7's `promptjson:` channel. Finding 3: AC1's restatement predicate. Finding 5:
   AC1's quoting assertion and AC4. §3 gains the hands-off to `TOOL-aGraftedHelix-21`, promoted from
   findings 22 and 17, and points away from unit 15 §5's check-9 sentence.
+- rev-3 · 2026-10-05 · §2 §4 §6 · S3 · AC1 AC2 · the builder, against a scratch run of the block
+  before any code. The commit's attribution trailer is the charter's and only the agent knows it, so
+  `<spec paths>` could not be the block's only placeholder without dropping the trailer unit 15
+  requires; `<attribution trailer>` is the second, and step 6 passes both trailers as `--trailer`.
+  The re-add removed alone left the commit clean, because step 5's whole-line loop also stages a
+  spec whose line moved from `??` to `AM`, so AC2's first-pair break is step 5 removed whole and the
+  re-add's own red here is AC1's. The `-B` break committed no cache on node `a` until
+  `PYTHONDONTWRITEBYTECODE` was unset, so the arm unsets it. AC1's re-add break names the
+  `git add -- <spec paths>` line, since the loop carries a `git add` of its own.
 
 ## 10. Reuse audit
 
