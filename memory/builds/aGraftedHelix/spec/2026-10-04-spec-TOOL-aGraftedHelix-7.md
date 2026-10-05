@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-7 — the gate runner stops dispatching legs above a declared memory fraction and records the pause
 
-**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-2 · base 5266d22e · streams tooling · order 8 · ratified 2026-10-04
+**Status:** SPECCED · rev-3 · 2026-10-05 · node a · Tier-2 · base 5266d22e · streams tooling · order 8 · ratified 2026-10-04
 
 <!-- gen:spec-records -->
 
@@ -26,9 +26,11 @@ taken during a pause out of ceiling evidence.
 - **S1** — A profile knob `mempause=<pct>` in `tools/run-gates/gate-profiles.txt`: 0 is off and is
   what a row that omits it gets, 1 to 100 is the used-memory threshold, and every shipped row
   declares `mempause=90`. `KNOWN_KNOBS` gains it, and a table value above 100 is refused like any
-  malformed knob. `GATE_MEMPAUSE=<pct>` overrides the row's value alone; any other override value
-  prints one `run-gates: NOTE` line and leaves the pause off. The profile line gains
-  `mempause <n>%`, `mempause off` or `mempause INERT`; `--print-profile` gains the key `mempause`;
+  malformed knob. `GATE_MEMPAUSE=<pct>` overrides the row's value alone; any other non-empty
+  override value prints one `run-gates: NOTE` line and leaves the pause off, and an empty one reads
+  as unset, as an empty `GATE_WALL` does. The profile line gains
+  `mempause <n>%`, `mempause off` or `mempause INERT`; `--print-profile` gains the key `mempause`,
+  the effective threshold with 0 for off, INERT being a fact about the host that the line carries;
   the run header gains `mempause` outside the four-key envelope block. Observed by AC1 and AC2.
 - **S2** — One shell block between `# >>> mempause_sh` and `# <<< mempause_sh`, canonical in the
   runner and carried byte-identical in `tools/run-gates/run-selftests.sh`, graded by a new
@@ -39,7 +41,9 @@ taken during a pause out of ceiling evidence.
   `MemTotal` against `MemAvailable`, or `MemFree` where the file carries no `MemAvailable`, from
   `GATE_MEMINFO` or `/proc/meminfo`; and, when a limit and a usage both read under
   `GATE_CGROUP_ROOT`, the cgroup's usage over its limit. The HIGHER of the two wins. With no reading
-  it prints nothing and fails. A knob that is on over a host giving no reading prints one
+  it prints nothing and fails. It also leaves the figure in `MEMPAUSE_READ`, so the decision calls
+  it with its output discarded rather than through a command substitution, which would fork. A
+  knob that is on over a host giving no reading prints one
   `run-gates: NOTE` line at start and reads INERT. Observed by AC4 and AC7.
 - **S4** — Before every dispatch, the runner calls `check_dispatch_pause` with the count of legs
   running, at BOTH of its dispatch sites: the inner pass, and the forced-progress branch, which
@@ -56,8 +60,10 @@ taken during a pause out of ceiling evidence.
   filter that line and check it was printed once. Observed by AC5, AC6, AC8 and AC13.
 - **S6** — The self-test runner's pooled sweep makes the same check before each suite it
   dispatches, with its own count of suites running, reads the threshold from the one
-  `--print-profile` call it already makes, and prints the same summary line. It keeps no run
-  record, so it writes no `pauses` row. Observed by AC9.
+  `--print-profile` call it already makes, decides INERT with one `read_mem_used` of its own
+  before its loop, and prints the same summary line. With no runner beside it the call answers
+  nothing and the pause reads off. It keeps no run record, so it writes no `pauses` row.
+  Observed by AC9.
 - **S7** — `read_runs` in `tools/run-gates/derive-ceilings.py` gains the set-aside reason `paused`,
   between `contended` and `uncensused` in first-match order: an admitted reading whose leg ran
   while one of its own run's `pauses` episodes was open, by strict overlap. The `# set aside:` line
@@ -119,7 +125,8 @@ memory: <k> pause(s), <s>s held  (peak <p>% used, threshold <n>%; fell <a>, boun
 ```
 
 The peak is the highest reading any dispatch decision took this run, so the close's own bar prints
-the figure that tells whether 90 suits node `a`.
+the figure that tells whether 90 suits node `a`; a run whose decisions took no reading prints it
+as `?`, the profile line's spelling of an unknown figure.
 
 ### The reading
 
@@ -166,7 +173,7 @@ hold lasts until the first running leg to finish after the bound does, and the p
 width 1; the bar slows and keeps moving.
 
 The runner has a SECOND dispatch site. When nothing is live, legs remain and the inner pass
-dispatched nothing, the forced-progress branch (`tools/run-gates/run-gates.sh:3093-3097`) runs one
+dispatched nothing, the forced-progress branch (`run-gates.sh`'s `if [ "$di" -eq "$di_before" ]`) runs one
 leg so the loop can never spin. A hold steps the index back, so a held leg can reach that branch
 when the running legs finish between the inner pass's count and the outer liveness test, a window
 the runner's own comment measures as common. The branch therefore calls `check_dispatch_pause 0`
@@ -207,6 +214,7 @@ only a reason to the filter `TOOL-aGraftedHelix-5` builds, defined by the record
 | `read_pauses` | `py.function` |
 | `mempause`, `MEMPAUSE_HOLD`, `GATE_MEMPAUSE`, `GATE_MEMPAUSE_HOLD`, `GATE_MEMINFO` | knob, constant, overrides; no cell |
 | `MEMPAUSE_N`, `MEMPAUSE_HELD_S` | the block's two counters; no cell |
+| `MEMPAUSE`, `MEMPAUSE_INERT`, `MEMPAUSE_ROWS`, `MEMPAUSE_READ` | what each caller sets for the block (threshold, host state, record path) and the last reading; no cell |
 | marker stem `mempause_sh` | parity-table key, no cell |
 | `pauses`, `paused`, `paused_s`, the reason `paused` | record file, verdict keys, set-aside reason; no cell |
 
@@ -413,6 +421,13 @@ New arm: tools/run-gates/run-gates.test.sh · AC12's deleted meminfo, AC13's wal
   rewritten to that semantics with its trace); 40 (the forced-progress branch named as a second
   dispatch site and routed through `check_dispatch_pause 0`, S4, AC14); and 23 (AC12's `unread`
   and AC13's `wall` end reasons and the wall-stopped summary).
+- rev-3 · 2026-10-05 · S1 S3 S6 §4 · read against the runner as unit 5 left it (run-gates 1.25,
+  `arm_census` beside `arm_wall`, the census merged at `909c5e0b9`): the forced-progress branch is
+  named by its condition, since its line numbers moved; `--print-profile`'s `mempause` is the
+  numeric threshold and an empty override reads as unset; `read_mem_used` also sets
+  `MEMPAUSE_READ` so a decision forks nothing; the sweep decides INERT with one read of its own and
+  reads off with no runner beside it; an unread peak prints `?`; the inventory names the four
+  variables a caller sets for the block.
 
 ## 10. Reuse audit
 
