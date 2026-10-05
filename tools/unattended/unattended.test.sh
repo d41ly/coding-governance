@@ -12578,6 +12578,42 @@ miss "$out" "skipped: verdict"
 same "GH12 AC2 --beat over another session's live claim moves no ref" "$(git ls-remote "$ORIGIN" refs/gov/runs/tRun | cut -f1)" "$gc_sha"
 remove_claim_refs; reset_tree
 
+# ==================================================================================================
+# TOOL-aGraftedHelix-18 — THE HOLDER ROW DECIDES `mine` BEFORE ITS write_lease AND COPIES THE CLAIM'S
+# IDENTITY AFTER IT. AC1: a record and claim preflighted under s1, the holder's --resume under s2
+# moves the claim to s2, and a second call under s2 reads it `mine`, never check 90. AC2: a changed
+# pid alone moves `lease-utc`, the claim then carries the record's stamp byte for byte, and the next
+# call under that pid pushes nothing. The record's stamp is first set ten minutes back, so a
+# write_lease inside the preflight's own second still moves it. RED against a driver whose claim
+# write reads the lease facts before write_lease, and against one whose due test reads them there.
+# WHAT THIS DOES NOT DRIVE: a claim push that does not complete after write_lease (TOOL-aGraftedHelix-20).
+# ==================================================================================================
+# ---- AC1
+arm_claim_fixture
+CLAUDE_CODE_SESSION_ID=s1 run --preflight tRun --keepalive-id k1 >/dev/null
+git add -A >/dev/null && git commit -q -m go-s1 --no-verify
+same "GH18 AC1 the claim names s1 before the resume" "$(read_claim_field tRun session)" "s1"
+out=$(CLAUDE_CODE_SESSION_ID=s2 run --resume tRun --keepalive-id k1); rc=$?
+same "GH18 AC1 the holder's resume under s2 exits 0" "$rc" "0"
+hit  "$out" "unattended: lease recorded · keepalive k1 · session s1 -> s2"
+same "GH18 AC1 ...and the claim follows the record to s2" "$(read_claim_field tRun session)" "s2"
+out=$(CLAUDE_CODE_SESSION_ID=s2 run --resume tRun --keepalive-id k1); rc=$?
+same "GH18 AC1 the second call under s2 exits 0" "$rc" "0"
+miss "$out" "UNATTENDED check 90 FAILED"
+# ---- AC2
+build_claim_held
+sed -i "s/^lease-utc: .*/lease-utc: $(derive_claim_ago 600)/" memory/builds/tRun/RUN.md
+git add -A >/dev/null && git commit -q -m go-aged --no-verify
+out=$(CLAUDE_PID=4242 run --resume tRun --keepalive-id k1); rc=$?
+same "GH18 AC2 the holder's resume under a changed pid exits 0" "$rc" "0"
+hit  "$out" "· pid 999999999 -> 4242 ·"
+same "GH18 AC2 the claim's lease-utc is the record's byte for byte" "$(read_claim_field tRun lease-utc)" "$(sed -n 's/^lease-utc: //p' memory/builds/tRun/RUN.md)"
+go_sha=$(read_claim_ref tRun)
+out=$(CLAUDE_PID=4242 run --resume tRun --keepalive-id k1); rc=$?
+same "GH18 AC2 the next call under that pid exits 0" "$rc" "0"
+same "GH18 AC2 ...and pushes nothing" "$(read_claim_ref tRun)" "$go_sha"
+remove_claim_refs; reset_tree
+
 fi   # ---- region two continues below: one compound block past about 3000 commands segfaults
      # ---- bash 5.3 on Cygwin (exit 139), so the region is cut into blocks at top-level seams
 if in_shard 2; then
@@ -13040,7 +13076,11 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # region two, its three `mutate` calls included, MEASURED: that block run alone behind this prologue
 # and the claim block's gh_ helpers on node a, 2026-10-05, executed 61 against the prologue's own 20,
 # green against the kit and red under two staged driver copies, one per cell set; no suite ran.
-FLOOR_ASSERTIONS=2086
+# RAISED 2086 -> 2099 by TOOL-aGraftedHelix-18: the holder-order arm's 13 executed assertions in
+# region two, its two `mutate` calls included, MEASURED: that block run alone behind this prologue
+# and the claim block's gh_ helpers on node a, 2026-10-05, executed 33 against the prologue's own 20,
+# green against the kit and red under the parent's driver and one staged driver copy; no suite ran.
+FLOOR_ASSERTIONS=2099
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -13172,7 +13212,8 @@ FLOOR_SHARD_1=209
 # RAISED 1810 -> 1836: the same 26 region-two hooked claim assertions, see FLOOR_ASSERTIONS.
 # RAISED 1836 -> 1848: the same 12 region-two lease-identity assertions, see FLOOR_ASSERTIONS.
 # RAISED 1848 -> 1889: the same 41 region-two claim-cell assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_2=1889
+# RAISED 1889 -> 1902: the same 13 region-two holder-order assertions, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_2=1902
 # +58 for the fold of dDerivedDocket's closing diff review, round 1 (F2, F3, F4), all in region two - see FLOOR_ASSERTIONS.
 # +14 for TOOL-dDerivedDocket-16's AC15 arm at the VERIFYING pass, all in region two - see FLOOR_ASSERTIONS.
 # +5 for the --hold line-end refusal arms at the second origin/main reconcile, region two - see FLOOR_ASSERTIONS.

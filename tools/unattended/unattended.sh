@@ -48,7 +48,7 @@
 # The generated region holds NO copy: the unit list is DERIVED from the build README's already-derived,
 # already-byte-compared slice. One derivation in the tree; this file is not a second one.
 set -u
-KIT_UNATTENDED_VERSION=1.64   # gov:kit unattended@1.64 — kit identity; set HERE, never from .unattended.conf
+KIT_UNATTENDED_VERSION=1.65   # gov:kit unattended@1.65 — kit identity; set HERE, never from .unattended.conf
 
 # ------------------------------------------------------------------------------ the dereference pin
 # A sha is a NAME, and turning a name into bytes or into ancestry happens in the run's own object
@@ -6857,7 +6857,7 @@ check_holder_worktree() { # slug · run-state file -> 0 passes, 1 with its own r
 # run-state lease and keeps its build folder's clock against the same bound (§8 F13).
 verb_resume() { # slug
   local slug="$1" rel p cond age bound rhc rc ka _rs_at _rs_bt _rs_rc ok os op
-  local ls_utc ls_sid ls_pid ls_hat live me rb cur restart lu
+  local ls_utc ls_sid ls_pid ls_hat live me rb cur restart lu cw
   check_slug "$slug" || return 1
   rel=$(runmd_of "$slug")
   [ -f "$rel" ] || { fail 10 "no run-state file, so there is no run to resume: $rel"; return 1; }
@@ -7010,23 +7010,28 @@ verb_resume() { # slug
   # records the one lease record and stages it, `keepalive` unchanged. A tick's first act is this
   # row, so a write on every call would restage the record every ten minutes and move `lease-utc`.
   if [ -n "$KID" ] && [ "$KID" = "$ka" ]; then
-    # TOOL-aGraftedHelix-1 S7 - THE HOLDER READS ITS CLAIM on every call, so a lost one is found, and
-    # renews it when due, BEFORE the lease below is touched: the claim is judged against the lease as
-    # the record holds it. Another session's claim is check 90 and nothing is written; a read or a
-    # write that does not complete is announced and the holder goes on, as it does offline at base.
+    # TOOL-aGraftedHelix-1 S7 - THE HOLDER READS ITS CLAIM on every call, so a lost one is found.
+    # Another session's claim is check 90 and nothing is written; a read or a write that does not
+    # complete is announced and the holder goes on, as it does offline at base.
+    # TOOL-aGraftedHelix-18 - THE ORDER, as the `--replaces` block below states its own: the claim
+    # read, the `mine` test and check 90 read the record's lease facts as they stood BEFORE this row's
+    # `write_lease`; the claim write that follows copies the facts AFTER it, and its due test compares
+    # the claim with those after-facts. Copied before, a moved session leaves the claim naming the old
+    # one, and the holder's next call reads its own claim as foreign and refuses at check 90.
+    cw=""
     if [ "$RUN_CLAIMS" = on ] && read_claims soft; then
-      check_claim_writable "$slug" holder "$ka" "${ls_sid:-absent}" "$ka" "$rel"
-      case "$?" in
-        1) return 1 ;;
-        0) write_claim "$slug" live "$ka" holder "$rel" || [ "$?" = 2 ] || return 1 ;;
-      esac
+      check_claim_writable "$slug" holder "$ka" "${ls_sid:-absent}" "$ka" "$rel"; cw=$?
+      [ "$cw" != 1 ] || return 1
     fi
     if [ -z "$ls_utc" ] || [ "$ls_sid" != "${me:-absent}" ] || [ "$ls_pid" != "${CLAUDE_PID:-absent}" ]; then
       os=$ls_sid; op=$ls_pid
       write_lease "$rel" "$KID" || return 1
       stage_or_fail "$rel" || return 1
       echo "unattended: lease recorded · keepalive $KID · session ${os:-none} -> $(fact "$rel" session) · pid ${op:-none} -> $(fact "$rel" pid) · this resume passes the keepalive the record names, so it is the holder"
+      # The same claim row, `mine` still against the before-facts; only its due test reads the record anew.
+      if [ -n "$cw" ]; then check_claim_writable "$slug" holder "$ka" "${ls_sid:-absent}" "$ka" "$rel"; cw=$?; fi
     fi
+    if [ "$cw" = 0 ]; then write_claim "$slug" live "$ka" holder "$rel" || [ "$?" = 2 ] || return 1; fi
     # TOOL-dDerivedDocket-28 S3 - THE HOLDER'S OWN ORPHANS: i26's harness killed the driver mid-bar
     # while the session lived on, so the holder resuming under its own id is the one who finds them.
     # Every row that does NOT hold the lease only counts them, through the status block.

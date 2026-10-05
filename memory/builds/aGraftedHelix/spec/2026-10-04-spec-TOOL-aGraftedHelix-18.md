@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-18 — the holder row decides `mine` before its `write_lease` and copies the claim's identity after it
 
-**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-2 · base 5266d22e · streams tooling · order 3
+**Status:** CLOSED · rev-2 · 2026-10-04 · node a · Tier-2 · base 5266d22e · streams tooling · order 3
 
 <!-- gen:spec-records -->
 
