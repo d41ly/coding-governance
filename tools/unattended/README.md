@@ -173,8 +173,9 @@ still holds it and whose holder started before the lease, and treats the pid it 
 flight until the tree moves or the stale bound passes, after which it is killed as hung and the
 run is launched again. The kit never registers it — `schtasks /create` and
 `crontab` are the owner's acts, once per node, under the login whose CLI is authenticated — and
-until it is registered the tick is inert; the adopter's `--check` says which on an `INFO` line and
-reds on neither answer.
+until it is registered the tick is inert; `--preflight` and the adopter's `--check` both say which,
+through the library's one probe, `read_tick_registration`, with a `WARNING` line when it is not
+registered or cannot be asked, and neither refuses on any answer.
 
 Windows, from cmd or PowerShell (Git-Bash needs every `/` option doubled, `//create`, `//sc`, …):
 
@@ -193,6 +194,13 @@ POSIX, one crontab line (the trailing comment names it the way the Windows task 
 bound run and does nothing else — no kill, no launch, no attempt line, no login probe. The two knobs
 it reads, `RESUME_ATTEMPTS` and `RESUME_TURNS`, are the root `.unattended.conf`'s and are announced
 on stderr when absent.
+
+The tick launches its session from the PATH CLI, which may be older than the one that launched the
+run. So `--preflight` pins `cli-version` ONCE, read from `AI_AGENT` in its `claude-code_` shape
+(`absent` when it carries none), beside the lease and never inside it; every resume that proceeds
+compares the running session's version against it as integers and prints one line — the same, a
+`WARNING` when this CLI is older, a `NOTE` when it is newer, or `UNKNOWN` naming the missing side.
+It is a warning and never a refusal, and so is the tick line beside it.
 
 ## The sidecar
 

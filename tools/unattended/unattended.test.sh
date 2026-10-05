@@ -1279,6 +1279,49 @@ hit "$sout" "phase RUNNING"
 hit "$rout" "resume at phase RUNNING"
 hit "$sout" "next ARCH-tRun-1"
 
+# ---- TOOL-aMendedFleet-61: --preflight pins the LAUNCHING CLI from AI_AGENT, every resume that
+# ---- proceeds compares against it as INTEGERS, and the tick's registration is a loud preflight
+# ---- line through the library's one probe. Staged red by deleting the `print_cli_version_drift`
+# ---- call in `print_resume_orientation`. The stubs stand in for `schtasks` AND `crontab`, so the
+# ---- arm reads the same on either probe; each prints the task name only when it answers yes.
+reset_tree
+_cv() { sed -n 's/^cli-version: //p' memory/builds/tRun/RUN.md | tr -d '\r'; }
+mkdir -p "$ORIGIN_DIR/tick-yes" "$ORIGIN_DIR/tick-no" "$ORIGIN_DIR/tick-none"
+for _tk in schtasks crontab; do
+  printf '#!/bin/sh\necho gov-resume-tick\nexit 0\n' > "$ORIGIN_DIR/tick-yes/$_tk"
+  printf '#!/bin/sh\nexit 1\n' > "$ORIGIN_DIR/tick-no/$_tk"
+done
+printf '#!/bin/sh\nexec %s "$@"\n' "$(command -v uname)" > "$ORIGIN_DIR/tick-none/uname"
+chmod +x "$ORIGIN_DIR"/tick-*/*
+out=$(PATH="$ORIGIN_DIR/tick-no:$PATH" AI_AGENT=claude-code_2-1-286_harness run --preflight tRun --keepalive-id KA-1234); rc=$?
+hit "$out" "the launching CLI pinned as cli-version: 2.1.286"
+hit "$out" "WARNING — no scheduled task named gov-resume-tick exists on this node"
+same "an unregistered tick does not move preflight's exit" "$rc" "0"
+same "preflight pins the launching CLI, dotted" "$(_cv)" "2.1.286"
+out=$(AI_AGENT=claude-code_2-1-178_harness run --resume tRun --keepalive-id KA-1234); rc=$?
+hit "$out" "WARNING — this session's CLI 2.1.178 is OLDER than the 2.1.286 that launched this run"
+same "an older CLI does not move the resume's exit" "$rc" "0"
+same "a resume never rewrites the pinned CLI" "$(_cv)" "2.1.286"
+out=$(env -u AI_AGENT bash "$SCRIPT" --resume tRun --keepalive-id KA-1234 2>&1); _rc2=$?
+hit "$out" "CLI version UNKNOWN — this session's side is missing"
+same "an unknown CLI does not move the resume's exit" "$_rc2" "$rc"
+out=$(AI_AGENT=other-agent_2-1-286_harness run --resume tRun --keepalive-id KA-1234)
+hit "$out" "CLI version UNKNOWN — this session's side is missing"
+out=$(AI_AGENT=claude-code_2-1-286_harness run --resume tRun --keepalive-id KA-1234)
+hit "$out" "CLI version 2.1.286 — the same as the one that launched this run"
+miss "$out" "is OLDER than the"; miss "$out" "is newer than the"
+out=$(AI_AGENT=claude-code_2-1-290_harness run --resume tRun --keepalive-id KA-1234)
+hit "$out" "NOTE — this session's CLI 2.1.290 is newer than the 2.1.286 that launched this run"
+# The string-comparison trap: 2.1.99 sorts AFTER 2.1.286 as text and is the OLDER of the two.
+out=$(AI_AGENT=claude-code_2-1-99_harness run --resume tRun --keepalive-id KA-1234)
+hit "$out" "WARNING — this session's CLI 2.1.99 is OLDER than the 2.1.286 that launched this run"
+# The probe itself, three answers: registered, not registered, and could not ask.
+_tr() { (PATH="$1"; read_tick_registration; printf '%s %s' "$?" "$TR_WHY"); }
+same "a probe answering yes reads registered" "$(_tr "$ORIGIN_DIR/tick-yes:$PATH")" "0 "
+same "a probe answering no reads unregistered" "$(_tr "$ORIGIN_DIR/tick-no:$PATH")" "1 "
+hit "$(_tr "$ORIGIN_DIR/tick-none")" "is not on PATH"
+same "a missing probe command reads UNKNOWN, not no" "$(_tr "$ORIGIN_DIR/tick-none" | cut -c1)" "2"
+
 # ---- check 10, all three branches: no file for --status, no phase, no file for --close.
 reset_tree; readme tNoRun; fixture
 out=$(run --status tNoRun);  hit "$out" "no run-state file, so there is no run to report on"

@@ -9083,6 +9083,11 @@
       "file": "tools/check-spec-tokens.test.sh"
     },
     {
+      "id": "print_cli_version_drift",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "print_corpus",
       "kind": "function",
       "file": "tools/workflows/review_replay.py"
@@ -9593,6 +9598,11 @@
       "file": "tools/unattended/gate-guard.js"
     },
     {
+      "id": "read_advertised_head",
+      "kind": "function",
+      "file": "tools/unattended/lib-unattended.sh"
+    },
+    {
       "id": "read_advertised_tip",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -9826,6 +9836,11 @@
       "id": "read_cli_help",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "read_cli_version",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "read_closing_evidence",
@@ -10181,6 +10196,11 @@
       "id": "read_history_groups",
       "kind": "function",
       "file": "tools/drift-audit/drift_report.py"
+    },
+    {
+      "id": "read_history_range",
+      "kind": "function",
+      "file": "tools/unattended/lib-unattended.sh"
     },
     {
       "id": "read_hold_codes",
@@ -10966,6 +10986,11 @@
       "id": "read_text_or_none",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "read_tick_registration",
+      "kind": "function",
+      "file": "tools/unattended/lib-unattended.sh"
     },
     {
       "id": "read_timings",
@@ -15238,6 +15263,11 @@
       "file": "tools/codebase-map/reuse_lookup.py"
     },
     {
+      "id": "seed_brange_fixture",
+      "kind": "function",
+      "file": "tools/unattended/check-brief-recorded.test.sh"
+    },
+    {
       "id": "seed_c42",
       "kind": "function",
       "file": "tools/unattended/check-unattended.test.sh"
@@ -15276,6 +15306,11 @@
       "id": "seed_log",
       "kind": "function",
       "file": "tools/unattended/resume-tick.test.sh"
+    },
+    {
+      "id": "seed_range_fixture",
+      "kind": "function",
+      "file": "tools/unattended/check-pass-order.test.sh"
     },
     {
       "id": "seed_recall_kit",
@@ -17958,6 +17993,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "write_br_build",
+      "kind": "function",
+      "file": "tools/unattended/check-brief-recorded.test.sh"
+    },
+    {
       "id": "write_c42_conf",
       "kind": "function",
       "file": "tools/unattended/check-unattended.test.sh"
@@ -18226,6 +18266,11 @@
       "id": "write_published_conf",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "write_range_spec",
+      "kind": "function",
+      "file": "tools/unattended/check-pass-order.test.sh"
     },
     {
       "id": "write_readers_spec",

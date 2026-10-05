@@ -1,10 +1,12 @@
 # TOOL-aMendedFleet-61 — preflight pins the launching CLI version and every resume compares it, and a missing resume tick is announced loudly
 
-**Status:** SPECCED · rev-4 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 62
+**Status:** CLOSED · rev-5 · 2026-10-04 · node a · Tier-2 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 62
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-04-build-TOOL-aMendedFleet-61-1-acceptance-ledger.md](../build/2026-10-04-build-TOOL-aMendedFleet-61-1-acceptance-ledger.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
@@ -239,6 +241,7 @@ New arm: `tools/unattended/unattended.test.sh` · a fixture run preflighted unde
   and reads only a value opening `claude-code_`; S1 read any value's second field, so another
   agent's `AI_AGENT` would have pinned a version. S1 now requires the prefix, and AC3 observes it.
 - rev-4 · 2026-10-04 · §1 status header order 61 -> 62: unit 62 builds first so node d's patch applies byte-identically (M2 cross-read ordering).
+- rev-5 · 2026-10-05 · S6 · the probe has a third answer, could not ask, and the adopter now prints it as a `WARNING` naming `TR_WHY` rather than folding it into not-registered; the adopter sources the library at the point of use, after its own `resolve_kit_dir` has run. S7 · the README sentence sits in its resume-tick section, which is where it describes what `--preflight` does about the tick.
 
 ## 10. Reuse audit
 

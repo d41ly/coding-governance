@@ -5225,7 +5225,7 @@ run_hold() { # slug · code · until · reason · reaped · unreachable · pendi
 }
 
 verb_preflight() { # slug · keepalive-id
-  local slug="$1" kid="$2" rel base src payload tmp arch="" rotate=0 _pf_ka _pf_miss _pf_fix _pf_gbt=""
+  local slug="$1" kid="$2" rel base src payload tmp arch="" rotate=0 _pf_ka _pf_miss _pf_fix _pf_gbt="" _pf_cv _pf_tr
   # TOOL-dDerivedDocket-16 S6 - THE IDS TEST RUNS FIRST, before `check_slug` and before any anchor
   # work, because it needs no tree. `check_slug`'s own grammar ADMITS an id - letters, digits and
   # dashes, opening on a letter - so an id reached the folder lookup and was refused with a message
@@ -5490,6 +5490,25 @@ verb_preflight() { # slug · keepalive-id
   # the session, pid, host, image and lease-utc beside it are the lease's own and are taken afresh.
   _pf_ka=$(fact "$rel" keepalive); [ -n "$_pf_ka" ] || _pf_ka="$kid"
   write_lease "$rel" "$_pf_ka" || return 1
+  # TOOL-aMendedFleet-61 S2 - THE LAUNCHING CLI, PINNED ONCE like the base, and BESIDE the lease,
+  # never inside it: `check_lease_only_diff` admits a lease-only difference on a closed set of six
+  # fact lines, and a resume rewriting this would record the resuming CLI over the launching one.
+  if [ -n "$(fact "$rel" cli-version)" ]; then
+    _pf_cv="pinned by an earlier preflight"
+  else
+    _pf_cv="read from AI_AGENT"
+    set_fact "$rel" cli-version "$(read_cli_version || echo absent)" || return 1
+  fi
+  echo "unattended: preflight — the launching CLI pinned as cli-version: $(fact "$rel" cli-version) ($_pf_cv)"
+  # S5 - THE RESUME TICK, announced and never graded: preflight's exit does not move on any answer.
+  read_tick_registration; _pf_tr=$?
+  if [ "$_pf_tr" = 0 ]; then
+    echo "unattended: preflight — the resume tick is registered as gov-resume-tick"
+  elif [ "$_pf_tr" = 1 ]; then
+    echo "unattended: WARNING — no scheduled task named gov-resume-tick exists on this node, so a run that stalls here waits for a human to start a session; the kit README has the line that registers it"
+  else
+    echo "unattended: WARNING — whether gov-resume-tick is registered on this node is UNKNOWN: $TR_WHY"
+  fi
   # S4: which anchor authorized this run, and — when it was the second one — the observation it
   # rested on. EVIDENCE, exactly like anchor-ref/sha/url: written so a party off this machine can
   # re-derive the pin, and never read back as an input by this kit. `trusted_base` deliberately does
@@ -6461,10 +6480,58 @@ print_liveness() { # slug
   return 0
 }
 
+# THE RUNNING SESSION'S CLI VERSION (TOOL-aMendedFleet-61 S1), from `AI_AGENT`, which the Claude Code
+# CLI sets to `claude-code_<major>-<minor>-<patch>_<kind>` from its OWN version, overwriting an
+# inherited one. Not `claude --version`: that answers for the PATH binary, which on node a is older
+# than the session running this. Only the underscore shape is read; an unset variable, another
+# agent's value or anything not two to four dot-separated integers after the turn returns 1.
+read_cli_version() { # -> the version, dotted, on stdout · 1 and nothing when unreadable
+  local v="${AI_AGENT:-}"
+  case "$v" in claude-code_*) ;; *) return 1 ;; esac
+  v=${v#claude-code_}; v=${v%%_*}; v=${v//-/.}
+  [[ $v =~ ^[0-9]+(\.[0-9]+){1,3}$ ]] || return 1
+  printf '%s\n' "$v"
+}
+
+# S3 - THIS SESSION'S CLI AGAINST THE ONE THAT LAUNCHED THE RUN, pinned as `cli-version` by
+# --preflight. Compared field by field as INTEGERS: a string comparison orders 2.1.99 after 2.1.286.
+# Exactly one line on every path, returns 0 on every path, and writes nothing: a version difference
+# is a fact for the run to report, never a reason to stop it. The pinned value is validated before
+# any arithmetic sees it, because the record is a file a hand can edit.
+print_cli_version_drift() { # run-state file
+  local now pin i x y cmp=0 a b
+  now=$(read_cli_version) || now=""
+  pin=$(fact "$1" cli-version) || pin=""
+  [[ $pin =~ ^[0-9]+(\.[0-9]+){1,3}$ ]] || pin=""
+  if [ -z "$now" ] || [ -z "$pin" ]; then
+    if [ -z "$now" ] && [ -z "$pin" ]; then
+      echo "unattended: CLI version UNKNOWN — both sides are missing: AI_AGENT carries no Claude Code version, and the record pins no readable cli-version"
+    elif [ -z "$now" ]; then
+      echo "unattended: CLI version UNKNOWN — this session's side is missing: AI_AGENT carries no Claude Code version; the run was launched by $pin"
+    else
+      echo "unattended: CLI version UNKNOWN — the launching side is missing: the record pins no readable cli-version; this session runs $now"
+    fi
+    return 0
+  fi
+  IFS=. read -r -a a <<< "$now"; IFS=. read -r -a b <<< "$pin"
+  for i in 0 1 2 3; do
+    x=$((10#${a[i]:-0})); y=$((10#${b[i]:-0}))
+    if [ "$x" -lt "$y" ]; then cmp=-1; break; fi
+    if [ "$x" -gt "$y" ]; then cmp=1; break; fi
+  done
+  case "$cmp" in
+    0) echo "unattended: CLI version $now — the same as the one that launched this run" ;;
+    -1) echo "unattended: WARNING — this session's CLI $now is OLDER than the $pin that launched this run; a resume through an older CLI may lack what the run relied on" ;;
+    1) echo "unattended: NOTE — this session's CLI $now is newer than the $pin that launched this run" ;;
+  esac
+  return 0
+}
+
 # The orientation half of --resume, unchanged in substance and extracted because the take-over half
 # ends in it too. The method path is DERIVED from MEMORY_ROOT, never recorded as a run fact: the
 # authored region carries its facts and never restates a derivable one (protocol section 2).
 print_resume_orientation() { # run-state file · phase
+  print_cli_version_drift "$1"
   echo "unattended: resume at phase $2 — read $1, then continue the first non-terminal unit above"
   [ -f "$M/guides/BUILD-METHOD.md" ] && echo "unattended: re-read the build method at $M/guides/BUILD-METHOD.md"
   echo "unattended: the directives and their waivers — the table in the unattended Skill; your waivers are parked in this file"
