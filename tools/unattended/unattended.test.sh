@@ -1566,6 +1566,38 @@ hit "$out" "write the RECORD KEY, which is not always the item name: parked-surf
 # ---- likeliest and was unguessable: the join reads --cached, so a record on disk and never staged
 # ---- is invisible here and reads exactly like having written no review at all.
 
+# ---- TOOL-aMendedFleet-63: --abort renders the run record itself, after its own END line, where
+# ---- the runlog kit resolves in the tree being aborted, and says `not asked` where it does not;
+# ---- neither moves the exit. One unit is dispatched first. Staged red by deleting the
+# ---- post-dispatch `write_run_record` call: the present arm loses its indented renderer lines and
+# ---- the absent arm its `not asked` line.
+# The kit is reached through the resolver, REPO-RELATIVE, never a spelled sibling path, and laid
+# into the fixture at that same relative path, which is where the driver's file test looks.
+_rl_rel=$(resolve_kit_dir "$_rkd_py" runlog runlog.py "$HERE") || exit 2
+_rl_src="$(git -C "$HERE" rev-parse --show-toplevel)/$_rl_rel"
+for _rk in present absent; do
+  bcopen
+  # A READY spec, because bcopen's is THIN and `--dispatch` refuses a THIN unit (check 49).
+  printf '# ARCH-tRun-1 — the unit\n\n**Status:** SPECCED · rev-1 · 2026-08-20 · node a · Tier-1 · base 0123abcd\n\n## 2. Scope (IN)\n\n- s\n\n## 6. Acceptance criteria\n\n- AC1 observable.\n\n## 7. Gates\n\n- g\n' > memory/builds/tRun/spec/one.md
+  fixture
+  hit "$(run --dispatch tRun --pass ARCH-tRun-1 --writes src/rr.sh)" "dispatch declared"
+  if [ "$_rk" = present ]; then
+    mkdir -p "$_rl_rel" && cp "$_rl_src"/*.py "$_rl_src"/redaction.tsv "$_rl_rel"/
+  fi
+  out=$(run --abort tRun --code fork-unresolvable --reason "the run-record arm, kit $_rk"); rc=$?
+  hit "$out" "phase ABORTED"
+  same "the run-record render does not move the abort's exit, kit $_rk" "$rc" "0"
+  if [ "$_rk" = present ]; then
+    hit "$out" "    runlog: record written memory/builds/tRun/build/"
+    hit "$(git diff --cached --name-only)" "memory/builds/tRun/build/"
+    # This fixture holds no memory-tree generator, so the index half is the named miss.
+    hit "$out" "unattended: run record staged, but no memory-tree generator resolves here"
+    miss "$out" "run record not asked"
+  else
+    hit "$out" "unattended: run record not asked — no runlog kit holding runlog.py resolves beside this kit"
+  fi
+  rm -rf "$_rl_rel"
+done
 
 bcrestore   # HOISTED: restore main to the shared BASE for the arms below.
 

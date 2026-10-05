@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-63 — `--close` and `--abort` render the run record themselves, after their own END line
 
-**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 63
+**Status:** CLOSED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 63
 
 <!-- gen:spec-records -->
 

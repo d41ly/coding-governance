@@ -1103,22 +1103,21 @@ everything the index rewrote, and let them ride the commit named below. A run th
 spec-defined unit gets the command's own no-record line and no file. That line is the answer, not a
 failure.
 
-**Three placements under `primary`, and each rides a commit the run already makes**, so under
-`primary` no path gains a commit it did not have. Each is the commit that carries the run-state file
-the verb just staged:
+**Three placements, and the first two are the verbs' own.** Each rides the commit that carries the
+run-state file the verb just staged:
 
-1. **After `--abort`**, in the ABORTED record commit. Render, re-index and stage before you commit it.
-2. **Under `primary`, after `--close` and before the merge, on every run that lands**, in the close's
-   records commit: the one `--close` tells you to make before you land. The record then travels
-   with the merge, and the bar at the push boundary grades it.
-3. **Under `primary`, after `--landed`**, in the LANDED record commit. Render AGAIN: `record --write`
-   finds the run's existing file by its run key, so it rewrites the SAME file rather than adding a
-   second one. The landing push joins this run by what it pushed, so the re-render adds that push
-   and the landing bar's verdict.
+1. **After `--abort`**, in the ABORTED record commit. The verb renders, re-indexes and stages the
+   record itself, after its own END line; its indented `runlog:` lines say what it wrote. Commit.
+2. **After `--close`, on every run that lands**, the same way. Under `primary` it rides the close's
+   records commit, the one `--close` tells you to make before you land, and travels with the merge.
+   Under `in-place` the verb commits it on top of the close record, and the landing carries it.
+3. **Under `primary`, after `--landed`**, in the LANDED record commit, and this one is YOURS. Render
+   AGAIN: `record --write` finds the run's existing file by its run key, so it rewrites the SAME
+   file rather than adding a second one. The landing push joins this run by what it pushed, so the
+   re-render adds that push and the landing bar's verdict.
 
-**Under `in-place`, render before the lander's `--prepare`**, and commit the record on the run branch
-in a records commit of its own. The in-place order commits nothing after the push and `--landed`
-writes no LANDED record there, so this is the one placement that travels with the landing.
+A verb's render that misses prints one `unattended: run record` line naming why and moves no exit;
+a `not asked` line means no runlog kit resolves and no record is owed.
 
 **Never between the lander's push and `--landed`.** Where the project declares a lander marker, a
 commit there moves HEAD off the commit the marker names, and `--landed` refuses it at check 34 — the
@@ -1289,8 +1288,8 @@ idle-wake (`keepalive-reaped`) and surface the parked decisions — since an abo
 exactly the same job and leaves exactly the same decisions unseen. An abort does not merge and does
 not push.
 
-**Render the run record before you commit the ABORTED record**: the first placement in
-[Record the run](#record-the-run), which binds where the runlog kit is installed.
+**The verb renders the run record itself** and stages it beside the ABORTED record, so commit them
+together: the first placement in [Record the run](#record-the-run).
 
 ## Reap
 

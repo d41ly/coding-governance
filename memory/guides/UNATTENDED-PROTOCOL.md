@@ -268,12 +268,12 @@ blocks `--close`, which leaves the override as the only exit: the spill exists s
 happens.
 
 **The run log is not this file, and nothing reads it back.** Every driver call but `--version` and
-`--plan` appends a START line and, from an EXIT trap, an END line to `runlog/driver.log` in the git
-COMMON dir: the driver's own exit code, `exit=clean` or `exit=unclean`, the refused checks and the
+`--plan` appends a START line and an END line to `runlog/driver.log` in the git
+COMMON dir: the driver's exit code, `exit=clean` or `exit=unclean`, the refused checks and the
 phase after the verb. It is machine-local EVIDENCE as facts 5-7 are: no verb or gate branches on
 it, and a failed append prints one stderr line. `GOV_RUNLOG=0` turns it off, and
-`RUNLOG_SESSION_VARS` (§8) names the session. The committed record of a run is rendered from it by
-the Skill, never by a verb.
+`RUNLOG_SESSION_VARS` (§8) names the session. `--close` and `--abort` render a run's committed
+record after their END; the Skill, after `--landed`.
 
 ## 3. The phase vocabulary
 

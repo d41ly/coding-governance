@@ -18338,6 +18338,11 @@
       "file": "tools/unattended/check-unattended.test.sh"
     },
     {
+      "id": "write_run_record",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "write_runlog_end",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"

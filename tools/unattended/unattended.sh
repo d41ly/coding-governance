@@ -10970,7 +10970,8 @@ write_runlog_start() { # the caller's first argument · its second -> the START 
   write_runlog_line "${f[@]}"
 }
 
-# Called by the EXIT trap and nothing else. EVERY read is defaulted: `set -u` holds inside a trap, and
+# Called by the EXIT trap, and once by the run-record writer below, which clears that trap at once so
+# no call writes two END lines. EVERY read is defaulted: `set -u` holds inside a trap, and
 # a trap that aborts on an unset name writes nothing for exactly the call it exists to record.
 write_runlog_end() { # the status the EXIT trap saw -> the END line, then the out-of-band stamp
   local rc="${1:-}" ex=unclean t d dur="" chk="" c u="" ub="" pt="" p1 p2 p3
@@ -11012,6 +11013,84 @@ write_runlog_end() { # the status the EXIT trap saw -> the END line, then the ou
       printf 'unattended: run log — cannot write the out-of-band stamp %s, so the next call cannot tell an outside edit from none; the verb, its output and its exit code are unaffected\n' "$RUNLOG_GITDIR/runlog-stamp-$RUNLOG_SLUG" >&2
     fi
   fi
+  return 0
+}
+
+# TOOL-aMendedFleet-63 - THE RUN RECORD, rendered by the two terminal verbs themselves. The Skill told
+# every run to render it at `--abort` and `--close` and most runs did not, so a run no other node could
+# read was the common case. Called ONCE, from the block after the verb dispatch, and only after a
+# `--close` or `--abort` that returned clean onto a LANDING or ABORTED record.
+#
+# THE END LINE FIRST (S2). The runlog model reads a START with no END as a `killed-verb` anomaly, so a
+# record rendered while this call's END is unwritten would report the very call that rendered it as
+# killed. The END is written here, the EXIT trap is cleared, and the final exit writes no second one.
+#
+# NOTHING HERE CHANGES AN EXIT (S6). Every miss is one line and a return 0: an absent kit (no record is
+# owed), a renderer or generator that refused, a dirty input, a refused stage or commit.
+#
+# THE INDEX follows `write_ask_views`'s two rules (S4): the record is staged FIRST, because the
+# generator lists its inputs with `git ls-files`; nothing renders over an unstaged input under the
+# memory root or `.memory-tree.conf`; and only paths the render newly dirtied are staged.
+write_run_record() { # slug -> 0 always; one line per miss
+  local slug=$1 py="" d="" gen="" rec="" p dirty="" rc
+  local -a stage=()
+  local -A pre=()
+  if [ "${RUNLOG_SWITCH:-}" != 0 ]; then
+    RUNLOG_CLEAN=1; write_runlog_end 0; builtin trap - EXIT
+  fi
+  if ! py=$(resolve_python 2>/dev/null) || [ -z "$py" ] \
+     || ! d=$(resolve_kit_dir "$py" runlog runlog.py "$KIT_DIR" 2>/dev/null) || [ ! -f "$d/runlog.py" ]; then
+    # The resolver answers REPO-RELATIVE to the kit's own repository, so the file test is what holds
+    # a driver run from another tree to the kit in the tree being closed, as the generator's is.
+    echo "unattended: run record not asked — no runlog kit holding runlog.py resolves beside this kit, so there is nothing to render from and no record is owed"
+    return 0
+  fi
+  run_bounded "$py" -B "$d/runlog.py" record "$slug" --write; rc=$?
+  [ -z "$RB_OUT" ] || printf '%s\n' "$RB_OUT" | sed 's/^/    /'
+  if [ "$rc" != 0 ]; then
+    echo "unattended: run record not written — the renderer exited $rc after ${RB_TOOK}s; this verb's exit is unchanged"
+    return 0
+  fi
+  rec=$(printf '%s\n' "$RB_STDOUT" | sed -n 's/^runlog: record written \(.*\) ([0-9]* bytes.*/\1/p' | head -1)
+  [ -n "$rec" ] || return 0   # the renderer's own no-record line, printed above, is the answer
+  GIT add -- "$rec" >/dev/null 2>&1 \
+    || { echo "unattended: run record written but git could not stage it, so no index was rendered: $rec"; return 0; }
+  if ! gen=$(resolve_index_generator) || [ ! -f "$gen" ]; then
+    echo "unattended: run record staged, but no memory-tree generator resolves here, so the index was not re-rendered — repair: $(derive_index_repair)"
+    return 0
+  fi
+  # The inputs: tracked paths under the memory root, the conf tracked or not, and the generator's
+  # own modules (a generator at the root names its top-level modules only), as write_ask_views reads them.
+  d=$(dirname -- "$gen"); [ "$d" != . ] || d=':(glob)*.py'
+  while IFS= read -r p; do dirty="$dirty${dirty:+ }$p"; done \
+    < <(GIT diff --no-renames --name-only -- "$M" .memory-tree.conf "$d" 2>/dev/null)
+  [ -z "$(GIT ls-files --others --exclude-standard -- .memory-tree.conf 2>/dev/null)" ] || dirty="$dirty${dirty:+ }.memory-tree.conf"
+  if [ -n "$dirty" ]; then
+    echo "unattended: run record staged, but the index was not re-rendered: its inputs carry changes the index does not hold: $dirty — repair: stage or discard them, then run $(derive_index_repair)"
+    return 0
+  fi
+  while IFS= read -r p; do pre[$p]=1; done < <(scan_dirty_paths)
+  run_bounded "$py" -B "$gen" --write; rc=$?
+  while IFS= read -r p; do [ -n "${pre[$p]+x}" ] || stage+=("$p"); done < <(scan_dirty_paths | sort -u)
+  if [ "$rc" != 0 ]; then
+    echo "unattended: run record staged, but the index generator exited $rc after ${RB_TOOK}s — repair: $(derive_index_repair)"
+    [ -z "${RB_OUT:-}" ] || printf '%s\n' "$RB_OUT" | sed 's/^/    /'
+  fi
+  if [ "${#stage[@]}" != 0 ] && ! GIT add -A -- "${stage[@]}" >/dev/null 2>&1; then
+    echo "unattended: run record staged, but git could not stage what the index render moved: ${stage[*]}"
+    return 0
+  fi
+  # S5 - THE COMMIT, only where the close already commits: `in-place`, after `--close`.
+  if [ "$VERB" = --close ] && [ "$LANDER_MODE" = in-place ]; then
+    if run_bounded git -c "$GIT_PIN_REPLACE" -c "$GIT_PIN_GRAFTADV" commit -q -m "records($slug): the run record"; then
+      echo "unattended: run record committed at $(GIT rev-parse --short HEAD 2>/dev/null) on top of the close record"
+    else
+      echo "unattended: run record staged, but its commit failed — the commit's own output follows"
+      [ -z "$RB_OUT" ] || printf '%s\n' "$RB_OUT" | sed 's/^/    /'
+    fi
+    return 0
+  fi
+  echo "unattended: run record staged, with the ${#stage[@]} path(s) its index render moved: $rec — commit them with the run-state file"
   return 0
 }
 
@@ -11217,5 +11296,12 @@ case "$VERB" in
   --record-set)   verb_record_set "$SLUG" "$RP_LEG" "$VERDICT" ;;
   --rescope)   verb_rescope "$SLUG" "$RS_ACT" "$PK_ITEM" "$RS_SUCC" "$REASON" ;;
   --dispatch)  verb_dispatch "$SLUG" "$PK_ITEM" "${DP_WRITES[@]}" ;;
+esac
+# TOOL-aMendedFleet-63 - the two terminal verbs render the run record, after their own END line.
+case "$VERB" in
+  --close|--abort)
+    if [ "$status" = 0 ]; then
+      case "$(fact "$(runmd_of "$SLUG")" phase 2>/dev/null)" in LANDING|ABORTED) write_run_record "$SLUG" ;; esac
+    fi ;;
 esac
 RUNLOG_CLEAN=1; exit "$status"

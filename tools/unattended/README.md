@@ -225,6 +225,10 @@ contend on the bar's turnstile. Where the project declares a profile, the queue 
 in the bar's backstop and the second run waits it out; where it does not, the wait is charged
 against `GATE_BOUND`, so the second can fail `gates-green` for contention.
 
+After a clean `--close` or `--abort`, the driver writes that call's END line itself and then renders
+the run record through the runlog kit, re-renders the index and stages both (`TOOL-aMendedFleet-63`);
+under `in-place` the close commits them. A miss is one line, and no exit moves.
+
 ## The bar's bound — wall, queue and margin
 
 `TOOL-dDerivedDocket-27`, under owner ruling D12-i7. The unattended bar has ONE declared number,

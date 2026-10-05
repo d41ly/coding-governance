@@ -239,7 +239,7 @@ ids TOOL-aMendedFleet-96 TOOL-aMendedFleet-97 TOOL-aMendedFleet-98 TOOL-aMendedF
 | [TOOL-aMendedFleet-60 — a cross-run overlap probe over unmerged remote refs runs at preflight](spec/2026-10-04-spec-TOOL-aMendedFleet-60.md) | 60 | 2 | CLOSED | rev-2 | 2026-10-04 |
 | [TOOL-aMendedFleet-62 — the two history legs grade the run's own range, reusing node d's bytes](spec/2026-10-04-spec-TOOL-aMendedFleet-62.md) | 61 | 2 | CLOSED | rev-4 | 2026-10-04 |
 | [TOOL-aMendedFleet-61 — preflight pins the launching CLI version and every resume compares it, and a missing resume tick is announced loudly](spec/2026-10-04-spec-TOOL-aMendedFleet-61.md) | 62 | 2 | CLOSED | rev-5 | 2026-10-04 |
-| [TOOL-aMendedFleet-63 — `--close` and `--abort` render the run record themselves, after their own END line](spec/2026-10-04-spec-TOOL-aMendedFleet-63.md) | 63 | 1 | SPECCED | rev-2 | 2026-10-04 |
+| [TOOL-aMendedFleet-63 — `--close` and `--abort` render the run record themselves, after their own END line](spec/2026-10-04-spec-TOOL-aMendedFleet-63.md) | 63 | 1 | CLOSED | rev-2 | 2026-10-04 |
 | [TOOL-aMendedFleet-64 — `govkit selfcheck --fix` writes every kit-version carrier from its `version_from` constant](spec/2026-10-04-spec-TOOL-aMendedFleet-64.md) | 64 | 2 | SPECCED | rev-2 | 2026-10-04 |
 | [TOOL-aMendedFleet-65 — the lander mints kit versions, so a branch owes no bump](spec/2026-10-04-spec-TOOL-aMendedFleet-65.md) | 65 | 2 | SPECCED | rev-2 | 2026-10-04 |
 | [TOOL-aMendedFleet-66 — the unattended close sequence lists the open asks that target files the run touched](spec/2026-10-04-spec-TOOL-aMendedFleet-66.md) | 66 | 1 | SPECCED | rev-1 | 2026-10-04 |
