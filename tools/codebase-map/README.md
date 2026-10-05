@@ -54,8 +54,12 @@ project specifics live in exactly two files the adopting repo owns.
   Output is bounded by `--budget <bytes>` (default `DEFAULT_BUDGET` in the script, measured over
   the replay corpus): the header, candidates and sources stop before the first candidate that
   would pass it, the first candidate always shows, and a `cut <n> of <m> candidate(s)` line names
-  what was dropped. `--budget 0` shows them all; the partial-recall notice and the `Decision:`
-  line print at every budget.
+  what was dropped. `--budget 0` shows them all; the partial-recall notice, the install-site
+  totals and the `Decision:` line print at every budget. Each candidate line carries its fan-in
+  (files naming it, definers subtracted) and, where any exist, `installs <n>`: the install sites,
+  tracked files carrying a `# >>> <name>` canonical-copy marker, the source the marker names left
+  out. A symbol is a SEAM when fan-in plus installs reaches `SEAM_FANIN_THRESHOLD`, here and in
+  `gen_map.py --seed-affordances` alike; installs never move the ranking order.
 - `adopt-codebase-map.sh --scaffold` — the one-shot adopter.
 - `.codebase-map.conf.example` — per-repo conf (MAP_ROOT · GATE_FILE · MAP_DIFF_CMD).
 - `selftest.py` — the kit's own contract check (`python <kit>/selftest.py`).

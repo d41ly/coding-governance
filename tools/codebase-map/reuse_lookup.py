@@ -133,6 +133,10 @@ class Corpus:
     recall_dark: tuple[str, ...] = ()       # layers declared uncovered in .codebase-map.conf
     threshold: int = m.SEAM_FANIN_THRESHOLD_DEFAULT
     has_symbols: bool = False               # was symbols.json present (recall tier adopted)?
+    # TOOL-aMendedFleet-42: name -> files carrying an inlined canonical copy (source left out), and
+    # why the mapping is empty when it is. Read once per corpus, never per candidate.
+    installs: dict = field(default_factory=dict)
+    installs_reason: str = ""
 
 
 @dataclass
@@ -141,7 +145,8 @@ class Ranked:
     is_seed: bool                           # a token-stem / prose match to the query
     fanin: int
     reason: str                             # why it is on the list (for the agent)
-    is_seam: bool = False                   # a symbol whose fan-in >= the seam threshold
+    is_seam: bool = False                   # a symbol whose fan-in + installs >= the seam threshold
+    installs: int = 0                       # files carrying an inlined canonical copy of it
 
 
 @dataclass
@@ -247,6 +252,7 @@ def load_corpus(root: Path | None = None) -> Corpus:
             shared_seams[feature] = prose
 
     recall_dark = tuple(t for t in re.split(r"[,\s]+", conf.get("RECALL_DARK_LAYERS", "")) if t)
+    installs, installs_reason = m._scan_install_sites(root)
     return Corpus(
         candidates=candidates,
         shared_seams=shared_seams,
@@ -255,6 +261,8 @@ def load_corpus(root: Path | None = None) -> Corpus:
         recall_dark=recall_dark,
         threshold=m.seam_fanin_threshold(root),
         has_symbols=has_symbols,
+        installs=installs,
+        installs_reason=installs_reason,
     )
 
 
@@ -338,7 +346,7 @@ def assemble_shortlist(query: str, corpus: Corpus, ref_index: dict[str, set[str]
 
     ranked: list[Ranked] = []
     for name, reason in seeds.items():
-        ranked.append(_rank(pool, corpus.threshold, ref_index, name, True, reason))
+        ranked.append(_rank(pool, corpus, ref_index, name, True, reason))
 
     # RANK THE WHOLE NEIGHBOUR POOL, THEN CAP. The cap used to slice `sorted(neighbours.items())`,
     # which is ALPHABETICAL, so the twelve slots went to the twelve names that sort earliest and
@@ -352,7 +360,7 @@ def assemble_shortlist(query: str, corpus: Corpus, ref_index: dict[str, set[str]
     # Cost: `_rank` is one `fan_in` lookup per name, so this ranks the pool rather than a slice of
     # it. That is the price of the cap meaning anything, and it is paid once per probe.
     neighbour_ranked = [
-        _rank(pool, corpus.threshold, ref_index, name, False, reason)
+        _rank(pool, corpus, ref_index, name, False, reason)
         for name, reason in sorted(neighbours.items())
     ]
     neighbour_ranked.sort(key=_derive_shortlist_key)
@@ -363,24 +371,26 @@ def assemble_shortlist(query: str, corpus: Corpus, ref_index: dict[str, set[str]
                      scan or {})
 
 
-def seed_affordances(corpus: Corpus, ref_index: dict[str, set[str]], top: int) -> list[tuple[Candidate, int]]:
-    """S4b — the bounded big-bang worklist: the ``top`` highest-fan-in seams (fan-in >= the seam
-    threshold) that NO dossier yet declares as a `## Reuse affordance` seam, so the
+def seed_affordances(corpus: Corpus, ref_index: dict[str, set[str]],
+                     top: int) -> list[tuple[Candidate, int, int]]:
+    """S4b — the bounded big-bang worklist: the ``top`` highest-scoring seams (fan-in + installs >=
+    the seam threshold, `TOOL-aMendedFleet-42` S3, the lookup's own test) that NO dossier yet declares as a `## Reuse affordance` seam, so the
     reinvention-prone active surface converges first. A symbol already carrying an affordance seam
     line has BOTH 'symbol' and 'affordance-seam' in its merged sources and is DONE (excluded);
     a symbol below the threshold is not a seam and is not worklist-worthy. Pure + deterministic:
-    ranked by fan-in desc then id. Fan-in is on demand (never committed) — same math as the lookup
-    so 'a seam' means one thing everywhere."""
-    scored: list[tuple[Candidate, int]] = []
+    ranked by fan-in + installs desc then id; each row is ``(candidate, fan-in, installs)``. Fan-in
+    is on demand (never committed) — same math as the lookup so 'a seam' means one thing everywhere."""
+    scored: list[tuple[Candidate, int, int]] = []
     for cand in corpus.candidates.values():
         if "symbol" not in cand.sources or not cand.files:
             continue  # only indexable symbols can have a fan-in / def file to point at
         if "affordance-seam" in cand.sources:
             continue  # already declared — off the worklist
         fanin = m.fan_in(ref_index, cand.name, cand.files)
-        if fanin >= corpus.threshold:
-            scored.append((cand, fanin))
-    scored.sort(key=lambda cf: (-cf[1], cf[0].name))
+        installs = len(corpus.installs.get(cand.name, ()))
+        if fanin + installs >= corpus.threshold:
+            scored.append((cand, fanin, installs))
+    scored.sort(key=lambda cf: (-(cf[1] + cf[2]), cf[0].name))
     return scored[:top]
 
 
@@ -407,12 +417,15 @@ def _derive_shortlist_key(r: Ranked) -> tuple:
     return (not r.is_seed, -r.fanin, r.candidate.name)
 
 
-def _rank(pool: dict[str, Candidate], threshold: int, ref_index: dict[str, set[str]],
+def _rank(pool: dict[str, Candidate], corpus: Corpus, ref_index: dict[str, set[str]],
           name: str, is_seed: bool, reason: str) -> Ranked:
     cand = pool[name]
     fanin = m.fan_in(ref_index, cand.name, cand.files) if cand.files else 0
-    is_seam = bool(cand.kind) and fanin >= threshold
-    return Ranked(cand, is_seed, fanin, reason, is_seam)
+    # TOOL-aMendedFleet-42 S2: installs make a SEAM and are printed, but never enter the ORDER —
+    # `_derive_shortlist_key` stays on fan-in, which is what the replay floor grades (spec F2).
+    installs = len(corpus.installs.get(cand.name, ()))
+    is_seam = bool(cand.kind) and fanin + installs >= corpus.threshold
+    return Ranked(cand, is_seed, fanin, reason, is_seam, installs)
 
 
 def _counts(corpus: Corpus) -> dict[str, int]:
@@ -422,6 +435,8 @@ def _counts(corpus: Corpus) -> dict[str, int]:
             if s in c:
                 c[s] += 1
     c["shared-seams"] = len(corpus.shared_seams)
+    c["install-files"] = len(set().union(*corpus.installs.values())) if corpus.installs else 0
+    c["install-names"] = len(corpus.installs)
     return c
 
 
@@ -439,14 +454,16 @@ def _render_header(shortlist: Shortlist) -> list[str]:
         f'# reuse-lookup: "{q}"',
         f"# corpus: {cc.get('symbol', 0)} symbols | {cc.get('inventory', 0)} inventory keys | "
         f"{cc.get('affordance-seam', 0)} affordance seams | {cc.get('shared-seams', 0)} dossiers",
-        f"# a seam = fan-in >= {shortlist.threshold} (SEAM_FANIN_THRESHOLD)",
+        f"# a seam = fan-in + installs >= {shortlist.threshold} (SEAM_FANIN_THRESHOLD)",
         # What the neighbour ranking does NOT mean. Twelve high-fan-in names read as twelve SEAMS
         # to everybody who did not write the ranker, and the fan-in behind them counts bare
         # identifier tokens with no symbol resolution (TOOL-aScouredKit-16) -- so a common short
         # name scores high for reasons that have nothing to do with reuse. The line discloses the
         # signal's limit rather than repairing it, which is a different unit.
+        # TOOL-aMendedFleet-42 dropped the second line's restatement ("never 'this is the seam you
+        # want'") to pay for `+ installs` above: the replay floor's budget arm had zero slack.
         "# neighbours are ranked by fan-in, which counts NAME TOKENS and resolves no symbols:",
-        "# a high rank means 'this name appears a lot', never 'this is the seam you want'",
+        "# a high rank means 'this name appears a lot'",
         # S6 — WHAT THE SCAN COULD NOT SEE, on every call. A fail-open reference scan that reports
         # nothing makes a ranking over half a corpus look exactly like a ranking over all of it,
         # which is the liveness failure `AGENTS.md` §7 names. Three facts, always printed: how many
@@ -526,6 +543,18 @@ def render(shortlist: Shortlist, corpus: Corpus, budget: int = 0) -> str:
         if n_cut:
             out.append(f"cut {n_cut} of {len(shortlist.ranked)} candidate(s) past the {budget}-byte "
                        "budget - rerun with --budget 0 to see them all")
+
+    # TOOL-aMendedFleet-42 S4: the install scan's own totals on every run, and its reason when it
+    # found nothing, so an empty count is never silent. In the FOOTER, beside the partial-recall
+    # notice, because the header is charged against the byte budget and the replay floor's
+    # hit@budget arm had zero slack: a header line there pushed a recorded hit past the cut.
+    cc = shortlist.corpus_counts
+    out.append("")
+    if cc.get("install-files"):
+        out.append(f"# install sites: {cc['install-files']} canonical-copy marker file(s) over "
+                   f"{cc.get('install-names', 0)} name(s) - an install is an inlined copy, not a use")
+    else:
+        out.append(f"# install sites: none found ({corpus.installs_reason or 'no scan ran'})")
 
     # DERIVED, like the banner line above and for the same reason: a conf naming a layer that is
     # not there would print a partial-recall warning about a population the walk never saw, and a
@@ -664,6 +693,8 @@ def _line(r: Ranked, corpus: "Corpus | None" = None) -> str:
         bits.append(", ".join(c.files))
     if c.files:
         bits.append(f"fan-in {r.fanin}")
+    if r.installs:
+        bits.append(f"installs {r.installs}")
     if r.is_seam:
         bits.append("SEAM")
     if c.detail and not c.kind:

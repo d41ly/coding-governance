@@ -1,6 +1,6 @@
 # TOOL-aMendedFleet-42 — the reuse probe counts canonical-copy install sites beside fan-in
 
-**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 42
+**Status:** CLOSED · rev-3 · 2026-10-04 · node a · Tier-1 · base 7af5f564 · streams tooling · ratified 2026-10-04 · order 42
 
 <!-- gen:spec-records -->
 
@@ -19,7 +19,7 @@ in the affordance worklist alike, so a seam means one thing in both.
 
 ## 2. Scope (IN)
 
-- **S1** — `tools/codebase-map/map_lib.py` gains `scan_install_sites(root)`, which runs one `git grep`
+- **S1** — `tools/codebase-map/map_lib.py` gains `_scan_install_sites(root)`, which runs one `git grep`
   over the tracked tree for lines opening a canonical-copy block, `#` or `//` then `>>>` then a name,
   and returns each name mapped to the set of files carrying it. The file whose basename the marker
   itself names after `canonical copy:` is the source, not an install, and is left out. The call names
@@ -33,10 +33,12 @@ in the affordance worklist alike, so a seam means one thing in both.
 - **S3** — `seed_affordances` scores a candidate by fan-in plus installs with the same threshold, and
   `tools/codebase-map/gen_map.py --seed-affordances` prints the installs beside the fan-in it already
   prints. Observed by AC4.
-- **S4** — The lookup header gains one line: `# install sites: <files> canonical-copy marker file(s)
-  over <names> name(s)`, or `# install sites: none found` with the reason when the scan returned no
-  mapping, so an empty count is never silent. The header's disclaimer adds that an install count is a
-  count of inlined copies. Observed by AC1 and AC3.
+- **S4** — The lookup output gains one FOOTER line, printed at every budget beside the
+  partial-recall notice: `# install sites: <files> canonical-copy marker file(s) over <names>
+  name(s)`, followed by the disclaimer that an install is an inlined copy, not a use; or
+  `# install sites: none found` with the reason when the scan returned no mapping, so an empty count
+  is never silent. The header's seam line reads `fan-in + installs`, paid for by dropping the
+  restatement `never 'this is the seam you want'` from the line after it. Observed by AC1 and AC3.
 - **S5** — The `reuse_lookup.py` row of `tools/codebase-map/README.md` and the `codebase-map`
   dossier's text on fan-in name install sites. Observed by AC5.
 
@@ -83,7 +85,7 @@ Read at base `7af5f564` and re-run at `fee9f62ba`, byte-equal for every file bel
 
 | Name | Kind | Cell |
 |---|---|---|
-| `scan_install_sites` | function in `map_lib.py` | `py.function`; `--suggest` answered OK |
+| `_scan_install_sites` | function in `map_lib.py`, module-private | `py.function`; `--suggest` answered OK |
 | `installs` | field of `Ranked` and of `Corpus` | none |
 
 ### Files touched (estimate)
@@ -121,12 +123,12 @@ Read at base `7af5f564` and re-run at `fee9f62ba`, byte-equal for every file bel
 ## 6. Acceptance criteria
 
 - **AC1** — When `python tools/codebase-map/reuse_lookup.py "find a sibling kit directory through the
-  install receipt" --budget 0` runs after the unit's commit, the `resolve_kit_dir` line carries `fan-in 3`,
-  `installs <n>` and `SEAM`, where n is one less than the count of files
-  `git grep -l -E "^[[:space:]]*# >>> resolve_kit_dir"` prints; and the header carries an
+  install receipt" --budget 0` runs after the unit's commit, the `resolve_kit_dir` line carries its
+  fan-in, `installs <n>` and `SEAM`, where n is one less than the count of files
+  `git grep -l -E "^[[:space:]]*# >>> resolve_kit_dir"` prints; and the output carries an
   `install sites:` line with non-zero totals.
-  Red when: the canonical source is counted, a shell carrier is missed, or the header line is absent.
-  figure: DERIVED from the grep at observation; 65 at writing.
+  Red when: the canonical source is counted, a shell carrier is missed, or the install line is absent.
+  figure: DERIVED from the grep at observation; 65 at writing; fan-in 3 at writing.
 - **AC2** — When `python tools/codebase-map/replay-phrases.py --floor` runs after the unit's commit,
   it exits 0.
   Red when: the install bit moved the order, or pushed a hit past the byte budget.
@@ -175,6 +177,15 @@ New arm: tools/codebase-map/selftest.py · a fixture tree with two carriers of o
   "units the run adds" while `TOOL-aMendedFleet-87` and `TOOL-aMendedFleet-88` exist in this build,
   so the Non-goal, Edges and F1 name them; and AC1 read one candidate line at the default byte budget
   `TOOL-aMendedFleet-36` lands first, which can cut it, so AC1, and AC3 through it, pass `--budget 0`.
+- rev-3 · 2026-10-05 · S1 Inventory · the build pass: `--dispatch` check 49 refuses a pass declaring
+  `gen_map.py` together with `memory/map/generated`, its generated index, and S3 edits `gen_map.py`. A
+  public definition in `map_lib.py` moves `symbols.json`, so the scanner is module-private,
+  `_scan_install_sites`, which the extractor skips; the map artifacts do not move in this pass.
+  S4 AC1: the first build put the install line in the HEADER and AC2 went red, hit@budget 0.831
+  under its 0.833 floor: one recorded phrase hit at rank 160 with zero slack, and the header is
+  charged against the budget. The line moves to the uncharged footer and the seam line's `+
+  installs` is paid for by the dropped restatement; AC2 then reads 0.833. AC1 no longer pins
+  `fan-in 3`: the shell copies are definers on the tree now, so the build read fan-in 8.
 
 ## 10. Reuse audit
 

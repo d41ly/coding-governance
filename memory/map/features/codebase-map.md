@@ -122,7 +122,16 @@ repo-wide python-launcher seam rather than anything this feature owns.
   So the change is correct at source and its effect on the ranks a reader actually looks at is
   nil on this corpus. The instrument is `replay-phrases.py`, which is `project-owned` and on no leg.
 - **The printed header discloses what the ranking does not mean.** Fan-in counts name tokens and
-  resolves no symbols, so a high rank means "this name appears a lot", never "this is your seam".
+  resolves no symbols, so a high rank means "this name appears a lot", not "this is your seam"; the
+  header line says the first half only, its restatement spent on `+ installs` in the seam line.
+- **Fan-in is not the only count: install sites sit beside it.** `fan_in` subtracts every definer,
+  and an inlined copy of a helper defines it, so the most-installed helper read as barely used.
+  `_scan_install_sites` counts each tracked file carrying a `# >>> <name>` canonical-copy marker,
+  the source the marker names left out, and a candidate is a seam when fan-in plus installs reaches
+  the threshold, in the lookup and the affordance worklist alike. Installs are printed and make a
+  seam; they never enter the ordering key, which the replay floor grades. The install-site totals
+  print in the FOOTER: the header is charged against the byte budget, and a header line there
+  pushed a recorded hit past the cut at the floor's zero slack.
 - **The same-kind arm is DIRECTORY-SCOPED, and the axis is the defining file's own directory.** Kind
   alone admitted 619 of 648 kinded candidates — 95% — so no cap over it selected by anything.
   Scoped to the seed's directory the same pool falls to 134 / 133 / 101 / 81 across the four

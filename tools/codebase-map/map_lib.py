@@ -853,6 +853,50 @@ def derive_present_layers(root: Path, skip_dirs: frozenset[str] = _SKIP_DIRS) ->
     return out
 
 
+#: A canonical-copy block's OPENING line: `#` or `//`, then `>>>`, then the block name. The grammar
+#: `tools/lib/resolve-python.test.sh` extracts blocks by; only the opening line is read here.
+_INSTALL_MARKER_RE = re.compile(r"^\s*(?:#|//) >>> ([A-Za-z_][A-Za-z0-9_]*)(.*)$")
+_CANONICAL_SOURCE_RE = re.compile(r"canonical copy:\s*(\S+)")
+
+
+def _scan_install_sites(root: Path) -> tuple[dict[str, set[str]], str]:
+    """`({name: {files carrying an inlined copy}}, reason)` over the TRACKED tree.
+
+    `TOOL-aMendedFleet-42` S1. `fan_in` subtracts every DEFINER, and an inlined copy defines the
+    helper, so the more widely a helper is installed the less used it looked. A copy is an INSTALL
+    SITE: a file with a `# >>> <name>` opening marker. The file whose basename the marker names after
+    `canonical copy:` is the SOURCE, not an install, and is left out. Shell copies sit in heredocs and
+    are no symbol definition in any layer, so only this marker scan sees them.
+
+    One `git grep`. No git, or git failing, returns `({}, <why>)`; a scan that ran and matched
+    nothing returns `({}, <why>)` too, so an empty count always carries its reason.
+    """
+    try:
+        res = subprocess.run(
+            ["git", "-C", str(root), "grep", "-I", "--null", "-E", "-e",
+             r"^[[:space:]]*(#|//) >>> [A-Za-z_]"],
+            capture_output=True, text=True, encoding="utf-8", errors="replace")
+    except (FileNotFoundError, OSError) as exc:
+        return {}, f"git not runnable ({exc.__class__.__name__})"
+    if res.returncode == 1 and not res.stdout:
+        return {}, "no canonical-copy marker in the tracked tree"
+    if res.returncode != 0:
+        return {}, f"git grep exited {res.returncode}"
+    out: dict[str, set[str]] = {}
+    for line in res.stdout.splitlines():
+        path, _, text = line.partition("\0")
+        hit = _INSTALL_MARKER_RE.match(text)
+        if not hit:
+            continue
+        src = _CANONICAL_SOURCE_RE.search(hit.group(2))
+        if src and Path(path).name == Path(src.group(1)).name:
+            continue  # the canonical source names itself: not an install
+        out.setdefault(hit.group(1), set()).add(path)
+    if not out:
+        return {}, "no canonical-copy marker in the tracked tree"
+    return out, ""
+
+
 def build_reference_index(
     files: list[str], *, root: Path | None = None, skip_dirs: frozenset[str] = _SKIP_DIRS,
     stats: dict | None = None,

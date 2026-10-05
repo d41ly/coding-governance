@@ -346,3 +346,5 @@ base: 7af5f564641d231f8b78f6b183dde1b6bf53111d
 2026-10-05T07:58:51Z dispatch · item ef0995af TOOL-aMendedFleet-41 · reason tools/codebase-map/replay-phrases.py memory/map/features/codebase-map.md memory/builds/aMendedFleet/spec/2026-10-04-spec-TOOL-aMendedFleet-41.md memory/map/generated/symbols.json memory/map/generated/MAP.md memory/map/generated/inventories.json memory/LIVE.md memory/ledger/2026-10.md memory/builds/aMendedFleet/README.md
 
 2026-10-05T08:01:42Z brief · item TOOL-aMendedFleet-42 · reason 4c433d32841d memory/builds/aMendedFleet/prompts/2026-10-04-prompt-TOOL-aMendedFleet-1-4-build-brief.md
+
+2026-10-05T08:09:30Z dispatch · item 8cc18a9a TOOL-aMendedFleet-42 · reason tools/codebase-map/map_lib.py tools/codebase-map/reuse_lookup.py tools/codebase-map/gen_map.py tools/codebase-map/selftest.py tools/codebase-map/README.md memory/map/features/codebase-map.md memory/builds/aMendedFleet/spec/2026-10-04-spec-TOOL-aMendedFleet-42.md memory/builds/aMendedFleet/README.md memory/LIVE.md memory/ledger/2026-10.md

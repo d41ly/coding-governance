@@ -189,13 +189,13 @@ def _seed_affordances(top: int) -> None:
         return
     ref_index = m.build_reference_index(corpus.symbol_files) if corpus.symbol_files else {}
     worklist = rl.seed_affordances(corpus, ref_index, top)
-    print(f"# seed-affordances: top {top} undeclared seams (fan-in >= {corpus.threshold})")
+    print(f"# seed-affordances: top {top} undeclared seams (fan-in + installs >= {corpus.threshold})")
     if not worklist:
         print("(none — every seam at/above the threshold already declares a ## Reuse affordance)")
         return
-    for cand, fanin in worklist:
+    for cand, fanin, installs in worklist:
         print(
-            f"- {cand.name}  [fan-in {fanin} | {cand.kind} | {', '.join(cand.files)}]  "
+            f"- {cand.name}  [fan-in {fanin} | installs {installs} | {cand.kind} | {', '.join(cand.files)}]  "
             f"-> add `seam: {cand.name} - reuse for <need>; extend via <point>` to its dossier"
         )
 

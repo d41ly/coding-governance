@@ -993,13 +993,52 @@ def test_seed_affordances(tmp: Path):
         worklist = rl.seed_affordances(corpus, ref, 10)
         # slugify EXCLUDED (already declares a seam) despite fan-in 5; Cache EXCLUDED (fan-in 1 < 3);
         # ranked by fan-in desc.
-        assert [c.name for c, _ in worklist] == ["titlecase", "truncate"], worklist
-        assert [fi for _, fi in worklist] == [4, 3]
-        assert all(c.name != "slugify" for c, _ in worklist)  # nothing already declared
+        assert [c.name for c, _, _ in worklist] == ["titlecase", "truncate"], worklist
+        assert [fi for _, fi, _ in worklist] == [4, 3]
+        assert all(c.name != "slugify" for c, _, _ in worklist)  # nothing already declared
         # --top cap: only the single highest-fan-in undeclared seam
-        assert [c.name for c, _ in rl.seed_affordances(corpus, ref, 1)] == ["titlecase"]
+        assert [c.name for c, _, _ in rl.seed_affordances(corpus, ref, 1)] == ["titlecase"]
+        # TOOL-aMendedFleet-42 S3: installs lift a below-threshold symbol onto the worklist, by the
+        # same fan-in + installs test the lookup applies.
+        corpus.installs = {"Cache": {"x/one.sh", "x/two.sh"}}
+        lifted = {c.name: (fi, n) for c, fi, n in rl.seed_affordances(corpus, ref, 10)}
+        assert lifted.get("Cache") == (1, 2), lifted
     finally:
         del os.environ["CODEBASE_MAP_ROOT"]
+
+
+def _test_install_sites(tmp: Path):
+    """TOOL-aMendedFleet-42 S1/S2: two carriers of one canonical-copy marker are two installs, and
+    the file the marker names as its canonical copy is the SOURCE and is left out. Staged red by
+    counting the source: the count is then three. A candidate at fan-in 1 with two installs is a
+    SEAM at threshold 3, and its line prints `installs 2`."""
+    import subprocess
+    marker = "# >>> helper -- canonical copy: helper.py in the lib dir (byte-identical; gated)\n"
+    (tmp / "lib").mkdir()
+    (tmp / "lib" / "helper.py").write_text(marker + "def helper():\n    pass\n", encoding="utf-8")
+    (tmp / "a.sh").write_text("cat <<'EOF'\n" + marker + "EOF\n", encoding="utf-8")
+    (tmp / "b.js").write_text("  // >>> helper -- canonical copy: helper.py\n", encoding="utf-8")
+    (tmp / "untracked.sh").write_text(marker, encoding="utf-8")
+    subprocess.run(["git", "-c", "init.defaultBranch=main", "init", "-q", str(tmp)],
+                   check=True, capture_output=True)
+    subprocess.run(["git", "-C", str(tmp), "add", "lib/helper.py", "a.sh", "b.js"],
+                   check=True, capture_output=True)
+    sites, why = m._scan_install_sites(tmp)
+    assert why == "", why
+    assert sites == {"helper": {"a.sh", "b.js"}}, sites  # source and untracked file left out
+
+    corpus = rl.Corpus(candidates={}, shared_seams={}, symbol_files=[], threshold=3,
+                       installs=sites)
+    pool = {"helper": rl.Candidate("helper", ("symbol",), "function", ("lib/helper.py",))}
+    r = rl._rank(pool, corpus, {"helper": {"lib/helper.py", "c.py"}}, "helper", True, "name stem")
+    assert (r.fanin, r.installs, r.is_seam) == (1, 2, True), r
+    assert "fan-in 1 | installs 2 | SEAM" in rl._line(r, corpus), rl._line(r, corpus)
+
+    # an empty scan carries its reason, never a silent zero
+    (tmp / "a.sh").write_text("nothing\n", encoding="utf-8")
+    (tmp / "b.js").write_text("nothing\n", encoding="utf-8")
+    sites, why = m._scan_install_sites(tmp)
+    assert sites == {} and why, (sites, why)
 
 
 def test_reuse_shared_primitives(tmp: Path):
@@ -1738,6 +1777,9 @@ def main() -> int:
     failures += check("affordance exemption drop on touch (S4a / AC1)", test_affordance_exemption_drop)
     with tempfile.TemporaryDirectory() as td:
         failures += check("seed-affordances worklist (S4b / AC5)", lambda: test_seed_affordances(Path(td)))
+    with tempfile.TemporaryDirectory() as td:
+        failures += check("install sites: copies counted, the canonical source left out",
+                          lambda: _test_install_sites(Path(td)))
     with tempfile.TemporaryDirectory() as td:
         failures += check(
             "reuse-lookup shared primitives (stems + fan-in + threshold)", lambda: test_reuse_shared_primitives(Path(td))
