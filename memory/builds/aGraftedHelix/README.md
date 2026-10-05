@@ -102,7 +102,7 @@ ids TOOL-aGraftedHelix-14 TOOL-aGraftedHelix-15 TOOL-aGraftedHelix-16 TOOL-aGraf
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-aGraftedHelix-1 — the driver claims a run on the remote as a compare-and-swap ref, and refuses a live foreign claim](spec/2026-10-04-spec-TOOL-aGraftedHelix-1.md) | 1 | 2 | CLOSED | rev-7 | 2026-10-05 |
-| [TOOL-aGraftedHelix-10 — a claim push names the remote, so the tracked pre-push hook observes its default branch and takes the non-default exit](spec/2026-10-04-spec-TOOL-aGraftedHelix-10.md) | 2 | 2 | SPECCED | rev-2 | 2026-10-04 |
+| [TOOL-aGraftedHelix-10 — a claim push names the remote, so the tracked pre-push hook observes its default branch and takes the non-default exit](spec/2026-10-04-spec-TOOL-aGraftedHelix-10.md) | 2 | 2 | SPECCED | rev-3 | 2026-10-05 |
 | [TOOL-aGraftedHelix-11 — a claim write copies its identity from the run's lease record, never from the writer's environment](spec/2026-10-04-spec-TOOL-aGraftedHelix-11.md) | 2 | 2 | SPECCED | rev-3 | 2026-10-04 |
 | [TOOL-aGraftedHelix-12 — every cell of the claim write table, and every write `--beat` declines, is observed](spec/2026-10-04-spec-TOOL-aGraftedHelix-12.md) | 2 | 1 | SPECCED | rev-2 | 2026-10-04 |
 | [TOOL-aGraftedHelix-2 — the orientation card lists the remote run claims under a two-clock rule](spec/2026-10-04-spec-TOOL-aGraftedHelix-2.md) | 2 | 1 | SPECCED | rev-2 | 2026-10-04 |

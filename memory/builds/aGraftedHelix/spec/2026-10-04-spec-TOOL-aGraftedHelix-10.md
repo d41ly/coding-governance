@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-10 — a claim push names the remote, so the tracked pre-push hook observes its default branch and takes the non-default exit
 
-**Status:** SPECCED · rev-2 · 2026-10-04 · node a · Tier-2 · base 5266d22e · streams tooling · order 2 · ratified 2026-10-04
+**Status:** SPECCED · rev-3 · 2026-10-05 · node a · Tier-2 · base 5266d22e · streams tooling · order 2 · ratified 2026-10-04
 
 <!-- gen:spec-records -->
 
@@ -23,10 +23,10 @@ the claim by the remote's NAME and observes the write through the tracked hook. 
 
 ## 2. Scope (IN)
 
-- **S1** — `resolve_claim_remote` prints two TAB-separated fields: the name of the clone's one
-  remote, which check 24 already admits, and that remote's push URL. `write_claim` pushes to the
-  NAME. `read_claims` keeps fetching from the URL, which check 25 already proves names the same
-  endpoint. Observed by AC1 and AC2.
+- **S1** — `resolve_claim_remote` already SETS two variables, as unit 1 built it: `CR_NAME`, the
+  name of the clone's one remote, which check 24 already admits, and `CR_URL`, that remote's push
+  URL. `write_claim` pushes to `CR_NAME`. `read_claims` keeps fetching from `CR_URL`, which check 25
+  already proves names the same endpoint. Observed by AC1 and AC2.
 - **S2** — The driver never supplies `GOV_DEFAULT_BRANCH` to a claim push. Where the remote's
   `HEAD` is not recorded locally and the variable is unset, the hook refuses with its
   `default-branch` token. That is a NOT COMPLETED write, so `--preflight` exits with check 91, never
@@ -40,9 +40,14 @@ the claim by the remote's NAME and observes the write through the tracked hook. 
   by the remote's name, the hook observes `<name>/HEAD`, the pushed ref is not the default branch,
   and the hook exits `skip-nondefault` unless the repository declares `GOV_BRANCH_GATE_CMD`. That
   is the restatement unit 1's §3 "The pre-push hook" lacks. Observed by AC6.
-- **S4** — `tools/unattended/unattended.test.sh` gains one claim block whose fixture sets
-  `core.hooksPath` to the clone's tracked `.githooks` and runs with `GOV_DEFAULT_BRANCH` unset. It
-  observes a create, a CAS update and the unset-`HEAD` refusal through the hook. NOT OBSERVED by a
+- **S4** — `tools/unattended/unattended.test.sh` gains one claim block that runs with
+  `GOV_DEFAULT_BRANCH` unset and `core.hooksPath` pointed at a directory OUTSIDE the work tree
+  holding a copy of this repository's tracked `.githooks/pre-push`, the shape `tools/push-main.test.sh`
+  already uses. The suite's fixture is a `git init` repository, not a clone, so it has no tracked
+  `.githooks` to point at, and a copy inside the tree would be cleaned by `reset_tree` or dirty the
+  tree `--preflight` refuses. It records `origin/HEAD` with `git remote set-head`, because
+  `git remote add` records none, and observes a create, a CAS update, the unset-`HEAD` refusal and a
+  stale refusal file through the hook. NOT OBSERVED by a
   criterion here: the suite is the main loop's to run at VERIFYING, and each arm's red on a staged
   break is observed there (§7).
 - **S5** — The unattended kit version moves once after this unit's last move, in every carrier
@@ -88,8 +93,8 @@ the claim by the remote's NAME and observes the write through the tracked hook. 
 - The skeptic of finding 38 reproduced both arms in a scratch clone wired to the tracked hooks. The
   URL push was refused with no `!` status line and exit 1. The same push to the remote name, with
   `origin/HEAD` set, landed as a new reference.
-- `observe_anchor` (`tools/unattended/unattended.sh:1562`) already holds the remote's name as
-  `rem`, and check 25 compares that name's fetch URL with its push URL.
+- `observe_anchor` (`tools/unattended/unattended.sh`) already reads the remote's name as `rem` from
+  `resolve_claim_remote`'s `CR_NAME`, and check 25 compares that name's fetch URL with its push URL.
 
 ### The invocation
 
@@ -123,9 +128,10 @@ hook, and a network failure is reported as NOT COMPLETED with git's exit and no 
 
 ### Inventory
 
-No new function, check, conf key or file. `resolve_claim_remote` changes its output from one field
-to two. The new test block's fixture builder is local to that block. S6 extends an existing gotcha
-record and mints none.
+No new function, check, conf key or file. `resolve_claim_remote` is unchanged: unit 1 built it to
+set `CR_NAME` beside `CR_URL`. The driver finds the refusal file in the git dir `resolve_runlog_dirs`
+resolves, the one the hook's own `git rev-parse --git-dir` names, with no `git` process. The new test
+block's fixture builder is local to that block. S6 extends an existing gotcha record and mints none.
 
 ### Files touched (estimate)
 
@@ -162,9 +168,13 @@ record and mints none.
 
 ## 6. Acceptance criteria
 
-The fixture is unit 1's: a `git clone --local` of this repository under `%TEMP%`, its one remote
-re-pointed at a bare repository beside it. Here it also runs `git config core.hooksPath .githooks`,
-and every command runs under `env -u GOV_DEFAULT_BRANCH`.
+The driver criteria, AC1, AC2, AC3 and AC5, run in the fixture unit 1's acceptance was observed in,
+the driver suite's: a `git init` repository whose one remote is a bare repository beside it, under `%TEMP%`,
+wired as S4 states, every command under `env -u GOV_DEFAULT_BRANCH`. They need a
+disposable slug `--preflight` accepts; that fixture builds one, and a clone of this repository holds
+only real builds. It carries no `gate-env.sh`, straggler guard or kit root, so §4's
+invocation is also measured once in a `git clone` of this repository with its tracked `.githooks`
+wired: by name with `origin/HEAD` recorded, by URL, and by name with it deleted.
 
 - **AC1** — When `bash tools/unattended/unattended.sh --preflight <slug> --keepalive-id k1` runs in
   the hook-wired fixture, it exits 0, `git ls-remote <bare> refs/gov/runs/<slug>` lists the claim,
@@ -233,6 +243,15 @@ slice, prologue plus that block, and the main loop runs the suite once at VERIFY
   arm); 29 (the driver composes `git remote set-head <name> -a`, AC3); 12 (S3's header comment is
   observed by AC6, not AC1); and 34 (S6 extends the fixture gotcha with this build's instance and
   anchors it on the driver's files, AC7).
+- rev-3 · 2026-10-05 · §2 §4 §6 · S1 S4 · the build pass's divergences, before the code: S1 said
+  `resolve_claim_remote` prints two TAB-separated fields, but unit 1 built it to SET `CR_NAME` and
+  `CR_URL`, so the push only moves to `CR_NAME` and §4 "Inventory" no longer changes the function;
+  §4 "Evidence" cited `observe_anchor` by a line that moved. S4 named "the clone's tracked
+  `.githooks`", but the suite's fixture is a `git init` repository with none, so the block copies
+  the tracked hook to a directory outside the work tree and records `origin/HEAD` itself. §6 named
+  a clone of this repository as the fixture for every criterion, but only the suite's fixture holds
+  a disposable slug to `--preflight`, so the driver criteria run there and the clone measures the
+  hook's branch once.
 
 ## 10. Reuse audit
 
