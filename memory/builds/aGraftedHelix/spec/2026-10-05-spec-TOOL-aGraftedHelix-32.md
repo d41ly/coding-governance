@@ -1,6 +1,6 @@
 # TOOL-aGraftedHelix-32 — the closing review's 21 MEDIUM and LOW findings, fixed as one batch
 
-**Status:** SPECCED · rev-2 · 2026-10-05 · node a · Tier-2 · base 018b5675 · streams tooling+kickoff · order 16 · closes TOOL-aBranchedMandate-9 · ratified 2026-10-05
+**Status:** SPECCED · rev-3 · 2026-10-05 · node a · Tier-2 · base 018b5675 · streams tooling+kickoff · order 16 · closes TOOL-aBranchedMandate-9 · ratified 2026-10-05
 
 <!-- gen:spec-records -->
 
@@ -44,8 +44,10 @@ Every item names the review section it answers. The review record is
 - **S4** — M2's left-shift. The checker derives its population. It scans its own directory and the
   memory-tree directory it is handed for files carrying the head's fixed tail, the trailing run of
   letters-only words of the head the catalogue renders, and a needle shorter than two words is a
-  refusal. A hit outside the declared evaluated set exits 1 naming the file. `--selftest` gains one
-  arm per new outcome and `ARMS_DECLARED` rises with them. Observed by AC4 and AC5.
+  refusal. A hit outside the declared evaluated set exits 1 naming the file. A scan that finds no
+  file of the evaluated set is a DEAD PROBE and a refusal, since every evaluated template spells the
+  tail in its pattern. `--selftest` gains one arm per new outcome and `ARMS_DECLARED` rises with
+  them. Observed by AC4 and AC5.
 - **S5** — M3, id 2. While `<git-dir>/push-main-active` exists in the git dir the claim push would
   run in, `write_claim` in `tools/unattended/unattended.sh` pushes nothing, leaves both verdict files
   alone and returns 2 with a `WC_WHY` naming the marker. The header comment's "a token read after it
@@ -254,7 +256,10 @@ already exempt as `.md`.
 New outcomes, one self-test arm each: a format rendering a different head is DRIFT, exit 1; zero or
 two `BY_DESIGN_FORMAT` declarations, or one that is not a one-line string literal, is REFUSING, exit
 2; a hit outside the declared set is DRIFT naming the file; a needle shorter than two words is
-REFUSING, because an empty needle is found in every file. A catalogue that predates the block skips
+REFUSING, because an empty needle is found in every file; a scan whose hits hold no file of the
+declared set is REFUSING as a dead probe, because the declared templates exist by then and each
+spells the tail, so a walk that reaches none of them would find a stray spelling no better. Its
+fixture spells the tail through escapes and pieces only, so no file carries it as text. A catalogue that predates the block skips
 before the scan, as today, so the flat fixture layout keeps its `SKIP`.
 
 `check_parity` takes the directory holding the templates rather than one template path. Outside the
@@ -522,7 +527,8 @@ pass's base, and bumps each kit once more after its own last move.
 - **AC5** — When the same scratchpad directory also holds a file `extra.py` carrying the head's
   fixed tail, the checker exits 1 with a `DRIFT` line naming `extra.py`. With `extra.py` gone and the
   `unattended-build.template.js` copy deleted, it exits 2 with a `REFUSING` line naming it.
-  `python check_by_design_parity.py --selftest`, run in `tools/workflows`, prints
+  Its `--selftest` arm whose fixture spells the tail only through escapes reads a `DEAD PROBE`
+  refusal. `python check_by_design_parity.py --selftest`, run in `tools/workflows`, prints
   `selftest: <n>/<n> arms`. Each new arm was observed FAIL once against a scratchpad copy of the
   checker with that arm's predicate disabled.
   Red when: an undeclared spelling exits 0, an absent declared template reads as parity, or fewer
@@ -632,7 +638,7 @@ pass's base, and bumps each kit once more after its own last move.
 
 New arm: tools/workflows/unattended-build.test.sh · GH16 with a pre-staged foreign edit and run-state file; stage the commit line's pathspec cut · FLOOR_ASSERTIONS, raised by the assertions added
 New arm: tools/workflows/unattended-build.test.sh · check-workflow-syntax.js over a fixture script with a pathless commit line and one with a pathspec; stage the ban's predicate inverted · FLOOR_ASSERTIONS
-New arm: check_by_design_parity.py --selftest · a reworded format, a missing format, an undeclared spelling, a needle shorter than two words; each predicate disabled in a scratch copy · ARMS_DECLARED, raised by four
+New arm: check_by_design_parity.py --selftest · a reworded format, a missing format, an undeclared spelling, a needle shorter than two words, a scan reaching no declared file; each predicate disabled in a scratch copy · ARMS_DECLARED, raised by five
 New arm: tools/unattended/unattended.test.sh · the push-main marker (S5), the preflight restore and claim disposition (S6, S7), the post-claim return structure (S8), the soft check-24 read (S10), the GH26 push leg (S12); each break as §6 names it · the suite's printed count
 New arm: skills/session-kickoff/manifest-check.test.sh · the claims cell under RUN_CLAIMS off; stage the off branch cut from the card's awk · FLOOR_ASSERTIONS, raised by the assertions added
 New arm: tools/memory-recall/selftest.py · the banner and superseded assertions inside two existing arms; stage each print doubled or cut · none, SELFTEST_ARMS holds
@@ -693,6 +699,10 @@ criterion lives in a suite, and the main loop runs those suites once at VERIFYIN
   exits 0 on the correct driver, so "does not exit 0" would red it. Measured in the pass's slice of
   the driver suite, the leg asserts exit 0, and under the staged CAS break the exit reds beside the
   push count while the ref assertion stays green.
+- rev-3 · 2026-10-05 · S4 and AC5: the pass's bug-class checklist selected
+  `vacuous-selector-empty-population`, and the derived scan had no liveness. A walk that reached no
+  file read `population — 0 file(s)` and exited 0, so a scan that finds no file of the evaluated
+  set now refuses as a dead probe, with a fifth self-test arm.
 
 ## 10. Reuse audit
 
