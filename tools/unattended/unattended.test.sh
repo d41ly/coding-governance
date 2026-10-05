@@ -5591,15 +5591,16 @@ bcopen
 run --review tRun --subject "F1 (fork)" --verdict BLOCKED --blockers 2 >/dev/null
 # The second call EXITS, so TOOL-dFoldedVerdict-1 makes --disposition mandatory here. This arm is
 # about the subject-as-regex defect and not about the disposition, so the flag is supplied rather
-# than asserted on — `promote`, the one value a blocker-bearing exit accepts since aProbedUnit's close.
-run --review tRun --subject "F1 (fork)" --verdict BLOCKED --blockers 2 --disposition promote >/dev/null
+# than asserted on — `promote`, the one value a blocker-bearing exit accepts since aProbedUnit's close,
+# with the zero counts every terminal exit carries since TOOL-aEvidencedLens-7.
+run --review tRun --subject "F1 (fork)" --verdict BLOCKED --blockers 2 --highs 0 --minors 0 --disposition promote >/dev/null
 hit "$(run --review tRun --subject "F1 (fork)" --verdict BLOCKED --blockers 1)" "this subject already carries a terminal review round, so the loop ended for it and another round would rewrite that history; a blocker confirmed on it now is DISPOSED under the build method's M4 by the severity rule, and never re-rounded"
 reset_tree
 
 # ---- the recorded round, and the TERMINAL LINE the leg reads
 bcopen
 run --review tRun --subject S1 --verdict BLOCKED --blockers 2 >/dev/null
-out=$(run --review tRun --subject S1 --verdict BLOCKED --blockers 2 --disposition promote)
+out=$(run --review tRun --subject S1 --verdict BLOCKED --blockers 2 --highs 0 --minors 0 --disposition promote)
 hit "$out" "NON-CONVERGENT"
 hit "$out" "PROMOTED"
 same "the exit token is written into the round's own reason" "$(grep -c 'review · item S1 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT' memory/builds/tRun/RUN.md)" "1"
@@ -5612,23 +5613,22 @@ hit "$(run --review tRun --subject S1 --verdict BLOCKED --blockers 1)" "this sub
 # ---- is about: a subject that converged at round 1 takes no further round, the refusal names the
 # ---- M4 severity-rule route, and the refused round wrote NO row — one review row, not two.
 bcopen
-run --review tRun --subject C1 --verdict "CLEAN WITH FIXES" --blockers 0 >/dev/null
+run --review tRun --subject C1 --verdict "CLEAN WITH FIXES" --blockers 0 --highs 0 --minors 0 >/dev/null
 hit "$(run --review tRun --subject C1 --verdict BLOCKED --blockers 1)" "this subject already carries a terminal review round, so the loop ended for it and another round would rewrite that history; a blocker confirmed on it now is DISPOSED under the build method's M4 by the severity rule, and never re-rounded"
 same "a refused round on a converged subject wrote nothing" "$(grep -c 'review · item C1 · reason' memory/builds/tRun/RUN.md)" "1"
-# ---- CONVERGED takes an OPTIONAL disposition (closing review of aProbedUnit, cluster C, id 12). The
-# ---- severity rule disposes the HIGHS that stood at zero blockers, and the harness promotes them;
-# ---- refusing the field here left that promotion unrecordable and invisible to the gate. Never
-# ---- required: the C1 round above recorded with no field and still does. Against the base driver
-# ---- the first call is refused as "not a terminal exit" and the row count reads 0.
-out=$(run --review tRun --subject C2 --verdict "CLEAN WITH FIXES" --blockers 0 --disposition promote)
-hit "$out" "CONVERGED · disposition promote — the loop is done for this subject, and"
+# ---- A CONVERGED SPEC EXIT STANDING ON A HIGH PROMOTES IT (closing review of aProbedUnit, cluster C,
+# ---- id 12, and TOOL-aEvidencedLens-7). The severity rule disposes the HIGHS that stood at zero
+# ---- blockers, and the counts now say so: the C1 round above stood on nothing and records no field.
+out=$(run --review tRun --subject C2 --verdict "CLEAN WITH FIXES" --blockers 0 --highs 1 --minors 0 --disposition promote)
+hit "$out" "CONVERGED · highs 1 · minors 0 · disposition promote — the loop is done for this subject, and"
 hit "$out" "PROMOTED"
-same "the optional promote is written into the converged round's reason" "$(grep -c 'review · item C2 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · disposition promote' memory/builds/tRun/RUN.md)" "1"
-# ...and `fold` there is the value for nothing above MEDIUM — legal, redundant, and the one exit
-# `review_exit_note fold` is still reachable from.
-out=$(run --review tRun --subject C3 --verdict "CLEAN WITH FIXES" --blockers 0 --disposition fold)
-hit "$out" "CONVERGED · disposition fold"
-hit "$out" "FOLDED into the specs it belongs to"
+hit "$out" "this exit owes at least 1 new unit(s)"
+same "the promote is written into the converged round's reason, after its counts" "$(grep -c 'review · item C2 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 1 · minors 0 · disposition promote$' memory/builds/tRun/RUN.md)" "1"
+# ...and `fold` there is REFUSED (TOOL-aEvidencedLens-7): a spec audit's MEDIUMs and LOWs are promoted,
+# batched, exactly as the closing review's. Against the base driver this round was written.
+out=$(run --review tRun --subject C3 --verdict "CLEAN WITH FIXES" --blockers 0 --highs 0 --minors 3 --disposition fold)
+hit "$out" "--review exits CONVERGED on a spec audit, which folds nothing: every confirmed finding is promoted, the MEDIUMs and LOWs batched into one unit or two"
+same "a refused converged fold wrote nothing" "$(grep -c 'review · item C3 · reason' memory/builds/tRun/RUN.md)" "0"
 reset_tree
 
 # ---- a review round is HISTORY, so it must not inflate the surfaced count the owner is shown.
@@ -5664,12 +5664,14 @@ reset_tree
 bcopen
 run --review tRun --subject D2 --verdict BLOCKED --blockers 2 >/dev/null
 out=$(run --review tRun --subject D2 --verdict BLOCKED --blockers 2 --disposition fold)
-hit "$out" "blocker(s) standing, and the severity rule promotes every blocker, so fold cannot be this exit's disposition; fold is legal only at CONVERGED, where nothing above MEDIUM stood"
-hit "$out" "--review exits NON-CONVERGENT with 2 blocker(s) standing"
+# ...and a spec subject's refusal no longer points at a legal fold at CONVERGED, because there is none
+# (TOOL-aEvidencedLens-7): the sentence names the spec audit and the promotion rule
+hit "$out" "--review exits NON-CONVERGENT on a spec audit, which folds nothing: every confirmed finding is promoted, the MEDIUMs and LOWs batched into one unit or two"
+miss "$out" "fold is legal only at CONVERGED"
 same "a refused fold wrote nothing" "$(grep -c 'review · item D2 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT' memory/builds/tRun/RUN.md)" "0"
-out=$(run --review tRun --subject D2 --verdict BLOCKED --blockers 2 --disposition promote)
-hit "$out" "NON-CONVERGENT · disposition promote"
-same "the promote disposition is written into the round's own reason" "$(grep -c 'review · item D2 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT · disposition promote' memory/builds/tRun/RUN.md)" "1"
+out=$(run --review tRun --subject D2 --verdict BLOCKED --blockers 2 --highs 0 --minors 0 --disposition promote)
+hit "$out" "NON-CONVERGENT · highs 0 · minors 0 · disposition promote"
+same "the promote disposition is written into the round's own reason" "$(grep -c 'review · item D2 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT · highs 0 · minors 0 · disposition promote' memory/builds/tRun/RUN.md)" "1"
 same "the pre-existing substring the leg reads still matches" "$(grep -c 'review · item D2 · reason verdict BLOCKED · blockers 2 · NON-CONVERGENT' memory/builds/tRun/RUN.md)" "1"
 reset_tree
 
@@ -5682,13 +5684,13 @@ bcopen
 mkconf "true" "true" "2026-08-19" "3600" "" "1800" "1"
 hit "$(run --review tRun --subject B1 --verdict BLOCKED --blockers 3)" "--review exits BOUNDED with 3 blocker(s) standing and requires --disposition promote"
 same "a refused bounded round wrote nothing" "$(grep -c 'review · item B1' memory/builds/tRun/RUN.md)" "0"
-out=$(run --review tRun --subject B1 --verdict BLOCKED --blockers 3 --disposition promote)
-hit "$out" "BOUNDED · disposition promote"
+out=$(run --review tRun --subject B1 --verdict BLOCKED --blockers 3 --highs 0 --minors 0 --disposition promote)
+hit "$out" "BOUNDED · highs 0 · minors 0 · disposition promote"
 hit "$out" "the declared round bound of 1 is reached"
 # the echo names the rule the exit applies — every CONFIRMED finding, by severity — and not the
 # pre-severity-rule "every standing blocker" (cluster G of the closing review, the driver half)
 hit "$out" "so the loop STOPS here and every CONFIRMED finding is DISPOSED BY SEVERITY:"
-same "the bounded exit is written into the round's own reason" "$(grep -c 'review · item B1 · reason verdict BLOCKED · blockers 3 · BOUNDED · disposition promote' memory/builds/tRun/RUN.md)" "1"
+same "the bounded exit is written into the round's own reason" "$(grep -c 'review · item B1 · reason verdict BLOCKED · blockers 3 · BOUNDED · highs 0 · minors 0 · disposition promote' memory/builds/tRun/RUN.md)" "1"
 hit "$(run --review tRun --subject B1 --verdict BLOCKED --blockers 1)" "this subject already carries a terminal review round, so the loop ended for it and another round would rewrite that history"
 # the SLUG subject keeps the ceiling: an explicit disposition on its first blocked round is refused as
 # non-terminal, and the round itself arms the loop — the closing diff review is unchanged in behaviour.
@@ -5699,8 +5701,17 @@ hit "$(run --review tRun --subject tRun --verdict BLOCKED --blockers 3)" "CONVER
 # severity rule promotes every one, and a row saying `fold` beside them is the hole the field was
 # added to close (cluster C). Nothing is written, so the subject stays open.
 out=$(run --review tRun --subject B2 --verdict BLOCKED --blockers 3 --disposition fold)
-hit "$out" "--review exits BOUNDED with 3 blocker(s) standing, and the severity rule promotes every blocker, so fold cannot be this exit's disposition"
+hit "$out" "--review exits BOUNDED on a spec audit, which folds nothing: every confirmed finding is promoted, the MEDIUMs and LOWs batched into one unit or two"
+miss "$out" "fold is legal only at CONVERGED"
 same "a refused fold at a bounded exit wrote nothing" "$(grep -c 'review · item B2 · reason' memory/builds/tRun/RUN.md)" "0"
+# ...BOUNDED joins the counted exits on a spec subject (TOOL-aEvidencedLens-7): a promote with no
+# counts is refused, and one with counts owes a unit per blocker and high plus one for the minors.
+hit "$(run --review tRun --subject B3 --verdict BLOCKED --blockers 2 --disposition promote)" "--review exits BOUNDED on a spec audit and requires --highs and --minors"
+out=$(run --review tRun --subject B3 --verdict BLOCKED --blockers 1 --highs 1 --minors 4 --disposition promote)
+hit "$out" "blockers 1 · BOUNDED · highs 1 · minors 4 · disposition promote"
+hit "$out" "this exit owes at least 3 new unit(s)"
+hit "$out" "the MEDIUMs and LOWs batched into one unit, two only across disjoint write sets"
+same "a bounded spec exit's counts sit before the disposition" "$(grep -c 'review · item B3 · reason verdict BLOCKED · blockers 1 · BOUNDED · highs 1 · minors 4 · disposition promote$' memory/builds/tRun/RUN.md)" "1"
 reset_tree
 
 # ---- TOOL-aBatchedMinors-2: THE CLOSING REVIEW PROMOTES EVERY FINDING, and its exit COUNTS them. The
@@ -5713,9 +5724,23 @@ reset_tree
 bcopen; sed -i '/review · item tRun · /d' memory/builds/tRun/RUN.md
 hit "$(run --review tRun --subject tRun --verdict CLEAN --blockers 0 --highs x --minors 0)" "--review requires --highs as a plain integer, the count of CONFIRMED HIGH findings standing at the closing review's exit"
 hit "$(run --review tRun --subject tRun --verdict CLEAN --blockers 0 --highs 0 --minors -1)" "--review requires --minors as a plain integer, the count of CONFIRMED MEDIUM and LOW findings standing at the closing review's exit"
-# ...a spec subject takes no count: its mediums and lows are folded into the spec under review
-hit "$(run --review tRun --subject S9 --verdict BLOCKED --blockers 0 --minors 2)" "--highs and --minors are the closing diff review's counts, and this subject is not the build slug: a spec audit's mediums and lows are FOLDED into the spec under review, so a count here would be read by the gate as owing units nobody owes"
-same "a refused spec-subject count wrote no row (closing review round 1, L6)" "$(grep -c 'review · item S9 · reason' memory/builds/tRun/RUN.md)" "0"
+# ...a spec subject's terminal exit COUNTS too (TOOL-aEvidencedLens-7): the owner answered on
+# 2026-10-05 that a spec audit's mediums and lows are promoted, batched, exactly as this review's are.
+# Against the base driver every count on a spec subject was refused, and a converged spec round with
+# no counts was written.
+hit "$(run --review tRun --subject S9 --verdict "CLEAN WITH FIXES" --blockers 0 --highs 1)" "--review exits CONVERGED on a spec audit and requires --highs and --minors, the CONFIRMED HIGH and MEDIUM-plus-LOW findings standing at the exit, because every one of them is promoted and a row that does not count them cannot be graded"
+hit "$(run --review tRun --subject S9 --verdict "CLEAN WITH FIXES" --blockers 0)" "--review exits CONVERGED on a spec audit and requires --highs and --minors"
+hit "$(run --review tRun --subject S9 --verdict CLEAN --blockers 0 --highs x --minors 0)" "--review requires --highs as a plain integer, the count of CONFIRMED HIGH findings standing at a spec audit's exit"
+hit "$(run --review tRun --subject S9 --verdict "CLEAN WITH FIXES" --blockers 0 --highs 0 --minors 3)" "--review exits CONVERGED on a spec audit with 0 blocker(s), 0 high(s) and 3 minor(s) standing, and requires --disposition promote, because every confirmed finding there is promoted"
+hit "$(run --review tRun --subject S9 --verdict CLEAN --blockers 0 --highs 0 --minors 0 --disposition promote)" "--review exits CONVERGED on a spec audit with nothing standing, so --disposition promote promotes nothing, and the gate would read the row as owing a unit"
+hit "$(run --review tRun --subject S9 --verdict BLOCKED --blockers 3 --minors 1)" "--review names --highs or --minors on a spec audit round that is not a terminal exit, and a count of what stands at the exit is a claim about an exit that has not happened yet: state"
+same "a refused spec-subject round wrote no row (closing review round 1, L6)" "$(grep -c 'review · item S9 · reason' memory/builds/tRun/RUN.md)" "0"
+# ...and a spec exit standing on findings records them before the disposition and owes their units
+run --review tRun --subject S8 --verdict BLOCKED --blockers 1 >/dev/null
+out=$(run --review tRun --subject S8 --verdict BLOCKED --blockers 1 --highs 1 --minors 4 --disposition promote)
+hit "$out" "NON-CONVERGENT · highs 1 · minors 4 · disposition promote"
+hit "$out" "this exit owes at least 3 new unit(s)"
+same "a spec exit's counts sit before the disposition" "$(grep -c 'review · item S8 · reason verdict BLOCKED · blockers 1 · NON-CONVERGENT · highs 1 · minors 4 · disposition promote$' memory/builds/tRun/RUN.md)" "1"
 # ...one integer for two readers (round 1, L1): bash reads a leading zero as octal, so `08` used to
 # abort the driver and `010` computed 8 while check 2 read 10; a ten-digit value wraps nothing now
 hit "$(run --review tRun --subject tRun --verdict CLEAN --blockers 0 --highs 08 --minors 0)" "--review requires --highs as a decimal of at most nine digits with no leading zero, because bash arithmetic reads a leading zero as octal and check 2 reads the row as decimal"
