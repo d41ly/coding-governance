@@ -289,6 +289,10 @@ if [ -n "${GATE_DOCS_BASE:-}" ] && [ -z "${GATE_FULL:-}" ]; then
   DOCS_BASE=$(git rev-parse --verify -q "${GATE_DOCS_BASE}^{commit}" 2>/dev/null) || DOCS_BASE=""
   [ -n "$DOCS_BASE" ] || echo "run-gates: GATE_DOCS_BASE '${GATE_DOCS_BASE}' resolves to no commit, so the docs mode is OFF and every leg is decided as usual" >&2
 fi
+# READ ONCE, THEN WITHHELD FROM EVERY LEG. A leg that drives a nested runner over its own scratch repo
+# would otherwise inherit a sha that does not exist there and print the OFF line into output it
+# compares; the mode is a fact about THIS run, and no leg has a use for it.
+unset GATE_DOCS_BASE
 # A DOC PATH MOVED when it differs between DOCS_BASE and the working tree, OR when any commit in
 # DOCS_BASE..HEAD touched it. The second half is not redundant: a path changed in one commit and
 # restored in a later one has no net diff, and a leg that grades COMMITS (a pass-order or brief rule)
@@ -3417,6 +3421,20 @@ if [ -n "$gd" ] && [ "$fails" = 0 ] && [ "$skips" = 0 ] && [ "$reuses" = 0 ] \
     printf 'stamped\t%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
   } > "$gd/gate-full-green.tmp" 2>/dev/null \
     && mv -f "$gd/gate-full-green.tmp" "$gd/gate-full-green" 2>/dev/null || true
+  # SHARED FROM A LINKED WORKTREE (TOOL-dThriftyLanding-2). The common dir's own `gate-full-green` is
+  # the PRIMARY tree's stamp and is never written from here: a branch's green that is no ancestor of
+  # the default branch would replace the primary's valid one. A separate `.shared` file, which the push
+  # boundary reads LAST, can only add a usable record. Same bytes, so the boundary validates it with
+  # the same predicates; a failed copy costs a shared record and nothing else.
+  _gcd=$(git rev-parse --git-common-dir 2>/dev/null) || _gcd=""
+  if [ -n "$_gcd" ] && [ -f "$gd/gate-full-green" ]; then
+    _gcd_abs=$(cd "$_gcd" 2>/dev/null && pwd -P) || _gcd_abs=""
+    _gd_abs=$(cd "$gd" 2>/dev/null && pwd -P) || _gd_abs=""
+    if [ -n "$_gcd_abs" ] && [ -n "$_gd_abs" ] && [ "$_gcd_abs" != "$_gd_abs" ]; then
+      cp "$gd/gate-full-green" "$_gcd_abs/gate-full-green.shared.tmp" 2>/dev/null \
+        && mv -f "$_gcd_abs/gate-full-green.shared.tmp" "$_gcd_abs/gate-full-green.shared" 2>/dev/null || true
+    fi
+  fi
 fi
 
 # THE INHERITED-GREEN STAMP (TOOL-dDerivedDocket-24, KF2). A DIFFERENT FILE from the full green, and

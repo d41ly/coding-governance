@@ -473,6 +473,34 @@ case "$line" in
   *) bad "29b the full arm reports a scope without naming the bar: ${line:-<no decision line>}" ;;
 esac
 
+# 30 — TOOL-dThriftyLanding-2: A GREEN FROM ANOTHER WORKTREE SERVES THIS PUSH. This fixture is a plain
+#      clone, so its git dir IS the common dir and its own stamp is the primary's; a linked worktree's
+#      runner writes `gate-full-green.shared` beside it. With no own stamp and a usable shared one, the
+#      decision is scoped and names where its record came from; with an unusable shared one it is FULL
+#      and names BOTH refusals, so neither is silent; and the own stamp still wins when it is usable.
+_gd30=$(git rev-parse --git-dir)
+rm -f "$_gd30/gate-full-green" "$_gd30/gate-full-green.shared"
+printf 'sha\t%s\nfingerprint\t\nmanifest_blob\t\nrun_id\ttest\n' "$(git rev-parse HEAD)" > "$_gd30/gate-full-green.shared"
+line=$(decide)
+case "$line" in
+  *"scoped gate"*"gate-full-green.shared"*) ok "30 a shared green from another worktree scopes the push and is named" ;;
+  *) bad "30 a usable shared green was not adopted: ${line:-<no decision line>}" ;;
+esac
+printf 'sha\t%s\nfingerprint\t\nmanifest_blob\t\nrun_id\ttest\n' 0000000000000000000000000000000000000000 > "$_gd30/gate-full-green.shared"
+line=$(decide)
+case "$line" in
+  *"FULL gate"*"no recorded full green"*"gate-full-green.shared"*"not an ancestor"*) ok "30b an unusable shared green forces FULL and both refusals are named" ;;
+  *) bad "30b expected FULL naming the own and the shared refusal: ${line:-<no decision line>}" ;;
+esac
+stamp "$(git rev-parse HEAD)"
+line=$(decide)
+case "$line" in
+  *"scoped gate"*" from "*) bad "30c a usable own stamp was passed over for a shared one: $line" ;;
+  *"scoped gate"*) ok "30c control — a usable own stamp is adopted first, worded as before" ;;
+  *) bad "30c control — a current own stamp did not scope: ${line:-<no decision line>}" ;;
+esac
+rm -f "$_gd30/gate-full-green" "$_gd30/gate-full-green.shared"
+
 # --- 16-18: TOOL-dScrubbedConduit-1 S2/S5. A LINKED WORKTREE, because that is the shape this
 # --- harness could not previously see. Every fixture above is `git init` plus `git init --bare`, and
 # --- neither exports GIT_DIR into a hook — which is exactly why this class went unobserved here

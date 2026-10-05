@@ -1,10 +1,13 @@
 # TOOL-dThriftyLanding-2 — a full green earned in any worktree serves every worktree's push
 
-**Status:** OPEN · rev-1 · 2026-10-05 · node d · Tier-2 · base c3ef6742 · streams tooling · order 2
+**Status:** CLOSED · rev-1 · 2026-10-05 · node d · Tier-2 · base c3ef6742 · streams tooling · order 2
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-05-build-TOOL-dThriftyLanding-2-1-acceptance-ledger.md](../build/2026-10-05-build-TOOL-dThriftyLanding-2-1-acceptance-ledger.md) | journal | — |
+| [2026-10-05-prompt-TOOL-dThriftyLanding-2-1-build-brief.md](../prompts/2026-10-05-prompt-TOOL-dThriftyLanding-2-1-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
