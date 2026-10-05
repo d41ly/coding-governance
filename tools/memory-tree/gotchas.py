@@ -19,6 +19,13 @@ has an entry for exactly that. The trade is stated rather than discovered: deriv
 recall-biased, so `--for-diff` OVER-selects, and a record naming no path at all matches nothing and
 is REPORTED as unanchored rather than silently never firing.
 
+AN INVARIANT IS THE OTHER HALF OF A REVIEWER'S BRIEF (TOOL-aGraftedHelix-3). A `kind: invariant` record
+names a ruling a reviewer keeps mistaking for a bug, by its `decision:` id, in five sections. It is
+selected by the same anchors, and printed AFTER the checklist as the by-design block
+(`# by design — <n> invariant(s) this selection touches`, the head printed on every non-empty
+selection, `0` included), never as a checklist item. The review harness cuts the block back out of
+`checklist` and hands it to every lens and skeptic as `byDesign`.
+
 THREE UPSTREAM HARVEST DEFECTS ARE CARRIED, each with its own arm in --selftest — TWO as behaviour
 this implementation shares, ONE as a difference:
   1. SHARED   — a token containing `::` inside backticks harvests to nothing.
@@ -56,7 +63,15 @@ ANCHOR_RE = re.compile(r"`([^`\s]+(?:/[^`\s]*|\.(?:md|py|sh|js|json|ts|toml|yml|
 # module searched only the post-front-matter body, so a `description` carrying the word "gated"
 # satisfied one and not the other. Every consumer calls `declares()`; nobody re-types the alternation.
 DECLARES_RE = re.compile(r"gated by|gated in|gated at|documented[ -]check|no machine gate", re.I)
-KINDS = ("class", "note", "superseded")
+KINDS = ("class", "note", "superseded", "invariant")
+# TOOL-aGraftedHelix-3 — an INVARIANT is a ruling a reviewer keeps mistaking for a bug: intended
+# behaviour, cited by its decision id, selected by the same anchors a class is. Its five body sections
+# (I5), each graded present and non-empty by check 18, and the head of the by-design block `--for-diff`
+# and `--for-paths` print after the checklist (I4), which the review harness cuts back out of
+# `checklist` and hands its lenses as `byDesign`. One spelling of the head: the harness matches it.
+INVARIANT_SECTIONS = ("Looks wrong", "Actually", "Do", "Do not", "Guarded by")
+BY_DESIGN_HEAD = "# by design — {n} invariant(s) this selection touches"
+GUARD_TOKEN_RE = re.compile(r"`([^`]+)`")
 
 
 class Problem(Exception):
@@ -88,7 +103,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from tree_lib import kit_rel, parse_conf  # noqa: E402  the kit's ONE conf parser
 
 def load_conf(root: str) -> dict:
-    conf = {"MEMORY_ROOT": "memory", "UNIVERSAL_BUDGET": ""}
+    conf = {"MEMORY_ROOT": "memory", "UNIVERSAL_BUDGET": "", "LEG_MANIFEST": ""}
     p = os.path.join(root, ".memory-tree.conf")
     if os.path.isfile(p):
         parse_conf(read(p), conf)
@@ -120,7 +135,77 @@ def append_only_re(root: str) -> re.Pattern:
                       f"{type(exc).__name__}: {exc}") from None
 
 
+def load_defined_ids(root: str, grammar_dir=None):
+    """`(ids, None)`: every id this corpus DEFINES, from `corpus_ids`' one walk — or `(None, why)` when
+    the id grammar's kit is absent, which check 18 ANNOUNCES rather than reds (TOOL-aGraftedHelix-3).
+
+    The set `corpus_ids.py --print-defined-ids` prints, reached in-process the way `append_only_re`
+    reaches its sibling, so there is still ONE id grammar: a decision recorded as a spec H1 or a backlog
+    row resolves exactly as a decision-log row does. `grammar_dir` exists for the self-test's
+    absent-kit arm and points the loaded module at a directory holding no grammar.
+    """
+    import importlib.util
+
+    src = HERE / "corpus_ids.py"
+    if not src.is_file():
+        raise Problem(f"gotchas: {src} is missing — it owns the defined-id set check 18 resolves "
+                      f"an invariant's decision against")
+    try:
+        spec = importlib.util.spec_from_file_location("corpus_ids", src)
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        if grammar_dir is not None:
+            mod.GRAMMAR_DIR = pathlib.Path(grammar_dir)
+        if not (mod.GRAMMAR_DIR / "extract.py").is_file():
+            return None, "the id grammar lives in the memory-recall kit, which is not installed beside this one"
+        return set(mod.walk(root, mod.load_conf(root))["defs"]), None
+    except Exception as exc:  # noqa: BLE001 — the sibling's own Problem is a different class
+        raise Problem(f"gotchas: could not ask corpus_ids for the defined-id set: "
+                      f"{type(exc).__name__}: {exc}") from None
+
+
+def load_leg_names(root: str, conf: dict):
+    """The leg names the manifest `LEG_MANIFEST` declares, or None when the key is blank.
+
+    Blank is legal and ANNOUNCED by the caller: a guard token that is no tracked path then cannot be
+    judged, and saying so beats both a false red and a silent pass. A SET key naming a file that does
+    not read as a list of `{name: ...}` rows is a named failure, never a traceback.
+    """
+    import json
+
+    rel = conf.get("LEG_MANIFEST", "").strip()
+    if not rel:
+        return None
+    try:
+        rows = json.loads(read(os.path.join(root, rel)))
+        if not isinstance(rows, list):
+            raise ValueError("the top level is not a list of leg rows")
+        return {r["name"] for r in rows if isinstance(r, dict) and isinstance(r.get("name"), str)}
+    except (OSError, ValueError) as exc:
+        raise Problem(f"gotchas: LEG_MANIFEST names {rel}, which cannot be read as a leg manifest "
+                      f"({type(exc).__name__}: {exc}) — fix the path, or blank the key so a leg-name "
+                      f"guard is announced unresolved instead") from None
+
+
 # ------------------------------------------------------------------------------------------ records
+def parse_sections(body: str) -> dict:
+    """`## <heading>` -> the lines of that section's FIRST paragraph, stripped, blank lines before it
+    skipped. A heading inside a fenced block is read as a heading — ponytail: no record needs one."""
+    out, cur, para = {}, None, None
+    for line in body.split("\n"):
+        if line.startswith("## "):
+            cur = line[3:].strip()
+            out[cur] = para = []
+            continue
+        if cur is None:
+            continue
+        s = line.strip()
+        if s:
+            if para is not None:
+                para.append(s)
+        elif para:
+            para = None          # the first paragraph ended; the rest of the section is not read
+    return out
 def parse_front_matter(path: str, text: str) -> dict:
     m = FM_RE.match(text)
     if not m:
@@ -176,6 +261,9 @@ def records(root: str, m: str) -> list:
             "kind": fm["kind"], "universal": fm["universal"],
             "declares": declares(text),
             "anchors": sorted(set(ANCHOR_RE.findall(body))),
+            # Read for an invariant only; a class carries neither key's meaning.
+            "decision": fm.get("decision", ""),
+            "sections": parse_sections(body) if fm["kind"] == "invariant" else {},
         })
     return out
 
@@ -211,6 +299,53 @@ def inert_only(rec: dict, paths, m: str, append_only: re.Pattern) -> bool:
     return bool(hits) and all(append_only.match(p) for p in hits)
 
 
+def check_invariant(rec: dict, tracked: set, legs, defined, why_undefined: str) -> tuple:
+    """Check 18 over ONE invariant record: `(findings, announcements)`.
+
+    `legs` is None when `LEG_MANIFEST` is blank and `defined` is None when the id grammar's kit is
+    absent; each turns its arm into an ANNOUNCEMENT, printed at exit 0, rather than a red. WHAT THIS
+    DOES NOT CHECK: that the ruling still describes the code, or that the guard named actually pins
+    it — a resolving token proves the name exists, not that the gate asserts this behaviour.
+    """
+    p, bad, notes = rec["path"], [], []
+    dec = rec["decision"]
+    if not dec:
+        bad.append(f"check 18: {p} is an invariant with no `decision:` — an invariant cites the ruling "
+                   f"that makes it intended, or it is an opinion")
+    elif defined is None:
+        notes.append(f"gotchas: {p} decision {dec} NOT resolved — {why_undefined}")
+    elif dec not in defined:
+        bad.append(f"check 18: {p} names decision {dec}, which no record in this corpus defines")
+    for h in INVARIANT_SECTIONS:
+        if not rec["sections"].get(h):
+            bad.append(f"check 18: {p} has no non-empty `## {h}` section — an invariant carries all of "
+                       f"{', '.join(INVARIANT_SECTIONS)}")
+    guard = rec["sections"].get("Guarded by") or []
+    if guard:
+        line = guard[0]
+        toks = GUARD_TOKEN_RE.findall(line)
+        rest = GUARD_TOKEN_RE.sub("", line)
+        if line.rstrip(".").strip().lower() == "no machine gate":
+            pass
+        elif not toks or not re.fullmatch(r"(?:[\s,;·]|and)*", rest):
+            bad.append(f"check 18: {p}'s `## Guarded by` opens with neither `no machine gate` nor backticked "
+                       f"tokens alone: {line}")
+        else:
+            for t in toks:
+                if t in tracked or any(x.startswith(t.rstrip("/") + "/") for x in tracked):
+                    continue
+                if legs is None:
+                    notes.append(f"gotchas: {p} guard `{t}` NOT resolved — LEG_MANIFEST is blank, so a "
+                                 f"token that is not a tracked path cannot be checked against a leg name")
+                elif t not in legs:
+                    bad.append(f"check 18: {p} guard `{t}` is neither a tracked path nor a leg name in "
+                               f"the leg manifest")
+    if rec["universal"]:
+        bad.append(f"check 19: {p} is an invariant marked universal — a by-design line on every review "
+                   f"skips the selection and the universal budget alike")
+    return bad, notes
+
+
 # ---------------------------------------------------------------------------------------- rendering
 def render(recs: list, m: str) -> str:
     head = [
@@ -240,6 +375,7 @@ def render(recs: list, m: str) -> str:
         "",
         f"{len(recs)} record(s): {len(classes)} class, "
         f"{sum(1 for r in recs if r['kind'] == 'note')} note, "
+        f"{sum(1 for r in recs if r['kind'] == 'invariant')} invariant, "
         f"{sum(1 for r in recs if r['kind'] == 'superseded')} superseded · "
         f"{sum(1 for r in classes if r['universal'])} universal · "
         f"{sum(1 for r in classes if not r['anchors'] and not r['universal'])} unanchored",
@@ -268,10 +404,30 @@ def cmd_check(root: str, conf: dict) -> int:
             bad.append(f"check 17: {m}/gotchas/INDEX.md is missing — run gotchas.py --write")
         elif read(idx) != want:
             bad.append(f"check 17: {m}/gotchas/INDEX.md is stale — run gotchas.py --write")
+    notes = []
     if recs:
         paths = [p for p in run("git", "ls-files", cwd=root).split("\n") if p]
         ao = append_only_re(root)
+        # TOOL-aGraftedHelix-3 — the invariant arms' two inputs, read only when an invariant exists:
+        # the defined-id walk costs a corpus pass, and a catalogue of classes alone pays nothing.
+        invs = [r for r in recs if r["kind"] == "invariant"]
+        if invs:
+            legs = load_leg_names(root, conf)
+            defined, why_undefined = load_defined_ids(root)
+            tracked = set(paths)
         for r in recs:
+            if r["kind"] == "invariant":
+                b, n = check_invariant(r, tracked, legs, defined, why_undefined)
+                bad += b
+                notes += n
+                # 19 for an invariant: no universal escape, so an unanchored one is always a finding.
+                if not r["anchors"]:
+                    bad.append(f"check 19: {r['path']} derives no anchor — an invariant reaches a review "
+                               f"only through its anchors, so it can never be handed to one")
+                elif inert_only(r, paths, m, ao):
+                    bad.append(f"check 19: {r['path']} has INERT anchors — every path they reach is "
+                               f"append-only, so the record is reachable on paper and dead in practice")
+                continue
             if r["kind"] != "class":
                 continue
             # 18 — declares a gate, or says it has none.
@@ -291,6 +447,10 @@ def cmd_check(root: str, conf: dict) -> int:
             if n > int(budget):
                 bad.append(f"check 19: {n} universal record(s) against a budget of {budget} — every one "
                            f"is emitted on EVERY checklist, so raise the budget in a commit that says why")
+    # Announcements first and never prefixed `HYGIENE`: they print at exit 0, and the engine shows a
+    # green run's output (TOOL-aGraftedHelix-3 S7) so a skip is never mistaken for a pass.
+    for line in notes:
+        print(line)
     for line in bad:
         print("HYGIENE " + line)
     return 1 if bad else 0
@@ -314,6 +474,7 @@ def cmd_report(root: str, conf: dict) -> int:
     classes = [r for r in recs if r["kind"] == "class"]
     print(f"records          : {len(recs)}")
     print(f"classes          : {len(classes)}")
+    print(f"invariants       : {sum(1 for r in recs if r['kind'] == 'invariant')}")
     print(f"universal        : {sum(1 for r in classes if r['universal'])}  "
           f"(budget {conf.get('UNIVERSAL_BUDGET') or 'unset'})")
     print(f"unanchored       : {sum(1 for r in classes if not r['anchors'] and not r['universal'])}")
@@ -369,22 +530,36 @@ def cmd_for_paths(root: str, conf: dict, paths, label: str = None, noun: str = "
     if not paths:
         print(f"gotchas: {label or 'those paths'} selects no file — nothing to check")
         return 0
-    hit, uni = [], []
+    hit, uni, inv = [], [], []
     for r in recs:
-        if r["kind"] != "class":
+        if r["kind"] not in ("class", "invariant"):
             continue
-        if r["universal"]:
+        if r["kind"] == "class" and r["universal"]:
             uni.append(r)
             continue
         for a in r["anchors"]:
             if selectable(a, paths, m):
-                hit.append(r)
+                (inv if r["kind"] == "invariant" else hit).append(r)
                 break
     print(f"# recurring-bug-class checklist for {label or f'{len(paths)} path(s)'} ({len(paths)} {noun}(s))")
     print(f"# {len(hit)} class(es) selected by an anchor + {len(uni)} universal")
     for r in uni + hit:
         print(f"\n- [ ] {r['name']}{' (universal)' if r['universal'] else ''}\n      {r['description']}\n      {r['path']}")
+    for line in render_by_design(inv):
+        print(line)
     return 0
+
+
+def render_by_design(inv: list) -> list:
+    """The by-design block (I4): its head ALWAYS, `0` included, so a reader can tell "no invariant
+    touched" from a kit that predates the block; then one line per selected invariant, built from the
+    first paragraph of its `## Looks wrong` and `## Actually` sections."""
+    out = ["", BY_DESIGN_HEAD.format(n=len(inv))]
+    for r in inv:
+        s = r["sections"]
+        out.append(f"- {r['name']} — {' '.join(s.get('Looks wrong') or [])} → "
+                   f"{' '.join(s.get('Actually') or [])} ({r['decision']})")
+    return out
 
 
 def cmd_for_diff(root: str, conf: dict, rng: str) -> int:
@@ -616,6 +791,97 @@ def cmd_selftest() -> int:
             lambda: cmd_for_paths(t8, c8, ["."]))
         arm("--for-diff omits a non-class record", "[rc=0]", lambda: 0 if "- [ ] note" not in text else 1)
 
+        # ---- TOOL-aGraftedHelix-3: the invariant kind (I5), its check 18/19 arms, and the by-design
+        # ---- block (I4). The decision `ARCH-tOne-1` is DEFINED by the fixture's decision-log row, so
+        # ---- the clean arms resolve it through the real walk rather than a stubbed set.
+        conf_text = 'MEMORY_ROOT=memory\nDISCIPLINES="arch"\nFAMILIES="arch:ARCH"\nUNIVERSAL_BUDGET="1"\n'
+        legs = {".memory-tree.conf": conf_text + 'LEG_MANIFEST="legs.json"\n',
+                "legs.json": '[{"name": "fixture leg"}]\n'}
+
+        def build_invariant(name, over=None, decision="ARCH-tOne-1", universal=False):
+            secs = {"Looks wrong": f"It looks wrong in `{PFX}some-gate.sh`.", "Actually": "It is the ruling.",
+                    "Do": "Keep it.", "Do not": "Change it.", "Guarded by": "no machine gate"}
+            secs.update(over or {})
+            fm = [f"name: {name}", "description: an invariant", "kind: invariant"]
+            fm += [f"decision: {decision}"] if decision else []
+            fm += ["universal: true"] if universal else []
+            return ("---\n" + "\n".join(fm) + "\n---\n\n" +
+                    "".join(f"## {h}\n{t}\n\n" for h, t in secs.items() if t is not None))
+
+        def build_tree(label, recs, extra=None):
+            t = os.path.join(base, label); os.makedirs(t)
+            c = _scratch(t, recs, extra)
+            cmd_write(t, c); run("git", "add", "-A", cwd=t); run("git", "commit", "-q", "-m", "i", "--no-verify", cwd=t)
+            return t, c
+
+        ti, ci = build_tree("inv", {"inv.md": build_invariant("inv-one")})
+        arm("an invariant with five sections, a defined decision and a declared guard is clean", None,
+            lambda: cmd_check(ti, ci))
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            cmd_for_paths(ti, ci, [f"{PFX}some-gate.sh"])
+        itext = out.getvalue()
+        want_line = f"- inv-one — It looks wrong in `{PFX}some-gate.sh`. → It is the ruling. (ARCH-tOne-1)"
+        arm("--for-paths ends with the by-design block on a hit", "[rc=0]",
+            lambda: 0 if itext.rstrip("\n").endswith(BY_DESIGN_HEAD.format(n=1) + "\n" + want_line) else 1)
+        arm("...and the invariant is never a checklist item", "[rc=0]", lambda: 0 if "- [ ] inv-one" not in itext else 1)
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            cmd_for_paths(ti, ci, ["memory/README.md"])
+        mtext = out.getvalue()
+        arm("--for-paths prints the 0 header on a miss", "[rc=0]",
+            lambda: 0 if mtext.rstrip("\n").endswith(BY_DESIGN_HEAD.format(n=0)) else 1)
+
+        # The two announcements: printed at exit 0, never a red.
+        tb, cb = build_tree("inv-blank", {"b.md": build_invariant("b", over={"Guarded by": "`fixture leg`"})})
+        arm("a leg-name guard under a blank LEG_MANIFEST is announced and exits 0",
+            "LEG_MANIFEST is blank, so a token that is not a tracked path cannot be checked against a leg name\n[rc=0]",
+            lambda: cmd_check(tb, cb))
+        real_load = load_defined_ids
+        globals()["load_defined_ids"] = lambda root: real_load(root, grammar_dir=os.path.join(base, "no-grammar"))
+        try:
+            arm("an absent id-grammar kit is announced NOT resolved and exits 0",
+                "decision ARCH-tOne-1 NOT resolved — the id grammar lives in the memory-recall kit, which is "
+                "not installed beside this one\n[rc=0]", lambda: cmd_check(ti, ci))
+        finally:
+            globals()["load_defined_ids"] = real_load
+
+        # A leg name resolves through a fixture manifest, and the reds a SET manifest makes possible.
+        tl, cl = build_tree("inv-leg", {"l.md": build_invariant("l", over={"Guarded by": "`fixture leg`"})}, legs)
+        arm("a leg name in the LEG_MANIFEST fixture resolves", None, lambda: cmd_check(tl, cl))
+        tr, cr = build_tree("inv-red", {
+            "dec.md": build_invariant("dec", decision="ARCH-tNone-9"),
+            "sec.md": build_invariant("sec", over={"Do not": None}),
+            "path.md": build_invariant("path", over={"Guarded by": f"`{PFX}no-such-gate.sh`"}),
+            "leg.md": build_invariant("leg", over={"Guarded by": "`no such leg`"}),
+            "una.md": build_invariant("una", over={"Looks wrong": "It looks wrong."}),
+            "uni.md": build_invariant("uni", universal=True),
+            "ine.md": build_invariant("ine", over={"Looks wrong": "It reads `memory/DECISIONS.md`."})}, legs)
+        # ONE check run over the seven offenders, each arm reading its own line out of it: a walk per arm
+        # would cost seven corpus passes to ask one question.
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            rrc = cmd_check(tr, cr)
+        rtext = out.getvalue()
+        for label, want in (
+                ("check 18 reds an unresolved decision", "dec.md names decision ARCH-tNone-9, which no record"),
+                ("check 18 reds a missing section", "sec.md has no non-empty `## Do not` section"),
+                ("check 18 reds a guard path that is not tracked", f"path.md guard `{PFX}no-such-gate.sh` is neither"),
+                ("check 18 reds a leg name the manifest lacks", "leg.md guard `no such leg` is neither"),
+                ("check 19 reds an unanchored invariant", "una.md derives no anchor"),
+                ("check 19 reds a universal invariant", "uni.md is an invariant marked universal"),
+                ("check 19 reds an invariant anchored only on the decision log", "ine.md has INERT anchors")):
+            arm(label, want, lambda: (print(rtext, end=""), rrc)[1])
+
+        # A SET manifest naming a missing file: the PROCESS prints one HYGIENE line, never a traceback.
+        tm, _ = build_tree("inv-missing", {"m.md": build_invariant("m", over={"Guarded by": "`fixture leg`"})},
+                           {".memory-tree.conf": conf_text + 'LEG_MANIFEST="missing.json"\n'})
+        pm = subprocess.run([sys.executable, os.path.abspath(__file__), "--check"], cwd=tm,
+                            capture_output=True, text=True, encoding="utf-8")
+        arm("a LEG_MANIFEST naming a missing file is a HYGIENE line, not a traceback", "[rc=0]",
+            lambda: 0 if pm.returncode == 1 and pm.stdout.startswith("HYGIENE gotchas: LEG_MANIFEST names missing.json")
+            and "Traceback" not in pm.stdout + pm.stderr else 1)
+
     if fails:
         print(f"FAIL — {len(fails)} arm(s) failed")
         return 1
@@ -624,6 +890,10 @@ def cmd_selftest() -> int:
 
 
 def main(argv: list) -> int:
+    # UTF-8 BEFORE ANYTHING PRINTS (TOOL-aGraftedHelix-3 S4). The by-design block carries `→`, which
+    # cp1252 cannot encode, and a piped stdout takes the locale codec on a node without PYTHONUTF8=1.
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8")
     mode = argv[1] if len(argv) > 1 else "--check"
     if mode == "--selftest":
         return cmd_selftest()

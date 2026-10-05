@@ -251,6 +251,11 @@ READ_PATH_WAIVER=""
 # Unlike the pins above this is a POLICY CEILING you choose, not a measurement of your corpus — so
 # it ships with a value rather than blank. Raise it in a commit that says why.
 UNIVERSAL_BUDGET="3"
+# gotchas.py (check 18): a JSON leg manifest, repo-relative — a list of rows each carrying a `name` —
+# that a `kind: invariant` record's `## Guarded by` token resolves against when it is not a tracked
+# path. Ships BLANK because an adopter may keep no such manifest: blank, a token that names no tracked
+# path is ANNOUNCED as unresolved on every run and never reds; a path that does not read is a failure.
+LEG_MANIFEST=""
 
 # memory-recall only (safe to delete if that kit is not adopted): the cache budget over the whole
 # `<git-common-dir>/recall/cache/` tree, in megabytes. ABSENT = the kit's default (512 MB);

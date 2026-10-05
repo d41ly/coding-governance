@@ -674,6 +674,53 @@ async function runWholeScriptArms() {
       'spec-audit: the checklist splits over the spec lenses')
   }
 
+  // ==== TOOL-aGraftedHelix-3 — the checker's by-design block becomes `byDesign`, never an item =========
+  // Every arm is RED against the parent render, which reads no block: the entry is swept as item C2,
+  // nothing is logged, RUN INTEGRITY carries no `By design:` clause, and nothing refuses a bad count.
+  const BD_ENTRY = 'inv-one — It looks wrong. → It is the ruling. (TOOL-x-1)'
+  const BD_CL = '# recurring-bug-class checklist for a (1 file(s))\n# 1 class(es) selected by an anchor + 0 universal\n\n' +
+    '- [ ] BDCLASSX\n      d\n      memory/gotchas/c.md\n\n# by design — 1 invariant(s) this selection touches\n- ' + BD_ENTRY + '\n'
+  const BD_LABEL = 'Intended behaviour — invariants this change touches:\n' + BD_ENTRY
+  const sweptAsItem = (fp) => fp.some((t) => /(^|\n)C\d+ inv-one/.test(t.prompt))
+  r = await runReview(Object.assign({}, DIFF, { checklist: BD_CL }), ALL_OK)
+  if (checkNoThrow(r, 'by-design block')) {
+    const sp = r.trace.find((t) => t.label === 'synth')
+    const ri = sp ? sp.prompt.slice(sp.prompt.indexOf('RUN INTEGRITY')) : ''
+    const fp = scanPrompts(r, 'find:')
+    ck(r.logs.indexOf('by-design: 1 invariant(s) from the checklist\'s by-design block') !== -1 &&
+      ri.indexOf('By design: 1 invariant(s) from the checklist\'s by-design block.') !== -1,
+      'by-design: the block is logged and stated in RUN INTEGRITY')
+    ck(fp.length === 5 && fp.every((t) => t.prompt.indexOf(BD_LABEL) !== -1) &&
+      fp.filter((t) => t.prompt.indexOf('BDCLASSX') !== -1).length === 1 && !sweptAsItem(fp),
+      'by-design: every lens reads the entry as intended behaviour, and no lens sweeps it as a class')
+  }
+  r = await runReview(Object.assign({}, DIFF, { checklist: BD_CL, byDesign: 'BDCALLERX' }), ALL_OK)
+  if (checkNoThrow(r, 'by-design block beside a caller byDesign')) {
+    const sp = r.trace.find((t) => t.label === 'synth')
+    const ri = sp ? sp.prompt.slice(sp.prompt.indexOf('RUN INTEGRITY')) : ''
+    const fp = scanPrompts(r, 'find:')
+    ck(r.logs.indexOf('by-design: the caller\'s byDesign') !== -1 &&
+      r.logs.indexOf('by-design: 1 invariant(s) from the checklist\'s by-design block') !== -1 &&
+      ri.indexOf('By design: the caller\'s byDesign; 1 invariant(s) from the checklist\'s by-design block.') !== -1,
+      'by-design: a caller byDesign beside a block logs both sources, and RUN INTEGRITY names both')
+    ck(fp.length === 5 && fp.every((t) => t.prompt.indexOf('Known and tracked — do not re-report:\nBDCALLERX\n' + BD_LABEL) !== -1) &&
+      !sweptAsItem(fp),
+      'by-design: the caller\'s value and the entry each sit under their own label, and the items still exclude the block')
+  }
+  r = await runReview(Object.assign({}, DIFF, { checklist: BD_CL.replace('by design — 1 invariant', 'by design — 2 invariant') }), ALL_OK)
+  ck(typeof r.threw === 'string' && r.threw.indexOf('claims 2 invariant(s) and carries 1 entry line(s)') !== -1 && r.trace.length === 0,
+    'by-design: a head claiming 2 over one entry refuses before any agent, naming both numbers')
+  r = await runReview(Object.assign({}, DIFF, { checklist: '# recurring-bug-class checklist for a (1 file(s))\n' +
+    '# 0 class(es) selected by an anchor + 0 universal\n\n# by design — 0 invariant(s) this selection touches\n' }), ALL_OK)
+  if (checkNoThrow(r, 'by-design header-only remainder')) {
+    const sp = r.trace.find((t) => t.label === 'synth')
+    const ri = sp ? sp.prompt.slice(sp.prompt.indexOf('RUN INTEGRITY')) : ''
+    ck(r.logs.some((l) => l.indexOf('`checklist` was supplied with no item') !== -1) &&
+      r.logs.indexOf('by-design: none supplied — no caller byDesign and a block of 0') !== -1 &&
+      ri.indexOf('By design: none supplied — no caller byDesign and a block of 0.') !== -1,
+      'by-design: a remainder of header lines alone is zero items, and a block of 0 is said')
+  }
+
   // ==== TOOL-aSightedSkeptic-2 — the skeptic judges each finding's proposed fix as well as its claim ====
   // Every arm is RED against the parent render: its verify prompt shows no fix, its schema has no
   // fixVerdict, its synthesis prints the finder's fix unmarked, and its batch print ignores the fix.
@@ -1223,7 +1270,11 @@ printf '%s\n' "$out"
 # RAISED 175 -> 180 by TOOL-aSightedSkeptic-10: 5 assertions, counted off the block — the synthesis-death
 # log's binding grade and rendered fix (2), the deferred log's binding grade (1), one uncertain answer
 # apart from no verdict (1) and an all-uncertain note (1).
-FLOOR_ASSERTIONS=180
+# RAISED 180 -> 186 by TOOL-aGraftedHelix-3: 6 assertions, counted off the block — the block logged and
+# in RUN INTEGRITY (1), the entry as intended behaviour and never an item (1), a caller byDesign beside a
+# block, logged and named (1) and under its own label (1), the count refusal (1) and the header-only
+# remainder with its block of 0 (1).
+FLOOR_ASSERTIONS=186
 executed=$(printf '%s\n' "$out" | sed -n 's/^---- \([0-9][0-9]*\) passed.*/\1/p' | tail -1)
 if [ -z "$executed" ]; then
   echo "FAIL the runner printed no assertion count at all — it died before its summary line"

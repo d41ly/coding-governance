@@ -30,7 +30,7 @@ set -u
 # no key at all, which the bar reads as a probe that could not answer rather than as a clean set.
 OFFENDERS=0; OFFENDER_KEYS=""
 if [ "${1:-}" = "--offenders" ]; then OFFENDERS=1; exec 3>&1 1>/dev/null; fi
-KIT_MEMORY_TREE_VERSION=2.118   # gov:kit memory-tree@2.118 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
+KIT_MEMORY_TREE_VERSION=2.119   # gov:kit memory-tree@2.119 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 MEMORY_ROOT=memory
@@ -2457,8 +2457,13 @@ fi
 # 17-19 — the bug-class catalogue (delegates to the sibling module). The catalogue's INDEX is
 # generated, every class record declares a gate or says it has none, and a record whose anchors reach
 # only the append-only tree is reachable on paper and dead in practice.
+# The capture is printed on a GREEN run too (TOOL-aGraftedHelix-3 S7), as check 20's is: an invariant
+# guard that cannot be resolved is ANNOUNCED inside the module's green output, and a gate that swallowed
+# it would turn the announcement back into the silent skip it exists to replace.
 if [ "$STAGED" = 0 ]; then
-  if ! got=$("$_PY" "$HERE/gotchas.py" --check 2>&1); then
+  if got=$("$_PY" "$HERE/gotchas.py" --check 2>&1); then
+    [ -z "$got" ] || printf '%s\n' "$got"
+  else
     printf '%s
 ' "$got"; status=1
     [ "$OFFENDERS" = 0 ] || add_offender_keys 17-19 $'\n'"$got"

@@ -184,7 +184,21 @@ non-empty strings. The items are split ROUND-ROBIN over the lenses of the run's 
 lens `(n - 1) % K` in lens order, so each class is swept by exactly one finder, labelled `C<n>`, and
 a finder begins a hit's claim with that label. A lens with no share is told so; skeptics get none. The
 split is logged, and RUN INTEGRITY states it. An absent or itemless checklist logs a `WARNING:` and
-RUN INTEGRITY says no class was swept. The parsed checklist joins the review key.
+RUN INTEGRITY says no class was swept; a string of `# ` header lines alone is itemless, not a refusal.
+The parsed checklist joins the review key.
+
+The string form may end with the checker's by-design block, `# by design — <n> invariant(s) this
+selection touches` and one `- ` line per invariant the change touches. It is CUT OUT before the items
+are parsed, so no lens sweeps intended behaviour as a bug class, and it becomes `byDesign` under the
+label `Intended behaviour — invariants this change touches:`, after a caller's own `byDesign` under
+`Known and tracked — do not re-report:`. Neither replaces the other. A head whose count disagrees with
+its entry lines refuses before any agent spawns. Each source is logged as a `by-design:` line, and
+RUN INTEGRITY's `By design:` clause names the same sources. The array form carries no block.
+
+`unattended-build.js` hands its spec audit a checklist the same way: the subject resolver runs
+`gotchas.py --for-paths` over the paths the specs' `### Files touched` sub-heads name and returns its
+stdout, which the stage forwards as `checklist`; a caller's `checklist` argument wins, and none at
+all logs a `WARNING:`.
 
 `intensity` is `'full'` or `'light'`, and absent it is `'full'`. Only the caller picks it; the harness
 never chooses light for itself, whatever the diff's size or history:

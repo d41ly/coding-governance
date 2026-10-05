@@ -1934,6 +1934,28 @@ n=$((n+1))
 n=$((n+1))
 grep -qF 'row-grammar: NOT MEASURED — memory/backlog/ARCH.md has no LIVE_ROW_PIN entry' <<<"$outy" \
   || { echo "FAIL a green check 20 run swallowed its NOT MEASURED line, so an unarmed live-row pin is silent again"; st=1; }
+# TOOL-aGraftedHelix-3 S7: checks 17-19's capture reaches the operator on a GREEN run too. A young tree
+# holding one invariant whose decision resolves and whose guard is a leg name, with LEG_MANIFEST
+# undeclared: gotchas.py announces the guard NOT resolved at exit 0, and an engine that printed the
+# capture only on failure turned that announcement back into silence. WHAT THIS DOES NOT CHECK: the
+# announcement's wording, which gotchas.py's own self-test owns; only that the green run shows it.
+YI=$TMP/young-invariant
+mkdir -p "$YI/memory/project" "$YI/memory/backlog" "$YI/memory/gotchas" "$YI/bin"
+( cd "$YI" && git init -q . && git config user.email t@t.test && git config user.name t
+  printf 'MEMORY_ROOT=memory\nDISCIPLINES="architecture"\nFAMILIES="architecture:ARCH"\nSPEC_FORMAT_CUTOFF="2026-07-15"\n' > .memory-tree.conf
+  printf '# r\n' > memory/README.md
+  printf '# ARCH backlog\n' > memory/backlog/ARCH.md
+  printf '# stale-header-waiver.txt -- EMPTY is the expected state; the file must exist.\n' > memory/project/stale-header-waiver.txt
+  printf '# d\n\n- ARCH-tYoung-1 · a ruling the invariant cites\n' > memory/DECISIONS.md
+  printf '#!/usr/bin/env bash\n' > bin/young-gate.sh
+  printf -- '---\nname: young-invariant\ndescription: a fixture invariant\nkind: invariant\ndecision: ARCH-tYoung-1\n---\n\n## Looks wrong\nIt looks wrong in `bin/young-gate.sh`.\n\n## Actually\nIt is the ruling.\n\n## Do\nKeep it.\n\n## Do not\nChange it.\n\n## Guarded by\n`young leg`\n' \
+    > memory/gotchas/young-invariant.md
+  git add -A && "$_PY" "$HERE/gen_build_index.py" --write >/dev/null && "$_PY" "$HERE/gotchas.py" --write >/dev/null && git add -A
+  git commit -q -m young-invariant --no-verify )
+outyi=$(cd "$YI" && bash "$SCRIPT" 2>/dev/null); rcyi=$?
+n=$((n+1))
+[ "$rcyi" = 0 ] && grep -qF 'gotchas: memory/gotchas/young-invariant.md guard `young leg` NOT resolved — LEG_MANIFEST is blank' <<<"$outyi" \
+  || { echo "FAIL a green checks 17-19 run swallowed gotchas.py's NOT resolved line (rc=$rcyi), so an unresolvable invariant guard is silent again"; st=1; }
 
 # ---- (c) A tree carrying a .codebase-map.conf. This is the ONLY place check 7's MAP_SUB branch is
 # ----     reachable: every tree above writes no such conf, so `MAP_SUB` is empty throughout and the

@@ -30,7 +30,8 @@ gotcha-classes = ["bounded-through-a-pipe-is-unbounded.md",
   "a-new-leg-trips-a-growing-set-of-meta-gates.md",
   "signal-trap-runs-the-exit-handler-twice.md",
   "async-job-starts-with-sigint-ignored.md",
-  "decision-re-derived-by-a-second-process.md"]
+  "decision-re-derived-by-a-second-process.md",
+  "canary-waits-on-a-rendezvous-not-a-clock.md", "sweep-issues-no-cost-verdict.md"]
 guides = []
 backlog-shards = []
 lexicon-verbs = []

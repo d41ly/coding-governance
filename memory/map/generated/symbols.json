@@ -1768,6 +1768,11 @@
       "file": "tools/runlog/model.py"
     },
     {
+      "id": "check_invariant",
+      "kind": "function",
+      "file": "tools/memory-tree/gotchas.py"
+    },
+    {
       "id": "check_is_root",
       "kind": "function",
       "file": "tools/process-monitor/scope.py"
@@ -3513,6 +3518,16 @@
       "file": "tools/hooks/agent-cap.js"
     },
     {
+      "id": "extractByDesign",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "extractByDesign",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
+    },
+    {
       "id": "extractCommitTarget",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
@@ -4023,6 +4038,11 @@
       "file": "tools/playbook/render_playbook.py"
     },
     {
+      "id": "load_defined_ids",
+      "kind": "function",
+      "file": "tools/memory-tree/gotchas.py"
+    },
+    {
       "id": "load_deploy",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -4061,6 +4081,11 @@
       "id": "load_kit_conf",
       "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"
+    },
+    {
+      "id": "load_leg_names",
+      "kind": "function",
+      "file": "tools/memory-tree/gotchas.py"
     },
     {
       "id": "load_map_tree",
@@ -4921,6 +4946,11 @@
       "id": "parse_row",
       "kind": "function",
       "file": "tools/memory-tree/row_grammar.py"
+    },
+    {
+      "id": "parse_sections",
+      "kind": "function",
+      "file": "tools/memory-tree/gotchas.py"
     },
     {
       "id": "parse_seen",
@@ -6601,6 +6631,11 @@
       "id": "render_build_backlog",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "render_by_design",
+      "kind": "function",
+      "file": "tools/memory-tree/gotchas.py"
     },
     {
       "id": "render_cell",

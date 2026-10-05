@@ -1,6 +1,6 @@
 export const meta = {
   name: 'unattended-build',
-  version: '1.2', // gov:kit unattended-build@1.2 — engine identity (the .template.js is the source; the .js beside it is RENDERED by check-protocol-parity.test.sh --render)
+  version: '1.3', // gov:kit unattended-build@1.3 — engine identity (the .template.js is the source; the .js beside it is RENDERED by check-protocol-parity.test.sh --render)
   description:
     'Runs a build SPEC -> AUDIT -> DISPOSAL as ordered stages of ONE program, then hands the caller an ordered roster and stops. Stage order is a property of control flow rather than of an agent recollection across a context that compacts, and the roster is unreachable unless the audit verdict is terminal. AUDIT is opt-in: with no `specAudit` arg the stage announces itself OFF by declaration and the roster follows SPEC completion.',
   phases: [
@@ -163,6 +163,9 @@ function chunk(a, n) {
 //   subjectRound: <integer>                         // ON A FOLD RE-INVOKE: the round the current subject
 //                                                   //   set was first audited at, copied from the CONVERGING
 //                                                   //   return; keeps the driver's sequence on ONE subject
+//   checklist: "<the checker's stdout>"             // optional: the spec audit's checklist; ABSENT = the
+//                                                   //   resolver's `--for-paths` run over the specs'
+//                                                   //   Files-touched paths, and a WARNING when it has none
 // }
 //
 // THE REVIEW SUBJECT IS KEYED PER SPEC-SET GENERATION (closing review round 1, cluster B). It was the
@@ -451,6 +454,10 @@ const SUBJECTS_SCHEMA = {
         required: ['path', 'blob', 'tree'],
       },
     },
+    // TOOL-aGraftedHelix-3 S9 - OPTIONAL, so a caller-supplied subject set and every stub that predates
+    // them keep working: the checker's stdout over the specs' Files-touched paths, and those paths.
+    checklist: { type: 'string' },
+    checklistPaths: { type: 'array', items: { type: 'string' } },
   },
   required: ['subjects'],
 }
@@ -764,6 +771,15 @@ if (!specAudit) {
 // and cannot watch the file between the check and the read. A caller-supplied set never enters
 // the branch and carries no `tree`, so the compare cannot read it; `badSubject` below grades both.
 let subjects = Array.isArray(a.subjects) ? a.subjects : null
+// TOOL-aGraftedHelix-3 S9 - THE SPEC AUDIT GETS A CHECKLIST. The resolver already runs git per spec, so
+// it also runs the bug-class checker over the paths the specs' `### Files touched` sub-heads name, and
+// the stage forwards its stdout as the audit's `checklist`: the classes, and the by-design block the
+// review harness cuts out of it. The Files-touched paths and never a tool root, because `--for-paths`
+// over a whole kit selects most of the catalogue (TOOL-aWeighedCompass-14). A caller's `checklist`
+// wins, as a caller's `subjects` does. WHAT THIS DOES NOT CHECK: that the agent ran the command it was
+// told to or returned its stdout unaltered; the harness's head-count refusal catches a truncated block.
+let auditChecklist = typeof a.checklist === 'string' ? a.checklist : null
+let auditChecklistFrom = auditChecklist === null ? null : 'the caller\'s checklist argument'
 // SCOPED AFTER A DISPOSAL. With `auditIds` the resolver sees only the promoted units, so the audit
 // reads the specs no spec-audit record names yet and not the whole set a terminal round already
 // closed; the subject key above is what lets the driver accept that round at all.
@@ -783,10 +799,19 @@ if (specAudit && !subjects) {
       '`git hash-object <specPath>` in ' + repo + ' and return both as the full 40-character object ' +
       'names — `blob` and `tree` respectively, one entry per spec. Return ONLY units whose spec ' +
       'exists and whose blob resolves; an unspecced unit is omitted rather than given an invented ' +
-      'hash. Paths are repo-relative and forward-slashed.',
+      'hash. Paths are repo-relative and forward-slashed.\n' +
+      'Then collect every backticked path token under each of those specs\' `### Files touched` sub-head, ' +
+      'spelled with or without ` (estimate)`, and run ONCE over all of them, in ' + repo + ': ' +
+      '`python {{MEMORY_TREE_DIR}}/gotchas.py --for-paths <those paths>`. Return its stdout VERBATIM as ' +
+      '`checklist` and the paths you passed as `checklistPaths`. A spec with no such sub-head adds no path; ' +
+      'with no path at all, omit both fields rather than run the command over nothing.',
     { label: 'audit:subjects:r' + roundNo, phase: 'Audit', schema: SUBJECTS_SCHEMA },
   )
   subjects = (res && Array.isArray(res.subjects)) ? res.subjects : []
+  if (auditChecklist === null && res && typeof res.checklist === 'string' && res.checklist.trim()) {
+    auditChecklist = res.checklist
+    auditChecklistFrom = '--for-paths over ' + (Array.isArray(res.checklistPaths) ? res.checklistPaths.length : 0) + ' path(s)'
+  }
   // THE PRE-FLIGHT, INSIDE THE BRANCH so a supplied `{path, blob}` set never reads as dirty. The
   // field refusal comes first and is distinct from the dirty verdict: the suite's runner evaluates
   // no schema, so a resolver that omits `tree` or abbreviates a side is refused NAMING THE FIELD,
@@ -834,12 +859,19 @@ if (badSubject !== -1) {
   )
 }
 
+// The checklist line is said ONCE per audited round, either way: a missing checklist is a lens set
+// sweeping none of the project's recurring classes, which must never read like one that swept them.
+if (specAudit) {
+  if (auditChecklist !== null) log('audit round ' + roundNo + ': checklist from ' + auditChecklistFrom)
+  else log('WARNING: audit round ' + roundNo + ': no checklist reached the spec audit — the resolver returned none ' +
+    'and the caller passed none, so no lens sweeps the project\'s recurring bug classes or reads its by-design list')
+}
 // `null` WITH THE AUDIT OFF, and null is the right word: the adapter below reads `auRaw` as the callee's
 // return, and the callee was never called. Every check it runs is guarded on `specAudit`, so a null
 // here is never mistaken for the dead sub-workflow the first guard refuses.
 const auRaw = !specAudit ? null : await workflow(
   { scriptPath: '{{KIT_DIR}}/tier2-review.js' },
-  {
+  Object.assign({
     kind: 'spec-audit',
     repo: repo,
     // THE CALLEE'S ROUND IS THE SUBJECT'S, NOT THE INVOCATION'S (closing review round 2, cluster E).
@@ -850,7 +882,7 @@ const auRaw = !specAudit ? null : await workflow(
     round: roundNo - subjectRound + 1,
     reviewDir: reviewDir,
     subjects: subjects,
-  },
+  }, auditChecklist === null ? {} : { checklist: auditChecklist }),
 )
 
 // ===================== THE ADAPTER, REBUILT AGAINST THE CALLEE'S ACTUAL CONTRACT =============

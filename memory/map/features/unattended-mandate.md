@@ -14,7 +14,7 @@ git-hooks = []
 workflow-scripts = []
 skill-engines = []
 rendered-skills = []
-gotcha-classes = []
+gotcha-classes = ["concurrent-runs-are-announced-not-refused.md"]
 guides = []
 backlog-shards = []
 lexicon-verbs = []
@@ -29,9 +29,10 @@ globs = [
 ]
 ```
 
-Split out of `unattended` when that dossier reached its size cap, so it claims no keys: every key it
-touches is claimed there. The split follows a real seam. That dossier is how a run proceeds; this one
-is what lets it start and what it was asked to do.
+Split out of `unattended` when that dossier reached its size cap, so every key it touches is claimed
+there but one: the invariant `concurrent-runs-are-announced-not-refused.md`, a preflight ruling that
+arrived with `unattended` two bytes under its cap (TOOL-aGraftedHelix-3). The split follows a real
+seam. That dossier is how a run proceeds; this one is what lets it start and what it was asked to do.
 
 ## Constraints & why
 

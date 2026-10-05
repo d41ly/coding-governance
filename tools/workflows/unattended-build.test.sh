@@ -1353,6 +1353,28 @@ o=$(run_wf "$NOSUBJ" "$(printf '{"spec:":%s,"audit:subjects":{"subjects":[{"path
 has    "WS15 a resolved subject with no tree THROWS naming the field" "$o" "40-hex tree"
 hasnt_ "WS15 ...and not as a dirty tree" "$o" "Commit the fold"
 
+# ---- TOOL-aGraftedHelix-3 S9: the spec audit is handed a checklist. The resolver returns the checker's
+# ---- stdout over the specs' Files-touched paths, the stage forwards it as `checklist`, a caller's own
+# ---- wins, and an absence is a WARNING with no `checklist` key passed. Each arm read RED first on a
+# ---- staged break: the forward dropped, the precedence reversed, the prompt's instruction deleted.
+GH3_RES='"audit:subjects":{"subjects":[{"path":"s3","blob":"%s","tree":"%s"}],"checklist":"RESOLVERCLX","checklistPaths":["a.sh","b.sh"]}'
+o=$(run_wf "$NOSUBJ" "$(printf '{"spec:":%s,'"$GH3_RES"',"workflow":%s,"audit:record":%s,"dispose:":%s}' "$SPEC_OK" "$B40" "$B40" "$(review_out 0)" "$(rec CONVERGED)" "$DISPOSE_OK")")
+w=$(printf '%s\n' "$o" | grep '^wargs:')
+has    "GH3 the resolver's checklist reaches the spec audit as checklist" "$w" '"checklist":"RESOLVERCLX"'
+has    "GH3 ...and the stage says where it came from" "$o" "log:audit round 2: checklist from --for-paths over 2 path(s)"
+o=$(run_wf "$NOSUBJ" "$(printf '{"spec:":%s,"audit:subjects":{"subjects":[{"path":"s3","blob":"%s","tree":"%s"}]},"workflow":%s,"audit:record":%s,"dispose:":%s}' "$SPEC_OK" "$B40" "$B40" "$(review_out 0)" "$(rec CONVERGED)" "$DISPOSE_OK")")
+has    "GH3 a resolver returning no checklist is a WARNING naming the gap" "$o" "log:WARNING: audit round 2: no checklist reached the spec audit"
+hasnt_ "GH3 ...and no checklist key is passed" "$(printf '%s\n' "$o" | grep '^wargs:')" '"checklist"'
+o=$(run_wf "$(printf '%s' "$NOSUBJ" | sed 's#"slug":"tB",#"slug":"tB","checklist":"CALLERCLX",#')" \
+    "$(printf '{"spec:":%s,'"$GH3_RES"',"workflow":%s,"audit:record":%s,"dispose:":%s}' "$SPEC_OK" "$B40" "$B40" "$(review_out 0)" "$(rec CONVERGED)" "$DISPOSE_OK")")
+w=$(printf '%s\n' "$o" | grep '^wargs:')
+has    "GH3 a caller checklist beside the resolver's is the one the audit receives" "$w" '"checklist":"CALLERCLX"'
+hasnt_ "GH3 ...and the resolver's is not passed" "$w" "RESOLVERCLX"
+p=$(printf '%s\n' "$o" | grep '^prompt:audit:subjects:r2:')
+has    "GH3 the rendered resolver prompt runs --for-paths through the rendered memory-tree path" "$p" \
+    "python ${PFX}${MT_KIT}/gotchas.py --for-paths <those paths>"
+has    "GH3 ...over the paths under the specs' Files touched sub-heads" "$p" '### Files touched'
+
 # ---- F (id 16): an UNVERIFIED finding the stage judges not a defect has a route. `refuted` is
 # ---- optional, bounded by `unverified`, in the sum, and the severity floors stand.
 o=$(run_wf "$UNITS" "$(printf '{"spec:":%s,"workflow":%s,"audit:record":%s,"dispose:":%s}' \
@@ -1459,9 +1481,9 @@ hasnt_ "BT3-AC6 declared: nothing announces the audit off" "$o" "OFF by declarat
 o=$(run_wf "$(printf '%s' "$T_UNITS" | sed 's#"specAudit":"2026-09-20",##; s#"subjects":\[[^]]*\],##')" '{"spec":{"authored":[],"alreadyPresent":[],"refused":[],"summary":"s"}}')
 has    "BT3 attended, OFF, every unit terminal: the exit carries the audit object" "$o" '"audit":{"ran":false,"verdict":"NOT-OWED"'
 has    "BT3 ...with an empty roster, by filtering" "$o" '"roster":[]'
-# ---- AC7: both carriers read 1.2 — the render is byte-compared to the template by the parity leg,
+# ---- AC7: both carriers read 1.3 — the render is byte-compared to the template by the parity leg,
 # ---- so the marker moving in one file and not the other reds there; this arm reads the render.
-has    "BT3-AC7 the render carries the engine version 1.2" "$(sed -n '3p' "$F")" "version: '1.2', // gov:kit unattended-build@1.2"
+has    "BT3-AC7 the render carries the engine version 1.3" "$(sed -n '3p' "$F")" "version: '1.3', // gov:kit unattended-build@1.3"
 
 # ================================== TOOL-dPolishedVitrine-1 — THE HARNESS IS RENDERED AT INSTALL
 # The harness shipped as an ENGINE file, and apply writes those verbatim, so every install path it
@@ -1791,7 +1813,10 @@ fi
 # `n=$((n+1))` sites — the PV-AC12 branch's among them, the one region that can SKIP — are not in
 # the static count, so it is a LOWER bound on what a green run executes. Lower it in a reviewed
 # diff or not at all.
-FLOOR_ASSERTIONS=293
+# RAISED 293 -> 301 by TOOL-aGraftedHelix-3: the eight GH3 sites, counted off the block — the resolver's
+# checklist forwarded and logged (2), its absence warned with no key passed (2), the caller's precedence
+# (2) and the rendered resolver prompt's instruction (2).
+FLOOR_ASSERTIONS=301
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; st=1; }
 # NOTHING RUNS AFTER THE TERMINAL EXIT (TOOL-dUnstalledConvoy-19): the floor cannot see an arm
 # appended past `exit $st`, and neither can check-arms.py or the summary line. One grep can. The

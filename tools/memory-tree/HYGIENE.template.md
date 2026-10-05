@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.118 -->
+<!-- gov:kit memory-tree@2.119 -->
 # {{MEMORY_ROOT}}/ retention & hygiene
 
 `{{MEMORY_ROOT}}/` is the project's AI-first memory: version-controlled, travelling to every node on clone.
@@ -343,11 +343,16 @@ imported, and with a pin set and the kit absent the failure is NAMED, not a trac
 17. **catalogue index freshness** — `gotchas/INDEX.md` byte-matches a fresh render.
 18. **a class declares its resolution** — every `kind: class` record names a gate or says in as many
     words that it has none. Silence is not acceptable: "no gate named" and "gate not yet written" are
-    indistinguishable from outside, and the second one quietly never happens.
+    indistinguishable from outside, and the second one quietly never happens. Every `kind: invariant`
+    record names a `decision:` this corpus DEFINES, carries all five sections non-empty, and opens its
+    `## Guarded by` with `no machine gate` or with backticked tokens alone, each a tracked path or a
+    leg name in the manifest `LEG_MANIFEST` names. A blank key, or an absent id-grammar kit, turns its
+    arm into a `NOT resolved` line printed at exit 0 — announced, never a red and never silent.
 19. **the record can actually fire** — a class record derives at least one anchor or is marked
     `universal`, and a record whose anchors reach ONLY the append-only tree is reported as INERT:
     reachable on paper, dead in practice. The `universal` set is budgeted (`UNIVERSAL_BUDGET`)
-    because every universal record is emitted on EVERY reviewer's checklist.
+    because every universal record is emitted on EVERY reviewer's checklist. An invariant is graded
+    the same way with no universal escape: unanchored or marked `universal` is a finding.
 
 20. **one id, one row per document** — within a single row document (the decision index, a backlog
     shard, and the rotated archive of either) an id appears at most once. An archive is recognised by
@@ -603,6 +608,20 @@ python {{KIT_DIR}}/gotchas.py --for-diff <base>..<head>
 ```
 
 Its stdout IS the checklist. A checklist nobody can finish is not a checklist.
+
+A record is a `kind: class` (the default), a `note`, a `superseded` class, or a `kind: invariant`: a
+ruling a reviewer keeps mistaking for a bug. An invariant carries a `decision:` key naming the ruling
+and five sections, `## Looks wrong`, `## Actually`, `## Do`, `## Do not` and `## Guarded by`; its
+anchors select it exactly as a class's do. It is never a checklist item. The checklist ends with the
+by-design block instead, printed on every non-empty selection, `0` included:
+
+```text
+# by design — 1 invariant(s) this selection touches
+- <name> — <looks wrong> → <actually> (<decision id>)
+```
+
+The review harness cuts that block out of `checklist` and hands it to every lens and skeptic as
+intended behaviour, so a reviewer refutes a finding the ruling covers instead of re-reporting it.
 
 ## Codebase-map interop
 
