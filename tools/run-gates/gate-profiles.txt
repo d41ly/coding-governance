@@ -41,8 +41,12 @@
 #                refused. The width is still chosen once, from RAM, at start; this watches what the
 #                legs actually do to it. A hold ends when the reading falls to the threshold, when
 #                nothing is left running, when the reading vanishes, when the wall fires, or at the
-#                first leg completion after `GATE_MEMPAUSE_HOLD` seconds (300), so it only ever
-#                narrows the pool and can never deadlock it: the knob costs speed, never a leg.
+#                first leg completion after the runner's `MEMPAUSE_HOLD` seconds, which
+#                `GATE_MEMPAUSE_HOLD` overrides, so it only ever narrows the pool and can never
+#                deadlock it: the knob costs speed, never a leg. Every row below declares 90: node
+#                `a` read 62 % used at rest on 2026-10-05, so 90 leaves a bar's own legs room and
+#                catches the thrash a second bar or a pooled suite run beside it causes. Each bar's
+#                `memory:` line prints the peak its decisions read, the figure to move it by.
 #                The reading is `/proc/meminfo` (`MemAvailable`, or `MemFree` where there is none,
 #                which on MSYS is Windows' own available figure) and the cgroup's usage over its
 #                limit, the HIGHER of the two; a host with neither reads INERT and says so.

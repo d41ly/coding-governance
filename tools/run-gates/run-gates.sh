@@ -30,7 +30,7 @@
 # REPORTING is always manifest order, so the output is byte-stable whatever the width.
 set -u
 KIT_RUN_GATES_VERSION=1.26   # gov:kit run-gates@1.26
-# 1.25 -> 1.26: the profile knob `mempause`, every shipped row at 90: dispatch HOLDS while used memory
+# 1.25 -> 1.26: the profile knob `mempause`, on every shipped row: dispatch HOLDS while used memory
 # is above it and a leg runs (TOOL-aGraftedHelix-7). The run record gains `pauses`, the verdict
 # `paused` and `paused_s`, the header and `--print-profile` `mempause`, the profile line a field, and
 # stdout one `memory:` line; a table carrying the knob is refused by a runner older than this one.

@@ -121,9 +121,9 @@ fail=0
 # than written as a literal. A hardcoded count is the recorded failure this leg exists for.
 # 132, not 134: arms 1c/1d/1e SKIP on a host with no runnable `timeout -k`, so the floor is the
 # skipped-host count. A floor set to the lucky-host figure reds every box without coreutils.
-FLOOR_ASSERTIONS=308
-# RAISED 278 -> 308 by TOOL-aGraftedHelix-7: arm 3a's `memory: ` presence check and section 11's
-# twenty-nine memory-pause assertions, the FIFO half of 11g counted on a host with no mkfifo as well.
+FLOOR_ASSERTIONS=309
+# RAISED 278 -> 309 by TOOL-aGraftedHelix-7: arm 3a's `memory: ` presence check and section 11's
+# thirty memory-pause assertions, the FIFO half of 11g counted on a host with no mkfifo as well.
 # RAISED 273 -> 278 by TOOL-dUnstuckLanding-16: section 7's five new assertions (AC1's attr line and
 # stamp, AC2's unbounded stamp, its OWN attr line and absent stamp), while the flipped AC17
 # and F1 assertions keep their count. None is host-conditional.
@@ -166,6 +166,11 @@ LEGS_FILE="${GATE_LEGS:-$(dirname "$KITREL")/gate-legs.json}"
 # arms reading those bars red on a runner that was fine. LEGS_FILE keeps the inherited manifest for
 # the arms that grade it; no scratch bar reads it, and one that needs a manifest names its own.
 unset GATE_LEGS
+# THE MEMORY PAUSE IS OFF for every scratch bar here unless an arm sets it (TOOL-aGraftedHelix-7). The
+# shipped table turns it on, and it reads the HOST's memory: on a box above the threshold it narrows
+# the pool, and the arms that count concurrent legs through a rendezvous would red for the box rather
+# than the runner. Section 11 drives it over fixture readings, setting the knob per bar.
+export GATE_MEMPAUSE=0
 
 # 1. manifest well-formed: non-empty list; every leg has a non-empty name, an argv with a launcher
 #    AND a script (len >= 2), and argv[0] in the allowed set. An empty name is the runner's
@@ -3023,6 +3028,12 @@ check_mp_value "AC13 its open episode closes wall" "$(read_mp_ends ac13)" "wall 
 check_mp_value "AC13 the verdict file carries paused and paused_s" \
   "$(awk -F'\t' '$1 == "paused" || $1 == "paused_s" { c++ } END { print c + 0 }' "$(resolve_mp_record ac13)/verdict")" 2
 check_mp_value "AC13 stdout carries one memory: line" "$(printf '%s\n' "$MP_OUT" | grep -c '^memory:')" 1
+# S5's THIRD verdict writer, the refusal of a manifest whose every leg is held, carries both keys too:
+# AC5 reads the ordinary writer and AC13 the wall's, and a key dropped from this one read green.
+printf '[{"name": "K5", "argv": ["bash", "fx/ok.sh"], "subject": "kit"}]\n' > "$MP/x/held.json"
+run_mp_bar held "$MP/x/held.json"
+check_mp_value "S5 the held-only refusal's verdict file reads REFUSED and carries paused and paused_s" \
+  "$(awk -F'\t' '$1 == "verdict" { v = $2 } $1 == "paused" || $1 == "paused_s" { c++ } END { print v "|" c + 0 }' "$(resolve_mp_record held)/verdict" 2>/dev/null)" "REFUSED|2"
 
 # 11g. AC14 — the FORCED-PROGRESS branch decides too. First the block alone: an episode open, the
 #      reading above the threshold, `check_dispatch_pause 0` dispatches and closes it `drained`.

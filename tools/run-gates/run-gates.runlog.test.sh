@@ -58,6 +58,9 @@ ARMS_SEEN=" "
 unset GATE_BASE GATE_FULL GATE_REUSE GATE_JOBS GATE_PROFILES GATE_PROFILE GATE_RUN_ID GATE_SELFTESTS \
   GATE_WALL GATE_LEGS GATE_TURNSTILE GATE_TURNSTILE_HELD GATE_RUN_KEEP GOV_RUNLOG \
   GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE GIT_COMMON_DIR
+# THE MEMORY PAUSE IS OFF for the same reason (TOOL-aGraftedHelix-7): the copied table turns it on and it
+# reads the HOST's memory, which is no input of any arm here.
+export GATE_MEMPAUSE=0
 
 check() { # name · got · want
   n=$((n + 1))

@@ -137,6 +137,10 @@ print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
 LIB_DIR=$(resolve_kit_dir "$DC_PY" lib resolve-python.sh "$HERE") || exit 2
 LIB="${LIB_DIR##*/}"
 tmp="$(mktemp -d)"; trap 'rm -rf "$tmp"' EXIT
+# THE MEMORY PAUSE IS OFF for every bar here (TOOL-aGraftedHelix-7): the shipped table turns it on and
+# it reads the HOST's memory, so a box above its threshold would narrow these bars' pools and move the
+# census and timing arms for a reason that is the box's. The canary drives the pause over fixtures.
+export GATE_MEMPAUSE=0
 bad=0
 # the run-gates promotion spec's S11. The count is INCREMENTED where the assertions actually happen -- in the
 # two helpers every arm routes through -- so it can never drift from the arms the way a hardcoded

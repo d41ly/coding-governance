@@ -203,15 +203,17 @@ dispatches that leg.
 
 The width is chosen once, from RAM, at start; the `mempause` knob watches what the legs then do to
 memory. Before every dispatch the runner reads used memory and HOLDS that dispatch while the reading
-sits above the threshold and a leg is still running. Every shipped row declares `mempause=90`; a row
-that omits it, or `GATE_MEMPAUSE=0`, is off. `GATE_MEMPAUSE=<pct>` overrides the row alone, any other
-override prints one `run-gates: NOTE` and leaves the pause off, and a table value above 100 refuses.
+sits above the threshold and a leg is still running. Every shipped row declares one, and the table
+argues its figure; a row that omits it, or `GATE_MEMPAUSE=0`, is off. `GATE_MEMPAUSE=<pct>` overrides
+the row alone, any other override prints one `run-gates: NOTE` and leaves the pause off, and a table
+value above 100 refuses.
 
 **A hold always ends**, so the knob costs speed and never a leg. Nothing polls: each decision happens
 when a leg completes, and a hold is released when the reading falls to the threshold (`fell`), when
 no leg is left running (`drained`), when the reading vanishes (`unread`), at the first completion
-after `GATE_MEMPAUSE_HOLD` seconds, 300 by default (`bound`), or by the wall (`wall`). Under pressure
-that never falls the pool drains toward width 1 and keeps moving; the serial retry is never held.
+after the block's `MEMPAUSE_HOLD` seconds, which `GATE_MEMPAUSE_HOLD` overrides (`bound`), or by the
+wall (`wall`). Under pressure that never falls the pool drains toward width 1 and keeps moving; the
+serial retry is never held.
 
 **The reading** is `/proc/meminfo`'s `MemTotal` against `MemAvailable`, or `MemFree` where the file
 has none, which on MSYS is Windows' own available figure; and the cgroup's usage over its limit under

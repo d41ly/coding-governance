@@ -208,7 +208,7 @@ world moved past is indistinguishable from one nobody measured. `TOOL-dDerivedDo
 
 **Only a census-clean reading argues a ceiling.** A `.leg` row's eighth field, `foreign`, is the most foreign gate-work trees the run's `census` saw, or `unknown`; it misses other load and Windows processes no MSYS shell spawned. `derive-ceilings.py` sets the rest aside as `contended` or `uncensused`; `--observed` stays admitted, uncensused. `cleanup` stops the turnstile ticker later censuses counted. `TOOL-aGraftedHelix-5`.
 
-**A dispatch waits out memory pressure, and every wait ends.** `mempause=90` holds the next leg while used memory sits above it and a leg runs; the `mempause_sh` block both dispatchers carry, parity-graded, releases a hold `fell`, `drained`, `unread`, `bound` or `wall`, so a pause narrows a pool and never deadlocks it. Each episode is a `pauses` row, and `derive-ceilings.py` sets its legs' readings aside as `paused`. `TOOL-aGraftedHelix-7`.
+**A dispatch waits out memory pressure, and every wait ends.** `mempause` holds the next leg while used memory is above its row's threshold and a leg runs; the `mempause_sh` block both dispatchers carry releases it `fell`, `drained`, `unread`, `bound` or `wall`, so a pool narrows and never deadlocks. Each episode is a `pauses` row, and `derive-ceilings.py` sets its legs' readings aside as `paused`. `TOOL-aGraftedHelix-7`.
 
 **A waiting bar beats.** On every tick it waits, the turnstile rewrites `gate-queue-heartbeat` under its own worktree's git dir, beside `gate-logs/`, and never removes it, so an out-of-process liveness reader sees a queued bar move before its first leg lands; the unattended driver's clock reads its mtime. `TOOL-dDerivedDocket-64`.
 
